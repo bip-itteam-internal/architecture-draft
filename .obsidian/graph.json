@@ -1,0 +1,79 @@
+{
+  "collapse-filter": false,
+  "search": "",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    {
+      "query": "file:HRIS",
+      "color": {
+        "a": 1,
+        "rgb": 14401024
+      }
+    },
+    {
+      "query": "file:CORE",
+      "color": {
+        "a": 1,
+        "rgb": 16711680
+      }
+    },
+    {
+      "query": "file:GA",
+      "color": {
+        "a": 1,
+        "rgb": 4513553
+      }
+    },
+    {
+      "query": "file:???",
+      "color": {
+        "a": 1,
+        "rgb": 0
+      }
+    },
+    {
+      "query": "file:Finance",
+      "color": {
+        "a": 1,
+        "rgb": 2025167
+      }
+    },
+    {
+      "query": "file:External",
+      "color": {
+        "a": 1,
+        "rgb": 16711880
+      }
+    },
+    {
+      "query": "file:Vendor",
+      "color": {
+        "a": 1,
+        "rgb": 16711880
+      }
+    },
+    {
+      "query": "file:WH",
+      "color": {
+        "a": 1,
+        "rgb": 2140670
+      }
+    }
+  ],
+  "collapse-display": false,
+  "showArrow": true,
+  "textFadeMultiplier": -3,
+  "nodeSizeMultiplier": 1.01875,
+  "lineSizeMultiplier": 1.80989583333333,
+  "collapse-forces": false,
+  "centerStrength": 0.5,
+  "repelStrength": 10.8333333333333,
+  "linkStrength": 1,
+  "linkDistance": 189,
+  "scale": 1,
+  "close": false
+}

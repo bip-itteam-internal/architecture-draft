@@ -1,0 +1,209 @@
+{
+  "main": {
+    "id": "bbb1d3f791dafed0",
+    "type": "split",
+    "children": [
+      {
+        "id": "5cd1f5d6addacb5d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "004aed8e1b2b9d80",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Important Readme.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Important Readme"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "6a5fc95f08ca9422",
+    "type": "split",
+    "children": [
+      {
+        "id": "42beccb0fd02cfc2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4dc241a992e84114",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "98d56585407da567",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "2e7df4666a8e910e",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 284.5
+  },
+  "right": {
+    "id": "ffed48240b79686d",
+    "type": "split",
+    "children": [
+      {
+        "id": "fb3152aeae5aa912",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "410e2fd00e2d0edd",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "e42fd118ae949168",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Human Resource Department/Analysis Dashboard.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Analysis Dashboard"
+            }
+          },
+          {
+            "id": "fbcbddf450bbcfe9",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "9b4ec62b54c43d7f",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Human Resource Department/Analysis Dashboard.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Analysis Dashboard"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "004aed8e1b2b9d80",
+  "lastOpenFiles": [
+    "Finance System/Finance.md",
+    "Human Resource Information System/HRIS - Analysis.md",
+    "Warehouse/WH - Outbound (Sending).md",
+    "Finance System",
+    "Untitled.md",
+    "Unknown or not listed/Untitled.md",
+    "Warehouse/WH - Management System.md",
+    "Warehouse/WH - Inbound (Receiving).md",
+    "Important Readme.md",
+    "Unknown or not listed/??? - Attendance System.md",
+    "Unknown or not listed/??? - Dynamic Task Tracker.md",
+    "Unknown or not listed/??? - Internal Inventory.md",
+    "Unknown or not listed/??? - Purchase Master Data.md",
+    "Unknown or not listed/??? - Sales Master Data.md",
+    "Unknown or not listed/??? - Warehouse Master Data.md",
+    "Human Resource Information System/HRIS - Payroll.md",
+    "Human Resource Information System/HRIS - Attrition.md",
+    "Core System or Databases/CORE - Employees Master Data.md",
+    "General Affairs/GA - Inventory Management.md",
+    "Human Resource Information System/HRIS - Training Program.md",
+    "Human Resource Information System/HRIS - Personalia.md",
+    "Human Resource Information System/HRIS - Interrelationship Matrices.md",
+    "Human Resource Information System/HRIS - Key Performance Index.md",
+    "Warehouse",
+    "Third-party Software/Vendor - CRM.md",
+    "Third-party Software/External - Accurate.md",
+    "Third-party Software",
+    "Unknown or not listed",
+    "Untitled.canvas",
+    "Human Resource Information System/Required Information",
+    "Core System or Databases",
+    "Human Resource Department/Analysis Dashboard/Talent Acquisition.md",
+    "Human Resource Department/Analysis Dashboard",
+    "Human Resource Information System",
+    "General Affairs"
+  ]
+}
