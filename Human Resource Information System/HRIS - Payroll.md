@@ -29,9 +29,12 @@
 ## Requirements
 
 - [ ] Employees master data (look up reference)
+	- [ ] Payment bank details
 - [ ] Attendance information and breakdowns
+	- This is required to grab information for normal and overtime working hours
 
 ## Dependencies
 
+- [ ] [[HRIS - BASE System]]
 - [ ] [[CORE - Employees Master Data]]
 - [ ] [[HRIS - Attendance System]]

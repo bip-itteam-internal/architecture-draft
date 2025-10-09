@@ -25,5 +25,6 @@
 
 ## Dependencies
 
+- [ ] [[HRIS - BASE System]]
 - [ ] [[CORE - Employees Master Data]]
 - [ ] [[GA - Inventory Management]]
