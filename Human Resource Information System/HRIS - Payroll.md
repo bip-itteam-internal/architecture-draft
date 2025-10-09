@@ -29,4 +29,4 @@
 
 **Dependencies**
 - [ ] [[CORE - Employees Master Data]]
-- [ ] [[[...] - Attendance System]]
+- [ ] [[HRIS - Attendance System]]

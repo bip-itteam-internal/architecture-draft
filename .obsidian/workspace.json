@@ -13,12 +13,26 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Unknown or not listed/[...] - Attendance System.md",
+                "file": "Human Resource Information System/HRIS - Attendance System.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "[...] - Attendance System"
+              "title": "HRIS - Attendance System"
+            }
+          },
+          {
+            "id": "be51ff1b813576b0",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Human Resource Information System/HRIS - Attrition.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "HRIS - Attrition"
             }
           }
         ]
@@ -94,7 +108,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Unknown or not listed/[...] - Attendance System.md",
+                "file": "Human Resource Information System/HRIS - Attendance System.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +118,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for [...] - Attendance System"
+              "title": "Backlinks for HRIS - Attendance System"
             }
           },
           {
@@ -171,19 +185,19 @@
   },
   "active": "07328d35b9b952b1",
   "lastOpenFiles": [
-    "Unknown or not listed/[...] - Attendance System.md",
+    "Human Resource Information System/HRIS - Attrition.md",
+    "Human Resource Information System/HRIS - Attendance System.md",
+    "Human Resource Information System/HRIS - Key Performance Index.md",
+    "Human Resource Information System/HRIS - Interrelationship Matrices.md",
+    "Human Resource Information System/HRIS - Analysis.md",
+    "Finance System/Finance.md",
+    "Core System or Databases/CORE - Employees Master Data.md",
     "Third-party Software/External - Accurate.md",
     "Third-party Software/Vendor - CRM.md",
     "Human Resource Information System/HRIS - Personalia.md",
     "Human Resource Information System/HRIS - Training Program.md",
     "Human Resource Information System/HRIS - Payroll.md",
-    "Human Resource Information System/HRIS - Key Performance Index.md",
-    "Human Resource Information System/HRIS - Interrelationship Matrices.md",
-    "Human Resource Information System/HRIS - Analysis.md",
-    "Human Resource Information System/HRIS - Attrition.md",
     "General Affairs/GA - Inventory Management.md",
-    "Finance System/Finance.md",
-    "Core System or Databases/CORE - Employees Master Data.md",
     "Unknown or not listed/[...] - Warehouse Master Data.md",
     "Unknown or not listed/[...] - Purchase Master Data.md",
     "Unknown or not listed/[...] - Sales Master Data.md",
