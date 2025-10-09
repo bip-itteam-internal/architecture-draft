@@ -1,0 +1,8 @@
+# Ignore some of obsidian users settings
+.obsidian/appearance.json
+.obsidian/workspace.json
+.obsidian/hotkeys.json
+
+# Ignore community plugins
+.obsidian/community-plugins.json
+.obsidian/plugins/*

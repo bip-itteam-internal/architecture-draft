@@ -1,9 +1,11 @@
-**Description**
+## Description
+
 *This dashboard listed all attrition from internal departments that include added and departed employees*
 
 [Example of this system](https://drive.google.com/drive/folders/17RNDBtMwKCU_tuAiLZbwCgFp-xwwmzuz)
 
-**Features**
+## Features
+
 - Dashboard
 	- Overview of everything excellent for reporting to stakeholders
 	- View per-departments
@@ -20,13 +22,16 @@
 - Quality assurance form
 	- This document will be passed from Human Resource Department to Accounting
 
-**Pending Details**
+## Pending Details
+
 - [ ] More information about what affect payroll daily controls for employees
 
-**Requirements**
-- [ ] Employees master data (look up reference)
-- [ ] Key performance index form creation based on departments (linked into employee data)
+## Requirements
 
-**Dependencies**
+- [ ] Employees master data (look up reference)
+- [ ] Attendance information and breakdowns
+
+## Dependencies
+
 - [ ] [[CORE - Employees Master Data]]
 - [ ] [[HRIS - Attendance System]]

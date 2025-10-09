@@ -19,3 +19,5 @@ We could look into [Obsidian Pricing](https://obsidian.md/pricing) for collabora
 ## Can we publish this into a wikipage?
 
 Yes, either we pay with the said [Obsidian Pricing](https://obsidian.md/pricing) or we could use [this community plugins](https://forum.obsidian.md/t/html-export-plugin/51743)
+
+Currently there is accessible offline wikipage under `.export/architecture-draft.html`

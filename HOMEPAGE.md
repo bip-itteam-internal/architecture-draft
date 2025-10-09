@@ -1,5 +1,6 @@
-*Everything in here is is a quick overview and a rough idea on how the system looks like and how it interact with one another*
-*This needs more discussion and collaboration together to refine and build on it*
+## Notices
+
+*Everything in here is is a quick overview and a rough idea on how the system looks like and how it interact with one another, this required more open discussion together*
 
 ## System lists, priorities and technical architectures
 

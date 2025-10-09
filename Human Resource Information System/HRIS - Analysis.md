@@ -1,10 +1,12 @@
-**Description**
+## Description
+
 *This dashboard will help Human Resource to manage employees from the start to end of their careers on this company*
 
 [Example of this system](https://docs.google.com/spreadsheets/d/14dDRxTWME4N4-TY42BPZFFaXYQOTTZxV/edit?gid=1164498077#gid=1164498077)
 
-**Features**
-- Task tracker (on all subsystems)
+## Features
+
+-  Task tracker (on all subsystems)
 	- Overview of everything that include current, ongoing and finished analysis
 	- This task might ended sooner than expected
 - Dashboard
@@ -14,7 +16,8 @@
 - Demographics
 	- Information in details regarding termination gender, type and reasons (additional easy lookup for departure per departments)
 
-**Subsystems**
+## Subsystems
+
 - Talent acquisition
 - Interview
 	- This is per-person
@@ -35,7 +38,8 @@
 	- Administration clearance (check into Finance department)
 	- Account deactivation (check into IT department)
 
-**Requirements**
+## Requirements
+
 - [ ] Task tracker creation based on subsystems
 	- The flows of all segments are static documents
 - [ ] Employees master data (look up reference)
@@ -43,7 +47,8 @@
 - [ ] Employee administration clearance
 - [ ] Employee account status
 
-**Dependencies**
+## Dependencies
+
 - [ ] [[CORE - Employees Master Data]]
 - [ ] [[[...] - Internal Inventory]]
 	- This is required for on-boarding, remote management and off-boarding

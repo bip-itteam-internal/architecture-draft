@@ -29,7 +29,7 @@
       }
     },
     {
-      "query": "file:???",
+      "query": "file:[...]",
       "color": {
         "a": 1,
         "rgb": 0

@@ -1,9 +1,15 @@
-**Description**
+## Notes
+
+*CORE System structure and functionality is still work in progress*
+
+## Description
+
 *This master data manage every employees data including additional linked documents or data from other system into this master data system*
+
+## Data Structures
 
 *All data below need to be rechecked and reconfirmed*
 
-**Below are list of known entry in the database**
 - Employee ID
 - Employee Department
 - Full name
