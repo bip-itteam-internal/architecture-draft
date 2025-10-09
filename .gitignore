@@ -2,6 +2,7 @@
 .obsidian/appearance.json
 .obsidian/workspace.json
 .obsidian/hotkeys.json
+.obsidian/graph.json
 
 # Ignore community plugins
 .obsidian/community-plugins.json
