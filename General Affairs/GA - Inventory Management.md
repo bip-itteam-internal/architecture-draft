@@ -24,6 +24,6 @@ IMO, The name is misleading as this didn't manage fully for [[??? - Internal Inv
 - [ ] Sales data from finance
 
 **Dependencies**
-- [ ] [[??? - Warehouse Master Data]]
-- [ ] [[??? - Purchase Master Data]]
-- [ ] [[??? - Sales Master Data]]
+- [ ] [[[...] - Warehouse Master Data]]
+- [ ] [[[...] - Purchase Master Data]]
+- [ ] [[[...] - Sales Master Data]]

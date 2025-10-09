@@ -45,6 +45,6 @@
 
 **Dependencies**
 - [ ] [[CORE - Employees Master Data]]
-- [ ] [[??? - Internal Inventory]]
+- [ ] [[[...] - Internal Inventory]]
 	- This is required for on-boarding, remote management and off-boarding
-- [ ] [[??? - Dynamic Task Tracker]]
+- [ ] [[[...] - Dynamic Task Tracker]]

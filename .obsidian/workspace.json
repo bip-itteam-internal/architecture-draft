@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "5cd1f5d6addacb5d",
+        "id": "74beddb04b4e49e0",
         "type": "tabs",
         "children": [
           {
-            "id": "004aed8e1b2b9d80",
+            "id": "91de363cd94249ef",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Important Readme.md",
+                "file": "Human Resource Information System/HRIS - Analysis.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Important Readme"
+              "title": "HRIS - Analysis"
             }
           }
         ]
@@ -168,9 +168,18 @@
       "bases:Create new base": false
     }
   },
-  "active": "004aed8e1b2b9d80",
+  "active": "91de363cd94249ef",
   "lastOpenFiles": [
+    "General Affairs/GA - Inventory Management.md",
+    "Unknown or not listed/[...] - Warehouse Master Data.md",
+    "Unknown or not listed/[...] - Purchase Master Data.md",
+    "Unknown or not listed/[...] - Sales Master Data.md",
     "Finance System/Finance.md",
+    "Core System or Databases/CORE - Employees Master Data.md",
+    "General Affairs/GA - Inventory Management.md~",
+    "Unknown or not listed/[...] - Attendance System.md",
+    "Human Resource Information System/HRIS - Payroll.md",
+    "Important Readme.md",
     "Human Resource Information System/HRIS - Analysis.md",
     "Warehouse/WH - Outbound (Sending).md",
     "Finance System",
@@ -178,30 +187,23 @@
     "Unknown or not listed/Untitled.md",
     "Warehouse/WH - Management System.md",
     "Warehouse/WH - Inbound (Receiving).md",
-    "Important Readme.md",
     "Unknown or not listed/??? - Attendance System.md",
     "Unknown or not listed/??? - Dynamic Task Tracker.md",
     "Unknown or not listed/??? - Internal Inventory.md",
     "Unknown or not listed/??? - Purchase Master Data.md",
     "Unknown or not listed/??? - Sales Master Data.md",
     "Unknown or not listed/??? - Warehouse Master Data.md",
-    "Human Resource Information System/HRIS - Payroll.md",
     "Human Resource Information System/HRIS - Attrition.md",
-    "Core System or Databases/CORE - Employees Master Data.md",
-    "General Affairs/GA - Inventory Management.md",
     "Human Resource Information System/HRIS - Training Program.md",
     "Human Resource Information System/HRIS - Personalia.md",
     "Human Resource Information System/HRIS - Interrelationship Matrices.md",
     "Human Resource Information System/HRIS - Key Performance Index.md",
     "Warehouse",
-    "Third-party Software/Vendor - CRM.md",
-    "Third-party Software/External - Accurate.md",
     "Third-party Software",
     "Unknown or not listed",
     "Untitled.canvas",
     "Human Resource Information System/Required Information",
     "Core System or Databases",
-    "Human Resource Department/Analysis Dashboard/Talent Acquisition.md",
     "Human Resource Department/Analysis Dashboard",
     "Human Resource Information System",
     "General Affairs"
