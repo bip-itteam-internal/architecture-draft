@@ -2,13 +2,6 @@
 
 *This database kept record of attendance from employees, therefore this need reference link into employee data and their work schedule to assign proper status*
 
-## Details
-
-- How will the data from fingerprint reader machine (Solution X105) be integrated to here?
-	- We can use their SDK and create our own script (https://drive.google.com/file/d/1MSV_OdJRTjIlcrKOrw1t0bbpT3vS4GoF/view?usp=sharing) or 3rd party (there are some open source script) to pull attendance data every day
-	- Store them in a "Raw Database"
-	- Fingerprint machine is a "Fallback" in case it's needed
-
 ## Data Structures
 
 *All data below need to be rechecked and reconfirmed*
