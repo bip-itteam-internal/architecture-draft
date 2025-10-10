@@ -30,7 +30,7 @@
 - Work hour calculation for Payroll system
 	- Normal working hour
 	- Overtime working hour
-	
+
 ## Dependencies
 
 - [ ] [[CORE - Employees Master Data]]
