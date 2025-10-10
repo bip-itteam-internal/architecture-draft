@@ -14,6 +14,18 @@
 
 *All data below need to be rechecked and reconfirmed*
 
+### Consideration 
+
+This database need something that will be used for UUID and act as Foreign Keys as well, pick one below what is best for this system:
+- Auto increment like standard SQL
+	- This is hard to get right as this need to be sync with the latest data insertion, even if we Single Source of Truth this is still tricky to sync
+- Natural keys
+	- Use something that is already from data below, possibly Employee ID
+- UUID/GUID
+	- Easy creation but accessing this would be nightmare and probably slow? The default one is 128-bit but we can start from 16-bit and step that up if collision happen
+- Snowflake (custom-uuid)
+	- Whatever bit-size data that has a structure from the system, the usual size is 64-bit with this composition: 1-bit signed, 41-bit timestamp, 10-bit from database/system creation, 12-bit randoms or from millisecond 
+
 ### Personal Data
 
 - Full name
@@ -36,6 +48,9 @@
 - Position or title
 - Employment type
 - Payment bank details
+- Additional documents
+	- Probation start
+	- Probation end
 
 #### Attendance Data
 
