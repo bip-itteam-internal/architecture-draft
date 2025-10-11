@@ -4,7 +4,12 @@
 
 ## Description
 
-This master data manage every employees data including additional linked documents or data from other system into this master data system. We can call it "Employee module". This module will have it's own Backend and Database. 
+This master data manage every employees data including additional linked documents or data from other system into this master data system. 
+
+Rename ideas since this has it's own back-end and databases
+- **"Employee module"** following the usage of of this system
+- **"Employee service"** following micro-services naming convention
+
 ## Pending Details
 
 - [ ] Who are responsible for this master data accuracy and completeness?

@@ -23,4 +23,5 @@ We could look into [Obsidian Pricing](https://obsidian.md/pricing) for collabora
 Yes, either we pay with the said [Obsidian Pricing](https://obsidian.md/pricing) or we could use [this community plugins](https://forum.obsidian.md/t/html-export-plugin/51743)
 
 Currently there is accessible offline wikipage under `.export/architecture-draft.html`
-Wikipage are now active and live on the link description or [click here](http://architecture.bharatainternasional.com/)!
+
+Wikipage are now [active here](http://architecture.bharatainternasional.com/)

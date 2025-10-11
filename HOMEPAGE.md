@@ -46,7 +46,7 @@ Below this will be system list and their priority, so we can aim to create the c
 
 Technical architecture of the said system will be discussed later on in details
 
-## System Prototype Use-case
+## Examples
 
 ### Example case
 
@@ -56,3 +56,20 @@ Employee wanted to login into HRIS system and access their attendance view
 2. Select go into HRIS
 3. Select attendance feature and click view my attendance options
 
+![[usecase-example.png]]
+
+Main portal will accommodate as the HUB of the application to other systems
+
+### Example request
+
+This is type of request that we will probably have 
+1. Single-fetch database request
+	- This is where you fetch single database information, normal and straight forward
+2. Multi-fetch database request
+	- This is where you fetch 2 or more database, middle-ware has to make sure all fetch are successful and return processed or cleaned version of the data
+- Single-fetch chained/propagate request
+	- Request into database endpoints, and that endpoint will chain/propagate to another required database as cross-validation for example and cleaning the data before returning to the middle-ware
+
+Image example below for (2) and (3) on how the data flow will looks like
+
+![[endpoint-example.png]]
