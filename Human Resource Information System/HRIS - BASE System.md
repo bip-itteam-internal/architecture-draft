@@ -10,5 +10,5 @@
 
 ## Dependencies
 
-- [ ] [[CORE - Employees Master Data]]
-- [ ] [[CORE - System Authentication]]
+- [ ] [[APP - Main Application]]
+- [ ] [[CORE - API Master Gateway]]

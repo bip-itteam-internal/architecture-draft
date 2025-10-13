@@ -2,24 +2,32 @@
 
 *Everything in here is is a quick overview and a rough idea on how the system looks like and how it interact with one another, this required more open discussion together*
 
+## What is APP?
+
+APP or application are the basic platform and landing page that will be web and/or mobile application, this is the portal to access another BASE System within the application
+
 ## What is CORE System?
 
-CORE system are basically Databases with API endpoints that accommodate required access to other system, need more discussion on this as well
+CORE system are the main API Gateway to other MODULE on the system, currently there is only one: CORE - System Authentication
+
+## What is MODULE?
+
+MODULE system are basically Databases with API endpoints that accommodate required access to other system, this access is restricted
 
 This database will be partitioned from the CORE - Employee Master Data to others CORE system with foreign keys
 
 ### Consideration
 
 - What kind of database to use
-	- Multiple database for each CORE system (NoSQL)
+	- Multiple database for each MODULE system (NoSQL)
 		- NoSQL database mean everything is flexible
 		- Reroute and role assignment on each system would be easier
-		- Clear differentiation between CORE system
+		- Clear differentiation between MODULE system
 		- Other system still able to function if their dependencies are met
-		- Foreign keys connection need to be carried out manually by back-end for example: CORE - Employee Master Data as Single Source of Truth, which means any inconsistency will be discarded and return as error
-	- Single database with multiple table representing each CORE system
-		- SQL database mean everything is strict
-		- Replication and backup is easier compare to multiple databases
+		- Foreign keys connection need to be carried out manually by back-end for example: MODULE - Employee Master Data as Single Source of Truth, which means any inconsistency will be discarded and return as error
+	- ~~Single database with multiple table representing each MODULE system~~
+		- ~~SQL database mean everything is strict~~
+		- ~~Replication and backup is easier compare to multiple databases~~
 - To have 1 read/write database and 2 read-only database (for each database)
 - Database replicate for daily/hourly backups
 - Database redundancy if required so failed access into the main could be redirected to alternative active database (low-priority as this is quite tricky to implement)
@@ -32,13 +40,14 @@ BASE system are base landing page and authentication for users to be able to use
 
 This is still an assumption/prediction and required further confirmation
 
-| Seq. | System Name                  | Status   |
-| ---- | ---------------------------- | -------- |
-| 1    | CORE - Employees Master Data | Drafting |
-| 2    | CORE - System Authentication | Drafting |
-| 3    | HRIS - BASE System           | ...      |
-| 4    | HRIS - Attendance System     | ...      |
-| ...  | ...                          | ...      |
+| Seq. | System Name                    | Status   |
+| ---- | ------------------------------ | -------- |
+| 1    | MODULE - Employees Master Data | Drafting |
+| 2    | CORE - System Authentication   | Drafting |
+| 3    | APP - Main Application         | Drafting |
+| 3    | HRIS - BASE System             | ...      |
+| 4    | HRIS - Attendance System       | ...      |
+| ...  | ...                            | ...      |
 
 ### About system lists, priorities and technical architectures
 
@@ -52,7 +61,7 @@ Technical architecture of the said system will be discussed later on in details
 
 Employee wanted to login into HRIS system and access their attendance view
 
-1. Go and login the main company application portal (not discussed or mention yet in this draft documents)
+1. Go and login the main company application portal (APP - Main Application) from their platform respectively
 2. Select go into HRIS
 3. Select attendance feature and click view my attendance options
 

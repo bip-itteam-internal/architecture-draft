@@ -28,6 +28,6 @@
 ## Dependencies
 
 - [ ] [[HRIS - BASE System]]
-- [ ] [[CORE - Attendance Data]]
+- [ ] [[CORE - API Master Gateway]]
 
-*This will link back information to [[CORE - Employees Master Data]] as it is needed for record keeping that will be used by HRIS - Payroll and because some employee have different work schedule*
+*This will insert attendance data to MODULE - Attendance Data as it is needed for record keeping that will be used by HRIS - Payroll and because some employee have different work schedule*

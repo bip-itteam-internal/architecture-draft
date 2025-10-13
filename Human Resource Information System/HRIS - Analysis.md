@@ -50,7 +50,6 @@
 ## Dependencies
 
 - [ ] [[HRIS - BASE System]]
-- [ ] [[CORE - Employees Master Data]]
 - [ ] [[[...] - Internal Inventory]]
 	- This is required for on-boarding, remote management and off-boarding
 - [ ] [[[...] - Dynamic Task Tracker]]

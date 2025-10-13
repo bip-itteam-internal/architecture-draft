@@ -1,6 +1,6 @@
 ## Notes
 
-*This system name is misleading as this didn't manage fully for [[??? - Internal Inventory]] and external inventory altogether. This only manage inventory used form purchase/procurement for production and sales of said products*
+*This system name is misleading as this didn't manage fully for Internal Inventory and external inventory altogether. This only manage inventory used form purchase/procurement for production and sales of said products*
 
 ## Features
 

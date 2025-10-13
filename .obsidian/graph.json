@@ -62,6 +62,20 @@
         "a": 1,
         "rgb": 2140670
       }
+    },
+    {
+      "query": "file:MODULE",
+      "color": {
+        "a": 1,
+        "rgb": 16711680
+      }
+    },
+    {
+      "query": "file:APP",
+      "color": {
+        "a": 1,
+        "rgb": 16711680
+      }
     }
   ],
   "collapse-display": false,
@@ -74,6 +88,6 @@
   "repelStrength": 10.8333333333333,
   "linkStrength": 0.5,
   "linkDistance": 189,
-  "scale": 0.8773374878188134,
+  "scale": 0.8028880844152412,
   "close": false
 }
