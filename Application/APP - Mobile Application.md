@@ -2,10 +2,6 @@
 
 *This is the main application/platform that going to be a portal to access all system and features*
 
-Where does this application will be accessible from? Currently we're working on 2 platform:
-- Mobile application
-- Web application
-
 ## Features
 
 - Login page

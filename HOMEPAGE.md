@@ -8,7 +8,7 @@ APP or application are the basic platform and landing page that will be web and/
 
 ## What is CORE System?
 
-CORE system are the main API Gateway to other MODULE on the system, currently there is only one: CORE - System Authentication
+CORE system are the main API Gateway to other MODULE on the system, currently there is only one: CORE - API Master Gateway
 
 ## What is MODULE?
 
@@ -32,6 +32,10 @@ This database will be partitioned from the CORE - Employee Master Data to others
 - Database replicate for daily/hourly backups
 - Database redundancy if required so failed access into the main could be redirected to alternative active database (low-priority as this is quite tricky to implement)
 
+### Internal Reroute
+
+This is internal reroute from one module to another, already implemented under [shared-library](https://github.com/bip-itteam-internal/api-gateway-test) which mean, one module can request to another without the restriction of authentication on API Master Gateway and only need to provide Internal Keys, which all of the module had, this is really beneficial since we can do multi-module query easily for either update or read
+
 ## What is BASE System?
 
 BASE system are base landing page and authentication for users to be able to use said system, by default the BASE system are empty, but will be filled with features by time
@@ -43,7 +47,7 @@ This is still an assumption/prediction and required further confirmation
 | Seq. | System Name                    | Status   |
 | ---- | ------------------------------ | -------- |
 | 1    | MODULE - Employees Master Data | Drafting |
-| 2    | CORE - System Authentication   | Drafting |
+| 2    | CORE - API Master Gateway      | Drafting |
 | 3    | APP - Main Application         | Drafting |
 | 3    | HRIS - BASE System             | ...      |
 | 4    | HRIS - Attendance System       | ...      |
@@ -69,7 +73,9 @@ Employee wanted to login into HRIS system and access their attendance view
 
 Main portal will accommodate as the HUB of the application to other systems
 
-### Example request
+### Example request (Outdated)
+
+**This is still in here since it is a good reference on how the API Master Gateway Reroute and Internal Reroute works**
 
 This is type of request that we will probably have 
 1. Single-fetch database request
@@ -82,3 +88,5 @@ This is type of request that we will probably have
 Image example below for (2) and (3) on how the data flow will looks like
 
 ![[endpoint-example.png]]
+
+Example images above are out-dated as we now using API Master Gateway authorization as the middleware on requests

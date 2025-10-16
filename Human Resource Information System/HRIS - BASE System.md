@@ -10,5 +10,4 @@
 
 ## Dependencies
 
-- [ ] [[APP - Main Application]]
 - [ ] [[CORE - API Master Gateway]]
