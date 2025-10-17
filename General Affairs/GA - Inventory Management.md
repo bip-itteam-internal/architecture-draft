@@ -29,6 +29,7 @@
 
 ## Dependencies
 
+- [ ] [[BASE - Landing Page]]
 - [ ] [[[...] - Warehouse Master Data]]
 - [ ] [[[...] - Purchase Master Data]]
 - [ ] [[[...] - Sales Master Data]]

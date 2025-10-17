@@ -25,4 +25,4 @@
 
 ## Dependencies
 
-- [ ] [[HRIS - BASE System]]
+- [ ] [[BASE - Landing Page]]

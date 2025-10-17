@@ -76,6 +76,13 @@
         "a": 1,
         "rgb": 16711680
       }
+    },
+    {
+      "query": "file:BASE",
+      "color": {
+        "a": 1,
+        "rgb": 16711680
+      }
     }
   ],
   "collapse-display": false,
@@ -85,9 +92,9 @@
   "lineSizeMultiplier": 1.80989583333333,
   "collapse-forces": false,
   "centerStrength": 0.5,
-  "repelStrength": 10.8333333333333,
-  "linkStrength": 0.5,
-  "linkDistance": 189,
+  "repelStrength": 11.25,
+  "linkStrength": 0.802083333333333,
+  "linkDistance": 206,
   "scale": 0.8028880844152412,
   "close": false
 }

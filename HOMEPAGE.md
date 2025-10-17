@@ -38,20 +38,20 @@ This is internal reroute from one module to another, already implemented under [
 
 ## What is BASE System?
 
-BASE system are base landing page and authentication for users to be able to use said system, by default the BASE system are empty, but will be filled with features by time
+BASE system are base landing page after logging in, they can see their own basic employee information and portal to go into another system features that they have role for (this is done from the front-end when they acquire logging info with user roles in it)
 
 ## System Creation Sequence
 
 This is still an assumption/prediction and required further confirmation
 
-| Seq. | System Name                    | Status   |
-| ---- | ------------------------------ | -------- |
-| 1    | MODULE - Employees Master Data | Drafting |
-| 2    | CORE - API Master Gateway      | Drafting |
-| 3    | APP - Main Application         | Drafting |
-| 3    | HRIS - BASE System             | ...      |
-| 4    | HRIS - Attendance System       | ...      |
-| ...  | ...                            | ...      |
+| Seq. | System Name                    | Status    |
+| ---- | ------------------------------ | --------- |
+| 1    | MODULE - Employees Master Data | Drafting  |
+| 2    | CORE - API Master Gateway      | Drafting  |
+| 3    | APP - Web Application          | Designing |
+| 3    | APP - Mobile Application       | Designing |
+| 4    | BASE - Landing Page            | Designing |
+| ...  | ...                            | ...       |
 
 ### About system lists, priorities and technical architectures
 

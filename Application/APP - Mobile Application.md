@@ -13,7 +13,7 @@
 		2. Insert unregistered Employee ID and it will show the full name of that employees (to make sure the employees and their account is match)
 		3. Requirement to fill new username, password and pick 1 options for 2nd verification (phone number or email, this is read-only data taken from MODULE - Employee Master Data)
 		4. Additional setup for alternative method of login with PIN or Bio-metrics passkey (based on device capabilities) this step is skip-able
-- Base dashboard with portal to access other system
+- Base dashboard with portal to access other system ([[BASE - Landing Page]])
 	- Base dashboard page will include base information or status of the employee
 	- Portal access to other system will be display with modular portal interface possibly with tile-based dashboard
 

@@ -17,7 +17,14 @@ List of exposed endpoint on each module will be discussed later on
 - [ ] [[MODULE - Employees Master Data]]
 - [ ] [[MODULE - Attendance Data]]
 
-### Consideration - Gateway Authorization to Module Endpoint
+List of unknown modules as per 10/17/25
+
+- [ ] [[[...] - Internal Inventory]]
+- [ ] [[[...] - Warehouse Master Data]]
+- [ ] [[[...] - Purchase Master Data]]
+- [ ] [[[...] - Sales Master Data]]
+
+### Gateway Authorization to Module Endpoint
 
 API Gateway and each module shared a matching secret **INTERNAL-KEY**, this key only supplied when request from API Gateway are forwarded to module
 Each module endpoint will validate this gateway **INTERNAL-KEY** with its own, if the provide 

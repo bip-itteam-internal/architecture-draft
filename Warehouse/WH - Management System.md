@@ -26,6 +26,7 @@
 
 ## Dependencies
 
+- [ ] [[BASE - Landing Page]]
 - [ ] [[[...] - Warehouse Master Data]]
 - [ ] Logging system
 	- [ ] [[WH - Inbound (Receiving)]]
