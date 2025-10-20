@@ -52,7 +52,7 @@ This database need something that will be used for UUID and act as Foreign Keys 
 - Payment bank details
 - Additional documents
 	- Probation start
-	- Probation end
+		- Probation end 
 
 #### Attendance Data
 

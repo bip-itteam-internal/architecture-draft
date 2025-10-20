@@ -1,0 +1,27 @@
+## Background
+
+General Affairs ingin punya dashboard untuk menejemen semua aset perusahaan dari alat dan bahan, ATK, dan dokumen-dokumen legal perusahaan. Dalam rangka program paperless, diperlukan sistem yang terintegrasi antar divisi. Data yang perlu pencatatan adalah:
+1. APD (QC) (dasar hukum: [APD - Google Drive](https://drive.google.com/drive/folders/1xD4_X3Wp6I0FOC1gYmynSgoXCORppnEX))
+2. Peralatan K3 Umum (APAR, Helm, dokumen terkait K3). diantara sertifikasi berikut ini:
+	a. HIRADC (Hazard Identification, Risk Assessment, and Determining Control)
+	b. IBPR (Identifikasi Bahaya dan Penilaian Risiko)
+	c. OHSAS (Occupational Health and Safety Assessment Series)
+3. Peralatan K3 Konstruksi
+4. Peralatan K3 Listrik dan petir
+5. Peralatan K3 Mekanik dan PUBT
+6. Peralatan P3K
+7. Implementasi ISO 22000 (standar internasional untuk Sistem Manajemen Keamanan Pangan (FSMS) yang berlaku untuk semua organisasi dalam rantai pasokan makanan, mulai dari produsen hingga konsumen akhir)
+8. Dokumen dan Implementasi program kecelakaan kerja
+9. Implementasi Checklist Management System (Checklist untuk masing-masing fungsi di General Affairs)
+	a. Checklist Ladder ([Ladder.xlsx - Google Spreadsheet](https://docs.google.com/spreadsheets/d/1nr1lap7-i55Ic2cASnCAqS_hs2AFbYm9/edit?gid=1229546643#gid=1229546643))
+	b. Checklist Excavator ([Memuat Google Spreadsheet](https://docs.google.com/spreadsheets/d/1uGn2nJPvrR8cgB5_JLh9AfuMQe5Ec0sT/edit?usp=drive_web&ouid=105436214326905949175&rtpof=true))
+	c. Checklist Diesel Generator ([DG.xlsx - Google Spreadsheet](https://docs.google.com/spreadsheets/d/1wge4oTMU1Ol3CX0jGAMSpiHHevWUeJzF/edit?gid=1975539744#gid=1975539744))
+	d. Checklist Panel Board ([DB.xlsx - Google Spreadsheet](https://docs.google.com/spreadsheets/d/1n8VdFk1p90G9MXxBrs6nQZ01ISp1qQlN/edit?gid=1243069169#gid=1243069169))
+	e. Checklist Fire Extenguisher ([Memuat Google Spreadsheet](https://docs.google.com/spreadsheets/d/1f3ukd6tBLI1ZFiqSreb8BGHBtJoe2neW/edit?usp=drive_web&ouid=105436214326905949175&rtpof=true))
+	(dan seterusnya)
+10. Implementasi Risk Management System
+11. Implementasi Waste Management System
+12. Implementasi Building Maintenance System (Kerusakan, kebersihan dan sanitasi gedung)
+13. Implementasi Machine & Utility Maintenance System
+14. Implementasi Accident Prevention System
+15. Implementasi Audit Internal System
