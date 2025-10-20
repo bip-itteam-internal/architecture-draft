@@ -25,3 +25,15 @@ General Affairs ingin punya dashboard untuk menejemen semua aset perusahaan dari
 13. Implementasi Machine & Utility Maintenance System
 14. Implementasi Accident Prevention System
 15. Implementasi Audit Internal System
+
+## Dependencies
+[[GA - Accident Prevention System]]
+[[GA - Audit Internal System]]
+[[GA - Building Maintenance System]]
+[[GA - Checklist Management System]]
+[[GA - Accident Prevention System]]
+[[GA - Inventory Management]]
+[[GA - Machine & Utility Maintenance System]]
+[[GA - Risk Management System]]
+[[GA - Waste Management System]]
+[[BASE - Landing Page]]
