@@ -2,7 +2,7 @@
 
 General Affairs ingin punya dashboard untuk menejemen semua aset perusahaan dari alat dan bahan, ATK, dan dokumen-dokumen legal perusahaan. Dalam rangka program paperless, diperlukan sistem yang terintegrasi antar divisi. Data yang perlu pencatatan adalah:
 1. Implementasi Inventory Management
-2. Implementasi Pengajuan online
+2. Implementasi e-Procurement Management System
 3. APD (QC) (dasar hukum: [APD - Google Drive](https://drive.google.com/drive/folders/1xD4_X3Wp6I0FOC1gYmynSgoXCORppnEX))
 4. Peralatan K3 Umum (APAR, Helm, dokumen terkait K3). diantara sertifikasi berikut ini:
 	a. HIRADC (Hazard Identification, Risk Assessment, and Determining Control)
@@ -36,6 +36,7 @@ General Affairs ingin punya dashboard untuk menejemen semua aset perusahaan dari
 [[GA - Accident Prevention System]]
 [[GA - Inventory Management]]
 [[GA - Machine & Utility Maintenance System]]
+[[GA - Procurement Management System]]
 [[GA - Risk Management System]]
 [[GA - Waste Management System]]
 [[BASE - Landing Page]]

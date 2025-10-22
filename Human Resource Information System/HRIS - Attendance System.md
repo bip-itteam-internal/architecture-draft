@@ -20,6 +20,10 @@
 * 3 Layer clock-in/out (face, location, and fencing)
 * Real-time attendance logs
 
+## Repository
+FE: [Backlog · HRIS](https://github.com/orgs/bip-itteam-internal/projects/4)
+BE: -
+
 ## Requirements
 
 - [ ] Employees master data (look up reference)
