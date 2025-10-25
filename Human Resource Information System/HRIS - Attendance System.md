@@ -14,6 +14,10 @@
 	* If the system are only available in local network then Geolocation and Geofencing information is redundant
 * Every clock-in/out data stored in "Attendance Logs" database which is as real-time as possible.
 
+## Consideration
+
+Since we're going with MongoDB it is good to [read about this](https://www.mongodb.com/docs/manual/data-modeling/design-antipatterns/reduce-collections/) before jumping into designing the database structure
+
 ## Features
 
 * Clock-in/out anywhere (Mobile App)
@@ -21,8 +25,9 @@
 * Real-time attendance logs
 
 ## Repository
-FE: [Backlog · HRIS](https://github.com/orgs/bip-itteam-internal/projects/4)
-BE: -
+
+- FE: [Backlog · HRIS](https://github.com/orgs/bip-itteam-internal/projects/4)
+- BE: -
 
 ## Requirements
 

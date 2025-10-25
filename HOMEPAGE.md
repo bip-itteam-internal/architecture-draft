@@ -44,14 +44,14 @@ BASE system are base landing page after logging in, they can see their own basic
 
 This is still an assumption/prediction and required further confirmation
 
-| Seq. | System Name                    | Status    |
-| ---- | ------------------------------ | --------- |
-| 1    | MODULE - Employees Master Data | Drafting  |
-| 2    | CORE - API Master Gateway      | Drafting  |
-| 3    | APP - Web Application          | Designing |
-| 3    | APP - Mobile Application       | Designing |
-| 4    | BASE - Landing Page            | Designing |
-| ...  | ...                            | ...       |
+| Seq. | System Name                    | Status       |
+| ---- | ------------------------------ | ------------ |
+| 1    | MODULE - Employees Master Data | Implementing |
+| 2    | CORE - API Master Gateway      | Implementing |
+| 3    | APP - Web Application          | Designing    |
+| 3    | APP - Mobile Application       | Designing    |
+| 4    | BASE - Landing Page            | Designing    |
+| ...  | ...                            | ...          |
 
 ### About system lists, priorities and technical architectures
 

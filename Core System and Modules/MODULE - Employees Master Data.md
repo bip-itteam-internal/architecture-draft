@@ -22,10 +22,10 @@ This database need something that will be used for UUID and act as Foreign Keys 
 	- ~~This is hard to get right as this need to be sync with the latest data insertion, even if we Single Source of Truth this is still tricky to sync~~
 - Natural keys
 	- Use something that is already from data below, possibly Employee ID
-- UUID/GUID
-	- Easy creation but accessing this would be nightmare and probably slow? The default one is 128-bit but we can start from 16-bit and step that up if collision happen
-- Snowflake (custom-uuid)
-	- Whatever bit-size data that has a structure from the system, the usual size is 64-bit with this composition: 1-bit signed, 41-bit timestamp, 10-bit from database/system creation, 12-bit randoms or from millisecond 
+- ~~UUID/GUID~~
+	- ~~Easy creation but accessing this would be nightmare and probably slow? The default one is 128-bit but we can start from 16-bit and step that up if collision happen~~
+- ~~Snowflake (custom-uuid)~~
+	- ~~Whatever bit-size data that has a structure from the system, the usual size is 64-bit with this composition: 1-bit signed, 41-bit timestamp, 10-bit from database/system creation, 12-bit randoms or from millisecond~~ 
 
 ### Personal Data
 
@@ -82,16 +82,6 @@ This database need something that will be used for UUID and act as Foreign Keys 
 - Roles (on their subsystem)
 	- Using object notation so it is easier to access, lookup are also faster as you can access it directly, example: `user.system_roles.hris`
 	- Obviously this will be enum type in their respective system
-
-#### System Roles Example
-
-```json
-"system_roles": {
-	"hris": "Manager",
-	"manufacturer": "Clerk",
-	"warehouse": "Auditor"
-}
-```
 
 ## Database Structures
 
@@ -170,7 +160,7 @@ Documents being split to save spaces and since those information aren't frequent
 	"employee_id": "0032-03-27102025", // Natural keys (FK)
 	
 	"department": "IT", // Enums to string
-	"position": "Supervisior", // Enums to string
+	"position": "Supervisior", // Enums to string, this doesn't really do anything for now, since we have our own system authentication
 	"employment_type": "Fulltime", // Enums to string
 	
 	"probation": {
@@ -184,11 +174,11 @@ Documents being split to save spaces and since those information aren't frequent
 	// Since all employee are forced to have Mandiri Bank account, but what if it changes? Is this better then? Since we account for changes that might happen in the future?
 	// Pick one from below
 	"mandiri_account_number": "930419413752", // Optional
-	"bank_details": { // Optional
-		"bank_name": "Bank Mandiri",
-		"account_number": "930419413752",
-		"account_holder": "Aurelia Mara"
-	}
+	// "bank_details": { // Optional
+		// "bank_name": "Bank Mandiri",
+		// "account_number": "930419413752",
+		// "account_holder": "Aurelia Mara"
+	// }
 }
 ```
 
@@ -226,7 +216,7 @@ This being separated since this will have more frequent access
 	// We shouldn't really mess much in here, we want to include work schedule but we need reference into their department schedule and shift, since hard embedding it in here would really bad and hard to change later on
 	// Therefore this should work for now, until we enstablish attendance system
 
-	"work_schedule": "BIP-REGULAR", // Natural keys (FK) referencec to company work schedule collections
+	"work_schedule": "BIP-REGULAR", // Natural keys (FK) reference to company work schedule collections
 	"exception": {} // This may be needed later on for Hybrid type and such
 }
 ```
@@ -432,7 +422,7 @@ This will have its own collections in Employee Master Data and Attendance Data a
 		"pin": "hash+salt..." // Encrypted
 	},
 	"system_roles": { // This is easily expandable
-		"it": "Supervisior" // Enums as string
+		"it": "Supervisor" // Enums as string
 	}
 }
 ```
