@@ -10,8 +10,10 @@
 	- Volume activity or stock changes
 - Purchases (Why this feature in here?)
 	- Normal purchase/procurement for product, with vendor/supplier details
+	- Because GA (General Affairs) has a petty cash fund used for expenses that are consumed within one month — for example, purchasing office supplies, cleaning equipment, or submitting requests for items not exceeding 2 million rupiah per month.
 - Sales (Why this feature in here?)
 	- Normal sales for product, but no information on where the product being sold to
+	- I agree, better to move this feature to it's own module (eg: move to Finance System)
 
 ## Issues that might come from other departments
 
