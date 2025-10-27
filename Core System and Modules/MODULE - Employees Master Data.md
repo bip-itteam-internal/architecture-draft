@@ -3,7 +3,7 @@
 This master data manage every employees data including additional linked documents or data from other system into this master data system. 
 
 Rename ideas since this has it's own back-end and databases
-- **"Employee module"** following the usage of this system
+- ~~**"Employee module"** following the usage of this system~~
 - **"Employee service"** following micro-services naming convention
 
 ## Pending Details
@@ -162,6 +162,8 @@ Documents being split to save spaces and since those information aren't frequent
 	"department": "IT", // Enums to string
 	"position": "Supervisior", // Enums to string, this doesn't really do anything for now, since we have our own system authentication
 	"employment_type": "Fulltime", // Enums to string
+	
+	"fingerprint_number": 211, // This is required as we might fallback to attendance using fingerprint
 	
 	"probation": {
 		start_date: ISODate(),

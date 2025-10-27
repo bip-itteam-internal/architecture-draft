@@ -2,6 +2,12 @@
 
 *This system name is misleading as this didn't manage fully for Internal Inventory and external inventory altogether. This only manage inventory used form purchase/procurement for production and sales of said products*
 
+## Consideration
+
+Can this be merged with internal inventory? As both will probably have a lot of feature the same, we could put it in here and add additional tags for items that is being used internally. 
+
+Might be undesiredable if internal inventory aren't natively managed by GA
+
 ## Features
 
 - Dashboard

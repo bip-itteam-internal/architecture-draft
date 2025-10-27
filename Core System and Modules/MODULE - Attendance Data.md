@@ -1,6 +1,6 @@
 ## Description
 
-*This database kept record of attendance from employees, therefore this need reference link into employee data and their work schedule to assign proper status*
+*This database kept record of attendance from employees, therefore this need reference link into employee data and their work schedule to assign proper status, based on this [employee schedule and shift details](https://docs.google.com/document/d/1W0MOCEPyoodp_09atBVe_PGDhSaoMgfxN2SCvpMVyHY/edit?tab=t.0)*
 
 ## Data Structures
 
