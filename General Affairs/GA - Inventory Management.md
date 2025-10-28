@@ -20,6 +20,10 @@ Might be undesiredable if internal inventory aren't natively managed by GA
 - Sales (Why this feature in here?)
 	- Normal sales for product, but no information on where the product being sold to
 	- I agree, better to move this feature to it's own module (eg: move to Finance System)
+* OCR Document
+	* dokumen fisik yang ada bisa di scan berbentuk gambar yang nantinya diupload ke sistem 
+	* OCR akan membaca dokumen tersebut dan bisa dimanfaatkan untuk kebutuhan lain
+	* misal: pencarian title dokumen, isi dokumen, nomor tertentu di dalam dokumen
 
 ## Issues that might come from other departments
 
