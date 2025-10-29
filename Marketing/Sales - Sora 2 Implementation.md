@@ -8,3 +8,7 @@ saat ini kebutuhan konten iklan di adv sangat besar dan sangat mengandalkan edit
 2. Aspek didalam konten yang secara spesifik ingin dirubah belum akurat
 3. Implementasi AI pada konten iklan belum ada yang bisa dijadikan acuan. karena konten iklan yang ada diplatform biasanya masih konvensional. Masih tingginya persepsi negatif soal konten AI. Hal ini bisa diatasi apabila implementasi AI hanya di sisipkan dalam sebuah konten, bukan sebuah pokok dari konten. 
 4. Ide yang kreatif masih menjadi pokok utama dalam pembuatan konten
+
+## References
+* Form Requirement : https://docs.google.com/spreadsheets/d/1GleSHDjYmOSL6BNrgNZ6M_A9DktdzCGZTqgo-qGZgkI/edit?usp=drive_link
+* Result : https://drive.google.com/drive/folders/1euadg8k0A7rI2wryTtVxjSZIS9DkhpBp?usp=sharing
