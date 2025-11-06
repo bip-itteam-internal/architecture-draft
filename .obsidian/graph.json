@@ -64,7 +64,7 @@
       }
     },
     {
-      "query": "file:MODULE",
+      "query": "file:DB",
       "color": {
         "a": 1,
         "rgb": 16711680

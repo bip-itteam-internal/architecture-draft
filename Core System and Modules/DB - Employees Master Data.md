@@ -226,6 +226,10 @@ This being separated since this will have more frequent access
 #### Company Work Schedule
 
 This is reference for the Work Schedule Data
+
+This collection owned by MODULE - Attendance Data, and will be fetched with buffer time after application initialization
+The service will panic if it cannot fetch new data from MODULE - Attendance Data and it has no recollection of this
+
 This will have its own collections in Employee Master Data and Attendance Data and will be synced properly between the two
 
 ```JSON

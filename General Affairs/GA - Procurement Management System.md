@@ -22,4 +22,4 @@ We're better off creating some feature that is exclusively used by GA and Financ
 ## Dependencies
 
 - [ ] [[GA - Inventory Management]]
-- [ ] [[MODULE - Employees Master Data]]
+- [ ] [[DB - Employees Master Data]]

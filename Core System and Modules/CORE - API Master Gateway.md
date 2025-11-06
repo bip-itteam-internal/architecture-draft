@@ -17,8 +17,8 @@
 Below are the valid endpoint, propagated calls or forwarded request from this gateway
 List of exposed endpoint on each module will be discussed later on
 
-- [ ] [[MODULE - Employees Master Data]]
-- [ ] [[MODULE - Attendance Data]]
+- [ ] [[DB - Employees Master Data]]
+- [ ] [[DB - Attendance Data]]
 
 List of unknown modules as per 10/17/25
 

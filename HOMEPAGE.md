@@ -46,10 +46,10 @@ This is still an assumption/prediction and required further confirmation
 
 | Seq. | System Name                    | Status       |
 | ---- | ------------------------------ | ------------ |
+| 2    | CORE - API Master Gateway      | Polishing    |
 | 1    | MODULE - Employees Master Data | Implementing |
-| 2    | CORE - API Master Gateway      | Implementing |
-| 3    | APP - Web Application          | Designing    |
-| 3    | APP - Mobile Application       | Designing    |
+| 3    | APP - Web Application          | Implementing |
+| 3    | APP - Mobile Application       | Implementing |
 | 4    | BASE - Landing Page            | Designing    |
 | ...  | ...                            | ...          |
 
