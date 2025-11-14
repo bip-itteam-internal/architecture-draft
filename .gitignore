@@ -7,3 +7,6 @@
 # Ignore community plugins
 .obsidian/community-plugins.json
 .obsidian/plugins/*
+
+# Mac
+.DS_Store

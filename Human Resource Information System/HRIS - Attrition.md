@@ -20,5 +20,4 @@
 
 ## Dependencies
 
-- [ ] [[HRIS - BASE System]]
-- [ ] [[CORE - Employees Master Data]]
+- [ ] [[BASE - Landing Page]]

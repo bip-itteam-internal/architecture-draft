@@ -49,8 +49,7 @@
 
 ## Dependencies
 
-- [ ] [[HRIS - BASE System]]
-- [ ] [[CORE - Employees Master Data]]
+- [ ] [[BASE - Landing Page]]
 - [ ] [[[...] - Internal Inventory]]
 	- This is required for on-boarding, remote management and off-boarding
 - [ ] [[[...] - Dynamic Task Tracker]]
