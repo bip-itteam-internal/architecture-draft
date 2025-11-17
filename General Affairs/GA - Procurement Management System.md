@@ -4,7 +4,7 @@ Saat ini pengajuan barang di perusahaan masih _paper-based_ dan ini memakan wakt
 
 ## Features
 
- - Pengajuan online melalui mobile app
+* Pengajuan online melalui mobile app
 - _Approval_ ditujukan ke principal yang berkaitan (SPV masing-masing divisi, GA, Finance, dan Dirut)
 - Setiap pengadaan yang sudah di _approve_, dan barang diterima, dilakukan verifikasi dahulu di GA untuk dilakukan pencatatan yang masuk ke [[GA - Inventory Management]] baru diserahkan ke yang bersangkutan
 
