@@ -26,6 +26,9 @@
 
 - [ ] More information about what affect payroll daily controls for employees
 
+* Setting Gaji
+* Setting BPJS Kesehatan dan Ketenagakerjaan
+* Perhitungan Izin selain sakit dan cuti
 ## Requirements
 
 - [ ] Employees master data (look up reference)
