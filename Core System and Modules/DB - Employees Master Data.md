@@ -1,6 +1,8 @@
 ## Description
 
-This master data manage every employees data including additional linked documents or data from other system into this master data system. 
+This master data manage every employees data including additional linked documents or data from other system into this master data system.
+
+[This is an example of what the current employee master data the HR teams currently have](https://drive.google.com/drive/folders/1DlL37IECH2i1e3-3oypd912AbcPU84nX)
 
 Rename ideas since this has it's own back-end and databases
 - ~~**"Employee module"** following the usage of this system~~
@@ -29,7 +31,7 @@ This database need something that will be used for UUID and act as Foreign Keys 
 
 ### Personal Data
 
-- Full name
+	- Full name
 - Gender
 - Religion
 - Martial status
@@ -175,12 +177,12 @@ Documents being split to save spaces and since those information aren't frequent
 	
 	// Since all employee are forced to have Mandiri Bank account, but what if it changes? Is this better then? Since we account for changes that might happen in the future?
 	// Pick one from below
-	"mandiri_account_number": "930419413752", // Optional
-	// "bank_details": { // Optional
-		// "bank_name": "Bank Mandiri",
-		// "account_number": "930419413752",
-		// "account_holder": "Aurelia Mara"
-	// }
+	// "mandiri_account_number": "930419413752", // Optional
+	"bank_details": { // Optional
+		"bank_name": "Bank Mandiri",
+		"account_number": "930419413752",
+		"account_holder": "Aurelia Mara"
+	}
 }
 ```
 
