@@ -1,4 +1,4 @@
-# Background
+## Background
 
 Saat ini pengajuan barang di perusahaan masih _paper-based_ dan ini memakan waktu lama untuk _approval_ dan dokumen _paper_ menumpuk. Diperlukan sistem pengajuan online yang handal dan terintegrasi dengan [[GA - Inventory Management]] 
 
@@ -21,5 +21,4 @@ We're better off creating some feature that is exclusively used by GA and Financ
 
 ## Dependencies
 
-- [ ] [[GA - Inventory Management]]
-- [ ] [[DB - Employees Master Data]]
+- [ ] [[GA - Inventory Management]] (as lookups for goods that is required to be always available)

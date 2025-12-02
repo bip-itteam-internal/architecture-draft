@@ -11,7 +11,7 @@
       "query": "file:HRIS",
       "color": {
         "a": 1,
-        "rgb": 14401024
+        "rgb": 15762713
       }
     },
     {
@@ -29,7 +29,7 @@
       }
     },
     {
-      "query": "file:[...]",
+      "query": "file:???",
       "color": {
         "a": 1,
         "rgb": 0
@@ -83,6 +83,13 @@
         "a": 1,
         "rgb": 16711680
       }
+    },
+    {
+      "query": "file:Sales",
+      "color": {
+        "a": 1,
+        "rgb": 12160416
+      }
     }
   ],
   "collapse-display": false,
@@ -96,5 +103,5 @@
   "linkStrength": 0.802083333333333,
   "linkDistance": 206,
   "scale": 0.5726803698453268,
-  "close": false
+  "close": true
 }

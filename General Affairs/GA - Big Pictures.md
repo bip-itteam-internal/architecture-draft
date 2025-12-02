@@ -30,14 +30,15 @@ General Affairs ingin punya dashboard untuk menejemen semua aset perusahaan dari
 
 ## Dependencies
 
-- [ ] [[GA - Accident Prevention System]]
+- [ ] [[GA - Accident Prevention]]
 - [ ] [[GA - Audit Internal System]]
-- [ ] [[GA - Building Maintenance System]]
-- [ ] [[GA - Checklist Management System]]
-- [ ] [[GA - Accident Prevention System]]
+- [ ] [[GA - Building Maintenance]]
+- [ ] [[GA - Checklist Management]]
+- [ ] [[GA - Accident Prevention]]
 - [ ] [[GA - Inventory Management]]
-- [ ] [[GA - Machine & Utility Maintenance System]]
-- [ ] [[GA - Procurement Management System]]
-- [ ] [[GA - Risk Management System]]
-- [ ] [[GA - Waste Management System]]
+- [ ] [[GA - Machine & Utility Maintenance]]
+- [ ] [[GA - Procurement System]]
+- [ ] [[GA - Risk Management]]
+- [ ] [[GA - Waste Management]]
+- [ ] [[GA - OCR Document]]
 - [ ] [[BASE - Landing Page]]

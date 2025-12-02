@@ -38,4 +38,4 @@
 
 ## Dependencies
 
-- [ ] [[BASE - Landing Page]]
+- [ ] [[DB - Attendance Data]]

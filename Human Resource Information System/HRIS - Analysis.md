@@ -49,7 +49,6 @@
 
 ## Dependencies
 
-- [ ] [[BASE - Landing Page]]
-- [ ] [[[...] - Internal Inventory]]
+- [ ] [[??? - Internal Inventory]]
 	- This is required for on-boarding, remote management and off-boarding
-- [ ] [[GA - Dynamic Task Tracker]]
+- [ ] [[??? - Dynamic Task Tracker]]

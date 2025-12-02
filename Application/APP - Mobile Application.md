@@ -1,6 +1,6 @@
 ## Description
 
-*This is the main application/platform that going to be a portal to access all system and features*
+*This is the main application/platform that going to be a portal to access all system and features, information regarding employee mobile devices surveys are [listed here](https://docs.google.com/spreadsheets/d/1w2blhMgFx1BI9zu6ni5gmQJab_NfMhdocm0cj5pyO_s/edit?usp=sharing)*
 
 ## Features
 
@@ -19,9 +19,21 @@
 		3. System automatically check for credentials and know that it is their first time to the platform, therefore they are rerouted to page to setup username and new password
 		4. After the setup is complete they are bring back to the login page to test their login details/credentials before entering to the platform
 	- HRD will able to see the temporary password from new employee data creation to inform to that employee to login into the platform with their employee id and the temporary password
-- Base dashboard with portal to access other system ([[BASE - Landing Page]])
+- Base dashboard with portal to access other system (BASE - Landing Page)
 	- Base dashboard page will include base information or status of the employee
 	- Portal access to other system will be display with modular portal interface possibly with tile-based dashboard
+
+## Implemented Features
+
+1. Login page with username and password
+2. Quick re-login page with PIN or Biometrics
+3. Onboarding features for first time users or resetted accounts
+4. Attendance view today and schedule
+5. Attendance clock-in and clock-out
+
+## Unimplemented Features
+
+1. There is plenty of unimplemented features that already have mobile front-end finished, nnow it is the question of when are we going to finish and support those features
 
 ## Dependencies
 

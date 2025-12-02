@@ -17,7 +17,3 @@
 
 - [ ] Employees master data (look up reference)
 - [ ] Termination records (creation and linked into employee data)
-
-## Dependencies
-
-- [ ] [[BASE - Landing Page]]

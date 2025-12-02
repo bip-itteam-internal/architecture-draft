@@ -17,15 +17,16 @@
 Below are the valid endpoint, propagated calls or forwarded request from this gateway
 List of exposed endpoint on each module will be discussed later on
 
+- [ ] [[DB - Overview and Notes]]
 - [ ] [[DB - Employees Master Data]]
 - [ ] [[DB - Attendance Data]]
 
 List of unknown modules as per 10/17/25
 
-- [ ] [[[...] - Internal Inventory]]
-- [ ] [[[...] - Warehouse Master Data]]
-- [ ] [[[...] - Purchase Master Data]]
-- [ ] [[[...] - Sales Master Data]]
+- [ ] [[??? - Internal Inventory]]
+- [ ] [[??? - Warehouse Master Data]]
+- [ ] [[??? - Purchase Master Data]]
+- [ ] [[??? - Sales Master Data]]
 
 ### Gateway Authorization to Module Endpoint
 

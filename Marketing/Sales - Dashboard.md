@@ -2,6 +2,12 @@ Berikut rincian **Full Tech Spec, audit masalah teknis utama, solusi, scope kesu
 
 ---
 
+![[WhatsApp Image 2025-12-02 at 10.38.30 AM.jpeg]]
+![[WhatsApp Image 2025-12-02 at 10.38.30 AM(1).jpeg]]
+![[WhatsApp Image 2025-12-02 at 10.38.30 AM(2).jpeg]]
+![[WhatsApp Image 2025-12-02 at 10.38.30 AM(3).jpeg]]
+![[WhatsApp Image 2025-12-02 at 10.38.31 AM.jpeg]]
+
 ## 1. ** Tech Spec (Backend Dashboard Multi-Ads Manager)**
 
 ## **A. Stack & Arsitektur**
@@ -289,8 +295,6 @@ Berikut adalah **template flowchart, contoh ERD, dan skema worker/scheduler untu
 
 ## 1. **ERD (Entity Relationship Diagram) Simplified**
 
-
-![[Screenshot 2025-10-28 at 09.49.01.png]]
 `
 - users: id, name, email, password_hash, role
     
@@ -469,29 +473,13 @@ job_scheduler
 
 ## **Flow: Upload Campaign dari Dashboard**
 
-text
-![[Pasted image 20251028095455.png]]
-
 ## **Flow: Periodic Fetch Campaign Report**
-
-text
-
-![[Pasted image 20251028095206.png]]
 
 ---
 
 ## 3. **Workflow Gambar/Diagram (pseudo-Mermaid)**
 
-text
-
-![[Pasted image 20251028095142.png]]
----
-
 ## 4. **UML Sequence (kode-mockup)**
-
-text
-
-![[Pasted image 20251028095108.png]]
 
 ---
 

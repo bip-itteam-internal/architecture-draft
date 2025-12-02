@@ -15,6 +15,7 @@
 
 ## Pending Details
 
+- [ ] Who are responsible of this system?
 - [ ] Does warehouse itself able to execute dispatch order? This might be needed if we have 2 or more warehouses to send goods back and front for organizing or somethings
 - [ ] Would we implement dispatch order? so order from Finance department can be carried immediately from the system?
 - [ ] How does inbound request from other system being placed or processed?
@@ -27,7 +28,7 @@
 ## Dependencies
 
 - [ ] [[BASE - Landing Page]]
-- [ ] [[[...] - Warehouse Master Data]]
+- [ ] [[??? - Warehouse Master Data]]
 - [ ] Logging system
 	- [ ] [[WH - Inbound (Receiving)]]
 	- [ ] [[WH - Outbound (Sending)]]

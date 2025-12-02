@@ -17,6 +17,7 @@ Might be undesiredable if internal inventory aren't natively managed by GA
 - Purchases (Why this feature in here?)
 	- Normal purchase/procurement for product, with vendor/supplier details
 	- Because GA (General Affairs) has a petty cash fund used for expenses that are consumed within one month — for example, purchasing office supplies, cleaning equipment, or submitting requests for items not exceeding 2 million rupiah per month.
+	- If so then Finance are still the sole owner of purchasing system, and GA are able request and see their accepted procurement entries
 - Sales (Why this feature in here?)
 	- Normal sales for product, but no information on where the product being sold to
 	- I agree, better to move this feature to it's own module (eg: move to Finance System)
@@ -41,7 +42,4 @@ Might be undesiredable if internal inventory aren't natively managed by GA
 
 ## Dependencies
 
-- [ ] [[BASE - Landing Page]]
-- [ ] [[[...] - Warehouse Master Data]]
-- [ ] [[[...] - Purchase Master Data]]
-- [ ] [[[...] - Sales Master Data]]
+- [ ] [[??? - Warehouse Master Data]]

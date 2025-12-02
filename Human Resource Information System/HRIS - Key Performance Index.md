@@ -22,7 +22,3 @@
 
 - [ ] Employees master data (look up reference)
 - [ ] Key performance index form creation based on departments (linked into employee data)
-
-## Dependencies
-
-- [ ] [[BASE - Landing Page]]

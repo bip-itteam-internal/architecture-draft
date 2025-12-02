@@ -1,6 +1,6 @@
 ## Description
 
-*This is the landing page of the application that include portals to other systems*
+*This is the landing page of the application that include portals to other systems this is currently exclusively implemented for website*
 
 ## Features
 
@@ -32,5 +32,3 @@ This is able to be implemented in both Mobile and Web application, although the 
 ## Dependencies
 
 - [ ] [[CORE - API Master Gateway]]
-- [ ] [[APP - Web Application]]
-- [ ] [[APP - Mobile Application]]

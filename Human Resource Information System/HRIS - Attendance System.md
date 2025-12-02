@@ -24,6 +24,16 @@ Since we're going with MongoDB it is good to [read about this](https://www.mongo
 * 3 Layer clock-in/out (face, location, and fencing)
 * Real-time attendance logs
 
+This is feature that is bind and owned by HRIS for attendances
+- View attendance in real-time
+- Change attendance entry status
+- Add additional comments to attendance entries
+- Add additional documents to attendance entries
+- Export attendance report
+
+Additional milestones
+ - Connect fingerprint machine with C application listener to enter data into DB using curl calling specific routes
+
 ## Repository
 
 - FE: [Backlog · HRIS](https://github.com/orgs/bip-itteam-internal/projects/4)
@@ -36,6 +46,6 @@ Since we're going with MongoDB it is good to [read about this](https://www.mongo
 
 ## Dependencies
 
-- [ ] [[BASE - Landing Page]]
+- [ ] [[DB - Attendance Data]]
 
 *This will insert attendance data to MODULE - Attendance Data as it is needed for record keeping that will be used by HRIS - Payroll and because some employee have different work schedule*

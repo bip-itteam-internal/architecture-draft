@@ -4,12 +4,25 @@
 
 ## Features
 
-- Automated attendance data creation based on employee shift with cron job 2 hours prior before their shift began
-- Employee get their newest attendance data sorted from datetime and their proper shift
-- Employee self-service to clock-in and clock-out endpoint (limited to modifing the entry, no creation needed)
-- Employee can see then is the national holiday set by HRIS
-- Employee can see their work schedules in yearly calendar (low priority)
+- **(Complete)** Automated attendance data creation based on employee shift with cron job 2 hours prior before their shift began
+- **(Complete)** Employee get their newest attendance data sorted from datetime and their proper shift
+- **(Complete)** Employee self-service to clock-in and clock-out endpoint (limited to modifing the entry, no creation needed)
+- **(Complete)** Employee can see their work schedules in the current month, including holiday that being set by HRIS in calendar (low priority)
+- Send out FCM notification to device to remind them of their work schedules
 - HRIS additional forced flagging and document insertion to the entries (low priority)
+
+## Cron Scheduler
+
+Cron schedule play a vital role in thiss daatabase system, as it is the one responsible for attendance data creation based on work schedule of the employee, this system/engine is already automated running for each 30mins
+
+Information that is essential for cron scheduler:
+1. Company work schedule (Static collection) 
+2. Company group rotation (Static collection) 
+3. Company holiday (set by HRIS)
+4. Work schedule (fetched from employee database)
+
+Minor information used by FCM notification:
+1. Active FCM token (fetched from employee database)
 
 ## Data Structures
 
