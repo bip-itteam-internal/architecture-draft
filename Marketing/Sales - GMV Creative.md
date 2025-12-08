@@ -44,3 +44,7 @@ Kalodata adalah 3rd party software yang melakukan rangking konten dan iklan Tikt
 	* dashboard Rp 8 juta per tahun = Rp. 600 rb / bulan (solusi jangka pendek)
 		* cara ini lebih murah karena ada member tim yang melakukan export data setiap hari melalui dashboard. kemudian di import ke sistem kita. namun perlu effort lebih 
 2. Menggunakan 3rd party lain
+
+# Development
+url: https://gmv-creative.bharatainternasional.com
+repo: https://github.com/bip-itteam-internal/Bharata-Internal-tiktok
