@@ -10,14 +10,14 @@ Fokus utamanya adalah **import data penjualan**, **sinkronisasi ke Accurate**, d
 ### 1. Platform Integration
 Import & olah file Excel dari berbagai platform:
 
-| Platform     | Channel                     |
-|--------------|-----------------------------|
-| TikTok Shop  | Marketplace                 |
-| Shopee       | Marketplace                 |
-| Lazada       | Marketplace                 |
-| Tokopedia    | Marketplace                 |
-| KiriminAja   | Non-Marketplace             |
-| Order Online | Non-Marketplace             |
+| Platform     | Channel         |
+| ------------ | --------------- |
+| TikTok Shop  | Marketplace     |
+| Shopee       | Marketplace     |
+| Lazada       | Marketplace     |
+| Tokopedia    | Marketplace     |
+| KiriminAja   | Non-Marketplace |
+| Order Online | Non-Marketplace |
 
 ---
 
