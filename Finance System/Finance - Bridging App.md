@@ -69,7 +69,7 @@ Menu untuk upload file excel per platform berbasis Team.
 | Menu           | Deskripsi                                                             |
 |---------------|------------------------------------------------------------------------|
 | **Sales Invoice** | Catatan invoice penjualan resmi                                     |
-| **Sample Sales**  | Transaksi sample sales **+ sync ke Accurate**                       |
+| **Sample Sales**  | Transaksi sample sales **+ sync Accurate**                       |
 | **Daily Sales**   | Rekap penjualan harian **+ sync Accurate + notif**         |
 
 ---
