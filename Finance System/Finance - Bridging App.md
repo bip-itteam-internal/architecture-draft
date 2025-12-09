@@ -102,7 +102,6 @@ Pengelolaan barang kembali/retur.
 
 ### 🔧 Backend
 - Language   : **Java**
-- Framework  : **Spring Boot**
 - Database   : **PostgreSQL**
 - API Docs   : **Swagger**
 - Auth       : **JWT Authentication**
