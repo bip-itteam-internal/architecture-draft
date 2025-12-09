@@ -42,4 +42,4 @@ Might be undesiredable if internal inventory aren't natively managed by GA
 
 ## Dependencies
 
-- [ ] [[??? - Warehouse Master Data]]
+- [ ] [[Unlisted - Warehouse Master Data]]
