@@ -19,6 +19,11 @@ Import & olah file Excel dari berbagai platform:
 | KiriminAja   | Non-Marketplace |
 | Order Online | Non-Marketplace |
 
+#### Contoh Excel TikTok Shop
+| Order ID | Order Status | Order Substatus | Cancelation/Return Type | Normal or Pre-order | Shipping Fee After Discount | Original Shipping Fee | Shipping Fee Seller Discount | Shipping Fee Platform Discount | Payment platform discount | Taxes | Order Amount | Order Refund Amount | Created Time | Paid Time | RTS Time | Shipped Time | Delivered Time | Cancelled Time | Cancel By | Cancel Reason | Fulfillment Type | Warehouse Name | Tracking ID | Delivery Option | Shipping Provider Name | Buyer Message | Buyer Username | Recipient | Phone # | Zipcode | Country | Province | Regency and City | Districts | Villages | Detail Address | Additional address information | Payment Method | Product Category | Package ID | Seller Note | Checked Status | Checked Marked by | SKU ID | Seller SKU | Product Name | Variation | Quantity | Sku Quantity of return | SKU Unit Original Price | SKU Subtotal Before Discount | SKU Platform Discount | SKU Seller Discount | SKU Subtotal After Discount | Buyer Service Fee | Weight(kg) | Dynamic Commission |
+|----------|--------------|-----------------|--------------------------|----------------------|------------------------------|------------------------|-------------------------------|--------------------------------|----------------------------|-------|--------------|----------------------|--------------|-----------|----------|---------------|-----------------|----------------|-----------|----------------|------------------|----------------|-------------|----------------|--------------------------|----------------|----------------|-----------|----------|---------|---------|----------|-------------------|-----------|----------|----------------|------------------------------|----------------|------------------|------------|-------------|----------------|---------------------|--------|------------|--------------|-----------|----------|------------------------|----------------------------|------------------------------|----------------------------|---------------------------|-------------------------------|------------------|-------------|--------------------|
+
+
 ---
 
 ### 2. Accurate Synchronization
