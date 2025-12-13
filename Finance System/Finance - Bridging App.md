@@ -30,7 +30,7 @@ Import & olah file Excel dari berbagai platform:
 
 | Bagian   | Repo Git |
 |---------|----------|
-| Backend | https://github.com/bip-itteam-internal/finance-be |
+| Backend | https://github.com/bip-itteam-internal/finance-backend |
 | Frontend| https://github.com/bip-itteam-internal/finance-frontend |
 
 ---
