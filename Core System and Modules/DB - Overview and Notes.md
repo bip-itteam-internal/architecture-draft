@@ -2,7 +2,7 @@
 
 This is just plain overview of how the database going to looks like and some notes for those information
 
-In database there is going to be a lot of collection and some of the collection aren't natively owned by said database, therefore those collection need to be fetched from their database if possible on each server restart
+In database there is going to be a lot of collection and some of the collection aren't natively owned by said database, therefore those collection need to be fetched from their database if possible on each server restart, cron based or by subscription based action
 
 Example can be seen below
 

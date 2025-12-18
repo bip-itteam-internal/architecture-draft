@@ -99,6 +99,11 @@ We have our own independent database exclusively for attendance
 
 ### Company Work Schedule
 
+This information currently are static hardcoded, which already being inserted to database, refreshed each restart, this can be expanded to modifyable in the future if it see fit
+
+But believe me, if this is editable they will easily broke the schedule and blame the automated system because of their wrong doing.
+Therefore kept this as static hardcoded as long as possible!
+
 ```JSON
 { // Company work schedule collections (This is bad, but will do for now)
 	"_id": ObjectId(MongoDB_ID_Assignment),
@@ -460,6 +465,10 @@ Also as this shift/group-based have differances in resolving themself, one is ch
 ```
 
 ### Company Holiday Date
+
+Simply information on the database where this will be used to check if the shedule engine need to create the attendance on that day or not
+
+Note, you will need something to fetch the normal working hour information on holiday and the calculation of it, since company holiday is fully paid, and the national one is fully paid but minus the lunch allowance
 
 ```JSON
 {

@@ -5,10 +5,12 @@
 ## Background
 
 * Attendance system is semi-automatic right now. We have fingerprint reader machine (Solution X105) that is connected to a network. HR can pull attendance logs everyday. (There's attempt to do cron job regulary pull the logs but never successful).
-	* - How will the data from fingerprint reader machine (Solution X105) be integrated to here?
+	* How will the data from fingerprint reader machine (Solution X105) be integrated to here?
 		- We can use their SDK and create our own script (https://drive.google.com/file/d/1MSV_OdJRTjIlcrKOrw1t0bbpT3vS4GoF/view?usp=sharing) or 3rd party (there are some open source script) to pull attendance data every day
 		- Store them in a "Raw Database"
 		- Fingerprint machine is a "Fallback" in case it's needed
+	- Looking at the SDK we could create a middleware listener, where it will pass the signal from fingerprint machine into the ERP website on attendance services with special routes for fingerprint automated clock-in/out
+	- The listener application will be build on Python with [pyzk](https://github.com/fananimi/pyzk) library, since it already link all the SDK into one place, and has the support for other series as well. The repository will be shared in here later on 
 * After many consideration, we decided to do Mobile App as a attendance gate. Mobile App will be installed on every employee and they can do clock-in or clock-out anywhere within the radius. (50 m)
 * There are 3 layer security to clock-in/out: Face recognition, Geolocation, and Geofencing (must connected to local WIFI)
 	* If the system are only available in local network then Geolocation and Geofencing information is redundant
@@ -32,7 +34,36 @@ This is feature that is bind and owned by HRIS for attendances
 - Export attendance report
 
 Additional milestones
- - Connect fingerprint machine with C application listener to enter data into DB using curl calling specific routes
+ - Connect fingerprint machine with C/C# application listener to enter data into DB using curl calling specific routes
+
+## Fingerprint Machine Details
+
+### Official website specification
+
+![[x105.jpg]]
+![[specification.png]]
+
+### Current status and information
+
+Status and information below are captured at 18 December 2025
+
+Connection/communication to the network
+- IP address: 10.10.10.201
+- Subnet mask: 255.255.255.0
+- Gateway: 10.10.10.1
+
+Image description
+- (A): Device machine information
+- (B): Device current allocated spaces
+
+| Image (A)              | Image (B)                 |
+| ---------------------- | ------------------------- |
+| ![[machine-info.jpeg]] | ![[allocated-space.jpeg]] |
+
+### Known issues
+
+- Fingerprint device port 4370 is restricted to 1 connection
+	- Which mean if we want to yield this to the server for custom fingerprint event listener then HR will not able to access it via the solution application
 
 ## Repository
 

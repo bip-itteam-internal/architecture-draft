@@ -10,7 +10,8 @@
 - [x] Pass forward the payload to be used by the module on the system
 - [x] Centralized API Gateway to other module on the system
 - [x] Login and logout features (data taken from Employee Master Data in the collections of System Authentication)
-- [ ] Registration from first time user that login with employee ID and temporary password given by HRD
+- [x] Registration from first time user that login with employee ID and temporary password given by HRD
+- [ ] Simplification of reroute request and internal request for easy development
 
 ## Forwarded Request / Reroute
 
@@ -41,6 +42,8 @@ The database are internal and not exposed, it has to be setup properly in docker
 
 Read more about [mTLS](https://www.cloudflare.com/learning/access-management/what-is-mutual-tls/) the more secure method of authorization 
 
+There is a discussion to imporve this into **INTERNAL-KEY-V2** where it will only be set and validated from internal to internal requests, therefore blocking any routes access with "/internal" automatically if it called from API-Gateway
+
 ## JWT Payload Structure / Custom Headers
 
 Additional JWT payload for easier look up into here instead of querying the database for those most reused information, this information is being passed around as additional headers
@@ -56,6 +59,8 @@ Additional JWT payload for easier look up into here instead of querying the data
 	}
 }
 ```
+
+This header are being used to check for self-services routes and also to set metadata into database on data creation/modification
 
 ## Public Endpoint Lists
 
