@@ -8,6 +8,20 @@ Can this be merged with internal inventory? As both will probably have a lot of 
 
 Might be undesiredable if internal inventory aren't natively managed by GA
 
+### General Affairs as the "Manager" of the Company Inventory
+
+This means every inventory items and object are natively owned by GA, on this system GA can propagate down some of the items into other department where the department will be able to maintain the items accordingly.
+
+This system will somewhat represent a hierarcy with GA at the top, and others below it
+
+![[inventory-propergation.png]]
+
+This means we would have 1 master data that is being circulated from GA to other department accordingly, some department like manufactur might have unique feature regarding how they see their inventory, and so on...
+
+But in here we need to know what type of inventory and what details do we want it to have? for example; base material for production will not have that much information on them while computer would have plenty including SN and other details
+
+And how does they keep their inventory? is it barcode based with SKU on where the location are? and how does that transfer down to department and such
+
 ## Features
 
 - Dashboard

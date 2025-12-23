@@ -20,6 +20,12 @@
 
 Since we're going with MongoDB it is good to [read about this](https://www.mongodb.com/docs/manual/data-modeling/design-antipatterns/reduce-collections/) before jumping into designing the database structure
 
+## Use-case Diagram
+
+Attendance can be done with 2 method as per December 2025, either from fingerprint machine validation or mobile application
+
+![[attendance-use-case.png]]
+
 ## Features
 
 * Clock-in/out anywhere (Mobile App)
