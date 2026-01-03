@@ -22,6 +22,9 @@ List of exposed endpoint on each module will be discussed later on
 - [ ] [[DB - Employees Master Data]]
 - [ ] [[DB - Attendance Data]]
 
+Others that is not urgent
+- [ ] [[DB - Notification Center]]
+
 List of unknown modules as per 10/17/25
 
 - [ ] [[Unlisted - Internal Inventory]]
