@@ -1,4 +1,6 @@
-Dashboard ini sepadan dengan Omnichannel dashboard pada umumnya. Omnichannel adalah dashboard yang menggabungkan beberapa data platform (Tiktok, shopee, lazada) menjadi satu. batasan dashboard hanya get API dari banyak platform tersebut. 
+Dashboard ini sepadan dengan Omnichannel dashboard pada umumnya. Omnichannel adalah dashboard yang menggabungkan beberapa data platform (Tiktok, shopee, lazada) menjadi satu. tantangan dashboard hanya get API dari banyak platform tersebut. 
+
+Tantangan selanjutnya adalah integrasi ads dengan toko yang saling berkaitan. Hal ini perlu dilakukan untuk mendapatkan informasi omset pertoko.
 
 Berikut rincian **Full Tech Spec, audit masalah teknis utama, solusi, scope kesulitan development dari nol, serta estimasi waktu untuk proyek dashboard backend campaign manager multi-akun/multi-platform (Node.js/Express atau Golang):
 
