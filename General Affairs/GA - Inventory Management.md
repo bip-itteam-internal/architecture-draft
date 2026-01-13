@@ -20,10 +20,34 @@ This means we would have 1 master data that is being circulated from GA to other
 
 But in here we need to know what type of inventory and what details do we want it to have? for example; base material for production will not have that much information on them while computer would have plenty including SN and other details
 
-And how does they keep their inventory? is it barcode based with SKU on where the location are? and how does that transfer down to department and such
+And how does they keep their inventory? is it barcode based with SKU on where the location are? and how does that transfer down to department and such.
 
+## Hasil Observasi
+Tanggal 13 Januari 2026
+#### kendala yang dialami tim GA:
+1. Ruangan aset yang belum ada. ruangan atau gudang aset & barang tidak terpakai belum ada. sehingga sementara ini barang-barang tersebut diletakan seadanya
+2. Barang material diletakan dilokasi yang seadanya (khusus jika ada pembangunan)
+3. Pencatatan barang yang rusak
+
+#### Kategori barang
+1. Barang Office
+2. Produksi & warehouse
+3. Aset building
+
+#### Sifat barang
+1. Konsumsi (Kopi, gula) (fixed cost)
+2. Aset (Sesuai kebutuhan)
 ## Features
 
+#### Scope
+* Pencatatan aset menjadi jelas
+* Controlling & monitoring aset
+* lokasi barang
+* Pencatatan vendor
+* Ada informasi SOP pengajuan aset
+* Reservasi ruang meeting
+
+#### Breakdown
 - Dashboard
 	- Overview of everything excellent for reporting to stakeholders
 	- Summary in details: purchases, sales, stocks and profits
@@ -40,6 +64,20 @@ And how does they keep their inventory? is it barcode based with SKU on where th
 	* OCR akan membaca dokumen tersebut dan bisa dimanfaatkan untuk kebutuhan lain
 	* misal: pencarian title dokumen, isi dokumen, nomor tertentu di dalam dokumen
 
+## Alur
+berikut alur sebuah barang menjadi aset perusahaan dari awal hingga akhir.
+1. User mengajukan barang dengan mengisi form disertai tanda tangan SPV departement ybs. ([[Form Permintaan Barang GA.pdf]])
+2. Form ini diserahkan ke GA dan dilakukan nego dengan mencarikan alternatif lain. minimal 3 pilihan barang yang sama dengan harga yang berbeda
+3. GA dan user memilih barang sesuai dengan vendor yang dipilih
+4. GA melakukan approval yang diwakili oleh Spv dan meneruskan proses
+5. GA menentukan pembayaran dengan ketentuan
+	* apabila harga barang kurang dari Rp. 3.000.000, maka tidak memerlukan tanda tangan Direktur
+	* apabila harga barang lebih dari Rp. 3.000.000, maka memerlukan persetujuan Direktur melalui sekretariat
+6. apabila sudah dilakukan approval di step 5 diatas, maka GA melanjutkan proses dengan melakukan PO
+7. Barang akan dikirim
+8. Setelah barang sampai, GA melakukan pencatatan dan melakukan penomoran (Jenis-Ruangan-Bulan-Tahun) dan menyerahkan barang ke User.
+9. Form penerimaan barang diisi sebagai bentuk pencatatan.
+
 ## Issues that might come from other departments
 
 - Finance
@@ -54,6 +92,8 @@ And how does they keep their inventory? is it barcode based with SKU on where th
 - [ ] Purchase data from finance
 - [ ] Sales data from finance
 
+### Referensi Sistem yang sudah ada
+1. Inventa
 ## Dependencies
 
 - [ ] [[Unlisted - Warehouse Master Data]]
