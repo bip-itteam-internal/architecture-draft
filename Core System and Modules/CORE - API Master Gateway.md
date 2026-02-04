@@ -21,8 +21,7 @@ List of exposed endpoint on each module will be discussed later on
 - [ ] [[DB - Overview and Notes]]
 - [ ] [[DB - Employees Master Data]]
 - [ ] [[DB - Attendance Data]]
-
-Others that is not urgent
+- [ ] [[DB - MinIO File Server]]
 - [ ] [[DB - Notification Center]]
 
 List of unknown modules as per 10/17/25
@@ -31,7 +30,7 @@ List of unknown modules as per 10/17/25
 - [ ] [[Unlisted - Warehouse Master Data]]
 - [ ] [[Unlisted - Purchase Master Data]]
 - [ ] [[Unlisted - Sales Master Data]]
-- [ ] [[Unlisted - Dynamic Task Tracker]]
+- [ ] [[APP - Dynamic Task Tracker]]
 
 ### Gateway Authorization to Module Endpoint
 

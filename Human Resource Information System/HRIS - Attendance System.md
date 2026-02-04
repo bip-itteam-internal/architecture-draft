@@ -1,6 +1,7 @@
 ## Notes
 
-*This system is required for automated attendance that will benefit HRIS - Payroll*
+*This system is required for automated attendance that will benefit HRIS - Payroll
+This system should be moved from HRIS system to Extension or something else*
 
 ## Background
 
@@ -28,19 +29,19 @@ Attendance can be done with 2 method as per December 2025, either from fingerpri
 
 ## Features
 
-* Clock-in/out anywhere (Mobile App)
-* 3 Layer clock-in/out (face, location, and fencing)
-* Real-time attendance logs
-
 This is feature that is bind and owned by HRIS for attendances
 - View attendance in real-time
-- Change attendance entry status
+- Change attendance entry statush
 - Add additional comments to attendance entries
 - Add additional documents to attendance entries
 - Export attendance report
 
-Additional milestones
+**(Finished)** Additional milestones
  - Connect fingerprint machine with C/C# application listener to enter data into DB using curl calling specific routes
+ - This is connected with Python script with collective open-source module for 
+
+Additional features
+ - We might want to consider using hybrid/remote work environment, therefore employee need to clock-in/out with mobile application outsite the company network
 
 ## Fingerprint Machine Details
 
@@ -70,19 +71,16 @@ Image description
 
 - Fingerprint device port 4370 is restricted to 1 connection
 	- Which mean if we want to yield this to the server for custom fingerprint event listener then HR will not able to access it via the solution application
-
-## Repository
-
-- FE: [Backlog · HRIS](https://github.com/orgs/bip-itteam-internal/projects/4)
-- BE: -
+- Fingerprint device onboard memory are reseted after 3 days without power? How does this happen? are the CMOS battery faulty or what is happening with the device?
+	- Which mean the connection/communication information will be reseted as well, therefore need manually be set to be on the correct network again 
 
 ## Requirements
 
-- [ ] Employees master data (look up reference)
-- [ ] Read and write access to attendance database
+- [x] Employees master data (look up reference)
+- [x] Read and write access to attendance database
 
 ## Dependencies
 
-- [ ] [[DB - Attendance Data]]
+- [x] [[DB - Attendance Data]]
 
 *This will insert attendance data to MODULE - Attendance Data as it is needed for record keeping that will be used by HRIS - Payroll and because some employee have different work schedule*

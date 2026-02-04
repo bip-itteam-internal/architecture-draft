@@ -16,6 +16,19 @@ Database will hold information as follow:
 Need futher disscusion on how does this will reside in here, as this is better suited to reside in HRIS database
 - Payroll document are saved in here for each employee, and easily viewable (required to verify PIN or password)
 
+## Completed Features
+
+Some of the features below are actually already done on the shared-library but aren't yet implemented to the notification center; like FCM broadcasting, WhatsApp groups messages and so on
+
+- [x] WhatsApp message to specific employee/number
+- [ ] WhatsApp message to specific groups
+- [ ] WhatsApp broadcast message to all employees
+- [ ] FCM message to specific employee on the following platform:
+	- [x] Android devices
+	- [ ] iOS devices
+	- [ ] Website with webpush
+- [ ] FCM broadcast message to all employees on all platform
+
 ## Consideration
 
 Images for articles need to be on fixed size so it didnt break for FCM notification on mobile, specification below:
