@@ -11,7 +11,9 @@
 - [x] Centralized API Gateway to other module on the system
 - [x] Login and logout features (data taken from Employee Master Data in the collections of System Authentication)
 - [x] Registration from first time user that login with employee ID and temporary password given by HRD
-- [ ] Simplification of reroute request and internal request for easy development
+- [x] Simplification of reroute request and internal request for easy development
+	- Reroute are only being used by the API Gateway itself
+	- Internal request are used for service-to-service requests
 
 ## Forwarded Request / Reroute
 
@@ -23,6 +25,8 @@ List of exposed endpoint on each module will be discussed later on
 - [ ] [[DB - Attendance Data]]
 - [ ] [[DB - MinIO File Server]]
 - [ ] [[DB - Notification Center]]
+
+Some of above list are also have an open-routes which mean everyone can request to it but also include some additional checks
 
 List of unknown modules as per 10/17/25
 
@@ -44,7 +48,7 @@ The database are internal and not exposed, it has to be setup properly in docker
 
 Read more about [mTLS](https://www.cloudflare.com/learning/access-management/what-is-mutual-tls/) the more secure method of authorization 
 
-There is a discussion to imporve this into **INTERNAL-KEY-V2** where it will only be set and validated from internal to internal requests, therefore blocking any routes access with "/internal" automatically if it called from API-Gateway
+Some information are also needed to access a routes including JWT and the RBAC data, which are being store in shared-library for reroute and internal request function
 
 ## JWT Payload Structure / Custom Headers
 

@@ -12,6 +12,7 @@ This system should be moved from HRIS system to Extension or something else*
 		- Fingerprint machine is a "Fallback" in case it's needed
 	- Looking at the SDK we could create a middleware listener, where it will pass the signal from fingerprint machine into the ERP website on attendance services with special routes for fingerprint automated clock-in/out
 	- The listener application will be build on Python with [pyzk](https://github.com/fananimi/pyzk) library, since it already link all the SDK into one place, and has the support for other series as well. The repository will be shared in here later on 
+- Read more about the fingerprint machine application and their usages on **APP (Extension) - Fingerprint Listener**
 * After many consideration, we decided to do Mobile App as a attendance gate. Mobile App will be installed on every employee and they can do clock-in or clock-out anywhere within the radius. (50 m)
 * There are 3 layer security to clock-in/out: Face recognition, Geolocation, and Geofencing (must connected to local WIFI)
 	* If the system are only available in local network then Geolocation and Geofencing information is redundant
@@ -23,7 +24,7 @@ Since we're going with MongoDB it is good to [read about this](https://www.mongo
 
 ## Use-case Diagram
 
-Attendance can be done with 2 method as per December 2025, either from fingerprint machine validation or mobile application
+Attendance can be done with 2 method as per February 2026, either from fingerprint machine validation or mobile application, website are currently disabled
 
 ![[attendance-use-case.png]]
 
@@ -42,37 +43,6 @@ This is feature that is bind and owned by HRIS for attendances
 
 Additional features
  - We might want to consider using hybrid/remote work environment, therefore employee need to clock-in/out with mobile application outsite the company network
-
-## Fingerprint Machine Details
-
-### Official website specification
-
-![[x105.jpg]]
-![[specification.png]]
-
-### Current status and information
-
-Status and information below are captured at 18 December 2025
-
-Connection/communication to the network
-- IP address: 10.10.10.201
-- Subnet mask: 255.255.255.0
-- Gateway: 10.10.10.1
-
-Image description
-- (A): Device machine information
-- (B): Device current allocated spaces
-
-| Image (A)              | Image (B)                 |
-| ---------------------- | ------------------------- |
-| ![[machine-info.jpeg]] | ![[allocated-space.jpeg]] |
-
-### Known issues
-
-- Fingerprint device port 4370 is restricted to 1 connection
-	- Which mean if we want to yield this to the server for custom fingerprint event listener then HR will not able to access it via the solution application
-- Fingerprint device onboard memory are reseted after 3 days without power? How does this happen? are the CMOS battery faulty or what is happening with the device?
-	- Which mean the connection/communication information will be reseted as well, therefore need manually be set to be on the correct network again 
 
 ## Requirements
 

@@ -22,6 +22,14 @@ But in here we need to know what type of inventory and what details do we want i
 
 And how does they keep their inventory? is it barcode based with SKU on where the location are? and how does that transfer down to department and such.
 
+## Description
+
+So we have concluded that te consideration above are valid, and can be used on the current situation since it is nicely propagated down/up based on the current importance and levels
+
+Currently the inventory unique tags looks like: **INV.Year.Category.No** which is still underdesired since we need to know the object, something like **INV.Year.Category.Item.No** where that give us nice base and specific information altogether
+
+But never the less the development can be continued, current category are limited to electronics. Will fill this later once the development taken place
+
 ## Hasil Observasi
 Tanggal 13 Januari 2026
 #### kendala yang dialami tim GA:

@@ -57,6 +57,8 @@ Read more below in **Company Group Rotation** for data structures and features n
 	- Rolling shift changed per-week basis like Host live schedule
 	- Rolling shift change per-self repetition basis like Security schedule with 2 day work and 1 day off, repetition disregarding anything else 
 
+
+
 ## Database Structures
 
 We have our own independent database exclusively for attendance
