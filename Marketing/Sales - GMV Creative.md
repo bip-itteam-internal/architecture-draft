@@ -3,6 +3,9 @@
 
 Kalodata adalah 3rd party software yang melakukan rangking konten dan iklan Tiktok. Marketing bisa memanfaatkan data ini sebagai acuan iklan & konten apa yang dibuat.
 
+## Production
+https://gmv-creative.bharatainternasional.com
+
 ## Update
 #### 13 Januari 2026
    a. Nama adv

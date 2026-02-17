@@ -3,11 +3,13 @@
 Data insentive selama ini diambil dari Sales, Income, Retur, dan KPI. Semua data tersebut didapat, HR melakukan perhitungan sedemikian rupa untuk menentukan nominal sesuai dengan SK dan peraturan perusahaan. SK [[doc.pdf]] ini berisi sebagai berikut:
 
 ## SPV Marketing
+Insentif SPV didasarkan pada:
 1. Insentif untuk Marketing SPV berdasarkan target profit yang telah ditentukan oleh perusahaan.
 2. Insentif diperhitungkan berdasarkan profit yang diperoleh dari omset aktivitas penjualan oleh Supervisor di seluruh platform setelah dikurangi beban – beban yang perhitungannya dilakukan oleh bagian finance.
 3. Nilai Rata- rata KPI > 70 untuk All Team
 4. Insentif tidak dicairkan apabila total retur dalam satu bulan > 5% dari total kuantiti penjualan.
 5. Insentif tidak dicairkan dan indikator lainnya tidak dihitung normal apabila pencapaian profit < 80%.
+Data akumulasi dibawah ini bisa diperoleh melalui [[External - Accurate]]
 
 | No. | % Pencapaian Target Profit (Bulan) | Insentif dari profit |
 | --- | ---------------------------------- | -------------------- |
@@ -25,9 +27,9 @@ penjualan dapat diberikan.*
 
 ## ADV LEADER
 1. Insentif advertiser berdasarkan pada skor final KPI (Key Performance Indicator)
-2. Skor Final KPI (Key Performance Indicator) dinilai berdasarkan jumlah konversi dan CPA sesuai dengan target yang telah ditentukan oleh Marketing SPV dengan persetujuan dari Tim Finance dan Direktur.
+2. Skor Final KPI (Key Performance Indicator) dinilai berdasarkan jumlah konversi dan CPA sesuai dengan target yang telah ditentukan oleh Marketing SPV dengan persetujuan dari Tim Finance dan Direktur. Data KPI bisa diambil dari [[APP - Dynamic Task Tracker]]
 3. Insentif tidak dicairkan apabila skor final KPI advertiser di bawah 70.
-4. Insentif hanya dihitung berdasarkan jumlah konversi yang tertera pada dashboard akun pengiklan masing-masing advertiser.
+4. Insentif hanya dihitung berdasarkan jumlah konversi yang tertera pada dashboard akun pengiklan masing-masing advertiser. Agregat data ini bisa diambil dari [[Sales - GMV Creative]]
 5. Penjualan lain di luar marketplace tiktok seperti diantaranya shopee, tokopedia, dan Lazada tidak mempengaruhi insentif pada advertiser.
 6. Skema perhitungan insentif advertiser secara bertingkat sebagai berikut:
 
@@ -46,7 +48,7 @@ Perhitungannya: (Finale Score x 0,5 x Jumlah Konversi )
 
 ## ADV META DAN MARKETPLACE
 1. Insentif advertiser berdasarkan pada skor final KPI (Key Performance Indicator).
-2. Skor Final KPI ( Key Performance Indicator) dinilai berdasarkan CPA dan jumlah konversi sesuai dengan target yang telah ditentukan oleh Marketing SPV dengan persetujuan dari Tim Finance dan Direktur.
+2. Skor Final KPI ( Key Performance Indicator) dinilai berdasarkan CPA dan jumlah konversi sesuai dengan target yang telah ditentukan oleh Marketing SPV dengan persetujuan dari Tim Finance dan Direktur. Data bisa diambil dari [[APP - Dynamic Task Tracker]] dan [[Sales - GMV Creative]]
 3. Insentif tidak diberikan apabila skor final KPI advertiser di bawah 70.
 4. Skema perhitungan insentif advertiser sebagai berikut
 
@@ -63,7 +65,7 @@ Perhitungannya: (Finale Score x 2 x Jumlah Konversi)
 
 ## ICC (Internal Content Creator)
 1. Insentif ICC berdasarkan pada skor final KPI (Key Performance Indicator).
-2. Skor Final KPI (Key Performance Indicator) dinilai berdasarkan Jumlah Video dan Konversi sesuai dengan target yang telah ditentukan oleh Marketing SPV dengan persetujuan dari Tim Finance dan Direktur.
+2. Skor Final KPI (Key Performance Indicator) dinilai berdasarkan Jumlah Video dan Konversi sesuai dengan target yang telah ditentukan oleh Marketing SPV dengan persetujuan dari Tim Finance dan Direktur. Data diambil dari [[APP - Dynamic Task Tracker]] dan [[Sales - GMV Creative]]
 3. Insentif tidak diberikan apabila skor final KPI advertiser di bawah 70.
 4. Skema perhitungan insentif Internal Content Creator tahun 2025 sebagai berikut:
 
@@ -108,7 +110,7 @@ Perhitungannya: (Finale Score x 2 x Jumlah Konversi)
 
 ## HOST LIVE
 1. Insentif Host Live berdasarkan pada skor final KPI Tim (Key Performance Indicator).
-2. Skor Final KPI (Key Performance Indicator) dinilai berdasarkan konversi sesuai dengan target yang telah ditentukan oleh Marketing SPV dengan persetujuan dari Tim Finance dan Direktur.
+2. Skor Final KPI (Key Performance Indicator) dinilai berdasarkan konversi sesuai dengan target yang telah ditentukan oleh Marketing SPV dengan persetujuan dari Tim Finance dan Direktur. Data bisa diambil dari [[APP - Dynamic Task Tracker]]
 3. Insentif tidak diberikan apabila skor final KPI tim host live di bawah 70.
 4. Total insentif tiap tim dibagi sejumlah anggota tim. Misal anggota tim terdiri dari 5 orang.
 5. Skema perhitungan insentif Host Live Team sebagai berikut:
@@ -127,7 +129,7 @@ yaitu sebesar Rp 760.000.*
 
 ## AFFILIATOR
 1. Insentif Affiliator Team berdasarkan pada skor final KPI Tim (Key Performance Indicator).
-2. Skor Final KPI (Key Performance Indicator) dinilai berdasarkan jumlah affiliate aktif dan konversi sesuai dengan target yang telah ditentukan oleh Marketing SPV dengan persetujuan dari Tim Finance dan Direktur.
+2. Skor Final KPI (Key Performance Indicator) dinilai berdasarkan jumlah affiliate aktif dan konversi sesuai dengan target yang telah ditentukan oleh Marketing SPV dengan persetujuan dari Tim Finance dan Direktur. Data bisa diambil dari [[APP - Dynamic Task Tracker]]
 3. Total insentif tiap tim dibagi sejumlah anggota tim. Misal anggota tim terdiri dari 4 orang.
 4. Skema perhitungan insentif Affiliator Team sebagai berikut:
 
@@ -146,7 +148,7 @@ yaitu sebesar Rp 996.300.*
 
 ## CRM
 1. Insentif CRM berdasarkan pada skor final KPI Tim (Key Performance Indicator).
-2. Skor Final KPI (Key Performance Indicator) dinilai berdasarkan konversi sesuai dengan target yang telah ditentukan oleh SPV dengan persetujuan dari Tim Finance dan Direktur.
+2. Skor Final KPI (Key Performance Indicator) dinilai berdasarkan konversi sesuai dengan target yang telah ditentukan oleh SPV dengan persetujuan dari Tim Finance dan Direktur. Data bisa diambil dari [[APP - Dynamic Task Tracker]]
 3. Insentif tidak diberikan apabila skor final KPI tim CRM di bawah 70.
 4. Total insentif tiap tim dibagi sejumlah anggota tim. Misal anggota tim terdiri dari 5 orang.
 5. Skema perhitungan insentif CRM Team sebagai berikut:
@@ -169,3 +171,7 @@ Sistem finance mencatat Sales, Income dan Retur. Namun yang menjadi acuan adalah
 
 # Dependencies
 [[Sales - Incentive]]
+[[Sales - GMV Creative]]
+[[External - Accurate]]
+[[Finance - Bridging App]]
+[[APP - Dynamic Task Tracker]]
