@@ -146,7 +146,7 @@ Pengelolaan barang kembali/retur.
 ---
 
 ## issue Finance: 
-1. insentive
+1. insentive [[Finance - Incentive]]
 2. rewrite to golang
 3. platform integration (Tiktok, Shopee, Lazada and Kiriminaja)
 solusi: bisa menggunakan Desty namun belum dicoba
