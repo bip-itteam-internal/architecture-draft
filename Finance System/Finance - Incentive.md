@@ -175,3 +175,71 @@ Sistem finance mencatat Sales, Income dan Retur. Namun yang menjadi acuan adalah
 [[External - Accurate]]
 [[Finance - Bridging App]]
 [[APP - Dynamic Task Tracker]]
+
+
+
+Insentive itu pakai rumus .
+Tiap-tiap rumus itu berbeda tiap jabatan marketing.
+
+Pertanyaanya :
+1.	Bagaimana rumus perhitungan insentive nya ?
+2.	Dari mana mengambil sumber datanya ?
+3.	Bagaimana arsitekturnya :
+		a.	Apakah gabung di erp atau finance atau terpisah ?
+		b.	Pakai mongodb atau postgres ?
+
+Jawaban :
+1.	Rumus perhitungan insentive itu sudah dijelaskan di Finance – Incentive. 
+2.	Dari dashboard tiktok, accurate, erp, task manager dengan detail :
+	Berikut detail sumber data berdasarkan asumsi untuk tiap role marketing :
+	
+	### SPV Marketing
+	1. insentive
+	2. [[Sales - GMV Creative]]/Dashboard TikTok
+	3. [[APP - Dynamic Task Tracker]]
+	4. [[External - Accurate]]
+	5. insentive
+
+	
+
+	### ADV Leader
+	1. insentive
+	2. [[APP - Dynamic Task Tracker]]
+	3. insentive
+	4. [[External - Accurate]]
+	5. insentive
+
+	### ADV META DAN MARKETPLACE
+	1.  insentive
+	2. [[APP - Dynamic Task Tracker]] dan [[Sales - GMV Creative]]/Dashboard TikTok
+	3. insentive
+
+	### ICC
+	1. insentive
+	2. [[APP - Dynamic Task Tracker]] dan [[Sales - GMV Creative]]/Dashboard TikTok
+	3. insentive
+
+	### HOST LIVE
+	1. insentive
+	2. [[APP - Dynamic Task Tracker]]
+	3. insentive
+
+	### AFFILIATOR
+	1. insentive
+	2. [[APP - Dynamic Task Tracker]]
+	3. insentive
+
+	### CRM
+	1. insentive
+	2. [[APP - Dynamic Task Tracker]]
+	3. insentive
+
+3.	jawaban 
+		a.  
+		b. 
+
+Catatan :
+- Butuh RBAC untuk membatasi akses user berdasarkan divisinya
+- perlu pengetahuan GMV itu apakah sama dengan dashboard tiktok jika sama maka data-data yang dari dashboard tiktok tidak perlu diambil lagi => Asumsi salah karena GMV tidak mengambil data dari dashboard TIKTOK. Perlu mendalami bagaimana mengambil data - data yang diperlukan dari tiktok dashboard
+- task manager jelas perlu diperbarui jika ingin dibuat realtim mengikut fitur insentive atau jika ingin targer cepat paling dibuat input manual tanpa refactor task manager
+
