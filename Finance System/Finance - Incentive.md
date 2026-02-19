@@ -235,8 +235,8 @@ Jawaban :
 	3. insentive
 
 3.	jawaban 
-		a.  
-		b. 
+		a.  Gabung ke ERP
+		b.  Menggunakan monggoDB
 
 Catatan :
 - Butuh RBAC untuk membatasi akses user berdasarkan divisinya
