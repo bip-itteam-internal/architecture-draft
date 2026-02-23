@@ -21,7 +21,7 @@ Need futher disscusion on how does this will reside in here, as this is better s
 Some of the features below are actually already done on the shared-library but aren't yet implemented to the notification center; like FCM broadcasting, WhatsApp groups messages and so on
 
 - [x] WhatsApp message to specific employee/number
-- [ ] WhatsApp message to specific groups
+- [x] WhatsApp message to specific groups
 - [ ] WhatsApp broadcast message to all employees
 - [ ] FCM message to specific employee on the following platform:
 	- [x] Android devices
