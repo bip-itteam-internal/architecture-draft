@@ -17,3 +17,165 @@ https://task.bharatainternasional.com
 
 - Integration to this system will took time
 - Context might feel separated from where it should be (for example HRIS task tracker will lives in here instead of the HRIS itself)
+
+## Integration to Insentive
+- Integration to inentive system has some question / problems :
+  1. In [[Finance - Incentive]] ICC, leader/spv check the video using module 
+  2.
+
+Integration to Insentive
+1. pada ICC : pengawas (disebut pengawas karena masih belum diketahui posisi yang melakukan tugas ini) melakukan pengecekan dan evaluasi video di modul khusus R&D. Apa modul khusus R&D tersebut ?
+2. Bagaimana flow task management setelah diperbarui dan integrasi dengan insentive ?
+3. Bagaimana rencana penggabungan task management dengan erp ?
+
+Jawab :
+1. 
+2. Flow task management inegrasi dengan insentive :
+   Untuk integrasi dengan insentive jelas perlu pembaruan flow ux , database dengan jadi patokan divisi marketing untuk intensive, fitur sprint untuk semua divisi:
+    - flow :
+	    tambahan field type pada form buat task/request. yang beda-beda tiap divisi. Khusus untuk marketing disesuaikan dengan insentive maka ada beberapa tambahan type beserta flownya : 
+		- **`ADS_CAMPAIGN` (Untuk Tim ADV & ADV Meta)**
+		    - **Aktivitas:** Menjalankan iklan di TikTok, Meta (FB/IG), dll.    
+		    - **Saat digeser ke "Done" meminta:** _Campaign ID_ atau _Ad Group ID_.
+		    - **Tujuan Metrik:** Menarik data Jumlah Konversi dan CPA dari API TikTok/Meta Ads.	        
+		- **`VIDEO_CONTENT` (Untuk Tim ICC)**
+		    - **Aktivitas:** Memproduksi dan mengunggah video ke TikTok sesuai standar R&D.  
+		    - **Saat digeser ke "Done" meminta:** _Video URL_ atau _Video ID_.
+		    - **Tujuan Metrik:** Menghitung Kuantitas Harian (5 video/hari), dan menarik data _Views_, CTR, _Watch Time_ untuk bonus kualitas video.
+		- **`LIVE_STREAM` (Untuk Tim Host Live)**
+		    - **Aktivitas:** Melakukan sesi siaran langsung (Live) di TikTok Shop/Marketplace.
+		    - **Saat digeser ke "Done" meminta:** _Live Session ID_ atau sekadar _Screenshot GMV_ (jika API belum siap).
+		    - **Tujuan Metrik:** Menarik data Konversi spesifik dari sesi Live tersebut.
+		- **`AFFILIATE_PITCH` / `AFFILIATE_CAMPAIGN` (Untuk Tim Affiliator)**
+		    - **Aktivitas:** Menghubungi kreator (Affiliate) untuk mempromosikan produk Bharata atau membuat _campaign_ komisi.
+		    - **Saat digeser ke "Done" meminta:** _Affiliate Link ID_ atau _Creator Username_.
+		    - **Tujuan Metrik:** Melacak jumlah _Affiliate_ yang aktif (syarat KPI Affiliator) dan Konversi dari _link_ afiliasi tersebut.
+		- **`CRM_BROADCAST` / `CUSTOMER_CLOSING` (Untuk Tim CRM)**
+		    
+		    - **Aktivitas:** Melakukan _follow-up_ database pelanggan lama atau _broadcast promo_.
+		        
+		    - **Saat digeser ke "Done" meminta:** _Nomor Tiket Order / Customer ID_ (Bisa dikoneksikan ke ERP).
+		        
+		    - **Tujuan Metrik:** Menghitung jumlah konversi (pesanan) yang berhasil di-_closing_ oleh tim CRM.
+
+	- Ekspektasi api dan response yang diharapkan 
+	  Berikut ekpektasi api dan response dari pengambilan data dari be :
+		- Data Keuangan (Dari Accurate) - Untuk Syarat SPV & Global
+			Data ini ditarik setiap akhir bulan untuk mengecek Laba Bersih dan batas Retur 5%.
+			- **Endpoint di Golang:** `POST /api/v1/webhook/finance/accurate-summary` 
+			- **Authorization:** `x-api-key: [SECRET_KEY_INTERNAL]`		    
+			- **Ekspektasi Payload (Dikirim oleh Analis Accurate):**
+				```
+				{
+				  "period": "2026-02",
+				  "division": "MARKETING",
+				  "data": {
+				    "net_profit": 85000000,          // Laba bersih dalam Rupiah
+				    "total_sales_qty": 10000,        // Total Pcs terjual bulan ini
+				    "total_return_qty": 350          // Total Pcs retur bulan ini
+				  },
+				  "fetched_at": "2026-02-28T23:59:00Z"
+				}
+				```
+			Response dari Golang (Jika Sukses):
+			```
+			{
+			  "status": "success",
+			  "message": "Finance data for 2026-02 recorded. Return rate is 3.5% (Qualified).",
+			  "reference_id": "fin_889900"
+			}
+			```
+		- Data Advertiser / ADV (Dari TikTok/Meta Ads)
+		
+			Data ini dikirim harian/mingguan untuk memperbarui metrik tiket _Task_ milik ADV.
+			- **Endpoint di Golang:** `POST /api/v1/webhook/marketing/ads-metrics`
+			- **Ekspektasi Payload (Dikirim oleh Analis TikTok/Meta):**
+			
+			JSON
+			
+			```
+			{
+			  "platform": "TIKTOK_ADS",
+			  "campaign_id": "1234567890",       // Harus match dengan ID di tiket ProjectFlow
+			  "metrics": {
+			    "conversions": 150,              // Jumlah Closing
+			    "spend": 2250000,                // Total pengeluaran (Opsional)
+			    "cpa": 15000                     // Cost Per Acquisition
+			  },
+			  "fetched_at": "2026-02-23T10:00:00Z"
+			}
+			```
+			
+			- **Response dari Golang (Jika ID Ditemukan):**
+			JSON
+			```
+			{
+			  "status": "success",
+			  "message": "Metrics updated for Task ID: 64a7b...",
+			  "updated_fields": ["conversions", "cpa"]
+			}
+			```
+			
+			- **Response dari Golang (Jika Error / Campaign ID tidak ada di database):**
+			
+			JSON
+			
+			```
+			{
+			  "status": "error",
+			  "code": "CAMPAIGN_NOT_FOUND",
+			  "message": "No active task found with campaign_id 1234567890"
+			}
+			```
+		- Data Content Creator / ICC (Dari TikTok API)
+		
+			Data ini digunakan untuk mengecek apakah video memenuhi standar kualitas (CTR ≥ 2% & Watch ≥ 30%) dan GMV Max (ROI ≥ 3.2 & Order ≥ 15).
+			
+			- **Endpoint di Golang:** `POST /api/v1/webhook/marketing/video-metrics`
+			    
+			- **Ekspektasi Payload (Dikirim oleh Analis TikTok):**
+			    
+			
+			JSON
+			
+			```
+			{
+			  "video_id": "9876543210123",       // Harus match dengan ID di tiket ProjectFlow
+			  "metrics": {
+			    "views": 50000,
+			    "ctr_percentage": 2.5,           // CTR dalam persen
+			    "watch_time_percentage": 35.0,   // Watch time dalam persen
+			    "total_orders": 20,              // Jumlah order dari video ini
+			    "roi_gmv": 4.1                   // ROI penjualan vs biaya
+			  }
+			}
+			```
+			
+			- **Logic Tersembunyi di Golang:** Saat menerima JSON ini, Golang Anda akan otomatis mengecek: _"Oh, CTR > 2% dan Watch > 30%, berarti is_qualified = true. Oh, Order > 15 dan ROI > 3.2, berarti is_gmv_winner = true"_.
+		- Data Host Live & Affiliator (Dari TikTok Shop)
+		
+			Data untuk tim _Live Stream_ dan _Affiliator_ berfokus pada volume konversi kelompok.
+			
+			- **Endpoint di Golang:** `POST /api/v1/webhook/marketing/shop-metrics`
+			    
+			- **Ekspektasi Payload:**
+			    
+			
+			JSON
+			
+			```
+			{
+			  "source_type": "LIVE_STREAM",      // Bisa "LIVE_STREAM" atau "AFFILIATE_LINK"
+			  "source_id": "live_session_999",   // ID Sesi Live atau ID Campaign Affiliate
+			  "metrics": {
+			    "conversions": 300,              // Jumlah pesanan terbayar (Paid)
+			    "active_affiliates": 0           // Diisi jika type-nya AFFILIATE_LINK
+			  }
+			}
+			```
+
+
+3. 
+
+Catatan :
+1. Harapan memang untuk pengambilan data bisa langsung terintegrasi ke sumber data tapi apakah perlu fitur antisipasi jika pengambilan data itu salah ? misal dibuat input link bukti satau ss laman bukti
