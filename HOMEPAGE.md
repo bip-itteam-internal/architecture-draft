@@ -64,8 +64,13 @@ Below are glances to the code repository with notes on it
     ├── database (Currently exclusive to MongoDB)
     ├── routes (Handles gateway and internal routing)
     │
-    ├── type (Common stuff for model, function and others that being ref often)
-    │   └── common.go
+    ├── common (Common stuff for model, function and others that being ref often)
+    │   ├── env.go
+    │   ├── header.go
+    │   ├── metadata.go
+    │   ├── response.go
+    │   ├── roles.go
+    │   └── struct.go
     │
     ├── models (Models declaration for all services)
     │   ├── attendance
