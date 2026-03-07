@@ -41,4 +41,5 @@ General Affairs ingin punya dashboard untuk menejemen semua aset perusahaan dari
 - [ ] [[GA - Risk Management]]
 - [ ] [[GA - Waste Management]]
 - [ ] [[GA - OCR Document]]
+- [ ] [[GA - Guestbook System]]
 - [ ] [[BASE - Landing Page]]
