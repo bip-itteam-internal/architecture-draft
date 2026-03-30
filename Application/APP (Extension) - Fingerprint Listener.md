@@ -14,7 +14,7 @@ Application are build on Python with [pyzk](https://github.com/fananimi/pyzk) li
 
 Currently we have 2 fingerprint devices:
 - **X105 Solution** (on the Cipari's main office building, ground floor on the main door enterance)
-- **X305 Solution** (on Tinggarjaya's warehouse, specific details on where it placed are unknown)
+- **X609 Solution** (on Tinggarjaya's warehouse, specific details on where it placed are unknown)
 
 Which mean both of those devices need to have the same user data, since those data are need to be sync with the ERP system, any additional devices need to be cloned
 
@@ -25,24 +25,17 @@ Below are the device specification and notes regarding the devices since they ar
 ### X105 Solution 
 
 ![[x105.jpg]]
-![[specification.png]]
+![[Additional documents/Fingerprint Machine X105/specification.png]]
 
 #### Current status and information
 
-Status and information below are captured at 18 December 2025
-
-Connection/communication to the network
-- IP address: 10.10.10.201
-- Subnet mask: 255.255.255.0
-- Gateway: 10.10.10.1
-
-Image description
-- (A): Device machine information
-- (B): Device current allocated spaces
-
-| Image (A)              | Image (B)                 |
-| ---------------------- | ------------------------- |
-| ![[machine-info.jpeg]] | ![[allocated-space.jpeg]] |
+- **Platform**: JZ4725_TFT
+- **Firmware**: Ver 6.60 Jun 23 2015
+- **Serial Number**: OID6090586090601114
+- **MAC Address**: 00:17:61:94:4C:B8
+- **IP Address**: 10.10.10.201
+- **Subnet Mask**: 255.255.255.0
+- **Gateway**: 10.10.10.1
 
 #### Known issues
 
@@ -51,9 +44,24 @@ Image description
 - Fingerprint device onboard memory are reseted after 3 days without power? How does this happen? are the CMOS battery faulty or what is happening with the device?
 	- Which mean the connection/communication information will be reseted as well, therefore need manually be set to be on the correct network again 
 
-### X305 Solution
+### X609 Solution
 
-Currently I have never look nor inspected the device that is being used on Tinggarjaya's warehouse, so this will be empty for the time being 
+This previously used in Tinggarjaya Warehouses, but now are not used anymore and can be utilized for something
+
+Since this device is better than we currently using, we could use this on the main office and update employee ID card with embedded RFID and display the ERP's QR code in the future
+
+![[x609.jpg]]
+![[Additional documents/Fingerprint Machine X609/specification.png]]
+
+#### Current status and information
+
+- **Platform**: ZLM60_TFT
+- **Firmware**: Ver 6.60 Apr 13 2022
+- **Serial Number**: JHG3235300134
+- **MAC Address**: 00:17:61:10:40:48
+- **IP Address**: 
+- **Subnet Mask**: 
+- **Gateway**: 10.10.10.1
 
 ## Additional information
 

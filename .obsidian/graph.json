@@ -90,6 +90,13 @@
         "a": 1,
         "rgb": 12160416
       }
+    },
+    {
+      "query": "file:IT",
+      "color": {
+        "a": 1,
+        "rgb": 11942566
+      }
     }
   ],
   "collapse-display": false,

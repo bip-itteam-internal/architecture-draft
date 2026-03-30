@@ -27,7 +27,7 @@ Some of the features below are actually already done on the shared-library but a
 	- [x] Android devices
 	- [ ] iOS devices
 	- [ ] Website with webpush
-- [ ] FCM broadcast message to all employees on all platform
+- [x] FCM broadcast message to all employees on all platform
 
 ## Consideration
 
