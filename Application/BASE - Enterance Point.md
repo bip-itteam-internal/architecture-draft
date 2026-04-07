@@ -24,11 +24,11 @@ This is able to be implemented in both Mobile and Web application, although the 
 
 ## Requirements
 
-- [ ] Employees master data (look up reference)
-- [ ] Role information from the employee master data
+- [x] Employees master data (look up reference)
+- [x] Role information from the employee master data
 	- [ ] Features status from available system (for maintenance flags, as you don't want to hide this in the front-end, you want to flag this unavailable at the moment)
-- [ ] Unified portal to others services or system
+- [x] Unified portal to others services or system
 
 ## Dependencies
 
-- [ ] [[CORE - API Master Gateway]]
+- [x] [[CORE - API Master Gateway]]

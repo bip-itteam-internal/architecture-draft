@@ -2,7 +2,7 @@
 
 Digitalized version of the current manually handled company's guestbook, currently aren't fully fledge system but we're on it, check out the [GitHub repository](https://github.com/bip-itteam-internal/guestbook-system)
 
-This system is fully owned by GA Security and they have full control over it
+This system is fully owned by GA Security and they have full control over it, all information will be saved under [[Microservices - Attendance Service]]
 
 ## Features
 
@@ -11,7 +11,7 @@ This system is fully owned by GA Security and they have full control over it
 	- Request are valid if the token send match the active token on the ERP system, which being rotated each day on 4 in the morning
 - View of the guestbook are available to GA/Security and all HR roles
 
-- (On-progress) For employee that is late and need to fill out guestbook we have faster option to do so with the help of mobile application, explaination below;
+- For employee that is late and need to fill out guestbook we have faster option to do so with the help of mobile application, explaination below;
 	- Employee come late, and clock in on the gate
 	- Security request the employee to show their employee data QR
 	- Security select 'scan late employee QR' option and simply scan the QR

@@ -33,8 +33,8 @@
 
 ## Unimplemented Features
 
-1. There is plenty of unimplemented features that already have mobile front-end finished, nnow it is the question of when are we going to finish and support those features
+1. There is plenty of unimplemented features that already have mobile front-end finished, now it is the question of when are we going to finish and support those features
 
 ## Dependencies
 
-- [ ] [[CORE - API Master Gateway]]
+- [x] [[CORE - API Master Gateway]]

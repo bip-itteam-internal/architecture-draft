@@ -46,9 +46,3 @@
 - [ ] Employee current assets lists
 - [ ] Employee administration clearance
 - [ ] Employee account status
-
-## Dependencies
-
-- [ ] [[Unlisted - Internal Inventory]]
-	- This is required for on-boarding, remote management and off-boarding
-- [ ] [[APP - Dynamic Task Tracker]]

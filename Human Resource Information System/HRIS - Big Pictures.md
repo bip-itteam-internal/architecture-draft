@@ -27,7 +27,7 @@ HR acknowledge are still in discussion as if the document required it then the m
 
 ## Dependencies
 
-- [ ] [[BASE - Landing Page]]
+- [ ] [[BASE - Enterance Point]]
 - [ ] [[HRIS - Analysis]]
 - [ ] [[HRIS - Attendance System]]
 - [ ] [[HRIS - Attrition]]
