@@ -22,6 +22,34 @@ But in here we need to know what type of inventory and what details do we want i
 
 And how does they keep their inventory? is it barcode based with SKU on where the location are? and how does that transfer down to department and such.
 
+## Merged information from Warehouse Master Data
+
+### Description
+
+*This master data manage on what things are kept/stored in the warehouse at current time, with Stock Keeping Unit and barcode to create a better flow of the system*
+
+## Merged information from Internal Inventory
+
+### Notes
+
+*This doesn't exist or yet mentioned as per 10/7/25 under [Bharata's document files google drive*](https://drive.google.com/drive/folders/1gKly790zuff8roX3kLQq1TVE02jT7drK)*
+
+### Description
+
+*This system would track all company's assets and would be dependency for upcoming system as repairs or something else*
+
+*This could be a child of GA - Inventory Management that reside for all goods that tagged as internal, and this could future be propagated to each system for example IT, HR to manage their own internal inventory approriately*
+
+### Features
+
+- Dashboard
+- Creation and tagging for individual assets (this is closely resemble one of WH - Management System features)
+- Asset assignment to employees
+
+### Pending Details
+
+- [ ] This database seems can be merged with Warehouse Master Data with explicit flags for internal inventory goods
+
 ## Description
 
 So we have concluded that te consideration above are valid, and can be used on the current situation since it is nicely propagated down/up based on the current importance and levels
@@ -102,6 +130,7 @@ berikut alur sebuah barang menjadi aset perusahaan dari awal hingga akhir.
 
 ### Referensi Sistem yang sudah ada
 1. Inventa
+
 ## Dependencies
 
-- [ ] [[Unlisted - Warehouse Master Data]]
+- [ ] [[WH - Management System]]

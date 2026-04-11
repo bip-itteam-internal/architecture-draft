@@ -38,4 +38,4 @@
 
 ## Dependencies
 
-- [ ] [[DB - Attendance Data]]
+- [ ] DB - Attendance Data

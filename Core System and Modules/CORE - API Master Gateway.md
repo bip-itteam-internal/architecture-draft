@@ -21,19 +21,15 @@ Below are the valid endpoint, propagated calls or forwarded request from this ga
 List of exposed endpoint on each module will be discussed later on
 
 - [ ] [[DB - Overview and Notes]]
-- [ ] [[DB - Employees Master Data]]
-- [ ] [[DB - Attendance Data]]
-- [ ] [[DB - MinIO File Server]]
-- [ ] [[DB - Notification Center]]
+- [ ] [[Microservices - Employee Service]]
+- [ ] [[Microservices - Attendance Service]]
+- [ ] [[Microservices - File Service]]
+- [ ] [[Microservices - Notification Service]]
 
 Some of above list are also have an open-routes which mean everyone can request to it but also include some additional checks
 
 List of unknown modules as per 10/17/25
 
-- [ ] [[Unlisted - Internal Inventory]]
-- [ ] [[Unlisted - Warehouse Master Data]]
-- [ ] [[Unlisted - Purchase Master Data]]
-- [ ] [[Unlisted - Sales Master Data]]
 - [ ] [[APP - Dynamic Task Tracker]]
 
 ### Gateway Authorization to Module Endpoint

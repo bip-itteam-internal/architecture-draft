@@ -31,4 +31,4 @@
 
 ## Dependencies
 
-- [ ] [[CORE - API Master Gateway]]
+- [x] [[CORE - API Master Gateway]]

@@ -73,4 +73,4 @@ But more testing are always needed since this is related to the hardware devices
 ## Dependencies
 
 - [x] [[CORE - API Master Gateway]]
-- [x] [[DB - Attendance Data]]
+- [x] [[Microservices - Attendance Service]]

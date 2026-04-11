@@ -8,7 +8,7 @@ This is actively being developed internally, repository are listed below:
 
 ## Features
 
-Currently this lack awareness for the people that use it to keep using it in the long terms, this required something to keep in touch with the person creating or assigned into a ticket, which is the main focus of [[DB - Notification Center]]
+Currently this lack awareness for the people that use it to keep using it in the long terms, this required something to keep in touch with the person creating or assigned into a ticket, which is the main focus of DB - Notification Center
 
 ### Production
 https://task.bharatainternasional.com
@@ -20,7 +20,7 @@ https://task.bharatainternasional.com
 
 ## Integration to Insentive
 - Integration to inentive system has some question / problems :
-  1. In [[Finance - Incentive]] ICC, leader/spv check the video using module 
+  1. In Finance - Incentive ICC, leader/spv check the video using module 
   2.
 
 Integration to Insentive
