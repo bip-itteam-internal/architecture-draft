@@ -24,6 +24,10 @@ Import & olah file Excel dari berbagai platform:
 ### 2. Accurate Synchronization
 - Transaksi dapat **disinkronkan ke Accurate**
 
+### 3. Rekonsiliasi
+* Rekonsiliasi untuk validasi data
+* Rekonsiliasi terkait sales, return dan income
+
 ---
 
 ## 📂 Repositori
@@ -40,16 +44,16 @@ Import & olah file Excel dari berbagai platform:
 ### 1. Master Data
 Master digunakan sebagai komponen dasar referensi transaksi.
 
-| Master            | Penjelasan                                                                               |
-|------------------|-------------------------------------------------------------------------------------------|
-| **Team**         | Grup penjualan — contoh: _Tiktok Beautyhacks, Tokopedia Beautyhacks_                      |
-| **Department**   | Unit kerja — contoh: _LEARNING CENTER, MARKETING - KYURA_                                 |
-| **Project**      | Pemetaan budget/tim — contoh: _BIP CRM, BIP Kyura_                                        |
-| **Platform**     | Marketplace/Channel — _Shopee, Lazada, KiriminAja, Order Online_                          |
-| **Product**      | Daftar produk Bharata                                                                     |
-| **Courier**      | Ekspedisi — _J&T Reguler, JNE Reguler, SiCepat, dll_                                      |
-| **Payment Method** | Transfer / COD / PayLater                                                                |
-| **Status**       | Status alur sistem           |
+| Master             | Penjelasan                                                           |
+| ------------------ | -------------------------------------------------------------------- |
+| **Team**           | Grup penjualan — contoh: _Tiktok Beautyhacks, Tokopedia Beautyhacks_ |
+| **Department**     | Unit kerja — contoh: _LEARNING CENTER, MARKETING - KYURA_            |
+| **Project**        | Pemetaan budget/tim — contoh: _BIP CRM, BIP Kyura_                   |
+| **Platform**       | Marketplace/Channel — _Shopee, Lazada, KiriminAja, Order Online_     |
+| **Product**        | Daftar produk Bharata                                                |
+| **Courier**        | Ekspedisi — _J&T Reguler, JNE Reguler, SiCepat, dll_                 |
+| **Payment Method** | Transfer / COD / PayLater                                            |
+| **Status**         | Status alur sistem                                                   |
 
 ---
 
