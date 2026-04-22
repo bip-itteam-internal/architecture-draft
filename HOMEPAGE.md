@@ -13,6 +13,21 @@ Interaction between the services can be interpreted like image below
 
 It is our entry point for request, which also handle JWT authentication and routes check for open/restricted routes propagation
 
+### Explanation of the API Gateway routes structures
+
+By default API Gateway doesn't have their own routes, and only foward the request to internal services accordingly *(with the exception of authenticaction since it will be post-processed by the API Gateway themself for JWT creation)*
+
+![[api-gateway-routes.png]]
+
+Routes structure lists (full details):
+- **/public** - Stand for public routes, which freely accessable for anyone
+- **/health** - This is heartbeat check for services that will always resolve to `/api/:service/` and sent back the information back
+- **/api** - Stand for normal api calls, this will calll internal services with the requirement of JWT authentication and/or unique `access-key` if requested to one of the open route services *(more explation can be read below)*
+- **/auth** - Stand for authentication, this route will always call into `/api/employee` under the hood and grab employee data and sign it with JWT on API Gateway
+- **/ext** - Stand for extension or external routes, with direct access (no JWT authentication) into services or webhooks *(currently heavily utilized for fingerprint integration)*
+- **/onboarding** - Being used for public access (minimal) information and helper function call/check for onboarding via mobile application 
+- **/debug** and **/dev** - Debug and development routes respectively, only available on dev/staging environment
+
 ### What does the Orchestrator do?
 
 Orchestrator is basically our wrapper for event-based action, for example some request might required to call 2 different services, this system will do it for you for processing required data to do so
