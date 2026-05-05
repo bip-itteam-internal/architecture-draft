@@ -1,52 +1,62 @@
 
 Mermaid file
 ```
-flowchart TD
+---
 
-    START([Mulai\nTim Gudang])
+config:
 
-  
+  layout: elk
 
-    N1[① Pengecekan Stok Fisik\nHitung semua item di gudang]
+---
 
-    D1{Stok Rusak /\nKadaluarsa?}
+flowchart TB
 
-    KARANTINA[Pindah ke\nGudang Karantina]
+    START(["Mulai\nTim Gudang"]) --> N1["① Pengecekan Stok Fisik\nHitung semua item di gudang"]
 
-    N2[② Hitung Selisih Stok\nStok Sistem vs. Hitung Fisik]
+    N1 --> D1{"Stok Rusak /\nKadaluarsa?"}
 
-    N3[③ Input Selisih & Foto\nKe Laporan Stock Opname]
+    D1 -- Ya --> APP["Gunakan MyBharata untuk\nInput data &amp; foto item rusak\n dengan berat/kg"]
 
-    N4[④ Cetak Berita Acara Resmi\nSemua pihak tandatangan]
+    APP --> KARANTINA["Pindah ke\nGudang Karantina"]
 
-    D2{Persetujuan TTD\nDisetujui?}
-
-    N5[⑤ Jalankan Penyesuaian Inventaris\nDi software Accurate]
-
-    FINISH([Selesai])
-
-  
-
-    START --> N1 --> D1
-
-    D1 -- Ya --> KARANTINA --> N2
+    KARANTINA --> N2["② Hitung Selisih Stok\nSistem vs. Fisik"]
 
     D1 -- Tidak --> N2
 
-    N2 --> N3 --> N4 --> D2
+    N2 --> N3["③ Input Selisih & Foto ke Aplikasi\n Stock Opname Report"]
 
-    D2 -- Ya --> N5 --> FINISH
+    N3 --> N4["④ Cetak Berita Acara Resmi\nSemua pihak tandatangan"]
 
-    D2 -- Tidak --o N3
+    N4 --> D2{"Persetujuan TTD\nDisetujui?"}
+
+    D2 -- Ya --> N5["⑤ Jalankan Penyesuaian Inventaris\nDi software Accurate"]
+
+    N5 --> FINISH(["Selesai"])
+
+    D2 -- Tidak --> N3
 
   
 
-    style KARANTINA fill:#1a7a4a,color:#fff
+     N1:::teal
 
-    style N3 fill:#c0392b,color:#fff
+     APP:::red
 
-    style N4 fill:#c0392b,color:#fff
+     KARANTINA:::green
 
-    style N5 fill:#1a7a4a,color:#fff
+     N2:::teal
+
+     N3:::red
+
+     N4:::orange
+
+     N5:::green
+
+    classDef teal stroke:#2dd4bf,fill:#f0fdfa
+
+    classDef green stroke:#4ade80,fill:#f0fdf4
+
+    classDef red stroke:#f87171,fill:#fef2f2
+
+    classDef orange stroke:#fb923c,fill:#fff7ed
 
 ```
