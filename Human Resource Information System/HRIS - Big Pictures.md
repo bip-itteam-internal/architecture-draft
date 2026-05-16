@@ -25,6 +25,14 @@ The proposed draft system, remove back and front process, but add waiting time w
 HR acknowledge are still in discussion as if the document required it then the maximum wait time is 2x24h for 1 requests, which is bad.
 ![[leave-requests-automated-draft.svg]]
 
+### Employee hourly leave approved
+
+When employee with hourly leave are approved they need to pass security's check on the enterance/exit gate,
+This mean security have access to view manual verification to compare/align the employee document to approved HR document just in-case
+Security also need to sign the document with QR scans for leave/back status in the document
+
+![[employee-hourly-leave-approved.svg]]
+
 ## Dependencies
 
 - [ ] [[BASE - Enterance Point]]
