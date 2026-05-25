@@ -10,6 +10,9 @@ This is actively being developed internally, repository are listed below:
 
 Currently this lack awareness for the people that use it to keep using it in the long terms, this required something to keep in touch with the person creating or assigned into a ticket, which is the main focus of DB - Notification Center
 
+## BUGS
+* user masih bisa melihat space dari department lain
+
 ### Production
 https://task.bharatainternasional.com
 
