@@ -210,7 +210,7 @@ Pertanyaanya / problems :
 
 Jawaban :
 1.	Rumus perhitungan insentive itu sudah dijelaskan di Finance – Incentive. 
-2.	Sistem insentif kini berjalan secara **semi-otomatis** dengan background worker (Cron Job) setiap 1 jam untuk mengambil data performa dari *integration service*, *accurate service*, dan sistem HR/Karyawan (*employee service*). Data ditarik ke dalam *draft*.
+2.	Sistem insentif kini berjalan secara **semi-otomatis** dengan background worker (Cron Job) secara berkala untuk mengambil data performa dari *integration service*, *accurate service*, dan sistem HR/Karyawan (*employee service*). Data ditarik ke dalam *draft*. Terdapat aturan **Cut-off** untuk penarikan data: perhitungan harian berjalan penuh (24 jam), namun pada hari terakhir setiap bulan cut-off dilakukan pada pukul 15:00 (Senin-Jumat) atau 12:00 (Sabtu). Data setelah jam cut-off di akhir bulan akan masuk ke perhitungan tanggal 1 bulan berikutnya.
 	Berikut detail sumber data berdasarkan asumsi untuk tiap role marketing :
 	
 	### SPV Marketing
@@ -312,13 +312,13 @@ Data ini memastikan uang dibagikan kepada orang yang tepat dengan pembagi yang t
 		a.  Arsitektur Terpisah: Sistem Insentif dibangun sebagai **Microservice (Golang/Fiber)** independen dengan integrasi via *API Gateway* (`bip-erp/services/insentive`). Frontend menggunakan **Next.js** (`erp-frontend`).
 		b.  Database menggunakan **MongoDB**.
 		c.  Koleksi Database Utama:
-			- `incentive_results`: Untuk menyimpan hasil kalkulasi (*snapshot* data). Memiliki field *status* (`AUTO_DRAFT`, `SUBMITTED`, `APPROVED`) dan `edit_history` untuk Audit Trail.
+			- `incentive_results`: Untuk menyimpan hasil kalkulasi (*snapshot* data). Memiliki field *status* (`DRAFT` dan`APPROVED`) dan `edit_history` untuk Audit Trail.
 			- `employee_performance_mappings`: Menyimpan pemetaan karyawan (`employee_id`, `role`, `platform`) dengan aset kerjanya (`advertiser_id`, `store_id`).
 			- `master_kpis`: Menyimpan master target KPI per-role (misal: untuk mengkalkulasi kuantitas video ICC).
 			- `audit_logs`: Mencatat rekam jejak untuk mapping dan data master.
 
 Catatan :
 - Terdapat **Role-based Visibility**: Finance melihat semua, Supervisor melihat Global, ADV Leader melihat departemen/tim, dll.
-- Terdapat **Approval Workflow**: Semua kalkulasi akan masuk ke `AUTO_DRAFT`, disubmit menjadi `SUBMITTED` (oleh ADV Leader untuk timnya atau diri sendiri), lalu diproses Finance untuk `APPROVED`.
+- Terdapat **Approval Workflow**: Semua kalkulasi akan masuk ke `DRAFT` lalu diproses Finance untuk `APPROVED`.
 - **Manual Override dengan Audit**: Jika terdapat kesalahan data (misal TikTok lag), performa metrik (revenue, dll) bisa ditimpa oleh ADV/Affiliate, atau total insentif di-override oleh Finance. Setiap aksi override diwajibkan menyertakan *reason* yang dicatat rapi pada `edit_history`.
 - Master KPI untuk keperluan ICC atau perhitungan khusus di-manage secara dinamis di sistem, tapi nominal reward ICC dihitung per-video.
