@@ -38,6 +38,7 @@ Security also need to sign the document with QR scans for leave/back status in t
 - [ ] [[BASE - Enterance Point]]
 - [ ] [[HRIS - Analysis]]
 - [ ] [[HRIS - Attendance System]]
+- [ ] [[HRIS - Shift Exchange]]
 - [ ] [[HRIS - Attrition]]
 - [ ] [[HRIS - Interrelationship Matrices]]
 - [ ] [[HRIS - Key Performance Index]]
