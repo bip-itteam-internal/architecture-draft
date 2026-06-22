@@ -49,6 +49,11 @@ Fitur tambahan
 - [x] Master data karyawan (referensi lookup)
 - [x] Akses baca dan tulis ke database attendance
 
+## Fitur Terkait
+
+- [[HRIS - Attendance Correction]] — Alur koreksi untuk clock-in/out yang terlewat
+- [[HRIS - Shift Exchange]] — Alur pertukaran shift/hari libur
+
 ## Dependensi
 
 - [x] [[Microservices - Attendance Service]]
