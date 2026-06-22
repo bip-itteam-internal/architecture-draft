@@ -6,12 +6,36 @@ Saat ini sedang dikembangkan secara internal, repository-nya tercantum di bawah 
 - [Repository frontend](https://github.com/bip-itteam-internal/bharata-task-manager-fe)
 - [Repository backend](https://github.com/bip-itteam-internal/bharata-task-manager-be)
 
-## Fitur
+## Status Implementasi (Frontend — `bharata-task-manager-fe`)
 
-Saat ini masih kurang kesadaran dari orang yang menggunakannya untuk terus memakainya dalam jangka panjang, hal ini membutuhkan sesuatu untuk tetap terhubung dengan orang yang membuat atau ditugaskan ke sebuah tiket, yang menjadi fokus utama DB - Notification Center
+- **Stack**: Next.js 16 (App Router) + React 19 + TypeScript; Kanban drag-drop `@dnd-kit`; `@tanstack/react-table`; axios + SWR; `react-hook-form` + zod; recharts; export Excel (`xlsx`)
+- **Path**: `task-management/bharata-task-manager-fe` (repo terpisah), branch `feature/gateway-cutover`
+- **Production**: `task.bharatainternasional.com`
+- **Status**: ✅ Implemented (aktif dikembangkan)
+
+**Autentikasi & Role**
+- **SSO gateway-cutover SELESAI** — tidak ada login lokal. Tujuan login diarahkan ke ERP (`/auth/callback`), tukar one-time code via `POST /auth/sso/redeem` → ERP JWT (disimpan di localStorage, dikirim sebagai Bearer & token WebSocket). Tanpa refresh token (401 → re-SSO).
+- Role: **staff / supervisor / admin** (dari `GET /api/task-management/me`). Route gating di middleware (`proxy.ts`): `/admin/*` admin+supervisor; divisi/settings/audit admin-only; approval/archive supervisor.
+
+**Fitur (Sudah Diimplementasikan)**
+- Member: dashboard (stat tugas masuk/keluar, refresh realtime), daftar tugas + detail, profile, report KPI, help
+- Spaces & **Kanban**: board per divisi dengan drag-drop status (stage Request/Todo/Done dilindungi), CRUD stage/priority, edit prioritas/tenggat/archive per kartu; drag di-gate per role (staff hanya tugas yang ditugaskan ke dirinya, supervisor di divisinya, admin lintas divisi)
+- Tugas: create/assign (multi-assignee), **approval** (approve dgn start_date + due_date + priority_id + assign_to / reject + alasan), comment, checklist, attachment (file + link, presigned preview), riwayat/aktivitas, badge **SLA** (response + resolution)
+- **Notifikasi**: inbox (unread count, mark-read, delete) + **WebSocket realtime** (auto-reconnect)
+- Admin/supervisor: executive/manager dashboard, team tasks per divisi, approval queue, archive, audit log, report SLA + export Excel
+- Backend lewat bip-erp gateway `/api/task-management/*` → [[Microservices - Task Management Service]] (BE standalone lama `bharata-task-manager-be` ditinggalkan)
+
+## Belum Diimplementasikan / Catatan
+
+- `/admin/settings` (Pengaturan Sistem) = **Coming Soon** (placeholder, disembunyikan dari sidebar)
+- **Members & Roles management** belum di-wire (komponen ada tapi orphan/dead code; tidak ada route `/admin/members`)
+- `/admin/divisions` = **read-only** (CRUD divisi menunggu dukungan backend)
+- **On-time rate** di report selalu menampilkan "—" (gateway belum menyuplai datanya)
+- **Role gating hanya di FE/middleware** — endpoint admin belum punya guard role di backend
+- Catatan adopsi: tantangan utama adalah menjaga pengguna tetap memakai sistem dalam jangka panjang — butuh keterhubungan dengan pembuat/penerima tiket (fokus Notification Center)
 
 ## BUGS
-* user masih bisa melihat space dari department lain
+* **User masih bisa melihat space dari divisi lain** — `SpacesPage` mengambil semua space; filter divisi hanya dropdown client-side yang bisa diubah ke "Semua divisi". Aksi Edit/Delete sudah benar di-gate ke supervisor divisi sendiri, tetapi isolasi tampilan yang sebenarnya perlu **scoping di backend**.
 
 ### Production
 https://task.bharatainternasional.com
