@@ -2,7 +2,9 @@
 
 ## Deskripsi
 
-*Task Management Service adalah sistem help-desk/ticketing internal ERP yang dipadukan dengan board Kanban. Karyawan (requestor) mengajukan request atau keluhan ke sebuah "Space" milik divisi tertentu, lalu supervisor/admin melakukan triase melalui workflow Kanban (`Request → Todo → On Going → Testing → Done`, ditambah jalur `Ditolak`). Service ini menyediakan gate approval, engine SLA dua dimensi (response + resolution) dengan scheduler eskalasi per jam, update realtime via WebSocket, push notification FCM serta inbox melalui notification-service, attachment (MinIO), comment, checklist, audit trail, dan reporting/dashboard.*
+*Task Management Service adalah backend **IT Helpdesk / ticketing** internal ERP yang dipadukan dengan board Kanban. Desk dimiliki dan ditangani oleh **divisi IT**, sementara **karyawan dari semua divisi dapat membuat (submit) tiket** untuk meminta bantuan/penyelesaian. Tiket ditriase oleh tim IT melalui workflow Kanban (`Request → Todo → On Going → Testing → Done`, ditambah jalur `Ditolak`). Service ini menyediakan gate approval, engine SLA dua dimensi (response + resolution) dengan scheduler eskalasi per jam, update realtime via WebSocket, push notification FCM serta inbox melalui notification-service, attachment (MinIO), comment, checklist, audit trail, dan reporting/dashboard.*
+
+> Catatan positioning: kode saat ini masih mendukung multi-divisi (Space per divisi, supervisor per divisi, admin/sekretaris lintas-divisi). Sesuai positioning IT Helpdesk, penanganan difokuskan ke divisi IT dengan semua divisi sebagai requestor — pembatasan scope ke IT perlu dipertimbangkan di implementasi.
 
 - **Stack:** Go + Fiber v2 + MongoDB + MinIO + WebSocket
 - **Path:** `services/task-management`

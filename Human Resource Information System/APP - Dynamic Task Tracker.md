@@ -1,6 +1,9 @@
 ## Catatan
 
-*Pembuatan task tracker dinamis yang terpusat akan bermanfaat bagi sistem lain yang membutuhkan fitur ini, sehingga kita memiliki sistem yang konsisten dan dapat digunakan kembali*
+*Sistem ini diposisikan sebagai **IT Helpdesk / ticketing**: desk dimiliki dan ditangani oleh **divisi IT**, sementara **semua divisi dapat membuat (submit) tiket** ke sana untuk meminta bantuan/penyelesaian dari IT. Dibangun sebagai task tracker dinamis berbasis Kanban yang terpusat agar konsisten dan dapat digunakan kembali.*
+
+> [!note] Positioning vs implementasi
+> Kode saat ini masih mendukung **multi-divisi** (Space per divisi + supervisor per divisi + admin/sekretaris lintas-divisi). Sesuai positioning baru sebagai IT Helpdesk, penanganan tiket difokuskan ke divisi IT dengan semua divisi sebagai requestor — pembatasan scope ke IT perlu dipertimbangkan di implementasi.
 
 Saat ini sedang dikembangkan secara internal, repository-nya tercantum di bawah ini:
 - [Repository frontend](https://github.com/bip-itteam-internal/bharata-task-manager-fe)
