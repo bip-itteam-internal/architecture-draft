@@ -9,44 +9,34 @@ saat ini kebutuhan konten iklan di adv sangat besar dan sangat mengandalkan edit
 3. Implementasi AI pada konten iklan belum ada yang bisa dijadikan acuan. karena konten iklan yang ada diplatform biasanya masih konvensional. Masih tingginya persepsi negatif soal konten AI. Hal ini bisa diatasi apabila implementasi AI hanya di sisipkan dalam sebuah konten, bukan sebuah pokok dari konten. 
 4. Ide yang kreatif masih menjadi pokok utama dalam pembuatan konten
 
-## Implementasi: Ideamills (Veo / Gemini)
+## Implementasi: Ideamills — Pembuatan Video Manual (branch `main`)
 
-*Konsep di atas kini diwujudkan oleh **Ideamills** — platform AI internal untuk membuat video iklan pendek (TikTok/Instagram) dari foto produk → ide kreatif → prompt → image → video. Engine video memakai **Veo 3.1 (Google/Gemini)**, bukan Sora.*
+*Konsep di atas diwujudkan oleh **Ideamills** — platform AI internal untuk membuat video iklan pendek (TikTok/Instagram) dari foto produk → ide kreatif → prompt → image → video. Engine video memakai **Veo 3.1 (Google/Gemini)**, bukan Sora. Dokumen ini mencakup alur **manual** (branch `main`); alur otomatis ada di [[Sales - Veo (Gemini) Automation Layer]].*
 
-- **Stack**: Next.js 15 (App Router) + TypeScript + Tailwind/shadcn; MongoDB (raw driver + GridFS); 3 worker proses (tsx, polling MongoDB sebagai queue); automation pakai LangGraph (+ checkpoint MongoDB)
-- **Path**: `ideamiils` (package `ideamills`), branch `automation-layer`
+- **Stack**: Next.js 15 (App Router) + TypeScript + Tailwind/shadcn; MongoDB (raw driver + GridFS); worker proses (tsx, polling MongoDB sebagai queue) untuk render Veo
+- **Path**: `ideamiils` (package `ideamills`), branch **`main`**
 - **Auth**: terintegrasi **SSO bip-erp** (verifikasi/refresh JWT ke `api.bharatainternasional.com`) — lihat [[CORE - SSO Flow]]; bukan standalone
-- **Status**: ✅ Implemented (manual app matang; automation layer WIP)
+- **Status**: ✅ Implemented (matang)
 
 **Engine AI (sudah ter-wire)**
 - **Video: Veo 3.1 (Google Flow via useapi.net)** — image-to-video, extend (sambung dari frame terakhir klip sebelumnya), concatenate, upscale
 - **Image: Imagen 4 / Nano Banana** (via useapi.net)
-- **LLM: OpenRouter** (Gemini 2.5, Claude Sonnet 4.6, GPT-5, DeepSeek) untuk vision, ideasi, expand prompt, enhance Veo prompt, analisis pola
-- **TikTok scraping: Apify** (trend/competitor/audience)
+- **LLM: OpenRouter** (Gemini 2.5, Claude Sonnet 4.6, GPT-5, DeepSeek) untuk vision, ideasi, expand prompt, enhance Veo prompt
+- **TikTok scraping: Apify** (riset referensi konten)
 
-**Mode pemakaian**
+**Mode pembuatan (manual)**
 - **Dari Nol**: upload foto produk + brief → analisis vision → 3–5 ide → pilih → expand prompt → preview image → video Veo
 - **Quick Generate**: foto + pilih script dari Script Bank → langsung Veo (paling cepat/murah untuk produksi massal)
-- **Automation campaign** (baru, WIP): pipeline otomatis berbasis LangGraph
 
-**Pipeline Automation (LangGraph)**
-`discoverTrends` (scrape TikTok) → `analyzeATM` (Amati-Tiru-Modifikasi pola tren) → `ideate` (ide + N `clipPrompts`) → `produce` (enqueue + tunggu render Veo) → `assemble` (concat klip jadi 1 video) → `reviewStep` (approval manusia / HITL) → `publish` (deliver). Default `clipsPerVideo` = 3 (~24 detik).
-
-**UI / Halaman**: `/studio` (Dari Nol + Quick, upload foto/Word doc), `/scripts` (Script Bank), `/assets` (galeri), `/history` + `/generations/[id]`, `/monitoring` (worker/queue/health), `/studio/concat` (gabung klip manual), `/chat`, `/automation` (campaign + review). *Catatan: `/automation` belum masuk menu sidebar.*
-
-**Belum Diimplementasikan / Roadmap**
-- **Fase 1B**: batch fan-out banyak produk + budget cap per campaign (`automation/scheduler.ts` belum ada)
-- **Fase 1C**: cron scheduler untuk campaign jatuh tempo (`node-cron`)
-- **Fase 2**: auto-publish ke YouTube Shorts + notifikasi Telegram (node `publish` sekarang masih *deliver-only stub*)
-- Publish langsung ke TikTok/Instagram tidak direncanakan (butuh app review platform)
-- Pipeline lama (tech-spec L0–L5, 50-angle) sudah dihapus; worker hanya menerima payload v2 Studio
+**UI / Halaman**
+- `/studio` (Dari Nol + Quick, upload foto/Word doc), `/scripts` (Script Bank), `/assets` (galeri), `/history` + `/generations/[id]`, `/monitoring` (worker/queue/health), `/studio/concat` (gabung klip manual), `/chat`, `/scrape` (riset TikTok)
 
 ## Referensi
 * Form Requirement : https://docs.google.com/spreadsheets/d/1GleSHDjYmOSL6BNrgNZ6M_A9DktdzCGZTqgo-qGZgkI/edit?usp=drive_link
 * Result : https://drive.google.com/drive/folders/1euadg8k0A7rI2wryTtVxjSZIS9DkhpBp?usp=sharing
 
 ## Dokumen Terkait
+- [[Sales - Veo (Gemini) Automation Layer]] — alur otomatis (branch `automation-layer`)
 - [[Sales - GMV Creative]]
-- [[Microservices - Integration Service]]
 - [[CORE - SSO Flow]]
 - [[CORE - API Master Gateway]]

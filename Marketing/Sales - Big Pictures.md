@@ -12,5 +12,6 @@ Selama ini, tim marketing setting iklan langsung ke dashboard platform (Tiktok A
 - [ ] [[Sales - Incentive]]
 - [ ] [[Sales - OTP Management]]
 - [ ] [[Sales - Veo (Gemini) Implementation]]
+- [ ] [[Sales - Veo (Gemini) Automation Layer]]
 - [ ] [[Sales - CRM management tool]]
 - [ ] [[Sales - TikTok Sentiment Pipeline]]
