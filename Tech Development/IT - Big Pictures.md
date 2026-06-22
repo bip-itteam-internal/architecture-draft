@@ -5,4 +5,8 @@ Departemen IT memiliki support yang akan menyelesaikan semua masalah yang masuk 
 
 - [ ] [[BASE - Enterance Point]]
 - [ ] [[IT - Employee System]]
+- [ ] [[IT - Helpdesk]]
 - [ ] [[IT - Monitoring System]]
+- [ ] [[IT - CI-CD]]
+- [ ] [[IT - Development Apps and Tools]]
+- [ ] [[IT - Server, VMs and Databases]]
