@@ -11,5 +11,5 @@ Selama ini, tim marketing setting iklan langsung ke dashboard platform (Tiktok A
 - [ ] [[Sales - GMV Creative]]
 - [ ] [[Sales - Incentive]]
 - [ ] [[Sales - OTP Management]]
-- [ ] [[Sales - Sora 2 Implementation]]
+- [ ] [[Sales - Veo (Gemini) Implementation]]
 - [ ] [[Sales - CRM management tool]]
