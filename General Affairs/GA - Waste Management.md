@@ -14,10 +14,10 @@
 
 - Pencatatan limbah (jenis, jumlah, sumber, periode)
 - Jadwal & log pengangkutan/penyerahan ke pihak ketiga
-- Penyimpanan dokumen kepatuhan/manifest (dapat lewat [[GA - OCR Document]])
+- Penyimpanan dokumen kepatuhan/manifest (dapat lewat [[CORE - OCR Document Service]])
 - Pelaporan periodik + tautan ke [[GA - Audit Internal System]] & [[GA - Risk Management]]
 
 ## Dependensi / Dokumen Terkait
 
 - [[GA - Big Pictures]]
-- [[GA - Audit Internal System]] · [[GA - Risk Management]] · [[GA - OCR Document]]
+- [[GA - Audit Internal System]] · [[GA - Risk Management]] · [[CORE - OCR Document Service]]

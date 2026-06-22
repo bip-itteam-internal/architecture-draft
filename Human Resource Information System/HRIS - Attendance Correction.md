@@ -17,7 +17,7 @@
 
 ## Model Data
 
-Koleksi: `correction_request` (di dalam database attendance)
+Koleksi: `attendance_correction_request` (di dalam database attendance)
 
 ```
 AttendanceCorrectionRequest {

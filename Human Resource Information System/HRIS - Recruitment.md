@@ -28,7 +28,7 @@
 1. Pelamar buka **halaman lowongan publik** → isi data + **upload CV (PDF)** → submit
 2. Sistem simpan CV ke [[Microservices - File Service]] (MinIO) + buat record `candidate` (status `Applied`)
 3. **AI screening otomatis**:
-	- Ekstrak teks CV (PDF; fallback OCR bila CV hasil scan)
+	- Ekstrak teks CV (PDF; fallback OCR via [[CORE - OCR Document Service]] bila CV hasil scan)
 	- Ambil **kriteria dari Job Posting/Requisition** (pendidikan, pengalaman, skill; must-have/nice-to-have)
 	- Kirim ke **LLM (OpenRouter)** → **skor kecocokan (%)** + breakdown per kriteria (terpenuhi/tidak + bukti dari CV) + **rekomendasi lolos/tidak** + ringkasan
 4. Hasil disimpan di `candidate` (status `Screening`) beserta skor & rekomendasi AI

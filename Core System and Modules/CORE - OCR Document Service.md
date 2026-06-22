@@ -1,5 +1,18 @@
 
 
+## Posisi: Shared Service
+
+*OCR Document adalah **shared service lintas-fitur** (bukan khusus General Affairs) — penyedia kapabilitas **OCR + dokumen-intelligence (RAG)** yang dikonsumsi berbagai subsistem ERP.*
+
+## Konsumen / Dipakai oleh
+
+- [[GA - Inventory Management]] — membaca dokumen (pembelian/kedatangan)
+- [[GA - Waste Management]] — dokumen kepatuhan/manifest
+- [[HRIS - Recruitment]] — OCR fallback untuk CV hasil scan (AI CV screening)
+- *Kandidat berikutnya:* [[GA - Procurement System]] (form pengajuan/tanda terima), [[HRIS - Leave Request]] (surat keterangan dokter), [[WH - Stock & Material Management]] (berita acara / dokumen supplier)
+
+---
+
 1. Ringkasan solusi
     
 

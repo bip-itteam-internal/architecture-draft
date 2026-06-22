@@ -40,6 +40,6 @@ General Affairs ingin punya dashboard untuk menejemen semua aset perusahaan dari
 - [ ] [[GA - Procurement System]]
 - [ ] [[GA - Risk Management]]
 - [ ] [[GA - Waste Management]]
-- [ ] [[GA - OCR Document]]
+- [ ] [[CORE - OCR Document Service]]
 - [ ] [[GA - Guestbook System (Complete)]]
 - [ ] [[BASE - Enterance Point]]

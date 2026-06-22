@@ -95,7 +95,7 @@ Tanggal 13 Januari 2026
 - Sales (Mengapa fitur ini ada di sini?)
 	- Sales normal untuk produk, tetapi tidak ada informasi ke mana produk dijual
 	- Saya setuju, lebih baik memindahkan fitur ini ke modulnya sendiri (mis: pindah ke Finance System)
-* OCR Document
+* [[CORE - OCR Document Service|OCR Document]] (shared service)
 	* dokumen fisik yang ada bisa di scan berbentuk gambar yang nantinya diupload ke sistem 
 	* OCR akan membaca dokumen tersebut dan bisa dimanfaatkan untuk kebutuhan lain
 	* misal: pencarian title dokumen, isi dokumen, nomor tertentu di dalam dokumen
