@@ -1,34 +1,45 @@
 ## Deskripsi
 
-*Ini adalah landing page aplikasi yang mencakup portal ke sistem lain, saat ini secara eksklusif diimplementasikan untuk website*
+*Landing page / titik masuk aplikasi yang menyediakan portal ke sistem lain. Saat ini diimplementasikan secara konkret di web ([[APP - Web Application]]) sebagai halaman login + dashboard + sidebar portal berbasis role.*
 
-## Fitur
+## Konsep
 
-Karena kami sudah memiliki informasi dasar karyawan, kami dapat membuat beberapa informasi yang berguna (good to have) bagi mereka pada landing page ini, lihat di bawah
+Karena kita sudah punya data dasar karyawan, landing page menyajikan informasi berguna (good to have) bagi mereka, plus daftar portal ke fitur sistem lain berdasarkan role.
 
-- Pemeriksaan informasi pribadi (read-only)
-- Kalender dengan jadwal kerja dan shift mereka
-	- Yang juga mencakup cuti massal yang sudah ditentukan perusahaan atau hari libur nasional
-- Status kehadiran mereka saat ini (ini membutuhkan HRIS - Attendance System)
-- Status Surat Peringatan (SP, yang dalam bahasa Indonesia berarti Surat Peringatan) dan berapa banyak yang sedang mereka miliki saat ini
-	- Perlu informasi lebih lanjut mengenai penghapusan ini, karena masing-masing memiliki masa berlaku 6 bulan sebelum dihapuskan
+- Informasi pribadi (read-only)
+- Kalender jadwal kerja & shift (termasuk cuti massal perusahaan / hari libur nasional)
+- Status kehadiran saat ini (butuh [[HRIS - Attendance System]])
+- Status Surat Peringatan (SP) dan jumlah yang sedang aktif (tiap SP berlaku 6 bulan sebelum hangus)
 
-Daftar portal akan ditampilkan di sisi kiri layar, terdaftar dengan semua kemungkinan fitur dari setiap sistem aktif berdasarkan role mereka di dalam sistem, contoh di bawah
-- HR Manager login ke APP - Website dan kini berada di BASE - Landing Page, mereka dapat melihat fitur Manage Employee di bawah judul HRIS pada sisi kiri, yang ketika diklik akan langsung membawa mereka ke fitur tersebut, gambar contoh ini akan segera dilampirkan
+Daftar portal ditampilkan di sisi kiri layar: judul module (HRIS, IT, dll) hanya indikasi (tidak dapat diklik), yang dapat diklik adalah fitur di bawahnya — sesuai role karyawan di sistem.
 
 ![[landing-page-example.png]]
 
-Pada sisi kiri, judul seperti: HRIS, Manufacturer, dan IT tidak dapat diklik dan hanya untuk indikasi, yang dapat diklik hanyalah fitur-fitur di bawah judul tersebut
+## Status Implementasi (di [[APP - Web Application]])
 
-Ini dapat diimplementasikan baik pada Mobile maupun Web application, walaupun UX pada mobile mungkin terganggu akibat daftar tab kiri yang tersembunyi ini
+**Sudah diimplementasikan**
+- Halaman login (`employee_id` + password) dengan handoff **SSO** (mint one-time code via `/auth/sso/ticket`)
+- **Portal sidebar berbasis role**: module muncul sesuai `system_roles`; fitur per module bisa langsung diklik (HRIS, Finance, IT, GA, Integration, dll)
+- Dashboard: ringkasan kehadiran pribadi (clock in/out, overtime/telat/cuti), ringkasan karyawan, jadwal/shift
+- Lookup employee master data + informasi role sebagai dasar portal
+
+**Belum diimplementasikan**
+- [ ] Status **Surat Peringatan (SP)** di landing belum ada
+- [ ] **Flag maintenance** per fitur (menandai sistem sementara tidak tersedia, alih-alih menyembunyikannya)
 
 ## Kebutuhan
 
-- [x] Employees master data (referensi look up)
+- [x] Employee master data (referensi look up)
 - [x] Informasi role dari employee master data
-	- [ ] Status fitur dari sistem yang tersedia (untuk flag maintenance, karena Anda tidak ingin menyembunyikan ini di front-end, melainkan ingin menandainya sebagai tidak tersedia untuk sementara)
-- [x] Portal terpadu ke service atau sistem lain
+	- [ ] Status fitur/sistem yang tersedia (untuk flag maintenance)
+- [x] Portal terpadu ke service / sistem lain
 
 ## Dependencies
 
 - [x] [[CORE - API Master Gateway]]
+- [[Microservices - Employee Service]] — sumber data karyawan & role
+
+## Dokumen Terkait
+
+- [[APP - Web Application]]
+- [[APP - Mobile Application]]

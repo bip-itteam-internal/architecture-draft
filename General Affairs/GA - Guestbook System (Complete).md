@@ -1,25 +1,50 @@
 ## Deskripsi
 
-Versi digital dari guestbook perusahaan yang saat ini ditangani secara manual, saat ini belum menjadi sistem yang sepenuhnya lengkap tetapi kami sedang mengerjakannya, lihat [repository GitHub](https://github.com/bip-itteam-internal/guestbook-system)
+*Versi digital guestbook perusahaan yang dulunya manual. Aplikasi web publik untuk pengunjung mengisi buku tamu via QR code; datanya disimpan di [[Microservices - Attendance Service]]. Sistem ini dimiliki penuh oleh GA Security. Lihat [repository GitHub](https://github.com/bip-itteam-internal/guestbook-system).*
 
-Sistem ini sepenuhnya dimiliki oleh GA Security dan mereka memiliki kontrol penuh atasnya, semua informasi akan disimpan di bawah [[Microservices - Attendance Service]]
+- **Stack**: Astro 5 (SSR, `output: 'server'`) + Svelte 5 (island form) + Tailwind v4; adapter `@astrojs/node` (standalone)
+- **Path**: `guestbook-system` (repo terpisah), branch `master`
+- **Deploy**: `tamu.bharatainternasional.com` — mobile-first, publik (tanpa login; akses di-gate oleh token per-kunjungan di URL)
+- **Status**: ✅ Implemented (funnel pengisian tamu; bukan sistem admin lengkap)
 
-## Fitur
+## Alur & Halaman (Sudah Diimplementasikan)
 
-- Aplikasi web publik yang bertanggung jawab mengirim entri guestbook ke sistem ERP
-	- Security menampilkan QR code guestbook kepada pengunjung untuk mereka isi guestbook-nya
-	- Request valid jika token yang dikirim cocok dengan token aktif pada sistem ERP, yang dirotasi setiap hari pada pukul 4 pagi
-- Tampilan guestbook tersedia untuk GA/Security dan semua role HR
+- `index.astro` — landing statis "Cara Penggunaan" (3 langkah)
+- `visit/[token].astro` — halaman inti: validasi token (SSR) ke API, gagal → redirect `/invalid`; tampilkan splash + `GuestForm`. Membaca query opsional `standby_security` & `visiting_office`
+- `success.astro` — konfirmasi setelah submit
+- `invalid.astro` — halaman error (`?reason=invalid|expired|used|notfound`); `404.astro` → redirect ke `/invalid`
 
-- Untuk karyawan yang terlambat dan perlu mengisi guestbook, kami memiliki opsi yang lebih cepat untuk melakukannya dengan bantuan aplikasi mobile, penjelasan di bawah;
-	- Karyawan datang terlambat, dan clock in di gerbang
-	- Security meminta karyawan untuk menampilkan QR data karyawan mereka
-	- Security memilih opsi 'scan late employee QR' dan cukup scan QR-nya
-	- Detailnya terisi otomatis dan diteruskan ke guestbook
+**Alur tamu:** Security tampilkan QR → pengunjung scan → `/visit/<token>` → token divalidasi → isi form (kategori personal/rombongan; nama, telepon, instansi, plat, tujuan, orang yang ditemui, jumlah orang bila rombongan) → submit → `/success`. Jika error API, muncul toast dan form tetap aktif.
 
+**Jalur cepat karyawan terlambat** (lewat [[APP - Mobile Application]]): karyawan clock-in di gerbang → Security pilih "scan late employee QR" → scan QR data karyawan → detail terisi otomatis & diteruskan ke guestbook.
+
+## Integrasi Backend & Notifikasi
+
+- API client tipis (`fetch`), base URL dari `PUBLIC_API_BASE_URL`. **Tanpa auth header** (akses publik token-based).
+- Endpoint yang dipakai (lewat [[CORE - API Master Gateway]] → [[Microservices - Attendance Service]]):
+	- Validasi token: `POST /public/guestbook?validate=token`
+	- Submit tamu: `POST /public/guestbook`
+- Token guestbook dirotasi tiap hari (pukul 04:00) oleh sistem ERP.
+- **Notifikasi host** (mis. WhatsApp/FCM saat tamu datang) **dipicu di sisi backend** sebagai respon `POST /public/guestbook`, bukan oleh aplikasi web ini. Di FE hanya ada toast on-screen.
+- **Tampilan/daftar guestbook** untuk GA/Security & role HR ada di [[APP - Web Application]] (bukan di aplikasi tamu ini).
+
+## Belum Diimplementasikan / Catatan
+
+- Tidak ada halaman admin / log kunjungan di aplikasi tamu ini (murni funnel submission)
+- QR code di-generate di tempat lain; app ini hanya mengonsumsi link `/visit/<token>`
+- `PUBLIC_API_BASE_URL=/proxy` di production bergantung pada reverse proxy eksternal (nginx) — tidak ada middleware proxy di repo
+- README sudah usang (masih menyebut endpoint `/api/guest` & field lama; klaim auto-redirect 10 detik di `/success` tidak ada di kode)
+- Validasi token meredirect semua kegagalan ke `?reason=invalid` (varian `expired`/`used` praktis tak terjangkau)
+- Sisa artifact build Vercel masih ada di tree meski sudah pindah ke adapter Node
 
 ## Pratinjau
 
-Karena aplikasi ini mobile-first, kami sekarang tidak terlalu peduli untuk mendukung tampilan yang lebih baik untuk desktop
+Aplikasi ini mobile-first; tampilan desktop belum diprioritaskan.
 
 ![[Pasted image 20260307112209.png]]
+
+## Dokumen Terkait
+
+- [[Microservices - Attendance Service]]
+- [[APP - Web Application]]
+- [[APP - Mobile Application]]
