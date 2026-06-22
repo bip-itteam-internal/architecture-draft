@@ -59,6 +59,7 @@
 - `PATCH /request/cancel` — pembatalan request.
 - `GET /request/security-lookup` — lookup oleh security (RequireSecurity).
 - `PATCH /request/security-verify` — verifikasi oleh security.
+- Detail jenis cuti/izin, reviewer, kuota & alur: [[HRIS - Leave Request]]
 
 **Shift Exchange (workflow)**
 - `POST /shift-exchange/create`, `GET /shift-exchange/view`, `PATCH /shift-exchange/review`, `PATCH /shift-exchange/cancel` — pertukaran hari kerja/libur (atau slot shift) dengan approval multi-level; setelah disetujui otomatis menyesuaikan attendance (`applyApprovedShiftExchange`). Detail lengkap: [[HRIS - Shift Exchange]].
@@ -90,6 +91,7 @@
 ## Dokumen Terkait
 
 - [[HRIS - Attendance System]]
+- [[HRIS - Leave Request]]
 - [[HRIS - Shift Exchange]]
 - [[HRIS - Attendance Correction]]
 - [[HRIS - Payroll]]
