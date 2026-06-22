@@ -29,6 +29,7 @@ Doc: [[Microservices - Attendance Service]]
 - fingerprint_export
 - guestbook
 - leave_request
+- shift_exchange_request
 
 ### notification — `notification-mongo-db`
 Doc: [[Microservices - Notification Service]]
