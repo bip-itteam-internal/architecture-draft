@@ -185,6 +185,7 @@ src/features/hris/shift-exchange/
 - Non-shift employees have client-side validation enforcing work_date must be a red date and exchange_date must not be
 - Approval progress shows a visual pipeline with colored status indicators per reviewer
 - Pending review count is polled every 60 seconds for the sidebar badge
+- All list tables use client-side pagination with page size options: 3 (default), 5, 10, 50
 
 ## Requirements
 

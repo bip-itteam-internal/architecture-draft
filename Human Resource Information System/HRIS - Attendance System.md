@@ -49,6 +49,11 @@ Additional features
 - [x] Employees master data (look up reference)
 - [x] Read and write access to attendance database
 
+## Related Features
+
+- [[HRIS - Attendance Correction]] — Correction workflow for missing clock-in/out
+- [[HRIS - Shift Exchange]] — Shift/day-off exchange workflow
+
 ## Dependencies
 
 - [x] [[Microservices - Attendance Service]]
