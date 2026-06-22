@@ -33,6 +33,7 @@
 ### TikTok Shop
 - OAuth: `/auth` (+ callback), `/authorized-shops`
 - Orders: list/detail, direct, sync
+- GMV Winning Content: `GET /tiktok/shop/insight/gmv-winning-content` — daftar konten pemenang GMV (handle `ErrShopNotFound` → HTTP 400)
 - Accounts: CRUD
 
 ### Shopee
@@ -46,11 +47,22 @@
 ### Transactions (model terpadu)
 - `/transactions/orders/list`, summary (+ shops / + products), `/transactions/orders/:id`
 - Master: `/master/shops`, `/master/channels`, `/master/status`
-- Summary Reports: list, `POST` trigger, group-by-status, get, items, retry, delete
+- Summary Reports: list, `POST` trigger, group-by-status, get, items, **invoices** (`/summary/reports/:id/invoices`), retry, delete
 - `POST /summary/reports/:id/send/:service` — kirim ringkasan ke Accurate
+- **Income reporting**: agregasi income invoice + field income pada transaction order (laporan pemasukan)
+- **Demography Insight**: `GET /transactions/insight/demography` — insight demografi dari transaksi
+- **Status history**: pelacakan riwayat status (status history) transaction order
 
 ### Accurate
 - Shop Settings: CRUD (`/accurate/settings/shops`)
+- **Product Management**: CRUD `/accurate/products` + validasi item (mapping produk Accurate)
+- **Bank Account**: CRUD `/accurate/bank-accounts`
+- **KV Config** (key-value): CRUD `/accurate/settings/kv-configs`
+
+### Marketing Team & Shop ACL (admin only)
+- `/marketing/teams` — CRUD tim marketing (gated `RequireIntegrationAdmin` = supervisor/admin module integration)
+- Anggota tim: assign/unassign member (`/marketing/teams/:id/members`)
+- **Shop ACL**: assign/unassign toko ke tim (`/marketing/teams/:id/shops`) — kontrol akses toko per tim marketing
 
 ### Items / Master Catalog
 - CRUD lengkap: `/items/list`, `/items/sku/:sku`, history, create, bulk, bundle, variations, patch, delete
@@ -68,6 +80,7 @@
 - Desty-credential refresh — tengah malam
 - Sync Shopee performance — 2 AM
 - Redis queue digunakan untuk task summary-report
+- Optimasi concurrency: global semaphore + sequential processing untuk mitigasi rate limit API marketplace
 
 ## Belum Diimplementasikan / Catatan
 

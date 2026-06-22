@@ -55,6 +55,7 @@
 
 - Tidak ada stub berarti — ini service paling lengkap dalam ekosistem bip-erp.
 - Hanya beberapa entry registry yang masih di-comment, yaitu department CRM dan role warehouse.
+- **Daftar posisi (position title) per departemen** didefinisikan di `shared-library/models/employee`. Catatan terbaru: posisi **"Bootcamp Content Creator"** kini berada di bawah **GA** (`PositionTitleGA`), dipindah dari HR.
 
 ## Dependencies & Integrasi
 

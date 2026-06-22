@@ -52,6 +52,11 @@ Doc: [[Microservices - Integration Service]]
 - items / master catalog
 - credentials
 - holidays
+- marketing_teams (grouping tim + shop ACL)
+- accurate_products
+- accurate_bank_accounts
+- accurate_kv_configs
+- shopee_escrow_details
 
 ### inventory — `inventory-mongo-db`
 Doc: [[Microservices - Inventory Service]]
