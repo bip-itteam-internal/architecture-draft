@@ -1,40 +1,116 @@
 ## Deskripsi
 
-*Ini adalah aplikasi/platform utama yang akan menjadi portal untuk mengakses seluruh sistem dan fitur, informasi mengenai survei perangkat mobile karyawan [terdaftar di sini](https://docs.google.com/spreadsheets/d/1w2blhMgFx1BI9zu6ni5gmQJab_NfMhdocm0cj5pyO_s/edit?usp=sharing)*
+*Aplikasi mobile **MyBharata** (`my_bharata`) adalah aplikasi HRIS resmi PT Bharata Internasional — satu codebase Flutter untuk Android & iOS yang menjadi portal karyawan untuk seluruh siklus HR: attendance → cuti/izin → lembur → payroll → evaluasi. Aplikasi menegakkan aturan "Peraturan Perusahaan 2026–2028" secara otomatis dan mencegah kecurangan absensi melalui biometric + geofencing + validasi QR.*
 
-## Fitur
+- Pengguna: karyawan, supervisor, HRD, IT admin, dan tamu eksternal (guest book)
+- Versi build saat ini: **1.9.3+101** (sumber: `pubspec.yaml`)
+- Target platform: Android (minSdk 23 / Android 6.0+), iOS 13+
+- Survei perangkat mobile karyawan [terdaftar di sini](https://docs.google.com/spreadsheets/d/1w2blhMgFx1BI9zu6ni5gmQJab_NfMhdocm0cj5pyO_s/edit?usp=sharing)
 
-- Halaman login
-	- Login dengan username dan password, atau dengan passkey tambahan yang telah disiapkan pada halaman registrasi
-	- Informasi lebih lanjut mengenai passkey dapat dilihat di Employee Master Data
-- Halaman registrasi atau on-boarding
-	- ~~(Tidak digunakan untuk saat ini karena kami tidak ingin langsung menerapkan verifikasi kedua) Ini berada di dalam halaman login, di mana diperlukan klik tambahan untuk "Karyawan baru", berikut adalah alur registrasinya:~~
-		1. ~~Informasi mengenai karyawan sudah diisi oleh HRD dan mengetahui Employee ID merupakan syarat untuk langkah berikutnya~~
-		2. ~~Masukkan Employee ID yang belum terdaftar dan sistem akan menampilkan nama lengkap karyawan tersebut (untuk memastikan karyawan dan akun mereka cocok)~~
-		3. ~~Kewajiban untuk mengisi username baru, password, dan memilih 1 opsi untuk verifikasi kedua (nomor telepon atau email, ini adalah data read-only yang diambil dari MODULE - Employee Master Data)~~
-		4. ~~Pengaturan tambahan untuk metode login alternatif dengan PIN atau passkey biometrik (berdasarkan kemampuan perangkat) langkah ini dapat dilewati~~
-	- Ini terjadi secara otomatis ketika karyawan login ke platform untuk pertama kalinya
-		1. Karena karyawan tidak tahu apa yang harus dimasukkan pada username/password, HRD perlu memberi tahu karyawan baru Employee ID mereka dan password sementara yang dihasilkan oleh sistem
-		2. Karyawan login ke platform menggunakan Employee ID mereka (pada kolom username) dan password sementara
-		3. Sistem secara otomatis memeriksa kredensial dan mengetahui bahwa ini adalah pertama kalinya mereka mengakses platform, sehingga mereka dialihkan ke halaman untuk mengatur username dan password baru
-		4. Setelah pengaturan selesai, mereka dibawa kembali ke halaman login untuk menguji detail/kredensial login mereka sebelum masuk ke platform
-	- HRD akan dapat melihat password sementara dari pembuatan data karyawan baru untuk diinformasikan kepada karyawan tersebut agar dapat login ke platform menggunakan Employee ID dan password sementara mereka
-- Dashboard dasar dengan portal untuk mengakses sistem lain (BASE - Landing Page)
-	- Halaman dashboard dasar akan mencakup informasi dasar atau status karyawan
-	- Akses portal ke sistem lain akan ditampilkan dengan antarmuka portal modular, kemungkinan dengan dashboard berbasis tile
+## Tech Stack
 
-## Fitur yang Sudah Diimplementasikan
+- **Framework**: Flutter (Dart SDK `^3.8.1`)
+- **State management**: `flutter_bloc` / `bloc` (pola event `Verb+Object`, state Initial/Loading/Loaded/Error/Empty)
+- **Dependency Injection**: `get_it` (registrasi berlapis: core → services → datasources → repositories → usecases → blocs)
+- **Networking**: `dio` melalui `ApiInterface`; response dibungkus `BaseResponse`; error dipetakan ke `Failure` (functional error handling pakai `fpdart` → `Either<Failure, T>`)
+- **Routing**: `go_router` dengan redirect terpusat (intro → login → PIN → auth)
+- **Lokalisasi**: `flutter_localizations` + `intl`; **Bahasa Indonesia (default)** & **English** via file ARB, diakses lewat `context.l10n.<key>`
+- **Firebase**: Core, Analytics, Crashlytics, Messaging (FCM), Performance — dengan dua flavor `dev`/`prod` (project `hris-bharata-dev` & `hris-bharata-prod`)
+- **Library penting lain**: `mobile_scanner` + `pretty_qr_code` (QR), `geolocator`/`geocoding` (geofencing), `local_auth` (biometric), `pinput` (PIN), `flutter_secure_storage` + `jwt_decoder` (auth), `syncfusion_flutter_pdfviewer` (payslip), `fl_chart` (grafik KPI), `table_calendar`, `flutter_local_notifications`
+- **CI/CD**: Codemagic
 
-1. Halaman login dengan username dan password
-2. Halaman re-login cepat dengan PIN atau Biometrik
-3. Fitur onboarding untuk pengguna pertama kali atau akun yang di-reset
-4. Tampilan kehadiran hari ini dan jadwal
-5. Clock-in dan clock-out kehadiran
+## Arsitektur
 
-## Fitur yang Belum Diimplementasikan
+- **Pola**: Clean Architecture + **Feature-First** — setiap fitur di `lib/src/features/<feature>/`, dengan kode bersama di `lib/src/core/`
+- **Layer per fitur**: `domain/` (entity, kontrak repository, usecase — pure Dart) → `data/` (model, datasource, implementasi repository + pembungkusan error) → `presentation/` (bloc, pages, widgets)
+- **Aliran data** searah: UI → BLoC → Usecase → Repository (abstract) → RepositoryImpl → Datasource, dan mengembalikan `Either<Failure, Entity>` ke atas
+- **Aturan**: domain bebas dependency framework; presentation hanya bicara ke BLoC; model data wajib `extend` entity domain
 
-1. Masih banyak fitur yang belum diimplementasikan yang front-end mobile-nya sudah selesai, sekarang tinggal pertanyaan kapan kami akan menyelesaikan dan mendukung fitur-fitur tersebut
+## Autentikasi
 
-## Dependencies
+- Login **email/password** menerbitkan **JWT** dengan silent refresh; token disimpan di `flutter_secure_storage`
+- **Biometric** (Face ID / fingerprint, via `local_auth`) untuk re-login cepat dan akses sensitif
+- **PIN** sebagai metode re-login alternatif
+- Kebijakan **1 akun = 1 device** (validasi pakai `device_info_plus`)
+- Onboarding: karyawan baru login pertama kali dengan Employee ID + password sementara dari HRD, lalu diarahkan untuk mengatur kredensial baru
 
-- [x] [[CORE - API Master Gateway]]
+> [!note] Catatan integrasi backend
+> Pada implementasi saat ini, MyBharata terhubung **langsung ke HRIS backend** (`https://admin.hris-bharata.com`, UAT `https://admin-dev.hris-bharata.com`) menggunakan JWT — **bukan** melalui [[CORE - API Master Gateway]] dan **bukan** SSO. Ini adalah selisih antara rencana arsitektur (portal terpusat di belakang API Master Gateway) dengan kondisi aplikasi yang sudah dibangun. Lihat bagian *Dependencies & Integrasi*.
+
+## Fitur Utama (Live)
+
+### Navigasi & Beranda
+- **Bottom navigation 5 tab**: Home, History (riwayat kehadiran), Scan/QR (Wi-Fi verification), Information (berita/artikel), Profile
+- **Home dashboard**: ringkasan kehadiran hari ini, pengumuman/berita perusahaan, carousel cuaca, dan grid menu cepat
+- **Notification center**: daftar + detail notifikasi (push via FCM), badge jumlah belum dibaca
+
+### Attendance (Kehadiran)
+- Clock-in / clock-out tervalidasi **QR Code + geofencing + biometric**, disertai capture **mood** karyawan
+- Lihat **jadwal kerja** (shift) dan **riwayat kehadiran** (kalender + statistik)
+- **My Team**: supervisor melihat kehadiran tim
+- **Employee Mood List**: pemantauan mood check-in karyawan
+
+### Submission — Izin & Cuti
+- Pengajuan **cuti tahunan, sakit, dispensasi, dinas luar kota**, dan **cuti melahirkan** (maternity, approval 3 tingkat: supervisor langsung → HR → Direksi) beserta riwayatnya
+- **Vacation Quota**: lihat sisa kuota cuti
+- **Check Permission / Verify Leaves**: verifikasi/approval pengajuan (untuk HR/atasan)
+
+### Lembur (Overtime)
+- Pengajuan lembur (form tanggal, alasan, upload file) dengan alur **approval SPKL** oleh supervisor
+
+### Payroll
+- Lihat **payslip** bulanan (PDF terenkripsi, **dilindungi PIN**, ditampilkan in-app) dan riwayat payslip tahunan
+
+### KPI & Task
+- **KPI**: laporan performa kuartalan (read-only di mobile) dengan grafik
+- **Task Management**: daftar & detail tugas yang ditugaskan
+
+### Fitur pendukung lain
+- **QR Code**: tampilkan QR pribadi + akses scanner inventory
+- **Guest Book**: tamu eksternal mengisi buku tamu (scan QR, input manual, kategori)
+- **Information**: feed berita/artikel internal
+- **Company Info**: detail perusahaan, handbook, kebijakan, struktur organisasi, kontak darurat
+- **Help Center**: FAQ (pencarian + kontak)
+- **IT Support**: daftar kontak IT (termasuk WhatsApp)
+- **Weather**: widget cuaca lokal untuk karyawan lapangan
+- **Settings**: bahasa (ID/EN), tema (terang/gelap), toggle biometric, pengaturan notifikasi
+
+## Fitur Developer / Admin
+
+> Catatan: belum ada **role-based gating** di routing layer — fitur ini hanya "tersembunyi" (tidak muncul di menu UI normal) dan diasumsikan di-enforce oleh backend.
+
+- **Developer Menu** (`/developer`) — hub navigasi untuk menguji seluruh route + demo halaman attendance
+- **Components Test** (`/component`) — sandbox komponen UI
+- **IT Admin — Account Reset** (`/it/account-reset`) — reset password akun karyawan
+
+## Fitur "Coming Soon" (Belum Tersedia)
+
+Tercantum di menu tetapi masih placeholder (route `/coming-soon` atau stub):
+- Digital ID, My Documents, Policy/Handbook, Insurance, Loan, Meeting Room, Vehicle, Learning Center, Inbox, Chat HRD
+
+## Roadmap (Belum Diimplementasikan)
+
+- **Offline-Mode Attendance** — rekam absensi offline (GPS terenkripsi lokal), auto-sync saat online *(prioritas: High)*
+- Naikkan test coverage 55% → 70% (fokus `attendance`, `payroll`)
+- Migrasi widget `payroll` lama ke dark theme
+- Penyatuan penanganan timezone (server UTC, format lokal di presentation)
+
+## Known Issues
+
+1. **Selisih waktu attendance lintas timezone** — perjalanan dinas lintas zona (mis. WIB → WITA) menampilkan jam clock-in yang salah; sebagian presentation pakai `DateTime.now()` lokal alih-alih konversi dari UTC server
+2. **Download payslip gagal di sebagian Android 13+** — permission storage lama ditolak Android 13 (API 33); workaround: lihat payslip via viewer in-app
+3. **JWT expiry setelah lama di background** — setelah >2 jam, app bisa freeze/terlempar ke Login akibat tabrakan refresh token pada request paralel
+
+## Dependencies & Integrasi
+
+- **HRIS backend** (`admin.hris-bharata.com`) — sumber data utama; integrasi langsung via REST + JWT
+- **Firebase** — Analytics, Crashlytics, FCM (push notification), Performance
+- [ ] [[CORE - API Master Gateway]] — *rencana awal:* portal terpusat di belakang gateway. *Kondisi saat ini:* belum dipakai oleh MyBharata (lihat catatan integrasi backend di atas)
+
+## Dokumen Terkait
+
+- [[HRIS - Attendance System]]
+- [[HRIS - Payroll]]
+- [[Microservices - Attendance Service]]
+- [[Microservices - Employee Service]]
+- [[Microservices - Notification Service]]
