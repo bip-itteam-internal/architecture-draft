@@ -18,7 +18,7 @@
 - `/auth/verify/jwt`, `/auth/verify/pin` — verifikasi kredensial
 - `/auth/logout` — revoke token + opsional deactivate device
 
-**SSO (one-time-code handoff, bukan IdP eksternal)**
+**SSO (one-time-code handoff, bukan IdP eksternal)** — alur lengkap end-to-end di [[CORE - SSO Flow]]
 - `POST /auth/sso/ticket` (butuh JWT valid) — menghasilkan kode hex sekali-pakai, disimpan di `ssoStore` in-memory, TTL 30 detik
 - `POST /auth/sso/redeem` (publik, rate-limited) — tukar kode menjadi ERP JWT
 - Dipakai oleh FE Task Manager untuk handoff sesi
