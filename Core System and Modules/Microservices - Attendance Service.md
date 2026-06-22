@@ -1,67 +1,67 @@
-## Description
+## Deskripsi
 
-*This database kept record of attendance from employees, therefore this need reference link into employee data and their work schedule to assign proper status, based on this [employee schedule and shift details](https://docs.google.com/document/d/1W0MOCEPyoodp_09atBVe_PGDhSaoMgfxN2SCvpMVyHY/edit?tab=t.0)*
+*Database ini menyimpan catatan kehadiran karyawan, sehingga membutuhkan reference link ke data karyawan dan jadwal kerja mereka untuk menetapkan status yang tepat, berdasarkan [detail jadwal dan shift karyawan](https://docs.google.com/document/d/1W0MOCEPyoodp_09atBVe_PGDhSaoMgfxN2SCvpMVyHY/edit?tab=t.0)*
 
-## Features
+## Fitur
 
-- **(Complete)** Automated attendance data creation based on employee shift with cron job 2 hours prior before their shift began
-- **(Complete)** Employee get their newest attendance data sorted from datetime and their proper shift
-- **(Complete)** Employee self-service to clock-in and clock-out endpoint (limited to modifing the entry, no creation needed)
-- **(Complete)** Employee can see their work schedules in the current month, including holiday that being set by HRIS in calendar (low priority)
-- Send out FCM notification to device to remind them of their work schedules
-- HRIS additional forced flagging and document insertion to the entries (low priority)
+- **(Selesai)** Pembuatan data kehadiran otomatis berdasarkan shift karyawan dengan cron job 2 jam sebelum shift mereka dimulai
+- **(Selesai)** Karyawan memperoleh data kehadiran terbarunya yang diurutkan berdasarkan datetime dan shift yang sesuai
+- **(Selesai)** Self-service karyawan untuk endpoint clock-in dan clock-out (terbatas hanya pada modifikasi entry, tidak perlu membuat entry baru)
+- **(Selesai)** Karyawan dapat melihat jadwal kerja mereka pada bulan berjalan, termasuk hari libur yang ditetapkan oleh HRIS di kalender (prioritas rendah)
+- Mengirimkan notifikasi FCM ke perangkat untuk mengingatkan mereka akan jadwal kerjanya
+- Penandaan paksa tambahan oleh HRIS dan penyisipan dokumen ke dalam entry (prioritas rendah)
 
 ## Cron Scheduler
 
-Cron schedule play a vital role in thiss daatabase system, as it is the one responsible for attendance data creation based on work schedule of the employee, this system/engine is already automated running for each 30mins
+Cron schedule memainkan peran penting dalam sistem database ini, karena ia bertanggung jawab atas pembuatan data kehadiran berdasarkan jadwal kerja karyawan. Sistem/engine ini sudah berjalan otomatis setiap 30 menit
 
-Information that is essential for cron scheduler:
-1. Company work schedule (Static collection) 
-2. Company group rotation (Static collection) 
-3. Company holiday (set by HRIS)
-4. Work schedule (fetched from employee database)
+Informasi yang esensial bagi cron scheduler:
+1. Jadwal kerja perusahaan (Static collection) 
+2. Rotasi grup perusahaan (Static collection) 
+3. Hari libur perusahaan (ditetapkan oleh HRIS)
+4. Jadwal kerja (diambil dari database karyawan)
 
-Minor information used by FCM notification:
-1. Active FCM token (fetched from employee database)
+Informasi minor yang digunakan oleh notifikasi FCM:
+1. Token FCM aktif (diambil dari database karyawan)
 
-## Data Structures
+## Struktur Data
 
-*All data below need to be rechecked and reconfirmed*
+*Semua data di bawah ini perlu dicek dan dikonfirmasi ulang*
 
 - Employee ID (reference)
-- Attendance date (this entry has to be created automatically each day)
-	- Clock-in timestamp
-	- Clock-out timestamp
-- Status (example: on-time, late, alpha, sick, vacation, holiday)
-	- Automated system check for on-time, late and alpha
-	- Manual flagging from HRD for sick, vacation, holiday, etc
-		- This manual flags will invalidate all information below
-- Automated leave hour
-	- Calculated automatically if late (starting hour - clock-in hour)
-- Leave hour
-	- Adjustment by HRD if the employee able to leave the job for X hour, this required additional documents as verification
-- Overtime hour
-	- Adjustment by HRD if the employee working X hour overtime, this required additional document as verification
+- Tanggal kehadiran (entry ini harus dibuat secara otomatis setiap hari)
+	- Timestamp clock-in
+	- Timestamp clock-out
+- Status (contoh: on-time, late, alpha, sick, vacation, holiday)
+	- Pengecekan otomatis oleh sistem untuk on-time, late, dan alpha
+	- Penandaan manual dari HRD untuk sick, vacation, holiday, dll
+		- Penandaan manual ini akan membatalkan semua informasi di bawahnya
+- Jam izin otomatis
+	- Dihitung secara otomatis jika telat (jam mulai - jam clock-in)
+- Jam izin
+	- Penyesuaian oleh HRD jika karyawan diperbolehkan meninggalkan pekerjaan selama X jam, ini membutuhkan dokumen tambahan sebagai verifikasi
+- Jam lembur
+	- Penyesuaian oleh HRD jika karyawan bekerja lembur selama X jam, ini membutuhkan dokumen tambahan sebagai verifikasi
 
-Read more below in **Company Group Rotation** for data structures and features needed to support shift/group-based schedules
+Baca lebih lanjut di bawah pada **Company Group Rotation** untuk struktur data dan fitur yang dibutuhkan guna mendukung jadwal berbasis shift/grup
 
-### Consideration
+### Pertimbangan
 
-- Clock-in/out limitation by Wifi MAC Address, since we want to limit from where the employee can clock-in/out (handled by front-end)
-	- Why MAC Address and not just SSID? Since SSID can easily be replicated with Hotspot, but not with MAC Address which would be harder to do
-	- But is this viable? As this access into MAC Address would be categozied into sensitive details under normal circumstances
-- Work hour calculation for Payroll system
-	- Normal working hour
-	- Overtime working hour
-- Attendance for employee that are inside rolling shift should have additional information on their employee work schedule, and we need some function resolvement to get their proper work schedule, since it is dynamics
-	- Rolling shift changed per-week basis like Host live schedule
-	- Rolling shift change per-self repetition basis like Security schedule with 2 day work and 1 day off, repetition disregarding anything else 
+- Pembatasan clock-in/out berdasarkan MAC Address Wifi, karena kita ingin membatasi dari mana karyawan dapat melakukan clock-in/out (ditangani oleh front-end)
+	- Mengapa MAC Address dan bukan sekadar SSID? Karena SSID dapat dengan mudah direplikasi dengan Hotspot, sedangkan MAC Address tidak, yang mana akan lebih sulit untuk dilakukan
+	- Tapi apakah ini layak? Karena akses ke MAC Address dalam keadaan normal tergolong sebagai detail sensitif
+- Perhitungan jam kerja untuk sistem Payroll
+	- Jam kerja normal
+	- Jam kerja lembur
+- Kehadiran untuk karyawan yang berada di dalam rolling shift seharusnya memiliki informasi tambahan pada jadwal kerja karyawannya, dan kita membutuhkan suatu fungsi penyelesaian untuk mendapatkan jadwal kerja yang tepat bagi mereka, karena bersifat dinamis
+	- Rolling shift yang berubah per minggu seperti jadwal Host live
+	- Rolling shift yang berubah berdasarkan repetisi mandiri seperti jadwal Security dengan 2 hari kerja dan 1 hari libur, repetisi yang mengabaikan hal lainnya 
 
 
 
-## Database Structures
+## Struktur Database
 
-We have our own independent database exclusively for attendance
+Kita memiliki database independen sendiri yang khusus untuk attendance
 
 ### Attendance Entries
 
@@ -101,10 +101,10 @@ We have our own independent database exclusively for attendance
 
 ### Company Work Schedule
 
-This information currently are static hardcoded, which already being inserted to database, refreshed each restart, this can be expanded to modifyable in the future if it see fit
+Informasi ini saat ini bersifat static hardcoded, yang sudah disisipkan ke database, di-refresh setiap restart. Ini dapat dikembangkan agar bisa dimodifikasi di masa mendatang jika dirasa perlu
 
-But believe me, if this is editable they will easily broke the schedule and blame the automated system because of their wrong doing.
-Therefore kept this as static hardcoded as long as possible!
+Tapi percayalah, jika ini bisa diedit mereka akan dengan mudah merusak jadwal dan menyalahkan sistem otomatis karena kesalahan mereka sendiri.
+Karena itu pertahankan ini sebagai static hardcoded selama mungkin!
 
 ```JSON
 { // Company work schedule collections (This is bad, but will do for now)
@@ -292,18 +292,18 @@ Therefore kept this as static hardcoded as long as possible!
 
 ### Company Group Rotation
 
-This information is required as we need to change the group shift rotation or rolling shift accordingly, which mean some employee aren;t bounded to their schedule but to their group-schedule instead, which will be annoying to deal with...
+Informasi ini diperlukan karena kita perlu mengubah rotasi shift grup atau rolling shift secara sesuai, yang berarti beberapa karyawan tidak terikat pada jadwal mereka sendiri melainkan pada jadwal grupnya, yang akan merepotkan untuk ditangani...
 
-1. **Host live groups**, rotated per-week basis, with 4 groups total (3 active work and 1 offwork group at any given week) 
-	- **Array structures:** A, B, C, null
-	- **Index changes:** 7 days
-2. **Security groups**, rotated per-self completion, with 3 groups total (2 active work and 1 offwork group at any given day)
-	- **Array structures:** A, B, null
-	- **Index changes:** array completion and reset into the first index
+1. **Grup Host live**, dirotasi per minggu, dengan total 4 grup (3 grup aktif bekerja dan 1 grup libur pada minggu tertentu) 
+	- **Struktur array:** A, B, C, null
+	- **Perubahan index:** 7 hari
+2. **Grup Security**, dirotasi berdasarkan penyelesaian mandiri, dengan total 3 grup (2 grup aktif bekerja dan 1 grup libur pada hari tertentu)
+	- **Struktur array:** A, B, null
+	- **Perubahan index:** penyelesaian array dan reset kembali ke index pertama
 
-Therefore we will need 1 helper function to be aware on this difference in static-based employee schedules and the shift/group-based (or whatever name it yourself) schedules and pass it into resolver function for date/attendance pickup or lookup
+Karena itu kita akan membutuhkan 1 fungsi helper untuk menyadari perbedaan ini antara jadwal karyawan berbasis statis dan jadwal berbasis shift/grup (atau apa pun namanya nanti) lalu meneruskannya ke fungsi resolver untuk pengambilan atau lookup tanggal/kehadiran
 
-Also as this shift/group-based have differances in resolving themself, one is changed statically based on time and the other is based on their own completion, then we will have 2 resolver function
+Selain itu, karena jadwal berbasis shift/grup ini memiliki perbedaan dalam cara penyelesaiannya, yang satu berubah secara statis berdasarkan waktu dan yang lainnya berdasarkan penyelesaiannya sendiri, maka kita akan memiliki 2 fungsi resolver
 
 ```JSON
 // Host-live rolling schedules
@@ -405,9 +405,9 @@ Also as this shift/group-based have differances in resolving themself, one is ch
 	"_id": ObjectId(MongoDB_ID_Assignment),
 	"group_id": "PRODUCTION-GROUP-1",
 	"schedule_rotation": [
-	   "PRODUCTION-SHIFT-A", 
-	   "PRODUCTION-SHIFT-C", 
-	   "PRODUCTION-SHIFT-B"
+	   "PRODUCTION-SHIFT-A", 
+	   "PRODUCTION-SHIFT-C", 
+	   "PRODUCTION-SHIFT-B"
 	],
 	schedule_rotated_in_x_days: 7,
 	starting_date: ISODate(),
@@ -417,9 +417,9 @@ Also as this shift/group-based have differances in resolving themself, one is ch
 	"_id": ObjectId(MongoDB_ID_Assignment),
 	"group_id": "PRODUCTION-GROUP-2",
 	"schedule_rotation": [
-	   "PRODUCTION-SHIFT-A", 
-	   "PRODUCTION-SHIFT-C", 
-	   "PRODUCTION-SHIFT-B"
+	   "PRODUCTION-SHIFT-A", 
+	   "PRODUCTION-SHIFT-C", 
+	   "PRODUCTION-SHIFT-B"
 	],
 	schedule_rotated_in_x_days: 7,
 	starting_date: ISODate(),
@@ -429,36 +429,36 @@ Also as this shift/group-based have differances in resolving themself, one is ch
 	"_id": ObjectId(MongoDB_ID_Assignment),
 	"group_id": "PRODUCTION-GROUP-3",
 	"schedule_rotation": [
-	   "PRODUCTION-SHIFT-A", 
-	   "PRODUCTION-SHIFT-C", 
-	   "PRODUCTION-SHIFT-B"
+	   "PRODUCTION-SHIFT-A", 
+	   "PRODUCTION-SHIFT-C", 
+	   "PRODUCTION-SHIFT-B"
 	],
 	schedule_rotated_in_x_days: 7,
 	starting_date: ISODate(),
 	starting_schedule: "PRODUCTION-SHIFT-B"
 },
- 
+ 
 // Warehouse rolling schedules
 // This is still wrong as there is 3 groups and 2 groups will be at shift A at any given time, which mean we should ref by index instead of string to the array
- {
+ {
 	"_id": ObjectId(MongoDB_ID_Assignment),
 	"group_id": "WAREHOUSE-GROUP-1",
 	"schedule_rotation": [
-	   "WAREHOUSE-SHIFT-A", 
-	   "WAREHOUSE-SHIFT-A", 
-	   "WAREHOUSE-SHIFT-B"
+	   "WAREHOUSE-SHIFT-A", 
+	   "WAREHOUSE-SHIFT-A", 
+	   "WAREHOUSE-SHIFT-B"
 	],
 	schedule_rotated_in_x_days: 7,
 	starting_date: ISODate(),
 	starting_schedule: "WAREHOUSE-SHIFT-A"
 },
- {
+ {
 	"_id": ObjectId(MongoDB_ID_Assignment),
 	"group_id": "WAREHOUSE-GROUP-2",
 	"schedule_rotation": [
-	   "WAREHOUSE-SHIFT-A", 
-	   "WAREHOUSE-SHIFT-A", 
-	   "WAREHOUSE-SHIFT-B"
+	   "WAREHOUSE-SHIFT-A", 
+	   "WAREHOUSE-SHIFT-A", 
+	   "WAREHOUSE-SHIFT-B"
 	],
 	schedule_rotated_in_x_days: 7,
 	starting_date: ISODate(),
@@ -468,9 +468,9 @@ Also as this shift/group-based have differances in resolving themself, one is ch
 
 ### Company Holiday Date
 
-Simply information on the database where this will be used to check if the shedule engine need to create the attendance on that day or not
+Sekadar informasi pada database di mana ini akan digunakan untuk mengecek apakah schedule engine perlu membuat kehadiran pada hari itu atau tidak
 
-Note, you will need something to fetch the normal working hour information on holiday and the calculation of it, since company holiday is fully paid, and the national one is fully paid but minus the lunch allowance
+Catatan, kamu akan membutuhkan sesuatu untuk mengambil informasi jam kerja normal pada hari libur beserta perhitungannya, karena hari libur perusahaan dibayar penuh, dan hari libur nasional dibayar penuh tetapi dikurangi tunjangan makan siang
 
 ```JSON
 {

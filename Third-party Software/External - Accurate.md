@@ -1,4 +1,3 @@
-## Notes
+## Catatan
 
-*[Accurate](https://accurate.id/) is third-party software that help in monitoring*
-
+*[Accurate](https://accurate.id/) adalah software third-party yang membantu dalam monitoring*

@@ -1,39 +1,39 @@
-## Documents
+## Dokumen
 
-This is what currently the HRD  have in terms of document that is being saved and some common document that being used internally
+Berikut ini adalah dokumen yang saat ini dimiliki HRD yang sedang disimpan beserta beberapa dokumen umum yang digunakan secara internal
 
 https://drive.google.com/drive/folders/1DlL37IECH2i1e3-3oypd912AbcPU84nX
 
 ## BPMN
 
-Below are the BPMN example flow on how the current and online requests will be looks like, more diagram will be added into here later on, with their own description
+Di bawah ini adalah contoh alur BPMN tentang bagaimana request saat ini dan online akan terlihat, lebih banyak diagram akan ditambahkan ke sini nanti, beserta deskripsinya masing-masing
 
-### Employee coming late to office process
+### Proses karyawan datang terlambat ke kantor
 
-Current process that being used on, basically manual handling
+Proses saat ini yang sedang digunakan, pada dasarnya penanganan manual
 ![[employee-late-manual-handling.svg]]
 
-Proposed system that will somewhat automated the process and eliminate 1 pool/roles from the process, with early ending flow, instead of circling full process
+Sistem yang diusulkan yang akan mengotomatiskan sebagian proses dan menghilangkan 1 pool/role dari proses, dengan alur yang berakhir lebih awal, alih-alih memutari proses secara penuh
 ![[employee-late-automated-draft.svg]]
 
-### Employee requesting leaves proccess
+### Proses karyawan mengajukan cuti
 
-Current process that being used on, yet again manual handling, but quick as the whole process only took ~2mins to ~5mins
+Proses saat ini yang sedang digunakan, sekali lagi penanganan manual, tetapi cepat karena keseluruhan proses hanya memakan waktu ~2 menit hingga ~5 menit
 ![[leave-requests-manual-handling.svg]]
 
-The proposed draft system, remove back and front process, but add waiting time which is double-sided blade. 
-HR acknowledge are still in discussion as if the document required it then the maximum wait time is 2x24h for 1 requests, which is bad.
+Draft sistem yang diusulkan, menghilangkan proses bolak-balik, tetapi menambahkan waktu tunggu yang merupakan pisau bermata dua. 
+Acknowledge HR masih dalam diskusi karena jika dokumen membutuhkannya maka waktu tunggu maksimum adalah 2x24 jam untuk 1 request, yang mana itu buruk.
 ![[leave-requests-automated-draft.svg]]
 
-### Employee hourly leave approved
+### Cuti per jam karyawan disetujui
 
-When employee with hourly leave are approved they need to pass security's check on the enterance/exit gate,
-This mean security have access to view manual verification to compare/align the employee document to approved HR document just in-case
-Security also need to sign the document with QR scans for leave/back status in the document
+Ketika karyawan dengan cuti per jam disetujui, mereka perlu melewati pemeriksaan security di gerbang masuk/keluar,
+ini berarti security memiliki akses untuk melihat verifikasi manual guna membandingkan/menyelaraskan dokumen karyawan dengan dokumen HR yang disetujui untuk berjaga-jaga
+Security juga perlu menandatangani dokumen dengan scan QR untuk status cuti/kembali pada dokumen
 
 ![[employee-hourly-leave-approved.svg]]
 
-## Dependencies
+## Dependensi
 
 - [ ] [[BASE - Enterance Point]]
 - [ ] [[HRIS - Analysis]]

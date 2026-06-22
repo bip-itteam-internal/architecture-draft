@@ -1,14 +1,14 @@
-## Notes
+## Catatan
 
-*Creation of centralized dynamic task tracker will benefit other system that required this feature, we would have consistent and reusable systems*
+*Pembuatan task tracker dinamis yang terpusat akan bermanfaat bagi sistem lain yang membutuhkan fitur ini, sehingga kita memiliki sistem yang konsisten dan dapat digunakan kembali*
 
-This is actively being developed internally, repository are listed below:
-- [Frontend repository](https://github.com/bip-itteam-internal/bharata-task-manager-fe)
-- [Backend repository](https://github.com/bip-itteam-internal/bharata-task-manager-be)
+Saat ini sedang dikembangkan secara internal, repository-nya tercantum di bawah ini:
+- [Repository frontend](https://github.com/bip-itteam-internal/bharata-task-manager-fe)
+- [Repository backend](https://github.com/bip-itteam-internal/bharata-task-manager-be)
 
-## Features
+## Fitur
 
-Currently this lack awareness for the people that use it to keep using it in the long terms, this required something to keep in touch with the person creating or assigned into a ticket, which is the main focus of DB - Notification Center
+Saat ini masih kurang kesadaran dari orang yang menggunakannya untuk terus memakainya dalam jangka panjang, hal ini membutuhkan sesuatu untuk tetap terhubung dengan orang yang membuat atau ditugaskan ke sebuah tiket, yang menjadi fokus utama DB - Notification Center
 
 ## BUGS
 * user masih bisa melihat space dari department lain
@@ -16,17 +16,17 @@ Currently this lack awareness for the people that use it to keep using it in the
 ### Production
 https://task.bharatainternasional.com
 
-## Consideration
+## Pertimbangan
 
-- Integration to this system will took time
-- Context might feel separated from where it should be (for example HRIS task tracker will lives in here instead of the HRIS itself)
+- Integrasi ke sistem ini akan memakan waktu
+- Konteks mungkin terasa terpisah dari tempat seharusnya (misalnya HRIS task tracker akan berada di sini alih-alih di HRIS itu sendiri)
 
-## Integration to Insentive
-- Integration to inentive system has some question / problems :
-  1. In Finance - Incentive ICC, leader/spv check the video using module 
+## Integrasi ke Insentive
+- Integrasi ke sistem insentive memiliki beberapa pertanyaan / masalah :
+  1. Di Finance - Incentive ICC, leader/spv mengecek video menggunakan modul 
   2.
 
-Integration to Insentive
+Integrasi ke Insentive
 1. pada ICC : pengawas (disebut pengawas karena masih belum diketahui posisi yang melakukan tugas ini) melakukan pengecekan dan evaluasi video di modul khusus R&D. Apa modul khusus R&D tersebut ?
 2. Bagaimana flow task management setelah diperbarui dan integrasi dengan insentive ?
 3. Bagaimana rencana penggabungan task management dengan erp ?

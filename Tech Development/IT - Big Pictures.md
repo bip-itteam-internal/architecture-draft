@@ -1,5 +1,5 @@
 
-IT department have support on which it will resolve all incoming problem accordingly
+Departemen IT memiliki support yang akan menyelesaikan semua masalah yang masuk sesuai kebutuhan
 
 ## Dependencies
 

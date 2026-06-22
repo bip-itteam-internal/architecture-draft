@@ -1,3 +1,3 @@
-## Notes
+## Catatan
 
-*This system is a web-hook into all purchase order from various e-stores, these information is passed to [[Finance]]*
+*Sistem ini merupakan webhook ke semua purchase order dari berbagai e-store, informasi ini diteruskan ke [[Finance]]*

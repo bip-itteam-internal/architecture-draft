@@ -1,30 +1,30 @@
-## Description
+## Deskripsi
 
-*This dashboard listed all attrition from internal departments that include added and departed employees*
+*Dashboard ini menampilkan seluruh attrition dari departemen internal yang mencakup karyawan yang masuk dan yang keluar*
 
-[Example of this system](https://drive.google.com/drive/folders/15fGQNX5usiMXIk2GY8DAqahHFF5ahPpA)
+[Contoh dari sistem ini](https://drive.google.com/drive/folders/15fGQNX5usiMXIk2GY8DAqahHFF5ahPpA)
 
-## Features
+## Fitur
 
-This document supposedly filled by supervisor for each employees, but that didn't close the option for the employee themself to fill the document then request a review from their supervisor respectively
+Dokumen ini seharusnya diisi oleh supervisor untuk setiap karyawan, namun hal tersebut tidak menutup kemungkinan bagi karyawan itu sendiri untuk mengisi dokumen lalu meminta review dari supervisor mereka masing-masing
 
-The document needed to be filled and collected on the first day of each month (special case if the first day is sunday/off-day then it will be the next day)
+Dokumen perlu diisi dan dikumpulkan pada hari pertama setiap bulan (kasus khusus jika hari pertama jatuh pada hari minggu/hari libur maka akan menjadi hari berikutnya)
 
-We wanted a easy way to fill the records and auto calculation for each scores, reviewed by supervisor and then propagated to HR directly, where HR can see the report like below:
+Kami menginginkan cara yang mudah untuk mengisi catatan dan kalkulasi otomatis untuk setiap skor, di-review oleh supervisor lalu diteruskan langsung ke HR, di mana HR dapat melihat laporan seperti berikut:
 
 - Dashboard
-	- Overview of everything excellent for reporting to stakeholders
-	- View per-department records
-	- View per-person records
-- Key performance index scoring form lifecycles
-	- This is per-person score
-	- Every department has different scoring template, but yet again, we need some standarization of the document
+	- Ikhtisar segala hal yang sangat baik untuk pelaporan kepada stakeholder
+	- Tampilan catatan per-departemen
+	- Tampilan catatan per-orang
+- Siklus form scoring key performance index
+	- Ini adalah skor per-orang
+	- Setiap departemen memiliki template scoring yang berbeda, namun sekali lagi, kita memerlukan standarisasi dokumen
 
-## Pending Details
+## Detail yang Tertunda
 
-- [ ] More information about things that might change employee payroll, example: overtime, incentive, insurance 
+- [ ] Informasi lebih lanjut tentang hal-hal yang mungkin mengubah payroll karyawan, contoh: overtime, insentif, asuransi
 
-## Requirements
+## Kebutuhan
 
-- [ ] Employees master data (look up reference)
-- [ ] Key performance index form creation based on departments (linked into employee data)
+- [ ] Master data karyawan (referensi lookup)
+- [ ] Pembuatan form key performance index berdasarkan departemen (terhubung ke data karyawan)

@@ -1,62 +1,62 @@
-## Notes
+## Catatan
 
-*This system name is misleading as this didn't manage fully for Internal Inventory and external inventory altogether. This only manage inventory used form purchase/procurement for production and sales of said products*
+*Nama sistem ini menyesatkan karena ini tidak mengelola sepenuhnya untuk Internal Inventory dan external inventory sekaligus. Ini hanya mengelola inventory yang digunakan dari purchase/procurement untuk produksi dan penjualan produk tersebut*
 
-## Consideration
+## Pertimbangan
 
-Can this be merged with internal inventory? As both will probably have a lot of feature the same, we could put it in here and add additional tags for items that is being used internally. 
+Bisakah ini digabungkan dengan internal inventory? Karena keduanya kemungkinan akan memiliki banyak fitur yang sama, kita bisa menaruhnya di sini dan menambahkan tag tambahan untuk item yang digunakan secara internal.
 
-Might be undesiredable if internal inventory aren't natively managed by GA
+Mungkin kurang diinginkan jika internal inventory tidak dikelola secara native oleh GA
 
-### General Affairs as the "Manager" of the Company Inventory
+### General Affairs sebagai "Pengelola" Inventory Perusahaan
 
-This means every inventory items and object are natively owned by GA, on this system GA can propagate down some of the items into other department where the department will be able to maintain the items accordingly.
+Ini berarti setiap item dan objek inventory secara native dimiliki oleh GA, pada sistem ini GA dapat menurunkan sebagian item ke departemen lain di mana departemen tersebut akan dapat memelihara item tersebut sesuai kebutuhan.
 
-This system will somewhat represent a hierarcy with GA at the top, and others below it
+Sistem ini akan merepresentasikan semacam hierarki dengan GA di puncak, dan lainnya di bawahnya
 
 ![[inventory-propergation.png]]
 
-This means we would have 1 master data that is being circulated from GA to other department accordingly, some department like manufactur might have unique feature regarding how they see their inventory, and so on...
+Ini berarti kita akan memiliki 1 master data yang disirkulasikan dari GA ke departemen lain sesuai kebutuhan, beberapa departemen seperti manufaktur mungkin memiliki fitur unik terkait bagaimana mereka melihat inventory mereka, dan seterusnya...
 
-But in here we need to know what type of inventory and what details do we want it to have? for example; base material for production will not have that much information on them while computer would have plenty including SN and other details
+Tetapi di sini kita perlu tahu jenis inventory apa dan detail apa yang kita inginkan untuk dimilikinya? misalnya; bahan baku untuk produksi tidak akan memiliki banyak informasi pada mereka sementara komputer akan memiliki banyak termasuk SN dan detail lainnya
 
-And how does they keep their inventory? is it barcode based with SKU on where the location are? and how does that transfer down to department and such.
+Dan bagaimana mereka menyimpan inventory mereka? apakah berbasis barcode dengan SKU pada lokasi keberadaannya? dan bagaimana hal itu diturunkan ke departemen dan sebagainya.
 
-## Merged information from Warehouse Master Data
+## Informasi gabungan dari Warehouse Master Data
 
-### Description
+### Deskripsi
 
-*This master data manage on what things are kept/stored in the warehouse at current time, with Stock Keeping Unit and barcode to create a better flow of the system*
+*Master data ini mengelola hal-hal apa yang disimpan di warehouse saat ini, dengan Stock Keeping Unit dan barcode untuk menciptakan alur sistem yang lebih baik*
 
-## Merged information from Internal Inventory
+## Informasi gabungan dari Internal Inventory
 
-### Notes
+### Catatan
 
-*This doesn't exist or yet mentioned as per 10/7/25 under [Bharata's document files google drive*](https://drive.google.com/drive/folders/1gKly790zuff8roX3kLQq1TVE02jT7drK)*
+*Ini belum ada atau belum disebutkan per 10/7/25 pada [berkas dokumen Bharata di google drive*](https://drive.google.com/drive/folders/1gKly790zuff8roX3kLQq1TVE02jT7drK)*
 
-### Description
+### Deskripsi
 
-*This system would track all company's assets and would be dependency for upcoming system as repairs or something else*
+*Sistem ini akan melacak semua aset perusahaan dan akan menjadi dependency untuk sistem mendatang seperti perbaikan atau lainnya*
 
-*This could be a child of GA - Inventory Management that reside for all goods that tagged as internal, and this could future be propagated to each system for example IT, HR to manage their own internal inventory approriately*
+*Ini bisa menjadi child dari GA - Inventory Management yang berada untuk semua barang yang ditandai sebagai internal, dan ini ke depannya bisa diturunkan ke setiap sistem misalnya IT, HR untuk mengelola internal inventory mereka sendiri secara tepat*
 
-### Features
+### Fitur
 
 - Dashboard
-- Creation and tagging for individual assets (this is closely resemble one of WH - Management System features)
-- Asset assignment to employees
+- Pembuatan dan penandaan untuk aset individual (ini sangat menyerupai salah satu fitur WH - Management System)
+- Penugasan aset ke karyawan
 
-### Pending Details
+### Detail yang Tertunda
 
-- [ ] This database seems can be merged with Warehouse Master Data with explicit flags for internal inventory goods
+- [ ] Database ini sepertinya bisa digabungkan dengan Warehouse Master Data dengan flag eksplisit untuk barang internal inventory
 
-## Description
+## Deskripsi
 
-So we have concluded that te consideration above are valid, and can be used on the current situation since it is nicely propagated down/up based on the current importance and levels
+Jadi kita telah menyimpulkan bahwa pertimbangan di atas valid, dan dapat digunakan pada situasi saat ini karena diturunkan/dinaikkan dengan rapi berdasarkan tingkat kepentingan dan level saat ini
 
-Currently the inventory unique tags looks like: **INV.Year.Category.No** which is still underdesired since we need to know the object, something like **INV.Year.Category.Item.No** where that give us nice base and specific information altogether
+Saat ini tag unik inventory terlihat seperti: **INV.Year.Category.No** yang masih kurang diinginkan karena kita perlu tahu objeknya, sesuatu seperti **INV.Year.Category.Item.No** di mana itu memberi kita basis yang baik dan informasi spesifik sekaligus
 
-But never the less the development can be continued, current category are limited to electronics. Will fill this later once the development taken place
+Tetapi meskipun demikian pengembangan dapat dilanjutkan, kategori saat ini terbatas pada elektronik. Akan diisi nanti setelah pengembangan berlangsung
 
 ## Hasil Observasi
 Tanggal 13 Januari 2026
@@ -73,7 +73,7 @@ Tanggal 13 Januari 2026
 #### Sifat barang
 1. Konsumsi (Kopi, gula) (fixed cost)
 2. Aset (Sesuai kebutuhan)
-## Features
+## Fitur
 
 #### Scope
 * Pencatatan aset menjadi jelas
@@ -85,16 +85,16 @@ Tanggal 13 Januari 2026
 
 #### Breakdown
 - Dashboard
-	- Overview of everything excellent for reporting to stakeholders
-	- Summary in details: purchases, sales, stocks and profits
-	- Volume activity or stock changes
-- Purchases (Why this feature in here?)
-	- Normal purchase/procurement for product, with vendor/supplier details
-	- Because GA (General Affairs) has a petty cash fund used for expenses that are consumed within one month — for example, purchasing office supplies, cleaning equipment, or submitting requests for items not exceeding 2 million rupiah per month.
-	- If so then Finance are still the sole owner of purchasing system, and GA are able request and see their accepted procurement entries
-- Sales (Why this feature in here?)
-	- Normal sales for product, but no information on where the product being sold to
-	- I agree, better to move this feature to it's own module (eg: move to Finance System)
+	- Ikhtisar semuanya yang sangat baik untuk pelaporan ke stakeholder
+	- Ringkasan secara detail: purchases, sales, stok, dan profit
+	- Volume aktivitas atau perubahan stok
+- Purchases (Mengapa fitur ini ada di sini?)
+	- Purchase/procurement normal untuk produk, dengan detail vendor/supplier
+	- Karena GA (General Affairs) memiliki dana petty cash yang digunakan untuk pengeluaran yang dikonsumsi dalam satu bulan — misalnya, membeli perlengkapan kantor, peralatan kebersihan, atau mengajukan permintaan untuk barang yang tidak melebihi 2 juta rupiah per bulan.
+	- Jika demikian maka Finance tetap menjadi satu-satunya pemilik sistem purchasing, dan GA dapat melakukan request dan melihat entri procurement mereka yang disetujui
+- Sales (Mengapa fitur ini ada di sini?)
+	- Sales normal untuk produk, tetapi tidak ada informasi ke mana produk dijual
+	- Saya setuju, lebih baik memindahkan fitur ini ke modulnya sendiri (mis: pindah ke Finance System)
 * OCR Document
 	* dokumen fisik yang ada bisa di scan berbentuk gambar yang nantinya diupload ke sistem 
 	* OCR akan membaca dokumen tersebut dan bisa dimanfaatkan untuk kebutuhan lain
@@ -114,19 +114,19 @@ berikut alur sebuah barang menjadi aset perusahaan dari awal hingga akhir.
 8. Setelah barang sampai, GA melakukan pencatatan dan melakukan penomoran (Jenis-Ruangan-Bulan-Tahun) dan menyerahkan barang ke User.
 9. Form penerimaan barang diisi sebagai bentuk pencatatan.
 
-## Issues that might come from other departments
+## Masalah yang mungkin muncul dari departemen lain
 
 - Finance
-	- Purchase/procurement order is required to validate the entry
-	- Sales order is required to validate the entry
+	- Purchase/procurement order diperlukan untuk memvalidasi entri
+	- Sales order diperlukan untuk memvalidasi entri
 - Warehouse
-	- Additional document to validate said product is being moved around inbound/outbound of the warehouse
+	- Dokumen tambahan untuk memvalidasi bahwa produk tersebut dipindahkan masuk/keluar dari warehouse
 
-## Requirements
+## Kebutuhan
 
-- [ ] Warehouse master data (look up reference)
-- [ ] Purchase data from finance
-- [ ] Sales data from finance
+- [ ] Warehouse master data (lihat referensi)
+- [ ] Data purchase dari finance
+- [ ] Data sales dari finance
 
 ### Referensi Sistem yang sudah ada
 1. Inventa

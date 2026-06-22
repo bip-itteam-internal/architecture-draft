@@ -17,7 +17,7 @@ Berikut rincian **Full Tech Spec, audit masalah teknis utama, solusi, scope kesu
 ## **A. Stack & Arsitektur**
 
 - **Backend:** Node.js (Express/NestJS) atau Golang (Gin/Fiber)
-- **Database:** PostgreSQL, Redis (optional cache/scheduler)
+- **Database:** PostgreSQL, Redis (cache/scheduler opsional)
 - **API Integration:** TikTok Ads API (upload, report), Shopee Partner API (report, upload jika support), Meta Ads, Google Ads (expandable)
 - **Auth:** JWT user session, OAuth2 multi-account API integration
 - **Storage:** Local server/S3/MinIO (creative images/video)
@@ -26,14 +26,14 @@ Berikut rincian **Full Tech Spec, audit masalah teknis utama, solusi, scope kesu
 - **Deployment:** Docker, VPS internal (min 4 vCPU/8GB RAM), CI/CD pipeline (GitHub Actions)
 - **Security:** Password bcrypt/argon2, RBAC middleware, encrypted token, HTTPS mandatory
 
-## **B. Feature & Entity Table**
+## **B. Tabel Feature & Entity**
 
 - CRUD user, ad account, campaign, creative asset
 - Bulk/single campaign upload ke multi-account/platform
 - Fetch/report metrics: spend, ratings, CTR, conversion, sales, status, export report
 - Audit trail per activity/error
 - RBAC role granuler (admin, head, manager, marketer)
-- Scheduler/worker for job batch, retry, alert
+- Scheduler/worker untuk job batch, retry, alert
 - Backup/restore DB & assets, monitoring job/slowness/fail
 - File validation, asset storage integrity
 
@@ -101,7 +101,7 @@ Berikut rincian **Full Tech Spec, audit masalah teknis utama, solusi, scope kesu
 **Kesulitan:**
 
 - Debug error asset di berbagai platform (dokumen API kadang ambigu).
-- Mengelola worker-resume jadi tidak duplikat atau partial fail.
+- Mengelola worker-resume agar tidak duplikat atau partial fail.
 
 ---
 
@@ -114,7 +114,7 @@ Berikut rincian **Full Tech Spec, audit masalah teknis utama, solusi, scope kesu
 
 **Solusi:**
 
-- Batch fetch & caching, raw response DB utk audit.
+- Batch fetch & caching, raw response DB untuk audit.
 - Worker monitoring, auto-restart scheduler jika stuck.
 
 **Kesulitan:**
@@ -225,7 +225,7 @@ Berikut adalah **template flowchart, contoh ERD, dan skema worker/scheduler untu
 
 ---
 
-## 2. **Flowchart (Simplified Process)**
+## 2. **Flowchart (Proses Disederhanakan)**
 
 **A. Campaign Upload**
 1. User login (auth, RBAC)
@@ -239,14 +239,14 @@ Berikut adalah **template flowchart, contoh ERD, dan skema worker/scheduler untu
 
 **B. Campaign Reporting**
 1. Scheduler auto-fetch report dari platform per interval/batch
-2. API call to each ad_account, pull metrics
+2. API call ke setiap ad_account, pull metrics
 3. Store raw & processed metrics di [reports]
 4. Email/notif jika error/mismatch > threshold
 5. Update dashboard + logging
 
 ---
 
-## 3. **Worker/Scheduler Skema**
+## 3. **Skema Worker/Scheduler**
 
 - **Upload Job Queue (Bull/Go channel):**
     - Status: pending/processing/success/fail
@@ -261,7 +261,7 @@ Berikut adalah **template flowchart, contoh ERD, dan skema worker/scheduler untu
 
 ---
 
-## 4. **Audit & Error Checklist**
+## 4. **Checklist Audit & Error**
 
 - Semua API key/token dienkripsi, tidak pernah keluar di log/error
 - Setiap aksi (upload, edit, delete) tercatat di [logs], dengan user ID, timestamp, IP

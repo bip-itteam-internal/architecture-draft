@@ -1,33 +1,33 @@
-## Description
+## Deskripsi
 
-This application responsible to listen and sent out command to the fingerprint machine
-[Check out the application repository](https://github.com/bip-itteam-internal/fingerprint-listener)
+Aplikasi ini bertanggung jawab untuk mendengarkan dan mengirimkan perintah ke mesin fingerprint
+[Lihat repository aplikasinya](https://github.com/bip-itteam-internal/fingerprint-listener)
 
-This extension/middleware provides:
-- Fingerprint event push into ERP system
-- ERP request to export fingerprint data directly from the machines which will be push to HR WhatsApp message from IT WooWa chatbot
-- ERP request to sync the fingerprint machine time
+Extension/middleware ini menyediakan:
+- Push event fingerprint ke dalam sistem ERP
+- Permintaan ERP untuk mengekspor data fingerprint langsung dari mesin yang kemudian akan dikirim ke pesan WhatsApp HR melalui chatbot IT WooWa
+- Permintaan ERP untuk menyinkronkan waktu mesin fingerprint
 
-Application are build on Python with [pyzk](https://github.com/fananimi/pyzk) library, since it already link all the SDK into one place, and has the support for other series as well.
+Aplikasi dibangun dengan Python menggunakan library [pyzk](https://github.com/fananimi/pyzk), karena library ini sudah menghubungkan seluruh SDK menjadi satu tempat, dan juga mendukung seri lainnya.
 
-## Fingerprint devices
+## Perangkat fingerprint
 
-Currently we have 2 fingerprint devices:
-- **X105 Solution** (on the Cipari's main office building, ground floor on the main door enterance)
-- **X609 Solution** (on Tinggarjaya's warehouse, specific details on where it placed are unknown)
+Saat ini kami memiliki 2 perangkat fingerprint:
+- **X105 Solution** (di gedung kantor utama Cipari, lantai dasar pada pintu masuk utama)
+- **X609 Solution** (di gudang Tinggarjaya, detail spesifik mengenai lokasi penempatannya tidak diketahui)
 
-Which mean both of those devices need to have the same user data, since those data are need to be sync with the ERP system, any additional devices need to be cloned
+Hal ini berarti kedua perangkat tersebut perlu memiliki data user yang sama, karena data tersebut perlu disinkronkan dengan sistem ERP, dan setiap perangkat tambahan perlu dikloning
 
-## Fingerprint device specifications
+## Spesifikasi perangkat fingerprint
 
-Below are the device specification and notes regarding the devices since they are being used heavily and therefore some quirks are expected
+Berikut adalah spesifikasi perangkat beserta catatan mengenai perangkat tersebut, karena perangkat ini digunakan secara intensif sehingga beberapa keanehan (quirk) memang dapat terjadi
 
 ### X105 Solution 
 
 ![[x105.jpg]]
 ![[Additional documents/Fingerprint Machine X105/specification.png]]
 
-#### Current status and information
+#### Status dan informasi saat ini
 
 - **Platform**: JZ4725_TFT
 - **Firmware**: Ver 6.60 Jun 23 2015
@@ -37,23 +37,23 @@ Below are the device specification and notes regarding the devices since they ar
 - **Subnet Mask**: 255.255.255.0
 - **Gateway**: 10.10.10.1
 
-#### Known issues
+#### Masalah yang diketahui
 
-- Fingerprint device port 4370 is restricted to 1 connection
-	- Which mean if we want to yield this to the server for custom fingerprint event listener then HR will not able to access it via the solution application
-- Fingerprint device onboard memory are reseted after 3 days without power? How does this happen? are the CMOS battery faulty or what is happening with the device?
-	- Which mean the connection/communication information will be reseted as well, therefore need manually be set to be on the correct network again 
+- Port 4370 perangkat fingerprint dibatasi hanya 1 koneksi
+	- Hal ini berarti jika kami ingin mengarahkan port ini ke server untuk listener event fingerprint custom, maka HR tidak akan dapat mengaksesnya melalui aplikasi solution
+- Memori onboard perangkat fingerprint ter-reset setelah 3 hari tanpa daya? Mengapa hal ini bisa terjadi? Apakah baterai CMOS-nya rusak atau apa yang sebenarnya terjadi pada perangkat?
+	- Hal ini berarti informasi koneksi/komunikasi juga akan ter-reset, sehingga perlu diatur ulang secara manual agar kembali berada pada jaringan yang benar 
 
 ### X609 Solution
 
-This previously used in Tinggarjaya Warehouses, but now are not used anymore and can be utilized for something
+Perangkat ini sebelumnya digunakan di Gudang Tinggarjaya, tetapi sekarang sudah tidak digunakan lagi dan dapat dimanfaatkan untuk keperluan lain
 
-Since this device is better than we currently using, we could use this on the main office and update employee ID card with embedded RFID and display the ERP's QR code in the future
+Karena perangkat ini lebih baik daripada yang kami gunakan saat ini, kami dapat menggunakannya di kantor utama dan memperbarui kartu ID karyawan dengan RFID tertanam serta menampilkan QR code ERP di masa mendatang
 
 ![[x609.jpg]]
 ![[Additional documents/Fingerprint Machine X609/specification.png]]
 
-#### Current status and information
+#### Status dan informasi saat ini
 
 - **Platform**: ZLM60_TFT
 - **Firmware**: Ver 6.60 Apr 13 2022
@@ -63,12 +63,12 @@ Since this device is better than we currently using, we could use this on the ma
 - **Subnet Mask**: 
 - **Gateway**: 10.10.10.1
 
-## Additional information
+## Informasi tambahan
 
-This application are currently limited to 1 devices, since it is easier to make. Therefore if we listen to 2 or more devices the number of active application will grow the same number
+Aplikasi ini saat ini dibatasi hanya untuk 1 perangkat, karena lebih mudah dibuat. Oleh karena itu, jika kami mendengarkan 2 atau lebih perangkat, jumlah aplikasi aktif akan bertambah dengan jumlah yang sama
 
-The application already have good disaster recovery, killing itself when error are found, heartbeat checks if the connection are lost.
-But more testing are always needed since this is related to the hardware devices
+Aplikasi ini sudah memiliki disaster recovery yang baik, mematikan dirinya sendiri ketika ditemukan error, serta pengecekan heartbeat jika koneksi terputus.
+Namun pengujian lebih lanjut selalu diperlukan karena hal ini berkaitan dengan perangkat hardware
 
 ## Dependencies
 

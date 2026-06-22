@@ -1,4 +1,4 @@
-# Incentive System for Adv and SPV Marketing
+# Sistem Insentif untuk Adv dan SPV Marketing
 
 Data insentive selama ini diambil dari Sales, Income, Retur, dan KPI. Semua data tersebut didapat, HR melakukan perhitungan sedemikian rupa untuk menentukan nominal sesuai dengan SK dan peraturan perusahaan. SK [[doc.pdf]] ini berisi sebagai berikut:
 
@@ -367,4 +367,3 @@ Catatan :
 - Butuh RBAC untuk membatasi akses user berdasarkan divisinya
 - perlu pengetahuan GMV itu apakah sama dengan dashboard tiktok jika sama maka data-data yang dari dashboard tiktok tidak perlu diambil lagi => Asumsi salah karena GMV tidak mengambil data dari dashboard TIKTOK. Perlu mendalami bagaimana mengambil data - data yang diperlukan dari tiktok dashboard
 - task manager jelas perlu diperbarui jika ingin dibuat realtim mengikut fitur insentive atau jika ingin targer cepat paling dibuat input manual tanpa refactor task manager
-

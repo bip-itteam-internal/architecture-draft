@@ -1,114 +1,114 @@
-## Description
+## Deskripsi
 
-This master data manage every employees data including additional linked documents or data from other system into this master data system.
+Master data ini mengelola seluruh data karyawan termasuk dokumen atau data tambahan yang ditautkan dari sistem lain ke dalam sistem master data ini.
 
-[This is an example of what the current employee master data the HR teams currently have](https://drive.google.com/drive/folders/1DlL37IECH2i1e3-3oypd912AbcPU84nX)
+[Ini adalah contoh master data karyawan yang saat ini dimiliki oleh tim HR](https://drive.google.com/drive/folders/1DlL37IECH2i1e3-3oypd912AbcPU84nX)
 
-Rename ideas since this has it's own back-end and databases
-- ~~**"Employee module"** following the usage of this system~~
-- **"Employee service"** following micro-services naming convention
+Ide penamaan ulang karena ini memiliki back-end dan database tersendiri
+- ~~**"Employee module"** mengikuti penggunaan sistem ini~~
+- **"Employee service"** mengikuti konvensi penamaan micro-services
 
-## Pending Details
+## Detail yang Tertunda
 
-- [ ] Who are responsible for this master data accuracy and completeness?
-	- This will be HRD Manager responsibilities
+- [ ] Siapa yang bertanggung jawab atas akurasi dan kelengkapan master data ini?
+	- Ini akan menjadi tanggung jawab HRD Manager
 
-## Data Structures
+## Struktur Data
 
-*All data below need to be rechecked and reconfirmed*
+*Seluruh data di bawah ini perlu diperiksa dan dikonfirmasi ulang*
 
-### Consideration 
+### Pertimbangan 
 
-This database need something that will be used for UUID and act as Foreign Keys as well, pick one below what is best for this system:
-- ~~Auto increment like standard SQL~~
-	- ~~This is hard to get right as this need to be sync with the latest data insertion, even if we Single Source of Truth this is still tricky to sync~~
+Database ini membutuhkan sesuatu yang akan digunakan sebagai UUID sekaligus berperan sebagai Foreign Keys, pilih salah satu di bawah ini yang paling sesuai untuk sistem ini:
+- ~~Auto increment seperti SQL standar~~
+	- ~~Ini sulit untuk dibuat tepat karena perlu disinkronkan dengan penyisipan data terbaru, meskipun kita menerapkan Single Source of Truth hal ini tetap rumit untuk disinkronkan~~
 - Natural keys
-	- Use something that is already from data below, possibly Employee ID
+	- Gunakan sesuatu yang sudah ada dari data di bawah ini, kemungkinan Employee ID
 - ~~UUID/GUID~~
-	- ~~Easy creation but accessing this would be nightmare and probably slow? The default one is 128-bit but we can start from 16-bit and step that up if collision happen~~
+	- ~~Mudah dibuat tetapi mengaksesnya akan menjadi mimpi buruk dan mungkin lambat? Yang default adalah 128-bit tetapi kita bisa mulai dari 16-bit dan menaikkannya jika terjadi collision~~
 - ~~Snowflake (custom-uuid)~~
-	- ~~Whatever bit-size data that has a structure from the system, the usual size is 64-bit with this composition: 1-bit signed, 41-bit timestamp, 10-bit from database/system creation, 12-bit randoms or from millisecond~~ 
+	- ~~Data dengan ukuran bit berapa pun yang memiliki struktur dari sistem, ukuran yang biasa digunakan adalah 64-bit dengan komposisi ini: 1-bit signed, 41-bit timestamp, 10-bit dari pembuatan database/sistem, 12-bit acak atau dari milidetik~~ 
 
-### Personal Data
+### Data Pribadi
 
-- Full name
-- Gender
-- Religion
-- Martial status
-- Telephone number
-- Email address
-- Home address
-- Additional documents
-	- Photo KTP
-	- Photo KK
+- Nama lengkap
+- Jenis kelamin
+- Agama
+- Status pernikahan
+- Nomor telepon
+- Alamat email
+- Alamat rumah
+- Dokumen tambahan
+	- Foto KTP
+	- Foto KK
 
-*We only want usable data that is useful to the system, therefore additional information and data can be stored as images or scanned document that is stored in bytes and even encrypt them if needed*
+*Kita hanya menginginkan data yang dapat digunakan dan berguna bagi sistem, oleh karena itu informasi dan data tambahan dapat disimpan sebagai gambar atau dokumen hasil pindai yang disimpan dalam bentuk bytes dan bahkan dienkripsi jika diperlukan*
 
-### Work Data
+### Data Pekerjaan
 
-- Employee ID (unique)
-	- Each division has its own employee ID
-	- Employee ID are being composed by: BIP (count, probation month count, etc)
-- Department or division
-- Position or title
-- Employment type
-- NPWP number
-- Payment bank details
-- Additional documents
-	- Signed contract
-	- Probation start
-	- Probation end
-	- Warning notices
+- Employee ID (unik)
+	- Setiap divisi memiliki Employee ID-nya sendiri
+	- Employee ID disusun dari: BIP (jumlah, jumlah bulan masa percobaan, dll)
+- Departemen atau divisi
+- Posisi atau jabatan
+- Tipe kepegawaian
+- Nomor NPWP
+- Detail bank pembayaran
+- Dokumen tambahan
+	- Kontrak yang ditandatangani
+	- Awal masa percobaan
+	- Akhir masa percobaan
+	- Surat peringatan
 
-#### Attendance Data
+#### Data Kehadiran
 
-*This data information could placed somewhere else if necessary, this will be reference look up to determine attendance automated status*
+*Informasi data ini dapat ditempatkan di tempat lain jika diperlukan, ini akan menjadi referensi lookup untuk menentukan status kehadiran secara otomatis*
 
-- Work type (onsite full-time, onsite shift-based or remote)
-- Work days
-- Work hours (start and end hour)
+- Tipe kerja (onsite full-time, onsite shift-based, atau remote)
+- Hari kerja
+- Jam kerja (jam mulai dan jam selesai)
 
-*Work days and hours are required as some department didn't follow the conventional attendance system, example: security/manufacturer as they follow their shift-based, live hosts as they start later on the day. etc*
+*Hari dan jam kerja diperlukan karena beberapa departemen tidak mengikuti sistem kehadiran konvensional, contoh: security/manufaktur karena mereka mengikuti sistem shift, live host karena mereka mulai lebih siang. dll*
 
-### System Authentication Roles
+### Role Autentikasi Sistem
 
-*This data include employee role on all system for the employee personal work information or other work-related system that is required for the employee to do their work*
+*Data ini mencakup role karyawan pada seluruh sistem untuk informasi kerja pribadi karyawan atau sistem terkait pekerjaan lain yang diperlukan agar karyawan dapat menjalankan pekerjaannya*
 
-*This information below is crucial and will be completed during the new employee on-boarding process with HRD side-by-side*
+*Informasi di bawah ini sangat penting dan akan dilengkapi selama proses on-boarding karyawan baru bersama dengan HRD*
 
 - Username
 - Password (hashed)
-- Passkey (exclusive to mobile based on device capabilities)
+- Passkey (eksklusif untuk mobile berdasarkan kemampuan perangkat)
 	- PIN (hashed)
-	- Bio-metrics (this credentials are saved locally on device per-application)
-- Roles (on their subsystem)
-	- Using object notation so it is easier to access, lookup are also faster as you can access it directly, example: `user.system_roles.hris`
-	- Obviously this will be enum type in their respective system
+	- Bio-metrics (kredensial ini disimpan secara lokal di perangkat per aplikasi)
+- Roles (pada subsistem mereka)
+	- Menggunakan object notation agar lebih mudah diakses, lookup juga lebih cepat karena dapat diakses secara langsung, contoh: `user.system_roles.hris`
+	- Tentu saja ini akan menjadi tipe enum pada sistem masing-masing
 
-## Database Structures
+## Struktur Database
 
-Since we re going with MongoDB NoSQL database so we need to identify what do we can do within the database
+Karena kita menggunakan database MongoDB NoSQL maka kita perlu mengidentifikasi apa saja yang dapat kita lakukan di dalam database
 
-### Consideration
+### Pertimbangan
 
-- Multiple collection within 1 database, as MongoDB has hard limit of 16MB of each documents/entry in the collection
-	- If that is accessed frequently by the system
-	- If it hold binary documents like images, PDF and others
-	- If it doesn't make sense to do embedded information on the entry
-		- Embedded documents is basically sub-object within the object like JSON `outer_object.inner_object.entry` and so on
-- Reference with MongoDB build-in `_id` as primary key
-	- If it is 1:1 reference and will never changes the other collection can match the `_id` field with the main reference object
-	- If it is many to many relation it is better to leave the object `_id` as default and add new entry like `_employee_reference` and give it the main reference to that object
+- Beberapa collection dalam 1 database, karena MongoDB memiliki batas keras sebesar 16MB untuk setiap dokumen/entry dalam collection
+	- Jika sering diakses oleh sistem
+	- Jika menyimpan dokumen biner seperti gambar, PDF, dan lainnya
+	- Jika tidak masuk akal untuk melakukan embedded information pada entry tersebut
+		- Embedded documents pada dasarnya adalah sub-object di dalam object seperti JSON `outer_object.inner_object.entry` dan seterusnya
+- Reference dengan `_id` bawaan MongoDB sebagai primary key
+	- Jika ini reference 1:1 dan tidak akan pernah berubah, collection lain dapat mencocokkan field `_id` dengan object reference utama
+	- Jika ini relasi many to many, lebih baik membiarkan `_id` object sebagai default dan menambahkan entry baru seperti `_employee_reference` serta memberikan reference utama ke object tersebut
 
-### Database Collection Graph and Relation
+### Graph dan Relasi Collection Database
 
-This will be attached in the future...
+Ini akan dilampirkan di masa mendatang...
 
-### Database Documents/Entries
+### Dokumen/Entry Database
 
-This is the example on the database document or entries going to looks like if it was in 1 massive wrapper after all join query has been done
+Ini adalah contoh seperti apa dokumen atau entry database nanti akan terlihat jika berada dalam 1 wrapper besar setelah seluruh join query selesai dilakukan
 
-#### Personal Data
+#### Data Pribadi
 
 ```JSON
 { // Personal information collections
@@ -127,7 +127,7 @@ This is the example on the database document or entries going to looks like if i
 }
 ```
 
-Documents being split to save spaces and since those information aren't frequently needed
+Dokumen dipisah untuk menghemat ruang dan karena informasi tersebut tidak sering dibutuhkan
 
 ```JSON
 { // Personal document collections
@@ -154,7 +154,7 @@ Documents being split to save spaces and since those information aren't frequent
 }
 ```
 
-#### Work Data
+#### Data Pekerjaan
 
 ```JSON
 { // Work information collections
@@ -186,7 +186,7 @@ Documents being split to save spaces and since those information aren't frequent
 }
 ```
 
-Documents being split to save spaces and since those information aren't frequently needed
+Dokumen dipisah untuk menghemat ruang dan karena informasi tersebut tidak sering dibutuhkan
 
 ```JSON
 { // Work document collections
@@ -208,9 +208,9 @@ Documents being split to save spaces and since those information aren't frequent
 }
 ```
 
-#### Work Schedule Data
+#### Data Jadwal Kerja
 
-This being separated since this will have more frequent access
+Ini dipisahkan karena akan lebih sering diakses
 
 ```JSON
 { // Work schedule collections
@@ -225,16 +225,16 @@ This being separated since this will have more frequent access
 }
 ```
 
-#### Company Work Schedule
+#### Jadwal Kerja Perusahaan
 
-This is reference for the Work Schedule Data
+Ini adalah referensi untuk Data Jadwal Kerja
 
-This collection owned by MODULE - Attendance Data, and will be fetched with buffer time after application initialization
-The service will panic if it cannot fetch new data from MODULE - Attendance Data and it has no recollection of this
+Collection ini dimiliki oleh MODULE - Attendance Data, dan akan di-fetch dengan buffer time setelah inisialisasi aplikasi
+Service akan panic jika tidak dapat melakukan fetch data baru dari MODULE - Attendance Data dan tidak memiliki rekaman data ini
 
-This will have its own collections in Employee Master Data and Attendance Data and will be synced properly between the two
+Ini akan memiliki collection-nya sendiri di Employee Master Data dan Attendance Data serta akan disinkronkan dengan benar di antara keduanya
 
-#### System Authentication Data
+#### Data Autentikasi Sistem
 
 ```JSON
 { // System authentication collections
@@ -254,4 +254,4 @@ This will have its own collections in Employee Master Data and Attendance Data a
 
 #### Metadata
 
-Since all of the example above has no metadata for date of creation, update or who created, updated the data, or even the current status of the data is active or not, this will be in future discussed of what is needed and what is not
+Karena seluruh contoh di atas tidak memiliki metadata untuk tanggal pembuatan, pembaruan, atau siapa yang membuat dan memperbarui data, atau bahkan status data saat ini aktif atau tidak, hal ini akan didiskusikan di masa mendatang mengenai apa yang dibutuhkan dan apa yang tidak

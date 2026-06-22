@@ -1,17 +1,16 @@
-## Description
+## Deskripsi
 
-*Development tools and application that being used internally to do iteration*
+*Development tools dan aplikasi yang digunakan secara internal untuk melakukan iterasi*
 
-[Hoppscotch](https://hoppscotch.io/) - Open-source API development ecosystem
-- Hosted internally on ERP-Development VMs: http://10.10.10.121:3000/
-- Credentials for the application are from personal GitHub account which need to be invited by Hoppscotch's admin account
-- The development workspace is on "BIP ERP"
+[Hoppscotch](https://hoppscotch.io/) - Ekosistem API development open-source
+- Di-host secara internal pada VM ERP-Development: http://10.10.10.121:3000/
+- Credentials untuk aplikasi ini berasal dari akun GitHub pribadi yang perlu di-invite oleh akun admin Hoppscotch
+- Development workspace ada di "BIP ERP"
 
 [OneBharata](https://hoppscotch.io/) - Production
-- Hosted internally on ERP-Production VMs: http://10.10.10.120:9696/
-- Credentials is following the account you created for the company when on-boarding on myBharata, if you forget this you can contact IT Support
+- Di-host secara internal pada VM ERP-Production: http://10.10.10.120:9696/
+- Credentials mengikuti akun yang Anda buat untuk perusahaan saat on-boarding di myBharata, jika Anda lupa Anda bisa menghubungi IT Support
 
 [OneBharata](https://hoppscotch.io/) - Development
-- Hosted internally on ERP-Development VMs: http://10.10.10.121:9696/
-- Credentials is change-able for development, but the document are sometimes resync with the production databases
-
+- Di-host secara internal pada VM ERP-Development: http://10.10.10.121:9696/
+- Credentials dapat diubah untuk keperluan development, namun dokumen terkadang di-resync dengan database production

@@ -1,19 +1,19 @@
-## Description
+## Deskripsi
 
-*This dashboard listed all attrition from internal departments that include added and departed employees*
+*Dashboard ini menampilkan seluruh attrition dari departemen internal yang mencakup karyawan yang masuk dan yang keluar*
 
-[Example of this system](https://docs.google.com/spreadsheets/d/113QO_RgfYz7f6NTyfFWxZjN5YQp1GxyJ/edit?gid=340825885#gid=340825885)
+[Contoh dari sistem ini](https://docs.google.com/spreadsheets/d/113QO_RgfYz7f6NTyfFWxZjN5YQp1GxyJ/edit?gid=340825885#gid=340825885)
 
-## Features
+## Fitur
 
 - Dashboard
-	- Overview of everything excellent for reporting to stakeholders
-- Details
-	- View of attrition in details viewed per departments
-- Demographics
-	- Information in details regarding termination gender, type and reasons (additional easy lookup for departure per departments)
+	- Ikhtisar segala hal yang sangat baik untuk pelaporan kepada stakeholder
+- Detail
+	- Tampilan attrition secara detail yang dilihat per departemen
+- Demografi
+	- Informasi detail mengenai gender, tipe, dan alasan terminasi (lookup tambahan yang mudah untuk kepergian per departemen)
 
-## Requirements
+## Kebutuhan
 
-- [ ] Employees master data (look up reference)
-- [ ] Termination records (creation and linked into employee data)
+- [ ] Master data karyawan (referensi lookup)
+- [ ] Catatan terminasi (pembuatan dan terhubung ke data karyawan)

@@ -1,48 +1,48 @@
-## Description
+## Deskripsi
 
-This database will hold everything about notification for all services includng articles intended for mobile and website
+Database ini akan menyimpan segala hal tentang notifikasi untuk semua service termasuk artikel yang ditujukan untuk mobile dan website
 
-## Features
+## Fitur
 
-This service will be able to manage all notification third-party usage like: 
-- Push WhatsApp notification request to personal or groups
-- Push FCM notication for single and multiple tokens
-*(This all already ready to be used on shared-library and some are already in-use by some services, merging them all together is better than each service need to setup each time for their own usage)*
+Service ini akan mampu mengelola seluruh penggunaan notifikasi pihak ketiga seperti:
+- Push request notifikasi WhatsApp ke personal atau grup
+- Push notifikasi FCM untuk single dan multiple token
+*(Semua ini sudah siap digunakan pada shared-library dan sebagian sudah dipakai oleh beberapa service, menggabungkan semuanya menjadi satu lebih baik dibandingkan setiap service harus melakukan setup sendiri setiap kali untuk penggunaannya masing-masing)*
 
-Database will hold information as follow:
-- History for FCM notification for mobile and website
-- Articles created from division regarding their update that impacted their own department, other department or the whole company, viewable on mobile and website
+Database akan menyimpan informasi sebagai berikut:
+- Riwayat notifikasi FCM untuk mobile dan website
+- Artikel yang dibuat oleh divisi terkait update mereka yang berdampak pada departemen mereka sendiri, departemen lain, atau seluruh perusahaan, dapat dilihat pada mobile dan website
 
-Need futher disscusion on how does this will reside in here, as this is better suited to reside in HRIS database
-- Payroll document are saved in here for each employee, and easily viewable (required to verify PIN or password)
+Perlu diskusi lebih lanjut tentang bagaimana hal ini akan ditempatkan di sini, karena ini lebih cocok ditempatkan pada database HRIS
+- Dokumen Payroll disimpan di sini untuk setiap karyawan, dan mudah dilihat (diperlukan verifikasi PIN atau password)
 
-## Completed Features
+## Fitur yang Sudah Selesai
 
-Some of the features below are actually already done on the shared-library but aren't yet implemented to the notification center; like FCM broadcasting, WhatsApp groups messages and so on
+Beberapa fitur di bawah ini sebenarnya sudah selesai pada shared-library namun belum diimplementasikan ke notification center; seperti FCM broadcasting, pesan WhatsApp grup, dan sebagainya
 
-- [x] WhatsApp message to specific employee/number
-- [x] WhatsApp message to specific groups
-- [ ] WhatsApp broadcast message to all employees
-- [ ] FCM message to specific employee on the following platform:
-	- [x] Android devices
-	- [ ] iOS devices
-	- [ ] Website with webpush
-- [x] FCM broadcast message to all employees on all platform
+- [x] Pesan WhatsApp ke karyawan/nomor tertentu
+- [x] Pesan WhatsApp ke grup tertentu
+- [ ] Broadcast pesan WhatsApp ke seluruh karyawan
+- [ ] Pesan FCM ke karyawan tertentu pada platform berikut:
+	- [x] Perangkat Android
+	- [ ] Perangkat iOS
+	- [ ] Website dengan webpush
+- [x] Broadcast pesan FCM ke seluruh karyawan pada semua platform
 
-## Consideration
+## Pertimbangan
 
-Images for articles need to be on fixed size so it didnt break for FCM notification on mobile, specification below:
-- Width and length: 1024x512 px
-- Filesize: below 1MB recommended to be below 300KB
+Gambar untuk artikel perlu berukuran tetap agar tidak rusak pada notifikasi FCM di mobile, spesifikasinya di bawah ini:
+- Lebar dan tinggi: 1024x512 px
+- Ukuran file: di bawah 1MB, disarankan di bawah 300KB
 
-## Data Structures
+## Struktur Data
 
-All structures below are just baseline and can be change as requirement needs
+Semua struktur di bawah ini hanyalah baseline dan dapat berubah sesuai kebutuhan
 
 ### Notification
 
-Personal notification required employee ID to know who is this notification are for, this will also present on bulk notification, this only reserved for important notification
-Therefore daily notification like clock-in and maybe some articles information are not saved into this collection
+Notifikasi personal membutuhkan employee ID untuk mengetahui notifikasi ini ditujukan untuk siapa, ini juga akan muncul pada notifikasi bulk, ini hanya dicadangkan untuk notifikasi penting
+Oleh karena itu notifikasi harian seperti clock-in dan mungkin beberapa informasi artikel tidak disimpan ke collection ini
 
 ```json
 { // Notification collection
@@ -81,5 +81,5 @@ Therefore daily notification like clock-in and maybe some articles information a
 }
 ```
 
-Articles are viewable by all department, it is fine to publish some notification for 1 department on here, since the other can just ignore it
-On articles publish, it will automatically use article title and summary to push FCM notification
+Artikel dapat dilihat oleh semua departemen, tidak masalah untuk mempublikasikan suatu notifikasi untuk 1 departemen di sini, karena departemen lain dapat saja mengabaikannya
+Pada saat artikel dipublikasikan, artikel akan secara otomatis menggunakan judul dan summary artikel untuk push notifikasi FCM

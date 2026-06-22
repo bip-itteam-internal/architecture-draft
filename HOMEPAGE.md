@@ -1,60 +1,60 @@
-## Notices
+## Pemberitahuan
 
-*Everything in here is is a quick overview and a rough idea on how the system looks like and how it interact with one another, this required more open discussion together*
+*Semua yang ada di sini hanyalah ikhtisar singkat dan gambaran kasar tentang bagaimana sistem terlihat serta bagaimana setiap bagian berinteraksi satu sama lain, hal ini memerlukan diskusi terbuka lebih lanjut bersama-sama*
 
-## What is ERP system looks like?
+## Seperti apa sistem ERP itu?
 
-Currently everything are still in mono repository, this will be moved out with git submodules down the line when it sees fit
+Saat ini semuanya masih berada dalam satu mono repository, ini akan dipindahkan dengan git submodules ke depannya ketika dirasa sudah tepat
 
-Interaction between the services can be interpreted like image below
+Interaksi antar service dapat diinterpretasikan seperti gambar di bawah ini
 ![[erp-request-nutshell.png]]
 
-### What does the API Gateway do?
+### Apa yang dilakukan API Gateway?
 
-It is our entry point for request, which also handle JWT authentication and routes check for open/restricted routes propagation
+Ini adalah entry point untuk request, yang juga menangani JWT authentication dan pengecekan propagasi routes untuk open/restricted routes
 
-### Explanation of the API Gateway routes structures
+### Penjelasan tentang struktur routes API Gateway
 
-By default API Gateway doesn't have their own routes, and only foward the request to internal services accordingly *(with the exception of authenticaction since it will be post-processed by the API Gateway themself for JWT creation)*
+Secara default API Gateway tidak memiliki routes-nya sendiri, dan hanya meneruskan request ke internal services sesuai kebutuhan *(dengan pengecualian authentication karena akan diproses lebih lanjut oleh API Gateway itu sendiri untuk pembuatan JWT)*
 
 ![[api-gateway-routes.png]]
 
-Routes structure lists (full details):
-- **/public** - Stand for public routes, which freely accessable for anyone
-- **/health** - This is heartbeat check for services that will always resolve to `/api/:service/` and sent back the information back
-- **/api** - Stand for normal api calls, this will calll internal services with the requirement of JWT authentication and/or unique `access-key` if requested to one of the open route services *(more explation can be read below)*
-- **/auth** - Stand for authentication, this route will always call into `/api/employee` under the hood and grab employee data and sign it with JWT on API Gateway
-- **/ext** - Stand for extension or external routes, with direct access (no JWT authentication) into services or webhooks *(currently heavily utilized for fingerprint integration)*
-- **/onboarding** - Being used for public access (minimal) information and helper function call/check for onboarding via mobile application 
-- **/debug** and **/dev** - Debug and development routes respectively, only available on dev/staging environment
+Daftar struktur routes (detail lengkap):
+- **/public** - Singkatan dari public routes, yang dapat diakses secara bebas oleh siapa saja
+- **/health** - Ini adalah pengecekan heartbeat untuk services yang akan selalu di-resolve ke `/api/:service/` dan mengirimkan kembali informasinya
+- **/api** - Singkatan dari panggilan api normal, ini akan memanggil internal services dengan syarat JWT authentication dan/atau `access-key` unik jika di-request ke salah satu open route services *(penjelasan lebih lanjut dapat dibaca di bawah)*
+- **/auth** - Singkatan dari authentication, route ini akan selalu memanggil ke `/api/employee` di balik layar dan mengambil data employee lalu menandatanganinya dengan JWT pada API Gateway
+- **/ext** - Singkatan dari extension atau external routes, dengan akses langsung (tanpa JWT authentication) ke services atau webhooks *(saat ini banyak dimanfaatkan untuk integrasi fingerprint)*
+- **/onboarding** - Digunakan untuk akses publik (minimal) informasi dan panggilan/pengecekan fungsi helper untuk onboarding melalui aplikasi mobile 
+- **/debug** dan **/dev** - Masing-masing adalah debug dan development routes, hanya tersedia pada environment dev/staging
 
-### What does the Orchestrator do?
+### Apa yang dilakukan Orchestrator?
 
-Orchestrator is basically our wrapper for event-based action, for example some request might required to call 2 different services, this system will do it for you for processing required data to do so
+Orchestrator pada dasarnya adalah wrapper kita untuk aksi berbasis event, sebagai contoh beberapa request mungkin memerlukan pemanggilan 2 service yang berbeda, sistem ini akan melakukannya untuk Anda dalam memproses data yang dibutuhkan untuk hal tersebut
 
-The orchestrator we currently have are: **HRIS** and **IT**
+Orchestrator yang saat ini kita miliki adalah: **HRIS** dan **IT**
 
-### What does the Service do?
+### Apa yang dilakukan Service?
 
-Service are the end-point that interact and connected with their own databases, this ensure the easy way of developing certain services, and if its ended up broken it is fine, since only said service are affected
+Service adalah end-point yang berinteraksi dan terhubung dengan database-nya masing-masing, ini memastikan kemudahan dalam mengembangkan service tertentu, dan jika ternyata rusak tidak masalah, karena hanya service tersebut yang terpengaruh
 
-We have 2 type of services:
-- **Open route services** - request can be made from outsite and required access/service keys, if the keys aren't provided it will fallback using JWT authentication
-- **Restricted services** - request must be validated using JWT authentication
+Kita memiliki 2 tipe services:
+- **Open route services** - request dapat dibuat dari luar dan memerlukan access/service keys, jika keys tidak disediakan maka akan fallback menggunakan JWT authentication
+- **Restricted services** - request harus divalidasi menggunakan JWT authentication
 
-## Type of Requests
+## Tipe Request
 
-There is total of 3 type of request for ERP system, where it is numbered as well, explained below:
+Terdapat total 3 tipe request untuk sistem ERP, yang juga diberi nomor, dijelaskan di bawah ini:
 
-1. **Direct request to services** - Where you request something directly to the services, example `/api/employee/status` or `/api/file/preview`
+1. **Direct request ke services** - Di mana Anda me-request sesuatu langsung ke services, contoh `/api/employee/status` atau `/api/file/preview`
 
-2. **Request to orchestrator** - Where you request to orchestrator to do business action to the various system, example `/api/hris/employee/create` where it will create the said employee data to the `employee-service` and upload the files to `file-service` and update the newest schedule to `attendance-service`
+2. **Request ke orchestrator** - Di mana Anda me-request ke orchestrator untuk melakukan aksi bisnis ke berbagai sistem, contoh `/api/hris/employee/create` di mana ia akan membuat data employee tersebut ke `employee-service` dan mengunggah file ke `file-service` serta memperbarui jadwal terbaru ke `attendance-service`
 
-3. **Direct request to services that dependand to another services** - This is moving into dangerous territory, where the action is vague and unclear since that is internal service-to-service calls. This is fine as long as it is not critical, example `/api/attendance/team-today?department=X` will fetch employees data based on department to `/api/employee-list` and use that information to get latest entry of that department employee attendance. **If you create this request and the flow are confusing then it means it is time move it to orchestrator**
+3. **Direct request ke services yang bergantung pada service lain** - Ini mulai memasuki wilayah berbahaya, di mana aksinya samar dan tidak jelas karena itu merupakan panggilan internal service-to-service. Ini tidak masalah selama bukan hal kritis, contoh `/api/attendance/team-today?department=X` akan mengambil data employees berdasarkan department ke `/api/employee-list` dan menggunakan informasi tersebut untuk mendapatkan entri terbaru attendance employee department tersebut. **Jika Anda membuat request seperti ini dan alurnya membingungkan maka itu berarti sudah waktunya memindahkannya ke orchestrator**
 
-## Glances to the Repository structure
+## Sekilas tentang struktur Repository
 
-Below are glances to the code repository with notes on it
+Di bawah ini adalah sekilas tentang code repository beserta catatannya
 
 ```
 ├── .env (Everything in here, need to sort this out)
@@ -64,14 +64,14 @@ Below are glances to the code repository with notes on it
 ├── api-gateway (Manages authenticcation and routes to existing services)
 │
 ├── orchestrator (Manages request for multiple services at once)
-│   ├── hris
-│   └── it
+│   ├── hris
+│   └── it
 │
 ├── services (ERP services, some are restricted other are open)
-│   ├── attendance (Restricted)
-│   ├── employee (Restricted)
-│   ├── file (Open-routes and restricted)
-│   └── notification (Open-routes and restricted)
+│   ├── attendance (Restricted)
+│   ├── employee (Restricted)
+│   ├── file (Open-routes and restricted)
+│   └── notification (Open-routes and restricted)
 │
 └── shared-library (All things point into shared-library to not declare something twice, this is out duct tape for all the services. Need to move this into proper go include if needed)
     │
@@ -80,18 +80,18 @@ Below are glances to the code repository with notes on it
     ├── routes (Handles gateway and internal routing)
     │
     ├── common (Common stuff for model, function and others that being ref often)
-    │   ├── env.go
-    │   ├── header.go
-    │   ├── metadata.go
-    │   ├── response.go
-    │   ├── roles.go
-    │   └── struct.go
+    │   ├── env.go
+    │   ├── header.go
+    │   ├── metadata.go
+    │   ├── response.go
+    │   ├── roles.go
+    │   └── struct.go
     │
     ├── models (Models declaration for all services)
-    │   ├── attendance
-    │   ├── employee
-    │   ├── inventory
-    │   └── notification
+    │   ├── attendance
+    │   ├── employee
+    │   ├── inventory
+    │   └── notification
     │
     ├── notification (WhatsApp and FCM library)
     ├── minio (File server)
@@ -99,37 +99,37 @@ Below are glances to the code repository with notes on it
     └── validation
 ```
 
-## Where do I start?
+## Dari mana saya mulai?
 
-Before starting it is recommended to familiar yourself with the shared-library files, api gateway and then to the services/orchestrator boilderplate files
+Sebelum memulai disarankan untuk membiasakan diri dengan file-file shared-library, api gateway, lalu ke file-file boilerplate services/orchestrator
 
-To start create new services you can do below:
-1. Create new folder for your service
-2. Run `go mod init 'service-name'` inside that new folder
-3. Adjust this command to suit your path to link the shared-library to your new services `go mod edit -replace github.com/bharata/shared-library=../../shared-library` and after that run `go get github.com/bharata/shared-library@v0.0.0`
-4. (Copy template of other services) Create `main.go` for your service
-5. (Copy template of other services) Create `dockerfile` for your service
-6. (Copy template of other services) Edit the `docker-compose.yml`, with the required stuff intended for your services
-7. Add your service-module-url to `api-gateway/main.go` on hashmap `InternalURL`
-8. Add new variables if you create it to `.env`
+Untuk mulai membuat service baru Anda dapat melakukan hal berikut:
+1. Buat folder baru untuk service Anda
+2. Jalankan `go mod init 'service-name'` di dalam folder baru tersebut
+3. Sesuaikan command ini agar cocok dengan path Anda untuk menautkan shared-library ke service baru Anda `go mod edit -replace github.com/bharata/shared-library=../../shared-library` dan setelah itu jalankan `go get github.com/bharata/shared-library@v0.0.0`
+4. (Salin template dari service lain) Buat `main.go` untuk service Anda
+5. (Salin template dari service lain) Buat `dockerfile` untuk service Anda
+6. (Salin template dari service lain) Edit `docker-compose.yml`, dengan hal-hal yang diperlukan untuk service Anda
+7. Tambahkan service-module-url Anda ke `api-gateway/main.go` pada hashmap `InternalURL`
+8. Tambahkan variabel baru jika Anda membuatnya ke `.env`
 
-These action above can be automated using shell script, but for now we dont have it nor we have any boilderplate template, so everything is manual for now
+Aksi-aksi di atas dapat diotomatisasi menggunakan shell script, tetapi untuk saat ini kita belum memilikinya maupun template boilerplate apa pun, jadi semuanya masih manual untuk sekarang
 
 ## TODO
 
-1. Split this into git submodules, or even just make them as seperate repository
-2. Forget about shared-library shares and just push it as standalone repository where we can include it easily to each services
-3. Split docker-compose and env variables to each services properly with their own slices
+1. Pisahkan ini menjadi git submodules, atau bahkan jadikan saja sebagai repository terpisah
+2. Lupakan saja sharing shared-library dan cukup push sebagai repository standalone di mana kita dapat menyertakannya dengan mudah ke setiap services
+3. Pisahkan docker-compose dan env variables ke setiap services secara benar dengan slice-nya masing-masing
 
 
 
 
-## Using pre-existing ERP authentication for external apps
+## Menggunakan authentication ERP yang sudah ada untuk aplikasi eksternal
 
-Sometimes we are unable to build on top of the ERP because of restriction or we have standalone prototype we want to share directly but it is need authentication
+Terkadang kita tidak dapat membangun di atas ERP karena adanya batasan atau kita memiliki prototype standalone yang ingin kita bagikan secara langsung tetapi membutuhkan authentication
 
-Therefore you can use the existing authentication on ERP for your external apps like below, just call the function and then save it as header for JWT, and validate it for each page access accordingly
+Oleh karena itu Anda dapat menggunakan authentication yang sudah ada pada ERP untuk aplikasi eksternal Anda seperti di bawah ini, cukup panggil fungsinya lalu simpan sebagai header untuk JWT, dan validasi setiap akses halaman sesuai kebutuhan
 
-Sequence diagram are show below
+Sequence diagram ditampilkan di bawah ini
 
 ![[erp-external-auth-use-case.svg]]

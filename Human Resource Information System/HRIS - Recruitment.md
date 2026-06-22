@@ -1,3 +1,3 @@
-## Notes
+## Catatan
 
-*This is replicate of HRIS - Analysis sub-features, since in there we include every steps for employee starting from onboarding and such. To be honest it is all need to be seperated intor their own spaces*
+*Ini adalah replika dari sub-fitur HRIS - Analysis, karena di sana kita memasukkan setiap langkah untuk karyawan mulai dari onboarding dan sebagainya. Sejujurnya semuanya perlu dipisahkan ke dalam ruangnya masing-masing*

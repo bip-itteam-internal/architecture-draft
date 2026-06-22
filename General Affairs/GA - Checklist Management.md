@@ -1,3 +1,3 @@
-## Notes
+## Catatan
 
-*Isn't this the same with dynamic task tracker or task management that is currently on development?*
+*Bukankah ini sama dengan dynamic task tracker atau task management yang saat ini sedang dalam pengembangan?*

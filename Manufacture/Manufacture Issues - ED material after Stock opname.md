@@ -1,5 +1,5 @@
 
-This department uses Accurate Online for managing production and raw materials. 
+Departemen ini menggunakan Accurate Online untuk mengelola produksi dan raw material. 
 
 ### Stok material yang ED atau wested
 ```
@@ -16,7 +16,7 @@ pertanyaan:
 4. jangan rubah langsung stok yang sudah ada, cukup tampilkan berapa nilai selisihnya, alasan selisih, dan nomor serinya. jawaban: dashboard khusus bisa menjadi solusi
 ```
 
-Suggestion flow:
+Alur yang disarankan:
 ![[Stok Pengecekan Fisik Flow.png]]
 
 

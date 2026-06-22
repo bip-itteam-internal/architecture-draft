@@ -1,14 +1,14 @@
 
-*Access to the on-site server and VMs are listed below, all root access password is the same with the user, but please DO NOT use the root as default*
+*Akses ke server on-site dan VM tercantum di bawah ini, semua password root sama dengan user, namun harap JANGAN menggunakan root sebagai default*
 
-## Servers
+## Server
 
 **Server - Windows Server (RAID5/HyperV)**
 - Local IP: 10.10.10.15
 - Username: administrator, devops
 - Password: Hijau+99!
 
-## VMs (Virtual Machines and VPS)
+## VM (Virtual Machine dan VPS)
 
 **VM - DevOps Ubuntu**
 - Local IP: 10.10.10.37
@@ -45,7 +45,7 @@
 - Username: netmon
 - Password: Hijau@99!
 
-## ERP Production MongoDBs
+## MongoDB ERP Production
 
 - **Employee (Primary Replication):** 
 	- mongodb://erp-mongo:{password}@10.10.10.120:32783/employee_db?authSource=admin&directConnection=true

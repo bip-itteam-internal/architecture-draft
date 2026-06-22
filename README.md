@@ -1,27 +1,27 @@
-# Architecture Draft
+# Draft Arsitektur
 
-This is architecture draft for Bharata International Pharmaceutical which will be refined together
+Ini adalah draft arsitektur untuk Bharata International Pharmaceutical yang akan disempurnakan bersama-sama
 
-## How to use
+## Cara menggunakan
 
-1. Clone this repository
-2. Download and install [Obsidian](https://obsidian.md/)
-3. Select repository folder with Open Existing Vault options when opening Obsidian
+1. Clone repository ini
+2. Unduh dan instal [Obsidian](https://obsidian.md/)
+3. Pilih folder repository dengan opsi Open Existing Vault saat membuka Obsidian
 
-## How to collaborate
+## Cara berkolaborasi
 
-Add your notes in the Obsidian and push the changes into the repository, also don't forget to pull it time to time :)
+Tambahkan catatan Anda di Obsidian dan push perubahannya ke repository, jangan lupa juga untuk melakukan pull dari waktu ke waktu :)
 
-Follow the header style guide, and be careful when linking stuff with **Add Link** feature on Obsidian as this create a graph link with arrow that might not be wanted, only reserve this for direct dependencies
+Ikuti panduan gaya header, dan berhati-hatilah saat menautkan sesuatu dengan fitur **Add Link** pada Obsidian karena ini membuat graph link dengan panah yang mungkin tidak diinginkan, gunakan ini hanya untuk dependensi langsung
 
-### Others way to collaborate easier?
+### Cara lain agar lebih mudah berkolaborasi?
 
-We could look into [Obsidian Pricing](https://obsidian.md/pricing) for collaboration and publishing as well, but this required [Obsidian account](https://obsidian.md/auth)
+Kita bisa melihat [Obsidian Pricing](https://obsidian.md/pricing) untuk kolaborasi dan publikasi juga, tetapi ini memerlukan [akun Obsidian](https://obsidian.md/auth)
 
-## Can we publish this into a wikipage?
+## Bisakah kita mempublikasikan ini menjadi halaman wiki?
 
-Yes, either we pay with the said [Obsidian Pricing](https://obsidian.md/pricing) or we could use [this community plugins](https://forum.obsidian.md/t/html-export-plugin/51743)
+Bisa, kita bisa membayar dengan [Obsidian Pricing](https://obsidian.md/pricing) tersebut atau kita bisa menggunakan [community plugin ini](https://forum.obsidian.md/t/html-export-plugin/51743)
 
-Currently there is accessible offline wikipage under `.export/architecture-draft.html`
+Saat ini terdapat halaman wiki offline yang dapat diakses di bawah `.export/architecture-draft.html`
 
-Wikipage are now [active here](http://architecture.bharatainternasional.com/)
+Halaman wiki sekarang [aktif di sini](http://architecture.bharatainternasional.com/)

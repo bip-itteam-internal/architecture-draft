@@ -1,4 +1,4 @@
-### Raw material doesn't automatically follow production quantity
+### Raw material tidak otomatis mengikuti kuantitas produksi
 ```
 Terkait PPIC
 pertanyaan:
@@ -7,5 +7,5 @@ pertanyaan:
 2. apabila ada formula yang sedikit berubah, bagaimana menyakinkan formula yang digunakan sudah benar sesuai dengan permintaan? fitur ini belum tersedia di accurate. dibutuhkan dashboard khusus yang terintegrasi dengan accurate untuk kalkulasi quantity formula tersebut
 ```
 
-Suggestion flow:
+Alur yang disarankan:
 ![[Order Production Workflow.png|697]]

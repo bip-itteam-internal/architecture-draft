@@ -1,24 +1,24 @@
-## Description
+## Deskripsi
 
-*Creation of single API Gateway that could be rerouted to all system authentication based on their current system would be beneficial to the whole system as managing it will be easier and centralized*
+*Pembuatan satu API Gateway tunggal yang dapat me-reroute ke seluruh authentication sistem berdasarkan sistem yang sedang berjalan akan bermanfaat bagi keseluruhan sistem karena pengelolaannya menjadi lebih mudah dan terpusat*
 
-[Read more into our implementation of this API Master Gateway](https://github.com/bip-itteam-internal/api-gateway-test)
+[Baca lebih lanjut tentang implementasi API Master Gateway kami](https://github.com/bip-itteam-internal/api-gateway-test)
 
-## Requirements
+## Kebutuhan
 
-- [x] Handle authentication
-- [x] Pass forward the payload to be used by the module on the system
-- [x] Centralized API Gateway to other module on the system
-- [x] Login and logout features (data taken from Employee Master Data in the collections of System Authentication)
-- [x] Registration from first time user that login with employee ID and temporary password given by HRD
-- [x] Simplification of reroute request and internal request for easy development
-	- Reroute are only being used by the API Gateway itself
-	- Internal request are used for service-to-service requests
+- [x] Menangani authentication
+- [x] Meneruskan payload untuk digunakan oleh modul pada sistem
+- [x] API Gateway terpusat ke modul lain pada sistem
+- [x] Fitur login dan logout (data diambil dari Employee Master Data pada collection System Authentication)
+- [x] Registrasi dari pengguna yang pertama kali login dengan employee ID dan password sementara yang diberikan oleh HRD
+- [x] Penyederhanaan reroute request dan internal request untuk kemudahan pengembangan
+	- Reroute hanya digunakan oleh API Gateway itu sendiri
+	- Internal request digunakan untuk request antar service (service-to-service)
 
 ## Forwarded Request / Reroute
 
-Below are the valid endpoint, propagated calls or forwarded request from this gateway
-List of exposed endpoint on each module will be discussed later on
+Berikut adalah endpoint yang valid, propagated call atau forwarded request dari gateway ini
+Daftar endpoint yang di-expose pada masing-masing modul akan dibahas kemudian
 
 - [ ] [[DB - Overview and Notes]]
 - [ ] [[Microservices - Employee Service]]
@@ -26,29 +26,29 @@ List of exposed endpoint on each module will be discussed later on
 - [ ] [[Microservices - File Service]]
 - [ ] [[Microservices - Notification Service]]
 
-Some of above list are also have an open-routes which mean everyone can request to it but also include some additional checks
+Sebagian dari daftar di atas juga memiliki open-route yang berarti semua orang dapat melakukan request ke endpoint tersebut, namun tetap disertai beberapa pemeriksaan tambahan
 
-List of unknown modules as per 10/17/25
+Daftar modul yang belum diketahui per 10/17/25
 
 - [ ] [[APP - Dynamic Task Tracker]]
 
-### Gateway Authorization to Module Endpoint
+### Authorization Gateway ke Endpoint Modul
 
-API Gateway and each module shared a matching secret **INTERNAL-KEY**, this key only supplied when request from API Gateway are forwarded to module
-Each module endpoint will validate this gateway **INTERNAL-KEY** with its own, if the provide 
-key is missing or incorrect it will result in error unauthorized
+API Gateway dan setiap modul berbagi secret yang cocok berupa **INTERNAL-KEY**, key ini hanya disertakan ketika request dari API Gateway diteruskan ke modul
+Setiap endpoint modul akan memvalidasi **INTERNAL-KEY** gateway ini dengan miliknya sendiri, apabila key yang diberikan
+hilang atau tidak benar maka akan menghasilkan error unauthorized
 
-The database are internal and not exposed, it has to be setup properly in docker to communicate with the API Gateway correctly
+Database bersifat internal dan tidak di-expose, database harus disiapkan dengan benar di docker agar dapat berkomunikasi dengan API Gateway secara tepat
 
 ![[gateway-example.png]]
 
-Read more about [mTLS](https://www.cloudflare.com/learning/access-management/what-is-mutual-tls/) the more secure method of authorization 
+Baca lebih lanjut tentang [mTLS](https://www.cloudflare.com/learning/access-management/what-is-mutual-tls/) metode authorization yang lebih aman
 
-Some information are also needed to access a routes including JWT and the RBAC data, which are being store in shared-library for reroute and internal request function
+Beberapa informasi juga dibutuhkan untuk mengakses sebuah route, termasuk JWT dan data RBAC, yang disimpan dalam shared-library untuk fungsi reroute dan internal request
 
-## JWT Payload Structure / Custom Headers
+## Struktur Payload JWT / Custom Header
 
-Additional JWT payload for easier look up into here instead of querying the database for those most reused information, this information is being passed around as additional headers
+Payload JWT tambahan untuk mempermudah pencarian di sini alih-alih melakukan query ke database untuk informasi yang paling sering digunakan tersebut, informasi ini diteruskan sebagai header tambahan
 
 ```JSON
 {
@@ -62,8 +62,8 @@ Additional JWT payload for easier look up into here instead of querying the data
 }
 ```
 
-This header are being used to check for self-services routes and also to set metadata into database on data creation/modification
+Header ini digunakan untuk memeriksa route self-service dan juga untuk menetapkan metadata ke database pada saat pembuatan/modifikasi data
 
-## Public Endpoint Lists
+## Daftar Public Endpoint
 
-*To be defined per-module in future sections*
+*Akan didefinisikan per modul pada bagian berikutnya*

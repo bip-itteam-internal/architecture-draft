@@ -1,13 +1,13 @@
-# Background
-There's a system for managing customer from Tiktok in this Dashboard: [monitoring.hubcrm.bharatainternasional.com](https://monitoring.hubcrm.bharatainternasional.com/)
+# Latar Belakang
+Terdapat sebuah sistem untuk mengelola customer dari Tiktok di Dashboard ini: [monitoring.hubcrm.bharatainternasional.com](https://monitoring.hubcrm.bharatainternasional.com/)
 
 
-# Issues
-1. There are alot of censored phone number, address and names. These data are from vendor (Semarang)
-2. There's an issue for blasting. Occasionally Whatsapp number got suspended after blasting message to 30+ numbers
+# Permasalahan
+1. Banyak nomor telepon, alamat, dan nama yang tersensor. Data-data ini berasal dari vendor (Semarang)
+2. Terdapat masalah pada blasting. Sesekali nomor Whatsapp menjadi suspended setelah mengirim pesan blasting ke 30+ nomor
 
-# Possible solutions
-1. Vendor collaboration. possible to share source code
-2. Create a small tool to blast numbers based on rules:
-	1. "Warming up" conversations. (Create 2 or more conversation with our own number to simulate real human conversation)
-	2. After warming up, don't bulk messages in one time. separate them in random interval. for example send 1 message to 1 number in 08.00, next message would be 08.01, or random time frame
+# Kemungkinan solusi
+1. Kolaborasi dengan vendor. memungkinkan untuk berbagi source code
+2. Membuat tool kecil untuk blasting nomor berdasarkan aturan:
+	1. Percakapan "Warming up". (Membuat 2 atau lebih percakapan dengan nomor kita sendiri untuk mensimulasikan percakapan manusia yang nyata)
+	2. Setelah warming up, jangan kirim pesan secara bulk dalam satu waktu. pisahkan dalam interval acak. sebagai contoh kirim 1 pesan ke 1 nomor pada 08.00, pesan berikutnya pada 08.01, atau rentang waktu acak

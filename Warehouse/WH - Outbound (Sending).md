@@ -1,19 +1,19 @@
-## Description
+## Deskripsi
 
-*This is inbound logging for record keeping and analysis if needed*
+*Ini adalah logging inbound untuk pencatatan dan analisis jika diperlukan*
 
-[Example of this system](https://docs.google.com/spreadsheets/d/13ncXYw1zn6qcLlqzJgp5Lv_QmXzwi8Sk/edit?gid=705616732#gid=705616732)
+[Contoh dari sistem ini](https://docs.google.com/spreadsheets/d/13ncXYw1zn6qcLlqzJgp5Lv_QmXzwi8Sk/edit?gid=705616732#gid=705616732)
 
-## Features
+## Fitur
 
-- Shipping dashboard *(Outbound)*
-	- Overview of everything about shipping goods 
-- Shipping logs
-	- Detailed list of outbound goods, including their current status, with additional post-send details
+- Dashboard shipping *(Outbound)*
+	- Ikhtisar tentang semua hal mengenai barang yang dikirim 
+- Log shipping
+	- Daftar detail barang outbound, termasuk status terkininya, dengan detail tambahan setelah pengiriman
 
-## Requirements
+## Kebutuhan
 
-- [ ] Warehouse management system (look up reference)
+- [ ] Warehouse management system (cari referensi)
 
 ## Dependencies
 

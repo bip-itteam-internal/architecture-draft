@@ -1,33 +1,33 @@
-## Description
+## Deskripsi
 
-*This is the main application/platform that going to be a portal to access all system and features*
+*Ini adalah aplikasi/platform utama yang akan menjadi portal untuk mengakses seluruh sistem dan fitur*
 
-## Features
+## Fitur
 
-- Login page
-	- Login with username and password, passkey are unavailable on web application
-- Base dashboard with portal to access other system (BASE - Landing Page)
-	- Base dashboard page will include base information or status of the employee
-	- Portal access to other system will be display with modular portal interface possibly with tile-based dashboard
-- **PRIORITY:** HRIS Manager to be able to input into Employee Master Data, since this is hard dependencies to make APP - Mobile Application login and registration features
+- Halaman login
+	- Login dengan username dan password, passkey tidak tersedia pada web application
+- Dashboard dasar dengan portal untuk mengakses sistem lain (BASE - Landing Page)
+	- Halaman dashboard dasar akan mencakup informasi dasar atau status karyawan
+	- Akses portal ke sistem lain akan ditampilkan dengan antarmuka portal modular, kemungkinan dengan dashboard berbasis tile
+- **PRIORITAS:** HRIS Manager harus dapat menginput ke Employee Master Data, karena ini merupakan dependency mutlak untuk membuat fitur login dan registrasi APP - Mobile Application
 
-## Implemented Features
+## Fitur yang Sudah Diimplementasikan
 
-1. Login page with username and password
-2. HRIS managing employee master data
-3. HRIS monitoring and editing employee attendance data
-4. HRIS managing holiday lists
+1. Halaman login dengan username dan password
+2. HRIS mengelola employee master data
+3. HRIS memantau dan mengedit data kehadiran karyawan
+4. HRIS mengelola daftar hari libur
 
-## Unimplemented Features
+## Fitur yang Belum Diimplementasikan
 
-1. HRIS warning for employee that suit this category:
-	- Partially filled employee data
-	- Employee is not registered in myBharata mobile application
-	- Employee is nearing their contract end period
-	- Employee absent from their attendance without any notes
-2. IT to manage employee system roles
-3. IT to reset employee accounts
-4. Helpdesk for all the system viewable by anyone
+1. Peringatan HRIS untuk karyawan yang masuk kategori berikut:
+	- Data karyawan terisi sebagian
+	- Karyawan belum terdaftar di aplikasi mobile myBharata
+	- Karyawan mendekati akhir masa kontraknya
+	- Karyawan absen dari kehadiran tanpa keterangan apa pun
+2. IT mengelola role sistem karyawan
+3. IT me-reset akun karyawan
+4. Helpdesk untuk seluruh sistem yang dapat dilihat oleh siapa saja
 
 ## Dependencies
 

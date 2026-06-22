@@ -1,25 +1,25 @@
-## Description
+## Deskripsi
 
-Digitalized version of the current manually handled company's guestbook, currently aren't fully fledge system but we're on it, check out the [GitHub repository](https://github.com/bip-itteam-internal/guestbook-system)
+Versi digital dari guestbook perusahaan yang saat ini ditangani secara manual, saat ini belum menjadi sistem yang sepenuhnya lengkap tetapi kami sedang mengerjakannya, lihat [repository GitHub](https://github.com/bip-itteam-internal/guestbook-system)
 
-This system is fully owned by GA Security and they have full control over it, all information will be saved under [[Microservices - Attendance Service]]
+Sistem ini sepenuhnya dimiliki oleh GA Security dan mereka memiliki kontrol penuh atasnya, semua informasi akan disimpan di bawah [[Microservices - Attendance Service]]
 
-## Features
+## Fitur
 
-- Public web application which responsible to send guestbook entries to ERP system
-	- Security show guestbook QR code to the visitor for them to fill out the guestbook
-	- Request are valid if the token send match the active token on the ERP system, which being rotated each day on 4 in the morning
-- View of the guestbook are available to GA/Security and all HR roles
+- Aplikasi web publik yang bertanggung jawab mengirim entri guestbook ke sistem ERP
+	- Security menampilkan QR code guestbook kepada pengunjung untuk mereka isi guestbook-nya
+	- Request valid jika token yang dikirim cocok dengan token aktif pada sistem ERP, yang dirotasi setiap hari pada pukul 4 pagi
+- Tampilan guestbook tersedia untuk GA/Security dan semua role HR
 
-- For employee that is late and need to fill out guestbook we have faster option to do so with the help of mobile application, explaination below;
-	- Employee come late, and clock in on the gate
-	- Security request the employee to show their employee data QR
-	- Security select 'scan late employee QR' option and simply scan the QR
-	- The details are filled automatically and passed to the guestbook
+- Untuk karyawan yang terlambat dan perlu mengisi guestbook, kami memiliki opsi yang lebih cepat untuk melakukannya dengan bantuan aplikasi mobile, penjelasan di bawah;
+	- Karyawan datang terlambat, dan clock in di gerbang
+	- Security meminta karyawan untuk menampilkan QR data karyawan mereka
+	- Security memilih opsi 'scan late employee QR' dan cukup scan QR-nya
+	- Detailnya terisi otomatis dan diteruskan ke guestbook
 
 
-## Preview
+## Pratinjau
 
-Since this application is mobile-first we dont really care now support better view for desktop
+Karena aplikasi ini mobile-first, kami sekarang tidak terlalu peduli untuk mendukung tampilan yang lebih baik untuk desktop
 
 ![[Pasted image 20260307112209.png]]

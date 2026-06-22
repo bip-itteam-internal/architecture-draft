@@ -1,33 +1,33 @@
-## Description
+## Deskripsi
 
-*This dashboard listed all goods stored in the warehouse in details so everything is organized and easy to keep track*
+*Dashboard ini mencantumkan semua barang yang disimpan di warehouse secara detail sehingga semuanya terorganisir dan mudah dilacak*
 
-[Example of this system](https://docs.google.com/spreadsheets/d/12L5OKViT2LnQECT6ldUBkjK-xablpcZO/edit?gid=1015075572#gid=1015075572)
+[Contoh dari sistem ini](https://docs.google.com/spreadsheets/d/12L5OKViT2LnQECT6ldUBkjK-xablpcZO/edit?gid=1015075572#gid=1015075572)
 
-## Features
+## Fitur
 
 - Dashboard
-	- Overview of everything that is stored in warehouse
-- View and search
-	- To keep track of goods count and placement within the warehouse
-- Creation of new Stock Keeping Unit entry and barcode
-	- This is needed as new goods will eventually come to the warehouse and has to be tracked properly
+	- Ikhtisar tentang semua hal yang disimpan di warehouse
+- Lihat dan cari
+	- Untuk melacak jumlah barang dan penempatannya di dalam warehouse
+- Pembuatan entri Stock Keeping Unit baru dan barcode
+	- Ini diperlukan karena barang baru pada akhirnya akan datang ke warehouse dan harus dilacak dengan benar
 
-## Pending Details
+## Detail yang Tertunda
 
-- [ ] Who are responsible of this system?
-- [ ] Does warehouse itself able to execute dispatch order? This might be needed if we have 2 or more warehouses to send goods back and front for organizing or somethings
-- [ ] Would we implement dispatch order? so order from Finance department can be carried immediately from the system?
-- [ ] How does inbound request from other system being placed or processed?
-- [ ] How does outbound request from other system being placed or processed?
+- [ ] Siapa yang bertanggung jawab atas sistem ini?
+- [ ] Apakah warehouse sendiri dapat menjalankan dispatch order? Ini mungkin diperlukan jika kita memiliki 2 atau lebih warehouse untuk mengirim barang bolak-balik untuk pengorganisasian atau hal lainnya
+- [ ] Apakah kita akan mengimplementasikan dispatch order? Sehingga order dari departemen Finance dapat langsung dijalankan dari sistem?
+- [ ] Bagaimana request inbound dari sistem lain ditempatkan atau diproses?
+- [ ] Bagaimana request outbound dari sistem lain ditempatkan atau diproses?
 
-## Requirements
+## Kebutuhan
 
-- [ ] Employees master data (look up reference, this will be used to link which entry are created by whom)
+- [ ] Master data karyawan (cari referensi, ini akan digunakan untuk menghubungkan entri mana yang dibuat oleh siapa)
 
 ## Dependencies
 
-- [ ] Logging system
+- [ ] Sistem logging
 	- [ ] [[WH - Inbound (Receiving)]]
 	- [ ] [[WH - Outbound (Sending)]]
-- [ ] Other system that able to request to this system
+- [ ] Sistem lain yang dapat melakukan request ke sistem ini

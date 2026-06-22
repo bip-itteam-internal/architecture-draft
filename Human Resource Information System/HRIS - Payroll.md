@@ -1,41 +1,41 @@
-## Description
+## Deskripsi
 
-*This dashboard listed all attrition from internal departments that include added and departed employees*
+*Dashboard ini menampilkan seluruh attrition dari departemen internal yang mencakup karyawan yang masuk dan yang keluar*
 
-[Example of this system](https://drive.google.com/drive/folders/17RNDBtMwKCU_tuAiLZbwCgFp-xwwmzuz)
+[Contoh dari sistem ini](https://drive.google.com/drive/folders/17RNDBtMwKCU_tuAiLZbwCgFp-xwwmzuz)
 
-## Features
+## Fitur
 
 - Dashboard
-	- Overview of everything excellent for reporting to stakeholders
-	- View per-departments
-	- View per-persons
-- Payroll per-employee controls
-	- This is going to be the backbone of the system as this information will be used to create everything on the dashboard
-	- Daily control
+	- Ikhtisar segala hal yang sangat baik untuk pelaporan kepada stakeholder
+	- Tampilan per-departemen
+	- Tampilan per-orang
+- Kontrol payroll per-karyawan
+	- Ini akan menjadi tulang punggung sistem karena informasi ini akan digunakan untuk membuat segala hal pada dashboard
+	- Kontrol harian
 		- Attendance
-		- Leaves
+		- Cuti
 		- Overtime
-	- Achievement or accomplishment
-	- Incentive
-	- Insurance
-- Quality assurance form
-	- This document will be passed from Human Resource Department to Accounting
+	- Pencapaian atau prestasi
+	- Insentif
+	- Asuransi
+- Form quality assurance
+	- Dokumen ini akan diteruskan dari Human Resource Department ke Accounting
 
-## Pending Details
+## Detail yang Tertunda
 
-- [ ] More information about what affect payroll daily controls for employees
+- [ ] Informasi lebih lanjut tentang apa yang memengaruhi kontrol payroll harian untuk karyawan
 
 * Setting Gaji
 * Setting BPJS Kesehatan dan Ketenagakerjaan
 * Perhitungan Izin selain sakit dan cuti
-## Requirements
+## Kebutuhan
 
-- [ ] Employees master data (look up reference)
-	- [ ] Payment bank details
-- [ ] Attendance information and breakdowns
-	- This is required to grab information for normal and overtime working hours
+- [ ] Master data karyawan (referensi lookup)
+	- [ ] Detail bank pembayaran
+- [ ] Informasi dan rincian attendance
+	- Ini diperlukan untuk mengambil informasi jam kerja normal dan overtime
 
-## Dependencies
+## Dependensi
 
 - [ ] DB - Attendance Data

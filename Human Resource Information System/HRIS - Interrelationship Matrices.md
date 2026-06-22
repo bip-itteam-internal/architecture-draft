@@ -1,3 +1,3 @@
-## Notes
+## Catatan
 
-*Information to create this page is insufficient, required more information*
+*Informasi untuk membuat halaman ini belum cukup, diperlukan informasi lebih lanjut*

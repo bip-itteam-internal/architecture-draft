@@ -1,30 +1,30 @@
-## Database Backups
+## Backup Database
 
-Backup are carried out for important databases, weekly on Monday at 4:15am
+Backup dilakukan untuk database-database penting, mingguan setiap hari Senin pukul 4:15 pagi
 
-Currently this backup reside only on the local machine project directory, this should be improved to upload the backups into cloud services, so we have something for fallback incase the local machine or VM crashes and unable to be recovered
+Saat ini backup hanya berada di direktori project mesin lokal, hal ini perlu ditingkatkan agar dapat mengunggah backup ke layanan cloud, sehingga kita memiliki cadangan untuk fallback jika mesin lokal atau VM crash dan tidak dapat dipulihkan
 
-## Collection Synchronization
+## Sinkronisasi Collection
 
-In database there is going to be a lot of collection and some of the collection aren't natively owned by said database, therefore those collection need to be fetched from their database if possible on each server restart, cron based or by subscription based action
+Dalam database akan ada banyak collection dan beberapa collection tersebut tidak secara native dimiliki oleh database tersebut, oleh karena itu collection tersebut perlu di-fetch dari database asalnya jika memungkinkan pada setiap server restart, berbasis cron, atau melalui aksi berbasis subscription
 
-Example can be seen below
+Contoh dapat dilihat di bawah ini
 
 ![[database-collection-ownership-example.png]]
 
-This is required to enforce ownership to each database properly and only update those who are the owner, other can fetch the data collection regularly or immediately if needed as the system see it fit
+Hal ini diperlukan untuk menegakkan kepemilikan pada setiap database dengan benar dan hanya memperbarui collection yang dimiliki oleh pemiliknya, sementara yang lain dapat melakukan fetch collection data secara berkala atau segera jika diperlukan sesuai pertimbangan sistem
 
-Also benefit of this method is multi-database lookup or query aren't necesarry anymore since they have their own information on the collection required for it. If one of the services down the other can still work just fine using the previous collection data fetched
+Selain itu, manfaat dari metode ini adalah lookup atau query lintas database tidak lagi diperlukan karena masing-masing sudah memiliki informasinya sendiri pada collection yang dibutuhkan. Jika salah satu service down, service lain tetap dapat bekerja dengan baik menggunakan data collection yang sudah di-fetch sebelumnya
 
-## Database Replication
+## Replikasi Database
 
-Database replication is required if we want to expose our database for external usages for other application, where it will only have **READ** access
+Replikasi database diperlukan jika kita ingin mengekspos database untuk penggunaan eksternal oleh aplikasi lain, di mana ia hanya akan memiliki akses **READ**
 
-Currently this only active for **Employee-MongoDB** and the slave/secondary cluster being used by **Task Management**
+Saat ini ini hanya aktif untuk **Employee-MongoDB** dan cluster slave/secondary yang digunakan oleh **Task Management**
 
-The replication rules explicitly state that the cluster cannot be change for the primary as we currently dont have dynamic cluster picker for those action
+Aturan replikasi secara eksplisit menyatakan bahwa cluster tidak dapat diubah untuk primary karena saat ini kita belum memiliki dynamic cluster picker untuk aksi tersebut
 
-## List of Databases and their Collections
+## Daftar Database dan Collection-nya
 
 **Employee-MongoDB**
 - PersonalData

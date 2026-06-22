@@ -1,6 +1,6 @@
-## Notes
+## Catatan
 
-*Current system of finance manage incoming data from Vendor - CRM, cleaning and synchronizing that information for [[External - Accurate]] to create overview regarding all aspect in finance*
+*Sistem finance saat ini mengelola data masuk dari Vendor - CRM, membersihkan dan menyinkronkan informasi tersebut untuk [[External - Accurate]] guna membuat ikhtisar mengenai seluruh aspek dalam finance*
 
-*Since this system are already encapsulate and has its own ecosystem, it is frown upon to link this current system into the architecture, thus finance will get a new system from the ground up and all previous encapsulated ecosystem will be re-implemented properly on the said new system*
+*Karena sistem ini sudah terenkapsulasi dan memiliki ekosistemnya sendiri, tidak disarankan untuk menautkan sistem yang ada ini ke dalam arsitektur, sehingga finance akan mendapatkan sistem baru yang dibangun dari awal dan seluruh ekosistem terenkapsulasi sebelumnya akan diimplementasikan ulang dengan benar pada sistem baru tersebut*
 
