@@ -1,69 +1,85 @@
 ## Deskripsi
 
-*Pembuatan satu API Gateway tunggal yang dapat me-reroute ke seluruh authentication sistem berdasarkan sistem yang sedang berjalan akan bermanfaat bagi keseluruhan sistem karena pengelolaannya menjadi lebih mudah dan terpusat*
+*API Master Gateway adalah satu-satunya pintu masuk yang menghadap ke internet untuk seluruh ekosistem bip-erp. Gateway ini menangani validasi JWT, CORS, rate limiting, dan response caching opsional via Redis, lalu melakukan reverse-proxy ke service internal lewat Docker network menggunakan internal gateway key header. Dengan pendekatan terpusat ini, pengelolaan authentication dan routing menjadi konsisten dan mudah dipelihara.*
 
-[Baca lebih lanjut tentang implementasi API Master Gateway kami](https://github.com/bip-itteam-internal/api-gateway-test)
+- **Stack:** Go + Fiber v2, Redis (caching opsional)
+- **Path:** `api-gateway/`
+- **Port:** 6969 (prod: `api.bharatainternasional.com`)
+- **Status:** ✅ Implemented (matang, production)
 
-## Kebutuhan
+## Endpoint / Fitur (Sudah Diimplementasikan)
 
-- [x] Menangani authentication
-- [x] Meneruskan payload untuk digunakan oleh modul pada sistem
-- [x] API Gateway terpusat ke modul lain pada sistem
-- [x] Fitur login dan logout (data diambil dari Employee Master Data pada collection System Authentication)
-- [x] Registrasi dari pengguna yang pertama kali login dengan employee ID dan password sementara yang diberikan oleh HRD
-- [x] Penyederhanaan reroute request dan internal request untuk kemudahan pengembangan
-	- Reroute hanya digunakan oleh API Gateway itu sendiri
-	- Internal request digunakan untuk request antar service (service-to-service)
+**Authentication (JWT Bearer)**
+- JWT Bearer via shared-library/auth (HS256), secret dari env `JWT_SECRET`, TTL 72 jam
+- Login didelegasikan ke employee-service, lalu gateway yang mint JWT:
+	- `/auth/login`, `/auth/login/pin`, `/auth/login/biometrics` — employee-service balikin `PayloadJWT`, gateway menerbitkan JWT
+	- Query `device_id` untuk enforcement satu device per akun
+- `/auth/refresh` — refresh token
+- `/auth/verify/jwt`, `/auth/verify/pin` — verifikasi kredensial
+- `/auth/logout` — revoke token + opsional deactivate device
 
-## Forwarded Request / Reroute
+**SSO (one-time-code handoff, bukan IdP eksternal)**
+- `POST /auth/sso/ticket` (butuh JWT valid) — menghasilkan kode hex sekali-pakai, disimpan di `ssoStore` in-memory, TTL 30 detik
+- `POST /auth/sso/redeem` (publik, rate-limited) — tukar kode menjadi ERP JWT
+- Dipakai oleh FE Task Manager untuk handoff sesi
 
-Berikut adalah endpoint yang valid, propagated call atau forwarded request dari gateway ini
-Daftar endpoint yang di-expose pada masing-masing modul akan dibahas kemudian
+**Internal Service Auth**
+- Gateway memasang header `GatewayID = INTERNAL_GATEWAY_KEY` di semua call yang diteruskan ke service internal
+- Gateway panic saat startup bila key kosong (fail-fast)
 
-- [ ] [[DB - Overview and Notes]]
-- [ ] [[Microservices - Employee Service]]
-- [ ] [[Microservices - Attendance Service]]
-- [ ] [[Microservices - File Service]]
-- [ ] [[Microservices - Notification Service]]
+**Routing service via `/api/:module/*`**
+- Module: employee, attendance, notification, file, insentive, integration, tiktok-shop, inventory, task-management, hris (orchestrator), it (orchestrator)
+- Contoh port internal: employee-service:6970, attendance-service:6971, notification-service:6972, file-service:6973, hris-orchestrator:7000, it-orchestrator:7001
+- **Open routes:** module `notification` & `file` boleh skip JWT bila ada query `?key=`
 
-Sebagian dari daftar di atas juga memiliki open-route yang berarti semua orang dapat melakukan request ke endpoint tersebut, namun tetap disertai beberapa pemeriksaan tambahan
+**Routing non-`/api` (proxy khusus)**
+- `/auth/*` & `/onboarding/*` → employee-service
+- `/public/feedback` → notification-service
+- `/public/guestbook` → attendance-service
+- `/ext/fingerprint/*` → mesin fingerprint eksternal (X105:4370, X609:4371, dipilih dari serial) + attendance-service
+- `/ext/tiktok-shop/callback` & `/ext/tiktok-shop/webhook` → tiktok-shop service
+- `/ext/webhook/:service` → integration-service
+- `/dev/*` & `/debug/*` (mint admin token) — khusus dev
 
-Daftar modul yang belum diketahui per 10/17/25
+**Response Caching (Redis)**
+- Cache response GET, TTL 3 menit, hanya untuk JSON dengan status 200
+- Cache key: `cache:{module}:{employeeID}:{url}`
+- Module dikecualikan dari cache: file, hris, integration, inventory
 
-- [ ] [[APP - Dynamic Task Tracker]]
+**Lain-lain**
+- CORS dan rate limiting di level gateway
 
-### Authorization Gateway ke Endpoint Modul
+## Belum Diimplementasikan / Catatan
 
-API Gateway dan setiap modul berbagi secret yang cocok berupa **INTERNAL-KEY**, key ini hanya disertakan ketika request dari API Gateway diteruskan ke modul
-Setiap endpoint modul akan memvalidasi **INTERNAL-KEY** gateway ini dengan miliknya sendiri, apabila key yang diberikan
-hilang atau tidak benar maka akan menghasilkan error unauthorized
+- **SSO store in-memory** tidak aman untuk deployment multi-instance (sudah ditandai di kode) — kode SSO yang disimpan di satu instance tidak terlihat oleh instance lain.
+- **Revoke token pada refresh/biometrics** masih placeholder kosong — JWT lama tidak benar-benar di-revoke saat refresh atau login biometrics.
+- **Route `/dev/*` & `/debug/get-jwt`** sengaja dibuat insecure (mint admin token tanpa proteksi) dan **harus dihapus di production**.
 
-Database bersifat internal dan tidak di-expose, database harus disiapkan dengan benar di docker agar dapat berkomunikasi dengan API Gateway secara tepat
+## Dependencies & Integrasi
 
-![[gateway-example.png]]
+Gateway meneruskan request ke seluruh service internal berikut:
 
-Baca lebih lanjut tentang [mTLS](https://www.cloudflare.com/learning/access-management/what-is-mutual-tls/) metode authorization yang lebih aman
+- [[Microservices - Employee Service]] — auth/login, onboarding, dan delegasi penerbitan JWT
+- [[Microservices - Attendance Service]] — presensi, guestbook publik, integrasi fingerprint
+- [[Microservices - Notification Service]] — notifikasi, feedback publik (open-route via `?key=`)
+- [[Microservices - File Service]] — manajemen file (open-route via `?key=`)
+- [[Microservices - Insentive Service]] — insentif
+- [[Microservices - Integration Service]] — webhook eksternal (`/ext/webhook/:service`)
+- [[Microservices - TikTok Shop Service]] — callback & webhook TikTok Shop
+- [[Microservices - Inventory Service]] — inventory (dikecualikan dari cache)
+- [[Microservices - Task Management Service]] — task management (klien FE Task Manager via SSO)
+- [[CORE - HRIS Orchestrator]] — orchestrator domain HRIS
+- [[CORE - IT Orchestrator]] — orchestrator domain IT
 
-Beberapa informasi juga dibutuhkan untuk mengakses sebuah route, termasuk JWT dan data RBAC, yang disimpan dalam shared-library untuk fungsi reroute dan internal request
+Klien utama gateway adalah [[APP - Mobile Application]]. Penyimpanan terkait dijelaskan di [[DB - Overview and Notes]].
 
-## Struktur Payload JWT / Custom Header
+## Dokumen Terkait
 
-Payload JWT tambahan untuk mempermudah pencarian di sini alih-alih melakukan query ke database untuk informasi yang paling sering digunakan tersebut, informasi ini diteruskan sebagai header tambahan
-
-```JSON
-{
-	"employee_id": "0032-03-27102025",
-	"username": "aurelia_mara",
-	"system_roles": {
-		"it": "supervisor",
-		"hris": "manager",
-		"finance": "staff",
-	}
-}
-```
-
-Header ini digunakan untuk memeriksa route self-service dan juga untuk menetapkan metadata ke database pada saat pembuatan/modifikasi data
-
-## Daftar Public Endpoint
-
-*Akan didefinisikan per modul pada bagian berikutnya*
+- [[CORE - HRIS Orchestrator]]
+- [[CORE - IT Orchestrator]]
+- [[Microservices - Employee Service]]
+- [[Microservices - Attendance Service]]
+- [[Microservices - Notification Service]]
+- [[Microservices - File Service]]
+- [[DB - Overview and Notes]]
+- [[APP - Mobile Application]]

@@ -1,53 +1,100 @@
-## Backup Database
+## Deskripsi
 
-Backup dilakukan untuk database-database penting, mingguan setiap hari Senin pukul 4:15 pagi
+bip-erp menerapkan pola **database-per-service**: setiap microservice memiliki MongoDB-nya sendiri (container Mongo terpisah) dan menjadi pemilik (ownership) penuh atas datanya. Tidak ada akses langsung lintas-database antar service; komunikasi dilakukan via HTTP internal melalui gateway (lihat [[CORE - API Master Gateway]]). Khusus employee-service berjalan sebagai **replica set** (primary + secondary) agar datanya dapat diekspos read-only untuk konsumen lain. Seluruh server menyimpan waktu dalam **UTC**. Selain MongoDB per service, terdapat dua infrastruktur data bersama: **Redis** (cache & queue) dan **MinIO** (object storage).
 
-Saat ini backup hanya berada di direktori project mesin lokal, hal ini perlu ditingkatkan agar dapat mengunggah backup ke layanan cloud, sehingga kita memiliki cadangan untuk fallback jika mesin lokal atau VM crash dan tidak dapat dipulihkan
+## Database per Service
 
-## Sinkronisasi Collection
+Tiap baris berikut menyebutkan nama service, container Mongo, collection utama, dan dokumen service terkait.
 
-Dalam database akan ada banyak collection dan beberapa collection tersebut tidak secara native dimiliki oleh database tersebut, oleh karena itu collection tersebut perlu di-fetch dari database asalnya jika memungkinkan pada setiap server restart, berbasis cron, atau melalui aksi berbasis subscription
+### employee — `employee-mongo-primary` / `employee-mongo-secondary` (replica set)
+Doc: [[Microservices - Employee Service]]
+- personal_data
+- personal_document
+- work_data
+- work_document
+- work_schedule
+- company_work_schedule
+- system_authentication
+- kpi_score (beserta KPI templates)
+- company_holiday
 
-Contoh dapat dilihat di bawah ini
+### attendance — `attendance-mongo-db`
+Doc: [[Microservices - Attendance Service]]
+- attendance_entries
+- work_schedule
+- company_work_schedule
+- company_group_rotation
+- company_wifi
+- company_holiday
+- fingerprint_export
+- guestbook
+- leave_request
 
-![[database-collection-ownership-example.png]]
+### notification — `notification-mongo-db`
+Doc: [[Microservices - Notification Service]]
+- inbox
+- splash
+- article
 
-Hal ini diperlukan untuk menegakkan kepemilikan pada setiap database dengan benar dan hanya memperbarui collection yang dimiliki oleh pemiliknya, sementara yang lain dapat melakukan fetch collection data secara berkala atau segera jika diperlukan sesuai pertimbangan sistem
+### insentive — `insentive-mongo-db`
+Doc: [[Microservices - Insentive Service]]
+- employee_performance_mappings
+- audit_logs
+- cron_locks
+- master_kpis
+- incentive_results
 
-Selain itu, manfaat dari metode ini adalah lookup atau query lintas database tidak lagi diperlukan karena masing-masing sudah memiliki informasinya sendiri pada collection yang dibutuhkan. Jika salah satu service down, service lain tetap dapat bekerja dengan baik menggunakan data collection yang sudah di-fetch sebelumnya
+### integration — `integration-mongo-db`
+Doc: [[Microservices - Integration Service]]
+- transaction_orders (model terpadu)
+- webhook logs
+- summary reports
+- items / master catalog
+- credentials
+- holidays
 
-## Replikasi Database
+### inventory — `inventory-mongo-db`
+Doc: [[Microservices - Inventory Service]]
+- inventory
+- data_master
+- repair_history
 
-Replikasi database diperlukan jika kita ingin mengekspos database untuk penggunaan eksternal oleh aplikasi lain, di mana ia hanya akan memiliki akses **READ**
+### tiktok-shop — `tiktok-shop-mongo-db`
+Doc: [[Microservices - TikTok Shop Service]]
+- tiktok_shop_callbacks
+- tiktok_shop_webhooks (payload mentah)
 
-Saat ini ini hanya aktif untuk **Employee-MongoDB** dan cluster slave/secondary yang digunakan oleh **Task Management**
+### task-management — `task-management-mongo-db`
+Doc: [[Microservices - Task Management Service]]
+- task
+- space
+- notifications
+- audits
 
-Aturan replikasi secara eksplisit menyatakan bahwa cluster tidak dapat diubah untuk primary karena saat ini kita belum memiliki dynamic cluster picker untuk aksi tersebut
+> Catatan: task-management juga membaca `employee_db` (ERP) secara **read-only** untuk memperoleh nama/divisi.
 
-## Daftar Database dan Collection-nya
+## Infrastruktur Data Bersama (Redis, MinIO)
 
-**Employee-MongoDB**
-- PersonalData
-- PersonalDocs
-- WorkData
-- WorkDocs
-- WorkSchedule
-- SystemAuthentication
-- CompanyWorkSchedule (Sync from Attendance-Service)
-- CompanyHoliday
+- **Redis** — cache response gateway sekaligus queue antar service. Key di-namespace per domain, mis. prefix `srv:integration`.
+- **MinIO** — object storage bersama. Objek dipisah per domain melalui prefix path: `employee/`, `attendance/`, `task/`, `notification/`.
 
-**Attendance-MongoDB**
-- AttendanceEntries
-- CompanyWorkSchedule
-- CompanyGroupRotation
-- CompanyHoliday
-- CompanyWifi
-- FingerprintExport
-- Guestbook
-- WorkSchedule (Sync from Employee-Service)
-- LeaveRequest
+## Catatan
 
-**Notification-MongoDB**
-- Inbox
-- Article
-- Splash
+- Setiap service mengelola datanya sendiri (ownership). Database satu service tidak diakses langsung oleh service lain.
+- Komunikasi antar service dilakukan via HTTP internal melalui gateway, lihat [[CORE - API Master Gateway]] — bukan query/lookup lintas-database.
+- Hanya employee-service yang berjalan sebagai replica set (primary + secondary); secondary dipakai untuk akses read-only, termasuk oleh task-management terhadap `employee_db`.
+- Cluster primary tidak boleh diubah sembarangan karena belum ada dynamic cluster picker.
+- Seluruh waktu disimpan dalam UTC.
+
+## Dokumen Terkait
+
+- [[CORE - API Master Gateway]]
+- [[Microservices - Employee Service]]
+- [[Microservices - Attendance Service]]
+- [[Microservices - Notification Service]]
+- [[Microservices - File Service]]
+- [[Microservices - Insentive Service]]
+- [[Microservices - Integration Service]]
+- [[Microservices - Inventory Service]]
+- [[Microservices - Task Management Service]]
+- [[Microservices - TikTok Shop Service]]
