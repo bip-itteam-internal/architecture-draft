@@ -8,6 +8,7 @@ Selama ini, tim marketing setting iklan langsung ke dashboard platform (Tiktok A
 - [ ] [[BASE - Enterance Point]]
 - [ ] [[Sales - Landing page]]
 - [ ] [[Sales - Dashboard]]
+- [ ] [[Sales - Marketplace Integration]]
 - [ ] [[Sales - GMV Creative]]
 - [ ] [[Sales - Incentive]]
 - [ ] [[Sales - OTP Management]]

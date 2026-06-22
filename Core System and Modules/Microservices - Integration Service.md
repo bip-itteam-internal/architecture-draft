@@ -103,6 +103,7 @@ External lain: TikTok Shop, TikTok Business/Ads, Shopee, Desty (middleware order
 
 ## Dokumen Terkait
 
+- [[Sales - Marketplace Integration]] (konsep sisi marketing)
 - [[Finance - Bridging App]]
 - [[Sales - GMV Creative]]
 - [[Vendor - CRM]]
