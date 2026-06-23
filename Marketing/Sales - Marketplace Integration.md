@@ -30,6 +30,10 @@
 
 - **Lazada** baru placeholder di kode (belum ada client) — lihat catatan di [[Microservices - Integration Service]]
 - Pembeda: integrasi ini untuk **order/penjualan & akuntansi marketplace**, berbeda dari [[Sales - TikTok Sentiment Pipeline]] (sentimen komentar kompetitor) dan [[Sales - Veo (Gemini) Implementation]] (produksi konten)
+## Kendala
+	-
+	-
+	-
 
 ## Dokumen Terkait
 
