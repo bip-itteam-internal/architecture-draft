@@ -24,7 +24,7 @@ Artinya ada **1 master data** yang disirkulasikan dari GA ke departemen lain ses
 * lokasi barang
 * Pencatatan vendor
 * Ada informasi SOP pengajuan aset
-* Reservasi ruang meeting
+* Reservasi ruang meeting & peminjaman aset (lihat [[GA - Asset Loan & Room Booking]])
 
 **Breakdown fitur**
 - **Dashboard** — ikhtisar yang baik untuk pelaporan ke stakeholder; ringkasan detail purchases, sales, stok, dan profit; volume aktivitas / perubahan stok
@@ -92,4 +92,5 @@ Sistem yang sudah ada:
 
 - [[WH - Management System]]
 - [[GA - Procurement System]] · [[CORE - OCR Document Service]]
+- [[GA - Asset Loan & Room Booking]] — alur pinjam ruang/aset
 - [[GA - Big Pictures]]

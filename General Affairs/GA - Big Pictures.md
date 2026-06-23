@@ -27,10 +27,12 @@ General Affairs ingin punya dashboard untuk menejemen semua aset perusahaan dari
 15. Implementasi Machine & Utility Maintenance System
 16. Implementasi Accident Prevention System
 17. Implementasi Audit Internal System
+18. Implementasi Asset Loan & Room Booking System (peminjaman ruang/aset/kendaraan)
 
 ## Dependencies
 
 - [ ] [[GA - Accident Prevention]]
+- [ ] [[GA - Asset Loan & Room Booking]]
 - [ ] [[GA - Audit Internal System]]
 - [ ] [[GA - Building Maintenance]]
 - [ ] [[GA - Checklist Management]]
