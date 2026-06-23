@@ -196,6 +196,7 @@ src/features/hris/shift-exchange/
 
 ## Dependensi
 
+- [x] [[HRIS - Employee Request & Approval]] *(framework induk)*
 - [x] [[HRIS - Attendance System]]
 - [x] [[Microservices - Attendance Service]]
 - [x] [[HRIS - Big Pictures]]

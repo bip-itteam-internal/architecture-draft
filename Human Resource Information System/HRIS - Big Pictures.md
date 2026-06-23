@@ -38,6 +38,7 @@ Security juga perlu menandatangani dokumen dengan scan QR untuk status cuti/kemb
 - [ ] [[BASE - Enterance Point]]
 - [ ] [[HRIS - Analysis]]
 - [ ] [[HRIS - Attendance System]]
+- [ ] [[HRIS - Employee Request & Approval]]
 - [ ] [[HRIS - Attendance Correction]]
 - [ ] [[HRIS - Leave Request]]
 - [ ] [[HRIS - Shift Exchange]]

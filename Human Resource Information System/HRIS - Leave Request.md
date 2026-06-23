@@ -1,6 +1,6 @@
 ## Catatan
 
-*Pengajuan cuti & izin (leave request) adalah alur **"pengajuan ke HR"** inti: karyawan mengajukan ketidakhadiran/izin secara digital, melalui rantai persetujuan **Supervisor → HR**, dan begitu disetujui otomatis menyesuaikan data kehadiran. Ini fondasi yang pola review-nya dipakai juga oleh [[HRIS - Shift Exchange]] dan [[HRIS - Attendance Correction]].*
+*Pengajuan cuti & izin (leave request) adalah alur **"pengajuan ke HR"** inti: karyawan mengajukan ketidakhadiran/izin secara digital, melalui rantai persetujuan **Supervisor → HR**, dan begitu disetujui otomatis menyesuaikan data kehadiran. Ini fondasi yang pola review-nya dipakai juga oleh [[HRIS - Shift Exchange]] dan [[HRIS - Attendance Correction]] — semuanya turunan dari [[HRIS - Employee Request & Approval]].*
 
 ## Latar Belakang
 
