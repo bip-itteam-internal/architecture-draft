@@ -1,0 +1,92 @@
+# CLAUDE.md — Rulebook untuk AI Agent (architecture-draft)
+
+Repo ini adalah **Obsidian vault dokumentasi arsitektur ERP Bharata**. Tugas AI agent: menjaga dokumentasi **selaras dengan kode** (grounded), konsisten, dan saling tertaut. Ikuti aturan di bawah **persis**.
+
+> Catatan notasi di file ini: wikilink Obsidian ditulis dengan **dua kurung siku** mengapit basename file (tanpa ekstensi); embed gambar memakai tanda **`!`** di depannya. Contoh sengaja tidak ditulis literal di sini agar tidak jadi link palsu.
+
+## 0. Prasyarat workspace (PENTING)
+
+Agent butuh akses ke **kode (sumber kebenaran)** dan **vault (target)** sekaligus. Clone vault + repo kode sebagai **folder bersebelahan (sibling)** lalu buka folder induk:
+
+```
+erp/                      ← working directory agent
+├── architecture-draft/   ← vault ini (target dokumentasi)
+├── main-erp/             ← berisi bip-erp/ dan erp-frontend/
+├── mybharata-app/  · task-management/  · ideamiils/  · scraping/  · guestbook-system/
+```
+Tidak wajib semua repo — cukup vault + repo yang sedang didokumentasikan.
+
+## 1. Prinsip utama
+
+- **Grounded-in-code**: tulis hanya yang benar-benar ada di kode/sumber. Yang belum ada → tandai **TBD**. **Jangan mengarang.** Bila rencana ≠ implementasi, catat gap-nya secara eksplisit.
+- **Konsep ↔ implementasi**: dok konsep/bisnis ada di folder domain (mis. Marketing, HRIS), implementasi/service di Core System and Modules. Keduanya **saling di-link**.
+- **Bahasa**: Bahasa Indonesia, istilah teknis tetap English (endpoint, request, service, JWT, dll).
+
+## 2. Struktur folder (domain)
+
+`Application` · `Core System and Modules` · `Finance System` · `General Affairs` · `Human Resource Information System` · `Manufacture` · `Marketing` · `Tech Development` · `Third-party Software` · `Warehouse` · `Unknown or not listed`
+
+## 3. Konvensi penamaan file
+
+Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
+- `CORE -` (gateway, SSO, orchestrator, shared service), `Microservices -` (service bip-erp), `DB -` → **Core System and Modules**
+- `APP -` / `BASE -` → **Application**
+- `HRIS -` → HRIS · `Sales -` → Marketing · `GA -` → General Affairs · `IT -` → Tech Development · `WH -` → Warehouse · `Finance -` → Finance System · `External -` / `Vendor -` → Third-party Software
+- Karakter `/` tidak boleh di nama file (pakai `-`, mis. `IT - CI-CD`).
+
+## 4. Wikilink
+
+- Tautkan antar-dok memakai wikilink Obsidian (basename file, tanpa ekstensi). Obsidian resolve via **basename** — folder tidak berpengaruh.
+- **Wajib**: sebelum commit, pastikan **semua wikilink resolve** ke file yang ada (0 broken). Embed gambar juga harus ada filenya.
+- Pindah folder file = link aman; **rename file = perbarui semua wikilink** yang menunjuk ke nama lama.
+
+## 5. Status marker (di awal dok)
+
+- ✅ **Implemented** — sudah ada di kode
+- ⚠️ **Implemented (ada catatan)** — jalan tapi ada gap/bug/parsial
+- 🟡 **Konsep / Draft / Direncanakan** — belum di kode
+- 🔴 **Stub** — kosong/skeleton
+
+## 6. Template struktur dokumen
+
+```
+## Deskripsi          (1 paragraf miring + bullet: Stack, Path di repo, Status)
+## Endpoint / Fitur (Sudah Diimplementasikan)   (grouped)
+## Belum Diimplementasikan / Catatan            (501/stub/TODO/gap; TBD bila konsep)
+## Dependensi & Integrasi                        (dengan wikilink)
+## Dokumen Terkait                               (wikilink)
+```
+Untuk dok konsep murni: `## Latar Belakang`, `## Ruang Lingkup`, `## Belum Diputuskan (TBD)`, dst.
+
+## 7. Pemetaan repo kode → dokumen
+
+| Repo kode | Dokumen utama |
+|---|---|
+| `bip-erp` (Go microservices) | `Core System and Modules/*` (API Master Gateway, SSO Flow, HRIS/IT Orchestrator, DB Overview, Microservices - <Service>, OCR Document Service) |
+| `mybharata-app` (Flutter) | `Application/APP - Mobile Application` |
+| `erp-frontend` (Next.js, di `main-erp/`) | `Application/APP - Web Application`, `BASE - Enterance Point` |
+| `task-management/bharata-task-manager-fe` | `Application/APP - Dynamic Task Tracker` (backend = Microservices - Task Management Service) |
+| `guestbook-system` (Astro) | `General Affairs/GA - Guestbook System (Complete)` |
+| `ideamiils` (Next.js + Veo) | `Marketing/Sales - Veo (Gemini) Implementation` & `... Automation Layer` |
+| `scraping` (Python/FastAPI) | `Marketing/Sales - TikTok Sentiment Pipeline` |
+
+## 8. Alur kerja sync (tiap update)
+
+1. `git pull` vault + repo kode (ambil terbaru)
+2. Baca diff/kode repo terkait → tentukan dok yang terdampak
+3. Update/buat dok (grounded; ikuti template & konvensi)
+4. **Verifikasi semua wikilink resolve** (0 broken)
+5. Commit & push
+
+## 9. Aturan git
+
+- **Stage per-nama file** (mis. `git add -- "Folder/Nama.md"`). **JANGAN `git add -A`** — bisa menyapu perubahan in-progress orang lain.
+- **Pull sebelum push** (vault dikerjakan banyak orang/agent secara paralel).
+- Pesan commit ringkas berformat `docs: ...`; jangan commit `.obsidian/*` kecuali diminta (itu state Obsidian).
+- Jangan menimpa/menghapus dok yang **bukan dibuat sesi ini** tanpa konfirmasi; hormati file yang sedang diedit orang lain.
+
+## 10. Jangan
+
+- Jangan mengarang detail yang tak ada di kode.
+- Jangan menghapus dok turunan hanya karena ada dok "induk" (induk = overview, turunan = detail).
+- Jangan membuat wikilink rusak; selalu verifikasi sebelum commit.
