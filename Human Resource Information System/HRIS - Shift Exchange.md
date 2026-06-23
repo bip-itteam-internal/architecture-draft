@@ -1,4 +1,4 @@
-## Catatan
+## Deskripsi
 
 *Fitur ini ditambahkan sebagai pelengkap Attendance System. Shift Exchange memungkinkan karyawan mengajukan pertukaran hari kerja/libur dalam bulan yang sama, dengan alur persetujuan multi-level. Fitur ini terutama relevan untuk karyawan berbasis shift (Security, Production, Host Live) yang juga dapat memilih slot shift berbeda pada hari yang ditukar.*
 

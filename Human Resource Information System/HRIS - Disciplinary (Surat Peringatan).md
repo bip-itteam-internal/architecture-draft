@@ -1,4 +1,4 @@
-## Catatan
+## Deskripsi
 
 *Penanganan kedisiplinan karyawan & **Surat Peringatan (SP)** — mis. dari keterlambatan/pelanggaran berulang. Saat ini masih **konsep** (disebut di [[HRIS - Big Pictures]] & [[BASE - Enterance Point]]), belum ada implementasi di kode.*
 

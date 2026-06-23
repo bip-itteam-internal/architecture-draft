@@ -1,4 +1,4 @@
-## Catatan
+## Deskripsi
 
 *Lembur (overtime) — jam kerja tambahan di luar jadwal yang menjadi bonus pada payroll. Saat ini lembur baru dicatat sebagai data pada attendance, belum punya workflow pengajuan/approval terdedikasi seperti [[HRIS - Leave Request]] (pola: [[HRIS - Employee Request & Approval]]).*
 

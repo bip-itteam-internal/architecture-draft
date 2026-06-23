@@ -1,4 +1,4 @@
-## Catatan
+## Deskripsi
 
 *Manajemen program pelatihan & pengembangan karyawan (training & development). Saat ini masih **konsep** — informasi detail belum cukup, banyak bagian TBD.*
 

@@ -1,4 +1,4 @@
-## Catatan
+## Deskripsi
 
 *Sistem ini diposisikan sebagai **IT Helpdesk / ticketing**: desk dimiliki dan ditangani oleh **divisi IT**, sementara **semua divisi dapat membuat (submit) tiket** ke sana untuk meminta bantuan/penyelesaian dari IT. Dibangun sebagai task tracker dinamis berbasis Kanban yang terpusat agar konsisten dan dapat digunakan kembali.*
 
