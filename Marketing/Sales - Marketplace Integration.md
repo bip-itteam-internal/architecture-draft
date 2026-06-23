@@ -40,3 +40,4 @@
 - [[Microservices - TikTok Shop Service]] (penerima callback/webhook TikTok)
 - [[Finance - Bridging App]] · [[External - Accurate]]
 - [[Sales - Dashboard]] · [[Sales - GMV Creative]] · [[Sales - Incentive]]
+- [Referensi API Integration Service — docs-api-greget](https://docs-api-greget.vercel.app/)

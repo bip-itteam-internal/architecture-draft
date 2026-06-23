@@ -7,6 +7,7 @@
 - **Stack**: Go + Fiber v2 + MongoDB + Redis
 - **Path**: `services/integration` (service terbesar)
 - **Status**: ✅ Implemented (mostly) — masih ada bagian legacy yang di-disable dan target bridging non-Accurate belum tersedia
+- **Referensi API**: dok endpoint lengkap (129 endpoint, 7 modul: Auth, TikTok, Shopee, Transactions, Webhooks, Workers, Accurate) → [docs-api-greget.vercel.app](https://docs-api-greget.vercel.app/) (Nextra). Dibangun vendor **Greget**, telah diserahterimakan ke BIP (maintenance kini internal).
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
@@ -107,3 +108,4 @@ External lain: TikTok Shop, TikTok Business/Ads, Shopee, Desty (middleware order
 - [[Finance - Bridging App]]
 - [[Sales - GMV Creative]]
 - [[Vendor - CRM]]
+- [Referensi API — docs-api-greget](https://docs-api-greget.vercel.app/) — REST API lengkap (129 endpoint, Nextra)
