@@ -1,6 +1,6 @@
 
 
-## Posisi: Shared Service
+## Deskripsi
 
 *OCR Document adalah **shared service lintas-fitur** (bukan khusus General Affairs) — penyedia kapabilitas **OCR + dokumen-intelligence (RAG)** yang dikonsumsi berbagai subsistem ERP.*
 

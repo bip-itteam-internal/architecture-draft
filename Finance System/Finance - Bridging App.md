@@ -1,11 +1,12 @@
-# 🧾 Finance System – Bridging Accurate & Marketplace
+# Finance System – Bridging Accurate & Marketplace
 
-Sistem Finance berfungsi sebagai **penghubung (bridging)** antara **Accurate** dan berbagai marketplace seperti **TikTok, Shopee, Lazada, Tokopedia, dan KiriminAja**.  
-Fokus utamanya adalah **import data penjualan**, **sinkronisasi ke Accurate**, dan **pengelolaan keuangan operasional harian**.
+## Deskripsi
+
+*Sistem Finance berfungsi sebagai **penghubung (bridging)** antara **Accurate** dan berbagai marketplace (**TikTok, Shopee, Lazada, Tokopedia, KiriminAja**). Fokus utamanya: **import data penjualan**, **sinkronisasi ke Accurate**, dan **pengelolaan keuangan operasional harian**.*
 
 ---
 
-## 🔥 Fitur Utama
+## Fitur Utama
 
 ### 1. Platform Integration
 Import & olah file Excel dari berbagai platform:
@@ -30,7 +31,7 @@ Import & olah file Excel dari berbagai platform:
 
 ---
 
-## 📂 Repositori
+## Repositori
 
 | Bagian   | Repo Git |
 |---------|----------|
@@ -39,7 +40,7 @@ Import & olah file Excel dari berbagai platform:
 
 ---
 
-## 🏗 Fitur Aplikasi
+## Fitur Aplikasi
 
 ### 1. Master Data
 Master digunakan sebagai komponen dasar referensi transaksi.
@@ -134,7 +135,7 @@ Pengelolaan barang kembali/retur.
 
 ---
 
-## ⚙️ Tech Stack
+## Tech Stack
 
 ### 🔧 Backend
 - Language   : **Java**

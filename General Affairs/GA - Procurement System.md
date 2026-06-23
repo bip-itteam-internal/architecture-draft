@@ -1,3 +1,9 @@
+## Deskripsi
+
+*Sistem pengajuan barang & pengadaan (procurement) online untuk menggantikan proses paper-based yang lambat, terintegrasi dengan [[GA - Inventory Management]].*
+
+- **Status**: 🟡 Konsep / Direncanakan
+
 ## Latar Belakang
 
 Saat ini pengajuan barang di perusahaan masih _paper-based_ dan ini memakan waktu lama untuk _approval_ dan dokumen _paper_ menumpuk. Diperlukan sistem pengajuan online yang handal dan terintegrasi dengan [[GA - Inventory Management]] 
