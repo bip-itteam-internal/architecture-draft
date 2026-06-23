@@ -32,6 +32,13 @@ try {
   $kv = (Get-Content (Join-Path $claude '.kit-version') -Raw).Trim()
   $ver = (Get-Content (Join-Path $kitRoot 'VERSION') -Raw).Trim()
   Check ($kv -eq $ver) '.kit-version sama dgn VERSION'
+
+  # v1.0.1: re-init harus prune file lama yg sudah tak ada di kit, tapi tetap salin yg nyata
+  $stale = Join-Path $claude 'commands/__stale-test__.md'
+  Set-Content -Path $stale -Value 'stale' -Encoding UTF8
+  & (Join-Path $svVault '.agent-kit/init.ps1') -Workspace $tmp -ActiveProject 'demo-proj' -NoPreCommitHook | Out-Null
+  Check (-not (Test-Path $stale)) 're-init prune file command lama'
+  Check (Test-Path (Join-Path $claude 'commands/start-task.md')) 're-init tetap salin command nyata'
 }
 finally {
   if (Test-Path $tmp) { Remove-Item -Recurse -Force $tmp }

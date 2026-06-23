@@ -19,7 +19,9 @@ fi
 git -C "$vault" fetch --quiet >/dev/null 2>&1 || true
 local_rev="$(git -C "$vault" rev-parse @ 2>/dev/null || true)"
 remote_rev="$(git -C "$vault" rev-parse '@{u}' 2>/dev/null || true)"
-if [ -n "$local_rev" ] && [ -n "$remote_rev" ] && [ "$local_rev" != "$remote_rev" ]; then
+base_rev="$(git -C "$vault" merge-base @ '@{u}' 2>/dev/null || true)"
+# "ketinggalan" hanya bila local = merge-base & beda dari remote (remote di depan)
+if [ -n "$local_rev" ] && [ -n "$remote_rev" ] && [ -n "$base_rev" ] && [ "$local_rev" != "$remote_rev" ] && [ "$local_rev" = "$base_rev" ]; then
   ctx="$ctx | architecture-draft ketinggalan dari remote. Jalankan: git -C architecture-draft pull"
 fi
 

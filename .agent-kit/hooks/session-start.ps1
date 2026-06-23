@@ -19,7 +19,10 @@ if (Test-Path $kitVerFile) {
 git -C $vault fetch --quiet 2>$null
 $localRev  = (git -C $vault rev-parse '@' 2>$null)
 $remoteRev = (git -C $vault rev-parse '@{u}' 2>$null)
-if ($localRev -and $remoteRev -and ($localRev -ne $remoteRev)) {
+$baseRev   = (git -C $vault merge-base '@' '@{u}' 2>$null)
+# "ketinggalan" hanya bila local = merge-base & beda dari remote (remote di depan);
+# kalau local ahead/diverged jangan suruh pull
+if ($localRev -and $remoteRev -and $baseRev -and ($localRev -ne $remoteRev) -and ($localRev -eq $baseRev)) {
   $lines += 'architecture-draft ketinggalan dari remote. Jalankan: git -C architecture-draft pull'
 }
 

@@ -38,8 +38,9 @@ $claude = Join-Path $ws '.claude'
 New-Item -ItemType Directory -Force -Path $claude | Out-Null
 foreach ($d in 'commands','hooks','skills') {
   $src = Join-Path $kitRoot $d
+  $dst = Join-Path $claude $d
+  if (Test-Path $dst) { Remove-Item -Recurse -Force $dst }   # prune file lama yg dihapus di kit baru
   if (Test-Path $src) {
-    $dst = Join-Path $claude $d
     New-Item -ItemType Directory -Force -Path $dst | Out-Null
     Copy-Item -Path (Join-Path $src '*') -Destination $dst -Recurse -Force
   }

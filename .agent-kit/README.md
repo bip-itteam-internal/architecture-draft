@@ -33,3 +33,8 @@ mengingatkan bila versi kit terpasang ≠ versi terbaru.
 - `init.ps1` / `init.sh` — pemasang.
 - `VERSION` — versi kit.
 - `docs/` — design & plan.
+
+## Changelog
+
+- **1.0.1** — session-start tak lagi salah lapor "ketinggalan dari remote" saat local justru _ahead_ (kini bandingkan ke merge-base); re-run init mem-_prune_ file `commands/`/`hooks/` yang sudah dihapus di kit baru (bukan cuma menimpa).
+- **1.0.0** — rilis awal: 6 command flow arch-first, hooks, init lintas-OS.

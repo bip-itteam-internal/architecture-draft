@@ -34,6 +34,7 @@ fi
 
 claude="$ws/.claude"; mkdir -p "$claude"
 for d in commands hooks skills; do
+  rm -rf "$claude/$d"   # prune file lama yg dihapus di kit baru
   [ -d "$kit_root/$d" ] && { mkdir -p "$claude/$d"; cp -R "$kit_root/$d/." "$claude/$d/"; }
 done
 
