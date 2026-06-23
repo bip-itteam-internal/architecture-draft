@@ -61,3 +61,9 @@
 
 - **Integration:** 
 	- mongodb://erp-mongo:{password}@10.10.10.120:32789/integration_db?authSource=admin
+
+## Dokumen Terkait
+
+- [[IT - Big Pictures]] — peta domain IT
+- [[IT - Network Management]] (subnet & perangkat) · [[IT - CI-CD]] (runner & deploy) · [[IT - Monitoring System]] (VM netmon) · [[IT - Backup & DR]]
+- [[DB - Overview and Notes]] — database per service

@@ -28,3 +28,9 @@ Kami menginginkan cara yang mudah untuk mengisi catatan dan kalkulasi otomatis u
 
 - [ ] Master data karyawan (referensi lookup)
 - [ ] Pembuatan form key performance index berdasarkan departemen (terhubung ke data karyawan)
+
+## Dokumen Terkait
+
+- [[HRIS - Work Review]] — penilaian kualitatif (KPI = sisi kuantitatif)
+- [[HRIS - Career & Promotion]] — masukan keputusan promosi
+- [[HRIS - Analysis]] · [[HRIS - Big Pictures]] · [[HRIS - Interrelationship Matrices]]

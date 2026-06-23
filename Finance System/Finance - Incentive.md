@@ -367,3 +367,10 @@ Catatan :
 - Butuh RBAC untuk membatasi akses user berdasarkan divisinya
 - perlu pengetahuan GMV itu apakah sama dengan dashboard tiktok jika sama maka data-data yang dari dashboard tiktok tidak perlu diambil lagi => Asumsi salah karena GMV tidak mengambil data dari dashboard TIKTOK. Perlu mendalami bagaimana mengambil data - data yang diperlukan dari tiktok dashboard
 - task manager jelas perlu diperbarui jika ingin dibuat realtim mengikut fitur insentive atau jika ingin targer cepat paling dibuat input manual tanpa refactor task manager
+
+## Dokumen Terkait
+
+- [[Sales - Incentive]] — irisan sisi marketing
+- [[Microservices - Insentive Service]] — backend perhitungan insentif
+- [[External - Accurate]] (profit/penjualan) · [[Sales - GMV Creative]] (konversi) · [[APP - Dynamic Task Tracker]] (skor KPI)
+- [[Finance - Bridging App]] · [[HRIS - Compensation & Benefits]]

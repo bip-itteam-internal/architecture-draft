@@ -14,3 +14,8 @@
 [OneBharata](https://hoppscotch.io/) - Development
 - Di-host secara internal pada VM ERP-Development: http://10.10.10.121:9696/
 - Credentials dapat diubah untuk keperluan development, namun dokumen terkadang di-resync dengan database production
+
+## Dokumen Terkait
+
+- [[IT - Big Pictures]] — peta domain IT
+- [[IT - Server, VMs and Databases]] — VM tempat tool ini di-host

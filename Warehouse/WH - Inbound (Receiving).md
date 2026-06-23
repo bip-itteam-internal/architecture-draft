@@ -13,10 +13,10 @@
 		- *Menurut saya, memiliki status pada barang inbound terasa aneh karena Anda tidak ingin entri tersebut ditampilkan di halaman yang sama dengan tempat semuanya berada, karena bisa menimbulkan kebingungan bagi pembaca*
 		- *Ini mungkin bisa di-fetch dari Purchase Master Data jika di-tag untuk Warehouse dan ditampilkan di halaman yang berbeda*
 
-# Kebutuhan
+## Kebutuhan
 
 - [ ] Warehouse management system (cari referensi)
 
-# Dependencies
+## Dokumen Terkait
 
-- [ ] [[WH - Management System]]
+- [[WH - Management System]] · [[WH - Stock & Material Management]] (backbone stok/material) · [[WH - Outbound (Sending)]]

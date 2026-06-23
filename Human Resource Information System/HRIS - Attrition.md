@@ -17,3 +17,9 @@
 
 - [ ] Master data karyawan (referensi lookup)
 - [ ] Catatan terminasi (pembuatan dan terhubung ke data karyawan)
+
+## Dokumen Terkait
+
+- [[HRIS - Retention]] — counterpart (yang bertahan)
+- [[HRIS - Personalia]] — sumber data off-boarding/terminasi
+- [[HRIS - Analysis]] · [[HRIS - Big Pictures]] · [[HRIS - Interrelationship Matrices]]

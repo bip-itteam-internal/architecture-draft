@@ -4,3 +4,9 @@
 
 *Karena sistem ini sudah terenkapsulasi dan memiliki ekosistemnya sendiri, tidak disarankan untuk menautkan sistem yang ada ini ke dalam arsitektur, sehingga finance akan mendapatkan sistem baru yang dibangun dari awal dan seluruh ekosistem terenkapsulasi sebelumnya akan diimplementasikan ulang dengan benar pada sistem baru tersebut*
 
+## Dokumen Terkait
+
+- [[Finance - Bridging App]] — implementasi bridging
+- [[Finance - Incentive]] — perhitungan insentif
+- [[External - Accurate]] (akuntansi) · [[Vendor - CRM]] (sumber data purchase order)
+

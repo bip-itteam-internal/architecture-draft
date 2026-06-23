@@ -36,3 +36,9 @@
 Credentials untuk service ini dapat ditemukan pada deskripsi grup WhatsApp Tech Development
 
 Beberapa monitoring tools ini memiliki webhook untuk memberi notifikasi ke grup jika ada yang bermasalah, Anda dapat menonaktifkan dan mengaktifkannya sesuai kebutuhan
+
+## Dokumen Terkait
+
+- [[IT - Big Pictures]] — peta domain IT
+- [[IT - Server, VMs and Databases]] (VM netmon) · [[IT - Network Management]] (monitoring jaringan) · [[IT - Backup & DR]]
+- [[IT - Employee System]] — monitoring login logs karyawan

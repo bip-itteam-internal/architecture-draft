@@ -46,3 +46,9 @@
 - [ ] Daftar aset karyawan saat ini
 - [ ] Clearance administrasi karyawan
 - [ ] Status akun karyawan
+
+## Dokumen Terkait
+
+- [[HRIS - Big Pictures]] — peta domain HRIS
+- Subsistem turunan: [[HRIS - Recruitment]] · [[HRIS - Retention]] · [[HRIS - Work Review]] · [[HRIS - Conflict Management]] · [[HRIS - Career & Promotion]]
+- [[HRIS - Attrition]] · [[HRIS - Personalia]] (off-boarding) · [[HRIS - Interrelationship Matrices]]
