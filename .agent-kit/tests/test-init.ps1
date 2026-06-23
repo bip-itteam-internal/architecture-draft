@@ -18,6 +18,8 @@ try {
 
   $claude = Join-Path $tmp '.claude'
   Check (Test-Path (Join-Path $claude 'commands/start-task.md')) 'commands tersalin'
+  $cmdCount = (Get-ChildItem (Join-Path $claude 'commands') -Filter *.md).Count
+  Check ($cmdCount -eq 7) 'jumlah command = 7 (6 flow + /ask)'
   Check (Test-Path (Join-Path $claude 'hooks/session-start.ps1')) 'hooks tersalin'
   Check (Test-Path (Join-Path $claude 'settings.json')) 'settings.json ada'
   $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8
