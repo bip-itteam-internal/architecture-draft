@@ -87,6 +87,72 @@ Konsep & implementasi **saling di-link**: konsep di folder domain ↔ implementa
 - [ ] Konsep ↔ implementasi saling di-link
 - [ ] Staged per-file; `.obsidian/*` tidak ikut
 
+## 7. Contoh prompt untuk agent
+
+Copy salah satu prompt di bawah, ganti placeholder `<...>`, tempel ke agent. Semua prompt mengasumsikan agent punya akses **vault + repo kode bersebelahan** (lihat `CLAUDE.md` §0) dan **diawali membaca `CLAUDE.md` + SOP ini** agar aturannya ter-load.
+
+### A. Dokumentasikan service baru dari kode (implementasi)
+
+```text
+Kamu mendokumentasikan ERP Bharata di Obsidian vault ini.
+
+1. Baca dulu `CLAUDE.md` (root) dan `Tech Development/IT - SOP Dokumentasi Vault.md`,
+   lalu patuhi seluruh aturannya (grounded-in-code, penamaan, wikilink 0-broken, alur git).
+2. Sumber kebenaran = kode di `main-erp/bip-erp/services/<nama-service>`. Baca kode itu
+   (routes, handler, model, worker/cron). JANGAN mengarang; yang belum ada tandai TBD.
+3. Buat dok `Core System and Modules/Microservices - <Nama Service>.md` mengikuti
+   template `Templates/Template - Implementasi Service.md`: Deskripsi (Stack/Path/Status) →
+   Endpoint/Fitur (Sudah Diimplementasikan, grouped) → Belum Diimplementasikan/Catatan →
+   Dependensi & Integrasi (wikilink) → Dokumen Terkait.
+4. Tautkan ke dok terkait yang sudah ada (gateway, DB, konsep domain) + backlink bila relevan.
+5. Verifikasi semua wikilink resolve (0 broken) → git pull → stage per-file →
+   commit `docs: ...` → push. Jangan commit `.obsidian/*`.
+```
+
+### B. Update dok existing setelah perubahan kode (sync)
+
+```text
+Kamu menyinkronkan dokumentasi ERP dengan perubahan kode terbaru.
+
+1. Baca `CLAUDE.md` + `Tech Development/IT - SOP Dokumentasi Vault.md`, patuhi aturannya.
+2. `git pull` di vault dan repo kode. Lihat diff/commit terbaru di
+   `<repo/path, mis. main-erp/bip-erp/services/employee>`.
+3. Tentukan dok terdampak (pakai pemetaan repo→dok di `CLAUDE.md` §7). Update HANYA yang
+   berubah: tambah endpoint/fitur baru ke section yang tepat, perbarui Status marker,
+   pindahkan item dari "Belum Diimplementasikan" → "Sudah Diimplementasikan" bila sudah jadi.
+4. Jaga grounded: ubah/hapus klaim yang tak lagi sesuai kode; catat gap baru sebagai TBD.
+5. Verifikasi wikilink 0-broken → stage per-file → commit `docs: ...` → push.
+```
+
+### C. Buat dok konsep/domain (bisnis)
+
+```text
+Kamu menulis dokumentasi KONSEP/bisnis (bukan implementasi) untuk domain
+<Marketing/HRIS/GA/Warehouse/Finance/...>.
+
+1. Baca `CLAUDE.md` + `Tech Development/IT - SOP Dokumentasi Vault.md`, patuhi aturannya.
+2. Buat dok `<Folder domain>/<Prefix> - <Nama>.md` mengikuti template
+   `Templates/Template - Konsep Domain.md`: Deskripsi → Latar Belakang →
+   Ruang Lingkup/Cakupan → Konsumen Data → Kendala → Belum Diputuskan (TBD) → Dokumen Terkait.
+3. WAJIB saling-link dengan dok implementasinya bila ada (service di Core System and Modules).
+   Hal yang belum diputuskan tulis sebagai TBD — jangan mengarang detail teknis.
+4. Verifikasi wikilink 0-broken → stage per-file → commit `docs: ...` → push.
+```
+
+### D. Catat log operasional (korespondensi / access-log / insiden)
+
+```text
+Kamu mencatat artefak OPERASIONAL (korespondensi vendor / dump access-log / catatan insiden)
+— ini bukan dokumentasi arsitektur.
+
+1. Baca `CLAUDE.md` §2 (area non-domain Logs) + `Tech Development/IT - SOP Dokumentasi Vault.md`.
+2. Buat file `Logs/LOG - <Judul Ringkas>.md` mengikuti template
+   `Templates/Template - Log Operasional.md`: header Tipe/Tanggal/Konteks-arsitektur →
+   isi point-in-time. MASK kredensial (token/sign/password).
+3. Tautkan ke dok arsitektur terkait (service/konsep yang relevan).
+4. Stage per-file → commit `docs: ...` → push.
+```
+
 ## Dokumen Terkait
 
 - [[CLAUDE]] — rulebook ringkas (sumber aturan)
