@@ -31,9 +31,8 @@
 - **Lazada** baru placeholder di kode (belum ada client) — lihat catatan di [[Microservices - Integration Service]]
 - Pembeda: integrasi ini untuk **order/penjualan & akuntansi marketplace**, berbeda dari [[Sales - TikTok Sentiment Pipeline]] (sentimen komentar kompetitor) dan [[Sales - Veo (Gemini) Implementation]] (produksi konten)
 ## Kendala
-	-
-	-
-	-
+
+- **Rate limit Shopee Ads API** — sync harian jam **02:00 WIB** menumpuk semua call di **burst ~2–4 detik** (paralel lintas toko: maks 3 toko × 5 request), sehingga **daily call limit kepukul** sebelum semua toko ter-sync. Observasi 2026-06-20…22: **~50% call gagal `429 error_limit`** (item GMS 50%, campaign GMS ~57% sukses) → data performa (GMS item/campaign) tidak lengkap. Diperparah token **shop-scoped** (1 call/toko) dan jumlah toko terus bertambah (8 toko saat ini). Detail metrik + surat permintaan kenaikan limit: [[LOG - Shopee API Rate Limit Request]].
 
 ## Dokumen Terkait
 

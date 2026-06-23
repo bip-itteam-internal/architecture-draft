@@ -26,12 +26,15 @@ Tidak wajib semua repo — cukup vault + repo yang sedang didokumentasikan.
 
 `Application` · `Core System and Modules` · `Finance System` · `General Affairs` · `Human Resource Information System` · `Manufacture` · `Marketing` · `Tech Development` · `Third-party Software` · `Warehouse` · `Unknown or not listed`
 
+**Area non-domain:** `Logs` — artefak **operasional** (korespondensi vendor, dump access-log, catatan insiden). Sifatnya **point-in-time record**, **bukan** dokumentasi arsitektur → **dikecualikan** dari grounded-in-code (§1), status marker (§5), dan template (§6). Tetap ikut konvensi nama (§3) dan **flat** (tanpa sub-pohon domain). Tautkan tiap log ke dok arsitektur terkait via wikilink.
+
 ## 3. Konvensi penamaan file
 
 Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
 - `CORE -` (gateway, SSO, orchestrator, shared service), `Microservices -` (service bip-erp), `DB -` → **Core System and Modules**
 - `APP -` / `BASE -` → **Application**
 - `HRIS -` → HRIS · `Sales -` → Marketing · `GA -` → General Affairs · `IT -` → Tech Development · `WH -` → Warehouse · `Finance -` → Finance System · `External -` / `Vendor -` → Third-party Software
+- `LOG -` → **Logs** (artefak operasional; mis. `LOG - Shopee API Rate Limit Request`)
 - Karakter `/` tidak boleh di nama file (pakai `-`, mis. `IT - CI-CD`).
 
 ## 4. Wikilink
