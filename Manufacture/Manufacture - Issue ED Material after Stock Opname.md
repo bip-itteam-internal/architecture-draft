@@ -1,7 +1,13 @@
+## Deskripsi
 
-Departemen ini menggunakan Accurate Online untuk mengelola produksi dan raw material. 
+*Issue produksi: **stok material ED/rusak tercampur dengan stok bagus** di Accurate sehingga angka rancu. Accurate belum bisa memilah ED ke wadah lain; perlu dashboard stock opname (selisih + karantina + berita acara/foto, tanpa mengubah stok asli). Dijawab oleh [[Manufacture - Stock & Material Management]] (fitur Stock opname & gudang karantina).*
 
-### Stok material yang ED atau wested
+- **Status**: 🟡 Issue / Direncanakan (belum ada solusi di kode)
+
+Departemen ini menggunakan Accurate Online untuk mengelola produksi dan raw material.
+
+## Stok material yang ED atau wasted
+
 ```
 Terkait manufaktur
 Daftar laporan -> Tarikan data kuatitas barang per gudang
@@ -19,5 +25,7 @@ pertanyaan:
 Alur yang disarankan:
 ![[Stok Pengecekan Fisik Flow.png]]
 
+## Dokumen Terkait
 
----
+- [[Manufacture - Stock & Material Management]] — sistem yang menjawab issue ini (Stock opname & karantina)
+- [[Manufacture - Issue Material Miss Count]]

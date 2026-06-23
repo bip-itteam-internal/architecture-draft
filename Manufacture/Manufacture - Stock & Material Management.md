@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Desain (to-be) sistem **manajemen stok & material gudang** — pengganti spreadsheet manual (stok bahan baku/kemas vs kebutuhan). Menggabungkan **master material + stok per gudang + perencanaan kebutuhan → kekurangan → pengadaan**. Menjadi backbone yang menaungi [[WH - Management System]], [[WH - Inbound (Receiving)]] / [[WH - Outbound (Sending)]], dan stock opname.*
+*Desain (to-be) sistem **manajemen stok & material** untuk produksi — pengganti spreadsheet manual (stok bahan baku/kemas vs kebutuhan). Menggabungkan **master material + stok per gudang + perencanaan kebutuhan → kekurangan → pengadaan**. Menjadi backbone yang menaungi [[WH - Management System]], [[WH - Inbound (Receiving)]] / [[WH - Outbound (Sending)]], dan stock opname.*
 
 - **Status**: 🟡 Desain / Direncanakan (**belum** diimplementasi di kode)
 - **Target arsitektur**: microservice `warehouse-service` baru + modul web, **rollout bertahap**
@@ -60,12 +60,12 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 - **Migrasi data spreadsheet** butuh cleanup: kode belum terstandar, KATEGORI tercampur (supplier/batch/produk), satuan tidak konsisten, dan **anomali nilai** (mis. MENTHOL CRYSTAL ±18,8 juta gram ≈ 76% total stok — perlu diverifikasi)
 - Konversi & konsistensi **satuan** (gram/kg vs pcs)
 - **Multi-gudang** vs gudang tunggal
-- **Ownership** sistem: PPIC vs Warehouse vs Manufacture
+- ~~Ownership sistem: PPIC vs Warehouse vs Manufacture~~ → **dok diletakkan di domain Manufacture** (ownership condong Manufacture; peran Warehouse/PPIC tetap terlibat di operasional)
 - Apakah stok **barang jadi** dikelola di sini atau di sisi Sales/distribusi
 
 ## Dependensi / Dokumen Terkait
 
+- [[Manufacture - Issue Material Miss Count]] · [[Manufacture - Issue ED Material after Stock Opname]] — issue produksi yang dijawab sistem ini
 - [[WH - Management System]] · [[WH - Inbound (Receiving)]] · [[WH - Outbound (Sending)]]
 - [[GA - Procurement System]]
-- [[Manufacture issue - Material miss count]] · [[Manufacture Issues - ED material after Stock opname]]
 - [[External - Accurate]] · [[APP - Mobile Application]] · [[APP - Web Application]]

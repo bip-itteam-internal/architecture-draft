@@ -36,7 +36,7 @@ Tidak wajib semua repo — cukup vault + repo yang sedang didokumentasikan.
 Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
 - `CORE -` (gateway, SSO, orchestrator, shared service), `Microservices -` (service bip-erp), `DB -` → **Core System and Modules**
 - `APP -` / `BASE -` → **Application**
-- `HRIS -` → HRIS · `Sales -` → Marketing · `GA -` → General Affairs · `IT -` → Tech Development · `WH -` → Warehouse · `Finance -` → Finance System · `External -` / `Vendor -` → Third-party Software
+- `HRIS -` → HRIS · `Sales -` → Marketing · `GA -` → General Affairs · `IT -` → Tech Development · `WH -` → Warehouse · `Manufacture -` → Manufacture · `Finance -` → Finance System · `External -` / `Vendor -` → Third-party Software
 - `LOG -` → **Logs** (artefak operasional; mis. `LOG - Shopee API Rate Limit Request`)
 - Karakter `/` tidak boleh di nama file (pakai `-`, mis. `IT - CI-CD`).
 

@@ -19,4 +19,4 @@
 
 ## Dokumen Terkait
 
-- [[WH - Management System]] · [[WH - Stock & Material Management]] (backbone stok/material) · [[WH - Outbound (Sending)]]
+- [[WH - Management System]] · [[Manufacture - Stock & Material Management]] (backbone stok/material) · [[WH - Outbound (Sending)]]
