@@ -28,6 +28,8 @@ Tidak wajib semua repo — cukup vault + repo yang sedang didokumentasikan.
 
 **Area non-domain:** `Logs` — artefak **operasional** (korespondensi vendor, dump access-log, catatan insiden). Sifatnya **point-in-time record**, **bukan** dokumentasi arsitektur → **dikecualikan** dari grounded-in-code (§1), status marker (§5), dan template (§6). Tetap ikut konvensi nama (§3) dan **flat** (tanpa sub-pohon domain). Tautkan tiap log ke dok arsitektur terkait via wikilink.
 
+**Area non-domain:** `Templates` — file **skeleton** untuk dok baru (dipakai via plugin Templates Obsidian atau di-copy agent). Bukan dokumentasi → **dikecualikan** dari §1/§5/§6; isinya placeholder + komentar `%% %%` (tanpa wikilink hidup). Prosedur lengkap: `Tech Development/IT - SOP Dokumentasi Vault.md`.
+
 ## 3. Konvensi penamaan file
 
 Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
@@ -60,6 +62,8 @@ Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
 ## Dokumen Terkait                               (wikilink)
 ```
 Untuk dok konsep murni: `## Latar Belakang`, `## Ruang Lingkup`, `## Belum Diputuskan (TBD)`, dst.
+
+> **Skeleton siap-pakai** untuk tiap bentuk ada di folder `Templates/` (Implementasi Service · Konsep Domain · Log Operasional). Prosedur lengkap + decision-tree penamaan: `Tech Development/IT - SOP Dokumentasi Vault.md`.
 
 ## 7. Pemetaan repo kode → dokumen
 

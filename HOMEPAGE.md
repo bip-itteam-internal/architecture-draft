@@ -69,6 +69,8 @@ Service adalah end-point yang berinteraksi dengan database-nya masing-masing (da
 
 **Domain (Big Pictures)** → [[HRIS - Big Pictures]] · [[Sales - Big Pictures]] · [[GA - Big Pictures]] · [[IT - Big Pictures]] · [[WH - Management System]] · [[Finance]]
 
+**Tata Kelola** → [[IT - SOP Dokumentasi Vault]] (cara nulis dok konsisten + template)
+
 ## Dari mana saya mulai?
 
 Biasakan diri dengan shared-library, api-gateway, lalu boilerplate services/orchestrator. Untuk membuat service baru:
