@@ -16,7 +16,7 @@
 - **Sinkronisasi order/penjualan** → model **transaksi terpadu** (unified) lintas marketplace
 - **Performa iklan/GMV** — laporan GMV Max (TikTok), GMS (Shopee); berkaitan dengan [[Sales - Dashboard]] (ads/omnichannel) & [[Sales - GMV Creative]]
 - **Bridge ke akuntansi** — ringkasan transaksi → **Accurate** (Sales Invoice/Return); lihat [[Finance - Bridging App]] & [[External - Accurate]]
-- **Webhook event order** — ingest via middleware **Desty**
+- **Webhook event order** — ingest via middleware [[External - Desty]]
 - **Marketing team + shop ACL** — kontrol akses toko per tim marketing
 - **Automasi** auto-ship/auto-approve (sadar hari libur)
 - **Master & item catalog** marketplace (mapping produk ke Accurate)

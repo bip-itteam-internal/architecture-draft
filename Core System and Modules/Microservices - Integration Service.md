@@ -100,10 +100,11 @@
 - [[Microservices - TikTok Shop Service]] — webhook landing
 - [[DB - Overview and Notes]] — MongoDB & Redis (queue prefix `srv:integration`)
 
-External lain: TikTok Shop, TikTok Business/Ads, Shopee, Desty (middleware order), Telegram (notifier error/job).
+External lain: TikTok Shop, TikTok Business/Ads, Shopee, [[External - Desty]] (middleware order), Telegram (notifier error/job).
 
 ## Dokumen Terkait
 
+- [[External - Desty]] — vendor middleware orkestrasi order (webhook + auto-approve)
 - [[Sales - Marketplace Integration]] (konsep sisi marketing)
 - [[Finance - Bridging App]]
 - [[Sales - GMV Creative]]
