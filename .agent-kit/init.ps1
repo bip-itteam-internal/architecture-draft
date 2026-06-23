@@ -52,16 +52,17 @@ $hooks = @{ SessionStart = @(@{ hooks = @(@{ type='command'; command=$ssCmd }) }
 if (-not $NoPreCommitHook) {
   $hooks['PreToolUse'] = @(@{ matcher='Bash'; hooks=@(@{ type='command'; command=$pcCmd }) })
 }
-(@{ hooks = $hooks } | ConvertTo-Json -Depth 8) | Set-Content -Path (Join-Path $claude 'settings.json') -Encoding UTF8
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText((Join-Path $claude 'settings.json'), (@{ hooks = $hooks } | ConvertTo-Json -Depth 8), $utf8NoBom)
 
 # 6. generate erp/CLAUDE.md dari template
 $kitVer = (Get-Content (Join-Path $kitRoot 'VERSION') -Raw).Trim()
-$cm = Get-Content (Join-Path $kitRoot 'templates\workspace-CLAUDE.md') -Raw
+$cm = Get-Content (Join-Path $kitRoot 'templates\workspace-CLAUDE.md') -Raw -Encoding UTF8
 $cm = $cm.Replace('__KIT_VERSION__', $kitVer).Replace('__ACTIVE_PROJECT__', $active)
-Set-Content -Path (Join-Path $claude 'CLAUDE.md') -Value $cm -Encoding UTF8
+[System.IO.File]::WriteAllText((Join-Path $claude 'CLAUDE.md'), $cm, $utf8NoBom)
 
 # 7. .kit-version
-Set-Content -Path (Join-Path $claude '.kit-version') -Value $kitVer -Encoding UTF8
+[System.IO.File]::WriteAllText((Join-Path $claude '.kit-version'), $kitVer, $utf8NoBom)
 
 # 8. ringkasan
 Write-Host ""

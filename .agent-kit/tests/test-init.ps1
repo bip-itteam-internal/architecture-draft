@@ -20,10 +20,12 @@ try {
   Check (Test-Path (Join-Path $claude 'commands/start-task.md')) 'commands tersalin'
   Check (Test-Path (Join-Path $claude 'hooks/session-start.ps1')) 'hooks tersalin'
   Check (Test-Path (Join-Path $claude 'settings.json')) 'settings.json ada'
-  $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw
+  $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8
   Check ($cm -match 'demo-proj') 'CLAUDE.md memuat project aktif'
   Check ($cm -notmatch '__ACTIVE_PROJECT__') 'placeholder project terisi'
   Check ($cm -notmatch '__KIT_VERSION__') 'placeholder versi terisi'
+  $arrow = [char]0x2192
+  Check ($cm.Contains($arrow)) 'CLAUDE.md panah utuh (UTF-8 tidak korup)'
   $st = Get-Content (Join-Path $claude 'settings.json') -Raw | ConvertFrom-Json
   Check ($null -ne $st.hooks.SessionStart) 'settings punya SessionStart'
   Check ($null -eq $st.hooks.PreToolUse) 'NoPreCommitHook menghapus PreToolUse'
