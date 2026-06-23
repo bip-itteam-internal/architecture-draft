@@ -76,15 +76,15 @@
 **1. Permintaan posisi (dari SPV/atasan)** — *sebelum ada lowongan, kebutuhan datang dari atasan. Tiap departemen punya **kuota** (jatah jumlah orang); selama kuota masih ada, SPV/kepala departemen boleh mengajukan permintaan posisi (job requisition) sesuai kebutuhan **asal tidak melebihi kuota**. Permintaan disetujui dulu, baru lowongan dibuka.*
 - **Rencana alurnya**: SPV mengajukan posisi + jumlah orang + alasan → sistem cek **sisa kuota** departemen → disetujui bertingkat (atasan, lalu HR) → setelah disetujui, lowongan baru boleh dibuka. Apakah HRD setuju alur ini?
 - **Kuota**: siapa yang menetapkan jatah tiap departemen & untuk periode apa (mis. tahunan / terkait anggaran)?
-- Selama **dalam kuota**, apakah approval tetap bertingkat atau cukup lebih ringan? Kalau **melebihi kuota** — ditolak, atau boleh tapi perlu persetujuan lebih tinggi (mis. **direktur**)?
-- Siapa yang boleh mengajukan — hanya SPV/kepala departemen, atau staf juga (lalu disetujui atasannya)?
+- Selama **dalam kuota**, apakah approval tetap bertingkat atau cukup lebih ringan? Kalau **melebihi kuota** ditolak, atau boleh tapi perlu persetujuan lebih tinggi (mis. **direktur**)?
+- Siapa yang boleh mengajukan hanya SPV/kepala departemen, atau staf juga (lalu disetujui atasannya)?
 - Apa saja yang wajib diisi (posisi, jumlah, alasan, target mulai, kisaran gaji, **usulan kualifikasi/kriteria kandidat**)? Kalau ditolak, direvisi & diajukan ulang?
 - **Kualifikasi kandidat — disepakati kolaborasi**: diusulkan **SPV** di requisition (paham kebutuhan teknis job), lalu **difinalkan & distandarkan HRD** jadi kriteria resmi (dipakai saat screening, poin 4).
 
 **2. Cara melamar & sumber pelamar** — *dari mana kandidat datang dan bagaimana mereka mendaftar.*
 - Lowongan disebar ke mana saja selain portal kita sendiri? (mis. job board seperti JobStreet, referral karyawan, media sosial, atau pelamar datang langsung/walk-in)
 - Kalau ada pelamar lewat jalur lain (kirim CV ke email, walk-in), apakah HRD mau memasukkannya manual ke sistem?
-- Satu orang boleh melamar beberapa posisi sekaligus? Kalau pernah ditolak, boleh melamar lagi — setelah berapa lama?
+- Satu orang boleh melamar beberapa posisi sekaligus? Kalau pernah ditolak, boleh melamar lagi setelah berapa lama?
 
 **3. Data kandidat** — *informasi apa yang dikumpulkan dari pelamar dan aturan mainnya.*
 - Saat melamar, data apa yang **wajib** diisi? (usulan dasar: nama, nomor WhatsApp/telepon, email, posisi yang dilamar, dan CV) — perlu tambahan seperti pendidikan, pengalaman, ekspektasi gaji, atau domisili?
