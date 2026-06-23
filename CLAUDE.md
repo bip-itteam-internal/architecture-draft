@@ -75,8 +75,8 @@ Untuk dok konsep murni: `## Latar Belakang`, `## Ruang Lingkup`, `## Belum Diput
 | `erp-frontend` (Next.js) | `Application/APP - Web Application`, `BASE - Enterance Point` |
 | `task-management/bharata-task-manager-fe` | `Application/APP - Dynamic Task Tracker` (backend = Microservices - Task Management Service) |
 | `guestbook-system` (Astro) | `General Affairs/GA - Guestbook System (Complete)` |
-| `ideamiils` (Next.js + Veo) | `Marketing/Sales - Veo (Gemini) Implementation` & `... Automation Layer` |
-| `scraping` (Python/FastAPI) | `Marketing/Sales - TikTok Sentiment Pipeline` |
+| `ideamiils` (Next.js + Veo) | `Application/APP - Ideamills` (app); konsep: `Marketing/Sales - Veo (Gemini) Implementation` (manual) & `... Automation Layer` |
+| `scraping` (Python/FastAPI) | `Application/APP - TikTok Sentiment Pipeline` (app) & `Marketing/Sales - TikTok Sentiment Pipeline` (konsep) |
 
 ## 8. Alur kerja sync (tiap update)
 

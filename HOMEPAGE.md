@@ -65,7 +65,7 @@ Service adalah end-point yang berinteraksi dengan database-nya masing-masing (da
 
 **Microservices** → [[Microservices - Employee Service]] · [[Microservices - Attendance Service]] · [[Microservices - Notification Service]] · [[Microservices - File Service]] · [[Microservices - Insentive Service]] · [[Microservices - Integration Service]] · [[Microservices - Inventory Service]] · [[Microservices - Task Management Service]] · [[Microservices - TikTok Shop Service]]
 
-**Aplikasi** → [[BASE - Enterance Point]] · [[APP - Web Application]] · [[APP - Mobile Application]] · [[APP - Dynamic Task Tracker]] · [[APP (Extension) - Fingerprint Listener (Complete)]]
+**Aplikasi** → [[BASE - Enterance Point]] · [[APP - Web Application]] · [[APP - Mobile Application]] · [[APP - Dynamic Task Tracker]] · [[APP - Ideamills]] · [[APP - TikTok Sentiment Pipeline]] · [[APP (Extension) - Fingerprint Listener (Complete)]]
 
 **Domain (Big Pictures)** → [[HRIS - Big Pictures]] · [[Sales - Big Pictures]] · [[GA - Big Pictures]] · [[IT - Big Pictures]] · [[WH - Management System]] · [[Finance]]
 
