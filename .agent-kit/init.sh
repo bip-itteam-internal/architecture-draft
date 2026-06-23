@@ -37,8 +37,8 @@ for d in commands hooks skills; do
   [ -d "$kit_root/$d" ] && { mkdir -p "$claude/$d"; cp -R "$kit_root/$d/." "$claude/$d/"; }
 done
 
-ss_cmd="bash \"$claude/hooks/session-start.sh\""
-pc_cmd="bash \"$claude/hooks/pre-commit-reminder.sh\""
+ss_cmd="bash \\\"$claude/hooks/session-start.sh\\\""
+pc_cmd="bash \\\"$claude/hooks/pre-commit-reminder.sh\\\""
 if [ "$no_precommit" -eq 1 ]; then
   cat > "$claude/settings.json" <<JSON
 { "hooks": { "SessionStart": [ { "hooks": [ { "type": "command", "command": "$ss_cmd" } ] } ] } }
