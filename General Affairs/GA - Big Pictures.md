@@ -34,7 +34,6 @@ General Affairs ingin punya dashboard untuk menejemen semua aset perusahaan dari
 - [ ] [[GA - Audit Internal System]]
 - [ ] [[GA - Building Maintenance]]
 - [ ] [[GA - Checklist Management]]
-- [ ] [[GA - Accident Prevention]]
 - [ ] [[GA - Inventory Management]]
 - [ ] [[GA - Machine & Utility Maintenance]]
 - [ ] [[GA - Procurement System]]
