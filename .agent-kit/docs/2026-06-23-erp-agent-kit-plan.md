@@ -475,10 +475,12 @@ try {
   Check (Test-Path (Join-Path $claude 'commands/start-task.md')) 'commands tersalin'
   Check (Test-Path (Join-Path $claude 'hooks/session-start.ps1')) 'hooks tersalin'
   Check (Test-Path (Join-Path $claude 'settings.json')) 'settings.json ada'
-  $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw
+  $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8
   Check ($cm -match 'demo-proj') 'CLAUDE.md memuat project aktif'
   Check ($cm -notmatch '__ACTIVE_PROJECT__') 'placeholder project terisi'
   Check ($cm -notmatch '__KIT_VERSION__') 'placeholder versi terisi'
+  $arrow = [char]0x2192
+  Check ($cm.Contains($arrow)) 'CLAUDE.md panah utuh (UTF-8 tidak korup)'
   $st = Get-Content (Join-Path $claude 'settings.json') -Raw | ConvertFrom-Json
   Check ($null -ne $st.hooks.SessionStart) 'settings punya SessionStart'
   Check ($null -eq $st.hooks.PreToolUse) 'NoPreCommitHook menghapus PreToolUse'
@@ -557,16 +559,17 @@ $hooks = @{ SessionStart = @(@{ hooks = @(@{ type='command'; command=$ssCmd }) }
 if (-not $NoPreCommitHook) {
   $hooks['PreToolUse'] = @(@{ matcher='Bash'; hooks=@(@{ type='command'; command=$pcCmd }) })
 }
-(@{ hooks = $hooks } | ConvertTo-Json -Depth 8) | Set-Content -Path (Join-Path $claude 'settings.json') -Encoding UTF8
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText((Join-Path $claude 'settings.json'), (@{ hooks = $hooks } | ConvertTo-Json -Depth 8), $utf8NoBom)
 
-# 6. generate erp/CLAUDE.md dari template
+# 6. generate erp/CLAUDE.md dari template (baca template sbg UTF-8 agar →/— tidak korup)
 $kitVer = (Get-Content (Join-Path $kitRoot 'VERSION') -Raw).Trim()
-$cm = Get-Content (Join-Path $kitRoot 'templates\workspace-CLAUDE.md') -Raw
+$cm = Get-Content (Join-Path $kitRoot 'templates\workspace-CLAUDE.md') -Raw -Encoding UTF8
 $cm = $cm.Replace('__KIT_VERSION__', $kitVer).Replace('__ACTIVE_PROJECT__', $active)
-Set-Content -Path (Join-Path $claude 'CLAUDE.md') -Value $cm -Encoding UTF8
+[System.IO.File]::WriteAllText((Join-Path $claude 'CLAUDE.md'), $cm, $utf8NoBom)
 
 # 7. .kit-version
-Set-Content -Path (Join-Path $claude '.kit-version') -Value $kitVer -Encoding UTF8
+[System.IO.File]::WriteAllText((Join-Path $claude '.kit-version'), $kitVer, $utf8NoBom)
 
 # 8. ringkasan
 Write-Host ""
