@@ -3,7 +3,7 @@
 *`hris-dashboard` ("One Bharata") adalah portal web internal ERP/HRIS terpadu Bharata Group — dashboard berbasis role untuk mengelola HR, attendance, finance/insentif, integrasi marketplace, IT, dan GA. Selain itu, web ini juga berperan sebagai **SSO Identity Provider** untuk aplikasi lain (mis. Task Manager).*
 
 - **Stack**: Next.js 16 (App Router) + React 19 + TypeScript; shadcn/ui + Radix + Tailwind v4; TanStack Query + axios; react-hook-form + zod; recharts (grafik); leaflet (peta lokasi absensi); `@uiw/react-md-editor` (article)
-- **Path**: `main-erp/erp-frontend` (repo `erp-frontend`), branch `feature/sso-task-manager-menu`
+- **Path**: `erp-frontend` (repo `erp-frontend`), branch `feature/sso-task-manager-menu`
 - **Status**: ✅ Implemented (aktif dikembangkan)
 
 ## Autentikasi & Role

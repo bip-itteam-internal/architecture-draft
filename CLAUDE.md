@@ -11,7 +11,8 @@ Agent butuh akses ke **kode (sumber kebenaran)** dan **vault (target)** sekaligu
 ```
 erp/                      ← working directory agent
 ├── architecture-draft/   ← vault ini (target dokumentasi)
-├── main-erp/             ← berisi bip-erp/ dan erp-frontend/
+├── bip-erp/
+├── erp-frontend/
 ├── mybharata-app/  · task-management/  · ideamiils/  · scraping/  · guestbook-system/
 ```
 Tidak wajib semua repo — cukup vault + repo yang sedang didokumentasikan.
@@ -71,7 +72,7 @@ Untuk dok konsep murni: `## Latar Belakang`, `## Ruang Lingkup`, `## Belum Diput
 |---|---|
 | `bip-erp` (Go microservices) | `Core System and Modules/*` (API Master Gateway, SSO Flow, HRIS/IT Orchestrator, DB Overview, Microservices - <Service>, OCR Document Service) |
 | `mybharata-app` (Flutter) | `Application/APP - Mobile Application` |
-| `erp-frontend` (Next.js, di `main-erp/`) | `Application/APP - Web Application`, `BASE - Enterance Point` |
+| `erp-frontend` (Next.js) | `Application/APP - Web Application`, `BASE - Enterance Point` |
 | `task-management/bharata-task-manager-fe` | `Application/APP - Dynamic Task Tracker` (backend = Microservices - Task Management Service) |
 | `guestbook-system` (Astro) | `General Affairs/GA - Guestbook System (Complete)` |
 | `ideamiils` (Next.js + Veo) | `Marketing/Sales - Veo (Gemini) Implementation` & `... Automation Layer` |

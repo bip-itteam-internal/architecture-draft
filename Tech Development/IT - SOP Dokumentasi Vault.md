@@ -1,4 +1,4 @@
-%% Dok ini = SOP/prosedur (penjelasan + contoh + langkah). Sumber-kebenaran ATURAN tetap CLAUDE.md di root vault. Bila ada konflik, CLAUDE.md menang. %%
+*Dok ini = SOP/prosedur (penjelasan + contoh + langkah). Sumber-kebenaran ATURAN tetap CLAUDE.md di root vault. Bila ada konflik, CLAUDE.md menang.*
 
 ## Deskripsi
 
@@ -98,7 +98,7 @@ Kamu mendokumentasikan ERP Bharata di Obsidian vault ini.
 
 1. Baca dulu `CLAUDE.md` (root) dan `Tech Development/IT - SOP Dokumentasi Vault.md`,
    lalu patuhi seluruh aturannya (grounded-in-code, penamaan, wikilink 0-broken, alur git).
-2. Sumber kebenaran = kode di `main-erp/bip-erp/services/<nama-service>`. Baca kode itu
+2. Sumber kebenaran = kode di `/bip-erp/services/<nama-service>`. Baca kode itu
    (routes, handler, model, worker/cron). JANGAN mengarang; yang belum ada tandai TBD.
 3. Buat dok `Core System and Modules/Microservices - <Nama Service>.md` mengikuti
    template `Templates/Template - Implementasi Service.md`: Deskripsi (Stack/Path/Status) →
@@ -116,7 +116,7 @@ Kamu menyinkronkan dokumentasi ERP dengan perubahan kode terbaru.
 
 1. Baca `CLAUDE.md` + `Tech Development/IT - SOP Dokumentasi Vault.md`, patuhi aturannya.
 2. `git pull` di vault dan repo kode. Lihat diff/commit terbaru di
-   `<repo/path, mis. main-erp/bip-erp/services/employee>`.
+   `<repo/path, mis. bip-erp/services/employee>`.
 3. Tentukan dok terdampak (pakai pemetaan repo→dok di `CLAUDE.md` §7). Update HANYA yang
    berubah: tambah endpoint/fitur baru ke section yang tepat, perbarui Status marker,
    pindahkan item dari "Belum Diimplementasikan" → "Sudah Diimplementasikan" bila sudah jadi.
