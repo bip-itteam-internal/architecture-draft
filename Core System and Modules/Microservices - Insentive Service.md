@@ -76,3 +76,4 @@ _Insentive Service adalah engine perhitungan insentif untuk tim sales/marketing.
 - [[Finance - Incentive]]
 - [[Sales - Incentive]]
 - [[HRIS - Key Performance Index]]
+- [[IT - Background Jobs & Schedulers]] — cron harian insentif service ini (00:00 WIB; lock cron_locks)

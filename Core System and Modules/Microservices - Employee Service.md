@@ -80,3 +80,4 @@
 - [[APP - MyBharata]]
 - [[HRIS - Key Performance Index]]
 - [[HRIS - Payroll]]
+- [[IT - Background Jobs & Schedulers]] — cron service ini (sync schedule harian 04:00, reminder KPI tgl 1, reset cuti 1 Jan)
