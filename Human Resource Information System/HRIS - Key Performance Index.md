@@ -1,8 +1,21 @@
 ## Deskripsi
 
-*Dashboard ini menampilkan seluruh attrition dari departemen internal yang mencakup karyawan yang masuk dan yang keluar*
+*Penilaian kinerja berbasis **skor KPI**. **Penting dipisahkan**: engine **skor→insentif tim marketing SUDAH ADA** di kode ([[Microservices - Insentive Service]]); sedangkan **appraisal/KPI bulanan menyeluruh per-karyawan semua departemen** (dijelaskan di "Fitur" bawah) masih **konsep**.*
 
 [Contoh dari sistem ini](https://drive.google.com/drive/folders/15fGQNX5usiMXIk2GY8DAqahHFF5ahPpA)
+
+- **Status**: ⚠️ Sebagian — engine KPI→insentif (marketing) ✅ di [[Microservices - Insentive Service]]; appraisal bulanan menyeluruh 🟡 konsep.
+
+## Sudah Diimplementasikan — KPI engine insentif (marketing)
+
+> Grounded ke [[Microservices - Insentive Service]] (✅ production). Cakupan: **9 role marketing** (Supervisor, ADV Leader TikTok, ADV Marketplace, ADV Meta, Host Live, Affiliate, CRM, CS, ICC) — **bukan** seluruh karyawan/departemen.
+
+- `master-kpi` (CRUD; bobot total 100) · `POST /calculate` (scoring bertingkat per-role) · hasil + workflow approve/override · cron harian menarik metrik iklan (TikTok GMV-Max / Shopee GMS) dari [[Microservices - Integration Service]].
+- Skor → **insentif** ([[Finance - Incentive]] / [[Sales - Incentive]]). Koleksi: `master_kpis`, `kpi_score`, `incentive_results` ([[DB - Overview and Notes]]).
+
+## Konsep — appraisal bulanan menyeluruh (belum di kode)
+
+Rancangan KPI/appraisal per-karyawan **semua departemen** (form bulanan diisi supervisor → diteruskan ke HR), **beda** dari engine insentif marketing di atas. Detailnya:
 
 ## Fitur
 
@@ -31,6 +44,7 @@ Kami menginginkan cara yang mudah untuk mengisi catatan dan kalkulasi otomatis u
 
 ## Dokumen Terkait
 
-- [[HRIS - Work Review]] — penilaian kualitatif (KPI = sisi kuantitatif)
+- **Implementasi**: [[Microservices - Insentive Service]] (engine KPI→insentif marketing) · [[Finance - Incentive]] · [[Sales - Incentive]]
+- [[HRIS - Work Review]] — penilaian kualitatif (KPI = sisi kuantitatif); pertimbangkan **berbagi satu Review Cycle** ([[ERPGo - Performance Review Cycles]]) ketimbang sistem terpisah
 - [[HRIS - Career & Promotion]] — masukan keputusan promosi
 - [[HRIS - Analysis]] · [[HRIS - Big Pictures]] · [[HRIS - Interrelationship Matrices]]
