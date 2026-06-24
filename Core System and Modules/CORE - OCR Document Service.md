@@ -8,7 +8,7 @@
 
 - [[GA - Inventory Management]] — membaca dokumen (pembelian/kedatangan)
 - [[GA - Waste Management]] — dokumen kepatuhan/manifest
-- [[HRIS - Recruitment]] — OCR fallback untuk CV hasil scan (AI CV screening)
+- [[HRIS - Recruitment]] — OCR fallback untuk CV hasil scan (AI CV screening — fase lanjut)
 - *Kandidat berikutnya:* [[GA - Procurement System]] (form pengajuan/tanda terima), [[HRIS - Leave Request]] (surat keterangan dokter), [[Manufacture - Stock & Material Management]] (berita acara / dokumen supplier)
 
 ---
