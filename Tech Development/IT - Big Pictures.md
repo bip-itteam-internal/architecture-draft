@@ -9,6 +9,7 @@ Departemen IT menyediakan dukungan/teknis untuk seluruh perusahaan, sekaligus me
 - **Deployment** — [[IT - CI-CD]] (GitHub Actions self-hosted runner; Codemagic untuk mobile)
 - **Pemantauan & keandalan** — [[IT - Monitoring System]] & [[IT - Backup & DR]]
 - **Tools pengembangan** — [[IT - Development Apps and Tools]]
+- **Keamanan** — [[IT - Security]]: konsolidasi kontrol keamanan (auth/RBAC, jaringan, secret, backup) + peta gap (incident response, patch, proteksi data)
 
 ## Infra Inti di Core System
 
@@ -29,3 +30,4 @@ Beberapa komponen inti yang berkaitan erat dengan IT didokumentasikan di folder 
 - [ ] [[IT - Backup & DR]]
 - [ ] [[IT - CI-CD]]
 - [ ] [[IT - Development Apps and Tools]]
+- [ ] [[IT - Security]]
