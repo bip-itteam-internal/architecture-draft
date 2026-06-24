@@ -69,6 +69,12 @@ Service adalah end-point yang berinteraksi dengan database-nya masing-masing (da
 
 **Domain (Big Pictures)** → [[HRIS - Big Pictures]] · [[Sales - Big Pictures]] · [[GA - Big Pictures]] · [[IT - Big Pictures]] · [[WH - Management System]] · [[Finance]]
 
+**Quality & Regulatory** → [[QA - Big Pictures]] (CPOB/GMP · BPOM/izin edar · batch & traceability · deviation/CAPA · ED & recall — farmasi)
+
+**Reference** → [[REF - Glossary]] (glosarium istilah & singkatan Bharata)
+
+**Benchmark** → [[ERPGo - Overview & Gap Matrix]] (riset fitur produk eksternal vs bip-erp)
+
 **Tata Kelola** → [[IT - SOP Dokumentasi Vault]] (cara nulis dok konsisten + template)
 
 ## Dari mana saya mulai?

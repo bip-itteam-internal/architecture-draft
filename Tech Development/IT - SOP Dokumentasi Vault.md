@@ -35,6 +35,9 @@ Format nama file **selalu**: `Prefix - Nama.md` — flat, tanpa `/` di nama (pak
 | Finance | Finance System | `Finance -` |
 | Software pihak ketiga | Third-party Software | `External -` / `Vendor -` |
 | Log / korespondensi operasional | Logs | `LOG -` |
+| QA/RA farmasi (CPOB/BPOM/batch/CAPA/ED) | Quality & Regulatory | `QA -` |
+| Glosarium / data dictionary / ownership | Reference | `REF -` |
+| Riset produk eksternal (mis. ERPGo) | Benchmark | `ERPGo -` (atau nama produk) |
 | Belum jelas domainnya | Unknown or not listed | (sesuaikan terdekat) |
 
 > Obsidian resolve wikilink lewat **basename** → pindah folder aman; **rename file = perbarui semua wikilink** yang menunjuk nama lama.
