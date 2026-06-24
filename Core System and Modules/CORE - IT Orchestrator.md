@@ -14,6 +14,8 @@
 - `/account/activate|deactivate|status|toggle`: pola get-then-set field `is_active` pada employee.
 - `/network` `GET`/`POST`/`DELETE`: allow-list WiFi, di-proxy ke attendance service (`/networks`, `/internal/wifi/add|delete`).
 
+> Catatan: orchestrator **tidak** punya aksi "revoke device saja" — `/reset-password` membersihkan device hanya sebagai efek samping. Untuk lepas device **tanpa** reset password (mis. karyawan ganti HP), gunakan Employee Service `/account/forget-device` (lihat [[Microservices - Employee Service]]).
+
 ## Belum Diimplementasikan / Catatan
 
 > ⚠️ Bagian ini berisi bug penting.

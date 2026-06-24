@@ -17,6 +17,13 @@
 - Internal: `GET /internal/auth/user/:username`, `GET /internal/auth/employee/:employee_id`, `POST /internal/auth/change-password`, `GET /internal/auth/roles`, `POST /internal/auth/disable`
 - Password & PIN di-hash via `auth.EncryptPassword`
 
+**Account Admin (IT-staff, `RequireITStaff`)** — grup `/account/*` (operasi admin akun langsung di Employee Service)
+- `PATCH /account/active-status` — set status aktif/nonaktif akun
+- `PATCH /account/forget-device` — **revoke semua registered device & web browser** (set `inactive`) **tanpa** mengubah password/PIN; untuk kasus ganti perangkat / lepas tautan device lama. Respon: "All devices and browsers revoked"
+- `PATCH /account/reset` — **hard reset** akun: kosongkan username/PIN, password sementara = `employee_id`, `has_registered=false`, revoke device/browser, role dipertahankan → karyawan onboarding ulang
+- `GET /account/roles`, `PATCH /account/roles` — baca / set `system_roles`
+> Catatan: sebagian operasi akun juga diorkestrasi via [[CORE - IT Orchestrator]] (mis. reset-password, roles); `/account/forget-device` & `/account/reset` adalah endpoint **langsung** Employee Service (gated IT-staff).
+
 **CRUD Master Data**
 - CRUD personal data, personal-documents, work data, work-documents, schedule, dan system-auth
 - Transaksi create/update employee (multi-collection, `RequireHRISStaff`) lengkap dengan existence/completeness checks

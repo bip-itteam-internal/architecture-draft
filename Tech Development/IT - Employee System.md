@@ -7,7 +7,7 @@
 ### Manajemen Akun Karyawan
 - **Aktifkan / nonaktifkan akun** karyawan (`is_active`) — menonaktifkan akun menghilangkan kemampuan karyawan login ke sistem perusahaan. (`/account/activate|deactivate|status|toggle`)
 - **Reset akun** karyawan — reset password ke `employee_id`, **clear PIN & device** (1-akun-1-device), role dipertahankan; sistem mengirim notif WhatsApp (akun di-reset) sehingga karyawan melakukan onboarding ulang. (`/reset-password`)
-- **Reset perangkat tertaut** — saat reset akun, **seluruh registered device karyawan dibersihkan** (kebijakan 1-akun-1-device). Dengan ini karyawan bisa login di **perangkat berbeda** meskipun akunnya sebelumnya masih tertaut ke device lama (mis. ganti HP). Sistem melaporkan jumlah device yang dibersihkan (`devices_cleared`).
+- **Reset perangkat tertaut** — saat reset akun, **seluruh registered device karyawan dibersihkan** (kebijakan 1-akun-1-device). Dengan ini karyawan bisa login di **perangkat berbeda** meskipun akunnya sebelumnya masih tertaut ke device lama (mis. ganti HP). Sistem melaporkan jumlah device yang dibersihkan (`devices_cleared`). Selain lewat reset akun, ada **endpoint khusus `/account/forget-device`** (Employee Service) yang me-revoke semua device & browser **tanpa** reset password — pas untuk ganti HP tanpa mengganggu kredensial; lihat [[Microservices - Employee Service]].
 
 ### Manajemen Role & Akses
 - **Lihat / set `system_roles`** karyawan (peta `module → role`) — menentukan modul & level akses (admin/supervisor/staff/security, dll) yang dipakai gateway untuk otorisasi. (`/roles/get`, `/roles/set`)
