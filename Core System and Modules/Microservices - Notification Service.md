@@ -34,7 +34,8 @@
 
 ## Belum Diimplementasikan / Catatan
 
-- Tidak ada stub berarti — service sudah fungsional penuh.
+- **Channel Email (direncanakan)** — belum ada di kode; dibutuhkan untuk notifikasi **kandidat recruitment** ([[Microservices - Recruitment Service]]). Rekomendasi provider **Resend** (transactional, dukung attachment mis. offer letter PDF); prasyarat deliverability: SPF/DKIM/DMARC di domain `bharatainternasional.com`.
+- Selain email, channel yang ada (inbox/FCM/WhatsApp/splash/article) tidak ada stub berarti — fungsional penuh.
 - Group `/debug/fcm` ditandai dapat dihapus saat production.
 
 ## Dependencies & Integrasi
