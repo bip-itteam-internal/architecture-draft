@@ -37,6 +37,10 @@ Tidak wajib semua repo — cukup vault + repo yang sedang didokumentasikan.
 
 **Area non-domain:** `Benchmark` — **riset/perbandingan produk eksternal** (mis. `Benchmark - ERPGo`, prefix `ERPGo -`). Sifatnya *point-in-time research*: sisi produk eksternal **dikecualikan** dari grounded-in-code; **sisi Bharata tetap grounded + wikilink**. Tiap dok ditandai status 🟡 dan menaut ke dok arsitektur terkait.
 
+**Area non-domain:** `Decisions` (prefix `ADR -`) — **Architecture/Business Decision Records**: satu file per keputusan (mis. `ADR - 0001 Akuntansi via Accurate`), format Context → Decision → Consequences. Grounded ke kondisi nyata; tandai `Superseded` bila digantikan ADR lain.
+
+> **Dok meta root** (di akar vault, tanpa prefix): `README` · `HOMEPAGE` (peta) · `CLAUDE` (rulebook) · `SCRUM SPECS` (proses) · `ROADMAP` (arah/prioritas). Bukan domain; jangan beri prefix.
+
 ## 3. Konvensi penamaan file
 
 Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
@@ -47,6 +51,7 @@ Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
 - `QA -` → **Quality & Regulatory** (QA/RA farmasi; mis. `QA - CPOB (GMP)`)
 - `REF -` → **Reference** (glosarium, data dictionary, ownership; mis. `REF - Glossary`)
 - `ERPGo -` (atau prefix nama-produk lain) → **Benchmark** (riset produk eksternal)
+- `ADR -` → **Decisions** (mis. `ADR - 0002 Database-per-Service`)
 - Karakter `/` tidak boleh di nama file (pakai `-`, mis. `IT - CI-CD`).
 
 ## 4. Wikilink

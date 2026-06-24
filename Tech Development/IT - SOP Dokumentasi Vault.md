@@ -38,6 +38,7 @@ Format nama file **selalu**: `Prefix - Nama.md` — flat, tanpa `/` di nama (pak
 | QA/RA farmasi (CPOB/BPOM/batch/CAPA/ED) | Quality & Regulatory | `QA -` |
 | Glosarium / data dictionary / ownership | Reference | `REF -` |
 | Riset produk eksternal (mis. ERPGo) | Benchmark | `ERPGo -` (atau nama produk) |
+| Keputusan arsitektur/bisnis (ADR) | Decisions | `ADR -` |
 | Belum jelas domainnya | Unknown or not listed | (sesuaikan terdekat) |
 
 > Obsidian resolve wikilink lewat **basename** → pindah folder aman; **rename file = perbarui semua wikilink** yang menunjuk nama lama.
