@@ -39,6 +39,10 @@
 - **Fase 3 (sedang)**: [[DB - Data Dictionary]] · [[IT - Runbooks]] · [[IT - Environment Inventory]]
 - Lengkapi [[REF - Ownership & RACI]] dengan pemilik nyata per service/dok.
 
+## Roadmap per-domain
+
+- [[HRIS - Roadmap]] — fase perbaikan + fitur HRIS (grounded per area)
+
 ## Dokumen Terkait
 
 - [[SCRUM SPECS]] · [[HOMEPAGE]] · [[ERPGo - Overview & Gap Matrix]] · [[REF - Ownership & RACI]]
