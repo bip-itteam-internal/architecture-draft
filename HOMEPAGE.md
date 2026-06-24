@@ -75,6 +75,8 @@ Service adalah end-point yang berinteraksi dengan database-nya masing-masing (da
 
 **Benchmark** → [[ERPGo - Overview & Gap Matrix]] (riset fitur produk eksternal vs bip-erp)
 
+**API Reference** → [[API - Index]] (daftar endpoint lengkap per service)
+
 **Mulai di sini (dev)** → [[DEVELOPER GUIDE]] (onboarding · workspace sibling · flow agent-kit · konvensi · git)
 
 **Roadmap & Keputusan** → [[ROADMAP]] · [[REF - Ownership & RACI]] · [[ADR - 0001 Akuntansi via Accurate]] · [[ADR - 0002 Database-per-Service]] · [[ADR - 0003 SSO-only Gateway]] · [[ADR - 0004 ERPGo Out-of-Scope]]

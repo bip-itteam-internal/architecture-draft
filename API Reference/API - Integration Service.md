@@ -1,0 +1,76 @@
+## Deskripsi
+
+*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, Desty, transaksi, items, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. ~174 rute. Grounded ke `services/integration/internal/interface/http/*`.*
+
+- **Implementasi**: [[Microservices - Integration Service]] · **Status**: ✅
+- **Indeks**: [[API - Index]] · Semua butuh gateway key kecuali webhook publik & `/health`.
+
+## Webhooks
+| Method | Path | Fungsi |
+|---|---|---|
+| POST | `/webhooks/services/desty` · `/shopee` · `/tiktok` | Terima webhook (PUBLIK, tanpa gateway) |
+| GET | `/webhooks/logs` · `/webhooks/logs/:id` · `/webhooks/tasks` · `/webhooks/accounts/desty` | Log & task webhook |
+| POST | `/webhooks/logs/:id/retry` | Retry pengiriman webhook |
+
+## Transactions / Orders
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/transactions/orders/list` · `/orders/:id` · `/orders/summary[/shops|/products]` | Order terpadu + ringkasan |
+| GET | `/transactions/master/shops` · `/channels` · `/status` | Master shop/channel/status |
+| GET/POST | `/transactions/summary/reports` (+ `/:id`, `/:id/items`, `/:id/invoices`, `/group-by-status`) | Laporan ringkasan (generate/list/detail) |
+| POST | `/transactions/summary/reports/:id/retry` · `/send/:service` · DELETE `/:id` | Retry/kirim/hapus laporan |
+| GET | `/transactions/insight/demography` | Insight demografi |
+
+## TikTok Shop
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/tiktok/shop/auth` · `/auth/callback` · `/authorized-shops` | OAuth + shop terotorisasi |
+| GET | `/tiktok/shop/orders/list[/direct]` · `/orders/detail[/direct]` · `/orders/sync` | Order (cache/direct/sync) |
+| GET | `/tiktok/shop/insight/gmv-winning-content` | Insight GMV |
+| GET/DELETE | `/tiktok/shop/accounts/list` · `/accounts/:id` | Akun TikTok Shop |
+
+## TikTok Business
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/tiktok/business/auth[/callback]` · `/advertisers[/info][/direct]` · `/stores[/products]` | Auth, advertiser, store |
+| GET | `/tiktok/business/report/integrated[/daily/ad][/sync][/list][/summary/list]` | Laporan integrated |
+| GET | `/tiktok/business/report/gmv_max/...` (performance, product, campaigns, items, summary, daily/sync) | Laporan GMV-Max |
+| GET | `/tiktok/business/sync/master-data` · `/accounts/list` · `/accounts/:id` (GET/POST/DELETE) | Sync & akun |
+
+## Shopee
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/shopee/auth[/callback]` · `/shops/list` · `/products/items` | OAuth, shop, produk |
+| GET | `/shopee/orders/list` · `/orders/detail` · `/orders/sync` · `/v2/shopee/orders/list` | Order (v1/v2/sync) |
+| GET | `/shopee/gms/item-performance[/sync|/summary]` · `/campaign-performance[/sync|/summary]` | Performa GMS |
+| GET/POST/DELETE | `/shopee/accounts/list` · `/accounts/:id` | Akun Shopee |
+
+## Accurate (akuntansi)
+| Method | Path | Fungsi |
+|---|---|---|
+| GET/POST/PUT/DELETE | `/accurate/settings/shops[/:id]` | Shop di Accurate |
+| GET/POST/PUT/DELETE | `/accurate/products[/list|/:id]` | Produk Accurate |
+| GET/POST/PUT/DELETE | `/accurate/bank-accounts[/list|/:id]` | Rekening bank Accurate |
+| GET/POST/PUT/DELETE | `/accurate/settings/kv-configs[/list|/:id]` | KV config Accurate |
+
+## Items · Credentials · Holidays
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/items/list` · `/items/sku/:sku` · `/items/:id[/history]` | Master item/SKU |
+| POST | `/items/` · `/items/bulk` · `/items/bundle` · `/items/variations` | Buat item/bundle/variasi |
+| PATCH/DELETE | `/items/:id` | Update/hapus item |
+| POST | `/credentials` | Kredensial platform |
+| GET/POST/DELETE | `/holidays[/:id]` | Hari libur kalkulasi |
+
+## Marketing Teams (admin) · Worker/Jobs
+| Method | Path | Fungsi |
+|---|---|---|
+| GET/POST/PATCH/DELETE | `/marketing/teams[/:id]` (+ `/members[/:employeeId]`, `/shops[/:shopAssignmentId]`) | Tim marketing + ACL shop (admin) |
+| GET | `/jobs/status` · `/jobs/histories` · `/jobs/configs` · `/jobs/:name/status|history|config` | Status/histori/config job |
+| POST/PUT | `/jobs/:name/trigger` · `/config` · `/disable` · `/enable` | Kelola scheduler |
+| GET | `/health` | Health (tanpa gateway) |
+
+> Banyak job terjadwal (sync TikTok/Shopee/Desty + webhook consumer 5 detik) — lihat [[IT - Background Jobs & Schedulers]].
+
+## Dokumen Terkait
+- [[Microservices - Integration Service]] · [[Sales - Marketplace Integration]] · [[External - Accurate]] · [[External - Desty]] · [[IT - Background Jobs & Schedulers]] · [[API - Index]]

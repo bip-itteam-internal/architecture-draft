@@ -39,6 +39,7 @@ Format nama file **selalu**: `Prefix - Nama.md` — flat, tanpa `/` di nama (pak
 | Glosarium / data dictionary / ownership | Reference | `REF -` |
 | Riset produk eksternal (mis. ERPGo) | Benchmark | `ERPGo -` (atau nama produk) |
 | Keputusan arsitektur/bisnis (ADR) | Decisions | `ADR -` |
+| Daftar endpoint per service | API Reference | `API -` |
 | Belum jelas domainnya | Unknown or not listed | (sesuaikan terdekat) |
 
 > Obsidian resolve wikilink lewat **basename** → pindah folder aman; **rename file = perbarui semua wikilink** yang menunjuk nama lama.

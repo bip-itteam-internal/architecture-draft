@@ -39,6 +39,8 @@ Tidak wajib semua repo — cukup vault + repo yang sedang didokumentasikan.
 
 **Area non-domain:** `Decisions` (prefix `ADR -`) — **Architecture/Business Decision Records**: satu file per keputusan (mis. `ADR - 0001 Akuntansi via Accurate`), format Context → Decision → Consequences. Grounded ke kondisi nyata; tandai `Superseded` bila digantikan ADR lain.
 
+**Area non-domain:** `API Reference` (prefix `API -`) — daftar **endpoint per service** (grounded ke kode). Satu file `API - <Service>.md` + `API - Index`; ikut §1/§4/§5; sinkron via `/sync-docs` saat rute berubah.
+
 > **Dok meta root** (di akar vault, tanpa prefix): `README` · `HOMEPAGE` (peta) · `CLAUDE` (rulebook) · `SCRUM SPECS` (proses) · `ROADMAP` (arah/prioritas) · `DEVELOPER GUIDE` (cara kerja dev). Bukan domain; jangan beri prefix.
 
 ## 3. Konvensi penamaan file
@@ -52,6 +54,7 @@ Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
 - `REF -` → **Reference** (glosarium, data dictionary, ownership; mis. `REF - Glossary`)
 - `ERPGo -` (atau prefix nama-produk lain) → **Benchmark** (riset produk eksternal)
 - `ADR -` → **Decisions** (mis. `ADR - 0002 Database-per-Service`)
+- `API -` → **API Reference** (mis. `API - Employee Service`)
 - Karakter `/` tidak boleh di nama file (pakai `-`, mis. `IT - CI-CD`).
 
 ## 4. Wikilink
