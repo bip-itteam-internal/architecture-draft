@@ -13,23 +13,39 @@
 | **Development** | `10.10.10.121` | port mirror production |
 | **Wiki dok** | `architecture.bharatainternasional.com` | export vault (lihat [[README]]) |
 
-## Port teramati (dari CORS gateway)
+## Port backend (internal, di belakang gateway) — grounded dari `.env.example`
 
-| Port | Dugaan peran | Status |
+| Port | Komponen |
+|---|---|
+| `6969` | API Gateway |
+| `6970` | employee-service |
+| `6971` | attendance-service |
+| `6972` | notification-service |
+| `6973` | file-service |
+| `6974` | insentive-service |
+| `6839` | integration-service |
+| `6975` | tiktok-shop-service |
+| `6976` | inventory-service |
+| `6977` | task-management-service |
+| `7000` | HRIS orchestrator |
+| `7001` | IT orchestrator |
+| `9000` / `9001` | MinIO API / console |
+
+> Tiap service juga punya Mongo container sendiri ([[DB - Overview and Notes]]). DB name: `employee_db`, `attendance_db`, `notification_db`, `insentive_db`, `integration_db`, `tiktok_shop_db`, `inventory_db`, `task_management_db`.
+
+## Port frontend/app — grounded dari CORS origin gateway
+
+| Port | Peran | Status |
 |---|---|---|
-| `6969` | API Gateway / web utama | TBD konfirmasi |
-| `3000` / `3001` | Frontend (Next.js) | TBD |
-| `9696` | (service/app) | TBD |
-| `4321` | Astro (guestbook?) | TBD |
-| `2700` | Task Manager FE (`tasks.*`) | TBD |
-| `6977` | task-management-service (dari `docker-compose.yml`) | grounded |
+| `3000` / `3001` | erp-frontend (Next.js) | grounded |
+| `9696` | app/web tambahan | TBD peran pasti |
+| `4321` | Astro (guestbook) | grounded (default Astro) |
+| `2700` | Task Manager FE (`tasks.*`) | grounded |
 | `4370` / `4371` | Hardware fingerprint extension (localhost) | grounded |
-
-> Port→service final ditetapkan dari `.env` (`*_SERVICE_PORT`). Tiap service juga punya Mongo container sendiri ([[DB - Overview and Notes]]).
 
 ## Belum Diputuskan / Dilengkapi (TBD)
 
-- Pemetaan pasti tiap port ke service/app.
+- Peran pasti port `9696` (frontend/app) + host staging.
 - Spesifikasi VM/host (CPU/RAM/disk) → [[IT - Server, VMs and Databases]].
 - Daftar domain + sertifikat + siapa pengelola DNS.
 
