@@ -39,7 +39,7 @@ Tidak wajib semua repo — cukup vault + repo yang sedang didokumentasikan.
 
 **Area non-domain:** `Decisions` (prefix `ADR -`) — **Architecture/Business Decision Records**: satu file per keputusan (mis. `ADR - 0001 Akuntansi via Accurate`), format Context → Decision → Consequences. Grounded ke kondisi nyata; tandai `Superseded` bila digantikan ADR lain.
 
-> **Dok meta root** (di akar vault, tanpa prefix): `README` · `HOMEPAGE` (peta) · `CLAUDE` (rulebook) · `SCRUM SPECS` (proses) · `ROADMAP` (arah/prioritas). Bukan domain; jangan beri prefix.
+> **Dok meta root** (di akar vault, tanpa prefix): `README` · `HOMEPAGE` (peta) · `CLAUDE` (rulebook) · `SCRUM SPECS` (proses) · `ROADMAP` (arah/prioritas) · `DEVELOPER GUIDE` (cara kerja dev). Bukan domain; jangan beri prefix.
 
 ## 3. Konvensi penamaan file
 
