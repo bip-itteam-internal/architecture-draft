@@ -80,6 +80,19 @@ Doc: [[Microservices - Task Management Service]]
 
 > Catatan: task-management juga membaca `employee_db` (ERP) secara **read-only** untuk memperoleh nama/divisi.
 
+### recruitment — `recruitment-mongo-db`
+Doc: [[Microservices - Recruitment Service]] (⚠️ Fase 1-3)
+- job_requisition
+- job_posting
+- candidate
+- screening_result
+- interview
+- technical_test_result
+- psychotest
+- background_check
+- offer
+- audit_logs
+
 ## Infrastruktur Data Bersama (Redis, MinIO)
 
 - **Redis** — cache response gateway sekaligus queue antar service. Key di-namespace per domain, mis. prefix `srv:integration`.

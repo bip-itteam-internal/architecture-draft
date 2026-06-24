@@ -4,7 +4,7 @@
 
 - **Stack**: Go + Fiber v2 + MongoDB (`recruitment_db`) — selaras pola service bip-erp lain
 - **Path**: `services/recruitment` *(direncanakan)*
-- **Status**: 🟡 Konsep / Direncanakan — **belum ada di kode**; di belakang [[CORE - API Master Gateway]], auth **SSO** ([[CORE - SSO Flow]]), role HR/recruitment dari `system_roles`
+- **Status**: ⚠️ **Implemented (Fase 1-3, BE)** di `services/recruitment` (branch `feat/recruitment-service`) — pipeline inti jalan; Fase 4-5 + FE menyusul. Di belakang [[CORE - API Master Gateway]], auth **SSO** ([[CORE - SSO Flow]]), role `system_roles["hris"]`. Port `6979`, mongo `recruitment-mongo-db`.
 
 ## Endpoint / Fitur (Direncanakan)
 
@@ -58,9 +58,9 @@
 - [[CORE - API Master Gateway]] · [[CORE - SSO Flow]] — routing + auth
 - [[DB - Overview and Notes]] — pola database-per-service
 
-## Rencana Implementasi (disetujui — eksekusi DITUNDA)
+## Implementasi (Fase 1-3 — ✅ SELESAI)
 
-> Hasil `/plan` 2026-06-24. Scope & keputusan dikunci; eksekusi ditunda ("kita buat nanti"). Saat dilanjutkan: TDD per slice.
+> Diimplementasi 2026-06-24 di branch `feat/recruitment-service` (7 slice, `go build`/`test`/`vet` hijau, di-push ke origin). **Live:** Job Requisition + approval (SPV→HR→Direktur/Secretary), Job Posting, Candidate + CV (MinIO), stage records (screening/interview/technical-test/background-check/psikotes), Offer + hire → `/onboarding/register`, audit log + notif inbox internal. **Belum (Fase 4-5):** AI CV screening, psikotes online, portal publik, WhatsApp, Glints sync, FE. Detail di bawah = yang dibangun.
 
 **Git workflow:** di repo `bip-erp`, **branch dari `main`** (checkout `main` + `git pull` dulu — HEAD saat ini di `feat/sso-task-management`), buat branch baru **`feat/recruitment-service`** (konvensi repo `feat/<nama>`).
 

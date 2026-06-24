@@ -27,6 +27,8 @@
 | `6975` | tiktok-shop-service |
 | `6976` | inventory-service |
 | `6977` | task-management-service |
+| `6978` | manufacture-service |
+| `6979` | recruitment-service |
 | `7000` | HRIS orchestrator |
 | `7001` | IT orchestrator |
 | `9000` / `9001` | MinIO API / console |

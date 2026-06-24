@@ -26,7 +26,7 @@
 
 ## Fase C — Net-new prioritas (desain sudah matang)
 
-- **Recruitment / ATS** — [[HRIS - Recruitment]] + [[Microservices - Recruitment Service]] (🟡, service belum ada). Bergantung **Email (Fase B)** untuk notifikasi kandidat.
+- **Recruitment / ATS** — [[HRIS - Recruitment]] + [[Microservices - Recruitment Service]] (⚠️ **BE Fase 1-3 SELESAI**, branch `feat/recruitment-service`). Belum: Fase 4-5 (AI screening, psikotes online, portal publik, WhatsApp, Glints sync) + FE. Notifikasi kandidat via email = masih bergantung **Email (Fase B)**.
 
 ## Fase D — Konsolidasi Performance (hindari duplikasi)
 
