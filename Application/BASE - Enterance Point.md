@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Landing page / titik masuk aplikasi yang menyediakan portal ke sistem lain. Saat ini diimplementasikan secara konkret di web ([[APP - Web Application]]) sebagai halaman login + dashboard + sidebar portal berbasis role.*
+*Landing page / titik masuk aplikasi yang menyediakan portal ke sistem lain. Saat ini diimplementasikan secara konkret di web ([[APP - Web ERP]]) sebagai halaman login + dashboard + sidebar portal berbasis role.*
 
 ## Konsep
 
@@ -15,7 +15,7 @@ Daftar portal ditampilkan di sisi kiri layar: judul module (HRIS, IT, dll) hanya
 
 ![[landing-page-example.png]]
 
-## Status Implementasi (di [[APP - Web Application]])
+## Status Implementasi (di [[APP - Web ERP]])
 
 **Sudah diimplementasikan**
 - Halaman login (`employee_id` + password) dengan handoff **SSO** (mint one-time code via `/auth/sso/ticket`)
@@ -41,5 +41,5 @@ Daftar portal ditampilkan di sisi kiri layar: judul module (HRIS, IT, dll) hanya
 
 ## Dokumen Terkait
 
-- [[APP - Web Application]]
-- [[APP - Mobile Application]]
+- [[APP - Web ERP]]
+- [[APP - MyBharata]]

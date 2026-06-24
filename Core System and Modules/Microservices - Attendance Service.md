@@ -95,4 +95,4 @@
 - [[HRIS - Shift Exchange]]
 - [[HRIS - Attendance Correction]]
 - [[HRIS - Payroll]]
-- [[APP - Mobile Application]]
+- [[APP - MyBharata]]

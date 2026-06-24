@@ -50,4 +50,4 @@
 - [[Microservices - Inventory Service]]
 - [[Microservices - Notification Service]]
 - [[DB - Overview and Notes]]
-- [[APP - Mobile Application]]
+- [[APP - MyBharata]]

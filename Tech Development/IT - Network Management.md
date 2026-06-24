@@ -11,7 +11,7 @@
 
 ## WiFi Kantor
 
-- Sekitar **±50 access point** kantor; **MAC di-allowlist** (collection `company_wifi`) dan dipakai sebagai **validasi geofencing** untuk clock-in via [[APP - Mobile Application]]
+- Sekitar **±50 access point** kantor; **MAC di-allowlist** (collection `company_wifi`) dan dipakai sebagai **validasi geofencing** untuk clock-in via [[APP - MyBharata]]
 - **Pengelolaan allowlist oleh IT** (tambah/hapus AP) lewat endpoint network attendance — lihat [[IT - Employee System]] & [[Microservices - Attendance Service]]
 
 ## Monitoring Jaringan

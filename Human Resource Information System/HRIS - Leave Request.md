@@ -6,7 +6,7 @@
 
 * Karyawan perlu mengajukan sakit, izin, cuti, atau perjalanan dinas dengan jejak yang bisa dilacak (bukan lewat chat/manual ke HR).
 * Pengajuan digital memberi: validasi jenis & durasi, cek kuota cuti, persetujuan berjenjang, dan penerapan otomatis ke attendance.
-* Diajukan dari [[APP - Mobile Application]] (menu Submission) dan diproses oleh [[Microservices - Attendance Service]].
+* Diajukan dari [[APP - MyBharata]] (menu Submission) dan diproses oleh [[Microservices - Attendance Service]].
 
 ## Jenis Pengajuan
 
@@ -96,8 +96,8 @@ Push **FCM + inbox** via [[Microservices - Notification Service]] pada event: pe
 
 ## Implementasi Frontend
 
-- **Mobile** ([[APP - Mobile Application]] — Submission): pilih jenis & subtipe, isi tanggal/durasi, upload dokumen, lihat status & kuota cuti
-- **Web/HRIS**: HR & supervisor mereview/menyetujui pengajuan dari modul kehadiran ([[APP - Web Application]])
+- **Mobile** ([[APP - MyBharata]] — Submission): pilih jenis & subtipe, isi tanggal/durasi, upload dokumen, lihat status & kuota cuti
+- **Web/HRIS**: HR & supervisor mereview/menyetujui pengajuan dari modul kehadiran ([[APP - Web ERP]])
 
 ## Kebutuhan
 

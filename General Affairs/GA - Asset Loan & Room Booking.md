@@ -21,7 +21,7 @@
 
 - [[GA - Inventory Management]] — status aset (tersedia / sedang dipinjam) & data master aset yang dapat dipinjam
 - [[GA - Machine & Utility Maintenance]] · [[GA - Building Maintenance]] — menerima eskalasi bila aset rusak saat dikembalikan
-- [[APP - Mobile Application]] — entry-point pengguna (menu **Meeting Room** & **Vehicle**, saat ini masih *Coming Soon*)
+- [[APP - MyBharata]] — entry-point pengguna (menu **Meeting Room** & **Vehicle**, saat ini masih *Coming Soon*)
 
 ## Kendala
 
@@ -36,11 +36,11 @@
 - Kendaraan: dengan **sopir** atau boleh dikemudikan sendiri? Perlu data BBM/odometer?
 - Integrasi kalender (mis. Google Calendar) atau internal saja?
 - Pemilik proses & approver (GA sepenuhnya, atau melibatkan sekretariat/atasan)?
-- Catatan: menu **"Loan"** di [[APP - Mobile Application]] **bukan** peminjaman aset di dok ini (kemungkinan **pinjaman karyawan/kasbon** — sisi HR; perlu konfirmasi).
+- Catatan: menu **"Loan"** di [[APP - MyBharata]] **bukan** peminjaman aset di dok ini (kemungkinan **pinjaman karyawan/kasbon** — sisi HR; perlu konfirmasi).
 
 ## Dokumen Terkait
 
 - [[GA - Inventory Management]] — master aset (fondasi peminjaman)
 - [[GA - Machine & Utility Maintenance]] · [[GA - Building Maintenance]] — eskalasi kerusakan
-- [[APP - Mobile Application]] — entry-point (Meeting Room / Vehicle)
+- [[APP - MyBharata]] — entry-point (Meeting Room / Vehicle)
 - [[GA - Big Pictures]]

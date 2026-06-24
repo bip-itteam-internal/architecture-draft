@@ -21,13 +21,13 @@
 ### erp-frontend (web "hris-dashboard") — GitHub Actions + PM2
 - **Trigger**: push ke `main` + `workflow_dispatch` (rollback)
 - **Alur**: SSH ke VM → `git reset --hard origin/main` → **PM2** jalankan `ecosystem.config.cjs` (app `web-erp`, otomatis `pnpm install && build && prod`) → verify `pm2 info`
-- App dir: `/home/erp/apps/frontend-hris-dashboard`. Lihat [[APP - Web Application]]
+- App dir: `/home/erp/apps/frontend-hris-dashboard`. Lihat [[APP - Web ERP]]
 
 ### mybharata-app (mobile Flutter) — Codemagic
 - **Trigger branch**: `development` → build staging (APK/IPA) → **Firebase App Distribution**; `release/*` atau `main` → build prod (AAB/IPA) → **Google Play Store & App Store Connect**
 - Tahap: unit test → `build_runner` → build per flavor (`dev`/`prod`)
 - **Secrets** disimpan sebagai Base64 di Codemagic env (FCM `google-services.json`, `GoogleService-Info.plist`, keystore `.jks`), direkonstruksi via pre-build script
-- **Notifikasi**: Slack `#hris-mobile-alerts`. Lihat [[APP - Mobile Application]]
+- **Notifikasi**: Slack `#hris-mobile-alerts`. Lihat [[APP - MyBharata]]
 
 ### Lainnya
 - **task-management** FE & BE — GitHub Actions `local-deploy.yml` (deploy via self-hosted runner). Lihat [[APP - Dynamic Task Tracker]]

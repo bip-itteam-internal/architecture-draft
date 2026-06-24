@@ -13,7 +13,7 @@
 
 ## Fitur / Proses yang Direncanakan
 
-- Lapor insiden (kronologi, lokasi, korban, foto) — dapat lewat [[APP - Mobile Application]]
+- Lapor insiden (kronologi, lokasi, korban, foto) — dapat lewat [[APP - MyBharata]]
 - Investigasi akar masalah → kontrol (terhubung HIRADC/IBPR di [[GA - Risk Management]])
 - CAPA + status; rekap statistik insiden (frekuensi, tingkat keparahan)
 - Eskalasi temuan dari [[GA - Checklist Management]] (mis. APAR/panel tidak layak)
@@ -22,4 +22,4 @@
 
 - [[GA - Big Pictures]]
 - [[GA - Risk Management]] · [[GA - Audit Internal System]] · [[GA - Checklist Management]]
-- [[GA - Inventory Management]] (peralatan P3K/K3) · [[APP - Mobile Application]]
+- [[GA - Inventory Management]] (peralatan P3K/K3) · [[APP - MyBharata]]

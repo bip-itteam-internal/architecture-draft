@@ -22,7 +22,7 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 - **BOM / Resep** (hybrid) — komponen bahan baku/kemas per barang jadi/WIP
 - **Perencanaan kebutuhan** — rencana produksi/target → kebutuhan dihitung otomatis via BOM, **bisa di-override/tambah manual** (hybrid)
 - **Perhitungan kekurangan** — kebutuhan vs stok → daftar kekurangan → diteruskan ke [[GA - Procurement System]] untuk pengadaan
-- **Stock opname & penyesuaian** — integrasi flow yang sudah ada: hitung fisik → selisih sistem vs fisik → barang rusak/ED ke karantina (input + foto via [[APP - Mobile Application]]) → berita acara → adjustment
+- **Stock opname & penyesuaian** — integrasi flow yang sudah ada: hitung fisik → selisih sistem vs fisik → barang rusak/ED ke karantina (input + foto via [[APP - MyBharata]]) → berita acara → adjustment
 
 ## Model Data
 
@@ -43,10 +43,10 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 - **Integrasi**:
 	- [[External - Accurate]] — **tarik stok awal** → bertahap menjadi source of truth (hybrid bertahap)
 	- [[GA - Procurement System]] — kekurangan → pengadaan/PO
-	- [[APP - Mobile Application]] — input stock opname & foto barang rusak/ED
+	- [[APP - MyBharata]] — input stock opname & foto barang rusak/ED
 	- [[Microservices - Notification Service]] — notifikasi (stok rendah, kekurangan, opname)
 	- [[Microservices - Employee Service]] — audit (pencatatan oleh siapa)
-- **UI**: modul **Warehouse** di [[APP - Web Application]]
+- **UI**: modul **Warehouse** di [[APP - Web ERP]]
 
 ## Rollout Bertahap
 
@@ -68,4 +68,4 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 - [[Manufacture - Issue Material Miss Count]] · [[Manufacture - Issue ED Material after Stock Opname]] — issue produksi yang dijawab sistem ini
 - [[WH - Management System]] · [[WH - Inbound (Receiving)]] · [[WH - Outbound (Sending)]]
 - [[GA - Procurement System]]
-- [[External - Accurate]] · [[APP - Mobile Application]] · [[APP - Web Application]]
+- [[External - Accurate]] · [[APP - MyBharata]] · [[APP - Web ERP]]

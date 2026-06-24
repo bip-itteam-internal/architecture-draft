@@ -10,7 +10,7 @@
 
 | Komponen | Peran dalam SSO | Dokumen |
 |---|---|---|
-| Web ERP (`hris-dashboard`) | **Identity Provider** — tempat login utama & pemicu handoff | [[APP - Web Application]] |
+| Web ERP (`hris-dashboard`) | **Identity Provider** — tempat login utama & pemicu handoff | [[APP - Web ERP]] |
 | API Master Gateway | Menerbitkan JWT, menyimpan one-time code, endpoint `ticket`/`redeem` | [[CORE - API Master Gateway]] |
 | Employee Service | **Sumber kredensial** — validasi login, balikin `PayloadJWT` | [[Microservices - Employee Service]] |
 | Task Manager (FE) | **Konsumen SSO** — redeem code jadi sesi | [[APP - Dynamic Task Tracker]] |
@@ -87,9 +87,9 @@ sequenceDiagram
 
 | Aplikasi | SSO? | Keterangan |
 |---|---|---|
-| [[APP - Web Application]] (web ERP) | ✅ (IdP) | Tempat login utama + pemicu handoff |
+| [[APP - Web ERP]] (web ERP) | ✅ (IdP) | Tempat login utama + pemicu handoff |
 | [[APP - Dynamic Task Tracker]] (Task Manager) | ✅ (konsumen) | Gateway-cutover selesai; tanpa login lokal |
-| [[APP - Mobile Application]] (MyBharata) | ❌ | Login JWT **langsung** ke HRIS backend (`admin.hris-bharata.com`), ekosistem terpisah |
+| [[APP - MyBharata]] (MyBharata) | ❌ | Login JWT **langsung** ke HRIS backend (`admin.hris-bharata.com`), ekosistem terpisah |
 | [[GA - Guestbook System (Complete)]] | ❌ | Publik, akses via token kunjungan (bukan SSO) |
 
 ## Catatan & Keterbatasan
@@ -105,7 +105,7 @@ sequenceDiagram
 
 - [[CORE - API Master Gateway]]
 - [[Microservices - Employee Service]]
-- [[APP - Web Application]]
+- [[APP - Web ERP]]
 - [[APP - Dynamic Task Tracker]]
 - [[Microservices - Task Management Service]]
 - [[BASE - Enterance Point]]

@@ -3,7 +3,7 @@
 *Konsep (sisi Marketing) integrasi **marketplace** ke ERP — menghubungkan **TikTok Shop & Shopee** (juga TikTok Business/Ads) untuk menyinkronkan order/penjualan & performa iklan, lalu menjembatani ke akuntansi. Implementasi back-end-nya sudah ada di [[Microservices - Integration Service]].*
 
 - **Status**: ✅ Implemented (backend) — dok ini melengkapi sisi konsep/bisnis yang sebelumnya belum ada
-- **Implementasi**: [[Microservices - Integration Service]] (Go) + modul Integration di [[APP - Web Application]]
+- **Implementasi**: [[Microservices - Integration Service]] (Go) + modul Integration di [[APP - Web ERP]]
 
 ## Latar Belakang
 

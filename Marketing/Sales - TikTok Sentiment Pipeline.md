@@ -1,9 +1,9 @@
 ## Deskripsi
 
-*Konsep (sisi Marketing) **intelijen kompetitor** berbasis komentar TikTok: mendengarkan suara pelanggan/penonton di konten kompetitor untuk menemukan **tema keluhan** dan **ide produk** sebagai bahan riset konten & R&D. Implementasi teknisnya (FastAPI + dashboard Next.js) ada di [[APP - TikTok Sentiment Pipeline]].*
+*Konsep (sisi Marketing) **intelijen kompetitor** berbasis komentar TikTok: mendengarkan suara pelanggan/penonton di konten kompetitor untuk menemukan **tema keluhan** dan **ide produk** sebagai bahan riset konten & R&D. Implementasi teknisnya (FastAPI + dashboard Next.js) ada di [[APP - Tiktok Insight Analyzer]].*
 
 - **Status**: ✅ Implemented — berjalan otomatis tiap awal pekan
-- **Implementasi**: [[APP - TikTok Sentiment Pipeline]] (folder `scraping`, Python/FastAPI + Next.js)
+- **Implementasi**: [[APP - Tiktok Insight Analyzer]] (folder `scraping`, Python/FastAPI + Next.js)
 
 ## Latar Belakang
 
@@ -24,7 +24,7 @@
 
 ## Dokumen Terkait
 
-- [[APP - TikTok Sentiment Pipeline]] — implementasi (pipeline, API, dashboard)
+- [[APP - Tiktok Insight Analyzer]] — implementasi (pipeline, API, dashboard)
 - [[Sales - GMV Creative]]
 - [[Sales - Veo (Gemini) Implementation]]
 - [[Sales - Dashboard]]

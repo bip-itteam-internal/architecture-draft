@@ -40,15 +40,15 @@
 
 ## Aktor & Role
 
-| Aktor                               | Peran                                                                                                                         |
-| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| **Pengaju (SPV / staf dept)** | Mengajukan Job Requisition (dalam sisa kuota) +**usul kualifikasi** kandidat *(siapa boleh mengajukan: lihat poin 1)* |
-| **SPV / Kepala departemen**   | Approval requisition**tingkat 1**; juga hiring manager (ikut interview & penilaian)                                     |
-| **HR Recruiter**              | Mengelola pipeline: validasi requisition, lowongan, pelamar, jadwal (termasuk **jadwal psikotes**), **input hasil psikotes**, offer                                                    |
-| **HR**                        | Approval requisition**tingkat 2**; **finalkan kualifikasi**; penerbitan offer                                     |
-| **Psikolog / Asesor**         | Melaksanakan & **menginterpretasi psikotes** (skor + rekomendasi); **internal** atau **vendor** pihak ketiga *(internal vs vendor: lihat TBD)*                |
-| **Direktur**                  | Approval bila**melebihi kuota** / headcount-posisi tertentu *(opsional — lihat TBD)*                                 |
-| **Kandidat**                  | Eksternal —**tanpa akun ERP** (data dikelola HR)                                                                       |
+| Aktor                         | Peran                                                                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pengaju (SPV / staf dept)** | Mengajukan Job Requisition (dalam sisa kuota) +**usul kualifikasi** kandidat *(siapa boleh mengajukan: lihat poin 1)*                          |
+| **SPV / Kepala departemen**   | Approval requisition**tingkat 1**; juga hiring manager (ikut interview & penilaian)                                                            |
+| **HR Recruiter**              | Mengelola pipeline: validasi requisition, lowongan, pelamar, jadwal (termasuk **jadwal psikotes**), **input hasil psikotes**, offer            |
+| **HR**                        | Approval requisition**tingkat 2**; **finalkan kualifikasi**; penerbitan offer                                                                  |
+| **Psikolog / Asesor**         | Melaksanakan & **menginterpretasi psikotes** (skor + rekomendasi); **internal** atau **vendor** pihak ketiga *(internal vs vendor: lihat TBD)* |
+| **Direktur**                  | Approval bila **melebihi kuota** / headcount-posisi tertentu *(opsional — lihat TBD)*                                                          |
+| **Kandidat**                  | Eksternal —**tanpa akun ERP** (data dikelola HR)                                                                                               |
 
 ## Model Data
 
@@ -73,7 +73,7 @@
   - [[Microservices - File Service]] — penyimpanan CV/dokumen pelamar + **report PDF psikotes** (MinIO)
   - **LLM (OpenRouter)** — AI CV screening (analisis CV vs kriteria); reuse infra LLM yang dipakai Ideamills ([[Sales - Veo (Gemini) Implementation]])
   - **Psikotes** — modul di `recruitment-service`; mode **manual/vendor** cukup catat hasil + lampiran via [[Microservices - File Service]], mode **online** butuh **test-engine + bank soal (TBD / fase lanjut)**; undangan jadwal via [[Microservices - Notification Service]] (internal HR; ke kandidat eksternal lihat **Pertanyaan untuk HRD** poin 8)
-- **UI**: modul **Recruitment** di [[APP - Web Application]] (HR & SPV) + **portal lowongan publik** untuk pelamar (self-apply + upload CV)
+- **UI**: modul **Recruitment** di [[APP - Web ERP]] (HR & SPV) + **portal lowongan publik** untuk pelamar (self-apply + upload CV)
 
 ## Pertanyaan untuk HRD (bahan diskusi)
 
@@ -160,4 +160,4 @@
 - [[HRIS - Personalia]] · [[HRIS - Big Pictures]]
 - [[Microservices - Employee Service]] — onboarding/register & master data
 - [[Microservices - Notification Service]]
-- [[APP - Web Application]]
+- [[APP - Web ERP]]

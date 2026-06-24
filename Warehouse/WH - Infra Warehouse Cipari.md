@@ -14,7 +14,7 @@
 - [ ] Tentukan **koordinat GPS** warehouse (untuk validasi lokasi attendance jika perlu)
 - [ ] Internet/koneksi cadangan — TBD
 
-> Catatan: **tidak ada mesin fingerprint** yang direncanakan untuk warehouse baru — absensi mengandalkan **aplikasi mobile** ([[APP - Mobile Application]]) dengan validasi WiFi/geofencing. Bila berubah, serial mesin perlu masuk allowlist attendance.
+> Catatan: **tidak ada mesin fingerprint** yang direncanakan untuk warehouse baru — absensi mengandalkan **aplikasi mobile** ([[APP - MyBharata]]) dengan validasi WiFi/geofencing. Bila berubah, serial mesin perlu masuk allowlist attendance.
 
 ## Server / NVR / CCTV
 
@@ -41,4 +41,4 @@
 - [[WH - Management System]]
 - [[Microservices - Attendance Service]]
 - [[IT - Server, VMs and Databases]]
-- [[APP - Mobile Application]]
+- [[APP - MyBharata]]

@@ -70,6 +70,6 @@
 
 ## Dokumen Terkait
 
-- [[APP - Mobile Application]]
+- [[APP - MyBharata]]
 - [[HRIS - Key Performance Index]]
 - [[HRIS - Payroll]]

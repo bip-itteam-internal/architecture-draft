@@ -71,7 +71,7 @@ Gateway meneruskan request ke seluruh service internal berikut:
 - [[CORE - HRIS Orchestrator]] — orchestrator domain HRIS
 - [[CORE - IT Orchestrator]] — orchestrator domain IT
 
-Klien utama gateway adalah [[APP - Mobile Application]]. Penyimpanan terkait dijelaskan di [[DB - Overview and Notes]].
+Klien utama gateway adalah [[APP - MyBharata]]. Penyimpanan terkait dijelaskan di [[DB - Overview and Notes]].
 
 ## Dokumen Terkait
 
@@ -82,4 +82,4 @@ Klien utama gateway adalah [[APP - Mobile Application]]. Penyimpanan terkait dij
 - [[Microservices - Notification Service]]
 - [[Microservices - File Service]]
 - [[DB - Overview and Notes]]
-- [[APP - Mobile Application]]
+- [[APP - MyBharata]]

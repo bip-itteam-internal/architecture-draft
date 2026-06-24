@@ -48,4 +48,4 @@ Plus aggregate read: `/v2/multi`, `/v2/multi/summary`, `/:id/multi`.
 ## Dokumen Terkait
 
 - [[CORE - IT Orchestrator]]
-- [[APP - Mobile Application]]
+- [[APP - MyBharata]]

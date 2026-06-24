@@ -4,7 +4,7 @@
 
 ## Seperti apa sistem ERP itu?
 
-**Backend** ERP (`bip-erp`) berupa **mono-repo microservices Go** (di belakang satu API Gateway). **Frontend & aplikasi** berada di **repo terpisah**: web ([[APP - Web Application]]), mobile ([[APP - Mobile Application]]), Task Manager ([[APP - Dynamic Task Tracker]]), generator konten (Ideamills → [[Sales - Veo (Gemini) Implementation]]), dan beberapa tool lain.
+**Backend** ERP (`bip-erp`) berupa **mono-repo microservices Go** (di belakang satu API Gateway). **Frontend & aplikasi** berada di **repo terpisah**: web ([[APP - Web ERP]]), mobile ([[APP - MyBharata]]), Task Manager ([[APP - Dynamic Task Tracker]]), generator konten (Ideamills → [[Sales - Veo (Gemini) Implementation]]), dan beberapa tool lain.
 
 Interaksi antar service dapat diinterpretasikan seperti gambar di bawah ini
 ![[erp-request-nutshell.png]]
@@ -65,7 +65,7 @@ Service adalah end-point yang berinteraksi dengan database-nya masing-masing (da
 
 **Microservices** → [[Microservices - Employee Service]] · [[Microservices - Attendance Service]] · [[Microservices - Notification Service]] · [[Microservices - File Service]] · [[Microservices - Insentive Service]] · [[Microservices - Integration Service]] · [[Microservices - Inventory Service]] · [[Microservices - Task Management Service]] · [[Microservices - TikTok Shop Service]]
 
-**Aplikasi** → [[BASE - Enterance Point]] · [[APP - Web Application]] · [[APP - Mobile Application]] · [[APP - Dynamic Task Tracker]] · [[APP - Ideamills]] · [[APP - TikTok Sentiment Pipeline]] · [[APP (Extension) - Fingerprint Listener (Complete)]]
+**Aplikasi** → [[BASE - Enterance Point]] · [[APP - Web ERP]] · [[APP - MyBharata]] · [[APP - Dynamic Task Tracker]] · [[APP - Ideamills]] · [[APP - Tiktok Insight Analyzer]] · [[APP (Extension) - Fingerprint Listener (Complete)]]
 
 **Domain (Big Pictures)** → [[HRIS - Big Pictures]] · [[Sales - Big Pictures]] · [[GA - Big Pictures]] · [[IT - Big Pictures]] · [[WH - Management System]] · [[Finance]]
 

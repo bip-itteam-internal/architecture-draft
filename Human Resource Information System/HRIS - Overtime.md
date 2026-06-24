@@ -26,4 +26,4 @@
 
 - [[HRIS - Big Pictures]]
 - [[HRIS - Attendance System]] · [[Microservices - Attendance Service]] · [[HRIS - Payroll]]
-- [[HRIS - Leave Request]] (pola pengajuan→approval) · [[APP - Mobile Application]]
+- [[HRIS - Leave Request]] (pola pengajuan→approval) · [[APP - MyBharata]]

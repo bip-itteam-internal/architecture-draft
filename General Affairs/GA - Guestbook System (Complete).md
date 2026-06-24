@@ -16,7 +16,7 @@
 
 **Alur tamu:** Security tampilkan QR → pengunjung scan → `/visit/<token>` → token divalidasi → isi form (kategori personal/rombongan; nama, telepon, instansi, plat, tujuan, orang yang ditemui, jumlah orang bila rombongan) → submit → `/success`. Jika error API, muncul toast dan form tetap aktif.
 
-**Jalur cepat karyawan terlambat** (lewat [[APP - Mobile Application]]): karyawan clock-in di gerbang → Security pilih "scan late employee QR" → scan QR data karyawan → detail terisi otomatis & diteruskan ke guestbook.
+**Jalur cepat karyawan terlambat** (lewat [[APP - MyBharata]]): karyawan clock-in di gerbang → Security pilih "scan late employee QR" → scan QR data karyawan → detail terisi otomatis & diteruskan ke guestbook.
 
 ## Integrasi Backend & Notifikasi
 
@@ -26,7 +26,7 @@
 	- Submit tamu: `POST /public/guestbook`
 - Token guestbook dirotasi tiap hari (pukul 04:00) oleh sistem ERP.
 - **Notifikasi host** (mis. WhatsApp/FCM saat tamu datang) **dipicu di sisi backend** sebagai respon `POST /public/guestbook`, bukan oleh aplikasi web ini. Di FE hanya ada toast on-screen.
-- **Tampilan/daftar guestbook** untuk GA/Security & role HR ada di [[APP - Web Application]] (bukan di aplikasi tamu ini).
+- **Tampilan/daftar guestbook** untuk GA/Security & role HR ada di [[APP - Web ERP]] (bukan di aplikasi tamu ini).
 
 ## Belum Diimplementasikan / Catatan
 
@@ -46,5 +46,5 @@ Aplikasi ini mobile-first; tampilan desktop belum diprioritaskan.
 ## Dokumen Terkait
 
 - [[Microservices - Attendance Service]]
-- [[APP - Web Application]]
-- [[APP - Mobile Application]]
+- [[APP - Web ERP]]
+- [[APP - MyBharata]]

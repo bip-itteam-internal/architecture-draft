@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Ringkasan hal-hal yang dapat dilakukan **tim IT** di dalam ERP. Sebagian besar operasi admin IT berjalan lewat [[CORE - IT Orchestrator]] (semua route ber-guard `RequireITStaff`) dan diakses dari modul **IT** pada [[APP - Web Application]].*
+*Ringkasan hal-hal yang dapat dilakukan **tim IT** di dalam ERP. Sebagian besar operasi admin IT berjalan lewat [[CORE - IT Orchestrator]] (semua route ber-guard `RequireITStaff`) dan diakses dari modul **IT** pada [[APP - Web ERP]].*
 
 ## Yang Bisa Dilakukan Tim IT
 
@@ -31,7 +31,7 @@
 - [[Microservices - Attendance Service]] — endpoint WiFi allow-list
 - [[Microservices - Notification Service]] — notif WhatsApp (akun di-reset)
 - [[CORE - API Master Gateway]] — routing `/api/it/*` + enforce JWT
-- [[APP - Web Application]] — UI modul IT (Employee, Network, KPI, IT Support)
+- [[APP - Web ERP]] — UI modul IT (Employee, Network, KPI, IT Support)
 
 ## Dokumen Terkait
 

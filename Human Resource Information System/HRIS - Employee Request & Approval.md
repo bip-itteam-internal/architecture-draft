@@ -43,4 +43,4 @@ Karyawan buat request
 
 - [[HRIS - Big Pictures]] · [[HRIS - Attendance System]]
 - [[Microservices - Attendance Service]] · [[Microservices - Notification Service]] · [[Microservices - Employee Service]]
-- [[APP - Mobile Application]] (menu Submission)
+- [[APP - MyBharata]] (menu Submission)
