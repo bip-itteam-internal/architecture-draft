@@ -14,6 +14,7 @@
 1. **Lupa clock-in** — Karyawan hadir tapi lupa clock-in. Koreksi mengisi `clock_in` dari jam mulai jadwal.
 2. **Lupa clock-out** — Karyawan hadir tapi lupa clock-out. Koreksi mengisi `clock_out` dari jam selesai jadwal.
 3. **Lupa keduanya** — Karyawan hadir seharian tapi tidak clock-in maupun clock-out. Koreksi mengisi keduanya dari jadwal.
+4. **Sengketa/koreksi telat** — Karyawan sudah clock-in tapi status **Late** (mis. salah rekam mesin / ada alasan). Boleh ajukan koreksi clock-in; bila disetujui review → status jadi Tepat Waktu. **Dibatasi anti-fraud**: ditolak bila keterlambatan sudah diverifikasi security di buku tamu (lihat §Aturan Validasi & Anti-Fraud).
 
 ## Model Data
 
@@ -113,6 +114,20 @@ Karyawan membuat request
             |-- Tidak -> Ditolak -> Notif karyawan
 ```
 
+## Aturan Validasi & Anti-Fraud (Guestbook)
+
+Saat pengajuan (`POST /correction`), urutan pemeriksaan:
+1. **Window** — ≤ 7 hari dari tanggal absen, tak boleh tanggal masa depan (`validateCorrectionWindow`). *(Tidak ada penjaga tutup-buku/payroll — lihat [[HRIS - Employee Request & Approval]] §Batas Tanggal.)*
+2. **Kecocokan tipe** (`validateCorrectionTypeMatch`):
+   - `checkin` — clock-in kosong → boleh; clock-in **terisi** → boleh **hanya bila status `Late`** (sengketa telat); bila sudah Tepat Waktu → ditolak.
+   - `checkout` — clock-out kosong (clock-in harus sudah ada).
+   - `both` — clock-in & clock-out keduanya kosong.
+3. **Anti-fraud guestbook** — untuk `checkin`/`both`, **ditolak** bila ada catatan keterlambatan terverifikasi security di buku tamu (`guestbook` `category="internal"`, `employee_id` & tanggal sama). Mencegah karyawan yang terbukti telat mengubah status jadi Tepat Waktu.
+
+**Penyimpanan bukti:** record guestbook `internal` kini menyimpan `employee_id` (dari scan QR di [[APP - MyBharata]]) → dipakai mencocokkan guard. *(Forward-looking: aktif untuk record yang sudah punya `employee_id`.)*
+
+> Pengaman berlapis: **guard guestbook (otomatis)** + **review SPV/HR (manusia)**.
+
 ## Pasca-Persetujuan: Dampak pada Attendance (`applyCorrectionToEntry`)
 
 Ketika koreksi sepenuhnya disetujui, sistem otomatis mengubah entri kehadiran yang direferensikan:
@@ -120,7 +135,7 @@ Ketika koreksi sepenuhnya disetujui, sistem otomatis mengubah entri kehadiran ya
 - **Koreksi clock-in**: Set `clock_in` ke `WorkTime.Start`, `clock_in_method` ke "Website", `status` ke "Tepat Waktu", `late_hour` ke 0
 - **Koreksi clock-out**: Set `clock_out` ke `WorkTime.End`, `clock_out_method` ke "Website"
 - **Keduanya**: Menerapkan keduanya di atas
-- Menambahkan komentar: `"Koreksi disetujui #<correction_id>"`
+- Menambahkan komentar `"Koreksi disetujui #<correction_id>"` — **di-append**, tidak menimpa comment lama (bukti keterlambatan guestbook tetap terjaga)
 - Memperbarui metadata dengan ID approver
 
 ## Logika Filter Review (`buildCorrectionReviewFilter`)
@@ -179,7 +194,7 @@ src/features/hris/attendance-correction/
 - Halaman Pengajuan Saya memiliki dua tampilan: **tabel** dan **kalender** (kalender interaktif dengan status kehadiran berwarna)
 - Tampilan kalender menampilkan kartu detail (clock-in, clock-out, jadwal) saat tanggal dipilih
 - Modal pengajuan koreksi otomatis mendeteksi clock-in/out yang kosong dan memilih tipe koreksi
-- Karyawan hanya bisa mengajukan koreksi untuk hari di mana clock-in atau clock-out kosong
+- Karyawan mengajukan koreksi untuk hari yang **clock-in/out kosong** atau **clock-in terisi tapi Late** (sengketa telat). Kalender pemilih-tanggal di-feed oleh `GET /api/attendance/history?missing=clockin|clockout|any` (mengembalikan hanya tanggal kandidat; entri telat yang sudah terverifikasi guestbook tak dimunculkan)
 - Tidak ada input waktu manual — modal menjelaskan bahwa waktu akan otomatis diisi dari jadwal shift saat disetujui
 - Halaman Review memiliki tab: **Menunggu Review** (pending) dan **Sudah Direview** (termasuk yang dibatalkan)
 - Reviewer melihat jadwal kerja pemohon (kolom "Jam Kerja") untuk konteks
