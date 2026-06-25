@@ -3,7 +3,7 @@
 *Desain (to-be) subsistem **Recruitment** — mengelola **siklus depan karyawan**: dari kebutuhan posisi sampai jadi karyawan aktif. Memisahkan subsistem **Talent acquisition → Interview → On-boarding** yang sekarang menumpuk di [[HRIS - Analysis]] ke ruangnya sendiri.*
 
 - **Status**: 🟡 Desain / Direncanakan (**belum** diimplementasi di kode)
-- **Target arsitektur**: microservice `recruitment-service` baru + modul web, dengan **rollout bertahap**
+- **Target arsitektur**: microservice `recruitment-service` baru ([[Microservices - Recruitment Service]]) + modul web, dengan **rollout bertahap**
 - Titik singgung yang sudah ada di kode: `POST /onboarding/register` (aktivasi akun karyawan baru) di [[Microservices - Employee Service]] — menjadi handoff akhir recruitment
 
 ## Latar Belakang
@@ -20,7 +20,7 @@
 3. **Candidate Management** — data pelamar (CV, kontak, posisi dilamar, sumber) + pelacakan pipeline via field **`progress`** (tahap) & **`status`** (keadaan), enum mengikuti **rekaman HRD** (lihat Model Data)
 4. **Screening (manual)** — HR menyaring CV/data pelamar **manual** terhadap kriteria posisi (lihat bagian khusus di bawah); **AI CV screening** direncanakan sebagai enhancement fase lanjut
 5. **Interview** — penjadwalan, **multi-tahap**: HR Interview → User Interview → **Technical Test (tes skill — terpisah dari psikotes)** → Final Interview (jumlah tahap tergantung posisi, mis. SPV) — HR + hiring manager/SPV dept; scoring + catatan per tahap. Lolos → **Background Check**
-6. **Psikotes / Assessment** — setelah lolos interview & **Background Check**, kandidat mengikuti psikotes **sebelum offer**. Dua mode: **(a) online self-service** (kandidat mengerjakan tes di portal — butuh test-engine/bank soal, **TBD**) atau **(b) manual/vendor** (psikolog internal atau vendor melaksanakan; HR input skor + lampirkan **report PDF**). **Rekomendasi: mulai mode manual/vendor**, online menyusul. Hasil (skor per-aspek + rekomendasi/interpretasi) jadi bahan keputusan akhir sebelum offer (ambang/bobot final di HR — lihat **Pertanyaan untuk HRD**)
+6. **Psikotes / Assessment** — setelah lolos interview & **Background Check**, kandidat mengikuti psikotes **sebelum offer**. Dua mode: **(a) online self-service** (kandidat mengerjakan tes di portal — butuh test-engine/bank soal, **TBD**) atau **(b) manual** — **dilaksanakan staf HR langsung** (HR input skor + lampirkan **report PDF**). **Rekomendasi: mulai mode manual (HR)**, online menyusul. Hasil (skor per-aspek + rekomendasi/interpretasi) jadi bahan keputusan akhir sebelum offer (ambang/bobot final di HR — lihat **Pertanyaan untuk HRD**)
 7. **Offer & Decision** — keputusan + surat penawaran → kandidat accept/decline
 8. **Onboarding Handoff** — saat kandidat `Hired` → buat akun karyawan via [[Microservices - Employee Service]] `POST /onboarding/register` (employee_id + temporary password) → masuk siklus karyawan aktif
 
@@ -46,8 +46,33 @@
 | **HR / HRGA Supervisor** | **Review kualifikasi** requisition (sesuai/minta revisi) + finalkan kriteria; kelola pipeline (lowongan, pelamar, jadwal incl. psikotes, input hasil); penerbitan offer |
 | **Direktur** | **Menyetujui Job Requisition** (menggantikan pola lama berbasis kuota) |
 | **Pewawancara** (hiring manager / SPV dept) | Ikut interview & penilaian (multi-tahap s/d 3×) |
-| **Psikolog / Asesor** | Melaksanakan & **menginterpretasi psikotes** (skor + rekomendasi) — **setelah interview**; internal atau vendor pihak ketiga *(lihat TBD)* |
 | **Kandidat** | Eksternal — **tanpa akun ERP** (data dikelola HR) |
+
+*(Psikotes **dilaksanakan & dicatat staf HR langsung** — tanpa psikolog/asesor internal/vendor.)*
+
+## User Persona
+
+> Persona pengguna sistem Recruitment — grounded ke aktor & proses HRD saat ini (manual/spreadsheet + Glints).
+
+**1. HR / HRGA Supervisor — "pemilik proses"**
+- **Tujuan**: kelola seluruh pipeline efisien & terlacak; review kualifikasi, jadwalkan tahap, **laksanakan & catat psikotes**, putuskan lolos/tolak, terbitkan offer.
+- **Butuh dari sistem**: satu tampilan semua pelamar + `progress`/`status`, skrining cepat, akses CV/berkas, jadwal & notifikasi.
+- **Pain saat ini**: data tersebar di spreadsheet + Glints; manual; sulit melacak status & kandidat "nyangkut".
+
+**2. SPV / Kepala Departemen — "pengaju & pewawancara teknis"**
+- **Tujuan**: dapat kandidat sesuai kebutuhan teknis posisinya, cepat.
+- **Butuh**: ajukan requisition + isi kualifikasi; lihat pelamar untuk posisinya; beri nilai User Interview & Technical Test.
+- **Pain**: approval lama; tak tahu progress lamaran.
+
+**3. Direktur — "pemberi persetujuan"**
+- **Tujuan**: kontrol penambahan karyawan.
+- **Butuh**: approve requisition ringkas (justifikasi + kualifikasi), idealnya dari mobile.
+- **Pain**: tanda tangan manual di form kertas.
+
+**4. Kandidat / Pelamar (eksternal, tanpa akun ERP) — "pencari kerja"**
+- **Tujuan**: melamar mudah & tahu kabar tiap tahap.
+- **Butuh**: lamar via Glints/portal, upload CV/berkas, notifikasi tiap tahap (Email → WA) termasuk hasil akhir.
+- **Pain**: tak dapat kabar / lama menunggu tanpa kepastian.
 
 ## Model Data
 
@@ -62,7 +87,7 @@
 - `interview` — sesi interview (kandidat, tahap: HR / User / Final, pewawancara, skor, catatan)
 - `technical_test_result` — hasil **Technical Test (tes skill)** per kandidat (skor/penilaian, penilai, waktu)
 - `psychotest` — penugasan tes ke kandidat (jenis tes, mode online/manual, jadwal, status pelaksanaan)
-- `psychotest_result` — hasil psikotes (skor per-aspek, rekomendasi/interpretasi, **report PDF di MinIO**, penilai/asesor, waktu); bank soal untuk mode online **TBD**
+- `psychotest_result` — hasil psikotes (skor per-aspek, rekomendasi/interpretasi, **report PDF di MinIO**, penilai = **staf HR**, waktu); bank soal untuk mode online **TBD**
 - `background_check` — hasil **Background Check** (status, temuan/catatan, waktu)
 - `offer` — penawaran (kandidat, detail, status accept/decline)
 
@@ -76,7 +101,7 @@
   - [[Microservices - File Service]] — penyimpanan CV/dokumen pelamar + **report PDF psikotes** (MinIO)
   - [[CORE - OCR Document Service]] — OCR CV hasil scan (untuk AI screening fase lanjut)
   - **LLM (OpenRouter)** — **AI CV screening (fase lanjut)**; reuse infra LLM yang dipakai Ideamills ([[Sales - Veo (Gemini) Implementation]])
-  - **Psikotes** — modul di `recruitment-service`; mode **manual/vendor** cukup catat hasil + lampiran via [[Microservices - File Service]], mode **online** butuh **test-engine + bank soal (TBD / fase lanjut)**; undangan jadwal via [[Microservices - Notification Service]]
+  - **Psikotes** — modul di `recruitment-service`; mode **manual (dilaksanakan staf HR)** cukup catat hasil + lampiran via [[Microservices - File Service]], mode **online** butuh **test-engine + bank soal (TBD / fase lanjut)**; undangan jadwal via [[Microservices - Notification Service]]
   - **Glints (TapLoker)** — ATS/job-portal eksternal yang dipakai aktif (sumber pelamar utama). Pemetaan stage Glints → pipeline kita: *Chat Dimulai/Terhubung* → Screening · *Skill & Psikotes* → Technical Test (skill) + Psikotes (kita pisahkan) · *Wawancara* → Interview · *Negosiasi* → Offer · *Direkrut* → Hired · *Belum Sesuai* → Rejected. ⚠️ **Beda urutan**: Glints menaruh **Skill & Psikotes sebelum Wawancara**, sedangkan proses internal kita **psikotes setelah interview** (keputusan HRD) — perlu disadari saat memetakan dari Glints. Komunikasi kandidat saat ini lewat **chat/WA Glints**. Relasi `recruitment-service` ↔ Glints (impor/sinkron vs menggantikan) = **TBD strategis**
 - **UI**: modul **Recruitment** di [[APP - Web ERP]] (HR & SPV) + **portal lowongan publik** untuk pelamar (self-apply + upload CV — fase lanjut)
 
@@ -88,6 +113,7 @@
 - **Melamar**: satu orang **boleh** melamar beberapa posisi; **boleh** melamar lagi setelah ditolak (tanpa jeda).
 - **Screening**: **manual** dulu (HR yang memutuskan); AI hanya **asisten skor & rekomendasi** (tanpa auto-reject) bila nanti diaktifkan.
 - **Interview**: multi-tahap **s/d 3×** tergantung posisi (mis. SPV).
+- **Psikotes**: dilaksanakan & dicatat **staf HR langsung** (tanpa psikolog/asesor internal/vendor).
 - **Urutan tahap (high-level)**: Screening → Interview → Psikotes → Offer.
 - **Tahap detail (rekaman HRD)**: CV Screening → HR/User Interview → **Technical Test (tes skill)** → Final Interview → **Background Check** → **Psikotes** → Offering → Hired → Onboarding. *(Technical Test = tes skill, **terpisah dari Psikotes**; Psikotes = tahap baru setelah Background Check, sebelum Offering.)*
 - **Notifikasi kandidat**: **Email dulu**, **WhatsApp menyusul** (email perlu dibangun — lihat Arsitektur & Integrasi).
@@ -105,9 +131,8 @@
 - Siapa boleh melihat data pelamar (HR semua; SPV hanya pelamar posisinya)?
 
 **Psikotes** — *kini setelah interview, sebelum offer.*
-- Online (portal) atau manual/luring (psikolog/vendor)?
+- Mode: online (portal/tool) atau manual oleh staf HR?
 - Jenis tes: kemampuan (kognitif/numerik/verbal/logika), kepribadian (DISC/Papikostick/MBTI), atau keduanya?
-- Penilai: psikolog internal atau vendor (report PDF)?
 - Penentu lulus/tidak (ambang skor) atau bahan pertimbangan? Seberapa besar bobotnya?
 
 **Offer & keputusan akhir**
@@ -124,7 +149,7 @@
 ## Rollout Bertahap
 
 - [ ] **Fase 1** — Job Requisition (approval **SPV → HR review → Direktur**) + Candidate management (data pelamar + status pipeline)
-- [ ] **Fase 2** — Sourcing & Job Posting + **Screening manual** + **Interview** (multi-tahap) + **Psikotes (manual/vendor)**
+- [ ] **Fase 2** — Sourcing & Job Posting + **Screening manual** + **Interview** (multi-tahap) + **Psikotes (manual oleh HR)**
 - [ ] **Fase 3** — Offer & Decision + **Onboarding handoff** (`/onboarding/register`) + **Notifikasi kandidat via Email** (bangun infra email dulu)
 - [ ] **Fase 4 (enhancement)** — **AI CV screening** (skor & rekomendasi, HR putuskan) + **WhatsApp** notifikasi kandidat
 - [ ] **Fase 5 (opsional)** — **portal self-apply publik** + **psikotes online** (test-engine + bank soal) + integrasi job board (mis. JobStreet)
@@ -133,7 +158,7 @@
 
 - **Strategi Glints** — `recruitment-service` mengimpor/sinkron dari Glints vs menggantikannya (Glints kini ATS eksternal utama).
 - **Infra Email** — kemampuan kirim email **belum ada di sistem**, perlu dibangun (prasyarat notifikasi kandidat fase awal).
-- **Psikotes**: mode (online vs manual/vendor), jenis tes & tools (kemampuan/kepribadian), penilai (psikolog internal vs vendor), ambang skor & bobot terhadap keputusan.
+- **Psikotes**: mode (online vs manual oleh HR), jenis tes & tools (kemampuan/kepribadian), ambang skor & bobot terhadap keputusan.
 - **AI CV screening (fase lanjut)**: model LLM yang dipakai & penanganan CV hasil scan (OCR).
 - **Offer letter**: template & approver.
 
@@ -141,6 +166,7 @@
 
 - [[HRIS - Analysis]] — sumber subsistem talent acquisition/interview/onboarding yang dipisah ke sini
 - [[HRIS - Personalia]] · [[HRIS - Big Pictures]]
+- [[Microservices - Recruitment Service]] — sisi implementasi service (rancangan)
 - [[Microservices - Employee Service]] — onboarding/register & master data
 - [[Microservices - Notification Service]] · [[Microservices - File Service]]
 - [[APP - Web ERP]]

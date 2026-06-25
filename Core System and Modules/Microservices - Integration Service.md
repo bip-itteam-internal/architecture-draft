@@ -110,3 +110,4 @@ External lain: TikTok Shop, TikTok Business/Ads, Shopee, [[External - Desty]] (m
 - [[Sales - GMV Creative]]
 - [[Vendor - CRM]]
 - [Referensi API — docs-api-greget](https://docs-api-greget.vercel.app/) — REST API lengkap (129 endpoint, Nextra)
+- [[IT - Background Jobs & Schedulers]] — 9 cron + webhook dispatcher service ini (sync TikTok/Shopee/Desty; konsumsi webhook tiap 5 dtk)

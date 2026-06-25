@@ -4,6 +4,16 @@
 
 [Contoh dari sistem ini](https://drive.google.com/drive/folders/17RNDBtMwKCU_tuAiLZbwCgFp-xwwmzuz)
 
+- **Status**: 🟡 Konsep (payroll penuh belum dibangun) — **kecuali** komponen *supplement* dari attendance yang **✅ sudah ada** di kode.
+
+## Sudah Diimplementasikan (komponen attendance)
+
+> Grounded: belum ada `payroll-service`/payroll penuh. Yang ada baru penyedia *supplement* berbasis kehadiran.
+
+- `GET /payroll-supplement` ([[Microservices - Attendance Service]]) — agregasi entry kehadiran **periode payroll 26 bln-lalu → 25 bln-ini**: `payout_pct = total_work_hours / expected_work_hours`, plus rincian jam (telat, cuti, lembur, absen) & hitung per status. Entry `Pending` dilewati dari kalkulasi payout.
+- `GET /payroll-approx` ([[Microservices - Employee Service]]) — endpoint per-karyawan yang mem-proxy `payroll-supplement` (pakai `employee_id` dari header).
+- Konsumen: [[CORE - HRIS Orchestrator]] (sisi perhitungan payroll).
+
 ## Fitur
 
 - Dashboard
@@ -39,3 +49,12 @@
 ## Dependensi
 
 - [ ] DB - Attendance Data
+
+## Belum Diimplementasikan (payroll penuh)
+
+🟡 Belum di kode: setting gaji nominal, BPJS Kesehatan & Ketenagakerjaan, perhitungan & potongan, generate **payslip**, serta handoff Form QA → Accounting. Gaji/akuntansi final didelegasikan ke Accurate ([[ADR - 0001 Akuntansi via Accurate]]) — **batas scope payroll vs Accurate masih perlu diputuskan**.
+
+## Dokumen Terkait
+
+- [[Microservices - Attendance Service]] (`payroll-supplement`) · [[Microservices - Employee Service]] (`payroll-approx`) · [[CORE - HRIS Orchestrator]]
+- [[HRIS - Overtime]] · [[HRIS - Compensation & Benefits]] · [[Finance]] · [[ADR - 0001 Akuntansi via Accurate]]

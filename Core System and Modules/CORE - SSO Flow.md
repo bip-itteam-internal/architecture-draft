@@ -80,8 +80,10 @@ sequenceDiagram
 
 ## Role & Otorisasi
 
-- Role berasal dari `system_roles` (map `module → role | role[]`) di collection `system_authentication` ([[Microservices - Employee Service]]).
-- Gateway menurunkan identitas + role lalu meneruskannya ke service via header; service membaca role dari header (mis. Task Manager: `system_roles["task-management"]` → admin / supervisor / staff).
+- Role berasal dari `system_roles` di collection `system_authentication` ([[Microservices - Employee Service]]). Tipe Go: `map[string]Role` (type alias `map[string]string`); key = department/feature key (mis. `"hris"`, `"it"`, `"insentive"`), value = role string (`"staff"`, `"supervisor"`, `"admin"`, dll).
+- Daftar key dan available roles per key dikelola di master data: `master_department` (department-based) dan `master_system_role` (feature-based) — lihat [[HRIS - Organization Structure]].
+- Gateway menurunkan identitas + role lalu meneruskannya ke service via header `BIP-System-Roles` (JSON); service membaca role dari header (mis. Task Manager: `system_roles["task-management"]` → admin / supervisor / staff).
+- Penambahan department/role baru **tidak memerlukan perubahan kode** — cukup tambah via CRUD master data endpoint atau frontend `/hris/master-data`.
 
 ## Aplikasi: Pakai SSO atau Tidak
 

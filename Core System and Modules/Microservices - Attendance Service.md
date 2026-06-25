@@ -96,3 +96,4 @@
 - [[HRIS - Attendance Correction]]
 - [[HRIS - Payroll]]
 - [[APP - MyBharata]]
+- [[IT - Background Jobs & Schedulers]] — cron service ini (pre-alokasi entry tiap 30 mnt, auto-ignore request basi tiap jam)

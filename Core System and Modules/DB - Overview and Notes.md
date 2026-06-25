@@ -17,6 +17,8 @@ Doc: [[Microservices - Employee Service]]
 - system_authentication
 - kpi_score (beserta KPI templates)
 - company_holiday
+- master_department (departments + positions + roles per dept; seed otomatis)
+- master_system_role (feature-based role systems: insentive, integration; seed otomatis)
 
 ### attendance — `attendance-mongo-db`
 Doc: [[Microservices - Attendance Service]]
@@ -79,6 +81,19 @@ Doc: [[Microservices - Task Management Service]]
 - audits
 
 > Catatan: task-management juga membaca `employee_db` (ERP) secara **read-only** untuk memperoleh nama/divisi.
+
+### recruitment — `recruitment-mongo-db`
+Doc: [[Microservices - Recruitment Service]] (⚠️ Fase 1-3)
+- job_requisition
+- job_posting
+- candidate
+- screening_result
+- interview
+- technical_test_result
+- psychotest
+- background_check
+- offer
+- audit_logs
 
 ## Infrastruktur Data Bersama (Redis, MinIO)
 
