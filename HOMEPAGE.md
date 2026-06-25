@@ -77,7 +77,7 @@ Service adalah end-point yang berinteraksi dengan database-nya masing-masing (da
 
 **Mulai di sini (dev)** → [[DEVELOPER GUIDE]] (onboarding · workspace sibling · flow agent-kit · konvensi · git)
 
-**Roadmap & Keputusan** → [[ROADMAP]] · [[REF - Ownership & RACI]] · [[ADR - 0001 Akuntansi via Accurate]] · [[ADR - 0002 Database-per-Service]] · [[ADR - 0003 SSO-only Gateway]]
+**Roadmap & Keputusan** → [[ROADMAP]] · [[REF - Ownership & RACI]] · [[ADR - 0001 Akuntansi via Accurate]] · [[ADR - 0002 Database-per-Service]] · [[ADR - 0003 SSO-only Gateway]] · [[ADR - 0005 Vault sebagai Team Knowledge Base]]
 
 **Tata Kelola** → [[IT - SOP Dokumentasi Vault]] (cara nulis dok konsisten + template)
 
