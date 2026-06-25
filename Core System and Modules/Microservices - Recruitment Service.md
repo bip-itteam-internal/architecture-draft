@@ -19,7 +19,8 @@
 
 ### Candidate Management
 - CRUD pelamar + pelacakan `progress` (tahap) & `status` (keadaan) — enum mengikuti rekaman HRD
-- Field `email` kandidat (opsional, divalidasi) untuk notifikasi email
+- Field `email` kandidat (opsional internal; **wajib saat apply publik**) untuk notifikasi email
+- **Dua jalur input:** HR (`POST /candidates`, JWT + role isHR) **atau** kandidat sendiri (apply publik, tanpa JWT — lihat increment di bawah)
 - Upload CV/berkas/portofolio → [[Microservices - File Service]] (MinIO)
 
 ### Screening · Interview · Technical Test · Background Check · Psikotes
@@ -85,6 +86,14 @@
 - **Lamaran diterima**: email otomatis saat `POST /candidates` (bila `email` terisi).
 - **Penawaran kerja**: `POST /candidates/:id/offer/letter` — HR unggah offer letter PDF → MinIO (`recruitment/offer/<id>/`) → email penawaran + **lampiran PDF** ke kandidat; `offer.letter_object` menyimpan referensi.
 - `idempotency_key` per event; `from` default `RESEND_FROM_EMAIL` (env Resend di-wire ke `docker-compose.yml` notification-service).
+
+## Increment: Apply Publik Kandidat (✅)
+
+> Ditambah setelah Fase 1-3 (branch `feat/recruitment-service`). Kandidat bisa **melamar sendiri** tanpa login, **selain** input oleh HR. Versi MVP dari "portal publik" (UI/form publik & captcha = fase lanjut).
+
+- **Service:** `POST /apply` (tanpa JWT/RBAC; tetap di belakang gateway key). `email` **wajib**; `posting_id` opsional (bila diisi → lowongan harus **ada & Open**). Service yang mengontrol field internal (`status=Applied`, `progress=CV Screening`, dll) — kiriman klien untuk itu diabaikan. Sukses → email "lamaran diterima" + respons minimal (`candidate_id`).
+- **Gateway:** `POST /public/recruitment/apply` (grup `/public`, **rate-limited**) → forward ke recruitment `/apply` — lihat [[CORE - API Master Gateway]].
+- HR tetap pakai `POST /candidates` (JWT + role isHR). Keduanya menghasilkan record kandidat yang sama.
 
 ## Dokumen Terkait
 

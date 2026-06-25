@@ -28,7 +28,7 @@
 - Gateway panic saat startup bila key kosong (fail-fast)
 
 **Routing service via `/api/:module/*`**
-- Module: employee, attendance, notification, file, insentive, integration, tiktok-shop, inventory, task-management, hris (orchestrator), it (orchestrator)
+- Module: employee, attendance, notification, file, insentive, integration, tiktok-shop, inventory, task-management, recruitment, hris (orchestrator), it (orchestrator)
 - Contoh port internal: employee-service:6970, attendance-service:6971, notification-service:6972, file-service:6973, hris-orchestrator:7000, it-orchestrator:7001
 - **Open routes:** module `notification` & `file` boleh skip JWT bila ada query `?key=`
 
@@ -36,6 +36,7 @@
 - `/auth/*` & `/onboarding/*` → employee-service
 - `/public/feedback` → notification-service
 - `/public/guestbook` → attendance-service
+- `/public/recruitment/apply` → recruitment-service (pelamar mendaftar sendiri tanpa JWT)
 - `/ext/fingerprint/*` → mesin fingerprint eksternal (X105:4370, X609:4371, dipilih dari serial) + attendance-service
 - `/ext/tiktok-shop/callback` & `/ext/tiktok-shop/webhook` → tiktok-shop service
 - `/ext/webhook/:service` → integration-service
@@ -68,6 +69,7 @@ Gateway meneruskan request ke seluruh service internal berikut:
 - [[Microservices - TikTok Shop Service]] — callback & webhook TikTok Shop
 - [[Microservices - Inventory Service]] — inventory (dikecualikan dari cache)
 - [[Microservices - Task Management Service]] — task management (klien FE Task Manager via SSO)
+- [[Microservices - Recruitment Service]] — ATS; termasuk apply publik `/public/recruitment/apply` (tanpa JWT)
 - [[CORE - HRIS Orchestrator]] — orchestrator domain HRIS
 - [[CORE - IT Orchestrator]] — orchestrator domain IT
 
@@ -81,5 +83,6 @@ Klien utama gateway adalah [[APP - MyBharata]]. Penyimpanan terkait dijelaskan d
 - [[Microservices - Attendance Service]]
 - [[Microservices - Notification Service]]
 - [[Microservices - File Service]]
+- [[Microservices - Recruitment Service]]
 - [[DB - Overview and Notes]]
 - [[APP - MyBharata]]
