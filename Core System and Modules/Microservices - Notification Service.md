@@ -30,12 +30,13 @@
 	- `POST /fcm/send-personal`
 	- `POST /fcm/send-department`
 	- `POST /fcm/send-broadcast` (batch 500 token)
+	- `POST /email/send` — Email via **Resend** (`resend-go/v3`); body `html`/`text`, attachment (base64 `content` atau `path` URL, mis. offer letter PDF), dan `idempotency_key` opsional untuk retry-safe.
 - **Cron:** harian pukul 03:00 WIB menghapus inbox berumur > 2 bulan.
 
 ## Belum Diimplementasikan / Catatan
 
-- **Channel Email (direncanakan)** — belum ada di kode; dibutuhkan untuk notifikasi **kandidat recruitment** ([[Microservices - Recruitment Service]]). Rekomendasi provider **Resend** (transactional, dukung attachment mis. offer letter PDF); prasyarat deliverability: SPF/DKIM/DMARC di domain `bharatainternasional.com`.
-- Selain email, channel yang ada (inbox/FCM/WhatsApp/splash/article) tidak ada stub berarti — fungsional penuh.
+- **Channel Email (Resend)** — ✅ sudah di kode (`POST /email/send`, lihat di atas) memakai SDK resmi `resend-go/v3`; ditujukan untuk notifikasi **kandidat recruitment** ([[Microservices - Recruitment Service]]). Catatan operasional: `from` wajib memakai domain terverifikasi di Resend (`bharatainternasional.com` — SPF/DKIM/DMARC) atau Resend menolak (HTTP 422); env `RESEND_API_KEY` & `RESEND_FROM_EMAIL` perlu diset saat deploy — bila kosong, `email.Init()` warn-and-skip sehingga service tetap berjalan. Belum ada smoke test pengiriman live yang tercatat.
+- Semua channel (inbox/FCM/WhatsApp/email/splash/article) sudah fungsional di kode — tidak ada stub berarti.
 - Group `/debug/fcm` ditandai dapat dihapus saat production.
 
 ## Dependencies & Integrasi
@@ -43,6 +44,7 @@
 - **MongoDB** — penyimpanan inbox, splash, dan article.
 - **FCM** — push notification (via shared-library).
 - **WhatsApp** — pesan personal/grup (via shared-library).
+- **Resend** — provider email transactional (via `resend-go/v3` di shared-library `notification/email`); butuh env `RESEND_API_KEY` & `RESEND_FROM_EMAIL` (sender pada domain terverifikasi).
 - Service lain:
 	- [[Microservices - Employee Service]] — sumber nomor telepon & FCM token (by id/nama/department/platform).
 	- [[Microservices - File Service]] — upload/hapus object di MinIO untuk image splash & article.
