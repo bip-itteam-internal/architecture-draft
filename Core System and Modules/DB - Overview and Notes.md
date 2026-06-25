@@ -17,6 +17,8 @@ Doc: [[Microservices - Employee Service]]
 - system_authentication
 - kpi_score (beserta KPI templates)
 - company_holiday
+- master_department (departments + positions + roles per dept; seed otomatis)
+- master_system_role (feature-based role systems: insentive, integration; seed otomatis)
 
 ### attendance — `attendance-mongo-db`
 Doc: [[Microservices - Attendance Service]]

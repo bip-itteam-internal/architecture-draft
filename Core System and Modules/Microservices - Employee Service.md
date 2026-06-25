@@ -24,7 +24,17 @@
 - `GET /account/roles`, `PATCH /account/roles` — baca / set `system_roles`
 > Catatan: sebagian operasi akun juga diorkestrasi via [[CORE - IT Orchestrator]] (mis. reset-password, roles); `/account/forget-device` & `/account/reset` adalah endpoint **langsung** Employee Service (gated IT-staff).
 
-**CRUD Master Data**
+**Master Data — Departments & System Roles**
+- `GET /master/departments`, `GET /master/departments/:key` — list / detail department (key, name, positions, roles)
+- `POST /master/departments`, `PUT /master/departments/:key`, `DELETE /master/departments/:key` — CRUD department (`RequireHRISSupervisor`)
+- `GET /master/system-roles` — list system roles (feature-based: insentive, integration, dll)
+- `POST /master/system-roles`, `PUT /master/system-roles/:key`, `DELETE /master/system-roles/:key` — CRUD system role (`RequireHRISSupervisor`)
+- Seed otomatis: `seedMasterData()` meng-insert default departments (~10) dan system roles (~2) saat collection kosong
+- Data-type endpoint (`GET /data-type/:dt`) sekarang membaca dari collection `master_department` / `master_system_role` (sebelumnya hardcoded di source code)
+- Model: `MasterDepartment` (key, name, positions[], roles[]) dan `MasterSystemRole` (key, name, roles[]) di `shared-library/models/employee/master_data.go`
+- Frontend: halaman CRUD di `/hris/master-data` (tabs Departments + System Roles)
+
+**CRUD Employee Data**
 - CRUD personal data, personal-documents, work data, work-documents, schedule, dan system-auth
 - Transaksi create/update employee (multi-collection, `RequireHRISStaff`) lengkap dengan existence/completeness checks
 
@@ -61,12 +71,14 @@
 ## Belum Diimplementasikan / Catatan
 
 - Tidak ada stub berarti — ini service paling lengkap dalam ekosistem bip-erp.
-- Hanya beberapa entry registry yang masih di-comment, yaitu department CRM dan role warehouse.
-- **Daftar posisi (position title) per departemen** didefinisikan di `shared-library/models/employee`. Catatan terbaru: posisi **"Bootcamp Content Creator"** kini berada di bawah **GA** (`PositionTitleGA`), dipindah dari HR.
+- Department CRM sudah dihapus (di-merge ke BeautyHacks/Kyura); role warehouse belum aktif.
+- **Departments, positions, dan system roles** sudah dimigrasikan dari hardcoded source ke **MongoDB master data** (`master_department`, `master_system_role`). Dapat dikelola via CRUD endpoint atau frontend `/hris/master-data`.
+- `common.Roles` (tipe system_roles di JWT/MongoDB) diubah dari Go struct dengan fixed field menjadi `map[string]Role` — mendukung penambahan department/role tanpa ubah kode. Format serialisasi JSON/BSON tidak berubah (backward compatible).
+- Backward compat string constants (`DeptHR`, `DeptGA`, dll) tersedia di `shared-library/models/employee/master_data.go` untuk consumer yang compare department name.
 
 ## Dependencies & Integrasi
 
-- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `kpi_score`, `company_holiday`. Lihat [[DB - Overview and Notes]].
+- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`. Lihat [[DB - Overview and Notes]].
 - **MinIO** — client langsung untuk upload foto & dokumen.
 - [[Microservices - Attendance Service]] — memanggil `POST /vacation/decrement`, mengonsumsi feed `/list` dan cron `/sync/work-schedules`.
 - [[Microservices - Notification Service]] — mengonsumsi feed `/list` (fcm-token, supervisor, dll).
