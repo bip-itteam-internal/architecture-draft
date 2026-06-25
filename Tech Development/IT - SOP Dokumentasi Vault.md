@@ -6,7 +6,7 @@
 
 - **Untuk siapa**: AI agent & kontributor manusia
 - **Sumber aturan**: `CLAUDE.md` (root vault) — bila bertentangan, `CLAUDE.md` yang menang
-- **Skeleton siap-pakai** (folder `Templates/`): [[Template - Implementasi Service]] · [[Template - Konsep Domain]] · [[Template - Log Operasional]]
+- **Skeleton siap-pakai** (folder `Templates/`): [[Template - Implementasi Service]] · [[Template - Konsep Domain]] · [[Template - Log Operasional]] · [[Template - Runbook]] · [[Template - Meeting Note]] · [[Template - Daily Note]]
 
 ## TL;DR — alur 6 langkah
 
@@ -39,6 +39,9 @@ Format nama file **selalu**: `Prefix - Nama.md` — flat, tanpa `/` di nama (pak
 | Glosarium / data dictionary / ownership | Reference | `REF -` |
 | Keputusan arsitektur/bisnis (ADR) | Decisions | `ADR -` |
 | Daftar endpoint per service | API Reference | `API -` |
+| Runbook / how-to / onboarding / troubleshoot | Runbooks | `RUN -` |
+| Notulen rapat | Workspace/Meetings | `MTG -` |
+| Daily note / idea capture | Workspace/Inbox | (bebas, `YYYY-MM-DD`) |
 | Belum jelas domainnya | Unknown or not listed | (sesuaikan terdekat) |
 
 > Obsidian resolve wikilink lewat **basename** → pindah folder aman; **rename file = perbarui semua wikilink** yang menunjuk nama lama.
@@ -50,6 +53,8 @@ Format nama file **selalu**: `Prefix - Nama.md` — flat, tanpa `/` di nama (pak
 | **Implementasi / Service** | dok grounded ke kode (service, gateway, DB, app) | [[Template - Implementasi Service]] | Deskripsi (Stack/Path/Status) → Endpoint/Fitur (Sudah Diimplementasikan) → Belum Diimplementasikan/Catatan → Dependensi & Integrasi → Dokumen Terkait |
 | **Konsep / Domain** | konsep bisnis sisi domain (Sales/HRIS/GA/…) | [[Template - Konsep Domain]] | Deskripsi → Latar Belakang → Ruang Lingkup/Cakupan → Konsumen Data → Kendala → Belum Diputuskan (TBD) → Dokumen Terkait |
 | **Log Operasional** | artefak point-in-time (korespondensi, access-log, insiden) | [[Template - Log Operasional]] | header Tipe/Tanggal/Konteks → isi point-in-time |
+| **Runbook** | prosedur operasional non-kode (grounded, di-publish) | [[Template - Runbook]] | Tujuan → Kapan dipakai → Prasyarat → Langkah → Verifikasi → Bila gagal/Rollback → Dokumen Terkait |
+| **Capture (privat)** | daily note / notulen — TIDAK di-publish, exempt | [[Template - Daily Note]] · [[Template - Meeting Note]] | bebas / Agenda → Catatan → Keputusan → Aksi → Naik kelas |
 
 Konsep & implementasi **saling di-link**: konsep di folder domain ↔ implementasi di Core System and Modules. Contoh nyata: [[Sales - Marketplace Integration]] (konsep) ↔ [[Microservices - Integration Service]] (implementasi).
 
@@ -59,7 +64,20 @@ Konsep & implementasi **saling di-link**: konsep di folder domain ↔ implementa
 - **Status marker** di awal dok (`CLAUDE.md` §5): ✅ Implemented · ⚠️ Implemented (ada catatan) · 🟡 Konsep/Draft · 🔴 Stub.
 - **Wikilink 0-broken** (`CLAUDE.md` §4): semua `[[...]]` harus resolve sebelum commit; embed gambar harus ada filenya.
 - **Bahasa**: Indonesia; istilah teknis tetap English (endpoint, service, request, JWT, dll).
-- **Pengecualian**: dok di `Logs/` & file di `Templates/` **dikecualikan** dari grounded/status/template (masing-masing point-in-time record & scaffold).
+- **Pengecualian**: dok di `Logs/` & file di `Templates/` **dikecualikan** dari grounded/status/template (point-in-time record & scaffold). Dok di `Workspace/` (Inbox + Meetings) **dikecualikan** dari grounded/status/template **dan** dari gate wikilink 0-broken (§4) — privat, tidak di-publish. `Runbooks/` **tidak** dikecualikan (grounded penuh + di-publish).
+
+## Naik kelas (capture → dok permanen)
+
+Capture mentah di `Workspace/` sifatnya sementara. Saat matang, **pindahkan isinya** ke rumah permanen lalu arsip/hapus yang mentah:
+
+| Dari (Workspace) | Isi matang | Ke (permanen) |
+|---|---|---|
+| Inbox / Meetings | keputusan | `Decisions/ADR - ...` |
+| Inbox / Meetings | konteks/aturan bisnis | "Latar Belakang" dok domain |
+| Inbox / Meetings | prosedur operasional | `Runbooks/RUN - ...` |
+| Inbox | fakta arsitektur/kode | dok domain/service terkait |
+
+`Workspace/` harus tetap **ramping**; kalau menggembung → ada yang belum naik kelas. Dok published **tidak boleh** nge-link ke `Workspace/`.
 
 ## 4. Cara pakai template
 
