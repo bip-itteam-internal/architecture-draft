@@ -19,6 +19,7 @@
 
 ### Candidate Management
 - CRUD pelamar + pelacakan `progress` (tahap) & `status` (keadaan) — enum mengikuti rekaman HRD
+- Field `email` kandidat (opsional, divalidasi) untuk notifikasi email
 - Upload CV/berkas/portofolio → [[Microservices - File Service]] (MinIO)
 
 ### Screening · Interview · Technical Test · Background Check · Psikotes
@@ -27,11 +28,11 @@
 - Background Check; Psikotes (**manual oleh staf HR** — input skor + report PDF; online = fase lanjut)
 
 ### Offer & Onboarding
-- Terbitkan offer (+ surat penawaran PDF) → accept/decline
+- Terbitkan offer (`POST /candidates/:id/offer`) → unggah surat penawaran PDF (`POST /candidates/:id/offer/letter` → MinIO) → email penawaran + lampiran PDF ke kandidat → accept/decline
 - `Hired` → **handoff** ke [[Microservices - Employee Service]] `POST /onboarding/register` (employee_id + temporary password)
 
 ### Notifikasi
-- Internal (approval/jadwal/offer) + **kandidat eksternal via Email (Resend, direncanakan) → WhatsApp menyusul** — lewat [[Microservices - Notification Service]]
+- Internal (approval/jadwal/offer, inbox/FCM) + **kandidat via Email (Resend) ✅** — "lamaran diterima" saat input pelamar & "penawaran kerja" + PDF saat unggah offer letter; WhatsApp kandidat menyusul — lewat [[Microservices - Notification Service]] (`POST /email/send`)
 
 ## Model Data (`recruitment_db`)
 
@@ -44,14 +45,14 @@
 - **Seluruh service belum ada di kode** (🟡) — scaffolding mengikuti pola `services/.template`.
 - `recruitment_db` (container Mongo) **akan didaftarkan** di [[DB - Overview and Notes]] saat implementasi; rute `/api/recruitment/*` ditambahkan ke [[CORE - API Master Gateway]] (`InternalURL`) saat itu juga.
 - **AI CV screening** (LLM OpenRouter + OCR) & **psikotes online** (test-engine + bank soal) = **fase lanjut**.
-- **Email channel** (kandidat) menunggu kemampuan email di [[Microservices - Notification Service]] (belum ada — lihat catatan di sana).
+- **Email kandidat** ✅ sudah di kode (best-effort via [[Microservices - Notification Service]] `POST /email/send`, Resend). **WhatsApp kandidat** masih menyusul.
 - Relasi dengan **Glints** (impor/sinkron vs menggantikan) = TBD strategis.
 
 ## Dependensi & Integrasi
 
 - [[Microservices - Employee Service]] — master posisi/departemen (`PositionTitle*`), cek duplikasi, **handoff `/onboarding/register`** saat hire
 - [[Microservices - File Service]] — CV/berkas pelamar, report PDF psikotes, surat penawaran (MinIO)
-- [[Microservices - Notification Service]] — notifikasi internal + kandidat (Email/Resend direncanakan + WhatsApp + inbox)
+- [[Microservices - Notification Service]] — notifikasi internal (inbox/FCM) + **kandidat via Email/Resend** (`/email/send`, sudah dipakai) + WhatsApp (menyusul)
 - [[CORE - OCR Document Service]] — OCR CV hasil scan (untuk AI screening fase lanjut)
 - **LLM (OpenRouter)** — AI CV screening (fase lanjut); reuse infra Ideamills ([[Sales - Veo (Gemini) Implementation]])
 - **Glints (TapLoker)** — ATS/job-portal eksternal, sumber pelamar utama
@@ -75,6 +76,15 @@
 **Deviasi tercatat:** CV ke **MinIO langsung** (prefix `recruitment/`, pola task-management) bukan via File Service; **"Direktur" = `hris` admin/Secretary**; onboarding handoff hanya **mengaktifkan akun** (pembuatan data master karyawan = di luar MVP).
 
 **Saat `/sync-docs` nanti:** status dok ini + [[HRIS - Recruitment]] → ⚠️/✅; daftarkan `recruitment_db` di [[DB - Overview and Notes]]; port di [[IT - Environment Inventory]]; tak ada cron/job (N/A di [[IT - Background Jobs & Schedulers]]).
+
+## Increment: Notifikasi Email Kandidat (✅)
+
+> Ditambah setelah Fase 1-3 (branch `feat/recruitment-service`, `go build`/`test`/`vet` hijau). Channel Email [[Microservices - Notification Service]] (Resend) kini dipakai recruitment, **best-effort** (gagal kirim ≠ gagalkan aksi inti).
+
+- `candidate` + field **`email`** (opsional, divalidasi format); helper `notifyCandidateEmail` → `POST /email/send` (service-key + gateway key).
+- **Lamaran diterima**: email otomatis saat `POST /candidates` (bila `email` terisi).
+- **Penawaran kerja**: `POST /candidates/:id/offer/letter` — HR unggah offer letter PDF → MinIO (`recruitment/offer/<id>/`) → email penawaran + **lampiran PDF** ke kandidat; `offer.letter_object` menyimpan referensi.
+- `idempotency_key` per event; `from` default `RESEND_FROM_EMAIL` (env Resend di-wire ke `docker-compose.yml` notification-service).
 
 ## Dokumen Terkait
 
