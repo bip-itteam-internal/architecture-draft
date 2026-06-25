@@ -10,7 +10,7 @@
 |---|---|---|---|
 | POST | `/tap` | Clock-in/out (fingerprint/mobile/website; `?method=`) | open (serial/MAC/token) |
 | GET | `/entries` | List entri (paginated, filter dept/status/periode) | HRIS |
-| GET | `/history` | Riwayat absensi sendiri (bulanan) | header |
+| GET | `/history` | Riwayat absensi sendiri (bulanan); `?missing=clockin/clockout/any` = kandidat koreksi | header |
 | GET | `/report` | Laporan periode 26→25 (`?yyyy-mm`) | HRIS |
 | PATCH | `/:id/update` | Update entri (+dokumen/status/comment) | HRIS |
 | GET | `/payroll-supplement` | Agregasi jam → payout_pct (`?employee_id`) | open |
@@ -35,14 +35,14 @@
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
 | POST/GET/PATCH | `/shift-exchange/create` · `/view` · `/review` · `/cancel` | Tukar shift (2-level review) | header |
-| POST/GET | `/correction` · `/correction/mine` · `/correction` | Koreksi absen (window 7 hari) | header |
+| POST/GET | `/correction` · `/correction/mine` · `/correction` | Koreksi absen (window 7 hari; clock-in: kosong/Late, kecuali telat terverifikasi guestbook) | header |
 | PATCH | `/correction/:id/cancel` · `/correction/:id/review` | Batal / review koreksi | header |
 
 ## Guestbook · WiFi · Internal
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
 | GET/POST | `/guestbook/token` · `/guestbook/token-validate` | Token tamu 15 menit | open |
-| GET/POST/PATCH | `/guestbook` | List/buat/edit entri tamu | GuestbookRBAC / Security |
+| GET/POST/PATCH | `/guestbook` | List/buat/edit entri tamu (POST `internal`/telat simpan `employee_id`) | GuestbookRBAC / Security |
 | POST/GET | `/fingerprint/export` | Upsert/list ekspor fingerprint | open (serial) |
 | GET/POST/DELETE | `/networks` · `/internal/wifi/add` · `/delete` | WiFi kantor (validasi on-site) | open / ITStaff |
 | GET | `/internal/summary` | Ringkasan 24 jam (utk HRIS orchestrator) | HRIS |
