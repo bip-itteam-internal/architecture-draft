@@ -39,6 +39,10 @@ Tidak wajib semua repo — cukup vault + repo yang sedang didokumentasikan.
 
 **Area non-domain:** `API Reference` (prefix `API -`) — daftar **endpoint per service** (grounded ke kode). Satu file `API - <Service>.md` + `API - Index`; ikut §1/§4/§5; sinkron via `/sync-docs` saat rute berubah.
 
+**Area non-domain:** `Runbooks` (prefix `RUN -`) — **pengetahuan operasional non-kode**: runbook, how-to, onboarding, troubleshooting. **TETAP grounded** (ikut §1/§4/§5: prosedur harus benar-benar jalan, status marker, wikilink 0-broken) dan **tetap di-publish** ke wiki. Flat, tanpa sub-pohon domain.
+
+**Area non-domain:** `Workspace` — **corong capture privat**, **dikecualikan dari publish wiki**. Dua sub-area: `Workspace/Inbox` (daily notes `YYYY-MM-DD.md` + idea capture, nama bebas) & `Workspace/Meetings` (notulen, prefix `MTG -`, mis. `MTG - 2026-06-25 Standup`). **Dikecualikan** dari grounded-in-code (§1), status marker (§5), template (§6), dan gate wikilink 0-broken (§4) — capture boleh nge-link ke catatan yang belum ada. Catatan matang **"naik kelas"** jadi dok domain / `RUN -` / `ADR -`, lalu yang mentah diarsip/dihapus. **Larangan:** dok published TIDAK boleh nge-link ke `Workspace/` (akan broken di wiki). Exclusion publish via ignore-glob `Workspace/**` dan/atau frontmatter `publish: false`.
+
 > **Dok meta root** (di akar vault, tanpa prefix): `README` · `HOMEPAGE` (peta) · `CLAUDE` (rulebook) · `SCRUM SPECS` (proses) · `ROADMAP` (arah/prioritas) · `DEVELOPER GUIDE` (cara kerja dev). Bukan domain; jangan beri prefix.
 
 ## 3. Konvensi penamaan file
@@ -52,6 +56,8 @@ Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
 - `REF -` → **Reference** (glosarium, data dictionary, ownership; mis. `REF - Glossary`)
 - `ADR -` → **Decisions** (mis. `ADR - 0002 Database-per-Service`)
 - `API -` → **API Reference** (mis. `API - Employee Service`)
+- `RUN -` → **Runbooks** (operasional non-kode; mis. `RUN - Onboarding Developer Baru`)
+- `MTG -` → **Workspace/Meetings** (notulen rapat; mis. `MTG - 2026-06-25 Standup`)
 - Karakter `/` tidak boleh di nama file (pakai `-`, mis. `IT - CI-CD`).
 
 ## 4. Wikilink
