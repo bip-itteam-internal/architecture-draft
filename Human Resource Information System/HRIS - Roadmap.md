@@ -30,7 +30,7 @@
 
 ## Fase D — Konsolidasi Performance (hindari duplikasi)
 
-- Satukan **"KPI appraisal menyeluruh" (konsep)** + [[HRIS - Work Review]] jadi **satu Review Cycle** ([[ERPGo - Performance Review Cycles]]) — **bukan** dua sistem terpisah. Engine insentif marketing ([[Microservices - Insentive Service]]) tetap terpisah. Lihat catatan overlap di [[HRIS - Key Performance Index]].
+- Satukan **"KPI appraisal menyeluruh" (konsep)** + [[HRIS - Work Review]] jadi **satu Review Cycle** — **bukan** dua sistem terpisah. Engine insentif marketing ([[Microservices - Insentive Service]]) tetap terpisah. Lihat catatan overlap di [[HRIS - Key Performance Index]].
 
 ## Fase E — HR lifecycle (🟡 konsep)
 
@@ -50,4 +50,4 @@
 ## Dokumen Terkait
 
 - [[ROADMAP]] (umum) · [[HRIS - Big Pictures]] · [[REF - Ownership & RACI]]
-- [[ERPGo - Performance Review Cycles]] · [[ADR - 0001 Akuntansi via Accurate]]
+- [[ADR - 0001 Akuntansi via Accurate]]

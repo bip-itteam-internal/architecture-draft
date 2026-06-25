@@ -17,7 +17,7 @@ Autentikasi **terpusat di [[CORE - API Master Gateway]]**: login memanggil emplo
 - ➕ Satu identitas karyawan untuk semua aplikasi; revoke terpusat.
 - ➕ Service tidak mengurus login — cukup percaya header gateway + cek role modulnya.
 - ➖ Gateway = komponen kritis (single entry); harus selalu sehat (lihat [[IT - Monitoring System]]).
-- ⚠️ Role per modul diambil dari `system_roles["<modul>"]`; menambah key role baru menyentuh employee-service/JWT (lihat keputusan RBAC [[ERPGo - Form Builder]] yang sengaja reuse key `it` agar tak mengubah employee-service).
+- ⚠️ Role per modul diambil dari `system_roles["<modul>"]`; menambah key role baru menyentuh employee-service/JWT (lihat keputusan RBAC [[IT - Form Builder]] yang sengaja reuse key `it` agar tak mengubah employee-service).
 - 🔗 Cut-over Task Manager ke SSO-only sudah dilakukan (lihat catatan proyek terkait).
 
 ## Dokumen Terkait

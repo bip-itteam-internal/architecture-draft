@@ -64,4 +64,3 @@
 ## Dokumen Terkait
 
 - [[HOMEPAGE]] · [[QA - Big Pictures]] · [[DB - Overview and Notes]]
-- [[ERPGo - Overview & Gap Matrix]] (istilah modul ERP eksternal)

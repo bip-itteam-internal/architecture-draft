@@ -35,8 +35,6 @@ Tidak wajib semua repo — cukup vault + repo yang sedang didokumentasikan.
 
 **Area non-domain:** `Reference` (prefix `REF -`) — referensi **lintas-domain** (glosarium istilah/singkatan, data dictionary, ownership/RACI). **TETAP grounded** (ikut §1/§4/§5) — beda dari Logs/Templates. Flat, tanpa sub-pohon domain.
 
-**Area non-domain:** `Benchmark` — **riset/perbandingan produk eksternal** (mis. `Benchmark - ERPGo`, prefix `ERPGo -`). Sifatnya *point-in-time research*: sisi produk eksternal **dikecualikan** dari grounded-in-code; **sisi Bharata tetap grounded + wikilink**. Tiap dok ditandai status 🟡 dan menaut ke dok arsitektur terkait.
-
 **Area non-domain:** `Decisions` (prefix `ADR -`) — **Architecture/Business Decision Records**: satu file per keputusan (mis. `ADR - 0001 Akuntansi via Accurate`), format Context → Decision → Consequences. Grounded ke kondisi nyata; tandai `Superseded` bila digantikan ADR lain.
 
 **Area non-domain:** `API Reference` (prefix `API -`) — daftar **endpoint per service** (grounded ke kode). Satu file `API - <Service>.md` + `API - Index`; ikut §1/§4/§5; sinkron via `/sync-docs` saat rute berubah.
@@ -52,7 +50,6 @@ Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
 - `LOG -` → **Logs** (artefak operasional; mis. `LOG - Shopee API Rate Limit Request`)
 - `QA -` → **Quality & Regulatory** (QA/RA farmasi; mis. `QA - CPOB (GMP)`)
 - `REF -` → **Reference** (glosarium, data dictionary, ownership; mis. `REF - Glossary`)
-- `ERPGo -` (atau prefix nama-produk lain) → **Benchmark** (riset produk eksternal)
 - `ADR -` → **Decisions** (mis. `ADR - 0002 Database-per-Service`)
 - `API -` → **API Reference** (mis. `API - Employee Service`)
 - Karakter `/` tidak boleh di nama file (pakai `-`, mis. `IT - CI-CD`).
@@ -98,7 +95,6 @@ Untuk dok konsep murni: `## Latar Belakang`, `## Ruang Lingkup`, `## Belum Diput
 **Area non-kode (tanpa repo):**
 - `Quality & Regulatory/*` ← sumber = **SOP/sertifikat QA-RA Bharata** (CPOB/BPOM/CDOB; diisi tim QA — bukan dari kode).
 - `Reference/*` ← istilah & singkatan yang dipakai lintas vault + kode (glosarium), data dictionary, ownership.
-- `Benchmark/*` ← riset produk eksternal (mis. ERPGo); sumber = dokumentasi produk ybs.
 
 ## 8. Alur kerja sync (tiap update)
 

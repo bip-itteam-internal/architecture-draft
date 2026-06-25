@@ -45,6 +45,6 @@ Kami menginginkan cara yang mudah untuk mengisi catatan dan kalkulasi otomatis u
 ## Dokumen Terkait
 
 - **Implementasi**: [[Microservices - Insentive Service]] (engine KPI→insentif marketing) · [[Finance - Incentive]] · [[Sales - Incentive]]
-- [[HRIS - Work Review]] — penilaian kualitatif (KPI = sisi kuantitatif); pertimbangkan **berbagi satu Review Cycle** ([[ERPGo - Performance Review Cycles]]) ketimbang sistem terpisah
+- [[HRIS - Work Review]] — penilaian kualitatif (KPI = sisi kuantitatif); pertimbangkan **berbagi satu Review Cycle** ketimbang sistem terpisah
 - [[HRIS - Career & Promotion]] — masukan keputusan promosi
 - [[HRIS - Analysis]] · [[HRIS - Big Pictures]] · [[HRIS - Interrelationship Matrices]]

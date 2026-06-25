@@ -7,7 +7,6 @@
 ## Selesai (baru-baru ini)
 
 - ✅ Task Manager cut-over ke **SSO-only** (jadi service bip-erp) — lihat [[ADR - 0003 SSO-only Gateway]]
-- ✅ Benchmark fitur **ERPGo** vs bip-erp — [[ERPGo - Overview & Gap Matrix]]
 - ✅ Second-brain Fase 1: domain [[QA - Big Pictures|Quality & Regulatory]] + glosarium [[REF - Glossary]]
 
 ## Direncanakan / Konsep
@@ -15,11 +14,11 @@
 | Item | Status | Sumber | Catatan |
 |---|---|---|---|
 | Recruitment service (ATS) | 🟡 | [[HRIS - Recruitment]] · [[Microservices - Recruitment Service]] | desain ada, belum di kode |
-| Form Builder service | 💤 | [[ERPGo - Form Builder]] | rencana `/plan` terkunci, eksekusi ditunda |
-| Contract Management | 🟡 | [[ERPGo - Contract Management]] | gap fit tinggi |
-| Budget Planner | 🟡 | [[ERPGo - Budget Planner]] | planning+monitoring saja (bukan akuntansi) |
-| Goal/OKR Management | 🟡 | [[ERPGo - Goal (OKR) Management]] | melengkapi KPI |
-| Internal CRM pipeline | 🟡 | [[ERPGo - Internal CRM (Leads & Deals)]] | bersyarat (ada jalur B2B?) |
+| Form Builder service | 💤 | [[IT - Form Builder]] | rencana `/plan` terkunci, eksekusi ditunda |
+| Contract Management | 🟡 | — | gap fit tinggi (kontrak vendor/customer/karyawan) |
+| Budget Planner | 🟡 | [[Finance]] | planning+monitoring saja (bukan akuntansi) |
+| Goal/OKR Management | 🟡 | [[HRIS - Key Performance Index]] | melengkapi KPI (beda lapis) |
+| Internal CRM pipeline | 🟡 | [[Sales - CRM management tool]] | bersyarat (ada jalur B2B?) |
 | Isi konten QA/RA farmasi | ❓ | [[QA - Big Pictures]] | butuh input tim QA (saat ini scaffold/TBD) |
 
 ## Infra / Teknis (dari [[HOMEPAGE]] TODO)
@@ -31,7 +30,7 @@
 ## Butuh keputusan (❓)
 
 - Prioritas & urutan eksekusi kandidat di atas (Product Owner).
-- Apakah ada kanal penjualan **B2B/wholesale** (penentu CRM internal + Quotation) — [[ERPGo - Quotation & Proposal]].
+- Apakah ada kanal penjualan **B2B/wholesale** (penentu CRM internal + Quotation).
 - Apakah Bharata memegang fungsi **distribusi (CDOB/PBF)** — [[QA - Big Pictures]].
 
 ## Fase second-brain berikutnya
@@ -45,4 +44,4 @@
 
 ## Dokumen Terkait
 
-- [[SCRUM SPECS]] · [[HOMEPAGE]] · [[ERPGo - Overview & Gap Matrix]] · [[REF - Ownership & RACI]]
+- [[SCRUM SPECS]] · [[HOMEPAGE]] · [[REF - Ownership & RACI]]

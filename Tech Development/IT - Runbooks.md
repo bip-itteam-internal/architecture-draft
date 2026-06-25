@@ -15,7 +15,7 @@ Pola dari [[HOMEPAGE]] + [[ADR - 0002 Database-per-Service]]:
 6. Tambah variabel ke `.env` / `.env.example` (`<SVC>_SERVICE_PORT`, `MONGO_<SVC>_DB`) — lihat alokasi port di [[IT - Environment Inventory]].
 7. Identitas user dari header `BIP-*` di belakang [[CORE - API Master Gateway]]; RBAC via `system_roles`.
 
-> Contoh penerapan lengkap (path eksak): [[ERPGo - Form Builder]] §Rencana Implementasi.
+> Contoh penerapan lengkap (path eksak): [[IT - Form Builder]] §Rencana Implementasi.
 
 ## Runbook 2 — Deploy / rilis (grounded dari [[IT - CI-CD]])
 

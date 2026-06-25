@@ -16,9 +16,9 @@ ERP internal (bip-erp) **tidak membangun akuntansi double-entry / general ledger
 
 - ➕ Tidak ada duplikasi mesin akuntansi; risiko ke pembukuan yang sudah jalan diminimalkan.
 - ➕ Konsumsi data actual untuk kebutuhan lain (mis. Budget Planner) cukup **read-only** dari jalur bridging.
-- ➖ Fitur ERP yang mengasumsikan akuntansi internal (mis. modul Accounting/Double-Entry ERPGo) **out-of-scope** — lihat [[ADR - 0004 ERPGo Out-of-Scope]].
+- ➖ Fitur ERP yang mengasumsikan akuntansi internal (mis. modul Accounting/Double-Entry penuh) **out-of-scope**.
 - ⚠️ Perubahan integrasi harus menjaga kontrak ke Accurate; jangan menulis balik sembarangan.
 
 ## Dokumen Terkait
 
-- [[Finance]] · [[External - Accurate]] · [[Finance - Bridging App]] · [[ADR - 0004 ERPGo Out-of-Scope]]
+- [[Finance]] · [[External - Accurate]] · [[Finance - Bridging App]]

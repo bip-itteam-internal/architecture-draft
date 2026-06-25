@@ -18,7 +18,7 @@ Setiap microservice **memiliki MongoDB-nya sendiri** (container terpisah) dan me
 - ➕ Ownership data tegas → konsisten dengan keputusan lain (mis. service baru = DB baru).
 - ➖ Butuh komunikasi service-to-service / orchestrator untuk data lintas-domain; bila alur rumit, pindahkan ke orchestrator ([[CORE - HRIS Orchestrator]] / [[CORE - IT Orchestrator]]).
 - ⚠️ Cluster primary tidak boleh diubah sembarangan (belum ada dynamic cluster picker). Semua waktu UTC.
-- ⚠️ Fitur/modul baru wajib mengikuti pola ini (mis. rencana [[ERPGo - Form Builder]] = service + Mongo sendiri).
+- ⚠️ Fitur/modul baru wajib mengikuti pola ini (mis. rencana [[IT - Form Builder]] = service + Mongo sendiri).
 
 ## Dokumen Terkait
 
