@@ -137,6 +137,16 @@ Ketika shift exchange sepenuhnya disetujui, sistem otomatis mengubah entri kehad
 
 Fungsi `getEmployeeScheduleDateRange()` di `func.go` juga memperhitungkan shift exchange yang sudah disetujui saat membangun tampilan kalender karyawan. Fungsi ini mengambil dokumen `ShiftExchangeRequest` yang disetujui dalam rentang tanggal dan menukar tampilan jadwal/work-time sesuai, termasuk format jadwal `REPLACEMENT_DAY_OFF` untuk hari yang ditukar.
 
+### Eksekusi & Penanganan Gagal
+
+`applyApprovedShiftExchange` berjalan **sinkron** saat reviewer menyetujui (final), **sebelum** status review dipersist:
+
+- Penerapan **gagal** (error update/insert Mongo) -> endpoint balas **500** dan status review **tidak** dipersist; pengajuan tetap dapat di-review ulang (mencegah kondisi "Disetujui" tapi entri absen tak berubah).
+- Penerapan **sukses** -> status menjadi `Disetujui`, lalu notifikasi "disetujui" dikirim.
+- Aman di-retry: update memakai `UpdateMany` (set ulang field yang sama) dan **insert hanya bila entri belum ada** (idempoten).
+
+> Sebelumnya penerapan dijalankan *fire-and-forget* (goroutine) sehingga kegagalan tidak terlihat & notifikasi "disetujui" tetap terkirim meski absen gagal berubah. Kini disamakan dengan pola sinkron pada [[HRIS - Attendance Correction]].
+
 ## Notifikasi
 
 Semua notifikasi menggunakan sistem push notification (FCM + inbox) melalui notification-service:
