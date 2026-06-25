@@ -81,6 +81,8 @@ Service adalah end-point yang berinteraksi dengan database-nya masing-masing (da
 
 **Tata Kelola** → [[IT - SOP Dokumentasi Vault]] (cara nulis dok konsisten + template)
 
+**Runbooks** → [[RUN - Onboarding Developer Baru]] (operasional non-kode: onboarding · how-to · troubleshooting — di-publish)
+
 ## Dari mana saya mulai?
 
 Biasakan diri dengan shared-library, api-gateway, lalu boilerplate services/orchestrator. Untuk membuat service baru:
