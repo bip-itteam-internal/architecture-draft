@@ -132,10 +132,13 @@ Saat pengajuan (`POST /correction`), urutan pemeriksaan:
 
 Ketika koreksi sepenuhnya disetujui, sistem otomatis mengubah entri kehadiran yang direferensikan:
 
-- **Koreksi clock-in**: Set `clock_in` ke `WorkTime.Start`, `clock_in_method` ke "Website", `status` ke "Tepat Waktu", `late_hour` ke 0
-- **Koreksi clock-out**: Set `clock_out` ke `WorkTime.End`, `clock_out_method` ke "Website"
-- **Keduanya**: Menerapkan keduanya di atas
-- Menambahkan komentar `"Koreksi disetujui #<correction_id>"` — **di-append**, tidak menimpa comment lama (bukti keterlambatan guestbook tetap terjaga)
+- **Koreksi clock-in**:
+  - Bila `clock_in` **kosong** (lupa absen) → isi `clock_in`=`WorkTime.Start`, `clock_in_method`="Website".
+  - Bila `clock_in` **sudah terisi** (koreksi/sengketa Late) → **jam asli + method dipertahankan** (tidak ditimpa) — data kedatangan nyata tetap auditable.
+  - Selalu: `status`→"Tepat Waktu", `late_hour`→0 (memaafkan keterlambatan).
+- **Koreksi clock-out**: isi `clock_out`=`WorkTime.End`, `clock_out_method`="Website" (hanya bila masih kosong).
+- **Keduanya**: terapkan keduanya.
+- Menambahkan komentar **`"Koreksi disetujui oleh <approver>"`** — **di-append** (tidak menimpa comment lama, mis. bukti keterlambatan guestbook). `approver` = penyetuju **final** yang memicu penerapan (HR untuk karyawan biasa; SPV HR / diri sendiri untuk internal HR).
 - Memperbarui metadata dengan ID approver
 
 ## Logika Filter Review (`buildCorrectionReviewFilter`)
