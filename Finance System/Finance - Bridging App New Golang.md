@@ -80,7 +80,7 @@ File hooks berada di `src/features/integration/accurate/hooks/`.
 | `useCreateSummaryReport` | `use-create-summary-report.ts` | POST buat ringkasan baru |
 | `useCreateSummaryModal` | `use-create-summary-modal.ts` | State modal form buat ringkasan |
 
-State pagination & filter dipersist via `PageStateContext` ke localStorage dengan key pattern `accurate-{type}-{channel}` (mis. `accurate-sales-tiktok`).
+State pagination & filter dikelola **in-memory** (`useState`) per halaman — **tidak** dipersist ke localStorage (tidak ada `PageStateContext`).
 
 ---
 
@@ -90,7 +90,7 @@ Base path: `/transactions/summary/reports`
 
 | Method | Path | Fungsi |
 |---|---|---|
-| `POST` | `/transactions/summary/reports` | Buat ringkasan baru (status awal: PENDING) |
+| `POST` | `/transactions/summary/reports` | Buat ringkasan baru — validasi + push task ke queue (record ditulis worker) |
 | `GET` | `/transactions/summary/reports` | List ringkasan dengan filter & paginasi |
 | `GET` | `/transactions/summary/reports/:id` | Detail satu ringkasan |
 | `GET` | `/transactions/summary/reports/:id/items` | Baris item dalam ringkasan |
@@ -104,15 +104,15 @@ Base path: `/transactions/summary/reports`
 | Parameter | Tipe | Keterangan |
 |---|---|---|
 | `page` | int | Nomor halaman (default: 1) |
-| `pageSize` | int | Jumlah per halaman |
-| `reportType` | string | `SALES_INVOICE` / `SALES_RETURN` / `INCOME` |
+| `page_size` | int | Jumlah per halaman |
+| `report_type` | string | `SALES_INVOICE` / `SALES_RETURN` / `INCOME` |
 | `channel` | string | `SHOPEE` / `TIKTOK` |
-| `shopId` | string | Filter berdasarkan ID toko |
-| `salesInvoiceNo` | string | Filter nomor invoice |
-| `salesReturnNo` | string | Filter nomor return |
-| `incomeNo` | string | Filter nomor income |
-| `timeFrom` | timestamp | Batas awal rentang waktu |
-| `timeTo` | timestamp | Batas akhir rentang waktu |
+| `shop_id` | string | Filter berdasarkan ID toko |
+| `sales_invoice_no` | string | Filter nomor invoice |
+| `sales_return_no` | string | Filter nomor return |
+| `income_no` | string | Filter nomor income |
+| `time_from` | timestamp | Batas awal rentang waktu |
+| `time_to` | timestamp | Batas akhir rentang waktu |
 | `status` | string | Filter status |
 
 #### Request Body POST Create Summary
@@ -155,7 +155,8 @@ Base path: `/transactions/summary/reports`
 
 | Status | Keterangan |
 |---|---|
-| `PENDING` | Baru dibuat, antri di queue Redis |
+| `PENDING` | Antri di queue Redis (di-set saat create & retry) |
+| `CREATING` | Worker mulai membuat record ringkasan |
 | `PROCESSING` | Worker sedang memproses |
 | `CREATED` | Berhasil dibuat |
 | `FAILED` | Gagal — dapat di-retry |
@@ -223,7 +224,7 @@ Validasi: kode mata uang harus ISO 4217. Field: `bank_name`, `bank_code`, `branc
 | `PUT` | `/accurate/settings/kv-configs/:id` | Update konfigurasi |
 | `DELETE` | `/accurate/settings/kv-configs/:id` | Hapus konfigurasi |
 
-**Key yang diizinkan:** `SERVICE_FEE`, `DISCOUNT`, `AFFILIATE_COMMISSION`, `SHIPPING_COST`, `ADVERTISING_COST`.
+**Key yang diizinkan** (nilai string tersimpan = lowercase-hyphenated): `service-fee`, `discount`, `affiliate-commision` (sic — typo di kode, satu `m`), `shipping-cost`, `advertising-cost`.
 
 ---
 
@@ -296,12 +297,13 @@ POST /transactions/summary/reports/:id/retry
 
 ## Belum Diimplementasikan / Catatan
 
-- **Route direct-push Accurate** (`/transactions/summary/create`, `/transactions/summary/send`, `/transactions/summary/status`) — handler **sudah lengkap** tapi route masih **di-comment** di `main.go`. Alur ini digantikan oleh `/transactions/summary/reports/:id/send/:service`.
+- **Route direct-push Accurate** (`/accurate/transactions/summary/create`, `.../send`, `.../status`) masih **di-comment** di `main.go`. Hanya handler **send** (`SendTransactionSummaryOrderToAccurate`) & **status** (`GetTransactionSummaryOrderStatus`) yang ada; handler **create** (`CreateTransactionSummaryOrder`) **belum ada** — route create menunjuk handler yang belum dibuat. Alur ini digantikan oleh `/transactions/summary/reports/:id/send/:service`.
 - **Service selain Accurate** mengembalikan HTTP 501 "service integration not implemented yet" — enum `service` saat ini hanya mendukung `ACCURATE`.
 - **Lazada, Tokopedia, KiriminAja** — tidak ada halaman integration-accurate untuk platform ini; hanya Shopee dan TikTok yang didukung pada Golang rewrite.
 - **Tokopedia & KiriminAja** sudah ada di sistem Finance lama (Java) tapi **belum dimigrasi**.
 - TODO kecil: indexing `time.Time` di MongoDB.
 - **Auto-send ke Accurate** belum otomatis — pengguna harus trigger manual via tombol.
+- **Endpoint belum didokumentasikan rinci**: `GET /transactions/summary/reports/group-by-status` & `GET /transactions/insight/demography` (terdaftar di `main.go`, belum dijabarkan di tabel atas).
 
 ---
 
@@ -310,7 +312,7 @@ POST /transactions/summary/reports/:id/retry
 - [[CORE - API Master Gateway]] — entry point semua request dari frontend ke service
 - [[Microservices - Integration Service]] — service ini adalah rumah semua handler di atas
 - [[External - Accurate]] — target bridging finansial (Accurate Online, autentikasi HMAC-SHA256)
-- [[DB - Overview and Notes]] — MongoDB (data ringkasan) + Redis (queue `srv:integration`)
+- [[DB - Overview and Notes]] — MongoDB (data ringkasan) + Redis (queue key `queue:integration_tasks`; prefix Redis `srv:integration`, lock `srv:integration:lock`)
 - **TikTok Shop API** — sumber data order untuk channel TIKTOK
 - **Shopee API** — sumber data order untuk channel SHOPEE
 
