@@ -27,10 +27,10 @@ Format nama file **selalu**: `Prefix - Nama.md` — flat, tanpa `/` di nama (pak
 | Gateway / SSO / Orchestrator / shared service | Core System and Modules | `CORE -` |
 | Database / skema / koleksi | Core System and Modules | `DB -` |
 | Aplikasi FE / mobile / desktop | Application | `APP -` / `BASE -` |
-| Konsep bisnis Marketing | Marketing | `Sales -` |
+| Konsep bisnis Marketing | Sales | `Sales -` |
 | Konsep bisnis HR | Human Resource Information System | `HRIS -` |
 | General Affairs | General Affairs | `GA -` |
-| Tech Development / IT ops | Tech Development | `IT -` |
+| Tech Development / IT ops | IT | `IT -` |
 | Warehouse | Warehouse | `WH -` |
 | Finance | Finance System | `Finance -` |
 | Software pihak ketiga | Third-party Software | `External -` / `Vendor -` |
@@ -118,7 +118,7 @@ Copy salah satu prompt di bawah, ganti placeholder `<...>`, tempel ke agent. Sem
 ```text
 Kamu mendokumentasikan ERP Bharata di Obsidian vault ini.
 
-1. Baca dulu `CLAUDE.md` (root) dan `Tech Development/IT - SOP Dokumentasi Vault.md`,
+1. Baca dulu `CLAUDE.md` (root) dan `IT/IT - SOP Dokumentasi Vault.md`,
    lalu patuhi seluruh aturannya (grounded-in-code, penamaan, wikilink 0-broken, alur git).
 2. Sumber kebenaran = kode di `/bip-erp/services/<nama-service>`. Baca kode itu
    (routes, handler, model, worker/cron). JANGAN mengarang; yang belum ada tandai TBD.
@@ -136,7 +136,7 @@ Kamu mendokumentasikan ERP Bharata di Obsidian vault ini.
 ```text
 Kamu menyinkronkan dokumentasi ERP dengan perubahan kode terbaru.
 
-1. Baca `CLAUDE.md` + `Tech Development/IT - SOP Dokumentasi Vault.md`, patuhi aturannya.
+1. Baca `CLAUDE.md` + `IT/IT - SOP Dokumentasi Vault.md`, patuhi aturannya.
 2. `git pull` di vault dan repo kode. Lihat diff/commit terbaru di
    `<repo/path, mis. bip-erp/services/employee>`.
 3. Tentukan dok terdampak (pakai pemetaan repo→dok di `CLAUDE.md` §7). Update HANYA yang
@@ -150,9 +150,9 @@ Kamu menyinkronkan dokumentasi ERP dengan perubahan kode terbaru.
 
 ```text
 Kamu menulis dokumentasi KONSEP/bisnis (bukan implementasi) untuk domain
-<Marketing/HRIS/GA/Warehouse/Finance/...>.
+<Sales/HRIS/GA/Warehouse/Finance/...>.
 
-1. Baca `CLAUDE.md` + `Tech Development/IT - SOP Dokumentasi Vault.md`, patuhi aturannya.
+1. Baca `CLAUDE.md` + `IT/IT - SOP Dokumentasi Vault.md`, patuhi aturannya.
 2. Buat dok `<Folder domain>/<Prefix> - <Nama>.md` mengikuti template
    `Templates/Template - Konsep Domain.md`: Deskripsi → Latar Belakang →
    Ruang Lingkup/Cakupan → Konsumen Data → Kendala → Belum Diputuskan (TBD) → Dokumen Terkait.
@@ -167,7 +167,7 @@ Kamu menulis dokumentasi KONSEP/bisnis (bukan implementasi) untuk domain
 Kamu mencatat artefak OPERASIONAL (korespondensi vendor / dump access-log / catatan insiden)
 — ini bukan dokumentasi arsitektur.
 
-1. Baca `CLAUDE.md` §2 (area non-domain Logs) + `Tech Development/IT - SOP Dokumentasi Vault.md`.
+1. Baca `CLAUDE.md` §2 (area non-domain Logs) + `IT/IT - SOP Dokumentasi Vault.md`.
 2. Buat file `Logs/LOG - <Judul Ringkas>.md` mengikuti template
    `Templates/Template - Log Operasional.md`: header Tipe/Tanggal/Konteks-arsitektur →
    isi point-in-time. MASK kredensial (token/sign/password).
