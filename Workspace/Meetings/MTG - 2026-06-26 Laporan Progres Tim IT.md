@@ -32,7 +32,7 @@ publish: false
 ## Infra
 - **Kondisi**: CI/CD dengan Harness & Docker agent berjalan; migrasi server ke cloud sedang proses; titik CCTV gudang baru sudah dikirim.
 - **Kendala**: Sering mati listrik & internet down (di luar kontrol IT) → webhook Shopee & TikTok terputus, padahal harus selalu on untuk data transaksi realtime & success rate >90%; absensi ikut terganggu.
-- **Rencana**: Percepat migrasi cloud agar layanan tak bergantung listrik/internet kantor; sediakan mode absen offline saat listrik/internet down.
+- **Rencana**: Percepat migrasi cloud agar layanan tak bergantung listrik/internet kantor.
 
 ---
 
@@ -40,11 +40,10 @@ publish: false
 
 - **"Shift exchange & attendance correction sudah di production"** — perbaikan terbaru (pertahankan jam clock-in asli, apply tukar shift sinkron, notif Bahasa Indonesia, comment "disetujui oleh approver") masih di branch `feat/recruitment-service` / **PR #156** — pastikan apakah sudah ikut ter-deploy ke production atau belum. Lihat [[HRIS - Attendance Correction]] & [[HRIS - Shift Exchange]].
 - **"Integrasi attendance & shift exchange ke MyBharata belum jalan"** — termasuk follow-up tertunda: **MyBharata kirim `employee_id` di guestbook internal** (mengaktifkan guard anti-fraud koreksi telat end-to-end). Deploy BE dulu sebelum FE kirim (handler `DisallowUnknownFields`).
-- **"Mode absen offline saat listrik/internet down"** (Infra) — fitur baru untuk attendance; perlu desain (antrian lokal + sync saat online, anti-duplikat/anti-backdate). Belum ada di kode.
 
 ## Tindak lanjut lintas-tim (capture)
 - [ ] Meeting requirement filter/analisis Marketing dengan user & manufaktur
 - [ ] Tim finance isi data product (sheet/CSV)
 - [ ] Integrasi attendance + shift exchange → MyBharata (sinkron dengan deploy BE)
 - [ ] Meeting validasi alur WMS dengan user
-- [ ] Percepat migrasi cloud (mitigasi mati listrik/internet) + desain mode absen offline
+- [ ] Percepat migrasi cloud (mitigasi mati listrik/internet)
