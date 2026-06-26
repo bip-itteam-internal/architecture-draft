@@ -61,6 +61,7 @@ Flow wajib tiap task: **`/start-task` → `/plan` → `/implement` → `/review`
 
 - [ ] Clone vault + repo yang akan digarap sebagai **sibling** (§2).
 - [ ] Pasang tools (§3): pnpm, Obsidian, Go, Docker.
+- [ ] **Pasang agent-kit**: dari folder `erp/`, jalankan init **sekali** — Windows `powershell -ExecutionPolicy Bypass -File architecture-draft\.agent-kit\init.ps1`; mac/linux `bash architecture-draft/.agent-kit/init.sh`. Tanpa ini, `/start-task … /sync-docs … /wrap` tak muncul di Claude Code. Detail + multi-project: [[RUN - Onboarding Developer Baru]].
 - [ ] Buka vault di Obsidian → baca [[HOMEPAGE]] + [[CLAUDE]] (rulebook).
 - [ ] Pahami alur kerja per task (§4) + konvensi (§5).
 - [ ] Jalankan stack lokal bila perlu (`bip-erp/docker-compose.yml`; port di [[IT - Environment Inventory]]).

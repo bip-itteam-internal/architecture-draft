@@ -25,6 +25,19 @@ Hari pertama developer baru, atau saat setup ulang environment dari awal.
 5. Untuk bikin service baru: ikuti langkah di [[HOMEPAGE]] (bagian "Dari mana saya mulai").
 6. Kerjakan task dengan flow wajib: `/start-task` → `/plan` → `/implement` → `/review` → `/sync-docs` → `/wrap`.
 
+## Multi-project (memegang beberapa repo)
+
+Satu workspace `erp/` menampung **banyak project sekaligus** — vault & `erp/.claude/` cukup **satu**.
+
+- Clone **semua** project yang dipegang sebagai sibling di `erp/` (di samping `architecture-draft`), mis. `bip-erp`, `erp-frontend`, `mybharata-app`.
+- Saat init, kit **mendeteksi semua** sibling ber-`.git` lalu meminta pilih **satu project aktif** — atau lewati prompt dengan `-ActiveProject <nama>` (PS) / `--active-project <nama>` (bash).
+- **Project aktif** = fokus flow saat ini (ke mana `/start-task` membaca dok, ke mana `/wrap` commit). Tertulis di `erp/CLAUDE.md`.
+- **Pindah fokus** = jalankan ulang init dengan project lain (beberapa detik; hanya menulis ulang baris "Project aktif", tak menyentuh repo project):
+  ```
+  powershell -ExecutionPolicy Bypass -File architecture-draft\.agent-kit\init.ps1 -ActiveProject erp-frontend
+  ```
+- Vault mendokumentasikan **semua** project ([[CLAUDE]] §7 memetakan repo→dok), jadi `/sync-docs` & `/start-task` otomatis mengarah ke dok project yang aktif. "Project aktif" **satu pada satu waktu** (tak ada multi-active).
+
 ## Verifikasi
 
 - Di Claude Code ketik `/` → command flow muncul (`/start-task`, `/sync-docs`, dll.); cek `erp/.claude/commands/` berisi 7 file.
