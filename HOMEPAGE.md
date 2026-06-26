@@ -67,7 +67,7 @@ Service adalah end-point yang berinteraksi dengan database-nya masing-masing (da
 
 **Aplikasi** → [[BASE - Enterance Point]] · [[APP - Web ERP]] · [[APP - MyBharata]] · [[APP - Dynamic Task Tracker]] · [[APP - Ideamills]] · [[APP - Tiktok Insight Analyzer]] · [[APP (Extension) - Fingerprint Listener (Complete)]]
 
-**Domain (Big Pictures)** → [[HRIS - Big Pictures]] · [[Sales - Big Pictures]] · [[GA - Big Pictures]] · [[IT - Big Pictures]] · [[WH - Management System]] · [[Finance]]
+**Domain (Big Pictures)** → [[HRIS - Big Pictures]] · [[Sales - Big Pictures]] · [[GA - Big Pictures]] · [[IT - Big Pictures]] · [[WH - Management System]] · [[Finance - Big Pictures]]
 
 **Quality & Regulatory** → [[QA - Big Pictures]] (CPOB/GMP · BPOM/izin edar · batch & traceability · deviation/CAPA · ED & recall — farmasi)
 

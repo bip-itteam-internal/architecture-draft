@@ -57,4 +57,4 @@
 ## Dokumen Terkait
 
 - [[Microservices - Attendance Service]] (`payroll-supplement`) · [[Microservices - Employee Service]] (`payroll-approx`) · [[CORE - HRIS Orchestrator]]
-- [[HRIS - Overtime]] · [[HRIS - Compensation & Benefits]] · [[Finance]] · [[ADR - 0001 Akuntansi via Accurate]]
+- [[HRIS - Overtime]] · [[HRIS - Compensation & Benefits]] · [[Finance - Big Pictures]] · [[ADR - 0001 Akuntansi via Accurate]]

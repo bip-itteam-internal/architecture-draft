@@ -5,5 +5,5 @@
 ## Dokumen Terkait
 
 - [[Microservices - Integration Service]] — bridging Sales Invoice/Return ke Accurate
-- [[Finance - Bridging App]] · [[Finance]] — konsumen akuntansi
+- [[Finance - Bridging App]] · [[Finance - Big Pictures]] — konsumen akuntansi
 - [[Microservices - Insentive Service]] · [[Sales - Marketplace Integration]]

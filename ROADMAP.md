@@ -16,7 +16,7 @@
 | Recruitment service (ATS) | 🟡 | [[HRIS - Recruitment]] · [[Microservices - Recruitment Service]] | desain ada, belum di kode |
 | Form Builder service | 💤 | [[IT - Form Builder]] | rencana `/plan` terkunci, eksekusi ditunda |
 | Contract Management | 🟡 | — | gap fit tinggi (kontrak vendor/customer/karyawan) |
-| Budget Planner | 🟡 | [[Finance]] | planning+monitoring saja (bukan akuntansi) |
+| Budget Planner | 🟡 | [[Finance - Big Pictures]] | planning+monitoring saja (bukan akuntansi) |
 | Goal/OKR Management | 🟡 | [[HRIS - Key Performance Index]] | melengkapi KPI (beda lapis) |
 | Internal CRM pipeline | 🟡 | [[Sales - CRM management tool]] | bersyarat (ada jalur B2B?) |
 | Isi konten QA/RA farmasi | ❓ | [[QA - Big Pictures]] | butuh input tim QA (saat ini scaffold/TBD) |

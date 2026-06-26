@@ -319,7 +319,7 @@ POST /transactions/summary/reports/:id/retry
 ## Dokumen Terkait
 
 - [[Finance - Bridging App]] — sistem Finance lama (Java/ReactJS) yang sedang dimigrasi
-- [[Finance]] — overview domain Finance System
+- [[Finance - Big Pictures]] — overview domain Finance System
 - [[Microservices - Integration Service]] — dokumentasi lengkap service (129 endpoint, semua modul)
 - [[External - Accurate]] — detail integrasi Accurate Online
 - [[Sales - Marketplace Integration]] — konteks bisnis sisi marketing

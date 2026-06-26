@@ -2,11 +2,11 @@
 
 - **Status**: ✅ Accepted (mencerminkan kondisi saat ini)
 - **Tanggal**: TBD (keputusan historis; dikodifikasi 2026-06-24)
-- **Konteks dok**: [[Finance]] · [[External - Accurate]] · [[Finance - Bridging App]]
+- **Konteks dok**: [[Finance - Big Pictures]] · [[External - Accurate]] · [[Finance - Bridging App]]
 
 ## Context
 
-Sistem finance Bharata sudah terenkapsulasi dengan ekosistemnya sendiri dan menyinkronkan data ke **Accurate** (software akuntansi) sebagai sumber kebenaran pembukuan. Lihat catatan di [[Finance]]: tidak disarankan menautkan sistem finance lama langsung ke arsitektur baru; finance akan dibangun ulang dengan benar, namun **akuntansi inti tetap di Accurate**.
+Sistem finance Bharata sudah terenkapsulasi dengan ekosistemnya sendiri dan menyinkronkan data ke **Accurate** (software akuntansi) sebagai sumber kebenaran pembukuan. Lihat catatan di [[Finance - Big Pictures]]: tidak disarankan menautkan sistem finance lama langsung ke arsitektur baru; finance akan dibangun ulang dengan benar, namun **akuntansi inti tetap di Accurate**.
 
 ## Decision
 
@@ -21,4 +21,4 @@ ERP internal (bip-erp) **tidak membangun akuntansi double-entry / general ledger
 
 ## Dokumen Terkait
 
-- [[Finance]] · [[External - Accurate]] · [[Finance - Bridging App]]
+- [[Finance - Big Pictures]] · [[External - Accurate]] · [[Finance - Bridging App]]

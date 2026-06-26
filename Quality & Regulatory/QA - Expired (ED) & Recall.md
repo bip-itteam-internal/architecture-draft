@@ -25,7 +25,7 @@
 
 - Apakah perlu alert ED otomatis (threshold hari) di sistem.
 - Alur recall formal + pelaporan ke [[QA - BPOM & Izin Edar (NIE)]].
-- Disposisi stok ED (retur vendor / pemusnahan) — dampak ke [[Finance]] (nilai stok).
+- Disposisi stok ED (retur vendor / pemusnahan) — dampak ke [[Finance - Big Pictures]] (nilai stok).
 
 ## Dokumen Terkait
 

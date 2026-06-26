@@ -153,6 +153,6 @@ Pengelolaan barang kembali/retur.
 ## Dokumen Terkait
 
 - [[Finance - Bridging App New Golang]] — penulisan ulang (Golang) sistem ini
-- [[Finance]] — overview domain Finance System
+- [[Finance - Big Pictures]] — overview domain Finance System
 - [[External - Accurate]] — target sinkronisasi akuntansi
 - [[Finance - Incentive]] — sistem insentif terkait

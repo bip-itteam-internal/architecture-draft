@@ -1,4 +1,6 @@
-## Catatan
+🟡 **Konsep / Overview** — peta domain Finance System: sistem lama terenkapsulasi (sinkron ke Accurate), direncanakan dibangun ulang dari awal.
+
+## Deskripsi
 
 *Sistem finance saat ini mengelola data masuk dari Vendor - CRM, membersihkan dan menyinkronkan informasi tersebut untuk [[External - Accurate]] guna membuat ikhtisar mengenai seluruh aspek dalam finance*
 

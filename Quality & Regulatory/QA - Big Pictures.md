@@ -24,7 +24,7 @@
 
 - [[Manufacture - Stock & Material Management]] — status mutu/karantina material & produk
 - [[WH - Management System]] — pemisahan stok released/quarantine/rejected (TBD)
-- [[Finance]] / [[External - Accurate]] — nilai stok terdampak ED/recall (TBD)
+- [[Finance - Big Pictures]] / [[External - Accurate]] — nilai stok terdampak ED/recall (TBD)
 
 ## Kendala
 
