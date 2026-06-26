@@ -63,6 +63,10 @@ Status dihitung dari dua review melalui `ResolveLeaveRequestStatus(review_1, rev
 
 Karyawan juga dapat membatalkan pengajuan mereka sendiri yang masih pending, yang mengubah `status` menjadi `Dibatalkan`.
 
+### Auto-Ignore (Pengajuan Basi)
+
+Pengajuan yang masih `Menunggu` lebih dari **24 jam** sejak dibuat (`metadata.created_at`) akan **otomatis diabaikan** oleh sistem via cron `cronAutoIgnoreStaleRequest` (jalan tiap jam): `status` → `Diabaikan`; review yang masih menunggu (`review_1`/`review_2`) ditandai `Diabaikan` + catatan "Pengajuan koreksi diabaikan oleh sistem (melebihi 24 jam)"; dan pemohon menerima notifikasi (`pushEmployeeCorrectionIgnored`). Aturan **sama persis** dengan [[HRIS - Leave Request]] (basis `created_at`, ambang 24 jam).
+
 ## Penentuan Reviewer (4 Kasus)
 
 Reviewer ditentukan secara dinamis berdasarkan peran dan departemen pemohon. Deteksi supervisor menggunakan `getSupervisorData(department)` untuk menentukan supervisor yang sebenarnya.
