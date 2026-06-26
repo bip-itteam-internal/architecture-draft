@@ -34,7 +34,10 @@ Satu workspace `erp/` menampung **banyak project sekaligus** — vault & `erp/.c
 - **Project aktif** = fokus flow saat ini (ke mana `/start-task` membaca dok, ke mana `/wrap` commit). Tertulis di `erp/CLAUDE.md`.
 - **Pindah fokus** = jalankan ulang init dengan project lain (beberapa detik; hanya menulis ulang baris "Project aktif", tak menyentuh repo project):
   ```
+  # Windows
   powershell -ExecutionPolicy Bypass -File architecture-draft\.agent-kit\init.ps1 -ActiveProject erp-frontend
+  # mac/linux
+  bash architecture-draft/.agent-kit/init.sh --active-project erp-frontend
   ```
 - Vault mendokumentasikan **semua** project ([[CLAUDE]] §7 memetakan repo→dok), jadi `/sync-docs` & `/start-task` otomatis mengarah ke dok project yang aktif. "Project aktif" **satu pada satu waktu** (tak ada multi-active).
 
