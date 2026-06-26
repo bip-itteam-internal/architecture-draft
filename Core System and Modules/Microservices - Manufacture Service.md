@@ -46,6 +46,7 @@ Daftar rute lengkap di [[API - Manufacture Service]]. Ringkas:
 - Perhitungan kebutuhan→kekurangan otomatis dari rencana produksi (Fase 2 di [[Manufacture - Stock & Material Management]]) — sebagian (formula ada, planning belum penuh).
 - Multi-gudang/lokasi + karantina ED, stock opname digital, integrasi [[External - Accurate]] — masih konsep.
 - Master `stok_awal` tersimpan 0 saat upsert master (kosmetik; snapshot stok benar ter-seed dari STOK GUDANG).
+- **Temuan audit kode** (authz, race stok, mapper FE, seed atomik) terdaftar di [[Manufacture - Issue Code Audit 2026-06]] — perbaikan terjadwal.
 
 ## Dependensi & Integrasi
 
