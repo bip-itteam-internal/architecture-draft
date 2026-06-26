@@ -97,6 +97,11 @@ Semua route berada di bawah **Attendance Service** (`/api/attendance/correction/
 
 - `as=reviewer` — menampilkan request di mana pemanggil adalah reviewer saat ini (pending review)
 - `as=reviewed` — menampilkan request yang sudah direview oleh pemanggil, **termasuk request yang dibatalkan** yang ditujukan ke reviewer ini
+- `filter=ongoing` — request yang **masih aktif**: baru disentuh (≤48 jam) **atau** status masih `Menunggu` review.
+- `filter=past` — request yang **sudah selesai**: lama tak disentuh (>48 jam) **dan** status final (`Disetujui`/`Ditolak`/`Diabaikan`/`Dibatalkan`).
+- `status=<Status>` — filter berdasarkan status (pada `/correction/mine`).
+
+> Catatan: `filter=ongoing/past` berlaku untuk `/correction/mine` & `/correction`, dan dapat dikombinasikan dengan `status`/`as` (di-AND). Berbeda dari Leave yang memakai window tanggal (`to_date`); koreksi memakai **status review** karena `attendance_date` selalu lampau.
 
 ## Alur Persetujuan
 
