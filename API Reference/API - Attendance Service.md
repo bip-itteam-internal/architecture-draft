@@ -10,7 +10,7 @@
 |---|---|---|---|
 | POST | `/tap` | Clock-in/out (fingerprint/mobile/website; `?method=`) | open (serial/MAC/token) |
 | GET | `/entries` | List entri (paginated, filter dept/status/periode) | HRIS |
-| GET | `/history` | Riwayat absensi sendiri (bulanan); `?missing=clockin/clockout/any` = kandidat koreksi | header |
+| GET | `/history` | Riwayat absensi sendiri (bulanan) | header |
 | GET | `/report` | Laporan periode 26→25 (`?yyyy-mm`) | HRIS |
 | PATCH | `/:id/update` | Update entri (+dokumen/status/comment) | HRIS |
 | GET | `/payroll-supplement` | Agregasi jam → payout_pct (`?employee_id`) | open |
@@ -36,6 +36,7 @@
 |---|---|---|---|
 | POST/GET/PATCH | `/shift-exchange/create` · `/view` · `/review` · `/cancel` | Tukar shift (2-level review) | header |
 | POST/GET | `/correction` · `/correction/mine` · `/correction` | Koreksi absen (window 7 hari; clock-in: kosong/Late, kecuali telat terverifikasi guestbook; list `?filter=ongoing/past` via status review, `?status=`) | header |
+| GET | `/correction/candidates` | Entri kandidat koreksi 7 hari terakhir (hari ini s/d H-7, lintas-bulan, tanpa month); `?type=clockin/clockout/any` — untuk pemilih tanggal FE | header |
 | PATCH | `/correction/:id/cancel` · `/correction/:id/review` | Batal / review koreksi | header |
 
 ## Guestbook · WiFi · Internal

@@ -95,6 +95,7 @@ Semua route berada di bawah **Attendance Service** (`/api/attendance/correction/
 |--------|--------------------------|--------------------------------------------------------|
 | POST   | `/correction`            | Membuat request koreksi baru                           |
 | GET    | `/correction/mine`       | Melihat daftar request koreksi milik sendiri            |
+| GET    | `/correction/candidates` | Entri absen **kandidat koreksi** 7 hari terakhir (hari ini s/d H-7, lintas-bulan, tanpa pilih bulan); `?type=clockin/clockout/any` — untuk pemilih tanggal di FE |
 | GET    | `/correction`            | Melihat daftar request untuk review (`?as=reviewer` atau `?as=reviewed`) |
 | PATCH  | `/correction/:id/cancel` | Membatalkan request pending milik sendiri               |
 | PATCH  | `/correction/:id/review` | Menyetujui atau menolak request (body: `{ status, notes? }`) |
