@@ -354,7 +354,7 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ### Task 4: Perluas SOP — decision-tree + bentuk dok + alur "naik kelas"
 
 **Files:**
-- Modify: `architecture-draft/Tech Development/IT - SOP Dokumentasi Vault.md`
+- Modify: `architecture-draft/IT/IT - SOP Dokumentasi Vault.md`
 
 **Interfaces:**
 - Consumes: template (Task 2), konvensi (Task 1).
@@ -404,7 +404,7 @@ Capture mentah di `Workspace/` sifatnya sementara. Saat matang, **pindahkan isin
 
 ```powershell
 $repo = "c:\Data utama\Aplikasi\Office\erp\architecture-draft"
-$f = "$repo\Tech Development\IT - SOP Dokumentasi Vault.md"
+$f = "$repo\IT\IT - SOP Dokumentasi Vault.md"
 Select-String -Path $f -Pattern 'RUN -|MTG -|Naik kelas|Workspace' | Select-Object LineNumber
 "--- wikilink resolve ---"
 ```
@@ -414,7 +414,7 @@ Lalu jalankan **verification helper** dengan `$file = $f`. Expected: section/bar
 
 ```powershell
 $repo = "c:\Data utama\Aplikasi\Office\erp\architecture-draft"
-git -C $repo add -- "Tech Development/IT - SOP Dokumentasi Vault.md"
+git -C $repo add -- "IT/IT - SOP Dokumentasi Vault.md"
 git -C $repo commit -m @'
 docs: SOP — runbook/capture + alur naik kelas (second brain)
 
@@ -463,19 +463,19 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 
 ---
 
-### Task 6: ADR-0004 — catat keputusan (dogfooding) + link dari HOMEPAGE
+### Task 6: ADR-0005 — catat keputusan (dogfooding) + link dari HOMEPAGE
 
 **Files:**
-- Create: `architecture-draft/Decisions/ADR - 0004 Vault sebagai Team Knowledge Base.md`
+- Create: `architecture-draft/Decisions/ADR - 0005 Vault sebagai Team Knowledge Base.md`
 - Modify: `architecture-draft/HOMEPAGE.md` (baris "Roadmap & Keputusan")
 
 **Interfaces:**
 - Consumes: `RUN - Onboarding Developer Baru` (Task 3), `IT - SOP Dokumentasi Vault` (ada).
 
-- [ ] **Step 1: Buat `Decisions/ADR - 0004 Vault sebagai Team Knowledge Base.md`** (format mengikuti ADR-0003):
+- [ ] **Step 1: Buat `Decisions/ADR - 0005 Vault sebagai Team Knowledge Base.md`** (format mengikuti ADR-0003):
 
 ```markdown
-## ADR 0004 — Vault sebagai Team Second Brain (Runbooks + Workspace)
+## ADR 0005 — Vault sebagai Team Second Brain (Runbooks + Workspace)
 
 - **Status**: ✅ Accepted
 - **Tanggal**: 2026-06-25
@@ -506,24 +506,24 @@ Stream bisnis/keputusan **tanpa folder baru** — reuse `Decisions/` (ADR) + "La
 - [[CLAUDE]] · [[IT - SOP Dokumentasi Vault]] · [[HOMEPAGE]] · [[RUN - Onboarding Developer Baru]]
 ```
 
-- [ ] **Step 2: Tautkan ADR-0004 dari HOMEPAGE.** Di `HOMEPAGE.md`, pada baris `**Roadmap & Keputusan** → ... [[ADR - 0003 SSO-only Gateway]]`, tambahkan di ujung: ` · [[ADR - 0004 Vault sebagai Team Knowledge Base]]`.
+- [ ] **Step 2: Tautkan ADR-0005 dari HOMEPAGE.** Di `HOMEPAGE.md`, pada baris `**Roadmap & Keputusan** → ... [[ADR - 0003 SSO-only Gateway]]`, tambahkan di ujung: ` · [[ADR - 0005 Vault sebagai Team Knowledge Base]]`.
 
 - [ ] **Step 3: Verifikasi.** Jalankan **verification helper** dua kali, dengan:
 
 ```powershell
-$file = "$repo\Decisions\ADR - 0004 Vault sebagai Team Knowledge Base.md"
+$file = "$repo\Decisions\ADR - 0005 Vault sebagai Team Knowledge Base.md"
 # lalu:
 $file = "$repo\HOMEPAGE.md"
 ```
-Expected: keduanya semua `OK`. Khusus HOMEPAGE, pastikan `ADR - 0004 ...` kini resolve.
+Expected: keduanya semua `OK`. Khusus HOMEPAGE, pastikan `ADR - 0005 ...` kini resolve.
 
 - [ ] **Step 4: Commit.**
 
 ```powershell
 $repo = "c:\Data utama\Aplikasi\Office\erp\architecture-draft"
-git -C $repo add -- "Decisions/ADR - 0004 Vault sebagai Team Knowledge Base.md" "HOMEPAGE.md"
+git -C $repo add -- "Decisions/ADR - 0005 Vault sebagai Team Knowledge Base.md" "HOMEPAGE.md"
 git -C $repo commit -m @'
-docs: ADR-0004 vault sebagai team second brain
+docs: ADR-0005 vault sebagai team second brain
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 '@
@@ -546,7 +546,7 @@ Get-ChildItem $repo -Recurse -Filter *.md -File |
 ```
 Expected: **tidak ada output** (tak ada dok published yang nge-link ke Workspace).
 
-- [ ] **Step 2: Cek wikilink 0-broken pada semua dok yang disentuh.** Jalankan **verification helper** untuk: `CLAUDE.md`, `HOMEPAGE.md`, `Tech Development\IT - SOP Dokumentasi Vault.md`, `Runbooks\RUN - Onboarding Developer Baru.md`, `Decisions\ADR - 0004 Vault sebagai Team Knowledge Base.md`. Expected: semua `OK`, 0 `MISS`.
+- [ ] **Step 2: Cek wikilink 0-broken pada semua dok yang disentuh.** Jalankan **verification helper** untuk: `CLAUDE.md`, `HOMEPAGE.md`, `IT\IT - SOP Dokumentasi Vault.md`, `Runbooks\RUN - Onboarding Developer Baru.md`, `Decisions\ADR - 0005 Vault sebagai Team Knowledge Base.md`. Expected: semua `OK`, 0 `MISS`.
 
 - [ ] **Step 3: Konfirmasi git bersih & tak menyentuh file orang lain.** Jalankan:
 

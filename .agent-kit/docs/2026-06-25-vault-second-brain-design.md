@@ -102,7 +102,7 @@ Inbox / Meetings  ──matang──▶  rumah permanen                 ──�
    catat aturan exclusion publish.
 2. **`Templates/`** — tambah `Template - Runbook.md`, `Template - Meeting Note.md`,
    `Template - Daily Note.md` (skeleton + placeholder `%% %%`, tanpa wikilink hidup, seperti template lain).
-3. **`Tech Development/IT - SOP Dokumentasi Vault.md`** — perluas decision-tree penamaan:
+3. **`IT/IT - SOP Dokumentasi Vault.md`** — perluas decision-tree penamaan:
    kapan Runbook vs dok domain vs Inbox vs Meeting; dokumentasikan alur naik kelas.
 4. **`HOMEPAGE.md`** — tambah baris index **Runbooks**; `Workspace/` sengaja **tidak** ditaut
    dari homepage publik.
@@ -110,7 +110,7 @@ Inbox / Meetings  ──matang──▶  rumah permanen                 ──�
    `DEVELOPER GUIDE`), `Workspace/Inbox/.gitkeep` + 1 contoh daily note,
    `Workspace/Meetings/MTG - 2026-06-25 Contoh.md`.
 6. **Wiring exclusion publish** — set ignore-glob/`publish: false` di tool export. **TBD-1.**
-7. **(Opsional, dogfooding)** `Decisions/ADR - 0004 Vault sebagai Team Knowledge Base.md` —
+7. **(Opsional, dogfooding)** `Decisions/ADR - 0005 Vault sebagai Team Knowledge Base.md` —
    catat keputusan ini (Context → Decision → Consequences).
 
 ## Risiko & Mitigasi
