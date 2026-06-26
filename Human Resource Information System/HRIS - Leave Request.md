@@ -53,6 +53,11 @@ Rantai **2 tingkat**: **Supervisor departemen → HR**. Supervisor dideteksi via
 - Selain itu → `Menunggu persetujuan`
 - Karyawan dapat **membatalkan** pengajuan sendiri yang masih pending → `Dibatalkan`
 
+### Auto-Ignore & Reminder
+
+- **Auto-ignore 24 jam**: pengajuan masih `Menunggu` >24 jam sejak dibuat (`metadata.created_at`) **otomatis diabaikan** via cron `cronAutoIgnoreStaleRequest` (tiap jam) — `status` & review yang menunggu (`spv_status`/`hr_status`) → `Diabaikan` + catatan; pemohon dinotifikasi (`pushEmployeeLeaveRequestIgnored`).
+- **Reminder reviewer (T+18 jam)**: **6 jam sebelum** batas, reviewer yang masih menunggu diingatkan **sekali** via cron `cronRemindStalePendingLeaves` — supervisor bila di `spv_status`, HR bila di `hr_status`. Pola sama persis dengan [[HRIS - Attendance Correction]].
+
 ## Aturan / Validasi
 
 - Jenis & subtipe harus valid (`IsLeaveRequestTypeValid` / `IsLeaveRequestSubtypeValid`)
