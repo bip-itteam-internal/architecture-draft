@@ -28,9 +28,16 @@ Fitur dipecah menjadi **dua sub-fitur**:
 - `exchange_date` minimal **H+3** (naik dari H+2 pada model lama).
 - **Tidak boleh dibatalkan** setelah disetujui (cancel hanya saat masih menunggu).
 
+### Sudah dijawab kode (telusur 2026-06-27)
+- **Lintas-role tidak mungkin** — slot tervalidasi **per-role** di `POST /shift-exchange/create` (`main.go` ~2610: Security 2, Production 3, Host Live 4 slot berbeda). Swap inheren **same-role**. Role disimpulkan dari `GroupID` (`IsScheduleSecurity/Production/Hostlive`), bukan department/position. → TBD "role" menyusut jadi soal **lokasi** (lihat bawah).
+- **Tidak ada validasi dobel-shift / rest-period** di attendance service — saat ini dobel-shift berturut **tidak dicegah** (unchecked).
+- **Warehouse dikecualikan** dari shift-based — `IsShiftBasedSchedule` = Security ∨ Hostlive ∨ Production saja; `WAREHOUSE-*` (static & pattern) kena **403** walau bekerja shift.
+
 ### Belum Diputuskan (TBD)
 - **Coverage**: boleh swap yang membuat slot kosong? minimum staffing per slot per role?
-- **Role**: swap **harus role/tim sama** atau boleh lintas-role? dobel-shift berturut diizinkan?
+- **Lokasi (per-site)**: swap harus **se-lokasi**? Ada varian `*-TINGGARJAYA` (site terpisah); kode **tidak** cek pool per-lokasi → swap lintas-site tak tertahan, padahal coverage per-site bisa bolong.
+- **Dobel-shift**: perlu **dilarang + jeda minimum** antar-shift? (kode belum punya guard → bila ya = fitur baru).
+- **Warehouse**: sengaja dikecualikan dari tukar shift, atau harus diikutkan?
 - **Tukar Hari**: kerja hari libur → uang lembur / libur pengganti / keduanya? libur pengganti harus bulan sama? siapa approver-nya?
 - **Approver**: detail approver per-role; apakah SPV HRD step-1 auto-approve berlaku di sini.
 - **Payroll**: tunjangan shift ikut pindah ke rekan? dampak ke perhitungan keterlambatan/SP?
