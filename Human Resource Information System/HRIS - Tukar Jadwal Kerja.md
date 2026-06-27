@@ -40,6 +40,7 @@ Fitur dipecah menjadi **dua sub-fitur**:
 - Hanya karyawan ber-shift (Security / Host Live / Production) — sudah berlaku via guard create (403).
 - `exchange_date` minimal **H+3** (naik dari H+2 pada model lama).
 - **Tidak boleh dibatalkan** setelah disetujui (cancel hanya saat masih menunggu).
+- **Auto-ignore & reminder** (konsisten leave/koreksi): pengajuan basi **>24 jam** → `Diabaikan` (termasuk tahap **consent rekan** yang tak direspons); **reminder** aktor saat ini (rekan/atasan/HRD) di **T+18 jam**. Cron `services/attendance/cron.go` (`cronAutoIgnoreStaleRequest` + `cronRemindStalePendingScheduleExchanges`).
 
 ### Sudah dijawab kode (telusur 2026-06-27)
 - **Lintas-role tidak mungkin** — slot tervalidasi **per-role** di `POST /schedule-exchange/create` (`main.go` ~2610: Security 2, Production 3, Host Live 4 slot berbeda). Swap inheren **same-role**. Role disimpulkan dari `GroupID` (`IsScheduleSecurity/Production/Hostlive`), bukan department/position. → TBD "role" menyusut jadi soal **lokasi** (lihat bawah).
