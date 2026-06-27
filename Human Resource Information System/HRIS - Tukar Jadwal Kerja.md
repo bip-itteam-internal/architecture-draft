@@ -24,6 +24,13 @@ Fitur dipecah menjadi **dua sub-fitur**:
 - **Jam kerja**: hari yang jadi masuk (`work_date`) **mewarisi jam kerja `exchange_date`** (shift ikut pindah bersama harinya), kecuali pemohon memilih slot eksplisit. *(Lihat catatan kode di bawah — implementasi sekarang belum konsisten.)*
 - **Alur**: **TBD** (atasan → HRD?).
 
+### Struktur data (redesign)
+- **Satu collection** untuk kedua sub-fitur (bukan dipisah) — ~80% field + seluruh pipeline (review, notifikasi, cron, list/view) sama; pembeda cukup field `type`.
+- **Rename collection**: `shift_exchange_request` → **`schedule_exchange_request`** *(perlu migrasi data; kode live masih pakai nama lama)*.
+- **Discriminator** `type`: `"shift"` (swap antar-rekan) \| `"day"` (geser hari, unilateral).
+- **Field baru**: `group_id` (pemohon); `partner_employee_id` / `partner_full_name` / `partner_group_id`; `partner_consent { status, responded_at, notes }`. Untuk `type:"day"` → field partner **null**.
+- **Field bersama** (tetap): `employee_id`, `work_date`, `exchange_date`, `exchange_work_time?`, `reason`, `status`, `review_1` (atasan), `review_2` (HRD), `metadata`. Sub-tipe: `WorkTime { remote, start, end }`, `ReviewData { employee_id, full_name, department, status, notes, reviewed_at }`.
+
 ### Aturan yang sudah diputuskan
 - Hanya karyawan ber-shift (Security / Host Live / Production) — sudah berlaku via guard create (403).
 - `exchange_date` minimal **H+3** (naik dari H+2 pada model lama).
