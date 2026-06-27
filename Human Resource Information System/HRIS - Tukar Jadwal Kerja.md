@@ -31,6 +31,11 @@ Fitur dipecah menjadi **dua sub-fitur**:
 - **Field baru**: `group_id` (pemohon); `partner_employee_id` / `partner_full_name` / `partner_group_id`; `partner_consent { status, responded_at, notes }`. Untuk `type:"day"` → field partner **null**.
 - **Field bersama** (tetap): `employee_id`, `work_date`, `exchange_date`, `exchange_work_time?`, `reason`, `status`, `review_1` (atasan), `review_2` (HRD), `metadata`. Sub-tipe: `WorkTime { remote, start, end }`, `ReviewData { employee_id, full_name, department, status, notes, reviewed_at }`.
 
+### Integrasi katalog hr-request (FE picker)
+- ✅ **Terdaftar** di katalog `GET /data-type/hr-request` sebagai type **"Tukar Jadwal Kerja"** (sebelumnya "Tukar Shift"), dengan subtype **["Tukar Shift", "Tukar Hari"]** via `/data-type/hr-request-subtype` (`shared-library/models/attendance/models.go`). Mobile FE memuat katalog ini **dinamis** → label baru muncul otomatis tanpa ubah FE.
+- **Mapping** subtype FE → discriminator `type`: *Tukar Shift* → `shift`, *Tukar Hari* → `day`.
+- ⚠️ Katalog hanya **pintu picker**; handler `create` belum bercabang per `type`, dan routing FE picker → endpoint create perlu diverifikasi (bagian redesign).
+
 ### Aturan yang sudah diputuskan
 - Hanya karyawan ber-shift (Security / Host Live / Production) — sudah berlaku via guard create (403).
 - `exchange_date` minimal **H+3** (naik dari H+2 pada model lama).
