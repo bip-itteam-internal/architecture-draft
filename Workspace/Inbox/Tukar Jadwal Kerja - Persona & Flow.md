@@ -48,6 +48,14 @@ publish: false
 
 ---
 
+## Diagram Alur (Excalidraw)
+
+![[Tukar Jadwal Kerja - Flow.excalidraw]]
+
+> **Kiri** = Flow A (Tukar Shift, 3 langkah dengan rekan). **Kanan** = Flow B (Tukar Hari, unilateral). Warna: 🟨 pemohon · 🟪 keputusan (rekan/atasan/HRD) · 🟥 ditolak/batal · 🟩 diterapkan. Detail tekstual di bawah.
+
+---
+
 ## Flow A — Tukar Shift (swap antar-rekan, 3 langkah)
 
 ```
