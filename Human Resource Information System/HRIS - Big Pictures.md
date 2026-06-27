@@ -41,7 +41,7 @@ Security juga perlu menandatangani dokumen dengan scan QR untuk status cuti/kemb
 - [ ] [[HRIS - Employee Request & Approval]]
 - [ ] [[HRIS - Attendance Correction]]
 - [ ] [[HRIS - Leave Request]]
-- [ ] [[HRIS - Shift Exchange]]
+- [ ] [[HRIS - Tukar Jadwal Kerja]]
 - [ ] [[HRIS - Overtime]]
 - [ ] [[HRIS - Attrition]]
 - [ ] [[HRIS - Retention]]

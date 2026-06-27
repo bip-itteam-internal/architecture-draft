@@ -47,8 +47,8 @@ publish: false
 
 **Keputusan:** tukar shift **hanya untuk karyawan ber-shift** — **Security, Host Live, Production**.
 
-**Status di kode:** ⚠️ **PERLU RE-APPLY.** Guard "shift-only" sempat dibuat lalu **di-revert** (mode "tukar hari" sekarang terbuka untuk **semua** karyawan) karena dok lama menyebut tukar-hari untuk semua. **HRD kini memutuskan shift-only**, jadi guard perlu **dipasang kembali** (`IsShiftBasedSchedule` di `POST /shift-exchange/create`). 
-**Tindak lanjut:** pasang ulang guard shift-only + update [[HRIS - Shift Exchange]] (cabut catatan "tukar hari untuk semua").
+**Status di kode:** ✅ **Guard sudah dipasang** (2026-06-27) — `IsShiftBasedSchedule` di awal `POST /shift-exchange/create`, non-shift → **403**. Lebih jauh, fitur ini berkembang jadi redesign **Tukar Jadwal Kerja** (Tukar Shift swap-antar-rekan + Tukar Hari) — lihat [[MTG - 2026-06-27 Pertanyaan Klarifikasi HRD - Tukar Shift & Tukar Hari]].
+**Tindak lanjut:** dok [[HRIS - Tukar Jadwal Kerja]] sudah di-rename & ditandai redesign 🟡; sisa pertanyaan HRD (coverage, role, comp-off, payroll) menunggu jawaban.
 
 ---
 
@@ -60,4 +60,4 @@ publish: false
 | 2 | Warna status report cuti (web) | 🟡 baru | FE erp-frontend |
 | 3 | SPV HRD step-1 auto-approve | ⚠️ sebagian | koreksi ✅; cek/leave |
 | 4 | Koreksi 7 hari ke belakang | ✅ sudah | — |
-| 5 | Tukar shift shift-only | ⚠️ re-apply | pasang ulang guard + dok |
+| 5 | Tukar shift shift-only | ✅ guard | redesign Tukar Jadwal Kerja menunggu HRD |

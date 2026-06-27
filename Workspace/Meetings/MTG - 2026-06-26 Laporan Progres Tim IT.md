@@ -38,7 +38,7 @@ publish: false
 
 ## Catatan relevansi (pekerjaan attendance/koreksi)
 
-- **"Shift exchange & attendance correction sudah di production"** — perbaikan terbaru (pertahankan jam clock-in asli, apply tukar shift sinkron, notif Bahasa Indonesia, comment "disetujui oleh approver") masih di branch `feat/recruitment-service` / **PR #156** — pastikan apakah sudah ikut ter-deploy ke production atau belum. Lihat [[HRIS - Attendance Correction]] & [[HRIS - Shift Exchange]].
+- **"Shift exchange & attendance correction sudah di production"** — perbaikan terbaru (pertahankan jam clock-in asli, apply tukar shift sinkron, notif Bahasa Indonesia, comment "disetujui oleh approver") masih di branch `feat/recruitment-service` / **PR #156** — pastikan apakah sudah ikut ter-deploy ke production atau belum. Lihat [[HRIS - Attendance Correction]] & [[HRIS - Tukar Jadwal Kerja]].
 - **"Integrasi attendance & shift exchange ke MyBharata belum jalan"** — termasuk follow-up tertunda: **MyBharata kirim `employee_id` di guestbook internal** (mengaktifkan guard anti-fraud koreksi telat end-to-end). Deploy BE dulu sebelum FE kirim (handler `DisallowUnknownFields`).
 
 ## Tindak lanjut lintas-tim (capture)

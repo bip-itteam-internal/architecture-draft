@@ -14,7 +14,7 @@ Hampir semua subsistem bertumpu pada **master data karyawan** ([[Microservices -
 |---|---|---|
 | [[HRIS - Attendance System]] | Employee (master, jadwal); penyesuaian dari Leave/Shift/Correction | [[HRIS - Payroll]] (jam kerja, telat, lembur, cuti) |
 | [[HRIS - Leave Request]] | Employee (supervisor, kuota cuti) | Attendance (status cuti/izin), decrement kuota |
-| [[HRIS - Shift Exchange]] | Employee, jadwal | Attendance (tukar hari/shift) |
+| [[HRIS - Tukar Jadwal Kerja]] | Employee, jadwal | Attendance (tukar hari/shift) |
 | [[HRIS - Attendance Correction]] | Attendance (entri), Employee | Attendance (koreksi clock-in/out) |
 | [[HRIS - Payroll]] | Attendance, KPI/insentif, Employee (gaji/BPJS) | Slip gaji / proses penggajian |
 | [[HRIS - Key Performance Index]] | Employee, target/KPI template | Payroll/insentif (skor kinerja) |

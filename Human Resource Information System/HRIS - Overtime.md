@@ -12,7 +12,7 @@
 
 ## Belum Ada (Gap / Roadmap)
 
-- **Workflow pengajuan lembur (SPKL)** yang berdiri sendiri — pengajuan oleh karyawan → **approval supervisor/HR** → otomatis set `overtime_hour` — seperti pola [[HRIS - Leave Request]] / [[HRIS - Shift Exchange]]
+- **Workflow pengajuan lembur (SPKL)** yang berdiri sendiri — pengajuan oleh karyawan → **approval supervisor/HR** → otomatis set `overtime_hour` — seperti pola [[HRIS - Leave Request]] / [[HRIS - Tukar Jadwal Kerja]]
 - Validasi (batas jam, hari libur vs hari kerja, tarif), bukti/lampiran wajib
 - Integrasi langsung ke perhitungan insentif/upah lembur
 

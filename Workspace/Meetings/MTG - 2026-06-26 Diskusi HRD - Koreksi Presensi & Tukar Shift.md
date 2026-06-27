@@ -9,7 +9,7 @@ publish: false
 - **Tujuan**: Mengunci **kebijakan** (policy) untuk fitur **Koreksi Presensi** & **Tukar Shift** yang sudah/akan berjalan, agar implementasi sesuai aturan HR — bukan asumsi developer.
 - **Cara pakai dokumen ini**: tiap poin berisi **"Sekarang di sistem"** (fakta kode) + **"Keputusan HRD"** (diisi saat rapat). Yang ditandai ⚠️ = paling berdampak.
 
-> Catatan: nilai "Sekarang di sistem" diambil dari kode attendance service (branch `feat/recruitment-service`). Lihat [[HRIS - Attendance Correction]] & [[HRIS - Shift Exchange]].
+> Catatan: nilai "Sekarang di sistem" diambil dari kode attendance service (branch `feat/recruitment-service`). Lihat [[HRIS - Attendance Correction]] & [[HRIS - Tukar Jadwal Kerja]].
 
 ---
 
@@ -131,5 +131,5 @@ Fitur ini sebenarnya **2 mode** — mohon diputuskan **per mode**:
 ## Tindak lanjut (diisi setelah rapat)
 
 - [ ] _Keputusan → tiket implementasi (jika ada perubahan kode)_
-- [ ] _Update dok arsitektur [[HRIS - Attendance Correction]] / [[HRIS - Shift Exchange]] sesuai keputusan_
+- [ ] _Update dok arsitektur [[HRIS - Attendance Correction]] / [[HRIS - Tukar Jadwal Kerja]] sesuai keputusan_
 - [ ] _PIC & deadline: ____

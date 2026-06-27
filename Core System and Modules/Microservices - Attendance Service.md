@@ -62,7 +62,7 @@
 - Detail jenis cuti/izin, reviewer, kuota & alur: [[HRIS - Leave Request]]
 
 **Shift Exchange (workflow)**
-- `POST /shift-exchange/create`, `GET /shift-exchange/view`, `PATCH /shift-exchange/review`, `PATCH /shift-exchange/cancel` — pertukaran hari kerja/libur (atau slot shift) dengan approval multi-level; setelah disetujui otomatis menyesuaikan attendance (`applyApprovedShiftExchange`). Detail lengkap: [[HRIS - Shift Exchange]].
+- `POST /shift-exchange/create`, `GET /shift-exchange/view`, `PATCH /shift-exchange/review`, `PATCH /shift-exchange/cancel` — pertukaran hari kerja/libur (atau slot shift) dengan approval multi-level; setelah disetujui otomatis menyesuaikan attendance (`applyApprovedShiftExchange`). Detail lengkap: [[HRIS - Tukar Jadwal Kerja]].
 
 **Attendance Correction (workflow)**
 - `POST /correction`, `GET /correction/mine`, `GET /correction`, `PATCH /correction/:id/review`, `PATCH /correction/:id/cancel` — koreksi clock-in/out yang terlewat dengan approval multi-level (routing per role); waktu diisi otomatis dari jadwal saat disetujui (`applyCorrectionToEntry`). Detail lengkap: [[HRIS - Attendance Correction]].
@@ -92,7 +92,7 @@
 
 - [[HRIS - Attendance System]]
 - [[HRIS - Leave Request]]
-- [[HRIS - Shift Exchange]]
+- [[HRIS - Tukar Jadwal Kerja]]
 - [[HRIS - Attendance Correction]]
 - [[HRIS - Payroll]]
 - [[APP - MyBharata]]

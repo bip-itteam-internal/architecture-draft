@@ -1,8 +1,41 @@
 ## Deskripsi
 
-*Fitur ini ditambahkan sebagai pelengkap Attendance System. Shift Exchange memungkinkan karyawan mengajukan pertukaran hari kerja/libur dalam bulan yang sama, dengan alur persetujuan multi-level. Sejak keputusan HRD 2026-06-26, fitur ini **hanya untuk karyawan berbasis shift** (Security, Production, Host Live) — backend menolak (403) pengajuan dari karyawan non-shift di `/shift-exchange/create`.*
+*Tukar Jadwal Kerja adalah payung fitur agar karyawan dapat mengubah jadwal kerjanya secara formal (digital, ada jejak audit, dengan persetujuan) — pelengkap [[HRIS - Attendance System]]. Terdiri dari dua sub-fitur: **Tukar Shift** (tukar slot jam dengan rekan) dan **Tukar Hari** (geser hari kerja/libur). Hanya untuk karyawan berbasis shift (Security, Production, Host Live) sejak keputusan HRD 2026-06-26.*
 
-> ⚠️ **Pembatasan shift-only (keputusan HRD 2026-06-26).** Guard di `POST /shift-exchange/create` (lookup `WorkSchedule` pemohon → `IsShiftBasedSchedule(GroupID)`; bila bukan shift → 403). **Gap:** web FE (`erp-frontend`) masih menyediakan flow "tukar hari" untuk karyawan non-shift (Kasus 1) yang kini akan ditolak BE — perlu disesuaikan (sembunyikan/nonaktifkan untuk non-shift).
+- **Stack / Path**: Attendance Service (`bip-erp/services/attendance`), koleksi `shift_exchange_request`.
+- **Status**: ⚠️ **Implemented sebagian** — yang live di produksi adalah model **single-person** (pemohon menggeser jadwalnya sendiri) + guard shift-only. 🟡 **Redesign direncanakan** → pisah jadi Tukar Shift (swap antar-rekan + consent rekan) & Tukar Hari (lihat bagian "Rencana Redesign" di bawah).
+
+> ⚠️ **Pembatasan shift-only (keputusan HRD 2026-06-26).** Guard di `POST /shift-exchange/create` (lookup `WorkSchedule` pemohon → `IsShiftBasedSchedule(GroupID)`; bila bukan shift → 403). **Gap:** web FE (`erp-frontend`) masih menyediakan flow "tukar hari" untuk karyawan non-shift yang kini ditolak BE — perlu disesuaikan (sembunyikan/nonaktifkan untuk non-shift).
+
+## Rencana Redesign — Tukar Jadwal Kerja (🟡 Konsep)
+
+> **Belum diimplementasikan.** Keputusan HRD 2026-06-26/27. Mulai dari "Latar Belakang" sampai "Implementasi Frontend" di bawah mendeskripsikan **model lama (single-person)** yang masih live & akan diganti oleh desain ini.
+
+Fitur dipecah menjadi **dua sub-fitur**:
+
+### 1. Tukar Shift — swap antar-rekan
+- **Definisi**: menukar **slot jam** pada tanggal tertentu dengan **rekan** (bukan menggeser jadwal sendiri). Hanya role ber-shift.
+- **Pihak**: pemohon **memilih rekan** tujuan. Agar coverage terjaga otomatis, rekan harus di **slot pool yang sama** (swap 1:1).
+- **Alur (3 langkah)**: **rekan** (consent) → **atasan** → **HRD**. Rekan **menolak → batal otomatis**.
+- **Dampak penerapan**: jadwal **kedua** karyawan ditukar (model lama hanya menyentuh pemohon).
+
+### 2. Tukar Hari — geser hari, tanpa pengganti
+- **Definisi**: geser **hari kerja/libur** sendiri (mis. kerja di hari libur → ambil libur pengganti). **Unilateral** — tidak melibatkan rekan/pengganti.
+- **Alur**: **TBD** (atasan → HRD?).
+
+### Aturan yang sudah diputuskan
+- Hanya karyawan ber-shift (Security / Host Live / Production) — sudah berlaku via guard create (403).
+- `exchange_date` minimal **H+3** (naik dari H+2 pada model lama).
+- **Tidak boleh dibatalkan** setelah disetujui (cancel hanya saat masih menunggu).
+
+### Belum Diputuskan (TBD)
+- **Coverage**: boleh swap yang membuat slot kosong? minimum staffing per slot per role?
+- **Role**: swap **harus role/tim sama** atau boleh lintas-role? dobel-shift berturut diizinkan?
+- **Tukar Hari**: kerja hari libur → uang lembur / libur pengganti / keduanya? libur pengganti harus bulan sama? siapa approver-nya?
+- **Approver**: detail approver per-role; apakah SPV HRD step-1 auto-approve berlaku di sini.
+- **Payroll**: tunjangan shift ikut pindah ke rekan? dampak ke perhitungan keterlambatan/SP?
+
+*(Daftar pertanyaan & jawaban lengkap ada di notulen HRD — Workspace.)*
 
 ## Latar Belakang
 

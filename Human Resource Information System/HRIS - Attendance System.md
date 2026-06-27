@@ -52,7 +52,7 @@ Fitur tambahan
 ## Fitur Terkait
 
 - [[HRIS - Attendance Correction]] — Alur koreksi untuk clock-in/out yang terlewat
-- [[HRIS - Shift Exchange]] — Alur pertukaran shift/hari libur
+- [[HRIS - Tukar Jadwal Kerja]] — Alur pertukaran shift/hari libur
 
 ## Dependensi
 

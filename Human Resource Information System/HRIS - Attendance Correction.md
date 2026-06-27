@@ -226,6 +226,6 @@ src/features/hris/attendance-correction/
 
 - [x] [[HRIS - Attendance System]]
 - [x] [[HRIS - Employee Request & Approval]] *(framework induk)*
-- [x] [[HRIS - Shift Exchange]] *(pola review dan infrastruktur notifikasi yang sama)*
+- [x] [[HRIS - Tukar Jadwal Kerja]] *(pola review dan infrastruktur notifikasi yang sama)*
 - [x] [[Microservices - Attendance Service]]
 - [x] [[HRIS - Big Pictures]]

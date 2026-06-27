@@ -49,4 +49,4 @@
 | GET | `/internal/summary` | Ringkasan 24 jam (utk HRIS orchestrator) | HRIS |
 
 ## Dokumen Terkait
-- [[Microservices - Attendance Service]] · [[HRIS - Leave Request]] · [[HRIS - Shift Exchange]] · [[HRIS - Attendance Correction]] · [[HRIS - Payroll]] · [[API - Index]]
+- [[Microservices - Attendance Service]] · [[HRIS - Leave Request]] · [[HRIS - Tukar Jadwal Kerja]] · [[HRIS - Attendance Correction]] · [[HRIS - Payroll]] · [[API - Index]]

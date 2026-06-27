@@ -30,7 +30,7 @@ Nama payung fitur: **Tukar Jadwal Kerja**. Berisi **dua sub-fitur** dengan model
 - **Tukar Shift** = swap antar-rekan (jawaban Q1–Q6); coverage terjaga otomatis **bila** rekan di slot pool yang sama.
 - **Tukar Hari** = unilateral, **tidak menggeser orang lain** (Q2: "gak perlu pengganti"). Alur approval-nya belum ditetapkan.
 
-> **Implikasi dok:** published `HRIS - Shift Exchange` akan **di-rename → `HRIS - Tukar Jadwal Kerja`** dan direstruktur jadi 2 sub-fitur **saat redesign diimplementasikan**. Untuk sekarang dok itu tetap grounded ke kode lama (single-person).
+> **Implikasi dok:** dok arsitektur sudah **di-rename → [[HRIS - Tukar Jadwal Kerja]]** (2026-06-27) & direstruktur — model lama (single-person) tetap ditandai live (⚠️), desain swap baru ditandai 🟡 Konsep dengan daftar TBD.
 
 ---
 
