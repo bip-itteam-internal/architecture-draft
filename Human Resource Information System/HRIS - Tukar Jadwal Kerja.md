@@ -2,39 +2,39 @@
 
 *Tukar Jadwal Kerja adalah payung fitur agar karyawan dapat mengubah jadwal kerjanya secara formal (digital, ada jejak audit, dengan persetujuan) — pelengkap [[HRIS - Attendance System]]. Terdiri dari dua sub-fitur: **Tukar Shift** (tukar slot jam dengan rekan) dan **Tukar Hari** (geser hari kerja/libur). Hanya untuk karyawan berbasis shift (Security, Production, Host Live) sejak keputusan HRD 2026-06-26.*
 
-- **Stack / Path**: Attendance Service (`bip-erp/services/attendance`), koleksi `shift_exchange_request`.
-- **Status**: ⚠️ **Implemented sebagian** — yang live di produksi adalah model **single-person** (pemohon menggeser jadwalnya sendiri) + guard shift-only. 🟡 **Redesign direncanakan** → pisah jadi Tukar Shift (swap antar-rekan + consent rekan) & Tukar Hari (lihat bagian "Rencana Redesign" di bawah).
+- **Stack / Path**: Attendance Service (`bip-erp/services/attendance`), koleksi **`schedule_exchange_request`** (rename dari `shift_exchange_request`).
+- **Status**: ⚠️ **Implemented** (branch `feat/recruitment-service`, belum rilis). **Tukar Shift** = swap antar-rekan 3-langkah (consent → atasan → HRD) **sudah dibangun**; **Tukar Hari** = model single-person (geser hari). Lihat "Desain & Implementasi" + **Known limitation** di bawah.
 
 > ⚠️ **Pembatasan shift-only (keputusan HRD 2026-06-26).** Guard di `POST /shift-exchange/create` (lookup `WorkSchedule` pemohon → `IsShiftBasedSchedule(GroupID)`; bila bukan shift → 403). **Gap:** web FE (`erp-frontend`) masih menyediakan flow "tukar hari" untuk karyawan non-shift yang kini ditolak BE — perlu disesuaikan (sembunyikan/nonaktifkan untuk non-shift).
 
-## Rencana Redesign — Tukar Jadwal Kerja (🟡 Konsep)
+## Desain & Implementasi — Tukar Jadwal Kerja (⚠️ Implemented)
 
-> **Belum diimplementasikan.** Keputusan HRD 2026-06-26/27. Mulai dari "Latar Belakang" sampai "Implementasi Frontend" di bawah mendeskripsikan **model lama (single-person)** yang masih live & akan diganti oleh desain ini.
+> **Sudah dibangun** (Fase 0–2, branch `feat/recruitment-service`; keputusan HRD 2026-06-26/27). Bagian "Latar Belakang"…"Implementasi Frontend" di bawah masih mendeskripsikan **model lama single-person** (diwarisi Tukar Hari); Tukar Shift swap mengikuti desain di section ini. Lihat **Known limitation & TBD** di bawah.
 
 Fitur dipecah menjadi **dua sub-fitur**:
 
-### 1. Tukar Shift — swap antar-rekan
-- **Definisi**: menukar **slot jam** pada tanggal tertentu dengan **rekan** (bukan menggeser jadwal sendiri). Hanya role ber-shift.
-- **Pihak**: pemohon **memilih rekan** tujuan. Agar coverage terjaga otomatis, rekan harus di **slot pool yang sama** (swap 1:1).
-- **Alur (3 langkah)**: **rekan** (consent) → **atasan** → **HRD**. Rekan **menolak → batal otomatis**.
-- **Dampak penerapan**: jadwal **kedua** karyawan ditukar (model lama hanya menyentuh pemohon).
+### 1. Tukar Shift — swap antar-rekan ✅
+- **Definisi**: menukar **slot jam** pada tanggal sama dengan **rekan**. Hanya role ber-shift; **same-role dipaksa** (slot tervalidasi per-role).
+- **Pihak**: pemohon **memilih rekan** (`partner_employee_id`). Validasi `validateSwapPartner` (beda orang, shift, role sama). Saat create, slot **kedua sisi** di-resolve & disimpan: pemohon `exchange_work_time` (= slot rekan), rekan `partner_work_time` (= slot pemohon).
+- **Alur (3 langkah)**: **rekan** `PATCH /shift-exchange/consent` → **atasan** (`review_1`) → **HRD** (`review_2`). Rekan **menolak → status Canceled**. Atasan/HRD **diblokir** sampai rekan menyetujui (gating). `ResolveScheduleExchangeStatus(consent, r1, r2)`.
+- **Dampak penerapan**: jadwal **kedua** karyawan ditukar. **Durable** via cron seeding & kalender sadar-swap (`WorkTimeFor` per sisi: pemohon→`exchange_work_time`, rekan→`partner_work_time`); apply saat approval hanya update entri yang sudah ada (tanpa duplikasi).
 
 ### 2. Tukar Hari — geser hari, tanpa pengganti
 - **Definisi**: geser **hari kerja/libur** sendiri (mis. kerja di hari libur → ambil libur pengganti). **Unilateral** — tidak melibatkan rekan/pengganti.
 - **Jam kerja**: hari yang jadi masuk (`work_date`) **mewarisi jam kerja `exchange_date`** (shift ikut pindah bersama harinya), kecuali pemohon memilih slot eksplisit. *(Lihat catatan kode di bawah — implementasi sekarang belum konsisten.)*
 - **Alur**: **TBD** (atasan → HRD?).
 
-### Struktur data (redesign)
+### Struktur data
 - **Satu collection** untuk kedua sub-fitur (bukan dipisah) — ~80% field + seluruh pipeline (review, notifikasi, cron, list/view) sama; pembeda cukup field `type`.
-- **Rename collection**: `shift_exchange_request` → **`schedule_exchange_request`** *(perlu migrasi data; kode live masih pakai nama lama)*.
-- **Discriminator** `type`: `"shift"` (swap antar-rekan) \| `"day"` (geser hari, unilateral).
-- **Field baru**: `group_id` (pemohon); `partner_employee_id` / `partner_full_name` / `partner_group_id`; `partner_consent { status, responded_at, notes }`. Untuk `type:"day"` → field partner **null**.
-- **Field bersama** (tetap): `employee_id`, `work_date`, `exchange_date`, `exchange_work_time?`, `reason`, `status`, `review_1` (atasan), `review_2` (HRD), `metadata`. Sub-tipe: `WorkTime { remote, start, end }`, `ReviewData { employee_id, full_name, department, status, notes, reviewed_at }`.
+- **Collection**: **`schedule_exchange_request`** ✅ (sudah di-rename dari `shift_exchange_request`; identifier Go `Collections.ShiftExchangeRequest` masih dipertahankan — kosmetik).
+- **Discriminator** `type`: `"shift"` (swap antar-rekan) \| `"day"` (geser hari, unilateral); kosong → di-infer dari pasangan tanggal (`InferScheduleExchangeType`).
+- **Field baru**: `type`, `group_id` (pemohon); `partner_employee_id` / `partner_full_name` / `partner_group_id` / **`partner_work_time`** (slot baru rekan); `partner_consent { status, responded_at, notes }`. Untuk `type:"day"` → field partner **null**.
+- **Field bersama** (tetap): `employee_id`, `work_date`, `exchange_date`, `exchange_work_time?` (untuk swap = slot baru pemohon), `reason`, `status`, `review_1` (atasan), `review_2` (HRD), `metadata`. Sub-tipe: `WorkTime { remote, start, end }`, `ReviewData { employee_id, full_name, department, status, notes, reviewed_at }`, `ConsentData { status, notes, responded_at }`.
 
 ### Integrasi katalog hr-request (FE picker)
 - ✅ **Terdaftar** di katalog `GET /data-type/hr-request` sebagai type **"Tukar Jadwal Kerja"** (sebelumnya "Tukar Shift"), dengan subtype **["Tukar Shift", "Tukar Hari"]** via `/data-type/hr-request-subtype` (`shared-library/models/attendance/models.go`). Mobile FE memuat katalog ini **dinamis** → label baru muncul otomatis tanpa ubah FE.
 - **Mapping** subtype FE → discriminator `type`: *Tukar Shift* → `shift`, *Tukar Hari* → `day`.
-- ⚠️ Katalog hanya **pintu picker**; handler `create` belum bercabang per `type`, dan routing FE picker → endpoint create perlu diverifikasi (bagian redesign).
+- Handler `create` kini **bercabang per `type`+partner** (swap → consent rekan). Routing FE picker → endpoint create (kirim `type` + `partner_employee_id`) **masih perlu diverifikasi/disesuaikan di mobile**.
 
 ### Aturan yang sudah diputuskan
 - Hanya karyawan ber-shift (Security / Host Live / Production) — sudah berlaku via guard create (403).
@@ -46,6 +46,13 @@ Fitur dipecah menjadi **dua sub-fitur**:
 - **Tidak ada validasi dobel-shift / rest-period** di attendance service — saat ini dobel-shift berturut **tidak dicegah** (unchecked).
 - **Warehouse dikecualikan** dari shift-based — `IsShiftBasedSchedule` = Security ∨ Hostlive ∨ Production saja; `WAREHOUSE-*` (static & pattern) kena **403** walau bekerja shift.
 - **Jam kerja Tukar Hari** (`applyApprovedShiftExchange`, `func.go` ~812-880): saat `work_date` **belum** punya entri → entri baru memakai **jam dari jadwal `exchange_date`** (shift ikut pindah); `exchange_date` jadi **"Replacement Day Off"**. ⚠️ **Gap**: bila entri `work_date` **sudah ada** (ter-seed cron) & tanpa slot eksplisit, hanya `status→Ontime` yang di-set — `work_time` **tidak** disetel ulang (`func.go` ~823-825) → jam bisa tetap dari entri lama (jalur insert vs update tak konsisten).
+
+### Known limitation (implementasi swap — follow-up)
+- **Timing pre-alokasi** *(pre-existing, kena single-person juga)*: `work_time` ter-swap benar, tapi **trigger pre-alloc & Alpha-setter** masih ikut jadwal asli → entri bisa di-seed pada waktu shift lama. Data slot benar; penjadwalan belum ideal.
+- **Reviewer list** masih menampilkan swap yang menunggu consent (aksi diblok, tapi tampil) — filter `buildShiftExchangeReviewFilter` belum exclude.
+- **Notif consent** ke kepala dept (`employee_id` kosong) jatuh ke HR (pola pre-existing, sama di review handler).
+- **`exchange_work_time` dari user diabaikan** saat ada partner (slot di-resolve dari jadwal).
+- **Belum ada test E2E** apply swap (butuh Mongo); unit test menutupi status machine + validasi rekan + infer type.
 
 ### Belum Diputuskan (TBD)
 - **Coverage**: boleh swap yang membuat slot kosong? minimum staffing per slot per role?
@@ -73,41 +80,54 @@ Fitur dipecah menjadi **dua sub-fitur**:
 
 ## Model Data
 
-Koleksi: `shift_exchange_request` (di dalam database attendance)
+Koleksi: `schedule_exchange_request` (di dalam database attendance)
 
 ```
 ShiftExchangeRequest {
   _id:                ObjectID
+  type:               string       // "shift" (swap rekan) | "day" (geser hari); kosong -> di-infer
   employee_id:        string
   full_name:          string
   position:           string
   department:         string
+  group_id:           string       // jadwal shift pemohon (validasi role/slot)
 
   work_date:          Date         // Hari karyawan akan bekerja (awalnya libur)
   exchange_date:      Date         // Hari karyawan mengambil libur (awalnya kerja)
-  exchange_work_time: WorkTime?    // Opsional — hanya untuk karyawan berbasis shift
-                                   // { start: "HH:MM", end: "HH:MM" }
+  exchange_work_time: WorkTime?    // Opsional; untuk swap = slot BARU pemohon (= slot rekan)
+                                   // { remote, start: "HH:MM", end: "HH:MM" }
+
+  // Rekan tukar — hanya untuk type "shift"
+  partner_employee_id: string
+  partner_full_name:   string
+  partner_group_id:    string
+  partner_work_time:   WorkTime?   // slot BARU rekan (= slot lama pemohon)
+  partner_consent:     ConsentData? // { status, notes, responded_at } — langkah 1 dari 3
 
   reason:             string
 
-  status:             ReviewStatus // Diturunkan dari review_1 + review_2
-  review_1:           ReviewData   // Reviewer pertama (SPV / kepala departemen / HR)
-  review_2:           ReviewData   // Reviewer kedua (HR / Direktur), bisa kosong
+  status:             ReviewStatus // Diturunkan dari partner_consent + review_1 + review_2
+  review_1:           ReviewData   // Atasan (SPV / kepala departemen / HR)
+  review_2:           ReviewData   // HRD / Direktur, bisa kosong
 
   metadata:           Metadata     // created_at, created_by, updated_at, updated_by
 }
 ```
 
-Menggunakan kembali tipe `ReviewData`, `ReviewStatus`, dan `WorkTime` dari domain attendance.
+Menggunakan kembali tipe `ReviewData`, `ReviewStatus`, `WorkTime`, dan `ConsentData` dari domain attendance. Method `WorkTimeFor(employeeID)` mengembalikan slot baru per sisi (dipakai cron seeding & kalender agar swap konsisten kedua sisi).
 
 ### Resolusi Status Review
 
-Status dihitung dari dua review melalui `ResolveShiftExchangeStatus()`:
+**Tukar Hari / tanpa rekan** — `ResolveShiftExchangeStatus(r1, r2)`:
 - Jika **salah satu** reviewer menolak -> `Ditolak`
 - Jika **salah satu** reviewer mengabaikan -> `Diabaikan`
-- Jika review_2 **kosong** dan review_1 disetujui -> `Disetujui`
-- Jika **keduanya** disetujui -> `Disetujui`
+- review_2 **kosong** & review_1 disetujui, atau **keduanya** disetujui -> `Disetujui`
 - Selain itu -> `Menunggu persetujuan`
+
+**Tukar Shift (swap)** — `ResolveScheduleExchangeStatus(partner_consent, r1, r2)` membungkus di atas:
+- `partner_consent` **menolak** -> `Dibatalkan` (batal otomatis)
+- `partner_consent` **menunggu** -> `Menunggu persetujuan` (reviewer diblokir)
+- `partner_consent` **disetujui** -> delegasi ke resolusi review_1/review_2 di atas
 
 ## Penentuan Reviewer
 
@@ -123,8 +143,9 @@ Reviewer ditentukan secara dinamis berdasarkan peran pemohon:
 ## Aturan Bisnis / Validasi
 
 - **Pemohon harus karyawan berbasis shift** (Security, Production, Host Live) — *keputusan HRD 2026-06-26*. Di awal `POST /shift-exchange/create`, backend lookup `WorkSchedule` pemohon lalu `IsShiftBasedSchedule(GroupID)`; bila bukan shift → **403** `tukar shift hanya untuk karyawan ber-shift (Security/Host Live/Production)`. Lookup gagal/jadwal tak ditemukan → **500**.
-- `exchange_date` harus **minimal 2 hari** dari hari ini
+- `exchange_date` harus **minimal 3 hari (H+3)** dari hari ini *(naik dari H+2)*
 - `work_date` dan `exchange_date` harus dalam **bulan yang sama**
+- **Tukar Shift (swap)**: `partner_employee_id` wajib karyawan **shift & role sama**, bukan diri sendiri (`validateSwapPartner`); pemohon & rekan harus terjadwal kerja pada tanggal itu
 - `exchange_work_time` **hanya** diperbolehkan untuk karyawan berbasis shift (Security, Production, Host Live)
 - Jika disediakan, `exchange_work_time` harus cocok dengan salah satu slot shift yang diizinkan untuk tipe jadwal karyawan:
   - Security: `07:00-19:00`, `19:00-07:00`
@@ -141,10 +162,11 @@ Semua route berada di bawah **Attendance Service** (`/api/attendance/shift-excha
 
 | Metode | Route                        | Deskripsi                                             |
 |--------|------------------------------|-------------------------------------------------------|
-| POST   | `/shift-exchange/create`     | Membuat request shift exchange baru — **403** bila pemohon bukan karyawan shift |
+| POST   | `/shift-exchange/create`     | Membuat request — **403** bila bukan karyawan shift. Body: `{ work_date, exchange_date, reason, type?, exchange_work_time?, partner_employee_id? }`. `type:"shift"`+`partner` → swap (resolve & simpan kedua slot, `partner_consent=Waiting`) |
+| PATCH  | `/shift-exchange/consent`    | **Rekan** menyetujui/menolak swap (langkah 1). Body: `{ id, status, notes? }`. Hanya `partner_employee_id` & saat `status=Waiting`. Tolak → Canceled; setuju → lanjut ke atasan |
 | GET    | `/shift-exchange/view`       | Melihat daftar request (mendukung `?as=reviewer/reviewed`, `?filter=ongoing/past`, `?id=`, `?search=`) |
-| PATCH  | `/shift-exchange/review`     | Menyetujui atau menolak request (body: `{ id, status, notes? }`) |
-| PATCH  | `/shift-exchange/cancel`     | Membatalkan request pending milik sendiri (query: `?id=`) |
+| PATCH  | `/shift-exchange/review`     | Atasan/HRD setuju/tolak (body: `{ id, status, notes? }`). **Diblokir** sampai consent rekan disetujui |
+| PATCH  | `/shift-exchange/cancel`     | Membatalkan request milik sendiri (query: `?id=`) — hanya saat status **Waiting** |
 
 ### Parameter Query Endpoint View
 
@@ -174,9 +196,13 @@ Review 1 menyetujui?
 
 ## Pasca-Persetujuan: Dampak pada Attendance (`applyApprovedShiftExchange`)
 
-Ketika shift exchange sepenuhnya disetujui, sistem otomatis mengubah entri kehadiran:
+Ketika sepenuhnya disetujui, sistem otomatis mengubah entri kehadiran:
 
-### Pertukaran hari sama (work_date == exchange_date)
+### Tukar Shift — swap antar-rekan (`type:"shift"` + partner)
+- `applyScheduleExchangeSwap` menukar `work_time` **kedua** karyawan pada tanggal itu: pemohon → `exchange_work_time`, rekan → `partner_work_time`.
+- **Hanya UPDATE** entri yang sudah ada (tak insert) → entri masa depan di-seed oleh cron yang **sadar-swap** (`WorkTimeFor`), sehingga tak ada duplikasi & slot benar di kedua sisi.
+
+### Pertukaran hari sama — single-person (tanpa partner)
 - Memperbarui `work_time` entri kehadiran yang ada ke `exchange_work_time` yang baru
 - Komentar: "Shift time changed (approved shift exchange)"
 
@@ -192,7 +218,7 @@ Ketika shift exchange sepenuhnya disetujui, sistem otomatis mengubah entri kehad
 
 ### Dampak pada Tampilan Kalender Jadwal
 
-Fungsi `getEmployeeScheduleDateRange()` di `func.go` juga memperhitungkan shift exchange yang sudah disetujui saat membangun tampilan kalender karyawan. Fungsi ini mengambil dokumen `ShiftExchangeRequest` yang disetujui dalam rentang tanggal dan menukar tampilan jadwal/work-time sesuai, termasuk format jadwal `REPLACEMENT_DAY_OFF` untuk hari yang ditukar.
+Fungsi `getEmployeeScheduleDateRange()` di `func.go` juga memperhitungkan shift exchange yang sudah disetujui saat membangun tampilan kalender karyawan. Filter mencakup `employee_id` **dan `partner_employee_id`** (swap terdampak kedua sisi); work-time ditentukan via `WorkTimeFor` sehingga kalender **kedua** karyawan menampilkan slot hasil swap. Termasuk format jadwal `REPLACEMENT_DAY_OFF` untuk hari yang ditukar (single-person).
 
 ### Eksekusi & Penanganan Gagal
 

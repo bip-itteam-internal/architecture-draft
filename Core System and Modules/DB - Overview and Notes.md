@@ -31,7 +31,7 @@ Doc: [[Microservices - Attendance Service]]
 - fingerprint_export
 - guestbook
 - leave_request
-- shift_exchange_request
+- schedule_exchange_request
 - attendance_correction_request
 
 ### notification — `notification-mongo-db`
