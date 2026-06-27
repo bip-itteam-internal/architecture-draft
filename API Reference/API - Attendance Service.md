@@ -34,7 +34,7 @@
 ## Shift exchange & correction
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
-| POST/GET/PATCH | `/shift-exchange/create` · `/view` · `/review` · `/cancel` | Tukar shift (2-level review) | header |
+| POST/GET/PATCH | `/shift-exchange/create` · `/view` · `/review` · `/cancel` | Tukar shift (2-level review). **create**: hanya karyawan shift (Security/Host Live/Production) — non-shift → **403** *(HRD 2026-06-26)* | header |
 | POST/GET | `/correction` · `/correction/mine` · `/correction` | Koreksi absen (window 7 hari; clock-in: kosong/Late, kecuali telat terverifikasi guestbook; list `?filter=ongoing/past` via status review, `?status=`) | header |
 | GET | `/correction/candidates` | Entri kandidat koreksi 7 hari terakhir (hari ini s/d H-7, lintas-bulan, tanpa month); `?type=clockin/clockout/any` — untuk pemilih tanggal FE | header |
 | PATCH | `/correction/:id/cancel` · `/correction/:id/review` | Batal / review koreksi | header |

@@ -1,17 +1,19 @@
 ## Deskripsi
 
-*Fitur ini ditambahkan sebagai pelengkap Attendance System. Shift Exchange memungkinkan karyawan mengajukan pertukaran hari kerja/libur dalam bulan yang sama, dengan alur persetujuan multi-level. Fitur ini terutama relevan untuk karyawan berbasis shift (Security, Production, Host Live) yang juga dapat memilih slot shift berbeda pada hari yang ditukar.*
+*Fitur ini ditambahkan sebagai pelengkap Attendance System. Shift Exchange memungkinkan karyawan mengajukan pertukaran hari kerja/libur dalam bulan yang sama, dengan alur persetujuan multi-level. Sejak keputusan HRD 2026-06-26, fitur ini **hanya untuk karyawan berbasis shift** (Security, Production, Host Live) — backend menolak (403) pengajuan dari karyawan non-shift di `/shift-exchange/create`.*
+
+> ⚠️ **Pembatasan shift-only (keputusan HRD 2026-06-26).** Guard di `POST /shift-exchange/create` (lookup `WorkSchedule` pemohon → `IsShiftBasedSchedule(GroupID)`; bila bukan shift → 403). **Gap:** web FE (`erp-frontend`) masih menyediakan flow "tukar hari" untuk karyawan non-shift (Kasus 1) yang kini akan ditolak BE — perlu disesuaikan (sembunyikan/nonaktifkan untuk non-shift).
 
 ## Latar Belakang
 
 * Karyawan terkadang perlu bekerja pada hari libur yang dijadwalkan (misalnya hari libur nasional) dan mengambil hari libur pengganti di hari lain, atau karyawan berbasis shift ingin mengubah slot shift mereka pada tanggal tertentu.
 * Sebelumnya hal ini ditangani secara informal melalui HR tanpa jejak audit yang bisa dilacak.
 * Fitur shift exchange menyediakan alur formal: pengajuan digital, persetujuan, dan penyesuaian kehadiran otomatis.
-* Tersedia untuk **semua karyawan**, tetapi karyawan berbasis shift (Security, Production, Host Live) mendapat opsi tambahan untuk menentukan `exchange_work_time` (slot shift) yang berbeda pada tanggal tujuan.
+* Sejak keputusan HRD 2026-06-26 **hanya untuk karyawan berbasis shift** (Security, Production, Host Live). Karyawan berbasis shift dapat menentukan `exchange_work_time` (slot shift) yang berbeda pada tanggal tujuan. *(Sebelumnya terbuka untuk semua karyawan — flow non-shift kini ditolak BE.)*
 
 ## Kasus Penggunaan
 
-1. **Karyawan jadwal tetap** — bekerja pada hari libur nasional (work_date) dan mendapat hari kerja libur sebagai gantinya (exchange_date). Kedua tanggal harus dalam bulan yang sama.
+1. ~~**Karyawan jadwal tetap**~~ — **DITOLAK backend sejak HRD 2026-06-26** (hanya shift-based). Sebelumnya: bekerja pada hari libur nasional (work_date) dan mendapat hari kerja libur sebagai gantinya (exchange_date), kedua tanggal harus dalam bulan yang sama. *Web FE masih punya flow ini — perlu disesuaikan.*
 2. **Karyawan berbasis shift (hari sama)** — mengajukan perubahan waktu shift pada satu hari (work_date == exchange_date). Contoh: menukar dari shift pagi ke shift malam.
 3. **Karyawan berbasis shift (hari berbeda)** — sama seperti kasus 1, tetapi dapat juga memilih slot shift mana yang dikerjakan melalui `exchange_work_time`.
 
@@ -66,6 +68,7 @@ Reviewer ditentukan secara dinamis berdasarkan peran pemohon:
 
 ## Aturan Bisnis / Validasi
 
+- **Pemohon harus karyawan berbasis shift** (Security, Production, Host Live) — *keputusan HRD 2026-06-26*. Di awal `POST /shift-exchange/create`, backend lookup `WorkSchedule` pemohon lalu `IsShiftBasedSchedule(GroupID)`; bila bukan shift → **403** `tukar shift hanya untuk karyawan ber-shift (Security/Host Live/Production)`. Lookup gagal/jadwal tak ditemukan → **500**.
 - `exchange_date` harus **minimal 2 hari** dari hari ini
 - `work_date` dan `exchange_date` harus dalam **bulan yang sama**
 - `exchange_work_time` **hanya** diperbolehkan untuk karyawan berbasis shift (Security, Production, Host Live)
@@ -73,7 +76,7 @@ Reviewer ditentukan secara dinamis berdasarkan peran pemohon:
   - Security: `07:00-19:00`, `19:00-07:00`
   - Production: `08:00-16:00`, `16:00-00:00`, `00:00-08:00`
   - Host Live: `07:00-15:00`, `12:00-20:00`, `16:00-24:00`, `08:00-16:00`
-- Untuk karyawan non-shift (jadwal tetap) di frontend:
+- ⚠️ Untuk karyawan non-shift (jadwal tetap) di frontend *(kini **inkonsisten** — BE menolak non-shift sejak HRD 2026-06-26; aturan FE ini perlu dicabut/disembunyikan)*:
   - `work_date` harus hari libur / tanggal merah (OFF-DUTY, NATIONAL_HOLIDAY, COMPANY_HOLIDAY, dll.)
   - `exchange_date` TIDAK boleh hari libur / tanggal merah
   - `work_date` dan `exchange_date` tidak boleh hari yang sama
@@ -84,7 +87,7 @@ Semua route berada di bawah **Attendance Service** (`/api/attendance/shift-excha
 
 | Metode | Route                        | Deskripsi                                             |
 |--------|------------------------------|-------------------------------------------------------|
-| POST   | `/shift-exchange/create`     | Membuat request shift exchange baru                   |
+| POST   | `/shift-exchange/create`     | Membuat request shift exchange baru — **403** bila pemohon bukan karyawan shift |
 | GET    | `/shift-exchange/view`       | Melihat daftar request (mendukung `?as=reviewer/reviewed`, `?filter=ongoing/past`, `?id=`, `?search=`) |
 | PATCH  | `/shift-exchange/review`     | Menyetujui atau menolak request (body: `{ id, status, notes? }`) |
 | PATCH  | `/shift-exchange/cancel`     | Membatalkan request pending milik sendiri (query: `?id=`) |
@@ -192,7 +195,7 @@ src/features/hris/shift-exchange/
 
 - Form request menampilkan **kalender interaktif** dengan modifier jadwal berwarna (pagi/malam/libur/hari raya) yang diambil dari jadwal karyawan sendiri
 - Untuk karyawan berbasis shift, form menampilkan **dropdown pemilih waktu shift** dengan slot waktu yang tersedia
-- Karyawan non-shift memiliki validasi sisi klien yang memastikan work_date harus tanggal merah dan exchange_date tidak boleh tanggal merah
+- ⚠️ Karyawan non-shift memiliki validasi sisi klien yang memastikan work_date harus tanggal merah dan exchange_date tidak boleh tanggal merah — **kini ditolak BE (403)** sejak HRD 2026-06-26; flow non-shift di web perlu disembunyikan/dinonaktifkan
 - Progress persetujuan menampilkan pipeline visual dengan indikator status berwarna per reviewer
 - Jumlah pending review di-poll setiap 60 detik untuk badge sidebar
 - Semua tabel menggunakan pagination sisi klien dengan opsi ukuran halaman: 3 (default), 5, 10, 50
