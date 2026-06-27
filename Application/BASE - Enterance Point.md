@@ -20,6 +20,7 @@ Daftar portal ditampilkan di sisi kiri layar: judul module (HRIS, IT, dll) hanya
 **Sudah diimplementasikan**
 - Halaman login (`employee_id` + password) dengan handoff **SSO** (mint one-time code via `/auth/sso/ticket`)
 - **Portal sidebar berbasis role**: module muncul sesuai `system_roles`; fitur per module bisa langsung diklik (HRIS, Finance, IT, GA, Integration, dll)
+- **Override akun "integration-only"** (allowlist env `NEXT_PUBLIC_INTEGRATION_ONLY_USERS`): akun tertentu dibatasi hanya melihat modul Integration + langsung diarahkan ke halaman Integration setelah login (mis. review/test Shopee) — detail di [[APP - Web ERP]]
 - Dashboard: ringkasan kehadiran pribadi (clock in/out, overtime/telat/cuti), ringkasan karyawan, jadwal/shift
 - Lookup employee master data + informasi role sebagai dasar portal
 

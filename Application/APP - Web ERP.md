@@ -14,6 +14,7 @@
 	- *Outbound launch*: tombol/menu "Task Management" memanggil `/auth/sso/ticket` lalu menuju `${TASK_MANAGER_APP_URL}/auth/callback?code=...`
 - Role dari cookie `system_roles` (map `module → role | role[]`). Module: `erp, finance, insentive, hris, kpi, it, ga, secretary, beauty_hacks, kyura, manufacture, quality, procurement, integration`. Role: `admin, supervisor, security`, dan khusus insentif `adv_leader, adv_marketplace, adv_meta`.
 - **Role gating**: sidebar menampilkan module sesuai key `system_roles` (`erp` publik); menu KPI butuh `supervisor`; Guestbook butuh `ga:security`; create Article + seluruh card Splash butuh `admin`; sub-item Incentive di-gate per role.
+- **Akun "integration-only" (allowlist env)**: username yang terdaftar di `NEXT_PUBLIC_INTEGRATION_ONLY_USERS` (comma-separated) dibatasi **hanya** melihat section Integration di sidebar — modul publik (`erp`/`hris`/`manufacture`) maupun section turunan Integration (INTEGRATION ACCURATE & INSIGHT) ikut disembunyikan — dan setelah login langsung diarahkan ke `/integration/ads-analytics`. Helper `isIntegrationOnlyUser` (`src/utils/access.ts`) dipakai di `components/layout/sidebar.tsx` & `app/login/page.tsx`. Tujuan: akun review/test marketplace (mis. Shopee).
 
 ## Modul / Fitur (Sudah Diimplementasikan)
 
@@ -47,6 +48,7 @@
 - **Payroll Calculator**: route ada tapi dihapus dari menu
 - **Firebase/FCM push**: kode di-comment, env Firebase masih placeholder
 - **Login**: "Forgot your password?" / "Contact admin" link mati; belum ada flow reset password / registrasi
+- **Integration-only allowlist = UI-gating saja**: route `/integration/*` & `/dashboard` tetap bisa diakses via URL langsung (tidak dijaga middleware `proxy.ts`); akun tetap butuh role `integration` di `system_roles` agar API tidak 403. Env `NEXT_PUBLIC_*` di-inline saat build → ubah allowlist butuh rebuild/restart. Belum ada hardening middleware untuk akun ini.
 
 ## Dependencies & Integrasi
 
