@@ -105,3 +105,25 @@ TERAPKAN: jadwal Budi
 | Approval Tukar Hari | Approver-nya atasan→HRD, atau beda? | Budi |
 
 > Aturan yang **sudah pasti**: pemohon harus karyawan ber-shift; `exchange_date` minimal **H+3**; **tidak boleh dibatalkan** setelah disetujui. Lintas-role **mustahil** (slot per-role). Warehouse saat ini **dikecualikan**.
+
+---
+
+## Skenario Jalan Gagal (failure paths)
+
+### Tukar Shift (Andi & Citra)
+1. **Rekan menolak** — Citra menolak permintaan → status **Batal**, notif ke Andi. Andi boleh **ajukan ulang ke rekan lain**.
+2. **Atasan menolak (coverage)** — Pak Dedi menilai shift malam jadi kurang orang → **Ditolak** + catatan. Notif ke Andi & Citra.
+3. **HRD menolak** — Bu Sari menolak (mis. terlalu sering tukar / alasan tak valid) → **Ditolak**.
+4. **Rekan beda role** — Andi (Security) memilih rekan Produksi → **ditolak sistem** (slot per-role; lintas-role mustahil). *(sudah pasti dari kode)*
+5. **Rekan beda lokasi** — Andi (pusat) memilih rekan Tinggarjaya → **TBD** (kode belum cek pool per-lokasi; perlu keputusan).
+
+### Tukar Hari (Budi)
+6. **Slot jadi bolong** — Budi libur tgl 5 tanpa pengganti → shift kurang orang. Saat ini **bergantung penilaian atasan**; bisa **ditolak otomatis** hanya bila minimum staffing ditetapkan *(TBD)*.
+7. **Dobel-shift berturut** — Budi kerja tgl 7 padahal mepet shift sebelumnya tanpa jeda → **kode belum mengecek** *(TBD)*.
+
+### Validasi sistem (otomatis, sebelum sampai ke reviewer)
+8. **Terlalu mepet (< H+3)** — `exchange_date` kurang dari 3 hari dari hari ini → **ditolak otomatis** ("minimal H+3").
+9. **Non-shift / Warehouse** — karyawan non-shift atau Warehouse mengajukan → **403** (guard `IsShiftBasedSchedule`).
+10. **Batalkan setelah disetujui** — pemohon mencoba cancel saat status sudah **Disetujui** → **tidak diizinkan** (cancel hanya saat **Menunggu**).
+
+> Ringkas: penolakan bisa datang dari **3 sumber** — (a) **rekan** (consent, Tukar Shift saja), (b) **reviewer** (atasan/HRD, manual), (c) **sistem** (validasi otomatis: H+3, shift-only, status-cancel). Sumber (b) untuk coverage/dobel-shift masih manual karena guard otomatisnya **belum ada** (TBD).
