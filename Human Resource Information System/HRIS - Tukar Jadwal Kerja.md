@@ -21,6 +21,7 @@ Fitur dipecah menjadi **dua sub-fitur**:
 
 ### 2. Tukar Hari — geser hari, tanpa pengganti
 - **Definisi**: geser **hari kerja/libur** sendiri (mis. kerja di hari libur → ambil libur pengganti). **Unilateral** — tidak melibatkan rekan/pengganti.
+- **Jam kerja**: hari yang jadi masuk (`work_date`) **mewarisi jam kerja `exchange_date`** (shift ikut pindah bersama harinya), kecuali pemohon memilih slot eksplisit. *(Lihat catatan kode di bawah — implementasi sekarang belum konsisten.)*
 - **Alur**: **TBD** (atasan → HRD?).
 
 ### Aturan yang sudah diputuskan
@@ -32,13 +33,14 @@ Fitur dipecah menjadi **dua sub-fitur**:
 - **Lintas-role tidak mungkin** — slot tervalidasi **per-role** di `POST /shift-exchange/create` (`main.go` ~2610: Security 2, Production 3, Host Live 4 slot berbeda). Swap inheren **same-role**. Role disimpulkan dari `GroupID` (`IsScheduleSecurity/Production/Hostlive`), bukan department/position. → TBD "role" menyusut jadi soal **lokasi** (lihat bawah).
 - **Tidak ada validasi dobel-shift / rest-period** di attendance service — saat ini dobel-shift berturut **tidak dicegah** (unchecked).
 - **Warehouse dikecualikan** dari shift-based — `IsShiftBasedSchedule` = Security ∨ Hostlive ∨ Production saja; `WAREHOUSE-*` (static & pattern) kena **403** walau bekerja shift.
+- **Jam kerja Tukar Hari** (`applyApprovedShiftExchange`, `func.go` ~812-880): saat `work_date` **belum** punya entri → entri baru memakai **jam dari jadwal `exchange_date`** (shift ikut pindah); `exchange_date` jadi **"Replacement Day Off"**. ⚠️ **Gap**: bila entri `work_date` **sudah ada** (ter-seed cron) & tanpa slot eksplisit, hanya `status→Ontime` yang di-set — `work_time` **tidak** disetel ulang (`func.go` ~823-825) → jam bisa tetap dari entri lama (jalur insert vs update tak konsisten).
 
 ### Belum Diputuskan (TBD)
 - **Coverage**: boleh swap yang membuat slot kosong? minimum staffing per slot per role?
 - **Lokasi (per-site)**: swap harus **se-lokasi**? Ada varian `*-TINGGARJAYA` (site terpisah); kode **tidak** cek pool per-lokasi → swap lintas-site tak tertahan, padahal coverage per-site bisa bolong.
 - **Dobel-shift**: perlu **dilarang + jeda minimum** antar-shift? (kode belum punya guard → bila ya = fitur baru).
 - **Warehouse**: sengaja dikecualikan dari tukar shift, atau harus diikutkan?
-- **Tukar Hari**: kerja hari libur → uang lembur / libur pengganti / keduanya? libur pengganti harus bulan sama? siapa approver-nya?
+- **Tukar Hari**: kerja hari libur → uang lembur / libur pengganti / keduanya? libur pengganti harus bulan sama? siapa approver-nya? **Pastikan `work_date` selalu mewarisi jam `exchange_date`** (rapikan jalur update yang tak menyetel `work_time`).
 - **Approver**: detail approver per-role; apakah SPV HRD step-1 auto-approve berlaku di sini.
 - **Payroll**: tunjangan shift ikut pindah ke rekan? dampak ke perhitungan keterlambatan/SP?
 
