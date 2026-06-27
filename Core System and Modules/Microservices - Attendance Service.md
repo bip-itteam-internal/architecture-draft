@@ -68,8 +68,8 @@
 - `POST /correction`, `GET /correction/mine`, `GET /correction`, `PATCH /correction/:id/review`, `PATCH /correction/:id/cancel` — koreksi clock-in/out yang terlewat dengan approval multi-level (routing per role); waktu diisi otomatis dari jadwal saat disetujui (`applyCorrectionToEntry`). Detail lengkap: [[HRIS - Attendance Correction]].
 
 **Cron & Seeding**
-- Tiap 30 menit: pra-generate entry absensi dari rotasi jadwal + flip status pending→alpha.
-- Per jam: auto-ignore request basi (>24 jam) + sinkronisasi jadwal.
+- Tiap 30 menit: pra-generate entry absensi dari rotasi jadwal (perhitungkan cuti & **tukar jadwal** disetujui — swap kedua sisi via `WorkTimeFor`) + flip status pending→alpha.
+- Per jam: auto-ignore **leave + koreksi presensi** basi (>24 jam) + **reminder reviewer T+18j** (koreksi & leave) + sinkronisasi jadwal.
 - Saat startup: seed ulang `company_work_schedule` (~40 definisi shift), `company_group_rotation`, dan `company_wifi` (~50 access point kantor).
 
 ## Belum Diimplementasikan / Catatan
