@@ -164,6 +164,7 @@ Semua route berada di bawah **Attendance Service** (`/api/attendance/shift-excha
 |--------|------------------------------|-------------------------------------------------------|
 | POST   | `/shift-exchange/create`     | Membuat request — **403** bila bukan karyawan shift. Body: `{ work_date, exchange_date, reason, type?, exchange_work_time?, partner_employee_id? }`. `type:"shift"`+`partner` → swap (resolve & simpan kedua slot, `partner_consent=Waiting`) |
 | PATCH  | `/shift-exchange/consent`    | **Rekan** menyetujui/menolak swap (langkah 1). Body: `{ id, status, notes? }`. Hanya `partner_employee_id` & saat `status=Waiting`. Tolak → Canceled; setuju → lanjut ke atasan |
+| GET    | `/shift-exchange/partners`   | **Pembantu** — kandidat rekan swap pada `?date=` (role/slot sama, bukan diri sendiri, terjadwal kerja). Return `{employee_id, full_name, group_id, work_time}` |
 | GET    | `/shift-exchange/view`       | Melihat daftar request (mendukung `?as=reviewer/reviewed`, `?filter=ongoing/past`, `?id=`, `?search=`) |
 | PATCH  | `/shift-exchange/review`     | Atasan/HRD setuju/tolak (body: `{ id, status, notes? }`). **Diblokir** sampai consent rekan disetujui |
 | PATCH  | `/shift-exchange/cancel`     | Membatalkan request milik sendiri (query: `?id=`) — hanya saat status **Waiting** |
