@@ -5,7 +5,7 @@
 - **Stack / Path**: Attendance Service (`bip-erp/services/attendance`), koleksi **`schedule_exchange_request`** (rename dari `shift_exchange_request`).
 - **Status**: ⚠️ **Implemented** (branch `feat/recruitment-service`, belum rilis). **Tukar Shift** = swap antar-rekan 3-langkah (consent → atasan → HRD) **sudah dibangun**; **Tukar Hari** = model single-person (geser hari). Lihat "Desain & Implementasi" + **Known limitation** di bawah.
 
-> ⚠️ **Pembatasan shift-only (keputusan HRD 2026-06-26).** Guard di `POST /shift-exchange/create` (lookup `WorkSchedule` pemohon → `IsShiftBasedSchedule(GroupID)`; bila bukan shift → 403). **Gap:** web FE (`erp-frontend`) masih menyediakan flow "tukar hari" untuk karyawan non-shift yang kini ditolak BE — perlu disesuaikan (sembunyikan/nonaktifkan untuk non-shift).
+> ⚠️ **Pembatasan shift-only (keputusan HRD 2026-06-26).** Guard di `POST /schedule-exchange/create` (lookup `WorkSchedule` pemohon → `IsShiftBasedSchedule(GroupID)`; bila bukan shift → 403). **Gap:** web FE (`erp-frontend`) masih menyediakan flow "tukar hari" untuk karyawan non-shift yang kini ditolak BE — perlu disesuaikan (sembunyikan/nonaktifkan untuk non-shift).
 
 ## Desain & Implementasi — Tukar Jadwal Kerja (⚠️ Implemented)
 
@@ -16,7 +16,7 @@ Fitur dipecah menjadi **dua sub-fitur**:
 ### 1. Tukar Shift — swap antar-rekan ✅
 - **Definisi**: menukar **slot jam** pada tanggal sama dengan **rekan**. Hanya role ber-shift; **same-role dipaksa** (slot tervalidasi per-role).
 - **Pihak**: pemohon **memilih rekan** (`partner_employee_id`). Validasi `validateSwapPartner` (beda orang, shift, role sama). Saat create, slot **kedua sisi** di-resolve & disimpan: pemohon `exchange_work_time` (= slot rekan), rekan `partner_work_time` (= slot pemohon).
-- **Alur (3 langkah)**: **rekan** `PATCH /shift-exchange/consent` → **atasan** (`review_1`) → **HRD** (`review_2`). Rekan **menolak → status Canceled**. Atasan/HRD **diblokir** sampai rekan menyetujui (gating). `ResolveScheduleExchangeStatus(consent, r1, r2)`.
+- **Alur (3 langkah)**: **rekan** `PATCH /schedule-exchange/consent` → **atasan** (`review_1`) → **HRD** (`review_2`). Rekan **menolak → status Canceled**. Atasan/HRD **diblokir** sampai rekan menyetujui (gating). `ResolveScheduleExchangeStatus(consent, r1, r2)`.
 - **Dampak penerapan**: jadwal **kedua** karyawan ditukar. **Durable** via cron seeding & kalender sadar-swap (`WorkTimeFor` per sisi: pemohon→`exchange_work_time`, rekan→`partner_work_time`); apply saat approval hanya update entri yang sudah ada (tanpa duplikasi).
 
 ### 2. Tukar Hari — geser hari, tanpa pengganti
@@ -42,7 +42,7 @@ Fitur dipecah menjadi **dua sub-fitur**:
 - **Tidak boleh dibatalkan** setelah disetujui (cancel hanya saat masih menunggu).
 
 ### Sudah dijawab kode (telusur 2026-06-27)
-- **Lintas-role tidak mungkin** — slot tervalidasi **per-role** di `POST /shift-exchange/create` (`main.go` ~2610: Security 2, Production 3, Host Live 4 slot berbeda). Swap inheren **same-role**. Role disimpulkan dari `GroupID` (`IsScheduleSecurity/Production/Hostlive`), bukan department/position. → TBD "role" menyusut jadi soal **lokasi** (lihat bawah).
+- **Lintas-role tidak mungkin** — slot tervalidasi **per-role** di `POST /schedule-exchange/create` (`main.go` ~2610: Security 2, Production 3, Host Live 4 slot berbeda). Swap inheren **same-role**. Role disimpulkan dari `GroupID` (`IsScheduleSecurity/Production/Hostlive`), bukan department/position. → TBD "role" menyusut jadi soal **lokasi** (lihat bawah).
 - **Tidak ada validasi dobel-shift / rest-period** di attendance service — saat ini dobel-shift berturut **tidak dicegah** (unchecked).
 - **Warehouse dikecualikan** dari shift-based — `IsShiftBasedSchedule` = Security ∨ Hostlive ∨ Production saja; `WAREHOUSE-*` (static & pattern) kena **403** walau bekerja shift.
 - **Jam kerja Tukar Hari** (`applyApprovedShiftExchange`, `func.go` ~812-880): saat `work_date` **belum** punya entri → entri baru memakai **jam dari jadwal `exchange_date`** (shift ikut pindah); `exchange_date` jadi **"Replacement Day Off"**. ⚠️ **Gap**: bila entri `work_date` **sudah ada** (ter-seed cron) & tanpa slot eksplisit, hanya `status→Ontime` yang di-set — `work_time` **tidak** disetel ulang (`func.go` ~823-825) → jam bisa tetap dari entri lama (jalur insert vs update tak konsisten).
@@ -142,7 +142,7 @@ Reviewer ditentukan secara dinamis berdasarkan peran pemohon:
 
 ## Aturan Bisnis / Validasi
 
-- **Pemohon harus karyawan berbasis shift** (Security, Production, Host Live) — *keputusan HRD 2026-06-26*. Di awal `POST /shift-exchange/create`, backend lookup `WorkSchedule` pemohon lalu `IsShiftBasedSchedule(GroupID)`; bila bukan shift → **403** `tukar shift hanya untuk karyawan ber-shift (Security/Host Live/Production)`. Lookup gagal/jadwal tak ditemukan → **500**.
+- **Pemohon harus karyawan berbasis shift** (Security, Production, Host Live) — *keputusan HRD 2026-06-26*. Di awal `POST /schedule-exchange/create`, backend lookup `WorkSchedule` pemohon lalu `IsShiftBasedSchedule(GroupID)`; bila bukan shift → **403** `tukar shift hanya untuk karyawan ber-shift (Security/Host Live/Production)`. Lookup gagal/jadwal tak ditemukan → **500**.
 - `exchange_date` harus **minimal 3 hari (H+3)** dari hari ini *(naik dari H+2)*
 - `work_date` dan `exchange_date` harus dalam **bulan yang sama**
 - **Tukar Shift (swap)**: `partner_employee_id` wajib karyawan **shift & role sama**, bukan diri sendiri (`validateSwapPartner`); pemohon & rekan harus terjadwal kerja pada tanggal itu
@@ -158,16 +158,16 @@ Reviewer ditentukan secara dinamis berdasarkan peran pemohon:
 
 ## Endpoint API
 
-Semua route berada di bawah **Attendance Service** (`/api/attendance/shift-exchange/`), diproxy melalui API Gateway.
+Semua route berada di bawah **Attendance Service** (`/api/attendance/schedule-exchange/`), diproxy melalui API Gateway.
 
 | Metode | Route                        | Deskripsi                                             |
 |--------|------------------------------|-------------------------------------------------------|
-| POST   | `/shift-exchange/create`     | Membuat request — **403** bila bukan karyawan shift. Body: `{ work_date, exchange_date, reason, type?, exchange_work_time?, partner_employee_id? }`. `type:"shift"`+`partner` → swap (resolve & simpan kedua slot, `partner_consent=Waiting`) |
-| PATCH  | `/shift-exchange/consent`    | **Rekan** menyetujui/menolak swap (langkah 1). Body: `{ id, status, notes? }`. Hanya `partner_employee_id` & saat `status=Waiting`. Tolak → Canceled; setuju → lanjut ke atasan |
-| GET    | `/shift-exchange/partners`   | **Pembantu** — kandidat rekan swap pada `?date=` (role/slot sama, bukan diri sendiri, terjadwal kerja). Return `{employee_id, full_name, group_id, work_time}` |
-| GET    | `/shift-exchange/view`       | Melihat daftar request (mendukung `?as=reviewer/reviewed`, `?filter=ongoing/past`, `?id=`, `?search=`) |
-| PATCH  | `/shift-exchange/review`     | Atasan/HRD setuju/tolak (body: `{ id, status, notes? }`). **Diblokir** sampai consent rekan disetujui |
-| PATCH  | `/shift-exchange/cancel`     | Membatalkan request milik sendiri (query: `?id=`) — hanya saat status **Waiting** |
+| POST   | `/schedule-exchange/create`     | Membuat request — **403** bila bukan karyawan shift. Body: `{ work_date, exchange_date, reason, type?, exchange_work_time?, partner_employee_id? }`. `type:"shift"`+`partner` → swap (resolve & simpan kedua slot, `partner_consent=Waiting`) |
+| PATCH  | `/schedule-exchange/consent`    | **Rekan** menyetujui/menolak swap (langkah 1). Body: `{ id, status, notes? }`. Hanya `partner_employee_id` & saat `status=Waiting`. Tolak → Canceled; setuju → lanjut ke atasan |
+| GET    | `/schedule-exchange/partners`   | **Pembantu** — kandidat rekan swap pada `?date=` (role/slot sama, bukan diri sendiri, terjadwal kerja). Return `{employee_id, full_name, group_id, work_time}` |
+| GET    | `/schedule-exchange/view`       | Melihat daftar request (mendukung `?as=reviewer/reviewed`, `?filter=ongoing/past`, `?id=`, `?search=`) |
+| PATCH  | `/schedule-exchange/review`     | Atasan/HRD setuju/tolak (body: `{ id, status, notes? }`). **Diblokir** sampai consent rekan disetujui |
+| PATCH  | `/schedule-exchange/cancel`     | Membatalkan request milik sendiri (query: `?id=`) — hanya saat status **Waiting** |
 
 ### Parameter Query Endpoint View
 

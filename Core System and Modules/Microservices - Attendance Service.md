@@ -62,7 +62,7 @@
 - Detail jenis cuti/izin, reviewer, kuota & alur: [[HRIS - Leave Request]]
 
 **Tukar Jadwal Kerja (workflow)** — collection `schedule_exchange_request`
-- `POST /shift-exchange/create`, `PATCH /shift-exchange/consent`, `GET /shift-exchange/view`, `PATCH /shift-exchange/review`, `PATCH /shift-exchange/cancel` — Tukar Shift (swap antar-rekan, 3 langkah: consent rekan → atasan → HRD) atau Tukar Hari (geser hari). Setelah disetujui menyesuaikan attendance (`applyApprovedShiftExchange`/`applyScheduleExchangeSwap`); cron seeding & kalender sadar-swap. Detail lengkap: [[HRIS - Tukar Jadwal Kerja]].
+- `POST /schedule-exchange/create`, `PATCH /schedule-exchange/consent`, `GET /schedule-exchange/view`, `PATCH /schedule-exchange/review`, `PATCH /schedule-exchange/cancel` — Tukar Shift (swap antar-rekan, 3 langkah: consent rekan → atasan → HRD) atau Tukar Hari (geser hari). Setelah disetujui menyesuaikan attendance (`applyApprovedShiftExchange`/`applyScheduleExchangeSwap`); cron seeding & kalender sadar-swap. Detail lengkap: [[HRIS - Tukar Jadwal Kerja]].
 
 **Attendance Correction (workflow)**
 - `POST /correction`, `GET /correction/mine`, `GET /correction`, `PATCH /correction/:id/review`, `PATCH /correction/:id/cancel` — koreksi clock-in/out yang terlewat dengan approval multi-level (routing per role); waktu diisi otomatis dari jadwal saat disetujui (`applyCorrectionToEntry`). Detail lengkap: [[HRIS - Attendance Correction]].
