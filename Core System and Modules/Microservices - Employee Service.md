@@ -37,7 +37,7 @@
 **CRUD Employee Data**
 - CRUD personal data, personal-documents, work data, work-documents, schedule, dan system-auth
 - Transaksi create/update employee (multi-collection, `RequireHRISStaff`) lengkap dengan existence/completeness checks
-- `GET /birthdays?month=1-12` — karyawan ulang tahun per bulan (default bulan berjalan); `$lookup` ke `work_data` untuk posisi/departemen + umur saat ini, urut per tanggal; hanya field aman (tanpa NIK/KK/alamat)
+- `GET /birthdays?month=1-12` — karyawan **aktif** (`$lookup` `system_authentication` + `is_active=true`) yang ulang tahun per bulan (default bulan berjalan); `$lookup` `work_data` untuk posisi/departemen + umur saat ini, urut per tanggal; hanya field aman (tanpa NIK/KK/alamat). Filter bulan & umur dihitung di Go (`date_of_birth` bisa string ISO, bukan BSON Date) + konversi ke WIB (data disimpan midnight WIB sebagai UTC)
 
 **Aggregation / HRIS**
 - `GET /v2/internal/aggregate/employees` — join multi-collection + paginated
