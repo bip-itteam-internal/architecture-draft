@@ -18,17 +18,33 @@ Sebelum ngoding ulang, perlu jelas dulu **maksud bisnisnya**. Pertanyaan di bawa
 
 ---
 
+## Struktur fitur yang disepakati (2026-06-27)
+
+Nama payung fitur: **Tukar Jadwal Kerja**. Berisi **dua sub-fitur** dengan model berbeda:
+
+| Sub-fitur | Definisi | Pihak terlibat | Alur persetujuan |
+|---|---|---|---|
+| **Tukar Shift** | Tukar **slot jam** dengan rekan (role ber-shift) | Pemohon **+ rekan** | rekan (consent) → atasan → HRD |
+| **Tukar Hari** | Geser **hari kerja/libur** sendiri, **tanpa pengganti** | Pemohon saja | TBD (atasan → HRD?) |
+
+- **Tukar Shift** = swap antar-rekan (jawaban Q1–Q6); coverage terjaga otomatis **bila** rekan di slot pool yang sama.
+- **Tukar Hari** = unilateral, **tidak menggeser orang lain** (Q2: "gak perlu pengganti"). Alur approval-nya belum ditetapkan.
+
+> **Implikasi dok:** published `HRIS - Shift Exchange` akan **di-rename → `HRIS - Tukar Jadwal Kerja`** dan direstruktur jadi 2 sub-fitur **saat redesign diimplementasikan**. Untuk sekarang dok itu tetap grounded ke kode lama (single-person).
+
+---
+
 ## 1. Konsep & ruang lingkup
 
-1. "Tukar shift" yang dimaksud = **swap dengan rekan** (rekan ikut bertukar jadwal), atau cukup **ubah jadwal sendiri** (seperti sekarang)?
-2. "Tukar hari" (kerja di hari libur → ambil libur pengganti) dianggap **fitur yang sama** dengan tukar shift, atau **dipisah**?
+1. "Tukar shift" yang dimaksud = **swap dengan rekan** (rekan ikut bertukar jadwal), atau cukup **ubah jadwal sendiri** (seperti sekarang)? bisa tukar dengan rekan dengan, dengan 3 step yaitu rekan yang mau tukar, atasan dan hrd
+2. "Tukar hari" (kerja di hari libur → ambil libur pengganti) dianggap **fitur yang sama** dengan tukar shift, atau **dipisah**? tukar hari gak perlu pengganti
 3. Apakah perlu membedakan jelas antara: (a) ganti **slot jam** di hari sama, vs (b) geser **hari kerja↔libur**?
 
 ## 2. Persetujuan rekan (consent)
 
-4. Kalau swap antar-rekan: rekan yang dituju **harus menyetujui dulu** sebelum atasan, atau atasan bisa langsung memutuskan?
-5. Kalau rekan **menolak** → pengajuan otomatis batal?
-6. Siapa yang memilih rekan — pemohon sendiri, atau ditentukan/disetujui SPV?
+4. Kalau swap antar-rekan: rekan yang dituju **harus menyetujui dulu** sebelum atasan, atau atasan bisa langsung memutuskan? ya, rekan yang dituju **harus menyetujui dulu** sebelum atasan,
+5. Kalau rekan **menolak** → pengajuan otomatis batal? ya
+6. Siapa yang memilih rekan — pemohon sendiri, atau ditentukan/disetujui SPV? ya pemohon yg memilih rekan
 
 ## 3. Coverage / kapasitas shift
 
@@ -62,8 +78,8 @@ Sebelum ngoding ulang, perlu jelas dulu **maksud bisnisnya**. Pertanyaan di bawa
 
 ## 7. Batas waktu & pembatalan
 
-19. `exchange_date` minimal **H+2** dari hari ini — tetap? Atau perlu lead-time berbeda?
-20. Boleh **batalkan setelah disetujui**? Sampai kapan (mis. sebelum H-1)?
+19. `exchange_date` minimal **H+3* dari hari ini — tetap
+20. Boleh **batalkan setelah disetujui**? Sampai kapan (mis. sebelum H-1)? ya gaboleh dibatalkan
 
 ## 8. Payroll & dampak lain
 
