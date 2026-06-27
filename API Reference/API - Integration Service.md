@@ -16,7 +16,7 @@
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/transactions/orders/list` · `/orders/:id` · `/orders/summary[/shops|/products]` | Order terpadu + ringkasan |
-| GET | `/transactions/orders/summary/comparison` | Perbandingan omset hari ini vs kemarin per channel (total + 24 slot hourly, status SHIPPED) |
+| GET | `/transactions/orders/summary/comparison` | Perbandingan omset hari ini vs kemarin per channel (total + 24 slot hourly, status TO_SHIP, aggregasi by `order_update_date`) |
 | GET | `/transactions/master/shops` · `/channels` · `/status` | Master shop/channel/status |
 | GET/POST | `/transactions/summary/reports` (+ `/:id`, `/:id/items`, `/:id/invoices`, `/group-by-status`) | Laporan ringkasan (generate/list/detail) |
 | POST | `/transactions/summary/reports/:id/retry` · `/send/:service` · DELETE `/:id` | Retry/kirim/hapus laporan |
