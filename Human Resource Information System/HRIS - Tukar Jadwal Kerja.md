@@ -48,6 +48,7 @@ Fitur dipecah menjadi **dua sub-fitur**:
 - `exchange_date` minimal **H+3** (naik dari H+2 pada model lama).
 - **Tidak boleh dibatalkan** setelah disetujui (cancel hanya saat masih menunggu).
 - **Auto-ignore & reminder** (konsisten leave/koreksi): pengajuan basi **>24 jam** → `Diabaikan` (termasuk tahap **consent rekan** yang tak direspons); **reminder** aktor saat ini (rekan/atasan/HRD) di **T+18 jam**. Cron `services/attendance/cron.go` (`cronAutoIgnoreStaleRequest` + `cronRemindStalePendingScheduleExchanges`).
+- **Rekan swap harus se-departemen + se-lokasi (site)** — **keputusan 2026-06-28**, berlaku untuk **Tukar Shift & Tukar Hari**. **Alasan (coverage per-brand):** rotasi Host Live dirancang **"1 host per brand per shift"** — di prod tiap grup `HOSTLIVE-…-THU-OFF-P3` = **1 Beauty Hacks + 1 Kyura** (total HL prod = 8 Kyura + 3 BH). Swap **lintas-departemen** membuat satu brand **kosong** di satu shift walau headcount netral (mis. *Khilda* BH ⟷ *Helga* Kyura → shift pagi jadi 0 BH, shift malam jadi 0 Kyura). **Same-department** menjaga invariant "1 per brand per shift"; **same-site** mencegah `*-TINGGARJAYA` (Security) tercampur lintas-lokasi. Guard diterapkan **di tingkat rekan** (bukan grup — grup rotasi memang boleh campur departemen).
 
 ### Sudah dijawab kode (telusur 2026-06-27)
 - **Lintas-role tidak mungkin** — slot tervalidasi **per-role** di `POST /schedule-exchange/create` (`main.go` ~2610: Security 2, Production 3, Host Live 4 slot berbeda). Swap inheren **same-role**. Role disimpulkan dari `GroupID` (`IsScheduleSecurity/Production/Hostlive`), bukan department/position. → TBD "role" menyusut jadi soal **lokasi** (lihat bawah).
@@ -60,11 +61,12 @@ Fitur dipecah menjadi **dua sub-fitur**:
 - **Reviewer list** masih menampilkan swap yang menunggu consent (aksi diblok, tapi tampil) — filter `buildShiftExchangeReviewFilter` belum exclude.
 - **Notif consent** ke kepala dept (`employee_id` kosong) jatuh ke HR (pola pre-existing, sama di review handler).
 - **`exchange_work_time` dari user diabaikan** saat ada partner (slot di-resolve dari jadwal).
-- **Belum ada test E2E** apply swap (butuh Mongo); unit test menutupi status machine + validasi rekan + infer type.
+- 🔴 **Guard same-department/same-site BELUM diimplementasi** (gap vs keputusan 2026-06-28): `validateSwapPartner` (`func.go` ~704) hanya cek `IsSameShiftRole` (family `group_id`), **tidak** cek departemen/site; endpoint **partners** juga filter `group_id` saja → swap **lintas-departemen masih lolos** (terverifikasi: Host Live BH bisa swap dgn Kyura). **TODO**: tambah `requesterDepartment == partnerDepartment` (+ site) di `validateSwapPartner` & filter `partners`.
+- **Test E2E**: Tukar **Shift** ✅ **terverifikasi di dev** (2026-06-28, Production: create→consent→atasan→HRD→jadwal tertukar). Tukar **Hari** ✅ approval & presensi benar, ⚠️ **render kalender** masih bug (cabang non-sameDay `getEmployeeScheduleDateRange`).
 
 ### Belum Diputuskan (TBD)
-- **Coverage**: boleh swap yang membuat slot kosong? minimum staffing per slot per role?
-- **Lokasi (per-site)**: swap harus **se-lokasi**? Ada varian `*-TINGGARJAYA` (site terpisah); kode **tidak** cek pool per-lokasi → swap lintas-site tak tertahan, padahal coverage per-site bisa bolong.
+- **Coverage (minimum staffing)**: angka minimum per slot/role/site masih perlu dikunci HRD (mis. Security ≥2/shift, Host Live ≥1 per brand/shift). Keputusan **same-department** (2026-06-28) sudah menutup coverage **per-brand**; sisa: **Tukar Hari unilateral** masih bisa menjatuhkan slot di bawah minimum.
+- ~~**Lokasi (per-site)**~~ → **DIPUTUSKAN 2026-06-28**: swap harus **se-site** (lihat "Aturan yang sudah diputuskan").
 - **Dobel-shift**: perlu **dilarang + jeda minimum** antar-shift? (kode belum punya guard → bila ya = fitur baru).
 - **Warehouse**: sengaja dikecualikan dari tukar shift, atau harus diikutkan?
 - **Tukar Hari**: kerja hari libur → uang lembur / libur pengganti / keduanya? libur pengganti harus bulan sama? siapa approver-nya? **Pastikan `work_date` selalu mewarisi jam `exchange_date`** (rapikan jalur update yang tak menyetel `work_time`).
