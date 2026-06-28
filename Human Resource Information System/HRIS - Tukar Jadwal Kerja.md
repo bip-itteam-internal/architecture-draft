@@ -7,9 +7,16 @@
 
 > ⚠️ **Pembatasan shift-only (keputusan HRD 2026-06-26).** Guard di `POST /schedule-exchange/create` (lookup `WorkSchedule` pemohon → `IsShiftBasedSchedule(GroupID)`; bila bukan shift → 403). **Gap:** web FE (`erp-frontend`) masih menyediakan flow "tukar hari" untuk karyawan non-shift yang kini ditolak BE — perlu disesuaikan (sembunyikan/nonaktifkan untuk non-shift).
 
+## Latar Belakang
+
+* Karyawan terkadang perlu bekerja pada hari libur yang dijadwalkan (misalnya hari libur nasional) dan mengambil hari libur pengganti di hari lain, atau karyawan berbasis shift ingin mengubah slot shift mereka pada tanggal tertentu.
+* Sebelumnya hal ini ditangani secara informal melalui HR tanpa jejak audit yang bisa dilacak.
+* **Tukar Jadwal Kerja** menyediakan alur formal: pengajuan digital, persetujuan berjenjang, dan penyesuaian kehadiran otomatis — pelengkap [[HRIS - Attendance System]].
+* Sejak keputusan HRD 2026-06-26 **hanya untuk karyawan berbasis shift** (Security, Production, Host Live). Karyawan berbasis shift dapat menentukan `exchange_work_time` (slot shift) yang berbeda pada tanggal tujuan. *(Sebelumnya terbuka untuk semua karyawan — flow non-shift kini ditolak BE.)*
+
 ## Desain & Implementasi — Tukar Jadwal Kerja (⚠️ Implemented)
 
-> **Sudah dibangun** (Fase 0–2, branch `feat/recruitment-service`; keputusan HRD 2026-06-26/27). Bagian "Latar Belakang"…"Implementasi Frontend" di bawah masih mendeskripsikan **model lama single-person** (diwarisi Tukar Hari); Tukar Shift swap mengikuti desain di section ini. Lihat **Known limitation & TBD** di bawah.
+> **Sudah dibangun** (Fase 0–2, branch `feat/recruitment-service`; keputusan HRD 2026-06-26/27). Bagian "Kasus Penggunaan"…"Implementasi Frontend" di bawah masih mendeskripsikan **model lama single-person** (diwarisi Tukar Hari); Tukar Shift swap mengikuti desain di section ini. Lihat **Known limitation & TBD** di bawah.
 
 Fitur dipecah menjadi **dua sub-fitur**:
 
@@ -65,13 +72,6 @@ Fitur dipecah menjadi **dua sub-fitur**:
 - **Payroll**: tunjangan shift ikut pindah ke rekan? dampak ke perhitungan keterlambatan/SP?
 
 *(Daftar pertanyaan & jawaban lengkap ada di notulen HRD — Workspace.)*
-
-## Latar Belakang
-
-* Karyawan terkadang perlu bekerja pada hari libur yang dijadwalkan (misalnya hari libur nasional) dan mengambil hari libur pengganti di hari lain, atau karyawan berbasis shift ingin mengubah slot shift mereka pada tanggal tertentu.
-* Sebelumnya hal ini ditangani secara informal melalui HR tanpa jejak audit yang bisa dilacak.
-* Fitur shift exchange menyediakan alur formal: pengajuan digital, persetujuan, dan penyesuaian kehadiran otomatis.
-* Sejak keputusan HRD 2026-06-26 **hanya untuk karyawan berbasis shift** (Security, Production, Host Live). Karyawan berbasis shift dapat menentukan `exchange_work_time` (slot shift) yang berbeda pada tanggal tujuan. *(Sebelumnya terbuka untuk semua karyawan — flow non-shift kini ditolak BE.)*
 
 ## Kasus Penggunaan
 
