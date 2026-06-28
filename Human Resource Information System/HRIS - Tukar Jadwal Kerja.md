@@ -41,7 +41,7 @@ Fitur dipecah menjadi **dua sub-fitur**:
 ### Integrasi katalog hr-request (FE picker)
 - ✅ **Terdaftar** di katalog `GET /data-type/hr-request` sebagai type **"Tukar Jadwal Kerja"** (sebelumnya "Tukar Shift"), dengan subtype **["Tukar Shift", "Tukar Hari"]** via `/data-type/hr-request-subtype` (`shared-library/models/attendance/models.go`). Mobile FE memuat katalog ini **dinamis** → label baru muncul otomatis tanpa ubah FE.
 - **Mapping** subtype FE → discriminator `type`: *Tukar Shift* → `shift`, *Tukar Hari* → `day`.
-- Handler `create` kini **bercabang per `type`+partner** (swap → consent rekan). Routing FE picker → endpoint create (kirim `type` + `partner_employee_id`) **masih perlu diverifikasi/disesuaikan di mobile**.
+- Handler `create` kini **bercabang per `type`+partner** (swap → consent rekan). **Mobile (MyBharata)** kini punya fitur khusus `features/schedule_exchange` yang memanggil `/schedule-exchange/*` **langsung** (kirim `type:"shift"` + `partner_employee_id`) — bukan lagi katalog `/request/*` generik (branch `feature/schedule-exchange`, **PR #78 → `dev`**). Detail di **Implementasi Frontend → Mobile**.
 
 ### Aturan yang sudah diputuskan
 - Hanya karyawan ber-shift (Security / Host Live / Production) — sudah berlaku via guard create (403).
@@ -168,7 +168,7 @@ Semua route berada di bawah **Attendance Service** (`/api/attendance/schedule-ex
 | POST   | `/schedule-exchange/create`     | Membuat request — **403** bila bukan karyawan shift. Body: `{ work_date, exchange_date, reason, type?, exchange_work_time?, partner_employee_id? }`. `type:"shift"`+`partner` → swap (resolve & simpan kedua slot, `partner_consent=Waiting`) |
 | PATCH  | `/schedule-exchange/consent`    | **Rekan** menyetujui/menolak swap (langkah 1). Body: `{ id, status, notes? }`. Hanya `partner_employee_id` & saat `status=Waiting`. Tolak → Canceled; setuju → lanjut ke atasan |
 | GET    | `/schedule-exchange/partners`   | **Pembantu** — kandidat rekan swap pada `?date=` (role/slot sama, bukan diri sendiri, terjadwal kerja). Return `{employee_id, full_name, group_id, work_time}` |
-| GET    | `/schedule-exchange/view`       | Melihat daftar request (mendukung `?as=reviewer/reviewed`, `?filter=ongoing/past`, `?id=`, `?search=`) |
+| GET    | `/schedule-exchange/view`       | Melihat daftar request (mendukung `?as=reviewer/reviewed/partner`, `?filter=ongoing/past`, `?id=`, `?search=`). `as=partner` = inbox consent rekan *(2026-06-29)* |
 | PATCH  | `/schedule-exchange/review`     | Atasan/HRD setuju/tolak (body: `{ id, status, notes? }`). **Diblokir** sampai consent rekan disetujui |
 | PATCH  | `/schedule-exchange/cancel`     | Membatalkan request milik sendiri (query: `?id=`) — hanya saat status **Waiting** |
 
@@ -176,6 +176,7 @@ Semua route berada di bawah **Attendance Service** (`/api/attendance/schedule-ex
 
 - `as=reviewer` — menampilkan request di mana pemanggil adalah reviewer saat ini (pending)
 - `as=reviewed` — menampilkan request yang sudah direview oleh pemanggil
+- `as=partner` — **(swap)** menampilkan request yang menunggu **consent** pemanggil sebagai rekan (`partner_employee_id` + `partner_consent.status=Menunggu persetujuan`) → inbox consent rekan. *(ditambah 2026-06-29, untuk mobile; tanpa ini rekan tak bisa list/akses request consent-nya karena filter default `employee_id=self`.)*
 - `filter=ongoing` — request yang masih aktif atau baru diperbarui
 - `filter=past` — request dengan status final atau sudah lama + exchange_date sudah lewat
 - `id=<hex>` — mengambil satu request berdasarkan ObjectID
@@ -284,6 +285,21 @@ src/features/hris/shift-exchange/
 - Jumlah pending review di-poll setiap 60 detik untuk badge sidebar
 - Semua tabel menggunakan pagination sisi klien dengan opsi ukuran halaman: 3 (default), 5, 10, 50
 
+### Mobile (MyBharata) — Tukar Shift ⚠️ (branch `feature/schedule-exchange`, PR #78 → `dev`, belum rilis)
+
+> Bagian di atas mendeskripsikan **web** (`erp-frontend`). Mobile dibangun terpisah: fitur khusus `lib/src/features/schedule_exchange/` (Clean Architecture, **meniru pola `submission`** & **reuse core widgets** — tanpa komponen baru), memanggil `/schedule-exchange/*` **langsung** (bukan katalog `/request/*` generik). **Hanya Tukar Shift** (`type:"shift"`, `work_date==exchange_date`); Tukar Hari tidak diikutkan di mobile.
+
+**Alur 3 aktor (mirror leave):**
+- **Pemohon** — pilih `work_date` → `GET /partners` → pilih rekan (**picker komposit**: `CustomBottomSheet` + `CustomInput` search + list) → alasan → submit (`POST /create`, payload RFC3339). Riwayat (`view`) + detail + **batal** (`cancel`).
+- **Rekan (consent)** — inbox tab "Persetujuan Rekan" → `GET /view?as=partner` → setuju/tolak (`PATCH /consent`). *(butuh BE `as=partner` — **bip-erp PR #172**, deploy dulu.)*
+- **Atasan/HRD (review)** — inbox tab "Tinjauan" → `GET /view?as=reviewer` → setuju/tolak (`PATCH /review`).
+
+**Catatan teknis:**
+- Detail dibuka sebagai **objek** `ScheduleExchange` dari list (bukan re-fetch `?id=`) — karena `/view?id=` difilter `employee_id=self` sehingga reviewer/rekan tak bisa fetch by id.
+- Entry: **2 menu** di kategori Attendance (`more_menu_page`): "Tukar Jadwal Kerja" (pemohon) + "Tinjauan Tukar Shift" (inbox consent+review).
+- Status string ID (`Disetujui`/`Ditolak`/`Menunggu persetujuan`); l10n 24 key (`app_id.arb`+`app_en.arb`).
+- **Verifikasi**: `dart analyze` (seluruh `lib`) bersih; **9 unit test** hijau (model `toJson` kontrak BE + BLoC form/consent/cancel via `bloc_test`+`mocktail`). ⏳ **E2E mobile belum** — perlu deploy BE PR #172 + akun shift.
+
 ## Kebutuhan
 
 - [x] Master data karyawan (referensi lookup, data supervisor)
@@ -296,4 +312,5 @@ src/features/hris/shift-exchange/
 - [x] [[HRIS - Employee Request & Approval]] *(framework induk)*
 - [x] [[HRIS - Attendance System]]
 - [x] [[Microservices - Attendance Service]]
+- [x] [[APP - MyBharata]] *(klien mobile — fitur Tukar Shift, PR #78)*
 - [x] [[HRIS - Big Pictures]]
