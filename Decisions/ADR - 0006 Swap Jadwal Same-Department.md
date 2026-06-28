@@ -26,7 +26,7 @@ Di samping syarat lama: bukan diri sendiri, sama-sama ber-shift, dan **same shif
 - ➕ Menjaga invariant coverage **"1 host per brand per shift"** (Host Live BH vs Kyura) dan coverage per-site (Security Tinggarjaya).
 - ➕ Approval konsisten — `review_1` = supervisor departemen pemohon; tak ada swap lintas-dept yang hanya di-review satu pihak.
 - ➖ Mempersempit kandidat rekan: Host Live **Beauty Hacks (hanya 3 orang)** jadi sangat terbatas pilihan rekannya.
-- ✅ **Diimplementasi** (branch `feat/swap-same-department`): `validateSwapPartner` + endpoint `partners` cek same-site (`IsSameSite`) + same-department; **fail-open** bila `department` belum ter-sync agar tak salah-blokir saat rollout. `WorkSchedule.Department` di-enrich ke `work_schedule` saat employee `/sync/work-schedules` (dari `work_data`). Verifikasi E2E negative (BH ⟷ Kyura ditolak) menyusul pasca-deploy.
+- ✅ **Diimplementasi** (branch `feat/swap-same-department`): `validateSwapPartner` + endpoint `partners` cek same-site (`IsSameSite`) + same-department; **fail-open** bila `department` belum ter-sync agar tak salah-blokir saat rollout. `WorkSchedule.Department` di-enrich ke `work_schedule` saat employee `/sync/work-schedules` (dari `work_data`). **✅ Terverifikasi E2E di dev 2026-06-28**: `/partners` Khilda (BH) tak menampilkan Kyura (termasuk yang se-grup persis), dan create lintas-dept (BH ⟷ Kyura) ditolak **400 "rekan harus dari departemen yang sama"**.
 - ⚠️ **Asumsi yang perlu dikonfirmasi HRD**: tiap shift host live wajib 1 BH + 1 Kyura (bukan satu pool interchangeable). Bila HRD menyatakan "satu pool", ADR ini ditinjau ulang (kemungkinan **Superseded**).
 - 🔗 Terkait coverage minimum staffing per role/slot/site (masih TBD di [[HRIS - Tukar Jadwal Kerja]]).
 
