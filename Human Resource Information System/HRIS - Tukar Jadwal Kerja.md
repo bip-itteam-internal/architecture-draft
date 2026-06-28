@@ -61,7 +61,7 @@ Fitur dipecah menjadi **dua sub-fitur**:
 - **Reviewer list** masih menampilkan swap yang menunggu consent (aksi diblok, tapi tampil) — filter `buildShiftExchangeReviewFilter` belum exclude.
 - **Notif consent** ke kepala dept (`employee_id` kosong) jatuh ke HR (pola pre-existing, sama di review handler).
 - **`exchange_work_time` dari user diabaikan** saat ada partner (slot di-resolve dari jadwal).
-- 🔴 **Guard same-department/same-site BELUM diimplementasi** (gap vs keputusan 2026-06-28): `validateSwapPartner` (`func.go` ~704) hanya cek `IsSameShiftRole` (family `group_id`), **tidak** cek departemen/site; endpoint **partners** juga filter `group_id` saja → swap **lintas-departemen masih lolos** (terverifikasi: Host Live BH bisa swap dgn Kyura). **TODO**: tambah `requesterDepartment == partnerDepartment` (+ site) di `validateSwapPartner` & filter `partners`.
+- ✅ **Guard same-department/same-site DIIMPLEMENTASI** (branch `feat/swap-same-department`): `validateSwapPartner` (`func.go` ~705) + endpoint `partners` kini cek **same-site** (`IsSameSite`, penanda Tinggarjaya) + **same-department** (fail-open bila department belum ter-sync, agar tak salah-blokir saat rollout). `Department` di-enrich ke `work_schedule` saat `/sync/work-schedules` (dari `work_data`). Detail: [[ADR - 0006 Swap Jadwal Same-Department]]. *(Verifikasi E2E negative — Host Live BH ⟷ Kyura ditolak — menyusul pasca deploy + sync.)*
 - **Test E2E**: Tukar **Shift** ✅ **terverifikasi di dev** (2026-06-28, Production: create→consent→atasan→HRD→jadwal tertukar). Tukar **Hari** ✅ approval & presensi benar, ⚠️ **render kalender** masih bug (cabang non-sameDay `getEmployeeScheduleDateRange`).
 
 ### Belum Diputuskan (TBD)

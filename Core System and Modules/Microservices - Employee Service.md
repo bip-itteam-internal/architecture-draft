@@ -64,7 +64,7 @@
 
 **Feed Lintas-Service**
 - `GET /list?type=fcm-token|department|supervisor|employee|vacation` — dipakai attendance & notification
-- `GET /sync/work-schedules` — dipakai cron attendance
+- `GET /sync/work-schedules` — dipakai cron attendance; kini **enrich `department`** (dari `work_data`) untuk guard swap same-department ([[ADR - 0006 Swap Jadwal Same-Department]])
 - `GET /qr/:employee_id`, `GET /check-unique/:field/:value`, `GET /data-type/:dt`
 - MinIO uploads: `POST /upload`, `POST /upload/multiple`
 - Cron aktif

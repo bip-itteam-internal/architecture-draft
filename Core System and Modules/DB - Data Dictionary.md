@@ -11,7 +11,7 @@ Doc: [[Microservices - Employee Service]]
 
 - **personal_data**: employee_id, photo (MinIOFile), full_name, gender, date_of_birth (time), religion, marital_status, blood_type, home_address, postal_code (int), email_address, phone_number, nik_number (int), kk_number (int), metadata
 - **work_data**: employee_id, department, position, join_date (time), employment_type, contract_ending (time), npwp_number, bpjs_ks_number, bpjs_kt_number, bank_detail?/bank_details? ([]BankDetail), fingerprint_id (int), is_supervisor (bool), vacation?, metadata
-- **work_schedule**: employee_id, full_name, fingerprint_id (int), schedule_type, schedule_id?, group_id?
+- **work_schedule**: employee_id, full_name, fingerprint_id (int), schedule_type, schedule_id?, group_id?, department? (di-enrich saat `/sync/work-schedules` dari work_data — guard swap same-department, [[ADR - 0006 Swap Jadwal Same-Department]])
 - **company_work_schedule**: schedule_id, schedule (WeeklySchedule)
 - **system_authentication**: employee_id, username, system_roles (common.Roles), password, pin?, is_active (bool), has_registered (bool), device ([]Device), web_browser ([]WebBrowser)
 - **kpi_score**: employee_id, period, template (KPITemplate), score (float64), metadata
