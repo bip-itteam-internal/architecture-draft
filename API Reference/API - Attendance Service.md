@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Endpoint **attendance-service** (kehadiran multi-metode, jadwal, leave/shift/correction, guestbook, payroll-supplement). Gateway: `/api/attendance/*`. Grounded ke `services/attendance/*.go`.*
+*Endpoint **attendance-service** (kehadiran multi-metode, jadwal, leave/shift/correction/perjalanan-dinas, guestbook, payroll-supplement). Gateway: `/api/attendance/*`. Grounded ke `services/attendance/*.go`.*
 
 - **Implementasi**: [[Microservices - Attendance Service]] · **Status**: ✅
 - **Indeks**: [[API - Index]] · RBAC: `RequireHRISStaff`, `RequireSecurity`, `RequireGuestbookRBAC`, `RequireITStaff`; banyak rute open (gated header/token/serial).
@@ -39,6 +39,15 @@
 | GET | `/correction/candidates` | Entri kandidat koreksi 7 hari terakhir (hari ini s/d H-7, lintas-bulan, tanpa month); `?type=clockin/clockout/any` — untuk pemilih tanggal FE | header |
 | PATCH | `/correction/:id/cancel` · `/correction/:id/review` | Batal / review koreksi | header |
 
+## Business trip (perjalanan dinas)
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| POST | `/business-trip/create` | Ajukan perjalanan dinas (multipart + dokumen opsional); body: `trip_type`, `destination`, `purpose`, `agenda`, `from_date`/`to_date` (RFC3339), `transports` (multi), `accommodation`, `budget_transport_pp`/`budget_accommodation`/`budget_allowance`. Generate nomor `<seq>/HRD/PERJADIN/<bulan-romawi>/<tahun>`; reviewer Atasan Langsung→HRD | header |
+| GET | `/business-trip/view` | Lihat pengajuan (`?as=reviewer\|reviewed`, `?id=`, `?search=`, `?trip_type=`) | header |
+| PATCH | `/business-trip/review` · `/business-trip/cancel` | Approve/reject (HRD tak boleh self-approve) / batal pending | header |
+
+> Opsi enum via `/data-type/:dt`: `business-trip-type`, `business-trip-transport`, `business-trip-accommodation`. Anggaran = estimasi (tanpa Finance). Detail: [[HRIS - Perjalanan Dinas]].
+
 ## Guestbook · WiFi · Internal
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
@@ -49,4 +58,4 @@
 | GET | `/internal/summary` | Ringkasan 24 jam (utk HRIS orchestrator) | HRIS |
 
 ## Dokumen Terkait
-- [[Microservices - Attendance Service]] · [[HRIS - Leave Request]] · [[HRIS - Tukar Jadwal Kerja]] · [[HRIS - Attendance Correction]] · [[HRIS - Payroll]] · [[API - Index]]
+- [[Microservices - Attendance Service]] · [[HRIS - Leave Request]] · [[HRIS - Tukar Jadwal Kerja]] · [[HRIS - Attendance Correction]] · [[HRIS - Perjalanan Dinas]] · [[HRIS - Payroll]] · [[API - Index]]
