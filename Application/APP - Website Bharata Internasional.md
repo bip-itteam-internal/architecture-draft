@@ -39,14 +39,17 @@
 
 **Frontend `apps/web` (publik)** — halaman: beranda, produk + detail, merek, berita + detail, karir + detail, kemitraan (form mitra), kontak (form), tentang, kebijakan privasi.
 
-**Modernisasi UI (SELESAI, sesi 2026-06-29):** beranda baru 7 section (Hero CTA "Jadi Mitra" → Tentang → Keunggulan/budaya → Produk → Legalitas → Berita → Kontak), Header (sticky + CTA + menu mobile) & Footer multi-kolom, sistem desain token (`components/ui/*`), bilingual ID/EN, placeholder gambar.
+**Modernisasi UI (SELESAI, sesi 2026-06-29):** beranda baru (Hero CTA "Jadi Mitra" → Kategori 3-kolom → Tentang → Keunggulan/budaya → Produk → Legalitas → Testimoni → Berita → Kontak), Header (sticky + CTA + menu mobile + **mega-menu Produk**) & Footer multi-kolom, sistem desain token (`components/ui/*`), bilingual ID/EN, placeholder gambar. Pola terinspirasi herbalife.com (struktur/UX, brand Bharata sendiri).
+
+**Belanja ringan (SELESAI FE+BE, sesi 2026-06-29):** produk punya **harga** (NULL = "Hubungi untuk harga") + tombol **Beli ke marketplace** per-produk (fallback link global Pengaturan Situs). Tanpa checkout/keranjang/pembayaran. Membalik PRD §4 — lihat [[ADR - 0001 Tampilkan Harga dan Beli ke Marketplace]]. Migration `00004`; kolom `harga`, `link_shopee/tokopedia/tiktokshop`.
 
 ## Belum Diimplementasikan / Catatan
 
 - **Konten masih demo** — produk/berita/settings belum diisi data final (`data-template/*.csv` masih `[CONTOH]`); teks manfaat & no. BPOM menunggu persetujuan regulatori (gerbang anti-klaim ilegal).
 - **Foto masih placeholder** SVG ber-brand di `apps/web/public/images/` — diganti aset final.
-- **`next build` typecheck** gagal pada file `*.test.tsx` (matcher jest-dom tak ter-type saat tsc berjalan); perlu exclude test dari typecheck build. (Vitest sendiri hijau.)
-- Roadmap PRD P1/P2: pencarian produk, lokasi reseller, testimoni, alur approval konten regulatori, audit log, retargeting/live chat.
+- **`next build`**: sudah bersih (file `*.test.tsx` di-exclude dari typecheck build; vitest tetap hijau).
+- **Belanja**: baru versi ringan (harga + Beli ke marketplace). Checkout penuh (keranjang/pembayaran/akun/pesanan) belum & sengaja di luar lingkup (perlu ADR baru bila diputuskan).
+- Roadmap PRD P1/P2: pencarian produk, lokasi reseller, alur approval konten regulatori, audit log, retargeting/live chat.
 
 ## Dependensi & Integrasi
 
@@ -56,5 +59,6 @@
 
 ## Dokumen Terkait
 
+- [[ADR - 0001 Tampilkan Harga dan Beli ke Marketplace]] — keputusan menampilkan harga + Beli ke marketplace.
 - [[Sales - Landing page]] — *konsep berbeda* (landing konversi penjualan ala Nike / WhatsApp-CS), **bukan** project website korporat ini.
 - [[Sales - Big Pictures]]
