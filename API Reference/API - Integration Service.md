@@ -38,6 +38,8 @@
 | GET | `/tiktok/business/report/gmv_max/...` (performance, product, campaigns, items, summary, daily/sync) | Laporan GMV-Max |
 | GET | `/tiktok/business/sync/master-data` · `/accounts/list` · `/accounts/:id` (GET/POST/DELETE) | Sync & akun |
 
+> ⚠️ Akun TikTok Business punya field **`brand`** (mis. KYURA/BEAUTYHACKS): di-set via `POST /accounts/:id`, dikembalikan oleh `/accounts/list`; dipakai form integrasi insentif untuk pengelompokan akun (Brand → Account → Advertiser). Grounded: `tiktok_business_handler.go`. Sudah di kode, **belum deploy**.
+
 ## Shopee
 | Method | Path | Fungsi |
 |---|---|---|
