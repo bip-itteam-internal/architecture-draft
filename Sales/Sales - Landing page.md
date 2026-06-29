@@ -1,3 +1,4 @@
+> Status: 🟡 **Konsep**. Catatan: ini **konsep landing page konversi penjualan** (referensi Nike / opsi Landing Page WhatsApp dikelola CS) — **berbeda** dari website korporat di [[APP - Website Bharata Internasional]] (rebuild `bharatainternasional.com`). Jangan tertukar.
 
 Landing page agar konsumen bisa order langsung menjadi pertimbangan menarik. Landing page ini diperuntukan untuk mengurangi beban admin di platform disetiap penjualan. landing page diharapkan dapat menyaring 10% dari total penjualan melalui platform. 
 
