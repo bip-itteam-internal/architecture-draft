@@ -28,6 +28,7 @@
 | GET | `/tiktok/shop/auth` · `/auth/callback` · `/authorized-shops` | OAuth + shop terotorisasi |
 | GET | `/tiktok/shop/orders/list[/direct]` · `/orders/detail[/direct]` · `/orders/sync` | Order (cache/direct/sync) |
 | GET | `/tiktok/shop/insight/gmv-winning-content` | Insight GMV |
+| GET | `/tiktok/shop/insight/creator-video-count` | Jumlah video per-creator per bulan (dari `tt_shop_video_performances`; sumber produksi ICC 125/bln). ⚠️ Baru, belum deploy |
 | GET/DELETE | `/tiktok/shop/accounts/list` · `/accounts/:id` | Akun TikTok Shop |
 
 ## TikTok Business
@@ -35,7 +36,9 @@
 |---|---|---|
 | GET | `/tiktok/business/auth[/callback]` · `/advertisers[/info][/direct]` · `/stores[/products]` | Auth, advertiser, store |
 | GET | `/tiktok/business/report/integrated[/daily/ad][/sync][/list][/summary/list]` | Laporan integrated |
-| GET | `/tiktok/business/report/gmv_max/...` (performance, product, campaigns, items, summary, daily/sync) | Laporan GMV-Max |
+| GET | `/tiktok/business/report/gmv_max/...` (performance, product, campaigns, items, summary, monitoring, daily/sync) | Laporan GMV-Max |
+| GET | `/tiktok/business/report/gmv_max/monitoring` | Ranking campaign GMV Max (GMV/ROI/orders/cost) lintas account/shop + flag **GMV winner** (ROI≥3.2 & order≥15, ICC 2026) untuk dashboard marketing-insight. ⚠️ Baru, belum deploy. Grounded: `tiktok_business_handler.go` (`ListGMVMaxMonitoring`) |
+| GET | `/tiktok/business/insight/icc-video-metrics` | Metrik per-video ICC (ctr/watch25/roas/orders/post_date/creator) untuk insentif ICC; agregasi GMV Max + join `campaign_items` + `tt_shop_video_performances`. ⚠️ Baru, belum deploy. Grounded: `ListICCVideoMetrics` |
 | GET | `/tiktok/business/sync/master-data` · `/accounts/list` · `/accounts/:id` (GET/POST/DELETE) | Sync & akun |
 
 > ⚠️ Akun TikTok Business punya field **`brand`** (mis. KYURA/BEAUTYHACKS): di-set via `POST /accounts/:id`, dikembalikan oleh `/accounts/list`; dipakai form integrasi insentif untuk pengelompokan akun (Brand → Account → Advertiser). Grounded: `tiktok_business_handler.go`. Sudah di kode, **belum deploy**.

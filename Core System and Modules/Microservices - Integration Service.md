@@ -29,6 +29,8 @@
 - Advertisers: list advertiser
 - Integrated Reports: `/report/integrated`, report daily/ad (+ sync), list, summary
 - GMV Max: performance & product (direct + sync), summary, campaigns/items
+- **GMV Max Monitoring**: `GET /tiktok/business/report/gmv_max/monitoring` — ranking performa per-campaign (GMV/ROI/orders/cost) lintas account & shop untuk dashboard marketing-insight, dengan flag **GMV winner** = ROI ≥ 3.2 & order ≥ 15 (aturan khusus ICC 2026 di [[Finance - Incentive]]; ambang `roi_threshold`/`min_orders` bisa di-override). Agregasi **menjumlahkan semua baris report** per campaign — termasuk bucket atribusi `item_id="-1"` yang **terpisah** (bukan rollup dari baris per-creative), sehingga total ROI realistis (~4) bukan menyesatkan (~42 bila pakai `-1` saja). Grounded: `tiktok_business_handler.go` (`ListGMVMaxMonitoring`), `usecase/gmv_max_monitoring.go`, `entity.GMVMaxCampaignMonitoringItem.ComputeDerived`. ⚠️ Baru — sudah di kode (unit test + tervalidasi data prod), **belum deploy**.
+- **ICC Video Metrics**: `GET /tiktok/business/insight/icc-video-metrics` — metrik per-video untuk insentif **ICC** (`ctr`, `watch25`, `roas`, `orders`, `post_date`, `creator`): agregasi GMV Max ad-creative + join `tt_business_campaign_items` (video↔creator) + join `tt_shop_video_performances` (post_date). Dikonsumsi service insentif via HTTP untuk `EvaluateICCVideoIncentive`/`IsICCVideoEligible` (lihat [[Finance - Incentive]]). Grounded: `tiktok_business_handler.go` (`ListICCVideoMetrics`), `entity.ICCVideoMetric.ComputeDerived`. ⚠️ Baru — di kode + tervalidasi prod (1.138 video), **belum deploy**; per-video ROAS diketahui kurang andal (atribusi biaya ke bucket campaign).
 - Stores & Products
 - `/sync/master-data` — sinkronisasi master data
 - Accounts: CRUD (`/accounts/list`, `/accounts/:id`) — kredensial TikTok Business punya field **`brand`** (mis. KYURA/BEAUTYHACKS): di-set saat update akun (`POST /accounts/:id`) & dikembalikan di `/accounts/list`. Dipakai form integrasi insentif untuk mengelompokkan akun (Brand → Account → Advertiser). Grounded: `tiktok_business_handler.go` (UpdateCredential/GetAllCredential), `entity.TiktokBusinessCredential.Brand`. ⚠️ Sudah di kode, **belum deploy** ke prod; backfill `brand` akun lama belum dilakukan.
@@ -37,6 +39,7 @@
 - OAuth: `/auth` (+ callback), `/authorized-shops`
 - Orders: list/detail, direct, sync
 - GMV Winning Content: `GET /tiktok/shop/insight/gmv-winning-content` — daftar konten pemenang GMV (handle `ErrShopNotFound` → HTTP 400)
+- **Shop Video Performance (persist)**: worker harian `sync-tt-shop-video-performance` (02:30) mem-persist performa video shop ke koleksi **`tt_shop_video_performances`** (video_id, creator, **post_date** dari `PublishTime`, views) — sumber **tanggal upload** (eligibility ICC 7–30 hari) & **hitung produksi video/creator/bulan**. Endpoint `GET /tiktok/shop/insight/creator-video-count?month=YYYY-MM`. Grounded: `usecase/icc_shop_video.go` (`SyncShopVideoPerformance`/`GetCreatorVideoCount`), `worker/tasks/tt_shop_video_performance_task.go`. ⚠️ Baru, **belum deploy** (koleksi terisi setelah worker jalan live; alignment `video_id` shop↔business dikonfirmasi pada sync pertama).
 - Accounts: CRUD
 
 ### Shopee
