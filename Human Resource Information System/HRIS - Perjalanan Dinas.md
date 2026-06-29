@@ -61,7 +61,7 @@ Reuse `ReviewData` / `ReviewStatus` / `ResolveLeaveRequestStatus` dari domain at
 
 ## Anggaran (estimasi, tanpa Finance)
 
-`budget` (transportasi PP, akomodasi, uang saku — rupiah `int64`) adalah **estimasi yang diisi pemohon**, ditampilkan ke reviewer saat persetujuan. **TIDAK** terhubung ke Finance/payroll/reimbursement — sesuai formulir kertas yang tak memuat tanda tangan Finance. Bila kelak butuh pencairan/reimbursement, itu pekerjaan integrasi Finance terpisah (bdk. [[GA - Procurement System]] yang masih konsep).
+`budget` (transportasi PP, akomodasi, uang saku — rupiah `int64`) adalah **estimasi yang diisi pemohon**, ditampilkan ke reviewer saat persetujuan. **TIDAK** terhubung ke Finance/payroll/reimbursement — sesuai formulir kertas yang tak memuat tanda tangan Finance. Bila kelak butuh pencairan/reimbursement, itu pekerjaan integrasi Finance terpisah (bdk. [[GA - Procurement System]] yang masih konsep). Arah ke depan & decision point (kemana uang mengalir, uang muka, realisasi, reviewer Finance) dipetakan di [[ADR - 0007 Reimbursement Perjalanan Dinas]].
 
 ## Penentuan Reviewer & Alur
 
