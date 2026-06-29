@@ -17,6 +17,8 @@
 - `GET /webhooks/tasks` — list task hasil webhook
 - `GET /webhooks/accounts/desty` — daftar account Desty
 - `POST /webhooks/services/desty` — ingest webhook Desty (auth `key` + `accessToken`, lalu enqueue ke queue)
+- `POST /webhooks/services/shopee` — ingest **Shopee Push Mechanism** (publik via gateway `/ext/webhook/shopee`). Auth **HMAC-SHA256** atas string `URL|body` lewat header `Authorization`; key dipilih per query `app_type` (`ads`/`order`/`marketing`/`one` → `SHOPEE_ADS_WEBHOOK_KEY` / `SHOPEE_ORDER_WEBHOOK_KEY` / `SHOPEE_MARKETING_WEBHOOK_KEY` / `SHOPEE_ONE_WEBHOOK_KEY`). ⚠️ Verifikasi signature **sementara di-bypass** — mismatch hanya di-log lalu tetap 200 (workaround bug Shopee console saat simpan key baru; `webhook_usecase.go`). Payload disimpan ke `webhook_logs` lalu diproses async oleh `ShopeePushProcessor` (create-on-missing — lihat *Observability & Ketahanan Shopee* di bawah).
+- `POST /webhooks/services/tiktok` — ingest webhook **TikTok direct/push** (`TiktokDirectProcessor` — selalu tarik order detail dari TikTok, bisa buat order baru)
 
 ### Credentials & Holidays
 - `POST /credentials` — simpan/registrasi kredensial integrasi
@@ -84,9 +86,9 @@
 - Redis queue digunakan untuk task summary-report
 - Optimasi concurrency: global semaphore + sequential processing untuk mitigasi rate limit API marketplace
 
-### Observability & Ketahanan Shopee
+### Observability & Ketahanan Shopee ✅
 
-> ⚠️ Bagian ini ada di **working branch yang BELUM di-merge/deploy** (prod masih menjalankan kode lama). Didokumentasikan agar tidak hilang; ubah marker ke ✅ setelah merge.
+> ✅ **Implemented** — sudah merge & **live di prod**.
 
 - **Notifikasi success-rate API Shopee per-run** — setiap cron `Sync Shopee performance` (02:00) **dan** endpoint sync manual (`/shopee/orders/sync`, `/shopee/gms/*/sync`) mengirim ringkasan **success-rate per-endpoint + overall** via Telegram di akhir tiap run. Penghitung **in-memory per-run** (dibawa di `context`) — tanpa DB, tanpa payload/PII. Tujuan: visibilitas success-rate tanpa bergantung dashboard Shopee yang delay.
 - **Ketahanan refresh & sync Shopee** (akar masalah restriction rate-limit Shopee, lihat [[LOG - Shopee API Rate Limit Request]]): distributed lock refresh-token per-shop (Redis) cegah race antar-instance + **circuit breaker** yang menghentikan run begitu Shopee balas `error_limit` (cegah death-spiral kuota) + retry simpan credential + timeout independen per-shop + observability (kegagalan GMS tidak lagi senyap).
