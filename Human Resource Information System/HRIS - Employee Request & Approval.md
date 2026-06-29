@@ -9,7 +9,7 @@
 | Jenis | Dokumen | Endpoint | Reviewer |
 |---|---|---|---|
 | Cuti / Izin | [[HRIS - Leave Request]] | `/request/*` | SPV → HR |
-| Tukar shift / hari | [[HRIS - Tukar Jadwal Kerja]] | `/shift-exchange/*` | multi-level (review_1 + review_2) |
+| Tukar shift / hari | [[HRIS - Tukar Jadwal Kerja]] | `/schedule-exchange/*` | multi-level (review_1 + review_2) |
 | Koreksi clock-in/out | [[HRIS - Attendance Correction]] | `/correction/*` | role-based (4 kasus) |
 | Lembur (SPKL) | [[HRIS - Overtime]] | *(belum)* | *(rencana mengikuti pola ini)* |
 

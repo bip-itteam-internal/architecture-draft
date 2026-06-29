@@ -2,7 +2,7 @@
 
 *Inventaris **proses yang berjalan diam-diam** di bip-erp — cron/scheduler/worker latar belakang: apa yang jalan, kapan, di service mana, untuk apa, dan lock-nya. Grounded dari kode (`bson`/cron string disalin verbatim). Tujuannya: tak ada "sistem tersembunyi" yang tak diketahui saat debugging, perencanaan kapasitas, atau mengubah service.*
 
-- **Status**: ✅ Implemented — 17 job terjadwal + 1 dispatcher webhook (per audit kode)
+- **Status**: ✅ Implemented — 20 job terjadwal + 1 dispatcher webhook (per audit kode). *3 job reminder attendance (koreksi/leave/tukar jadwal) + auto-ignore koreksi & tukar jadwal + pre-alokasi sadar-swap dari **PR #165** — belum rilis ke prod.*
 - **Zona waktu**: semua **Asia/Jakarta (WIB)** kecuali override env `INTEGRATION_WORKER_TZ`
 - **Sintaks cron**: integration pakai `robfig/cron` **6-field** (`detik menit jam tgl bln dow`); attendance/employee/notification pakai **5-field** klasik
 
@@ -13,8 +13,11 @@
 | employee | harian 04:00 (`0 4 * * *`) | sync company work schedule | — | `services/employee/cron.go:29` |
 | employee | tgl 1 / bulan 08:45 (`45 8 1 * *`) | broadcast reminder KPI (FCM + inbox) | — | `services/employee/cron.go:34` |
 | employee | 1 Jan 00:05 (`5 0 1 1 *`) | reset kuota cuti tahunan (used→0) | — | `services/employee/cron.go:37` |
-| attendance | tiap 30 mnt (`*/30 * * * *`) | pre-alokasi entry absensi ~2j sebelum shift; pending→alpha saat shift mulai | — | `services/attendance/cron.go:28` |
-| attendance | tiap jam (`0 * * * *`) | auto-ignore leave/shift request basi (>24j) + FCM | — | `services/attendance/cron.go:38` |
+| attendance | tiap 30 mnt (`*/30 * * * *`) | pre-alokasi entry absensi ~2j sebelum shift; pending→alpha saat shift mulai; perhitungkan **cuti & tukar jadwal** disetujui (swap kedua sisi via `WorkTimeFor`) | — | `services/attendance/cron.go:28` |
+| attendance | tiap jam (`0 * * * *`) | auto-ignore **leave + koreksi presensi + tukar jadwal** basi (>24j) + FCM — termasuk tahap consent rekan | — | `services/attendance/cron.go:38` |
+| attendance | tiap jam (`0 * * * *`) | **reminder reviewer koreksi** basi (T+18j, ~6j sblm auto-ignore) → SPV/HR FCM | — | `services/attendance/cron.go:41` |
+| attendance | tiap jam (`0 * * * *`) | **reminder reviewer leave** basi (T+18j) → SPV/HR FCM | — | `services/attendance/cron.go:42` |
+| attendance | tiap jam (`0 * * * *`) | **reminder tukar jadwal** basi (T+18j) → rekan/atasan/HRD FCM | — | `services/attendance/cron.go:43` |
 | insentive | harian 00:00 (akhir bulan: 15:00 Sn–Jm / 12:00 Sb) | hitung insentif otomatis; tarik metrik TikTok/Shopee; carry-over tgl 1–7 | Mongo `cron_locks` TTL 2j | `services/insentive/cron_worker.go:63` |
 | task-management | tiap jam (delay awal 1 mnt) | eskalasi SLA task (warning ke SPV / breach ke admin) | — | `services/task-management/reminder.go:12` |
 | notification | harian 03:00 (`0 3 * * *`) | hapus `inbox` > 2 bulan | — | `services/notification/cron.go:20` |

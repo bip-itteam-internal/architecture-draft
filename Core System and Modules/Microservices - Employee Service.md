@@ -37,6 +37,7 @@
 **CRUD Employee Data**
 - CRUD personal data, personal-documents, work data, work-documents, schedule, dan system-auth
 - Transaksi create/update employee (multi-collection, `RequireHRISStaff`) lengkap dengan existence/completeness checks
+- `GET /birthdays?month=1-12` — karyawan **aktif** (`$lookup` `system_authentication` + `is_active=true`) yang ulang tahun per bulan (default bulan berjalan); `$lookup` `work_data` untuk posisi/departemen + umur saat ini, urut per tanggal; hanya field aman (tanpa NIK/KK/alamat). Filter bulan & umur dihitung di Go (`date_of_birth` bisa string ISO, bukan BSON Date) + konversi ke WIB (data disimpan midnight WIB sebagai UTC)
 
 **Aggregation / HRIS**
 - `GET /v2/internal/aggregate/employees` — join multi-collection + paginated
@@ -63,7 +64,7 @@
 
 **Feed Lintas-Service**
 - `GET /list?type=fcm-token|department|supervisor|employee|vacation` — dipakai attendance & notification
-- `GET /sync/work-schedules` — dipakai cron attendance
+- `GET /sync/work-schedules` — dipakai cron attendance; kini **enrich `department`** (dari `work_data`) untuk guard swap same-department ([[ADR - 0006 Swap Jadwal Same-Department]])
 - `GET /qr/:employee_id`, `GET /check-unique/:field/:value`, `GET /data-type/:dt`
 - MinIO uploads: `POST /upload`, `POST /upload/multiple`
 - Cron aktif

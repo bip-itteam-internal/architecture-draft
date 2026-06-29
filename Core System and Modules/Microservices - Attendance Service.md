@@ -61,15 +61,15 @@
 - `PATCH /request/security-verify` — verifikasi oleh security.
 - Detail jenis cuti/izin, reviewer, kuota & alur: [[HRIS - Leave Request]]
 
-**Shift Exchange (workflow)**
-- `POST /shift-exchange/create`, `GET /shift-exchange/view`, `PATCH /shift-exchange/review`, `PATCH /shift-exchange/cancel` — pertukaran hari kerja/libur (atau slot shift) dengan approval multi-level; setelah disetujui otomatis menyesuaikan attendance (`applyApprovedShiftExchange`). Detail lengkap: [[HRIS - Tukar Jadwal Kerja]].
+**Tukar Jadwal Kerja (workflow)** — collection `schedule_exchange_request`
+- `POST /schedule-exchange/create`, `PATCH /schedule-exchange/consent`, `GET /schedule-exchange/view`, `PATCH /schedule-exchange/review`, `PATCH /schedule-exchange/cancel` — Tukar Shift (swap antar-rekan, 3 langkah: consent rekan → atasan → HRD) atau Tukar Hari (geser hari). Setelah disetujui menyesuaikan attendance (`applyApprovedShiftExchange`/`applyScheduleExchangeSwap`); cron seeding & kalender sadar-swap. Detail lengkap: [[HRIS - Tukar Jadwal Kerja]].
 
 **Attendance Correction (workflow)**
 - `POST /correction`, `GET /correction/mine`, `GET /correction`, `PATCH /correction/:id/review`, `PATCH /correction/:id/cancel` — koreksi clock-in/out yang terlewat dengan approval multi-level (routing per role); waktu diisi otomatis dari jadwal saat disetujui (`applyCorrectionToEntry`). Detail lengkap: [[HRIS - Attendance Correction]].
 
 **Cron & Seeding**
-- Tiap 30 menit: pra-generate entry absensi dari rotasi jadwal + flip status pending→alpha.
-- Per jam: auto-ignore request basi (>24 jam) + sinkronisasi jadwal.
+- Tiap 30 menit: pra-generate entry absensi dari rotasi jadwal (perhitungkan cuti & **tukar jadwal** disetujui — swap kedua sisi via `WorkTimeFor`) + flip status pending→alpha.
+- Per jam: auto-ignore **leave + koreksi presensi + tukar jadwal** basi (>24 jam) + **reminder reviewer T+18j** (koreksi, leave & tukar jadwal) + sinkronisasi jadwal.
 - Saat startup: seed ulang `company_work_schedule` (~40 definisi shift), `company_group_rotation`, dan `company_wifi` (~50 access point kantor).
 
 ## Belum Diimplementasikan / Catatan
@@ -80,7 +80,7 @@
 
 ## Dependencies & Integrasi
 
-- **MongoDB** — database independen, collections: `attendance_entries`, `work_schedule`, `company_work_schedule`, `company_group_rotation`, `company_wifi`, `company_holiday`, `fingerprint_export`, `guestbook`, `leave_request`, `shift_exchange_request`, `attendance_correction_request`. Lihat [[DB - Overview and Notes]].
+- **MongoDB** — database independen, collections: `attendance_entries`, `work_schedule`, `company_work_schedule`, `company_group_rotation`, `company_wifi`, `company_holiday`, `fingerprint_export`, `guestbook`, `leave_request`, `schedule_exchange_request`, `attendance_correction_request`. Lihat [[DB - Overview and Notes]].
 - [[Microservices - Employee Service]] — endpoint `/list` (data karyawan) dan `/vacation/decrement` (decrement kuota cuti).
 - [[Microservices - File Service]] — upload dokumen pendukung leave request.
 - [[Microservices - Notification Service]] — pengiriman notifikasi FCM (guestbook, review leave request).

@@ -11,7 +11,7 @@ Doc: [[Microservices - Employee Service]]
 
 - **personal_data**: employee_id, photo (MinIOFile), full_name, gender, date_of_birth (time), religion, marital_status, blood_type, home_address, postal_code (int), email_address, phone_number, nik_number (int), kk_number (int), metadata
 - **work_data**: employee_id, department, position, join_date (time), employment_type, contract_ending (time), npwp_number, bpjs_ks_number, bpjs_kt_number, bank_detail?/bank_details? ([]BankDetail), fingerprint_id (int), is_supervisor (bool), vacation?, metadata
-- **work_schedule**: employee_id, full_name, fingerprint_id (int), schedule_type, schedule_id?, group_id?
+- **work_schedule**: employee_id, full_name, fingerprint_id (int), schedule_type, schedule_id?, group_id?, department? (di-enrich saat `/sync/work-schedules` dari work_data — guard swap same-department, [[ADR - 0006 Swap Jadwal Same-Department]])
 - **company_work_schedule**: schedule_id, schedule (WeeklySchedule)
 - **system_authentication**: employee_id, username, system_roles (common.Roles), password, pin?, is_active (bool), has_registered (bool), device ([]Device), web_browser ([]WebBrowser)
 - **kpi_score**: employee_id, period, template (KPITemplate), score (float64), metadata
@@ -23,7 +23,7 @@ Doc: [[Microservices - Attendance Service]]
 
 - **attendance_entries**: _id, employee_id, full_name, fingerprint_id (int), schedule_id, schedule_fmt?, group_id?, date (time), realtime (time), work_time (WorkTime), clock_in (*string), clock_out (*string), clock_in_method, clock_out_method, clock_in_location (*GPS), clock_out_location (*GPS), status, emoji, late_hour (int), leave_hour (int), overtime_hour (int), comment, document ([]Document), metadata
 - **leave_request**: _id, employee_id, full_name, position, department, from_date (time), to_date (time), leave_type, leave_subtype?, reason, document (MinIOFile), status, spv_status (ReviewData), hr_status (ReviewData), security_verify?, metadata
-- **shift_exchange_request**: _id, employee_id, full_name, position, department, work_date (time), exchange_date (time), exchange_work_time? (*WorkTime), reason, status, review_1 (ReviewData), review_2 (ReviewData), metadata
+- **schedule_exchange_request** *(rename dari shift_exchange_request)*: _id, type ("shift"|"day"), employee_id, full_name, position, department, group_id?, work_date (time), exchange_date (time), exchange_work_time? (*WorkTime), partner_employee_id?, partner_full_name?, partner_group_id?, partner_work_time? (*WorkTime), partner_consent? (ConsentData {status, notes, responded_at}), reason, status, review_1 (ReviewData), review_2 (ReviewData), metadata
 - **attendance_correction_request**: _id, employee_id, full_name, position, department, attendance_id (ObjectID), attendance_date (time), work_time (WorkTime), correction_type, reason, status, review_1, review_2, metadata
 - **company_group_rotation**: group_id, schedule_rotation ([]*string), schedule_rotated_in_x_days (int), starting_date (time), starting_schedule (*string)
 - **company_wifi**: _id, ssid, mac_address, metadata

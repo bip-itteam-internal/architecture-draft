@@ -49,6 +49,7 @@
 - Lihat **jadwal kerja** (shift) dan **riwayat kehadiran** (kalender + statistik)
 - **My Team**: supervisor melihat kehadiran tim
 - **Employee Mood List**: pemantauan mood check-in karyawan
+- **Tukar Shift (Tukar Jadwal Kerja)** ⚠️ *(branch `feature/schedule-exchange`, PR #78 → `dev`, belum rilis)* — pemohon ajukan tukar slot shift dengan rekan se-departemen/se-site, lalu **consent rekan** → review atasan/HRD; fitur `features/schedule_exchange` memanggil `/schedule-exchange/*` langsung. Detail: [[HRIS - Tukar Jadwal Kerja]]
 
 ### Submission — Izin & Cuti
 - Pengajuan **cuti tahunan, sakit, dispensasi, dinas luar kota**, dan **cuti melahirkan** (maternity, approval 3 tingkat: supervisor langsung → HR → Direksi) beserta riwayatnya

@@ -53,7 +53,7 @@
 - **Income reporting**: agregasi income invoice + field income pada transaction order (laporan pemasukan)
 - **Demography Insight**: `GET /transactions/insight/demography` — insight demografi dari transaksi
 - **Status history**: pelacakan riwayat status (status history) transaction order
-- **Revenue Comparison**: `GET /transactions/orders/summary/comparison` — perbandingan omset hari ini vs kemarin: total `total_revenue` (status `SHIPPED`) per channel, + breakdown 24 slot per-jam untuk line chart. Query param: `channel` (SHOPEE|TIKTOK, wajib), `shop_id` (opsional), `timezone` (IANA, default `Asia/Jakarta`).
+- **Revenue Comparison**: `GET /transactions/orders/summary/comparison` — perbandingan omset hari ini vs kemarin: total `total_revenue` (status `TO_SHIP`) per channel, + breakdown 24 slot per-jam untuk line chart. Aggregasi berdasarkan `order_update_date` (bukan `order_date`) karena TO_SHIP di-set saat order diupdate. Query param: `channel` (SHOPEE|TIKTOK, wajib), `shop_id` (opsional), `timezone` (IANA, default `Asia/Jakarta`).
 
 ### Accurate
 - Shop Settings: CRUD (`/accurate/settings/shops`)

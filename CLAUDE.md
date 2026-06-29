@@ -97,6 +97,7 @@ Untuk dok konsep murni: `## Latar Belakang`, `## Ruang Lingkup`, `## Belum Diput
 | `guestbook-system` (Astro) | `General Affairs/GA - Guestbook System (Complete)` |
 | `ideamiils` (Next.js + Veo) | `Application/APP - Ideamills` (app); konsep: `Sales/Sales - Veo (Gemini) Implementation` (manual) & `... Automation Layer` |
 | `scraping` (Python/FastAPI) | `Application/APP - TikTok Sentiment Pipeline` (app) & `Sales/Sales - TikTok Sentiment Pipeline` (konsep) |
+| `website-bharata` (Next.js + Go, **repo terpisah**, bukan bip-erp) | `Application/APP - Website Bharata Internasional` |
 
 **Area non-kode (tanpa repo):**
 - `Quality & Regulatory/*` ← sumber = **SOP/sertifikat QA-RA Bharata** (CPOB/BPOM/CDOB; diisi tim QA — bukan dari kode).
