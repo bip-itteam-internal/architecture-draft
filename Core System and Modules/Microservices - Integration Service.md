@@ -29,7 +29,7 @@
 - GMV Max: performance & product (direct + sync), summary, campaigns/items
 - Stores & Products
 - `/sync/master-data` — sinkronisasi master data
-- Accounts: CRUD
+- Accounts: CRUD (`/accounts/list`, `/accounts/:id`) — kredensial TikTok Business punya field **`brand`** (mis. KYURA/BEAUTYHACKS): di-set saat update akun (`POST /accounts/:id`) & dikembalikan di `/accounts/list`. Dipakai form integrasi insentif untuk mengelompokkan akun (Brand → Account → Advertiser). Grounded: `tiktok_business_handler.go` (UpdateCredential/GetAllCredential), `entity.TiktokBusinessCredential.Brand`. ⚠️ Sudah di kode, **belum deploy** ke prod; backfill `brand` akun lama belum dilakukan.
 
 ### TikTok Shop
 - OAuth: `/auth` (+ callback), `/authorized-shops`
