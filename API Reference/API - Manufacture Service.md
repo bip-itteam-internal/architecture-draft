@@ -9,6 +9,7 @@
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/master-bahan` · `/master-bahan/:kode` | List/detail master bahan |
+| POST/PUT/DELETE | `/master-bahan` · `/master-bahan/:kode` | Create/update/delete master bahan manual (tandai `source:"manual"` → kebal stale-marking saat sync Sheet) |
 | POST/PATCH | `/master-bahan/sync` · `/master-bahan/:kode/status` | Sync (Sheets) / ubah status (audit) |
 | GET/POST | `/master-product` · `/master-product/:kode` · `/master-product/sync` | Master produk |
 | GET/POST | `/stok` · `/stok/:kode` · `/stok/reconcile` | Stok + rekonsiliasi |
@@ -16,7 +17,7 @@
 ## Transaksi · Formula · Produksi
 | Method | Path | Fungsi |
 |---|---|---|
-| GET/POST | `/transaksi` | List/buat transaksi stok (in/out/transfer) |
+| GET/POST | `/transaksi` | List/buat transaksi stok (INBOUND/OUTBOUND); kode boleh master bahan **atau** produk jadi (`master_product`); field UI tambahan (QC, PIC, dll) disimpan apa adanya di `detail` |
 | GET/POST/DELETE | `/formula` · `/formula/:id` | Formula/BOM (resep produksi) |
 | POST | `/formula/sync` | Sync formula dari Google Sheet (service account) |
 | GET/POST | `/production` | Order produksi (konsumsi stok) |
