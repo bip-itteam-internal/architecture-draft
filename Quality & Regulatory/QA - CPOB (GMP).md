@@ -7,7 +7,7 @@
 
 ## Latar Belakang
 
-- CPOB adalah standar wajib pembuatan obat di Indonesia (diawasi [[QA - BPOM & Izin Edar (NIE)]]). Mengatur bangunan/fasilitas, personil, sanitasi & higiene, dokumentasi, produksi, pengawasan mutu, hingga penanganan keluhan & penarikan.
+- CPOB adalah standar wajib pembuatan obat di Indonesia (diawasi [[QA - BPOM & Izin Edar (NIE)]]. Mengatur bangunan/fasilitas, personil, sanitasi & higiene, dokumentasi, produksi, pengawasan mutu, hingga penanganan keluhan & penarikan.
 
 ## Ruang Lingkup / Cakupan (business view)
 

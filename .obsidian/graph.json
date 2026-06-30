@@ -11,91 +11,119 @@
       "query": "file:HRIS",
       "color": {
         "a": 1,
-        "rgb": 15762713
+        "rgb": 16747520
       }
     },
     {
       "query": "file:CORE",
       "color": {
         "a": 1,
-        "rgb": 16711680
+        "rgb": 14692657
       }
     },
     {
       "query": "file:GA",
       "color": {
         "a": 1,
-        "rgb": 4513553
+        "rgb": 3120708
       }
     },
     {
       "query": "file:???",
       "color": {
         "a": 1,
-        "rgb": 0
+        "rgb": 8818326
       }
     },
     {
       "query": "file:Finance",
       "color": {
         "a": 1,
-        "rgb": 2025167
+        "rgb": 1226886
       }
     },
     {
       "query": "file:External",
       "color": {
         "a": 1,
-        "rgb": 16711880
+        "rgb": 15092096
       }
     },
     {
       "query": "file:Vendor",
       "color": {
         "a": 1,
-        "rgb": 16711880
+        "rgb": 16221100
       }
     },
     {
       "query": "file:WH",
       "color": {
         "a": 1,
-        "rgb": 2140670
+        "rgb": 1667522
       }
     },
     {
       "query": "file:Microservices",
       "color": {
         "a": 1,
-        "rgb": 16711680
+        "rgb": 7358696
       }
     },
     {
       "query": "file:APP",
       "color": {
         "a": 1,
-        "rgb": 16711680
+        "rgb": 2275535
       }
     },
     {
       "query": "file:BASE",
       "color": {
         "a": 1,
-        "rgb": 16711680
+        "rgb": 8571166
       }
     },
     {
       "query": "file:Sales",
       "color": {
         "a": 1,
-        "rgb": 12160416
+        "rgb": 16766011
       }
     },
     {
       "query": "file:IT",
       "color": {
         "a": 1,
-        "rgb": 11942566
+        "rgb": 10237621
+      }
+    },
+    {
+      "query": "path:\"API Reference\"",
+      "color": {
+        "a": 1,
+        "rgb": 5090295
+      }
+    },
+    {
+      "query": "file:QA",
+      "color": {
+        "a": 1,
+        "rgb": 11105359
+      }
+    },
+    {
+      "query": "file:ADR",
+      "color": {
+        "a": 1,
+        "rgb": 4804695
+      }
+    },
+    {
+      "query": "file:Manufacture",
+      "color": {
+        "a": 1,
+        "rgb": 6067213
       }
     }
   ],
@@ -109,6 +137,6 @@
   "repelStrength": 11.25,
   "linkStrength": 0.802083333333333,
   "linkDistance": 206,
-  "scale": 0.2595729583969001,
+  "scale": 0.22135771579250543,
   "close": true
 }
