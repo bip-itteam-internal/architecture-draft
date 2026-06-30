@@ -35,7 +35,10 @@
 
 **IT** — Employee (aktivasi akun, reset password), Network (WiFi SSID/MAC CRUD)
 **GA** — Inventory (QR, repair history, assignment)
-**Integration (marketplace ↔ Accurate)** — Ads Analytics (Shopee/TikTok), Ads Management, Auto-Approve log, Marketplace log, Transactions + Accurate sync, Master Data (Product, Config Accurate), Shipment Setting, OAuth; `integration-accurate`: Sales / Income / Return Shopee & TikTok-Shop
+**Integration (marketplace ↔ Accurate)** — Ads Analytics (Shopee/TikTok), Ads Management, Auto-Approve log, Marketplace log, Master Data (Product, Config Accurate), Shipment Setting, OAuth; `integration-accurate`: Sales / Income / Return Shopee & TikTok-Shop
+- **Transactions** — sub-navigasi dua halaman:
+  - *Dashboard* (`/integration/transactions`): 4 kartu status live (Pesanan Baru/Belum Di Proses/Siap Dikirim/Pesanan Selesai), filter Platform + Shop + rentang tanggal kustom, grafik perbandingan 4 tab (Potensi Penjualan, Produk Terjual, Penjualan Selesai, Pesanan Selesai) dengan granularity hourly/daily otomatis.
+  - *Order Management* (`/integration/transactions/list`): tabel order terpadu + filter (platform, shop, status, date range, Canceled By — tampil hanya saat status = CANCELLED) + 4 kartu ringkasan (Total Revenue, Total Orders, Total Cancel, Total Return) + search global order ID + tombol Accurate Integration. Detail order: Payment Method + Due Date ditampilkan di seksi Shipping Information.
 **Lain** — Secretary / Manufacture / Quality / Procurement (KPI saja), Beauty_hacks / Kyura (link eksternal Ideamiils + KPI)
 
 ## Belum Diimplementasikan / Catatan
