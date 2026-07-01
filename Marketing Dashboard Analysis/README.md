@@ -11,6 +11,7 @@ Analisis + spec untuk membangun dashboard **Marketing & Ads Command Center** (mo
 - [[2026-06-30-profit-engine-design]] — spec profit engine + HPP master
 - [[2026-06-30-hpp-master-plan]] — plan implementasi HPP (field cost + upload xlsx)
 - [[2026-06-30-affiliate-seller-sync-design]] — spec affiliate auto-sync (API, bukan CSV)
+- [[2026-07-01-affiliate-seller-sync-plan]] — plan implementasi affiliate (7 task; token via GetOrRefreshToken)
 - [[Affiliate integration]] — dok resmi TikTok (endpoint + onboarding)
 - [[TikTok Shop Affiliate(Creator Collaboration)Developer onboarding & termination Rules]] — dok resmi TikTok (aturan onboarding)
 

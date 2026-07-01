@@ -41,6 +41,7 @@ Dashboard tab Affiliate #7 butuh: roster creator, komisi per order, GMV affiliat
 
 Folder `Marketing Dashboard Analysis/`:
 - [[2026-06-30-affiliate-seller-sync-design]] — spec auto-sync (client, cron, koleksi affiliate_orders, handler)
+- [[2026-07-01-affiliate-seller-sync-plan]] — **plan implementasi** (bite-sized, 7 task; token via GetOrRefreshToken karena token DB stale)
 - [[2026-07-01-marketing-dashboard-ANALISIS-REKAP]] — index analisis
 - [[2026-06-30-marketing-dashboard-MASTER]] — §B4 affiliate lengkap (scope, endpoint, blocker)
 - Dok resmi TikTok: [[Affiliate integration]] · [[TikTok Shop Affiliate(Creator Collaboration)Developer onboarding & termination Rules]]
