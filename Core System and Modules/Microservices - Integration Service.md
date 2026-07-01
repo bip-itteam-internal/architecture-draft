@@ -43,8 +43,8 @@
 - Accounts: CRUD
 
 ### Shopee
-- OAuth: `/auth` (+ callback)
-- Orders: list, v2 list, detail, sync
+- OAuth: `/auth` (+ callback) — per `account_type` (**ADS_SERVICE** / **ERP_SYSTEM**), lihat *Dual-app* di bawah
+- Orders: list, v2 list, detail, sync, **escrow backfill** (`/orders/escrow/backfill`)
 - Shops
 - Products / Items
 - GMS Analytics: item & campaign performance (+ sync + summary)
@@ -94,9 +94,11 @@
 > ✅ **Implemented** — sudah merge & **live di prod**.
 
 - **Notifikasi success-rate API Shopee per-run** — setiap cron `Sync Shopee performance` (02:00) **dan** endpoint sync manual (`/shopee/orders/sync`, `/shopee/gms/*/sync`) mengirim ringkasan **success-rate per-endpoint + overall** via Telegram di akhir tiap run. Penghitung **in-memory per-run** (dibawa di `context`) — tanpa DB, tanpa payload/PII. Tujuan: visibilitas success-rate tanpa bergantung dashboard Shopee yang delay.
-- **Ketahanan refresh & sync Shopee** (akar masalah restriction rate-limit Shopee, lihat [[LOG - Shopee API Rate Limit Request]]): distributed lock refresh-token per-shop (Redis) cegah race antar-instance + **circuit breaker** yang menghentikan run begitu Shopee balas `error_limit` (cegah death-spiral kuota) + retry simpan credential + timeout independen per-shop + observability (kegagalan GMS tidak lagi senyap).
+- **Ketahanan refresh & sync Shopee** (akar masalah restriction rate-limit Shopee, lihat [[LOG - Shopee API Rate Limit Request]]): distributed lock refresh-token per-shop (Redis) cegah race antar-instance + **circuit breaker** yang menghentikan run begitu Shopee balas rate-limit (`error_limit`, `error_too_many_request`, atau `ads_rate_limit_shop_api` — throttle per-shop pada endpoint ads/GMS) (cegah death-spiral kuota) + retry simpan credential + timeout independen per-shop + observability (kegagalan GMS tidak lagi senyap).
 - **Webhook order ingest — TikTok vs Shopee** (jalur "direct"/push, registry `(platform, source) → processor`): keduanya kini menarik order detail dari API platform, tapi beda strategi. **TikTok direct** (`TiktokDirectProcessor`) **selalu** tarik order detail dari API TikTok tiap webhook (bisa buat order baru). **Shopee push** (`ShopeePushProcessor`, code 3) kini **create-on-missing**: order yang sudah ada → update status saja (0 call API); order baru → tarik order detail dari Shopee (buat order). Sebelumnya Shopee-push hanya update-status & **error** bila order belum ada. Langkah menuju "lepas dari [[External - Desty]]" untuk Shopee.
 - **Rate-limit gate Shopee** (proses-wide, in-memory): begitu ada call Shopee balas `error_limit`, gate menyala sampai **00:00 UTC+8** (reset kuota Shopee). Webhook order-fetch cek gate **sebelum** call — bila menyala, **skip + defer** (retry setelah reset) agar tidak menambah call gagal saat kuota habis. Push code ≠ 3 / tanpa `order_sn` → di-acknowledge tanpa error.
+- **Dual-app credential per toko (routing per `account_type`)** ✅ live — tiap toko Shopee kini bisa punya DUA kredensial: **ADS_SERVICE** (app "Ads Bharata", partner `2032638`) untuk **GMS** (`get_gms_*`), dan **ERP_SYSTEM** (app "One Bharata", partner `2032314`) untuk **order/escrow/push** (`get_order_*`, `get_escrow_detail`). Sebab: kategori app Shopee memisahkan **Ads vs ERP secara desain** — tak ada satu app yang punya izin GMS + Payment/escrow sekaligus. Resolusi kredensial sadar-API-group (`getAndRefreshCredentialByType`): GMS→ADS_SERVICE, order/escrow→ERP_SYSTEM; **degrade gracefully** bila salah satu cred belum ada (skip tanpa fail). Index unik compound `(shop_id_list, account_type)` mengizinkan kedua cred hidup berdampingan; `/shopee/accounts/list` mengembalikan `account_type` + `shop_id_list` (frontend menggabung 2 cred jadi 1 kartu per toko). Grounded: `usecase/shopee_new_usecase.go`, `repository/shopee_repo.go`.
+- **Escrow income (`get_escrow_detail`) via One** ✅ live — untuk order **COMPLETED**, `SyncOrderDetail` menarik escrow (net settlement setelah fee) dan mengisi field `income` transaction order. **Fix bug decode (2026-07-01)**: Shopee mengirim `order_income.tenure_info_list` sebagai **array**, tapi dimodelkan struct tunggal → decode gagal 100% (income tak pernah terisi); diperbaiki jadi `[]ShopeeTenureInfo` (`clients/shopee_client_new.go`, `entity/shopee.go`) → escrow tervalidasi terisi di prod. **Backfill histori** ⚠️ (di kode, belum deploy): `GET /shopee/orders/escrow/backfill?shop_id=&limit=` (`BackfillEscrow`) memilih order completed lokal ber-`income` null (filter `TransactionOrderFilter.IncomeEmpty`) → escrow-only tanpa re-list, batch 50, breaker bersama, **resumable**.
 
 ## Belum Diimplementasikan / Catatan
 
