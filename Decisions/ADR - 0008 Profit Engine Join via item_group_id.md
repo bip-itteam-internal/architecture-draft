@@ -36,3 +36,12 @@ Masalah: menyambungkan ad-spend (item_group_id) → order → HPP tidak ada satu
 - **Risiko akurasi**: data `transaction_orders` belum tentu 100% lengkap — ada **ETL drift** (order raw hilang dari summary, rate-limiter skip Upsert; underreport). Laba engine harus sadar ini; angka laba per produk dipakai keputusan SCALE/HENTIKAN → verifikasi kelengkapan data dulu.
 - **TikTok settlement `ad_cost=0`** (ad spend dari BC report terpisah); Shopee ad_cost inline di settlement → engine **channel-aware** agar tak double-count.
 - Belum diimplementasi — spec detail: `docs/superpowers/specs/2026-06-30-profit-engine-design.md` (di repo bip-erp, di luar vault).
+
+## Dokumen Terkait (repo bip-erp — di luar vault, tak bisa wikilink)
+
+Analisis lengkap dashboard Marketing & Ads:
+- `docs/superpowers/specs/2026-07-01-marketing-dashboard-ANALISIS-REKAP.md` — **index** (baca dulu)
+- `docs/superpowers/specs/2026-06-30-marketing-dashboard-MASTER.md` — roadmap 8 scope + 9 engine + join + affiliate
+- `docs/superpowers/specs/2026-06-30-profit-engine-design.md` — spec profit engine + HPP
+- `docs/superpowers/plans/2026-06-30-hpp-master-plan.md` — plan HPP master (field cost + upload xlsx)
+- Terkait: [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]] · `docs/superpowers/plans/2026-07-01-etl-transaction-orders-drift-recovery.md` (risiko akurasi laba)

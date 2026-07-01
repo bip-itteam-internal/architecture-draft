@@ -36,3 +36,11 @@ Dashboard tab Affiliate #7 butuh: roster creator, komisi per order, GMV affiliat
 - **Catatan data**: status order CSV mayoritas Unpaid/Pending → komisi sebagian belum final; dashboard bedakan **Est vs Actual commission**.
 - **Ads (BC)** = app terpisah (`TIKTOK_BUSINESS_APP_ID`), tak terpengaruh scope affiliate.
 - Belum diimplementasi — spec detail: `docs/superpowers/specs/2026-06-30-affiliate-seller-sync-design.md` (di repo bip-erp).
+
+## Dokumen Terkait (repo bip-erp — di luar vault, tak bisa wikilink)
+
+- `docs/superpowers/specs/2026-06-30-affiliate-seller-sync-design.md` — spec auto-sync (client, cron, koleksi affiliate_orders, handler)
+- `docs/superpowers/specs/2026-07-01-marketing-dashboard-ANALISIS-REKAP.md` — index analisis
+- `docs/superpowers/specs/2026-06-30-marketing-dashboard-MASTER.md` — §B4 affiliate lengkap (scope, endpoint, blocker)
+- Dok resmi TikTok (repo bip-erp): `docs/superpowers/Affiliate integration.md` · `docs/superpowers/TikTok Shop Affiliate(Creator Collaboration)Developer onboarding & termination Rules.md`
+- Terkait: [[ADR - 0008 Profit Engine Join via item_group_id]] (join via product_id==item_group_id)
