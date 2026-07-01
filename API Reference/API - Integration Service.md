@@ -51,7 +51,7 @@
 | GET | `/shopee/gms/item-performance[/sync|/summary]` · `/campaign-performance[/sync|/summary]` | Performa GMS |
 | GET/POST/DELETE | `/shopee/accounts/list` · `/accounts/:id` | Akun Shopee |
 
-> **Dual-app per toko** (✅ live): tiap shop bisa punya 2 kredensial via `account_type` — **ADS_SERVICE** (GMS) & **ERP_SYSTEM** (order/escrow/push); `/accounts/list` mengembalikan `account_type` + `shop_id_list`. **`/orders/escrow/backfill?shop_id=&limit=`** (⚠️ baru, belum deploy): isi `income` order COMPLETED yang belum ter-escrow (escrow-only, resumable). Detail: [[Microservices - Integration Service]].
+> **Dual-app per toko** (✅ live): tiap shop bisa punya 2 kredensial via `account_type` — **ADS_SERVICE** (GMS) & **ERP_SYSTEM** (order/escrow/push); `/accounts/list` mengembalikan `account_type` + `shop_id_list`. **`/orders/escrow/backfill?shop_id=&limit=`** (✅ live): isi `income` order COMPLETED yang belum ter-escrow (escrow-only, resumable) — dipakai backfill toko 908963392 (1.308/1.308 order). Detail: [[Microservices - Integration Service]].
 
 ## Accurate (akuntansi)
 | Method | Path | Fungsi |
