@@ -6,13 +6,23 @@
 
 ## Turunan (jenis request)
 
-| Jenis | Dokumen | Endpoint | Reviewer |
-|---|---|---|---|
-| Cuti / Izin | [[HRIS - Leave Request]] | `/request/*` | SPV → HR |
-| Tukar shift / hari | [[HRIS - Tukar Jadwal Kerja]] | `/schedule-exchange/*` | multi-level (review_1 + review_2) |
-| Koreksi clock-in/out | [[HRIS - Attendance Correction]] | `/correction/*` | role-based (4 kasus) |
-| Perjalanan dinas | [[HRIS - Perjalanan Dinas]] | `/business-trip/*` | SPV → HRD |
-| Lembur (SPKL) | [[HRIS - Overtime]] | *(belum)* | *(rencana mengikuti pola ini)* |
+Enam jenis HR request (Lembur menyusul). Sejak **penyeragaman 2026-07**, keempat jenis aktif memakai **model review yang sama**: field `spv_review`/`hr_review` (bson `spv_status`/`hr_status`, seragam dengan Leave), dengan **SPV di-assign spesifik** via `getSupervisorData` (slot lama `review_1`/`review_2` di Tukar & Koreksi sudah di-rename).
+
+| Jenis (`request_type`) | Koleksi | Dokumen | Endpoint | Reviewer |
+|---|---|---|---|---|
+| **Izin / Cuti / Sakit** | `leave_request` | [[HRIS - Leave Request]] | `/request/*` | SPV → HRD |
+| **Dinas** (Perjalanan Dinas) | `business_trip_request` | [[HRIS - Perjalanan Dinas]] | `/business-trip/*` | SPV → HRD |
+| **Koreksi** clock-in/out | `attendance_correction_request` | [[HRIS - Attendance Correction]] | `/correction/*` | SPV → HRD (reguler); atasan/HR → HR |
+| **Tukar** Shift/Hari | `schedule_exchange_request` | [[HRIS - Tukar Jadwal Kerja]] | `/schedule-exchange/*` | (Rekan consent — hanya Shift) → SPV → HRD |
+| Lembur (SPKL) | *(belum)* | [[HRIS - Overtime]] | *(belum)* | *(rencana mengikuti pola ini)* |
+
+## Endpoint Admin HR (lihat semua request)
+
+Untuk **admin HR** (`department == "Human Resource"`), satu endpoint melihat **semua** pengajuan lintas koleksi — `services/attendance/hr_admin.go` (lihat [[Microservices - Attendance Service]]):
+
+- `GET /hr/requests` — daftar ringkas. `request_type` **granular**: **Izin, Cuti, Sakit, Dinas, Koreksi, Tukar** (Izin/Cuti/Sakit = nilai `leave_type` pada `leave_request`). Filter: `type`, `status`, `department`, `search`, `from`, `to` + pagination `page`/`limit`. Balas `{ data, total, page, limit }` (urut `created_at` desc); `data[]` = `{ id, request_type, employee_id, full_name, department, subtype, status, created_at }`.
+- `GET /hr/requests/detail?type=&id=` — full doc satu pengajuan (bypass filter per-user; admin boleh lihat semua).
+- Non-HR → `403`.
 
 ## Komponen Bersama (di kode)
 
@@ -20,7 +30,7 @@ Semua di [[Microservices - Attendance Service]]:
 - **Model**: `ReviewData`, `ReviewStatus` (`Menunggu / Disetujui / Ditolak / Diabaikan / Dibatalkan`)
 - **Resolusi status**: `Resolve*Status(...)` — menggabungkan beberapa review jadi status final
 - **Penentuan reviewer**: `getSupervisorData(department)` + `build*ReviewFilter(...)`
-- **Pola endpoint**: `create` / `view` (`?as=reviewer|reviewed`) / `review` / `cancel`
+- **Pola endpoint**: `create` / `view` (`?as=reviewer` = antrian perlu-tindakan-ku, termasuk **consent rekan** untuk Tukar Shift; `?as=reviewed` = sudah ditindak) / `review` / `cancel`. Filter reviewer via `buildReviewFilter` (leave/dinas/tukar) & `buildCorrectionReviewFilter`, dengan guard `employee_id != pemanggil` (anti-bocor sedepartemen). *(Case `as=partner` khusus Tukar sudah dihapus — consent kini lewat `as=reviewer`.)*
 - **Notifikasi**: FCM + inbox ke reviewer & pemohon (via [[Microservices - Notification Service]])
 - **Apply-to-attendance**: setelah disetujui, otomatis menyesuaikan entri attendance
 
