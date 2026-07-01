@@ -37,11 +37,11 @@ Masalah: menyambungkan ad-spend (item_group_id) → order → HPP tidak ada satu
 - **TikTok settlement `ad_cost=0`** (ad spend dari BC report terpisah); Shopee ad_cost inline di settlement → engine **channel-aware** agar tak double-count.
 - Belum diimplementasi — spec detail: `docs/superpowers/specs/2026-06-30-profit-engine-design.md` (di repo bip-erp, di luar vault).
 
-## Dokumen Terkait (repo bip-erp — di luar vault, tak bisa wikilink)
+## Dokumen Terkait
 
-Analisis lengkap dashboard Marketing & Ads:
-- `docs/superpowers/specs/2026-07-01-marketing-dashboard-ANALISIS-REKAP.md` — **index** (baca dulu)
-- `docs/superpowers/specs/2026-06-30-marketing-dashboard-MASTER.md` — roadmap 8 scope + 9 engine + join + affiliate
-- `docs/superpowers/specs/2026-06-30-profit-engine-design.md` — spec profit engine + HPP
-- `docs/superpowers/plans/2026-06-30-hpp-master-plan.md` — plan HPP master (field cost + upload xlsx)
-- Terkait: [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]] · `docs/superpowers/plans/2026-07-01-etl-transaction-orders-drift-recovery.md` (risiko akurasi laba)
+Analisis lengkap dashboard Marketing & Ads (folder `Marketing Dashboard Analysis/`):
+- [[2026-07-01-marketing-dashboard-ANALISIS-REKAP]] — **index** (baca dulu)
+- [[2026-06-30-marketing-dashboard-MASTER]] — roadmap 8 scope + 9 engine + join + affiliate
+- [[2026-06-30-profit-engine-design]] — spec profit engine + HPP
+- [[2026-06-30-hpp-master-plan]] — plan HPP master (field cost + upload xlsx)
+- [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]]
