@@ -47,9 +47,11 @@
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/shopee/auth[/callback]` · `/shops/list` · `/products/items` | OAuth, shop, produk |
-| GET | `/shopee/orders/list` · `/orders/detail` · `/orders/sync` · `/v2/shopee/orders/list` | Order (v1/v2/sync) |
+| GET | `/shopee/orders/list` · `/orders/detail` · `/orders/sync` · `/orders/escrow/backfill` · `/v2/shopee/orders/list` | Order (v1/v2/sync + backfill escrow income) |
 | GET | `/shopee/gms/item-performance[/sync|/summary]` · `/campaign-performance[/sync|/summary]` | Performa GMS |
 | GET/POST/DELETE | `/shopee/accounts/list` · `/accounts/:id` | Akun Shopee |
+
+> **Dual-app per toko** (✅ live): tiap shop bisa punya 2 kredensial via `account_type` — **ADS_SERVICE** (GMS) & **ERP_SYSTEM** (order/escrow/push); `/accounts/list` mengembalikan `account_type` + `shop_id_list`. **`/orders/escrow/backfill?shop_id=&limit=`** (⚠️ baru, belum deploy): isi `income` order COMPLETED yang belum ter-escrow (escrow-only, resumable). Detail: [[Microservices - Integration Service]].
 
 ## Accurate (akuntansi)
 | Method | Path | Fungsi |
