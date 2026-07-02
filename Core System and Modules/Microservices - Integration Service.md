@@ -85,6 +85,7 @@
 - GMV-Max report — 1 AM
 - Integration report — 2 AM
 - **Affiliate orders sync** — per 8 jam (`0,8,16,23`), pola & cadence seragam ads GMV-max; loop credential→authorized-shop, error isolated per-shop
+- **Affiliate status refresh** — mingguan (Minggu 02:00): re-pull window 89 hari (cap API 3 bulan) agar `settlement_status` + `actual_commission` order lama ter-update (API affiliate hanya bisa filter `create_time`; order settle sampai ~90 hari). Jeda 8s antar-toko (anti-throttle). Limitation: order yang settle setelah umur >89 hari miss (rencana tambal: join finance statement, tunggu coverage ETL)
 - Webhook-consumer — tiap 5 detik
 - Desty-credential refresh — tengah malam
 - Sync Shopee performance — 2 AM

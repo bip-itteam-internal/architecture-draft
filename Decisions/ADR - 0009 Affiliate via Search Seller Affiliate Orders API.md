@@ -36,7 +36,7 @@ Dashboard tab Affiliate #7 butuh: roster creator, komisi per order, GMV affiliat
 - **Isolasi**: `affiliate_orders` = koleksi terpisah dari `transaction_orders` (terverifikasi: 113rb transaction utuh). 1 order affiliate juga ada di transaction_orders → **link via order_id**, bukan campur.
 - **Catatan data**: status settlement mayoritas belum final → dashboard bedakan **Est vs Actual commission**.
 - **Ads (BC)** = app terpisah (`TIKTOK_BUSINESS_APP_ID`), tak terpengaruh scope affiliate.
-- **Implementasi** (repo bip-erp, service integration): client `affiliate_client.go`, entity `affiliate.go`, repo `affiliate_repo.go` (upsert + aggregate totals/creator/product), usecase `affiliate_usecase.go`, cron task `affiliate_orders_sync.go`, handler `affiliate_handler.go` (`GET /affiliate/orders`, `/summary/{totals,creators,products}`). FE: modul `marketing-insight/affiliate` ([[APP - Web ERP]]). Spec: `docs/superpowers/specs/2026-06-30-affiliate-seller-sync-design.md`.
+- **Implementasi** (repo bip-erp, service integration): client `affiliate_client.go`, entity `affiliate.go`, repo `affiliate_repo.go` (upsert + aggregate totals/creator/product), usecase `affiliate_usecase.go`, cron task `affiliate_orders_sync.go` + weekly refresh `affiliate_orders_refresh.go` (Minggu 02:00, window 89h — update settlement_status/actual_commission order lama; API hanya filter create_time, order settle ~90h; spec: `docs/superpowers/specs/2026-07-02-affiliate-status-refresh-design.md`), handler `affiliate_handler.go` (`GET /affiliate/orders`, `/summary/{totals,creators,products}`). FE: modul `marketing-insight/affiliate` ([[APP - Web ERP]]). Spec: `docs/superpowers/specs/2026-06-30-affiliate-seller-sync-design.md`.
 
 ## Dokumen Terkait
 
