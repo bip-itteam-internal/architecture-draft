@@ -40,7 +40,7 @@
 
 ### Affiliate (TikTok Seller)
 - **Affiliate orders** — client `SearchSellerAffiliateOrders` panggil TikTok Affiliate Seller API `POST /affiliate_seller/202410/orders/search` (reuse `generateSign`/`buildQueryString`; versi **202410** terverifikasi live). Cron 8-jam tarik → koleksi `affiliate_orders` (grain order_id+sku_id, upsert idempotent), terpisah dari `transaction_orders` (link via order_id). Data per-SKU: creator_username, content_id/type, commission_model/rate, price, est/actual commission, settlement_status.
-- **Dashboard API**: `GET /affiliate/orders` (list+filter+paginate) · `/affiliate/summary/{totals,creators,products}` (agregasi Mongo untuk KPI + top creator/produk). FE: [[APP - Web ERP]] modul marketing-insight/affiliate. Detail keputusan: [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]].
+- **Dashboard API**: `GET /affiliate/orders` (list+filter+paginate, incl. `validation_status`) · `/affiliate/summary/{totals,creators,products,validation}` (agregasi Mongo untuk KPI + top creator/produk). FE: [[APP - Web ERP]] modul marketing-insight/affiliate. Detail keputusan: [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]].
 
 ### Shopee
 - OAuth: `/auth` (+ callback)
@@ -86,6 +86,7 @@
 - Integration report — 2 AM
 - **Affiliate orders sync** — per 8 jam (`0,8,16,23`), pola & cadence seragam ads GMV-max; loop credential→authorized-shop, error isolated per-shop
 - **Affiliate status refresh** — mingguan (Minggu 02:00): re-pull window 89 hari (cap API 3 bulan) agar `settlement_status` + `actual_commission` order lama ter-update (API affiliate hanya bisa filter `create_time`; order settle sampai ~90 hari). Jeda 8s antar-toko (anti-throttle). Limitation: order yang settle setelah umur >89 hari miss (rencana tambal: join finance statement, tunggu coverage ETL)
+- **Affiliate commission validation** — harian (04:00): cross-check komisi order SETTLED vs finance statement lokal (`tt_shop_transaction_by_orders`), stempel `validation_status` (VALIDATED/DISCREPANCY/NO_STATEMENT/PENDING; grace delivery+21h atau create+45h). Join murni DB lokal — nol call TikTok API
 - Webhook-consumer — tiap 5 detik
 - Desty-credential refresh — tengah malam
 - Sync Shopee performance — 2 AM

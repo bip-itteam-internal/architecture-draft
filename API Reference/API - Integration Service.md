@@ -42,10 +42,11 @@
 ## Affiliate (TikTok Seller)
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/affiliate/orders` | List order affiliate (filter: `store_id`, `creator_username`, `product_id`, `order_status`, `from`/`to` unix; paginated `page`/`per_page`) |
+| GET | `/affiliate/orders` | List order affiliate (filter: `store_id`, `creator_username`, `product_id`, `order_status`, `validation_status`, `from`/`to` unix; paginated `page`/`per_page`) |
 | GET | `/affiliate/summary/totals` | KPI: GMV, komisi est/actual, jml order, jml creator |
 | GET | `/affiliate/summary/creators` | Agregat per creator (GMV desc): order, konten, GMV, komisi |
 | GET | `/affiliate/summary/products` | Agregat per produk: order, qty, GMV, komisi |
+| GET | `/affiliate/summary/validation` | Breakdown validasi komisi vs finance statement (per status: VALIDATED/DISCREPANCY/NO_STATEMENT/PENDING) |
 
 > Sumber = koleksi `affiliate_orders` (di-sync cron 8-jam via Search Seller Affiliate Orders API). Lihat [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]].
 
