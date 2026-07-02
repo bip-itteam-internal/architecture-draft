@@ -38,6 +38,10 @@
 - GMV Winning Content: `GET /tiktok/shop/insight/gmv-winning-content` — daftar konten pemenang GMV (handle `ErrShopNotFound` → HTTP 400)
 - Accounts: CRUD
 
+### Affiliate (TikTok Seller)
+- **Affiliate orders** — client `SearchSellerAffiliateOrders` panggil TikTok Affiliate Seller API `POST /affiliate_seller/202410/orders/search` (reuse `generateSign`/`buildQueryString`; versi **202410** terverifikasi live). Cron 8-jam tarik → koleksi `affiliate_orders` (grain order_id+sku_id, upsert idempotent), terpisah dari `transaction_orders` (link via order_id). Data per-SKU: creator_username, content_id/type, commission_model/rate, price, est/actual commission, settlement_status.
+- **Dashboard API**: `GET /affiliate/orders` (list+filter+paginate) · `/affiliate/summary/{totals,creators,products}` (agregasi Mongo untuk KPI + top creator/produk). FE: [[APP - Web ERP]] modul marketing-insight/affiliate. Detail keputusan: [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]].
+
 ### Shopee
 - OAuth: `/auth` (+ callback)
 - Orders: list, v2 list, detail, sync
@@ -80,6 +84,7 @@
 - TikTok Business master-data
 - GMV-Max report — 1 AM
 - Integration report — 2 AM
+- **Affiliate orders sync** — per 8 jam (`0,8,16,23`), pola & cadence seragam ads GMV-max; loop credential→authorized-shop, error isolated per-shop
 - Webhook-consumer — tiap 5 detik
 - Desty-credential refresh — tengah malam
 - Sync Shopee performance — 2 AM
