@@ -10,7 +10,7 @@
 
 **Health & Registry**
 - `GET /health` — health check service.
-- `GET /data-type/:dt` — registry data type: schedule-list, leave-type/subtype, holiday-type, attendance-status.
+- `GET /data-type/:dt` — registry data type: schedule-list, leave-type/subtype (dengan `?detail=true` → `max_range`/`format`/`paid`), holiday-type, attendance-status.
 - `GET /sync/company-work-schedules` — sinkronisasi definisi jadwal kerja perusahaan.
 
 **Networks (dipakai IT)**
@@ -22,7 +22,7 @@
 - `GET /internal/summary` — hitung jumlah clock-in/out dalam 24 jam.
 - `PATCH /:id/update` — edit entry absensi sekaligus lampirkan dokumen.
 - `GET /report` — laporan bulanan per karyawan (periode 26→26).
-- `GET /payroll-supplement` — agregasi jam kerja, telat, cuti, lembur, dan absen menjadi persentase payout.
+- `GET /payroll-supplement` — agregasi jam kerja, telat, cuti (dipotong), **izin dibayar** (bucket `paid_leave` = `AttendanceEntries.paid_leave_hour`; izin "urusan kantor" dihitung sebagai kerja, tidak menurunkan payout), lembur, dan absen menjadi `payout_pct`. Diproxy oleh Employee Service sbg `/api/employee/me/payroll-approx`.
 
 **Clock In/Out**
 - `POST /tap?method=` — clock-in/out multi-metode:
