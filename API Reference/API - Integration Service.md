@@ -75,6 +75,18 @@
 | POST | `/credentials` | Kredensial platform |
 | GET/POST/DELETE | `/holidays[/:id]` | Hari libur kalkulasi |
 
+## Profit (Gross Profit per Product)
+
+> ⚠️ Working branch `feat/gross-profit`, belum merge/deploy.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/profit/products?start&end&shop_id&account_id&product_name&sku` | Profit per produk (roll-up SKU) + flags `pending_income_items`/`unmapped_skus`/`missing_hpp`; `account_id` = credential TikTok Shop |
+| POST | `/profit/costs/upload` | Upload xlsx HPP finance (multipart `file` + `effective_from`; **finance/admin only**) |
+| GET | `/profit/costs?product_name=` | List HPP (riwayat per `effective_from`) |
+| GET/POST/PUT | `/profit/mappings` | List/simpan mapping SKU↔item_id↔produk (mutasi **finance/admin only**) |
+| DELETE | `/profit/mappings/:id` | Hapus mapping (**finance/admin only**) |
+
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
 |---|---|---|
