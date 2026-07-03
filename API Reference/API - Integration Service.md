@@ -82,10 +82,10 @@
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/profit/products?start&end&shop_id&account_id&product_name&sku` | Profit per produk (roll-up SKU) + flags `pending_income_items`/`unmapped_skus`/`missing_hpp`; `account_id` = credential TikTok Shop |
-| POST | `/profit/costs/upload` | Upload xlsx HPP finance (multipart `file` + `effective_from`; **finance/admin only**) |
+| POST | `/profit/costs/upload` | Upload xlsx HPP finance (multipart `file` + `effective_from`; **supervisor|admin modul integration/finance**) |
 | GET | `/profit/costs?product_name=` | List HPP (riwayat per `effective_from`) |
-| GET/POST/PUT | `/profit/mappings` | List/simpan mapping SKU↔item_id↔produk (mutasi **finance/admin only**) |
-| DELETE | `/profit/mappings/:id` | Hapus mapping (**finance/admin only**) |
+| GET/POST/PUT | `/profit/mappings` | List/simpan mapping SKU↔item_id↔produk (mutasi **supervisor|admin modul integration/finance**) |
+| DELETE | `/profit/mappings/:id` | Hapus mapping (**supervisor|admin modul integration/finance**) |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
