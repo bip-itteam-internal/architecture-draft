@@ -85,6 +85,7 @@
 | POST | `/profit/costs/upload` | Upload xlsx HPP finance (multipart `file` + `effective_from`; **supervisor|admin modul integration/finance**) |
 | GET | `/profit/costs?product_name=` | List HPP (riwayat per `effective_from`) |
 | GET/POST/PUT | `/profit/mappings` | List/simpan mapping SKU↔item_id↔produk (mutasi **supervisor|admin modul integration/finance**) |
+| POST | `/profit/mappings/seed` | Generate mapping otomatis dari master `items` (komponen bundle + qty) + riwayat order (item_id TikTok); laporan created/skipped/unmatched (**supervisor|admin modul integration/finance**) |
 | DELETE | `/profit/mappings/:id` | Hapus mapping (**supervisor|admin modul integration/finance**) |
 
 ## Marketing Teams (admin) · Worker/Jobs
