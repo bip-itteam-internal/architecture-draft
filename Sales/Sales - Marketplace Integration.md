@@ -12,7 +12,7 @@
 
 ## Cakupan / Fitur (business view)
 
-- **Koneksi akun/toko marketplace** — OAuth TikTok Shop, Shopee, TikTok Business/Ads; kelola kredensial per toko
+- **Koneksi akun/toko marketplace** — OAuth TikTok Shop, Shopee, TikTok Business/Ads; kelola kredensial per toko. **Lazada** 🟡 direncanakan (belum diimplementasikan) — lihat [[Microservices - Integration Service]] §Lazada
 - **Sinkronisasi order/penjualan** → model **transaksi terpadu** (unified) lintas marketplace
 - **Performa iklan/GMV** — laporan GMV Max (TikTok), GMS (Shopee); berkaitan dengan [[Sales - Dashboard]] (ads/omnichannel) & [[Sales - GMV Creative]]
 - **Bridge ke akuntansi** — ringkasan transaksi → **Accurate** (Sales Invoice/Return); lihat [[Finance - Bridging App]] & [[External - Accurate]]
@@ -28,7 +28,7 @@
 
 ## Catatan
 
-- **Lazada** baru placeholder di kode (belum ada client) — lihat catatan di [[Microservices - Integration Service]]
+- **Lazada** 🟡 direncanakan — saat ini order Lazada (bila ada) hanya tertangani **generik** lewat middleware [[External - Desty]] (auto-approve, tanpa masuk model transaksi terpadu). Rencana integrasi **langsung** (dedicated OAuth/API client setara Shopee/TikTok Shop, order masuk `transaction_orders`) didokumentasikan di [[Microservices - Integration Service]] §Lazada; cara pembuatan akun/app di [[RUN - Onboarding Lazada Open Platform]]. Belum ada keputusan final apakah jalur Desty untuk Lazada akan digantikan atau tetap dual-run — lihat open question di dokumen teknis.
 - Pembeda: integrasi ini untuk **order/penjualan & akuntansi marketplace**, berbeda dari [[Sales - TikTok Sentiment Pipeline]] (sentimen komentar kompetitor) dan [[Sales - Veo (Gemini) Implementation]] (produksi konten)
 ## Kendala
 
@@ -38,6 +38,7 @@
 
 - [[Microservices - Integration Service]] (implementasi)
 - [[Microservices - TikTok Shop Service]] (penerima callback/webhook TikTok)
+- [[RUN - Onboarding Lazada Open Platform]] (rencana onboarding akun/app Lazada)
 - [[Finance - Bridging App]] · [[External - Accurate]]
 - [[Sales - Dashboard]] · [[Sales - GMV Creative]] · [[Sales - Incentive]]
 - [Referensi API Integration Service — docs-api-greget](https://docs-api-greget.vercel.app/)
