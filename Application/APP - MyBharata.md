@@ -63,9 +63,9 @@
 ### Payroll
 - Lihat **payslip** bulanan (PDF terenkripsi, **dilindungi PIN**, ditampilkan in-app) dan riwayat payslip tahunan
 
-### KPI & Task
+### KPI & Support Ticket
 - **KPI**: laporan performa kuartalan (read-only di mobile) dengan grafik
-- **Task Management**: daftar & detail tugas yang ditugaskan
+- **Support Ticket** *(sebelumnya "Helpdesk IT")* — buat tiket ke **Space per divisi** (lintas divisi, bukan khusus IT) lewat form "Buat Tiket": pilih Space (dikelompokkan per divisi), Judul, Deskripsi, dan **lampiran opsional**. Lampiran memakai alur **Upload First**: file diunggah dulu ke `/uploads/temp` lalu diklaim via `attachment_ids` saat create (batas 20 file, 10 MB/file di sisi FE). Tersedia daftar & detail tiket, dan **URL di deskripsi otomatis menjadi tautan yang bisa diklik**. Fitur `features/task`, label menu **Support Ticket**. Backend: [[Microservices - Task Management Service]] · sisi tracker: [[APP - Dynamic Task Tracker]]
 
 ### Fitur pendukung lain
 - **QR Code**: tampilkan QR pribadi + akses scanner inventory
@@ -116,3 +116,5 @@ Tercantum di menu tetapi masih placeholder (route `/coming-soon` atau stub):
 - [[Microservices - Attendance Service]]
 - [[Microservices - Employee Service]]
 - [[Microservices - Notification Service]]
+- [[Microservices - Task Management Service]]
+- [[APP - Dynamic Task Tracker]]
