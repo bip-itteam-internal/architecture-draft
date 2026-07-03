@@ -49,9 +49,10 @@
 | GET | `/shopee/auth[/callback]` · `/shops/list` · `/products/items` | OAuth, shop, produk |
 | GET | `/shopee/orders/list` · `/orders/detail` · `/orders/sync` · `/orders/escrow/backfill` · `/v2/shopee/orders/list` | Order (v1/v2/sync **chunked ≤15 hari** + backfill escrow income) |
 | GET | `/shopee/gms/item-performance[/sync|/summary]` · `/campaign-performance[/sync|/summary]` | Performa GMS |
+| GET | `/shopee/affiliate/performance` · `/affiliate/recommended` | Affiliate/AMS — per-affiliate performa (sales/order/komisi/ROI) + rekomendasi (via app AMS) |
 | GET/POST/DELETE | `/shopee/accounts/list` · `/accounts/:id` | Akun Shopee |
 
-> **Dual-app per toko** (✅ live): tiap shop bisa punya 2 kredensial via `account_type` — **ADS_SERVICE** (GMS) & **ERP_SYSTEM** (order/escrow/push); `/accounts/list` mengembalikan `account_type` + `shop_id_list`. **`/orders/escrow/backfill?shop_id=&limit=`** (✅ live): isi `income` order COMPLETED yang belum ter-escrow (escrow-only, resumable) — dipakai backfill toko 908963392 (1.308/1.308 order). Detail: [[Microservices - Integration Service]].
+> **Tri-app per toko** (✅ live): tiap shop bisa punya sampai 3 kredensial via `account_type` — **ADS_SERVICE** (GMS, partner 2032638), **ERP_SYSTEM** (order/escrow/push, 2032314), **AMS** (affiliate, 2038141, kategori app "Affiliate Marketing Solution Management" — hanya app ini yang bisa panggil AMS API); `/accounts/list` mengembalikan `account_type` + `shop_id_list`. **`/orders/escrow/backfill?shop_id=&limit=`** (✅ live): isi `income` order COMPLETED yang belum ter-escrow (escrow-only, resumable) — backfill 908963392 (1.308/1.308). **`/affiliate/performance|recommended`** (✅ live, v1 proxy): analisis per-affiliate Shopee AMS. Detail: [[Microservices - Integration Service]].
 
 > **`/orders/sync`** (⚠️ baru, belum deploy): tarik order per toko, mendukung **histori panjang (~3 bulan)** via chunking otomatis ke window **≤15 hari** (batas `get_order_list`), satu circuit breaker per-run, **tanpa** gate proses-wide (app order ERP_SYSTEM `2032314` terpisah dari GMS `2032638`). Param: `shop_id` (wajib), `time_from`/`time_to` (unix) **atau** `days` (mis. `days=90`; maks **400 hari**). Rate-limit di tengah → **HTTP 200 partial** + ringkasan success-rate di body. Grounded: `shopee_handler.go` (`SyncOrders`). Detail: [[Microservices - Integration Service]].
 
