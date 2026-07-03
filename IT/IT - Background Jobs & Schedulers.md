@@ -30,6 +30,7 @@
 | integration | **tiap 5 detik** (`*/5 * * * * *`) | konsumsi antrian webhook `webhook_tasks` & dispatch | Redis `lock:webhook-consumer` (5m) | `.../worker/tasks/webhook_consumer_task.go:36` |
 | integration | harian 00:00 (`0 0 0 * * *`) | refresh kredensial Desty (cek expiry buffer 5 hari) | Redis `lock:desty-credential-task` (5m) | `.../worker/tasks/desty_credential_task.go:40` |
 | integration | harian 02:00 (`0 0 2 * * *`) | sync performa Shopee GMS (item & campaign) | Redis `lock:sync-shopee-performance` (30m) | `.../worker/tasks/shopee_sync_task.go:30` |
+| integration | harian 03:00 (`0 0 3 * * *`) | snapshot performa affiliate Shopee AMS per toko → `shopee_affiliate_performance` (window **mundur 3 hari** untuk self-heal order yang baru ter-confirm; upsert idempotent; toko tanpa cred AMS di-skip) | Redis `lock:sync-shopee-affiliate-performance` (30m) | `.../worker/tasks/shopee_affiliate_sync_task.go:26` |
 
 > Inisialisasi index (bukan job): `services/insentive/cron_worker.go:1550` — `ensureCronIndexes()` (TTL index `cron_locks.expires_at`) dipanggil sekali saat startup.
 
