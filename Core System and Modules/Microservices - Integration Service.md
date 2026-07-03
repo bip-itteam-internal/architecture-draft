@@ -50,17 +50,6 @@
 - GMS Analytics: item & campaign performance (+ sync + summary)
 - Accounts: CRUD
 
-### Transactions (model terpadu)
-- `/transactions/orders/list`, summary (+ shops / + products), `/transactions/orders/:id`
-- Master: `/master/shops`, `/master/channels`, `/master/status`
-- Summary Reports: list, `POST` trigger, group-by-status, get, items, **invoices** (`/summary/reports/:id/invoices`), retry, delete
-- `POST /summary/reports/:id/send/:service` — kirim ringkasan ke Accurate
-- **Income reporting**: agregasi income invoice + field income pada transaction order (laporan pemasukan)
-- **Demography Insight**: `GET /transactions/insight/demography` — insight demografi dari transaksi
-- **Status history**: pelacakan riwayat status (status history) transaction order
-- **Revenue Comparison**: `GET /transactions/orders/summary/comparison` — perbandingan performa dua periode kustom. Query param: `start_date`/`end_date` (periode aktif, YYYY-MM-DD, default hari ini), `comparison_start`/`comparison_end` (periode pembanding, default kemarin), `channel` (SHOPEE|TIKTOK, **opsional** — omit untuk semua channel), `shop_id`, `timezone` (IANA, default `Asia/Jakarta`). Granularity otomatis: `hourly` (rentang 1 hari → 24 slot label `HH:00`) atau `daily` (multi-hari → 1 slot per hari label `DD/MM`). Respons: `current`, `previous` (masing-masing `total_revenue`, `total_orders` TO_SHIP; `total_completed_revenue`, `total_completed_orders`, `total_products` COMPLETED; + array `slots`), `comparison` (% perubahan ke-5 metrik), `granularity`. Dua query MongoDB dijalankan **concurrent** via `errgroup` (TO_SHIP + COMPLETED).
-- **Dashboard Status Summary**: `GET /transactions/orders/dashboard/summary` — jumlah order aktif saat ini **tanpa filter tanggal** (semua order di DB), dikelompokkan per kategori kartu dashboard. Param: `channel`, `shop_id` (opsional). Respons: `pesanan_baru` (TO_PROCESS), `siap_dikirim` (TO_SHIP), `belum_di_proses` (TO_PROCESS + TO_SHIP), `pesanan_selesai` (COMPLETED).
-
 ### Lazada
 
 > 🟡 **Bagian ini KONSEP/RENCANA — belum ada kode.** Ditulis untuk grounding rencana implementasi integrasi langsung (bukan sekadar jalur [[External - Desty]] yang sudah ada). Update marker ke ✅ per sub-bagian begitu client Lazada nyata di-merge. Detail teknis di bawah bersumber dari dokumentasi publik Lazada Open Platform (`open.lazada.com`) per Juli 2026 — **bukan dari kode BIP** — jadi wajib diverifikasi ulang sebelum implementasi (API vendor bisa berubah).
@@ -71,8 +60,19 @@
 - **Order sync**: rencana dua jalur seperti Shopee/TikTok Shop — polling/cron (mirror endpoint `/orders/sync`, memetakan `GetOrders`/`GetOrderItems` Lazada) **dan** webhook native `POST /webhooks/services/lazada` (konstanta `WebhookPlatformLazada = "LAZADA"` sudah ada di `entity/webhook.go` tapi belum dipakai) dengan processor baru di registry `(platform, source)` — pola identik `desty_shopee.go`/`shopee_push.go`.
 - **Model data**: perlu tambah `TransactionChannelLazada = "LAZADA"` di `entity/transaction.go` **dan** masukkan ke `TransactionChannelList` (allow-list yang divalidasi handler) — preseden persis: `TransactionChannelTokopedia` sudah didefinisikan tapi sengaja dibiarkan **dormant** (tidak masuk `TransactionChannelList`) sampai clientnya nyata.
 - **Rate limit**: Lazada Open Platform membatasi QPS per-seller (indikasi ~10 QPS pada salah satu endpoint publik) dan memblokir sementara saat terlampaui. **Rekomendasi eksplisit**: terapkan pola ketahanan Shopee sejak awal (distributed lock refresh-token per-shop, circuit breaker saat kena limit — lihat §Observability & Ketahanan Shopee di atas) alih-alih menyusulkan setelah insiden, mengacu preseden [[LOG - Shopee API Rate Limit Request]].
-- **Frontend**: `TransactionPlatform` & lookup sejenis di `erp-frontend` (`frontend/src/features/integration/**`) saat ini hardcode union `"SHOPEE" | "TIKTOK"` di ≥12 file (types, constants, label, ikon, filter) — semua perlu entry `LAZADA` + ikon baru saat integrasi jalan sampai FE. Lihat [[APP - Web ERP]].
+- **Frontend**: `TransactionPlatform` & lookup sejenis di `erp-frontend` (`frontend/src/features/integration/**`) saat ini hardcode `"SHOPEE"`/`"TIKTOK"` di ≥12 file — bukan pola seragam: sebagian union type (`types/transactions.ts`, `teams/types.ts`, dll.), sebagian `Record<string,...>` lookup (label/ikon), sebagian literal fallback default. Dua di antaranya (`accurate-transaction/components/log-detail-table-section.tsx`, `transaction-detail-table-section.tsx`) malah punya bug pre-existing terpisah — `PLATFORM_ICON` di sana **belum** punya key SHOPEE sama sekali, jadi perlu dibenahi lebih dulu sebelum menambah LAZADA. Semua titik ini perlu entry Lazada + ikon baru saat integrasi jalan sampai FE. Lihat [[APP - Web ERP]].
 - **Open question (belum diputuskan)**: apakah client native ini **menggantikan** jalur Desty untuk Lazada, atau **dual-run** (Desty tetap auto-approve, client native menambah data granular ke `transaction_orders`)? Perlu keputusan eksplisit sebelum implementasi, bukan asumsi dokumen ini.
+
+### Transactions (model terpadu)
+- `/transactions/orders/list`, summary (+ shops / + products), `/transactions/orders/:id`
+- Master: `/master/shops`, `/master/channels`, `/master/status`
+- Summary Reports: list, `POST` trigger, group-by-status, get, items, **invoices** (`/summary/reports/:id/invoices`), retry, delete
+- `POST /summary/reports/:id/send/:service` — kirim ringkasan ke Accurate
+- **Income reporting**: agregasi income invoice + field income pada transaction order (laporan pemasukan)
+- **Demography Insight**: `GET /transactions/insight/demography` — insight demografi dari transaksi
+- **Status history**: pelacakan riwayat status (status history) transaction order
+- **Revenue Comparison**: `GET /transactions/orders/summary/comparison` — perbandingan performa dua periode kustom. Query param: `start_date`/`end_date` (periode aktif, YYYY-MM-DD, default hari ini), `comparison_start`/`comparison_end` (periode pembanding, default kemarin), `channel` (SHOPEE|TIKTOK, **opsional** — omit untuk semua channel), `shop_id`, `timezone` (IANA, default `Asia/Jakarta`). Granularity otomatis: `hourly` (rentang 1 hari → 24 slot label `HH:00`) atau `daily` (multi-hari → 1 slot per hari label `DD/MM`). Respons: `current`, `previous` (masing-masing `total_revenue`, `total_orders` TO_SHIP; `total_completed_revenue`, `total_completed_orders`, `total_products` COMPLETED; + array `slots`), `comparison` (% perubahan ke-5 metrik), `granularity`. Dua query MongoDB dijalankan **concurrent** via `errgroup` (TO_SHIP + COMPLETED).
+- **Dashboard Status Summary**: `GET /transactions/orders/dashboard/summary` — jumlah order aktif saat ini **tanpa filter tanggal** (semua order di DB), dikelompokkan per kategori kartu dashboard. Param: `channel`, `shop_id` (opsional). Respons: `pesanan_baru` (TO_PROCESS), `siap_dikirim` (TO_SHIP), `belum_di_proses` (TO_PROCESS + TO_SHIP), `pesanan_selesai` (COMPLETED).
 
 ### Accurate
 - Shop Settings: CRUD (`/accurate/settings/shops`)
