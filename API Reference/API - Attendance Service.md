@@ -48,6 +48,17 @@
 
 > Opsi enum via `/data-type/:dt`: `business-trip-type`, `business-trip-transport`, `business-trip-accommodation`. Anggaran = estimasi (tanpa Finance). Detail: [[HRIS - Perjalanan Dinas]].
 
+## HR requests terpadu (lintas jenis)
+Ringkasan/detail **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar) dari satu endpoint — FE reuse satu kartu + stepper. Grounded ke `hr_admin.go` (`handleMyRequests`/`handleHRRequestsList`/`handleHRRequestDetail`).
+
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| GET | `/requests/mine` | Ringkasan pengajuan **milik pemanggil** ("Aktivitas Saya"); `?filter=ongoing/past`. Bentuk `HRRequestSummary` (header + `steps` timeline review + tanggal per jenis) | header |
+| GET | `/hr/requests` | Daftar ringkas untuk **peninjau / admin HR**. `?as=reviewer` (antrian) / `reviewed` (sudah) = difilter per peran **rekan / atasan(SPV) / HRD** (rekan hanya untuk Tukar); tanpa `as` = mode admin HR (dept HR; hanya yang sudah sampai HRD). Filter `?type=`, `?status=`, `?department=`, `?search=`, `?from=`/`?to=` (yyyy-MM-dd, atas `metadata.created_at`), `?page=`/`?limit=`. Guard: pemohon tak muncul atas pengajuan sendiri | header |
+| GET | `/hr/requests/detail` | Dokumen penuh satu pengajuan by `?type=` & `?id=`; `?as=self` (pemilik) / `reviewer\|reviewed` (peninjau, filter per jenis; item tab "sudah" hanya cocok `as=reviewed`) / tanpa = admin HR. Body = doc per jenis (sama dengan `/*/view`) | header |
+
+> FE mybharata: "Aktivitas Saya" pakai `/requests/mine`; "Review Submission" + kartu beranda pending pakai `/hr/requests` (+ `/hr/requests/detail` fetch-on-tap). Detail: [[APP - MyBharata]].
+
 ## Guestbook · WiFi · Internal
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|

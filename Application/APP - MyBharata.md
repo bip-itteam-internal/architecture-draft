@@ -55,6 +55,7 @@
 - Pengajuan **cuti tahunan, sakit, dispensasi, dinas luar kota**, dan **cuti melahirkan** (maternity, approval 3 tingkat: supervisor langsung → HR → Direksi) beserta riwayatnya
 - **Vacation Quota**: lihat sisa kuota cuti
 - **Check Permission / Verify Leaves**: verifikasi/approval pengajuan (untuk HR/atasan)
+- **Review Submission** (peninjau): inbox **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar) dalam satu daftar via `/hr/requests` (`?as=reviewer` antrian / `reviewed` sudah); detail fetch-on-tap via `/hr/requests/detail`. "Aktivitas Saya" & kartu beranda "menunggu persetujuan" juga pakai endpoint terpadu (`/requests/mine`, `/hr/requests`). Kontrak: [[API - Attendance Service]]
 
 ### Lembur (Overtime)
 - Pengajuan lembur (form tanggal, alasan, upload file) dengan alur **approval SPKL** oleh supervisor
