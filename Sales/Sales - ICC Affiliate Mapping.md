@@ -186,7 +186,7 @@ Alasan memilih Opsi A: konsisten dengan pola yang sudah ada di [[Microservices -
 |---|---|
 | **Prereq** | [[Microservices - Employee Service]] harus sudah bisa menerima field `tiktok_usernames` |
 | **Risiko: username berubah** | Kreator bisa ganti username TikTok kapan saja; tidak ada notifikasi otomatis dari API TikTok |
-| **Risiko: akun ganda** | Satu username bisa muncul di 2 karyawan (BELIA & FADLY sama-sama punya `auraliaa__`); perlu validasi unik atau model many-to-one |
+| **Akun bersama (by design)** | Satu username bisa dimiliki >1 karyawan ICC (mis. `auraliaa__`, `efcare`, `gumince`); model data harus many-to-many (username → [employee_id]) — bukan unique constraint per username |
 | **Risiko: akun tidak aktif** | Kreator yang resign tidak otomatis off dari daftar ICC |
 | **Dependency runtime** | Fase 2 menambah HTTP call ke Employee Service; pastikan timeout + fallback (jika Employee Service down, fallback ke cache lama) |
 
@@ -196,9 +196,9 @@ Dari daftar ICC 2026-07-04 (33 anggota):
 - **41 username** aktif (beberapa anggota punya 2 akun)
 - **SATRIO** — username TikTok belum diketahui (TBD)
 - **HANIF** — username diverifikasi `zestique_beauty` (bukan `zestique beauty`)
-- **BELIA & FADLY** — keduanya terdaftar dengan username `auraliaa__` (akun yang sama dipakai 2 orang, atau satu diantaranya salah — perlu klarifikasi)
-- **FIRA & IPUL** — keduanya terdaftar dengan username `efcare` (idem)
-- **GUMILANG & FUAD** — keduanya terdaftar dengan username `gumince` (idem)
+- **BELIA & FADLY** — berbagi akun `auraliaa__` (dikelola bersama — by design)
+- **FIRA & IPUL** — berbagi akun `efcare` (dikelola bersama — by design)
+- **GUMILANG & FUAD** — berbagi akun `gumince` (dikelola bersama — by design)
 
 ---
 
