@@ -47,6 +47,7 @@
 | GET | `/affiliate/summary/creators` | Agregat per creator (GMV desc): order, konten, GMV, komisi |
 | GET | `/affiliate/summary/products` | Agregat per produk: order, qty, GMV, komisi |
 | GET | `/affiliate/summary/validation` | Breakdown validasi komisi vs finance statement (per status: VALIDATED/DISCREPANCY/NO_STATEMENT/PENDING) |
+| GET | `/affiliate/summary/sync-history` | Aktivitas pipeline: sync/validasi terakhir, total order, 10 batch tarikan terakhir (per jam WIB) |
 
 > Sumber = koleksi `affiliate_orders` (di-sync cron 8-jam via Search Seller Affiliate Orders API). Lihat [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]].
 
@@ -74,6 +75,22 @@
 | PATCH/DELETE | `/items/:id` | Update/hapus item |
 | POST | `/credentials` | Kredensial platform |
 | GET/POST/DELETE | `/holidays[/:id]` | Hari libur kalkulasi |
+
+## Profit (Gross Profit per Product)
+
+> ⚠️ Working branch `feat/gross-profit` (sudah di-push ke origin), belum merge/deploy.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/profit/products?start&end&shop_id&account_id&product_name&sku` | Laba Sejati per produk (roll-up SKU + `bundles` + `breakdown` GMV/promo/fee/net-settlement/retur + `estimated_share`) + flags `unmapped_skus`/`missing_hpp`; `account_id` = credential TikTok Shop |
+| POST | `/profit/costs/upload` | Upload xlsx HPP finance (multipart `file` + `effective_from`; **supervisor|admin modul integration/finance**) |
+| GET | `/profit/costs?product_name=` | List HPP (riwayat per `effective_from`) |
+| POST/PUT/DELETE | `/profit/costs` · `/profit/costs/:id` | CRUD HPP satuan manual dari UI (tambah/edit/hapus 1 baris; **supervisor|admin modul integration/finance**) |
+| GET/POST/PUT | `/profit/mappings` | List/simpan mapping SKU↔item_id↔produk (mutasi **supervisor|admin modul integration/finance**) |
+| POST | `/profit/mappings/seed` | Generate mapping 2 fase: master `items` (bundle+qty) + match SKU liar ke nama HPP finance (auto/saran); laporan created/skipped/auto_named/suggestions (**supervisor|admin modul integration/finance**) |
+| DELETE | `/profit/mappings/:id` | Hapus mapping (**supervisor|admin modul integration/finance**) |
+| POST/GET | `/profit/channel-map/upload` · `/profit/channel-map` | Upload kamus channel variation (export Master Product; sku_id→master SKU) · ringkas count (**upload: supervisor|admin integration/finance**) |
+| GET | `/profit/order-listings` | Daftar Product Listing dari riwayat order (sample_name, item_id_count, mapped) — sumber dropdown form mapping |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
