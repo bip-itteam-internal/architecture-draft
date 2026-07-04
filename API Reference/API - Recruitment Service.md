@@ -59,7 +59,8 @@
 |---|---|---|
 | GET | `/public/recruitment/postings` | Daftar lowongan Open (featured dulu) |
 | GET | `/public/recruitment/postings/:id` | Detail lowongan + `application_questions` di-expand (render form) |
-| POST | `/public/recruitment/apply` | Pelamar mendaftar sendiri (email wajib; `custom_answers` tervalidasi) |
+| POST | `/public/recruitment/apply` | Pelamar mendaftar sendiri (email wajib; `custom_answers` tervalidasi) → respons `tracking_token` + `track_url` |
+| GET | `/public/recruitment/track/:token` | Cek status lamaran via **tracking_token** (bukan `_id`) — curated: progress/status label + stepper |
 
 ## Dokumen Terkait
 - [[Microservices - Recruitment Service]] · [[HRIS - Recruitment]] · [[Microservices - Employee Service]] · [[CORE - API Master Gateway]] · [[API - Index]]
