@@ -108,7 +108,7 @@
 
 ### Gross Profit per Product (modul profit)
 
-> ⚠️ Bagian ini ada di **working branch `feat/gross-profit` yang BELUM di-merge/deploy**. Ubah marker ke ✅ setelah merge. Spec: `bip-erp` sibling `docs/superpowers/specs/2026-07-03-gross-profit-submodule-design.md`.
+> ⚠️ Bagian ini ada di **working branch `feat/gross-profit` (sudah di-push ke origin) yang BELUM di-merge/deploy**. Ubah marker ke ✅ setelah merge. Deploy note: drop index unik lama `sku_1_tiktok_item_id_1_product_name_1` di `product_sku_mappings` (index baru menambah `master_sku`). Spec: `bip-erp` sibling `docs/superpowers/specs/2026-07-03-gross-profit-submodule-design.md`.
 
 Rumus per produk/SKU (TikTok) — **"Laba Sejati"** (blueprint dashboard marketing):
 `GMV − biaya marketplace (breakdown) − promo = NET SETTLEMENT`, lalu `NET SETTLEMENT − HPP − iklan = LABA KONTRIBUSI` (retur = kolom informasi).
@@ -119,7 +119,7 @@ Rumus per produk/SKU (TikTok) — **"Laba Sejati"** (blueprint dashboard marketi
 - **Koleksi baru (integration_db)**: `product_costs` (HPP per produk, riwayat per `effective_from`, `source: upload|accurate` — siap sync Accurate fase berikut) + `product_sku_mappings` (kunci unik `(sku, tiktok_item_id, product_name)`; 1 SKU boleh multi-baris: multi-toko per item_id & bundle per komponen dengan `qty_per_unit`; HPP dihitung sekali per komponen distinct).
 - **Arsitektur hitung**: aggregate on-read (pipeline Mongo + fungsi murni `AssembleProductProfit` di usecase, unit-tested) — tanpa ETL/snapshot baru.
 - **Identitas produk = SKU master** (mis. `PJB-002`): HPP, roll-up produk, dan dedup komponen di-join per `master_sku`; NAMA hanya alias/tampilan (case-insensitive, boleh berubah antar upload — yang tampil nama dari HPP terbaru). Baris mapping per product listing: `master_sku` sama = alias (HPP sekali), beda = komponen bundle. Terminologi: **Product Listing** = teks SKU penjual di order; **SKU** = SKU master.
-- **Input HPP**: upload xlsx finance — format baru `SKU | Produk | HPP/Pcs` (header by-nama, posisi bebas) ATAU format lama 2 kolom (SKU di-resolve dari nama sekali saat upload; sisanya legacy by-nama). Baris berawalan CONTOH dilewati. Authz upload/mapping: `supervisor|admin` modul `integration` ATAU `finance`; lainnya view-only.
+- **Input HPP**: upload xlsx finance — format baru `SKU | Produk | HPP/Pcs` (header by-nama, posisi bebas) ATAU format lama 2 kolom (SKU di-resolve dari nama sekali saat upload; sisanya legacy by-nama). Baris berawalan CONTOH dilewati. Plus **CRUD satuan manual** dari UI (`POST/PUT/DELETE /profit/costs[/:id]`, `source: manual`). Authz upload/mapping/CRUD: `supervisor|admin` modul `integration` ATAU `finance`; lainnya view-only.
 - **Seed mapping 2 fase**: fase 1 dari master `items` (komponen bundle + qty); fase 2 match SKU liar (tak terdaftar master) ke nama HPP finance via normalisasi/token (auto kalau kandidat tunggal, `suggestions` kalau ganda — indikasi bundle).
 - **Transparansi data bolong**: response bawa `pending_income_items` (order COMPLETED belum settle), `unmapped_skus`, flag `missing_hpp` — tidak ada angka diam-diam.
 - **Filter**: all / per account (credential TikTok Shop → resolve authorized shops) / per toko (`shop_id`) / per produk / per SKU (iklan level SKU = prorata share revenue, granularitas asli GMV Max per item_id).

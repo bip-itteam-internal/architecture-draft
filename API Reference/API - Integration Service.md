@@ -77,13 +77,14 @@
 
 ## Profit (Gross Profit per Product)
 
-> ⚠️ Working branch `feat/gross-profit`, belum merge/deploy.
+> ⚠️ Working branch `feat/gross-profit` (sudah di-push ke origin), belum merge/deploy.
 
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/profit/products?start&end&shop_id&account_id&product_name&sku` | Laba Sejati per produk (roll-up SKU + `bundles` + `breakdown` GMV/promo/fee/net-settlement/retur + `estimated_share`) + flags `unmapped_skus`/`missing_hpp`; `account_id` = credential TikTok Shop |
 | POST | `/profit/costs/upload` | Upload xlsx HPP finance (multipart `file` + `effective_from`; **supervisor|admin modul integration/finance**) |
 | GET | `/profit/costs?product_name=` | List HPP (riwayat per `effective_from`) |
+| POST/PUT/DELETE | `/profit/costs` · `/profit/costs/:id` | CRUD HPP satuan manual dari UI (tambah/edit/hapus 1 baris; **supervisor|admin modul integration/finance**) |
 | GET/POST/PUT | `/profit/mappings` | List/simpan mapping SKU↔item_id↔produk (mutasi **supervisor|admin modul integration/finance**) |
 | POST | `/profit/mappings/seed` | Generate mapping 2 fase: master `items` (bundle+qty) + match SKU liar ke nama HPP finance (auto/saran); laporan created/skipped/auto_named/suggestions (**supervisor|admin modul integration/finance**) |
 | DELETE | `/profit/mappings/:id` | Hapus mapping (**supervisor|admin modul integration/finance**) |
