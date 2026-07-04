@@ -37,6 +37,7 @@
 - `/public/feedback` → notification-service
 - `/public/guestbook` → attendance-service
 - `/public/recruitment/apply` → recruitment-service (pelamar mendaftar sendiri tanpa JWT)
+- `/public/recruitment/postings` & `/public/recruitment/postings/:id` → recruitment-service (portal karir: daftar & detail lowongan Open + pertanyaan aplikasi, tanpa JWT)
 - `/ext/fingerprint/*` → mesin fingerprint eksternal (X105:4370, X609:4371, dipilih dari serial) + attendance-service
 - `/ext/tiktok-shop/callback` & `/ext/tiktok-shop/webhook` → tiktok-shop service
 - `/ext/webhook/:service` → integration-service
