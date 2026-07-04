@@ -81,11 +81,11 @@
 
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/profit/products?start&end&shop_id&account_id&product_name&sku` | Profit per produk (roll-up SKU) + flags `pending_income_items`/`unmapped_skus`/`missing_hpp`; `account_id` = credential TikTok Shop |
+| GET | `/profit/products?start&end&shop_id&account_id&product_name&sku` | Laba Sejati per produk (roll-up SKU + `bundles` + `breakdown` GMV/promo/fee/net-settlement/retur + `estimated_share`) + flags `unmapped_skus`/`missing_hpp`; `account_id` = credential TikTok Shop |
 | POST | `/profit/costs/upload` | Upload xlsx HPP finance (multipart `file` + `effective_from`; **supervisor|admin modul integration/finance**) |
 | GET | `/profit/costs?product_name=` | List HPP (riwayat per `effective_from`) |
 | GET/POST/PUT | `/profit/mappings` | List/simpan mapping SKU↔item_id↔produk (mutasi **supervisor|admin modul integration/finance**) |
-| POST | `/profit/mappings/seed` | Generate mapping otomatis dari master `items` (komponen bundle + qty) + riwayat order (item_id TikTok); laporan created/skipped/unmatched (**supervisor|admin modul integration/finance**) |
+| POST | `/profit/mappings/seed` | Generate mapping 2 fase: master `items` (bundle+qty) + match SKU liar ke nama HPP finance (auto/saran); laporan created/skipped/auto_named/suggestions (**supervisor|admin modul integration/finance**) |
 | DELETE | `/profit/mappings/:id` | Hapus mapping (**supervisor|admin modul integration/finance**) |
 
 ## Marketing Teams (admin) · Worker/Jobs
