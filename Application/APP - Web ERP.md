@@ -2,7 +2,7 @@
 
 *`hris-dashboard` ("One Bharata") adalah portal web internal ERP/HRIS terpadu Bharata Group — dashboard berbasis role untuk mengelola HR, attendance, finance/insentif, integrasi marketplace, IT, dan GA. Selain itu, web ini juga berperan sebagai **SSO Identity Provider** untuk aplikasi lain (mis. Task Manager).*
 
-- **Stack**: Next.js 16 (App Router) + React 19 + TypeScript; shadcn/ui + Radix + Tailwind v4; TanStack Query + axios; react-hook-form + zod; recharts (grafik); leaflet (peta lokasi absensi); `@uiw/react-md-editor` (article)
+- **Stack**: Next.js 16 (App Router) + React 19 + TypeScript; shadcn/ui + Radix + Tailwind v4; TanStack Query + axios; react-hook-form + zod; recharts (grafik); leaflet (peta lokasi absensi); `@uiw/react-md-editor` (article); **react-i18next** (i18n dua bahasa → [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]])
 - **Path**: `erp-frontend` (repo `erp-frontend`), branch `feature/sso-task-manager-menu`
 - **Status**: ✅ Implemented (aktif dikembangkan)
 
@@ -43,6 +43,8 @@
 
 **Lain** — Secretary / Manufacture / Quality / Procurement (KPI saja), Beauty_hacks / Kyura (link eksternal Ideamiils + KPI)
 
+**Internasionalisasi (i18n)** — dukungan dua bahasa **Indonesia (default) / English** via `react-i18next` (`src/i18n/`); switcher di header (samping tema), pilihan disimpan cookie `lang` (dibaca SSR). Rollout **bertahap**; sudah: HRIS Ulang Tahun, KPI, Announcements. Aturan lengkap: [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
+
 ## Belum Diimplementasikan / Catatan
 
 - **`/integration/inventories` = STUB** (data `MOCK_INVENTORIES` hardcoded; inventory asli ada di module GA)
@@ -68,3 +70,4 @@
 - [[Finance - Incentive]]
 - [[Finance - Bridging App]]
 - [[GA - Inventory Management]]
+- [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
