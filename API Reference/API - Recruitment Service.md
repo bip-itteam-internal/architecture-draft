@@ -1,8 +1,8 @@
 ## Deskripsi
 
-*Endpoint **recruitment-service** (ATS Fase 1-3). Gateway: `/api/recruitment/*`. RBAC `system_roles["hris"]`. Grounded ke `services/recruitment/routes.go` (branch `feat/recruitment-service`).*
+*Endpoint **recruitment-service** (ATS Fase 1-3 + adopsi struktur ERPGo Fase A–E). Gateway: `/api/recruitment/*` (auth) & `/public/recruitment/*` (publik, tanpa JWT). RBAC `system_roles["hris"]`. Grounded ke `services/recruitment/routes.go` (branch `feat/recruitment-service`).*
 
-- **Implementasi**: [[Microservices - Recruitment Service]] · **Status**: ⚠️ BE Fase 1-3 (branch, belum merge)
+- **Implementasi**: [[Microservices - Recruitment Service]] · **Status**: ⚠️ BE Fase 1-3 + master/form-builder ERPGo (A–E) + upload berkas & portal browse (branch, belum merge)
 - **Indeks**: [[API - Index]] · Role: `isSupervisor` (ajukan), `isHR`/`isHRSupervisor` (kelola/review), `isApprover` (Direktur/Secretary).
 
 ## Sistem
@@ -34,6 +34,7 @@
 | POST/GET | `/candidates` · `/candidates/:id` | Input/list (`?posting_id=&progress=&status=`)/detail | HR |
 | PUT | `/candidates/:id` · `/advance` · `/reject` · `/withdraw` | Edit / gerak tahap (maju) / tolak / undur | HR |
 | POST/GET | `/candidates/:id/cv` · `/cv/preview` | Upload/preview CV (MinIO) | HR |
+| POST/GET | `/candidates/:id/profile-image[/preview]` · `/cover-letter[/preview]` | Upload/preview foto profil & cover letter (MinIO) | HR |
 
 ## Stages & Offer
 | Method | Path | Fungsi | Role |
@@ -41,9 +42,24 @@
 | POST | `/candidates/:id/screening` · `/interviews` · `/technical-test` · `/background-check` · `/psychotest` | Catat tiap tahap | HR |
 | GET | `/candidates/:id/stages` | Timeline tahap kandidat | HR |
 | POST | `/candidates/:id/offer` | Terbitkan offer (→ Offering) | HR supervisor |
+| POST | `/candidates/:id/offer/letter` | Unggah surat penawaran PDF (MinIO) + email kandidat | HR supervisor |
 | POST | `/candidates/:id/offer/accept` · `/offer/decline` | Respon offer | HR |
 | POST | `/candidates/:id/hire` | Hire → onboarding handoff ke employee `/onboarding/register` | approver |
 | GET | `/audits` | Audit log keputusan | HR admin |
 
+## Master & Form Builder (adopsi ERPGo)
+| Method | Path | Fungsi | Role |
+|---|---|---|---|
+| CRUD | `/masters/job-types` · `/masters/candidate-sources` · `/masters/interview-types` | Lookup (list/create/update/delete) | HR |
+| CRUD | `/locations` | Master lokasi kerja | HR |
+| CRUD | `/questions` | Bank pertanyaan aplikasi (form builder, 7 tipe) | HR |
+
+## Publik (tanpa JWT — via gateway `/public/recruitment/*`)
+| Method | Path (gateway) | Fungsi |
+|---|---|---|
+| GET | `/public/recruitment/postings` | Daftar lowongan Open (featured dulu) |
+| GET | `/public/recruitment/postings/:id` | Detail lowongan + `application_questions` di-expand (render form) |
+| POST | `/public/recruitment/apply` | Pelamar mendaftar sendiri (email wajib; `custom_answers` tervalidasi) |
+
 ## Dokumen Terkait
-- [[Microservices - Recruitment Service]] · [[HRIS - Recruitment]] · [[Microservices - Employee Service]] · [[API - Index]]
+- [[Microservices - Recruitment Service]] · [[HRIS - Recruitment]] · [[Microservices - Employee Service]] · [[CORE - API Master Gateway]] · [[API - Index]]
