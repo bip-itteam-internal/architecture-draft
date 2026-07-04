@@ -110,12 +110,16 @@
 
 > ⚠️ Bagian ini ada di **working branch `feat/gross-profit` yang BELUM di-merge/deploy**. Ubah marker ke ✅ setelah merge. Spec: `bip-erp` sibling `docs/superpowers/specs/2026-07-03-gross-profit-submodule-design.md`.
 
-Rumus per produk/SKU (TikTok): `gross_profit = revenue − iklan − fee_marketplace − HPP`.
+Rumus per produk/SKU (TikTok) — **"Laba Sejati"** (blueprint dashboard marketing):
+`GMV − biaya marketplace (breakdown) − promo = NET SETTLEMENT`, lalu `NET SETTLEMENT − HPP − iklan = LABA KONTRIBUSI` (retur = kolom informasi).
 
-- **Sumber komponen**: revenue = `transaction_orders.items[].total` (order non-cancelled); iklan = GMV Max report `metrics.cost` per `dimensions.item_id` (`Income.TotalAdvertisingCost` sengaja DI-EXCLUDE dari fee — anti dobel hitung); fee = prorata `(TotalServiceFee + TotalAffiliateCommissionFee)` per share revenue item, hanya order `income_status=fetched`; HPP = koleksi `product_costs`.
+- **Sumber komponen**: settlement per-SKU dari `tt_shop_transaction_by_orders` (GMV `subtotal_before_discount`, promo `seller_discount`, fee breakdown komisi/affiliate/proses/ongkir, retur refund, `settlement_amount`; identitas kolom eksak, residual di `other`) — join `sku_id→seller_sku` via `tt_shop_orders.line_items` (per-order → kamus global → fallback); qty & bucket bulanan dari `transaction_orders`; iklan = GMV Max `metrics.cost` per `dimensions.item_group_id` (= ID produk; `item_id` = level kreatif — verified) dengan split prorata revenue untuk listing multi-claim; HPP = `product_costs` per BULAN order (`effective_from` bulanan, bucket `%Y-%m` WIB).
+- **Estimasi order belum settle**: rate komponen/GMV agregat per bulan dari data settled → komponen order pending diestimasi; `estimated_share` dilaporkan per baris & agregat (transparansi, terganti otomatis saat settlement masuk).
+- **Bundle**: SKU multi-komponen dialokasikan ke produk komponen dengan rasio nilai HPP (revenue/fee/net di-share; HPP exact per komponen; qty = qty_bundle × qty_per_unit); daftar `bundles` terpisah di response sebagai view informasi (overlap dengan products, jangan dijumlah).
 - **Koleksi baru (integration_db)**: `product_costs` (HPP per produk, riwayat per `effective_from`, `source: upload|accurate` — siap sync Accurate fase berikut) + `product_sku_mappings` (kunci unik `(sku, tiktok_item_id, product_name)`; 1 SKU boleh multi-baris: multi-toko per item_id & bundle per komponen dengan `qty_per_unit`; HPP dihitung sekali per komponen distinct).
 - **Arsitektur hitung**: aggregate on-read (pipeline Mongo + fungsi murni `AssembleProductProfit` di usecase, unit-tested) — tanpa ETL/snapshot baru.
 - **Input HPP**: upload xlsx format finance (sheet per brand-group, kolom `Produk` + `HPP/Pcs`; parser tolak format angka ambigu). Authz upload/mapping: header `system_roles` role `supervisor|admin` modul `integration` ATAU `finance` (selaras RequireIntegrationAdmin & RequireFinanceSupervisor); lainnya view-only.
+- **Seed mapping 2 fase**: fase 1 dari master `items` (komponen bundle + qty); fase 2 match SKU liar (tak terdaftar master) ke nama HPP finance via normalisasi/token (auto kalau kandidat tunggal, `suggestions` kalau ganda — indikasi bundle).
 - **Transparansi data bolong**: response bawa `pending_income_items` (order COMPLETED belum settle), `unmapped_skus`, flag `missing_hpp` — tidak ada angka diam-diam.
 - **Filter**: all / per account (credential TikTok Shop → resolve authorized shops) / per toko (`shop_id`) / per produk / per SKU (iklan level SKU = prorata share revenue, granularitas asli GMV Max per item_id).
 - Konsumen: [[APP - Web ERP]] halaman `/integration/gross-profit`. Rute lengkap: [[API - Integration Service]].
