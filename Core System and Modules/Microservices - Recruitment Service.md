@@ -39,7 +39,8 @@
 
 > Detail field per collection ada di [[HRIS - Recruitment]] (hindari duplikasi).
 
-- `job_requisition` · `job_posting` · `candidate` (+`progress`/`status`) · `screening_result` · `interview` · `technical_test_result` · `psychotest` · `psychotest_result` · `background_check` · `offer`
+- **Backbone internal:** `job_requisition` · `job_posting` · `candidate` (+`progress`/`status`) · `screening_result` · `interview` · `technical_test_result` · `psychotest` · `psychotest_result` · `background_check` · `offer`
+- **Adopsi ERPGo (✅ Fase A–E):** `job_type` · `candidate_source` · `interview_type` · `job_location` · `custom_question` (master); `job_posting` & `candidate` diperkaya (lihat increment di bawah).
 
 ## Belum Diimplementasikan / Catatan
 
@@ -94,6 +95,29 @@
 - **Service:** `POST /apply` (tanpa JWT/RBAC; tetap di belakang gateway key). `email` **wajib**; `posting_id` opsional (bila diisi → lowongan harus **ada & Open**). Service yang mengontrol field internal (`status=Applied`, `progress=CV Screening`, dll) — kiriman klien untuk itu diabaikan. Sukses → email "lamaran diterima" + respons minimal (`candidate_id`).
 - **Gateway:** `POST /public/recruitment/apply` (grup `/public`, **rate-limited**) → forward ke recruitment `/apply` — lihat [[CORE - API Master Gateway]].
 - HR tetap pakai `POST /candidates` (JWT + role isHR). Keduanya menghasilkan record kandidat yang sama.
+
+## Increment: Adopsi Struktur ERPGo (Data — Fase A–E ✅)
+
+> Ditambah 2026-07-03 di branch `feat/recruitment-service` (6 commit, `go build`/`vet`/`test` hijau, auto-push). Mengadopsi struktur data modul Recruitment **ERPGo SaaS (WorkDo)** secara **hybrid**: backbone internal kita (requisition+approval, pipeline `Progress`/`Status`, stage records, offer, onboarding handoff) **dipertahankan**; entity front-of-funnel & form-builder ERPGo **ditambahkan**. Referensi antar-service = **string ID** (bukan objectId), tanpa tenant-scope (`created_by`=`employee_id` audit), uang `float64`.
+
+**Master baru (role `isHR`):**
+- `job_type` · `candidate_source` · `interview_type` — lookup identik (`Lookup`: name, description, is_active). Endpoint `/masters/{job-types,candidate-sources,interview-types}`.
+- `job_location` — lokasi kerja (name, remote_work, address, city/state/country/postal_code [**string**, jaga leading zero], status). Endpoint `/locations`.
+- `custom_question` — form builder aplikasi: question, `type` (Text/Textarea/Select/Radio/Checkbox/Date/Number), `options` (wajib utk tipe pilihan), is_required, is_active, sort_order. Endpoint `/questions`.
+
+**`job_posting` diperkaya:** title, job_type_id, location_id, branch, job_application, career_portal_url, number_of_positions, priority (Low/Medium/High), min/max_experience, min/max_salary, application_deadline, is_featured, toggle `ask_gender`/`ask_date_of_birth`/`ask_country` & `show_profile_image`/`show_resume`/`show_cover_letter`, required_skills[], description/requirements/benefits/terms_condition (HTML), show_terms_on_form, `application_questions[]` (m2m ke `custom_question`). Keberadaan job_type/location/questions dicek saat create/update. Kontrak `PUT /postings/:id` = **full-replace** (kirim form lengkap).
+
+**`candidate` diperkaya:** source_id, country, `custom_answers[]` (jawaban `application_questions`), profile_image_object & cover_letter_object (MinIO), + opsional expected/current_salary, notice_period, portfolio_url, linkedin_url, education. Validasi baru: pertanyaan **wajib** per-lowongan harus terjawab + field kondisional (`ask_*`) — diwire ke `POST /candidates` (HR) & `POST /apply` (publik).
+
+**Deviasi tercatat vs skema ERPGo:** tanpa `created_by` tenant-scope; FK antar-service = string; funnel tetap enum `Progress`/`Status` (bukan `job_stages` master); `candidate_assessments` **di-skip** (sudah ada `technical_test_result`+`psychotest`).
+
+**Increment lanjut (✅ gap A):** endpoint **upload/preview** `profile-image` & `cover-letter` kandidat (MinIO, pola CV) — menutup field yang tadinya yatim; **portal karir publik** `GET /public/postings` (daftar Open) & `GET /public/postings/:id` (detail + `application_questions` di-expand ke `custom_question` aktif) — dipublish gateway `/public/recruitment/postings*`, melengkapi `/apply` agar form publik bisa render pertanyaan. Detail endpoint: [[API - Recruitment Service]].
+
+**Increment (✅ Fase F — interview rounds+feedback):** `interview_round` (per lowongan: name, sequence, status active/inactive — CRUD `/postings/:id/rounds` & `/rounds/:id`); `interview_feedback` (per sesi: rating 1-5 technical/communication/cultural_fit, `recommendation` Strong Hire..Strong No Hire, strengths/weaknesses/comments — `POST`/`GET /interviews/:id/feedback`); `interview` diperkaya (interview_type_id, interviewers[] employee_id, meeting_link, duration_minutes, scheduled_time). + backlog: `GET /:id` get-single master/location/question; `validateAgainstPosting` juga di `PUT /candidates/:id`.
+
+**Increment (✅ tracking status lamaran):** `candidate.tracking_token` (crypto/rand 32-hex — **bukan `_id`** agar tak bisa dienumerasi) di-set saat create/apply; endpoint publik `GET /public/track/:token` (gateway `/public/recruitment/track/:token`) → tampilan **curated** (nama/posisi/tanggal + progress & status label ramah + stepper), tanpa skor/catatan internal. Email "lamaran diterima" +tombol **Lihat Status Lamaran** (base env `CAREER_PORTAL_URL`); respons `/apply` kembalikan `tracking_token` + `track_url`. Label penolakan dilembutkan ("Belum Sesuai") — apakah status ditampilkan ke kandidat = keputusan HRD terbuka ([[HRIS - Recruitment]]).
+
+**Belum (menyusul, Fase G–I):** onboarding checklist; offer letter template; recruitment/career settings.
 
 ## Dokumen Terkait
 

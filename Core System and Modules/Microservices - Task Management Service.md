@@ -49,7 +49,9 @@
 - `GET /report/sla` — rate on-time response & resolution (overall + per divisi, dengan rentang tanggal).
 
 ### Lain-lain
-- **Attachments** — upload ke MinIO, allowlist MIME, cap 25MB, presigned URL untuk preview.
+- **Attachments** — upload ke MinIO, allowlist MIME, cap 25MB, presigned URL untuk preview. Dua jalur:
+	- **Upload First (temp)** — `POST /uploads/temp` (multipart field `files`, boleh banyak; auth `FlexibleAuthMultipart` = form field `api_key`+`employee_id` **atau** JWT) menyimpan file sementara dan mengembalikan `id` per file. Diklaim saat create task lewat body `attachment_ids[]` pada `POST /tasks` (`ClaimTempUploads`). Kelola: `GET /uploads/temp` (list milik user), `GET /uploads/temp/:id` (info), `GET /uploads/temp/:id/preview`, `DELETE /uploads/temp/:id`. Batas **20 file/user**, TTL **24 jam** (auto-cleanup job) bila tidak diklaim.
+	- **Upload ke task existing** — `POST /tasks/:id/files` (multipart field `files`) untuk lampiran susulan pada task yang sudah ada.
 - **Comments** & **Checklist** — kolaborasi pada task.
 - **Notifications** — `GET /notifications`, `/unread-count`, `PUT /read-all`, `/:id/read`, `DELETE /:id`. Fan-out ke Mongo + WebSocket live + FCM/inbox via notification-service.
 - **Users/departments** — data dari ERP untuk dropdown.
