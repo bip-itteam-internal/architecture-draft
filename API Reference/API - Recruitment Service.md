@@ -47,12 +47,19 @@
 | POST | `/candidates/:id/hire` | Hire → onboarding handoff ke employee `/onboarding/register` | approver |
 | GET | `/audits` | Audit log keputusan | HR admin |
 
+## Interview Rounds & Feedback (Fase F — adopsi ERPGo)
+| Method | Path | Fungsi | Role |
+|---|---|---|---|
+| POST/GET | `/postings/:id/rounds` | Definisi/daftar babak interview per lowongan | HR |
+| PUT/DELETE | `/rounds/:id` | Ubah / hapus babak | HR |
+| POST/GET | `/interviews/:id/feedback` | Kirim/lihat penilaian terstruktur (rating 1-5 + recommendation) | HR |
+
 ## Master & Form Builder (adopsi ERPGo)
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
-| CRUD | `/masters/job-types` · `/masters/candidate-sources` · `/masters/interview-types` | Lookup (list/create/update/delete) | HR |
-| CRUD | `/locations` | Master lokasi kerja | HR |
-| CRUD | `/questions` | Bank pertanyaan aplikasi (form builder, 7 tipe) | HR |
+| CRUD | `/masters/job-types` · `/masters/candidate-sources` · `/masters/interview-types` | Lookup (list/get/create/update/delete) | HR |
+| CRUD | `/locations` | Master lokasi kerja (list/get/create/update/delete) | HR |
+| CRUD | `/questions` | Bank pertanyaan aplikasi (form builder, 7 tipe; list/get/create/update/delete) | HR |
 
 ## Publik (tanpa JWT — via gateway `/public/recruitment/*`)
 | Method | Path (gateway) | Fungsi |
