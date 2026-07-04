@@ -47,6 +47,7 @@
 | GET | `/affiliate/summary/creators` | Agregat per creator (GMV desc): order, konten, GMV, komisi |
 | GET | `/affiliate/summary/products` | Agregat per produk: order, qty, GMV, komisi |
 | GET | `/affiliate/summary/validation` | Breakdown validasi komisi vs finance statement (per status: VALIDATED/DISCREPANCY/NO_STATEMENT/PENDING) |
+| GET | `/affiliate/summary/sync-history` | Aktivitas pipeline: sync/validasi terakhir, total order, 10 batch tarikan terakhir (per jam WIB) |
 
 > Sumber = koleksi `affiliate_orders` (di-sync cron 8-jam via Search Seller Affiliate Orders API). Lihat [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]].
 
