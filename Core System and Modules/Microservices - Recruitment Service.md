@@ -113,6 +113,8 @@
 
 **Increment lanjut (✅ gap A):** endpoint **upload/preview** `profile-image` & `cover-letter` kandidat (MinIO, pola CV) — menutup field yang tadinya yatim; **portal karir publik** `GET /public/postings` (daftar Open) & `GET /public/postings/:id` (detail + `application_questions` di-expand ke `custom_question` aktif) — dipublish gateway `/public/recruitment/postings*`, melengkapi `/apply` agar form publik bisa render pertanyaan. Detail endpoint: [[API - Recruitment Service]].
 
+**Increment (✅ tracking status lamaran):** `candidate.tracking_token` (crypto/rand 32-hex — **bukan `_id`** agar tak bisa dienumerasi) di-set saat create/apply; endpoint publik `GET /public/track/:token` (gateway `/public/recruitment/track/:token`) → tampilan **curated** (nama/posisi/tanggal + progress & status label ramah + stepper), tanpa skor/catatan internal. Email "lamaran diterima" +tombol **Lihat Status Lamaran** (base env `CAREER_PORTAL_URL`); respons `/apply` kembalikan `tracking_token` + `track_url`. Label penolakan dilembutkan ("Belum Sesuai") — apakah status ditampilkan ke kandidat = keputusan HRD terbuka ([[HRIS - Recruitment]]).
+
 **Belum (menyusul, Fase F–I):** interview rounds+feedback; onboarding checklist; offer letter template; recruitment/career settings; `GET /:id` master/location/question; validasi custom-answer saat `PUT /candidates/:id`.
 
 ## Dokumen Terkait
