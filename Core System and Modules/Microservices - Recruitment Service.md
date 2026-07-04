@@ -113,9 +113,11 @@
 
 **Increment lanjut (✅ gap A):** endpoint **upload/preview** `profile-image` & `cover-letter` kandidat (MinIO, pola CV) — menutup field yang tadinya yatim; **portal karir publik** `GET /public/postings` (daftar Open) & `GET /public/postings/:id` (detail + `application_questions` di-expand ke `custom_question` aktif) — dipublish gateway `/public/recruitment/postings*`, melengkapi `/apply` agar form publik bisa render pertanyaan. Detail endpoint: [[API - Recruitment Service]].
 
+**Increment (✅ Fase F — interview rounds+feedback):** `interview_round` (per lowongan: name, sequence, status active/inactive — CRUD `/postings/:id/rounds` & `/rounds/:id`); `interview_feedback` (per sesi: rating 1-5 technical/communication/cultural_fit, `recommendation` Strong Hire..Strong No Hire, strengths/weaknesses/comments — `POST`/`GET /interviews/:id/feedback`); `interview` diperkaya (interview_type_id, interviewers[] employee_id, meeting_link, duration_minutes, scheduled_time). + backlog: `GET /:id` get-single master/location/question; `validateAgainstPosting` juga di `PUT /candidates/:id`.
+
 **Increment (✅ tracking status lamaran):** `candidate.tracking_token` (crypto/rand 32-hex — **bukan `_id`** agar tak bisa dienumerasi) di-set saat create/apply; endpoint publik `GET /public/track/:token` (gateway `/public/recruitment/track/:token`) → tampilan **curated** (nama/posisi/tanggal + progress & status label ramah + stepper), tanpa skor/catatan internal. Email "lamaran diterima" +tombol **Lihat Status Lamaran** (base env `CAREER_PORTAL_URL`); respons `/apply` kembalikan `tracking_token` + `track_url`. Label penolakan dilembutkan ("Belum Sesuai") — apakah status ditampilkan ke kandidat = keputusan HRD terbuka ([[HRIS - Recruitment]]).
 
-**Belum (menyusul, Fase F–I):** interview rounds+feedback; onboarding checklist; offer letter template; recruitment/career settings; `GET /:id` master/location/question; validasi custom-answer saat `PUT /candidates/:id`.
+**Belum (menyusul, Fase G–I):** onboarding checklist; offer letter template; recruitment/career settings.
 
 ## Dokumen Terkait
 
