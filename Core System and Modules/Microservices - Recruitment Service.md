@@ -111,7 +111,9 @@
 
 **Deviasi tercatat vs skema ERPGo:** tanpa `created_by` tenant-scope; FK antar-service = string; funnel tetap enum `Progress`/`Status` (bukan `job_stages` master); `candidate_assessments` **di-skip** (sudah ada `technical_test_result`+`psychotest`).
 
-**Belum (menyusul, Fase F–I):** endpoint upload profile_image/cover_letter; interview rounds+feedback; onboarding checklist; offer letter template; recruitment/career settings; validasi custom-answer saat `PUT /candidates/:id`.
+**Increment lanjut (✅ gap A):** endpoint **upload/preview** `profile-image` & `cover-letter` kandidat (MinIO, pola CV) — menutup field yang tadinya yatim; **portal karir publik** `GET /public/postings` (daftar Open) & `GET /public/postings/:id` (detail + `application_questions` di-expand ke `custom_question` aktif) — dipublish gateway `/public/recruitment/postings*`, melengkapi `/apply` agar form publik bisa render pertanyaan. Detail endpoint: [[API - Recruitment Service]].
+
+**Belum (menyusul, Fase F–I):** interview rounds+feedback; onboarding checklist; offer letter template; recruitment/career settings; `GET /:id` master/location/question; validasi custom-answer saat `PUT /candidates/:id`.
 
 ## Dokumen Terkait
 
