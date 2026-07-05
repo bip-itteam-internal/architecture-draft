@@ -31,6 +31,18 @@
 - `/sync/master-data` — sinkronisasi master data
 - Accounts: CRUD
 
+### Meta Ads
+
+> 🟡 **Bagian ini KONSEP/RENCANA — belum ada kode.** Ditulis untuk grounding rencana implementasi client Meta Marketing API (pola ads/reporting seperti TikTok Business/Ads di atas, **bukan** pola order-sync Shopee/TikTok Shop). Update marker ke ✅ per sub-bagian begitu client Meta Ads nyata di-merge. Detail teknis di bawah bersumber dari dokumentasi publik Meta for Developers (`developers.facebook.com`) per Juli 2026 — **bukan dari kode BIP** — jadi wajib diverifikasi ulang sebelum implementasi (API vendor bisa berubah).
+
+- **Kondisi saat ini**: `TIDAK ada client Meta Ads` di backend `services/integration`. Konsepnya sudah eksis di sisi lain: FE Finance/Incentive (`erp-frontend`) punya role `adv_meta`, `PLATFORMS = ["tiktok", "shopee", "meta"]`, setting "Meta Ads PPN (%)", dan Master Integration (mapping employee↔platform/campaign) — tapi semua **manual entry**, bukan API sync. [[Finance - Incentive]] §Arsitektur & Sumber Data eksplisit hanya menyebut `[[Sales - GMV Creative]]`/Dashboard TikTok sebagai sumber "Jumlah konversi" — Meta **tidak** disebut sebagai sumber otomatis sama sekali, konsisten dengan skema "ADV META DAN MARKETPLACE SHOPEE" di dokumen yang sama yang juga tidak punya jalur data otomatis.
+- **Rencana App/Auth**: buat app tipe **Business** di Meta for Developers → hubungkan ke **Business Manager** Bharata → buat **System User** di Business Manager → assign ad account + permission (`ads_read` minimal, `ads_management` bila perlu tulis, `business_management` untuk kelola aset) → generate token System User (**tidak expired**, beda dari token user biasa yang cuma 60 hari). **App Review hanya perlu bila akses ad account di luar Business Manager Bharata sendiri** — untuk kebutuhan internal saat ini kemungkinan tidak perlu App Review sama sekali (lebih sederhana dari OAuth per-shop Shopee/TikTok). Detail langkah operasional: [[RUN - Onboarding Meta Ads]].
+- **Kredensial**: rencana reuse entity generik `PlatformToken`/`Credential` yang sudah ada — komentar kode entity saat ini baru sebut "tiktokshop, shopee, lazada, ..." (belum sebut "meta" eksplisit, perlu ditambah saat implementasi) — **bukan** entity baru dari nol.
+- **Data pull**: `GET /act_{ad_account_id}/insights` (fields `campaign_name`, `impressions`, `clicks`, `spend`, `actions`, `cost_per_action_type`) — pola mirip `/report/integrated` TikTok Business/Ads (laporan/reporting), **BUKAN** order sync. Tidak ada order/transaksi dari Meta, jadi **tidak** menyentuh `TransactionChannel`/`transaction_orders` sama sekali (beda dari Shopee/TikTok Shop/rencana Lazada sebelumnya).
+- **Konsumen data**: `Microservices - Insentive Service` (skor KPI/konversi/CPA untuk skema insentif ADV Meta, lihat [[Finance - Incentive]]) — bukan model transaksi terpadu. Rekomendasi pola alur: Integration Service tarik data Insights dulu (satu pintu, konsisten pola TikTok GMV-Max) → baru dikonsumsi Insentif Service, alih-alih Insentif Service manggil Meta API langsung.
+- **Rate limit**: mekanisme Meta berbasis tier akses (header `X-FB-Ads-Insights-Throttle`, `app_id_util_pct`/`acc_id_util_pct`), beda dari window-reset Shopee/Lazada. Tetap rekomendasikan pacing/circuit-breaker serupa pola ketahanan Shopee (lihat §Observability & Ketahanan Shopee di bawah) begitu jumlah ad account bertambah.
+- **Open question (belum diputuskan)**: apakah data Insights Meta Ads perlu disimpan sebagai koleksi tersendiri di Integration Service (mirror `affiliate_orders`) sebelum dikonsumsi Insentif Service, atau cukup pass-through tanpa persist? Perlu keputusan eksplisit sebelum implementasi, bukan asumsi dokumen ini.
+
 ### TikTok Shop
 - OAuth: `/auth` (+ callback), `/authorized-shops`
 - Orders: list/detail, direct, sync
@@ -49,19 +61,6 @@
 - Products / Items
 - GMS Analytics: item & campaign performance (+ sync + summary)
 - Accounts: CRUD
-
-### Lazada
-
-> 🟡 **Bagian ini KONSEP/RENCANA — belum ada kode.** Ditulis untuk grounding rencana implementasi integrasi langsung (bukan sekadar jalur [[External - Desty]] yang sudah ada). Update marker ke ✅ per sub-bagian begitu client Lazada nyata di-merge. Detail teknis di bawah bersumber dari dokumentasi publik Lazada Open Platform (`open.lazada.com`) per Juli 2026 — **bukan dari kode BIP** — jadi wajib diverifikasi ulang sebelum implementasi (API vendor bisa berubah).
-
-- **Kondisi saat ini**: `TIDAK ada client Lazada` di kode — satu-satunya jejak adalah `strings.Contains(platform, "lazada")` di cron auto-approve yang **sudah disabled** (`internal/cmd/cron.go`), dan Lazada di-auto-approve **generik** lewat Desty `POST /api/order/accept` (lihat [[External - Desty]]). Order Lazada tidak masuk model transaksi terpadu (`transaction_orders`).
-- **Rencana OAuth/App**: daftar app di Lazada Open Platform (tipe *Seller In-house APP*) → dapat App Key + App Secret → otorisasi per-seller (Seller ID + country) → authorize URL `https://auth.lazada.com/oauth/authorize?response_type=code&force_auth=true&redirect_uri=...&client_id={appkey}` → tukar `code` jadi `access_token`/`refresh_token` via `/auth/token/create` (param `app_key`, `timestamp`, `sign_method`, `code`, `sign`; sign = HMAC-SHA256 atas string param, hex uppercase). Pola ini sejajar `shopee_handler.go` (`Auth`/`AuthCallback`) dan `tiktok_shop_handler.go` — bukan konsep baru. Detail langkah operasional: [[RUN - Onboarding Lazada Open Platform]].
-- **Kredensial**: rencana reuse entity generik yang sudah ada dan sudah eksplisit menyebut Lazada di komentar kode — `PlatformToken` (koleksi `platform_tokens`, `_id = "{platform}_{storeID}"`) dan/atau `Credential` (koleksi `credentials`) — **bukan** entity baru dari nol.
-- **Order sync**: rencana dua jalur seperti Shopee/TikTok Shop — polling/cron (mirror endpoint `/orders/sync`, memetakan `GetOrders`/`GetOrderItems` Lazada) **dan** webhook native `POST /webhooks/services/lazada` (konstanta `WebhookPlatformLazada = "LAZADA"` sudah ada di `entity/webhook.go` tapi belum dipakai) dengan processor baru di registry `(platform, source)` — pola identik `desty_shopee.go`/`shopee_push.go`.
-- **Model data**: perlu tambah `TransactionChannelLazada = "LAZADA"` di `entity/transaction.go` **dan** masukkan ke `TransactionChannelList` (allow-list yang divalidasi handler) — preseden persis: `TransactionChannelTokopedia` sudah didefinisikan tapi sengaja dibiarkan **dormant** (tidak masuk `TransactionChannelList`) sampai clientnya nyata.
-- **Rate limit**: Lazada Open Platform membatasi QPS per-seller (indikasi ~10 QPS pada salah satu endpoint publik) dan memblokir sementara saat terlampaui. **Rekomendasi eksplisit**: terapkan pola ketahanan Shopee sejak awal (distributed lock refresh-token per-shop, circuit breaker saat kena limit — lihat §Observability & Ketahanan Shopee di atas) alih-alih menyusulkan setelah insiden, mengacu preseden [[LOG - Shopee API Rate Limit Request]].
-- **Frontend**: `TransactionPlatform` & lookup sejenis di `erp-frontend` (`frontend/src/features/integration/**`) saat ini hardcode `"SHOPEE"`/`"TIKTOK"` di ≥12 file — bukan pola seragam: sebagian union type (`types/transactions.ts`, `teams/types.ts`, dll.), sebagian `Record<string,...>` lookup (label/ikon), sebagian literal fallback default. Dua di antaranya (`accurate-transaction/components/log-detail-table-section.tsx`, `transaction-detail-table-section.tsx`) malah punya bug pre-existing terpisah — `PLATFORM_ICON` di sana **belum** punya key SHOPEE sama sekali, jadi perlu dibenahi lebih dulu sebelum menambah LAZADA. Semua titik ini perlu entry Lazada + ikon baru saat integrasi jalan sampai FE. Lihat [[APP - Web ERP]].
-- **Open question (belum diputuskan)**: apakah client native ini **menggantikan** jalur Desty untuk Lazada, atau **dual-run** (Desty tetap auto-approve, client native menambah data granular ke `transaction_orders`)? Perlu keputusan eksplisit sebelum implementasi, bukan asumsi dokumen ini.
 
 ### Transactions (model terpadu)
 - `/transactions/orders/list`, summary (+ shops / + products), `/transactions/orders/:id`
@@ -106,6 +105,25 @@
 - Redis queue digunakan untuk task summary-report
 - Optimasi concurrency: global semaphore + sequential processing untuk mitigasi rate limit API marketplace
 
+### Gross Profit per Product (modul profit)
+
+> ⚠️ Bagian ini ada di **working branch `feat/gross-profit` (sudah di-push ke origin) yang BELUM di-merge/deploy**. Ubah marker ke ✅ setelah merge. Deploy note: drop index unik lama `sku_1_tiktok_item_id_1_product_name_1` di `product_sku_mappings` (index baru menambah `master_sku`). Spec: `bip-erp` sibling `docs/superpowers/specs/2026-07-03-gross-profit-submodule-design.md`.
+
+Rumus per produk/SKU (TikTok) — **"Laba Sejati"** (blueprint dashboard marketing):
+`GMV − biaya marketplace (breakdown) − promo = NET SETTLEMENT`, lalu `NET SETTLEMENT − HPP − iklan = LABA KONTRIBUSI` (retur = kolom informasi).
+
+- **Sumber komponen**: settlement per-SKU dari `tt_shop_transaction_by_orders` (GMV `subtotal_before_discount`, promo `seller_discount`, fee breakdown komisi/affiliate/proses/ongkir, retur refund, `settlement_amount`; identitas kolom eksak, residual di `other`) — join `sku_id→seller_sku` via `tt_shop_orders.line_items` (per-order → kamus global → fallback); qty & bucket bulanan dari `transaction_orders`; iklan = GMV Max `metrics.cost` per `dimensions.item_group_id` (= ID produk; `item_id` = level kreatif — verified) dengan split prorata revenue untuk listing multi-claim; HPP = `product_costs` per BULAN order (`effective_from` bulanan, bucket `%Y-%m` WIB).
+- **Estimasi order belum settle**: rate komponen/GMV agregat per bulan dari data settled → komponen order pending diestimasi; `estimated_share` dilaporkan per baris & agregat (transparansi, terganti otomatis saat settlement masuk).
+- **Bundle**: SKU multi-komponen dialokasikan ke produk komponen dengan rasio nilai HPP (revenue/fee/net di-share; HPP exact per komponen; qty = qty_bundle × qty_per_unit); daftar `bundles` terpisah di response sebagai view informasi (overlap dengan products, jangan dijumlah).
+- **Koleksi baru (integration_db)**: `product_costs` (HPP per produk, riwayat per `effective_from`, `source: upload|accurate` — siap sync Accurate fase berikut) + `product_sku_mappings` (kunci unik `(sku, tiktok_item_id, product_name)`; 1 SKU boleh multi-baris: multi-toko per item_id & bundle per komponen dengan `qty_per_unit`; HPP dihitung sekali per komponen distinct).
+- **Arsitektur hitung**: aggregate on-read (pipeline Mongo + fungsi murni `AssembleProductProfit` di usecase, unit-tested) — tanpa ETL/snapshot baru.
+- **Identitas produk = SKU master** (mis. `PJB-002`): HPP, roll-up produk, dan dedup komponen di-join per `master_sku`; NAMA hanya alias/tampilan (case-insensitive, boleh berubah antar upload — yang tampil nama dari HPP terbaru). Baris mapping per product listing: `master_sku` sama = alias (HPP sekali), beda = komponen bundle. Terminologi: **Product Listing** = teks SKU penjual di order; **SKU** = SKU master.
+- **Input HPP**: upload xlsx finance — format baru `SKU | Produk | HPP/Pcs` (header by-nama, posisi bebas) ATAU format lama 2 kolom (SKU di-resolve dari nama sekali saat upload; sisanya legacy by-nama). Baris berawalan CONTOH dilewati. Plus **CRUD satuan manual** dari UI (`POST/PUT/DELETE /profit/costs[/:id]`, `source: manual`). Authz upload/mapping/CRUD: `supervisor|admin` modul `integration` ATAU `finance`; lainnya view-only.
+- **Seed mapping 2 fase**: fase 1 dari master `items` (komponen bundle + qty); fase 2 match SKU liar (tak terdaftar master) ke nama HPP finance via normalisasi/token (auto kalau kandidat tunggal, `suggestions` kalau ganda — indikasi bundle).
+- **Transparansi data bolong**: response bawa `pending_income_items` (order COMPLETED belum settle), `unmapped_skus`, flag `missing_hpp` — tidak ada angka diam-diam.
+- **Filter**: all / per account (credential TikTok Shop → resolve authorized shops) / per toko (`shop_id`) / per produk / per SKU (iklan level SKU = prorata share revenue, granularitas asli GMV Max per item_id).
+- Konsumen: [[APP - Web ERP]] halaman `/integration/gross-profit`. Rute lengkap: [[API - Integration Service]].
+
 ### Observability & Ketahanan Shopee
 
 > ⚠️ Bagian ini ada di **working branch yang BELUM di-merge/deploy** (prod masih menjalankan kode lama). Didokumentasikan agar tidak hilang; ubah marker ke ✅ setelah merge.
@@ -121,14 +139,15 @@
 - Route direct-push Accurate (`/transactions/summary/create|send|status`) handler-nya sudah **LENGKAP**, tetapi route-nya **DI-COMMENT** — digantikan alur summary-report `/send/:service`.
 - Route webhook Desty langsung (`/webhook/desty`, `/webhooks/desty`) **di-comment** — digantikan `/webhooks/services/desty`.
 - CronManager lama **fully disabled** — fungsinya dipindah ke worker framework.
-- **Lazada** hanya disebut di kode cron yang sudah disabled — **TIDAK ada client Lazada** (placeholder/partial). Rencana integrasi langsung: lihat §Lazada di atas.
+- **Lazada** hanya disebut di kode cron yang sudah disabled — **TIDAK ada client Lazada** (placeholder/partial).
+- **Meta Ads** — **TIDAK ada client Meta Ads** di backend; konsepnya baru eksis sebagai role/setting manual di FE Finance/Incentive. Rencana integrasi: lihat §Meta Ads di atas.
 - TODO kecil: indexing `time.Time`.
 
 ## Dependencies & Integrasi
 
 - [[CORE - API Master Gateway]] — entry point / routing ke service
 - [[External - Accurate]] — bridging finansial (Accurate Online, HMAC-signed): Sales Invoice / Sales Return
-- [[Microservices - Insentive Service]] — konsumen data iklan (laporan TikTok/Shopee)
+- [[Microservices - Insentive Service]] — konsumen data iklan (laporan TikTok/Shopee, + Meta Ads rencana)
 - [[Microservices - TikTok Shop Service]] — webhook landing
 - [[DB - Overview and Notes]] — MongoDB & Redis (queue prefix `srv:integration`)
 
@@ -137,7 +156,8 @@ External lain: TikTok Shop, TikTok Business/Ads, Shopee, [[External - Desty]] (m
 ## Dokumen Terkait
 
 - [[External - Desty]] — vendor middleware orkestrasi order (webhook + auto-approve)
-- [[RUN - Onboarding Lazada Open Platform]] — langkah operasional pembuatan akun/app Lazada (rencana)
+- [[RUN - Onboarding Meta Ads]] — langkah operasional pembuatan akun/app Meta Ads (rencana)
+- [[Finance - Incentive]] — konsumen data konversi/CPA Meta Ads untuk skema insentif ADV Meta
 - [[Sales - Marketplace Integration]] (konsep sisi marketing)
 - [[Finance - Bridging App]]
 - [[Sales - GMV Creative]]
