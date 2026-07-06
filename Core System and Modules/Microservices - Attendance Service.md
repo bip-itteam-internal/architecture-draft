@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Attendance Service menangani absensi karyawan secara end-to-end: clock-in/out multi-metode (mobile, fingerprint, website), resolusi serta rotasi jadwal kerja (static maupun shift/group rolling), leave request, guestbook tamu, manajemen hari libur, hingga laporan payroll dan absensi. Service ini menjadi sumber data kehadiran utama yang dikonsumsi oleh HRIS Orchestrator untuk perhitungan payroll dan pelaporan.*
+*Attendance Service menangani absensi karyawan secara end-to-end: clock-in/out multi-metode (mobile, fingerprint, website), resolusi serta rotasi jadwal kerja (static maupun shift/group rolling), leave request, perjalanan dinas, guestbook tamu, manajemen hari libur, hingga laporan payroll dan absensi. Service ini menjadi sumber data kehadiran utama yang dikonsumsi oleh HRIS Orchestrator untuk perhitungan payroll dan pelaporan.*
 
 - **Stack:** Go + Fiber v2 + MongoDB
 - **Path:** `services/attendance`
@@ -10,7 +10,7 @@
 
 **Health & Registry**
 - `GET /health` — health check service.
-- `GET /data-type/:dt` — registry data type: schedule-list, leave-type/subtype, holiday-type, attendance-status.
+- `GET /data-type/:dt` — registry data type: schedule-list, leave-type/subtype (dengan `?detail=true` → `max_range`/`format`/`paid`), holiday-type, attendance-status.
 - `GET /sync/company-work-schedules` — sinkronisasi definisi jadwal kerja perusahaan.
 
 **Networks (dipakai IT)**
@@ -22,7 +22,7 @@
 - `GET /internal/summary` — hitung jumlah clock-in/out dalam 24 jam.
 - `PATCH /:id/update` — edit entry absensi sekaligus lampirkan dokumen.
 - `GET /report` — laporan bulanan per karyawan (periode 26→26).
-- `GET /payroll-supplement` — agregasi jam kerja, telat, cuti, lembur, dan absen menjadi persentase payout.
+- `GET /payroll-supplement` — agregasi jam kerja, telat, cuti (dipotong), **izin dibayar** (bucket `paid_leave` = `AttendanceEntries.paid_leave_hour`; izin "urusan kantor" dihitung sebagai kerja, tidak menurunkan payout), lembur, dan absen menjadi `payout_pct`. Diproxy oleh Employee Service sbg `/api/employee/me/payroll-approx`.
 
 **Clock In/Out**
 - `POST /tap?method=` — clock-in/out multi-metode:
@@ -67,9 +67,16 @@
 **Attendance Correction (workflow)**
 - `POST /correction`, `GET /correction/mine`, `GET /correction`, `PATCH /correction/:id/review`, `PATCH /correction/:id/cancel` — koreksi clock-in/out yang terlewat dengan approval multi-level (routing per role); waktu diisi otomatis dari jadwal saat disetujui (`applyCorrectionToEntry`). Detail lengkap: [[HRIS - Attendance Correction]].
 
+**Business Trip / Perjalanan Dinas (workflow)** — collection `business_trip_request`
+- `POST /business-trip/create` — buat pengajuan perjalanan dinas (multipart + upload dokumen opsional); generate nomor dokumen `<seq>/HRD/PERJADIN/<bulan-romawi>/<tahun>` (counter atomik per-tahun, collection `business_trip_counter`); reviewer **Atasan Langsung → HRD**.
+- `GET /business-trip/view?as=reviewer|reviewed` — lihat pengajuan sebagai pengaju / reviewer.
+- `PATCH /business-trip/review` — approve/reject SPV/HRD (HRD tak boleh menyetujui pengajuannya sendiri); saat disetujui HRD → status kehadiran rentang tanggal = `Dinas` (`applyApprovedBusinessTripToAttendance` + pre-alokasi cron untuk future-dated).
+- `PATCH /business-trip/cancel` — batalkan pengajuan pending milik sendiri.
+- Anggaran (transport PP/akomodasi/uang saku) = **estimasi**, tanpa integrasi Finance. Detail lengkap: [[HRIS - Perjalanan Dinas]].
+
 **Cron & Seeding**
-- Tiap 30 menit: pra-generate entry absensi dari rotasi jadwal (perhitungkan cuti & **tukar jadwal** disetujui — swap kedua sisi via `WorkTimeFor`) + flip status pending→alpha.
-- Per jam: auto-ignore **leave + koreksi presensi + tukar jadwal** basi (>24 jam) + **reminder reviewer T+18j** (koreksi, leave & tukar jadwal) + sinkronisasi jadwal.
+- Tiap 30 menit: pra-generate entry absensi dari rotasi jadwal (perhitungkan cuti, **tukar jadwal** disetujui — swap kedua sisi via `WorkTimeFor` — & **perjalanan dinas** disetujui → status `Dinas`) + flip status pending→alpha.
+- Per jam: auto-ignore **leave + koreksi presensi + tukar jadwal + perjalanan dinas** basi (>24 jam) + **reminder reviewer T+18j** (koreksi, leave, tukar jadwal & perjalanan dinas) + sinkronisasi jadwal.
 - Saat startup: seed ulang `company_work_schedule` (~40 definisi shift), `company_group_rotation`, dan `company_wifi` (~50 access point kantor).
 
 ## Belum Diimplementasikan / Catatan
@@ -80,7 +87,7 @@
 
 ## Dependencies & Integrasi
 
-- **MongoDB** — database independen, collections: `attendance_entries`, `work_schedule`, `company_work_schedule`, `company_group_rotation`, `company_wifi`, `company_holiday`, `fingerprint_export`, `guestbook`, `leave_request`, `schedule_exchange_request`, `attendance_correction_request`. Lihat [[DB - Overview and Notes]].
+- **MongoDB** — database independen, collections: `attendance_entries`, `work_schedule`, `company_work_schedule`, `company_group_rotation`, `company_wifi`, `company_holiday`, `fingerprint_export`, `guestbook`, `leave_request`, `schedule_exchange_request`, `attendance_correction_request`, `business_trip_request`, `business_trip_counter`. Lihat [[DB - Overview and Notes]].
 - [[Microservices - Employee Service]] — endpoint `/list` (data karyawan) dan `/vacation/decrement` (decrement kuota cuti).
 - [[Microservices - File Service]] — upload dokumen pendukung leave request.
 - [[Microservices - Notification Service]] — pengiriman notifikasi FCM (guestbook, review leave request).
@@ -94,6 +101,7 @@
 - [[HRIS - Leave Request]]
 - [[HRIS - Tukar Jadwal Kerja]]
 - [[HRIS - Attendance Correction]]
+- [[HRIS - Perjalanan Dinas]]
 - [[HRIS - Payroll]]
 - [[APP - MyBharata]]
 - [[IT - Background Jobs & Schedulers]] — cron service ini (pre-alokasi entry tiap 30 mnt, auto-ignore request basi tiap jam)

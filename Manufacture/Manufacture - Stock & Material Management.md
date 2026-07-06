@@ -26,17 +26,17 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 
 ## Model Data
 
-`manufacture-service` punya database sendiri (`manufacture_db`). **Koleksi nyata di kode** (prefix `manufacture_`, lihat [[Microservices - Manufacture Service]]): `manufacture_master_bahan`, `manufacture_master_product`, `manufacture_stok` (snapshot), `manufacture_transaksi` (in/out — sumber kebenaran pergerakan), `manufacture_formula` (BOM), `manufacture_sync_log`, `manufacture_production_log`, `manufacture_material_order`, `manufacture_marketing_po`, `manufacture_procurement_po`, `manufacture_proposal`, `manufacture_audit_log`.
+`manufacture-service` punya database sendiri (`manufacture_db`). **Koleksi nyata di kode** (prefix `manufacture_`, lihat [[Microservices - Manufacture Service]]): `manufacture_master_bahan`, `manufacture_master_product`, `manufacture_stok` (snapshot), `manufacture_transaksi` (in/out — sumber kebenaran pergerakan), `manufacture_formula` (BOM), `manufacture_sync_log`, `manufacture_production_log`, `manufacture_material_order`, `manufacture_marketing_po`, `manufacture_procurement_po`, `manufacture_proposal`, `manufacture_audit_log`, `manufacture_resi` (master resi retur), `manufacture_saldo_awal_bulanan` (snapshot saldo awal per bulan — **data master barang terpisah dari saldo awal bulanan**; snapshot otomatis idempoten tiap awal bulan).
 
 **Desain to-be (belum semua di kode)** — penamaan konseptual:
 
 - `material` → terealisasi sbg `manufacture_master_bahan` + `manufacture_master_product`
-- `stock` → `manufacture_stok` (snapshot; **belum** per-gudang/lokasi)
+- `stock` → `manufacture_stok` (snapshot; **belum** per-gudang/lokasi — aproksimasi per-gudang via `GET /stok/sektor`: Utama = kode master bahan, Tinggar = kode master barang, Sadewa = net transaksi bergudang-simpan "sadewa")
 - `bom` → `manufacture_formula` (header + ingredients)
 - `production_plan` / `requirement` — target produksi + kebutuhan terhitung (+ override manual) — **TBD**
 - `shortage` — hasil perhitungan kekurangan (untuk pengadaan) — **TBD**
 - `stock_opname` — sesi opname + selisih + penyesuaian — **TBD**
-- `inbound` / `outbound` → sebagian via `manufacture_transaksi`; flow [[WH - Inbound (Receiving)]] / [[WH - Outbound (Sending)]] penuh **TBD**
+- `inbound` / `outbound` → via `manufacture_transaksi`; **rantai alur FE sudah tersambung & anti-duplikat**: keluar bahan (grup RM-OUT-BOM, stok tak boleh minus, deviasi fisik vs teori BOM → approval PPIC→SPV) → laporan hasil produksi (stok FG tercipta) → kirim produk (SJ IN TRANSIT) → input gudang FG (terima SJ → DELIVERED + gudang simpan) → masuk kembali sisa bahan (checklist per grup); flow [[WH - Inbound (Receiving)]] / [[WH - Outbound (Sending)]] penuh **TBD**
 - `warehouse` / `location` — multi-gudang + karantina — **TBD**
 
 ## Arsitektur & Integrasi
@@ -61,7 +61,7 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 
 - **Migrasi data spreadsheet** butuh cleanup: kode belum terstandar, KATEGORI tercampur (supplier/batch/produk), satuan tidak konsisten, dan **anomali nilai** (mis. MENTHOL CRYSTAL ±18,8 juta gram ≈ 76% total stok — perlu diverifikasi)
 - Konversi & konsistensi **satuan** (gram/kg vs pcs)
-- **Multi-gudang** vs gudang tunggal
+- **Multi-gudang** vs gudang tunggal — sementara: identitas gudang di level spreadsheet master (Utama = sheet bahan "GUDANG MANUFACTURE", Tinggar = sheet barang "GUDANG TINGGAR JAYA"; Elit = pemasok saja; Sadewa = titipan, dihitung dari transaksi); stok per-gudang sejati (ledger per lokasi) masih TBD
 - ~~Ownership sistem: PPIC vs Warehouse vs Manufacture~~ → **dok diletakkan di domain Manufacture** (ownership condong Manufacture; peran Warehouse/PPIC tetap terlibat di operasional)
 - Apakah stok **barang jadi** dikelola di sini atau di sisi Sales/distribusi
 

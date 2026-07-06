@@ -15,6 +15,7 @@
 - **Koneksi akun/toko marketplace** — OAuth TikTok Shop, Shopee, TikTok Business/Ads; kelola kredensial per toko
 - **Sinkronisasi order/penjualan** → model **transaksi terpadu** (unified) lintas marketplace
 - **Performa iklan/GMV** — laporan GMV Max (TikTok), GMS (Shopee); berkaitan dengan [[Sales - Dashboard]] (ads/omnichannel) & [[Sales - GMV Creative]]
+- **Integrasi Ads Platform (Meta)** 🟡 direncanakan (belum diimplementasikan) — beda sifat dari koneksi marketplace di atas: Meta Ads bukan channel order, melainkan sumber data konversi/CPA untuk skema insentif "ADV Meta" (lihat [[Finance - Incentive]]). Rencana teknis di [[Microservices - Integration Service]] §Meta Ads
 - **Bridge ke akuntansi** — ringkasan transaksi → **Accurate** (Sales Invoice/Return); lihat [[Finance - Bridging App]] & [[External - Accurate]]
 - **Webhook event order** — ingest via middleware [[External - Desty]]
 - **Marketing team + shop ACL** — kontrol akses toko per tim marketing
@@ -28,7 +29,7 @@
 
 ## Catatan
 
-- **Lazada** baru placeholder di kode (belum ada client) — lihat catatan di [[Microservices - Integration Service]]
+- **Meta Ads** 🟡 direncanakan — **bukan channel order/marketplace**, tapi didokumentasikan di sini (dokumen "Marketplace Integration") atas keputusan tim untuk konsolidasi referensi integrasi eksternal marketing, bukan karena kecocokan domain. Saat ini role `adv_meta`, setting PPN Meta Ads, dan Master Integration mapping employee↔campaign **sudah ada** di FE Finance/Incentive (`erp-frontend`) — tapi konversi/CPA masih dibaca **manual** dari dashboard akun pengiklan, belum API sync. Rencana integrasi via Meta Marketing API (System User token, Insights API) didokumentasikan di [[Microservices - Integration Service]] §Meta Ads; cara pembuatan akun/app di [[RUN - Onboarding Meta Ads]]. Konsumen datanya [[Finance - Incentive]] (skema insentif ADV Meta), bukan model transaksi terpadu.
 - Pembeda: integrasi ini untuk **order/penjualan & akuntansi marketplace**, berbeda dari [[Sales - TikTok Sentiment Pipeline]] (sentimen komentar kompetitor) dan [[Sales - Veo (Gemini) Implementation]] (produksi konten)
 ## Kendala
 
@@ -38,6 +39,8 @@
 
 - [[Microservices - Integration Service]] (implementasi)
 - [[Microservices - TikTok Shop Service]] (penerima callback/webhook TikTok)
+- [[RUN - Onboarding Meta Ads]] (rencana onboarding akun/app Meta Ads)
+- [[Finance - Incentive]] (konsumen data Meta Ads — skema insentif ADV Meta)
 - [[Finance - Bridging App]] · [[External - Accurate]]
 - [[Sales - Dashboard]] · [[Sales - GMV Creative]] · [[Sales - Incentive]]
 - [Referensi API Integration Service — docs-api-greget](https://docs-api-greget.vercel.app/)

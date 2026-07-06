@@ -2,7 +2,7 @@
 
 *Desain (to-be) subsistem **Recruitment** — mengelola **siklus depan karyawan**: dari kebutuhan posisi sampai jadi karyawan aktif. Memisahkan subsistem **Talent acquisition → Interview → On-boarding** yang sekarang menumpuk di [[HRIS - Analysis]] ke ruangnya sendiri.*
 
-- **Status**: 🟡 Desain / Direncanakan (**belum** diimplementasi di kode)
+- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–E) sudah live di [[Microservices - Recruitment Service]]; FE + Fase 4-5 (AI screening / psikotes online / portal publik) menyusul
 - **Target arsitektur**: microservice `recruitment-service` baru ([[Microservices - Recruitment Service]]) + modul web, dengan **rollout bertahap**
 - Titik singgung yang sudah ada di kode: `POST /onboarding/register` (aktivasi akun karyawan baru) di [[Microservices - Employee Service]] — menjadi handoff akhir recruitment
 
@@ -91,6 +91,13 @@
 - `background_check` — hasil **Background Check** (status, temuan/catatan, waktu)
 - `offer` — penawaran (kandidat, detail, status accept/decline)
 
+**Master & form builder (adopsi ERPGo — ✅ Fase A–E; detail di [[Microservices - Recruitment Service]]):**
+- `job_type` / `candidate_source` / `interview_type` — lookup (name, is_active) untuk klasifikasi lowongan, sumber pelamar, jenis interview
+- `job_location` — master lokasi kerja (name, remote_work, alamat, city/state/country/postal_code, status); dipakai dropdown Location di `job_posting`
+- `custom_question` — bank pertanyaan aplikasi (question, type [Text/Textarea/Select/Radio/Checkbox/Date/Number], options, is_required, is_active, sort_order); dirakit ke `job_posting.application_questions`, jawaban kandidat di `candidate.custom_answers`
+- `job_posting` **diperkaya**: job_type/location/branch, number_of_positions, priority, min/max experience & salary, application_deadline, is_featured, toggle ask_*/show_*, required_skills, description/requirements/benefits/terms_condition (HTML), application_questions
+- `candidate` **diperkaya**: source_id, country, custom_answers, profile_image/cover_letter (MinIO), expected/current_salary, notice_period, portfolio_url, linkedin_url, education
+
 ## Arsitektur & Integrasi
 
 - **`recruitment-service`**: Go + Fiber v2 + MongoDB, di belakang [[CORE - API Master Gateway]], auth **SSO** (lihat [[CORE - SSO Flow]]), role HR/recruitment dari `system_roles`
@@ -148,11 +155,13 @@
 
 ## Rollout Bertahap
 
-- [ ] **Fase 1** — Job Requisition (approval **SPV → HR review → Direktur**) + Candidate management (data pelamar + status pipeline)
-- [ ] **Fase 2** — Sourcing & Job Posting + **Screening manual** + **Interview** (multi-tahap) + **Psikotes (manual oleh HR)**
-- [ ] **Fase 3** — Offer & Decision + **Onboarding handoff** (`/onboarding/register`) + **Notifikasi kandidat via Email** (bangun infra email dulu)
+- [x] **Fase 1** — Job Requisition (approval **SPV → HR review → Direktur**) + Candidate management (data pelamar + status pipeline) — ✅ BE
+- [x] **Fase 2** — Sourcing & Job Posting + **Screening manual** + **Interview** (multi-tahap) + **Psikotes (manual oleh HR)** — ✅ BE
+- [x] **Fase 3** — Offer & Decision + **Onboarding handoff** (`/onboarding/register`) + **Notifikasi kandidat via Email** (Resend) — ✅ BE
+- [x] **Fase A–E (adopsi ERPGo)** — master (job_type/candidate_source/interview_type/job_location) + form builder (custom_question) + enrich job_posting & candidate — ✅ BE (2026-07-03)
 - [ ] **Fase 4 (enhancement)** — **AI CV screening** (skor & rekomendasi, HR putuskan) + **WhatsApp** notifikasi kandidat
 - [ ] **Fase 5 (opsional)** — **portal self-apply publik** + **psikotes online** (test-engine + bank soal) + integrasi job board (mis. JobStreet)
+- [ ] **Fase F–I (adopsi ERPGo lanjut)** — interview rounds+feedback, onboarding checklist, offer letter template, career/recruitment settings
 
 ## Belum Diputuskan (TBD)
 

@@ -15,9 +15,18 @@ Ada 4 jenis (`LeaveType`) dengan subtipe & batas durasi (`max_range`, format har
 | Jenis | Subtipe (contoh) | Batas |
 |---|---|---|
 | **Sakit** | Ada surat keterangan dokter; Tanpa surat keterangan dokter | bebas (hari) |
-| **Izin** | Tidak masuk kerja (maks 2 hari); Meninggalkan pekerjaan sementara (maks 6 jam); Pulang cepat (hari sama) | hari/jam |
+| **Izin** | Tidak masuk kerja (maks 2 hari); Meninggalkan pekerjaan sementara — **urusan kantor** / **urusan pribadi** (maks 6 jam); Pulang cepat (hari sama) | hari/jam |
 | **Cuti** | Cuti tahunan (cek kuota); Pernikahan (5h); Pernikahan anak (3h); Melahirkan/keguguran (90h); Istri melahirkan/keguguran (3h); Pemakaman anggota keluarga (5h); Wisuda (1h); Pemakaman saudara kandung (1h); Sunat/baptis (2h); Panggilan instansi pemerintah; Bencana alam | per subtipe |
 | **Dinas** | Menghadiri rapat; Mengunjungi instansi; Seminar/khusus; Pemasaran/marketing program; Pembelian barang/jasa; Kegiatan sosial; Antar jemput | hari |
+
+### Izin Meninggalkan Pekerjaan: Kantor vs Pribadi (payroll)
+
+Izin **"Meninggalkan pekerjaan sementara"** dipecah dua subtipe, dibedakan atribut payroll `Paid` pada `LeaveSubtypeDetail` (keputusan HR 2026-06-26):
+
+- **urusan kantor** (`Paid: true`) → jam izin **dihitung sebagai kerja, tidak memotong** tunjangan/payout.
+- **urusan pribadi** (`Paid: false`) → jam izin **memotong** tunjangan kehadiran & uang makan (perilaku default, sama seperti subtipe izin lain).
+
+Jam izin kantor disimpan di `AttendanceEntries.paid_leave_hour` (terpisah dari `leave_hour`), dan `/payroll-supplement` menghitungnya sebagai kerja sehingga tidak menurunkan `payout_pct`. Detail lihat [[Microservices - Attendance Service]].
 
 ## Model Data
 

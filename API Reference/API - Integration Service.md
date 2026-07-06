@@ -16,7 +16,8 @@
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/transactions/orders/list` · `/orders/:id` · `/orders/summary[/shops|/products]` | Order terpadu + ringkasan |
-| GET | `/transactions/orders/summary/comparison` | Perbandingan omset hari ini vs kemarin per channel (total + 24 slot hourly, status TO_SHIP, aggregasi by `order_update_date`) |
+| GET | `/transactions/orders/summary/comparison` | Perbandingan performa 2 periode kustom: 4 metrik (TO_SHIP revenue, COMPLETED revenue, COMPLETED qty produk, COMPLETED order count) + granularity hourly/daily. Param: `start_date`, `end_date`, `comparison_start`, `comparison_end` (YYYY-MM-DD; default today vs yesterday), `channel` (opsional), `shop_id`, `timezone` |
+| GET | `/transactions/orders/dashboard/summary` | Jumlah order aktif saat ini (tanpa filter tanggal) per kategori kartu dashboard: `pesanan_baru` (TO_PROCESS), `siap_dikirim` (TO_SHIP), `belum_di_proses` (TO_PROCESS+TO_SHIP), `pesanan_selesai` (COMPLETED). Param: `channel` (opsional), `shop_id` (opsional) |
 | GET | `/transactions/master/shops` · `/channels` · `/status` | Master shop/channel/status |
 | GET/POST | `/transactions/summary/reports` (+ `/:id`, `/:id/items`, `/:id/invoices`, `/group-by-status`) | Laporan ringkasan (generate/list/detail) |
 | POST | `/transactions/summary/reports/:id/retry` · `/send/:service` · DELETE `/:id` | Retry/kirim/hapus laporan |
@@ -26,7 +27,7 @@
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/tiktok/shop/auth` · `/auth/callback` · `/authorized-shops` | OAuth + shop terotorisasi |
-| GET | `/tiktok/shop/orders/list[/direct]` · `/orders/detail[/direct]` · `/orders/sync` | Order (cache/direct/sync) |
+| GET | `/tiktok/shop/orders/list[/direct]` · `/orders/detail[/direct]` · `/orders/sync` | Order (cache/direct/sync). `/orders/detail` juga kembalikan `transaction_orders` = settlement per-order (Finance API `statement_transactions`, breakdown fee/ongkir/afiliasi/settlement per-SKU) |
 | GET | `/tiktok/shop/insight/gmv-winning-content` | Insight GMV |
 | GET | `/tiktok/shop/insight/creator-video-count` | Jumlah video per-creator per bulan (dari `tt_shop_video_performances`; sumber produksi ICC 125/bln). ⚠️ Baru, belum deploy |
 | GET/DELETE | `/tiktok/shop/accounts/list` · `/accounts/:id` | Akun TikTok Shop |
@@ -41,7 +42,17 @@
 | GET | `/tiktok/business/insight/icc-video-metrics` | Metrik per-video ICC (ctr/watch25/roas/orders/post_date/creator) untuk insentif ICC; agregasi GMV Max + join `campaign_items` + `tt_shop_video_performances`. ⚠️ Baru, belum deploy. Grounded: `ListICCVideoMetrics` |
 | GET | `/tiktok/business/sync/master-data` · `/accounts/list` · `/accounts/:id` (GET/POST/DELETE) | Sync & akun |
 
-> ⚠️ Akun TikTok Business punya field **`brand`** (mis. KYURA/BEAUTYHACKS): di-set via `POST /accounts/:id`, dikembalikan oleh `/accounts/list`; dipakai form integrasi insentif untuk pengelompokan akun (Brand → Account → Advertiser). Grounded: `tiktok_business_handler.go`. Sudah di kode, **belum deploy**.
+## Affiliate (TikTok Seller)
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/affiliate/orders` | List order affiliate (filter: `store_id`, `creator_username`, `product_id`, `order_status`, `validation_status`, `from`/`to` unix; paginated `page`/`per_page`) |
+| GET | `/affiliate/summary/totals` | KPI: GMV, komisi est/actual, jml order, jml creator |
+| GET | `/affiliate/summary/creators` | Agregat per creator (GMV desc): order, konten, GMV, komisi |
+| GET | `/affiliate/summary/products` | Agregat per produk: order, qty, GMV, komisi |
+| GET | `/affiliate/summary/validation` | Breakdown validasi komisi vs finance statement (per status: VALIDATED/DISCREPANCY/NO_STATEMENT/PENDING) |
+| GET | `/affiliate/summary/sync-history` | Aktivitas pipeline: sync/validasi terakhir, total order, 10 batch tarikan terakhir (per jam WIB) |
+
+> Sumber = koleksi `affiliate_orders` (di-sync cron 8-jam via Search Seller Affiliate Orders API). Lihat [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]].
 
 ## Shopee
 | Method | Path | Fungsi |
@@ -74,6 +85,22 @@
 | PATCH/DELETE | `/items/:id` | Update/hapus item |
 | POST | `/credentials` | Kredensial platform |
 | GET/POST/DELETE | `/holidays[/:id]` | Hari libur kalkulasi |
+
+## Profit (Gross Profit per Product)
+
+> ⚠️ Working branch `feat/gross-profit` (sudah di-push ke origin), belum merge/deploy.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/profit/products?start&end&shop_id&account_id&product_name&sku` | Laba Sejati per produk (roll-up SKU + `bundles` + `breakdown` GMV/promo/fee/net-settlement/retur + `estimated_share`) + flags `unmapped_skus`/`missing_hpp`; `account_id` = credential TikTok Shop |
+| POST | `/profit/costs/upload` | Upload xlsx HPP finance (multipart `file` + `effective_from`; **supervisor|admin modul integration/finance**) |
+| GET | `/profit/costs?product_name=` | List HPP (riwayat per `effective_from`) |
+| POST/PUT/DELETE | `/profit/costs` · `/profit/costs/:id` | CRUD HPP satuan manual dari UI (tambah/edit/hapus 1 baris; **supervisor|admin modul integration/finance**) |
+| GET/POST/PUT | `/profit/mappings` | List/simpan mapping SKU↔item_id↔produk (mutasi **supervisor|admin modul integration/finance**) |
+| POST | `/profit/mappings/seed` | Generate mapping 2 fase: master `items` (bundle+qty) + match SKU liar ke nama HPP finance (auto/saran); laporan created/skipped/auto_named/suggestions (**supervisor|admin modul integration/finance**) |
+| DELETE | `/profit/mappings/:id` | Hapus mapping (**supervisor|admin modul integration/finance**) |
+| POST/GET | `/profit/channel-map/upload` · `/profit/channel-map` | Upload kamus channel variation (export Master Product; sku_id→master SKU) · ringkas count (**upload: supervisor|admin integration/finance**) |
+| GET | `/profit/order-listings` | Daftar Product Listing dari riwayat order (sample_name, item_id_count, mapped) — sumber dropdown form mapping |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |

@@ -17,3 +17,4 @@ __ACTIVE_PROJECT__
 - JS/TS: pakai **pnpm**, bukan npm/yarn.
 - Grounded-in-code: jangan mengarang; yang belum ada tandai TBD.
 - Dokumentasi disinkronkan via `/sync-docs` (delegasi ke rulebook vault).
+- **i18n dua bahasa (`erp-frontend`)**: SEMUA teks user-facing **baru** WAJIB lewat `react-i18next` — `t("domain.key")`, key ditaruh di **dua** file `src/i18n/locales/id.ts` **dan** `en.ts`. **JANGAN hardcode** string yang tampil ke user. Default **Indonesia**; **istilah teknis lazim English biarkan English** di kedua locale (Dashboard, Export, KPI, Score, dll) — jangan dipaksa Indonesia. Tanggal/bulan/angka pakai `toLocaleDateString(intlLocale(lang))`, bukan hardcode `"id-ID"`. Aturan lengkap: **ADR 0010** di vault (`Decisions/ADR - 0010 Internasionalisasi (i18n) Dua Bahasa.md`).
