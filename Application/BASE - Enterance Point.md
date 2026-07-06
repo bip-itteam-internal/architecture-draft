@@ -19,6 +19,7 @@ Daftar portal ditampilkan di sisi kiri layar: judul module (HRIS, IT, dll) hanya
 
 **Sudah diimplementasikan**
 - Halaman login (`employee_id` + password) dengan handoff **SSO** (mint one-time code via `/auth/sso/ticket`)
+- Halaman login **dwibahasa (id/en)** via `react-i18next` (namespace `auth.login.*`) + **switcher bahasa di kartu login**; pesan error login **spesifik** (kredensial salah vs gangguan server vs masalah jaringan). Lihat [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
 - **Portal sidebar berbasis role**: module muncul sesuai `system_roles`; fitur per module bisa langsung diklik (HRIS, Finance, IT, GA, Integration, dll)
 - Dashboard: ringkasan kehadiran pribadi (clock in/out, overtime/telat/cuti), ringkasan karyawan, jadwal/shift
 - Lookup employee master data + informasi role sebagai dasar portal
