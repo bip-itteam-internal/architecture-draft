@@ -68,6 +68,7 @@
 - Products / Items
 - GMS Analytics: item & campaign performance (+ sync + summary)
 - Accounts: CRUD
+- **Filter Toko & Client-Side Aggregation (Shopee vs TikTok GMV Max)**: Berbeda dengan TikTok GMV Max yang mendukung filter `store_ids` (array opsional) untuk agregasi lintas-toko secara native di level server/MongoDB, seluruh endpoint Shopee GMS (`/shopee/gms/*`) dan Shopee Affiliate (`/shopee/affiliate/*`) **mewajibkan parameter `shop_id` tunggal** (`shop_id > 0`). Untuk mendukung fitur filter **"All Shop"** di frontend (ERP Web), aplikasi menggunakan strategi **Client-Side Aggregation**: frontend secara paralel mengeksekusi request (`Promise.all`) ke seluruh `shop_id` yang terotorisasi dan menggabungkan hasilnya secara live di browser. Strategi ini menghindari kompleksitas perombakan skema query `$match` dan kontrak interface di puluhan repositori backend yang berisiko memicu *silent bugs*.
 
 ### Transactions (model terpadu)
 - `/transactions/orders/list`, summary (+ shops / + products), `/transactions/orders/:id`

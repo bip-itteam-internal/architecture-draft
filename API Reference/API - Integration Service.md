@@ -69,6 +69,8 @@
 
 > **`/orders/sync`** (⚠️ baru, belum deploy): tarik order per toko, mendukung **histori panjang (~3 bulan)** via chunking otomatis ke window **≤15 hari** (batas `get_order_list`), satu circuit breaker per-run, **tanpa** gate proses-wide (app order ERP_SYSTEM `2032314` terpisah dari GMS `2032638`). Param: `shop_id` (wajib), `time_from`/`time_to` (unix) **atau** `days` (mis. `days=90`; maks **400 hari**). Rate-limit di tengah → **HTTP 200 partial** + ringkasan success-rate di body. Grounded: `shopee_handler.go` (`SyncOrders`). Detail: [[Microservices - Integration Service]].
 
+> **Catatan Filter Toko (All Shop)**: Semua endpoint Shopee GMS (`/shopee/gms/*`) dan Shopee Affiliate (`/shopee/affiliate/*`) **mewajibkan parameter `shop_id` tunggal** (`shop_id > 0`). Untuk fitur filter **"All Shop"** di aplikasi ERP Web, frontend melakukan **Client-Side Aggregation** (`Promise.all` ke semua toko terotorisasi lalu menggabungkan responsnya secara live di browser) karena backend tidak mendukung query multi-toko/agregasi tanpa `shop_id` secara native.
+
 ## Accurate (akuntansi)
 | Method | Path | Fungsi |
 |---|---|---|
