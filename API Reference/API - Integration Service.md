@@ -91,6 +91,7 @@
 | DELETE | `/profit/mappings/:id` | Hapus mapping (**supervisor|admin modul integration/finance**) |
 | POST/GET | `/profit/channel-map/upload` · `/profit/channel-map` | Upload kamus channel variation (export Master Product; sku_id→master SKU) · ringkas count (**upload: supervisor|admin integration/finance**) |
 | GET | `/profit/order-listings` | Daftar Product Listing dari riwayat order (sample_name, item_id_count, mapped) — sumber dropdown form mapping |
+| GET | `/profit/cash-flow?start&end&shop_id&account_id` | Arus dana: `summary` (Sudah Cair actual + Uang Gantung estimasi shrinkage per toko, `estimate_ok`) + `accuracy_30d` (track-record rumus, on-the-fly) + `rows` per toko×bulan (sort gantung desc) |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
