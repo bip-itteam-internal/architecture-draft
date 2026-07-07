@@ -4,7 +4,7 @@
 
 [Contoh dari sistem ini](https://drive.google.com/drive/folders/17RNDBtMwKCU_tuAiLZbwCgFp-xwwmzuz)
 
-- **Status**: ⚠️ **Fase 1 (Salary Setup & Config) sudah di kode** ([[Microservices - Payroll Service]]) — komponen gaji, config BPJS/pajak, assign gaji per karyawan. Komponen *supplement* dari attendance juga **✅ ada**. **Payroll run/kalkulasi + slip gaji = fase berikut.**
+- **Status**: ⚠️ **Fase 1 (Setup) + Fase 2 (Engine Payroll Run) sudah di kode** ([[Microservices - Payroll Service]]) — komponen gaji, config BPJS/pajak, assign gaji per karyawan, + **kalkulasi slip** (gross → BPJS → net; PPh21 = 0). Komponen *supplement* attendance dipakai untuk prorata Tunjangan Kehadiran. **Slip gaji (PDF) + PPh21 TER = fase berikut.**
 
 ## Sudah Diimplementasikan (komponen attendance)
 
@@ -58,9 +58,9 @@
 
 - [ ] DB - Attendance Data
 
-## Belum Diimplementasikan (kalkulasi & slip)
+## Belum Diimplementasikan (slip & pajak)
 
-Setup gaji, BPJS, dan pajak **sudah ada** ([[Microservices - Payroll Service]] Fase 1). **Belum di kode**: **engine payroll run** (kalkulasi BPJS/PPh21 TER, prorata Tunjangan Kehadiran via `payroll-supplement`, lembur), generate **payslip**, THR, dashboard, serta handoff/export → Accounting. Gaji/akuntansi final didelegasikan ke Accurate ([[ADR - 0001 Akuntansi via Accurate]]) — **batas scope payroll vs Accurate masih perlu diputuskan**.
+Setup gaji + **engine payroll run** (kalkulasi gross → BPJS → net; prorata Tunjangan Kehadiran via `payroll-supplement`; lembur) **sudah ada** ([[Microservices - Payroll Service]] Fase 1+2). **Belum di kode**: **PPh21 TER** (kini PPh21 = 0; engine = Fase 2b), generate **payslip** (PDF), THR, dashboard, serta handoff/export → Accounting. Gaji/akuntansi final didelegasikan ke Accurate ([[ADR - 0001 Akuntansi via Accurate]]) — **batas scope payroll vs Accurate masih perlu diputuskan**.
 
 ## Dokumen Terkait
 
