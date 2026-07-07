@@ -59,6 +59,7 @@
 |---|---|---|
 | GET | `/shopee/auth[/callback]` · `/shops/list` · `/products/items` | OAuth, shop, produk |
 | GET | `/shopee/orders/list` · `/orders/detail` · `/orders/sync` · `/orders/escrow/backfill` · `/v2/shopee/orders/list` | Order (v1/v2/sync **chunked ≤15 hari** + backfill escrow income) |
+| GET | `/shopee/returns/sync` · `/returns/list` | **Return/Refund ingestion** (chunked ≤15 hari, app ERP_SYSTEM) — tarik return via `get_return_list` → koleksi `shopee_returns` + sub-doc `order.return` (item **parsial** + tanggal proses + refund); `Partial` dari **kuantitas** (bukan uang). ⚠️ baru, tervalidasi live (15 return), belum deploy. Detail: [[Microservices - Integration Service]] |
 | GET | `/shopee/gms/item-performance[/sync|/summary]` · `/campaign-performance[/sync|/summary]` | Performa GMS |
 | GET/POST | `/shopee/affiliate/performance` · POST `/affiliate/sync` · `/affiliate/recommended` | Affiliate/AMS — per-affiliate performa (baca DB `shopee_affiliate_performance`, sales/order/komisi/ROI) + `sync` (backfill manual dari AMS) + rekomendasi (proxy, via app AMS) |
 | GET/POST | `/shopee/affiliate/conversions[/sync]` · `/affiliate/validations[/sync]` | **Affiliate v2 (AMS order-level)** ✅ live — ledger order+item (baca DB `shopee_affiliate_conversion`, `get_conversion_report`; `price`/komisi = **string desimal rupiah**) + tagihan komisi bulanan & rekonsiliasi (`shopee_affiliate_validation_bill`, `get_validation_list`/`get_validation_report` window placement **[M−2..M−1]**); `sync` = backfill background via notifier |
