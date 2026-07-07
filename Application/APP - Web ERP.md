@@ -26,6 +26,8 @@
 - Employee: CRUD penuh, filter/search, summary, export Excel, status registrasi myBharata, halaman detail
 - Attendance: tabel clock in/out + ikon metode + preview geolokasi (Leaflet), update manual, summary
 - Contract, Schedule (kalender + holiday CRUD), Vacation (kuota/terpakai/sisa), Report (bulanan + export Excel), Fingerprint (device management), Dashboard analitik, KPI
+- **Recruitment**: Job Requisitions + System Setup (master ATS) → [[Microservices - Recruitment Service]]
+- **Payroll**: halaman **"Pengaturan Gaji"** (System Setup — 5 tab: Komponen Gaji, Gaji Karyawan, BPJS, Pajak/PTKP, Perusahaan; reuse `SystemSetupLayout`) → [[Microservices - Payroll Service]] **Fase 1 (setup)**; kalkulasi/slip = fase berikut. ⚠️ *branch `feat/payroll-fe`, belum merge; butuh BE payroll-service ter-deploy di gateway untuk E2E*
 
 **KPI (shared)** — scoring per departemen + template CRUD + filter periode/status; HR lihat semua, supervisor hanya divisinya
 
@@ -45,7 +47,7 @@
 
 **Lain** — Secretary / Manufacture / Quality / Procurement (KPI saja), Beauty_hacks / Kyura (link eksternal Ideamiils + KPI)
 
-**Internasionalisasi (i18n)** — dukungan dua bahasa **Indonesia (default) / English** via `react-i18next` (`src/i18n/`); switcher di header (samping tema), pilihan disimpan cookie `lang` (dibaca SSR). Rollout **bertahap**; sudah: HRIS Ulang Tahun, KPI, Announcements. Aturan lengkap: [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
+**Internasionalisasi (i18n)** — dukungan dua bahasa **Indonesia (default) / English** via `react-i18next` (`src/i18n/`); switcher di header (samping tema), pilihan disimpan cookie `lang` (dibaca SSR). Rollout **bertahap**; sudah: HRIS Ulang Tahun, KPI, Announcements, Recruitment System Setup, Payroll Pengaturan Gaji (`hris.payroll.*`). Aturan lengkap: [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
 
 ## Belum Diimplementasikan / Catatan
 

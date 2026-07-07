@@ -31,7 +31,7 @@
 
 - **Engine payroll run** (kalkulasi gross → BPJS → PPh21 TER → net), **prorata Tunjangan Kehadiran** via attendance `payroll-supplement` (`payout_pct`), dan **Lembur** = **Fase 2**.
 - **Slip gaji** (PDF) = Fase 3. **THR & rekonsiliasi PPh21 tahunan** = Fase 4. **Dashboard + export Accurate** = Fase 5 ([[ADR - 0001 Akuntansi via Accurate]]).
-- **FE** "Pengaturan Gaji" (pola Recruitment System Setup) = menyusul.
+- **FE** "Pengaturan Gaji" (5 tab: Komponen Gaji, Gaji Karyawan, BPJS, Pajak/PTKP, Perusahaan) — **✅ Fase 1 ada** ([[APP - Web ERP]]; branch `feat/payroll-fe`, belum merge). Butuh service ini ter-deploy di gateway untuk E2E.
 - **Multi-company ditunda** (Fase 1 single-company) — kenyataan grup punya >1 entitas (mis. CV Pure Glow Lux, PT Bharata Internasional).
 - Validasi referensial (`component_id` / eksistensi `employee_id`) dilakukan di FE; assign gaji memakai role `isHR`.
 
