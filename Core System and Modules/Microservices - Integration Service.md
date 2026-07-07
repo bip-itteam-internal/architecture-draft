@@ -62,6 +62,25 @@
 - GMS Analytics: item & campaign performance (+ sync + summary)
 - Accounts: CRUD
 
+### KiriminAja
+
+> 🟡 **Bagian ini KONSEP/RENCANA — belum ada kode.** Ditulis untuk grounding rencana integrasi. **Beda kategori** dari section platform lain di atas: KiriminAja **bukan** channel order (seperti Shopee/TikTok Shop) atau ads (seperti TikTok Business/Meta Ads) — ini API agregator **shipping/logistics** (rate check, booking AWB, tracking, cetak label, webhook, pickup, COD), dipakai dari sisi Bharata untuk operasional pengiriman, bukan sumber data penjualan. Detail teknis di bawah bersumber dari dokumentasi publik KiriminAja Mitra API (`developer.kiriminaja.com`) per Juli 2026 — **bukan dari kode BIP** — jadi wajib diverifikasi ulang sebelum implementasi (API vendor bisa berubah). Cakupan fitur dikonfirmasi tim marketing (2026-07-05).
+
+- **Kondisi saat ini**: `TIDAK ada client KiriminAja` di kode — 0 referensi di seluruh `bip-erp`. Satu-satunya jejak historis ada di sistem Finance **lama** (Java, di luar lingkup dokumen ini) yang mencatat KiriminAja sebagai channel "Non-Marketplace" via Excel upload manual (kolom `Ekspedisi, Service, AWB, COD, Biaya COD, Pencairan COD, Ongkir` — bukan format order/produk seperti Shopee/TikTok/Lazada).
+- **Rencana Auth**: Bearer token API key. Registrasi via email `tech@kiriminaja.com` → proses partnership/approval → sandbox key (`https://tdev.kiriminaja.com`) via Sandbox Dashboard → UAT → transisi ke API key produksi (`https://client.kiriminaja.com`). Header: `Authorization: Bearer {api_key}`. Detail langkah operasional: [[RUN - Onboarding KiriminAja]].
+- **Catatan implementasi khusus**: KiriminAja punya **Go SDK resmi** (`github.com/kiriminaja/go`) — beda dari Shopee/TikTok/Meta Ads yang semua pakai client custom tulisan BIP sendiri. Rekomendasi: evaluasi pakai SDK resmi ini langsung di `services/integration`, bukan tulis ulang HTTP client dari nol seperti pola platform lain.
+- **Cakupan fitur** (dikonfirmasi tim marketing, semua jadi fitur utama — bukan sekunder):
+  - **Create Shipment** — booking pengiriman, generate AWB (nomor resi)
+  - **Cek Ongkir** — rate check lintas 15+ kurir (JNE, J&T, SiCepat, TIKI, Pos Indonesia, dll)
+  - **Tracking** — pelacakan status pengiriman real-time
+  - **Cetak Label** — cetak label pengiriman (bila tersedia di API)
+  - **Webhook** — pembaruan status pengiriman otomatis (bila tersedia; alternatif: polling)
+  - **Pickup Scheduling** — jadwal penjemputan kurir
+  - **Payment / COD Management** — proses pembayaran COD & non-COD, rekonsiliasi pencairan dana COD
+- **Sumber order — open question (belum diputuskan)**: fitur "Create Shipment" butuh detail order (alamat, berat, nilai barang, status COD/non-COD) sebagai input. Order marketplace di `transaction_orders` (Shopee/TikTok) **biasanya sudah** punya logistik built-in dari platform masing-masing. KiriminAja historisnya untuk channel **"Order Online"** (non-marketplace) — tapi **channel ini tidak punya entitas order sama sekali di `bip-erp`** (0 hasil pencarian "Order Online"/"order_online"). Perlu keputusan eksplisit: (a) bikin entitas order baru untuk "Order Online" dulu, atau (b) scope KiriminAja generik dulu sebagai utility (cek ongkir/booking/tracking dipanggil dari mana saja tanpa order-source built-in) — **bukan diasumsikan oleh dokumen ini**.
+- **Webhook**: rencana endpoint native baru `POST /webhooks/services/kiriminaja` (pola sama seperti `/webhooks/services/shopee`/`/tiktok`), processor baru di registry `(platform, source)` — pola identik `shopee_push.go`/`tiktok_direct.go`.
+- **Model data**: berbeda dari platform lain — KiriminAja **bukan sumber** `TransactionChannel` baru (tidak menambah entry ke `transaction_orders` sebagai channel order), melainkan **konsumen** yang membaca detail order yang sudah ada (dari channel manapun yang diputuskan di atas) untuk keperluan booking pengiriman + menulis balik status tracking.
+
 ### Transactions (model terpadu)
 - `/transactions/orders/list`, summary (+ shops / + products), `/transactions/orders/:id`
 - Master: `/master/shops`, `/master/channels`, `/master/status`
@@ -141,6 +160,7 @@ Rumus per produk/SKU (TikTok) — **"Laba Sejati"** (blueprint dashboard marketi
 - CronManager lama **fully disabled** — fungsinya dipindah ke worker framework.
 - **Lazada** hanya disebut di kode cron yang sudah disabled — **TIDAK ada client Lazada** (placeholder/partial).
 - **Meta Ads** — **TIDAK ada client Meta Ads** di backend; konsepnya baru eksis sebagai role/setting manual di FE Finance/Incentive. Rencana integrasi: lihat §Meta Ads di atas.
+- **KiriminAja** — **TIDAK ada client KiriminAja** sama sekali; 0 referensi di kode. Rencana integrasi (shipping/logistics API): lihat §KiriminAja di atas.
 - TODO kecil: indexing `time.Time`.
 
 ## Dependencies & Integrasi
@@ -157,6 +177,7 @@ External lain: TikTok Shop, TikTok Business/Ads, Shopee, [[External - Desty]] (m
 
 - [[External - Desty]] — vendor middleware orkestrasi order (webhook + auto-approve)
 - [[RUN - Onboarding Meta Ads]] — langkah operasional pembuatan akun/app Meta Ads (rencana)
+- [[RUN - Onboarding KiriminAja]] — langkah operasional partnership & API key KiriminAja (rencana)
 - [[Finance - Incentive]] — konsumen data konversi/CPA Meta Ads untuk skema insentif ADV Meta
 - [[Sales - Marketplace Integration]] (konsep sisi marketing)
 - [[Finance - Bridging App]]
