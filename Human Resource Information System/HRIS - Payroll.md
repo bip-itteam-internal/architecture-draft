@@ -10,7 +10,7 @@
 
 > Grounded: belum ada `payroll-service`/payroll penuh. Yang ada baru penyedia *supplement* berbasis kehadiran.
 
-- `GET /payroll-supplement` ([[Microservices - Attendance Service]]) — agregasi entry kehadiran **periode payroll 26 bln-lalu → 25 bln-ini**: `payout_pct = total_work_hours / expected_work_hours`, plus rincian jam (telat, cuti, lembur, absen) & hitung per status. Entry `Pending` dilewati dari kalkulasi payout.
+- `GET /payroll-supplement` ([[Microservices - Attendance Service]]) — agregasi entry kehadiran **periode payroll 26 bln-lalu → 25 bln-ini**: `payout_pct = total_work_hours / expected_work_hours`, plus rincian jam (telat, cuti, lembur, absen) & hitung per status. Entry `Pending` dilewati dari kalkulasi payout. **Status mana dibayar vs dipotong kini _configurable_** (master `payroll_status_treatment`; FE tab **"Perlakuan Kehadiran"** di Pengaturan Gaji). Default: Cuti/Sakit/Dinas/Libur = dibayar; Izin/Tanpa Keterangan = dipotong.
 - `GET /payroll-approx` ([[Microservices - Employee Service]]) — endpoint per-karyawan yang mem-proxy `payroll-supplement` (pakai `employee_id` dari header).
 - Konsumen: [[CORE - HRIS Orchestrator]] (sisi perhitungan payroll).
 
