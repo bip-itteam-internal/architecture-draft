@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Microservice **manufacture-service** — WMS manufaktur (warehouse/produksi): master bahan baku & produk, stok, transaksi in/out, formula/BOM, produksi, material order, PO marketing/procurement, proposal koreksi, dan audit log. Master di-sync dari **Google Sheets** (via service account); data operasional (transaksi, stok) **sumber kebenaran di MongoDB**. Implementasi nyata dari konsep [[Manufacture - Stock & Material Management]].*
+*Microservice **manufacture-service** — WMS manufaktur (warehouse/produksi): master bahan baku & produk, stok, transaksi in/out, formula/BOM, produksi, material order, PO marketing/procurement, proposal koreksi, dan audit log. Master (bahan, produk, formula) kini dikelola **native via web** (CRUD penuh); sync **Google Sheets** (via service account) menjadi **opsional untuk transisi**, bukan ketergantungan. Data operasional (transaksi, stok) **sumber kebenaran di MongoDB**. Implementasi nyata dari konsep [[Manufacture - Stock & Material Management]].*
 
 - **Stack**: Go + Fiber v2 + MongoDB (driver resmi) + shared-library; di belakang [[CORE - API Master Gateway]] (`/api/manufacture/*`), auth via header gateway (lihat [[CORE - SSO Flow]]).
 - **Path di repo**: `bip-erp/services/manufacture/` · models: `bip-erp/shared-library/models/manufacture/models.go` · FE modul: `erp-frontend/src/features/manufacture/`.
@@ -12,21 +12,21 @@
 
 Daftar rute lengkap di [[API - Manufacture Service]]. Ringkas:
 
-- **Master bahan & produk** — list/detail + `POST /sync` (tarik dari Google Sheet) + `PATCH status` (active/discontinued, dengan audit). **Master bahan** kini juga punya **CRUD manual** (`POST`/`PUT`/`DELETE /master-bahan[/:kode]`): item buatan WMS ditandai `source:"manual"` dan **dikecualikan dari stale-marking** saat sync (tidak hilang saat sync berikutnya).
+- **Master bahan & produk** — list/detail + `POST /sync` (tarik dari Google Sheet) + `PATCH status` (active/discontinued, dengan audit). **Master bahan _dan_ master produk** kini punya **CRUD manual** (`POST`/`PUT`/`DELETE /master-bahan|/master-product[/:kode]`): item buatan WMS ditandai `source:"manual"` dan **dikecualikan dari stale-marking** saat sync (tidak hilang saat sync berikutnya). Sync Sheet berperan sebagai **bulk import opsional (transisi)**, bukan satu-satunya sumber data.
 - **Stok** — snapshot per kode + `POST /stok/reconcile` (rekonsiliasi snapshot vs transaksi) + `GET /stok/sektor` (stok riil per gudang: utama/tinggar/sadewa, breakdown jenis barang → satuan; konsumen = card Status Sektor di Dashboard FE).
 - **Saldo awal bulanan** — `manufacture_saldo_awal_bulanan`: snapshot stok tiap awal bulan (terpisah dari master barang), dibuat otomatis oleh goroutine ticker (saat boot + tiap 6 jam, idempoten per bulan — service mati saat tanggal 1 terbackfill saat nyala) atau manual via `POST /saldo-awal/snapshot`.
 - **Transaksi** — INBOUND/OUTBOUND; mengubah stok **atomik** (Mongo transaction). Validasi kode menerima **master bahan baku ATAU produk jadi** (`master_product`) → transaksi barang jadi (FG in/out) tidak lagi ditolak. OUTBOUND dengan stok tidak cukup ditolak 422 (**stok tidak boleh minus**). `PATCH /transaksi/:id/status` mengubah `detail.status` (alur terima SJ Kirim Produk: IN TRANSIT → DELIVERED). Field UI tambahan (Qty QC, PIC, produk jadi, formula, dll) disimpan apa adanya di field fleksibel `detail`.
-- **Formula/BOM** — CRUD + `POST /formula/sync` (tarik resep dari Sheet via service account).
+- **Formula/BOM** — CRUD penuh (create/update/delete, termasuk `PUT /formula/:id`) + `POST /formula/sync` (tarik resep dari Sheet via service account, opsional).
 - **Produksi** — order produksi (konsumsi stok) + production-log (catatan tanpa konsumsi).
 - **PO & Proposal** — marketing-po, procurement-po (status workflow + audit), proposal approve/reject. Proposal dipakai untuk **deviasi pemakaian fisik vs teori BOM** pada keluar-produksi: FE membuat proposal `PENDING_PPIC` (transaksi belum ada), approval dua tahap PPIC → SPV; saat `APPLIED` backend insert transaksi + potong stok dengan filter kondisional `stok_sekarang >= qty` (ditolak 409 bila akan minus).
-- **Audit log** — `GET /audit-log` (siapa mengubah apa, per aksi/target).
+- **Audit log** — `GET /audit-log` (siapa mengubah apa, per aksi/target) + `GET /audit-log/rekap?bulan=YYYY-MM` (agregasi aktivitas CRUD per user untuk **KPI otomatis**; batas hari/bulan pakai **WIB (UTC+7)**, respons ber-flag `truncated` bila entri bulan >20k).
 
 ## Model Data (`manufacture_db`)
 
 14 collection (prefix `manufacture_`), grounded ke `models.go`:
 
 - `manufacture_master_bahan` — master bahan baku (`_id`=kode, nama, kategori, satuan, min_stok, stok_awal dari Sheet, status app-managed, `source` `sheet`/`manual`).
-- `manufacture_master_product` — master produk/bahan kemas (kode, jenis_barang, kategori_produk, status).
+- `manufacture_master_product` — master produk/bahan kemas (kode, jenis_barang, kategori_produk, status, `source` `sheet`/`manual`, `stale`).
 - `manufacture_stok` — snapshot stok per kode.
 - `manufacture_transaksi` — transaksi in/out (sumber kebenaran pergerakan stok) + `detail` (bson.M, field UI tambahan).
 - `manufacture_formula` — resep/BOM (product_name + ingredients[kode_bahan, nama, qty_needed]). Catatan: `product_sku` kosong dari sync Sheet → pencocokan FE via **nama produk**.
@@ -43,12 +43,12 @@ Daftar rute lengkap di [[API - Manufacture Service]]. Ringkas:
 - **Tagged logging** `[Manufacture <Event>]` untuk identifikasi di monitoring Docker.
 - **Audit log** merekam user login terakhir yang mengubah data di tab mana pun (header gateway).
 - **Field `detail` (bson.M) sebagai blob fleksibel**: model Go inti (transaksi, production-log, procurement-po) minimal, sedangkan UI punya banyak field tambahan (QC, PIC, checklist, daftar bahan). Field tersebut disimpan apa adanya di `detail` agar log/ledger/arsip tetap utuh setelah reload — tanpa menambah kolom per-field di model.
-- **Item master manual kebal sync**: master-bahan buatan WMS (`source:"manual"`) dikecualikan dari penandaan `stale` saat `SyncMaster`, jadi tidak terhapus oleh sync Google Sheet.
+- **Item master manual kebal sync**: master-bahan **dan master-product** buatan WMS (`source:"manual"`) dikecualikan dari penandaan `stale` saat `SyncMaster`/`SyncMasterProduct`, jadi tidak terhapus oleh sync Google Sheet. Ini menopang transisi menuju **CRUD native** (sync Sheet jadi opsional, target: tidak lagi bergantung pada Sheet setelah transisi penuh).
 - **Mapping gudang = per-spreadsheet** (tidak ada kolom gudang per baris di Sheet): spreadsheet master bahan ("MUTASI GUDANG MANUFACTURE") = **Gudang Utama** (bahan baku+kemas); spreadsheet master barang ("GUDANG TINGGAR JAYA") = **Gudang Tinggar** (kemas+barang jadi); **Gudang Sadewa** (titipan) tidak punya sheet — dihitung dari net transaksi bergudang-simpan "sadewa". Kode yang terdaftar di dua master terhitung di dua gudang (aproksimasi; stok per-gudang sejati masih TBD).
 - **Aturan stok & approval keluar-produksi**: stok **tidak boleh minus** (blokir di FE + validasi 422 backend + filter kondisional saat proposal APPLIED). Approval PPIC→SPV terpicu oleh **deviasi fisik pemakaian vs teori BOM** (bukan oleh kekurangan stok).
 - **Rantai alur FE saling tereferensi & anti-duplikat**: keluar-produksi membuat `grupDokumen` (RM-OUT-BOM) → Laporan Hasil Produksi mengambil grup (menyimpan `grupDokumen`; grup terpakai disembunyikan) & Qty Masuk Gudang menciptakan stok FG (`PROD-<batch>`) → Kirim Produk mengambil laporan (menyimpan `refLaporanProduksi`; laporan terpakai disembunyikan; OUTBOUND, SJ IN TRANSIT) → Input Gudang FG menerima SJ (PATCH status DELIVERED; INBOUND + gudang simpan Utama/Tinggar/Sadewa) → Masuk Kembali mengembalikan sisa bahan per grup via checklist. 
 - **Akses modul WMS**: halaman `/manufacture` dibatasi system role `manufacture` (guard FE `ManufactureGuard`), supervisor IT super-akses; tombol approve di menu Persetujuan & Akun mengikuti role `manufacture: ppic`/`supervisor` dari cookie `system_roles` (verifikasi role backend belum ada — lihat temuan audit).
-- **FE**: modul `manufacture` di [[APP - Web ERP]] (Next.js, `erp-frontend/src/features/manufacture`), 10 view (gudang bahan baku/jadi, stok, produksi, PO, KPI, dll). Konversi field **dua arah**: tulis (legacy camelCase → Go snake_case + `_id`), baca (Go snake_case → legacy camelCase) lewat mapper di container — tanpa ini create gagal validasi (`id`/`product_sku` wajib) & arsip tampil kosong.
+- **FE**: modul `manufacture` di [[APP - Web ERP]] (Next.js, `erp-frontend/src/features/manufacture`), 10 view (gudang bahan baku/jadi, stok, produksi, PO, KPI, dll). Fitur terbaru: tab **Master Barang** kini **CRUD produk penuh** (badge sumber Manual/Sheet), kartu **Formula BOM** punya tombol edit; modul **Pusat Laporan & KPI** menambah tab **KPI Otomatis (rekap CRUD)** — skor per user dari audit log (indikator berbobot ala menu KPI Scoring, batas WIB, prorate bulan berjalan); menu **Audit History** dipisah tab **Ledger Transaksi** vs **Log Aktivitas User** + pagination + filter tanggal. Konversi field **dua arah**: tulis (legacy camelCase → Go snake_case + `_id`), baca (Go snake_case → legacy camelCase) lewat mapper di container — tanpa ini create gagal validasi (`id`/`product_sku` wajib) & arsip tampil kosong.
 
 ## Belum Diimplementasikan / Catatan (TBD)
 
