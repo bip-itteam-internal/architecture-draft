@@ -95,6 +95,12 @@ Doc: [[Microservices - Recruitment Service]] (⚠️ Fase 1-3)
 - offer
 - audit_logs
 
+### payroll — `payroll-mongo-db`
+Doc: [[Microservices - Payroll Service]] (⚠️ Fase 1 — Salary Setup & Config)
+- salary_component
+- employee_salary
+- payroll_config
+
 ## Infrastruktur Data Bersama (Redis, MinIO)
 
 - **Redis** — cache response gateway sekaligus queue antar service. Key di-namespace per domain, mis. prefix `srv:integration`.
@@ -120,3 +126,4 @@ Doc: [[Microservices - Recruitment Service]] (⚠️ Fase 1-3)
 - [[Microservices - Inventory Service]]
 - [[Microservices - Task Management Service]]
 - [[Microservices - TikTok Shop Service]]
+- [[Microservices - Payroll Service]]
