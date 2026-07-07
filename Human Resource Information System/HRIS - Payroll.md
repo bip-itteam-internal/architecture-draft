@@ -4,13 +4,13 @@
 
 [Contoh dari sistem ini](https://drive.google.com/drive/folders/17RNDBtMwKCU_tuAiLZbwCgFp-xwwmzuz)
 
-- **Status**: ⚠️ **Fase 1 (Setup) + Fase 2 (Engine Payroll Run) + Fase 2b (PPh21 TER) sudah di kode** ([[Microservices - Payroll Service]]) — komponen gaji, config BPJS/pajak, assign gaji per karyawan, + **kalkulasi slip** (gross → BPJS → potongan kehadiran → **PPh21 TER** → net). Komponen *supplement* attendance dipakai untuk prorata Tunjangan Kehadiran. **Slip gaji (PDF) = fase berikut.**
+- **Status**: ⚠️ **Fase 1 (Setup) + Fase 2 (Payroll Run + publish + slip self-service) + Fase 2b (PPh21 TER) sudah di kode** ([[Microservices - Payroll Service]]) — komponen gaji, config BPJS/pajak, assign gaji per karyawan, + **payroll run** (kalkulasi gross → BPJS → potongan kehadiran → **PPh21 TER** → net; lifecycle **draft → approved → published**; karyawan lihat **slip sendiri** via self-service). Penggajian **bulanan** (tak ada mingguan). *Supplement* attendance dipakai untuk prorata Tunjangan Kehadiran. Scope: **sampai terbitkan slip, tanpa pembayaran**. **Slip PDF/cetak = fase berikut.**
 
 ## Sudah Diimplementasikan (komponen attendance)
 
 > Grounded: bagian ini = penyedia *supplement* berbasis kehadiran di [[Microservices - Attendance Service]] (input untuk payroll-service). Engine payroll penuh ada di [[Microservices - Payroll Service]] — lihat bagian Fase 1 & 2b di bawah.
 
-- `GET /payroll-supplement` ([[Microservices - Attendance Service]]) — agregasi entry kehadiran **periode payroll 26 bln-lalu → 25 bln-ini**: `payout_pct = total_work_hours / expected_work_hours`, plus rincian jam (telat, cuti, lembur, absen) & hitung per status. Entry `Pending` dilewati dari kalkulasi payout. **Status mana dibayar vs dipotong kini _configurable_** (master `payroll_status_treatment`; FE tab **"Perlakuan Kehadiran"** di Pengaturan Gaji). Default: Cuti/Sakit/Dinas/Libur = dibayar; Izin/Tanpa Keterangan = dipotong.
+- `GET /payroll-supplement` ([[Microservices - Attendance Service]]) — agregasi entry kehadiran **periode payroll 26 bln-lalu → 25 bln-ini**: `payout_pct = total_work_hours / expected_work_hours`, plus rincian jam (telat, cuti, lembur, absen) & hitung per status. Entry `Pending` dilewati dari kalkulasi payout. **Status mana dibayar vs dipotong kini _configurable_** (master `payroll_status_treatment`; FE tab **"Perlakuan Kehadiran"** di Pengaturan Gaji). Default: Cuti/Sakit/Dinas/Libur = dibayar; Izin/Tanpa Keterangan = dipotong. Master juga punya **override per-subtipe** (`payroll_subtype_treatment`, diturunkan dari `LeaveSubtypes`; PR #271/#169) — disimpan & dikonfigurasi HR, tapi **belum memengaruhi payout** (`computePayoutBreakdown` masih per-status; wiring subtipe ke `attendance_entries` = Fase 2).
 - `GET /payroll-approx` ([[Microservices - Employee Service]]) — endpoint per-karyawan yang mem-proxy `payroll-supplement` (pakai `employee_id` dari header).
 - Konsumen: [[CORE - HRIS Orchestrator]] (sisi perhitungan payroll).
 
