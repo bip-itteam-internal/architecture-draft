@@ -33,12 +33,12 @@ Saat ini sedang dikembangkan secara internal, repository-nya tercantum di bawah 
 - `/admin/settings` (Pengaturan Sistem) = **Coming Soon** (placeholder, disembunyikan dari sidebar)
 - **Members & Roles management** belum di-wire (komponen ada tapi orphan/dead code; tidak ada route `/admin/members`)
 - `/admin/divisions` = **read-only** (CRUD divisi menunggu dukungan backend)
-- **On-time rate** di report selalu menampilkan "—" (gateway belum menyuplai datanya)
-- **Role gating hanya di FE/middleware** — endpoint admin belum punya guard role di backend
+- **On-time rate**: backend kini menyuplai via `GET /report/sla` (`overall`/`by_division` response & resolution) — lihat [[Microservices - Task Management Service]]; verifikasi tampilan FE end-to-end **pending**. (Manpower on-time masih `null` di sisi FE.)
+- **Role gating**: backend kini punya RBAC ringan (`requireRoles` `supervisor`/`staff`) di [[Microservices - Task Management Service]]; gating FE/middleware tetap dipertahankan sebagai lapis tambahan
 - Catatan adopsi: tantangan utama adalah menjaga pengguna tetap memakai sistem dalam jangka panjang — butuh keterhubungan dengan pembuat/penerima tiket (fokus Notification Center)
 
 ## BUGS
-* **User masih bisa melihat space dari divisi lain** — `SpacesPage` mengambil semua space; filter divisi hanya dropdown client-side yang bisa diubah ke "Semua divisi". Aksi Edit/Delete sudah benar di-gate ke supervisor divisi sendiri, tetapi isolasi tampilan yang sebenarnya perlu **scoping di backend**.
+* **User masih bisa melihat space dari divisi lain** — `SpacesPage` mengambil semua space; filter divisi hanya dropdown client-side yang bisa diubah ke "Semua divisi". Aksi Edit/Delete sudah benar di-gate ke supervisor divisi sendiri, tetapi isolasi tampilan yang sebenarnya perlu **scoping di backend**. **Masih terbuka**: paritas BE `feat/task-management-parity` menambah scoping pada `/tasks/filter` (flag kepemilikan) tetapi **belum** pada listing `GET /spaces`.
 
 ### Production
 https://task.bharatainternasional.com
