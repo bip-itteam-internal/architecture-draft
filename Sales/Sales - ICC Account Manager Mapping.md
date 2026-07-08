@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB (backend) · Next.js (frontend)
 - **Path target:** `bip-erp/services/integration/` (koleksi & endpoint baru)
-- **Status:** 🟡 Konsep / Draft — belum diimplementasikan
+- **Status:** ⚠️ Implemented (ada catatan) — Phase 1 backend selesai; Phase 2 frontend & Phase 3–4 belum
 - **Dokumen terkait:** [[Sales - ICC Affiliate Mapping]] · [[Microservices - Integration Service]] · [[Microservices - Insentive Service]]
 
 ---
@@ -50,12 +50,7 @@ ICC Employee → {
 | TikTok Ads Advertiser | `tt_business_advertisers` | Integration | Akun iklan per-toko, berisi `advertiser_id`, `advertiser_name` |
 | ICC Affiliate Username | Konstanta FE | Frontend | Lihat [[Sales - ICC Affiliate Mapping]] |
 | Employee Mapping (ADV) | `employee_performance_mappings` | Insentive | Mapping karyawan ADV Leader → advertiser_id + store_id |
-
-### Akan Dibuat
-
-| Entitas | Collection | Service | Keterangan |
-|---|---|---|---|
-| ICC Account Mapping | `icc_account_mappings` | Integration | Mapping ICC employee → shop_id + advertiser_id |
+| ICC Account Mapping | `icc_account_mappings` | Integration | ✅ Phase 1: Mapping ICC employee → shop_id + advertiser_id |
 
 ---
 
@@ -172,9 +167,9 @@ var RequireMarketingLeader = validateRole(
 
 ---
 
-## Endpoint Baru yang Dibutuhkan
+## Endpoint (✅ Phase 1 Diimplementasikan)
 
-Semua endpoint di bawah berada di **Integration Service** (`bip-erp/services/integration`), prefix `/icc`.
+Semua endpoint berada di **Integration Service** (`bip-erp/services/integration`), prefix `/icc`.
 Semua endpoint dilindungi middleware `RequireMarketingLeader` (lihat §Otorisasi di atas).
 
 ### `GET /icc/mappings`
@@ -290,7 +285,7 @@ Daftar TikTok Ads advertiser yang belum di-assign.
 | Item | Detail |
 |---|---|
 | **Data shop** | `tt_shop_authorized_shops` harus sudah terisi lengkap (16 toko) |
-| **Data advertiser** | `tt_business_advertisers` harus sudah terisi (sync dari TikTok BC). **Catatan implementasi**: dokumen disimpan sebagai nested array `{core_user_id, advertisers: [{advertiser_id, advertiser_name, ...}]}` — endpoint `available-advertisers` perlu aggregate+unwind lintas semua dokumen. Repository perlu tambah method `ListAllAdvertisers()` (belum ada). |
+| **Data advertiser** | `tt_business_advertisers` harus sudah terisi (sync dari TikTok BC). Dokumen disimpan sebagai nested array `{core_user_id, advertisers: [{advertiser_id, advertiser_name, ...}]}` — endpoint `available-advertisers` menggunakan aggregate+unwind (`$unwind $advertisers` → `$replaceRoot`). ✅ Method `ListAllAdvertisers()` sudah ditambahkan ke `TiktokBusinessRepository`. |
 | **Employee data** | `employee_id` dan `employee_name` diisi manual sementara; idealnya dari Employee Service |
 | **Kardinalitas shop** | 1 AM dapat handle **lebih dari 1 toko dan lebih dari 1 akun ads** (dikonfirmasi). Unique index hanya pada `(tiktok_shop_id, is_active=true)` dan `(tiktok_advertiser_id, is_active=true)` — tiap toko/advertiser hanya punya 1 pemegang aktif, tapi 1 karyawan bisa punya banyak mapping |
 | **Risiko: rotasi** | Jika mapping sering berubah, laporan historis perlu snapshot (siapa handle toko X di bulan Y) — perlu `effective_from`/`effective_to` di fase berikutnya |
@@ -300,13 +295,13 @@ Daftar TikTok Ads advertiser yang belum di-assign.
 
 ## Fase Implementasi
 
-| Fase | Scope | Prasyarat |
+| Fase | Scope | Status |
 |---|---|---|
-| **0 (sekarang)** | Dok ini — rancangan + endpoint spec | — |
-| **1** | Backend: koleksi + endpoint CRUD `/icc/mappings` | `tt_shop_authorized_shops` & `tt_business_advertisers` terisi |
-| **2** | Frontend: form admin assign shop+advertiser ke karyawan ICC | Fase 1 selesai |
-| **3** | Dashboard: tampilkan performa per AM (gabungan ads + shop) | Fase 1-2 selesai |
-| **4** | Integrasi Insentive Service: hitung KPI AM dari mapping ini | Perubahan jabatan ICC → AM resmi |
+| **0** | Dok ini — rancangan + endpoint spec | ✅ Selesai |
+| **1** | Backend: koleksi + endpoint CRUD `/icc/mappings` + middleware `RequireMarketingLeader` | ✅ Selesai (2026-07-08) |
+| **2** | Frontend: form admin assign shop+advertiser ke karyawan ICC | 🟡 Belum |
+| **3** | Dashboard: tampilkan performa per AM (gabungan ads + shop) | 🟡 Belum |
+| **4** | Integrasi Insentive Service: hitung KPI AM dari mapping ini | 🟡 Belum |
 
 ---
 
