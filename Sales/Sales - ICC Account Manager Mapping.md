@@ -146,9 +146,36 @@ Admin ERP
 
 ---
 
+## Otorisasi (RBAC)
+
+Fitur ini khusus untuk tim marketing. Middleware baru `RequireMarketingLeader` perlu dibuat di `shared-library/common/roles.go`:
+
+```go
+// RequireMarketingLeader grants access to marketing SPV (Kyura/BeautyHacks) and ADV Leader.
+// Used for /icc/mappings endpoints.
+var RequireMarketingLeader = validateRole(
+    checkRole("kyura",        RoleSupervisor, RoleAdmin),
+    checkRole("beauty_hacks", RoleSupervisor, RoleAdmin),
+    checkRole("insentive",    RoleInsentiveAdvLeader), // "adv_leader"
+    checkRole("integration",  RoleSupervisor, RoleAdmin), // IT admin retain access
+)
+```
+
+| Role | System Key | Value | Akses |
+|---|---|---|---|
+| SPV Marketing Kyura | `kyura` | `supervisor` | Lihat semua + assign |
+| SPV Marketing BeautyHacks | `beauty_hacks` | `supervisor` | Lihat semua + assign |
+| ADV Leader | `insentive` | `adv_leader` | Lihat semua + assign |
+| IT Admin (fallback) | `integration` | `supervisor` / `admin` | Lihat semua + assign |
+
+> Catatan: SPV dapat melihat **semua** akun shop dan ads beserta pemegang aktifnya (tidak difilter per departemen).
+
+---
+
 ## Endpoint Baru yang Dibutuhkan
 
 Semua endpoint di bawah berada di **Integration Service** (`bip-erp/services/integration`), prefix `/icc`.
+Semua endpoint dilindungi middleware `RequireMarketingLeader` (lihat §Otorisasi di atas).
 
 ### `GET /icc/mappings`
 
@@ -263,7 +290,7 @@ Daftar TikTok Ads advertiser yang belum di-assign.
 | Item | Detail |
 |---|---|
 | **Data shop** | `tt_shop_authorized_shops` harus sudah terisi lengkap (16 toko) |
-| **Data advertiser** | `tt_business_advertisers` harus sudah terisi (sync dari TikTok BC) |
+| **Data advertiser** | `tt_business_advertisers` harus sudah terisi (sync dari TikTok BC). **Catatan implementasi**: dokumen disimpan sebagai nested array `{core_user_id, advertisers: [{advertiser_id, advertiser_name, ...}]}` — endpoint `available-advertisers` perlu aggregate+unwind lintas semua dokumen. Repository perlu tambah method `ListAllAdvertisers()` (belum ada). |
 | **Employee data** | `employee_id` dan `employee_name` diisi manual sementara; idealnya dari Employee Service |
 | **Kardinalitas shop** | 1 AM dapat handle **lebih dari 1 toko dan lebih dari 1 akun ads** (dikonfirmasi). Unique index hanya pada `(tiktok_shop_id, is_active=true)` dan `(tiktok_advertiser_id, is_active=true)` — tiap toko/advertiser hanya punya 1 pemegang aktif, tapi 1 karyawan bisa punya banyak mapping |
 | **Risiko: rotasi** | Jika mapping sering berubah, laporan historis perlu snapshot (siapa handle toko X di bulan Y) — perlu `effective_from`/`effective_to` di fase berikutnya |
