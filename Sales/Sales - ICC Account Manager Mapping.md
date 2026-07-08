@@ -30,11 +30,13 @@ ICC Employee → ?                    (shop + ads account, belum ada)
 
 ```
 ICC Employee → {
-  tiktok_creator_usernames[],   ← sudah ada (Sales - ICC Affiliate Mapping)
-  tiktok_shop_id,               ← BARU: toko yang dikelola
-  tiktok_advertiser_id,         ← BARU: akun ads yang dikelola
+  tiktok_creator_usernames[],    ← sudah ada (Sales - ICC Affiliate Mapping)
+  tiktok_shop_ids[],             ← BARU: 1 atau lebih toko yang dikelola
+  tiktok_advertiser_ids[],       ← BARU: 1 atau lebih akun ads yang dikelola
 }
 ```
+
+> Kardinalitas: **1 karyawan → N toko, N akun ads**. Setiap toko dan setiap advertiser tetap hanya dimiliki satu karyawan aktif (many-to-one dari sisi toko/advertiser).
 
 ---
 
@@ -80,7 +82,7 @@ ICC Employee → {
 **Constraints:**
 - `tiktok_shop_id` harus ada di `tt_shop_authorized_shops`
 - `tiktok_advertiser_id` harus ada di `tt_business_advertisers`
-- **1 karyawan = 1 toko** (dikonfirmasi) — unique index `(employee_id, is_active=true)`
+- **1 karyawan boleh handle >1 toko dan >1 ads** — tidak ada unique index pada `employee_id`
 - Satu shop hanya boleh di-assign ke satu karyawan aktif — unique index `(tiktok_shop_id, is_active=true)`
 - Satu advertiser hanya boleh di-assign ke satu karyawan aktif — unique index `(tiktok_advertiser_id, is_active=true)`
 
@@ -263,7 +265,7 @@ Daftar TikTok Ads advertiser yang belum di-assign.
 | **Data shop** | `tt_shop_authorized_shops` harus sudah terisi lengkap (16 toko) |
 | **Data advertiser** | `tt_business_advertisers` harus sudah terisi (sync dari TikTok BC) |
 | **Employee data** | `employee_id` dan `employee_name` diisi manual sementara; idealnya dari Employee Service |
-| **Kardinalitas shop** | 1 AM handle tepat 1 toko — **by design, dikonfirmasi**. Unique index `(tiktok_shop_id, is_active=true)` + `(employee_id, is_active=true)` menjamin relasi 1:1 ketat |
+| **Kardinalitas shop** | 1 AM dapat handle **lebih dari 1 toko dan lebih dari 1 akun ads** (dikonfirmasi). Unique index hanya pada `(tiktok_shop_id, is_active=true)` dan `(tiktok_advertiser_id, is_active=true)` — tiap toko/advertiser hanya punya 1 pemegang aktif, tapi 1 karyawan bisa punya banyak mapping |
 | **Risiko: rotasi** | Jika mapping sering berubah, laporan historis perlu snapshot (siapa handle toko X di bulan Y) — perlu `effective_from`/`effective_to` di fase berikutnya |
 | **Belum terintegrasi insentif** | Insentive Service belum konsumsi endpoint ini; integrasi dilakukan saat jabatan ICC → AM resmi berubah |
 
