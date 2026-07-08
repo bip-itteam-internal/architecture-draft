@@ -103,6 +103,19 @@
 - **Bank Account**: CRUD `/accurate/bank-accounts`
 - **KV Config** (key-value): CRUD `/accurate/settings/kv-configs`
 
+### ICC Account Mapping (marketing leader)
+
+> Auth: `RequireMarketingLeader` = kyura/beauty_hacks SPV · insentive `adv_leader` · integration SPV/admin. Grounded ke `internal/interface/http/icc_mapping_handler.go`. Lihat [[Sales - ICC Account Manager Mapping]].
+
+- `GET /icc/mappings` — daftar mapping aktif (filter: `employee_id`, `tiktok_shop_id`, `tiktok_advertiser_id`, `is_active`; default `true`)
+- `POST /icc/mappings` — buat mapping; enrich shop/advertiser name dari `tt_shop_authorized_shops` & `tt_business_advertisers`; unique constraint active per shop & advertiser (409 jika duplikat)
+- `PATCH /icc/mappings/:id` — update `is_active` / `notes`
+- `DELETE /icc/mappings/:id` — hapus (hanya jika `is_active=false`; else 409)
+- `GET /icc/mappings/available-shops` — toko belum di-assign (untuk dropdown form)
+- `GET /icc/mappings/available-advertisers` — advertiser belum di-assign (untuk dropdown form)
+
+Koleksi `icc_account_mappings`. Index: partial unique `(tiktok_shop_id, is_active=true)` + `(tiktok_advertiser_id, is_active=true)` + compound `(employee_id, is_active)`.
+
 ### Marketing Team & Shop ACL (admin only)
 - `/marketing/teams` — CRUD tim marketing (gated `RequireIntegrationAdmin` = supervisor/admin module integration)
 - Anggota tim: assign/unassign member (`/marketing/teams/:id/members`)
