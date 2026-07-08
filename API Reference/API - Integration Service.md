@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, Desty, transaksi, items, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. ~175 rute. Grounded ke `services/integration/internal/interface/http/*`.*
+*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, Desty, transaksi, items, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. ~181 rute. Grounded ke `services/integration/internal/interface/http/*`.*
 
 - **Implementasi**: [[Microservices - Integration Service]] · **Status**: ✅
 - **Indeks**: [[API - Index]] · Semua butuh gateway key kecuali webhook publik & `/health`.
@@ -93,6 +93,19 @@
 | GET | `/profit/order-listings` | Daftar Product Listing dari riwayat order (sample_name, item_id_count, mapped) — sumber dropdown form mapping |
 | GET | `/profit/cash-flow?start&end&shop_id&account_id` | Arus dana: `summary` (Sudah Cair actual + Uang Gantung estimasi shrinkage per toko, `estimate_ok`) + `accuracy_30d` (track-record rumus, on-the-fly) + `rows` per toko×bulan (sort gantung desc) |
 | GET | `/profit/cash-flow/orders?start&end&shop_id&account_id` | Daftar order uang gantung (COMPLETED belum settle) untuk panel rincian: order_id, toko, akun (credential), tgl order, tgl complete, GMV, umur ditagih (**H+1 sejak COMPLETE**, bukan sejak order dibuat); sort GMV desc, cap 500 |
+
+## ICC Account Mapping
+
+> Auth: `RequireMarketingLeader` (kyura/beauty_hacks SPV · insentive `adv_leader` · integration SPV/admin). Lihat [[Sales - ICC Account Manager Mapping]].
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/icc/mappings` | Daftar mapping ICC (filter: `employee_id`, `tiktok_shop_id`, `tiktok_advertiser_id`, `is_active`; default `true`) |
+| POST | `/icc/mappings` | Buat mapping — enrich nama shop/advertiser; validasi keunikan aktif; 409 jika duplikat |
+| PATCH | `/icc/mappings/:id` | Update `is_active` / `notes` |
+| DELETE | `/icc/mappings/:id` | Hapus mapping (hanya jika `is_active=false`; else 409) |
+| GET | `/icc/mappings/available-shops` | TikTok Shop belum di-assign (untuk dropdown) |
+| GET | `/icc/mappings/available-advertisers` | Advertiser belum di-assign (untuk dropdown) |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
