@@ -92,7 +92,7 @@
 | POST/GET | `/profit/channel-map/upload` · `/profit/channel-map` | Upload kamus channel variation (export Master Product; sku_id→master SKU) · ringkas count (**upload: supervisor|admin integration/finance**) |
 | GET | `/profit/order-listings` | Daftar Product Listing dari riwayat order (sample_name, item_id_count, mapped) — sumber dropdown form mapping |
 | GET | `/profit/cash-flow?start&end&shop_id&account_id` | Arus dana: `summary` (Sudah Cair actual + Uang Gantung estimasi shrinkage per toko, `estimate_ok`) + `accuracy_30d` (track-record rumus, on-the-fly) + `rows` per toko×bulan (sort gantung desc) |
-| GET | `/profit/cash-flow/orders?start&end&shop_id&account_id` | Daftar order uang gantung (COMPLETED belum settle) untuk panel rincian: order_id, toko, akun (credential), tgl order, GMV, umur (hari sejak selesai); sort GMV desc, cap 500 |
+| GET | `/profit/cash-flow/orders?start&end&shop_id&account_id` | Daftar order uang gantung (COMPLETED belum settle) untuk panel rincian: order_id, toko, akun (credential), tgl order, tgl complete, GMV, umur ditagih (**H+1 sejak COMPLETE**, bukan sejak order dibuat); sort GMV desc, cap 500 |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
