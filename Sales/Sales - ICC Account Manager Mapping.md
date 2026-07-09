@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB (backend) · Next.js (frontend)
 - **Path target:** `bip-erp/services/integration/` (koleksi & endpoint baru)
-- **Status:** ⚠️ Implemented (ada catatan) — Phase 1 backend selesai; Phase 2 frontend & Phase 3–4 belum
+- **Status:** ⚠️ Implemented (ada catatan) — Phase 1–2 selesai; ada bug akses staff ICC ke endpoint; Phase 3–4 belum
 - **Dokumen terkait:** [[Sales - ICC Affiliate Mapping]] · [[Microservices - Integration Service]] · [[Microservices - Insentive Service]]
 
 ---
@@ -101,20 +101,23 @@ Admin ERP
       → Response: 201 Created + data mapping
 ```
 
-### Flow 2: Dashboard ERP Menampilkan Performa per AM
+### Flow 2: ICC Dashboard — Staff ICC Lihat Performa Sendiri (⚠️ Ada bug akses, lihat §Catatan Bug)
 
 ```
-Frontend (dashboard per-AM)
-  → GET /icc/mappings?employee_id=BIP-0123
-    → Returns: { shop_id, advertiser_id, shop_name, advertiser_name }
-  
-  → GET /insight/gmv-max?advertiser_id=7234567890123456   (sudah ada)
-    → Returns: performa iklan karyawan ini
-  
-  → GET /affiliate/summary/creators?store_id=7123456789012345678  (sudah ada)
-    → Returns: performa affiliate toko ini
-  
-  Frontend: tampilkan gabungan data → performa AM lengkap
+Staff ICC login (position=icc)
+  → Halaman /icc/my-accounts (sidebar: "ICC Dashboard")
+  → GET /icc/mappings?employee_id=BIP-0123   ← ⚠️ saat ini 403 karena RequireMarketingLeader
+    → Returns: { tiktok_shop_id, tiktok_advertiser_id, tiktok_shop_name, ... }
+
+  Tab "Performa Toko":
+  → GET /integration/transactions/orders/summary?shop_id=...&time_from=...&time_to=...
+  → GET /integration/transactions/orders/dashboard/summary?shop_id=...
+    → Returns: total pesanan, revenue, cancel, return + status real-time
+
+  Tab "Performa Iklan":
+  → GET /integration/tiktok/business/report/gmv_max/performance/summary
+      ?advertiser_id=...&store_id=...&start_date=...&end_date=...
+    → Returns: cost, gross_revenue, ROI, orders, CTR, CVR, CPA
 ```
 
 ### Flow 3: Laporan Akuntabilitas AM
@@ -280,6 +283,32 @@ Daftar TikTok Ads advertiser yang belum di-assign.
 
 ---
 
+## Catatan Bug & Gap (Phase 2)
+
+### Bug: Staff ICC tidak bisa akses endpoint `/icc/mappings`
+
+Semua route `/icc/mappings` dilindungi `RequireMarketingLeader`. Staff ICC (position=icc) **bukan** marketing leader, sehingga request dari halaman ICC Dashboard akan mendapat **403 Forbidden**.
+
+Solusi yang dibutuhkan di Phase 3:
+- Tambah route terpisah `GET /icc/mappings/me` dengan middleware yang mengizinkan staff ICC (cek `BIP-Position: icc` atau `system_roles.insentive: icc`)
+- Atau: buat middleware `RequireIccAccess` yang menerima marketing leader ATAU icc staff, dengan filter otomatis `employee_id` untuk staff (tidak bisa lihat data orang lain)
+
+### Gap: Isolasi data antar tim (Kyura vs BeautyHacks)
+
+Saat ini mapping tidak menyimpan informasi tim/departemen. SPV Kyura dan SPV BeautyHacks sama-sama bisa melihat **semua** mapping dari kedua tim. Idealnya:
+- Tambah field `team` (`"kyura"` | `"beautyhacks"`) di `icc_account_mappings` — diisi otomatis dari `BIP-Department` header si creator
+- Endpoint List filter by `team` berdasarkan department si pemanggil
+
+### Perubahan teknis (sudah diimplementasikan)
+
+| Item | Perubahan |
+|---|---|
+| `ListAllAdvertisers()` | Ditambah `$group` by `advertiser_id` untuk deduplikasi — advertiser yang muncul di beberapa dokumen `tt_business_advertisers` (linked ke beberapa core user) sebelumnya menyebabkan duplicate key error di dropdown |
+| Employee lookup di form Assign | Beralih dari `role_system=insentive&role_value=icc` ke `position=icc` (filter berdasarkan jabatan di WorkData); endpoint `/api/employee/list?type=employee` ditambah dukungan param `position` |
+| Response format handler | Dihapus wrapping `fiber.Map{"data": ...}` yang menyebabkan `data.data` berupa object bukan array di frontend |
+
+---
+
 ## Dependensi & Risiko
 
 | Item | Detail |
@@ -299,8 +328,8 @@ Daftar TikTok Ads advertiser yang belum di-assign.
 |---|---|---|
 | **0** | Dok ini — rancangan + endpoint spec | ✅ Selesai |
 | **1** | Backend: koleksi + endpoint CRUD `/icc/mappings` + middleware `RequireMarketingLeader` | ✅ Selesai (2026-07-08) |
-| **2** | Frontend: form admin assign shop+advertiser ke karyawan ICC | 🟡 Belum |
-| **3** | Dashboard: tampilkan performa per AM (gabungan ads + shop) | 🟡 Belum |
+| **2** | Frontend: sidebar "MARKETING ICC", halaman ICC Management (CRUD assign), ICC Dashboard (performa toko + iklan per staff) | ✅ Selesai (2026-07-09) |
+| **3** | Dashboard tim: SPV/Leader lihat performa seluruh staff ICC tim (per departemen Kyura/BeautyHacks); isolasi data antar tim; route `/icc/mappings/me` untuk staff ICC | 🟡 Belum — lihat §Catatan Bug di bawah |
 | **4** | Integrasi Insentive Service: hitung KPI AM dari mapping ini | 🟡 Belum |
 
 ---
