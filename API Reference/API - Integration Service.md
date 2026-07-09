@@ -99,16 +99,17 @@
 
 ## ICC Account Mapping
 
-> Auth: `RequireMarketingLeader` (kyura/beauty_hacks SPV · insentive `adv_leader` · integration SPV/admin). Lihat [[Sales - ICC Account Manager Mapping]].
+> Auth: `RequireMarketingLeader` (kyura/beauty_hacks SPV · insentive `adv_leader` · integration SPV/admin) — kecuali `/me`. Lihat [[Sales - ICC Account Manager Mapping]].
 
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/icc/mappings` | Daftar mapping ICC (filter: `employee_id`, `tiktok_shop_id`, `tiktok_advertiser_id`, `is_active`; default `true`) |
-| POST | `/icc/mappings` | Buat mapping — enrich nama shop/advertiser; validasi keunikan aktif; 409 jika duplikat |
+| GET | `/icc/mappings/me` | Mapping milik staff ICC yang login — **tanpa** `RequireMarketingLeader`; filter otomatis dari `BIP-Employee-ID` |
+| GET | `/icc/mappings` | Daftar mapping ICC (filter: `employee_id`, `tiktok_shop_id`, `tiktok_advertiser_id`, `team`, `is_active`; default `true`) |
+| POST | `/icc/mappings` | Buat mapping — `team` auto-fill dari `BIP-Department`; shop/advertiser opsional (minimal satu); enrich nama; validasi keunikan aktif; 409 jika duplikat |
 | PATCH | `/icc/mappings/:id` | Update `is_active` / `notes` |
 | DELETE | `/icc/mappings/:id` | Hapus mapping (hanya jika `is_active=false`; else 409) |
-| GET | `/icc/mappings/available-shops` | TikTok Shop belum di-assign (untuk dropdown) |
-| GET | `/icc/mappings/available-advertisers` | Advertiser belum di-assign (untuk dropdown) |
+| GET | `/icc/mappings/available-shops` | TikTok Shop belum di-assign aktif (pool global) |
+| GET | `/icc/mappings/available-advertisers` | Advertiser belum di-assign aktif (pool global; deduplikasi via `$group`) |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
