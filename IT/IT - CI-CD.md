@@ -7,6 +7,7 @@
 - **Self-hosted runner**: VM `10.10.10.8` (user `cicd`) — menjalankan workflow GitHub Actions, lalu SSH ke VM target
 - **Deployment VM (dev)**: `10.10.10.121` (user `erp`) — host container/app (dev). Prod di `10.10.10.120`
 - Auth deploy: **SSH password** via GitHub Secret `VM_PASSWORD` (`sshpass`); StrictHostKeyChecking dimatikan untuk automation
+- **VPS Biznet Gio (migrasi, ⚠️)**: `116.206.196.31` (user `bharata`, Ubuntu 22.04) — target migrasi prod baru. CI via **Harness** (`bip-erp-vm-delegate` container jalan di VPS; build di VM). Per 2026-07-09 masih **dobel deployment** dengan `.120` (integration-service + worker jalan di dua tempat, belum cutover). Storage: additional disk 100G di-mount `/backup`.
 - Detail VM & kredensial: [[IT - Server, VMs and Databases]]
 
 ## Pipeline per Aplikasi
@@ -43,8 +44,16 @@
 - Git di VM pakai SSH deploy key tanpa passphrase (read-only)
 - Secret mobile (Firebase/keystore) tidak masuk repo — Base64 di Codemagic env
 
+## Build & Runtime (Docker)
+- **Multi-stage production build** (bip-erp, 2026-07): 15 service Go pindah dari dev/`air` hot-reload (image ~1GB, source ter-mount) ke multi-stage binary static (`CGO_ENABLED=0`, `alpine` runtime, image ~30-65MB). Hemat disk rootfs ~14G di VPS Biznet. Volume mount source dev dibuang (binary tak butuh source live). PR #299/#300.
+- **Frontend** (erp-frontend, Next.js): sudah production-grade — multi-stage `node:22-alpine`, Next standalone output, non-root user.
+- **mongod logging**: log ke `json-file` driver (max-size 50m × max-file 3), bukan `--logpath` ke volume data (dulu numpuk 67G). PR #285.
+- **Auto-recovery**: `autoheal` container (`willfarrell/autoheal`, `LABEL=all`) monitor semua container ber-healthcheck via `docker.sock`, auto-restart yang `unhealthy` (hang). Melengkapi `restart: unless-stopped` (yang hanya tangani crash). PR #300.
+- **Healthcheck coverage**: 15 service Go + Mongo punya healthcheck (`wget /health` / `mongosh ping`). PR #307.
+
 ## Catatan / Roadmap
-- Belum ada health-check & automated test **sebelum** deploy (rencana di dok bip-erp); deploy-approval workflow & registry image (GHCR) masih ide
+- ✅ **Health-check per service sudah ada** (autoheal + healthcheck 15 service) — sebelumnya roadmap
+- Automated test **sebelum** deploy, deploy-approval workflow & registry image (GHCR) masih ide. Build cache di VM dibersihkan via cron `docker-prune.sh` (build cache >48h + dangling).
 
 ## Dokumen Terkait
 
