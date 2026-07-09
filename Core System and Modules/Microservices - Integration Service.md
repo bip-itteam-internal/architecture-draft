@@ -112,9 +112,11 @@
 - `PATCH /icc/mappings/:id` — update `is_active` / `notes`
 - `DELETE /icc/mappings/:id` — hapus (hanya jika `is_active=false`; else 409)
 - `GET /icc/mappings/available-shops` — toko belum di-assign (untuk dropdown form)
-- `GET /icc/mappings/available-advertisers` — advertiser belum di-assign (untuk dropdown form)
+- `GET /icc/mappings/available-advertisers` — advertiser belum di-assign (untuk dropdown form); pipeline `$unwind → $group by advertiser_id` untuk deduplikasi (advertiser yang muncul di beberapa dokumen `tt_business_advertisers` dideduplikasi di sini)
 
 Koleksi `icc_account_mappings`. Index: partial unique `(tiktok_shop_id, is_active=true)` + `(tiktok_advertiser_id, is_active=true)` + compound `(employee_id, is_active)`.
+
+> ⚠️ **Gap**: semua route `/icc/mappings` dilindungi `RequireMarketingLeader` — staff ICC (position=icc) tidak bisa mengakses data mapping milik sendiri. Perlu route `/icc/mappings/me` dengan middleware terpisah di Phase 3. Lihat [[Sales - ICC Account Manager Mapping]].
 
 ### Marketing Team & Shop ACL (admin only)
 - `/marketing/teams` — CRUD tim marketing (gated `RequireIntegrationAdmin` = supervisor/admin module integration)
