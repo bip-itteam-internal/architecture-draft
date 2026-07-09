@@ -307,6 +307,57 @@ POST /transactions/summary/reports/:id/retry
 
 ---
 
+### Gap dari Meeting 2026-06-26
+
+> Sumber: [[MTG - 2026-06-26 Finance Service Modul]]
+
+#### Produk & SKU
+
+- **Bundling produk belum masuk Accurate** — validasi saat ini hanya menerima *leaf SKU* tunggal. Perlu logic baru untuk menangani bundle (1 item bundle → beberapa SKU komponen). SKU aktif sejak 17 Juni 2026.
+- **Kategori produk** belum dipetakan ke Accurate: Kyuragb → Skincare; Beautyhack → Perawatan dan Kecantikan.
+- **Departemen** belum dikonfigurasi: Marketing Beautyhack · Marketing KY+GB.
+- **Project** di Accurate belum disetup untuk kedua departemen di atas.
+- **List account Accurate** belum didokumentasikan: Rahardian · Afiani · Utvi.
+
+#### Summary — Constraint Status Order
+
+Saat `create summary`, sistem harus memvalidasi bahwa order memiliki timestamp yang relevan sesuai tipe summary:
+
+| Tipe Summary | Status Order | Field wajib ada |
+|---|---|---|
+| `summaryInvoice` | TO_SHIP, SHIPPED | `shipped_at` |
+| `summaryIncome` | — | `shipped_at`, `completed_at` |
+| `summaryReturn` | CANCELLED | `completed_at`, `returned_at` |
+| `summaryReturn` | RETURNED | `completed_at`, `returned_at` |
+
+Status yang sudah ter-cover di data order: COMPLETED → `completed_at`; SHIPPED → `shipped_at`; CANCELLED → `cancelled_at`; RETURNED → `returned_at`. Validasi constraint ini **belum diimplementasikan** di backend.
+
+#### Summary Multi-Toko
+
+- Fitur **centang multi toko** (pilih beberapa shop sekaligus untuk income/sales/return) belum ada — saat ini satu summary = satu `shop_id`.
+
+#### Bank & List Data Bank
+
+- **List data bank dari Accurate** belum ada endpoint fetch-nya — pengguna tidak dapat memilih bank dari dropdown yang bersumber Accurate.
+
+#### Modul Baru (Belum Ada Implementasi)
+
+- **Piutang** — modul baru total:
+  - Kolom tanggal jatuh tempo di invoice
+  - Notifikasi otomatis pada H+14 dan H+60 setelah jatuh tempo
+  - Baca piutang non-marketplace (diinput langsung di Accurate)
+  - Dok target: buat `Finance - Piutang.md` (🔴 Stub)
+
+- **Transaksi Logistik** — uang masuk/keluar dari logistik yang belum teridentifikasi:
+  - Mekanisme: `order_id` → `related_order_id` (dari data logistik)
+  - Blueprint **TBD — menunggu dokumen dari Utvi**
+  - Dok target: buat `Finance - Transaksi Logistik.md` setelah blueprint ada
+
+- **Mutasi Toko** — toko memiliki mutasi seperti rekening bank; perlu fitur baca transaksi masuk/keluar non-sales:
+  - Dok target: buat `Finance - Mutasi Toko.md` (🟡 Konsep)
+
+---
+
 ## Dependensi & Integrasi
 
 - [[CORE - API Master Gateway]] — entry point semua request dari frontend ke service
