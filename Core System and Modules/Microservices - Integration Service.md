@@ -27,7 +27,11 @@
 - Advertisers: list advertiser
 - Integrated Reports: `/report/integrated`, report daily/ad (+ sync), list, summary
 - GMV Max: performance & product (direct + sync), summary, campaigns/items
+- **GMV Max Overview** (`GetGMVMaxOverview` → `/report/gmv_max/overview`, 2026-07) — agregasi Mongo `tt_business_gmv_max_performance_reports` group by `dimensions.item_group_id` (buang `item_id="0"`), join nama produk (`tt_business_store_products.title`) + nama toko (`tt_business_stores.store_name`). Metrik per produk: spend (Σcost), revenue (Σgross_revenue), orders (Σorders), cost/order, ROAS (rev/spend), **ROI = (rev−spend)/spend×100** (ad-level, exclude HPP). FE = dashboard **Product Performance** ([[APP - Web ERP]] modul marketing-insight). Rentang bebas (agregat, bukan raw report). **Fix 2026-07**: ROI awalnya `$avg(metrics.roi)` (rata-rata rasio per-row → nilai ngaco ~558%), diganti agregat dari total.
+- **GMV Max Monitoring** (`ListGMVMaxCampaignMonitoring` → `/report/gmv_max/monitoring`) — agregasi per campaign untuk dashboard winner (ICC Finance: ROI≥3.2 & orders≥15). `item_id="-1"` = attribution bucket "no-creative" **terpisah** dari row per-item (bukan rollup — verified: rasio item/-1 acak lintas campaign), jadi Σ semua row = performa campaign sebenarnya. `item_group_id`=ID produk, `item_id`=level kreatif.
 - Stores & Products
+- **Cron master data** (`SyncMasterData`, setiap 00:00): sync campaigns + stores per advertiser. Sebelumnya kena rate limit TikTok (`40000: Request too frequent`) akibat burst concurrency (advertiser goroutine limit 5, campaign page limit 10). **Fix 2026-07-09**: tambah `getCampaignsWithRetry` (4 attempts, exponential backoff 5s→10s→20s + jitter ≤3s), turunkan concurrency advertiser 5→2 dan page 10→3. Campaigns wajib ada agar cron GMV Max 01:00 bisa berjalan (filter `store_id` dari campaigns).
+- **`ListGMVMaxPerformanceReport`** — filter `advertiser_id` sebelumnya salah pakai field path `metrics.advertiser_id` (nested di sub-dokumen); **fix 2026-07-09** ke `advertiser_id` (field top-level di koleksi `tt_business_gmv_max_performance_reports`). Bug ini menyebabkan semua query performance per advertiser return 0 hasil di FE.
 - `/sync/master-data` — sinkronisasi master data
 - Accounts: CRUD
 
@@ -131,18 +135,26 @@ Koleksi `icc_account_mappings`. Index: partial unique `(tiktok_shop_id, is_activ
 - `GET /health`
 
 ### Background Workers (cron)
-- Sync TikTok Shop orders — 1 AM
-- TikTok Business master-data
-- GMV-Max report — 1 AM
-- Integration report — 2 AM
-- **Affiliate orders sync** — per 8 jam (`0,8,16,23`), pola & cadence seragam ads GMV-max; loop credential→authorized-shop, error isolated per-shop
-- **Affiliate status refresh** — mingguan (Minggu 02:00): re-pull window 89 hari (cap API 3 bulan) agar `settlement_status` + `actual_commission` order lama ter-update (API affiliate hanya bisa filter `create_time`; order settle sampai ~90 hari). Jeda 8s antar-toko (anti-throttle). Limitation: order yang settle setelah umur >89 hari miss (rencana tambal: join finance statement, tunggu coverage ETL)
-- **Affiliate commission validation** — harian (04:00): cross-check komisi order SETTLED vs finance statement lokal (`tt_shop_transaction_by_orders`), stempel `validation_status` (VALIDATED/DISCREPANCY/NO_STATEMENT/PENDING; grace delivery+21h atau create+45h). Join murni DB lokal — nol call TikTok API
+- **Sync TikTok Shop orders** — **4× sehari** 00:00/08:00/16:00/23:00 WIB (`0 0 0,8,16,23 * * *`); window 9 jam overlap. *Re-enabled 2026-07-09 dengan jadwal diperbarui — sebelumnya 1× di 01:00 dan sempat disabled sejak Jun 2026.*
+- TikTok Business master-data — harian 00:00
+- GMV-Max report (historis) — harian 01:00
+- **GMV-Max report today** (intraday) — **4× sehari** 00:00/08:00/16:00/23:00
+- Integration report — harian 02:00
+- Video performance TikTok Shop — 02:30
+- **Affiliate orders sync** — 4× sehari (`0,8,16,23`), loop credential→authorized-shop, error isolated per-shop
+- **Affiliate status refresh** — mingguan (Minggu 02:00): re-pull window 89 hari agar `settlement_status` + `actual_commission` lama ter-update
+- **Affiliate commission validation** — harian 04:00: cross-check komisi SETTLED vs finance statement lokal (`tt_shop_transaction_by_orders`), stempel `validation_status`. Nol call TikTok API
+- **Income reconciler TikTok** — tiap jam **:30** (digeser dari :00 — hindari pileup quota TikTok dengan gmv-max/affiliate-sync/escrow). Batch 600 order/run, limiter 5 req/s + circuit breaker 36009002 (5 fail beruntun → abort run). Klasifikasi hasil refetch: `fetched` (settlement masuk) / `not_available` (belum cair, re-scan tanpa bakar attempt; min-age 3 hari) / `pending` (error teknis, attempt++ cap 10). Ringkasan tiap run disimpan ke koleksi `reconciler_run_stats` → dipakai endpoint `settlement/sync-status` untuk baris info FE settlement
+- **Shopee escrow reconciler** — tiap jam :00
 - Webhook-consumer — tiap 5 detik
-- Desty-credential refresh — tengah malam
-- Sync Shopee performance — 2 AM
+- **Desty credential refresh** — 00:00 (cek expiry buffer 5 hari, singleflight)
+- **Shopee credential refresh** — 05:05 (proaktif sebelum expiry 06:00)
+- Sync Shopee performance — 02:00
 - Redis queue digunakan untuk task summary-report
 - Optimasi concurrency: global semaphore + sequential processing untuk mitigasi rate limit API marketplace
+- **Notifikasi kegagalan**: semua worker kirim Telegram otomatis via `WithOnJobError` hook manager level (setelah semua retry habis) — 18 job ter-cover tanpa konfigurasi per-task
+- ⚠️ **Jadwal task = DB source of truth**: schedule di-SEED sekali ke Mongo `workers.worker_configs` saat registrasi pertama; setelahnya **nilai DB yang berlaku** — mengubah `Schedule()` di kode TIDAK berpengaruh sampai dokumen `worker_configs` di-update manual (`db.worker_configs.updateOne({_id:"<job>"},{$set:{schedule:"..."}})`; efektif live tanpa restart). Boot log WARN bila schedule DB ≠ kode. Pause task sementara: tanam lock di `workers.worker_locks` (`_id: lock:<job>`, `expires_at` = auto-lepas). Insiden 4 Jul 2026: jadwal income-reconciler diubah di kode tapi prod tetap pakai config lama. Detail: `services/integration/internal/worker/README.md`
+- **One-off CLI recovery** (`cmd/backfill`, `cmd/settledfeed`; dry-run default, idempotent, `--apply` untuk tulis ke DB): `backfill` = migrasi field `income_status` doc lama + re-insert order raw-only (order_date dari `create_time` asli — summary group by order_date); `settledfeed` = feed order affiliate SETTLED → by-order finance fetch (interleave per-shop, adaptive backoff 36009002 cool-down 5/10/15s, newest-first). Dipakai recovery Jul 2026: coverage finance affiliate-SETTLED 15,7% → 100% (~78rb order, ~26 jam)
 
 ### Gross Profit per Product (modul profit)
 

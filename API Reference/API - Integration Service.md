@@ -29,6 +29,7 @@
 | GET | `/tiktok/shop/auth` · `/auth/callback` · `/authorized-shops` | OAuth + shop terotorisasi |
 | GET | `/tiktok/shop/orders/list[/direct]` · `/orders/detail[/direct]` · `/orders/sync` | Order (cache/direct/sync). `/orders/detail` juga kembalikan `transaction_orders` = settlement per-order (Finance API `statement_transactions`, breakdown fee/ongkir/afiliasi/settlement per-SKU) |
 | GET | `/tiktok/shop/insight/gmv-winning-content` | Insight GMV |
+| GET | `/tiktok/shop/settlement/sync-status` | Status sync income-reconciler: run terakhir + agregat harian dari `reconciler_run_stats` (schedule, batch_size, last_run, today) — konsumen: baris info FE settlement di list transaksi |
 | GET/DELETE | `/tiktok/shop/accounts/list` · `/accounts/:id` | Akun TikTok Shop |
 
 ## TikTok Business
@@ -37,6 +38,8 @@
 | GET | `/tiktok/business/auth[/callback]` · `/advertisers[/info][/direct]` · `/stores[/products]` | Auth, advertiser, store |
 | GET | `/tiktok/business/report/integrated[/daily/ad][/sync][/list][/summary/list]` | Laporan integrated |
 | GET | `/tiktok/business/report/gmv_max/...` (performance, product, campaigns, items, summary, daily/sync) | Laporan GMV-Max |
+| GET | `/tiktok/business/report/gmv_max/overview` | Agregat GMV-Max **per produk** (item_group_id) lintas toko untuk dashboard Product Performance: totals (spend/revenue/orders/ROAS/product_count/store_count) + list produk (spend, revenue, orders, cost/order, ROAS, ROI). Query: `start_date`/`end_date` (wajib), `store_ids` (opsional JSON array). Buang `item_id="0"` (noise). |
+| GET | `/tiktok/business/report/gmv_max/monitoring` | Agregat GMV-Max **per campaign** untuk dashboard GMV Max Monitoring (winner ROI≥3.2 & orders≥15). Query: `start_date`/`end_date`, `advertiser_id`, `store_ids`, `campaign_ids`. |
 | GET | `/tiktok/business/sync/master-data` · `/accounts/list` · `/accounts/:id` (GET/POST/DELETE) | Sync & akun |
 
 ## Affiliate (TikTok Seller)
