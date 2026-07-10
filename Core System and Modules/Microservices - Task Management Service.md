@@ -26,6 +26,7 @@
 - `POST /tasks` — create task (status awal `Request`, set `response_due_at = now + 24h`).
 - `GET /tasks/:id` — detail task (populated).
 - `GET /tasks/filter` — list dengan RBAC + filter (`space_id`, `status`, `assigned_to_me`, `created_by_me`, `pending_my_approval`, dll), search, dan pagination.
+- `GET /tasks/counts` — jumlah tiket **aktif** per-scope (`created`/`assigned`/`team`) untuk badge tab. Scope divisi mengecualikan status `Request`/`Ditolak`; `team` hanya dihitung untuk supervisor/admin (0 selain itu).
 - `PUT /tasks/:id/status` — ubah status (set `completed_at` saat mencapai `Done`).
 - `PUT /tasks/:id/assign`, `/archive`, `/unarchive`, `/due-date`, `/priority`, `/space` — mutasi atribut task.
 - `GET /tasks/:id/history` — riwayat perubahan task.
@@ -54,7 +55,7 @@
 	- `POST /tasks/:id/links` — body `{name,url}` → `FileAttachment{type:"link"}`; respons `{link}`.
 	- `DELETE /tasks/:id/attachments/:attachmentId` — hapus object di file-service (bila file) + `$pull`; lampiran milik requestor tak bisa dihapus assignee.
 	- `GET /tasks/:id/attachments/:fileId/preview` — respons `{url}` = presigned GET (public base MinIO, ~300s); untuk link kembalikan URL apa adanya.
-- **Comments** & **Checklist** — kolaborasi pada task.
+- **Comments** & **Checklist** — kolaborasi pada task. **Izin ubah checklist** (tambah/centang/hapus item) di-gate `canHandleTask` = **privileged (admin/supervisor) ATAU assignee**; **pembuat/pemohon TIDAK boleh** (read-only) — beda dari `canEditTask` yang masih memasukkan creator. Checklist **dibuat lewat web** ([[APP - Web ERP]]); mobile ([[APP - MyBharata]]) hanya bisa mencentang.
 - **Notifications** — `GET /notifications` (paginate), `/unread-count`, `PUT /read-all`, `/:id/read`, `DELETE /:id`. Fan-out ke **Mongo + WebSocket live** (`notify.go` → `hub.sendToUser`). **FCM/inbox via notification-service: ditunda (TBD)**.
 - **Users/departments** — dari ERP employee_db (`users_handlers.go`): `GET /users`, `GET /users/byDivision?division=`, `GET /departments` (array string). Join `system_authentication`+`personal_data`+`work_data`.
 - **Audit** — `GET /tasks/:id/history` (array, per task) & `GET /audits` (`{items,total}`, scope divisi supervisor). Audit ditulis di semua mutasi task/comment/checklist/attachment (`audit.go`, `writeAudit`).
@@ -64,6 +65,8 @@
 - **WebSocket butuh rute ingress** `/ws/task-management → service:/ws` (gateway tak proxy WS); tanpa itu realtime mati tapi app tetap jalan via polling REST. Lihat `WEBSOCKET.md`.
 - **Push FCM/inbox via notification-service: TBD** (saat ini WS-only atas keputusan; BE lama punya jalur WA+FCM).
 - **Role admin lintas-divisi tidak diaktifkan** — hanya `supervisor`/`staff` (di-derive dari `system_roles`).
+- **Deteksi supervisor divisi utk notifikasi** (`findDivisionSupervisors`) memakai `work_data` ERP (flag `is_supervisor`, fallback jabatan regex `Supervisor|^Leader$`), **bukan** `system_roles` (key `system_roles` = kode modul spt "it"/"finance", tak pernah cocok dgn nama departemen). Hanya akun aktif.
+- Notif **"Permintaan baru"** (`NotifTaskRequest`, ke supervisor divisi + admin saat tiket dibuat) menyertakan arahan **buka website ERP** — sebab **approve/reject hanya tersedia di web**; mobile ([[APP - MyBharata]]) belum punya alur approval.
 - **Override SLA per-priority: TBD** (default response 24 jam / resolution 72 jam).
 - `GET /report/sla`: `met` = selesai **tepat waktu** atas item terukur (yang sudah `responded_at`/`completed_at`); `total` = jumlah item terukur. On-time rate = met/total.
 - `getAdminTaskStats` = hitungan status divisi supervisor (bentuk **FLAT** `{total,request,todo,ongoing,testing,done,ditolak}`), bukan alias `getTaskStats`.
