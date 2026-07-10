@@ -80,6 +80,7 @@
 
 ### Transactions (model terpadu)
 - `/transactions/orders/list`, summary (+ shops / + products), `/transactions/orders/:id`
+- **Export Order Management**: `GET /transactions/orders/export` — stream `.xlsx` (1 baris per item) untuk daftar order; filter identik `/orders/list` (channel/status/canceled_by/time range/shop_id/order_id), tanpa paginasi (cap 10.000 order). Handler `ExportTransactionOrders` (`transaction_handler.go`) → `writeExcelExport` (`excel_export.go`); nama file dibangun `buildOrdersExportFilename` dari filter aktif. FE: [[APP - Web ERP]] tombol Export di halaman Order Management (butuh gateway CORS `ExposeHeaders: Content-Disposition` agar nama file terbaca browser lintas-origin)
 - Master: `/master/shops`, `/master/channels`, `/master/status`
 - Summary Reports: list, `POST` trigger, group-by-status, get, items, **invoices** (`/summary/reports/:id/invoices`), retry, delete
 - `POST /summary/reports/:id/send/:service` — kirim ringkasan ke Accurate
