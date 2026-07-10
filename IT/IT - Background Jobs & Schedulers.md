@@ -52,7 +52,7 @@
 ## Catatan & risiko operasional
 
 - **Penumpukan jam 00:00–02:00**: banyak sync integration (master data, order, report, kredensial) menumpuk di tengah malam WIB — perhatikan saat menilai beban/quota API TikTok/Shopee. Tambahan: `sync-tt-shop-orders` kini 4× sehari (bukan 1× di 01:00) — jam 00:00/08:00/16:00/23:00 WIB.
-- **Notifikasi kegagalan**: semua worker integration kirim Telegram otomatis via `WithOnJobError` hook di manager level — tidak perlu konfigurasi per-task. Shopee & Desty credential task juga punya `SendError` inline.
+- **Notifikasi worker**: semua worker integration kirim Telegram otomatis via hook di manager level — tidak perlu konfigurasi per-task. `WithOnJobError` → `SendError` saat gagal (setelah semua retry habis); `WithOnJobEnd` → `Send` saat sukses. Dikecualikan dari notif sukses: `webhook-consumer` & `sync-resi-wms` (frekuensi tinggi, akan spam). PR #322.
 - **Job tersibuk**: `webhook_consumer` jalan **tiap 5 detik** — paling sering; pastikan lock Redis sehat agar tak dobel.
 - **Locking**: integration = Redis (prefix `srv:integration:lock:*`); insentive = Mongo `cron_locks` (TTL 2j). Service lain (employee/attendance/notification/task-management) **tanpa distributed lock** — aman selama **single instance**; bila di-scale horizontal, job bisa dobel.
 - Backup DB mingguan ada di luar tabel ini (lihat [[IT - Backup & DR]] / [[IT - Runbooks]]).
