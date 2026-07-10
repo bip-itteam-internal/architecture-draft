@@ -134,7 +134,8 @@ Saat pengajuan (`POST /correction`), urutan pemeriksaan:
    - `checkin` — clock-in kosong → boleh; clock-in **terisi** → boleh **hanya bila status `Late`** (sengketa telat); bila sudah Tepat Waktu → ditolak.
    - `checkout` — clock-out kosong (clock-in harus sudah ada).
    - `both` — clock-in & clock-out keduanya kosong.
-3. **Anti-fraud guestbook** — untuk `checkin`/`both`, **ditolak** bila ada catatan keterlambatan terverifikasi security di buku tamu (`guestbook` `category="internal"`, `employee_id` & tanggal sama). Mencegah karyawan yang terbukti telat mengubah status jadi Tepat Waktu.
+3. **Jendela waktu clock-out** (`clockOutCorrectionBlocked`, untuk `checkout`/`both`) — koreksi clock-out **baru bisa diajukan setelah window tap clock-out tutup**, yaitu **jam pulang `WorkTime.End` + `clockOutWindowHours` (6 jam)**. Sebelum itu ditolak (422 `"koreksi clock-out baru bisa diajukan setelah batas waktu clock-out berakhir (HH:MM)"`). Alasannya: selama window tap masih terbuka, karyawan cukup **tap clock-out biasa** — koreksi hanya untuk saat window tap sudah `expired`. Bila `WorkTime.End` kosong → tak dibatasi. Konstanta `clockOutWindowHours` **dipakai bersama** dengan pembatas tap clock-out di Attendance Service agar tak drift.
+4. **Anti-fraud guestbook** — untuk `checkin`/`both`, **ditolak** bila ada catatan keterlambatan terverifikasi security di buku tamu (`guestbook` `category="internal"`, `employee_id` & tanggal sama). Mencegah karyawan yang terbukti telat mengubah status jadi Tepat Waktu.
 
 **Penyimpanan bukti:** record guestbook `internal` kini menyimpan `employee_id` (dari scan QR di [[APP - MyBharata]]) → dipakai mencocokkan guard. *(Forward-looking: aktif untuk record yang sudah punya `employee_id`.)*
 
