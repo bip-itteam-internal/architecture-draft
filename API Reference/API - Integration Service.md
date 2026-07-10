@@ -29,7 +29,6 @@
 | GET | `/tiktok/shop/auth` · `/auth/callback` · `/authorized-shops` | OAuth + shop terotorisasi |
 | GET | `/tiktok/shop/orders/list[/direct]` · `/orders/detail[/direct]` · `/orders/sync` | Order (cache/direct/sync). `/orders/detail` juga kembalikan `transaction_orders` = settlement per-order (Finance API `statement_transactions`, breakdown fee/ongkir/afiliasi/settlement per-SKU) |
 | GET | `/tiktok/shop/insight/gmv-winning-content` | Insight GMV |
-| GET | `/tiktok/shop/settlement/sync-status` | Status sync income-reconciler: run terakhir + agregat harian dari `reconciler_run_stats` (schedule, batch_size, last_run, today) — konsumen: baris info FE settlement di list transaksi |
 | GET/DELETE | `/tiktok/shop/accounts/list` · `/accounts/:id` | Akun TikTok Shop |
 
 ## TikTok Business
@@ -38,8 +37,6 @@
 | GET | `/tiktok/business/auth[/callback]` · `/advertisers[/info][/direct]` · `/stores[/products]` | Auth, advertiser, store |
 | GET | `/tiktok/business/report/integrated[/daily/ad][/sync][/list][/summary/list]` | Laporan integrated |
 | GET | `/tiktok/business/report/gmv_max/...` (performance, product, campaigns, items, summary, daily/sync) | Laporan GMV-Max |
-| GET | `/tiktok/business/report/gmv_max/overview` | Agregat GMV-Max **per produk** (item_group_id) lintas toko untuk dashboard Product Performance: totals (spend/revenue/orders/ROAS/product_count/store_count) + list produk (spend, revenue, orders, cost/order, ROAS, ROI). Query: `start_date`/`end_date` (wajib), `store_ids` (opsional JSON array). Buang `item_id="0"` (noise). |
-| GET | `/tiktok/business/report/gmv_max/monitoring` | Agregat GMV-Max **per campaign** untuk dashboard GMV Max Monitoring (winner ROI≥3.2 & orders≥15). Query: `start_date`/`end_date`, `advertiser_id`, `store_ids`, `campaign_ids`. |
 | GET | `/tiktok/business/sync/master-data` · `/accounts/list` · `/accounts/:id` (GET/POST/DELETE) | Sync & akun |
 
 ## Affiliate (TikTok Seller)
@@ -58,9 +55,19 @@
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/shopee/auth[/callback]` · `/shops/list` · `/products/items` | OAuth, shop, produk |
-| GET | `/shopee/orders/list` · `/orders/detail` · `/orders/sync` · `/v2/shopee/orders/list` | Order (v1/v2/sync) |
+| GET | `/shopee/orders/list` · `/orders/detail` · `/orders/sync` · `/orders/escrow/backfill` · `/v2/shopee/orders/list` | Order (v1/v2/sync **chunked ≤15 hari** + backfill escrow income) |
+| GET | `/shopee/returns/sync` · `/returns/list` | **Return/Refund ingestion** (chunked ≤15 hari, app ERP_SYSTEM) — tarik return via `get_return_list` → koleksi `shopee_returns` + sub-doc `order.return` (item **parsial** + tanggal proses + refund); `Partial` dari **kuantitas** (bukan uang). ⚠️ baru, tervalidasi live (15 return), belum deploy. Detail: [[Microservices - Integration Service]] |
 | GET | `/shopee/gms/item-performance[/sync|/summary]` · `/campaign-performance[/sync|/summary]` | Performa GMS |
+| GET/POST | `/shopee/affiliate/performance` · POST `/affiliate/sync` · `/affiliate/recommended` | Affiliate/AMS — per-affiliate performa (baca DB `shopee_affiliate_performance`, sales/order/komisi/ROI) + `sync` (backfill manual dari AMS) + rekomendasi (proxy, via app AMS) |
+| GET/POST | `/shopee/affiliate/conversions[/sync]` · `/affiliate/validations[/sync]` | **Affiliate v2 (AMS order-level)** ✅ live — ledger order+item (baca DB `shopee_affiliate_conversion`, `get_conversion_report`; `price`/komisi = **string desimal rupiah**) + tagihan komisi bulanan & rekonsiliasi (`shopee_affiliate_validation_bill`, `get_validation_list`/`get_validation_report` window placement **[M−2..M−1]**); `sync` = backfill background via notifier |
+| GET/POST | `/shopee/affiliate/products[/sync]` · `/affiliate/contents[/sync]` | **Affiliate v3 (AMS analytics)** ✅ live — per-produk (`get_product_performance`, baca DB `shopee_affiliate_product_performance`, ≈ klon v1 per-item) + per-konten Video/Live (`get_content_performance`, `shopee_affiliate_content_performance`; `views`/`likes` **kumulatif→MAX**, `sales` per-hari→SUM). Beda dari GMS item-performance. Sync harian via worker 03:00 + background manual |
 | GET/POST/DELETE | `/shopee/accounts/list` · `/accounts/:id` | Akun Shopee |
+
+> **Tri-app per toko** (✅ live): tiap shop bisa punya sampai 3 kredensial via `account_type` — **ADS_SERVICE** (GMS, partner 2032638), **ERP_SYSTEM** (order/escrow/push, 2032314), **AMS** (affiliate, 2038141, kategori app "Affiliate Marketing Solution Management" — hanya app ini yang bisa panggil AMS API); `/accounts/list` mengembalikan `account_type` + `shop_id_list`. **`/orders/escrow/backfill?shop_id=&limit=`** (✅ live): isi `income` order COMPLETED yang belum ter-escrow (escrow-only, resumable) — backfill 908963392 (1.308/1.308). **`/affiliate/performance`** (✅ live, **baca DB** `shopee_affiliate_performance`, roll-up per-affiliate, param `start_date`/`end_date` yyyymmdd, default 30 hari) + **`POST /affiliate/sync`** (backfill manual dari AMS, snapshot harian) + **`/affiliate/recommended`** (proxy live). Snapshot harian juga diisi worker `sync-shopee-affiliate-performance` (03:00, lihat [[IT - Background Jobs & Schedulers]]). ⚠️ `total_buyers`/`new_buyers` = akumulasi harian (buyer-hari, bukan pembeli unik). Detail: [[Microservices - Integration Service]].
+
+> **`/orders/sync`** (⚠️ baru, belum deploy): tarik order per toko, mendukung **histori panjang (~3 bulan)** via chunking otomatis ke window **≤15 hari** (batas `get_order_list`), satu circuit breaker per-run, **tanpa** gate proses-wide (app order ERP_SYSTEM `2032314` terpisah dari GMS `2032638`). Param: `shop_id` (wajib), `time_from`/`time_to` (unix) **atau** `days` (mis. `days=90`; maks **400 hari**). Rate-limit di tengah → **HTTP 200 partial** + ringkasan success-rate di body. Grounded: `shopee_handler.go` (`SyncOrders`). Detail: [[Microservices - Integration Service]].
+
+> **Catatan Filter Toko (All Shop)**: Semua endpoint Shopee GMS (`/shopee/gms/*`) dan Shopee Affiliate (`/shopee/affiliate/*`) **mewajibkan parameter `shop_id` tunggal** (`shop_id > 0`). Untuk fitur filter **"All Shop"** di aplikasi ERP Web, frontend melakukan **Client-Side Aggregation** (`Promise.all` ke semua toko terotorisasi lalu menggabungkan responsnya secara live di browser) karena backend tidak mendukung query multi-toko/agregasi tanpa `shop_id` secara native.
 
 ## Accurate (akuntansi)
 | Method | Path | Fungsi |
@@ -94,8 +101,6 @@
 | DELETE | `/profit/mappings/:id` | Hapus mapping (**supervisor|admin modul integration/finance**) |
 | POST/GET | `/profit/channel-map/upload` · `/profit/channel-map` | Upload kamus channel variation (export Master Product; sku_id→master SKU) · ringkas count (**upload: supervisor|admin integration/finance**) |
 | GET | `/profit/order-listings` | Daftar Product Listing dari riwayat order (sample_name, item_id_count, mapped) — sumber dropdown form mapping |
-| GET | `/profit/cash-flow?start&end&shop_id&account_id` | Arus dana: `summary` (Sudah Cair actual + Uang Gantung estimasi shrinkage per toko, `estimate_ok`) + `accuracy_30d` (track-record rumus, on-the-fly) + `rows` per toko×bulan (sort gantung desc) |
-| GET | `/profit/cash-flow/orders?start&end&shop_id&account_id` | Daftar order uang gantung (COMPLETED belum settle) untuk panel rincian: order_id, toko, akun (credential), tgl order, tgl complete, GMV, umur ditagih (**H+1 sejak COMPLETE**, bukan sejak order dibuat); sort GMV desc, cap 500 |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
