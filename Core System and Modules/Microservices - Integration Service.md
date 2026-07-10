@@ -118,7 +118,7 @@
 - `GET /health`
 
 ### Background Workers (cron)
-- **Sync TikTok Shop orders** — **4× sehari** 00:00/08:00/16:00/23:00 WIB (`0 0 0,8,16,23 * * *`); window 9 jam overlap. *Re-enabled 2026-07-09 dengan jadwal diperbarui — sebelumnya 1× di 01:00 dan sempat disabled sejak Jun 2026.*
+- **Sync TikTok Shop orders** — **4× sehari** 00:00/08:00/16:00/23:00 WIB (`0 0 0,8,16,23 * * *`); window 9 jam overlap. *Re-enabled 2026-07-09 dengan jadwal diperbarui — sebelumnya 1× di 01:00 dan sempat disabled sejak Jun 2026 (era itu diganti cron host `tiktok-sync.sh`; script host di bip-vps DINONAKTIFKAN 2026-07-11 karena redundan + rusak port/key — worker ini pemilik tunggal sync order sekarang).*
 - TikTok Business master-data — harian 00:00
 - GMV-Max report (historis) — harian 01:00
 - **GMV-Max report today** (intraday) — **4× sehari** 00:00/08:00/16:00/23:00
