@@ -3,7 +3,7 @@
 *Aplikasi mobile **MyBharata** (`my_bharata`) adalah aplikasi HRIS resmi PT Bharata Internasional — satu codebase Flutter untuk Android & iOS yang menjadi portal karyawan untuk seluruh siklus HR: attendance → cuti/izin → lembur → payroll → evaluasi. Aplikasi menegakkan aturan "Peraturan Perusahaan 2026–2028" secara otomatis dan mencegah kecurangan absensi melalui biometric + geofencing + validasi QR.*
 
 - Pengguna: karyawan, supervisor, HRD, IT admin, dan tamu eksternal (guest book)
-- Versi build saat ini: **1.9.3+101** (sumber: `pubspec.yaml`)
+- Versi build saat ini: **1.10.2+104** (dev; `pubspec.yaml`) — PR Support Ticket (#83) menaikkan ke **1.10.3+105**
 - Target platform: Android (minSdk 23 / Android 6.0+), iOS 13+
 - Survei perangkat mobile karyawan [terdaftar di sini](https://docs.google.com/spreadsheets/d/1w2blhMgFx1BI9zu6ni5gmQJab_NfMhdocm0cj5pyO_s/edit?usp=sharing)
 
@@ -65,7 +65,7 @@
 
 ### KPI & Support Ticket
 - **KPI**: laporan performa kuartalan (read-only di mobile) dengan grafik
-- **Support Ticket** *(sebelumnya "Helpdesk IT")* — buat tiket ke **Space per divisi** (lintas divisi, bukan khusus IT) lewat form "Buat Tiket": pilih Space (dikelompokkan per divisi), Judul, Deskripsi, dan **lampiran opsional**. Lampiran memakai alur **Upload First**: file diunggah dulu ke `/uploads/temp` lalu diklaim via `attachment_ids` saat create (batas 20 file, 10 MB/file di sisi FE). Tersedia daftar & detail tiket, dan **URL di deskripsi otomatis menjadi tautan yang bisa diklik**. Fitur `features/task`, label menu **Support Ticket**. Backend: [[Microservices - Task Management Service]] · sisi tracker: [[APP - Dynamic Task Tracker]]
+- **Support Ticket** *(sebelumnya "Helpdesk IT")* — buat tiket ke **Space per divisi** (lintas divisi) lewat form "Buat Tiket": pilih Space, Judul, Deskripsi, **lampiran opsional** (**create-then-upload** per-file ke `/tasks/:id/attachments`, batas **4 MB/file** selaras file-service). Daftar tiket punya **3 tab scope** — *Tiket Saya* / *Ditugaskan ke Saya* / *Tiket Tim* (supervisor) — dengan **badge jumlah aktif** (`/tasks/counts`), pencarian, filter (status/prioritas/periode), urut terbaru; warna status kartu/header ikut `status_color` per-space. **Detail** dibagi section **Checklist** (hanya **centang**; item dibuat lewat web) & **Komentar** (terbaru dulu); **ubah status** (maju-saja) & **komentar** lewat **bottom action bar**. Gate izin: hanya **assignee/supervisor** yang boleh ubah status & checklist; **pemohon read-only** (hanya komentar). **Approve/Reject permintaan hanya di web** — mobile belum punya alur approval, sehingga notif "Permintaan baru" mengarahkan buka website ERP. URL di deskripsi jadi tautan klik; input teks auto-kapital huruf pertama (sentence-case). Fitur `features/task`. Backend: [[Microservices - Task Management Service]] · web: [[APP - Web ERP]] · tracker: [[APP - Dynamic Task Tracker]]
 
 ### Fitur pendukung lain
 - **QR Code**: tampilkan QR pribadi + akses scanner inventory
