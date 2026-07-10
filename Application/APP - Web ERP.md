@@ -30,7 +30,11 @@
 - **Recruitment**: Job Requisitions + System Setup (master ATS) → [[Microservices - Recruitment Service]]
 - **Payroll**: halaman **"Pengaturan Gaji"** (System Setup — 6 tab: Komponen Gaji, Gaji Karyawan, BPJS, Pajak/PTKP, **Perlakuan Kehadiran**, Perusahaan; reuse `SystemSetupLayout`) → [[Microservices - Payroll Service]] **Fase 1 (setup)**; kalkulasi/slip = fase berikut. Tab **Perlakuan Kehadiran** = master dibayar/dipotong per status absensi (data milik [[Microservices - Attendance Service]] `payroll_status_treatment`, memengaruhi payout). ⚠️ *branch `feat/payroll-fe`, belum merge; butuh BE ter-deploy di gateway untuk E2E*
 
-**KPI (shared)** — scoring per departemen + template CRUD + filter periode/status; HR lihat semua, supervisor hanya divisinya
+**KPI (shared)** — scoring per departemen + template CRUD (**per posisi**) + filter periode/status; HR lihat semua, supervisor hanya divisinya. Modal **Score KPI menyaring dropdown template ke posisi karyawan** yang dinilai — submit ditolak backend (`400`) bila posisi template ≠ posisi karyawan (bila belum ada template posisi tsb → diarahkan membuat dulu). Detail: [[HRIS - Key Performance Index]]
+
+**Support Ticket** (`src/features/support-ticket/`, menu **Support Ticket**) — portal ticketing lintas-divisi; backend [[Microservices - Task Management Service]]:
+- **Ajukan Tiket** (pilih departemen → Space, Judul/Deskripsi **auto-kapital huruf pertama** sentence-case, lampiran ≤ **4 MB**), **Tiket Saya** (tab *Tiket Saya* / *Ditugaskan* / *Tiket Tim* supervisor), **Permintaan Masuk** (triage supervisor: **approve** dgn assign penangan / **reject** dgn alasan — **approval hanya di web**), detail tiket (status inline, checklist, komentar).
+- **Kelola Space** (dulu "System Setup") — CRUD Space per divisi. **RBAC** di-anchor ke role sistem `ticket`: **admin ticket** → semua divisi; **supervisor divisi** (termasuk IT-spv) → **HANYA divisinya** (selaras BE `canSuperviseDivision`). **Izin checklist** hanya assignee/supervisor (pemohon read-only).
 
 **Finance**
 - Piutang (TikTok/Shopee): tabel accounts-receivable + filter overdue/in-transit
