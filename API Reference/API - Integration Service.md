@@ -104,6 +104,8 @@
 | DELETE | `/profit/mappings/:id` | Hapus mapping (**supervisor|admin modul integration/finance**) |
 | POST/GET | `/profit/channel-map/upload` · `/profit/channel-map` | Upload kamus channel variation (export Master Product; sku_id→master SKU) · ringkas count (**upload: supervisor|admin integration/finance**) |
 | GET | `/profit/order-listings` | Daftar Product Listing dari riwayat order (sample_name, item_id_count, mapped) — sumber dropdown form mapping |
+| GET | `/profit/cash-flow?start&end&shop_id&account_id&channel` | Kartu arus dana Sudah Cair (settlement actual) vs Uang Gantung (estimasi ±, rasio dipelajari dari settled 21 hari terakhir) + rincian per toko×bulan + akurasi historis; `channel=TIKTOK\|SHOPEE` (default TIKTOK) — definisi "settled" & sejumlah fitur (order yatim, join akun) ikut channel, lihat [[Microservices - Integration Service]] §Gross Profit; `account_id` diabaikan bila `channel=SHOPEE` |
+| GET | `/profit/cash-flow/orders?start&end&shop_id&account_id&channel` | Daftar order Uang Gantung (COMPLETED belum settle) utk panel rincian, maks 500 urut GMV desc; parameter & catatan channel sama seperti `/profit/cash-flow` |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
