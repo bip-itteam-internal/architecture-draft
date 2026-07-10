@@ -29,7 +29,6 @@
 | GET | `/tiktok/shop/auth` · `/auth/callback` · `/authorized-shops` | OAuth + shop terotorisasi |
 | GET | `/tiktok/shop/orders/list[/direct]` · `/orders/detail[/direct]` · `/orders/sync` | Order (cache/direct/sync). `/orders/detail` juga kembalikan `transaction_orders` = settlement per-order (Finance API `statement_transactions`, breakdown fee/ongkir/afiliasi/settlement per-SKU) |
 | GET | `/tiktok/shop/insight/gmv-winning-content` | Insight GMV |
-| GET | `/tiktok/shop/insight/creator-video-count` | Jumlah video per-creator per bulan (dari `tt_shop_video_performances`; sumber produksi ICC 125/bln). ⚠️ Baru, belum deploy |
 | GET/DELETE | `/tiktok/shop/accounts/list` · `/accounts/:id` | Akun TikTok Shop |
 
 ## TikTok Business
@@ -37,9 +36,7 @@
 |---|---|---|
 | GET | `/tiktok/business/auth[/callback]` · `/advertisers[/info][/direct]` · `/stores[/products]` | Auth, advertiser, store |
 | GET | `/tiktok/business/report/integrated[/daily/ad][/sync][/list][/summary/list]` | Laporan integrated |
-| GET | `/tiktok/business/report/gmv_max/...` (performance, product, campaigns, items, summary, monitoring, daily/sync) | Laporan GMV-Max |
-| GET | `/tiktok/business/report/gmv_max/monitoring` | Ranking campaign GMV Max (GMV/ROI/orders/cost) lintas account/shop + flag **GMV winner** (ROI≥3.2 & order≥15, ICC 2026) untuk dashboard marketing-insight. ⚠️ Baru, belum deploy. Grounded: `tiktok_business_handler.go` (`ListGMVMaxMonitoring`) |
-| GET | `/tiktok/business/insight/icc-video-metrics` | Metrik per-video ICC (ctr/watch25/roas/orders/post_date/creator) untuk insentif ICC; agregasi GMV Max + join `campaign_items` + `tt_shop_video_performances`. ⚠️ Baru, belum deploy. Grounded: `ListICCVideoMetrics` |
+| GET | `/tiktok/business/report/gmv_max/...` (performance, product, campaigns, items, summary, daily/sync) | Laporan GMV-Max |
 | GET | `/tiktok/business/sync/master-data` · `/accounts/list` · `/accounts/:id` (GET/POST/DELETE) | Sync & akun |
 
 ## Affiliate (TikTok Seller)
@@ -95,7 +92,7 @@
 
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/profit/products?start&end&shop_id&account_id&product_name&sku` | Laba Sejati per produk (roll-up SKU + `bundles` + `breakdown` GMV/promo/fee/net-settlement/retur + `estimated_share`) + flags `unmapped_skus`/`missing_hpp`; `account_id` = credential TikTok Shop |
+| GET | `/profit/products?start&end&shop_id&account_id&product_name&sku&mode` | Laba Sejati per produk (roll-up SKU + `bundles` + `breakdown` GMV/promo/fee/net-settlement/retur + `estimated_share`) + flags `unmapped_skus`/`missing_hpp`; `account_id` = credential TikTok Shop; `mode=settled` = MODE CAIR (hanya settlement actual: revenue/qty dari settlement, bucket belum cair dibuang, `estimated_share`=0, iklan diprorata porsi cair) — default semua order |
 | POST | `/profit/costs/upload` | Upload xlsx HPP finance (multipart `file` + `effective_from`; **supervisor|admin modul integration/finance**) |
 | GET | `/profit/costs?product_name=` | List HPP (riwayat per `effective_from`) |
 | POST/PUT/DELETE | `/profit/costs` · `/profit/costs/:id` | CRUD HPP satuan manual dari UI (tambah/edit/hapus 1 baris; **supervisor|admin modul integration/finance**) |
@@ -104,8 +101,6 @@
 | DELETE | `/profit/mappings/:id` | Hapus mapping (**supervisor|admin modul integration/finance**) |
 | POST/GET | `/profit/channel-map/upload` · `/profit/channel-map` | Upload kamus channel variation (export Master Product; sku_id→master SKU) · ringkas count (**upload: supervisor|admin integration/finance**) |
 | GET | `/profit/order-listings` | Daftar Product Listing dari riwayat order (sample_name, item_id_count, mapped) — sumber dropdown form mapping |
-| GET | `/profit/cash-flow?start&end&shop_id&account_id&channel` | Kartu arus dana Sudah Cair (settlement actual) vs Uang Gantung (estimasi ±, rasio dipelajari dari settled 21 hari terakhir) + rincian per toko×bulan + akurasi historis; `channel=TIKTOK\|SHOPEE` (default TIKTOK) — definisi "settled" & sejumlah fitur (order yatim, join akun) ikut channel, lihat [[Microservices - Integration Service]] §Gross Profit; `account_id` diabaikan bila `channel=SHOPEE` |
-| GET | `/profit/cash-flow/orders?start&end&shop_id&account_id&channel` | Daftar order Uang Gantung (COMPLETED belum settle) utk panel rincian, maks 500 urut GMV desc; parameter & catatan channel sama seperti `/profit/cash-flow` |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |

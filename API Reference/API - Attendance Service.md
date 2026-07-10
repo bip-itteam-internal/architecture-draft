@@ -13,7 +13,9 @@
 | GET | `/history` | Riwayat absensi sendiri (bulanan) | header |
 | GET | `/report` | Laporan periode 26→25 (`?yyyy-mm`) | HRIS |
 | PATCH | `/:id/update` | Update entri (+dokumen/status/comment) | HRIS |
-| GET | `/payroll-supplement` | Agregasi jam → payout_pct (`?employee_id`) | open |
+| GET | `/payroll-supplement` | Agregasi jam → payout_pct (`?employee_id`); dibayar/dipotong per status dari master treatment | open |
+| GET | `/payroll-status-treatment` | Perlakuan dibayar/dipotong per status (untuk payout) | HR |
+| PUT | `/payroll-status-treatment` | Set flag `paid` satu status (`{status, paid}`) | HR |
 | GET | `/today` · `/schedule` · `/sync/company-work-schedules` · `/data-type/:dt` | Jadwal harian/bulanan/sync/enum | open |
 | GET/PATCH | `/mood` | Mood check-in harian | header |
 

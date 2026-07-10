@@ -22,7 +22,7 @@
 | task-management | tiap jam (delay awal 1 mnt) | eskalasi SLA task (warning ke SPV / breach ke admin) | — | `services/task-management/reminder.go:12` |
 | notification | harian 03:00 (`0 3 * * *`) | hapus `inbox` > 2 bulan | — | `services/notification/cron.go:20` |
 | integration | harian 01:00 (`0 1 * * *`) | refresh token Desty + retry order PENDING | Redis | `services/integration/internal/cmd/cron.go:34` |
-| integration | harian 01:00 (`0 0 1 * * *`) | sync order TikTok Shop (semua shop authorized) | Redis `lock:sync-tt-shop-orders` (15m) | `.../worker/tasks/tt_shop_sync_orders.go:35` |
+| integration | **4× sehari** 00:00/08:00/16:00/23:00 (`0 0 0,8,16,23 * * *`) | sync order TikTok Shop (semua shop authorized, window 9 jam overlap) | Redis `lock:sync-tt-shop-orders` (15m) | `.../worker/tasks/tt_shop_sync_orders.go:35` |
 | integration | harian 00:00 (`0 0 0 * * *`) | sync master data TikTok Business | Redis `lock:sync-tt-business-master-data` (15m) | `.../worker/tasks/tt_business_master_data.go:45` |
 | integration | harian 01:00 (`0 0 1 * * *`) | sync report GMV-Max | Redis `lock:sync-tt-business-gmv-max-report` (15m, conc. 5) | `.../worker/tasks/tt_business_gmv_max_report.go:33` |
 | integration | harian 02:00 (`0 0 2 * * *`) | sync integration report | Redis `lock:sync-tt-business-integration-report` (15m) | `.../worker/tasks/tt_business_integration_report.go:35` |
@@ -30,8 +30,14 @@
 | integration | **tiap 5 detik** (`*/5 * * * * *`) | konsumsi antrian webhook `webhook_tasks` & dispatch | Redis `lock:webhook-consumer` (5m) | `.../worker/tasks/webhook_consumer_task.go:36` |
 | integration | harian 00:00 (`0 0 0 * * *`) | refresh kredensial Desty (cek expiry buffer 5 hari) | Redis `lock:desty-credential-task` (5m) | `.../worker/tasks/desty_credential_task.go:40` |
 | integration | harian 02:00 (`0 0 2 * * *`) | sync performa Shopee GMS (item & campaign) | Redis `lock:sync-shopee-performance` (30m) | `.../worker/tasks/shopee_sync_task.go:30` |
-| integration | harian 03:00 (`0 0 3 * * *`) | snapshot performa affiliate Shopee AMS per toko → `shopee_affiliate_performance` (window **mundur 3 hari** untuk self-heal order yang baru ter-confirm; upsert idempotent; toko tanpa cred AMS di-skip). **+ v3 (2026-07-04): product** (`get_product_performance`, AllChannel) → `shopee_affiliate_product_performance` **+ content** (`get_content_performance`, ShopeeVideo+LiveStreaming) → `shopee_affiliate_content_performance` — **isolated** (kegagalan v3 tak flip status v1, muncul di `v3-problems` notifier) | Redis `lock:sync-shopee-affiliate-performance` (30m) | `.../worker/tasks/shopee_affiliate_sync_task.go:26` |
-| integration | harian 05:00 (`0 0 5 * * *`) ✅ live | Affiliate v2: ledger order-level (`get_conversion_report`, iris per-hari) → `shopee_affiliate_conversion` + tagihan komisi bulanan (`get_validation_list`/`report` window placement **[M−2..M−1]**) → `shopee_affiliate_validation_bill` + stamp/rekonsiliasi; window konversi di-gate ke `get_performance_data_update_time` (fallback trailing-3-hari); plafon `page*size≤10000`; per-shop isolation, skip tanpa cred AMS | Redis `lock:sync-shopee-affiliate-conversion` (30m) | `.../worker/tasks/shopee_affiliate_conversion_sync_task.go:26` |
+| integration | harian 05:05 (`0 5 5 * * *`) | proaktif refresh token semua Shopee shop (buffer sebelum expiry 06:00) | Redis `lock:shopee-credential-task` (30m) | `.../worker/tasks/shopee_credential_task.go:30` |
+| integration | tiap jam :00 (`0 0 * * * *`) | rekonsiliasi income/escrow Shopee | Redis `lock:shopee-escrow-reconciler` | `.../worker/tasks/shopee_escrow_reconciler.go` |
+| integration | tiap jam :30 (`0 30 * * * *`) | rekonsiliasi income TikTok per order (refetch settlement) | Redis `lock:income-reconciler` | `.../worker/tasks/tt_income_reconciler.go` |
+| integration | **4× sehari** 00:00/08:00/16:00/23:00 (`0 0 0,8,16,23 * * *`) | sync affiliate orders TikTok Seller | Redis `lock:sync-affiliate-orders` (15m) | `.../worker/tasks/affiliate_orders_sync.go` |
+| integration | mingguan Minggu 02:00 (`0 0 2 * * 0`) | refresh status affiliate orders 89 hari terakhir | Redis `lock:refresh-affiliate-orders` | `.../worker/tasks/affiliate_orders_refresh.go` |
+| integration | harian 04:00 (`0 0 4 * * *`) | validasi komisi affiliate vs finance statement lokal | Redis `lock:validate-affiliate-commission` | `.../worker/tasks/affiliate_commission_validate.go` |
+| integration | harian 02:30 (`0 30 2 * * *`) | sync video performance TikTok Shop | Redis `lock:sync-tt-shop-video-performance` | `.../worker/tasks/tt_shop_video_performance_task.go` |
+| integration | **4× sehari** 00:00/08:00/16:00/23:00 (`0 0 0,8,16,23 * * *`) | sync report GMV-Max **hari ini** (intraday update) | Redis `lock:sync-tt-business-gmv-max-report-today` (15m) | `.../worker/tasks/tt_business_gmv_max_report_today.go:34` |
 
 > Inisialisasi index (bukan job): `services/insentive/cron_worker.go:1550` — `ensureCronIndexes()` (TTL index `cron_locks.expires_at`) dipanggil sekali saat startup.
 
@@ -45,7 +51,8 @@
 
 ## Catatan & risiko operasional
 
-- **Penumpukan jam 00:00–02:00**: banyak sync integration (master data, order, report, kredensial) menumpuk di tengah malam WIB — perhatikan saat menilai beban/quota API TikTok/Shopee.
+- **Penumpukan jam 00:00–02:00**: banyak sync integration (master data, order, report, kredensial) menumpuk di tengah malam WIB — perhatikan saat menilai beban/quota API TikTok/Shopee. Tambahan: `sync-tt-shop-orders` kini 4× sehari (bukan 1× di 01:00) — jam 00:00/08:00/16:00/23:00 WIB.
+- **Notifikasi kegagalan**: semua worker integration kirim Telegram otomatis via `WithOnJobError` hook di manager level — tidak perlu konfigurasi per-task. Shopee & Desty credential task juga punya `SendError` inline.
 - **Job tersibuk**: `webhook_consumer` jalan **tiap 5 detik** — paling sering; pastikan lock Redis sehat agar tak dobel.
 - **Locking**: integration = Redis (prefix `srv:integration:lock:*`); insentive = Mongo `cron_locks` (TTL 2j). Service lain (employee/attendance/notification/task-management) **tanpa distributed lock** — aman selama **single instance**; bila di-scale horizontal, job bisa dobel.
 - Backup DB mingguan ada di luar tabel ini (lihat [[IT - Backup & DR]] / [[IT - Runbooks]]).

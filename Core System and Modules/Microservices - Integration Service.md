@@ -32,6 +32,8 @@
 - **GMV Max Monitoring**: `GET /tiktok/business/report/gmv_max/monitoring` — ranking performa per-campaign (GMV/ROI/orders/cost) lintas account & shop untuk dashboard marketing-insight, dengan flag **GMV winner** = ROI ≥ 3.2 & order ≥ 15 (aturan khusus ICC 2026 di [[Finance - Incentive]]; ambang `roi_threshold`/`min_orders` bisa di-override). Agregasi **menjumlahkan semua baris report** per campaign — termasuk bucket atribusi `item_id="-1"` yang **terpisah** (bukan rollup dari baris per-creative), sehingga total ROI realistis (~4) bukan menyesatkan (~42 bila pakai `-1` saja). Grounded: `tiktok_business_handler.go` (`ListGMVMaxMonitoring`), `usecase/gmv_max_monitoring.go`, `entity.GMVMaxCampaignMonitoringItem.ComputeDerived`. ⚠️ Baru — sudah di kode (unit test + tervalidasi data prod), **belum deploy**.
 - **ICC Video Metrics**: `GET /tiktok/business/insight/icc-video-metrics` — metrik per-video untuk insentif **ICC** (`ctr`, `watch25`, `roas`, `orders`, `post_date`, `creator`): agregasi GMV Max ad-creative + join `tt_business_campaign_items` (video↔creator) + join `tt_shop_video_performances` (post_date). Dikonsumsi service insentif via HTTP untuk `EvaluateICCVideoIncentive`/`IsICCVideoEligible` (lihat [[Finance - Incentive]]). Grounded: `tiktok_business_handler.go` (`ListICCVideoMetrics`), `entity.ICCVideoMetric.ComputeDerived`. ⚠️ Baru — di kode + tervalidasi prod (1.138 video), **belum deploy**; per-video ROAS diketahui kurang andal (atribusi biaya ke bucket campaign).
 - Stores & Products
+- **Cron master data** (`SyncMasterData`, setiap 00:00): sync campaigns + stores per advertiser. Sebelumnya kena rate limit TikTok (`40000: Request too frequent`) akibat burst concurrency (advertiser goroutine limit 5, campaign page limit 10). **Fix 2026-07-09**: tambah `getCampaignsWithRetry` (4 attempts, exponential backoff 5s→10s→20s + jitter ≤3s), turunkan concurrency advertiser 5→2 dan page 10→3. Campaigns wajib ada agar cron GMV Max 01:00 bisa berjalan (filter `store_id` dari campaigns).
+- **`ListGMVMaxPerformanceReport`** — filter `advertiser_id` sebelumnya salah pakai field path `metrics.advertiser_id` (nested di sub-dokumen); **fix 2026-07-09** ke `advertiser_id` (field top-level di koleksi `tt_business_gmv_max_performance_reports`). Bug ini menyebabkan semua query performance per advertiser return 0 hasil di FE.
 - `/sync/master-data` — sinkronisasi master data
 - Accounts: CRUD
 
@@ -49,6 +51,11 @@
 
 ### TikTok Shop
 - OAuth: `/auth` (+ callback), `/authorized-shops`
+- **Model multi-account & multi-toko** — hierarki `1 open platform app → N credential → N authorized shop`:
+  - **App tunggal**: `TIKTOK_SHOP_APP_KEY`/`TIKTOK_SHOP_APP_SECRET` dibaca dari env (`tiktok_usecase.go` ctor) — satu app TikTok Shop Open Platform dipakai semua akun. Konsekuensi: rate limit API dihitung per-app, makin banyak akun/toko makin cepat kena limit (analog kasus kuota Shopee di §Observability & Ketahanan Shopee).
+  - **Credential per akun seller**: tiap otorisasi OAuth (`/auth/callback` → `ExchangeAccessToken`) membuat 1 dokumen `TiktokShopCredential` (`_id` UUID, name, access/refresh token + expiry, open_id) — 1 credential = 1 akun TikTok seller yang meng-authorize app.
+  - **Shop per credential**: `GetAuthorizedShops` (API `/authorization/202309/shops`) mengembalikan array shops per credential; disimpan sebagai `TiktokShopAuthorizedShop` (id, name, region, cipher, `credential_id` sebagai link ke credential). Tiap call API per-toko memakai `shop_cipher` toko tsb.
+  - **Cron multi-account otomatis**: task sync (orders, master data, affiliate) loop `ListCredentials` → per credential loop authorized shops — akun/toko baru cukup di-authorize via OAuth, tanpa perubahan kode/env.
 - Orders: list/detail, direct, sync
 - **Settlement per-order** (detail penyelesaian pembayaran): client `GetTransactionsByOrder` panggil TikTok **Finance API** `GET /finance/202501/orders/{order_id}/statement_transactions`. Ditarik saat sync order (`GetTransactionByOrderID` → fallback `GetTransactionsByOrder` bila belum ada), disimpan via `UpsertTransactionByOrder` ke entity `TiktokShopTransactionByOrder`, lalu ikut dikembalikan di response `/orders/detail` (field `transaction_orders`). Breakdown **per-SKU** mencakup semua komponen layar TikTok Shop: subtotal (`revenue_breakdown.subtotal_before_discount_amount` − `seller_discount_amount`), komisi platform (`fee.platform_commission_amount`/`referral_fee_amount`), ongkir (`shipping_cost_breakdown.*`), komisi afiliasi (`fee.affiliate_commission_amount` + partner/ads), komisi dinamis (co-funded/flash-sale/voucher-xtra fee), cashback bonus (`fee.bonus_cashback_service_fee_amount`), biaya pemrosesan (`fee.transaction_fee_amount`/`sfp_service_fee_amount`), dan `settlement_amount`. Transform `TransformToOrderIncome()` agregat ke `TransactionIncome` (revenue, service fee, shipping, discount, affiliate commission, settlement). **Catatan versi**: `202501` di-hardcode di client — verifikasi versi masih aktif sebelum diandalkan.
 - GMV Winning Content: `GET /tiktok/shop/insight/gmv-winning-content` — daftar konten pemenang GMV (handle `ErrShopNotFound` → HTTP 400)
@@ -102,19 +109,26 @@
 - `GET /health`
 
 ### Background Workers (cron)
-- Sync TikTok Shop orders — 1 AM
-- TikTok Business master-data
-- GMV-Max report — 1 AM
-- Integration report — 2 AM
-- **Affiliate orders sync** — per 8 jam (`0,8,16,23`), pola & cadence seragam ads GMV-max; loop credential→authorized-shop, error isolated per-shop
-- **Affiliate status refresh** — mingguan (Minggu 02:00): re-pull window 89 hari (cap API 3 bulan) agar `settlement_status` + `actual_commission` order lama ter-update (API affiliate hanya bisa filter `create_time`; order settle sampai ~90 hari). Jeda 8s antar-toko (anti-throttle). Limitation: order yang settle setelah umur >89 hari miss (rencana tambal: join finance statement, tunggu coverage ETL)
-- **Affiliate commission validation** — harian (04:00): cross-check komisi order SETTLED vs finance statement lokal (`tt_shop_transaction_by_orders`), stempel `validation_status` (VALIDATED/DISCREPANCY/NO_STATEMENT/PENDING; grace delivery+21h atau create+45h). Join murni DB lokal — nol call TikTok API
+- **Sync TikTok Shop orders** — **4× sehari** 00:00/08:00/16:00/23:00 WIB (`0 0 0,8,16,23 * * *`); window 9 jam overlap. *Re-enabled 2026-07-09 dengan jadwal diperbarui — sebelumnya 1× di 01:00 dan sempat disabled sejak Jun 2026.*
+- TikTok Business master-data — harian 00:00
+- GMV-Max report (historis) — harian 01:00
+- **GMV-Max report today** (intraday) — **4× sehari** 00:00/08:00/16:00/23:00
+- Integration report — harian 02:00
+- Video performance TikTok Shop — 02:30
+- **Affiliate orders sync** — 4× sehari (`0,8,16,23`), loop credential→authorized-shop, error isolated per-shop
+- **Affiliate status refresh** — mingguan (Minggu 02:00): re-pull window 89 hari agar `settlement_status` + `actual_commission` lama ter-update
+- **Affiliate commission validation** — harian 04:00: cross-check komisi SETTLED vs finance statement lokal (`tt_shop_transaction_by_orders`), stempel `validation_status`. Nol call TikTok API
+- **Income reconciler TikTok** — tiap jam **:30** (digeser dari :00 — hindari pileup quota TikTok dengan gmv-max/affiliate-sync/escrow). Batch 600 order/run, limiter 5 req/s + circuit breaker 36009002 (5 fail beruntun → abort run). Klasifikasi hasil refetch: `fetched` (settlement masuk) / `not_available` (belum cair, re-scan tanpa bakar attempt; min-age 3 hari) / `pending` (error teknis, attempt++ cap 10). Ringkasan tiap run disimpan ke koleksi `reconciler_run_stats` → dipakai endpoint `settlement/sync-status` untuk baris info FE settlement
+- **Shopee escrow reconciler** — tiap jam :00
 - Webhook-consumer — tiap 5 detik
 - Desty-credential refresh — tengah malam
 - Sync Shopee performance — 2 AM
 - **Shopee escrow reconciler** — per jam (`0 0 * * * *`): re-fetch escrow order yang **RILIS** (via `get_escrow_list`) → koreksi `income` stale (fee difinalisasi setelah COMPLETED, mis. komisi AMS). Cursor per-toko by `release_time`, skip-if-match, breaker. Lihat *Reconcile income/escrow stale* di Observability.
 - Redis queue digunakan untuk task summary-report
 - Optimasi concurrency: global semaphore + sequential processing untuk mitigasi rate limit API marketplace
+- **Notifikasi kegagalan**: semua worker kirim Telegram otomatis via `WithOnJobError` hook manager level (setelah semua retry habis) — 18 job ter-cover tanpa konfigurasi per-task
+- ⚠️ **Jadwal task = DB source of truth**: schedule di-SEED sekali ke Mongo `workers.worker_configs` saat registrasi pertama; setelahnya **nilai DB yang berlaku** — mengubah `Schedule()` di kode TIDAK berpengaruh sampai dokumen `worker_configs` di-update manual (`db.worker_configs.updateOne({_id:"<job>"},{$set:{schedule:"..."}})`; efektif live tanpa restart). Boot log WARN bila schedule DB ≠ kode. Pause task sementara: tanam lock di `workers.worker_locks` (`_id: lock:<job>`, `expires_at` = auto-lepas). Insiden 4 Jul 2026: jadwal income-reconciler diubah di kode tapi prod tetap pakai config lama. Detail: `services/integration/internal/worker/README.md`
+- **One-off CLI recovery** (`cmd/backfill`, `cmd/settledfeed`; dry-run default, idempotent, `--apply` untuk tulis ke DB): `backfill` = migrasi field `income_status` doc lama + re-insert order raw-only (order_date dari `create_time` asli — summary group by order_date); `settledfeed` = feed order affiliate SETTLED → by-order finance fetch (interleave per-shop, adaptive backoff 36009002 cool-down 5/10/15s, newest-first). Dipakai recovery Jul 2026: coverage finance affiliate-SETTLED 15,7% → 100% (~78rb order, ~26 jam)
 
 ### Gross Profit per Product (modul profit)
 
@@ -125,6 +139,10 @@ Rumus per produk/SKU (TikTok) — **"Laba Sejati"** (blueprint dashboard marketi
 
 - **Sumber komponen**: settlement per-SKU dari `tt_shop_transaction_by_orders` (GMV `subtotal_before_discount`, promo `seller_discount`, fee breakdown komisi/affiliate/proses/ongkir, retur refund, `settlement_amount`; identitas kolom eksak, residual di `other`) — join `sku_id→seller_sku` via `tt_shop_orders.line_items` (per-order → kamus global → fallback); qty & bucket bulanan dari `transaction_orders`; iklan = GMV Max `metrics.cost` per `dimensions.item_group_id` (= ID produk; `item_id` = level kreatif — verified) dengan split prorata revenue untuk listing multi-claim; HPP = `product_costs` per BULAN order (`effective_from` bulanan, bucket `%Y-%m` WIB).
 - **Estimasi order belum settle**: rate komponen/GMV agregat per bulan dari data settled → komponen order pending diestimasi; `estimated_share` dilaporkan per baris & agregat (transparansi, terganti otomatis saat settlement masuk).
+- **Mode cair** (`?mode=settled`, default FE): bucket sales diganti angka settlement actual (`SettledOnlySales` — revenue=GMV settled, qty=qty settled, bucket belum cair dibuang) → seluruh breakdown murni actual tanpa estimasi; iklan diprorata porsi cair per SKU (`applySettledAdsScale`) karena spend harian tak mengenal status settle. Mode default (tanpa param) = semua order.
+- **Dibayar Pembeli** (`buyer_paid`): `total_payment` order (uang dibayar buyer = setelah diskon + ongkir, SEBELUM potongan komisi TikTok) diprorata ke SKU dengan share `items.total` — konsisten cara fee di-split. = kolom "Order Amount" export Semua Pesanan TikTok (verified match). Bucket settlement-only (order yatim) tanpa total_payment → buyer_paid 0.
+- **Klasifikasi Komisi**: `fee_commission` = platform + referral + **dynamic commission + flash-sale + voucher-xtra** (dynamic terverifikasi prod > platform commission, Jun 2026: 313jt vs 226jt — sebelumnya nyangkut di residual Proses); `fee_affiliate` = organik + partner + **affiliate ADS commission**; `fee_process` = residual: cashback program + biaya infrastruktur tetap (`vn_fix_infrastructure_fee`) + mall service fee + pajak/lainnya (porsi fluktuatif antar periode). **Pecahan informasi** dibawa breakdown & tampil di kartu KPI, kolom tabel (grup − BIAYA MARKETPLACE), dan sub-baris waterfall panel: `fee_comm_dynamic` (komisi dinamis; dasar = commission − dynamic) + `fee_proc_cashback/infra/mall` (lainnya = process − 3) — semua subset, ikut Add/Scale/estimasi/projection.
+- **Arus dana** (`GET /profit/cash-flow`): kartu **Sudah Cair** (Σ `income.total_settlement_amount` order `income_status=fetched` — actual) vs **Uang Gantung** (COMPLETED belum settle — estimasi `GMV × rate_toko`, shrinkage `(net+global×K)/(gmv+K)` K=100jt, window belajar order settled 21/45 hari terdekat; backtest Apr+Mei total ±3,0%, per-toko 4–6%) + rincian toko×bulan + `accuracy_30d` (track-record rumus dihitung on-the-fly). Granularitas repo per (toko, hari WIB) — `AggregateCashFlowDaily`. Kartu Sudah Cair juga menghitung **order yatim** (settlement tercatat tapi order tak pernah masuk pipeline — 9.625 order drift order-list historis; `AggregateOrphanSettledDaily` anti-join) supaya konsisten dengan tabel; tooling pemulihan: `cmd/orphanbackfill` (tarik detail by-ID batch 50, dry-run default).
 - **Bundle**: SKU multi-komponen dialokasikan ke produk komponen dengan rasio nilai HPP (revenue/fee/net di-share; HPP exact per komponen; qty = qty_bundle × qty_per_unit); daftar `bundles` terpisah di response sebagai view informasi (overlap dengan products, jangan dijumlah).
 - **Koleksi baru (integration_db)**: `product_costs` (HPP per produk, riwayat per `effective_from`, `source: upload|accurate` — siap sync Accurate fase berikut) + `product_sku_mappings` (kunci unik `(sku, tiktok_item_id, product_name)`; 1 SKU boleh multi-baris: multi-toko per item_id & bundle per komponen dengan `qty_per_unit`; HPP dihitung sekali per komponen distinct).
 - **Arsitektur hitung**: aggregate on-read (pipeline Mongo + fungsi murni `AssembleProductProfit` di usecase, unit-tested) — tanpa ETL/snapshot baru.
@@ -164,6 +182,7 @@ Rumus per produk/SKU (TikTok) — **"Laba Sejati"** (blueprint dashboard marketi
 - CronManager lama **fully disabled** — fungsinya dipindah ke worker framework.
 - **Lazada** hanya disebut di kode cron yang sudah disabled — **TIDAK ada client Lazada** (placeholder/partial).
 - **Meta Ads** — **TIDAK ada client Meta Ads** di backend; konsepnya baru eksis sebagai role/setting manual di FE Finance/Incentive. Rencana integrasi: lihat §Meta Ads di atas.
+- **KiriminAja** — **TIDAK ada client KiriminAja** sama sekali; 0 referensi di kode. Rencana integrasi (shipping/logistics API): lihat §KiriminAja di atas.
 - TODO kecil: indexing `time.Time`.
 
 ## Dependencies & Integrasi
@@ -180,6 +199,7 @@ External lain: TikTok Shop, TikTok Business/Ads, Shopee, [[External - Desty]] (m
 
 - [[External - Desty]] — vendor middleware orkestrasi order (webhook + auto-approve)
 - [[RUN - Onboarding Meta Ads]] — langkah operasional pembuatan akun/app Meta Ads (rencana)
+- [[RUN - Onboarding KiriminAja]] — langkah operasional partnership & API key KiriminAja (rencana)
 - [[Finance - Incentive]] — konsumen data konversi/CPA Meta Ads untuk skema insentif ADV Meta
 - [[Sales - Marketplace Integration]] (konsep sisi marketing)
 - [[Finance - Bridging App]]

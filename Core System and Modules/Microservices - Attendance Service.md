@@ -22,7 +22,8 @@
 - `GET /internal/summary` — hitung jumlah clock-in/out dalam 24 jam.
 - `PATCH /:id/update` — edit entry absensi sekaligus lampirkan dokumen.
 - `GET /report` — laporan bulanan per karyawan (periode 26→26).
-- `GET /payroll-supplement` — agregasi jam kerja, telat, cuti (dipotong), **izin dibayar** (bucket `paid_leave` = `AttendanceEntries.paid_leave_hour`; izin "urusan kantor" dihitung sebagai kerja, tidak menurunkan payout), lembur, dan absen menjadi `payout_pct`. Diproxy oleh Employee Service sbg `/api/employee/me/payroll-approx`.
+- `GET /payroll-supplement` — agregasi jam kerja jadi `payout_pct = jam_kerja / jam_diharapkan` (+ rincian telat, leave, lembur, absen). **Perlakuan dibayar/dipotong per status kini _configurable_** via master `payroll_status_treatment` (default: Cuti/Sakit/Dinas/Libur = **dibayar**; Izin/Tanpa Keterangan = **dipotong**). Tepat Waktu/Terlambat = hari ter-clock (kerja = jadwal − telat − izin jam); Pending dilewati. Logika agregasi = fungsi murni `computePayoutBreakdown`. Diproxy oleh Employee Service sbg `/api/employee/me/payroll-approx`.
+- `GET /payroll-status-treatment` — perlakuan payout per status (`data`) + **override per-subtipe** (`subtypes`); RBAC HR. `PUT /payroll-status-treatment` (body `{status, paid, subtype?}`) — set `paid` per status, atau per `(status, subtype)` bila `subtype` diisi (koleksi `payroll_subtype_treatment`, diturunkan dari `LeaveSubtypes` yang di-resolve ke status; PR #271). Hanya baris ter-seed (404 selainnya). Di-seed default saat boot (idempoten, tak menimpa perubahan HR). **Override subtipe kini dipakai payout** (Fase 2, PR #273): subtipe dipersist ke `attendance_entries` (cron + approval), `computePayoutBreakdown(entries, paidStatus, subtypePaid)` menerapkan override per-(status,subtipe) di atas per-status via `paidForEntry`. Entry lama tanpa subtipe = per-status (tanpa backfill). Konsep bisnis: [[HRIS - Payroll]] · [[HRIS - Employee Request & Approval]].
 
 **Clock In/Out**
 - `POST /tap?method=` — clock-in/out multi-metode:
@@ -87,7 +88,7 @@
 
 ## Dependencies & Integrasi
 
-- **MongoDB** — database independen, collections: `attendance_entries`, `work_schedule`, `company_work_schedule`, `company_group_rotation`, `company_wifi`, `company_holiday`, `fingerprint_export`, `guestbook`, `leave_request`, `schedule_exchange_request`, `attendance_correction_request`, `business_trip_request`, `business_trip_counter`. Lihat [[DB - Overview and Notes]].
+- **MongoDB** — database independen, collections: `attendance_entries`, `work_schedule`, `company_work_schedule`, `company_group_rotation`, `company_wifi`, `company_holiday`, `fingerprint_export`, `guestbook`, `leave_request`, `schedule_exchange_request`, `attendance_correction_request`, `business_trip_request`, `business_trip_counter`, `payroll_status_treatment` (perlakuan dibayar/dipotong per status untuk payout), `payroll_subtype_treatment` (override per-subtipe; belum dipakai payout). Lihat [[DB - Overview and Notes]].
 - [[Microservices - Employee Service]] — endpoint `/list` (data karyawan) dan `/vacation/decrement` (decrement kuota cuti).
 - [[Microservices - File Service]] — upload dokumen pendukung leave request.
 - [[Microservices - Notification Service]] — pengiriman notifikasi FCM (guestbook, review leave request).
