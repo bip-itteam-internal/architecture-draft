@@ -127,7 +127,7 @@
 - **Affiliate orders sync** — 4× sehari (`0,8,16,23`), loop credential→authorized-shop, error isolated per-shop
 - **Affiliate status refresh** — mingguan (Minggu 02:00): re-pull window 89 hari agar `settlement_status` + `actual_commission` lama ter-update
 - **Affiliate commission validation** — harian 04:00: cross-check komisi SETTLED vs finance statement lokal (`tt_shop_transaction_by_orders`), stempel `validation_status`. Nol call TikTok API
-- **Income reconciler TikTok** — tiap jam **:30** (digeser dari :00 — hindari pileup quota TikTok dengan gmv-max/affiliate-sync/escrow). Batch 600 order/run, limiter 5 req/s + circuit breaker 36009002 (5 fail beruntun → abort run). Klasifikasi hasil refetch: `fetched` (settlement masuk) / `not_available` (belum cair, re-scan tanpa bakar attempt; min-age 3 hari) / `pending` (error teknis, attempt++ cap 10). Ringkasan tiap run disimpan ke koleksi `reconciler_run_stats` → dipakai endpoint `settlement/sync-status` untuk baris info FE settlement
+- **Income reconciler TikTok** — tiap jam **:30, hanya 06:30–23:30 WIB** (skip dini hari — quota habis buat sync harian besar, breaker sering trip; antrian persisten di DB jadi order malam terambil run 06:30). Batch 600 order/run, limiter 5 req/s + circuit breaker 36009002 (5 fail beruntun → abort run). Klasifikasi hasil refetch: `fetched` (settlement masuk) / `not_available` (belum cair, re-scan tanpa bakar attempt; min-age 3 hari) / `pending` (error teknis, attempt++ cap 10). Ringkasan tiap run disimpan ke koleksi `reconciler_run_stats` → dipakai endpoint `settlement/sync-status` untuk baris info FE settlement
 - **Shopee escrow reconciler** — tiap jam :00
 - Webhook-consumer — tiap 5 detik
 - Desty-credential refresh — tengah malam
