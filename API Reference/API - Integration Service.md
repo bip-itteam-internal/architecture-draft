@@ -93,7 +93,7 @@
 
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/profit/products?start&end&shop_id&account_id&product_name&sku&mode` | Laba Sejati per produk (roll-up SKU + `bundles` + `breakdown` GMV/promo/fee/net-settlement/retur + `estimated_share`) + flags `unmapped_skus`/`missing_hpp`; `account_id` = credential TikTok Shop; `mode=settled` = MODE CAIR (hanya settlement actual: revenue/qty dari settlement, bucket belum cair dibuang, `estimated_share`=0, iklan diprorata porsi cair) — default semua order |
+| GET | `/profit/products?start&end&shop_id&account_id&product_name&sku&mode` | Laba Sejati per produk (roll-up SKU + `bundles` + `breakdown` GMV/promo/fee/net-settlement/retur + `estimated_share` + `periods[]` bila HPP produk berubah di rentang — pecah per periode HPP presisi tanggal, SEMUA kolom qty→margin, tidak dirata-rata) + flags `unmapped_skus`/`missing_hpp`; `account_id` = credential TikTok Shop; `mode=settled` = MODE CAIR (hanya settlement actual: revenue/qty dari settlement, bucket belum cair dibuang, `estimated_share`=0, iklan diprorata porsi cair — periods iklan/laba juga diprorata ulang) — default semua order |
 | POST | `/profit/costs/upload` | Upload xlsx HPP finance (multipart `file` + `effective_from`; **supervisor|admin modul integration/finance**) |
 | GET | `/profit/costs?product_name=` | List HPP (riwayat per `effective_from`) |
 | POST/PUT/DELETE | `/profit/costs` · `/profit/costs/:id` | CRUD HPP satuan manual dari UI (tambah/edit/hapus 1 baris; **supervisor|admin modul integration/finance**) |
