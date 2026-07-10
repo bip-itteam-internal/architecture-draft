@@ -16,6 +16,7 @@
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/transactions/orders/list` · `/orders/:id` · `/orders/summary[/shops|/products]` | Order terpadu + ringkasan |
+| GET | `/transactions/orders/export` | Export daftar order (Order Management) ke **.xlsx**, 1 baris per item. Filter identik `/orders/list`: `channel`, `status`, `canceled_by`, `time_from`, `time_to`, `shop_id`, `order_id`. Tanpa paginasi (cap 10.000 order, `order_date` desc). Nama file (`Content-Disposition`) mencerminkan filter aktif (channel/shop/rentang tanggal `DD-MM-YYYY_sd_DD-MM-YYYY`) |
 | GET | `/transactions/orders/summary/comparison` | Perbandingan performa 2 periode kustom: 4 metrik (TO_SHIP revenue, COMPLETED revenue, COMPLETED qty produk, COMPLETED order count) + granularity hourly/daily. Param: `start_date`, `end_date`, `comparison_start`, `comparison_end` (YYYY-MM-DD; default today vs yesterday), `channel` (opsional), `shop_id`, `timezone` |
 | GET | `/transactions/orders/dashboard/summary` | Jumlah order aktif saat ini (tanpa filter tanggal) per kategori kartu dashboard: `pesanan_baru` (TO_PROCESS), `siap_dikirim` (TO_SHIP), `belum_di_proses` (TO_PROCESS+TO_SHIP), `pesanan_selesai` (COMPLETED). Param: `channel` (opsional), `shop_id` (opsional) |
 | GET | `/transactions/master/shops` · `/channels` · `/status` | Master shop/channel/status |
