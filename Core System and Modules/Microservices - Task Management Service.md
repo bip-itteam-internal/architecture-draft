@@ -39,7 +39,12 @@
 ### Lifecycle: Hold / Reopen
 - `POST /tasks/:id/hold` — **tahan** tiket (guard `staffOrSup` + `canHold`: hanya tiket non-terminal & belum di-hold). Set `on_hold=true`, `held_at`, `hold_reason` (opsional dari body). Selama hold, SLA masuk state **`held`** (jam SLA dijeda).
 - `POST /tasks/:id/unhold` — **lepas** hold (guard `staffOrSup` + `canUnhold`). Hitung durasi hold `now − held_at`, akumulasi ke `hold_accum_ms`; **geser** `response_due_at`/`due_date` sebesar durasi tsb (hanya bila belum `responded_at`/`completed_at`), lalu clear `on_hold`/`held_at`.
-- `POST /tasks/:id/reopen` — **buka kembali** tiket dari status terminal (`Done`/`Selesai` atau ter-`is_archived`) ke **langkah kerja pertama** space (guard `staffOrSup`; **pemohon juga boleh** — dicek di handler via `isCreator`). Reset SLA resolusi: `due_date = now + target resolusi prioritas` (`resolutionHoursOf`, fallback 72 jam), `is_archived=false`, unset `completed_at`, `reopen_count++`, stamp `reopened_at`.
+- `POST /tasks/:id/reopen` — **buka kembali** tiket dari status terminal (`Done`/`Selesai` atau ter-`is_archived`) ke **langkah kerja pertama** space (guard `staffOrSup`; **pemohon juga boleh** — dicek di handler via `isCreator`). Reset SLA resolusi: `due_date = now + target resolusi prioritas` (`resolutionHoursOf`, fallback 72 jam), `is_archived=false`, unset `completed_at` & `csat`, `reopen_count++`, stamp `reopened_at`.
+
+### CSAT (Kepuasan Requester)
+- `POST /tasks/:id/csat` — requester memberi rating **1–5 bintang** + komentar (guard `staffOrSup`; **requester-only** dicek di handler via `canSubmitCSAT`). Validasi (`csat.go`): rating 1–5, **komentar wajib bila rating ≤ 2** (`400`); hanya untuk tiket **berstatus `Done`, `completed_at != nil`, non-arsip** (`403` bukan pemohon / `409` belum selesai). Idempotent overwrite; disimpan embedded `csat{rating,comment,rated_at,rated_by}` pada task; audit + broadcast `task_update`.
+- **Notif** `task_resolved_rate_me` ke requester saat tiket → `Done` (di 3 situs transisi `updateTaskStatus`/`updateTask`/`approveTask`; guard `status != "Done"` cegah dobel; reopen→Done kirim lagi).
+- **Reopen** membersihkan `csat` (`$unset`) → siklus resolusi baru, requester menilai ulang. (PR #343 BE, #233 Web.)
 
 ### SLA Engine (dua dimensi)
 - **Response:** `response_due_at` vs `responded_at` (field diset saat create/approve). **Resolution:** `due_date` vs `completed_at`.
@@ -53,6 +58,7 @@
 - `GET /report/timeline` — timeline.
 - `GET /report/manpower-performance` — performa manpower.
 - `GET /report/sla` — rate on-time response & resolution (overall + per divisi, dengan rentang tanggal).
+- `GET /report/csat` — agregat CSAT **flat** `{average, top2box_pct (bintang 4–5), count, distribution[1..5]}`; rentang tanggal (`csat.rated_at`) + scope role meniru `/report/sla`.
 
 ### Lain-lain
 - **Attachments** — lewat **[[Microservices - File Service]]** (bukan MinIO langsung; prefix object `task/`, key `MINIO_TASK_KEY`), bukan temp-upload (FE create-task-lalu-upload). Endpoint (`attachment_handlers.go`, `fileclient.go`):
