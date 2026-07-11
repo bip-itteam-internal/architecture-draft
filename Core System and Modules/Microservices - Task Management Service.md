@@ -33,13 +33,18 @@
 - `DELETE /tasks/:id` — hapus task.
 
 ### Approval
-- `POST /tasks/:id/approve` — approve task. Untuk transisi `Request → Todo` WAJIB body `start_date`, `due_date`, `priority_id`; stamp `responded_at` (menghentikan SLA response clock). Untuk `Testing → Done` stamp `completed_at`.
+- `POST /tasks/:id/approve` — approve task. Untuk transisi `Request → Todo` **wajib `priority_id`** (`400` bila kosong/invalid); `due_date` **opsional** — bila kosong diisi otomatis `now + target resolusi prioritas` (`resolution_hours`, fallback 72 jam); `start_date` opsional. Stamp `responded_at` (menghentikan SLA response clock). Untuk `Testing → Done` stamp `completed_at`.
 - `POST /tasks/:id/reject` — tolak task (status `Ditolak`).
+
+### Lifecycle: Hold / Reopen
+- `POST /tasks/:id/hold` — **tahan** tiket (guard `staffOrSup` + `canHold`: hanya tiket non-terminal & belum di-hold). Set `on_hold=true`, `held_at`, `hold_reason` (opsional dari body). Selama hold, SLA masuk state **`held`** (jam SLA dijeda).
+- `POST /tasks/:id/unhold` — **lepas** hold (guard `staffOrSup` + `canUnhold`). Hitung durasi hold `now − held_at`, akumulasi ke `hold_accum_ms`; **geser** `response_due_at`/`due_date` sebesar durasi tsb (hanya bila belum `responded_at`/`completed_at`), lalu clear `on_hold`/`held_at`.
+- `POST /tasks/:id/reopen` — **buka kembali** tiket dari status terminal (`Done`/`Selesai` atau ter-`is_archived`) ke **langkah kerja pertama** space (guard `staffOrSup`; **pemohon juga boleh** — dicek di handler via `isCreator`). Reset SLA resolusi: `due_date = now + target resolusi prioritas` (`resolutionHoursOf`, fallback 72 jam), `is_archived=false`, unset `completed_at`, `reopen_count++`, stamp `reopened_at`.
 
 ### SLA Engine (dua dimensi)
 - **Response:** `response_due_at` vs `responded_at` (field diset saat create/approve). **Resolution:** `due_date` vs `completed_at`.
-- State (dihitung di `sla.go`, disertakan pada task populated `sla.response/resolution.{due_at,state}`): `none` / `on_track` / `warning` / `breached` / `met`; `warning` aktif di 80% window.
-- Default: response **24 jam** (diset saat create), resolution **72 jam** (referensi resolution: `start_date`/`responded_at`/`created_at` → `due_date`). Override per-priority: **TBD**.
+- State (dihitung di `sla.go`, disertakan pada task populated `sla.response/resolution.{due_at,state}`): `none` / `on_track` / `warning` / `breached` / `met` / **`held`** (saat tiket di-hold); `warning` aktif di 80% window.
+- Default: response **24 jam** (diset saat create), resolution **72 jam** (referensi resolution: `start_date`/`responded_at`/`created_at` → `due_date`). **Override resolution per-priority ✅**: tiap `Priority` punya `resolution_hours` (per-space, satuan jam) → dipakai `resolutionHoursOf(space, priority_id)` saat approve (default `due_date`) & reopen; fallback 72 jam bila `resolution_hours ≤ 0` / prioritas tak ada. (Response tetap 24 jam, bukan per-priority.)
 - Scheduler eskalasi (`sla_scheduler.go`): goroutine per jam, mengirim notifikasi **breach sekali** per task (ditandai array `sla_notified`): response breach → **supervisor divisi**; resolution breach → **assignee + supervisor**. (Warning hanya untuk badge, belum dieskalasi via notifikasi.)
 
 ### Reports / Dashboard
@@ -67,7 +72,7 @@
 - **Role admin lintas-divisi tidak diaktifkan** — hanya `supervisor`/`staff` (di-derive dari `system_roles`).
 - **Deteksi supervisor divisi utk notifikasi** (`findDivisionSupervisors`) memakai `work_data` ERP (flag `is_supervisor`, fallback jabatan regex `Supervisor|^Leader$`), **bukan** `system_roles` (key `system_roles` = kode modul spt "it"/"finance", tak pernah cocok dgn nama departemen). Hanya akun aktif.
 - Notif **"Permintaan baru"** (`NotifTaskRequest`, ke supervisor divisi + admin saat tiket dibuat) menyertakan arahan **buka website ERP** — sebab **approve/reject hanya tersedia di web**; mobile ([[APP - MyBharata]]) belum punya alur approval.
-- **Override SLA per-priority: TBD** (default response 24 jam / resolution 72 jam).
+- **Override SLA resolution per-priority ✅ implemented** (`Priority.resolution_hours` per-space, fallback 72 jam; approve auto-`due_date` + reopen; PR #337). Override **response** per-priority tetap TBD (response fix 24 jam).
 - `GET /report/sla`: `met` = selesai **tepat waktu** atas item terukur (yang sudah `responded_at`/`completed_at`); `total` = jumlah item terukur. On-time rate = met/total.
 - `getAdminTaskStats` = hitungan status divisi supervisor (bentuk **FLAT** `{total,request,todo,ongoing,testing,done,ditolak}`), bukan alias `getTaskStats`.
 - `filterTasks` menghormati flag `assigned_to_me`/`created_by_me`/`pending_my_approval`/`filter_by_admin_division` (search/pagination dilakukan client-side).
