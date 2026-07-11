@@ -81,6 +81,10 @@
 | GET/POST/PUT/DELETE | `/accurate/settings/kv-configs[/list|/:id]` | KV config Accurate |
 | GET | `/accurate/daily-invoices` | List faktur harian auto-sync RTS (filter `shop_id`, `channel`, `date`/`date_from`/`date_to` (WIB `YYYYMMDD`), `status` SENT/FAILED/PENDING; paginated) |
 | POST | `/accurate/daily-invoices/:id/retry` | Retry sinkron faktur auto-sync (re-snapshot order `TO_SHIP` shop-hari → kirim ulang, balas status akhir) |
+| GET | `/accurate/stocks?sku=` | Stok live per SKU listing (pecah komponen bundle via `product_sku_mappings`, get-stock.do) |
+| GET | `/accurate/stocks/list` | Semua stok dari salinan lokal `accurate_stocks` (search `q`, paginated) — 🟡 PR #340 |
+| GET | `/accurate/stocks/listing` | Stok per SKU listing dari salinan lokal: komponen bundle + stok efektif — 🟡 PR #340 |
+| POST | `/webhooks/services/accurate` | Webhook Accurate (ITEM_QUANTITY/STOCK_MUTATION) → update `accurate_stocks` (PUBLIK via `/ext/webhook/accurate`) — 🟡 PR #340 |
 
 > **Guard anti-dobel:** `POST /transactions/summary/reports/:id/send/accurate` (SALES_INVOICE) balas **409** + daftar overlap bila rentang report beririsan faktur auto-sync `SENT`; bypass `?force=true`.
 
