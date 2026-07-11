@@ -20,6 +20,7 @@ Daftar rute lengkap di [[API - Manufacture Service]]. Ringkas:
 - **Produksi** — order produksi (konsumsi stok) + production-log (catatan tanpa konsumsi).
 - **PO & Proposal** — marketing-po, procurement-po (status workflow + audit), proposal approve/reject. Proposal dipakai untuk **deviasi pemakaian fisik vs teori BOM** pada keluar-produksi: FE membuat proposal `PENDING_PPIC` (transaksi belum ada), approval dua tahap PPIC → SPV; saat `APPLIED` backend insert transaksi + potong stok dengan filter kondisional `stok_sekarang >= qty` (ditolak 409 bila akan minus).
 - **Audit log** — `GET /audit-log` (siapa mengubah apa, per aksi/target) + `GET /audit-log/rekap?bulan=YYYY-MM` (agregasi aktivitas CRUD per user untuk **KPI otomatis**; batas hari/bulan pakai **WIB (UTC+7)**, respons ber-flag `truncated` bila entri bulan >20k).
+- **Resi — Master Retur Ekspedisi (bridge marketplace)** — `manufacture_resi` (upsert by `no_resi` unik) untuk auto-fill scan form Return & Keluar FG, kini **terisi otomatis** dari order marketplace lewat integration: manufacture bisa **pull** (`POST /resi/sync-tiktok` → `/tiktok/shop/orders/resi-feed`; `POST /resi/sync-shopee` → `/shopee/orders/resi-feed`) atau menerima **push** batch (`POST /resi/sync-batch`) dari scheduler integration `sync-resi-wms` (tiap 10 mnt, watermark per-channel). Tiap resi membawa `status_pesanan`, `tanggal_rts` & `shift` gudang (jam kerja 08:00–16:00 WIB dibagi **Pagi/Siang/Sore**, di luar itu "Luar Jam"). FE **Master Resi** paginasi **per-hari** (nomor urut reset per hari), filter marketplace + **order status kanonik** (To Process/To Ship/Shipped/Completed/Returned/Cancelled, sama seperti modul Integration) + shift, dan **export Excel** (modal filter + pemilih kolom: Order Id/No Resi/SKU/Nama Produk/Qty + opsional). Detail sisi produsen: [[Microservices - Integration Service]]; jadwal: [[IT - Background Jobs & Schedulers]].
 
 ## Model Data (`manufacture_db`)
 
@@ -34,7 +35,7 @@ Daftar rute lengkap di [[API - Manufacture Service]]. Ringkas:
 - `manufacture_production_log` (+`detail`) · `manufacture_material_order` · `manufacture_marketing_po` · `manufacture_procurement_po` (+`detail`, menampung daftar `items` saat 1 permintaan berisi banyak bahan) · `manufacture_proposal`.
 - `manufacture_saldo_awal_bulanan` — snapshot saldo awal per bulan (`_id` = `kode|YYYY-MM`, kode, nama, bulan, qty) — memisahkan saldo awal bulanan dari data master barang.
 - `manufacture_audit_log` — jejak perubahan oleh user (dari header `BIP-Employee-ID`/`BIP-Username`).
-- `manufacture_resi` — master resi retur ekspedisi (no resi, market, ekspedisi, items) — sumber scan form Return & Keluar FG.
+- `manufacture_resi` — master resi/AWB retur ekspedisi (`no_resi` **unik**, `nama_market`, `nama_toko`, `nomor_pesanan`, `status_pesanan`, `tanggal_pesanan`, `tanggal_rts`, `shift`, `ekspedisi`, `items[]{sku,nama_barang,qty_total}`) — sumber auto-fill scan form Return & Keluar FG. **Terisi otomatis** dari order TikTok/Shopee via resi-bridge (upsert by `no_resi`), tak lagi bergantung input manual.
 
 ## Keputusan Teknis (grounded)
 

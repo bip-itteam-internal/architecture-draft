@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Endpoint **manufacture-service** (WMS manufaktur: master bahan/produk, stok, transaksi, formula, produksi, PO, proposal). Gateway: `/api/manufacture/*`. Grounded ke `services/manufacture/main.go`.*
+*Endpoint **manufacture-service** (WMS manufaktur: master bahan/produk, stok, transaksi, formula, produksi, PO, proposal, resi retur ekspedisi). Gateway: `/api/manufacture/*`. Grounded ke `services/manufacture/main.go`.*
 
 - **Implementasi**: [[Microservices - Manufacture Service]] · **Status**: ✅ (di kode)
 - **Indeks**: [[API - Index]] · RBAC: di-handle di gateway (tak eksplisit di rute).
@@ -29,6 +29,15 @@
 | GET/POST/DELETE | `/production-log` · `/production-log/:id` | Catatan produksi (tanpa konsumsi stok) |
 | GET/POST/DELETE | `/material-order` · `/material-order/:id` | Order material internal |
 
+## Resi — Master Retur Ekspedisi
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/resi` · `/resi/lookup/:resi` | List semua resi · lookup 1 resi by `no_resi` (auto-fill scan form Return & Keluar FG). Tiap resi bawa `status_pesanan`, `tanggal_rts`, `shift` (Pagi/Siang/Sore/Luar Jam — diturunkan dari waktu ready-to-ship) |
+| POST/PUT/DELETE | `/resi` · `/resi/:id` | CRUD resi (mayoritas terisi otomatis; tombol input manual sudah dihapus dari UI, endpoint tetap ada) |
+| POST | `/resi/sync-tiktok` | **Pull** resi order TikTok dari integration `/tiktok/shop/orders/resi-feed`, upsert by `no_resi` (index unik) |
+| POST | `/resi/sync-shopee` | **Pull** resi order Shopee dari integration `/shopee/orders/resi-feed`, upsert by `no_resi` |
+| POST | `/resi/sync-batch` | **Push endpoint**: menerima batch resi-feed dari scheduler integration `sync-resi-wms` (lihat [[IT - Background Jobs & Schedulers]]) |
+
 ## PO · Proposal · Audit
 | Method | Path | Fungsi |
 |---|---|---|
@@ -38,4 +47,4 @@
 | GET | `/audit-log` (`?user=&aksi=`) · `/audit-log/rekap` (`?bulan=YYYY-MM`) · `/health` | Audit log (list) · rekap aktivitas CRUD per user/bulan untuk **KPI otomatis** (agregasi batas hari/bulan pakai **WIB**, respons ber-flag `truncated` bila >20k entri) · health |
 
 ## Dokumen Terkait
-- [[Microservices - Manufacture Service]] · [[Manufacture - Stock & Material Management]] · [[GA - Procurement System]] · [[API - Index]]
+- [[Microservices - Manufacture Service]] · [[Manufacture - Stock & Material Management]] · [[GA - Procurement System]] · [[API - Integration Service]] (resi-feed) · [[IT - Background Jobs & Schedulers]] (`sync-resi-wms`) · [[API - Index]]

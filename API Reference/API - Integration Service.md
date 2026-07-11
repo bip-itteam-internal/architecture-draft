@@ -29,6 +29,7 @@
 |---|---|---|
 | GET | `/tiktok/shop/auth` · `/auth/callback` · `/authorized-shops` | OAuth + shop terotorisasi |
 | GET | `/tiktok/shop/orders/list[/direct]` · `/orders/detail[/direct]` · `/orders/sync` | Order (cache/direct/sync). `/orders/detail` juga kembalikan `transaction_orders` = settlement per-order (Finance API `statement_transactions`, breakdown fee/ongkir/afiliasi/settlement per-SKU) |
+| GET | `/tiktok/shop/orders/resi-feed` | Feed resi/AWB order TikTok (`no_resi`, ekspedisi, no pesanan, `status`, `rts_time`→shift, items) untuk **WMS Master Resi**. Param `updated_since`/`limit` (watermark). Di-pull manufacture `POST /resi/sync-tiktok` & di-push scheduler `sync-resi-wms`. Lihat [[API - Manufacture Service]] |
 | GET | `/tiktok/shop/insight/gmv-winning-content` | Insight GMV |
 | GET/DELETE | `/tiktok/shop/accounts/list` · `/accounts/:id` | Akun TikTok Shop |
 
@@ -57,6 +58,7 @@
 |---|---|---|
 | GET | `/shopee/auth[/callback]` · `/shops/list` · `/products/items` | OAuth, shop, produk |
 | GET | `/shopee/orders/list` · `/orders/detail` · `/orders/sync` · `/orders/escrow/backfill` · `/v2/shopee/orders/list` | Order (v1/v2/sync **chunked ≤15 hari** + backfill escrow income) |
+| GET | `/shopee/orders/resi-feed` | Feed resi/AWB order Shopee untuk **WMS Master Resi** (AWB via `get_tracking_number`, diisi worker `sync-shopee-tracking`; shift dari `update_time`; `shop_id` disimpan di `shopee_order_details`). Konsumen: manufacture `POST /resi/sync-shopee` + scheduler `sync-resi-wms`. Lihat [[API - Manufacture Service]] |
 | GET | `/shopee/returns/sync` · `/returns/list` | **Return/Refund ingestion** (chunked ≤15 hari, app ERP_SYSTEM) — tarik return via `get_return_list` → koleksi `shopee_returns` + sub-doc `order.return` (item **parsial** + tanggal proses + refund); `Partial` dari **kuantitas** (bukan uang). ⚠️ baru, tervalidasi live (15 return), belum deploy. Detail: [[Microservices - Integration Service]] |
 | GET | `/shopee/gms/item-performance[/sync|/summary]` · `/campaign-performance[/sync|/summary]` | Performa GMS |
 | GET/POST | `/shopee/affiliate/performance` · POST `/affiliate/sync` · `/affiliate/recommended` | Affiliate/AMS — per-affiliate performa (baca DB `shopee_affiliate_performance`, sales/order/komisi/ROI) + `sync` (backfill manual dari AMS) + rekomendasi (proxy, via app AMS) |
