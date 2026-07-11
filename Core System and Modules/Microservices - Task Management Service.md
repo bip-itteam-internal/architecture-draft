@@ -21,6 +21,7 @@
 - `POST /spaces` — create Space; validasi divisi harus ada di ERP, seed otomatis 5 stage + 3 priority default.
 - `GET /spaces` & `GET /spaces/:id` — list dan detail Space.
 - `PUT /spaces/:id` & `DELETE /spaces/:id` — update/delete; gated untuk admin atau supervisor divisi terkait. Stage wajib (`Request`/`Todo`/`Done`) dilindungi dari penghapusan.
+- Config **automation** per-space (diterima `createSpace`/`updateSpace`): `auto_assign` (bool), `auto_close_days` (int, `0`=nonaktif) — lihat **### Automation**.
 
 ### Tasks
 - `POST /tasks` — create task (status awal `Request`, set `response_due_at = now + 24h`).
@@ -45,6 +46,11 @@
 - `POST /tasks/:id/csat` — requester memberi rating **1–5 bintang** + komentar (guard `staffOrSup`; **requester-only** dicek di handler via `canSubmitCSAT`). Validasi (`csat.go`): rating 1–5, **komentar wajib bila rating ≤ 2** (`400`); hanya untuk tiket **berstatus `Done`, `completed_at != nil`, non-arsip** (`403` bukan pemohon / `409` belum selesai). Idempotent overwrite; disimpan embedded `csat{rating,comment,rated_at,rated_by}` pada task; audit + broadcast `task_update`.
 - **Notif** `task_resolved_rate_me` ke requester saat tiket → `Done` (di 3 situs transisi `updateTaskStatus`/`updateTask`/`approveTask`; guard `status != "Done"` cegah dobel; reopen→Done kirim lagi).
 - **Reopen** membersihkan `csat` (`$unset`) → siklus resolusi baru, requester menilai ulang. (PR #343 BE, #233 Web.)
+
+### Automation (auto-assign & auto-close)
+Konfigurasi **per-space** (`Space.auto_assign` bool, `auto_close_days` int `0`=nonaktif, `auto_assign_cursor` internal `json:"-"`).
+- **Auto-assign round-robin** (`approveTask`, transisi `Request→Todo`): bila body `assign_to` kosong **dan** `space.auto_assign` **dan** `len(members)>0` → pilih anggota bergiliran via `nextRoundRobin(members, cursor)` (cursor ter-bound `[0,n)`, disimpan di space). Assignee **manual selalu menang**; assignee hasil auto ikut dinotifikasi. Members kosong → tak meng-assign (perilaku approve lama).
+- **Auto-close** (`sla_scheduler.go` `runAutoClose()`, per-jam bersama eskalasi SLA): untuk space `auto_close_days>0`, arsip tiket `status=="Done"` non-arsip yang `completed_at` sudah lewat ambang (`shouldAutoClose`) → `is_archived=true` + audit + **notif requester** `task_auto_closed`. Idempoten (ter-arsip → keluar dari query). Tiket ter-auto-close tetap bisa **reopen**. (PR #352 BE, #236 Web.)
 
 ### SLA Engine (dua dimensi)
 - **Response:** `response_due_at` vs `responded_at` (field diset saat create/approve). **Resolution:** `due_date` vs `completed_at`.
