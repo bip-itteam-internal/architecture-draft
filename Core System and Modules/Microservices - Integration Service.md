@@ -7,7 +7,7 @@
 - **Stack**: Go + Fiber v2 + MongoDB + Redis
 - **Path**: `services/integration` (service terbesar)
 - **Status**: ✅ Implemented (mostly) — masih ada bagian legacy yang di-disable dan target bridging non-Accurate belum tersedia
-- **Referensi API**: dok endpoint lengkap (129 endpoint, 7 modul: Auth, TikTok, Shopee, Transactions, Webhooks, Workers, Accurate) → [docs-api-greget.vercel.app](https://docs-api-greget.vercel.app/) (Nextra). Dibangun vendor **Greget**, telah diserahterimakan ke BIP (maintenance kini internal).
+- **Referensi API**: dok endpoint vendor (129 endpoint, 7 modul: Auth, TikTok, Shopee, Transactions, Webhooks, Workers, Accurate) → [docs-api-greget.vercel.app](https://docs-api-greget.vercel.app/) (Nextra). Dibangun vendor **Greget**, telah diserahterimakan ke BIP (maintenance kini internal). ⚠️ **Angka 129 historis** (snapshot vendor); kode kini meregistrasi **≈214 rute** di `main.go` — daftar grounded terkini di [[API - Integration Service]].
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
