@@ -34,7 +34,8 @@
 
 **Support Ticket** (`src/features/support-ticket/`, menu **Support Ticket**) — portal ticketing lintas-divisi; backend [[Microservices - Task Management Service]]:
 - **Ajukan Tiket** (pilih departemen → Space, Judul/Deskripsi **auto-kapital huruf pertama** sentence-case, lampiran ≤ **4 MB**), **Tiket Saya** (tab *Tiket Saya* / *Ditugaskan* / *Tiket Tim* supervisor), **Permintaan Masuk** (triage supervisor: **approve** dgn assign penangan / **reject** dgn alasan — **approval hanya di web**), detail tiket (status inline, checklist, komentar).
-- **Kelola Space** (dulu "System Setup") — CRUD Space per divisi. **RBAC** di-anchor ke role sistem `ticket`: **admin ticket** → semua divisi; **supervisor divisi** (termasuk IT-spv) → **HANYA divisinya** (selaras BE `canSuperviseDivision`). **Izin checklist** hanya assignee/supervisor (pemohon read-only).
+- **Kelola Space** (dulu "System Setup") — CRUD Space per divisi. **RBAC** di-anchor ke role sistem `ticket`: **admin ticket** → semua divisi; **supervisor divisi** (termasuk IT-spv) → **HANYA divisinya** (selaras BE `canSuperviseDivision`). **Izin checklist** hanya assignee/supervisor (pemohon read-only). Editor prioritas punya input **Target resolusi (jam)** per prioritas (`resolution_hours`; kosong = fallback 72 jam), dikirim saat create/update Space.
+- **SLA & lifecycle tiket**: badge SLA response/resolution di daftar & detail (state `on_track`/`warning`/`breached`/`met`/**`held`**). Saat **triage/approve**, `due_date` **auto pre-fill** = hari ini + target resolusi prioritas terpilih (tetap bisa diedit). Aksi **Tahan (Hold)** / **Lepas** & **Buka kembali (Reopen)** di detail tiket, selaras endpoint BE `hold`/`unhold`/`reopen` (PR #226 UI Hold/Reopen, #227 SLA per-priority).
 
 **Finance**
 - Piutang (TikTok/Shopee): tabel accounts-receivable + filter overdue/in-transit
@@ -57,7 +58,7 @@
 
 **Lain** — Secretary / Manufacture / Quality / Procurement (KPI saja), Beauty_hacks / Kyura (link eksternal Ideamiils + KPI)
 
-**Internasionalisasi (i18n)** — dukungan dua bahasa **Indonesia (default) / English** via `react-i18next` (`src/i18n/`); switcher di header (samping tema), pilihan disimpan cookie `lang` (dibaca SSR). Rollout **bertahap**; sudah: HRIS Ulang Tahun, KPI, Announcements, Recruitment System Setup, Payroll Pengaturan Gaji (`hris.payroll.*`). Aturan lengkap: [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
+**Internasionalisasi (i18n)** — dukungan dua bahasa **Indonesia (default) / English** via `react-i18next` (`src/i18n/`); switcher di header (samping tema), pilihan disimpan cookie `lang` (dibaca SSR). Rollout **bertahap**; sudah: HRIS Ulang Tahun, KPI, Announcements, Recruitment System Setup, Payroll Pengaturan Gaji (`hris.payroll.*`), Support Ticket. Aturan lengkap: [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
 
 ## Belum Diimplementasikan / Catatan
 
