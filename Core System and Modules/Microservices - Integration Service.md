@@ -125,6 +125,13 @@ Koleksi `icc_account_mappings`. Field baru (Phase 3): **`team string`** (diisi o
 - Anggota tim: assign/unassign member (`/marketing/teams/:id/members`)
 - **Shop ACL**: assign/unassign toko ke tim (`/marketing/teams/:id/shops`) — kontrol akses toko per tim marketing
 
+### Fulfillment (WMS Bridge — internal)
+
+> Endpoint internal untuk WMS Tinggarjaya. Dilindungi oleh gateway key global (`ValidateGateway`) — tidak ada middleware tambahan. Grounded: `usecase/warehouse_bridge_usecase.go`, `interface/http/warehouse_bridge_handler.go`.
+
+- **`POST /fulfillment/ship-batch`** — batch ship order lintas platform. Body: `[{order_id, channel, shop_id, package_id}]`. Hasil **non-all-or-nothing**: satu order gagal tidak menghentikan yang lain; tiap item di response memiliki `success`, `awb` (opsional), dan `error` (opsional). Channel di-normalize ke uppercase. TikTok = `tiktokUC.ShipOrder(packageID, shopID)`; Shopee = `shopeeUC.ShipOrder(orderSN, storeID)` via `ShopeeNewUseCase`.
+- **`POST /fulfillment/labels`** — ambil shipping label per order. Body: `[{order_id, channel, shop_id, package_id}]` — POST (bukan GET) karena TikTok memerlukan `package_id` per order yang tidak bisa di-derive dari `order_id` saja. Response per item: `status` (READY | PROCESSING | FAILED), `url` (TikTok — synchronous), `pdf_data` (Shopee — base64 PDF). **TikTok**: synchronous via `GetShippingDocument`→parse `doc_url` dari `json.RawMessage`. **Shopee**: async 3-langkah (`CreateShippingDocument` → `GetShippingDocumentResult` → jika READY `DownloadShippingDocument`); jika PROCESSING → WMS wajib retry.
+
 ### Items / Master Catalog
 - CRUD lengkap: `/items/list`, `/items/sku/:sku`, history, create, bulk, bundle, variations, patch, delete
 
