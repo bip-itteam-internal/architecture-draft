@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, transaksi, items, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈212 rute** (dihitung dari registrasi `main.go`). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
+*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, transaksi, items, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈214 rute** (dihitung dari registrasi `main.go`). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
 
 - **Implementasi**: [[Microservices - Integration Service]] · **Status**: ✅
 - **Indeks**: [[API - Index]] · Semua butuh gateway key kecuali webhook publik (`/ext/webhook/*`). ⚠️ `/health` **juga** butuh gateway key (route terdaftar setelah middleware `ValidateGateway`; gateway memanggilnya dengan key — bukan endpoint terbuka).
@@ -131,6 +131,15 @@
 | DELETE | `/icc/mappings/:id` | Hapus mapping (hanya jika `is_active=false`; else 409) |
 | GET | `/icc/mappings/available-shops` | TikTok Shop belum di-assign aktif (pool global) |
 | GET | `/icc/mappings/available-advertisers` | Advertiser belum di-assign aktif (pool global; deduplikasi via `$group`) |
+
+## Fulfillment (WMS Bridge — internal)
+
+> Auth: gateway key global (semua rute `POST /fulfillment/*` di-cover `ValidateGateway`). Grounded: `usecase/warehouse_bridge_usecase.go`, `interface/http/warehouse_bridge_handler.go`.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| POST | `/fulfillment/ship-batch` | Batch ship order lintas platform (TikTok + Shopee). Body: `[{order_id, channel, shop_id, package_id}]`. Non-all-or-nothing: satu gagal tak membatalkan yang lain. Response: `[{order_id, channel, success, awb?, error?}]` |
+| POST | `/fulfillment/labels` | Ambil shipping label per order. Body: `[{order_id, channel, shop_id, package_id}]` (POST — bukan GET — karena TikTok butuh `package_id` yang tidak derivable dari `order_id` saja). TikTok: synchronous, status READY + `url`. Shopee: async — status PROCESSING bila belum siap (WMS retry); READY + `pdf_data` (base64) bila sudah jadi |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
