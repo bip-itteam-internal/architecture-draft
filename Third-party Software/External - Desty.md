@@ -4,9 +4,11 @@
 
 > **Cakupan di bip-erp:** client marketplace **khusus** baru **TikTok Shop & Shopee** (ada `ShipOrder` masing-masing). Platform Desty lain (mis. Lazada/Blibli/Zalora) di-auto-approve **generik** lewat Desty `POST /api/order/accept` — **tanpa** client khusus (konsisten dgn catatan "tidak ada client Lazada" di [[Microservices - Integration Service]]).
 
-- **Status**: ✅ Implemented — integrasi aktif lewat [[Microservices - Integration Service]]
+- **Status**: ⚠️ Implemented (ada catatan) — **soft-disabled per 2026-07-12**; kode masih ada, tapi seluruh registrasi runtime (route, processor, credential task) dicabut dari `main.go`
 - **Sisi vendor**: produk SaaS eksternal (akun + kredensial dikelola via ENV)
 - **Detail implementasi**: ada di [[Microservices - Integration Service]] (dok ini hanya level vendor/konsep + pointer)
+
+> **SOFT-DISABLED (2026-07-12).** Traffic Desty di prod terbukti mati (total 18 webhook sepanjang masa, terakhir 2026-06-24, nol task diproses) — seluruh order TikTok & Shopee kini masuk via webhook **direct** masing-masing platform (`TiktokDirectProcessor` / `ShopeePushProcessor`). Yang dicabut dari `services/integration/main.go` (branch `chore/disable-desty-webhook`): route `POST /webhooks/services/desty` + `GET /webhooks/accounts/desty`, registrasi `DestyTiktokProcessor` + `DestyShopeeProcessor`, dan `DestyCredentialTask`. File `desty_*` dan konstruksi `destyRepo`/`destyClient` tetap ada (dependency `NewWebhookUseCase`) — rollback = revert 1 commit. Deskripsi peran di bawah = **historis**.
 
 ## Peran di bip-erp
 
@@ -22,7 +24,9 @@
 
 ## Catatan
 
-- Route webhook Desty langsung (`/webhook/desty`, `/webhooks/desty`) **di-comment** — digantikan `/webhooks/services/desty` (lihat [[Microservices - Integration Service]]).
+- **2026-07-12**: seluruh jalur Desty **soft-disabled** (lihat blok status di atas). `POST /webhooks/services/desty` kini 404.
+- Cron 01:00 `refreshDestyToken` + `ProcessPendingAutoShip` di `internal/cmd/cron.go` (`CronManager`) ternyata **dead code** — tidak pernah dipanggil dari `main.go`; refresh kredensial yang sempat aktif adalah `DestyCredentialTask` (worker, 00:00), kini juga dicabut.
+- Historis: route webhook Desty langsung (`/webhook/desty`, `/webhooks/desty`) **di-comment** — digantikan `/webhooks/services/desty` (lihat [[Microservices - Integration Service]]).
 
 ## Dokumen Terkait
 

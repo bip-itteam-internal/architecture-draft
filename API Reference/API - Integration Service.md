@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, Desty, transaksi, items, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈214 rute** (dihitung dari registrasi `main.go`). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
+*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, transaksi, items, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈212 rute** (dihitung dari registrasi `main.go`). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
 
 - **Implementasi**: [[Microservices - Integration Service]] · **Status**: ✅
 - **Indeks**: [[API - Index]] · Semua butuh gateway key kecuali webhook publik (`/ext/webhook/*`). ⚠️ `/health` **juga** butuh gateway key (route terdaftar setelah middleware `ValidateGateway`; gateway memanggilnya dengan key — bukan endpoint terbuka).
@@ -8,8 +8,8 @@
 ## Webhooks
 | Method | Path | Fungsi |
 |---|---|---|
-| POST | `/webhooks/services/desty` · `/shopee` · `/tiktok` | Terima webhook (PUBLIK, tanpa gateway) |
-| GET | `/webhooks/logs` · `/webhooks/logs/:id` · `/webhooks/tasks` · `/webhooks/accounts/desty` | Log & task webhook |
+| POST | `/webhooks/services/shopee` · `/tiktok` · `/accurate` | Terima webhook (PUBLIK, tanpa gateway) |
+| GET | `/webhooks/logs` · `/webhooks/logs/:id` · `/webhooks/tasks` | Log & task webhook |
 | POST | `/webhooks/logs/:id/retry` | Retry pengiriman webhook |
 
 ## Transactions / Orders
@@ -121,7 +121,7 @@
 | POST/PUT | `/jobs/:name/trigger` · `/config` · `/disable` · `/enable` | Kelola scheduler |
 | GET | `/health` | Health (tanpa gateway) |
 
-> Banyak job terjadwal (sync TikTok/Shopee/Desty + webhook consumer 5 detik) — lihat [[IT - Background Jobs & Schedulers]].
+> Banyak job terjadwal (sync TikTok/Shopee + webhook consumer 5 detik) — lihat [[IT - Background Jobs & Schedulers]]. Jalur [[External - Desty]] soft-disabled per 2026-07-12 (route `/webhooks/services/desty` + `/webhooks/accounts/desty` dicabut → 404).
 
 ## Dokumen Terkait
 - [[Microservices - Integration Service]] · [[Sales - Marketplace Integration]] · [[External - Accurate]] · [[External - Desty]] · [[IT - Background Jobs & Schedulers]] · [[API - Index]]
