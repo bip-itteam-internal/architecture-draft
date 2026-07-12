@@ -31,6 +31,9 @@
 | GET | `/tiktok/shop/orders/list[/direct]` · `/orders/detail[/direct]` · `/orders/sync` | Order (cache/direct/sync). `/orders/detail` juga kembalikan `transaction_orders` = settlement per-order (Finance API `statement_transactions`, breakdown fee/ongkir/afiliasi/settlement per-SKU) |
 | GET | `/tiktok/shop/orders/resi-feed` | Feed resi/AWB order TikTok (`no_resi`, ekspedisi, no pesanan, `status`, `rts_time`→shift, items) untuk **WMS Master Resi**. Param `updated_since`/`limit` (watermark). Di-pull manufacture `POST /resi/sync-tiktok` & di-push scheduler `sync-resi-wms`. Lihat [[API - Manufacture Service]] |
 | GET | `/tiktok/shop/insight/gmv-winning-content` | Insight GMV |
+| GET | `/tiktok/shop/settlement/sync-status` | Status sync income-reconciler: run terakhir + agregat harian dari `reconciler_run_stats` — konsumen: baris info FE settlement |
+| GET | `/tiktok/shop/statements?shop_id&start&end&page&page_size` | 🟡 *branch `feat/statement-time-enrich`, belum deploy* — list batch pencairan (koleksi `tt_shop_statements`: tanggal cair, payable_amount, status, order_count) buat halaman FE Pencairan |
+| GET | `/tiktok/shop/statements/:id/orders` | 🟡 *idem* — daftar order dalam satu statement (max 500) |
 | GET/DELETE | `/tiktok/shop/accounts/list` · `/accounts/:id` | Akun TikTok Shop |
 
 ## TikTok Business
