@@ -4,7 +4,7 @@
 
 [Contoh dari sistem ini](https://drive.google.com/drive/folders/15fGQNX5usiMXIk2GY8DAqahHFF5ahPpA)
 
-- **Status**: ⚠️ Sebagian — engine KPI→insentif (marketing) ✅ di [[Microservices - Insentive Service]]; appraisal bulanan menyeluruh 🟡 konsep.
+- **Status**: ⚠️ Sebagian — engine KPI→insentif (marketing) ✅ di [[Microservices - Insentive Service]]; appraisal per-karyawan lintas-departemen ✅ **sebagian** di [[Microservices - Employee Service]] (`/kpi/*`: template per posisi + scoring); siklus bulanan wajib & workflow review supervisor→HR 🟡 konsep.
 
 ## Sudah Diimplementasikan — KPI engine insentif (marketing)
 
@@ -13,7 +13,18 @@
 - `master-kpi` (CRUD; bobot total 100) · `POST /calculate` (scoring bertingkat per-role) · hasil + workflow approve/override · cron harian menarik metrik iklan (TikTok GMV-Max / Shopee GMS) dari [[Microservices - Integration Service]].
 - Skor → **insentif** ([[Finance - Incentive]] / [[Sales - Incentive]]). Koleksi: `master_kpis`, `kpi_score`, `incentive_results` ([[DB - Overview and Notes]]).
 
-## Konsep — appraisal bulanan menyeluruh (belum di kode)
+## Sudah Diimplementasikan — appraisal per-karyawan (employee-service)
+
+> Grounded ke [[Microservices - Employee Service]] (`/kpi/*`) + FE [[APP - Web ERP]] (`src/features/hris/kpi/`). Sebagian dari konsep appraisal menyeluruh di bawah kini **sudah berjalan** untuk penilaian per-karyawan lintas departemen (bukan hanya marketing).
+
+- **Template per posisi**: `GET/POST/DELETE /kpi/templates` (filter `?department=&position=`). Tiap template = `{name, department, position, metrics[]}`; metrik `{label, weight, description}` (nilai 0–100, bobot total tiap template).
+- **Scoring per-karyawan+periode** (`YYYY-MM`): submit `template_id` + `values{label→0..100}`. Template di-**snapshot** ke `kpi_score` (skor lampau beku — edit master template tidak retroaktif); final = Σ(weight×value).
+- **Aturan kunci — posisi template WAJIB = posisi karyawan**: submit ditolak `400 "template position … does not match employee position …"` bila `template.position != workData.position`. FE (modal Score KPI) menyaring dropdown template ke posisi karyawan agar tak salah pilih (bila belum ada template untuk posisi tsb → diarahkan membuat dulu).
+- **RBAC per departemen** (`RequireKPIDepartmentRBAC`).
+- **Dashboard/analitik**: agregasi per departemen (rata-rata, coverage) + daftar *need training* (<60) & *top performer* (≥80).
+- **Belum**: penegakan siklus bulanan & workflow review supervisor→HR (lihat konsep di bawah) = **TBD**.
+
+## Konsep — appraisal bulanan menyeluruh (sebagian sudah — lihat bagian di atas)
 
 Rancangan KPI/appraisal per-karyawan **semua departemen** (form bulanan diisi supervisor → diteruskan ke HR), **beda** dari engine insentif marketing di atas. Detailnya:
 

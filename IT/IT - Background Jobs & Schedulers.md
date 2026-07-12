@@ -2,7 +2,7 @@
 
 *Inventaris **proses yang berjalan diam-diam** di bip-erp — cron/scheduler/worker latar belakang: apa yang jalan, kapan, di service mana, untuk apa, dan lock-nya. Grounded dari kode (`bson`/cron string disalin verbatim). Tujuannya: tak ada "sistem tersembunyi" yang tak diketahui saat debugging, perencanaan kapasitas, atau mengubah service.*
 
-- **Status**: ✅ Implemented — 20 job terjadwal + 1 dispatcher webhook (per audit kode). *3 job reminder attendance (koreksi/leave/tukar jadwal) + auto-ignore koreksi & tukar jadwal + pre-alokasi sadar-swap dari **PR #165** — belum rilis ke prod.*
+- **Status**: ✅ Implemented — 24 job terjadwal + 1 dispatcher webhook (per audit kode; +4 job integration ditambahkan 2026-07-11: affiliate Shopee AMS performance/conversion & WMS resi bridge `sync-resi-wms`/`sync-shopee-tracking`). *3 job reminder attendance (koreksi/leave/tukar jadwal) + auto-ignore koreksi & tukar jadwal + pre-alokasi sadar-swap dari **PR #165** — belum rilis ke prod.*
 - **Zona waktu**: semua **Asia/Jakarta (WIB)** kecuali override env `INTEGRATION_WORKER_TZ`
 - **Sintaks cron**: integration pakai `robfig/cron` **6-field** (`detik menit jam tgl bln dow`); attendance/employee/notification pakai **5-field** klasik
 
@@ -38,6 +38,10 @@
 | integration | harian 04:00 (`0 0 4 * * *`) | validasi komisi affiliate vs finance statement lokal | Redis `lock:validate-affiliate-commission` | `.../worker/tasks/affiliate_commission_validate.go` |
 | integration | harian 02:30 (`0 30 2 * * *`) | sync video performance TikTok Shop | Redis `lock:sync-tt-shop-video-performance` | `.../worker/tasks/tt_shop_video_performance_task.go` |
 | integration | **4× sehari** 00:00/08:00/16:00/23:00 (`0 0 0,8,16,23 * * *`) | sync report GMV-Max **hari ini** (intraday update) | Redis `lock:sync-tt-business-gmv-max-report-today` (15m) | `.../worker/tasks/tt_business_gmv_max_report_today.go:34` |
+| integration | harian 03:00 (`0 0 3 * * *`) | sync performa affiliate Shopee AMS (v1 snapshot per-affiliate + v3 product/content) | Redis `lock:sync-shopee-affiliate-performance` (30m) | `.../worker/tasks/shopee_affiliate_sync_task.go:31` |
+| integration | harian 05:00 (`0 0 5 * * *`) | sync konversi order-level + validasi komisi affiliate Shopee AMS (v2) | Redis `lock:sync-shopee-affiliate-conversion` (30m) | `.../worker/tasks/shopee_affiliate_conversion_sync_task.go:32` |
+| integration | **tiap :05 & :35** (`0 5,35 * * * *`) | **WMS resi**: fetch AWB Shopee (`get_tracking_number`) untuk order shippable tanpa resi — dijalankan sebelum `sync-resi-wms` | Redis `lock:sync-shopee-tracking` (12m) | `.../worker/tasks/sync_shopee_tracking.go:28` |
+| integration | **tiap 10 menit** (`0 */10 * * * *`) | **WMS resi bridge**: pull resi-feed TikTok+Shopee (watermark per-channel di `sync_cursors`) → push batch ke manufacture `POST /resi/sync-batch` | Redis `lock:sync-resi-wms` (8m) | `.../worker/tasks/sync_resi_wms.go:55` |
 
 > Inisialisasi index (bukan job): `services/insentive/cron_worker.go:1550` — `ensureCronIndexes()` (TTL index `cron_locks.expires_at`) dipanggil sekali saat startup.
 
@@ -52,7 +56,7 @@
 ## Catatan & risiko operasional
 
 - **Penumpukan jam 00:00–02:00**: banyak sync integration (master data, order, report, kredensial) menumpuk di tengah malam WIB — perhatikan saat menilai beban/quota API TikTok/Shopee. Tambahan: `sync-tt-shop-orders` kini 4× sehari (bukan 1× di 01:00) — jam 00:00/08:00/16:00/23:00 WIB.
-- **Notifikasi kegagalan**: semua worker integration kirim Telegram otomatis via `WithOnJobError` hook di manager level — tidak perlu konfigurasi per-task. Shopee & Desty credential task juga punya `SendError` inline.
+- **Notifikasi worker**: semua worker integration kirim Telegram otomatis via hook di manager level — tidak perlu konfigurasi per-task. `WithOnJobError` → `SendError` saat gagal (setelah semua retry habis); `WithOnJobEnd` → `Send` saat sukses. Dikecualikan dari notif sukses: `webhook-consumer` & `sync-resi-wms` (frekuensi tinggi, akan spam). PR #322.
 - **Job tersibuk**: `webhook_consumer` jalan **tiap 5 detik** — paling sering; pastikan lock Redis sehat agar tak dobel.
 - **Locking**: integration = Redis (prefix `srv:integration:lock:*`); insentive = Mongo `cron_locks` (TTL 2j). Service lain (employee/attendance/notification/task-management) **tanpa distributed lock** — aman selama **single instance**; bila di-scale horizontal, job bisa dobel.
 - Backup DB mingguan ada di luar tabel ini (lihat [[IT - Backup & DR]] / [[IT - Runbooks]]).
