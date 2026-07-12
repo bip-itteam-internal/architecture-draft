@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, Desty, transaksi, items, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈214 rute** (dihitung dari registrasi `main.go`). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
+*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, transaksi, items, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈212 rute** (dihitung dari registrasi `main.go`). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
 
 - **Implementasi**: [[Microservices - Integration Service]] · **Status**: ✅
 - **Indeks**: [[API - Index]] · Semua butuh gateway key kecuali webhook publik (`/ext/webhook/*`). ⚠️ `/health` **juga** butuh gateway key (route terdaftar setelah middleware `ValidateGateway`; gateway memanggilnya dengan key — bukan endpoint terbuka).
@@ -8,8 +8,8 @@
 ## Webhooks
 | Method | Path | Fungsi |
 |---|---|---|
-| POST | `/webhooks/services/desty` · `/shopee` · `/tiktok` | Terima webhook (PUBLIK, tanpa gateway) |
-| GET | `/webhooks/logs` · `/webhooks/logs/:id` · `/webhooks/tasks` · `/webhooks/accounts/desty` | Log & task webhook |
+| POST | `/webhooks/services/shopee` · `/tiktok` · `/accurate` | Terima webhook (PUBLIK, tanpa gateway) |
+| GET | `/webhooks/logs` · `/webhooks/logs/:id` · `/webhooks/tasks` | Log & task webhook |
 | POST | `/webhooks/logs/:id/retry` | Retry pengiriman webhook |
 
 ## Transactions / Orders
@@ -31,6 +31,9 @@
 | GET | `/tiktok/shop/orders/list[/direct]` · `/orders/detail[/direct]` · `/orders/sync` | Order (cache/direct/sync). `/orders/detail` juga kembalikan `transaction_orders` = settlement per-order (Finance API `statement_transactions`, breakdown fee/ongkir/afiliasi/settlement per-SKU) |
 | GET | `/tiktok/shop/orders/resi-feed` | Feed resi/AWB order TikTok (`no_resi`, ekspedisi, no pesanan, `status`, `rts_time`→shift, items) untuk **WMS Master Resi**. Param `updated_since`/`limit` (watermark). Di-pull manufacture `POST /resi/sync-tiktok` & di-push scheduler `sync-resi-wms`. Lihat [[API - Manufacture Service]] |
 | GET | `/tiktok/shop/insight/gmv-winning-content` | Insight GMV |
+| GET | `/tiktok/shop/settlement/sync-status` | Status sync income-reconciler: run terakhir + agregat harian dari `reconciler_run_stats` — konsumen: baris info FE settlement |
+| GET | `/tiktok/shop/statements?shop_id&start&end&page&page_size` | 🟡 *branch `feat/statement-time-enrich`, belum deploy* — list batch pencairan (koleksi `tt_shop_statements`: tanggal cair, payable_amount, status, order_count) buat halaman FE Pencairan |
+| GET | `/tiktok/shop/statements/:id/orders` | 🟡 *idem* — daftar order dalam satu statement (max 500) |
 | GET/DELETE | `/tiktok/shop/accounts/list` · `/accounts/:id` | Akun TikTok Shop |
 
 ## TikTok Business
@@ -65,6 +68,8 @@
 | GET/POST | `/shopee/affiliate/conversions[/sync]` · `/affiliate/validations[/sync]` | **Affiliate v2 (AMS order-level)** ✅ live — ledger order+item (baca DB `shopee_affiliate_conversion`, `get_conversion_report`; `price`/komisi = **string desimal rupiah**) + tagihan komisi bulanan & rekonsiliasi (`shopee_affiliate_validation_bill`, `get_validation_list`/`get_validation_report` window placement **[M−2..M−1]**); `sync` = backfill background via notifier |
 | GET/POST | `/shopee/affiliate/products[/sync]` · `/affiliate/contents[/sync]` | **Affiliate v3 (AMS analytics)** ✅ live — per-produk (`get_product_performance`, baca DB `shopee_affiliate_product_performance`, ≈ klon v1 per-item) + per-konten Video/Live (`get_content_performance`, `shopee_affiliate_content_performance`; `views`/`likes` **kumulatif→MAX**, `sales` per-hari→SUM). Beda dari GMS item-performance. Sync harian via worker 03:00 + background manual |
 | GET/POST/DELETE | `/shopee/accounts/list` · `/accounts/:id` | Akun Shopee |
+| GET | `/shopee/payouts?shop_id&start&end&page&page_size` | 🟡 *branch `feat/statement-time-enrich`, belum deploy* — rekap pencairan escrow HARIAN per toko (dari `income.paid_at`+`payout_amount`; Shopee cair per-order, baris = pseudo-batch harian) buat tab Shopee halaman Pencairan |
+| GET | `/shopee/payouts/orders?shop_id&date=YYYY-MM-DD` | 🟡 *idem* — order yang cair pada tanggal itu (max 500; dua param wajib) |
 
 > **Tri-app per toko** (✅ live): tiap shop bisa punya sampai 3 kredensial via `account_type` — **ADS_SERVICE** (GMS, partner 2032638), **ERP_SYSTEM** (order/escrow/push, 2032314), **AMS** (affiliate, 2038141, kategori app "Affiliate Marketing Solution Management" — hanya app ini yang bisa panggil AMS API); `/accounts/list` mengembalikan `account_type` + `shop_id_list`. **`/orders/escrow/backfill?shop_id=&limit=`** (✅ live): isi `income` order COMPLETED yang belum ter-escrow (escrow-only, resumable) — backfill 908963392 (1.308/1.308). **`/affiliate/performance`** (✅ live, **baca DB** `shopee_affiliate_performance`, roll-up per-affiliate, param `start_date`/`end_date` yyyymmdd, default 30 hari) + **`POST /affiliate/sync`** (backfill manual dari AMS, snapshot harian) + **`/affiliate/recommended`** (proxy live). Snapshot harian juga diisi worker `sync-shopee-affiliate-performance` (03:00, lihat [[IT - Background Jobs & Schedulers]]). ⚠️ `total_buyers`/`new_buyers` = akumulasi harian (buyer-hari, bukan pembeli unik). Detail: [[Microservices - Integration Service]].
 
@@ -135,7 +140,7 @@
 | POST/PUT | `/jobs/:name/trigger` · `/config` · `/disable` · `/enable` | Kelola scheduler |
 | GET | `/health` | Health (tanpa gateway) |
 
-> Banyak job terjadwal (sync TikTok/Shopee/Desty + webhook consumer 5 detik) — lihat [[IT - Background Jobs & Schedulers]].
+> Banyak job terjadwal (sync TikTok/Shopee + webhook consumer 5 detik) — lihat [[IT - Background Jobs & Schedulers]]. Jalur [[External - Desty]] soft-disabled per 2026-07-12 (route `/webhooks/services/desty` + `/webhooks/accounts/desty` dicabut → 404).
 
 ## Dokumen Terkait
 - [[Microservices - Integration Service]] · [[Sales - Marketplace Integration]] · [[External - Accurate]] · [[External - Desty]] · [[IT - Background Jobs & Schedulers]] · [[API - Index]]

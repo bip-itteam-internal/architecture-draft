@@ -21,14 +21,14 @@
 | insentive | harian 00:00 (akhir bulan: 15:00 Sn–Jm / 12:00 Sb) | hitung insentif otomatis; tarik metrik TikTok/Shopee; carry-over tgl 1–7 | Mongo `cron_locks` TTL 2j | `services/insentive/cron_worker.go:63` |
 | task-management | tiap jam (delay awal 1 mnt) | eskalasi SLA task (warning ke SPV / breach ke admin) | — | `services/task-management/reminder.go:12` |
 | notification | harian 03:00 (`0 3 * * *`) | hapus `inbox` > 2 bulan | — | `services/notification/cron.go:20` |
-| integration | harian 01:00 (`0 1 * * *`) | refresh token Desty + retry order PENDING | Redis | `services/integration/internal/cmd/cron.go:34` |
+| integration | ~~harian 01:00~~ **dead code** | ~~refresh token Desty + retry order PENDING~~ — `CronManager` tidak pernah dipanggil dari `main.go` (verifikasi 2026-07-12) | Redis | `services/integration/internal/cmd/cron.go:34` |
 | integration | **4× sehari** 00:00/08:00/16:00/23:00 (`0 0 0,8,16,23 * * *`) | sync order TikTok Shop (semua shop authorized, window 9 jam overlap) | Redis `lock:sync-tt-shop-orders` (15m) | `.../worker/tasks/tt_shop_sync_orders.go:35` |
 | integration | harian 00:00 (`0 0 0 * * *`) | sync master data TikTok Business | Redis `lock:sync-tt-business-master-data` (15m) | `.../worker/tasks/tt_business_master_data.go:45` |
 | integration | harian 01:00 (`0 0 1 * * *`) | sync report GMV-Max | Redis `lock:sync-tt-business-gmv-max-report` (15m, conc. 5) | `.../worker/tasks/tt_business_gmv_max_report.go:33` |
 | integration | harian 02:00 (`0 0 2 * * *`) | sync integration report | Redis `lock:sync-tt-business-integration-report` (15m) | `.../worker/tasks/tt_business_integration_report.go:35` |
 | integration | harian 00:00 (`0 0 0 * * *`) | sync master data TikTok Shop (produk/kategori) | Redis `lock:sync-tt-shop-master-data` (15m) | `.../worker/tasks/tt_shop_master_data.go:34` |
 | integration | **tiap 5 detik** (`*/5 * * * * *`) | konsumsi antrian webhook `webhook_tasks` & dispatch | Redis `lock:webhook-consumer` (5m) | `.../worker/tasks/webhook_consumer_task.go:36` |
-| integration | harian 00:00 (`0 0 0 * * *`) | refresh kredensial Desty (cek expiry buffer 5 hari) | Redis `lock:desty-credential-task` (5m) | `.../worker/tasks/desty_credential_task.go:40` |
+| integration | ~~harian 00:00~~ **dicabut 2026-07-12** | ~~refresh kredensial Desty~~ — registrasi task dihapus dari `main.go` ([[External - Desty]] soft-disabled) | Redis `lock:desty-credential-task` (5m) | `.../worker/tasks/desty_credential_task.go:40` |
 | integration | harian 02:00 (`0 0 2 * * *`) | sync performa Shopee GMS (item & campaign) | Redis `lock:sync-shopee-performance` (30m) | `.../worker/tasks/shopee_sync_task.go:30` |
 | integration | harian 05:05 (`0 5 5 * * *`) | proaktif refresh token semua Shopee shop (buffer sebelum expiry 06:00) | Redis `lock:shopee-credential-task` (30m) | `.../worker/tasks/shopee_credential_task.go:30` |
 | integration | tiap jam :00 (`0 0 * * * *`) | rekonsiliasi income/escrow Shopee | Redis `lock:shopee-escrow-reconciler` | `.../worker/tasks/shopee_escrow_reconciler.go` |
@@ -47,7 +47,7 @@
 
 ## Event-driven (webhook dispatcher)
 
-- **integration** — `internal/webhook/dispatcher.go`: antrian in-memory, **5 worker goroutine** default. Entry: `POST /webhooks/services/desty` (publik, tanpa validasi gateway). Callback Desty/TikTok Shop/Shopee → di-log → di-antri per-platform → di-konsumsi job `webhook_consumer_task` (tiap 5 detik). Rate limit 20 req/dtk per platform; retry on failure; status disimpan ke Mongo. Lihat [[Microservices - Integration Service]].
+- **integration** — `internal/webhook/dispatcher.go`: antrian in-memory, **5 worker goroutine** default. Entry: `POST /webhooks/services/shopee` · `/tiktok` · `/accurate` (publik, tanpa validasi gateway). Callback TikTok Shop/Shopee → di-log → di-antri per-platform → di-konsumsi job `webhook_consumer_task` (tiap 5 detik). Rate limit 20 req/dtk per platform; retry on failure; status disimpan ke Mongo. Entry `/webhooks/services/desty` **dicabut 2026-07-12** ([[External - Desty]] soft-disabled). Lihat [[Microservices - Integration Service]].
 
 ## Service tanpa job background
 
