@@ -7,8 +7,9 @@ via webhook marketplace hingga serah kurir dan settlement di Accurate. Mencakup 
 `services/warehouse` (MVP), state machine, event architecture, dan gap analysis terhadap
 sistem yang sudah berjalan.*
 
-- **Status**: 🟡 Konsep / Disetujui — implementasi belum dimulai
+- **Status**: ⚠️ Implemented (ada catatan) — Fase 1 ✅ existing; Fase 2 event+reconciler ✅ Task 4; Fase 3 operasi WMS 🟡 Task 5–9; Fase 4 settlement ✅ existing
 - **Referensi**: Blueprint WMS Tinggarjaya (Juli 2026) · Design doc `2026-07-12-wms-tinggarjaya-fulfillment-design.md`
+- **Implementasi**: [[Microservices - Warehouse Service]] · **API**: [[API - Warehouse Service]]
 - **Dependensi utama**: [[Microservices - Integration Service]], [[External - Accurate]]
 
 ---
@@ -49,24 +50,26 @@ POST warehouse /fulfillment/events  (async + retry via webhook_tasks)
 > manual (batch) oleh Admin Gudang / Leader / SPV. Auto-ship existing (00:01–14:59 WIB)
 > tetap berjalan di integration service — ini berbeda dari approve WMS.
 
-### Fase 2 — Event & Reconciler (🟡 Akan Dibangun)
+### Fase 2 — Event & Reconciler (✅ Diimplementasikan — Task 4)
 
 ```
 Integration service
         │
-        ├─ OnOrderUpsert hook → POST warehouse /fulfillment/events
+        ├─ OnOrderUpsert hook → POST warehouse /fulfillment/events   [🟡 hook belum ada]
         │  payload: order_id, channel, shop_id, status, items[{sku, qty}]
-        │  • Idempoten (upsert by order_id + channel; bandingkan update_time)
+        │  • Idempoten (upsert by order_id + channel; bandingkan update_time)   ✅
         │  • Retry via webhook_tasks existing (event gagal tidak hilang)
-        │  • Cancel webhook (type 11) → order CANCELLED realtime
+        │  • Cancel webhook (type 11) → order CANCELLED realtime               ✅
         │
-        └─ Reconciler sweep (tiap 60 detik, goroutine warehouse)
-           • Watermark updated_since per-channel + overlap 5 menit
-           • Redis lock (cegah concurrent run)
-           • Pull transaction_orders shippable dari integration
-           • Tangkap event yang hilang saat restart / network drop
+        └─ Reconciler sweep (tiap 60 detik, goroutine warehouse)               ✅
+           • Cursor watermark di sync_cursors + overlap 5 menit                ✅
+           • Redis lock lock:warehouse-reconciler TTL 50s (cegah concurrent)   ✅
+           • Pull GET /transactions/orders/list?status=TO_SHIP&updated_since=  ✅
+           • Tangkap event yang hilang saat restart / network drop              ✅
            • Worst-case keterlambatan: ±1 menit
 ```
+
+> **Catatan**: Hook `OnOrderUpsert` di integration service belum diimplementasikan. Saat ini hanya reconciler 60s yang aktif (worst-case lag ±1 mnt). Hook push realtime menjadi bagian Task integration berikutnya.
 
 ### Fase 3 — Operasi Gudang / WMS (🟡 Akan Dibangun)
 
