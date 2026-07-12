@@ -7,7 +7,7 @@ via webhook marketplace hingga serah kurir dan settlement di Accurate. Mencakup 
 `services/warehouse` (MVP), state machine, event architecture, dan gap analysis terhadap
 sistem yang sudah berjalan.*
 
-- **Status**: ⚠️ Implemented (ada catatan) — Fase 1 ✅ existing; Fase 2 event+reconciler ✅ Task 4; Fase 3 operasi WMS 🟡 Task 5–9; Fase 4 settlement ✅ existing
+- **Status**: ⚠️ Implemented (ada catatan) — Fase 1 ✅ existing; Fase 2 event+reconciler ✅ Task 4; Fase 3 operasi WMS ⚠️ partial (approve/pick/pack/rts/labels/dashboard ✅ Task 7; produk CRUD 🟡); Fase 4 settlement ✅ existing
 - **Referensi**: Blueprint WMS Tinggarjaya (Juli 2026) · Design doc `2026-07-12-wms-tinggarjaya-fulfillment-design.md`
 - **Implementasi**: [[Microservices - Warehouse Service]] · **API**: [[API - Warehouse Service]]
 - **Dependensi utama**: [[Microservices - Integration Service]], [[External - Accurate]]
@@ -71,7 +71,7 @@ Integration service
 
 > **Catatan**: Hook `OnOrderUpsert` di integration service belum diimplementasikan. Saat ini hanya reconciler 60s yang aktif (worst-case lag ±1 mnt). Hook push realtime menjadi bagian Task integration berikutnya.
 
-### Fase 3 — Operasi Gudang / WMS (🟡 Akan Dibangun)
+### Fase 3 — Operasi Gudang / WMS (⚠️ Partial — approve/pick/pack/rts/labels/dashboard ✅ Task 7)
 
 #### State Machine `fulfillment_orders`
 
