@@ -29,7 +29,8 @@
 | Inventory | `/api/inventory/*` | [[API - Inventory Service]] | [[Microservices - Inventory Service]] |
 | TikTok Shop | `/api/tiktok-shop/*` | [[API - TikTok Shop Service]] | [[Microservices - TikTok Shop Service]] |
 | Task Management | `/api/task-management/*` | [[API - Task Management Service]] | [[Microservices - Task Management Service]] |
-| Manufacture | `/api/manufacture/*` | [[API - Manufacture Service]] | `Microservices - Manufacture Service` (dok konsep TBD) |
+| Manufacture | `/api/manufacture/*` | [[API - Manufacture Service]] | [[Microservices - Manufacture Service]] |
+| Warehouse | `/api/warehouse/*` | [[API - Warehouse Service]] | [[Microservices - Warehouse Service]] |
 | Recruitment | `/api/recruitment/*` | [[API - Recruitment Service]] | [[Microservices - Recruitment Service]] |
 
 ## Dokumen Terkait
