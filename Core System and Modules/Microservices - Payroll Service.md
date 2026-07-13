@@ -14,6 +14,11 @@
 - `GET/PUT /config/tax` — PPh21 metode **TER** + nominal PTKP per status + tabel TER
 - GET = role HR; PUT = HR admin. Dokumen **singleton**, di-seed default saat boot (idempoten).
 
+### Master Badan Usaha (multi-company — identitas/kop slip)
+- CRUD `/companies` — `listCompanies` (GET, HR) · `createCompany` (POST, HR admin) · `updateCompany` (PUT `/:id`) · `deleteCompany` (DELETE `/:id`, badan usaha **default tak bisa dihapus**).
+- Field `Company`: `name`, `npwp`, `city`, `hrd_signer`, `bank_name`, `bank_account`, `is_default` (hanya satu default; dijaga saat create/update). Di-seed satu entitas default dari identitas config lama (CV Pure Glow Lux).
+- **Konsep**: karyawan bekerja di bawah 1 PT induk tetapi bisa **digaji atas nama badan usaha berbeda**; yang beda antar-entitas **HANYA identitas slip (kop)** — **BPJS/PPh21/PTKP/TER tetap nasional** (config singleton). Saat run, identitas badan usaha disematkan ke tiap slip via `CompanySnapshot` (kop stabil walau master berubah/terhapus).
+
 ### Master Komponen Gaji
 - CRUD `/salary-components` — komponen `type` (earning/deduction), `input_type` (manual/computed), `taxable`, `bpjs_base`, `sort_order`, `is_active`
 - **Di-seed 15 komponen** default **persis slip nyata** (9 pendapatan + 6 pengurangan). Yang `computed` (Lembur, BPJS, PPh21, **potongan** Tunjangan Kehadiran) dihitung engine; **earning Tunjangan Kehadiran = manual** (base per karyawan). GET = HR; tulis = HR admin.
@@ -34,7 +39,7 @@
 
 ## Model Data (`payroll_db`)
 
-- `salary_component` · `employee_salary` · `payroll_config` (singleton) · `payroll_run` (metadata `title`/`period`/`pay_period_start`/`pay_period_end`/`pay_date` + lifecycle `draft→approved→published` + `approved_by/at`, `published_by/at`) · `payroll_run_line` (snapshot payslip per karyawan + `error` bila supplement gagal)
+- `salary_component` · `employee_salary` · `payroll_config` (singleton) · **`company`** (master badan usaha penggaji; identitas/kop slip, `is_default`) · `payroll_run` (metadata `title`/`period`/`pay_period_start`/`pay_period_end`/`pay_date` + lifecycle `draft→approved→published` + `approved_by/at`, `published_by/at`) · `payroll_run_line` (snapshot payslip per karyawan + **`CompanySnapshot`** kop badan usaha + `error` bila supplement gagal)
 
 ## Belum Diimplementasikan / Catatan
 
@@ -43,7 +48,7 @@
 - **Slip gaji** (PDF/cetak) = Fase 3 (kini slip hanya view in-app). **THR** = Fase 4. **Dashboard + export Accurate** = Fase 5 ([[ADR - 0001 Akuntansi via Accurate]]).
 - **FE** ([[APP - Web ERP]], grup menu **Payroll**, PR belum merge): **Pengaturan Gaji** (config: Komponen, BPJS, Pajak/PTKP, Perlakuan Kehadiran, Perusahaan) · **Gaji Karyawan** (Daftar Gaji register + edit) · **Payroll Run** (buat → detail KPI+tabel karyawan → approve → publish → modal slip) · **Slip Gaji Saya** (self-service). Butuh service ini ter-deploy di gateway untuk E2E.
 - **Slip self-service** kini via [[APP - Web ERP]]; integrasi [[APP - MyBharata]] (Flutter) untuk karyawan menyusul.
-- **Multi-company ditunda** (Fase 1 single-company) — kenyataan grup punya >1 entitas (mis. CV Pure Glow Lux, PT Bharata Internasional).
+- **Multi-company (identitas/kop slip) SUDAH ada** — master badan usaha `/companies` (lihat §Fase 1) memungkinkan menggaji atas nama entitas berbeda (CV Pure Glow Lux, PT Bharata Internasional). **Yang masih single/nasional**: config BPJS/PPh21/PTKP/TER (`payroll_config` singleton) — per-entitas config pajak/BPJS **belum** (ditunda; realita: rate nasional sama antar-entitas).
 - Validasi referensial (`component_id` / eksistensi `employee_id`) dilakukan di FE; assign gaji memakai role `isHR`.
 
 ## Dependensi & Integrasi
