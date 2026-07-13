@@ -86,6 +86,8 @@
 | GET/POST/PUT/DELETE | `/accurate/settings/kv-configs[/list|/:id]` | KV config Accurate |
 | GET | `/accurate/daily-invoices` | List faktur harian auto-sync RTS (filter `shop_id`, `channel`, `date`/`date_from`/`date_to` (WIB `YYYYMMDD`), `status` SENT/FAILED/PENDING; paginated) |
 | POST | `/accurate/daily-invoices/:id/retry` | Retry sinkron faktur auto-sync (re-snapshot order `TO_SHIP` shop-hari → kirim ulang, balas status akhir) |
+| GET | `/accurate/daily-returns` (+ `/:id`, `/export`) | List/detail/export retur auto-sync (Retur Penjualan Shopee; filter `shop_id`/`channel`/`date`/`status` incl. `SENT`/`FAILED`/`FULL_VIA_INVOICE`/`HELD_REFUND_ONLY`; paginated) |
+| POST | `/accurate/daily-returns/:id/retry` | Retry sinkron retur auto-sync (baris `FAILED`) / override manual push (baris `HELD_REFUND_ONLY`) |
 | GET | `/accurate/stocks?sku=` | Stok live per SKU listing (pecah komponen bundle via `product_sku_mappings`, get-stock.do) |
 | GET | `/accurate/stocks/list` | Semua stok dari salinan lokal `accurate_stocks` (search `q`, paginated; `only_products` default true = hanya item ter-mapping produk jualan) ✅ |
 | GET | `/accurate/stocks/listing` | Stok per SKU listing dari salinan lokal: komponen bundle (+flag `mapped`) + stok efektif; sku numeric-id legacy tersaring ✅ |
