@@ -4,7 +4,7 @@
 
 - **Stack**: Go + Fiber v2 + MongoDB (`hrd_document_db`) — selaras pola service bip-erp lain.
 - **Path**: `services/hrd-document` (port `6990`).
-- **Status**: ⚠️ **Implemented (Fase 1 BE)**. Di belakang [[CORE - API Master Gateway]] (map `/api/hrd-document/*`), auth **SSO**, RBAC `system_roles["hris"]` (`isHR`/`isHRAdmin`). **FE, soft-validate target ke sumber, enforcement ack di BE = belum** (lihat Catatan).
+- **Status**: ⚠️ **Implemented (Fase 1 BE)**. Di belakang [[CORE - API Master Gateway]] (map `/api/hrd-document/*`), auth **SSO**, RBAC `system_roles["hris"]` (**author=`isHR`** staf HR; registry-type tulis=`isHRAdmin`). Konten body = **Markdown** (`body_md`, selaras editor FE). **FE, soft-validate target ke sumber, enforcement ack di BE = belum** (lihat Catatan).
 
 ## Endpoint / Fitur (Sudah Diimplementasikan — Fase 1 BE)
 
@@ -12,10 +12,10 @@
 - `GET /document-types` (isHR) — daftar jenis. `POST` / `PUT /:id` (isHRAdmin). Di-seed default **sop / terms / policy / guideline** (idempoten); HR bisa tambah tanpa deploy.
 
 ### Dokumen (kelola HR)
-- `POST /documents` (isHR) — buat **draft** (`type`, `title`, `body_html/json/text`, `targets[]`, `ack_required`).
+- `POST /documents` (isHR) — buat **draft** (`type`, `title`, `body_md`, `targets[]`, `ack_required`).
 - `GET /documents` (isHR, filter `?status=`/`?type=`) · `GET /documents/:id` (isHR).
-- `PUT /documents/:id` (isHRAdmin) — edit konten kerja/config · `DELETE /documents/:id` (isHRAdmin, **hanya draft**).
-- `POST /documents/:id/publish` (isHRAdmin) — snapshot konten kerja ke **versi baru IMMUTABLE** + `current_version++` + status `published`.
+- `PUT /documents/:id` (isHR) — edit konten kerja/config · `DELETE /documents/:id` (isHR, **hanya draft**).
+- `POST /documents/:id/publish` (isHR) — snapshot konten kerja ke **versi baru IMMUTABLE** + `current_version++` + status `published` (isi wajib non-kosong).
 - `GET /documents/:id/versions` + `GET /documents/:id/versions/:v` (isHR) — riwayat versi.
 
 ### Karyawan (self-service)
@@ -24,8 +24,8 @@
 
 ## Model Data (`hrd_document_db`)
 
-- `hrd_document` — identitas + config + konten kerja: `type`, `title`, `body_html/json/text`, `targets[]{type,value,label}`, `ack_required`, `status` (draft/published/archived), `current_version`.
-- `hrd_document_version` — **snapshot konten immutable** per publish (`document_id`, `version`, `title`, `body_*`, `published_by/at`). Ack terikat ke versi.
+- `hrd_document` — identitas + config + konten kerja: `type`, `title`, `body_md` (Markdown kanonik) + `body_text` (turunan teks polos via `toPlainText`, untuk search/preview), `targets[]{type,value,label}`, `ack_required`, `status` (draft/published/archived), `current_version`.
+- `hrd_document_version` — **snapshot konten immutable** per publish (`document_id`, `version`, `title`, `body_md/text`, `published_by/at`). Ack terikat ke versi.
 - `hrd_document_ack` — persetujuan (`document_id`, `version`, `employee_id`, `agreed_at`).
 - `hrd_document_type` — registry jenis (`key`, `label`, `is_active`).
 

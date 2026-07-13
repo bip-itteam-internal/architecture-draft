@@ -17,12 +17,14 @@ Satu model **dokumen HRD reusable** di **service baru `hrd-document`** (DB sendi
 1. **Penyasaran (`targets[]`)** — dokumen punya `targets: [{type, value, label}]`, berlaku bila karyawan cocok **salah satu** (OR); boleh campur dimensi. `type` target = **ENUM 5 dimensi**: `all | position | department | request_type | employee`.
 2. **Acknowledgment opsional** — flag `ack_required` per dokumen. Bila true & S&K terkait pengajuan → karyawan **wajib setuju saat submit** (langsung, **tanpa** menunggu HR → menjawab kekhawatiran wait 2×24 jam). Ack dicatat **per-versi**.
 3. **Versioning immutable** — tiap publish = versi baru (snapshot title+body); versi lama tersimpan (riwayat). Ack terikat versi.
-4. **Body rich-text** — simpan `body_html`/`body_json` (dari rich-text-editor) + turunan `body_text` (search/preview).
+4. **Body Markdown** — editor FE (TipTap + `tiptap-markdown`, `RichTextField`) menghasilkan & menampilkan **Markdown**; simpan `body_md` (kanonik) + turunan `body_text` (teks polos untuk search/preview, via `toPlainText`). *(Revisi pasca-implementasi FE: rencana awal `body_html`/`body_json` diganti Markdown agar selaras editor nyata di `erp-frontend`.)*
 5. **Extensibility** — `type` dokumen (sop/terms/policy/…) = **registry** configurable (HR tambah tanpa deploy); `scope_type` = **enum kode** (tiap dimensi butuh resolver).
 6. **Rumah** — service baru `hrd-document` (bukan menggemukkan employee service).
 7. **Validasi target soft** — saat simpan, cek nilai target ada di sumber (posisi/dept → employee, request_type → registry attendance) + simpan `label` snapshot; **soft** (warning bila tak cocok, tak memblokir keras).
 
-**Model data** (`hrd_document_db`): `hrd_document` (identitas+config: type, title, targets[], ack_required, status, current_version) · `hrd_document_version` (snapshot konten immutable: title, body_html/json/text, published_by/at) · `hrd_document_ack` (`{document_id, version, employee_id, agreed_at}`) · `hrd_document_type` (registry jenis).
+**Model data** (`hrd_document_db`): `hrd_document` (identitas+config: type, title, body_md/text, targets[], ack_required, status, current_version) · `hrd_document_version` (snapshot konten immutable: title, body_md/text, published_by/at) · `hrd_document_ack` (`{document_id, version, employee_id, agreed_at}`) · `hrd_document_type` (registry jenis).
+
+**RBAC**: **author = HR staff (`isHR`)** — buat/edit/hapus-draft/**terbitkan** dokumen (bukan `isHRAdmin`; menulis dokumen bagian kerja staf HR). Registry `type` tulis = `isHRAdmin`. Baca+ack karyawan = terautentikasi.
 
 **Resolusi "Dokumen Saya"** = union target vs posisi/dept/employee_id karyawan + `all`. **S&K saat pengajuan** = FE query dokumen `target{request_type:X}` + `ack_required` → tampil → wajib setuju → catat ack → submit boleh lanjut.
 
