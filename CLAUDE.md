@@ -84,7 +84,9 @@ Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
 ```
 Untuk dok konsep murni: `## Latar Belakang`, `## Ruang Lingkup`, `## Belum Diputuskan (TBD)`, dst.
 
-> **Skeleton siap-pakai** untuk tiap bentuk ada di folder `Templates/` (Implementasi Service · Konsep Domain · Log Operasional). Prosedur lengkap + decision-tree penamaan: `IT/IT - SOP Dokumentasi Vault.md`.
+> **Skeleton siap-pakai** untuk tiap bentuk ada di folder `Templates/` (Implementasi Service · Konsep Domain · Log Operasional · Persona). Prosedur lengkap + decision-tree penamaan: `IT/IT - SOP Dokumentasi Vault.md`.
+
+> **Persona / Pengguna** — dok **domain** & **service ber-UI** memuat `## Persona / Pengguna`: tabel aktor (**Persona · Peran & Divisi · Akses/RBAC · Device**) + poin **Tujuan · Pain point · Aksi utama**. Tujuan: developer/AI paham **siapa** pengguna fitur. Alur **banyak-aktor kompleks** → buat dok terpisah `<Prefix> - <Fitur> Persona` dari **Template - Persona** (folder domain, prefix domain) lalu link dari dok induk. Persona **ikut status** dok induk (tanpa marker terpisah) & tetap **grounded** (§1) — dari peran/RBAC nyata, jangan mengarang.
 
 ## 7. Pemetaan repo kode → dokumen
 

@@ -27,6 +27,20 @@ Lihat: IT - SOP Dokumentasi Vault · CLAUDE.md §1 §4 §5 §6
 
 - `fitur / proses bisnis utama`
 
+## Persona / Pengguna
+
+%% Siapa MANUSIA yang memakai fitur ini — beri gambaran ke developer/AI. Ringkas.
+   Alur banyak-aktor kompleks → buat dok terpisah `<Prefix> - <Fitur> Persona` (Template - Persona)
+   dan link di sini. Grounded: dari peran/RBAC nyata, jangan mengarang. %%
+
+| Persona | Peran & Divisi | Akses / RBAC | Device |
+|---|---|---|---|
+| `nama/label` | `jabatan, divisi/grup` | `role sistem / permission` | `Web ERP / MyBharata` |
+
+- **Tujuan**: `yang ingin dicapai`
+- **Pain point**: `masalah lama yang dipecahkan`
+- **Aksi utama**: `langkah inti di sistem`
+
 ## Konsumen Data
 
 %% Siapa yang memakai data/output ini. Tautkan dengan wikilink tanpa backtick. %%
