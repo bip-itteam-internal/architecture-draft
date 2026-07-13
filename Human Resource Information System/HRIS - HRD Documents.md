@@ -4,8 +4,8 @@
 
 *Sistematisasi dokumen HRD (SOP, Syarat & Ketentuan, Kebijakan, dll.) dari Google Drive manual menjadi satu model **reusable**: `title + body` + **penyasaran (targets) polimorfik** (semua/posisi/departemen/jenis-pengajuan/karyawan) + acknowledgment + versioning. SOP disasar per posisi; S&K per jenis pengajuan; kebijakan sekantor.*
 
-- **Status**: 🟡 **Konsep / Draft** (keputusan desain: [[ADR - 0013 HRD Documents]]) — belum di kode.
-- **Implementasi**: service `hrd-document` (TBD).
+- **Status**: ⚠️ **Fase 1 BE di kode** (keputusan: [[ADR - 0013 HRD Documents]]) — service [[Microservices - HRD Document Service]]; **FE & soft-validate target belum**.
+- **Implementasi**: [[Microservices - HRD Document Service]] (Fase 1 BE).
 
 ## Latar Belakang
 
