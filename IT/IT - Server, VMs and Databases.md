@@ -17,11 +17,6 @@
 - Username: devops_ubuntu
 - Password: Hijau+99
 
-**VM - CI/CD Runner**
-- Local IP: 10.10.10.8
-- Username: cicd
-- Password: Hijau@99!
-
 **VM - ERP Development**
 - Local IP: 10.10.10.121
 - Username: erp
@@ -36,7 +31,7 @@
 - Public IP: 116.206.196.31 (Ubuntu 22.04)
 - Username: bharata (SSH key `~/.ssh/biznet-key`, alias `ssh bip-vps`)
 - Additional disk 100G → mount `/backup` (backup DB harian). App dir: `/home/bharata/apps/bip-erp`.
-- Target migrasi prod dari `10.10.10.120`. Per 2026-07-10 masih **dobel deployment** (belum cutover). CI via Harness (delegate di VPS). Ingress: nginx-proxy-manager (`~/npm`, network `BIP-ERP-Bridge`). Detail: [[IT - CI-CD]] · [[IT - Network Management]].
+- Target migrasi prod dari `10.10.10.120`. Per 2026-07-10 masih **dobel deployment** (belum cutover). CI via Harness (delegate di VPS) + host **self-hosted GitHub Actions runner** (pindahan dari VM `10.10.10.8` yang sudah decommissioned). Ingress: nginx-proxy-manager (`~/npm`, network `BIP-ERP-Bridge`). Detail: [[IT - CI-CD]] · [[IT - Network Management]].
 - **Akses MongoDB (dev)**: dari IP kantor statik (cloud firewall Biznet allow), Compass/mongosh `mongodb://erp-mongo:<pwd>@116.206.196.31:<port>/?authSource=admin` — port per service (Integration 32789, Employee-Primary 32783, dst).
 
 **VM - ERP Testing
