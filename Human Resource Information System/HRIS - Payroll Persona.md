@@ -1,6 +1,6 @@
 # Payroll — Persona & Alur
 
-> Menggambarkan **siapa** yang memakai alur **Payroll Run** (penggajian bulanan & **THR**) dan **bagaimana** alurnya. Sisi konsep: [[HRIS - Payroll]]; implementasi: [[Microservices - Payroll Service]]. Status: ⚠️ **Implemented (BE)** — lifecycle run + slip self-service + THR sudah di kode; FE menyusul.
+> Menggambarkan **siapa** yang memakai alur **Payroll Run** (penggajian bulanan & **THR**) dan **bagaimana** alurnya. Sisi konsep: [[HRIS - Payroll]]; implementasi: [[Microservices - Payroll Service]]. Status: ⚠️ **Implemented (BE + FE)** — lifecycle run + slip self-service + THR di kode BE; **FE THR** (buat run THR, badge Jenis, detail masa kerja/proporsi, slip THR) di [[APP - Web ERP]].
 
 ## Aktor (ringkas)
 
