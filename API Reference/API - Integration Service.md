@@ -134,6 +134,17 @@
 | GET | `/icc/mappings/available-shops` | TikTok Shop belum di-assign aktif (pool global) |
 | GET | `/icc/mappings/available-advertisers` | Advertiser belum di-assign aktif (pool global; deduplikasi via `$group`) |
 
+## Kas Toko / Wallet (🟡 branch `feat/kas-toko`, PR #380 — belum merge)
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/wallet/balances` | Saldo kas toko semua toko (Shopee aktual dari `current_balance`; TikTok estimasi anchor+Σ, flag `estimated`/`anchor_missing`/`sync_stale`) |
+| GET | `/wallet/withdrawals` | Riwayat penarikan (filter shop/channel/type/status/tanggal WIB). Meta paginasi HANYA sisi TikTok; Shopee = list grup penuh + `completed_total` |
+| GET | `/wallet/mutations` | Mutasi wallet Shopee ("Saldo Saya") + saldo berjalan, paginasi normal |
+| GET | `/wallet/reconciliation` | Laporan uang masuk per toko basis `income.paid_at` (`paid_from/paid_to` wajib; `order_from/order_to` opsional — cross-periode) |
+| GET | `/wallet/reconciliation/export` | Export Excel laporan |
+| PUT | `/wallet/opening-balance/:shopId` | Set anchor saldo awal TikTok (`{amount, as_of}`) |
+| GET | `/wallet/sync-status` | State sync per toko (last_run, status, error) |
+
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
 |---|---|---|
