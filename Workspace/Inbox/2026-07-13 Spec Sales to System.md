@@ -16,13 +16,18 @@ meminta 3 hal lanjutan. Requirement pajak/keterangan/dept-proyek SUDAH terpenuhi
 - Shopee: tidak punya program sampel (0 order berpola sampel dalam 30 hari) — di luar scope.
 
 **Perubahan data:**
-- Field baru `transaction_orders.is_sample` (bool, bson omitempty). Diisi di jalur transform/
-  sync TikTok dari `is_sample_order`. Backfill 390 order lama via script join
-  `tt_shop_order_details` (manual, sekali).
+- Field baru `transaction_orders.is_sample` (bool, bson omitempty). Rantai LENGKAP tiga titik
+  (pelajaran PR #372/#373 — field di entity saja = data terbuang): DTO client TikTok →
+  entity raw `tt_shop_order_details` (sudah ada `is_sample_order`) → mapping transform →
+  `transaction_orders.is_sample`. Berlaku di jalur cron sync DAN webhook direct.
+- Backfill 390 order lama via script join `tt_shop_order_details._id = order_id` (manual, sekali).
 
 **Keluar dari faktur:**
-- Snapshot faktur (query order shop-hari + `buildDetailItemsFromOrders`) melewati order
-  `is_sample=true`. Baris sampel (harga 0) hilang dari faktur sales; total faktur tak berubah.
+- Filter level query: field baru `TransactionOrderFilter.ExcludeSample` — dipasang di SEMUA
+  call site snapshot faktur (OnOrderToShip, RetryDailyInvoice, SweepDailyInvoice/
+  snapshotUnchanged, GetDailyInvoiceDetail, jalur correction). Satu titik terlewat = hash
+  sender vs sweep berbeda → edit ulang tiap malam. Baris sampel (harga 0) hilang dari faktur;
+  total faktur tak berubah.
 
 **Masuk Penyesuaian Persediaan (diverifikasi live ke API Accurate):**
 - 1 dokumen per (toko, hari kirim WIB) via `item-adjustment/save.do`; baris per item:
@@ -36,8 +41,10 @@ meminta 3 hal lanjutan. Requirement pajak/keterangan/dept-proyek SUDAH terpenuhi
 - Ketahanan meniru faktur: koleksi `accurate_daily_adjustments` (nomor stabil per toko-hari,
   `accurate_id`, last_status SENT/FAILED/PENDING, lines_hash, lock, attempts), edit protokol
   resmi (header `id` + baris lama `_status:"delete"` + snapshot baru), retry 3×, notif
-  Telegram, skip-unchanged (hash lokal). Trigger: hook SHIPPED/COMPLETED existing — order
-  sampel dialihkan ke jalur adjustment alih-alih faktur.
+  Telegram, skip-unchanged (hash lokal). Model dokumen = SNAPSHOT (semua order sampel
+  shipped toko-hari itu, dibangun ulang tiap sync — sampel yang batal otomatis keluar),
+  bukan append. Trigger: hook SHIPPED/COMPLETED existing — order `is_sample` memicu sync
+  adjustment; sync faktur tetap jalan (no-op karena sampel tak pernah masuk snapshot faktur).
 - Monitoring: seksi terpisah "Penyesuaian Sampel" di tab Auto Sync FE (tabel sendiri di bawah
   tabel faktur: tanggal, toko, nomor IA, status, lines, error, tombol Retry) — endpoint
   list/retry paralel dgn daily-invoices (`/accurate/daily-adjustments`).
@@ -54,9 +61,15 @@ dan dokumen penyesuaian dibuat untuk hari-hari tsb. Hari sebelum 10 Jul tidak di
 - Status `AUTO`: TIDAK pernah dikirim ke Accurate — endpoint `send/:service` menolak,
   tombol send disembunyikan di FE. 409-guard manual-send tidak berubah (tetap membandingkan
   ke `accurate_daily_invoices`, bukan summary).
+- KRITIS anti-bentrok: summary AUTO **tidak menstempel** order (`BatchUpdateReportID`
+  TIDAK dipanggil) — stempel `sales_invoice_report_id` tetap milik alur manual. Raw export
+  untuk report AUTO mengambil order via query (shop_id, channel, hari-kirim WIB), bukan via
+  stempel. Idempoten: unique index parsial (shop_id, channel, date, status AUTO) — worker
+  rerun tidak menggandakan.
 - Halaman Summary existing menampilkannya → download Raw File existing
-  (`GET /summary/reports/:id/orders/export`) langsung jalan. Kolom "Accurate Number" diisi
-  `accurate_daily_invoices.invoice_number` via join (shop_id, channel, hari-kirim WIB).
+  (`GET /summary/reports/:id/orders/export`) langsung jalan (bercabang by status AUTO).
+  Kolom "Accurate Number" diisi `accurate_daily_invoices.invoice_number` via join
+  (shop_id, channel, hari-kirim WIB).
 - Order sampel TETAP tampil di raw file (finance perlu lihat), kolom Accurate Number kosong
   (tidak pernah difakturkan); kolom nomor penyesuaian menyusul bila diminta — YAGNI.
 
