@@ -29,6 +29,7 @@ mengingatkan bila versi kit terpasang ≠ versi terbaru.
 
 - `commands/` — 6 slash command flow + `/ask` (recall read-only, sebut sumber).
 - `hooks/` — session-start (info flow + cek versi/staleness) & pre-commit-reminder.
+- `rules/` — `team-memory.md` (ingatan tim bersama; disalin ke `.claude/rules/`, di-import CLAUDE.md).
 - `templates/` — `workspace-CLAUDE.md` (jadi `erp/CLAUDE.md`).
 - `init.ps1` / `init.sh` — pemasang.
 - `VERSION` — versi kit.
@@ -36,6 +37,7 @@ mengingatkan bila versi kit terpasang ≠ versi terbaru.
 
 ## Changelog
 
+- **1.2.0** — tambah `rules/team-memory.md` (ingatan tim bersama: gotchas, konvensi, sumber-kebenaran); `init` menyalin `rules/` → `.claude/rules/`; `workspace-CLAUDE.md` meng-`@import` file itu supaya ter-load tiap sesi.
 - **1.1.0** — tambah `/ask`: tanya-jawab read-only grounded ke vault + kode, sebut sumber & status, sarankan `/sync-docs` bila ada gap dok.
 - **1.0.1** — session-start tak lagi salah lapor "ketinggalan dari remote" saat local justru _ahead_ (kini bandingkan ke merge-base); re-run init mem-_prune_ file `commands/`/`hooks/` yang sudah dihapus di kit baru (bukan cuma menimpa).
 - **1.0.0** — rilis awal: 6 command flow arch-first, hooks, init lintas-OS.
