@@ -37,6 +37,7 @@ mengingatkan bila versi kit terpasang ≠ versi terbaru.
 
 ## Changelog
 
+- **1.2.1** — `rules/team-memory.md`: tambah konvensi `pnpm`, gotchas (vault creds intentional, repo mybharata rename, RBAC `system_roles`=modul & atasan di `work_data`), perjelas auto-push (FE/mybharata tak auto-push).
 - **1.2.0** — tambah `rules/team-memory.md` (ingatan tim bersama: gotchas, konvensi, sumber-kebenaran); `init` menyalin `rules/` → `.claude/rules/`; `workspace-CLAUDE.md` meng-`@import` file itu supaya ter-load tiap sesi.
 - **1.1.0** — tambah `/ask`: tanya-jawab read-only grounded ke vault + kode, sebut sumber & status, sarankan `/sync-docs` bila ada gap dok.
 - **1.0.1** — session-start tak lagi salah lapor "ketinggalan dari remote" saat local justru _ahead_ (kini bandingkan ke merge-base); re-run init mem-_prune_ file `commands/`/`hooks/` yang sudah dihapus di kit baru (bukan cuma menimpa).
