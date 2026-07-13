@@ -11,7 +11,7 @@
 | POST | `/tap` | Clock-in/out (fingerprint/mobile/website; `?method=`) | open (serial/MAC/token) |
 | GET | `/entries` | List entri (paginated, filter dept/status/periode) | HRIS |
 | GET | `/history` | Riwayat absensi sendiri (bulanan) | header |
-| GET | `/report` | Laporan periode 26→25 (`?yyyy-mm`) | HRIS |
+| GET | `/report` | Laporan periode 26→25 (`?yyyy-mm`); tiap entry juga membawa `leave_subtype` (bedakan Izin urusan kantor vs pribadi di FE) | HRIS |
 | PATCH | `/:id/update` | Update entri (+dokumen/status/comment) | HRIS |
 | GET | `/payroll-supplement` | Agregasi jam → payout_pct (`?employee_id`); dibayar/dipotong per status dari master treatment | open |
 | GET | `/payroll-status-treatment` | Perlakuan dibayar/dipotong per status (untuk payout) | HR |
