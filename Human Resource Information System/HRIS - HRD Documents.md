@@ -4,8 +4,8 @@
 
 *Sistematisasi dokumen HRD (SOP, Syarat & Ketentuan, Kebijakan, dll.) dari Google Drive manual menjadi satu model **reusable**: `title + body` + **penyasaran (targets) polimorfik** (semua/posisi/departemen/jenis-pengajuan/karyawan) + acknowledgment + versioning. SOP disasar per posisi; S&K per jenis pengajuan; kebijakan sekantor.*
 
-- **Status**: ⚠️ **Fase 1 BE di kode** (keputusan: [[ADR - 0013 HRD Documents]]) — service [[Microservices - HRD Document Service]]; **FE & soft-validate target belum**.
-- **Implementasi**: [[Microservices - HRD Document Service]] (Fase 1 BE).
+- **Status**: ⚠️ **Fase 1 BE + FE author di kode** (keputusan: [[ADR - 0013 HRD Documents]]) — service [[Microservices - HRD Document Service]]; FE author [[APP - Web ERP]] PR #276; **employee-facing FE ("Dokumen Saya"/ack/S&K) & soft-validate target belum**.
+- **Implementasi**: [[Microservices - HRD Document Service]] (BE) · [[APP - Web ERP]] (FE author, PR #276).
 
 ## Latar Belakang
 
@@ -28,9 +28,9 @@ Dokumen HRD kini manual di **Google Drive** ([[HRIS - Big Pictures]] §Dokumen):
 - **HR Admin** — **Tujuan**: kelola dokumen HRD tersistem & tersasar. **Aksi**: buat/edit → set `type`, `targets`, `ack_required`, tulis body (rich-text) → **publish** (versi baru).
 - **Karyawan** — **Tujuan**: baca dokumen yang berlaku untuknya + setuju S&K saat mengajukan. **Aksi**: "Dokumen Saya" (dokumen yang menyasar dirinya); saat pengajuan (mis. Cuti) → tampil S&K → **setuju** → submit.
 
-## Bentuk Form Author (FE, acuan)
+## Bentuk Form Author (FE — ✅ diimplementasi PR #276)
 
-Satu form untuk **semua jenis** dokumen — yang berubah hanya *Jenis* & nilai *target*.
+Satu form untuk **semua jenis** dokumen — yang berubah hanya *Jenis* & nilai *target*. Terwujud di `erp-frontend` (`/hris/documents`): `SelectForm` Jenis · `InputForm` Judul · `TargetsBuilder` (`useFieldArray`, dimensi Semua/Posisi/Departemen/Jenis Pengajuan — `employee` ditunda) · `CheckboxForm` ack · `RichTextField` (Markdown) · Simpan Draft / **Terbitkan** + riwayat versi.
 
 ```
 Jenis *      [ Syarat & Ketentuan ▼ ]        ← registry type

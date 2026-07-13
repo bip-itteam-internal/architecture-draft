@@ -1,6 +1,6 @@
 ## ADR 0013 — HRD Documents: model dokumen reusable (title+body + targets polimorfik)
 
-- **Status**: ✅ Accepted — **Fase 1 BE diimplementasi** ([[Microservices - HRD Document Service]]); FE & soft-validate target menyusul
+- **Status**: ✅ Accepted — **Fase 1 BE + FE author diimplementasi** ([[Microservices - HRD Document Service]] · [[APP - Web ERP]] PR #276); employee-facing FE & soft-validate target menyusul
 - **Tanggal**: 2026-07-14
 - **Konteks dok**: [[HRIS - HRD Documents]] · [[HRIS - Big Pictures]] · [[Microservices - Employee Service]] · [[Microservices - Attendance Service]] · [[ADR - 0002 Database-per-Service]]
 

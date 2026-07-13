@@ -4,7 +4,7 @@
 
 - **Stack**: Go + Fiber v2 + MongoDB (`hrd_document_db`) — selaras pola service bip-erp lain.
 - **Path**: `services/hrd-document` (port `6990`).
-- **Status**: ⚠️ **Implemented (Fase 1 BE)**. Di belakang [[CORE - API Master Gateway]] (map `/api/hrd-document/*`), auth **SSO**, RBAC `system_roles["hris"]` (**author=`isHR`** staf HR; registry-type tulis=`isHRAdmin`). Konten body = **Markdown** (`body_md`, selaras editor FE). **FE, soft-validate target ke sumber, enforcement ack di BE = belum** (lihat Catatan).
+- **Status**: ⚠️ **Implemented (Fase 1 BE)**. Di belakang [[CORE - API Master Gateway]] (map `/api/hrd-document/*`), auth **SSO**, RBAC `system_roles["hris"]` (**author=`isHR`** staf HR; registry-type tulis=`isHRAdmin`). Konten body = **Markdown** (`body_md`, selaras editor FE). **FE author = di kode** ([[APP - Web ERP]] PR #276); **employee-facing FE, soft-validate target ke sumber, enforcement ack di BE = belum** (lihat Catatan).
 
 ## Endpoint / Fitur (Sudah Diimplementasikan — Fase 1 BE)
 
@@ -36,7 +36,7 @@
 - **Soft-validate nilai target ke sumber** (posisi/dept → employee, `request_type` → attendance `/data-type/hr-request`) **belum** — Fase 1 hanya validasi struktural + `label = value`. `fetchEmployeeWork` (employee `/internal/aggregate/employee/:id`) dipakai **fallback** resolusi "Dokumen Saya" (utama: header gateway) — **bentuk respons belum diverifikasi live** (parser toleran).
 - **Enforcement ack di BE saat submit request** (attendance `/request/create` cek ack) = **Fase 2** (kini gate di FE).
 - **Endpoint arsip** (status `archived`) belum ada; publish/ack **non-atomik** (belum ada unique index) — robustness Fase lanjut.
-- **FE** (form author rich-text, "Dokumen Saya", ack, S&K saat pengajuan) = **belum** (di luar Fase 1 BE).
+- **FE author** (form author + targets builder polimorfik + versi/riwayat, body Markdown via `RichTextField`) **diimplementasi** — [[APP - Web ERP]] `erp-frontend` **PR #276** (`/hris/documents`, menu "Dokumen HRD"). **Employee-facing** ("Dokumen Saya", ack, S&K saat pengajuan) = **belum**.
 - **Deploy**: env wajib — service butuh `EMPLOYEE_MODULE_URL`+`ATTENDANCE_MODULE_URL`, gateway `HRD_DOCUMENT_MODULE_URL` (`ValidateInternalURL` panic bila kosong). docker-compose: `hrd-document-service` + `hrd-document-mongo-db` (host `32796`).
 
 ## Dependensi & Integrasi
