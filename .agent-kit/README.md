@@ -29,7 +29,7 @@ mengingatkan bila versi kit terpasang ≠ versi terbaru.
 
 - `commands/` — 6 slash command flow + `/ask` (recall read-only, sebut sumber).
 - `hooks/` — session-start (info flow + cek versi/staleness) & pre-commit-reminder.
-- `rules/` — `team-memory.md` (ingatan tim bersama; disalin ke `.claude/rules/`, di-import CLAUDE.md).
+- `rules/` — `team-memory.md` (ingatan tim bersama; **di-import langsung** oleh CLAUDE.md dari vault via `@../architecture-draft/.agent-kit/rules/team-memory.md` — update cukup `git pull`, tak perlu re-init).
 - `templates/` — `workspace-CLAUDE.md` (jadi `erp/CLAUDE.md`).
 - `init.ps1` / `init.sh` — pemasang.
 - `VERSION` — versi kit.
@@ -37,6 +37,7 @@ mengingatkan bila versi kit terpasang ≠ versi terbaru.
 
 ## Changelog
 
+- **1.3.0** — team-memory kini **di-import langsung dari vault** (`@../architecture-draft/.agent-kit/rules/team-memory.md`) alih-alih disalin ke `.claude/rules/`; `init` tak lagi menyalin `rules/`. Efek: update ingatan tim cukup `git pull architecture-draft` — **tanpa re-run init**. (Re-init sekali untuk adopsi mekanisme baru; `.claude/rules/` lama bisa dihapus, tak dipakai.)
 - **1.2.1** — `rules/team-memory.md`: tambah konvensi `pnpm`, gotchas (vault creds intentional, repo mybharata rename, RBAC `system_roles`=modul & atasan di `work_data`), perjelas auto-push (FE/mybharata tak auto-push).
 - **1.2.0** — tambah `rules/team-memory.md` (ingatan tim bersama: gotchas, konvensi, sumber-kebenaran); `init` menyalin `rules/` → `.claude/rules/`; `workspace-CLAUDE.md` meng-`@import` file itu supaya ter-load tiap sesi.
 - **1.1.0** — tambah `/ask`: tanya-jawab read-only grounded ke vault + kode, sebut sumber & status, sarankan `/sync-docs` bila ada gap dok.

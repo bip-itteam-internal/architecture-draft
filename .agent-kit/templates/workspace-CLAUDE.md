@@ -20,5 +20,5 @@ __ACTIVE_PROJECT__
 - **i18n dua bahasa (`erp-frontend`)**: SEMUA teks user-facing **baru** WAJIB lewat `react-i18next` — `t("domain.key")`, key ditaruh di **dua** file `src/i18n/locales/id.ts` **dan** `en.ts`. **JANGAN hardcode** string yang tampil ke user. Default **Indonesia**; **istilah teknis lazim English biarkan English** di kedua locale (Dashboard, Export, KPI, Score, dll) — jangan dipaksa Indonesia. Tanggal/bulan/angka pakai `toLocaleDateString(intlLocale(lang))`, bukan hardcode `"id-ID"`. Aturan lengkap: **ADR 0010** di vault (`Decisions/ADR - 0010 Internasionalisasi (i18n) Dua Bahasa.md`).
 
 ## Ingatan tim (shared memory)
-Indeks memori bersama antar-agent/dev (gotchas, konvensi, sumber-kebenaran) — di-load via import:
-@rules/team-memory.md
+Indeks memori bersama antar-agent/dev (gotchas, konvensi, sumber-kebenaran) — di-import LANGSUNG dari vault; update cukup `git pull architecture-draft` (tanpa re-run init):
+@../architecture-draft/.agent-kit/rules/team-memory.md

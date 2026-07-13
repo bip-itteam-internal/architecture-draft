@@ -33,10 +33,11 @@ if (-not $active) {
   if ($sel -match '^\d+$' -and [int]$sel -lt $projects.Count) { $active = $projects[[int]$sel] } else { $active = $sel }
 }
 
-# 4. salin commands/hooks/skills/rules -> erp/.claude
+# 4. salin commands/hooks/skills -> erp/.claude
+# (team-memory TIDAK disalin: di-import langsung dari vault oleh CLAUDE.md, lihat template)
 $claude = Join-Path $ws '.claude'
 New-Item -ItemType Directory -Force -Path $claude | Out-Null
-foreach ($d in 'commands','hooks','skills','rules') {
+foreach ($d in 'commands','hooks','skills') {
   $src = Join-Path $kitRoot $d
   $dst = Join-Path $claude $d
   if (Test-Path $dst) { Remove-Item -Recurse -Force $dst }   # prune file lama yg dihapus di kit baru
