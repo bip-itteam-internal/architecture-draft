@@ -32,5 +32,12 @@
 - **Auto-memory lokal** (`~/.claude/.../memory/`) = scratch **privat** per-mesin; tidak ter-share.
 - **Naik kelas**: fakta lokal yang berguna untuk tim → promosikan ke vault (grounded) atau ke file ini.
 
+## Skill & tooling AI (Claude Code)
+- **Command tim ERP** (`/start-task`→`/plan`→`/implement`→`/review`→`/sync-docs`→`/wrap` + `/ask`): dari **agent-kit**, BUKAN plugin. Onboarding: clone `architecture-draft` + project sibling → jalankan `init`. Sumber: `.agent-kit/commands/`.
+- **Skill umum** (superpowers: brainstorming/TDD/systematic-debugging/writing-plans, dataviz, frontend-design, code-review, deep-research, dll.): **plugin per-mesin**, tak ikut repo. Marketplace resmi Anthropic (`claude-plugins-official`) **sudah pre-registered**. Install: `/plugin` (tab Discover) atau CLI `claude plugin install <nama>@claude-plugins-official` (mis. `superpowers`). Kelola: `/plugin list`, `claude plugin enable|disable|uninstall <nama>@<marketplace>`. (Cek nama marketplace asli plugin di `/plugin` → tab Marketplaces.)
+- **Standarkan set plugin tim**: `enabledPlugins` di `.claude/settings.json` (project scope) auto-enable saat clone + trust. Tapi `.claude/settings.json` ERP **di-generate `init`** (bisa ketimpa) → standarisasi resmi tim idealnya lewat agent-kit (init menulis `enabledPlugins`) — **belum dilakukan (TBD)**.
+- **Bikin skill custom tim** (shareable): taruh `SKILL.md` di `.agent-kit/skills/<nama>/` → `init` menyalin ke `.claude/skills/`; bump versi kit → tim `git pull` + re-init.
+- **Update file ingatan-tim ini**: edit `.agent-kit/rules/team-memory.md` di vault → tim cukup `git pull architecture-draft` (di-import langsung sejak kit v1.3.0; **tanpa** re-init).
+
 ## Bahasa
 - Balasan AI ke user & dokumentasi: **Bahasa Indonesia**; istilah teknis lazim English biarkan English.
