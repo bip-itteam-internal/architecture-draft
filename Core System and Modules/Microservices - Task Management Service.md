@@ -59,11 +59,13 @@ Konfigurasi **per-space** (`Space.auto_assign` bool, `auto_close_days` int `0`=n
 - Scheduler eskalasi (`sla_scheduler.go`): goroutine per jam, mengirim notifikasi **breach sekali** per task (ditandai array `sla_notified`): response breach → **supervisor divisi**; resolution breach → **assignee + supervisor**. (Warning hanya untuk badge, belum dieskalasi via notifikasi.)
 
 ### Reports / Dashboard
-- `GET /tasks/stats` & `GET /tasks/admin-stats` — statistik task.
-- `GET /report/summary-by-department` — ringkasan per divisi.
-- `GET /report/timeline` — timeline.
-- `GET /report/manpower-performance` — performa manpower.
+Semua reuse `reportBaseFilter` (scope: supervisor→space divisinya, admin→semua, staff→task sendiri) + `parseReportRange` (default 30 hari; `start_date`/`end_date`). Dikonsumsi halaman **Laporan Tim** supervisor di [[APP - Web ERP]].
+- `GET /tasks/stats` — statistik status task (scope role). `GET /tasks/admin-stats` — status divisi supervisor **FLAT**, kini + `reopened` & `reopen_rate` (persen 0–100, `reopened/total`).
+- `GET /report/summary-by-department` — ringkasan per space × status.
+- `GET /report/timeline` — timeline harian (total + per status).
+- `GET /report/manpower-performance` — performa per anggota: `total`, `done`, kini + `avg_response_hours`, `avg_resolution_hours` (rata-rata jam atas task yang punya `responded_at`/`completed_at`), `reopened` (jumlah task `reopen_count>0`). Agregasi in-memory via `accumulateManpower` (pure, tertes).
 - `GET /report/sla` — rate on-time response & resolution (overall + per divisi, dengan rentang tanggal).
+- `GET /report/sla-breaches` — **daftar tiket yang lewat SLA** (bukan agregat): reuse `computeSLA` → satu baris per dimensi `breached` (response/resolution), tiket `on_hold` (state `held`) tak dihitung; field `{ticket_id,keluhan,space_name,assignee_name,priority,breach_type,overdue_hours,status}`. Untuk ditindaklanjuti supervisor.
 - `GET /report/csat` — agregat CSAT **flat** `{average, top2box_pct (bintang 4–5), count, distribution[1..5]}`; rentang tanggal (`csat.rated_at`) + scope role meniru `/report/sla`.
 
 ### Lain-lain
@@ -86,7 +88,7 @@ Konfigurasi **per-space** (`Space.auto_assign` bool, `auto_close_days` int `0`=n
 - Notif **"Permintaan baru"** (`NotifTaskRequest`, ke supervisor divisi + admin saat tiket dibuat) menyertakan arahan **buka website ERP** — sebab **approve/reject hanya tersedia di web**; mobile ([[APP - MyBharata]]) belum punya alur approval.
 - **Override SLA resolution per-priority ✅ implemented** (`Priority.resolution_hours` per-space, fallback 72 jam; approve auto-`due_date` + reopen; PR #337). Override **response** per-priority tetap TBD (response fix 24 jam).
 - `GET /report/sla`: `met` = selesai **tepat waktu** atas item terukur (yang sudah `responded_at`/`completed_at`); `total` = jumlah item terukur. On-time rate = met/total.
-- `getAdminTaskStats` = hitungan status divisi supervisor (bentuk **FLAT** `{total,request,todo,ongoing,testing,done,ditolak}`), bukan alias `getTaskStats`.
+- `getAdminTaskStats` = hitungan status divisi supervisor (bentuk **FLAT** `{total,request,todo,ongoing,testing,done,ditolak}` + `reopened`,`reopen_rate`), bukan alias `getTaskStats`.
 - `filterTasks` menghormati flag `assigned_to_me`/`created_by_me`/`pending_my_approval`/`filter_by_admin_division` (search/pagination dilakukan client-side).
 - Field `Space.OwnerID` ada tetapi belum dipakai.
 - Branch `feat/task-management-parity` berbasis `main` lokal (tertinggal dari `origin/main`); rebase sebelum PR.

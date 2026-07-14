@@ -33,6 +33,7 @@ if [ -z "$active" ]; then
 fi
 
 claude="$ws/.claude"; mkdir -p "$claude"
+# team-memory TIDAK disalin: di-import langsung dari vault oleh CLAUDE.md (lihat template)
 for d in commands hooks skills; do
   rm -rf "$claude/$d"   # prune file lama yg dihapus di kit baru
   [ -d "$kit_root/$d" ] && { mkdir -p "$claude/$d"; cp -R "$kit_root/$d/." "$claude/$d/"; }

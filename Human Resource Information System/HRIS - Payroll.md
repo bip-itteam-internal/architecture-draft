@@ -4,7 +4,7 @@
 
 [Contoh dari sistem ini](https://drive.google.com/drive/folders/17RNDBtMwKCU_tuAiLZbwCgFp-xwwmzuz)
 
-- **Status**: ⚠️ **Fase 1 (Setup) + Fase 2 (Payroll Run + publish + slip self-service) + Fase 2b (PPh21 TER) sudah di kode** ([[Microservices - Payroll Service]]) — komponen gaji, config BPJS/pajak, assign gaji per karyawan, + **payroll run** (kalkulasi gross → BPJS → potongan kehadiran → **PPh21 TER** → net; lifecycle **draft → approved → published**; karyawan lihat **slip sendiri** via self-service). Penggajian **bulanan** (tak ada mingguan). *Supplement* attendance dipakai untuk prorata Tunjangan Kehadiran. Scope: **sampai terbitkan slip, tanpa pembayaran**. **Slip PDF/cetak = fase berikut.**
+- **Status**: ⚠️ **Fase 1 (Setup) + Fase 2 (Payroll Run + publish + slip self-service) + Fase 2b (PPh21 TER) + Fase 4 (THR) sudah di kode** ([[Microservices - Payroll Service]]) — komponen gaji, config BPJS/pajak, assign gaji per karyawan, + **payroll run** (kalkulasi gross → BPJS → potongan kehadiran → **PPh21 TER** → net; lifecycle **draft → approved → published**; karyawan lihat **slip sendiri** via self-service). Penggajian **bulanan** (tak ada mingguan). *Supplement* attendance dipakai untuk prorata Tunjangan Kehadiran. Scope: **sampai terbitkan slip, tanpa pembayaran**. **Slip PDF/cetak = fase berikut.**
 
 ## Sudah Diimplementasikan (komponen attendance)
 
@@ -60,7 +60,7 @@
 
 ## Belum Diimplementasikan (slip & pajak)
 
-Setup gaji + **engine payroll run** (kalkulasi gross → BPJS → potongan kehadiran → **PPh21 TER** → net; prorata Tunjangan Kehadiran via `payroll-supplement`; lembur) **sudah ada** ([[Microservices - Payroll Service]] Fase 1 + 2 + 2b). **PPh21 TER** (metode TER bulanan PMK 168/2023) kini dihitung — ⚠️ angka tabel TER **perlu sign-off HRD/Finance** (editable via config). **Belum di kode**: generate **payslip** (PDF), THR, **rekonsiliasi PPh21 tahunan Desember**, dashboard, serta handoff/export → Accounting. Gaji/akuntansi final didelegasikan ke Accurate ([[ADR - 0001 Akuntansi via Accurate]]) — **batas scope payroll vs Accurate masih perlu diputuskan**.
+Setup gaji + **engine payroll run** (kalkulasi gross → BPJS → potongan kehadiran → **PPh21 TER** → net; prorata Tunjangan Kehadiran via `payroll-supplement`; lembur) **sudah ada** ([[Microservices - Payroll Service]] Fase 1 + 2 + 2b). **PPh21 TER** (metode TER bulanan PMK 168/2023) kini dihitung — ⚠️ angka tabel TER **perlu sign-off HRD/Finance** (editable via config). **THR** ✅ **sudah di kode (Fase 4)** — run THR terpisah, basis **gaji pokok × proporsi masa kerja** (Permenaker), PPh21 TER standalone (aktor & alur: [[HRIS - Payroll Persona]]). **Belum di kode**: generate **payslip** (PDF), **rekonsiliasi PPh21 tahunan Desember** (true-up Ps.17), dashboard, serta handoff/export → Accounting. Gaji/akuntansi final didelegasikan ke Accurate ([[ADR - 0001 Akuntansi via Accurate]]) — **batas scope payroll vs Accurate masih perlu diputuskan**.
 
 ## Dokumen Terkait
 
