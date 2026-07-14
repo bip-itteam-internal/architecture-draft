@@ -86,6 +86,8 @@
 | GET/POST/PUT/DELETE | `/accurate/settings/kv-configs[/list|/:id]` | KV config Accurate |
 | GET | `/accurate/daily-invoices` | List faktur harian auto-sync RTS (filter `shop_id`, `channel`, `date`/`date_from`/`date_to` (WIB `YYYYMMDD`), `status` SENT/FAILED/PENDING; paginated) |
 | POST | `/accurate/daily-invoices/:id/retry` | Retry sinkron faktur auto-sync (re-snapshot order `TO_SHIP` shop-hari → kirim ulang, balas status akhir) |
+| GET | `/accurate/daily-returns` (+ `/:id`, `/export`) | List/detail/export retur auto-sync (Retur Penjualan Shopee; filter `shop_id`/`channel`/`date`/`status` incl. `SENT`/`FAILED`/`FULL_VIA_INVOICE`/`HELD_REFUND_ONLY`; paginated) |
+| POST | `/accurate/daily-returns/:id/retry` | Retry sinkron retur auto-sync (baris `FAILED`) / override manual push (baris `HELD_REFUND_ONLY`) |
 | GET | `/accurate/stocks?sku=` | Stok live per SKU listing (pecah komponen bundle via `product_sku_mappings`, get-stock.do) |
 | GET | `/accurate/stocks/list` | Semua stok dari salinan lokal `accurate_stocks` (search `q`, paginated; `only_products` default true = hanya item ter-mapping produk jualan) ✅ |
 | GET | `/accurate/stocks/listing` | Stok per SKU listing dari salinan lokal: komponen bundle (+flag `mapped`) + stok efektif; sku numeric-id legacy tersaring ✅ |
@@ -140,6 +142,17 @@
 |---|---|---|
 | POST | `/fulfillment/ship-batch` | Batch ship order lintas platform (TikTok + Shopee). Body: `[{order_id, channel, shop_id, package_id}]`. Non-all-or-nothing: satu gagal tak membatalkan yang lain. Response: `[{order_id, channel, success, awb?, error?}]` |
 | POST | `/fulfillment/labels` | Ambil shipping label per order. Body: `[{order_id, channel, shop_id, package_id}]` (POST — bukan GET — karena TikTok butuh `package_id` yang tidak derivable dari `order_id` saja). TikTok: synchronous, status READY + `url`. Shopee: async — status PROCESSING bila belum siap (WMS retry); READY + `pdf_data` (base64) bila sudah jadi |
+
+## Kas Toko / Wallet (🟡 branch `feat/kas-toko`, PR #380 — belum merge)
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/wallet/balances` | Saldo kas toko semua toko (Shopee aktual dari `current_balance`; TikTok estimasi anchor+Σ, flag `estimated`/`anchor_missing`/`sync_stale`) |
+| GET | `/wallet/withdrawals` | Riwayat penarikan (filter shop/channel/type/status/tanggal WIB). Meta paginasi HANYA sisi TikTok; Shopee = list grup penuh + `completed_total` |
+| GET | `/wallet/mutations` | Mutasi wallet Shopee ("Saldo Saya") + saldo berjalan, paginasi normal |
+| GET | `/wallet/reconciliation` | Laporan uang masuk per toko basis `income.paid_at` (`paid_from/paid_to` wajib; `order_from/order_to` opsional — cross-periode) |
+| GET | `/wallet/reconciliation/export` | Export Excel laporan |
+| PUT | `/wallet/opening-balance/:shopId` | Set anchor saldo awal TikTok (`{amount, as_of}`) |
+| GET | `/wallet/sync-status` | State sync per toko (last_run, status, error) |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |

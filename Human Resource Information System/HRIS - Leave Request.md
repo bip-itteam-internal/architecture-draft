@@ -28,6 +28,8 @@ Izin **"Meninggalkan pekerjaan sementara"** dipecah dua subtipe, dibedakan atrib
 
 Jam izin kantor disimpan di `AttendanceEntries.paid_leave_hour` (terpisah dari `leave_hour`), dan `/payroll-supplement` menghitungnya sebagai kerja sehingga tidak menurunkan `payout_pct`. Detail lihat [[Microservices - Attendance Service]].
 
+Pembedaan ini juga tampil di **Laporan Kehadiran** (FE): izin urusan kantor memakai kode legend `IK` (terpisah dari `I` izin pribadi), digerakkan oleh `leave_subtype` yang kini ikut dikembalikan `GET /report`.
+
 ## Model Data
 
 Koleksi: `leave_request` (di database attendance)

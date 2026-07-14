@@ -34,6 +34,7 @@ if (-not $active) {
 }
 
 # 4. salin commands/hooks/skills -> erp/.claude
+# (team-memory TIDAK disalin: di-import langsung dari vault oleh CLAUDE.md, lihat template)
 $claude = Join-Path $ws '.claude'
 New-Item -ItemType Directory -Force -Path $claude | Out-Null
 foreach ($d in 'commands','hooks','skills') {

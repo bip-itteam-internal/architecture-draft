@@ -19,6 +19,20 @@ Lihat: IT - SOP Dokumentasi Vault · CLAUDE.md §1 §4 §5 §6
 - **Path**: `path di repo kode (mis. services/integration)`
 - **Status**: `✅ Implemented | ⚠️ Implemented (ada catatan) | 🟡 Konsep | 🔴 Stub` — `catatan singkat`
 
+## Persona / Pengguna
+
+%% OPSIONAL — isi bila service punya UI/pengguna langsung; HAPUS seksi ini utk service backend-only.
+   Siapa MANUSIA yang memakai (gambaran utk developer/AI). Alur banyak-aktor kompleks →
+   dok terpisah `<Prefix> - <Fitur> Persona` (Template - Persona), link di sini. Grounded, jangan mengarang. %%
+
+| Persona | Peran & Divisi | Akses / RBAC | Device |
+|---|---|---|---|
+| `nama/label` | `jabatan, divisi/grup` | `role sistem / permission` | `Web ERP / MyBharata` |
+
+- **Tujuan**: `yang ingin dicapai`
+- **Pain point**: `masalah lama yang dipecahkan`
+- **Aksi utama**: `langkah inti di sistem`
+
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
 %% Kelompokkan per area dengan sub-header ###. Tulis hanya yang BENAR ada di kode. %%
