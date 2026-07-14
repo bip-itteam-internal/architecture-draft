@@ -3,7 +3,7 @@
 *HRD Document Service mengelola **dokumen HRD** (SOP, Syarat & Ketentuan, Kebijakan, dll.) dengan model reusable: `title + body` (rich-text) + **penyasaran (`targets`) polimorfik** (semua/posisi/departemen/jenis-pengajuan/karyawan), **versioning immutable**, dan **acknowledgment** per-versi. Sisi implementasi dari [[HRIS - HRD Documents]] & [[ADR - 0013 HRD Documents]].*
 
 - **Stack**: Go + Fiber v2 + MongoDB (`hrd_document_db`) — selaras pola service bip-erp lain.
-- **Path**: `services/hrd-document` (port `6990`).
+- **Path**: `services/hrd-document` (port `6982`).
 - **Status**: ⚠️ **Implemented (Fase 1 BE)**. Di belakang [[CORE - API Master Gateway]] (map `/api/hrd-document/*`), auth **SSO**, RBAC `system_roles["hris"]` (**author=`isHR`** staf HR; registry-type tulis=`isHRAdmin`). Konten body = **Markdown** (`body_md`, selaras editor FE). **FE author = di kode** ([[APP - Web ERP]] PR #276); **employee-facing FE, soft-validate target ke sumber, enforcement ack di BE = belum** (lihat Catatan).
 
 ## Endpoint / Fitur (Sudah Diimplementasikan — Fase 1 BE)
