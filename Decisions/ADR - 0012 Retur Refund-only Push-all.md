@@ -1,6 +1,8 @@
 # ADR - 0012 Retur Refund-only: Push-all (default) dengan Sakelar
 
-Status: ✅ Implemented (2026-07-13)
+Status: ⛔ Superseded — digantikan [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] (2026-07-13)
+
+> **Superseded (2026-07-13):** kebijakan di ADR ini (`autoPushRefundOnly`, status `HELD_REFUND_ONLY`, `returnHeldReason`) **sudah dihapus dari kode**. Verifikasi data prod membantah asumsi "retur penuh selalu keluar dari snapshot" (39% tetap `COMPLETED`), dan refund-only kini dibukukan mode **`NOT_RETURNED`** (tak over-restock) alih-alih push-all + stok-opname. Lihat [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]]. Isi di bawah dipertahankan sebagai rekam jejak.
 
 ## Context
 
