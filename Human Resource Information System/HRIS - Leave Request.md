@@ -28,7 +28,7 @@ Izin **"Meninggalkan pekerjaan sementara"** dipecah dua subtipe, dibedakan atrib
 
 Jam izin kantor disimpan di `AttendanceEntries.paid_leave_hour` (terpisah dari `leave_hour`), dan `/payroll-supplement` menghitungnya sebagai kerja sehingga tidak menurunkan `payout_pct`. Detail lihat [[Microservices - Attendance Service]].
 
-Pembedaan ini juga tampil di **Laporan Kehadiran** (FE): izin urusan kantor memakai kode legend `IK` (terpisah dari `I` izin pribadi), digerakkan oleh `leave_subtype` yang kini ikut dikembalikan `GET /report`.
+Pembedaan ini juga tampil di **Laporan Kehadiran** (FE): izin urusan kantor dibedakan dari izin pribadi (`I`) lewat `leave_subtype` yang ikut dikembalikan `GET /report`, dan di grid ditandai **warna hijau** + entri legend `IK`. Karena IK bersifat partial-day (karyawan tetap clock-in), **sel grid menampilkan jam clock-in/out** — bukan kode `IK`; kode `IK` dipakai hanya sebagai fallback bila jam tak ada. Status izin pribadi (`I`) tak berubah. Logika: `erp-frontend` `report/helper/report.ts` → `buildAttendanceCell`.
 
 ## Model Data
 
