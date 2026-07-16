@@ -2,7 +2,7 @@
 
 *Endpoint **recruitment-service** (ATS Fase 1-3 + adopsi struktur ERPGo Fase A–E + portal karir publik). Gateway: `/api/recruitment/*` (auth) & `/public/recruitment/*` (publik, tanpa JWT). RBAC `system_roles["hris"]`. Grounded ke `services/recruitment/routes.go` (branch `main`).*
 
-- **Implementasi**: [[Microservices - Recruitment Service]] · **Status**: ⚠️ BE Fase 1-3 + master/form-builder ERPGo (A–F) + portal publik (browse/apply/track) + requisition se-departemen — **semua increment 2026-07-16 sudah deployed & terverifikasi live di dev**
+- **Implementasi**: [[Microservices - Recruitment Service]] · **Status**: ⚠️ BE Fase 1-3 + master ERPGo (A–F) + portal publik (browse/apply/track) + requisition se-departemen — increment 2026-07-16 deployed & terverifikasi live di dev. **Custom Questions dihapus** (#486/#342). **hire→karyawan** (endpoint `link-employee`, PR #490) **merged, belum deploy**.
 - **Konsumen publik**: [[APP - Portal Karir Bharata]]
 - **Indeks**: [[API - Index]] · Role: `isSupervisor` (ajukan), `isHR`/`isHRSupervisor` (kelola/review), `isApprover` (Direktur/Secretary).
 
@@ -34,6 +34,7 @@
 |---|---|---|---|
 | POST/GET | `/candidates` · `/candidates/:id` | Input/list (`?posting_id=&progress=&status=`)/detail | HR |
 | PUT | `/candidates/:id` · `/advance` · `/reject` · `/withdraw` | Edit / gerak tahap (maju) / tolak / undur | HR |
+| PUT | `/candidates/:id/link-employee` | Tautkan kandidat **Hired** ke karyawan yang dibuat di HRIS (wajib Hired & belum tertaut → set `employee_id`, `progress`→Onboarding, audit; cegah konversi ganda) — PR #490 | HR |
 | POST/GET | `/candidates/:id/cv` · `/cv/preview` | Upload/preview CV (MinIO) | HR |
 | POST/GET | `/candidates/:id/profile-image[/preview]` · `/cover-letter[/preview]` | Upload/preview foto profil & cover letter (MinIO) | HR |
 
@@ -45,7 +46,7 @@
 | POST | `/candidates/:id/offer` | Terbitkan offer (→ Offering) | HR supervisor |
 | POST | `/candidates/:id/offer/letter` | Unggah surat penawaran PDF (MinIO) + email kandidat | HR supervisor |
 | POST | `/candidates/:id/offer/accept` · `/offer/decline` | Respon offer | HR |
-| POST | `/candidates/:id/hire` | Hire → onboarding handoff ke employee `/onboarding/register` | approver |
+| POST | `/candidates/:id/hire` | Hire (butuh offer Accepted) → set `Hired` + onboarding handoff `/onboarding/register` (aktivasi akun). Pembuatan **data karyawan** dilakukan terpisah di HRIS "Tambah Karyawan" (dari kandidat) → `link-employee` | approver |
 | GET | `/audits` | Audit log keputusan | HR admin |
 
 ## Interview Rounds & Feedback (Fase F — adopsi ERPGo)
@@ -60,13 +61,15 @@
 |---|---|---|---|
 | CRUD | `/masters/job-types` · `/masters/candidate-sources` · `/masters/interview-types` | Lookup (list/get/create/update/delete) | HR |
 | CRUD | `/locations` | Master lokasi kerja (list/get/create/update/delete) | HR |
-| CRUD | `/questions` | Bank pertanyaan aplikasi (form builder, 7 tipe; list/get/create/update/delete) | HR |
+| CRUD | `/checklists` · `/checklists/:id/items` | Template onboarding checklist + item (list/get/create/update/delete) | HR |
+
+> **Custom Questions dihapus** (BE #486 / FE #342, 2026-07-16): endpoint `/questions` (form builder) + field `application_questions`/`custom_answers` **tak ada lagi** — portal karir memakai field native `candidate`. BSON lama diabaikan saat decode (tanpa migrasi).
 
 ## Publik (tanpa JWT — via gateway `/public/recruitment/*`)
 | Method | Path (gateway) | Fungsi |
 |---|---|---|
 | GET | `/public/recruitment/postings` | Daftar lowongan Open (featured dulu) — tiap item memuat **`slug`** |
-| GET | `/public/recruitment/postings/:id` | Detail lowongan. **`:id` menerima `slug` ATAU ObjectID** (dicoba ObjectID dulu; gagal parse → lookup by `slug`). Respons + `slug` & **`job_type`** (nama, hasil resolve `job_type_id` → master `job_types`) + `application_questions` di-expand |
+| GET | `/public/recruitment/postings/:id` | Detail lowongan. **`:id` menerima `slug` ATAU ObjectID** (dicoba ObjectID dulu; gagal parse → lookup by `slug`). Respons + `slug` & **`job_type`** (nama, hasil resolve `job_type_id` → master `job_types`) |
 | POST | `/public/recruitment/apply` | Pelamar mendaftar sendiri (email + `posisi_dilamar` wajib) → respons `tracking_token` + `track_url`. **Dua bentuk body**: (a) JSON, atau (b) **`multipart/form-data`**: field `data` = JSON kandidat + file **`berkas`** = PDF **maks 10 MB** → MinIO `recruitment/cv/<candidate_id>/berkas.pdf` → set `cv_object` (HR buka via `GET /candidates/:id/cv/preview`) |
 | GET | `/public/recruitment/track/:token` | Cek status lamaran via **tracking_token** (bukan `_id`) — curated: progress/status label + stepper |
 
