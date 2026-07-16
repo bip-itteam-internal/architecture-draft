@@ -121,7 +121,7 @@
 
 **Increment (✅ tracking status lamaran):** `candidate.tracking_token` (crypto/rand 32-hex — **bukan `_id`** agar tak bisa dienumerasi) di-set saat create/apply; endpoint publik `GET /public/track/:token` (gateway `/public/recruitment/track/:token`) → tampilan **curated** (nama/posisi/tanggal + progress & status label ramah + stepper), tanpa skor/catatan internal. Email "lamaran diterima" +tombol **Lihat Status Lamaran** (base env `CAREER_PORTAL_URL`); respons `/apply` kembalikan `tracking_token` + `track_url`. Label penolakan dilembutkan ("Belum Sesuai") — apakah status ditampilkan ke kandidat = keputusan HRD terbuka ([[HRIS - Recruitment]]).
 
-**Belum (menyusul, Fase G–I):** onboarding checklist; offer letter template; recruitment/career settings.
+**Belum (menyusul, Fase G–I):** ~~onboarding checklist~~ **instansiasi per-kandidat ✅ #492** (lihat increment di bawah); offer letter template; recruitment/career settings.
 
 ## Increment: Penopang Portal Karir Publik (2026-07-16)
 
@@ -155,7 +155,25 @@ Menutup TBD lama "mapping hire → data karyawan". Pembuatan **data master karya
 
 - **BE (#490):** `candidate` + field **`employee_id`** (omitempty). Endpoint baru `PUT /candidates/:id/link-employee` (isHR): wajib kandidat **Hired** & **belum tertaut** → set `employee_id`, `progress`→**Onboarding**, tulis audit. `updateCandidate` mempertahankan `employee_id`. Tak ada auto-generate employee_id (dibuat HRIS).
 - **FE (#344, erp-frontend):** HRIS "Tambah Karyawan" kini bermula dari **modal 2 opsi** — *isi manual* (perilaku lama) atau *dari kandidat rekrutmen*. Mode dari-kandidat: picker kandidat **Hired belum tertaut** (`GET /candidates?status=Hired`, filter `!employee_id`) → wizard memprefill data kandidat (nama, jenis_kelamin, tanggal_lahir, email, no_hp, alamat), **menyembunyikannya** (kartu ringkasan read-only) & hanya menampilkan **sisa** field yang HR isi. Field wajib yang **kosong** di kandidat tetap tampil (email/alamat/tgl lahir opsional). Karyawan dibuat via `POST /api/hris/employees/multi` ([[Microservices - Employee Service]]), lalu `link-employee` dipanggil (best-effort) agar kandidat drop dari picker.
-- **Alur:** kandidat harus lebih dulu `Hired` (offer → accept → hire) baru muncul di picker. Onboarding checklist per-kandidat = **masih TBD** (lihat Fase G–I).
+- **Alur:** kandidat harus lebih dulu `Hired` (offer → accept → hire) baru muncul di picker.
+
+## Increment: Onboarding Checklist per-kandidat (⚠️ PR #492/#346 — belum merged/deploy)
+
+> Melengkapi template `onboarding_checklist` (Fase 2, selama ini template-only) dengan **instansiasi per-kandidat**. `go build`/`vet`/`test` hijau (+ `TestOnboardingCompletedAt`).
+
+- Collection baru `onboarding_progress` (1 doc/kandidat Hired). Item = **snapshot** salinan dari template (ubah template kemudian **tak** mengubah onboarding berjalan — benar secara historis).
+- `POST /candidates/:id/onboarding` `{checklist_id}` (isHR): kandidat wajib **Hired** & belum punya onboarding → salin item **aktif** template (urut due_day, task_name); cegah dobel. `GET` → progress (`null` bila belum). `PUT /…/items/:itemId` `{done}` → toggle + `done_by`/`done_at`; `completed_at` saat semua item **wajib** selesai (bila tak ada wajib → semua item).
+- **FE (erp-frontend):** kartu **Onboarding** di detail kandidat (muncul saat Hired) — *Mulai Onboarding* pilih template (default terpilih) → progress bar + centang item. `assigned_to_role` tampil info saja; yang mencentang HR.
+
+## Increment: Performance Review Onboarding (⚠️ PR #493/#349 — belum merged/deploy)
+
+> Digitalisasi **Form Review Performance Masa Evaluasi** (dulu Google Form). Di perusahaan, "onboarding" = **masa evaluasi** karyawan baru yang berpuncak pada sesi **Performance Review Onboarding** (peserta presentasi → beberapa penilai lintas divisi menilai → HR putuskan status). `go build`/`vet`/`test` hijau (+ `TestValidateReviewResponse`, `TestReviewOutcomeValid`). Detail konsep di [[HRIS - Recruitment]].
+
+- **Data:** `onboarding_review` (sesi per peserta=kandidat Hired: snapshot nama/jabatan/departemen, `scheduled_at`, `location`, status `Scheduled`→`Decided`, `reviewers[]` snapshot, `decision` {outcome `Lulus`/`Diperpanjang`/`Tidak Lulus`, note, decided_by/at}) + `onboarding_review_response` (per penilai: `ratings` 7×1-5 + 3 uraian strengths/improvements/recommendations).
+- **Kriteria 7 + uraian 3 = konstanta** (`reviewCriteriaKeys`) — **purpose-built, bukan form builder** (Custom Questions form-builder sengaja sudah dihapus; nilai fitur ada di alur undang→isi→rekap→putuskan, bukan di field).
+- **HR (isHR):** `POST /onboarding-reviews` (buat + undang penilai via `notifyInbox` inbox internal + email Resend best-effort), `GET` (list), `GET /:id` (rekap semua jawaban), `PUT /:id/decide`.
+- **Penilai (requireAuth, karyawan mana pun):** `GET /onboarding-reviews/assigned` (tugas saya + jawaban saya; jawaban penilai lain disembunyikan), `POST /:id/response` (edit sampai `Decided`).
+- **FE (erp-frontend):** halaman khusus HR (menu Recruitment → **Performance Review**: list + buat + detail rekap + keputusan) + menu **Review Onboarding Saya** (Portal Saya, **semua karyawan**: form 7 rating + 3 uraian).
 
 ## Dokumen Terkait
 

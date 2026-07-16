@@ -65,6 +65,25 @@
 
 > **Custom Questions dihapus** (BE #486 / FE #342, 2026-07-16): endpoint `/questions` (form builder) + field `application_questions`/`custom_answers` **tak ada lagi** — portal karir memakai field native `candidate`. BSON lama diabaikan saat decode (tanpa migrasi).
 
+## Onboarding Checklist per-kandidat (⚠️ PR #492/#346 — belum merged/deploy)
+| Method | Path | Fungsi | Role |
+|---|---|---|---|
+| POST | `/candidates/:id/onboarding` | Mulai onboarding kandidat **Hired**: body `{checklist_id}` → salin item **aktif** template jadi `onboarding_progress` (snapshot). Cegah dobel | HR |
+| GET | `/candidates/:id/onboarding` | Progress onboarding kandidat (body `null` bila belum mulai) | HR |
+| PUT | `/candidates/:id/onboarding/items/:itemId` | Tandai item selesai/belum `{done}`; `completed_at` saat semua item **wajib** selesai | HR |
+
+## Performance Review Onboarding (⚠️ PR #493/#349 — belum merged/deploy)
+> Digitalisasi Form Review Performance Masa Evaluasi (dulu Google Form). Peserta = kandidat Hired; penilai = karyawan mana pun (identitas SSO). Kriteria 7+3 **konstanta** (purpose-built, bukan form builder).
+
+| Method | Path | Fungsi | Role |
+|---|---|---|---|
+| POST | `/onboarding-reviews` | HR buat sesi `{candidate_id, scheduled_at, location, reviewers[]}` → undang penilai (inbox + email best-effort) | HR |
+| GET | `/onboarding-reviews` | Daftar sesi (`?status=&candidate_id=`) | HR |
+| GET | `/onboarding-reviews/:id` | Detail + **rekap** (semua jawaban penilai) | HR |
+| PUT | `/onboarding-reviews/:id/decide` | Keputusan `{outcome, note}` — outcome `Lulus`/`Diperpanjang`/`Tidak Lulus` → status `Decided` | HR |
+| GET | `/onboarding-reviews/assigned` | Sesi yang ditugaskan ke saya (+ jawaban saya) | auth (penilai) |
+| POST | `/onboarding-reviews/:id/response` | Submit/ubah jawaban `{ratings(7×1-5), strengths, improvements, recommendations}` — boleh edit sampai sesi `Decided` | auth (penilai) |
+
 ## Publik (tanpa JWT — via gateway `/public/recruitment/*`)
 | Method | Path (gateway) | Fungsi |
 |---|---|---|
