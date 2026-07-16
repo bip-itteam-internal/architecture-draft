@@ -12,7 +12,7 @@
 - **Framework**: Flutter (Dart SDK `^3.8.1`)
 - **State management**: `flutter_bloc` / `bloc` (pola event `Verb+Object`, state Initial/Loading/Loaded/Error/Empty)
 - **Dependency Injection**: `get_it` (registrasi berlapis: core → services → datasources → repositories → usecases → blocs)
-- **Networking**: `dio` melalui `ApiInterface`; response dibungkus `BaseResponse`; error dipetakan ke `Failure` (functional error handling pakai `fpdart` → `Either<Failure, T>`)
+- **Networking**: `dio` melalui `ApiInterface`; response dibungkus `BaseResponse`; error dipetakan ke `Failure` (functional error handling pakai `fpdart` → `Either<Failure, T>`). **Timeout wajib** di `buildApiBaseOptions` (connect 15s / receive 30s / send 60s) agar request tak menggantung tanpa batas saat jaringan tak stabil — mencegah spinner "muter terus" padahal data sudah tersimpan (yang memicu retry & data ganda); timeout dipetakan ke `NetworkFailure` sehingga UI selalu resolve
 - **Routing**: `go_router` dengan redirect terpusat (intro → login → PIN → auth)
 - **Lokalisasi**: `flutter_localizations` + `intl`; **Bahasa Indonesia (default)** & **English** via file ARB, diakses lewat `context.l10n.<key>`
 - **Firebase**: Core, Analytics, Crashlytics, Messaging (FCM), Performance — dengan dua flavor `dev`/`prod` (project `hris-bharata-dev` & `hris-bharata-prod`)
