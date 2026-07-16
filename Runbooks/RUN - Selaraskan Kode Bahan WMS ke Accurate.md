@@ -11,7 +11,7 @@ Menyelaraskan kode bahan WMS ([[Microservices - Manufacture Service]]) dari mnem
 ## Kapan dipakai
 
 - Environment baru / environment yang master bahannya masih memakai kode lama (dev, prod).
-- Gejala: hasil `POST /master-bahan/sync-accurate` memuat `perlu_align` tidak kosong, atau master bahan terlihat dobel (satu bahan muncul dua kali: kode lama + kode Accurate — mis. `AC1000` **dan** `BBK-001` sama-sama "ACCARE 1000"). Contoh nyata di dev 16 Juli 2026: Database Master menampilkan **1021** item, padahal sehatnya ~579 (= ~484 bahan + barang jadi).
+- Gejala: hasil `POST /master-bahan/sync-accurate` memuat `perlu_align` tidak kosong, atau master bahan terlihat dobel (satu bahan muncul dua kali: kode lama + kode Accurate — mis. `AC1000` **dan** `BBK-001` sama-sama "ACCARE 1000"). Contoh nyata di dev 16 Juli 2026: Database Master menampilkan **1021** item, padahal sehatnya **~544** (= ~482 bahan + 62 barang jadi). Kode **produk jadi** lama (NEI, FAY, …) punya masalah yang sama persis — bereskan dengan tombol **Sync Barang Jadi & Bundle dari HPP** (juga self-healing, dialognya sama; backend `POST /master-product/align-hpp`).
 
 ## Prasyarat
 
@@ -26,6 +26,8 @@ mongodump -u <user> -p <pass> --authenticationDatabase admin -d manufacture_db -
 ## Cara termudah: lewat UI (sejak FE `856067d2`)
 
 Tombol **Sync Master Bahan (Accurate)** di WMS → Manajemen Stok → tab Sync Master kini **self-healing**: bila masih ada kode bahan lama, ia menampilkan rencananya di dialog konfirmasi (berapa dipindah/digabung/dibiarkan) → setelah disetujui menjalankan **align → sync master → sync stok** sekaligus. Batal = tidak terjadi apa-apa. Data dimuat ulang **otomatis** setelah sync (banner "Memuat data master…" tampil di tab Database Master) — tidak perlu reload halaman; dulu refresh pasca-sync menampilkan stok 0 & menghilangkan barang jadi tanpa indikator, sehingga data tampak "belum terbaca".
+
+Tombol **Sync Barang Jadi & Bundle dari HPP** berperilaku sama untuk kode **produk jadi** lama (NEI, FAY, …): dialog rencana → align (`/master-product/align-hpp`) → sync-hpp. Jalankan keduanya (urutan bebas).
 
 Sesudahnya, betulkan satuan yang dilaporkan di hasil sync (`satuan perlu dicek`) lewat **form edit item** di tab Database Master — kolom stok saat mode edit kini punya input **satuan** dan **faktor acc.** (pengali qty Accurate per-item): `BBK-101` → satuan GRAM + kategori BAHAN BAKU KOSMETIK; `BBO-056` → faktor `1000` (satuan tetap PCS). Lalu klik **Sync Stok** sekali lagi.
 
