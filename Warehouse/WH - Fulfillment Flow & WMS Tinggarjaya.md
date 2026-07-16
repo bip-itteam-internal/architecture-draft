@@ -7,7 +7,7 @@ via webhook marketplace hingga serah kurir dan settlement di Accurate. Mencakup 
 `services/warehouse` (MVP), state machine, event architecture, dan gap analysis terhadap
 sistem yang sudah berjalan.*
 
-- **Status**: ⚠️ Implemented (ada catatan) — Fase 1 ✅ existing; Fase 2 event+reconciler ✅ Task 4; Fase 3 operasi WMS ⚠️ partial (approve/pick/pack/rts/labels/dashboard ✅ Task 7; produk CRUD 🟡); Fase 4 settlement ✅ existing
+- **Status**: ⚠️ Implemented (ada catatan) — Fase 1 ✅ existing; Fase 2 event+reconciler ✅ Task 4; Fase 3 operasi WMS ✅ (approve/pick/pack/rts/labels/handover/dashboard/produk CRUD/export rekon + jalur cepat APPROVED→RTS); Fase 4 settlement ✅ existing
 - **Referensi**: Blueprint WMS Tinggarjaya (Juli 2026) · Design doc `2026-07-12-wms-tinggarjaya-fulfillment-design.md`
 - **Implementasi**: [[Microservices - Warehouse Service]] · **API**: [[API - Warehouse Service]]
 - **Dependensi utama**: [[Microservices - Integration Service]], [[External - Accurate]]
@@ -71,11 +71,16 @@ Integration service
 
 > **Catatan**: Hook `OnOrderUpsert` di integration service belum diimplementasikan. Saat ini hanya reconciler 60s yang aktif (worst-case lag ±1 mnt). Hook push realtime menjadi bagian Task integration berikutnya.
 
-### Fase 3 — Operasi Gudang / WMS (⚠️ Partial — approve/pick/pack/rts/labels/dashboard ✅ Task 7)
+### Fase 3 — Operasi Gudang / WMS (✅ — jalur cepat + gerbang rekon + jalur scan opsional)
 
 #### State Machine `fulfillment_orders`
 
 ```
+Jalur cepat (utama — alur real gudang, 100+ resi/hari):
+NEW → APPROVED → RTS_OK → LABEL_PRINTED → HANDED_OVER
+              ↘ RTS_FAILED (retryable → RTS_OK)
+
+Jalur scan (opsional — verifikasi barang per order):
 NEW → APPROVED → PICKING → PACKED → RTS_OK → LABEL_PRINTED → HANDED_OVER
                                   ↘ RTS_FAILED (retryable → RTS_OK)
 
@@ -83,13 +88,50 @@ NEW / APPROVED → HELD (tahan manual, mencurigakan)
 semua status pra-RTS → CANCELLED (dari webhook cancel marketplace)
 ```
 
-#### Alur Operasional
+**Gerbang rekon (wajib, kedua jalur)**: order hanya bisa RTS bila datanya
+sudah ditarik (`exported_at` terisi via `GET /fulfillment/queue/export`).
+Alasan bisnis: rekap rekon diambil dari file unduhan **sebelum** cetak resi —
+per batch, sehingga unduhan siang tidak membawa order batch pagi
+(`only_new=true` hanya mengambil order yang belum pernah ditarik). RTS order
+yang belum ditarik → 422 + daftar `not_exported`.
+
+**Kode packer (`packer_code`, T1/T2)**: tim packer harian/freelance tidak
+terdaftar di database employee → dicatat sebagai kode tim, dipilih admin saat
+batch cetak label (`POST /fulfillment/labels`), dicap ke semua order batch
+yang transisi LABEL_PRINTED. Jalur scan juga bisa mengisinya saat pack
+(opsional); label tidak menimpa kode yang sudah ada. Muncul di kolom
+"Kode Packer" file export — untuk evaluasi salah kirim/qty kurang per tim.
+
+#### Alur Operasional (jalur cepat — utama)
 
 ```
 [1. APPROVE — batch]
 Admin Gudang / Leader / SPV centang N order NEW
 POST /fulfillment/approve → status: APPROVED
 Order mencurigakan → HELD
+        │
+        ▼
+[2. UNDUH DATA PESANAN — gerbang rekon]
+GET /fulfillment/queue/export?status=APPROVED&only_new=true
+→ xlsx rekap (1 baris per item: nomor pesanan, tanggal, SKU, nama barang,
+  qty, toko, expedisi, kode packer, keterangan)
+→ order yang ikut terunduh dicap exported_at + exported_by (sekali)
+Badge FE tab Disetujui: "Sudah Ditarik" / "Belum Ditarik"
+        │
+        ▼
+[3. RTS + CETAK RESI]
+POST /fulfillment/rts (hanya order exported) → RTS_OK + AWB
+POST /fulfillment/labels {packer_code: "T1"} → LABEL_PRINTED
+Packer tinggal tempel resi ke paket sesuai rekap
+        │
+        ▼
+[4. SERAH KURIR] → HANDED_OVER
+```
+
+#### Alur Operasional (jalur scan — opsional)
+
+```
+[1. APPROVE — batch] → sama seperti di atas
         │
         ▼
 [2. PICKING]
@@ -232,22 +274,26 @@ warehouse_db (MongoDB, pola standar bip-erp)
 | Method | Path | Fungsi |
 |---|---|---|
 | POST | `/fulfillment/events` | Terima event order dari integration (internal, idempoten) |
-| GET | `/fulfillment/queue` | Antrian order per status WMS |
+| GET | `/fulfillment/queue` | Antrian order: status, search, toko, tanggal+jam, sort, pagination |
+| GET | `/fulfillment/queue/export` | Unduh xlsx rekon; `only_new=true` per batch; cap `exported_at` (gerbang RTS) |
 | POST | `/fulfillment/approve` | Approve batch order NEW → APPROVED |
 | POST | `/fulfillment/hold` | Tahan order → HELD |
 | POST | `/fulfillment/pick` | Konfirmasi picking per order |
-| POST | `/fulfillment/pack` | Verifikasi scan barcode SKU + qty → PACKED |
-| POST | `/fulfillment/rts` | RTS batch → proxy ke integration ship-batch |
-| GET | `/fulfillment/labels` | Cetak label → proxy ke integration labels |
+| POST | `/fulfillment/pack` | Verifikasi scan barcode SKU + qty → PACKED (+ `packer_code` opsional) |
+| POST | `/fulfillment/rts` | RTS batch (gerbang: hanya order ter-export) → proxy integration ship-batch |
+| POST | `/fulfillment/labels` | Cetak label + cap `packer_code` batch → proxy integration labels |
+| POST | `/fulfillment/handover` | Konfirmasi serah kurir → HANDED_OVER |
 | GET | `/fulfillment/dashboard` | Kartu antrian, resi keluar, cancel, RTS gagal |
-| CRUD | `/products` + `/products/import` | Master SKU + lokasi rak + import xlsx |
+| CRUD | `/wms/products` + `/wms/products/import` | Master SKU + lokasi rak + import xlsx |
+
+> Detail request/response lengkap: [[API - Warehouse Service]].
 
 **`services/integration`** (internal, gateway-key) — endpoint baru:
 
 | Method | Path | Fungsi |
 |---|---|---|
 | POST | `/fulfillment/ship-batch` | Batch ShipPackage (TikTok) + ship_order (Shopee); hasil per-order |
-| GET | `/fulfillment/labels` | Ambil shipping document PDF per platform, merge batch |
+| POST | `/fulfillment/labels` | Ambil shipping document per platform (TikTok sync URL; Shopee async PDF) — deviation dari brief GET: POST agar body array |
 
 ---
 
@@ -255,13 +301,14 @@ warehouse_db (MongoDB, pola standar bip-erp)
 
 | Modul Blueprint | Status | Keterangan |
 |---|---|---|
-| Order Marketplace | ✅ Sudah ada | Integration sync TikTok + Shopee, event ke warehouse (dibangun MVP) |
-| Approve + Picking + Packing | ❌ Belum ada | Core WMS MVP |
-| RTS batch | ⚠️ Sebagian | `ShipPackage`/`ShipOrder` ada, endpoint batch belum |
-| Cetak Resi (label) | ❌ Belum ada | Client baru di integration; Shopee async 3-langkah |
+| Order Marketplace | ✅ Sudah ada | Integration sync TikTok + Shopee, event ke warehouse |
+| Approve + Picking + Packing | ✅ Sudah ada | Approve batch; picking/packing = jalur scan opsional (jalur cepat melewatinya) |
+| Unduh data rekon (export xlsx) | ✅ Sudah ada | `/queue/export` + gerbang `exported_at` sebelum RTS; `only_new` per batch |
+| RTS batch | ✅ Sudah ada | `/fulfillment/rts` → integration ship-batch; dari APPROVED (cepat) atau PACKED (scan) |
+| Cetak Resi (label) | ✅ Sudah ada | `/fulfillment/labels` + cap kode packer T1/T2; Shopee async retry |
 | Return Reuse/Rework/Reject | ❌ Belum ada | Fase berikut (bukan MVP) |
-| Dashboard gudang | ❌ Belum ada | Bagian dari `services/warehouse` MVP |
-| Master SKU + lokasi rak | ❌ Belum ada | `warehouse_products` di warehouse_db |
+| Dashboard gudang | ✅ Sudah ada | `/fulfillment/dashboard` |
+| Master SKU + lokasi rak | ✅ Sudah ada | `warehouse_products` + import xlsx; ⚠️ barcode/nama sebagian SKU masih kosong |
 | Report internal gudang | ❌ Belum ada | Fase berikut |
 
 ---
