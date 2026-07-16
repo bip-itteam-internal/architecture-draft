@@ -28,7 +28,7 @@
 ## Leave request (cuti/izin/dinas)
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
-| POST | `/request/create` | Ajukan cuti (multipart + dokumen) | header |
+| POST | `/request/create` | Ajukan cuti (multipart + dokumen). **Idempoten**: dedup berbasis konten (`employee_id`+`leave_type`+`leave_subtype`+`from_date`+`to_date` yang masih `Waiting`/`Approved`) → pengajuan identik dianggap sukses tanpa duplikat | header |
 | GET | `/request/view` | Lihat pengajuan (`?as=reviewer|reviewed`) | header |
 | PATCH | `/request/review` · `/request/cancel` | Approve/reject / batal | header |
 | GET/PATCH | `/request/security-lookup` · `/request/security-verify` | Verifikasi security cuti per-jam | Security |
