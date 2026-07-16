@@ -112,16 +112,16 @@ Hasil di localhost sbg pembanding: **484** baris master bahan, **0** duplikat, *
 
 ## Yang sengaja TIDAK diselaraskan
 
-8 kode ini namanya tak cocok persis dan **butuh konfirmasi orang gudang** — jangan ditebak, fuzzy match pernah memilih **"PLASTIK SHRINK 19 CM" untuk "PLASTIK SRING 9 CM"** dan **20 CM untuk 10/12 CM**:
+Kode-kode ini namanya tak cocok persis dan **butuh konfirmasi orang gudang** — jangan ditebak, fuzzy match pernah memilih **"PLASTIK SHRINK 19 CM" untuk "PLASTIK SRING 9 CM"** dan **20 CM untuk 10/12 CM**:
 
-| Kode lama | Nama | Kendala |
-|---|---|---|
-| `SLG` | SILICA GEL | Accurate salah ketik: `PP-036 SILLICA GEL` |
-| `PS SRK 7/8/9/10/12 CM` | PLASTIK SRING … | Accurate punya varian ukuran+merek (`PP-021`…`PP-039`), tak terputuskan otomatis |
-| `RF150` | BOTOL VIVIDENT (150 ML) | tak ada di Accurate |
-| `TEST-01` | Barang TESTING | data testing |
+| Kode lama | Nama | Kendala | Status |
+|---|---|---|---|
+| `SLG` | SILICA GEL | Accurate salah ketik: `PP-036 SILLICA GEL` | ✅ **selesai di localhost 16 Juli 2026** — user konfirmasi stok WMS 6.767.876 = data test, angka real di Accurate (46). Caranya: rename nama WMS → `SILLICA GEL` (samakan dgn Accurate) → align memindahkannya (`PP-036`, alias `SLG`, 22 formula ikut). **Di dev harus diulang** (rename = data per-environment): edit nama via UI → klik Sync Master Bahan |
+| `PS SRK 7/8/9/10/12 CM` | PLASTIK SRING … | Accurate punya varian ukuran+merek (`PP-021`…`PP-039`), tak terputuskan otomatis | menunggu gudang |
+| `RF150` | BOTOL VIVIDENT (150 ML) | tak ada di Accurate | menunggu keputusan (discontinue?) |
+| `TEST-01` | Barang TESTING | data testing | kandidat hapus (konfirmasi user dulu) |
 
-Setelah dikonfirmasi, cukup tambahkan kode lama ke `aliases` baris kanoniknya (atau betulkan namanya agar cocok), lalu jalankan ulang align.
+Setelah dikonfirmasi, cukup tambahkan kode lama ke `aliases` baris kanoniknya (atau betulkan namanya agar cocok persis dgn Accurate — cara SLG), lalu jalankan ulang align/klik Sync Master Bahan.
 
 ## Dokumen Terkait
 
