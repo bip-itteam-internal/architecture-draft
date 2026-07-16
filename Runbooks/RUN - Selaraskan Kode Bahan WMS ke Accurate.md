@@ -1,4 +1,6 @@
-> **Status:** ✅ Terverifikasi end-to-end di localhost (16 Juli 2026) — dijalankan dari salinan data **pra-migrasi** (453 kode lama) dan menghasilkan 484 baris, 0 duplikat, identik dengan migrasi manual yang sudah diverifikasi sebelumnya. **Belum dijalankan di dev/prod.**
+> **Status:** ✅ Terverifikasi end-to-end di localhost (16 Juli 2026) pada **dua keadaan awal**: (a) data **pra-sync** (453 kode lama) dan (b) replika keadaan **dev yang sudah menumpuk** (926 baris: kode lama + kode Accurate berdampingan). Keduanya menghasilkan 484 baris & 0 duplikat. **Belum dijalankan di dev/prod.**
+
+> **Aman dijalankan walau master sudah terlanjur menumpuk** — align mengenali baris kanonik yang sudah dibuat sync dan tidak menjumlahkan stoknya (kode lama & kode Accurate menghitung barang fisik yang sama). Prinsip yang dipakai: **kuantitas ikut Accurate, atribut master (satuan/kategori/min_stok) ikut data terkurasi WMS** — satuan pada baris kanonik hasil sync cuma tebakan dari prefix, jadi tak boleh menggusur data gudang (prefix `BBO` menebak GRAM, padahal CANGKANG KAPSUL memang PCS).
 
 > **Kenapa runbook ini ada:** penyelarasan kode bahan pertama kali dikerjakan sebagai skrip `mongosh` ad-hoc di satu mesin, jadi **tidak ikut ter-deploy**. Akibatnya di environment lain kode bahan masih mnemonik, dan menekan **Sync Master Bahan** menyisipkan kode Accurate di samping baris lama → **master menumpuk** (terukur: 453 → 926 baris, 441 di antaranya barang yang sama). Migrasinya kini jadi endpoint; urutan di bawah wajib diikuti.
 
@@ -9,7 +11,7 @@ Menyelaraskan kode bahan WMS ([[Microservices - Manufacture Service]]) dari mnem
 ## Kapan dipakai
 
 - Environment baru / environment yang master bahannya masih memakai kode lama (dev, prod).
-- Gejala: hasil `POST /master-bahan/sync-accurate` memuat `perlu_align` tidak kosong, atau master bahan terlihat dobel (satu bahan muncul dua kali: kode lama + kode Accurate).
+- Gejala: hasil `POST /master-bahan/sync-accurate` memuat `perlu_align` tidak kosong, atau master bahan terlihat dobel (satu bahan muncul dua kali: kode lama + kode Accurate — mis. `AC1000` **dan** `BBK-001` sama-sama "ACCARE 1000"). Contoh nyata di dev 16 Juli 2026: Database Master menampilkan **1021** item, padahal sehatnya ~579 (= ~484 bahan + barang jadi).
 
 ## Prasyarat
 
@@ -74,7 +76,7 @@ PUT /api/manufacture/master-bahan/BBO-056
 ```
 
 - `BBK-101` OAT EXTRACT: salah entri — semua ekstrak lain GRAM & kategori bahan baku.
-- `BBO-056` CANGKANG KAPSUL: satuan PCS **sudah benar**; yang beda satuan Accurate-nya (**ribuan butir**) → pakai faktor per-item, **jangan** diubah jadi GRAM (angka MRP kebetulan benar, tapi kapsul jadi terhitung sebagai bahan curah bergram di dashboard).
+- `BBO-056` CANGKANG KAPSUL: satuan PCS **sudah benar**; yang beda satuan Accurate-nya (**ribuan butir**) → pakai faktor per-item, **jangan** diubah jadi GRAM (angka MRP kebetulan benar, tapi kapsul jadi terhitung sebagai bahan curah bergram di dashboard — dan `satuan_perlu_dicek` ikut bisu, jadi salahnya tak akan ketahuan lagi).
 
 Lalu ulangi langkah 4; `satuan_perlu_dicek` harus kosong.
 
