@@ -23,6 +23,14 @@ Menyelaraskan kode bahan WMS ([[Microservices - Manufacture Service]]) dari mnem
 mongodump -u <user> -p <pass> --authenticationDatabase admin -d manufacture_db -o /tmp/bk
 ```
 
+## Cara termudah: lewat UI (sejak FE `856067d2`)
+
+Tombol **Sync Master Bahan (Accurate)** di WMS → Manajemen Stok → tab Sync Master kini **self-healing**: bila masih ada kode bahan lama, ia menampilkan rencananya di dialog konfirmasi (berapa dipindah/digabung/dibiarkan) → setelah disetujui menjalankan **align → sync master → sync stok** sekaligus. Batal = tidak terjadi apa-apa.
+
+Sesudahnya, betulkan satuan yang dilaporkan di hasil sync (`satuan perlu dicek`) lewat **form edit item** di tab Database Master — kolom stok saat mode edit kini punya input **satuan** dan **faktor acc.** (pengali qty Accurate per-item): `BBK-101` → satuan GRAM + kategori BAHAN BAKU KOSMETIK; `BBO-056` → faktor `1000` (satuan tetap PCS). Lalu klik **Sync Stok** sekali lagi.
+
+Prosedur API manual di bawah = fallback (bila FE belum ter-deploy) & untuk memahami mekaniknya.
+
 ## Urutan (jangan dibalik)
 
 **1. Lihat rencananya dulu — jangan langsung apply.**
