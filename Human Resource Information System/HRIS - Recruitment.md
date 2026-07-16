@@ -96,7 +96,7 @@
 - `job_type` / `candidate_source` / `interview_type` — lookup (name, is_active) untuk klasifikasi lowongan, sumber pelamar, jenis interview
 - `job_location` — master lokasi kerja (name, remote_work, alamat, city/state/country/postal_code, status); dipakai dropdown Location di `job_posting`
 - `onboarding_checklist` + `checklist_item` — **template** checklist onboarding (task_name, category, assigned_to_role, due_day, is_required). **Instansiasi per-kandidat ✅ (⚠️ #492):** `onboarding_progress` (1/kandidat Hired; item = snapshot dari template + status `done`)
-- `onboarding_review` + `onboarding_review_response` (⚠️ #493) — sesi **Performance Review Onboarding** (masa evaluasi): peserta, jadwal, penilai, 7 rating + 3 uraian per penilai, keputusan status
+- `onboarding_review` + `onboarding_review_response` (⚠️ #493) — sesi **Performance Review Onboarding** (masa evaluasi): peserta (**karyawan masa evaluasi**, `employment_type` "PKWT (Evaluasi)"), jadwal, penilai, 7 rating + 3 uraian per penilai, keputusan status
 - `job_posting` **diperkaya**: job_type/location/branch, number_of_positions, priority, min/max experience & salary, application_deadline, is_featured, toggle ask_*/show_*, required_skills, description/requirements/benefits/terms_condition (HTML)
 - `candidate` **diperkaya**: source_id, country, profile_image/cover_letter (MinIO), expected/current_salary, notice_period, portfolio_url, linkedin_url, education, **`employee_id`** (terisi saat kandidat Hired dikonversi jadi karyawan)
 
