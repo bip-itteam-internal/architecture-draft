@@ -30,12 +30,13 @@
 	- `POST /fcm/send-personal`
 	- `POST /fcm/send-department`
 	- `POST /fcm/send-broadcast` (batch 500 token)
-	- `POST /email/send` — Email via **Resend** (`resend-go/v3`); body `html`/`text`, attachment (base64 `content` atau `path` URL, mis. offer letter PDF), dan `idempotency_key` opsional untuk retry-safe.
+	- `POST /email/send` — Email via **Resend** (`resend-go/v3`); body `html`/`text`, attachment (base64 `content` atau `path` URL, mis. offer letter PDF), dan `idempotency_key` opsional untuk retry-safe. Field **`from` opsional**: bila kosong dipakai `RESEND_FROM_EMAIL`; **tidak divalidasi** handler (hanya `to`/`subject`/body/attachment yang dicek) → diteruskan apa adanya ke Resend, sehingga format RFC `Nama <email>` didukung — ini dasar **identitas pengirim per-service** (lihat catatan di bawah).
 - **Cron:** harian pukul 03:00 WIB menghapus inbox berumur > 2 bulan.
 
 ## Belum Diimplementasikan / Catatan
 
-- **Channel Email (Resend)** — ✅ sudah di kode (`POST /email/send`, lihat di atas) memakai SDK resmi `resend-go/v3`; ditujukan untuk notifikasi **kandidat recruitment** ([[Microservices - Recruitment Service]]). Catatan operasional: `from` wajib memakai domain terverifikasi di Resend (`bharatainternasional.com` — SPF/DKIM/DMARC) atau Resend menolak (HTTP 422); env `RESEND_API_KEY` & `RESEND_FROM_EMAIL` perlu diset saat deploy — bila kosong, `email.Init()` warn-and-skip sehingga service tetap berjalan. Belum ada smoke test pengiriman live yang tercatat.
+- **Channel Email (Resend)** — ✅ sudah di kode (`POST /email/send`, lihat di atas) memakai SDK resmi `resend-go/v3`; ditujukan untuk notifikasi **kandidat recruitment** ([[Microservices - Recruitment Service]]). **✅ Terverifikasi jalan live di dev (2026-07-16)** — email "Lamaran Anda Telah Kami Terima" sampai ke inbox kandidat, jadi `RESEND_API_KEY` & `RESEND_FROM_EMAIL` sudah terpasang di deploy. Catatan operasional: `from` wajib memakai domain terverifikasi di Resend (`bharatainternasional.com` — SPF/DKIM/DMARC) atau Resend menolak (HTTP 422); bila env kosong, `email.Init()` warn-and-skip sehingga service tetap berjalan.
+- **Identitas pengirim per-service (pola wajib)** — `RESEND_FROM_EMAIL` adalah **default untuk SEMUA service**, jadi **jangan** diisi nama satu domain-bisnis (mis. "Recruitment"): email service lain (mis. payroll/slip gaji) yang tidak mengisi `from` akan ikut tampil dengan nama itu. Pola: `RESEND_FROM_EMAIL` = default **generik** (mis. `Bharata Internasional <noreply@…>`); **tiap service mengisi `from` sendiri** lewat env-nya — recruitment: `RECRUITMENT_EMAIL_FROM` (mis. `Bharata Recruitment <noreply@…>`, lihat [[Microservices - Recruitment Service]]); payroll dst. mengikuti pola sama **tanpa** mengubah shared-library. Cukup menambah display name di depan alamat yang sudah terverifikasi. Saat ini **recruitment adalah satu-satunya pemanggil `/email/send`**.
 - Semua channel (inbox/FCM/WhatsApp/email/splash/article) sudah fungsional di kode — tidak ada stub berarti.
 - Group `/debug/fcm` ditandai dapat dihapus saat production.
 
