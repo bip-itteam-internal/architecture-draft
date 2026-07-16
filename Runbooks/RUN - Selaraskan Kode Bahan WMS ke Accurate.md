@@ -1,4 +1,4 @@
-> **Status:** ✅ Terverifikasi end-to-end di localhost (16 Juli 2026) pada **dua keadaan awal**: (a) data **pra-sync** (453 kode lama) dan (b) replika keadaan **dev yang sudah menumpuk** (926 baris: kode lama + kode Accurate berdampingan). Keduanya menghasilkan 484 baris & 0 duplikat. **Belum dijalankan di dev/prod.**
+> **Status:** ✅ Terverifikasi end-to-end di localhost (16 Juli 2026) pada **dua keadaan awal**: (a) data **pra-sync** (453 kode lama) dan (b) replika keadaan **dev yang sudah menumpuk** (926 baris: kode lama + kode Accurate berdampingan). Keduanya menghasilkan 484 baris & 0 duplikat — termasuk **lewat UI**: klik tombol → dialog rencana → Database Master 987 → 546 tanpa reload halaman, lalu koreksi satuan/faktor via form edit. **Belum dijalankan di dev/prod.**
 
 > **Aman dijalankan walau master sudah terlanjur menumpuk** — align mengenali baris kanonik yang sudah dibuat sync dan tidak menjumlahkan stoknya (kode lama & kode Accurate menghitung barang fisik yang sama). Prinsip yang dipakai: **kuantitas ikut Accurate, atribut master (satuan/kategori/min_stok) ikut data terkurasi WMS** — satuan pada baris kanonik hasil sync cuma tebakan dari prefix, jadi tak boleh menggusur data gudang (prefix `BBO` menebak GRAM, padahal CANGKANG KAPSUL memang PCS).
 
@@ -25,7 +25,7 @@ mongodump -u <user> -p <pass> --authenticationDatabase admin -d manufacture_db -
 
 ## Cara termudah: lewat UI (sejak FE `856067d2`)
 
-Tombol **Sync Master Bahan (Accurate)** di WMS → Manajemen Stok → tab Sync Master kini **self-healing**: bila masih ada kode bahan lama, ia menampilkan rencananya di dialog konfirmasi (berapa dipindah/digabung/dibiarkan) → setelah disetujui menjalankan **align → sync master → sync stok** sekaligus. Batal = tidak terjadi apa-apa.
+Tombol **Sync Master Bahan (Accurate)** di WMS → Manajemen Stok → tab Sync Master kini **self-healing**: bila masih ada kode bahan lama, ia menampilkan rencananya di dialog konfirmasi (berapa dipindah/digabung/dibiarkan) → setelah disetujui menjalankan **align → sync master → sync stok** sekaligus. Batal = tidak terjadi apa-apa. Data dimuat ulang **otomatis** setelah sync (banner "Memuat data master…" tampil di tab Database Master) — tidak perlu reload halaman; dulu refresh pasca-sync menampilkan stok 0 & menghilangkan barang jadi tanpa indikator, sehingga data tampak "belum terbaca".
 
 Sesudahnya, betulkan satuan yang dilaporkan di hasil sync (`satuan perlu dicek`) lewat **form edit item** di tab Database Master — kolom stok saat mode edit kini punya input **satuan** dan **faktor acc.** (pengali qty Accurate per-item): `BBK-101` → satuan GRAM + kategori BAHAN BAKU KOSMETIK; `BBO-056` → faktor `1000` (satuan tetap PCS). Lalu klik **Sync Stok** sekali lagi.
 
