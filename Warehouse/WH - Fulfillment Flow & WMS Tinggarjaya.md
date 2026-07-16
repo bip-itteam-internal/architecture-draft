@@ -220,8 +220,9 @@ warehouse_db (MongoDB, pola standar bip-erp)
 └── warehouse_products    — master SKU + lokasi rak
     fields: sku, barcode, nama, lokasi_rak
     CRUD manual di FE + import xlsx (MVP)
-    Sumber jangka panjang: Google Sheet master product manufacture
-    (jangan jadi dependency MVP — SHEETS_SA_KEY masih kosong)
+    Sumber jangka panjang: master product manufacture — kini dari data HPP
+    (POST /master-product/sync-hpp), BUKAN lagi Google Sheet
+    (jangan jadi dependency MVP)
 ```
 
 ### Endpoint baru

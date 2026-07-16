@@ -44,7 +44,7 @@ Lakukan **migrasi cloud bertahap (phased), provider-agnostic**. ADR ini **hanya 
 - [[Microservices - Insentive Service]] — cron harian 00:00, hasil `DRAFT` dan bisa dihitung ulang; cukup rerun setelah listrik kembali.
 - [[Microservices - Inventory Service]] — asset tracking GA, internal, frekuensi rendah, tidak memanggil service lain.
 - [[Microservices - Task Management Service]] — produktivitas internal (diakses via SSO).
-- [[Microservices - Manufacture Service]] — WMS internal; master sudah dari Google Sheets (sudah cloud).
+- [[Microservices - Manufacture Service]] — WMS internal; master tidak disimpan sendiri (sumbernya sudah cloud). *Catatan pasca-ADR: sync Google Sheets sudah dihapus — master bahan & stok kini dari [[External - Accurate]] (read-only) via [[Microservices - Integration Service]], barang jadi & bundle dari data HPP. Sumbernya tetap cloud, jadi keputusan Tier 3 tidak berubah.*
 - [[CORE - OCR Document Service]] — masih 🟡 konsep, belum ada di kode.
 
 ### Infra bersama ikut service-nya
