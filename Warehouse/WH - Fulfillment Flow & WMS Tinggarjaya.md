@@ -98,11 +98,12 @@ per batch, sehingga unduhan siang tidak membawa order batch pagi
 yang belum ditarik → 422 + daftar `not_exported`.
 
 **Kode packer (`packer_code`, T1/T2)**: tim packer harian/freelance tidak
-terdaftar di database employee → dicatat sebagai kode tim, dipilih admin saat
-batch cetak label (`POST /fulfillment/labels`), dicap ke semua order batch
-yang transisi LABEL_PRINTED. Jalur scan juga bisa mengisinya saat pack
-(opsional); label tidak menimpa kode yang sudah ada. Muncul di kolom
-"Kode Packer" file export — untuk evaluasi salah kirim/qty kurang per tim.
+terdaftar di database employee → dicatat sebagai kode tim. **Titik utama
+pencatatan: saat unduh rekon di Pengambilan Barang** (`packer_code` param di
+`/queue/export`) — satu batch unduhan dikerjakan satu tim, kode terisi di
+kolom xlsx sekaligus dicap ke order. Lapis berikutnya: batch cetak label
+(`POST /fulfillment/labels`) dan scan pack (opsional) — keduanya tidak
+menimpa kode yang sudah ada. Untuk evaluasi salah kirim/qty kurang per tim.
 
 **Riwayat cetak resi**: menu "Riwayat Cetak Resi" (`GET /fulfillment/labels/history`)
 merekam per order: waktu cetak, siapa yang cetak, tim packer, cetak ulang
@@ -123,9 +124,12 @@ gerbang rekon, sehingga dihapus dari Antrian Pesanan agar tidak terpicu dari tab
 #### Alur Operasional (jalur cepat — utama)
 
 Menu FE (bahasa baku): Antrian Pesanan · Pengambilan Barang · Pengemasan ·
-Atur Pengiriman · Cetak Resi · Riwayat Cetak Resi · Serah Terima Kurir ·
-Master Produk. UI scan barcode dihilangkan (terlalu lambat untuk 100+
+Riwayat Cetak Resi · Serah Terima Kurir · Master Produk. Menu "Atur
+Pengiriman" & "Cetak Resi" dihapus dari sidebar (fungsi melebur ke Pengemasan
+dan Riwayat; halaman `/warehouse/rts` & `/warehouse/labels` tetap bisa
+diakses via URL). UI scan barcode dihilangkan (terlalu lambat untuk 100+
 resi/hari — keputusan tim gudang); endpoint pick/pack tetap ada.
+Panduan pemakaian untuk user gudang: [[RUN - Panduan WMS Fulfillment Gudang Tinggarjaya]].
 
 ```
 [1. APPROVE — batch]  (menu Antrian Pesanan)
@@ -134,11 +138,13 @@ POST /fulfillment/approve → status: APPROVED
 Order mencurigakan → HELD
         │
         ▼
-[2. UNDUH DATA PESANAN — gerbang rekon]  (menu Pengambilan Barang — satu pintu)
-GET /fulfillment/queue/export?status=APPROVED&only_new=true
+[2. PILIH TIM + UNDUH DATA PESANAN — gerbang rekon]  (menu Pengambilan Barang — satu pintu)
+Pilih Tim Packer (T1/T2) → Unduh Pesanan Baru
+GET /fulfillment/queue/export?status=APPROVED,PICKING,PACKED,RTS_FAILED
+    &only_new=true&packer_code=T1
 → xlsx rekap (1 baris per item: nomor pesanan, tanggal, SKU, nama barang,
-  qty, toko, expedisi, kode packer, keterangan)
-→ order yang ikut terunduh dicap exported_at + exported_by (sekali)
+  qty, toko, expedisi, kode packer TERISI otomatis, keterangan)
+→ order yang ikut terunduh dicap exported_at + exported_by + packer_code (sekali)
 Badge FE tab Disetujui: "Sudah Ditarik" / "Belum Ditarik"
         │
         ▼

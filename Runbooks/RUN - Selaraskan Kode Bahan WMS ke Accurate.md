@@ -1,4 +1,4 @@
-> **Status:** ✅ Terverifikasi end-to-end di localhost (16 Juli 2026) pada **dua keadaan awal**: (a) data **pra-sync** (453 kode lama) dan (b) replika keadaan **dev yang sudah menumpuk** (926 baris: kode lama + kode Accurate berdampingan). Keduanya menghasilkan 484 baris & 0 duplikat. **Belum dijalankan di dev/prod.**
+> **Status:** ✅ Terverifikasi end-to-end di localhost (16 Juli 2026) pada **dua keadaan awal**: (a) data **pra-sync** (453 kode lama) dan (b) replika keadaan **dev yang sudah menumpuk** (926 baris: kode lama + kode Accurate berdampingan). Keduanya menghasilkan 484 baris & 0 duplikat — termasuk **lewat UI**: klik tombol → dialog rencana → Database Master 987 → 546 tanpa reload halaman, lalu koreksi satuan/faktor via form edit. **Belum dijalankan di dev/prod.**
 
 > **Aman dijalankan walau master sudah terlanjur menumpuk** — align mengenali baris kanonik yang sudah dibuat sync dan tidak menjumlahkan stoknya (kode lama & kode Accurate menghitung barang fisik yang sama). Prinsip yang dipakai: **kuantitas ikut Accurate, atribut master (satuan/kategori/min_stok) ikut data terkurasi WMS** — satuan pada baris kanonik hasil sync cuma tebakan dari prefix, jadi tak boleh menggusur data gudang (prefix `BBO` menebak GRAM, padahal CANGKANG KAPSUL memang PCS).
 
@@ -11,7 +11,7 @@ Menyelaraskan kode bahan WMS ([[Microservices - Manufacture Service]]) dari mnem
 ## Kapan dipakai
 
 - Environment baru / environment yang master bahannya masih memakai kode lama (dev, prod).
-- Gejala: hasil `POST /master-bahan/sync-accurate` memuat `perlu_align` tidak kosong, atau master bahan terlihat dobel (satu bahan muncul dua kali: kode lama + kode Accurate — mis. `AC1000` **dan** `BBK-001` sama-sama "ACCARE 1000"). Contoh nyata di dev 16 Juli 2026: Database Master menampilkan **1021** item, padahal sehatnya ~579 (= ~484 bahan + barang jadi).
+- Gejala: hasil `POST /master-bahan/sync-accurate` memuat `perlu_align` tidak kosong, atau master bahan terlihat dobel (satu bahan muncul dua kali: kode lama + kode Accurate — mis. `AC1000` **dan** `BBK-001` sama-sama "ACCARE 1000"). Contoh nyata di dev 16 Juli 2026: Database Master menampilkan **1021** item, padahal sehatnya **~544** (= ~482 bahan + 62 barang jadi). Kode **produk jadi** lama (NEI, FAY, …) punya masalah yang sama persis — bereskan dengan tombol **Sync Barang Jadi & Bundle dari HPP** (juga self-healing, dialognya sama; backend `POST /master-product/align-hpp`).
 
 ## Prasyarat
 
@@ -25,7 +25,9 @@ mongodump -u <user> -p <pass> --authenticationDatabase admin -d manufacture_db -
 
 ## Cara termudah: lewat UI (sejak FE `856067d2`)
 
-Tombol **Sync Master Bahan (Accurate)** di WMS → Manajemen Stok → tab Sync Master kini **self-healing**: bila masih ada kode bahan lama, ia menampilkan rencananya di dialog konfirmasi (berapa dipindah/digabung/dibiarkan) → setelah disetujui menjalankan **align → sync master → sync stok** sekaligus. Batal = tidak terjadi apa-apa.
+Tombol **Sync Master Bahan (Accurate)** di WMS → Manajemen Stok → tab Sync Master kini **self-healing**: bila masih ada kode bahan lama, ia menampilkan rencananya di dialog konfirmasi (berapa dipindah/digabung/dibiarkan) → setelah disetujui menjalankan **align → sync master → sync stok** sekaligus. Batal = tidak terjadi apa-apa. Data dimuat ulang **otomatis** setelah sync (banner "Memuat data master…" tampil di tab Database Master) — tidak perlu reload halaman; dulu refresh pasca-sync menampilkan stok 0 & menghilangkan barang jadi tanpa indikator, sehingga data tampak "belum terbaca".
+
+Tombol **Sync Barang Jadi & Bundle dari HPP** berperilaku sama untuk kode **produk jadi** lama (NEI, FAY, …): dialog rencana → align (`/master-product/align-hpp`) → sync-hpp. Jalankan keduanya (urutan bebas).
 
 Sesudahnya, betulkan satuan yang dilaporkan di hasil sync (`satuan perlu dicek`) lewat **form edit item** di tab Database Master — kolom stok saat mode edit kini punya input **satuan** dan **faktor acc.** (pengali qty Accurate per-item): `BBK-101` → satuan GRAM + kategori BAHAN BAKU KOSMETIK; `BBO-056` → faktor `1000` (satuan tetap PCS). Lalu klik **Sync Stok** sekali lagi.
 
@@ -112,16 +114,16 @@ Hasil di localhost sbg pembanding: **484** baris master bahan, **0** duplikat, *
 
 ## Yang sengaja TIDAK diselaraskan
 
-8 kode ini namanya tak cocok persis dan **butuh konfirmasi orang gudang** — jangan ditebak, fuzzy match pernah memilih **"PLASTIK SHRINK 19 CM" untuk "PLASTIK SRING 9 CM"** dan **20 CM untuk 10/12 CM**:
+Kode-kode ini namanya tak cocok persis dan **butuh konfirmasi orang gudang** — jangan ditebak, fuzzy match pernah memilih **"PLASTIK SHRINK 19 CM" untuk "PLASTIK SRING 9 CM"** dan **20 CM untuk 10/12 CM**:
 
-| Kode lama | Nama | Kendala |
-|---|---|---|
-| `SLG` | SILICA GEL | Accurate salah ketik: `PP-036 SILLICA GEL` |
-| `PS SRK 7/8/9/10/12 CM` | PLASTIK SRING … | Accurate punya varian ukuran+merek (`PP-021`…`PP-039`), tak terputuskan otomatis |
-| `RF150` | BOTOL VIVIDENT (150 ML) | tak ada di Accurate |
-| `TEST-01` | Barang TESTING | data testing |
+| Kode lama | Nama | Kendala | Status |
+|---|---|---|---|
+| `SLG` | SILICA GEL | Accurate salah ketik: `PP-036 SILLICA GEL` | ✅ **selesai di localhost 16 Juli 2026** — user konfirmasi stok WMS 6.767.876 = data test, angka real di Accurate (46). Caranya: rename nama WMS → `SILLICA GEL` (samakan dgn Accurate) → align memindahkannya (`PP-036`, alias `SLG`, 22 formula ikut). **Di dev harus diulang** (rename = data per-environment): edit nama via UI → klik Sync Master Bahan |
+| `PS SRK 7/8/9/10/12 CM` | PLASTIK SRING … | Accurate punya varian ukuran+merek (`PP-021`…`PP-039`), tak terputuskan otomatis | menunggu gudang |
+| `RF150` | BOTOL VIVIDENT (150 ML) | ternyata BUKAN "tak ada di Accurate" — WMS menamai botol menurut pemakaiannya, Accurate menurut jenisnya | ✅ **selesai di localhost 16 Juli 2026** — user konfirmasi = `BKK-015 BOTOL RF 150 ML TUTUP ULIR PUTIH`; merge via rename nama → align (alias `RF150`, 3 formula + 2 transaksi ikut, stok pakai Accurate 7.884). **Di dev harus diulang** |
+| `TEST-01` | Barang TESTING | data testing | ✅ **dihapus** (localhost, konfirmasi user; 0 rujukan). **Di dev hapus juga** via tombol hapus di Database Master |
 
-Setelah dikonfirmasi, cukup tambahkan kode lama ke `aliases` baris kanoniknya (atau betulkan namanya agar cocok), lalu jalankan ulang align.
+Setelah dikonfirmasi, cukup tambahkan kode lama ke `aliases` baris kanoniknya (atau betulkan namanya agar cocok persis dgn Accurate — cara SLG), lalu jalankan ulang align/klik Sync Master Bahan.
 
 ## Dokumen Terkait
 
