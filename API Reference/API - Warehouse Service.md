@@ -64,7 +64,7 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 
 **`GET /fulfillment/queue`**
 - Query (semua opsional):
-  - `status=NEW` — dicocokkan ke `status_wms`
+  - `status=NEW` — dicocokkan ke `status_wms`; dukung multi-status `status=A,B,C` (`$in`)
   - `q=` — regex case-insensitive ke `order_id` / `items.sku`
   - `shop_ids=id1,id2` — filter multi-toko
   - `date_from=` / `date_to=` — filter `created_at`, timezone WIB. Dua format: `2006-01-02T15:04` (dengan jam; `date_to` inklusif sampai akhir menit) atau `2006-01-02` (tanpa jam; `date_to` sampai 23:59:59.999). Format tidak valid diabaikan (graceful skip)
@@ -73,9 +73,12 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 - Response `200`: `{"data": [FulfillmentOrder...], "total": n, "page": n, "limit": n}`
 
 **`GET /fulfillment/queue/export`** — unduh xlsx untuk rekap/rekon gudang:
-- Query: filter sama dengan `/queue` (status, q, shop_ids, date_from/to, sort — tanpa pagination), plus `only_new=true` = hanya order yang `exported_at`-nya belum ada (rekon per batch — unduhan siang tidak membawa data pagi)
-- Satu baris per item produk. Kolom: No, Nomor Pesanan, Tanggal Pesanan Masuk (WIB), No Resi (awb), SKU, Nama Barang, Qty Pesanan, Nama Toko, Expedisi, Kode Packer (`packer_code`, fallback `packed_by`), Keterangan (kosong, diisi manual)
+- Query: filter sama dengan `/queue` (status — termasuk multi-status koma, q, shop_ids, date_from/to, sort — tanpa pagination), plus:
+  - `only_new=true` = hanya order yang `exported_at`-nya belum ada (rekon per batch — unduhan siang tidak membawa data pagi)
+  - `packer_code=T1` = kode tim packer batch ini — satu batch unduhan dikerjakan satu tim, jadi tim dipilih saat unduh; kode terisi di kolom xlsx **dan dicap ke order yang baru ditarik** (tidak menimpa kode yang sudah ada)
+- Satu baris per item produk. Kolom: No, Nomor Pesanan, Tanggal Pesanan Masuk (WIB), No Resi (awb), SKU, Nama Barang, Qty Pesanan, Nama Toko, Expedisi, Kode Packer (urutan: `packer_code` order → param `packer_code` → `packed_by`), Keterangan (kosong, diisi manual)
 - Efek samping: order yang ikut ter-export dicap `exported_at` + `exported_by` (sekali; unduhan ulang tidak menimpa) — **gerbang wajib sebelum RTS**
+- FE Pengambilan Barang memakai `status=APPROVED,PICKING,PACKED,RTS_FAILED` agar order legacy tahap scan ikut bisa ditarik
 - Response `200`: file xlsx (`Content-Disposition: attachment`); `400` bila hasil filter > 20.000 order
 
 **`POST /fulfillment/approve` / `/hold` / `/pick`** (pola sama):
