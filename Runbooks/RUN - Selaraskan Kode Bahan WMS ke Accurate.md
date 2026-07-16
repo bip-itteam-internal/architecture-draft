@@ -118,8 +118,8 @@ Kode-kode ini namanya tak cocok persis dan **butuh konfirmasi orang gudang** —
 |---|---|---|---|
 | `SLG` | SILICA GEL | Accurate salah ketik: `PP-036 SILLICA GEL` | ✅ **selesai di localhost 16 Juli 2026** — user konfirmasi stok WMS 6.767.876 = data test, angka real di Accurate (46). Caranya: rename nama WMS → `SILLICA GEL` (samakan dgn Accurate) → align memindahkannya (`PP-036`, alias `SLG`, 22 formula ikut). **Di dev harus diulang** (rename = data per-environment): edit nama via UI → klik Sync Master Bahan |
 | `PS SRK 7/8/9/10/12 CM` | PLASTIK SRING … | Accurate punya varian ukuran+merek (`PP-021`…`PP-039`), tak terputuskan otomatis | menunggu gudang |
-| `RF150` | BOTOL VIVIDENT (150 ML) | tak ada di Accurate | menunggu keputusan (discontinue?) |
-| `TEST-01` | Barang TESTING | data testing | kandidat hapus (konfirmasi user dulu) |
+| `RF150` | BOTOL VIVIDENT (150 ML) | ternyata BUKAN "tak ada di Accurate" — WMS menamai botol menurut pemakaiannya, Accurate menurut jenisnya | ✅ **selesai di localhost 16 Juli 2026** — user konfirmasi = `BKK-015 BOTOL RF 150 ML TUTUP ULIR PUTIH`; merge via rename nama → align (alias `RF150`, 3 formula + 2 transaksi ikut, stok pakai Accurate 7.884). **Di dev harus diulang** |
+| `TEST-01` | Barang TESTING | data testing | ✅ **dihapus** (localhost, konfirmasi user; 0 rujukan). **Di dev hapus juga** via tombol hapus di Database Master |
 
 Setelah dikonfirmasi, cukup tambahkan kode lama ke `aliases` baris kanoniknya (atau betulkan namanya agar cocok persis dgn Accurate — cara SLG), lalu jalankan ulang align/klik Sync Master Bahan.
 
