@@ -56,6 +56,7 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 | POST | `/fulfillment/rts` | admin_gudang, leader, spv | Batch RTS → proxy integration ship-batch |
 | POST | `/fulfillment/labels` | admin_gudang, leader, spv | Proxy integration labels → LABEL_PRINTED; reprint dicatat di history |
 | GET | `/fulfillment/labels/history` | admin_gudang, leader, spv, admin_qc | Riwayat resi tercetak — audit keterlambatan (dicetak siapa/kapan, cetak ulang, serah kurir) |
+| GET | `/fulfillment/labels/history/export` | admin_gudang, leader, spv, admin_qc | Unduh riwayat sebagai xlsx — kode packer terisi otomatis (bahan evaluasi per tim) |
 | POST | `/fulfillment/handover` | admin_gudang, leader, spv | Konfirmasi serah-terima kurir → HANDED_OVER |
 | GET | `/fulfillment/dashboard` | admin_gudang, leader, spv, admin_qc | Aggregate count per status_wms |
 
@@ -136,7 +137,8 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 {
   "data": [{
     "order_id": "...", "channel": "tiktok", "shop_name": "...",
-    "awb": "JNE123", "packer_code": "T1", "status_wms": "LABEL_PRINTED",
+    "package_id": "PKG_123", "awb": "JNE123", "packer_code": "T1",
+    "status_wms": "LABEL_PRINTED",
     "label_printed_at": "...", "printed_by": "EMP-001",
     "reprint_count": 1, "last_reprint_at": "...",
     "handed_over_at": null
@@ -145,7 +147,14 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 }
 ```
 - `printed_by` diambil dari history entry pertama dengan `to: LABEL_PRINTED` tanpa note; `reprint_count` dari entry `note: "cetak ulang resi"`
+- `package_id` disertakan untuk tombol Cetak Ulang FE (TikTok butuh package_id saat re-request label; Shopee cukup `order_sn` + `shop_id`)
 - Interpretasi audit: `handed_over_at` kosong = resi dicetak tapi paket belum diserahkan ke kurir
+- FE Riwayat menyediakan tombol **Cetak Ulang** per baris — sekaligus jalur retry order Shopee `PROCESSING` yang sudah telanjur tercap LABEL_PRINTED (penandaan per-batch) dan tidak muncul lagi di layar Pengemasan
+
+**`GET /fulfillment/labels/history/export`** — unduh riwayat sebagai xlsx:
+- Query: `q`/`date_from`/`date_to` sama dengan `/labels/history` (tanpa pagination; max 20.000 baris)
+- Kolom: No, Waktu Cetak (WIB), Nomor Pesanan, Nama Toko, Channel, No Resi, Kode Packer, Dicetak Oleh, Cetak Ulang, Waktu Serah Kurir (WIB), Status
+- Beda tujuan dengan `/queue/export` (rekon, dibuat SEBELUM pengemasan → kode packer manual): file ini dibuat SETELAH cetak → kode packer terisi otomatis. **Tanpa efek samping** (tidak ada penandaan apa pun)
 
 **`GET /fulfillment/queue/counts`**:
 ```json

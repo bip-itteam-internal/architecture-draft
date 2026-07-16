@@ -109,6 +109,16 @@ merekam per order: waktu cetak, siapa yang cetak, tim packer, cetak ulang
 (history note `"cetak ulang resi"`), serah kurir, dan selisih cetak→serah.
 Untuk diagnosis pesanan terlambat: belum dicetak = bottleneck gudang; dicetak
 tapi `handed_over_at` kosong = paket tidak ikut pickup kurir.
+Tambahan: tombol **Unduh** (xlsx riwayat — kode packer terisi otomatis, bahan
+evaluasi per tim; beda dari file rekon yang packer-nya diisi manual) dan tombol
+**Cetak Ulang** per baris (juga jalur retry Shopee PROCESSING yang sudah keluar
+dari layar Pengemasan).
+
+**Dua file, dua tujuan**: file rekon (`/queue/export`, dibuat sebelum pengemasan,
+kolom Kode Packer diisi manual saat bagi tugas) vs file riwayat
+(`/labels/history/export`, dibuat setelah cetak, kode packer otomatis).
+Unduh rekon dipusatkan di menu **Pengambilan Barang** saja — punya efek samping
+gerbang rekon, sehingga dihapus dari Antrian Pesanan agar tidak terpicu dari tab NEW.
 
 #### Alur Operasional (jalur cepat — utama)
 
@@ -124,7 +134,7 @@ POST /fulfillment/approve → status: APPROVED
 Order mencurigakan → HELD
         │
         ▼
-[2. UNDUH DATA PESANAN — gerbang rekon]  (menu Antrian Pesanan / Pengambilan Barang)
+[2. UNDUH DATA PESANAN — gerbang rekon]  (menu Pengambilan Barang — satu pintu)
 GET /fulfillment/queue/export?status=APPROVED&only_new=true
 → xlsx rekap (1 baris per item: nomor pesanan, tanggal, SKU, nama barang,
   qty, toko, expedisi, kode packer, keterangan)
@@ -300,6 +310,7 @@ warehouse_db (MongoDB, pola standar bip-erp)
 | POST | `/fulfillment/rts` | RTS batch (gerbang: hanya order ter-export) → proxy integration ship-batch |
 | POST | `/fulfillment/labels` | Cetak label + cap `packer_code` batch → proxy integration labels; reprint tercatat |
 | GET | `/fulfillment/labels/history` | Riwayat resi tercetak — audit keterlambatan per order |
+| GET | `/fulfillment/labels/history/export` | Unduh riwayat xlsx — kode packer otomatis (evaluasi per tim) |
 | POST | `/fulfillment/handover` | Konfirmasi serah kurir → HANDED_OVER |
 | GET | `/fulfillment/dashboard` | Kartu antrian, resi keluar, cancel, RTS gagal |
 | CRUD | `/wms/products` + `/wms/products/import` | Master SKU + lokasi rak + import xlsx |
