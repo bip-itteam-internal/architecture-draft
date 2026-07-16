@@ -1,4 +1,4 @@
-> Status: ⚠️ **Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar → cek status); **belum go-live**: belum ada remote Git, belum ada domain/deploy, halaman legal masih draf menunggu review, dan sebagian fitur menunggu **deploy manual BE** (lihat *Belum Diimplementasikan / Catatan*).
+> Status: ⚠️ **Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas → cek status; **E2E terverifikasi live 2026-07-16**). BE penopang **semua sudah deployed**. **Belum go-live**: belum ada remote Git, domain, maupun deploy portal; halaman legal masih draf; production 0 lowongan (lihat *Belum Diimplementasikan / Catatan*).
 
 ## Deskripsi
 
@@ -16,7 +16,7 @@
 
 - **Server Components** untuk fetch data (list/detail/track, `cache: "no-store"`); **Client Components** hanya untuk interaksi (form lamar, filter, modal WASPADA, input token).
 - Semua akses BE disentralkan di `src/lib/recruitment-api.ts` (tipe `PostingListItem`/`PostingView`/`ApplyDTO`/`TrackView` + fungsi `listPostings`/`getPosting`/`apply`/`track`, native `fetch`). Detail/track → `null` bila 404 → `notFound()`.
-- **Deploy: Docker standalone** (`output: "standalone"` di `next.config.ts` + `Dockerfile` multi-stage) — ⚠️ image belum divalidasi (lihat catatan).
+- **Deploy: Docker standalone** (`output: "standalone"` + `Dockerfile` 2-stage + `docker-compose.yml` + `.dockerignore`) — **pola disamakan dengan `erp-frontend`** (2026-07-16): `.env` **ikut masuk image** (bukan `--build-arg`) karena `NEXT_PUBLIC_*` di-inline saat `next build`; compose punya healthcheck/restart/logging. **Guard**: build **digagalkan** bila `.env` tak ada (tanpa itu kode jatuh ke fallback URL **dev** → portal production salah alamat senyap). ⚠️ image masih **belum divalidasi** (Docker daemon mati saat uji). **Base API production = `https://api.bharatainternasional.com/public/recruitment`** (gateway di VPS Biznet, terverifikasi 200) — **bukan** `10.10.10.121` internal.
 
 ## Halaman / Fitur (Sudah Diimplementasikan)
 
@@ -44,8 +44,9 @@ Detail: [[API - Recruitment Service]] §Publik.
 
 ## Belum Diimplementasikan / Catatan
 
-- **Belum go-live**: belum ada **remote Git**, domain, maupun deploy. Image Docker **belum divalidasi** (Docker daemon mati saat pengujian).
-- **Menunggu deploy manual BE** (bip-erp deploy manual — merge ≠ deploy): **jenis pekerjaan dari master** (PR #451) & **upload berkas** (PR #452) sudah di `main` tetapi belum aktif di dev; nama pengirim email "Bharata Recruitment" (PR #453) belum merge + butuh env `RECRUITMENT_EMAIL_FROM`.
+- **Belum go-live**: belum ada **remote Git**, domain, maupun deploy portal. Image Docker **belum divalidasi** (Docker daemon mati saat pengujian). Production gateway juga perlu deploy agar CORS origin portal (PR #460) aktif di sana.
+- **BE penopang: ✅ semua deployed & terverifikasi live di dev (2026-07-16)** — slug, job_type dari master, upload berkas (E2E multipart → `cv_object` → HR preview PDF valid), email kandidat (nama pengirim via `RECRUITMENT_EMAIL_FROM`, env sudah diset user). Tak ada lagi yang menunggu deploy BE.
+- **Production 0 lowongan** — 5 lowongan hanya di **dev** (seed). Requisition → approve → posting harus dibuat dari nol di production sebelum portal menampilkan apa pun.
 - **Halaman legal masih draf** — perlu review pihak berwenang sebelum publish.
 - **`pnpm dev` rusak di path ber-spasi** (`c:\Data utama\...`): Turbopack panic "Next.js package not found"; `next dev --webpack` → `ENOENT .next/browser/default-stylesheet.css` (500 di route dinamis). **Preview andal = `pnpm build` lalu `pnpm start`**. Bukan bug kode portal.
 - `public/hero/pixel.jpg` **±2,9 MB** — perlu dioptimasi sebelum go-live.
