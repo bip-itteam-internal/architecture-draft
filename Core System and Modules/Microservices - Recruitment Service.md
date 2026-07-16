@@ -1,14 +1,16 @@
 ## Deskripsi
 
-*Recruitment Service adalah service (direncanakan) yang mengelola **siklus depan karyawan**: permintaan posisi → lowongan → pelamar → screening → interview → background check → psikotes → offer → onboarding handoff. Ini sisi **implementasi** dari konsep/bisnis di [[HRIS - Recruitment]]. **Belum ada di kode** — dokumen ini menetapkan rancangan service-nya.*
+*Recruitment Service mengelola **siklus depan karyawan**: permintaan posisi → lowongan → pelamar → screening → interview → background check → psikotes → offer → onboarding handoff. Ini sisi **implementasi** dari konsep/bisnis di [[HRIS - Recruitment]].*
 
 - **Stack**: Go + Fiber v2 + MongoDB (`recruitment_db`) — selaras pola service bip-erp lain
-- **Path**: `services/recruitment` *(direncanakan)*
-- **Status**: ⚠️ **Implemented (Fase 1-3, BE)** di `services/recruitment` (branch `feat/recruitment-service`) — pipeline inti jalan; Fase 4-5 + FE menyusul. Di belakang [[CORE - API Master Gateway]], auth **SSO** ([[CORE - SSO Flow]]), role `system_roles["hris"]`. Port `6979`, mongo `recruitment-mongo-db`.
+- **Path**: `services/recruitment` (go.mod per-service; build/vet dari folder itu)
+- **Status**: ⚠️ **Implemented (BE)** — Fase 1-3 + adopsi ERPGo (A–F) + portal publik (browse/apply/track), **sudah di `main`** & jalan di dev. Belum: AI CV screening, psikotes online, WhatsApp kandidat, Glints sync, FE internal (erp-frontend Candidate Pipeline berjalan terpisah). Di belakang [[CORE - API Master Gateway]], auth **SSO** ([[CORE - SSO Flow]]), role `system_roles["hris"]`. Port `6979`, mongo `recruitment-mongo-db`.
+- **⚠️ Deploy MANUAL**: workflow "BIP ERP — Deploy to Dev" **disabled** → **merge ≠ deploy**. Deploy: SSH `erp@10.10.10.121:/home/erp/apps/bip-erp` → `git reset --hard origin/main` + `docker compose build/up -d recruitment-service`. Selalu **deploy BE sebelum FE/portal** untuk perubahan kontrak.
+- **Konsumen publik**: [[APP - Portal Karir Bharata]] · **Endpoint lengkap**: [[API - Recruitment Service]]
 
-## Endpoint / Fitur (Direncanakan)
+## Endpoint / Fitur (Sudah Diimplementasikan)
 
-> 🟡 Belum ada di kode — kontrak/path final ditetapkan saat implementasi. Berikut cakupan yang direncanakan per pipeline.
+> Daftar path/role lengkap ada di [[API - Recruitment Service]] (hindari duplikasi). Di bawah = cakupan per pipeline.
 
 ### Job Requisition
 - Ajukan permintaan posisi (Form Permintaan Karyawan) + usulan kualifikasi
@@ -44,8 +46,7 @@
 
 ## Belum Diimplementasikan / Catatan
 
-- **Seluruh service belum ada di kode** (🟡) — scaffolding mengikuti pola `services/.template`.
-- `recruitment_db` (container Mongo) **akan didaftarkan** di [[DB - Overview and Notes]] saat implementasi; rute `/api/recruitment/*` ditambahkan ke [[CORE - API Master Gateway]] (`InternalURL`) saat itu juga.
+- `recruitment_db` (container Mongo) & rute `/api/recruitment/*` + `/public/recruitment/*` — lihat [[DB - Overview and Notes]] dan [[CORE - API Master Gateway]] (`InternalURL["recruitment"]`).
 - **AI CV screening** (LLM OpenRouter + OCR) & **psikotes online** (test-engine + bank soal) = **fase lanjut**.
 - **Email kandidat** ✅ sudah di kode (best-effort via [[Microservices - Notification Service]] `POST /email/send`, Resend). **WhatsApp kandidat** masih menyusul.
 - Relasi dengan **Glints** (impor/sinkron vs menggantikan) = TBD strategis.
@@ -119,8 +120,23 @@
 
 **Belum (menyusul, Fase G–I):** onboarding checklist; offer letter template; recruitment/career settings.
 
+## Increment: Penopang Portal Karir Publik (2026-07-16)
+
+> 4 PR ke `main` sebagai BE untuk [[APP - Portal Karir Bharata]] (portal karir publik yang kini benar-benar ada UI-nya). `go build`/`vet`/`test` hijau. **Ingat: deploy manual** — status per-PR ditandai di bawah.
+
+- **Slug URL lowongan (PR #448 — ✅ live di dev):** `job_posting` + field `slug`, digenerate saat `POST /postings`: `slugify(title|posisi)` (lowercase, non-alfanumerik → `-`, trim) + `uniquePostingSlug` (bentrok → sufiks `-2`, `-3`, …; fallback `lowongan`). Diekspos di list & detail publik; `GET /public/postings/:id` **menerima slug ATAU ObjectID** (coba parse ObjectID dulu; gagal → lookup by `slug`) → URL portal `/lowongan/frontend-developer`, bukan ObjectID. Test: `TestSlugify`. **Posting lama (pra-#448) tak punya slug** → hanya bisa diakses via ObjectID.
+- **Jenis pekerjaan dari master (PR #451 — ✅ merged, ⚠️ belum deploy):** `toPublicPostingView` **resolve `job_type_id` → nama** dari master `job_types` (`Lookup.Name`) lalu mengisi `job_type` di respons publik. **Catatan proses:** PR #449 sempat menambah field plain `JobType` di `job_posting` — **menduplikasi master yang sudah ada** (System Setup → Jenis Pekerjaan) → **dikoreksi/dibatalkan** di #451. Aturan turunan: **cek master/struktur eksisting dulu sebelum menambah field baru**.
+- **Upload berkas lamaran di apply publik (PR #452 — ✅ merged, ⚠️ belum deploy):** `POST /apply` menerima **`multipart/form-data`** selain JSON — field `data` = JSON kandidat + file **`berkas`** = **PDF maks 10 MB** → MinIO `recruitment/cv/<candidate_id>/berkas.pdf` → set `cv_object`, sehingga HR memakai **endpoint lama** `GET /candidates/:id/cv/preview` (tanpa endpoint baru). Upload **best-effort setelah insert** (gagal upload ≠ gagal lamaran); body JSON tanpa file tetap diterima (**backward-compatible**); non-PDF / >10 MB → 400. Satu berkas gabungan (CV+ijazah+sertifikat) mengikuti kebiasaan Google Form HRD sebelumnya.
+- **Identitas pengirim email (PR #453 — 🟡 belum merge):** `notifyCandidateEmail` mengisi `From` dari env **`RECRUITMENT_EMAIL_FROM`** (format RFC `Nama <email>`, mis. `Bharata Recruitment <noreply@bharatainternasional.com>`) agar inbox kandidat menampilkan nama pengirim, bukan sekadar "noreply". Env kosong → `From` kosong → notification-service fallback ke `RESEND_FROM_EMAIL` (perilaku lama, backward-compatible). **Jangan** ubah `RESEND_FROM_EMAIL` global jadi nama recruitment — itu default **semua** service (email payroll nanti ikut salah nama); pola per-service dijelaskan di [[Microservices - Notification Service]]. Deploy **wajib set env `RECRUITMENT_EMAIL_FROM`** (alamat harus domain terverifikasi Resend).
+
+**Field lamaran publik = model `candidate` yang sudah ada** (nama_lengkap, email, no_hp, jenis_kelamin, tanggal_lahir, alamat, pendidikan, ipk, pengalaman, expected_salary, dll) — **bukan** `custom_question`/`custom_answers`; form builder tetap tersedia untuk kebutuhan lain. `tanggal_lahir` memakai **RFC3339 selaras model employee** dan nilai `jenis_kelamin` ("Laki-laki"/"Perempuan") **sudah identik** employee → mapping saat hire tak perlu isi ulang (mapping hire → create-employee sendiri masih **TBD**, lihat [[HRIS - Recruitment]]).
+
+**Email kandidat ✅ terverifikasi live** di dev (2026-07-16): "Lamaran Anda Telah Kami Terima" sampai ke inbox pelamar — menutup TODO smoke test di [[Microservices - Notification Service]].
+
 ## Dokumen Terkait
 
 - [[HRIS - Recruitment]] — konsep/bisnis & keputusan HRD (pasangan dok ini)
+- [[API - Recruitment Service]] — daftar endpoint lengkap
+- [[APP - Portal Karir Bharata]] — portal karir publik (konsumen `/public/recruitment/*`)
 - [[Microservices - Employee Service]] · [[Microservices - Notification Service]] · [[Microservices - File Service]]
 - [[CORE - API Master Gateway]] · [[CORE - SSO Flow]]
