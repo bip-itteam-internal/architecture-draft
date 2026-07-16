@@ -1,0 +1,119 @@
+> **Status:** ✅ Terverifikasi end-to-end di localhost (16 Juli 2026) — dijalankan dari salinan data **pra-migrasi** (453 kode lama) dan menghasilkan 484 baris, 0 duplikat, identik dengan migrasi manual yang sudah diverifikasi sebelumnya. **Belum dijalankan di dev/prod.**
+
+> **Kenapa runbook ini ada:** penyelarasan kode bahan pertama kali dikerjakan sebagai skrip `mongosh` ad-hoc di satu mesin, jadi **tidak ikut ter-deploy**. Akibatnya di environment lain kode bahan masih mnemonik, dan menekan **Sync Master Bahan** menyisipkan kode Accurate di samping baris lama → **master menumpuk** (terukur: 453 → 926 baris, 441 di antaranya barang yang sama). Migrasinya kini jadi endpoint; urutan di bawah wajib diikuti.
+
+## Tujuan
+
+Menyelaraskan kode bahan WMS ([[Microservices - Manufacture Service]]) dari mnemonik internal (`PEGA`, `AMY`, `AC1000`) ke **kode item Accurate** (`BBO-030`, `BBK-001`), beserta seluruh rujukannya, supaya stok bahan bisa disinkronkan dari [[External - Accurate]].
+
+## Kapan dipakai
+
+- Environment baru / environment yang master bahannya masih memakai kode lama (dev, prod).
+- Gejala: hasil `POST /master-bahan/sync-accurate` memuat `perlu_align` tidak kosong, atau master bahan terlihat dobel (satu bahan muncul dua kali: kode lama + kode Accurate).
+
+## Prasyarat
+
+- Manufacture service sudah memuat endpoint `align-accurate` (lihat [[API - Manufacture Service]]).
+- [[Microservices - Integration Service]] bisa dihubungi & `accurate_stocks` sudah terisi (endpoint `/accurate/stocks/list` mengembalikan data). Align **membaca** dari salinan lokal itu, tidak memanggil Accurate langsung.
+- **Backup `manufacture_db` dulu** — align menulis ulang `_id` dan menghapus baris lama.
+
+```
+mongodump -u <user> -p <pass> --authenticationDatabase admin -d manufacture_db -o /tmp/bk
+```
+
+## Urutan (jangan dibalik)
+
+**1. Lihat rencananya dulu — jangan langsung apply.**
+
+```
+POST /api/manufacture/master-bahan/align-accurate?dry_run=true
+```
+
+Periksa hasilnya sebelum lanjut:
+
+| Field | Arti |
+|---|---|
+| `akan_dipindah` | jumlah kode Accurate tujuan |
+| `merge` | >1 kode lama menunjuk 1 kode Accurate (barang fisik yang terlanjur terpecah) — stok dijumlahkan |
+| `tak_cocok_dibiarkan` | namanya tak cocok persis → **tetap kode lama**, tidak ditebak |
+| `ambigu_dibiarkan` | 1 nama cocok ke >1 kode Accurate → dibiarkan |
+| `rencana[]` | daftar `kode_lama → kode_baru` + nama |
+
+Baca `rencana[]` sekilas: pastikan pasangannya masuk akal. Kalau ada yang janggal, **berhenti** dan tanyakan ke orang gudang — jangan apply.
+
+**2. Apply.**
+
+```
+POST /api/manufacture/master-bahan/align-accurate
+```
+
+Memindahkan `_id` + cascade rujukan: `manufacture_stok`, `manufacture_saldo_awal_bulanan` (`_id` komposit `kode|YYYY-MM`), `manufacture_transaksi`, `manufacture_formula`, `manufacture_production_log`, `manufacture_material_order`, `manufacture_procurement_po`. Idempoten — aman diulang (`dipindah` jadi 0).
+
+**3. Sync master bahan** (menarik bahan yang memang baru dari Accurate):
+
+```
+POST /api/manufacture/master-bahan/sync-accurate
+```
+
+`perlu_align` **harus kosong**. Kalau masih terisi, berarti langkah 1–2 belum jalan/gagal — jangan lanjut.
+
+**4. Sync stok:**
+
+```
+POST /api/manufacture/stok/sync-accurate
+```
+
+**5. Betulkan satuan yang dilaporkan.** Cek `satuan_perlu_dicek` dari langkah 4 (satuan PCS tapi qty Accurate pecahan = satuan master salah, atau satuan Accurate-nya beda). Per 16 Juli 2026 ada dua, dan **keduanya beda penanganan**:
+
+```
+PUT /api/manufacture/master-bahan/BBK-101
+{ "satuan": "GRAM", "kategori": "BAHAN BAKU KOSMETIK" }
+
+PUT /api/manufacture/master-bahan/BBO-056
+{ "faktor_stok_accurate": 1000 }
+```
+
+- `BBK-101` OAT EXTRACT: salah entri — semua ekstrak lain GRAM & kategori bahan baku.
+- `BBO-056` CANGKANG KAPSUL: satuan PCS **sudah benar**; yang beda satuan Accurate-nya (**ribuan butir**) → pakai faktor per-item, **jangan** diubah jadi GRAM (angka MRP kebetulan benar, tapi kapsul jadi terhitung sebagai bahan curah bergram di dashboard).
+
+Lalu ulangi langkah 4; `satuan_perlu_dicek` harus kosong.
+
+## Verifikasi
+
+```
+// 0 = tak ada bahan yang muncul di >1 kode (inti masalah "menumpuk")
+const byName = {};
+db.manufacture_master_bahan.find({}, {nama:1}).forEach(d => {
+  const n = (d.nama||"").toUpperCase().replace(/[^A-Z0-9 ]/g," ").replace(/\s+/g," ").trim();
+  (byName[n] = byName[n] || []).push(d._id);
+});
+print(Object.values(byName).filter(v => v.length > 1).length);
+
+// rujukan formula menggantung — hanya "#N/A" yang wajar (error di file NEW FORMULA sumber)
+const mb = new Set(db.manufacture_master_bahan.distinct("_id"));
+const dangling = new Set();
+db.manufacture_formula.find().forEach(f => (f.ingredients||[]).forEach(i => {
+  if (!mb.has(i.kode_bahan)) dangling.add(i.kode_bahan);
+}));
+print(JSON.stringify([...dangling]));
+```
+
+Hasil di localhost sbg pembanding: **484** baris master bahan, **0** duplikat, **8** kode lama tersisa (sengaja), rujukan menggantung hanya `#N/A`.
+
+## Yang sengaja TIDAK diselaraskan
+
+8 kode ini namanya tak cocok persis dan **butuh konfirmasi orang gudang** — jangan ditebak, fuzzy match pernah memilih **"PLASTIK SHRINK 19 CM" untuk "PLASTIK SRING 9 CM"** dan **20 CM untuk 10/12 CM**:
+
+| Kode lama | Nama | Kendala |
+|---|---|---|
+| `SLG` | SILICA GEL | Accurate salah ketik: `PP-036 SILLICA GEL` |
+| `PS SRK 7/8/9/10/12 CM` | PLASTIK SRING … | Accurate punya varian ukuran+merek (`PP-021`…`PP-039`), tak terputuskan otomatis |
+| `RF150` | BOTOL VIVIDENT (150 ML) | tak ada di Accurate |
+| `TEST-01` | Barang TESTING | data testing |
+
+Setelah dikonfirmasi, cukup tambahkan kode lama ke `aliases` baris kanoniknya (atau betulkan namanya agar cocok), lalu jalankan ulang align.
+
+## Dokumen Terkait
+
+- [[Microservices - Manufacture Service]] · [[API - Manufacture Service]] · [[Manufacture - Stock & Material Management]]
+- [[External - Accurate]] · [[RUN - Accurate API Access Token (OAuth)]] · [[ADR - 0001 Akuntansi via Accurate]]
