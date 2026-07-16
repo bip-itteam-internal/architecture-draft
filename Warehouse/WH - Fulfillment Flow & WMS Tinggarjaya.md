@@ -80,8 +80,10 @@ Jalur cepat (utama — alur real gudang, 100+ resi/hari):
 NEW → APPROVED → RTS_OK → LABEL_PRINTED → HANDED_OVER
               ↘ RTS_FAILED (retryable → RTS_OK)
 
-Jalur scan (opsional — verifikasi barang per order):
+Jalur scan (opsional — endpoint pick/pack tetap ada, UI scan sudah dihilangkan):
 NEW → APPROVED → PICKING → PACKED → RTS_OK → LABEL_PRINTED → HANDED_OVER
+                        ↘ (PICKING boleh langsung → RTS_OK — order lama di
+                           tahap scan tidak terdampar)
                                   ↘ RTS_FAILED (retryable → RTS_OK)
 
 NEW / APPROVED → HELD (tahan manual, mencurigakan)
@@ -102,16 +104,27 @@ yang transisi LABEL_PRINTED. Jalur scan juga bisa mengisinya saat pack
 (opsional); label tidak menimpa kode yang sudah ada. Muncul di kolom
 "Kode Packer" file export — untuk evaluasi salah kirim/qty kurang per tim.
 
+**Riwayat cetak resi**: menu "Riwayat Cetak Resi" (`GET /fulfillment/labels/history`)
+merekam per order: waktu cetak, siapa yang cetak, tim packer, cetak ulang
+(history note `"cetak ulang resi"`), serah kurir, dan selisih cetak→serah.
+Untuk diagnosis pesanan terlambat: belum dicetak = bottleneck gudang; dicetak
+tapi `handed_over_at` kosong = paket tidak ikut pickup kurir.
+
 #### Alur Operasional (jalur cepat — utama)
 
+Menu FE (bahasa baku): Antrian Pesanan · Pengambilan Barang · Pengemasan ·
+Atur Pengiriman · Cetak Resi · Riwayat Cetak Resi · Serah Terima Kurir ·
+Master Produk. UI scan barcode dihilangkan (terlalu lambat untuk 100+
+resi/hari — keputusan tim gudang); endpoint pick/pack tetap ada.
+
 ```
-[1. APPROVE — batch]
+[1. APPROVE — batch]  (menu Antrian Pesanan)
 Admin Gudang / Leader / SPV centang N order NEW
 POST /fulfillment/approve → status: APPROVED
 Order mencurigakan → HELD
         │
         ▼
-[2. UNDUH DATA PESANAN — gerbang rekon]
+[2. UNDUH DATA PESANAN — gerbang rekon]  (menu Antrian Pesanan / Pengambilan Barang)
 GET /fulfillment/queue/export?status=APPROVED&only_new=true
 → xlsx rekap (1 baris per item: nomor pesanan, tanggal, SKU, nama barang,
   qty, toko, expedisi, kode packer, keterangan)
@@ -119,13 +132,17 @@ GET /fulfillment/queue/export?status=APPROVED&only_new=true
 Badge FE tab Disetujui: "Sudah Ditarik" / "Belum Ditarik"
         │
         ▼
-[3. RTS + CETAK RESI]
-POST /fulfillment/rts (hanya order exported) → RTS_OK + AWB
-POST /fulfillment/labels {packer_code: "T1"} → LABEL_PRINTED
-Packer tinggal tempel resi ke paket sesuai rekap
+[3. PENGEMASAN — CETAK RESI satu klik]  (menu Pengemasan)
+Ceklis pesanan (pilih semua) + pilih Tim Packer (T1/T2) → klik "Cetak Resi"
+FE otomatis dua langkah:
+  POST /fulfillment/rts (untuk yang belum RTS; hanya order exported) → RTS_OK + AWB
+  POST /fulfillment/labels {packer_code} → LABEL_PRINTED + resi terbuka
+Panel "Hasil Proses Terakhir" bertahan setelah refetch (Buka Resi / Coba Lagi)
+Packer tempel resi ke paket sesuai rekap
         │
         ▼
-[4. SERAH KURIR] → HANDED_OVER
+[4. SERAH KURIR]  (menu Serah Terima Kurir) → HANDED_OVER
+Audit: menu Riwayat Cetak Resi
 ```
 
 #### Alur Operasional (jalur scan — opsional)
@@ -281,7 +298,8 @@ warehouse_db (MongoDB, pola standar bip-erp)
 | POST | `/fulfillment/pick` | Konfirmasi picking per order |
 | POST | `/fulfillment/pack` | Verifikasi scan barcode SKU + qty → PACKED (+ `packer_code` opsional) |
 | POST | `/fulfillment/rts` | RTS batch (gerbang: hanya order ter-export) → proxy integration ship-batch |
-| POST | `/fulfillment/labels` | Cetak label + cap `packer_code` batch → proxy integration labels |
+| POST | `/fulfillment/labels` | Cetak label + cap `packer_code` batch → proxy integration labels; reprint tercatat |
+| GET | `/fulfillment/labels/history` | Riwayat resi tercetak — audit keterlambatan per order |
 | POST | `/fulfillment/handover` | Konfirmasi serah kurir → HANDED_OVER |
 | GET | `/fulfillment/dashboard` | Kartu antrian, resi keluar, cancel, RTS gagal |
 | CRUD | `/wms/products` + `/wms/products/import` | Master SKU + lokasi rak + import xlsx |

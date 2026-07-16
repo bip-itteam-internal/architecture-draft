@@ -54,7 +54,8 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 | POST | `/fulfillment/pick` | admin_gudang, leader, spv | Batch konfirmasi picking → PICKING |
 | POST | `/fulfillment/pack` | admin_gudang, leader, spv | Verifikasi scan SKU+qty per order → PACKED |
 | POST | `/fulfillment/rts` | admin_gudang, leader, spv | Batch RTS → proxy integration ship-batch |
-| POST | `/fulfillment/labels` | admin_gudang, leader, spv | Proxy integration labels → LABEL_PRINTED |
+| POST | `/fulfillment/labels` | admin_gudang, leader, spv | Proxy integration labels → LABEL_PRINTED; reprint dicatat di history |
+| GET | `/fulfillment/labels/history` | admin_gudang, leader, spv, admin_qc | Riwayat resi tercetak — audit keterlambatan (dicetak siapa/kapan, cetak ulang, serah kurir) |
 | POST | `/fulfillment/handover` | admin_gudang, leader, spv | Konfirmasi serah-terima kurir → HANDED_OVER |
 | GET | `/fulfillment/dashboard` | admin_gudang, leader, spv, admin_qc | Aggregate count per status_wms |
 
@@ -111,7 +112,7 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 { "error": "data pesanan belum ditarik — unduh data pesanan masuk dulu sebelum RTS/cetak resi", "not_exported": ["ORDER_A"] }
 ```
 - **Gerbang rekon**: order dengan `exported_at` kosong ditolak — wajib unduh via `/queue/export` dulu
-- Transisi valid: APPROVED → RTS_OK (jalur cepat tanpa scan) atau PACKED → RTS_OK (jalur scan); RTS_FAILED → RTS_OK (retry)
+- Transisi valid: APPROVED/PICKING → RTS_OK (jalur cepat tanpa scan; PICKING ikut agar order lama di tahap scan tidak terdampar) atau PACKED → RTS_OK (jalur scan); RTS_FAILED → RTS_OK (retry)
 - `502`: integration service tidak bisa dihubungi
 
 **`POST /fulfillment/labels`**:
@@ -124,6 +125,27 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 - Label status: `READY` | `PROCESSING` (Shopee async, FE harus retry) | `FAILED`
 - Jika response integration 200 OK → order yang bisa transisi diupdate ke `LABEL_PRINTED`
 - `packer_code` tidak menimpa kode yang sudah ada dari scan packing
+- Order yang sudah `LABEL_PRINTED` → dicatat entry history `note: "cetak ulang resi"` (untuk kolom Cetak Ulang di riwayat)
+- ⚠️ Penandaan LABEL_PRINTED bersifat per-batch (integration 200 OK), bukan per hasil order — order Shopee yang masih `PROCESSING` ikut tertandai
+
+**`GET /fulfillment/labels/history`** — riwayat resi tercetak untuk audit keterlambatan:
+- Query: `q=` (regex order_id/awb), `date_from=`/`date_to=` (WIB `2006-01-02`, pada `label_printed_at`), `page`/`limit` (default 50, max 200)
+- Sort `label_printed_at DESC`. Hanya order yang `label_printed_at`-nya terisi.
+```json
+// Response 200
+{
+  "data": [{
+    "order_id": "...", "channel": "tiktok", "shop_name": "...",
+    "awb": "JNE123", "packer_code": "T1", "status_wms": "LABEL_PRINTED",
+    "label_printed_at": "...", "printed_by": "EMP-001",
+    "reprint_count": 1, "last_reprint_at": "...",
+    "handed_over_at": null
+  }],
+  "total": 120, "page": 1, "limit": 50
+}
+```
+- `printed_by` diambil dari history entry pertama dengan `to: LABEL_PRINTED` tanpa note; `reprint_count` dari entry `note: "cetak ulang resi"`
+- Interpretasi audit: `handed_over_at` kosong = resi dicetak tapi paket belum diserahkan ke kurir
 
 **`GET /fulfillment/queue/counts`**:
 ```json

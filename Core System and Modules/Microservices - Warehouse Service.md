@@ -31,7 +31,8 @@ Role guard via `system_roles["warehouse"]` (header `BIP-System-Roles` dari gatew
 - **`POST /fulfillment/pick`** — batch konfirmasi picking `order_ids[]`; APPROVED → PICKING. Catat `picked_by/at`.
 - **`POST /fulfillment/pack`** — verifikasi scan barcode `scanned_items[]` vs `order.Items` (SKU+qty harus cocok persis); PICKING → PACKED. Catat `packed_by/at` + `packer_code` opsional (kode tim harian T1/T2). Mismatch → HTTP 422 + detail.
 - **`POST /fulfillment/rts`** — batch RTS; proxy ke integration `POST /fulfillment/ship-batch`. **Gerbang rekon**: order dengan `exported_at` kosong ditolak (422 + `not_exported[]` bila semua tertolak). Transisi dari APPROVED (jalur cepat) atau PACKED (jalur scan). Partial result per order: sukses → RTS_OK + AWB; gagal → RTS_FAILED + `rts_error`. Role: admin_gudang, leader, spv.
-- **`POST /fulfillment/labels`** — proxy ke integration `POST /fulfillment/labels`; jika integration 200 OK, update order yang bisa → LABEL_PRINTED + `label_printed_at` + cap `packer_code` batch (tidak menimpa kode dari scan packing). Shopee bersifat async (PROCESSING → FE retry).
+- **`POST /fulfillment/labels`** — proxy ke integration `POST /fulfillment/labels`; jika integration 200 OK, update order yang bisa → LABEL_PRINTED + `label_printed_at` + cap `packer_code` batch (tidak menimpa kode dari scan packing). Order yang sudah LABEL_PRINTED dicatat history `"cetak ulang resi"`. Shopee bersifat async (PROCESSING → FE retry).
+- **`GET /fulfillment/labels/history`** — riwayat resi tercetak (audit keterlambatan): `printed_by`/`reprint_count` diturunkan dari `history[]`, plus `handed_over_at` untuk deteksi "dicetak tapi belum diserahkan kurir". Filter `q` (order_id/awb), `date_from`/`date_to` WIB, pagination. Role: admin_gudang, leader, spv, admin_qc.
 - **`POST /fulfillment/handover`** — konfirmasi serah-terima ke kurir; LABEL_PRINTED → HANDED_OVER. Catat `handed_over_at`. Pola sama dengan approve/pick (batch, non-all-or-nothing, `{transitioned, skipped, failed}`). Role: admin_gudang, leader, spv.
 - **`GET /fulfillment/dashboard`** — MongoDB `$group by status_wms + $sum 1`; kembalikan `{data:[{status,count}], counts:{STATUS:N}}`. Role: admin_gudang, leader, spv, admin_qc.
 
@@ -48,7 +49,9 @@ Role guard via `system_roles["warehouse"]` (header `BIP-System-Roles` dari gatew
 ```
 Jalur cepat (utama):  NEW → APPROVED → RTS_OK → LABEL_PRINTED → HANDED_OVER
 Jalur scan (opsional): NEW → APPROVED → PICKING → PACKED → RTS_OK → ...
-                                    APPROVED/PACKED ↘ RTS_FAILED → RTS_OK (retry)
+                       (PICKING juga boleh langsung → RTS_OK — order lama di
+                        tahap scan tidak terdampar saat UI scan dihilangkan)
+                                    APPROVED/PICKING/PACKED ↘ RTS_FAILED → RTS_OK (retry)
 NEW / APPROVED → HELD → APPROVED / CANCELLED
 semua status pra-HANDED_OVER → CANCELLED
 ```
@@ -69,6 +72,8 @@ diambil per batch sebelum cetak resi). Detail alur: [[WH - Fulfillment Flow & WM
 ## Belum Diimplementasikan / Catatan (TBD)
 
 - Label Shopee bersifat async 3-langkah (create → poll → download) — FE harus retry order yang masih PROCESSING.
+- ⚠️ Penandaan LABEL_PRINTED (dan log reprint) bersifat per-batch integration 200 OK, bukan per hasil order — order Shopee yang masih PROCESSING ikut tertandai printed. Perbaikan: parse hasil per order sebelum menandai.
+- Cetak ulang setelah HANDED_OVER tidak dicatat di history (hanya saat masih LABEL_PRINTED).
 - Order APPROVED yang sudah ada sebelum deploy gerbang rekon belum punya `exported_at` — perlu sekali "Unduh Semua" agar tertandai dan bisa diproses RTS.
 - Deploy backend + frontend harus serentak: gate 422 dan `packer_code` saling bergantung antara service dan UI.
 - `POST /fulfillment/labels` menggunakan POST (bukan GET) karena TikTok memerlukan `package_id` per order yang tidak bisa di-derive dari `order_id` saja.
