@@ -2,7 +2,7 @@
 
 *Endpoint **recruitment-service** (ATS Fase 1-3 + adopsi struktur ERPGo Fase A–E + portal karir publik). Gateway: `/api/recruitment/*` (auth) & `/public/recruitment/*` (publik, tanpa JWT). RBAC `system_roles["hris"]`. Grounded ke `services/recruitment/routes.go` (branch `main`).*
 
-- **Implementasi**: [[Microservices - Recruitment Service]] · **Status**: ⚠️ BE Fase 1-3 + master/form-builder ERPGo (A–E) + portal publik (browse/apply/track) — **sudah di `main`**; sebagian increment terbaru masih **menunggu deploy manual** (lihat catatan di §Publik)
+- **Implementasi**: [[Microservices - Recruitment Service]] · **Status**: ⚠️ BE Fase 1-3 + master/form-builder ERPGo (A–F) + portal publik (browse/apply/track) + requisition se-departemen — **semua increment 2026-07-16 sudah deployed & terverifikasi live di dev**
 - **Konsumen publik**: [[APP - Portal Karir Bharata]]
 - **Indeks**: [[API - Index]] · Role: `isSupervisor` (ajukan), `isHR`/`isHRSupervisor` (kelola/review), `isApprover` (Direktur/Secretary).
 
@@ -14,9 +14,9 @@
 ## Job Requisition
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
-| POST | `/requisitions` | Ajukan permintaan posisi | supervisor |
-| GET | `/requisitions` · `/requisitions/:id` | List (HR semua / pengaju sendiri) / detail | auth |
-| PUT | `/requisitions/:id` | Edit (saat Submitted/Revision) | pengaju |
+| POST | `/requisitions` | Ajukan permintaan posisi. **`department` diambil dari identitas pengaju, bukan body** (anti-spoof, PR #478) | supervisor |
+| GET | `/requisitions` · `/requisitions/:id` | List (HR semua / pengaju sendiri) / detail. **`?scope=department`** → SPV lihat requisition **se-departemen** (departemen dari identitas gateway; detail juga izinkan SPV se-departemen) — PR #470 | auth |
+| PUT | `/requisitions/:id` | Edit (saat Submitted/Revision). Departemen **dipertahankan** (edit tak memindahkan requisition) | pengaju |
 | POST | `/requisitions/:id/resubmit` | Kirim ulang setelah revisi | pengaju |
 | POST | `/requisitions/:id/hr-review` | Review kualifikasi (approve/revision) | HR supervisor |
 | POST | `/requisitions/:id/director-approve` | Persetujuan final | approver |
@@ -72,7 +72,7 @@
 
 > **Catatan kontrak `/apply`:** `posisi_dilamar` **wajib** dan **tidak** diisi server dari posting — divalidasi lebih dulu, jadi klien harus mengirimnya walau sudah kirim `posting_id`. `tanggal_lahir` = **RFC3339** (samakan dengan model employee agar mapping saat hire tidak perlu isi ulang — lihat [[HRIS - Recruitment]]). Upload berkas **backward-compatible**: body JSON tanpa file tetap diterima; berkas non-PDF / >10 MB → 400.
 
-> **Catatan deploy (per 2026-07-16):** `slug` **sudah live** di dev. **`job_type` (resolve master)** dan **upload `berkas`** sudah di `main` tetapi **belum ter-deploy** — deploy bip-erp **manual** (lihat [[Microservices - Recruitment Service]]).
+> **Catatan deploy (per 2026-07-16):** `slug`, `job_type` (resolve master), dan upload `berkas` **semua sudah live & terverifikasi** di dev (E2E multipart+berkas → `cv_object` → HR preview PDF valid). Deploy bip-erp **manual** (lihat [[Microservices - Recruitment Service]]).
 
 ## Dokumen Terkait
 - [[Microservices - Recruitment Service]] · [[HRIS - Recruitment]] · [[Microservices - Employee Service]] · [[CORE - API Master Gateway]] · [[API - Index]]
