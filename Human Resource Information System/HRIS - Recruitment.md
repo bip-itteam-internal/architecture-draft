@@ -2,7 +2,7 @@
 
 *Desain (to-be) subsistem **Recruitment** — mengelola **siklus depan karyawan**: dari kebutuhan posisi sampai jadi karyawan aktif. Memisahkan subsistem **Talent acquisition → Interview → On-boarding** yang sekarang menumpuk di [[HRIS - Analysis]] ke ruangnya sendiri.*
 
-- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–E) sudah live di [[Microservices - Recruitment Service]]; FE + Fase 4-5 (AI screening / psikotes online / portal publik) menyusul
+- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas + cek status). Menyusul: AI CV screening, psikotes online, WhatsApp kandidat, integrasi job board
 - **Target arsitektur**: microservice `recruitment-service` baru ([[Microservices - Recruitment Service]]) + modul web, dengan **rollout bertahap**
 - Titik singgung yang sudah ada di kode: `POST /onboarding/register` (aktivasi akun karyawan baru) di [[Microservices - Employee Service]] — menjadi handoff akhir recruitment
 
@@ -104,13 +104,13 @@
 - **Integrasi**:
   - [[Microservices - Employee Service]] — master data posisi/departemen (`PositionTitle*`), cek duplikasi, **handoff `/onboarding/register`** saat hire
   - [[Microservices - Notification Service]] — notifikasi **internal** (approval requisition / jadwal / offer) via FCM + inbox
-  - **Notifikasi kandidat (eksternal)** — **Email** sebagai kanal utama fase awal; ⚠️ **fitur email belum ada di sistem → prasyarat dibangun dulu**; **WhatsApp menyusul** (WA otomatis saat ini memakai satu nomor IT — lihat catatan teknis)
+  - **Notifikasi kandidat (eksternal)** — **Email** kanal utama: ✅ **sudah jalan** (channel Resend di [[Microservices - Notification Service]], **terverifikasi live** 2026-07-16) — email "lamaran diterima" otomatis saat melamar + email penawaran + lampiran PDF saat offer letter diunggah. Nama pengirim di inbox kandidat diatur per-service via env `RECRUITMENT_EMAIL_FROM` ("Bharata Recruitment"). **WhatsApp menyusul** (WA otomatis saat ini memakai satu nomor IT — lihat catatan teknis)
   - [[Microservices - File Service]] — penyimpanan CV/dokumen pelamar + **report PDF psikotes** (MinIO)
   - [[CORE - OCR Document Service]] — OCR CV hasil scan (untuk AI screening fase lanjut)
   - **LLM (OpenRouter)** — **AI CV screening (fase lanjut)**; reuse infra LLM yang dipakai Ideamills ([[Sales - Veo (Gemini) Implementation]])
   - **Psikotes** — modul di `recruitment-service`; mode **manual (dilaksanakan staf HR)** cukup catat hasil + lampiran via [[Microservices - File Service]], mode **online** butuh **test-engine + bank soal (TBD / fase lanjut)**; undangan jadwal via [[Microservices - Notification Service]]
   - **Glints (TapLoker)** — ATS/job-portal eksternal yang dipakai aktif (sumber pelamar utama). Pemetaan stage Glints → pipeline kita: *Chat Dimulai/Terhubung* → Screening · *Skill & Psikotes* → Technical Test (skill) + Psikotes (kita pisahkan) · *Wawancara* → Interview · *Negosiasi* → Offer · *Direkrut* → Hired · *Belum Sesuai* → Rejected. ⚠️ **Beda urutan**: Glints menaruh **Skill & Psikotes sebelum Wawancara**, sedangkan proses internal kita **psikotes setelah interview** (keputusan HRD) — perlu disadari saat memetakan dari Glints. Komunikasi kandidat saat ini lewat **chat/WA Glints**. Relasi `recruitment-service` ↔ Glints (impor/sinkron vs menggantikan) = **TBD strategis**
-- **UI**: modul **Recruitment** di [[APP - Web ERP]] (HR & SPV) + **portal lowongan publik** untuk pelamar (self-apply + upload CV — fase lanjut)
+- **UI**: modul **Recruitment** di [[APP - Web ERP]] (HR & SPV) + **portal karir publik** untuk pelamar ✅ [[APP - Portal Karir Bharata]] — lihat lowongan, **melamar sendiri** (field native `candidate` + **satu berkas PDF gabungan maks 10 MB**), dan **cek status** via `tracking_token`. Menggantikan alur **Google Form** lama (lamaran langsung masuk pipeline, HR tak lagi memindahkan data manual)
 
 ## Keputusan (sudah disepakati HRD)
 
@@ -151,7 +151,7 @@
 - Di tahap mana saja kandidat dikabari? Yang **ditolak** dikabari (bahasa halus) atau tidak?
 - Tampil **atas nama siapa** (HRD/perusahaan)? Dikirim **otomatis sistem** atau manual petugas?
 
-> **Catatan teknis (belum mengikat):** fitur **email belum tersedia** di sistem → harus dibangun bila jadi kanal utama. Pengiriman WhatsApp otomatis saat ini memakai **satu nomor milik IT** (bukan nomor resmi HRD).
+> **Catatan teknis:** fitur **email sudah tersedia & terpakai** (Resend via [[Microservices - Notification Service]], terverifikasi live 2026-07-16). Pengiriman WhatsApp otomatis saat ini masih memakai **satu nomor milik IT** (bukan nomor resmi HRD).
 
 ## Rollout Bertahap
 
@@ -159,14 +159,16 @@
 - [x] **Fase 2** — Sourcing & Job Posting + **Screening manual** + **Interview** (multi-tahap) + **Psikotes (manual oleh HR)** — ✅ BE
 - [x] **Fase 3** — Offer & Decision + **Onboarding handoff** (`/onboarding/register`) + **Notifikasi kandidat via Email** (Resend) — ✅ BE
 - [x] **Fase A–E (adopsi ERPGo)** — master (job_type/candidate_source/interview_type/job_location) + form builder (custom_question) + enrich job_posting & candidate — ✅ BE (2026-07-03)
+- [x] **Portal karir publik** — [[APP - Portal Karir Bharata]]: browse lowongan (URL `slug`) → detail → **self-apply** (field native `candidate` + **berkas PDF gabungan maks 10 MB** → MinIO) → **cek status** via `tracking_token`; + email otomatis "lamaran diterima". ✅ BE (2026-07-16) & FE jalan terhadap dev — ⚠️ **belum go-live** (belum ada domain/deploy; sebagian menunggu deploy manual BE)
 - [ ] **Fase 4 (enhancement)** — **AI CV screening** (skor & rekomendasi, HR putuskan) + **WhatsApp** notifikasi kandidat
-- [ ] **Fase 5 (opsional)** — **portal self-apply publik** + **psikotes online** (test-engine + bank soal) + integrasi job board (mis. JobStreet)
-- [ ] **Fase F–I (adopsi ERPGo lanjut)** — interview rounds+feedback, onboarding checklist, offer letter template, career/recruitment settings
+- [ ] **Fase 5 (opsional, sisa)** — **psikotes online** (test-engine + bank soal) + integrasi job board (mis. JobStreet)
+- [ ] **Fase F–I (adopsi ERPGo lanjut)** — [x] interview rounds+feedback (✅ BE); [ ] onboarding checklist, offer letter template, career/recruitment settings
 
 ## Belum Diputuskan (TBD)
 
-- **Strategi Glints** — `recruitment-service` mengimpor/sinkron dari Glints vs menggantikannya (Glints kini ATS eksternal utama).
-- **Infra Email** — kemampuan kirim email **belum ada di sistem**, perlu dibangun (prasyarat notifikasi kandidat fase awal).
+- **Strategi Glints** — `recruitment-service` mengimpor/sinkron dari Glints vs menggantikannya (Glints kini ATS eksternal utama); kini bertambah pertanyaan: posisi Glints vs **portal karir sendiri** ([[APP - Portal Karir Bharata]]) sebagai kanal utama.
+- **Mapping hire → data karyawan** — field lamaran sudah **selaras model employee** (`tanggal_lahir` RFC3339; nilai `jenis_kelamin` identik), tapi `hire` saat ini hanya **mengaktifkan akun** (`/onboarding/register`); pembuatan data master karyawan dari data kandidat belum dibangun.
+- **Sumber lowongan ganda** — situs korporat ([[APP - Website Bharata Internasional]]) punya halaman karir dengan BE sendiri; perlu diputuskan apakah diarahkan ke portal karir agar tak ada dua sumber lowongan.
 - **Psikotes**: mode (online vs manual oleh HR), jenis tes & tools (kemampuan/kepribadian), ambang skor & bobot terhadap keputusan.
 - **AI CV screening (fase lanjut)**: model LLM yang dipakai & penanganan CV hasil scan (OCR).
 - **Offer letter**: template & approver.
@@ -175,7 +177,8 @@
 
 - [[HRIS - Analysis]] — sumber subsistem talent acquisition/interview/onboarding yang dipisah ke sini
 - [[HRIS - Personalia]] · [[HRIS - Big Pictures]]
-- [[Microservices - Recruitment Service]] — sisi implementasi service (rancangan)
+- [[Microservices - Recruitment Service]] — sisi implementasi service · [[API - Recruitment Service]] — endpoint
+- [[APP - Portal Karir Bharata]] — portal karir publik untuk pelamar
 - [[Microservices - Employee Service]] — onboarding/register & master data
 - [[Microservices - Notification Service]] · [[Microservices - File Service]]
 - [[APP - Web ERP]]
