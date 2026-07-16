@@ -73,12 +73,12 @@
 | PUT | `/candidates/:id/onboarding/items/:itemId` | Tandai item selesai/belum `{done}`; `completed_at` saat semua item **wajib** selesai | HR |
 
 ## Performance Review Onboarding (⚠️ PR #493/#349 — belum merged/deploy)
-> Digitalisasi Form Review Performance Masa Evaluasi (dulu Google Form). Peserta = kandidat Hired; penilai = karyawan mana pun (identitas SSO). Kriteria 7+3 **konstanta** (purpose-built, bukan form builder).
+> Digitalisasi Form Review Performance Masa Evaluasi (dulu Google Form). Peserta = **karyawan masa evaluasi** (`employment_type` "PKWT (Evaluasi)"); penilai = karyawan mana pun (identitas SSO). Peserta tak boleh menilai dirinya sendiri. Kriteria 7+3 **konstanta** (purpose-built, bukan form builder).
 
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
-| POST | `/onboarding-reviews` | HR buat sesi `{candidate_id, scheduled_at, location, reviewers[]}` → undang penilai (inbox + email best-effort) | HR |
-| GET | `/onboarding-reviews` | Daftar sesi (`?status=&candidate_id=`) | HR |
+| POST | `/onboarding-reviews` | HR buat sesi `{employee_id, peserta_name, peserta_position, peserta_department, scheduled_at, location, reviewers[]}` (peserta = karyawan masa evaluasi; peserta di-skip bila ikut `reviewers[]`) → undang penilai (inbox + email best-effort) | HR |
+| GET | `/onboarding-reviews` | Daftar sesi (`?status=&employee_id=`) | HR |
 | GET | `/onboarding-reviews/:id` | Detail + **rekap** (semua jawaban penilai) | HR |
 | PUT | `/onboarding-reviews/:id/decide` | Keputusan `{outcome, note}` — outcome `Lulus`/`Diperpanjang`/`Tidak Lulus` → status `Decided` | HR |
 | GET | `/onboarding-reviews/assigned` | Sesi yang ditugaskan ke saya (+ jawaban saya) | auth (penilai) |
