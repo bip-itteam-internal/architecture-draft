@@ -17,10 +17,14 @@ Pergerakan WMS didorong ke Accurate sebagai **dokumen Penyesuaian Persediaan har
 |---|---|---|
 | Keluar FG marketplace (F4) | `marketplaceSalesDetection` | ❌ — tercakup Sales Invoice |
 | Return ekspedisi (F3) | `namaMarket` | ❌ — tercakup Sales Return |
-| Kirim Produk (transfer keluar) | `driver` | ❌ — net antar gudang nol |
-| Input Gudang FG (transfer masuk) | `gudangSimpan` | ❌ — pasangan di atas |
+| **Barang Masuk Harian dari supplier** | `tanggalSj`/`qtySj` | ❌ — tercakup **Faktur Pembelian** finance (tangkapan user 17 Juli) |
+| Kirim Produk (produksi → gudang FG) | `driver` | ❌ — menunggu titik pengakuan |
+| Hasil produksi (Laporan Hasil Produksi / order produksi) | kode PRODUK JADI + `grupDokumen`/`PROD-*`/"produksi hasil" | ❌ — **stok FG diakui saat Input Gudang FG** (gudang memverifikasi barang sampai; keputusan user 17 Juli) |
+| **Input Gudang FG** | `gudangSimpan` | ✅ — **titik pengakuan barang jadi** (ADJUSTMENT_IN) |
 | Saldo OPENING era import | `ref: OPENING` | ❌ — baseline |
-| Konsumsi bahan produksi, hasil produksi, masuk-kembali, koreksi proposal, transaksi manual | (sisanya) | ✅ |
+| Konsumsi bahan produksi, masuk-kembali sisa, koreksi proposal, transaksi manual | (sisanya) | ✅ |
+
+Rantai produksi barang jadi: hasil produksi (IN, skip) → Kirim Produk (OUT, skip) → Input Gudang FG (IN, **push**) — net di Accurate: +qty saat barang **diterima gudang**, bukan saat dilaporkan produksi. Catatan pengawasan: bila kelak ada penerimaan `gudangSimpan` yang BUKAN kiriman produksi (mis. titipan pihak luar ke Sadewa), aturan ini perlu ditinjau.
 
 Mekanisme (`services/manufacture/accurate_push.go` + integration `POST /accurate/wms-adjustment`):
 - **Pemindai watermark** atas ledger `manufacture_transaksi` — bukan hook per-form (kebal rollback transaksi Mongo, otomatis mencakup jalur tulis baru). Watermark perdana = saat pertama dipindai → **sejarah lama tak pernah ikut terdorong**.
