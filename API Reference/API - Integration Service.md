@@ -19,10 +19,17 @@
 | GET | `/transactions/orders/export` | Export daftar order (Order Management) ke **.xlsx**, 1 baris per item. Filter identik `/orders/list`: `channel`, `status`, `canceled_by`, `time_from`, `time_to`, `shop_id`, `order_id`. Tanpa paginasi (cap 10.000 order, `order_date` desc). Nama file (`Content-Disposition`) mencerminkan filter aktif (channel/shop/rentang tanggal `DD-MM-YYYY_sd_DD-MM-YYYY`) |
 | GET | `/transactions/orders/summary/comparison` | Perbandingan performa 2 periode kustom: 4 metrik (TO_SHIP revenue, COMPLETED revenue, COMPLETED qty produk, COMPLETED order count) + granularity hourly/daily. Param: `start_date`, `end_date`, `comparison_start`, `comparison_end` (YYYY-MM-DD; default today vs yesterday), `channel` (opsional), `shop_id`, `timezone` |
 | GET | `/transactions/orders/dashboard/summary` | Jumlah order aktif saat ini (tanpa filter tanggal) per kategori kartu dashboard: `pesanan_baru` (TO_PROCESS), `siap_dikirim` (TO_SHIP), `belum_di_proses` (TO_PROCESS+TO_SHIP), `pesanan_selesai` (COMPLETED). Param: `channel` (opsional), `shop_id` (opsional) |
-| GET | `/transactions/master/shops` · `/channels` · `/status` | Master shop/channel/status |
+| GET | `/transactions/returns` | **Feed retur lintas-channel** (Shopee **+** TikTok) untuk WMS gudang — satu baris per **event retur** (`return_sn`), bukan per order. Sumber: sub-dokumen `return` di `transaction_orders` (terisi untuk kedua channel). Param: `channel`, `shop_id`, `order_id`, `page`, `limit` (default 50, maks 500). Balasan tiap baris: `dedupe_key` (kunci join ke record gudang: `return_sn`, fallback `order_id`), `goods_returning` (terjemahan `solution`: false = refund-only, barang tak balik), `partial`, `status` retur vs `order_status`, `items[]` + `items_available`. Konsumen: [[API - Manufacture Service]] `GET /returns` |
 | GET/POST | `/transactions/summary/reports` (+ `/:id`, `/:id/items`, `/:id/invoices`, `/group-by-status`) | Laporan ringkasan (generate/list/detail) |
 | POST | `/transactions/summary/reports/:id/retry` · `/send/:service` · DELETE `/:id` | Retry/kirim/hapus laporan |
 | GET | `/transactions/insight/demography` | Insight demografi |
+
+> **Kenapa `/transactions/returns` ada, padahal sudah ada endpoint retur lain** — tiga hal yang mudah salah dipakai:
+> - **Seleksinya keberadaan sub-dok `return`, BUKAN `status=RETURNED`.** [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] membuktikan 39% retur penuh tetap `COMPLETED` dan flip ke `RETURNED` tak deterministik → memfilter pakai status menyembunyikan mayoritas retur parsial.
+> - **Bukan `/shopee/returns/list`** (Shopee-only): TikTok tak punya koleksi retur tersendiri — datanya masuk ke `transaction_orders.return` via `FetchAndSetTikTokReturn`, sedangkan `webhook_logs` TikTok (type 12) hanya membawa `order_id`+`return_status`, tanpa SKU/qty. Memakai endpoint Shopee untuk daftar lintas-channel = retur TikTok hilang diam-diam.
+> - **Bukan `/accurate/daily-returns`**: barisnya hanya terbentuk untuk kebutuhan booking Accurate, jadi bukan cerminan semua retur.
+>
+> `items_available=false` berarti marketplace **tidak memberi rincian** item retur — **bukan** berarti tak ada barang. Item sengaja **tidak** disalin dari item order: itu akan mengklaim seluruh isi order kembali padahal tak diketahui, dan angkanya dipakai admin gudang menggerakkan stok.
 
 ## TikTok Shop
 | Method | Path | Fungsi |
