@@ -97,7 +97,7 @@
 - `job_location` — master lokasi kerja (name, remote_work, alamat, city/state/country/postal_code, status); dipakai dropdown Location di `job_posting`
 - `onboarding_checklist` + `checklist_item` — **template** checklist onboarding (task_name, category, assigned_to_role, due_day, is_required). **Instansiasi per-kandidat ✅ (⚠️ #492):** `onboarding_progress` (1/kandidat Hired; item = snapshot dari template + status `done`)
 - `onboarding_review` + `onboarding_review_response` (⚠️ #493) — sesi **Performance Review Onboarding** (masa evaluasi): peserta (**karyawan masa evaluasi**, `employment_type` "PKWT (Evaluasi)"), jadwal, penilai, 7 rating + 3 uraian per penilai, keputusan status
-- `job_posting` **diperkaya**: job_type/location/branch, number_of_positions, priority, min/max experience & salary, application_deadline, is_featured, toggle ask_*/show_*, required_skills, description/requirements/benefits/terms_condition (HTML)
+- `job_posting` **diperkaya**: job_type/location/branch, number_of_positions, priority, min/max experience & salary, application_deadline, is_featured, toggle show_* (profile/resume/cover), required_skills, description/requirements/benefits/terms_condition (HTML). *(Toggle `ask_gender`/`ask_date_of_birth` dibuang #503/#358 — jenis_kelamin & tanggal_lahir kini SELALU wajib pelamar.)*
 - `candidate` **diperkaya**: source_id, country, profile_image/cover_letter (MinIO), expected/current_salary, notice_period, portfolio_url, linkedin_url, education, **`employee_id`** (terisi saat kandidat Hired dikonversi jadi karyawan)
 
 > **Custom Questions (form builder) dihapus** #486/#342 (2026-07-16): `custom_question` + `application_questions`/`custom_answers` tak ada lagi — portal karir memakai field native `candidate`.
