@@ -54,7 +54,11 @@
 |---|---|---|---|
 | POST/GET | `/postings/:id/rounds` | Definisi/daftar babak interview per lowongan | HR |
 | PUT/DELETE | `/rounds/:id` | Ubah / hapus babak | HR |
-| POST/GET | `/interviews/:id/feedback` | Kirim/lihat penilaian terstruktur (rating 1-5 + recommendation) | HR |
+| GET | `/interviews/assigned` | Sesi interview yang menugaskan saya sebagai pewawancara (+ nama/posisi kandidat + jawaban saya) — sisi **"Interview Saya"** | auth |
+| POST | `/interviews/:id/feedback` | Kirim/**ubah** penilaian (rating 1-5 + recommendation). **Upsert** per (interview, pewawancara) → tak dobel. Boleh **pewawancara sesi ATAU HR** | auth |
+| GET | `/interviews/:id/feedback` | Lihat semua feedback (rekap panel) | HR |
+
+> **Interview orchestration (#498/#356, 2026-07-17):** `POST /candidates/:id/interviews` menerima **`round_id`** (tautkan sesi ke babak per-lowongan) & mengirim **notifikasi inbox** ke tiap pewawancara (`interviewers[]` + `interviewer` tunggal, dedup) → muncul di menu "Interview Saya". Feedback kini **`requireAuth`** (pewawancara mengisi sendiri) + **upsert** (satu feedback/pewawancara, editable). FE menampilkan **rekap panel** (rata-rata per dimensi + tally rekomendasi).
 
 ## Master & Form Builder (adopsi ERPGo)
 | Method | Path | Fungsi | Role |

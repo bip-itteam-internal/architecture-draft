@@ -175,6 +175,15 @@ Menutup TBD lama "mapping hire → data karyawan". Pembuatan **data master karya
 - **Penilai (requireAuth, karyawan mana pun):** `GET /onboarding-reviews/assigned` (tugas saya + jawaban saya; jawaban penilai lain disembunyikan), `POST /:id/response` (edit sampai `Decided`).
 - **FE (erp-frontend):** halaman khusus HR (menu Recruitment → **Performance Review**: list + buat + detail rekap + keputusan) + menu **Review Onboarding Saya** (Portal Saya, **semua karyawan**: form 7 rating + 3 uraian).
 
+## Increment: Interview Orchestration (2026-07-17, #498/#356 — merged)
+
+> Menutup 3 gap fitur interview (audit 2026-07-17): sebelumnya kaya di pencatatan & feedback tapi kurang orkestrasi. `go build`/`vet`/`test` hijau (+ `TestIsAssignedInterviewer`). ⚠️ **Belum tentu ter-deploy** (deploy manual, BE dulu baru FE).
+
+- **Babak ↔ sesi (Gap A):** `Interview` + field **`round_id`** — sesi interview kini bisa ditautkan ke `interview_round` (babak per-lowongan). Sebelumnya rounds hanya config yatim di lowongan, tak direferensikan saat catat interview. FE: picker Babak di form + tampil di timeline.
+- **Undangan pewawancara + "Interview Saya" (Gap B):** `recordInterview` memanggil `notifyInbox` (best-effort) ke tiap pewawancara (`interviewers[]` + `interviewer`, dedup). Endpoint baru **`GET /interviews/assigned`** (requireAuth) mengembalikan sesi yang menugaskan pemanggil sebagai pewawancara, diperkaya nama/posisi kandidat + jawaban sendiri (jawaban penilai lain disembunyikan). FE: menu **"Interview Saya"** (Portal Saya, semua karyawan) → isi feedback sendiri.
+- **Feedback editable + agregasi (Gap C):** `POST /interviews/:id/feedback` diturunkan dari `isHR` → **`requireAuth`** + guard (pewawancara sesi **atau** HR) + **upsert** per `(interview_id, interviewer_id)` → satu feedback per pewawancara, bisa diedit, tak dobel. FE dialog feedback menampilkan **rekap panel** (rata-rata per dimensi + overall + tally rekomendasi), bukan lagi daftar mentah.
+- **Belum (menyusul):** integrasi kalender/ICS + reminder; auto-advance tahap dari hasil; notifikasi **email** ke pewawancara/kandidat (kini inbox internal saja).
+
 ## Dokumen Terkait
 
 - [[HRIS - Recruitment]] — konsep/bisnis & keputusan HRD (pasangan dok ini)
