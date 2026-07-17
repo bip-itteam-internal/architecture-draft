@@ -1,6 +1,13 @@
 # ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line
 
-Status: ⚠️ Implemented (rem OFF, 2026-07-13) — menggantikan [[ADR - 0012 Retur Refund-only Push-all]]
+Status: 🟡 **Superseded (2026-07-17)** oleh [[ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur]] — menggantikan [[ADR - 0012 Retur Refund-only Push-all]]
+
+> ⚠️ **Bagian yang SUDAH TIDAK BERLAKU** — jangan dijadikan acuan:
+> - **Mekanisme *drop snapshot*/line-drop SUDAH DICABUT TOTAL.** Faktur kini **permanen**: `OnOrderCancelledOrReturned` = no-op & `listSnapshotOrders` **tanpa filter status** (semua order ber-`shipped_at` masuk). Konsekuensinya, keep-line **bukan lagi pengecualian** — ia berlaku untuk semua.
+> - **Guard "jangan buku bila order sudah `RETURNED`" (HIGH-C) SUDAH DICABUT** (beserta kembarannya di `RetryDailyReturn`). Premisnya mati; membiarkannya membuat retur pada faktur auto-sync **tak pernah terbukukan** (terukur: 6 retur TikTok menggantung).
+> - **`CANCELLED` → "selalu drop"** tidak berlaku lagi; pembatalan pasca-kirim kini butuh Retur Penjualan tersendiri (belum diimplementasikan — lihat ADR-0018).
+>
+> Yang **masih berlaku**: mode per-`solution`/`partial` (RETURNED/NOT_RETURNED/PARTIALLY_RETURNED), prinsip "faktur tetap utuh, tidak pernah dihapus" ([[ADR - 0001 Akuntansi via Accurate]]), dan larangan mengirim enum mode kosong.
 
 ## Context
 
