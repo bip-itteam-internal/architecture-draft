@@ -2,7 +2,7 @@
 
 *Endpoint **recruitment-service** (ATS Fase 1-3 + adopsi struktur ERPGo Fase A–E + portal karir publik). Gateway: `/api/recruitment/*` (auth) & `/public/recruitment/*` (publik, tanpa JWT). RBAC `system_roles["hris"]`. Grounded ke `services/recruitment/routes.go` (branch `main`).*
 
-- **Implementasi**: [[Microservices - Recruitment Service]] · **Status**: ⚠️ BE Fase 1-3 + master ERPGo (A–F) + portal publik (browse/apply/track) + requisition se-departemen — increment 2026-07-16 deployed & terverifikasi live di dev. **Custom Questions dihapus** (#486/#342). **hire→karyawan** (endpoint `link-employee`, PR #490) **merged, belum deploy**.
+- **Implementasi**: [[Microservices - Recruitment Service]] · **Status**: ⚠️ BE Fase 1-3 + master ERPGo (A–F) + portal publik (browse/apply/track) + requisition se-departemen — increment 2026-07-16 deployed & terverifikasi live di dev. **Custom Questions dihapus** (#486/#342). **hire→karyawan** (endpoint `link-employee`, PR #490) **merged, belum deploy**. **Link Form Feedback Interview** (`GET /interviews`, panel/location, feedback hardening — PR #536/#381) **merged & dilaporkan ter-deploy dev** (2026-07-18).
 - **Konsumen publik**: [[APP - Portal Karir Bharata]]
 - **Indeks**: [[API - Index]] · Role: `isSupervisor` (ajukan), `isHR`/`isHRSupervisor` (kelola/review), `isApprover` (Direktur/Secretary).
 
@@ -54,11 +54,14 @@
 |---|---|---|---|
 | POST/GET | `/postings/:id/rounds` | Definisi/daftar babak interview per lowongan | HR |
 | PUT/DELETE | `/rounds/:id` | Ubah / hapus babak | HR |
-| GET | `/interviews/assigned` | Sesi interview yang menugaskan saya sebagai pewawancara (+ nama/posisi kandidat + jawaban saya) — sisi **"Interview Saya"** | auth |
-| POST | `/interviews/:id/feedback` | Kirim/**ubah** penilaian (rating 1-5 + recommendation). **Upsert** per (interview, pewawancara) → tak dobel. Boleh **pewawancara sesi ATAU HR** | auth |
+| GET | `/interviews` | **Semua** sesi interview (terbaru dulu), diperkaya nama/posisi kandidat + status feedback `feedback_submitted`/`feedback_total` — sisi HR (menu **Interviews**) — PR #536 | HR |
+| GET | `/interviews/assigned` | Sesi interview yang menugaskan saya sebagai pewawancara (+ nama/posisi kandidat + jawaban saya). Dipakai halaman link `/interview-feedback/:id`; menu "Interview Saya" sendiri sudah dihapus dari navigasi (dormant) | auth |
+| POST | `/interviews/:id/feedback` | Kirim/**ubah** penilaian (rating 1-5 + recommendation). **Upsert** per (interview, pewawancara) → tak dobel. Boleh **pewawancara sesi ATAU HR**. **`interviewer_id`** di body hanya dipakai bila pengirim **HR** (rekap atas nama pewawancara lain) — non-HR **selalu** JWT sendiri (PR #536) | auth |
 | GET | `/interviews/:id/feedback` | Lihat semua feedback (rekap panel) | HR |
 
-> **Interview orchestration (#498/#356, 2026-07-17):** `POST /candidates/:id/interviews` menerima **`round_id`** (tautkan sesi ke babak per-lowongan) & mengirim **notifikasi inbox** ke tiap pewawancara (`interviewers[]` + `interviewer` tunggal, dedup) → muncul di menu "Interview Saya". Feedback kini **`requireAuth`** (pewawancara mengisi sendiri) + **upsert** (satu feedback/pewawancara, editable). FE menampilkan **rekap panel** (rata-rata per dimensi + tally rekomendasi).
+> **Interview orchestration (#498/#356, 2026-07-17):** `POST /candidates/:id/interviews` menerima **`round_id`** (tautkan sesi ke babak per-lowongan) & mengirim **notifikasi inbox** ke tiap pewawancara (`interviewers[]` + `interviewer` tunggal, dedup). Feedback **`requireAuth`** (pewawancara mengisi sendiri) + **upsert** (satu feedback/pewawancara, editable). FE menampilkan **rekap panel** (rata-rata per dimensi + tally rekomendasi).
+>
+> **Link Form Feedback Interview (#536/#381, 2026-07-18 — merged):** body juga menerima **`panel[]`** (snapshot pewawancara `employee_id`/`name`/`email`, untuk alamat email) & **`location`** (teks bebas, terpisah dari `meeting_link`). Untuk stage **User/Final**, tiap pewawancara di `panel[]` yang punya email dapat **email undangan** (jadwal + tombol **"Buka Form Feedback"** → halaman login-gated `/interview-feedback/:id`) — **menggantikan** menu "Interview Saya" sebagai jalur pengisian. Stage **HR**: tanpa email (HR isi dari detail kandidat). Kandidat menerima email jadwal terpisah (**semua stage**, tanpa link form). Detail: [[Microservices - Recruitment Service]].
 
 ## Master & Form Builder (adopsi ERPGo)
 | Method | Path | Fungsi | Role |
