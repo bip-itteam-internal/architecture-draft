@@ -26,9 +26,9 @@
 
 **Master Data — Departments & System Roles**
 - `GET /master/departments`, `GET /master/departments/:key` — list / detail department (key, name, positions, roles)
-- `POST /master/departments`, `PUT /master/departments/:key`, `DELETE /master/departments/:key` — CRUD department (`RequireHRISSupervisor`)
+- `POST /master/departments`, `PUT /master/departments/:key`, `DELETE /master/departments/:key` — CRUD department (`RequireHRISOrITSupervisor`: supervisor/admin HRIS **atau** IT — halaman Master Data di-link dari menu IT, sebelumnya HRIS-only sehingga akun IT 403; fix 17 Juli 2026)
 - `GET /master/system-roles` — list system roles (feature-based: insentive, integration, dll)
-- `POST /master/system-roles`, `PUT /master/system-roles/:key`, `DELETE /master/system-roles/:key` — CRUD system role (`RequireHRISSupervisor`)
+- `POST /master/system-roles`, `PUT /master/system-roles/:key`, `DELETE /master/system-roles/:key` — CRUD system role (`RequireITSupervisor`: supervisor/admin IT saja — kelola role sistem di bawah IT sejak 9 Juli 2026, commit `b9f85de5`). FE menyembunyikan tombol kelola bila role tak berhak (lihat-saja).
 - Seed otomatis: `seedMasterData()` meng-insert default departments (~10) dan system roles (~2) saat collection kosong
 - Data-type endpoint (`GET /data-type/:dt`) sekarang membaca dari collection `master_department` / `master_system_role` (sebelumnya hardcoded di source code)
 - Model: `MasterDepartment` (key, name, positions[], roles[]) dan `MasterSystemRole` (key, name, roles[]) di `shared-library/models/employee/master_data.go`
