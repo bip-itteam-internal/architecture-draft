@@ -31,6 +31,15 @@
 | PATCH/GET | `/account/active-status` · `/forget-device` · `/reset` · `/roles` | Kelola akun (RequireITStaff) |
 | GET/POST/DELETE | `/device` · `/web-browser` | Perangkat & sesi browser |
 
+## Master Data (departemen & system role)
+| Method | Path | Fungsi | RBAC |
+|---|---|---|---|
+| GET | `/master/departments[/:key]` · `/master/system-roles` | List/detail master | open (di belakang gateway) |
+| POST/PUT/DELETE | `/master/departments[/:key]` | CRUD departemen (key, name, positions, roles) | `RequireHRISOrITSupervisor` (supervisor/admin HRIS **atau** IT) |
+| POST/PUT/DELETE | `/master/system-roles[/:key]` | CRUD definisi system role | `RequireITSupervisor` (supervisor/admin IT) |
+
+> Konsumen FE: halaman `/hris/master-data` (di-link dari **menu IT**) & System Setup Personalia; tombol kelola disembunyikan bila role tak berhak.
+
 ## KPI · Vacation · Reports (HRIS)
 | Method | Path | Fungsi | RBAC |
 |---|---|---|---|
