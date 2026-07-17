@@ -20,8 +20,9 @@
 | GET | `/sku-mapping` (`?bundle=true`) | Mapping listing SKU → komponen. Bundle bersifat **virtual**: stok hanya ada di level komponen |
 | GET/POST | `/stok` · `/stok/:kode` · `/stok/reconcile` | Stok + rekonsiliasi |
 | POST | `/stok/sync-accurate` | **Sync stok barang jadi + bahan dari Accurate — READ-ONLY** (WMS tak pernah push balik; lihat [[ADR - 0001 Akuntansi via Accurate]]). Hanya kode yang terdaftar di master. **Konversi satuan** wajib: bahan `GRAM` ×1000 (Accurate menyimpan bahan curah dalam KG), plus `faktor_stok_accurate` per-item bila satuan Accurate tak bisa disimpulkan dari satuan WMS (mis. cangkang kapsul: Accurate memakai ribuan butir, WMS memakai PCS). Melaporkan `bahan_tanpa_padanan_accurate`, `satuan_perlu_dicek` (satuan PCS tapi qty Accurate pecahan) & `stok_dikonversi` |
+| POST | `/stok/align` (`?dry_run=true`) | **Bersihkan baris stok & saldo awal yatim** (kode tak ada di master bahan maupun barang — lahir dari DeleteMaster yang tak menghapus stok, atau sisa data test). Tak tampil di UI tapi berbahaya laten: mutasi stok pakai `$inc`, kode yang dibuat ulang mewarisi angka basi. Idempoten |
 | GET | `/stok/sektor` | Stok riil per gudang untuk card Status Sektor (utama = kode master bahan, tinggar = kode master barang, sadewa = net transaksi bergudang-simpan "sadewa"); breakdown `jenis` → satuan → qty. Terdaftar **sebelum** `/stok/:kode` agar tidak tertangkap param |
-| GET/POST | `/saldo-awal` (`?bulan=YYYY-MM`) · `/saldo-awal/snapshot` | Saldo awal bulanan (snapshot stok tiap awal bulan, terpisah dari master); snapshot idempoten — dipicu otomatis (boot + ticker 6 jam) atau manual |
+| GET/POST | `/saldo-awal` (`?bulan=YYYY-MM`) · `/saldo-awal/snapshot` (`?force=true`) | Saldo awal bulanan (snapshot stok tiap awal bulan, terpisah dari master); snapshot idempoten — dipicu otomatis (boot + ticker 6 jam) atau manual. `force=true` = buang snapshot **bulan berjalan** lalu potret ulang dari stok terkini — dipakai sesudah stok pindah sumber ke Accurate (snapshot lama berisi angka era sebelumnya dan idempotensinya membuat ia tak pernah memperbaiki diri) |
 
 ## Transaksi · Formula · Produksi
 | Method | Path | Fungsi |

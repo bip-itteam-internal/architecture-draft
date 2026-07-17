@@ -27,7 +27,9 @@ mongodump -u <user> -p <pass> --authenticationDatabase admin -d manufacture_db -
 
 Tombol **Sync Master Bahan (Accurate)** di WMS → Manajemen Stok → tab Sync Master kini **self-healing**: bila masih ada kode bahan lama, ia menampilkan rencananya di dialog konfirmasi (berapa dipindah/digabung/dibiarkan) → setelah disetujui menjalankan **align → sync master → sync stok** sekaligus. Batal = tidak terjadi apa-apa. Data dimuat ulang **otomatis** setelah sync (banner "Memuat data master…" tampil di tab Database Master) — tidak perlu reload halaman; dulu refresh pasca-sync menampilkan stok 0 & menghilangkan barang jadi tanpa indikator, sehingga data tampak "belum terbaca".
 
-Tombol **Sync Barang Jadi & Bundle dari HPP** berperilaku sama untuk kode **produk jadi** lama (NEI, FAY, …): dialog rencana → align (`/master-product/align-hpp`) → sync-hpp. Jalankan keduanya (urutan bebas).
+Tombol **Sync Barang Jadi & Bundle dari HPP** berperilaku sama untuk kode **produk jadi** lama (NEI, FAY, …): dialog rencana → align (`/master-product/align-hpp`) → sync-hpp. Tombol **Sync Stok** menawarkan pembersihan baris stok/saldo awal **yatim** (dialog merah — satu-satunya yang menghapus; `/stok/align`). Jalankan ketiganya (urutan bebas).
+
+Penutup: bila saldo awal **bulan berjalan** masih berisi angka era sebelum Accurate (dipotret sebelum stok pindah sumber), jalankan `POST /saldo-awal/snapshot?force=true` sekali — membuang snapshot bulan ini lalu memotret ulang dari stok terkini. (Belum ada tombolnya; via API/curl.)
 
 Sesudahnya, betulkan satuan yang dilaporkan di hasil sync (`satuan perlu dicek`) lewat **form edit item** di tab Database Master — kolom stok saat mode edit kini punya input **satuan** dan **faktor acc.** (pengali qty Accurate per-item): `BBK-101` → satuan GRAM + kategori BAHAN BAKU KOSMETIK; `BBO-056` → faktor `1000` (satuan tetap PCS). Lalu klik **Sync Stok** sekali lagi.
 
