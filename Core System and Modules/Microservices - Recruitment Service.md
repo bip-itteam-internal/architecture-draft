@@ -37,6 +37,7 @@
 
 ### Notifikasi
 - Internal (approval/jadwal/offer, inbox/FCM) + **kandidat via Email (Resend) ✅** — "lamaran diterima" saat input pelamar & "penawaran kerja" + PDF saat unggah offer letter; WhatsApp kandidat menyusul — lewat [[Microservices - Notification Service]] (`POST /email/send`)
+- **Interview (✅ #536/#381):** saat `recordInterview`, **kandidat** dapat email jadwal (semua stage, tanpa link) & **pewawancara** stage **User/Final** dapat email undangan + **link form feedback** (login-gated) — lihat increment di bawah
 
 ## Model Data (`recruitment_db`)
 
@@ -56,7 +57,7 @@
 
 - [[Microservices - Employee Service]] — master posisi/departemen (`PositionTitle*`), cek duplikasi, **handoff `/onboarding/register`** saat hire
 - [[Microservices - File Service]] — CV/berkas pelamar, report PDF psikotes, surat penawaran (MinIO)
-- [[Microservices - Notification Service]] — notifikasi internal (inbox/FCM) + **kandidat via Email/Resend** (`/email/send`, sudah dipakai) + WhatsApp (menyusul)
+- [[Microservices - Notification Service]] — notifikasi internal (inbox/FCM) + **kandidat & pewawancara (interview User/Final) via Email/Resend** (`/email/send`, sudah dipakai) + WhatsApp (menyusul)
 - [[CORE - OCR Document Service]] — OCR CV hasil scan (untuk AI screening fase lanjut)
 - **LLM (OpenRouter)** — AI CV screening (fase lanjut); reuse infra Ideamills ([[Sales - Veo (Gemini) Implementation]])
 - **Glints (TapLoker)** — ATS/job-portal eksternal, sumber pelamar utama
@@ -184,7 +185,27 @@ Menutup TBD lama "mapping hire → data karyawan". Pembuatan **data master karya
 - **Babak ↔ sesi (Gap A):** `Interview` + field **`round_id`** — sesi interview kini bisa ditautkan ke `interview_round` (babak per-lowongan). Sebelumnya rounds hanya config yatim di lowongan, tak direferensikan saat catat interview. FE: picker Babak di form + tampil di timeline.
 - **Undangan pewawancara + "Interview Saya" (Gap B):** `recordInterview` memanggil `notifyInbox` (best-effort) ke tiap pewawancara (`interviewers[]` + `interviewer`, dedup). Endpoint baru **`GET /interviews/assigned`** (requireAuth) mengembalikan sesi yang menugaskan pemanggil sebagai pewawancara, diperkaya nama/posisi kandidat + jawaban sendiri (jawaban penilai lain disembunyikan). FE: menu **"Interview Saya"** (Portal Saya, semua karyawan) → isi feedback sendiri.
 - **Feedback editable + agregasi (Gap C):** `POST /interviews/:id/feedback` diturunkan dari `isHR` → **`requireAuth`** + guard (pewawancara sesi **atau** HR) + **upsert** per `(interview_id, interviewer_id)` → satu feedback per pewawancara, bisa diedit, tak dobel. FE dialog feedback menampilkan **rekap panel** (rata-rata per dimensi + overall + tally rekomendasi), bukan lagi daftar mentah.
-- **Belum (menyusul):** integrasi kalender/ICS + reminder; auto-advance tahap dari hasil; notifikasi **email** ke pewawancara/kandidat (kini inbox internal saja).
+- **Belum (menyusul):** integrasi kalender/ICS + reminder; auto-advance tahap dari hasil. *(Notifikasi email ke pewawancara/kandidat — ditutup increment berikut.)*
+
+## Increment: Link Form Feedback Interview (email pewawancara, 2026-07-18 — merged)
+
+> BE **PR #536** (bip-erp) + FE **PR #381** (erp-frontend), keduanya **merged** ke `main`. `go build`/`vet`/`test` hijau. **BE dilaporkan sudah ter-deploy di dev**; env `ERP_FRONTEND_URL` (pola sama dengan `reviewFormURL` di [[HRIS - Recruitment]] Performance Review Onboarding) sudah di-set di VM dev — **⚠️ tak terdaftar** di `docker-compose.yml`/`.env.example` repo (masuk lewat `.env` VM di luar repo; tak bisa diverifikasi dari kode saja).
+
+Menutup gap **"notifikasi email ke pewawancara"** dari increment Interview Orchestration di atas: pewawancara stage **User/Final** kini mengisi feedback lewat **link 1-sesi via email** (login-gated), bukan lagi menu "Interview Saya".
+
+- **Model (`models_stages.go`):** `Interview` + field **`Panel []InterviewPanelist`** (`employee_id`/`name`/`email` — snapshot pewawancara dikirim FE saat menjadwalkan, untuk alamat email undangan; `Interviewers []string` tetap sumber identitas/authz) + **`Location string`** (teks bebas, terpisah dari `MeetingLink`/Zoom) + virtual **`FeedbackSubmitted`/`FeedbackTotal`** (diisi `listInterviews`, tak disimpan).
+- **`interview_notify.go`:** `interviewUsesLink(stage)` → `true` hanya untuk **User/Final** (stage HR = tanpa link/email, diisi HR dari detail kandidat). `interviewFeedbackURL(interviewID)` membangun `<ERP_FRONTEND_URL>/interview-feedback/<id>` (env kosong → link kosong, email tetap terkirim tanpa tombol). Builder branded: **`interviewInviteEmail`** (ke pewawancara — jadwal+lokasi+tombol "Gabung Meeting" bila ada+tombol "Buka Form Feedback" bila link ada) & **`interviewCandidateEmail`** (ke kandidat — jadwal+durasi+lokasi+meeting link, **tanpa** link form).
+- **`email_render.go`:** shell HTML branded (header putih + logo, dari increment sebelumnya) diekstrak jadi **`emailShellHTML`/`emailAccentButton`** — dipakai bersama oleh `renderTemplate` (4 template kandidat existing, tak berubah perilaku) **dan** dua builder email interview di atas — satu sumber tampilan.
+- **`stage_handlers.go` (`recordInterview`):** kini kirim **dua email best-effort** setelah simpan sesi: (1) **kandidat** — jadwal+zoom, **semua stage**, `idempotency_key` `intv-cand-<interview_id>`; (2) **panel pewawancara** (`notifyInterviewPanel`, ditulis ulang) — inbox untuk **semua** target (`Interviewers[]` + `Interviewer` tunggal, dedup), **plus email** hanya untuk stage **User/Final** & hanya bila pewawancara punya alamat di `Panel[]`, key `intv-invite-<interview_id>-<employee_id>` (satu email/pewawancara).
+- **`interview_ext_handlers.go`:** `submitInterviewFeedback` **diperketat** — hanya **HR** boleh menetapkan `interviewer_id` dari body (rekap/koreksi atas nama pewawancara lain); **non-HR** (jalur link) **selalu** pakai identitas JWT, tak bisa submit atas nama orang lain (authz `isHR || isAssignedInterviewer` tetap). Endpoint baru **`listInterviews`** = `GET /interviews` (HR, list **semua** sesi terbaru dulu, diperkaya nama/posisi kandidat + `feedback_submitted`/`feedback_total`).
+- **`routes.go`:** `GET /interviews` (`require(isHR)`) — path eksak, terdaftar **sebelum** `/interviews/:id/*` agar tak ketangkap sebagai `:id`.
+
+**FE (erp-frontend, semua merged):**
+- Komponen `InterviewFeedbackForm` diekstrak jadi **reusable** (dipakai baik di dialog HR maupun di halaman link pewawancara).
+- Halaman baru **`/interview-feedback/[interviewId]`** (`src/app/interview-feedback/[interviewId]/page.tsx`) — **di luar** grup `(main)` (tanpa sidebar/chrome), pakai `useAssignedInterviews()` (tetap manggil `GET /interviews/assigned`) lalu filter sesi sesuai `interviewId` di URL. **Login tetap wajib**: belum login → interceptor axios (`lib/axios.ts`) auto-redirect ke `/login` saat request 401; identitas dari JWT (server tak percaya `interviewId` di URL untuk authorisasi selain "assigned ke saya").
+- Menu HR baru **Interviews** (`/hris/recruitment/interviews`, grup sidebar **Recruitment** — bukan Portal Saya) — tabel semua sesi (filter tahap, search kandidat) + kolom status feedback (`feedback_submitted`/`feedback_total`) + aksi **salin link feedback** (ikon, hanya stage User/Final via `interviewHasFeedbackLink`) & **Lihat** (buka `InterviewFeedbackDialog` rekap panel).
+- Form jadwal interview: input **Lokasi** + kirim **snapshot Panel** (nama+email pewawancara) saat menjadwalkan.
+- Menu **"Interview Saya"** (dulu `/portal/interviews`, Portal Saya) **dihapus dari navigasi** — digantikan link 1-sesi per email. Komponen `MyInterviewsPage` + route `/portal/interviews` **dibiarkan dormant** (reversible, tak dihapus dari kode).
 
 ## Dokumen Terkait
 
