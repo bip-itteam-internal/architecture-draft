@@ -44,7 +44,7 @@
 > Detail field per collection ada di [[HRIS - Recruitment]] (hindari duplikasi).
 
 - **Backbone internal:** `job_requisition` · `job_posting` · `candidate` (+`progress`/`status`) · `screening_result` · `interview` · `technical_test_result` · `psychotest` · `psychotest_result` · `background_check` · `offer`
-- **Adopsi ERPGo (✅ Fase A–E):** `job_type` · `candidate_source` · `interview_type` · `job_location` (master) + `onboarding_checklist`/`checklist_item` (template); `job_posting` & `candidate` diperkaya (lihat increment di bawah). *(`custom_question` form-builder **dihapus** #486 — lihat catatan.)*
+- **Adopsi ERPGo (✅ Fase A–E):** `job_type` · `candidate_source` · `interview_type` · `job_location` (master); `job_posting` & `candidate` diperkaya (lihat increment di bawah). *(`custom_question` form-builder **dihapus** #486; `onboarding_checklist`/`checklist_item` **dihapus** 2026-07-18 — lihat catatan.)*
 
 ## Belum Diimplementasikan / Catatan
 
@@ -106,9 +106,9 @@
 **Master baru (role `isHR`):**
 - `job_type` · `candidate_source` · `interview_type` — lookup identik (`Lookup`: name, description, is_active). Endpoint `/masters/{job-types,candidate-sources,interview-types}`.
 - `job_location` — lokasi kerja (name, remote_work, address, city/state/country/postal_code [**string**, jaga leading zero], status). Endpoint `/locations`.
-- `onboarding_checklist` + `checklist_item` — template checklist onboarding (task_name, category, assigned_to_role, due_day, is_required). Endpoint `/checklists` + `/checklists/:checklistId/items`. **Template saja** — instansiasi per-kandidat saat hire belum ada (TBD, lihat [[HRIS - Recruitment]]).
-
 > **Custom Questions (form builder) dihapus** — BE #486 / FE #342 (2026-07-16). `custom_question` master (endpoint `/questions`) + field `application_questions` (`job_posting`) & `custom_answers` (`candidate`) **tak ada lagi** di kode; portal karir memakai field native `candidate`. BSON lama diabaikan saat decode (tanpa migrasi).
+
+> **Onboarding checklist dihapus** — BE `chore/remove-onboarding-checklist` / FE erp-frontend (2026-07-18). Master `onboarding_checklist`/`checklist_item` (endpoint `/checklists*`) **dan** instansiasi per-kandidat `onboarding_progress` (`/candidates/:id/onboarding*`) **tak ada lagi** di kode: komponen FE-nya (`ChecklistsPage`, kartu `OnboardingSection`) **yatim/tak pernah dirender** sejak dibangun (#492/#346) — dead code. Data Mongo lama dibiarkan (tak dipakai). **Dipertahankan:** stage pipeline `Onboarding`, hire handoff `/onboarding/register`, `link-employee`, dan Performance Review Onboarding.
 
 **`job_posting` diperkaya:** title, job_type_id, location_id, branch, job_application, career_portal_url, number_of_positions, priority (Low/Medium/High), min/max_experience, min/max_salary, application_deadline, is_featured, `show_profile_image`/`show_resume`/`show_cover_letter`, required_skills[], description/requirements/benefits/terms_condition (HTML), show_terms_on_form. Keberadaan job_type/location dicek saat create/update. Kontrak `PUT /postings/:id` = **full-replace** (kirim form lengkap). ⚠️ **Gotcha full-replace:** field yang tak dikirim tertulis kosong/false → FE (form Lowongan tak punya field `show_*`/`terms`) **wajib round-trip** nilainya saat edit, kalau tidak konfigurasi portal terhapus senyap (diperbaiki di erp-frontend `buildPostingPayload`).
 
@@ -124,7 +124,7 @@
 
 **Increment (✅ tracking status lamaran):** `candidate.tracking_token` (crypto/rand 32-hex — **bukan `_id`** agar tak bisa dienumerasi) di-set saat create/apply; endpoint publik `GET /public/track/:token` (gateway `/public/recruitment/track/:token`) → tampilan **curated** (nama/posisi/tanggal + progress & status label ramah + stepper), tanpa skor/catatan internal. Email "lamaran diterima" +tombol **Lihat Status Lamaran** (base env `CAREER_PORTAL_URL`); respons `/apply` kembalikan `tracking_token` + `track_url`. Label penolakan dilembutkan ("Belum Sesuai") — apakah status ditampilkan ke kandidat = keputusan HRD terbuka ([[HRIS - Recruitment]]).
 
-**Belum (menyusul, Fase G–I):** ~~onboarding checklist~~ **instansiasi per-kandidat ✅ #492** (lihat increment di bawah); offer letter template; recruitment/career settings.
+**Belum (menyusul, Fase G–I):** offer letter template; recruitment/career settings. *(~~onboarding checklist per-kandidat #492~~ **dibuang lagi 2026-07-18** — dead code, lihat catatan di atas.)*
 
 ## Increment: Penopang Portal Karir Publik (2026-07-16)
 
@@ -160,13 +160,9 @@ Menutup TBD lama "mapping hire → data karyawan". Pembuatan **data master karya
 - **FE (#344, erp-frontend):** HRIS "Tambah Karyawan" kini bermula dari **modal 2 opsi** — *isi manual* (perilaku lama) atau *dari kandidat rekrutmen*. Mode dari-kandidat: picker kandidat **Hired belum tertaut** (`GET /candidates?status=Hired`, filter `!employee_id`) → wizard memprefill data kandidat (nama, jenis_kelamin, tanggal_lahir, email, no_hp, alamat), **menyembunyikannya** (kartu ringkasan read-only) & hanya menampilkan **sisa** field yang HR isi. Field wajib yang **kosong** di kandidat tetap tampil (email/alamat/tgl lahir opsional). Karyawan dibuat via `POST /api/hris/employees/multi` ([[Microservices - Employee Service]]), lalu `link-employee` dipanggil (best-effort) agar kandidat drop dari picker.
 - **Alur:** kandidat harus lebih dulu `Hired` (offer → accept → hire) baru muncul di picker.
 
-## Increment: Onboarding Checklist per-kandidat (⚠️ PR #492/#346 — belum merged/deploy)
+## Increment: Onboarding Checklist per-kandidat — ❌ DIHAPUS (2026-07-18)
 
-> Melengkapi template `onboarding_checklist` (Fase 2, selama ini template-only) dengan **instansiasi per-kandidat**. `go build`/`vet`/`test` hijau (+ `TestOnboardingCompletedAt`).
-
-- Collection baru `onboarding_progress` (1 doc/kandidat Hired). Item = **snapshot** salinan dari template (ubah template kemudian **tak** mengubah onboarding berjalan — benar secara historis).
-- `POST /candidates/:id/onboarding` `{checklist_id}` (isHR): kandidat wajib **Hired** & belum punya onboarding → salin item **aktif** template (urut due_day, task_name); cegah dobel. `GET` → progress (`null` bila belum). `PUT /…/items/:itemId` `{done}` → toggle + `done_by`/`done_at`; `completed_at` saat semua item **wajib** selesai (bila tak ada wajib → semua item).
-- **FE (erp-frontend):** kartu **Onboarding** di detail kandidat (muncul saat Hired) — *Mulai Onboarding* pilih template (default terpilih) → progress bar + centang item. `assigned_to_role` tampil info saja; yang mencentang HR.
+> ~~Instansiasi per-kandidat dari template `onboarding_checklist`.~~ **Dibuang** (BE `chore/remove-onboarding-checklist` + FE erp-frontend, 2026-07-18). Baik master template (`/checklists*`, Fase 2) maupun instance per-kandidat `onboarding_progress` (`/candidates/:id/onboarding*`) beserta komponen FE (`ChecklistsPage`, kartu `OnboardingSection` + hooks) **tak ada lagi di kode** — komponen FE **yatim/tak pernah dirender** sejak dibangun (#492/#346), jadi dead code. Data Mongo lama dibiarkan (tak dipakai). **Dipertahankan:** stage pipeline `Onboarding`, hire handoff `/onboarding/register`, `link-employee`, dan **Performance Review Onboarding** (di bawah).
 
 ## Increment: Performance Review Onboarding (⚠️ PR #493/#349 — belum merged/deploy)
 
