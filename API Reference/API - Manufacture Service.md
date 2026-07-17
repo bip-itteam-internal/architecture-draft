@@ -31,7 +31,7 @@
 | PATCH | `/transaksi/:id/status` | Ubah status UI transaksi (`detail.status`) — dipakai alur terima SJ Kirim Produk (IN TRANSIT → DELIVERED) |
 | POST | `/transaksi/fg` | Transaksi barang jadi multi-baris: **validasi seluruh baris dulu, baru tulis** (tak ada tulisan separuh jalan bila satu baris stoknya kurang). Baris bundle dipecah ke komponen lewat `/sku-mapping` |
 | GET/POST/PUT/DELETE | `/formula` · `/formula/:id` | Formula/BOM (resep produksi) — CRUD penuh (create/update/delete) |
-| POST | `/formula/import` | Import formula/BOM dari file `.xlsx` (multipart `file`, layout tab NEW FORMULA), upsert by `product_name`. File sumber masih memakai **kode bahan lama (mnemonik)** → dipetakan ke kode kanonik lewat alias → nama; kode yang tak dikenal dilaporkan di `kode_bahan_tak_dikenal` |
+| POST | `/formula/import` | Import formula/BOM dari file `.xlsx` (multipart `file`, layout tab NEW FORMULA), upsert by `product_name`. File utama `NEW FORMULA.xlsx` (di C:/Work, mesin user) **sudah dikonversi ke kode Accurate** (16 Juli 2026; 832 kode diganti, tersisa 2 sel `#N/A` error sumber) — tapi salinan lama yang beredar masih bisa memakai kode mnemonik → importer tetap memetakan lewat alias → nama; kode tak dikenal dilaporkan di `kode_bahan_tak_dikenal` |
 | GET/POST | `/production` | Order produksi (konsumsi stok) |
 | GET/POST/DELETE | `/production-log` · `/production-log/:id` | Catatan produksi (tanpa konsumsi stok) |
 | GET/POST/DELETE | `/material-order` · `/material-order/:id` | Order material internal |
