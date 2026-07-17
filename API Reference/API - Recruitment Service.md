@@ -68,16 +68,10 @@
 |---|---|---|---|
 | CRUD | `/masters/job-types` · `/masters/candidate-sources` · `/masters/interview-types` | Lookup (list/get/create/update/delete) | HR |
 | CRUD | `/locations` | Master lokasi kerja (list/get/create/update/delete) | HR |
-| CRUD | `/checklists` · `/checklists/:id/items` | Template onboarding checklist + item (list/get/create/update/delete) | HR |
 
 > **Custom Questions dihapus** (BE #486 / FE #342, 2026-07-16): endpoint `/questions` (form builder) + field `application_questions`/`custom_answers` **tak ada lagi** — portal karir memakai field native `candidate`. BSON lama diabaikan saat decode (tanpa migrasi).
 
-## Onboarding Checklist per-kandidat (⚠️ PR #492/#346 — belum merged/deploy)
-| Method | Path | Fungsi | Role |
-|---|---|---|---|
-| POST | `/candidates/:id/onboarding` | Mulai onboarding kandidat **Hired**: body `{checklist_id}` → salin item **aktif** template jadi `onboarding_progress` (snapshot). Cegah dobel | HR |
-| GET | `/candidates/:id/onboarding` | Progress onboarding kandidat (body `null` bila belum mulai) | HR |
-| PUT | `/candidates/:id/onboarding/items/:itemId` | Tandai item selesai/belum `{done}`; `completed_at` saat semua item **wajib** selesai | HR |
+> **Onboarding checklist dihapus** (2026-07-18): endpoint `/checklists` · `/checklists/:id/items` (template) **dan** `/candidates/:id/onboarding*` (instance per-kandidat) **tak ada lagi** — komponen FE-nya yatim/tak pernah dirender (dead code). Data Mongo lama dibiarkan (koleksi jadi yatim, tak di-decode). Performance Review Onboarding tetap.
 
 ## Performance Review Onboarding (⚠️ PR #493/#349 — belum merged/deploy)
 > Digitalisasi Form Review Performance Masa Evaluasi (dulu Google Form). Peserta = **karyawan masa evaluasi** (`employment_type` "PKWT (Evaluasi)"); penilai = karyawan mana pun (identitas SSO). Peserta tak boleh menilai dirinya sendiri. Kriteria 7+3 **konstanta** (purpose-built, bukan form builder).
