@@ -54,7 +54,7 @@
 - `POST /guestbook` — entri tamu publik (token-gated, mengirim FCM).
 
 **Leave Request (workflow penuh)**
-- `POST /request/create` — buat request (multipart + upload via file service, rantai review supervisor→HR, cek kuota cuti).
+- `POST /request/create` — buat request (multipart + upload via file service, rantai review supervisor→HR, cek kuota cuti). **Idempoten** (guard `duplicateLeaveRequestFilter`, `request_dedup.go`): sebelum `InsertOne`, cek duplikat **berbasis konten** — `employee_id` + `leave_type` + `leave_subtype` + `from_date` + `to_date` yang masih **aktif** (status `Waiting`/`Approved`). Bila ada, kembalikan sukses **tanpa insert baru** (mencegah data ganda dari retry saat jaringan tak stabil — respons hilang padahal data sudah tersimpan). Status terminal (`Rejected`/`Canceled`/`Ignored`) tetap boleh diajukan ulang. Catatan: `reason` & lampiran **tidak** masuk identitas dedup — pengajuan kedua dengan alasan beda tapi tipe/subtipe/tanggal sama tetap dianggap duplikat.
 - `GET /request/view?as=reviewer|reviewed` — lihat request sebagai reviewer atau yang direview.
 - `PATCH /request/review` — approval SPV/HR + notif + auto-apply cuti + decrement kuota.
 - `PATCH /request/cancel` — pembatalan request.

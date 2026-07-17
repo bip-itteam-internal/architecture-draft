@@ -2,7 +2,7 @@
 
 *Desain (to-be) subsistem **Recruitment** — mengelola **siklus depan karyawan**: dari kebutuhan posisi sampai jadi karyawan aktif. Memisahkan subsistem **Talent acquisition → Interview → On-boarding** yang sekarang menumpuk di [[HRIS - Analysis]] ke ruangnya sendiri.*
 
-- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–E) sudah live di [[Microservices - Recruitment Service]]; FE + Fase 4-5 (AI screening / psikotes online / portal publik) menyusul
+- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas + cek status). Menyusul: AI CV screening, psikotes online, WhatsApp kandidat, integrasi job board
 - **Target arsitektur**: microservice `recruitment-service` baru ([[Microservices - Recruitment Service]]) + modul web, dengan **rollout bertahap**
 - Titik singgung yang sudah ada di kode: `POST /onboarding/register` (aktivasi akun karyawan baru) di [[Microservices - Employee Service]] — menjadi handoff akhir recruitment
 
@@ -19,10 +19,11 @@
 2. **Sourcing & Job Posting** — HR membuka lowongan + mencatat **sumber pelamar**. Kanal eksternal utama saat ini: **Glints (TapLoker)** — ATS/job-portal yang dipakai aktif (PT Bharata terverifikasi: pasang lowongan, Pertanyaan Skrining, akses CV, chat WA); plus referral, walk-in, bootcamp
 3. **Candidate Management** — data pelamar (CV, kontak, posisi dilamar, sumber) + pelacakan pipeline via field **`progress`** (tahap) & **`status`** (keadaan), enum mengikuti **rekaman HRD** (lihat Model Data)
 4. **Screening (manual)** — HR menyaring CV/data pelamar **manual** terhadap kriteria posisi (lihat bagian khusus di bawah); **AI CV screening** direncanakan sebagai enhancement fase lanjut
-5. **Interview** — penjadwalan, **multi-tahap**: HR Interview → User Interview → **Technical Test (tes skill — terpisah dari psikotes)** → Final Interview (jumlah tahap tergantung posisi, mis. SPV) — HR + hiring manager/SPV dept; scoring + catatan per tahap. Lolos → **Background Check**
+5. **Interview** — penjadwalan, **multi-tahap**: HR Interview → User Interview → **Technical Test (tes skill — terpisah dari psikotes)** → Final Interview (jumlah tahap tergantung posisi, mis. SPV) — HR + hiring manager/SPV dept; scoring + catatan per tahap. Lolos → **Background Check**. **Orkestrasi (⚠️ #498/#356):** sesi bisa ditautkan ke **babak** (`round_id`); pewawancara **diundang** (notif inbox) & mengisi feedback sendiri via menu **"Interview Saya"** (feedback terstruktur 3 rating + rekomendasi, editable); HR lihat **rekap panel** (rata-rata + tally rekomendasi). Belum: kalender/reminder, auto-advance tahap, email pewawancara.
 6. **Psikotes / Assessment** — setelah lolos interview & **Background Check**, kandidat mengikuti psikotes **sebelum offer**. Dua mode: **(a) online self-service** (kandidat mengerjakan tes di portal — butuh test-engine/bank soal, **TBD**) atau **(b) manual** — **dilaksanakan staf HR langsung** (HR input skor + lampirkan **report PDF**). **Rekomendasi: mulai mode manual (HR)**, online menyusul. Hasil (skor per-aspek + rekomendasi/interpretasi) jadi bahan keputusan akhir sebelum offer (ambang/bobot final di HR — lihat **Pertanyaan untuk HRD**)
 7. **Offer & Decision** — keputusan + surat penawaran → kandidat accept/decline
-8. **Onboarding Handoff** — saat kandidat `Hired` → buat akun karyawan via [[Microservices - Employee Service]] `POST /onboarding/register` (employee_id + temporary password) → masuk siklus karyawan aktif
+8. **Hire → Karyawan** — saat kandidat `Hired`, HR membuat **data karyawan** di HRIS "Tambah Karyawan" (mode *dari kandidat* — data kandidat diprefill, HR isi sisanya) via [[Microservices - Employee Service]]; kandidat lalu **ditautkan** ke `employee_id` (`PUT /candidates/:id/link-employee`, progress→Onboarding). Aktivasi akun tetap via `POST /onboarding/register`.
+9. **Masa Evaluasi & Performance Review Onboarding** — karyawan baru jalani masa evaluasi, berpuncak pada sesi **Performance Review** (presentasi → penilai lintas divisi menilai → keputusan status). Didukung: **onboarding checklist per-kandidat** (⚠️ #492) + **Performance Review Onboarding** (⚠️ #493) — lihat bagian khusus di bawah.
 
 ## Screening (Manual; AI menyusul)
 
@@ -94,9 +95,26 @@
 **Master & form builder (adopsi ERPGo — ✅ Fase A–E; detail di [[Microservices - Recruitment Service]]):**
 - `job_type` / `candidate_source` / `interview_type` — lookup (name, is_active) untuk klasifikasi lowongan, sumber pelamar, jenis interview
 - `job_location` — master lokasi kerja (name, remote_work, alamat, city/state/country/postal_code, status); dipakai dropdown Location di `job_posting`
-- `custom_question` — bank pertanyaan aplikasi (question, type [Text/Textarea/Select/Radio/Checkbox/Date/Number], options, is_required, is_active, sort_order); dirakit ke `job_posting.application_questions`, jawaban kandidat di `candidate.custom_answers`
-- `job_posting` **diperkaya**: job_type/location/branch, number_of_positions, priority, min/max experience & salary, application_deadline, is_featured, toggle ask_*/show_*, required_skills, description/requirements/benefits/terms_condition (HTML), application_questions
-- `candidate` **diperkaya**: source_id, country, custom_answers, profile_image/cover_letter (MinIO), expected/current_salary, notice_period, portfolio_url, linkedin_url, education
+- `onboarding_checklist` + `checklist_item` — **template** checklist onboarding (task_name, category, assigned_to_role, due_day, is_required). **Instansiasi per-kandidat ✅ (⚠️ #492):** `onboarding_progress` (1/kandidat Hired; item = snapshot dari template + status `done`)
+- `onboarding_review` + `onboarding_review_response` (⚠️ #493) — sesi **Performance Review Onboarding** (masa evaluasi): peserta (**karyawan masa evaluasi**, `employment_type` "PKWT (Evaluasi)"), jadwal, penilai, 7 rating + 3 uraian per penilai, keputusan status
+- `job_posting` **diperkaya**: job_type/location/branch, number_of_positions, priority, min/max experience & salary, application_deadline, is_featured, toggle ask_*/show_*, required_skills, description/requirements/benefits/terms_condition (HTML)
+- `candidate` **diperkaya**: source_id, country, profile_image/cover_letter (MinIO), expected/current_salary, notice_period, portfolio_url, linkedin_url, education, **`employee_id`** (terisi saat kandidat Hired dikonversi jadi karyawan)
+
+> **Custom Questions (form builder) dihapus** #486/#342 (2026-07-16): `custom_question` + `application_questions`/`custom_answers` tak ada lagi — portal karir memakai field native `candidate`.
+
+## Masa Evaluasi & Performance Review Onboarding
+
+*Setelah `Hired` → jadi karyawan, karyawan baru menjalani **masa evaluasi** (semacam masa percobaan). Di perusahaan, istilah "**onboarding**" merujuk ke fase ini, yang berpuncak pada sesi **Performance Review Onboarding**: peserta mempresentasikan hasil kerja, lalu **beberapa penilai** (karyawan lintas divisi, diundang HRGA) memberi penilaian; hasilnya jadi bahan HR memutuskan status. Dua alat pendukung (⚠️ dibangun 2026-07-16, PR belum merged/deploy):*
+
+**1. Onboarding checklist per-kandidat (⚠️ #492/#346)** — HR menyalin **template** `onboarding_checklist` jadi daftar tugas milik karyawan baru (kontrak, dokumen, IT setup, dll), lalu mencentang progresnya. Item = snapshot (ubah template kemudian tak mengubah yang berjalan). Alat **operasional** HRD.
+
+**2. Performance Review Onboarding (⚠️ #493/#349)** — digitalisasi **Form Review Performance Masa Evaluasi** (dulu Google Form):
+- **HR** menjadwalkan sesi (peserta, waktu, tempat) + menugaskan **penilai**; sistem mengirim **undangan** (inbox + email) — menggantikan undangan manual HRGA.
+- **Penilai** (karyawan mana pun, identitas SSO) mengisi **7 aspek skala 1–5** (pemahaman pekerjaan, jelaskan hasil, jelaskan kendala & solusi, jawab pertanyaan, presentasi & komunikasi, kerapihan materi, profesionalisme) + **3 uraian** (kelebihan/kontribusi, yang perlu ditingkatkan, saran pengembangan).
+- **HR** melihat **rekap** (rata-rata per aspek + semua uraian) lalu mencatat **keputusan status**: **Lulus / Diperpanjang / Tidak Lulus**.
+- Kriteria bersifat **tetap (purpose-built)**, bukan form builder — keputusan sadar (form-builder `custom_question` sebelumnya sudah dihapus karena tak terpakai). Implementasi: [[Microservices - Recruitment Service]] & [[API - Recruitment Service]].
+
+> **Persona penilai:** karyawan mana pun bisa diundang menilai (lintas divisi); aksesnya via menu **"Review Onboarding Saya"** (Portal Saya). Keputusan status tetap di HR.
 
 ## Arsitektur & Integrasi
 
@@ -104,13 +122,13 @@
 - **Integrasi**:
   - [[Microservices - Employee Service]] — master data posisi/departemen (`PositionTitle*`), cek duplikasi, **handoff `/onboarding/register`** saat hire
   - [[Microservices - Notification Service]] — notifikasi **internal** (approval requisition / jadwal / offer) via FCM + inbox
-  - **Notifikasi kandidat (eksternal)** — **Email** sebagai kanal utama fase awal; ⚠️ **fitur email belum ada di sistem → prasyarat dibangun dulu**; **WhatsApp menyusul** (WA otomatis saat ini memakai satu nomor IT — lihat catatan teknis)
+  - **Notifikasi kandidat (eksternal)** — **Email** kanal utama: ✅ **sudah jalan** (channel Resend di [[Microservices - Notification Service]], **terverifikasi live** 2026-07-16) — email "lamaran diterima" otomatis saat melamar + email penawaran + lampiran PDF saat offer letter diunggah. Nama pengirim di inbox kandidat diatur per-service via env `RECRUITMENT_EMAIL_FROM` ("Bharata Recruitment"). **WhatsApp menyusul** (WA otomatis saat ini memakai satu nomor IT — lihat catatan teknis)
   - [[Microservices - File Service]] — penyimpanan CV/dokumen pelamar + **report PDF psikotes** (MinIO)
   - [[CORE - OCR Document Service]] — OCR CV hasil scan (untuk AI screening fase lanjut)
   - **LLM (OpenRouter)** — **AI CV screening (fase lanjut)**; reuse infra LLM yang dipakai Ideamills ([[Sales - Veo (Gemini) Implementation]])
   - **Psikotes** — modul di `recruitment-service`; mode **manual (dilaksanakan staf HR)** cukup catat hasil + lampiran via [[Microservices - File Service]], mode **online** butuh **test-engine + bank soal (TBD / fase lanjut)**; undangan jadwal via [[Microservices - Notification Service]]
   - **Glints (TapLoker)** — ATS/job-portal eksternal yang dipakai aktif (sumber pelamar utama). Pemetaan stage Glints → pipeline kita: *Chat Dimulai/Terhubung* → Screening · *Skill & Psikotes* → Technical Test (skill) + Psikotes (kita pisahkan) · *Wawancara* → Interview · *Negosiasi* → Offer · *Direkrut* → Hired · *Belum Sesuai* → Rejected. ⚠️ **Beda urutan**: Glints menaruh **Skill & Psikotes sebelum Wawancara**, sedangkan proses internal kita **psikotes setelah interview** (keputusan HRD) — perlu disadari saat memetakan dari Glints. Komunikasi kandidat saat ini lewat **chat/WA Glints**. Relasi `recruitment-service` ↔ Glints (impor/sinkron vs menggantikan) = **TBD strategis**
-- **UI**: modul **Recruitment** di [[APP - Web ERP]] (HR & SPV) + **portal lowongan publik** untuk pelamar (self-apply + upload CV — fase lanjut)
+- **UI**: modul **Recruitment** di [[APP - Web ERP]] (HR & SPV) + **portal karir publik** untuk pelamar ✅ [[APP - Portal Karir Bharata]] — lihat lowongan, **melamar sendiri** (field native `candidate` + **satu berkas PDF gabungan maks 10 MB**), dan **cek status** via `tracking_token`. Menggantikan alur **Google Form** lama (lamaran langsung masuk pipeline, HR tak lagi memindahkan data manual)
 
 ## Keputusan (sudah disepakati HRD)
 
@@ -151,22 +169,28 @@
 - Di tahap mana saja kandidat dikabari? Yang **ditolak** dikabari (bahasa halus) atau tidak?
 - Tampil **atas nama siapa** (HRD/perusahaan)? Dikirim **otomatis sistem** atau manual petugas?
 
-> **Catatan teknis (belum mengikat):** fitur **email belum tersedia** di sistem → harus dibangun bila jadi kanal utama. Pengiriman WhatsApp otomatis saat ini memakai **satu nomor milik IT** (bukan nomor resmi HRD).
+> **Catatan teknis:** fitur **email sudah tersedia & terpakai** (Resend via [[Microservices - Notification Service]], terverifikasi live 2026-07-16). Pengiriman WhatsApp otomatis saat ini masih memakai **satu nomor milik IT** (bukan nomor resmi HRD).
 
 ## Rollout Bertahap
 
 - [x] **Fase 1** — Job Requisition (approval **SPV → HR review → Direktur**) + Candidate management (data pelamar + status pipeline) — ✅ BE
 - [x] **Fase 2** — Sourcing & Job Posting + **Screening manual** + **Interview** (multi-tahap) + **Psikotes (manual oleh HR)** — ✅ BE
 - [x] **Fase 3** — Offer & Decision + **Onboarding handoff** (`/onboarding/register`) + **Notifikasi kandidat via Email** (Resend) — ✅ BE
-- [x] **Fase A–E (adopsi ERPGo)** — master (job_type/candidate_source/interview_type/job_location) + form builder (custom_question) + enrich job_posting & candidate — ✅ BE (2026-07-03)
+- [x] **Fase A–E (adopsi ERPGo)** — master (job_type/candidate_source/interview_type/job_location) + enrich job_posting & candidate — ✅ BE (2026-07-03). *(form builder `custom_question` sempat ada lalu **dihapus** #486/#342.)*
+- [x] **Portal karir publik** — [[APP - Portal Karir Bharata]]: browse lowongan (URL `slug`) → detail → **self-apply** (field native `candidate` + **berkas PDF gabungan maks 10 MB** → MinIO) → **cek status** via `tracking_token`; + email otomatis "lamaran diterima". ✅ BE (2026-07-16) & FE jalan terhadap dev — ⚠️ **belum go-live** (belum ada domain/deploy; sebagian menunggu deploy manual BE)
+- [x] **Hire → Karyawan** — konversi kandidat Hired jadi data karyawan di HRIS (mode *dari kandidat*, prefill + isi sisa) + `link-employee` — ✅ BE #490 / FE #344 (2026-07-16, merged; ⚠️ deploy manual)
+- [x] **Onboarding checklist per-kandidat** — instansiasi checklist dari template + centang progress — ⚠️ BE #492 / FE #346 (PR, belum merged/deploy)
+- [x] **Performance Review Onboarding (masa evaluasi)** — sesi review multi-penilai (7 rating + 3 uraian) → keputusan status — ⚠️ BE #493 / FE #349 (PR, belum merged/deploy)
 - [ ] **Fase 4 (enhancement)** — **AI CV screening** (skor & rekomendasi, HR putuskan) + **WhatsApp** notifikasi kandidat
-- [ ] **Fase 5 (opsional)** — **portal self-apply publik** + **psikotes online** (test-engine + bank soal) + integrasi job board (mis. JobStreet)
-- [ ] **Fase F–I (adopsi ERPGo lanjut)** — interview rounds+feedback, onboarding checklist, offer letter template, career/recruitment settings
+- [ ] **Fase 5 (opsional, sisa)** — **psikotes online** (test-engine + bank soal) + integrasi job board (mis. JobStreet)
+- [ ] **Fase F–I (adopsi ERPGo lanjut)** — [x] interview rounds+feedback (✅ BE); [x] onboarding checklist per-kandidat (⚠️ #492); [ ] offer letter template, career/recruitment settings
 
 ## Belum Diputuskan (TBD)
 
-- **Strategi Glints** — `recruitment-service` mengimpor/sinkron dari Glints vs menggantikannya (Glints kini ATS eksternal utama).
-- **Infra Email** — kemampuan kirim email **belum ada di sistem**, perlu dibangun (prasyarat notifikasi kandidat fase awal).
+- **Strategi Glints** — `recruitment-service` mengimpor/sinkron dari Glints vs menggantikannya (Glints kini ATS eksternal utama); kini bertambah pertanyaan: posisi Glints vs **portal karir sendiri** ([[APP - Portal Karir Bharata]]) sebagai kanal utama.
+- ~~**Mapping hire → data karyawan**~~ ✅ **selesai** (2026-07-16, #490/#344): HRIS "Tambah Karyawan" punya mode *dari kandidat* (prefill data kandidat, HR isi sisa) + `link-employee` menautkan kandidat ke `employee_id`. Detail: [[Microservices - Recruitment Service]].
+- ~~**Onboarding checklist & Performance Review**~~ ✅ **dibangun** (⚠️ PR #492/#346 & #493/#349, belum merged/deploy): instansiasi checklist per-kandidat + sesi Performance Review Onboarding (masa evaluasi). Lihat bagian **Masa Evaluasi & Performance Review Onboarding**.
+- **Sumber lowongan ganda** — situs korporat ([[APP - Website Bharata Internasional]]) punya halaman karir dengan BE sendiri; perlu diputuskan apakah diarahkan ke portal karir agar tak ada dua sumber lowongan.
 - **Psikotes**: mode (online vs manual oleh HR), jenis tes & tools (kemampuan/kepribadian), ambang skor & bobot terhadap keputusan.
 - **AI CV screening (fase lanjut)**: model LLM yang dipakai & penanganan CV hasil scan (OCR).
 - **Offer letter**: template & approver.
@@ -175,7 +199,8 @@
 
 - [[HRIS - Analysis]] — sumber subsistem talent acquisition/interview/onboarding yang dipisah ke sini
 - [[HRIS - Personalia]] · [[HRIS - Big Pictures]]
-- [[Microservices - Recruitment Service]] — sisi implementasi service (rancangan)
+- [[Microservices - Recruitment Service]] — sisi implementasi service · [[API - Recruitment Service]] — endpoint
+- [[APP - Portal Karir Bharata]] — portal karir publik untuk pelamar
 - [[Microservices - Employee Service]] — onboarding/register & master data
 - [[Microservices - Notification Service]] · [[Microservices - File Service]]
 - [[APP - Web ERP]]

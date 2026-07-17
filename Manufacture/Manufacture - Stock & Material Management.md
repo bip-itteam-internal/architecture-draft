@@ -2,7 +2,7 @@
 
 *Desain (to-be) sistem **manajemen stok & material** untuk produksi — pengganti spreadsheet manual (stok bahan baku/kemas vs kebutuhan). Menggabungkan **master material + stok per gudang + perencanaan kebutuhan → kekurangan → pengadaan**. Menjadi backbone yang menaungi [[WH - Management System]], [[WH - Inbound (Receiving)]] / [[WH - Outbound (Sending)]], dan stock opname.*
 
-- **Status**: ⚠️ Sebagian Implemented — service nyata = [[Microservices - Manufacture Service]] (`manufacture-service` + `manufacture_db`). Fase 1 (master bahan/produk + stok + transaksi) & BOM/formula **sudah jalan**; fase lanjut (kekurangan otomatis, opname digital, multi-gudang, Accurate) masih konsep.
+- **Status**: ⚠️ Sebagian Implemented — service nyata = [[Microservices - Manufacture Service]] (`manufacture-service` + `manufacture_db`). Fase 1 (master bahan/produk + stok + transaksi), BOM/formula, dan **baca stok dari Accurate (satu arah)** sudah jalan; fase lanjut (kekurangan otomatis, opname digital, multi-gudang, tulis balik ke Accurate) masih konsep.
 - **Target arsitektur**: microservice **`manufacture-service`** (Go + Fiber v2 + MongoDB) + modul web di [[APP - Web ERP]], **rollout bertahap**. (Dok ini awalnya menamai `warehouse-service`; implementasi final memakai nama tunggal **`manufacture`** di semua layer — service, db, FE.)
 - **Catatan**: berbeda dari [[Microservices - Inventory Service]] & [[GA - Inventory Management]] yang menangani **aset GA**, bukan stok bahan/produksi
 
@@ -26,7 +26,7 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 
 ## Model Data
 
-`manufacture-service` punya database sendiri (`manufacture_db`). **Koleksi nyata di kode** (prefix `manufacture_`, lihat [[Microservices - Manufacture Service]]): `manufacture_master_bahan`, `manufacture_master_product`, `manufacture_stok` (snapshot), `manufacture_transaksi` (in/out — sumber kebenaran pergerakan), `manufacture_formula` (BOM), `manufacture_sync_log`, `manufacture_production_log`, `manufacture_material_order`, `manufacture_marketing_po`, `manufacture_procurement_po`, `manufacture_proposal`, `manufacture_audit_log`, `manufacture_resi` (master resi retur), `manufacture_saldo_awal_bulanan` (snapshot saldo awal per bulan — **data master barang terpisah dari saldo awal bulanan**; snapshot otomatis idempoten tiap awal bulan).
+`manufacture-service` punya database sendiri (`manufacture_db`). **Koleksi nyata di kode** (prefix `manufacture_`, lihat [[Microservices - Manufacture Service]]): `manufacture_master_bahan`, `manufacture_master_product`, `manufacture_stok` (snapshot), `manufacture_transaksi` (in/out — sumber kebenaran pergerakan), `manufacture_formula` (BOM), `manufacture_sku_mapping` (listing SKU → komponen; bundle **virtual**, stok hanya di level komponen), `manufacture_sync_log`, `manufacture_production_log`, `manufacture_material_order`, `manufacture_marketing_po`, `manufacture_procurement_po`, `manufacture_proposal`, `manufacture_audit_log`, `manufacture_resi` (master resi retur), `manufacture_saldo_awal_bulanan` (snapshot saldo awal per bulan — **data master barang terpisah dari saldo awal bulanan**; snapshot otomatis idempoten tiap awal bulan).
 
 **Desain to-be (belum semua di kode)** — penamaan konseptual:
 
@@ -41,9 +41,9 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 
 ## Arsitektur & Integrasi
 
-- **`manufacture-service`**: Go + Fiber v2 + MongoDB, di belakang [[CORE - API Master Gateway]], auth via header gateway (lihat [[CORE - SSO Flow]]), role Manufacture / PPIC / Warehouse. Detail implementasi: [[Microservices - Manufacture Service]]. **Master di-sync dari Google Sheets via service account** (bahan, produk, formula); stok = sumber kebenaran di Mongo (mutasi atomik via replica-set transaction).
+- **`manufacture-service`**: Go + Fiber v2 + MongoDB, di belakang [[CORE - API Master Gateway]], auth via header gateway (lihat [[CORE - SSO Flow]]), role Manufacture / PPIC / Warehouse. Detail implementasi: [[Microservices - Manufacture Service]]. **Sync Google Sheets sudah dihapus** — master bahan & angka stok kini dari **Accurate** (read-only), barang jadi & bundle dari **data HPP**, formula dari **import Excel**. Transaksi = sumber kebenaran pergerakan di Mongo (mutasi atomik via replica-set transaction).
 - **Integrasi**:
-	- [[External - Accurate]] — **tarik stok awal** → bertahap menjadi source of truth (hybrid bertahap) — *rencana*
+	- [[External - Accurate]] — **sumber master bahan & angka stok, READ-ONLY** (lewat [[Microservices - Integration Service]]) — *sudah jalan*; WMS tak pernah push balik. Dua arah ditunda sampai ada koordinasi manufacture↔finance (risiko dobel-hitung)
 	- [[GA - Procurement System]] — kekurangan → pengadaan/PO — *rencana*
 	- [[APP - MyBharata]] — input stock opname & foto barang rusak/ED — *rencana*
 	- [[Microservices - Notification Service]] — notifikasi (stok rendah, kekurangan, opname) — *rencana*
@@ -52,15 +52,15 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 
 ## Rollout Bertahap
 
-- [x] **Fase 1** — Master material (bahan + produk) terstandar via sync Google Sheets + stok (snapshot, opening-balance-as-transaction) + transaksi in/out ✅ *(sumber master = Google Sheets via SA, bukan Accurate; per-gudang & kekurangan otomatis masih TBD)*
-- [~] **Fase 2** — BOM/resep ✅ (sync formula dari Sheet); kebutuhan otomatis dari rencana produksi (hybrid + override manual) — *belum*
-- [ ] **Fase 3** — Integrasi Accurate lebih dalam + stock opname digital (selisih, karantina, berita acara)
+- [x] **Fase 1** — Master material (bahan + produk) terstandar + stok (snapshot) + transaksi in/out ✅ *(sumber master sudah pindah dari Google Sheets ke Accurate/HPP; per-gudang & kekurangan otomatis masih TBD)*
+- [~] **Fase 2** — BOM/resep ✅ (import Excel layout NEW FORMULA); kebutuhan otomatis dari rencana produksi (hybrid + override manual) — *belum*
+- [~] **Fase 3** — Integrasi Accurate: **baca stok bahan & barang jadi sudah jalan (satu arah)** ✅; tulis balik ke Accurate + stock opname digital (selisih, karantina, berita acara) — *belum*
 - [ ] **Fase 4** — Inbound/outbound digital + multi-gudang/dispatch; `manufacture-service` jadi **source of truth** stok
 
 ## Catatan Migrasi & Belum Diputuskan (TBD)
 
 - **Migrasi data spreadsheet** butuh cleanup: kode belum terstandar, KATEGORI tercampur (supplier/batch/produk), satuan tidak konsisten, dan **anomali nilai** (mis. MENTHOL CRYSTAL ±18,8 juta gram ≈ 76% total stok — perlu diverifikasi)
-- Konversi & konsistensi **satuan** (gram/kg vs pcs)
+- ~~Konversi & konsistensi **satuan** (gram/kg vs pcs)~~ → **terjawab saat integrasi Accurate**: Accurate menyimpan bahan curah dalam **KG**, WMS memakai **GRAM** → sync mengalikan 1000 untuk satuan GRAM (PCS/LITER/ROL/KG apa adanya). Kasus yang tak bisa disimpulkan dari satuan dipakaikan `faktor_stok_accurate` per-item (mis. cangkang kapsul: Accurate ribuan butir, WMS PCS → 1000). Detail: [[Microservices - Manufacture Service]]. Sisa: satuan master yang salah entri dilaporkan tiap sync lewat `satuan_perlu_dicek`
 - **Multi-gudang** vs gudang tunggal — sementara: identitas gudang di level spreadsheet master (Utama = sheet bahan "GUDANG MANUFACTURE", Tinggar = sheet barang "GUDANG TINGGAR JAYA"; Elit = pemasok saja; Sadewa = titipan, dihitung dari transaksi); stok per-gudang sejati (ledger per lokasi) masih TBD
 - ~~Ownership sistem: PPIC vs Warehouse vs Manufacture~~ → **dok diletakkan di domain Manufacture** (ownership condong Manufacture; peran Warehouse/PPIC tetap terlibat di operasional)
 - Apakah stok **barang jadi** dikelola di sini atau di sisi Sales/distribusi
