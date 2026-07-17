@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Endpoint **manufacture-service** (WMS manufaktur: master bahan/produk, stok, transaksi, formula, produksi, PO, proposal, resi retur ekspedisi). Gateway: `/api/manufacture/*`. Grounded ke `services/manufacture/main.go`.*
+*Endpoint **manufacture-service** (WMS manufaktur: master bahan/produk, stok, transaksi, formula, produksi, PO, proposal, resi retur ekspedisi, feed retur marketplace). Gateway: `/api/manufacture/*`. Grounded ke `services/manufacture/main.go`.*
 
 - **Implementasi**: [[Microservices - Manufacture Service]] · **Status**: ✅ (di kode)
 - **Indeks**: [[API - Index]] · RBAC: di-handle di gateway (tak eksplisit di rute).
@@ -46,6 +46,25 @@
 | POST | `/resi/sync-shopee` | **Pull** resi order Shopee dari integration `/shopee/orders/resi-feed`, upsert by `no_resi` |
 | POST | `/resi/sync-batch` | **Push endpoint**: menerima batch resi-feed dari scheduler integration `sync-resi-wms` (lihat [[IT - Background Jobs & Schedulers]]) |
 
+## Retur Marketplace — Feed Gudang ✅
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/returns` | **Feed retur marketplace + status pencatatan gudang** — sumber tabel tab *Return Dari Ekspedisi* ([[APP - Web ERP]]). Retur ditarik dari integration `GET /transactions/returns` lewat HTTP + gateway key (sesuai [[ADR - 0002 Database-per-Service]] — **bukan** baca `integration_db` langsung), lalu di-join **di Go** dengan `manufacture_transaksi` by `dedupe_key` (beda cluster Mongo → `$lookup` mustahil). Param: `channel`, `shop_id`. Meta: `total`, `belum_dicatat`, `truncated` |
+
+**Status pencatatan DITURUNKAN saat baca, tidak disimpan** — supaya tak bisa melenceng saat retur/record berubah:
+
+| Status | Arti |
+|---|---|
+| `BELUM_DICATAT` | Barang balik (`goods_returning`) tapi gudang belum mengisi keterangan — **inilah sinyal yang dipantau Finance** (`meta.belum_dicatat`) |
+| `SUDAH_DICATAT` | Sudah ada transaksi bertanda `detail.returnKey` = `dedupe_key` retur (index sparse `detail_return_key_idx`) |
+| `TANPA_BARANG_BALIK` | Refund-only — tak ada barang fisik yang akan tiba, jadi gudang tak akan pernah punya sesuatu untuk dicatat. Netral, **tidak** dihitung sebagai tunggakan |
+
+> **Kunci join `detail.returnKey`** (camelCase, mengikuti isi `detail` yang memang salinan verbatim objek UI). Bila pengirim di form retur dan pembaca di `loadReturnRecords` tak lagi sepakat, join gagal **diam-diam** dan SEMUA retur tampak "belum dicatat".
+>
+> **Gagal-aman:** integration tak terjangkau → **502 eksplisit**, bukan daftar kosong; "tak ada retur" dan "gagal menghubungi" wajib bisa dibedakan, karena Finance memakai halaman ini untuk memastikan tak ada retur tertunggak. Paginasi dihabiskan (batas 10 × 200); bila batas tersentuh `meta.truncated=true` + dicatat ke log — pemotongan dilaporkan, tidak dipendam.
+>
+> Retur yang dicatat lewat feed ini tetap membawa penanda `namaMarket`, sehingga tetap **di-SKIP** dari push Penyesuaian Persediaan sesuai [[ADR - 0015 Push Pergerakan WMS ke Accurate]] (tercakup Sales Return).
+
 ## PO · Proposal · Audit
 | Method | Path | Fungsi |
 |---|---|---|
@@ -55,4 +74,5 @@
 | GET | `/audit-log` (`?user=&aksi=`) · `/audit-log/rekap` (`?bulan=YYYY-MM`) · `/health` | Audit log (list) · rekap aktivitas CRUD per user/bulan untuk **KPI otomatis** (agregasi batas hari/bulan pakai **WIB**, respons ber-flag `truncated` bila >20k entri) · health |
 
 ## Dokumen Terkait
-- [[Microservices - Manufacture Service]] · [[Manufacture - Stock & Material Management]] · [[GA - Procurement System]] · [[API - Integration Service]] (resi-feed) · [[IT - Background Jobs & Schedulers]] (`sync-resi-wms`) · [[API - Index]]
+- [[Microservices - Manufacture Service]] · [[Manufacture - Stock & Material Management]] · [[GA - Procurement System]] · [[API - Integration Service]] (resi-feed, `/transactions/returns`) · [[IT - Background Jobs & Schedulers]] (`sync-resi-wms`) · [[API - Index]]
+- [[ADR - 0002 Database-per-Service]] (feed retur lewat API, bukan lintas-DB) · [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] (kenapa seleksi retur bukan lewat status order) · [[ADR - 0015 Push Pergerakan WMS ke Accurate]] (retur F3 di-SKIP dari push)

@@ -24,6 +24,8 @@ Daftar rute lengkap di [[API - Manufacture Service]]. Ringkas:
 - **Audit log** — `GET /audit-log` (siapa mengubah apa, per aksi/target) + `GET /audit-log/rekap?bulan=YYYY-MM` (agregasi aktivitas CRUD per user untuk **KPI otomatis**; batas hari/bulan pakai **WIB (UTC+7)**, respons ber-flag `truncated` bila entri bulan >20k).
 - **Resi — Master Retur Ekspedisi (bridge marketplace)** — `manufacture_resi` (upsert by `no_resi` unik) untuk auto-fill scan form Return & Keluar FG, kini **terisi otomatis** dari order marketplace lewat integration: manufacture bisa **pull** (`POST /resi/sync-tiktok` → `/tiktok/shop/orders/resi-feed`; `POST /resi/sync-shopee` → `/shopee/orders/resi-feed`) atau menerima **push** batch (`POST /resi/sync-batch`) dari scheduler integration `sync-resi-wms` (tiap 10 mnt, watermark per-channel). Tiap resi membawa `status_pesanan`, `tanggal_rts` & `shift` gudang, dihitung saat resi terbuat dari waktu ready-to-ship (WIB): **Shift 1** 08–16 · **Shift 2** 16–24 · **Shift 3** 00–08 (menutup 24 jam; tak ada lagi kategori "Luar Jam"). FE **Master Resi** paginasi **per-hari** (nomor urut reset per hari), filter marketplace + **order status kanonik** (To Process/To Ship/Shipped/Completed/Returned/Cancelled, sama seperti modul Integration) + shift, dan **export Excel** (modal filter + pemilih kolom: Order Id/No Resi/SKU/Nama Produk/Qty + opsional). Detail sisi produsen: [[Microservices - Integration Service]]; jadwal: [[IT - Background Jobs & Schedulers]].
 
+- **Feed Retur Marketplace (tab Return Dari Ekspedisi)** ✅ — `GET /returns` menyajikan retur marketplace **beserta status pencatatan gudang**, sumber tabel tab *Return Dari Ekspedisi* di Gudang Barang Jadi. Retur ditarik dari integration `GET /transactions/returns` lewat **HTTP + gateway key** (`getFromIntegration`, sesuai [[ADR - 0002 Database-per-Service]]), lalu di-join **di kode Go** dengan `manufacture_transaksi` by `dedupe_key` — `integration_db` & `manufacture_db` beda cluster Mongo sehingga `$lookup` mustahil. Status (`BELUM_DICATAT`/`SUDAH_DICATAT`/`TANPA_BARANG_BALIK`) **diturunkan saat baca, tidak disimpan**, supaya tak bisa melenceng dari kenyataan; `meta.belum_dicatat` = sinyal tunggakan yang dipantau Finance. Record gudang ditandai `detail.returnKey` (= `dedupe_key`), index sparse `detail_return_key_idx`. Rincian kontrak: [[API - Manufacture Service]].
+
 ## Model Data (`manufacture_db`)
 
 15 collection (prefix `manufacture_`), grounded ke `models.go`:
@@ -67,6 +69,8 @@ Daftar rute lengkap di [[API - Manufacture Service]]. Ringkas:
 - **8 kode bahan belum diselaraskan** ke kode Accurate — ambigu, sengaja tidak ditebak: `SLG` (Accurate salah ketik `PP-036 SILLICA GEL`), `PS SRK 7/8/9/10/12 CM` (nama "PLASTIK SRING", Accurate punya varian ukuran+merek yang tak terputuskan otomatis — fuzzy match sempat salah pilih 9→19 CM dan 10/12→20 CM), `RF150` (BOTOL VIVIDENT 150 ML, tak ada di Accurate), `TEST-01` (data testing). Dilaporkan tiap sync via `bahan_tanpa_padanan_accurate`.
 - **`#N/A` di formula** DR FAY SERUM & HAIR & BODY WASH — error di file NEW FORMULA sumber, bukan bug kode.
 - **Temuan audit kode** (authz, race stok, mapper FE, seed atomik) terdaftar di [[Manufacture - Issue Code Audit 2026-06]] — perbaikan terjadwal.
+- ⚠️ **Service ini tidak memeriksa role sama sekali** — hanya `ValidateGateway` (auth antar-service). Seluruh pembatasan akses modul WMS ada di **frontend** (`ManufactureGuard`), termasuk akses read-only Finance ke Gudang FG. Konsekuensinya: pemanggil yang punya gateway key tetap bisa menulis lewat `POST /transaksi` tanpa role manufacture. Gap pra-ada, kini lebih relevan karena Finance resmi punya pintu ke modul ini.
+- ⚠️ **Qty `Reject` pada retur ikut menambah stok FG** (form kirim `qty` = reuse+rework+reject; `deltaStok` INBOUND menambah penuh) — padahal reject seharusnya ke scrap. Belum diperbaiki; rincian & keputusan yang ditunggu ada di catatan Inbox *Temuan - Reject retur menambah stok FG*.
 
 ## Dependensi & Integrasi
 
@@ -74,7 +78,8 @@ Daftar rute lengkap di [[API - Manufacture Service]]. Ringkas:
 - [[Microservices - Employee Service]] — sumber identitas/role (audit).
 - [[GA - Procurement System]] — kekurangan → pengadaan (rencana).
 - [[External - Accurate]] — **sumber master bahan & angka stok (read-only)**, diakses lewat [[Microservices - Integration Service]] (`/accurate/stocks/list`, salinan lokal `accurate_stocks`); manufacture tak pernah memanggil Accurate langsung. Lihat [[ADR - 0001 Akuntansi via Accurate]].
-- [[Microservices - Integration Service]] — data HPP (barang jadi & bundle) + resi-feed marketplace.
+- [[Microservices - Integration Service]] — data HPP (barang jadi & bundle) + resi-feed marketplace + **feed retur** (`GET /transactions/returns`, dikonsumsi `GET /returns`).
+- **Env `INTEGRATION_MODULE_URL`** wajib untuk semua jalur di atas (feed retur, `/resi/sync-*`, sync HPP). Ditambahkan ke `manufacture-service` di `docker-compose.yml` bersama feed retur — **sebelumnya tidak ada**, padahal `resi.go` & `sync_hpp.go` sudah memakainya (tanpa env ini mereka balas *"INTEGRATION_MODULE_URL belum diset"*).
 
 ## Dokumen Terkait
 
