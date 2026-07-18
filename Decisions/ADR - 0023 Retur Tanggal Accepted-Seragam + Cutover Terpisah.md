@@ -1,6 +1,8 @@
-✅ **Implemented** (kode 2026-07-16/17; ⚠️ belum deploy per 2026-07-17)
+⚠️ **Implemented (sebagian digantikan)** — keputusan **#2 (cutover split)** tetap berlaku; keputusan **#1 (tanggal accepted-seragam)** **digantikan** [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] (2026-07-18).
 
 # ADR - 0023 Retur: Tanggal Accepted-Seragam + Cutover Terpisah Retur/Faktur
+
+> **Sebagian digantikan (2026-07-18):** keputusan **#1** (tanggal = `accepted` seragam) memakai premis "Shopee `accepted` bersih" yang **terbantah** — `updated_at` Shopee juga melar mundur saat settle refund (median 3 hari). Kini tanggal **per-solution** (refund-only→`requested_at`; barang-balik→arrival via `return_tracking`), lihat [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]]. Keputusan **#2** (cutover faktur `20260710` vs retur `20260701`) **TIDAK berubah**.
 
 Dua keputusan terkait semantik pembukuan **Retur Penjualan** auto-sync ke Accurate. Melengkapi [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] & [[ADR - 0012 Retur Refund-only Push-all]].
 
