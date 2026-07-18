@@ -1,5 +1,7 @@
 # Marketing & Ads Command Center — MASTER Roadmap
 
+- **Status**: 🟡 Konsep — roadmap master dashboard Marketing & Ads Command Center.
+
 > Acuan tetap untuk membangun dashboard `10_DASH_MARKETING_ADS.html`.
 > Berbasis audit terverifikasi 5 sisi: koleksi `integration_db`, client API existing, API resmi TikTok Shop, FE marketing, FE accurate/incentive.
 > Prinsip: **reuse existing dulu, baru bangun yang kurang.** Jangan dobel-bangun.

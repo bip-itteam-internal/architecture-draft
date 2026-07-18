@@ -1,3 +1,7 @@
+# Order Production Workflow (Flow Source)
+
+- **Status**: 🟡 Konsep / Source — sumber flowchart (Mermaid) alur order produksi.
+
 File Mermaid
 ```
 flowchart TD

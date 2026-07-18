@@ -1,5 +1,7 @@
 # Affiliate Seller Sync — Implementation Plan
 
+- **Status**: 🟡 Konsep / Plan — rencana implementasi affiliate sync.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development atau superpowers:executing-plans. Steps pakai checkbox `- [ ]`.
 
 **Goal:** Auto-sync data affiliate dari TikTok Shop `Search Seller Affiliate Orders` API ke koleksi `affiliate_orders`, dipanggil dari DALAM service (token via `GetOrRefreshToken`, bukan token DB stale).

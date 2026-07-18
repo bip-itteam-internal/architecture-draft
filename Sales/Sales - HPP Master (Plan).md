@@ -1,5 +1,7 @@
 # HPP Master Implementation Plan
 
+- **Status**: 🟡 Konsep / Plan — rencana implementasi HPP (Cost per SKU + upload xlsx).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Tambah HPP (Cost) per SKU ke master `items`, dengan endpoint list + upload xlsx (preview → commit) + edit manual, dan tab FE "HPP Master".

@@ -1,3 +1,7 @@
+# Stok Pengecekan Fisik (Flow Source)
+
+- **Status**: 🟡 Konsep / Source — sumber flowchart (Mermaid) alur pengecekan stok fisik.
+
 
 File Mermaid
 ```

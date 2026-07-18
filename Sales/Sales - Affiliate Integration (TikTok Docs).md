@@ -1,5 +1,7 @@
 # Affiliate integration
 
+- **Status**: 🟡 Referensi — dok resmi TikTok Shop (Affiliate API).
+
 # Background
 TikTok Shop is excited to launch a new category of APIs focused on affiliate marketing on TikTok Shop.
 These APIs will provide Sellers, Creator Affiliates, and TikTok Shop Partners more efficient ways to create, manage, matchmake, track, monetize, and collaborate across TikTok Shop Affiliate Collaborations and Partner Campaigns.

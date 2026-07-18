@@ -1,5 +1,7 @@
 # Profit Engine + HPP Master — Design (Fase 1)
 
+- **Status**: 🟡 Konsep / Design (Fase 1) — spec profit engine (laba after-ads) + HPP; keputusan di [[ADR - 0008 Profit Engine Join via item_group_id]].
+
 > Spec ini fondasi dashboard "Marketing & Ads Command Center" (mockup `10_DASH_MARKETING_ADS.html`).
 > Fase 1 = laba after-ads real per produk/akun + KPI ringkasan + HPP master. Modul Creator/Affiliate/Live + RBAC = fase lanjut.
 

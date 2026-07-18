@@ -1,5 +1,7 @@
 # Marketing & Ads Dashboard — Rekap Analisis (Index)
 
+- **Status**: 🟡 Konsep — rekap/analisis teknis dashboard marketing.
+
 > Rekap lengkap analisis untuk membangun dashboard `10_DASH_MARKETING_ADS.html`.
 > Semua temuan tervalidasi **data produksi nyata** (mongosh read-only, integration_db) / **dok resmi TikTok**.
 > Dokumen ini = index. Detail per topik di file terkait (link bawah).

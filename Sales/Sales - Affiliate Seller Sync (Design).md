@@ -1,5 +1,7 @@
 # Affiliate Seller Sync — Design
 
+- **Status**: 🟡 Konsep / Design — spec auto-sync affiliate TikTok; keputusan di [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]].
+
 > Auto-sync data affiliate dari TikTok Shop **Affiliate Seller API** (bukan CSV import). Pola = sync existing (`SyncTTBusinessGMVMaxReport`).
 > Bagian dari MASTER roadmap Scope 6. Spec sumber: `2026-06-30-marketing-dashboard-MASTER.md` §B4.
 

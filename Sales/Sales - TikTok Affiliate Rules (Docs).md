@@ -1,5 +1,7 @@
 # TikTok Shop Affiliate(Creator Collaboration)Developer onboarding & termination Rules
 
+- **Status**: 🟡 Referensi — dok resmi TikTok (aturan onboarding/termination affiliate developer).
+
 # Background
 TikTok Shop has launched a new category ("Creator Collaboration" ) of APIs focused on affiliate marketing for beta testing on TikTok Shop. These APIs will provide Sellers, Creator Affiliates, and TikTok Shop Partners with more efficient ways to create, manage, matchmake, track, monetize, and collaborate across TikTok Shop Affiliate Collaborations and Partner Campaigns.
 This document is written to provide clear onboarding & termination rules for this category during the onboarding process.

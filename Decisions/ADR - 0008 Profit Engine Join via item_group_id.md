@@ -48,8 +48,8 @@ Masalah: menyambungkan ad-spend (item_group_id) → order → HPP tidak ada satu
 ## Dokumen Terkait
 
 Analisis lengkap dashboard Marketing & Ads (folder `Marketing Dashboard Analysis/`):
-- [[2026-07-01-marketing-dashboard-ANALISIS-REKAP]] — **index** (baca dulu)
-- [[2026-06-30-marketing-dashboard-MASTER]] — roadmap 8 scope + 9 engine + join + affiliate
-- [[2026-06-30-profit-engine-design]] — spec profit engine + HPP
-- [[2026-06-30-hpp-master-plan]] — plan HPP master (field cost + upload xlsx)
+- [[Sales - Marketing Dashboard (Analisis Rekap)]] — **index** (baca dulu)
+- [[Sales - Marketing Dashboard (Master Roadmap)]] — roadmap 8 scope + 9 engine + join + affiliate
+- [[Sales - Profit Engine (Design)]] — spec profit engine + HPP
+- [[Sales - HPP Master (Plan)]] — plan HPP master (field cost + upload xlsx)
 - [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]]
