@@ -34,11 +34,12 @@ tags: [hris, recruitment, roadmap]
 ### Dashboard (Talent Acquisition Hub)
 | Fitur ERPGo | Status bip-erp | Rekomendasi |
 |---|---|---|
-| KPI cards (Total Candidates, Active Jobs, Interviews, Onboarded) | ❌ tak ada dashboard rekrutmen khusus (data-nya ada: candidate/posting/interview) | 🟢 **Dashboard Rekrutmen** — reuse pola KPI HRIS ([[HRIS - Key Performance Index]]) |
-| Hiring Funnel (Applications→Shortlisted→Interviewed→Hired) | ❌ | 🟢 funnel dari agregasi `progress` (10 tahap pipeline) |
-| Status Overview (donut Candidate Status) | ❌ | 🟢 breakdown per `status` |
-| Interview Calendar | ⚠️ ada list menu **Interviews** (bukan kalender) | 🟡 tampilan kalender (nice-to-have) |
-| Copy Career Portal + QR | ⚠️ portal ada ([[APP - Portal Karir Bharata]]); tombol share/QR di app ❌ | 🟡 tombol salin link + QR |
+| KPI cards (Total Candidates, Active Jobs, Interviews, Onboarded) | ✅ **dibangun** — Total Kandidat · Lowongan Open · Interviews (total) · Onboarded (kandidat tahap Onboarding) | ✅ FE `feat/recruitment-dashboard` |
+| Hiring Funnel (Applications→…→Hired) | ✅ **dibangun** — kumulatif "mencapai ≥ tahap" + **persentase** (agregasi `progress`) | ✅ |
+| Status Overview — donut Candidate Status | ✅ **dibangun** (donut per `status`) | ✅ |
+| Status Overview — donut Onboarding Progress | ✅ **dibangun** (dari Performance Review masa-evaluasi: Scheduled + outcome Lulus/Diperpanjang/Tidak Lulus) | ✅ |
+| Interview Calendar | ✅ **dibangun** (grid bulan + navigasi, dari `scheduled_at`) | ✅ |
+| Copy Career Portal + QR | ❌ belum (portal ada [[APP - Portal Karir Bharata]]) | 🟡 tombol salin link + QR (opsional) |
 
 ### Fase 1 — Konfigurasi / Master Data
 | Fitur ERPGo | Status bip-erp | Rekomendasi |
@@ -87,7 +88,7 @@ tags: [hris, recruitment, roadmap]
 ## Kandidat Implementasi (prioritas, disesuaikan perusahaan)
 
 **🟢 Prioritas — data sudah ada, nilai tinggi:**
-1. **Dashboard Rekrutmen** — KPI (total kandidat, lowongan Open, interview terjadwal, hired periode) + **hiring funnel** (agregasi `progress`) + breakdown `status`. Fondasi visibilitas HR; reuse pola KPI/dashboard HRIS.
+1. ~~**Dashboard Rekrutmen**~~ ✅ **SELESAI 2026-07-18** (FE `feat/recruitment-dashboard`) — KPI (Total Kandidat/Lowongan Open/Interviews/Onboarded) + hiring funnel (kumulatif + %) + donut status kandidat + donut onboarding progress + **kalender interview**. Reuse recharts+StatSummary, agregasi FE (BE tak diubah). Sisa opsional: Copy Portal + QR.
 2. **Quick wins:** ubah status/tahap kandidat **inline** dari daftar; **tanggal kedaluwarsa** + state "Dikirim" pada Offer.
 
 **🟡 Pertimbangkan — nilai jelas, effort sedang:**
