@@ -1,8 +1,8 @@
 ## Deskripsi
 
-*Manajemen program **pelatihan & pengembangan karyawan** (training & development). Dokumen ini menaikkan status dari konsep-mentah menjadi **usulan desain MVP** — hasil adaptasi modul **Training ERPGo** ke kondisi Bharata. **Backend MVP kini sudah diimplementasi** (branch `feat/employee-training`), grounded ke pola service & master data yang ada. **Cakupan sengaja dibatasi ke MVP inti**; fitur lanjut ditandai fase-lanjut/TBD.*
+*Manajemen program **pelatihan & pengembangan karyawan** (training & development). Dokumen ini menaikkan status dari konsep-mentah menjadi **usulan desain MVP** — hasil adaptasi modul **Training ERPGo** ke kondisi Bharata. **Backend & Frontend MVP sudah diimplementasi & merged ke main**, grounded ke pola service & master data yang ada. **Cakupan sengaja dibatasi ke MVP inti**; fitur lanjut ditandai fase-lanjut/TBD.*
 
-- **Status**: ⚠️ **BE MVP diimplementasi** (branch `feat/employee-training`, **belum merge/deploy**) — endpoint di [[Microservices - Employee Service]] · [[API - Employee Service]]. **Frontend & deploy belum**. Desain di bawah tetap acuan.
+- **Status**: ⚠️ **MVP implemented & merged ke main** (BE bip-erp #545/#550 + FE erp-frontend #390/#391; refine FE #396) — endpoint di [[Microservices - Employee Service]] · [[API - Employee Service]], UI `/hris/training`. **Deploy dev + smoke test masih pending**. Desain di bawah = acuan.
 - **Referensi bentuk**: modul **Training ERPGo** (3 sub-menu: Training Types · Trainers · Training List) — diambil selektif, **bukan** disalin utuh
 - **Penempatan usulan**: perluasan [[Microservices - Employee Service]] (bukan microservice baru) — lihat **Penempatan Arsitektur**
 - **Prioritas**: Fase E di [[HRIS - Roadmap]] (HR lifecycle, setelah Recruitment) — belum urgen; dokumen ini menyiapkan desain agar cepat dieksekusi saat gilirannya
@@ -96,30 +96,30 @@ Collection baru di database Employee Service (MongoDB), sejajar dengan `master_d
 
 - **Cakupan** = **MVP inti** (Types + Trainers + Training + peserta/kehadiran) + roadmap bertahap; fitur lanjut ditunda.
 - **Penempatan** = **perluas Employee Service** (bukan service baru) untuk MVP.
-- **Branch dibuang** — org unit tunggal = **Department** (`master_department`).
+- **Branch dibuang** (adaptasi ERPGo). **Department = OPSIONAL** (peran *Penyelenggara*) — **tidak** membatasi peserta; peserta lintas semua departemen, di-assign HRD. *(Revisi: semula wajib satu dept.)*
 - **Cost** informasional (tanpa integrasi akunting; Accurate = [[ADR - 0001 Akuntansi via Accurate]]).
 - **Evaluasi** (bila dibangun) = **purpose-built**, bukan form builder.
 - **Pemilik proses** = **HR Training Officer** (kelola master + transaksi + keputusan final pengajuan).
 - **Kehadiran** = **boolean hadir/tidak** (cukup untuk MVP; tanpa status izin/jam).
-- **Kapasitas** `max_participants` = **cap keras** (bukan sekadar informasional).
+- **Kapasitas** = **otomatis mengikuti jumlah peserta yang di-assign** (cap keras `max_participants` **dibuang**); assign via **multi-select** karyawan. *(Revisi keputusan lama.)*
 - **Approval pengajuan pelatihan** (fase lanjut) = **SPV → HR Training Officer → Direktur**, bersifat **administratif** (Cost informasional, **tanpa** approval anggaran / integrasi keuangan).
 
-## Implementasi (BE MVP — ⚠️ branch `feat/employee-training`, belum merge/deploy)
+## Implementasi (BE+FE — ✅ merged ke main; deploy dev pending)
 
-*Backend MVP menyeluruh dibangun sebagai perluasan [[Microservices - Employee Service]] (`services/employee/training.go` + model/validasi di `shared-library/models/employee/training.go`). Endpoint lengkap: [[API - Employee Service]] §Training Program.*
+*Dibangun sebagai perluasan [[Microservices - Employee Service]] (`services/employee/training.go` + model/validasi di `shared-library/models/employee/training.go`) + UI [[APP - Web ERP]] (`src/features/hris/training/*`). Endpoint lengkap: [[API - Employee Service]] §Training Program.*
 
 - **Master** ✅ — CRUD `/training/types` & `/training/trainers` (internal/eksternal).
 - **Transaksi** ✅ — CRUD `/training` (filter Department+Status), cek FK, guard transisi status, delete cascade.
-- **Peserta & kehadiran** ✅ — enroll (**cap keras** + unique index anti-duplikat), kehadiran boolean, riwayat per-karyawan.
+- **Peserta & kehadiran** ✅ — **assign multi-select** (lintas dept), unique index anti-duplikat, **tanpa cap keras** (kapasitas = jumlah peserta), kehadiran boolean, riwayat per-karyawan.
 - **Validasi murni + unit test** ✅ — `ValidateTraining`, `CanEnroll`, `IsValidStatusTransition`, `validateTrainer`.
-- **Belum**: Frontend (admin + list + peserta), deploy manual ke dev, smoke test live.
+- **Frontend** ✅ — `/hris/training` (list + form) & `/hris/training/masters` + dialog peserta (multi-select, reuse `MultiEmployeeSelect`) + menu nav (grup People Development). **Belum**: deploy manual ke dev + smoke test live.
 - **Backlog/hardening** (dari /review): PUT = full-replace (FE wajib kirim objek lengkap); enroll belum cek employee ada di `work_data`; list tanpa pagination; `department_key` beda konvensi (vs nama di KPI/`work_data`); resolusi route `/training/:id` bergantung urutan registrasi Fiber (statik didaftarkan lebih dulu).
 
 ## Rollout Bertahap (Usulan)
 
-- [x] **MVP-1 — Master** (✅ BE; halaman admin FE belum) — `training_type` + `trainer` (internal/eksternal) CRUD.
-- [x] **MVP-2 — Transaksi** (✅ BE; FE belum) — `training` CRUD + list (filter Department+Status) + status lifecycle.
-- [x] **MVP-3 — Peserta & Kehadiran** (✅ BE; FE belum) — tugaskan karyawan + tandai hadir + **riwayat per-karyawan**.
+- [x] **MVP-1 — Master** (✅ BE+FE) — `training_type` + `trainer` (internal/eksternal) CRUD.
+- [x] **MVP-2 — Transaksi** (✅ BE+FE) — `training` CRUD + list (filter Department+Status) + status lifecycle.
+- [x] **MVP-3 — Peserta & Kehadiran** (✅ BE+FE) — assign multi-select + tandai hadir + **riwayat per-karyawan**.
 - [ ] **Fase lanjut A** — **Evaluasi pasca-pelatihan** (rating purpose-built) → umpan [[HRIS - Key Performance Index]].
 - [ ] **Fase lanjut B** — **Sertifikat PDF** (MinIO via [[Microservices - File Service]]).
 - [ ] **Fase lanjut C** — **Request/approval pelatihan** (rantai **SPV → HR Training Officer → Direktur**, administratif; pola [[HRIS - Employee Request & Approval]]) + **notifikasi** ([[Microservices - Notification Service]]).

@@ -34,13 +34,13 @@
 - Model: `MasterDepartment` (key, name, positions[], roles[]) dan `MasterSystemRole` (key, name, roles[]) di `shared-library/models/employee/master_data.go`
 - Frontend: halaman CRUD di `/hris/master-data` (tabs Departments + System Roles)
 
-**Training Program (HRIS) — ⚠️ diimplementasi di branch `feat/employee-training`, belum merge/deploy**
-- Modul pelatihan karyawan (perluasan service ini, `services/employee/training.go`). Org unit = **Department** (`master_department.key`), **tanpa Branch**.
+**Training Program (HRIS) — ✅ merged ke main (deploy dev pending)**
+- Modul pelatihan karyawan (perluasan service ini, `services/employee/training.go`) + UI `/hris/training`. **Department opsional** (penyelenggara — tak membatasi peserta), **tanpa Branch**; peserta lintas dept di-assign HRD.
 - **Master**: CRUD `/training/types` (jenis) & `/training/trainers` (internal via `employee_id` / eksternal), by ObjectID.
-- **Transaksi**: CRUD `/training` + filter `?department_key=&status=`; cek FK type/trainer/department; **guard transisi status** (Scheduled→Ongoing→Completed / →Cancelled); delete cascade ke peserta.
-- **Peserta & kehadiran**: `/training/:id/participants` (enroll dgn **cap keras** `max_participants` + **unique index** `{training_id, employee_id}` anti-duplikat), PATCH kehadiran boolean, `GET /training/history/:employeeId`.
+- **Transaksi**: CRUD `/training` + filter `?department_key=&status=`; cek FK type/trainer (department **opsional**); **guard transisi status** (Scheduled→Ongoing→Completed / →Cancelled); delete cascade ke peserta.
+- **Peserta & kehadiran**: `/training/:id/participants` (enroll — **unique index** `{training_id, employee_id}` anti-duplikat, **tanpa cap keras**; kapasitas = jumlah peserta; FE assign **multi-select** lintas dept), PATCH kehadiran boolean, `GET /training/history/:employeeId`.
 - RBAC tulis = `RequireHRISStaff`; GET open (di belakang gateway). Model + validasi murni + unit test di `shared-library/models/employee/training.go`.
-- **Backlog/hardening**: PUT = full-replace (FE wajib kirim objek lengkap); enroll belum cek employee ada di `work_data`; list tanpa pagination; `department_key` (bukan nama) beda konvensi dgn KPI/`work_data`. Detail konsep: [[HRIS - Training Program]].
+- **Backlog/hardening**: PUT = full-replace (FE wajib kirim objek lengkap); enroll belum cek employee ada di `work_data`; list tanpa pagination. Detail konsep: [[HRIS - Training Program]].
 
 **CRUD Employee Data**
 - CRUD personal data, personal-documents, work data, work-documents, schedule, dan system-auth
