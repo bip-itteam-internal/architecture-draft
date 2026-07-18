@@ -29,6 +29,8 @@ Daftar rute lengkap di [[API - Manufacture Service]]. Ringkas:
 
 > **Performa sync (18 Juli 2026):** ketiga endpoint sync (`master-bahan/sync-accurate`, `stok/sync-accurate`, `master-product/sync-hpp`) memakai **`BulkWrite` unordered** (helper `bulkUpsert`/`upsertModel`) — sebelumnya loop `UpdateOne` per-item (~1000+ round-trip Mongo berurutan tiap klik) yang di prod (VPS, RTT jaringan) memakan detik-detik; kini 1 round-trip per koleksi (~0.1s/sync di uji lokal). Bukan "async" — kerjanya dibuat benar-benar cepat, bukan disembunyikan.
 
+> **Paginasi resi (18 Juli 2026):** `manufacture_resi` puluhan ribu baris & tumbuh terus (feed marketplace tiap 10 mnt). `GET /resi` polos mengirim semuanya (~8MB lokal) → Master Resi lambat. Ditambah `?date`/`?since` + `GET /resi/days` + index tanggal; FE default muat jendela 60 hari + indikator loading + tombol "Muat Semua". `/resi?date=` = 57KB (140× lebih kecil). Refactor penuh (self-fetch per-hari + search/export server-side) = pekerjaan lanjutan.
+
 ## Model Data (`manufacture_db`)
 
 15 collection (prefix `manufacture_`), grounded ke `models.go`:

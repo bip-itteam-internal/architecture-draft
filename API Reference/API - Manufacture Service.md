@@ -40,7 +40,7 @@
 ## Resi — Master Retur Ekspedisi
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/resi` · `/resi/lookup/:resi` | List semua resi · lookup 1 resi by `no_resi` (auto-fill scan form Return & Keluar FG). Tiap resi bawa `status_pesanan`, `tanggal_rts`, `shift` — diturunkan dari waktu ready-to-ship (WIB): **Shift 1** 08–16 · **Shift 2** 16–24 · **Shift 3** 00–08 |
+| GET | `/resi` (`?date=YYYY-MM-DD` \| `?since=YYYY-MM-DD`) · `/resi/days` · `/resi/lookup/:resi` | **Paginasi server** (koleksi puluhan ribu baris — kirim semua = 8MB, lambat): `?date` satu hari · `?since` jendela hari terbaru · tanpa param seluruhnya (kompat, hindari di prod). `/resi/days` = daftar hari+jumlah (ringan, navigasi). `/resi/lookup/:resi` = lookup 1 resi by `no_resi` (auto-fill scan Return & Keluar FG). Query hari pakai index `tanggal_rts`/`tanggal_pesanan`. Tiap resi bawa `status_pesanan`, `tanggal_rts`, `shift` (WIB): **Shift 1** 08–16 · **Shift 2** 16–24 · **Shift 3** 00–08. FE default muat `?since=60 hari` + tombol "Muat Semua" |
 | POST/PUT/DELETE | `/resi` · `/resi/:id` | CRUD resi (mayoritas terisi otomatis; tombol input manual sudah dihapus dari UI, endpoint tetap ada) |
 | POST | `/resi/sync-tiktok` | **Pull** resi order TikTok dari integration `/tiktok/shop/orders/resi-feed`, upsert by `no_resi` (index unik) |
 | POST | `/resi/sync-shopee` | **Pull** resi order Shopee dari integration `/shopee/orders/resi-feed`, upsert by `no_resi` |
