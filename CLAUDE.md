@@ -126,3 +126,17 @@ Untuk dok konsep murni: `## Latar Belakang`, `## Ruang Lingkup`, `## Belum Diput
 - Jangan mengarang detail yang tak ada di kode.
 - Jangan menghapus dok turunan hanya karena ada dok "induk" (induk = overview, turunan = detail).
 - Jangan membuat wikilink rusak; selalu verifikasi sebelum commit.
+
+<!-- shopee-context:start -->
+## Integrasi eksternal
+
+Konteks integrasi disimpan per folder dan dibaca **hanya saat relevan**.
+Jangan load isinya kalau task tidak menyentuh integrasi tersebut.
+
+| Integrasi | Folder | Baca kapan |
+|---|---|---|
+| Shopee Open API v2 | `API Reference/Shopee Open API v2/` | task menyentuh Shopee: order, produk, stok, logistik, iklan |
+
+Saat relevan, baca `README.md` di folder tersebut lebih dulu — di situ ada
+alur wajib, termasuk cara memperbarui dokumentasinya sendiri.
+<!-- shopee-context:end -->
