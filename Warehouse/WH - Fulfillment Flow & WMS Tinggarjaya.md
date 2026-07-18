@@ -88,6 +88,10 @@ NEW → APPROVED → PICKING → PACKED → RTS_OK → LABEL_PRINTED → HANDED_
 
 NEW / APPROVED → HELD (tahan manual, mencurigakan)
 semua status pra-RTS → CANCELLED (dari webhook cancel marketplace)
+semua status pra-RTS → HANDED_OVER otomatis bila marketplace sudah
+  SHIPPED/COMPLETED/RETURNED (order diproses di luar WMS via Seller Center —
+  history: "diproses via Seller Center"; mencegah antrian menggantung &
+  RTS dobel "not eligible for rescheduling")
 ```
 
 **Gerbang rekon (wajib, kedua jalur)**: order hanya bisa RTS bila datanya

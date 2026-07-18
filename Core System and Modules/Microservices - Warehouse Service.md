@@ -63,6 +63,15 @@ Implementasi: `CanTransition(to string) bool` di `models.go` — dipanggil setia
 pesanan wajib diunduh via `GET /fulfillment/queue/export` dulu (rekap rekon gudang
 diambil per batch sebelum cetak resi). Detail alur: [[WH - Fulfillment Flow & WMS Tinggarjaya]].
 
+**Auto-close order eksternal**: bila event/reconciler membawa status marketplace
+SHIPPED/COMPLETED/RETURNED sementara `status_wms` masih pra-RTS
+(NEW/APPROVED/PICKING/PACKED/RTS_FAILED/HELD) → order ditutup otomatis ke
+HANDED_OVER (action `closed_external`, history "diproses via Seller Center").
+Order yang RTS-nya lewat WMS (RTS_OK/LABEL_PRINTED) tidak disentuh — webhook
+SHIPPED hasil RTS sendiri hanya memperbarui `order_status_mp`. Reconciler kini
+menarik 4 status (TO_SHIP + SHIPPED/COMPLETED/RETURNED) sebagai fallback webhook;
+integration `shouldNotifyWarehouse` ikut meneruskan status tersebut.
+
 ## Keputusan Teknis (grounded)
 
 - **Flat package `main`**: semua file di `services/warehouse/` root, tidak ada sub-package. Konsisten dengan pola service lain di bip-erp.

@@ -33,6 +33,7 @@
 - `201 Created` + `{"action": "created"}` — order baru berhasil dibuat
 - `200 OK` + `{"action": "updated"}` — status_mp diperbarui
 - `200 OK` + `{"action": "cancelled"}` — cancel propagasi berhasil
+- `200 OK` + `{"action": "closed_external"}` — order diproses di luar WMS (marketplace SHIPPED/COMPLETED/RETURNED saat status_wms masih pra-RTS) → auto-close ke HANDED_OVER + history "diproses via Seller Center"
 - `200 OK` + `{"action": "skipped", "reason": "stale_event"}` — update_time lebih lama
 - `200 OK` + `{"action": "skipped", "reason": "already_final"}` — cancel tapi sudah HANDED_OVER/CANCELLED
 - `200 OK` + `{"action": "ignored", "reason": "not_to_ship"}` — order baru tapi bukan TO_SHIP
