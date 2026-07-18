@@ -58,7 +58,7 @@
 |---|---|---|---|
 | GET/POST | `/kpi` · `/kpi/dashboard` · `/kpi/templates` | KPI score + template | KPIDepartmentRBAC / HRIS |
 | GET/POST | `/vacation` · `/vacation/quota` · `/vacation/decrement` | Kuota & pemakaian cuti | HRIS (decrement: open) |
-| GET/PATCH | `/contract` · `/bpjs` · `/analysis` | Kontrak, BPJS, analisis | HRIS |
+| GET/PATCH | `/contract` · `/bpjs` · `/analysis` | Kontrak (filter `department`/`employment_type`/`status`/`ending_month`=`YYYY-MM` berdasar `contract_ending`), BPJS, analisis | HRIS |
 | GET | `/internal/aggregate/employee/:id` · `/v2/internal/aggregate/employees[/summary|/it]` · `/internal/export/all` | Aggregate & export | HRIS / IT |
 | POST/PUT | `/internal/transaction/create-employee` · `/update-employee/:id` | Bulk create/update employee | HRIS |
 
