@@ -29,7 +29,7 @@
 - Employee: CRUD penuh, filter/search, summary, export Excel, status registrasi myBharata, halaman detail
 - Attendance: tabel clock in/out + ikon metode + preview geolokasi (Leaflet), update manual, summary
 - Contract, Schedule (kalender + holiday CRUD), Vacation (kuota/terpakai/sisa), Report (bulanan + export Excel), Fingerprint (device management), Dashboard analitik, KPI
-- **Recruitment**: Job Requisitions + System Setup (master ATS) → [[Microservices - Recruitment Service]]
+- **Recruitment**: Job Requisitions + System Setup (master ATS) + **Panduan in-app** (modal onboarding section `/hris/recruitment`: auto-muncul pertama kali, tombol Paham/Ingatkan-nanti persist `localStorage`, tombol Panduan di header khusus section; 6 tab + flowchart alur; dwibahasa) → [[Microservices - Recruitment Service]]
 - **Payroll**: halaman **"Pengaturan Gaji"** (System Setup — 6 tab: Komponen Gaji, Gaji Karyawan, BPJS, Pajak/PTKP, **Perlakuan Kehadiran**, Perusahaan; reuse `SystemSetupLayout`) → [[Microservices - Payroll Service]] **Fase 1 (setup)**; kalkulasi/slip = fase berikut. Tab **Perlakuan Kehadiran** = master dibayar/dipotong per status absensi (data milik [[Microservices - Attendance Service]] `payroll_status_treatment`, memengaruhi payout). ⚠️ *branch `feat/payroll-fe`, belum merge; butuh BE ter-deploy di gateway untuk E2E*
 
 **KPI (shared)** — scoring per departemen + template CRUD (**per posisi**) + filter periode/status; HR lihat semua, supervisor hanya divisinya. Modal **Score KPI menyaring dropdown template ke posisi karyawan** yang dinilai — submit ditolak backend (`400`) bila posisi template ≠ posisi karyawan (bila belum ada template posisi tsb → diarahkan membuat dulu). Detail: [[HRIS - Key Performance Index]]
