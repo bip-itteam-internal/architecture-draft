@@ -44,6 +44,7 @@
 | POST/PUT/DELETE | `/resi` · `/resi/:id` | CRUD resi (mayoritas terisi otomatis; tombol input manual sudah dihapus dari UI, endpoint tetap ada) |
 | POST | `/resi/sync-tiktok` | **Pull** resi order TikTok dari integration `/tiktok/shop/orders/resi-feed`, upsert by `no_resi` (index unik) |
 | POST | `/resi/sync-shopee` | **Pull** resi order Shopee dari integration `/shopee/orders/resi-feed`, upsert by `no_resi` |
+| GET·POST·DELETE | `/selisih-rm` (`?date=` opsional) · `/selisih-rm/:id` | **Bukti Selisih RM**: log selisih bahan baku dikirim-vs-diterima produksi + foto + keterangan. Foto = `minio_object` key (upload lewat file-service `GET /api/file/minio/presigned?service=manufacture&document=selisih-rm`, dikompres di browser dulu). Akses (FE): posisi Security + role admin gudang RM/FG + PPIC/SPV |
 | POST | `/resi/sync-batch` | **Push endpoint**: menerima batch resi-feed dari scheduler integration `sync-resi-wms` (lihat [[IT - Background Jobs & Schedulers]]) |
 
 ## Retur Marketplace — Feed Gudang ✅
