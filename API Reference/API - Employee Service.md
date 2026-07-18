@@ -40,6 +40,19 @@
 
 > Konsumen FE: halaman `/hris/master-data` (di-link dari **menu IT**) & System Setup Personalia; tombol kelola disembunyikan bila role tak berhak.
 
+## Training Program (HRIS) — ⚠️ branch `feat/employee-training`
+> BE MVP diimplementasi (`services/employee/training.go`), **belum merge ke main / belum deploy**. Org unit = **Department** (`master_department.key`), tanpa Branch. RBAC tulis = `RequireHRISStaff`; GET open (di belakang gateway). Detail konsep: [[HRIS - Training Program]].
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET · POST | `/training/types` · `/training/trainers` | List / buat master jenis pelatihan & trainer (internal/eksternal) |
+| GET · PUT · DELETE | `/training/types/:id` · `/training/trainers/:id` | Detail/ubah/hapus master (by ObjectID) |
+| GET · POST | `/training` (`?department_key=&status=`) | List / buat event pelatihan (cek FK type/trainer/department) |
+| GET · PUT · DELETE | `/training/:id` | Detail / ubah (guard transisi status) / hapus (cascade peserta) |
+| GET · POST | `/training/:id/participants` | List / enroll peserta (**cap keras** + unique index anti-duplikat) |
+| PATCH · DELETE | `/training/:id/participants/:employeeId` | Tandai kehadiran (boolean) / batalkan peserta |
+| GET | `/training/history/:employeeId` | Riwayat pelatihan per karyawan |
+
 ## KPI · Vacation · Reports (HRIS)
 | Method | Path | Fungsi | RBAC |
 |---|---|---|---|
