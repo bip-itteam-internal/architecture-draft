@@ -15,6 +15,20 @@ tags: [hris, recruitment, roadmap]
 - **Legenda status:** ✅ ada · ⚠️ parsial · ❌ belum ada · ⛔ sengaja tak diadopsi
 - **Legenda rekomendasi:** 🟢 prioritas · 🟡 pertimbangkan · ⏭️ skip · 🔮 future (selaras kapabilitas AI)
 
+## Kondisi Aktual (As-Is)
+
+*Grounded ke `services/recruitment/routes.go` (semua endpoint) + model + menu FE. **Menu FE nyata:** Recruitment (HR) = Job Requisitions · Job Postings · Candidates · Interviews · Candidate Onboarding · System Setup. Portal SPV = Job Requisitions (ajukan). Link login-gated tanpa sidebar: `/interview-feedback/[id]`, `/onboarding-review/[employeeId]`. Portal publik: [[APP - Portal Karir Bharata]].*
+
+1. **Job Requisition** — **approval 3-tingkat**: SPV ajukan (`Submitted`) → HR review (`HR Reviewed`/`Revision Requested`) → **Direktur** (`Approved`) → `Posted`; + reject + resubmit. Kualifikasi (usia/gender/pendidikan/pengalaman/tugas/tanggal mulai). Capability flags per-aksi.
+2. **Job Posting** — dibuka dari requisition Approved; `Open/Closed`, **slug** URL publik; field kaya (job_type/location/branch/positions/priority/experience/salary/deadline/featured/show_*/skills/description/requirements/benefits/terms HTML).
+3. **Candidate** — pipeline **`progress` (10 tahap) + `status` (9 keadaan)** + `tracking_token`; field lengkap + salary expected/current, notice, portfolio/linkedin, source; berkas **CV + profile image + cover letter** (MinIO); aksi create/update/**advance**/reject/withdraw/**link-employee**; **apply publik + tracking**. Flags can_issue_offer/upload_letter/respond/hire.
+4. **Stage records (timeline seleksi, 5 jenis)** — `GET /stages` + PUT/DELETE per record: **Screening** (lanjut/reject) · **Interview** (dari menu Interviews: HR/User/Final, panel, rounds per-lowongan, feedback rating+rekomendasi + link email) · **Technical Test** (skill/score/notes — **manual**) · **Background Check** (clear/issue) · **Psikotes** (jenis/mode/scores/interpretasi + **report PDF**; `online` placeholder).
+5. **Offer & Hire** — issue (HR supervisor) → upload **letter PDF** → accept/decline → **hire** (Direktur/approver). Status `Issued/Accepted/Declined`. → link-employee jadi karyawan.
+6. **"Onboarding" = masa evaluasi** — **Performance Review Onboarding** (multi-penilai 7 rating + 3 uraian → Lulus/Diperpanjang/Tidak Lulus, penilai isi via link). **Bukan** checklist tugas.
+7. **Master & Settings (System Setup)** — master `job_type`/`candidate_source`/`interview_type`/`job_location`; **Kelola Template Email** per-event (preview/test-send/reset); **audit log** (HR admin).
+
+**Sudah dihapus (jangan dihitung ada):** Custom Questions (#486), Onboarding Checklist template + per-kandidat (2026-07-18), toggle `ask_gender`/`ask_date_of_birth`/`ask_country`.
+
 ## Pemetaan Fitur
 
 ### Dashboard (Talent Acquisition Hub)
@@ -35,6 +49,7 @@ tags: [hris, recruitment, roadmap]
 | System Setup → Onboarding Checklists | ⛔ **dihapus 2026-07-18** (dead code, tak dipakai FE) | ⏭️ lihat "Onboarding" di bawah |
 | System Setup → Brand Settings + konten portal (About, Application Tips, What Happens Next, Need Help, Tracking FAQ) | ❌ konten portal karir sebagian hardcoded | 🟡 config konten portal via System Setup (HR ubah tanpa deploy) |
 | System Setup → Offer Letter Template | ❌ offer letter = **upload PDF manual** (`letter_object` MinIO), bukan template | 🟡 template + generate PDF (lihat Offers) |
+| *(di luar ERPGo)* **Kelola Template Email** per-event | ✅ bip-erp punya (settings: list/get/put/preview/test-send/reset) | — kelebihan bip-erp |
 
 ### Fase 2 — Sourcing
 | Fitur ERPGo | Status bip-erp | Rekomendasi |
@@ -59,7 +74,7 @@ tags: [hris, recruitment, roadmap]
 |---|---|---|
 | Offers (Candidate/Position/Salary/Start/Status) | ✅ `offer` (Issued→Accepted/Declined) + letter PDF upload/preview | — |
 | Offer → status kaya (Draft/Sent/Negotiating/Expired) + **Expiration Date** | ❌ hanya Issued/Accepted/Declined, tanpa kedaluwarsa | 🟢 tambah **tanggal kedaluwarsa** + state "Dikirim" (kecil, berguna) |
-| Offer → **Approval Status** (Pending/Approved) sebelum kirim | ❌ approval ada di **requisition**, bukan offer | 🟡 offer approval pakai approver existing (SPV→hris supervisor→Secretary) |
+| Offer → **Approval Status** (Pending/Approved) sebelum kirim | ⚠️ tak ada field status approval di offer, TAPI ada **role-gating**: issue oleh **HR supervisor** → **hire oleh Direktur/approver**. Approval "berat" ada di **requisition (3-tingkat)** di hulu | 🟡 opsional: field approval eksplisit di offer bila butuh gate tambahan sebelum kirim ke kandidat |
 | Offer → salary increment | ❌ | ⏭️ low value |
 | Offer Letter **Template** generator | ❌ upload PDF manual | 🟡 template + generate (butuh konten di System Setup) |
 | Checklist Items + Candidate Onboarding + **Buddy** | ⛔ checklist **dihapus**; buddy ❌ tak ada | ⏭️ skip — model perusahaan beda: "onboarding" = **masa evaluasi** → **Performance Review Onboarding** (#493), bukan checklist tugas |
@@ -76,7 +91,7 @@ tags: [hris, recruitment, roadmap]
 2. **Quick wins:** ubah status/tahap kandidat **inline** dari daftar; **tanggal kedaluwarsa** + state "Dikirim" pada Offer.
 
 **🟡 Pertimbangkan — nilai jelas, effort sedang:**
-3. **Offer approval flow** (pakai approver existing) + **Offer Letter template** (+ konten di System Setup).
+3. **Offer Letter template** (+ konten di System Setup); field status approval eksplisit di offer = **opsional** (role-gating issue→hire sudah ada; approval berat ada di requisition).
 4. **Status hasil asesmen** (Lulus/Tidak/Pending) untuk Technical Test & Psikotes; opsi **tes online** (bank soal / kirim tugas + upload jawaban) — menjawab pertanyaan pengembangan Tes.
 5. **Interview status lifecycle** (Completed/Cancelled/No-show) — mendukung dashboard/funnel.
 6. **Config konten Career Portal** (About/Tips/What-Happens-Next/FAQ) via System Setup.
