@@ -202,6 +202,7 @@
 - [[HRIS - Analysis]] — sumber subsistem talent acquisition/interview/onboarding yang dipisah ke sini
 - [[HRIS - Personalia]] · [[HRIS - Big Pictures]]
 - [[Microservices - Recruitment Service]] — sisi implementasi service · [[API - Recruitment Service]] — endpoint
+- [[HRIS - Recruitment Roadmap (Adopsi ERPGo)]] — pemetaan fitur ERPGo vs implementasi + kandidat pengembangan
 - [[APP - Portal Karir Bharata]] — portal karir publik untuk pelamar
 - [[Microservices - Employee Service]] — onboarding/register & master data
 - [[Microservices - Notification Service]] · [[Microservices - File Service]]
