@@ -1,4 +1,4 @@
-> **Status:** 🟡 Draft — disusun dari dokumentasi publik Meta for Developers (`developers.facebook.com`) per Juli 2026. **Belum pernah dieksekusi dengan akun Bharata asli** — belum ada implementasi client Meta Ads di [[Microservices - Integration Service]] (§Meta Ads, konsep). Jangan anggap langkah di bawah final; verifikasi ulang tiap field/permission saat implementasi nyata dimulai, dan naikkan status ke ✅ setelah terverifikasi jalan.
+> **Status**: 🟡 Draft — disusun dari dokumentasi publik Meta for Developers (`developers.facebook.com`) per Juli 2026. **Belum pernah dieksekusi dengan akun Bharata asli** — belum ada implementasi client Meta Ads di [[Microservices - Integration Service]] (§Meta Ads, konsep). Jangan anggap langkah di bawah final; verifikasi ulang tiap field/permission saat implementasi nyata dimulai, dan naikkan status ke ✅ setelah terverifikasi jalan.
 
 ## Tujuan
 

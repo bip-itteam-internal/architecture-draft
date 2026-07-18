@@ -57,8 +57,8 @@ ROAS ≥ 3.2 (konsisten `GMV_MAX_WINNER_ROI_THRESHOLD` existing), CPA < Rp30.000
 Scope nempel ke APP (`service_id`), bukan URL auth (`GetAuthorizeURL` cuma `service_id=app_id`). Idealnya **1 app** (scope affiliate + transaction di app Shop existing) → 1 re-auth → 1 token cover semua. Ads (BC) = app terpisah (`TIKTOK_BUSINESS_APP_ID`), tak terpengaruh. **OPEN: app affiliate (Creator Collaboration) = App ID sama/beda dgn `TIKTOK_SHOP_APP_ID` (75485...)?** Sama→1-app simpel; beda→2-app (extend token per-app).
 
 ## 9. Risiko akurasi (dari sesi lain, relevan ke laba)
-- **ETL drift:** 364 order hilang dari summary (Rp32.6jt underreport) — rate-limiter skip Upsert. Profit-engine harus sadar data transaction belum 100% lengkap. Lihat [[etl-transaction-orders-drift]].
-- **Timezone:** revenue beda vs seller center (fixed, date-fns-tz Asia/Jakarta). Lihat [[wib-timezone-date-filter]].
+- **ETL drift:** 364 order hilang dari summary (Rp32.6jt underreport) — rate-limiter skip Upsert. Profit-engine harus sadar data transaction belum 100% lengkap. (Temuan sesi lain *etl-transaction-orders-drift* — belum ada nota terpisah di vault.)
+- **Timezone:** revenue beda vs seller center (fixed, date-fns-tz Asia/Jakarta). (Temuan sesi lain *wib-timezone-date-filter* — sudah fixed.)
 
 ---
 

@@ -1,4 +1,4 @@
-> **Status:** ✅ Terverifikasi end-to-end (akun trial, 2026-07-14) — code ditukar jadi access token, `db-list.do`/`open-db.do` jalan, dan `GetItemStock` lewat **client asli** mengembalikan stok nyata. Semua endpoint (`oauth/token`, `db-list.do`, `open-db.do`, data `/accurate/api/...`) teruji; cocokkan hanya daftar **scope** ke app-mu.
+> **Status**: ✅ Terverifikasi end-to-end (akun trial, 2026-07-14) — code ditukar jadi access token, `db-list.do`/`open-db.do` jalan, dan `GetItemStock` lewat **client asli** mengembalikan stok nyata. Semua endpoint (`oauth/token`, `db-list.do`, `open-db.do`, data `/accurate/api/...`) teruji; cocokkan hanya daftar **scope** ke app-mu.
 >
 > **Penting — model token:** access_token OAuth Accurate berformat **UUID** (mis. `9748cd77-…`), **BUKAN** `aat.…`. Token OAuth **butuh session** (`open-db.do` → header `X-Session-ID`); client kita menanganinya **otomatis** bila `ACCURATE_DB_ID` diisi (lihat *§Mode token*). Token **API Token `aat.…`** (DB-bound) bebas-session → kosongkan `ACCURATE_DB_ID`.
 

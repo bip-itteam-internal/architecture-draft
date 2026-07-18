@@ -1,4 +1,4 @@
-> **Status:** ✅ Implemented (17 Juli 2026) — kill switch `ACCURATE_WMS_PUSH` default MATI. **18 Juli 2026: dinyalakan di dev LOKAL** (kredensial ternetralkan `accurate-disabled.invalid`) — uji hidup end-to-end lolos: pindai watermark → outbox → grup harian `ADJUSTMENT_IN` → konversi gram→kg benar (1 g = 0.001) → tulis gagal 502 → outbox tetap PENDING & diulang tiap 10 mnt (gagal-aman terbukti). **Dev VM & production masih MATI** — menyalakannya butuh koordinasi finance; jalur tulis-sukses ke Accurate belum pernah tereksekusi.
+> **Status**: ✅ Implemented (17 Juli 2026) — kill switch `ACCURATE_WMS_PUSH` default MATI. **18 Juli 2026: dinyalakan di dev LOKAL** (kredensial ternetralkan `accurate-disabled.invalid`) — uji hidup end-to-end lolos: pindai watermark → outbox → grup harian `ADJUSTMENT_IN` → konversi gram→kg benar (1 g = 0.001) → tulis gagal 502 → outbox tetap PENDING & diulang tiap 10 mnt (gagal-aman terbukti). **Dev VM & production masih MATI** — menyalakannya butuh koordinasi finance; jalur tulis-sukses ke Accurate belum pernah tereksekusi.
 
 ## Context
 

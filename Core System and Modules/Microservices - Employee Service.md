@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB (replica set)
 - **Path:** `services/employee`
-- **Status:** ✅ Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti
+- **Status**: ✅ Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

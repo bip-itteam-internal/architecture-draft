@@ -1,4 +1,4 @@
-> **Status:** 🟡 Draft — disusun dari dokumentasi publik KiriminAja Mitra API (`developer.kiriminaja.com`) per Juli 2026. **Belum pernah dieksekusi dengan akun Bharata asli** — belum ada implementasi client KiriminAja di [[Microservices - Integration Service]] (§KiriminAja, konsep). Jangan anggap langkah di bawah final; verifikasi ulang tiap field/endpoint saat implementasi nyata dimulai, dan naikkan status ke ✅ setelah terverifikasi jalan.
+> **Status**: 🟡 Draft — disusun dari dokumentasi publik KiriminAja Mitra API (`developer.kiriminaja.com`) per Juli 2026. **Belum pernah dieksekusi dengan akun Bharata asli** — belum ada implementasi client KiriminAja di [[Microservices - Integration Service]] (§KiriminAja, konsep). Jangan anggap langkah di bawah final; verifikasi ulang tiap field/endpoint saat implementasi nyata dimulai, dan naikkan status ke ✅ setelah terverifikasi jalan.
 
 ## Tujuan
 

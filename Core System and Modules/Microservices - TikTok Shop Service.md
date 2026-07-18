@@ -6,7 +6,7 @@ _TikTok Shop Service adalah penerima minimal untuk **OAuth callback + webhook Ti
 
 - **Stack:** Go + Fiber v2 + MongoDB
 - **Path:** `services/tiktok-shop-service`
-- **Status:** 🔴 Stub / skeleton (paling belum berkembang)
+- **Status**: 🔴 Stub / skeleton (paling belum berkembang)
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

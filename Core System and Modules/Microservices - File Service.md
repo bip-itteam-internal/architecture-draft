@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MinIO (tanpa MongoDB)
 - **Path:** `services/file` (satu `main.go` ~496 baris, fungsional penuh — bukan placeholder)
-- **Status:** ✅ Implemented (1 file by design)
+- **Status**: ✅ Implemented (1 file by design)
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

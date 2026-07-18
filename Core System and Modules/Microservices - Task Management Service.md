@@ -8,7 +8,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB + WebSocket + file-service (MinIO via [[Microservices - File Service]])
 - **Path:** `services/task-management`
-- **Status:** ⚠️ Implemented (branch `feat/task-management-parity`, dari `main`; belum merge). Paritas penuh dengan FE gateway-cutover. Catatan: **WebSocket butuh rute ingress** (gateway tak proxy WS), **push FCM/inbox ke notification-service ditunda** (WS-only), **role hanya `supervisor`/`staff`** (admin lintas-divisi tidak diaktifkan).
+- **Status**: ⚠️ Implemented (branch `feat/task-management-parity`, dari `main`; belum merge). Paritas penuh dengan FE gateway-cutover. Catatan: **WebSocket butuh rute ingress** (gateway tak proxy WS), **push FCM/inbox ke notification-service ditunda** (WS-only), **role hanya `supervisor`/`staff`** (admin lintas-divisi tidak diaktifkan).
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

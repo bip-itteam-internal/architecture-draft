@@ -7,7 +7,7 @@ Cara pakai: copy isi, ganti placeholder, HAPUS blok komentar %% %% ini.
 Lihat: IT - SOP Dokumentasi Vault · CLAUDE.md §2 (area non-domain Runbooks)
 ============================================================ %%
 
-> **Status:** 🟡 Draft  %% jadi ✅ Implemented bila prosedur sudah terverifikasi jalan %%
+> **Status**: 🟡 Draft  %% jadi ✅ Implemented bila prosedur sudah terverifikasi jalan %%
 
 ## Tujuan
 

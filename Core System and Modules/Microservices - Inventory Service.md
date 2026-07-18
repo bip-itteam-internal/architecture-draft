@@ -6,7 +6,7 @@ _Inventory Service adalah microservice untuk manajemen **aset/inventaris General
 
 - **Stack:** Go + Fiber v2 + MongoDB + MinIO
 - **Path:** `services/inventory`
-- **Status:** ✅ Implemented penuh
+- **Status**: ✅ Implemented penuh
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

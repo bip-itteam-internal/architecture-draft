@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB
 - **Path:** `services/attendance`
-- **Status:** ✅ Implemented penuh (kecuali clock-in via website)
+- **Status**: ✅ Implemented penuh (kecuali clock-in via website)
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

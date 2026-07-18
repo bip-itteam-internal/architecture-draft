@@ -6,7 +6,7 @@ _Insentive Service adalah engine perhitungan insentif untuk tim sales/marketing.
 
 - **Stack:** Go + Fiber v2 + MongoDB
 - **Path:** `services/insentive`
-- **Status:** ✅ Implemented penuh (production-grade, dilengkapi unit test)
+- **Status**: ✅ Implemented penuh (production-grade, dilengkapi unit test)
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

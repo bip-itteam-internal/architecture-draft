@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 (+ client MinIO langsung)
 - **Path:** `orchestrator/hris` (port `7000`)
-- **Status:** ✅ Implemented, aktif dipakai
+- **Status**: ✅ Implemented, aktif dipakai
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

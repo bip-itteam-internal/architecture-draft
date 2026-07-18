@@ -5,7 +5,7 @@
 - **Stack:** Go + Fiber v2, Redis (caching opsional)
 - **Path:** `api-gateway/`
 - **Port:** 6969 (prod: `api.bharatainternasional.com`)
-- **Status:** ✅ Implemented (matang, production)
+- **Status**: ✅ Implemented (matang, production)
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

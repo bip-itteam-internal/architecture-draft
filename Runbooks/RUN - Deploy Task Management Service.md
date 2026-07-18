@@ -1,4 +1,4 @@
-> **Status:** ⚠️ Implemented (prosedur diturunkan & terverifikasi dari deploy **dev** 2026-07-08 dengan migrasi data nyata; nilai host/creds prod diisi saat eksekusi. Belum dijalankan di prod.)
+> **Status**: ⚠️ Implemented (prosedur diturunkan & terverifikasi dari deploy **dev** 2026-07-08 dengan migrasi data nyata; nilai host/creds prod diisi saat eksekusi. Belum dijalankan di prod.)
 
 ## Tujuan
 

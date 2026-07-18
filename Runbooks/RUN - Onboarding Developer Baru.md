@@ -1,4 +1,4 @@
-> **Status:** ⚠️ Implemented (langkah agent-kit init terverifikasi ke `init.ps1`/`init.sh`; bagian stack lokal & alur masih ringkas — perluas dari pengalaman onboarding nyata)
+> **Status**: ⚠️ Implemented (langkah agent-kit init terverifikasi ke `init.ps1`/`init.sh`; bagian stack lokal & alur masih ringkas — perluas dari pengalaman onboarding nyata)
 
 ## Tujuan
 

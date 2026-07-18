@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2
 - **Path:** `orchestrator/it` (port `7001`)
-- **Status:** ⚠️ Implemented, ada bug
+- **Status**: ⚠️ Implemented, ada bug
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

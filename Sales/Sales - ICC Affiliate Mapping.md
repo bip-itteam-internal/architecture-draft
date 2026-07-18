@@ -5,7 +5,7 @@
 - **Stack:** Next.js (frontend) · Go + Fiber v2 + MongoDB (backend)
 - **Path frontend:** `frontend/src/features/marketing-insight/affiliate/`
 - **Path backend (target):** `bip-erp/services/integration/` · `bip-erp/services/employee/` (TBD)
-- **Status:** ⚠️ Implemented parsial — mapping berjalan tapi hardcoded di frontend; integrasi Employee Service belum ada
+- **Status**: ⚠️ Implemented parsial — mapping berjalan tapi hardcoded di frontend; integrasi Employee Service belum ada
 
 ---
 

@@ -1,4 +1,4 @@
-> **Status:** ⚠️ Implemented (tool + planner sudah di kode & tervalidasi dry-run 2026-07-17: 7.339 order target/8 toko; **eksekusi write ke prod belum dijalankan** — butuh kredensial Shopee prod + service hidup). Grounded ke [[Microservices - Integration Service]] (§*Observability & Ketahanan Shopee* → butir `shipped_at` = `pickup_done_time`).
+> **Status**: ⚠️ Implemented (tool + planner sudah di kode & tervalidasi dry-run 2026-07-17: 7.339 order target/8 toko; **eksekusi write ke prod belum dijalankan** — butuh kredensial Shopee prod + service hidup). Grounded ke [[Microservices - Integration Service]] (§*Observability & Ketahanan Shopee* → butir `shipped_at` = `pickup_done_time`).
 
 ## Tujuan
 

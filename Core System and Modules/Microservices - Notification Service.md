@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB
 - **Path:** `services/notification`
-- **Status:** ✅ Implemented penuh
+- **Status**: ✅ Implemented penuh
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

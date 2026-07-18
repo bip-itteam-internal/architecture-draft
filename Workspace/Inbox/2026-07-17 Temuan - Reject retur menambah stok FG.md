@@ -1,6 +1,6 @@
 # Temuan (17 Juli 2026) — Qty Reject pada retur ikut menambah stok FG
 
-**Status:** belum diperbaiki (sengaja) — ditemukan saat mengerjakan feed retur gudang;
+**Status**: belum diperbaiki (sengaja) — ditemukan saat mengerjakan feed retur gudang;
 user memutuskan dicatat terpisah agar tidak mencampur lingkup task.
 
 ## Gejala
