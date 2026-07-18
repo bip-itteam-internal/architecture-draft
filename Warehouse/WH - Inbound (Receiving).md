@@ -2,6 +2,8 @@
 
 *Ini adalah logging inbound untuk pencatatan dan analisis jika diperlukan*
 
+- **Status**: 🟡 Konsep / Draft — belum diimplementasi (contoh masih spreadsheet).
+
 [Contoh dari sistem ini](https://docs.google.com/spreadsheets/d/13ncXYw1zn6qcLlqzJgp5Lv_QmXzwi8Sk/edit?gid=705616732#gid=705616732)
 
 ## Fitur

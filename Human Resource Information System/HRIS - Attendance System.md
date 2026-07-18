@@ -3,6 +3,8 @@
 *Sistem ini diperlukan untuk attendance otomatis yang akan bermanfaat bagi HRIS - Payroll
 Sistem ini sebaiknya dipindahkan dari sistem HRIS ke Extension atau tempat lain*
 
+- **Status**: ⚠️ Implemented (semi-otomatis) — presensi jalan, tapi tarik log mesin fingerprint (Solution X105) masih manual; cron/otomasi belum berhasil.
+
 ## Latar Belakang
 
 * Sistem attendance saat ini bersifat semi-otomatis. Kita memiliki mesin fingerprint reader (Solution X105) yang terhubung ke jaringan. HR dapat menarik log attendance setiap hari. (Ada upaya untuk membuat cron job yang menarik log secara berkala namun belum pernah berhasil).

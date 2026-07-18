@@ -4,6 +4,8 @@
 
 *Berikut adalah daftar monitoring tools yang digunakan baik secara internal maupun eksternal*
 
+- **Status**: ✅ Aktif — monitoring tools yang dipakai (Terrabit, Beszel, dll).
+
 [Terrabit](https://www.terrabitnet.com/) - Monitoring tools untuk internet yang disediakan oleh ISP untuk perusahaan kita
  - Proprietary: https://mrtg.terabit.net.id/
  - Credentials untuk aplikasi

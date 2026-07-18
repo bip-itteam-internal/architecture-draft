@@ -3,6 +3,8 @@
 
 *Pemanfaatan **Kalodata** (3rd-party) untuk ranking konten & iklan TikTok sebagai acuan pembuatan iklan/konten marketing.*
 
+- **Status**: ✅ Aktif — dipakai produksi (gmv-creative.bharatainternasional.com), acuan konten/iklan via Kalodata.
+
 ## Latar Belakang
 
 Kalodata adalah 3rd party software yang melakukan rangking konten dan iklan Tiktok. Marketing bisa memanfaatkan data ini sebagai acuan iklan & konten apa yang dibuat.

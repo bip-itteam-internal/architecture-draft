@@ -8,6 +8,8 @@
 > [[API - Warehouse Service]] · [[Microservices - Warehouse Service]]
 >
 > Terakhir diperbarui: 17 Juli 2026
+>
+> **Status**: ✅ Berlaku — panduan operasional aktif.
 
 ---
 

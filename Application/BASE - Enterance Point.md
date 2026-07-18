@@ -2,6 +2,8 @@
 
 *Landing page / titik masuk aplikasi yang menyediakan portal ke sistem lain. Saat ini diimplementasikan secara konkret di web ([[APP - Web ERP]]) sebagai halaman login + dashboard + sidebar portal berbasis role.*
 
+- **Status**: ⚠️ Implemented (sebagian) — login + dashboard + sidebar portal per-role di [[APP - Web ERP]] sudah ada; info tambahan (SP, kalender, dll) sebagian masih konsep.
+
 ## Konsep
 
 Karena kita sudah punya data dasar karyawan, landing page menyajikan informasi berguna (good to have) bagi mereka, plus daftar portal ke fitur sistem lain berdasarkan role.

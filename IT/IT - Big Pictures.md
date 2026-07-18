@@ -1,6 +1,8 @@
 
 Departemen IT menyediakan dukungan/teknis untuk seluruh perusahaan, sekaligus mengelola infrastruktur, deployment, jaringan, akun & akses, serta keandalan sistem ERP. Dokumen ini adalah peta domain IT.
 
+- **Status**: 🟡 Overview — peta domain IT; tiap area berstatus sendiri di dok masing-masing.
+
 ## Ruang Lingkup Domain IT
 
 - **Layanan & dukungan** — [[IT - Helpdesk]] (ticketing): tim IT menangani tiket dari semua divisi

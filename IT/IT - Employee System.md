@@ -2,6 +2,8 @@
 
 *Ringkasan hal-hal yang dapat dilakukan **tim IT** di dalam ERP. Sebagian besar operasi admin IT berjalan lewat [[CORE - IT Orchestrator]] (semua route ber-guard `RequireITStaff`) dan diakses dari modul **IT** pada [[APP - Web ERP]].*
 
+- **Status**: ✅ Implemented — operasi admin IT (akun aktif/nonaktif, reset, device, roles) via [[CORE - IT Orchestrator]] (guard RequireITStaff).
+
 ## Yang Bisa Dilakukan Tim IT
 
 ### Manajemen Akun Karyawan

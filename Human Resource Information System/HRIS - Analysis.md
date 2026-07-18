@@ -2,6 +2,8 @@
 
 *Dashboard ini akan membantu Human Resource mengelola karyawan dari awal hingga akhir karier mereka di perusahaan ini*
 
+- **Status**: 🟡 Konsep / Draft — belum diimplementasi (contoh masih spreadsheet).
+
 [Contoh dari sistem ini](https://docs.google.com/spreadsheets/d/14dDRxTWME4N4-TY42BPZFFaXYQOTTZxV/edit?gid=1164498077#gid=1164498077)
 
 ## Fitur

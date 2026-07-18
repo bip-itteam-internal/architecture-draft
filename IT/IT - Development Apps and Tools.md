@@ -2,6 +2,8 @@
 
 *Development tools dan aplikasi yang digunakan secara internal untuk melakukan iterasi*
 
+- **Status**: ✅ Aktif — referensi tools internal yang dipakai (Hoppscotch, OneBharata, dll).
+
 [Hoppscotch](https://hoppscotch.io/) - Ekosistem API development open-source
 - Di-host secara internal pada VM ERP-Development: http://10.10.10.121:3000/
 - Credentials untuk aplikasi ini berasal dari akun GitHub pribadi yang perlu di-invite oleh akun admin Hoppscotch

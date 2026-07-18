@@ -2,6 +2,8 @@
 
 *Fitur ini ditambahkan sebagai pelengkap Attendance System. Koreksi Absen memungkinkan karyawan mengajukan koreksi clock-in/out untuk hari di mana mereka lupa clock-in, clock-out, atau keduanya. Waktu clock otomatis diisi dari jadwal kerja karyawan saat disetujui — tidak perlu input waktu manual.*
 
+- **Status**: ⚠️ Implemented — alur koreksi (pengajuan → approval berjenjang → auto-fix attendance) sudah jalan; penyempurnaan anti-fraud & sebagian FE menyusul.
+
 ## Latar Belakang
 
 * Karyawan terkadang lupa melakukan clock-in atau clock-out, yang mengakibatkan catatan kehadiran tidak lengkap (status "Tanpa Keterangan" / Alpha).

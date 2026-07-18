@@ -1,3 +1,5 @@
+- **Status**: 🟡 Konsep / Overview — peta & kumpulan dokumen domain HRIS; tiap subsistem berstatus sendiri di dok masing-masing.
+
 ## Dokumen
 
 Berikut ini adalah dokumen yang saat ini dimiliki HRD yang sedang disimpan beserta beberapa dokumen umum yang digunakan secara internal

@@ -4,6 +4,8 @@
 
 *OCR Document adalah **shared service lintas-fitur** (bukan khusus General Affairs) — penyedia kapabilitas **OCR + dokumen-intelligence (RAG)** yang dikonsumsi berbagai subsistem ERP.*
 
+- **Status**: 🟡 Konsep / Draft — layanan OCR + dokumen-intelligence (RAG) lintas-fitur; konsumen sebagian besar masih fase lanjut (perlu verifikasi implementasi ke kode).
+
 ## Konsumen / Dipakai oleh
 
 - [[GA - Inventory Management]] — membaca dokumen (pembelian/kedatangan)

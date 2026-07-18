@@ -1,4 +1,6 @@
 
+- **Status**: 🟡 Konsep — arah sudah diputuskan (Phone Farming); implementasi belum terdokumentasi.
+
 # Latar Belakang
 saat ini nomor handphone yang digunakan di toko Tiktok tidak dimiliki oleh tim internal. diperlukan management system OTP untuk kebutuhan Tim ADV dan Tim IT. 
 

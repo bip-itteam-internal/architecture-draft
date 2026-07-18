@@ -1,3 +1,5 @@
+- **Status**: ⚠️ Parsial — dashboard CRM (vendor) berjalan tapi bermasalah (data tersensor, WA blasting suspend); solusi internal masih eksplorasi.
+
 # Latar Belakang
 Terdapat sebuah sistem untuk mengelola customer dari Tiktok di Dashboard ini: [monitoring.hubcrm.bharatainternasional.com](https://monitoring.hubcrm.bharatainternasional.com/)
 

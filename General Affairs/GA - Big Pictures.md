@@ -1,3 +1,5 @@
+- **Status**: 🟡 Konsep / Overview — peta domain GA; mayoritas subsistem masih rencana.
+
 ## Latar Belakang
 
 General Affairs ingin punya dashboard untuk menejemen semua aset perusahaan dari alat dan bahan, ATK, dan dokumen-dokumen legal perusahaan. Dalam rangka program paperless, diperlukan sistem yang terintegrasi antar divisi. Data yang perlu pencatatan adalah:

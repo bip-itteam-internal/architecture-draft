@@ -2,6 +2,8 @@
 
 *Dashboard ini mencantumkan semua barang yang disimpan di warehouse secara detail sehingga semuanya terorganisir dan mudah dilacak*
 
+- **Status**: 🟡 Konsep / Draft — belum diimplementasi (contoh masih spreadsheet).
+
 [Contoh dari sistem ini](https://docs.google.com/spreadsheets/d/12L5OKViT2LnQECT6ldUBkjK-xablpcZO/edit?gid=1015075572#gid=1015075572)
 
 ## Fitur

@@ -2,6 +2,8 @@
 
 *Sistem ini diposisikan sebagai **IT Helpdesk / ticketing**: desk dimiliki dan ditangani oleh **divisi IT**, sementara **semua divisi dapat membuat (submit) tiket** ke sana untuk meminta bantuan/penyelesaian dari IT. Dibangun sebagai task tracker dinamis berbasis Kanban yang terpusat agar konsisten dan dapat digunakan kembali.*
 
+- **Status**: ⚠️ In development — task tracker / IT Helpdesk sedang dibangun (FE + BE internal); rincian di §Status Implementasi.
+
 > [!note] Positioning vs implementasi
 > Kode saat ini masih mendukung **multi-divisi** (Space per divisi + supervisor per divisi + admin/sekretaris lintas-divisi). Sesuai positioning baru sebagai IT Helpdesk, penanganan tiket difokuskan ke divisi IT dengan semua divisi sebagai requestor — pembatasan scope ke IT perlu dipertimbangkan di implementasi.
 

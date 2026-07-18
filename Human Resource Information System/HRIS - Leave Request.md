@@ -2,6 +2,8 @@
 
 *Pengajuan cuti & izin (leave request) adalah alur **"pengajuan ke HR"** inti: karyawan mengajukan ketidakhadiran/izin secara digital, melalui rantai persetujuan **Supervisor → HR**, dan begitu disetujui otomatis menyesuaikan data kehadiran. Ini fondasi yang pola review-nya dipakai juga oleh [[HRIS - Tukar Jadwal Kerja]] dan [[HRIS - Attendance Correction]] — semuanya turunan dari [[HRIS - Employee Request & Approval]].*
 
+- **Status**: ✅ Implemented — pengajuan cuti/izin + approval Supervisor→HR + auto-apply ke attendance ([[APP - MyBharata]] + [[Microservices - Attendance Service]]).
+
 ## Latar Belakang
 
 * Karyawan perlu mengajukan sakit, izin, cuti, atau perjalanan dinas dengan jejak yang bisa dilacak (bukan lewat chat/manual ke HR).

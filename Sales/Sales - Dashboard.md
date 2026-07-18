@@ -1,3 +1,5 @@
+- **Status**: 🟡 Konsep / Draft — desain & tech-spec dashboard omnichannel; belum diimplementasi.
+
 Dashboard ini sepadan dengan Omnichannel dashboard pada umumnya. Omnichannel adalah dashboard yang menggabungkan beberapa data platform (Tiktok, shopee, lazada) menjadi satu. tantangan dashboard hanya get API dari banyak platform tersebut. 
 
 Tantangan selanjutnya adalah integrasi ads dengan toko yang saling berkaitan. Hal ini perlu dilakukan untuk mendapatkan informasi omset pertoko.

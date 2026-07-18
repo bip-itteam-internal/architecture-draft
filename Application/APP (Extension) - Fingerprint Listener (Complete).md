@@ -3,6 +3,8 @@
 Aplikasi ini bertanggung jawab untuk mendengarkan dan mengirimkan perintah ke mesin fingerprint
 [Lihat repository aplikasinya](https://github.com/bip-itteam-internal/fingerprint-listener)
 
+- **Status**: ✅ Implemented — listener fingerprint (Python/pyzk) yang push event ke ERP.
+
 Extension/middleware ini menyediakan:
 - Push event fingerprint ke dalam sistem ERP
 - Permintaan ERP untuk mengekspor data fingerprint langsung dari mesin yang kemudian akan dikirim ke pesan WhatsApp HR melalui chatbot IT WooWa

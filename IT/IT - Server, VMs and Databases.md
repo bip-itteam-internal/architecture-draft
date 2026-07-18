@@ -3,6 +3,8 @@
 
 *Akses ke server on-site dan VM tercantum di bawah ini, semua password root sama dengan user, namun harap JANGAN menggunakan root sebagai default*
 
+- **Status**: ✅ Aktif — inventaris server/VM/DB yang berjalan (referensi akses IT).
+
 ## Server
 
 **Server - Windows Server (RAID5/HyperV)**

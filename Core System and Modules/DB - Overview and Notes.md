@@ -2,6 +2,8 @@
 
 bip-erp menerapkan pola **database-per-service**: setiap microservice memiliki MongoDB-nya sendiri (container Mongo terpisah) dan menjadi pemilik (ownership) penuh atas datanya. Tidak ada akses langsung lintas-database antar service; komunikasi dilakukan via HTTP internal melalui gateway (lihat [[CORE - API Master Gateway]]). Khusus employee-service berjalan sebagai **replica set** (primary + secondary) agar datanya dapat diekspos read-only untuk konsumen lain. Seluruh server menyimpan waktu dalam **UTC**. Selain MongoDB per service, terdapat dua infrastruktur data bersama: **Redis** (cache & queue) dan **MinIO** (object storage).
 
+- **Status**: ✅ Aktif — pemetaan DB-per-service yang berjalan (grounded ke docker-compose & service).
+
 ## Database per Service
 
 Tiap baris berikut menyebutkan nama service, container Mongo, collection utama, dan dokumen service terkait.

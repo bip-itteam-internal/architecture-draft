@@ -4,6 +4,7 @@
 
 *Standard Operating Procedure penulisan dokumentasi di vault ini — supaya tiap agent/manusia menulis dengan struktur, penamaan, dan penautan yang konsisten. Ini versi "cara kerja + contoh" dari rulebook ringkas di root (`CLAUDE.md`); SOP menjelaskannya, bukan menggantinya.*
 
+- **Status**: ✅ Berlaku — SOP aktif; sumber aturan tetap `CLAUDE.md` root.
 - **Untuk siapa**: AI agent & kontributor manusia
 - **Sumber aturan**: `CLAUDE.md` (root vault) — bila bertentangan, `CLAUDE.md` yang menang
 - **Skeleton siap-pakai** (folder `Templates/`): [[Template - Implementasi Service]] · [[Template - Konsep Domain]] · [[Template - Log Operasional]] · [[Template - Runbook]] · [[Template - Persona]] · [[Template - Meeting Note]] · [[Template - Daily Note]]
