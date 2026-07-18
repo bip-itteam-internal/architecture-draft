@@ -22,11 +22,11 @@
 
 ## Fase B — Enabler
 
-- **Kapabilitas Email** di [[Microservices - Notification Service]] (kini hanya inbox/WA/FCM). **Prasyarat** notifikasi kandidat di [[HRIS - Recruitment]].
+- ✅ **Kapabilitas Email** — **sudah di kode**: Resend via `resend-go/v3` (channel fungsional + unit test) di [[Microservices - Notification Service]] (kini inbox/WA/FCM/**email**/splash/article). Tinggal set env prod (`RESEND_API_KEY`/`RESEND_FROM_EMAIL`) + smoke test. **Prasyarat** notifikasi kandidat [[HRIS - Recruitment]] praktis **lepas**.
 
 ## Fase C — Net-new prioritas (desain sudah matang)
 
-- **Recruitment / ATS** — [[HRIS - Recruitment]] + [[Microservices - Recruitment Service]] (⚠️ **BE Fase 1-3 SELESAI**, branch `feat/recruitment-service`). Belum: Fase 4-5 (AI screening, psikotes online, portal publik, WhatsApp, Glints sync) + FE. Notifikasi kandidat via email = masih bergantung **Email (Fase B)**.
+- **Recruitment / ATS** — [[HRIS - Recruitment]] + [[Microservices - Recruitment Service]] (⚠️ **BE Fase 1-3 SELESAI**, branch `feat/recruitment-service`). Belum: Fase 4-5 (AI screening, psikotes online, portal publik, WhatsApp, Glints sync) + FE. Notifikasi kandidat via email: **Email (Fase B) sudah di kode** — tinggal env prod + smoke test.
 
 ## Fase D — Konsolidasi Performance (hindari duplikasi)
 
@@ -43,7 +43,7 @@
 
 ## Dependensi kunci
 
-- `Email (B)` → `Recruitment (C)`
+- `Email (B)` → `Recruitment (C)` — ✅ Email sudah di kode (tinggal env prod)
 - `Keputusan scope Payroll-vs-Accurate` → `Fase F`
 - `Konsolidasi Review Cycle (D)` sebelum bangun appraisal/Work Review terpisah
 

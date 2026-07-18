@@ -21,12 +21,12 @@ Ada 4 jenis (`LeaveType`) dengan subtipe & batas durasi (`max_range`, format har
 
 ### Izin Meninggalkan Pekerjaan: Kantor vs Pribadi (payroll)
 
-Izin **"Meninggalkan pekerjaan sementara"** dipecah dua subtipe, dibedakan atribut payroll `Paid` pada `LeaveSubtypeDetail` (keputusan HR 2026-06-26):
+Izin **"Meninggalkan pekerjaan sementara"** dipecah dua subtipe, dibedakan **perlakuan bayar** (`Paid`) di master `payroll_subtype_treatment` per-(status, subtipe) — **bukan** di `LeaveSubtypeDetail` (yang hanya `MaxRange`+`Format`). Keputusan HR 2026-06-26:
 
-- **urusan kantor** (`Paid: true`) → jam izin **dihitung sebagai kerja, tidak memotong** tunjangan/payout.
-- **urusan pribadi** (`Paid: false`) → jam izin **memotong** tunjangan kehadiran & uang makan (perilaku default, sama seperti subtipe izin lain).
+- **urusan kantor** → default **`Paid: true`** (via `paidSubtypeOverrides`, `services/attendance/payroll_treatment.go`) → jam izin **dihitung sebagai kerja, tidak memotong** tunjangan/payout, walau Izin secara default dipotong.
+- **urusan pribadi** → **`Paid: false`** (mengikuti default status Izin) → jam izin **memotong** tunjangan kehadiran & uang makan.
 
-Jam izin kantor disimpan di `AttendanceEntries.paid_leave_hour` (terpisah dari `leave_hour`), dan `/payroll-supplement` menghitungnya sebagai kerja sehingga tidak menurunkan `payout_pct`. Detail lihat [[Microservices - Attendance Service]].
+Mekanisme: entri kehadiran membawa `leave_subtype`; saat payout dihitung (`computePayoutBreakdown` / `/payroll-supplement`), `paidForEntry` menerapkan override per-(status,subtipe) di atas per-status — subtipe `Paid` tidak menurunkan `payout_pct`. **Tidak ada** field `paid_leave_hour`; jam tetap di `leave_hour`, perlakuan bayar ditentukan master treatment (editable HR, tab "Perlakuan Kehadiran"). Detail: [[Microservices - Attendance Service]] · [[HRIS - Payroll]].
 
 Pembedaan ini juga tampil di **Laporan Kehadiran** (FE): izin urusan kantor dibedakan dari izin pribadi (`I`) lewat `leave_subtype` yang ikut dikembalikan `GET /report`, dan di grid ditandai **warna hijau** + entri legend `IK`. Karena IK bersifat partial-day (karyawan tetap clock-in), **sel grid menampilkan jam clock-in/out** — bukan kode `IK`; kode `IK` dipakai hanya sebagai fallback bila jam tak ada. Status izin pribadi (`I`) tak berubah. Logika: `erp-frontend` `report/helper/report.ts` → `buildAttendanceCell`.
 
