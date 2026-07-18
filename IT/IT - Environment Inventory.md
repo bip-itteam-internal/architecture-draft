@@ -8,7 +8,7 @@
 
 | Env | Host (grounded) | Catatan |
 |---|---|---|
-| **Production** | `10.10.10.120` | URL publik: `erp.bharatainternasional.com`, `tamu.bharatainternasional.com`, `tasks.bharatainternasional.com` |
+| **Production** | **VPS Biznet `116.206.196.31`** (sejak ≤18 Juli 2026; `10.10.10.120` pensiun — konfirmasi user) | URL publik: `erp.bharatainternasional.com`, `tamu.bharatainternasional.com`, `tasks.bharatainternasional.com`. ⚠️ Workflow "Deploy to Prod" masih menarget `.120` — belum dipindah ke VPS |
 | **Staging** | `erp-dev.bharatainternasional.com` | host internal = TBD |
 | **Development** | `10.10.10.121` | port mirror production |
 | **Wiki dok** | `architecture.bharatainternasional.com` | export vault (lihat [[README]]) |

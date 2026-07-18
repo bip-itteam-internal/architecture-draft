@@ -5,7 +5,7 @@
 ## Infrastruktur CI/CD
 
 - **Self-hosted runner**: kini di **VPS Biznet Gio** `116.206.196.31` (VM internal lama `10.10.10.8`/`cicd` sudah **decommissioned**) — menjalankan workflow GitHub Actions (`runs-on: self-hosted` di `deploy.yml`), lalu SSH ke VM target
-- **Deployment VM (dev)**: `10.10.10.121` (user `erp`) — host container/app (dev). Prod di `10.10.10.120`
+- **Deployment VM (dev)**: `10.10.10.121` (user `erp`) — host container/app (dev). ⚠️ Prod LIVE kini di **VPS Biznet `116.206.196.31`** (konfirmasi user 18 Juli 2026; `10.10.10.120` pensiun) — workflow deploy-prod masih menarget `.120` dan perlu dipindah
 - Auth deploy: **SSH password** via GitHub Secret `VM_PASSWORD` (`sshpass`); StrictHostKeyChecking dimatikan untuk automation
 - **VPS Biznet Gio (migrasi, ⚠️)**: `116.206.196.31` (user `bharata`, Ubuntu 22.04) — target migrasi prod baru. CI via **Harness** (`bip-erp-vm-delegate` container jalan di VPS; build di VM). Per 2026-07-09 masih **dobel deployment** dengan `.120` (integration-service + worker jalan di dua tempat, belum cutover). Storage: additional disk 100G di-mount `/backup`.
 - Detail VM & kredensial: [[IT - Server, VMs and Databases]]
