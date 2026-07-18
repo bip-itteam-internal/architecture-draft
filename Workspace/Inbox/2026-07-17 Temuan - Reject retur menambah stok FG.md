@@ -44,6 +44,6 @@ Perlu diperiksa juga apakah `GudangBahanBakuView` (tab BALIK_RM) punya pola yang
 ## Terkait
 
 - [[Microservices - Manufacture Service]] · [[ADR - 0015 Push Pergerakan WMS ke Accurate]]
-- [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] (refund-only `NOT_RETURNED`
+- [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] (refund-only `NOT_RETURNED`
   sengaja tak me-restock — semangat yang sama: barang yang tak layak/tak kembali jangan
   menambah stok)

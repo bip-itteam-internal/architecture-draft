@@ -2,7 +2,7 @@
 
 # ADR - 0016 Retur: Grouped per (Faktur Sumber + Tanggal Retur)
 
-Satu dokumen **Retur Penjualan** merekap semua retur yang berbagi faktur sumber & tanggal retur. Melengkapi [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] & [[ADR - 0015 Retur Tanggal Accepted-Seragam + Cutover Terpisah]].
+Satu dokumen **Retur Penjualan** merekap semua retur yang berbagi faktur sumber & tanggal retur. Melengkapi [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] & [[ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah]].
 
 ## Context
 
@@ -38,5 +38,5 @@ Satu dokumen **Retur Penjualan** merekap semua retur yang berbagi faktur sumber 
 - [[Microservices - Integration Service]] — Auto-Sync Retur (model grup)
 - [[ADR - 0017 Tanggal Retur TikTok via order_update_date]]
 - [[ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur]]
-- [[ADR - 0015 Retur Tanggal Accepted-Seragam + Cutover Terpisah]]
+- [[ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah]]
 - [[APP - Web ERP]] — halaman Auto-Sync Retur

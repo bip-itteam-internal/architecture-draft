@@ -131,4 +131,4 @@ Ganti `ACCURATE_BEARER_TOKEN` dengan `access_token` baru.
 - [[Microservices - Integration Service]] — konsumen token (Auto-Sync Faktur & Retur)
 - [[External - Accurate]] — kontrak API, host, signing
 - [[ADR - 0001 Akuntansi via Accurate]] — keputusan integrasi Accurate
-- [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] — fitur retur yang butuh token ini
+- [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] — fitur retur yang butuh token ini

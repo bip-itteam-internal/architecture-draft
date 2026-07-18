@@ -2,11 +2,11 @@
 
 # ADR - 0018 Faktur Permanen — Semua Pembalikan via Retur Penjualan
 
-Faktur Penjualan tak pernah diubah setelah terbit; **setiap** pembalikan (retur maupun batal) lewat dokumen **Retur Penjualan**. Menggantikan mekanisme *line-drop* di [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] & [[ADR - 0012 Retur Refund-only Push-all]].
+Faktur Penjualan tak pernah diubah setelah terbit; **setiap** pembalikan (retur maupun batal) lewat dokumen **Retur Penjualan**. Menggantikan mekanisme *line-drop* di [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] & [[ADR - 0012 Retur Refund-only Push-all]].
 
 ## Context
 
-- Model lama: penjualan bisa dibalik **dua cara** — (a) **line-drop**: faktur di-snapshot ulang tanpa order itu → barisnya lenyap; (b) **Retur Penjualan**. [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] menetapkan campuran: `RETURNED` + ada retur SENT → baris dipertahankan; `RETURNED` tanpa retur → drop; **`CANCELLED` → selalu drop**.
+- Model lama: penjualan bisa dibalik **dua cara** — (a) **line-drop**: faktur di-snapshot ulang tanpa order itu → barisnya lenyap; (b) **Retur Penjualan**. [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] menetapkan campuran: `RETURNED` + ada retur SENT → baris dipertahankan; `RETURNED` tanpa retur → drop; **`CANCELLED` → selalu drop**.
 - Campuran itu punya dua masalah. **Konseptual**: line-drop **menulis ulang sejarah** — penjualan bruto hari itu mengecil sendiri dan returnya tak pernah muncul di laporan retur. **Operasional**: dua mekanisme harus selalu sepakat, dan ketidaksepakatannya = pembalikan ganda atau nol.
 - Kerangka bisnis (keputusan user 2026-07-17): **`penjualan = income (faktur) + retur`** — tiap transaksi marketplace adalah salah satu: *income* (barang keluar → INV) atau *retur* (barang balik → RTR). Faktur mencatat apa yang terjual; retur mencatat apa yang balik; angka bersih = selisihnya. **Sistem lama finance bekerja persis begini** (bukti prod: `INV/2026/07/06/015-BH` barisnya tetap, dibalik oleh `RTR/26/07/14/014-BH`).
 
@@ -34,6 +34,6 @@ Faktur Penjualan tak pernah diubah setelah terbit; **setiap** pembalikan (retur 
 
 ## Dokumen Terkait
 - [[Microservices - Integration Service]] — Auto-Sync Faktur & Retur
-- [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] — digantikan
+- [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] — digantikan
 - [[ADR - 0016 Retur Grouped per Faktur + Tanggal Retur]]
 - [[ADR - 0017 Tanggal Retur TikTok via order_update_date]]

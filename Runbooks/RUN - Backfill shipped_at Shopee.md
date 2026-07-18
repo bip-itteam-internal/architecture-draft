@@ -49,7 +49,7 @@ mongosh "$MONGO_URI" b2_plan_faktur_rebuild.js > b2_calls.sh
 less b2_calls.sh        # REVIEW: retry (auto-era) + backfill (pra-cutover SENT)
 bash b2_calls.sh
 ```
-Planner **otomatis mengecualikan**: faktur `IMPORTED` (manual finance), `FAILED`, dan **hari-kirim order ber-Retur Penjualan SENT** (rebuild bisa ditolak Accurate "tidak dapat menghapus rincian faktur … dipakai retur" → flip FAILED). Retry/backfill idempoten + skip-unchanged. Latar keputusan retur: [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]].
+Planner **otomatis mengecualikan**: faktur `IMPORTED` (manual finance), `FAILED`, dan **hari-kirim order ber-Retur Penjualan SENT** (rebuild bisa ditolak Accurate "tidak dapat menghapus rincian faktur … dipakai retur" → flip FAILED). Retry/backfill idempoten + skip-unchanged. Latar keputusan retur: [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]].
 
 ## 4. Verifikasi
 
@@ -61,7 +61,7 @@ Harapan: **TOTAL null turun drastis**; faktur **FAILED tetap** (tak ada FAILED b
 ## Tindak lanjut manual (di luar auto)
 
 - Order **proxy_uncertain** → daftar dari log langkah 2; finance tinjau tanggal kirim.
-- Hari **at-risk retur** & **2 FAILED** → penanganan retur terpisah ([[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]]).
+- Hari **at-risk retur** & **2 FAILED** → penanganan retur terpisah ([[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]]).
 - Hari **IMPORTED (pra-cutover 10 Jul)** = faktur manual finance; tak disentuh auto.
 
 ## Rollback
@@ -73,5 +73,5 @@ Harapan: **TOTAL null turun drastis**; faktur **FAILED tetap** (tak ada FAILED b
 
 - [[Microservices - Integration Service]] — pipeline `shipped_at`/`pickup_done_time` + tool `cmd/ordersync`
 - [[External - Accurate]] — target Sales Invoice
-- [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] — kenapa hari ber-retur dikecualikan
+- [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] — kenapa hari ber-retur dikecualikan
 - [[LOG - Shopee API Rate Limit Request]] — konteks kuota Shopee

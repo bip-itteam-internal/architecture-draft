@@ -2,11 +2,11 @@
 
 # ADR - 0017 Tanggal Retur TikTok via `order_update_date`
 
-Mengubah sumber tanggal Retur Penjualan **khusus TikTok**. Menggantikan sebagian keputusan-1 [[ADR - 0015 Retur Tanggal Accepted-Seragam + Cutover Terpisah]] (yang tetap berlaku untuk Shopee).
+Mengubah sumber tanggal Retur Penjualan **khusus TikTok**. Menggantikan sebagian keputusan-1 [[ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah]] (yang tetap berlaku untuk Shopee).
 
 ## Context
 
-- [[ADR - 0015 Retur Tanggal Accepted-Seragam + Cutover Terpisah]] menetapkan tanggal retur = `accepted` (`update_time` record retur marketplace), seragam lintas channel. Asumsinya: `update_time` = saat retur **disetujui**.
+- [[ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah]] menetapkan tanggal retur = `accepted` (`update_time` record retur marketplace), seragam lintas channel. Asumsinya: `update_time` = saat retur **disetujui**.
 - **Untuk TikTok asumsi itu salah.** `update_time` adalah sentuhan **TERAKHIR** record retur — termasuk **settle refund** yang terjadi berhari-hari setelah returnya. Terukur prod 2026-07-17: **24 dari 49** retur TikTok terbukukan **mundur 7–10 hari** dari kejadian sebenarnya (mis. order `584588723385435246` dibukukan 09/07 padahal returnya 02/07).
 - Diperparah pola ingestion: **82% (50/61)** retur TikTok punya `returned_at` NULL → ketahuan lewat **backfill/order-sync**, bukan webhook. Saat returnya di-fetch, `update_time` sudah terlanjur maju.
 - Sumber tanggal yang tersedia dari API retur TikTok **hanya dua**: `create_time` (`return.requested_at`) & `update_time` (`return.updated_at`). Retur TikTok **tak punya** data barang-tiba/reverse-tracking (puluhan `*_time` lain milik **order**, bukan retur).
@@ -33,6 +33,6 @@ Mengubah sumber tanggal Retur Penjualan **khusus TikTok**. Menggantikan sebagian
 
 ## Dokumen Terkait
 - [[Microservices - Integration Service]] — Auto-Sync Retur (tanggal & penomoran)
-- [[ADR - 0015 Retur Tanggal Accepted-Seragam + Cutover Terpisah]] — tetap berlaku untuk Shopee
+- [[ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah]] — tetap berlaku untuk Shopee
 - [[ADR - 0016 Retur Grouped per Faktur + Tanggal Retur]]
 - [[APP - Web ERP]] — Status History (konfirmasi, bukan sumber)

@@ -1,6 +1,6 @@
 > Status: ✅ **Accepted** (2026-06-29)
 
-# ADR - 0001 Tampilkan Harga + Beli ke Marketplace
+# ADR - 0020 Tampilkan Harga + Beli ke Marketplace
 
 ## Context
 [[APP - Website Bharata Internasional]] (rebuild `bharatainternasional.com`) semula mengikuti PRD v1.2 yang menetapkan **Non-Goal**: tanpa checkout/pembayaran, **tanpa menampilkan harga**, pembelian diarahkan ke marketplace resmi. Stakeholder kemudian meminta pengalaman "belanja" seperti herbalife.com.

@@ -75,4 +75,4 @@
 
 ## Dokumen Terkait
 - [[Microservices - Manufacture Service]] · [[Manufacture - Stock & Material Management]] · [[GA - Procurement System]] · [[API - Integration Service]] (resi-feed, `/transactions/returns`) · [[IT - Background Jobs & Schedulers]] (`sync-resi-wms`) · [[API - Index]]
-- [[ADR - 0002 Database-per-Service]] (feed retur lewat API, bukan lintas-DB) · [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] (kenapa seleksi retur bukan lewat status order) · [[ADR - 0015 Push Pergerakan WMS ke Accurate]] (retur F3 di-SKIP dari push)
+- [[ADR - 0002 Database-per-Service]] (feed retur lewat API, bukan lintas-DB) · [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] (kenapa seleksi retur bukan lewat status order) · [[ADR - 0015 Push Pergerakan WMS ke Accurate]] (retur F3 di-SKIP dari push)

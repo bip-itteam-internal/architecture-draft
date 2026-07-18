@@ -1,4 +1,4 @@
-## ADR 0007 — Migrasi cloud bertahap untuk service kritis (ketahanan mati listrik / kegagalan server kantor)
+## ADR 0021 — Migrasi cloud bertahap untuk service kritis (ketahanan mati listrik / kegagalan server kantor)
 
 - **Status**: 🟡 Proposed (rekomendasi system analyst; menunggu persetujuan manajemen/IT)
 - **Tanggal**: 2026-06-29

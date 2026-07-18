@@ -1,4 +1,4 @@
-# ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line
+# ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line
 
 Status: 🟡 **Superseded (2026-07-17)** oleh [[ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur]] — menggantikan [[ADR - 0012 Retur Refund-only Push-all]]
 

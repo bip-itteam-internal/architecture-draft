@@ -41,7 +41,7 @@
 
 **Modernisasi UI (SELESAI, sesi 2026-06-29):** beranda baru (Hero CTA "Jadi Mitra" → Kategori 3-kolom → Tentang → Keunggulan/budaya → Produk → Legalitas → Testimoni → Berita → Kontak), Header (sticky + CTA + menu mobile + **mega-menu Produk**) & Footer multi-kolom, sistem desain token (`components/ui/*`), bilingual ID/EN, placeholder gambar. Pola terinspirasi herbalife.com (struktur/UX, brand Bharata sendiri).
 
-**Belanja ringan (SELESAI FE+BE, sesi 2026-06-29):** produk punya **harga** (NULL = "Hubungi untuk harga") + tombol **Beli ke marketplace** per-produk (fallback link global Pengaturan Situs). Tanpa checkout/keranjang/pembayaran. Membalik PRD §4 — lihat [[ADR - 0001 Tampilkan Harga dan Beli ke Marketplace]]. Migration `00004`; kolom `harga`, `link_shopee/tokopedia/tiktokshop`.
+**Belanja ringan (SELESAI FE+BE, sesi 2026-06-29):** produk punya **harga** (NULL = "Hubungi untuk harga") + tombol **Beli ke marketplace** per-produk (fallback link global Pengaturan Situs). Tanpa checkout/keranjang/pembayaran. Membalik PRD §4 — lihat [[ADR - 0020 Tampilkan Harga dan Beli ke Marketplace]]. Migration `00004`; kolom `harga`, `link_shopee/tokopedia/tiktokshop`.
 
 ## Belum Diimplementasikan / Catatan
 
@@ -59,6 +59,6 @@
 
 ## Dokumen Terkait
 
-- [[ADR - 0001 Tampilkan Harga dan Beli ke Marketplace]] — keputusan menampilkan harga + Beli ke marketplace.
+- [[ADR - 0020 Tampilkan Harga dan Beli ke Marketplace]] — keputusan menampilkan harga + Beli ke marketplace.
 - [[Sales - Landing page]] — *konsep berbeda* (landing konversi penjualan ala Nike / WhatsApp-CS), **bukan** project website korporat ini.
 - [[Sales - Big Pictures]]

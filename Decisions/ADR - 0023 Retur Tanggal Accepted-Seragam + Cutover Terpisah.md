@@ -1,8 +1,8 @@
 ✅ **Implemented** (kode 2026-07-16/17; ⚠️ belum deploy per 2026-07-17)
 
-# ADR - 0015 Retur: Tanggal Accepted-Seragam + Cutover Terpisah Retur/Faktur
+# ADR - 0023 Retur: Tanggal Accepted-Seragam + Cutover Terpisah Retur/Faktur
 
-Dua keputusan terkait semantik pembukuan **Retur Penjualan** auto-sync ke Accurate. Melengkapi [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] & [[ADR - 0012 Retur Refund-only Push-all]].
+Dua keputusan terkait semantik pembukuan **Retur Penjualan** auto-sync ke Accurate. Melengkapi [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] & [[ADR - 0012 Retur Refund-only Push-all]].
 
 ## Context
 
@@ -22,10 +22,10 @@ Dua keputusan terkait semantik pembukuan **Retur Penjualan** auto-sync ke Accura
 
 - **Positif**: faktur retur seragam (1 basis tanggal → mudah direkonsiliasi ke tanggal persetujuan marketplace); badge "perkiraan" hilang untuk retur normal, dipersempit ke anomali `shipped` (badge "cek tanggal", [[APP - Web ERP]]); retur yatim 1–9 Jul (TikTok berfaktur IMPORTED) kini bisa dibukukan tanpa menyentuh faktur finance.
 - **Trade-off tanggal**: retur yang barangnya tiba di bulan berbeda dari tanggal disetujui tercatat di bulan disetujui — dapat diterima karena stok fisik diurus service lain.
-- **Prasyarat cutover-split aman**: `OnOrderCancelledOrReturned` WAJIB tetap ber-guard cutover **faktur** (10 Jul) — guard ini sempat HILANG di jalur koreksi & ditambahkan 2026-07-16; tanpa itu, re-snapshot menimpa faktur IMPORTED finance (vektor insiden [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]] / 14 Jul).
+- **Prasyarat cutover-split aman**: `OnOrderCancelledOrReturned` WAJIB tetap ber-guard cutover **faktur** (10 Jul) — guard ini sempat HILANG di jalur koreksi & ditambahkan 2026-07-16; tanpa itu, re-snapshot menimpa faktur IMPORTED finance (vektor insiden [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] / 14 Jul).
 - **Anomali `shipped` = data problem**: kalau retur ACCEPTED tetap jatuh ke `shipped`, timestamp marketplace hilang → ditandai (dokumen Accurate + UI) untuk cek manual.
 
 ## Dokumen Terkait
 - [[Microservices - Integration Service]] — bagian Auto-Sync Retur (HIGH-F tanggal, Cutover terpisah)
-- [[ADR - 0013 Retur via Sales Return per Mode + Keep Invoice Line]]
+- [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]]
 - [[APP - Web ERP]] — halaman Auto-Sync Retur (badge)
