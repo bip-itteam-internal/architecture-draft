@@ -127,6 +127,8 @@ Kode-kode ini namanya tak cocok persis dan **butuh konfirmasi orang gudang** —
 
 Setelah dikonfirmasi, cukup tambahkan kode lama ke `aliases` baris kanoniknya (atau betulkan namanya agar cocok persis dgn Accurate — cara SLG), lalu jalankan ulang align/klik Sync Master Bahan.
 
+> **Update 18 Juli 2026:** langkah registrasi manual varian PP- TIDAK diperlukan lagi di environment baru — sync kini punya daftar kurasi `bahanNonPrefix` (15 kode PP- bahan) di `sync_hpp.go`, jadi tombol sync sendiri sudah menggenapkan 532. Bagian pendaftaran manual di atas tinggal relevan sebagai sejarah.
+
 Catatan: duplikat di sisi Accurate (`PP-025` & `PP-028` bernama persis sama "PLASTIK SHRINK NEI - 7 CM") ikut termirror ke WMS — itu data finance untuk dibereskan di Accurate; begitu di-merge di sana, sisi WMS tinggal menghapus baris matinya.
 
 ## Dokumen Terkait
