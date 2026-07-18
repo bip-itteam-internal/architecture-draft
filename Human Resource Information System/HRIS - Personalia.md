@@ -8,7 +8,7 @@
 
 Dokumen/data yang dikelola (sebagian sudah ada di [[Microservices - Employee Service]]):
 - **Data personal pegawai** (`personal_data`, `personal_document`)
-- **Kontrak / PKWT** (mis. BIP-203-0525) — **notifikasi 1 bulan sebelum masa kontrak habis** → follow up ke SPV
+- **Kontrak / PKWT** (mis. BIP-203-0525) — **notifikasi 1 bulan sebelum masa kontrak habis** → follow up ke SPV. Digitalisasi tanda tangan & e-Meterai kontrak: [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] (🟡 direncanakan)
 - **BPJS**
 - **Riwayat masa kerja** (history)
 
@@ -33,4 +33,5 @@ Hasil off-boarding (terminasi) menjadi sumber data [[HRIS - Attrition]].
 
 - [[HRIS - Big Pictures]]
 - [[HRIS - Analysis]] · [[HRIS - Attrition]]
+- [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] — digitalisasi TTE + e-Meterai kontrak (🟡 direncanakan)
 - [[Microservices - Employee Service]] · [[GA - Inventory Management]]
