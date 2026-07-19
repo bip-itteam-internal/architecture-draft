@@ -1,4 +1,4 @@
-✅ **Implemented** (kode 2026-07-18: gerbang payout + tanggal per-solution + pemicu settlement; ⚠️ belum deploy; cleanup data existing PENDING)
+✅ **Implemented & Deployed** (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel)
 
 # ADR - 0024 Retur: Gerbang Payout≈0 (Income vs Retur) + Tanggal per-Solution
 
@@ -19,20 +19,22 @@ Investigasi berangkat dari keluhan: tanggal & jumlah retur di ERP ≠ Shopee (co
 **1. Retur Penjualan ⟺ order `payout ≈ 0`.** `returnPayoutGate(order)` (`accurate_rts_usecase.go`, reuse `payoutOf()` **identik** dgn receipt):
 - order **CANCELLED** → **book** langsung (tak punya escrow, tak menunggu).
 - income belum settle (`Income.PaidAt == nil`) → **DEFER** (payout belum diketahui).
-- settled & **payout > 0** → **SKIP** (baris ditandai `SKIPPED`; Auto Sync Income yang menangani).
+- settled & **payout > 0 & ship ≥ 10 Jul** (post-cutover faktur) → **SKIP** (baris `SKIPPED`; Auto Sync Income/receipt menyerap refund). ⚠️ **Syarat cutover WAJIB**: receipt sendiri skip ship < 10 Jul → untuk pra-cutover retur TETAP book (kalau di-skip, pembalikan HILANG — tak ada yang menangani).
 - settled & **payout ≈ 0** → **book**.
 
 Dipasang di `SyncOrderReturn` (auto) & `RetryDailyReturn` (manual tolak payout>0/belum-settle). **Pemicu**: retur DEFER di-book saat escrow cair — `triggerReturnAfterSettlement` di `syncEscrowReleaseWindow` (refetch branch, `shopee_new_usecase.go`) memanggil `SyncOrderReturn` bila payout≈0; urutan sebaliknya (settle dulu, retur menyusul) ditangani ingestion `SyncReturns` yang gate-nya melihat income settled. Idempoten (guard by-member) & fire-and-forget.
 
 **2. Tanggal retur per-solution (Shopee).** `resolveReturnTransDate`: CANCELLED→`cancelled_at`; **TikTok**→`order_update_date` (tetap, [[ADR - 0017 Tanggal Retur TikTok via order_update_date]]); **Shopee refund-only** (`solution=1`)→`requested_at` (`create_time`, anti-drift); **Shopee barang-balik** (`solution=0`) + `return_tracking.status==RECEIVED` + `last_event_at`→**arrival**; fallback `updated_at`→`requested_at`→`shipped`. Memakai sub-doc `return_tracking` yang **sudah** diisi cron reverse-tracking — **bukan** menghidupkan `arrivalResolver` lama yang dicabut ADR-0023.
 
+**3. Cutover retur = HARI KIRIM (ikut faktur), bukan tanggal-retur** (2026-07-19). Gate cutover di `SyncOrderReturn`/`RetryDailyReturn`/`RecordReturnFetchFailure` menilai `dateWIB` (hari-kirim = tanggal faktur sumber) ≥ `autoSyncReturnCutoverDateWIB` "20260701" — BUKAN tanggal retur. Alasan: retur harus mengikuti era faktur & income sumbernya. Order kirim < 1 Jul = era **manual finance** (faktur IMPORTED/tak-ada, income di-skip receipt) → returnya JUGA manual, tak auto. Basis tanggal-retur lama menarik retur order-lama (kirim Mei/Juni, faktur manual) ke auto → retur auto membalik pembukuan manual (tak konsisten + dobel). Menggantikan basis retur di [[ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah]] #2 (struktur split 2-konstanta tetap; basis retur berubah).
+
 ## Consequences
 
 - **Dobel mustahil by-design**: payout>0 & payout≈0 saling eksklusif — Receipt ATAU Retur, tak pernah keduanya.
 - **Income/Auto Sync Income sync TIDAK diubah** — ia sudah benar (menyerap refund payout>0, defer payout≈0 ke retur). Perbaikan 100% di sisi retur.
 - **Tanggal benar go-forward**: refund-only pakai tanggal ajukan (stabil), barang-balik pakai tanggal fisik sampai gudang.
-- **Menggantikan**: ADR-0023 **keputusan #1** (accepted-seragam) — premisnya salah; ADR-0023 **keputusan #2** (cutover split faktur/retur) **tetap berlaku**. Juga menutup premis "refund-only selalu jadi retur" di [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] / [[ADR - 0012 Retur Refund-only Push-all]].
-- **Cleanup data existing (PENDING)**: **void ~7 RTR payout>0 dobel**; **re-date/rebuild** retur sah (payout≈0) yang tanggalnya terlanjur `updated_at` melar.
+- **Menggantikan**: ADR-0023 **keputusan #1** (accepted-seragam) — premisnya salah; ADR-0023 **keputusan #2** — struktur split tetap, **basis cutover retur diubah** (tanggal-retur → hari-kirim, lihat Decision #3). Juga menutup premis "refund-only selalu jadi retur" di [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] / [[ADR - 0012 Retur Refund-only Push-all]].
+- **Cleanup data existing (✅ SELESAI 2026-07-19)**: `cmd/returndescope` mengeluarkan **1565 retur hari-kirim < 1 Jul** dari auto (**1007 dok Retur Penjualan dihapus dari Accurate** via `delete.do`, semua ditandai `SKIPPED`); **1 dobel post-cutover** `RTR/2026/07/16/006-BH` (payout>0 + receipt) di-void. Era kept ≥ 1 Jul: 615 SENT sah + 8 FAILED (SKU era-baru, ditunda).
 - **Edge butuh finance**: barang-balik `solution=0` **payout>0** (~48, ~1–2 SENT) — receipt urus revenue, tapi **stok tak balik** (Accurate under-stock). Konservatif (stok-opname backstop), idealnya retur-stok-saja — **ditahan untuk finance**.
 
 ## Dokumen Terkait

@@ -1,4 +1,4 @@
-⚠️ **Implemented (sebagian digantikan)** — keputusan **#2 (cutover split)** tetap berlaku; keputusan **#1 (tanggal accepted-seragam)** **digantikan** [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] (2026-07-18).
+⚠️ **Implemented (sebagian digantikan)** — keputusan **#1 (tanggal accepted-seragam)** **digantikan** [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] (2026-07-18). Keputusan **#2**: struktur **split** (2 konstanta) tetap, TAPI **basis cutover retur diubah tanggal-retur → hari-kirim** (2026-07-19, ADR-0024).
 
 # ADR - 0023 Retur: Tanggal Accepted-Seragam + Cutover Terpisah Retur/Faktur
 
@@ -18,7 +18,7 @@ Dua keputusan terkait semantik pembukuan **Retur Penjualan** auto-sync ke Accura
 
 **2. Cutover DIPECAH dua konstanta berbeda basis:**
 - **Faktur** `autoSyncCutoverDateWIB = "20260710"` (basis **hari kirim**) — jalur yang membuat/mengedit faktur: `OnOrderToShip`, `SweepDailyInvoice`, `RetryDailyInvoice`, `BackfillPreCutoverInvoice`, `OnOrderCancelledOrReturned`.
-- **Retur** `autoSyncReturnCutoverDateWIB = "20260701"` (basis **tanggal retur**) — jalur yang membukukan retur: `SyncOrderReturn`, `RetryDailyReturn`, `RecordReturnFetchFailure`. Aman lebih awal karena membukukan retur hanya **MERUJUK** faktur (tak mengedit), jadi faktur manual finance 1–9 Jul tetap utuh.
+- **Retur** `autoSyncReturnCutoverDateWIB = "20260701"` — ⚠️ **basis DIUBAH 2026-07-19: tanggal-retur → HARI KIRIM** ([[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]]). Dulu basis **tanggal-retur** menarik retur order-lama (kirim Mei/Juni) ke auto padahal faktur & income-nya **manual finance** → retur auto membalik pembukuan manual (tak konsisten + potensi dobel). Kini basis **hari kirim** = retur ikut era faktur sumbernya: order kirim < 1 Jul = manual finance (faktur, income, DAN retur); ≥ 1 Jul = auto. Jalur: `SyncOrderReturn`, `RetryDailyReturn`, `RecordReturnFetchFailure` (semua kini menilai `dateWIB` hari-kirim, bukan tanggal-retur). Retur < 1 Jul yang terlanjur di-book **di-descope** (`cmd/returndescope`: hapus dok Accurate + tandai SKIPPED; 1565 baris, 1007 dok Accurate dihapus 2026-07-19).
 
 ## Consequences
 
