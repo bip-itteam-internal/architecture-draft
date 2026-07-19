@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, transaksi, items, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈214 rute** (dihitung dari registrasi `main.go`). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
+*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, transaksi, items, ulasan marketplace, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈219 rute** (dihitung dari registrasi `main.go`; +5 `/reviews/*` 2026-07-19). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
 
 - **Implementasi**: [[Microservices - Integration Service]] · **Status**: ✅
 - **Indeks**: [[API - Index]] · Semua butuh gateway key kecuali webhook publik (`/ext/webhook/*`). ⚠️ `/health` **juga** butuh gateway key (route terdaftar setelah middleware `ValidateGateway`; gateway memanggilnya dengan key — bukan endpoint terbuka).
@@ -161,6 +161,17 @@
 | GET | `/wallet/reconciliation/export` | Export Excel laporan |
 | PUT | `/wallet/opening-balance/:shopId` | Set anchor saldo awal TikTok (`{amount, as_of}`) |
 | GET | `/wallet/sync-status` | State sync per toko (last_run, status, error) |
+
+## Reviews (Ulasan Marketplace)
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/reviews/summary` | Ringkasan rating per toko (`start`/`end` YYYY-MM-DD WIB, `channel`, `shop_id`; SHOPEE=SUM harian, TIKTOK=snapshot kumulatif terbaru) |
+| GET | `/reviews/products` | Agregat per produk, sort avg terendah dulu (`rating_avg` 1-5 bucket floor(avg) · `with_star` · `min_reviews` · +`shop_name`/`product_name`) |
+| GET | `/reviews/products/:productId/trend` | Deret snapshot harian per produk (tren; TikTok = kumulatif, delta dihitung FE) |
+| GET | `/reviews/comments` | Komentar Shopee (teks, baca-saja); `shop_id` **opsional** = feed global lintas toko (PR #568) · filter `item_id`/`rating`/`channel`/`has_text`/`has_media`/`unreplied` · paginated + join `product_name`/`shop_name` |
+| GET | `/reviews/sync-status` | State sync per toko (`last_synced_at`, `last_error`, `backfill_truncated` cap-500 Shopee) |
+
+> Worker `sync-reviews` harian 06:45 WIB. TikTok TIDAK punya API teks ulasan (hanya distribusi bintang kumulatif) — detail keterbatasan & desain: [[Microservices - Integration Service]] §Ulasan Marketplace.
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
