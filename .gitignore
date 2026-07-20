@@ -14,3 +14,4 @@
 Tools/.venv/
 __pycache__/
 .pytest_cache/
+VAULT-INDEX.batch.json
