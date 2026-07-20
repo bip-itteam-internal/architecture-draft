@@ -14,7 +14,8 @@ _RE_STATUS = re.compile(
     re.MULTILINE,
 )
 _RE_WIKILINK = re.compile(r"(?<!!)\[\[([^\]|#]+)")
-_RE_HEADING = re.compile(r"^#{1,6} .+$", re.MULTILINE)
+_RE_HEADING_LINE = re.compile(r"^#{1,6} .+$")
+_RE_FENCE = re.compile(r"^(`{3,}|~{3,})")
 
 
 def ekstrak_status(teks: str) -> tuple[str | None, str | None]:
@@ -49,7 +50,44 @@ def ekstrak_wikilink(teks: str) -> list[str]:
 
 
 def ekstrak_heading(teks: str) -> list[str]:
-    return _RE_HEADING.findall(teks)
+    """Baris heading (# .. ######), melewati isi fenced code block.
+
+    Pembatas ``` maupun ~~~ dikenali, termasuk fence dengan info string
+    (```python) dan fence >3 karakter (```` menutup literal ``` di
+    dalamnya). Fence hanya ditutup oleh pembatas jenis sama dengan
+    panjang >= pembukanya dan tanpa isi lain di baris penutup. Fence
+    yang tak pernah ditutup membuat sisa dokumen dianggap kode.
+    """
+    hasil: list[str] = []
+    in_fence = False
+    fence_char = ""
+    fence_len = 0
+
+    for line in teks.splitlines():
+        m = _RE_FENCE.match(line.lstrip())
+        if m:
+            marker = m.group(1)
+            if not in_fence:
+                in_fence = True
+                fence_char = marker[0]
+                fence_len = len(marker)
+            elif (
+                marker[0] == fence_char
+                and len(marker) >= fence_len
+                and line.lstrip()[len(marker):].strip() == ""
+            ):
+                in_fence = False
+                fence_char = ""
+                fence_len = 0
+            continue
+
+        if in_fence:
+            continue
+
+        if _RE_HEADING_LINE.match(line):
+            hasil.append(line)
+
+    return hasil
 
 
 def hitung_hash(teks: str) -> str:
