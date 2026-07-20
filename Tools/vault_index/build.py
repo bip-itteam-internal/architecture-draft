@@ -16,10 +16,17 @@ from .summarize import MODEL, ambil_hasil, ringkas_stub, submit_batch
 VERSI_SKEMA = 1
 NAMA_INDEX = "VAULT-INDEX.json"
 
-# Sidecar sementara: batch_id + peta custom_id->path, ditulis SEGERA setelah
-# submit (sebelum polling yang bisa berjalan sampai 24 jam). Kalau proses mati
-# di tengah polling, sidecar ini satu-satunya cara melanjutkan tanpa
-# mensubmit (dan membayar) batch baru. Bukan isi vault -> masuk .gitignore.
+# Sidecar sementara: batch_id + peta custom_id->path. Ditulis DUA TAHAP:
+#   1. "submitting" (batch_id null) -- SEBELUM submit_batch dipanggil sama
+#      sekali, supaya peta custom_id->path sudah aman di disk sebelum ada
+#      kemungkinan uang terpakai (create() bisa sukses di server tapi
+#      exception terjadi sebelum nilainya kembali ke kita -- timeout baca
+#      respons, KeyboardInterrupt, retry SDK tanpa idempotency key).
+#   2. "submitted" (batch_id terisi) -- SEGERA setelah submit_batch kembali,
+#      sebelum polling yang bisa berjalan sampai 24 jam dimulai.
+# Kalau proses mati di tengah polling, sidecar ini satu-satunya cara
+# melanjutkan tanpa mensubmit (dan membayar) batch baru. Bukan isi vault ->
+# masuk .gitignore.
 NAMA_SIDECAR = "VAULT-INDEX.batch.json"
 
 
@@ -140,14 +147,26 @@ class SidecarRusak(Exception):
         super().__init__(f"sidecar rusak: {path}")
 
 
-def _tulis_sidecar(path_sidecar: Path, batch_id: str, tugas: list[dict]) -> None:
-    """Simpan batch_id + peta custom_id->path SEGERA setelah submit, sebelum
-    polling dimulai.
+def _tulis_sidecar(
+    path_sidecar: Path,
+    batch_id: str | None,
+    tugas: list[dict],
+    status: str = "submitted",
+) -> None:
+    """Simpan status + batch_id (boleh None) + peta custom_id->path.
 
-    Peta custom_id->path wajib ada di sini: peta itu dibangun di memori saat
-    submit dan akan hilang total kalau proses mati saat polling. Tanpanya,
-    hasil batch yang masih ada di server Anthropic (sampai 29 hari) tidak
-    bisa dipetakan balik ke dokumen mana pun -- batch_id saja tidak cukup.
+    Dipanggil dua kali per submit baru (lihat komentar `NAMA_SIDECAR`):
+    sekali dengan `status="submitting"` dan `batch_id=None` SEBELUM
+    `submit_batch` dipanggil, sekali lagi dengan `status="submitted"` dan
+    `batch_id` terisi SEGERA setelah `submit_batch` kembali. Jalur
+    `--batch-id` yang menerima sidecar `submitting` juga memanggil ini untuk
+    merekam batch_id yang dimasukkan manual.
+
+    Peta custom_id->path wajib ada di sini SEJAK panggilan pertama: peta itu
+    dibangun di memori saat submit dan akan hilang total kalau proses mati.
+    Tanpanya, hasil batch yang masih ada di server Anthropic (sampai 29
+    hari) tidak bisa dipetakan balik ke dokumen mana pun -- batch_id saja
+    tidak cukup.
 
     Ditulis ATOMIC: tulis ke berkas sementara di direktori yang SAMA, flush +
     fsync supaya isinya benar-benar di disk, baru `os.replace` (atomic di
@@ -157,6 +176,7 @@ def _tulis_sidecar(path_sidecar: Path, batch_id: str, tugas: list[dict]) -> None
     (yang justru melumpuhkan gerbangnya sendiri lewat `SidecarRusak`).
     """
     data = {
+        "status": status,
         "batch_id": batch_id,
         "disubmit_pada": datetime.now(timezone.utc).isoformat(),
         "tugas": [{"custom_id": t["custom_id"], "path": t["path"]} for t in tugas],
@@ -172,6 +192,60 @@ def _tulis_sidecar(path_sidecar: Path, batch_id: str, tugas: list[dict]) -> None
     except BaseException:
         tmp.unlink(missing_ok=True)
         raise
+
+
+def _cetak_pemulihan_sidecar_gagal(
+    exc: BaseException,
+    path_sidecar: Path,
+    root: Path,
+    batch_id: str | None,
+    tugas: list[dict],
+    tahap: str,
+) -> None:
+    """Cetak blok pemulihan saat `_tulis_sidecar` gagal dengan exception
+    APA PUN (Perbaikan 2 -- bukan cuma `OSError`: `KeyboardInterrupt` dan
+    `TypeError` dibuktikan lolos lewat `except OSError` yang lama).
+
+    Dipanggil di KEDUA titik penulisan sidecar. `batch_id=None` berarti ini
+    terjadi SEBELUM `submit_batch` dipanggil -- belum ada uang terpakai,
+    aman untuk memperbaiki lalu mengulang. `batch_id` terisi berarti
+    `submit_batch` SUDAH sukses -- uang SUDAH terpakai, satu-satunya jalan
+    pulih adalah menyalin blok JSON di stdout ini jadi `NAMA_SIDECAR` manual
+    lalu melanjutkan dengan `--batch-id`.
+
+    Pemanggil WAJIB `raise` (bukan menelan) setelah memanggil ini --
+    `KeyboardInterrupt`/`SystemExit` harus tetap menghentikan proses.
+    """
+    peta = [{"custom_id": t["custom_id"], "path": t["path"]} for t in tugas]
+    if batch_id is None:
+        print(
+            f"GAGAL menulis sidecar intent {path_sidecar} {tahap}: {exc}\n"
+            f"Belum ada batch yang tersubmit di titik ini -- aman untuk "
+            f"memperbaiki masalah penulisan berkas ini lalu menjalankan "
+            f"ulang.\n"
+            f"Peta custom_id->path yang seharusnya tercatat (referensi bila "
+            f"submit tetap sempat terjadi di server sebelum proses ini "
+            f"berhenti):\n"
+            f"{json.dumps(peta, ensure_ascii=False, indent=2)}"
+        )
+        return
+    pemulihan = {
+        "status": "submitted",
+        "batch_id": batch_id,
+        "disubmit_pada": datetime.now(timezone.utc).isoformat(),
+        "tugas": peta,
+    }
+    print(
+        f"GAGAL menulis sidecar {path_sidecar} {tahap}: {exc}\n"
+        f"PENTING: batch {batch_id} SUDAH tersubmit dan SUDAH dibayar -- "
+        f"jangan submit ulang. Salin blok JSON di bawah ini persis apa "
+        f"adanya, simpan sebagai {NAMA_SIDECAR} di {root}, lalu lanjutkan "
+        f"dengan:\n"
+        f"  python Tools/build-vault-index.py --batch-id {batch_id}\n"
+        f"--- SALIN DARI BARIS DI BAWAH INI ---\n"
+        f"{json.dumps(pemulihan, ensure_ascii=False, indent=2)}\n"
+        f"--- SAMPAI BARIS DI ATAS INI ---"
+    )
 
 
 def _muat_sidecar(path_sidecar: Path) -> dict | None:
@@ -309,7 +383,31 @@ def main(argv: list[str] | None = None) -> int:
                 f"memetakan hasil batch ke dokumen tanpa itu. Tidak menebak, berhenti."
             )
             return 1
-        if sidecar["batch_id"] != args.batch_id:
+        status_sidecar = sidecar.get("status", "submitted")
+        if status_sidecar == "submitting":
+            # I1 (Perbaikan 1): sidecar intent (batch_id belum tercatat) --
+            # ini JUSTRU skenario pemulihan utama: pengguna menemukan
+            # batch_id secara manual (mis. dashboard/API Anthropic) dan
+            # memasukkannya di sini. Peta custom_id->path di dalamnya sudah
+            # utuh sejak ditulis SEBELUM submit_batch dipanggil -- terima
+            # apa adanya, lalu SEGERA perbarui sidecar jadi status
+            # 'submitted' dengan batch_id itu supaya jejak di disk tetap
+            # konsisten kalau proses ini mati lagi di tengah polling.
+            try:
+                _tulis_sidecar(
+                    path_sidecar, args.batch_id, sidecar["tugas"], status="submitted"
+                )
+            except BaseException as exc:
+                _cetak_pemulihan_sidecar_gagal(
+                    exc, path_sidecar, root, args.batch_id, sidecar["tugas"],
+                    "saat memperbarui sidecar 'submitting' dengan --batch-id",
+                )
+                raise
+            print(
+                f"Sidecar {path_sidecar} diperbarui: status=submitted, "
+                f"batch_id={args.batch_id}"
+            )
+        elif sidecar["batch_id"] != args.batch_id:
             print(
                 f"GAGAL: sidecar {NAMA_SIDECAR} menyebut batch_id "
                 f"'{sidecar['batch_id']}', bukan '{args.batch_id}' yang diminta. "
@@ -358,19 +456,53 @@ def main(argv: list[str] | None = None) -> int:
                 f"Isi mentah sidecar (untuk penyelamatan manual):\n{exc.mentah}"
             )
             return 1
-        if sidecar_tertinggal is not None and not args.abaikan_batch_tertinggal:
-            print(
-                f"GAGAL: batch tertinggal ditemukan (batch_id="
-                f"{sidecar_tertinggal['batch_id']}) di {path_sidecar}. Proses "
-                f"sebelumnya kemungkinan mati sebelum hasilnya diambil. Mensubmit "
-                f"batch baru sekarang berisiko membayar dua kali.\n"
-                f"Lanjutkan batch itu dengan:\n"
-                f"  python Tools/build-vault-index.py --batch-id "
-                f"{sidecar_tertinggal['batch_id']}\n"
-                f"Atau, bila memang ingin mengabaikannya dan submit baru:\n"
-                f"  python Tools/build-vault-index.py --abaikan-batch-tertinggal"
-            )
-            return 1
+        if sidecar_tertinggal is not None:
+            status_tertinggal = sidecar_tertinggal.get("status", "submitted")
+            if status_tertinggal == "submitting":
+                # I1 (Perbaikan 1): batch_id BELUM tercatat -- proses
+                # sebelumnya kemungkinan mati TEPAT di sekitar submit.
+                # Beda dari sidecar 'submitted' biasa di bawah: di sini kita
+                # bahkan tidak tahu apakah submit-nya sempat sukses di
+                # server. SELALU blokir -- termasuk saat
+                # --abaikan-batch-tertinggal dipakai, karena flag itu untuk
+                # mengabaikan sidecar VALID yang risikonya sudah dipahami
+                # (batch_id diketahui), bukan status "kita bahkan tidak
+                # tahu" yang justru paling berisiko menyembunyikan batch
+                # yatim yang sudah dibayar.
+                print(
+                    f"GAGAL: sidecar {NAMA_SIDECAR} di {path_sidecar} berstatus "
+                    f"'submitting' -- batch_id BELUM tercatat. Proses sebelumnya "
+                    f"kemungkinan mati TEPAT di sekitar submit: ADA kemungkinan "
+                    f"sebuah batch SUDAH tersubmit dan SUDAH dibayar di server "
+                    f"Anthropic, tapi batch_id-nya belum sempat tersimpan di "
+                    f"sini -- batch itu bisa jadi YATIM (orphan) tanpa jejak "
+                    f"lokal sama sekali. JANGAN submit batch baru sebelum "
+                    f"memeriksa manual apakah ada batch semacam itu (mis. lewat "
+                    f"dashboard/API Anthropic, cek sekitar waktu "
+                    f"{sidecar_tertinggal.get('disubmit_pada')}).\n"
+                    f"Peta custom_id->path (untuk pencocokan manual bila batch "
+                    f"ketemu):\n"
+                    f"{json.dumps(sidecar_tertinggal['tugas'], ensure_ascii=False, indent=2)}\n"
+                    f"Kalau KETEMU batch_id-nya, lanjutkan dengan:\n"
+                    f"  python Tools/build-vault-index.py --batch-id <BATCH_ID>\n"
+                    f"Kalau YAKIN tidak ada batch yang tersubmit (mis. proses "
+                    f"mati sebelum sempat menghubungi server), hapus "
+                    f"{path_sidecar} lalu jalankan ulang."
+                )
+                return 1
+            if not args.abaikan_batch_tertinggal:
+                print(
+                    f"GAGAL: batch tertinggal ditemukan (batch_id="
+                    f"{sidecar_tertinggal['batch_id']}) di {path_sidecar}. Proses "
+                    f"sebelumnya kemungkinan mati sebelum hasilnya diambil. Mensubmit "
+                    f"batch baru sekarang berisiko membayar dua kali.\n"
+                    f"Lanjutkan batch itu dengan:\n"
+                    f"  python Tools/build-vault-index.py --batch-id "
+                    f"{sidecar_tertinggal['batch_id']}\n"
+                    f"Atau, bila memang ingin mengabaikannya dan submit baru:\n"
+                    f"  python Tools/build-vault-index.py --abaikan-batch-tertinggal"
+                )
+                return 1
 
         if perlu_llm:
             client = anthropic.Anthropic()
@@ -379,41 +511,49 @@ def main(argv: list[str] | None = None) -> int:
                  "jenis": e["jenis"], "isi": e["_isi"], "path": e["path"]}
                 for i, e in enumerate(perlu_llm)
             ]
+            # I1 (Perbaikan 1): tulis sidecar INTENT (status='submitting',
+            # batch_id null) SEBELUM submit_batch dipanggil sama sekali.
+            # Menutup celah terakhir: kalau create() sukses di server tapi
+            # exception terjadi SEBELUM nilainya kembali ke sini (timeout
+            # baca respons, KeyboardInterrupt, retry SDK yang melahirkan
+            # batch ganda -- anthropic 0.117.0 DEFAULT_MAX_RETRIES=2 tanpa
+            # header idempotency), peta custom_id->path tetap ada di disk
+            # walau batch_id belum diketahui. Tanpa ini, batch berbayar itu
+            # jadi TANPA JEJAK sama sekali di sisi kita.
+            try:
+                _tulis_sidecar(path_sidecar, None, tugas, status="submitting")
+            except BaseException as exc:
+                # I2 (Perbaikan 2): tangkap APA PUN (bukan cuma OSError),
+                # cetak info, lalu naikkan lagi -- KeyboardInterrupt/
+                # SystemExit tetap harus menghentikan proses.
+                _cetak_pemulihan_sidecar_gagal(
+                    exc, path_sidecar, root, None, tugas,
+                    "SEBELUM submit_batch dipanggil",
+                )
+                raise
+            print(f"Sidecar intent ditulis (status=submitting): {path_sidecar}")
+
             print(f"Submit batch {len(tugas)} dokumen ke {MODEL} ...")
             batch_id = submit_batch(client, tugas)
             print(f"Batch id: {batch_id}")
 
-            # B1: sidecar ditulis SEGERA, sebelum polling (yang bisa berjalan
+            # I1: sidecar diperbarui jadi status='submitted' SEGERA setelah
+            # submit_batch kembali, sebelum polling (yang bisa berjalan
             # sampai 24 jam) dimulai.
             try:
-                _tulis_sidecar(path_sidecar, batch_id, tugas)
-            except OSError as exc:
-                # Uang SUDAH terpakai (submit_batch sukses di atas) dan
-                # sidecar GAGAL ditulis -- tanpa ini, batch_id + peta
-                # custom_id->path hilang total dari disk, dan --batch-id
-                # mewajibkan sidecar. Satu-satunya jalan pulih: cetak
-                # semuanya ke stdout dalam bentuk yang bisa disalin manusia
-                # jadi VAULT-INDEX.batch.json.
-                pemulihan = {
-                    "batch_id": batch_id,
-                    "disubmit_pada": datetime.now(timezone.utc).isoformat(),
-                    "tugas": [
-                        {"custom_id": t["custom_id"], "path": t["path"]}
-                        for t in tugas
-                    ],
-                }
-                print(
-                    f"GAGAL menulis sidecar {path_sidecar}: {exc}\n"
-                    f"PENTING: batch {batch_id} SUDAH tersubmit dan SUDAH "
-                    f"dibayar -- jangan submit ulang. Salin blok JSON di "
-                    f"bawah ini persis apa adanya, simpan sebagai "
-                    f"{NAMA_SIDECAR} di {root}, lalu lanjutkan dengan:\n"
-                    f"  python Tools/build-vault-index.py --batch-id {batch_id}\n"
-                    f"--- SALIN DARI BARIS DI BAWAH INI ---\n"
-                    f"{json.dumps(pemulihan, ensure_ascii=False, indent=2)}\n"
-                    f"--- SAMPAI BARIS DI ATAS INI ---"
+                _tulis_sidecar(path_sidecar, batch_id, tugas, status="submitted")
+            except BaseException as exc:
+                # I2: uang SUDAH terpakai (submit_batch sukses di atas) dan
+                # sidecar GAGAL ditulis -- tanpa ini, batch_id hilang total
+                # dari disk, dan --batch-id mewajibkan sidecar. Satu-satunya
+                # jalan pulih: cetak semuanya ke stdout dalam bentuk yang
+                # bisa disalin manusia jadi VAULT-INDEX.batch.json. Lalu
+                # tetap naikkan exception -- jangan menelan.
+                _cetak_pemulihan_sidecar_gagal(
+                    exc, path_sidecar, root, batch_id, tugas,
+                    "SETELAH submit_batch sukses",
                 )
-                return 1
+                raise
             print(f"Sidecar ditulis: {path_sidecar}")
 
             selesai = _tunggu_batch_dengan_deadline(

@@ -462,23 +462,38 @@ def test_tulis_sidecar_atomic_tanpa_sisa_file_sementara(tmp_path):
 def test_gagal_tulis_sidecar_setelah_submit_cetak_info_pemulihan(
     vault_batch, monkeypatch, capsys
 ):
-    """Kalau _tulis_sidecar melempar SETELAH submit_batch sukses, uang sudah
-    terpakai. Satu-satunya jalan pulih adalah stdout: batch_id + peta lengkap
-    custom_id->path, cukup untuk ditulis manusia jadi VAULT-INDEX.batch.json
-    lalu dilanjutkan dengan --batch-id."""
+    """Kalau _tulis_sidecar melempar SETELAH submit_batch sukses (tahap
+    status='submitted'), uang sudah terpakai. Satu-satunya jalan pulih adalah
+    stdout: batch_id + peta lengkap custom_id->path, cukup untuk ditulis
+    manusia jadi VAULT-INDEX.batch.json lalu dilanjutkan dengan --batch-id.
+
+    CATATAN penyesuaian (Task 9c, Perbaikan 1+2): berbeda dari versi
+    sebelumnya, sekarang _tulis_sidecar dipanggil DUA KALI (sekali sebelum
+    submit dengan status='submitting', sekali sesudah dengan
+    status='submitted') -- fake di sini hanya menggagalkan panggilan KEDUA,
+    memakai implementasi asli untuk yang pertama, supaya skenario yang diuji
+    memang "gagal SETELAH submit", bukan gagal sebelum submit_batch bahkan
+    sempat dipanggil. Assersi juga berubah dari cek kode-balik jadi cek
+    exception naik (Perbaikan 2: except BaseException ... raise, bukan lagi
+    except OSError ... return 1)."""
     batches = _FakeBatches(batch_id="batch_xyz")
     client = _FakeClient(batches)
     monkeypatch.setattr(build, "anthropic", _FakeAnthropicModule(client))
     monkeypatch.setattr(build.time, "sleep", lambda s: None)
 
-    def _gagal_tulis(*a, **k):
+    asli = build._tulis_sidecar
+
+    def _gagal_pada_submitted(path_sidecar, batch_id, tugas, status="submitted"):
+        if status == "submitting":
+            return asli(path_sidecar, batch_id, tugas, status=status)
         raise OSError("disk penuh")
 
-    monkeypatch.setattr(build, "_tulis_sidecar", _gagal_tulis)
+    monkeypatch.setattr(build, "_tulis_sidecar", _gagal_pada_submitted)
 
-    kode = build.main(["--root", str(vault_batch)])
+    with pytest.raises(OSError):
+        build.main(["--root", str(vault_batch)])
 
-    assert kode != 0
+    assert len(batches.create_calls) == 1  # submit SUDAH terjadi -- uang terpakai
     keluaran = capsys.readouterr().out
     assert "batch_xyz" in keluaran
     assert "doc-0" in keluaran and "doc-1" in keluaran
@@ -514,3 +529,230 @@ def test_batch_id_beri_ringkasan_pada_dokumen_stub(vault_batch, monkeypatch):
     dok = {d["path"]: d for d in index["dokumen"]}
     assert dok["Sales/Sales - Stub.md"]["ringkasan"] is not None
     assert "Sales/Sales - Stub.md" not in index["gagal"]
+
+
+# --- I1/I2 (Task 9c): intent record SEBELUM submit + tangkap BaseException --
+#
+# Invarian: tidak boleh ada jalur di mana batch tersubmit (uang terpakai)
+# lalu batch_id ATAU peta custom_id->path hilang. Sebelumnya sidecar hanya
+# ditulis SETELAH submit_batch kembali -- kalau create() sukses di server
+# tapi exception terjadi sebelum nilainya kembali (timeout baca respons,
+# KeyboardInterrupt, retry SDK tanpa idempotency key), nol jejak tersisa.
+# Perbaikan: sidecar dua tahap (status='submitting' sebelum submit,
+# status='submitted' sesudah) + except BaseException (bukan cuma OSError) di
+# kedua titik tulis, dengan re-raise (bukan ditelan).
+
+
+def test_sidecar_submitting_blok_run_biasa_dengan_pesan_kemungkinan_yatim(
+    vault_batch, monkeypatch, capsys
+):
+    """I1: sidecar status='submitting' (batch_id null) berarti proses
+    sebelumnya mati PERSIS di sekitar submit -- ADA kemungkinan batch sudah
+    tersubmit (dan dibayar) di server tapi belum sempat tercatat di sini.
+    Run biasa (tanpa --batch-id) TIDAK BOLEH mensubmit batch baru."""
+    (vault_batch / NAMA_SIDECAR).write_text(json.dumps({
+        "status": "submitting",
+        "batch_id": None,
+        "disubmit_pada": "2026-01-01T00:00:00+00:00",
+        "tugas": [
+            {"custom_id": "doc-0", "path": "Sales/Sales - A.md"},
+            {"custom_id": "doc-1", "path": "Sales/Sales - B.md"},
+        ],
+    }), encoding="utf-8")
+    batches = _FakeBatches()
+    client = _FakeClient(batches)
+    monkeypatch.setattr(build, "anthropic", _FakeAnthropicModule(client))
+    monkeypatch.setattr(build.time, "sleep", lambda s: None)
+
+    kode = build.main(["--root", str(vault_batch)])
+
+    assert kode != 0
+    assert batches.create_calls == []
+    assert not (vault_batch / NAMA_INDEX).exists()
+    keluaran = capsys.readouterr().out
+    assert "yatim" in keluaran.lower()
+    assert "submitting" in keluaran.lower()
+
+
+def test_sidecar_submitting_blok_meski_abaikan_batch_tertinggal(
+    vault_batch, monkeypatch, capsys
+):
+    """I1: beda dari sidecar 'submitted' biasa, status 'submitting' HARUS
+    tetap memblokir walau --abaikan-batch-tertinggal dipakai -- flag itu
+    untuk sidecar VALID yang risikonya (batch_id diketahui) sudah dipahami,
+    bukan untuk status 'kita bahkan tidak tahu apakah sudah tersubmit'."""
+    (vault_batch / NAMA_SIDECAR).write_text(json.dumps({
+        "status": "submitting",
+        "batch_id": None,
+        "disubmit_pada": "2026-01-01T00:00:00+00:00",
+        "tugas": [{"custom_id": "doc-0", "path": "Sales/Sales - A.md"}],
+    }), encoding="utf-8")
+    batches = _FakeBatches()
+    client = _FakeClient(batches)
+    monkeypatch.setattr(build, "anthropic", _FakeAnthropicModule(client))
+    monkeypatch.setattr(build.time, "sleep", lambda s: None)
+
+    kode = build.main(["--root", str(vault_batch), "--abaikan-batch-tertinggal"])
+
+    assert kode != 0
+    assert batches.create_calls == []
+    assert not (vault_batch / NAMA_INDEX).exists()
+    assert "submitting" in capsys.readouterr().out.lower()
+
+
+def test_batch_id_terima_sidecar_status_submitting(vault_batch, monkeypatch):
+    """I1: skenario pemulihan UTAMA -- pengguna menemukan batch_id secara
+    manual (mis. dashboard/API Anthropic) lalu memasukkannya via --batch-id.
+    Sidecar 'submitting' (batch_id null) harus DITERIMA, bukan ditolak;
+    setelah sukses, sidecar terhapus dan manifest tertulis seperti biasa."""
+    (vault_batch / NAMA_SIDECAR).write_text(json.dumps({
+        "status": "submitting",
+        "batch_id": None,
+        "disubmit_pada": "2026-01-01T00:00:00+00:00",
+        "tugas": [
+            {"custom_id": "doc-0", "path": "Sales/Sales - A.md"},
+            {"custom_id": "doc-1", "path": "Sales/Sales - B.md"},
+        ],
+    }), encoding="utf-8")
+    hasil_baris = [_baris_sukses("doc-0", "Ringkasan A"), _baris_sukses("doc-1", "Ringkasan B")]
+    batches = _FakeBatches(results=hasil_baris)
+    client = _FakeClient(batches)
+    monkeypatch.setattr(build, "anthropic", _FakeAnthropicModule(client))
+    monkeypatch.setattr(build.time, "sleep", lambda s: None)
+
+    kode = build.main([
+        "--root", str(vault_batch), "--batch-id", "batch_ditemukan_manual",
+    ])
+
+    assert kode == 0
+    assert batches.create_calls == []  # --batch-id TIDAK submit ulang
+    assert not (vault_batch / NAMA_SIDECAR).exists()
+    index = json.loads((vault_batch / NAMA_INDEX).read_text(encoding="utf-8"))
+    ringkasan = {d["path"]: d["ringkasan"] for d in index["dokumen"]}
+    assert ringkasan["Sales/Sales - A.md"] == "Ringkasan A"
+    assert ringkasan["Sales/Sales - B.md"] == "Ringkasan B"
+
+
+def test_batch_id_submitting_diperbarui_jadi_submitted_meski_deadline_terlampaui(
+    vault_batch, monkeypatch
+):
+    """I1: 'Setelah dipakai, sidecar diperbarui jadi berstatus submitted
+    dengan batch_id itu.' Dibuktikan lewat kasus deadline terlampaui (batch
+    belum 'ended') -- sidecar TIDAK dihapus (masih dibutuhkan untuk lanjut
+    nanti), tapi batch_id manual yang diberikan via --batch-id sudah harus
+    tercatat di sana, bukan tetap null/'submitting'."""
+    p = vault_batch / NAMA_SIDECAR
+    p.write_text(json.dumps({
+        "status": "submitting",
+        "batch_id": None,
+        "disubmit_pada": "2026-01-01T00:00:00+00:00",
+        "tugas": [{"custom_id": "doc-0", "path": "Sales/Sales - A.md"}],
+    }), encoding="utf-8")
+    batches = _FakeBatches(retrieve_statuses=["in_progress"] * 5)
+    client = _FakeClient(batches)
+    monkeypatch.setattr(build, "anthropic", _FakeAnthropicModule(client))
+    monkeypatch.setattr(build.time, "sleep", lambda s: None)
+
+    kode = build.main([
+        "--root", str(vault_batch), "--batch-id", "batch_ditemukan",
+        "--batas-tunggu-menit", "0",
+    ])
+
+    assert kode != 0
+    assert p.exists()
+    sidecar = json.loads(p.read_text(encoding="utf-8"))
+    assert sidecar["status"] == "submitted"
+    assert sidecar["batch_id"] == "batch_ditemukan"
+
+
+def test_peta_tertulis_ke_disk_sebelum_create_dipanggil(vault_batch, monkeypatch):
+    """I1, pembuktian inti: peta custom_id->path (dan status='submitting')
+    harus sudah ADA DI DISK SEBELUM submit_batch memanggil create() --
+    bukan cuma di memori. Dibuktikan dengan client palsu yang membaca
+    sidecar dari disk DI DALAM create()."""
+    path_sidecar = vault_batch / NAMA_SIDECAR
+    dibaca_saat_create = {}
+
+    class _BatchesBacaSidecarSaatCreate(_FakeBatches):
+        def create(self, requests):
+            assert path_sidecar.exists(), (
+                "sidecar belum ada di disk saat create() dipanggil -- "
+                "berarti penulisan terjadi SETELAH create, persis bug yang "
+                "seharusnya sudah diperbaiki"
+            )
+            dibaca_saat_create["isi"] = json.loads(
+                path_sidecar.read_text(encoding="utf-8")
+            )
+            return super().create(requests)
+
+    batches = _BatchesBacaSidecarSaatCreate(batch_id="batch_xyz")
+    client = _FakeClient(batches)
+    monkeypatch.setattr(build, "anthropic", _FakeAnthropicModule(client))
+    monkeypatch.setattr(build.time, "sleep", lambda s: None)
+
+    build.main(["--root", str(vault_batch)])
+
+    assert "isi" in dibaca_saat_create, "create() tidak pernah dipanggil"
+    isi = dibaca_saat_create["isi"]
+    assert isi["status"] == "submitting"
+    assert isi["batch_id"] is None
+    peta = {t["custom_id"]: t["path"] for t in isi["tugas"]}
+    assert peta == {
+        "doc-0": "Sales/Sales - A.md",
+        "doc-1": "Sales/Sales - B.md",
+    }
+
+
+def test_keyboardinterrupt_saat_tulis_sidecar_sebelum_submit_cetak_lalu_naik(
+    vault_batch, monkeypatch, capsys
+):
+    """I2: KeyboardInterrupt (BUKAN OSError) saat menulis sidecar intent
+    SEBELUM submit harus tetap mencetak info pemulihan lalu naik ke
+    pemanggil -- bukan ditelan oleh `except OSError` yang lama (terlalu
+    sempit), dan bukan pula mati diam-diam tanpa jejak apa pun tercetak."""
+    batches = _FakeBatches(batch_id="batch_xyz")
+    client = _FakeClient(batches)
+    monkeypatch.setattr(build, "anthropic", _FakeAnthropicModule(client))
+    monkeypatch.setattr(build.time, "sleep", lambda s: None)
+
+    def _gagal(*a, **k):
+        raise KeyboardInterrupt()
+
+    monkeypatch.setattr(build, "_tulis_sidecar", _gagal)
+
+    with pytest.raises(KeyboardInterrupt):
+        build.main(["--root", str(vault_batch)])
+
+    assert batches.create_calls == []  # gagal SEBELUM submit_batch dipanggil
+    keluaran = capsys.readouterr().out
+    assert "GAGAL" in keluaran
+    assert "doc-0" in keluaran and "doc-1" in keluaran
+
+
+def test_typeerror_saat_tulis_sidecar_setelah_submit_cetak_lalu_naik(
+    vault_batch, monkeypatch, capsys
+):
+    """I2: TypeError (BUKAN OSError) saat menulis sidecar SETELAH
+    submit_batch sukses -- uang sudah terpakai -- harus tetap mencetak blok
+    pemulihan (batch_id + peta) lalu naik ke pemanggil, bukan ditelan."""
+    batches = _FakeBatches(batch_id="batch_xyz")
+    client = _FakeClient(batches)
+    monkeypatch.setattr(build, "anthropic", _FakeAnthropicModule(client))
+    monkeypatch.setattr(build.time, "sleep", lambda s: None)
+
+    asli = build._tulis_sidecar
+
+    def _gagal_pada_submitted(path_sidecar, batch_id, tugas, status="submitted"):
+        if status == "submitting":
+            return asli(path_sidecar, batch_id, tugas, status=status)
+        raise TypeError("bentuk data tak terduga")
+
+    monkeypatch.setattr(build, "_tulis_sidecar", _gagal_pada_submitted)
+
+    with pytest.raises(TypeError):
+        build.main(["--root", str(vault_batch)])
+
+    assert len(batches.create_calls) == 1  # submit SUDAH terjadi -- uang terpakai
+    keluaran = capsys.readouterr().out
+    assert "batch_xyz" in keluaran
+    assert "--batch-id" in keluaran
