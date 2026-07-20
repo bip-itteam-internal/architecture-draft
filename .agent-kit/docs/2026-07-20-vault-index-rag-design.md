@@ -115,7 +115,8 @@ Ditaruh di akar vault. Namanya bukan `INDEX.json` karena sudah ada `API Referenc
       "judul": "HRIS - Overtime",
       "area": "Human Resource Information System",
       "jenis": "domain",
-      "status": "✅ Implemented",
+      "status_emoji": "⚠️",
+      "status_teks": "Sebagian terimplementasi (pencatatan), workflow pengajuan **belum**",
       "publik": true,
       "ringkasan": "Menjawab: bagaimana karyawan mengajukan lembur, siapa yang menyetujui, dan bagaimana upah lembur dihitung. Mencakup alur pengajuan via MyBharata dan aturan batas jam.",
       "kata_kunci": ["lembur", "overtime", "SPL", "upah lembur", "approval", "batas jam"],
@@ -142,7 +143,7 @@ Ini keputusan desain paling penting dalam spec ini.
 | `area` | Path folder | Langsung |
 | `jenis` | Prefix nama berkas + folder | Aturan (lihat rulebook vault §3) |
 | `publik` | Folder | Allowlist, default `false` |
-| `status` | Isi dokumen | Regex marker |
+| `status_emoji`, `status_teks` | Isi dokumen | Regex marker, disimpan mentah |
 | `tautan` | Isi dokumen | Regex wikilink |
 | `hash` | Isi dokumen | SHA-256 |
 | **`ringkasan`** | Isi dokumen | **LLM** |
@@ -152,14 +153,45 @@ Hanya dua field terakhir yang di-generate LLM. Sisanya deterministik.
 
 Alasannya bukan sekadar efisiensi. Status marker adalah **klaim faktual** tentang apakah sesuatu sudah ada di kode. Kalau LLM menyimpulkan status dari isi dokumen, ia akan sesekali salah, dan agent akan menjawab "sudah diimplementasi" untuk hal yang masih rencana. Regex tidak berhalusinasi. Ini yang menjaga prinsip grounded-in-code tetap utuh.
 
-### Ekstraksi `status`
+### Ekstraksi `status` (direvisi 2026-07-20 setelah pengukuran)
 
-Dua format yang beredar di vault harus dikenali:
+Draft awal spec ini mengasumsikan empat emoji dan menganggap status absen sebagai kasus tepi. **Pengukuran atas 217 dokumen membantah keduanya:**
 
-1. Marker di baris awal: `✅ Implemented`, `⚠️ Implemented (ada catatan)`, `🟡 Konsep`, `🔴 Stub`
-2. Format `**Status**: ✅ Implemented` (hasil cleanup vault 2026-07-18)
+| Temuan | Angka |
+|---|---|
+| Dokumen punya baris Status | 148 |
+| **Dokumen tanpa baris Status** | **69 (32%)** |
+| Format `- **Status**: ...` | 143 |
+| Format `Status: ...` (tanpa bullet/bold) | 3 |
+| Emoji berbeda yang dipakai | **6** |
+| Status berisi prosa, bukan emoji | 4 |
 
-Tidak ditemukan → `"status": null`. Bukan tebakan.
+Sebaran emoji: 🟡 58 · ✅ 43 · ⚠️ 34 · 🔴 7 · 🔜 1 · ⛔ 1.
+
+**Konsekuensi 1: `status` disimpan mentah, tidak dinormalisasi.**
+
+Kosakata status bersifat terbuka dan berbeda per jenis dokumen. ADR memakai `Accepted` / `Proposed` / `Superseded`; dokumen domain memakai `Implemented` / `Konsep` / `Stub`. Memetakan semuanya ke satu enum tetap akan membuang informasi dan memaksa tebakan. Karena itu dua field terpisah, keduanya mentah:
+
+```json
+"status_emoji": "⚠️",
+"status_teks": "Sebagian terimplementasi (pencatatan), workflow pengajuan **belum**"
+```
+
+Regex mengambil apa adanya. Tidak ada pemetaan, tidak ada penyeragaman.
+
+**Konsekuensi 2: status absen adalah kondisi normal, bukan error.**
+
+69 dokumen tanpa status mencakup **seluruh** dok meta root (`README`, `HOMEPAGE`, `ROADMAP`, `DEVELOPER GUIDE`, `SCRUM SPECS`, `CLAUDE`) dan **seluruh** dokumen `API - *`. Untuk jenis-jenis itu status memang tidak berlaku.
+
+`status_emoji: null` dan `status_teks: null` tidak boleh memicu peringatan atau masuk array `gagal`. Yang dilaporkan sebagai peringatan hanya dokumen ber-`jenis: domain` atau `adr` yang kehilangan status, karena di sana status seharusnya ada.
+
+**Regex yang dipakai** (mengakomodasi ketiga format, dicari dalam 15 baris pertama):
+
+```
+(?m)^\s*(?:-\s*)?(?:\*\*)?Status(?:\*\*)?\s*:\s*(\S+)\s*(.*)$
+```
+
+Grup 1 masuk `status_emoji` bila cocok salah satu dari enam emoji yang dikenal, selain itu `status_emoji: null` dan seluruh sisa baris masuk `status_teks` (ini menangani 4 dokumen yang statusnya berupa prosa).
 
 ### Ringkasan: apa yang diminta dari LLM
 
@@ -216,7 +248,7 @@ Panggilan pakai SDK resmi `anthropic` (Python), bukan raw HTTP.
 ### Penanganan error
 
 - Panggilan LLM gagal setelah retry: entri ditandai `"ringkasan": null`, path masuk array `gagal`, skrip lanjut, ringkasan kegagalan dicetak di akhir, **exit code non-nol**. Tidak ada kegagalan senyap.
-- Marker status tidak ditemukan: `"status": null`.
+- Marker status tidak ditemukan: `status_emoji: null`, `status_teks: null`. Normal untuk 69 dokumen (meta root, `API - *`); diperingatkan hanya bila `jenis` adalah `domain` atau `adr`.
 - Berkas tidak terbaca (permission, encoding): masuk `gagal`, skrip lanjut.
 
 ## Konsumen: `/ask` dan `/start-task`
@@ -272,7 +304,7 @@ TDD untuk bagian deterministik. `pytest` dengan fixture vault mini.
 
 | Yang dites | Kenapa |
 |---|---|
-| Ekstraksi status marker, empat varian × dua format | Format `**Status**:` mudah terlewat |
+| Ekstraksi status: 6 emoji × 3 format, plus status prosa, plus status absen | Varian nyata di vault, terukur 2026-07-20 |
 | Parsing wikilink, termasuk embed gambar `![[...]]` | Embed bukan tautan dokumen |
 | Klasifikasi `jenis` dari prefix + folder | Aturan rulebook §3 |
 | Klasifikasi `publik` per folder | Keamanan |
