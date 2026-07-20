@@ -92,7 +92,7 @@ sequenceDiagram
 - Klaim **hanya disertakan** bila cakupannya lebih dari departemen sendiri, supaya token non-supervisor tak membengkak. Konsumen **wajib** punya fallback ke `BIP-Department` — token berlaku 72 jam, jadi setelah rilis masih banyak token beredar tanpa klaim ini (`common.SupervisedDepartments`).
 - Perubahan relasi di master data **baru terasa setelah login ulang**, karena cakupannya ikut di token.
 - 🔒 **Gateway membuang seluruh namespace `BIP-*` yang datang dari klien** sebelum mengisinya dari klaim JWT. Penyalinan header masuk sebelumnya membawa serta header BIP-* kiriman pemanggil, sementara pengisian dari klaim bersifat kondisional — header yang kebetulan tak terisi bisa dipalsukan pemanggil untuk memperluas aksesnya sendiri. **Header BIP-* apa pun yang ditambahkan ke depan wajib masuk daftar penghapusan itu.**
-- `routes.InternalRequest` (panggilan antar-service, tanpa gateway) **belum** meneruskan header cakupan; konsumen jatuh ke satu departemen. Aman karena menyempit, bukan melebar = **TBD**.
+- `routes.InternalRequest` (panggilan antar-service, tanpa gateway) **sudah** meneruskan header cakupan, sehingga hasilnya sama baik lewat gateway maupun antar-service. ⚠️ `InternalRequestMultipart` dan `InternalRequestCustomHeader` **tidak**, karena keduanya memang tak meneruskan `BIP-Department` sama sekali (hanya EmployeeID, Username, SystemRoles) — konsumen lewat dua jalur itu jatuh ke perilaku satu departemen. Menyeragamkannya berarti mengubah perilaku alur yang sudah jalan (mis. pembuatan perjalanan dinas multipart) = **TBD**.
 
 ## Aplikasi: Pakai SSO atau Tidak
 
