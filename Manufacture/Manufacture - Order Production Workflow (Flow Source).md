@@ -56,3 +56,9 @@ flowchart TD
 
     style N7 fill:#27ae60,color:#fff
 ```
+
+## Dokumen Terkait
+
+- [[Manufacture - Stock & Material Management]] (dok induk: BOM/formula & perencanaan kebutuhan)
+- [[External - Accurate]] (Work Order & BOM aktif dibaca dari sini)
+- [[Microservices - Manufacture Service]] (implementasi `manufacture_formula`)
