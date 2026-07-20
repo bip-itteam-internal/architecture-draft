@@ -9,3 +9,8 @@
 
 # Mac
 .DS_Store
+
+# Vault index tooling
+Tools/.venv/
+__pycache__/
+.pytest_cache/
