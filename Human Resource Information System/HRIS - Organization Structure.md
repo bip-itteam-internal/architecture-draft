@@ -12,23 +12,47 @@
 - **Hierarki/atasan** — relasi supervisor per divisi (dipakai di banyak approval, mis. `getSupervisorData`)
 - **Org chart** — visualisasi struktur (belum ada)
 
-## Satu supervisor untuk dua departemen — General Affair → Human Resource
+## Cakupan supervisi antar-departemen (`supervised_by`)
 
-⚠️ **Aturan operasional yang tidak terlihat dari kode maupun UI. Baca sebelum mengubah data supervisor.**
+⚠️ **Baca sebelum mengubah data departemen atau supervisor.** Relasi ini menentukan ke siapa pengajuan cuti mengalir.
 
-**General Affair sengaja tidak punya supervisor sendiri** (`work_data.is_supervisor` = `true` nol orang); yang membawahinya adalah **supervisor Human Resource**. Kedua departemen **tetap terpisah** sebagai data — 15 orang GA (mayoritas Security & Office Boy) tetap ber-`work_data.department` = `General Affair`.
+Sebagian departemen sengaja **tidak punya supervisor sendiri** dan dibawahi supervisor departemen lain. Saat ini: **General Affair dibawahi supervisor Human Resource** (`work_data.is_supervisor` = `true` nol orang di GA). Kedua departemen **tetap terpisah sebagai data** — 15 orang GA (mayoritas Security & Office Boy) tetap ber-`work_data.department` = `General Affair`.
 
-Yang membuatnya berjalan: `services/employee/main.go` pada `/list?type=supervisor` **menulis ulang** query `department=General Affair` menjadi `Human Resource` (ada di jalur utama **dan** jalur fallback by-position). Karena `getSupervisorData` di [[Microservices - Attendance Service]] memakai endpoint itu, seluruh pengajuan GA (cuti, izin, koreksi absensi, perjalanan dinas) otomatis mengarah ke SPV HR.
+Relasinya disimpan sebagai **master data**, bukan di kode: `master_department.supervised_by` berisi **key** departemen induk (GA → `hris`). Pasangannya `master_department.supervision_label` memberi nama pendek untuk kelompok gabungan (HR → `HRGA`).
 
-Konsekuensi yang perlu dijaga:
+### Dua konsep terpisah yang jangan dicampur
 
-- **Jangan hapus remap tersebut.** Tanpa itu jalur cadangan pun gagal, karena tak satu pun posisi di GA (`Security`, `Office Boy`, `GA Staff`, `Legal Staff`, `Admin`) cocok dengan pola judul `Supervisor|^Leader$`. Hasilnya **nol approver** untuk 15 orang.
-- **Remap bersifat satu arah (GA→HR).** Supervisor wajib terdaftar di `Human Resource`. Bila di-set ke `General Affair`, staf HR maupun GA sama-sama tak menemukannya, dan panel admin HR menolak 403.
-- **Menambah `is_supervisor` di GA tidak berefek** selama remap masih ada, karena query sudah ditulis ulang sebelum menyentuh database.
-- **Memisahkan kembali** butuh ubah kode (menghapus remap), bukan sekadar ubah data. Memindahkannya jadi relasi di `master_department` = **TBD**, lihat bagian TBD di bawah.
+| | Cakupan TAMPILAN | Cakupan WEWENANG |
+|---|---|---|
+| Sumber | Struktur organisasi (`DepartmentGroups`) | Cakupan orang, di klaim JWT |
+| Berlaku bagi | Siapa pun yang sudah berhak melihat | Hanya `is_supervisor` |
+| Dipakai | KPI, daftar karyawan, laporan absensi | Support Ticket |
+| Sifat | Mengelompokkan ulang baris yang sudah lolos RBAC; **tak pernah menambah baris** | Menambah akses |
+
+Mencampur keduanya berbahaya dua arah: menyempitkan tampilan bikin staf HR melihat HR dan GA terpisah padahal timnya satu; melebarkan wewenang bikin staf HR ikut mendapat akses tiket GA yang bukan haknya.
+
+### Urutan pencarian atasan
+
+`/list?type=supervisor&department=X` menelusuri berurutan sampai ketemu:
+
+1. `is_supervisor` di departemen X sendiri
+2. `is_supervisor` di departemen induk X
+3. Judul jabatan cocok `Supervisor|^Leader$` di X
+4. Judul jabatan cocok di induk X
+
+**Data eksplisit selalu menang atas tebakan judul jabatan**, di kedalaman mana pun. Kalau tidak, seseorang berjudul `GA Supervisor` (jabatan itu ada di seed default GA) tanpa flag `is_supervisor` akan membajak seluruh pengajuan GA dari supervisor HR yang sah.
+
+**Departemen yang punya atasan sendiri selalu menang atas induknya.** Jadi memisahkan kembali cukup mengangkat supervisor di departemen itu; relasinya tak perlu dikosongkan lebih dulu, dan tak perlu ubah kode maupun deploy.
+
+### Konsekuensi yang perlu dijaga
+
+- **Jangan hapus `supervised_by` GA tanpa mengangkat supervisor GA lebih dulu.** Tak satu pun posisi di GA (`Security`, `Office Boy`, `GA Staff`, `Legal Staff`, `Admin`) cocok pola judul `Supervisor|^Leader$`, jadi hasilnya **nol approver** untuk 15 orang — dan gejalanya bukan error, melainkan pengajuan yang mentok diam-diam.
+- **Relasi satu arah dan satu tingkat.** Induk membawa yang dibawahinya, bukan sebaliknya; cucu tidak ikut naik ke kakek.
+- **Perubahan cakupan baru terasa setelah pemakai login ulang**, karena cakupannya ikut di token (berlaku 72 jam). Label kelompok dibaca per-permintaan, jadi perubahannya langsung terlihat.
 - **Tahap review HR bersifat dept-level**: slot `hr_status` diisi pseudo-user tanpa `employee_id`, sehingga **semua** orang berdepartemen `Human Resource` dapat melihat & menindak antrian tahap HR, termasuk pengajuan milik orang GA. Tahap SPV tidak begitu (diisi `employee_id` spesifik). Ini alasan kuat untuk **tidak** menggabungkan kedua departemen di level data: bila GA dipindah ke HR, Security & Office Boy ikut bisa melihat antrian pengajuan seluruh perusahaan.
+- **Form Master Data belum menampilkan `supervised_by`** — hanya bisa diubah lewat API. `PUT /master/departments/:key` mempertahankan field ini bila tak disebut di body, supaya edit jabatan lewat UI tidak diam-diam memutus relasi. Mengeksposnya di UI = **TBD**.
 
-Tampilan KPI menyatukan keduanya sebagai satu entri filter tanpa menyentuh data — lihat [[HRIS - Key Performance Index]].
+Tampilan KPI menyatukan keduanya sebagai satu entri tanpa menyentuh data — lihat [[HRIS - Key Performance Index]].
 
 ## Keterkaitan
 
@@ -42,7 +66,9 @@ Tampilan KPI menyatukan keduanya sebagai satu entri filter tanpa menyentuh data 
 
 - Format org chart (visual) + jenjang/golongan
 - Penanganan posisi rangkap / matriks
-- **Relasi supervisi antar-departemen sebagai master data** — saat ini "GA dibawahi SPV HR" tersebar di tiga tempat berbeda: remap hardcode di employee service, union HR+GA hardcode di attendance (`/today?view=team`), dan konstanta di FE KPI. Field relasi di `master_department` (mis. `supervised_by`) akan menyatukan ketiganya sehingga penataan ulang cukup ubah data. Pola serupa sudah ada implisit di `deptKeyToNames` yang memetakan role `finance` ke `Finance` **dan** `Procurement`.
+- **Ekspos `supervised_by` & `supervision_label` di form Master Data** — sudah jadi master data, tapi belum bisa dikelola lewat UI
+- **Relasi supervisi berjenjang** — saat ini sengaja dibatasi SATU tingkat. Organisasi bertingkat (divisi → departemen → sub-departemen) perlu keputusan tersendiri
+- **Satukan `deptKeyToNames`** (`shared-library/common/roles.go`) ke master data — pemetaan role key → nama departemen masih hardcode, dan `finance` → `Finance` + `Procurement` sebenarnya konsep yang sama dengan `supervised_by`. Departemen yang benar-benar baru masih butuh ubah kode di situ **dan** di switch jadwal absensi
 
 ## Dependensi / Dokumen Terkait
 
