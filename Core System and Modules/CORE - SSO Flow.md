@@ -83,7 +83,16 @@ sequenceDiagram
 - Role berasal dari `system_roles` di collection `system_authentication` ([[Microservices - Employee Service]]). Tipe Go: `map[string]Role` (type alias `map[string]string`); key = department/feature key (mis. `"hris"`, `"it"`, `"insentive"`), value = role string (`"staff"`, `"supervisor"`, `"admin"`, dll).
 - Daftar key dan available roles per key dikelola di master data: `master_department` (department-based) dan `master_system_role` (feature-based) — lihat [[HRIS - Organization Structure]].
 - Gateway menurunkan identitas + role lalu meneruskannya ke service via header `BIP-System-Roles` (JSON); service membaca role dari header (mis. Task Manager: `system_roles["task-management"]` → admin / supervisor / staff).
-- Penambahan department/role baru **tidak memerlukan perubahan kode** — cukup tambah via CRUD master data endpoint atau frontend `/hris/master-data`.
+- Penambahan department/role baru **tidak memerlukan perubahan kode** — cukup tambah via CRUD master data endpoint atau frontend `/hris/master-data`. ⚠️ Berlaku untuk **penambahan**; departemen yang benar-benar baru masih perlu entri di `deptKeyToNames` (`shared-library/common/roles.go`) dan di switch jadwal absensi. Detail: [[HRIS - Organization Structure]] §TBD.
+
+### Cakupan supervisi lintas departemen
+
+- Klaim JWT **`supervised_departments`** (array nama departemen) + header **`BIP-Supervised-Departments`** (JSON array) membawa departemen yang berada dalam cakupan supervisi pemakai. Diisi employee-service saat login dari `master_department.supervised_by`.
+- **Menyertai, bukan menggantikan** `BIP-Department` yang tetap berisi satu nilai (departemen asal pemakai), sehingga konsumen lama tak terpengaruh.
+- Klaim **hanya disertakan** bila cakupannya lebih dari departemen sendiri, supaya token non-supervisor tak membengkak. Konsumen **wajib** punya fallback ke `BIP-Department` — token berlaku 72 jam, jadi setelah rilis masih banyak token beredar tanpa klaim ini (`common.SupervisedDepartments`).
+- Perubahan relasi di master data **baru terasa setelah login ulang**, karena cakupannya ikut di token.
+- 🔒 **Gateway membuang seluruh namespace `BIP-*` yang datang dari klien** sebelum mengisinya dari klaim JWT. Penyalinan header masuk sebelumnya membawa serta header BIP-* kiriman pemanggil, sementara pengisian dari klaim bersifat kondisional — header yang kebetulan tak terisi bisa dipalsukan pemanggil untuk memperluas aksesnya sendiri. **Header BIP-* apa pun yang ditambahkan ke depan wajib masuk daftar penghapusan itu.**
+- `routes.InternalRequest` (panggilan antar-service, tanpa gateway) **belum** meneruskan header cakupan; konsumen jatuh ke satu departemen. Aman karena menyempit, bukan melebar = **TBD**.
 
 ## Aplikasi: Pakai SSO atau Tidak
 
