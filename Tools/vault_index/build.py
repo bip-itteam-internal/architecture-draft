@@ -17,7 +17,7 @@ from pathlib import Path
 
 from .parsing import ekstrak_status, ekstrak_wikilink, hitung_hash, potong_untuk_llm
 from .paths import klasifikasi_path
-from .summarize import _TEMPLATE, _parse_isi_pesan, ringkas_stub
+from .summarize import PANDUAN_AGENT, _parse_isi_pesan, ringkas_stub
 
 VERSI_SKEMA = 1
 NAMA_INDEX = "VAULT-INDEX.json"
@@ -125,15 +125,14 @@ def _peringatan_folder_tak_dikenal(entri: list[dict]) -> list[str]:
 
 
 def _panduan_untuk_agent() -> str:
-    """Instruksi ringkasan untuk agent: `_TEMPLATE` tanpa bagian isi dokumen.
+    """Instruksi lengkap untuk agent yang membaca `--daftar-tugas`.
 
-    Sumber tunggal kebenaran gaya ringkasan tetap `_TEMPLATE` (summarize.py).
-    Ini cuma memotong bagian yang spesifik per-dokumen (isi mentah, yang di
-    berkas daftar tugas sudah ada per-entri lewat field `isi`), supaya
-    berkas `--daftar-tugas` menjelaskan dirinya sendiri ke agent yang
-    membacanya, tanpa instruksi terpisah.
+    Sumber tunggal kebenaran: `PANDUAN_AGENT` (summarize.py) -- konstanta
+    berdiri sendiri yang menjelaskan gaya ringkasan DAN kontrak keluaran
+    (nama berkas, bentuk JSON, kewajiban menyalin `hash`). Lihat docstring
+    `PANDUAN_AGENT` untuk alasan kenapa ini bukan turunan `_TEMPLATE`.
     """
-    return _TEMPLATE.split("--- ISI DOKUMEN ---")[0].rstrip() + "\n"
+    return PANDUAN_AGENT
 
 
 def _tandai_perlu_dan_stub(entri: list[dict], lama: dict | None) -> set[str]:
@@ -198,6 +197,7 @@ def _mode_daftar_tugas(entri: list[dict], lama: dict | None, path_tugas: Path,
         "panduan": _panduan_untuk_agent(),
         "tugas": tugas,
     }
+    path_tugas.parent.mkdir(parents=True, exist_ok=True)
     path_tugas.write_text(
         json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
@@ -221,9 +221,18 @@ def _mode_serap(entri: list[dict], lama: dict | None, path_hasil: Path, root: Pa
         print(f"GAGAL: berkas hasil {path_hasil} tidak bisa dibaca/diparse: {exc}")
         return 1
 
-    hasil = data.get("hasil") if isinstance(data, dict) else None
-    if not isinstance(hasil, dict):
-        hasil = {}
+    if not isinstance(data, dict) or not isinstance(data.get("hasil"), dict):
+        print(
+            f"GAGAL: berkas hasil {path_hasil} bentuknya salah. Diharapkan objek "
+            'JSON level atas dengan key "hasil" berisi peta path -> {"ringkasan": '
+            '..., "kata_kunci": [...], "hash": ...}. Contoh:\n'
+            '  {"hasil": {"Sales/Sales - A.md": {"ringkasan": "...", '
+            '"kata_kunci": ["..."], "hash": "..."}}}\n'
+            "Manifest TIDAK ditulis, tidak ada berkas yang dihapus. Perbaiki bentuk "
+            "berkas hasil lalu jalankan --serap lagi."
+        )
+        return 1
+    hasil: dict = data["hasil"]
 
     _tandai_perlu_dan_stub(entri, lama)
     entri_by_path = {e["path"]: e for e in entri}
@@ -268,11 +277,24 @@ def _mode_serap(entri: list[dict], lama: dict | None, path_hasil: Path, root: Pa
         f"tak ditemukan di vault: {tak_ditemukan}, masih gagal: {len(index['gagal'])}"
     )
 
-    # artefak sementara -- hapus begitu manifest berhasil ditulis di atas
-    for p in {path_hasil, root / NAMA_TUGAS, root / NAMA_HASIL}:
-        if p.exists():
-            p.unlink()
-            print(f"Dihapus: {p}")
+    # artefak sementara -- hapus HANYA bila serap bersih total (tanpa entri
+    # ditolak/basi/tak-ditemukan). Sebagian gagal berarti operator masih
+    # perlu memperbaiki hasil.json dan menjalankan ulang --serap; menghapus
+    # artefak di titik itu membuang bukti dan memaksa mengulang seluruh sesi
+    # ringkasan dari nol.
+    if ditolak or basi or tak_ditemukan:
+        print(
+            f"Artefak dipertahankan ({path_hasil}) -- ada entri "
+            f"ditolak/basi/tak ditemukan. Perbaiki lalu jalankan --serap lagi."
+        )
+    else:
+        for p in [path_hasil, root / NAMA_TUGAS, root / NAMA_HASIL]:
+            if p.exists():
+                try:
+                    p.unlink()
+                    print(f"Dihapus: {p}")
+                except OSError as exc:
+                    print(f"PERINGATAN: gagal menghapus {p}: {exc}")
 
     if index["gagal"]:
         print(f"\n{len(index['gagal'])} dokumen masih belum punya ringkasan:")
@@ -300,14 +322,16 @@ def _mode_default(entri: list[dict], lama: dict | None, root: Path) -> int:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Bangun VAULT-INDEX.json")
     ap.add_argument("--full", action="store_true", help="regen semua, abaikan hash")
-    ap.add_argument("--check", action="store_true",
-                    help="exit 1 bila index basi, tanpa menulis")
     ap.add_argument("--root", default=".", help="akar vault")
-    ap.add_argument(
+
+    mode = ap.add_mutually_exclusive_group()
+    mode.add_argument("--check", action="store_true",
+                       help="exit 1 bila index basi, tanpa menulis")
+    mode.add_argument(
         "--daftar-tugas", nargs="?", const="", default=None, metavar="PATH",
         help=f"tulis dokumen yang perlu diringkas ke PATH (default {NAMA_TUGAS} di akar vault)",
     )
-    ap.add_argument(
+    mode.add_argument(
         "--serap", nargs="?", const="", default=None, metavar="PATH",
         help=f"serap ringkasan dari PATH (default {NAMA_HASIL} di akar vault), tulis {NAMA_INDEX}",
     )

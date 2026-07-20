@@ -230,6 +230,26 @@ def test_daftar_tugas_panduan_non_kosong(vault_ringkasan):
     assert "ISI DOKUMEN" not in tugas["panduan"]
 
 
+# --- I2: panduan harus menjelaskan kontrak keluaran, bukan cuma gaya --------
+
+
+def test_daftar_tugas_panduan_menjelaskan_kontrak_keluaran(vault_ringkasan):
+    build.main(["--root", str(vault_ringkasan), "--daftar-tugas"])
+    tugas = json.loads((vault_ringkasan / NAMA_TUGAS).read_text(encoding="utf-8"))
+    panduan = tugas["panduan"]
+    assert NAMA_HASIL in panduan  # nama berkas keluaran
+    assert "hasil" in panduan
+    assert "hash" in panduan
+
+
+def test_daftar_tugas_panduan_tanpa_placeholder_mentah(vault_ringkasan):
+    build.main(["--root", str(vault_ringkasan), "--daftar-tugas"])
+    tugas = json.loads((vault_ringkasan / NAMA_TUGAS).read_text(encoding="utf-8"))
+    panduan = tugas["panduan"]
+    assert "{judul}" not in panduan
+    assert "{jenis}" not in panduan
+
+
 def test_daftar_tugas_kosong_kalau_semua_sudah_diringkas(vault_ringkasan):
     entri = scan_vault(vault_ringkasan)
     lengkap = []
@@ -405,6 +425,149 @@ def test_serap_berkas_hasil_tidak_ada_berhenti_tanpa_crash(vault_ringkasan, caps
     assert str(vault_ringkasan / NAMA_HASIL) in capsys.readouterr().out
 
 
+# --- C1: pembungkus "hasil" salah bentuk -- harus fail-closed, bukan senyap
+# jadi {} yang menghapus seluruh sesi ringkasan tanpa jejak. ------------------
+
+
+def test_serap_tanpa_pembungkus_hasil_gagal_tanpa_menulis_atau_menghapus(
+    vault_ringkasan, capsys
+):
+    """Agent menulis peta path->ringkasan langsung di level atas, tanpa
+    pembungkus `"hasil"`. Ini reproduksi persis skenario C1: dulu diam-diam
+    diperlakukan sebagai {} (nol diserap) dan berkas hasil tetap dihapus."""
+    entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
+    salah_bentuk = {
+        "Sales/Sales - A.md": {
+            "ringkasan": "Ringkasan A.", "kata_kunci": ["a"],
+            "hash": entri["Sales/Sales - A.md"]["hash"],
+        },
+    }
+    (vault_ringkasan / NAMA_HASIL).write_text(json.dumps(salah_bentuk), encoding="utf-8")
+
+    kode = build.main(["--root", str(vault_ringkasan), "--serap"])
+
+    assert kode != 0
+    assert not (vault_ringkasan / NAMA_INDEX).exists()
+    assert (vault_ringkasan / NAMA_HASIL).exists()  # TIDAK dihapus
+    keluaran = capsys.readouterr().out
+    assert "GAGAL" in keluaran
+    assert "hasil" in keluaran
+
+
+@pytest.mark.parametrize("hasil_salah", [[], "sebuah string", None, "123"])
+def test_serap_hasil_bukan_dict_gagal_tanpa_menulis_atau_menghapus(
+    vault_ringkasan, capsys, hasil_salah
+):
+    (vault_ringkasan / NAMA_HASIL).write_text(
+        json.dumps({"hasil": hasil_salah}), encoding="utf-8",
+    )
+
+    kode = build.main(["--root", str(vault_ringkasan), "--serap"])
+
+    assert kode != 0
+    assert not (vault_ringkasan / NAMA_INDEX).exists()
+    assert (vault_ringkasan / NAMA_HASIL).exists()
+    assert "GAGAL" in capsys.readouterr().out
+
+
+# --- I1/I4: hapus artefak hanya bila serap bersih total ----------------------
+
+
+def test_serap_sebagian_ditolak_artefak_dipertahankan(vault_ringkasan, capsys):
+    (vault_ringkasan / NAMA_TUGAS).write_text("{}", encoding="utf-8")
+    hasil = {
+        "hasil": {
+            "Sales/Sales - A.md": {"ringkasan": 123, "kata_kunci": []},  # ditolak
+        }
+    }
+    (vault_ringkasan / NAMA_HASIL).write_text(json.dumps(hasil), encoding="utf-8")
+
+    kode = build.main(["--root", str(vault_ringkasan), "--serap"])
+
+    assert kode != 0
+    assert (vault_ringkasan / NAMA_HASIL).exists()
+    assert (vault_ringkasan / NAMA_TUGAS).exists()
+    assert "dipertahankan" in capsys.readouterr().out.lower()
+
+
+def test_serap_hash_basi_artefak_dipertahankan(vault_ringkasan, capsys):
+    hasil = {
+        "hasil": {
+            "Sales/Sales - A.md": {
+                "ringkasan": "x", "kata_kunci": [], "hash": "hash-salah",
+            },
+        }
+    }
+    (vault_ringkasan / NAMA_HASIL).write_text(json.dumps(hasil), encoding="utf-8")
+
+    build.main(["--root", str(vault_ringkasan), "--serap"])
+
+    assert (vault_ringkasan / NAMA_HASIL).exists()
+    assert "dipertahankan" in capsys.readouterr().out.lower()
+
+
+def test_serap_path_tak_ditemukan_artefak_dipertahankan(vault_ringkasan, capsys):
+    hasil = {"hasil": {"Sales/Sales - Tidak Ada.md": {"ringkasan": "x", "kata_kunci": []}}}
+    (vault_ringkasan / NAMA_HASIL).write_text(json.dumps(hasil), encoding="utf-8")
+
+    build.main(["--root", str(vault_ringkasan), "--serap"])
+
+    assert (vault_ringkasan / NAMA_HASIL).exists()
+    assert "dipertahankan" in capsys.readouterr().out.lower()
+
+
+def test_serap_sukses_penuh_artefak_tetap_terhapus(vault_ringkasan):
+    """Kontrol positif: serap bersih (semua entri diterima) tetap membersihkan
+    artefak sementara seperti sebelumnya -- I1 hanya menambah pengecualian."""
+    entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
+    hasil = {
+        "hasil": {
+            "Sales/Sales - A.md": {
+                "ringkasan": "a", "kata_kunci": [],
+                "hash": entri["Sales/Sales - A.md"]["hash"],
+            },
+            "Sales/Sales - C.md": {
+                "ringkasan": "c", "kata_kunci": [],
+                "hash": entri["Sales/Sales - C.md"]["hash"],
+            },
+            "Sales/Sales - Besar.md": {
+                "ringkasan": "b", "kata_kunci": [],
+                "hash": entri["Sales/Sales - Besar.md"]["hash"],
+            },
+        }
+    }
+    (vault_ringkasan / NAMA_HASIL).write_text(json.dumps(hasil), encoding="utf-8")
+
+    kode = build.main(["--root", str(vault_ringkasan), "--serap"])
+
+    assert kode == 0
+    assert not (vault_ringkasan / NAMA_HASIL).exists()
+
+
+def test_serap_gagal_unlink_cetak_peringatan_bukan_crash(vault_ringkasan, monkeypatch, capsys):
+    """Berkas terkunci proses lain (Obsidian, antivirus) saat unlink tidak
+    boleh melempar traceback -- manifest yang sudah benar tetap harus
+    dilaporkan lengkap."""
+    (vault_ringkasan / NAMA_HASIL).write_text(json.dumps({"hasil": {}}), encoding="utf-8")
+
+    asli_unlink = Path.unlink
+
+    def unlink_gagal(self, *a, **k):
+        if self.name == NAMA_HASIL:
+            raise OSError("berkas terkunci")
+        return asli_unlink(self, *a, **k)
+
+    monkeypatch.setattr(Path, "unlink", unlink_gagal)
+
+    kode = build.main(["--root", str(vault_ringkasan), "--serap"])
+
+    assert kode != 0  # mencerminkan hasil serap (dokumen lain masih gagal), bukan crash
+    assert (vault_ringkasan / NAMA_INDEX).exists()
+    keluaran = capsys.readouterr().out
+    assert "PERINGATAN" in keluaran
+    assert "gagal menghapus" in keluaran.lower()
+
+
 # --- mode tanpa flag ---------------------------------------------------------
 
 
@@ -443,6 +606,23 @@ def test_mode_tanpa_flag_carry_forward_ringkasan_yang_hash_nya_sama(vault_ringka
     index = json.loads((vault_ringkasan / NAMA_INDEX).read_text(encoding="utf-8"))
     dok = {d["path"]: d for d in index["dokumen"]}
     assert dok["Sales/Sales - A.md"]["ringkasan"] == "sudah ada"
+
+
+# --- minor: mode CLI harus saling eksklusif, bukan diselesaikan senyap by
+# precedence (--check / --daftar-tugas / --serap). ---------------------------
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["--check", "--serap"],
+        ["--check", "--daftar-tugas"],
+        ["--daftar-tugas", "--serap"],
+    ],
+)
+def test_dua_flag_mode_sekaligus_ditolak_argparse(vault_ringkasan, argv):
+    with pytest.raises(SystemExit):
+        build.main(["--root", str(vault_ringkasan), *argv])
 
 
 # --- anti-regresi: jalur berbayar (Batches API) benar-benar hilang ----------

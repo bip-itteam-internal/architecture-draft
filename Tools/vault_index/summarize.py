@@ -69,6 +69,80 @@ def bangun_prompt(judul: str, jenis: str | None, isi: str) -> str:
     )
 
 
+# Panduan untuk agent (Claude Code) yang membaca VAULT-INDEX.tugas.json dan
+# menulis VAULT-INDEX.hasil.json. Konstanta BERDIRI SENDIRI (bukan dipotong
+# dari `_TEMPLATE`, yang hanya menjelaskan gaya untuk SATU dokumen): agent
+# yang membaca berkas daftar tugas perlu tahu bentuk keluaran yang dibaca
+# balik oleh `--serap` (build.py), bukan cuma gaya penulisan ringkasan.
+# `_TEMPLATE` dan konstanta ini berkembang terpisah dengan sengaja -- lihat
+# docstring modul.
+PANDUAN_AGENT = """\
+Kamu meringkas dokumen-dokumen di daftar `tugas` di bawah, satu per satu, \
+untuk index pencarian vault arsitektur ERP Bharata.
+
+## Gaya ringkasan
+
+Tulis dalam Bahasa Indonesia. Istilah teknis yang lazim English biarkan \
+English (endpoint, request, service, payroll, approval, dst).
+
+`ringkasan`: 2 sampai 3 kalimat yang menjawab "dokumen ini bisa menjawab \
+pertanyaan apa saja", BUKAN sekadar memadatkan isinya.
+Buruk : "Berisi endpoint dan alur lembur."
+Baik  : "Menjawab: bagaimana cara mengajukan lembur, siapa yang menyetujui, \
+dan bagaimana upah lembur dihitung."
+
+`kata_kunci`: 5 sampai 10 istilah yang mungkin dipakai orang saat mencari \
+dokumen ini. Sertakan padanan dua bahasa bila ada (mis. "lembur" dan \
+"overtime"), termasuk singkatan yang dipakai internal.
+
+JANGAN menyimpulkan status implementasi. Itu diambil terpisah dari marker \
+dokumen, bukan dari ringkasanmu.
+
+## Berkas keluaran
+
+Tulis hasilnya ke `VAULT-INDEX.hasil.json`, di folder akar vault yang sama \
+dengan berkas daftar tugas ini.
+
+## Bentuk JSON persis
+
+Objek level atas WAJIB berupa `{"hasil": {...}}` -- peta dari `path` \
+dokumen (disalin APA ADANYA dari field `path` tiap tugas di bawah, \
+termasuk folder dan ekstensi `.md`) ke objek `{"ringkasan", "kata_kunci", \
+"hash"}`. Contoh untuk dua dokumen:
+
+    {
+      "hasil": {
+        "Human Resource Information System/HRIS - Overtime.md": {
+          "ringkasan": "Menjawab: bagaimana cara mengajukan lembur, siapa yang menyetujui, dan bagaimana upah lembur dihitung.",
+          "kata_kunci": ["lembur", "overtime", "approval", "upah"],
+          "hash": "<disalin apa adanya dari field hash tugas ini>"
+        },
+        "IT/IT - Security.md": {
+          "ringkasan": "...",
+          "kata_kunci": ["..."],
+          "hash": "<disalin apa adanya dari field hash tugas ini>"
+        }
+      }
+    }
+
+JANGAN menulis peta `path -> ringkasan` langsung di level atas tanpa \
+pembungkus `"hasil"`. Bentuk itu ditolak mentah-mentah oleh `--serap` \
+(skrip tidak menebak bentuk lain) -- kalau itu terjadi, manifest tidak \
+ditulis dan seluruh sesi ringkasan ini harus diulang.
+
+## `hash` wajib disalin apa adanya
+
+Tiap tugas di bawah punya field `hash`. Salin nilainya PERSIS ke field \
+`hash` pada entri hasil yang berpadanan. Ini dipakai `--serap` untuk \
+memverifikasi dokumen belum berubah sejak daftar tugas ini dibuat --\
+dokumen vault bisa saja diedit orang lain selagi kamu bekerja. Kalau \
+`hash` tidak kamu sertakan, entri tetap diterima tapi tanpa verifikasi \
+kebasian (tidak disarankan). Kalau `hash` tidak cocok dengan dokumen saat \
+ini, entri ditolak sebagai basi dan harus diringkas ulang di sesi \
+berikutnya.
+"""
+
+
 def ringkas_stub(judul: str) -> dict:
     """Dokumen 🔴 Stub: satu baris, tanpa panggil LLM. Hemat dan jujur."""
     return {
