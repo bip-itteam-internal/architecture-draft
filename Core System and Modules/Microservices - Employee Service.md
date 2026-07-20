@@ -57,6 +57,12 @@
 - `GET /kpi`, `GET /kpi/dashboard`, `POST /kpi`
 - Templates CRUD
 - `GET /me/kpi-score` — mode grafik 12 bulan
+- Departemen yang satu tim tampil sebagai satu kelompok, dari master data. Detail: [[HRIS - Key Performance Index]]
+
+**Cakupan supervisi antar-departemen**
+- `master_department` punya `supervised_by` (key departemen induk) + `supervision_label` (nama pendek kelompok, mis. `HRGA`). Di-seed & di-migrasi idempoten saat startup (hanya mengisi bila field belum pernah ada, jadi nilai yang diatur admin tak tertimpa).
+- Service ini **sumber kebenaran** relasi tersebut: mengisi klaim JWT `supervised_departments` saat login, dan melayani `/list?type=supervisor` dengan urutan telusur departemen sendiri → induk.
+- Konsep, aturan, dan konsekuensinya: [[HRIS - Organization Structure]]
 
 **Self-Service (`/me`)**
 - Profile, kpi-score, vacation, payroll-approx

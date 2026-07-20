@@ -82,6 +82,9 @@
 
 ## Belum Diimplementasikan / Catatan
 
+- **Cakupan supervisi lintas departemen**: `getSupervisorData` memakai `/list?type=supervisor` di [[Microservices - Employee Service]], yang kini menelusuri departemen sendiri lebih dulu lalu departemen **induk** dari `master_department.supervised_by`. Tidak ada lagi penulisan ulang departemen yang hardcoded. Pengajuan 15 orang **General Affair** bergantung pada langkah cadangan ini untuk menemukan approver — detail & konsekuensinya di [[HRIS - Organization Structure]].
+- **Absensi Tim Hari Ini** (`/today?view=team`) menampilkan departemen yang satu tim bersama, dengan memakai `include_group=true` pada employee-service. Pasangan departemennya **tidak** ditulis di service ini.
+- ~~Filter departemen pada laporan absensi tak pernah bekerja~~ → **diperbaiki**: pemanggilan salah memakai `type=department`, yang bukan case valid pada `/list` sehingga selalu balas `400` dan ditelan jadi hasil kosong. Akibatnya filter mati untuk **semua** departemen, tanpa error yang terlihat. Pesan error `/list` yang sempat mengiklankan `department` sebagai opsi valid ikut dibetulkan.
 - **Clock-in via website** masih mengembalikan `501 NotImplemented` — hanya metode `fingerprint` dan `mobile` yang berfungsi.
 - Terdapat kode rotasi hostlive lama dan `cronDatabaseBackup` yang sudah di-comment (dipindahkan ke system cron).
 - Beberapa nilai masih hardcoded: koordinat GPS kantor pusat dan allowlist serial mesin fingerprint.

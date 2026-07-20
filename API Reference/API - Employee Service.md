@@ -11,7 +11,7 @@
 | POST | `/auth/login` · `/auth/login-pin` · `/auth/login-biometrics` | Login (dipakai gateway) |
 | GET | `/auth/refresh` · POST `/auth/verify-pin` | Refresh / verifikasi PIN |
 | POST | `/onboarding/register` | Aktivasi akun karyawan baru (handoff) |
-| GET | `/qr/:employee_id` · `/data-type/:dt` · `/check-unique/:field/:value` | QR profil, enum, cek unik |
+| GET | `/qr/:employee_id` · `/data-type/:dt` · `/check-unique/:field/:value` | QR profil, enum, cek unik. `/data-type/department?grouped=true` menggabungkan departemen satu tim jadi **satu opsi** berlabel kelompok (mis. `HRGA`) yang bisa dikirim balik apa adanya sebagai filter; **opt-in** karena sebagian halaman justru perlu departemen satuan |
 
 ## Personal & Work Data
 | Method | Path | Fungsi |
@@ -35,7 +35,7 @@
 | Method | Path | Fungsi | RBAC |
 |---|---|---|---|
 | GET | `/master/departments[/:key]` · `/master/system-roles` | List/detail master | open (di belakang gateway) |
-| POST/PUT/DELETE | `/master/departments[/:key]` | CRUD departemen (key, name, positions, roles) | `RequireHRISOrITSupervisor` (supervisor/admin HRIS **atau** IT) |
+| POST/PUT/DELETE | `/master/departments[/:key]` | CRUD departemen (key, name, positions, roles, **supervised_by**, **supervision_label**). ⚠️ `PUT` memakai `ReplaceOne`; dua field terakhir **dipertahankan** bila tak disebut di body, supaya edit dari form (yang hanya mengirim sebagian field) tak memutus relasi supervisi. Kirim eksplisit untuk melepasnya | `RequireHRISOrITSupervisor` (supervisor/admin HRIS **atau** IT) |
 | POST/PUT/DELETE | `/master/system-roles[/:key]` | CRUD definisi system role | `RequireITSupervisor` (supervisor/admin IT) |
 
 > Konsumen FE: halaman `/hris/master-data` (di-link dari **menu IT**) & System Setup Personalia; tombol kelola disembunyikan bila role tak berhak.
@@ -56,7 +56,7 @@
 ## KPI · Vacation · Reports (HRIS)
 | Method | Path | Fungsi | RBAC |
 |---|---|---|---|
-| GET/POST | `/kpi` · `/kpi/dashboard` · `/kpi/templates` | KPI score + template. `GET /kpi` filter `?department=` (boleh **beberapa dipisah koma** → semua harus berhak), `?period=YYYY-MM`, `?status=`, dan `?merge=<daftar departemen>` untuk menampilkan departemen ber-supervisor sama sebagai satu kelompok (detail: [[HRIS - Key Performance Index]]) | KPIDepartmentRBAC / HRIS |
+| GET/POST | `/kpi` · `/kpi/dashboard` · `/kpi/templates` | KPI score + template. `GET /kpi` filter `?department=` (boleh **beberapa dipisah koma** → semua harus berhak), `?period=YYYY-MM`, `?status=`. Departemen yang satu tim otomatis digabung dari master data; `?merge=` + `?merge_label=` untuk penggabungan ad-hoc (detail: [[HRIS - Key Performance Index]]) | KPIDepartmentRBAC / HRIS |
 | GET/POST | `/vacation` · `/vacation/quota` · `/vacation/decrement` | Kuota & pemakaian cuti | HRIS (decrement: open) |
 | GET/PATCH | `/contract` · `/bpjs` · `/analysis` | Kontrak (filter `department`/`employment_type`/`status`/`ending_month`=`YYYY-MM` berdasar `contract_ending`), BPJS, analisis | HRIS |
 | GET | `/internal/aggregate/employee/:id` · `/v2/internal/aggregate/employees[/summary|/it]` · `/internal/export/all` | Aggregate & export | HRIS / IT |

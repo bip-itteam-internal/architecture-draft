@@ -15,6 +15,16 @@
 ### Bootstrap & Identity
 - `GET /health` — health check.
 - `GET /me` — identitas SSO dari header gateway (`IdentityFromHeaders`). Nomor telepon/foto diambil FE terpisah via `/api/employee/me`.
+
+#### Cakupan divisi supervisor (`Identity.Divisions`)
+
+Supervisor yang membawahi **lebih dari satu departemen** melihat dan menindak tiket seluruh divisi dalam cakupannya. Saat ini: **SPV Human Resource mencakup divisi General Affair** (relasi dari `master_department.supervised_by`, lihat [[HRIS - Organization Structure]]).
+
+- Cakupan datang dari header `BIP-Supervised-Departments` (klaim JWT), **bukan** dari pengelompokan organisasi yang dipakai KPI. Bedanya menentukan: di KPI penggabungan cuma tampilan sehingga berlaku bagi semua yang sudah berhak; **di sini ia menambah WEWENANG**, jadi dibatasi pemegang `is_supervisor`.
+- `scopedDivisions()` adalah satu-satunya pintu baca. Ia memberi cakupan lintas departemen **hanya** bila `isPrivileged` (admin/supervisor); selain itu, dan bila cakupan kosong (token lama), jatuh ke `BIP-Department` sehingga perilakunya sama seperti sebelum fitur ini ada.
+	- Konsekuensinya: orang ber-`is_supervisor` di HRIS tapi berperan **staf** di modul tiket **tidak** mendapat divisi tambahan.
+- Berlaku konsisten di **daftar tiket, laporan tim, CSAT, dan audit log**.
+- **Notifikasi**: `findDivisionSupervisors` menengok departemen **induk** bila sebuah divisi tak punya atasan sendiri. Tanpa itu tiket di General Affair tak memberi tahu siapa pun, karena GA memang sengaja tanpa supervisor sendiri.
 - `GET /ws` — koneksi WebSocket (auth lewat query `?token=` JWT, divalidasi sendiri). **Masuk via ingress LANGSUNG ke service (bypass gateway)** — didaftarkan sebelum `ValidateGateway`; butuh rute ingress `/ws/task-management → service:/ws` (lihat `WEBSOCKET.md`). Event: `notification` (per user), `task_update`/`space_update` (broadcast).
 
 ### Spaces (board Kanban per divisi)
