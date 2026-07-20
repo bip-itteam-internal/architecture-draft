@@ -1,19 +1,21 @@
-"""Ringkasan dokumen via Claude Batches API.
+"""Prompt + validasi untuk ringkasan dokumen.
 
-Ini satu-satunya bagian non-deterministik dari generator. Kualitasnya
-diukur lewat eval set, bukan lewat assertion.
+Ringkasan dan kata_kunci dibuat oleh Claude Code sendiri (tim memakai Claude
+Code Max, bukan API key) -- bukan oleh panggilan jaringan dari modul ini.
+Modul ini TIDAK memanggil API apa pun: cuma menyusun instruksi (`bangun_prompt`,
+dipakai untuk membangun `panduan` di berkas `--daftar-tugas`), stub lokal untuk
+dokumen 🔴 Stub, dan validasi tipe atas ringkasan yang diserap kembali lewat
+`--serap`.
+
+Ini satu-satunya bagian non-deterministik dari generator. Kualitasnya diukur
+lewat eval set, bukan lewat assertion.
 """
 
 import json
-import time
-
-from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
-from anthropic.types.messages.batch_create_params import Request
 
 from .parsing import potong_untuk_llm
 
-MODEL = "claude-opus-4-8"
-MAX_TOKENS = 1024
+MODEL = "claude-opus-4-8"  # dokumentasi: model yang dipakai Claude Code untuk meringkas
 
 SKEMA_RINGKASAN: dict = {
     "type": "object",
@@ -83,6 +85,11 @@ def _parse_isi_pesan(isi: str) -> dict | None:
     `list[str]`. Data yang lolos di sini dengan tipe salah akan gagal
     jauh dari sumbernya dan sulit didiagnosis -- lebih baik ditolak
     di titik ini, konsisten dengan filosofi fungsi ini: rusak -> None.
+
+    Dulu inputnya datang dari structured output API yang dibatasi skema;
+    sekarang datang dari berkas JSON (`--serap`) yang ditulis agent secara
+    bebas, yang jauh lebih mungkin menyimpang -- validasi ini justru makin
+    penting, bukan berkurang relevansinya.
     """
     try:
         data = json.loads(isi)
@@ -104,47 +111,3 @@ def _parse_isi_pesan(isi: str) -> dict | None:
         return None
 
     return {"ringkasan": ringkasan, "kata_kunci": kata_kunci}
-
-
-def submit_batch(client, tugas: list[dict]) -> str:
-    """Submit batch ringkasan. Batches API memberi diskon 50 persen."""
-    requests = [
-        Request(
-            custom_id=t["custom_id"],
-            params=MessageCreateParamsNonStreaming(
-                model=MODEL,
-                max_tokens=MAX_TOKENS,
-                output_config={
-                    "format": {"type": "json_schema", "schema": SKEMA_RINGKASAN}
-                },
-                messages=[{
-                    "role": "user",
-                    "content": bangun_prompt(t["judul"], t["jenis"], t["isi"]),
-                }],
-            ),
-        )
-        for t in tugas
-    ]
-    batch = client.messages.batches.create(requests=requests)
-    return batch.id
-
-
-def ambil_hasil(client, batch_id: str, interval: int = 30) -> dict[str, dict | None]:
-    """Tunggu batch selesai, kembalikan custom_id -> hasil (None bila gagal)."""
-    while True:
-        batch = client.messages.batches.retrieve(batch_id)
-        if batch.processing_status == "ended":
-            break
-        print(f"  batch {batch_id}: {batch.processing_status} ...")
-        time.sleep(interval)
-
-    hasil: dict[str, dict | None] = {}
-    for baris in client.messages.batches.results(batch_id):
-        if baris.result.type != "succeeded":
-            hasil[baris.custom_id] = None
-            continue
-        teks = next(
-            (b.text for b in baris.result.message.content if b.type == "text"), ""
-        )
-        hasil[baris.custom_id] = _parse_isi_pesan(teks)
-    return hasil
