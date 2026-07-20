@@ -64,3 +64,10 @@ flowchart TB
     classDef orange stroke:#fb923c,fill:#fff7ed
 
 ```
+
+## Dokumen Terkait
+
+- [[Manufacture - Stock & Material Management]] (dok induk: stock opname & penyesuaian, masih TBD di kode)
+- [[APP - MyBharata]] (input data & foto item rusak/ED)
+- [[Manufacture - Issue ED Material after Stock Opname]] (issue yang dijawab flow ini)
+- [[External - Accurate]] (penyesuaian inventaris dijalankan di sini)

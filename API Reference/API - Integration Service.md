@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, transaksi, items, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈214 rute** (dihitung dari registrasi `main.go`). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
+*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, transaksi, items, ulasan marketplace, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈219 rute** (dihitung dari registrasi `main.go`; +5 `/reviews/*` 2026-07-19). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
 
 - **Implementasi**: [[Microservices - Integration Service]] · **Status**: ✅
 - **Indeks**: [[API - Index]] · Semua butuh gateway key kecuali webhook publik (`/ext/webhook/*`). ⚠️ `/health` **juga** butuh gateway key (route terdaftar setelah middleware `ValidateGateway`; gateway memanggilnya dengan key — bukan endpoint terbuka).
@@ -20,6 +20,9 @@
 | GET | `/transactions/orders/summary/comparison` | Perbandingan performa 2 periode kustom: 4 metrik (TO_SHIP revenue, COMPLETED revenue, COMPLETED qty produk, COMPLETED order count) + granularity hourly/daily. Param: `start_date`, `end_date`, `comparison_start`, `comparison_end` (YYYY-MM-DD; default today vs yesterday), `channel` (opsional), `shop_id`, `timezone` |
 | GET | `/transactions/orders/dashboard/summary` | Jumlah order aktif saat ini (tanpa filter tanggal) per kategori kartu dashboard: `pesanan_baru` (TO_PROCESS), `siap_dikirim` (TO_SHIP), `belum_di_proses` (TO_PROCESS+TO_SHIP), `pesanan_selesai` (COMPLETED). Param: `channel` (opsional), `shop_id` (opsional) |
 | GET | `/transactions/returns` | **Feed retur lintas-channel** (Shopee **+** TikTok) untuk WMS gudang — satu baris per **event retur** (`return_sn`), bukan per order. Sumber: sub-dokumen `return` di `transaction_orders` (terisi untuk kedua channel). Param: `channel`, `shop_id`, `order_id`, `page`, `limit` (default 50, maks 500). Balasan tiap baris: `dedupe_key` (kunci join ke record gudang: `return_sn`, fallback `order_id`), `goods_returning` (terjemahan `solution`: false = refund-only, barang tak balik), `partial`, `status` retur vs `order_status`, `items[]` + `items_available`. Konsumen: [[API - Manufacture Service]] `GET /returns` |
+| GET | `/transactions/orders/tracking` | **Packet Tracking list** — pelacakan paket (checkpoint API resmi MP). Param: `date_from`/`date_to` **WAJIB** (unix detik / `YYYY-MM-DD` WIB, range ≤90 hari), `status`, `marketplace` (channel), `tracking_status` (enum internal PREPARING/PICKED_UP/IN_TRANSIT/DELIVERED/FAILED/RETURNED), `provider` (kurir), `stuck`(bool), `has_return`(bool), `search` (resi forward/retur atau order_id), `min_age_hours` (umur diam sejak `tracking.last_event_at`), `page`/`per_page`. **TO_PROCESS & TO_SHIP di-exclude** (belum pasti dikirim). Baca sub-dok `tracking`/`stuck`/`return_tracking` di `transaction_orders` (no compute-on-read) |
+| GET | `/transactions/orders/tracking/stats` | Agregat dashboard ($facet): by status / tracking_status / provider + total stuck & return. Param `date_from`/`date_to`/`channel` |
+| POST | `/transactions/orders/tracking/backfill` | Backfill checkpoint historis by window (`date_from`/`date_to`) — **async fire-and-forget** (202), loop batch 500 sampai habis. Goroutine tak survive restart → picu ulang via header gateway (`BIP-Gateway-ID` + `BIP-System-Roles`). Ops-only |
 | GET/POST | `/transactions/summary/reports` (+ `/:id`, `/:id/items`, `/:id/invoices`, `/group-by-status`) | Laporan ringkasan (generate/list/detail) |
 | POST | `/transactions/summary/reports/:id/retry` · `/send/:service` · DELETE `/:id` | Retry/kirim/hapus laporan |
 | GET | `/transactions/insight/demography` | Insight demografi |
@@ -161,6 +164,17 @@
 | GET | `/wallet/reconciliation/export` | Export Excel laporan |
 | PUT | `/wallet/opening-balance/:shopId` | Set anchor saldo awal TikTok (`{amount, as_of}`) |
 | GET | `/wallet/sync-status` | State sync per toko (last_run, status, error) |
+
+## Reviews (Ulasan Marketplace)
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/reviews/summary` | Ringkasan rating per toko (`start`/`end` YYYY-MM-DD WIB, `channel`, `shop_id`; SHOPEE=SUM harian, TIKTOK=snapshot kumulatif terbaru) |
+| GET | `/reviews/products` | Agregat per produk, sort avg terendah dulu (`rating_avg` 1-5 bucket floor(avg) · `with_star` · `min_reviews` · +`shop_name`/`product_name`) |
+| GET | `/reviews/products/:productId/trend` | Deret snapshot harian per produk (tren; TikTok = kumulatif, delta dihitung FE) |
+| GET | `/reviews/comments` | Komentar Shopee (teks, baca-saja); `shop_id` **opsional** = feed global lintas toko (PR #568) · filter `item_id`/`rating`/`channel`/`has_text`/`has_media`/`unreplied` · paginated + join `product_name`/`shop_name` |
+| GET | `/reviews/sync-status` | State sync per toko (`last_synced_at`, `last_error`, `backfill_truncated` cap-500 Shopee) |
+
+> Worker `sync-reviews` harian 06:45 WIB. TikTok TIDAK punya API teks ulasan (hanya distribusi bintang kumulatif) — detail keterbatasan & desain: [[Microservices - Integration Service]] §Ulasan Marketplace.
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
