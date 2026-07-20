@@ -37,6 +37,12 @@ PREFIX_DILEWATI: tuple[str, ...] = (
     "API Reference/Shopee Open API v2/",
 )
 
+# dok meta akar yang memang ada dan memang layak publik (persis, case-sensitive,
+# dicocokkan ke basename tanpa ekstensi). Berkas akar lain -> fail-closed.
+META_ROOT: frozenset[str] = frozenset({
+    "README", "HOMEPAGE", "CLAUDE", "SCRUM SPECS", "ROADMAP", "DEVELOPER GUIDE",
+})
+
 
 def klasifikasi_path(rel_path: str) -> dict | None:
     """Klasifikasikan path relatif-vault.
@@ -57,7 +63,10 @@ def klasifikasi_path(rel_path: str) -> dict | None:
         return None
 
     if len(p.parts) == 1:
-        return {"area": "root", "jenis": "meta", "publik": True}
+        if p.stem in META_ROOT:
+            return {"area": "root", "jenis": "meta", "publik": True}
+        # fail-closed: berkas akar baru yang tak dikenal tidak boleh otomatis publik
+        return {"area": "root", "jenis": None, "publik": False}
 
     top = p.parts[0]
     if top in DILEWATI or top.startswith("."):
