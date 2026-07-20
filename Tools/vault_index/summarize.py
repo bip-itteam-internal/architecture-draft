@@ -76,7 +76,14 @@ def ringkas_stub(judul: str) -> dict:
 
 
 def _parse_isi_pesan(isi: str) -> dict | None:
-    """Parse JSON balasan model. Rusak -> None, bukan exception."""
+    """Parse JSON balasan model. Rusak -> None, bukan exception.
+
+    Validasi TIPE, bukan cuma keberadaan key: manifest hilir berasumsi
+    `ringkasan` adalah `str` (tak kosong) dan `kata_kunci` adalah
+    `list[str]`. Data yang lolos di sini dengan tipe salah akan gagal
+    jauh dari sumbernya dan sulit didiagnosis -- lebih baik ditolak
+    di titik ini, konsisten dengan filosofi fungsi ini: rusak -> None.
+    """
     try:
         data = json.loads(isi)
     except (json.JSONDecodeError, TypeError):
@@ -85,9 +92,18 @@ def _parse_isi_pesan(isi: str) -> dict | None:
         return None
     if "ringkasan" not in data or "kata_kunci" not in data:
         return None
-    if not isinstance(data["kata_kunci"], list):
+
+    ringkasan = data["ringkasan"]
+    kata_kunci = data["kata_kunci"]
+
+    if not isinstance(ringkasan, str) or not ringkasan.strip():
         return None
-    return {"ringkasan": data["ringkasan"], "kata_kunci": data["kata_kunci"]}
+    if not isinstance(kata_kunci, list):
+        return None
+    if not all(isinstance(k, str) for k in kata_kunci):
+        return None
+
+    return {"ringkasan": ringkasan, "kata_kunci": kata_kunci}
 
 
 def submit_batch(client, tugas: list[dict]) -> str:
