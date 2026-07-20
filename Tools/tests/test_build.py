@@ -395,3 +395,122 @@ def test_deadline_terlampaui_sidecar_tetap_ada(vault_batch, monkeypatch, capsys)
     keluaran = capsys.readouterr().out
     assert sidecar["batch_id"] in keluaran
     assert "--batch-id" in keluaran
+
+
+# --- C1: sidecar RUSAK (beda dari 'tidak ada') harus memblokir, bukan lolos --
+
+
+def test_sidecar_rusak_json_terpotong_blok_submit_baru(vault_batch, monkeypatch, capsys):
+    """C1: sidecar ADA tapi JSON-nya terpotong. Menyamakannya dengan 'tidak
+    ada' membuat gerbang bayar-ganda tidak pernah menyala -- ini harus
+    memblokir submit baru, bukan lolos. Isi mentahnya juga harus tercetak
+    supaya batch_id di dalamnya bisa diselamatkan manual oleh manusia."""
+    mentah = '{"batch_id": "batch_lama_penting", "tug'
+    (vault_batch / NAMA_SIDECAR).write_text(mentah, encoding="utf-8")
+    batches = _FakeBatches()
+    client = _FakeClient(batches)
+    monkeypatch.setattr(build, "anthropic", _FakeAnthropicModule(client))
+    monkeypatch.setattr(build.time, "sleep", lambda s: None)
+
+    kode = build.main(["--root", str(vault_batch)])
+
+    assert kode != 0
+    assert batches.create_calls == []
+    assert not (vault_batch / NAMA_INDEX).exists()
+    keluaran = capsys.readouterr().out
+    assert "rusak" in keluaran.lower()
+    assert mentah in keluaran
+
+
+def test_sidecar_valid_tanpa_key_tugas_diperlakukan_rusak(vault_batch, monkeypatch, capsys):
+    """JSON valid tapi tanpa key 'tugas' -- bentuknya tak dikenal, harus
+    diperlakukan sama seperti rusak (blokir), bukan seperti 'tidak ada'."""
+    (vault_batch / NAMA_SIDECAR).write_text(
+        json.dumps({"batch_id": "batch_lama"}), encoding="utf-8"
+    )
+    batches = _FakeBatches()
+    client = _FakeClient(batches)
+    monkeypatch.setattr(build, "anthropic", _FakeAnthropicModule(client))
+    monkeypatch.setattr(build.time, "sleep", lambda s: None)
+
+    kode = build.main(["--root", str(vault_batch)])
+
+    assert kode != 0
+    assert batches.create_calls == []
+    assert not (vault_batch / NAMA_INDEX).exists()
+    keluaran = capsys.readouterr().out
+    assert "rusak" in keluaran.lower()
+
+
+# --- C1: penulisan sidecar atomic ---------------------------------------------
+
+
+def test_tulis_sidecar_atomic_tanpa_sisa_file_sementara(tmp_path):
+    path_sidecar = tmp_path / NAMA_SIDECAR
+    tugas = [{"custom_id": "doc-0", "path": "a.md"}]
+
+    build._tulis_sidecar(path_sidecar, "batch_x", tugas)
+
+    assert path_sidecar.exists()
+    sisa = [p for p in tmp_path.iterdir() if p != path_sidecar]
+    assert sisa == [], f"file sementara tersisa: {sisa}"
+
+
+# --- C2: gagal menulis sidecar setelah submit sukses -> harus bisa dipulihkan -
+
+
+def test_gagal_tulis_sidecar_setelah_submit_cetak_info_pemulihan(
+    vault_batch, monkeypatch, capsys
+):
+    """Kalau _tulis_sidecar melempar SETELAH submit_batch sukses, uang sudah
+    terpakai. Satu-satunya jalan pulih adalah stdout: batch_id + peta lengkap
+    custom_id->path, cukup untuk ditulis manusia jadi VAULT-INDEX.batch.json
+    lalu dilanjutkan dengan --batch-id."""
+    batches = _FakeBatches(batch_id="batch_xyz")
+    client = _FakeClient(batches)
+    monkeypatch.setattr(build, "anthropic", _FakeAnthropicModule(client))
+    monkeypatch.setattr(build.time, "sleep", lambda s: None)
+
+    def _gagal_tulis(*a, **k):
+        raise OSError("disk penuh")
+
+    monkeypatch.setattr(build, "_tulis_sidecar", _gagal_tulis)
+
+    kode = build.main(["--root", str(vault_batch)])
+
+    assert kode != 0
+    keluaran = capsys.readouterr().out
+    assert "batch_xyz" in keluaran
+    assert "doc-0" in keluaran and "doc-1" in keluaran
+    assert "Sales/Sales - A.md" in keluaran
+    assert "Sales/Sales - B.md" in keluaran
+    assert "--batch-id" in keluaran
+
+
+# --- I4: jalur --batch-id juga harus meringkas dokumen 🔴 Stub ---------------
+
+
+def test_batch_id_beri_ringkasan_pada_dokumen_stub(vault_batch, monkeypatch):
+    """Loop ringkas_stub sebelumnya hanya ada di cabang submit-baru. Vault
+    nyata punya 7 dokumen stub -> jalur pemulihan (--batch-id) harus tetap
+    memberi ringkasan lokal untuk stub, bukan meninggalkannya null/gagal."""
+    (vault_batch / "Sales" / "Sales - Stub.md").write_text(
+        "- **Status**: 🔴 Stub\n", encoding="utf-8",
+    )
+    _tulis_sidecar_mentah(vault_batch, "batch_resume", [
+        {"custom_id": "doc-0", "path": "Sales/Sales - A.md"},
+        {"custom_id": "doc-1", "path": "Sales/Sales - B.md"},
+    ])
+    hasil_baris = [_baris_sukses("doc-0", "Ringkasan A"), _baris_sukses("doc-1", "Ringkasan B")]
+    batches = _FakeBatches(results=hasil_baris)
+    client = _FakeClient(batches)
+    monkeypatch.setattr(build, "anthropic", _FakeAnthropicModule(client))
+    monkeypatch.setattr(build.time, "sleep", lambda s: None)
+
+    kode = build.main(["--root", str(vault_batch), "--batch-id", "batch_resume"])
+
+    assert kode == 0
+    index = json.loads((vault_batch / NAMA_INDEX).read_text(encoding="utf-8"))
+    dok = {d["path"]: d for d in index["dokumen"]}
+    assert dok["Sales/Sales - Stub.md"]["ringkasan"] is not None
+    assert "Sales/Sales - Stub.md" not in index["gagal"]

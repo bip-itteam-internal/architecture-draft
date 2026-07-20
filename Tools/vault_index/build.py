@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 import time
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -121,6 +122,24 @@ def _peringatan_folder_tak_dikenal(entri: list[dict]) -> list[str]:
     return [e["path"] for e in entri if e["jenis"] is None]
 
 
+class SidecarRusak(Exception):
+    """Sidecar ADA tapi tidak bisa dipakai (JSON tak valid atau key wajib
+    hilang) -- beda dari 'tidak ada'.
+
+    Menyamakan keduanya (dua-duanya jadi None) adalah bug: gerbang deteksi
+    batch tertinggal hanya menyala bila hasil `_muat_sidecar` bukan None,
+    jadi sidecar rusak akan LOLOS gerbang itu dan proses mensubmit batch
+    baru padahal batch lama (yang sudah dibayar) belum tentu sudah diambil.
+    Dengan exception ini, pemanggil WAJIB menangani kasus rusak secara
+    eksplisit dan berbeda dari kasus tidak-ada.
+    """
+
+    def __init__(self, path: Path, mentah: str):
+        self.path = path
+        self.mentah = mentah
+        super().__init__(f"sidecar rusak: {path}")
+
+
 def _tulis_sidecar(path_sidecar: Path, batch_id: str, tugas: list[dict]) -> None:
     """Simpan batch_id + peta custom_id->path SEGERA setelah submit, sebelum
     polling dimulai.
@@ -129,31 +148,52 @@ def _tulis_sidecar(path_sidecar: Path, batch_id: str, tugas: list[dict]) -> None
     submit dan akan hilang total kalau proses mati saat polling. Tanpanya,
     hasil batch yang masih ada di server Anthropic (sampai 29 hari) tidak
     bisa dipetakan balik ke dokumen mana pun -- batch_id saja tidak cukup.
+
+    Ditulis ATOMIC: tulis ke berkas sementara di direktori yang SAMA, flush +
+    fsync supaya isinya benar-benar di disk, baru `os.replace` (atomic di
+    POSIX maupun Windows) ke nama akhir. Ini membuat sidecar rusak-separuh
+    mustahil terjadi -- proses yang mati kapan pun sebelum `os.replace` cuma
+    meninggalkan berkas `.tmp-*`, bukan `NAMA_SIDECAR` yang setengah tertulis
+    (yang justru melumpuhkan gerbangnya sendiri lewat `SidecarRusak`).
     """
     data = {
         "batch_id": batch_id,
         "disubmit_pada": datetime.now(timezone.utc).isoformat(),
         "tugas": [{"custom_id": t["custom_id"], "path": t["path"]} for t in tugas],
     }
-    path_sidecar.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    isi = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
+    tmp = path_sidecar.with_name(f"{path_sidecar.name}.tmp-{os.getpid()}")
+    try:
+        with open(tmp, "w", encoding="utf-8") as f:
+            f.write(isi)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path_sidecar)
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
 
 
 def _muat_sidecar(path_sidecar: Path) -> dict | None:
-    """Muat sidecar. Hilang, rusak, atau bentuknya tak dikenal -> None.
+    """Muat sidecar. Tidak ada -> None. ADA tapi rusak (JSON tak valid atau
+    key wajib hilang) -> raise `SidecarRusak`, BUKAN None.
 
     Jangan pernah menebak isi sidecar yang rusak; pemanggil harus berhenti
-    dengan pesan jelas, bukan melanjutkan dengan asumsi.
+    dengan pesan jelas (memuat isi mentah supaya bisa diselamatkan manual),
+    bukan melanjutkan dengan asumsi seolah sidecar tak pernah ada.
     """
     if not path_sidecar.exists():
         return None
     try:
-        data = json.loads(path_sidecar.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
+        mentah = path_sidecar.read_text(encoding="utf-8")
+    except OSError:
         return None
+    try:
+        data = json.loads(mentah)
+    except json.JSONDecodeError as exc:
+        raise SidecarRusak(path_sidecar, mentah) from exc
     if not isinstance(data, dict) or "batch_id" not in data or "tugas" not in data:
-        return None
+        raise SidecarRusak(path_sidecar, mentah)
     return data
 
 
@@ -236,15 +276,36 @@ def main(argv: list[str] | None = None) -> int:
         e["kata_kunci"] = d.get("kata_kunci", [])
     entri_by_path = {e["path"]: e for e in entri}
 
+    # 🔴 Stub tidak perlu LLM -- berlaku di KEDUA jalur (submit baru maupun
+    # --batch-id). Vault nyata punya beberapa dokumen stub; kalau loop ini
+    # cuma ada di satu cabang, jalur satunya selalu berakhir dengan stub
+    # ber-ringkasan null (masuk daftar gagal, exit 1) walau tidak ada
+    # yang benar-benar salah.
+    perlu_llm = []
+    for e in perlu:
+        if e["status_emoji"] == "🔴":
+            e.update(ringkas_stub(e["judul"]))
+        else:
+            perlu_llm.append(e)
+
     if args.batch_id:
         # --- B2: lanjutkan batch yang sudah tersubmit, tanpa submit ulang ---
         client = anthropic.Anthropic()
 
-        sidecar = _muat_sidecar(path_sidecar)
+        try:
+            sidecar = _muat_sidecar(path_sidecar)
+        except SidecarRusak as exc:
+            print(
+                f"GAGAL: --batch-id {args.batch_id} diberikan tapi sidecar "
+                f"{NAMA_SIDECAR} di {exc.path} RUSAK (tidak bisa diparse atau "
+                f"bentuknya tak dikenal). Tidak menebak, berhenti.\n"
+                f"Isi mentah sidecar (untuk penyelamatan manual):\n{exc.mentah}"
+            )
+            return 1
         if sidecar is None:
             print(
                 f"GAGAL: --batch-id {args.batch_id} diberikan tapi sidecar "
-                f"{NAMA_SIDECAR} tidak ditemukan/rusak di {root}. Tidak bisa "
+                f"{NAMA_SIDECAR} tidak ditemukan di {root}. Tidak bisa "
                 f"memetakan hasil batch ke dokumen tanpa itu. Tidak menebak, berhenti."
             )
             return 1
@@ -276,7 +337,27 @@ def main(argv: list[str] | None = None) -> int:
 
     else:
         # --- B3: jaring pengaman -- sidecar tertinggal menghalangi submit baru ---
-        sidecar_tertinggal = _muat_sidecar(path_sidecar)
+        try:
+            sidecar_tertinggal = _muat_sidecar(path_sidecar)
+        except SidecarRusak as exc:
+            # Sidecar RUSAK tidak boleh diperlakukan sama dengan "tidak ada":
+            # ini bisa berarti proses sebelumnya mati SETELAH submit_batch
+            # sukses (uang sudah terpakai) tapi SEBELUM sidecar selesai
+            # ditulis. Selalu blokir -- termasuk saat --abaikan-batch-tertinggal
+            # dipakai, karena flag itu untuk mengabaikan sidecar VALID yang
+            # sudah dibaca dan dipahami risikonya, bukan untuk melewati
+            # sidecar yang bahkan belum bisa dibaca.
+            print(
+                f"GAGAL: sidecar {NAMA_SIDECAR} di {exc.path} ADA tapi RUSAK "
+                f"(tidak bisa diparse atau bentuknya tak dikenal). Ini bisa "
+                f"berarti sebuah batch SUDAH tersubmit (sudah dibayar) dan "
+                f"proses mati sebelum sidecar-nya selesai ditulis. TIDAK "
+                f"mensubmit batch baru sampai ini ditangani manual -- "
+                f"perbaiki atau hapus {exc.path} setelah memastikan tidak "
+                f"ada batch yang belum diambil hasilnya.\n"
+                f"Isi mentah sidecar (untuk penyelamatan manual):\n{exc.mentah}"
+            )
+            return 1
         if sidecar_tertinggal is not None and not args.abaikan_batch_tertinggal:
             print(
                 f"GAGAL: batch tertinggal ditemukan (batch_id="
@@ -291,14 +372,6 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 1
 
-        # 🔴 Stub tidak perlu LLM
-        perlu_llm = []
-        for e in perlu:
-            if e["status_emoji"] == "🔴":
-                e.update(ringkas_stub(e["judul"]))
-            else:
-                perlu_llm.append(e)
-
         if perlu_llm:
             client = anthropic.Anthropic()
             tugas = [
@@ -312,7 +385,35 @@ def main(argv: list[str] | None = None) -> int:
 
             # B1: sidecar ditulis SEGERA, sebelum polling (yang bisa berjalan
             # sampai 24 jam) dimulai.
-            _tulis_sidecar(path_sidecar, batch_id, tugas)
+            try:
+                _tulis_sidecar(path_sidecar, batch_id, tugas)
+            except OSError as exc:
+                # Uang SUDAH terpakai (submit_batch sukses di atas) dan
+                # sidecar GAGAL ditulis -- tanpa ini, batch_id + peta
+                # custom_id->path hilang total dari disk, dan --batch-id
+                # mewajibkan sidecar. Satu-satunya jalan pulih: cetak
+                # semuanya ke stdout dalam bentuk yang bisa disalin manusia
+                # jadi VAULT-INDEX.batch.json.
+                pemulihan = {
+                    "batch_id": batch_id,
+                    "disubmit_pada": datetime.now(timezone.utc).isoformat(),
+                    "tugas": [
+                        {"custom_id": t["custom_id"], "path": t["path"]}
+                        for t in tugas
+                    ],
+                }
+                print(
+                    f"GAGAL menulis sidecar {path_sidecar}: {exc}\n"
+                    f"PENTING: batch {batch_id} SUDAH tersubmit dan SUDAH "
+                    f"dibayar -- jangan submit ulang. Salin blok JSON di "
+                    f"bawah ini persis apa adanya, simpan sebagai "
+                    f"{NAMA_SIDECAR} di {root}, lalu lanjutkan dengan:\n"
+                    f"  python Tools/build-vault-index.py --batch-id {batch_id}\n"
+                    f"--- SALIN DARI BARIS DI BAWAH INI ---\n"
+                    f"{json.dumps(pemulihan, ensure_ascii=False, indent=2)}\n"
+                    f"--- SAMPAI BARIS DI ATAS INI ---"
+                )
+                return 1
             print(f"Sidecar ditulis: {path_sidecar}")
 
             selesai = _tunggu_batch_dengan_deadline(
