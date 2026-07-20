@@ -56,7 +56,7 @@
 ## KPI · Vacation · Reports (HRIS)
 | Method | Path | Fungsi | RBAC |
 |---|---|---|---|
-| GET/POST | `/kpi` · `/kpi/dashboard` · `/kpi/templates` | KPI score + template | KPIDepartmentRBAC / HRIS |
+| GET/POST | `/kpi` · `/kpi/dashboard` · `/kpi/templates` | KPI score + template. `GET /kpi` filter `?department=` (boleh **beberapa dipisah koma** → semua harus berhak), `?period=YYYY-MM`, `?status=`, dan `?merge=<daftar departemen>` untuk menampilkan departemen ber-supervisor sama sebagai satu kelompok (detail: [[HRIS - Key Performance Index]]) | KPIDepartmentRBAC / HRIS |
 | GET/POST | `/vacation` · `/vacation/quota` · `/vacation/decrement` | Kuota & pemakaian cuti | HRIS (decrement: open) |
 | GET/PATCH | `/contract` · `/bpjs` · `/analysis` | Kontrak (filter `department`/`employment_type`/`status`/`ending_month`=`YYYY-MM` berdasar `contract_ending`), BPJS, analisis | HRIS |
 | GET | `/internal/aggregate/employee/:id` · `/v2/internal/aggregate/employees[/summary|/it]` · `/internal/export/all` | Aggregate & export | HRIS / IT |
