@@ -95,12 +95,12 @@ Untuk dok konsep murni: `## Latar Belakang`, `## Ruang Lingkup`, `## Belum Diput
 | Repo kode | Dokumen utama |
 |---|---|
 | `bip-erp` (Go microservices) | `Core System and Modules/*` (API Master Gateway, SSO Flow, HRIS/IT Orchestrator, DB Overview, Microservices - <Service>, OCR Document Service) |
-| `mybharata-app` (Flutter) | `Application/APP - Mobile Application` |
-| `erp-frontend` (Next.js) | `Application/APP - Web Application`, `BASE - Enterance Point` |
+| `mybharata-app` (Flutter) | `Application/APP - MyBharata` |
+| `erp-frontend` (Next.js) | `Application/APP - Web ERP`, `BASE - Enterance Point` |
 | `task-management/bharata-task-manager-fe` | `Application/APP - Dynamic Task Tracker` (backend = Microservices - Task Management Service) |
 | `guestbook-system` (Astro) | `General Affairs/GA - Guestbook System (Complete)` |
 | `ideamiils` (Next.js + Veo) | `Application/APP - Ideamills` (app); konsep: `Sales/Sales - Veo (Gemini) Implementation` (manual) & `... Automation Layer` |
-| `scraping` (Python/FastAPI) | `Application/APP - TikTok Sentiment Pipeline` (app) & `Sales/Sales - TikTok Sentiment Pipeline` (konsep) |
+| `scraping` (Python/FastAPI) | `Application/APP - Tiktok Insight Analyzer` (app) & `Sales/Sales - TikTok Sentiment Pipeline` (konsep) |
 | `website-bharata` (Next.js + Go, **repo terpisah**, bukan bip-erp) | `Application/APP - Website Bharata Internasional` |
 | `career-bharata` (Next.js 16, **repo terpisah**; konsumen `/public/recruitment/*`) | `Application/APP - Portal Karir Bharata` |
 

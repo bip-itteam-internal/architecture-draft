@@ -26,7 +26,7 @@ publish: false
 **Keputusan:** status cuti pada **report di FE ERP (web)** dibedakan **warnanya**.
 
 **Status di kode:** 🟡 **BARU (web).** Modul report ada di `erp-frontend/src/features/hris/report`. Perlu pewarnaan per-status pada tampilan report cuti.
-**Tindak lanjut:** FE web (erp-frontend) — definisikan warna per status cuti di report. Pengaruh: [[APP - Web Application]] / modul HRIS report.
+**Tindak lanjut:** FE web (erp-frontend) — definisikan warna per status cuti di report. Pengaruh: [[APP - Web ERP]] / modul HRIS report.
 
 ## 3. Approval SPV HRD step-1 auto-approve
 
