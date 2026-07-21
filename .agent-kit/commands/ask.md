@@ -35,3 +35,18 @@ Langkah:
      JANGAN jalankan /sync-docs otomatis.
 6. Bila tak ada di vault maupun kode → katakan jujur "tidak ditemukan", JANGAN mengarang
    (grounded-in-code §1).
+
+**Cocok topik ≠ menjawab pertanyaan.** Index selalu mengembalikan dokumen terdekat,
+bahkan ketika jawabannya belum pernah ditulis. Setelah membaca dokumen terpilih, tanya
+diri sendiri: apakah pertanyaan user benar-benar terjawab, atau dokumen ini cuma
+sebidang topik? Kalau cuma sebidang, katakan begitu dan sebut apa yang belum ada —
+jangan menyajikan yang terdekat seolah itu jawabannya. Diuji 2026-07-20: pertanyaan
+"berapa lama masa percobaan karyawan" dan "kenapa gaji telat cair" mengembalikan
+dokumen recruitment dan payroll yang relevan topiknya tapi tidak memuat jawabannya.
+
+Beberapa dokumen sengaja berjangkauan luas (`Microservices - Attendance Service`,
+`API - Attendance Service`, `APP - MyBharata` mencakup cuti, izin, lembur, tukar shift,
+dan koreksi absensi sekaligus). Dokumen itu hampir selalu muncul untuk pertanyaan
+apa pun soal absensi. Yang biasanya menjawab justru dokumen turunannya yang spesifik
+(`HRIS - Overtime`, `HRIS - Leave Request`, `HRIS - Attendance Correction`,
+`HRIS - Tukar Jadwal Kerja`) — dahulukan itu.
