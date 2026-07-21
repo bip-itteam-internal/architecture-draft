@@ -52,7 +52,9 @@ Satu manifest, dua profil konsumen, dibedakan flag `publik` per entri.
 | `Additional documents/` (aset Excalidraw) | 2 | **tidak** | tidak |
 | `API Reference/Shopee Open API v2/` | 149 | **tidak** | tidak |
 
-Total korpus ter-index untuk agent: **217 dokumen** (219 berkas dikurangi 2 aset Excalidraw).
+Total korpus ter-index untuk agent: **217 dokumen** (219 berkas dikurangi 2 aset Excalidraw) **per 2026-07-20**.
+
+> **Angka ini bergerak.** Vault ditulis banyak orang; satu ADR baru dari rekan tim menaikkannya jadi 218 di hari yang sama. Semua angka korpus di dokumen ini adalah potret saat diukur, bukan konstanta. Jangan menjadikannya assertion di tes — pakai `--check` untuk mengetahui angka terkini.
 
 ### Keputusan: `IT/` dikecualikan utuh dari kanal manusia
 
