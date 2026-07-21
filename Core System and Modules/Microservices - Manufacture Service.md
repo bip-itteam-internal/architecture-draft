@@ -34,6 +34,8 @@ Daftar rute lengkap di [[API - Manufacture Service]]. Ringkas:
 
 > **Scroll horizontal WMS (21 Juli 2026):** batang scroll horizontal ada di *dasar* kontainer tabel — pada tabel tinggi dasarnya jatuh di luar layar sehingga user harus menggulung halaman sampai bawah dulu baru bisa menggeser ke samping. Perbaikan di dua sisi: (1) `globals.css` aturan bersarang `.wms-root` — `::-webkit-scrollbar` didefinisikan eksplisit (mematikan overlay/auto-hide) + `overflow-x: scroll` supaya batang selalu hadir di semua menu, berlaku ke ~28 kontainer tanpa menyunting satu per satu; (2) `manufacture-app` menghitung tinggi tiap kontainer saat render = tinggi layar − posisi atas − 24px (dibatasi `max-h-[…]` kelasnya bila lebih kecil, lantai 140px), memakai **ResizeObserver** + listener `resize` — bukan `requestAnimationFrame`, karena rAF tak dijalankan browser saat tab tak terlihat sehingga pengukuran pertama terlewat. Halaman `/manufacture/kpi` (di luar manufacture-app) diberi penanda `wms-root` sendiri.
 
+> **Asal data (`source`) — 21 Juli 2026:** sync dulu tak pernah mengisi field `source`, sehingga semua baris kosong dan UI melabelinya **"Sheet"** (peninggalan era Google Sheets yang sudah dihapus) — label yang menyesatkan. Sync kini menstempel setelah bulk upsert: master bahan → `accurate`; produk ber-cost HPP → `hpp`; produk daftar kurasi dari Accurate (`produkNonHPP`) → `accurate`. Baris `manual` (dibuat lewat web) **tak ditimpa** (filter `source != manual`). Baris lama yang bukan hasil kedua sync (mis. 40 BAHAN KEMAS + 2 KERTAS di `master_product`) tetap kosong dan FE menampilkan **"—"**, bukan tebakan.
+
 ## Model Data (`manufacture_db`)
 
 15 collection (prefix `manufacture_`), grounded ke `models.go`:
