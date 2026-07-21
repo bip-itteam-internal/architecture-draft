@@ -46,18 +46,20 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 
 | Method | Path | Role yang Diizinkan | Fungsi |
 |---|---|---|---|
-| GET | `/fulfillment/queue` | admin_gudang, leader, spv, admin_qc | Antrian order: filter status/q/shop_ids/tanggal+jam, sort, pagination |
-| GET | `/fulfillment/queue/counts` | admin_gudang, leader, spv, admin_qc | Jumlah order per status_wms + kunci `ALL` (total) |
+| GET | `/fulfillment/queue` | admin_gudang, leader, spv, admin_qc | Antrian order: filter status/q/shop_ids/couriers/tanggal+jam/status_mp, sort, pagination |
+| GET | `/fulfillment/queue/counts` | admin_gudang, leader, spv, admin_qc | Jumlah order per status_wms + `ALL`; plus `DIKIRIM`/`SELESAI` (pecahan HANDED_OVER) |
 | GET | `/fulfillment/queue/shops` | admin_gudang, leader, spv, admin_qc | Daftar distinct toko yang ada di antrian, sort nama ASC |
-| GET | `/fulfillment/queue/export` | admin_gudang, leader, spv, admin_qc | Unduh xlsx rekon (filter sama dengan queue); tandai `exported_at` |
+| GET | `/fulfillment/queue/couriers` | admin_gudang, leader, spv, admin_qc | Daftar distinct kurir (`shipping_provider`) non-kosong, sort ASC — dropdown filter kurir |
+| GET | `/fulfillment/queue/export` | admin_gudang, leader, spv, admin_qc | Unduh xlsx rekon (filter sama dengan queue); `only_new`/`packer_code`; tandai `exported_at` |
 | POST | `/fulfillment/approve` | admin_gudang, leader, spv | Batch approve → APPROVED |
 | POST | `/fulfillment/hold` | admin_gudang, leader, spv | Batch hold → HELD |
 | POST | `/fulfillment/pick` | admin_gudang, leader, spv | Batch konfirmasi picking → PICKING |
-| POST | `/fulfillment/pack` | admin_gudang, leader, spv | Verifikasi scan SKU+qty per order → PACKED |
-| POST | `/fulfillment/rts` | admin_gudang, leader, spv | Batch RTS → proxy integration ship-batch |
-| POST | `/fulfillment/labels` | admin_gudang, leader, spv | Proxy integration labels → LABEL_PRINTED; reprint dicatat di history |
+| POST | `/fulfillment/pack` | admin_gudang, leader, spv | Verifikasi scan SKU+qty per order → PACKED (+ `packer_code` opsional) |
+| POST | `/fulfillment/rts` | admin_gudang, leader, spv | Batch RTS → proxy integration ship-batch; gate `exported_at` (422 `not_exported`) |
+| POST | `/fulfillment/labels` | admin_gudang, leader, spv | Cetak resi per order (URL/PDF) → LABEL_PRINTED; reprint dicatat di history |
+| POST | `/fulfillment/labels/merged` | admin_gudang, leader, spv | Cetak batch besar → **SATU PDF gabungan** (max 100/batch, timeout 5 mnt); hanya `included` → LABEL_PRINTED |
 | GET | `/fulfillment/labels/history` | admin_gudang, leader, spv, admin_qc | Riwayat resi tercetak — audit keterlambatan (dicetak siapa/kapan, cetak ulang, serah kurir) |
-| GET | `/fulfillment/labels/history/export` | admin_gudang, leader, spv, admin_qc | Unduh riwayat sebagai xlsx — kode packer terisi otomatis (bahan evaluasi per tim) |
+| GET | `/fulfillment/labels/history/export` | admin_gudang, leader, spv, admin_qc | Unduh riwayat xlsx (filter jam WIB); kolom: Waktu Cetak, No Resi, Nama Toko, Nama Produk, Qty |
 | POST | `/fulfillment/handover` | admin_gudang, leader, spv | Konfirmasi serah-terima kurir → HANDED_OVER |
 | GET | `/fulfillment/dashboard` | admin_gudang, leader, spv, admin_qc | Aggregate count per status_wms |
 
@@ -66,12 +68,26 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 **`GET /fulfillment/queue`**
 - Query (semua opsional):
   - `status=NEW` — dicocokkan ke `status_wms`; dukung multi-status `status=A,B,C` (`$in`)
-  - `q=` — regex case-insensitive ke `order_id` / `items.sku`
+  - `q=` — regex case-insensitive ke `order_id` / **`awb` (no resi)** / `items.sku` / **`items.nama` (nama produk)**
   - `shop_ids=id1,id2` — filter multi-toko
+  - `couriers=J&T Express,SPX` — filter multi-kurir (`shipping_provider` `$in`)
+  - `mp_status=COMPLETED` / `mp_status_ne=COMPLETED` — filter `order_status_mp` (exact / not-equal); memecah HANDED_OVER jadi tab Dikirim (`mp_status_ne=COMPLETED`) vs Selesai (`mp_status=COMPLETED`)
   - `date_from=` / `date_to=` — filter `created_at`, timezone WIB. Dua format: `2006-01-02T15:04` (dengan jam; `date_to` inklusif sampai akhir menit) atau `2006-01-02` (tanpa jam; `date_to` sampai 23:59:59.999). Format tidak valid diabaikan (graceful skip)
-  - `sort=` — `created_desc` / `updated_desc`; default created_at ASC
+  - `sort=` — `created_desc` / `updated_desc` / `qty_desc` / `qty_asc`; default created_at ASC. Qty-sort: total qty produk per order (aggregation `total_qty`), tanggal terlama sebagai kunci kedua
   - `page=` (default 1), `limit=` (default 50, max 200)
 - Response `200`: `{"data": [FulfillmentOrder...], "total": n, "page": n, "limit": n}`
+
+**`POST /fulfillment/labels/merged`** — cetak batch besar jadi satu PDF:
+```json
+// Request (max 100 order/batch)
+{ "orders": [{"order_id": "...", "package_id": "..."}], "packer_code": "T1" }
+// Response 200
+{ "pdf": "<base64 PDF gabungan>", "included": ["ORDER_A", ...], "data": [LabelResult...] }
+```
+- Proxy ke integration `POST /fulfillment/labels/merged` (pdfcpu MergeRaw). Hanya order yang labelnya READY masuk PDF (`included`); yang gagal/PROCESSING dilaporkan di `data` tapi tidak ditandai LABEL_PRINTED
+- Hanya order di `included` yang transisi ke LABEL_PRINTED + cap `packer_code`
+- `400` bila > 100 order/batch; timeout 5 menit (batch Shopee polling lambat)
+- FE: tombol "Buka PDF Gabungan (N resi)" — satu tab, satu perintah print (tanpa 100 tab terpisah)
 
 **`GET /fulfillment/queue/export`** — unduh xlsx untuk rekap/rekon gudang:
 - Query: filter sama dengan `/queue` (status — termasuk multi-status koma, q, shop_ids, date_from/to, sort — tanpa pagination), plus:
@@ -156,20 +172,27 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 - FE Riwayat menyediakan tombol **Cetak Ulang** per baris — sekaligus jalur retry order Shopee `PROCESSING` yang sudah telanjur tercap LABEL_PRINTED (penandaan per-batch) dan tidak muncul lagi di layar Pengemasan
 
 **`GET /fulfillment/labels/history/export`** — unduh riwayat sebagai xlsx:
-- Query: `q`/`date_from`/`date_to` sama dengan `/labels/history` (tanpa pagination; max 20.000 baris)
-- Kolom: No, Waktu Cetak (WIB), Nomor Pesanan, Nama Toko, Channel, No Resi, Kode Packer, Dicetak Oleh, Cetak Ulang, Waktu Serah Kurir (WIB), Status
-- Beda tujuan dengan `/queue/export` (rekon, dibuat SEBELUM pengemasan → kode packer manual): file ini dibuat SETELAH cetak → kode packer terisi otomatis. **Tanpa efek samping** (tidak ada penandaan apa pun)
+- Query: `q` + `date_from`/`date_to` (WIB, dukung jam `2006-01-02T15:04` atau tanggal saja, batas menit inklusif) — sama dengan `/labels/history`; tanpa pagination; max 20.000 baris
+- Kolom (kebutuhan rekap tim, 2026-07-20): **No, Waktu Cetak (WIB), No Resi, Nama Toko, Nama Produk, Qty** — satu baris per produk
+- Basis filter = `label_printed_at` (waktu cetak resi). Tanpa efek samping (tidak ada penandaan apa pun)
 
 **`GET /fulfillment/queue/counts`**:
 ```json
-// Response 200 — map status_wms → jumlah order; "ALL" = total semua status
-{"NEW": 5, "APPROVED": 3, "PICKING": 1, "PACKED": 2, "ALL": 11}
+// Response 200 — map status_wms → jumlah order; "ALL" = total semua status.
+// DIKIRIM/SELESAI = pecahan HANDED_OVER (belum COMPLETED vs COMPLETED).
+{"NEW": 5, "APPROVED": 3, "RTS_OK": 2, "HANDED_OVER": 40, "DIKIRIM": 18, "SELESAI": 22, "ALL": 50}
 ```
 
 **`GET /fulfillment/queue/shops`**:
 ```json
 // Response 200 — array distinct toko, sorted shop_name ASC
 [{"shop_id": "123", "shop_name": "BH Official", "channel": "tiktok"}]
+```
+
+**`GET /fulfillment/queue/couriers`**:
+```json
+// Response 200 — array distinct kurir (shipping_provider) non-kosong, sort ASC
+["ID Express", "J&T Express", "JNE Reguler", "SPX Standard"]
 ```
 
 **`POST /fulfillment/handover`** (pola sama dengan approve/hold/pick):

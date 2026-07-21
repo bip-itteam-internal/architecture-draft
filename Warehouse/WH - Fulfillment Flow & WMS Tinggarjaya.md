@@ -157,13 +157,33 @@ Ceklis pesanan (pilih semua) + pilih Tim Packer (T1/T2) → klik "Cetak Resi"
 FE otomatis dua langkah:
   POST /fulfillment/rts (untuk yang belum RTS; hanya order exported) → RTS_OK + AWB
   POST /fulfillment/labels {packer_code} → LABEL_PRINTED + resi terbuka
+  • Shopee: poll berulang di server (±6 dtk) → umumnya langsung READY;
+    sisa PROCESSING di-auto-retry FE (tanpa klik manual)
+  • Cetak BATCH BESAR: POST /fulfillment/labels/merged → 1 PDF gabungan
+    (max 100 resi/batch) → "Buka PDF Gabungan (N resi)" → satu print
 Panel "Hasil Proses Terakhir" bertahan setelah refetch (Buka Resi / Coba Lagi)
 Packer tempel resi ke paket sesuai rekap
         │
         ▼
 [4. SERAH KURIR]  (menu Serah Terima Kurir) → HANDED_OVER
+Setelah kurir bawa & marketplace update → tab Dikirim → (COMPLETED) tab Selesai
 Audit: menu Riwayat Cetak Resi
 ```
+
+**Antrian Pesanan — filter & tab**: tab Pesanan Baru · Disetujui · Siap Kirim ·
+**Dikirim** (HANDED_OVER belum COMPLETED) · **Selesai** (COMPLETED) · Dibatalkan.
+Filter: cari (no pesanan / **no resi** / SKU / nama produk), Filter Toko,
+**Filter Kurir**, Filter Tanggal+jam+preset, Urutkan (termasuk qty terbanyak/sedikit).
+
+**Cetak resi gabungan (bulk)**: `POST /fulfillment/labels/merged` menggabungkan
+resi banyak order jadi SATU PDF (pdfcpu) — max 100/batch, timeout 5 menit. Untuk
+500 order: 5 kali cetak. Menyelesaikan rencana "Merge batch → 1 PDF" (dulu §5 🟡).
+
+**Watermark cetak** (🟡 belum diimplementasikan): overlay watermark ke PDF resi
+bisa dibakar server-side di `mergeLabelPDFs` (pdfcpu sudah ada di pipeline) — tapi
+ada risiko ToS marketplace (modifikasi label resmi). Alternatif aman: cetakan
+terpisah / watermark level printer. Belum ada di kode. Lihat baris "Watermark"
+di Gap Analysis.
 
 #### Alur Operasional (jalur scan — opsional)
 
@@ -209,7 +229,7 @@ GET integration /fulfillment/labels?order_ids=
       → FE cetak order yang READY duluan; poll ulang yang masih PROCESSING
       ← ENDPOINT BARU di integration
 
-Merge batch → 1 PDF → print → LABEL_PRINTED
+Merge batch → 1 PDF → print → LABEL_PRINTED   ✅ (POST /fulfillment/labels/merged, pdfcpu, max 100/batch)
 
 ⚠️ PRASYARAT: label hanya tersedia SETELAH RTS. Urutan ini final.
 ⚠️ RISIKO: scope/permission app untuk shipping document belum terverifikasi.
@@ -319,8 +339,10 @@ warehouse_db (MongoDB, pola standar bip-erp)
 | POST | `/fulfillment/pack` | Verifikasi scan barcode SKU + qty → PACKED (+ `packer_code` opsional) |
 | POST | `/fulfillment/rts` | RTS batch (gerbang: hanya order ter-export) → proxy integration ship-batch |
 | POST | `/fulfillment/labels` | Cetak label + cap `packer_code` batch → proxy integration labels; reprint tercatat |
+| POST | `/fulfillment/labels/merged` | Cetak batch besar → 1 PDF gabungan (max 100/batch, pdfcpu) |
 | GET | `/fulfillment/labels/history` | Riwayat resi tercetak — audit keterlambatan per order |
-| GET | `/fulfillment/labels/history/export` | Unduh riwayat xlsx — kode packer otomatis (evaluasi per tim) |
+| GET | `/fulfillment/labels/history/export` | Unduh riwayat xlsx — kolom Waktu Cetak/No Resi/Toko/Nama Produk/Qty |
+| GET | `/fulfillment/queue/couriers` | Daftar distinct kurir untuk filter |
 | POST | `/fulfillment/handover` | Konfirmasi serah kurir → HANDED_OVER |
 | GET | `/fulfillment/dashboard` | Kartu antrian, resi keluar, cancel, RTS gagal |
 | CRUD | `/wms/products` + `/wms/products/import` | Master SKU + lokasi rak + import xlsx |
@@ -389,7 +411,7 @@ bukan body request).
 | Auto-approve berjadwal | ❌ Tidak dibangun | Approve tetap manual (batch) oleh Admin Gudang |
 | Event push realtime | ✅ Diputuskan | Hook `OnOrderUpsert` → POST warehouse; reconciler 60 detik sebagai fallback |
 | Cetak resi dari sistem | ✅ Masuk MVP | Bukan dari Seller Center |
-| Watermark "terima kasih / unboxing" | 🟡 Fase berikut | Kemungkinan langgar ToS MP; cetakan terpisah, bukan di label resmi |
+| Watermark "terima kasih / unboxing" | 🟡 Fase berikut | Kemungkinan langgar ToS MP; cetakan terpisah / level printer lebih aman. Infra bakar-ke-PDF siap (pdfcpu di `mergeLabelPDFs`) bila diputuskan tempel di label |
 | Lazada | 🟡 Fase berikut | Tidak ada Lazada client di integration saat ini |
 | KiriminAja | 🟡 TBD | Dibutuhkan hanya untuk channel non-marketplace |
 | `cmd/labeltest` sebelum build label | ✅ Wajib | Permission app Shopee/TikTok untuk shipping document belum terverifikasi |
