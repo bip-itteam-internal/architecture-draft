@@ -65,7 +65,23 @@
 **Manufacture (WMS)** (`/manufacture/*`, feature `src/features/manufacture/`) — modul WMS manufaktur di balik `ManufactureGuard`; navigasi lewat sidebar ERP (Dashboard · Master & Referensi · Operasional Gudang · Order & Dokumen · Pengawasan · KPI). Backend: [[API - Manufacture Service]].
 - **Gudang Barang Jadi (FG)** (`/manufacture/finished-goods`) — 3 tab: *Input Gudang FG (Inbound)* · *Return Dari Ekspedisi* · *Keluar FG (Marketplace Sales)*.
 	- **Return Dari Ekspedisi** ✅ — tabelnya bersumber **retur marketplace** (`/api/manufacture/returns`), bukan lagi ledger lokal. Tiap baris berbadge **Belum Dicatat** / **Sudah Dicatat** / **Tanpa Barang Balik** (refund-only), dengan hitungan belum-dicatat di header sebagai **sinyal Finance**. Klik baris *Belum Dicatat* → modal Form Return Ekspedisi terbuka **prefilled** (SKU + qty retur marketplace sebagai acuan; pembagian Reuse/Rework/Reject tetap penilaian pengecek) dan membawa kunci join, sehingga setelah simpan baris berubah status sendiri. Baris yang **sudah** dicatat tak bisa diklik — form ini selalu membuat transaksi baru (tak ada jalur edit), jadi simpan kedua akan menambah stok dua kali. Bundle dipecah ke komponen (stok FG per komponen). Gagal memuat feed tampil sebagai **banner merah**, bukan tabel kosong — "tak ada retur" dan "gagal memuat" wajib bisa dibedakan.
-	- Record lama tanpa kunci join tetap tampil sebagai *Catatan Manual* supaya tak ada data yang lenyap dari layar.
+	- Record hasil input gudang — termasuk catatan manual lama tanpa kunci join — kini tampil di sub-tab **Input WMS** (lihat di bawah), bukan lagi berbaur di tabel feed sebagai *Catatan Manual*. Tak ada data yang lenyap, hanya berpindah tempat.
+
+- **Log sumber vs input WMS** ✅ (21 Juli 2026, [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]]) — log di **empat** menu dipecah dua sub-tab: data **dari sumber** vs data hasil **input gudang**. Tujuannya rekonsiliasi Finance: apa yang seharusnya masuk/keluar vs apa yang sudah dicatat.
+
+	| Menu | Tab sumber | Tab Input WMS |
+	|---|---|---|
+	| Return Dari Ekspedisi | feed retur marketplace | transaksi retur WMS |
+	| Keluar FG | resi marketplace | transaksi keluar WMS |
+	| Inbound RM Harian (Gudang RM) | Procurement PO | penerimaan WMS |
+	| Input Gudang FG | Surat Jalan `IN TRANSIT` | penerimaan WMS |
+
+	- **Baris sumber bisa diklik → form terbuka terisi**, meniru pola Return. Untuk Input Gudang FG logika pengisian diekstrak jadi `pilihSjUntukTerima()` sehingga dropdown di dalam form & klik baris memakai satu jalur.
+	- **Badge status hanya di Return** — Keluar FG & Inbound RM tak punya kunci join (transaksi tak menyimpan nomor resi/PO), jadi sengaja tanpa badge; menebak status di sana lebih berbahaya bagi Finance daripada tidak ada badge. Input Gudang FG tak butuh badge (daftar `IN TRANSIT` per definisi = belum diterima).
+	- **PO multi-bahan** hanya mengisi supplier & tanggal; form Inbound RM satu bahan per input, jadi pemilihan bahan diserahkan operator (catatan in-form menampilkan daftar bahan PO).
+	- Tab sumber Keluar FG dibatasi **per tanggal RTS + maks 300 baris** (`resiList` = jendela 60 hari ≈ 14 ribu record); jumlah yang disembunyikan ditampilkan eksplisit agar daftar terpotong tak terbaca sebagai daftar utuh.
+
+- **Kolom "Diinput oleh"** ✅ — log WMS menampilkan `created_by_name` (stempel server dari JWT, lihat [[Microservices - Manufacture Service]]). **Sengaja dibedakan** dari field PIC/`adminPic`/`marketingPic` yang diketik manual di form — keduanya bisa orang berbeda. Data sebelum fitur ini tampil `—`. Penempatan menyesuaikan tabel: kolom sendiri di log Gudang RM/FG & Material Order, **sub-baris di kolom Tanggal** pada Laporan Hasil Produksi (tabelnya sudah 11 kolom — menambah kolom ke-12 mengulang masalah kolom terpotong yang baru diperbaiki), dan di Master Resi **hanya muncul untuk resi manual** (resi hasil sync tak punya penginput; `—` di belasan ribu baris hanya jadi kebisingan, sekaligus jadi penanda asal data).
 
 **Lain** — Secretary / Quality / Procurement (KPI saja), Beauty_hacks / Kyura (link eksternal Ideamiils + KPI)
 
