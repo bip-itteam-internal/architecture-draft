@@ -419,10 +419,16 @@ def test_serap_hapus_berkas_tugas_dan_hasil_setelah_manifest_ditulis(vault_ringk
 
 
 def test_serap_berkas_hasil_tidak_ada_berhenti_tanpa_crash(vault_ringkasan, capsys):
+    """DISESUAIKAN untuk Perubahan B: --serap tanpa PATH sekarang mencari
+    SEMUA pola berkas hasil (tunggal + bernomor), bukan cuma satu nama
+    tetap -- jadi pesan kegagalan sekarang menjelaskan langkah 2 belum
+    dikerjakan (lihat test_serap_tanpa_satupun_berkas_hasil_pesan_langkah_2)
+    alih-alih menyebut satu path tetap yang tidak lagi merepresentasikan
+    seluruh pencarian."""
     kode = build.main(["--root", str(vault_ringkasan), "--serap"])
     assert kode != 0
     assert not (vault_ringkasan / NAMA_INDEX).exists()
-    assert str(vault_ringkasan / NAMA_HASIL) in capsys.readouterr().out
+    assert "langkah 2" in capsys.readouterr().out.lower()
 
 
 # --- C1: pembungkus "hasil" salah bentuk -- harus fail-closed, bukan senyap
@@ -623,6 +629,280 @@ def test_mode_tanpa_flag_carry_forward_ringkasan_yang_hash_nya_sama(vault_ringka
 def test_dua_flag_mode_sekaligus_ditolak_argparse(vault_ringkasan, argv):
     with pytest.raises(SystemExit):
         build.main(["--root", str(vault_ringkasan), *argv])
+
+
+# --- Task 11 -- Perubahan A: --pecah N pada --daftar-tugas ------------------
+
+
+@pytest.fixture
+def vault_pecah(tmp_path: Path) -> Path:
+    """5 dokumen non-stub -- cukup untuk --pecah 2 menghasilkan potongan 2/2/1."""
+    (tmp_path / "Sales").mkdir()
+    for huruf in "ABCDE":
+        (tmp_path / "Sales" / f"Sales - {huruf}.md").write_text(
+            f"- **Status**: ✅ Implemented\n\nIsi {huruf}.\n", encoding="utf-8",
+        )
+    return tmp_path
+
+
+def test_pecah_menghasilkan_potongan_2_2_1(vault_pecah):
+    kode = build.main(["--root", str(vault_pecah), "--daftar-tugas", "--pecah", "2"])
+    assert kode == 0
+
+    potongan = sorted(vault_pecah.glob("VAULT-INDEX.tugas.*.json"))
+    assert [p.name for p in potongan] == [
+        "VAULT-INDEX.tugas.001.json",
+        "VAULT-INDEX.tugas.002.json",
+        "VAULT-INDEX.tugas.003.json",
+    ]
+    jumlah = [len(json.loads(p.read_text(encoding="utf-8"))["tugas"]) for p in potongan]
+    assert jumlah == [2, 2, 1]
+    assert not (vault_pecah / NAMA_TUGAS).exists()  # bukan berkas tunggal lama
+
+
+def test_pecah_tiap_potongan_berdiri_sendiri(vault_pecah):
+    build.main(["--root", str(vault_pecah), "--daftar-tugas", "--pecah", "2"])
+
+    for i, nomor in enumerate(["001", "002", "003"], start=1):
+        data = json.loads(
+            (vault_pecah / f"VAULT-INDEX.tugas.{nomor}.json").read_text(encoding="utf-8")
+        )
+        assert data["versi_skema"] == VERSI_SKEMA
+        assert data["panduan"].strip() != ""
+        assert data["potongan"] == i
+        assert data["total_potongan"] == 3
+        assert data["berkas_keluaran"] == f"VAULT-INDEX.hasil.{nomor}.json"
+        assert data["jumlah"] == len(data["tugas"])
+
+
+def test_pecah_berkas_keluaran_potongan_ketiga(vault_pecah):
+    build.main(["--root", str(vault_pecah), "--daftar-tugas", "--pecah", "2"])
+    data = json.loads(
+        (vault_pecah / "VAULT-INDEX.tugas.003.json").read_text(encoding="utf-8")
+    )
+    assert data["berkas_keluaran"] == "VAULT-INDEX.hasil.003.json"
+
+
+def test_pecah_tanpa_dokumen_perlu_diringkas_nol_potongan(vault_pecah):
+    entri = scan_vault(vault_pecah)
+    lengkap = [{**e, "ringkasan": "sudah ada", "kata_kunci": []} for e in entri]
+    lama = rakit_index(lengkap)
+    (vault_pecah / NAMA_INDEX).write_text(json.dumps(lama), encoding="utf-8")
+
+    kode = build.main(["--root", str(vault_pecah), "--daftar-tugas", "--pecah", "2"])
+
+    assert kode == 0
+    assert sorted(vault_pecah.glob("VAULT-INDEX.tugas.*.json")) == []
+
+
+def test_pecah_bersihkan_potongan_lama_sebelum_menulis_baru(vault_pecah, capsys):
+    for n in range(1, 11):
+        (vault_pecah / f"VAULT-INDEX.tugas.{n:03d}.json").write_text("{}", encoding="utf-8")
+
+    kode = build.main(["--root", str(vault_pecah), "--daftar-tugas", "--pecah", "2"])
+
+    assert kode == 0
+    sisa = sorted(p.name for p in vault_pecah.glob("VAULT-INDEX.tugas.*.json"))
+    assert sisa == [
+        "VAULT-INDEX.tugas.001.json",
+        "VAULT-INDEX.tugas.002.json",
+        "VAULT-INDEX.tugas.003.json",
+    ]
+    assert "Dihapus 10" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("nilai", ["0", "-1", "abc"])
+def test_pecah_nilai_tidak_valid_ditolak_argparse(vault_pecah, nilai):
+    with pytest.raises(SystemExit):
+        build.main(["--root", str(vault_pecah), "--daftar-tugas", "--pecah", nilai])
+
+
+# --- Task 11 -- Perubahan B: --serap menggabungkan banyak berkas hasil ------
+
+
+def test_serap_tanpa_path_gabung_beberapa_berkas_hasil_bernomor(vault_ringkasan):
+    entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
+    hasil_1 = {
+        "hasil": {
+            "Sales/Sales - A.md": {
+                "ringkasan": "Ringkasan A.", "kata_kunci": ["a"],
+                "hash": entri["Sales/Sales - A.md"]["hash"],
+            },
+            "Sales/Sales - C.md": {
+                "ringkasan": "Ringkasan C.", "kata_kunci": ["c"],
+                "hash": entri["Sales/Sales - C.md"]["hash"],
+            },
+        }
+    }
+    hasil_2 = {
+        "hasil": {
+            "Sales/Sales - Besar.md": {
+                "ringkasan": "Ringkasan Besar.", "kata_kunci": ["besar"],
+                "hash": entri["Sales/Sales - Besar.md"]["hash"],
+            },
+        }
+    }
+    (vault_ringkasan / "VAULT-INDEX.hasil.001.json").write_text(
+        json.dumps(hasil_1), encoding="utf-8"
+    )
+    (vault_ringkasan / "VAULT-INDEX.hasil.002.json").write_text(
+        json.dumps(hasil_2), encoding="utf-8"
+    )
+
+    kode = build.main(["--root", str(vault_ringkasan), "--serap"])
+
+    assert kode == 0  # A, C, Besar semua diserap; Stub ditangani lokal
+    index = json.loads((vault_ringkasan / NAMA_INDEX).read_text(encoding="utf-8"))
+    ringkasan = {d["path"]: d["ringkasan"] for d in index["dokumen"]}
+    assert ringkasan["Sales/Sales - A.md"] == "Ringkasan A."
+    assert ringkasan["Sales/Sales - C.md"] == "Ringkasan C."
+    assert ringkasan["Sales/Sales - Besar.md"] == "Ringkasan Besar."
+    assert not (vault_ringkasan / "VAULT-INDEX.hasil.001.json").exists()
+    assert not (vault_ringkasan / "VAULT-INDEX.hasil.002.json").exists()
+
+
+def test_serap_satu_berkas_salah_bentuk_menolak_seluruh_operasi(vault_ringkasan, capsys):
+    """C1 versi banyak-berkas: satu berkas hasil bentuknya salah harus
+    menolak SELURUH gabungan walau berkas lain sah -- rusak bukan berarti
+    kosong, dan bukan 'lewati yang rusak, pakai yang sah'."""
+    entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
+    hasil_sah = {
+        "hasil": {
+            "Sales/Sales - A.md": {
+                "ringkasan": "Ringkasan A.", "kata_kunci": ["a"],
+                "hash": entri["Sales/Sales - A.md"]["hash"],
+            },
+        }
+    }
+    (vault_ringkasan / "VAULT-INDEX.hasil.001.json").write_text(
+        json.dumps(hasil_sah), encoding="utf-8"
+    )
+    # bentuk salah: tanpa pembungkus "hasil"
+    (vault_ringkasan / "VAULT-INDEX.hasil.002.json").write_text(
+        json.dumps({"Sales/Sales - C.md": {"ringkasan": "x", "kata_kunci": []}}),
+        encoding="utf-8",
+    )
+
+    kode = build.main(["--root", str(vault_ringkasan), "--serap"])
+
+    assert kode != 0
+    assert not (vault_ringkasan / NAMA_INDEX).exists()  # manifest TIDAK ditulis
+    assert (vault_ringkasan / "VAULT-INDEX.hasil.001.json").exists()  # tidak dihapus
+    assert (vault_ringkasan / "VAULT-INDEX.hasil.002.json").exists()  # tidak dihapus
+    keluaran = capsys.readouterr().out
+    assert "GAGAL" in keluaran
+    assert "VAULT-INDEX.hasil.002.json" in keluaran
+
+
+def test_serap_path_konflik_lintas_berkas_menolak_seluruh_operasi(vault_ringkasan, capsys):
+    entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
+    hash_a = entri["Sales/Sales - A.md"]["hash"]
+    hasil_1 = {
+        "hasil": {
+            "Sales/Sales - A.md": {"ringkasan": "Versi 1.", "kata_kunci": [], "hash": hash_a},
+        }
+    }
+    hasil_2 = {
+        "hasil": {
+            "Sales/Sales - A.md": {"ringkasan": "Versi 2.", "kata_kunci": [], "hash": hash_a},
+        }
+    }
+    (vault_ringkasan / "VAULT-INDEX.hasil.001.json").write_text(
+        json.dumps(hasil_1), encoding="utf-8"
+    )
+    (vault_ringkasan / "VAULT-INDEX.hasil.002.json").write_text(
+        json.dumps(hasil_2), encoding="utf-8"
+    )
+
+    kode = build.main(["--root", str(vault_ringkasan), "--serap"])
+
+    assert kode != 0
+    assert not (vault_ringkasan / NAMA_INDEX).exists()
+    assert (vault_ringkasan / "VAULT-INDEX.hasil.001.json").exists()
+    assert (vault_ringkasan / "VAULT-INDEX.hasil.002.json").exists()
+    keluaran = capsys.readouterr().out
+    assert "Sales/Sales - A.md" in keluaran
+    assert "VAULT-INDEX.hasil.001.json" in keluaran
+    assert "VAULT-INDEX.hasil.002.json" in keluaran
+
+
+def test_serap_tanpa_satupun_berkas_hasil_pesan_langkah_2(vault_ringkasan, capsys):
+    kode = build.main(["--root", str(vault_ringkasan), "--serap"])
+
+    assert kode != 0
+    assert not (vault_ringkasan / NAMA_INDEX).exists()
+    assert "langkah 2" in capsys.readouterr().out.lower()
+
+
+def test_serap_pembersihan_mencakup_seluruh_potongan_tugas_dan_hasil(vault_ringkasan):
+    """Pembersihan artefak sukses harus mencakup seluruh berkas potongan
+    tugas DAN hasil, bukan cuma dua nama tetap (VAULT-INDEX.tugas.json /
+    VAULT-INDEX.hasil.json)."""
+    entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
+    pasangan = [
+        ("001", "Sales/Sales - A.md"),
+        ("002", "Sales/Sales - C.md"),
+        ("003", "Sales/Sales - Besar.md"),
+    ]
+    for n, path_dok in pasangan:
+        (vault_ringkasan / f"VAULT-INDEX.tugas.{n}.json").write_text("{}", encoding="utf-8")
+        hasil = {
+            "hasil": {
+                path_dok: {
+                    "ringkasan": f"Ringkasan {path_dok}.", "kata_kunci": [],
+                    "hash": entri[path_dok]["hash"],
+                }
+            }
+        }
+        (vault_ringkasan / f"VAULT-INDEX.hasil.{n}.json").write_text(
+            json.dumps(hasil), encoding="utf-8"
+        )
+
+    kode = build.main(["--root", str(vault_ringkasan), "--serap"])
+
+    assert kode == 0
+    for n, _ in pasangan:
+        assert not (vault_ringkasan / f"VAULT-INDEX.tugas.{n}.json").exists()
+        assert not (vault_ringkasan / f"VAULT-INDEX.hasil.{n}.json").exists()
+
+
+# --- Task 11 -- Perubahan C: --check melaporkan sisa artefak ----------------
+
+
+def _index_lengkap(vault: Path) -> dict:
+    entri = scan_vault(vault)
+    lengkap = []
+    for e in entri:
+        if e["status_emoji"] == "🔴":
+            lengkap.append({**e, **ringkas_stub(e["judul"])})
+        else:
+            lengkap.append({**e, "ringkasan": "sudah ada", "kata_kunci": []})
+    return rakit_index(lengkap)
+
+
+def test_check_melaporkan_artefak_potongan_tersisa(vault_ringkasan, capsys):
+    lama = _index_lengkap(vault_ringkasan)
+    (vault_ringkasan / NAMA_INDEX).write_text(json.dumps(lama), encoding="utf-8")
+    (vault_ringkasan / "VAULT-INDEX.tugas.001.json").write_text("{}", encoding="utf-8")
+    (vault_ringkasan / "VAULT-INDEX.hasil.001.json").write_text("{}", encoding="utf-8")
+
+    kode = build.main(["--root", str(vault_ringkasan), "--check"])
+
+    assert kode == 0  # index tetap segar -- exit code TIDAK berubah oleh artefak
+    keluaran = capsys.readouterr().out
+    assert "PERINGATAN" in keluaran
+    assert "VAULT-INDEX.tugas.001.json" in keluaran
+    assert "VAULT-INDEX.hasil.001.json" in keluaran
+
+
+def test_check_tanpa_artefak_tidak_ada_peringatan(vault_ringkasan, capsys):
+    lama = _index_lengkap(vault_ringkasan)
+    (vault_ringkasan / NAMA_INDEX).write_text(json.dumps(lama), encoding="utf-8")
+
+    kode = build.main(["--root", str(vault_ringkasan), "--check"])
+
+    assert kode == 0
+    assert "PERINGATAN" not in capsys.readouterr().out
 
 
 # --- anti-regresi: jalur berbayar (Batches API) benar-benar hilang ----------

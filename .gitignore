@@ -14,5 +14,5 @@
 Tools/.venv/
 __pycache__/
 .pytest_cache/
-VAULT-INDEX.tugas.json
-VAULT-INDEX.hasil.json
+VAULT-INDEX.tugas*.json
+VAULT-INDEX.hasil*.json
