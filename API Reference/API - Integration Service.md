@@ -15,7 +15,7 @@
 ## Transactions / Orders
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/transactions/orders/list` · `/orders/:id` · `/orders/summary[/shops|/products]` | Order terpadu + ringkasan |
+| GET | `/transactions/orders/list` · `/orders/:id` · `/orders/summary[/shops|/products]` | Order terpadu + ringkasan. Param `sort_by` dukung `order_update_date` + `updated_since` (dipakai reconciler warehouse, sort ASC watermark). Bila `updated_since` diisi → response di-enrich `tracking_number` (transient, dari koleksi order mentah TikTok/Shopee) agar WMS bisa mengisi kolom `awb` |
 | GET | `/transactions/orders/export` | Export daftar order (Order Management) ke **.xlsx**, 1 baris per item. Filter identik `/orders/list`: `channel`, `status`, `canceled_by`, `time_from`, `time_to`, `shop_id`, `order_id`. Tanpa paginasi (cap 10.000 order, `order_date` desc). Nama file (`Content-Disposition`) mencerminkan filter aktif (channel/shop/rentang tanggal `DD-MM-YYYY_sd_DD-MM-YYYY`) |
 | GET | `/transactions/orders/summary/comparison` | Perbandingan performa 2 periode kustom: 4 metrik (TO_SHIP revenue, COMPLETED revenue, COMPLETED qty produk, COMPLETED order count) + granularity hourly/daily. Param: `start_date`, `end_date`, `comparison_start`, `comparison_end` (YYYY-MM-DD; default today vs yesterday), `channel` (opsional), `shop_id`, `timezone` |
 | GET | `/transactions/orders/dashboard/summary` | Jumlah order aktif saat ini (tanpa filter tanggal) per kategori kartu dashboard: `pesanan_baru` (TO_PROCESS), `siap_dikirim` (TO_SHIP), `belum_di_proses` (TO_PROCESS+TO_SHIP), `pesanan_selesai` (COMPLETED). Param: `channel` (opsional), `shop_id` (opsional) |
@@ -151,8 +151,9 @@
 
 | Method | Path | Fungsi |
 |---|---|---|
-| POST | `/fulfillment/ship-batch` | Batch ship order lintas platform (TikTok + Shopee). Body: `[{order_id, channel, shop_id, package_id}]`. Non-all-or-nothing: satu gagal tak membatalkan yang lain. Response: `[{order_id, channel, success, awb?, error?}]` |
-| POST | `/fulfillment/labels` | Ambil shipping label per order. Body: `[{order_id, channel, shop_id, package_id}]` (POST — bukan GET — karena TikTok butuh `package_id` yang tidak derivable dari `order_id` saja). TikTok: synchronous, status READY + `url`. Shopee: async — status PROCESSING bila belum siap (WMS retry); READY + `pdf_data` (base64) bila sudah jadi |
+| POST | `/fulfillment/ship-batch` | Batch ship order lintas platform (TikTok + Shopee). Body: `[{order_id, channel, shop_id, package_id}]`. Non-all-or-nothing. Response: `[{order_id, channel, success, awb?, error?}]`. **Shopee "not eligible for rescheduling" diperlakukan sukses** — order Shopee masuk WMS saat sudah PROCESSED (pengiriman sudah diatur), jadi penolakan itu jalur normal, bukan error |
+| POST | `/fulfillment/labels` | Ambil shipping label per order. Body: `[{order_id, channel, shop_id, package_id}]` (POST karena TikTok butuh `package_id`). Paralel max 5 worker. TikTok: sync READY + `url` (tipe `SHIPPING_LABEL_AND_PACKING_SLIP` A6 — resi + detail produk). Shopee: alur async 3-step + **poll berulang di server** (±6 dtk) sehingga umumnya langsung READY + `pdf_data`; PROCESSING bila belum siap (FE auto-retry) |
+| POST | `/fulfillment/labels/merged` | Sama dengan `/labels` tapi **menggabungkan semua PDF READY jadi SATU** (pdfcpu `MergeRaw`). Response: `{pdf: base64, included: [order_id...], data: [LabelResult...]}`. TikTok URL diunduh dulu, Shopee pakai pdf_data langsung; non-PDF/gagal dilewati. Untuk cetak batch 50–100 resi sekali print |
 
 ## Kas Toko / Wallet (🟡 branch `feat/kas-toko`, PR #380 — belum merge)
 | Method | Path | Fungsi |
