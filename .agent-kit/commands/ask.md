@@ -9,10 +9,20 @@ pun — tugasmu hanya menjawab + menyebut sumber.
 Pertanyaan: $ARGUMENTS
 
 Langkah:
-1. Tentukan area pertanyaan. Buka `architecture-draft/CLAUDE.md` §7 (pemetaan repo→dokumen)
-   untuk menemukan dok arsitektur relevan.
-2. Baca dok vault terkait di `architecture-draft/`. Perhatikan status marker
-   (§5: ✅ Implemented / ⚠️ ada catatan / 🟡 Konsep / 🔴 Stub).
+1. Baca `architecture-draft/VAULT-INDEX.json` (manifest ~218 dokumen: judul, area,
+   jenis, status, tautan, ringkasan, kata kunci). Pilih **3 sampai 5 dokumen** paling
+   relevan dengan mencocokkan pertanyaan ke `ringkasan` dan `kata_kunci`.
+   Bila index tidak ada, rusak, atau `versi_skema` tak dikenal → pakai cara lama
+   (`architecture-draft/CLAUDE.md` §7 + grep) dan **beri tahu user** bahwa index tidak
+   tersedia; sarankan `/index-vault`.
+2. Baca dokumen terpilih **secara utuh** di `architecture-draft/`. Perhatikan
+   `status_emoji` + `status_teks` di entri index dan marker di dokumennya
+   (✅ Implemented / ⚠️ ada catatan / 🟡 Konsep / 🔴 Stub / 🔜 Direncanakan /
+   ⛔ Superseded). Sekitar sepertiga dokumen **tidak punya status** — seluruh dok meta
+   root dan seluruh `API - *`. Itu normal, bukan gap.
+   Bila pertanyaannya berangkat dari kode, `CLAUDE.md` §7 tetap dipakai: §7 memetakan
+   **repo → dokumen**, index memetakan **pertanyaan → dokumen**. Sumbu berbeda,
+   keduanya berguna.
 3. Bila vault mencakup pertanyaan & konsisten dengan kode → jawab dari vault.
 4. Bila vault diam ATAU terlihat usang vs kode → baca kode terkait di project aktif
    (lihat .claude/CLAUDE.md baris "Project aktif") untuk tetap menjawab.

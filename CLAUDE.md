@@ -108,6 +108,14 @@ Untuk dok konsep murni: `## Latar Belakang`, `## Ruang Lingkup`, `## Belum Diput
 - `Quality & Regulatory/*` ← sumber = **SOP/sertifikat QA-RA Bharata** (CPOB/BPOM/CDOB; diisi tim QA — bukan dari kode).
 - `Reference/*` ← istilah & singkatan yang dipakai lintas vault + kode (glosarium), data dictionary, ownership.
 
+## 7b. Index pencarian (`VAULT-INDEX.json`)
+
+Manifest seluruh dokumen vault: judul, area, jenis, status, tautan, ringkasan, dan kata kunci. Dipakai `/ask` dan `/start-task` untuk memilih dokumen relevan dari sebuah **pertanyaan**; §7 di atas memetakan dari **repo kode**. Sumbu berbeda, keduanya dipakai bersama.
+
+Field `publik` menandai dokumen yang boleh muncul di kanal untuk staf non-IT nanti. `IT/`, `Workspace/`, `Logs/`, dan `Templates/` selalu `false`, dan folder yang belum dikenal otomatis `false` (fail-closed).
+
+Diregenerasi lewat `/index-vault` — ringkasan dibuat subagent Claude Code, bukan API. **Jangan diedit tangan.** Wajib ikut ter-commit tiap `/sync-docs` yang mengubah dokumen. Detail: `Tools/README.md`.
+
 ## 8. Alur kerja sync (tiap update)
 
 1. `git pull` vault + repo kode (ambil terbaru)
