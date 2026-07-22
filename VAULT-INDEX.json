@@ -415,22 +415,19 @@
         "Microservices - Employee Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "96fd17f7f564c5df5c9b113cb0853d8ff03107019b998b3201606ce922fe1ac9",
-      "ukuran_kb": 10.4,
-      "ringkasan": "Menjawab: bagaimana alur ATS lengkap berjalan dari pengajuan job requisition, review dan persetujuan direktur, pembukaan job posting, input kandidat, tahapan seleksi (screening/interview/tes/psikotes), sampai offer dan hire beserta penautan ke data karyawan HRIS. Juga menjawab endpoint feedback interview per-babak (panel/lokasi/email undangan), master data rekrutmen (job type/sumber kandidat/tipe interview), endpoint publik portal karir, dan performance review masa evaluasi karyawan baru.",
+      "hash": "8f7090fa6efc1e6bd4daa72bc7ba1296405b2f9985928e6e1cec8c61aca61f22",
+      "ukuran_kb": 10.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia untuk Job Requisition, Job Posting, Candidate, interview, dan offer di recruitment-service, termasuk endpoint mana yang dipakai untuk approval/reject requisition dan role yang berwenang memanggilnya. Juga menjawab apakah job posting punya field rentang gaji, dan bagaimana bentuk request/response tiap endpoint.",
       "kata_kunci": [
-        "recruitment",
-        "rekrutmen",
-        "ATS",
-        "job requisition",
+        "approval requisition",
+        "persetujuan permintaan karyawan",
+        "SPV HRD",
+        "hr-review",
         "job posting",
-        "kandidat",
-        "interview",
-        "offer",
-        "hire",
-        "onboarding",
-        "portal karir",
-        "performance review"
+        "lowongan",
+        "gaji",
+        "candidate",
+        "interview feedback"
       ]
     },
     {
@@ -1574,20 +1571,20 @@
         "IT - Background Jobs & Schedulers",
         "APP - Web ERP"
       ],
-      "hash": "6e733b403ea3abea56200c33490ef8c8633330ae587e150354b27eef5ba111bc",
-      "ukuran_kb": 33.7,
-      "ringkasan": "Menjawab: bagaimana siklus rekrutmen berjalan dari permintaan posisi (job requisition) dengan approval berjenjang, job posting, hingga screening, interview multi-tahap, background check, psikotes, offer, dan hire menjadi karyawan. Juga menjelaskan bagaimana kandidat melamar lewat portal karir publik tanpa JWT dan bagaimana notifikasi email ke kandidat/pewawancara bekerja.",
+      "hash": "ea465073110a97ac89b2d3de2e430dbde0b4dd45af7c82964896ef508a8ad893",
+      "ukuran_kb": 34.8,
+      "ringkasan": "Menjawab: bagaimana alur approval Job Requisition bekerja di recruitment-service (siapa yang mengajukan, siapa yang menyetujui final, apa yang terjadi dengan status dan field lama seperti director_approver), serta apakah job posting masih menampilkan rentang gaji ke pelamar. Juga menjawab arsitektur service (stack, path, port, dependensi ke Employee/File/Notification Service) dan tahap pipeline recruitment yang sudah dibangun (posting, candidate, interview, offer, hire, onboarding handoff).",
       "kata_kunci": [
-        "recruitment",
-        "rekrutmen",
-        "job requisition",
+        "alur approval requisition",
+        "persetujuan permintaan karyawan",
+        "SPV HRD",
+        "Direktur",
+        "director-approve dihapus",
         "job posting",
-        "candidate",
-        "interview",
-        "offer letter",
-        "hire onboarding",
-        "portal karir",
-        "ATS"
+        "lowongan",
+        "rentang gaji",
+        "gaji",
+        "recruitment-service"
       ]
     },
     {
@@ -3988,20 +3985,20 @@
         "HRIS - Big Pictures",
         "HRIS - Recruitment Roadmap (Adopsi ERPGo)"
       ],
-      "hash": "b50abb2a727a0888959df455d938815c3afc7664bc4485c9be93937ab508bf03",
-      "ukuran_kb": 25.4,
-      "ringkasan": "Menjawab: bagaimana alur end-to-end recruitment dari Job Requisition sampai karyawan aktif (sourcing, screening manual, interview multi-tahap, psikotes, offer, hire, masa evaluasi), siapa saja aktor/persona yang terlibat (SPV, HR/HRGA Supervisor, Direktur, kandidat), dan bagaimana integrasi dengan Glints serta rencana AI CV screening.",
+      "hash": "a315604179a09681491aae804a69cb43f7b5bd774edc3e2f7a03d4fde8d6372f",
+      "ukuran_kb": 25.8,
+      "ringkasan": "Menjawab: bagaimana desain end-to-end proses recruitment dari permintaan posisi (Job Requisition) sampai karyawan aktif, siapa saja aktor yang terlibat (SPV pengaju, SPV HRD, pewawancara, kandidat) dan apa peran masing-masing dalam approval. Juga menjawab format Form Permintaan Karyawan, kenapa tahap Direktur dihapus dari alur persetujuan, dan apakah lowongan mencantumkan rentang gaji ke pelamar.",
       "kata_kunci": [
-        "recruitment",
-        "rekrutmen",
         "job requisition",
-        "screening",
-        "interview",
-        "psikotes",
-        "offer",
-        "hire",
-        "onboarding",
-        "Glints"
+        "permintaan karyawan",
+        "approval requisition",
+        "persetujuan",
+        "SPV HRD",
+        "Direktur",
+        "job posting",
+        "lowongan",
+        "gaji",
+        "aktor recruitment"
       ]
     },
     {

@@ -15,7 +15,7 @@
 
 ![[Recruitment Pipeline.excalidraw]]
 
-1. **Job Requisition** — SPV/atasan mengajukan posisi via **Form Permintaan Karyawan** (field: departemen, jumlah karyawan sekarang, jumlah dibutuhkan, posisi, **jenis permintaan: penambahan/penggantian**, alasan, **persyaratan/kualifikasi**: usia, jenis kelamin, pendidikan, pengalaman, kualifikasi, tugas & tanggung jawab, tanggal mulai). Alur: **SPV mengisi kualifikasi** → **HR (HRGA Supervisor) review kualifikasi** (sesuai/standar atau minta revisi) → **Direktur menyetujui** → status `Approved` → lowongan boleh dibuka. **Tanpa batasan kuota** (jumlah dibutuhkan bersifat informasional, bukan cap)
+1. **Job Requisition** — SPV/atasan mengajukan posisi via **Form Permintaan Karyawan** (field: departemen, jumlah karyawan sekarang, jumlah dibutuhkan, posisi, **jenis permintaan: penambahan/penggantian**, alasan, **persyaratan/kualifikasi**: usia, jenis kelamin, pendidikan, pengalaman, kualifikasi, tugas & tanggung jawab, tanggal mulai). Alur: **SPV mengisi kualifikasi** → **SPV HRD review kualifikasi lalu menyetujui** (atau minta revisi) → status `Approved` → lowongan boleh dibuka. **Satu tahap persetujuan** sejak 2026-07-22: tahap Direktur dihapus, SPV HRD adalah pemberi persetujuan final. **Tanpa batasan kuota** (jumlah dibutuhkan bersifat informasional, bukan cap)
 2. **Sourcing & Job Posting** — HR membuka lowongan + mencatat **sumber pelamar**. Kanal eksternal utama saat ini: **Glints (TapLoker)** — ATS/job-portal yang dipakai aktif (PT Bharata terverifikasi: pasang lowongan, Pertanyaan Skrining, akses CV, chat WA); plus referral, walk-in, bootcamp
 3. **Candidate Management** — data pelamar (CV, kontak, posisi dilamar, sumber) + pelacakan pipeline via field **`progress`** (tahap) & **`status`** (keadaan), enum mengikuti **rekaman HRD** (lihat Model Data)
 4. **Screening (manual)** — HR menyaring CV/data pelamar **manual** terhadap kriteria posisi (lihat bagian khusus di bawah); **AI CV screening** direncanakan sebagai enhancement fase lanjut
@@ -44,8 +44,7 @@
 | Aktor | Peran |
 | --- | --- |
 | **Pengaju (SPV / kepala dept)** | Mengajukan Job Requisition via Form Permintaan Karyawan + **mengisi usulan kualifikasi** kandidat |
-| **HR / HRGA Supervisor** | **Review kualifikasi** requisition (sesuai/minta revisi) + finalkan kriteria; kelola pipeline (lowongan, pelamar, jadwal incl. psikotes, input hasil); penerbitan offer |
-| **Direktur** | **Menyetujui Job Requisition** (menggantikan pola lama berbasis kuota) |
+| **HR / HRGA Supervisor (SPV HRD)** | **Review kualifikasi + menyetujui/menolak** requisition — pemberi persetujuan **final** sejak 2026-07-22; finalkan kriteria; kelola pipeline (lowongan, pelamar, jadwal incl. psikotes, input hasil); penerbitan offer |
 | **Pewawancara** (hiring manager / SPV dept) | Ikut interview & penilaian (multi-tahap s/d 3×) |
 | **Kandidat** | Eksternal — **tanpa akun ERP** (data dikelola HR) |
 
@@ -65,12 +64,9 @@
 - **Butuh**: ajukan requisition + isi kualifikasi; lihat pelamar untuk posisinya; beri nilai User Interview & Technical Test.
 - **Pain**: approval lama; tak tahu progress lamaran.
 
-**3. Direktur — "pemberi persetujuan"**
-- **Tujuan**: kontrol penambahan karyawan.
-- **Butuh**: approve requisition ringkas (justifikasi + kualifikasi), idealnya dari mobile.
-- **Pain**: tanda tangan manual di form kertas.
+> **Persona Direktur dihapus 2026-07-22.** Tahap persetujuan Direktur dibuang dari alur requisition (PR #609/#466); kontrol penambahan karyawan kini sepenuhnya di SPV HRD (persona 1). Requisition lama yang terlanjur disetujui Direktur tetap menyimpan riwayatnya di field `director_approver`.
 
-**4. Kandidat / Pelamar (eksternal, tanpa akun ERP) — "pencari kerja"**
+**3. Kandidat / Pelamar (eksternal, tanpa akun ERP) — "pencari kerja"**
 - **Tujuan**: melamar mudah & tahu kabar tiap tahap.
 - **Butuh**: lamar via Glints/portal, upload CV/berkas, notifikasi tiap tahap (Email → WA) termasuk hasil akhir.
 - **Pain**: tak dapat kabar / lama menunggu tanpa kepastian.
@@ -133,7 +129,8 @@
 ## Keputusan (sudah disepakati HRD)
 
 - **Kuota headcount**: **tanpa batasan** — requisition tak dicek/dibatasi kuota; "jumlah dibutuhkan" bersifat informasional.
-- **Approval requisition**: SPV/atasan mengajukan + isi persyaratan → **HR (HRGA Supervisor) review kualifikasi** (sesuai / minta revisi) → **Direktur menyetujui**. (Sesuai blok tanda tangan **Form Permintaan Karyawan**.)
+- **Approval requisition**: SPV/atasan mengajukan + isi persyaratan → **SPV HRD review kualifikasi lalu menyetujui** (atau minta revisi). Satu tahap, sejak 2026-07-22.
+  > ⚠️ **Gap dengan form fisik:** alur lama dua tahap dibuat mengikuti blok tanda tangan **Form Permintaan Karyawan** yang memuat kolom Direktur. Setelah tahap Direktur dihapus di sistem, form kertasnya **belum diselaraskan**. Perlu diputuskan HRD: revisi form fisik, atau kolom Direktur dibiarkan kosong/dihapus.
 - **Persyaratan kandidat**: diusulkan **SPV** di requisition, **direview & difinalkan HR** jadi kriteria resmi (dipakai saat screening).
 - **Melamar**: satu orang **boleh** melamar beberapa posisi; **boleh** melamar lagi setelah ditolak (tanpa jeda).
 - **Screening**: **manual** dulu (HR yang memutuskan); AI hanya **asisten skor & rekomendasi** (tanpa auto-reject) bila nanti diaktifkan.
@@ -173,7 +170,7 @@
 
 ## Rollout Bertahap
 
-- [x] **Fase 1** — Job Requisition (approval **SPV → HR review → Direktur**) + Candidate management (data pelamar + status pipeline) — ✅ BE
+- [x] **Fase 1** — Job Requisition (approval **SPV → SPV HRD**; alur awal memakai tahap Direktur, dihapus 2026-07-22) + Candidate management (data pelamar + status pipeline) — ✅ BE
 - [x] **Fase 2** — Sourcing & Job Posting + **Screening manual** + **Interview** (multi-tahap) + **Psikotes (manual oleh HR)** — ✅ BE
 - [x] **Fase 3** — Offer & Decision + **Onboarding handoff** (`/onboarding/register`) + **Notifikasi kandidat via Email** (Resend) — ✅ BE
 - [x] **Fase A–E (adopsi ERPGo)** — master (job_type/candidate_source/interview_type/job_location) + enrich job_posting & candidate — ✅ BE (2026-07-03). *(form builder `custom_question` sempat ada lalu **dihapus** #486/#342.)*

@@ -14,10 +14,13 @@
 
 ### Job Requisition
 - Ajukan permintaan posisi (Form Permintaan Karyawan) + usulan kualifikasi
-- Alur approval: **HR (HRGA Supervisor) review kualifikasi → Direktur menyetujui** → `Approved` (tanpa cek kuota)
+- Alur approval: **SPV HRD review kualifikasi lalu menyetujui** → `Approved` (tanpa cek kuota). Satu tahap, `isHRSupervisor` (role supervisor/admin modul `hris`) adalah pemberi persetujuan **final** — lihat perubahan 2026-07-22 di bawah
+- **Tahap Direktur dihapus** (PR #609/#466, 2026-07-22). Status `HR Reviewed` masih ada di enum tapi **tidak diproduksi lagi**; dipertahankan supaya requisition lama yang terlanjur menggantung di status itu tetap bisa diselesaikan SPV HRD lewat endpoint yang sama. Field `director_approver`/`director_approver_name`/`director_note` disimpan sebagai **riwayat** persetujuan lama, tak diisi lagi, tanpa migrasi MongoDB
+- Alasan penolakan kini ditulis ke `hr_reviewer`/`hr_note` (dulu `director_note`), karena SPV HRD yang menolak
 
 ### Job Posting & Sourcing
 - Buka/tutup lowongan; catat sumber pelamar (utama: **Glints/TapLoker**, referral, walk-in, bootcamp)
+- **Tanpa rentang gaji.** Field `min_salary`/`max_salary` dihapus dari model, DTO publik, dan UI (PR #608/#465/career-bharata #2, 2026-07-22) — lowongan tidak menampilkan kisaran gaji ke pelamar. Data lama di dokumen `job_postings` dibiarkan jadi field yatim (tanpa migrasi). Tidak menyentuh `expected_salary`/`current_salary` kandidat maupun `gaji_pokok` offer
 
 ### Candidate Management
 - CRUD pelamar + pelacakan `progress` (tahap) & `status` (keadaan) — enum mengikuti rekaman HRD
@@ -78,7 +81,7 @@
 
 **Slices (commit per slice, TDD):** 1) scaffold + wiring + pipeline enums → 2) requisition + approval → 3) posting → 4) candidate + CV + advance → 5) stage records → 6) offer + hire→`/onboarding/register` → 7) notif internal + audit.
 
-**Deviasi tercatat:** CV ke **MinIO langsung** (prefix `recruitment/`, pola task-management) bukan via File Service; **"Direktur" = `hris` admin/Secretary**; onboarding handoff hanya **mengaktifkan akun** (pembuatan data master karyawan = di luar MVP).
+**Deviasi tercatat:** CV ke **MinIO langsung** (prefix `recruitment/`, pola task-management) bukan via File Service; **"Direktur" = `hris` admin/Secretary** (*tahap ini dihapus 2026-07-22 — lihat Job Requisition di atas*); onboarding handoff hanya **mengaktifkan akun** (pembuatan data master karyawan = di luar MVP).
 
 **Saat `/sync-docs` nanti:** status dok ini + [[HRIS - Recruitment]] → ⚠️/✅; daftarkan `recruitment_db` di [[DB - Overview and Notes]]; port di [[IT - Environment Inventory]]; tak ada cron/job (N/A di [[IT - Background Jobs & Schedulers]]).
 
