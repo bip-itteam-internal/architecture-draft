@@ -1,33 +1,42 @@
-"""Orkestrasi: scan vault, diff incremental, rakit dan tulis VAULT-INDEX.json."""
+"""Orkestrasi: scan vault, diff incremental, rakit dan tulis VAULT-INDEX.json.
+
+Ringkasan LLM dibuat oleh Claude Code sendiri, lewat tiga langkah CLI (bukan
+panggilan API dari modul ini -- modul ini tidak pernah menyentuh jaringan):
+
+    1. --daftar-tugas   tulis VAULT-INDEX.tugas.json (dokumen yang perlu diringkas)
+       (atau, dengan --pecah N, beberapa VAULT-INDEX.tugas.NNN.json berdiri
+       sendiri, untuk difan-out ke banyak subagent paralel)
+    2. (Claude Code membaca berkas itu, menulis VAULT-INDEX.hasil.json,
+       atau satu VAULT-INDEX.hasil.NNN.json per subagent bila dipecah)
+    3. --serap          baca hasil (satu berkas atau gabungan banyak berkas
+       bernomor), tulis VAULT-INDEX.json
+
+Tanpa flag: rakit manifest hanya dari ringkasan yang sudah ada (plus stub).
+"""
 
 import argparse
 import json
-import os
-import time
-from datetime import date, datetime, timezone
+from datetime import date
 from pathlib import Path
 
-import anthropic
-
-from .parsing import ekstrak_status, ekstrak_wikilink, hitung_hash
+from .parsing import ekstrak_status, ekstrak_wikilink, hitung_hash, potong_untuk_llm
 from .paths import klasifikasi_path
-from .summarize import MODEL, ambil_hasil, ringkas_stub, submit_batch
+from .summarize import PANDUAN_AGENT, _parse_isi_pesan, ringkas_stub
 
 VERSI_SKEMA = 1
 NAMA_INDEX = "VAULT-INDEX.json"
+NAMA_TUGAS = "VAULT-INDEX.tugas.json"
+NAMA_HASIL = "VAULT-INDEX.hasil.json"
 
-# Sidecar sementara: batch_id + peta custom_id->path. Ditulis DUA TAHAP:
-#   1. "submitting" (batch_id null) -- SEBELUM submit_batch dipanggil sama
-#      sekali, supaya peta custom_id->path sudah aman di disk sebelum ada
-#      kemungkinan uang terpakai (create() bisa sukses di server tapi
-#      exception terjadi sebelum nilainya kembali ke kita -- timeout baca
-#      respons, KeyboardInterrupt, retry SDK tanpa idempotency key).
-#   2. "submitted" (batch_id terisi) -- SEGERA setelah submit_batch kembali,
-#      sebelum polling yang bisa berjalan sampai 24 jam dimulai.
-# Kalau proses mati di tengah polling, sidecar ini satu-satunya cara
-# melanjutkan tanpa mensubmit (dan membayar) batch baru. Bukan isi vault ->
-# masuk .gitignore.
-NAMA_SIDECAR = "VAULT-INDEX.batch.json"
+# Pola glob untuk berkas potongan bernomor (VAULT-INDEX.tugas.NNN.json /
+# VAULT-INDEX.hasil.NNN.json). Diturunkan dari NAMA_TUGAS/NAMA_HASIL supaya
+# tidak ada dua sumber kebenaran untuk nama dasarnya. `*` glob TIDAK cocok
+# dengan berkas tunggal tanpa nomor (mis. "VAULT-INDEX.tugas.json") --
+# butuh minimal satu karakter di antara "tugas." dan ".json" -- jadi pola
+# ini murni menyasar potongan, dan berkas tunggal ditangani terpisah di
+# tiap tempat yang butuh (lihat _temukan_berkas_hasil).
+POLA_TUGAS_POTONGAN = Path(NAMA_TUGAS).stem + ".*.json"
+POLA_HASIL_POTONGAN = Path(NAMA_HASIL).stem + ".*.json"
 
 
 def scan_vault(root: Path) -> list[dict]:
@@ -75,7 +84,7 @@ def muat_index(path: Path) -> dict | None:
 def pilih_yang_perlu_diringkas(
     entri: list[dict], lama: dict | None, full: bool = False
 ) -> list[dict]:
-    """Pilih dokumen yang perlu panggilan LLM.
+    """Pilih dokumen yang perlu ringkasan baru.
 
     Dipilih bila: --full, atau belum ada di index lama, atau hash berubah,
     atau ringkasan sebelumnya null (percobaan sebelumnya gagal).
@@ -129,209 +138,464 @@ def _peringatan_folder_tak_dikenal(entri: list[dict]) -> list[str]:
     return [e["path"] for e in entri if e["jenis"] is None]
 
 
-class SidecarRusak(Exception):
-    """Sidecar ADA tapi tidak bisa dipakai (JSON tak valid atau key wajib
-    hilang) -- beda dari 'tidak ada'.
+def _panduan_untuk_agent() -> str:
+    """Instruksi lengkap untuk agent yang membaca `--daftar-tugas` (mode satu
+    berkas, tanpa --pecah).
 
-    Menyamakan keduanya (dua-duanya jadi None) adalah bug: gerbang deteksi
-    batch tertinggal hanya menyala bila hasil `_muat_sidecar` bukan None,
-    jadi sidecar rusak akan LOLOS gerbang itu dan proses mensubmit batch
-    baru padahal batch lama (yang sudah dibayar) belum tentu sudah diambil.
-    Dengan exception ini, pemanggil WAJIB menangani kasus rusak secara
-    eksplisit dan berbeda dari kasus tidak-ada.
+    Sumber tunggal kebenaran: `PANDUAN_AGENT` (summarize.py) -- konstanta
+    berdiri sendiri yang menjelaskan gaya ringkasan DAN kontrak keluaran
+    (nama berkas, bentuk JSON, kewajiban menyalin `hash`). Lihat docstring
+    `PANDUAN_AGENT` untuk alasan kenapa ini bukan turunan `_TEMPLATE`.
     """
-
-    def __init__(self, path: Path, mentah: str):
-        self.path = path
-        self.mentah = mentah
-        super().__init__(f"sidecar rusak: {path}")
+    return PANDUAN_AGENT
 
 
-def _tulis_sidecar(
-    path_sidecar: Path,
-    batch_id: str | None,
-    tugas: list[dict],
-    status: str = "submitted",
-) -> None:
-    """Simpan status + batch_id (boleh None) + peta custom_id->path.
+def _panduan_untuk_potongan(nomor: int, total: int, berkas_keluaran: str) -> str:
+    """Panduan berdiri sendiri untuk SATU potongan (`--pecah`).
 
-    Dipanggil dua kali per submit baru (lihat komentar `NAMA_SIDECAR`):
-    sekali dengan `status="submitting"` dan `batch_id=None` SEBELUM
-    `submit_batch` dipanggil, sekali lagi dengan `status="submitted"` dan
-    `batch_id` terisi SEGERA setelah `submit_batch` kembali. Jalur
-    `--batch-id` yang menerima sidecar `submitting` juga memanggil ini untuk
-    merekam batch_id yang dimasukkan manual.
+    Subagent yang menangani potongan ini hanya membaca berkas potongan itu
+    sendiri -- tidak ada konteks lain -- jadi catatan posisi + override nama
+    berkas keluaran ditaruh di ATAS panduan gaya umum (`PANDUAN_AGENT`).
 
-    Peta custom_id->path wajib ada di sini SEJAK panggilan pertama: peta itu
-    dibangun di memori saat submit dan akan hilang total kalau proses mati.
-    Tanpanya, hasil batch yang masih ada di server Anthropic (sampai 29
-    hari) tidak bisa dipetakan balik ke dokumen mana pun -- batch_id saja
-    tidak cukup.
-
-    Ditulis ATOMIC: tulis ke berkas sementara di direktori yang SAMA, flush +
-    fsync supaya isinya benar-benar di disk, baru `os.replace` (atomic di
-    POSIX maupun Windows) ke nama akhir. Ini membuat sidecar rusak-separuh
-    mustahil terjadi -- proses yang mati kapan pun sebelum `os.replace` cuma
-    meninggalkan berkas `.tmp-*`, bukan `NAMA_SIDECAR` yang setengah tertulis
-    (yang justru melumpuhkan gerbangnya sendiri lewat `SidecarRusak`).
+    SENGAJA bukan substring-replace ke teks `PANDUAN_AGENT` (mis. mengganti
+    kemunculan `NAMA_HASIL` di sana): itu rapuh terhadap perubahan wording di
+    masa depan pada `summarize.py` -- kalau substring-nya tidak lagi cocok
+    persis, `.replace()` diam-diam tidak melakukan apa-apa, dan panduan yang
+    dibaca agent tetap menyebut nama berkas default yang SALAH. Menambahkan
+    catatan override di depan tidak punya mode gagal senyap seperti itu.
     """
-    data = {
-        "status": status,
-        "batch_id": batch_id,
-        "disubmit_pada": datetime.now(timezone.utc).isoformat(),
-        "tugas": [{"custom_id": t["custom_id"], "path": t["path"]} for t in tugas],
-    }
-    isi = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
-    tmp = path_sidecar.with_name(f"{path_sidecar.name}.tmp-{os.getpid()}")
-    try:
-        with open(tmp, "w", encoding="utf-8") as f:
-            f.write(isi)
-            f.flush()
-            os.fsync(f.fileno())
-        os.replace(tmp, path_sidecar)
-    except BaseException:
-        tmp.unlink(missing_ok=True)
-        raise
-
-
-def _cetak_pemulihan_sidecar_gagal(
-    exc: BaseException,
-    path_sidecar: Path,
-    root: Path,
-    batch_id: str | None,
-    tugas: list[dict],
-    tahap: str,
-) -> None:
-    """Cetak blok pemulihan saat `_tulis_sidecar` gagal dengan exception
-    APA PUN (Perbaikan 2 -- bukan cuma `OSError`: `KeyboardInterrupt` dan
-    `TypeError` dibuktikan lolos lewat `except OSError` yang lama).
-
-    Dipanggil di KEDUA titik penulisan sidecar. `batch_id=None` berarti ini
-    terjadi SEBELUM `submit_batch` dipanggil -- belum ada uang terpakai,
-    aman untuk memperbaiki lalu mengulang. `batch_id` terisi berarti
-    `submit_batch` SUDAH sukses -- uang SUDAH terpakai, satu-satunya jalan
-    pulih adalah menyalin blok JSON di stdout ini jadi `NAMA_SIDECAR` manual
-    lalu melanjutkan dengan `--batch-id`.
-
-    Pemanggil WAJIB `raise` (bukan menelan) setelah memanggil ini --
-    `KeyboardInterrupt`/`SystemExit` harus tetap menghentikan proses.
-    """
-    peta = [{"custom_id": t["custom_id"], "path": t["path"]} for t in tugas]
-    if batch_id is None:
-        print(
-            f"GAGAL menulis sidecar intent {path_sidecar} {tahap}: {exc}\n"
-            f"Belum ada batch yang tersubmit di titik ini -- aman untuk "
-            f"memperbaiki masalah penulisan berkas ini lalu menjalankan "
-            f"ulang.\n"
-            f"Peta custom_id->path yang seharusnya tercatat (referensi bila "
-            f"submit tetap sempat terjadi di server sebelum proses ini "
-            f"berhenti):\n"
-            f"{json.dumps(peta, ensure_ascii=False, indent=2)}"
-        )
-        return
-    pemulihan = {
-        "status": "submitted",
-        "batch_id": batch_id,
-        "disubmit_pada": datetime.now(timezone.utc).isoformat(),
-        "tugas": peta,
-    }
-    print(
-        f"GAGAL menulis sidecar {path_sidecar} {tahap}: {exc}\n"
-        f"PENTING: batch {batch_id} SUDAH tersubmit dan SUDAH dibayar -- "
-        f"jangan submit ulang. Salin blok JSON di bawah ini persis apa "
-        f"adanya, simpan sebagai {NAMA_SIDECAR} di {root}, lalu lanjutkan "
-        f"dengan:\n"
-        f"  python Tools/build-vault-index.py --batch-id {batch_id}\n"
-        f"--- SALIN DARI BARIS DI BAWAH INI ---\n"
-        f"{json.dumps(pemulihan, ensure_ascii=False, indent=2)}\n"
-        f"--- SAMPAI BARIS DI ATAS INI ---"
+    return (
+        f"## Kamu mengerjakan potongan {nomor} dari {total}\n\n"
+        "Daftar tugas ini dipecah supaya beberapa agent bisa mengerjakannya "
+        "paralel. Potongan lain ditangani agent lain -- JANGAN membaca atau "
+        "menunggu berkas potongan lain, cukup kerjakan `tugas` di bawah ini.\n\n"
+        f"**Berkas keluaran WAJIB untuk potongan ini: `{berkas_keluaran}`** "
+        f"(BUKAN `{NAMA_HASIL}` yang disebut di panduan gaya di bawah -- itu "
+        "nama default untuk mode tanpa pemecahan. Subagent lain menulis ke "
+        "berkas hasil masing-masing dengan nama berbeda supaya tidak saling "
+        "menimpa; `--serap` nanti menggabungkan seluruhnya).\n\n"
+        "---\n\n"
+        f"{PANDUAN_AGENT}"
     )
 
 
-def _muat_sidecar(path_sidecar: Path) -> dict | None:
-    """Muat sidecar. Tidak ada -> None. ADA tapi rusak (JSON tak valid atau
-    key wajib hilang) -> raise `SidecarRusak`, BUKAN None.
+def _tandai_perlu_dan_stub(entri: list[dict], lama: dict | None) -> set[str]:
+    """Set ringkasan baseline untuk seluruh entri: carry-forward dokumen yang
+    tidak perlu diringkas ulang, null untuk yang perlu, lalu terapkan
+    `ringkas_stub` untuk dokumen 🔴 Stub (menimpa null ATAU carry-forward --
+    stub tidak pernah butuh LLM, di jalur apa pun).
 
-    Jangan pernah menebak isi sidecar yang rusak; pemanggil harus berhenti
-    dengan pesan jelas (memuat isi mentah supaya bisa diselamatkan manual),
-    bukan melanjutkan dengan asumsi seolah sidecar tak pernah ada.
+    Mengembalikan path dokumen yang perlu diringkas ulang (`perlu`), supaya
+    pemanggil bisa membedakan mana yang masih genuinely butuh ringkasan baru.
     """
-    if not path_sidecar.exists():
-        return None
+    perlu_paths = {e["path"] for e in pilih_yang_perlu_diringkas(entri, lama)}
+    sebelumnya = {d["path"]: d for d in (lama or {}).get("dokumen", [])}
+
+    for e in entri:
+        if e["path"] in perlu_paths:
+            e["ringkasan"] = None
+            e["kata_kunci"] = []
+        else:
+            d = sebelumnya.get(e["path"], {})
+            e["ringkasan"] = d.get("ringkasan")
+            e["kata_kunci"] = d.get("kata_kunci", [])
+        if e["status_emoji"] == "🔴":
+            e.update(ringkas_stub(e["judul"]))
+
+    return perlu_paths
+
+
+def _tulis_index(entri: list[dict], root: Path) -> dict:
+    index = rakit_index(entri)
+    path_index = root / NAMA_INDEX
+    path_index.write_text(
+        json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    print(f"Ditulis: {path_index} ({index['jumlah_dokumen']} dokumen)")
+
+    for p in _peringatan_status(entri):
+        print(f"  PERINGATAN status hilang: {p}")
+    for p in _peringatan_folder_tak_dikenal(entri):
+        print(f"  PERINGATAN folder tak dikenal (publik=False): {p}")
+
+    return index
+
+
+# --- Perubahan A: --pecah N pada --daftar-tugas -----------------------------
+
+
+def _tipe_pecah(nilai: str) -> int:
+    """Validator argparse untuk --pecah: integer >= 1."""
     try:
-        mentah = path_sidecar.read_text(encoding="utf-8")
-    except OSError:
-        return None
+        n = int(nilai)
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"--pecah harus berupa integer, dapat: {nilai!r}"
+        )
+    if n < 1:
+        raise argparse.ArgumentTypeError("--pecah harus >= 1")
+    return n
+
+
+def _bersihkan_potongan_tugas(root: Path) -> int:
+    """Hapus VAULT-INDEX.tugas.NNN.json lama sebelum menulis yang baru.
+
+    Run sebelumnya bisa saja menghasilkan lebih banyak potongan daripada run
+    sekarang (mis. 10 lalu 3) -- sisa potongan basi HARUS dihapus, bukan
+    dibiarkan tersebar dan diserap belakangan sebagai hasil yang sudah tidak
+    relevan. Hanya menyasar potongan BERNOMOR -- BUKAN VAULT-INDEX.tugas.json
+    tunggal (mode tanpa --pecah), yang siklus hidupnya diatur --serap.
+    """
+    lama = sorted(root.glob(POLA_TUGAS_POTONGAN))
+    for p in lama:
+        try:
+            p.unlink()
+        except OSError as exc:
+            print(f"PERINGATAN: gagal menghapus potongan lama {p}: {exc}")
+    return len(lama)
+
+
+def _tulis_tugas_terpecah(tugas: list[dict], pecah: int, root: Path) -> int:
+    """Tulis --pecah N potongan berdiri sendiri di akar vault.
+
+    Selalu ditulis ke `root` dengan nama default bernomor -- BUKAN mengikuti
+    PATH custom yang mungkin diberikan ke --daftar-tugas -- karena --serap
+    (tanpa PATH) menemukan berkas hasil lewat pola nama tetap yang berpadanan
+    (lihat _temukan_berkas_hasil); PATH custom akan memutus pemadanan itu.
+    """
+    dihapus = _bersihkan_potongan_tugas(root)
+    if dihapus:
+        print(f"Dihapus {dihapus} potongan tugas lama.")
+    else:
+        print("Tidak ada potongan tugas lama untuk dihapus.")
+
+    if not tugas:
+        print("Tidak ada dokumen yang perlu diringkas. Tidak ada potongan ditulis.")
+        return 0
+
+    kelompok = [tugas[i:i + pecah] for i in range(0, len(tugas), pecah)]
+    total = len(kelompok)
+    root.mkdir(parents=True, exist_ok=True)
+
+    for idx, chunk in enumerate(kelompok, start=1):
+        nomor = f"{idx:03d}"
+        berkas_keluaran = f"{Path(NAMA_HASIL).stem}.{nomor}.json"
+        data = {
+            "versi_skema": VERSI_SKEMA,
+            "jumlah": len(chunk),
+            "potongan": idx,
+            "total_potongan": total,
+            "berkas_keluaran": berkas_keluaran,
+            "panduan": _panduan_untuk_potongan(idx, total, berkas_keluaran),
+            "tugas": chunk,
+        }
+        p = root / f"{Path(NAMA_TUGAS).stem}.{nomor}.json"
+        p.write_text(
+            json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+        print(f"Ditulis: {p} ({len(chunk)} dokumen, potongan {idx}/{total})")
+
+    print(f"{len(tugas)} dokumen dipecah jadi {total} potongan di {root}.")
+    return 0
+
+
+def _mode_daftar_tugas(
+    entri: list[dict], lama: dict | None, path_tugas: Path, root: Path,
+    full: bool, pecah: int | None,
+) -> int:
+    perlu = pilih_yang_perlu_diringkas(entri, lama, full=full)
+    tugas = [
+        {
+            "path": e["path"],
+            "judul": e["judul"],
+            "jenis": e["jenis"],
+            "hash": e["hash"],
+            "isi": potong_untuk_llm(e["_isi"]),
+        }
+        for e in perlu
+        if e["status_emoji"] != "🔴"  # stub ditangani lokal oleh ringkas_stub
+    ]
+
+    if pecah is not None:
+        return _tulis_tugas_terpecah(tugas, pecah, root)
+
+    data = {
+        "versi_skema": VERSI_SKEMA,
+        "jumlah": len(tugas),
+        "panduan": _panduan_untuk_agent(),
+        "tugas": tugas,
+    }
+    path_tugas.parent.mkdir(parents=True, exist_ok=True)
+    path_tugas.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    if tugas:
+        print(f"{len(tugas)} dokumen perlu diringkas. Ditulis: {path_tugas}")
+    else:
+        print(f"Tidak ada dokumen yang perlu diringkas. Ditulis: {path_tugas} (tugas: [])")
+    return 0
+
+
+# --- Perubahan B: --serap menggabungkan banyak berkas hasil -----------------
+
+
+def _artefak_potongan_tersisa(root: Path) -> list[Path]:
+    """Seluruh berkas potongan bernomor (tugas + hasil) yang masih ada."""
+    return sorted(root.glob(POLA_TUGAS_POTONGAN)) + sorted(root.glob(POLA_HASIL_POTONGAN))
+
+
+def _temukan_berkas_hasil(root: Path) -> list[Path]:
+    """Temukan berkas hasil untuk --serap TANPA PATH eksplisit.
+
+    Seluruh VAULT-INDEX.hasil.NNN.json (urut nama, hasil fan-out --pecah),
+    PLUS VAULT-INDEX.hasil.json tunggal bila ada (mode lama / tanpa pemecahan).
+    """
+    berkas = sorted(root.glob(POLA_HASIL_POTONGAN))
+    tunggal = root / NAMA_HASIL
+    if tunggal.exists():
+        berkas.append(tunggal)
+    return berkas
+
+
+def _muat_berkas_hasil(p: Path) -> tuple[dict | None, str | None]:
+    """Muat + validasi bentuk SATU berkas hasil.
+
+    (peta_hasil, None) sukses -- (None, pesan) gagal, pesan sudah termasuk
+    detail supaya operator tahu berkas mana yang salah dan kenapa. Rusak
+    bukan berarti kosong: pemanggil TIDAK boleh memperlakukan None sebagai
+    {} (nol diserap) -- itu persis skenario yang dulu membuang 210 ringkasan.
+    """
+    try:
+        mentah = p.read_text(encoding="utf-8")
+    except OSError as exc:
+        return None, f"tidak bisa dibaca: {exc}"
     try:
         data = json.loads(mentah)
     except json.JSONDecodeError as exc:
-        raise SidecarRusak(path_sidecar, mentah) from exc
-    if not isinstance(data, dict) or "batch_id" not in data or "tugas" not in data:
-        raise SidecarRusak(path_sidecar, mentah)
-    return data
+        return None, f"tidak bisa diparse sebagai JSON: {exc}"
+
+    if not isinstance(data, dict) or not isinstance(data.get("hasil"), dict):
+        return None, (
+            'bentuknya salah. Diharapkan objek JSON level atas dengan key '
+            '"hasil" berisi peta path -> {"ringkasan": ..., "kata_kunci": '
+            '[...], "hash": ...}. Contoh:\n'
+            '  {"hasil": {"Sales/Sales - A.md": {"ringkasan": "...", '
+            '"kata_kunci": ["..."], "hash": "..."}}}'
+        )
+    return data["hasil"], None
 
 
-def _tunggu_batch_dengan_deadline(
-    client, batch_id: str, batas_tunggu_menit: int, interval: int = 30
-) -> bool:
-    """Poll status batch dengan batas waktu, TANPA pernah membuang batch_id.
+def _gabung_berkas_hasil(berkas_list: list[Path]) -> tuple[dict | None, int]:
+    """Muat + gabungkan banyak berkas hasil.
 
-    Beda dari `summarize.ambil_hasil` (menunggu tanpa batas): fungsi ini
-    hanya mengecek `processing_status` dan berhenti begitu 'ended' (True)
-    atau begitu batas waktu terlampaui (False). Baik hasil True maupun
-    False, batch_id tidak hilang -- sidecar sudah ditulis oleh pemanggil
-    sebelum fungsi ini dipanggil, jadi keduanya sama-sama pulih via
-    `--batch-id`.
+    Dua aturan fail-closed, keduanya menolak SELURUH operasi (bukan
+    melewati/memakai sebagian):
 
-    Batas waktu dihitung dari akumulasi `interval` yang "ditidurkan", bukan
-    jam dinding. Ini sengaja: cukup untuk deadline praktis, dan bisa diuji
-    hanya dengan menambal `time.sleep` -- konsisten dengan gaya
-    `ambil_hasil` di summarize.py -- tanpa perlu menambal jam sistem juga.
+    1. Bentuk salah pada SATU berkas -> tolak seluruhnya. "Rusak bukan
+       berarti kosong" -- satu berkas rusak di antara sepuluh tidak boleh
+       diam-diam diperlakukan seolah berkas itu {} (nol entri).
+    2. Path dokumen yang sama muncul di lebih dari satu berkas -> konflik ->
+       tolak seluruhnya. Diam-diam memakai yang terakhir akan menyembunyikan
+       bug di sisi pemecahan (dua subagent kebetulan meringkas dokumen sama).
     """
-    batas_detik = batas_tunggu_menit * 60
-    terlewat = 0
-    while True:
-        batch = client.messages.batches.retrieve(batch_id)
-        if batch.processing_status == "ended":
-            return True
-        if terlewat >= batas_detik:
-            return False
-        time.sleep(interval)
-        terlewat += interval
+    per_berkas: list[tuple[Path, dict]] = []
+    for p in berkas_list:
+        hasil, pesan_error = _muat_berkas_hasil(p)
+        if hasil is None:
+            print(f"GAGAL: berkas hasil {p} {pesan_error}")
+            print(
+                "Manifest TIDAK ditulis, tidak ada berkas yang dihapus. "
+                "Perbaiki bentuk berkas hasil lalu jalankan --serap lagi."
+            )
+            return None, 1
+        per_berkas.append((p, hasil))
+
+    sumber: dict[str, list[str]] = {}
+    for p, hasil in per_berkas:
+        for path_dok in hasil:
+            sumber.setdefault(path_dok, []).append(p.name)
+
+    konflik = {k: v for k, v in sumber.items() if len(v) > 1}
+    if konflik:
+        print(
+            f"GAGAL: {len(konflik)} path dokumen konflik -- muncul di lebih dari "
+            "satu berkas hasil (kemungkinan dua subagent kebetulan meringkas "
+            "dokumen yang sama):"
+        )
+        for path_dok, files in konflik.items():
+            print(f"  - {path_dok}: {', '.join(files)}")
+        print("Manifest TIDAK ditulis, tidak ada berkas yang dihapus.")
+        return None, 1
+
+    gabungan: dict = {}
+    for _, hasil in per_berkas:
+        gabungan.update(hasil)
+    return gabungan, 0
 
 
-def _pesan_deadline_terlampaui(batch_id: str, path_sidecar: Path, menit: int) -> str:
-    return (
-        f"GAGAL: batch {batch_id} belum 'ended' setelah {menit} menit. "
-        f"batch_id TIDAK hilang -- sidecar {path_sidecar} tetap ada. "
-        f"Lanjutkan nanti dengan:\n"
-        f"  python Tools/build-vault-index.py --batch-id {batch_id}"
+def _mode_serap(
+    entri: list[dict], lama: dict | None, root: Path, path_eksplisit: Path | None,
+) -> int:
+    if path_eksplisit is not None:
+        if not path_eksplisit.exists():
+            print(
+                f"GAGAL: berkas hasil {path_eksplisit} tidak ditemukan. Jalankan "
+                f"--daftar-tugas, buat ringkasannya, baru --serap."
+            )
+            return 1
+        berkas_list = [path_eksplisit]
+    else:
+        berkas_list = _temukan_berkas_hasil(root)
+        if not berkas_list:
+            print(
+                f"GAGAL: tidak ada berkas hasil ditemukan di {root} (pola "
+                f"{NAMA_HASIL} atau {POLA_HASIL_POTONGAN}). Langkah 2 (Claude "
+                "Code meringkas, menulis berkas hasil) belum dikerjakan -- "
+                "jalankan --daftar-tugas dulu, buat ringkasannya, baru --serap."
+            )
+            return 1
+
+    hasil, kode_gagal = _gabung_berkas_hasil(berkas_list)
+    if hasil is None:
+        return kode_gagal
+
+    _tandai_perlu_dan_stub(entri, lama)
+    entri_by_path = {e["path"]: e for e in entri}
+
+    diterima = ditolak = basi = tak_ditemukan = 0
+    peringatan_tanpa_hash_dicetak = False
+
+    for path, entri_hasil in hasil.items():
+        e = entri_by_path.get(path)
+        if e is None:
+            print(f"  PERINGATAN: path di hasil tidak ada di vault, dilewati: {path}")
+            tak_ditemukan += 1
+            continue
+
+        parsed = _parse_isi_pesan(json.dumps(entri_hasil))
+        if parsed is None:
+            print(f"  DITOLAK (ringkasan/kata_kunci tidak valid): {path}")
+            ditolak += 1
+            continue
+
+        hash_hasil = entri_hasil.get("hash")
+        if hash_hasil is not None:
+            if hash_hasil != e["hash"]:
+                print(f"  BASI (hash tidak cocok dengan dokumen saat ini, dilewati): {path}")
+                basi += 1
+                continue
+        elif not peringatan_tanpa_hash_dicetak:
+            print(
+                "  PERINGATAN: entri hasil tanpa 'hash' -- diterima tanpa "
+                "verifikasi kebasian."
+            )
+            peringatan_tanpa_hash_dicetak = True
+
+        e["ringkasan"] = parsed["ringkasan"]
+        e["kata_kunci"] = parsed["kata_kunci"]
+        diterima += 1
+
+    index = _tulis_index(entri, root)
+
+    print(
+        f"Diserap: {diterima}, ditolak: {ditolak}, basi: {basi}, "
+        f"tak ditemukan di vault: {tak_ditemukan}, masih gagal: {len(index['gagal'])}"
     )
+
+    # artefak sementara -- hapus HANYA bila serap bersih total (tanpa entri
+    # ditolak/basi/tak-ditemukan). Sebagian gagal berarti operator masih
+    # perlu memperbaiki hasil.json dan menjalankan ulang --serap; menghapus
+    # artefak di titik itu membuang bukti dan memaksa mengulang seluruh sesi
+    # ringkasan dari nol. Cakupan pembersihan MENCAKUP seluruh berkas
+    # potongan tugas dan hasil (bukan cuma dua nama tetap) -- run --pecah
+    # sebelumnya bisa saja meninggalkan potongan yang tidak lagi relevan
+    # begitu manifest gabungan berhasil ditulis.
+    if ditolak or basi or tak_ditemukan:
+        nama_berkas = ", ".join(str(p) for p in berkas_list)
+        print(
+            f"Artefak dipertahankan ({nama_berkas}) -- ada entri "
+            f"ditolak/basi/tak ditemukan. Perbaiki lalu jalankan --serap lagi."
+        )
+    else:
+        artefak = set(berkas_list)
+        artefak.add(root / NAMA_TUGAS)
+        artefak.add(root / NAMA_HASIL)
+        artefak.update(root.glob(POLA_TUGAS_POTONGAN))
+        artefak.update(root.glob(POLA_HASIL_POTONGAN))
+        for p in sorted(artefak):
+            if p.exists():
+                try:
+                    p.unlink()
+                    print(f"Dihapus: {p}")
+                except OSError as exc:
+                    print(f"PERINGATAN: gagal menghapus {p}: {exc}")
+
+    if index["gagal"]:
+        print(f"\n{len(index['gagal'])} dokumen masih belum punya ringkasan:")
+        for p in index["gagal"]:
+            print(f"  - {p}")
+        return 1
+    return 0
+
+
+def _mode_default(entri: list[dict], lama: dict | None, root: Path) -> int:
+    _tandai_perlu_dan_stub(entri, lama)
+    index = _tulis_index(entri, root)
+
+    if index["gagal"]:
+        print(f"\n{len(index['gagal'])} dokumen belum punya ringkasan:")
+        for p in index["gagal"]:
+            print(f"  - {p}")
+        print(
+            "\nLangkah berikutnya: python Tools/build-vault-index.py --daftar-tugas"
+        )
+        return 1
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Bangun VAULT-INDEX.json")
     ap.add_argument("--full", action="store_true", help="regen semua, abaikan hash")
-    ap.add_argument("--check", action="store_true",
-                    help="exit 1 bila index basi, tanpa menulis")
     ap.add_argument("--root", default=".", help="akar vault")
-    ap.add_argument("--batch-id", default=None,
-                     help="lanjutkan batch yang sudah tersubmit (lewati submit ulang)")
-    ap.add_argument("--abaikan-batch-tertinggal", action="store_true",
-                     help="submit batch baru walau ada sidecar batch tertinggal")
-    ap.add_argument("--batas-tunggu-menit", type=int, default=90,
-                     help="batas waktu polling batch dalam menit (default 90)")
+    ap.add_argument(
+        "--pecah", type=_tipe_pecah, default=None, metavar="N",
+        help=(
+            "pakai bersama --daftar-tugas: pecah jadi berkas bernomor "
+            f"{Path(NAMA_TUGAS).stem}.NNN.json, N dokumen per potongan, "
+            "untuk difan-out ke banyak subagent"
+        ),
+    )
+
+    mode = ap.add_mutually_exclusive_group()
+    mode.add_argument("--check", action="store_true",
+                       help="exit 1 bila index basi, tanpa menulis")
+    mode.add_argument(
+        "--daftar-tugas", nargs="?", const="", default=None, metavar="PATH",
+        help=f"tulis dokumen yang perlu diringkas ke PATH (default {NAMA_TUGAS} di akar vault)",
+    )
+    mode.add_argument(
+        "--serap", nargs="?", const="", default=None, metavar="PATH",
+        help=(
+            f"serap ringkasan dari PATH, atau (tanpa PATH) gabungkan seluruh "
+            f"{NAMA_HASIL} dan {POLA_HASIL_POTONGAN} yang ditemukan di akar "
+            f"vault, tulis {NAMA_INDEX}"
+        ),
+    )
     args = ap.parse_args(argv)
 
     root = Path(args.root).resolve()
     path_index = root / NAMA_INDEX
-    path_sidecar = root / NAMA_SIDECAR
 
     entri = scan_vault(root)
     lama = muat_index(path_index)
-    perlu = pilih_yang_perlu_diringkas(entri, lama, full=args.full)
 
     if args.check:
+        perlu = pilih_yang_perlu_diringkas(entri, lama, full=args.full)
+        tersisa = _artefak_potongan_tersisa(root)
+        if tersisa:
+            print(f"PERINGATAN: {len(tersisa)} artefak potongan tugas/hasil tertinggal:")
+            for p in tersisa:
+                print(f"  - {p.name}")
         if perlu:
             print(f"BASI: {len(perlu)} dokumen belum terwakili di {NAMA_INDEX}")
             for e in perlu[:10]:
@@ -340,256 +604,14 @@ def main(argv: list[str] | None = None) -> int:
         print(f"SEGAR: {NAMA_INDEX} sinkron dengan {len(entri)} dokumen")
         return 0
 
-    print(f"{len(entri)} dokumen di-scan, {len(perlu)} perlu diringkas")
-
-    # bawa ringkasan lama untuk dokumen yang tidak berubah
-    sebelumnya = {d["path"]: d for d in (lama or {}).get("dokumen", [])}
-    for e in entri:
-        d = sebelumnya.get(e["path"], {})
-        e["ringkasan"] = d.get("ringkasan")
-        e["kata_kunci"] = d.get("kata_kunci", [])
-    entri_by_path = {e["path"]: e for e in entri}
-
-    # 🔴 Stub tidak perlu LLM -- berlaku di KEDUA jalur (submit baru maupun
-    # --batch-id). Vault nyata punya beberapa dokumen stub; kalau loop ini
-    # cuma ada di satu cabang, jalur satunya selalu berakhir dengan stub
-    # ber-ringkasan null (masuk daftar gagal, exit 1) walau tidak ada
-    # yang benar-benar salah.
-    perlu_llm = []
-    for e in perlu:
-        if e["status_emoji"] == "🔴":
-            e.update(ringkas_stub(e["judul"]))
-        else:
-            perlu_llm.append(e)
-
-    if args.batch_id:
-        # --- B2: lanjutkan batch yang sudah tersubmit, tanpa submit ulang ---
-        client = anthropic.Anthropic()
-
-        try:
-            sidecar = _muat_sidecar(path_sidecar)
-        except SidecarRusak as exc:
-            print(
-                f"GAGAL: --batch-id {args.batch_id} diberikan tapi sidecar "
-                f"{NAMA_SIDECAR} di {exc.path} RUSAK (tidak bisa diparse atau "
-                f"bentuknya tak dikenal). Tidak menebak, berhenti.\n"
-                f"Isi mentah sidecar (untuk penyelamatan manual):\n{exc.mentah}"
-            )
-            return 1
-        if sidecar is None:
-            print(
-                f"GAGAL: --batch-id {args.batch_id} diberikan tapi sidecar "
-                f"{NAMA_SIDECAR} tidak ditemukan di {root}. Tidak bisa "
-                f"memetakan hasil batch ke dokumen tanpa itu. Tidak menebak, berhenti."
-            )
-            return 1
-        status_sidecar = sidecar.get("status", "submitted")
-        if status_sidecar == "submitting":
-            # I1 (Perbaikan 1): sidecar intent (batch_id belum tercatat) --
-            # ini JUSTRU skenario pemulihan utama: pengguna menemukan
-            # batch_id secara manual (mis. dashboard/API Anthropic) dan
-            # memasukkannya di sini. Peta custom_id->path di dalamnya sudah
-            # utuh sejak ditulis SEBELUM submit_batch dipanggil -- terima
-            # apa adanya, lalu SEGERA perbarui sidecar jadi status
-            # 'submitted' dengan batch_id itu supaya jejak di disk tetap
-            # konsisten kalau proses ini mati lagi di tengah polling.
-            try:
-                _tulis_sidecar(
-                    path_sidecar, args.batch_id, sidecar["tugas"], status="submitted"
-                )
-            except BaseException as exc:
-                _cetak_pemulihan_sidecar_gagal(
-                    exc, path_sidecar, root, args.batch_id, sidecar["tugas"],
-                    "saat memperbarui sidecar 'submitting' dengan --batch-id",
-                )
-                raise
-            print(
-                f"Sidecar {path_sidecar} diperbarui: status=submitted, "
-                f"batch_id={args.batch_id}"
-            )
-        elif sidecar["batch_id"] != args.batch_id:
-            print(
-                f"GAGAL: sidecar {NAMA_SIDECAR} menyebut batch_id "
-                f"'{sidecar['batch_id']}', bukan '{args.batch_id}' yang diminta. "
-                f"Tidak menebak, berhenti."
-            )
-            return 1
-
-        selesai = _tunggu_batch_dengan_deadline(
-            client, args.batch_id, args.batas_tunggu_menit
+    if args.daftar_tugas is not None:
+        path_tugas = Path(args.daftar_tugas) if args.daftar_tugas else root / NAMA_TUGAS
+        return _mode_daftar_tugas(
+            entri, lama, path_tugas, root, full=args.full, pecah=args.pecah
         )
-        if not selesai:
-            print(_pesan_deadline_terlampaui(
-                args.batch_id, path_sidecar, args.batas_tunggu_menit
-            ))
-            return 1
 
-        hasil = ambil_hasil(client, args.batch_id)
-        for t in sidecar["tugas"]:
-            e = entri_by_path.get(t["path"])
-            if e is None:
-                continue  # dokumen sudah tak ada lagi di vault sejak submit
-            r = hasil.get(t["custom_id"])
-            e["ringkasan"] = r["ringkasan"] if r else None
-            e["kata_kunci"] = r["kata_kunci"] if r else []
+    if args.serap is not None:
+        path_eksplisit = Path(args.serap) if args.serap else None
+        return _mode_serap(entri, lama, root, path_eksplisit)
 
-    else:
-        # --- B3: jaring pengaman -- sidecar tertinggal menghalangi submit baru ---
-        try:
-            sidecar_tertinggal = _muat_sidecar(path_sidecar)
-        except SidecarRusak as exc:
-            # Sidecar RUSAK tidak boleh diperlakukan sama dengan "tidak ada":
-            # ini bisa berarti proses sebelumnya mati SETELAH submit_batch
-            # sukses (uang sudah terpakai) tapi SEBELUM sidecar selesai
-            # ditulis. Selalu blokir -- termasuk saat --abaikan-batch-tertinggal
-            # dipakai, karena flag itu untuk mengabaikan sidecar VALID yang
-            # sudah dibaca dan dipahami risikonya, bukan untuk melewati
-            # sidecar yang bahkan belum bisa dibaca.
-            print(
-                f"GAGAL: sidecar {NAMA_SIDECAR} di {exc.path} ADA tapi RUSAK "
-                f"(tidak bisa diparse atau bentuknya tak dikenal). Ini bisa "
-                f"berarti sebuah batch SUDAH tersubmit (sudah dibayar) dan "
-                f"proses mati sebelum sidecar-nya selesai ditulis. TIDAK "
-                f"mensubmit batch baru sampai ini ditangani manual -- "
-                f"perbaiki atau hapus {exc.path} setelah memastikan tidak "
-                f"ada batch yang belum diambil hasilnya.\n"
-                f"Isi mentah sidecar (untuk penyelamatan manual):\n{exc.mentah}"
-            )
-            return 1
-        if sidecar_tertinggal is not None:
-            status_tertinggal = sidecar_tertinggal.get("status", "submitted")
-            if status_tertinggal == "submitting":
-                # I1 (Perbaikan 1): batch_id BELUM tercatat -- proses
-                # sebelumnya kemungkinan mati TEPAT di sekitar submit.
-                # Beda dari sidecar 'submitted' biasa di bawah: di sini kita
-                # bahkan tidak tahu apakah submit-nya sempat sukses di
-                # server. SELALU blokir -- termasuk saat
-                # --abaikan-batch-tertinggal dipakai, karena flag itu untuk
-                # mengabaikan sidecar VALID yang risikonya sudah dipahami
-                # (batch_id diketahui), bukan status "kita bahkan tidak
-                # tahu" yang justru paling berisiko menyembunyikan batch
-                # yatim yang sudah dibayar.
-                print(
-                    f"GAGAL: sidecar {NAMA_SIDECAR} di {path_sidecar} berstatus "
-                    f"'submitting' -- batch_id BELUM tercatat. Proses sebelumnya "
-                    f"kemungkinan mati TEPAT di sekitar submit: ADA kemungkinan "
-                    f"sebuah batch SUDAH tersubmit dan SUDAH dibayar di server "
-                    f"Anthropic, tapi batch_id-nya belum sempat tersimpan di "
-                    f"sini -- batch itu bisa jadi YATIM (orphan) tanpa jejak "
-                    f"lokal sama sekali. JANGAN submit batch baru sebelum "
-                    f"memeriksa manual apakah ada batch semacam itu (mis. lewat "
-                    f"dashboard/API Anthropic, cek sekitar waktu "
-                    f"{sidecar_tertinggal.get('disubmit_pada')}).\n"
-                    f"Peta custom_id->path (untuk pencocokan manual bila batch "
-                    f"ketemu):\n"
-                    f"{json.dumps(sidecar_tertinggal['tugas'], ensure_ascii=False, indent=2)}\n"
-                    f"Kalau KETEMU batch_id-nya, lanjutkan dengan:\n"
-                    f"  python Tools/build-vault-index.py --batch-id <BATCH_ID>\n"
-                    f"Kalau YAKIN tidak ada batch yang tersubmit (mis. proses "
-                    f"mati sebelum sempat menghubungi server), hapus "
-                    f"{path_sidecar} lalu jalankan ulang."
-                )
-                return 1
-            if not args.abaikan_batch_tertinggal:
-                print(
-                    f"GAGAL: batch tertinggal ditemukan (batch_id="
-                    f"{sidecar_tertinggal['batch_id']}) di {path_sidecar}. Proses "
-                    f"sebelumnya kemungkinan mati sebelum hasilnya diambil. Mensubmit "
-                    f"batch baru sekarang berisiko membayar dua kali.\n"
-                    f"Lanjutkan batch itu dengan:\n"
-                    f"  python Tools/build-vault-index.py --batch-id "
-                    f"{sidecar_tertinggal['batch_id']}\n"
-                    f"Atau, bila memang ingin mengabaikannya dan submit baru:\n"
-                    f"  python Tools/build-vault-index.py --abaikan-batch-tertinggal"
-                )
-                return 1
-
-        if perlu_llm:
-            client = anthropic.Anthropic()
-            tugas = [
-                {"custom_id": f"doc-{i}", "judul": e["judul"],
-                 "jenis": e["jenis"], "isi": e["_isi"], "path": e["path"]}
-                for i, e in enumerate(perlu_llm)
-            ]
-            # I1 (Perbaikan 1): tulis sidecar INTENT (status='submitting',
-            # batch_id null) SEBELUM submit_batch dipanggil sama sekali.
-            # Menutup celah terakhir: kalau create() sukses di server tapi
-            # exception terjadi SEBELUM nilainya kembali ke sini (timeout
-            # baca respons, KeyboardInterrupt, retry SDK yang melahirkan
-            # batch ganda -- anthropic 0.117.0 DEFAULT_MAX_RETRIES=2 tanpa
-            # header idempotency), peta custom_id->path tetap ada di disk
-            # walau batch_id belum diketahui. Tanpa ini, batch berbayar itu
-            # jadi TANPA JEJAK sama sekali di sisi kita.
-            try:
-                _tulis_sidecar(path_sidecar, None, tugas, status="submitting")
-            except BaseException as exc:
-                # I2 (Perbaikan 2): tangkap APA PUN (bukan cuma OSError),
-                # cetak info, lalu naikkan lagi -- KeyboardInterrupt/
-                # SystemExit tetap harus menghentikan proses.
-                _cetak_pemulihan_sidecar_gagal(
-                    exc, path_sidecar, root, None, tugas,
-                    "SEBELUM submit_batch dipanggil",
-                )
-                raise
-            print(f"Sidecar intent ditulis (status=submitting): {path_sidecar}")
-
-            print(f"Submit batch {len(tugas)} dokumen ke {MODEL} ...")
-            batch_id = submit_batch(client, tugas)
-            print(f"Batch id: {batch_id}")
-
-            # I1: sidecar diperbarui jadi status='submitted' SEGERA setelah
-            # submit_batch kembali, sebelum polling (yang bisa berjalan
-            # sampai 24 jam) dimulai.
-            try:
-                _tulis_sidecar(path_sidecar, batch_id, tugas, status="submitted")
-            except BaseException as exc:
-                # I2: uang SUDAH terpakai (submit_batch sukses di atas) dan
-                # sidecar GAGAL ditulis -- tanpa ini, batch_id hilang total
-                # dari disk, dan --batch-id mewajibkan sidecar. Satu-satunya
-                # jalan pulih: cetak semuanya ke stdout dalam bentuk yang
-                # bisa disalin manusia jadi VAULT-INDEX.batch.json. Lalu
-                # tetap naikkan exception -- jangan menelan.
-                _cetak_pemulihan_sidecar_gagal(
-                    exc, path_sidecar, root, batch_id, tugas,
-                    "SETELAH submit_batch sukses",
-                )
-                raise
-            print(f"Sidecar ditulis: {path_sidecar}")
-
-            selesai = _tunggu_batch_dengan_deadline(
-                client, batch_id, args.batas_tunggu_menit
-            )
-            if not selesai:
-                print(_pesan_deadline_terlampaui(
-                    batch_id, path_sidecar, args.batas_tunggu_menit
-                ))
-                return 1
-
-            hasil = ambil_hasil(client, batch_id)
-            for i, e in enumerate(perlu_llm):
-                r = hasil.get(f"doc-{i}")
-                e["ringkasan"] = r["ringkasan"] if r else None
-                e["kata_kunci"] = r["kata_kunci"] if r else []
-
-    index = rakit_index(entri)
-    path_index.write_text(
-        json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
-    print(f"Ditulis: {path_index} ({index['jumlah_dokumen']} dokumen)")
-
-    # B4: hapus sidecar HANYA setelah manifest berhasil ditulis di atas.
-    if path_sidecar.exists():
-        path_sidecar.unlink()
-        print(f"Sidecar dihapus: {path_sidecar}")
-
-    for p in _peringatan_status(entri):
-        print(f"  PERINGATAN status hilang: {p}")
-    for p in _peringatan_folder_tak_dikenal(entri):
-        print(f"  PERINGATAN folder tak dikenal (publik=False): {p}")
-
-    if index["gagal"]:
-        print(f"\nGAGAL diringkas ({len(index['gagal'])}):")
-        for p in index["gagal"]:
-            print(f"  - {p}")
-        return 1
-    return 0
+    return _mode_default(entri, lama, root)

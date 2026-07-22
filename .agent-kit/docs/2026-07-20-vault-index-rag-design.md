@@ -52,7 +52,9 @@ Satu manifest, dua profil konsumen, dibedakan flag `publik` per entri.
 | `Additional documents/` (aset Excalidraw) | 2 | **tidak** | tidak |
 | `API Reference/Shopee Open API v2/` | 149 | **tidak** | tidak |
 
-Total korpus ter-index untuk agent: **217 dokumen** (219 berkas dikurangi 2 aset Excalidraw).
+Total korpus ter-index untuk agent: **217 dokumen** (219 berkas dikurangi 2 aset Excalidraw) **per 2026-07-20**.
+
+> **Angka ini bergerak.** Vault ditulis banyak orang; satu ADR baru dari rekan tim menaikkannya jadi 218 di hari yang sama. Semua angka korpus di dokumen ini adalah potret saat diukur, bukan konstanta. Jangan menjadikannya assertion di tes — pakai `--check` untuk mengetahui angka terkini.
 
 ### Keputusan: `IT/` dikecualikan utuh dari kanal manusia
 
@@ -208,41 +210,64 @@ Bahasa Indonesia, istilah teknis lazim English dibiarkan English, sesuai aturan 
 
 Python dipilih karena vault sudah punya preseden (`setup_shopee.py` di akar, `API Reference/Shopee Open API v2/Tools/*.py`) dan folder `Tools/` per-area sudah jadi konvensi. Vault bukan repo JS, jadi aturan pnpm tim tidak berlaku di sini.
 
+### Siapa yang membuat ringkasan (direvisi 2026-07-20)
+
+Draft awal spec ini memakai **Anthropic Batches API** dengan API key, lengkap dengan pengaman biaya berlapis. **Itu keliru.** Tim memakai **Claude Code Max**, bukan API key, dan langganan itu tidak memberi kredit API; keduanya jalur penagihan yang berbeda dan bahkan bisa bentrok secara kredensial.
+
+Kekeliruannya bukan sekadar salah pilih penyedia. Bagian deterministik desain ini (scan path, parsing status, wikilink, hash, perakitan manifest) **tidak pernah butuh LLM**. Yang butuh LLM cuma dua field: `ringkasan` dan `kata_kunci`. Karena tim sudah punya Claude Code, seluruh mesin API beserta pengamannya tidak pernah perlu ada.
+
+Biaya kekeliruan ini konkret dan tercatat: tiga ronde perbaikan (sidecar atomic, deteksi sidecar rusak, intent record sebelum submit) dihabiskan untuk melindungi dari uang yang terbakar dua kali, lalu seluruhnya dihapus. Pelajarannya: **tanyakan bagaimana tim menjalankan AI sebelum mengunci jalur pemanggilan LLM di spec.**
+
+**Ringkasan dibuat Claude Code**, memakai langganan yang sudah ada. Tanpa API key, tanpa biaya per-panggilan, tanpa pemulihan batch.
+
 ### Antarmuka
 
+Empat mode. Claude Code berjalan dari `erp/`, bukan dari dalam vault, jadi `--root architecture-draft` adalah pemakaian sehari-hari.
+
 ```
-python Tools/build-vault-index.py            # incremental (default)
-python Tools/build-vault-index.py --full     # regen semua, abaikan hash
-python Tools/build-vault-index.py --check    # exit 1 kalau index basi, tanpa menulis
+python .../build-vault-index.py --check --root architecture-draft
+    exit 1 bila index basi, tanpa menulis apa pun
+
+python .../build-vault-index.py --daftar-tugas --root architecture-draft
+    tulis VAULT-INDEX.tugas.json: dokumen yang butuh ringkasan + panduan lengkap untuk agent
+
+    (Claude Code membaca berkas itu, meringkas, menulis VAULT-INDEX.hasil.json)
+
+python .../build-vault-index.py --serap --root architecture-draft
+    baca hasil, validasi, tulis VAULT-INDEX.json
+
+python .../build-vault-index.py --root architecture-draft
+    rakit manifest dari ringkasan yang sudah ada saja; yang belum punya masuk `gagal`
 ```
+
+`--full` berlaku untuk `--daftar-tugas` (abaikan hash, masukkan semua dokumen non-stub).
 
 `--check` dipanggil di akhir `/sync-docs`. Index basi lebih berbahaya daripada tidak ada index, karena agent akan mempercayai ringkasan yang salah.
 
+### Kontrak berkas tugas dan hasil
+
+`VAULT-INDEX.tugas.json` memuat `path`, `judul`, `jenis`, `hash`, dan `isi` (sudah dipotong) per dokumen, plus field `panduan` yang **berdiri sendiri**: gaya ringkasan, nama berkas keluaran, bentuk JSON persis, dan kewajiban menyalin kembali `hash`.
+
+Panduan itu harus lengkap karena agent yang mengerjakan langkah 2 **hanya** membaca berkas ini. Versi pertama panduan cuma menjelaskan gaya dan tidak menyebut kontrak keluaran sama sekali; akibatnya agent yang taat justru menghasilkan bentuk salah, dan `--serap` membuang seluruh hasilnya tanpa pesan apa pun sambil menghapus berkasnya.
+
+`VAULT-INDEX.hasil.json` berbentuk `{"hasil": {"<path>": {"ringkasan": ..., "kata_kunci": [...], "hash": ...}}}`.
+
+**Bentuk yang tidak dikenali harus menolak, bukan menganggap kosong.** Rusak bukan berarti tidak ada; jangan menebak, jangan lanjut, jangan hapus apa pun. Ini prinsip yang sama yang dulu menjaga sidecar batch, dan tetap berlaku meski yang dipertaruhkan bukan lagi uang melainkan jam kerja agent.
+
+`hash` diverifikasi saat serap. Dokumen bisa diedit selagi agent bekerja; tanpa cek ini ringkasan basi akan tersimpan bersama hash baru sehingga logika incremental tidak akan pernah menyegarkannya.
+
+Kedua berkas dihapus **hanya** bila serap bersih sepenuhnya. Bila ada entri ditolak, basi, atau tak ditemukan, berkasnya dipertahankan supaya bisa diperbaiki lalu diserap ulang.
+
 ### Regenerasi incremental
 
-`hash` adalah SHA-256 isi berkas sumber. Saat regen, LLM hanya dipanggil untuk dokumen yang hash-nya berubah atau belum ada di manifest. Untuk perubahan rutin `/sync-docs` yang menyentuh 2 sampai 3 dokumen, biayanya di bawah satu sen dan selesai dalam hitungan detik. Ini juga membuat `VAULT-INDEX.json` layak di-commit: diff-nya kecil dan terbaca.
-
-### Model dan biaya
-
-**Claude Opus 4.8** (`claude-opus-4-8`) via **Batches API** (`client.messages.batches.create`) untuk generate awal. Batches memberi diskon 50 persen dan cocok karena pekerjaan ini tidak sensitif latensi.
-
-| Komponen | Perhitungan |
-|---|---|
-| Input | ~400 rb token × $5/jt = $2,00 |
-| Output | ~33 rb token × $25/jt = $0,82 |
-| Subtotal | $2,82 |
-| **Via Batches (−50%)** | **~$1,41** |
-
-Sekali jalan penuh. Regen incremental setelahnya praktis gratis. Karena angkanya sekecil ini, tidak ada alasan menurunkan ke model lebih murah: kualitas ringkasan langsung menentukan kualitas retrieval, dan itu satu-satunya hal yang menentukan apakah desain ini berhasil.
-
-Panggilan pakai SDK resmi `anthropic` (Python), bukan raw HTTP.
+`hash` adalah SHA-256 isi berkas sumber. Saat regen, hanya dokumen yang hash-nya berubah atau belum ada di manifest yang masuk daftar tugas. Untuk perubahan rutin `/sync-docs` yang menyentuh 2 sampai 3 dokumen, ini selesai dalam satu putaran singkat. Ini juga membuat `VAULT-INDEX.json` layak di-commit: diff-nya kecil dan terbaca.
 
 ### Penanganan kasus khusus
 
 | Kasus | Perlakuan |
 |---|---|
 | Dokumen besar (mis. `Microservices - Integration Service.md`, 139 KB) | Potong: kepala 8 KB + daftar seluruh heading. Ringkasan tingkat dokumen tidak butuh isi lengkap. |
-| Dokumen 🔴 Stub | Ringkasan satu baris tanpa panggil LLM. Hemat dan jujur. |
+| Dokumen 🔴 Stub | Ringkasan satu baris dibuat lokal, tidak masuk daftar tugas. 7 dokumen di vault. |
 | Dokumen di folder tak dikenal | `publik: false`, `jenis: null`, dilaporkan sebagai peringatan. |
 
 ### Penanganan error

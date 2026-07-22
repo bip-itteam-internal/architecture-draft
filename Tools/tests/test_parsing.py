@@ -44,7 +44,7 @@ def test_status_berupa_prosa_bukan_emoji():
 
 
 def test_status_absen_adalah_kondisi_normal():
-    """69 dari 217 dokumen memang tidak punya status. Bukan error."""
+    """Sekitar sepertiga dokumen vault memang tidak punya status. Bukan error."""
     teks = "## Deskripsi\n\nDokumen tanpa baris status sama sekali.\n"
     assert ekstrak_status(teks) == (None, None)
 

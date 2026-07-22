@@ -9,10 +9,20 @@ pun — tugasmu hanya menjawab + menyebut sumber.
 Pertanyaan: $ARGUMENTS
 
 Langkah:
-1. Tentukan area pertanyaan. Buka `architecture-draft/CLAUDE.md` §7 (pemetaan repo→dokumen)
-   untuk menemukan dok arsitektur relevan.
-2. Baca dok vault terkait di `architecture-draft/`. Perhatikan status marker
-   (§5: ✅ Implemented / ⚠️ ada catatan / 🟡 Konsep / 🔴 Stub).
+1. Baca `architecture-draft/VAULT-INDEX.json` (manifest ~218 dokumen: judul, area,
+   jenis, status, tautan, ringkasan, kata kunci). Pilih **3 sampai 5 dokumen** paling
+   relevan dengan mencocokkan pertanyaan ke `ringkasan` dan `kata_kunci`.
+   Bila index tidak ada, rusak, atau `versi_skema` tak dikenal → pakai cara lama
+   (`architecture-draft/CLAUDE.md` §7 + grep) dan **beri tahu user** bahwa index tidak
+   tersedia; sarankan `/index-vault`.
+2. Baca dokumen terpilih **secara utuh** di `architecture-draft/`. Perhatikan
+   `status_emoji` + `status_teks` di entri index dan marker di dokumennya
+   (✅ Implemented / ⚠️ ada catatan / 🟡 Konsep / 🔴 Stub / 🔜 Direncanakan /
+   ⛔ Superseded). Sekitar sepertiga dokumen **tidak punya status** — seluruh dok meta
+   root dan seluruh `API - *`. Itu normal, bukan gap.
+   Bila pertanyaannya berangkat dari kode, `CLAUDE.md` §7 tetap dipakai: §7 memetakan
+   **repo → dokumen**, index memetakan **pertanyaan → dokumen**. Sumbu berbeda,
+   keduanya berguna.
 3. Bila vault mencakup pertanyaan & konsisten dengan kode → jawab dari vault.
 4. Bila vault diam ATAU terlihat usang vs kode → baca kode terkait di project aktif
    (lihat .claude/CLAUDE.md baris "Project aktif") untuk tetap menjawab.
@@ -25,3 +35,18 @@ Langkah:
      JANGAN jalankan /sync-docs otomatis.
 6. Bila tak ada di vault maupun kode → katakan jujur "tidak ditemukan", JANGAN mengarang
    (grounded-in-code §1).
+
+**Cocok topik ≠ menjawab pertanyaan.** Index selalu mengembalikan dokumen terdekat,
+bahkan ketika jawabannya belum pernah ditulis. Setelah membaca dokumen terpilih, tanya
+diri sendiri: apakah pertanyaan user benar-benar terjawab, atau dokumen ini cuma
+sebidang topik? Kalau cuma sebidang, katakan begitu dan sebut apa yang belum ada —
+jangan menyajikan yang terdekat seolah itu jawabannya. Diuji 2026-07-20: pertanyaan
+"berapa lama masa percobaan karyawan" dan "kenapa gaji telat cair" mengembalikan
+dokumen recruitment dan payroll yang relevan topiknya tapi tidak memuat jawabannya.
+
+Beberapa dokumen sengaja berjangkauan luas (`Microservices - Attendance Service`,
+`API - Attendance Service`, `APP - MyBharata` mencakup cuti, izin, lembur, tukar shift,
+dan koreksi absensi sekaligus). Dokumen itu hampir selalu muncul untuk pertanyaan
+apa pun soal absensi. Yang biasanya menjawab justru dokumen turunannya yang spesifik
+(`HRIS - Overtime`, `HRIS - Leave Request`, `HRIS - Attendance Correction`,
+`HRIS - Tukar Jadwal Kerja`) — dahulukan itu.

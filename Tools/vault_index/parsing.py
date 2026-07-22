@@ -24,7 +24,8 @@ def ekstrak_status(teks: str) -> tuple[str | None, str | None]:
     Status TIDAK dinormalisasi: kosakata ADR (Accepted/Proposed/Superseded)
     berbeda dari kosakata domain (Implemented/Konsep/Stub).
 
-    Absennya status adalah kondisi normal (69 dari 217 dokumen).
+    Absennya status adalah kondisi normal — sekitar sepertiga korpus
+    (seluruh dok meta root dan seluruh `API - *`).
     """
     kepala = "\n".join(teks.splitlines()[:BARIS_KEPALA])
     m = _RE_STATUS.search(kepala)
