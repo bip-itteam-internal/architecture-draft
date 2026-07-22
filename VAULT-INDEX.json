@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-07-21",
-  "jumlah_dokumen": 218,
+  "digenerate": "2026-07-22",
+  "jumlah_dokumen": 222,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -252,6 +252,7 @@
       "tautan": [
         "Microservices - Integration Service",
         "API - Index",
+        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "API - Manufacture Service",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
         "ADR - 0009 Affiliate via Search Seller Affiliate Orders API",
@@ -262,22 +263,21 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "0f85970df510cee0b4123d6d8fb5d972fed6e32ebe478ce95bc16cfc9c6ca9d9",
-      "ukuran_kb": 24.6,
-      "ringkasan": "Menjawab: bagaimana order/transaksi TikTok Shop, TikTok Business, dan Shopee disinkronkan dan direkonsiliasi ke Accurate, endpoint feed retur lintas-channel untuk gudang (dan kenapa endpoint ini berbeda dari endpoint retur Shopee-only atau daily-returns Accurate), serta bagaimana tracking pengiriman/resi dan laporan settlement/pencairan diambil. Juga menjawab endpoint webhook marketplace, affiliate, mapping akun ICC, kas toko, dan ulasan marketplace.",
+      "hash": "aca3593fdeb5a2deb546cbb4658aff7426cd8fd8529da6af57db5f534a0aa84b",
+      "ukuran_kb": 25.7,
+      "ringkasan": "Menjawab pertanyaan endpoint apa saja yang tersedia di integration-service untuk mengelola order/transaksi marketplace (TikTok Shop, TikTok Business, Shopee), webhook, retur, tracking resi, sinkronisasi ke Accurate, profit per produk, ICC account mapping, dan fitur WMS bridge. Juga menjelaskan kenapa endpoint `/transactions/returns` berbeda dari endpoint retur lain (Shopee-only, Accurate-only) dan cara membaca parameternya. Cocok dicari saat butuh path/method endpoint integration-service secara spesifik, bukan konsep bisnisnya.",
       "kata_kunci": [
-        "integration service",
-        "marketplace",
+        "integration-service",
+        "endpoint",
+        "API integration",
         "TikTok Shop",
+        "TikTok Business",
         "Shopee",
         "Accurate",
-        "retur",
-        "settlement",
         "webhook",
+        "retur",
         "tracking resi",
-        "affiliate",
-        "ICC",
-        "kas toko"
+        "gateway"
       ]
     },
     {
@@ -521,6 +521,83 @@
       ]
     },
     {
+      "path": "API Reference/TikTok Shop API/Endpoints/return_refund.returns_search.md",
+      "judul": "return_refund.returns_search",
+      "area": "API Reference",
+      "jenis": "api",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [],
+      "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
+      "ukuran_kb": 2.0,
+      "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
+      "kata_kunci": [
+        "TikTok Shop",
+        "open-api",
+        "return_refund",
+        "returns_search",
+        "retur",
+        "refund",
+        "resi retur",
+        "return_tracking_number",
+        "TikTok Partner API"
+      ]
+    },
+    {
+      "path": "API Reference/TikTok Shop API/Index.md",
+      "judul": "Index",
+      "area": "API Reference",
+      "jenis": "api",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [],
+      "hash": "9e9ef98c30f82061649a8dd91b26710b939cc26538002af2684fd2a8f37be4d0",
+      "ukuran_kb": 2.3,
+      "ringkasan": "Menjawab pertanyaan endpoint TikTok Shop Partner API (open-api.tiktokglobalshop.com) mana saja yang benar-benar dipanggil kode integration-service, seperti order search, fulfillment tracking, return search, product detail, withdrawal, analytics performa, dan affiliate, lengkap dengan path dan versi modulnya masing-masing. Juga menjelaskan modul yang belum dipakai kode (authorization, logistics, promotion, dll) sehingga belum bisa dijadikan acuan sebelum diverifikasi.",
+      "kata_kunci": [
+        "TikTok Shop",
+        "open-api",
+        "TikTok Partner API",
+        "endpoint index",
+        "order search",
+        "fulfillment tracking",
+        "return_refund",
+        "analytics",
+        "affiliate",
+        "verified-by-usage"
+      ]
+    },
+    {
+      "path": "API Reference/TikTok Shop API/README.md",
+      "judul": "README",
+      "area": "API Reference",
+      "jenis": "api",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [
+        "Microservices - Integration Service",
+        "API - Integration Service"
+      ],
+      "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
+      "ukuran_kb": 3.0,
+      "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
+      "kata_kunci": [
+        "TikTok Shop",
+        "open-api",
+        "signing",
+        "HMAC-SHA256",
+        "app_key",
+        "shop_cipher",
+        "access_token",
+        "auth",
+        "TikTok Partner API",
+        "cara cari endpoint"
+      ]
+    },
+    {
       "path": "Application/APP (Extension) - Fingerprint Listener (Complete).md",
       "judul": "APP (Extension) - Fingerprint Listener (Complete)",
       "area": "Application",
@@ -735,19 +812,22 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "50b22af31b4e5a1e1570a614e7b7727de2aec3edb78b193c51dbb12e4ee1be90",
-      "ukuran_kb": 30.3,
-      "ringkasan": "Menjawab: modul apa saja yang tersedia di portal web ERP (HRIS, Payroll, KPI, Recruitment, Support Ticket, Manufacture/WMS, Integration, dsb), bagaimana login/SSO dan role-based access (system_roles per module) diterapkan, dan bagaimana matriks akses menu WMS per posisi serta RBAC Support Ticket per divisi bekerja. Juga menjawab pengecualian akses lintas-modul (Finance read-only ke Gudang FG) dan allowlist akun \"integration-only\".",
+      "hash": "fe98f2d834e62662b57e16385cf0ff4482b589df89c297e8fae8bd65160de88c",
+      "ukuran_kb": 35.6,
+      "ringkasan": "Menjawab pertanyaan tentang fitur apa saja yang ada di web ERP (erp-frontend/\"One Bharata\") -- modul HRIS, Recruitment, Payroll, KPI, Support Ticket, dan akses menu WMS manufacture -- serta bagaimana autentikasi, role/RBAC (`system_roles`), dan SSO Identity Provider bekerja untuk aplikasi lain seperti Task Manager. Juga menjelaskan matriks akses per posisi untuk menu WMS dan aturan read-only Finance ke Gudang FG.",
       "kata_kunci": [
+        "erp-frontend",
         "Web ERP",
-        "hris-dashboard",
         "One Bharata",
-        "role gating",
         "SSO",
-        "matriks akses WMS",
-        "support ticket RBAC",
-        "sidebar module",
-        "system_roles"
+        "RBAC",
+        "system_roles",
+        "HRIS",
+        "recruitment",
+        "payroll",
+        "KPI",
+        "support ticket",
+        "autentikasi"
       ]
     },
     {
@@ -818,20 +898,21 @@
       "status_teks": null,
       "publik": true,
       "tautan": [],
-      "hash": "871ca760a2caa3d1b8ed3c0f02ec706275281378666b2bd61c4970b8c305b4e3",
-      "ukuran_kb": 11.5,
-      "ringkasan": "Menjawab: apa aturan wajib bagi AI agent saat mengedit vault architecture-draft ini sendiri (bukan kode) — konvensi penamaan file per-domain, struktur folder, status marker, template dokumen, wajib wikilink 0-broken, alur sync tiap update, dan aturan git khusus vault. Rujuk dokumen ini saat bingung dokumen baru harus ditaruh di folder mana / prefix apa, atau bagaimana menandai status implementasi sebuah fitur.",
+      "hash": "99476e00b526227b55b32bd62e377d4b34e80f390b0f16dda6d765f4a162e776",
+      "ukuran_kb": 12.2,
+      "ringkasan": "Menjawab: bagaimana aturan menulis dan menata dokumentasi di vault architecture-draft (struktur folder domain, konvensi penamaan file dengan prefix, format wikilink, status marker, template struktur dokumen), serta alur kerja sinkronisasi dokumentasi dengan kode dan aturan git untuk vault ini. Dipakai saat bingung di folder/prefix mana sebuah dokumen baru harus dibuat, atau bagaimana format status Implemented/Draft/Stub ditulis.",
       "kata_kunci": [
-        "rulebook",
         "CLAUDE.md",
-        "konvensi penamaan",
-        "status marker",
-        "wikilink",
-        "grounded-in-code",
-        "template dokumen",
-        "struktur folder vault",
+        "rulebook",
+        "vault",
         "Obsidian",
-        "aturan git vault"
+        "konvensi dokumentasi",
+        "prefix nama file",
+        "wikilink",
+        "status marker",
+        "grounded-in-code",
+        "sync-docs",
+        "template dokumen"
       ]
     },
     {
@@ -1288,6 +1369,7 @@
         "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
         "External - Accurate",
         "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
+        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "ADR - 0017 Tanggal Retur TikTok via order_update_date",
         "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
         "Sales - ICC Account Manager Mapping",
@@ -1305,20 +1387,21 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "6d6263c7e462c70f11999761a477cc4cc4c1b57dd11590cd5d00d932dab998ba",
-      "ukuran_kb": 140.0,
-      "ringkasan": "Menjawab: bagaimana order dari TikTok Shop dan Shopee masuk realtime via webhook lalu dinormalisasi jadi model transaksi terpadu, bagaimana bridging ke Accurate untuk invoice dan sales return bekerja, dan bagaimana metrik iklan (GMV Max, ROI, ROAS) dihitung untuk dashboard marketing-insight. Juga menjelaskan status integrasi Meta Ads (masih konsep) dan Desty (soft-disabled).",
+      "hash": "c924f47f091243c02a91f2995d3b5b8d71fcccc842e932fad2ffef0a6beafa62",
+      "ukuran_kb": 144.4,
+      "ringkasan": "Menjawab pertanyaan arsitektur integration-service -- bagaimana order marketplace (TikTok Shop, TikTok Business, Shopee) masuk lewat webhook, dinormalisasi jadi model transaction terpadu, dan di-bridging ke Accurate (invoice, sales return, ringkasan harian). Juga menjelaskan fitur GMV Max Monitoring/Overview & ICC Video Metrics untuk insentif marketing, status integrasi Meta Ads yang masih konsep, serta status middleware Desty yang sudah soft-disabled.",
       "kata_kunci": [
-        "integration service",
-        "TikTok Shop",
-        "Shopee",
+        "integration-service",
+        "marketplace",
         "webhook",
         "Accurate",
+        "TikTok Business",
         "GMV Max",
-        "ROI ROAS",
-        "marketplace",
-        "bridging akuntansi",
-        "Meta Ads"
+        "ICC",
+        "insentif marketing",
+        "Meta Ads",
+        "Desty",
+        "bridging akuntansi"
       ]
     },
     {
@@ -1375,20 +1458,20 @@
         "ADR - 0001 Akuntansi via Accurate",
         "DB - Overview and Notes"
       ],
-      "hash": "a953cba4f1b636d1b118b3ebbaea74ed7c793aa83ce463f4b511643f52659ac0",
-      "ukuran_kb": 33.3,
-      "ringkasan": "Menjawab: bagaimana master bahan baku dan produk WMS manufaktur disinkronkan dari Accurate dan data HPP (menggantikan sync Google Sheets lama), bagaimana rekonsiliasi stok dan saldo awal bulanan bekerja, serta bagaimana pergerakan internal (konsumsi bahan, koreksi proposal) didorong balik ke Accurate. Juga mencakup transaksi in/out, formula/BOM, dan produksi.",
+      "hash": "560fc312463ca4e6193614b9b866896d88b3ea393edaa58a0e3f7d6cacb0ca3e",
+      "ukuran_kb": 36.6,
+      "ringkasan": "Menjawab pertanyaan seputar WMS manufacture-service -- bagaimana master bahan baku & produk disinkronkan dari Accurate/data HPP (bukan lagi Google Sheets), bagaimana stok direkonsiliasi dan didorong (push) ke Accurate sebagai Penyesuaian Persediaan, serta bagaimana Saldo Awal Bulanan dihitung dan dikunci tiap pergantian bulan. Juga menjelaskan stempel `created_by_name` di jalur transaksi/proposal untuk jejak audit siapa yang menginput.",
       "kata_kunci": [
-        "manufacture",
+        "manufacture-service",
         "WMS",
+        "master bahan",
         "stok",
-        "bahan baku",
-        "formula BOM",
-        "produksi",
         "sync Accurate",
+        "push Accurate",
         "saldo awal bulanan",
-        "master produk",
-        "push pergerakan Accurate"
+        "transaksi",
+        "formula BOM",
+        "audit input"
       ]
     },
     {
@@ -1401,6 +1484,7 @@
       "publik": true,
       "tautan": [
         "Microservices - Recruitment Service",
+        "ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri)",
         "Microservices - Employee Service",
         "Microservices - File Service",
         "CORE - API Master Gateway",
@@ -1408,19 +1492,23 @@
         "APP - MyBharata",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "043c83e78f407088f966c3bd60451d29861c1f1dab506b3a36eb5a6fcc612c0e",
-      "ukuran_kb": 4.4,
-      "ringkasan": "Menjawab: bagaimana service lain mengirim notifikasi lewat berbagai channel (in-app inbox, FCM push, WhatsApp, email via Resend, splash promotion, article) dari satu hub terpusat. Juga menjelaskan pola identitas pengirim email per-service (variabel `from`) supaya notifikasi domain-bisnis berbeda (recruitment vs payroll) tidak saling tertukar nama pengirim.",
+      "hash": "7aef0664f9b42c3aa003f3d6d240377db0c7f857666c3ae321c4e9ea24f326d3",
+      "ukuran_kb": 4.7,
+      "ringkasan": "Menjawab: bagaimana sistem mengirim notifikasi lintas channel (in-app inbox, FCM push, WhatsApp, splash promotion, article, dan email transaksional via Resend), endpoint apa saja yang tersedia (`/email/send`, `/fcm/send-*`, `/wa/send-*`, `/inbox/send`), dan bagaimana pola identitas pengirim email per-service (from address) diatur agar tidak tabrakan antar service seperti recruitment dan payroll. Juga menjawab siapa saja service lain yang bergantung pada notification service (Employee Service, File Service) dan jadwal cron pembersihan inbox.",
       "kata_kunci": [
-        "notification",
-        "notifikasi",
-        "FCM push",
+        "notification service",
+        "email",
+        "Resend",
+        "resend-go",
+        "kirim email",
+        "FCM",
+        "push notification",
         "WhatsApp",
-        "email Resend",
         "inbox",
-        "splash promotion",
-        "article",
-        "identitas pengirim"
+        "RESEND_API_KEY",
+        "RESEND_FROM_EMAIL",
+        "identitas pengirim",
+        "deliverability"
       ]
     },
     {
@@ -2309,25 +2397,68 @@
       "tautan": [
         "CORE - API Master Gateway",
         "Microservices - Manufacture Service",
+        "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
+        "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
+        "Microservices - Integration Service",
         "APP - Web ERP",
         "API - Manufacture Service",
         "Manufacture - Stock & Material Management",
         "ADR - 0002 Database-per-Service",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "6f2abb421477d307a1a55c8261f0ef6a98edb3d05ac93dd1705d00636116099a",
-      "ukuran_kb": 10.9,
-      "ringkasan": "Menjawab bagaimana log tiap menu WMS (Return Ekspedisi, Keluar FG, Inbound RM, Input Gudang FG, Kirim FG) dipisah jadi tab sumber vs input gudang, kapan badge status 'sudah/belum dicatat' relevan ditampilkan, dan bagaimana nama penginput (created_by_name) distempel di server agar jadi jejak audit yang tak bisa dipalsukan.",
+      "hash": "b87984b59492dc17450dac478ae3907a428256a3dff7c657b78b3bdbb5e617dd",
+      "ukuran_kb": 16.5,
+      "ringkasan": "Menjawab kenapa log tiap menu WMS (Return Ekspedisi, Keluar FG, Inbound RM, Input Gudang FG, Kirim FG) dipecah jadi tab SUMBER vs INPUT WMS, kapan badge status \"sudah/belum dicatat\" ditampilkan, kenapa tab Keluar FG diagregasi per SKU (bukan per resi), dan status resi mana (COMPLETED/SHIPPED) yang dihitung sebagai barang keluar gudang. Juga menjelaskan kenapa nama penginput (`created_by_name`) distempel server dari header gateway, bukan dikirim client, dan jalur mana saja yang sudah ikut distempel.",
       "kata_kunci": [
-        "WMS log",
-        "log sumber vs input",
-        "stempel penginput",
+        "ADR 0025",
+        "log sumber",
+        "input WMS",
         "created_by_name",
-        "audit trail WMS",
+        "stempel penginput",
         "Keluar FG",
-        "Inbound RM",
-        "resi marketplace",
-        "manufacture"
+        "Return Ekspedisi",
+        "resi",
+        "audit trail",
+        "badge status",
+        "saldo awal"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri).md",
+      "judul": "ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri)",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "✅",
+      "status_teks": "Accepted (mencerminkan kondisi kode; Resend sudah jalan di produksi)",
+      "publik": true,
+      "tautan": [
+        "Microservices - Notification Service",
+        "Microservices - Recruitment Service",
+        "IT - Server, VMs and Databases",
+        "IT - Environment Inventory",
+        "APP - Portal Karir Bharata",
+        "API - Notification Service"
+      ],
+      "hash": "bd5e71dd55a567d8321ad43ee9b70c7b3eb955f5f7f979a6a4be3cf7eefb2a8b",
+      "ukuran_kb": 5.0,
+      "ringkasan": "Menjawab: kenapa email transaksional (konfirmasi lamaran, jadwal interview, offer letter) dikirim lewat Resend dan bukan mail server self-hosted seperti Mailu, apa perbedaan mendasar antara layanan pengiriman email (ESP) versus mail server sendiri, dan kapan Mailu tetap masuk akal dipakai (mis. kotak surat internal tim, menerima email balasan, kebutuhan data di dalam negeri). Juga menjawab risiko deliverability dari VPS tanpa reputasi IP, konsekuensi ketergantungan pihak ketiga, serta syarat minimum (SPF/DKIM/DMARC/PTR/IP warming) bila suatu saat ingin pindah ke server sendiri.",
+      "kata_kunci": [
+        "ADR 0026",
+        "Resend",
+        "Mailu",
+        "mail server",
+        "self-hosted",
+        "email transaksional",
+        "deliverability",
+        "SPF",
+        "DKIM",
+        "DMARC",
+        "PTR record",
+        "IP warming",
+        "kotak surat",
+        "spam",
+        "reputasi IP",
+        "layanan email pihak ketiga"
       ]
     },
     {
@@ -6500,26 +6631,27 @@
       "judul": "2026-07-17 Temuan - Reject retur menambah stok FG",
       "area": "Workspace",
       "jenis": "workspace",
-      "status_emoji": null,
-      "status_teks": "belum diperbaiki (sengaja) — ditemukan saat mengerjakan feed retur gudang;",
+      "status_emoji": "⛔",
+      "status_teks": "**DITUTUP — arah keputusan DIBALIK (22 Juli 2026, keputusan user).** Temuan ini",
       "publik": false,
       "tautan": [
+        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "ADR - 0015 Push Pergerakan WMS ke Accurate",
         "Microservices - Manufacture Service",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line"
       ],
-      "hash": "4bb165055a7b4e1c81c67f7c641faa3251875918faf5c050c33183e469df9020",
-      "ukuran_kb": 2.7,
-      "ringkasan": "Menjawab pertanyaan tentang bug pada form Input Return Ekspedisi di Gudang Barang Jadi di mana qty reject ikut menambah stok FG (seharusnya hanya reuse+rework yang kembali ke stok), termasuk rantai penyebab di kode frontend/backend dan keputusan yang belum diambil sebelum bug ini diperbaiki.",
+      "hash": "82babeaf81bf7cb0f6566eb25ef6576ca73422b0a608d634f892ee70d0f0f9e4",
+      "ukuran_kb": 3.3,
+      "ringkasan": "Menjawab kenapa qty Reject pada form Input Return Ekspedisi (Gudang Barang Jadi) tetap dihitung menambah stok FG bersama Reuse/Rework, termasuk kronologi teknis root cause awal (bug di frontend `GudangBarangJadiView.tsx`) dan keputusan akhir yang membalik arah perbaikan. Berguna saat menelusuri riwayat diskusi/keputusan soal penanganan barang reject dan penyesuaian stok manual oleh finance.",
       "kata_kunci": [
         "reject retur",
         "stok FG",
-        "bug",
-        "Gudang Barang Jadi",
         "Input Return Ekspedisi",
-        "reuse rework reject",
-        "deltaStok",
-        "scrap"
+        "Reuse Rework Reject",
+        "Gudang Barang Jadi",
+        "temuan",
+        "scrap",
+        "deltaStokTransaksi"
       ]
     },
     {
