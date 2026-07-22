@@ -1,4 +1,4 @@
-> **Status**: ✅ Implemented (21 Juli 2026) — **lima** menu WMS dipecah dua sub-tab; stempel `created_by_name` aktif di semua jalur tulis manual (termasuk jalur proposal). Verifikasi visual tuntas untuk **Inbound RM**, **Kirim FG**, & **Master Resi**; Keluar FG / Input Gudang FG / Laporan Hasil Produksi menunggu pengecekan dengan role yang sesuai (`admin gudang FG`, `admin produksi`). **Follow-up 22 Juli 2026:** batasan "PO multi-bahan tak mengisi form penuh" diselesaikan — form Inbound RM jadi multi-baris (klik baris PO memuat seluruh bahan), lihat Consequences.
+> **Status**: ✅ Implemented (21 Juli 2026) — **lima** menu WMS dipecah dua sub-tab; stempel `created_by_name` aktif di semua jalur tulis manual (termasuk jalur proposal). Verifikasi visual tuntas untuk **Inbound RM**, **Kirim FG**, & **Master Resi**; Keluar FG / Input Gudang FG / Laporan Hasil Produksi menunggu pengecekan dengan role yang sesuai (`admin gudang FG`, `admin produksi`). **Follow-up 22 Juli 2026:** (a) batasan "PO multi-bahan tak mengisi form penuh" diselesaikan — form Inbound RM jadi multi-baris (klik baris PO memuat seluruh bahan); (b) **backend gerbang gudang** (retur barang-balik ditahan sampai gudang scan; Decision #8) — cakupan ADR ini diperluas dari log-split FE ke fondasi backend yang membuatnya bermakna; **terbukti end-to-end di prod**; (c) **form retur dilengkapi** (pengaman qty/status, panel konteks, scan dari daftar, retur basi terlipat; Decision #9). Lihat Consequences.
 
 ## Context
 
@@ -60,6 +60,15 @@ Jalur **proposal** ditambahkan belakangan (21 Juli 2026): transaksi yang lahir d
 
 **7. Resi hasil sync marketplace TIDAK distempel.** `upsertResiFeed` sengaja dibiarkan kosong — datanya datang dari marketplace, bukan diketik orang. Mengisi nama pemicu sync akan membuat kolom "Diinput oleh" berbohong tentang ribuan baris. Konsekuensi yang diambil sebagai keuntungan: ada/tidaknya nama sekaligus menjadi penanda asal data (manual vs sync) di [[Microservices - Manufacture Service]] tab Master Resi.
 
+**8. Backend: retur BARANG-BALIK ditahan sampai gudang mengonfirmasi** (fondasi yang membuat "belum dicatat gudang" bermakna; ✅ live, **terbukti end-to-end prod 22 Juli 2026**). Retur `solution=0` yang lolos gerbang payout ([[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]]) **tidak** langsung dibukukan ke Accurate — `holdForWarehouse` menahannya status **PENDING** sampai form ini tersimpan, lalu manufacture memanggil `POST /accurate/daily-returns/warehouse-confirm`. **Kondisi fisik (Reuse/Rework/Reject) menentukan pembukuan** — membalik [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] ("tak perlu tunggu barang fisik"): membukukan saat marketplace menyetujui berarti menebak qty yang belum dilihat siapa pun. Ketiga kondisi **sama-sama menambah stok** (label informasi; barang rusak disesuaikan finance manual — keputusan 21 Juli). Detail mekanisme (akumulasi per `(order_id, SKU)`, lookup by-member, re-key ke tanggal gudang) + audit `cmd/returnrecon` ada di [[Microservices - Integration Service]] §Auto-Sync Retur.
+
+**9. Form retur dilengkapi + daftar difokuskan** (22 Juli 2026). Perbaikan FE `GudangBarangJadiView` di atas fondasi #8:
+- **Pengaman input**: keterangan kondisi (dropdown Rework: isi berkurang/segel terbuka; Reject: pecah/barang tidak sesuai—klaim ekspedisi) **wajib** saat qty terisi; total per baris tak boleh **melebihi** klaim marketplace (over-retur diblokir — Accurate pasti menolak), **kurang** disorot (parsial sah).
+- **Panel konteks retur read-only** (order, no. retur, channel/toko, status order, alasan marketplace **yang di-humanize** dari kode mentah, nilai refund) — sebelumnya form tak menampilkan retur mana yang dicatat.
+- **Field "Cancel Order" manual dihapus** — diturunkan dari `order_status` marketplace (sistem sudah tahu; ketik ulang = sumber salah).
+- **Scan resi dari halaman daftar** membuka form terisi + tertaut (auto-fokus untuk scanner); pesan sukses membedakan tertaut vs catatan WMS lepas.
+- **Daftar difokuskan**: default hanya retur yang bisa dikerjakan; badge memimpin angka **aktif**, retur **basi** (>14 hari, barang mungkin tak datang) diberi angka redup + dilipat di bawah. Ambang 14 hari heuristik (idealnya per-SLA channel).
+
 ## Consequences
 
 **Yang membaik**
@@ -78,6 +87,8 @@ Jalur **proposal** ditambahkan belakangan (21 Juli 2026): transaksi yang lahir d
 - **Tab sumber Keluar FG disaring per tanggal RTS.** `resiList` memuat jendela 60 hari (≈14 ribu record); agregasi per SKU membuat batas 300 baris yang sempat dipasang tidak lagi diperlukan (satu tanggal ≈ 19 baris) dan sudah dihapus.
 - **Angka tab sumber Keluar FG bukan "seluruh resi hari itu".** Yang batal/retur dan yang belum diambil kurir dikecualikan, jadi totalnya lebih kecil dari jumlah resi mentah. Jumlah yang dikecualikan ditampilkan eksplisit di header supaya selisihnya bisa dijelaskan, bukan tampak sebagai data hilang.
 - **Perilaku terhadap status Shopee belum teruji** — di dev semua resi TikTok, tak ada satu pun Shopee meski endpoint sync-nya ada. Begitu Shopee aktif di produksi, kategori kanoniknya perlu dicek sekali; status yang tak terpetakan akan ikut terhitung (dan dilaporkan merah), bukan lenyap.
+- **Retur "basi" belum punya penutupan resmi** (#9). Retur barang-balik yang barangnya tak akan datang menumpuk di "belum dicatat" selamanya — melipatnya di FE hanya kosmetik. Perlu aksi backend "tutup retur basi" (state penutupan) + keputusan finance (siapa boleh menutup, kapan). ANTREAN.
+- **Stok WMS ≠ stok Accurate untuk kondisi Reject** (#8, disengaja — versi lanjut). FE `onUpdateStock` hanya menambah Reuse+Rework ke stok WMS (Reject → scrap), sementara Accurate membukukan **ketiganya** sebagai `RETURNED` (keputusan 21 Juli). Jadi tiap Reject membuat dua sistem berselisih sampai finance menyesuaikan. Disadari sebagai utang, dikerjakan di iterasi berikutnya.
 
 ## Dokumen Terkait
 
