@@ -56,6 +56,12 @@
 
 - **integration** — `internal/webhook/dispatcher.go`: antrian in-memory, **5 worker goroutine** default. Entry: `POST /webhooks/services/shopee` · `/tiktok` · `/accurate` (publik, tanpa validasi gateway). Callback TikTok Shop/Shopee → di-log → di-antri per-platform → di-konsumsi job `webhook_consumer_task` (tiap 5 detik). Rate limit 20 req/dtk per platform; retry on failure; status disimpan ke Mongo. Entry `/webhooks/services/desty` **dicabut 2026-07-12** ([[External - Desty]] soft-disabled). Lihat [[Microservices - Integration Service]].
 
+## In-process poller (goroutine, bukan cron)
+
+- **warehouse** — dua goroutine poll di `main.go` (bukan cron manager), Redis lock via redsync:
+  - **Reconciler 60s** (`reconciler.go`, `lock:warehouse-reconciler` TTL 50s) — tarik order dari integration `GET /transactions/orders/list` **by-watermark** (`order_update_date`, cursor per-status di `sync_cursors`), 4 stream `TO_SHIP`/`SHIPPED`/`COMPLETED`/`RETURNED`, batch 500. Antrian kerja WMS + auto-close order yang diproses di luar WMS.
+  - **Open-order sweep 5m** (`open_order_sweep.go`, `lock:warehouse-open-sweep` TTL 4m) — jaring pengaman **self-healing**: kumpulkan order **terbuka** (`status_wms NOT IN [HANDED_OVER, CANCELLED]`, tertua-dulu, cap 5000/tick) → tanya status terkini `?order_ids=…` → `doUpsert`. **Tanpa cursor** → menutup celah reconciler yang melewatkan update telat (order nyangkut). Idempoten; run pertama membersihkan backlog. Lihat [[Microservices - Warehouse Service]].
+
 ## Service tanpa job background
 
 `file` · `inventory` · `tiktok-shop-service` · `api-gateway` · orchestrator `hris` · orchestrator `it`.
