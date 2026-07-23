@@ -42,9 +42,12 @@
 - **Automation (per-space)**: di **Kelola Space** ada toggle **Auto-assign (round-robin)** + input **Auto-tutup setelah (hari)** (0 = nonaktif), dikirim saat create/update space. Di **triage/approve**, assignee jadi **opsional** bila space auto-assign aktif & punya member (hint "di-assign otomatis"). Selaras field BE `auto_assign`/`auto_close_days`. (Web PR #236, BE PR #352.)
 - **Laporan Tim** (`/support-ticket/team-report`, menu **Laporan Tim** — **supervisor-only**, gate `canManageTicket`; beda dari halaman **Laporan** yang pribadi) — dashboard tim/divisi: **KPI** (Total/Open/Selesai/Backlog — *Open & Backlog kecualikan tiket Ditolak* — on-time SLA response/resolusi, CSAT, reopen rate), **tren** masuk vs selesai per hari (recharts), **Sebaran per Space**, **Kepatuhan SLA** (overall + per divisi), **Kinerja Anggota** (total/done/avg response/avg resolusi jam/reopened), **CSAT** (rata-rata + distribusi ⭐1–5), **Tiket Lewat SLA** (klik baris → detail). **Export Excel** per-tabel + **Print/PDF**; filter rentang tanggal. Konsumsi endpoint report divisi BE (`admin-stats`, `summary-by-department`, `timeline`, `sla`, `manpower-performance`, `sla-breaches`, `csat` — lihat [[Microservices - Task Management Service]]). i18n **id+en**; **status tiket tetap mentah** (custom per-space, tak diterjemah); loading `Skeleton`, error per-seksi. (Web PR #262, BE PR #392.)
 
-**Finance**
-- Piutang (TikTok/Shopee): tabel accounts-receivable + filter overdue/in-transit
-- Incentive: Dashboard (stats/tren + bulk approve), detail, My Incentive, Master KPI CRUD, Master Integration (mapping employee ↔ platform/campaign)
+**Finance** — menu role `finance` (grounded ke `sidebar-menus.tsx` `financeMenus` + halaman `app/(main)/finance/*`)
+- **Piutang** (`/finance/piutang/*`): tabel accounts-receivable + filter overdue/in-transit. Empat sub-halaman: **All**, **TikTok Shop**, **Shopee**, dan **Uang Gantung** (dana marketplace yang belum cair)
+- **Incentive** (`/finance/incentive/*`) → [[Microservices - Insentive Service]]: **Dashboard** (stats/tren + bulk approve), **My Incentive**, **Payroll Calculator** (`/incentive/calculator`, kalkulator insentif), **Settings** (2 tab: Master KPI CRUD + Master Integration = mapping employee ↔ platform/campaign)
+- **Pencairan** (`/integration/payouts`): overview + tabel pencairan dana marketplace (Shopee terpisah), backend [[Microservices - Integration Service]]
+- **KPI** (`/finance/kpi`): halaman KPI yang sama dengan [[HRIS - Key Performance Index]], **dikunci ke departemen Finance** (`KpiPageContent lockedDepartment="Finance"`) — appraisal KPI per-karyawan Finance, bukan skor insentif marketing
+- Role `finance` juga melihat **seluruh blok Accurate Bridging** (Sales/Income/Return/Auto-Sync/Kas Toko/Receipts/Stok/Panduan) yang identik dengan role `integration_accurate` — didokumentasikan di bagian **Integration** di bawah, sengaja tidak diduplikasi di sini
 
 **IT** — Employee (aktivasi akun, reset password), Network (WiFi SSID/MAC CRUD)
 **GA** — Inventory (QR, repair history, assignment)

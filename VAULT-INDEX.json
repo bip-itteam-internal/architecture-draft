@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-07-22",
-  "jumlah_dokumen": 222,
+  "digenerate": "2026-07-23",
+  "jumlah_dokumen": 224,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -252,6 +252,7 @@
       "tautan": [
         "Microservices - Integration Service",
         "API - Index",
+        "Microservices - Warehouse Service",
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "API - Manufacture Service",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
@@ -263,21 +264,20 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "aca3593fdeb5a2deb546cbb4658aff7426cd8fd8529da6af57db5f534a0aa84b",
-      "ukuran_kb": 25.7,
-      "ringkasan": "Menjawab pertanyaan endpoint apa saja yang tersedia di integration-service untuk mengelola order/transaksi marketplace (TikTok Shop, TikTok Business, Shopee), webhook, retur, tracking resi, sinkronisasi ke Accurate, profit per produk, ICC account mapping, dan fitur WMS bridge. Juga menjelaskan kenapa endpoint `/transactions/returns` berbeda dari endpoint retur lain (Shopee-only, Accurate-only) dan cara membaca parameternya. Cocok dicari saat butuh path/method endpoint integration-service secara spesifik, bukan konsep bisnisnya.",
+      "hash": "b29ee9e9778dcc357478f551ea86e228b504cbe9353546fe1219dd1d37a54431",
+      "ukuran_kb": 26.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di integration-service untuk mengambil data order/transaksi marketplace (TikTok Shop, TikTok Business, Shopee), retur, tracking paket, dan sinkronisasi ke Accurate, termasuk parameter query, format response, dan siapa konsumen tiap endpoint (mis. WMS/warehouse, manufacture). Juga menjawab: bagaimana cara export order ke Excel, webhook masuk dari marketplace, serta endpoint ICC account mapping dan marketing teams.",
       "kata_kunci": [
         "integration-service",
-        "endpoint",
-        "API integration",
+        "endpoint API",
         "TikTok Shop",
         "TikTok Business",
         "Shopee",
         "Accurate",
         "webhook",
-        "retur",
+        "retur/return marketplace",
         "tracking resi",
-        "gateway"
+        "order/transaksi"
       ]
     },
     {
@@ -355,21 +355,20 @@
         "API - Integration Service",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line"
       ],
-      "hash": "687fbdc4971601365f8ab64396d954f6803391d0ef306b2f459d1b37342c0c7d",
-      "ukuran_kb": 13.4,
-      "ringkasan": "Menjawab: bagaimana master bahan dan master produk disinkronkan dari Accurate, bagaimana migrasi/alignment kode bahan-produk lama ke kode Accurate dilakukan tanpa duplikasi, dan bagaimana stok, saldo awal, serta rekonsiliasi/push pergerakan WMS ke Accurate bekerja. Juga menjawab endpoint transaksi produksi, formula/BOM, order material, master resi retur ekspedisi, dan feed retur marketplace untuk gudang.",
+      "hash": "37414c1256f1bb7aaad4eb80cc34fc01eb51c9da600c6ef7e5581a18b04b0cee",
+      "ukuran_kb": 14.2,
+      "ringkasan": "Menjawab: endpoint apa saja untuk mengelola master bahan baku & produk WMS manufaktur, cara sync/align kode dari Accurate atau HPP, bagaimana stok dan saldo awal bulanan dikelola, serta endpoint formula/BOM, produksi, dan push pergerakan WMS ke Accurate. Juga menjawab: bagaimana Master Resi retur ekspedisi diquery dan bagaimana feed retur marketplace dikonsumsi gudang.",
       "kata_kunci": [
-        "manufacture",
-        "WMS",
+        "manufacture-service",
+        "endpoint API",
         "master bahan",
         "master produk",
-        "stok",
-        "formula BOM",
-        "produksi",
+        "formula/BOM",
         "sync Accurate",
+        "saldo awal bulanan",
         "resi retur",
-        "purchase order",
-        "saldo awal"
+        "produksi",
+        "stok"
       ]
     },
     {
@@ -790,6 +789,7 @@
         "Microservices - Attendance Service",
         "HRIS - Key Performance Index",
         "Microservices - Task Management Service",
+        "Microservices - Insentive Service",
         "Microservices - Integration Service",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
         "ADR - 0012 Retur Refund-only Push-all",
@@ -799,7 +799,6 @@
         "CORE - API Master Gateway",
         "Microservices - Employee Service",
         "Microservices - Notification Service",
-        "Microservices - Insentive Service",
         "Microservices - Inventory Service",
         "CORE - IT Orchestrator",
         "CORE - HRIS Orchestrator",
@@ -809,22 +808,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "fe98f2d834e62662b57e16385cf0ff4482b589df89c297e8fae8bd65160de88c",
-      "ukuran_kb": 35.6,
-      "ringkasan": "Menjawab pertanyaan tentang fitur apa saja yang ada di web ERP (erp-frontend/\"One Bharata\") -- modul HRIS, Recruitment, Payroll, KPI, Support Ticket, dan akses menu WMS manufacture -- serta bagaimana autentikasi, role/RBAC (`system_roles`), dan SSO Identity Provider bekerja untuk aplikasi lain seperti Task Manager. Juga menjelaskan matriks akses per posisi untuk menu WMS dan aturan read-only Finance ke Gudang FG.",
+      "hash": "8b35e22d9591bda563aebd99eb7d55631328d929e42db1d4fe4df8fa39fa4b9b",
+      "ukuran_kb": 36.6,
+      "ringkasan": "Menjawab: fitur & modul apa saja yang tersedia di portal web ERP (hris-dashboard/One Bharata) - Dashboard, HRIS (Employee/Attendance/Recruitment/Payroll/KPI), Support Ticket, dan integrasi marketplace - beserta stack teknis dan role/RBAC per modul. Juga menjawab: bagaimana login & SSO Identity Provider bekerja, bagaimana matriks akses menu WMS per posisi diatur, dan bagaimana role Finance mendapat akses read-only ke Gudang FG (tab Return Dari Ekspedisi).",
       "kata_kunci": [
         "erp-frontend",
-        "Web ERP",
+        "hris-dashboard",
         "One Bharata",
+        "portal web ERP",
         "SSO",
-        "RBAC",
-        "system_roles",
-        "HRIS",
-        "recruitment",
-        "payroll",
-        "KPI",
-        "support ticket",
-        "autentikasi"
+        "role/RBAC",
+        "sidebar menu",
+        "Finance Gudang FG read-only",
+        "matriks akses WMS",
+        "system_roles"
       ]
     },
     {
@@ -1360,6 +1357,7 @@
         "ADR - 0009 Affiliate via Search Seller Affiliate Orders API",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
         "API - Manufacture Service",
+        "Microservices - Manufacture Service",
         "ADR - 0014 Accurate Token DB-backed via OAuth",
         "RUN - Accurate API Access Token (OAuth)",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur",
@@ -1371,7 +1369,7 @@
         "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
         "Sales - ICC Account Manager Mapping",
         "IT - Background Jobs & Schedulers",
-        "Microservices - Manufacture Service",
+        "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace",
         "ADR - 0008 Profit Engine Join via item_group_id",
         "LOG - Shopee API Rate Limit Request",
         "RUN - Backfill shipped_at Shopee",
@@ -1384,21 +1382,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "c924f47f091243c02a91f2995d3b5b8d71fcccc842e932fad2ffef0a6beafa62",
-      "ukuran_kb": 144.4,
-      "ringkasan": "Menjawab pertanyaan arsitektur integration-service -- bagaimana order marketplace (TikTok Shop, TikTok Business, Shopee) masuk lewat webhook, dinormalisasi jadi model transaction terpadu, dan di-bridging ke Accurate (invoice, sales return, ringkasan harian). Juga menjelaskan fitur GMV Max Monitoring/Overview & ICC Video Metrics untuk insentif marketing, status integrasi Meta Ads yang masih konsep, serta status middleware Desty yang sudah soft-disabled.",
+      "hash": "599f74c4e6c2aebb440037b9135ef68a2f9a0eac00664aeb57ea19e5df41d90e",
+      "ukuran_kb": 149.3,
+      "ringkasan": "Menjawab: apa itu integration-service, bagaimana arsitekturnya menghubungkan marketplace (TikTok Shop, TikTok Business/Ads, Shopee) ke ERP dan ke Accurate, serta fitur apa saja yang sudah diimplementasikan (webhook, GMV Max monitoring, ICC video metrics, sync master data, dsb). Juga menjawab: apakah integrasi Meta Ads sudah ada di kode atau baru rencana, dan bagaimana status jalur Desty yang di-disable.",
       "kata_kunci": [
         "integration-service",
         "marketplace",
-        "webhook",
+        "TikTok Shop",
+        "TikTok Business/Ads",
+        "Shopee",
         "Accurate",
-        "TikTok Business",
-        "GMV Max",
-        "ICC",
-        "insentif marketing",
         "Meta Ads",
-        "Desty",
-        "bridging akuntansi"
+        "GMV Max",
+        "webhook",
+        "Desty"
       ]
     },
     {
@@ -1453,22 +1450,23 @@
         "Microservices - Employee Service",
         "GA - Procurement System",
         "ADR - 0001 Akuntansi via Accurate",
-        "DB - Overview and Notes"
+        "DB - Overview and Notes",
+        "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
-      "hash": "560fc312463ca4e6193614b9b866896d88b3ea393edaa58a0e3f7d6cacb0ca3e",
-      "ukuran_kb": 36.6,
-      "ringkasan": "Menjawab pertanyaan seputar WMS manufacture-service -- bagaimana master bahan baku & produk disinkronkan dari Accurate/data HPP (bukan lagi Google Sheets), bagaimana stok direkonsiliasi dan didorong (push) ke Accurate sebagai Penyesuaian Persediaan, serta bagaimana Saldo Awal Bulanan dihitung dan dikunci tiap pergantian bulan. Juga menjelaskan stempel `created_by_name` di jalur transaksi/proposal untuk jejak audit siapa yang menginput.",
+      "hash": "4aa55d34a1108e87ddb19ab449a2422dd3f944685b1f7b94d4c58670d4faf24b",
+      "ukuran_kb": 40.2,
+      "ringkasan": "Menjawab: apa itu manufacture-service, bagaimana arsitektur WMS manufaktur mengelola master bahan/produk/formula/BOM/stok/produksi, dan dari mana sumber data master berasal (Accurate untuk bahan & stok, HPP untuk barang jadi, Excel untuk formula). Juga menjawab: bagaimana mekanisme push pergerakan WMS ke Accurate, bagaimana saldo awal bulanan dihitung, dan bagaimana stempel penginput (created_by_name) diterapkan di berbagai jalur tulis.",
       "kata_kunci": [
         "manufacture-service",
-        "WMS",
+        "WMS manufaktur",
         "master bahan",
-        "stok",
+        "master produk",
+        "formula/BOM",
         "sync Accurate",
-        "push Accurate",
         "saldo awal bulanan",
-        "transaksi",
-        "formula BOM",
-        "audit input"
+        "push WMS Accurate",
+        "produksi",
+        "stok"
       ]
     },
     {
@@ -1655,26 +1653,29 @@
         "WH - Fulfillment Flow & WMS Tinggarjaya",
         "CORE - API Master Gateway",
         "API - Warehouse Service",
+        "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace",
+        "External - Desty",
         "Microservices - Integration Service",
         "External - Accurate",
         "DB - Overview and Notes",
         "APP - Web ERP",
-        "IT - Background Jobs & Schedulers"
+        "IT - Background Jobs & Schedulers",
+        "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "1d44127551dadce9bd91b486af0f796be4d03e562e1b5001386f477486fc420a",
-      "ukuran_kb": 12.6,
-      "ringkasan": "Menjawab: bagaimana alur fulfillment WMS Tinggarjaya berjalan dari event order marketplace masuk, di-approve, picking, packing (scan barcode), hingga RTS dan handover ke kurir, serta bagaimana reconciler menyinkronkan status order dari integration service tiap 60 detik. Juga menjelaskan role gudang (admin_gudang, leader, spv, admin_qc) dan gerbang rekon `exported_at` sebelum RTS.",
+      "hash": "ec41f54a0ae38fc5c90f2422beff9d2403482b6d7b33293b19b407892b05cc05",
+      "ukuran_kb": 13.8,
+      "ringkasan": "Menjawab: apa itu warehouse-service, bagaimana alur fulfillment gudang Tinggarjaya bekerja dari order masuk (event ingestion) hingga serah-terima kurir (approve, pick, pack, RTS, label, handover), dan bagaimana reconciler serta open-order sweep menjaga data tetap sinkron dengan marketplace. Juga menjawab: role apa yang boleh melakukan operasi WMS apa, dan bagaimana gerbang rekonsiliasi (exported_at) sebelum RTS bekerja.",
       "kata_kunci": [
-        "warehouse",
-        "WMS",
+        "warehouse-service",
+        "WMS Tinggarjaya",
         "fulfillment",
-        "picking packing",
-        "RTS",
-        "label resi",
         "reconciler",
+        "open-order sweep",
+        "pick pack RTS",
+        "label pengiriman",
         "handover kurir",
-        "Tinggarjaya",
-        "state machine order"
+        "state machine status_wms",
+        "gudang"
       ]
     },
     {
@@ -2173,21 +2174,24 @@
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
         "ADR - 0012 Retur Refund-only Push-all",
         "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
+        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "Microservices - Integration Service",
         "ADR - 0017 Tanggal Retur TikTok via order_update_date"
       ],
-      "hash": "242d8be1d74e36a205e0e62f3c3bfffdf74d6e2a18c5990628e4d45c4a47590f",
-      "ukuran_kb": 5.9,
-      "ringkasan": "Menjawab kenapa Faktur Penjualan tidak lagi diedit/di-drop setelah terbit dan bagaimana semua pembalikan penjualan (retur maupun pembatalan pasca-kirim/COD) mesti lewat dokumen Retur Penjualan, termasuk insiden guard lama yang membuat sejumlah retur diam-diam tidak terbukukan.",
+      "hash": "2c71e83d0362cf083e08fbf7e72b847f15c4bc8396473c9d1af7f5755c1762db",
+      "ukuran_kb": 7.3,
+      "ringkasan": "Menjawab: kenapa Faktur Penjualan di sistem finance tidak pernah diubah/dihapus setelah terbit, dan kenapa semua pembalikan (retur maupun pembatalan pasca-kirim) harus lewat dokumen Retur Penjualan alih-alih line-drop. Juga menjawab: apa itu guard 'HIGH-C' yang dicabut, bagaimana pembatalan COD/pasca-kirim disintesis jadi retur, dan bug apa yang sempat menyebabkan retur tak terbukukan diam-diam di faktur auto-sync.",
       "kata_kunci": [
         "faktur permanen",
+        "retur penjualan",
         "line-drop",
-        "Retur Penjualan",
-        "cancel pasca-kirim",
-        "pembatalan COD",
-        "guard HIGH-C",
+        "sales return",
+        "HIGH-C guard",
+        "pembatalan pasca-kirim",
+        "COD gagal",
         "Accurate",
-        "sales invoice"
+        "cancel order",
+        "rebooking retur"
       ]
     },
     {
@@ -2456,6 +2460,35 @@
         "spam",
         "reputasi IP",
         "layanan email pihak ketiga"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace.md",
+      "judul": "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "✅",
+      "status_teks": "Accepted (mencerminkan kondisi kode; sudah jalan di [[Microservices - Integration Service]])",
+      "publik": true,
+      "tautan": [
+        "Microservices - Integration Service",
+        "Microservices - Manufacture Service",
+        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput"
+      ],
+      "hash": "f067d43973c5c95450a64d04cd8652ba38adae23257bd0bb971484fb1c67d967",
+      "ukuran_kb": 7.0,
+      "ringkasan": "Menjawab: kenapa resi/AWB yang sudah ada di marketplace kadang tidak muncul di Master Resi WMS, dan kenapa memakai field update_time marketplace sebagai watermark sync bisa membuat order tertentu permanen tak tertangkap. Juga menjawab: bagaimana desain koleksi resi_sync_state dan jaring pengaman (safety net) 2 jam mengatasi masalah ini tanpa bergantung pada disiplin developer di jalur tulis baru.",
+      "kata_kunci": [
+        "Master Resi",
+        "sync resi WMS",
+        "update_time watermark",
+        "resi_sync_state",
+        "safety net",
+        "cursor incremental sync",
+        "AWB",
+        "tracking number",
+        "sync-resi-wms",
+        "reconciler"
       ]
     },
     {
@@ -4207,6 +4240,7 @@
       "tautan": [
         "External - Desty",
         "Microservices - Integration Service",
+        "Microservices - Warehouse Service",
         "IT - Backup & DR",
         "IT - Runbooks",
         "IT - Monitoring System",
@@ -4219,19 +4253,20 @@
         "Microservices - Task Management Service",
         "Sales - Marketplace Integration"
       ],
-      "hash": "01109fbeaa136856621cf5622bb00f30f85152c8794ad0ab2efd05f07c355954",
-      "ukuran_kb": 13.4,
-      "ringkasan": "Menjawab: cron/job/worker latar belakang apa saja yang berjalan di bip-erp, kapan jadwalnya dan di service mana, untuk keperluan apa (sync order Shopee/TikTok, reminder attendance, auto-ignore pengajuan, rekonsiliasi income, dsb), dan mekanisme lock (Redis/Mongo) yang mencegahnya jalan dobel.",
+      "hash": "3a63df5d82ed6f4253a50dff62fa313a709850d90718f7fdce7c3a1ee484ab6b",
+      "ukuran_kb": 14.4,
+      "ringkasan": "Menjawab: proses/job apa saja yang berjalan otomatis di latar belakang (cron, scheduler, worker) di seluruh service bip-erp - kapan jadwalnya, di service mana, untuk apa, dan lock apa yang dipakai. Berguna saat debugging perilaku tak terduga, merencanakan kapasitas, atau ingin tahu apakah suatu perubahan data berasal dari job otomatis, termasuk job guardian retur/order Shopee-TikTok dan reminder attendance.",
       "kata_kunci": [
         "cron job",
         "scheduler",
-        "background job",
-        "worker",
-        "lock redis",
-        "sync order",
-        "guardian job",
-        "webhook dispatcher",
-        "reminder attendance"
+        "background worker",
+        "guardian order",
+        "guardian retur",
+        "lock Redis",
+        "reminder attendance",
+        "webhook consumer",
+        "job terjadwal",
+        "IT operasional"
       ]
     },
     {
@@ -5308,6 +5343,37 @@
         "ordersync",
         "rekonsiliasi",
         "rebuild faktur"
+      ]
+    },
+    {
+      "path": "Runbooks/RUN - Deploy Microservices bip-erp.md",
+      "judul": "RUN - Deploy Microservices bip-erp",
+      "area": "Runbooks",
+      "jenis": "runbook",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [
+        "IT - Background Jobs & Schedulers",
+        "Microservices - Warehouse Service",
+        "Microservices - Integration Service",
+        "RUN - Deploy Task Management Service",
+        "CORE - API Master Gateway"
+      ],
+      "hash": "4ec21f326e51d6db40d34c1c99f8412b5761fe13332e57af4591e7eece6ec130",
+      "ukuran_kb": 3.9,
+      "ringkasan": "Menjawab: bagaimana cara deploy ulang satu microservice bip-erp ke produksi dengan aman di jam rawan tanpa mengganggu dependensinya (database/service lain), dan kenapa flag --no-deps wajib dipakai. Juga menjawab: urutan deploy yang benar bila dua service saling bergantung, cara verifikasi pasca-deploy, dan troubleshooting gejala umum (mis. operasi gudang putus sesaat, service gagal konek mongo/redis).",
+      "kata_kunci": [
+        "deploy",
+        "docker compose",
+        "--no-deps",
+        "rebuild image",
+        "microservice",
+        "warehouse-service",
+        "integration-service",
+        "troubleshooting deploy",
+        "urutan deploy",
+        "runbook"
       ]
     },
     {
