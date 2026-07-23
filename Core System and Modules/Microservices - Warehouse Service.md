@@ -105,3 +105,4 @@ integration `shouldNotifyWarehouse` ikut meneruskan status tersebut.
 
 - [[WH - Fulfillment Flow & WMS Tinggarjaya]] · [[API - Warehouse Service]]
 - [[Microservices - Integration Service]] · [[IT - Background Jobs & Schedulers]]
+- [[RUN - Deploy Microservices bip-erp]] — deploy per-service aman (`--no-deps`)
