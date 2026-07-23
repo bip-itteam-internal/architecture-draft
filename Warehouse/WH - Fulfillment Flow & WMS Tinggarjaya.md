@@ -59,10 +59,18 @@ POST warehouse /fulfillment/events  (async + retry via webhook_tasks)
 > Reconcile OM↔WMS yang sahih = banding `TO_SHIP ↔ TO_SHIP`, bukan angka mentah (beda cakupan
 > status + basis tanggal `order_date` vs `created_at`).
 >
-> Langkah **arrange** (2→3) selama ini oleh **Desty**. Pengganti in-house = worker **`auto-arrange`**
-> (Gap 2, integration; **DORMANT** di balik `AUTO_ARRANGE_ENABLED`, nyala saat cutover) — lihat
-> [[External - Desty]] & [[IT - Background Jobs & Schedulers]]. Alur gudang **tidak berubah**:
-> order tetap masuk WMS saat `TO_SHIP`.
+> Langkah **arrange** (2→3) selama ini oleh **Desty**. Penggantinya di WMS = **menu "Perlu Diproses"**
+> (`GET /fulfillment/pending-arrange` + `POST /fulfillment/arrange`): admin melihat order tahap-2,
+> memilih batch, lalu menekan **"Proses Pengiriman"** → resi terbit → order masuk "Pesanan Baru".
+> Ini meniru tab "Perlu diproses" Desty dan **mempertahankan kendali admin** atas *ritme* (proses saat
+> gudang siap kemas, agar SLA tak berjalan sebelum barang dikemas) dan *penyaringan* (menahan order
+> bermasalah) — dua alasan nyata admin mengklik manual di Desty.
+>
+> **Order tahap-2 TIDAK dibuat sebagai record WMS** — hanya ditampilkan; record lahir saat order jadi
+> `TO_SHIP` lewat jalur ingest existing, sehingga aturan *"order di WMS pasti sudah punya resi"* utuh.
+> Alur gudang setelahnya **tidak berubah**. Worker **`auto-arrange`** (Gap 2) tetap **DORMANT** di balik
+> `AUTO_ARRANGE_ENABLED` dan **bukan** cara utama — lihat [[External - Desty]] &
+> [[IT - Background Jobs & Schedulers]].
 
 ### Fase 2 — Event & Reconciler (✅ Diimplementasikan — Task 4)
 
