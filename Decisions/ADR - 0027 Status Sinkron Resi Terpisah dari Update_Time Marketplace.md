@@ -1,6 +1,6 @@
 ## ADR 0027 — Status Sinkron Resi Terpisah dari `update_time` Marketplace
 
-- **Status**: ✅ Accepted (mencerminkan kondisi kode; sudah jalan di [[Microservices - Integration Service]])
+- **Status**: ✅ Accepted (mencerminkan kondisi kode; sudah jalan di [[Microservices - Integration Service]], deployed & diverifikasi prod 2026-07-23)
 - **Tanggal**: 2026-07-22/23
 - **Konteks dok**: [[Microservices - Integration Service]] · [[Microservices - Manufacture Service]]
 
@@ -29,7 +29,11 @@ Dua lapis pengaman dipasang, bukan satu:
 
 Kunci desainnya: jaring pengaman **tidak** bergantung pada `update_time` sama sekali — kebenarannya murni "ada di `resi_sync_state` dengan AWB yang cocok, atau tidak". Kalau jalur tulis BARU di masa depan lupa mencatat ke `resi_sync_state`, order itu otomatis muncul lagi di sapuan 2 jam berikutnya — **tanpa perlu tahu jalur mana yang salah**.
 
-Cap sapuan (`resiWMSSafetyNetScanCap`) sengaja **besar** (200.000, bukan sekadar "di atas volume nyata" seperti cap lain) dan **dilog eksplisit** bila tersentuh: cursor sapuan ini ephemeral (mulai dari 0 tiap run) — cap yang terlalu kecil justru bisa menciptakan blind-spot permanennya sendiri (selalu berhenti di irisan tertua yang sama, tak pernah maju), persis kelas bug yang sedang diberantas.
+Cap sapuan (`resiWMSSafetyNetScanCap`) sengaja **besar** (500.000, bukan sekadar "di atas volume nyata" seperti cap lain) dan **dilog eksplisit** bila tersentuh: cursor sapuan ini ephemeral (mulai dari 0 tiap run) — cap yang terlalu kecil justru bisa menciptakan blind-spot permanennya sendiri (selalu berhenti di irisan tertua yang sama, tak pernah maju), persis kelas bug yang sedang diberantas. **Dinaikkan dari 200.000 ke 500.000 (2026-07-23)**: query prod live saat first-run menunjukkan TikTok SENDIRI sudah punya 213.302 order-ber-AWB — melebihi cap awal, yang berarti cursor ephemeral tak akan pernah maju melewati irisan tertua yang sama (blind-spot permanen persis yang coba dihindari cap ini).
+
+**Push per-chunk, bukan sekali-jalan (ditemukan saat first-run 2026-07-23)**: implementasi awal mem-push SELURUH straggler channel dalam satu HTTP call ke `manufacture`. Pada volume TikTok (214.734 straggler saat first-run, migrasi dari nol), ini gagal dua kali berturut-turut dengan manifestasi beda (`413 Request Entity Too Large`, lalu `connection reset by peer`) — ukuran body / durasi request melebihi batas yang wajar. Diperbaiki: `sweepChannel` mem-push per-chunk (`resiWMSBatchLimit` = 1.000, konstanta yang sama dengan jalur cepat) dan memanggil `MarkSynced` per-chunk (bukan sekali di akhir) — kalau chunk ke-N gagal, chunk 1..N-1 yang sudah sukses tetap tercatat di `resi_sync_state` (tak perlu diulang dari nol saat retry). Hasil first-run pasca-fix: **213.293/214.734 TikTok berhasil disync tanpa error**, Shopee (57.683 straggler) sukses penuh dari awal (volumenya di bawah ambang masalah).
+
+⚠️ **Catatan gap yang masih terbuka**: loop per-chunk mengecek `error` dari `pushResiFeed` tapi **tidak** mencocokkan field `Synced` (jumlah yang benar-benar di-upsert manufacture) terhadap `len(chunk)` yang dikirim. Kalau manufacture mengembalikan HTTP 200 tapi diam-diam melewati sebagian item dalam chunk (mis. `BulkWrite` partial-failure yang tak membuat handler manufacture mengembalikan non-200), `MarkSynced` tetap menandai SEMUA item chunk itu sebagai tersinkron — item yang sebenarnya gagal jadi false-positive dan tak akan disapu ulang oleh safety-net berikutnya (karena `resi_sync_state`-nya sudah "benar" secara keliru). Belum terbukti terjadi di prod (spot-check `JY1079597252` cocok), tapi kelas risikonya nyata selama loop belum memverifikasi `Synced == len(chunk)`.
 
 Backfill satu-kali untuk resi yang SUDAH terlanjur macet (sebelum safety-net pertama kali jalan): `cmd/resiwmsbackfill` (dry-run default, `--apply`) — membandingkan watermark `sync_cursors` terhadap `update_time` order untuk cari kandidat stuck, lalu membump `update_time`-nya (memicu jalur cepat, bukan menduplikasi logika push). Dalam praktik, safety-net sendiri sudah cukup menyembuhkan ini otomatis pada run pertama; tool CLI berguna untuk menyembuhkan SATU order tertentu segera, tanpa menunggu jadwal.
 
@@ -46,7 +50,7 @@ Backfill satu-kali untuk resi yang SUDAH terlanjur macet (sebelum safety-net per
 - Mengganti `update_time` dengan timestamp lain (mis. `created_at`) TIDAK menghilangkan kelas bug ini — cuma memindahkannya. Order yang tracking-nya diisi belakangan tetap punya timestamp "asal" yang jauh lebih lama dari saat AWB benar-benar terisi, apa pun nama fieldnya.
 - Mengandalkan disiplin "tiap jalur tulis baru WAJIB ingat membarui field X" tidak scalable — itu persis kegagalan yang menyebabkan bug ini muncul pertama kali (developer yang menulis `SetOrderTracking` tidak salah paham arsitektur, cuma tidak tahu field itu dipakai cursor DI FILE LAIN).
 
-**Kalau suatu saat volume order-ber-AWB tumbuh signifikan** (cap 200.000 mulai tersentuh secara rutin, bukan cuma sekali di awal): pertimbangkan mengganti sapuan penuh dengan cursor yang **juga** persisten tapi berbasis kunci di `resi_sync_state` sendiri (bukan `update_time` order) — kuncinya boleh watermark lagi, tapi atas field yang KITA kendalikan penuh siklus hidupnya, bukan field milik upstream.
+**Kalau suatu saat volume order-ber-AWB tumbuh signifikan** (cap 500.000 mulai tersentuh secara rutin, bukan cuma sekali di awal): pertimbangkan mengganti sapuan penuh dengan cursor yang **juga** persisten tapi berbasis kunci di `resi_sync_state` sendiri (bukan `update_time` order) — kuncinya boleh watermark lagi, tapi atas field yang KITA kendalikan penuh siklus hidupnya, bukan field milik upstream.
 
 ## Dokumen Terkait
 
