@@ -50,6 +50,20 @@ POST warehouse /fulfillment/events  (async + retry via webhook_tasks)
 > manual (batch) oleh Admin Gudang / Leader / SPV. Auto-ship existing (00:01–14:59 WIB)
 > tetap berjalan di integration service — ini berbeda dari approve WMS.
 
+> **3 tahap status marketplace (jangan tertukar — "dibayar" ≠ TO_SHIP):**
+> **(1) Belum siap** (TikTok `UNPAID/ON_HOLD`, Shopee `UNPAID`) → `TO_PROCESS`. **(2) Siap
+> diatur kirim** (TikTok `AWAITING_SHIPMENT`, Shopee `READY_TO_SHIP/RETRY_SHIP`, **termasuk
+> COD** yang tak prabayar) → **tetap** `TO_PROCESS`. **(3) Diatur kirim** (arrange → AWB terbit;
+> TikTok `AWAITING_COLLECTION`, Shopee `PROCESSED`) → `TO_SHIP`. **WMS hanya menarik `TO_SHIP`**
+> (tahap 3) sebagai `NEW` — order `TO_PROCESS` hanya terlihat di Order Management, belum di WMS.
+> Reconcile OM↔WMS yang sahih = banding `TO_SHIP ↔ TO_SHIP`, bukan angka mentah (beda cakupan
+> status + basis tanggal `order_date` vs `created_at`).
+>
+> Langkah **arrange** (2→3) selama ini oleh **Desty**. Pengganti in-house = worker **`auto-arrange`**
+> (Gap 2, integration; **DORMANT** di balik `AUTO_ARRANGE_ENABLED`, nyala saat cutover) — lihat
+> [[External - Desty]] & [[IT - Background Jobs & Schedulers]]. Alur gudang **tidak berubah**:
+> order tetap masuk WMS saat `TO_SHIP`.
+
 ### Fase 2 — Event & Reconciler (✅ Diimplementasikan — Task 4)
 
 ```

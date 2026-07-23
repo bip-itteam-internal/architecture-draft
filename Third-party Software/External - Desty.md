@@ -14,6 +14,7 @@
 
 - **Webhook order masuk** — Desty mengirim event order lintas-platform → di-*ingest* lewat `POST /webhooks/services/desty` (auth `key` + `accessToken`), lalu di-enqueue ke queue untuk diproses.
 - **Auto-ship / auto-approve sadar-holiday** — saat order baru: ship hanya pada **00:01–14:59 WIB**; ditunda (`PENDING`) bila **>15:00 WIB** atau **hari libur** (varian Shopee juga menunda bila **besok** libur). Eksekusi per platform: Shopee/TikTok via ship-order masing-masing, selain itu via Desty `POST /api/order/accept`.
+  - **Pengganti in-house (Gap 2, 2026-07-23):** logika sadar-holiday ini kini direplikasi sebagai worker **`auto-arrange`** di integration (lihat [[IT - Background Jobs & Schedulers]] & [[Microservices - Integration Service]]) — mengambil order `raw_status` siap-kirim (termasuk COD) → `ShipBatch`. **Landing DORMANT** di balik env `AUTO_ARRANGE_ENABLED` (default off); dinyalakan **hanya saat cutover Desty→WMS** (WMS gudang mulai dipakai & arrange manual Desty dihentikan). Sampai flag on, arrange masih via Desty App operasional.
 - **Token rotation** — token Bearer Desty disimpan sebagai **current + previous** (jendela aman saat rotasi) dan di-refresh cron **tengah malam** (`0 0 0 * * *`, buffer kedaluwarsa 5 hari).
 
 ## Konfigurasi & Kredensial

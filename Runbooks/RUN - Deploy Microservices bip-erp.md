@@ -39,6 +39,12 @@ Bila dua service dirilis bersama dan salah satu memanggil yang lain saat boot/ru
 
 Urutan terbalik hanya berisiko sementara (warehouse memanggil endpoint yang belum paham param baru → filter diabaikan) sampai integration ter-update; bukan fatal, tapi hindari di jam rawan.
 
+## 3b. Fitur dorman di balik feature flag (aman deploy siapa pun)
+
+Beberapa fitur landing **DORMANT** — kode ada di produksi tapi tidak jalan sampai env flag dinyalakan sengaja. **Deploy integration-service oleh siapa pun TIDAK mengaktifkannya** selama flag tidak di-set `true` di `.env`.
+
+- **`AUTO_ARRANGE_ENABLED`** (integration-service, default **off**) — worker `auto-arrange` (pengganti auto-ship Desty) hanya didaftarkan bila `=true`. **JANGAN set `true` sampai cutover Desty→WMS** (WMS gudang mulai dipakai & arrange manual Desty dihentikan). Mengaktifkan = aksi kirim NYATA & irreversible ke marketplace. Lihat [[External - Desty]] & [[IT - Background Jobs & Schedulers]]. Verifikasi status di log boot: `auto-arrange scheduler DORMANT` (off) vs `... ENABLED` (on).
+
 ## 4. Verifikasi pasca-deploy
 
 ```bash
