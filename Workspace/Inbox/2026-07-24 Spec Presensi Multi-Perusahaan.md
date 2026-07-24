@@ -26,7 +26,7 @@ Menyiapkan sistem PRESENSI (attendance) bip-erp agar bisa dipakai perusahaan lai
 ### 1. Model Perusahaan & identitas
 - **Entitas master Perusahaan (baru)**: `company_id`, nama, kode pendek (BIP/PGL/...), status aktif, setelan default (zona jam kerja). Dipisah dari `Company` payroll (bisa dikaitkan kemudian, makna beda).
 - **`company_id` di akun karyawan** (`work_data`/auth). Diturunkan otomatis saat login (bukan dipilih user) -> ditempel ke **JWT** + header baru `BIP-Company`.
-- **`employee_id` tetap manual**; prefix per perusahaan opsional (keterbacaan), tapi patokan resmi = field `company_id`, bukan tebakan prefix.
+- **`employee_id` tetap manual, prefix per perusahaan WAJIB & unik** (mis. `BIP-`, `PGL-`) untuk keterbacaan + keunikan global. Patokan tenant resmi tetap field `company_id` (prefix untuk manusia, bukan sumber kebenaran penyaringan).
 - **BIP = Perusahaan #1 (default)**; semua data lama di-backfill `company_id = BIP`; perilaku BIP identik dengan sekarang.
 - **Master departemen, posisi, jadwal kerja** ikut ber-`company_id` (sekarang global), agar tiap perusahaan punya struktur & jam kerja sendiri.
 
@@ -38,7 +38,7 @@ Menyiapkan sistem PRESENSI (attendance) bip-erp agar bisa dipakai perusahaan lai
 - **`fingerprint_id` di-namespace per perusahaan** (perusahaan baru mobile-only; aman bila kelak ada mesin).
 
 ### 3. Onboarding, peran, login
-- **Onboarding (admin pusat)**: buat Perusahaan -> isi departemen/posisi & jadwal -> tunjuk HR admin perusahaan -> daftarkan karyawan (boleh didelegasikan ke HR perusahaan itu).
+- **Onboarding (admin pusat)**: buat Perusahaan -> isi departemen/posisi & jadwal -> tunjuk HR admin perusahaan -> **daftarkan karyawan (oleh admin pusat)**. HR perusahaan mengelola operasional harian (persetujuan, laporan).
 - **Peran per-perusahaan**: hak akses HR/supervisor/staf berlaku dalam konteks perusahaannya; hanya **admin pusat** yang lintas. (Beririsan dengan inisiatif "perapihan role/permission"; tetap dijaga scope ke presensi dulu.)
 - **Login karyawan perusahaan baru (MyBharata)**: sama seperti BIP; otomatis hanya melihat data perusahaannya; alur persetujuan izin/cuti mengalir ke atasan/HR perusahaan tersebut.
 - **Web HR**: HR tiap perusahaan lihat data & laporan perusahaannya; admin pusat bisa berpindah/pilih perusahaan.
@@ -46,7 +46,7 @@ Menyiapkan sistem PRESENSI (attendance) bip-erp agar bisa dipakai perusahaan lai
 ### 4. Perambatan lintas-service
 - **employee-service**: sinkron `work_schedule` + `/list` per perusahaan.
 - **notification-service**: teruskan konteks perusahaan (FCM/inbox/WA).
-- **api-gateway**: JWT + header `BIP-Company`; CORS mungkin perlu domain tambahan bila subdomain per perusahaan.
+- **api-gateway**: JWT + header `BIP-Company`. **Satu domain bersama** (tanpa subdomain per perusahaan) -> CORS tak berubah; perusahaan ditentukan dari akun saat login, bukan dari URL.
 
 ## Fase 1 (yang dibangun)
 1. Fondasi tenant: entitas Perusahaan, `company_id` di model, klaim perusahaan di login, lapisan penyaringan bersama, migrasi cap data BIP.
@@ -65,8 +65,10 @@ Mesin fingerprint untuk perusahaan baru; kaitan ke payroll multi-perusahaan; mod
 ## Tolok ukur sukses fase 1
 Karyawan 1 perusahaan pilot bisa absen, lihat jadwal, ajukan izin/cuti (persetujuan mengalir ke atasan perusahaan itu), dan HR-nya melihat laporan - semua terisolasi dari BIP, dan BIP tetap jalan normal tanpa perubahan.
 
-## Pertanyaan terbuka (untuk tahap rencana)
-- Pendaftaran karyawan perusahaan baru: admin pusat atau HR perusahaan itu sendiri (atau keduanya)?
-- Prefix `employee_id` per perusahaan: diwajibkan atau opsional?
-- Domain/URL: satu domain bersama atau subdomain per perusahaan (berpengaruh ke CORS)?
-- Berapa perusahaan pilot & kapan targetnya?
+## Keputusan lanjutan (2026-07-24)
+- **Pendaftaran karyawan perusahaan baru**: oleh **admin pusat**.
+- **Prefix `employee_id` per perusahaan**: **wajib & unik** (`company_id` tetap patokan resmi penyaringan).
+- **Domain**: **satu domain bersama** (perusahaan ditentukan dari akun, bukan subdomain).
+
+## Pertanyaan terbuka (tersisa)
+- Perusahaan pilot & target waktu: **belum ditentukan** (tidak memengaruhi arsitektur; hanya untuk penahapan/urgensi).
