@@ -27,7 +27,7 @@ Paket **presensi penuh**: absen, jadwal, izin/cuti/sakit + approval, laporan HR.
 
 **Attendance (in-scope) — hardening:**
 - **Batch A (PR #653):** hari libur (`resolveEmployeeSchedule` + `/holiday` GET/DELETE), filter reviewer leave & tukar jadwal (`/request/view`,`/review`, `/schedule-exchange/*`, `/hr/requests/detail`), `/guestbook` GET, `/request/security-lookup`+`verify`, `PATCH /:id/update`, review koreksi, komentar telat guestbook → **ter-scope `company_id`**. (Libur kini per-perusahaan: perusahaan baru mengelola daftar liburnya sendiri, termasuk nasional.)
-- **Masih terbuka — A5 supervisor-lookup** `InternalRequest(nil)` → default BIP (lintas-service: `getSupervisorData` 8 call-site + cron + scope employee `/list?type=supervisor`); cron satu sweep global.
+- **A5 supervisor-lookup (PR #655):** employee `/list?type=supervisor` + attendance `getSupervisorData` (8 call-site + cron) ter-scope `company_id` via query param (sebab `InternalRequest(nil)` tak forward header). **Masih terbuka:** cron satu sweep global.
 - **Batch B (belum):** definisi shift (`company_work_schedule`) + rotasi (`company_group_rotation`, tanpa field `company_id`) di-fetch by `schedule_id`/`group_id` **global** → id wajib unik lintas-perusahaan + belum ada kelola shift per-perusahaan; GPS/fingerprint/WiFi hardcoded satu kantor.
 
 **Di LUAR fase 1 (belum ter-scope, per desain — fase lanjut):**
