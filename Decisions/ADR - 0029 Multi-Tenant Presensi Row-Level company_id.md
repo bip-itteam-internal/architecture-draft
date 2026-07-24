@@ -32,7 +32,7 @@ Paket **presensi penuh**: absen, jadwal, izin/cuti/sakit + approval, laporan HR.
 - **Payroll** — `company_id` = badan usaha penggaji (kop slip), **BUKAN tenant**; `listEmployeeSalaries`/run/THR campur semua perusahaan.
 - **Recruitment** — tanpa field company; portal karir publik (`/public/postings`, `/apply`) bersama semua tenant.
 - **HRD-document** — distribusi global (`my/documents` + `target:all` sampai ke semua tenant).
-- **master_department per-perusahaan** — PR #649 **ter-orphan** (merged ke branch stacked yang sudah mati, tak sampai `main`); re-apply via PR #652. Sampai merge, departemen (dan posisi) masih **GLOBAL**.
+- **Departemen per-perusahaan** — ✅ **live di main via PR #652**: `master_department.company_id` + scope `/data-type/department`,`/position`,`/master/departments` (`EffectiveCompanyID`) + migrasi backfill BIP. (Catatan proses: PR #649 sempat **ter-orphan** ke branch stacked yang sudah mati, lalu dipulihkan via #652.)
 - KPI groups + supervisor-lookup masih department-only (merge lintas-tenant bila nama departemen sama).
 
 **Sudah aman:** gateway (header ke semua service), notification FCM (personal/dept/broadcast ter-scope + `/list?type=fcm-token` filter company), core employee create + `/me` + respons login onboarding.

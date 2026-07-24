@@ -19,7 +19,7 @@ Doc: [[Microservices - Employee Service]]
 - system_authentication
 - kpi_score (beserta KPI templates)
 - company_holiday
-- master_department (departments + positions + roles per dept; seed otomatis) — **`company_id` per-perusahaan menyusul** (PR #652; sampai merge masih global — [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]])
+- master_department (departments + positions + roles per dept; seed otomatis) — kini **`company_id` per-perusahaan** (PR #652, migrasi backfill BIP; supervisi/RBAC tetap global — [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]])
 - master_system_role (feature-based role systems: insentive, integration; seed otomatis)
 - master_company (perusahaan/tenant multi-perusahaan: `key`/`name`/`code`; seed BIP; `code` = prefix employee_id)
 
