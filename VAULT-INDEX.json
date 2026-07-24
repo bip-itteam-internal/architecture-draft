@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-07-23",
-  "jumlah_dokumen": 227,
+  "digenerate": "2026-07-24",
+  "jumlah_dokumen": 234,
   "dokumen": [
     {
       "path": "2026-07-23.md",
@@ -525,23 +525,22 @@
         "WH - Fulfillment Flow & WMS Tinggarjaya",
         "API - Integration Service"
       ],
-      "hash": "7387acf6512d53bcdcf54e80f1aaefc7bcb56a0045e517a76a91d26b63b86b96",
-      "ukuran_kb": 16.8,
-      "ringkasan": "Menjawab: endpoint apa saja untuk WMS gudang Tinggarjaya dan bagaimana bentuk request/response-nya - ingest event order dari integration (`/fulfillment/events`), antrian & filter order, operasi approve/pick/pack/RTS/cetak label/handover, menu 'Perlu Diproses' (pending-arrange + arrange untuk terbitkan resi), export rekon, serta CRUD master produk. Menjelaskan role yang diizinkan (admin_gudang/leader/spv/admin_qc), auth gateway key, dan batasan (TikTok belum didukung di arrange).",
+      "hash": "6a501f233e2b8c18a5ee59b6170223dd44de558565d79710fdb588dc3251803b",
+      "ukuran_kb": 17.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan warehouse-service untuk fulfillment order marketplace, bagaimana event order masuk lewat POST /fulfillment/events beserta arti tiap action respons (created/updated/cancelled/closed_external/skipped), dan operasi WMS apa yang tersedia (queue + filter, pending-arrange, arrange/terbitkan resi, approve, pick, pack, RTS, cetak label, handover, dashboard, export rekon). Juga menjawab role mana (admin_gudang/leader/spv/admin_qc) yang boleh mengakses tiap operasi dan bagaimana order TikTok diproses via package_id.",
       "kata_kunci": [
-        "warehouse service",
+        "warehouse",
         "WMS",
         "fulfillment",
-        "queue",
-        "arrange",
-        "resi",
-        "label",
-        "RTS",
-        "handover",
         "gudang",
+        "resi",
+        "arrange",
+        "ship-batch",
+        "queue",
+        "RTS",
         "endpoint",
-        "pending-arrange",
-        "master produk"
+        "package_id",
+        "handover"
       ]
     },
     {
@@ -713,6 +712,7 @@
       "status_teks": "Implemented — aplikasi HRIS mobile produksi (Flutter, Android/iOS); rilis dev 1.10.2+104.",
       "publik": true,
       "tautan": [
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "CORE - API Master Gateway",
         "HRIS - Tukar Jadwal Kerja",
         "API - Attendance Service",
@@ -725,21 +725,22 @@
         "Microservices - Employee Service",
         "Microservices - Notification Service"
       ],
-      "hash": "7d0d385b6fb8a9af70420e27b99dbcbf1722f3058aa2ddfd4709d9a570221303",
-      "ukuran_kb": 10.1,
-      "ringkasan": "Menjawab: fitur apa saja yang tersedia di aplikasi mobile HRIS karyawan (attendance dengan geofencing/biometric/QR, cuti/izin, lembur, payslip, KPI, support ticket, tukar shift), bagaimana autentikasi JWT/biometric/PIN dan kebijakan satu akun satu device bekerja, dan stack teknis Flutter (bloc, clean architecture) yang dipakai. Juga menjawab catatan bahwa MyBharata terhubung langsung ke HRIS backend, bukan lewat API Gateway/SSO.",
+      "hash": "b3206c327d8146be93690bfa394d7c15ca6065c6ee91693f5a6eefec7c30813c",
+      "ukuran_kb": 10.5,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata dan fitur HRIS apa yang tersedia untuk karyawan (attendance clock-in/out, cuti/izin/dinas, lembur, payslip, KPI, support ticket, guest book, tukar shift), tech stack serta arsitektur Flutter-nya (Clean Architecture, bloc, dio, go_router), dan bagaimana autentikasi bekerja (JWT/PIN/biometric, kebijakan 1 akun 1 device). Juga menjawab bagaimana app terhubung langsung ke backend HRIS (bukan lewat gateway/SSO) dan status multi-perusahaan.",
       "kata_kunci": [
         "MyBharata",
-        "aplikasi mobile",
+        "mobile app",
         "Flutter",
+        "HRIS",
+        "attendance",
         "absensi",
-        "geofencing",
-        "biometric",
-        "payslip",
-        "support ticket",
         "cuti",
+        "izin",
         "lembur",
-        "tukar shift"
+        "overtime",
+        "payslip",
+        "biometric"
       ]
     },
     {
@@ -811,6 +812,7 @@
       "publik": true,
       "tautan": [
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "Microservices - Manufacture Service",
         "Microservices - Recruitment Service",
         "Microservices - Payroll Service",
@@ -836,26 +838,21 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "358b6514035d0685d200ff8312175744376f8a5c7eb133f1bfe096aeef37f9e9",
-      "ukuran_kb": 37.2,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (hris-dashboard), modul dan fitur apa saja yang tersedia (HR, attendance, finance/insentif, integrasi marketplace, KPI, payroll, recruitment, support ticket, WMS), serta stack teknologinya (Next.js/React/TypeScript). Juga menjawab: bagaimana autentikasi, role, dan RBAC bekerja, bagaimana gating sidebar per-module, matriks akses menu WMS per posisi, akun integration-only, dan peran web ini sebagai SSO Identity Provider untuk aplikasi lain.",
+      "hash": "c6cf83e5a38f3c37e5d85bafba94588341620f7eb4be94de4be0740a94e3f152",
+      "ukuran_kb": 37.7,
+      "ringkasan": "Menjawab: apa itu portal web ERP One Bharata (hris-dashboard, repo erp-frontend), modul dan fitur apa saja yang tersedia (HRIS/employee, attendance, payroll, recruitment, KPI, support ticket, WMS/manufacture, integration), serta bagaimana autentikasi dan role gating bekerja (login employee_id, SSO Identity Provider, system_roles per modul, matriks akses menu WMS, akun integration-only). Juga menjawab stack teknologinya (Next.js 16/React 19) dan dukungan multi-perusahaan di web.",
       "kata_kunci": [
+        "Web ERP",
         "hris-dashboard",
         "One Bharata",
-        "web ERP",
-        "frontend",
+        "erp-frontend",
         "Next.js",
         "RBAC",
-        "role",
         "system_roles",
         "SSO",
-        "HRIS",
-        "payroll",
-        "KPI",
-        "support ticket",
-        "WMS",
-        "insentif",
-        "incentive"
+        "role gating",
+        "sidebar",
+        "dashboard HRM"
       ]
     },
     {
@@ -953,6 +950,7 @@
       "publik": true,
       "tautan": [
         "CORE - SSO Flow",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
@@ -968,20 +966,22 @@
         "APP - MyBharata",
         "DB - Overview and Notes"
       ],
-      "hash": "3db94560846b77e4cb5d6cd109b003502c3fa3a94053f8b7747b441cd075fa29",
-      "ukuran_kb": 5.4,
-      "ringkasan": "Menjawab: bagaimana autentikasi JWT dan SSO ditangani di titik masuk tunggal ekosistem bip-erp, endpoint mana yang di-routing ke service mana (termasuk rute publik tanpa JWT), dan bagaimana rate limiting serta response caching via Redis bekerja di gateway. Juga menjelaskan header internal antar-service dan celah keamanan yang diketahui (SSO store in-memory, route dev/debug insecure).",
+      "hash": "8492d4a4acef0cad626b2d3cc3106e713320879c4e44e693c42f95d7f1d7541d",
+      "ukuran_kb": 5.8,
+      "ringkasan": "Menjawab: bagaimana API Master Gateway menangani autentikasi JWT, login (delegasi ke employee-service lalu mint JWT), SSO one-time-code, dan routing ke microservice via /api/:module/*. Juga menjawab header identitas apa yang di-inject dari klaim JWT (BIP-Employee-Id, BIP-System-Roles, BIP-Company-ID), route publik/open (?key=, /public/*, /ext/*), caching Redis, serta keterbatasan yang diketahui (SSO store in-memory, revoke token placeholder, route /dev insecure).",
       "kata_kunci": [
+        "gateway",
         "API gateway",
         "JWT",
-        "autentikasi",
+        "auth",
+        "login",
         "SSO",
         "routing",
         "reverse proxy",
-        "rate limiting",
+        "Fiber",
         "Redis cache",
-        "internal gateway key",
-        "Fiber"
+        "INTERNAL_GATEWAY_KEY",
+        "BIP-Company-ID"
       ]
     },
     {
@@ -1093,25 +1093,27 @@
         "Microservices - Employee Service",
         "APP - Dynamic Task Tracker",
         "HRIS - Organization Structure",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "APP - MyBharata",
         "GA - Guestbook System (Complete)",
         "Microservices - Task Management Service",
         "BASE - Enterance Point"
       ],
-      "hash": "68caa261b5bcd8f151021216607ed203114caaaed21caf429b8227b2d1d28534",
-      "ukuran_kb": 10.5,
-      "ringkasan": "Menjawab: bagaimana alur single sign-on end-to-end antar aplikasi internal bip-erp (one-time-code handoff, bukan IdP eksternal), langkah konkret menambah aplikasi konsumen SSO baru, serta bagaimana role/RBAC dan cakupan supervisi lintas departemen diturunkan dari klaim JWT dan header BIP-*. Rujuk dokumen ini saat mengintegrasikan aplikasi baru ke login ERP atau men-debug masalah redirect/token.",
+      "hash": "a4e5159647e3f5473d0cf0c6e7994775488f7db013ffeb65ee83d7cc93189150",
+      "ukuran_kb": 10.8,
+      "ringkasan": "Menjawab: bagaimana SSO bip-erp bekerja end-to-end sebagai one-time-code handoff (bukan IdP OAuth/SAML eksternal), komponen mana yang berperan (Web ERP sebagai Identity Provider, gateway, employee-service, app konsumen seperti Task Manager), dan skenario outbound launch vs inbound handoff. Juga menjawab endpoint ticket/redeem, pengelolaan token/sesi (TTL, refresh), langkah menambah aplikasi konsumen SSO baru, serta bagaimana role dan cakupan supervisi lintas departemen (supervised_departments) dan company_id dibawa di JWT/header.",
       "kata_kunci": [
         "SSO",
         "single sign-on",
-        "one-time code",
+        "one-time-code",
+        "handoff",
+        "ticket",
+        "redeem",
         "JWT",
-        "ticket redeem",
-        "login redirect",
+        "Task Manager",
+        "redirect_url",
         "supervised_departments",
-        "BIP-Department",
-        "RBAC",
-        "Task Manager"
+        "identity provider"
       ]
     },
     {
@@ -1163,6 +1165,7 @@
       "tautan": [
         "CORE - API Master Gateway",
         "Microservices - Employee Service",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
         "Microservices - Insentive Service",
@@ -1174,18 +1177,21 @@
         "Microservices - Payroll Service",
         "Microservices - File Service"
       ],
-      "hash": "189d8c8a696abae7929114f1ca90e9193d9e744cd124c9242cb36ef6159e5494",
-      "ukuran_kb": 4.7,
-      "ringkasan": "Menjawab: database mana milik service mana dalam pola database-per-service, daftar collection utama tiap service, dan bagaimana Redis serta MinIO dipakai sebagai infrastruktur data bersama. Juga menjelaskan mengapa employee-service satu-satunya yang berjalan sebagai replica set dan dibaca read-only oleh service lain.",
+      "hash": "072db2bd7dacee50953b51fb731fa9053872447cb1a89bdec10283ea61ff0c84",
+      "ukuran_kb": 5.4,
+      "ringkasan": "Menjawab: bagaimana pola database bip-erp diatur (database-per-service, satu MongoDB per microservice, tanpa akses lintas-DB), service dan container Mongo mana yang memiliki collection apa (employee, attendance, notification, insentive, integration, inventory, tiktok-shop, task-management, recruitment, payroll), serta di mana suatu data disimpan. Juga menjawab peran replica set employee-service, infrastruktur data bersama Redis (cache/queue) dan MinIO (object storage), dan penandaan company_id row-level multi-perusahaan.",
       "kata_kunci": [
-        "database-per-service",
+        "database",
         "MongoDB",
+        "database-per-service",
+        "collection",
+        "replica set",
         "Redis",
         "MinIO",
-        "replica set",
-        "collection",
-        "ownership data",
-        "infrastruktur data bersama"
+        "ownership",
+        "DB overview",
+        "company_id",
+        "koleksi"
       ]
     },
     {
@@ -1194,9 +1200,10 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented penuh (kecuali clock-in via website)",
+      "status_teks": "Implemented penuh (kecuali clock-in via website) · ⚠️ **multi-perusahaan (tenant) parsial** — lihat catatan di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]",
       "publik": true,
       "tautan": [
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "HRIS - Leave Request",
         "HRIS - Payroll",
         "HRIS - Employee Request & Approval",
@@ -1214,22 +1221,22 @@
         "APP - MyBharata",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "c9adc9b368177441d8472633bf2b0476c6680c7a2aee3afd74ca5a4927f7e307",
-      "ukuran_kb": 11.2,
-      "ringkasan": "Menjawab: bagaimana clock-in/clock-out multi-metode (fingerprint, mobile, website) bekerja, bagaimana alur pengajuan cuti/izin dan approval-nya, bagaimana tukar jadwal kerja (shift/hari), koreksi presensi, dan perjalanan dinas diajukan-disetujui, serta bagaimana payout payroll dihitung dari data kehadiran. Juga mencakup guestbook tamu dan manajemen hari libur.",
+      "hash": "5f40300ec0ad4bb12ba96d3cfdcb299ee0ef9c10a693334f93461cd8947b9307",
+      "ukuran_kb": 13.3,
+      "ringkasan": "Menjawab: endpoint dan fitur apa yang ditangani attendance-service (clock-in/out multi-metode via fingerprint/mobile/website, resolusi dan rotasi jadwal, leave request, koreksi presensi, perjalanan dinas, tukar jadwal kerja, guestbook tamu, hari libur, laporan payroll dan absensi). Juga menjawab bagaimana alur approval dan idempotency pengajuan bekerja, bagaimana payout per status absensi dihitung (payroll-supplement, payroll_status_treatment), cron pra-generate entry, dan status scoping multi-perusahaan.",
       "kata_kunci": [
         "attendance",
         "absensi",
-        "clock-in clock-out",
+        "presensi",
+        "clock-in",
+        "leave request",
         "cuti",
         "izin",
-        "leave request",
-        "tukar jadwal",
-        "shift exchange",
         "koreksi presensi",
         "perjalanan dinas",
-        "payroll supplement",
-        "guestbook"
+        "tukar jadwal",
+        "guestbook",
+        "payroll-supplement"
       ]
     },
     {
@@ -1238,9 +1245,10 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti",
+      "status_teks": "Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ⚠️ **multi-perusahaan (tenant) parsial** — fondasi ada, banyak read belum ter-scope; lihat catatan & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]",
       "publik": true,
       "tautan": [
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "CORE - IT Orchestrator",
         "HRIS - Training Program",
         "HRIS - Key Performance Index",
@@ -1256,21 +1264,22 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "a33e9053c71cae00929d81cb2da72cd39eed988f1c23099e1668ecf31391c18c",
-      "ukuran_kb": 9.5,
-      "ringkasan": "Menjawab: bagaimana karyawan login (username/employee_id, PIN, biometric) dan bagaimana onboarding/registrasi akun baru bekerja, bagaimana master data department dan system role dikelola via CRUD, serta bagaimana KPI dan training program karyawan dicatat. Juga menjawab endpoint admin akun (reset password/PIN, revoke device, aktif/nonaktif) dan feed data lintas-service yang dikonsumsi service lain.",
+      "hash": "7bce0196e2b2465f507ce49433f2a9e5fe1b9b02213195eccd7f3141a2c89432",
+      "ukuran_kb": 11.0,
+      "ringkasan": "Menjawab: apa peran employee-service sebagai master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding, serta endpoint apa saja yang disediakan (login/PIN/biometric, registration, account admin IT seperti forget-device dan reset, CRUD data karyawan, master department dan system role, KPI, contract, BPJS, vacation, training program, feed lintas-service). Juga menjawab bagaimana cakupan supervisi antar-departemen (supervised_by, klaim supervised_departments) di-resolve dari master data.",
       "kata_kunci": [
         "employee service",
+        "karyawan",
+        "auth",
         "login",
-        "autentikasi",
-        "master data department",
-        "system roles",
-        "KPI",
-        "training program",
         "onboarding",
-        "reset akun",
-        "PIN",
-        "biometric"
+        "master data",
+        "department",
+        "system_roles",
+        "KPI",
+        "vacation",
+        "training",
+        "supervised_departments"
       ]
     },
     {
@@ -1311,31 +1320,33 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (Fase 1 BE)**. Di belakang [[CORE - API Master Gateway]] (map `/api/hrd-document/*`), auth **SSO**, RBAC `system_roles[\"hris\"]` (**author=`isHR`** staf HR; registry-type tulis=`isHRAdmin`). Konten body = **Markdown** (`body_md`, selaras editor FE). **FE author = di kode** ([[APP - Web ERP]] PR #276); **employee-facing FE, soft-validate target ke sumber, enforcement ack di BE = belum** (lihat Catatan).",
+      "status_teks": "**Implemented (Fase 1 BE)**. Di belakang [[CORE - API Master Gateway]] (map `/api/hrd-document/*`), auth **SSO**, RBAC `system_roles[\"hris\"]` (**author=`isHR`** staf HR; registry-type tulis=`isHRAdmin`). Konten body = **Markdown** (`body_md`, selaras editor FE). **FE author = di kode** ([[APP - Web ERP]] PR #276); **employee-facing FE, soft-validate target ke sumber, enforcement ack di BE = belum** (lihat Catatan). · 🔴 **Multi-perusahaan: belum ter-scope** — distribusi global: `my/documents` (+ `target:all`) menjangkau semua tenant, tak ada dimensi company pada target. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].",
       "publik": true,
       "tautan": [
         "HRIS - HRD Documents",
         "ADR - 0013 HRD Documents",
         "CORE - API Master Gateway",
         "APP - Web ERP",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
         "ADR - 0002 Database-per-Service"
       ],
-      "hash": "1b1e2a4e74d25fb2dd8ae348e704e6089f5b5ce5e474bd52d97a21883982b6b7",
-      "ukuran_kb": 4.9,
-      "ringkasan": "Menjawab: bagaimana dokumen HRD (SOP, Syarat & Ketentuan, kebijakan) dikelola dengan versioning immutable dan dipublikasikan, bagaimana penyasaran (targets) dokumen ke posisi/departemen/jenis-pengajuan/karyawan tertentu bekerja, dan bagaimana karyawan mengakui (acknowledge) versi dokumen yang berlaku bagi dirinya. Termasuk gap yang belum diimplementasikan seperti soft-validate target dan enforcement ack di BE.",
+      "hash": "1616e39aeb296dd4b7779ef6c78a99037f207afc0faa55b3bdd07c64424ae4f5",
+      "ukuran_kb": 5.1,
+      "ringkasan": "Menjawab: bagaimana HRD Document Service mengelola dokumen HRD (SOP, Syarat & Ketentuan, kebijakan, guideline) dengan model title+body Markdown, penyasaran (targets) polimorfik ke semua/posisi/departemen/jenis-pengajuan/karyawan, versioning immutable, dan acknowledgment per-versi. Juga menjawab endpoint kelola HR (draft, publish, versi), self-service karyawan (my/documents, ack, S&K saat pengajuan), model data collection, dan bagian yang belum ada (enforcement ack di BE, FE employee-facing, arsip).",
       "kata_kunci": [
         "HRD document",
-        "SOP",
-        "syarat dan ketentuan",
-        "kebijakan",
-        "versioning",
-        "acknowledgment",
-        "ack",
-        "targets penyasaran",
         "dokumen HRD",
-        "publish"
+        "SOP",
+        "syarat ketentuan",
+        "kebijakan",
+        "policy",
+        "acknowledgment",
+        "versioning",
+        "targets",
+        "ack",
+        "guideline"
       ]
     },
     {
@@ -1417,24 +1428,22 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "c99883f9bb3e390e3842f724641b1fdc0da279a202fd5d587cbf1bf7ddc145ae",
-      "ukuran_kb": 153.5,
-      "ringkasan": "Menjawab: apa peran dan arsitektur integration-service (service terbesar bip-erp) - bagaimana order marketplace masuk via webhook direct, dinormalkan jadi model transaction terpadu, lalu di-bridge ke Accurate Online (invoice, Sales Invoice/Return); ditambah fitur GMV Max/ICC video metrics, auto-ship/approve sadar-holiday, kredensial OAuth per marketplace, dan job sync terjadwal. Menjelaskan juga status Desty (soft-disabled 2026-07-12) dan bagian yang masih konsep (Meta Ads belum ada kode).",
+      "hash": "8b991e610cfe1059c4262b56456a709674cf2bb54d8be7706ed7e25b045c1ab2",
+      "ukuran_kb": 157.4,
+      "ringkasan": "Menjawab: bagaimana integration-service menghubungkan ERP ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee) via webhook direct per platform, menormalkan order dan laporan iklan menjadi model transaction terpadu, dan melakukan bridging akuntansi ke Accurate (invoice, Sales Invoice/Return). Juga menjawab detail webhook, kredensial OAuth, sync terjadwal, metrik ads (GMV Max monitoring/overview, ICC video metrics), fulfillment bridge ke WMS, review analytics, dan status Desty yang soft-disabled serta Meta Ads yang masih konsep.",
       "kata_kunci": [
-        "integration service",
+        "integration",
         "marketplace",
-        "TikTok",
+        "TikTok Shop",
         "Shopee",
         "Accurate",
-        "bridging",
-        "GMV Max",
-        "ICC",
         "webhook",
-        "Desty",
-        "Meta Ads",
-        "OAuth",
-        "auto-ship",
-        "Go Fiber"
+        "order sync",
+        "GMV Max",
+        "ads",
+        "iklan",
+        "bridging",
+        "transaction_orders"
       ]
     },
     {
@@ -1514,9 +1523,10 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented penuh",
+      "status_teks": "Implemented penuh · multi-perusahaan: pengiriman FCM (personal/departemen/broadcast) **ter-scope `company_id`** (`common.CompanyID(c)` → `/list?type=fcm-token&company_id=`), cegah bocor lintas-tenant. `InboxMessage` belum punya `company_id` (baca per-`employee_id` = aman; flag bila ada fitur agregat inbox). Lihat [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].",
       "publik": true,
       "tautan": [
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "Microservices - Recruitment Service",
         "ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri)",
         "Microservices - Employee Service",
@@ -1526,23 +1536,21 @@
         "APP - MyBharata",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "7aef0664f9b42c3aa003f3d6d240377db0c7f857666c3ae321c4e9ea24f326d3",
-      "ukuran_kb": 4.7,
-      "ringkasan": "Menjawab: bagaimana sistem mengirim notifikasi lintas channel (in-app inbox, FCM push, WhatsApp, splash promotion, article, dan email transaksional via Resend), endpoint apa saja yang tersedia (`/email/send`, `/fcm/send-*`, `/wa/send-*`, `/inbox/send`), dan bagaimana pola identitas pengirim email per-service (from address) diatur agar tidak tabrakan antar service seperti recruitment dan payroll. Juga menjawab siapa saja service lain yang bergantung pada notification service (Employee Service, File Service) dan jadwal cron pembersihan inbox.",
+      "hash": "4caa531b9fe7ee545a4e0abc0e483df49515565a97eb05e997d11b30982280ee",
+      "ukuran_kb": 5.0,
+      "ringkasan": "Menjawab: channel notifikasi apa saja yang disediakan hub notification-service (in-app inbox, FCM push, WhatsApp, email via Resend, splash promotion, article), endpoint pengiriman ber-service-key mana yang dipanggil service lain, dan bagaimana email transaksional dikirim (field from per-service, domain terverifikasi, idempotency_key). Juga menjawab pola identitas pengirim per-service, cron cleanup inbox, dan scoping FCM per company_id.",
       "kata_kunci": [
-        "notification service",
+        "notification",
+        "notifikasi",
+        "FCM",
+        "push",
+        "WhatsApp",
         "email",
         "Resend",
-        "resend-go",
-        "kirim email",
-        "FCM",
-        "push notification",
-        "WhatsApp",
         "inbox",
-        "RESEND_API_KEY",
-        "RESEND_FROM_EMAIL",
-        "identitas pengirim",
-        "deliverability"
+        "splash",
+        "article",
+        "send"
       ]
     },
     {
@@ -1551,13 +1559,14 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (Fase 1 Setup + Fase 2 Run+publish+self-service + Fase 2b PPh21 TER + Fase 4 THR)**. Di belakang [[CORE - API Master Gateway]] (`InternalURL[\"payroll\"]`), auth **SSO** ([[CORE - SSO Flow]]), role `system_roles[\"hris\"]`. Port `6980`, mongo `payroll-mongo-db` (host `32792`).",
+      "status_teks": "**Implemented (Fase 1 Setup + Fase 2 Run+publish+self-service + Fase 2b PPh21 TER + Fase 4 THR)**. Di belakang [[CORE - API Master Gateway]] (`InternalURL[\"payroll\"]`), auth **SSO** ([[CORE - SSO Flow]]), role `system_roles[\"hris\"]`. Port `6980`, mongo `payroll-mongo-db` (host `32792`). · 🔴 **Multi-perusahaan: belum ter-scope** — `company_id` di service ini = badan usaha **penggaji** (kop slip), BUKAN tenant; `listEmployeeSalaries`/run generation/THR meng-enumerasi SEMUA karyawan (`bson.M{}`) → campur lintas-perusahaan. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].",
       "publik": true,
       "tautan": [
         "HRIS - Payroll",
         "HRIS - Compensation & Benefits",
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
         "HRIS - Payroll Persona",
@@ -1568,20 +1577,22 @@
         "DB - Overview and Notes",
         "ADR - 0002 Database-per-Service"
       ],
-      "hash": "61ca36770e23458ce8673bbc27226e2d95bdb54a592db171424d291f4c2079c3",
-      "ukuran_kb": 9.8,
-      "ringkasan": "Menjawab: bagaimana payroll run dihitung (gaji pokok, BPJS, PPh21 metode TER, tunjangan kehadiran, lembur) hingga menjadi slip yang bisa diakses karyawan self-service, bagaimana lifecycle draft-approved-published bekerja, dan bagaimana THR dihitung berdasarkan masa kerja. Juga menjelaskan master komponen gaji, master badan usaha (multi-company untuk kop slip), dan config BPJS/pajak.",
+      "hash": "fd40b77899a93d026111811f736668fdc457da7672d59b6bbbb313f8367a3cac",
+      "ukuran_kb": 10.1,
+      "ringkasan": "Menjawab: bagaimana payroll-service mengelola penggajian dari setup sampai terbit slip (komponen gaji, konfigurasi BPJS dan pajak PPh21 metode TER, gaji per karyawan, master badan usaha untuk kop slip, payroll run dengan lifecycle draft-approve-publish, slip self-service, THR). Juga menjawab bagaimana slip dihitung (buildPayslip, PPh21 TER, potongan tunjangan kehadiran), model data payroll_db, batas scope (tanpa pembayaran/transfer), dan status multi-perusahaan yang belum ter-scope.",
       "kata_kunci": [
         "payroll",
         "penggajian",
         "gaji",
-        "PPh21 TER",
-        "BPJS",
-        "THR",
         "slip gaji",
+        "payslip",
+        "BPJS",
+        "PPh21",
+        "TER",
+        "THR",
         "payroll run",
         "komponen gaji",
-        "badan usaha"
+        "PTKP"
       ]
     },
     {
@@ -1590,12 +1601,13 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (BE)** — Fase 1-3 + adopsi ERPGo (A–F) + portal publik (browse/apply/track), **sudah di `main`** & jalan di dev. Belum: AI CV screening, psikotes online, WhatsApp kandidat, Glints sync, FE internal (erp-frontend Candidate Pipeline berjalan terpisah). Di belakang [[CORE - API Master Gateway]], auth **SSO** ([[CORE - SSO Flow]]), role `system_roles[\"hris\"]`. Port `6979`, mongo `recruitment-mongo-db`.",
+      "status_teks": "**Implemented (BE)** — Fase 1-3 + adopsi ERPGo (A–F) + portal publik (browse/apply/track), **sudah di `main`** & jalan di dev. Belum: AI CV screening, psikotes online, WhatsApp kandidat, Glints sync, FE internal (erp-frontend Candidate Pipeline berjalan terpisah). Di belakang [[CORE - API Master Gateway]], auth **SSO** ([[CORE - SSO Flow]]), role `system_roles[\"hris\"]`. Port `6979`, mongo `recruitment-mongo-db`. · 🔴 **Multi-perusahaan: belum ter-scope** — tak ada field company; requisition/posting/kandidat/interview/assessment + **portal karir publik** (`/public/postings`, `/apply`) bersama semua tenant. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].",
       "publik": true,
       "tautan": [
         "HRIS - Recruitment",
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "APP - Portal Karir Bharata",
         "API - Recruitment Service",
         "Microservices - File Service",
@@ -1608,20 +1620,22 @@
         "IT - Background Jobs & Schedulers",
         "APP - Web ERP"
       ],
-      "hash": "ea465073110a97ac89b2d3de2e430dbde0b4dd45af7c82964896ef508a8ad893",
-      "ukuran_kb": 34.8,
-      "ringkasan": "Menjawab: bagaimana alur approval Job Requisition bekerja di recruitment-service (siapa yang mengajukan, siapa yang menyetujui final, apa yang terjadi dengan status dan field lama seperti director_approver), serta apakah job posting masih menampilkan rentang gaji ke pelamar. Juga menjawab arsitektur service (stack, path, port, dependensi ke Employee/File/Notification Service) dan tahap pipeline recruitment yang sudah dibangun (posting, candidate, interview, offer, hire, onboarding handoff).",
+      "hash": "4b08f4ee768e445c85752a90b7c4b757a8d86bbd8817ebd10aa6f1a3499de760",
+      "ukuran_kb": 35.1,
+      "ringkasan": "Menjawab: bagaimana recruitment-service menangani siklus depan karyawan (job requisition + approval SPV HRD, job posting dan sourcing, candidate management, screening/interview/technical test/background check/psikotes, offer dan onboarding handoff ke employee-service, notifikasi email kandidat via Resend). Juga menjawab model data collection recruitment_db, jalur apply publik dan tracking kandidat, adopsi struktur ERPGo, catatan deploy manual, serta fitur yang belum ada (AI CV screening, psikotes online, WhatsApp, Glints sync).",
       "kata_kunci": [
-        "alur approval requisition",
-        "persetujuan permintaan karyawan",
-        "SPV HRD",
-        "Direktur",
-        "director-approve dihapus",
-        "job posting",
+        "recruitment",
+        "rekrutmen",
+        "ATS",
+        "job requisition",
         "lowongan",
-        "rentang gaji",
-        "gaji",
-        "recruitment-service"
+        "candidate",
+        "kandidat",
+        "interview",
+        "offer",
+        "hire",
+        "onboarding",
+        "portal karir"
       ]
     },
     {
@@ -1686,7 +1700,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — event ingestion + reconciler ✅; operasi WMS lengkap (approve/pick/pack/rts/labels/handover/dashboard/export rekon) ✅; jalur cepat APPROVED→RTS + gerbang rekon `exported_at` ✅; master produk CRUD ✅; frontend warehouse lengkap ✅ (queue+filter+unduh, picking, packing, RTS, label, handover).",
+      "status_teks": "Implemented (ada catatan) — event ingestion + reconciler ✅; operasi WMS lengkap (approve/pick/pack/rts/labels/handover/dashboard/export rekon) ✅; jalur cepat APPROVED→RTS + gerbang rekon `exported_at` ✅; master produk CRUD ✅; frontend warehouse lengkap ✅ (queue+filter+unduh, picking, packing, RTS, label, handover). ✅ **Deadlock cursor reconciler diperbaiki & deploy 2026-07-24** (PR #638, commit `14b9795c`) — lihat *Event Ingestion & Reconciler*.",
       "publik": true,
       "tautan": [
         "WH - Fulfillment Flow & WMS Tinggarjaya",
@@ -1701,22 +1715,22 @@
         "IT - Background Jobs & Schedulers",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "21796e3995cb3573d868d22e381073952666d27504da6ed18e65c6ad1de6f518",
-      "ukuran_kb": 15.1,
-      "ringkasan": "Menjawab: bagaimana warehouse-service (WMS Tinggarjaya) bekerja - ingest event order dari integration, state machine `status_wms`, reconciler 60 detik dan open-order sweep 5 menit sebagai jaring pengaman self-healing, serta operasi gudang (approve/pick/pack/RTS/label/handover/export rekon) dengan role guard `system_roles[\"warehouse\"]`. Menjelaskan stack (Go/Fiber/Mongo/Redis), port 6980, database `warehouse_db`, env kunci, dan menu 'Perlu Diproses' pengganti arrange Desty (Shopee jalan, TikTok belum).",
+      "hash": "db663675371540ea6572eaef520cfa12584195085c460e98d2f4acfaa6b5df00",
+      "ukuran_kb": 18.6,
+      "ringkasan": "Menjawab: bagaimana warehouse-service (WMS Tinggarjaya) mengimplementasikan fulfillment secara nyata di kode (event ingestion order dari integration, reconciler 60 detik dengan cursor terpisah per status, open-order sweep self-healing, operasi WMS approve/pick/pack/RTS/label/handover/dashboard/export rekon). Juga menjawab keputusan teknis (menu Perlu Diproses untuk arrange resi pengganti Desty, guard package_id TikTok, gerbang rekon exported_at), state machine status_wms, model data warehouse_db, dan hak akses role warehouse.",
       "kata_kunci": [
-        "warehouse service",
+        "warehouse",
         "WMS",
+        "Tinggarjaya",
+        "fulfillment",
         "reconciler",
-        "open-order sweep",
+        "arrange",
+        "resi",
         "state machine",
         "status_wms",
-        "fulfillment",
-        "gudang",
-        "arrange",
-        "Redis lock",
-        "warehouse_db",
-        "Go Fiber"
+        "package_id",
+        "sweep",
+        "packer"
       ]
     },
     {
@@ -2562,6 +2576,45 @@
         "bip-erp",
         "VAULT-INDEX",
         "deterministik"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0029 Multi-Tenant Presensi Row-Level company_id.md",
+      "judul": "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan) — Fase 1 (Presensi) di `main`; hardening attendance + service lain BELUM ter-scope",
+      "publik": true,
+      "tautan": [
+        "Microservices - Attendance Service",
+        "Microservices - Employee Service",
+        "Microservices - Notification Service",
+        "Microservices - Payroll Service",
+        "Microservices - Recruitment Service",
+        "Microservices - HRD Document Service",
+        "CORE - API Master Gateway",
+        "CORE - SSO Flow",
+        "DB - Overview and Notes",
+        "APP - MyBharata",
+        "APP - Web ERP",
+        "ADR - 0002 Database-per-Service"
+      ],
+      "hash": "9501e6512a7517bc75859ea13219aebba4d797325f8e825737e27eec24fee851",
+      "ukuran_kb": 6.3,
+      "ringkasan": "Menjawab: mengapa dan bagaimana presensi bip-erp dibuat multi-tenant memakai company_id row-level di satu database (bukan instance atau DB terpisah per perusahaan), bagaimana company_id mengalir lewat JWT, header BIP-Company-ID, dan gateway lalu disaring di lapisan bersama (CompanyID/EffectiveCompanyID). Juga menjawab apa scope Fase 1 (paket presensi penuh yang sudah di main), hardening per PR (libur, jadwal, fingerprint, rotasi), dan bagian mana yang belum ter-scope (employee directory, payroll, recruitment, HRD document).",
+      "kata_kunci": [
+        "multi-tenant",
+        "multi-perusahaan",
+        "company_id",
+        "tenant",
+        "row-level",
+        "presensi",
+        "BIP",
+        "ADR 0029",
+        "isolasi data",
+        "admin pusat",
+        "EffectiveCompanyID"
       ]
     },
     {
@@ -3982,6 +4035,33 @@
       ]
     },
     {
+      "path": "Human Resource Information System/HRIS - Recruitment Flow.excalidraw.md",
+      "judul": "HRIS - Recruitment Flow.excalidraw",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [],
+      "hash": "f2d49092d109910d5a407fd40c6d5b21837bc601f9e1870bb7a8452dcd67e96a",
+      "ukuran_kb": 15.1,
+      "ringkasan": "Menjawab: seperti apa alur dan tahapan rekrutmen dari Job Requisition sampai Onboarding secara visual (diagram Excalidraw), yakni urutan tahap Requisition, Lowongan, Pelamar, CV Screening, Interview HR, Interview User, Technical Test, Interview Final, Background Check, Psikotes, Offering, Hired, hingga Onboarding (Masa Evaluasi). Juga menjawab pengelompokan fase (Sourcing, Seleksi, Keputusan, Onboarding) dan titik keputusan/approval (Approve SPV HRD, Terima/Tolak, Lulus/Perpanjang/Tidak Lulus).",
+      "kata_kunci": [
+        "recruitment flow",
+        "alur rekrutmen",
+        "pipeline",
+        "tahapan",
+        "requisition",
+        "screening",
+        "interview",
+        "offering",
+        "hired",
+        "onboarding",
+        "excalidraw",
+        "diagram"
+      ]
+    },
+    {
       "path": "Human Resource Information System/HRIS - Recruitment Pipeline Redesign (Plan).md",
       "judul": "HRIS - Recruitment Pipeline Redesign (Plan)",
       "area": "Human Resource Information System",
@@ -4328,22 +4408,21 @@
         "Microservices - Task Management Service",
         "Sales - Marketplace Integration"
       ],
-      "hash": "86e651b76dbf5dc097c8e286264d18b2d6e18f1e32e4cd47cf482db9f71f8b6a",
-      "ukuran_kb": 15.1,
-      "ringkasan": "Menjawab: proses latar belakang apa saja yang berjalan diam-diam di bip-erp - inventaris cron/scheduler/worker per service, jadwalnya (WIB), tujuannya, dan lock yang dipakai (Redis/Mongo), sehingga tak ada 'sistem tersembunyi' saat debugging, perencanaan kapasitas, atau mengubah service. Mencakup sync order/report marketplace, guardian order & retur Shopee/TikTok, reconciler income/escrow, reminder attendance, reset kuota cuti tahunan, packet tracking, dan dispatcher webhook.",
+      "hash": "24137f3c47eb85a474b6a89e131b4e8b030a32b42bec60c4185001b969fe5b3e",
+      "ukuran_kb": 15.5,
+      "ringkasan": "Menjawab: proses latar belakang apa saja (cron, scheduler, worker) yang berjalan diam-diam di bip-erp, di service mana, dengan jadwal berapa (WIB), untuk apa, dan lock apa yang dipakai, sehingga tidak ada sistem tersembunyi saat debugging, perencanaan kapasitas, atau perubahan service. Juga menjawab detail per job (reset kuota cuti, pre-alokasi entry absensi, reminder reviewer, sync order/GMV Max/report TikTok dan Shopee, guardian retur, packet tracking, cleanup inbox) beserta sintaks cron dan zona waktunya.",
       "kata_kunci": [
         "background jobs",
         "cron",
         "scheduler",
         "worker",
-        "job terjadwal",
-        "reconciler",
-        "guardian",
-        "Redis lock",
+        "terjadwal",
         "WIB",
-        "webhook consumer",
+        "lock",
+        "reconciler",
         "sync",
-        "robfig cron"
+        "guardian",
+        "robfig/cron"
       ]
     },
     {
@@ -6545,21 +6624,21 @@
         "Sales - Marketplace Integration",
         "DB - Overview and Notes"
       ],
-      "hash": "8ec240542ad76b19f13a7d34b85f8f0b6df0b3b057ae4598573afbc40aef798f",
-      "ukuran_kb": 5.0,
-      "ringkasan": "Menjawab: apa itu Desty dan perannya (historis) di bip-erp - middleware/SaaS orkestrasi order lintas-marketplace yang ditangani integration-service untuk webhook order masuk, auto-ship/approve sadar-holiday, dan token rotation. Menjelaskan status soft-disabled per 2026-07-12 (traffic mati, order kini via webhook direct TikTok/Shopee), konfigurasi & kredensial ENV, endpoint Desty yang dipakai, serta penggantinya (menu WMS 'Perlu Diproses' manual + worker auto-arrange yang masih dorman).",
+      "hash": "c9e181cd8346b3b86e27b2fd085860892589777e5d9cd9e3691f6bbe3040fb9f",
+      "ukuran_kb": 5.9,
+      "ringkasan": "Menjawab: apa itu Desty (middleware SaaS orkestrasi order lintas-marketplace) dan perannya di bip-erp (webhook order masuk, auto-ship/auto-approve sadar-holiday, token rotation), serta mengapa jalurnya soft-disabled per 2026-07-12. Juga menjawab apa penggantinya (webhook direct per platform plus menu WMS Perlu Diproses untuk arrange manual, worker auto-arrange yang masih dormant di balik AUTO_ARRANGE_ENABLED), konfigurasi/kredensial ENV, dan endpoint Desty yang dipakai.",
       "kata_kunci": [
         "Desty",
         "middleware",
         "orkestrasi order",
-        "marketplace",
         "auto-ship",
         "auto-approve",
-        "webhook",
+        "marketplace",
         "soft-disabled",
+        "webhook",
         "arrange",
-        "integration service",
-        "token rotation"
+        "TikTok Shop",
+        "Shopee"
       ]
     },
     {
@@ -6641,24 +6720,22 @@
         "Sales - Marketplace Integration",
         "DB - Overview and Notes"
       ],
-      "hash": "be5a84cb6ecb70f9cf60ec9011e6337c28ab909502d9665ed57e0213d5bea93e",
-      "ukuran_kb": 22.5,
-      "ringkasan": "Menjawab: bagaimana alur fulfillment end-to-end gudang Tinggarjaya bekerja - dari order masuk via webhook marketplace, arrange (terbit resi), operasi gudang lewat state machine `fulfillment_orders` (NEW->APPROVED->RTS->label->handover), gerbang rekon `exported_at`, kode packer (T1/T2), hingga serah kurir dan settlement Accurate. Menjelaskan 3 tahap status marketplace (kenapa TO_PROCESS != TO_SHIP), menu 'Perlu Diproses' pengganti arrange Desty, gap analysis blueprint vs sistem, hak akses, dan peran KiriminAja.",
+      "hash": "584812d0778d0a25c1d7d3624b66b5e4f44fcafc043467e414f10f8130646e46",
+      "ukuran_kb": 23.6,
+      "ringkasan": "Menjawab: bagaimana alur fulfillment gudang Tinggarjaya berjalan end-to-end dari order masuk via webhook marketplace, event dan reconciler, operasi WMS (approve/pick/pack/RTS/label/handover), settlement Accurate, sampai return. Juga menjawab tiga tahap status marketplace (TO_PROCESS vs TO_SHIP dan mengapa dibayar bukan berarti TO_SHIP), langkah arrange resi lewat menu Perlu Diproses pengganti Desty, state machine fulfillment_orders (jalur cepat vs scan), gerbang rekon, hak akses role warehouse, dan gap analysis blueprint vs sistem.",
       "kata_kunci": [
         "fulfillment",
         "WMS",
         "Tinggarjaya",
         "gudang",
-        "state machine",
+        "alur order",
         "TO_SHIP",
-        "TO_PROCESS",
         "arrange",
         "resi",
-        "packer code",
-        "reconciler",
-        "handover",
+        "state machine",
         "settlement",
-        "Desty"
+        "KiriminAja",
+        "packer"
       ]
     },
     {
@@ -6862,6 +6939,139 @@
         "DateRangeFilter",
         "pencarian resi",
         "Gudang FG"
+      ]
+    },
+    {
+      "path": "Workspace/Inbox/2026-07-24 Rencana 1 - Fondasi Tenant Presensi.md",
+      "judul": "2026-07-24 Rencana 1 - Fondasi Tenant Presensi",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [],
+      "hash": "c5a93e790cb9a16f39a5b82c0bc97e8158edfa6103a11958e78b92b6222bd0e9",
+      "ukuran_kb": 26.6,
+      "ringkasan": "Menjawab: langkah rencana implementasi task-per-task (gaya TDD) untuk membuat backend bip-erp sadar-perusahaan sebagai fondasi multi-tenant tanpa mengubah perilaku BIP. Menjawab detail tiap task: helper common.CompanyID + konstanta header BIP-Company-ID, JWT membawa company_id, gateway meneruskan header, WorkData.CompanyID + login menstempel perusahaan, migrasi backfill company_id=BIP, master Company beserta CRUD, create-employee menyetel company_id, dan gerbang regresi. Berisi kode contoh, file target konkret, dan langkah commit.",
+      "kata_kunci": [
+        "rencana",
+        "plan",
+        "multi-tenant",
+        "company_id",
+        "fondasi",
+        "backend",
+        "TDD",
+        "CompanyID",
+        "JWT",
+        "master company",
+        "tenant",
+        "DefaultCompanyID"
+      ]
+    },
+    {
+      "path": "Workspace/Inbox/2026-07-24 Rencana 2 - Presensi Ber-Perusahaan.md",
+      "judul": "2026-07-24 Rencana 2 - Presensi Ber-Perusahaan",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [],
+      "hash": "fe78e3347ed1e433f4ccdd42988279b6c25196dc0a145ed0e280b9761b23617e",
+      "ukuran_kb": 15.2,
+      "ringkasan": "Menjawab: rencana implementasi task-per-task untuk menyaring seluruh data dan alur presensi per-perusahaan di attendance-service dan notification (prasyarat Rencana 1). Menjawab detail tiap task: tambah field company_id ke koleksi presensi, sync work_schedule membawa perusahaan, migrasi backfill BIP, helper pure companyFilter/withCompany, cap company_id saat create, saring /entries //today/mood/report/HR admin/review, cron sweeper per perusahaan, fingerprint dan wifi per perusahaan, notification anti-bocor lintas-tenant, plus gerbang isolasi dan regresi.",
+      "kata_kunci": [
+        "rencana",
+        "plan",
+        "presensi",
+        "attendance",
+        "company_id",
+        "multi-tenant",
+        "companyFilter",
+        "backfill",
+        "isolasi",
+        "scoping",
+        "notification",
+        "TDD"
+      ]
+    },
+    {
+      "path": "Workspace/Inbox/2026-07-24 Rencana 3 - Web HR & Admin Pusat.md",
+      "judul": "2026-07-24 Rencana 3 - Web HR & Admin Pusat",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [],
+      "hash": "e75c926e10bf4081c378b92e07308e4e26fae6a13168a80f90029d86f7dde931",
+      "ukuran_kb": 8.1,
+      "ringkasan": "Menjawab: rencana implementasi task-per-task untuk membuat web HR (erp-frontend) sadar-perusahaan (prasyarat Rencana 1 dan 2, deploy BE sebelum FE). Menjawab detail tiap task: peran admin pusat + override ?company= di backend attendance, plumbing cookie company_id di FE, halaman Kelola Perusahaan (master tenant) meniru departments-manager, pemilih/switcher perusahaan untuk admin pusat, field Perusahaan di Buat Karyawan, dan verifikasi/regresi. Menyertakan file target, i18n dua bahasa, dan reuse komponen.",
+      "kata_kunci": [
+        "rencana",
+        "plan",
+        "web HR",
+        "erp-frontend",
+        "admin pusat",
+        "kelola perusahaan",
+        "company switcher",
+        "multi-tenant",
+        "company_id",
+        "buat karyawan",
+        "i18n"
+      ]
+    },
+    {
+      "path": "Workspace/Inbox/2026-07-24 Rencana 4 - MyBharata Mobile.md",
+      "judul": "2026-07-24 Rencana 4 - MyBharata Mobile",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [],
+      "hash": "bd10c2144ab389523df3d8538f412dc35dded31eeb9730c3fb765f8b8fcc815a",
+      "ukuran_kb": 5.8,
+      "ringkasan": "Menjawab: rencana implementasi task-per-task untuk membuat MyBharata mobile sadar-perusahaan dengan perubahan minimal (prasyarat Rencana 1 dan 2). Menjawab detail tiap task: verifikasi lebih dulu bahwa alur inti presensi mobile sudah ter-scope otomatis via JWT (Task 0), ganti info perusahaan hardcoded jadi data nyata, opsional simpan identitas perusahaan dari login dan label bangunan dinamis, lalu rilis pilot dengan menaikkan versionCode. Menekankan mobile hampir tidak berubah karena scoping ditangani backend.",
+      "kata_kunci": [
+        "rencana",
+        "plan",
+        "MyBharata",
+        "mobile",
+        "Flutter",
+        "multi-tenant",
+        "company_id",
+        "tenant-awareness",
+        "JWT",
+        "versionCode",
+        "pilot"
+      ]
+    },
+    {
+      "path": "Workspace/Inbox/2026-07-24 Spec Presensi Multi-Perusahaan.md",
+      "judul": "2026-07-24 Spec Presensi Multi-Perusahaan",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": "Draft / Kajian",
+      "publik": false,
+      "tautan": [],
+      "hash": "ad0e463ce529aa88edf66142279a4256deb4ee8782dcab482ded10ae2c801138",
+      "ukuran_kb": 6.4,
+      "ringkasan": "Menjawab: apa keputusan dan desain hasil kajian untuk menjadikan presensi bip-erp multi-tenant bagi Bharata Group, yaitu model satu sistem terpusat dengan company_id row-level (bukan instance terpisah), cara absen perusahaan baru via MyBharata (GPS/selfie tanpa mesin fingerprint), scope Fase 1 (paket presensi penuh), dan adanya admin pusat plus isolasi per perusahaan. Juga menjawab kondisi kode saat ini, perubahan data/penyaringan, onboarding/peran/login, perambatan lintas-service, risiko, dan tolok ukur sukses. Dokumen ini adalah spec/latar yang mendasari Rencana 1-4 dan ADR 0029.",
+      "kata_kunci": [
+        "spec",
+        "kajian",
+        "presensi",
+        "multi-perusahaan",
+        "multi-tenant",
+        "company_id",
+        "Bharata Group",
+        "admin pusat",
+        "isolasi",
+        "onboarding",
+        "pilot",
+        "desain"
       ]
     },
     {
