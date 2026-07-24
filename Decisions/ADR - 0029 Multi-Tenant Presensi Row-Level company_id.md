@@ -30,7 +30,8 @@ Paket **presensi penuh**: absen, jadwal, izin/cuti/sakit + approval, laporan HR.
 - **A5 supervisor-lookup (PR #655):** employee `/list?type=supervisor` + attendance `getSupervisorData` (8 call-site + cron) ter-scope `company_id` via query param (sebab `InternalRequest(nil)` tak forward header). **Masih terbuka:** cron satu sweep global.
 - **Batch B (PR #656):** `company_work_schedule` + `company_group_rotation` ber-`company_id` (kepemilikan; lookup resolusi jadwal tetap by `schedule_id`/`group_id` yang **unik global** — sengaja, agar hot-path resolusi inti tak diubah) + seed BIP aman restart (`DeleteMany` BIP, bukan `Drop`) + CRUD `/company-work-schedule` (list/create/delete, **ENFORCE `schedule_id` unik global** = jaminan isolasi). FE Kelola Shift = erp-frontend #501.
 - **Fingerprint per-perusahaan (PR #657):** koleksi `company_fingerprint` (serial→tenant+lokasi, serial unik global) menggantikan allowlist + koordinat hardcoded; `/tap` fingerprint scope entry ke perusahaan pemilik mesin. **Temuan:** GPS mobile TAK dipakai untuk radius (jadwal WFA hanya butuh lokasi ADA), jadi hardcode GPS bukan blocker pilot mobile; hanya website `/tap` (501) yang masih pakai koordinat tetap.
-- **Masih terbuka:** CRUD `company_group_rotation` (rotasi shift bergilir) + FE kelola fingerprint; cron satu sweep global.
+- **CRUD rotasi shift (PR #658):** `/company-group-rotation` (list/create/delete, `group_id` unik global) untuk perusahaan shift bergilir.
+- **Masih terbuka:** FE kelola fingerprint + FE kelola rotasi (BE siap); cron satu sweep global.
 
 **Di LUAR fase 1 (belum ter-scope, per desain — fase lanjut):**
 - **Employee directory** — `/internal/export/all`, `/view`, `/v2/internal/aggregate/employees*`, `/list?type=employee|supervisor`, KPI, contract, BPJS, vacation, birthday, analysis, headcount: semua lintas perusahaan (PII massal). `EffectiveCompanyID` belum dipakai di read employee-service.
