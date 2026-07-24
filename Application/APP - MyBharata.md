@@ -3,6 +3,7 @@
 *Aplikasi mobile **MyBharata** (`my_bharata`) adalah aplikasi HRIS resmi PT Bharata Internasional — satu codebase Flutter untuk Android & iOS yang menjadi portal karyawan untuk seluruh siklus HR: attendance → cuti/izin → lembur → payroll → evaluasi. Aplikasi menegakkan aturan "Peraturan Perusahaan 2026–2028" secara otomatis dan mencegah kecurangan absensi melalui biometric + geofencing + validasi QR.*
 
 - **Status**: ✅ Implemented — aplikasi HRIS mobile produksi (Flutter, Android/iOS); rilis dev 1.10.2+104.
+- **Multi-perusahaan** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]): presensi (absen/jadwal/izin) ter-scope **otomatis via JWT** (tak ada perubahan). **Profil Perusahaan** kini dari `/me` (BIP profil penuh; perusahaan lain nama saja) & **onboarding** (welcome + setup-selesai) dari respons login `new_user` — buang hardcode "PT Bharata". **Sisa hardcode BIP (perlu dinamiskan):** `office_weather_card` + QR badge (`my_qr_widget`).
 
 - Pengguna: karyawan, supervisor, HRD, IT admin, dan tamu eksternal (guest book)
 - Versi build saat ini: **1.10.2+104** (dev; `pubspec.yaml`) — PR Support Ticket (#83) menaikkan ke **1.10.3+105**

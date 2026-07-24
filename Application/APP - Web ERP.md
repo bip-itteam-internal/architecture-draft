@@ -5,6 +5,7 @@
 - **Stack**: Next.js 16 (App Router) + React 19 + TypeScript; shadcn/ui + Radix + Tailwind v4; TanStack Query + axios; react-hook-form + zod; recharts (grafik); leaflet (peta lokasi absensi); `@uiw/react-md-editor` (article); **react-i18next** (i18n dua bahasa → [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]])
 - **Path**: `erp-frontend` (repo `erp-frontend`), branch `feature/sso-task-manager-menu`
 - **Status**: ✅ Implemented (aktif dikembangkan)
+- **Multi-perusahaan** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]): halaman **Kelola Perusahaan** `/hris/companies`, **pemilih perusahaan admin pusat** di header (kirim `?company` ke presensi), **Buat Karyawan** pilih-perusahaan-dulu + prefix Employee ID ikut perusahaan + kandidat rekrutmen khusus BIP, **Kelola Departemen** per-perusahaan (mengandalkan BE PR #652 — sampai merge, dropdown departemen masih global).
 
 ## Autentikasi & Role
 

@@ -19,8 +19,11 @@ Doc: [[Microservices - Employee Service]]
 - system_authentication
 - kpi_score (beserta KPI templates)
 - company_holiday
-- master_department (departments + positions + roles per dept; seed otomatis)
+- master_department (departments + positions + roles per dept; seed otomatis) — **`company_id` per-perusahaan menyusul** (PR #652; sampai merge masih global — [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]])
 - master_system_role (feature-based role systems: insentive, integration; seed otomatis)
+- master_company (perusahaan/tenant multi-perusahaan: `key`/`name`/`code`; seed BIP; `code` = prefix employee_id)
+
+> **Multi-perusahaan (tenant):** `work_data` dan ke-10 koleksi presensi (`attendance_entries`, `leave_request`, `attendance_correction_request`, `business_trip_request`, `schedule_exchange_request`, `guestbook`, `company_work_schedule`, `company_holiday`, `company_wifi`, mood) membawa `company_id` (row-level, default `"BIP"`). Filter di lapisan `common.CompanyID`/`EffectiveCompanyID`. Cakupan & gap: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 
 ### attendance — `attendance-mongo-db`
 Doc: [[Microservices - Attendance Service]]

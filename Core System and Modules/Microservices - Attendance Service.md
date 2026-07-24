@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB
 - **Path:** `services/attendance`
-- **Status**: ✅ Implemented penuh (kecuali clock-in via website)
+- **Status**: ✅ Implemented penuh (kecuali clock-in via website) · ⚠️ **multi-perusahaan (tenant) parsial** — lihat catatan di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
@@ -88,6 +88,7 @@
 - **Clock-in via website** masih mengembalikan `501 NotImplemented` — hanya metode `fingerprint` dan `mobile` yang berfungsi.
 - Terdapat kode rotasi hostlive lama dan `cronDatabaseBackup` yang sudah di-comment (dipindahkan ke system cron).
 - Beberapa nilai masih hardcoded: koordinat GPS kantor pusat dan allowlist serial mesin fingerprint.
+- **Multi-perusahaan (tenant) — parsial** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]): ke-10 koleksi presensi kini punya `company_id`, setiap CREATE menstempelnya, dan **jalur utama ter-scope** (`/entries`, `/today` team, `/mood`, `/report`, HR admin, review koreksi/dinas, cron entry, wifi/fingerprint WFO, notification FCM). Baca dipakai `common.EffectiveCompanyID(c)` (override `?company=` khusus admin pusat). **Hardening BELUM tuntas (potensi leak lintas-perusahaan):** lookup hari libur di `resolveEmployeeSchedule` (paling pervasif), `/holiday` GET, `/guestbook` GET, `/request/security-lookup`, `/hr/requests/detail` (by `_id`); `buildReviewFilter` + `buildScheduleExchangeReviewFilter` (reviewer departemen sama-nama); write by `_id` (`PATCH /:id/update`, `DELETE /holiday/:id`, `security-verify`, guestbook late-comment); `InternalRequest(nil)` → default BIP (supervisor/kuota nyasar); cron satu sweep global; `schedule_id`/GPS/fingerprint/WiFi masih satu kantor.
 
 ## Dependencies & Integrasi
 
