@@ -25,7 +25,10 @@ Paket **presensi penuh**: absen, jadwal, izin/cuti/sakit + approval, laporan HR.
 
 ## Consequences / Known Limitations (audit 2026-07-24)
 
-**Attendance (in-scope) — hardening BELUM tuntas** (potensi leak lintas-perusahaan): lookup hari libur di `resolveEmployeeSchedule` (paling pervasif) + `/holiday` GET + `/guestbook` GET + `/request/security-lookup` + `/hr/requests/detail` (by `_id`); `buildReviewFilter` + `buildScheduleExchangeReviewFilter` (reviewer departemen sama-nama lintas perusahaan); write by `_id` (`PATCH /:id/update`, `DELETE /holiday/:id`, `security-verify`, guestbook late-comment); `InternalRequest(nil)` → default BIP (supervisor/kuota nyasar); cron satu sweep global; `schedule_id`/GPS/fingerprint/WiFi masih hardcoded satu kantor.
+**Attendance (in-scope) — hardening:**
+- **Batch A (PR #653):** hari libur (`resolveEmployeeSchedule` + `/holiday` GET/DELETE), filter reviewer leave & tukar jadwal (`/request/view`,`/review`, `/schedule-exchange/*`, `/hr/requests/detail`), `/guestbook` GET, `/request/security-lookup`+`verify`, `PATCH /:id/update`, review koreksi, komentar telat guestbook → **ter-scope `company_id`**. (Libur kini per-perusahaan: perusahaan baru mengelola daftar liburnya sendiri, termasuk nasional.)
+- **Masih terbuka — A5 supervisor-lookup** `InternalRequest(nil)` → default BIP (lintas-service: `getSupervisorData` 8 call-site + cron + scope employee `/list?type=supervisor`); cron satu sweep global.
+- **Batch B (belum):** definisi shift (`company_work_schedule`) + rotasi (`company_group_rotation`, tanpa field `company_id`) di-fetch by `schedule_id`/`group_id` **global** → id wajib unik lintas-perusahaan + belum ada kelola shift per-perusahaan; GPS/fingerprint/WiFi hardcoded satu kantor.
 
 **Di LUAR fase 1 (belum ter-scope, per desain — fase lanjut):**
 - **Employee directory** — `/internal/export/all`, `/view`, `/v2/internal/aggregate/employees*`, `/list?type=employee|supervisor`, KPI, contract, BPJS, vacation, birthday, analysis, headcount: semua lintas perusahaan (PII massal). `EffectiveCompanyID` belum dipakai di read employee-service.
