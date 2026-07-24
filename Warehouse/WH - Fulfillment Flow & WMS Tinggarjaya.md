@@ -91,14 +91,14 @@ Integration service
            • Worst-case keterlambatan: ±1 menit
 ```
 
-> **Catatan (diperbarui 2026-07-24)**: hook push **sudah ada** — `NotifyWarehouse` (`webhook/processor/warehouse_hook.go:123` → `POST /fulfillment/events`), dipanggil async fire-and-forget dari **dua pemroses webhook** saja: `tiktok_direct.go:176` & `shopee_push.go:247`. Terbukti hidup di prod (2.166 order masuk WMS dalam 24 jam; 1.277 dalam 3 jam).
+> **Catatan (diperbarui 2026-07-24)**: hook push **sudah ada** — `NotifyWarehouse` (`internal/warehousehook/hook.go` → `POST /fulfillment/events`). Terbukti hidup di prod (2.166 order masuk WMS dalam 24 jam).
 >
-> 🔴 **Dua celah nyata pada rantai ini, ditemukan saat simulasi pertama 2026-07-24 — keduanya belum diperbaiki:**
+> ✅ **Dua celah rantai arrange→WMS, ditemukan saat simulasi pertama 2026-07-24 dan DIPERBAIKI hari yang sama (PR #638 / commit `14b9795c`):**
 >
-> 1. **Hook tidak dipanggil dari `ShipBatch`.** Order yang di-arrange lewat menu WMS "Perlu Diproses" mengandalkan webhook balasan marketplace, dan webhook itu **tidak datang** (2/2 sampel TikTok, ≥35 menit). Hipotesis: marketplace tidak menggemakan perubahan ke aplikasi yang menyebabkannya. Gerbang ingest hanya membuat order baru saat `status_mp = TO_SHIP` (`fulfillment_event.go:83`), jadi webhook `SHIPPED` yang datang belakangan saat kurir pickup pun akan di-`ignored` — order **tak akan pernah** masuk WMS dengan sendirinya. Detail: [[Microservices - Integration Service]].
-> 2. **Reconciler — satu-satunya jaring pengaman untuk order yang belum ada di WMS — bisa macet.** Terjadi nyata hari yang sama (cursor `TO_SHIP` beku ≥45 menit karena saturasi batch). Open-order sweep **tidak menolong** di sini: sweep hanya menyegarkan order yang **sudah** terdaftar di WMS. Detail: [[Microservices - Warehouse Service]].
+> 1. **Hook tidak dipanggil dari `ShipBatch`.** Order yang di-arrange lewat menu WMS "Perlu Diproses" mengandalkan webhook balasan marketplace, dan webhook itu **tidak datang** (2/2 sampel TikTok, ≥35 menit) — hipotesis: marketplace tidak menggemakan perubahan ke aplikasi yang menyebabkannya. **Perbaikan:** `ShipBatch` kini memanggil `NotifyWarehouse` langsung (jalur dorong) **dan** menaikkan `status`→`TO_SHIP` + `order_update_date` (jalur tarik reconciler) — dua jalur lepas-webhook. Detail: [[Microservices - Integration Service]].
+> 2. **Reconciler — satu-satunya jaring pengaman untuk order yang belum ada di WMS — bisa macet** (cursor `TO_SHIP` beku ≥1j44m karena saturasi batch). **Perbaikan:** paginasi + dorong cursor. Detail: [[Microservices - Warehouse Service]].
 >
-> Efek gabungan: pada 24 Juli 2026 jalur push **dan** jalur pull sama-sama tidak berfungsi untuk order yang kita arrange sendiri. **Blocker cutover** — perbaiki sebelum menu "Perlu Diproses" dipakai produksi penuh atau `AUTO_ARRANGE_ENABLED` dinyalakan.
+> **Terverifikasi live pasca-deploy:** order TikTok di-arrange lewat menu → muncul di "Pesanan Baru" dalam <60 detik tanpa webhook marketplace. Menu "Perlu Diproses" kini siap dipakai simulasi penuh.
 
 ### Fase 3 — Operasi Gudang / WMS (✅ — jalur cepat + gerbang rekon + jalur scan opsional)
 
