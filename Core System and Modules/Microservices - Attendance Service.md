@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB
 - **Path:** `services/attendance`
-- **Status**: ✅ Implemented penuh (kecuali clock-in via website)
+- **Status**: ✅ Implemented penuh (kecuali clock-in via website) · ⚠️ **multi-perusahaan (tenant) parsial** — lihat catatan di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
@@ -88,6 +88,7 @@
 - **Clock-in via website** masih mengembalikan `501 NotImplemented` — hanya metode `fingerprint` dan `mobile` yang berfungsi.
 - Terdapat kode rotasi hostlive lama dan `cronDatabaseBackup` yang sudah di-comment (dipindahkan ke system cron).
 - Beberapa nilai masih hardcoded: koordinat GPS kantor pusat dan allowlist serial mesin fingerprint.
+- **Multi-perusahaan (tenant) — parsial** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]): ke-10 koleksi presensi kini punya `company_id`, setiap CREATE menstempelnya, dan **jalur utama ter-scope** (`/entries`, `/today` team, `/mood`, `/report`, HR admin, review koreksi/dinas, cron entry, wifi/fingerprint WFO, notification FCM). Baca dipakai `common.EffectiveCompanyID(c)` (override `?company=` khusus admin pusat). **Hardening (Batch A, PR #653):** hari libur (`resolveEmployeeSchedule` + `/holiday` GET/DELETE), filter reviewer leave & tukar jadwal (`/request/view`,`/review`, `/schedule-exchange/view`,`/review`, `/hr/requests/detail`), `/guestbook` GET, `/request/security-lookup`+`verify`, `PATCH /:id/update`, review koreksi, komentar telat guestbook — **sudah ter-scope `company_id`**. **A5 supervisor-lookup (PR #655):** employee `/list?type=supervisor` + attendance `getSupervisorData` (8 call-site + cron) ter-scope `company_id` via query param. **Batch B (PR #656):** `company_work_schedule` + `company_group_rotation` ber-`company_id` (kepemilikan; lookup resolusi tetap by `schedule_id`/`group_id` yang **unik global**); seed BIP aman restart (`DeleteMany` company BIP, bukan `Drop` koleksi); CRUD `/company-work-schedule` (create/list/delete, **ENFORCE `schedule_id` unik global** → jaminan isolasi lookup). **FE Kelola Shift = erp-frontend #501** (editor 7-hari). **Fingerprint per-perusahaan (PR #657):** koleksi `company_fingerprint` (serial→tenant+lokasi) menggantikan allowlist hardcoded; `/tap` scope entry ke perusahaan pemilik mesin; CRUD `/internal/fingerprint/*`. Catatan: GPS mobile TAK dipakai untuk radius (WFA cuma butuh lokasi ADA), jadi hardcode GPS bukan blocker mobile — hanya website `/tap` (501) yang masih pakai `mainOfficeGPSCoordinate`. **CRUD rotasi shift (PR #658):** `/company-group-rotation` (list/create/delete, `group_id` unik global) untuk perusahaan shift bergilir. **Masih terbuka:** FE kelola fingerprint + FE kelola rotasi (BE siap); cron satu sweep global.
 
 ## Dependencies & Integrasi
 

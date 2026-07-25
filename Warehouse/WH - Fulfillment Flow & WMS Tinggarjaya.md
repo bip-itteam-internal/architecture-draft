@@ -91,7 +91,14 @@ Integration service
            • Worst-case keterlambatan: ±1 menit
 ```
 
-> **Catatan**: Hook `OnOrderUpsert` di integration service belum diimplementasikan. Saat ini hanya reconciler 60s yang aktif (worst-case lag ±1 mnt). Hook push realtime menjadi bagian Task integration berikutnya.
+> **Catatan (diperbarui 2026-07-24)**: hook push **sudah ada** — `NotifyWarehouse` (`internal/warehousehook/hook.go` → `POST /fulfillment/events`). Terbukti hidup di prod (2.166 order masuk WMS dalam 24 jam).
+>
+> ✅ **Dua celah rantai arrange→WMS, ditemukan saat simulasi pertama 2026-07-24 dan DIPERBAIKI hari yang sama (PR #638 / commit `14b9795c`):**
+>
+> 1. **Hook tidak dipanggil dari `ShipBatch`.** Order yang di-arrange lewat menu WMS "Perlu Diproses" mengandalkan webhook balasan marketplace, dan webhook itu **tidak datang** (2/2 sampel TikTok, ≥35 menit) — hipotesis: marketplace tidak menggemakan perubahan ke aplikasi yang menyebabkannya. **Perbaikan:** `ShipBatch` kini memanggil `NotifyWarehouse` langsung (jalur dorong) **dan** menaikkan `status`→`TO_SHIP` + `order_update_date` (jalur tarik reconciler) — dua jalur lepas-webhook. Detail: [[Microservices - Integration Service]].
+> 2. **Reconciler — satu-satunya jaring pengaman untuk order yang belum ada di WMS — bisa macet** (cursor `TO_SHIP` beku ≥1j44m karena saturasi batch). **Perbaikan:** paginasi + dorong cursor. Detail: [[Microservices - Warehouse Service]].
+>
+> **Terverifikasi live pasca-deploy:** order TikTok di-arrange lewat menu → muncul di "Pesanan Baru" dalam <60 detik tanpa webhook marketplace. Menu "Perlu Diproses" kini siap dipakai simulasi penuh.
 
 ### Fase 3 — Operasi Gudang / WMS (✅ — jalur cepat + gerbang rekon + jalur scan opsional)
 

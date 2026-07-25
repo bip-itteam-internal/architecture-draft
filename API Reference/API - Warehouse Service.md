@@ -61,7 +61,7 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 | POST | `/fulfillment/labels` | admin_gudang, leader, spv | Cetak resi per order (URL/PDF) → LABEL_PRINTED; reprint dicatat di history |
 | POST | `/fulfillment/labels/merged` | admin_gudang, leader, spv | Cetak batch besar → **SATU PDF gabungan** (max 100/batch, timeout 5 mnt); hanya `included` → LABEL_PRINTED |
 | GET | `/fulfillment/labels/history` | admin_gudang, leader, spv, admin_qc | Riwayat resi tercetak — audit keterlambatan (dicetak siapa/kapan, cetak ulang, serah kurir) |
-| GET | `/fulfillment/labels/history/export` | admin_gudang, leader, spv, admin_qc | Unduh riwayat xlsx (filter jam WIB); kolom: Waktu Cetak, No Resi, Nama Toko, Nama Produk, Qty |
+| GET | `/fulfillment/labels/history/export` | admin_gudang, leader, spv, admin_qc | Unduh riwayat xlsx (filter jam WIB); kolom: Waktu Cetak, No Resi, Expedisi, Nama Toko, Nama Produk, Qty |
 | POST | `/fulfillment/handover` | admin_gudang, leader, spv | Konfirmasi serah-terima kurir → HANDED_OVER |
 | GET | `/fulfillment/dashboard` | admin_gudang, leader, spv, admin_qc | Aggregate count per status_wms |
 
@@ -175,7 +175,7 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 
 **`GET /fulfillment/labels/history/export`** — unduh riwayat sebagai xlsx:
 - Query: `q` + `date_from`/`date_to` (WIB, dukung jam `2006-01-02T15:04` atau tanggal saja, batas menit inklusif) — sama dengan `/labels/history`; tanpa pagination; max 20.000 baris
-- Kolom (kebutuhan rekap tim, 2026-07-20): **No, Waktu Cetak (WIB), No Resi, Nama Toko, Nama Produk, Qty** — satu baris per produk
+- Kolom (kebutuhan rekap tim, 2026-07-20; **Expedisi** ditambah 2026-07-24 untuk surat jalan): **No, Waktu Cetak (WIB), No Resi, Expedisi, Nama Toko, Nama Produk, Qty** — satu baris per produk. `Expedisi` = `shipping_provider` (kosong bila belum terisi event/reconciler), ejaan konsisten dengan export rekon antrian.
 - Basis filter = `label_printed_at` (waktu cetak resi). Tanpa efek samping (tidak ada penandaan apa pun)
 
 **`GET /fulfillment/queue/counts`**:

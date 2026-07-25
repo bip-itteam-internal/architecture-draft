@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB
 - **Path:** `services/notification`
-- **Status**: ✅ Implemented penuh
+- **Status**: ✅ Implemented penuh · multi-perusahaan: pengiriman FCM (personal/departemen/broadcast) **ter-scope `company_id`** (`common.CompanyID(c)` → `/list?type=fcm-token&company_id=`), cegah bocor lintas-tenant. `InboxMessage` belum punya `company_id` (baca per-`employee_id` = aman; flag bila ada fitur agregat inbox). Lihat [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

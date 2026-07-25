@@ -4,7 +4,7 @@
 
 - **Stack**: Go + Fiber v2 + MongoDB (`hrd_document_db`) — selaras pola service bip-erp lain.
 - **Path**: `services/hrd-document` (port `6982`).
-- **Status**: ⚠️ **Implemented (Fase 1 BE)**. Di belakang [[CORE - API Master Gateway]] (map `/api/hrd-document/*`), auth **SSO**, RBAC `system_roles["hris"]` (**author=`isHR`** staf HR; registry-type tulis=`isHRAdmin`). Konten body = **Markdown** (`body_md`, selaras editor FE). **FE author = di kode** ([[APP - Web ERP]] PR #276); **employee-facing FE, soft-validate target ke sumber, enforcement ack di BE = belum** (lihat Catatan).
+- **Status**: ⚠️ **Implemented (Fase 1 BE)**. Di belakang [[CORE - API Master Gateway]] (map `/api/hrd-document/*`), auth **SSO**, RBAC `system_roles["hris"]` (**author=`isHR`** staf HR; registry-type tulis=`isHRAdmin`). Konten body = **Markdown** (`body_md`, selaras editor FE). **FE author = di kode** ([[APP - Web ERP]] PR #276); **employee-facing FE, soft-validate target ke sumber, enforcement ack di BE = belum** (lihat Catatan). · 🔴 **Multi-perusahaan: belum ter-scope** — distribusi global: `my/documents` (+ `target:all`) menjangkau semua tenant, tak ada dimensi company pada target. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 
 ## Endpoint / Fitur (Sudah Diimplementasikan — Fase 1 BE)
 

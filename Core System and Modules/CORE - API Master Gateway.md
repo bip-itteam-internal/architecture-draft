@@ -26,6 +26,7 @@
 **Internal Service Auth**
 - Gateway memasang header `GatewayID = INTERNAL_GATEWAY_KEY` di semua call yang diteruskan ke service internal
 - Gateway panic saat startup bila key kosong (fail-fast)
+- **Header identitas dari klaim JWT** (`Reroute` membuang header `BIP-*` kiriman klien lalu meng-inject ulang dari klaim): `BIP-Employee-Id`, `BIP-System-Roles`, dan **`BIP-Company-ID`** (perusahaan/tenant; fallback `"BIP"`) — dikirim ke **semua** module secara seragam, dan diteruskan antar-service via `InternalRequest`. Inilah fondasi multi-perusahaan: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 
 **Routing service via `/api/:module/*`**
 - Module: employee, attendance, notification, file, insentive, integration, tiktok-shop, inventory, task-management, recruitment, hris (orchestrator), it (orchestrator)
