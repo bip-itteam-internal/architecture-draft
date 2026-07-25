@@ -1402,21 +1402,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "6d2792e5e493569ff8a1ecd1e699c3e6c72f5e11d27e007a476db5929dd885c0",
-      "ukuran_kb": 159.7,
-      "ringkasan": "Menjawab: apa fungsi Integration Service, marketplace apa yang diintegrasikan (TikTok Shop, TikTok Business/Ads, Shopee), dan bagaimana order marketplace dinormalkan lalu di-bridge ke Accurate Online (invoice, ringkasan transaksi harian per-shop, push Sales Invoice dan Sales Return). Menjelaskan stack (Go + Fiber v2 + MongoDB + Redis), fitur per modul (webhook direct per platform, kredensial OAuth, auto-ship/auto-approve sadar-holiday, GMV Max monitoring/overview, ICC video metrics, WMS bridge, review analytics), status Meta Ads yang masih konsep, dan jalur Desty yang soft-disabled. Cocok untuk pertanyaan 'service ini melakukan apa', 'bagaimana data marketplace masuk ke akuntansi', dan 'modul/fitur backend integrasi apa yang ada'.",
+      "hash": "9c2eda4f846d0d2eb648fe68767e24963a6f16f60c6d4e6082748bd8e2afb608",
+      "ukuran_kb": 160.3,
+      "ringkasan": "Menjawab: bagaimana ERP mengintegrasikan marketplace Indonesia (TikTok Shop, TikTok Business/Ads, Shopee) — dari ingest order via webhook direct per platform, normalisasi ke model transaction terpadu, sampai bridging finansial ke Accurate Online (push Sales Invoice & Sales Return, ringkasan transaksi harian per-shop/channel). Menjawab pula: endpoint/fitur apa saja yang tersedia (manajemen kredensial OAuth per marketplace, GMV Max Monitoring/Overview, ICC Video Metrics untuk insentif, automasi auto-ship/auto-approve sadar-holiday, review analytics, gross profit per produk) serta cron/worker sync terjadwal dan aspek observability/ketahanan Shopee. Termasuk konteks jalur legacy Desty yang soft-disabled dan rencana Meta Ads yang belum ada kodenya.",
       "kata_kunci": [
-        "integration service",
-        "marketplace e-commerce",
+        "Integration Service",
+        "integrasi marketplace",
         "TikTok Shop",
-        "TikTok Business Ads",
         "Shopee",
-        "Accurate bridge akuntansi",
-        "Sales Invoice Sales Return",
-        "webhook direct",
+        "Accurate Online",
+        "webhook",
+        "Sales Invoice",
+        "Sales Return",
         "GMV Max",
-        "OAuth kredensial",
-        "auto-ship auto-approve"
+        "auto-ship"
       ]
     },
     {
