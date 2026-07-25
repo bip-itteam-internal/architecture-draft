@@ -45,7 +45,7 @@
 - **MongoDB** — penyimpanan inbox, splash, dan article.
 - **FCM** — push notification (via shared-library).
 - **WhatsApp** — pesan personal/grup (via shared-library).
-- **Resend** — provider email transactional (via `resend-go/v3` di shared-library `notification/email`); butuh env `RESEND_API_KEY` & `RESEND_FROM_EMAIL` (sender pada domain terverifikasi).
+- **Resend** — provider email transactional (via `resend-go/v3` di shared-library `notification/email`); butuh env `RESEND_API_KEY` & `RESEND_FROM_EMAIL` (sender pada domain terverifikasi). Alasan memakai layanan pihak ketiga alih-alih mail server sendiri: [[ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri)]].
 - Service lain:
 	- [[Microservices - Employee Service]] — sumber nomor telepon & FCM token (by id/nama/department/platform).
 	- [[Microservices - File Service]] — upload/hapus object di MinIO untuk image splash & article.
@@ -59,4 +59,5 @@
 - [[Microservices - File Service]]
 - [[DB - Overview and Notes]]
 - [[APP - MyBharata]]
+- [[ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri)]] — kenapa Resend, bukan mail server self-hosted
 - [[IT - Background Jobs & Schedulers]] — cron service ini (cleanup inbox >2 bulan, harian 03:00)

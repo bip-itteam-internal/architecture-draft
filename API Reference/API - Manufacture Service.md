@@ -52,7 +52,9 @@
 ## Retur Marketplace — Feed Gudang ✅
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/returns` | **Feed retur marketplace + status pencatatan gudang** — sumber tabel tab *Return Dari Ekspedisi* ([[APP - Web ERP]]). Retur ditarik dari integration `GET /transactions/returns` lewat HTTP + gateway key (sesuai [[ADR - 0002 Database-per-Service]] — **bukan** baca `integration_db` langsung), lalu di-join **di Go** dengan `manufacture_transaksi` by `dedupe_key` (beda cluster Mongo → `$lookup` mustahil). Param: `channel`, `shop_id`. Meta: `total`, `belum_dicatat`, `truncated` |
+| GET | `/returns` | **Feed retur marketplace + status pencatatan gudang** — sumber tabel tab *Return Dari Ekspedisi* ([[APP - Web ERP]]). Retur ditarik dari integration `GET /transactions/returns` lewat HTTP + gateway key (sesuai [[ADR - 0002 Database-per-Service]] — **bukan** baca `integration_db` langsung), lalu di-join **di Go** dengan `manufacture_transaksi` by `dedupe_key` (beda cluster Mongo → `$lookup` mustahil). Param: `channel`, `shop_id`. Meta: `total`, `belum_dicatat`, `truncated`. **Halaman ≥2 ditarik paralel** (maks 5 sekaligus) sejak 2026-07-23 — sebelumnya berurutan (lambat saat backlog besar) |
+| GET | `/returns/lookup` | **Fallback 1-order** (✅ 2026-07-23) — cari SATU order langsung ke integration (`?order_id=`), tak menyentuh cap paginasi `/returns`. Dipakai FE saat scan resi tak ketemu di feed yang sudah termuat browser (feed bisa terpotong; order lama yang baru cancel bisa jatuh di luar batch pertama) — sebelum keliru menyimpulkan "tak cocok dengan retur marketplace mana pun" |
+| GET | `/returns/sync-health` | **Status kesehatan sync marketplace** (✅ 2026-07-23) — proxy `GET /jobs/:name/status` milik integration untuk `sync-tt-shop-orders`/`sync-shopee-orders`/`sync-resi-wms`. Dipakai FE menampilkan banner SEBELUM operator menyimpulkan "data tidak ada" saat sync sedang bermasalah |
 
 **Status pencatatan DITURUNKAN saat baca, tidak disimpan** — supaya tak bisa melenceng saat retur/record berubah:
 

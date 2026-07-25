@@ -4,7 +4,7 @@
 
 - **Implementasi**: [[Microservices - Recruitment Service]] · **Status**: ⚠️ BE Fase 1-3 + master ERPGo (A–F) + portal publik (browse/apply/track) + requisition se-departemen — increment 2026-07-16 deployed & terverifikasi live di dev. **Custom Questions dihapus** (#486/#342). **hire→karyawan** (endpoint `link-employee`, PR #490) **merged, belum deploy**. **Link Form Feedback Interview** (`GET /interviews`, panel/location, feedback hardening — PR #536/#381) **merged & dilaporkan ter-deploy dev** (2026-07-18).
 - **Konsumen publik**: [[APP - Portal Karir Bharata]]
-- **Indeks**: [[API - Index]] · Role: `isSupervisor` (ajukan), `isHR`/`isHRSupervisor` (kelola/review), `isApprover` (Direktur/Secretary).
+- **Indeks**: [[API - Index]] · Role: `isSupervisor` (ajukan), `isHR`/`isHRSupervisor` (kelola/review **+ persetujuan final requisition** sejak 2026-07-22), `isApprover` (HR admin/Secretary — **tidak lagi dipakai di requisition**, masih dipakai untuk hire kandidat).
 
 ## Sistem
 | Method | Path | Fungsi |
@@ -18,9 +18,10 @@
 | GET | `/requisitions` · `/requisitions/:id` | List (HR semua / pengaju sendiri) / detail. **`?scope=department`** → SPV lihat requisition **se-departemen** (departemen dari identitas gateway; detail juga izinkan SPV se-departemen) — PR #470 | auth |
 | PUT | `/requisitions/:id` | Edit (saat Submitted/Revision). Departemen **dipertahankan** (edit tak memindahkan requisition) | pengaju |
 | POST | `/requisitions/:id/resubmit` | Kirim ulang setelah revisi | pengaju |
-| POST | `/requisitions/:id/hr-review` | Review kualifikasi (approve/revision) | HR supervisor |
-| POST | `/requisitions/:id/director-approve` | Persetujuan final | approver |
-| POST | `/requisitions/:id/reject` | Tolak | HR sup / approver |
+| POST | `/requisitions/:id/hr-review` | Review kualifikasi. `action=approve` → **langsung `Approved`** (persetujuan final); `action=revision` → `Revision`. Menerima status sumber `Submitted` **maupun** `HR Reviewed` (agar requisition lama yang menggantung bisa diselesaikan) — PR #609 | HR supervisor |
+| POST | `/requisitions/:id/reject` | Tolak. Alasan disimpan di `hr_note` (dulu `director_note`) | HR supervisor |
+
+> **`POST /requisitions/:id/director-approve` DIHAPUS** (PR #609, 2026-07-22) bersama tahap persetujuan Direktur. Respons juga **tidak lagi memuat `can_director_approve`**; `can_hr_review` kini bernilai `true` untuk status `Submitted` maupun `HR Reviewed`.
 
 ## Job Posting
 | Method | Path | Fungsi | Role |

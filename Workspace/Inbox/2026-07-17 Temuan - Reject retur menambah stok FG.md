@@ -1,7 +1,15 @@
 # Temuan (17 Juli 2026) — Qty Reject pada retur ikut menambah stok FG
 
-**Status**: belum diperbaiki (sengaja) — ditemukan saat mengerjakan feed retur gudang;
-user memutuskan dicatat terpisah agar tidak mencampur lingkup task.
+**Status**: ⛔ **DITUTUP — arah keputusan DIBALIK (22 Juli 2026, keputusan user).** Temuan ini
+mengusulkan reject **tidak** menambah stok (ke scrap). Keputusan akhir kebalikannya: **ketiga
+kondisi (Reuse/Rework/Reject) sama-sama menambah stok**; kondisi murni jadi keterangan dashboard,
+penyesuaian barang rusak dikerjakan **finance secara manual**. Alasannya: Accurate membukukan
+ketiganya sebagai `RETURNED` ([[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] Decision
+#8), jadi mengurangi Reject di WMS justru bikin dua sistem berselisih permanen. `deltaStokTransaksi`
+kini menambah seluruh qty (bukan lagi reuse+rework). **Jangan "memperbaiki" ini balik ke scrap** —
+itu keputusan sadar, bukan bug.
+
+> Catatan historis di bawah tetap dipertahankan sebagai konteks penemuan awal.
 
 ## Gejala
 
