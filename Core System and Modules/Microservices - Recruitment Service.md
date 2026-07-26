@@ -47,7 +47,9 @@
 > Detail field per collection ada di [[HRIS - Recruitment]] (hindari duplikasi).
 
 - **Backbone internal:** `job_requisition` · `job_posting` · `candidate` (+`progress`/`status`) · `screening_result` · `interview` · `technical_test_result` · `psychotest` · `psychotest_result` · `background_check` · `offer`
-- **Adopsi ERPGo (✅ Fase A–E):** `job_type` · `candidate_source` · `interview_type` · `job_location` (master); `job_posting` & `candidate` diperkaya (lihat increment di bawah). *(`custom_question` form-builder **dihapus** #486; `onboarding_checklist`/`checklist_item` **dihapus** 2026-07-18 — lihat catatan.)*
+- **Adopsi ERPGo (✅ Fase A–E):** `job_type` · `candidate_source` · `interview_type` · `job_location` (master); `job_posting` & `candidate` diperkaya (lihat increment di bawah). *(`custom_question` form-builder **dihapus** #486; `onboarding_checklist`/`checklist_item` per-kandidat lama **dihapus** 2026-07-18.)*
+- **Onboarding Checklist (✅ dibangun ulang 2026-07-26):** `onboarding_template` (master) + `onboarding_instance` (per karyawan baru, `tasks[]` snapshot) — model BARU dengan penugasan PIC lintas-tim + notif, menggantikan versi lama yang dibuang. Lihat increment di bawah.
+- **Candidate Assessment (✅):** `candidate_assessment` — catatan penilaian/tes (Pass/Fail/Pending), TIDAK mengubah status kandidat.
 
 ## Belum Diimplementasikan / Catatan
 
@@ -119,7 +121,7 @@
 
 > **Toggle `ask_gender`/`ask_date_of_birth` DIBUANG** — BE #503 / FE #358 (2026-07-17). Jenis kelamin & tanggal lahir bukan lagi opsional per-lowongan; keduanya **selalu wajib** untuk pelamar. `validateAgainstPosting` + field `AskGender`/`AskDateOfBirth` (`job_posting`) dihapus; portal karir memang sudah selalu memintanya. BSON lama ber-`ask_*` diabaikan saat decode (`ask_country` sudah dibuang lebih dulu, #462).
 
-**Deviasi tercatat vs skema ERPGo:** tanpa `created_by` tenant-scope; FK antar-service = string; funnel tetap enum `Progress`/`Status` (bukan `job_stages` master); `candidate_assessments` **di-skip** (sudah ada `technical_test_result`+`psychotest`).
+**Deviasi tercatat vs skema ERPGo:** tanpa `created_by` tenant-scope; FK antar-service = string; funnel tetap enum `Progress`/`Status` (bukan `job_stages` master). *(Catatan: `candidate_assessments` yang di increment ini ditulis "di-skip" KINI sudah diimplementasikan — koleksi `candidate_assessment` + menu FE "Candidate Assessment"; lihat Model Data di atas.)*
 
 **Increment lanjut (✅ gap A):** endpoint **upload/preview** `profile-image` & `cover-letter` kandidat (MinIO, pola CV) — menutup field yang tadinya yatim; **portal karir publik** `GET /public/postings` (daftar Open) & `GET /public/postings/:id` (detail) — dipublish gateway `/public/recruitment/postings*`, melengkapi `/apply`. Detail endpoint: [[API - Recruitment Service]].
 
@@ -163,9 +165,26 @@ Menutup TBD lama "mapping hire → data karyawan". Pembuatan **data master karya
 - **FE (#344, erp-frontend):** HRIS "Tambah Karyawan" kini bermula dari **modal 2 opsi** — *isi manual* (perilaku lama) atau *dari kandidat rekrutmen*. Mode dari-kandidat: picker kandidat **Hired belum tertaut** (`GET /candidates?status=Hired`, filter `!employee_id`) → wizard memprefill data kandidat (nama, jenis_kelamin, tanggal_lahir, email, no_hp, alamat), **menyembunyikannya** (kartu ringkasan read-only) & hanya menampilkan **sisa** field yang HR isi. Field wajib yang **kosong** di kandidat tetap tampil (email/alamat/tgl lahir opsional). Karyawan dibuat via `POST /api/hris/employees/multi` ([[Microservices - Employee Service]]), lalu `link-employee` dipanggil (best-effort) agar kandidat drop dari picker.
 - **Alur:** kandidat harus lebih dulu `Hired` (offer → accept → hire) baru muncul di picker.
 
-## Increment: Onboarding Checklist per-kandidat — ❌ DIHAPUS (2026-07-18)
+## Increment: Onboarding Checklist per-kandidat — ❌ DIHAPUS (2026-07-18) → dibangun ulang 2026-07-26
 
+> **Versi lama** ini dibuang; **dibangun ulang** 2026-07-26 dengan model & alur berbeda — lihat increment "Onboarding Checklist (rebuild)" di bawah.
+>
 > ~~Instansiasi per-kandidat dari template `onboarding_checklist`.~~ **Dibuang** (BE `chore/remove-onboarding-checklist` + FE erp-frontend, 2026-07-18). Baik master template (`/checklists*`, Fase 2) maupun instance per-kandidat `onboarding_progress` (`/candidates/:id/onboarding*`) beserta komponen FE (`ChecklistsPage`, kartu `OnboardingSection` + hooks) **tak ada lagi di kode** — komponen FE **yatim/tak pernah dirender** sejak dibangun (#492/#346), jadi dead code. Data Mongo lama dibiarkan (tak dipakai). **Dipertahankan:** stage pipeline `Onboarding`, hire handoff `/onboarding/register`, `link-employee`, dan **Performance Review Onboarding** (di bawah).
+
+## Increment: Onboarding Checklist (rebuild — 2026-07-26, ✅ BE live dev)
+
+> Membangun ulang fitur checklist onboarding karyawan baru (dibuang 2026-07-18 karena dead code) sebagai **fitur dedicated** meniru pola Performance Review Onboarding — kali ini **dengan penugasan PIC lintas-tim + notifikasi + pelacakan progres**. Mendigitalisasi proses manual HR (orientasi, setup IT, dokumen, tunjangan, kenalan tim). BE **PR #692** + FE **PR #524** (erp-frontend), keduanya **merged**; BE **terverifikasi live** di dev (smoke test create+delete template via gateway). `go build`/`vet`/`test` hijau. **≠ Performance Review Onboarding**: ini checklist tugas operasional (siapa mengerjakan apa, kapan); Performance Review = penilaian masa evaluasi. Keduanya berdampingan.
+
+- **Koleksi baru** (`db.go`): `onboarding_template` & `onboarding_instance`.
+  - `onboarding_template` (master, HR): key/name/description/target/status(`active`/`inactive`) + `items[]` {task, category, `assigned_role` (label panduan), is_required, due_day (hari sejak mulai)}.
+  - `onboarding_instance` (per karyawan baru): employee snapshot + template_key/name + start_date + buddy (opsional) + status (`In Progress`→`Completed`) + `tasks[]` snapshot {id lokal, task, category, is_required, due_date, `assignee` (PIC), status (`Pending`/`In Progress`/`Done`), done_by/at, note}. **Snapshot**: edit template tak mengganggu instance berjalan.
+- **Template CRUD** (`require(isHR)`): `/onboarding-templates` (+`/:id`).
+- **Instance** (`require(isHR)`): `POST /onboarding-instances` (bangun tasks dari item + PIC pilihan HR, hitung `due_date` = start + due_day, notif inbox tiap PIC), `GET` (filter `?status=&employee_id=`), `GET /:id`, `PUT /:id/complete` (override manual).
+- **PIC** (`requireAuth` + guard assignee/HR): `GET /onboarding-tasks/assigned` (tugas saya lintas instance), `PUT /onboarding-instances/:id/tasks/:taskId` (tandai status + catatan; **auto-complete** instance saat semua item `is_required` = Done).
+- **RBAC**: kelola = isHR; PIC ditetapkan HR **manual** (tak ada auto-resolve role→orang, karena system_roles=hak modul, bukan jabatan org). **Notif** = `notifyInbox` best-effort; **email PIC DITAHAN** (menyusul, event template `onboarding_task_assigned`).
+- **FE** ([[APP - Web ERP]]): menu **Onboarding Checklist** (Recruitment, 2 tab: Template + Onboarding Berjalan) + **Tugas Onboarding Saya** (Portal Saya). Menu lama **"Candidate Onboarding" di-rename → "Review Onboarding"** (= Performance Review) agar tak rancu. Reuse Combobox 2-baris + `useListEmployees`. i18n id+en.
+- **File** (`services/recruitment`): `models_onboarding.go`, `onboarding_template_handlers.go`, `onboarding_instance_handlers.go`, `onboarding_task_handlers.go`, `onboarding_test.go` (+ `db.go`/`routes.go`). Nol perubahan shared-library → service lain nol risiko.
+- **Belum**: uji E2E penuh via UI; email PIC; konfirmasi deploy FE (manual).
 
 ## Increment: Performance Review Onboarding (⚠️ PR #493/#349 — belum merged/deploy)
 

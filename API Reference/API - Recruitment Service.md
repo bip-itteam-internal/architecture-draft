@@ -72,7 +72,7 @@
 
 > **Custom Questions dihapus** (BE #486 / FE #342, 2026-07-16): endpoint `/questions` (form builder) + field `application_questions`/`custom_answers` **tak ada lagi** — portal karir memakai field native `candidate`. BSON lama diabaikan saat decode (tanpa migrasi).
 
-> **Onboarding checklist dihapus** (2026-07-18): endpoint `/checklists` · `/checklists/:id/items` (template) **dan** `/candidates/:id/onboarding*` (instance per-kandidat) **tak ada lagi** — komponen FE-nya yatim/tak pernah dirender (dead code). Data Mongo lama dibiarkan (koleksi jadi yatim, tak di-decode). Performance Review Onboarding tetap.
+> **Onboarding checklist (versi lama) dihapus** (2026-07-18): endpoint `/checklists` · `/checklists/:id/items` (template) **dan** `/candidates/:id/onboarding*` (instance per-kandidat) **tak ada lagi** — komponen FE-nya yatim/tak pernah dirender (dead code). **DIBANGUN ULANG 2026-07-26** dengan endpoint & model baru (`/onboarding-templates*`, `/onboarding-instances*`, `/onboarding-tasks/assigned`) — lihat section **Onboarding Checklist** di bawah. Performance Review Onboarding tetap terpisah.
 
 ## Performance Review Onboarding (⚠️ PR #493/#349 — belum merged/deploy)
 > Digitalisasi Form Review Performance Masa Evaluasi (dulu Google Form). Peserta = **karyawan masa evaluasi** (`employment_type` "PKWT (Evaluasi)"); penilai = karyawan mana pun (identitas SSO). Peserta tak boleh menilai dirinya sendiri. Kriteria 7+3 **konstanta** (purpose-built, bukan form builder).
@@ -85,6 +85,22 @@
 | PUT | `/onboarding-reviews/:id/decide` | Keputusan `{outcome, note}` — outcome `Lulus`/`Diperpanjang`/`Tidak Lulus` → status `Decided` | HR |
 | GET | `/onboarding-reviews/assigned` | Sesi yang ditugaskan ke saya (+ jawaban saya) | auth (penilai) |
 | POST | `/onboarding-reviews/:id/response` | Submit/ubah jawaban `{ratings(7×1-5), strengths, improvements, recommendations}` — boleh edit sampai sesi `Decided` | auth (penilai) |
+
+## Onboarding Checklist (rebuild 2026-07-26 — ✅ BE live dev, PR #692/#524)
+> Template tugas onboarding karyawan baru + instansiasi per orang + penugasan **PIC lintas-tim** + notif inbox + pelacakan progres. **≠ Performance Review Onboarding** (yang itu penilaian masa evaluasi). Detail: [[Microservices - Recruitment Service]].
+
+| Method | Path | Fungsi | Role |
+|---|---|---|---|
+| POST/GET | `/onboarding-templates` | Buat/daftar template (item: task/category/assigned_role/is_required/due_day) | HR |
+| GET/PUT/DELETE | `/onboarding-templates/:id` | Detail / edit (full-replace items) / hapus | HR |
+| POST | `/onboarding-instances` | Mulai onboarding: snapshot karyawan + template + `tasks[]` (item + PIC pilihan HR); BE hitung `due_date` (start+due_day), notif inbox tiap PIC | HR |
+| GET | `/onboarding-instances` | Daftar (`?status=&employee_id=`) | HR |
+| GET | `/onboarding-instances/:id` | Detail progres | HR |
+| PUT | `/onboarding-instances/:id/complete` | Tutup manual (override) | HR |
+| GET | `/onboarding-tasks/assigned` | Tugas onboarding yang ditugaskan ke saya, lintas instance | auth (PIC) |
+| PUT | `/onboarding-instances/:id/tasks/:taskId` | Tandai status (Pending/In Progress/Done) + catatan; **auto-complete** instance saat semua item `is_required` = Done | auth (PIC/HR) |
+
+> **Notif** = inbox best-effort; **email PIC ditahan** (menyusul, event `onboarding_task_assigned`). RBAC: kelola = isHR; PIC ditetapkan HR **manual** + guard assignee/HR pada update tugas.
 
 ## Publik (tanpa JWT — via gateway `/public/recruitment/*`)
 | Method | Path (gateway) | Fungsi |
