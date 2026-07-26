@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-07-25",
+  "digenerate": "2026-07-26",
   "jumlah_dokumen": 231,
   "dokumen": [
     {
@@ -1402,20 +1402,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "9c2eda4f846d0d2eb648fe68767e24963a6f16f60c6d4e6082748bd8e2afb608",
-      "ukuran_kb": 160.3,
-      "ringkasan": "Menjawab: bagaimana ERP mengintegrasikan marketplace Indonesia (TikTok Shop, TikTok Business/Ads, Shopee) — dari ingest order via webhook direct per platform, normalisasi ke model transaction terpadu, sampai bridging finansial ke Accurate Online (push Sales Invoice & Sales Return, ringkasan transaksi harian per-shop/channel). Menjawab pula: endpoint/fitur apa saja yang tersedia (manajemen kredensial OAuth per marketplace, GMV Max Monitoring/Overview, ICC Video Metrics untuk insentif, automasi auto-ship/auto-approve sadar-holiday, review analytics, gross profit per produk) serta cron/worker sync terjadwal dan aspek observability/ketahanan Shopee. Termasuk konteks jalur legacy Desty yang soft-disabled dan rencana Meta Ads yang belum ada kodenya.",
+      "hash": "e8ead653a0efd1662fd997448fe79b0f0feb3cd3d9cdf7721b047a3e91537a06",
+      "ukuran_kb": 164.4,
+      "ringkasan": "Menjawab: bagaimana Integration Service menghubungkan ERP ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee) lewat webhook direct dan OAuth per-akun/per-toko, bagaimana order serta laporan iklan dinormalkan menjadi model \"transaction\" terpadu, dan bagaimana bridging finansial ke Accurate Online bekerja (push Sales Invoice, Sales Return, ringkasan transaksi harian per-shop/channel). Merinci endpoint per modul (Webhooks, Credentials/Holidays, TikTok Business/Ads termasuk GMV Max Monitoring/Overview & ICC Video Metrics, Affiliate TikTok, Shopee termasuk AMS affiliate & Returns ingestion, Transactions, Accurate, WMS fulfillment bridge, worker/cron sync), model settlement per-SKU, automasi auto-ship/auto-approve yang sadar-holiday, serta feed retur lintas-channel untuk gudang. Berguna untuk pertanyaan soal arsitektur & stack service (Go/Fiber/Mongo/Redis), sumber data insentif dan marketing-insight, ketahanan terhadap rate limit/kuota Shopee, dan status (implemented vs belum deploy vs konsep seperti Meta Ads).",
       "kata_kunci": [
         "Integration Service",
         "integrasi marketplace",
+        "webhook",
+        "OAuth",
+        "Accurate Online",
+        "Sales Invoice",
         "TikTok Shop",
         "Shopee",
-        "Accurate Online",
-        "webhook",
-        "Sales Invoice",
-        "Sales Return",
         "GMV Max",
-        "auto-ship"
+        "settlement per-SKU"
       ]
     },
     {
