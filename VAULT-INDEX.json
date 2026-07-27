@@ -503,22 +503,22 @@
         "WH - Fulfillment Flow & WMS Tinggarjaya",
         "API - Integration Service"
       ],
-      "hash": "6a501f233e2b8c18a5ee59b6170223dd44de558565d79710fdb588dc3251803b",
-      "ukuran_kb": 17.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan warehouse-service untuk fulfillment order marketplace, bagaimana event order masuk lewat POST /fulfillment/events beserta arti tiap action respons (created/updated/cancelled/closed_external/skipped), dan operasi WMS apa yang tersedia (queue + filter, pending-arrange, arrange/terbitkan resi, approve, pick, pack, RTS, cetak label, handover, dashboard, export rekon). Juga menjawab role mana (admin_gudang/leader/spv/admin_qc) yang boleh mengakses tiap operasi dan bagaimana order TikTok diproses via package_id.",
+      "hash": "703f280498358bf2c15330ded9d0880a2800950a408e396ac722bce1feafd77c",
+      "ukuran_kb": 17.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan warehouse-service dan bagaimana kontrak request/response tiap route (`/api/warehouse/*`). Dokumen ini menjelaskan cara integration service mengirim event order (`POST /fulfillment/events`) beserta aturan idempotency, stale-event, cancel propagasi, dan auto-close; serta cara memfilter antrian WMS (status, kurir, toko, tanggal-jam WIB, sort qty), memproses pengiriman/terbitkan resi (pending-arrange, arrange, ship-batch), mencetak label (per order & PDF gabungan), handover kurir, export rekon xlsx, dan CRUD master produk. Menjelaskan juga skema auth: gateway key `BIP-Gateway-ID` untuk semua route plus role guard `BIP-System-Roles` (`warehouse`) untuk operasi WMS.",
       "kata_kunci": [
-        "warehouse",
+        "warehouse-service",
         "WMS",
         "fulfillment",
-        "gudang",
-        "resi",
-        "arrange",
-        "ship-batch",
-        "queue",
-        "RTS",
-        "endpoint",
-        "package_id",
-        "handover"
+        "endpoint API",
+        "event ingestion",
+        "queue antrian",
+        "resi label",
+        "arrange pengiriman",
+        "RTS handover",
+        "role guard",
+        "gateway key",
+        "package_id"
       ]
     },
     {
@@ -531,7 +531,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 2.0,
+      "ukuran_kb": 1.9,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -583,7 +583,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 3.0,
+      "ukuran_kb": 2.9,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1406,20 +1406,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "e8ead653a0efd1662fd997448fe79b0f0feb3cd3d9cdf7721b047a3e91537a06",
-      "ukuran_kb": 164.4,
-      "ringkasan": "Menjawab: bagaimana Integration Service menghubungkan ERP ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee) lewat webhook direct dan OAuth per-akun/per-toko, bagaimana order serta laporan iklan dinormalkan menjadi model \"transaction\" terpadu, dan bagaimana bridging finansial ke Accurate Online bekerja (push Sales Invoice, Sales Return, ringkasan transaksi harian per-shop/channel). Merinci endpoint per modul (Webhooks, Credentials/Holidays, TikTok Business/Ads termasuk GMV Max Monitoring/Overview & ICC Video Metrics, Affiliate TikTok, Shopee termasuk AMS affiliate & Returns ingestion, Transactions, Accurate, WMS fulfillment bridge, worker/cron sync), model settlement per-SKU, automasi auto-ship/auto-approve yang sadar-holiday, serta feed retur lintas-channel untuk gudang. Berguna untuk pertanyaan soal arsitektur & stack service (Go/Fiber/Mongo/Redis), sumber data insentif dan marketing-insight, ketahanan terhadap rate limit/kuota Shopee, dan status (implemented vs belum deploy vs konsep seperti Meta Ads).",
+      "hash": "9752b6d96eb57c99df3ee0166b90ad8e8867acf56741166e43124da09eb1e39e",
+      "ukuran_kb": 168.1,
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee) lewat webhook direct per platform, bagaimana order dan laporan iklan dinormalkan menjadi model transaction terpadu, serta bagaimana bridging finansial ke Accurate Online (push Sales Invoice & Sales Return, ringkasan transaksi harian per shop/channel) bekerja. Menjawab juga: endpoint/fitur apa saja yang tersedia (webhooks, credentials & holidays, TikTok Business/Ads termasuk GMV Max Monitoring/Overview & ICC Video Metrics, Shopee, Affiliate, Transactions, Accurate, fulfillment WMS bridge, gross profit per produk, review analytics), bagaimana automasi auto-ship/auto-approve yang sadar-holiday, cron sync terjadwal, dan manajemen kredensial OAuth per marketplace. Termasuk status jalur legacy Desty (soft-disabled), rencana Meta Ads (masih konsep, belum ada kode), dan catatan observability/ketahanan Shopee.",
       "kata_kunci": [
         "Integration Service",
         "integrasi marketplace",
-        "webhook",
-        "OAuth",
-        "Accurate Online",
-        "Sales Invoice",
         "TikTok Shop",
         "Shopee",
+        "TikTok Business Ads",
+        "Accurate Online",
+        "webhook",
         "GMV Max",
-        "settlement per-SKU"
+        "Sales Invoice Sales Return",
+        "auto-ship auto-approve"
       ]
     },
     {
@@ -1682,6 +1682,7 @@
         "API - Warehouse Service",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace",
         "External - Desty",
+        "WH - Warehouse Sadewa",
         "Microservices - Integration Service",
         "External - Accurate",
         "DB - Overview and Notes",
@@ -1689,22 +1690,22 @@
         "IT - Background Jobs & Schedulers",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "db663675371540ea6572eaef520cfa12584195085c460e98d2f4acfaa6b5df00",
-      "ukuran_kb": 18.6,
-      "ringkasan": "Menjawab: bagaimana warehouse-service (WMS Tinggarjaya) mengimplementasikan fulfillment secara nyata di kode (event ingestion order dari integration, reconciler 60 detik dengan cursor terpisah per status, open-order sweep self-healing, operasi WMS approve/pick/pack/RTS/label/handover/dashboard/export rekon). Juga menjawab keputusan teknis (menu Perlu Diproses untuk arrange resi pengganti Desty, guard package_id TikTok, gerbang rekon exported_at), state machine status_wms, model data warehouse_db, dan hak akses role warehouse.",
+      "hash": "e3577a469b75877239e17989353d781a9f3a88a607d68545f513def78e16725d",
+      "ukuran_kb": 20.7,
+      "ringkasan": "Menjawab: bagaimana arsitektur microservice warehouse (WMS Tinggarjaya) bekerja secara internal — stack (Go/Fiber/MongoDB `warehouse_db`/Redis), port, env kunci, dan struktur package flat. Dokumen ini menjelaskan mekanisme sinkronisasi order: event ingestion idempoten, reconciler 60 detik (cursor terpisah per status TO_SHIP/SHIPPED/COMPLETED/RETURNED, pagination, fix deadlock), dan open-order sweep 5 menit sebagai jaring pengaman self-healing berbasis kondisi WMS (bukan watermark). Menjawab juga soal operasi WMS (approve/pick/pack/RTS/label/handover), state machine `status_wms`, model data, keputusan teknis, dan alur \"Perlu Diproses\"/arrange untuk terbitkan resi.",
       "kata_kunci": [
-        "warehouse",
-        "WMS",
-        "Tinggarjaya",
-        "fulfillment",
+        "warehouse-service",
+        "WMS Tinggarjaya",
         "reconciler",
-        "arrange",
-        "resi",
-        "state machine",
-        "status_wms",
-        "package_id",
-        "sweep",
-        "packer"
+        "open-order sweep",
+        "state machine status_wms",
+        "event ingestion",
+        "cursor sync",
+        "pick pack RTS",
+        "fulfillment",
+        "MongoDB Redis",
+        "arrange resi",
+        "package_id backfill"
       ]
     },
     {
@@ -4884,7 +4885,7 @@
         "Manufacture - Stock & Material Management"
       ],
       "hash": "b29674cd9308f35f48973eab2408950fa265ca80da910c0a000ce73583236ab3",
-      "ukuran_kb": 4.7,
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab: bug atau temuan keamanan dan integritas data apa yang ditemukan saat audit kode manufacture-service (mis. authz bypass di approval, race condition stok minus, mapper frontend yang salah field), di lokasi file:baris mana ditemukan, dan apa rencana perbaikannya.",
       "kata_kunci": [
         "audit kode",
@@ -6775,21 +6776,22 @@
         "RUN - Panduan WMS Fulfillment Gudang Tinggarjaya",
         "WH - Management System"
       ],
-      "hash": "d651c24ca2bb14562f7b1afcba35de26c3c00072087eb6ba605021c676db33cf",
-      "ukuran_kb": 9.3,
-      "ringkasan": "Menjawab: bagaimana gudang Sadewa (barang titipan) bekerja sebagai warehouse kedua yang berbagi antrian fulfillment dan komponen PackingBoard dengan Tinggar, dan mengapa aksi cetak resi Sadewa harus lewat approval Sadewa→Tinggar sementara operator Tinggar langsung. Menjelaskan hak akses (bolehAksesSadewa, admin_gudang_sadewa, approver), alur cetak resi via manufacture_sadewa_action (PENDING→APPLIED/REJECTED), alur retur langsung lewat pipeline transaksi manufacture, route backend sadewa.go, dan enum SadewaAction. Berguna juga untuk mengetahui catatan/bug: tab \"Retur log\" kemungkinan selalu kosong dan komentar kode \"stub FE-first\" yang sudah stale.",
+      "hash": "d97707626a12aa2a8b4fcc681b13b5ae5ceebe9c7de4c7f6c6d61f23c3eb5cc0",
+      "ukuran_kb": 11.2,
+      "ringkasan": "Menjawab: apa itu gudang Sadewa (barang titipan) sebagai warehouse kedua dan bagaimana ia berbagi antrian fulfillment serta komponen `PackingBoard` dengan gudang Tinggar. Dokumen ini menjelaskan pembeda utamanya — alur cetak resi Sadewa yang harus lewat approval Sadewa→Tinggar (aksi PENDING→APPLIED/REJECTED, source ditentukan server dari JWT), hak akses/role (`admin_gudang_sadewa`, PPIC, SPV) di `akses.ts` dan enforcement backend, atribusi riwayat cetak resi per gudang lewat `printed_by_role`, serta alur retur Sadewa yang langsung tanpa approval. Menjawab pula di mana data aksi disimpan (service manufacture, collection `manufacture_sadewa_action`) dan bagaimana menu/struktur FE diatur.",
       "kata_kunci": [
         "Sadewa",
-        "warehouse",
+        "gudang warehouse",
         "cetak resi",
-        "approval",
+        "approval persetujuan",
         "PackingBoard",
         "admin_gudang_sadewa",
-        "manufacture_sadewa_action",
-        "retur",
+        "retur return",
         "Tinggar",
-        "RBAC",
-        "barang titipan"
+        "printed_by_role atribusi",
+        "manufacture service",
+        "barang titipan",
+        "hak akses role"
       ]
     },
     {
@@ -6877,7 +6879,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.2,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
