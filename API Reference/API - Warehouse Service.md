@@ -60,8 +60,8 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 | POST | `/fulfillment/rts` | admin_gudang, leader, spv | Batch RTS → proxy integration ship-batch; gate `exported_at` (422 `not_exported`) |
 | POST | `/fulfillment/labels` | admin_gudang, leader, spv | Cetak resi per order (URL/PDF) → LABEL_PRINTED; reprint dicatat di history |
 | POST | `/fulfillment/labels/merged` | admin_gudang, leader, spv | Cetak batch besar → **SATU PDF gabungan** (max 100/batch, timeout 5 mnt); hanya `included` → LABEL_PRINTED |
-| GET | `/fulfillment/labels/history` | admin_gudang, leader, spv, admin_qc | Riwayat resi tercetak — audit keterlambatan (dicetak siapa/kapan, cetak ulang, serah kurir) |
-| GET | `/fulfillment/labels/history/export` | admin_gudang, leader, spv, admin_qc | Unduh riwayat xlsx (filter jam WIB); kolom: Waktu Cetak, No Resi, Expedisi, Nama Toko, Nama Produk, Qty |
+| GET | `/fulfillment/labels/history` | admin_gudang, leader, spv, admin_qc | Riwayat resi tercetak — audit keterlambatan (dicetak siapa/kapan, cetak ulang, serah kurir); filter opsional `actor_role` (per gudang) |
+| GET | `/fulfillment/labels/history/export` | admin_gudang, leader, spv, admin_qc | Unduh riwayat xlsx (filter jam WIB + `actor_role`); kolom: Waktu Cetak, No Resi, Expedisi, Nama Toko, Nama Produk, Qty |
 | POST | `/fulfillment/handover` | admin_gudang, leader, spv | Konfirmasi serah-terima kurir → HANDED_OVER |
 | GET | `/fulfillment/dashboard` | admin_gudang, leader, spv, admin_qc | Aggregate count per status_wms |
 
@@ -152,7 +152,7 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 - ⚠️ Penandaan LABEL_PRINTED bersifat per-batch (integration 200 OK), bukan per hasil order — order Shopee yang masih `PROCESSING` ikut tertandai
 
 **`GET /fulfillment/labels/history`** — riwayat resi tercetak untuk audit keterlambatan:
-- Query: `q=` (regex order_id/awb), `date_from=`/`date_to=` (WIB `2006-01-02`, pada `label_printed_at`), `page`/`limit` (default 50, max 200)
+- Query: `q=` (regex order_id/awb), `date_from=`/`date_to=` (WIB `2006-01-02`, pada `label_printed_at`), `actor_role=` (dinormalisasi → `printed_by_role`; mis. `admin_gudang_sadewa` untuk menu Riwayat Cetak Resi Warehouse Sadewa), `page`/`limit` (default 50, max 1000)
 - Sort `label_printed_at DESC`. Hanya order yang `label_printed_at`-nya terisi.
 ```json
 // Response 200
@@ -162,6 +162,7 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
     "package_id": "PKG_123", "awb": "JNE123", "packer_code": "T1",
     "status_wms": "LABEL_PRINTED",
     "label_printed_at": "...", "printed_by": "EMP-001",
+    "printed_by_role": "admin_gudang_sadewa",
     "reprint_count": 1, "last_reprint_at": "...",
     "handed_over_at": null
   }],
@@ -169,12 +170,13 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 }
 ```
 - `printed_by` diambil dari history entry pertama dengan `to: LABEL_PRINTED` tanpa note; `reprint_count` dari entry `note: "cetak ulang resi"`
+- `printed_by_role` = role warehouse aktor pencetak awal (`admin_gudang` / `admin_gudang_sadewa`), distempel saat `markLabelPrinted`; dipakai `actor_role` untuk memisahkan riwayat per gudang. Resi tercetak **sebelum** field ini ada tak punya `printed_by_role` → tak lolos filter `actor_role`
 - `package_id` disertakan untuk tombol Cetak Ulang FE (TikTok butuh package_id saat re-request label; Shopee cukup `order_sn` + `shop_id`)
 - Interpretasi audit: `handed_over_at` kosong = resi dicetak tapi paket belum diserahkan ke kurir
 - FE Riwayat menyediakan tombol **Cetak Ulang** per baris — sekaligus jalur retry order Shopee `PROCESSING` yang sudah telanjur tercap LABEL_PRINTED (penandaan per-batch) dan tidak muncul lagi di layar Pengemasan
 
 **`GET /fulfillment/labels/history/export`** — unduh riwayat sebagai xlsx:
-- Query: `q` + `date_from`/`date_to` (WIB, dukung jam `2006-01-02T15:04` atau tanggal saja, batas menit inklusif) — sama dengan `/labels/history`; tanpa pagination; max 20.000 baris
+- Query: `q` + `date_from`/`date_to` (WIB, dukung jam `2006-01-02T15:04` atau tanggal saja, batas menit inklusif) + `actor_role` — sama dengan `/labels/history`; tanpa pagination; max 20.000 baris
 - Kolom (kebutuhan rekap tim, 2026-07-20; **Expedisi** ditambah 2026-07-24 untuk surat jalan): **No, Waktu Cetak (WIB), No Resi, Expedisi, Nama Toko, Nama Produk, Qty** — satu baris per produk. `Expedisi` = `shipping_provider` (kosong bila belum terisi event/reconciler), ejaan konsisten dengan export rekon antrian.
 - Basis filter = `label_printed_at` (waktu cetak resi). Tanpa efek samping (tidak ada penandaan apa pun)
 

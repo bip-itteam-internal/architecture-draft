@@ -23,6 +23,7 @@ Modul `warehouse` di sidebar dipecah dua grup lewat field `group` (`erp-frontend
 | Grup | Item | Route |
 |---|---|---|
 | **Warehouse Sadewa** | **Pengemasan** (dulu "Cetak Resi", di-rename agar selaras Pengemasan Tinggar — berbagi `PackingBoard`) | `/warehouse/sadewa/labels` |
+| **Warehouse Sadewa** | **Riwayat Cetak Resi** (reuse `LabelHistoryView`, disaring ke aktor `admin_gudang_sadewa`) | `/warehouse/sadewa/label-history` |
 | **Warehouse Sadewa** | **Retur** | `/warehouse/sadewa/return` |
 | **Warehouse Tinggar** | **Persetujuan** (sengaja di grup Tinggar — approver = otoritas Tinggar) | `/warehouse/sadewa/approvals` |
 
@@ -70,6 +71,17 @@ Untuk matriks akses WMS Tinggar/manufacture lengkap lihat [[Microservices - Manu
 - **Mode di `PackingBoard`**: aktor Sadewa dapat `gating.mode="approval"` (tombol "Ajukan Cetak Resi" / badge status pengajuan; order PENDING tak bisa dipilih ulang), otoritas Tinggar dapat `gating.mode="direct"` (langsung "Cetak Resi"). `indexCetakResiByOrder` memetakan aksi→state per order (APPROVED > PENDING > REJECTED > NONE).
 
 **Antrian bersama**: halaman Sadewa memakai endpoint fulfillment **warehouse** yang identik dengan Tinggar (`/api/warehouse/fulfillment/{queue,rts,labels,labels/merged}`) — tidak ada antrian khusus Sadewa. Yang membedakan hanya lapisan `sadewa/actions`. Di service warehouse, `admin_gudang_sadewa` **mewarisi izin `admin_gudang`** di `warehouseGuard` (`services/warehouse/fulfillment_ops.go`) agar lolos ke endpoint antrian.
+
+---
+
+## Riwayat Cetak Resi Sadewa (atribusi per gudang)
+
+*Karena antrian & riwayat cetak resi **dikongsi** Tinggar+Sadewa dan history hanya menyimpan `actor` (employee ID, tanpa role/gudang), atribusi per gudang direkam saat cetak lalu dipakai memfilter menu riwayat Sadewa.*
+
+- **Rekam saat cetak** (`markLabelPrinted`, `services/warehouse/fulfillment_ops.go`): pada cetak awal, field top-level `printed_by_role` di dokumen `FulfillmentOrder` di-stempel dari `normRoleWms(id.SystemRoles["warehouse"])` aktor (mis. `admin_gudang` vs `admin_gudang_sadewa`); tiap entry `history` (cetak awal & cetak ulang) juga membawa `actor_role`. Diskriminatornya = **role aktor yang mencetak**, bukan asal order.
+- **Filter riwayat** (`fulfillment_label_history.go`): `buildLabelHistoryFilter` menerima query `actor_role` → `filter["printed_by_role"]` (dinormalisasi). Dipakai `GetLabelHistory` **dan** `ExportLabelHistory` (endpoint & guard tetap; `admin_gudang_sadewa` sudah lolos `warehouseGuard`). `labelHistoryRow` menambah `printed_by_role`.
+- **FE**: `LabelHistoryView` menerima prop opsional `actorRole`/`title`/`subtitle` (default = perilaku Tinggar tanpa filter). Halaman `/warehouse/sadewa/label-history` (dibungkus `SadewaAccessGuard`) memanggilnya dengan `actorRole="admin_gudang_sadewa"`; `useLabelHistory` meneruskan `actor_role`.
+- ⚠️ **Backfill**: resi yang tercetak **sebelum** perubahan ini belum ber-tag `printed_by_role` → tidak muncul di menu Sadewa (riwayat mulai terisi sejak deploy). Dampak minimal karena gudang Sadewa baru. Perlu **REBUILD+redeploy [[Microservices - Warehouse Service|warehouse service]]** agar tag & filter aktif.
 
 ---
 
