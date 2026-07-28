@@ -42,37 +42,34 @@ Import memisahkan dua kelompok field:
 - **Milik Accurate** (selalu diperbarui): identitas, kategori, kontak, alamat, syarat pembayaran, status sync.
 - **Hanya saat baris baru** (`$setOnInsert`): `akun_utang`, `jenis_pajak`, `nama_wajib_pajak`, `negara`.
 
-Pemisahan ini mencegah import ulang menghapus isian user di ERP — khususnya Akun Utang, yang tidak dapat disinkronkan lewat API sehingga ERP menjadi satu-satunya tempat nilainya hidup.
+Pemisahan ini mencegah import ulang menghapus isian user di ERP. Akun Utang dan
+Akun Uang Muka kini termasuk **milik Accurate** (ikut diperbarui saat import),
+karena keduanya benar-benar dikirim dan Accurate menjadi sumbernya.
 
 ## Belum Diimplementasikan / Catatan
 
 - **Belum di-deploy.** Backend terverifikasi berjalan di lingkungan lokal (Docker), belum pernah dijalankan di server.
 - **Import 139 pemasok belum dijalankan.** Kredensial Accurate hanya tersedia di server produksi, tidak ada di lingkungan lokal.
-- **Belum pernah menulis ke Accurate.** Seluruh perilaku payload bersumber dari OpenAPI resmi Accurate v1.4467.1872 dan pengamatan 139 pemasok produksi (read-only). Verifikasi nyata terjadi saat pemasok asli pertama dibuat.
-- **Empat field dapat DIBACA tetapi tidak dapat DITULIS** lewat API: **Akun Utang**
-  (`vendorPayableAccountList`), Akun Uang Muka (`vendorDownPaymentAccountList`),
-  **Tipe Pemasok** (`vendorType`), dan Jenis Dokumen (`documentCode`, terisi
-  `DIGUNGGUNG` pada 139/139 pemasok produksi).
+- **Belum pernah menulis ke Accurate.** Seluruh perilaku payload bersumber dari
+  dokumentasi API **resmi** Accurate (`docs/accurate-api/accurate-api-resmi.json`,
+  versi 1.0.1#4611) dan pengamatan 139 pemasok produksi (read-only). Verifikasi
+  nyata terjadi saat pemasok asli pertama dibuat.
+- **Dua field tidak dapat DITULIS** lewat API — hanya terbaca dari `detail.do`:
+  **Tipe Pemasok** (`vendorType`) dan **Jenis Dokumen** (`documentCode`, terisi
+  `DIGUNGGUNG` pada 139/139 pemasok produksi). Keduanya tidak ada di antara 41
+  parameter `vendor/save.do`. ERP menampilkannya sebagai nilai baca-saja hasil
+  import; pengisiannya dilakukan finance di Accurate.
 
-  Keempatnya dikembalikan `detail.do` dengan nilai lengkap — probe read-only
-  menunjukkan `detail.do` mengembalikan **87 field** sedangkan `save.do` hanya
-  menerima **36**, jadi ada 51 field yang terbaca tetapi tak tertulis. Contoh
-  nyata: `PBK-018 → vendorType=COMPANY, utang=2101, uang muka=1504`.
-
-  Konsekuensinya ERP dapat **menampilkan** keempatnya (hasil import) tetapi
-  pengisiannya dilakukan finance langsung di Accurate. Bila field akun tetap
-  dikirim, Accurate mengabaikannya diam-diam sehingga request tampak sukses
-  padahal akun tetap kosong.
-
-  Sebagai pembanding, `customer/save.do` **punya** `customerReceivableAccountListNo`
-  — Accurate menyediakannya untuk pelanggan tetapi tidak untuk pemasok.
-
-  **Peringatan pembacaan:** kesimpulan "tidak dapat ditulis" bersumber dari
-  spesifikasi OpenAPI yang **terakhir diperbarui 16 Agustus 2024**, sedangkan
-  nilai `CTAS_KEPADA_SELAIN_PEMUNGUT_PPN` yang dipakai 53 pemasok produksi
-  **tidak ada** di enum spec itu. Spec karena itu terbukti tertinggal dari
-  server, dan kemungkinan server menerima field yang tak terdaftar belum dapat
-  disingkirkan tanpa uji tulis.
+  > **Koreksi 2026-07-28.** Sebelumnya dokumen ini menyatakan **empat** field
+  > tidak dapat ditulis — Akun Utang dan Akun Uang Muka ikut disebut. Itu
+  > **KELIRU**. Kesimpulan tersebut berasal dari spec SwaggerHub yang terakhir
+  > diperbarui 16 Agustus 2024. Dokumentasi resmi menyediakan
+  > `vendorPayableAccountListNo` ("Kode Akun Hutang") dan
+  > `vendorDownPaymentAccountListNo` ("Kode Akun Uang Muka") — keduanya kini
+  > **benar-benar dikirim**. Lihat `docs/accurate-api/README.md`.
+- **WhatsApp tidak tersinkron.** `vendor/save.do` tidak punya field WhatsApp
+  (`bbmPin` milik `EmployeeParam`, bukan `VendorParam`), sehingga `no_wa` hanya
+  tersimpan di ERP. Mengirimkannya membuat Accurate mengabaikannya diam-diam.
 - **Pengosongan nilai belum tersinkron (TBD).** Field opsional memakai `omitempty`, sehingga menghapus nilai yang sebelumnya terisi tidak sampai ke Accurate — Accurate mempertahankan nilai lama. Benar untuk pembuatan pemasok baru, tetapi bug diam untuk suntingan. Belum diperbaiki karena bergantung pada perilaku Accurate yang belum diverifikasi (apakah `save.do` menerima string kosong sebagai perintah mengosongkan). Wajib diuji saat pemasok asli pertama disunting.
 - **Default jenis pajak CTAS menunggu konfirmasi finance.** Datanya kuat (16 pemasok terbaru 100% CTAS; `PRLHNDLMNEGERI_BKN_PPN` dilabeli Accurate sendiri sebagai *legacy*), tetapi penentuan perlakuan pajak adalah ranah finance.
 
@@ -81,7 +78,12 @@ Pemisahan ini mencegah import ulang menghapus isian user di ERP — khususnya Ak
 Tiga hal yang paling mudah salah dan sudah dikunci test:
 
 1. **Referensi memakai NAMA, bukan id.** `vendor/save.do` menerima `categoryName` dan `termName`, sedangkan `detail.do` mengembalikan `categoryId`/`defaultTermId`. Mengirim id akan ditolak.
-2. **Akun Utang tidak boleh masuk payload.** Lihat catatan di atas — kebocoran menghasilkan sukses palsu yang tidak terdeteksi di produksi.
+2. **Field yang tidak ada di `vendor/save.do` jangan dikirim.** Accurate
+   mengabaikannya diam-diam sehingga request tampak sukses padahal nilainya tidak
+   tersimpan — sukses palsu yang tidak terdeteksi di produksi. Yang terbukti
+   tidak ada: `vendorType`, `documentCode`, `bbmPin` (WhatsApp). Sebaliknya
+   `vendorPayableAccountListNo` dan `vendorDownPaymentAccountListNo` **ada** dan
+   wajib dikirim.
 3. **Nama syarat pembayaran dipotong 20 karakter oleh Accurate.** Term id 300 bernama `"DP 50%, Pelunasan Se"` (tepat 20 karakter) sementara teks lengkapnya hanya ada di `memo`. Yang dikirim ke API harus bentuk terpotong; `memo` hanya untuk tampilan.
 
 Selain itu: **`transDate` wajib** (format `dd/MM/yyyy`) meskipun pemasok bukan transaksi, dan **dihitung dalam WIB** — antara 00:00–07:00 WIB, UTC masih berada di tanggal sebelumnya sehingga tanggal pengakuan bisa mundur satu hari dan masuk periode pembukuan yang keliru. Zona waktu dikunci di kode, tidak bergantung pada variabel `TZ` lingkungan.

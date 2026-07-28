@@ -105,7 +105,12 @@
 
 - Tidak ada endpoint **hapus pemasok** — penghapusan master pemasok dilakukan finance di Accurate.
 - Tidak ada endpoint **pemicu sync manual**; worker berjalan otomatis tiap 30 detik atas baris `PENDING`/`FAILED`.
-- Empat field **dapat dibaca tetapi tidak dapat ditulis** lewat API (Akun Utang, Akun Uang Muka, Tipe Pemasok, Jenis Dokumen). ERP menampilkannya hasil import; pengisiannya dilakukan finance di Accurate — lihat [[Microservices - Procurement Service]].
+- Dua field **dapat dibaca tetapi tidak dapat ditulis** lewat API: Tipe Pemasok
+  (`vendorType`) dan Jenis Dokumen (`documentCode`). ERP menampilkannya hasil import;
+  pengisiannya dilakukan finance di Accurate — lihat [[Microservices - Procurement Service]].
+  Akun Utang & Akun Uang Muka **dikirim** ke Accurate (koreksi 2026-07-28).
+- WhatsApp (`no_wa`) hanya tersimpan di ERP — `vendor/save.do` tidak menyediakan
+  field WhatsApp untuk pemasok.
 - Pengosongan nilai belum tersinkron (`omitempty`) — TBD, lihat dok implementasi.
 
 ## Dependensi & Integrasi
