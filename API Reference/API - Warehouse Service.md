@@ -242,6 +242,16 @@ Auth: gateway key + role guard `system_roles["warehouse"]`. Path group `/wms/`.
 | DELETE | `/wms/products/:sku` | admin_gudang, leader, spv | Hapus SKU |
 | POST | `/wms/products/import` | admin_gudang, leader, spv | Import xlsx master produk |
 
+## Toko Gudang Sadewa (✅ Diimplementasikan)
+
+Assignment toko marketplace → Warehouse Sadewa (men-scope antrian/feed menu Sadewa). Auth: gateway key + `sadewaShopWriteGuard` untuk tulis — **hanya otoritas Tinggar** (`admin_gudang`/`leader`/`spv` warehouse atau PPIC/SPV manufaktur atau IT-spv); **`admin_gudang_sadewa` ditolak** (tidak mewarisi `admin_gudang` di guard ini). Lihat [[WH - Warehouse Sadewa]].
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/wms/sadewa-shops` | List toko yang di-assign ke Sadewa (sort `shop_name`) |
+| POST | `/wms/sadewa-shops` | Assign toko — upsert `{shop_id, channel, shop_name}` by `shop_id`+`channel` |
+| DELETE | `/wms/sadewa-shops/:shopId?channel=` | Lepas assignment toko |
+
 ## Dokumen Terkait
 
 - [[Microservices - Warehouse Service]] · [[WH - Fulfillment Flow & WMS Tinggarjaya]] · [[API - Integration Service]] · [[API - Index]]
