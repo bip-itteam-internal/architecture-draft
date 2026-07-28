@@ -14,6 +14,7 @@
 | POST | `/pemasok` | Buat pemasok. `201` + data (termasuk `id` hasil insert). `400` validasi gagal, `409` nomor sudah dipakai. |
 | PUT | `/pemasok/:id` | Sunting pemasok. `400` id/body/validasi gagal, `404` tidak ditemukan, `409` nomor dipakai pemasok lain. |
 | GET | `/katalog/syarat-pembayaran` | Opsi syarat pembayaran dari Accurate. `502` bila Accurate tidak dapat dihubungi. |
+| GET | `/katalog/akun-utang` | Akun bertipe `ACCOUNT_PAYABLE` dari bagan akun Accurate (akun nonaktif dibuang). Mengisi dropdown Akun Utang agar staf memilih akun yang benar-benar ada. `502` bila Accurate tidak dapat dihubungi. |
 | POST | `/import` | Import awal seluruh pemasok dari Accurate (role `admin`). Idempoten. `502` bila Accurate gagal. |
 | GET | `/health` | Health check (tanpa auth). |
 
@@ -23,7 +24,12 @@
   "nama":              "string (wajib)",
   "vendor_no":         "string (wajib) — format <PREFIX>-<angka>, prefix harus cocok kategori",
   "kategori":          "string (wajib) — Pemasok Bahan Baku / Pemasok Bahan Kemas / Umum",
-  "no_wa":             "string",
+  "no_wa":             "string — WhatsApp; Accurate menyimpannya di bbmPin",
+  "no_hp":             "string — Handphone; Accurate mobilePhone",
+  "telp_bisnis":       "string — Accurate workPhone",
+  "faksimili":         "string — Accurate fax",
+  "website":           "string",
+  "mata_uang":         "string — Accurate currencyCode, mis. IDR",
   "email":             "string",
   "alamat":            { "jalan": "string", "kota": "string", "provinsi": "string", "kode_pos": "string" },
   "syarat_pembayaran": "string — nama term PERSIS seperti di Accurate (bisa terpotong 20 karakter)",
@@ -43,6 +49,11 @@
     "vendor_no": "PBB-061",
     "kategori": "Pemasok Bahan Baku",
     "no_wa": "0812xxxxxxx",
+    "no_hp": "0813xxxxxxx",
+    "telp_bisnis": "0274-xxxxxx",
+    "faksimili": "",
+    "website": "",
+    "mata_uang": "IDR",
     "email": "kontak@contoh.co.id",
     "alamat": { "jalan": "...", "kota": "...", "provinsi": "...", "kode_pos": "..." },
     "syarat_pembayaran": "C.B.D",
@@ -75,6 +86,16 @@
 
 > `nama` = nilai yang **dikirim** ke Accurate (dipotong 20 karakter oleh Accurate); `tampilan` = teks yang **dibaca user** (dari `memo`, jatuh ke `nama` bila memo kosong). Frontend wajib menampilkan `tampilan` dan mengirim `nama`.
 
+**Response** `GET /katalog/akun-utang`:
+```json
+{ "data": [ { "nama": "2101", "tampilan": "2101 — Utang Usaha Supplier - IDR" } ] }
+```
+
+> Hanya akun bertipe `ACCOUNT_PAYABLE` yang ditawarkan. Akun Uang Muka Pembelian
+> (1504/1507) bertipe `ACCOUNT_RECEIVABLE` sehingga bukan kandidat akun utang
+> pemasok. `nama` berisi **nomor** akun — itu bentuk yang dipakai seluruh data
+> pemasok produksi. Nilainya disimpan di ERP saja; lihat catatan di bawah.
+
 **Response** `POST /import`:
 ```json
 { "data": { "terimpor": 139 } }
@@ -84,7 +105,7 @@
 
 - Tidak ada endpoint **hapus pemasok** — penghapusan master pemasok dilakukan finance di Accurate.
 - Tidak ada endpoint **pemicu sync manual**; worker berjalan otomatis tiap 30 detik atas baris `PENDING`/`FAILED`.
-- Empat field **tidak dapat disinkronkan** ke Accurate (Akun Utang, Akun Uang Muka, Tipe Pemasok, Jenis Dokumen) — lihat [[Microservices - Procurement Service]].
+- Empat field **dapat dibaca tetapi tidak dapat ditulis** lewat API (Akun Utang, Akun Uang Muka, Tipe Pemasok, Jenis Dokumen). ERP menampilkannya hasil import; pengisiannya dilakukan finance di Accurate — lihat [[Microservices - Procurement Service]].
 - Pengosongan nilai belum tersinkron (`omitempty`) — TBD, lihat dok implementasi.
 
 ## Dependensi & Integrasi

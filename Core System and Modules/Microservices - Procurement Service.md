@@ -49,7 +49,30 @@ Pemisahan ini mencegah import ulang menghapus isian user di ERP — khususnya Ak
 - **Belum di-deploy.** Backend terverifikasi berjalan di lingkungan lokal (Docker), belum pernah dijalankan di server.
 - **Import 139 pemasok belum dijalankan.** Kredensial Accurate hanya tersedia di server produksi, tidak ada di lingkungan lokal.
 - **Belum pernah menulis ke Accurate.** Seluruh perilaku payload bersumber dari OpenAPI resmi Accurate v1.4467.1872 dan pengamatan 139 pemasok produksi (read-only). Verifikasi nyata terjadi saat pemasok asli pertama dibuat.
-- **Empat field tidak dapat disinkronkan** karena `vendor/save.do` tidak menyediakan jalurnya: **Akun Utang**, Akun Uang Muka, Tipe Pemasok, dan Jenis Dokumen (`documentCode`, terisi `DIGUNGGUNG` pada 139/139 pemasok produksi). Sebagai pembanding, `customer/save.do` **punya** `customerReceivableAccountListNo` — Accurate menyediakannya untuk pelanggan tetapi tidak untuk pemasok. Bila field akun tetap dikirim, Accurate mengabaikannya diam-diam sehingga request tampak sukses padahal akun tetap kosong.
+- **Empat field dapat DIBACA tetapi tidak dapat DITULIS** lewat API: **Akun Utang**
+  (`vendorPayableAccountList`), Akun Uang Muka (`vendorDownPaymentAccountList`),
+  **Tipe Pemasok** (`vendorType`), dan Jenis Dokumen (`documentCode`, terisi
+  `DIGUNGGUNG` pada 139/139 pemasok produksi).
+
+  Keempatnya dikembalikan `detail.do` dengan nilai lengkap — probe read-only
+  menunjukkan `detail.do` mengembalikan **87 field** sedangkan `save.do` hanya
+  menerima **36**, jadi ada 51 field yang terbaca tetapi tak tertulis. Contoh
+  nyata: `PBK-018 → vendorType=COMPANY, utang=2101, uang muka=1504`.
+
+  Konsekuensinya ERP dapat **menampilkan** keempatnya (hasil import) tetapi
+  pengisiannya dilakukan finance langsung di Accurate. Bila field akun tetap
+  dikirim, Accurate mengabaikannya diam-diam sehingga request tampak sukses
+  padahal akun tetap kosong.
+
+  Sebagai pembanding, `customer/save.do` **punya** `customerReceivableAccountListNo`
+  — Accurate menyediakannya untuk pelanggan tetapi tidak untuk pemasok.
+
+  **Peringatan pembacaan:** kesimpulan "tidak dapat ditulis" bersumber dari
+  spesifikasi OpenAPI yang **terakhir diperbarui 16 Agustus 2024**, sedangkan
+  nilai `CTAS_KEPADA_SELAIN_PEMUNGUT_PPN` yang dipakai 53 pemasok produksi
+  **tidak ada** di enum spec itu. Spec karena itu terbukti tertinggal dari
+  server, dan kemungkinan server menerima field yang tak terdaftar belum dapat
+  disingkirkan tanpa uji tulis.
 - **Pengosongan nilai belum tersinkron (TBD).** Field opsional memakai `omitempty`, sehingga menghapus nilai yang sebelumnya terisi tidak sampai ke Accurate — Accurate mempertahankan nilai lama. Benar untuk pembuatan pemasok baru, tetapi bug diam untuk suntingan. Belum diperbaiki karena bergantung pada perilaku Accurate yang belum diverifikasi (apakah `save.do` menerima string kosong sebagai perintah mengosongkan). Wajib diuji saat pemasok asli pertama disunting.
 - **Default jenis pajak CTAS menunggu konfirmasi finance.** Datanya kuat (16 pemasok terbaru 100% CTAS; `PRLHNDLMNEGERI_BKN_PPN` dilabeli Accurate sendiri sebagai *legacy*), tetapi penentuan perlakuan pajak adalah ranah finance.
 
