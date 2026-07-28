@@ -32,6 +32,7 @@
 | Manufacture | `/api/manufacture/*` | [[API - Manufacture Service]] | [[Microservices - Manufacture Service]] |
 | Warehouse | `/api/warehouse/*` | [[API - Warehouse Service]] | [[Microservices - Warehouse Service]] |
 | Recruitment | `/api/recruitment/*` | [[API - Recruitment Service]] | [[Microservices - Recruitment Service]] |
+| Procurement | `/api/procurement/*` | [[API - Procurement Service]] | [[Microservices - Procurement Service]] |
 
 ## Dokumen Terkait
 
