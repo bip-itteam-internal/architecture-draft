@@ -1,4 +1,4 @@
-**Status**: ⚠️ Implemented (ada catatan) — Fase 1 (Presensi) di `main`; hardening attendance + service lain BELUM ter-scope
+**Status**: ⚠️ Implemented (ada catatan). Fase 1 (Presensi) + Fase 2 parsial sudah di `main`; perusahaan kedua (ELT) sudah terdaftar & terpakai di dev; payroll, recruitment, HRD-document, dan task-management BELUM ter-scope.
 
 ## Context
 
@@ -23,7 +23,7 @@ Paket **presensi penuh**: absen, jadwal, izin/cuti/sakit + approval, laporan HR.
 - Web (erp-frontend): halaman **Kelola Perusahaan** `/hris/companies`, **pemilih perusahaan admin pusat** di header (kirim `?company` ke presensi), **Buat Karyawan** pilih-perusahaan-dulu + prefix ikut perusahaan.
 - Mobile (my-bharata): identitas perusahaan di **Profil Perusahaan** (dari `/me`) + **onboarding** (dari respons login), gate profil lengkap ke BIP.
 
-## Consequences / Known Limitations (audit 2026-07-24)
+## Consequences / Known Limitations (audit 2026-07-24, disegarkan 2026-07-28)
 
 **Attendance (in-scope) — hardening:**
 - **Batch A (PR #653):** hari libur (`resolveEmployeeSchedule` + `/holiday` GET/DELETE), filter reviewer leave & tukar jadwal (`/request/view`,`/review`, `/schedule-exchange/*`, `/hr/requests/detail`), `/guestbook` GET, `/request/security-lookup`+`verify`, `PATCH /:id/update`, review koreksi, komentar telat guestbook → **ter-scope `company_id`**. (Libur kini per-perusahaan: perusahaan baru mengelola daftar liburnya sendiri, termasuk nasional.)
@@ -31,17 +31,42 @@ Paket **presensi penuh**: absen, jadwal, izin/cuti/sakit + approval, laporan HR.
 - **Batch B (PR #656):** `company_work_schedule` + `company_group_rotation` ber-`company_id` (kepemilikan; lookup resolusi jadwal tetap by `schedule_id`/`group_id` yang **unik global** — sengaja, agar hot-path resolusi inti tak diubah) + seed BIP aman restart (`DeleteMany` BIP, bukan `Drop`) + CRUD `/company-work-schedule` (list/create/delete, **ENFORCE `schedule_id` unik global** = jaminan isolasi). FE Kelola Shift = erp-frontend #501.
 - **Fingerprint per-perusahaan (PR #657):** koleksi `company_fingerprint` (serial→tenant+lokasi, serial unik global) menggantikan allowlist + koordinat hardcoded; `/tap` fingerprint scope entry ke perusahaan pemilik mesin. **Temuan:** GPS mobile TAK dipakai untuk radius (jadwal WFA hanya butuh lokasi ADA), jadi hardcode GPS bukan blocker pilot mobile; hanya website `/tap` (501) yang masih pakai koordinat tetap.
 - **CRUD rotasi shift (PR #658):** `/company-group-rotation` (list/create/delete, `group_id` unik global) untuk perusahaan shift bergilir.
-- **Masih terbuka:** FE kelola fingerprint + FE kelola rotasi (BE siap); cron satu sweep global.
+- **FE kelola fingerprint + FE kelola rotasi sudah ADA** (lihat §Fase 2), jadi tak lagi jadi item terbuka.
 
-**Di LUAR fase 1 (belum ter-scope, per desain — fase lanjut):**
-- **Employee directory** — `/internal/export/all`, `/view`, `/v2/internal/aggregate/employees*`, `/list?type=employee|supervisor`, KPI, contract, BPJS, vacation, birthday, analysis, headcount: semua lintas perusahaan (PII massal). `EffectiveCompanyID` belum dipakai di read employee-service.
-- **Payroll** — `company_id` = badan usaha penggaji (kop slip), **BUKAN tenant**; `listEmployeeSalaries`/run/THR campur semua perusahaan.
+**Di LUAR fase 1 (belum ter-scope, per desain, fase lanjut):**
+- **Payroll** — `company_id` = badan usaha penggaji (kop slip), **BUKAN tenant** (`services/payroll/models_employee_salary.go:31`); `listEmployeeSalaries`/run/THR campur semua perusahaan.
 - **Recruitment** — tanpa field company; portal karir publik (`/public/postings`, `/apply`) bersama semua tenant.
 - **HRD-document** — distribusi global (`my/documents` + `target:all` sampai ke semua tenant).
+- **Task-management (Helpdesk IT)** — tanpa field company; tiket bercampur lintas perusahaan.
 - **Departemen per-perusahaan** — ✅ **live di main via PR #652**: `master_department.company_id` + scope `/data-type/department`,`/position`,`/master/departments` (`EffectiveCompanyID`) + migrasi backfill BIP. (Catatan proses: PR #649 sempat **ter-orphan** ke branch stacked yang sudah mati, lalu dipulihkan via #652.)
-- KPI groups + supervisor-lookup masih department-only (merge lintas-tenant bila nama departemen sama).
+- **Employee directory** — ✅ **sudah ter-scope** sejak F2-A (PR #659), lihat §Fase 2. Sisa: pengelompokan KPI (`kpi_group`) + supervisor-lookup masih berbasis nama departemen, jadi dua perusahaan dengan nama departemen sama bisa ter-merge.
 
 **Sudah aman:** gateway (header ke semua service), notification FCM (personal/dept/broadcast ter-scope + `/list?type=fcm-token` filter company), core employee create + `/me` + respons login onboarding.
+
+## Fase 2 (lanjutan, sudah di `main` 2026-07-24 sampai 2026-07-25)
+
+- **F2-A direktori & agregat karyawan (PR #659)** — helper `companyEmployeeIDs(c)` (`services/employee/company.go:19`) membatasi jalur yang berangkat dari `personal_data`/`system_authentication` (dua koleksi itu tak punya `company_id`) ke himpunan karyawan perusahaan pembaca. Ter-scope: `/v2/internal/aggregate/employees`, `/summary`, `/it`, `/list?type=employee`, `/internal/export/all`, `handleEmployeeView`, plus sub-list sensitif headcount, KPI, `kpi/dashboard`, contract, BPJS, analysis, birthdays, vacation. Index `{company_id, employee_id}` dipasang saat seed (covered query).
+- **Orchestrator meneruskan `?company` (PR #660)** — `orchestrator/hris` (`/employees/v2/multi/summary`, `/employees/export`) sempat membuang query string sehingga override admin pusat hilang (direktori benar, summary tetap angka BIP). Kini diteruskan.
+- **Katalog jadwal data-driven (PR #661)** — `GetScheduleType` yang hardcoded menolak `schedule_id` milik perusahaan lain (mis. `ELT-REGULAR`), jadi onboarding jadwal perusahaan baru butuh ubah kode shared-library. Kini resolusi tipe jadwal dibaca dari `company_work_schedule` (static) / `company_group_rotation` (pattern) dengan fallback katalog lama; endpoint `/sync/company-group-rotations` menyusul. Hot-path presensi (cron & clock-in) sengaja tak disentuh.
+- **Artikel Informasi ter-tenant + broadcast grup (PR #662)** — `GET /article` sebelumnya global sehingga karyawan ELT melihat pengumuman BIP (ketahuan saat uji mobile). Kini `Article` punya `company_id` + `group_wide`; baca = perusahaan pembaca ATAU `group_wide`, tulis distempel `CompanyID(c)`, dan `group_wide` hanya boleh diset admin pusat. Ada migrasi backfill artikel lama ke BIP.
+- **Admin pusat kelola WiFi perusahaan lain (PR #663)** — `getCompanyNetworks`/`add`/`delete` naik ke `EffectiveCompanyID` supaya WiFi kantor perusahaan pilot (yang tak punya user IT sendiri) bisa didaftarkan admin pusat. Verifikasi clock-in WFO tetap memakai `CompanyID` (karyawan absen di WiFi perusahaannya sendiri).
+- **Web (erp-frontend, semua di `main`)** — `CompanySwitcher` dipindah ke footer sidebar, Kelola Rotasi + Mesin Fingerprint per perusahaan di `/hris/schedule`, Kelola Network ikut switcher, toggle "Bharata Group" di form artikel, dan direktori/agregat karyawan ikut perusahaan terpilih (F2-A FE).
+- **Mobile (my-bharata, PR #89/#90/#91 merged ke `dev`, versionCode 120, belum naik ke `main`)** — identitas perusahaan dari `/me` + onboarding, konten beranda dinamis per tenant (blok "Tentang Perusahaan" & "Bharata Community" khusus BIP), nama perusahaan di kartu cuaca & QR lanyard, dan menu **Pengajuan disembunyikan untuk non-BIP** selama pilot. Konsekuensi: tenant baru praktis dapat absen + jadwal saja di mobile, bukan paket presensi penuh seperti tertulis di §Scope Fase 1.
+
+## Status pilot (verifikasi live dev 2026-07-28)
+
+Lewat gateway dev `10.10.10.121:6969` (read-only, akun admin pusat):
+
+- `master_company` = **2 tenant**: `BIP` (PT Bharata Internasional, prefix `BIP-`) dan `ELT` (CV Elit, prefix `ELT-`, dibuat 2026-07-24 oleh `BIP-0221-10-25`).
+- Isolasi terbukti di `/v2/internal/aggregate/employees/summary`: `?company=BIP` → 169 karyawan, `?company=ELT` → 1 karyawan (departemen "Operasional").
+- ELT sudah punya jadwal `ELT-REGULAR` (Senin sampai Jumat 08:00-17:00, Sabtu 08:00-13:00, `remote:false`).
+- **Belum lengkap untuk go-live pilot**: `master_department` ELT masih **0** (dropdown departemen ELT kosong walau karyawannya sudah berdepartemen), `company_group_rotation` ELT 0, dan **WiFi kantor ELT masih kosong** padahal jadwalnya WFO. PR #663 dibuat justru agar admin pusat bisa mendaftarkan WiFi itu, tapi datanya belum diisi.
+
+## Masih terbuka
+
+- **Cron presensi satu sweep global** — `cronScheduleCheck` membaca seluruh `work_schedule` tanpa filter perusahaan (`services/attendance/cron.go:62`). Entri hasilnya tetap ber-`company_id` (diturunkan dari `work_schedule`), jadi bukan kebocoran data, tapi belum ada pemisahan per tenant (mis. zona waktu / jadwal cron sendiri).
+- **Peran "admin pusat" resmi belum ada** — interim dipetakan ke `system_roles.it` = supervisor/admin (`shared-library/common/company_scope.go:27`).
+- **`executeEmployeeUpdateTransaction` bisa mengosongkan tenant** — update work_data memakai `$set: update.WorkData` tanpa `defaultWorkCompany` (`services/employee/func.go:205`), dan `WorkData.CompanyID` ber-tag `bson:"company_id"` **tanpa** `omitempty`, jadi payload FE yang tak menyertakan `company_id` akan menimpanya jadi `""`. Jalur create sudah aman (`func.go:58` + `func.go:114`).
 
 ## Terkait
 

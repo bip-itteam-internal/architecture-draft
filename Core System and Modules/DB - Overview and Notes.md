@@ -21,7 +21,9 @@ Doc: [[Microservices - Employee Service]]
 - company_holiday
 - master_department (departments + positions + roles per dept; seed otomatis) — kini **`company_id` per-perusahaan** (PR #652, migrasi backfill BIP; supervisi/RBAC tetap global — [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]])
 - master_system_role (feature-based role systems: insentive, integration; seed otomatis)
-- master_company (perusahaan/tenant multi-perusahaan: `key`/`name`/`code`; seed BIP; `code` = prefix employee_id)
+- master_company (perusahaan/tenant multi-perusahaan: `key`/`name`/`code`; seed BIP; `code` = prefix employee_id). Di dev sudah berisi **2 tenant**: `BIP` + `ELT` (CV Elit).
+- company_group_rotation (definisi rotasi shift bergilir, di-sync dari attendance agar resolusi tipe jadwal jadi data-driven; PR #661)
+- Index tenant idempoten saat boot (`ensureTenantIndexes`): `work_data {company_id, employee_id}` (covered query untuk himpunan karyawan per perusahaan) + `master_department {company_id}`.
 
 > **Multi-perusahaan (tenant):** `work_data` dan ke-10 koleksi presensi (`attendance_entries`, `leave_request`, `attendance_correction_request`, `business_trip_request`, `schedule_exchange_request`, `guestbook`, `company_work_schedule`, `company_holiday`, `company_wifi`, mood) membawa `company_id` (row-level, default `"BIP"`). Filter di lapisan `common.CompanyID`/`EffectiveCompanyID`. Cakupan & gap: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 
@@ -43,7 +45,7 @@ Doc: [[Microservices - Attendance Service]]
 Doc: [[Microservices - Notification Service]]
 - inbox
 - splash
-- article
+- article — kini ber-`company_id` + `group_wide` (broadcast lintas-perusahaan, hanya admin pusat; migrasi backfill BIP, PR #662 → [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]])
 
 ### insentive — `insentive-mongo-db`
 Doc: [[Microservices - Insentive Service]]

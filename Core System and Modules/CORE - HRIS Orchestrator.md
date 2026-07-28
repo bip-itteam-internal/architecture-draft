@@ -22,6 +22,8 @@ Create/update employee dijalankan sebagai **TRANSAKSI**:
 
 Plus aggregate read: `/v2/multi`, `/v2/multi/summary`, `/:id/multi`.
 
+> **Multi-perusahaan**: rute yang meneruskan ke employee-service **wajib ikut meneruskan query string**, sebab override admin pusat dikirim lewat `?company=`. `/v2/multi/summary` dan `/employees/export` sempat membuangnya sehingga direktori sudah benar (0 karyawan ELT) tapi summary & ekspor tetap memakai angka perusahaan pemakai; diperbaiki di PR #660. Detail: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
+
 ### `/attendances/*`
 - `summary`.
 - `PATCH` `/:id/update` (mendukung JSON maupun multipart + upload dokumen ke MinIO dengan rollback).
