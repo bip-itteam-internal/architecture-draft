@@ -108,7 +108,11 @@
 
 - **Kolom "Diinput oleh"** ✅ — log WMS menampilkan `created_by_name` (stempel server dari JWT, lihat [[Microservices - Manufacture Service]]). **Sengaja dibedakan** dari field PIC/`adminPic`/`marketingPic` yang diketik manual di form — keduanya bisa orang berbeda. Data sebelum fitur ini tampil `—`. Penempatan menyesuaikan tabel: kolom sendiri di log Gudang RM/FG & Material Order, **sub-baris di kolom Tanggal** pada Laporan Hasil Produksi (tabelnya sudah 11 kolom — menambah kolom ke-12 mengulang masalah kolom terpotong yang baru diperbaiki), dan di Master Resi **hanya muncul untuk resi manual** (resi hasil sync tak punya penginput; `—` di belasan ribu baris hanya jadi kebisingan, sekaligus jadi penanda asal data).
 
-**Lain** — Secretary / Quality / Procurement (KPI saja), Beauty_hacks / Kyura (link eksternal Ideamiils + KPI)
+**Procurement** (`/procurement/*`, feature `src/features/procurement/`, gerbang `ProcurementGuard` — role `system_roles["procurement"]` atau anggota IT) — di luar KPI, kini punya dua modul master data yang tiru pola sama persis (list + dialog form + hook TanStack Query + katalog Accurate via Combobox):
+- **Master Pemasok** (`/procurement/pemasok`) — tabel + cari + filter kategori/status-sync/akun-utang-kosong; form Tambah/Ubah dengan usul nomor otomatis per kategori (`PBB-061`), field baca-saja **Tipe Pemasok** saat edit. Backend: [[Microservices - Procurement Service]] bagian Master Pemasok.
+- **Barang & Jasa** (`/procurement/barang`, ✅ 2026-07-28) — tabel + cari + filter kategori/jenis-barang/status-sync; form Tambah/Ubah dengan usul kode otomatis (`BRG-{angka}`, **tidak per-kategori** — beda dari pemasok), toggle berjenjang **Nomor Seri/Produksi** (aktif → pilih Tipe Nomor Seri UNIQUE/BATCH + toggle Pakai Kadaluarsa) dan **Kena PPN** (aktif → pilih PPN dari katalog), dua field baca-saja saat edit (**Merek Barang**, **Tipe Persediaan**). Backend: [[Microservices - Procurement Service]] bagian Master Barang & Jasa.
+
+**Lain** — Secretary / Quality (KPI saja), Beauty_hacks / Kyura (link eksternal Ideamiils + KPI)
 
 **Internasionalisasi (i18n)** — dukungan dua bahasa **Indonesia (default) / English** via `react-i18next` (`src/i18n/`); switcher di header (samping tema), pilihan disimpan cookie `lang` (dibaca SSR). Rollout **bertahap**; sudah: HRIS Ulang Tahun, KPI, Announcements, Recruitment System Setup, Payroll Pengaturan Gaji (`hris.payroll.*`), Support Ticket. Aturan lengkap: [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
 

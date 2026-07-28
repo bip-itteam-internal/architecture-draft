@@ -1,11 +1,11 @@
 ## Deskripsi
 
-*Microservice **procurement-service** — master Pemasok yang diinput di BIP-ERP lalu disinkronkan otomatis ke Accurate Online. Tujuannya agar staf procurement tidak perlu lagi membuka Accurate untuk pendaftaran pemasok harian.*
+*Microservice **procurement-service** — master Pemasok dan master Barang & Jasa yang diinput di BIP-ERP lalu disinkronkan otomatis ke Accurate Online. Tujuannya agar staf procurement tidak perlu lagi membuka Accurate untuk pendaftaran pemasok/barang harian.*
 
 - **Stack**: Go + Fiber v2 + MongoDB (driver resmi) + shared-library; di belakang [[CORE - API Master Gateway]] (`/api/procurement/*`), seluruh route internal dilindungi `BIP-Gateway-ID` + role guard `system_roles["procurement"]`.
-- **Path di repo**: `bip-erp/services/procurement/` · flat package `main` · `models.go` (entity + peta prefix→kategori) · `accurate_client.go` (transport) · `accurate_vendor.go` (payload + method vendor) · `nomor.go` (usul nomor) · `sync.go` (worker antrian) · `pemasok.go` (handler CRUD) · `import.go` (import awal).
+- **Path di repo**: `bip-erp/services/procurement/` · flat package `main` · `models.go` (entity + peta prefix→kategori pemasok) · `accurate_client.go` (transport) · `accurate_vendor.go` (payload + method vendor) · `accurate_item.go` (payload + method barang) · `nomor.go` (usul nomor pemasok) · `sync.go` (worker antrian, kedua entity) · `pemasok.go` (handler CRUD pemasok) · `barang.go` (handler CRUD barang, termasuk usul kode) · `import.go` / `import_barang.go` (import awal).
 - **Port**: `6983` (default). **Database**: `procurement_db` (MongoDB per-service, host port `32794`). **Env kunci**: `MONGO_URI`, `MONGO_DB`, `INTERNAL_GATEWAY_KEY`, `ACCURATE_ACCOUNT_URL`, `ACCURATE_SECRET_KEY`, `ACCURATE_BEARER_TOKEN`.
-- **Status**: ⚠️ Implemented (ada catatan) — backend lengkap & terverifikasi berjalan lokal (boot, index, guard, CRUD, penomoran) ✅; **belum di-deploy** dan **import 139 pemasok belum dijalankan** (butuh kredensial Accurate); frontend terpisah.
+- **Status**: ⚠️ Implemented (ada catatan) — backend Pemasok + Barang & Jasa lengkap & terverifikasi lokal (boot, index, guard, CRUD, penomoran; 119 test PASS) ✅; **belum di-deploy** dan **import awal (pemasok maupun barang) belum dijalankan** di produksi (butuh kredensial Accurate). Frontend Master Pemasok **dan** Barang & Jasa sudah ada di `erp-frontend` (`src/features/procurement/`) — lihat [[APP - Web ERP]].
 - **API**: [[API - Procurement Service]].
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
@@ -20,6 +20,19 @@ Daftar rute lengkap di [[API - Procurement Service]]. Ringkas:
 - **`PUT /pemasok/:id`** — sunting pemasok. `accurate_id` selalu diambil dari data lama, **tidak pernah** dari kiriman client — nilai karangan bisa menimpa pemasok lain di Accurate. Setiap suntingan mengantre ulang (`PENDING`) dengan `sync_attempts` direset.
 - **`GET /katalog/syarat-pembayaran`** — opsi syarat pembayaran dari Accurate.
 - **`POST /import`** — import awal seluruh pemasok dari Accurate (role `admin`).
+
+### Master Barang & Jasa (`barang.go`)
+
+- **`GET /barang`** — daftar barang; filter `cari` (nama/kode), `kategori`, `jenis_barang`, `sync_status`.
+- **`GET /barang/usul-kode`** — usulan kode berikut, format **`BRG-{angka}`**, dari kode **tertinggi di seluruh koleksi** (bukan per-kategori — beda dari `usul-nomor` pemasok, karena kategori barang berasal dari katalog Accurate yang terbuka, tidak ada skema prefix tetap). Parameter `kategori` diterima untuk konsistensi bentuk endpoint dengan pemasok tapi **tidak memengaruhi hasil**.
+- **`POST /barang`** — buat barang. Empat field wajib (selaras `item/save.do`): `nama`, `kategori`, `jenis_barang` (enum `INVENTORY`/`NON_INVENTORY`/`SERVICE`/`GROUP`/`PRODUCTION_COST`), `satuan`. Menolak kode bentrok dengan **409**. Status awal `PENDING`.
+- **`PUT /barang/:id`** — sunting barang. `accurate_id` selalu dari data lama. Toggle boolean (`pakai_ppn`, `kelola_nomor_seri`, `pakai_kadaluarsa`) pada edit parsial **hanya bisa diaktifkan, tidak bisa dinonaktifkan** oleh request yang tidak mengirim field itu — plain `bool` tidak bisa membedakan "false dikirim" dari "field tak dikirim". Tidak terasa di FE ERP karena form selalu mengirim seluruh field toggle; ini murni pengaman terhadap client yang mengirim payload parsial.
+- **`GET /katalog/kategori-barang`**, **`GET /katalog/satuan`**, **`GET /katalog/pajak`** — opsi dari Accurate (`item-category/list.do`, `unit/list.do`, `tax/list.do`), bentuk `{nama, tampilan}` sama seperti katalog pemasok.
+- **`POST /barang/import`** — import awal seluruh barang dari Accurate (role `admin`), idempoten dengan kunci `accurate_id`.
+
+Nomor seri: `kelola_nomor_seri` (manageSN) mengaktifkan pilihan `tipe_nomor_seri` (`UNIQUE`/`BATCH`, enum `SerialNumberType`) dan `pakai_kadaluarsa` (manageExpired) — keduanya hanya dikirim ke Accurate bila nomor seri aktif; mengirim tipe nomor seri tanpa mengaktifkan nomor seri tidak masuk akal secara bisnis.
+
+**Dua field baca-saja** (sama polanya dengan Tipe Pemasok): **Merek Barang** (`itemBrand`) dan **Tipe Persediaan** (`materialProduced`/`itemProduced`) tidak ada di antara 58 parameter `item/save.do` — Accurate mengabaikannya diam-diam bila dikirim. Struct `ItemPayload` sengaja tidak mendeklarasikan keduanya sama sekali; nilainya hanya terisi lewat import (`detail.do`).
 
 ### Penomoran (`nomor.go`)
 
@@ -50,6 +63,8 @@ karena keduanya benar-benar dikirim dan Accurate menjadi sumbernya.
 
 - **Belum di-deploy.** Backend terverifikasi berjalan di lingkungan lokal (Docker), belum pernah dijalankan di server.
 - **Import 139 pemasok belum dijalankan.** Kredensial Accurate hanya tersedia di server produksi, tidak ada di lingkungan lokal.
+- **Import awal barang juga belum dijalankan di produksi**, alasan sama (kredensial Accurate). `ImportBarangDenganKlien` idempoten (kunci `accurate_id`) dan terverifikasi lewat test, tapi belum pernah menyentuh data Accurate sungguhan.
+- **Barang tidak punya field milik-ERP-murni** seperti `jenis_pajak`/`negara` pada pemasok — seluruh data barang bersumber dari Accurate, jadi `FieldBarangSaatBaru` (bagian `$setOnInsert` import) hanya menyetel `sync_attempts`.
 - **Belum pernah menulis ke Accurate.** Seluruh perilaku payload bersumber dari
   dokumentasi API **resmi** Accurate (`docs/accurate-api/accurate-api-resmi.json`,
   versi 1.0.1#4611) dan pengamatan 139 pemasok produksi (read-only). Verifikasi
@@ -97,6 +112,14 @@ Koleksi `pemasok` di `procurement_db`. Index:
 | `vendor_no` | unique | Nomor diketik manual; database menjadi penjaga terakhir bila dua orang menyimpan nomor sama nyaris bersamaan. |
 | `accurate_id` | unique + partial (`$gt: 0`) | Sparse tidak cukup — `accurate_id` bertipe `int64` sehingga pemasok baru bisa bernilai 0. Partial filter membatasi keunikan pada baris yang benar-benar sudah tersinkron. |
 | `sync_status` + `next_retry_at` | biasa | Dipakai worker mengambil antrian. |
+
+Koleksi `barang` di `procurement_db` — indeks berpola identik:
+
+| Index | Sifat | Alasan |
+|---|---|---|
+| `kode` | unique (`kode_unique`) | Penomoran otomatis (`UsulKodeBarangBerikut`) hanya usulan; database tetap penjaga terakhir. |
+| `accurate_id` | unique + partial `$gt: 0` (`accurate_id_unique`) | Sama alasannya dengan pemasok — barang baru bernilai `accurate_id: 0`. |
+| `sync_status` + `next_retry_at` | biasa (`antrian_sync_barang`) | Dipakai worker mengambil antrian, baris pemasok maupun barang diproses worker yang sama. |
 
 ## Dependensi & Integrasi
 
