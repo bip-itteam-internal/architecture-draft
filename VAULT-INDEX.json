@@ -633,20 +633,24 @@
       "status_teks": "In development — task tracker / IT Helpdesk sedang dibangun (FE + BE internal); rincian di §Status Implementasi.",
       "publik": true,
       "tautan": [
-        "Microservices - Task Management Service"
+        "APP - Web ERP",
+        "Microservices - Task Management Service",
+        "IT - Helpdesk"
       ],
-      "hash": "59e7945cc38a474ac1dc3159cf17c2c63a1b481969bc384b793cb67f39ddd662",
-      "ukuran_kb": 11.7,
-      "ringkasan": "Menjawab: fitur apa saja yang sudah jalan di frontend task tracker/IT Helpdesk (Kanban drag-drop, approval, notifikasi realtime, SLA, attachment), bagaimana login SSO gateway-cutover dan role staff/supervisor/admin diterapkan, dan bug/keterbatasan yang diketahui (isolasi space antar divisi belum di-scope backend). Juga menjawab rencana integrasi task management dengan sistem insentif marketing (tipe task per divisi seperti ADS_CAMPAIGN, VIDEO_CONTENT, LIVE_STREAM).",
+      "hash": "a82de4ff76eadc16ebbcc938bf88a3bf67084b9975afd6a8c8244d14647ab5a3",
+      "ukuran_kb": 12.0,
+      "ringkasan": "Menjawab: bagaimana app task tracker Kanban terpisah (task.bharatainternasional.com) yang diposisikan sebagai IT Helpdesk bekerja, fitur apa saja yang sudah jalan (board per divisi, approval, SLA response/resolution, comment/checklist/attachment, notifikasi WebSocket, report + export Excel), serta bagaimana login SSO ke ERP dan gating role staff/supervisor/admin diterapkan. Juga menjawab apa yang belum ada (Pengaturan Sistem, members & roles, CRUD divisi), bug isolasi space antar-divisi, dan rencana integrasi type task per divisi ke sistem insentif marketing (ADS_CAMPAIGN, VIDEO_CONTENT, LIVE_STREAM, AFFILIATE, CRM).",
       "kata_kunci": [
         "task tracker",
-        "IT Helpdesk",
         "Kanban",
+        "IT Helpdesk",
+        "ticketing",
+        "tiket",
+        "bharata-task-manager-fe",
+        "SLA",
+        "approval",
         "SSO",
-        "space",
-        "approval tugas",
-        "bug isolasi divisi",
-        "integrasi insentif"
+        "insentif"
       ]
     },
     {
@@ -703,20 +707,20 @@
         "Microservices - Employee Service",
         "Microservices - Notification Service"
       ],
-      "hash": "1986d393836b7fffbe84604b5a31e4eb601593b58d4501e577cf809be888fad8",
-      "ukuran_kb": 11.2,
-      "ringkasan": "Menjawab: fitur apa saja yang tersedia di aplikasi mobile HRIS MyBharata (absensi QR + geofencing + biometric, cuti/izin, lembur, payslip, KPI, support ticket), bagaimana arsitektur Flutter-nya disusun (Clean Architecture feature-first, BLoC, get_it, dio/fpdart), dan bagaimana autentikasi login/PIN/biometric serta kebijakan 1 akun = 1 device bekerja. Juga menjelaskan bahwa aplikasi terhubung langsung ke backend HRIS (bukan lewat API Master Gateway, bukan SSO) dan bagian mana yang sudah disesuaikan untuk multi-perusahaan (profil perusahaan, konten per tenant, menu yang disembunyikan untuk non-BIP).",
+      "hash": "3c63c7e727fec08b978e9883a334c5d419d4291ec9358c02ba2f75c04f4279bf",
+      "ukuran_kb": 11.4,
+      "ringkasan": "Menjawab: aplikasi mobile HRIS MyBharata dipakai untuk apa oleh karyawan (clock-in/out via QR + geofencing + biometric, jadwal & riwayat kehadiran, pengajuan cuti/izin/sakit/dinas, lembur SPKL, payslip PDF ber-PIN, KPI, tugas/Task Management), dan bagaimana teknis aplikasinya dibangun (Flutter, Clean Architecture feature-first, bloc, dio + fpdart, go_router, Firebase, l10n id/en). Juga menjawab bagaimana autentikasi JWT/PIN/biometric dan kebijakan 1 akun 1 device berjalan, ke backend mana app terhubung (langsung ke HRIS backend, bukan lewat API Master Gateway), serta bagaimana dukungan multi-perusahaan (scope via JWT, konten per tenant) diterapkan.",
       "kata_kunci": [
         "MyBharata",
-        "mobile app",
-        "aplikasi karyawan",
+        "aplikasi mobile",
         "Flutter",
-        "BLoC",
-        "absensi mobile",
+        "HRIS",
+        "absensi",
         "attendance",
-        "geofencing",
+        "cuti",
+        "lembur",
         "payslip",
-        "multi-perusahaan"
+        "geofencing"
       ]
     },
     {
@@ -814,20 +818,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "16a363b46cc25ae53da2663607896cbccf0b64d8a92ae592386eea60f1253021",
-      "ukuran_kb": 41.7,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web internal One Bharata (repo erp-frontend), siapa yang boleh membuka tiap menu, dan bagaimana role gating dari cookie system_roles bekerja, termasuk matriks akses WMS per posisi, pengecualian Finance read-only di Gudang FG, dan akun integration-only lewat allowlist env. Juga menjelaskan alur login serta peran web ini sebagai SSO Identity Provider (mint one-time code, inbound handoff dan outbound launch), dan halaman apa saja yang menangani multi-perusahaan seperti Kelola Perusahaan, company switcher, shift/rotasi/network per-perusahaan.",
+      "hash": "58ccb39993fe43b8f521a7177e4ce23b34adbc8b3d601f92aa9d21e9148aec59",
+      "ukuran_kb": 42.9,
+      "ringkasan": "Menjawab: portal web ERP/HRIS internal \"One Bharata\" (repo erp-frontend) berisi modul apa saja (ERP publik, HRIS lengkap, recruitment, payroll setup, finance/insentif, WMS/manufacture, IT, GA, integration) dan siapa yang boleh membuka tiap menu. Juga menjawab bagaimana login employee_id + password, refresh token, dan role gating berbasis cookie system_roles bekerja, termasuk matriks akses menu WMS per posisi, pengecualian read-only Finance ke Gudang FG, dan akun integration-only. Selain itu menjelaskan perannya sebagai SSO Identity Provider untuk app lain dan bagaimana dukungan multi-perusahaan diterapkan di halaman HRIS.",
       "kata_kunci": [
         "Web ERP",
         "erp-frontend",
-        "One Bharata",
         "hris-dashboard",
-        "Next.js",
+        "One Bharata",
         "SSO",
         "system_roles",
         "role gating",
-        "portal internal",
-        "dashboard HRIS"
+        "RBAC",
+        "Next.js",
+        "multi-perusahaan"
       ]
     },
     {
@@ -4639,23 +4643,24 @@
         "Microservices - Task Management Service",
         "APP - Dynamic Task Tracker",
         "CORE - SSO Flow",
+        "APP - Web ERP",
         "IT - Employee System",
         "IT - Big Pictures"
       ],
-      "hash": "64fe824b029f0b449b4b3519f382220953489b8a3b11c60a7a861a18380a0354",
-      "ukuran_kb": 1.7,
-      "ringkasan": "Menjawab: bagaimana alur tiket IT Helpdesk berjalan (Kanban Request-Todo-On Going-Testing-Done, approval, SLA 2-dimensi dengan eskalasi otomatis), siapa saja peran yang terlibat (requestor semua divisi, IT staff/supervisor, admin), dan bagaimana notifikasi serta laporan SLA/manpower ditangani.",
+      "hash": "0d97467e2bbe42b10cba744aaaf5fe96e9fc8fc4e65a0cc9f02372efdfa3700d",
+      "ukuran_kb": 2.3,
+      "ringkasan": "Menjawab: bagaimana konsep IT Helpdesk Bharata bekerja, yaitu siapa yang boleh membuat tiket (karyawan semua divisi), siapa yang menangani (divisi IT), dan tahap apa saja yang dilalui tiket di Kanban (Request, Todo, On Going, Testing, Done, plus jalur Ditolak) termasuk syarat approval dan SLA dua dimensi dengan eskalasi otomatis. Juga menjawab peran apa saja yang ada (requestor, IT staff/supervisor, admin lintas divisi), laporan apa yang tersedia, serta kenapa nama \"Task Management\" sejak 2026-07-28 menunjuk dua UI di atas satu backend yang sama dan di mana implementasinya.",
       "kata_kunci": [
-        "IT Helpdesk",
-        "ticketing",
+        "helpdesk",
+        "IT support",
         "tiket",
+        "ticket",
+        "ticketing",
         "Kanban",
         "SLA",
         "approval",
-        "Task Management Service",
-        "Dynamic Task Tracker",
-        "requestor",
-        "eskalasi tiket"
+        "Task Management",
+        "eskalasi"
       ]
     },
     {
