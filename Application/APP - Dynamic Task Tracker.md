@@ -4,6 +4,9 @@
 
 - **Status**: ⚠️ In development — task tracker / IT Helpdesk sedang dibangun (FE + BE internal); rincian di §Status Implementasi.
 
+> [!warning] Nama ganda sejak 2026-07-28
+> Portal ticketing di dalam ERP ([[APP - Web ERP]]) kini juga bernama **Task Management** (dulu "Support Ticket"). Dua UI, satu backend ([[Microservices - Task Management Service]]): dokumen ini membahas **app terpisah** `task.bharatainternasional.com`, bukan menu di web ERP. Lihat [[IT - Helpdesk]] §Catatan Penamaan.
+
 > [!note] Positioning vs implementasi
 > Kode saat ini masih mendukung **multi-divisi** (Space per divisi + supervisor per divisi + admin/sekretaris lintas-divisi). Sesuai positioning baru sebagai IT Helpdesk, penanganan tiket difokuskan ke divisi IT dengan semua divisi sebagai requestor — pembatasan scope ke IT perlu dipertimbangkan di implementasi.
 

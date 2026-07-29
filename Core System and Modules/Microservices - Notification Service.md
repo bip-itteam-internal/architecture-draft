@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB
 - **Path:** `services/notification`
-- **Status**: ✅ Implemented penuh · multi-perusahaan: pengiriman FCM (personal/departemen/broadcast) **ter-scope `company_id`** (`common.CompanyID(c)` → `/list?type=fcm-token&company_id=`), cegah bocor lintas-tenant. `InboxMessage` belum punya `company_id` (baca per-`employee_id` = aman; flag bila ada fitur agregat inbox). Lihat [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
+- **Status**: ✅ Implemented penuh · multi-perusahaan: pengiriman FCM (personal/departemen/broadcast) **ter-scope `company_id`** (`common.CompanyID(c)` → `/list?type=fcm-token&company_id=`) dan **feed Article ter-scope** (PR #662). `InboxMessage` belum punya `company_id` (baca per-`employee_id` = aman; flag bila ada fitur agregat inbox). Lihat [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
@@ -20,8 +20,8 @@
 	- `POST /splash` — multipart image (di-upload via file-service/MinIO)
 	- `DELETE /splash` — sekaligus menghapus object di MinIO
 - **Article:**
-	- `GET /article` — `?id`, `?recent`, atau seluruhnya
-	- `POST /article` — multipart
+	- `GET /article` — `?id`, `?recent`, atau seluruhnya; **ter-scope tenant**: hanya artikel `company_id` = perusahaan pembaca (`EffectiveCompanyID`) ATAU yang ber-`group_wide` (broadcast Bharata Group). Berlaku di ketiga cabang (all / recent / by-id).
+	- `POST /article` — multipart; distempel `company_id` = perusahaan pembuat (`CompanyID(c)`, default BIP). Flag `group_wide` **hanya boleh diset admin pusat** (`IsCentralAdmin`) supaya perusahaan biasa tak bisa broadcast lintas-tenant.
 	- `DELETE /article`
 - **Route pengiriman (ber-service-key, `?key=` cocok `NotificationServiceKey`):**
 	- `POST /inbox/send`
@@ -38,6 +38,7 @@
 - **Channel Email (Resend)** — ✅ sudah di kode (`POST /email/send`, lihat di atas) memakai SDK resmi `resend-go/v3`; ditujukan untuk notifikasi **kandidat recruitment** ([[Microservices - Recruitment Service]]). **✅ Terverifikasi jalan live di dev (2026-07-16)** — email "Lamaran Anda Telah Kami Terima" sampai ke inbox kandidat, jadi `RESEND_API_KEY` & `RESEND_FROM_EMAIL` sudah terpasang di deploy. Catatan operasional: `from` wajib memakai domain terverifikasi di Resend (`bharatainternasional.com` — SPF/DKIM/DMARC) atau Resend menolak (HTTP 422); bila env kosong, `email.Init()` warn-and-skip sehingga service tetap berjalan.
 - **Identitas pengirim per-service (pola wajib)** — `RESEND_FROM_EMAIL` adalah **default untuk SEMUA service**, jadi **jangan** diisi nama satu domain-bisnis (mis. "Recruitment"): email service lain (mis. payroll/slip gaji) yang tidak mengisi `from` akan ikut tampil dengan nama itu. Pola: `RESEND_FROM_EMAIL` = default **generik** (mis. `Bharata Internasional <noreply@…>`); **tiap service mengisi `from` sendiri** lewat env-nya — recruitment: `RECRUITMENT_EMAIL_FROM` (mis. `Bharata Recruitment <noreply@…>`, lihat [[Microservices - Recruitment Service]]); payroll dst. mengikuti pola sama **tanpa** mengubah shared-library. Cukup menambah display name di depan alamat yang sudah terverifikasi. Saat ini **recruitment adalah satu-satunya pemanggil `/email/send`**.
 - Semua channel (inbox/FCM/WhatsApp/email/splash/article) sudah fungsional di kode — tidak ada stub berarti.
+- **Isolasi tenant feed Article (PR #662)**: `GET /article` dulu global (`bson.M{}`) sehingga karyawan perusahaan lain melihat pengumuman BIP; ketahuan saat uji mobile akun ELT. Model `Article` kini punya `company_id` + `group_wide`, plus migrasi backfill idempoten artikel lama ke BIP (guard `$exists:false`). Backward-compat: FE lama tetap jalan karena `group_wide` default `false`. Toggle "Bharata Group" di web sudah ada ([[APP - Web ERP]]).
 - Group `/debug/fcm` ditandai dapat dihapus saat production.
 
 ## Dependencies & Integrasi

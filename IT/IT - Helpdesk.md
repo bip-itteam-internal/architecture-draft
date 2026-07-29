@@ -23,6 +23,10 @@
 
 Kode saat ini masih mendukung **multi-divisi** (Space + supervisor per divisi). Sesuai positioning sebagai **IT Helpdesk**, penanganan difokuskan ke divisi IT dengan semua divisi sebagai requestor — pembatasan scope perlu dipertimbangkan di implementasi (lihat catatan di [[Microservices - Task Management Service]] & [[APP - Dynamic Task Tracker]]).
 
+## Catatan Penamaan (2026-07-28)
+
+Menu ticketing di web ERP di-rename dari **Support Ticket** menjadi **Task Management** (rute `/task-management/*`, istilah user-facing "Tugas"), dan label di MyBharata ikut. Akibatnya nama "Task Management" kini menunjuk **dua UI** di atas backend yang sama ([[Microservices - Task Management Service]]): portal di dalam ERP ([[APP - Web ERP]]) dan app terpisah `task.bharatainternasional.com` ([[APP - Dynamic Task Tracker]]). Role sistem penentu akses tetap bernama `ticket`, begitu pula nama tampilannya di Master Data employee-service (belum ikut di-rename).
+
 ## Implementasi & Dokumen Terkait
 
 - [[Microservices - Task Management Service]] (backend) · [[APP - Dynamic Task Tracker]] (FE)
