@@ -83,6 +83,17 @@
 | GET/POST/DELETE | `/edit-grant` (`?employee_id=&bulan=`) · `/edit-grant/:id` | **Buka kunci edit riwayat WMS per-akun** (`manufacture_edit_grant`). Riwayat transaksi bulan **tertutup** (< bulan berjalan) mengunci tombol "Koreksi Input" di FE; IT memberi satu akun akses edit satu bulan (`{employee_id, username?, bulan, expires_at?}`, idempoten `_id=employee_id\|bulan`, `granted_by` distempel header) → `DELETE` mencabut. Enforcement = **FE-gating** (period-lock + grant aktif utk `employeeId` user); pengecekan role per-endpoint backend belum ada (gap pra-ada) |
 | GET | `/audit-log` (`?user=&aksi=`) · `/audit-log/rekap` (`?bulan=YYYY-MM`) · `/health` | Audit log (list) · rekap aktivitas CRUD per user/bulan untuk **KPI otomatis** (agregasi batas hari/bulan pakai **WIB**, respons ber-flag `truncated` bila >20k entri) · health |
 
+## Mutasi Gudang (Fase 1) ✅
+*Sistem mutasi antar-lokasi (offline) — status 1–3 (di Gudang A → dikirim → diterima Gudang B/Toko). **Layer pelacakan**: dokumen mutasi TIDAK menyentuh `manufacture_stok`/transaksi/Accurate (total stok global tak berubah). AR/konsinyasi status 4–5 = Fase 2 (belum). 29 Juli 2026.*
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET·POST | `/lokasi-gudang` (`?aktif=&tipe=`) · GET·PUT·DELETE `/lokasi-gudang/:kode` | **Master lokasi gudang** (`manufacture_lokasi_gudang`, `_id`=kode): `{kode, nama, tipe (GUDANG\|TOKO), konsinyasi, alamat, aktif}`. Create validasi kode/nama/tipe, kode unik→409. **Delete ditolak 400 bila lokasi dipakai dokumen mutasi** (nonaktifkan saja: `aktif=false`) |
+| GET·POST | `/mutasi-gudang` (`?status=&lokasi=&from=&to=`) | **Dokumen mutasi** (`manufacture_mutasi_gudang`, `_id`=`MUT-YYYYMMDD-xxxx`). `POST` buat status **DRAFT**: body `{tanggal?, lokasi_asal, lokasi_tujuan, keterangan, items:[{kode, qty_kirim}]}` — validasi asal≠tujuan + keduanya aktif + ≥1 item qty>0; nama/satuan diresolve dari `master_product`. `GET` list (filter status/lokasi/periode WIB, terbaru dulu) |
+| PATCH | `/mutasi-gudang/:id/kirim` | **DRAFT→DIKIRIM** (status 2 "proses pengiriman") — guard bersyarat `status=DRAFT` (MatchedCount→409); set `dikirim_at`, `pic_kirim` |
+| PATCH | `/mutasi-gudang/:id/terima` | **DIKIRIM→DITERIMA** (status 3, input per lokasi) — body `{items:[{kode, qty_terima}]}` (default = qty_kirim bila tak diisi; boleh `< qty_kirim` = selisih perjalanan); guard `status=DIKIRIM` (MatchedCount→409, cegah lost-update balapan); set `diterima_at`, `pic_terima` |
+| GET | `/lokasi-stok` (`?lokasi=`) | **Saldo mutasi per-lokasi** (diturunkan, inti pure `saldoLokasi`): per kode = Σ qty_terima (DITERIMA ke lokasi) − Σ qty_kirim (DIKIRIM/DITERIMA dari lokasi). ⚠️ = **net pergerakan via mutasi** (untuk toko = qty tercatat di toko), **bukan stok absolut** (butuh saldo awal per-lokasi — Fase lanjut). Akses FE (lokasi & mutasi): admin gudang RM/FG + PPIC/SPV |
+
 ## Dokumen Terkait
 - [[Microservices - Manufacture Service]] · [[Manufacture - Stock & Material Management]] · [[GA - Procurement System]] · [[API - Integration Service]] (resi-feed, `/transactions/returns`) · [[IT - Background Jobs & Schedulers]] (`sync-resi-wms`) · [[API - Index]]
 - [[ADR - 0002 Database-per-Service]] (feed retur lewat API, bukan lintas-DB) · [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] (kenapa seleksi retur bukan lewat status order) · [[ADR - 0015 Push Pergerakan WMS ke Accurate]] (retur F3 di-SKIP dari push)
