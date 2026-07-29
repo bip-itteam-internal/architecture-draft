@@ -4,6 +4,7 @@
 
 - **Status**: 🔴 Stub — kerangka
 - **Induk**: [[QA - Big Pictures]]
+- **Implementasi digital (WMS)**: [[Manufacture - Dokumen Produksi Batch]] — dossier batch 7 lembar + workflow rilis (✅ Implemented)
 
 ## Latar Belakang
 
