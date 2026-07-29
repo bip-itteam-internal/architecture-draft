@@ -2,7 +2,7 @@
 
 *Hasil audit kode service [[Microservices - Manufacture Service]] (backend Go + frontend Next.js) per 2026-06-26. Mendaftar temuan korektnes, keamanan, dan integritas data beserta lokasi `file:line` dan rencana perbaikan. Point-in-time record — status per temuan diperbarui saat fix masuk.*
 
-- **Status**: 🟡 Issue / Teridentifikasi — plan perbaikan disetujui, sebagian **belum** masuk kode.
+- **Status**: ⚠️ Issue / Sebagian diperbaiki — **B9 ✅ masuk kode (2026-07-29)**; sisanya (B1–B8, F1–F6) plan disetujui, **belum** masuk kode.
 - **Cakupan**: `bip-erp/services/manufacture/*` + `erp-frontend/src/features/manufacture/*`.
 
 ## Temuan Backend (Go)
@@ -17,6 +17,7 @@
 | B6 | handler sync/reconcile | 🟠 Major | Pakai `context.Background()` bukan request ctx → request sync besar tak bisa dibatalkan. | Pakai `c.Context()`/`c.UserContext()`. | 🟡 Belum |
 | B7 | `master.go` · `master_product.go` | 🟠 Major | Partial-failure sync: error di tengah loop `return 500` → state setengah jadi tanpa rollback/laporan. | Kumpulkan error per-baris, lanjut, balas `{synced, failed[]}`. | 🟡 Belum |
 | B8 | `helper.go:56-64` | 🟡 Minor | `parseNum` buang semua titik (ribuan) → desimal ber-titik salah; non-angka → 0 senyap. | Dokumentasikan locale id-ID; log warning saat parse gagal. | 🟡 Belum |
+| B9 | `main.go:73` (seluruh rute) | 🔴 Critical | **Tak ada gerbang RBAC per-endpoint**: hanya `ValidateGateway` (internal key), tak satu rute pakai `common.Require*`. Siapa pun bertoken valid — termasuk `staff` yang per matriks "tanpa akses WMS" — bisa panggil langsung `POST /transaksi`, `DELETE /master-bahan/:kode`, `POST /stok/align`, dll. Matriks posisi di `akses.ts` cuma menyembunyikan menu. | Middleware per-tab (`rbac.go`) mencerminkan `MATRIKS_TAB_WMS`: `requireTabRead`/`requireTabWrite` (sadar method), `requireWmsSupervisor` (Sync Master/Rencana Produksi/push Accurate/edit-grant/audit-log), `requireBatch*`, gerbang Sadewa. Role dinormalisasi (spasi→underscore, ≡ FE); Finance read-only & Security (posisi) sebagai pengecualian lintas-modul. | ✅ Done (2026-07-29) |
 
 ## Temuan Frontend (Next.js)
 
@@ -33,7 +34,8 @@
 
 - Formula mapper (`mapFormulaToLegacy`) **sudah** diperbaiki (commit FE 2026-06-26); F1 adalah pola yang sama untuk 5 entitas sisanya.
 - Endpoint approve/reject/create proposal **sudah ada** di backend; F3 murni soal FE memanggilnya.
-- Urutan perbaikan disarankan: B1 (security) → F1 (crash) → B2/B3 (race) → B4 → F3 → sisanya.
+- **B9 selesai 2026-07-29** (`rbac.go` + wiring `main.go` + `rbac_test.go`): seluruh rute WMS kini bergerbang RBAC per-tab. Menutup kelas kerentanan "endpoint terbuka", tapi **B1 tetap terpisah & belum**: rute proposal kini tergerbang ke tab `orders_po`, namun `ApproveProposal` masih membaca `role` dari **body** untuk alur PPIC→SPV — perbaiki sesuai rencana B1 (ambil dari `BIP-System-Roles`).
+- Urutan perbaikan disarankan: ~~B1 (security)~~ → **B9 ✅** → B1 (authz proposal) → F1 (crash) → B2/B3 (race) → B4 → F3 → sisanya.
 
 ## Dokumen Terkait
 
