@@ -5,7 +5,7 @@
 - **Stack**: Go + Fiber v2 + MongoDB (driver resmi) + shared-library; di belakang [[CORE - API Master Gateway]] (`/api/procurement/*`), seluruh route internal dilindungi `BIP-Gateway-ID` + role guard `system_roles["procurement"]`.
 - **Path di repo**: `bip-erp/services/procurement/` · flat package `main` · `models.go` (entity + peta prefix→kategori pemasok) · `accurate_client.go` (transport) · `accurate_vendor.go` (payload + method vendor) · `accurate_item.go` (payload + method barang) · `nomor.go` (usul nomor pemasok) · `sync.go` (worker antrian, kedua entity) · `pemasok.go` (handler CRUD pemasok) · `barang.go` (handler CRUD barang, termasuk usul kode) · `import.go` / `import_barang.go` (import awal).
 - **Port**: `6983` (default). **Database**: `procurement_db` (MongoDB per-service, host port `32794`). **Env kunci**: `MONGO_URI`, `MONGO_DB`, `INTERNAL_GATEWAY_KEY`, `ACCURATE_ACCOUNT_URL`, `ACCURATE_SECRET_KEY`, `ACCURATE_BEARER_TOKEN`.
-- **Status**: ⚠️ Implemented (ada catatan) — backend Pemasok + Barang & Jasa lengkap & terverifikasi lokal (boot, index, guard, CRUD, penomoran; 119 test PASS) ✅; **belum di-deploy** dan **import awal (pemasok maupun barang) belum dijalankan** di produksi (butuh kredensial Accurate). Frontend Master Pemasok **dan** Barang & Jasa sudah ada di `erp-frontend` (`src/features/procurement/`) — lihat [[APP - Web ERP]].
+- **Status**: ⚠️ Implemented (ada catatan) — backend Pemasok + Barang & Jasa lengkap & terverifikasi lokal (boot, index, guard, CRUD, penomoran; 139 test PASS) ✅; **belum di-deploy** dan **import awal (pemasok maupun barang) belum dijalankan** di produksi (butuh kredensial Accurate). Frontend Master Pemasok **dan** Barang & Jasa sudah ada di `erp-frontend` (`src/features/procurement/`) — lihat [[APP - Web ERP]].
 - **API**: [[API - Procurement Service]].
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
@@ -33,6 +33,8 @@ Daftar rute lengkap di [[API - Procurement Service]]. Ringkas:
 Nomor seri: `kelola_nomor_seri` (manageSN) mengaktifkan pilihan `tipe_nomor_seri` (`UNIQUE`/`BATCH`, enum `SerialNumberType`) dan `pakai_kadaluarsa` (manageExpired) — keduanya hanya dikirim ke Accurate bila nomor seri aktif; mengirim tipe nomor seri tanpa mengaktifkan nomor seri tidak masuk akal secara bisnis.
 
 **Dua field baca-saja** (sama polanya dengan Tipe Pemasok): **Merek Barang** (`itemBrand`) dan **Tipe Persediaan** (`materialProduced`/`itemProduced`) tidak ada di antara 58 parameter `item/save.do` — Accurate mengabaikannya diam-diam bila dikirim. Struct `ItemPayload` sengaja tidak mendeklarasikan keduanya sama sekali; nilainya hanya terisi lewat import (`detail.do`).
+
+`materialProduced`/`itemProduced` di respons `detail.do` adalah **boolean** (bukan string) — terbukti di server testing dengan Accurate sungguhan: mendeklarasikannya sebagai `string` membuat unmarshal gagal pada **setiap** barang, sehingga `POST /barang/import` mengembalikan `terimpor:0` walau ratusan barang tersedia. Diperbaiki: `ItemDetail.MaterialProduced`/`ItemProduced` sekarang `bool`, diterjemahkan ke `Barang.TipePersediaan` (string tampilan: "Bahan Baku", "Diproduksi", atau "Bahan Baku, Diproduksi" bila keduanya aktif) lewat `tipePersediaanDari()` di `import_barang.go`. Perbaikan terverifikasi di level test (139 PASS); **belum diverifikasi ulang di server testing produksi** (butuh re-run import barang).
 
 ### Penomoran (`nomor.go`)
 
