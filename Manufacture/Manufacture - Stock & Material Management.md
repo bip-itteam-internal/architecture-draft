@@ -35,9 +35,9 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 - `bom` → `manufacture_formula` (header + ingredients)
 - `production_plan` / `requirement` — target produksi + kebutuhan terhitung (+ override manual) — **TBD**
 - `shortage` — hasil perhitungan kekurangan (untuk pengadaan) — **TBD**
-- `stock_opname` — sesi opname + selisih + penyesuaian — **TBD**
-- `inbound` / `outbound` → via `manufacture_transaksi`; **rantai alur FE sudah tersambung & anti-duplikat**: keluar bahan (grup RM-OUT-BOM, stok tak boleh minus, deviasi fisik vs teori BOM → approval PPIC→SPV) → laporan hasil produksi (stok FG tercipta) → kirim produk (SJ IN TRANSIT) → input gudang FG (terima SJ → DELIVERED + gudang simpan) → masuk kembali sisa bahan (checklist per grup); flow [[WH - Inbound (Receiving)]] / [[WH - Outbound (Sending)]] penuh **TBD**
-- `warehouse` / `location` — multi-gudang + karantina — **TBD**
+- `stock_opname` — sesi opname + selisih + penyesuaian — **sebagian**: **Saldo Akhir bulanan kini bisa direkonsiliasi ke hasil SO** via import Excel (PPIC/SPV; `qty_akhir` dikunci = hasil SO, lihat [[Microservices - Manufacture Service]]) & saldo awal bisa **direvisi lewat approval PPIC→SPV**; sesi opname digital penuh (selisih per lokasi, karantina, berita acara) masih TBD
+- `inbound` / `outbound` → via `manufacture_transaksi`; **rantai alur FE sudah tersambung & anti-duplikat**: keluar bahan (grup RM-OUT-BOM, stok tak boleh minus, deviasi fisik vs teori BOM **atau tambah/hapus bahan dari formula** → approval PPIC→SPV) → laporan hasil produksi (stok FG tercipta) → kirim produk (SJ IN TRANSIT) → input gudang FG (terima SJ → DELIVERED + gudang simpan) → masuk kembali sisa bahan (checklist per grup); flow [[WH - Inbound (Receiving)]] / [[WH - Outbound (Sending)]] penuh **TBD**
+- `warehouse` / `location` — multi-gudang + karantina — **sebagian**: **Mutasi Gudang Fase 1** (29 Juli 2026) menambah master **kode lokasi** (`manufacture_lokasi_gudang`) + dokumen mutasi antar-lokasi (DRAFT→DIKIRIM→DITERIMA) + saldo per-lokasi diturunkan — sebagai **layer pelacakan** (tak menyentuh stok global; lihat [[Microservices - Manufacture Service]]). Ledger per-lokasi sejati (saldo awal absolut), karantina, & AR/konsinyasi (Fase 2) masih TBD
 
 ## Arsitektur & Integrasi
 

@@ -26,6 +26,7 @@ Modul `warehouse` di sidebar dipecah dua grup lewat field `group` (`erp-frontend
 | **Warehouse Sadewa** | **Riwayat Cetak Resi** (reuse `LabelHistoryView`, disaring ke aktor `admin_gudang_sadewa`) | `/warehouse/sadewa/label-history` |
 | **Warehouse Sadewa** | **Retur** | `/warehouse/sadewa/return` |
 | **Warehouse Tinggar** | **Persetujuan** (sengaja di grup Tinggar — approver = otoritas Tinggar) | `/warehouse/sadewa/approvals` |
+| **Warehouse Tinggar** | **Toko Gudang Sadewa** (assign toko → Sadewa; grup Tinggar karena pengelola = otoritas Tinggar) | `/warehouse/sadewa-shops` |
 
 > **Catatan rename (sesi 2026-07-27)**: menu Sadewa **"Cetak Resi" → "Pengemasan"**, ikon `Printer` → `Package`, plus judul halaman `PackingBoard` (`title="Pengemasan — Warehouse Sadewa"`) dan pesan `SadewaAccessGuard`. Action type backend `CETAK_RESI` **tidak** diganti (enum, bukan label UI).
 
@@ -90,6 +91,17 @@ Untuk matriks akses WMS Tinggar/manufacture lengkap lihat [[Microservices - Manu
 - Halaman `/warehouse/sadewa/return` **me-reuse** `GudangBarangJadiView` mode `returOnly` — sumber data & alur **sama persis** dengan retur Tinggar (tab "Return Dari Ekspedisi" Gudang FG).
 - Menulis lewat **pipeline transaksi manufacture** (`POST /api/manufacture/transaksi`), **bukan** ke collection `sadewa_action`. Server menstempel `detail.sumberGudang = SADEWA` & `created_by_name` dari JWT (anti-palsu).
 - Alasan retur: Rework (Isi berkurang / Segel terbuka) & Reject (Pecah / Tidak sesuai).
+
+---
+
+## Menu Toko Gudang Sadewa (assignment toko → Sadewa)
+
+*Menentukan **toko marketplace mana** yang ditangani Warehouse Sadewa. Assignment ini men-**scope** antrian Pengemasan & feed Retur menu Sadewa agar hanya menampilkan pesanan dari toko-toko tersebut. Sumber daftar toko = Shop Mapping (Config Accurate / `accurate_shops`); di warehouse service hanya disimpan yang di-assign.*
+
+- **Route/FE**: `/warehouse/sadewa-shops` (`app/(main)/warehouse/sadewa-shops/page.tsx`), grup sidebar **Warehouse Tinggar**, gate `bolehKelolaTokoSadewa` (`SadewaAccessGuard`).
+- **Pengelola = otoritas Tinggar saja**: staff warehouse Tinggar (`admin_gudang`/`leader`/`spv`) atau pengawas WMS (PPIC/SPV) atau IT-spv. **`admin_gudang_sadewa` DIKECUALIKAN** (penerima, bukan pengelola) — ditegakkan FE (`bolehKelolaTokoSadewa`) **dan** BE (`sadewaShopWriteGuard`, yang sengaja **tidak** mewariskan `admin_gudang_sadewa→admin_gudang`).
+- **UX (sejak 2026-07-27)**: tabel menampilkan **hanya toko yang sudah di-assign** (`useSadewaShops`), tiap baris punya tombol **Lepas** (unassign). Menambah lewat tombol **Tambahkan Toko** → popover berisi search + daftar **semua toko** (`useFetchShops`, Config Accurate) yang **belum** di-assign; klik toko → assign. (Sebelumnya: tabel menampilkan **semua** toko dengan toggle "Tandai"/"Ditandai".)
+- **BE** (`services/warehouse/sadewa_shops.go`, collection `SadewaShops`): `GET /wms/sadewa-shops` (list, sort `shop_name`), `POST /wms/sadewa-shops` (upsert by `shop_id`+`channel`), `DELETE /wms/sadewa-shops/:shopId?channel=` (unassign). Field `SadewaShop`: `shop_id`, `channel`, `shop_name`, `assigned_by`, `assigned_at`.
 
 ---
 

@@ -159,16 +159,17 @@
 | POST | `/fulfillment/labels` | Ambil shipping label per order. Body: `[{order_id, channel, shop_id, package_id}]` (POST karena TikTok butuh `package_id`). Paralel max 5 worker. TikTok: sync READY + `url` (tipe `SHIPPING_LABEL_AND_PACKING_SLIP` A6 — resi + detail produk). Shopee: alur async 3-step + **poll berulang di server** (±6 dtk) sehingga umumnya langsung READY + `pdf_data`; PROCESSING bila belum siap (FE auto-retry) |
 | POST | `/fulfillment/labels/merged` | Sama dengan `/labels` tapi **menggabungkan semua PDF READY jadi SATU** (pdfcpu `MergeRaw`). Response: `{pdf: base64, included: [order_id...], data: [LabelResult...]}`. TikTok URL diunduh dulu, Shopee pakai pdf_data langsung; non-PDF/gagal dilewati. Untuk cetak batch 50–100 resi sekali print |
 
-## Kas Toko / Wallet (🟡 branch `feat/kas-toko`, PR #380 — belum merge)
+## Kas Toko / Wallet (✅ LIVE — Shopee/TikTok/Lazada)
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/wallet/balances` | Saldo kas toko semua toko (Shopee aktual dari `current_balance`; TikTok estimasi anchor+Σ, flag `estimated`/`anchor_missing`/`sync_stale`) |
 | GET | `/wallet/withdrawals` | Riwayat penarikan (filter shop/channel/type/status/tanggal WIB). Meta paginasi HANYA sisi TikTok; Shopee = list grup penuh + `completed_total` |
-| GET | `/wallet/mutations` | Mutasi wallet Shopee ("Saldo Saya") + saldo berjalan, paginasi normal |
+| GET | `/wallet/mutations` | Mutasi wallet Shopee ("Saldo Saya") + saldo berjalan, paginasi normal. `channel=LAZADA` → mutasi Lazada (`lazada_account_transactions`, Deposit/Withdrawal/Payment; amount bertanda, TAK punya `current_balance`/`order_sn`) |
 | GET | `/wallet/reconciliation` | Laporan uang masuk per toko basis `income.paid_at` (`paid_from/paid_to` wajib; `order_from/order_to` opsional — cross-periode) |
 | GET | `/wallet/reconciliation/export` | Export Excel laporan |
 | PUT | `/wallet/opening-balance/:shopId` | Set anchor saldo awal TikTok (`{amount, as_of}`) |
 | GET | `/wallet/sync-status` | State sync per toko (last_run, status, error) |
+| GET | `/lazada/payouts` | ✅ Pencairan Lazada per-statement dari `lazada_payouts` (`shop_id`/`date_from`/`date_to`/paging; row: `statement_number`, `created_at`=tanggal cair, `payout`, `closing_balance`=saldo, `paid`) — analog `/tiktok/shop/statements` + `/shopee/payouts` |
 
 ## Reviews (Ulasan Marketplace)
 | Method | Path | Fungsi |
