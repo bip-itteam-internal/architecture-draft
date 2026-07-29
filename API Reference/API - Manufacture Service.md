@@ -83,8 +83,8 @@
 | GET/POST/DELETE | `/edit-grant` (`?employee_id=&bulan=`) · `/edit-grant/:id` | **Buka kunci edit riwayat WMS per-akun** (`manufacture_edit_grant`). Riwayat transaksi bulan **tertutup** (< bulan berjalan) mengunci tombol "Koreksi Input" di FE; IT memberi satu akun akses edit satu bulan (`{employee_id, username?, bulan, expires_at?}`, idempoten `_id=employee_id\|bulan`, `granted_by` distempel header) → `DELETE` mencabut. Enforcement = **FE-gating** (period-lock + grant aktif utk `employeeId` user); pengecekan role per-endpoint backend belum ada (gap pra-ada) |
 | GET | `/audit-log` (`?user=&aksi=`) · `/audit-log/rekap` (`?bulan=YYYY-MM`) · `/health` | Audit log (list) · rekap aktivitas CRUD per user/bulan untuk **KPI otomatis** (agregasi batas hari/bulan pakai **WIB**, respons ber-flag `truncated` bila >20k entri) · health |
 
-## Mutasi Gudang (Fase 1) ✅
-*Sistem mutasi antar-lokasi (offline) — status 1–3 (di Gudang A → dikirim → diterima Gudang B/Toko). **Layer pelacakan**: dokumen mutasi TIDAK menyentuh `manufacture_stok`/transaksi/Accurate (total stok global tak berubah). AR/konsinyasi status 4–5 = Fase 2 (belum). 29 Juli 2026.*
+## Mutasi Gudang & Konsinyasi ✅
+*Sistem mutasi antar-lokasi (offline) — status 1–5. Fase 1 = status 1–3 (di Gudang A → dikirim → diterima Gudang B/Toko). Fase 2 = status 4–5 (AR/piutang konsinyasi → terbayar). **Layer pelacakan**: TIDAK menyentuh `manufacture_stok`/transaksi/Accurate (total stok global tak berubah); qty-based, bukan akunting Rp. 29 Juli 2026.*
 
 | Method | Path | Fungsi |
 |---|---|---|
@@ -93,6 +93,8 @@
 | PATCH | `/mutasi-gudang/:id/kirim` | **DRAFT→DIKIRIM** (status 2 "proses pengiriman") — guard bersyarat `status=DRAFT` (MatchedCount→409); set `dikirim_at`, `pic_kirim` |
 | PATCH | `/mutasi-gudang/:id/terima` | **DIKIRIM→DITERIMA** (status 3, input per lokasi) — body `{items:[{kode, qty_terima}]}` (default = qty_kirim bila tak diisi; boleh `< qty_kirim` = selisih perjalanan); guard `status=DIKIRIM` (MatchedCount→409, cegah lost-update balapan); set `diterima_at`, `pic_terima` |
 | GET | `/lokasi-stok` (`?lokasi=`) | **Saldo mutasi per-lokasi** (diturunkan, inti pure `saldoLokasi`): per kode = Σ qty_terima (DITERIMA ke lokasi) − Σ qty_kirim (DIKIRIM/DITERIMA dari lokasi). ⚠️ = **net pergerakan via mutasi** (untuk toko = qty tercatat di toko), **bukan stok absolut** (butuh saldo awal per-lokasi — Fase lanjut). Akses FE (lokasi & mutasi): admin gudang RM/FG + PPIC/SPV |
+| GET | `/piutang-konsinyasi` (`?toko=`) | **Piutang konsinyasi (Fase 2, status 4–5)** — per kode di toko konsinyasi: `{diterima, terbayar, piutang, status}` (inti pure `piutangKonsinyasi` teruji). `diterima` = Σ qty_terima mutasi DITERIMA ke toko; `terbayar` = Σ qty_bayar pembayaran; `piutang` = selisih; status **AR** (piutang>0) / **LUNAS** (≤0). Toko wajib `konsinyasi` & aktif |
+| GET·POST | `/pembayaran-konsinyasi` (`?toko=&from=&to=`) | **Pembayaran konsinyasi** (`manufacture_pembayaran_konsinyasi`). `POST` catat pembayaran qty parsial agregat per toko: `{toko, tanggal?, keterangan?, items:[{kode, qty_bayar}]}` → **overpay-guard**: tolak 400 bila `qty_bayar > sisa piutang` kode (dihitung dari state saat ini; akumulasi dalam-request agar baris kode ganda tak lampaui). `GET` riwayat. FE `PiutangKonsinyasiView.tsx`; akses admin gudang RM/FG + PPIC/SPV + **Finance read-only** (`TAB_WMS_FINANCE`; form pembayaran disembunyikan untuk read-only) |
 
 ## Dokumen Terkait
 - [[Microservices - Manufacture Service]] · [[Manufacture - Stock & Material Management]] · [[GA - Procurement System]] · [[API - Integration Service]] (resi-feed, `/transactions/returns`) · [[IT - Background Jobs & Schedulers]] (`sync-resi-wms`) · [[API - Index]]
