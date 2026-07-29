@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-07-28",
-  "jumlah_dokumen": 234,
+  "digenerate": "2026-07-29",
+  "jumlah_dokumen": 235,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -708,7 +708,7 @@
         "Microservices - Notification Service"
       ],
       "hash": "3c63c7e727fec08b978e9883a334c5d419d4291ec9358c02ba2f75c04f4279bf",
-      "ukuran_kb": 11.4,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab: aplikasi mobile HRIS MyBharata dipakai untuk apa oleh karyawan (clock-in/out via QR + geofencing + biometric, jadwal & riwayat kehadiran, pengajuan cuti/izin/sakit/dinas, lembur SPKL, payslip PDF ber-PIN, KPI, tugas/Task Management), dan bagaimana teknis aplikasinya dibangun (Flutter, Clean Architecture feature-first, bloc, dio + fpdart, go_router, Firebase, l10n id/en). Juga menjawab bagaimana autentikasi JWT/PIN/biometric dan kebijakan 1 akun 1 device berjalan, ke backend mana app terhubung (langsung ke HRIS backend, bukan lewat API Master Gateway), serta bagaimana dukungan multi-perusahaan (scope via JWT, konten per tenant) diterapkan.",
       "kata_kunci": [
         "MyBharata",
@@ -795,6 +795,7 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "Microservices - Manufacture Service",
         "Microservices - Recruitment Service",
+        "HRIS - Pengembangan Organisasi (Community of Interest)",
         "Microservices - Payroll Service",
         "Microservices - Attendance Service",
         "HRIS - Key Performance Index",
@@ -818,20 +819,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "58ccb39993fe43b8f521a7177e4ce23b34adbc8b3d601f92aa9d21e9148aec59",
-      "ukuran_kb": 42.9,
-      "ringkasan": "Menjawab: portal web ERP/HRIS internal \"One Bharata\" (repo erp-frontend) berisi modul apa saja (ERP publik, HRIS lengkap, recruitment, payroll setup, finance/insentif, WMS/manufacture, IT, GA, integration) dan siapa yang boleh membuka tiap menu. Juga menjawab bagaimana login employee_id + password, refresh token, dan role gating berbasis cookie system_roles bekerja, termasuk matriks akses menu WMS per posisi, pengecualian read-only Finance ke Gudang FG, dan akun integration-only. Selain itu menjelaskan perannya sebagai SSO Identity Provider untuk app lain dan bagaimana dukungan multi-perusahaan diterapkan di halaman HRIS.",
+      "hash": "925ca77e5f37840f302afdb55c854f8e493b5543e80c76c50c46a9367fc4fc27",
+      "ukuran_kb": 43.7,
+      "ringkasan": "Menjawab: modul dan menu apa saja yang ada di portal web ERP Bharata (One Bharata), siapa yang boleh melihat tiap menu berdasarkan system_roles dan matriks posisi, serta bagaimana alur login dan perannya sebagai SSO Identity Provider. Juga menjawab detail per modul: HRIS (employee, absensi, recruitment, payroll, Pengembangan Organisasi), Finance, Integration Accurate, WMS, dan status rollout i18n dua bahasa.",
       "kata_kunci": [
-        "Web ERP",
-        "erp-frontend",
+        "web ERP",
         "hris-dashboard",
         "One Bharata",
-        "SSO",
-        "system_roles",
+        "sidebar",
+        "menu",
         "role gating",
-        "RBAC",
-        "Next.js",
-        "multi-perusahaan"
+        "system_roles",
+        "SSO",
+        "Next.js frontend",
+        "i18n"
       ]
     },
     {
@@ -3453,7 +3454,7 @@
         "HRIS - Recruitment"
       ],
       "hash": "a84a53a84ea2984d977d11c6b8e22b62f86afbebe68b5dd5b8ffff2197b29d56",
-      "ukuran_kb": 4.5,
+      "ukuran_kb": 4.6,
       "ringkasan": "Menjawab: bagaimana fitur Candidate Assessment (tes teknis/keahlian di tahap Screening) dirancang, mulai dari master katalog tipe assessment di System Setup, entity candidate_assessment berisi skor dan hasil Pass/Fail/Pending, sampai endpoint backend dan halaman menu tersendiri di web beserta reuse CandidatePicker. Juga menjelaskan keputusan desain yang sudah dikunci, misalnya perubahan status kandidat tetap manual oleh HR (tanpa otomatis dari hasil tes) dan picker kandidat dibatasi ke status Screening, plus urutan slicing BE lalu FE dan hal yang di luar scope MVP seperti lampiran hasil tes.",
       "kata_kunci": [
         "candidate assessment",
@@ -3939,6 +3940,39 @@
       ]
     },
     {
+      "path": "Human Resource Information System/HRIS - Pengembangan Organisasi (Community of Interest).md",
+      "judul": "HRIS - Pengembangan Organisasi (Community of Interest)",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan). UI jalan penuh, tetapi **seluruh data klub & dokumentasi masih konstanta di frontend**; belum ada service maupun storage di backend",
+      "publik": true,
+      "tautan": [
+        "HRIS - Retention",
+        "Microservices - Employee Service",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "APP - MyBharata",
+        "APP - Web ERP",
+        "HRIS - Personalia",
+        "HRIS - Big Pictures"
+      ],
+      "hash": "4f542417bd4400932817b14091b502e9ecccd152e69a34a30fb78cef37cec419",
+      "ukuran_kb": 5.3,
+      "ringkasan": "Menjawab: apa isi menu Pengembangan Organisasi (OD) di Web ERP, yaitu Community of Interest dengan Jadwal Club, Dokumentasi Kegiatan Club, dan Ulang Tahun karyawan. Menjelaskan jadwal rutin tiap klub Bharata Club Community (badminton, football, ladies sport, billiard), route tiap halaman, siapa yang bisa mengaksesnya, serta batasannya: data klub dan dokumentasi masih konstanta frontend tanpa service maupun storage foto.",
+      "kata_kunci": [
+        "pengembangan organisasi",
+        "organization development",
+        "OD",
+        "community of interest",
+        "Bharata Club Community",
+        "jadwal club",
+        "dokumentasi kegiatan",
+        "ulang tahun",
+        "birthday",
+        "engagement karyawan"
+      ]
+    },
+    {
       "path": "Human Resource Information System/HRIS - Perjalanan Dinas.md",
       "judul": "HRIS - Perjalanan Dinas",
       "area": "Human Resource Information System",
@@ -4018,7 +4052,7 @@
       "publik": true,
       "tautan": [],
       "hash": "f2d49092d109910d5a407fd40c6d5b21837bc601f9e1870bb7a8452dcd67e96a",
-      "ukuran_kb": 15.1,
+      "ukuran_kb": 15.2,
       "ringkasan": "Menjawab: seperti apa gambaran visual alur rekrutmen dari requisition sampai onboarding, dan tahap apa saja yang dilalui kandidat (Requisition, Lowongan, Pelamar, CV Screening, Interview HR, Interview User, Technical Test, Interview Final, Background Check, Psikotes, Offering, Hired, Onboarding masa evaluasi) beserta pengelompokannya ke fase Sourcing, Seleksi, Keputusan, dan Onboarding. Titik keputusan yang ditandai di diagram antara lain approve SPV HRD pada requisition, terima atau tolak offering, dan lulus/perpanjang/tidak lulus di akhir masa evaluasi. Berkas ini adalah diagram Excalidraw dengan data gambar terkompresi, jadi dipakai sebagai rujukan visual alur, bukan penjelasan naratif.",
       "kata_kunci": [
         "alur rekrutmen",
