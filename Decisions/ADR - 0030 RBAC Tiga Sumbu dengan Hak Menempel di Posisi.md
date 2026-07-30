@@ -1,4 +1,4 @@
-**Status**: 🟡 Direncanakan. Fondasi permission-set **sudah live untuk modul ticket** (katalog + `RequirePermission` + resolusi klaim JWT); lapisan **posisi sebagai pembawa hak** dan katalog modul lain belum ada di kode.
+**Status**: ⚠️ Implemented (ada catatan). Keputusan ini **sudah dijalankan dan terverifikasi live di dev DAN produksi** (2026-07-30): posisi memegang paket hak, izin efektif digabung dari posisi + akun dengan reach tertinggi, layar Hak per Posisi & Siapa Boleh Apa jalan, dan penegakan per-aksi aktif di `ticket` serta `payroll`. Paket per-akun sudah dirapikan (dev 5 jadi 1, prod 4 jadi 0, sehingga hampir semua hak kini berasal dari jabatan). Catatan: `finance` baru berkatalog tanpa gerbang, 11 modul lain belum berkatalog, dan pola izin antar-modul belum seragam (lihat Consequences).
 
 ## Context
 
@@ -45,6 +45,14 @@ Keputusan turunan:
 - **`admin.permissionset.manage` dan `admin.assignment.manage` adalah hak yang bisa menaikkan hak sendiri**, jadi wajib menempel di satu posisi saja dan setiap perubahannya diaudit. Tanpa itu, seluruh pondasi ini bisa dilewati dari dalam.
 - **Katalog tanpa gerbang BE adalah dekorasi.** Modul dengan rute telanjang (WMS, integration, insentive, notification, sebagian employee dan attendance) tidak boleh dinyalakan penyaringan FE-nya sebelum endpoint-nya digerbang, karena hasilnya persis masalah WMS sekarang: menu rapi, endpoint tetap bisa dipanggil langsung.
 
+**Konsekuensi yang muncul saat dijalankan (2026-07-30):**
+
+- **Backfill paket per-akun dicabut.** `migratePermissionSetAssignment` memberi paket ke akun yang punya role ticket eksplisit dan `permission_sets` kosong. Karena "kosong" tak bisa dibedakan dari "sengaja dikosongkan", setiap restart service mengembalikan paket per-akun yang baru dirapikan ke posisi (terbukti di dev: 2 akun kembali dalam satu deploy). Backfill dicabut; paket yang sudah ada tidak dihapus.
+- **Jalur per-akun TETAP dipertahankan, dan itu keputusan berdasar data.** Sempat diusulkan mencabutnya agar sumber hak tunggal, tapi di dev ada akun berposisi **ICC yang dipegang 40 orang** yang diberi hak supervisi tiket. Memindahkannya ke posisi berarti menaikkan hak 39 orang lain; mengarang posisi khusus satu orang mengotori struktur organisasi yang dibaca fitur lain (supervisi, KPI, requisition). Jadi: posisi untuk hak yang mengikuti jabatan, akun untuk pengecualian individu. Yang wajib diperbaiki keterlihatannya, dan itu sudah dikerjakan lewat daftar pengecualian di layar Siapa Boleh Apa.
+- **Patokan sebelum memindahkan hak akun ke posisi**: hitung dulu jumlah pemegang posisi itu. Tanpa langkah ini, pembersihan yang tampak rapi bisa berubah jadi kenaikan hak massal.
+- **Pola izin belum seragam.** Katalog `payroll` mengikuti tangga tingkat (dengan satu pengecualian `payroll.salary.write`), sementara `finance` yang menyusul memakai izin **per-objek** (`finance.ar.view`, `finance.kastoko.view`, dst). Belum diputuskan mana yang jadi acuan; lihat catatan penyimpangan di [[CORE - RBAC dan Permission Set]].
+- **"Rute telanjang" ternyata lebih terbuka dari yang dicatat ADR ini.** Audit lanjutan menemukan prefix `/internal/` **bukan** batas keamanan (gateway meneruskan seluruh sub-path dan mengisi sendiri gateway key), sehingga sebagian rute tanpa middleware bisa dipanggil dari internet oleh siapa pun yang bisa login, termasuk satu rute yang menulis `system_roles` apa pun. Dua lubang ditambal dan ter-deploy hari yang sama. Ini menguatkan poin "katalog tanpa gerbang BE adalah dekorasi" di atas: urutan yang benar adalah gerbangi endpoint dulu, baru nyalakan penyaringan FE. Detail keputusan di [[ADR - 0031 Prefix internal Bukan Batas Keamanan]], bukti dan forensiknya di [[LOG - 2026-07-30 Audit Otorisasi Employee Service]].
+
 **Yang belum diputuskan (TBD):**
 
 - **Pemisahan per area gudang** (Admin Gudang RM vs FG) bukan soal permission melainkan cakupan area. Menempelkannya ke permission akan melahirkan `wms.rm.*` dan `wms.fg.*` dan membengkakkan katalog. Tahap pertama menyamakan dengan matriks FE yang berlaku; kemungkinan arah: cakupan mirip `reach`, bukan permission baru.
@@ -59,4 +67,4 @@ Keputusan turunan:
 - [[CORE - API Master Gateway]] (stempel header identitas dari klaim JWT) · [[CORE - SSO Flow]]
 - [[APP - Web ERP]] (penyaringan menu & tombol) · [[HRIS - Organization Structure]] (posisi & departemen sebagai master)
 - [[DB - Data Dictionary]] (`master_permission_set` dan `permission_sets` belum terdaftar di sana)
-- [[ADR - 0003 SSO-only Gateway]] · [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]
+- [[ADR - 0003 SSO-only Gateway]] · [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · [[ADR - 0031 Prefix internal Bukan Batas Keamanan]]

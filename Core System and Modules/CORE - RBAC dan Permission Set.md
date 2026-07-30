@@ -4,7 +4,7 @@
 
 - **Stack**: Go (fiber middleware) + MongoDB (`master_permission_set`, `master_department`, `system_authentication`) + JWT HS256 sebagai pembawa izin efektif; frontend Next.js membaca klaim yang sama.
 - **Path di repo**: `bip-erp/shared-library/common/{permissions.go,catalog_ticket.go,roles.go,position.go}` · `bip-erp/shared-library/models/employee/permission_set.go` · `bip-erp/services/employee/permission_resolve.go` · `bip-erp/services/task-management/{rbac.go,routes.go}` · `erp-frontend/src/utils/access.ts` · `erp-frontend/src/features/hris/master-data/*`
-- **Status**: ⚠️ Implemented (ada catatan). Mesin permission-set sudah jalan penuh untuk modul **ticket**; 14 modul lain masih bertumpu pada `system_roles` tier, dan lapisan posisi-memegang-hak belum ada.
+- **Status**: ⚠️ Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket** serta **payroll**. **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul lain masih bertumpu pada `system_roles` tier.
 
 ## Persona / Pengguna
 
@@ -28,6 +28,10 @@
 - **Transport anti-palsu** — gateway membuang seluruh namespace `BIP-*` kiriman klien lalu mengisinya ulang dari klaim JWT (`routes.Reroute`), termasuk `BIP-Permissions` dan `BIP-Position`.
 - **Penegakan** — `common.RequirePermission(perm)` (deny-by-default) dan `gate(perm, tierFallback...)` di task-management; kill-switch env `TICKET_PERMISSION_ENFORCEMENT=off`.
 - **API katalog untuk frontend** — `GET /api/employee/master/permission-catalog/:module` menyajikan katalog dari Go, dipakai modal permission-set di Master Data.
+- **API daftar modul** — `GET /api/employee/master/permission-modules` (dari `common.CatalogModules()`, urut abjad) mengisi pemilih modul di modal. Sengaja dari katalog, bukan konstanta di FE: modul tanpa katalog selalu ditolak `ValidatePermissionSet`, jadi menawarkannya hanya memancing pemakai menyusun paket yang pasti gagal disimpan. Efeknya terbukti saat katalog `finance` mendarat: modulnya langsung muncul di dropdown tanpa satu baris perubahan FE.
+- **API pengecualian per-akun** — `GET /api/employee/master/permission-set-exceptions` mengembalikan akun ber-`permission_sets` beserta jabatannya plus `dari_posisi` (paket yang sudah diberikan posisinya). Field terakhir dipakai layar Siapa Boleh Apa menandai pengecualian yang **redundan**, yaitu yang aman dikosongkan tanpa mengubah akses.
+- **Pemasangan hak ke posisi** — `PUT /api/employee/master/departments/:key/positions/:positionKey/permission-sets` (gate interim `RequireITSupervisor`). Menyentuh satu posisi saja, tak lewat `ReplaceOne` seluruh dokumen departemen.
+- **Backfill paket per-akun DICABUT** (`migratePermissionSetAssignment`, dicabut 2026-07-30). Syaratnya "akun punya role ticket & `permission_sets` kosong", dan "kosong" tak bisa dibedakan dari "sengaja dikosongkan" — akibatnya setiap restart service mengembalikan paket per-akun yang baru dirapikan ke posisi. Paket yang sudah ada tidak dihapus; yang berubah, pengosongan kini bertahan dan karyawan baru mendapat hak dari posisi.
 - **UI kelola set & assign per akun** — `erp-frontend/src/features/hris/master-data/components/{permission-set-form-modal,permission-set-assign}.tsx`.
 
 **Pencocokan posisi (hasil pembenahan 2026-07-29):** `common.KanonPosisi` + `common.PosisiCocok` (`shared-library/common/position.go`) menyatukan aturan pencocokan nama posisi (huruf kecil, non-alfanumerik jadi underscore, exact match atas bentuk kanonik), dipakai `checkPosition` dan `isCostControl`.
@@ -62,6 +66,9 @@
 | `notification` | ✅ | | | ✅ | `notification.broadcast.send` | all |
 | `admin` | ✅ | | | ✅ | `admin.permissionset.manage`, `admin.assignment.manage` | all |
 | `ticket` | 15 permission granular (sudah live, tidak diubah) | | | | | own/div/all |
+| `finance` | (live, TIDAK memakai tangga — lihat catatan di bawah) | | | | | all |
+
+> **Penyimpangan rencana vs implementasi (per 2026-07-30).** Katalog `finance` yang sudah live memakai izin **per-objek**, bukan tangga tingkat: `finance.ar.view`, `finance.ar.export`, `finance.ap.view`, `finance.profit.view`, `finance.payout.view`, `finance.kastoko.view`. Bentuk itu masuk akal untuk finance karena tiap objek (piutang, utang, laba, pencairan, kas toko) memang ditinjau orang berbeda, tapi ia belum diselaraskan dengan ADR 0030 yang menetapkan tangga `view/work/approve/manage` plus pengecualian terbatas. **Perlu diputuskan:** perlebar ADR untuk mengizinkan pola per-objek pada modul multi-objek, atau selaraskan finance ke tangga. Selama belum diputuskan, dua pola hidup berbarengan dan itu akan membingungkan modul berikutnya.
 
 **Self-service tanpa permission**: slip gaji, KPI, insentif, tugas onboarding, dan inbox **milik sendiri** adalah hak bawaan tiap karyawan, ditegakkan BE lewat `employee_id` dari token.
 
@@ -78,6 +85,8 @@ Paket WMS adalah terjemahan langsung matriks tab yang sudah berjalan di `erp-fro
 ## Belum Diimplementasikan / Catatan
 
 **Status penegakan per service** (scan 950 rute, 2026-07-29). "Telanjang" = rute user-facing tanpa middleware apa pun; rute sistem (`/internal`, `/public`, `/health`, `/webhook`) tidak dihitung.
+
+> ⚠️ **Angka di bawah UNDER-COUNT.** Pengecualian `/internal` pada scan itu keliru: prefix tersebut **bukan** batas keamanan. Gateway meneruskan seluruh sub-path `/api/<module>/*` apa adanya dan `Reroute` mengisi sendiri `BIP-Gateway-ID`, jadi rute `/internal/...` bisa dipanggil dari internet oleh siapa pun yang punya token login. Audit 2026-07-30 di employee-service menemukan 3 rute tulis `/internal/auth/*` tanpa gerbang (satu di antaranya menulis `system_roles` apa pun, termasuk `group=admin`) plus 6 rute yang membocorkan peran dan dokumen pribadi. Semuanya ditambal dan ter-deploy hari itu, dan employee-service kini dijaga uji `internal_routes_guard_test.go`. **Scan ulang service lain harus memasukkan `/internal`.** Lihat [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] dan [[LOG - 2026-07-30 Audit Otorisasi Employee Service]].
 
 | Service | Rute | Ber-middleware | Telanjang | Tulis telanjang |
 |---|---|---|---|---|
@@ -99,14 +108,16 @@ Paket WMS adalah terjemahan langsung matriks tab yang sudah berjalan di `erp-fro
 
 Total **557 rute user-facing tanpa gerbang, 230 di antaranya tulis**.
 
+**Sudah selesai sejak dok ini pertama ditulis** (semua terverifikasi live di dev): posisi ber-`key` stabil + `work_data.position_key` + migrasi; posisi bisa memegang paket dan ikut resolusi login (union dengan paket akun, reach tertinggi); layar **Hak per Posisi** & **Siapa Boleh Apa** termasuk daftar pengecualian per-akun; penyaringan menu FE dari klaim `permissions`; katalog **payroll** (5 izin, ditegakkan) dan **finance** (6 izin, belum ditegakkan).
+
 **Yang belum ada:**
-- **Posisi belum jadi entitas ber-identitas.** `master_department.positions` masih `[]string` dan `work_data.position` teks bebas, jadi rename posisi memutus akses tanpa jejak. Prasyarat semua lapisan di atasnya.
-- **Posisi belum bisa memegang paket.** `permission_sets` baru ada di `system_authentication` (per akun), belum di posisi; `resolveEffectivePermissions` baru menerima set akun.
-- **Frontend belum menyaring dari permission.** `can()` dan `reachFor()` ada di `erp-frontend/src/utils/access.ts` dan klaim `permissions` sudah dibaca `use-auth.ts`, tapi **belum dipanggil di satu tempat pun**; menu masih disaring `system_roles` plus empat pengecualian posisi hardcoded (Cost Control, Security, Personalia, ICC).
-- **Katalog 14 modul lain belum ditulis**, jadi belum ada yang bisa di-assign selain ticket.
+- **Rute `/internal` service lain belum disapu.** employee-service sudah bereskan + dijaga uji, tapi integration, manufacture, attendance, dan insentive belum diperiksa dengan asumsi yang benar (bahwa `/internal` terbuka ke internet). Pertahanan di tepi (gateway menolak `/internal/` dari luar) menutup kelas ini sekaligus, tapi menunggu `erp-frontend` memindahkan `/api/attendance/internal/fingerprint/*` keluar namespace tersebut. Rinciannya di [[ADR - 0031 Prefix internal Bukan Batas Keamanan]].
+- **finance belum punya gerbang.** Katalog + 3 paket sudah live dan bisa dipasang ke posisi, tapi **tak satu pun endpoint memeriksanya** — jadi paketnya masih dekoratif. Tak ada `RegisterCatalog(ModuleFinance, ...)` di service pemilik data finance (hanya di employee-service untuk validasi), dan tak ada pemakaian `PermFinance*` di `services/`.
+- **Katalog 11 modul lain belum ditulis** (hris, recruitment, kpi, training, hrdoc, wms, warehouse, procurement, integration, insentive, ga, notification, admin).
 - **`master_permission_set` dan `system_authentication.permission_sets` belum terdaftar** di [[DB - Data Dictionary]].
-- **Layar yang belum ada**: "Hak per Posisi" (HR memilih paket) dan "Siapa Boleh Apa" (tabel baca posisi kali modul).
-- **TBD**: pemisahan per area gudang (RM vs FG) sebagai cakupan alih-alih permission; perilaku seragam saat pemakai membuka URL tanpa hak (403 informatif vs pengalihan).
+- **Empat gate posisi hardcoded belum dicabut** (Cost Control, Security, Personalia, ICC) — menunggu katalog modul yang bersangkutan.
+- **Gate `admin.assignment.manage` belum ada**, jadi pemasangan hak ke posisi masih dikunci interim ke `RequireITSupervisor`, bukan ke HR.
+- **TBD**: pemisahan per area gudang (RM vs FG) sebagai cakupan alih-alih permission; perilaku seragam saat pemakai membuka URL tanpa hak (403 informatif vs pengalihan); penyelarasan pola izin finance (per-objek) dengan tangga ADR 0030.
 
 **Aturan kerja**: satu PR sama dengan satu modul, memuat katalog + paket bawaan, gerbang BE + kill-switch env, dan penyaringan FE sekaligus. Urutan: payroll, recruitment, hris, wms, integration (integration terakhir karena terbesar dan paling banyak celah).
 

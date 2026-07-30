@@ -32,6 +32,8 @@
 - Module: employee, attendance, notification, file, insentive, integration, tiktok-shop, inventory, task-management, recruitment, hris (orchestrator), it (orchestrator)
 - Contoh port internal: employee-service:6970, attendance-service:6971, notification-service:6972, file-service:6973, hris-orchestrator:7000, it-orchestrator:7001
 - **Open routes:** module `notification` & `file` boleh skip JWT bila ada query `?key=`
+- ⚠️ **Catch-all, bukan allowlist.** `api.All("/:module/*")` meneruskan **seluruh** sub-path apa adanya; gateway tidak punya daftar rute yang diizinkan dan tidak menyaring path. Digabung dengan `Reroute` yang **mengisi sendiri** `BIP-Gateway-ID` (sehingga `ValidateGateway` di service selalu lolos), akibatnya **prefix `/internal/...` di service ikut terbuka ke internet**: syaratnya hanya token login valid, peran apa pun. Jadi `/internal/` **bukan** batas keamanan, dan setiap rute wajib menggerbangi dirinya sendiri. Latar, bukti di produksi, dan aturannya: [[ADR - 0031 Prefix internal Bukan Batas Keamanan]].
+- Konsekuensi lain dari catch-all yang sama: rute yang punya limiter khusus di level gateway bisa **dilewati** lewat jalur `/api/<module>/*`. Contoh nyata: `strictLimiter` menempel di `/auth/login`, tapi employee-service juga melayani `/auth/login` sehingga `/api/employee/auth/login` mencapainya tanpa limiter (belum ditambal, tercatat di ADR 0031).
 
 **Routing non-`/api` (proxy khusus)**
 - `/auth/*` & `/onboarding/*` → employee-service
