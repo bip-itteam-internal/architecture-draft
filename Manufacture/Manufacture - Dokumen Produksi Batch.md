@@ -12,7 +12,7 @@
 
 | Persona | Peran & Divisi | Akses/RBAC (`system_roles`) | Device |
 |---|---|---|---|
-| Admin RM (Restu) | Manufaktur — gudang RM | `manufacture = admin_gudang_rm` — buat/isi kolom **Ditimbang** (pra-produksi) + No.Batch bahan | Desktop web |
+| Admin RM (Restu) | Manufaktur — gudang RM | `manufacture = admin_gudang_rm` — buat/isi kolom **Ditimbang** (pra-produksi) | Desktop web |
 | Admin Produksi (Mame) | Manufaktur — produksi | `manufacture = admin_produksi` — isi **Sisa + Hasil PCS** + data proses; edit (DRAFT/DITOLAK), ajukan | Desktop web |
 | QC / RnD (PJ Teknis) | Manufaktur — QC/RnD | `manufacture = qc`/`rnd` — periksa, isi field mutu, setujui (LULUS)/tolak; **tidak** bisa melihat DRAFT | Desktop web |
 | PPIC / SPV | Manufaktur | super-akses (lihat semua tab WMS) | Desktop web |
@@ -41,7 +41,7 @@ Mengikuti urutan & format dokumen manual:
 - **Pengecualian (field bersumber → ditaut, bukan ketik bebas)**: **Nama Bahan** per fase pada Catatan Pengujian dipilih **admin produksi** lewat picker dari **tabel penimbangan** dossier (sumber = formula; disimpan string `"a, b, c"`) — QC hanya mengisi kolom **Hasil**. Header **Nama Produk/Kode Produk** + seluruh baris **penimbangan** auto ter-isi saat pilih **Formula**. Kolom **MO** auto dari Material Order (lihat bawah), **bukan** input manual.
 
 ### Penimbangan multi-peran & rekonsiliasi MO (support ticket 2026-07)
-- Tabel penimbangan diisi **dua peran** pada satu dossier: **admin RM (Restu)** mengisi **Ditimbang** (jumlah ditimbang pra-produksi) + No.Batch bahan; **admin produksi (Mame)** mengisi **Sisa** (sisa timbangan pasca-produksi) + **Hasil PCS**. Kolom dikunci per peran (RM tak bisa ubah Sisa, dan sebaliknya); PPIC/SPV boleh semua.
+- Tabel penimbangan diisi **dua peran** pada satu dossier: **admin RM (Restu)** mengisi **Ditimbang** (jumlah ditimbang pra-produksi); **admin produksi (Mame)** mengisi **Sisa** (sisa timbangan pasca-produksi) + **Hasil PCS**. Kolom dikunci per peran (RM tak bisa ubah Sisa, dan sebaliknya); PPIC/SPV boleh semua.
 - **Pemakaian = Ditimbang − Sisa** (auto). **Rekonsiliasi = Pemakaian/Teoritis × 100** (batas <2%). Kolom **MO** auto dari [[Manufacture - Order Production Workflow (Flow Source)|Material Order]] (`qty_needed_total`, ditaut by `no_batch`); ditandai **kuning** bila **Pemakaian > MO** → "jumlah MO sesuai pemakaian" terpantau.
 - **BPOM** tetap dokumen fisik (di luar sistem); versi **Perusahaan** = softfile ini. Jadi tidak ada dua varian ekspor — cukup satu output.
 - Gate: `admin_gudang_rm` masuk `bolehBuatBatchRecord` + middleware `requireBatchCreate` (rbac.go).
