@@ -24,6 +24,7 @@
   "recipient_name":   "string — nama penerima",
   "recipient_address":"string — alamat lengkap penerima",
   "shipping_provider":"string — nama kurir (JNE, SiCepat, dll)",
+  "tracking_number":  "string — resi/AWB; dibawa saat arrange (capture-resi integration, 2026-07-30) → warehouse isi kolom `awb` fill-only tanpa menunggu tracking-sync. Lihat [[Microservices - Integration Service]]",
   "package_id":       "string — TikTok saja; diambil dari PackageID line-item pertama; boleh kosong untuk Shopee",
   "items": [{ "sku": "string", "qty": "int" }]
 }
@@ -177,7 +178,7 @@ Auth tambahan: `BIP-System-Roles` header (JSON map), key `"warehouse"`, value = 
 
 **`GET /fulfillment/labels/history/export`** — unduh riwayat sebagai xlsx:
 - Query: `q` + `date_from`/`date_to` (WIB, dukung jam `2006-01-02T15:04` atau tanggal saja, batas menit inklusif) + `actor_role` — sama dengan `/labels/history`; tanpa pagination; max 20.000 baris
-- Kolom (kebutuhan rekap tim, 2026-07-20; **Expedisi** ditambah 2026-07-24 untuk surat jalan): **No, Waktu Cetak (WIB), No Resi, Expedisi, Nama Toko, Nama Produk, Qty** — satu baris per produk. `Expedisi` = `shipping_provider` (kosong bila belum terisi event/reconciler), ejaan konsisten dengan export rekon antrian.
+- Kolom (kebutuhan rekap tim, 2026-07-20; **Expedisi** ditambah 2026-07-24 untuk surat jalan): **No, Waktu Cetak (WIB), No Resi, Expedisi, Nama Toko, Nama Produk, Qty** — satu baris per produk. `Expedisi` = `shipping_provider`, `No Resi` = `awb`; keduanya kini diisi **saat arrange** (capture-resi integration, 2026-07-30 — event `/fulfillment/events` membawa `tracking_number`+`shipping_provider`, `backfillEmptyFields` fill-only) sehingga jarang kosong walau rekon diunduh cepat; sisa kekosongan tertutup event/reconciler berikutnya. Ejaan `Expedisi` konsisten dengan export rekon antrian. Lihat [[Microservices - Integration Service]].
 - Basis filter = `label_printed_at` (waktu cetak resi). Tanpa efek samping (tidak ada penandaan apa pun)
 
 **`GET /fulfillment/queue/counts`**:
