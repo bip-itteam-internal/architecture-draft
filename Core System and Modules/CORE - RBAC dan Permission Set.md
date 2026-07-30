@@ -86,6 +86,8 @@ Paket WMS adalah terjemahan langsung matriks tab yang sudah berjalan di `erp-fro
 
 **Status penegakan per service** (scan 950 rute, 2026-07-29). "Telanjang" = rute user-facing tanpa middleware apa pun; rute sistem (`/internal`, `/public`, `/health`, `/webhook`) tidak dihitung.
 
+> ⚠️ **Angka di bawah UNDER-COUNT.** Pengecualian `/internal` pada scan itu keliru: prefix tersebut **bukan** batas keamanan. Gateway meneruskan seluruh sub-path `/api/<module>/*` apa adanya dan `Reroute` mengisi sendiri `BIP-Gateway-ID`, jadi rute `/internal/...` bisa dipanggil dari internet oleh siapa pun yang punya token login. Audit 2026-07-30 di employee-service menemukan 3 rute tulis `/internal/auth/*` tanpa gerbang (satu di antaranya menulis `system_roles` apa pun, termasuk `group=admin`) plus 6 rute yang membocorkan peran dan dokumen pribadi. Semuanya ditambal dan ter-deploy hari itu, dan employee-service kini dijaga uji `internal_routes_guard_test.go`. **Scan ulang service lain harus memasukkan `/internal`.** Lihat [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] dan [[LOG - 2026-07-30 Audit Otorisasi Employee Service]].
+
 | Service | Rute | Ber-middleware | Telanjang | Tulis telanjang |
 |---|---|---|---|---|
 | integration | 318 | 43 RBAC (+29 cache) | 241 | 74 |
@@ -109,6 +111,7 @@ Total **557 rute user-facing tanpa gerbang, 230 di antaranya tulis**.
 **Sudah selesai sejak dok ini pertama ditulis** (semua terverifikasi live di dev): posisi ber-`key` stabil + `work_data.position_key` + migrasi; posisi bisa memegang paket dan ikut resolusi login (union dengan paket akun, reach tertinggi); layar **Hak per Posisi** & **Siapa Boleh Apa** termasuk daftar pengecualian per-akun; penyaringan menu FE dari klaim `permissions`; katalog **payroll** (5 izin, ditegakkan) dan **finance** (6 izin, belum ditegakkan).
 
 **Yang belum ada:**
+- **Rute `/internal` service lain belum disapu.** employee-service sudah bereskan + dijaga uji, tapi integration, manufacture, attendance, dan insentive belum diperiksa dengan asumsi yang benar (bahwa `/internal` terbuka ke internet). Pertahanan di tepi (gateway menolak `/internal/` dari luar) menutup kelas ini sekaligus, tapi menunggu `erp-frontend` memindahkan `/api/attendance/internal/fingerprint/*` keluar namespace tersebut. Rinciannya di [[ADR - 0031 Prefix internal Bukan Batas Keamanan]].
 - **finance belum punya gerbang.** Katalog + 3 paket sudah live dan bisa dipasang ke posisi, tapi **tak satu pun endpoint memeriksanya** — jadi paketnya masih dekoratif. Tak ada `RegisterCatalog(ModuleFinance, ...)` di service pemilik data finance (hanya di employee-service untuk validasi), dan tak ada pemakaian `PermFinance*` di `services/`.
 - **Katalog 11 modul lain belum ditulis** (hris, recruitment, kpi, training, hrdoc, wms, warehouse, procurement, integration, insentive, ga, notification, admin).
 - **`master_permission_set` dan `system_authentication.permission_sets` belum terdaftar** di [[DB - Data Dictionary]].
