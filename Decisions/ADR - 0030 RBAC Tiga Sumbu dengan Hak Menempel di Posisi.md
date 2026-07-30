@@ -6,7 +6,7 @@ Hari ini ada **tiga mekanisme akses yang hidup berdampingan** di bip-erp, tanpa 
 
 1. **`system_roles`** (map modul ke satu nilai role: `staff`/`supervisor`/`admin` plus nilai granular seperti `admin_gudang_rm`, `ppic`, `icc`). Ditegakkan `common.Require*` / `checkRole` (`shared-library/common/roles.go`). Ini yang dipakai hampir semua service.
 2. **Permission-set** (bundel permission granular + `reach`), pilot di modul **ticket**: katalog `shared-library/common/catalog_ticket.go` (15 permission), validasi set `shared-library/models/employee/permission_set.go`, resolusi izin efektif saat login `services/employee/permission_resolve.go`, penegakan `common.RequirePermission` + `gate()` di `services/task-management/routes.go`.
-3. **Posisi** (`work_data.position`) sebagai pengecualian lintas-modul di **empat titik**: Cost Control (BE `checkPosition` + `isCostControl`), Security, Personalia, dan ICC (ketiganya **hanya di FE**).
+3. **Posisi** (`work_data.position`) sebagai pengecualian lintas-modul di **empat titik**: Cost Control (BE `checkPosition` + `isCostControl`), Security, Personalia, dan ICC (ketiganya **hanya di FE**). Sejak 2026-07-30 bertambah **titik kelima**, lihat §Consequences.
 
 Empat fakta hasil audit 2026-07-29 yang membentuk keputusan ini:
 
@@ -53,11 +53,29 @@ Keputusan turunan:
 - **Pola izin belum seragam.** Katalog `payroll` mengikuti tangga tingkat (dengan satu pengecualian `payroll.salary.write`), sementara `finance` yang menyusul memakai izin **per-objek** (`finance.ar.view`, `finance.kastoko.view`, dst). Belum diputuskan mana yang jadi acuan; lihat catatan penyimpangan di [[CORE - RBAC dan Permission Set]].
 - **"Rute telanjang" ternyata lebih terbuka dari yang dicatat ADR ini.** Audit lanjutan menemukan prefix `/internal/` **bukan** batas keamanan (gateway meneruskan seluruh sub-path dan mengisi sendiri gateway key), sehingga sebagian rute tanpa middleware bisa dipanggil dari internet oleh siapa pun yang bisa login, termasuk satu rute yang menulis `system_roles` apa pun. Dua lubang ditambal dan ter-deploy hari yang sama. Ini menguatkan poin "katalog tanpa gerbang BE adalah dekorasi" di atas: urutan yang benar adalah gerbangi endpoint dulu, baru nyalakan penyaringan FE. Detail keputusan di [[ADR - 0031 Prefix internal Bukan Batas Keamanan]], bukti dan forensiknya di [[LOG - 2026-07-30 Audit Otorisasi Employee Service]].
 
+**Titik pengecualian posisi KELIMA — Dashboard HRIS per posisi (2026-07-30, branch `feat/dashboard-hris-per-posisi`, belum merge):**
+
+Berlawanan arah dengan ADR ini, dan disepakati sadar oleh pemilik keputusan setelah keterbatasannya disampaikan. Isi `/hris/dashboard` dipilih dari **nama posisi**, bukan `position_key` maupun paket izin, karena dua prasyarat belum ada: `position_key` belum diteruskan ke frontend (yang sampai ke sana hanya cookie `position` berisi nama tampilan), dan modul `hris`/`recruitment`/`kpi` belum punya katalog izin sehingga `bolehMenu` sengaja mengembalikan `true`.
+
+Yang membedakannya dari empat titik sebelumnya, dan yang membuatnya bisa dibongkar nanti tanpa perburuan:
+
+- **Terpusat** di `features/hris/dashboard/lib/position-view.ts`, bukan `if` telanjang tersebar seperti `sidebar.tsx` (yang mencocokkan `icc`, `security`, `cost control` di tiga tempat berbeda).
+- **Bagian terpenting tidak bergantung nama**: status supervisor diambil dari `system_roles.hris`, jadi rename posisi tak mencabut tampilan lengkap SPV. Nama posisi hanya membedakan sesama staf, di mana `system_roles` memang tak punya informasi.
+- **Fallback aman**: nama tak dikenal jatuh ke preset `default` yang tetap berguna, bukan layar kosong.
+- **Daftar nama posisi dikunci test**, sehingga perubahan master data bikin CI merah lebih dulu daripada pemakai menemukan dashboardnya berganti diam-diam.
+
+Begitu `position_key` mengalir ke frontend dan `hris` punya katalog izin, cukup fungsi `presetUntuk` yang diganti isinya.
+
+**Batas nyata yang ditemukan saat verifikasi dev 2026-07-30**: preset `ga`, `security`, dan `office-boy` **tidak akan pernah tampil**, karena menu HRIS menuntut `system_roles.hris` sedangkan posisi itu tak punya (`GA Staff` 2 orang `ga:staff`, `Security` 7 orang `ga:security`, `Office Boy` 4 orang `system_roles` **kosong**). Praktisnya **13 dari 17 orang HRGA belum terlayani**. Presetnya sengaja dipertahankan agar siap pakai, tapi jangan dibaca sebagai "GA sudah dapat dashboard".
+
+Catatan penting: penyaringan ini **kenyamanan tampilan, bukan kontrol akses**. `/hris/dashboard` tak dijaga middleware, penjaga sebenarnya tetap 403 backend.
+
 **Yang belum diputuskan (TBD):**
 
 - **Pemisahan per area gudang** (Admin Gudang RM vs FG) bukan soal permission melainkan cakupan area. Menempelkannya ke permission akan melahirkan `wms.rm.*` dan `wms.fg.*` dan membengkakkan katalog. Tahap pertama menyamakan dengan matriks FE yang berlaku; kemungkinan arah: cakupan mirip `reach`, bukan permission baru.
 - **Perilaku saat pemakai membuka URL tanpa hak**: halaman 403 yang menyebut permission yang dibutuhkan, atau pengalihan ke dashboard (perilaku WMS sekarang). Perlu satu perilaku seragam.
 - **Peran "admin pusat"** masih dipetakan interim ke `system_roles.group = admin` (lihat [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]); hubungannya dengan modul `admin` di katalog ini perlu dirapikan.
+- **Cara posisi GA (GA Staff, Security, Office Boy) mendapat dashboardnya**: diberi `system_roles.hris`, atau dibuatkan dashboard sendiri di bawah `/ga/`. Pilihan pertama membuka seluruh menu HRIS untuk mereka, jadi kemungkinan besar bukan yang diinginkan.
 
 ## Terkait
 

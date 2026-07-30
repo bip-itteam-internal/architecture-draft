@@ -955,20 +955,24 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "8eb0bfba91c9ee3f1a3511d828fec5a94dc04e8869170ffa257567297ef87311",
-      "ukuran_kb": 47.2,
-      "ringkasan": "Menjawab: menu dan modul apa saja yang tersedia di portal web ERP internal (One Bharata / erp-frontend), stack frontend apa yang dipakai, dan bagaimana login serta role gating bekerja (cookie system_roles, refresh token, peran web ini sebagai SSO Identity Provider). Juga menjawab siapa yang boleh membuka tiap menu (matriks posisi WMS, pengecualian Finance read-only Gudang FG, akun integration-only lewat allowlist env) dan bagaimana dukungan multi-perusahaan muncul di UI, mulai dari pemilih perusahaan sampai Kelola Perusahaan, Departemen, Shift, dan Network.",
+      "hash": "e9846aff6a5d6ab168035b8f9c3d49b4ea1bebf4418df92871853687b3a09871",
+      "ukuran_kb": 49.6,
+      "ringkasan": "Menjawab: apa saja modul dan halaman yang ada di portal web internal ERP/HRIS Bharata (hris-dashboard \"One Bharata\"), stack teknologinya apa, dan bagaimana login serta refresh token bekerja. Menjelaskan juga bagaimana menu dan tombol disaring per role/posisi (system_roles, matriks akses WMS, pengecualian Finance read-only Gudang FG, akun integration-only), bagaimana web ini bertindak sebagai SSO Identity Provider untuk aplikasi lain, dan bagaimana dukungan multi-perusahaan (company switcher, kelola perusahaan/departemen/shift/network per-perusahaan) diterapkan di frontend. Berguna untuk menelusuri di mana suatu fitur HRIS, recruitment, payroll, manufacture, atau integration berada di erp-frontend beserta batasan gating-nya.",
       "kata_kunci": [
         "erp-frontend",
+        "hris-dashboard",
         "One Bharata",
         "web ERP",
-        "sidebar menu",
-        "role gating",
+        "frontend",
+        "Next.js",
+        "SSO identity provider",
         "system_roles",
-        "SSO Identity Provider",
-        "RBAC frontend",
+        "role gating",
+        "sidebar menu",
         "multi-perusahaan",
-        "Next.js"
+        "company switcher",
+        "i18n dua bahasa",
+        "matriks akses WMS"
       ]
     },
     {
@@ -2847,21 +2851,25 @@
         "DB - Data Dictionary",
         "ADR - 0003 SSO-only Gateway"
       ],
-      "hash": "38149646863299e4d11a8304fbc2e15e94d3343466059f759214b00dac1766d8",
-      "ukuran_kb": 10.3,
-      "ringkasan": "Menjawab: mengapa bip-erp memilih RBAC tiga sumbu dengan hak default menempel pada posisi/jabatan, bukan pada akun atau satu role per modul, dan bagaimana 67 permission plus paket bernama disusun (termasuk lima pengecualian granular yang dibenarkan). Juga menjawab konsekuensinya: hak ikut token berlaku 72 jam sehingga perlu login ulang, backfill paket per-akun dicabut, jalur pengecualian per-akun tetap dipertahankan atas dasar data, dan katalog tanpa gerbang backend hanya dekorasi.",
+      "hash": "7addadf5a660671ab2ce98a067d0ad346297ee7458585d565b7649621919ab29",
+      "ukuran_kb": 12.8,
+      "ringkasan": "Menjawab: bagaimana model hak akses (RBAC) bip-erp dirancang, yaitu tiga sumbu modul + tingkat (view/work/approve/manage) + cakupan reach (own/division/all), dan mengapa hak default menempel pada POSISI (jabatan) bukan pada akun. Menjelaskan alasan meninggalkan campuran system_roles, permission-set pilot ticket, dan gate posisi hardcoded; jumlah permission yang disepakati (67), konsep paket bernama (MasterPermissionSet) yang dipilih HR, aturan self-service tanpa permission, fallback tier saat migrasi, serta kewajiban satu PR = satu modul (katalog + gerbang BE + penyaringan FE). Berguna untuk menjawab kenapa perubahan hak baru terasa setelah login ulang (token 72 jam), kapan pengecualian per-akun masih boleh dipakai, dan mengapa katalog tanpa gerbang backend dianggap dekorasi.",
       "kata_kunci": [
-        "ADR 0030",
         "RBAC",
-        "tiga sumbu",
-        "permission set",
+        "hak akses",
+        "permission",
+        "permission-set",
+        "paket izin",
         "posisi",
+        "position_key",
         "jabatan",
+        "system_roles",
         "reach",
-        "fallback tier",
-        "keputusan arsitektur",
-        "67 permission",
-        "login ulang"
+        "cakupan",
+        "authorization",
+        "ADR 0030",
+        "RequirePermission",
+        "fallback tier"
       ]
     },
     {
