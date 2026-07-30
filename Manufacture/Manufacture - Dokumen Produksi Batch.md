@@ -13,7 +13,7 @@
 | Persona | Peran & Divisi | Akses/RBAC (`system_roles`) | Device |
 |---|---|---|---|
 | Admin RM (Restu) | Manufaktur — gudang RM | `manufacture = admin_gudang_rm` — buat/isi kolom **Ditimbang** (pra-produksi) | Desktop web |
-| Admin Produksi (Mame) | Manufaktur — produksi | `manufacture = admin_produksi` — isi **Hasil PCS** + data proses; edit (DRAFT/DITOLAK), ajukan | Desktop web |
+| Admin Produksi (Mame) | Manufaktur — produksi | `manufacture = admin_produksi` — isi **Hasil PCS** + data proses; edit (DRAFT/DITOLAK), ajukan; isi **Sisa timbangan** di menu **Rekonsiliasi MO** | Desktop web |
 | QC / RnD (PJ Teknis) | Manufaktur — QC/RnD | `manufacture = qc`/`rnd` — periksa, isi field mutu, setujui (LULUS)/tolak; **tidak** bisa melihat DRAFT | Desktop web |
 | PPIC / SPV | Manufaktur | super-akses (lihat semua tab WMS) | Desktop web |
 
@@ -44,10 +44,12 @@ Mengikuti urutan & format dokumen manual:
 - Tabel penimbangan dossier **mengikuti kertas** (Catatan Pengolahan Batch hal. 4): **No. Batch** + **Ditimbang** diisi **admin RM (Restu)** saat penimbangan; **Rekonsiliasi = Ditimbang / Teoritis × 100%** (batas <2%). **Tidak ada** kolom MO / Sisa / Pemakaian di dossier — itu bukan bagian dokumen asli.
 - Backend `recalcBatchRecord` menghitung rekon atas **Nyata (Ditimbang)**, bukan Pemakaian.
 
-### Rekonsiliasi Pemakaian vs MO (support ticket 2026-07) — TBD, fitur terpisah
-- Kebutuhan tiket ("agar **jumlah MO sesuai pemakaian**", input Restu=timbang awal & Mame=**Sisa + Hasil PCS**, dicek **SPV QC**, output **BPOM/Perusahaan**) **bukan** bagian dokumen batch asli, sehingga **tidak** ditempel ke dossier. Menu [[Manufacture - Order Production Workflow (Flow Source)|Laporan Produksi]] pun tak menampung data per-bahan → butuh **fitur/laporan rekonsiliasi tersendiri** (bentuk belum diputuskan: menu baru vs tab non-cetak).
-- Data pendukung sudah disiapkan **dormant** di `BatchRecord.penimbangan`: `qty_mo` (auto dari [[Manufacture - Order Production Workflow (Flow Source)|Material Order]] `qty_needed_total`, by `no_batch`), `sisa`, `pemakaian` (= Ditimbang − Sisa) — tidak ditampilkan di dossier, tersedia untuk fitur rekonsiliasi nanti.
-- Gate: `admin_gudang_rm` masuk `bolehBuatBatchRecord` + middleware `requireBatchCreate` (rbac.go).
+### Rekonsiliasi Pemakaian vs MO (support ticket 2026-07) — ✅ menu terpisah "Rekonsiliasi MO"
+- Kebutuhan tiket ("agar **jumlah MO sesuai pemakaian**") **bukan** bagian dokumen batch asli & Laporan Produksi tak menampung data per-bahan → dibuat **menu tersendiri** `RekonMoView` (`/manufacture/rekonsiliasi-mo`, tab `rekon_mo`), **memakai koleksi `manufacture_batch_record` yang sama** (Ditimbang tetap satu sumber — tak diduplikasi), **tidak** ikut cetak 7-lembar dossier.
+- Per bahan menampilkan **MO** (dari [[Manufacture - Order Production Workflow (Flow Source)|Material Order]] `qty_needed_total`, by `no_batch`) · **Ditimbang** (dari dossier, Restu) · **Sisa** (diisi **Mame**) · **Pemakaian** (= Ditimbang − Sisa) · **Selisih vs MO** (kuning bila ≠). Plus **Hasil PCS** (`rekon_produk_jadi`).
+- **SPV QC** memeriksa: ceklis "Kelengkapan hasil produksi" + "Hasil timbangan dari produksi" + catatan → tandai **DICEK**. Output **Perusahaan** = cetak softfile ("Laporan Catatan Pengolahan dan Pengemasan Batch"); **BPOM** tetap fisik/di luar sistem.
+- Endpoint: `PUT .../batch-record/:id/rekon-mo` (isi Sisa+qty_mo; `requireBatchCreate` = admin produksi/RM) · `POST .../batch-record/:id/rekon-mo/approve` (`requireBatchApprove` = QC/RnD). Field: `rekon_mo_status` ("" | "DICEK"), `rekon_mo_ceklis`, `rekon_mo_catatan`, `rekon_mo_diperiksa_oleh_*`, `rekon_mo_diperiksa_at`. `qty_mo`/`sisa`/`pemakaian` di `penimbangan` (sebelumnya dormant) kini dipakai di sini.
+- Gate: `admin_gudang_rm` masuk `bolehBuatBatchRecord` + `requireBatchCreate`; matriks tab `rekon_mo` = {admin_produksi, admin_gudang_rm, qc, rnd} (FE `akses.ts` + BE `rbac.go`).
 
 ### Rekonsiliasi (warning-only)
 - Penimbangan bahan: `R = nyata/teoritis × 100%`, batas keberterimaan penyimpangan **< 2%**.
@@ -66,7 +68,7 @@ Mengikuti urutan & format dokumen manual:
 
 ## Model Data & Endpoint
 
-- **Collection**: `manufacture_batch_record` (struct `BatchRecord`). Field kunci: `nomor_dossier` (auto `BR/<tahun>/<urut>`), `status`, header produk, `dibuat_oleh_*`, `diajukan_oleh_*`, `disetujui_oleh_*`, sub-struct 7 lembar (`ceklis`, `kesiapan_olah/kemas`, `penimbangan` [`no_batch_bahan`, `teoritis`, `nyata`=ditimbang, `rekonsiliasi`; + `qty_mo`/`sisa`/`pemakaian` **dormant** utk fitur rekonsiliasi MO], `fase`, `rekon_*`, `komposisi_kemasan`, `prosedur_kemas`, `foto_kemasan` [MinIO key], `uji_produksi`, `keseragaman`, `checklist_qa`, dll).
+- **Collection**: `manufacture_batch_record` (struct `BatchRecord`). Field kunci: `nomor_dossier` (auto `BR/<tahun>/<urut>`), `status`, header produk, `dibuat_oleh_*`, `diajukan_oleh_*`, `disetujui_oleh_*`, sub-struct 7 lembar (`ceklis`, `kesiapan_olah/kemas`, `penimbangan` [`no_batch_bahan`, `teoritis`, `nyata`=ditimbang, `rekonsiliasi`; + `qty_mo`/`sisa`/`pemakaian` **dormant** utk fitur rekonsiliasi MO], `fase`, `rekon_*`, `komposisi_kemasan`, `prosedur_kemas`, `foto_kemasan` [MinIO key], `uji_produksi`, `keseragaman`, `checklist_qa`, `rekon_mo_*` [status/ceklis/catatan/diperiksa — fitur Rekonsiliasi MO], dll).
 - **Endpoint** (via gateway → manufacture service, lihat [[API - Manufacture Service]]):
   - `GET /api/manufacture/batch-record` (list; filter status/produk) · `GET .../:id`
   - `POST .../batch-record` (buat draft; auto nomor + seed ceklis/kesiapan/uji) · `PUT .../:id` (edit saat DRAFT/DITOLAK)
