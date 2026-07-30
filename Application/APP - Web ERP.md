@@ -128,6 +128,8 @@
 - **Firebase/FCM push**: kode di-comment, env Firebase masih placeholder
 - **Login**: "Forgot your password?" / "Contact admin" link mati; belum ada flow reset password / registrasi
 - **Integration-only allowlist = UI-gating saja**: route `/integration/*` & `/dashboard` tetap bisa diakses via URL langsung (tidak dijaga middleware `proxy.ts`); akun tetap butuh role `integration` di `system_roles` agar API tidak 403. Env `NEXT_PUBLIC_*` di-inline saat build → ubah allowlist butuh rebuild/restart. Belum ada hardening middleware untuk akun ini.
+- **Definisi "admin pusat" di FE beda dari BE**: `sidebar.tsx:60` dan `app/(main)/hris/schedule/page.tsx:52` masih memakai `isSupervisorOrAdmin(systemRoles?.it)`, sedangkan BE sudah pindah ke `system_roles.group = admin`. Akibatnya pemilih perusahaan bisa muncul untuk user yang override `?company=`-nya justru diabaikan BE. Detail: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
+- **Edit Data Pekerjaan** (`/hris/employee/<id>`, tab Data Pekerjaan) — dropdown Departemen & Jabatan dulu tidak ter-scope perusahaan sehingga karyawan tenant lain disodori master data BIP; diperbaiki di branch `fix/edit-workdata-company-scope` (**belum merge**) dengan mengalirkan `work_data.company_id` ke modal. Karena perusahaan pilot bisa belum punya `master_department`, nilai tersimpan disisipkan sebagai opsi agar tak terhapus saat disimpan. Perbaikan ini hanya efektif penuh bagi admin grup (lihat butir di atas), dan **butuh BE ter-deploy lebih dulu** karena jalur simpannya ikut diperbaiki ([[CORE - HRIS Orchestrator]]).
 
 ## Dependencies & Integrasi
 
