@@ -13,7 +13,7 @@
 | Persona | Peran & Divisi | Akses/RBAC (`system_roles`) | Device |
 |---|---|---|---|
 | Admin RM (Restu) | Manufaktur — gudang RM | `manufacture = admin_gudang_rm` — buat/isi kolom **Ditimbang** (pra-produksi) | Desktop web |
-| Admin Produksi (Mame) | Manufaktur — produksi | `manufacture = admin_produksi` — isi **Sisa + Hasil PCS** + data proses; edit (DRAFT/DITOLAK), ajukan | Desktop web |
+| Admin Produksi (Mame) | Manufaktur — produksi | `manufacture = admin_produksi` — isi **Hasil PCS** + data proses; edit (DRAFT/DITOLAK), ajukan | Desktop web |
 | QC / RnD (PJ Teknis) | Manufaktur — QC/RnD | `manufacture = qc`/`rnd` — periksa, isi field mutu, setujui (LULUS)/tolak; **tidak** bisa melihat DRAFT | Desktop web |
 | PPIC / SPV | Manufaktur | super-akses (lihat semua tab WMS) | Desktop web |
 
@@ -27,7 +27,7 @@
 Mengikuti urutan & format dokumen manual:
 1. **Ceklis Kelengkapan Dokumen Produksi** (cover) — daftar dokumen ADA/TIDAK + catatan; ttd Yang Mengajukan & Penanggung Jawab Teknis.
 2. **Daftar Kesiapan Ruang Pengolahan** (No.Doc PR/04/PD/011/03) — tahapan · persyaratan · hasil · paraf Pelaksana/Pemeriksa.
-3. **Catatan Pengolahan Batch** — penimbangan **multi-peran** (kolom **Teoritis · MO · Ditimbang · Sisa · Pemakaian · Rekon %**), rekonsiliasi, fase proses (A/B/AB/C/ABC/FILLING) + Hasil QC, ttd Ka.Bag Produksi & Ka.Bag Pengawasan Mutu.
+3. **Catatan Pengolahan Batch** — penimbangan bahan (kolom **Nama Bahan · No. Batch · Teoritis · Ditimbang · Rekon %**, persis kertas), rekonsiliasi (Ditimbang/Teoritis, <2%), fase proses (A/B/AB/C/ABC/FILLING) + Hasil QC, ttd Ka.Bag Produksi & Ka.Bag Pengawasan Mutu.
 4. **Daftar Kesiapan Ruang Pengemasan** (No.Doc PR/04/PD/011/04).
 5. **Catatan Pengemasan Batch** (No.Dok PR/SOP/007/01/F/01) — komposisi kemasan (botol/label/hologram), prosedur pengemasan sekunder, **foto kemasan**, rekonsiliasi produk jadi.
 6. **Catatan Pengujian** — pengujian produksi per fase, keseragaman bobot/volume (S1/S2/S3), pengujian pengemasan (Jelas/Rapih), pelaksana.
@@ -38,12 +38,15 @@ Mengikuti urutan & format dokumen manual:
 - **Pemisahan peran**: admin produksi membuat & mengajukan; **QC/RnD** memeriksa & menyetujui/menolak. Identitas & waktu pengaju/penyetuju **distempel dari header JWT** (nama lengkap karyawan), bukan dari body → tanda tangan digital.
 - **Mode Pengecekan QC** (bukan approve buta): tombol **Periksa & Setujui** membuka **preview dokumen interaktif**. QC mengisi field yang jadi tanggung jawabnya — Catatan Pengujian (**Hasil** uji, keseragaman, Jelas/Rapih, pelaksana), **Hasil & Paraf Pemeriksa** di Kesiapan Ruang, **Hasil QC per fase** di Catatan Pengolahan, **Hasil QC & Paraf Pemeriksa** di Prosedur Pengemasan, serta men-**centang Ada + Catatan** pada **Ceklis Kelengkapan** & **Daftar Checklist QA** — lalu **Setujui (LULUS)** (tombol di bagian bawah dokumen) atau **Tolak** + alasan. Field isian bertanda latar kuning; menekan **Tab** pada field kosong mengisi otomatis teks contohnya.
 - **Field milik QC dikunci di form admin**: seluruh field di atas **read-only** di form Dokumen Produksi Batch (admin produksi/RM) dan **hanya** bisa diisi di layar review — cerminan tulisan tangan QC pada dokumen asli. Saat approve, `ceklis`, `prosedur_kemas`, `fase`, `uji_produksi`, `kesiapan_olah/kemas`, `checklist_qa`, dll. di-`$set` dari body review (kolom admin—deskripsi/jam/hasil/pelaksana—dipertahankan dari record yang di-load, QC hanya menambah kolomnya).
-- **Pengecualian (field bersumber → ditaut, bukan ketik bebas)**: **Nama Bahan** per fase pada Catatan Pengujian dipilih **admin produksi** lewat picker dari **tabel penimbangan** dossier (sumber = formula; disimpan string `"a, b, c"`) — QC hanya mengisi kolom **Hasil**. Header **Nama Produk/Kode Produk** + seluruh baris **penimbangan** auto ter-isi saat pilih **Formula**. Kolom **MO** auto dari Material Order (lihat bawah), **bukan** input manual.
+- **Pengecualian (field bersumber → ditaut, bukan ketik bebas)**: **Nama Bahan** per fase pada Catatan Pengujian dipilih **admin produksi** lewat picker dari **tabel penimbangan** dossier (sumber = formula; disimpan string `"a, b, c"`) — QC hanya mengisi kolom **Hasil**. Header **Nama Produk/Kode Produk** + seluruh baris **penimbangan** auto ter-isi saat pilih **Formula**.
 
-### Penimbangan multi-peran & rekonsiliasi MO (support ticket 2026-07)
-- Tabel penimbangan diisi **dua peran** pada satu dossier: **admin RM (Restu)** mengisi **Ditimbang** (jumlah ditimbang pra-produksi); **admin produksi (Mame)** mengisi **Sisa** (sisa timbangan pasca-produksi) + **Hasil PCS**. Kolom dikunci per peran (RM tak bisa ubah Sisa, dan sebaliknya); PPIC/SPV boleh semua.
-- **Pemakaian = Ditimbang − Sisa** (auto). **Rekonsiliasi = Pemakaian/Teoritis × 100** (batas <2%). Kolom **MO** auto dari [[Manufacture - Order Production Workflow (Flow Source)|Material Order]] (`qty_needed_total`, ditaut by `no_batch`); ditandai **kuning** bila **Pemakaian > MO** → "jumlah MO sesuai pemakaian" terpantau.
-- **BPOM** tetap dokumen fisik (di luar sistem); versi **Perusahaan** = softfile ini. Jadi tidak ada dua varian ekspor — cukup satu output.
+### Penimbangan = persis dokumen asli
+- Tabel penimbangan dossier **mengikuti kertas** (Catatan Pengolahan Batch hal. 4): **No. Batch** + **Ditimbang** diisi **admin RM (Restu)** saat penimbangan; **Rekonsiliasi = Ditimbang / Teoritis × 100%** (batas <2%). **Tidak ada** kolom MO / Sisa / Pemakaian di dossier — itu bukan bagian dokumen asli.
+- Backend `recalcBatchRecord` menghitung rekon atas **Nyata (Ditimbang)**, bukan Pemakaian.
+
+### Rekonsiliasi Pemakaian vs MO (support ticket 2026-07) — TBD, fitur terpisah
+- Kebutuhan tiket ("agar **jumlah MO sesuai pemakaian**", input Restu=timbang awal & Mame=**Sisa + Hasil PCS**, dicek **SPV QC**, output **BPOM/Perusahaan**) **bukan** bagian dokumen batch asli, sehingga **tidak** ditempel ke dossier. Menu [[Manufacture - Order Production Workflow (Flow Source)|Laporan Produksi]] pun tak menampung data per-bahan → butuh **fitur/laporan rekonsiliasi tersendiri** (bentuk belum diputuskan: menu baru vs tab non-cetak).
+- Data pendukung sudah disiapkan **dormant** di `BatchRecord.penimbangan`: `qty_mo` (auto dari [[Manufacture - Order Production Workflow (Flow Source)|Material Order]] `qty_needed_total`, by `no_batch`), `sisa`, `pemakaian` (= Ditimbang − Sisa) — tidak ditampilkan di dossier, tersedia untuk fitur rekonsiliasi nanti.
 - Gate: `admin_gudang_rm` masuk `bolehBuatBatchRecord` + middleware `requireBatchCreate` (rbac.go).
 
 ### Rekonsiliasi (warning-only)
@@ -63,7 +66,7 @@ Mengikuti urutan & format dokumen manual:
 
 ## Model Data & Endpoint
 
-- **Collection**: `manufacture_batch_record` (struct `BatchRecord`). Field kunci: `nomor_dossier` (auto `BR/<tahun>/<urut>`), `status`, header produk, `dibuat_oleh_*`, `diajukan_oleh_*`, `disetujui_oleh_*`, sub-struct 7 lembar (`ceklis`, `kesiapan_olah/kemas`, `penimbangan` [+`qty_mo`, `nyata`=ditimbang, `sisa`, `pemakaian`], `fase`, `rekon_*`, `komposisi_kemasan`, `prosedur_kemas`, `foto_kemasan` [MinIO key], `uji_produksi`, `keseragaman`, `checklist_qa`, dll).
+- **Collection**: `manufacture_batch_record` (struct `BatchRecord`). Field kunci: `nomor_dossier` (auto `BR/<tahun>/<urut>`), `status`, header produk, `dibuat_oleh_*`, `diajukan_oleh_*`, `disetujui_oleh_*`, sub-struct 7 lembar (`ceklis`, `kesiapan_olah/kemas`, `penimbangan` [`no_batch_bahan`, `teoritis`, `nyata`=ditimbang, `rekonsiliasi`; + `qty_mo`/`sisa`/`pemakaian` **dormant** utk fitur rekonsiliasi MO], `fase`, `rekon_*`, `komposisi_kemasan`, `prosedur_kemas`, `foto_kemasan` [MinIO key], `uji_produksi`, `keseragaman`, `checklist_qa`, dll).
 - **Endpoint** (via gateway → manufacture service, lihat [[API - Manufacture Service]]):
   - `GET /api/manufacture/batch-record` (list; filter status/produk) · `GET .../:id`
   - `POST .../batch-record` (buat draft; auto nomor + seed ceklis/kesiapan/uji) · `PUT .../:id` (edit saat DRAFT/DITOLAK)
