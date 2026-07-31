@@ -4,7 +4,7 @@
 
 - **Stack**: Go (fiber middleware) + MongoDB (`master_permission_set`, `master_department`, `system_authentication`) + JWT HS256 sebagai pembawa izin efektif; frontend Next.js membaca klaim yang sama.
 - **Path di repo**: `bip-erp/shared-library/common/{permissions.go,catalog_ticket.go,roles.go,position.go}` · `bip-erp/shared-library/models/employee/permission_set.go` · `bip-erp/services/employee/permission_resolve.go` · `bip-erp/services/task-management/{rbac.go,routes.go}` · `erp-frontend/src/utils/access.ts` · `erp-frontend/src/features/hris/master-data/*`
-- **Status**: ⚠️ Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket** serta **payroll**. **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul lain masih bertumpu pada `system_roles` tier.
+- **Status**: ⚠️ Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, serta **monitoring**. **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul lain masih bertumpu pada `system_roles` tier.
 
 ## Persona / Pengguna
 
@@ -33,6 +33,22 @@
 - **Pemasangan hak ke posisi** — `PUT /api/employee/master/departments/:key/positions/:positionKey/permission-sets` (gate interim `RequireITSupervisor`). Menyentuh satu posisi saja, tak lewat `ReplaceOne` seluruh dokumen departemen.
 - **Backfill paket per-akun DICABUT** (`migratePermissionSetAssignment`, dicabut 2026-07-30). Syaratnya "akun punya role ticket & `permission_sets` kosong", dan "kosong" tak bisa dibedakan dari "sengaja dikosongkan" — akibatnya setiap restart service mengembalikan paket per-akun yang baru dirapikan ke posisi. Paket yang sudah ada tidak dihapus; yang berubah, pengosongan kini bertahan dan karyawan baru mendapat hak dari posisi.
 - **UI kelola set & assign per akun** — `erp-frontend/src/features/hris/master-data/components/{permission-set-form-modal,permission-set-assign}.tsx`.
+
+**Tampilan menu per posisi — BUKAN bagian dari RBAC (2026-07-31, branch `feat/menu-per-posisi` + `feat/pengaturan-menu-posisi`, belum merge):**
+
+`master_department.position_items[].menu_hidden` menyimpan url menu yang **disembunyikan** dari sidebar bagi pemegang sebuah jabatan, disetel di **HRIS → Personalia → Pengaturan → Tampilan Menu**. Ditaruh di dokumen ini karena menempel pada objek yang sama dengan `permission_sets` dan gampang tertukar dengannya. **Keduanya berbeda jenis dan jangan disatukan:**
+
+| | `permission_sets` | `menu_hidden` |
+|---|---|---|
+| Jenis | hak akses | tampilan |
+| Arah | memberi | **hanya mengurangi** |
+| Ditegakkan | gerbang backend | tidak ditegakkan sama sekali |
+| Gerbang tulis | `RequireITSupervisor` | `RequireHRISOrITSupervisor` |
+| Berlaku | setelah login ulang | setelah muat ulang halaman |
+
+Aturan yang mengikat: `tampil = (boleh menurut role/izin) DAN (tidak ada di menu_hidden)`. Karena itu ia dijalankan **setelah** seluruh penyaringan izin dan tak pernah bisa memperluas akses; salah setel paling buruk menyembunyikan menu. Rutenya tetap terbuka lewat URL — menyembunyikan menu **bukan keamanan**, konsisten dengan [[ADR - 0031 Prefix internal Bukan Batas Keamanan]]. Gerbang tulisnya sengaja lebih longgar daripada pemasangan paket justru karena ia tak bisa menaikkan hak siapa pun.
+
+Disimpan sebagai daftar yang **disembunyikan**, bukan yang ditampilkan, supaya menu baru otomatis muncul untuk semua posisi alih-alih hilang diam-diam sampai ada yang mendaftarkannya ke 79 jabatan.
 
 **Pencocokan posisi (hasil pembenahan 2026-07-29):** `common.KanonPosisi` + `common.PosisiCocok` (`shared-library/common/position.go`) menyatukan aturan pencocokan nama posisi (huruf kecil, non-alfanumerik jadi underscore, exact match atas bentuk kanonik), dipakai `checkPosition` dan `isCostControl`.
 
@@ -108,12 +124,14 @@ Paket WMS adalah terjemahan langsung matriks tab yang sudah berjalan di `erp-fro
 
 Total **557 rute user-facing tanpa gerbang, 230 di antaranya tulis**.
 
-**Sudah selesai sejak dok ini pertama ditulis** (semua terverifikasi live di dev): posisi ber-`key` stabil + `work_data.position_key` + migrasi; posisi bisa memegang paket dan ikut resolusi login (union dengan paket akun, reach tertinggi); layar **Hak per Posisi** & **Siapa Boleh Apa** termasuk daftar pengecualian per-akun; penyaringan menu FE dari klaim `permissions`; katalog **payroll** (5 izin, ditegakkan) dan **finance** (6 izin, belum ditegakkan).
+**Sudah selesai sejak dok ini pertama ditulis** (semua terverifikasi live di dev): posisi ber-`key` stabil + `work_data.position_key` + migrasi; posisi bisa memegang paket dan ikut resolusi login (union dengan paket akun, reach tertinggi); layar **Hak per Posisi** & **Siapa Boleh Apa** termasuk daftar pengecualian per-akun; penyaringan menu FE dari klaim `permissions`; katalog **payroll** (5 izin, ditegakkan), **procurement** (7 izin, ditegakkan), **monitoring** (2 izin, ditegakkan), dan **finance** (6 izin, belum ditegakkan).
+
+⚠️ **Pola izin nyata menyimpang dari tangga, dan tangga kini justru minoritas.** Dari lima katalog yang hidup, **hanya `payroll`** yang mengikuti `view/work/approve/manage`. `finance` memakai per-objek baca, `procurement` memakai satu `view` luas plus tulis yang dipecah per objek (`tagihan.save`, `bayar.save`, `po.save`, `master.save`), `ticket` memakai 15 izin granular, `monitoring` cuma `view`+`export`. Yang konvergen di lapangan adalah **satu `view` luas, lalu izin tulis dipecah menurut RISIKO**; `catalog_procurement.go` menuliskan alasannya sendiri — `bayar.save` dipisah dari `tagihan.save` karena "membuat tagihan hanya mengakui utang, membayar memindahkan uang", dan pembayaran tak bisa dibatalkan dari ERP. Keputusan yang tertunda di §TBD bukan lagi "selaraskan finance ke tangga", melainkan **apakah tangga masih layak jadi acuan**.
 
 **Yang belum ada:**
 - **Rute `/internal` service lain belum disapu.** employee-service sudah bereskan + dijaga uji, tapi integration, manufacture, attendance, dan insentive belum diperiksa dengan asumsi yang benar (bahwa `/internal` terbuka ke internet). Pertahanan di tepi (gateway menolak `/internal/` dari luar) menutup kelas ini sekaligus, tapi menunggu `erp-frontend` memindahkan `/api/attendance/internal/fingerprint/*` keluar namespace tersebut. Rinciannya di [[ADR - 0031 Prefix internal Bukan Batas Keamanan]].
 - **finance belum punya gerbang.** Katalog + 3 paket sudah live dan bisa dipasang ke posisi, tapi **tak satu pun endpoint memeriksanya** — jadi paketnya masih dekoratif. Tak ada `RegisterCatalog(ModuleFinance, ...)` di service pemilik data finance (hanya di employee-service untuk validasi), dan tak ada pemakaian `PermFinance*` di `services/`.
-- **Katalog 11 modul lain belum ditulis** (hris, recruitment, kpi, training, hrdoc, wms, warehouse, procurement, integration, insentive, ga, notification, admin).
+- **Katalog 12 modul lain belum ditulis** (hris, recruitment, kpi, training, hrdoc, wms, warehouse, integration, insentive, ga, notification, admin). `procurement` dan `monitoring` **sudah** — dikoreksi 2026-07-31 setelah ditemukan masih tercatat belum ditulis di sini padahal keduanya hidup di kode.
 - **`master_permission_set` dan `system_authentication.permission_sets` belum terdaftar** di [[DB - Data Dictionary]].
 - **Empat gate posisi hardcoded belum dicabut** (Cost Control, Security, Personalia, ICC) — menunggu katalog modul yang bersangkutan.
 - **Gate `admin.assignment.manage` belum ada**, jadi pemasangan hak ke posisi masih dikunci interim ke `RequireITSupervisor`, bukan ke HR.

@@ -37,6 +37,7 @@
 | GET | `/master/departments[/:key]` · `/master/system-roles` | List/detail master | open (di belakang gateway) |
 | POST/PUT/DELETE | `/master/departments[/:key]` | CRUD departemen (key, name, positions, roles, **supervised_by**, **supervision_label**). ⚠️ `PUT` memakai `ReplaceOne`; dua field terakhir **dipertahankan** bila tak disebut di body, supaya pemanggil yang hanya mengirim sebagian field tak memutus relasi supervisi. Kirim eksplisit (boleh string kosong) untuk melepasnya — itu yang dilakukan form `/hris/master-data` | `RequireHRISOrITSupervisor` (supervisor/admin HRIS **atau** IT) |
 | POST/PUT/DELETE | `/master/system-roles[/:key]` | CRUD definisi system role | `RequireITSupervisor` (supervisor/admin IT) |
+| PUT | `/master/departments/:key/positions/:positionKey/menu-hidden` | Url menu yang **disembunyikan** dari sidebar bagi pemegang jabatan itu. **Setelan tampilan, BUKAN hak akses**: hanya mengurangi yang sudah boleh dilihat, tak pernah menambah, dan rutenya tetap terbuka lewat URL. Menyentuh satu posisi saja. Daftar kosong = tak menyembunyikan apa pun (aksi sah). Entri tanpa `/` di awal dibuang karena tak akan pernah cocok dengan menu mana pun | `RequireHRISOrITSupervisor` — sengaja lebih longgar daripada `permission-sets` karena tak bisa menaikkan hak siapa pun |
 
 > Konsumen FE: halaman `/hris/master-data` (di-link dari **menu IT**) & System Setup Personalia; tombol kelola disembunyikan bila role tak berhak.
 
@@ -57,6 +58,8 @@
 | Method | Path | Fungsi | RBAC |
 |---|---|---|---|
 | GET/POST | `/kpi` · `/kpi/dashboard` · `/kpi/templates` | KPI score + template. `GET /kpi` filter `?department=` (boleh **beberapa dipisah koma** → semua harus berhak), `?period=YYYY-MM`, `?status=`. Departemen yang satu tim otomatis digabung dari master data; `?merge=` + `?merge_label=` untuk penggabungan ad-hoc (detail: [[HRIS - Key Performance Index]]) | KPIDepartmentRBAC / HRIS |
+| GET | `/kpi?scope=team` | KPI **bawahan langsung** pemanggil (Leader). Gerbangnya **keberadaan bawahan aktif**, bukan role — Leader ber-role `staff` selalu ditolak KPIDepartmentRBAC. Filter `?department=` diabaikan: cakupannya orang. Tanpa bawahan aktif → 403 | Punya bawahan |
+| GET/PUT | `/supervisor-assignment` | Baca & tetapkan **atasan langsung** per departemen. GET `?department=` menerima **nama departemen ATAU label grup** (`HRGA`) dan memekarkannya ke satu tim penuh lewat `ResolveDepartmentFilter`+`ExpandToDepartmentGroup` — sama seperti `/kpi`, jadi meminta satu anggota mengembalikan seluruh grupnya. Nama tak dikenal master dipakai apa adanya, bukan dijawab kosong. Balasan: `employee_id`·`full_name`·`position`·`supervisor_id`·`is_supervisor`·**`is_active`**. PUT semua-atau-tidak: satu baris tak sah membatalkan seluruh permintaan + daftar masalahnya; `supervisor_id` kosong = melepas atasan | HRIS/IT staff |
 | GET/POST | `/vacation` · `/vacation/quota` · `/vacation/decrement` | Kuota & pemakaian cuti | HRIS (decrement: open) |
 | GET/PATCH | `/contract` · `/bpjs` · `/analysis` | Kontrak (filter `department`/`employment_type`/`status`/`ending_month`=`YYYY-MM` berdasar `contract_ending`), BPJS, analisis | HRIS |
 | GET | `/internal/aggregate/employee/:id` · `/v2/internal/aggregate/employees[/summary|/it]` · `/internal/export/all` | Aggregate & export | HRIS / IT |
@@ -67,6 +70,8 @@
 |---|---|---|
 | GET | `/list` · `/view` · `/personal` · `/work` · `/schedule` · `/system` | Daftar & view tab |
 | GET/POST | `/me/` · `/me/kpi-score` · `/me/vacation` · `/me/payroll-approx` · `/me/photo` | Profil sendiri (header) |
+| GET | `/me/subordinates` | Bawahan **langsung** yang akunnya aktif. Dipakai FE untuk menentukan menu KPI di Portal Saya tampil, dan mengisi halamannya |
+| GET | `/me/menu-hidden` | Url menu yang disembunyikan bagi posisi pemanggil. Departemen & posisi **diselesaikan di server** dari `work_data`, bukan diterima sebagai query: FE hanya menyimpan NAMA posisi di cookie, dan nama jabatan tidak unik lintas departemen ("GA Staff" dipakai dua peran). Pencocokan departemen **case-insensitive**, sama seperti kode pemetaan departemen lain. Kegagalan membalas daftar kosong (200), bukan error: sidebar yang gagal memuat setelan harus menampilkan menu apa adanya |
 | POST | `/upload` · `/upload/multiple` | Upload file |
 
 > ~90 endpoint. Daftar lengkap path per `:doc_type`/method ada di `services/employee/main.go`.
