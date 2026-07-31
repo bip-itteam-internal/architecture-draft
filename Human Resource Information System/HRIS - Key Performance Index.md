@@ -36,6 +36,7 @@
 - **Bentuk respons**: satu departemen (atau beberapa yang seluruhnya digabung) → `{department, summary, members}`; selain itu → `{summary, departments[]}`.
 - **Dashboard/analitik**: agregasi per departemen (rata-rata, coverage) + daftar *need training* (<60) & *top performer* (≥80).
 - **Belum**: penegakan siklus bulanan & workflow review supervisor→HR (lihat konsep di bawah) = **TBD**.
+- **Pengisian nilai 100% manual**: `ApplyKPIValues` hanya menerima map `label → 0..100` dari body request; tidak ada jalur auto-fill dari service lain. Analisis kelayakan otomasi per metrik (data production 2026-07-31: 70 template, 311 metrik, 73 metrik sumber datanya sudah siap) ada di [[HRIS - Otomasi Skor KPI]].
 
 ## Konsep — appraisal bulanan menyeluruh (sebagian sudah — lihat bagian di atas)
 
@@ -69,6 +70,7 @@ Kami menginginkan cara yang mudah untuk mengisi catatan dan kalkulasi otomatis u
 ## Dokumen Terkait
 
 - **Implementasi**: [[Microservices - Insentive Service]] (engine KPI→insentif marketing) · [[Finance - Incentive]] · [[Sales - Incentive]]
+- [[HRIS - Otomasi Skor KPI]] — analisis kelayakan mengisi skor otomatis dari data ERP (peta 311 metrik ke sumber datanya, modul yang ada tapi datanya kosong, dan rencana bertahap)
 - [[HRIS - Work Review]] — penilaian kualitatif (KPI = sisi kuantitatif); pertimbangkan **berbagi satu Review Cycle** ketimbang sistem terpisah
 - [[HRIS - Career & Promotion]] — masukan keputusan promosi
 - [[HRIS - Analysis]] · [[HRIS - Big Pictures]] · [[HRIS - Interrelationship Matrices]]
