@@ -59,7 +59,7 @@
 |---|---|---|---|
 | GET/POST | `/kpi` · `/kpi/dashboard` · `/kpi/templates` | KPI score + template. `GET /kpi` filter `?department=` (boleh **beberapa dipisah koma** → semua harus berhak), `?period=YYYY-MM`, `?status=`. Departemen yang satu tim otomatis digabung dari master data; `?merge=` + `?merge_label=` untuk penggabungan ad-hoc (detail: [[HRIS - Key Performance Index]]) | KPIDepartmentRBAC / HRIS |
 | GET | `/kpi?scope=team` | KPI **bawahan langsung** pemanggil (Leader). Gerbangnya **keberadaan bawahan aktif**, bukan role — Leader ber-role `staff` selalu ditolak KPIDepartmentRBAC. Filter `?department=` diabaikan: cakupannya orang. Tanpa bawahan aktif → 403 | Punya bawahan |
-| GET/PUT | `/supervisor-assignment` | Baca & tetapkan **atasan langsung** per departemen (alat isi-massal). PUT semua-atau-tidak: satu baris tak sah membatalkan seluruh permintaan + daftar masalahnya | HRIS/IT staff |
+| GET/PUT | `/supervisor-assignment` | Baca & tetapkan **atasan langsung** per departemen. GET `?department=` mengembalikan `employee_id`·`full_name`·`position`·`supervisor_id`·`is_supervisor`·**`is_active`**. PUT semua-atau-tidak: satu baris tak sah membatalkan seluruh permintaan + daftar masalahnya. `supervisor_id` kosong = melepas atasan | HRIS/IT staff |
 | GET/POST | `/vacation` · `/vacation/quota` · `/vacation/decrement` | Kuota & pemakaian cuti | HRIS (decrement: open) |
 | GET/PATCH | `/contract` · `/bpjs` · `/analysis` | Kontrak (filter `department`/`employment_type`/`status`/`ending_month`=`YYYY-MM` berdasar `contract_ending`), BPJS, analisis | HRIS |
 | GET | `/internal/aggregate/employee/:id` · `/v2/internal/aggregate/employees[/summary|/it]` · `/internal/export/all` | Aggregate & export | HRIS / IT |
