@@ -83,20 +83,20 @@
         "HRIS - Key Performance Index",
         "HRIS - Payroll"
       ],
-      "hash": "a229f8bc8fd0ab6bac530e80978abd808dd7ced34dbf11b3dbfa47feca57faf4",
-      "ukuran_kb": 8.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik gateway `/api/employee/*`, mulai dari login/refresh token, CRUD personal data dan work data, dokumen karyawan, jadwal kerja, sampai KPI, cuti, kontrak, BPJS, dan export. Menjelaskan juga siapa yang boleh memanggil tiap grup endpoint (RequireHRISStaff, RequireITStaff, RequireITSupervisor, KPIDepartmentRBAC) serta perilaku khusus master data departemen (PUT memakai ReplaceOne, supervised_by dan supervision_label dipertahankan bila tak dikirim). Bisa dipakai untuk mencari path endpoint Training Program, /supervisor-assignment atasan langsung, /me/subordinates, /me/menu-hidden, dan /birthdays beserta parameter query-nya.",
+      "hash": "9b4e64a6edf1895cdc6513cf888646615932a4516ccf212b34ad6e94306db24a",
+      "ukuran_kb": 8.4,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik gateway `/api/employee/*`, mulai dari login/refresh token, CRUD personal data dan work data, dokumen karyawan, jadwal kerja, sampai master departemen dan system role. Juga menjawab siapa yang boleh memanggil tiap rute (RequireHRISStaff, RequireITStaff, RequireITSupervisor, KPIDepartmentRBAC) dan bagaimana filter departemen bekerja, termasuk mode `grouped=true` yang menggabungkan departemen satu tim jadi satu opsi. Berguna saat mencari rute KPI (termasuk `?scope=team` untuk Leader), supervisor-assignment atasan langsung, kuota cuti, kontrak/BPJS, training program, endpoint `/me/*` untuk portal pribadi, serta menu-hidden per jabatan.",
       "kata_kunci": [
         "employee service",
-        "endpoint",
-        "API karyawan",
+        "endpoint karyawan",
+        "API HRIS",
         "auth login",
-        "RBAC",
-        "master departemen",
+        "personal data",
+        "work data",
         "master department",
-        "KPI",
-        "supervisor assignment",
-        "training program"
+        "system roles",
+        "supervisor-assignment",
+        "KPI endpoint"
       ]
     },
     {
@@ -958,20 +958,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "9b2fe5cac31312d8073075cceae37d730f5ebcaf2c0735ecb33da138b7aa9199",
-      "ukuran_kb": 55.1,
-      "ringkasan": "Menjawab: apa itu portal web ERP `hris-dashboard` (One Bharata), stack apa yang dipakai (Next.js 16, React 19, shadcn/ui, TanStack Query, react-i18next), dan bagaimana login, cookie token, refresh proaktif, serta perannya sebagai SSO Identity Provider bekerja. Menjelaskan cara kerja role gating sidebar dari `system_roles`, struktur pengelompokan menu HRIS (menu induk bersarang, bukan field group), pengaturan tampilan menu per jabatan lewat `menu_hidden` yang disimpan terbalik dari centang, serta perataan induk menu tipis. Memuat juga cakupan multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/network per company) dan pelajaran dari kegagalan produksi halaman Atasan Langsung akibat loop render.",
+      "hash": "d027fc55e629732935c1038e848d6f013b785f569a5adaee596813f752449372",
+      "ukuran_kb": 55.8,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal `hris-dashboard` (\"One Bharata\"), stack apa yang dipakai (Next.js 16, React 19, shadcn/Radix, TanStack Query, react-i18next), dan bagaimana login serta role gating bekerja lewat cookie `system_roles` dan token dari gateway. Menjelaskan perannya sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager, termasuk handoff `redirect_url` dan allowlist origin. Berguna untuk memahami susunan menu sidebar (menu induk bersarang, bukan field group), tab Pengaturan/System Setup, pengaturan tampilan menu per jabatan, menu KPI untuk Leader di Portal Saya, halaman Atasan Langsung, serta dampak multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/network per company).",
       "kata_kunci": [
+        "web ERP",
         "erp-frontend",
         "hris-dashboard",
         "One Bharata",
         "Next.js",
-        "sidebar menu",
-        "system_roles",
         "SSO",
-        "menu_hidden",
-        "multi-perusahaan",
-        "CompanySwitcher"
+        "system_roles",
+        "sidebar menu",
+        "role gating",
+        "multi-perusahaan"
       ]
     },
     {
@@ -4226,19 +4226,19 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "845975131ba68069c1831c44f34f49c376105eadc490e94603e74681456cdc7f",
-      "ukuran_kb": 10.8,
-      "ringkasan": "Menjawab: bagaimana departemen, posisi/jabatan, dan hierarki atasan disimpan serta dikelola (collection `master_department` dengan `positions[]`, `position_items[]`, `roles[]`, `company_id`, `supervised_by`) dan bagaimana `work_data` menyimpan sisi karyawannya. Menjelaskan beda tegas antara cakupan TAMPILAN (struktur organisasi, dipakai KPI/daftar karyawan/laporan absensi) dan cakupan WEWENANG (klaim JWT, dipakai Support Ticket), urutan pencarian atasan untuk approval, serta akibat berbahaya bila `supervised_by` General Affair dihapus tanpa mengangkat supervisor GA. Menjawab pula bagaimana atasan langsung per orang (`work_data.supervisor_id`) diisi lewat alur pilih atasan lalu centang bawahan, batasannya satu karyawan satu atasan, tidak rekursif, tanpa penjaga siklus, dan bahwa org chart belum ada.",
+      "hash": "a3b0380e34e53ee2a6fe449cddf3bbeb2983bcfbe3168d0c4e5baca6ff60ee6c",
+      "ukuran_kb": 11.9,
+      "ringkasan": "Menjawab: bagaimana struktur organisasi disimpan dan dikelola, yaitu departemen dan jabatan sebagai master data di `master_department` (key, positions, position_items, roles, company_id) plus data karyawan di `work_data`. Menjelaskan perbedaan penting antara cakupan TAMPILAN (pengelompokan departemen satu tim seperti HRGA lewat `supervised_by`/`supervision_label`) dan cakupan WEWENANG (klaim JWT untuk supervisor), serta urutan pencarian atasan saat pengajuan mengalir. Berguna untuk memahami atasan langsung per orang (`work_data.supervisor_id`), aturan satu karyawan satu atasan, cara pengisian lewat halaman Atasan Langsung, batasan relasi yang tidak rekursif, dan status org chart yang belum ada.",
       "kata_kunci": [
         "struktur organisasi",
         "organization structure",
         "departemen",
         "jabatan",
-        "posisi",
+        "position",
         "atasan langsung",
         "supervisor",
         "supervised_by",
-        "hierarki",
+        "HRGA",
         "org chart"
       ]
     },
@@ -4294,20 +4294,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "08eab4a3a18a99d813d7820b43acd52272eb00081a3a4d865f6dbe6830d66ca6",
-      "ukuran_kb": 19.2,
-      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang sumber datanya sudah ada di ERP sehingga bisa diisi otomatis, mana yang modulnya jalan tapi koleksinya masih kosong, dan mana yang memang tak punya sumber data sama sekali. Memuat klasifikasi empat status (otomatis penuh, semi-otomatis, terblokir data, manual), rekap persentase otomatisasi per departemen, serta peta tiap klaster metrik ke endpoint dan koleksi sumbernya (iklan TikTok, ROAS marketing analytics, attendance, SLA dan CSAT task management, uptime monitoring, lead time procurement, laporan keuangan Accurate). Juga menjelaskan hambatannya, terutama pemetaan karyawan ke toko atau advertiser dan label metrik yang belum layak dijadikan kunci otomasi.",
+      "hash": "d45f9802d7f7f7bbd888522aa5d87434f199e61bbab0fb945d7dc07dc5ecd276",
+      "ukuran_kb": 19.7,
+      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang skornya bisa diisi otomatis dari data ERP dan mana yang tetap harus manual, beserta rekap per departemen (Tech Development, Kyura, Finance, Manufaktur, dst). Menjelaskan pemetaan tiap klaster metrik ke sumber datanya secara konkret, mis. konversi iklan TikTok, ROI/ROAS, omzet, rating toko, piutang/AR dan EBITDA dari Accurate, uptime Uptime Kuma, SLA dan CSAT e-ticket, kehadiran, lead time PO, serta resi ekspedisi. Juga menjawab kenapa sebagian metrik terblokir (modul jalan tapi koleksinya kosong), bagaimana model kpi_template/kpi_score dan validasi bobot bekerja, dan mengapa label metrik jadi kunci pengikat untuk auto-fill.",
       "kata_kunci": [
         "KPI",
         "otomasi skor KPI",
+        "KPI automation",
         "auto-fill KPI",
-        "311 metrik",
+        "kpi_template",
         "kpi_score",
-        "sumber data metrik",
-        "performance appraisal",
-        "penilaian karyawan",
-        "HRIS",
-        "employee-service"
+        "metrik KPI",
+        "penilaian kinerja",
+        "performance metrics",
+        "sumber data KPI"
       ]
     },
     {
@@ -5480,20 +5480,20 @@
         "QA - Batch Record & Traceability",
         "QA - CPOB (GMP)"
       ],
-      "hash": "83d9150dd6b5154280f2d2dd5f7a3a558302f65a63e51f188e23bb73c4fd7106",
-      "ukuran_kb": 14.0,
-      "ringkasan": "Menjawab: bagaimana dokumen batch release produksi (form manual 7 lembar Ceklis Kelengkapan Dokumen Produksi) didigitalkan jadi menu WMS, isi tiap lembarnya apa saja, dan siapa mengisi bagian mana (admin RM, admin produksi, QC/RnD, PPIC/SPV). Menjelaskan workflow status DRAFT sampai LULUS atau DITOLAK, mode pengecekan QC yang mengunci field milik QC dari form admin, paraf berbasis jabatan lewat roster, paraf digital berjenjang yang mengunci persetujuan PJ Teknis sampai semua slot terisi, serta cara rekonsiliasi penimbangan dihitung. Juga menjawab mengapa kebutuhan pencocokan pemakaian bahan dengan MO dipisah ke menu Rekonsiliasi MO dan mengapa fitur ini sengaja tidak menyentuh stok atau Accurate.",
+      "hash": "038d870836238612d725fd193221c06fc8b2a77ae80855b3fdc8d66c00e4a136",
+      "ukuran_kb": 15.0,
+      "ringkasan": "Menjawab: bagaimana dokumen batch release produksi (form manual 7 lembar Ceklis Kelengkapan Dokumen Produksi) didigitalkan jadi menu WMS `/manufacture/dokumen-produksi-batch`, siapa yang mengisi bagian mana (admin RM, admin produksi, QC/RnD, PPIC/SPV), dan bagaimana alur DRAFT ke DIAJUKAN lalu LULUS atau DITOLAK dijaga di server. Menjelaskan mekanisme paraf: paraf by jabatan lewat panel Tim Batch, paraf digital berjenjang per slot yang mengunci persetujuan PJ Teknis sampai semua jabatan roster terisi, serta field milik QC yang read-only di form admin dan hanya bisa diisi di layar review. Berguna juga untuk pertanyaan soal rumus rekonsiliasi penimbangan (Ditimbang dibagi Teoritis, batas di bawah 2 persen), menu terpisah Rekonsiliasi MO, cetak PDF 7 lembar, dan rantai nomor batch dari MO sampai Laporan Produksi.",
       "kata_kunci": [
-        "dokumen produksi batch",
         "batch record",
+        "dokumen produksi batch",
         "batch release",
-        "WMS",
+        "dossier",
         "QC",
-        "paraf digital",
-        "rekonsiliasi MO",
+        "paraf",
+        "rekonsiliasi",
         "penimbangan",
         "manufacture",
-        "approval produksi"
+        "WMS"
       ]
     },
     {
