@@ -140,7 +140,7 @@ Perlu dibereskan sebelum otomasi apa pun, karena semuanya menyentuh label yang j
 
 ## Rencana Bertahap (TBD, belum ada di kode)
 
-Seluruh bab ini **rencana**, belum satu pun dikerjakan.
+Seluruh bab ini **rencana**, belum satu pun dikerjakan. Batas service dan kepemilikan datanya sudah diputuskan di [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]: otomasi dikerjakan di dalam employee-service dulu, `kpi_score` tetap milik employee-service, dan pemisahan `kpi-collector` ditunda sampai pemicu yang tertulis di ADR terpenuhi.
 
 **Fase 1, tanpa modul baru**
 1. Sambungkan [[Microservices - Insentive Service]] ke `kpi_score` sebagai nilai berstatus DRAFT (kurang lebih 30 metrik Kyura dan Beauty Hacks).

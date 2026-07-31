@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-07-31",
-  "jumlah_dokumen": 247,
+  "jumlah_dokumen": 248,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -2942,6 +2942,49 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik.md",
+      "judul": "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "Diputuskan 2026-07-31, **belum diimplementasikan**. Tidak ada satu pun metrik KPI yang terisi otomatis hari ini. Analisis yang mendasarinya ada di [[HRIS - Otomasi Skor KPI]].",
+      "publik": true,
+      "tautan": [
+        "HRIS - Otomasi Skor KPI",
+        "Microservices - Employee Service",
+        "Microservices - Marketing Analytics Service",
+        "Microservices - Attendance Service",
+        "Microservices - Task Management Service",
+        "IT - Monitoring System",
+        "External - Accurate",
+        "Microservices - Insentive Service",
+        "ADR - 0002 Database-per-Service",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "HRIS - Key Performance Index",
+        "HRIS - Work Review",
+        "CORE - HRIS Orchestrator",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "IT - Background Jobs & Schedulers",
+        "DB - Overview and Notes",
+        "APP - Web ERP"
+      ],
+      "hash": "06aeb31a5a9c9d790a412a1b436534285dfe04dd5d45afef33f19d8b515e5f7d",
+      "ukuran_kb": 9.5,
+      "ringkasan": "Menjawab: siapa pemilik koleksi kpi_template dan kpi_score, service mana yang boleh menulis skor KPI, dan mengapa otomasi KPI dikerjakan di dalam employee-service alih-alih membuat service kpi-collector terpisah. Menjelaskan kontrak nilai otomatis (auto_value terpisah dari value, status DRAFT, satu endpoint internal bergerbang, override wajib beralasan) serta tiga pemicu konkret yang membuat pemisahan service jadi layak (tiga konektor keluar, penjadwalan non-HR, atau penyimpanan kredensial sistem non-HR). Juga merekam alternatif yang ditolak, yaitu bikin service KPI sekarang, menaruh job di hris-orchestrator, dan menjadikan insentive-service pemilik KPI.",
+      "kata_kunci": [
+        "KPI",
+        "kpi_score",
+        "kpi_template",
+        "ADR 0032",
+        "employee-service",
+        "kpi-collector",
+        "batas service",
+        "database-per-service",
+        "auto_value",
+        "otomasi KPI"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -4236,6 +4279,7 @@
         "GA - Building Maintenance",
         "GA - Checklist Management",
         "HRIS - Career & Promotion",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "Microservices - Task Management Service",
         "HRIS - Work Review",
         "Microservices - Marketing Analytics Service",
@@ -4251,20 +4295,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "b30b49b93a1da7ac1aa2cf0dfbd0462200292832339a605a5f99580387879545",
-      "ukuran_kb": 18.9,
-      "ringkasan": "Menjawab: metrik KPI mana yang bisa diisi otomatis dari data yang sudah dimiliki ERP dan dari endpoint atau koleksi mana datanya diambil. Memuat klasifikasi 311 metrik production menjadi otomatis penuh, semi-otomatis, terblokir data kosong, dan manual, lengkap dengan rekap persentase per departemen. Berguna untuk menjawab kenapa suatu metrik belum bisa diotomatiskan (definisi, target, mapping, atau budget yang tidak tersimpan di ERP) dan bagaimana model kpi_template atau kpi_score mengikat auto-fill ke label metrik.",
+      "hash": "08eab4a3a18a99d813d7820b43acd52272eb00081a3a4d865f6dbe6830d66ca6",
+      "ukuran_kb": 19.2,
+      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang sumber datanya sudah ada di ERP sehingga bisa diisi otomatis, mana yang modulnya jalan tapi koleksinya masih kosong, dan mana yang memang tak punya sumber data sama sekali. Memuat klasifikasi empat status (otomatis penuh, semi-otomatis, terblokir data, manual), rekap persentase otomatisasi per departemen, serta peta tiap klaster metrik ke endpoint dan koleksi sumbernya (iklan TikTok, ROAS marketing analytics, attendance, SLA dan CSAT task management, uptime monitoring, lead time procurement, laporan keuangan Accurate). Juga menjelaskan hambatannya, terutama pemetaan karyawan ke toko atau advertiser dan label metrik yang belum layak dijadikan kunci otomasi.",
       "kata_kunci": [
-        "otomasi KPI",
-        "auto-fill skor",
-        "metrik KPI",
-        "kpi_template",
+        "KPI",
+        "otomasi skor KPI",
+        "auto-fill KPI",
+        "311 metrik",
         "kpi_score",
-        "sumber data",
-        "kelayakan otomasi",
-        "Accurate",
-        "employee service",
-        "rekap departemen"
+        "sumber data metrik",
+        "performance appraisal",
+        "penilaian karyawan",
+        "HRIS",
+        "employee-service"
       ]
     },
     {
