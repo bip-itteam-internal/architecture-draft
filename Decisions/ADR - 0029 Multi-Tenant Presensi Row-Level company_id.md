@@ -10,7 +10,7 @@ Multi-tenant **satu database** dengan penanda **`company_id` row-level** (BUKAN 
 
 - `company_id` = key perusahaan (mis. `"BIP"`, `"PGL"`); default `common.DefaultCompanyID = "BIP"`. Disimpan di `work_data`, klaim JWT, dan header `BIP-Company-ID`.
 - **Gateway** meng-inject `BIP-Company-ID` + `BIP-System-Roles` dari klaim JWT ke **semua** request internal (`routes.Reroute`); service-to-service diteruskan via `InternalRequest`.
-- `common.CompanyID(c)` = perusahaan **penulis** (dipakai di create/stamp); `common.EffectiveCompanyID(c)` = perusahaan **pembaca**, menghormati override `?company=` **hanya** untuk central admin (`IsCentralAdmin` = `system_roles.it` ∈ supervisor/admin).
+- `common.CompanyID(c)` = perusahaan **penulis** (dipakai di create/stamp); `common.EffectiveCompanyID(c)` = perusahaan **pembaca**, menghormati override `?company=` **hanya** untuk central admin. `IsCentralAdmin` = **`system_roles.group = admin`** (`common.SystemRoleGroup`, `shared-library/common/company_scope.go:27`). Pemetaan interim ke `system_roles.it` supervisor/admin **sudah DICABUT** supaya "admin IT" dan "admin grup" terpisah; regresinya dikunci `shared-library/common/company_scope_test.go`.
 - **BIP = perusahaan default**; data lama di-backfill `company_id=BIP`; fallback di mana-mana → perilaku BIP tak berubah (gerbang regresi wajib).
 - Master perusahaan: collection `master_company` (`key`/`name`/`code`) + CRUD `/master/companies` (gate IT supervisor). `code` = prefix `employee_id` per perusahaan (wajib & unik).
 - Capture presensi via **MyBharata mobile** — ter-scope otomatis via JWT (interceptor kirim Bearer; endpoint tak kirim identitas perusahaan). **Admin pusat** = IT supervisor/admin (interim; peran khusus "admin pusat" belum ada).
@@ -53,6 +53,18 @@ Paket **presensi penuh**: absen, jadwal, izin/cuti/sakit + approval, laporan HR.
 - **Web (erp-frontend, semua di `main`)** — `CompanySwitcher` dipindah ke footer sidebar, Kelola Rotasi + Mesin Fingerprint per perusahaan di `/hris/schedule`, Kelola Network ikut switcher, toggle "Bharata Group" di form artikel, dan direktori/agregat karyawan ikut perusahaan terpilih (F2-A FE).
 - **Mobile (my-bharata, PR #89/#90/#91 merged ke `dev`, versionCode 120, belum naik ke `main`)** — identitas perusahaan dari `/me` + onboarding, konten beranda dinamis per tenant (blok "Tentang Perusahaan" & "Bharata Community" khusus BIP), nama perusahaan di kartu cuaca & QR lanyard, dan menu **Pengajuan disembunyikan untuk non-BIP** selama pilot. Konsekuensi: tenant baru praktis dapat absen + jadwal saja di mobile, bukan paket presensi penuh seperti tertulis di §Scope Fase 1.
 
+## Perbaikan jalur edit karyawan (2026-07-30, branch — belum merge)
+
+Audit yang berangkat dari keluhan nyata (form **Edit Data Pekerjaan** karyawan ELT menampilkan departemen/jabatan BIP) menemukan **dua** cacat berbeda pada jalur yang sama. Keduanya diperbaiki di branch `fix/employee-partial-update` (bip-erp) + `fix/edit-workdata-company-scope` (erp-frontend); **belum merge, belum deploy**.
+
+**1. Dropdown master data tak ter-scope (FE).** `edit-workdata.tsx` memanggil `/data-type/department` dan `/position` **tanpa** parameter `company`, sehingga `EffectiveCompanyID` jatuh ke perusahaan pemakai yang login. BE sudah benar sejak PR #652; yang tertinggal jalur edit. Form **Buat Karyawan** (`create-employee/step1.tsx`) sudah mengirimnya sejak awal. Perbaikan: `work_data.company_id` dialirkan dari `work.tsx` ke modal. Menyusul dari itu, karena perusahaan pilot bisa belum punya `master_department` sama sekali, nilai tersimpan karyawan disisipkan sebagai opsi (`lib/select-options.ts`) agar tak lenyap dari pilihan lalu terhapus saat disimpan.
+
+**2. Orchestrator menimpa field yang tak dikirim FE (BE).** `UpdateWorkData`/`UpdatePersonalData` (`orchestrator/hris/employee_route.go`) mem-parse body parsial ke **struct penuh** lalu me-`json.Marshal` ulang. Karena `company_id` dan `photo` tak ber-`omitempty`, dan `omitempty` **tidak berlaku untuk struct** di `encoding/json` (sehingga `vacation` ikut terpancar), setiap simpan form menulis: `work_data.company_id = ""`, `work_data.vacation` ter-nol-kan (kuota cuti hilang), dan `personal_data.photo` dikosongkan. Ditambah `UpsertMetadata` pada payload tanpa metadata selalu masuk cabang `created_*`, sehingga jejak pembuatan tertimpa waktu edit dan `updated_*` tak pernah tercatat.
+
+Perbaikan: orchestrator meneruskan body sebagai **map** (`orchestrator/hris/partial_update.go`), dan employee-service menstempel audit lewat **dot-notation** `metadata.updated_at`/`updated_by` (`services/employee/partial_update.go`) supaya `created_*` tak tersentuh.
+
+**Status kerusakan di dev (verifikasi 2026-07-30):** belum terjadi. **Nol** dokumen ber-`company_id` kosong, dan tak ada `vacation` yang ter-nol-kan jalur ini. Sebabnya 31 dokumen yang membawa jejak jalur edit itu terakhir disentuh sekitar **25 Mei 2026**, yaitu **sebelum** `company_id` (24 Juli 2026) dan `Vacation` masuk struct `WorkData` — dibuktikan 14 di antaranya bahkan tak punya field `vacation` sama sekali. **Produksi belum diperiksa.** Yang sudah terlanjur rusak justru tipe BSON-nya (lihat §Masih terbuka).
+
 ## Status pilot (verifikasi live dev 2026-07-28)
 
 Lewat gateway dev `10.10.10.121:6969` (read-only, akun admin pusat):
@@ -65,8 +77,9 @@ Lewat gateway dev `10.10.10.121:6969` (read-only, akun admin pusat):
 ## Masih terbuka
 
 - **Cron presensi satu sweep global** — `cronScheduleCheck` membaca seluruh `work_schedule` tanpa filter perusahaan (`services/attendance/cron.go:62`). Entri hasilnya tetap ber-`company_id` (diturunkan dari `work_schedule`), jadi bukan kebocoran data, tapi belum ada pemisahan per tenant (mis. zona waktu / jadwal cron sendiri).
-- **Peran "admin pusat" resmi belum ada** — interim dipetakan ke `system_roles.it` = supervisor/admin (`shared-library/common/company_scope.go:27`).
-- **`executeEmployeeUpdateTransaction` bisa mengosongkan tenant** — update work_data memakai `$set: update.WorkData` tanpa `defaultWorkCompany` (`services/employee/func.go:205`), dan `WorkData.CompanyID` ber-tag `bson:"company_id"` **tanpa** `omitempty`, jadi payload FE yang tak menyertakan `company_id` akan menimpanya jadi `""`. Jalur create sudah aman (`func.go:58` + `func.go:114`).
+- **Definisi admin pusat BEDA antara FE dan BE** — peran resmi di BE kini `system_roles.group = admin` (lihat §Decision), tapi FE masih memakai patokan interim lama `isSupervisorOrAdmin(systemRoles?.it)` di `erp-frontend/src/components/layout/sidebar.tsx:60` dan `src/app/(main)/hris/schedule/page.tsx:52`. Akibatnya FE bisa menampilkan pemilih perusahaan dan mengirim `?company=` untuk user yang override-nya justru diabaikan BE.
+- **`executeEmployeeUpdateTransaction` bisa mengosongkan tenant** — `$set: update.WorkData` tanpa `defaultWorkCompany` (`services/employee/func.go:205`), dan `WorkData.CompanyID` ber-tag `bson:"company_id"` **tanpa** `omitempty`, jadi payload yang tak menyertakan `company_id` menimpanya jadi `""`. Jalur create sudah aman (`func.go:58` + `func.go:114`). **Masih terbuka**; jalur ini BUKAN yang dipakai form Web ERP (lihat butir berikut).
+- **Korupsi tipe BSON di jalur update parsial** — `PUT /update/:employee_id/work` dan `/personal` (`services/employee/main.go`) mem-parse body ke `map[string]interface{}` lalu men-`$set` apa adanya, sehingga tanggal tersimpan sebagai **string** dan angka sebagai **double**, padahal model mendeklarasikan `time.Time` dan `int`. Terverifikasi di DB dev 2026-07-30: **31 dari 179** `work_data` punya `join_date`/`contract_ending` string, `fingerprint_id` double, dan `metadata.created_at` string; **6** `personal_data` punya `date_of_birth` string. Dokumen itu gagal didekode ke struct. Belum diperbaiki dan belum ada migrasi.
 
 ## Terkait
 

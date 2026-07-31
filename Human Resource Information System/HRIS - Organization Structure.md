@@ -6,11 +6,14 @@
 
 ## Ruang Lingkup
 
-- **Departemen** — dikelola di collection `master_department` (key, name, positions[], roles[]); CRUD via `GET/POST/PUT/DELETE /master/departments` di [[Microservices - Employee Service]]
+- **Departemen** — dikelola di collection `master_department` (`key`, `name`, `positions[]`, `position_items[]`, `roles[]`, `company_id`, `supervised_by`, `supervision_label`); CRUD via `GET/POST/PUT/DELETE /master/departments` di [[Microservices - Employee Service]]
 - **Posisi/jabatan** per departemen — tersimpan sebagai array `positions` di setiap dokumen `master_department`; sebelumnya hardcoded (`PositionTitle*` di shared-library), sekarang dapat ditambah/ubah via API atau frontend `/hris/master-data`
+	- **`position_items[]` — jabatan sebagai entitas ber-identitas** ([[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]). Tiap item `{key, name, permission_sets[]}`: `key` slug stabil yang **tidak berubah walau namanya diganti**, sehingga paket hak yang menempel tak lepas saat jabatan di-rename; `permission_sets` = paket hak yang diwarisi setiap karyawan berjabatan itu, digabung dengan paket milik akun saat login (union, reach tertinggi). Sengaja **hidup berdampingan** dengan `positions[]` (array nama) yang tetap jadi sumber jawaban `/data-type/position`; `positions[]` dibuang nanti setelah semua pembaca pindah. `SyncPositionItems` menjaga keduanya selaras sambil mempertahankan key dan paket hak yang sudah ada.
+	- Sisi karyawan: `work_data.position` (nama, untuk tampilan/laporan/template KPI) + `work_data.position_key` (kunci pencocokan paket hak). Kosong pada data lama sebelum migrasi → pemanggil jatuh ke pencocokan by nama.
+- **Departemen ter-scope per perusahaan** — `master_department.company_id` ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]). **`key` unik PER perusahaan, bukan global**; kosong pada data lama berarti BIP. Perusahaan baru mulai dengan daftar departemen kosong. Endpoint `/data-type/department`, `/data-type/position`, dan `/master/departments` menyaring memakai `EffectiveCompanyID`. ⚠️ Supervisi/RBAC (`allMasterDepartments`, `system-list`) sengaja **tetap global**, jadi jangan disamakan dengan penyaringan tampilan.
 - **System roles** — role per department (staff, supervisor, admin, security) dan feature-based roles (insentive, integration) dikelola di `master_department.roles` dan `master_system_role`
 - **Hierarki/atasan** — relasi supervisor per divisi (dipakai di banyak approval, mis. `getSupervisorData`)
-- **Org chart** — visualisasi struktur (belum ada)
+- **Org chart** — visualisasi struktur (**belum ada**; diverifikasi ulang 2026-07-31, tak ada komponen bagan organisasi di `erp-frontend`). Datanya sudah cukup untuk membangunnya, **kecuali jenjang/golongan** yang memang belum ada di data mana pun (lihat TBD)
 
 ## Cakupan supervisi antar-departemen (`supervised_by`)
 

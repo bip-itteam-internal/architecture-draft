@@ -10,6 +10,7 @@
 
 ### `/employees/*`
 - `PATCH` `personal-data`, `work-data`, `personal-documents`, `work-documents`, `work-schedule` → diteruskan ke employee service.
+	- **Pembaruan PARSIAL**: `personal-data` & `work-data` meneruskan body sebagai **map**, bukan struct. Rute tujuan di [[Microservices - Employee Service]] men-`$set` isi body apa adanya, jadi field yang tak dikirim TIDAK boleh ikut terpancar. Round-trip struct yang dipakai sebelumnya melanggar itu dan menimpa `company_id`, `vacation`, serta `photo` dengan nilai nol setiap kali form disimpan (`orchestrator/hris/partial_update.go`, branch `fix/employee-partial-update` — belum merge). Audit **bukan** lagi tanggung jawab orchestrator; `UpsertMetadata` dicabut dari kedua handler dan distempel service pemilik koleksi.
 - `GET` `/employees/it`, `GET` `/employees/export`.
 - RBAC: `RequireHRISStaff` / `RequireITStaff`.
 

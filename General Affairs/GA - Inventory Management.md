@@ -3,7 +3,7 @@
 *Sistem inventory General Affairs — pencatatan & kontrol aset/barang perusahaan. **Catatan penting:** nama "Inventory Management" agak menyesatkan; saat ini cakupannya **bukan** mengelola Internal & external inventory sepenuhnya sekaligus, melainkan inventory yang digunakan dari purchase/procurement untuk produksi & penjualan produk tersebut. Arah jangka panjang: GA sebagai pengelola inventory perusahaan (lihat Pertimbangan).*
 
 - **Status**: 🟡 Konsep / Draft
-- **Penomoran aset (tag)**: saat ini `INV.Year.Category.No`; arah yang diinginkan `INV.Year.Category.Item.No` (lebih spesifik — tahu objeknya). Kategori saat ini terbatas elektronik, diisi seiring pengembangan.
+- **Penomoran aset (tag)**: implementasi saat ini `INV-BIP-DDMMYY-NAMA-n` (tanggal dari `purchase_date` WIB, `NAMA` = nama barang uppercase tanpa spasi, `n` = increment) — sudah menyertakan item, sejalan dengan arah yang diinginkan. Kategori & nama barang kini **bebas-ketik** (bukan lagi enum terbatas). Detail grounded: [[Microservices - Inventory Service]] · [[API - Inventory Service]].
 - Terkait erat dengan [[GA - Procurement System]] (sumber masuknya barang) & [[WH - Management System]] (master data).
 
 ## Latar Belakang
