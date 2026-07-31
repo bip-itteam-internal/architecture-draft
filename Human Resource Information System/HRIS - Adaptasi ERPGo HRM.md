@@ -42,7 +42,7 @@ Ringkasan hasil bedah route/handler/model. Semua service Go + Fiber v2 + MongoDB
 - **Payroll-supplement**: `/payroll-supplement` (agregat 26→25, `payout_pct`; **tanpa RBAC guard**) + `/payroll-status-treatment` GET/PUT (**perlakuan bayar per-status/subtipe configurable**).
 - **Hari libur**: `/holiday` GET/POST/DELETE (mutasi `RequireHRISStaff`), collection `company_holiday` — **CRUD nyata sudah ada**.
 - **Cron**: prealloc entri (Pending→Alpha di jam mulai), auto-ignore stale 24 jam, reminder reviewer.
-- **Catatan**: `company_work_schedule` **di-drop & re-seed tiap start** (statik, **belum bisa diatur HR** dari HRIS). Field `paid_leave_hour` **tidak ada** (mekanisme = `leave_hour` + master treatment).
+- **Catatan**: `company_work_schedule` kini **HR-editable sebagian** lewat menu Kelola Shift (`/hris/schedule`) — CRUD `/company-work-schedule` hanya **list/create/delete**, **tanpa update**. Seed BIP **bukan** drop koleksi lagi melainkan `DeleteMany` khusus `company_id` BIP lalu re-seed tiap start (`services/attendance/setup.go:458`), jadi shift bawaan BIP tetap kembali setelah restart sedangkan shift perusahaan lain yang dibuat via CRUD bertahan. Field `paid_leave_hour` **tidak ada** (mekanisme = `leave_hour` + master treatment).
 
 ### [[Microservices - Payroll Service]] — setup gaji, run, PPh21 TER, THR, slip
 - **Config**: `/config/company`, `/config/bpjs` (5 program rate/cap), `/config/tax` (**PPh21 TER + PTKP**); master multi-badan-usaha `/companies`.
@@ -85,7 +85,7 @@ Ringkasan hasil bedah route/handler/model. Semua service Go + Fiber v2 + MongoDB
 | Branches | ❌ | Buang — single-site. |
 | Departments · Designations | ✅ | `master_department` CRUD (+positions[]) — [[Microservices - Employee Service]] · [[HRIS - Organization Structure]]. |
 | Allowance · Deduction Types | ✅ | `salary-components` earning/deduction (manual/computed) — [[Microservices - Payroll Service]]. |
-| Working Days / Shift | ⚠️ | `company_work_schedule` jalan **tapi statik seed** (drop+re-seed tiap start; belum bisa diatur HR). — [[HRIS - Attendance System]]. |
+| Working Days / Shift | ⚠️ | `company_work_schedule` jalan; HR bisa **tambah/hapus** lewat Kelola Shift, tapi **tidak bisa edit** (CRUD tanpa update) dan shift bawaan BIP tetap di-re-seed tiap start. — [[HRIS - Attendance System]]. |
 | Holiday (+ Types) | ⚠️→✅ | **CRUD `/holiday` nyata** di attendance (`company_holiday`); *typing* kategori belum. Lihat kandidat **Kalender** di bawah. |
 | Document Types / Categories | ⚠️ | Registry `type` (SOP/S&K/Kebijakan/Panduan) + `personal_document` — [[HRIS - HRD Documents]]. |
 | Termination · Warning · Complaint Types | 🟡 | Bagian dok konsep [[HRIS - Attrition]]/[[HRIS - Personalia]] · [[HRIS - Disciplinary (Surat Peringatan)]] · [[HRIS - Conflict Management]]. |
@@ -205,7 +205,7 @@ Temuan bedah kode yang **tidak cocok** dengan dok vault — perlu koreksi saat s
 2. ✅ **dikoreksi di disk** (belum commit) — **Field `paid_leave_hour` tidak ada di kode** (grep 0 match); **hanya** [[HRIS - Leave Request]] yang mengklaimnya (bukan [[Microservices - Attendance Service]]) — diperbaiki ke mekanisme riil (`leave_subtype` + master `payroll_subtype_treatment`/`payroll_status_treatment`).
 3. **Modul Training**: model+collection ada di Employee Service **tanpa route** (belum di-wire) — [[HRIS - Training Program]] bilang "belum ada kode"; sebenarnya **scaffolding model sudah ada**. Nuansa kecil.
 4. **`Article` (papan pengumuman)** di Notification Service belum tercermin sebagai fondasi Announcements di dok HRIS.
-5. **`company_work_schedule` statik** (drop+re-seed tiap start, belum HR-editable) — perjelas di [[HRIS - Attendance System]].
+5. **`company_work_schedule` HR-editable sebagian** (create/delete via Kelola Shift, **tanpa update**; seed BIP di-`DeleteMany`+re-seed tiap start sehingga shift bawaan BIP tak bisa diubah permanen) — perjelas di [[HRIS - Attendance System]].
 
 ## Belum Diputuskan (TBD)
 
