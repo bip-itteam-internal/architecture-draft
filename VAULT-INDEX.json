@@ -83,21 +83,20 @@
         "HRIS - Key Performance Index",
         "HRIS - Payroll"
       ],
-      "hash": "85f8fce07519aab749e50da082a001051c471bd0cea96dee7dfcede4a821c6bc",
-      "ukuran_kb": 6.3,
-      "ringkasan": "Menjawab: endpoint apa saja untuk CRUD data karyawan (personal & work data), dokumen kerja/pribadi, jadwal kerja, kredensial akun/role sistem, master data departemen dan system role (termasuk relasi supervisi antar-departemen). Juga menjawab endpoint training program HRIS, KPI, kuota cuti, kontrak/BPJS, serta agregasi/export data karyawan untuk kebutuhan HR/IT.",
+      "hash": "0cc4870fe7c4bd731285bec92459cf136acedca8c446880e95c70beb33bbf7a0",
+      "ukuran_kb": 6.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service (HRIS inti) di balik gateway `/api/employee/*`, dan middleware RBAC apa yang menjaga tiap kelompoknya. Bisa dipakai untuk mencari path login/refresh/PIN, CRUD personal & work data, dokumen pribadi/kerja, jadwal kerja, kelola akun dan perangkat, master departemen & system role, Training Program, KPI, cuti, kontrak, BPJS, endpoint aggregate/export internal, serta endpoint `/me/*` untuk profil sendiri. Juga menjawab detail perilaku parameter seperti `?grouped=true` pada data-type department, filter `?department=` multi-nilai pada KPI, `scope=team` untuk Leader, dan mengapa `PUT /master/departments` mempertahankan `supervised_by`/`supervision_label`.",
       "kata_kunci": [
         "employee service",
-        "data karyawan",
-        "KPI",
-        "training program",
-        "kontrak kerja",
-        "BPJS",
-        "master departemen",
+        "endpoint",
+        "API HRIS",
+        "auth login",
+        "personal data",
+        "work data",
+        "master department",
         "system roles",
-        "RBAC",
-        "onboarding",
-        "kuota cuti"
+        "KPI endpoint",
+        "training program"
       ]
     },
     {
@@ -930,12 +929,13 @@
       "tautan": [
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "HRIS - Key Performance Index",
+        "HRIS - Organization Structure",
         "Microservices - Manufacture Service",
         "Microservices - Recruitment Service",
         "HRIS - Pengembangan Organisasi (Community of Interest)",
         "Microservices - Payroll Service",
         "Microservices - Attendance Service",
-        "HRIS - Key Performance Index",
         "Microservices - Task Management Service",
         "API - Integration Service",
         "Microservices - Insentive Service",
@@ -957,20 +957,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "a967ae869943dd3ea115fafe144598408aad25caaf569122b12e344cab7db6c5",
-      "ukuran_kb": 51.1,
-      "ringkasan": "Menjawab: apa itu portal web internal One Bharata (erp-frontend), stack dan modul apa saja yang tersedia (HRIS, attendance, payroll, finance/insentif, integration marketplace, manufacture/WMS, IT, GA), serta bagaimana login dan SSO Identity Provider bekerja. Menjelaskan aturan role gating sidebar dari cookie system_roles, pengelompokan menu bersarang, matriks akses menu WMS per posisi (termasuk pengecualian Finance read-only ke Gudang FG) dan akun integration-only lewat allowlist env. Juga sumber jawaban soal dukungan multi-perusahaan di frontend: CompanySwitcher, kelola perusahaan/departemen/shift/network per-perusahaan, dan prefix Employee ID.",
+      "hash": "d80b3c0967592770ff54591f7fe1863f326c7e169605678ad2fbe82ffb528b4f",
+      "ukuran_kb": 51.8,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal `hris-dashboard` (One Bharata), stack dan repo mana yang dipakai, serta modul/fitur apa saja yang sudah jalan di frontend. Menjelaskan cara kerja login dan token, peran web ini sebagai SSO Identity Provider, dan bagaimana menu disaring berdasarkan `system_roles`, permission, matriks posisi WMS, sampai akun integration-only lewat allowlist env. Juga menjawab bagaimana dukungan multi-perusahaan tampil di UI (company switcher, kelola perusahaan/departemen/shift/network per perusahaan) dan bagaimana sub-menu HRIS dikelompokkan.",
       "kata_kunci": [
-        "erp-frontend",
-        "One Bharata",
         "web ERP",
+        "hris-dashboard",
+        "One Bharata",
+        "frontend",
+        "erp-frontend",
         "Next.js",
         "SSO",
-        "system_roles",
-        "role gating",
         "sidebar menu",
-        "multi-perusahaan",
-        "CompanySwitcher"
+        "role gating",
+        "multi-perusahaan"
       ]
     },
     {
@@ -2845,25 +2845,20 @@
         "DB - Data Dictionary",
         "ADR - 0003 SSO-only Gateway"
       ],
-      "hash": "7addadf5a660671ab2ce98a067d0ad346297ee7458585d565b7649621919ab29",
-      "ukuran_kb": 12.8,
-      "ringkasan": "Menjawab: bagaimana model hak akses (RBAC) bip-erp dirancang, yaitu tiga sumbu modul + tingkat (view/work/approve/manage) + cakupan reach (own/division/all), dan mengapa hak default menempel pada POSISI (jabatan) bukan pada akun. Menjelaskan alasan meninggalkan campuran system_roles, permission-set pilot ticket, dan gate posisi hardcoded; jumlah permission yang disepakati (67), konsep paket bernama (MasterPermissionSet) yang dipilih HR, aturan self-service tanpa permission, fallback tier saat migrasi, serta kewajiban satu PR = satu modul (katalog + gerbang BE + penyaringan FE). Berguna untuk menjawab kenapa perubahan hak baru terasa setelah login ulang (token 72 jam), kapan pengecualian per-akun masih boleh dipakai, dan mengapa katalog tanpa gerbang backend dianggap dekorasi.",
+      "hash": "b4004614db324441bed0ae15188d8b7a3077ddb0d16255ebcb79fa4ab6d68e66",
+      "ukuran_kb": 13.8,
+      "ringkasan": "Menjawab: mengapa RBAC bip-erp dirancang ulang jadi tiga sumbu (modul, tingkat `view`/`work`/`approve`/`manage`, dan cakupan `reach` own/division/all), dan mengapa hak default menempel pada POSISI/jabatan, bukan pada akun. Menjelaskan asal keputusan dari hasil audit (rute tanpa middleware, posisi bukan entitas ber-ID, katalog per-endpoint terlalu rinci), isi keputusan turunannya (67 permission, paket bernama yang dipilih HR, `position_key` di work_data, fallback tier saat migrasi, satu PR sama dengan satu modul), dan konsekuensi nyata saat dijalankan. Berguna untuk menjawab kenapa perubahan hak baru terasa setelah login ulang, kenapa jalur permission-set per-akun tetap dipertahankan sebagai pengecualian individu, dan kenapa katalog tanpa gerbang backend dianggap dekorasi.",
       "kata_kunci": [
         "RBAC",
+        "ADR 0030",
+        "permission set",
         "hak akses",
-        "permission",
-        "permission-set",
-        "paket izin",
         "posisi",
         "position_key",
-        "jabatan",
-        "system_roles",
         "reach",
-        "cakupan",
+        "system_roles",
         "authorization",
-        "ADR 0030",
-        "RequirePermission",
-        "fallback tier"
+        "paket hak"
       ]
     },
     {
@@ -4030,19 +4025,20 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "9678163ecc860265ecd55899758665d0b811556f4ef92a235d2582c8166970c4",
-      "ukuran_kb": 6.8,
-      "ringkasan": "Menjawab: bagaimana skor KPI dihitung dan dipakai untuk insentif tim marketing (9 role), bagaimana appraisal KPI per-karyawan lintas departemen bekerja (template per posisi, scoring per periode, RBAC per departemen), dan bagaimana tampilan gabungan lintas departemen (mis. HRGA) dihitung tanpa mengubah data asli. Juga membedakan engine insentif yang sudah production dari konsep appraisal bulanan menyeluruh yang masih sebagian.",
+      "hash": "ca4e71ae5b8b73cd6013f9826ce561db5e503f85a79ba1e0d995a58bb8e3f075",
+      "ukuran_kb": 8.0,
+      "ringkasan": "Menjawab: apa beda engine KPI yang menghitung insentif tim marketing dengan appraisal KPI per-karyawan lintas departemen, dan bagian mana dari masing-masing yang sudah berjalan. Menjelaskan cara kerja penilaian per-karyawan di employee-service: template KPI per posisi beserta bobot metrik, aturan bahwa posisi template wajib sama dengan posisi karyawan, snapshot template ke `kpi_score` sehingga skor lampau beku, dan rumus skor akhir. Juga menjawab siapa yang boleh melihat KPI siapa (RBAC per departemen, `scope=team` untuk Leader berdasarkan keberadaan bawahan langsung, supervisor menang bila keduanya) serta bagaimana departemen satu tim seperti HRGA digabung di tampilan tanpa mengubah data karyawan.",
       "kata_kunci": [
         "KPI",
         "key performance index",
-        "insentif marketing",
-        "appraisal",
-        "template scoring",
-        "RBAC departemen",
-        "HRGA",
         "penilaian kinerja",
-        "master-kpi"
+        "appraisal",
+        "template KPI",
+        "kpi_score",
+        "insentif marketing",
+        "scope team",
+        "Leader",
+        "HRGA"
       ]
     },
     {
@@ -4143,19 +4139,19 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "45a683ea15fd34b254c947d65a07e78b6f1848d5794a3c00c289a2177e308ad8",
-      "ukuran_kb": 8.5,
-      "ringkasan": "Menjawab: di mana departemen dan posisi disimpan (collection `master_department` dengan CRUD `/master/departments` dan halaman admin `/hris/master-data`), bagaimana jabatan jadi entitas ber-identitas lewat `position_items` sehingga paket hak tidak lepas saat jabatan di-rename, dan bagaimana departemen di-scope per perusahaan lewat `company_id`. Juga menjawab siapa atasan sebuah departemen yang tidak punya supervisor sendiri (relasi `supervised_by`, kasus General Affair dibawahi supervisor Human Resource), urutan pencarian atasan yang menentukan ke mana pengajuan cuti mengalir, beda cakupan tampilan vs cakupan wewenang, dan risiko diam-diam tanpa approver bila relasi supervisi dihapus sembarangan.",
+      "hash": "50486f31a5599b101bac307e701ebeea2317528ee0ccc29d64dd6c1cfd9f1bda",
+      "ukuran_kb": 9.7,
+      "ringkasan": "Menjawab: bagaimana struktur organisasi disimpan dan dikelola (departemen dan posisi sebagai master data `master_department`, `position_items[]` ber-key stabil untuk menempelkan paket hak, `work_data.position` dan `position_key` di sisi karyawan, serta scoping departemen per perusahaan). Menjelaskan cara kerja relasi supervisi antar-departemen `supervised_by` plus `supervision_label`, urutan pencarian atasan saat mencari approver, dan mengapa cakupan TAMPILAN harus dipisah dari cakupan WEWENANG. Juga menjawab apa itu atasan langsung per orang (`work_data.supervisor_id`), cara mengisinya, batasannya yang hanya satu tingkat, konsekuensi berbahaya bila `supervised_by` GA dihapus tanpa mengangkat supervisor, dan status org chart yang belum ada.",
       "kata_kunci": [
         "struktur organisasi",
         "organization structure",
         "master_department",
         "departemen",
-        "posisi jabatan",
+        "posisi",
         "supervised_by",
-        "supervisor approval",
-        "position_items",
-        "RBAC",
+        "atasan langsung",
+        "supervisor_id",
+        "hierarki approval",
         "org chart"
       ]
     },
@@ -5329,19 +5325,20 @@
         "QA - Batch Record & Traceability",
         "QA - CPOB (GMP)"
       ],
-      "hash": "f5ea3a5e0edefe66c7e47edc5c1a14e232c9820e77c124942eff9b25065366ae",
-      "ukuran_kb": 13.9,
-      "ringkasan": "Menjawab: bagaimana dossier batch release 7 lembar (ceklis kelengkapan, kesiapan ruang, catatan pengolahan, pengemasan, pengujian, lembar keputusan) diisi secara digital di menu WMS, siapa mengisi bagian mana (admin RM untuk kolom Ditimbang, admin produksi untuk data proses, QC/RnD untuk hasil uji dan checklist QA), dan bagaimana alur status DRAFT, DIAJUKAN, LULUS, atau DITOLAK dijaga di server. Juga menjawab cara kerja paraf digital berjenjang per jabatan yang mengunci persetujuan PJ Teknis sampai semua slot terisi, cara rekonsiliasi penimbangan dihitung, dan apa bedanya dengan menu terpisah Rekonsiliasi MO.",
+      "hash": "83d9150dd6b5154280f2d2dd5f7a3a558302f65a63e51f188e23bb73c4fd7106",
+      "ukuran_kb": 14.0,
+      "ringkasan": "Menjawab: bagaimana dokumen batch release produksi (form manual 7 lembar Ceklis Kelengkapan Dokumen Produksi) didigitalkan jadi menu WMS, isi tiap lembarnya apa saja, dan siapa mengisi bagian mana (admin RM, admin produksi, QC/RnD, PPIC/SPV). Menjelaskan workflow status DRAFT sampai LULUS atau DITOLAK, mode pengecekan QC yang mengunci field milik QC dari form admin, paraf berbasis jabatan lewat roster, paraf digital berjenjang yang mengunci persetujuan PJ Teknis sampai semua slot terisi, serta cara rekonsiliasi penimbangan dihitung. Juga menjawab mengapa kebutuhan pencocokan pemakaian bahan dengan MO dipisah ke menu Rekonsiliasi MO dan mengapa fitur ini sengaja tidak menyentuh stok atau Accurate.",
       "kata_kunci": [
-        "batch record",
         "dokumen produksi batch",
+        "batch record",
         "batch release",
+        "WMS",
+        "QC",
         "paraf digital",
-        "QC approval",
-        "penimbangan",
         "rekonsiliasi MO",
-        "WMS manufacture",
-        "cetak dossier"
+        "penimbangan",
+        "manufacture",
+        "approval produksi"
       ]
     },
     {

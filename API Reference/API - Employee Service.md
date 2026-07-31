@@ -57,6 +57,8 @@
 | Method | Path | Fungsi | RBAC |
 |---|---|---|---|
 | GET/POST | `/kpi` · `/kpi/dashboard` · `/kpi/templates` | KPI score + template. `GET /kpi` filter `?department=` (boleh **beberapa dipisah koma** → semua harus berhak), `?period=YYYY-MM`, `?status=`. Departemen yang satu tim otomatis digabung dari master data; `?merge=` + `?merge_label=` untuk penggabungan ad-hoc (detail: [[HRIS - Key Performance Index]]) | KPIDepartmentRBAC / HRIS |
+| GET | `/kpi?scope=team` | KPI **bawahan langsung** pemanggil (Leader). Gerbangnya **keberadaan bawahan aktif**, bukan role — Leader ber-role `staff` selalu ditolak KPIDepartmentRBAC. Filter `?department=` diabaikan: cakupannya orang. Tanpa bawahan aktif → 403 | Punya bawahan |
+| GET/PUT | `/supervisor-assignment` | Baca & tetapkan **atasan langsung** per departemen (alat isi-massal). PUT semua-atau-tidak: satu baris tak sah membatalkan seluruh permintaan + daftar masalahnya | HRIS/IT staff |
 | GET/POST | `/vacation` · `/vacation/quota` · `/vacation/decrement` | Kuota & pemakaian cuti | HRIS (decrement: open) |
 | GET/PATCH | `/contract` · `/bpjs` · `/analysis` | Kontrak (filter `department`/`employment_type`/`status`/`ending_month`=`YYYY-MM` berdasar `contract_ending`), BPJS, analisis | HRIS |
 | GET | `/internal/aggregate/employee/:id` · `/v2/internal/aggregate/employees[/summary|/it]` · `/internal/export/all` | Aggregate & export | HRIS / IT |
@@ -67,6 +69,7 @@
 |---|---|---|
 | GET | `/list` · `/view` · `/personal` · `/work` · `/schedule` · `/system` | Daftar & view tab |
 | GET/POST | `/me/` · `/me/kpi-score` · `/me/vacation` · `/me/payroll-approx` · `/me/photo` | Profil sendiri (header) |
+| GET | `/me/subordinates` | Bawahan **langsung** yang akunnya aktif. Dipakai FE untuk menentukan menu KPI di Portal Saya tampil, dan mengisi halamannya |
 | POST | `/upload` · `/upload/multiple` | Upload file |
 
 > ~90 endpoint. Daftar lengkap path per `:doc_type`/method ada di `services/employee/main.go`.
