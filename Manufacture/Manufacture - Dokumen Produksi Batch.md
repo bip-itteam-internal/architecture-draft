@@ -65,6 +65,10 @@ Mengikuti urutan & format dokumen manual:
 ### Daftar & filter
 - Filter status berbentuk **tab** (Semua/Draft/Diajukan/Lulus/Ditolak + hitungan) + **filter bulan-tahun** (default bulan berjalan) + pencarian. Kolom: No. Dossier · Produk · No. Batch · Tgl · **Mengajukan** · **Menyetujui** · Status. Untuk akun QC-only: default tab **Diajukan** & baris DRAFT disembunyikan.
 
+### Rantai No. Batch: MO → Dokumen Produksi → Laporan Produksi
+- **No. Batch dossier** = **dropdown** dari No. Batch [[Manufacture - Order Production Workflow (Flow Source)|Material Order]] (`no_batch_reference`) yang **belum dipakai** dossier mana pun (+ no_batch dossier yang sedang dibuka). Jadi tiap MO hanya bisa dijadikan satu dokumen produksi.
+- **No. Batch Laporan Produksi** = **dropdown** dari dokumen produksi ber-status **LULUS** yang **belum dibuat laporannya** (+ no_batch laporan yang sedang diedit). Filter client-side (diff daftar MO/dossier/production-log).
+
 ### Tautan silang ke Laporan Produksi
 - Dicocokkan berdasarkan **`no_batch`** yang sama: dari dossier, **No. Batch** menjadi link ke [[Manufacture - Order Production Workflow (Flow Source)|Laporan Produksi]] (`/manufacture/production?batch=<no_batch>`), dan sebaliknya baris Laporan Produksi menampilkan link **"Dokumen Batch"**. Menu tujuan otomatis ter-prefilter. (Klien mem-fetch set `no_batch` menu lawan; link muncul hanya bila ada padanan. Link ke Laporan Produksi disembunyikan untuk QC-only yang tak punya akses menu itu.)
 
