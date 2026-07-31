@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-07-30",
+  "digenerate": "2026-07-31",
   "jumlah_dokumen": 245,
   "dokumen": [
     {
@@ -955,24 +955,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "e9846aff6a5d6ab168035b8f9c3d49b4ea1bebf4418df92871853687b3a09871",
-      "ukuran_kb": 49.6,
-      "ringkasan": "Menjawab: apa saja modul dan halaman yang ada di portal web internal ERP/HRIS Bharata (hris-dashboard \"One Bharata\"), stack teknologinya apa, dan bagaimana login serta refresh token bekerja. Menjelaskan juga bagaimana menu dan tombol disaring per role/posisi (system_roles, matriks akses WMS, pengecualian Finance read-only Gudang FG, akun integration-only), bagaimana web ini bertindak sebagai SSO Identity Provider untuk aplikasi lain, dan bagaimana dukungan multi-perusahaan (company switcher, kelola perusahaan/departemen/shift/network per-perusahaan) diterapkan di frontend. Berguna untuk menelusuri di mana suatu fitur HRIS, recruitment, payroll, manufacture, atau integration berada di erp-frontend beserta batasan gating-nya.",
+      "hash": "a967ae869943dd3ea115fafe144598408aad25caaf569122b12e344cab7db6c5",
+      "ukuran_kb": 51.1,
+      "ringkasan": "Menjawab: apa itu portal web internal One Bharata (erp-frontend), stack dan modul apa saja yang tersedia (HRIS, attendance, payroll, finance/insentif, integration marketplace, manufacture/WMS, IT, GA), serta bagaimana login dan SSO Identity Provider bekerja. Menjelaskan aturan role gating sidebar dari cookie system_roles, pengelompokan menu bersarang, matriks akses menu WMS per posisi (termasuk pengecualian Finance read-only ke Gudang FG) dan akun integration-only lewat allowlist env. Juga sumber jawaban soal dukungan multi-perusahaan di frontend: CompanySwitcher, kelola perusahaan/departemen/shift/network per-perusahaan, dan prefix Employee ID.",
       "kata_kunci": [
         "erp-frontend",
-        "hris-dashboard",
         "One Bharata",
         "web ERP",
-        "frontend",
         "Next.js",
-        "SSO identity provider",
+        "SSO",
         "system_roles",
         "role gating",
         "sidebar menu",
         "multi-perusahaan",
-        "company switcher",
-        "i18n dua bahasa",
-        "matriks akses WMS"
+        "CompanySwitcher"
       ]
     },
     {
@@ -1600,25 +1596,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "ab47f06946aeafbbb3154eeb3d1209c864e0024427e6ba5674e9e21e7c253046",
-      "ukuran_kb": 184.3,
-      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) sekaligus bridge akuntansi ke Accurate, dan fitur apa yang ada per area (webhook, kredensial, holiday, ads report, GMV Max, transaksi terpadu, profit, ulasan, fulfillment bridge, worker cron). Juga menjawab gotcha nyatanya seperti verifikasi signature webhook Shopee yang sementara di-bypass, perhitungan ROI/ROAS GMV Max yang pernah salah, jalur Desty yang soft-disabled, dan bagian Meta Ads yang masih konsep tanpa kode.",
+      "hash": "d0cc51229acff3499de317e9cee35d887db4d7d864e6afabb4fa22ef92dfbdf3",
+      "ukuran_kb": 185.3,
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada), jalur webhook direct mana yang dipakai untuk order masuk, dan bagaimana order/laporan iklan dinormalkan ke model transaction terpadu sebelum di-bridge ke Accurate Online (invoice, ringkasan harian, push Sales Invoice/Sales Return). Menjelaskan endpoint per modul (webhooks, credentials, holidays, TikTok Ads/GMV Max, Shopee, transactions, Accurate, fulfillment WMS bridge, workers/cron) beserta rumus metrik iklan seperti ROAS, ROI, GMV winner, dan ICC video metrics yang dipakai perhitungan insentif. Juga tempat mencari catatan gotcha: verifikasi signature webhook Shopee yang di-bypass, jalur Desty yang soft-disabled, fix rate limit cron master data, dan status Meta Ads yang masih konsep tanpa kode.",
       "kata_kunci": [
         "integration service",
         "marketplace",
         "TikTok Shop",
-        "TikTok Business",
         "Shopee",
-        "Lazada",
-        "Accurate",
         "webhook",
+        "Accurate Online",
+        "Sales Invoice",
         "GMV Max",
         "ROAS",
-        "ROI",
-        "ICC",
-        "Desty",
-        "Meta Ads",
-        "worker cron"
+        "Meta Ads"
       ]
     },
     {
@@ -2667,27 +2658,26 @@
         "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
         "Microservices - Integration Service",
+        "ADR - 0002 Database-per-Service",
         "APP - Web ERP",
         "API - Manufacture Service",
         "Manufacture - Stock & Material Management",
-        "ADR - 0002 Database-per-Service",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "b87984b59492dc17450dac478ae3907a428256a3dff7c657b78b3bdbb5e617dd",
-      "ukuran_kb": 16.5,
-      "ringkasan": "Menjawab kenapa log tiap menu WMS (Return Ekspedisi, Keluar FG, Inbound RM, Input Gudang FG, Kirim FG) dipecah jadi tab SUMBER vs INPUT WMS, kapan badge status \"sudah/belum dicatat\" ditampilkan, kenapa tab Keluar FG diagregasi per SKU (bukan per resi), dan status resi mana (COMPLETED/SHIPPED) yang dihitung sebagai barang keluar gudang. Juga menjelaskan kenapa nama penginput (`created_by_name`) distempel server dari header gateway, bukan dikirim client, dan jalur mana saja yang sudah ikut distempel.",
+      "hash": "0921c360e8d88f0b84202baad78e88c91dbea1ab5b1c6c5213048440484e2e6c",
+      "ukuran_kb": 18.5,
+      "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi dua sub-tab SUMBER (retur marketplace, resi, PO procurement, Surat Jalan produksi) dan INPUT WMS (transaksi hasil input gudang), serta menu mana saja yang kena pemecahan itu. Menjelaskan alasan badge status sudah/belum dicatat hanya dipasang di tab yang punya kunci join, kenapa tab sumber Keluar FG diagregasi per SKU dengan bundle dipecah ke komponen, dan kenapa hanya resi berstatus COMPLETED plus SHIPPED yang dihitung keluar gudang sementara TO_SHIP dikecualikan. Juga menjawab bagaimana jejak penginput dijamin: field created_by_name distempel server dari header BIP-Username dan selalu menimpa nilai kiriman client, bukan dikirim frontend dari cookie.",
       "kata_kunci": [
         "ADR 0025",
+        "WMS",
         "log sumber",
-        "input WMS",
+        "input gudang",
         "created_by_name",
-        "stempel penginput",
-        "Keluar FG",
-        "Return Ekspedisi",
-        "resi",
         "audit trail",
-        "badge status",
-        "saldo awal"
+        "Keluar FG",
+        "Inbound RM",
+        "Master Resi",
+        "retur marketplace"
       ]
     },
     {
