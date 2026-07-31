@@ -83,19 +83,19 @@
         "HRIS - Key Performance Index",
         "HRIS - Payroll"
       ],
-      "hash": "0cc4870fe7c4bd731285bec92459cf136acedca8c446880e95c70beb33bbf7a0",
-      "ukuran_kb": 6.9,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service (HRIS inti) di balik gateway `/api/employee/*`, dan middleware RBAC apa yang menjaga tiap kelompoknya. Bisa dipakai untuk mencari path login/refresh/PIN, CRUD personal & work data, dokumen pribadi/kerja, jadwal kerja, kelola akun dan perangkat, master departemen & system role, Training Program, KPI, cuti, kontrak, BPJS, endpoint aggregate/export internal, serta endpoint `/me/*` untuk profil sendiri. Juga menjawab detail perilaku parameter seperti `?grouped=true` pada data-type department, filter `?department=` multi-nilai pada KPI, `scope=team` untuk Leader, dan mengapa `PUT /master/departments` mempertahankan `supervised_by`/`supervision_label`.",
+      "hash": "ea57a49155b986af2ace7cbf88c81f370f7c018b810ec8b81e4dfca87e77e5d3",
+      "ukuran_kb": 8.0,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik gateway `/api/employee/*`, mulai dari login/refresh token, CRUD personal & work data, dokumen karyawan, jadwal kerja, master departemen & system role, training program, KPI, kuota cuti, kontrak/BPJS, sampai endpoint `/me` untuk profil sendiri. Menjelaskan juga siapa yang boleh memanggil tiap grup endpoint (RequireHRISStaff, RequireITStaff, RequireITSupervisor, RequireHRISOrITSupervisor, KPIDepartmentRBAC) serta perilaku khusus seperti filter `?department=` multi-nilai, `?scope=team` untuk KPI bawahan langsung, `?grouped=true` pada data-type department, dan `menu-hidden` yang bersifat tampilan bukan hak akses. Berguna saat mencari path/method yang tepat untuk integrasi FE atau service lain, termasuk endpoint internal aggregate/export dan bulk create/update employee.",
       "kata_kunci": [
-        "employee service",
-        "endpoint",
-        "API HRIS",
+        "employee-service",
+        "API employee",
+        "endpoint HRIS",
         "auth login",
         "personal data",
         "work data",
-        "master department",
+        "master departemen",
         "system roles",
-        "KPI endpoint",
+        "KPI",
         "training program"
       ]
     },
@@ -929,6 +929,7 @@
       "tautan": [
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "CORE - RBAC dan Permission Set",
         "HRIS - Key Performance Index",
         "HRIS - Organization Structure",
         "Microservices - Manufacture Service",
@@ -957,20 +958,21 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "d80b3c0967592770ff54591f7fe1863f326c7e169605678ad2fbe82ffb528b4f",
-      "ukuran_kb": 51.8,
-      "ringkasan": "Menjawab: apa itu portal web ERP internal `hris-dashboard` (One Bharata), stack dan repo mana yang dipakai, serta modul/fitur apa saja yang sudah jalan di frontend. Menjelaskan cara kerja login dan token, peran web ini sebagai SSO Identity Provider, dan bagaimana menu disaring berdasarkan `system_roles`, permission, matriks posisi WMS, sampai akun integration-only lewat allowlist env. Juga menjawab bagaimana dukungan multi-perusahaan tampil di UI (company switcher, kelola perusahaan/departemen/shift/network per perusahaan) dan bagaimana sub-menu HRIS dikelompokkan.",
+      "hash": "38e36aa704fbeb914490df92956abdc645bffa277d6c5f7ebfc99230a84dfde2",
+      "ukuran_kb": 53.7,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal `hris-dashboard` (\"One Bharata\"), teknologi apa yang dipakainya (Next.js 16, React 19, shadcn/Radix, Tailwind v4, TanStack Query, react-i18next), dan bagaimana login, refresh token, serta perannya sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager. Menjelaskan cara menu dan akses ditentukan: cookie `system_roles` (module ke role), role gating sidebar, pengelompokan menu induk bersarang, perataan induk menu tipis, pengaturan Tampilan Menu per posisi, serta matriks akses menu WMS `/manufacture/*` per jabatan. Juga menjawab bagaimana dukungan multi-perusahaan bekerja di FE (CompanySwitcher, kelola perusahaan, departemen, shift/rotasi, network WiFi, artikel lintas-perusahaan).",
       "kata_kunci": [
-        "web ERP",
+        "erp-frontend",
         "hris-dashboard",
         "One Bharata",
-        "frontend",
-        "erp-frontend",
+        "web ERP",
         "Next.js",
-        "SSO",
         "sidebar menu",
-        "role gating",
-        "multi-perusahaan"
+        "system_roles",
+        "SSO",
+        "multi-perusahaan",
+        "CompanySwitcher",
+        "akses WMS"
       ]
     },
     {
@@ -1207,7 +1209,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket** serta **payroll**. **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul lain masih bertumpu pada `system_roles` tier.",
+      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, serta **monitoring**. **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul lain masih bertumpu pada `system_roles` tier.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -1234,22 +1236,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "d1672f8982baea452fff981df9007886a74019f16c19109a1c239134546fbe80",
-      "ukuran_kb": 14.1,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp disusun dari tiga sumbu (modul, tingkat view/work/approve/manage, dan reach own/division/all), bagaimana paket permission-set menempel di posisi, dan bagaimana izin efektif dihitung saat login lalu dibawa di klaim JWT. Juga menjawab endpoint master apa yang mengelola katalog, paket, dan assignment; modul mana yang penegakannya sudah aktif (ticket, payroll) versus baru berkatalog (finance); serta hak self-service mana yang tidak butuh permission.",
+      "hash": "e2a3ba6c2c7b0757459708ec1959aa547453e07a28e446c88fb196fd26f17257",
+      "ukuran_kb": 16.7,
+      "ringkasan": "Menjawab: bagaimana hak akses di seluruh bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi view/work/approve/manage, dan cakupan data own/division/all), bagaimana permission granular dirakit jadi paket bernama (permission set) yang menempel pada posisi/jabatan, dan bagaimana izin efektif diresolusi saat login lalu dibawa di klaim JWT sampai ditegakkan `RequirePermission` di service. Menjelaskan katalog per modul, endpoint master permission-set/catalog/modules/exceptions, gerbang penulisannya, kill-switch `TICKET_PERMISSION_ENFORCEMENT`, aturan pencocokan nama posisi (KanonPosisi/PosisiCocok), dan alasan backfill paket per-akun dicabut. Juga menjawab beda `permission_sets` (hak akses, ditegakkan backend) dengan `menu_hidden` (tampilan sidebar, hanya mengurangi, tidak pernah menambah akses).",
       "kata_kunci": [
         "RBAC",
         "permission set",
         "hak akses",
+        "izin per posisi",
         "reach",
-        "view work approve manage",
-        "posisi",
-        "position",
         "system_roles",
-        "katalog permission",
-        "klaim JWT",
-        "kill switch",
-        "Siapa Boleh Apa"
+        "JWT permissions",
+        "menu_hidden",
+        "master_permission_set",
+        "katalog permission"
       ]
     },
     {

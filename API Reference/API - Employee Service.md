@@ -37,6 +37,7 @@
 | GET | `/master/departments[/:key]` · `/master/system-roles` | List/detail master | open (di belakang gateway) |
 | POST/PUT/DELETE | `/master/departments[/:key]` | CRUD departemen (key, name, positions, roles, **supervised_by**, **supervision_label**). ⚠️ `PUT` memakai `ReplaceOne`; dua field terakhir **dipertahankan** bila tak disebut di body, supaya pemanggil yang hanya mengirim sebagian field tak memutus relasi supervisi. Kirim eksplisit (boleh string kosong) untuk melepasnya — itu yang dilakukan form `/hris/master-data` | `RequireHRISOrITSupervisor` (supervisor/admin HRIS **atau** IT) |
 | POST/PUT/DELETE | `/master/system-roles[/:key]` | CRUD definisi system role | `RequireITSupervisor` (supervisor/admin IT) |
+| PUT | `/master/departments/:key/positions/:positionKey/menu-hidden` | Url menu yang **disembunyikan** dari sidebar bagi pemegang jabatan itu. **Setelan tampilan, BUKAN hak akses**: hanya mengurangi yang sudah boleh dilihat, tak pernah menambah, dan rutenya tetap terbuka lewat URL. Menyentuh satu posisi saja. Daftar kosong = tak menyembunyikan apa pun (aksi sah). Entri tanpa `/` di awal dibuang karena tak akan pernah cocok dengan menu mana pun | `RequireHRISOrITSupervisor` — sengaja lebih longgar daripada `permission-sets` karena tak bisa menaikkan hak siapa pun |
 
 > Konsumen FE: halaman `/hris/master-data` (di-link dari **menu IT**) & System Setup Personalia; tombol kelola disembunyikan bila role tak berhak.
 
@@ -70,6 +71,7 @@
 | GET | `/list` · `/view` · `/personal` · `/work` · `/schedule` · `/system` | Daftar & view tab |
 | GET/POST | `/me/` · `/me/kpi-score` · `/me/vacation` · `/me/payroll-approx` · `/me/photo` | Profil sendiri (header) |
 | GET | `/me/subordinates` | Bawahan **langsung** yang akunnya aktif. Dipakai FE untuk menentukan menu KPI di Portal Saya tampil, dan mengisi halamannya |
+| GET | `/me/menu-hidden` | Url menu yang disembunyikan bagi posisi pemanggil. Departemen & posisi **diselesaikan di server** dari `work_data`, bukan diterima sebagai query: FE hanya menyimpan NAMA posisi di cookie, dan nama jabatan tidak unik lintas departemen ("GA Staff" dipakai dua peran). Pencocokan departemen **case-insensitive**, sama seperti kode pemetaan departemen lain. Kegagalan membalas daftar kosong (200), bukan error: sidebar yang gagal memuat setelan harus menampilkan menu apa adanya |
 | POST | `/upload` · `/upload/multiple` | Upload file |
 
 > ~90 endpoint. Daftar lengkap path per `:doc_type`/method ada di `services/employee/main.go`.
