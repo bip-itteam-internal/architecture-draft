@@ -21,6 +21,11 @@
 - **Scoring per-karyawan+periode** (`YYYY-MM`): submit `template_id` + `values{label→0..100}`. Template di-**snapshot** ke `kpi_score` (skor lampau beku — edit master template tidak retroaktif); final = Σ(weight×value).
 - **Aturan kunci — posisi template WAJIB = posisi karyawan**: submit ditolak `400 "template position … does not match employee position …"` bila `template.position != workData.position`. FE (modal Score KPI) menyaring dropdown template ke posisi karyawan agar tak salah pilih (bila belum ada template untuk posisi tsb → diarahkan membuat dulu).
 - **RBAC per departemen** (`RequireKPIDepartmentRBAC`). `department` boleh berisi **beberapa departemen dipisah koma** — dalam hal itu **SEMUA** harus terjangkau role pemanggil; satu saja tak berhak berarti ditolak, agar tampilan gabungan tak membocorkan departemen yang bukan haknya. Role `hris` tetap lolos untuk departemen mana pun.
+- **Cakupan TIM untuk Leader** (`GET /kpi?scope=team`, branch `feat/atasan-langsung-kpi-leader` + `feat/kpi-leader-portal`, **belum merge**): menyaring ke **bawahan langsung** pemanggil (`work_data.supervisor_id`), bukan ke departemen. Menu KPI di Portal Saya yang dulu khusus supervisor kini juga terbuka bagi mereka.
+	- **Gerbangnya keberadaan bawahan, BUKAN role, nama jabatan, maupun jenjang.** Leader ber-role `staff` sehingga selalu ditolak `RequireKPIDepartmentRBAC`; sementara pola judul `Supervisor|^Leader$` tak cocok untuk "Leader Production", "AR Leader", atau "QA Leader" yang benar-benar ada di data, dan jenjang jabatan belum tercatat di mana pun. Konsekuensi yang disengaja: begitu bawahan seseorang dipindahkan, menunya ikut hilang.
+	- Cabang gerbangnya **dipisah**, bukan menambal `RequireKPIDepartmentRBAC` — gerbang itu meloloskan seluruh staf `hris` untuk departemen mana pun, dan pelebaran itu tak boleh terbawa ke jalur baru. Tanpa bawahan **aktif**, `scope=team` ditolak 403 supaya tak jadi pintu belakang.
+	- **Supervisor menang** bila seseorang kebetulan keduanya: ia tetap melihat seluruh departemennya, termasuk orang yang sudah punya Leader.
+	- Penyaringan keaktifan memakai `system_authentication.is_active`, sama seperti pipeline, supaya gerbang dan isi halaman sepakat.
 - **Tampilan gabungan lintas departemen**: departemen yang **satu tim** ditampilkan sebagai satu kelompok berlabel pendek (saat ini **HRGA** = Human Resource + General Affair), departemen lain tetap terpisah. Sumbernya **master data** `master_department.supervised_by` + `supervision_label` — bukan konfigurasi frontend, bukan hardcode (lihat [[HRIS - Organization Structure]]).
 	- **Berlaku untuk SIAPA PUN yang berhak melihat kedua departemen**, bukan hanya supervisornya. Penggabungan adalah sifat organisasi, bukan sifat penontonnya: staf HR (`hris:staff`) melihat HRGA menyatu sama seperti SPV-nya. Staf GA tak terpengaruh karena tanpa role `hris` mereka tak sampai ke menu HRIS.
 	- **Data karyawan tidak diubah**: `work_data.department` tiap orang tetap di departemen masing-masing. Yang disatukan hanya tampilannya, sehingga pemisahan kembali **tanpa migrasi data** dan tanpa deploy — cukup ubah master data.
@@ -31,6 +36,7 @@
 - **Bentuk respons**: satu departemen (atau beberapa yang seluruhnya digabung) → `{department, summary, members}`; selain itu → `{summary, departments[]}`.
 - **Dashboard/analitik**: agregasi per departemen (rata-rata, coverage) + daftar *need training* (<60) & *top performer* (≥80).
 - **Belum**: penegakan siklus bulanan & workflow review supervisor→HR (lihat konsep di bawah) = **TBD**.
+- **Pengisian nilai 100% manual**: `ApplyKPIValues` hanya menerima map `label → 0..100` dari body request; tidak ada jalur auto-fill dari service lain. Analisis kelayakan otomasi per metrik (data production 2026-07-31: 70 template, 311 metrik, 73 metrik sumber datanya sudah siap) ada di [[HRIS - Otomasi Skor KPI]].
 
 ## Konsep — appraisal bulanan menyeluruh (sebagian sudah — lihat bagian di atas)
 
@@ -64,6 +70,7 @@ Kami menginginkan cara yang mudah untuk mengisi catatan dan kalkulasi otomatis u
 ## Dokumen Terkait
 
 - **Implementasi**: [[Microservices - Insentive Service]] (engine KPI→insentif marketing) · [[Finance - Incentive]] · [[Sales - Incentive]]
+- [[HRIS - Otomasi Skor KPI]] — analisis kelayakan mengisi skor otomatis dari data ERP (peta 311 metrik ke sumber datanya, modul yang ada tapi datanya kosong, dan rencana bertahap)
 - [[HRIS - Work Review]] — penilaian kualitatif (KPI = sisi kuantitatif); pertimbangkan **berbagi satu Review Cycle** ketimbang sistem terpisah
 - [[HRIS - Career & Promotion]] — masukan keputusan promosi
 - [[HRIS - Analysis]] · [[HRIS - Big Pictures]] · [[HRIS - Interrelationship Matrices]]

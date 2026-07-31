@@ -53,6 +53,14 @@ Keputusan turunan:
 - **Pola izin belum seragam.** Katalog `payroll` mengikuti tangga tingkat (dengan satu pengecualian `payroll.salary.write`), sementara `finance` yang menyusul memakai izin **per-objek** (`finance.ar.view`, `finance.kastoko.view`, dst). Belum diputuskan mana yang jadi acuan; lihat catatan penyimpangan di [[CORE - RBAC dan Permission Set]].
 - **"Rute telanjang" ternyata lebih terbuka dari yang dicatat ADR ini.** Audit lanjutan menemukan prefix `/internal/` **bukan** batas keamanan (gateway meneruskan seluruh sub-path dan mengisi sendiri gateway key), sehingga sebagian rute tanpa middleware bisa dipanggil dari internet oleh siapa pun yang bisa login, termasuk satu rute yang menulis `system_roles` apa pun. Dua lubang ditambal dan ter-deploy hari yang sama. Ini menguatkan poin "katalog tanpa gerbang BE adalah dekorasi" di atas: urutan yang benar adalah gerbangi endpoint dulu, baru nyalakan penyaringan FE. Detail keputusan di [[ADR - 0031 Prefix internal Bukan Batas Keamanan]], bukti dan forensiknya di [[LOG - 2026-07-30 Audit Otorisasi Employee Service]].
 
+**KPI cakupan tim — gerbang RELASI, bukan izin (2026-07-31, branch `feat/atasan-langsung-kpi-leader`, belum merge):**
+
+`GET /kpi?scope=team` menggerbang aksesnya dari **keberadaan bawahan langsung** (`work_data.supervisor_id`), bukan dari izin `kpi.view.team` sebagaimana dikehendaki ADR ini. Sebabnya modul `kpi` termasuk 15 modul di §Decision tapi **belum punya katalog izin**, dan membuat katalognya berarti menyeret pekerjaan itu ke dalam task yang seharusnya kecil.
+
+Perlu dicatat bahwa ini **bukan** pengecualian berbasis nama posisi seperti empat titik sebelumnya. Justru sebaliknya: pendekatan berbasis nama jabatan sengaja **ditolak** karena pola `Supervisor|^Leader$` tak cocok untuk "Leader Production", "AR Leader", maupun "QA Leader" yang benar-benar ada di data. Gerbang berbasis relasi lebih dekat ke semangat ADR ini ketimbang cocok-cocokan nama, dan otomatis benar saat jabatan di-rename.
+
+Penekan kerugiannya: pemeriksaannya satu fungsi terpusat (`bawahanAktif`), jadi saat katalog `kpi` dibuat nanti cukup fungsi itu yang diganti pemanggilnya.
+
 **Titik pengecualian posisi KELIMA — Dashboard HRIS per posisi (2026-07-30, branch `feat/dashboard-hris-per-posisi`, belum merge):**
 
 Berlawanan arah dengan ADR ini, dan disepakati sadar oleh pemilik keputusan setelah keterbatasannya disampaikan. Isi `/hris/dashboard` dipilih dari **nama posisi**, bukan `position_key` maupun paket izin, karena dua prasyarat belum ada: `position_key` belum diteruskan ke frontend (yang sampai ke sana hanya cookie `position` berisi nama tampilan), dan modul `hris`/`recruitment`/`kpi` belum punya katalog izin sehingga `bolehMenu` sengaja mengembalikan `true`.
