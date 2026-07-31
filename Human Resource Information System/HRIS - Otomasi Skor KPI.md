@@ -173,7 +173,7 @@ Field `attribution_note` pada `mart_profit_attribution` di production menyatakan
 ## Belum Diimplementasikan / Catatan
 
 - Tidak ada satu pun metrik yang terisi otomatis hari ini. Seluruh bab Rencana Bertahap berstatus TBD.
-- **`marketing-analytics-service` belum terdokumentasi di vault.** Service ini berjalan di production (container `marketing-analytics-service`, database `marketing_analytics_db`, koleksi `mart_profit_attribution` 405.543 dokumen, `mart_video_performance` 87.813, `mart_ad_creative_link` 7.814) dan menyediakan `GET /profit/{shops,products,campaigns,ads}`, `/videos`, `/lives`, `/affiliate`, `/cohort`, `/audience`, `/returns/breakdown`, `/matrix/sku-shop`, `/price-floor`. Perlu dok `Microservices - Marketing Analytics Service` tersendiri. Konteks bisnisnya ada di [[Sales - Marketing Dashboard (Master Roadmap)]].
+- Sumber ROI/ROAS otomatis berasal dari [[Microservices - Marketing Analytics Service]] (didokumentasikan 2026-07-31, sebelumnya service ini berjalan di production tanpa dok). Perlu diperhatikan: `/lives`, `/cohort`, dan `/price-floor` masih membalas kosong karena koleksinya belum terisi, dan `/matrix/sku-shop` masih stub. Konteks bisnisnya di [[Sales - Marketing Dashboard (Master Roadmap)]].
 - Angka sensus adalah snapshot 2026-07-31 dan akan bergeser. Cara memperbarui daftar template per posisi tanpa menebak: baca koleksi `kpi_template` pada database `employee_db`, urutkan berdasarkan `department` lalu `position`. Kredensial Mongo diambil dari environment container, jangan ditulis di dokumen.
 
 ## Dependensi & Integrasi
