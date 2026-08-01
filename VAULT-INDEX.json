@@ -4347,19 +4347,19 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "47c288fac927391f393209f0b6821ab52f99c986782084f50f65827d84c8c71e",
-      "ukuran_kb": 125.9,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang di production, per departemen dan per jabatan, lengkap dengan bobot tiap metrik dan target/keterangannya seperti tersimpan di kpi_template. Menjawab juga metrik mana yang sumber datanya sudah ada di sistem ERP beserta rekomendasi tindak lanjutnya dalam bahasa non-teknis, kenapa label metrik disalin apa adanya (termasuk typo dan spasi berlebih) karena label adalah kunci identitas metrik di kode, dan cacat data apa saja yang sudah diketahui seperti template uji, metrik duplikat, serta label berisi target korporat. Berguna saat mencari daftar KPI satu posisi, menghitung rekap metrik per departemen, atau menyegarkan dokumen ini dari database.",
+      "hash": "ebcd61b8c6c9250912818fc22fb845ddf5fde3145f14cdc3f8ed5fcffabca4cd",
+      "ukuran_kb": 126.8,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang dipakai menilai tiap posisi di setiap departemen, berapa bobot masing-masing, dan target apa yang tertulis di deskripsinya. Menjawab juga metrik mana yang sumber datanya sudah ada di ERP dan apa rekomendasi tindak lanjutnya per metrik, termasuk cacat data template yang sudah diketahui (template uji ikut produksi, metrik duplikat, label memakai target korporat). Berguna untuk mencari isi persis koleksi kpi_template di production dan cara menyegarkan salinannya.",
       "kata_kunci": [
         "KPI",
-        "kpi_template",
         "matriks KPI",
+        "kpi_template",
         "bobot metrik",
         "target KPI",
-        "penilaian kinerja",
+        "penilaian karyawan",
         "performance appraisal",
         "departemen",
-        "jabatan",
+        "posisi",
         "employee_db"
       ]
     },
@@ -4435,6 +4435,7 @@
         "HRIS - Career & Promotion",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "RUN - Menambah Metrik KPI Otomatis",
+        "HRIS - Matriks KPI per Departemen",
         "Microservices - Task Management Service",
         "HRIS - Work Review",
         "Microservices - Marketing Analytics Service",
@@ -4451,20 +4452,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "26a543bfd2e741f47229bbdff87799be96d7b70e9518ff26970c04d184ba7920",
-      "ukuran_kb": 29.7,
-      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang skornya bisa diisi otomatis dari data yang sudah dimiliki ERP, mana yang modulnya ada tapi datanya masih kosong, dan mana yang memang tidak punya sumber data sama sekali, lengkap dengan rekap dan persentase per departemen. Memetakan tiap klaster metrik ke sumber datanya secara konkret (koleksi MongoDB, endpoint service internal, proxy Accurate) beserta volume produksinya, dan menjelaskan apa yang masih kurang untuk metrik semi-otomatis seperti definisi, target, atau mapping. Menjawab juga bagaimana model kpi_template / kpi_score bekerja, kenapa label metrik menjadi kunci pengikat setiap rencana auto-fill, dan urutan bertahap yang direncanakan untuk mengotomatiskan pengisian skor.",
+      "hash": "fff266e0d8f93a0ddc76fdb18a37771928d6dbcbd0b438cfba579f87af490aa7",
+      "ukuran_kb": 30.2,
+      "ringkasan": "Menjawab: bisakah skor KPI diisi otomatis dari data yang sudah dimiliki ERP alih-alih diketik supervisor, dan dari 311 metrik production mana yang sumber datanya sudah terisi, mana yang butuh definisi atau mapping tambahan, mana yang modulnya ada tapi datanya kosong, dan mana yang tidak punya sumber sama sekali. Menjawab juga koleksi atau endpoint mana yang memasok tiap klaster metrik (iklan TikTok, omzet, piutang Accurate, uptime monitoring, SLA dan CSAT tiket, kehadiran, procurement) beserta volume datanya. Memuat rekap persentase otomasi per departemen dan syarat teknis auto-fill seperti label metrik sebagai kunci identitas.",
       "kata_kunci": [
         "otomasi KPI",
         "KPI automation",
         "auto-fill skor",
         "kpi_score",
         "kpi_template",
-        "sumber data metrik",
-        "semi-otomatis",
+        "sumber data KPI",
         "employee service",
-        "skor kinerja",
-        "Tech Development"
+        "uptime_sistem",
+        "SLA CSAT",
+        "kelayakan otomatisasi"
       ]
     },
     {

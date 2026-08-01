@@ -824,9 +824,23 @@ Template `KPI Quality Supervisor`, 5 metrik.
 
 7 template, 30 metrik. Klasifikasi otomasi: **14 / 9 / 0 / 7**.
 
-> **Departemen pertama yang dikerjakan.** Per 1 Agustus 2026, **7 dari 30 metrik** sudah punya sumber terdaftar dan tinggal diisi konfigurasinya: lima metrik uptime lewat sumber `uptime_sistem` (`IT Infrastructure / System` 0,1 · `IT Infrastructure / Server` 0,1 · `IT Support / Network` 0,4 · `Leader / Revenue 240M` 0,2 · `Supervisor / Revenue 240M` 0,2) dan dua metrik KPI tim lewat sumber `skor_tim` (`Leader / Performance Monitoring Team` 0,4 · `Supervisor / Performance Monitoring Team` 0,3). Kodenya **sudah merge (PR #866) dan deploy ke produksi 1 Agustus 2026**, terverifikasi terhadap data sungguhan. Yang tersisa tinggal mengisi konfigurasi `auto` pada ketujuh metrik itu lewat `POST /kpi/templates`, tanpa perlu deploy. Lihat [[Microservices - Monitoring Service]].
+> **Departemen pertama yang dikerjakan.** Kodenya **sudah merge (PR #866) dan deploy ke produksi 1 Agustus 2026**, terverifikasi terhadap data sungguhan. Lihat [[Microservices - Monitoring Service]].
+>
+> **Belum satu pun metrik benar-benar otomatis.** Sensus `kpi_template` produksi 1 Agustus 2026: dari 70 template, **0 punya konfigurasi `auto`**, dan dari 406 dokumen `kpi_score`, **0 punya `auto_value`**. Mesin dan sumbernya siap; yang kurang konfigurasinya, diisi lewat `POST /kpi/templates` tanpa perlu deploy.
+>
+> **Tujuh metrik punya sumber terdaftar, tetapi hanya lima menyentuh orang.** Posisi `IT Infrastructure` **tidak punya karyawan sama sekali (0 orang)**, sehingga `System` 0,1 dan `Server` 0,1 menempel di template yang tak dipegang siapa pun. Yang nyata:
+>
+> | Posisi | Orang | Metrik siap | Sumber | Bobot |
+> |---|---:|---|---|---:|
+> | `IT Support` | 2 | `Network ` | `uptime_sistem` | 0,4 |
+> | `Tech Development Leader ` | 1 | `Revenue 240M` · `Performance Monitoring Team` | `uptime_sistem` · `skor_tim` | 0,6 |
+> | `Tech Development Supervisor` | 1 | `Revenue 240M` · `Performance Monitoring Team` | `uptime_sistem` · `skor_tim` | 0,5 |
+>
+> **Tujuh developer tidak tersentuh sama sekali.** 2 Backend, 1 Frontend, dan 4 Fullstack — mayoritas departemen — tidak punya satu pun metrik dengan sumber data di sistem. Metrik mereka (`Delivery`, `Quality`, `Support`, `Improvement`, `System Development`, `Kaizen`) semuanya belum terpetakan.
 >
 > Dua penghambat sisanya bukan pekerjaan kode: **CSAT** baru 8 tiket ter-rating seumur hidup, dan **SLA resolusi** tidak punya satu pun sampel karena `due_date` tiket tak pernah diisi. Keduanya butuh perubahan kebiasaan pakai, bukan fitur baru.
+>
+> **Awas spasi di ujung.** Nama posisi `"Tech Development Leader "` dan label `"IT Support / Network "` menyimpan spasi di belakang. `work_data` kebetulan menyimpan spasi yang sama sehingga pencocokan posisi jalan, tetapi jangan mengetik ulang nama itu dari layar — salin apa adanya.
 
 ### Backend Developer
 

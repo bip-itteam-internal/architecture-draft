@@ -247,6 +247,8 @@ Batas service dan kepemilikan datanya diputuskan di [[ADR - 0032 Kepemilikan kpi
 >
 > Alasannya dikerjakan duluan: ketujuhnya tidak menunggu siapa pun mengisi data. Uptime sudah terekam sendiri oleh Uptime Kuma, dan skor tim sudah ada di `kpi_score`. Bandingkan dengan ICC yang butuh tabel pemetaan diisi manual lebih dulu. Yang tersisa di Tech Development justru butuh orang mengubah kebiasaan — mengisi due date dan meminta rating tiap hari — dan itu bukan pekerjaan kode.
 >
+> **Tetapi hanya lima dari tujuh yang menyentuh orang.** Sensus 1 Agustus 2026: posisi `IT Infrastructure` **tidak punya karyawan sama sekali**, sehingga `System` 0,1 dan `Server` 0,1 menempel di template yang tak dipegang siapa pun. Yang tersisa mengenai **4 orang**: `IT Support` (2), `Tech Development Leader ` (1), `Tech Development Supervisor` (1). Sementara **7 developer** (2 Backend, 1 Frontend, 4 Fullstack) tidak tersentuh sama sekali. Rinciannya di [[HRIS - Matriks KPI per Departemen]].
+>
 > Temuan ikutan yang perlu ditangani tim IT terpisah dari KPI: **SLA resolusi tiket saat ini tidak terukur sama sekali.**
 
 **Fase 2, perlu development ringan**
