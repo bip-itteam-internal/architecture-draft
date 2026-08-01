@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-01",
-  "jumlah_dokumen": 250,
+  "jumlah_dokumen": 251,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -6240,6 +6240,42 @@
       ]
     },
     {
+      "path": "Runbooks/RUN - Menambah Metrik KPI Otomatis.md",
+      "judul": "RUN - Menambah Metrik KPI Otomatis",
+      "area": "Runbooks",
+      "jenis": "runbook",
+      "status_emoji": "⚠️",
+      "status_teks": "Mesinnya ada di branch `feat/kpi-mesin-formula` (**belum merge, belum deploy**). Prosedur di bawah sudah final terhadap kode itu, tetapi belum dapat dijalankan sampai branch tersebut masuk.",
+      "publik": true,
+      "tautan": [
+        "HRIS - Otomasi Skor KPI",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "HRIS - Key Performance Index",
+        "Microservices - Employee Service",
+        "Microservices - Integration Service",
+        "Microservices - Marketing Analytics Service",
+        "HRIS - Organization Structure"
+      ],
+      "hash": "d60f9af0d2054039128562229dc9bd0b199f80457e3b405ed499a77016867074",
+      "ukuran_kb": 9.2,
+      "ringkasan": "Menjawab: bagaimana dev departemen menambah satu metrik KPI yang terisi otomatis tanpa menyentuh aturan penilaian, lewat pendaftaran sumber di services/employee dan konfigurasi via POST /kpi/templates. Menjelaskan pemisahan tiga lapis (Sumber - Reduksi - Arah/Target), katalog formula reduksi (rata_rata, jumlah_unit, jumlah_nilai, rasio_ambang), beda ambang vs target, arah naik/turun, dan target per periode. Juga menjawab: jebakan apa yang sudah pernah menghasilkan angka salah tanpa error (salah arah, atribusi ke departemen keliru, pakai label sebagai kunci, cocokkan entitas lewat nama, abaikan batas perusahaan) dan apa isi checklist sebelum PR.",
+      "kata_kunci": [
+        "KPI",
+        "metrik otomatis",
+        "automated metric",
+        "kpi_score",
+        "skor KPI",
+        "formula reduksi",
+        "rasio_ambang",
+        "arah target",
+        "employee service",
+        "runbook"
+      ]
+    },
+    {
       "path": "Runbooks/RUN - Onboarding Developer Baru.md",
       "judul": "RUN - Onboarding Developer Baru",
       "area": "Runbooks",
@@ -6628,20 +6664,20 @@
         "ADR - 0009 Affiliate via Search Seller Affiliate Orders API",
         "Sales - Incentive"
       ],
-      "hash": "0752a60eee0ccbeeaee09994608c3ccac04786c5e88cd1967417d0198ff97288",
-      "ukuran_kb": 13.7,
-      "ringkasan": "Menjawab rancangan mapping karyawan ICC ke akun TikTok Shop (toko) dan TikTok Ads (advertiser) yang mereka kelola sebagai Account Manager, termasuk model data icc_account_mappings, flow assign/rotasi oleh SPV, dashboard performa staff/tim, dan aturan RBAC per role.",
+      "hash": "f02f74fef5a3096e72a58f55b7582924f3e43388fa84a92060955e5b178019ec",
+      "ukuran_kb": 16.6,
+      "ringkasan": "Menjawab: bagaimana karyawan ICC (Internal Content Creator) dipetakan ke akun TikTok Shop dan TikTok Ads yang mereka kelola, termasuk model data koleksi icc_account_mappings, aturan kardinalitas (1 karyawan boleh banyak toko/advertiser, tapi satu toko/advertiser hanya satu karyawan aktif), dan unique index-nya. Menjelaskan alur SPV/Leader membuat mapping, ICC Dashboard untuk staff melihat performa toko dan iklannya sendiri, Team Performance untuk supervisor, rotasi/pergantian AM, plus endpoint /icc/mappings dan otorisasi via RequireMarketingLeader. Juga menjawab: dari mana field team diisi (header BIP-Department) dan bagian mana yang masih rencana (laporan akuntabilitas AM, relasi leader dan akumulasi insentif).",
       "kata_kunci": [
         "ICC",
+        "Internal Content Creator",
         "Account Manager",
+        "AM",
         "icc_account_mappings",
         "TikTok Shop",
         "TikTok Ads",
         "advertiser_id",
-        "mapping karyawan",
-        "ICC Dashboard",
-        "team performance",
-        "rotasi AM"
+        "integration service",
+        "mapping karyawan"
       ]
     },
     {
