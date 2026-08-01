@@ -59,6 +59,16 @@
 - `GET /me/kpi-score` — mode grafik 12 bulan
 - Departemen yang satu tim tampil sebagai satu kelompok, dari master data. Detail: [[HRIS - Key Performance Index]]
 
+**Nilai otomatis metrik KPI** — ⚠️ branch `feat/kpi-auto-value`, **belum merge & belum deploy** ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]], analisis: [[HRIS - Otomasi Skor KPI]])
+- `KPIMetric` bertambah `key` (identitas stabil), `auto` (konfigurasi), serta `auto_value`/`auto_basis`/`auto_cakupan`/`auto_at` (hasil hitung). Semuanya `omitempty`, jadi 70 template & 406 skor lama terbaca apa adanya.
+- **Kosakata sumber disamakan dengan frontend** (`otomatis`/`semi`/`manual` di `erp-frontend/src/features/finance/posisi/lib/status-sumber.ts`), bukan padanan baru. `SumberMetrik` **memaksa `manual` selama belum ada `auto_value`**, dan `semi` bila cakupan tim belum 100% — meniru `tampilanSumberKpi()` di FE supaya sumber angka tak bisa berbohong dari sisi mana pun.
+- `GET /kpi/auto-values?employee_id=&period=&template_id=` — pratinjau usulan sistem, **read-only**, gerbang sama dengan `POST /kpi`. `POST /kpi` menstempel `auto_*` ke snapshot saat submit (dihitung di situ, karena `ReplaceOne` menimpa seluruh dokumen).
+- Dua rumus: `rata_skor_tim` dan `persen_capai_target`, keduanya dibatasi 100 mengikuti pola `(realisasi/target)` di [[Microservices - Insentive Service]]. Cakupan `department` memakai `SupervisedDepartments` dari master data (HRGA menyatu karena master datanya bilang begitu); cakupan `team` memakai `work_data.supervisor_id`.
+- **Hitungan yang gagal tidak diisi angka**: `auto_value` dibiarkan kosong dan alasannya ditulis ke `auto_basis`, sehingga sumbernya jatuh ke `manual`. Nilai 0 akan menekan skor penilai tanpa dasar dan tak terbedakan dari tim yang memang berskor 0. Karyawan yang dinilai juga dikeluarkan dari daftar timnya sendiri.
+- Migrasi `migrateKPIMetricKeys()` mengisi `metrics[].key` idempoten saat boot (pola `migrateDepartmentPositionItems`); `label` tidak disentuh dan `kpi_score.template` **tidak** dimigrasi karena snapshot beku adalah inti desain penilaian.
+- Index baru `kpi_score{employee_id, period}` di `ensureTenantIndexes` (koleksi itu di produksi sebelumnya hanya punya `_id_`).
+- **Belum menghasilkan apa pun** sampai HR mengisi konfigurasi `auto` pada metrik lewat `POST /kpi/templates`; tidak ada nama posisi yang di-hardcode. Frontend belum ada.
+
 **Cakupan supervisi antar-departemen**
 - `master_department` punya `supervised_by` (key departemen induk) + `supervision_label` (nama pendek kelompok, mis. `HRGA`). Di-seed & di-migrasi idempoten saat startup (hanya mengisi bila field belum pernah ada, jadi nilai yang diatur admin tak tertimpa).
 - Service ini **sumber kebenaran** relasi tersebut: mengisi klaim JWT `supervised_departments` saat login, dan melayani `/list?type=supervisor` dengan urutan telusur departemen sendiri → induk.

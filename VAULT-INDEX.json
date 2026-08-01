@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-07-31",
+  "digenerate": "2026-08-01",
   "jumlah_dokumen": 248,
   "dokumen": [
     {
@@ -81,22 +81,23 @@
         "API - Index",
         "HRIS - Training Program",
         "HRIS - Key Performance Index",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "HRIS - Payroll"
       ],
-      "hash": "9b4e64a6edf1895cdc6513cf888646615932a4516ccf212b34ad6e94306db24a",
-      "ukuran_kb": 8.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik gateway `/api/employee/*`, mulai dari login/refresh token, CRUD personal data dan work data, dokumen karyawan, jadwal kerja, sampai master departemen dan system role. Juga menjawab siapa yang boleh memanggil tiap rute (RequireHRISStaff, RequireITStaff, RequireITSupervisor, KPIDepartmentRBAC) dan bagaimana filter departemen bekerja, termasuk mode `grouped=true` yang menggabungkan departemen satu tim jadi satu opsi. Berguna saat mencari rute KPI (termasuk `?scope=team` untuk Leader), supervisor-assignment atasan langsung, kuota cuti, kontrak/BPJS, training program, endpoint `/me/*` untuk portal pribadi, serta menu-hidden per jabatan.",
+      "hash": "42985907d5e9a8e925c7071a9ec8412e30b9245d3e5a06c432e547d1f1288f8d",
+      "ukuran_kb": 8.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik gateway `/api/employee/*`, mulai dari login (username/PIN/biometric), onboarding, CRUD personal & work data, dokumen, jadwal kerja, akun/system auth, master departemen & system role, training program, KPI, cuti, kontrak, BPJS, sampai profil `/me` dan daftar bawahan. Menjawab juga siapa yang boleh memanggil tiap rute (RequireHRISStaff, RequireITStaff, RequireITSupervisor, RequireHRISOrITSupervisor, KPIDepartmentRBAC) dan perilaku khusus tiap query param, misalnya `?grouped=true` pada `/data-type/department`, filter `?department=` multi-nilai pada `/kpi`, `?scope=team` untuk KPI bawahan Leader, serta pemekaran label grup (HRGA) di `/supervisor-assignment`. Berguna saat mencari path pasti, method, bentuk filter, atau gerbang RBAC sebuah fitur HRIS sebelum menulis kode frontend atau integrasi.",
       "kata_kunci": [
         "employee service",
-        "endpoint karyawan",
+        "endpoint",
         "API HRIS",
-        "auth login",
-        "personal data",
-        "work data",
+        "auth login PIN biometrics",
         "master department",
         "system roles",
+        "RBAC",
+        "KPI",
         "supervisor-assignment",
-        "KPI endpoint"
+        "training program"
       ]
     },
     {
@@ -1422,6 +1423,9 @@
         "CORE - IT Orchestrator",
         "HRIS - Training Program",
         "HRIS - Key Performance Index",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "HRIS - Otomasi Skor KPI",
+        "Microservices - Insentive Service",
         "HRIS - Organization Structure",
         "ADR - 0006 Swap Jadwal Same-Department",
         "CORE - HRIS Orchestrator",
@@ -1434,20 +1438,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "35db6634d57f1541d2d5d098447cde302dfc66e1799e1073bb14e2344e9d237d",
-      "ukuran_kb": 13.3,
-      "ringkasan": "Menjawab: di mana sumber kebenaran autentikasi dan master data karyawan bip-erp berada, cara login apa saja yang didukung (username/employee_id, PIN, biometric, refresh, onboarding register), dan endpoint admin akun apa yang tersedia untuk tim IT (reset akun, forget-device, kelola roles). Juga menjawab bagaimana master department dan system role dikelola dari MongoDB, siapa yang boleh CRUD-nya, serta di mana data KPI, kontrak, BPJS, kuota cuti, training, ulang tahun, dan feed lintas-service (fcm-token, supervisor, work-schedule) disediakan.",
+      "hash": "50f577bdbc2080d7bfde5c83813daf63af584745bf5701d6e05122b449febb2f",
+      "ukuran_kb": 15.5,
+      "ringkasan": "Menjawab: apa peran employee-service sebagai master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding seluruh ekosistem bip-erp, apa saja fitur yang benar-benar sudah jalan di kode (`services/employee`, Go + Fiber + MongoDB), dan bagaimana bentuk model datanya. Menjawab pertanyaan operasional seperti: apa beda `/account/forget-device` dan `/account/reset`, siapa yang boleh CRUD departemen versus system role, bagaimana seed master data bekerja, bagaimana `/birthdays` menyaring karyawan aktif dan mengonversi tanggal ke WIB, serta bagaimana rencana nilai otomatis metrik KPI (`auto_value`, `auto_basis`, kosakata sumber otomatis/semi/manual) dirancang agar tidak menimpa nilai manusia. Berguna untuk memahami cakupan service terbesar ini, batas kepemilikan datanya, dan catatan hardening yang masih menggantung.",
       "kata_kunci": [
         "employee service",
-        "auth login",
-        "PIN biometric",
-        "system_roles",
-        "master department",
+        "microservice",
+        "SSO",
+        "onboarding",
         "master data karyawan",
-        "KPI",
-        "vacation quota",
-        "contract BPJS",
-        "training program"
+        "account reset",
+        "forget device",
+        "KPI auto value",
+        "training program",
+        "multi-tenant company_id"
       ]
     },
     {
@@ -2945,8 +2949,8 @@
       "judul": "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "Diputuskan 2026-07-31, **belum diimplementasikan**. Tidak ada satu pun metrik KPI yang terisi otomatis hari ini. Analisis yang mendasarinya ada di [[HRIS - Otomasi Skor KPI]].",
+      "status_emoji": "⚠️",
+      "status_teks": "Diputuskan 2026-07-31; fondasinya sudah ditulis di branch `feat/kpi-auto-value` (**belum merge, belum deploy**), sisanya belum. Tidak ada satu pun metrik KPI yang terisi otomatis di produksi hari ini. Analisis yang mendasarinya ada di [[HRIS - Otomasi Skor KPI]].",
       "publik": true,
       "tautan": [
         "HRIS - Otomasi Skor KPI",
@@ -2967,20 +2971,20 @@
         "DB - Overview and Notes",
         "APP - Web ERP"
       ],
-      "hash": "06aeb31a5a9c9d790a412a1b436534285dfe04dd5d45afef33f19d8b515e5f7d",
-      "ukuran_kb": 9.5,
-      "ringkasan": "Menjawab: siapa pemilik koleksi kpi_template dan kpi_score, service mana yang boleh menulis skor KPI, dan mengapa otomasi KPI dikerjakan di dalam employee-service alih-alih membuat service kpi-collector terpisah. Menjelaskan kontrak nilai otomatis (auto_value terpisah dari value, status DRAFT, satu endpoint internal bergerbang, override wajib beralasan) serta tiga pemicu konkret yang membuat pemisahan service jadi layak (tiga konektor keluar, penjadwalan non-HR, atau penyimpanan kredensial sistem non-HR). Juga merekam alternatif yang ditolak, yaitu bikin service KPI sekarang, menaruh job di hris-orchestrator, dan menjadikan insentive-service pemilik KPI.",
+      "hash": "c29071d0aea1c55218c57f830d2c40c21a9b8c4910ec48143fd6ec493ecd18fd",
+      "ukuran_kb": 10.2,
+      "ringkasan": "Menjawab: siapa pemilik data `kpi_template` dan `kpi_score`, dan mengapa otomasi pengisian skor KPI dikerjakan di dalam employee-service alih-alih membuat service `kpi-collector` terpisah. Menjawab pula aturan mainnya: tidak ada service lain yang boleh menulis langsung ke `employee_db`, nilai otomatis wajib masuk lewat satu pintu bergerbang, `auto_value` dipisah dari `value` agar bisa dibedakan angka mesin dan angka atasan, dan nilai otomatis berstatus DRAFT yang tetap diverifikasi supervisor. Menjelaskan tiga pemicu yang bila salah satunya terpenuhi barulah collector dipisah jadi service sendiri, alternatif yang ditolak beserta alasannya, serta konsekuensi yang diterima termasuk employee-service yang membesar dulu.",
       "kata_kunci": [
-        "KPI",
+        "ADR 0032",
         "kpi_score",
         "kpi_template",
-        "ADR 0032",
-        "employee-service",
-        "kpi-collector",
+        "otomasi KPI",
         "batas service",
+        "kpi-collector",
         "database-per-service",
         "auto_value",
-        "otomasi KPI"
+        "employee_db",
+        "service boundary"
       ]
     },
     {
@@ -4226,19 +4230,19 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "a3b0380e34e53ee2a6fe449cddf3bbeb2983bcfbe3168d0c4e5baca6ff60ee6c",
-      "ukuran_kb": 11.9,
-      "ringkasan": "Menjawab: bagaimana struktur organisasi disimpan dan dikelola, yaitu departemen dan jabatan sebagai master data di `master_department` (key, positions, position_items, roles, company_id) plus data karyawan di `work_data`. Menjelaskan perbedaan penting antara cakupan TAMPILAN (pengelompokan departemen satu tim seperti HRGA lewat `supervised_by`/`supervision_label`) dan cakupan WEWENANG (klaim JWT untuk supervisor), serta urutan pencarian atasan saat pengajuan mengalir. Berguna untuk memahami atasan langsung per orang (`work_data.supervisor_id`), aturan satu karyawan satu atasan, cara pengisian lewat halaman Atasan Langsung, batasan relasi yang tidak rekursif, dan status org chart yang belum ada.",
+      "hash": "5496515331d29ad901a07b03679e706fe1bab9809ab6a14ed0e122a78cce94fd",
+      "ukuran_kb": 12.5,
+      "ringkasan": "Menjawab: bagaimana struktur organisasi disimpan dan dikelola, yaitu departemen dan posisi sebagai master data di `master_department` (termasuk `position_items[]` berkunci stabil yang menempeli paket hak akses) plus `company_id` yang membuat `key` unik per perusahaan, bukan global. Menjawab pertanyaan hierarki yang sering rancu: apa beda atasan langsung per orang (`work_data.supervisor_id`, diisi lewat HRIS > Personalia > Atasan Langsung) versus supervisi antar-departemen (`supervised_by`, misalnya General Affair dibawahi supervisor Human Resource) dan mengapa yang pertama hanya menentukan cakupan TAMPILAN sementara alur persetujuan tetap memakai yang kedua. Menjelaskan juga aturan satu karyawan satu atasan beserta akibat pemindahannya, penanganan karyawan non-aktif, pengenalan label grup departemen seperti HRGA, dan bahwa org chart visual belum ada.",
       "kata_kunci": [
         "struktur organisasi",
         "organization structure",
         "departemen",
-        "jabatan",
-        "position",
+        "posisi jabatan",
         "atasan langsung",
-        "supervisor",
+        "supervisor_id",
         "supervised_by",
         "HRGA",
+        "master_department",
         "org chart"
       ]
     },
@@ -4248,7 +4252,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "🟡",
-      "status_teks": "Konsep otomasi (belum ada satu pun metrik yang terisi otomatis). **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.",
+      "status_teks": "Konsep otomasi, **belum ada satu pun metrik yang terisi otomatis di produksi**. Fondasi Fase 1 sudah ditulis di branch `feat/kpi-auto-value` (belum merge, belum deploy); selebihnya rencana. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.",
       "publik": true,
       "tautan": [
         "HRIS - Key Performance Index",
@@ -4294,20 +4298,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "d45f9802d7f7f7bbd888522aa5d87434f199e61bbab0fb945d7dc07dc5ecd276",
-      "ukuran_kb": 19.7,
-      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang skornya bisa diisi otomatis dari data ERP dan mana yang tetap harus manual, beserta rekap per departemen (Tech Development, Kyura, Finance, Manufaktur, dst). Menjelaskan pemetaan tiap klaster metrik ke sumber datanya secara konkret, mis. konversi iklan TikTok, ROI/ROAS, omzet, rating toko, piutang/AR dan EBITDA dari Accurate, uptime Uptime Kuma, SLA dan CSAT e-ticket, kehadiran, lead time PO, serta resi ekspedisi. Juga menjawab kenapa sebagian metrik terblokir (modul jalan tapi koleksinya kosong), bagaimana model kpi_template/kpi_score dan validasi bobot bekerja, dan mengapa label metrik jadi kunci pengikat untuk auto-fill.",
+      "hash": "2dd5bbd82098ad0b8f95f41bff303a567ce8503344a7303a484dab392e94c1cc",
+      "ukuran_kb": 21.5,
+      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang sumber datanya sudah tersedia di ERP sehingga bisa diisi otomatis, mana yang modulnya jalan tapi koleksinya masih kosong, dan mana yang memang tak punya sumber sama sekali, lengkap dengan rekap per departemen dan persentase otomasinya. Menjawab pula pertanyaan pemetaan konkret: metrik apa mengambil angka dari service atau sumber mana, misalnya konversi iklan TikTok dari integration-service, ROAS dari marketing-analytics, SLA dan CSAT dari task-management, uptime dari monitoring, kedisiplinan dari attendance, keuangan dari Accurate, dan skor tim dari `kpi_score` sendiri lewat departemen atau `supervisor_id`. Menjelaskan juga mengapa label metrik jadi kunci identitas yang membatasi otomasi, apa yang masih kurang pada metrik semi-otomatis (definisi, target, budget, mapping karyawan ke toko), dan rencana bertahapnya.",
       "kata_kunci": [
-        "KPI",
-        "otomasi skor KPI",
+        "otomasi KPI",
         "KPI automation",
-        "auto-fill KPI",
-        "kpi_template",
+        "skor KPI",
+        "auto-fill metrik",
         "kpi_score",
-        "metrik KPI",
-        "penilaian kinerja",
-        "performance metrics",
-        "sumber data KPI"
+        "311 metrik",
+        "sumber data KPI",
+        "ROAS",
+        "SLA CSAT",
+        "attendance Accurate"
       ]
     },
     {
