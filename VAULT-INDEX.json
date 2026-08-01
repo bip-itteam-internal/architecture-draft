@@ -1128,20 +1128,20 @@
         "APP - MyBharata",
         "DB - Overview and Notes"
       ],
-      "hash": "1a2ca12f5c46a1f5d2f0dba393356e194b3e9bad27ec7e683f8e6256c7f36a2d",
+      "hash": "a8f3fd3c809b1a8e9fa392b43899bb3467d1d68dbfddb6d9d9956dd708a37f17",
       "ukuran_kb": 7.5,
-      "ringkasan": "Menjawab: bagaimana request dari internet masuk ke ekosistem bip-erp, bagaimana JWT diterbitkan (login didelegasikan ke employee service, gateway yang mint token) dan divalidasi, serta bagaimana identitas dioper ke service internal lewat header `BIP-Employee-Id`, `BIP-System-Roles`, dan `BIP-Company-ID` plus internal gateway key. Juga menjawab pemetaan module ke service, rute non-`/api` seperti `/auth/*`, `/public/*`, `/ext/fingerprint/*`, aturan open route `?key=`, dan kebijakan response caching Redis beserta module yang dikecualikan. Menjelaskan pula konsekuensi routing catch-all: prefix `/internal/` ikut terbuka ke internet dan limiter khusus bisa dilewati lewat jalur `/api/<module>/*`.",
+      "ringkasan": "Menjawab: bagaimana request dari luar masuk ke ekosistem bip-erp, bagaimana login menghasilkan JWT (termasuk login PIN/biometrics, refresh, logout, dan handoff SSO one-time-code), serta bagaimana gateway mem-proxy ke tiap service internal lewat pola /api/:module/* dan rute khusus /auth, /public, /ext. Juga menjawab: header identitas apa yang di-inject gateway dari klaim JWT (BIP-Employee-Id, BIP-System-Roles, BIP-Company-ID) sebagai fondasi multi-perusahaan, bagaimana response caching Redis dan rate limiting bekerja, serta module mana yang boleh skip JWT lewat query key. Menjelaskan pula kenapa routing catch-all membuat prefix /internal/ ikut terbuka ke internet dan limiter khusus bisa dilewati, plus daftar port internal tiap service.",
       "kata_kunci": [
-        "API gateway",
+        "api gateway",
+        "API Master Gateway",
+        "JWT",
+        "auth login",
+        "SSO",
         "reverse proxy",
-        "JWT auth login",
-        "SSO ticket redeem",
-        "BIP header",
-        "internal gateway key",
+        "routing module",
         "rate limiting",
-        "Redis cache",
-        "public ext route",
-        "catch-all routing"
+        "CORS",
+        "Redis cache"
       ]
     },
     {
@@ -1549,20 +1549,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "f95ccb962f2c37f63dce2184ddf53be1ddae0314e0fce7a32b3a5438e55b9f3f",
-      "ukuran_kb": 10.6,
-      "ringkasan": "Menjawab: bagaimana tim IT dan HRGA menyusun form dinamis tanpa rilis kode, 9 tipe pertanyaan apa yang didukung, bagaimana sasaran form (all, departments, employees) diresolusi langsung dari header identitas tanpa memanggil service lain, dan bagaimana validasi struktur maupun validasi jawaban bekerja sebagai fungsi murni. Juga menjawab siapa persona penggunanya beserta gerbang RBAC-nya, mengapa susunan pertanyaan terkunci setelah ada jawaban masuk, dan bagaimana idempotensi pengiriman dijaga lewat sidik jawaban ber-kunci-terurut. Menjelaskan pula keputusan konservatif yang menjaga jalur clock-in: gerbang gagal-tertutup pada data cacat, mode default `warn`, jendela tanggal wajib, dan identitas `/internal/compliance` yang terkunci ke header.",
+      "hash": "fa37660fdd048a6063081d249802dce5196ea1932f36966f11ca5fcd4ca55143",
+      "ukuran_kb": 11.0,
+      "ringkasan": "Menjawab: bagaimana tim IT dan HRGA membuat form dinamis tanpa coding (9 tipe pertanyaan, alur status draft ke published ke closed, siapa yang boleh mengelola lewat system_roles it/ga), bagaimana sasaran form ditentukan (all, departments, employees) dan bagaimana karyawan mengisi serta melihat riwayat jawabannya. Juga menjawab: bagaimana rekap jawaban dibaca lewat analytics dan diekspor ke CSV, aturan idempotensi pengiriman jawaban, penguncian susunan pertanyaan setelah ada jawaban masuk, serta scoping company_id untuk multi-tenant. Menjelaskan pula endpoint /internal/compliance yang dipakai attendance-service untuk menahan atau memperingatkan clock-in mobile bila ada form wajib belum diisi, termasuk keputusan gagal-tertutup dan penguncian identitas ke header, plus variabel env dan port yang wajib ada sebelum gateway di-redeploy.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
-        "survei internal",
-        "audience sasaran",
-        "attendance gate",
-        "gerbang presensi",
-        "idempoten",
-        "analytics",
-        "RBAC it ga",
-        "company_id"
+        "dynamic form",
+        "survei",
+        "survey",
+        "kepatuhan presensi",
+        "attendance compliance",
+        "export CSV",
+        "analytics jawaban",
+        "HRGA"
       ]
     },
     {
