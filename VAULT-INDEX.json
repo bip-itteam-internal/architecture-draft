@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-01",
-  "jumlah_dokumen": 253,
+  "jumlah_dokumen": 254,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -85,7 +85,7 @@
         "HRIS - Payroll"
       ],
       "hash": "e9e6cacaa45c14bfb3e0df39cf8b1bb2533c600e41eb799d9265062daf1bf1a9",
-      "ukuran_kb": 9.5,
+      "ukuran_kb": 9.4,
       "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service (HRIS inti) di balik gateway `/api/employee/*`, mulai dari login/refresh token dan aktivasi akun, CRUD personal_data & work_data, dokumen pribadi/kerja, jadwal kerja, kelola akun & perangkat, sampai master departemen dan system role. Menjawab juga: siapa yang boleh memanggil tiap rute (RequireHRISStaff, RequireITStaff, RequireHRISOrITSupervisor, KPIDepartmentRBAC), bagaimana filter departemen bekerja termasuk penggabungan grup seperti HRGA, dan apa bedanya menu_hidden sebagai setelan tampilan versus hak akses. Berguna saat mencari rute KPI (termasuk scope=team untuk Leader), supervisor-assignment, org-chart, cuti, kontrak, BPJS, Training Program, ulang tahun karyawan, atau endpoint internal aggregate antar-service.",
       "kata_kunci": [
         "employee service",
@@ -187,6 +187,33 @@
         "rekening bank",
         "hari libur",
         "attendance summary"
+      ]
+    },
+    {
+      "path": "API Reference/API - IT Orchestrator.md",
+      "judul": "API - IT Orchestrator",
+      "area": "API Reference",
+      "jenis": "api",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [
+        "CORE - IT Orchestrator",
+        "API - Index",
+        "IT - Network Management",
+        "Microservices - Employee Service"
+      ],
+      "hash": "cc96229bac738516c213e99417c3cf2c7a0cb5224a86bab536f3109778b016cd",
+      "ukuran_kb": 0.9,
+      "ringkasan": "Menjawab: endpoint apa yang dipakai tim IT untuk mengelola akun karyawan (reset password, aktivasi/nonaktifkan, ubah status), mengatur role/hak akses sistem, dan mengelola jaringan (WiFi) kantor dari satu titik orchestrator.",
+      "kata_kunci": [
+        "IT orchestrator",
+        "reset password",
+        "aktivasi akun",
+        "role management",
+        "jaringan",
+        "network",
+        "deaktivasi karyawan"
       ]
     },
     {
@@ -307,25 +334,20 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "c9a3ea091796b10daba651c0072715fbbeb6ceb44409c5d24c0c539211c0b538",
-      "ukuran_kb": 28.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service untuk marketplace (TikTok Shop, TikTok Business, Shopee) dan bridging Accurate, termasuk order/transaction, export xlsx, aging piutang, feed retur lintas-channel, dan packet tracking. Juga menjawab mana webhook publik yang tanpa gateway key, parameter filter apa yang didukung tiap endpoint order, dan kenapa /transactions/returns dipakai alih-alih endpoint retur Shopee atau Accurate.",
+      "hash": "42d3eeda405ad5fb94c883b04454e14b58a50ed1dd0b0913475482a2e2784cdc",
+      "ukuran_kb": 32.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service di gateway `/api/integration/*` untuk marketplace (TikTok Shop, TikTok Business, Affiliate, Shopee) dan bridging Accurate, serta bagaimana webhook publik `/ext/webhook/*` diterima, dicatat, dan di-retry. Merinci parameter dan bentuk balasan endpoint order terpadu (`/transactions/orders/list`, `/export`, `/summary/comparison`, `/dashboard/summary`), aging piutang (`/piutang/summary`), feed retur lintas-channel (`/transactions/returns`), serta Packet Tracking (`/tracking`, `/tracking/stats`, `/tracking/backfill`). Juga menjelaskan kapan harus memakai `/transactions/returns` alih-alih `/shopee/returns/list` atau `/accurate/daily-returns`, plus kelompok rute Accounting/FAT, Items, Profit, ICC mapping, Fulfillment WMS bridge, Kas Toko/Wallet, Reviews, dan Marketing Teams/Worker.",
       "kata_kunci": [
         "integration service",
         "endpoint",
-        "marketplace",
-        "TikTok Shop",
-        "Shopee",
-        "order",
-        "retur",
-        "return",
-        "piutang",
-        "aging",
+        "API reference",
         "webhook",
+        "transaction orders",
+        "piutang",
+        "accounts receivable",
+        "retur",
         "packet tracking",
-        "resi",
-        "Accurate",
-        "export xlsx"
+        "marketplace"
       ]
     },
     {
@@ -342,7 +364,7 @@
         "GA - Asset Loan & Room Booking"
       ],
       "hash": "bdb0c21010b32d1740c246946d8a52770a7eacf9fc27e101be20d3557dfd2b38",
-      "ukuran_kb": 4.8,
+      "ukuran_kb": 4.7,
       "ringkasan": "Menjawab: endpoint apa saja yang tersedia untuk aset/inventaris GA lewat gateway `/api/inventory/*`, field mana yang wajib saat membuat item (held_by, specs, purchase_date, purchase_document), dan rute mana yang publik vs butuh RBAC GeneralAffair. Juga menjawab bagaimana pola ID `INV-BIP-DDMMYY-NAMA-n` dibentuk, aturan upload dokumen ke MinIO (tipe image/PDF, maks 4 MB, verifikasi objek ada), kenapa `GET /items` tidak punya pagination server-side sehingga filter dan paginasi dilakukan client-side, serta isi respons `GET /summary` untuk jumlah dan biaya aset.",
       "kata_kunci": [
         "inventory service",
@@ -355,33 +377,6 @@
         "summary biaya aset",
         "master item",
         "asset tracking"
-      ]
-    },
-    {
-      "path": "API Reference/API - IT Orchestrator.md",
-      "judul": "API - IT Orchestrator",
-      "area": "API Reference",
-      "jenis": "api",
-      "status_emoji": null,
-      "status_teks": null,
-      "publik": true,
-      "tautan": [
-        "CORE - IT Orchestrator",
-        "API - Index",
-        "IT - Network Management",
-        "Microservices - Employee Service"
-      ],
-      "hash": "cc96229bac738516c213e99417c3cf2c7a0cb5224a86bab536f3109778b016cd",
-      "ukuran_kb": 0.9,
-      "ringkasan": "Menjawab: endpoint apa yang dipakai tim IT untuk mengelola akun karyawan (reset password, aktivasi/nonaktifkan, ubah status), mengatur role/hak akses sistem, dan mengelola jaringan (WiFi) kantor dari satu titik orchestrator.",
-      "kata_kunci": [
-        "IT orchestrator",
-        "reset password",
-        "aktivasi akun",
-        "role management",
-        "jaringan",
-        "network",
-        "deaktivasi karyawan"
       ]
     },
     {
@@ -405,23 +400,20 @@
         "API - Integration Service",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line"
       ],
-      "hash": "1fc4b72cae0114148a7faa1896ee14d0d5d0117ce1c3a1577651cae45b89bf7d",
-      "ukuran_kb": 20.7,
-      "ringkasan": "Menjawab: endpoint WMS manufaktur apa yang tersedia untuk master bahan/produk, stok, saldo awal bulanan, laporan tarikan mutasi, dan transparansi substitusi RM. Juga menjawab cara sync serta align kode master ke Accurate/HPP, aturan konversi satuan (bahan gram vs kg Accurate, faktor_stok_accurate), dan bagaimana hasil Stock Opname diimpor lalu mengunci saldo akhir agar tak ditimpa ticker.",
+      "hash": "13ead0ba40b0a47fe9c8a046307e39b4dbb1830a0d83e65055ce9cc2d9a9096f",
+      "ukuran_kb": 21.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang dipakai WMS manufaktur di `/api/manufacture/*` untuk master bahan, master produk, stok, saldo awal, transaksi, formula, produksi, PO/proposal, resi retur ekspedisi, dan feed retur marketplace. Menerangkan cara menarik master & stok dari Accurate (`/master-bahan/sync-accurate`, `/stok/sync-accurate` yang read-only + aturan konversi satuan dan `faktor_stok_accurate`), migrasi kode lama ke kode Accurate/HPP lewat endpoint align dengan `dry_run`, pembersihan stok yatim, serta push pergerakan WMS ke Accurate. Juga menjelaskan alur Stock Opname (import pratinjau lalu commit dengan penguncian `akhir_locked`) dan laporan `/mutasi` serta `/substitusi` beserta cara angkanya dihitung dan siapa yang boleh mengaksesnya di frontend.",
       "kata_kunci": [
         "manufacture service",
         "WMS",
+        "endpoint",
         "master bahan",
-        "master produk",
+        "master product",
         "stok",
-        "sync Accurate",
-        "align kode",
-        "saldo awal bulanan",
+        "saldo awal",
         "stock opname",
-        "SO",
-        "tarikan mutasi",
-        "substitusi RM",
-        "endpoint"
+        "sync accurate",
+        "mutasi"
       ]
     },
     {
@@ -465,22 +457,20 @@
         "ADR - 0001 Akuntansi via Accurate",
         "CORE - API Master Gateway"
       ],
-      "hash": "302bf985282d0572b23c38d6d3d02f6e3d75273cceca4c922659ff3532d3a25d",
-      "ukuran_kb": 10.8,
-      "ringkasan": "Menjawab: endpoint apa yang dipakai mengelola master Pemasok dan master Barang & Jasa, field apa saja di request/response-nya, dan kode error mana yang muncul (400 validasi, 409 nomor bentrok, 502 Accurate tak terhubung). Juga menjawab perbedaan penomoran pemasok per kategori versus usul kode barang yang global, arti sync_status PENDING/SYNCED/FAILED, serta field mana yang baca-saja karena tak bisa ditulis ke Accurate.",
+      "hash": "ee82c57c7bdde8706d2eb8929a3e42e85af6510ead13496ff9b84df494ad7aad",
+      "ukuran_kb": 17.0,
+      "ringkasan": "Menjawab: endpoint apa saja di `/api/procurement/*` untuk master Pemasok dan master Barang & Jasa (CRUD, usulan nomor/kode, katalog dari Accurate, import awal) serta cermin baca-saja modul Pembelian (Pesanan, Penerimaan, Permintaan Barang). Memuat bentuk request body dan response lengkap `Pemasok` dan `Barang` beserta arti tiap field, pemetaan field ke Accurate (mis. `no_wa` → `bbmPin`, `telp_bisnis` → `workPhone`), nilai enum `jenis_barang` dan `tipe_nomor_seri`, serta arti `sync_status` PENDING/SYNCED/FAILED. Juga menjelaskan kode status HTTP tiap rute (400/404/409/502), aturan auth gateway key plus role guard `system_roles[\"procurement\"]`, dan field baca-saja `merek`/`tipe_persediaan` yang hanya terisi lewat import.",
       "kata_kunci": [
-        "procurement",
+        "procurement service",
+        "endpoint",
         "pemasok",
         "vendor",
-        "master barang",
         "barang dan jasa",
-        "usul nomor",
-        "usul kode",
-        "sync status",
+        "master data",
         "Accurate",
+        "sync_status",
         "katalog",
-        "import awal",
-        "endpoint"
+        "import"
       ]
     },
     {
@@ -500,7 +490,7 @@
         "CORE - API Master Gateway"
       ],
       "hash": "3017331b7160c5ce7ca9038c4784cf5fd3f476c4b59cfea3baa8bdc8535c2263",
-      "ukuran_kb": 12.5,
+      "ukuran_kb": 12.4,
       "ringkasan": "Menjawab: apa saja endpoint recruitment-service (ATS) beserta method, path gateway, dan role/RBAC yang dibutuhkan untuk tiap aksi — mulai ajukan job requisition, buka/tutup lowongan (posting), kelola kandidat & upload CV, catat tahap (screening/interview/technical-test/background-check/psikotes), terbitkan offer, hire, sampai interview rounds/feedback, master lookup, dan onboarding checklist. Juga menjelaskan endpoint publik portal karir (browse/apply/track tanpa JWT) serta perubahan kontrak penting seperti penghapusan tahap approval Direktur pada requisition, penghapusan Custom Questions, dan link form feedback interview.",
       "kata_kunci": [
         "recruitment",
@@ -589,7 +579,7 @@
         "API - Integration Service"
       ],
       "hash": "88f07ee2a121d9f7f4ac35a2891aaedbb8ef2cf9971e38067e30f678a9f6cd20",
-      "ukuran_kb": 19.1,
+      "ukuran_kb": 18.8,
       "ringkasan": "Menjawab: bagaimana order marketplace masuk ke WMS lewat POST /fulfillment/events (idempotensi per order_id+channel, propagasi cancel, auto-close order yang diproses di Seller Center) dan action/response apa yang mungkin dikembalikan. Juga menjawab endpoint operasi gudang apa saja yang tersedia dari antrian sampai serah-terima kurir, role mana yang boleh memanggilnya, filter apa yang didukung antrian, dan mengapa arrange resi TikTok bisa ditolak karena package_id kosong.",
       "kata_kunci": [
         "warehouse service",
@@ -649,7 +639,7 @@
         "README"
       ],
       "hash": "52eb6306aef513055af71556b6d2cdf0f8cf634f9cb922ca007b472e4ecac5d1",
-      "ukuran_kb": 3.4,
+      "ukuran_kb": 3.3,
       "ringkasan": "Menjawab: endpoint Lazada Open API mana yang benar-benar dipanggil ERP, fungsi Go mana yang memakainya, untuk apa, dan seberapa tinggi confidence tiap endpoint (verified-live, verified-by-usage, atau TBD). Juga menjawab bentuk respons sumber retur Lazada yang dipakai produksi dan TBD apa yang masih terbuka soal enum request_type, reverse_status, serta ketersediaan tracking_number.",
       "kata_kunci": [
         "Lazada",
@@ -677,7 +667,7 @@
         "TikTok Shop API"
       ],
       "hash": "0deb51a0dca813a21fb798334e0b69f094928576c7afe6a058ccb9af2c865ef1",
-      "ukuran_kb": 3.2,
+      "ukuran_kb": 3.1,
       "ringkasan": "Menjawab: bagaimana auth dan tanda tangan (sign HMAC-SHA256) panggilan Lazada Open API disusun, host mana yang dipakai Indonesia, dan urutan sumber kebenaran dokumentasinya (kode kita, endpoint debug live, portal resmi). Juga menjawab gotcha yang sudah terbukti: satuan SEN, filter trade_order_id yang tak berfungsi, paging retur belum lengkap, store_id = seller_id numerik, dan retur Lazada yang hanya masuk lewat webhook tanpa worker penyapu.",
       "kata_kunci": [
         "Lazada",
@@ -704,7 +694,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 2.0,
+      "ukuran_kb": 1.9,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -756,7 +746,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 3.0,
+      "ukuran_kb": 2.9,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -811,7 +801,7 @@
         "IT - Helpdesk"
       ],
       "hash": "a82de4ff76eadc16ebbcc938bf88a3bf67084b9975afd6a8c8244d14647ab5a3",
-      "ukuran_kb": 12.0,
+      "ukuran_kb": 11.8,
       "ringkasan": "Menjawab: bagaimana app task tracker Kanban terpisah (task.bharatainternasional.com) yang diposisikan sebagai IT Helpdesk bekerja, fitur apa saja yang sudah jalan (board per divisi, approval, SLA response/resolution, comment/checklist/attachment, notifikasi WebSocket, report + export Excel), serta bagaimana login SSO ke ERP dan gating role staff/supervisor/admin diterapkan. Juga menjawab apa yang belum ada (Pengaturan Sistem, members & roles, CRUD divisi), bug isolasi space antar-divisi, dan rencana integrasi type task per divisi ke sistem insentif marketing (ADS_CAMPAIGN, VIDEO_CONTENT, LIVE_STREAM, AFFILIATE, CRM).",
       "kata_kunci": [
         "task tracker",
@@ -884,7 +874,7 @@
         "Microservices - Notification Service"
       ],
       "hash": "86bfa7b42a71539ffe8d3eeaf93a00a4ff46044c6751a32ad5f42ccb8a1cc61c",
-      "ukuran_kb": 16.7,
+      "ukuran_kb": 16.6,
       "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile karyawan MyBharata, bagaimana arsitektur Flutter-nya disusun, dan bagaimana ia terhubung ke backend lewat API gateway memakai JWT Bearer. Mencakup presensi, pengajuan izin dan cuti, lembur, payslip, KPI, task management beserta pengingat penilaian tiket, guest book, dan pengisian survei Form Builder yang berhalaman per bagian. Memuat juga versi build berjalan dan aturan kontrak yang mudah dilanggar diam-diam.",
       "kata_kunci": [
         "MyBharata",
@@ -918,7 +908,7 @@
         "CORE - SSO Flow"
       ],
       "hash": "5ad6b5e98f3f248bc9e4b5276baf8eeb0b853e7967f095075b52d5e938e5d312",
-      "ukuran_kb": 8.3,
+      "ukuran_kb": 8.2,
       "ringkasan": "Menjawab: bagaimana pelamar publik melihat lowongan, melamar dengan upload satu berkas PDF, dan mengecek status lamaran lewat token tracking tanpa login, kontrak endpoint /public/recruitment/* yang dipakai beserta gotcha field wajibnya (posisi_dilamar, format tanggal RFC3339, casing enum). Juga menjawab apa yang masih menghambat go-live portal (belum ada remote Git/domain, halaman legal draf, production nol lowongan).",
       "kata_kunci": [
         "portal karir",
@@ -989,6 +979,7 @@
         "API - Manufacture Service",
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "Microservices - Procurement Service",
+        "API - Procurement Service",
         "CORE - HRIS Orchestrator",
         "CORE - API Master Gateway",
         "Microservices - Employee Service",
@@ -1000,20 +991,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "50eacd56ab2f4ba893d5620945772b52a109867abdcc9fdda6bb830532ccd1ad",
-      "ukuran_kb": 66.1,
-      "ringkasan": "Menjawab: modul apa saja yang tersedia di web ERP Bharata, bagaimana struktur Next.js dan konvensi UI-nya, serta bagaimana menu sidebar dipetakan ke kategori dan peran pemakai. Merinci fitur per domain termasuk Form Builder beserta editor bertab, editor bagian, keterangan ujung skala, perbaikan alur menambah pertanyaan, dan halaman analisa jawabannya. Berguna untuk menemukan letak sebuah halaman sekaligus alasan di balik keputusan tampilannya.",
+      "hash": "17099343319293f5a919a1cfc84065ca863736b9edf90dfcea9c2d7c83352f3b",
+      "ukuran_kb": 72.0,
+      "ringkasan": "Menjawab: apa itu portal web internal `hris-dashboard` (\"One Bharata\"), stack dan repo yang dipakainya, serta modul/fitur apa saja yang tersedia untuk HR, attendance, finance/insentif, integrasi marketplace, IT, dan GA. Menerangkan alur autentikasi (login `employee_id`, cookie token, proactive refresh, interceptor 401) dan perannya sebagai SSO Identity Provider lewat `POST /auth/sso/ticket` beserta allowlist redirect. Juga menjadi rujukan cara kerja role gating dari cookie `system_roles`, dukungan multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/network per-perusahaan), serta susunan menu sidebar — menu induk bersarang, perataan induk tipis, pengaturan tampilan menu per jabatan (`menu_hidden`), dan gating menu KPI berdasarkan keberadaan bawahan langsung.",
       "kata_kunci": [
         "Web ERP",
-        "erp-frontend",
+        "hris-dashboard",
+        "One Bharata",
+        "frontend",
         "Next.js",
-        "sidebar",
-        "menu",
-        "form builder",
-        "editor",
-        "AdminFooter",
-        "analisa jawaban",
-        "i18n"
+        "SSO",
+        "system_roles",
+        "role gating",
+        "sidebar menu",
+        "multi-perusahaan"
       ]
     },
     {
@@ -1085,7 +1076,7 @@
       "publik": true,
       "tautan": [],
       "hash": "99476e00b526227b55b32bd62e377d4b34e80f390b0f16dda6d765f4a162e776",
-      "ukuran_kb": 12.2,
+      "ukuran_kb": 12.1,
       "ringkasan": "Menjawab: bagaimana aturan menulis dan menata dokumentasi di vault architecture-draft (struktur folder domain, konvensi penamaan file dengan prefix, format wikilink, status marker, template struktur dokumen), serta alur kerja sinkronisasi dokumentasi dengan kode dan aturan git untuk vault ini. Dipakai saat bingung di folder/prefix mana sebuah dokumen baru harus dibuat, atau bagaimana format status Implemented/Draft/Stub ditulis.",
       "kata_kunci": [
         "CLAUDE.md",
@@ -1312,7 +1303,7 @@
         "BASE - Enterance Point"
       ],
       "hash": "a4e5159647e3f5473d0cf0c6e7994775488f7db013ffeb65ee83d7cc93189150",
-      "ukuran_kb": 10.8,
+      "ukuran_kb": 10.7,
       "ringkasan": "Menjawab: bagaimana SSO bip-erp bekerja end-to-end sebagai one-time-code handoff (bukan IdP OAuth/SAML eksternal), komponen mana yang berperan (Web ERP sebagai Identity Provider, gateway, employee-service, app konsumen seperti Task Manager), dan skenario outbound launch vs inbound handoff. Juga menjawab endpoint ticket/redeem, pengelolaan token/sesi (TTL, refresh), langkah menambah aplikasi konsumen SSO baru, serta bagaimana role dan cakupan supervisi lintas departemen (supervised_departments) dan company_id dibawa di JWT/header.",
       "kata_kunci": [
         "SSO",
@@ -1391,7 +1382,7 @@
         "Microservices - File Service"
       ],
       "hash": "30e4043042d196a21236ea2a6b41de54172c42d20fecbfb70333082939eaedcd",
-      "ukuran_kb": 6.9,
+      "ukuran_kb": 6.7,
       "ringkasan": "Menjawab: database mana milik service mana pada pola database-per-service, dan collection apa saja yang ada di tiap MongoDB (employee, attendance, notification, insentive, integration, inventory, tiktok-shop, task-management, recruitment, payroll, form-builder). Juga menjawab service mana yang berjalan sebagai replica set dan boleh dibaca read-only, koleksi mana yang membawa `company_id` untuk multi-perusahaan, index apa yang dibuat idempoten saat boot, serta mengapa satu-jawaban-per-orang di form builder ditegakkan di handler alih-alih index unik. Menjelaskan pula peran infrastruktur data bersama Redis dan MinIO termasuk konvensi prefix objek per domain dan aturan waktu disimpan UTC.",
       "kata_kunci": [
         "database",
@@ -1437,7 +1428,7 @@
         "IT - Background Jobs & Schedulers"
       ],
       "hash": "db88ef01a656226989b3c0ae4e8eea59f6a0241aecc98ceb977fb5b12c8b08c5",
-      "ukuran_kb": 16.0,
+      "ukuran_kb": 15.9,
       "ringkasan": "Menjawab: bagaimana clock-in/out dijalankan per metode (mobile dengan validasi MAC WiFi kantor atau GPS, fingerprint dengan allowlist serial, dan method `Website` yang berarti koreksi), bagaimana ambang telat dihitung, dan endpoint mana yang dipakai HRIS untuk report bulanan periode 26 ke 26 serta `payroll-supplement`. Juga menjawab alur workflow lengkap leave request (rantai review supervisor ke HR, kuota cuti, guard idempotensi berbasis konten), tukar jadwal kerja shift/hari, koreksi presensi, perjalanan dinas, guestbook tamu bertoken, dan hari libur. Menjelaskan pula bagaimana perlakuan dibayar atau dipotong diatur per status dan per subtipe lewat master `payroll_status_treatment`.",
       "kata_kunci": [
         "attendance",
@@ -1481,7 +1472,7 @@
         "IT - Background Jobs & Schedulers"
       ],
       "hash": "50f577bdbc2080d7bfde5c83813daf63af584745bf5701d6e05122b449febb2f",
-      "ukuran_kb": 15.5,
+      "ukuran_kb": 15.4,
       "ringkasan": "Menjawab: apa peran employee-service sebagai master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding seluruh ekosistem bip-erp, apa saja fitur yang benar-benar sudah jalan di kode (`services/employee`, Go + Fiber + MongoDB), dan bagaimana bentuk model datanya. Menjawab pertanyaan operasional seperti: apa beda `/account/forget-device` dan `/account/reset`, siapa yang boleh CRUD departemen versus system role, bagaimana seed master data bekerja, bagaimana `/birthdays` menyaring karyawan aktif dan mengonversi tanggal ke WIB, serta bagaimana rencana nilai otomatis metrik KPI (`auto_value`, `auto_basis`, kosakata sumber otomatis/semi/manual) dirancang agar tidak menimpa nilai manusia. Berguna untuk memahami cakupan service terbesar ini, batas kepemilikan datanya, dan catatan hardening yang masih menggantung.",
       "kata_kunci": [
         "employee service",
@@ -1682,20 +1673,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "e33f71b05a24e22886f3d0001f7ee358f9227f136013082cf6012551534fea35",
-      "ukuran_kb": 186.2,
-      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace Indonesia (TikTok Shop, TikTok Business/Ads, Shopee, Lazada), bagaimana order masuk realtime lewat webhook direct per platform lalu dinormalkan jadi model transaction terpadu, dan bagaimana bridging finansial ke Accurate Online (Sales Invoice dan Sales Return) bekerja. Juga menjawab endpoint report iklan apa yang tersedia (GMV Max monitoring, GMV Max overview per produk, ICC video metrics) beserta rumus ROAS/ROI-nya, bagaimana kredensial OAuth dan hari libur untuk auto-ship dikelola, serta bagaimana verifikasi HMAC webhook Shopee dan cron sync master data berperilaku. Menerangkan pula bagian mana yang masih konsep (Meta Ads) dan jalur mana yang sudah dimatikan (Desty).",
+      "hash": "feb052ac99e79a07987f1f0ee64dfcdcefcea638d0f6c20091c8c82c6ad4acb0",
+      "ukuran_kb": 186.7,
+      "ringkasan": "Menjawab: bagaimana Integration Service menghubungkan ERP ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) dan menjadi bridge akuntansi ke Accurate Online — mulai dari ingest webhook direct, normalisasi order ke model transaction terpadu, sampai push Sales Invoice dan Sales Return. Merinci mekanisme auth webhook Shopee (HMAC-SHA256 per `app_type` beserta bypass verifikasi yang berlaku), fitur TikTok Business/Ads seperti GMV Max Monitoring/Overview dan ICC Video Metrics lengkap dengan rumus ROAS/ROI dan alasan perbaikannya, serta cron master data dan perbaikan rate limit/field filter. Juga menjadi rujukan status jalur Desty yang soft-disabled, rencana Meta Ads yang belum berkode, dan daftar area lain: Affiliate, Transactions, Accurate, ICC account mapping, Fulfillment WMS bridge, items, workers/cron, gross profit, dan review analytics.",
       "kata_kunci": [
         "integration service",
+        "microservice",
         "marketplace",
         "TikTok Shop",
         "Shopee",
+        "Accurate",
         "webhook",
-        "Accurate Online",
         "GMV Max",
-        "ICC",
-        "Meta Ads",
-        "OAuth credentials"
+        "Desty",
+        "Meta Ads"
       ]
     },
     {
@@ -1713,7 +1704,7 @@
         "GA - Inventory Management"
       ],
       "hash": "9c0aeb904f44dac9081da686211aadb282b108057ccc50f1890af5c4cb960d2a",
-      "ukuran_kb": 4.3,
+      "ukuran_kb": 4.2,
       "ringkasan": "Menjawab: apa cakupan inventory-service (pelacakan aset/inventaris General Affairs, bukan stok-kuantitas gudang), fitur dan endpoint apa saja yang sudah jalan, serta bagaimana ID aset `INV-BIP-DDMMYY-NAMA-n` dibentuk memakai zona WIB. Juga menjawab kenapa kategori dan nama barang kini bebas-ketik sehingga endpoint `/categories` jadi vestigial bagi UI, bagaimana integritas dokumen dijaga agar tidak muncul referensi menggantung di MinIO, dan collection MongoDB serta dependensi apa yang dipakai service ini.",
       "kata_kunci": [
         "inventory service",
@@ -1756,7 +1747,7 @@
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
       "hash": "9df9713e2543b6835803b0f12f1d3fdfc097aac05ac8935a4175b94dbb5c7179",
-      "ukuran_kb": 48.9,
+      "ukuran_kb": 48.8,
       "ringkasan": "Menjawab: bagaimana manufacture-service (WMS manufaktur) menyimpan master bahan/produk, stok, transaksi, formula, produksi, PO, dan proposal, serta dari mana sumber master datang setelah sync Google Sheets dihapus (Accurate untuk bahan & angka stok, data HPP untuk barang jadi & bundle, import Excel untuk formula). Juga menjawab cara kerja push pergerakan ke Accurate beserta kill switch dan status penyalaannya, aturan saldo awal/akhir bulanan termasuk kunci hasil Stock Opname dan revisi via approval PPIC ke SPV, plus laporan tarikan mutasi bahan per periode.",
       "kata_kunci": [
         "manufacture service",
@@ -1803,20 +1794,20 @@
         "Sales - ICC Affiliate Mapping",
         "Sales - Marketing Dashboard (Analisis Rekap)"
       ],
-      "hash": "294d286f30bf83e415d785683918b112957fb83aaab5a1875e9dc0a4fca7793b",
-      "ukuran_kb": 13.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang menyajikan laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live, serta dari koleksi mart mana angkanya dibaca. Juga menjelaskan cara memicu job sync lewat POST /jobs/:name/trigger (parameter hari, kunci per-job, respons 409/400) dan kenapa penjadwalan harus datang dari luar service. Menerangkan pula aturan integration_db baca-saja tiga lapis, arti /health degraded 503, harga minimal per SKU yang effective-dated, dan alasan mart_video_performance sengaja tanpa dimensi hari.",
+      "hash": "bfcf1dc8151ae4f503ce6f97f3cca90f70cc1b99fba611e3f9c9f1523b5fe393",
+      "ukuran_kb": 20.8,
+      "ringkasan": "Menjawab: bagaimana laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live diagregasi lebih dulu ke koleksi `mart_*` di `marketing_analytics_db`, dan endpoint apa saja yang membacanya (`/profit/*`, `/videos`, `/lives`, `/affiliate`, `/returns/breakdown`, `/cohort`, `/audience`, `/price-floor`). Menjelaskan dua prinsip arsitektur yang wajib dijaga: `integration_db` baca-saja yang ditegakkan tiga lapis (tipe reader, test pemindai AST, read preference `secondaryPreferred`) dan `/health` yang turun jadi `degraded` 503 bila index unik gagal dibuat. Juga merinci ketiga job sync beserta perilaku trigger `POST /jobs/:name/trigger` (kunci per-proses, 409 saat berjalan, validasi `hari`, timeout 30 menit), isi dan kunci unik tiap koleksi mart, alasan `mart_video_performance` sengaja tanpa dimensi hari, serta fakta bahwa service ini tidak punya scheduler internal.",
       "kata_kunci": [
         "marketing analytics",
-        "laba",
+        "microservice",
+        "mart",
         "profit attribution",
-        "koleksi mart",
+        "pre-agregasi",
         "job sync",
-        "trigger job",
-        "TikTok",
-        "video performance",
         "price floor",
-        "integration_db read-only"
+        "video performance",
+        "integration_db read-only",
+        "dashboard marketing"
       ]
     },
     {
@@ -1877,7 +1868,7 @@
         "IT - Background Jobs & Schedulers"
       ],
       "hash": "65f78691316566cbf4c8e0701dc58105033547c366c730cfb03375d24f7a9afe",
-      "ukuran_kb": 5.9,
+      "ukuran_kb": 5.8,
       "ringkasan": "Menjawab: channel notifikasi apa saja yang tersedia untuk seluruh ekosistem (inbox in-app, FCM push personal/departemen/broadcast, WhatsApp, email lewat Resend, splash promotion, article) dan endpoint mana yang dipakai untuk mengirimnya, termasuk route yang dijaga service key. Juga menjelaskan pola identitas pengirim email per-service (default RESEND_FROM_EMAIL versus field from milik tiap service), scoping feed artikel per perusahaan dengan flag group_wide untuk broadcast grup, serta cron harian pembersih inbox berumur lebih dari 2 bulan.",
       "kata_kunci": [
         "notification service",
@@ -1940,7 +1931,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — backend Pemasok + Barang & Jasa lengkap & terverifikasi lokal (boot, index, guard, CRUD, penomoran; 119 test PASS) ✅; **belum di-deploy** dan **import awal (pemasok maupun barang) belum dijalankan** di produksi (butuh kredensial Accurate). Frontend Master Pemasok **dan** Barang & Jasa sudah ada di `erp-frontend` (`src/features/procurement/`) — lihat [[APP - Web ERP]].",
+      "status_teks": "Implemented (ada catatan) — backend Pemasok + Barang & Jasa lengkap & terverifikasi lokal (boot, index, guard, CRUD, penomoran; 139 test PASS) ✅; **belum di-deploy** dan **import awal (pemasok maupun barang) belum dijalankan** di produksi (butuh kredensial Accurate). Modul **Pembelian** (PR #810, merged) ✅ terverifikasi lokal — 1.036 Pesanan, 1.835 Penerimaan, 234 Permintaan tertarik dari Accurate produksi (read-only, tanpa menulis). Frontend Master Pemasok, Barang & Jasa, **dan** ketiga tab Pembelian sudah ada di `erp-frontend` (`src/features/procurement/`) — lihat [[APP - Web ERP]].",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
@@ -1950,21 +1941,20 @@
         "Microservices - Manufacture Service",
         "Microservices - Integration Service"
       ],
-      "hash": "d5b768cb5d60bcafa49262159736eac0c222518b57325535a043ce0516558df4",
-      "ukuran_kb": 13.0,
-      "ringkasan": "Menjawab: bagaimana procurement-service membuat master Pemasok dan Barang & Jasa di ERP lalu menyinkronkannya ke Accurate Online lewat worker antrian terpisah (interval 30 detik, hanya baris PENDING/FAILED, retry backoff menaik, pesan asli disimpan di sync_error). Juga menjawab aturan penomoran pemasok per prefix kategori dan mengapa lubang nomor tak didaur ulang, mengapa kode barang diusulkan global, field mana yang baca-saja karena Accurate mengabaikannya, serta status deploy dan import awal yang belum dijalankan di produksi.",
+      "hash": "7b96c8392b0d1b21cdf8a59e54e714a6843cf46a080419c9e284a4705b56bb3d",
+      "ukuran_kb": 21.0,
+      "ringkasan": "Menjawab: bagaimana procurement-service mengelola master Pemasok, master Barang & Jasa, Tagihan Pemasok, dan cermin baca-saja Pembelian, termasuk arah datanya — master diinput di ERP lalu disinkronkan ke Accurate, sementara Pembelian dicatat di Accurate lalu ditarik ke ERP. Merinci susunan file di `services/procurement/`, port, database `procurement_db`, env kunci, worker sync, penomoran, dan import awal, plus alasan desain tiap endpoint (mis. `accurate_id` selalu dari data lama, toggle boolean yang hanya bisa diaktifkan pada edit parsial, usul kode barang global bukan per-kategori). Juga menjadi rujukan jebakan integrasi Accurate yang sudah terverifikasi, seperti `materialProduced`/`itemProduced` yang bertipe boolean sehingga salah tipe membuat import mengembalikan nol, field baca-saja yang tak ada di parameter `item/save.do`, dan alasan rute `/pesanan` dipisah dari `/po` lama.",
       "kata_kunci": [
         "procurement service",
+        "microservice",
         "pemasok",
-        "vendor",
         "barang dan jasa",
+        "pembelian",
+        "pesanan",
+        "penerimaan",
         "Accurate",
         "worker sync",
-        "retry backoff",
-        "import awal",
-        "penomoran",
-        "nomor seri",
-        "procurement_db"
+        "import"
       ]
     },
     {
@@ -1993,7 +1983,7 @@
         "APP - Web ERP"
       ],
       "hash": "101bde4ce4ddbc81fc4eb5b0e71edfa0c53d8c66b48915ad07cbed516d092430",
-      "ukuran_kb": 38.6,
+      "ukuran_kb": 38.4,
       "ringkasan": "Menjawab: bagaimana recruitment-service diimplementasikan — stack (Go + Fiber + MongoDB), path repo, port, dan cara deploy manual (workflow auto-deploy disabled, SSH ke VM dev) — serta alur pipeline rekrutmen dari job requisition, posting, kandidat, screening, interview, background check, psikotes, offer, sampai onboarding handoff ke Employee Service. Juga menjelaskan model data koleksi recruitment_db, dependensi ke service lain (Employee/File/Notification), integrasi email kandidat via Resend, dan riwayat increment (penghapusan tahap Direktur, apply publik, adopsi struktur ERPGo, interview orchestration, onboarding checklist rebuild).",
       "kata_kunci": [
         "recruitment service",
@@ -2029,7 +2019,7 @@
         "IT - Background Jobs & Schedulers"
       ],
       "hash": "e394da6994097630cd7dbf5504ef71225dd35d5bdf609828a035c8e072b217da",
-      "ukuran_kb": 16.7,
+      "ukuran_kb": 16.5,
       "ringkasan": "Menjawab: bagaimana tiket dibuat, ditriase, dikerjakan, dan ditutup di task-management, siapa yang boleh melakukan apa, serta bagaimana SLA dan kepuasan pemohon dihitung. Menjelaskan cakupan divisi lewat scopedDivisions, siklus status termasuk hold dan reopen, CSAT beserta daftar tiket yang menunggu penilaian, notifikasi, WebSocket, dan laporan tim. Berguna untuk memahami aturan izin sebelum mengubah perilaku tiket.",
       "kata_kunci": [
         "task management",
@@ -2086,7 +2076,7 @@
         "RUN - Deploy Microservices bip-erp"
       ],
       "hash": "e3577a469b75877239e17989353d781a9f3a88a607d68545f513def78e16725d",
-      "ukuran_kb": 20.7,
+      "ukuran_kb": 20.6,
       "ringkasan": "Menjawab: bagaimana arsitektur microservice warehouse (WMS Tinggarjaya) bekerja secara internal — stack (Go/Fiber/MongoDB `warehouse_db`/Redis), port, env kunci, dan struktur package flat. Dokumen ini menjelaskan mekanisme sinkronisasi order: event ingestion idempoten, reconciler 60 detik (cursor terpisah per status TO_SHIP/SHIPPED/COMPLETED/RETURNED, pagination, fix deadlock), dan open-order sweep 5 menit sebagai jaring pengaman self-healing berbasis kondisi WMS (bukan watermark). Menjawab juga soal operasi WMS (approve/pick/pack/RTS/label/handover), state machine `status_wms`, model data, keputusan teknis, dan alur \"Perlu Diproses\"/arrange untuk terbitkan resi.",
       "kata_kunci": [
         "warehouse-service",
@@ -2101,6 +2091,45 @@
         "MongoDB Redis",
         "arrange resi",
         "package_id backfill"
+      ]
+    },
+    {
+      "path": "DEVELOPER GUIDE.md",
+      "judul": "DEVELOPER GUIDE",
+      "area": "root",
+      "jenis": "meta",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [
+        "README",
+        "HOMEPAGE",
+        "CLAUDE",
+        "SCRUM SPECS",
+        "ROADMAP",
+        "DB - Overview and Notes",
+        "IT - Runbooks",
+        "CORE - API Master Gateway",
+        "CORE - SSO Flow",
+        "IT - SOP Dokumentasi Vault",
+        "REF - Glossary",
+        "IT - CI-CD",
+        "RUN - Onboarding Developer Baru",
+        "IT - Environment Inventory"
+      ],
+      "hash": "5607ea9aa1d02756613b7f4ce797bb33b756efe17f9cc3b2e49c7369129b3af5",
+      "ukuran_kb": 4.7,
+      "ringkasan": "Menjawab cara kerja standar developer ERP Bharata (manusia maupun AI agent): setup workspace/tools, flow wajib per task dari /start-task sampai /wrap, konvensi git & dokumentasi, dan checklist onboarding hari pertama.",
+      "kata_kunci": [
+        "developer guide",
+        "onboarding",
+        "workspace setup",
+        "agent-kit",
+        "flow task /start-task /wrap",
+        "pnpm",
+        "docker compose",
+        "sibling repo",
+        "CLAUDE.md"
       ]
     },
     {
@@ -2299,7 +2328,7 @@
         "ADR - 0009 Affiliate via Search Seller Affiliate Orders API"
       ],
       "hash": "aa1d7c94c52090b4576f439e79182c2b73cf997f0875095fc5b51fd714937d56",
-      "ukuran_kb": 6.9,
+      "ukuran_kb": 6.8,
       "ringkasan": "Menjawab bagaimana profit engine menghitung laba after-ads per produk dengan menyambungkan ad spend, order/settlement, dan HPP yang tersebar di koleksi berbeda tanpa key seragam, termasuk join key item_group_id==product_id dan bagaimana mekanisme mapping-nya berkembang (items vs product_costs/product_sku_mappings) untuk multi-channel TikTok/Shopee dan fitur Cash Flow.",
       "kata_kunci": [
         "profit engine",
@@ -2391,7 +2420,7 @@
         "ADR - 0008 Profit Engine Join via item_group_id"
       ],
       "hash": "abea5b11d8dae02b1a2cd430ca0046a99b53ed7b7b20db913174e5248f1f27da",
-      "ukuran_kb": 4.6,
+      "ukuran_kb": 4.5,
       "ringkasan": "Menjawab kenapa endpoint analitik integration service (profit produk, ringkasan transaksi order, dashboard) lambat dan sering error 500/502, serta bagaimana cache in-service + singleflight mengatasinya (key cache, TTL, degradasi Redis down) dan arah Fase 2 pre-agregasi.",
       "kata_kunci": [
         "cache",
@@ -2482,7 +2511,7 @@
         "ADR - 0001 Akuntansi via Accurate"
       ],
       "hash": "960bd5f5a134a84893bdbb492101b8123c99d6bc23ae14d3c3fba923b12df3a6",
-      "ukuran_kb": 3.0,
+      "ukuran_kb": 2.9,
       "ringkasan": "Menjawab bagaimana token akses Accurate dikelola: connect via UI, auto-refresh, penyimpanan terenkripsi di database sebagai pengganti tempel token manual dari env, termasuk endpoint connect/disconnect dan mekanisme fallback saat gagal.",
       "kata_kunci": [
         "Accurate token",
@@ -2574,7 +2603,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "9535c7aa27ea11e10f473f2a724893153acbb57826d6a04571e3427efd8d9ad2",
-      "ukuran_kb": 4.9,
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab sumber tanggal yang dipakai untuk membukukan retur TikTok ke Accurate: kenapa update_time menyesatkan (ikut mundur karena settle refund) dan kenapa order_update_date dipilih sebagai gantinya, serta perbaikan zona waktu WIB untuk penomoran dokumen retur (RTR).",
       "kata_kunci": [
         "tanggal retur",
@@ -2713,7 +2742,7 @@
         "IT - Monitoring System"
       ],
       "hash": "d626f97248b291e1eb56ddbdd6b2bdf6b0c75ac33dfa8438a4847363454d22e4",
-      "ukuran_kb": 7.7,
+      "ukuran_kb": 7.6,
       "ringkasan": "Menjawab service mana yang paling perlu duluan dipindah ke cloud agar tetap hidup saat listrik/server kantor mati (gateway, integration, employee, attendance), mana yang bisa menyusul atau tetap on-premise, dan blocker teknis (ssoStore in-memory, cron tanpa distributed lock) yang harus dibereskan sebelum migrasi.",
       "kata_kunci": [
         "migrasi cloud",
@@ -2741,7 +2770,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "999c639176c5c576a1497b17c5be20b4e88c841dc9f00a1d8e92e98a66e8a932",
-      "ukuran_kb": 5.6,
+      "ukuran_kb": 5.5,
       "ringkasan": "Menjawab bagaimana dulu sistem menentukan kapan Retur Penjualan dibukukan berdasarkan mode retur (refund-only vs barang balik) sambil mempertahankan baris faktur asli, dan kenapa asumsi 'retur penuh selalu keluar dari snapshot faktur' terbantah oleh verifikasi data produksi.",
       "kata_kunci": [
         "retur per mode",
@@ -2833,7 +2862,7 @@
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
       "hash": "7144f90edde6acfe2c0abe7e45e3e9fa89c5b602d6a9e8252ae2ce2b23990929",
-      "ukuran_kb": 18.5,
+      "ukuran_kb": 18.4,
       "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi dua sub-tab (SUMBER vs INPUT WMS), apa sumber data tiap menu (feed retur marketplace, resi, Procurement PO, Surat Jalan, Laporan Hasil Produksi), dan kenapa badge 'sudah/belum dicatat' hanya dipasang di tab yang punya kunci join. Juga menjawab status resi mana yang dihitung keluar gudang (COMPLETED plus SHIPPED, dengan alasan TO_SHIP sengaja dikecualikan), kenapa tab Keluar FG diagregasi per SKU dan bundle dipecah ke komponen, serta bagaimana jejak akuntabilitas penginput dijamin lewat `created_by_name` yang distempel server dari header username, bukan dikirim client.",
       "kata_kunci": [
         "WMS",
@@ -3105,45 +3134,6 @@
       ]
     },
     {
-      "path": "DEVELOPER GUIDE.md",
-      "judul": "DEVELOPER GUIDE",
-      "area": "root",
-      "jenis": "meta",
-      "status_emoji": null,
-      "status_teks": null,
-      "publik": true,
-      "tautan": [
-        "README",
-        "HOMEPAGE",
-        "CLAUDE",
-        "SCRUM SPECS",
-        "ROADMAP",
-        "DB - Overview and Notes",
-        "IT - Runbooks",
-        "CORE - API Master Gateway",
-        "CORE - SSO Flow",
-        "IT - SOP Dokumentasi Vault",
-        "REF - Glossary",
-        "IT - CI-CD",
-        "RUN - Onboarding Developer Baru",
-        "IT - Environment Inventory"
-      ],
-      "hash": "5607ea9aa1d02756613b7f4ce797bb33b756efe17f9cc3b2e49c7369129b3af5",
-      "ukuran_kb": 4.7,
-      "ringkasan": "Menjawab cara kerja standar developer ERP Bharata (manusia maupun AI agent): setup workspace/tools, flow wajib per task dari /start-task sampai /wrap, konvensi git & dokumentasi, dan checklist onboarding hari pertama.",
-      "kata_kunci": [
-        "developer guide",
-        "onboarding",
-        "workspace setup",
-        "agent-kit",
-        "flow task /start-task /wrap",
-        "pnpm",
-        "docker compose",
-        "sibling repo",
-        "CLAUDE.md"
-      ]
-    },
-    {
       "path": "Finance System/Finance - Big Pictures.md",
       "judul": "Finance - Big Pictures",
       "area": "Finance System",
@@ -3188,7 +3178,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "ef3638af9ecf55233e212c73376c5be52c44a23de12cb237d1fc13d2abc6833f",
-      "ukuran_kb": 16.3,
+      "ukuran_kb": 15.9,
       "ringkasan": "Menjawab endpoint dan alur kerja Finance Bridging versi Golang (penulisan ulang dari sistem Java): bagaimana membuat dan mengirim ringkasan transaksi Sales/Income/Return ke Accurate, halaman FE terkait per channel, status ringkasan, serta setting toko dan mapping produk.",
       "kata_kunci": [
         "Finance Bridging Golang",
@@ -3241,7 +3231,7 @@
         "Finance - Big Pictures"
       ],
       "hash": "c4d745c5d1d6481993cdb4c7ad8241b0a449d6e0876b2c415ab632952855e3f9",
-      "ukuran_kb": 5.1,
+      "ukuran_kb": 5.0,
       "ringkasan": "Menjawab prosedur manual menghapus data income duplikat di database Finance lama saat file report marketplace ter-upload dobel, termasuk script Python untuk generate query DELETE dan langkah verifikasi sebelum eksekusi.",
       "kata_kunci": [
         "hapus data duplikat",
@@ -3531,7 +3521,7 @@
         "Form Permintaan Barang GA.pdf"
       ],
       "hash": "a5d80f69043f13c9fc1d8398dba5bbd267573b1787006299977b3074f1d8f6ab",
-      "ukuran_kb": 7.0,
+      "ukuran_kb": 6.9,
       "ringkasan": "Menjawab: apa sebenarnya ruang lingkup Inventory Management GA dan kenapa namanya dianggap menyesatkan, serta bagaimana visi GA sebagai pemilik native seluruh aset yang menurunkan item ke departemen lain. Juga menjawab alur lengkap sebuah barang menjadi aset perusahaan (form permintaan bertanda tangan SPV, nego minimal tiga alternatif vendor, approval GA, keharusan persetujuan Direktur untuk harga di atas Rp3.000.000, PO, lalu pencatatan dan penomoran saat barang datang), kendala nyata tim GA hasil observasi, kategori dan sifat barang, serta hal yang masih TBD seperti penggabungan internal inventory dengan warehouse master data.",
       "kata_kunci": [
         "GA inventory",
@@ -3713,7 +3703,7 @@
         "RUN - Onboarding Developer Baru"
       ],
       "hash": "a7f85f84b2c8c034892c59c9e818c23b01f0505267942ad1227b26c0f3a66278",
-      "ukuran_kb": 7.2,
+      "ukuran_kb": 7.1,
       "ringkasan": "Menjawab pertanyaan orientasi umum tentang arsitektur ERP Bharata (bip-erp) -- apa itu API Gateway, Orchestrator, dan Service, bagaimana struktur routes (/public, /api, /auth, /ext, dll), struktur repository bip-erp, serta menjadi peta/index ke seluruh dokumen vault (aplikasi, microservices, domain, ADR, API reference).",
       "kata_kunci": [
         "homepage",
@@ -3968,7 +3958,7 @@
         "HRIS - Recruitment"
       ],
       "hash": "a84a53a84ea2984d977d11c6b8e22b62f86afbebe68b5dd5b8ffff2197b29d56",
-      "ukuran_kb": 4.6,
+      "ukuran_kb": 4.5,
       "ringkasan": "Menjawab: bagaimana fitur Candidate Assessment (tes teknis/keahlian di tahap Screening) dirancang, mulai dari master katalog tipe assessment di System Setup, entity candidate_assessment berisi skor dan hasil Pass/Fail/Pending, sampai endpoint backend dan halaman menu tersendiri di web beserta reuse CandidatePicker. Juga menjelaskan keputusan desain yang sudah dikunci, misalnya perubahan status kandidat tetap manual oleh HR (tanpa otomatis dari hasil tes) dan picker kandidat dibatasi ke status Screening, plus urutan slicing BE lalu FE dan hal yang di luar scope MVP seperti lampiran hasil tes.",
       "kata_kunci": [
         "candidate assessment",
@@ -4314,7 +4304,7 @@
         "HRIS - Big Pictures"
       ],
       "hash": "1c7abd03000f91ee32541f1b0b6eab0b556309aa4232ad5c68daee4feed33fca",
-      "ukuran_kb": 8.1,
+      "ukuran_kb": 8.0,
       "ringkasan": "Menjawab: bagaimana cara mengajukan cuti/izin/sakit/dinas, jenis dan subtipe apa saja yang tersedia beserta batas durasinya, siapa yang menyetujui (SPV lalu HR), dan bagaimana izin urusan kantor vs urusan pribadi memengaruhi perhitungan payroll (dipotong atau tidak). Juga menjelaskan mekanisme auto-ignore pengajuan basi, reminder reviewer, dan dampak persetujuan ke status kehadiran.",
       "kata_kunci": [
         "cuti",
@@ -4380,7 +4370,7 @@
         "HRIS - Personalia"
       ],
       "hash": "71402ba86240d728f9e0305da3b2fb442d49c982eb1207dfe8962eefde84a8e7",
-      "ukuran_kb": 14.7,
+      "ukuran_kb": 14.6,
       "ringkasan": "Menjawab: bagaimana struktur organisasi disimpan dan dikelola, yaitu departemen dan posisi sebagai master data di `master_department` (termasuk `position_items[]` berkunci stabil yang menempeli permission_sets) serta scoping per perusahaan lewat `company_id`. Menjawab juga: siapa atasan seseorang, bedanya `work_data.supervisor_id` (atasan langsung, dipakai untuk cakupan tampilan KPI Leader) dengan `supervised_by` (cakupan supervisi departemen yang dipakai alur approval), cara mengisinya lewat menu Atasan Langsung dengan alur pilih atasan lalu centang bawahan, dan aturan satu karyawan hanya punya satu atasan. Berguna untuk memahami bagan organisasi `/hris/org-chart` yang berkerangka departemen (bukan rantai atasan), penanganan karyawan non-aktif, pemekaran label grup HRGA, dan hal yang masih TBD seperti jenjang/golongan.",
       "kata_kunci": [
         "struktur organisasi",
@@ -4547,7 +4537,7 @@
         "Finance - Big Pictures"
       ],
       "hash": "430d7530132d083cb27b4e488b5047e73da75284c618036554bbfd13470ab323",
-      "ukuran_kb": 5.3,
+      "ukuran_kb": 5.2,
       "ringkasan": "Menjawab: bagaimana komponen gaji, BPJS, dan PPh21 metode TER dihitung dalam engine payroll run, apa itu payroll-supplement dari attendance untuk prorata tunjangan kehadiran, dan apa saja yang sudah vs belum diimplementasikan (slip PDF cetak, rekonsiliasi PPh21 Desember, batas scope terhadap Accurate).",
       "kata_kunci": [
         "payroll",
@@ -4674,7 +4664,7 @@
       "publik": true,
       "tautan": [],
       "hash": "f2d49092d109910d5a407fd40c6d5b21837bc601f9e1870bb7a8452dcd67e96a",
-      "ukuran_kb": 15.2,
+      "ukuran_kb": 15.1,
       "ringkasan": "Menjawab: seperti apa gambaran visual alur rekrutmen dari requisition sampai onboarding, dan tahap apa saja yang dilalui kandidat (Requisition, Lowongan, Pelamar, CV Screening, Interview HR, Interview User, Technical Test, Interview Final, Background Check, Psikotes, Offering, Hired, Onboarding masa evaluasi) beserta pengelompokannya ke fase Sourcing, Seleksi, Keputusan, dan Onboarding. Titik keputusan yang ditandai di diagram antara lain approve SPV HRD pada requisition, terima atau tolak offering, dan lulus/perpanjang/tidak lulus di akhir masa evaluasi. Berkas ini adalah diagram Excalidraw dengan data gambar terkompresi, jadi dipakai sebagai rujukan visual alur, bukan penjelasan naratif.",
       "kata_kunci": [
         "alur rekrutmen",
@@ -4762,7 +4752,7 @@
         "HRIS - Key Performance Index"
       ],
       "hash": "e2c6094c53cbb4145fe180044f1d0721a4f08e421ab9733c387c774ae37650d0",
-      "ukuran_kb": 11.0,
+      "ukuran_kb": 10.9,
       "ringkasan": "Menjawab: fitur apa saja dari modul Recruitment ERPGo (job requisition, job posting, candidate, dashboard, offer & onboarding) yang sudah diadopsi bip-erp, apa yang sengaja tidak diadopsi (custom questions, dll), dan rekomendasi prioritas pengembangan berikutnya (mis. tanggal kedaluwarsa offer, status inline).",
       "kata_kunci": [
         "ERPGo",
@@ -4883,7 +4873,7 @@
         "HRIS - Big Pictures"
       ],
       "hash": "5f365899886a6a91fdfc4ee707fbfc9382e5ebbe90996415f2282863aab0f88e",
-      "ukuran_kb": 3.6,
+      "ukuran_kb": 3.5,
       "ringkasan": "Menjawab: apa urutan prioritas dan fase pengembangan domain HRIS ke depan (perbaikan yang sudah jalan, enabler email, recruitment, konsolidasi Review Cycle, HR lifecycle, struktur & payroll), serta dependency antar fase yang perlu diselesaikan lebih dulu.",
       "kata_kunci": [
         "roadmap HRIS",
@@ -5018,7 +5008,7 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented — 26 job terjadwal + 1 dispatcher webhook (per audit kode; +4 job integration ditambahkan 2026-07-11: affiliate Shopee AMS performance/conversion & WMS resi bridge `sync-resi-wms`/`sync-shopee-tracking`; +1 guardian order Shopee `sync-shopee-orders` 2026-07-14, **belum deploy**; +1 guardian retur Shopee `sync-shopee-returns` 2026-07-15 & +1 guardian retur TikTok `recover-tiktok-returns` 2026-07-16 — memicu booking Retur Penjualan yang selama ini tak pernah menyala, **belum deploy**; +1 sync ulasan marketplace `sync-reviews` 2026-07-19 harian 06:45, **LIVE**; +3 job Packet Tracking `sync-tracking`/`detect-stuck`/`sync-return-tracking` 2026-07-17..18 — checkpoint pengiriman forward+retur & deteksi mandek, **LIVE**). *3 job reminder attendance (koreksi/leave/tukar jadwal) + auto-ignore koreksi & tukar jadwal + pre-alokasi sadar-swap dari **PR #165** — belum rilis ke prod.*",
+      "status_teks": "Implemented — 45 job terjadwal + 1 dispatcher webhook (per audit kode 2026-08-01: +19 job integration yang sebelumnya belum tercatat — rumpun Accurate (stock/aset/opex refresh, sweep faktur/retur/receipt, receipt-sync, sample-shipping-expense, anomali retur), rekonsiliasi (statement TikTok, income Lazada, status order, retur TikTok), resi (enrich cancel/reverse, safety-net WMS), wallet-sync, seed-mapping, guardian stale-toship; +4 job integration ditambahkan 2026-07-11: affiliate Shopee AMS performance/conversion & WMS resi bridge `sync-resi-wms`/`sync-shopee-tracking`; +1 guardian order Shopee `sync-shopee-orders` 2026-07-14, **belum deploy**; +1 guardian retur Shopee `sync-shopee-returns` 2026-07-15 & +1 guardian retur TikTok `recover-tiktok-returns` 2026-07-16 — memicu booking Retur Penjualan yang selama ini tak pernah menyala, **belum deploy**; +1 sync ulasan marketplace `sync-reviews` 2026-07-19 harian 06:45, **LIVE**; +3 job Packet Tracking `sync-tracking`/`detect-stuck`/`sync-return-tracking` 2026-07-17..18 — checkpoint pengiriman forward+retur & deteksi mandek, **LIVE**). *3 job reminder attendance (koreksi/leave/tukar jadwal) + auto-ignore koreksi & tukar jadwal + pre-alokasi sadar-swap dari **PR #165** — belum rilis ke prod.*",
       "publik": false,
       "tautan": [
         "External - Desty",
@@ -5036,22 +5026,20 @@
         "Microservices - Task Management Service",
         "Sales - Marketplace Integration"
       ],
-      "hash": "404d6def943bc62fccd84789620c385d651355c19400d5f3aaed4ca4c2aab371",
-      "ukuran_kb": 16.7,
-      "ringkasan": "Menjawab: proses latar belakang apa saja yang berjalan di bip-erp, di service mana, jam berapa (WIB), untuk apa, lock apa yang dipakai, dan di file:line mana kodenya. Juga menjawab perbedaan sintaks cron 6-field integration versus 5-field service lain, job mana yang sudah dicabut atau jadi dead code, dan mana yang sudah live versus belum deploy, sehingga bisa dipakai saat debugging, perencanaan kapasitas, atau mengubah service.",
+      "hash": "930bb24c400c3a5677a7ae374057fb07f46563ee711f1c57762c2f5e730415e8",
+      "ukuran_kb": 21.7,
+      "ringkasan": "Menjawab: proses latar belakang apa saja yang berjalan diam-diam di bip-erp — cron, scheduler, worker, dan poller in-process — beserta jadwalnya dalam WIB, service pemiliknya, tujuannya, mekanisme lock-nya, dan lokasi file:line-nya. Berguna saat debugging, perencanaan kapasitas, atau mengubah service supaya tidak ada \"sistem tersembunyi\" yang terlewat; mencakup job employee, attendance, insentive, task-management, notification, dan rumpun besar job integration (sync order/master data TikTok, GMV Max, Shopee GMS, guardian order/retur Shopee & TikTok, refresh kredensial, rekonsiliasi income/escrow, affiliate, packet tracking, sync ulasan). Juga mencatat konvensi yang mudah salah: integration memakai cron `robfig` 6-field sedangkan attendance/employee/notification 5-field, zona waktu default Asia/Jakarta dengan override `INTEGRATION_WORKER_TZ`, serta dispatcher webhook, service tanpa job background, dan catatan risiko operasional.",
       "kata_kunci": [
-        "cron",
-        "scheduler",
         "background job",
+        "scheduler",
+        "cron",
         "worker",
         "jadwal",
         "lock",
         "Redis lock",
-        "WIB",
-        "sync order",
-        "reminder",
-        "reconciler",
-        "webhook dispatcher"
+        "guardian",
+        "webhook consumer",
+        "WIB"
       ]
     },
     {
@@ -5142,7 +5130,7 @@
         "IT - Monitoring System"
       ],
       "hash": "f42b587edfe10fa01ea2d914d68ac52c895cca0c7f9eb2000805dfb3767e433b",
-      "ukuran_kb": 5.5,
+      "ukuran_kb": 5.4,
       "ringkasan": "Menjawab: bagaimana pipeline deploy tiap aplikasi bekerja (bip-erp via GitHub Actions self-hosted runner, erp-frontend via PM2, mybharata-app via Codemagic), di VM/server mana deploy berjalan (termasuk status migrasi ke VPS Biznet), serta bagaimana mekanisme rollback dan notifikasi deploy.",
       "kata_kunci": [
         "CI/CD",
@@ -5380,7 +5368,7 @@
         "IT - Big Pictures"
       ],
       "hash": "339e5923d4ed79eee969a57eb7a886d7b539c2cc4c69c8083807c979305f4277",
-      "ukuran_kb": 3.2,
+      "ukuran_kb": 3.1,
       "ringkasan": "Menjawab: bagaimana jaringan LAN dan WiFi kantor dikelola (subnet lokal, allowlist access point untuk validasi geofencing clock-in), bagaimana ingress/reverse proxy dan cloud firewall VPS Biznet dikonfigurasi selama migrasi, dan apa saja yang masih belum diputuskan (topologi/VLAN formal).",
       "kata_kunci": [
         "network management",
@@ -5433,6 +5421,43 @@
         "GitHub Actions",
         "mongo-backup",
         "rotasi secret"
+      ]
+    },
+    {
+      "path": "IT/IT - SOP Dokumentasi Vault.md",
+      "judul": "IT - SOP Dokumentasi Vault",
+      "area": "IT",
+      "jenis": "domain",
+      "status_emoji": "✅",
+      "status_teks": "Berlaku — SOP aktif; sumber aturan tetap `CLAUDE.md` root.",
+      "publik": false,
+      "tautan": [
+        "Template - Implementasi Service",
+        "Template - Konsep Domain",
+        "Template - Log Operasional",
+        "Template - Runbook",
+        "Template - Persona",
+        "Template - Meeting Note",
+        "Template - Daily Note",
+        "Sales - Marketplace Integration",
+        "Microservices - Integration Service",
+        "...",
+        "CLAUDE",
+        "HOMEPAGE"
+      ],
+      "hash": "f8a268cfeb8ffd7ba48fb84a42fcb2e37b970a170893cc4faef0ef6da92c66ef",
+      "ukuran_kb": 11.4,
+      "ringkasan": "Menjawab: bagaimana cara menulis dokumentasi baru di vault ini secara konsisten (memilih folder & prefix nama file yang tepat, memilih bentuk dokumen dan template yang sesuai, cara memakai wikilink dan status marker), serta langkah git untuk commit dokumentasi.",
+      "kata_kunci": [
+        "SOP dokumentasi",
+        "template",
+        "penamaan file",
+        "wikilink",
+        "decision-tree folder",
+        "status marker",
+        "cara menulis dok",
+        "git commit dokumentasi",
+        "Obsidian"
       ]
     },
     {
@@ -5500,43 +5525,6 @@
         "inventaris infrastruktur",
         "ERP Production",
         "ERP Development"
-      ]
-    },
-    {
-      "path": "IT/IT - SOP Dokumentasi Vault.md",
-      "judul": "IT - SOP Dokumentasi Vault",
-      "area": "IT",
-      "jenis": "domain",
-      "status_emoji": "✅",
-      "status_teks": "Berlaku — SOP aktif; sumber aturan tetap `CLAUDE.md` root.",
-      "publik": false,
-      "tautan": [
-        "Template - Implementasi Service",
-        "Template - Konsep Domain",
-        "Template - Log Operasional",
-        "Template - Runbook",
-        "Template - Persona",
-        "Template - Meeting Note",
-        "Template - Daily Note",
-        "Sales - Marketplace Integration",
-        "Microservices - Integration Service",
-        "...",
-        "CLAUDE",
-        "HOMEPAGE"
-      ],
-      "hash": "f8a268cfeb8ffd7ba48fb84a42fcb2e37b970a170893cc4faef0ef6da92c66ef",
-      "ukuran_kb": 11.4,
-      "ringkasan": "Menjawab: bagaimana cara menulis dokumentasi baru di vault ini secara konsisten (memilih folder & prefix nama file yang tepat, memilih bentuk dokumen dan template yang sesuai, cara memakai wikilink dan status marker), serta langkah git untuk commit dokumentasi.",
-      "kata_kunci": [
-        "SOP dokumentasi",
-        "template",
-        "penamaan file",
-        "wikilink",
-        "decision-tree folder",
-        "status marker",
-        "cara menulis dok",
-        "git commit dokumentasi",
-        "Obsidian"
       ]
     },
     {
@@ -5646,7 +5634,7 @@
         "QA - CPOB (GMP)"
       ],
       "hash": "27972aec76e82cebdde220081bb6156484590f416c53451c6a219e86e438ec67",
-      "ukuran_kb": 15.3,
+      "ukuran_kb": 15.2,
       "ringkasan": "Menjawab: bagaimana dokumen batch release 7 lembar (ceklis kelengkapan, kesiapan ruang, catatan pengolahan, pengemasan, pengujian, lembar keputusan) diisi sebagai menu WMS, siapa mengisi bagian mana (admin gudang RM mengisi kolom ditimbang, admin produksi mengisi data proses, QC/RnD mengisi hasil uji lalu menyetujui), dan bagaimana alur status DRAFT ke DIAJUKAN ke LULUS atau DITOLAK dijaga di server. Juga menjawab cara kerja paraf digital berjenjang berbasis jabatan (roster paraf, paraf per baris, approve terkunci sampai semua slot terparaf) serta aturan rekonsiliasi penimbangan di bawah 2%. Menyebut pula path backend dan frontend-nya, letak menu, dan RBAC `system_roles.manufacture` per persona.",
       "kata_kunci": [
         "batch record",
@@ -5800,7 +5788,7 @@
         "Manufacture - Order Production Workflow (Flow Source)"
       ],
       "hash": "1cf76d2702e919de817bd9b6c2a8e2334e5ac3f707c06e4aa5c97ed6555d063d",
-      "ukuran_kb": 9.5,
+      "ukuran_kb": 9.4,
       "ringkasan": "Menjawab: desain to-be manajemen stok dan material produksi sebagai pengganti spreadsheet, mulai dari master material terstandar, stok per gudang termasuk karantina, BOM/resep, perencanaan kebutuhan, sampai perhitungan kekurangan yang diteruskan ke pengadaan. Juga menjawab bagian mana yang sudah nyata di manufacture-service versus masih TBD, koleksi apa saja yang ada di manufacture_db, dan status rollout Fase 1 hingga Fase 4 termasuk integrasi Accurate yang baru satu arah dan konversi satuan gram versus kg.",
       "kata_kunci": [
         "stok",
@@ -5845,6 +5833,28 @@
         "penyesuaian inventaris",
         "diagram Mermaid"
       ]
+    },
+    {
+      "path": "Quality & Regulatory/QA - BPOM & Izin Edar (NIE).md",
+      "judul": "QA - BPOM & Izin Edar (NIE)",
+      "area": "Quality & Regulatory",
+      "jenis": "domain",
+      "status_emoji": "🔴",
+      "status_teks": "Stub — kerangka; data izin edar Bharata belum ada",
+      "publik": true,
+      "tautan": [
+        "QA - Big Pictures",
+        "Sales - Marketplace Integration",
+        "Microservices - Notification Service",
+        "Microservices - Integration Service",
+        "Microservices - Inventory Service",
+        "QA - CPOB (GMP)",
+        "REF - Glossary"
+      ],
+      "hash": "7b464828b5d67ee060222075e355a994a13ebb219f13010b8c916a9f61259630",
+      "ukuran_kb": 1.4,
+      "ringkasan": "Stub kosong untuk QA - BPOM & Izin Edar (NIE). Belum ada isi.",
+      "kata_kunci": []
     },
     {
       "path": "Quality & Regulatory/QA - Batch Record & Traceability.md",
@@ -5907,28 +5917,6 @@
         "CAPA",
         "izin edar"
       ]
-    },
-    {
-      "path": "Quality & Regulatory/QA - BPOM & Izin Edar (NIE).md",
-      "judul": "QA - BPOM & Izin Edar (NIE)",
-      "area": "Quality & Regulatory",
-      "jenis": "domain",
-      "status_emoji": "🔴",
-      "status_teks": "Stub — kerangka; data izin edar Bharata belum ada",
-      "publik": true,
-      "tautan": [
-        "QA - Big Pictures",
-        "Sales - Marketplace Integration",
-        "Microservices - Notification Service",
-        "Microservices - Integration Service",
-        "Microservices - Inventory Service",
-        "QA - CPOB (GMP)",
-        "REF - Glossary"
-      ],
-      "hash": "7b464828b5d67ee060222075e355a994a13ebb219f13010b8c916a9f61259630",
-      "ukuran_kb": 1.4,
-      "ringkasan": "Stub kosong untuk QA - BPOM & Izin Edar (NIE). Belum ada isi.",
-      "kata_kunci": []
     },
     {
       "path": "Quality & Regulatory/QA - CPOB (GMP).md",
@@ -6031,6 +6019,50 @@
       ]
     },
     {
+      "path": "ROADMAP.md",
+      "judul": "ROADMAP",
+      "area": "root",
+      "jenis": "meta",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [
+        "SCRUM SPECS",
+        "APP - Dynamic Task Tracker",
+        "ADR - 0003 SSO-only Gateway",
+        "QA - Big Pictures",
+        "REF - Glossary",
+        "HRIS - Recruitment",
+        "Microservices - Recruitment Service",
+        "IT - Form Builder",
+        "Microservices - Form Builder Service",
+        "Finance - Big Pictures",
+        "HRIS - Key Performance Index",
+        "Sales - CRM management tool",
+        "HOMEPAGE",
+        "DB - Data Dictionary",
+        "IT - Runbooks",
+        "IT - Environment Inventory",
+        "REF - Ownership & RACI",
+        "HRIS - Roadmap"
+      ],
+      "hash": "1e7d1e6afc8f9d6bf35c0b151f395578f1c1f70f1898716aacd3994126bd5aad",
+      "ukuran_kb": 2.4,
+      "ringkasan": "Menjawab: apa arah dan prioritas pengembangan ERP Bharata, kandidat fitur atau service apa saja yang terdaftar (Recruitment, Form Builder, Contract Management, Budget Planner, Goal/OKR, CRM internal) dan dokumen sumber mana yang membahas tiap item. Juga menjawab item infra/teknis yang masih menggantung seperti shared-library standalone dan pemisahan `docker-compose` serta `.env` per service, plus pertanyaan bisnis yang menahan keputusan (ada tidaknya kanal B2B/wholesale, fungsi distribusi CDOB). Menjelaskan pula bahwa prioritas dan target tanggal ditetapkan Product Owner, dan backlog operasional harian disimpan di Dynamic Task Tracker, bukan di sini.",
+      "kata_kunci": [
+        "roadmap",
+        "prioritas",
+        "backlog",
+        "rencana pengembangan",
+        "product owner",
+        "second-brain",
+        "infra teknis",
+        "Contract Management",
+        "Budget Planner",
+        "OKR"
+      ]
+    },
+    {
       "path": "Reference/REF - Glossary.md",
       "judul": "REF - Glossary",
       "area": "Reference",
@@ -6112,50 +6144,6 @@
       ]
     },
     {
-      "path": "ROADMAP.md",
-      "judul": "ROADMAP",
-      "area": "root",
-      "jenis": "meta",
-      "status_emoji": null,
-      "status_teks": null,
-      "publik": true,
-      "tautan": [
-        "SCRUM SPECS",
-        "APP - Dynamic Task Tracker",
-        "ADR - 0003 SSO-only Gateway",
-        "QA - Big Pictures",
-        "REF - Glossary",
-        "HRIS - Recruitment",
-        "Microservices - Recruitment Service",
-        "IT - Form Builder",
-        "Microservices - Form Builder Service",
-        "Finance - Big Pictures",
-        "HRIS - Key Performance Index",
-        "Sales - CRM management tool",
-        "HOMEPAGE",
-        "DB - Data Dictionary",
-        "IT - Runbooks",
-        "IT - Environment Inventory",
-        "REF - Ownership & RACI",
-        "HRIS - Roadmap"
-      ],
-      "hash": "1e7d1e6afc8f9d6bf35c0b151f395578f1c1f70f1898716aacd3994126bd5aad",
-      "ukuran_kb": 2.4,
-      "ringkasan": "Menjawab: apa arah dan prioritas pengembangan ERP Bharata, kandidat fitur atau service apa saja yang terdaftar (Recruitment, Form Builder, Contract Management, Budget Planner, Goal/OKR, CRM internal) dan dokumen sumber mana yang membahas tiap item. Juga menjawab item infra/teknis yang masih menggantung seperti shared-library standalone dan pemisahan `docker-compose` serta `.env` per service, plus pertanyaan bisnis yang menahan keputusan (ada tidaknya kanal B2B/wholesale, fungsi distribusi CDOB). Menjelaskan pula bahwa prioritas dan target tanggal ditetapkan Product Owner, dan backlog operasional harian disimpan di Dynamic Task Tracker, bukan di sini.",
-      "kata_kunci": [
-        "roadmap",
-        "prioritas",
-        "backlog",
-        "rencana pengembangan",
-        "product owner",
-        "second-brain",
-        "infra teknis",
-        "Contract Management",
-        "Budget Planner",
-        "OKR"
-      ]
-    },
-    {
       "path": "Runbooks/RUN - Accurate API Access Token (OAuth).md",
       "judul": "RUN - Accurate API Access Token (OAuth)",
       "area": "Runbooks",
@@ -6172,7 +6160,7 @@
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line"
       ],
       "hash": "3f96919e54322e4b24b7df85ce405b30cd7ae09d424a039dbeea2a1b0af0b838",
-      "ukuran_kb": 9.0,
+      "ukuran_kb": 8.8,
       "ringkasan": "Menjawab bagaimana mendapatkan dan memperbarui access token OAuth Accurate (via tombol Connect di UI atau curl manual authorization-code flow), cara mengisi env ACCURATE_* di services/integration, perbedaan mode token (OAuth berbasis session vs API Token aat.), serta cara troubleshoot error auth (invalid_grant, invalid_client, 401 signature) saat auto-sync Sales Invoice/Sales Return ke Accurate.",
       "kata_kunci": [
         "Accurate",
@@ -6202,7 +6190,7 @@
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line"
       ],
       "hash": "a30906ada14245b5636bd30815b15151df70cef9bf452fcfc169570de9f722e4",
-      "ukuran_kb": 4.5,
+      "ukuran_kb": 4.4,
       "ringkasan": "Menjawab bagaimana mengatasi order Shopee yang tidak masuk rekap faktur Accurate karena kolom shipped_at kosong, cara menjalankan tool backfill pickup_done_time (cmd/ordersync mode shippedatbackfill) per toko, dan cara rebuild faktur terdampak secara retur-safe beserta verifikasinya.",
       "kata_kunci": [
         "shipped_at",
@@ -6264,7 +6252,7 @@
         "CORE - API Master Gateway"
       ],
       "hash": "e050fdbedf0f1c8f722c81edb13dacd89b2b0e72fa64068811e4bdf6d20b5679",
-      "ukuran_kb": 4.7,
+      "ukuran_kb": 4.6,
       "ringkasan": "Menjawab: bagaimana men-deploy ulang satu microservice bip-erp ke produksi dengan aman - perintah `docker compose up -d --build <service> --no-deps`, kenapa `--no-deps` wajib di jam rawan (batasi blast radius, jangan recreate MongoDB dependensi) dan kapan justru tak boleh dipakai. Menjelaskan urutan aman antar-service saling bergantung (deploy penyedia API dulu), fitur dorman di balik feature flag (AUTO_ARRANGE_ENABLED default off), verifikasi pasca-deploy via log/health, dan tabel troubleshooting gejala-akar-fix.",
       "kata_kunci": [
         "deploy",
@@ -6395,7 +6383,7 @@
         "LOG - Shopee API Rate Limit Request"
       ],
       "hash": "3fcbdb4347094045dc6998e0115a68ed088a3fb583e5af2bd05e654cf5098b00",
-      "ukuran_kb": 4.8,
+      "ukuran_kb": 4.7,
       "ringkasan": "Menjawab bagaimana proses mendapatkan API key (Bearer token) KiriminAja Mitra API untuk kebutuhan integrasi shipping/logistik (create shipment, cek ongkir, tracking, cetak label, webhook, pickup, COD), termasuk alur registrasi partnership, sandbox, evaluasi Go SDK resmi, dan transisi ke produksi. Dokumen ini masih draft dan belum pernah dieksekusi dengan akun asli.",
       "kata_kunci": [
         "KiriminAja",
@@ -6454,7 +6442,7 @@
         "Microservices - Warehouse Service"
       ],
       "hash": "8b7496db6240f24cbe304cf14fde304173f23b262ead612aa69d90da39695047",
-      "ukuran_kb": 12.8,
+      "ukuran_kb": 12.5,
       "ringkasan": "Menjawab cara admin gudang memproses pesanan marketplace (TikTok Shop & Shopee) dari antrian pesanan sampai serah terima kurir memakai menu Warehouse di ERP, termasuk aturan wajib unduh data sebelum cetak resi, cara pilih tim packer, dan cara membaca Riwayat Cetak Resi untuk investigasi kasus pesanan terlambat.",
       "kata_kunci": [
         "WMS",
@@ -6487,7 +6475,7 @@
         "ADR - 0001 Akuntansi via Accurate"
       ],
       "hash": "fe92607ce84028a35d808d5fe5bcb568bb54766d44d7b0785bbfcb12006a28d1",
-      "ukuran_kb": 11.7,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab cara menyelaraskan kode bahan/master WMS dari kode mnemonik lama ke kode item Accurate agar stok bisa disinkronkan tanpa data master menumpuk/dobel, baik lewat tombol UI self-healing (Sync Master Bahan/Barang Jadi) maupun endpoint align-accurate manual, serta cara memperbaiki satuan yang dilaporkan bermasalah pasca-sync.",
       "kata_kunci": [
         "align-accurate",
@@ -6503,6 +6491,36 @@
       ]
     },
     {
+      "path": "SCRUM SPECS.md",
+      "judul": "SCRUM SPECS",
+      "area": "root",
+      "jenis": "meta",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [
+        "IT - CI-CD",
+        "APP - Dynamic Task Tracker",
+        "Microservices - Task Management Service",
+        "CORE - SSO Flow"
+      ],
+      "hash": "3abd840890a55dba27fddce02b56dc55eb93eca0c247d20dff5ebc5bdadcec92",
+      "ukuran_kb": 3.0,
+      "ringkasan": "Menjawab pertanyaan tentang bagaimana tim development ERP Bharata bekerja dari product backlog sampai rilis (peran Product Owner/Scrum Master/QA, alur sprint planning-daily-product increment), aturan branching feature-ke-dev-ke-main, dan kapan deploy otomatis ke production terjadi.",
+      "kata_kunci": [
+        "scrum",
+        "sprint",
+        "product backlog",
+        "sprint backlog",
+        "product owner",
+        "scrum master",
+        "QA",
+        "branching",
+        "CI/CD",
+        "definition of done"
+      ]
+    },
+    {
       "path": "Sales/Sales - Affiliate Integration (TikTok Docs).md",
       "judul": "Sales - Affiliate Integration (TikTok Docs)",
       "area": "Sales",
@@ -6514,7 +6532,7 @@
         "/ljhwZthlaukjlkulzlp/Developer_Guide/Affiliate%20Integration/aff1.mp4?x-resource-account=public\" type=\"video/mp4\"></video>\n<video controls><source src=\"https://sf16-sg.tiktokcdn.com/obj/eden-sg/jvK_ylwvslclK_JWZ[[/ljhwZthlaukjlkulzlp/Developer_Guide/Affiliate%20Integration/aff2.mp4?x-resource-account=public\" type=\"video/mp4\"></video>"
       ],
       "hash": "dd0ae4c2bb8d57f754caf8cbaab8e6f1f6e5fe22bdad7f957375aa0d5a216bc4",
-      "ukuran_kb": 36.9,
+      "ukuran_kb": 36.4,
       "ringkasan": "Referensi dokumentasi resmi TikTok Shop Affiliate API yang menjawab bagaimana setup partner account dan development shop, alur onboarding seller/creator, serta use case seperti generate link promosi, targeted collaboration, dan program free samples untuk affiliate.",
       "kata_kunci": [
         "TikTok Shop",
@@ -6541,7 +6559,7 @@
         "ADR - 0009 Affiliate via Search Seller Affiliate Orders API"
       ],
       "hash": "0662e3fc986a1b9dfd8cc98a36f4ec2b33a6fcc4f54eab6a16dfa6ec5ecdc8b5",
-      "ukuran_kb": 6.4,
+      "ukuran_kb": 6.3,
       "ringkasan": "Menjawab desain teknis auto-sync data affiliate TikTok (order, komisi, creator) dari Search Seller Affiliate Orders API ke koleksi affiliate_orders, meliputi model data, komponen backend yang perlu dibuat (client/repo/usecase/handler/cron), dan prasyarat scope/re-authorize toko sebelum sync bisa jalan.",
       "kata_kunci": [
         "affiliate sync",
@@ -6565,7 +6583,7 @@
       "publik": true,
       "tautan": [],
       "hash": "5351566c7cced1fa33c8986f552d96c0f584b25d35cbe0d379ed3b90d4a4a09e",
-      "ukuran_kb": 19.2,
+      "ukuran_kb": 18.7,
       "ringkasan": "Menjawab rencana implementasi step-by-step (task 1-7 dengan checkbox) untuk fitur auto-sync affiliate TikTok, mencakup client method SearchSellerAffiliateOrders, entity AffiliateOrder, repository, usecase, HTTP handler, dan cron task harian, lengkap dengan contoh kode Go dan prasyarat token/scope.",
       "kata_kunci": [
         "affiliate sync",
@@ -6708,7 +6726,7 @@
       "publik": true,
       "tautan": [],
       "hash": "e524a33079bdb271320186b073436f16bf3265c5a3f07a144937d0f418879807",
-      "ukuran_kb": 26.9,
+      "ukuran_kb": 26.1,
       "ringkasan": "Menjawab rencana implementasi field HPP/Cost per SKU di master items beserta fitur upload xlsx (parse, fuzzy-match nama produk ke SKU, preview matched/ambiguous/unmatched, lalu commit), termasuk struktur task backend (entity, usecase, handler) dan frontend (tab HPP Master) secara step-by-step.",
       "kata_kunci": [
         "HPP",
@@ -6739,7 +6757,7 @@
         "Sales - Incentive"
       ],
       "hash": "d32dd441bd5ed73a0b051e2d7ef6c3b29162aaaaddaebc2907c3b495bd49e02f",
-      "ukuran_kb": 17.7,
+      "ukuran_kb": 17.4,
       "ringkasan": "Menjawab: bagaimana karyawan ICC (Internal Content Creator) dipetakan ke akun TikTok Shop dan TikTok Ads yang mereka kelola, seperti apa model data koleksi icc_account_mappings di Integration Service, dan aturan apa yang berlaku (shop/advertiser opsional tapi minimal salah satu wajib, satu karyawan boleh banyak toko/ads, satu shop atau advertiser hanya untuk satu karyawan aktif). Menjelaskan alur SPV/Leader membuat mapping dengan team auto-fill dari header BIP-Department, halaman ICC Dashboard untuk staff melihat performa toko dan iklannya sendiri, Team Performance untuk atasan, serta cara rotasi atau pergantian Account Manager. Memuat juga daftar endpoint /icc/mappings, otorisasi lewat middleware RequireMarketingLeader, fase implementasi, dan kaitannya dengan insentif.",
       "kata_kunci": [
         "ICC",
@@ -6771,7 +6789,7 @@
         "APP - Web ERP"
       ],
       "hash": "32d122230c018fa426415cd0bdd994d994990b41fb0fbc9426fe40367524c561",
-      "ukuran_kb": 9.8,
+      "ukuran_kb": 9.6,
       "ringkasan": "Menjawab bagaimana daftar username TikTok affiliate milik karyawan ICC saat ini dikelola (hardcoded di frontend) beserta masalahnya, serta rancangan opsi migrasi ke data bersumber Employee Service (field tiktok_usernames/is_icc) supaya bisa dikelola HR/ADV Leader tanpa deploy ulang kode.",
       "kata_kunci": [
         "ICC",
@@ -6850,7 +6868,7 @@
       "publik": true,
       "tautan": [],
       "hash": "67e9f4daf35bede6c9a827748a476616d6bc1a904f17135dbe19a711d5294d9a",
-      "ukuran_kb": 5.4,
+      "ukuran_kb": 5.3,
       "ringkasan": "Menjawab rekap temuan teknis untuk membangun dashboard Marketing & Ads Command Center, meliputi progress vs mockup, strategi join data laba via item_group_id/product_id, sumber HPP, status fee/settlement, target ROAS/CPA, sumber API affiliate, dan daftar blocker eksternal (re-authorize toko, RAPB, detail Live).",
       "kata_kunci": [
         "marketing dashboard",
@@ -6911,7 +6929,7 @@
       "publik": true,
       "tautan": [],
       "hash": "b81f63e1e09754c05a02128d37a382fd36f928bd3caa9324f1053a3e43bbc0d4",
-      "ukuran_kb": 13.5,
+      "ukuran_kb": 13.3,
       "ringkasan": "Menjawab roadmap master pembangunan dashboard Marketing & Ads Command Center, mencakup data/API/FE yang sudah ada untuk di-reuse, daftar gap dan 9 'engine' yang dibutuhkan (profit, KPI, status rekomendasi, funnel, pacing, attribution, dst), strategi sumber data affiliate, dan urutan scope pengerjaan hulu-hilir.",
       "kata_kunci": [
         "master roadmap",
@@ -7001,7 +7019,7 @@
         "ADR - 0008 Profit Engine Join via item_group_id"
       ],
       "hash": "19c5b037af97c52a9f164010720ebdc43b8873a16e567063f50a75c97100c9de",
-      "ukuran_kb": 8.6,
+      "ukuran_kb": 8.4,
       "ringkasan": "Menjawab pertanyaan tentang bagaimana laba after-ads dihitung per produk/akun (formula GMV dikurangi biaya marketplace, HPP, retur, dan iklan), desain endpoint backend untuk HPP master (upload/preview/commit xlsx), config RAPB/target, dan profit report, serta desain tab frontend dashboard Marketing & Ads Command Center. Cocok dicari saat butuh detail keputusan desain seperti join ad-spend per ItemID, penyimpanan HPP di master items, dan aturan status SCALE/JAGA/PERBAIKI/HENTIKAN.",
       "kata_kunci": [
         "profit engine",
@@ -7026,7 +7044,7 @@
       "publik": true,
       "tautan": [],
       "hash": "32d5e28c350baa39195bbee9ccf14b15f44f8c179fc9220815b6d584981770e0",
-      "ukuran_kb": 3.9,
+      "ukuran_kb": 3.8,
       "ringkasan": "Menjawab pertanyaan tentang syarat dan tahapan onboarding developer kategori 'Creator Collaboration' (affiliate) di TikTok Shop Partner Center, siapa yang mereview aplikasi, dan aturan apa yang menyebabkan terminasi akses API affiliate. Ini dokumen resmi TikTok yang di-paste sebagai referensi, bukan tulisan tim ERP.",
       "kata_kunci": [
         "TikTok Shop",
@@ -7127,36 +7145,6 @@
         "image to video",
         "editor",
         "prompt to video"
-      ]
-    },
-    {
-      "path": "SCRUM SPECS.md",
-      "judul": "SCRUM SPECS",
-      "area": "root",
-      "jenis": "meta",
-      "status_emoji": null,
-      "status_teks": null,
-      "publik": true,
-      "tautan": [
-        "IT - CI-CD",
-        "APP - Dynamic Task Tracker",
-        "Microservices - Task Management Service",
-        "CORE - SSO Flow"
-      ],
-      "hash": "3abd840890a55dba27fddce02b56dc55eb93eca0c247d20dff5ebc5bdadcec92",
-      "ukuran_kb": 3.0,
-      "ringkasan": "Menjawab pertanyaan tentang bagaimana tim development ERP Bharata bekerja dari product backlog sampai rilis (peran Product Owner/Scrum Master/QA, alur sprint planning-daily-product increment), aturan branching feature-ke-dev-ke-main, dan kapan deploy otomatis ke production terjadi.",
-      "kata_kunci": [
-        "scrum",
-        "sprint",
-        "product backlog",
-        "sprint backlog",
-        "product owner",
-        "scrum master",
-        "QA",
-        "branching",
-        "CI/CD",
-        "definition of done"
       ]
     },
     {
@@ -7343,7 +7331,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "c911c6f45d7564707de9de433c1208f7b9dc9b318a6a12d77d8ed76b81fa68a9",
-      "ukuran_kb": 2.7,
+      "ukuran_kb": 2.6,
       "ringkasan": "Menjawab pertanyaan tentang bagaimana ERP terhubung ke Accurate Online sebagai sumber kebenaran akuntansi, termasuk cara autentikasi (API Token + HMAC-SHA256), endpoint yang dipakai (sales-invoice, sales-return, detail), protokol edit dokumen, dan siapa saja konsumen integrasinya (Integration Service, Web ERP).",
       "kata_kunci": [
         "Accurate",
@@ -7474,7 +7462,7 @@
         "DB - Overview and Notes"
       ],
       "hash": "4e2baed0fe701ec2314f952cae43b4edeab995af997895fc5c4cc1815373713d",
-      "ukuran_kb": 23.7,
+      "ukuran_kb": 23.3,
       "ringkasan": "Menjawab: bagaimana alur fulfillment gudang Tinggarjaya berjalan end-to-end dari order marketplace masuk (TikTok/Shopee via webhook & reconciler) sampai serah kurir dan settlement Accurate, serta kapan sebuah order muncul di WMS (hanya status TO_SHIP). Menjelaskan state machine fulfillment_orders (jalur cepat NEW→APPROVED→RTS→LABEL→HANDED_OVER dan jalur scan opsional), gerbang rekon wajib sebelum RTS, kode packer, menu \"Perlu Diproses\" pengganti arrange Desty, serta hak akses system_roles[\"warehouse\"]. Berguna untuk memahami arsitektur services/warehouse, event/reconciler, peran KiriminAja, dan gap analysis blueprint vs implementasi.",
       "kata_kunci": [
         "fulfillment",
@@ -7612,7 +7600,7 @@
         "WH - Management System"
       ],
       "hash": "19b2b8250ac6b40a0ca51f0e212951b214cca8ac344758fe67e378d7fbd8118a",
-      "ukuran_kb": 13.0,
+      "ukuran_kb": 12.9,
       "ringkasan": "Menjawab: bagaimana gudang Sadewa (barang titipan) dijalankan sebagai warehouse kedua yang berbagi antrian fulfillment dan komponen PackingBoard dengan Tinggar, tapi aksi cetak resinya melewati lapisan persetujuan Sadewa ke Tinggar. Juga menjawab menu dan route apa saja yang tersedia, fungsi akses mana yang menggerbanginya, aturan status aksi di backend (kapan PENDING versus langsung APPLIED), cara atribusi riwayat cetak resi per gudang lewat printed_by_role beserta keterbatasan backfill-nya, dan catatan bahwa tab retur log kemungkinan selalu kosong.",
       "kata_kunci": [
         "Warehouse Sadewa",
@@ -7659,7 +7647,7 @@
       "publik": false,
       "tautan": [],
       "hash": "c4cbf18696eb031063b90ffac8633d180c98568b9953cd666b9a1cf8c701bcdb",
-      "ukuran_kb": 5.8,
+      "ukuran_kb": 5.7,
       "ringkasan": "Menjawab pertanyaan tentang bagaimana order sampel TikTok dikecualikan dari faktur Accurate dan dicatat sebagai Penyesuaian Persediaan (item-adjustment), bagaimana summary report harian dibuat otomatis dengan status AUTO tanpa terkirim ke Accurate, dan bagaimana fitur export Excel multi-toko (satu sheet per toko) bekerja.",
       "kata_kunci": [
         "sample order",
@@ -7714,7 +7702,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.5,
+      "ukuran_kb": 11.2,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
@@ -8008,7 +7996,7 @@
         "Finance - Bridging App New Golang"
       ],
       "hash": "885eb5fc575fa1dd8d99a2bafdad31bf53f0c44adda35c65a1ee57e3331010db",
-      "ukuran_kb": 4.1,
+      "ukuran_kb": 4.0,
       "ringkasan": "Menjawab: bagaimana product mapping SKU marketplace ke Accurate berjalan (termasuk kasus bundling yang belum masuk), syarat field order (shipped_at/completed_at/returned_at) sebelum summary income/sales/return bisa dibuat, dan rencana modul baru piutang (notifikasi jatuh tempo) serta transaksi non-order (transaksi logistik, mutasi toko). Juga menjawab pembagian departemen/project Accurate untuk Marketing Beautyhack dan KY+GB.",
       "kata_kunci": [
         "finance service",
@@ -8126,7 +8114,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "e4e0dfaaaaa55112edc9c531fd5aad00e480bed7d909d8730bb100310b1a395c",
-      "ukuran_kb": 3.3,
+      "ukuran_kb": 3.2,
       "ringkasan": "Menjawab: apa arahan manajemen (Pak Widi) untuk dashboard data platform terintegrasi (ads, transaksi, video content), laporan profit breakdown per SKU/piece/toko, kebutuhan infra (backup internet failover, backup data lokal, zero-downtime deployment), dan prioritas urgent migrasi data marketplace. Jadi referensi requirement platform & infra yang diarahkan manajemen.",
       "kata_kunci": [
         "dashboard data platform",
@@ -8161,7 +8149,23 @@
         "notulen kosong",
         "workspace meetings"
       ]
+    },
+    {
+      "path": "docs/superpowers/plans/2026-07-12-order-sync-status-card.md",
+      "judul": "2026-07-12-order-sync-status-card",
+      "area": "docs",
+      "jenis": null,
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [],
+      "hash": "75900309c7faf6b0586b254afc81386afcfa8081ad263121f4cd5357c37e1867",
+      "ukuran_kb": 12.4,
+      "ringkasan": null,
+      "kata_kunci": []
     }
   ],
-  "gagal": []
+  "gagal": [
+    "docs/superpowers/plans/2026-07-12-order-sync-status-card.md"
+  ]
 }
