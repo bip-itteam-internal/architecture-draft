@@ -2,7 +2,7 @@
 
 *Analisis kelayakan **mengisi skor KPI secara otomatis** dari data yang sudah dimiliki ERP, bukan diketik manual oleh supervisor. Menjawab: dari 311 metrik yang benar-benar terpasang di production, mana yang sumber datanya sudah ada, mana yang modulnya ada tapi belum dipakai, dan mana yang memang tidak punya sumber sama sekali. Melengkapi [[HRIS - Key Performance Index]] yang menjelaskan mekanisme scoring-nya.*
 
-- **Status**: 🟡 Konsep otomasi, **belum ada satu pun metrik yang terisi otomatis di produksi**. Fondasi Fase 1 sudah ditulis di branch `feat/kpi-auto-value` (belum merge, belum deploy); selebihnya rencana. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.
+- **Status**: ⚠️ Mesinnya ada, **belum ada satu pun metrik yang terisi otomatis di produksi**. Fondasi Fase 1 sudah merge ke `main` (PR #843 kontrak sumber nilai, PR #857 mesin reduksi + arah target + registry sumber) tetapi **belum deploy**, dan belum satu pun metrik diisi konfigurasi `auto`-nya. Departemen pertama yang dikerjakan: **Tech Development** (branch `feat/monitoring-uptime-periode`, belum merge). **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.
 - **Ruang lingkup**: `kpi_template` / `kpi_score` di [[Microservices - Employee Service]]. **Bukan** engine insentif marketing di [[Microservices - Insentive Service]], walau bab 6 mengusulkan menyambungkan keduanya.
 
 ## Kondisi Saat Ini
@@ -62,7 +62,7 @@ Departemen **Percetakan** (13 karyawan) dan **Marketing Offline Distribution** (
 | Piutang / AR aging | AR Leader, AR Staff (Piutang) | Accurate live proxy `GET /accounting/receivables`, `GET /orders/piutang/summary` ([[External - Accurate]]) | live |
 | EBITDA, net income, cashflow, OPEX YoY | SPV Finance, Account Payable, Cost Control | Accurate live proxy `/accounting/profit-loss`, `/balance-sheet`, `/profit/cash-flow` | live |
 | **Skor KPI tim** | 15 posisi SPV dan Leader (16 baris metrik), rinciannya di bawah | `employee_db.kpi_score` sendiri, diagregasi lewat department atau `work_data.supervisor_id` ([[HRIS - Organization Structure]]) | 406 |
-| Uptime server dan sistem | IT Infrastructure, IT Support, Tech Leader/SPV | `monitoring-service` membaca `kuma.db` Uptime Kuma read-only: `GET /monitors` (`uptime_24h/7d/30d`), `GET /incidents` (`downtime_seconds`) ([[IT - Monitoring System]]) | 35 monitor |
+| Uptime server dan sistem | IT Infrastructure, IT Support, Tech Leader/SPV | Sumber `uptime_sistem` memanggil `GET /monitoring/kpi/uptime?periode=YYYY-MM` ([[Microservices - Monitoring Service]]). Jendela berjalan `GET /monitors` TIDAK dipakai untuk KPI: "30 hari terakhir" bukan nilai bulan mana pun | 34 monitor; heartbeat baru sejak 9 Juli 2026 |
 | SLA e-ticket | IT Support, Backend/Frontend Developer | `GET /task-management/report/sla`, field `on_time_rate` untuk response dan resolution (`services/task-management/sla.go:112-159`) ([[IT - Helpdesk]]) | 293 task |
 | CSAT layanan IT | IT Support, Fullstack, Tech Leader | `GET /report/csat`, `GET /report/manpower-performance` (`avg_csat` per orang, `services/task-management/report_handlers.go:160-232`) | tersedia |
 | Kedisiplinan dan kehadiran | Personalia, Culture & Industrial | `GET /attendance/report?date=YYYY-MM`, entri harian membawa `status` (Hadir/Terlambat/Tanpa Keterangan) dan `late_hour`; periode sudah tanggal 26 ke 26 mengikuti siklus payroll (`services/attendance/main.go:716`) ([[HRIS - Attendance System]]) | 24.163 entri |
@@ -235,7 +235,7 @@ Batas service dan kepemilikan datanya diputuskan di [[ADR - 0032 Kepemilikan kpi
 
 **Fase 1, tanpa modul baru**
 1. Sambungkan [[Microservices - Insentive Service]] ke `kpi_score` sebagai nilai berstatus DRAFT (kurang lebih 30 metrik Kyura dan Beauty Hacks). **Belum dikerjakan.**
-2. **⚠️ Fondasinya sudah ada di kode** (branch `feat/kpi-auto-value`, **belum merge & belum deploy**): kontrak sumber nilai pada `KPIMetric`, kunci metrik stabil beserta migrasinya, rumus agregasi tim, `GET /kpi/auto-values`, dan stempel `auto_*` saat submit. Detail di [[Microservices - Employee Service]].
+2. **⚠️ Fondasinya sudah merge ke `main`, belum deploy** (PR #843 lalu PR #857): kontrak sumber nilai pada `KPIMetric`, kunci metrik stabil beserta migrasinya, `GET /kpi/auto-values`, stempel `auto_*` saat submit, mesin reduksi empat rumus, arah target naik/turun, dan registry sumber yang membuat kerja per departemen bisa paralel. Detail di [[Microservices - Employee Service]] dan cara memakainya di [[RUN - Menambah Metrik KPI Otomatis]].
 	- Cakupan yang benar-benar tersentuh: **7 baris** supervisor level departemen, bukan 13 seperti tertulis di versi awal dokumen ini.
 	- Belum menghasilkan apa pun sampai HR mengisi konfigurasi `auto` pada ketujuh metrik lewat `POST /kpi/templates`. Ini disengaja: tidak ada nama posisi yang di-hardcode, sehingga departemen atau perusahaan baru tidak menuntut ubah kode.
 	- Frontend belum ada, jadi usulan sistem belum tampil di modal Score KPI.
@@ -243,7 +243,9 @@ Batas service dan kepemilikan datanya diputuskan di [[ADR - 0032 Kepemilikan kpi
 4. Auto-fill metrik kedisiplinan dari `GET /attendance/report`. **Belum dikerjakan.**
 5. Bersihkan data master sesuai bab Temuan Data Master.
 
-> **Tech Development ditunda, meski persentasenya tertinggi di tabel Rekap.** Persentase itu menghitung "sumber datanya ada", bukan "sumbernya cukup terisi". Pemeriksaan kepadatan 2026-08-01: CSAT hanya **8 tiket ter-rating seumur hidup**, dan SLA resolusi **0 dokumen** memenuhi syarat hitung (`due_date` dan `completedAt` tak pernah terisi bersamaan dari 293 task). Yang benar-benar tegak di sana tinggal uptime dan skor tim, sekitar 4 metrik. Kekurangannya juga beda kelas: ICC butuh tabel pemetaan diisi sekali, Tech Development butuh orang mengubah kebiasaan mengisi due date dan meminta rating tiap hari.
+> **Tech Development dikerjakan lebih dulu, tetapi bukan karena persentasenya tertinggi.** Persentase di tabel Rekap menghitung "sumber datanya ada", bukan "sumbernya cukup terisi. Pemeriksaan kepadatan 2026-08-01 menunjukkan bedanya: CSAT hanya **8 tiket ter-rating seumur hidup**, dan SLA resolusi **0 dokumen** memenuhi syarat hitung (`due_date` dan `completedAt` tak pernah terisi bersamaan dari 293 task). Yang benar-benar tegak di sana **7 dari 30 metrik**: lima uptime dan dua skor tim.
+>
+> Alasannya dikerjakan duluan: ketujuhnya tidak menunggu siapa pun mengisi data. Uptime sudah terekam sendiri oleh Uptime Kuma, dan skor tim sudah ada di `kpi_score`. Bandingkan dengan ICC yang butuh tabel pemetaan diisi manual lebih dulu. Yang tersisa di Tech Development justru butuh orang mengubah kebiasaan — mengisi due date dan meminta rating tiap hari — dan itu bukan pekerjaan kode.
 >
 > Temuan ikutan yang perlu ditangani tim IT terpisah dari KPI: **SLA resolusi tiket saat ini tidak terukur sama sekali.**
 
@@ -270,13 +272,17 @@ Field `attribution_note` pada `mart_profit_attribution` di production menyatakan
 
 ## Belum Diimplementasikan / Catatan
 
-- Tidak ada satu pun metrik yang terisi otomatis hari ini. Seluruh bab Rencana Bertahap berstatus TBD.
+- Tidak ada satu pun metrik yang terisi otomatis hari ini. Mesinnya sudah merge tetapi belum deploy, dan belum satu pun `kpi_template` diisi konfigurasi `auto`-nya.
+- **Uptime bulan Juni 2026 dan sebelumnya tidak dapat dihitung.** Heartbeat Uptime Kuma terawal 9 Juli 2026, sehingga Juli tercakup 23 dari 31 hari dan Agustus baru periode penuh pertama. Metriknya melapor cakupan apa adanya dan bernilai kosong bila memang tak ada data, bukan nol persen.
+- **`System uptime` dan `Server uptime` belum dapat dibedakan.** Seluruh monitor bertipe `docker` (33) dan `http` (1); memisahkannya butuh monitor tingkat host di Kuma, pekerjaan tim IT.
+- **`MONITORING_SERVICE_KEY` belum di-set di produksi.** Selama belum, metrik uptime dilaporkan gagal hitung, bukan nol.
 - Sumber ROI/ROAS otomatis berasal dari [[Microservices - Marketing Analytics Service]] (didokumentasikan 2026-07-31, sebelumnya service ini berjalan di production tanpa dok). Perlu diperhatikan: `/lives`, `/cohort`, dan `/price-floor` masih membalas kosong karena koleksinya belum terisi, dan `/matrix/sku-shop` masih stub. Konteks bisnisnya di [[Sales - Marketing Dashboard (Master Roadmap)]].
 - Angka sensus adalah snapshot 2026-07-31 dan akan bergeser. Cara memperbarui daftar template per posisi tanpa menebak: baca koleksi `kpi_template` pada database `employee_db`, urutkan berdasarkan `department` lalu `position`. Kredensial Mongo diambil dari environment container, jangan ditulis di dokumen.
 
 ## Dependensi & Integrasi
 
 - **Sumber skor manual**: [[Microservices - Employee Service]] (`/kpi/*`), FE di [[APP - Web ERP]]
+- **Sumber otomatis yang sudah terpasang**: [[Microservices - Monitoring Service]] (`uptime_sistem`) · [[Microservices - Employee Service]] sendiri (`skor_tim`)
 - **Kandidat sumber otomatis**: [[Microservices - Insentive Service]] · [[Microservices - Integration Service]] · [[Microservices - Attendance Service]] · [[Microservices - Task Management Service]] · [[Microservices - Procurement Service]] · [[Microservices - Warehouse Service]] · [[Microservices - Inventory Service]] · [[External - Accurate]] · [[IT - Monitoring System]]
 - **Terblokir adopsi**: [[Microservices - Manufacture Service]] · [[Microservices - Recruitment Service]] · [[HRIS - Training Program]]
 - **Penjadwalan**: [[IT - Background Jobs & Schedulers]]

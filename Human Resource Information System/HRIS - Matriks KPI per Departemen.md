@@ -824,6 +824,10 @@ Template `KPI Quality Supervisor`, 5 metrik.
 
 7 template, 30 metrik. Klasifikasi otomasi: **14 / 9 / 0 / 7**.
 
+> **Departemen pertama yang dikerjakan.** Per 1 Agustus 2026, **7 dari 30 metrik** sudah punya sumber terdaftar dan tinggal diisi konfigurasinya: lima metrik uptime lewat sumber `uptime_sistem` (`IT Infrastructure / System` 0,1 · `IT Infrastructure / Server` 0,1 · `IT Support / Network` 0,4 · `Leader / Revenue 240M` 0,2 · `Supervisor / Revenue 240M` 0,2) dan dua metrik KPI tim lewat sumber `skor_tim` (`Leader / Performance Monitoring Team` 0,4 · `Supervisor / Performance Monitoring Team` 0,3). Kodenya ada di branch `feat/monitoring-uptime-periode` — belum merge, belum deploy. Lihat [[Microservices - Monitoring Service]].
+>
+> Dua penghambat sisanya bukan pekerjaan kode: **CSAT** baru 8 tiket ter-rating seumur hidup, dan **SLA resolusi** tidak punya satu pun sampel karena `due_date` tiket tak pernah diisi. Keduanya butuh perubahan kebiasaan pakai, bukan fitur baru.
+
 ### Backend Developer
 
 Template `Backend Developer`, 4 metrik.
@@ -865,9 +869,11 @@ Template `Infrastruktur`, 5 metrik.
 |---:|---|---|---|---|
 | 0.1 | `Infrastruktur` | Otomasi & Deployment | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
 | 0.1 | `Network` | Arsitektur jaringan sesuai requirements | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
-| 0.1 | `System` | System uptime 99% | GET /monitoring/monitors (uptime_24h/7d/30d) + /incidents. 35 monitor aktif, data padat. | Bisa otomatis sekarang. Sistem sudah memantau 35 server dan aplikasi, datanya lengkap. |
-| 0.1 | `Server` | Server uptime 99% | GET /monitoring/monitors (uptime_24h/7d/30d) + /incidents. 35 monitor aktif, data padat. | Bisa otomatis sekarang. Sistem sudah memantau 35 server dan aplikasi, datanya lengkap. |
+| 0.1 | `System` | System uptime 99% | Sumber `uptime_sistem` (GET /monitoring/kpi/uptime?periode=YYYY-MM) + reduksi `rata_rata`, arah `naik`. 34 monitor aktif. CATATAN: heartbeat baru ada sejak 9 Juli 2026, jadi Juli tercakup 23 dari 31 hari dan Juni tak bisa dihitung. | Bisa otomatis sekarang, tapi angkanya baru penuh mulai Agustus 2026. Sistem sudah memantau 34 server dan aplikasi, dan tiap bulan dilaporkan berapa hari yang benar-benar ada datanya. |
+| 0.1 | `Server` | Server uptime 99% | Sumber `uptime_sistem` (GET /monitoring/kpi/uptime?periode=YYYY-MM) + reduksi `rata_rata`, arah `naik`. 34 monitor aktif. CATATAN: heartbeat baru ada sejak 9 Juli 2026, jadi Juli tercakup 23 dari 31 hari dan Juni tak bisa dihitung. | Bisa otomatis sekarang, tapi angkanya baru penuh mulai Agustus 2026. Sistem sudah memantau 34 server dan aplikasi, dan tiap bulan dilaporkan berapa hari yang benar-benar ada datanya. |
 | 0.6 | `Support` | Support System | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
+
+> **`System` dan `Server` membaca angka yang sama.** Seluruh monitor di Uptime Kuma bertipe `docker` (33) dan `http` (1) per 1 Agustus 2026, sehingga uptime container dan uptime host belum dapat dibedakan. Memisahkannya butuh monitor tingkat host di Kuma — pekerjaan tim IT, bukan kode. Selama belum dipisah, dua metrik berbobot 0,1 ini efektif menilai hal yang sama.
 
 ### IT Support
 
@@ -875,7 +881,7 @@ Template `IT Support`, 4 metrik.
 
 | Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
-| 0.4 | `Network` | Optimalisasi Uptime Server & Sistem | GET /monitoring/monitors (uptime_24h/7d/30d) + /incidents. 35 monitor aktif, data padat. | Bisa otomatis sekarang. Sistem sudah memantau 35 server dan aplikasi, datanya lengkap. |
+| 0.4 | `Network` | Optimalisasi Uptime Server & Sistem | Sumber `uptime_sistem` (GET /monitoring/kpi/uptime?periode=YYYY-MM) + reduksi `rata_rata`, arah `naik`. 34 monitor aktif. CATATAN: heartbeat baru ada sejak 9 Juli 2026, jadi Juli tercakup 23 dari 31 hari dan Juni tak bisa dihitung. | Bisa otomatis sekarang, tapi angkanya baru penuh mulai Agustus 2026. Sistem sudah memantau 34 server dan aplikasi, dan tiap bulan dilaporkan berapa hari yang benar-benar ada datanya. |
 | 0.15 | `Customer Satisfaction` | Kepuasan Pelayanan IT Support | GET /task-management/report/csat. CATATAN: baru 8 tiket ter-rating seumur hidup, terlalu tipis. | Belum layak dipakai. Fiturnya ada, tapi baru 8 tiket yang pernah dinilai pemintanya, jadi angkanya belum bisa dipercaya. |
 | 0.3 | `Problem Solving` | Penyelesaian E - Ticket sesuai dengan SLA ( Service Level Agreement ) | GET /task-management/report/sla. CATATAN: SLA resolusi 0 sampel terhitung (due_date tak pernah diisi); response 53 sampel. | Bisa sebagian. Kecepatan menanggapi tiket sudah bisa dihitung, tapi kecepatan menyelesaikan belum, karena tenggat tiket tidak pernah diisi. Kebiasaan mengisi tenggat perlu dibenahi dulu. |
 | 0.15 | `Kaizen` | Improvement | TIDAK ADA modul Kaizen/ide inovasi di sistem (pencarian nol hasil di services + shared-library). Perlu fitur baru. | Belum bisa otomatis. Sistem belum punya tempat mencatat ide perbaikan, jadi harus dibuatkan dulu. |
@@ -886,7 +892,7 @@ Template `Leader`, 5 metrik.
 
 | Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
-| 0.2 | `Revenue 240M` | Menjamin operasional IT tanpa gangguan | GET /monitoring/monitors (uptime_24h/7d/30d) + /incidents. 35 monitor aktif, data padat. | Bisa otomatis sekarang. Sistem sudah memantau 35 server dan aplikasi, datanya lengkap. |
+| 0.2 | `Revenue 240M` | Menjamin operasional IT tanpa gangguan | Sumber `uptime_sistem` (GET /monitoring/kpi/uptime?periode=YYYY-MM) + reduksi `rata_rata`, arah `naik`. 34 monitor aktif. CATATAN: heartbeat baru ada sejak 9 Juli 2026, jadi Juli tercakup 23 dari 31 hari dan Juni tak bisa dihitung. | Bisa otomatis sekarang, tapi angkanya baru penuh mulai Agustus 2026. Sistem sudah memantau 34 server dan aplikasi, dan tiap bulan dilaporkan berapa hari yang benar-benar ada datanya. |
 | 0.1 | `Net income 20%` | Pengendalian anggaran IT | Budget TIDAK tersimpan di ERP mana pun. Realisasi ada di Accurate; perlu master anggaran lebih dulu. | Belum bisa otomatis. Pengeluarannya sudah tercatat, tapi anggarannya belum pernah dimasukkan ke sistem, jadi tidak ada yang bisa dibandingkan. |
 | 0.2 | `Integration System Development di Q4` | On-time project delivery rate (%) – proyek IT/development selesai sesuai timeline | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
 | 0.1 | `Customer Satifaction` | Average Tingkat Kepuasan User Terhadap Pelayanan Team IT ( Fullstack & Support ) | GET /task-management/report/csat. CATATAN: baru 8 tiket ter-rating seumur hidup, terlalu tipis. | Belum layak dipakai. Fiturnya ada, tapi baru 8 tiket yang pernah dinilai pemintanya, jadi angkanya belum bisa dipercaya. |
@@ -898,7 +904,7 @@ Template `Supervisor KPI`, 4 metrik.
 
 | Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
-| 0.2 | `Revenue 240M` | Menjamin operasional IT tanpa gangguan | GET /monitoring/monitors (uptime_24h/7d/30d) + /incidents. 35 monitor aktif, data padat. | Bisa otomatis sekarang. Sistem sudah memantau 35 server dan aplikasi, datanya lengkap. |
+| 0.2 | `Revenue 240M` | Menjamin operasional IT tanpa gangguan | Sumber `uptime_sistem` (GET /monitoring/kpi/uptime?periode=YYYY-MM) + reduksi `rata_rata`, arah `naik`. 34 monitor aktif. CATATAN: heartbeat baru ada sejak 9 Juli 2026, jadi Juli tercakup 23 dari 31 hari dan Juni tak bisa dihitung. | Bisa otomatis sekarang, tapi angkanya baru penuh mulai Agustus 2026. Sistem sudah memantau 34 server dan aplikasi, dan tiap bulan dilaporkan berapa hari yang benar-benar ada datanya. |
 | 0.1 | `Net income 20%` | Pengendalian anggaran IT | Budget TIDAK tersimpan di ERP mana pun. Realisasi ada di Accurate; perlu master anggaran lebih dulu. | Belum bisa otomatis. Pengeluarannya sudah tercatat, tapi anggarannya belum pernah dimasukkan ke sistem, jadi tidak ada yang bisa dibandingkan. |
 | 0.4 | `Integration System Development di Q4` | Menyelesaikan Fitur Baru Sesuai Request SPV All Dept / Bulan | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
 | 0.3 | `Performance Monitoring Team` | KPI Team | Sumber skor_tim + reduksi rata_rata, scope department. Sudah didukung mesin; tinggal isi konfigurasi. | Bisa otomatis sekarang. Sistem tinggal merata-ratakan skor anggota departemen, dan mesinnya sudah siap. |

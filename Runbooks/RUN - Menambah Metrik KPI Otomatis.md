@@ -2,7 +2,14 @@
 
 *Cara dev departemen menambahkan satu metrik KPI yang terisi otomatis, tanpa menyentuh aturan penilaian dan tanpa bertabrakan dengan dev departemen lain. Latar belakang dan peta metriknya ada di [[HRIS - Otomasi Skor KPI]]; keputusan batas servicenya di [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]].*
 
-- **Status**: ⚠️ Mesinnya ada di branch `feat/kpi-mesin-formula` (**belum merge, belum deploy**). Prosedur di bawah sudah final terhadap kode itu, tetapi belum dapat dijalankan sampai branch tersebut masuk.
+- **Status**: ⚠️ Mesinnya **sudah merge ke `main`** (PR #857, 1 Agustus 2026) tetapi **belum deploy**. Prosedur di bawah sudah final terhadap kode itu.
+
+Dua sumber sudah terdaftar dan bisa dipakai sebagai contoh:
+
+| Nama sumber | Datanya dari | Contoh yang mewakili |
+|---|---|---|
+| `skor_tim` | Koleksi `kpi_score` di employee-service sendiri | Sumber yang membaca data lokal, disempitkan ke tim atau departemen |
+| `uptime_sistem` | monitoring-service lewat HTTP | Sumber yang menarik dari service lain, dan cakupannya bukan rasio unit |
 
 ## Yang perlu dipahami lebih dulu
 
@@ -50,6 +57,32 @@ Aturan yang mengikat:
 - **`Populasi` bukan `len(Nilai)`.** Bedanya yang membuat cakupan bermakna: 8 dari 12 anggota dinilai menghasilkan cakupan 67%, dan metriknya dilaporkan `semi`, bukan `otomatis`.
 - **Kembalikan error, jangan Cuplikan kosong.** Cuplikan kosong dan kegagalan baca ditangani berbeda; menelan error jadi kosong membuat "tidak tahu" terbaca sebagai "hasilnya nol".
 
+### Bila cakupanmu bukan "berapa unit dari berapa unit"
+
+`Cakupan()` bawaan menghitung `len(Nilai) / Populasi`. Itu benar untuk metrik yang mencacah unit (anggota tim dinilai, video terpasang), tetapi salah untuk sumber yang hanya membawa **satu angka realisasi**. Contohnya cakupan **waktu**: uptime Juli 2026 berdiri di atas 23 dari 31 hari, tetapi `Nilai` hanya berisi satu angka, sehingga rasio bawaannya 1/1 dan melapor 100% lengkap. Cakupan **nilai** punya masalah yang sama: 18,7% omzet Kyura belum terpetakan pemiliknya, dan itu tak terwakili oleh cacahan unit.
+
+Isi `CakupanPersen` untuk menimpanya:
+
+```go
+cakupan := float64(hariBerdata) / float64(hariDiminta) * 100
+return employee.Cuplikan{
+    Nilai:         []float64{uptime},
+    Populasi:      1,
+    CakupanPersen: &cakupan, // pointer: nil = pakai rasio unit, 0 tetap berarti nol
+    Catatan:       fmt.Sprintf("%d dari %d hari berdata", hariBerdata, hariDiminta),
+}, nil
+```
+
+Pointer, bukan `float64` biasa, supaya "belum diisi" terbedakan dari "nol persen" — dan nol persen adalah jawaban yang sah.
+
+### Bila datanya ada di service lain
+
+Boleh ditarik lewat HTTP; [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] mengizinkannya selama employee-service tetap jadi pemilik tunggal `kpi_score`. Tiga hal yang wajib diikuti, semuanya dipetik dari `kpi_sumber_uptime.go`:
+
+- **Rute di service tujuan menggerbangi dirinya sendiri dengan kunci layanan sendiri**, bukan bersandar pada `INTERNAL_GATEWAY_KEY`. Gateway memasang header itu untuk setiap permintaan yang lolos JWT, jadi rute yang bersandar padanya terbuka bagi semua karyawan yang sudah login ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Kunci yang belum dikonfigurasi harus **menutup** rute, bukan membukanya.
+- **Jangan masukkan URL-nya ke `InternalURL`.** Peta itu divalidasi saat boot dengan `panic`, sehingga satu env yang belum dipasang saat deploy akan mematikan seluruh employee-service demi satu metrik KPI. Baca env-nya langsung.
+- **Beri batas waktu klien HTTP-nya.** Tanpa itu, satu service yang tersendat menahan `GET /kpi` sampai frontend menyerah.
+
 ## Langkah 3: isi konfigurasi metrik
 
 Lewat `POST /kpi/templates` yang sudah ada. Tidak perlu deploy untuk mengubahnya.
@@ -73,6 +106,8 @@ Lewat `POST /kpi/templates` yang sudah ada. Tidak perlu deploy untuk mengubahnya
 | `jumlah_unit` | banyaknya `Nilai` | `Kuantitas Video Konten`, target 125 |
 | `jumlah_nilai` | jumlah isi `Nilai` | omzet departemen |
 | `rasio_ambang` | persen `Nilai` ≥ `ambang`, terhadap `Populasi` | `Video ... Indikator 10.000/video`, ambang 10.000 target 70 |
+
+Metrik yang sumbernya sudah berupa persentase (uptime, konversi) memakai `rata_rata` atas satu `Nilai`: realisasinya dipakai apa adanya, lalu dibandingkan dengan target seperti metrik lain.
 
 **`ambang` dan `target` adalah dua hal berbeda.** `ambang` dipakai mencacah, `target` dipakai membandingkan. Metrik ICC membutuhkan keduanya sekaligus: ambang GMV 10.000 per video, target 70% video yang melewatinya.
 

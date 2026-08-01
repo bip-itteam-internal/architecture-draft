@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-01",
-  "jumlah_dokumen": 252,
+  "jumlah_dokumen": 253,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1816,6 +1816,43 @@
         "video performance",
         "price floor",
         "integration_db read-only"
+      ]
+    },
+    {
+      "path": "Core System and Modules/Microservices - Monitoring Service.md",
+      "judul": "Microservices - Monitoring Service",
+      "area": "Core System and Modules",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan) — jalan di produksi; endpoint periode (`/uptime`, `/kpi/uptime`) masih di branch `feat/monitoring-uptime-periode`, belum merge & belum deploy.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0031 Prefix Internal Bukan Batas Keamanan",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "IT - Monitoring System",
+        "APP - Web ERP",
+        "Microservices - Employee Service",
+        "CORE - API Master Gateway",
+        "CORE - RBAC dan Permission Set",
+        "HRIS - Otomasi Skor KPI",
+        "RUN - Menambah Metrik KPI Otomatis",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "IT - Server, VMs and Databases"
+      ],
+      "hash": "1b30016959509639ea4a58f330169d559804b81e850b1cec8281b4470bc68f68",
+      "ukuran_kb": 7.8,
+      "ringkasan": "Menjawab: dari mana dashboard status IT di ERP mengambil datanya (basis data kuma.db milik Uptime Kuma, dibuka read-only), endpoint apa saja yang tersedia untuk daftar monitor, heartbeat, insiden, ekspor CSV, dan uptime per periode kalender. Menjelaskan juga kenapa service ini hanya berfungsi di host produksi dan kenapa /health serta seluruh endpoint membalas 503 di dev. Merinci cara uptime satu bulan dihitung (batas periode WIB dikonversi ke UTC, rata-rata tertimbang jumlah heartbeat, uptime nullable, pelaporan cakupan hari), aturan cache periode berjalan vs periode tutup, serta kenapa rute KPI digerbangi kunci layanan sendiri dan bukan INTERNAL_GATEWAY_KEY.",
+      "kata_kunci": [
+        "monitoring service",
+        "uptime",
+        "Uptime Kuma",
+        "kuma.db",
+        "heartbeat",
+        "insiden",
+        "incident",
+        "dashboard IT",
+        "KPI uptime",
+        "MONITORING_SERVICE_KEY"
       ]
     },
     {
@@ -4304,23 +4341,24 @@
         "RUN - Menambah Metrik KPI Otomatis",
         "HRIS - Otomasi Skor KPI",
         "Microservices - Employee Service",
+        "Microservices - Monitoring Service",
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "0c54aa5647bd32b77abcd228bcdbc00e2c8da03319b273380ce8dd993db2b718",
-      "ukuran_kb": 124.2,
-      "ringkasan": "Menjawab: metrik KPI apa yang benar-benar dipakai menilai orang per departemen dan per jabatan di production, berapa bobotnya, dan apa targetnya (target tersimpan di `description` karena `kpi_template` tidak punya field target yang terbaca mesin). Juga menjawab metrik mana yang bisa diotomatiskan sekarang, mana yang butuh kesepakatan definisi dulu, mana yang modulnya ada tapi datanya kosong, dan mana yang tidak punya sumber sama sekali, plus cacat data yang sudah diketahui (template uji ikut produksi, metrik duplikat, label memakai target korporat) dan cara menyegarkan dokumen ini dari `employee_db`.",
+      "hash": "2c1b98d0685f84a1410d5f7426ac1ebc5162f0166ba6d5dc12168cdd055d1c58",
+      "ukuran_kb": 125.8,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang per departemen dan per posisi, berapa bobot tiap metrik, dan apa target atau keterangannya. Menjelaskan kenapa label metrik ditulis persis seperti tersimpan (termasuk typo dan spasi ujung) karena label adalah kunci identitas metrik di kode, serta kenapa target sebenarnya berada di field description dan bukan field yang terbaca mesin. Memuat juga rekap jumlah template dan metrik per departemen, daftar cacat data yang sudah diketahui (template uji ikut produksi, metrik duplikat, label memakai target korporat), dan cara menyegarkan dokumen ini dari koleksi kpi_template.",
       "kata_kunci": [
         "KPI",
-        "matriks KPI",
         "kpi_template",
+        "matriks KPI",
         "bobot metrik",
+        "weight",
         "target KPI",
-        "otomasi skor KPI",
         "departemen",
-        "employee_db",
         "penilaian karyawan",
-        "performance appraisal"
+        "employee_db",
+        "label metrik"
       ]
     },
     {
@@ -4362,8 +4400,8 @@
       "judul": "HRIS - Otomasi Skor KPI",
       "area": "Human Resource Information System",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "Konsep otomasi, **belum ada satu pun metrik yang terisi otomatis di produksi**. Fondasi Fase 1 sudah ditulis di branch `feat/kpi-auto-value` (belum merge, belum deploy); selebihnya rencana. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.",
+      "status_emoji": "⚠️",
+      "status_teks": "Mesinnya ada, **belum ada satu pun metrik yang terisi otomatis di produksi**. Fondasi Fase 1 sudah merge ke `main` (PR #843 kontrak sumber nilai, PR #857 mesin reduksi + arah target + registry sumber) tetapi **belum deploy**, dan belum satu pun metrik diisi konfigurasi `auto`-nya. Departemen pertama yang dikerjakan: **Tech Development** (branch `feat/monitoring-uptime-periode`, belum merge). **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.",
       "publik": true,
       "tautan": [
         "HRIS - Key Performance Index",
@@ -4373,7 +4411,7 @@
         "Microservices - Integration Service",
         "External - Accurate",
         "HRIS - Organization Structure",
-        "IT - Monitoring System",
+        "Microservices - Monitoring Service",
         "IT - Helpdesk",
         "HRIS - Attendance System",
         "HRIS - Personalia",
@@ -4394,12 +4432,14 @@
         "GA - Checklist Management",
         "HRIS - Career & Promotion",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "RUN - Menambah Metrik KPI Otomatis",
         "Microservices - Task Management Service",
         "HRIS - Work Review",
         "Microservices - Marketing Analytics Service",
         "Sales - Marketing Dashboard (Master Roadmap)",
         "APP - Web ERP",
         "Microservices - Attendance Service",
+        "IT - Monitoring System",
         "DB - Overview and Notes",
         "HRIS - Analysis",
         "HRIS - Big Pictures",
@@ -4409,20 +4449,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "5b8adfacd26649be999b6c693c4fb1679c0e68f5657dea4e23c9e8451c84b082",
-      "ukuran_kb": 28.0,
-      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang skornya bisa diisi otomatis dari data ERP dan mana yang tetap manual, serta sumber data (koleksi/endpoint) apa yang dipakai untuk tiap klaster metrik. Menjelaskan juga klasifikasi metrik (otomatis penuh, semi-otomatis, terblokir data, manual), rekap kelayakan otomasi per departemen, dan apa yang masih kurang agar metrik semi-otomatis bisa dihitung sendiri. Berguna untuk mencari tahu mengapa metrik tertentu belum bisa auto-fill, peran label metrik sebagai kunci pengikat otomasi, serta rencana bertahapnya.",
+      "hash": "713eee82b1052c087ab4dee7899b8f33ca2cdd66b41467b1a2d4064ca0b5efd9",
+      "ukuran_kb": 29.5,
+      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang sumber datanya sudah ada di ERP, mana yang butuh definisi atau mapping tambahan, mana yang modulnya jalan tapi koleksinya kosong, dan mana yang memang tidak punya sumber sama sekali. Memuat peta metrik ke sumber data konkret (koleksi dan endpoint beserta volumenya) untuk klaster seperti konversi iklan TikTok, ROI/ROAS, omzet, rating toko, piutang/AR aging, uptime, SLA e-ticket, CSAT, kehadiran, dan on time delivery supplier, plus rekap persentase otomasi per departemen. Menjelaskan juga bagaimana skor KPI diisi saat ini (map label ke nilai 0..100 dari input manusia), kenapa label metrik jadi kunci pengikat setiap rencana auto-fill, dan batas ruang lingkupnya terhadap engine insentif marketing.",
       "kata_kunci": [
-        "KPI",
-        "otomasi skor KPI",
-        "KPI automation",
+        "otomasi KPI",
         "auto-fill KPI",
-        "kpi_template",
         "kpi_score",
-        "metrik KPI",
-        "penilaian kinerja",
-        "performance score",
-        "employee service"
+        "kpi_template",
+        "sumber data metrik",
+        "employee service",
+        "kelayakan otomasi",
+        "semi-otomatis",
+        "performance",
+        "KPI otomatis"
       ]
     },
     {
@@ -5296,26 +5336,27 @@
       "status_teks": "Aktif — monitoring tools yang dipakai (Terrabit, Beszel, dll).",
       "publik": false,
       "tautan": [
+        "Microservices - Monitoring Service",
         "IT - Big Pictures",
         "IT - Server, VMs and Databases",
         "IT - Network Management",
         "IT - Backup & DR",
         "IT - Employee System"
       ],
-      "hash": "a5725b54a6b6bc2641bdde7b3038f72fc267f543488679ec887630e32d7c4942",
-      "ukuran_kb": 2.2,
-      "ringkasan": "Menjawab: monitoring tools apa saja yang dipakai tim IT untuk memantau internet, perangkat, dan service secara realtime (Terrabit, Beszel, Uptime Kuma, Zabbix), di mana masing-masing bisa diakses, dan bagaimana notifikasi kegagalan terhubung ke grup WhatsApp.",
+      "hash": "f747154614e7d6de974a2261dc505e588b64ed2d2f64a1c967d5897cf7cd80f9",
+      "ukuran_kb": 2.3,
+      "ringkasan": "Menjawab: monitoring tools apa saja yang dipakai perusahaan, untuk memantau apa masing-masing, dan di mana mengaksesnya (Terrabit untuk internet dari ISP, Beszel untuk perangkat dan VM, Uptime Kuma untuk API service internal dan eksternal, Zabbix untuk bandwidth dan uplink). Memuat URL publik maupun alamat internal tempat tiap tool di-host beserta kredensial aplikasinya. Menyebut juga tools mana yang notifikasinya terhubung ke grup WhatsApp IT lewat webhook dan bahwa webhook itu bisa dinonaktifkan sesuai kebutuhan.",
       "kata_kunci": [
-        "monitoring",
-        "Terrabit",
-        "Beszel",
+        "monitoring tools",
         "Uptime Kuma",
+        "Beszel",
         "Zabbix",
-        "uptime",
-        "bandwidth",
+        "Terrabit",
+        "status.bharatainternasional.com",
+        "netmon",
         "notifikasi WhatsApp",
-        "VM netmon",
-        "credentials monitoring"
+        "webhook",
+        "kredensial monitoring"
       ]
     },
     {
@@ -6277,34 +6318,34 @@
       "area": "Runbooks",
       "jenis": "runbook",
       "status_emoji": "⚠️",
-      "status_teks": "Mesinnya ada di branch `feat/kpi-mesin-formula` (**belum merge, belum deploy**). Prosedur di bawah sudah final terhadap kode itu, tetapi belum dapat dijalankan sampai branch tersebut masuk.",
+      "status_teks": "Mesinnya **sudah merge ke `main`** (PR #857, 1 Agustus 2026) tetapi **belum deploy**. Prosedur di bawah sudah final terhadap kode itu.",
       "publik": true,
       "tautan": [
         "HRIS - Otomasi Skor KPI",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
-        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "HRIS - Key Performance Index",
         "Microservices - Employee Service",
         "Microservices - Integration Service",
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "d60f9af0d2054039128562229dc9bd0b199f80457e3b405ed499a77016867074",
-      "ukuran_kb": 9.2,
-      "ringkasan": "Menjawab: bagaimana dev departemen menambah satu metrik KPI yang terisi otomatis tanpa menyentuh aturan penilaian, lewat pendaftaran sumber di services/employee dan konfigurasi via POST /kpi/templates. Menjelaskan pemisahan tiga lapis (Sumber - Reduksi - Arah/Target), katalog formula reduksi (rata_rata, jumlah_unit, jumlah_nilai, rasio_ambang), beda ambang vs target, arah naik/turun, dan target per periode. Juga menjawab: jebakan apa yang sudah pernah menghasilkan angka salah tanpa error (salah arah, atribusi ke departemen keliru, pakai label sebagai kunci, cocokkan entitas lewat nama, abaikan batas perusahaan) dan apa isi checklist sebelum PR.",
+      "hash": "3f31bf8f6d0db20af02037df0d383214f7bf9b5c77565c234bdc521818d8f09b",
+      "ukuran_kb": 11.8,
+      "ringkasan": "Menjawab: langkah apa saja yang harus dilakukan dev departemen untuk menambah satu metrik KPI yang terisi otomatis, mulai dari memastikan datanya memang cukup terisi dan bisa diatribusikan ke satu orang, mendaftarkan sumber baru di employee-service, sampai mengisi konfigurasi metrik lewat POST /kpi/templates. Menjelaskan pembagian tiga lapis (sumber, reduksi, arah dan target) dan kenapa sumber tidak boleh menghitung nilai sendiri, aturan Cuplikan (Populasi bukan len(Nilai), kembalikan error alih-alih cuplikan kosong, CakupanPersen bertipe pointer untuk cakupan waktu atau nilai). Memuat juga katalog formula reduksi (rata_rata, jumlah_unit, jumlah_nilai, rasio_ambang), beda ambang dengan target, bahaya salah mengisi arah naik atau turun, target per periode, dan syarat menarik data dari service lain lewat HTTP (kunci layanan sendiri, jangan masukkan ke InternalURL, wajib timeout).",
       "kata_kunci": [
-        "KPI",
+        "runbook KPI",
         "metrik otomatis",
-        "automated metric",
-        "kpi_score",
-        "skor KPI",
+        "DaftarkanSumber",
+        "Cuplikan",
         "formula reduksi",
         "rasio_ambang",
         "arah target",
-        "employee service",
-        "runbook"
+        "kpi/templates",
+        "cakupan",
+        "employee service"
       ]
     },
     {
