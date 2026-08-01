@@ -139,26 +139,27 @@
         "Microservices - Form Builder Service",
         "API - Index",
         "APP - Web ERP",
+        "APP - MyBharata",
         "Microservices - Attendance Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "IT - Form Builder",
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "b6b67623397bf95544e39ff84fbc52830aadbefd33c6fc7b58a53379a2ddc4e6",
+      "hash": "e7a161ad419ceff0f07fe4f8d199d2a8f56fb7bc3be1dce009ec08ee4f40ef13",
       "ukuran_kb": 4.3,
-      "ringkasan": "Menjawab: endpoint apa saja untuk membuat, menerbitkan, menyunting, dan menutup form dinamis, siapa yang boleh mengelolanya (RBAC key `it` atau `ga`) versus siapa yang cukup mengisi. Juga menjawab bentuk data pentingnya: 9 tipe field, tipe audience/sasaran, format tanggal RFC3339 pada attendance_gate, isi respons analytics, serta aturan idempotensi pengiriman jawaban. Menjelaskan pula rute `/internal/compliance` yang dipanggil attendance service saat clock-in dan mengapa identitas di situ terkunci ke header, bukan query param.",
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (RBAC `it`/`ga`) versus siapa yang cukup terautentikasi untuk mengisi, dan kapan sebuah request dibalas 403 atau 409. Juga menjawab bentuk datanya: 9 tipe field, cara menentukan sasaran (audience), format tanggal gerbang presensi (RFC3339, bukan YYYY-MM-DD), isi respons analytics, aturan idempoten pengiriman jawaban 2 menit, dan kenapa identitas di `/internal/compliance` terkunci ke header.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
+        "dynamic form",
         "endpoint",
         "API reference",
         "RBAC it ga",
         "attendance gate",
         "gerbang presensi",
         "analytics",
-        "export CSV",
-        "compliance"
+        "export CSV"
       ]
     },
     {
@@ -1001,8 +1002,19 @@
       ],
       "hash": "f099283126474f364d08b0b231c7225c1c572859a78b053d1e334487444ebb22",
       "ukuran_kb": 61.1,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: apa itu portal web internal `hris-dashboard` (\"One Bharata\"), stack dan repo mana yang dipakai, bagaimana alur login serta perannya sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager. Juga menjawab bagaimana `system_roles` menggerbangi sidebar dan menu, bagaimana menu dikelompokkan dan diratakan, bagaimana pengaturan tampilan menu per jabatan bekerja (`menu_hidden`), serta bagian mana dari web ini yang sudah company-aware untuk multi-perusahaan.",
+      "kata_kunci": [
+        "Web ERP",
+        "hris-dashboard",
+        "One Bharata",
+        "erp-frontend",
+        "Next.js",
+        "SSO identity provider",
+        "system_roles",
+        "sidebar menu",
+        "multi-perusahaan",
+        "company switcher"
+      ]
     },
     {
       "path": "Application/APP - Website Bharata Internasional.md",
@@ -1522,7 +1534,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Merged ke `main` 2026-08-01** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849), merge commit `4f546f14`), backend lengkap dan teruji (122 unit test). **BELUM live di dev** per pemeriksaan 2026-08-01: `GET /health?check=form-builder` di gateway dev masih balas `400 unknown service`, artinya gateway di sana masih binary pra-merge. **FE kelola di [[APP - Web ERP]] sudah ada** (branch `feat/form-builder` di repo `erp-frontend`, **belum merge**): daftar form + builder. **Yang masih kosong**: layar analisa/export di web, dan renderer pengisian di [[APP - MyBharata]] — sehingga karyawan belum punya cara mengisi form sama sekali.",
+      "status_teks": "**Implemented & LIVE di dev** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849) + perbaikan [#855](https://github.com/bip-itteam-internal/bip-erp/pull/855)); terverifikasi end-to-end lewat gateway dev 2026-08-01. **PROD belum jalan** — container-nya belum pernah dibuat. FE web di [[APP - Web ERP]] sudah lengkap (kelola, builder, **analisa jawaban**). **Yang masih kosong: renderer pengisian di [[APP - MyBharata]]**, sehingga karyawan belum punya cara mengisi form sama sekali.",
       "publik": true,
       "tautan": [
         "Microservices - Attendance Service",
@@ -1538,10 +1550,21 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "5e198f9290754b501354ae476d0b677868e9fbae5313fc7f97a9acbb6a17c1e2",
-      "ukuran_kb": 11.5,
-      "ringkasan": null,
-      "kata_kunci": []
+      "hash": "f2c727750714acbbe0d0ea16dd1683780eb3ea4ecdebc7d12f16b8dae4931316",
+      "ukuran_kb": 12.5,
+      "ringkasan": "Menjawab: bagaimana form-builder-service dibangun dan dijalankan (Go + Fiber + MongoDB `form_builder_db`, port 6986, path `services/form-builder`), siapa personanya, dan fitur apa saja yang sudah ada dari kelola form sampai analytics dan export CSV. Juga menjawab pertanyaan desain yang penting: kenapa susunan pertanyaan dikunci setelah ada jawaban, kenapa gerbang presensi dibuat gagal-tertutup pada data cacat, kenapa `/internal/compliance` tidak boleh percaya query param, bagaimana scoping `company_id`, serta env dan langkah docker compose apa yang dibutuhkan untuk menghidupkannya.",
+      "kata_kunci": [
+        "form builder service",
+        "microservice",
+        "Go Fiber",
+        "MongoDB",
+        "form_builder_db",
+        "port 6986",
+        "compliance clock-in",
+        "audience sasaran form",
+        "multi-tenant company_id",
+        "deploy dev prod"
+      ]
     },
     {
       "path": "Core System and Modules/Microservices - HRD Document Service.md",
@@ -4284,20 +4307,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "5d0e32133af3a94f057ec3d79cd692f669fc1fd46385cd261b66324d5fcb39fa",
-      "ukuran_kb": 87.5,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang per departemen dan per posisi, berapa bobot tiap metrik, dan apa targetnya (target tersimpan di field description, karena kpi_template tak punya field target yang dapat dibaca mesin). Menjawab juga metrik mana yang sudah punya sumber data di sistem hari ini (nama koleksi/endpoint beserta volumenya), mana yang modulnya ada tapi datanya kosong, dan mana yang sama sekali belum ada sumbernya, sehingga dev departemen tahu metrik mana yang layak diotomatiskan. Selain itu memuat daftar cacat data yang sudah diketahui (template uji ikut produksi, metrik duplikat, label memakai target korporat, departemen tanpa template) dan cara menyegarkan dokumen ini dari koleksi kpi_template di employee_db.",
+      "hash": "0c54aa5647bd32b77abcd228bcdbc00e2c8da03319b273380ce8dd993db2b718",
+      "ukuran_kb": 124.2,
+      "ringkasan": "Menjawab: metrik KPI apa yang benar-benar dipakai menilai orang per departemen dan per jabatan di production, berapa bobotnya, dan apa targetnya (target tersimpan di `description` karena `kpi_template` tidak punya field target yang terbaca mesin). Juga menjawab metrik mana yang bisa diotomatiskan sekarang, mana yang butuh kesepakatan definisi dulu, mana yang modulnya ada tapi datanya kosong, dan mana yang tidak punya sumber sama sekali, plus cacat data yang sudah diketahui (template uji ikut produksi, metrik duplikat, label memakai target korporat) dan cara menyegarkan dokumen ini dari `employee_db`.",
       "kata_kunci": [
         "KPI",
         "matriks KPI",
         "kpi_template",
-        "bobot",
+        "bobot metrik",
         "target KPI",
         "otomasi skor KPI",
-        "penilaian kinerja",
-        "employee_db",
         "departemen",
-        "metrik"
+        "employee_db",
+        "penilaian karyawan",
+        "performance appraisal"
       ]
     },
     {
@@ -5218,8 +5241,19 @@
       ],
       "hash": "4ad90fb7917428a8bac4f4c46cb0a38d7bbdbccd9ba6ea0e5d63b2ea35e04e46",
       "ukuran_kb": 5.5,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: kenapa Form Builder dibuat (form request Bharata sebelumnya di-hardcode per kasus), apa bedanya yang dibangun dari rencana asli (RBAC bertambah `ga`, ada analitik, ada sasaran form, dan menyentuh attendance service), serta apa yang tetap ditunda yaitu upload file dan logika percabangan. Juga menjawab bagaimana intersep presensi diputuskan (mode `block` vs `warn`, hanya jalur mobile, gagal-terbuka, jendela tanggal wajib), kenapa mode `block` belum boleh dinyalakan di produksi sebelum MyBharata siap, dan kenapa identitas responden sengaja ditampilkan penuh di halaman analisa.",
+      "kata_kunci": [
+        "Form Builder",
+        "form dinamis",
+        "no-code form",
+        "intersep presensi",
+        "block warn",
+        "survei internal",
+        "deklarasi kesehatan",
+        "privasi responden",
+        "HRGA",
+        "IT tooling"
+      ]
     },
     {
       "path": "IT/IT - Helpdesk.md",
@@ -8087,9 +8121,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Application/APP - Web ERP.md",
-    "Core System and Modules/Microservices - Form Builder Service.md",
-    "IT/IT - Form Builder.md"
-  ]
+  "gagal": []
 }
