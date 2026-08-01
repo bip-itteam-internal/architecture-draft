@@ -999,21 +999,10 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "d8dcf21429aecf6bfd97affce82aee2c210ebc84673487602e3aeaacf85ed233",
-      "ukuran_kb": 59.3,
-      "ringkasan": "Menjawab: apa itu portal web internal `hris-dashboard` (One Bharata), stack frontend-nya (Next.js, React, shadcn/ui, TanStack Query, react-i18next), dan bagaimana login, refresh token proaktif, serta SSO handoff kode sekali-pakai bekerja. Juga menjawab bagaimana sidebar digerbangi map `system_roles`, bagaimana menu dikelompokkan lewat induk bersarang (bukan field `group`), bagaimana setelan Tampilan Menu per jabatan menyimpan `menu_hidden`, dan bagaimana alat Atasan Langsung mengisi hierarki. Menjelaskan pula wujud multi-perusahaan di web: company switcher, kelola perusahaan/departemen/shift/network, dan direktori karyawan yang ikut perusahaan terpilih.",
-      "kata_kunci": [
-        "web ERP",
-        "hris-dashboard",
-        "One Bharata",
-        "frontend",
-        "Next.js",
-        "SSO",
-        "system_roles",
-        "sidebar menu",
-        "multi-perusahaan",
-        "company switcher"
-      ]
+      "hash": "f099283126474f364d08b0b231c7225c1c572859a78b053d1e334487444ebb22",
+      "ukuran_kb": 61.1,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Application/APP - Website Bharata Internasional.md",
@@ -1549,21 +1538,10 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "fa37660fdd048a6063081d249802dce5196ea1932f36966f11ca5fcd4ca55143",
-      "ukuran_kb": 11.0,
-      "ringkasan": "Menjawab: bagaimana tim IT dan HRGA membuat form dinamis tanpa coding (9 tipe pertanyaan, alur status draft ke published ke closed, siapa yang boleh mengelola lewat system_roles it/ga), bagaimana sasaran form ditentukan (all, departments, employees) dan bagaimana karyawan mengisi serta melihat riwayat jawabannya. Juga menjawab: bagaimana rekap jawaban dibaca lewat analytics dan diekspor ke CSV, aturan idempotensi pengiriman jawaban, penguncian susunan pertanyaan setelah ada jawaban masuk, serta scoping company_id untuk multi-tenant. Menjelaskan pula endpoint /internal/compliance yang dipakai attendance-service untuk menahan atau memperingatkan clock-in mobile bila ada form wajib belum diisi, termasuk keputusan gagal-tertutup dan penguncian identitas ke header, plus variabel env dan port yang wajib ada sebelum gateway di-redeploy.",
-      "kata_kunci": [
-        "form builder",
-        "form dinamis",
-        "dynamic form",
-        "survei",
-        "survey",
-        "kepatuhan presensi",
-        "attendance compliance",
-        "export CSV",
-        "analytics jawaban",
-        "HRGA"
-      ]
+      "hash": "5e198f9290754b501354ae476d0b677868e9fbae5313fc7f97a9acbb6a17c1e2",
+      "ukuran_kb": 11.5,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Core System and Modules/Microservices - HRD Document Service.md",
@@ -4306,20 +4284,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "517d419efc2d020884e4194f260b84ef8d5d91666774d0cd5837272cd2f7e098",
-      "ukuran_kb": 46.8,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang dipakai tiap departemen dan posisi, berapa bobot masing-masing metrik, dan apa target/keterangannya persis seperti tersimpan di koleksi kpi_template production. Juga menjawab metrik mana yang layak diotomatiskan (klasifikasi otomatis / semi / terblokir data / manual per departemen), departemen mana yang belum punya template sama sekali, serta cacat data yang sudah diketahui seperti template uji ikut production, metrik duplikat, dan label yang memakai target korporat. Menjelaskan pula cara membaca label apa adanya (termasuk typo) karena label adalah kunci identitas metrik di kode, dan cara menyegarkan dokumen ini dari employee_db.",
+      "hash": "5d0e32133af3a94f057ec3d79cd692f669fc1fd46385cd261b66324d5fcb39fa",
+      "ukuran_kb": 87.5,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang per departemen dan per posisi, berapa bobot tiap metrik, dan apa targetnya (target tersimpan di field description, karena kpi_template tak punya field target yang dapat dibaca mesin). Menjawab juga metrik mana yang sudah punya sumber data di sistem hari ini (nama koleksi/endpoint beserta volumenya), mana yang modulnya ada tapi datanya kosong, dan mana yang sama sekali belum ada sumbernya, sehingga dev departemen tahu metrik mana yang layak diotomatiskan. Selain itu memuat daftar cacat data yang sudah diketahui (template uji ikut produksi, metrik duplikat, label memakai target korporat, departemen tanpa template) dan cara menyegarkan dokumen ini dari koleksi kpi_template di employee_db.",
       "kata_kunci": [
         "KPI",
         "matriks KPI",
         "kpi_template",
-        "bobot KPI",
+        "bobot",
         "target KPI",
-        "penilaian kinerja",
-        "performance appraisal",
         "otomasi skor KPI",
+        "penilaian kinerja",
         "employee_db",
-        "KPI per departemen"
+        "departemen",
+        "metrik"
       ]
     },
     {
@@ -5215,9 +5193,10 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Backend sudah merged ke `main` 2026-08-01** (PR #849), **belum live di dev**. **FE kelola** ada di branch `feat/form-builder` repo `erp-frontend` (**belum merge**) dan berupa alat **kelola** saja (daftar + builder); **halaman analisa/export belum**, dan **pengisian di MyBharata belum ada**",
+      "status_teks": "**Backend + FE web semuanya merged 2026-08-01** (bip-erp #849 & #855; erp-frontend #680, #682, #683). Web menyediakan kelola form, builder bertab, dan **halaman analisa jawaban**. **Yang masih kosong: pengisian di [[APP - MyBharata]]** — karyawan belum punya cara mengisi form sama sekali. Deploy: **dev sudah jalan** (form-builder-service + gateway dibangun ulang 2026-08-01); **prod belum** (service-nya belum pernah dibuat)",
       "publik": false,
       "tautan": [
+        "APP - MyBharata",
         "Microservices - Form Builder Service",
         "APP - Web ERP",
         "API - Form Builder Service",
@@ -5230,7 +5209,6 @@
         "GA - Checklist Management",
         "Microservices - Attendance Service",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
-        "APP - MyBharata",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "Microservices - File Service",
         "CORE - SSO Flow",
@@ -5238,21 +5216,10 @@
         "DB - Overview and Notes",
         "ROADMAP"
       ],
-      "hash": "a9414c9cc92eb6123636874167d620fd67a095f7ccc0710d00c76503b6a321be",
-      "ukuran_kb": 4.6,
-      "ringkasan": "Menjawab: mengapa Form Builder dibangun, kasus pakai apa yang disasar (survei internal, deklarasi, pendataan mendadak, pendaftaran event) dibanding form request yang selama ini di-hardcode per kasus, dan aspek mana yang melebar dari rencana asli pada RBAC, hasil jawaban, sasaran, dampak lintas service, dan multi-perusahaan. Juga menjawab keputusan bisnis intersep presensi: pilihan `block` versus `warn`, mengapa hanya jalur mobile dan hanya clock-in yang ditahan, prinsip gagal-terbuka bila service form mati, dan kewajiban jendela tanggal. Menjelaskan pula urutan rilis yang mengikat serta daftar hal yang sengaja masih TBD seperti upload file, logika percabangan, form publik, dan pencarian karyawan untuk sasaran per-orang.",
-      "kata_kunci": [
-        "form builder",
-        "konsep",
-        "intersep presensi",
-        "block warn",
-        "gagal-terbuka",
-        "urutan rilis deploy",
-        "TBD",
-        "upload file",
-        "logika percabangan",
-        "IT HRGA"
-      ]
+      "hash": "4ad90fb7917428a8bac4f4c46cb0a38d7bbdbccd9ba6ea0e5d63b2ea35e04e46",
+      "ukuran_kb": 5.5,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "IT/IT - Helpdesk.md",
@@ -8120,5 +8087,9 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "Application/APP - Web ERP.md",
+    "Core System and Modules/Microservices - Form Builder Service.md",
+    "IT/IT - Form Builder.md"
+  ]
 }
