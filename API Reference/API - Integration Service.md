@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, transaksi, items, ulasan marketplace, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈219 rute** (dihitung dari registrasi `main.go`; +5 `/reviews/*` 2026-07-19). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
+*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, transaksi, items, ulasan marketplace, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈336 rute** (dihitung dari registrasi `main.go`; +5 `/reviews/*` 2026-07-19; +17 `/accounting/*` dashboard FAT 2026-08-01). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
 
 - **Implementasi**: [[Microservices - Integration Service]] · **Status**: ✅
 - **Indeks**: [[API - Index]] · Semua butuh gateway key kecuali webhook publik (`/ext/webhook/*`). ⚠️ `/health` **juga** butuh gateway key (route terdaftar setelah middleware `ValidateGateway`; gateway memanggilnya dengan key — bukan endpoint terbuka).
@@ -109,6 +109,26 @@
 | POST | `/webhooks/services/accurate` | Webhook Accurate (ITEM_QUANTITY/STOCK_MUTATION) → update `accurate_stocks` (PUBLIK via `/ext/webhook/accurate`) ✅ (pendaftaran di portal Accurate masih pending) |
 
 > **Guard anti-dobel:** `POST /transactions/summary/reports/:id/send/accurate` (SALES_INVOICE) balas **409** + daftar overlap bila rentang report beririsan faktur auto-sync `SENT`; bypass `?force=true`.
+
+## Accounting — Dashboard FAT (`/accounting/*`)
+
+*Grup **baca-saja** dari Accurate (nol tulis), menyuplai dashboard divisi FAT di [[APP - Web ERP]] `/finance`. Seluruhnya `cache10` kecuali anggaran & varians — koreksi yang baru disimpan harus langsung terlihat, kalau tidak terbaca seperti simpanannya gagal.*
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/accounting/profit-loss` · `/balance-sheet` · `/account-balance` | Laporan keuangan Accurate. Param `startDate`/`endDate` (**`dd/MM/yyyy`**; `account-balance` juga menuntut `asOfDate`). ⚠️ Keys respons Accurate memuat **titik literal** (`"profitLoss.description"`) — bukan bersarang; diurai lewat `map[string]any`, bukan struct bertag |
+| GET | `/accounting/receivables` | **Piutang B2B** + aging + DSO. Disaring kategori pelanggan lewat **dua langkah**: `customer/list.do` (`filter.customerCategoryId`) → id pelanggan → `sales-invoice/list.do` (`filter.customerId`). ⚠️ `sales-invoice/list` **tak punya** filter kategori — parameter itu diabaikan diam-diam, dan versi awal menarik 8.073 faktur marketplace. Kategori kosong dijawab `belum_diatur: true`, **bukan** "semua" |
+| GET | `/accounting/customer-categories` | Daftar kategori pelanggan (mengisi layar pengaturan kategori B2B) |
+| GET | `/accounting/journals` · `/journals/:id` | Jurnal umum berhalaman (~96 ribu; paginasi di sisi Accurate) + rincian debit/kredit. Filter rentang `dari`/`sampai` (`dd/MM/yyyy`). ⚠️ Bentuk filter **wajib** `filter.transDate.op=BETWEEN` + `val[0]`/`val[1]`; `transDateFilter` (nama yang disebut dokumentasi Accurate) **diabaikan diam-diam**, dan `GREATER_OR_EQUAL`/`LESS_OR_EQUAL` **ditolak** — rentang satu sisi memakai sentinel `01/01/1990`–`31/12/2090` |
+| GET | `/accounting/fixed-assets` · `/fixed-assets/summary` | Aset tetap dari **salinan Mongo** (`accurate_fixed_assets`), disegarkan task harian. ⚠️ `fixed-asset/list.do` hanya mengirim `id`/`quantity`/`draft` — nama & penyusutan hanya ada di `detail.do`, jadi 371 aset = 371 panggilan; itu sebabnya diimpor, bukan dipanggil tiap buka layar. Aset **draft** dipisah dari agregat (penyusutannya selalu nol). `salinan_kosong: true` = belum pernah disinkron, **bukan** nol aset |
+| GET | `/accounting/anggaran` · `/anggaran/katalog` | Master anggaran OPEX per **akun × departemen × bulan**, dan katalog dropdown (akun beban + 13 departemen). Katalog membuang akun `isParent` (nilainya sudah memuat anaknya) dan mencacah yang dilewati |
+| POST/PUT/DELETE | `/accounting/anggaran` | Simpan (upsert) & hapus satu baris anggaran |
+| POST | `/accounting/anggaran/upload` | Unggah Excel. Kolom wajib `akun`/`tahun`/`bulan`/`nominal`, opsional `departemen` (kosong = seluruh perusahaan) & `catatan`. Baris tak sah ditolak **sendiri-sendiri dengan nomor barisnya**; nominal berambigu (mis. `10.5`) ditolak, bukan ditebak. ⚠️ Badan respons berbentuk sama pada 200/400/500 — alasan penolakan ada di respons galat |
+| GET | `/accounting/anggaran/varians` | Anggaran vs realisasi + agregat. Membedakan **tiga jenis nol** lewat penanda terpisah: `anggaran_belum_diisi`, `realisasi_belum_disinkron`, `departemen_tak_dikenal` (+`sebab`), digerbangi `varians_terdefinisi`. `persen_terpakai` **null** saat anggaran nol |
+
+> **Realisasi OPEX per departemen wajib `glaccount/get-balance.do`, BUKAN `get-pl-account-amount.do`.** Yang kedua **mengabaikan** `departmentName` diam-diam — kontrol negatif dengan nama departemen ngawur tetap mengembalikan angka penuh, sehingga tiap departemen akan menampilkan total seluruh perusahaan dan variansnya tampak wajar padahal palsu. Yang pertama lolos kontrol negatif (`s=false` untuk nama tak dikenal). Dimensi departemen terbukti terisi: menjumlahkan 13 departemen = persis total tanpa filter (selisih Rp 0,00 pada dua akun, setahun penuh).
+
+> **Salinan lokal & penyegar:** aset tetap (task harian 02:15) dan realisasi OPEX (02:45) diimpor ke Mongo mengikuti pola `accurate_stocks`. Impor realisasi sengaja hanya menarik kombinasi **yang punya anggaran** — 56 akun × 13 departemen × 2 periode ≈ 1.456 panggilan akan menduduki limiter Accurate 6 req/s yang dibagi lintas service, demi angka yang tak punya pembanding.
 
 ## Items · Credentials · Holidays
 | Method | Path | Fungsi |
