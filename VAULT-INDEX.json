@@ -138,26 +138,27 @@
       "tautan": [
         "Microservices - Form Builder Service",
         "API - Index",
+        "APP - Web ERP",
         "Microservices - Attendance Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "IT - Form Builder",
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "074244f2ad30829ccc2a9e0eb963bef421412b1084999ed7f533dccad5040ff0",
-      "ukuran_kb": 4.1,
-      "ringkasan": "Menjawab: endpoint apa saja untuk membuat, menerbitkan, menyunting, dan menutup form dinamis, siapa yang boleh mengelolanya (RBAC `system_roles` key `it`/`ga`) versus siapa yang cukup mengisi. Juga menjawab bentuk data payload penting (9 tipe field, `audience`, `attendance_gate` yang wajib RFC3339), cara membaca analytics dan export CSV berikut penanda truncated, serta aturan idempotensi pengiriman jawaban dalam 2 menit. Menjelaskan pula kenapa `/internal/compliance` mengunci identitas ke header `BIP-*` dan mengabaikan query param dari request pemakai.",
+      "hash": "36a210de51df5ea0b7391fa0586fd100ddd3661bd09fe99b12efd5fa91bf05f7",
+      "ukuran_kb": 4.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service di balik gateway `/api/form-builder/*`, siapa yang boleh memanggil tiap rute (kelola form butuh key `system_roles` `it` atau `ga`, pengisian cukup terautentikasi), dan kode error apa yang muncul saat form disunting setelah ada jawaban atau status dimundurkan. Menjelaskan juga bentuk data penting: 9 tipe field, tipe sasaran (`all`/`departments`/`employees`), format RFC3339 wajib pada `attendance_gate`, isi respons analytics, export CSV dengan header `X-Export-Truncated`, dan aturan idempoten 2 menit pada pengiriman jawaban. Termasuk kenapa identitas di `/internal/compliance` dikunci ke header dan kapan query param `?employee_id=` masih dihormati.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
+        "dynamic form",
         "endpoint",
         "API reference",
         "RBAC it ga",
         "attendance gate",
-        "compliance",
-        "export CSV",
-        "analytics",
-        "audience"
+        "gerbang presensi",
+        "analytics export CSV",
+        "internal compliance"
       ]
     },
     {
@@ -979,6 +980,9 @@
         "API - Integration Service",
         "Microservices - Insentive Service",
         "Microservices - Integration Service",
+        "Microservices - Form Builder Service",
+        "IT - Form Builder",
+        "APP - MyBharata",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
         "ADR - 0012 Retur Refund-only Push-all",
         "API - Manufacture Service",
@@ -991,25 +995,24 @@
         "Microservices - Inventory Service",
         "CORE - IT Orchestrator",
         "BASE - Enterance Point",
-        "APP - MyBharata",
         "Finance - Incentive",
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "1854d91807bb5b777b2ffa344183115afd3277b9878e1d12a847fd890499293a",
-      "ukuran_kb": 56.5,
-      "ringkasan": "Menjawab: apa itu portal web internal One Bharata (`hris-dashboard`/erp-frontend), stack apa yang dipakai (Next.js 16, React 19, shadcn/Tailwind, TanStack Query, react-i18next), dan modul apa saja yang sudah ada di dalamnya. Menjawab juga: bagaimana login dan refresh token bekerja, bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain, serta bagaimana sidebar digerbang oleh `system_roles` per module dan role. Berguna saat menelusuri struktur menu (menu induk bersarang, perataan induk tipis, Tampilan Menu per jabatan, menu KPI untuk Leader), fitur Atasan Langsung dan Bagan Organisasi, serta dukungan multi-perusahaan seperti CompanySwitcher, kelola perusahaan, shift/rotasi, dan network WFO.",
+      "hash": "e90f31dc3118e4b519ea4093d3034baaa5d0b863d5fa82bc87f886a0eaa27d80",
+      "ukuran_kb": 59.2,
+      "ringkasan": "Menjawab: teknologi apa yang dipakai portal web internal ERP Bharata (`hris-dashboard` / \"One Bharata\", repo `erp-frontend`), bagaimana login dan refresh token bekerja, serta bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain. Menjelaskan cara role gating dari cookie `system_roles` (module dan role apa saja yang dikenal), bagaimana sidebar dikelompokkan lewat menu induk bersarang, kenapa field `group` ditolak, bagaimana setelan Tampilan Menu per jabatan menyimpan `menu_hidden` (centang = tampil), dan kapan induk menu tipis diratakan. Juga sumber jawaban untuk dukungan multi-perusahaan di FE (CompanySwitcher, Kelola Perusahaan/Departemen/Shift/Network per company) serta fitur Atasan Langsung dan menu KPI untuk Leader.",
       "kata_kunci": [
-        "erp-frontend",
         "web ERP",
-        "One Bharata",
         "hris-dashboard",
-        "SSO",
+        "One Bharata",
+        "erp-frontend",
+        "Next.js frontend",
+        "SSO identity provider",
+        "system_roles role gating",
         "sidebar menu",
-        "system_roles",
-        "role gating",
-        "Next.js",
-        "multi-perusahaan"
+        "tampilan menu per posisi",
+        "multi-perusahaan company switcher"
       ]
     },
     {
@@ -1530,7 +1533,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented di branch `feat/form-builder` — BELUM merge ke `main`, BELUM deploy.** Backend lengkap dan teruji (122 unit test); **FE [[APP - Web ERP]] dan [[APP - MyBharata]] belum ada**, jadi fitur ini belum bisa dipakai pengguna akhir.",
+      "status_teks": "**Implemented di branch `feat/form-builder` — BELUM merge ke `main`, BELUM deploy.** Backend lengkap dan teruji (122 unit test). **FE kelola di [[APP - Web ERP]] sudah ada** (branch `feat/form-builder` di repo `erp-frontend`, juga belum merge): daftar form + builder. **Yang masih kosong**: layar analisa/export di web, dan renderer pengisian di [[APP - MyBharata]] — sehingga karyawan belum punya cara mengisi form sama sekali.",
       "publik": true,
       "tautan": [
         "Microservices - Attendance Service",
@@ -1539,27 +1542,27 @@
         "API - Form Builder Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "IT - Form Builder",
         "Microservices - File Service",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "DB - Overview and Notes",
         "CORE - API Master Gateway",
-        "CORE - SSO Flow",
-        "IT - Form Builder"
+        "CORE - SSO Flow"
       ],
-      "hash": "b6269c41dbaf551c517a8e48b26c0000ac7417a4cc55b78fa4125532ec8bbbbc",
-      "ukuran_kb": 9.0,
-      "ringkasan": "Menjawab: bagaimana form dinamis dibuat tanpa rilis kode (9 tipe pertanyaan, sasaran all/departments/employees, siklus draft ke published ke closed), siapa personanya dan gerbang RBAC-nya (`system_roles` `it` dan `ga`, security GA sengaja dikecualikan), serta bagaimana jawaban dibaca lewat analytics dan export CSV. Juga menjawab kenapa clock-in mobile bisa ditahan form wajib dan pengaman apa yang dipasang (default `warn`, jendela tanggal wajib, gagal-tertutup pada data cacat, identitas `/internal/compliance` terkunci ke header). Menjelaskan pula batas yang belum ada: upload file, logika percabangan, FE web dan mobile, hitung otomatis ukuran sasaran, dan batas agregasi 20.000 jawaban.",
+      "hash": "d3e12c9f49884942436cad7a75f9bf19f343586829c0814038801ccab931501f",
+      "ukuran_kb": 9.6,
+      "ringkasan": "Menjawab: bagaimana form-builder-service dibangun dan dijalankan (Go + Fiber v2 + MongoDB `form_builder_db`, path `services/form-builder`, port 6986 internal), siapa penggunanya (staf/SPV IT dan HRGA sebagai pengelola, karyawan sebagai pengisi) dan kenapa peran `security` milik GA dikecualikan. Menjelaskan aturan yang mengunci susunan pertanyaan begitu ada jawaban, bagaimana sasaran form diresolusi murni dari header identitas gateway tanpa memanggil service lain, dan keputusan konservatif di jalur clock-in (gerbang gagal-tertutup pada data cacat, default `warn`, jendela tanggal wajib, identitas terkunci ke header). Juga jadi rujukan batasan yang diketahui: agregasi dibatasi 20.000 jawaban, `estimated_size` diisi manual, upload file dan logika percabangan belum ada.",
       "kata_kunci": [
-        "form builder",
+        "form builder service",
         "form dinamis",
-        "survei",
-        "kuesioner",
-        "attendance gate",
-        "clock-in",
-        "analytics",
-        "export CSV",
-        "multi-tenant",
-        "RBAC"
+        "Go Fiber MongoDB",
+        "form_builder_db",
+        "audience sasaran form",
+        "attendance gate clock-in",
+        "idempoten response",
+        "analytics export CSV",
+        "multi-tenant company_id",
+        "RBAC it ga"
       ]
     },
     {
@@ -5181,10 +5184,11 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Backend selesai di branch `feat/form-builder` (belum merge, belum deploy); FE & mobile belum ada**",
+      "status_teks": "**Backend + FE kelola selesai di branch `feat/form-builder` (belum merge, belum deploy).** FE web berupa alat **kelola** saja (daftar + builder); **halaman analisa/export belum**, dan **pengisian di MyBharata belum ada**",
       "publik": false,
       "tautan": [
         "Microservices - Form Builder Service",
+        "APP - Web ERP",
         "API - Form Builder Service",
         "HRIS - Employee Request & Approval",
         "HRIS - Leave Request",
@@ -5195,7 +5199,6 @@
         "GA - Checklist Management",
         "Microservices - Attendance Service",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
-        "APP - Web ERP",
         "APP - MyBharata",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "Microservices - File Service",
@@ -5204,20 +5207,19 @@
         "DB - Overview and Notes",
         "ROADMAP"
       ],
-      "hash": "fcf6ebdbe1dda2a9aa47cf194c6cb89712cec438eb829fe92b4425337a1f73f4",
-      "ukuran_kb": 3.8,
-      "ringkasan": "Menjawab: kenapa Form Builder dibuat, kasus pemakaian mana yang cocok (survei internal, deklarasi, pendataan mendadak, pendaftaran event) dan mana yang sengaja tidak boleh dipindah ke sana (form approval yang sudah matang seperti cuti, lembur, dan koreksi presensi). Juga menjawab bagaimana scope berubah dari rencana asli (RBAC bertambah `ga`, ada analitik, ada sasaran form, menyentuh attendance service, `company_id` sejak awal) dan keputusan bisnis di balik intersep presensi (`block` versus `warn`, hanya jalur mobile, gagal-terbuka, jendela tanggal wajib). Menutup dengan hal yang masih TBD seperti waktu merge/deploy, bentuk builder UI, dan form publik tanpa login.",
+      "hash": "917d9ca85099c7e604680b61d75a2540f5cff52203d867d7b7acfb35fef5f45e",
+      "ukuran_kb": 4.5,
+      "ringkasan": "Menjawab: kenapa Form Builder dibuat, yaitu agar form internal baru atau ad-hoc (survei, deklarasi, pendataan, pendaftaran event) tidak lagi butuh siklus development per kasus seperti form request yang sudah hardcoded. Menjelaskan apa saja yang berubah dari rencana asli (RBAC melebar ke `ga`, ada analitik selain CSV, ada sasaran form, dan ternyata menyentuh attendance service) serta apa yang tetap ditunda (upload file dan logika percabangan). Juga jadi rujukan keputusan intersep presensi (hanya jalur mobile, clock-out tidak ditahan, gagal-terbuka, jendela tanggal wajib), urutan rilis yang mengikat (mode `block` menunggu MyBharata siap, deploy backend dulu), dan daftar hal yang belum diputuskan.",
       "kata_kunci": [
         "form builder",
-        "konsep",
-        "form dinamis",
+        "konsep no-code form",
+        "form request internal",
         "intersep presensi",
-        "clock-in",
-        "block warn",
-        "IT",
-        "HRGA",
-        "scope",
-        "TBD"
+        "block warn clock-in",
+        "RBAC it ga",
+        "urutan rilis deploy",
+        "survei deklarasi pendataan",
+        "TBD roadmap"
       ]
     },
     {

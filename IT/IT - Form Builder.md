@@ -2,9 +2,9 @@
 
 *Konsep **Form Builder** — pembuat form dinamis tanpa coding untuk kasus internal baru/ad-hoc. Bharata banyak memakai "form request" yang kini di-hardcode per kasus; Form Builder jadi fondasi reusable (buat form baru tanpa rilis kode). Rencana yang dulu ditunda **sudah dieksekusi**: backend lengkap ada di branch `feat/form-builder`, dengan scope yang **lebih luas** dari rencana asli.*
 
-- **Status**: ⚠️ **Backend selesai di branch `feat/form-builder` (belum merge, belum deploy); FE & mobile belum ada**
+- **Status**: ⚠️ **Backend + FE kelola selesai di branch `feat/form-builder` (belum merge, belum deploy).** FE web berupa alat **kelola** saja (daftar + builder); **halaman analisa/export belum**, dan **pengisian di MyBharata belum ada**
 - **Penempatan**: tooling platform (Tech Development), dipakai bersama HRGA
-- **Implementasi**: [[Microservices - Form Builder Service]] · **API**: [[API - Form Builder Service]]
+- **Implementasi**: [[Microservices - Form Builder Service]] · **FE web**: [[APP - Web ERP]] · **API**: [[API - Form Builder Service]]
 
 ## Latar Belakang
 
@@ -36,10 +36,18 @@ Kebutuhan yang memicu perluasan scope: HRGA ingin memastikan form tertentu (mis.
 
 Rinciannya di [[Microservices - Form Builder Service]] dan [[Microservices - Attendance Service]].
 
+## Urutan Rilis yang Mengikat
+
+**Mode `block` sebaiknya belum dinyalakan di produksi sampai MyBharata siap.** Keputusan menaruh pengisian sepenuhnya di mobile berarti karyawan yang tertahan gerbang belum punya jalan mengisi lewat web. Mode `warn` aman dipakai lebih dulu. FE web sudah memasang peringatan ini di layar pengaturan gerbang, tapi itu peringatan, bukan pencegah.
+
+Deploy tetap **backend lebih dulu, FE menyusul**.
+
 ## Belum Diputuskan (TBD)
 
 - Kapan di-merge & deploy (BE harus naik lebih dulu dari FE — lihat catatan urutan deploy di [[Microservices - Form Builder Service]]).
-- Bentuk builder UI di [[APP - Web ERP]] dan renderer di [[APP - MyBharata]].
+- Halaman **analisa & export** di [[APP - Web ERP]]: endpoint backend sudah siap tapi belum ada layarnya.
+- Renderer pengisian di [[APP - MyBharata]] — belum dikerjakan sama sekali.
+- Pencarian karyawan untuk sasaran per-orang (sementara diketik sebagai Employee ID per baris).
 - Apakah form publik (tanpa login) akan didukung — belum dikerjakan.
 - Apakah RBAC akan dinaikkan ke permission-set [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].
 

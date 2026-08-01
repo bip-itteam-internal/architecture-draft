@@ -5,7 +5,7 @@
 - **Stack:** Go + Fiber v2 + MongoDB (database sendiri `form_builder_db`)
 - **Path:** `services/form-builder`
 - **Port:** 6986 (internal, `expose`; tidak dipublish ke host)
-- **Status**: ⚠️ **Implemented di branch `feat/form-builder` — BELUM merge ke `main`, BELUM deploy.** Backend lengkap dan teruji (122 unit test); **FE [[APP - Web ERP]] dan [[APP - MyBharata]] belum ada**, jadi fitur ini belum bisa dipakai pengguna akhir.
+- **Status**: ⚠️ **Implemented di branch `feat/form-builder` — BELUM merge ke `main`, BELUM deploy.** Backend lengkap dan teruji (122 unit test). **FE kelola di [[APP - Web ERP]] sudah ada** (branch `feat/form-builder` di repo `erp-frontend`, juga belum merge): daftar form + builder. **Yang masih kosong**: layar analisa/export di web, dan renderer pengisian di [[APP - MyBharata]] — sehingga karyawan belum punya cara mengisi form sama sekali.
 
 ## Persona / Pengguna
 
@@ -67,7 +67,8 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 ## Belum Diimplementasikan / Catatan
 
 - **Belum merge, belum deploy.** Seluruh isi dokumen ini ada di branch `feat/form-builder`.
-- **FE belum ada** — builder UI, halaman analisa, dan renderer di [[APP - Web ERP]] serta [[APP - MyBharata]] menyusul setelah kontrak API terkunci.
+- **Konsumen yang sudah ada**: FE kelola di [[APP - Web ERP]] memakai `POST/GET/PATCH/DELETE /forms*`. **Endpoint `/forms/:id/analytics`, `/forms/:id/responses`, dan `/forms/:id/export` sudah siap tapi BELUM ada yang memanggilnya** — layar analisa & export menyusul.
+- **Endpoint pengisian (`/me/*`) belum punya konsumen sama sekali.** Pengisian direncanakan lewat [[APP - MyBharata]] yang belum dibangun, dan web sengaja tak menyediakan halaman isi form. Konsekuensinya gerbang mode `block` belum boleh dinyalakan di produksi — lihat [[IT - Form Builder]].
 - **Upload file** belum didukung (menyusul via [[Microservices - File Service]], cap 4 MB).
 - **Logika percabangan** (lompat seksi berdasarkan jawaban) belum ada.
 - **Jumlah sasaran tidak dihitung otomatis.** Untuk sasaran `all`/`departments`, penyebut tingkat pengisian memakai `audience.estimated_size` yang diisi manual pembuat form — service ini sengaja tak memanggil employee-service. Bila kosong, tingkat pengisian **tidak dilaporkan** (menampilkan 0% lebih menyesatkan daripada tak menampilkan apa pun).

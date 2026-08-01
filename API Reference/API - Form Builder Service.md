@@ -2,8 +2,9 @@
 
 *Endpoint **form-builder-service** (form dinamis + analisa jawaban + kepatuhan presensi). Gateway: `/api/form-builder/*`. RBAC dari map `system_roles`: kelola form butuh key `it` atau `ga` (staff/supervisor/admin); mengisi cukup terautentikasi. Grounded ke `services/form-builder/routes.go` + handler terkait (branch `feat/form-builder`).*
 
-- **Implementasi**: [[Microservices - Form Builder Service]] · **Status**: ⚠️ (branch belum merge, belum deploy; FE belum ada)
+- **Implementasi**: [[Microservices - Form Builder Service]] · **Status**: ⚠️ (branch belum merge, belum deploy)
 - **Indeks**: [[API - Index]]
+- **Konsumen**: rute `/forms*` sudah dipakai FE kelola di [[APP - Web ERP]]. Rute **analitik/export** dan seluruh rute **`/me/*`** belum punya pemanggil — lihat catatan di [[Microservices - Form Builder Service]].
 
 ## Sistem
 | Method | Path | Fungsi |
