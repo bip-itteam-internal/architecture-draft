@@ -1,8 +1,8 @@
 ## Deskripsi
 
-*Struktur organisasi perusahaan — departemen, posisi/jabatan, dan hierarki (atasan/SPV). **Departemen dan posisi** kini dikelola sebagai master data di MongoDB (`master_department`) dengan CRUD endpoint dan halaman admin di frontend. Data karyawan tetap di `work_data`. Visualisasi org chart formal belum ada.*
+*Struktur organisasi perusahaan — departemen, posisi/jabatan, dan hierarki (atasan/SPV). **Departemen dan posisi** dikelola sebagai master data di MongoDB (`master_department`) dengan CRUD endpoint dan halaman admin di frontend. Data karyawan tetap di `work_data`. **Bagan organisasi sudah ada** (`/hris/org-chart`); jenjang/golongan belum.*
 
-- **Status**: ⚠️ Implemented (ada catatan) — master departemen/posisi sudah di-DB; org chart belum
+- **Status**: ⚠️ Implemented (ada catatan) — master departemen/posisi sudah di-DB; org chart **sudah ada** (2026-08-01), jenjang/golongan belum
 
 ## Ruang Lingkup
 
@@ -14,7 +14,7 @@
 - **System roles** — role per department (staff, supervisor, admin, security) dan feature-based roles (insentive, integration) dikelola di `master_department.roles` dan `master_system_role`
 - **Hierarki/atasan** — relasi supervisor per divisi (dipakai di banyak approval, mis. `getSupervisorData`)
 	- **Atasan LANGSUNG per orang** (`work_data.supervisor_id`) — dihidupkan 2026-07-31, kini **✅ merged dan berjalan di produksi** (backend `GET/PUT /supervisor-assignment` di `services/employee/main.go:892` & `:950`; frontend `src/app/(main)/hris/employee/atasan-langsung/page.tsx`; prod `erp-frontend` di `c18adfec`, merge PR #664). Sebelumnya field itu ada di dokumen dan di form tapi **tak pernah masuk struct `WorkData`, terisi 0 dari 179 karyawan, dan tak dipakai apa pun**.
-		- ⚠️ **Fiturnya lengkap, datanya masih kosong.** Sensus produksi 2026-07-31: `supervisor_id` terisi **0 dari 204** karyawan. Jadi setiap fitur yang bersandar padanya (cakupan KPI Leader, agregasi skor tim ber-scope `team`) belum menghasilkan apa pun sampai HR membuka halaman Atasan Langsung dan mengisinya. Ini kesenjangan **adopsi**, bukan kesenjangan kode. Menjawab pertanyaan yang tak bisa dijawab hierarki departemen: siapa bawahan seorang **Leader**. Departemen hanya mengenal satu supervisor, sehingga 11 Leader di 7 departemen tak punya cakupan apa pun.
+		- **Pengisiannya sudah berjalan.** Sensus produksi **2026-08-01**: `supervisor_id` terisi **54 dari 204** karyawan (Beauty Hacks 45, Tech Development 5, Human Resource 4). Sehari sebelumnya masih nol, jadi angka ini bergerak cepat begitu alatnya ada — jangan pakai angka lama untuk menyimpulkan fitur ini belum dipakai. Sisanya masih menunggu, dan setiap fitur yang bersandar padanya (cakupan KPI Leader, agregasi skor tim ber-scope `team`) baru menghasilkan sesuatu untuk departemen yang sudah diisi. Menjawab pertanyaan yang tak bisa dijawab hierarki departemen: siapa bawahan seorang **Leader**. Departemen hanya mengenal satu supervisor, sehingga 11 Leader di 7 departemen tak punya cakupan apa pun.
 	- ⚠️ **Dipakai untuk CAKUPAN TAMPILAN, BUKAN cakupan wewenang.** Alur persetujuan pengajuan **tidak berubah** dan tetap lewat `getSupervisorData` + `supervised_by`. Pemisahan ini disengaja dan diputuskan pemilik keputusan; menggabungkannya berarti menambah satu tahap persetujuan untuk 178 orang. Lihat tabel dua konsep di bawah.
 	- Diisi lewat **HRIS → Personalia → Atasan Langsung** (`GET/PUT /supervisor-assignment`), atau per orang di form Edit Data Pekerjaan. Keduanya divalidasi sama: menolak atasan = diri sendiri, tak ditemukan, beda perusahaan, atau akunnya tak aktif.
 	- **Alurnya: pilih departemen → pilih atasan → centang bawahannya** (dibalik 2026-07-31 lewat PR #664, **sudah merged dan live di produksi**). Bentuk awalnya meminta atasan satu per satu untuk tiap karyawan, sehingga satu departemen berarti membuka dropdown belasan kali. Yang dibalik bukan cuma jumlah klik: pertanyaan yang ada di kepala orang adalah "anak buah Aris siapa saja", bukan "atasan si A siapa" diulang dua puluh kali.
@@ -23,7 +23,13 @@
 	- **Label grup departemen dikenali.** `GET /supervisor-assignment` menerima `HRGA` maupun nama departemen satuan, memakai `ResolveDepartmentFilter` + `ExpandToDepartmentGroup` seperti `/kpi`. Tanpa itu Leader HRGA tak bisa menetapkan bawahan lintas Human Resource dan General Affair dalam satu layar, padahal keduanya satu tim (30 orang). Konsekuensi yang disengaja: **kedua departemen tak lagi bisa dipilih terpisah** di layar ini, dan karena `ExpandToDepartmentGroup` memekarkan anggota mana pun jadi satu tim penuh, meminta "Human Resource" saja pun kini mengembalikan seluruh HRGA. Sama seperti KPI, penggabungan adalah sifat organisasi, bukan sifat penontonnya.
 	- **Tidak ada penjaga siklus.** A bisa jadi atasan B sekaligus bawahannya. Karena relasinya tidak rekursif hal itu tak merusak apa pun, keduanya sekadar saling melihat KPI; backend hanya menolak penetapan diri-sendiri.
 	- **Tidak rekursif**, hanya satu tingkat ke bawah. Selama hierarki masih Supervisor → Leader → Staff, rekursi tak menambah apa pun.
-- **Org chart** — visualisasi struktur (**belum ada**; diverifikasi ulang 2026-07-31, tak ada komponen bagan organisasi di `erp-frontend`). Datanya sudah cukup untuk membangunnya, **kecuali jenjang/golongan** yang memang belum ada di data mana pun (lihat TBD)
+- **Org chart** — ✅ dibangun 2026-08-01 (branch `feat/org-chart`, **belum merge**). `GET /org-chart` mengirim seluruh karyawan **aktif** satu perusahaan beserta daftar departemennya dalam satu panggilan; halaman `/hris/org-chart` (menu **HRIS → Personalia → Bagan Organisasi**) menggambarnya.
+	- **Kerangkanya DEPARTEMEN, bukan rantai atasan.** Sebagian besar karyawan belum punya `supervisor_id`, jadi bagan yang murni mengikuti rantai hanya akan menampilkan beberapa cabang berisi dan menyembunyikan sisanya. Dengan departemen sebagai kerangka, bagan utuh sejak hari pertama dan makin dalam seiring data diisi.
+	- Orang tanpa atasan **menempel ke departemennya** dan jumlahnya disebut di kepala halaman, jadi bagan sekaligus menunjukkan pekerjaan pengisian yang belum selesai. Karyawan **tanpa departemen** dikumpulkan ke kelompok berlabel, bukan dibuang — dikunci uji "jumlah seluruh simpul selalu sama dengan jumlah orang".
+	- ⚠️ **Penjaga siklus WAJIB di sini walau tak ada di KPI.** KPI hanya melihat satu tingkat sehingga siklus tak berbahaya; bagan **menelusuri rantai**, jadi satu siklus akan berputar tanpa henti dan membekukan browser. Orang yang atasannya membentuk siklus tetap digambar, menempel ke departemen. Logikanya di `features/hris/org-chart/lib/bangun-pohon.ts`, terpisah dari render supaya bisa diuji tanpa React.
+	- **Tanpa pustaka bagan.** HTML bersarang biasa; `recharts` yang sudah ada tak punya tata letak pohon. Departemen terbuka, isinya terlipat secara bawaan — 204 kartu sekaligus membuat bagan lebih sulit dibaca daripada daftar.
+	- ⚠️ **Direktur muncul di dalam Kesekretariatan, bukan di puncak**, karena begitulah datanya (`work_data.department` = `Kesekretariatan`). Penentuan akar **tidak** ditebak dari nama jabatan. Menjadikan Direktur puncak organisasi adalah **keputusan data**, sekelas dengan jenjang jabatan; bagan ini justru membuat kejanggalan itu terlihat.
+	- **Jenjang/golongan tetap belum ada** dan tetap TBD — lihat di bawah.
 
 ## Cakupan supervisi antar-departemen (`supervised_by`)
 
@@ -79,7 +85,7 @@ Tampilan KPI menyatukan keduanya sebagai satu entri tanpa menyentuh data — lih
 
 ## Belum Diputuskan (TBD)
 
-- Format org chart (visual) + jenjang/golongan
+- ~~Format org chart (visual)~~ — **selesai 2026-08-01**, lihat §Ruang Lingkup. **Jenjang/golongan masih terbuka**: tak ada field `grade`/`level`/`golongan` di `work_data` maupun `position_items`, dan yang perlu diputuskan lebih dulu bukan kodenya melainkan **berapa tingkat, namanya apa, dan siapa di tingkat mana untuk 79 jabatan**. Itu keputusan HR; kode tinggal menyimpannya
 - Penanganan posisi rangkap / matriks
 - **Relasi supervisi berjenjang** — saat ini sengaja dibatasi SATU tingkat. Organisasi bertingkat (divisi → departemen → sub-departemen) perlu keputusan tersendiri
 - **Satukan `deptKeyToNames`** (`shared-library/common/roles.go`) ke master data — pemetaan role key → nama departemen masih hardcode, dan `finance` → `Finance` + `Procurement` sebenarnya konsep yang sama dengan `supervised_by`. Departemen yang benar-benar baru masih butuh ubah kode di situ **dan** di switch jadwal absensi

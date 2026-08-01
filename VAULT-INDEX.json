@@ -84,20 +84,20 @@
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "HRIS - Payroll"
       ],
-      "hash": "42985907d5e9a8e925c7071a9ec8412e30b9245d3e5a06c432e547d1f1288f8d",
-      "ukuran_kb": 8.9,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik gateway `/api/employee/*`, mulai dari login (username/PIN/biometric), onboarding, CRUD personal & work data, dokumen, jadwal kerja, akun/system auth, master departemen & system role, training program, KPI, cuti, kontrak, BPJS, sampai profil `/me` dan daftar bawahan. Menjawab juga siapa yang boleh memanggil tiap rute (RequireHRISStaff, RequireITStaff, RequireITSupervisor, RequireHRISOrITSupervisor, KPIDepartmentRBAC) dan perilaku khusus tiap query param, misalnya `?grouped=true` pada `/data-type/department`, filter `?department=` multi-nilai pada `/kpi`, `?scope=team` untuk KPI bawahan Leader, serta pemekaran label grup (HRGA) di `/supervisor-assignment`. Berguna saat mencari path pasti, method, bentuk filter, atau gerbang RBAC sebuah fitur HRIS sebelum menulis kode frontend atau integrasi.",
+      "hash": "e9e6cacaa45c14bfb3e0df39cf8b1bb2533c600e41eb799d9265062daf1bf1a9",
+      "ukuran_kb": 9.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service (HRIS inti) di balik gateway `/api/employee/*`, mulai dari login/refresh token dan aktivasi akun, CRUD personal_data & work_data, dokumen pribadi/kerja, jadwal kerja, kelola akun & perangkat, sampai master departemen dan system role. Menjawab juga: siapa yang boleh memanggil tiap rute (RequireHRISStaff, RequireITStaff, RequireHRISOrITSupervisor, KPIDepartmentRBAC), bagaimana filter departemen bekerja termasuk penggabungan grup seperti HRGA, dan apa bedanya menu_hidden sebagai setelan tampilan versus hak akses. Berguna saat mencari rute KPI (termasuk scope=team untuk Leader), supervisor-assignment, org-chart, cuti, kontrak, BPJS, Training Program, ulang tahun karyawan, atau endpoint internal aggregate antar-service.",
       "kata_kunci": [
         "employee service",
         "endpoint",
-        "API HRIS",
-        "auth login PIN biometrics",
-        "master department",
-        "system roles",
-        "RBAC",
-        "KPI",
-        "supervisor-assignment",
-        "training program"
+        "API",
+        "HRIS",
+        "auth login",
+        "work_data",
+        "personal_data",
+        "master departemen",
+        "system role",
+        "RBAC"
       ]
     },
     {
@@ -959,19 +959,19 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "d027fc55e629732935c1038e848d6f013b785f569a5adaee596813f752449372",
-      "ukuran_kb": 55.8,
-      "ringkasan": "Menjawab: apa itu portal web ERP internal `hris-dashboard` (\"One Bharata\"), stack apa yang dipakai (Next.js 16, React 19, shadcn/Radix, TanStack Query, react-i18next), dan bagaimana login serta role gating bekerja lewat cookie `system_roles` dan token dari gateway. Menjelaskan perannya sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager, termasuk handoff `redirect_url` dan allowlist origin. Berguna untuk memahami susunan menu sidebar (menu induk bersarang, bukan field group), tab Pengaturan/System Setup, pengaturan tampilan menu per jabatan, menu KPI untuk Leader di Portal Saya, halaman Atasan Langsung, serta dampak multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/network per company).",
+      "hash": "1854d91807bb5b777b2ffa344183115afd3277b9878e1d12a847fd890499293a",
+      "ukuran_kb": 56.5,
+      "ringkasan": "Menjawab: apa itu portal web internal One Bharata (`hris-dashboard`/erp-frontend), stack apa yang dipakai (Next.js 16, React 19, shadcn/Tailwind, TanStack Query, react-i18next), dan modul apa saja yang sudah ada di dalamnya. Menjawab juga: bagaimana login dan refresh token bekerja, bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain, serta bagaimana sidebar digerbang oleh `system_roles` per module dan role. Berguna saat menelusuri struktur menu (menu induk bersarang, perataan induk tipis, Tampilan Menu per jabatan, menu KPI untuk Leader), fitur Atasan Langsung dan Bagan Organisasi, serta dukungan multi-perusahaan seperti CompanySwitcher, kelola perusahaan, shift/rotasi, dan network WFO.",
       "kata_kunci": [
-        "web ERP",
         "erp-frontend",
-        "hris-dashboard",
+        "web ERP",
         "One Bharata",
-        "Next.js",
+        "hris-dashboard",
         "SSO",
-        "system_roles",
         "sidebar menu",
+        "system_roles",
         "role gating",
+        "Next.js",
         "multi-perusahaan"
       ]
     },
@@ -4218,7 +4218,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — master departemen/posisi sudah di-DB; org chart belum",
+      "status_teks": "Implemented (ada catatan) — master departemen/posisi sudah di-DB; org chart **sudah ada** (2026-08-01), jenjang/golongan belum",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
@@ -4230,20 +4230,20 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "5496515331d29ad901a07b03679e706fe1bab9809ab6a14ed0e122a78cce94fd",
-      "ukuran_kb": 12.5,
-      "ringkasan": "Menjawab: bagaimana struktur organisasi disimpan dan dikelola, yaitu departemen dan posisi sebagai master data di `master_department` (termasuk `position_items[]` berkunci stabil yang menempeli paket hak akses) plus `company_id` yang membuat `key` unik per perusahaan, bukan global. Menjawab pertanyaan hierarki yang sering rancu: apa beda atasan langsung per orang (`work_data.supervisor_id`, diisi lewat HRIS > Personalia > Atasan Langsung) versus supervisi antar-departemen (`supervised_by`, misalnya General Affair dibawahi supervisor Human Resource) dan mengapa yang pertama hanya menentukan cakupan TAMPILAN sementara alur persetujuan tetap memakai yang kedua. Menjelaskan juga aturan satu karyawan satu atasan beserta akibat pemindahannya, penanganan karyawan non-aktif, pengenalan label grup departemen seperti HRGA, dan bahwa org chart visual belum ada.",
+      "hash": "71402ba86240d728f9e0305da3b2fb442d49c982eb1207dfe8962eefde84a8e7",
+      "ukuran_kb": 14.7,
+      "ringkasan": "Menjawab: bagaimana struktur organisasi disimpan dan dikelola, yaitu departemen dan posisi sebagai master data di `master_department` (termasuk `position_items[]` berkunci stabil yang menempeli permission_sets) serta scoping per perusahaan lewat `company_id`. Menjawab juga: siapa atasan seseorang, bedanya `work_data.supervisor_id` (atasan langsung, dipakai untuk cakupan tampilan KPI Leader) dengan `supervised_by` (cakupan supervisi departemen yang dipakai alur approval), cara mengisinya lewat menu Atasan Langsung dengan alur pilih atasan lalu centang bawahan, dan aturan satu karyawan hanya punya satu atasan. Berguna untuk memahami bagan organisasi `/hris/org-chart` yang berkerangka departemen (bukan rantai atasan), penanganan karyawan non-aktif, pemekaran label grup HRGA, dan hal yang masih TBD seperti jenjang/golongan.",
       "kata_kunci": [
         "struktur organisasi",
         "organization structure",
-        "departemen",
-        "posisi jabatan",
+        "master_department",
+        "posisi",
+        "jabatan",
         "atasan langsung",
         "supervisor_id",
         "supervised_by",
-        "HRGA",
-        "master_department",
-        "org chart"
+        "org chart",
+        "hierarki"
       ]
     },
     {
@@ -4298,20 +4298,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "2dd5bbd82098ad0b8f95f41bff303a567ce8503344a7303a484dab392e94c1cc",
-      "ukuran_kb": 21.5,
-      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang sumber datanya sudah tersedia di ERP sehingga bisa diisi otomatis, mana yang modulnya jalan tapi koleksinya masih kosong, dan mana yang memang tak punya sumber sama sekali, lengkap dengan rekap per departemen dan persentase otomasinya. Menjawab pula pertanyaan pemetaan konkret: metrik apa mengambil angka dari service atau sumber mana, misalnya konversi iklan TikTok dari integration-service, ROAS dari marketing-analytics, SLA dan CSAT dari task-management, uptime dari monitoring, kedisiplinan dari attendance, keuangan dari Accurate, dan skor tim dari `kpi_score` sendiri lewat departemen atau `supervisor_id`. Menjelaskan juga mengapa label metrik jadi kunci identitas yang membatasi otomasi, apa yang masih kurang pada metrik semi-otomatis (definisi, target, budget, mapping karyawan ke toko), dan rencana bertahapnya.",
+      "hash": "d2699ee549e51bb6efdcae022d55c946628d690cd611585073b317314bc3edd6",
+      "ukuran_kb": 21.7,
+      "ringkasan": "Menjawab: metrik KPI mana saja yang bisa diisi otomatis dari data yang sudah ada di ERP, dan dari koleksi/endpoint mana nilainya diambil (TikTok GMV Max, mart_profit_attribution, transaction_orders, Accurate profit-loss/receivables, attendance report, SLA & CSAT task-management, Uptime Kuma, procurement lead-time, warehouse resi). Menjelaskan klasifikasi 311 metrik di 70 template menjadi otomatis penuh, semi-otomatis, terblokir data kosong, dan manual, lengkap dengan rekap persentase per departemen. Juga menjawab kenapa sebagian metrik belum bisa diotomatiskan, mulai dari label metrik sebagai kunci pemetaan, budget/anggaran yang tidak tersimpan di ERP, sampai departemen yang belum punya template KPI sama sekali.",
       "kata_kunci": [
-        "otomasi KPI",
-        "KPI automation",
-        "skor KPI",
-        "auto-fill metrik",
+        "KPI",
+        "otomasi skor KPI",
+        "auto-fill KPI",
+        "kpi_template",
         "kpi_score",
-        "311 metrik",
-        "sumber data KPI",
-        "ROAS",
-        "SLA CSAT",
-        "attendance Accurate"
+        "metrik",
+        "bobot metrik",
+        "employee service",
+        "penilaian kinerja",
+        "performance metrics"
       ]
     },
     {
