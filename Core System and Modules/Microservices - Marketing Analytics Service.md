@@ -31,7 +31,7 @@ Seluruhnya `GET` kecuali disebut lain. Sumber: `routes.go`, `handler_mart.go`, `
 | Endpoint | Isi |
 |---|---|
 | `/summary` | Ringkasan lintas sumber |
-| `/profit/shops` · `/profit/products` · `/profit/campaigns` · `/profit/ads` | Laba per level entitas per hari dari `mart_profit_attribution` |
+| `/profit/shops` · `/profit/products` · `/profit/campaigns` · `/profit/ads` | Laba per level entitas dari `mart_profit_attribution`. **Bawaannya BULANAN** — satu baris per entitas per bulan per channel; rincian per tanggal diminta lewat `granularitas=harian` (lihat *Granularitas* di bawah) |
 | `/videos` | Performa video. Baris berupa `VideoRow`, bukan dokumen mart apa adanya, karena halaman video punya tiga tab (VSA / GMV Max / organik) yang hanya dapat dipisahkan lewat `spend_vsa`, `spend_gmv_max`, dan `sumber` |
 | `/lives` | Sesi live dari `mart_live_sessions` |
 
@@ -99,6 +99,37 @@ Perbaikannya struktural: dimensi harinya dibuang, bukan dibatasi. Dengan satu ba
 > **Catatan deploy**: `CreateOne` tidak mengganti index yang sudah ada. Perubahan kunci unik pada `mart_video_performance` dan `mart_profit_attribution` menuntut `dropIndex` index lama secara manual. Verifikasi production 2026-07-31 menunjukkan **index baru sudah aktif** pada ketiga koleksi berisi, jadi migrasinya sudah dijalankan.
 
 > **Catatan deploy — penggabungan per master SKU**: susunan kunci upsert **tidak berubah**, tetapi **arti `entity_id` level product berubah** (SKU jual → master SKU). Dokumen product lama ber-`entity_id` SKU jual **tidak** diperbarui oleh sync baru karena kuncinya berbeda: ia berhenti disentuh sementara baris master-nya lahir di sebelahnya, sehingga `/profit/products` akan menampilkan **angka dobel** bila tidak dibersihkan. Tindakan yang disarankan: **hapus dokumen `mart_profit_attribution` yang `level: "product"` sebelum deploy**, lalu jalankan ulang sync jendela penuh. Nilainya dihitung ulang dari sumber, jadi drop + re-sync lebih murah dan lebih aman daripada memetakan ulang `entity_id` per dokumen. Level shop/campaign/ad/video **tidak terdampak**.
+
+## Granularitas halaman laba — bulanan sebagai bawaan
+
+Mart berdimensi **hari**, dan halaman laba dulu menampilkannya apa adanya. Terukur production Juli 2026 level product TIKTOK: **969 baris untuk 247 entitas**, satu entitas sampai **31 baris**. Produk yang sama muncul berkali-kali dan menilai labanya memaksa mata menjumlah sendiri — keluhan nyata pengguna.
+
+Sejak itu keempat tab `/profit/*` **default BULANAN**: satu baris per entitas per bulan per channel. Rincian harian **tidak dihapus**, ia turun satu lapis dan diminta lewat drill.
+
+| Parameter | Nilai | Bila tak dikirim |
+|---|---|---|
+| `granularitas` | `bulanan` \| `harian` | `bulanan` |
+| `bulan` | `YYYY-MM` (mis. `2026-07`) — **menggantikan** `dari`/`sampai` | rentang bawaan biasa |
+| `entity_id` | id entitas yang diklik, menyaring drill ke satu entitas | seluruh entitas |
+
+Nilai `granularitas` yang tak dikenal membalas **400** beserta daftar nilai sah, **bukan** jatuh diam-diam ke bawaan — seragam dengan kontrak `sort_by`/`sort_dir`. Salah ketik yang dilayani dengan bawaan membuat pengguna yakin sedang melihat rincian harian padahal melihat agregat.
+
+Baris bulanan membawa field **`bulan`**; baris harian tidak. Itulah cara FE membedakan keduanya tanpa menebak dari bentuk `date` (baris bulanan memakai `date` = tanggal 1 bulan itu agar tetap dapat diurutkan bersama baris harian).
+
+**Dihitung saat baca, tanpa koleksi mart bulanan terpisah.** Aturan repo: pra-agregasi bila menggabungkan lintas koleksi atau menghitung laba. Di sini sumbernya **satu** koleksi dan labanya **sudah** dihitung saat sync — yang tersisa hanya penjumlahan kolom aditif, dan index `level_1_date_1_channel_1` yang sudah ada melayani `$match`-nya. Terukur production: **5–41 ms** untuk shop/product/campaign/ad. Koleksi kedua akan menambah sumber kebenaran yang wajib disinkronkan, dan setiap kelambatannya tampil sebagai angka bulanan yang tidak cocok dengan hariannya.
+
+**Batas bulan WIB (Asia/Jakarta), bukan UTC.** `2026-07-31T18:00:00Z` adalah 1 Agustus 01:00 WIB; memotongnya pakai UTC memindahkannya ke Juli. Repo ini sudah pernah kena bug zona waktu (selisih revenue vs seller center), jadi batasnya tidak boleh bergantung pada "kebetulan sepakat" karena baris mart umumnya sudah dinormalkan ke tengah malam UTC.
+
+**Yang dijaga saat menggabungkan** (masing-masing punya uji mutasi):
+- **Invarian ads_cost tetap utuh** — terbukti atas data production nyata, selisih `0.0000` di seluruh level & channel: TIKTOK shop/product `1.301.399.198`, campaign `1.301.464.803`.
+- **`attribution_kolom` menular, tak pernah terhapus** — satu hari bertanda berarti bulannya bertanda. Penggabungan yang menimpa dengan peta hari terakhir membuat baris perkiraan terbaca **aktual**.
+- **`belum_termapping` menular** — satu hari `true` membuat bulannya `true`.
+- **`icc` digabung tanpa kembar dan tanpa kehilangan daftarnya**; status `tak_tersedia` (level ad, tak berdimensi toko) **tidak** dilebur jadi `belum_ditetapkan`, karena yang pertama berarti melengkapi mapping tidak akan mengisinya.
+- **`ads_cost` SHOPEE yang nol tetap nol** dan barisnya tetap tampil — bug terpisah di jalur iklan Shopee tidak boleh tersamarkan oleh agregasi.
+
+**`/videos` MENOLAK `granularitas` (400), bukan mengabaikannya.** Dua sebab yang masing-masing sudah cukup: `mart_video_performance` adalah **snapshot kumulatif** satu baris per video **tanpa dimensi hari**, sehingga tak ada yang dapat dijumlah per bulan dan melayaninya akan mengembalikan baris yang sama berlabel "bulanan"; dan barisnya membawa kolom **rasio/rata-rata** (`completion_rate`, `avg_watch_sec`) yang memang tak boleh dijumlah.
+
+> **Kolom rasio & rata-rata**: `MartProfitAttribution` seluruhnya kolom **aditif**, sehingga penjumlahan lurus aman. Itu bukan kebetulan yang boleh diandalkan diam-diam — bila kolom rasio (ROAS, `return_rate_pct`, …) kelak ditambahkan, ia **wajib** dihitung ulang dari pembilang/penyebut bulanan, bukan lewat jalur penjumlahan.
 
 ## Kejujuran Data (bagian yang tidak boleh dihapus)
 
