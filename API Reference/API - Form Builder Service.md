@@ -1,27 +1,29 @@
 ## Deskripsi
 
-*Endpoint **form-builder-service** (form dinamis + analisa jawaban + kepatuhan presensi). Gateway: `/api/form-builder/*`. RBAC dari map `system_roles`: kelola form butuh key `it` atau `ga` (staff/supervisor/admin); mengisi cukup terautentikasi. Grounded ke `services/form-builder/routes.go` + handler terkait (`main`, PR #849).*
+*Endpoint **form-builder-service** (form dinamis + analisa jawaban + kepatuhan presensi). Gateway: `/api/form-builder/*`. Kelola form butuh **tingkat peran** `staff`/`supervisor`/`admin` di modul mana pun DAN departemen pemanggil ada di daftar departemen aktif; mengisi cukup terautentikasi. Grounded ke `services/form-builder/routes.go` + handler terkait (`main`, PR #849; kepemilikan per departemen PR #869).*
 
 - **Implementasi**: [[Microservices - Form Builder Service]] · **Status**: ⚠️ (live di dev, **belum di prod**)
 - **Indeks**: [[API - Index]]
-- **Konsumen**: seluruh rute `/forms*` — termasuk `analytics`, `responses`, `export` — sudah dipakai [[APP - Web ERP]]. Rute **`/me/*`** belum punya pemanggil sama sekali; pengisian menunggu [[APP - MyBharata]].
+- **Konsumen**: seluruh rute `/forms*` — termasuk `analytics`, `responses`, `export` — dipakai [[APP - Web ERP]]. Rute **`/me/*`** dipakai [[APP - MyBharata]] (section Survei di beranda + halaman pengisian).
 
 ## Sistem
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/health` | Health check (di belakang gateway key) |
 
-## Kelola Form (RBAC `it` / `ga`)
+## Kelola Form (RBAC per departemen)
 | Method | Path | Fungsi |
 |---|---|---|
-| POST | `/forms` | Buat form (lahir `draft`; `owner_module` wajib `it`/`ga` dan harus dikelola pemanggil) |
-| GET | `/forms` | Daftar form modul yang boleh dikelola pemanggil (`?status=`, `?search=`, `?page=`, `?limit=` maks 100) |
+| POST | `/forms` | Buat form (lahir `draft`; `owner_department` wajib dan harus dalam cakupan pemanggil. Ejaannya **dikanonikkan** ke daftar departemen aktif) |
+| GET | `/forms` | Daftar form departemen yang boleh dikelola pemanggil (`?status=`, `?search=`, `?page=`, `?limit=` maks 100) |
 | GET | `/forms/:id` | Detail + `response_count` |
-| PATCH | `/forms/:id` | Sunting. `409` bila susunan field diubah padahal sudah ada jawaban. `owner_module` tak bisa dipindah |
+| PATCH | `/forms/:id` | Sunting. `409` bila susunan field diubah padahal sudah ada jawaban. `owner_department` tak bisa dipindah |
 | PATCH | `/forms/:id/status` | `draft`→`published`→`closed`. `409` bila mencoba mundur dari `published` ke `draft` |
 | DELETE | `/forms/:id` | Hapus lunak (`deleted_at` + status `closed`) |
 
-## Analisa & Export (RBAC `it` / `ga`)
+> **Cakupannya departemen, bukan modul.** Diambil dari `common.SupervisedDepartments` (departemen sendiri + yang dibawahi lewat `master_department.supervised_by`) lalu diiris daftar departemen aktif. SPV HRGA karena itu melihat form Human Resource **dan** General Affair, tapi tidak Tech Development. Daftar aktifnya konfigurasi `FORM_BUILDER_DEPARTMENTS`; bila kosong dipakai bawaan `Human Resource, General Affair, Tech Development`.
+
+## Analisa & Export (RBAC per departemen)
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/forms/:id/analytics` | Rekap per pertanyaan + tren harian + tingkat pengisian (lihat bentuk respons di bawah) |
@@ -31,11 +33,14 @@
 ## Pengisian (karyawan terautentikasi)
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`submitted`, `blocks_attendance`, `gate_end_date`) |
+| GET | `/me/capability` | `{can_manage, departments[]}` — apa yang boleh dilakukan pemanggil di Form Builder |
+| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `submitted`, `blocks_attendance`, `gate_end_date`) |
 | POST | `/me/forms/:id/responses` | Kirim jawaban. `403` bila bukan sasaran, `409` bila form tak `published` atau `single_response` sudah terpakai |
 | GET | `/me/responses` | Riwayat jawaban sendiri |
 
 > **Idempoten**: pengiriman identik dalam 2 menit dibalas `200 {"duplicate": true}` tanpa insert baru (sidik jawaban di-hash setelah kunci diurutkan, jadi payload yang disusun ulang saat retry tetap terdeteksi).
+
+> **Kenapa `/me/capability` ada di grup pengisian, bukan di balik `requireFormManager`.** Daftar departemen aktif tinggal di konfigurasi server; tanpa endpoint ini setiap klien harus menyalinnya dan pasti melenceng saat daftarnya berubah. Ditaruh di `/me` supaya yang tak berhak menerima `can_manage:false` yang bisa dibaca klien, bukan `403` yang harus ditebak artinya. `departments` sengaja dikosongkan bila `can_manage:false`.
 
 ## Internal (dipanggil service lain)
 | Method | Path | Fungsi |
@@ -48,7 +53,9 @@
 
 **Tipe field** (`fields[].type`): `short_text` · `long_text` · `number` · `date` (`YYYY-MM-DD`) · `time` (`HH:MM`) · `dropdown` · `radio` · `checkbox` (jawaban berupa array) · `scale` (rentang maks 10 langkah).
 
-**Sasaran** (`audience.type`): `all` · `departments` (+`departments[]`) · `employees` (+`employee_ids[]`). `estimated_size` diisi manual sebagai penyebut tingkat pengisian; bila 0, `response_rate` tidak dikirim.
+**Pemilik** (`owner_department`): nama departemen `master_department` (mis. `"General Affair"`), BUKAN key `system_roles`. Form lama yang masih menyimpan `owner_module` dipindah otomatis saat service boot (`it`→`Tech Development`, `ga`→`General Affair`).
+
+**Sasaran** (`audience.type`): `all` · `departments` (+`departments[]`) · `employees` (+`employee_ids[]`). `estimated_size` diisi manual sebagai penyebut tingkat pengisian; bila 0, `response_rate` tidak dikirim. Perhatikan `audience.departments` menjawab **siapa yang mengisi**, sedangkan `owner_department` menjawab **siapa yang memiliki** — keduanya tak harus sama.
 
 **Gerbang presensi** (`attendance_gate`): `{enabled, mode: "warn"|"block", start_date, end_date}`. Tanggal wajib **RFC3339** (`2026-08-01T00:00:00Z`); `"2026-08-01"` akan ditolak.
 

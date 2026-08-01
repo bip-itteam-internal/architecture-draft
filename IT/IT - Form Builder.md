@@ -17,7 +17,7 @@ Rencana yang terkunci di dokumen ini sebelumnya (RBAC `it` saja, tanpa FE, tanpa
 
 | Aspek | Rencana asli | Yang dibangun |
 |---|---|---|
-| RBAC | `system_roles["it"]` saja | `it` **dan** `ga` (HRGA) |
+| RBAC | `system_roles["it"]` saja | **per departemen** (PR #869): tingkat peran pengelola + departemen ada di daftar aktif. Sekarang HRGA (Human Resource + General Affair) dan IT (Tech Development); departemen berikutnya cukup ubah env |
 | Hasil jawaban | export CSV saja | analisa per pertanyaan + tren harian + tingkat pengisian, **plus** CSV |
 | Sasaran form | (tak ada) | semua / per departemen / per karyawan |
 | Dampak ke service lain | "nol dampak" | **menyentuh [[Microservices - Attendance Service]]**: clock-in mobile bisa ditahan bila ada form wajib belum diisi |
@@ -46,9 +46,11 @@ Deploy tetap **backend lebih dulu, FE menyusul**.
 
 Halaman analisa menampilkan **nama, departemen, dan jabatan** tiap pengisi beserta seluruh jawabannya (tab Pertanyaan & Individu), meniru Google Form.
 
-Ini **keputusan sadar pemilik produk 2026-08-01**, diambil setelah konsekuensinya disampaikan: pengelola form — yaitu **siapa pun berperan `it` ATAU `ga`**, bukan hanya HRGA — bisa melihat siapa menjawab apa. Untuk form seperti Deklarasi Kesehatan, itu berarti kondisi kesehatan per orang terbaca tim IT juga.
+Ini **keputusan sadar pemilik produk 2026-08-01**, diambil setelah konsekuensinya disampaikan: pengelola form bisa melihat siapa menjawab apa. Untuk form seperti Deklarasi Kesehatan, itu berarti kondisi kesehatan per orang terbaca pengelolanya.
 
 Dicatat di sini supaya keputusannya terekam dan bisa ditinjau ulang, bukan tersembunyi sebagai perilaku kode. Alternatif yang ditolak: hanya agregat, atau daftar tanpa identitas.
+
+> **Diperkecil oleh PR #869.** Saat keputusan ini diambil, "pengelola form" berarti siapa pun berperan `it` **atau** `ga`, sehingga jawaban Deklarasi Kesehatan milik HRGA ikut terbaca tim IT. Setelah kepemilikan pindah ke departemen, analisa sebuah form hanya terbaca departemen pemiliknya (plus atasannya lewat `supervised_by`). Keputusan menampilkan identitas penuh **tidak berubah**; yang menyempit adalah lingkaran orang yang bisa membacanya.
 
 ## Belum Diputuskan (TBD)
 

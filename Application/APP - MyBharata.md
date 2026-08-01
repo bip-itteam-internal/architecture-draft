@@ -6,7 +6,7 @@
 - **Multi-perusahaan** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]): presensi (absen/jadwal/izin) ter-scope **otomatis via JWT** (tak ada perubahan). **Profil Perusahaan** dari `/me` (BIP profil penuh; perusahaan lain nama saja) & **onboarding** (welcome + setup-selesai) dari respons login `new_user`, membuang hardcode "PT Bharata". **Konten dinamis per tenant (F2-C, PR #90)**: helper `CompanyScope` / `companyScopeOf(context)` dari `UserProfileBloc` (key kosong = BIP demi kompatibilitas token lama); blok "Tentang Perusahaan" (Visi/Misi/Company Info/SOP) & "Bharata Community" hanya untuk BIP, sedangkan kartu cuaca kantor dan nama pada strap QR lanyard kini ikut nama perusahaan user. **Menu Pengajuan disembunyikan untuk non-BIP (PR #91)** selama pilot, di dua entry point (`home_menu_grid` + `more_menu`), karena perusahaan lain fokus presensi dulu. **Status rilis**: PR #89/#90/#91 sudah **merged ke `dev`** (versionCode 120), belum naik ke `main`. **Masih TBD (butuh data per-perusahaan di BE):** kontak HR, nama gedung + guestbook, handbook/SOP PDF. Kontak IT sengaja tetap pusat (helpdesk grup, dipakai juga pra-login sebelum perusahaan diketahui).
 
 - Pengguna: karyawan, supervisor, HRD, IT admin, dan tamu eksternal (guest book)
-- Versi build saat ini: **1.10.6+120** (`origin/dev`; `pubspec.yaml`) — PR rename Task Management menaikkan ke **1.10.6+121**
+- Versi build saat ini: **1.11.0+122** (`origin/dev`; `pubspec.yaml`) — PR penyelarasan kontrak `owner_department` ([#94](https://github.com/bip-itteam-internal/my-bharata/pull/94), open) menaikkan ke **1.11.1+123**
 - Target platform: Android (minSdk 23 / Android 6.0+), iOS 13+
 - Survei perangkat mobile karyawan [terdaftar di sini](https://docs.google.com/spreadsheets/d/1w2blhMgFx1BI9zu6ni5gmQJab_NfMhdocm0cj5pyO_s/edit?usp=sharing)
 
@@ -73,6 +73,22 @@
 ### KPI & Task Management
 - **KPI**: laporan performa kuartalan (read-only di mobile) dengan grafik
 - **Task Management** *(sebelumnya "Support Ticket", sebelumnya lagi "Helpdesk IT"; label diselaraskan dengan web pada 2026-07-28 — istilah user-facing kini **Tugas**/**Task**, key l10n `menuTaskManagement`/`task*` tidak berubah)* — buat tugas ke **Space per divisi** (lintas divisi) lewat form "Buat Tugas": pilih Space, Judul, Deskripsi, **lampiran opsional** (**create-then-upload** per-file ke `/tasks/:id/attachments`, batas **4 MB/file** selaras file-service). Daftar tugas punya **3 tab scope** — *Tugas Saya* / *Ditugaskan ke Saya* / *Tugas Tim* (supervisor) — dengan **badge jumlah aktif** (`/tasks/counts`), pencarian, filter (status/prioritas/periode), urut terbaru; warna status kartu/header ikut `status_color` per-space. **Detail** dibagi section **Checklist** (hanya **centang**; item dibuat lewat web) & **Komentar** (terbaru dulu); **ubah status** (maju-saja) & **komentar** lewat **bottom action bar**. Gate izin: hanya **assignee/supervisor** yang boleh ubah status & checklist; **pemohon read-only** (hanya komentar). **Approve/Reject permintaan hanya di web** — mobile belum punya alur approval, sehingga notif "Permintaan baru" mengarahkan buka website ERP. URL di deskripsi jadi tautan klik; input teks auto-kapital huruf pertama (sentence-case). Fitur `features/task`. Backend: [[Microservices - Task Management Service]] · web: [[APP - Web ERP]] · tracker: [[APP - Dynamic Task Tracker]]
+
+### Survei / Form Builder
+- **Section "Survei" di beranda**, tepat di bawah quick menu, berisi form terbit yang ditujukan ke karyawan itu dan **belum** ia isi. Tiap kartu menampilkan jumlah pertanyaan, tenggat gerbang, dan penanda merah **"Wajib sebelum absen"** bila form-nya menahan clock-in.
+- **Halaman pengisian `/survey/:id`** merender **9 tipe pertanyaan** (`short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`), memvalidasi cermin aturan backend sebelum kirim, lalu menyegarkan section supaya form yang baru diisi langsung lenyap.
+- Sumber data `GET /api/form-builder/me/forms` + `POST /api/form-builder/me/forms/:id/responses`. Backend: [[Microservices - Form Builder Service]] · kontrak: [[API - Form Builder Service]]
+- Fitur `features/form`. my-bharata PR [#93](https://github.com/bip-itteam-internal/my-bharata/pull/93) (merged, `dev`).
+
+> [!important] Section ini menghilang sepenuhnya saat gagal memuat, bukan hanya saat kosong
+> `form-builder-service` **belum jalan di prod**, jadi di produksi endpointnya membalas `404`. Datasource menerjemahkan `404` jadi daftar kosong, dan section memperlakukan keadaan gagal **sama dengan kosong**: tak ada judul menggantung, tak ada kerangka, tak ada pesan galat. Memunculkan kegagalan di layar utama untuk fitur yang belum dirilis di lingkungan itu lebih buruk daripada diam. Halaman pengisian tetap menampilkan pesan errornya sendiri.
+
+> [!warning] Tiga aturan kontrak yang mudah dilanggar diam-diam
+> **`number` dan `scale` wajib dikirim sebagai angka JSON.** Backend memakai pembanding tipe yang menolak string, sedangkan input teks di layar selalu menghasilkan string. Konversinya dipusatkan di `answer_encoder.dart`.
+>
+> **Koma diterima sebagai pemisah desimal** ("36,5") lalu dinormalkan ke titik. Papan ketik angka menyediakan komanya dan orang Indonesia menulis begitu; menolaknya berarti menjebak pemakai.
+>
+> **`scale_min` bertag `omitempty` di backend**, jadi skala `0..N` datang **tanpa** field itu. Nilai bawaannya harus 0, bukan 1 — menebak 1 membuat pilihan terendah tak pernah bisa disentuh.
 
 ### Fitur pendukung lain
 - **QR Code**: tampilkan QR pribadi + akses scanner inventory

@@ -1,35 +1,36 @@
 ## Deskripsi
 
-*Form Builder Service adalah pembuat form dinamis tanpa coding: tim IT dan HRGA menyusun form sendiri (9 tipe pertanyaan), menerbitkannya ke sasaran tertentu, membaca rekap jawabannya, dan mengekspornya ke CSV — tanpa rilis kode untuk tiap form baru. Service ini juga menyediakan satu endpoint kepatuhan yang dipakai [[Microservices - Attendance Service]] untuk menahan clock-in mobile bila ada form wajib yang belum diisi.*
+*Form Builder Service adalah pembuat form dinamis tanpa coding: sebuah departemen menyusun form sendiri (9 tipe pertanyaan), menerbitkannya ke sasaran tertentu, membaca rekap jawabannya, dan mengekspornya ke CSV — tanpa rilis kode untuk tiap form baru. Service ini juga menyediakan satu endpoint kepatuhan yang dipakai [[Microservices - Attendance Service]] untuk menahan clock-in mobile bila ada form wajib yang belum diisi.*
 
 - **Stack:** Go + Fiber v2 + MongoDB (database sendiri `form_builder_db`)
 - **Path:** `services/form-builder`
 - **Port:** 6986 (internal, `expose`; tidak dipublish ke host)
-- **Status**: ⚠️ **Implemented & LIVE di dev** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849) + perbaikan [#855](https://github.com/bip-itteam-internal/bip-erp/pull/855)); terverifikasi end-to-end lewat gateway dev 2026-08-01. **PROD belum jalan** — container-nya belum pernah dibuat. FE web di [[APP - Web ERP]] sudah lengkap (kelola, builder, **analisa jawaban**). **Yang masih kosong: renderer pengisian di [[APP - MyBharata]]**, sehingga karyawan belum punya cara mengisi form sama sekali.
+- **Status**: ⚠️ **Implemented & LIVE di dev** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849) + perbaikan [#855](https://github.com/bip-itteam-internal/bip-erp/pull/855)); terverifikasi end-to-end lewat gateway dev 2026-08-01. **PROD belum jalan** — container-nya belum pernah dibuat. FE web di [[APP - Web ERP]] sudah lengkap (kelola, builder, **analisa jawaban**), dan pengisian di [[APP - MyBharata]] sudah ada (section Survei di beranda + halaman isi 9 tipe). **Kepemilikan per departemen** menunggu merge PR [#869](https://github.com/bip-itteam-internal/bip-erp/pull/869).
 
 ## Persona / Pengguna
 
 | Persona | Peran & Divisi | Akses/RBAC | Device |
 |---|---|---|---|
-| Staf/SPV IT | Tech Development | `system_roles["it"]` = staff/supervisor/admin | Web |
-| Staf/SPV HRGA | General Affair | `system_roles["ga"]` = staff/supervisor/admin | Web |
+| Staf/SPV IT | Tech Development | Peran staff/supervisor/admin + departemen `Tech Development` aktif | Web |
+| Staf/SPV HRGA | Human Resource · General Affair | Idem; SPV HRGA membawahi keduanya lewat `supervised_by` | Web |
 | Karyawan | Semua divisi | Terautentikasi (tanpa syarat peran) | Mobile (MyBharata), Web |
 
-- **Tujuan** — IT/HRGA: membuat form ad-hoc (survei, deklarasi, pendataan) tanpa menunggu rilis kode, lalu membaca hasilnya. Karyawan: mengisi form yang ditujukan kepadanya.
+- **Tujuan** — pemilik form: membuat form ad-hoc (survei, deklarasi, pendataan) tanpa menunggu rilis kode, lalu membaca hasilnya. Karyawan: mengisi form yang ditujukan kepadanya.
 - **Pain point** — sebelum ini setiap form baru berarti satu siklus development; permintaan pendataan mendadak tak terlayani.
-- **Aksi utama** — IT/HRGA: susun pertanyaan → tentukan sasaran → terbitkan → baca analisa/export. Karyawan: buka daftar form → isi → kirim.
+- **Aksi utama** — pemilik form: susun pertanyaan → tentukan sasaran → terbitkan → baca analisa/export. Karyawan: buka daftar form → isi → kirim.
 
-> Peran `security` milik GA (satpam) **sengaja dikecualikan** dari pengelola form: key `ga`-nya untuk buku tamu, bukan membangun form.
+> Peran `security` milik GA (satpam) **sengaja dikecualikan** dari pengelola form: tingkat perannya bukan staff/supervisor/admin, jadi tak pernah lolos gerbang.
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
 Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Service]].
 
-**Kelola form** (gerbang `requireFormManager`: `system_roles` `it` **atau** `ga`)
-- `POST /forms` · `GET /forms` — buat & daftar form. Daftar **hanya menampilkan form milik modul yang boleh dikelola pemanggil**, jadi staf GA tak melihat form IT.
+**Kelola form** (gerbang `requireFormManager`: tingkat peran pengelola + departemen aktif)
+- `POST /forms` · `GET /forms` — buat & daftar form. Daftar **hanya menampilkan form milik departemen dalam cakupan pemanggil**, jadi tim GA tak melihat form IT.
 - `GET /forms/:id` · `PATCH /forms/:id` · `DELETE /forms/:id` — detail, sunting, hapus lunak (`deleted_at`).
 - `PATCH /forms/:id/status` — `draft` → `published` → `closed`. Form terbit **tidak bisa mundur** ke draft.
-- `owner_module` tak bisa dipindah setelah dibuat (memindahkannya akan membuat form lenyap dari daftar pemiliknya sendiri).
+- `owner_department` tak bisa dipindah setelah dibuat (memindahkannya akan membuat form lenyap dari daftar pemiliknya sendiri).
+- `GET /me/capability` — `{can_manage, departments[]}` untuk klien, supaya daftar departemen aktif tak perlu disalin ke FE.
 - **Susunan pertanyaan terkunci begitu ada jawaban masuk** (balas `409`). Menyunting field setelah orang menjawab membuat jawaban lama menunjuk pertanyaan yang sudah berubah arti, dan analisanya diam-diam jadi salah.
 
 **Tipe pertanyaan (9)** — `short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`. Validasi struktur (key unik, options wajib untuk tipe pilihan, rentang scale maksimal 10 langkah, `min ≤ max`) dan validasi jawaban (tipe cocok, nilai ∈ options, batas angka & panjang teks, format `YYYY-MM-DD` dan `HH:MM`) keduanya **fungsi murni** — teruji tanpa Mongo.
@@ -50,6 +51,26 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 
 **Kepatuhan presensi**
 - `GET /internal/compliance` — dipakai attendance-service saat clock-in. Membalas `blocking` (mode `block`) dan `warning` (mode `warn`).
+
+## Kepemilikan form: departemen, bukan modul
+
+Sampai PR #869, pemilik form adalah key `system_roles` (`it`/`ga`). Itu **salah sumbu**: `system_roles` adalah hak akses modul/menu, bukan hierarki organisasi (lihat [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]). Akibatnya orang yang kebetulan punya peran di dua modul melihat form dua tim sekaligus — SPV HRD sempat melihat form IT di daftarnya.
+
+Sekarang:
+
+- **Pemilik** = `owner_department`, nilai `master_department` (mis. `"General Affair"`).
+- **Cakupan** = `common.SupervisedDepartments` (departemen sendiri + yang dibawahi lewat `master_department.supervised_by`) **diiris** daftar departemen aktif. Pola yang sama sudah dipakai `services/recruitment/rbac.go`.
+- **Departemen aktif** = env `FORM_BUILDER_DEPARTMENTS` (dipisah koma). Bila kosong dipakai bawaan `Human Resource, General Affair, Tech Development`. Defaultnya sengaja ada: daftar kosong berarti tak seorang pun bisa membuka Form Builder, jadi env yang lupa diisi akan mematikan fitur tanpa pesan galat yang menjelaskan sebabnya.
+- **Tingkat peran** tetap `staff`/`supervisor`/`admin` di modul mana pun. Key `group` **dikecualikan** — itu penanda jangkauan lintas-perusahaan (`common.IsCentralAdmin`), bukan modul; tanpa pengecualian ini setiap admin grup jadi pengelola Form Builder.
+
+Hasilnya "HRGA" tak pernah jadi nilai tersimpan di mana pun: ia gabungan dua departemen yang muncul sendiri dari master data, persis seperti di [[HRIS - Organization Structure]].
+
+> [!warning] Dua jebakan yang sudah ditutup, keduanya diam-diam
+> **Kanonikalisasi ejaan.** Penyaringan daftar memakai `$in` Mongo yang PEKA HURUF. Kiriman `"tech development"` lolos pemeriksaan akses (yang tak sensitif huruf) lalu tersimpan apa adanya — formnya berhasil dibuat dan **langsung lenyap dari daftar pembuatnya sendiri**. Karena itu `owner_department` dikanonikkan ke ejaan daftar aktif saat menulis.
+>
+> **Backfill saat boot, bukan skrip manual.** Begitu versi ini naik, form yang masih menyimpan `owner_module` tak cocok filter mana pun: hilang dari daftar dan menolak dibuka dengan `403`. Dev deploy-nya otomatis dari `main`, jadi jedanya tak bisa dijadwalkan. Pemindahan dijalankan idempoten saat boot (`it`→`Tech Development`, `ga`→`General Affair`), bersama pembuatan index.
+
+**Siapa yang berubah aksesnya**: staf HR (`hris:staff`) yang dulu terkunci kini bisa membangun form; pemegang peran `it`/`ga` yang departemennya di luar daftar aktif kehilangan akses; karyawan tanpa `department` di `work_data` kini tertutup (fail-closed, disengaja untuk perubahan kontrol akses). Token berlaku 72 jam, jadi SPV HRGA yang belum login ulang sementara hanya melihat departemennya sendiri — fallback `SupervisedDepartments` menanganinya tanpa error.
 
 ## Keputusan yang menjaga presensi tetap hidup
 
@@ -72,7 +93,9 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 - ✅ **`.env` dev dan prod SUDAH diisi (2026-08-01)**: `FORM_BUILDER_SERVICE_PORT=6986` + `MONGO_FORM_BUILDER_DB=form_builder_db`. Diverifikasi lewat `docker compose config` di kedua server — `FORM_BUILDER_MODULE_URL` merender `http://form-builder-service:6986` di blok gateway maupun attendance. Backup disimpan (`~/apps/bip-erp/.env.bak-*`). Port 6986 bebas di keduanya.
 - ⚠️ **Kenapa dua variabel itu wajib ada SEBELUM gateway di-redeploy.** Berbeda dari attendance (yang sengaja menaruh URL form-builder DI LUAR map tervalidasi), gateway memasukkan `form-builder` ke `InternalURL` dan menjalankan `validation.ValidateInternalURL` — nilai kosong berarti **gateway panic saat boot dan SELURUH ERP ikut mati**. `docker-compose.yml` meredam ini karena nilainya dirakit dari string literal (`http://form-builder-service:${...}`) sehingga tak pernah benar-benar kosong, tapi variabel port yang hilang tetap menghasilkan URL rusak dan semua `/api/form-builder/*` gagal. Deploy gateway HARUS memakai compose yang ikut ter-merge, bukan env lama.
 - **Konsumen**: [[APP - Web ERP]] memakai seluruh rute `/forms*` **termasuk** `analytics`, `responses`, dan `export` (halaman analisa, erp-frontend PR #683).
-- **Endpoint pengisian (`/me/*`) belum punya konsumen sama sekali.** Pengisian direncanakan lewat [[APP - MyBharata]] yang belum dibangun, dan web sengaja tak menyediakan halaman isi form. Konsekuensinya gerbang mode `block` belum boleh dinyalakan di produksi — lihat [[IT - Form Builder]].
+- ✅ **Pengisian (`/me/*`) sudah punya konsumen**: [[APP - MyBharata]] (my-bharata PR #93, merged) — section Survei di beranda + halaman isi 9 tipe. Web sengaja tetap tak menyediakan halaman isi form.
+- ⚠️ **Gerbang mode `block` tetap belum boleh dinyalakan di produksi**: `form-builder-service` belum jalan di prod DAN attendance-service masih pra-merge. Lihat [[IT - Form Builder]].
+- ⚠️ **`FORM_BUILDER_DEPARTMENTS` belum diisi di `.env` mana pun** — tak masalah, bawaannya sudah benar. Isi hanya bila daftarnya mau berbeda.
 
 > [!warning] Gotcha yang sudah menggigit: BSON tak sama dengan JSON
 > **PR #855, ditemukan di dev 2026-08-01.** Pertanyaan checkbox melaporkan SEMUA opsi bernilai nol dan kolom CSV-nya keluar sebagai `[Tidak ada]` lengkap dengan kurung siku, padahal datanya tersimpan benar di Mongo.
@@ -87,7 +110,8 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 - **Jumlah sasaran tidak dihitung otomatis.** Untuk sasaran `all`/`departments`, penyebut tingkat pengisian memakai `audience.estimated_size` yang diisi manual pembuat form — service ini sengaja tak memanggil employee-service. Bila kosong, tingkat pengisian **tidak dilaporkan** (menampilkan 0% lebih menyesatkan daripada tak menampilkan apa pun).
 - **Agregasi dibatasi 20.000 jawaban.** Bila terlampaui, total sebenarnya tetap dilaporkan dan hasil ditandai `truncated` + `sample_size`, sedangkan tingkat pengisian disembunyikan. Export menandai lewat header `X-Export-Truncated`.
 - **`attendance_gate.start_date`/`end_date` hanya menerima RFC3339** (mis. `2026-08-01T00:00:00Z`); kiriman `"2026-08-01"` akan ditolak dengan pesan parse JSON yang tidak informatif. Perlu dibereskan saat FE dibangun.
-- **RBAC masih pola `system_roles` kasar**, belum berkatalog permission-set per [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]. Form Builder menambah satu lagi ke daftar modul yang belum berkatalog.
+- **RBAC belum berkatalog permission-set** per [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]. Pindah ke sumbu departemen **mendekatkan** ke ADR itu (hak menempel pada tempat orang bekerja, bukan pada key modul) tapi belum memenuhinya: tingkat perannya masih tier lama `staff`/`supervisor`/`admin`, bukan permission-set granular.
+- **Upload file, section/multi-halaman, percabangan, grid, dan opsi "Lainnya" belum ada** — jarak yang tersisa terhadap Google Forms. Urutan yang disarankan: opsi "Lainnya" (murah) → section → upload file → percabangan (percabangan menuju section, jadi harus menunggu section).
 - **Form approval yang sudah matang JANGAN dimigrasikan ke sini** (leave/overtime/koreksi presensi) — semuanya punya workflow & rantai approval sendiri. Form Builder untuk kasus baru/ad-hoc.
 
 ## Dependensi & Integrasi
