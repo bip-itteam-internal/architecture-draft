@@ -1,4 +1,6 @@
-**Status**: 🟡 Diputuskan 2026-07-31, **belum diimplementasikan**. Tidak ada satu pun metrik KPI yang terisi otomatis hari ini. Analisis yang mendasarinya ada di [[HRIS - Otomasi Skor KPI]].
+**Status**: ⚠️ Diputuskan 2026-07-31; fondasinya sudah ditulis di branch `feat/kpi-auto-value` (**belum merge, belum deploy**), sisanya belum. Tidak ada satu pun metrik KPI yang terisi otomatis di produksi hari ini. Analisis yang mendasarinya ada di [[HRIS - Otomasi Skor KPI]].
+
+> **Penyempitan yang disepakati saat implementasi Fase 1**: butir 4 di bawah menyebut pintu masuk berupa **endpoint tulis**. Fase 1 justru **menghitung di sisi baca** (`GET /kpi/auto-values`, plus stempel saat submit `POST /kpi`), dan itu disengaja. Alasannya ada di kode yang sudah berjalan: `ApplyKPIValues` menolak submit yang tak memuat SELURUH label, dan `POST /kpi` menimpa dokumen skor dengan `ReplaceOne`, sehingga nilai yang dititipkan terpisah pasti tersapu pada submit berikutnya. Endpoint tulis tetap berlaku untuk Fase 2, saat collector eksternal benar-benar ada. Keputusan pokoknya (kepemilikan data, satu pintu bergerbang, DRAFT) tidak berubah.
 
 ## Context
 

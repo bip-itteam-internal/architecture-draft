@@ -2,7 +2,7 @@
 
 *Analisis kelayakan **mengisi skor KPI secara otomatis** dari data yang sudah dimiliki ERP, bukan diketik manual oleh supervisor. Menjawab: dari 311 metrik yang benar-benar terpasang di production, mana yang sumber datanya sudah ada, mana yang modulnya ada tapi belum dipakai, dan mana yang memang tidak punya sumber sama sekali. Melengkapi [[HRIS - Key Performance Index]] yang menjelaskan mekanisme scoring-nya.*
 
-- **Status**: 🟡 Konsep otomasi (belum ada satu pun metrik yang terisi otomatis). **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.
+- **Status**: 🟡 Konsep otomasi, **belum ada satu pun metrik yang terisi otomatis di produksi**. Fondasi Fase 1 sudah ditulis di branch `feat/kpi-auto-value` (belum merge, belum deploy); selebihnya rencana. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.
 - **Ruang lingkup**: `kpi_template` / `kpi_score` di [[Microservices - Employee Service]]. **Bukan** engine insentif marketing di [[Microservices - Insentive Service]], walau bab 6 mengusulkan menyambungkan keduanya.
 
 ## Kondisi Saat Ini
@@ -61,7 +61,7 @@ Departemen **Percetakan** (13 karyawan) dan **Marketing Offline Distribution** (
 | Retur penjualan | AR Staff (Retur) | `accurate_daily_returns`, `shopee_returns`, `GET /daily-returns/stats` | 3.351 / 271 |
 | Piutang / AR aging | AR Leader, AR Staff (Piutang) | Accurate live proxy `GET /accounting/receivables`, `GET /orders/piutang/summary` ([[External - Accurate]]) | live |
 | EBITDA, net income, cashflow, OPEX YoY | SPV Finance, Account Payable, Cost Control | Accurate live proxy `/accounting/profit-loss`, `/balance-sheet`, `/profit/cash-flow` | live |
-| **Skor KPI tim** | 13 posisi SPV dan Leader | `employee_db.kpi_score` sendiri, diagregasi lewat `work_data.supervisor_id` atau department ([[HRIS - Organization Structure]]) | 406 |
+| **Skor KPI tim** | 15 posisi SPV dan Leader (16 baris metrik), rinciannya di bawah | `employee_db.kpi_score` sendiri, diagregasi lewat department atau `work_data.supervisor_id` ([[HRIS - Organization Structure]]) | 406 |
 | Uptime server dan sistem | IT Infrastructure, IT Support, Tech Leader/SPV | `monitoring-service` membaca `kuma.db` Uptime Kuma read-only: `GET /monitors` (`uptime_24h/7d/30d`), `GET /incidents` (`downtime_seconds`) ([[IT - Monitoring System]]) | 35 monitor |
 | SLA e-ticket | IT Support, Backend/Frontend Developer | `GET /task-management/report/sla`, field `on_time_rate` untuk response dan resolution (`services/task-management/sla.go:112-159`) ([[IT - Helpdesk]]) | 293 task |
 | CSAT layanan IT | IT Support, Fullstack, Tech Leader | `GET /report/csat`, `GET /report/manpower-performance` (`avg_csat` per orang, `services/task-management/report_handlers.go:160-232`) | tersedia |
@@ -138,20 +138,37 @@ Perlu dibereskan sebelum otomasi apa pun, karena semuanya menyentuh label yang j
 - **Pain point**: metrik yang datanya sudah ada di ERP tetap diketik manual, sehingga rawan salah ketik dan sulit diaudit.
 - **Aksi utama**: isi nilai 0..100 per metrik, unggah bukti, kirim per periode `YYYY-MM`.
 
-## Rencana Bertahap (TBD, belum ada di kode)
+## Metrik "skor tim" bukan satu kelompok
 
-Seluruh bab ini **rencana**, belum satu pun dikerjakan. Batas service dan kepemilikan datanya sudah diputuskan di [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]: otomasi dikerjakan di dalam employee-service dulu, `kpi_score` tetap milik employee-service, dan pemisahan `kpi-collector` ditunda sampai pemicu yang tertulis di ADR terpenuhi.
+Enam belas baris metrik bertema monitoring tim tersebar di 15 posisi, tetapi **deskripsinya menyimpan lima maksud berbeda**. Menganggapnya satu kelompok adalah cara termudah salah mengotomatiskannya.
+
+| Kelompok | Baris | Contoh posisi | Bisa diotomatiskan |
+|---|---:|---|---|
+| Supervisor cakupan departemen | 7 | Finance SPV, Quality SPV, Kyura SPV, Tech Dev SPV, BeautyHacks SPV, Manufacturing SPV, HRD SPV (kelompok HRGA) | ✅ jalur pertama |
+| Supervisor lintas seluruh departemen | 1 | HRD SPV, "Performance Monitoring 100% Terimplementasi di Q4" | rumus berbeda, belum |
+| Cakupan Leader (`work_data.supervisor_id`) | 3 | Leader Beauty Hacks, Leader Production, Tech Dev Leader | ✅ tanpa kode tambahan; bergantung pengisian `supervisor_id` yang sedang berjalan (2026-08-01: **54 dari 204**, Beauty Hacks 45, Tech Development 5, Human Resource 4) sehingga Leader Beauty Hacks sudah bisa terlayani sementara Leader Production belum ([[HRIS - Organization Structure]]) |
+| Merujuk skor pemegangnya sendiri | 3 | Host Live BHS, Affiliate Kyura, Leader Kyura ("Skor final KPI tercapai sesuai target") | ❌ sirkular, tetap manual |
+| Bukan skor tim | 2 | AR Leader & Senior Accountant, "Monitoring Team" = checker inputan + ketepatan tanggal | ❌ tetap manual |
+
+Label keenam belas baris itu juga punya **enam varian penulisan**, termasuk satu berspasi di ujung (`Monitoring Team `) dan satu typo (`Perfomance Monitoring`). Karena label adalah kunci identitas metrik di kode, inilah alasan konkret kunci stabil dibutuhkan (lihat Fase 1 nomor 2).
+
+## Rencana Bertahap
+
+Batas service dan kepemilikan datanya diputuskan di [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]: otomasi dikerjakan di dalam employee-service dulu, `kpi_score` tetap milik employee-service, dan pemisahan `kpi-collector` ditunda sampai pemicu yang tertulis di ADR terpenuhi.
 
 **Fase 1, tanpa modul baru**
-1. Sambungkan [[Microservices - Insentive Service]] ke `kpi_score` sebagai nilai berstatus DRAFT (kurang lebih 30 metrik Kyura dan Beauty Hacks).
-2. Auto-fill metrik "Performance Monitoring Team" dari agregasi `kpi_score` bawahan (13 posisi). Datanya berada di `employee_db` sendiri sehingga tidak perlu memanggil service lain.
-3. Auto-fill metrik kedisiplinan dari `GET /attendance/report`.
+1. Sambungkan [[Microservices - Insentive Service]] ke `kpi_score` sebagai nilai berstatus DRAFT (kurang lebih 30 metrik Kyura dan Beauty Hacks). **Belum dikerjakan.**
+2. **⚠️ Fondasinya sudah ada di kode** (branch `feat/kpi-auto-value`, **belum merge & belum deploy**): kontrak sumber nilai pada `KPIMetric`, kunci metrik stabil beserta migrasinya, rumus agregasi tim, `GET /kpi/auto-values`, dan stempel `auto_*` saat submit. Detail di [[Microservices - Employee Service]].
+	- Cakupan yang benar-benar tersentuh: **7 baris** supervisor level departemen, bukan 13 seperti tertulis di versi awal dokumen ini.
+	- Belum menghasilkan apa pun sampai HR mengisi konfigurasi `auto` pada ketujuh metrik lewat `POST /kpi/templates`. Ini disengaja: tidak ada nama posisi yang di-hardcode, sehingga departemen atau perusahaan baru tidak menuntut ubah kode.
+	- Frontend belum ada, jadi usulan sistem belum tampil di modal Score KPI.
+3. Auto-fill metrik kedisiplinan dari `GET /attendance/report`. **Belum dikerjakan.**
 4. Auto-fill KPI Tech Development dari `task-management` dan `monitoring` (14 metrik). Departemen paling siap sekaligus dikerjakan tim sendiri, cocok sebagai pilot.
 5. Bersihkan data master sesuai bab Temuan Data Master.
 
 **Fase 2, perlu development ringan**
-6. Tambahkan penanda sumber pada `KPIMetric` (mis. `source` dan `auto_value` terpisah dari `value`) supaya nilai sistem dapat ditimpa supervisor **dengan jejak alasan**, meniru pola `PATCH /results/:id/override` yang sudah ada di insentive.
-7. Normalkan label metrik.
+6. ~~Tambahkan penanda sumber pada `KPIMetric`~~ **sudah dikerjakan di Fase 1** (`auto_value` terpisah dari `value`, sumber diturunkan `SumberMetrik`). **Sisanya**: jejak **alasan** saat supervisor menimpa angka sistem, meniru `PATCH /results/:id/override` di insentive. Saat ini penimpaan hanya terdeteksi dari `value != auto_value`, tanpa alasan.
+7. Normalkan label metrik. Kunci stabil sudah ada, jadi label kini **aman diganti** tanpa memutus konfigurasi otomatis.
 8. Auto-fill Finance dari Accurate live proxy (13 metrik) dan Procurement (4 metrik).
 9. Simpan budget/anggaran di ERP, karena saat ini tidak ada di mana pun.
 
