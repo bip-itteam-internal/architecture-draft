@@ -5,7 +5,7 @@
 - **Stack**: Go + Fiber v2, SQLite read-only via `modernc.org/sqlite` (driver murni Go, tanpa cgo)
 - **Path di repo**: `bip-erp/services/monitoring/`
 - **Port**: `6984` (`MONITORING_SERVICE_PORT`)
-- **Status**: ⚠️ Implemented (ada catatan) — jalan di produksi; endpoint periode (`/uptime`, `/kpi/uptime`) masih di branch `feat/monitoring-uptime-periode`, belum merge & belum deploy.
+- **Status**: ⚠️ Implemented (ada catatan) — jalan di produksi. Endpoint periode (`/uptime`, `/kpi/uptime`) merge lewat PR #866 dan **sudah deploy ke produksi 1 Agustus 2026**, terverifikasi terhadap `kuma.db` sungguhan.
 
 ### Kenapa hanya jalan di produksi
 
@@ -74,13 +74,27 @@ Dua gerbang berbeda, karena pemanggilnya berbeda jenis.
 
 Muatan KPI sengaja agregat saja, tanpa daftar monitor: nama monitor memaparkan topologi infrastruktur, sedangkan penilaian hanya butuh satu angka.
 
+### Hasil verifikasi produksi (1 Agustus 2026)
+
+Dipanggil langsung di dalam container prod terhadap `kuma.db` sungguhan:
+
+| Periode | `uptime` | `hari_berdata` / `hari_diminta` | `cakupan_persen` |
+|---|---:|---:|---:|
+| 2026-06 | `null` | 0 / 30 | 0 |
+| 2026-07 | 99,813 | 23 / 31 | 74,19 |
+| 2026-08 | 99,721 | 1 / 31 | 3,23 |
+
+Angka 23 hari untuk Juli mengonfirmasi heartbeat terawal 9 Juli 2026 secara empiris. Gerbangnya juga terbukti: tanpa kunci layanan membalas 401, periode cacat membalas 400.
+
+**Selama bulan berjalan, cakupan selalu jauh di bawah 100%** dan metriknya dilaporkan `semi`, bukan `otomatis`. Itu disengaja: uptime satu hari bukan uptime sebulan. Ia baru penuh setelah bulannya tutup, dan di situlah penilaian KPI dilakukan.
+
 ## Belum Diimplementasikan / Catatan
 
 - **"System uptime" dan "Server uptime" belum dapat dibedakan.** Seluruh monitor di Kuma bertipe `docker` (33) dan `http` (1) per 1 Agustus 2026, jadi keduanya membaca angka yang sama. Memisahkannya butuh monitor tingkat host di Kuma — pekerjaan tim IT, bukan kode.
 - **Juni 2026 dan sebelumnya tidak punya data.** Heartbeat terawal 9 Juli 2026; retensi Kuma `keepDataPeriodDays = 180`. Juli tercakup 23 dari 31 hari; Agustus dan seterusnya penuh.
 - **Uptime bersifat lintas-tenant.** Infrastruktur yang dipantau melayani BIP dan ELT sekaligus, sehingga angkanya sama untuk kedua perusahaan. Ini benar secara fakta, bukan kebocoran scoping tenant ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]).
-- Endpoint `/uptime` dan `/kpi/uptime` masih di branch `feat/monitoring-uptime-periode`; belum merge, belum deploy, jadi belum pernah diuji terhadap `kuma.db` produksi sungguhan.
-- `MONITORING_SERVICE_KEY` belum di-set di `.env` produksi. Selama belum di-set, `/kpi/uptime` menolak dan metrik uptime dilaporkan gagal hitung (bukan nol).
+- **Belum ada konsumen yang benar-benar memakainya.** Endpoint sudah hidup dan terverifikasi, tetapi belum satu pun `kpi_template` diisi konfigurasi `auto` bersumber `uptime_sistem`, dan dashboard IT belum memanggil `/uptime`.
+- `MONITORING_SERVICE_KEY` sudah terpasang di `.env` produksi (1 Agustus 2026). Nilainya berbeda dari `.env` pengembangan, dan itu memang seharusnya.
 
 ## Dependensi & Integrasi
 

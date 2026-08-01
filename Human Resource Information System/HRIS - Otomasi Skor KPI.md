@@ -2,7 +2,7 @@
 
 *Analisis kelayakan **mengisi skor KPI secara otomatis** dari data yang sudah dimiliki ERP, bukan diketik manual oleh supervisor. Menjawab: dari 311 metrik yang benar-benar terpasang di production, mana yang sumber datanya sudah ada, mana yang modulnya ada tapi belum dipakai, dan mana yang memang tidak punya sumber sama sekali. Melengkapi [[HRIS - Key Performance Index]] yang menjelaskan mekanisme scoring-nya.*
 
-- **Status**: ⚠️ Mesinnya ada, **belum ada satu pun metrik yang terisi otomatis di produksi**. Fondasi Fase 1 sudah merge ke `main` (PR #843 kontrak sumber nilai, PR #857 mesin reduksi + arah target + registry sumber) tetapi **belum deploy**, dan belum satu pun metrik diisi konfigurasi `auto`-nya. Departemen pertama yang dikerjakan: **Tech Development** (branch `feat/monitoring-uptime-periode`, belum merge). **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.
+- **Status**: ⚠️ Mesin dan sumber pertamanya **sudah jalan di produksi** (PR #843 kontrak sumber nilai, #857 mesin reduksi + arah target + registry sumber, #866 sumber `uptime_sistem`; deploy 1 Agustus 2026 dan terverifikasi terhadap `kuma.db` sungguhan). **Tetapi belum ada satu pun metrik yang terisi otomatis**, karena belum satu pun `kpi_template` diisi konfigurasi `auto`-nya — itu pekerjaan data, bukan kode. Departemen pertama yang dikerjakan: **Tech Development**. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.
 - **Ruang lingkup**: `kpi_template` / `kpi_score` di [[Microservices - Employee Service]]. **Bukan** engine insentif marketing di [[Microservices - Insentive Service]], walau bab 6 mengusulkan menyambungkan keduanya.
 
 ## Kondisi Saat Ini
@@ -272,10 +272,10 @@ Field `attribution_note` pada `mart_profit_attribution` di production menyatakan
 
 ## Belum Diimplementasikan / Catatan
 
-- Tidak ada satu pun metrik yang terisi otomatis hari ini. Mesinnya sudah merge tetapi belum deploy, dan belum satu pun `kpi_template` diisi konfigurasi `auto`-nya.
-- **Uptime bulan Juni 2026 dan sebelumnya tidak dapat dihitung.** Heartbeat Uptime Kuma terawal 9 Juli 2026, sehingga Juli tercakup 23 dari 31 hari dan Agustus baru periode penuh pertama. Metriknya melapor cakupan apa adanya dan bernilai kosong bila memang tak ada data, bukan nol persen.
+- Tidak ada satu pun metrik yang terisi otomatis hari ini. Mesin dan endpointnya sudah hidup di produksi; yang kurang adalah konfigurasi `auto` pada `kpi_template`, diisi lewat `POST /kpi/templates` tanpa perlu deploy.
+- **Uptime bulan Juni 2026 dan sebelumnya tidak dapat dihitung.** Diverifikasi di produksi 1 Agustus 2026: Juni membalas `null` dengan 0 dari 30 hari, Juli 99,81% dengan 23 dari 31 hari (membenarkan heartbeat terawal 9 Juli). Agustus adalah periode penuh pertama.
+- **Selama bulan berjalan, metrik uptime akan dilaporkan `semi`, bukan `otomatis`.** Cakupannya memang belum penuh, dan uptime satu hari bukan uptime sebulan. Ia menjadi `otomatis` setelah bulannya tutup, yaitu saat penilaian dilakukan.
 - **`System uptime` dan `Server uptime` belum dapat dibedakan.** Seluruh monitor bertipe `docker` (33) dan `http` (1); memisahkannya butuh monitor tingkat host di Kuma, pekerjaan tim IT.
-- **`MONITORING_SERVICE_KEY` belum di-set di produksi.** Selama belum, metrik uptime dilaporkan gagal hitung, bukan nol.
 - Sumber ROI/ROAS otomatis berasal dari [[Microservices - Marketing Analytics Service]] (didokumentasikan 2026-07-31, sebelumnya service ini berjalan di production tanpa dok). Perlu diperhatikan: `/lives`, `/cohort`, dan `/price-floor` masih membalas kosong karena koleksinya belum terisi, dan `/matrix/sku-shop` masih stub. Konteks bisnisnya di [[Sales - Marketing Dashboard (Master Roadmap)]].
 - Angka sensus adalah snapshot 2026-07-31 dan akan bergeser. Cara memperbarui daftar template per posisi tanpa menebak: baca koleksi `kpi_template` pada database `employee_db`, urutkan berdasarkan `department` lalu `position`. Kredensial Mongo diambil dari environment container, jangan ditulis di dokumen.
 
