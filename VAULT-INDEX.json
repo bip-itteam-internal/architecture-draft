@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-01",
-  "jumlah_dokumen": 251,
+  "jumlah_dokumen": 252,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -4289,6 +4289,37 @@
         "payout payroll",
         "auto-ignore",
         "security-verify"
+      ]
+    },
+    {
+      "path": "Human Resource Information System/HRIS - Matriks KPI per Departemen.md",
+      "judul": "HRIS - Matriks KPI per Departemen",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "✅",
+      "status_teks": "Salinan setia data production per **2026-08-01**. Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini.",
+      "publik": true,
+      "tautan": [
+        "RUN - Menambah Metrik KPI Otomatis",
+        "HRIS - Otomasi Skor KPI",
+        "Microservices - Employee Service",
+        "HRIS - Key Performance Index",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
+      ],
+      "hash": "517d419efc2d020884e4194f260b84ef8d5d91666774d0cd5837272cd2f7e098",
+      "ukuran_kb": 46.8,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang dipakai tiap departemen dan posisi, berapa bobot masing-masing metrik, dan apa target/keterangannya persis seperti tersimpan di koleksi kpi_template production. Juga menjawab metrik mana yang layak diotomatiskan (klasifikasi otomatis / semi / terblokir data / manual per departemen), departemen mana yang belum punya template sama sekali, serta cacat data yang sudah diketahui seperti template uji ikut production, metrik duplikat, dan label yang memakai target korporat. Menjelaskan pula cara membaca label apa adanya (termasuk typo) karena label adalah kunci identitas metrik di kode, dan cara menyegarkan dokumen ini dari employee_db.",
+      "kata_kunci": [
+        "KPI",
+        "matriks KPI",
+        "kpi_template",
+        "bobot KPI",
+        "target KPI",
+        "penilaian kinerja",
+        "performance appraisal",
+        "otomasi skor KPI",
+        "employee_db",
+        "KPI per departemen"
       ]
     },
     {
