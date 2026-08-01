@@ -35,6 +35,8 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 
 **Tipe pertanyaan (9)** — `short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`. Validasi struktur (key unik, options wajib untuk tipe pilihan, rentang scale maksimal 10 langkah, `min ≤ max`) dan validasi jawaban (tipe cocok, nilai ∈ options, batas angka & panjang teks, format `YYYY-MM-DD` dan `HH:MM`) keduanya **fungsi murni** — teruji tanpa Mongo.
 
+**Bagian (`section`)** — penanda pemisah halaman, bukan pertanyaan. Lihat bagian tersendiri di bawah.
+
 **Sasaran form (audience)** — `all`, `departments`, atau `employees`. Diresolusi dari **header identitas yang sudah dibawa gateway** (`BIP-Employee-ID`, `BIP-Department`), sehingga service ini **tak memanggil satu service pun**. Tipe sasaran yang tak dikenal **gagal-tertutup** (tidak cocok), supaya salah ketik tak pernah menahan presensi sekantor.
 
 **Pengisian** (cukup karyawan terautentikasi)
@@ -71,6 +73,29 @@ Hasilnya "HRGA" tak pernah jadi nilai tersimpan di mana pun: ia gabungan dua dep
 > **Backfill saat boot, bukan skrip manual.** Begitu versi ini naik, form yang masih menyimpan `owner_module` tak cocok filter mana pun: hilang dari daftar dan menolak dibuka dengan `403`. Dev deploy-nya otomatis dari `main`, jadi jedanya tak bisa dijadwalkan. Pemindahan dijalankan idempoten saat boot (`it`→`Tech Development`, `ga`→`General Affair`), bersama pembuatan index.
 
 **Siapa yang berubah aksesnya**: staf HR (`hris:staff`) yang dulu terkunci kini bisa membangun form; pemegang peran `it`/`ga` yang departemennya di luar daftar aktif kehilangan akses; karyawan tanpa `department` di `work_data` kini tertutup (fail-closed, disengaja untuk perubahan kontrol akses). Token berlaku 72 jam, jadi SPV HRGA yang belum login ulang sementara hanya melihat departemennya sendiri — fallback `SupervisedDepartments` menanganinya tanpa error.
+
+## Bagian (section): penanda di daftar datar, bukan struktur bersarang
+
+Form panjang bisa dipecah jadi beberapa halaman saat diisi. Bagian disimpan sebagai **item bertipe `section` di dalam `fields` yang tetap datar** — `label` jadi judulnya, `description` jadi keterangannya, jadi tak ada penambahan skema.
+
+Tiga bentuk dipertimbangkan; yang dipilih paling murah justru karena bentuk datanya tak berubah:
+
+| Bentuk | Konsekuensi |
+|---|---|
+| `Form.Sections[]` bersarang berisi `fields[]` | Paling rapi secara konsep, tapi SEMUA pengulang `form.Fields` ikut berubah: validasi, analitik, export, renderer web, renderer mobile. Plus migrasi seluruh form lama |
+| `section_index` di tiap field + daftar judul terpisah | Dua sumber kebenaran yang bisa tak sinkron; menggeser urutan jadi rawan |
+| **Penanda di daftar datar** ✅ | Reorder, validasi, analitik, dan export cukup MELEWATI penanda. **Tak ada migrasi** |
+
+Penjagaan yang dipasang:
+
+- **Bagian tak bisa diwajibkan.** Kontradiksi: tak ada yang bisa diisi di sana, jadi form-nya jadi mustahil dikirim.
+- **Bagian menolak `options`, rentang scale, batas panjang, dan batas angka.** Atribut yang menempel padanya pasti sisa perpindahan tipe, dan membiarkannya lolos berarti menyimpan aturan yang tak pernah dijalankan siapa pun.
+- **Jawaban yang menunjuk key bagian ditolak** (`400`). Nilainya tak akan pernah muncul di analisa maupun export, jadi diam-diam hilang.
+- **Analisa dan export memakai `questionFields()`**, supaya bagian tak jadi kolom CSV yang selalu kosong maupun kartu analisa hampa.
+
+Bagian tetap wajib punya key unik dan judul, mengikuti aturan field lain. Form yang sudah punya jawaban tetap terkunci (`409`), jadi bagian tak bisa ditambahkan ke form berjalan.
+
+**Pemecahan halamannya terjadi di klien**, bukan di bentuk datanya: [[APP - MyBharata]] memakai `splitSurveyPages()` untuk memecah daftar datar jadi halaman. Form tanpa bagian menghasilkan tepat satu halaman, sehingga perilaku lamanya tak berubah.
 
 ## Keputusan yang menjaga presensi tetap hidup
 
@@ -111,7 +136,9 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 - **Agregasi dibatasi 20.000 jawaban.** Bila terlampaui, total sebenarnya tetap dilaporkan dan hasil ditandai `truncated` + `sample_size`, sedangkan tingkat pengisian disembunyikan. Export menandai lewat header `X-Export-Truncated`.
 - **`attendance_gate.start_date`/`end_date` hanya menerima RFC3339** (mis. `2026-08-01T00:00:00Z`); kiriman `"2026-08-01"` akan ditolak dengan pesan parse JSON yang tidak informatif. Perlu dibereskan saat FE dibangun.
 - **RBAC belum berkatalog permission-set** per [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]. Pindah ke sumbu departemen **mendekatkan** ke ADR itu (hak menempel pada tempat orang bekerja, bukan pada key modul) tapi belum memenuhinya: tingkat perannya masih tier lama `staff`/`supervisor`/`admin`, bukan permission-set granular.
-- **Upload file, section/multi-halaman, percabangan, grid, dan opsi "Lainnya" belum ada** — jarak yang tersisa terhadap Google Forms. Urutan yang disarankan: opsi "Lainnya" (murah) → section → upload file → percabangan (percabangan menuju section, jadi harus menunggu section).
+- ✅ **Section/multi-halaman sudah ada** (PR [#870](https://github.com/bip-itteam-internal/bip-erp/pull/870), belum merged).
+- **Upload file, percabangan, grid, dan opsi "Lainnya" belum ada** — jarak yang tersisa terhadap Google Forms. Urutan yang disarankan: opsi "Lainnya" (murah) → upload file → percabangan. Percabangan menuju bagian, jadi kini sudah punya landasannya.
+- **Analisa belum mengelompokkan hasil per bagian.** Yang dijamin sekarang hanya bagian tak muncul sebagai kartu kosong; pengelompokan visualnya polesan yang belum dikerjakan.
 - **Form approval yang sudah matang JANGAN dimigrasikan ke sini** (leave/overtime/koreksi presensi) — semuanya punya workflow & rantai approval sendiri. Form Builder untuk kasus baru/ad-hoc.
 
 ## Dependensi & Integrasi

@@ -77,6 +77,7 @@
 ### Survei / Form Builder
 - **Section "Survei" di beranda**, tepat di bawah quick menu, berisi form terbit yang ditujukan ke karyawan itu dan **belum** ia isi. Tiap kartu menampilkan jumlah pertanyaan, tenggat gerbang, dan penanda merah **"Wajib sebelum absen"** bila form-nya menahan clock-in.
 - **Halaman pengisian `/survey/:id`** merender **9 tipe pertanyaan** (`short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`), memvalidasi cermin aturan backend sebelum kirim, lalu menyegarkan section supaya form yang baru diisi langsung lenyap.
+- **Pengisian per bagian** (PR [#95](https://github.com/bip-itteam-internal/my-bharata/pull/95), belum merged): form berbagian dipecah jadi satu halaman per bagian lewat `splitSurveyPages()` — fungsi murni, teruji tanpa merender. Form **tanpa** bagian tetap satu halaman tanpa navigasi, jadi perilaku lamanya tak berubah. Pemeriksaan jawaban berjalan **per halaman** saat menekan Berikutnya; menundanya sampai tombol kirim berarti pengisi baru menemukan kesalahan bagian pertama setelah menyelesaikan bagian terakhir. Saat mengirim, kesalahan pertama membawa layar **lompat ke halamannya**, karena pesan untuk pertanyaan yang tak terlihat membuat pengisi menebak-nebak.
 - Sumber data `GET /api/form-builder/me/forms` + `POST /api/form-builder/me/forms/:id/responses`. Backend: [[Microservices - Form Builder Service]] · kontrak: [[API - Form Builder Service]]
 - Fitur `features/form`. my-bharata PR [#93](https://github.com/bip-itteam-internal/my-bharata/pull/93) (merged, `dev`).
 
