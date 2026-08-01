@@ -33,6 +33,9 @@
 | Warehouse | `/api/warehouse/*` | [[API - Warehouse Service]] | [[Microservices - Warehouse Service]] |
 | Recruitment | `/api/recruitment/*` | [[API - Recruitment Service]] | [[Microservices - Recruitment Service]] |
 | Procurement | `/api/procurement/*` | [[API - Procurement Service]] | [[Microservices - Procurement Service]] |
+| Form Builder ⚠️ | `/api/form-builder/*` | [[API - Form Builder Service]] | [[Microservices - Form Builder Service]] |
+
+> ⚠️ Form Builder masih di branch `feat/form-builder` (belum merge, belum deploy).
 
 ## Dokumen Terkait
 

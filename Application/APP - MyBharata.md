@@ -38,7 +38,11 @@
 - Onboarding: karyawan baru login pertama kali dengan Employee ID + password sementara dari HRD, lalu diarahkan untuk mengatur kredensial baru
 
 > [!note] Catatan integrasi backend
-> Pada implementasi saat ini, MyBharata terhubung **langsung ke HRIS backend** (`https://admin.hris-bharata.com`, UAT `https://admin-dev.hris-bharata.com`) menggunakan JWT — **bukan** melalui [[CORE - API Master Gateway]] dan **bukan** SSO. Ini adalah selisih antara rencana arsitektur (portal terpusat di belakang API Master Gateway) dengan kondisi aplikasi yang sudah dibangun. Lihat bagian *Dependencies & Integrasi*.
+> **Dikoreksi 2026-08-01 (grounded ke kode):** MyBharata **memang lewat** [[CORE - API Master Gateway]]. `lib/src/core/api/url.dart` menetapkan base URL `https://api.bharatainternasional.com/` (prod) dan `http://10.10.10.121:6969/` (dev) — keduanya alamat gateway — dan **seluruh** konstanta endpoint berprefix `api/<module>/...` (mis. `api/attendance/tap`, `api/notification/inbox`, `api/file/preview`), yaitu pola routing `/api/:module/*` milik gateway.
+>
+> Catatan lama di tempat ini menyatakan aplikasi terhubung langsung ke `admin.hris-bharata.com` dan **bukan** melalui gateway. Itu **tidak sesuai kode** dan sudah dicabut. Yang masih benar: MyBharata memakai **JWT Bearer**, bukan alur SSO ticket ([[CORE - SSO Flow]]) yang dipakai FE Task Manager.
+>
+> Konsekuensi praktisnya: service baru yang terdaftar di map `InternalURL` gateway **otomatis terjangkau** MyBharata tanpa infrastruktur tambahan — dasar yang dipakai [[Microservices - Form Builder Service]] untuk menargetkan pengisian form lewat mobile.
 
 ## Fitur Utama (Live)
 
@@ -108,9 +112,8 @@ Tercantum di menu tetapi masih placeholder (route `/coming-soon` atau stub):
 
 ## Dependencies & Integrasi
 
-- **HRIS backend** (`admin.hris-bharata.com`) — sumber data utama; integrasi langsung via REST + JWT
+- [[CORE - API Master Gateway]] — **pintu masuk seluruh request** (`api.bharatainternasional.com`, dev `10.10.10.121:6969`), dipanggil dengan pola `api/<module>/...` + JWT Bearer. Lihat koreksi di catatan integrasi backend di atas.
 - **Firebase** — Analytics, Crashlytics, FCM (push notification), Performance
-- [ ] [[CORE - API Master Gateway]] — *rencana awal:* portal terpusat di belakang gateway. *Kondisi saat ini:* belum dipakai oleh MyBharata (lihat catatan integrasi backend di atas)
 
 ## Dokumen Terkait
 

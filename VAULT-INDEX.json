@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-01",
-  "jumlah_dokumen": 248,
+  "jumlah_dokumen": 250,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -128,6 +128,39 @@
       ]
     },
     {
+      "path": "API Reference/API - Form Builder Service.md",
+      "judul": "API - Form Builder Service",
+      "area": "API Reference",
+      "jenis": "api",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [
+        "Microservices - Form Builder Service",
+        "API - Index",
+        "Microservices - Attendance Service",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "IT - Form Builder",
+        "API - Attendance Service",
+        "CORE - API Master Gateway"
+      ],
+      "hash": "074244f2ad30829ccc2a9e0eb963bef421412b1084999ed7f533dccad5040ff0",
+      "ukuran_kb": 4.1,
+      "ringkasan": "Menjawab: endpoint apa saja untuk membuat, menerbitkan, menyunting, dan menutup form dinamis, siapa yang boleh mengelolanya (RBAC `system_roles` key `it`/`ga`) versus siapa yang cukup mengisi. Juga menjawab bentuk data payload penting (9 tipe field, `audience`, `attendance_gate` yang wajib RFC3339), cara membaca analytics dan export CSV berikut penanda truncated, serta aturan idempotensi pengiriman jawaban dalam 2 menit. Menjelaskan pula kenapa `/internal/compliance` mengunci identitas ke header `BIP-*` dan mengabaikan query param dari request pemakai.",
+      "kata_kunci": [
+        "form builder",
+        "form dinamis",
+        "endpoint",
+        "API reference",
+        "RBAC it ga",
+        "attendance gate",
+        "compliance",
+        "export CSV",
+        "analytics",
+        "audience"
+      ]
+    },
+    {
       "path": "API Reference/API - HRIS Orchestrator.md",
       "judul": "API - HRIS Orchestrator",
       "area": "API Reference",
@@ -196,23 +229,25 @@
         "Microservices - Recruitment Service",
         "API - Procurement Service",
         "Microservices - Procurement Service",
+        "API - Form Builder Service",
+        "Microservices - Form Builder Service",
         "DB - Overview and Notes",
         "HOMEPAGE"
       ],
-      "hash": "684da59f9c3ff92ccd4fb99523c3e6b2bc2ffa652c6081052632e0a0506db817",
-      "ukuran_kb": 2.9,
-      "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, prefix gateway mana yang dipakai tiap service, dan di file API Reference mana daftar endpoint-nya berada. Juga menjelaskan cara routing lewat API Master Gateway, bagaimana JWT divalidasi lalu identitas diteruskan sebagai header BIP-*, serta kapan sebuah rute boleh diakses tanpa JWT (open route dengan service key, /ext/*, /public/*).",
+      "hash": "45711c1fccd3d78ee31bd36f23577e9dff994dc8c5365839a45886bec90779db",
+      "ukuran_kb": 3.2,
+      "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, prefix gateway masing-masing (`/api/<module>/*`), dan file API Reference mana yang harus dibuka untuk tiap service. Juga menjawab bagaimana request di-routing lewat API Master Gateway, bagaimana JWT diterjemahkan jadi header identitas `BIP-*` yang dibaca service, serta apa itu open route (`?key=`) dan rute `/public/*` dan `/ext/*` yang tanpa JWT.",
       "kata_kunci": [
+        "API index",
         "daftar service",
-        "service list",
         "prefix gateway",
         "routing",
-        "API reference",
-        "indeks endpoint",
-        "header BIP",
+        "endpoint",
+        "JWT",
+        "BIP header",
         "open route",
-        "public route",
-        "health check"
+        "public ext",
+        "microservices"
       ]
     },
     {
@@ -833,6 +868,8 @@
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "CORE - API Master Gateway",
+        "CORE - SSO Flow",
+        "Microservices - Form Builder Service",
         "HRIS - Tukar Jadwal Kerja",
         "API - Attendance Service",
         "Microservices - Task Management Service",
@@ -844,20 +881,20 @@
         "Microservices - Employee Service",
         "Microservices - Notification Service"
       ],
-      "hash": "3c63c7e727fec08b978e9883a334c5d419d4291ec9358c02ba2f75c04f4279bf",
-      "ukuran_kb": 11.5,
-      "ringkasan": "Menjawab: aplikasi mobile HRIS MyBharata dipakai untuk apa oleh karyawan (clock-in/out via QR + geofencing + biometric, jadwal & riwayat kehadiran, pengajuan cuti/izin/sakit/dinas, lembur SPKL, payslip PDF ber-PIN, KPI, tugas/Task Management), dan bagaimana teknis aplikasinya dibangun (Flutter, Clean Architecture feature-first, bloc, dio + fpdart, go_router, Firebase, l10n id/en). Juga menjawab bagaimana autentikasi JWT/PIN/biometric dan kebijakan 1 akun 1 device berjalan, ke backend mana app terhubung (langsung ke HRIS backend, bukan lewat API Master Gateway), serta bagaimana dukungan multi-perusahaan (scope via JWT, konten per tenant) diterapkan.",
+      "hash": "d486da9d11a15ea16c71dd07f06f3627fd232ba8b738b378f4669f950453537c",
+      "ukuran_kb": 12.1,
+      "ringkasan": "Menjawab: apa saja yang bisa dilakukan karyawan lewat aplikasi mobile MyBharata (clock-in/out dengan QR, geofencing, dan biometric, cuti/izin, lembur, payslip ber-PIN, KPI, task management, guestbook) dan bagaimana aplikasinya dibangun (Flutter, BLoC, get_it, dio, go_router, Firebase, flavor dev/prod, Clean Architecture feature-first). Juga menjawab bagaimana alur autentikasinya (JWT Bearer, PIN, biometric, kebijakan 1 akun 1 device) dan bahwa aplikasi memang mengakses backend lewat API Master Gateway dengan prefix `api/<module>`, bukan langsung ke service. Menjelaskan pula bagian mana yang sudah multi-perusahaan dan apa yang masih TBD per tenant.",
       "kata_kunci": [
         "MyBharata",
-        "aplikasi mobile",
+        "mobile",
         "Flutter",
-        "HRIS",
+        "aplikasi karyawan",
+        "HRIS mobile",
         "absensi",
         "attendance",
-        "cuti",
-        "lembur",
-        "payslip",
-        "geofencing"
+        "geofencing",
+        "biometric",
+        "payslip"
       ]
     },
     {
@@ -1082,28 +1119,26 @@
         "Microservices - Inventory Service",
         "Microservices - Task Management Service",
         "Microservices - Recruitment Service",
+        "Microservices - Form Builder Service",
         "CORE - HRIS Orchestrator",
         "CORE - IT Orchestrator",
         "APP - MyBharata",
         "DB - Overview and Notes"
       ],
-      "hash": "971d7fa5fe3724d6fcd8bcf23b925fc6d4ad39e53609b2f69172d031c6ab8e67",
-      "ukuran_kb": 6.7,
-      "ringkasan": "Menjawab: bagaimana request dari internet masuk ke ekosistem bip-erp, bagaimana JWT diterbitkan, diverifikasi, dan di-refresh, serta bagaimana identitas diteruskan ke service lewat header BIP-Employee-Id, BIP-System-Roles, dan BIP-Company-ID. Juga menjawab rute non-/api (auth, onboarding, public, ext, dev), aturan cache Redis, alur SSO one-time-code, plus risiko catch-all /:module/* yang membuat prefix /internal ikut terbuka dan limiter login bisa dilewati.",
+      "hash": "6759cebcc259c83b87cdbf614701d3998f489a519bfbd335c01e2dac6f5927c0",
+      "ukuran_kb": 7.1,
+      "ringkasan": "Menjawab: bagaimana request dari luar masuk ke seluruh ekosistem bip-erp, bagaimana login diproses dan JWT diterbitkan/di-refresh, dan bagaimana gateway meng-inject header identitas (`BIP-Employee-Id`, `BIP-System-Roles`, `BIP-Company-ID`) ke service dari klaim JWT. Juga menjawab peta routing lengkapnya (`/api/:module/*`, `/auth/*`, `/public/*`, `/ext/*`, `/dev/*`), cara kerja SSO ticket-redeem sekali pakai, response caching Redis, serta internal gateway key antar-service. Menjelaskan pula risiko yang diketahui: routing catch-all membuat prefix `/internal/` ikut terbuka ke internet dan sebagian limiter bisa dilewati.",
       "kata_kunci": [
+        "gateway",
         "API gateway",
         "JWT",
-        "auth login",
-        "refresh token",
-        "SSO ticket",
-        "redeem",
-        "header BIP",
-        "internal gateway key",
-        "catch-all",
-        "rate limit",
-        "cache Redis",
-        "public route",
-        "ext webhook"
+        "login",
+        "SSO",
+        "routing",
+        "reverse proxy",
+        "Redis cache",
+        "BIP-Company-ID",
+        "internal"
       ]
     },
     {
@@ -1348,22 +1383,23 @@
         "Microservices - Task Management Service",
         "Microservices - Recruitment Service",
         "Microservices - Payroll Service",
+        "Microservices - Form Builder Service",
         "Microservices - File Service"
       ],
-      "hash": "313d1e023122fe64604b3ef2b53cc25ac492a3d8b38d84c8e8fc41debb93d7da",
-      "ukuran_kb": 5.9,
-      "ringkasan": "Menjawab: database mana milik service mana di bip-erp (pola database-per-service), collection apa saja yang ada di tiap MongoDB per service, dan service mana yang jalan sebagai replica set beserta alasannya. Juga menjelaskan infrastruktur data bersama (Redis untuk cache dan queue, MinIO untuk object storage dengan prefix per domain), aturan bahwa tidak ada query lintas-database antar service, waktu selalu UTC, dan koleksi mana yang membawa company_id untuk multi-perusahaan.",
+      "hash": "deb2978154add66428a9b916c02e294b33b26824962f0e5e018defc426b64bf5",
+      "ukuran_kb": 6.9,
+      "ringkasan": "Menjawab: database mana milik service mana (pola database-per-service), collection apa saja yang ada di tiap MongoDB, dan di mana sebuah data sebaiknya dicari. Juga menjawab collection mana yang sudah membawa `company_id` untuk multi-perusahaan, kenapa hanya employee-service yang berjalan sebagai replica set, dan bagaimana Redis serta MinIO dipakai sebagai infrastruktur data bersama (namespace key dan prefix objek per domain). Menjelaskan pula aturan ownership data: tidak ada query lintas-database, komunikasi antar service lewat HTTP internal.",
       "kata_kunci": [
         "database",
         "MongoDB",
-        "database-per-service",
         "collection",
+        "database-per-service",
+        "replica set",
         "Redis",
         "MinIO",
-        "replica set",
-        "data ownership",
         "company_id",
-        "DB overview"
+        "multi-tenant",
+        "index"
       ]
     },
     {
@@ -1379,6 +1415,9 @@
         "HRIS - Leave Request",
         "HRIS - Payroll",
         "HRIS - Employee Request & Approval",
+        "Microservices - Form Builder Service",
+        "APP - MyBharata",
+        "IT - Form Builder",
         "HRIS - Tukar Jadwal Kerja",
         "HRIS - Attendance Correction",
         "HRIS - Perjalanan Dinas",
@@ -1391,23 +1430,22 @@
         "CORE - API Master Gateway",
         "CORE - HRIS Orchestrator",
         "HRIS - Attendance System",
-        "APP - MyBharata",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "97180ff43bdaf364c033d84077e7275980b00ca41d3f107876dd8b1c6f7eb0f3",
-      "ukuran_kb": 14.6,
-      "ringkasan": "Menjawab: bagaimana clock-in/clock-out bekerja per metode (fingerprint dengan allowlist serial, mobile dengan validasi WiFi kantor atau GPS, website yang belum ada) termasuk ambang keterlambatan, endpoint apa saja untuk jadwal kerja, hari libur, guestbook tamu, mood, dan laporan bulanan. Juga menjelaskan workflow lengkap leave request (termasuk guard idempoten anti-duplikat), koreksi absensi, tukar jadwal kerja, dan perjalanan dinas beserta rantai approval-nya, plus perhitungan payroll-supplement (payout_pct) dan master perlakuan dibayar/dipotong per status maupun per subtipe izin.",
+      "hash": "4fa45e67854b5ee18be1e066e36a40001dfbed012156e12ea96a22a586062d86",
+      "ukuran_kb": 15.9,
+      "ringkasan": "Menjawab: bagaimana clock-in/clock-out diproses per metode (fingerprint dengan allowlist serial, mobile dengan validasi WiFi kantor atau GPS), bagaimana jadwal kerja dan rotasi shift diresolusi, dan endpoint mana yang dipakai untuk leave request, koreksi presensi, tukar jadwal kerja, perjalanan dinas, guestbook tamu, serta hari libur. Juga menjawab bagaimana data kehadiran diolah jadi laporan bulanan periode 26 ke 26 dan payroll supplement (`payout_pct`, perlakuan dibayar/dipotong per status dan per subtipe yang configurable). Menjelaskan pula guard idempotensi leave request dan gerbang form wajib yang bisa menahan clock-in mobile.",
       "kata_kunci": [
         "attendance",
+        "presensi",
         "absensi",
         "clock-in",
-        "clock-out",
         "leave request",
         "cuti",
-        "izin",
-        "koreksi absensi",
-        "payroll supplement",
-        "guestbook"
+        "koreksi presensi",
+        "tukar shift",
+        "guestbook",
+        "payroll supplement"
       ]
     },
     {
@@ -1484,6 +1522,44 @@
         "access-key",
         "object storage",
         "otorisasi folder"
+      ]
+    },
+    {
+      "path": "Core System and Modules/Microservices - Form Builder Service.md",
+      "judul": "Microservices - Form Builder Service",
+      "area": "Core System and Modules",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented di branch `feat/form-builder` — BELUM merge ke `main`, BELUM deploy.** Backend lengkap dan teruji (122 unit test); **FE [[APP - Web ERP]] dan [[APP - MyBharata]] belum ada**, jadi fitur ini belum bisa dipakai pengguna akhir.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Attendance Service",
+        "APP - Web ERP",
+        "APP - MyBharata",
+        "API - Form Builder Service",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "Microservices - File Service",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "DB - Overview and Notes",
+        "CORE - API Master Gateway",
+        "CORE - SSO Flow",
+        "IT - Form Builder"
+      ],
+      "hash": "b6269c41dbaf551c517a8e48b26c0000ac7417a4cc55b78fa4125532ec8bbbbc",
+      "ukuran_kb": 9.0,
+      "ringkasan": "Menjawab: bagaimana form dinamis dibuat tanpa rilis kode (9 tipe pertanyaan, sasaran all/departments/employees, siklus draft ke published ke closed), siapa personanya dan gerbang RBAC-nya (`system_roles` `it` dan `ga`, security GA sengaja dikecualikan), serta bagaimana jawaban dibaca lewat analytics dan export CSV. Juga menjawab kenapa clock-in mobile bisa ditahan form wajib dan pengaman apa yang dipasang (default `warn`, jendela tanggal wajib, gagal-tertutup pada data cacat, identitas `/internal/compliance` terkunci ke header). Menjelaskan pula batas yang belum ada: upload file, logika percabangan, FE web dan mobile, hitung otomatis ukuran sasaran, dan batas agregasi 20.000 jawaban.",
+      "kata_kunci": [
+        "form builder",
+        "form dinamis",
+        "survei",
+        "kuesioner",
+        "attendance gate",
+        "clock-in",
+        "analytics",
+        "export CSV",
+        "multi-tenant",
+        "RBAC"
       ]
     },
     {
@@ -5104,10 +5180,12 @@
       "judul": "IT - Form Builder",
       "area": "IT",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "Konsep / Direncanakan (rencana terkunci, belum di kode)",
+      "status_emoji": "⚠️",
+      "status_teks": "**Backend selesai di branch `feat/form-builder` (belum merge, belum deploy); FE & mobile belum ada**",
       "publik": false,
       "tautan": [
+        "Microservices - Form Builder Service",
+        "API - Form Builder Service",
         "HRIS - Employee Request & Approval",
         "HRIS - Leave Request",
         "HRIS - Overtime",
@@ -5115,25 +5193,31 @@
         "HRIS - Recruitment",
         "GA - Guestbook System (Complete)",
         "GA - Checklist Management",
-        "DB - Overview and Notes",
+        "Microservices - Attendance Service",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "APP - Web ERP",
+        "APP - MyBharata",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "Microservices - File Service",
         "CORE - SSO Flow",
         "CORE - API Master Gateway",
+        "DB - Overview and Notes",
         "ROADMAP"
       ],
-      "hash": "1ce35ddce6de102237147f06d95f6cad944952c1e28806737f6b3d5056055684",
-      "ukuran_kb": 3.2,
-      "ringkasan": "Menjawab: apa itu rencana Form Builder (pembuat form dinamis tanpa coding untuk kasus baru/ad-hoc), mengapa dibutuhkan (mengganti form request yang saat ini hardcoded per kasus), dan bagaimana rencana implementasinya (topologi microservice, RBAC MVP, urutan TDD) meski eksekusinya masih ditunda.",
+      "hash": "fcf6ebdbe1dda2a9aa47cf194c6cb89712cec438eb829fe92b4425337a1f73f4",
+      "ukuran_kb": 3.8,
+      "ringkasan": "Menjawab: kenapa Form Builder dibuat, kasus pemakaian mana yang cocok (survei internal, deklarasi, pendataan mendadak, pendaftaran event) dan mana yang sengaja tidak boleh dipindah ke sana (form approval yang sudah matang seperti cuti, lembur, dan koreksi presensi). Juga menjawab bagaimana scope berubah dari rencana asli (RBAC bertambah `ga`, ada analitik, ada sasaran form, menyentuh attendance service, `company_id` sejak awal) dan keputusan bisnis di balik intersep presensi (`block` versus `warn`, hanya jalur mobile, gagal-terbuka, jendela tanggal wajib). Menutup dengan hal yang masih TBD seperti waktu merge/deploy, bentuk builder UI, dan form publik tanpa login.",
       "kata_kunci": [
         "form builder",
-        "dynamic form",
-        "form request",
-        "no-code",
-        "MVP scope",
-        "RBAC form builder",
-        "microservice form-builder",
-        "rencana implementasi",
-        "form dinamis"
+        "konsep",
+        "form dinamis",
+        "intersep presensi",
+        "clock-in",
+        "block warn",
+        "IT",
+        "HRGA",
+        "scope",
+        "TBD"
       ]
     },
     {
@@ -5484,20 +5568,20 @@
         "QA - Batch Record & Traceability",
         "QA - CPOB (GMP)"
       ],
-      "hash": "038d870836238612d725fd193221c06fc8b2a77ae80855b3fdc8d66c00e4a136",
-      "ukuran_kb": 15.0,
-      "ringkasan": "Menjawab: bagaimana dokumen batch release produksi (form manual 7 lembar Ceklis Kelengkapan Dokumen Produksi) didigitalkan jadi menu WMS `/manufacture/dokumen-produksi-batch`, siapa yang mengisi bagian mana (admin RM, admin produksi, QC/RnD, PPIC/SPV), dan bagaimana alur DRAFT ke DIAJUKAN lalu LULUS atau DITOLAK dijaga di server. Menjelaskan mekanisme paraf: paraf by jabatan lewat panel Tim Batch, paraf digital berjenjang per slot yang mengunci persetujuan PJ Teknis sampai semua jabatan roster terisi, serta field milik QC yang read-only di form admin dan hanya bisa diisi di layar review. Berguna juga untuk pertanyaan soal rumus rekonsiliasi penimbangan (Ditimbang dibagi Teoritis, batas di bawah 2 persen), menu terpisah Rekonsiliasi MO, cetak PDF 7 lembar, dan rantai nomor batch dari MO sampai Laporan Produksi.",
+      "hash": "27972aec76e82cebdde220081bb6156484590f416c53451c6a219e86e438ec67",
+      "ukuran_kb": 15.3,
+      "ringkasan": "Menjawab: bagaimana dokumen batch release 7 lembar (ceklis kelengkapan, kesiapan ruang, catatan pengolahan, pengemasan, pengujian, lembar keputusan) diisi sebagai menu WMS, siapa mengisi bagian mana (admin gudang RM mengisi kolom ditimbang, admin produksi mengisi data proses, QC/RnD mengisi hasil uji lalu menyetujui), dan bagaimana alur status DRAFT ke DIAJUKAN ke LULUS atau DITOLAK dijaga di server. Juga menjawab cara kerja paraf digital berjenjang berbasis jabatan (roster paraf, paraf per baris, approve terkunci sampai semua slot terparaf) serta aturan rekonsiliasi penimbangan di bawah 2%. Menyebut pula path backend dan frontend-nya, letak menu, dan RBAC `system_roles.manufacture` per persona.",
       "kata_kunci": [
         "batch record",
         "dokumen produksi batch",
+        "manufacture",
+        "WMS",
         "batch release",
-        "dossier",
         "QC",
-        "paraf",
+        "paraf digital",
         "rekonsiliasi",
         "penimbangan",
-        "manufacture",
-        "WMS"
+        "approval"
       ]
     },
     {
@@ -5967,6 +6051,7 @@
         "HRIS - Recruitment",
         "Microservices - Recruitment Service",
         "IT - Form Builder",
+        "Microservices - Form Builder Service",
         "Finance - Big Pictures",
         "HRIS - Key Performance Index",
         "Sales - CRM management tool",
@@ -5977,18 +6062,20 @@
         "REF - Ownership & RACI",
         "HRIS - Roadmap"
       ],
-      "hash": "ffec0097e0b85f3b7ba459ca4f12a4741b07cc848945955483b553e6a025437f",
-      "ukuran_kb": 2.3,
-      "ringkasan": "Menjawab: apa saja fitur/service yang sudah selesai, sedang direncanakan, atau ditunda dalam roadmap ERP Bharata (mis. Recruitment service, Form Builder, Contract Management, Budget Planner, Goal/OKR Management), dan keputusan strategis apa yang masih menunggu Product Owner.",
+      "hash": "5d6932dae5535fbbdc38e8160b8814701e6ba2b6050cafa4788fc9f0ae95f48b",
+      "ukuran_kb": 2.4,
+      "ringkasan": "Menjawab: fitur atau service apa yang sedang jalan, direncanakan, ditunda, atau masih butuh keputusan di ERP Bharata, lengkap dengan dokumen sumber tiap item (Recruitment, Form Builder, Contract Management, Budget Planner, OKR, CRM internal, konten QA/RA). Juga menjawab pekerjaan infra/teknis yang masih terbuka (shared-library standalone, pemisahan docker-compose dan .env per service) dan pertanyaan bisnis yang menghambat, misalnya ada tidaknya kanal B2B/wholesale dan fungsi distribusi CDOB. Prioritas dan target tanggal sendiri ditetapkan Product Owner, bukan di dokumen ini.",
       "kata_kunci": [
         "roadmap",
         "prioritas",
-        "rencana pengembangan",
-        "recruitment service",
-        "form builder",
-        "budget planner",
         "backlog",
-        "arah pengembangan"
+        "rencana",
+        "planned",
+        "TBD",
+        "product owner",
+        "arah pengembangan",
+        "second-brain",
+        "infra"
       ]
     },
     {
