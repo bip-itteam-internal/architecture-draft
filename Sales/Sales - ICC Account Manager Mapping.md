@@ -283,45 +283,46 @@ Daftar TikTok Ads advertiser yang belum di-assign aktif. Pool advertiser bersifa
 | **2** | Frontend: sidebar "MARKETING ICC", halaman ICC Management (CRUD assign), ICC Dashboard (performa toko + iklan per staff) | ✅ Selesai (2026-07-09) |
 | **3** | Field `team` (auto-fill dari department), isolasi data per tim, shop/advertiser opsional, halaman Team Performance untuk SPV/Leader, route `/icc/mappings/me` untuk staff ICC | ✅ Selesai (2026-07-09) |
 | **4** | Integrasi Insentive Service: hitung KPI AM dari mapping ini | 🟡 Belum |
-| **5** | Relasi leader saat assign (lihat [[#Relasi Leader & Akumulasi Insentif (🟡 Rencana)]]) | 🟡 Rencana (2026-08-01) |
+| **5** | Relasi leader saat assign (lihat [[#Relasi Leader & Akumulasi Insentif]]) | ⚠️ Implemented (2026-08-01; branch `feat/icc-leader` + FE `dev`, belum deploy) |
 
 ---
 
-## Relasi Leader & Akumulasi Insentif (🟡 Rencana)
+## Relasi Leader & Akumulasi Insentif
 
-*Permintaan dirut (tiket, 2026-08-01): sebelum SPV/leader meng-assign karyawan ICC ke toko, karyawan tersebut harus tercatat berada di bawah leader siapa — dipakai untuk akumulasi perhitungan insentif leader.*
+*Permintaan dirut (tiket, 2026-08-01): sebelum SPV/leader meng-assign karyawan ICC ke toko, harus jelas karyawan itu di bawah leader siapa — dipakai untuk akumulasi perhitungan insentif leader.*
 
-**Keputusan desain (hasil diskusi 2026-08-01):**
+- **Status**: ⚠️ Implemented (2026-08-01) — kode di `feat/icc-leader` (Integration Service) + FE branch `dev`; belum merge/deploy. Konsumsi oleh Insentive Service (Phase 4) belum.
 
-- **Satu sumber kebenaran**: relasi ICC → leader disimpan HANYA di `IncentiveOrg` (koleksi org Insentive Service, field `Anggota`) — struktur ini **sudah ada** berikut endpoint `GET/POST /profit/org` + `PATCH /profit/org/:id/tutup` dan rollup 3 level `SusunEntitas` (ICC → Leader → Supervisor) di `services/insentive/func.go`. **Tidak ada** field leader duplikat di `icc_account_mappings`.
-- **1 leader per department** (kyura / beautyhacks). Leader = karyawan berposisi "leader" (istilah insentif: `adv_leader`).
-- **Leader boleh pegang toko sendiri**: ia muncul di dua level — level ICC atas tokonya (insentif pribadi) dan level Leader atas total timnya *termasuk tokonya sendiri* (sudah ditangani `SusunEntitas`; leader tanpa toko otomatis hanya muncul di level Leader).
-- **Self-membership**: bila yang di-assign toko adalah leader itu sendiri, field leader otomatis dirinya.
-- **Tanpa effective dates tambahan** — `IncentiveOrg` sudah punya `BerlakuDari`/`BerlakuSampai`; rotasi memakai mekanisme tutup-baris yang ada.
-- **Data lama** (mapping tanpa leader): backfill manual via edit, tidak ada migrasi otomatis.
+**Desain final (leader-first, menyederhanakan draf sebelumnya):**
 
-### Flowchart Assign dengan Relasi Leader
+- **Satu record leader per team** di koleksi **`icc_leaders`** (Integration Service): `team → employee_id + employee_name`, unique partial index `(team, is_active=true)`; pergantian leader = nonaktifkan baris lama + buat baru (riwayat tersimpan). Endpoint `GET/POST /icc/leaders`, `PATCH /icc/leaders/:id/deactivate` (guard `RequireMarketingLeader`).
+- **Tanpa daftar anggota manual**: keanggotaan team diturunkan dari `icc_account_mappings.team` — anggota team X = semua mapping aktif ber-`team` X. (Berbeda dari draf awal yang mau memakai `IncentiveOrg.Anggota` — dipilih Integration-lokal mengikuti pelajaran `mappingDariRingkasan` di `services/insentive/func.go`: panggilan antar-service tanpa identitas user kena 403 di route ber-RBAC; Integration adalah pemilik data "siapa mengelola apa".)
+- **Guard leader-first di BE**: `POST /icc/mappings` ditolak bila team karyawan belum punya leader aktif. Cek memakai `employee_team` dari body (department karyawan yang di-assign; dikirim FE) dengan fallback header `BIP-Department` — supaya assign lintas department oleh IT tetap tervalidasi ke team karyawan, bukan team pemanggil.
+- **FE (ICC Management)**: `LeaderBar` menampilkan leader team + tombol Set Leader (kandidat = karyawan posisi `leader`; team diturunkan dari department kandidat, bukan dipilih manual). Form assign menampilkan warning + submit disabled selama team belum punya leader; dropdown karyawan diperluas posisi `icc` **+ `leader`** (leader boleh pegang toko; form menandai *self-leader*). Leader **tanpa** toko cukup terdaftar di `icc_leaders` — tidak butuh baris mapping, validasi "minimal satu akun" tak berubah.
+- **1 leader per department** (kyura / beautyhacks); leader = posisi "leader" (istilah insentif: `adv_leader`). Nilai `team` konsisten karena satu sumber: department HRIS (= cookie `department` FE = header `BIP-Department`).
+- **Data lama**: mapping existing tak butuh migrasi (leader tidak disimpan di mapping); SPV cukup Set Leader sekali per team setelah live.
+- **Phase 4 (belum)**: Insentive membaca leader dari Integration (pola ringkasan internal seperti `mappingDariRingkasan`) untuk rollup ICC → Leader; `IncentiveOrg` dashboard profit belum disentuh — sampai disatukan, keduanya paralel (leader di dashboard profit tetap diisi manual).
+
+### Flowchart Assign (leader-first)
 
 ```mermaid
 flowchart TD
-    A["SPV/Leader buka form assign\n(ICC Management)"] --> B["Muat leader aktif department\nGET /profit/org (level=leader, team)"]
-    B --> C{"Leader department\nsudah terdaftar?"}
-    C -- "belum" --> D["Blokir form:\nminta daftarkan leader dulu\n(POST /profit/org)"]
-    C -- "sudah" --> E["Pilih karyawan\n(posisi icc + leader)"]
-    E --> F{"Karyawan =\nleader itu sendiri?"}
-    F -- "ya" --> G["Field leader terkunci:\ndirinya sendiri (self-membership)"]
-    F -- "bukan" --> H["Field leader wajib terisi\n(auto: satu-satunya leader department)"]
+    A["SPV/Leader buka ICC Management"] --> B["LeaderBar: GET /icc/leaders (team)"]
+    B --> C{"Team sudah punya\nleader aktif?"}
+    C -- "belum" --> D["Set Leader: pilih karyawan posisi leader\n(team = department kandidat)\nPOST /icc/leaders\n(ganti leader → baris lama nonaktif)"]
+    D --> E
+    C -- "sudah" --> E["Form assign: pilih karyawan\n(posisi icc + leader)"]
+    E --> F{"Karyawan = leader\nteam itu sendiri?"}
+    F -- "ya" --> G["Form menandai self-leader\n(toko dihitung pribadi + tim)"]
+    F -- "bukan" --> H["Form tampilkan leader team"]
     G --> I["Pilih toko / ads / Shopee + notes"]
     H --> I
-    I --> J["POST /icc/mappings"]
-    J --> K{"Validasi Integration Service:\nminimal 1 akun, akun tersedia,\nbelum di-assign aktif"}
-    K -- "gagal" --> L["400 / 409 → tampilkan error"]
+    I --> J["POST /icc/mappings + employee_team"]
+    J --> K{"Guard BE:\nteam karyawan punya leader aktif?\n+ validasi akun tersedia"}
+    K -- "tidak" --> L["400: daftarkan leader dulu\n(FE juga sudah memblokir submit)"]
     K -- "lolos" --> M["Simpan icc_account_mappings"]
-    M --> N["Sinkron keanggotaan:\ntambah employee_id ke\nIncentiveOrg.Anggota leader (bila belum)"]
-    N --> O["Akumulasi insentif (rollup SusunEntitas):\nlevel ICC = toko sendiri\nlevel Leader = toko seluruh Anggota\n(termasuk toko leader sendiri)"]
+    M --> N["Akumulasi insentif leader (Phase 4, belum):\nanggota team = mapping aktif se-team\nlevel ICC = toko sendiri\nlevel Leader = toko seluruh team\n(termasuk toko leader sendiri)"]
 ```
-
-**Belum diputuskan (TBD)**: mekanisme sinkron `Anggota` — dipanggil frontend setelah create mapping, atau Integration Service memanggil Insentive server-side; ditetapkan saat `/plan` implementasi.
 
 ## Dependensi & Risiko
 
