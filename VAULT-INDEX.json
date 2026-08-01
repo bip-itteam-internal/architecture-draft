@@ -530,21 +530,20 @@
         "API - Index",
         "APP - Dynamic Task Tracker"
       ],
-      "hash": "7f04d88c81ebe13269d6a4c4b56e2c4846c6d1ba5d13f3efa0098124a81ab997",
-      "ukuran_kb": 3.3,
-      "ringkasan": "Menjawab: bagaimana space/board Kanban dan task (create, assign, approve/reject, ubah status/prioritas) bekerja untuk fitur ticketing/helpdesk, termasuk lampiran file, komentar, checklist, dan notifikasi realtime lewat WebSocket. Juga menjawab endpoint laporan SLA response/resolution per divisi, statistik tugas, audit trail, dan dropdown assignee/divisi dari data ERP.",
+      "hash": "a47834d127e837451f44c6b689daa07ce27be76414064a2948e4f5431b3f0fa5",
+      "ukuran_kb": 4.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan task-management, siapa yang boleh memanggil tiap rute, dan bentuk payload tiket beserta lampiran, komentar, checklist, dan laporannya. Memuat rute daftar dan filter tiket, hitungan badge tiket aktif, daftar tiket yang menunggu penilaian, pengiriman rating CSAT, serta laporan SLA dan CSAT. Berguna untuk mencari kontrak persis sebelum menyentuh klien web maupun mobile.",
       "kata_kunci": [
         "task management",
-        "ticketing",
-        "helpdesk",
-        "Kanban",
-        "space",
+        "tiket",
+        "support ticket",
+        "API",
+        "endpoint",
+        "CSAT",
+        "penilaian",
         "SLA",
-        "WebSocket",
-        "approval task",
         "checklist",
-        "laporan divisi",
-        "audit trail"
+        "laporan"
       ]
     },
     {
@@ -884,19 +883,19 @@
         "Microservices - Employee Service",
         "Microservices - Notification Service"
       ],
-      "hash": "7e756c51dc6b2e2e74187d2b79b2f8bdb177726fba5d798b8d3073b25a08a88c",
-      "ukuran_kb": 15.7,
-      "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile karyawan MyBharata, bagaimana arsitektur Flutter-nya disusun, dan bagaimana ia terhubung ke backend lewat API gateway memakai JWT Bearer. Mencakup presensi, pengajuan izin dan cuti, lembur, payslip, KPI, task management, guest book, serta section Survei di beranda dan halaman pengisian form yang berhalaman per bagian. Memuat juga versi build yang berjalan, komponen pemilih yang dipakai bersama, dan aturan kontrak yang mudah dilanggar diam-diam.",
+      "hash": "86bfa7b42a71539ffe8d3eeaf93a00a4ff46044c6751a32ad5f42ccb8a1cc61c",
+      "ukuran_kb": 16.7,
+      "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile karyawan MyBharata, bagaimana arsitektur Flutter-nya disusun, dan bagaimana ia terhubung ke backend lewat API gateway memakai JWT Bearer. Mencakup presensi, pengajuan izin dan cuti, lembur, payslip, KPI, task management beserta pengingat penilaian tiket, guest book, dan pengisian survei Form Builder yang berhalaman per bagian. Memuat juga versi build berjalan dan aturan kontrak yang mudah dilanggar diam-diam.",
       "kata_kunci": [
         "MyBharata",
         "mobile",
         "Flutter",
         "aplikasi karyawan",
         "presensi",
-        "clock-in",
         "survei",
-        "form builder",
-        "bagian",
+        "tiket",
+        "CSAT",
+        "penilaian",
         "versionCode"
       ]
     },
@@ -1001,8 +1000,8 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "15ea50b3beb52ab103c1b07f415a0de2d18cac5520b79e28c8836ae0b1830616",
-      "ukuran_kb": 65.5,
+      "hash": "71a1c49184df9370876eee281ecf3b441f50d6cb177df9ddbf1f15a02e664ce8",
+      "ukuran_kb": 65.4,
       "ringkasan": "Menjawab: modul apa saja yang tersedia di web ERP Bharata, bagaimana struktur Next.js dan konvensi UI-nya, serta bagaimana menu sidebar dipetakan ke kategori dan peran pemakai. Merinci fitur per domain termasuk Form Builder beserta editor bertab, editor bagian, keterangan ujung skala, dan halaman analisa jawabannya. Berguna untuk menemukan letak sebuah halaman sekaligus alasan di balik keputusan tampilannya.",
       "kata_kunci": [
         "Web ERP",
@@ -1535,7 +1534,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented & LIVE di dev** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849) + perbaikan [#855](https://github.com/bip-itteam-internal/bip-erp/pull/855)); terverifikasi end-to-end lewat gateway dev 2026-08-01. **PROD belum jalan** — container-nya belum pernah dibuat. FE web di [[APP - Web ERP]] sudah lengkap (kelola, builder, **analisa jawaban**), dan pengisian di [[APP - MyBharata]] sudah ada (section Survei di beranda + halaman isi 9 tipe). **Kepemilikan per departemen** menunggu merge PR [#869](https://github.com/bip-itteam-internal/bip-erp/pull/869).",
+      "status_teks": "**Implemented & LIVE di dev** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849) + perbaikan [#855](https://github.com/bip-itteam-internal/bip-erp/pull/855)); terverifikasi end-to-end lewat gateway dev 2026-08-01. **PROD belum jalan** — container-nya belum pernah dibuat. FE web di [[APP - Web ERP]] sudah lengkap (kelola, builder, **analisa jawaban**), dan pengisian di [[APP - MyBharata]] sudah ada (section Survei di beranda + halaman isi berbagian). **Kepemilikan per departemen, bagian, dan keterangan ujung skala sudah merged** (PR [#869](https://github.com/bip-itteam-internal/bip-erp/pull/869), [#870](https://github.com/bip-itteam-internal/bip-erp/pull/870), [#871](https://github.com/bip-itteam-internal/bip-erp/pull/871)) — **belum diverifikasi ulang di dev** setelah merge.",
       "publik": true,
       "tautan": [
         "Microservices - Attendance Service",
@@ -1552,8 +1551,8 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "0bed6c70a920c7b2cdb0f987dafef876322d6958241f832e44fc55907f020c4b",
-      "ukuran_kb": 19.0,
+      "hash": "5314717c311b0f8126a795efb6b97bce6d96dff8370e8d7fd789b7401924952e",
+      "ukuran_kb": 19.2,
       "ringkasan": "Menjawab: bagaimana form dinamis dibuat dan diterbitkan tanpa rilis kode per form, siapa yang memilikinya, dan bagaimana jawabannya direkap. Menjelaskan kepemilikan per departemen beserta cakupan supervisi HRGA, sembilan tipe pertanyaan plus penanda bagian dan keterangan ujung skala, sasaran form, gerbang presensi yang bisa menahan clock-in, serta analisa dan export CSV. Memuat pula jebakan BSON pada checkbox, kanonikalisasi ejaan departemen, dan backfill data lama saat service boot.",
       "kata_kunci": [
         "form builder",
@@ -2020,8 +2019,8 @@
       "tautan": [
         "Microservices - File Service",
         "HRIS - Organization Structure",
-        "APP - Web ERP",
         "APP - MyBharata",
+        "APP - Web ERP",
         "CORE - API Master Gateway",
         "DB - Overview and Notes",
         "Microservices - Employee Service",
@@ -2029,21 +2028,20 @@
         "APP - Dynamic Task Tracker",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "bf827e5a0a16bee7a038463ae5c96f745d70f241237bf1000aa8e424e654b99b",
-      "ukuran_kb": 15.7,
-      "ringkasan": "Menjawab: bagaimana alur tiket IT Helpdesk berjalan di board Kanban (Request→Todo→On Going→Testing→Done), bagaimana SLA response dan resolution dihitung serta eskalasi per jam bekerja, dan bagaimana approval, auto-assign round-robin, auto-close, hold/reopen, serta CSAT requester diimplementasikan. Juga menjelaskan cakupan divisi supervisor lintas departemen dan koneksi realtime via WebSocket.",
+      "hash": "8bae4b31363da82c47aba40772aa4f4a7960b0d623c37f8517df102178225a55",
+      "ukuran_kb": 16.6,
+      "ringkasan": "Menjawab: bagaimana tiket dibuat, ditriase, dikerjakan, dan ditutup di task-management, siapa yang boleh melakukan apa, serta bagaimana SLA dan kepuasan pemohon dihitung. Menjelaskan cakupan divisi lewat scopedDivisions, siklus status termasuk hold dan reopen, CSAT beserta daftar tiket yang menunggu penilaian, notifikasi, WebSocket, dan laporan tim. Berguna untuk memahami aturan izin sebelum mengubah perilaku tiket.",
       "kata_kunci": [
         "task management",
-        "IT helpdesk",
-        "ticketing",
-        "Kanban",
-        "SLA response resolution",
-        "approval tiket",
+        "tiket",
+        "support ticket",
+        "SLA",
         "CSAT",
-        "auto-assign",
-        "auto-close",
-        "WebSocket",
-        "hold reopen"
+        "penilaian",
+        "reopen",
+        "divisi",
+        "notifikasi",
+        "WebSocket"
       ]
     },
     {
