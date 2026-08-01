@@ -1,8 +1,8 @@
 ## Deskripsi
 
-*Endpoint **procurement-service** (master Pemasok + master Barang & Jasa: CRUD, penomoran, katalog, import awal, worker sync ke Accurate). Gateway: `/api/procurement/*`. Grounded ke `services/procurement/`.*
+*Endpoint **procurement-service** (master Pemasok + master Barang & Jasa: CRUD, penomoran, katalog, import awal, worker sync ke Accurate; plus cermin baca-saja Pembelian: Pesanan/Penerimaan/Permintaan Barang). Gateway: `/api/procurement/*`. Grounded ke `services/procurement/`.*
 
-- **Implementasi**: [[Microservices - Procurement Service]] · **Status**: ⚠️ Implemented (ada catatan) — backend lengkap & terverifikasi berjalan lokal (119 test PASS); belum di-deploy, import awal (pemasok maupun barang) belum dijalankan di produksi.
+- **Implementasi**: [[Microservices - Procurement Service]] · **Status**: ⚠️ Implemented (ada catatan) — backend Pemasok/Barang lengkap & terverifikasi berjalan lokal (119 test PASS); belum di-deploy, import awal (pemasok maupun barang) belum dijalankan di produksi. Modul Pembelian (PR #810) ✅ terverifikasi terhadap Accurate produksi read-only.
 - **Indeks**: [[API - Index]] · Auth: gateway key `BIP-Gateway-ID` untuk semua route, plus role guard via `BIP-System-Roles` header (`system_roles["procurement"]`). Role yang diterima: `staff`, `spv`, `admin`; route import khusus `admin`.
 
 ## Master Pemasok (✅ Diimplementasikan)
@@ -194,6 +194,132 @@
 { "data": { "terimpor": 139 } }
 ```
 
+## Pembelian — cermin Accurate BACA-SAJA (✅ Diimplementasikan)
+
+Arah data kebalikan dari Pemasok/Barang: dicatat finance **langsung di Accurate**, ditarik ke ERP otomatis (06:00 & 18:00 WIB) atau manual. Seluruh rute daftar membaca Mongo saja — **tidak pernah** memanggil Accurate saat layar dibuka.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/pesanan` | Daftar pesanan pembelian, cermin `purchase-order/list.do`. Query: `vendor_no`, `status` (cocok `status_name`). |
+| GET | `/penerimaan` | Daftar penerimaan, cermin `receive-item/list.do` + baris turunan `pesanan_nomor`/`selisih_hari`/`punya_selisih`/`terlambat` (dihitung saat dibaca). Query: `status`. |
+| GET | `/permintaan` | Daftar permintaan barang, cermin `purchase-requisition/list.do`. Query: `status`. Hanya `number`/`trans_date`/`status_name` — `requisitionType` tidak ada di list.do Accurate. |
+| GET | `/pembelian/status` | Kemajuan impor per modul: `berhasil_pada`, `jumlah_terakhir`, `gagal_pada`, `gagal_pesan`, `detail_terambil`. |
+| POST | `/pembelian/impor` | Penyegaran manual ketiga modul. Role `imporMassal` (bukan `akses` biasa). 200 bila ada yang berhasil; 502 hanya bila ketiganya gagal. Timeout 30 menit (impor pertama menarik detail ~belasan menit). |
+| POST | `/penerimaan/:id/tandai-tidak-sesuai` | Menandai satu penerimaan sebagai barang tidak sesuai (rusak/kurang/salah kirim). Body `{"keterangan": "..."}`, **wajib diisi** — `400` bila kosong/hanya-spasi, `404` bila id tidak ditemukan. Role `tulisPO` (bukan permission baru). Catatan milik ERP murni — Accurate tidak pernah ditulis. |
+| POST | `/penerimaan/:id/batal-tandai-tidak-sesuai` | Membatalkan penandaan. Tanpa body. Keterangan/penanda/waktu dikosongkan. Role `tulisPO`. `404` bila id tidak ditemukan. |
+
+**Response** `GET /pesanan`:
+```json
+{
+  "data": [
+    {
+      "id": "6a68a8f454ac69964f06f7ea",
+      "accurate_id": 123456,
+      "number": "PO.2026.07.0099",
+      "trans_date": "05/07/2026",
+      "ship_date": "12/07/2026",
+      "status": "OPEN",
+      "status_name": "Terbuka",
+      "approval_status": "Approved",
+      "percent_shipped": 40,
+      "total_amount": 15000000,
+      "vendor_no": "PBB-061",
+      "vendor_nama": "CV Contoh Jaya",
+      "catatan_erp": ""
+    }
+  ]
+}
+```
+> `vendor_no`/`vendor_nama` diratakan backend dari objek `vendor` **bersarang** Accurate — `vendorId`/`vendorName` tidak ada langsung di `purchase-order/list.do`.
+
+**Response** `GET /penerimaan`:
+```json
+{
+  "data": [
+    {
+      "penerimaan": {
+        "id": "6a68a8f454ac69964f06f7ea",
+        "accurate_id": 654321,
+        "number": "RI.2026.07.0050",
+        "trans_date": "10/07/2026",
+        "ship_date": "",
+        "status_name": "Difaktur",
+        "pesanan_accurate_id": 123456,
+        "pesanan_nomor": "PO.2026.07.0099",
+        "detail_terambil": true,
+        "catatan_erp": "",
+        "tidak_sesuai": false,
+        "keterangan_tidak_sesuai": "",
+        "tidak_sesuai_oleh": "",
+        "tidak_sesuai_pada": null
+      },
+      "pesanan_nomor": "PO.2026.07.0099",
+      "selisih_hari": 3,
+      "punya_selisih": true,
+      "terlambat": true,
+      "detail_terambil": true
+    }
+  ],
+  "detail_dari": "10/02/2026",
+  "detail_sampai": "31/07/2026"
+}
+```
+> `detail_dari`/`detail_sampai` (format `dd/MM/yyyy`) adalah jendela 6 bulan **yang benar-benar dipakai** backend saat itu — wajib ditampilkan FE agar cakupan periode tidak dibaca sebagai sepanjang masa. `punya_selisih=false` **tidak pernah** disertai angka hari yang berarti (`selisih_hari` tetap 0 tapi tidak dipakai) — `terlambat` juga selalu `false` dalam keadaan ini.
+>
+> Empat field `tidak_sesuai*` adalah catatan **milik ERP** (lihat bagian Penandaan di bawah) — muncul di **setiap** baris `penerimaan` karena dokumennya dibaca penuh (bukan lewat proyeksi terpisah), bukan hanya pada baris yang tertandai.
+
+**Query** `GET /penerimaan?hanya_tidak_sesuai=true`: menyaring HANYA baris yang sudah ditandai — menggerakkan daftar kerja "Barang Tidak Sesuai" lewat rute yang sama. Nilai apa pun selain `"true"` (termasuk tidak dikirim) berarti false: seluruh baris ditampilkan.
+
+**Request/Response** `POST /penerimaan/:id/tandai-tidak-sesuai`:
+```json
+// Request
+{ "keterangan": "dus penyok, 3 unit pecah" }
+
+// Response 200
+{
+  "data": {
+    "id": "6a68a8f454ac69964f06f7ea",
+    "accurate_id": 654321,
+    "number": "RI.2026.07.0050",
+    "tidak_sesuai": true,
+    "keterangan_tidak_sesuai": "dus penyok, 3 unit pecah",
+    "tidak_sesuai_oleh": "E1",
+    "tidak_sesuai_pada": "2026-07-31T09:00:00+07:00"
+  }
+}
+```
+> `400` bila `keterangan` kosong/hanya-spasi: `{"error": "keterangan wajib diisi — jelaskan apa yang tidak sesuai (rusak/kurang/salah kirim)"}`. `tidak_sesuai_oleh` diambil dari header `BIP-Employee-ID`, bukan dari body.
+
+**Response** `POST /penerimaan/:id/batal-tandai-tidak-sesuai`:
+```json
+{
+  "data": {
+    "id": "6a68a8f454ac69964f06f7ea",
+    "tidak_sesuai": false,
+    "keterangan_tidak_sesuai": "",
+    "tidak_sesuai_oleh": "",
+    "tidak_sesuai_pada": null
+  }
+}
+```
+
+**Response** `GET /pembelian/status`:
+```json
+{
+  "data": [
+    {
+      "modul": "pesanan",
+      "berhasil_pada": "2026-07-31T06:00:12+07:00",
+      "jumlah_terakhir": 1036,
+      "gagal_pada": null,
+      "gagal_pesan": "",
+      "detail_terambil": 0
+    }
+  ]
+}
+```
+> `berhasil_pada: null` = modul ini **belum pernah** berhasil disegarkan. `gagal_pada` terisi hanya bila percobaan **terakhir** gagal — ditampilkan berdampingan dengan `berhasil_pada` supaya data lama yang masih tampil tidak dikira data terkini.
+
 ## Belum Diimplementasikan / Catatan
 
 - Tidak ada endpoint **hapus pemasok** maupun **hapus barang** — penghapusan master dilakukan finance/procurement di Accurate.
@@ -206,6 +332,9 @@
 - WhatsApp (`no_wa`) hanya tersimpan di ERP — `vendor/save.do` tidak menyediakan
   field WhatsApp untuk pemasok.
 - Pengosongan nilai belum tersinkron (`omitempty`) — TBD, lihat dok implementasi.
+- **Pembelian tidak punya endpoint tulis ke Accurate** — tak ada `POST`/`PUT`/`DELETE` yang mengirim pesanan/penerimaan/permintaan ke Accurate; seluruhnya dicatat finance di Accurate, ERP hanya mencerminkan. Pengecualian: `POST /penerimaan/:id/tandai-tidak-sesuai` dan `.../batal-tandai-tidak-sesuai` **menulis ke Mongo ERP saja** (catatan gudang internal) — Accurate tetap tidak pernah disentuh, penerimaan tetap cermin murni.
+- **Permintaan barang hanya tiga field tampil** (`number`/`trans_date`/`status_name`) — `requisitionType` tidak dikembalikan `purchase-requisition/list.do`, bukan bug pengambilan data.
+- **`purchaseOrderId` di penerimaan hanya terisi dalam jendela 6 bulan** — di luar jendela itu, `pesanan_nomor` kosong bukan karena pembelian langsung, melainkan detailnya belum pernah ditarik (`detail_terambil=false`).
 
 ## Dependensi & Integrasi
 

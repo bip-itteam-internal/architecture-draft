@@ -31,7 +31,7 @@ Seluruhnya `GET` kecuali disebut lain. Sumber: `routes.go`, `handler_mart.go`, `
 | Endpoint | Isi |
 |---|---|
 | `/summary` | Ringkasan lintas sumber |
-| `/profit/shops` · `/profit/products` · `/profit/campaigns` · `/profit/ads` | Laba per level entitas per hari dari `mart_profit_attribution` |
+| `/profit/shops` · `/profit/products` · `/profit/campaigns` · `/profit/ads` | Laba per level entitas dari `mart_profit_attribution`. **Bawaannya BULANAN** — satu baris per entitas per bulan per channel; rincian per tanggal diminta lewat `granularitas=harian` (lihat *Granularitas* di bawah) |
 | `/videos` | Performa video. Baris berupa `VideoRow`, bukan dokumen mart apa adanya, karena halaman video punya tiga tab (VSA / GMV Max / organik) yang hanya dapat dipisahkan lewat `spend_vsa`, `spend_gmv_max`, dan `sumber` |
 | `/lives` | Sesi live dari `mart_live_sessions` |
 
@@ -82,7 +82,7 @@ Seluruh index unik dibuat saat boot (`index.go`). Kolom "prod" adalah `estimated
 
 | Koleksi | Kunci unik | Prod | Isi |
 |---|---|---:|---|
-| `mart_profit_attribution` | `channel + level + entity_id + date` | 405.543 | Laba per hari. `level` = shop / product / campaign / ad / video / live |
+| `mart_profit_attribution` | `channel + level + entity_id + date` | 405.543 | Laba per hari. `level` = shop / product / campaign / ad / video / live. **`entity_id` level product = master SKU** (bukan SKU jual) sejak penggabungan per produk; SKU yang belum termapping tetap memakai SKU aslinya |
 | `mart_video_performance` | `channel + video_id` | 87.813 | **Snapshot kumulatif, sengaja tanpa dimensi hari** |
 | `mart_ad_creative_link` | `advertiser_id + ad_id + tiktok_item_id` | 7.814 | Jembatan ad ke post organik |
 | `sync_state` | `channel + job` | 3 | Cursor, `last_run_at`, `last_ok_at`, `last_error` per job |
@@ -98,17 +98,61 @@ Perbaikannya struktural: dimensi harinya dibuang, bukan dibatasi. Dengan satu ba
 
 > **Catatan deploy**: `CreateOne` tidak mengganti index yang sudah ada. Perubahan kunci unik pada `mart_video_performance` dan `mart_profit_attribution` menuntut `dropIndex` index lama secara manual. Verifikasi production 2026-07-31 menunjukkan **index baru sudah aktif** pada ketiga koleksi berisi, jadi migrasinya sudah dijalankan.
 
+> **Catatan deploy — penggabungan per master SKU**: susunan kunci upsert **tidak berubah**, tetapi **arti `entity_id` level product berubah** (SKU jual → master SKU). Dokumen product lama ber-`entity_id` SKU jual **tidak** diperbarui oleh sync baru karena kuncinya berbeda: ia berhenti disentuh sementara baris master-nya lahir di sebelahnya, sehingga `/profit/products` akan menampilkan **angka dobel** bila tidak dibersihkan. Tindakan yang disarankan: **hapus dokumen `mart_profit_attribution` yang `level: "product"` sebelum deploy**, lalu jalankan ulang sync jendela penuh. Nilainya dihitung ulang dari sumber, jadi drop + re-sync lebih murah dan lebih aman daripada memetakan ulang `entity_id` per dokumen. Level shop/campaign/ad/video **tidak terdampak**.
+
+## Granularitas halaman laba — bulanan sebagai bawaan
+
+Mart berdimensi **hari**, dan halaman laba dulu menampilkannya apa adanya. Terukur production Juli 2026 level product TIKTOK: **969 baris untuk 247 entitas**, satu entitas sampai **31 baris**. Produk yang sama muncul berkali-kali dan menilai labanya memaksa mata menjumlah sendiri — keluhan nyata pengguna.
+
+Sejak itu keempat tab `/profit/*` **default BULANAN**: satu baris per entitas per bulan per channel. Rincian harian **tidak dihapus**, ia turun satu lapis dan diminta lewat drill.
+
+| Parameter | Nilai | Bila tak dikirim |
+|---|---|---|
+| `granularitas` | `bulanan` \| `harian` | `bulanan` |
+| `bulan` | `YYYY-MM` (mis. `2026-07`) — **menggantikan** `dari`/`sampai` | rentang bawaan biasa |
+| `entity_id` | id entitas yang diklik, menyaring drill ke satu entitas | seluruh entitas |
+
+Nilai `granularitas` yang tak dikenal membalas **400** beserta daftar nilai sah, **bukan** jatuh diam-diam ke bawaan — seragam dengan kontrak `sort_by`/`sort_dir`. Salah ketik yang dilayani dengan bawaan membuat pengguna yakin sedang melihat rincian harian padahal melihat agregat.
+
+Baris bulanan membawa field **`bulan`**; baris harian tidak. Itulah cara FE membedakan keduanya tanpa menebak dari bentuk `date` (baris bulanan memakai `date` = tanggal 1 bulan itu agar tetap dapat diurutkan bersama baris harian).
+
+**Dihitung saat baca, tanpa koleksi mart bulanan terpisah.** Aturan repo: pra-agregasi bila menggabungkan lintas koleksi atau menghitung laba. Di sini sumbernya **satu** koleksi dan labanya **sudah** dihitung saat sync — yang tersisa hanya penjumlahan kolom aditif, dan index `level_1_date_1_channel_1` yang sudah ada melayani `$match`-nya. Terukur production: **5–41 ms** untuk shop/product/campaign/ad. Koleksi kedua akan menambah sumber kebenaran yang wajib disinkronkan, dan setiap kelambatannya tampil sebagai angka bulanan yang tidak cocok dengan hariannya.
+
+**Batas bulan WIB (Asia/Jakarta), bukan UTC.** `2026-07-31T18:00:00Z` adalah 1 Agustus 01:00 WIB; memotongnya pakai UTC memindahkannya ke Juli. Repo ini sudah pernah kena bug zona waktu (selisih revenue vs seller center), jadi batasnya tidak boleh bergantung pada "kebetulan sepakat" karena baris mart umumnya sudah dinormalkan ke tengah malam UTC.
+
+**Yang dijaga saat menggabungkan** (masing-masing punya uji mutasi):
+- **Invarian ads_cost tetap utuh** — terbukti atas data production nyata, selisih `0.0000` di seluruh level & channel: TIKTOK shop/product `1.301.399.198`, campaign `1.301.464.803`.
+- **`attribution_kolom` menular, tak pernah terhapus** — satu hari bertanda berarti bulannya bertanda. Penggabungan yang menimpa dengan peta hari terakhir membuat baris perkiraan terbaca **aktual**.
+- **`belum_termapping` menular** — satu hari `true` membuat bulannya `true`.
+- **`icc` digabung tanpa kembar dan tanpa kehilangan daftarnya**; status `tak_tersedia` (level ad, tak berdimensi toko) **tidak** dilebur jadi `belum_ditetapkan`, karena yang pertama berarti melengkapi mapping tidak akan mengisinya.
+- **`ads_cost` SHOPEE yang nol tetap nol** dan barisnya tetap tampil — bug terpisah di jalur iklan Shopee tidak boleh tersamarkan oleh agregasi.
+
+**`/videos` MENOLAK `granularitas` (400), bukan mengabaikannya.** Dua sebab yang masing-masing sudah cukup: `mart_video_performance` adalah **snapshot kumulatif** satu baris per video **tanpa dimensi hari**, sehingga tak ada yang dapat dijumlah per bulan dan melayaninya akan mengembalikan baris yang sama berlabel "bulanan"; dan barisnya membawa kolom **rasio/rata-rata** (`completion_rate`, `avg_watch_sec`) yang memang tak boleh dijumlah.
+
+> **Kolom rasio & rata-rata**: `MartProfitAttribution` seluruhnya kolom **aditif**, sehingga penjumlahan lurus aman. Itu bukan kebetulan yang boleh diandalkan diam-diam — bila kolom rasio (ROAS, `return_rate_pct`, …) kelak ditambahkan, ia **wajib** dihitung ulang dari pembilang/penyebut bulanan, bukan lewat jalur penjumlahan.
+
 ## Kejujuran Data (bagian yang tidak boleh dihapus)
 
 Service ini menyimpan **alasan ketidaklengkapan bersama datanya**, bukan membiarkan angka kosong dibaca sebagai nol.
 
 - **Envelope kanal**: `/videos` dan `/lives` selalu menandai Lazada `unavailable` beserta alasannya (`ReasonLazadaNoVideo`, `ReasonLazadaNoLive`), supaya tabel kosong tidak terbaca sebagai "data hilang". Lazada Open Platform memang tidak menyediakan analytics konten.
-- **`attribution` + `attribution_note`** pada tiap baris laba. Nilai `estimated` berarti biaya iklannya hasil prorata, bukan aktual. Catatan production yang terpasang saat ini menyatakan: retur **tidak dapat diatribusikan ke level iklan** (laporan iklan tidak membawanya, order tidak menyimpan campaign/ad/video id), sehingga `retur = 0` di level itu berarti **tidak diketahui, bukan nol**; dasar labanya `gross_revenue` laporan iklan, bukan settlement bersih; potongan marketplace belum dikurangkan.
+- **`attribution_kolom` — penanda aktual vs perkiraan melekat PER KOLOM**, bukan per baris. Bentuknya peta `nama kolom -> alasan terbaca manusia`; kolom yang **tidak ada di peta berarti aktual**, dan peta kosong berarti seluruh baris aktual. Nama kuncinya persis tag json kolom yang ditandai (`ads_cost`, `gross_profit`, `retur`, …).
+
+  Penanda tingkat-baris sebelumnya memvonis **seluruh** baris padahal hanya sebagian kolomnya perkiraan. Terukur production Juli 2026: seluruh 2.384 baris level campaign bertanda `estimated`, dan pengguna membacanya sebagai "biaya iklan tidak valid" — padahal biaya iklannya **aktual**, Rp1.289.007.856 cocok persis dengan total belanja GMV Max. Yang perkiraan adalah **labanya**. Karena itu `ads_cost` kini tampil polos kecuali benar-benar hasil prorata (Shopee GMS / Lazada) **dan** nilainya bukan nol.
+
+  Alasan yang terpasang: retur **tidak dapat diatribusikan ke level iklan** (laporan iklan tidak membawanya, order tidak menyimpan campaign/ad/video id), sehingga `retur = 0` di level itu berarti **tidak diketahui, bukan nol**; dasar labanya `gross_revenue` laporan iklan, bukan settlement bersih; potongan marketplace belum dikurangkan; HPP yang belum diketahui membuat kolom `hpp` dan `gross_profit` perkiraan sementara `revenue` dan `ads_cost` tetap aktual.
+
+- **`attribution` + `attribution_note` kini TURUNAN** dari `attribution_kolom` (`estimated` bila ada kolom bertanda, catatannya gabungan seluruh alasan), **dipertahankan sementara supaya FE lama tidak pecah**. **Utang teknis** — dihapus setelah FE membaca `attribution_kolom`.
+
+- **`master_sku` + `belum_termapping`** pada level product. `entity_id` level product adalah **master SKU**, bukan SKU jual: 39 master_sku unik dari 1.748 SKU, sehingga produk bernama sama tidak lagi terpecah. Baris yang `master_sku`-nya kosong **tetap tampil sendiri-sendiri** dengan SKU aslinya dan bertanda `belum_termapping` — tidak dibuang dan **tidak dilebur jadi satu baris "lain-lain"** (67 SKU nyata senilai Rp3,7 M; satu baris sebesar itu tak dapat ditindaklanjuti siapa pun). Begitu mapping dibersihkan, baris-baris itu menyatu sendiri tanpa ubah kode.
+
+- **`icc` — penanggung jawab toko**, dibaca dari `insentive_db.employee_performance_mappings` (database **dan** container Mongo terpisah; baca-saja). Membawa **daftar** pemegang + status + keterangan, bukan satu nama: satu toko dapat dipegang lebih dari satu orang (terverifikasi production: toko `7495537364189547259` dipegang dua orang sekaligus), dan bentuk satu-nilai akan memilih salah satu mengikuti urutan iterasi Mongo — kolomnya terisi, terbaca benar, dan salah. Statusnya **tiga**, bukan dua: `ditetapkan` / `belum_ditetapkan` (tim insentif perlu melengkapi mapping) / `tak_tersedia` (melengkapi mapping **tidak** akan mengisinya). Level `ad` selalu `tak_tersedia` karena **levelnya**, bukan karena isi `shop_id` per baris — cakupan `shop_id` production: shop/product/campaign/video 100%, ad **0 dari 10.650** (laporan VSA berdimensi `ad_id` saja).
+  > **TBD**: pemuatan indeks ICC (`muatICCAman` / `bacaIndeksICC` di `sumber_agregasi.go`) **belum terpasang**. Sampai itu dilakukan, kolomnya berbunyi `belum_ditetapkan` untuk semua toko — belum terisi, bukan salah.
 - **`SpendVSA` dan `SpendGMVMax` sengaja tetap terpisah** sampai ke penyimpanan: yang satu biaya aktual per `ad_id`, yang lain hasil prorata tingkat kampanye. Menggabungkannya menghapus pembedaan yang menjadi alasan seluruh agregasi video dibangun.
 - **`AdaSumberLain`** menandai video yang spend-nya juga tercatat di tab lain, supaya pembaca satu tab tidak menghitung ROAS dari spend yang belum lengkap.
 - **`CompletionRate` bernilai nil untuk TikTok**, artinya tidak tersedia di platform, bukan nol.
 - **`VideoURL` kosong** bila `creator_username` tidak ada (3% dari 84.134 baris). Kosong berarti tidak ada tautan, bukan tautan rusak; menebaknya menghasilkan URL yang pasti 404.
-- **`EntityName` tidak pernah kosong**: bila lookup meleset, isinya `entity_id` apa adanya, karena id mentah masih dapat ditelusuri ke seller center sementara `""` atau `"Unknown"` menghapus satu-satunya pegangan.
+- **`EntityName` tidak pernah kosong**: bila lookup meleset, isinya `entity_id` apa adanya, karena id mentah masih dapat ditelusuri ke seller center sementara `""` atau `"Unknown"` menghapus satu-satunya pegangan. Untuk level product yang `entity_id`-nya kini master SKU, namanya dicari lewat `product_name` milik master itu, dan jatuh ke master SKU bila kosong.
 - **`sync_state.last_error` dipakai juga untuk CATATAN**, bukan hanya error. Isi production 2026-07-31 mencontohkannya: `sync-profit-attribution` mencatat sejumlah SKU tanpa HPP berlaku (laba baris terkait lebih besar dari sebenarnya) dan sejumlah rupiah belanja iklan yang tidak dapat dipetakan ke SKU; `sync-video-performance` mencatat 3.679 video ber-spend tanpa baris organik.
 
 ## Persona / Pengguna
