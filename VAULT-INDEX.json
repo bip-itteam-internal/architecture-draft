@@ -1000,19 +1000,19 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "b15785586776a434999c61a668f3171d9d0836958927b1aa7d5acb203f434bde",
+      "hash": "66c400654363b694b0025a5e3557c48a760db57da1cdaa1f5467696a298238f6",
       "ukuran_kb": 63.3,
-      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (erp-frontend / \"One Bharata\"), stack apa yang dipakai (Next.js App Router, React, TypeScript, shadcn/Radix/Tailwind, TanStack Query, react-i18next), dan modul apa saja yang tersedia untuk HR, attendance, finance/insentif, IT, GA, serta integrasi marketplace. Menjelaskan juga cara login dan refresh token lewat gateway, peran web ini sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager, dan bagaimana sidebar/menu digerbang oleh cookie system_roles per module dan role. Berguna untuk pertanyaan soal dukungan multi-perusahaan (company switcher, shift/rotasi/mesin fingerprint/network per perusahaan), pengelompokan menu bersarang, setelan Tampilan Menu per jabatan (menu_hidden, beda dari permission set), perataan induk menu tipis, menu KPI untuk Leader, serta halaman Atasan Langsung dan Bagan Organisasi.",
+      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (hris-dashboard / \"One Bharata\"), stack dan repo mana yang dipakai, serta modul apa saja yang tersedia di dalamnya. Menjelaskan cara login dan refresh token, bagaimana peran dari `system_roles` menentukan menu yang tampil, dan bagaimana web ini bertindak sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager. Juga menjawab pertanyaan seputar dukungan multi-perusahaan (company switcher, kelola perusahaan/departemen/shift/network per-perusahaan), penyusunan dan penyembunyian menu sidebar per jabatan, serta pengaturan atasan langsung dan akses KPI untuk Leader.",
       "kata_kunci": [
         "erp-frontend",
-        "web ERP",
-        "One Bharata",
         "hris-dashboard",
+        "One Bharata",
+        "web ERP",
         "Next.js",
         "SSO",
         "system_roles",
+        "role gating",
         "sidebar menu",
-        "company switcher",
         "multi-perusahaan"
       ]
     },
