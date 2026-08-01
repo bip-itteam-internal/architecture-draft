@@ -152,6 +152,83 @@ Enam belas baris metrik bertema monitoring tim tersebar di 15 posisi, tetapi **d
 
 Label keenam belas baris itu juga punya **enam varian penulisan**, termasuk satu berspasi di ujung (`Monitoring Team `) dan satu typo (`Perfomance Monitoring`). Karena label adalah kunci identitas metrik di kode, inilah alasan konkret kunci stabil dibutuhkan (lihat Fase 1 nomor 2).
 
+## Matriks metrik per posisi (kandidat otomasi)
+
+Label ditulis **persis** seperti tersimpan di `kpi_template` produksi, termasuk typo dan spasi, karena label adalah kunci identitas metrik di kode. Bobot dan target disalin apa adanya dari `weight` dan `description`. Daftar lengkap 311 metrik tidak disalin ke sini karena akan cepat basi; ia dibaca dari koleksi `kpi_template` (urutkan `department`, `position`).
+
+### ICC (36 orang aktif, kandidat pertama)
+
+Posisi terbesar yang dikaji: **Beauty Hacks 24 aktif dari 26, Kyura 12 aktif dari 15**. Dua departemen memakai template berbeda meski posisinya sama.
+
+**Kyura, template `INTERNAL CONTENT CREATOR `**
+
+| Bobot | Label | Target (dari deskripsi) | Sumber | Status |
+|---:|---|---|---|---|
+| 0,4 | `Kuantitas Video Konten` | 125 video/bulan | `tt_shop_video_performances.published_at` | ✅ |
+| 0,2 | `Video Memenuhi Standar Struktur Indikator 10.000/video` | ≥ 70% atau min. 87 video | `gmv` per video ≥ 10.000 | ✅ |
+| 0,4 | `Video Memenuhi Standar Struktur Indikator 150.000/video` | ≥ 30% atau min. 37 video | `gmv` per video ≥ 150.000 | ✅ |
+
+**Beauty Hacks, template `INTERNAL CONTENT CREATOR`**
+
+| Bobot | Label | Target | Sumber | Status |
+|---:|---|---|---|---|
+| 0,4 | `Jumlah Video` | 125 video/bulan | sama dengan Kyura | ✅ |
+| 0,2 | `Video Memenuhi Standar Struktur Indikator VSA` | ≥ 70% atau min. 87 video | `mart_video_performance.sumber` = `vsa` | ⚠️ sumber berbeda |
+| 0,4 | `Video Memenuhi Standar Struktur Indikator GMV MAX` | ≥ 30% atau min. 37 video | `mart_video_performance.sumber` = `gmv_max` | ⚠️ sumber berbeda |
+
+Perhatikan bahwa angka `10.000` dan `150.000` pada Kyura adalah **ambang GMV**, sedangkan `VSA` dan `GMV MAX` pada Beauty Hacks adalah **jenis iklan**. Bobotnya kebetulan sama (0,2 dan 0,4) sehingga mudah dikira metrik yang sama; keduanya butuh sumber data yang berbeda.
+
+**Ambangnya dibuktikan dari data, bukan ditafsirkan.** Untuk 10 toko Kyura sepanjang Juli 2026 (3.419 video):
+
+| Tafsir | Hasil | Target | Layak? |
+|---|---:|---:|---|
+| `gmv` ≥ 10.000 | 37% | 70% | ✅ menantang tapi tercapai |
+| `gmv` ≥ 150.000 | 20% | 30% | ✅ |
+| `views` ≥ 10.000 | 3% | 70% | ❌ semua orang gagal selamanya |
+| `views` ≥ 150.000 | 0% | 30% | ❌ |
+
+**Atribusi**: lewat `icc_account_mappings.employee_id` → `tiktok_shop_id` → video toko itu. Berlaku karena satu orang memegang satu toko dan tokonya berbeda-beda. Jangan lewat kolom `team` di koleksi yang sama: kolom itu menulis `"Tech Development"` untuk sepuluh orang yang `work_data`-nya berkata `Kyura`.
+
+Keadaan pemetaan per 2026-08-01: **Kyura 10 dari 12 aktif** (kurang Annisa Nurul Fadhilah `BIP-0086-09-24` dan Priyastama Wahyu Romadhoni `BIP-0169-06-25`); **Beauty Hacks praktis nol** (satu-satunya barisnya milik Aan Budiyanto dan sudah nonaktif).
+
+**Skor manual saat ini meleset ke dua arah.** Perbandingan Juni 2026, skor tersimpan di `kpi_score` vs hasil hitung dari data video:
+
+| Orang | Video Juni | Manual | Hitungan data | Selisih |
+|---|---:|---:|---:|---:|
+| Dika | 308 | 54,0 | 76,0 | +22,0 |
+| Firdaus | 465 | 42,2 | 61,2 | +19,0 |
+| Ryfanda | 147 | 45,4 | 63,4 | +18,0 |
+| Ardiyansah | 155 | 40,0 | 52,0 | +12,0 |
+| Fitriyah | 262 | 52,8 | 63,2 | +10,4 |
+| Wiky | 684 | 44,3 | 54,2 | +9,9 |
+| Burhanuddin | 178 | 41,1 | 50,2 | +9,1 |
+| Putri | 319 | 45,4 | 43,4 | -2,0 |
+| Silvia | 735 | 75,6 | 63,0 | -12,6 |
+| Dzimar | **31** | 42,2 | **12,8** | **-29,4** |
+
+Dua pola yang menjelaskannya, dan keduanya bukan kesalahan orang per orang:
+
+- **Metrik `...10.000/video` diisi 0 untuk SEMUA orang, tiap bulan**, padahal 8% sampai 32% video tiap toko melewati ambang itu. Pola "semua nol, selalu" adalah ciri metrik yang tak seorang pun tahu cara menghitungnya.
+- **Kuantitas video diisi 100 walau realisasinya jauh di bawah target**: Dzimar menerbitkan 31 dari 125 video (25%) tetapi dinilai penuh.
+
+⚠️ **Belum diputuskan**: deskripsi berbunyi "≥ 70% **atau min. 87 video**". Perbandingan di atas hanya memakai sisi persentase. Bila cabang jumlah absolut ikut dihitung (ambil yang lebih menguntungkan), skor pemilik volume tinggi seperti Wiky (684 video) dan Silvia (735) naik lebih jauh.
+
+### Kyura, posisi selain ICC
+
+| Posisi | Bobot | Label | Status |
+|---|---:|---|---|
+| Kyura Supervisor | 0,6 | `Revenue 240M` | 🟡 deskripsi memuat **tiga** angka: label 240M, "Target Profit 546 jt", "Omset 4.090.000.000" |
+| Kyura Supervisor | 0,05 | `Inventory turn over 90 days` | 🔴 tidak ada modul forecast |
+| Kyura Supervisor | 0,05 | `Customer Satisfactions untuk Produk Beautyhacks 4,5 dari 5` | 🟡 rating toko tersedia, tapi **labelnya menyebut produk Beautyhacks di template Kyura** |
+| Kyura Supervisor | 0,3 | `Performance Monitoring Team` | ✅ agregasi `kpi_score` departemen |
+| Host Live | 0,7 · 0,3 | `Conversion` · `ROI` | ✅ GMV-Max dan `mart_profit_attribution` |
+| Leader | 0,4 · 0,4 · 0,2 | `ROI` · `Conversion / OMZET` · `Perfomance Monitoring` | ✅ · ✅ · ❌ sirkular |
+| Marketplace Advertiser | 0,5 · 0,5 | `Conversion` · `ROI` | ✅ |
+| Affiliate | 0,4 · 0,4 · 0,2 | `Jumlah Affiliate Aktif` · `Conversion` · `Perfomance Monitoring` | 🟡 · ✅ · ❌ sirkular |
+| Meta Advertiser | 0,5 · 0,5 | `Conversion` · `ROI` | ❌ Meta Ads tidak terintegrasi |
+| Customer Support | 0,4 · 0,4 · 0,2 | `Perfoma` (rating toko) · `Kinerja` (respon chat) · `Kaizen` | ✅ · ❌ · ❌ |
+| Buzzer | 5 metrik | `Early Engagement Speed` dst. | ❌ akun personal, tanpa API |
+
 ## Rencana Bertahap
 
 Batas service dan kepemilikan datanya diputuskan di [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]: otomasi dikerjakan di dalam employee-service dulu, `kpi_score` tetap milik employee-service, dan pemisahan `kpi-collector` ditunda sampai pemicu yang tertulis di ADR terpenuhi.
@@ -162,9 +239,13 @@ Batas service dan kepemilikan datanya diputuskan di [[ADR - 0032 Kepemilikan kpi
 	- Cakupan yang benar-benar tersentuh: **7 baris** supervisor level departemen, bukan 13 seperti tertulis di versi awal dokumen ini.
 	- Belum menghasilkan apa pun sampai HR mengisi konfigurasi `auto` pada ketujuh metrik lewat `POST /kpi/templates`. Ini disengaja: tidak ada nama posisi yang di-hardcode, sehingga departemen atau perusahaan baru tidak menuntut ubah kode.
 	- Frontend belum ada, jadi usulan sistem belum tampil di modal Score KPI.
-3. Auto-fill metrik kedisiplinan dari `GET /attendance/report`. **Belum dikerjakan.**
-4. Auto-fill KPI Tech Development dari `task-management` dan `monitoring` (14 metrik). Departemen paling siap sekaligus dikerjakan tim sendiri, cocok sebagai pilot.
+3. **Auto-fill ICC (36 orang aktif) — posisi yang dipilih dikerjakan lebih dulu.** Belum dikerjakan. Rincian label, ambang, atribusi, dan perbandingan skor manual vs data ada di bab Matriks di atas. Dipotong dua: **Kyura 12 orang** (10 sudah terpetakan, satu sumber data) lalu **Beauty Hacks 24 orang** (butuh 24 pemetaan diisi dan sumber kedua `mart_video_performance.sumber` disambungkan).
+4. Auto-fill metrik kedisiplinan dari `GET /attendance/report`. **Belum dikerjakan.**
 5. Bersihkan data master sesuai bab Temuan Data Master.
+
+> **Tech Development ditunda, meski persentasenya tertinggi di tabel Rekap.** Persentase itu menghitung "sumber datanya ada", bukan "sumbernya cukup terisi". Pemeriksaan kepadatan 2026-08-01: CSAT hanya **8 tiket ter-rating seumur hidup**, dan SLA resolusi **0 dokumen** memenuhi syarat hitung (`due_date` dan `completedAt` tak pernah terisi bersamaan dari 293 task). Yang benar-benar tegak di sana tinggal uptime dan skor tim, sekitar 4 metrik. Kekurangannya juga beda kelas: ICC butuh tabel pemetaan diisi sekali, Tech Development butuh orang mengubah kebiasaan mengisi due date dan meminta rating tiap hari.
+>
+> Temuan ikutan yang perlu ditangani tim IT terpisah dari KPI: **SLA resolusi tiket saat ini tidak terukur sama sekali.**
 
 **Fase 2, perlu development ringan**
 6. ~~Tambahkan penanda sumber pada `KPIMetric`~~ **sudah dikerjakan di Fase 1** (`auto_value` terpisah dari `value`, sumber diturunkan `SumberMetrik`). **Sisanya**: jejak **alasan** saat supervisor menimpa angka sistem, meniru `PATCH /results/:id/override` di insentive. Saat ini penimpaan hanya terdeteksi dari `value != auto_value`, tanpa alasan.

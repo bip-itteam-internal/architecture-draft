@@ -4377,20 +4377,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "d2699ee549e51bb6efdcae022d55c946628d690cd611585073b317314bc3edd6",
-      "ukuran_kb": 21.7,
-      "ringkasan": "Menjawab: metrik KPI mana saja yang bisa diisi otomatis dari data yang sudah ada di ERP, dan dari koleksi/endpoint mana nilainya diambil (TikTok GMV Max, mart_profit_attribution, transaction_orders, Accurate profit-loss/receivables, attendance report, SLA & CSAT task-management, Uptime Kuma, procurement lead-time, warehouse resi). Menjelaskan klasifikasi 311 metrik di 70 template menjadi otomatis penuh, semi-otomatis, terblokir data kosong, dan manual, lengkap dengan rekap persentase per departemen. Juga menjawab kenapa sebagian metrik belum bisa diotomatiskan, mulai dari label metrik sebagai kunci pemetaan, budget/anggaran yang tidak tersimpan di ERP, sampai departemen yang belum punya template KPI sama sekali.",
+      "hash": "5b8adfacd26649be999b6c693c4fb1679c0e68f5657dea4e23c9e8451c84b082",
+      "ukuran_kb": 28.0,
+      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang skornya bisa diisi otomatis dari data ERP dan mana yang tetap manual, serta sumber data (koleksi/endpoint) apa yang dipakai untuk tiap klaster metrik. Menjelaskan juga klasifikasi metrik (otomatis penuh, semi-otomatis, terblokir data, manual), rekap kelayakan otomasi per departemen, dan apa yang masih kurang agar metrik semi-otomatis bisa dihitung sendiri. Berguna untuk mencari tahu mengapa metrik tertentu belum bisa auto-fill, peran label metrik sebagai kunci pengikat otomasi, serta rencana bertahapnya.",
       "kata_kunci": [
         "KPI",
         "otomasi skor KPI",
+        "KPI automation",
         "auto-fill KPI",
         "kpi_template",
         "kpi_score",
-        "metrik",
-        "bobot metrik",
-        "employee service",
+        "metrik KPI",
         "penilaian kinerja",
-        "performance metrics"
+        "performance score",
+        "employee service"
       ]
     },
     {
