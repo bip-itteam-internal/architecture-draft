@@ -95,6 +95,7 @@
 | GET/POST/PUT/DELETE | `/accurate/products[/list|/:id]` | Produk Accurate |
 | GET/POST/PUT/DELETE | `/accurate/bank-accounts[/list|/:id]` | Rekening bank Accurate |
 | GET/POST/PUT/DELETE | `/accurate/settings/kv-configs[/list|/:id]` | KV config Accurate |
+| GET | `/accurate/settings/kv-configs/catalog` | **Katalog laci akun GL** yang dikenali sistem (kunci + label + catatan akibat bila dikosongkan). Sumber tunggal daftar yang dirender FE Config Accurate — sebelumnya daftar dihardcode di frontend sehingga kv baru tak pernah muncul di layar operator. Menambah laci cukup mendaftarkannya di `entity.AccurateKVAccountCatalog` |
 | GET | `/accurate/daily-invoices` | List faktur harian auto-sync RTS (filter `shop_id`, `channel`, `date`/`date_from`/`date_to` (WIB `YYYYMMDD`), `status` SENT/FAILED/PENDING; paginated) |
 | POST | `/accurate/daily-invoices/:id/retry` | Retry sinkron faktur auto-sync (re-snapshot order `TO_SHIP` shop-hari → kirim ulang, balas status akhir) |
 | GET | `/accurate/daily-returns` (+ `/:id`, `/export`) | List/detail/export retur auto-sync (Retur Penjualan; filter `shop_id`/`channel`/`date`/`date_from`/`date_to`/`status` = `PENDING`/`SENT`/`FAILED`/`SKIPPED` (SKIPPED = sengaja dilewati & benar, hanya retur era manual pra-cutover — bukan kegagalan) + **`search`** (alias `order_id`) = cari by nomor pesanan **atau** nomor retur, partial & case-insensitive; `/export` memakai filter yang sama; paginated). *Status `FULL_VIA_INVOICE`/`HELD_REFUND_ONLY` **dihapus** oleh [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]].* |
