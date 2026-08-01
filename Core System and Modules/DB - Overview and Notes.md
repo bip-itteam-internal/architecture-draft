@@ -109,7 +109,7 @@ Doc: [[Microservices - Payroll Service]] (⚠️ Fase 1 — Salary Setup & Confi
 - payroll_config
 
 ### form-builder — `form-builder-mongo-db` ⚠️
-Doc: [[Microservices - Form Builder Service]] (⚠️ branch `feat/form-builder`, belum merge/deploy)
+Doc: [[Microservices - Form Builder Service]] (⚠️ merged 2026-08-01, belum live di dev)
 - forms (definisi form + sasaran + pengaturan gerbang presensi)
 - form_responses (jawaban; `fingerprint` = sidik isi untuk guard idempotensi)
 - Keduanya ber-`company_id` **sejak awal** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]), bukan ditambal belakangan.

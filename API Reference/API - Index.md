@@ -35,7 +35,7 @@
 | Procurement | `/api/procurement/*` | [[API - Procurement Service]] | [[Microservices - Procurement Service]] |
 | Form Builder ⚠️ | `/api/form-builder/*` | [[API - Form Builder Service]] | [[Microservices - Form Builder Service]] |
 
-> ⚠️ Form Builder masih di branch `feat/form-builder` (belum merge, belum deploy).
+> ⚠️ Form Builder sudah merged ke `main` (2026-08-01, PR #849) tapi **belum live di dev** — gateway dev masih membalas `400 unknown service`.
 
 ## Dokumen Terkait
 

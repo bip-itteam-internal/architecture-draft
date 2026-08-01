@@ -70,7 +70,7 @@
 **IT** — Employee (aktivasi akun, reset password), Network (WiFi SSID/MAC CRUD)
 **GA** — Inventory (QR, repair history, assignment)
 
-**Form Builder** (`src/features/form-builder/`, rute `/form-builder*`, ⚠️ branch `feat/form-builder`, **belum merge**) — alat kelola form dinamis untuk **IT dan HRGA**; backend [[Microservices - Form Builder Service]], konsep [[IT - Form Builder]]:
+**Form Builder** (`src/features/form-builder/`, rute `/form-builder*`, ⚠️ branch `feat/form-builder` di `erp-frontend`, **belum merge**) — alat kelola form dinamis untuk **IT dan HRGA**; backend [[Microservices - Form Builder Service]] (**sudah merged ke `main` 2026-08-01**, belum live di dev), konsep [[IT - Form Builder]]:
 - **Satu rute dipakai dua modul.** Menu didaftarkan di kategori `it` **dan** `ga`, keduanya menunjuk `/form-builder` yang sama. Backend sudah menyaring form per `owner_module`, jadi tiap tim hanya melihat miliknya tanpa dua halaman kembar yang harus dijaga sinkron. Dikunci `components/layout/form-builder-menu.test.ts`.
 - **Daftar** (`/form-builder`): Banner + MainTable, filter status, kolom penanda gerbang presensi, aksi terbitkan/tutup/hapus. Tombol transisi diturunkan dari `lib/lifecycle.ts` yang mencerminkan satu larangan backend — form terbit tak bisa mundur ke draft — supaya tombol yang pasti ditolak server tak pernah muncul.
 - **Builder** (`/form-builder/new`, `/form-builder/[id]`): sembilan tipe pertanyaan, urutan bisa digeser, editor opsi, sasaran (semua / per departemen / per karyawan), dan pengaturan gerbang presensi. Halaman tersendiri, bukan modal — isinya tak muat nyaman di `ActionForm` yang dipakai form dua-field.

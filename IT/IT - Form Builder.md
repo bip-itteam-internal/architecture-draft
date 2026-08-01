@@ -1,8 +1,8 @@
 ## Deskripsi
 
-*Konsep **Form Builder** — pembuat form dinamis tanpa coding untuk kasus internal baru/ad-hoc. Bharata banyak memakai "form request" yang kini di-hardcode per kasus; Form Builder jadi fondasi reusable (buat form baru tanpa rilis kode). Rencana yang dulu ditunda **sudah dieksekusi**: backend lengkap ada di branch `feat/form-builder`, dengan scope yang **lebih luas** dari rencana asli.*
+*Konsep **Form Builder** — pembuat form dinamis tanpa coding untuk kasus internal baru/ad-hoc. Bharata banyak memakai "form request" yang kini di-hardcode per kasus; Form Builder jadi fondasi reusable (buat form baru tanpa rilis kode). Rencana yang dulu ditunda **sudah dieksekusi**, dengan scope yang **lebih luas** dari rencana asli.*
 
-- **Status**: ⚠️ **Backend + FE kelola selesai di branch `feat/form-builder` (belum merge, belum deploy).** FE web berupa alat **kelola** saja (daftar + builder); **halaman analisa/export belum**, dan **pengisian di MyBharata belum ada**
+- **Status**: ⚠️ **Backend sudah merged ke `main` 2026-08-01** (PR #849), **belum live di dev**. **FE kelola** ada di branch `feat/form-builder` repo `erp-frontend` (**belum merge**) dan berupa alat **kelola** saja (daftar + builder); **halaman analisa/export belum**, dan **pengisian di MyBharata belum ada**
 - **Penempatan**: tooling platform (Tech Development), dipakai bersama HRGA
 - **Implementasi**: [[Microservices - Form Builder Service]] · **FE web**: [[APP - Web ERP]] · **API**: [[API - Form Builder Service]]
 

@@ -5,7 +5,7 @@
 - **Stack:** Go + Fiber v2 + MongoDB (database sendiri `form_builder_db`)
 - **Path:** `services/form-builder`
 - **Port:** 6986 (internal, `expose`; tidak dipublish ke host)
-- **Status**: ⚠️ **Implemented di branch `feat/form-builder` — BELUM merge ke `main`, BELUM deploy.** Backend lengkap dan teruji (122 unit test). **FE kelola di [[APP - Web ERP]] sudah ada** (branch `feat/form-builder` di repo `erp-frontend`, juga belum merge): daftar form + builder. **Yang masih kosong**: layar analisa/export di web, dan renderer pengisian di [[APP - MyBharata]] — sehingga karyawan belum punya cara mengisi form sama sekali.
+- **Status**: ⚠️ **Merged ke `main` 2026-08-01** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849), merge commit `4f546f14`), backend lengkap dan teruji (122 unit test). **BELUM live di dev** per pemeriksaan 2026-08-01: `GET /health?check=form-builder` di gateway dev masih balas `400 unknown service`, artinya gateway di sana masih binary pra-merge. **FE kelola di [[APP - Web ERP]] sudah ada** (branch `feat/form-builder` di repo `erp-frontend`, **belum merge**): daftar form + builder. **Yang masih kosong**: layar analisa/export di web, dan renderer pengisian di [[APP - MyBharata]] — sehingga karyawan belum punya cara mengisi form sama sekali.
 
 ## Persona / Pengguna
 
@@ -66,7 +66,8 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 
 ## Belum Diimplementasikan / Catatan
 
-- **Belum merge, belum deploy.** Seluruh isi dokumen ini ada di branch `feat/form-builder`.
+- **Sudah di `main`, belum live di dev.** Diperiksa 2026-08-01: gateway dev (`10.10.10.121:6969`) sehat untuk employee/attendance/recruitment tapi membalas `400 unknown service` untuk `form-builder`, jadi binary gateway di sana masih pra-merge.
+- ⚠️ **`.env` server WAJIB memuat `FORM_BUILDER_SERVICE_PORT` sebelum gateway di-redeploy.** Berbeda dari attendance (yang sengaja menaruh URL form-builder DI LUAR map tervalidasi), gateway memasukkan `form-builder` ke `InternalURL` dan menjalankan `validation.ValidateInternalURL` — nilai kosong berarti **gateway panic saat boot dan SELURUH ERP ikut mati**. `docker-compose.yml` meredam ini karena nilainya dirakit dari string literal (`http://form-builder-service:${...}`) sehingga tak pernah benar-benar kosong, tapi variabel port yang hilang tetap menghasilkan URL rusak dan semua `/api/form-builder/*` gagal. Deploy gateway HARUS memakai compose yang ikut ter-merge, bukan env lama.
 - **Konsumen yang sudah ada**: FE kelola di [[APP - Web ERP]] memakai `POST/GET/PATCH/DELETE /forms*`. **Endpoint `/forms/:id/analytics`, `/forms/:id/responses`, dan `/forms/:id/export` sudah siap tapi BELUM ada yang memanggilnya** — layar analisa & export menyusul.
 - **Endpoint pengisian (`/me/*`) belum punya konsumen sama sekali.** Pengisian direncanakan lewat [[APP - MyBharata]] yang belum dibangun, dan web sengaja tak menyediakan halaman isi form. Konsekuensinya gerbang mode `block` belum boleh dinyalakan di produksi — lihat [[IT - Form Builder]].
 - **Upload file** belum didukung (menyusul via [[Microservices - File Service]], cap 4 MB).

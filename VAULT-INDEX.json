@@ -145,20 +145,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "36a210de51df5ea0b7391fa0586fd100ddd3661bd09fe99b12efd5fa91bf05f7",
+      "hash": "b6b67623397bf95544e39ff84fbc52830aadbefd33c6fc7b58a53379a2ddc4e6",
       "ukuran_kb": 4.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service di balik gateway `/api/form-builder/*`, siapa yang boleh memanggil tiap rute (kelola form butuh key `system_roles` `it` atau `ga`, pengisian cukup terautentikasi), dan kode error apa yang muncul saat form disunting setelah ada jawaban atau status dimundurkan. Menjelaskan juga bentuk data penting: 9 tipe field, tipe sasaran (`all`/`departments`/`employees`), format RFC3339 wajib pada `attendance_gate`, isi respons analytics, export CSV dengan header `X-Export-Truncated`, dan aturan idempoten 2 menit pada pengiriman jawaban. Termasuk kenapa identitas di `/internal/compliance` dikunci ke header dan kapan query param `?employee_id=` masih dihormati.",
+      "ringkasan": "Menjawab: endpoint apa saja untuk membuat, menerbitkan, menyunting, dan menutup form dinamis, siapa yang boleh mengelolanya (RBAC key `it` atau `ga`) versus siapa yang cukup mengisi. Juga menjawab bentuk data pentingnya: 9 tipe field, tipe audience/sasaran, format tanggal RFC3339 pada attendance_gate, isi respons analytics, serta aturan idempotensi pengiriman jawaban. Menjelaskan pula rute `/internal/compliance` yang dipanggil attendance service saat clock-in dan mengapa identitas di situ terkunci ke header, bukan query param.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
-        "dynamic form",
         "endpoint",
         "API reference",
         "RBAC it ga",
         "attendance gate",
         "gerbang presensi",
-        "analytics export CSV",
-        "internal compliance"
+        "analytics",
+        "export CSV",
+        "compliance"
       ]
     },
     {
@@ -235,19 +235,19 @@
         "DB - Overview and Notes",
         "HOMEPAGE"
       ],
-      "hash": "45711c1fccd3d78ee31bd36f23577e9dff994dc8c5365839a45886bec90779db",
+      "hash": "ac5869fccccec97f39d9276b732b88b63766d9fe8b8daf72274c2a89ded025a7",
       "ukuran_kb": 3.2,
-      "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, prefix gateway masing-masing (`/api/<module>/*`), dan file API Reference mana yang harus dibuka untuk tiap service. Juga menjawab bagaimana request di-routing lewat API Master Gateway, bagaimana JWT diterjemahkan jadi header identitas `BIP-*` yang dibaca service, serta apa itu open route (`?key=`) dan rute `/public/*` dan `/ext/*` yang tanpa JWT.",
+      "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, lewat prefix gateway mana masing-masing diakses (`/api/<module>/*`), dan di file API Reference mana kontrak endpointnya dicari. Juga menjawab cara routing umum: semua request masuk lewat API Master Gateway, JWT divalidasi lalu identitas diteruskan sebagai header `BIP-*` ke service, plus pengecualian open route dengan service key `?key=` dan jalur tanpa JWT `/ext/*` serta `/public/*`. Berguna sebagai titik awal saat belum tahu endpoint suatu fitur ada di service mana.",
       "kata_kunci": [
         "API index",
         "daftar service",
         "prefix gateway",
         "routing",
-        "endpoint",
         "JWT",
         "BIP header",
         "open route",
-        "public ext",
+        "service key",
+        "endpoint",
         "microservices"
       ]
     },
@@ -999,20 +999,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "e90f31dc3118e4b519ea4093d3034baaa5d0b863d5fa82bc87f886a0eaa27d80",
-      "ukuran_kb": 59.2,
-      "ringkasan": "Menjawab: teknologi apa yang dipakai portal web internal ERP Bharata (`hris-dashboard` / \"One Bharata\", repo `erp-frontend`), bagaimana login dan refresh token bekerja, serta bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain. Menjelaskan cara role gating dari cookie `system_roles` (module dan role apa saja yang dikenal), bagaimana sidebar dikelompokkan lewat menu induk bersarang, kenapa field `group` ditolak, bagaimana setelan Tampilan Menu per jabatan menyimpan `menu_hidden` (centang = tampil), dan kapan induk menu tipis diratakan. Juga sumber jawaban untuk dukungan multi-perusahaan di FE (CompanySwitcher, Kelola Perusahaan/Departemen/Shift/Network per company) serta fitur Atasan Langsung dan menu KPI untuk Leader.",
+      "hash": "d8dcf21429aecf6bfd97affce82aee2c210ebc84673487602e3aeaacf85ed233",
+      "ukuran_kb": 59.3,
+      "ringkasan": "Menjawab: apa itu portal web internal `hris-dashboard` (One Bharata), stack frontend-nya (Next.js, React, shadcn/ui, TanStack Query, react-i18next), dan bagaimana login, refresh token proaktif, serta SSO handoff kode sekali-pakai bekerja. Juga menjawab bagaimana sidebar digerbangi map `system_roles`, bagaimana menu dikelompokkan lewat induk bersarang (bukan field `group`), bagaimana setelan Tampilan Menu per jabatan menyimpan `menu_hidden`, dan bagaimana alat Atasan Langsung mengisi hierarki. Menjelaskan pula wujud multi-perusahaan di web: company switcher, kelola perusahaan/departemen/shift/network, dan direktori karyawan yang ikut perusahaan terpilih.",
       "kata_kunci": [
         "web ERP",
         "hris-dashboard",
         "One Bharata",
-        "erp-frontend",
-        "Next.js frontend",
-        "SSO identity provider",
-        "system_roles role gating",
+        "frontend",
+        "Next.js",
+        "SSO",
+        "system_roles",
         "sidebar menu",
-        "tampilan menu per posisi",
-        "multi-perusahaan company switcher"
+        "multi-perusahaan",
+        "company switcher"
       ]
     },
     {
@@ -1128,20 +1128,20 @@
         "APP - MyBharata",
         "DB - Overview and Notes"
       ],
-      "hash": "6759cebcc259c83b87cdbf614701d3998f489a519bfbd335c01e2dac6f5927c0",
-      "ukuran_kb": 7.1,
-      "ringkasan": "Menjawab: bagaimana request dari luar masuk ke seluruh ekosistem bip-erp, bagaimana login diproses dan JWT diterbitkan/di-refresh, dan bagaimana gateway meng-inject header identitas (`BIP-Employee-Id`, `BIP-System-Roles`, `BIP-Company-ID`) ke service dari klaim JWT. Juga menjawab peta routing lengkapnya (`/api/:module/*`, `/auth/*`, `/public/*`, `/ext/*`, `/dev/*`), cara kerja SSO ticket-redeem sekali pakai, response caching Redis, serta internal gateway key antar-service. Menjelaskan pula risiko yang diketahui: routing catch-all membuat prefix `/internal/` ikut terbuka ke internet dan sebagian limiter bisa dilewati.",
+      "hash": "1a2ca12f5c46a1f5d2f0dba393356e194b3e9bad27ec7e683f8e6256c7f36a2d",
+      "ukuran_kb": 7.5,
+      "ringkasan": "Menjawab: bagaimana request dari internet masuk ke ekosistem bip-erp, bagaimana JWT diterbitkan (login didelegasikan ke employee service, gateway yang mint token) dan divalidasi, serta bagaimana identitas dioper ke service internal lewat header `BIP-Employee-Id`, `BIP-System-Roles`, dan `BIP-Company-ID` plus internal gateway key. Juga menjawab pemetaan module ke service, rute non-`/api` seperti `/auth/*`, `/public/*`, `/ext/fingerprint/*`, aturan open route `?key=`, dan kebijakan response caching Redis beserta module yang dikecualikan. Menjelaskan pula konsekuensi routing catch-all: prefix `/internal/` ikut terbuka ke internet dan limiter khusus bisa dilewati lewat jalur `/api/<module>/*`.",
       "kata_kunci": [
-        "gateway",
         "API gateway",
-        "JWT",
-        "login",
-        "SSO",
-        "routing",
         "reverse proxy",
+        "JWT auth login",
+        "SSO ticket redeem",
+        "BIP header",
+        "internal gateway key",
+        "rate limiting",
         "Redis cache",
-        "BIP-Company-ID",
-        "internal"
+        "public ext route",
+        "catch-all routing"
       ]
     },
     {
@@ -1389,19 +1389,19 @@
         "Microservices - Form Builder Service",
         "Microservices - File Service"
       ],
-      "hash": "deb2978154add66428a9b916c02e294b33b26824962f0e5e018defc426b64bf5",
+      "hash": "30e4043042d196a21236ea2a6b41de54172c42d20fecbfb70333082939eaedcd",
       "ukuran_kb": 6.9,
-      "ringkasan": "Menjawab: database mana milik service mana (pola database-per-service), collection apa saja yang ada di tiap MongoDB, dan di mana sebuah data sebaiknya dicari. Juga menjawab collection mana yang sudah membawa `company_id` untuk multi-perusahaan, kenapa hanya employee-service yang berjalan sebagai replica set, dan bagaimana Redis serta MinIO dipakai sebagai infrastruktur data bersama (namespace key dan prefix objek per domain). Menjelaskan pula aturan ownership data: tidak ada query lintas-database, komunikasi antar service lewat HTTP internal.",
+      "ringkasan": "Menjawab: database mana milik service mana pada pola database-per-service, dan collection apa saja yang ada di tiap MongoDB (employee, attendance, notification, insentive, integration, inventory, tiktok-shop, task-management, recruitment, payroll, form-builder). Juga menjawab service mana yang berjalan sebagai replica set dan boleh dibaca read-only, koleksi mana yang membawa `company_id` untuk multi-perusahaan, index apa yang dibuat idempoten saat boot, serta mengapa satu-jawaban-per-orang di form builder ditegakkan di handler alih-alih index unik. Menjelaskan pula peran infrastruktur data bersama Redis dan MinIO termasuk konvensi prefix objek per domain dan aturan waktu disimpan UTC.",
       "kata_kunci": [
         "database",
         "MongoDB",
-        "collection",
         "database-per-service",
+        "collection",
         "replica set",
-        "Redis",
-        "MinIO",
         "company_id",
         "multi-tenant",
+        "Redis",
+        "MinIO",
         "index"
       ]
     },
@@ -1435,20 +1435,20 @@
         "HRIS - Attendance System",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "4fa45e67854b5ee18be1e066e36a40001dfbed012156e12ea96a22a586062d86",
-      "ukuran_kb": 15.9,
-      "ringkasan": "Menjawab: bagaimana clock-in/clock-out diproses per metode (fingerprint dengan allowlist serial, mobile dengan validasi WiFi kantor atau GPS), bagaimana jadwal kerja dan rotasi shift diresolusi, dan endpoint mana yang dipakai untuk leave request, koreksi presensi, tukar jadwal kerja, perjalanan dinas, guestbook tamu, serta hari libur. Juga menjawab bagaimana data kehadiran diolah jadi laporan bulanan periode 26 ke 26 dan payroll supplement (`payout_pct`, perlakuan dibayar/dipotong per status dan per subtipe yang configurable). Menjelaskan pula guard idempotensi leave request dan gerbang form wajib yang bisa menahan clock-in mobile.",
+      "hash": "db88ef01a656226989b3c0ae4e8eea59f6a0241aecc98ceb977fb5b12c8b08c5",
+      "ukuran_kb": 16.0,
+      "ringkasan": "Menjawab: bagaimana clock-in/out dijalankan per metode (mobile dengan validasi MAC WiFi kantor atau GPS, fingerprint dengan allowlist serial, dan method `Website` yang berarti koreksi), bagaimana ambang telat dihitung, dan endpoint mana yang dipakai HRIS untuk report bulanan periode 26 ke 26 serta `payroll-supplement`. Juga menjawab alur workflow lengkap leave request (rantai review supervisor ke HR, kuota cuti, guard idempotensi berbasis konten), tukar jadwal kerja shift/hari, koreksi presensi, perjalanan dinas, guestbook tamu bertoken, dan hari libur. Menjelaskan pula bagaimana perlakuan dibayar atau dipotong diatur per status dan per subtipe lewat master `payroll_status_treatment`.",
       "kata_kunci": [
         "attendance",
         "presensi",
-        "absensi",
         "clock-in",
+        "clock-out",
         "leave request",
-        "cuti",
-        "koreksi presensi",
-        "tukar shift",
+        "cuti izin",
+        "payroll supplement",
         "guestbook",
-        "payroll supplement"
+        "tukar shift",
+        "koreksi presensi"
       ]
     },
     {
@@ -1533,7 +1533,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented di branch `feat/form-builder` — BELUM merge ke `main`, BELUM deploy.** Backend lengkap dan teruji (122 unit test). **FE kelola di [[APP - Web ERP]] sudah ada** (branch `feat/form-builder` di repo `erp-frontend`, juga belum merge): daftar form + builder. **Yang masih kosong**: layar analisa/export di web, dan renderer pengisian di [[APP - MyBharata]] — sehingga karyawan belum punya cara mengisi form sama sekali.",
+      "status_teks": "**Merged ke `main` 2026-08-01** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849), merge commit `4f546f14`), backend lengkap dan teruji (122 unit test). **BELUM live di dev** per pemeriksaan 2026-08-01: `GET /health?check=form-builder` di gateway dev masih balas `400 unknown service`, artinya gateway di sana masih binary pra-merge. **FE kelola di [[APP - Web ERP]] sudah ada** (branch `feat/form-builder` di repo `erp-frontend`, **belum merge**): daftar form + builder. **Yang masih kosong**: layar analisa/export di web, dan renderer pengisian di [[APP - MyBharata]] — sehingga karyawan belum punya cara mengisi form sama sekali.",
       "publik": true,
       "tautan": [
         "Microservices - Attendance Service",
@@ -1549,20 +1549,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "d3e12c9f49884942436cad7a75f9bf19f343586829c0814038801ccab931501f",
-      "ukuran_kb": 9.6,
-      "ringkasan": "Menjawab: bagaimana form-builder-service dibangun dan dijalankan (Go + Fiber v2 + MongoDB `form_builder_db`, path `services/form-builder`, port 6986 internal), siapa penggunanya (staf/SPV IT dan HRGA sebagai pengelola, karyawan sebagai pengisi) dan kenapa peran `security` milik GA dikecualikan. Menjelaskan aturan yang mengunci susunan pertanyaan begitu ada jawaban, bagaimana sasaran form diresolusi murni dari header identitas gateway tanpa memanggil service lain, dan keputusan konservatif di jalur clock-in (gerbang gagal-tertutup pada data cacat, default `warn`, jendela tanggal wajib, identitas terkunci ke header). Juga jadi rujukan batasan yang diketahui: agregasi dibatasi 20.000 jawaban, `estimated_size` diisi manual, upload file dan logika percabangan belum ada.",
+      "hash": "f95ccb962f2c37f63dce2184ddf53be1ddae0314e0fce7a32b3a5438e55b9f3f",
+      "ukuran_kb": 10.6,
+      "ringkasan": "Menjawab: bagaimana tim IT dan HRGA menyusun form dinamis tanpa rilis kode, 9 tipe pertanyaan apa yang didukung, bagaimana sasaran form (all, departments, employees) diresolusi langsung dari header identitas tanpa memanggil service lain, dan bagaimana validasi struktur maupun validasi jawaban bekerja sebagai fungsi murni. Juga menjawab siapa persona penggunanya beserta gerbang RBAC-nya, mengapa susunan pertanyaan terkunci setelah ada jawaban masuk, dan bagaimana idempotensi pengiriman dijaga lewat sidik jawaban ber-kunci-terurut. Menjelaskan pula keputusan konservatif yang menjaga jalur clock-in: gerbang gagal-tertutup pada data cacat, mode default `warn`, jendela tanggal wajib, dan identitas `/internal/compliance` yang terkunci ke header.",
       "kata_kunci": [
-        "form builder service",
+        "form builder",
         "form dinamis",
-        "Go Fiber MongoDB",
-        "form_builder_db",
-        "audience sasaran form",
-        "attendance gate clock-in",
-        "idempoten response",
-        "analytics export CSV",
-        "multi-tenant company_id",
-        "RBAC it ga"
+        "survei internal",
+        "audience sasaran",
+        "attendance gate",
+        "gerbang presensi",
+        "idempoten",
+        "analytics",
+        "RBAC it ga",
+        "company_id"
       ]
     },
     {
@@ -5184,7 +5184,7 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Backend + FE kelola selesai di branch `feat/form-builder` (belum merge, belum deploy).** FE web berupa alat **kelola** saja (daftar + builder); **halaman analisa/export belum**, dan **pengisian di MyBharata belum ada**",
+      "status_teks": "**Backend sudah merged ke `main` 2026-08-01** (PR #849), **belum live di dev**. **FE kelola** ada di branch `feat/form-builder` repo `erp-frontend` (**belum merge**) dan berupa alat **kelola** saja (daftar + builder); **halaman analisa/export belum**, dan **pengisian di MyBharata belum ada**",
       "publik": false,
       "tautan": [
         "Microservices - Form Builder Service",
@@ -5207,19 +5207,20 @@
         "DB - Overview and Notes",
         "ROADMAP"
       ],
-      "hash": "917d9ca85099c7e604680b61d75a2540f5cff52203d867d7b7acfb35fef5f45e",
-      "ukuran_kb": 4.5,
-      "ringkasan": "Menjawab: kenapa Form Builder dibuat, yaitu agar form internal baru atau ad-hoc (survei, deklarasi, pendataan, pendaftaran event) tidak lagi butuh siklus development per kasus seperti form request yang sudah hardcoded. Menjelaskan apa saja yang berubah dari rencana asli (RBAC melebar ke `ga`, ada analitik selain CSV, ada sasaran form, dan ternyata menyentuh attendance service) serta apa yang tetap ditunda (upload file dan logika percabangan). Juga jadi rujukan keputusan intersep presensi (hanya jalur mobile, clock-out tidak ditahan, gagal-terbuka, jendela tanggal wajib), urutan rilis yang mengikat (mode `block` menunggu MyBharata siap, deploy backend dulu), dan daftar hal yang belum diputuskan.",
+      "hash": "a9414c9cc92eb6123636874167d620fd67a095f7ccc0710d00c76503b6a321be",
+      "ukuran_kb": 4.6,
+      "ringkasan": "Menjawab: mengapa Form Builder dibangun, kasus pakai apa yang disasar (survei internal, deklarasi, pendataan mendadak, pendaftaran event) dibanding form request yang selama ini di-hardcode per kasus, dan aspek mana yang melebar dari rencana asli pada RBAC, hasil jawaban, sasaran, dampak lintas service, dan multi-perusahaan. Juga menjawab keputusan bisnis intersep presensi: pilihan `block` versus `warn`, mengapa hanya jalur mobile dan hanya clock-in yang ditahan, prinsip gagal-terbuka bila service form mati, dan kewajiban jendela tanggal. Menjelaskan pula urutan rilis yang mengikat serta daftar hal yang sengaja masih TBD seperti upload file, logika percabangan, form publik, dan pencarian karyawan untuk sasaran per-orang.",
       "kata_kunci": [
         "form builder",
-        "konsep no-code form",
-        "form request internal",
+        "konsep",
         "intersep presensi",
-        "block warn clock-in",
-        "RBAC it ga",
+        "block warn",
+        "gagal-terbuka",
         "urutan rilis deploy",
-        "survei deklarasi pendataan",
-        "TBD roadmap"
+        "TBD",
+        "upload file",
+        "logika percabangan",
+        "IT HRGA"
       ]
     },
     {
@@ -6064,20 +6065,20 @@
         "REF - Ownership & RACI",
         "HRIS - Roadmap"
       ],
-      "hash": "5d6932dae5535fbbdc38e8160b8814701e6ba2b6050cafa4788fc9f0ae95f48b",
+      "hash": "1e7d1e6afc8f9d6bf35c0b151f395578f1c1f70f1898716aacd3994126bd5aad",
       "ukuran_kb": 2.4,
-      "ringkasan": "Menjawab: fitur atau service apa yang sedang jalan, direncanakan, ditunda, atau masih butuh keputusan di ERP Bharata, lengkap dengan dokumen sumber tiap item (Recruitment, Form Builder, Contract Management, Budget Planner, OKR, CRM internal, konten QA/RA). Juga menjawab pekerjaan infra/teknis yang masih terbuka (shared-library standalone, pemisahan docker-compose dan .env per service) dan pertanyaan bisnis yang menghambat, misalnya ada tidaknya kanal B2B/wholesale dan fungsi distribusi CDOB. Prioritas dan target tanggal sendiri ditetapkan Product Owner, bukan di dokumen ini.",
+      "ringkasan": "Menjawab: apa arah dan prioritas pengembangan ERP Bharata, kandidat fitur atau service apa saja yang terdaftar (Recruitment, Form Builder, Contract Management, Budget Planner, Goal/OKR, CRM internal) dan dokumen sumber mana yang membahas tiap item. Juga menjawab item infra/teknis yang masih menggantung seperti shared-library standalone dan pemisahan `docker-compose` serta `.env` per service, plus pertanyaan bisnis yang menahan keputusan (ada tidaknya kanal B2B/wholesale, fungsi distribusi CDOB). Menjelaskan pula bahwa prioritas dan target tanggal ditetapkan Product Owner, dan backlog operasional harian disimpan di Dynamic Task Tracker, bukan di sini.",
       "kata_kunci": [
         "roadmap",
         "prioritas",
         "backlog",
-        "rencana",
-        "planned",
-        "TBD",
+        "rencana pengembangan",
         "product owner",
-        "arah pengembangan",
         "second-brain",
-        "infra"
+        "infra teknis",
+        "Contract Management",
+        "Budget Planner",
+        "OKR"
       ]
     },
     {
