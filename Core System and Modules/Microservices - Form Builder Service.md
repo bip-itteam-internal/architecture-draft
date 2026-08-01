@@ -37,6 +37,8 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 
 **Bagian (`section`)** — penanda pemisah halaman, bukan pertanyaan. Lihat bagian tersendiri di bawah.
 
+**Keterangan ujung skala** (`scale_min_label`/`scale_max_label`, maks 40 karakter, opsional) — tanpa itu pengisi harus menebak apakah angka terkecil berarti terbaik atau terburuk, dan tebakan yang salah membuat **seluruh jawaban skala terbalik artinya sementara analisanya tetap tampak masuk akal**. Hanya berlaku untuk tipe `scale`; menempel di tipe lain ditolak karena pasti sisa perpindahan tipe.
+
 **Sasaran form (audience)** — `all`, `departments`, atau `employees`. Diresolusi dari **header identitas yang sudah dibawa gateway** (`BIP-Employee-ID`, `BIP-Department`), sehingga service ini **tak memanggil satu service pun**. Tipe sasaran yang tak dikenal **gagal-tertutup** (tidak cocok), supaya salah ketik tak pernah menahan presensi sekantor.
 
 **Pengisian** (cukup karyawan terautentikasi)
@@ -137,6 +139,7 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 - **`attendance_gate.start_date`/`end_date` hanya menerima RFC3339** (mis. `2026-08-01T00:00:00Z`); kiriman `"2026-08-01"` akan ditolak dengan pesan parse JSON yang tidak informatif. Perlu dibereskan saat FE dibangun.
 - **RBAC belum berkatalog permission-set** per [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]. Pindah ke sumbu departemen **mendekatkan** ke ADR itu (hak menempel pada tempat orang bekerja, bukan pada key modul) tapi belum memenuhinya: tingkat perannya masih tier lama `staff`/`supervisor`/`admin`, bukan permission-set granular.
 - ✅ **Section/multi-halaman sudah ada** (PR [#870](https://github.com/bip-itteam-internal/bip-erp/pull/870), belum merged).
+- ✅ **Keterangan ujung skala sudah ada** (PR [#871](https://github.com/bip-itteam-internal/bip-erp/pull/871), belum merged).
 - **Upload file, percabangan, grid, dan opsi "Lainnya" belum ada** — jarak yang tersisa terhadap Google Forms. Urutan yang disarankan: opsi "Lainnya" (murah) → upload file → percabangan. Percabangan menuju bagian, jadi kini sudah punya landasannya.
 - **Analisa belum mengelompokkan hasil per bagian.** Yang dijamin sekarang hanya bagian tak muncul sebagai kartu kosong; pengelompokan visualnya polesan yang belum dikerjakan.
 - **Form approval yang sudah matang JANGAN dimigrasikan ke sini** (leave/overtime/koreksi presensi) — semuanya punya workflow & rantai approval sendiri. Form Builder untuk kasus baru/ad-hoc.

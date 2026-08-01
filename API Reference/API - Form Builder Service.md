@@ -55,6 +55,8 @@
 
 **`section` bukan pertanyaan** melainkan penanda awal bagian, hidup di dalam `fields` yang tetap datar. `label` jadi judul bagian, `description` jadi keterangannya. Aturannya: tak boleh `required`, tak boleh membawa `options`/`min`/`max`/`max_length`/`scale_*`, dan **jawaban yang menunjuk key bagian ditolak** (`400`). Bagian tak muncul di `analytics.fields` maupun kolom CSV.
 
+**Keterangan ujung skala** (`scale_min_label`, `scale_max_label`) — mis. `"Sangat tidak puas"` .. `"Sangat puas"`. Keduanya opsional dan satu ujung saja pun sah; maksimal **40 karakter**; hanya berlaku untuk tipe `scale` (menempel di tipe lain ditolak `400`). Murni keterangan tampilan: nilai jawaban tetap angka, dan mengirim teks labelnya sebagai jawaban tetap ditolak.
+
 **Pemilik** (`owner_department`): nama departemen `master_department` (mis. `"General Affair"`), BUKAN key `system_roles`. Form lama yang masih menyimpan `owner_module` dipindah otomatis saat service boot (`it`→`Tech Development`, `ga`→`General Affair`).
 
 **Sasaran** (`audience.type`): `all` · `departments` (+`departments[]`) · `employees` (+`employee_ids[]`). `estimated_size` diisi manual sebagai penyebut tingkat pengisian; bila 0, `response_rate` tidak dikirim. Perhatikan `audience.departments` menjawab **siapa yang mengisi**, sedangkan `owner_department` menjawab **siapa yang memiliki** — keduanya tak harus sama.

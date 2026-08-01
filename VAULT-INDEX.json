@@ -146,9 +146,9 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "eba34b15cbdb1a57ffc0666b5ff94b4d9e8096db4d49fcdd894e5a125bd4efc6",
-      "ukuran_kb": 6.2,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service, siapa yang boleh memanggil tiap kelompok rute, dan seperti apa bentuk payload form maupun jawabannya. Merinci gerbang RBAC per departemen untuk rute kelola form, rute pengisian /me/* termasuk /me/capability, serta /internal/compliance yang dipakai attendance saat clock-in. Memuat pula sepuluh tipe field termasuk penanda bagian, bentuk respons analytics, dan aturan idempotensi pengiriman jawaban.",
+      "hash": "f43eb0b2cd748dd0d58530ee88993636720db8dadf242ce308d830bcf8df9b9f",
+      "ukuran_kb": 6.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service, siapa yang boleh memanggil tiap kelompok rute, dan seperti apa bentuk payload form maupun jawabannya. Merinci gerbang RBAC per departemen untuk rute kelola form, rute pengisian /me/* termasuk /me/capability, serta /internal/compliance yang dipakai attendance saat clock-in. Memuat pula sepuluh tipe field termasuk penanda bagian dan keterangan ujung skala, bentuk respons analytics, dan aturan idempotensi pengiriman jawaban.",
       "kata_kunci": [
         "form builder",
         "endpoint",
@@ -157,8 +157,8 @@
         "capability",
         "section",
         "bagian",
+        "skala",
         "analytics",
-        "survei",
         "RBAC departemen"
       ]
     },
@@ -884,9 +884,9 @@
         "Microservices - Employee Service",
         "Microservices - Notification Service"
       ],
-      "hash": "ffbf7e4ec90b5b0be2ef93596e870fdaa1a5c94c4ed755946b9dca94788591c6",
-      "ukuran_kb": 14.9,
-      "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile karyawan MyBharata, bagaimana arsitektur Flutter-nya disusun, dan bagaimana ia terhubung ke backend lewat API gateway memakai JWT Bearer. Mencakup presensi, pengajuan izin dan cuti, lembur, payslip, KPI, task management, guest book, serta section Survei di beranda dan halaman pengisian form yang kini berhalaman per bagian. Memuat juga versi build yang berjalan dan aturan kontrak yang mudah dilanggar diam-diam.",
+      "hash": "7e756c51dc6b2e2e74187d2b79b2f8bdb177726fba5d798b8d3073b25a08a88c",
+      "ukuran_kb": 15.7,
+      "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile karyawan MyBharata, bagaimana arsitektur Flutter-nya disusun, dan bagaimana ia terhubung ke backend lewat API gateway memakai JWT Bearer. Mencakup presensi, pengajuan izin dan cuti, lembur, payslip, KPI, task management, guest book, serta section Survei di beranda dan halaman pengisian form yang berhalaman per bagian. Memuat juga versi build yang berjalan, komponen pemilih yang dipakai bersama, dan aturan kontrak yang mudah dilanggar diam-diam.",
       "kata_kunci": [
         "MyBharata",
         "mobile",
@@ -1001,9 +1001,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "17af290b9d295493acc9c29c5c704123b043734c3d62d7e276fc26af2fcc908f",
-      "ukuran_kb": 64.9,
-      "ringkasan": "Menjawab: modul apa saja yang tersedia di web ERP Bharata, bagaimana struktur Next.js dan konvensi UI-nya, serta bagaimana menu sidebar dipetakan ke kategori dan peran pemakai. Merinci fitur per domain termasuk Form Builder beserta editor bertab, editor bagian, dan halaman analisa jawabannya. Berguna untuk menemukan letak sebuah halaman sekaligus alasan di balik keputusan tampilannya.",
+      "hash": "15ea50b3beb52ab103c1b07f415a0de2d18cac5520b79e28c8836ae0b1830616",
+      "ukuran_kb": 65.5,
+      "ringkasan": "Menjawab: modul apa saja yang tersedia di web ERP Bharata, bagaimana struktur Next.js dan konvensi UI-nya, serta bagaimana menu sidebar dipetakan ke kategori dan peran pemakai. Merinci fitur per domain termasuk Form Builder beserta editor bertab, editor bagian, keterangan ujung skala, dan halaman analisa jawabannya. Berguna untuk menemukan letak sebuah halaman sekaligus alasan di balik keputusan tampilannya.",
       "kata_kunci": [
         "Web ERP",
         "erp-frontend",
@@ -1012,8 +1012,8 @@
         "menu",
         "form builder",
         "bagian",
+        "skala",
         "analisa jawaban",
-        "frontend",
         "i18n"
       ]
     },
@@ -1552,18 +1552,18 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "01d50ff77e52791b9b6dcded8220918b324d9496df0e1bbdf2db3a6b17547ed9",
-      "ukuran_kb": 18.4,
-      "ringkasan": "Menjawab: bagaimana form dinamis dibuat dan diterbitkan tanpa rilis kode per form, siapa yang memilikinya, dan bagaimana jawabannya direkap. Menjelaskan kepemilikan per departemen beserta cakupan supervisi HRGA, sembilan tipe pertanyaan plus penanda bagian untuk memecah form panjang, sasaran form, gerbang presensi yang bisa menahan clock-in, serta analisa dan export CSV. Memuat pula jebakan BSON pada checkbox, kanonikalisasi ejaan departemen, dan backfill data lama saat service boot.",
+      "hash": "0bed6c70a920c7b2cdb0f987dafef876322d6958241f832e44fc55907f020c4b",
+      "ukuran_kb": 19.0,
+      "ringkasan": "Menjawab: bagaimana form dinamis dibuat dan diterbitkan tanpa rilis kode per form, siapa yang memilikinya, dan bagaimana jawabannya direkap. Menjelaskan kepemilikan per departemen beserta cakupan supervisi HRGA, sembilan tipe pertanyaan plus penanda bagian dan keterangan ujung skala, sasaran form, gerbang presensi yang bisa menahan clock-in, serta analisa dan export CSV. Memuat pula jebakan BSON pada checkbox, kanonikalisasi ejaan departemen, dan backfill data lama saat service boot.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
         "survei",
         "section",
         "bagian",
+        "skala",
         "owner_department",
         "gerbang presensi",
-        "attendance gate",
         "analisa jawaban",
         "export CSV"
       ]
