@@ -1000,9 +1000,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "05518a85c4ad71c4724295e10ad3234d9ab65d718f40ee95e9b96290e87456ce",
-      "ukuran_kb": 62.3,
-      "ringkasan": "Menjawab: apa itu portal web internal \"One Bharata\" (repo erp-frontend, Next.js 16 + React 19), stack dan library apa yang dipakai, serta bagaimana login, refresh token, dan perannya sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager. Menjelaskan juga bagaimana sidebar dan menu digerbang oleh cookie system_roles per modul (hris, finance, it, ga, insentive, kpi, dst), bagaimana menu dikelompokkan lewat menu induk bersarang, kapan induk tipis diratakan, dan bagaimana pengaturan Tampilan Menu per jabatan bekerja (centang = tampil, yang disimpan menu_hidden) sebagai setelan tampilan dan bukan hak akses. Berisi pula cakupan multi-perusahaan di FE (CompanySwitcher, Kelola Perusahaan/Departemen/Shift/Network per company) dan fitur atasan langsung, KPI Leader, serta Bagan Organisasi.",
+      "hash": "b15785586776a434999c61a668f3171d9d0836958927b1aa7d5acb203f434bde",
+      "ukuran_kb": 63.3,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (erp-frontend / \"One Bharata\"), stack apa yang dipakai (Next.js App Router, React, TypeScript, shadcn/Radix/Tailwind, TanStack Query, react-i18next), dan modul apa saja yang tersedia untuk HR, attendance, finance/insentif, IT, GA, serta integrasi marketplace. Menjelaskan juga cara login dan refresh token lewat gateway, peran web ini sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager, dan bagaimana sidebar/menu digerbang oleh cookie system_roles per module dan role. Berguna untuk pertanyaan soal dukungan multi-perusahaan (company switcher, shift/rotasi/mesin fingerprint/network per perusahaan), pengelompokan menu bersarang, setelan Tampilan Menu per jabatan (menu_hidden, beda dari permission set), perataan induk menu tipis, menu KPI untuk Leader, serta halaman Atasan Langsung dan Bagan Organisasi.",
       "kata_kunci": [
         "erp-frontend",
         "web ERP",
@@ -1012,7 +1012,7 @@
         "SSO",
         "system_roles",
         "sidebar menu",
-        "menu_hidden",
+        "company switcher",
         "multi-perusahaan"
       ]
     },
