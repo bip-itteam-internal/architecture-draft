@@ -146,7 +146,7 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "f43eb0b2cd748dd0d58530ee88993636720db8dadf242ce308d830bcf8df9b9f",
+      "hash": "f178b1429c109f557bec65aeda205c2da58360aab7fcfb63741eb5c95aee3682",
       "ukuran_kb": 6.6,
       "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service, siapa yang boleh memanggil tiap kelompok rute, dan seperti apa bentuk payload form maupun jawabannya. Merinci gerbang RBAC per departemen untuk rute kelola form, rute pengisian /me/* termasuk /me/capability, serta /internal/compliance yang dipakai attendance saat clock-in. Memuat pula sepuluh tipe field termasuk penanda bagian dan keterangan ujung skala, bentuk respons analytics, dan aturan idempotensi pengiriman jawaban.",
       "kata_kunci": [
@@ -158,7 +158,7 @@
         "section",
         "bagian",
         "skala",
-        "analytics",
+        "survei",
         "RBAC departemen"
       ]
     },
@@ -1000,9 +1000,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "71a1c49184df9370876eee281ecf3b441f50d6cb177df9ddbf1f15a02e664ce8",
-      "ukuran_kb": 65.4,
-      "ringkasan": "Menjawab: modul apa saja yang tersedia di web ERP Bharata, bagaimana struktur Next.js dan konvensi UI-nya, serta bagaimana menu sidebar dipetakan ke kategori dan peran pemakai. Merinci fitur per domain termasuk Form Builder beserta editor bertab, editor bagian, keterangan ujung skala, dan halaman analisa jawabannya. Berguna untuk menemukan letak sebuah halaman sekaligus alasan di balik keputusan tampilannya.",
+      "hash": "50eacd56ab2f4ba893d5620945772b52a109867abdcc9fdda6bb830532ccd1ad",
+      "ukuran_kb": 66.1,
+      "ringkasan": "Menjawab: modul apa saja yang tersedia di web ERP Bharata, bagaimana struktur Next.js dan konvensi UI-nya, serta bagaimana menu sidebar dipetakan ke kategori dan peran pemakai. Merinci fitur per domain termasuk Form Builder beserta editor bertab, editor bagian, keterangan ujung skala, perbaikan alur menambah pertanyaan, dan halaman analisa jawabannya. Berguna untuk menemukan letak sebuah halaman sekaligus alasan di balik keputusan tampilannya.",
       "kata_kunci": [
         "Web ERP",
         "erp-frontend",
@@ -1010,8 +1010,8 @@
         "sidebar",
         "menu",
         "form builder",
-        "bagian",
-        "skala",
+        "editor",
+        "AdminFooter",
         "analisa jawaban",
         "i18n"
       ]
@@ -1534,7 +1534,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented & LIVE di dev** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849) + perbaikan [#855](https://github.com/bip-itteam-internal/bip-erp/pull/855)); terverifikasi end-to-end lewat gateway dev 2026-08-01. **PROD belum jalan** — container-nya belum pernah dibuat. FE web di [[APP - Web ERP]] sudah lengkap (kelola, builder, **analisa jawaban**), dan pengisian di [[APP - MyBharata]] sudah ada (section Survei di beranda + halaman isi berbagian). **Kepemilikan per departemen, bagian, dan keterangan ujung skala sudah merged** (PR [#869](https://github.com/bip-itteam-internal/bip-erp/pull/869), [#870](https://github.com/bip-itteam-internal/bip-erp/pull/870), [#871](https://github.com/bip-itteam-internal/bip-erp/pull/871)) — **belum diverifikasi ulang di dev** setelah merge.",
+      "status_teks": "**Implemented & LIVE di dev DAN prod** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849) + perbaikan [#855](https://github.com/bip-itteam-internal/bip-erp/pull/855)); prod naik 2026-08-01 dengan kepemilikan per departemen, bagian, dan keterangan ujung skala (PR [#869](https://github.com/bip-itteam-internal/bip-erp/pull/869), [#870](https://github.com/bip-itteam-internal/bip-erp/pull/870), [#871](https://github.com/bip-itteam-internal/bip-erp/pull/871)). FE web di [[APP - Web ERP]] sudah lengkap (kelola, builder, **analisa jawaban**) dan ikut ter-deploy; pengisian di [[APP - MyBharata]] sudah ada (section Survei di beranda + halaman isi berbagian). **Yang diverifikasi saat deploy hanya health `200` lewat gateway + backfill data lama**; alur buat→terbit→isi→analisa **belum diuji ulang** pada versi baru ini, baik di dev maupun prod.",
       "publik": true,
       "tautan": [
         "Microservices - Attendance Service",
@@ -1551,20 +1551,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "5314717c311b0f8126a795efb6b97bce6d96dff8370e8d7fd789b7401924952e",
-      "ukuran_kb": 19.2,
-      "ringkasan": "Menjawab: bagaimana form dinamis dibuat dan diterbitkan tanpa rilis kode per form, siapa yang memilikinya, dan bagaimana jawabannya direkap. Menjelaskan kepemilikan per departemen beserta cakupan supervisi HRGA, sembilan tipe pertanyaan plus penanda bagian dan keterangan ujung skala, sasaran form, gerbang presensi yang bisa menahan clock-in, serta analisa dan export CSV. Memuat pula jebakan BSON pada checkbox, kanonikalisasi ejaan departemen, dan backfill data lama saat service boot.",
+      "hash": "186ac26611c348638a2f4ae90295e4ccc69ba1f99d342aad6a6c3601624d1fc2",
+      "ukuran_kb": 20.3,
+      "ringkasan": "Menjawab: bagaimana form dinamis dibuat dan diterbitkan tanpa rilis kode per form, siapa yang memilikinya, dan bagaimana jawabannya direkap. Menjelaskan kepemilikan per departemen beserta cakupan supervisi HRGA, sembilan tipe pertanyaan plus penanda bagian dan keterangan ujung skala, sasaran form, gerbang presensi yang bisa menahan clock-in, serta analisa dan export CSV. Memuat status deploy dev dan prod, jebakan BSON pada checkbox, kanonikalisasi ejaan departemen, dan backfill data lama saat service boot.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
         "survei",
         "section",
         "bagian",
-        "skala",
         "owner_department",
+        "backfill",
         "gerbang presensi",
         "analisa jawaban",
-        "export CSV"
+        "deploy prod"
       ]
     },
     {
@@ -2028,8 +2028,8 @@
         "APP - Dynamic Task Tracker",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "8bae4b31363da82c47aba40772aa4f4a7960b0d623c37f8517df102178225a55",
-      "ukuran_kb": 16.6,
+      "hash": "e394da6994097630cd7dbf5504ef71225dd35d5bdf609828a035c8e072b217da",
+      "ukuran_kb": 16.7,
       "ringkasan": "Menjawab: bagaimana tiket dibuat, ditriase, dikerjakan, dan ditutup di task-management, siapa yang boleh melakukan apa, serta bagaimana SLA dan kepuasan pemohon dihitung. Menjelaskan cakupan divisi lewat scopedDivisions, siklus status termasuk hold dan reopen, CSAT beserta daftar tiket yang menunggu penilaian, notifikasi, WebSocket, dan laporan tim. Berguna untuk memahami aturan izin sebelum mengubah perilaku tiket.",
       "kata_kunci": [
         "task management",
@@ -5257,7 +5257,7 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Backend + FE web semuanya merged 2026-08-01** (bip-erp #849 & #855; erp-frontend #680, #682, #683). Web menyediakan kelola form, builder bertab, dan **halaman analisa jawaban**. **Yang masih kosong: pengisian di [[APP - MyBharata]]** — karyawan belum punya cara mengisi form sama sekali. Deploy: **dev sudah jalan** (form-builder-service + gateway dibangun ulang 2026-08-01); **prod belum** (service-nya belum pernah dibuat)",
+      "status_teks": "**Backend, FE web, dan pengisian mobile semuanya merged 2026-08-01** (bip-erp #849, #855, #869–#871; erp-frontend #680, #682, #683, #691–#693; my-bharata #93–#95). Web menyediakan kelola form, builder bertab, dan **halaman analisa jawaban**; [[APP - MyBharata]] menyediakan section Survei di beranda + halaman pengisian berbagian. Deploy: **dev dan prod sama-sama jalan** (prod naik manual 2026-08-01, health `200` lewat gateway). **Yang belum: alur buat→terbit→isi→analisa belum diuji ulang** pada versi terbaru ini",
       "publik": false,
       "tautan": [
         "APP - MyBharata",
@@ -5280,9 +5280,9 @@
         "DB - Overview and Notes",
         "ROADMAP"
       ],
-      "hash": "8259e1d019f92bb38061b22d784875291ba3bdfed1f859f84b76e6152da440fb",
-      "ukuran_kb": 6.0,
-      "ringkasan": "Menjawab: kenapa Form Builder dibangun, sampai mana ruang lingkupnya, dan keputusan produk apa saja yang menyertainya. Mencatat perubahan scope dari rencana asli, keputusan menampilkan identitas responden secara penuh beserta konsekuensi privasinya, dan hal yang masih belum diputuskan. Dokumen konsep dan latar belakang, bukan rincian implementasi.",
+      "hash": "8d800adc5bf9e3b3812f284d7142252a9003afe127f9a92b7382ec995268e973",
+      "ukuran_kb": 6.1,
+      "ringkasan": "Menjawab: kenapa Form Builder dibangun, sampai mana ruang lingkupnya, dan keputusan produk apa saja yang menyertainya. Mencatat perubahan scope dari rencana asli, keputusan menampilkan identitas responden secara penuh beserta konsekuensi privasinya dan bagaimana lingkarannya menyempit setelah kepemilikan pindah ke departemen, status deploy, serta hal yang masih belum diputuskan. Dokumen konsep dan latar belakang, bukan rincian implementasi.",
       "kata_kunci": [
         "form builder",
         "konsep",

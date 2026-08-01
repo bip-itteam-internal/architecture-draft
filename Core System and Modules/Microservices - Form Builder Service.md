@@ -5,7 +5,7 @@
 - **Stack:** Go + Fiber v2 + MongoDB (database sendiri `form_builder_db`)
 - **Path:** `services/form-builder`
 - **Port:** 6986 (internal, `expose`; tidak dipublish ke host)
-- **Status**: ⚠️ **Implemented & LIVE di dev** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849) + perbaikan [#855](https://github.com/bip-itteam-internal/bip-erp/pull/855)); terverifikasi end-to-end lewat gateway dev 2026-08-01. **PROD belum jalan** — container-nya belum pernah dibuat. FE web di [[APP - Web ERP]] sudah lengkap (kelola, builder, **analisa jawaban**), dan pengisian di [[APP - MyBharata]] sudah ada (section Survei di beranda + halaman isi berbagian). **Kepemilikan per departemen, bagian, dan keterangan ujung skala sudah merged** (PR [#869](https://github.com/bip-itteam-internal/bip-erp/pull/869), [#870](https://github.com/bip-itteam-internal/bip-erp/pull/870), [#871](https://github.com/bip-itteam-internal/bip-erp/pull/871)) — **belum diverifikasi ulang di dev** setelah merge.
+- **Status**: ⚠️ **Implemented & LIVE di dev DAN prod** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849) + perbaikan [#855](https://github.com/bip-itteam-internal/bip-erp/pull/855)); prod naik 2026-08-01 dengan kepemilikan per departemen, bagian, dan keterangan ujung skala (PR [#869](https://github.com/bip-itteam-internal/bip-erp/pull/869), [#870](https://github.com/bip-itteam-internal/bip-erp/pull/870), [#871](https://github.com/bip-itteam-internal/bip-erp/pull/871)). FE web di [[APP - Web ERP]] sudah lengkap (kelola, builder, **analisa jawaban**) dan ikut ter-deploy; pengisian di [[APP - MyBharata]] sudah ada (section Survei di beranda + halaman isi berbagian). **Yang diverifikasi saat deploy hanya health `200` lewat gateway + backfill data lama**; alur buat→terbit→isi→analisa **belum diuji ulang** pada versi baru ini, baik di dev maupun prod.
 
 ## Persona / Pengguna
 
@@ -115,13 +115,21 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 ## Belum Diimplementasikan / Catatan
 
 - ✅ **LIVE di dev sejak 2026-08-01.** `form-builder-service` + `form-builder-mongo-db` dijalankan dan `api-gateway` dibangun ulang; `GET /health?check=form-builder` balas `200`. Terverifikasi end-to-end lewat gateway: buat → terbit → isi → analisa → export → hapus.
-- ⚠️ **PROD belum**: repo & `.env` sudah siap, gateway prod bahkan sudah mengenal `form-builder` (balas `503`, bukan `400`), tapi **container `form-builder-service` belum pernah dibuat**. Untuk menyelesaikannya: `docker compose build form-builder-service` lalu `docker compose up -d form-builder-mongo-db form-builder-service` (mongo disebut eksplisit karena statusnya masih `created`).
+- ✅ **PROD JALAN sejak 2026-08-01**: `form-builder-service` + `form-builder-mongo-db` sehat, `GET /health?check=form-builder` lewat gateway balas `200`. Di-deploy manual (`docker compose build form-builder-service task-management-service` lalu `up -d --no-deps`); prod **tidak** auto-deploy.
+- ⚠️ **`FORM_BUILDER_DEPARTMENTS` belum diisi di `.env` prod**, jadi compose memunculkan peringatan "variable is not set" dan service memakai daftar bawaannya. Itu perilaku yang dirancang dan nilainya benar; mengisi env hanya menghilangkan peringatannya.
+
+> [!warning] Backfill menyelamatkan data yang dokumen ini sempat bilang tak ada
+> Catatan sebelumnya menyatakan prod belum punya data Form Builder. **Itu keliru**: container sudah dinaikkan lebih dulu dan sudah ada 1 form di sana. Log boot saat deploy mencatat:
+>
+> `[Form-Builder] 1 form dipindah dari owner_module="it" ke owner_department="Tech Development"`
+>
+> Kalau pemindahan dijalankan sebagai skrip manual seperti rencana awal, form itu akan lenyap dari daftar pemiliknya dan menolak dibuka dengan `403` sampai ada yang menyadarinya. Pelajarannya: **migrasi yang menempel di boot service lebih aman daripada yang menempel di ingatan orang**, terutama saat catatan tentang isi database bisa saja sudah basi.
 - ⚠️ **attendance-service masih pra-merge di dev dan prod**, jadi gerbang presensi belum aktif di mana pun. Itu aman selama belum ada form ber-mode `block`.
 - ✅ **`.env` dev dan prod SUDAH diisi (2026-08-01)**: `FORM_BUILDER_SERVICE_PORT=6986` + `MONGO_FORM_BUILDER_DB=form_builder_db`. Diverifikasi lewat `docker compose config` di kedua server — `FORM_BUILDER_MODULE_URL` merender `http://form-builder-service:6986` di blok gateway maupun attendance. Backup disimpan (`~/apps/bip-erp/.env.bak-*`). Port 6986 bebas di keduanya.
 - ⚠️ **Kenapa dua variabel itu wajib ada SEBELUM gateway di-redeploy.** Berbeda dari attendance (yang sengaja menaruh URL form-builder DI LUAR map tervalidasi), gateway memasukkan `form-builder` ke `InternalURL` dan menjalankan `validation.ValidateInternalURL` — nilai kosong berarti **gateway panic saat boot dan SELURUH ERP ikut mati**. `docker-compose.yml` meredam ini karena nilainya dirakit dari string literal (`http://form-builder-service:${...}`) sehingga tak pernah benar-benar kosong, tapi variabel port yang hilang tetap menghasilkan URL rusak dan semua `/api/form-builder/*` gagal. Deploy gateway HARUS memakai compose yang ikut ter-merge, bukan env lama.
 - **Konsumen**: [[APP - Web ERP]] memakai seluruh rute `/forms*` **termasuk** `analytics`, `responses`, dan `export` (halaman analisa, erp-frontend PR #683).
 - ✅ **Pengisian (`/me/*`) sudah punya konsumen**: [[APP - MyBharata]] (my-bharata PR #93, merged) — section Survei di beranda + halaman isi 9 tipe. Web sengaja tetap tak menyediakan halaman isi form.
-- ⚠️ **Gerbang mode `block` tetap belum boleh dinyalakan di produksi**: `form-builder-service` belum jalan di prod DAN attendance-service masih pra-merge. Lihat [[IT - Form Builder]].
+- ⚠️ **Gerbang mode `block` tetap belum boleh dinyalakan di produksi.** Alasannya kini tinggal satu: **attendance-service masih pra-merge**, jadi ia belum memanggil `/internal/compliance` sama sekali. Menyalakan `block` hanya akan memasang penanda yang tak ditegakkan siapa pun — dan begitu attendance naik, ia langsung menahan clock-in tanpa masa transisi. Lihat [[IT - Form Builder]].
 - ⚠️ **`FORM_BUILDER_DEPARTMENTS` belum diisi di `.env` mana pun** — tak masalah, bawaannya sudah benar. Isi hanya bila daftarnya mau berbeda.
 
 > [!warning] Gotcha yang sudah menggigit: BSON tak sama dengan JSON

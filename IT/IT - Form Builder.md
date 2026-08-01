@@ -2,7 +2,7 @@
 
 *Konsep **Form Builder** — pembuat form dinamis tanpa coding untuk kasus internal baru/ad-hoc. Bharata banyak memakai "form request" yang kini di-hardcode per kasus; Form Builder jadi fondasi reusable (buat form baru tanpa rilis kode). Rencana yang dulu ditunda **sudah dieksekusi**, dengan scope yang **lebih luas** dari rencana asli.*
 
-- **Status**: ⚠️ **Backend + FE web semuanya merged 2026-08-01** (bip-erp #849 & #855; erp-frontend #680, #682, #683). Web menyediakan kelola form, builder bertab, dan **halaman analisa jawaban**. **Yang masih kosong: pengisian di [[APP - MyBharata]]** — karyawan belum punya cara mengisi form sama sekali. Deploy: **dev sudah jalan** (form-builder-service + gateway dibangun ulang 2026-08-01); **prod belum** (service-nya belum pernah dibuat)
+- **Status**: ⚠️ **Backend, FE web, dan pengisian mobile semuanya merged 2026-08-01** (bip-erp #849, #855, #869–#871; erp-frontend #680, #682, #683, #691–#693; my-bharata #93–#95). Web menyediakan kelola form, builder bertab, dan **halaman analisa jawaban**; [[APP - MyBharata]] menyediakan section Survei di beranda + halaman pengisian berbagian. Deploy: **dev dan prod sama-sama jalan** (prod naik manual 2026-08-01, health `200` lewat gateway). **Yang belum: alur buat→terbit→isi→analisa belum diuji ulang** pada versi terbaru ini
 - **Penempatan**: tooling platform (Tech Development), dipakai bersama HRGA
 - **Implementasi**: [[Microservices - Form Builder Service]] · **FE web**: [[APP - Web ERP]] · **API**: [[API - Form Builder Service]]
 
