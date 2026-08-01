@@ -1000,20 +1000,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "f099283126474f364d08b0b231c7225c1c572859a78b053d1e334487444ebb22",
-      "ukuran_kb": 61.1,
-      "ringkasan": "Menjawab: apa itu portal web internal `hris-dashboard` (\"One Bharata\"), stack dan repo mana yang dipakai, bagaimana alur login serta perannya sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager. Juga menjawab bagaimana `system_roles` menggerbangi sidebar dan menu, bagaimana menu dikelompokkan dan diratakan, bagaimana pengaturan tampilan menu per jabatan bekerja (`menu_hidden`), serta bagian mana dari web ini yang sudah company-aware untuk multi-perusahaan.",
+      "hash": "05518a85c4ad71c4724295e10ad3234d9ab65d718f40ee95e9b96290e87456ce",
+      "ukuran_kb": 62.3,
+      "ringkasan": "Menjawab: apa itu portal web internal \"One Bharata\" (repo erp-frontend, Next.js 16 + React 19), stack dan library apa yang dipakai, serta bagaimana login, refresh token, dan perannya sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager. Menjelaskan juga bagaimana sidebar dan menu digerbang oleh cookie system_roles per modul (hris, finance, it, ga, insentive, kpi, dst), bagaimana menu dikelompokkan lewat menu induk bersarang, kapan induk tipis diratakan, dan bagaimana pengaturan Tampilan Menu per jabatan bekerja (centang = tampil, yang disimpan menu_hidden) sebagai setelan tampilan dan bukan hak akses. Berisi pula cakupan multi-perusahaan di FE (CompanySwitcher, Kelola Perusahaan/Departemen/Shift/Network per company) dan fitur atasan langsung, KPI Leader, serta Bagan Organisasi.",
       "kata_kunci": [
-        "Web ERP",
-        "hris-dashboard",
-        "One Bharata",
         "erp-frontend",
+        "web ERP",
+        "One Bharata",
+        "hris-dashboard",
         "Next.js",
-        "SSO identity provider",
+        "SSO",
         "system_roles",
         "sidebar menu",
-        "multi-perusahaan",
-        "company switcher"
+        "menu_hidden",
+        "multi-perusahaan"
       ]
     },
     {
@@ -6696,9 +6696,9 @@
         "ADR - 0009 Affiliate via Search Seller Affiliate Orders API",
         "Sales - Incentive"
       ],
-      "hash": "f02f74fef5a3096e72a58f55b7582924f3e43388fa84a92060955e5b178019ec",
-      "ukuran_kb": 16.6,
-      "ringkasan": "Menjawab: bagaimana karyawan ICC (Internal Content Creator) dipetakan ke akun TikTok Shop dan TikTok Ads yang mereka kelola, termasuk model data koleksi icc_account_mappings, aturan kardinalitas (1 karyawan boleh banyak toko/advertiser, tapi satu toko/advertiser hanya satu karyawan aktif), dan unique index-nya. Menjelaskan alur SPV/Leader membuat mapping, ICC Dashboard untuk staff melihat performa toko dan iklannya sendiri, Team Performance untuk supervisor, rotasi/pergantian AM, plus endpoint /icc/mappings dan otorisasi via RequireMarketingLeader. Juga menjawab: dari mana field team diisi (header BIP-Department) dan bagian mana yang masih rencana (laporan akuntabilitas AM, relasi leader dan akumulasi insentif).",
+      "hash": "d32dd441bd5ed73a0b051e2d7ef6c3b29162aaaaddaebc2907c3b495bd49e02f",
+      "ukuran_kb": 17.7,
+      "ringkasan": "Menjawab: bagaimana karyawan ICC (Internal Content Creator) dipetakan ke akun TikTok Shop dan TikTok Ads yang mereka kelola, seperti apa model data koleksi icc_account_mappings di Integration Service, dan aturan apa yang berlaku (shop/advertiser opsional tapi minimal salah satu wajib, satu karyawan boleh banyak toko/ads, satu shop atau advertiser hanya untuk satu karyawan aktif). Menjelaskan alur SPV/Leader membuat mapping dengan team auto-fill dari header BIP-Department, halaman ICC Dashboard untuk staff melihat performa toko dan iklannya sendiri, Team Performance untuk atasan, serta cara rotasi atau pergantian Account Manager. Memuat juga daftar endpoint /icc/mappings, otorisasi lewat middleware RequireMarketingLeader, fase implementasi, dan kaitannya dengan insentif.",
       "kata_kunci": [
         "ICC",
         "Internal Content Creator",

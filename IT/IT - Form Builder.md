@@ -2,7 +2,7 @@
 
 *Konsep **Form Builder** — pembuat form dinamis tanpa coding untuk kasus internal baru/ad-hoc. Bharata banyak memakai "form request" yang kini di-hardcode per kasus; Form Builder jadi fondasi reusable (buat form baru tanpa rilis kode). Rencana yang dulu ditunda **sudah dieksekusi**, dengan scope yang **lebih luas** dari rencana asli.*
 
-- **Status**: ⚠️ **Backend sudah merged ke `main` 2026-08-01** (PR #849), **belum live di dev**. **FE kelola** ada di branch `feat/form-builder` repo `erp-frontend` (**belum merge**) dan berupa alat **kelola** saja (daftar + builder); **halaman analisa/export belum**, dan **pengisian di MyBharata belum ada**
+- **Status**: ⚠️ **Backend + FE web semuanya merged 2026-08-01** (bip-erp #849 & #855; erp-frontend #680, #682, #683). Web menyediakan kelola form, builder bertab, dan **halaman analisa jawaban**. **Yang masih kosong: pengisian di [[APP - MyBharata]]** — karyawan belum punya cara mengisi form sama sekali. Deploy: **dev sudah jalan** (form-builder-service + gateway dibangun ulang 2026-08-01); **prod belum** (service-nya belum pernah dibuat)
 - **Penempatan**: tooling platform (Tech Development), dipakai bersama HRGA
 - **Implementasi**: [[Microservices - Form Builder Service]] · **FE web**: [[APP - Web ERP]] · **API**: [[API - Form Builder Service]]
 
@@ -42,12 +42,20 @@ Rinciannya di [[Microservices - Form Builder Service]] dan [[Microservices - Att
 
 Deploy tetap **backend lebih dulu, FE menyusul**.
 
+## Keputusan: Identitas Responden Ditampilkan Penuh
+
+Halaman analisa menampilkan **nama, departemen, dan jabatan** tiap pengisi beserta seluruh jawabannya (tab Pertanyaan & Individu), meniru Google Form.
+
+Ini **keputusan sadar pemilik produk 2026-08-01**, diambil setelah konsekuensinya disampaikan: pengelola form — yaitu **siapa pun berperan `it` ATAU `ga`**, bukan hanya HRGA — bisa melihat siapa menjawab apa. Untuk form seperti Deklarasi Kesehatan, itu berarti kondisi kesehatan per orang terbaca tim IT juga.
+
+Dicatat di sini supaya keputusannya terekam dan bisa ditinjau ulang, bukan tersembunyi sebagai perilaku kode. Alternatif yang ditolak: hanya agregat, atau daftar tanpa identitas.
+
 ## Belum Diputuskan (TBD)
 
-- Kapan di-merge & deploy (BE harus naik lebih dulu dari FE — lihat catatan urutan deploy di [[Microservices - Form Builder Service]]).
-- Halaman **analisa & export** di [[APP - Web ERP]]: endpoint backend sudah siap tapi belum ada layarnya.
-- Renderer pengisian di [[APP - MyBharata]] — belum dikerjakan sama sekali.
+- Renderer pengisian di [[APP - MyBharata]] — belum dikerjakan sama sekali, dan inilah yang menahan mode `block` boleh dinyalakan.
+- Deploy **prod**: form-builder-service belum pernah dibuat di sana (lihat [[Microservices - Form Builder Service]]).
 - Pencarian karyawan untuk sasaran per-orang (sementara diketik sebagai Employee ID per baris).
+- Form berulang: gerbang presensi menganggap "sudah pernah mengisi" selamanya, jadi belum ada bentuk deklarasi **harian**. Form contoh di dev diberi nama per bulan sebagai siasat.
 - Apakah form publik (tanpa login) akan didukung — belum dikerjakan.
 - Apakah RBAC akan dinaikkan ke permission-set [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].
 

@@ -5,7 +5,7 @@
 - **Stack:** Go + Fiber v2 + MongoDB (database sendiri `form_builder_db`)
 - **Path:** `services/form-builder`
 - **Port:** 6986 (internal, `expose`; tidak dipublish ke host)
-- **Status**: ⚠️ **Merged ke `main` 2026-08-01** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849), merge commit `4f546f14`), backend lengkap dan teruji (122 unit test). **BELUM live di dev** per pemeriksaan 2026-08-01: `GET /health?check=form-builder` di gateway dev masih balas `400 unknown service`, artinya gateway di sana masih binary pra-merge. **FE kelola di [[APP - Web ERP]] sudah ada** (branch `feat/form-builder` di repo `erp-frontend`, **belum merge**): daftar form + builder. **Yang masih kosong**: layar analisa/export di web, dan renderer pengisian di [[APP - MyBharata]] — sehingga karyawan belum punya cara mengisi form sama sekali.
+- **Status**: ⚠️ **Implemented & LIVE di dev** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849) + perbaikan [#855](https://github.com/bip-itteam-internal/bip-erp/pull/855)); terverifikasi end-to-end lewat gateway dev 2026-08-01. **PROD belum jalan** — container-nya belum pernah dibuat. FE web di [[APP - Web ERP]] sudah lengkap (kelola, builder, **analisa jawaban**). **Yang masih kosong: renderer pengisian di [[APP - MyBharata]]**, sehingga karyawan belum punya cara mengisi form sama sekali.
 
 ## Persona / Pengguna
 
@@ -66,11 +66,22 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 
 ## Belum Diimplementasikan / Catatan
 
-- **Sudah di `main`, belum live di dev.** Diperiksa 2026-08-01: gateway dev (`10.10.10.121:6969`) sehat untuk employee/attendance/recruitment tapi membalas `400 unknown service` untuk `form-builder`, jadi binary gateway di sana masih pra-merge.
-- ✅ **`.env` dev dan prod SUDAH diisi (2026-08-01)**: `FORM_BUILDER_SERVICE_PORT=6986` + `MONGO_FORM_BUILDER_DB=form_builder_db`. Diverifikasi lewat `docker compose config` di kedua server — `FORM_BUILDER_MODULE_URL` merender `http://form-builder-service:6986` di blok gateway maupun attendance. Backup disimpan (`~/apps/bip-erp/.env.bak-*`). Port 6986 bebas di keduanya. **Container belum di-restart**, jadi kode yang berjalan masih pra-merge.
+- ✅ **LIVE di dev sejak 2026-08-01.** `form-builder-service` + `form-builder-mongo-db` dijalankan dan `api-gateway` dibangun ulang; `GET /health?check=form-builder` balas `200`. Terverifikasi end-to-end lewat gateway: buat → terbit → isi → analisa → export → hapus.
+- ⚠️ **PROD belum**: repo & `.env` sudah siap, gateway prod bahkan sudah mengenal `form-builder` (balas `503`, bukan `400`), tapi **container `form-builder-service` belum pernah dibuat**. Untuk menyelesaikannya: `docker compose build form-builder-service` lalu `docker compose up -d form-builder-mongo-db form-builder-service` (mongo disebut eksplisit karena statusnya masih `created`).
+- ⚠️ **attendance-service masih pra-merge di dev dan prod**, jadi gerbang presensi belum aktif di mana pun. Itu aman selama belum ada form ber-mode `block`.
+- ✅ **`.env` dev dan prod SUDAH diisi (2026-08-01)**: `FORM_BUILDER_SERVICE_PORT=6986` + `MONGO_FORM_BUILDER_DB=form_builder_db`. Diverifikasi lewat `docker compose config` di kedua server — `FORM_BUILDER_MODULE_URL` merender `http://form-builder-service:6986` di blok gateway maupun attendance. Backup disimpan (`~/apps/bip-erp/.env.bak-*`). Port 6986 bebas di keduanya.
 - ⚠️ **Kenapa dua variabel itu wajib ada SEBELUM gateway di-redeploy.** Berbeda dari attendance (yang sengaja menaruh URL form-builder DI LUAR map tervalidasi), gateway memasukkan `form-builder` ke `InternalURL` dan menjalankan `validation.ValidateInternalURL` — nilai kosong berarti **gateway panic saat boot dan SELURUH ERP ikut mati**. `docker-compose.yml` meredam ini karena nilainya dirakit dari string literal (`http://form-builder-service:${...}`) sehingga tak pernah benar-benar kosong, tapi variabel port yang hilang tetap menghasilkan URL rusak dan semua `/api/form-builder/*` gagal. Deploy gateway HARUS memakai compose yang ikut ter-merge, bukan env lama.
-- **Konsumen yang sudah ada**: FE kelola di [[APP - Web ERP]] memakai `POST/GET/PATCH/DELETE /forms*`. **Endpoint `/forms/:id/analytics`, `/forms/:id/responses`, dan `/forms/:id/export` sudah siap tapi BELUM ada yang memanggilnya** — layar analisa & export menyusul.
+- **Konsumen**: [[APP - Web ERP]] memakai seluruh rute `/forms*` **termasuk** `analytics`, `responses`, dan `export` (halaman analisa, erp-frontend PR #683).
 - **Endpoint pengisian (`/me/*`) belum punya konsumen sama sekali.** Pengisian direncanakan lewat [[APP - MyBharata]] yang belum dibangun, dan web sengaja tak menyediakan halaman isi form. Konsekuensinya gerbang mode `block` belum boleh dinyalakan di produksi — lihat [[IT - Form Builder]].
+
+> [!warning] Gotcha yang sudah menggigit: BSON tak sama dengan JSON
+> **PR #855, ditemukan di dev 2026-08-01.** Pertanyaan checkbox melaporkan SEMUA opsi bernilai nol dan kolom CSV-nya keluar sebagai `[Tidak ada]` lengkap dengan kurung siku, padahal datanya tersimpan benar di Mongo.
+>
+> Sebabnya driver Mongo men-decode array BSON menjadi **`primitive.A`**, yaitu tipe **BERNAMA** (`type A []interface{}`). Type switch `case []interface{}:` **tidak cocok dengan tipe bernama**, jadi setiap nilai yang dibaca **kembali** dari database gagal dikenali sebagai daftar lalu jatuh ke `fmt.Sprintf("%v")`. Jalur TULIS aman karena nilainya masih dari JSON — itulah kenapa validasi saat submit tak pernah menolak apa pun dan bug ini lolos sampai dev.
+>
+> Perbaikannya memakai **reflection** (`reflect.Kind() == Slice`), bukan mendaftar tipe satu per satu, supaya bentuk lain ikut tertangani.
+>
+> **Pelajaran yang berlaku untuk service mana pun di repo ini:** 122 unit test service ini semuanya hijau saat bug ini hidup, karena setiap fixture dirakit tangan sebagai `[]interface{}` dan tak satu pun melewati BSON. Uji dengan data buatan sendiri **tidak** menguji lapisan decode database. Regresinya dikunci di `bson_values_test.go` memakai `primitive.A` asli.
 - **Upload file** belum didukung (menyusul via [[Microservices - File Service]], cap 4 MB).
 - **Logika percabangan** (lompat seksi berdasarkan jawaban) belum ada.
 - **Jumlah sasaran tidak dihitung otomatis.** Untuk sasaran `all`/`departments`, penyebut tingkat pengisian memakai `audience.estimated_size` yang diisi manual pembuat form — service ini sengaja tak memanggil employee-service. Bila kosong, tingkat pengisian **tidak dilaporkan** (menampilkan 0% lebih menyesatkan daripada tak menampilkan apa pun).
