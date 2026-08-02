@@ -1,11 +1,12 @@
 ## Deskripsi
 
-*Form Builder Service adalah pembuat form dinamis tanpa coding: sebuah departemen menyusun form sendiri (9 tipe pertanyaan), menerbitkannya ke sasaran tertentu, membaca rekap jawabannya, dan mengekspornya ke CSV — tanpa rilis kode untuk tiap form baru. Service ini juga menyediakan satu endpoint kepatuhan yang dipakai [[Microservices - Attendance Service]] untuk menahan clock-in mobile bila ada form wajib yang belum diisi.*
+*Form Builder Service adalah pembuat form dinamis tanpa coding: sebuah departemen menyusun form sendiri (9 tipe pertanyaan), menerbitkannya ke sasaran tertentu, membaca rekap jawabannya, dan mengekspornya ke CSV — tanpa rilis kode untuk tiap form baru. Sejak PR #907 form juga bisa **menilai karyawan lain**: satu form dipakai berulang untuk banyak orang tanpa pengisinya mengulang dari awal. Service ini juga menyediakan satu endpoint kepatuhan yang dipakai [[Microservices - Attendance Service]] untuk menahan clock-in mobile bila ada form wajib yang belum diisi.*
 
 - **Stack:** Go + Fiber v2 + MongoDB (database sendiri `form_builder_db`)
 - **Path:** `services/form-builder`
 - **Port:** 6986 (internal, `expose`; tidak dipublish ke host)
 - **Status**: ⚠️ **Implemented & LIVE di dev DAN prod** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849) + perbaikan [#855](https://github.com/bip-itteam-internal/bip-erp/pull/855)); prod naik 2026-08-01 dengan kepemilikan per departemen, bagian, dan keterangan ujung skala (PR [#869](https://github.com/bip-itteam-internal/bip-erp/pull/869), [#870](https://github.com/bip-itteam-internal/bip-erp/pull/870), [#871](https://github.com/bip-itteam-internal/bip-erp/pull/871)). FE web di [[APP - Web ERP]] sudah lengkap (kelola, builder, **analisa jawaban**) dan ikut ter-deploy; pengisian di [[APP - MyBharata]] sudah ada (section Survei di beranda + halaman isi berbagian). **Yang diverifikasi saat deploy hanya health `200` lewat gateway + backfill data lama**; alur buat→terbit→isi→analisa **belum diuji ulang** pada versi baru ini, baik di dev maupun prod.
+- **Penilaian karyawan lain + tipe form**: PR [#907](https://github.com/bip-itteam-internal/bip-erp/pull/907) **merged & LIVE di dev 2026-08-02** (log boot mencatat `8 form lama ditandai form_type="survey"`, handler jadi 31). Rekap per orang & tingkat penyelesaian: PR [#908](https://github.com/bip-itteam-internal/bip-erp/pull/908) **merged 2026-08-02**. **Keduanya belum di prod**, dan alur penilaian belum diuji end-to-end di lingkungan mana pun.
 
 ## Persona / Pengguna
 
@@ -35,14 +36,21 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 
 **Tipe pertanyaan (9)** — `short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`. Validasi struktur (key unik, options wajib untuk tipe pilihan, rentang scale maksimal 10 langkah, `min ≤ max`) dan validasi jawaban (tipe cocok, nilai ∈ options, batas angka & panjang teks, format `YYYY-MM-DD` dan `HH:MM`) keduanya **fungsi murni** — teruji tanpa Mongo.
 
+**Tipe form (4)** — `survey`, `evaluation`, `request`, `checklist`. Bukan sekadar label: tanpanya daftar form berisi survei, pengajuan, checklist, dan penilaian yang tampak serupa padahal cara mengisinya berbeda jauh. `GET /forms?form_type=` menyaringnya; nilai `survey` sengaja ikut menjaring dokumen yang field-nya belum ada, karena backfill baru mengisinya saat boot. Kiriman tanpa `form_type` diberi default `survey` (klien lama belum mengirimnya), tapi nilai **tak dikenal diteruskan apa adanya** supaya validasi menolaknya dengan pesan jelas alih-alih diam-diam berubah jadi survei.
+
 **Bagian (`section`)** — penanda pemisah halaman, bukan pertanyaan. Lihat bagian tersendiri di bawah.
+
+**Hitungan jawaban di daftar form** — tiap item membawa `response_count` (jumlah jawaban) dan `respondent_count` (jumlah ORANG). Dibedakan karena pada form penilaian keduanya berbeda jauh: 185 karyawan menilai 4 office boy menghasilkan 740 jawaban, dan menjawab "sudah berapa yang mengisi" dengan 740 terbaca seolah empat kali lipat karyawan perusahaan sudah mengisi. Keduanya **diturunkan** saat menyusun daftar (`bson:"-"`), tak pernah disimpan, lewat **satu agregasi** untuk seluruh halaman.
 
 **Keterangan ujung skala** (`scale_min_label`/`scale_max_label`, maks 40 karakter, opsional) — tanpa itu pengisi harus menebak apakah angka terkecil berarti terbaik atau terburuk, dan tebakan yang salah membuat **seluruh jawaban skala terbalik artinya sementara analisanya tetap tampak masuk akal**. Hanya berlaku untuk tipe `scale`; menempel di tipe lain ditolak karena pasti sisa perpindahan tipe.
 
-**Sasaran form (audience)** — `all`, `departments`, atau `employees`. Diresolusi dari **header identitas yang sudah dibawa gateway** (`BIP-Employee-ID`, `BIP-Department`), sehingga service ini **tak memanggil satu service pun**. Tipe sasaran yang tak dikenal **gagal-tertutup** (tidak cocok), supaya salah ketik tak pernah menahan presensi sekantor.
+**Sasaran form (audience)** — `all`, `departments`, atau `employees`. Diresolusi dari **header identitas yang sudah dibawa gateway** (`BIP-Employee-ID`, `BIP-Department`), sehingga jalur pengisian **tak memanggil satu service pun**. Tipe sasaran yang tak dikenal **gagal-tertutup** (tidak cocok), supaya salah ketik tak pernah menahan presensi sekantor.
+
+**Sasaran penilaian (subject)** — siapa yang DINILAI, sumbu terpisah dari `audience`. Lihat bagian tersendiri di bawah.
 
 **Pengisian** (cukup karyawan terautentikasi)
-- `GET /me/forms` — form terbit yang ditujukan ke pemanggil, lengkap dengan penanda `submitted` dan `blocks_attendance`.
+- `GET /me/forms` — form terbit yang ditujukan ke pemanggil, lengkap dengan penanda `submitted` dan `blocks_attendance`. Untuk form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous`; `submitted` baru bernilai `true` setelah **seluruh** sasaran dinilai, bukan setelah orang pertama.
+- `GET /me/forms/:id/subjects` — daftar orang yang harus dinilai pemanggil, beserta mana yang sudah selesai. Dibaca dari potret di dokumen form, jadi jalur ini **tak menyentuh employee-service sama sekali**.
 - `POST /me/forms/:id/responses` — kirim jawaban. Form non-`published` ditolak, dan bukan-sasaran ditolak `403`.
 - `GET /me/responses` — riwayat jawaban sendiri.
 - **Idempoten**: pengiriman identik dalam 2 menit dianggap retry dan dibalas sukses tanpa insert baru. Sidiknya di-hash dari jawaban yang **kuncinya diurutkan lebih dulu**, jadi klien yang menyusun ulang payload saat retry tetap terdeteksi. Pola sejenis dipakai leave request di [[Microservices - Attendance Service]].
@@ -75,6 +83,70 @@ Hasilnya "HRGA" tak pernah jadi nilai tersimpan di mana pun: ia gabungan dua dep
 > **Backfill saat boot, bukan skrip manual.** Begitu versi ini naik, form yang masih menyimpan `owner_module` tak cocok filter mana pun: hilang dari daftar dan menolak dibuka dengan `403`. Dev deploy-nya otomatis dari `main`, jadi jedanya tak bisa dijadwalkan. Pemindahan dijalankan idempoten saat boot (`it`→`Tech Development`, `ga`→`General Affair`), bersama pembuatan index.
 
 **Siapa yang berubah aksesnya**: staf HR (`hris:staff`) yang dulu terkunci kini bisa membangun form; pemegang peran `it`/`ga` yang departemennya di luar daftar aktif kehilangan akses; karyawan tanpa `department` di `work_data` kini tertutup (fail-closed, disengaja untuk perubahan kontrol akses). Token berlaku 72 jam, jadi SPV HRGA yang belum login ulang sementara hanya melihat departemennya sendiri — fallback `SupervisedDepartments` menanganinya tanpa error.
+
+## Penilaian karyawan lain: sumbu `subject`, terpisah dari `audience`
+
+Kasus nyata yang jadi acuan: **seluruh karyawan menilai tiap Office Boy, satu per satu**. Di produksi itu 185 karyawan × 4 Office Boy = **740 penilaian**, dan tiap orang mengisi 4 kali dalam satu duduk.
+
+Dua sumbu yang berbeda dan sengaja tidak digabung:
+
+| Sumbu | Menjawab | Nilai |
+|---|---|---|
+| `audience` (lama) | siapa yang **MENGISI** | `all` · `departments` · `employees` |
+| `subject` (baru) | siapa yang **DINILAI** | aturan `departments` · `positions` · `employees` |
+
+Skenario OB jadi `audience: all` + `subject.rules: [positions]` dengan `positions: ["Office Boy"]`. Aturan digabung sebagai **OR** — "semua OB ditambah seluruh tim Security" permintaan wajar, sedangkan "OB yang sekaligus Security" tak pernah ada.
+
+**Form tanpa `subject` berperilaku persis seperti sebelumnya**, jadi tak satu pun form lama perlu dimigrasi.
+
+**Tipe `evaluation` terikat DUA ARAH dengan `subject`**: tipe penilaian wajib punya sasaran, dan yang punya sasaran wajib bertipe penilaian. Tanpa ikatan itu keduanya jadi dua saklar terpisah yang bisa bertentangan, dan hasilnya form yang tampak benar di editor tapi berperilaku lain di tangan pengisi — form "Penilaian Karyawan" yang dibuka lalu tak menemukan seorang pun untuk dinilai.
+
+### Potret sasaran diambil sekali saat terbit
+
+`subject.resolved` membekukan daftar orang **tepat saat form diterbitkan**, dan itu bukan cache demi kecepatan semata. Orang pindah jabatan dan karyawan baru masuk kapan saja; daftar yang bergeser di tengah periode membuat sebagian penilai mendapat orang yang tak pernah dilihat penilai lain, lalu angkanya dibandingkan seolah setara.
+
+Efek sampingnya seluruh jalur pengisian **tak menyentuh employee-service sama sekali** — service itu hanya dipanggil pada saat menerbitkan.
+
+Gagal memotret **menggagalkan penerbitan** (`422`), berbeda dari notifikasi yang cuma di-log: form berpenilaian tanpa daftar sasaran tampak normal bagi pengelolanya sementara tak seorang pun pengisi melihat siapa yang harus dinilai. Batasnya **300 orang**, ditolak di muka dan tidak dipotong diam-diam.
+
+### Aturan relasional sengaja belum ada
+
+Atasan langsung, bawahan, dan sejawat satu atasan **tidak ditawarkan**. Penentunya `supervisor_id` di `work_data`, yang lapangan menunjukkan baru terisi pada segelintir karyawan (lihat [[HRIS - Organization Structure]]). Aturan yang diam-diam menghasilkan daftar kosong lebih buruk daripada aturan yang belum ada.
+
+### Kunci keunikan bergeser
+
+Dari (form, pengisi) jadi **(form, pengisi, yang dinilai)**. Tanpa itu `single_response` menghentikan pengisi tepat setelah sasaran pertama dan sisa daftarnya mustahil diselesaikan. Guard idempotensi ikut memakai `subject_employee_id`: dua penilaian berturut-turut atas orang **berbeda** bisa punya jawaban yang persis sama (lima bintang untuk semuanya), dan tanpa pembeda itu yang kedua dibuang sebagai retry.
+
+`subject_employee_id` dari klien **tidak dipercaya** dan dicocokkan ulang ke potret; tanpa itu siapa pun bisa mengirim penilaian atas orang yang tak pernah ada di daftarnya.
+
+> [!warning] Jebakan yang ikut ditutup: field yang hilang ≠ string kosong
+> Jawaban yang tersimpan **sebelum** fitur ini tak punya `subject_employee_id` sama sekali (`omitempty`), dan di Mongo `{field: ""}` **tidak cocok** dengan dokumen yang field-nya hilang. Tanpa `subjectQuery` (yang memakai `$in: ["", null]`), `single_response` dan guard idempotensi diam-diam berhenti bekerja pada **seluruh form lama**: form sekali-isi bisa diisi ulang, dan retry jaringan mulai melahirkan jawaban ganda.
+
+### Gerbang presensi DILARANG pada form penilaian
+
+Keputusan sadar. Gerbang menahan orang masuk kerja; form penilaian menuntut **seluruh** sasaran dinilai lebih dulu. Pada kasus OB itu berarti menahan 185 orang di depan pintu sampai masing-masing menyelesaikan 4 penilaian. Larangan ini sekaligus menjaga jalur clock-in tetap murah: tanpanya tiap clock-in harus menghitung kelengkapan penilaian per orang.
+
+### Kerahasiaan penilai: saklar per form
+
+`subject.anonymous`, default mati. Identitas penilai **tetap tersimpan** supaya satu orang tak bisa menilai dua kali dan jejaknya tetap bisa diaudit, tapi dikosongkan di export CSV dan daftar jawaban. Yang **dinilai** tetap utuh, karena itulah gunanya laporan ini dibaca. Kolomnya dikosongkan, bukan dihapus, supaya bentuk file CSV tak berubah dan template lama tak patah.
+
+Disetel per form karena bobotnya beda jauh: survei fasilitas kantor tak butuh kerahasiaan, penilaian sejawat oleh 184 orang justru tak ada artinya tanpa itu.
+
+### Rekap per orang & tingkat penyelesaian (PR #908)
+
+`GET /forms/:id/analytics` bertambah `evaluation`, `subjects`, dan `subjects_truncated` — semuanya absen pada form biasa.
+
+**Tingkat penyelesaian memakai penyebut yang berbeda.** Angka bawaan menghitung siapa saja yang mengirim minimal satu penilaian, jadi pada sasaran 4 orang seseorang yang baru menilai satu sudah terhitung penuh dan angkanya menyentuh 100% jauh sebelum pekerjaannya selesai. Yang dilaporkan sekarang adalah penilai yang menyelesaikan **seluruh** daftarnya, diperiksa **per penilai terhadap daftar miliknya sendiri** — jumlah sasaran tiap orang bisa berbeda satu, karena yang namanya ikut di daftar tidak menilai dirinya sendiri kecuali `allow_self` menyala.
+
+**Rekap per orang bertumpu pada potret, bukan pada jawaban yang masuk.** Orang yang belum dinilai siapa pun tetap muncul dengan angka nol; kalau disusun dari jawaban saja, orang yang paling terlewat justru lenyap dari laporan padahal dialah yang paling perlu ditindaklanjuti. Rata-rata hanya untuk pertanyaan `number` dan `scale` — merata-ratakan pilihan atau teks tak punya arti, dan mencampur skala 1..5 dengan 1..10 justru menyesatkan. Rata-rata memakai pointer, bukan 0: "belum ada yang menilai" dan "dinilai nol" berjauhan artinya.
+
+## Notifikasi inbox
+
+Saat form **terbit**, seluruh sasaran diberi tahu lewat [[Microservices - Notification Service]] (`POST /inbox/send`), dan jumlah orang yang menunggu dinilai disebut di muka supaya penerima bisa memilih waktu yang cukup. Daftar penerima disusun **sinkron** (butuh header perusahaan dari Ctx hidup), pengirimannya **asinkron**: 185 kiriman inbox berurutan tak boleh menyandera tombol terbit.
+
+Saat pengisian **selesai**, konfirmasi dikirim **sekali** ketika seluruh sasaran rampung, bukan tiap satu orang dinilai. Empat notifikasi berturut-turut hanya melatih orang mengabaikan inbox-nya.
+
+Kategori `form-published` dan `form-submitted` didaftarkan di `shared-library/models/notification`; notification-service menolak `400` kategori di luar daftar itu, jadi tanpa entri itu notifnya hilang tanpa jejak.
 
 ## Bagian (section): penanda di daftar datar, bukan struktur bersarang
 
@@ -142,7 +214,7 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 > **Pelajaran yang berlaku untuk service mana pun di repo ini:** 122 unit test service ini semuanya hijau saat bug ini hidup, karena setiap fixture dirakit tangan sebagai `[]interface{}` dan tak satu pun melewati BSON. Uji dengan data buatan sendiri **tidak** menguji lapisan decode database. Regresinya dikunci di `bson_values_test.go` memakai `primitive.A` asli.
 - **Upload file** belum didukung (menyusul via [[Microservices - File Service]], cap 4 MB).
 - **Logika percabangan** (lompat seksi berdasarkan jawaban) belum ada.
-- **Jumlah sasaran tidak dihitung otomatis.** Untuk sasaran `all`/`departments`, penyebut tingkat pengisian memakai `audience.estimated_size` yang diisi manual pembuat form — service ini sengaja tak memanggil employee-service. Bila kosong, tingkat pengisian **tidak dilaporkan** (menampilkan 0% lebih menyesatkan daripada tak menampilkan apa pun).
+- **Jumlah PENGISI tidak dihitung otomatis.** Untuk `audience` bertipe `all`/`departments`, penyebut tingkat pengisian tetap memakai `audience.estimated_size` yang diisi manual pembuat form. Bila kosong, tingkat pengisian **tidak dilaporkan** (menampilkan 0% lebih menyesatkan daripada tak menampilkan apa pun). Berbeda dari `subject`, yang JUSTRU di-resolve otomatis dari employee-service saat terbit — sumbu yang dinilai butuh nama dan jabatan, sedangkan sumbu pengisi cukup dicocokkan dari header.
 - **Agregasi dibatasi 20.000 jawaban.** Bila terlampaui, total sebenarnya tetap dilaporkan dan hasil ditandai `truncated` + `sample_size`, sedangkan tingkat pengisian disembunyikan. Export menandai lewat header `X-Export-Truncated`.
 - **`attendance_gate.start_date`/`end_date` hanya menerima RFC3339** (mis. `2026-08-01T00:00:00Z`); kiriman `"2026-08-01"` akan ditolak dengan pesan parse JSON yang tidak informatif. Perlu dibereskan saat FE dibangun.
 - **RBAC belum berkatalog permission-set** per [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]. Pindah ke sumbu departemen **mendekatkan** ke ADR itu (hak menempel pada tempat orang bekerja, bukan pada key modul) tapi belum memenuhinya: tingkat perannya masih tier lama `staff`/`supervisor`/`admin`, bukan permission-set granular.
@@ -158,7 +230,13 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 - [[CORE - API Master Gateway]] — satu-satunya pintu masuk; modul `form-builder` di map `InternalURL`.
 - [[Microservices - Attendance Service]] — **konsumen** `GET /internal/compliance` pada jalur clock-in mobile.
 - Auth mengikuti [[CORE - SSO Flow]]; identitas datang sebagai header `BIP-*`.
-- **Tidak memanggil service lain.** Ini disengaja: sasaran form diresolusi dari header, sehingga tak ada entri di `InternalURL` milik service ini dan tak ada service yang bisa membuatnya gagal boot.
+- [[Microservices - Employee Service]] — **dependensi OPSIONAL**, dipanggil HANYA saat menerbitkan form penilaian (`GET /list?type=employee`) untuk memotret sasaran dan menyusun penerima notifikasi. Daftar diambil **sekali** untuk keduanya.
+- [[Microservices - Notification Service]] — **dependensi OPSIONAL**, `POST /inbox/send` saat form terbit dan saat pengisian selesai. Best-effort: gagal hanya di-log.
+
+> [!warning] Kedua dependensi itu SENGAJA di luar map `InternalURL`
+> `validation.ValidateInternalURL` **panic** pada entri kosong, jadi menaruh `EMPLOYEE_MODULE_URL` / `NOTIFICATION_MODULE_URL` di map itu berarti **seluruh service mati** — termasuk gerbang presensi dan pengisian form biasa — hanya karena env satu fitur belum diisi saat deploy. Keduanya dibaca `os.Getenv` langsung dengan penjaga nil. Pola yang sama dipakai task-management untuk notification-service, dan pernah menggigit sebelumnya (lihat catatan `ValidateInternalURL` di dok ini).
+>
+> Konsekuensinya: **jalur pengisian form (`/me/*`) tetap tak memanggil service mana pun.** Yang berubah cuma jalur menerbitkan.
 
 ## Dokumen Terkait
 
