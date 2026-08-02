@@ -4369,20 +4369,20 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "0b520134d3a839a766229b191784b4cc22ffda9fde0d0c6203e5f30bdabaa27a",
-      "ukuran_kb": 16.3,
-      "ringkasan": "Menjawab: bagaimana struktur organisasi disimpan dan dikelola, yaitu departemen dan posisi sebagai master data di `master_department` (termasuk `position_items[]` berkunci stabil yang menempelkan permission_sets ke jabatan) serta scoping per perusahaan lewat `company_id`. Menjawab juga bagaimana atasan langsung ditetapkan per orang (`work_data.supervisor_id`, menu Personalia lalu Atasan Langsung, alur pilih departemen lalu atasan lalu centang bawahan) dan mengapa itu dipakai untuk cakupan tampilan, bukan cakupan wewenang approval yang tetap lewat `supervised_by`. Cocok dicari saat ingin tahu aturan satu karyawan satu atasan, perlakuan karyawan non-aktif, peleburan departemen se-kelompok supervisi seperti HRGA, dan cara bagan organisasi disusun memakai kerangka departemen.",
+      "hash": "50e6ca6f21fd24b44f7f87785be8687e6280405839e5375e1900d8df310dc4ec",
+      "ukuran_kb": 16.4,
+      "ringkasan": "Menjawab: di mana departemen dan jabatan disimpan serta bagaimana CRUD-nya (collection `master_department`, endpoint `/master/departments`, `/data-type/department`, `/data-type/position`), dan bagaimana jabatan sebagai entitas ber-key (`position_items[]`) menempel ke paket hak RBAC. Menjawab juga cara menetapkan atasan langsung per karyawan (`work_data.supervisor_id` lewat menu HRIS, Personalia, Atasan Langsung dan endpoint `/supervisor-assignment`), aturannya (satu karyawan satu atasan, karyawan non-aktif disembunyikan, label grup departemen seperti HRGA, tanpa penjaga siklus, tidak rekursif), serta beda cakupan tampilan versus cakupan wewenang approval yang tetap lewat `getSupervisorData` dan `supervised_by`. Terakhir, menjelaskan bagan organisasi `/hris/org-chart` (endpoint `/org-chart`) yang berkerangka departemen, bukan rantai atasan, dan penyaringan departemen per perusahaan via `company_id` plus `EffectiveCompanyID`.",
       "kata_kunci": [
         "struktur organisasi",
         "organization structure",
         "departemen",
+        "department",
         "jabatan",
-        "posisi",
+        "position",
         "atasan langsung",
-        "supervisor_id",
-        "hierarki",
-        "org chart",
-        "master data"
+        "supervisor",
+        "bagan organisasi",
+        "org chart"
       ]
     },
     {
