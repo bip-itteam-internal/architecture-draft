@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-01",
-  "jumlah_dokumen": 254,
+  "digenerate": "2026-08-02",
+  "jumlah_dokumen": 255,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -260,23 +260,24 @@
         "Microservices - Procurement Service",
         "API - Form Builder Service",
         "Microservices - Form Builder Service",
+        "API - Marketing Analytics Service",
+        "Microservices - Marketing Analytics Service",
         "DB - Overview and Notes",
         "HOMEPAGE"
       ],
-      "hash": "ac5869fccccec97f39d9276b732b88b63766d9fe8b8daf72274c2a89ded025a7",
-      "ukuran_kb": 3.2,
-      "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, lewat prefix gateway mana masing-masing diakses (`/api/<module>/*`), dan di file API Reference mana kontrak endpointnya dicari. Juga menjawab cara routing umum: semua request masuk lewat API Master Gateway, JWT divalidasi lalu identitas diteruskan sebagai header `BIP-*` ke service, plus pengecualian open route dengan service key `?key=` dan jalur tanpa JWT `/ext/*` serta `/public/*`. Berguna sebagai titik awal saat belum tahu endpoint suatu fitur ada di service mana.",
+      "hash": "3b7b4330e280adc447446fa98c0245fa69a631e950726efe8b8a60b46a028cf0",
+      "ukuran_kb": 3.3,
+      "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, prefix gateway tiap service, dan di file API mana daftar endpoint lengkapnya; juga bagaimana routing, auth JWT via header BIP-*, open route ber-service-key, dan jalur public/ext bekerja.",
       "kata_kunci": [
-        "API index",
+        "api index",
         "daftar service",
         "prefix gateway",
         "routing",
+        "endpoint",
         "JWT",
         "BIP header",
         "open route",
-        "service key",
-        "endpoint",
-        "microservices"
+        "service key"
       ]
     },
     {
@@ -414,6 +415,35 @@
         "stock opname",
         "sync accurate",
         "mutasi"
+      ]
+    },
+    {
+      "path": "API Reference/API - Marketing Analytics Service.md",
+      "judul": "API - Marketing Analytics Service",
+      "area": "API Reference",
+      "jenis": "api",
+      "status_emoji": "✅",
+      "status_teks": "Grounded ke kode (2026-08-02)",
+      "publik": true,
+      "tautan": [
+        "Microservices - Marketing Analytics Service",
+        "API - Index",
+        "CORE - API Master Gateway"
+      ],
+      "hash": "c3260b0b1f82a393aeffdd9228d26816d9fb63db15c20d3935133e73764dde34",
+      "ukuran_kb": 4.0,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki Marketing Analytics Service (21 route), parameter tiap route (granularitas, lingkup, sort_by, termasuk_batal, reason kosong yang bermakna), kontrak amplop (unavailable_channels, kolom_tidak_berlaku, total -1), dan nama job sync yang bisa dipicu beserta batas ?hari.",
+      "kata_kunci": [
+        "marketing analytics",
+        "endpoint",
+        "profit",
+        "drill order",
+        "returns detail",
+        "videos orders",
+        "granularitas",
+        "lingkup",
+        "kolom_tidak_berlaku",
+        "jobs trigger"
       ]
     },
     {
@@ -1772,15 +1802,16 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented dengan catatan. Berjalan di production dan datanya terisi (verifikasi 2026-07-31), tetapi `/matrix/sku-shop` masih stub, 3 dari 6 koleksi mart masih kosong, dan **tidak ada scheduler di dalam service** (job hanya dipicu lewat HTTP).",
+      "status_teks": "Implemented dengan catatan (audit kode 2026-08-02). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan 21 route. Catatan: `/matrix/sku-shop` masih stub, `mart_live_sessions` & `mart_buyer_cohort` kosong, lock job hanya in-process.",
       "publik": true,
       "tautan": [
         "Sales - Marketing Dashboard (Master Roadmap)",
         "Microservices - Integration Service",
         "ADR - 0002 Database-per-Service",
+        "API - Marketing Analytics Service",
         "IT - Background Jobs & Schedulers",
         "APP - Web ERP",
-        "HRIS - Otomasi Skor KPI",
+        "Microservices - Insentive Service",
         "Sales - Marketplace Integration",
         "CORE - API Master Gateway",
         "Sales - Marketing Dashboard (Index)",
@@ -1788,26 +1819,28 @@
         "Sales - HPP Master (Plan)",
         "ADR - 0008 Profit Engine Join via item_group_id",
         "DB - Overview and Notes",
-        "Microservices - Insentive Service",
         "ADR - 0011 Integration Read Cache + Singleflight (Fase 1 Perf)",
         "Sales - GMV Creative",
         "Sales - ICC Affiliate Mapping",
-        "Sales - Marketing Dashboard (Analisis Rekap)"
+        "Sales - Marketing Dashboard (Analisis Rekap)",
+        "HRIS - Otomasi Skor KPI"
       ],
-      "hash": "bfcf1dc8151ae4f503ce6f97f3cca90f70cc1b99fba611e3f9c9f1523b5fe393",
-      "ukuran_kb": 20.8,
-      "ringkasan": "Menjawab: bagaimana laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live diagregasi lebih dulu ke koleksi `mart_*` di `marketing_analytics_db`, dan endpoint apa saja yang membacanya (`/profit/*`, `/videos`, `/lives`, `/affiliate`, `/returns/breakdown`, `/cohort`, `/audience`, `/price-floor`). Menjelaskan dua prinsip arsitektur yang wajib dijaga: `integration_db` baca-saja yang ditegakkan tiga lapis (tipe reader, test pemindai AST, read preference `secondaryPreferred`) dan `/health` yang turun jadi `degraded` 503 bila index unik gagal dibuat. Juga merinci ketiga job sync beserta perilaku trigger `POST /jobs/:name/trigger` (kunci per-proses, 409 saat berjalan, validasi `hari`, timeout 30 menit), isi dan kunci unik tiap koleksi mart, alasan `mart_video_performance` sengaja tanpa dimensi hari, serta fakta bahwa service ini tidak punya scheduler internal.",
+      "hash": "fb0924445323f3e35c9404d6310ca13735652a36cd3541e5c256106098278d4a",
+      "ukuran_kb": 24.1,
+      "ringkasan": "Menjawab: bagaimana laba per toko/produk/kampanye/iklan/video dihitung dan disimpan ke mart, kenapa channel TikTok+Shopee punya jebakan data (order_date vs created_at, CANCELLED, Long BSON, primitive.DateTime, jam 19:00 UTC), bagaimana bundel & mapping SKU dialokasikan, bagaimana ICC tiga sumber digabung, dan bagaimana penjadwal internal 48 jam bekerja beserta cara memeriksanya lewat /jobs/status.",
       "kata_kunci": [
         "marketing analytics",
-        "microservice",
-        "mart",
-        "profit attribution",
-        "pre-agregasi",
-        "job sync",
-        "price floor",
-        "video performance",
-        "integration_db read-only",
-        "dashboard marketing"
+        "mart_profit_attribution",
+        "laba",
+        "HPP",
+        "ads_cost",
+        "Shopee GMS",
+        "ICC penanggung jawab",
+        "attribution_kolom",
+        "penjadwal",
+        "bundel",
+        "master_sku",
+        "order_date"
       ]
     },
     {
@@ -5008,7 +5041,7 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented — 45 job terjadwal + 1 dispatcher webhook (per audit kode 2026-08-01: +19 job integration yang sebelumnya belum tercatat — rumpun Accurate (stock/aset/opex refresh, sweep faktur/retur/receipt, receipt-sync, sample-shipping-expense, anomali retur), rekonsiliasi (statement TikTok, income Lazada, status order, retur TikTok), resi (enrich cancel/reverse, safety-net WMS), wallet-sync, seed-mapping, guardian stale-toship; +4 job integration ditambahkan 2026-07-11: affiliate Shopee AMS performance/conversion & WMS resi bridge `sync-resi-wms`/`sync-shopee-tracking`; +1 guardian order Shopee `sync-shopee-orders` 2026-07-14, **belum deploy**; +1 guardian retur Shopee `sync-shopee-returns` 2026-07-15 & +1 guardian retur TikTok `recover-tiktok-returns` 2026-07-16 — memicu booking Retur Penjualan yang selama ini tak pernah menyala, **belum deploy**; +1 sync ulasan marketplace `sync-reviews` 2026-07-19 harian 06:45, **LIVE**; +3 job Packet Tracking `sync-tracking`/`detect-stuck`/`sync-return-tracking` 2026-07-17..18 — checkpoint pengiriman forward+retur & deteksi mandek, **LIVE**). *3 job reminder attendance (koreksi/leave/tukar jadwal) + auto-ignore koreksi & tukar jadwal + pre-alokasi sadar-swap dari **PR #165** — belum rilis ke prod.*",
+      "status_teks": "Implemented — 46 job terjadwal + 1 dispatcher webhook (+1 penjadwal internal marketing-analytics 2026-08-01, **LIVE** — service itu sebelumnya tanpa scheduler sama sekali; per audit kode 2026-08-01: +19 job integration yang sebelumnya belum tercatat — rumpun Accurate (stock/aset/opex refresh, sweep faktur/retur/receipt, receipt-sync, sample-shipping-expense, anomali retur), rekonsiliasi (statement TikTok, income Lazada, status order, retur TikTok), resi (enrich cancel/reverse, safety-net WMS), wallet-sync, seed-mapping, guardian stale-toship; +4 job integration ditambahkan 2026-07-11: affiliate Shopee AMS performance/conversion & WMS resi bridge `sync-resi-wms`/`sync-shopee-tracking`; +1 guardian order Shopee `sync-shopee-orders` 2026-07-14, **belum deploy**; +1 guardian retur Shopee `sync-shopee-returns` 2026-07-15 & +1 guardian retur TikTok `recover-tiktok-returns` 2026-07-16 — memicu booking Retur Penjualan yang selama ini tak pernah menyala, **belum deploy**; +1 sync ulasan marketplace `sync-reviews` 2026-07-19 harian 06:45, **LIVE**; +3 job Packet Tracking `sync-tracking`/`detect-stuck`/`sync-return-tracking` 2026-07-17..18 — checkpoint pengiriman forward+retur & deteksi mandek, **LIVE**). *3 job reminder attendance (koreksi/leave/tukar jadwal) + auto-ignore koreksi & tukar jadwal + pre-alokasi sadar-swap dari **PR #165** — belum rilis ke prod.*",
       "publik": false,
       "tautan": [
         "External - Desty",
@@ -5026,20 +5059,19 @@
         "Microservices - Task Management Service",
         "Sales - Marketplace Integration"
       ],
-      "hash": "930bb24c400c3a5677a7ae374057fb07f46563ee711f1c57762c2f5e730415e8",
-      "ukuran_kb": 21.7,
-      "ringkasan": "Menjawab: proses latar belakang apa saja yang berjalan diam-diam di bip-erp — cron, scheduler, worker, dan poller in-process — beserta jadwalnya dalam WIB, service pemiliknya, tujuannya, mekanisme lock-nya, dan lokasi file:line-nya. Berguna saat debugging, perencanaan kapasitas, atau mengubah service supaya tidak ada \"sistem tersembunyi\" yang terlewat; mencakup job employee, attendance, insentive, task-management, notification, dan rumpun besar job integration (sync order/master data TikTok, GMV Max, Shopee GMS, guardian order/retur Shopee & TikTok, refresh kredensial, rekonsiliasi income/escrow, affiliate, packet tracking, sync ulasan). Juga mencatat konvensi yang mudah salah: integration memakai cron `robfig` 6-field sedangkan attendance/employee/notification 5-field, zona waktu default Asia/Jakarta dengan override `INTEGRATION_WORKER_TZ`, serta dispatcher webhook, service tanpa job background, dan catatan risiko operasional.",
+      "hash": "531c44832a4b19843c5a50f576a57fc4af13f887c76ffcb2fac1f6ae2a966295",
+      "ukuran_kb": 22.4,
+      "ringkasan": "Menjawab: proses latar belakang apa saja yang berjalan di bip-erp (46 job terjadwal + dispatcher webhook), kapan jadwalnya (WIB), di service mana, memakai lock apa, dan mana yang belum deploy atau dead code — termasuk penjadwal internal marketing-analytics 48 jam yang baru.",
       "kata_kunci": [
-        "background job",
-        "scheduler",
         "cron",
+        "scheduler",
+        "background job",
         "worker",
+        "lock redis",
+        "sync",
         "jadwal",
-        "lock",
-        "Redis lock",
-        "guardian",
-        "webhook consumer",
-        "WIB"
+        "penjadwal",
+        "integration worker"
       ]
     },
     {
@@ -8161,11 +8193,15 @@
       "tautan": [],
       "hash": "75900309c7faf6b0586b254afc81386afcfa8081ad263121f4cd5357c37e1867",
       "ukuran_kb": 12.4,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana rencana implementasi kartu status sinkronisasi order (order sync status card) disusun — langkah task, berkas yang disentuh, dan kriteria selesai. Artefak plan sesi pengembangan, bukan dokumentasi arsitektur.",
+      "kata_kunci": [
+        "plan",
+        "order sync",
+        "status card",
+        "superpowers",
+        "rencana implementasi"
+      ]
     }
   ],
-  "gagal": [
-    "docs/superpowers/plans/2026-07-12-order-sync-status-card.md"
-  ]
+  "gagal": []
 }
