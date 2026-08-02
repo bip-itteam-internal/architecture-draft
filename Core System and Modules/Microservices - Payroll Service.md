@@ -35,6 +35,14 @@
 - **Batch run**: `POST /payroll-runs` (metadata `title`, `pay_period_start/end`, `pay_date`, `notes` — **penggajian BULANAN**, tak ada mingguan; `period` label diturunkan dari `pay_period_start` bila kosong; hitung semua karyawan, simpan snapshot per orang; supplement gagal per-orang ditandai, tak gagalkan run) · `GET /payroll-runs` · `GET /payroll-runs/:id` (+ lines) · `POST /:id/recalculate` (draft) · `POST /:id/approve` (approver) · `POST /:id/publish` (approver; approved → published) · `GET /:id/lines/:employeeId`. Status **draft → approved → published**.
 - **Slip self-service** (tanpa gate HR — identitas dari header gateway): `GET /payroll-runs/my` (+ `/my/:id`) — karyawan lihat slip **sendiri**, HANYA dari run **published**; field internal HR (`notes`, `created_by`/`approved_by`/`published_by`) di-**redact**. Rute `/my` didaftarkan **sebelum** `/:id` agar tak ketangkap sebagai param.
 - **Service-to-service**: panggil [[Microservices - Attendance Service]] `GET /payroll-supplement` (`payout_pct` **persentase 0–100** → prorata Tunjangan Kehadiran + lembur) via `InternalRequest`.
+
+### Beban pemberi kerja (konsumsi antar-service — modul insentif)
+
+- **`GET /employer-cost?employee_ids=a,b,c&period=YYYY-MM`** — beban **PERUSAHAAN** per karyawan: `bruto` (total pendapatan slip) + `iuran_bpjs_perusahaan` = `total`. Batch (dipisah koma) karena satu dashboard insentif memuat puluhan orang.
+- **BUKAN gaji bersih yang diterima karyawan.** Potongan PPh21 & BPJS karyawan tetap uang yang keluar perusahaan (disetor ke kantor pajak/BPJS), jadi memakai gaji bersih akan mengecilkan biaya dan membuat profit insentif tampak lebih besar. Keputusan client 2026-08-02; dikunci test `b.Total <= slip.Net` → merah.
+- **`computeBpjsCompany`** (kembaran `computeBpjsEmployee`) — memakai `CompanyRate` + batas upah yang sama. Rate-nya **sudah ada di config sejak awal tapi tak pernah dihitung**, karena iuran pemberi kerja bukan potongan karyawan sehingga tak muncul di slip. Slip nyata: bruto 4.328.500 + iuran 329.728 = **4.658.228** (vs gaji bersih 4.094.423 — selisih 13,8%).
+- Angkanya dirakit lewat `buildPayslip` yang **sama persis** dengan payroll run sungguhan, bukan dijumlah ulang — menyalin rumus bruto akan melahirkan rumus tandingan yang menyimpang diam-diam.
+- ⚠️ **Sengaja TANPA `gate()`** — tak seperti `/employee-salary`. Pemanggilnya service lain yang tak membawa identitas orang, dan `gate()` membalas **401** begitu header employee id kosong. Pola menyalin `/payroll-supplement` milik [[Microservices - Attendance Service]]: dijaga kunci gateway (`app.Use(ValidateGateway)`) dan **hanya memulangkan satu angka beban per karyawan** — tanpa rincian komponen, tanpa gaji pokok, tanpa slip. Karyawan tanpa penetapan gaji dibalas `ditemukan:false`, bukan dihilangkan dari hasil dan bukan 404: pemanggil harus bisa membedakan "belum ditetapkan" dari "nol".
 - Grounded: **golden test reproduksi slip nyata** (gross 4.328.500 & BPJS 32.200/96.600 cocok persis; net 4.094.423 ~slip, selisih ~4 rp krn payout dibulatkan 1 desimal) + smoke E2E lolos.
 
 ## Endpoint / Fitur (Sudah Diimplementasikan — Fase 4: THR)
@@ -52,7 +60,8 @@
 ## Belum Diimplementasikan / Catatan
 
 - **PPh21 TER** ✅ **sudah di kode (Fase 2b)** — TER bulanan PMK 168/2023. ⚠️ Angka tabel TER **perlu sign-off HRD/Finance**; editable via `PUT /config/tax` (`ter_brackets`) tanpa redeploy. **Rekonsiliasi PPh21 tahunan (Desember, progresif Ps.17)** belum termasuk → Fase 4.
-- **Formula lembur** default `jam × (gaji_pokok/173)` (DJTK 1.5×/2× = TBD konfirmasi HRD). **Insentif** = komponen manual (belum integrasi [[Finance - Incentive]]).
+- **Formula lembur** default `jam × (gaji_pokok/173)` (DJTK 1.5×/2× = TBD konfirmasi HRD).
+- **Insentif** = komponen manual di slip. Integrasi dengan [[Finance - Incentive]] sejauh ini **satu arah**: modul insentif **menarik** beban karyawan dari sini (`/employer-cost`) untuk dipakai sebagai biaya operasional. Arah sebaliknya — nominal insentif masuk otomatis ke slip — **belum**, dan menunggu keputusan apakah insentif dibayar lewat slip atau transfer terpisah (kalau terpisah, payroll tak perlu disentuh sama sekali). Bila lewat slip, `Taxable` & `BpjsBase` komponennya perlu ditetapkan finance/HRD.
 - **THR** ✅ **sudah di kode (Fase 4)** — lihat §Fase 4 di atas. **Sisa Fase 4**: Rekonsiliasi PPh21 Desember (progresif Ps.17) — true-up tahunan yang mengoreksi impresisi TER THR.
 - **Slip gaji** (PDF/cetak) = Fase 3 (kini slip hanya view in-app). **Dashboard + export Accurate** = Fase 5 ([[ADR - 0001 Akuntansi via Accurate]]).
 - **FE** ([[APP - Web ERP]], grup menu **Payroll**, **sudah di `main`**): **Pengaturan Gaji** (config: Komponen, BPJS, Pajak/PTKP, Perlakuan Kehadiran, Perusahaan) · **Gaji Karyawan** (Daftar Gaji register + edit) · **Payroll Run** (buat → detail KPI+tabel karyawan → approve → publish → modal slip) · **Slip Gaji Saya** (self-service). **FE THR** (menyusul BE #406): tombol "Buat Run THR" + badge **Jenis** (Bulanan/THR) di daftar, detail run THR (kolom masa kerja/proporsi), slip THR self-service (label + payout disembunyikan). Butuh service ter-deploy di gateway untuk E2E.
@@ -71,3 +80,5 @@
 
 - [[HRIS - Payroll]] · [[HRIS - Compensation & Benefits]] — konsep/bisnis (pasangan dok ini)
 - [[Microservices - Employee Service]] · [[Microservices - Attendance Service]]
+- [[Microservices - Insentive Service]] — konsumen `/employer-cost` (beban karyawan sebagai biaya operasional insentif)
+- [[Finance - Incentive]] · [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]]
