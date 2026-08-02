@@ -155,6 +155,18 @@
 | POST/GET | `/profit/channel-map/upload` · `/profit/channel-map` | Upload kamus channel variation (export Master Product; sku_id→master SKU) · ringkas count (**upload: supervisor|admin integration/finance**) |
 | GET | `/profit/order-listings` | Daftar Product Listing dari riwayat order (sample_name, item_id_count, mapped) — sumber dropdown form mapping |
 
+## Profit Insentif (dasar insentif profit-based)
+
+> Dikonsumsi [[Microservices - Insentive Service]]. Beda dari `/profit/products` di atas: ini **per-TOKO**, basis **hari kirim + cutoff pencairan**, bukan per-produk basis tanggal order.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/profit/incentive/summary?month=YYYY-MM&cutoff_day=25&shop_id=a,b` | Komponen profit per toko (uang cair, HPP, iklan, retur) + pemilik ICC tiap toko |
+| GET | `/profit/incentive/panduan` | Kerangka rumus + penjelasan tiap baris untuk ditampilkan di UI (dihasilkan dari struct yang sama dengan yang menghitung) |
+| GET | `/profit/incentive/opex?month=YYYY-MM&projects=a,b,c[&refresh=1]` | Beban operasional **non-gaji** per proyek Accurate (akun `6000` − 14 akun yang sudah terhitung di tempat lain); membawa rincian akun yang dipotong + alasannya. `refresh=1` melewati salinan lokal 12 jam |
+
+> ⚠️ Filter proyek Accurate memakai **`projectNo`**; `projectName` diabaikan diam-diam dan membalas total seluruh perusahaan. Lihat [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]].
+
 ## ICC Account Mapping
 
 > Auth: `RequireMarketingLeader` (kyura/beauty_hacks SPV · insentive `adv_leader` · integration SPV/admin) — kecuali `/me`. Lihat [[Sales - ICC Account Manager Mapping]].
