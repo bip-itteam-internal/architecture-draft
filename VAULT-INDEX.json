@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-02",
+  "digenerate": "2026-08-03",
   "jumlah_dokumen": 255,
   "dokumen": [
     {
@@ -554,20 +554,20 @@
         "API - Index",
         "APP - Dynamic Task Tracker"
       ],
-      "hash": "a47834d127e837451f44c6b689daa07ce27be76414064a2948e4f5431b3f0fa5",
-      "ukuran_kb": 4.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan task-management, siapa yang boleh memanggil tiap rute, dan bentuk payload tiket beserta lampiran, komentar, checklist, dan laporannya. Memuat rute daftar dan filter tiket, hitungan badge tiket aktif, daftar tiket yang menunggu penilaian, pengiriman rating CSAT, serta laporan SLA dan CSAT. Berguna untuk mencari kontrak persis sebelum menyentuh klien web maupun mobile.",
+      "hash": "c93e4d0a1c949f602b9b53f767fa7fea38eba311220f8f3fc6025f9ccc1fc89f",
+      "ukuran_kb": 4.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di task-management-service dan bagaimana memanggilnya lewat gateway `/api/task-management/*`. Merinci rute untuk membuat/menyaring tiket, ubah status, assign, approve/reject, kelola space beserta visibility dan tipe permintaan, lampiran via file-service, komentar, checklist, notifikasi, laporan tim, audit trail, serta koneksi WebSocket realtime. Juga menjelaskan aturan gating akses (403 untuk space restricted), validasi `type_id` harus milik space, dan mengapa `/tasks/pending-csat` dipisah dari `/tasks/counts`.",
       "kata_kunci": [
-        "task management",
+        "task management service",
+        "API endpoint",
         "tiket",
-        "support ticket",
-        "API",
-        "endpoint",
+        "ticketing",
+        "helpdesk",
+        "space",
         "CSAT",
-        "penilaian",
+        "WebSocket",
         "SLA",
-        "checklist",
-        "laporan"
+        "gateway"
       ]
     },
     {
@@ -907,19 +907,19 @@
         "Microservices - Employee Service",
         "Microservices - Notification Service"
       ],
-      "hash": "79b8e043f032ebb765626c0ebb4142480ed07c465255fee7b89d57b47d02c5d7",
-      "ukuran_kb": 18.7,
-      "ringkasan": "Menjawab: aplikasi mobile HRIS MyBharata itu apa dan fitur apa saja yang tersedia untuk karyawan, mulai dari clock-in/out ber-QR, geofencing dan biometric, cuti/izin, lembur, payslip, KPI, sampai pengisian survei. Juga menjawab arsitektur dan autentikasinya (Flutter + BLoC, Clean Architecture, JWT lewat gateway, PIN, kebijakan 1 akun 1 device) serta bagian mana yang berbeda untuk perusahaan non-BIP dalam skema multi-perusahaan.",
+      "hash": "280e1c0f48b826827a0b7516ed2de88ba88dd3ce21321fedf03c4c4a7a645e72",
+      "ukuran_kb": 19.7,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, fitur HRIS apa saja yang bisa dipakai karyawan dari HP (presensi QR + geofencing + biometric, cuti/izin, lembur, payslip, KPI, tiket, survei), dan bagaimana arsitektur Flutter-nya disusun (Clean Architecture feature-first, BLoC, get_it, dio, go_router, Firebase). Menjelaskan cara autentikasi (JWT Bearer, PIN, biometric, 1 akun = 1 device) dan menegaskan bahwa aplikasi memanggil backend lewat API Master Gateway, bukan koneksi langsung. Juga menjawab bagaimana dukungan multi-perusahaan bekerja di mobile (scope via JWT, CompanyScope, konten per tenant) dan versi build mana yang sudah rilis vs baru di branch dev.",
       "kata_kunci": [
         "MyBharata",
-        "aplikasi mobile",
+        "mobile",
         "Flutter",
         "HRIS mobile",
         "presensi",
         "attendance",
-        "cuti",
-        "payslip",
-        "JWT",
+        "aplikasi karyawan",
+        "geofencing",
+        "BLoC",
         "multi-perusahaan"
       ]
     },
@@ -1027,19 +1027,19 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "dd5f3a13b19c4f2515ba01d20c78f56dfeeafe1ee62df0cd404ec9ffcff1da55",
-      "ukuran_kb": 75.2,
-      "ringkasan": "Menjawab: portal web ERP internal Bharata mencakup modul apa saja, bagaimana login dan role gating bekerja (cookie system_roles berisi peta module ke role), dan bagaimana perannya sebagai SSO Identity Provider bagi aplikasi lain. Juga menjawab cara menu sidebar dikelompokkan, diratakan, dan disembunyikan per jabatan, halaman mana yang menangani multi-perusahaan, serta stack frontend yang dipakai.",
+      "hash": "e299bfe0100586022c4f35c27a29c184b62091a3a3c02591fa41ad80200d19f4",
+      "ukuran_kb": 76.5,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS `hris-dashboard` (\"One Bharata\"), tech stack-nya (Next.js 16, React 19, shadcn/Radix/Tailwind, TanStack Query, react-i18next), dan modul apa saja yang tersedia untuk HR, attendance, finance/insentif, IT, GA, serta integrasi marketplace. Menjelaskan cara login dan refresh token, peran web ini sebagai SSO Identity Provider (mint ticket, allowlist redirect), serta bagaimana `system_roles` menggerbang tampilan sidebar per module dan role. Juga menjawab keputusan desain navigasi (menu induk bersarang bukan `group`, perataan induk tipis, Pengaturan bertab + Tampilan Menu per jabatan yang menyimpan `menu_hidden`), fitur Atasan Langsung, dan cakupan multi-perusahaan di web.",
       "kata_kunci": [
         "Web ERP",
         "hris-dashboard",
         "One Bharata",
-        "frontend",
+        "erp-frontend",
         "Next.js",
-        "SSO",
-        "system_roles",
-        "role gating",
         "sidebar menu",
+        "system_roles",
+        "SSO",
+        "role gating",
         "multi-perusahaan"
       ]
     },
@@ -2053,29 +2053,29 @@
       "tautan": [
         "Microservices - File Service",
         "HRIS - Organization Structure",
+        "CORE - API Master Gateway",
         "APP - MyBharata",
         "APP - Web ERP",
-        "CORE - API Master Gateway",
         "DB - Overview and Notes",
         "Microservices - Employee Service",
         "Microservices - Notification Service",
         "APP - Dynamic Task Tracker",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "e394da6994097630cd7dbf5504ef71225dd35d5bdf609828a035c8e072b217da",
-      "ukuran_kb": 16.7,
-      "ringkasan": "Menjawab: bagaimana tiket dibuat, ditriase, dikerjakan, dan ditutup di task-management, siapa yang boleh melakukan apa, serta bagaimana SLA dan kepuasan pemohon dihitung. Menjelaskan cakupan divisi lewat scopedDivisions, siklus status termasuk hold dan reopen, CSAT beserta daftar tiket yang menunggu penilaian, notifikasi, WebSocket, dan laporan tim. Berguna untuk memahami aturan izin sebelum mengubah perilaku tiket.",
+      "hash": "b7525bfb61da52b7c9ea3e55088f938c55134f9efcd296ea339077a9ac96be28",
+      "ukuran_kb": 20.1,
+      "ringkasan": "Menjawab: bagaimana backend IT Helpdesk/ticketing internal ERP bekerja, mulai dari alur Kanban tiket (`Request → Todo → On Going → Testing → Done` plus jalur `Ditolak`), approval, hold/reopen, CSAT, automation auto-assign/auto-close, sampai SLA engine dua dimensi dengan scheduler eskalasi. Menjelaskan model Space per divisi (stage & priority default, tipe permintaan per-space, visibility public/restricted dan gerbang `canAccessSpace`) serta bagaimana cakupan divisi supervisor diturunkan dari header `BIP-Supervised-Departments` lewat `scopedDivisions()`. Berguna untuk memahami alasan desain dan jebakan integrasi, mis. `type_id` sengaja opsional demi klien mobile lama, `visibility` kosong harus dibaca sebagai `public`, dan WebSocket masuk lewat ingress langsung karena gateway tidak mem-proxy WS.",
       "kata_kunci": [
-        "task management",
+        "task management service",
+        "IT Helpdesk",
+        "ticketing",
         "tiket",
-        "support ticket",
+        "Kanban",
+        "space",
         "SLA",
         "CSAT",
-        "penilaian",
-        "reopen",
-        "divisi",
-        "notifikasi",
-        "WebSocket"
+        "supervisor divisi",
+        "Go Fiber MongoDB"
       ]
     },
     {
