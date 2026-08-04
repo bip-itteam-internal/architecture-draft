@@ -3867,30 +3867,35 @@
       ]
     },
     {
-      "path": "Human Resource Information System/HRIS - Alur KPI Otomatis.excalidraw.md",
-      "judul": "HRIS - Alur KPI Otomatis.excalidraw",
+      "path": "Human Resource Information System/HRIS - Alur KPI Otomatis.md",
+      "judul": "HRIS - Alur KPI Otomatis",
       "area": "Human Resource Information System",
       "jenis": "domain",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "✅",
+      "status_teks": "Selaras dengan keadaan produksi per **2 Agustus 2026**",
       "publik": true,
       "tautan": [
-        "0, 0"
+        "HRIS - Alur KPI Otomatis.excalidraw",
+        "HRIS - Alur KPI Otomatis Rinci.excalidraw",
+        "HRIS - Otomasi Skor KPI",
+        "HRIS - Matriks KPI per Departemen",
+        "RUN - Menambah Metrik KPI Otomatis",
+        "HRIS - Key Performance Index"
       ],
-      "hash": "326566dce7d4f3e55c2e66deb06f3a106b09fab4da7e4c3e5f11135d761de9e8",
-      "ukuran_kb": 26.9,
-      "ringkasan": "Diagram yang menjawab: bagaimana rangkaian dari tim bekerja, tercatat lewat aplikasi (absensi, tiket, monitoring, TikTok), tersimpan di database, lalu dihitung sistem sampai skor KPI terisi sendiri tanpa atasan menebak. Menjelaskan tiga syarat yang biasanya menghambat, yaitu aplikasi harus benar-benar dipakai dan diisi lengkap, sistem harus tahu data itu milik siapa, dan matriknya harus mungkin diukur, masing-masing dengan contoh nyata kegagalannya (tenggat tiket kosong, kepemilikan toko ICC belum tercatat, target VSA mustahil). Juga menegaskan bahwa saat syarat belum terpenuhi sistem menandai metrik 'belum bisa dihitung' dan tidak mengarang angka.",
+      "hash": "39879139cfef552f45edd98ad5d8c522ea5569cab087659b4a32fed01cfdab19",
+      "ukuran_kb": 3.0,
+      "ringkasan": "Menjawab: bagaimana alur otomasi skor KPI berjalan dari pekerjaan tim sampai skor terisi sendiri, dan di mana letak dua diagram Excalidraw-nya (versi gambaran besar untuk SPV/HR/direksi dan versi rinci sembilan langkah untuk dev). Menjelaskan juga kenapa skor KPI belum terisi otomatis walau matriknya sudah lengkap, lewat tiga syarat non-kode: aplikasi benar-benar dipakai dan diisi lengkap, sistem tahu data milik siapa, dan matriknya mungkin diukur. Menerangkan prinsip bahwa sistem menandai metrik 'belum bisa dihitung' beserta alasannya alih-alih mengarang angka, sehingga penilaian kembali manual.",
       "kata_kunci": [
-        "KPI otomatis",
-        "alur KPI",
-        "skor KPI",
-        "matrik KPI",
-        "diagram",
-        "excalidraw",
+        "KPI",
+        "alur KPI otomatis",
+        "otomasi skor KPI",
+        "automated KPI scoring",
+        "matrik KPI per posisi",
+        "KPI matrix",
+        "Excalidraw diagram",
+        "employee-service",
         "penilaian kinerja",
-        "otomasi",
-        "ICC",
-        "tiket"
+        "performance appraisal"
       ]
     },
     {
