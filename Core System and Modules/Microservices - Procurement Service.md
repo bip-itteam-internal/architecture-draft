@@ -12,6 +12,11 @@
 
 Daftar rute lengkap di [[API - Procurement Service]]. Ringkas:
 
+> **Register tambahan di employee-service (⚠️ branch `feature/workspace-position`, belum merge).** Dua register non-Accurate untuk workspace posisi Procurement dibangun **terpisah dari service ini**, di-host di employee-service (pola sama dengan Legal/R&D/Quality) agar tak menambah modul gateway. Dipanggil FE lewat `/api/employee/procurement/*` (bukan `/api/procurement/*` milik service Accurate ini):
+> - **Kontrak & Perpanjangan Vendor** — `services/employee/procurement_kontrak.go`, collection `procurement_contract`. CRUD `/procurement/contracts` (gate `RequireProcurementStaff`; DELETE `RequireProcurementSupervisor`). Field: `vendor`, `contract_type`, `value_per_year`, `end_date` (alert H-60), `increase_requested`, `proposal`, `status`, `file_object`. FE `/procurement/kontrak`.
+> - **Register Penghematan (Cost Saving)** — `services/employee/procurement_saving.go`, collection `procurement_saving`. CRUD `/procurement/savings`. Field: `item`, `vendor`, `category` (Negosiasi/Kontrak/Substitusi/Vendor Baru/Volume), `base_price`, `final_price`, `saving_value` (= acuan − jadi), `date`. FE `/procurement/penghematan` (menjumlah total penghematan). Fondasi untuk Dashboard Pengadaan & Cost Saving.
+> - RBAC role key `procurement` (`RequireProcurementStaff`/`RequireProcurementSupervisor` di `common/roles.go`); department `procurement` sudah di-seed. Detail: [[Microservices - Employee Service]] + [[CORE - RBAC dan Permission Set]]. Bila service ini kelak jadi rumah tetap, register bisa dipindah ke sini.
+
 ### Master Pemasok (`pemasok.go`)
 
 - **`GET /pemasok`** — daftar pemasok; filter `cari` (nama/nomor), `kategori`, `sync_status`, dan `akun_utang_kosong=true` (daftar pantauan finance).

@@ -50,6 +50,11 @@
 - CRUD `/quality/capa`, `/quality/incoming`, `/quality/batch-releases` — GET/POST/PUT gate `RequireQualityStaff`, DELETE gate `RequireQualitySupervisor`. FE lewat `/api/employee/quality/*`.
 - Model `QualityCAPA`/`QualityIncoming`/`QualityBatchRelease`, collection senama. Department `quality` sudah ada di seed; role key `quality`. CAPA dipakai bersama R&D. Detail: [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]].
 
+**Procurement — Kontrak Vendor & Register Penghematan (⚠️ live di kode, runtime pending)**
+- Register non-Accurate untuk posisi Procurement, di-host di service ini (`services/employee/{procurement_kontrak.go,procurement_saving.go}`, `RegisterProcurementRoutes`) — **terpisah** dari [[Microservices - Procurement Service]] yang berbasis Accurate.
+- CRUD `/procurement/contracts` (kontrak vendor non-inventory, alert H-60) & `/procurement/savings` (cost saving = harga acuan − jadi) — gate `RequireProcurementStaff`/`RequireProcurementSupervisor`. FE lewat `/api/employee/procurement/*`.
+- Model `ProcurementContract`/`ProcurementSaving`, collection `procurement_contract`/`procurement_saving`. Department `procurement` sudah ada di seed; role key `procurement`.
+
 **Training Program (HRIS) — ✅ merged ke main (deploy dev pending)**
 - Modul pelatihan karyawan (perluasan service ini, `services/employee/training.go`) + UI `/hris/training`. **Department opsional** (penyelenggara — tak membatasi peserta), **tanpa Branch**; peserta lintas dept di-assign HRD.
 - **Master**: CRUD `/training/types` (jenis) & `/training/trainers` (internal via `employee_id` / eksternal), by ObjectID.
@@ -150,7 +155,7 @@
 
 ## Dependencies & Integrasi
 
-- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `external_account`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`, `master_company`, `master_job_level`, `training_type`, `trainer`, `training`, `training_participant`, `legal_license`, `legal_contract`, `legal_dispute`, `rnd_registration`, `rnd_product`, `quality_capa`, `quality_incoming`, `quality_batch_release`. Lihat [[DB - Overview and Notes]].
+- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `external_account`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`, `master_company`, `master_job_level`, `training_type`, `trainer`, `training`, `training_participant`, `legal_license`, `legal_contract`, `legal_dispute`, `rnd_registration`, `rnd_product`, `quality_capa`, `quality_incoming`, `quality_batch_release`, `procurement_contract`, `procurement_saving`. Lihat [[DB - Overview and Notes]].
 - **MinIO** — client langsung untuk upload foto & dokumen.
 - [[Microservices - Attendance Service]] — memanggil `POST /vacation/decrement`, mengonsumsi feed `/list` dan cron `/sync/work-schedules`.
 - [[Microservices - Notification Service]] — mengonsumsi feed `/list` (fcm-token, supervisor, dll).
