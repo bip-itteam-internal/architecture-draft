@@ -74,6 +74,15 @@
 - Service ini **sumber kebenaran** relasi tersebut: mengisi klaim JWT `supervised_departments` saat login, dan melayani `/list?type=supervisor` dengan urutan telusur departemen sendiri → induk.
 - Konsep, aturan, dan konsekuensinya: [[HRIS - Organization Structure]]
 
+**Jenjang jabatan — ✅ live di produksi 2026-08-03** (PR [#952](https://github.com/bip-itteam-internal/bip-erp/pull/952), `60e77d53`)
+- Koleksi baru `master_job_level` (`key`, `name`, `rank`) + `position_items[].level_key` di `master_department`. Lima tingkat bawaan: Pelaksana(10) · Senior/Officer(20) · Leader(30) · Supervisor(40) · Direktur(50). Model & helper di `shared-library/models/employee/master_data.go` (`JobLevel`, `DefaultJobLevels`, `RankOf`, `MinJarakRank`), handler di `services/employee/job_level.go`.
+- ⚠️ **Penanda ORGANISASI, BUKAN sumbu hak akses** ([[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]). `permission_resolve.go` & `permission_exceptions.go` **tidak boleh menyebutnya sama sekali**, dan itu dikunci `TestJenjangBukanSumbuHakAkses` yang membaca kedua berkas itu — pola sama dengan `internal_routes_guard_test.go`. Dijaga dari sumbernya karena pelanggarannya tak akan membuat satu pun test fungsional gagal.
+- **Rank renggang** supaya tingkat baru (mis. Manager ber-rank 45) cukup satu entri di `DefaultJobLevels()` + deploy, tanpa menyentuh dokumen jabatan/karyawan mana pun. Jarak minimalnya dikunci uji.
+- `seedJobLevels()` menyisipkan **per key**, bukan skip-if-nonempty seperti `seedMasterDepartments`/`seedMasterSystemRoles`/`seedPermissionSets` — pola itu menuntut fungsi `migrate*` sendiri tiap ada key baru, karena dev & prod tak pernah kosong. Nama yang sudah diubah HR tak ditimpa.
+- **GLOBAL**, tanpa `company_id`, beda dari `master_department`. Index unik `key` di `ensureTenantIndexes`.
+- `GET /master/job-levels` · `PUT /master/departments/:key/positions/:positionKey/level` (`RequireHRISOrITSupervisor`, sama dengan `menu-hidden`). Frontend: tab **Jenjang Jabatan** di `/hris/master-data`.
+- **Belum menghasilkan apa pun sampai HR mengisi**: verifikasi prod 2026-08-03 menunjukkan 5 jenjang ter-seed dan **0 dari 79 jabatan** berjenjang. Aturan & konsekuensinya: [[HRIS - Organization Structure]] · [[HRIS - Career & Promotion]]
+
 **Self-Service (`/me`)**
 - Profile, kpi-score, vacation, payroll-approx
 - Photo get/upload

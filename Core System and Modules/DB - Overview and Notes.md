@@ -108,6 +108,15 @@ Doc: [[Microservices - Payroll Service]] (⚠️ Fase 1 — Salary Setup & Confi
 - employee_salary
 - payroll_config
 
+### form-builder — `form-builder-mongo-db` ⚠️
+Doc: [[Microservices - Form Builder Service]] (⚠️ merged 2026-08-01, belum live di dev)
+- forms (definisi form + sasaran + pengaturan gerbang presensi)
+- form_responses (jawaban; `fingerprint` = sidik isi untuk guard idempotensi)
+- Keduanya ber-`company_id` **sejak awal** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]), bukan ditambal belakangan.
+- Index idempoten saat boot: `forms {company_id, status}`, `forms {company_id, owner_module}`, `forms {company_id, attendance_gate.enabled, status}` (jalur panas gerbang presensi), `form_responses {form_id, employee_id}`, `form_responses {company_id, employee_id}`.
+
+> Catatan: **tak ada index unik** pada `(form_id, employee_id)` — satu-jawaban-per-orang hanya berlaku bila `settings.single_response` menyala, dan itu per-form; index unik akan salah untuk form yang memang boleh diisi berulang. Penegakannya di handler.
+
 ## Infrastruktur Data Bersama (Redis, MinIO)
 
 - **Redis** — cache response gateway sekaligus queue antar service. Key di-namespace per domain, mis. prefix `srv:integration`.

@@ -1,0 +1,80 @@
+## Deskripsi
+
+*Endpoint **form-builder-service** (form dinamis + analisa jawaban + kepatuhan presensi). Gateway: `/api/form-builder/*`. Kelola form butuh **tingkat peran** `staff`/`supervisor`/`admin` di modul mana pun DAN departemen pemanggil ada di daftar departemen aktif; mengisi cukup terautentikasi. Grounded ke `services/form-builder/routes.go` + handler terkait (`main`, PR #849; kepemilikan per departemen PR #869).*
+
+- **Implementasi**: [[Microservices - Form Builder Service]] · **Status**: ⚠️ (live di dev **dan prod** sejak 2026-08-01; **penilaian karyawan, tipe form, dan rekap per orang dinilai** merged 2026-08-02 lewat PR #907 + #908 — **live di dev DAN prod** sejak 2026-08-02)
+- **Indeks**: [[API - Index]]
+- **Konsumen**: seluruh rute `/forms*` — termasuk `analytics`, `responses`, `export` — dipakai [[APP - Web ERP]]. Rute **`/me/*`** dipakai [[APP - MyBharata]] (section Survei di beranda + halaman pengisian).
+
+## Sistem
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/health` | Health check (di belakang gateway key) |
+
+## Kelola Form (RBAC per departemen)
+| Method | Path | Fungsi |
+|---|---|---|
+| POST | `/forms` | Buat form (lahir `draft`; `owner_department` wajib dan harus dalam cakupan pemanggil. Ejaannya **dikanonikkan** ke daftar departemen aktif) |
+| GET | `/forms` | Daftar form departemen yang boleh dikelola pemanggil (`?status=`, `?form_type=`, `?search=`, `?page=`, `?limit=` maks 100). Tiap item membawa `form_type`, `response_count` (jumlah jawaban) dan `respondent_count` (jumlah ORANG) |
+| GET | `/forms/:id` | Detail + `response_count` |
+| PATCH | `/forms/:id` | Sunting. `409` bila susunan field diubah padahal sudah ada jawaban. `owner_department` tak bisa dipindah |
+| PATCH | `/forms/:id/status` | `draft`→`published`→`closed`. `409` bila mencoba mundur dari `published` ke `draft`. Saat terbit: **memotret sasaran penilaian** (`422` bila gagal, kosong, atau >300 orang) lalu mengirim notifikasi inbox ke seluruh sasaran |
+| DELETE | `/forms/:id` | Hapus lunak (`deleted_at` + status `closed`) |
+
+> **Cakupannya departemen, bukan modul.** Diambil dari `common.SupervisedDepartments` (departemen sendiri + yang dibawahi lewat `master_department.supervised_by`) lalu diiris daftar departemen aktif. SPV HRGA karena itu melihat form Human Resource **dan** General Affair, tapi tidak Tech Development. Daftar aktifnya konfigurasi `FORM_BUILDER_DEPARTMENTS`; bila kosong dipakai bawaan `Human Resource, General Affair, Tech Development`.
+
+## Analisa & Export (RBAC per departemen)
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/forms/:id/analytics` | Rekap per pertanyaan + tren harian + tingkat pengisian (lihat bentuk respons di bawah) |
+| GET | `/forms/:id/responses` | Daftar jawaban berhalaman (`?page=`, `?limit=` maks 200), terbaru dulu |
+| GET | `/forms/:id/export` | CSV (`text/csv`). Header `X-Export-Truncated` muncul bila menyentuh batas 20.000 baris |
+
+## Pengisian (karyawan terautentikasi)
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/me/capability` | `{can_manage, departments[]}` — apa yang boleh dilakukan pemanggil di Form Builder |
+| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `submitted`, `blocks_attendance`, `gate_end_date`). Form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous` |
+| GET | `/me/forms/:id/subjects` | Daftar orang yang harus DINILAI pemanggil + `progress{done,total,anonymous}`. `409` bila form tak menilai siapa pun |
+| POST | `/me/forms/:id/responses` | Kirim jawaban (+`subject_employee_id` untuk form penilaian). `403` bila bukan sasaran atau menilai orang di luar daftar, `409` bila form tak `published` atau orang itu sudah dinilai. Balas `subject_done`, `subject_total`, `all_completed` |
+| GET | `/me/responses` | Riwayat jawaban sendiri |
+
+> **Idempoten**: pengiriman identik dalam 2 menit dibalas `200 {"duplicate": true}` tanpa insert baru (sidik jawaban di-hash setelah kunci diurutkan, jadi payload yang disusun ulang saat retry tetap terdeteksi).
+
+> **Kenapa `/me/capability` ada di grup pengisian, bukan di balik `requireFormManager`.** Daftar departemen aktif tinggal di konfigurasi server; tanpa endpoint ini setiap klien harus menyalinnya dan pasti melenceng saat daftarnya berubah. Ditaruh di `/me` supaya yang tak berhak menerima `can_manage:false` yang bisa dibaca klien, bukan `403` yang harus ditebak artinya. `departments` sengaja dikosongkan bila `can_manage:false`.
+
+## Internal (dipanggil service lain)
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/internal/compliance` | Form wajib yang belum diisi: `{blocking:[{id,title}], warning:[...]}`. Dipakai [[Microservices - Attendance Service]] saat clock-in |
+
+> **Identitas terkunci ke header.** Query `?employee_id=&department=&company_id=` HANYA dihormati bila request tak membawa `BIP-Employee-ID` sama sekali (ciri panggilan service-to-service). Request pemakai lewat gateway selalu terkunci ke dirinya sendiri — tanpa aturan ini rute ini jadi jalan mengintip form tertunda orang lain lintas perusahaan. Lihat [[ADR - 0031 Prefix internal Bukan Batas Keamanan]].
+
+## Bentuk data penting
+
+**Tipe field** (`fields[].type`): `short_text` · `long_text` · `number` · `date` (`YYYY-MM-DD`) · `time` (`HH:MM`) · `dropdown` · `radio` · `checkbox` (jawaban berupa array) · `scale` (rentang maks 10 langkah) · **`section`**.
+
+**`section` bukan pertanyaan** melainkan penanda awal bagian, hidup di dalam `fields` yang tetap datar. `label` jadi judul bagian, `description` jadi keterangannya. Aturannya: tak boleh `required`, tak boleh membawa `options`/`min`/`max`/`max_length`/`scale_*`, dan **jawaban yang menunjuk key bagian ditolak** (`400`). Bagian tak muncul di `analytics.fields` maupun kolom CSV.
+
+**Keterangan ujung skala** (`scale_min_label`, `scale_max_label`) — mis. `"Sangat tidak puas"` .. `"Sangat puas"`. Keduanya opsional dan satu ujung saja pun sah; maksimal **40 karakter**; hanya berlaku untuk tipe `scale` (menempel di tipe lain ditolak `400`). Murni keterangan tampilan: nilai jawaban tetap angka, dan mengirim teks labelnya sebagai jawaban tetap ditolak.
+
+**Pemilik** (`owner_department`): nama departemen `master_department` (mis. `"General Affair"`), BUKAN key `system_roles`. Form lama yang masih menyimpan `owner_module` dipindah otomatis saat service boot (`it`→`Tech Development`, `ga`→`General Affair`).
+
+**Sasaran** (`audience.type`): `all` · `departments` (+`departments[]`) · `employees` (+`employee_ids[]`). `estimated_size` diisi manual sebagai penyebut tingkat pengisian; bila 0, `response_rate` tidak dikirim. Perhatikan `audience.departments` menjawab **siapa yang mengisi**, sedangkan `owner_department` menjawab **siapa yang memiliki** — keduanya tak harus sama.
+
+**Tipe form** (`form_type`): `survey` · `evaluation` · `request` · `checklist`. Kiriman kosong jadi `survey`; nilai tak dikenal ditolak `400` (bukan diam-diam diubah). **Terikat dua arah dengan `subject`**: `evaluation` wajib punya sasaran, dan yang punya sasaran wajib `evaluation`.
+
+**Sasaran PENILAIAN** (`subject`): `{rules[], departments[], positions[], employee_ids[], allow_self, anonymous, resolved[]}`. `rules` digabung **OR**, isinya `departments`/`positions`/`employees`, dan tiap aturan wajib membawa daftarnya sendiri. `resolved` adalah **potret** yang diisi backend saat terbit — kiriman klien diabaikan. `anonymous` mengosongkan identitas penilai di export dan daftar jawaban, tapi TIDAK di database.
+
+> **`subject` menjawab siapa yang DINILAI**, `audience` menjawab siapa yang MENGISI. Skenario "semua karyawan menilai tiap Office Boy" = `audience.type: all` + `subject.rules: ["positions"]`, `positions: ["Office Boy"]`. **Gerbang presensi ditolak `400`** pada form bersasaran penilaian.
+
+**Gerbang presensi** (`attendance_gate`): `{enabled, mode: "warn"|"block", start_date, end_date}`. Tanggal wajib **RFC3339** (`2026-08-01T00:00:00Z`); `"2026-08-01"` akan ditolak.
+
+**Respons analytics**: `total_responses`, `unique_respondents`, `audience_size`, `sample_size`, `truncated`, `response_rate` (opsional), `daily[{date,count}]`, `fields[{key,label,type,answered,skipped,options[{option,count}],average,min,max,sample_text[]}]`. Saat `truncated=true`, `response_rate` sengaja tidak dikirim karena tak bisa dihitung jujur dari sebagian data.
+
+**Respons analytics form penilaian** (absen pada form biasa): `evaluation{subject_count, evaluators_started, evaluators_completed, pairs_done}`, `subjects[{employee_id,name,department,position,responses,scores[{key,label,answered,average}]}]`, `subjects_truncated`. `scores` hanya untuk pertanyaan `number`/`scale`, dan `average` **absen** (bukan 0) bila belum ada yang menilai. `response_rate` di sini = `evaluators_completed / audience_size` — yang dihitung penilai yang menyelesaikan SELURUH daftarnya, bukan yang sekadar mengirim satu penilaian.
+
+## Dokumen Terkait
+
+- [[Microservices - Form Builder Service]] · [[IT - Form Builder]]
+- [[API - Index]] · [[API - Attendance Service]] · [[CORE - API Master Gateway]]

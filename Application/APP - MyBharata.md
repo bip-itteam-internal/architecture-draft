@@ -6,7 +6,7 @@
 - **Multi-perusahaan** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]): presensi (absen/jadwal/izin) ter-scope **otomatis via JWT** (tak ada perubahan). **Profil Perusahaan** dari `/me` (BIP profil penuh; perusahaan lain nama saja) & **onboarding** (welcome + setup-selesai) dari respons login `new_user`, membuang hardcode "PT Bharata". **Konten dinamis per tenant (F2-C, PR #90)**: helper `CompanyScope` / `companyScopeOf(context)` dari `UserProfileBloc` (key kosong = BIP demi kompatibilitas token lama); blok "Tentang Perusahaan" (Visi/Misi/Company Info/SOP) & "Bharata Community" hanya untuk BIP, sedangkan kartu cuaca kantor dan nama pada strap QR lanyard kini ikut nama perusahaan user. **Menu Pengajuan disembunyikan untuk non-BIP (PR #91)** selama pilot, di dua entry point (`home_menu_grid` + `more_menu`), karena perusahaan lain fokus presensi dulu. **Status rilis**: PR #89/#90/#91 sudah **merged ke `dev`** (versionCode 120), belum naik ke `main`. **Masih TBD (butuh data per-perusahaan di BE):** kontak HR, nama gedung + guestbook, handbook/SOP PDF. Kontak IT sengaja tetap pusat (helpdesk grup, dipakai juga pra-login sebelum perusahaan diketahui).
 
 - Pengguna: karyawan, supervisor, HRD, IT admin, dan tamu eksternal (guest book)
-- Versi build saat ini: **1.10.6+120** (`origin/dev`; `pubspec.yaml`) — PR rename Task Management menaikkan ke **1.10.6+121**
+- Versi build saat ini: **1.14.5+135** (`origin/dev`; `pubspec.yaml`) — naik berturut-turut lewat PR #94 (kontrak `owner_department`), #95 (bagian + dropdown lembar bawah + label skala), #96 (pengingat penilaian tiket), #104 (penilaian karyawan berurutan), dan #105 (tipe permintaan saat buat tiket). ⚠️ **Belum ada rilis** untuk versi-versi ini: `main` belum ditarik dari `dev` dan tag/GitHub Release belum dibuat, jadi yang terpasang di HP pemakai masih **1.14.2+132**
 - Target platform: Android (minSdk 23 / Android 6.0+), iOS 13+
 - Survei perangkat mobile karyawan [terdaftar di sini](https://docs.google.com/spreadsheets/d/1w2blhMgFx1BI9zu6ni5gmQJab_NfMhdocm0cj5pyO_s/edit?usp=sharing)
 
@@ -38,7 +38,11 @@
 - Onboarding: karyawan baru login pertama kali dengan Employee ID + password sementara dari HRD, lalu diarahkan untuk mengatur kredensial baru
 
 > [!note] Catatan integrasi backend
-> Pada implementasi saat ini, MyBharata terhubung **langsung ke HRIS backend** (`https://admin.hris-bharata.com`, UAT `https://admin-dev.hris-bharata.com`) menggunakan JWT — **bukan** melalui [[CORE - API Master Gateway]] dan **bukan** SSO. Ini adalah selisih antara rencana arsitektur (portal terpusat di belakang API Master Gateway) dengan kondisi aplikasi yang sudah dibangun. Lihat bagian *Dependencies & Integrasi*.
+> **Dikoreksi 2026-08-01 (grounded ke kode):** MyBharata **memang lewat** [[CORE - API Master Gateway]]. `lib/src/core/api/url.dart` menetapkan base URL `https://api.bharatainternasional.com/` (prod) dan `http://10.10.10.121:6969/` (dev) — keduanya alamat gateway — dan **seluruh** konstanta endpoint berprefix `api/<module>/...` (mis. `api/attendance/tap`, `api/notification/inbox`, `api/file/preview`), yaitu pola routing `/api/:module/*` milik gateway.
+>
+> Catatan lama di tempat ini menyatakan aplikasi terhubung langsung ke `admin.hris-bharata.com` dan **bukan** melalui gateway. Itu **tidak sesuai kode** dan sudah dicabut. Yang masih benar: MyBharata memakai **JWT Bearer**, bukan alur SSO ticket ([[CORE - SSO Flow]]) yang dipakai FE Task Manager.
+>
+> Konsekuensi praktisnya: service baru yang terdaftar di map `InternalURL` gateway **otomatis terjangkau** MyBharata tanpa infrastruktur tambahan — dasar yang dipakai [[Microservices - Form Builder Service]] untuk menargetkan pengisian form lewat mobile.
 
 ## Fitur Utama (Live)
 
@@ -69,6 +73,40 @@
 ### KPI & Task Management
 - **KPI**: laporan performa kuartalan (read-only di mobile) dengan grafik
 - **Task Management** *(sebelumnya "Support Ticket", sebelumnya lagi "Helpdesk IT"; label diselaraskan dengan web pada 2026-07-28 — istilah user-facing kini **Tugas**/**Task**, key l10n `menuTaskManagement`/`task*` tidak berubah)* — buat tugas ke **Space per divisi** (lintas divisi) lewat form "Buat Tugas": pilih Space, Judul, Deskripsi, **lampiran opsional** (**create-then-upload** per-file ke `/tasks/:id/attachments`, batas **4 MB/file** selaras file-service). Daftar tugas punya **3 tab scope** — *Tugas Saya* / *Ditugaskan ke Saya* / *Tugas Tim* (supervisor) — dengan **badge jumlah aktif** (`/tasks/counts`), pencarian, filter (status/prioritas/periode), urut terbaru; warna status kartu/header ikut `status_color` per-space. **Detail** dibagi section **Checklist** (hanya **centang**; item dibuat lewat web) & **Komentar** (terbaru dulu); **ubah status** (maju-saja) & **komentar** lewat **bottom action bar**. Gate izin: hanya **assignee/supervisor** yang boleh ubah status & checklist; **pemohon read-only** (hanya komentar). **Approve/Reject permintaan hanya di web** — mobile belum punya alur approval, sehingga notif "Permintaan baru" mengarahkan buka website ERP. URL di deskripsi jadi tautan klik; input teks auto-kapital huruf pertama (sentence-case). Fitur `features/task`. Backend: [[Microservices - Task Management Service]] · web: [[APP - Web ERP]] · tracker: [[APP - Dynamic Task Tracker]]
+
+- **Tipe permintaan ✅** (PR [#105](https://github.com/bip-itteam-internal/my-bharata/pull/105)) — form Buat Tugas punya field **Tipe Permintaan** memakai `CustomSelectBottomSheet` yang sudah ada (radio list, bukan grid kartu seperti pemilih Space; keterangan tiap tipe tampil **di dalam** daftar). Muncul **hanya** bila Space tujuan punya daftar tipe, dan pilihannya **dibuang saat Space berganti** karena tipe milik satu space tertentu. `type_id` **dihilangkan dari body** saat kosong, bukan dikirim string kosong (BE menolaknya sebagai id tak sah).
+	- ⚠️ Field `types` datang dalam **tiga bentuk** yang semuanya berarti kosong: absen, `null` (Go memancarkan slice nil sebagai null), dan bukan-list. Parsing di `TaskSpaceOptionModel` menangani ketiganya; entri tanpa `id` dibuang karena tak bisa dikirim balik.
+- **Pengingat penilaian tiket (CSAT)** — banner di beranda saat ada tiket **selesai yang belum dinilai**; menekannya membuka halaman Task Management. Sumber datanya `GET /tasks/pending-csat` yang dibuat khusus untuk ini (PR bip-erp [#872](https://github.com/bip-itteam-internal/bip-erp/pull/872)); sebelumnya tak ada cara menanyakan hal itu ke server, karena `/tasks/counts` justru **mengecualikan** tiket selesai.
+
+> [!note] Kenapa banner menetap, bukan SnackBar
+> SnackBar sungguhan menghilang sendiri setelah beberapa detik, jadi pengingat akan terlewat oleh orang yang sedang menggulir atau baru membuka aplikasi — padahal justru itu yang mau diingatkan. Bentuk dan warnanya tetap meniru snackbar (`inverseSurface`), tapi ia tinggal di halaman sampai tiketnya dinilai.
+>
+> Menuju **daftar** tiket, bukan langsung ke satu tiket: saat ada beberapa yang menunggu, memilihkan salah satunya berarti menebak. Hilang sepenuhnya saat tak ada yang menunggu maupun saat gagal memuat (termasuk `404` dari server yang belum memuat rute ini) — pengingat bukan sesuatu yang diminta pemakai, jadi kegagalannya tak layak memakan layar utama.
+
+### Survei / Form Builder
+- **Section "Survei" di beranda**, tepat di bawah quick menu, berisi form terbit yang ditujukan ke karyawan itu dan **belum** ia isi. Tiap kartu menampilkan jumlah pertanyaan, tenggat gerbang, dan penanda merah **"Wajib sebelum absen"** bila form-nya menahan clock-in.
+- **Halaman pengisian `/survey/:id`** merender **9 tipe pertanyaan** (`short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`), memvalidasi cermin aturan backend sebelum kirim, lalu menyegarkan section supaya form yang baru diisi langsung lenyap.
+- **Dropdown, tanggal, dan jam memakai satu jalur yang sama** (PR [#95](https://github.com/bip-itteam-internal/my-bharata/pull/95)): mode nilai `CustomFormField` + pemilih milik aplikasi. Dropdown memakai **`CustomSelectBottomSheet`**, bukan `DropdownButtonFormField` bawaan Material — repo sudah punya komponennya, dan menu melayang di layar sempit sering terpotong sedangkan lembar bawah memang dirancang untuk jempol. Ketiganya kini punya tombol **"Kosongkan"** saat pertanyaannya opsional; sebelumnya tanggal dan jam terkunci begitu tersentuh karena pemilih tak punya cara bawaan membatalkan pilihan.
+- **Keterangan ujung skala** digambar di bawah deretan angka bila dikirim backend; satu ujung saja tetap digambar.
+- **Pengisian per bagian** (PR [#95](https://github.com/bip-itteam-internal/my-bharata/pull/95)): form berbagian dipecah jadi satu halaman per bagian lewat `splitSurveyPages()` — fungsi murni, teruji tanpa merender. Form **tanpa** bagian tetap satu halaman tanpa navigasi, jadi perilaku lamanya tak berubah. Pemeriksaan jawaban berjalan **per halaman** saat menekan Berikutnya; menundanya sampai tombol kirim berarti pengisi baru menemukan kesalahan bagian pertama setelah menyelesaikan bagian terakhir. Saat mengirim, kesalahan pertama membawa layar **lompat ke halamannya**, karena pesan untuk pertanyaan yang tak terlihat membuat pengisi menebak-nebak.
+- **Penilaian karyawan lain, berurutan** (PR [#104](https://github.com/bip-itteam-internal/my-bharata/pull/104), **merged ke `dev` 2026-08-02**): form penilaian dibuka **sekali**, lalu pengisi maju dari orang ke orang tanpa kembali ke daftar. Tanpa ini, menilai empat office boy berarti membuka form empat kali dan mengisi ulang seluruh halamannya. Tombolnya **"Simpan & Lanjut"**, berganti **"Simpan & Selesai"** pada orang terakhir.
+	- Header "sedang menilai" (nama, jabatan, nomor keberapa dari berapa, garis kemajuan) diulang di **setiap** halaman bagian, bukan cuma di awal: pertanyaannya sama persis untuk empat orang, dan itu yang paling mudah terlupakan begitu pengisi menggulir.
+	- **Orang berikutnya dicari dari yang BELUM selesai**, bukan indeks berikutnya, sehingga pengisi yang menutup aplikasi di tengah jalan kembali ke tempatnya berhenti.
+	- **Pengalihan ke alur ini dikerjakan di `SurveyFillPage`, bukan di kartu beranda**: notifikasi "form terbit" dari backend memakai rute `/form/<id>` yang sama untuk kedua jenis form, jadi kalau ditaruh di kartu, penerima tautan notifikasi mendarat di halaman pengisian biasa yang pasti ditolak backend karena tak menyebut siapa yang dinilai.
+	- `SurveyFillView` **dilepas dari `SurveyBloc`** dan menerima callback `onSubmit`; tampilan yang sama dipakai dua alur berbeda blocnya. Kunci widget diganti per orang (`ValueKey(employeeId)`) supaya State isian lama dibuang — tanpa itu jawaban orang sebelumnya terbawa dan terkirim tanpa disadari.
+	- Daftar sasaran yang **kosong atau sudah selesai** tak dibiarkan masuk ke layar pengisian, dan **kegagalan mengambilnya tidak** diperlakukan sebagai daftar kosong (berbeda dari daftar form di beranda yang memang sengaja diam saat gagal). Keduanya akan mengatakan "sudah selesai semua" kepada orang yang belum menilai siapa pun.
+- Sumber data `GET /api/form-builder/me/forms` + `GET .../me/forms/:id/subjects` + `POST .../me/forms/:id/responses` (+`subject_employee_id`). Backend: [[Microservices - Form Builder Service]] · kontrak: [[API - Form Builder Service]]
+- Fitur `features/form`. my-bharata PR [#93](https://github.com/bip-itteam-internal/my-bharata/pull/93) (merged, `dev`) · [#104](https://github.com/bip-itteam-internal/my-bharata/pull/104) (open, versionCode **134**).
+
+> [!important] Section ini menghilang sepenuhnya saat gagal memuat, bukan hanya saat kosong
+> `form-builder-service` **belum jalan di prod**, jadi di produksi endpointnya membalas `404`. Datasource menerjemahkan `404` jadi daftar kosong, dan section memperlakukan keadaan gagal **sama dengan kosong**: tak ada judul menggantung, tak ada kerangka, tak ada pesan galat. Memunculkan kegagalan di layar utama untuk fitur yang belum dirilis di lingkungan itu lebih buruk daripada diam. Halaman pengisian tetap menampilkan pesan errornya sendiri.
+
+> [!warning] Tiga aturan kontrak yang mudah dilanggar diam-diam
+> **`number` dan `scale` wajib dikirim sebagai angka JSON.** Backend memakai pembanding tipe yang menolak string, sedangkan input teks di layar selalu menghasilkan string. Konversinya dipusatkan di `answer_encoder.dart`.
+>
+> **Koma diterima sebagai pemisah desimal** ("36,5") lalu dinormalkan ke titik. Papan ketik angka menyediakan komanya dan orang Indonesia menulis begitu; menolaknya berarti menjebak pemakai.
+>
+> **`scale_min` bertag `omitempty` di backend**, jadi skala `0..N` datang **tanpa** field itu. Nilai bawaannya harus 0, bukan 1 — menebak 1 membuat pilihan terendah tak pernah bisa disentuh.
 
 ### Fitur pendukung lain
 - **QR Code**: tampilkan QR pribadi + akses scanner inventory
@@ -108,9 +146,8 @@ Tercantum di menu tetapi masih placeholder (route `/coming-soon` atau stub):
 
 ## Dependencies & Integrasi
 
-- **HRIS backend** (`admin.hris-bharata.com`) — sumber data utama; integrasi langsung via REST + JWT
+- [[CORE - API Master Gateway]] — **pintu masuk seluruh request** (`api.bharatainternasional.com`, dev `10.10.10.121:6969`), dipanggil dengan pola `api/<module>/...` + JWT Bearer. Lihat koreksi di catatan integrasi backend di atas.
 - **Firebase** — Analytics, Crashlytics, FCM (push notification), Performance
-- [ ] [[CORE - API Master Gateway]] — *rencana awal:* portal terpusat di belakang gateway. *Kondisi saat ini:* belum dipakai oleh MyBharata (lihat catatan integrasi backend di atas)
 
 ## Dokumen Terkait
 

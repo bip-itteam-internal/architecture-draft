@@ -1,6 +1,51 @@
 # Sistem Insentif untuk Adv dan SPV Marketing
 
-🟡 **Konsep / Direncanakan** — skema insentif marketing (acuan SK perusahaan); sistem perhitungan terpadu masih dirancang. Backend terkait: [[Microservices - Insentive Service]].
+⚠️ **Implemented (ada catatan)** — sejak **2026-07-30** skemanya **profit-based untuk SELURUH jabatan** (SK 010/DIR/Rev-SK6/VII/2026 & SK 011/DIR/SK6/VII/2026). Perhitungannya sudah di kode dan ter-test; yang menahan pemakaian adalah master data yang belum terisi, bukan enginenya. Backend: [[Microservices - Insentive Service]].
+
+> ⛔ **Seluruh skema KPI-multiplier per-jabatan di bawah (§SPV Marketing s/d §CRM) sudah DICABUT** dan kodenya dihapus 2026-07-30. Dipertahankan di sini sebagai riwayat SK lama — **jangan dipakai sebagai acuan perhitungan**. Yang berlaku ada di §Skema Berlaku tepat di bawah ini.
+
+## Skema Berlaku (profit-based, SK 010 & 011/2026)
+
+```
+Profit    = Uang Cair (Net Settlement) − HPP − Beban Iklan − Biaya Operasional
+Insentif  = tarif(%) × Profit
+```
+
+**Dinilai bertingkat tiga level** — ICC → Leader → Supervisor. Satu orang bisa menempati dua level sekaligus: leader yang punya toko sendiri dinilai sebagai ICC atas tokonya **dan** sebagai Leader atas total timnya, dengan target masing-masing.
+
+| % Pencapaian Target Profit | Tarif dari profit |
+| --- | --- |
+| < 80% | 0% |
+| 80% – 90% | **2%** |
+| > 90% – 100% | **3%** |
+| > 100% – 110% | **4%** |
+| > 110% | **5%** |
+
+> ⚠️ Tabel tarif **lama** di §SPV Marketing (0/1/2/3/4%) **kurang satu poin persen** dari SK. Itu bug produksi yang sempat terkunci tes; sudah dibetulkan 2026-07-30 dan diverifikasi terhadap 4 contoh perhitungan di SK.
+
+**Aturan turunan yang mengikat:**
+
+1. **Gerbang retur 7%** — batas berlaku selama pencapaian **≤100%**; di atas itu retur tidak lagi menggugurkan. Rasionya dari **jumlah order** (keputusan client 2026-07-31), bukan nilai rupiah; rasio nilai tetap ditampilkan sebagai pembanding karena bisa berbeda jauh (Juli 2026: 4,12% vs 3,35%).
+2. **Target diketik hanya di lingkup Supervisor**, lalu dibagi rata turun ke Leader dan ICC. Baris turunan boleh ditimpa manual. Ubah target saat periode berjalan wajib beralasan; setelah disetujui, ditolak.
+3. **Dasarnya UANG CAIR, bukan harga jual** — potongan marketplace dan retur sudah terpotong di dalamnya, jadi tidak dikurangkan lagi. Retur ditampilkan untuk pemantauan dan syarat 7%, bukan sebagai pengurang.
+4. **Order yang belum cair sampai tanggal 25 bulan berikutnya HANGUS** untuk periode itu. Konsekuensinya dashboard akan selalu sedikit lebih tinggi dari pembukuan Accurate — itu aturan keadilan, bukan buku besar.
+
+**Biaya operasional** dirakit dari dua sumber yang dipisah tegas: beban karyawan dari [[Microservices - Payroll Service]] (bruto + iuran BPJS pemberi kerja — **bukan** gaji bersih yang diterima) dan beban non-gaji dari proyek [[External - Accurate]] per karyawan. Alasan lengkap + daftar akun yang dikecualikan: [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]].
+
+### Yang masih menahan (per 2026-08-02)
+
+- **Atribusi ICC belum lengkap** — baru 10 dari 28 toko punya mapping; 63% profit Juli tak berpemilik. Sumber pengisinya berkas LIST TOKO dari client.
+- **Pengecualian omzet affiliate eksternal belum terpasang** di perhitungan (daftar putihnya sudah bisa diisi, tapi belum dipakai kode) → pencapaian di layar masih lebih tinggi dari seharusnya. Terukur Juli 2026: 71,6% nilai affiliate dari kreator eksternal.
+- **Beban non-gaji baru terisi di 6 dari 62 proyek karyawan** di Accurate; sisanya masih dibukukan di proyek merek.
+- **Belum ada alur approval/freeze** untuk skema profit.
+- Menunggu dari luar: Lampiran SK (target sesungguhnya), dan finance melengkapi HPP.
+- Terbuka untuk finance: PPN di dalam profit · target sebelum/sesudah opex · jadwal bayar SK (tgl 1/5) vs cutoff pencairan (tgl 25).
+
+---
+
+## Riwayat: SK lama (DICABUT)
+
+> Bagian di bawah ini adalah isi SK sebelumnya. Disimpan sebagai riwayat; **bukan acuan perhitungan**.
 
 Data insentive selama ini diambil dari Sales, Income, Retur, dan KPI. Semua data tersebut didapat, HR melakukan perhitungan sedemikian rupa untuk menentukan nominal sesuai dengan SK dan peraturan perusahaan. SK [[doc.pdf]] ini berisi sebagai berikut:
 
@@ -198,12 +243,17 @@ Sistem finance mencatat Sales, Income dan Retur. Namun yang menjadi acuan adalah
 
 ## Arsitektur & Sumber Data (keputusan)
 
-Sistem insentif diputuskan dibangun **gabung ke ERP**, basis **MongoDB**, dengan **RBAC per divisi**. Sumber data per metrik:
+Sistem insentif dibangun **gabung ke ERP**, basis **MongoDB**, dengan **RBAC per divisi**. Sumber data per komponen **skema berlaku**:
 
-- **Profit / total penjualan & retur** → [[External - Accurate]] (API).
-- **Jumlah konversi** → [[Sales - GMV Creative]] / Dashboard TikTok (penjualan non-TikTok tidak dihitung untuk advertiser).
-- **Skor KPI (individu & tim)** → [[APP - Dynamic Task Tracker]].
-- **Jabatan & jumlah anggota tim** → ERP / Master Data Karyawan.
+| Komponen | Sumber |
+|---|---|
+| Uang cair, HPP, beban iklan, retur | [[Microservices - Integration Service]] `GET /profit/incentive/summary` (per toko, basis hari kirim + cutoff 25) |
+| Beban karyawan | [[Microservices - Payroll Service]] `GET /employer-cost` |
+| Beban operasional non-gaji | [[External - Accurate]] per proyek, lewat integration `GET /profit/incentive/opex` |
+| Struktur tim, target, daftar putih affiliate | `insentive_db` (master data di [[Microservices - Insentive Service]]) |
+| Pemilik toko (ICC) | `icc_account_mappings` di integration — lihat [[Sales - ICC Account Manager Mapping]] |
+
+**Sumber skema LAMA yang tak lagi dipakai**: skor KPI dari [[APP - Dynamic Task Tracker]] dan jumlah konversi dari [[Sales - GMV Creative]] — keduanya tak masuk rumus profit-based. KPI tetap dipakai untuk evaluasi & kenaikan gaji, bukan penentu nominal insentif.
 
 > Rincian desain & investigasi (pertimbangan Desty, pertanyaan terbuka, rancangan field lengkap) di-capture di `Workspace/Inbox` sampai sistem dibangun — lihat catatan naik-kelas.
 
@@ -219,5 +269,7 @@ Sistem insentif diputuskan dibangun **gabung ke ERP**, basis **MongoDB**, dengan
 
 - [[Sales - Incentive]] — irisan sisi marketing
 - [[Microservices - Insentive Service]] — backend perhitungan insentif
-- [[External - Accurate]] (profit/penjualan) · [[Sales - GMV Creative]] (konversi) · [[APP - Dynamic Task Tracker]] (skor KPI)
+- [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]] — keputusan sumber biaya operasional
+- [[Microservices - Integration Service]] (komponen profit) · [[Microservices - Payroll Service]] (beban karyawan) · [[External - Accurate]] (pembukuan)
+- [[Sales - GMV Creative]] · [[APP - Dynamic Task Tracker]] — sumber skema LAMA, tak dipakai rumus profit
 - [[Finance - Bridging App]] · [[HRIS - Compensation & Benefits]]

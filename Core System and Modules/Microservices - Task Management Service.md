@@ -29,9 +29,31 @@ Supervisor yang membawahi **lebih dari satu departemen** melihat dan menindak ti
 
 ### Spaces (board Kanban per divisi)
 - `POST /spaces` — create Space; validasi divisi harus ada di ERP, seed otomatis 5 stage + 3 priority default.
-- `GET /spaces` & `GET /spaces/:id` — list dan detail Space.
+- `GET /spaces` & `GET /spaces/:id` — list dan detail Space. **Disaring hak akses** (lihat **### Kontrol akses space**).
 - `PUT /spaces/:id` & `DELETE /spaces/:id` — update/delete; gated untuk admin atau supervisor divisi terkait. Stage wajib (`Request`/`Todo`/`Done`) dilindungi dari penghapusan.
 - Config **automation** per-space (diterima `createSpace`/`updateSpace`): `auto_assign` (bool), `auto_close_days` (int, `0`=nonaktif) — lihat **### Automation**.
+- **Tipe permintaan per-space ✅** `Space.Types []SpaceType` (`{id,name,description,color}`), diterima `createSpace`/`updateSpace` lewat field `types`. Lihat **### Tipe permintaan**.
+- **Visibility ✅** `Space.Visibility` (`public` bawaan / `restricted`) + `AllowedDivisions` + `AllowedEmployees`. Lihat **### Kontrol akses space**.
+
+### Tipe permintaan
+Penanda jenis permintaan yang **dipilih pemohon** saat membuat tiket (mis. Perbaikan Bug, Penambahan Fitur). Bentuknya meniru `Priority`, tapi perannya berbeda: prioritas ditetapkan **supervisor saat triase** dan menentukan target SLA resolusi, sedangkan tipe **murni penanda** untuk filter dan laporan — tidak memengaruhi SLA maupun penugasan.
+
+- Daftarnya **per-space**; `types` kosong berarti tim itu belum memakai tipe, dan FE menyembunyikan pilihannya sama sekali. Karena itu **tidak perlu migrasi** dan rollout bisa per tim.
+- Space baru **tidak** di-seed tipe default (beda dari stage & priority) — jenis pekerjaan terlalu spesifik per tim.
+- `POST /tasks` menerima `type_id` dan memverifikasi tipe itu **milik space yang dipilih** (`spaceHasType`). Tanpa cek ini tugas tetap tersimpan tapi `buildPopulated` tak menemukan tipenya, sehingga tiket tampil tanpa tipe dan laporan salah hitung.
+- ⚠️ `type_id` **OPSIONAL di API** sekalipun space punya daftar tipe; yang mewajibkan memilih adalah FE. Alasannya rilis: MyBharata versi lama tidak mengirim field ini, dan mewajibkannya akan membuat pemakai app lama gagal membuat tiket sampai memperbarui aplikasi.
+- `PUT /tasks/:id/type` — supervisor membetulkan salah pilih (gated `PermTicketTriage` + supervisor/admin). Body kosong = mengosongkan tipe, bukan galat.
+- `mergeTypes` **mempertahankan id** saat nama tipe diubah; id yang berganti akan membuat tugas lama kehilangan tipenya tanpa galat.
+- Pindah space (`PUT /tasks/:id/space`) ikut mengosongkan `type_id` karena daftarnya milik space lama. **Gap:** `priority_id` punya persoalan menggantung yang sama dan sengaja belum disentuh (prioritas menentukan target SLA).
+
+### Kontrol akses space
+Space bisa disetel terbuka untuk semua karyawan (`public`, bawaan) atau dibatasi ke departemen/orang tertentu (`restricted`).
+
+- `canAccessSpace(id, sp)` digerbang di **tiga tempat**: `GET /spaces` (menyaring daftar), `GET /spaces/:id` (403), dan `POST /tasks` (403). Menyaring daftar saja tidak cukup — gateway meneruskan permintaan apa adanya, jadi siapa pun bisa mengirim `space_id` langsung ke endpoint create (lihat [[CORE - API Master Gateway]]).
+- **Tim pemilik tak pernah terkunci**: supervisor divisi space, admin, dan anggota space (`members`) selalu lolos lebih dulu. Tanpa itu salah isi daftar izin membuat space jadi yatim dan tak bisa diperbaiki siapa pun.
+- Nilai `visibility` asing **ditolak saat menulis** (`normalizeVisibility`). Bila boleh tersimpan, pembacaan akan menganggapnya publik dan space yang dikira terbatas diam-diam terbuka.
+- ⚠️ Space lama tak punya field ini di Mongo, sehingga API mengirim `"visibility": ""` (string kosong, **bukan** null). Klien wajib memperlakukan kosong sebagai `public`; `?? "public"` di TypeScript **tidak cukup** karena hanya menangkap null/undefined.
+- Gerbang ini mengatur **siapa boleh mengajukan**, bukan visibilitas tiket yang sudah dibuat.
 
 ### Tasks
 - `POST /tasks` — create task (status awal `Request`, set `response_due_at = now + 24h`).
@@ -39,7 +61,7 @@ Supervisor yang membawahi **lebih dari satu departemen** melihat dan menindak ti
 - `GET /tasks/filter` — list dengan RBAC + filter (`space_id`, `status`, `assigned_to_me`, `created_by_me`, `pending_my_approval`, dll), search, dan pagination.
 - `GET /tasks/counts` — jumlah tiket **aktif** per-scope (`created`/`assigned`/`team`) untuk badge tab. Scope divisi mengecualikan status `Request`/`Ditolak`; `team` hanya dihitung untuk supervisor/admin (0 selain itu).
 - `PUT /tasks/:id/status` — ubah status (set `completed_at` saat mencapai `Done`).
-- `PUT /tasks/:id/assign`, `/archive`, `/unarchive`, `/due-date`, `/priority`, `/space` — mutasi atribut task.
+- `PUT /tasks/:id/assign`, `/archive`, `/unarchive`, `/due-date`, `/priority`, `/space`, `/type` — mutasi atribut task. `/type` digerbang izin triase (bukan `staffOrSup` seperti `/priority`) dan memverifikasi tipe milik space tugas tersebut.
 - `GET /tasks/:id/history` — riwayat perubahan task.
 - `DELETE /tasks/:id` — hapus task.
 
@@ -56,6 +78,7 @@ Supervisor yang membawahi **lebih dari satu departemen** melihat dan menindak ti
 - `POST /tasks/:id/csat` — requester memberi rating **1–5 bintang** + komentar (guard `staffOrSup`; **requester-only** dicek di handler via `canSubmitCSAT`). Validasi (`csat.go`): rating 1–5, **komentar wajib bila rating ≤ 2** (`400`); hanya untuk tiket **berstatus `Done`, `completed_at != nil`, non-arsip** (`403` bukan pemohon / `409` belum selesai). Idempotent overwrite; disimpan embedded `csat{rating,comment,rated_at,rated_by}` pada task; audit + broadcast `task_update`.
 - **Notif** `task_resolved_rate_me` ke requester saat tiket → `Done` (di 3 situs transisi `updateTaskStatus`/`updateTask`/`approveTask`; guard `status != "Done"` cegah dobel; reopen→Done kirim lagi).
 - **Reopen** membersihkan `csat` (`$unset`) → siklus resolusi baru, requester menilai ulang. (PR #343 BE, #233 Web.)
+- `GET /tasks/pending-csat` — tiket pemanggil yang **sudah selesai tapi belum dinilai** (`{data, total}`, terbaru dulu, maks 20). Dipakai pengingat di beranda [[APP - MyBharata]]. **Sengaja rute tersendiri, bukan ditambahkan ke `/tasks/counts`**: tiga hitungan di sana menyaring tiket AKTIF (`status $nin [Done, Ditolak]`), jadi tiket yang menunggu penilaian tak pernah masuk hitungan mana pun sebelum rute ini ada — dan menaruh keduanya bersebelahan membuat pembaca wajar mengira keempat angka itu sejenis. Aturannya **diturunkan dari `canSubmitCSAT`**, bukan ditulis ulang; kalau keduanya berbeda, klien akan menawarkan tiket yang justru ditolak server saat rating dikirim. Filter Mongo dan penilai in-memory dipakai berdampingan, yang kedua sebagai jaring pengaman untuk dokumen lama yang bentuknya tak tertangkap filter. (PR [#872](https://github.com/bip-itteam-internal/bip-erp/pull/872); **sudah jalan di prod sejak 2026-08-01**, health `200` lewat gateway.)
 
 ### Automation (auto-assign & auto-close)
 Konfigurasi **per-space** (`Space.auto_assign` bool, `auto_close_days` int `0`=nonaktif, `auto_assign_cursor` internal `json:"-"`).

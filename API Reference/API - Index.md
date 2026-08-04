@@ -33,6 +33,10 @@
 | Warehouse | `/api/warehouse/*` | [[API - Warehouse Service]] | [[Microservices - Warehouse Service]] |
 | Recruitment | `/api/recruitment/*` | [[API - Recruitment Service]] | [[Microservices - Recruitment Service]] |
 | Procurement | `/api/procurement/*` | [[API - Procurement Service]] | [[Microservices - Procurement Service]] |
+| Form Builder ⚠️ | `/api/form-builder/*` | [[API - Form Builder Service]] | [[Microservices - Form Builder Service]] |
+| Marketing Analytics | `/api/marketing-analytics/*` | [[API - Marketing Analytics Service]] | [[Microservices - Marketing Analytics Service]] |
+
+> ⚠️ Form Builder sudah merged ke `main` (2026-08-01, PR #849) tapi **belum live di dev** — gateway dev masih membalas `400 unknown service`.
 
 ## Dokumen Terkait
 

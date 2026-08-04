@@ -1,10 +1,10 @@
-> Status: ⚠️ **Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas → cek status; **E2E terverifikasi live 2026-07-16**). BE penopang **semua sudah deployed**. **Belum go-live**: belum ada remote Git, domain, maupun deploy portal; halaman legal masih draf; production 0 lowongan (lihat *Belum Diimplementasikan / Catatan*).
+> Status: ⚠️ **Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas → cek status; **E2E terverifikasi live 2026-07-16**). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf, dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*).
 
 ## Deskripsi
 
 *Portal karir publik **PT Bharata Internasional Pharmaceutical** — situs tanpa login tempat pelamar melihat lowongan, mengirim lamaran (satu berkas PDF gabungan), dan mengecek status lamarannya. Menggantikan alur **Google Form** lama HRD: lamaran langsung masuk pipeline [[Microservices - Recruitment Service]] sehingga HR tak perlu memindahkan data manual. Target domain: **`career.bharatainternasional.com`**.*
 
-- **Repo**: `career-bharata` — **repo Git terpisah** (sibling di bawah `erp/`), **bukan** bagian dari `bip-erp`. **Belum ada remote** — commit lokal di branch `master` (🟡 TBD: buat repo GitHub).
+- **Repo**: `career-bharata` — **repo Git terpisah** (sibling di bawah `erp/`), **bukan** bagian dari `bip-erp`. Remote: `github.com/bip-itteam-internal/career-bharata`, branch utama **`master`** (bukan `main` — `origin/HEAD` menunjuk ke sana).
 - **Package manager**: **pnpm** (`pnpm@10.25.0`). Bukan npm/yarn.
 - **Stack**: Next.js **16.2.10** (App Router) + React **19.2.4** + TypeScript strict + **Tailwind v4**; form `react-hook-form` + `zod`; HTML rich-text disanitasi `isomorphic-dompurify`.
 - **Backend**: **tidak punya BE sendiri** — sepenuhnya mengonsumsi `/public/recruitment/*` bip-erp lewat [[CORE - API Master Gateway]] (**tanpa JWT/SSO**). Base URL dari env `NEXT_PUBLIC_RECRUITMENT_API`.
@@ -16,7 +16,12 @@
 
 - **Server Components** untuk fetch data (list/detail/track, `cache: "no-store"`); **Client Components** hanya untuk interaksi (form lamar, filter, modal WASPADA, input token).
 - Semua akses BE disentralkan di `src/lib/recruitment-api.ts` (tipe `PostingListItem`/`PostingView`/`ApplyDTO`/`TrackView` + fungsi `listPostings`/`getPosting`/`apply`/`track`, native `fetch`). Detail/track → `null` bila 404 → `notFound()`.
-- **Deploy: Docker standalone** (`output: "standalone"` + `Dockerfile` 2-stage + `docker-compose.yml` + `.dockerignore`) — **pola disamakan dengan `erp-frontend`** (2026-07-16): `.env` **ikut masuk image** (bukan `--build-arg`) karena `NEXT_PUBLIC_*` di-inline saat `next build`; compose punya healthcheck/restart/logging. **Guard**: build **digagalkan** bila `.env` tak ada (tanpa itu kode jatuh ke fallback URL **dev** → portal production salah alamat senyap). ⚠️ image masih **belum divalidasi** (Docker daemon mati saat uji). **Base API production = `https://api.bharatainternasional.com/public/recruitment`** (gateway di VPS Biznet, terverifikasi 200) — **bukan** `10.10.10.121` internal.
+- **Deploy: Docker standalone** (`output: "standalone"` + `Dockerfile` 2-stage + `docker-compose.yml` + `.dockerignore`) — **pola disamakan dengan `erp-frontend`** (2026-07-16): `.env` **ikut masuk image** (bukan `--build-arg`) karena `NEXT_PUBLIC_*` di-inline saat `next build`; compose punya healthcheck/restart/logging. **Guard**: build **digagalkan** bila `.env` tak ada (tanpa itu kode jatuh ke fallback URL **dev** → portal production salah alamat senyap). ✅ image **sudah divalidasi di produksi** (build + jalan, 2026-08-02). **Base API production = `https://api.bharatainternasional.com/public/recruitment`** (gateway di VPS Biznet, terverifikasi 200) — **bukan** `10.10.10.121` internal.
+
+> [!warning] Compose di server SENGAJA berbeda satu baris dari repo
+> Repo memetakan `3011:3011`, sedangkan prod sudah memakai **port host 3005** dan yang merutekan domain publik menunjuk ke sana. Compose di server karena itu dipatok **`3005:3011`** — port host mengikuti prod, port container mengikuti `ENV PORT=3011` di Dockerfile. Memakai compose lama apa adanya (`3005:3000`) akan menghasilkan container hidup tapi **tak ada yang mendengarkan di sisi dalam**.
+>
+> Sekalian dua jebakan saat deploy pertama ke prod: (1) `docker-compose.yml` kini **ter-track di repo** sedangkan server memegang versi lokal, jadi `git pull` berhenti dengan sendirinya — file lama harus disingkirkan lebih dulu, **jangan** dipaksa dengan reset/clean karena isinya konfigurasi prod; (2) nama service berubah `career` → `career-portal` sementara `container_name` tetap, sehingga compose menganggap container lama **orphan** dan bentrok nama. Container lama harus dihapus dulu, dan itu berarti ada jeda singkat.
 
 ## Halaman / Fitur (Sudah Diimplementasikan)
 

@@ -29,7 +29,7 @@
 - **Header identitas dari klaim JWT** (`Reroute` membuang header `BIP-*` kiriman klien lalu meng-inject ulang dari klaim): `BIP-Employee-Id`, `BIP-System-Roles`, dan **`BIP-Company-ID`** (perusahaan/tenant; fallback `"BIP"`) — dikirim ke **semua** module secara seragam, dan diteruskan antar-service via `InternalRequest`. Inilah fondasi multi-perusahaan: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 
 **Routing service via `/api/:module/*`**
-- Module: employee, attendance, notification, file, insentive, integration, tiktok-shop, inventory, task-management, recruitment, hris (orchestrator), it (orchestrator)
+- Module: employee, attendance, notification, file, insentive, integration, tiktok-shop, inventory, task-management, recruitment, hris (orchestrator), it (orchestrator), form-builder (⚠️ merged 2026-08-01, **belum live di dev** — `/health?check=form-builder` masih balas `400 unknown service`)
 - Contoh port internal: employee-service:6970, attendance-service:6971, notification-service:6972, file-service:6973, hris-orchestrator:7000, it-orchestrator:7001
 - **Open routes:** module `notification` & `file` boleh skip JWT bila ada query `?key=`
 - ⚠️ **Catch-all, bukan allowlist.** `api.All("/:module/*")` meneruskan **seluruh** sub-path apa adanya; gateway tidak punya daftar rute yang diizinkan dan tidak menyaring path. Digabung dengan `Reroute` yang **mengisi sendiri** `BIP-Gateway-ID` (sehingga `ValidateGateway` di service selalu lolos), akibatnya **prefix `/internal/...` di service ikut terbuka ke internet**: syaratnya hanya token login valid, peran apa pun. Jadi `/internal/` **bukan** batas keamanan, dan setiap rute wajib menggerbangi dirinya sendiri. Latar, bukti di produksi, dan aturannya: [[ADR - 0031 Prefix internal Bukan Batas Keamanan]].
@@ -75,6 +75,7 @@ Gateway meneruskan request ke seluruh service internal berikut:
 - [[Microservices - Inventory Service]] — inventory (dikecualikan dari cache)
 - [[Microservices - Task Management Service]] — task management (klien FE Task Manager via SSO)
 - [[Microservices - Recruitment Service]] — ATS; termasuk apply publik `/public/recruitment/apply` (tanpa JWT)
+- [[Microservices - Form Builder Service]] — form dinamis IT/HRGA (⚠️ merged 2026-08-01, belum live di dev). ⚠️ **`FORM_BUILDER_MODULE_URL` masuk map `InternalURL` yang divalidasi**, jadi nilai kosong = gateway panic saat boot = seluruh ERP mati. `.env` **dev dan prod sudah diisi 2026-08-01** dan diverifikasi lewat `docker compose config`; yang tersisa: gateway harus dideploy dengan `docker-compose.yml` yang ikut ter-merge, bukan env lama. Rute `/internal/compliance`-nya adalah contoh penerapan [[ADR - 0031 Prefix internal Bukan Batas Keamanan]]: karena catch-all di atas membuatnya terbuka ke internet, rute itu mengunci identitas ke header dan mengabaikan query param dari request pemakai.
 - [[CORE - HRIS Orchestrator]] — orchestrator domain HRIS
 - [[CORE - IT Orchestrator]] — orchestrator domain IT
 

@@ -14,7 +14,7 @@
 | Item | Status | Sumber | Catatan |
 |---|---|---|---|
 | Recruitment service (ATS) | 🟡 | [[HRIS - Recruitment]] · [[Microservices - Recruitment Service]] | desain ada, belum di kode |
-| Form Builder service | 💤 | [[IT - Form Builder]] | rencana `/plan` terkunci, eksekusi ditunda |
+| Form Builder service | 🔵 | [[IT - Form Builder]] · [[Microservices - Form Builder Service]] | backend **merged ke main** 2026-08-01 (PR #849), belum live di dev; FE kelola menunggu merge, analisa/export & mobile belum |
 | Contract Management | 🟡 | — | gap fit tinggi (kontrak vendor/customer/karyawan) |
 | Budget Planner | 🟡 | [[Finance - Big Pictures]] | planning+monitoring saja (bukan akuntansi) |
 | Goal/OKR Management | 🟡 | [[HRIS - Key Performance Index]] | melengkapi KPI (beda lapis) |

@@ -1,15 +1,28 @@
 ## Deskripsi
 
-*Endpoint **insentive-service** (engine skor KPI → insentif 9 role marketing + workflow approval). Gateway: `/api/insentive/*`. Semua butuh gateway key; `/health` bebas. Grounded ke `services/insentive/main.go`.*
+*Endpoint **insentive-service**. Sejak 2026-07-30 skemanya **profit-based untuk seluruh jabatan** (SK 010 & 011/DIR/SK6/VII/2026); rute `/profit*` di bawah adalah yang berlaku. Rute warisan skema KPI-multiplier masih terdaftar tetapi sebagian **menolak** — lihat catatannya. Gateway: `/api/insentive/*`. Semua butuh gateway key; `/health` bebas. Grounded ke `services/insentive/main.go` + `func.go`.*
 
-- **Implementasi**: [[Microservices - Insentive Service]] · **Status**: ✅
+- **Implementasi**: [[Microservices - Insentive Service]] · **Status**: ⚠️ Implemented (ada catatan)
 - **Indeks**: [[API - Index]]
 
-## Engine & Master KPI
+## Profit-based (skema berlaku)
 | Method | Path | Fungsi |
 |---|---|---|
-| POST | `/calculate` | Engine perhitungan insentif universal (per-role) |
-| POST | `/calculate/auto` | Trigger manual cron auto-calculate |
+| GET | `/profit-dashboard` | Dashboard insentif per periode & level (`periode=YYYY-MM`, `level=icc\|leader\|supervisor`, `refresh=1` tarik ulang beban non-gaji) |
+| GET/POST | `/profit/org` | Struktur tim (ICC ↔ Leader ↔ Supervisor) |
+| PATCH | `/profit/org/:id/tutup` | Tutup masa berlaku satu baris struktur |
+| GET/POST | `/profit/targets` | Target profit per entitas/periode (ubah saat berjalan wajib beralasan ≥10 karakter) |
+| GET/POST | `/profit/opex` | Biaya operasional manual — kini **cadangan** (gaji dari payroll, non-gaji dari Accurate) |
+| POST | `/profit/opex/distribusi` | Bagi satu angka divisi ke tiap entitas (pro-rata, metode sisa-terbesar) |
+| GET/POST/DELETE | `/profit/internal-affiliates` · `/:username` | Daftar putih akun affiliate milik sendiri |
+
+> Sumber angka: komponen profit & beban non-gaji dari [[API - Integration Service]] (`/profit/incentive/summary`, `/profit/incentive/opex`), beban karyawan dari payroll-service `GET /employer-cost`.
+
+## Engine lama & Master KPI (warisan)
+| Method | Path | Fungsi |
+|---|---|---|
+| POST | `/calculate` | ⚠️ **Menolak seluruh role** — skema KPI-multiplier & ICC per-video dicabut; balasannya menyebut SK pencabutnya |
+| POST | `/calculate/auto` | ⚠️ Sama; cron harian sudah dihapus |
 | GET/POST/PUT/DELETE | `/master-kpi` · `/master-kpi/:id` | CRUD master KPI (bobot total 100) |
 
 ## Mappings & Audit
@@ -38,7 +51,8 @@
 | GET | `/integration/shopee/item-performance` | Ambil GMS Shopee dari integration |
 | GET | `/health` | Health check |
 
-> Cron harian 00:00 WIB (lock `cron_locks`) — lihat [[IT - Background Jobs & Schedulers]].
+> ⚠️ **Cron harian sudah DIHAPUS** bersama skema KPI-multiplier (`cron_worker.go`, 2026-07-30). Tidak ada lagi job terjadwal di service ini — lihat [[IT - Background Jobs & Schedulers]].
 
 ## Dokumen Terkait
 - [[Microservices - Insentive Service]] · [[HRIS - Key Performance Index]] · [[Finance - Incentive]] · [[API - Index]]
+- [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]] · [[API - Integration Service]]

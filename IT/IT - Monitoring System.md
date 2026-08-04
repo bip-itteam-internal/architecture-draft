@@ -41,6 +41,7 @@ Beberapa monitoring tools ini memiliki webhook untuk memberi notifikasi ke grup 
 
 ## Dokumen Terkait
 
+- [[Microservices - Monitoring Service]] — service ERP yang membaca `kuma.db` Uptime Kuma dan menyajikannya ke dashboard IT serta skor KPI
 - [[IT - Big Pictures]] — peta domain IT
 - [[IT - Server, VMs and Databases]] (VM netmon) · [[IT - Network Management]] (monitoring jaringan) · [[IT - Backup & DR]]
 - [[IT - Employee System]] — monitoring login logs karyawan
