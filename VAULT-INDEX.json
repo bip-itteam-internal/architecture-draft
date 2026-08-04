@@ -312,20 +312,20 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "30114855a9f8440bdad0bbc29ed232016ee15603e8dd5541995a640a5e296e60",
-      "ukuran_kb": 34.1,
-      "ringkasan": "Menjawab: endpoint mana yang dipakai untuk order marketplace (TikTok Shop, Shopee), webhook publik per platform, ringkasan/laporan transaksi, feed retur lintas-channel, pelacakan paket, dan aging piutang. Juga menjawab parameter tiap query (rentang tanggal, channel, shop_id, watermark) dan endpoint mana yang benar untuk kebutuhan tertentu, misalnya kenapa daftar retur harus diambil dari feed lintas-channel dan bukan dari endpoint retur Shopee atau jalur Accurate.",
+      "hash": "4c9cbdae39442a1efae5aa291b01b178010d8303791d44f19f223b2de5d37fb9",
+      "ukuran_kb": 36.0,
+      "ringkasan": "Menjawab: endpoint mana yang dipakai untuk menarik order marketplace (TikTok Shop, TikTok Business, Shopee) beserta ringkasan, export .xlsx, perbandingan periode, dan kartu dashboard-nya. Juga menjawab bagaimana aging piutang diambil, bagaimana feed retur lintas-channel serta packet tracking dikonsumsi WMS, dan rute mana yang publik (webhook `/ext/webhook/*`) versus wajib gateway key termasuk `/health`. Menerangkan pula kenapa `/transactions/returns` yang dipakai untuk retur gudang, bukan endpoint retur Shopee atau Accurate.",
       "kata_kunci": [
         "integration service",
-        "marketplace",
+        "endpoint",
+        "API reference",
         "TikTok Shop",
         "Shopee",
+        "Accurate",
         "webhook",
-        "order",
         "retur",
         "return",
-        "piutang",
-        "tracking resi"
+        "piutang"
       ]
     },
     {
@@ -1027,20 +1027,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "5eab78ecf910d271fb3aa5df154152d05d40d4e45429c4599e03ca38789f3efc",
-      "ukuran_kb": 79.4,
-      "ringkasan": "Menjawab: apa itu portal web internal One Bharata (erp-frontend), stack apa yang dipakai, dan bagaimana login serta SSO-nya bekerja (login employee_id, cookie token, refresh, mint one-time code untuk app lain seperti Task Manager). Menjelaskan juga bagaimana menu sidebar digerbang oleh system_roles per modul, bagaimana sub-menu dikelompokkan dan diratakan, serta cara mengatur tampilan menu per jabatan (centang = tampil, yang disimpan menu_hidden) yang berbeda dari hak akses. Termasuk dukungan multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/network per company) dan fitur Atasan Langsung serta menu KPI untuk Leader.",
+      "hash": "4d262ae2c3dd1147fed583c20e3cd20551e6b283f19b661a36d1156c95a16873",
+      "ukuran_kb": 81.2,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal (`hris-dashboard` / One Bharata), stack dan repo-nya, bagaimana login serta refresh token bekerja, dan bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain. Juga menjawab bagaimana sidebar dan menu di-gate oleh `system_roles`, bagaimana pengelompokan menu bersarang serta setelan Tampilan Menu per jabatan bekerja (centang = tampil, yang disimpan `menu_hidden`), dan bagian mana yang sadar multi-perusahaan (company switcher, shift, network, departemen, direktori karyawan). Cocok untuk mencari asal-usul keputusan UI seperti perataan induk menu tipis, menu KPI untuk Leader, dan halaman Atasan Langsung.",
       "kata_kunci": [
         "web ERP",
-        "erp-frontend",
-        "One Bharata",
         "hris-dashboard",
+        "One Bharata",
+        "erp-frontend",
         "SSO",
         "system_roles",
-        "sidebar menu",
-        "role gating",
+        "sidebar",
+        "menu",
         "multi-perusahaan",
-        "CompanySwitcher"
+        "company switcher"
       ]
     },
     {
@@ -1718,20 +1718,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "0809f13bae67a338f3e6ca14b985c6a341308fcaf98062dcfad8e01185ba8da3",
-      "ukuran_kb": 188.6,
-      "ringkasan": "Menjawab: bagaimana ERP terhubung ke TikTok Shop, TikTok Business/Ads, Shopee, dan Lazada; bagaimana order masuk lewat webhook lalu dinormalkan jadi model transaksi terpadu; dan bagaimana bridging akuntansi ke Accurate dilakukan (invoice, ringkasan harian per shop, sales return). Juga menjawab detail teknis seperti verifikasi signature webhook Shopee, cara agregasi GMV Max serta perhitungan ROI/ROAS, mapping akun ICC, job cron sync, dan bagian mana yang berupa rencana (Meta Ads) atau sudah dimatikan (Desty).",
+      "hash": "5eb96dd3827aae9ca1d08ff91a7028aee411e25884ef969f12b4ba9333035fdb",
+      "ukuran_kb": 192.0,
+      "ringkasan": "Menjawab: apa tugas integration-service, marketplace apa saja yang tersambung (TikTok Shop, TikTok Business/Ads, Shopee, Lazada), bagaimana order masuk realtime lewat webhook direct lalu dinormalkan jadi model transaction terpadu, dan bagaimana bridging akuntansi ke Accurate Online berjalan (invoice, ringkasan harian per shop, sales return). Juga menjawab bagaimana GMV Max monitoring/overview dan ICC video metrics dihitung, dari mana angka ROI/ROAS berasal, serta modul lain seperti profit per produk, review analytics, ACL marketing team, WMS bridge, dan job cron. Menjelaskan pula status Meta Ads yang masih konsep tanpa kode dan jalur Desty yang soft-disabled.",
       "kata_kunci": [
         "integration service",
         "marketplace",
         "TikTok Shop",
         "TikTok Business",
+        "GMV Max",
         "Shopee",
         "Accurate",
         "webhook",
-        "GMV Max",
-        "ROAS",
-        "ICC mapping"
+        "Desty",
+        "ICC"
       ]
     },
     {
@@ -4460,19 +4460,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "82226a2ea755c364670d53d146a7cebf2a0d43b264b2c930f642a34a57b79bc6",
-      "ukuran_kb": 127.0,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang di production hari ini, per departemen dan per posisi, lengkap dengan label persis seperti tersimpan, bobot, dan target di kolom deskripsi. Menjawab juga metrik mana yang sumber datanya sudah ada di sistem ERP dan apa rekomendasi tindak lanjutnya, plus cacat data yang sudah diketahui (template uji ikut produksi, metrik duplikat, label memakai target korporat, satu deskripsi memuat banyak angka). Berguna untuk dev departemen yang akan mengotomatiskan metriknya dan untuk pemilik metrik yang perlu menyepakati definisi target.",
+      "hash": "5abdf900d65b521ccaec3c4de24ff6e4046071afef74a22052f0a2544e7a9cd4",
+      "ukuran_kb": 129.6,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai tiap posisi di setiap departemen, berapa bobotnya, apa target/keterangannya, dan metrik mana yang sudah bisa dihitung otomatis dari data ERP versus yang masih manual atau terblokir data kosong. Juga menjawab dari koleksi mana angkanya diambil (`kpi_template` di `employee_db`), kenapa label ditulis persis seperti tersimpan termasuk typo (label adalah kunci identitas metrik di kode), dan cacat data yang sudah diketahui seperti template uji ikut produksi, metrik duplikat, serta label bertarget korporat. Berisi pula cara memperbarui dokumen ini dan departemen mana yang belum punya template sama sekali.",
       "kata_kunci": [
-        "matriks KPI",
-        "KPI per departemen",
+        "KPI",
         "kpi_template",
-        "bobot metrik",
-        "target KPI",
-        "otomasi KPI",
-        "penilaian kinerja",
-        "performance metric",
-        "employee_db"
+        "matriks KPI",
+        "bobot",
+        "target",
+        "otomasi skor KPI",
+        "departemen",
+        "penilaian karyawan",
+        "employee_db",
+        "performance"
       ]
     },
     {
@@ -5157,19 +5158,20 @@
         "Microservices - Task Management Service",
         "Sales - Marketplace Integration"
       ],
-      "hash": "531c44832a4b19843c5a50f576a57fc4af13f887c76ffcb2fac1f6ae2a966295",
-      "ukuran_kb": 22.5,
-      "ringkasan": "Menjawab: proses latar belakang apa saja yang berjalan di bip-erp (46 job terjadwal + dispatcher webhook), kapan jadwalnya (WIB), di service mana, memakai lock apa, dan mana yang belum deploy atau dead code — termasuk penjadwal internal marketing-analytics 48 jam yang baru.",
+      "hash": "6e0f97f0a2e4a9a3eece42d640d5d78cfc468a35c82f4b5a45324c6850d202f3",
+      "ukuran_kb": 22.9,
+      "ringkasan": "Menjawab: proses apa saja yang berjalan diam-diam di bip-erp (cron, scheduler, worker), kapan jadwalnya, di service mana, untuk apa, lock apa yang dipakai agar tidak dobel jalan, dan di file/baris mana kodenya. Berguna saat menelusuri data yang berubah sendiri atau tertinggal (sync order, rekonsiliasi, guardian retur, reminder approval, pembersihan inbox, alokasi absensi), merencanakan kapasitas, atau mengubah service. Menjelaskan pula zona waktu WIB, beda sintaks cron 6-field di integration versus 5-field di service lain, job yang sudah dead code atau dicabut, dispatcher webhook event-driven, poller in-process, dan service yang sama sekali tanpa job.",
       "kata_kunci": [
         "cron",
         "scheduler",
         "background job",
         "worker",
-        "lock redis",
-        "sync",
         "jadwal",
-        "penjadwal",
-        "integration worker"
+        "bip-erp",
+        "lock Redis",
+        "sync",
+        "reminder",
+        "webhook dispatcher"
       ]
     },
     {
