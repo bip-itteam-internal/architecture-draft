@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB (replica set)
 - **Path:** `services/employee`
-- **Status**: ✅ Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]
+- **Status**: ✅ Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · ⚠️ **akun pihak luar (vendor/mitra)**: fondasi data + gerbang masa berlaku merged, **role & UI belum ada** (lihat grup Akun pihak luar)
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
@@ -83,6 +83,17 @@
 - `GET /master/job-levels` · `PUT /master/departments/:key/positions/:positionKey/level` (`RequireHRISOrITSupervisor`, sama dengan `menu-hidden`). Frontend: tab **Jenjang Jabatan** di `/hris/master-data`.
 - **Belum menghasilkan apa pun sampai HR mengisi**: verifikasi prod 2026-08-03 menunjukkan 5 jenjang ter-seed dan **0 dari 79 jabatan** berjenjang. Aturan & konsekuensinya: [[HRIS - Organization Structure]] · [[HRIS - Career & Promotion]]
 
+**Akun pihak luar (vendor/mitra) — ✅ merged 2026-08-04, deploy prod pending** (PR [#956](https://github.com/bip-itteam-internal/bip-erp/pull/956))
+- Koleksi baru `external_account` (`employee_id`, `full_name`, `organization`, `email_address`, `phone_number`, `company_id`, `sponsor_employee_id`, `valid_until`, `purpose`, `metadata`) + field `account_type` di `system_authentication` (kosong = `employee`). Model & helper di `shared-library/models/employee/external_account.go`, handler di `services/employee/external_account.go` + `external_account_routes.go`.
+- **Kredensialnya menumpang `system_authentication`**, bukan koleksi kedua — supaya login, SSO, device, dan `permission_sets` tetap satu jalur. Yang membedakan hanya `account_type`.
+- **Tidak dijadikan record karyawan** karena model karyawan menuntut NIK, KK, agama, status pernikahan, golongan darah, NPWP, dua nomor BPJS, rekening bank, dan `fingerprint_id` — untuk orang luar sebagian besar bukan kebetulan kosong melainkan memang tak boleh dikumpulkan. Sebaliknya tiga hal yang justru dibutuhkan (asal organisasi, penanggung jawab internal, masa berlaku) tak punya tempat di `work_data`/`personal_data`.
+- ⚠️ **Menutup fail-open `company_id`.** `resolveCompanyID` berpangkal pada `work_data`, dan akun luar tak punya `work_data`, jadi sebelumnya nilainya jatuh ke `DefaultCompanyID` dan tiap vendor diam-diam tercatat sebagai tenant **BIP** tanpa galat apa pun. `companyIDAkun` (`services/employee/external_account.go`) mengambilnya dari `external_account.company_id` untuk akun luar. Dasar isolasinya: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
+- **Masa berlaku ditegakkan di EMPAT jalur token**: `/auth/login`, `/auth/login-pin`, `/auth/login-biometrics`, dan `GET /auth/refresh`. Yang terakhir menentukan — refresh menerbitkan token baru tanpa kredensial, jadi menjaga tiga jalur login saja berarti akun kedaluwarsa bisa memperpanjang dirinya sendiri tanpa batas.
+- **Fail-closed dua tempat**: `ValidUntil` kosong dianggap **kedaluwarsa** (bukan berlaku selamanya), dan `NormalizeAccountType` memetakan nilai tak dikenal ke `external` (bukan `employee`).
+- **Tak bocor ke agregat karyawan** — diperiksa, bukan diasumsikan: `companyEmployeeIDs` berangkat dari `work_data.company_id` dan daftar karyawan dari `personal_data`; akun luar tak punya keduanya, jadi otomatis terkecualikan dari Total Karyawan, direktori, dan bagan organisasi.
+- `GET|POST /master/external-accounts` · `PUT|DELETE /master/external-accounts/:employeeID` (`RequireITSupervisor` — menerbitkan kredensial untuk orang di luar perusahaan lebih dekat ke memberi kunci daripada ke mengelola data HR, jadi sengaja **lebih ketat** dari master data lain). Penanggung jawab wajib & diverifikasi ada di `work_data`; `DELETE` menonaktifkan (`is_active=false`), tidak menghapus. ID berprefiks `EXT-` mengikuti pola `master_company.code`; index unik `employee_id`.
+- 🔴 **Belum ada role/permission & belum ada UI.** Pemasangan `permission_sets` untuk akun luar ditunda atas keputusan pemilik keputusan, jadi akun vendor bisa login tapi **belum bisa mengakses modul apa pun**. Pembuatan sementara hanya lewat API. Menonaktifkan akun juga **tidak** memutus token yang sudah beredar (JWT TTL 72 jam, revoke masih placeholder — [[CORE - SSO Flow]] §Catatan & Keterbatasan).
+
 **Self-Service (`/me`)**
 - Profile, kpi-score, vacation, payroll-approx
 - Photo get/upload
@@ -119,7 +130,7 @@
 
 ## Dependencies & Integrasi
 
-- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`, `training_type`, `trainer`, `training`, `training_participant`. Lihat [[DB - Overview and Notes]].
+- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `external_account`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`, `master_company`, `master_job_level`, `training_type`, `trainer`, `training`, `training_participant`. Lihat [[DB - Overview and Notes]].
 - **MinIO** — client langsung untuk upload foto & dokumen.
 - [[Microservices - Attendance Service]] — memanggil `POST /vacation/decrement`, mengonsumsi feed `/list` dan cron `/sync/work-schedules`.
 - [[Microservices - Notification Service]] — mengonsumsi feed `/list` (fcm-token, supervisor, dll).

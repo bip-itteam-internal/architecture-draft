@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-03",
+  "digenerate": "2026-08-04",
   "jumlah_dokumen": 255,
   "dokumen": [
     {
@@ -84,22 +84,20 @@
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "HRIS - Payroll"
       ],
-      "hash": "929814f9e1c64608d9af40b0f4d4917afb0471c556a9a6e80bcd4b847a44121d",
-      "ukuran_kb": 10.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service dan siapa yang boleh memanggilnya. Memuat rute karyawan, autentikasi/akun, master data departemen & system role, jenjang jabatan, KPI, training, kontrak, dan feed lintas-service, lengkap dengan gerbang RBAC tiap rute. Termasuk catatan gotcha seperti PUT departemen yang memakai ReplaceOne dan mempertahankan relasi supervisi.",
+      "hash": "22d6e8f8d3c1e68697055158e4f19c7b1e5a7b1db71183e2d7e30370ba18f670",
+      "ukuran_kb": 12.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik gateway `/api/employee/*`, mulai dari login/refresh/PIN, CRUD personal & work data, dokumen, jadwal kerja, sampai KPI, vacation, dan report HRIS. Menjelaskan juga RBAC tiap grup rute (mis. RequireHRISStaff, RequireITStaff, RequireHRISOrITSupervisor, RequireITSupervisor), termasuk kenapa master data departemen/system role, menu-hidden, dan job level punya gerbang berbeda. Bisa dipakai untuk mencari cara mengelola master departemen & posisi, menerbitkan akun pihak luar (vendor/mitra) berprefiks EXT-, mengambil daftar ulang tahun karyawan, atau memakai endpoint Training Program beserta peserta dan kehadirannya.",
       "kata_kunci": [
         "employee service",
         "endpoint",
-        "API",
+        "API reference",
+        "auth login",
         "RBAC",
-        "master data",
-        "departemen",
-        "department",
+        "master data departemen",
         "system role",
-        "jenjang jabatan",
-        "job level",
-        "permission set",
-        "menu hidden"
+        "external account vendor",
+        "training program",
+        "KPI"
       ]
     },
     {
@@ -1029,20 +1027,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "e299bfe0100586022c4f35c27a29c184b62091a3a3c02591fa41ad80200d19f4",
-      "ukuran_kb": 76.5,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS `hris-dashboard` (\"One Bharata\"), tech stack-nya (Next.js 16, React 19, shadcn/Radix/Tailwind, TanStack Query, react-i18next), dan modul apa saja yang tersedia untuk HR, attendance, finance/insentif, IT, GA, serta integrasi marketplace. Menjelaskan cara login dan refresh token, peran web ini sebagai SSO Identity Provider (mint ticket, allowlist redirect), serta bagaimana `system_roles` menggerbang tampilan sidebar per module dan role. Juga menjawab keputusan desain navigasi (menu induk bersarang bukan `group`, perataan induk tipis, Pengaturan bertab + Tampilan Menu per jabatan yang menyimpan `menu_hidden`), fitur Atasan Langsung, dan cakupan multi-perusahaan di web.",
+      "hash": "0b41d27302c1cda00b442533056bfdd8afdc094a41be312dba38a4061fbe751a",
+      "ukuran_kb": 78.5,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal (hris-dashboard / One Bharata), stack apa yang dipakai (Next.js 16, React 19, shadcn/ui, TanStack Query, react-i18next), dan bagaimana alur login, penyimpanan token, refresh, serta SSO sebagai Identity Provider untuk aplikasi lain. Menjelaskan cara role gating bekerja dari cookie system_roles per modul, bagaimana sidebar disusun (menu induk bersarang, bukan field group), aturan perataan induk menu tipis, tab Pengaturan, dan setelan Tampilan Menu per jabatan yang menyimpan menu_hidden. Juga menjawab apa saja yang ikut multi-perusahaan di sisi frontend, seperti Kelola Perusahaan, CompanySwitcher, Kelola Shift/Rotasi/Fingerprint, Kelola Network, dan halaman Atasan Langsung.",
       "kata_kunci": [
-        "Web ERP",
+        "web ERP",
         "hris-dashboard",
         "One Bharata",
         "erp-frontend",
-        "Next.js",
+        "frontend Next.js",
         "sidebar menu",
-        "system_roles",
-        "SSO",
         "role gating",
-        "multi-perusahaan"
+        "system_roles",
+        "SSO identity provider",
+        "multi perusahaan"
       ]
     },
     {
@@ -1340,21 +1338,20 @@
         "Microservices - Task Management Service",
         "BASE - Enterance Point"
       ],
-      "hash": "a4e5159647e3f5473d0cf0c6e7994775488f7db013ffeb65ee83d7cc93189150",
-      "ukuran_kb": 10.8,
-      "ringkasan": "Menjawab: bagaimana SSO bip-erp bekerja end-to-end sebagai one-time-code handoff (bukan IdP OAuth/SAML eksternal), komponen mana yang berperan (Web ERP sebagai Identity Provider, gateway, employee-service, app konsumen seperti Task Manager), dan skenario outbound launch vs inbound handoff. Juga menjawab endpoint ticket/redeem, pengelolaan token/sesi (TTL, refresh), langkah menambah aplikasi konsumen SSO baru, serta bagaimana role dan cakupan supervisi lintas departemen (supervised_departments) dan company_id dibawa di JWT/header.",
+      "hash": "d0dc25e8d477f00768dc0d33730879424ba271e4573dbae808171dd0e0b1ae72",
+      "ukuran_kb": 11.5,
+      "ringkasan": "Menjawab: bagaimana karyawan login sekali di Web ERP lalu masuk ke aplikasi internal lain tanpa login ulang, lewat one-time-code handoff di gateway (bukan OAuth/SAML pihak ketiga). Merinci alur end-to-end outbound launch dan inbound handoff, endpoint `/auth/login`, `/auth/sso/ticket`, `/auth/sso/redeem`, TTL code 30 detik, dan ERP JWT HS256 dengan TTL 72 jam beserta cara penyimpanan sesi di tiap konsumen. Berisi panduan developer untuk menambah aplikasi konsumen SSO baru (allowlist redirect_url, halaman /auth/callback, env, verifikasi), serta bagaimana role dan cakupan supervisi lintas departemen diteruskan lewat header BIP-System-Roles dan BIP-Supervised-Departments.",
       "kata_kunci": [
         "SSO",
         "single sign-on",
-        "one-time-code",
-        "handoff",
-        "ticket",
-        "redeem",
+        "one-time code",
+        "sso ticket redeem",
         "JWT",
-        "Task Manager",
+        "auth callback",
         "redirect_url",
-        "supervised_departments",
-        "identity provider"
+        "gateway",
+        "system_roles",
+        "supervised_departments"
       ]
     },
     {
@@ -1369,6 +1366,7 @@
         "DB - Overview and Notes",
         "ADR - 0002 Database-per-Service",
         "Microservices - Employee Service",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "ADR - 0006 Swap Jadwal Same-Department",
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
@@ -1380,19 +1378,20 @@
         "Microservices - File Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "80287a817485f9114356bfb57de2da0db7cfcf6e1b83b9ad6e94b61e6a914f98",
-      "ukuran_kb": 9.9,
-      "ringkasan": "Menjawab: field apa saja yang ada di tiap collection MongoDB per service (dengan tipe data dari tag bson), dan collection mana yang punya struct Go bertipe versus disimpan dinamis (bson.M). Dipakai saat perlu tahu nama/tipe field persis suatu collection (mis. employee, attendance, insentive, integration, inventory) tanpa membaca kode langsung.",
+      "hash": "b143fa312604ad18c8d4c3daf768503ad7ddccfb27bef9a3cf97f3ae35815ce1",
+      "ukuran_kb": 10.6,
+      "ringkasan": "Menjawab: field apa saja yang ada di tiap collection MongoDB per service, apa tipenya, dan mana yang opsional (omitempty), grounded dari struct Go dan bson tag di repo bip-erp. Bisa dipakai untuk mengecek nama field sebelum menulis query atau menambah field, mis. isi personal_data, work_data, system_authentication, external_account, attendance_entries, leave_request, schedule_exchange_request, inbox/splash/article, sampai koleksi integration dan inventory. Menjelaskan juga koleksi mana yang dinamis (bson.M) atau struct-nya belum ditemukan sehingga masih TBD, dan pemisahan database-per-service.",
       "kata_kunci": [
         "data dictionary",
         "kamus data",
-        "collection MongoDB",
+        "schema",
+        "collection",
+        "MongoDB",
         "field",
-        "bson tag",
+        "bson",
         "struct Go",
-        "skema database",
-        "employee",
-        "attendance"
+        "database per service",
+        "company_id"
       ]
     },
     {
@@ -1487,7 +1486,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]",
+      "status_teks": "Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · ⚠️ **akun pihak luar (vendor/mitra)**: fondasi data + gerbang masa berlaku merged, **role & UI belum ada** (lihat grup Akun pihak luar)",
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
@@ -1500,6 +1499,7 @@
         "HRIS - Organization Structure",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "HRIS - Career & Promotion",
+        "CORE - SSO Flow",
         "ADR - 0006 Swap Jadwal Same-Department",
         "CORE - HRIS Orchestrator",
         "DB - Overview and Notes",
@@ -1511,26 +1511,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "dc9b621f274e666ac3ef65447a4ec9fb5ea28cc959949d86f9662e7fefae46c2",
-      "ukuran_kb": 17.5,
-      "ringkasan": "Menjawab: apa yang dikerjakan employee-service, koleksi apa yang dimilikinya, dan fitur mana yang sudah jalan versus masih rencana. Mencakup master data departemen/posisi, multi-perusahaan (company_id), cakupan supervisi antar-departemen, atasan langsung, org chart, KPI beserta otomasi skornya, jenjang jabatan, training, dan kontrak karyawan. Juga menyebut keputusan desain yang mudah dilanggar, mis. larangan jenjang menjadi sumbu hak akses yang dikunci lewat test pembaca sumber.",
+      "hash": "d7d13f5660eded9af54d99f86f5d77797d27e045c9c8dd16618d140709fe8df0",
+      "ukuran_kb": 21.0,
+      "ringkasan": "Menjawab: apa tanggung jawab employee-service sebagai master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding (login username/employee_id, PIN, biometric, hashing password, registrasi karyawan baru). Merinci fitur yang sudah ada: admin akun oleh IT (forget-device, hard reset, kelola roles), master data departemen & system role beserta seed otomatis, agregasi/direktori karyawan, KPI dan template, Training Program, serta akun pihak luar (vendor/mitra) dengan masa berlaku. Bisa dipakai untuk memahami rancangan nilai otomatis metrik KPI (auto_value/auto_basis, rumus rata_skor_tim dan persen_capai_target) dan catatan gap/hardening tiap fitur.",
       "kata_kunci": [
         "employee service",
         "microservice",
-        "master_department",
-        "work_data",
-        "position_key",
-        "master_job_level",
-        "jenjang jabatan",
-        "job level",
-        "company_id",
-        "multi-tenant",
-        "supervised_by",
-        "supervisor_id",
-        "org chart",
-        "KPI",
-        "seed",
-        "migrasi"
+        "autentikasi",
+        "login PIN biometric",
+        "onboarding",
+        "master data",
+        "account reset device",
+        "KPI otomatis",
+        "training program",
+        "external account"
       ]
     },
     {
@@ -3001,8 +2995,8 @@
       "status_teks": "Implemented (ada catatan). Fase 1 (Presensi) + Fase 2 parsial sudah di `main`; perusahaan kedua (ELT) sudah terdaftar & terpakai di dev; payroll, recruitment, HRD-document, dan task-management BELUM ter-scope.",
       "publik": true,
       "tautan": [
-        "Microservices - Attendance Service",
         "Microservices - Employee Service",
+        "Microservices - Attendance Service",
         "Microservices - Notification Service",
         "Microservices - Payroll Service",
         "Microservices - Recruitment Service",
@@ -3014,19 +3008,20 @@
         "APP - Web ERP",
         "ADR - 0002 Database-per-Service"
       ],
-      "hash": "9f73c9d33f40becb34b52ed2a4c8f7c70cb358c149ad16ca31dafd4b634d573b",
-      "ukuran_kb": 14.7,
-      "ringkasan": "Menjawab: kenapa multi-tenant presensi Bharata Group dipilih dengan penanda company_id row-level di satu database (bukan instance atau DB terpisah), bagaimana company_id mengalir dari work_data ke klaim JWT dan header BIP-Company-ID, dan siapa yang boleh melakukan override lintas perusahaan lewat ?company (central admin = system_roles.group admin). Juga menjawab area mana yang sudah ter-scope (presensi, jadwal, libur, fingerprint, direktori karyawan, artikel, WiFi) dan mana yang sengaja belum (payroll, recruitment, HRD-document, task-management), termasuk daftar keterbatasan dan PR terkait.",
+      "hash": "b6e37e1db606b0a06d85519535fd009f37a5a652fbb08a180647271d0c85a038",
+      "ukuran_kb": 16.1,
+      "ringkasan": "Menjawab: kenapa presensi bip-erp dibuat multi-tenant dengan penanda company_id row-level dalam satu database, bukan instance atau database terpisah per perusahaan. Menjelaskan bagaimana company_id mengalir dari work_data ke klaim JWT lalu header BIP-Company-ID, beda CompanyID (penulis) vs EffectiveCompanyID (pembaca dengan override ?company= untuk central admin), siapa yang dianggap admin pusat, serta aturan default BIP dan backfill data lama. Bisa dipakai untuk mengecek bagian mana yang sudah ter-scope (attendance, jadwal, rotasi, fingerprint, WiFi, artikel, departemen, direktori karyawan) dan mana yang belum (payroll, recruitment, HRD-document, task-management) beserta batasan yang masih terbuka.",
       "kata_kunci": [
         "multi-tenant",
+        "multi perusahaan",
         "company_id",
-        "tenant presensi",
+        "ADR 0029",
+        "row-level scope",
         "EffectiveCompanyID",
-        "central admin",
         "master_company",
-        "BIP-Company-ID",
-        "row-level",
-        "ELT"
+        "admin pusat",
+        "presensi attendance",
+        "tenant isolation"
       ]
     },
     {

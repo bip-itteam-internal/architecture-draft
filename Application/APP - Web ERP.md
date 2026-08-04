@@ -183,6 +183,13 @@
 
 **Lain** — Secretary / Quality (KPI saja), Beauty_hacks / Kyura (link eksternal Ideamiils + KPI)
 
+**Pola satu card untuk layar daftar** ✅ (2026-08-04, PR erp-frontend [#775](https://github.com/bip-itteam-internal/erp-frontend/pull/775)) — layar daftar sebelumnya menumpuk **dua card terpisah** (banner di atas, tabel di bawah, berjarak), dan banyak di antaranya masih memasang `<h1>` sendiri **di atas** banner sehingga nama layar tertulis dua kali berturut-turut; dua halaman bahkan merender dua banner sekaligus. Kini `Table` (`src/components/table/index.tsx`) menerima prop **`toolbar`**: isinya dirender di dalam card yang sama lalu dipisah `Separator`, dan `CardHeader` dilewati supaya judul tak ganda. `Banner` mendapat mode **`bare`** (dirinya sendiri, tanpa card pembungkus). Diterapkan ke **24 layar HRIS**; Kelola Karyawan jadi acuannya.
+	- **`CardContent` bawaannya `p-6 pt-0`** dan selama ini mengandalkan `CardHeader` untuk jarak atas — begitu header dilewati isinya menempel ke garis pemisah, jadi `pt-6` dipasang khusus saat `toolbar` ada.
+	- **Filter dirender di LUAR pembungkus ber-padding** supaya menempel penuh ke tepi card tanpa sudut membulat; layout-nya tak lagi dipaksa tiga kolom (mengalir `flex-wrap`, tiap kontrol melebar penuh di layar sempit).
+	- **Dropdown baris-per-halaman dan tombol Download pindah ke footer** `Table` (mengikuti pola Task Management), bukan dihapus per halaman — cara itu menjaga ekspor tetap ada di 17 halaman tanpa menyentuh satu per satu.
+	- Bug ikutan: **placeholder filter tak pernah muncul** karena nilai kosong dipetakan ke sentinel `__all__` yang dianggap Radix sebagai sebuah pilihan; kini nilainya benar-benar `""`.
+	- **Kelola Karyawan** (`/hris/employee`): kolom **Aksi** dihapus (isinya cuma satu tautan ke detail — satu kolom penuh untuk satu tautan menyempitkan kolom yang benar-benar dibaca), barisnya sendiri yang bisa diklik; status pendaftaran memakai **ikon MyBharata** asli (berwarna = terdaftar, `grayscale` = belum) menggantikan ikon generik berlatar biru yang menabrak warna aksi di sekitarnya.
+
 **Internasionalisasi (i18n)** — dukungan dua bahasa **Indonesia (default) / English** via `react-i18next` (`src/i18n/`); switcher di header (samping tema), pilihan disimpan cookie `lang` (dibaca SSR). Rollout **bertahap**; sudah: HRIS Ulang Tahun, KPI, Announcements, Recruitment System Setup, Payroll Pengaturan Gaji (`hris.payroll.*`), Task Management, Pengembangan Organisasi (`hris.community.*` + header grup sidebar). Aturan lengkap: [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
 
 ## Belum Diimplementasikan / Catatan
