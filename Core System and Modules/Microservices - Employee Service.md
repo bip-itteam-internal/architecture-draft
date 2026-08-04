@@ -34,6 +34,12 @@
 - Model: `MasterDepartment` (key, name, positions[], roles[]) dan `MasterSystemRole` (key, name, roles[]) di `shared-library/models/employee/master_data.go`
 - Frontend: halaman CRUD di `/hris/master-data` (tabs Departments + System Roles)
 
+**Legal — Register Perizinan & Sertifikasi (⚠️ live di kode, runtime pending)**
+- Workspace posisi Staf Legal, di-host di service ini (`services/employee/legal_perizinan.go`, `RegisterLegalRoutes`). Di-host di sini — bukan service `legal` baru — agar tak menambah modul/URL gateway (menghindari panic `ValidateInternalURL`).
+- `GET /legal/licenses` (filter `?license_type=`&`?status=`), `GET /legal/licenses/:id`, `POST /legal/licenses`, `PUT /legal/licenses/:id` — gate `RequireLegalStaff`; `DELETE /legal/licenses/:id` — gate `RequireLegalSupervisor`. Dipanggil FE lewat `/api/employee/legal/*`.
+- Model `LegalLicense` (`shared-library/models/employee/models.go`), collection `legal_license` (`Collections.LegalLicense`). Department `legal` di-seed di `DefaultDepartments`; role key `legal` (staff/supervisor) — lihat [[CORE - RBAC dan Permission Set]].
+- Frontend `/legal/perizinan` + alert H-90. Detail: [[QA - Register Perizinan & Sertifikasi]].
+
 **Training Program (HRIS) — ✅ merged ke main (deploy dev pending)**
 - Modul pelatihan karyawan (perluasan service ini, `services/employee/training.go`) + UI `/hris/training`. **Department opsional** (penyelenggara — tak membatasi peserta), **tanpa Branch**; peserta lintas dept di-assign HRD.
 - **Master**: CRUD `/training/types` (jenis) & `/training/trainers` (internal via `employee_id` / eksternal), by ObjectID.
@@ -134,7 +140,7 @@
 
 ## Dependencies & Integrasi
 
-- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `external_account`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`, `master_company`, `master_job_level`, `training_type`, `trainer`, `training`, `training_participant`. Lihat [[DB - Overview and Notes]].
+- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `external_account`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`, `master_company`, `master_job_level`, `training_type`, `trainer`, `training`, `training_participant`, `legal_license`. Lihat [[DB - Overview and Notes]].
 - **MinIO** — client langsung untuk upload foto & dokumen.
 - [[Microservices - Attendance Service]] — memanggil `POST /vacation/decrement`, mengonsumsi feed `/list` dan cron `/sync/work-schedules`.
 - [[Microservices - Notification Service]] — mengonsumsi feed `/list` (fcm-token, supervisor, dll).

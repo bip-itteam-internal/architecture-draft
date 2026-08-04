@@ -98,6 +98,8 @@ Disimpan sebagai daftar yang **disembunyikan**, bukan yang ditampilkan, supaya m
 
 Paket WMS adalah terjemahan langsung matriks tab yang sudah berjalan di `erp-frontend/src/features/manufacture/akses.ts`.
 
+> **Modul tier lama (`system_roles`).** Modul di luar tabel katalog di atas masih memakai peran `staff`/`supervisor` langsung dari `system_roles`, digating via `common.Require<Modul>Staff/Supervisor` (`roles.go`). Termasuk **`legal`** — role key baru (Agustus 2026) dengan `RequireLegalStaff`/`RequireLegalSupervisor` + department `legal` di-seed di `DefaultDepartments`, dipakai Register Perizinan & Sertifikasi (lihat [[QA - Register Perizinan & Sertifikasi]]). Modul begini belum punya katalog permission-set, jadi belum bisa dirakit jadi paket per posisi.
+
 ## Belum Diimplementasikan / Catatan
 
 **Status penegakan per service** (scan 950 rute, 2026-07-29). "Telanjang" = rute user-facing tanpa middleware apa pun; rute sistem (`/internal`, `/public`, `/health`, `/webhook`) tidak dihitung.
