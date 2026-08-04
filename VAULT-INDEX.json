@@ -84,20 +84,20 @@
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "HRIS - Payroll"
       ],
-      "hash": "22d6e8f8d3c1e68697055158e4f19c7b1e5a7b1db71183e2d7e30370ba18f670",
-      "ukuran_kb": 12.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik gateway `/api/employee/*`, mulai dari login/refresh/PIN, CRUD personal & work data, dokumen, jadwal kerja, sampai KPI, vacation, dan report HRIS. Menjelaskan juga RBAC tiap grup rute (mis. RequireHRISStaff, RequireITStaff, RequireHRISOrITSupervisor, RequireITSupervisor), termasuk kenapa master data departemen/system role, menu-hidden, dan job level punya gerbang berbeda. Bisa dipakai untuk mencari cara mengelola master departemen & posisi, menerbitkan akun pihak luar (vendor/mitra) berprefiks EXT-, mengambil daftar ulang tahun karyawan, atau memakai endpoint Training Program beserta peserta dan kehadirannya.",
+      "hash": "07b27e7dc673fb801f3dc2a3ab86388a152ce255486ff30ec9561dd54a23714c",
+      "ukuran_kb": 12.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service dan lewat path gateway mana (`/api/employee/*`) memanggilnya, mulai dari login (username/employee_id, PIN, biometric), refresh token, onboarding register, CRUD personal & work data, dokumen pribadi/kerja, jadwal kerja, sampai master departemen, system role, job level, dan penyembunyian menu per posisi. Menjawab juga siapa yang berhak memanggil tiap grup (RequireHRISStaff, RequireITStaff, RequireITSupervisor, RequireHRISOrITSupervisor, RequireKPIDepartmentRBAC) dan perilaku khusus tiap rute, misalnya PUT master departemen yang memakai ReplaceOne tapi mempertahankan supervised_by, serta level key tak dikenal yang ditolak 400. Termasuk cara menerbitkan, memperpanjang, dan menonaktifkan akun pihak luar (vendor/mitra) berprefiks EXT-, plus rute Training Program, KPI, ulang tahun karyawan, dan endpoint agregat/listing.",
       "kata_kunci": [
         "employee service",
+        "employee-service",
         "endpoint",
-        "API reference",
-        "auth login",
+        "API karyawan",
+        "auth login PIN biometric",
         "RBAC",
         "master data departemen",
         "system role",
-        "external account vendor",
-        "training program",
-        "KPI"
+        "akun eksternal vendor",
+        "training program"
       ]
     },
     {
@@ -1511,20 +1511,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "d7d13f5660eded9af54d99f86f5d77797d27e045c9c8dd16618d140709fe8df0",
-      "ukuran_kb": 21.0,
-      "ringkasan": "Menjawab: apa tanggung jawab employee-service sebagai master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding (login username/employee_id, PIN, biometric, hashing password, registrasi karyawan baru). Merinci fitur yang sudah ada: admin akun oleh IT (forget-device, hard reset, kelola roles), master data departemen & system role beserta seed otomatis, agregasi/direktori karyawan, KPI dan template, Training Program, serta akun pihak luar (vendor/mitra) dengan masa berlaku. Bisa dipakai untuk memahami rancangan nilai otomatis metrik KPI (auto_value/auto_basis, rumus rata_skor_tim dan persen_capai_target) dan catatan gap/hardening tiap fitur.",
+      "hash": "eecadfeae4e406815a60b04dd2e9ef2d4636a37f8cc918981e7f91af5d63dcce",
+      "ukuran_kb": 23.6,
+      "ringkasan": "Menjawab: apa peran Employee Service sebagai master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding untuk seluruh ekosistem bip-erp, memakai stack apa (Go + Fiber v2 + MongoDB replica set, path `services/employee`), dan fitur apa saja yang sudah benar-benar ada di kode. Menjawab cara admin IT mengelola akun (set aktif/nonaktif, forget-device yang mencabut device dan browser tanpa mengubah password, hard reset yang memaksa onboarding ulang, baca/set system_roles), bagaimana master departemen dan system role di-seed lalu dibaca endpoint data-type, siapa gerbang RBAC tiap operasi, serta bagaimana modul Training Program dan agregasi karyawan bekerja. Berguna juga untuk memahami rancangan nilai otomatis metrik KPI (kosakata sumber otomatis/semi/manual, rumus rata_skor_tim dan persen_capai_target, cakupan department lewat master data dan team lewat supervisor_id, serta aturan hitungan gagal tidak diisi angka) dan status multi-perusahaan/tenant service ini.",
       "kata_kunci": [
         "employee service",
-        "microservice",
-        "autentikasi",
-        "login PIN biometric",
-        "onboarding",
-        "master data",
-        "account reset device",
+        "karyawan",
+        "employee",
+        "SSO autentikasi onboarding",
+        "master data departemen",
+        "system roles",
         "KPI otomatis",
-        "training program",
-        "external account"
+        "account reset forget-device",
+        "multi-tenant company_id",
+        "Go Fiber MongoDB"
       ]
     },
     {
