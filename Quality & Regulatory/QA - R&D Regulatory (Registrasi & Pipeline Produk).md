@@ -36,7 +36,7 @@
 ## Belum Diimplementasikan / Catatan
 
 - **Simulasi HPP Produk Baru** (P1, route `/finance/cost-control/hpp?mode=simulasi`) — butuh data BOM/harga dari Cost Control/Manufacture; **belum**.
-- **Register CAPA Audit Eksternal** (P2) — dipakai bersama Quality (`/quality/capa`); **belum**.
+- **Register CAPA Audit Eksternal** (P2) — kini **sudah tersedia** lewat modul Quality (`/quality/capa`, sumber `Audit Eksternal/BPOM/HACCP`); R&D memakai register yang sama. Lihat [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]].
 - **Papan Pengembangan** masih **tabel** dengan kolom tahap + badge, bukan **kanban drag-drop**; lead time vs target 14 hari kerja belum dihitung otomatis (baru badge target_date manual).
 - **Hosting di employee-service** (TBD) — sama seperti Legal; ekstrak ke service `rnd` bila beban tumbuh. Lihat [[CORE - API Master Gateway]].
 - **Verifikasi runtime**: build/typecheck lolos; smoke-test E2E (akun `rnd`, CRUD ke employee-service) belum — perlu redeploy `docker-compose.dev.yml`.
