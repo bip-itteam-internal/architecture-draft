@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-04",
-  "jumlah_dokumen": 255,
+  "jumlah_dokumen": 256,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1027,20 +1027,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "0b41d27302c1cda00b442533056bfdd8afdc094a41be312dba38a4061fbe751a",
-      "ukuran_kb": 78.5,
-      "ringkasan": "Menjawab: apa itu portal web ERP internal (hris-dashboard / One Bharata), stack apa yang dipakai (Next.js 16, React 19, shadcn/ui, TanStack Query, react-i18next), dan bagaimana alur login, penyimpanan token, refresh, serta SSO sebagai Identity Provider untuk aplikasi lain. Menjelaskan cara role gating bekerja dari cookie system_roles per modul, bagaimana sidebar disusun (menu induk bersarang, bukan field group), aturan perataan induk menu tipis, tab Pengaturan, dan setelan Tampilan Menu per jabatan yang menyimpan menu_hidden. Juga menjawab apa saja yang ikut multi-perusahaan di sisi frontend, seperti Kelola Perusahaan, CompanySwitcher, Kelola Shift/Rotasi/Fingerprint, Kelola Network, dan halaman Atasan Langsung.",
+      "hash": "5eab78ecf910d271fb3aa5df154152d05d40d4e45429c4599e03ca38789f3efc",
+      "ukuran_kb": 79.4,
+      "ringkasan": "Menjawab: apa itu portal web internal One Bharata (erp-frontend), stack apa yang dipakai, dan bagaimana login serta SSO-nya bekerja (login employee_id, cookie token, refresh, mint one-time code untuk app lain seperti Task Manager). Menjelaskan juga bagaimana menu sidebar digerbang oleh system_roles per modul, bagaimana sub-menu dikelompokkan dan diratakan, serta cara mengatur tampilan menu per jabatan (centang = tampil, yang disimpan menu_hidden) yang berbeda dari hak akses. Termasuk dukungan multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/network per company) dan fitur Atasan Langsung serta menu KPI untuk Leader.",
       "kata_kunci": [
         "web ERP",
-        "hris-dashboard",
-        "One Bharata",
         "erp-frontend",
-        "frontend Next.js",
+        "One Bharata",
+        "hris-dashboard",
+        "SSO",
+        "system_roles",
         "sidebar menu",
         "role gating",
-        "system_roles",
-        "SSO identity provider",
-        "multi perusahaan"
+        "multi-perusahaan",
+        "CompanySwitcher"
       ]
     },
     {
@@ -1379,7 +1379,7 @@
         "CORE - API Master Gateway"
       ],
       "hash": "b143fa312604ad18c8d4c3daf768503ad7ddccfb27bef9a3cf97f3ae35815ce1",
-      "ukuran_kb": 10.6,
+      "ukuran_kb": 10.7,
       "ringkasan": "Menjawab: field apa saja yang ada di tiap collection MongoDB per service, apa tipenya, dan mana yang opsional (omitempty), grounded dari struct Go dan bson tag di repo bip-erp. Bisa dipakai untuk mengecek nama field sebelum menulis query atau menambah field, mis. isi personal_data, work_data, system_authentication, external_account, attendance_entries, leave_request, schedule_exchange_request, inbox/splash/article, sampai koleksi integration dan inventory. Menjelaskan juga koleksi mana yang dinamis (bson.M) atau struct-nya belum ditemukan sehingga masih TBD, dan pemisahan database-per-service.",
       "kata_kunci": [
         "data dictionary",
@@ -1791,23 +1791,20 @@
         "DB - Overview and Notes",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
-      "hash": "9df9713e2543b6835803b0f12f1d3fdfc097aac05ac8935a4175b94dbb5c7179",
-      "ukuran_kb": 48.9,
-      "ringkasan": "Menjawab: bagaimana manufacture-service (WMS manufaktur) menyimpan master bahan/produk, stok, transaksi, formula, produksi, PO, dan proposal, serta dari mana sumber master datang setelah sync Google Sheets dihapus (Accurate untuk bahan & angka stok, data HPP untuk barang jadi & bundle, import Excel untuk formula). Juga menjawab cara kerja push pergerakan ke Accurate beserta kill switch dan status penyalaannya, aturan saldo awal/akhir bulanan termasuk kunci hasil Stock Opname dan revisi via approval PPIC ke SPV, plus laporan tarikan mutasi bahan per periode.",
+      "hash": "73b9ded53958a5c78e08d640603acb586f77a1faca2f8b9d99abc326b85e64c6",
+      "ukuran_kb": 51.0,
+      "ringkasan": "Menjawab: bagaimana WMS manufaktur (manufacture-service) mengelola master bahan dan produk, stok, transaksi in/out, formula/BOM, produksi, material order, PO, dan proposal koreksi, termasuk port, database, dan letak kodenya. Menjelaskan dari mana master dan angka stok berasal (Accurate read-only, data HPP untuk barang jadi/bundle, formula dari import Excel setelah sync Google Sheets dihapus) serta bagaimana pergerakan WMS didorong balik ke Accurate lewat outbox dengan kill switch. Juga menjawab cara kerja saldo awal/akhir bulanan (snapshot idempoten, kunci saat bulan berganti, import hasil Stock Opname, revisi lewat approval PPIC ke SPV dan gate izin buka kunci edit).",
       "kata_kunci": [
         "manufacture service",
         "WMS",
-        "stok",
+        "warehouse",
         "master bahan",
+        "stok",
         "formula",
         "BOM",
-        "produksi",
-        "Accurate",
-        "sync",
-        "align",
         "saldo awal bulanan",
         "stock opname",
-        "push Accurate",
+        "Accurate",
         "manufacture_db"
       ]
     },
@@ -3009,7 +3006,7 @@
         "ADR - 0002 Database-per-Service"
       ],
       "hash": "b6e37e1db606b0a06d85519535fd009f37a5a652fbb08a180647271d0c85a038",
-      "ukuran_kb": 16.1,
+      "ukuran_kb": 16.2,
       "ringkasan": "Menjawab: kenapa presensi bip-erp dibuat multi-tenant dengan penanda company_id row-level dalam satu database, bukan instance atau database terpisah per perusahaan. Menjelaskan bagaimana company_id mengalir dari work_data ke klaim JWT lalu header BIP-Company-ID, beda CompanyID (penulis) vs EffectiveCompanyID (pembaca dengan override ?company= untuk central admin), siapa yang dianggap admin pusat, serta aturan default BIP dan backfill data lama. Bisa dipakai untuk mengecek bagian mana yang sudah ter-scope (attendance, jadwal, rotasi, fingerprint, WiFi, artikel, departemen, direktori karyawan) dan mana yang belum (payroll, recruitment, HRD-document, task-management) beserta batasan yang masih terbuka.",
       "kata_kunci": [
         "multi-tenant",
@@ -3870,6 +3867,33 @@
       ]
     },
     {
+      "path": "Human Resource Information System/HRIS - Alur KPI Otomatis.excalidraw.md",
+      "judul": "HRIS - Alur KPI Otomatis.excalidraw",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [
+        "0, 0"
+      ],
+      "hash": "326566dce7d4f3e55c2e66deb06f3a106b09fab4da7e4c3e5f11135d761de9e8",
+      "ukuran_kb": 26.9,
+      "ringkasan": "Diagram yang menjawab: bagaimana rangkaian dari tim bekerja, tercatat lewat aplikasi (absensi, tiket, monitoring, TikTok), tersimpan di database, lalu dihitung sistem sampai skor KPI terisi sendiri tanpa atasan menebak. Menjelaskan tiga syarat yang biasanya menghambat, yaitu aplikasi harus benar-benar dipakai dan diisi lengkap, sistem harus tahu data itu milik siapa, dan matriknya harus mungkin diukur, masing-masing dengan contoh nyata kegagalannya (tenggat tiket kosong, kepemilikan toko ICC belum tercatat, target VSA mustahil). Juga menegaskan bahwa saat syarat belum terpenuhi sistem menandai metrik 'belum bisa dihitung' dan tidak mengarang angka.",
+      "kata_kunci": [
+        "KPI otomatis",
+        "alur KPI",
+        "skor KPI",
+        "matrik KPI",
+        "diagram",
+        "excalidraw",
+        "penilaian kinerja",
+        "otomasi",
+        "ICC",
+        "tiket"
+      ]
+    },
+    {
       "path": "Human Resource Information System/HRIS - Analysis.md",
       "judul": "HRIS - Analysis",
       "area": "Human Resource Information System",
@@ -4427,22 +4451,22 @@
         "HRIS - Otomasi Skor KPI",
         "Microservices - Employee Service",
         "Microservices - Monitoring Service",
+        "HRIS - Alur KPI Otomatis.excalidraw",
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "ebcd61b8c6c9250912818fc22fb845ddf5fde3145f14cdc3f8ed5fcffabca4cd",
-      "ukuran_kb": 126.8,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang dipakai menilai tiap posisi di setiap departemen, berapa bobot masing-masing, dan target apa yang tertulis di deskripsinya. Menjawab juga metrik mana yang sumber datanya sudah ada di ERP dan apa rekomendasi tindak lanjutnya per metrik, termasuk cacat data template yang sudah diketahui (template uji ikut produksi, metrik duplikat, label memakai target korporat). Berguna untuk mencari isi persis koleksi kpi_template di production dan cara menyegarkan salinannya.",
+      "hash": "82226a2ea755c364670d53d146a7cebf2a0d43b264b2c930f642a34a57b79bc6",
+      "ukuran_kb": 127.0,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang di production hari ini, per departemen dan per posisi, lengkap dengan label persis seperti tersimpan, bobot, dan target di kolom deskripsi. Menjawab juga metrik mana yang sumber datanya sudah ada di sistem ERP dan apa rekomendasi tindak lanjutnya, plus cacat data yang sudah diketahui (template uji ikut produksi, metrik duplikat, label memakai target korporat, satu deskripsi memuat banyak angka). Berguna untuk dev departemen yang akan mengotomatiskan metriknya dan untuk pemilik metrik yang perlu menyepakati definisi target.",
       "kata_kunci": [
-        "KPI",
         "matriks KPI",
+        "KPI per departemen",
         "kpi_template",
         "bobot metrik",
         "target KPI",
-        "penilaian karyawan",
-        "performance appraisal",
-        "departemen",
-        "posisi",
+        "otomasi KPI",
+        "penilaian kinerja",
+        "performance metric",
         "employee_db"
       ]
     },
@@ -4533,6 +4557,7 @@
         "Microservices - Attendance Service",
         "IT - Monitoring System",
         "DB - Overview and Notes",
+        "HRIS - Alur KPI Otomatis.excalidraw",
         "HRIS - Analysis",
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices",
@@ -4541,20 +4566,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "fff266e0d8f93a0ddc76fdb18a37771928d6dbcbd0b438cfba579f87af490aa7",
-      "ukuran_kb": 30.2,
-      "ringkasan": "Menjawab: bisakah skor KPI diisi otomatis dari data yang sudah dimiliki ERP alih-alih diketik supervisor, dan dari 311 metrik production mana yang sumber datanya sudah terisi, mana yang butuh definisi atau mapping tambahan, mana yang modulnya ada tapi datanya kosong, dan mana yang tidak punya sumber sama sekali. Menjawab juga koleksi atau endpoint mana yang memasok tiap klaster metrik (iklan TikTok, omzet, piutang Accurate, uptime monitoring, SLA dan CSAT tiket, kehadiran, procurement) beserta volume datanya. Memuat rekap persentase otomasi per departemen dan syarat teknis auto-fill seperti label metrik sebagai kunci identitas.",
+      "hash": "c0f617dc025c226acbf6d8232d6009bc3c20029951a814e4d336d7a0c79b1658",
+      "ukuran_kb": 30.3,
+      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, berapa yang bisa diisi otomatis dari data ERP, berapa yang butuh definisi atau mapping tambahan, berapa yang modulnya ada tapi datanya kosong, dan berapa yang memang tidak punya sumber sama sekali, dirinci per departemen. Memetakan tiap klaster metrik ke sumber datanya secara konkret (koleksi atau endpoint beserta volume production), mulai dari konversi iklan TikTok, ROAS, omzet, rating toko, piutang, uptime server, SLA dan CSAT tiket, sampai kehadiran dan lead time PO. Menjelaskan juga model kpi_template/kpi_score, aturan bobot total 1.0, dan mengapa label metrik menjadi kunci identitas yang mengikat setiap rencana auto-fill.",
       "kata_kunci": [
         "otomasi KPI",
-        "KPI automation",
         "auto-fill skor",
         "kpi_score",
         "kpi_template",
         "sumber data KPI",
         "employee service",
-        "uptime_sistem",
-        "SLA CSAT",
-        "kelayakan otomatisasi"
+        "KPI",
+        "performance",
+        "kelayakan otomasi",
+        "metrik"
       ]
     },
     {
@@ -5733,20 +5758,20 @@
         "QA - Batch Record & Traceability",
         "QA - CPOB (GMP)"
       ],
-      "hash": "27972aec76e82cebdde220081bb6156484590f416c53451c6a219e86e438ec67",
-      "ukuran_kb": 15.3,
-      "ringkasan": "Menjawab: bagaimana dokumen batch release 7 lembar (ceklis kelengkapan, kesiapan ruang, catatan pengolahan, pengemasan, pengujian, lembar keputusan) diisi sebagai menu WMS, siapa mengisi bagian mana (admin gudang RM mengisi kolom ditimbang, admin produksi mengisi data proses, QC/RnD mengisi hasil uji lalu menyetujui), dan bagaimana alur status DRAFT ke DIAJUKAN ke LULUS atau DITOLAK dijaga di server. Juga menjawab cara kerja paraf digital berjenjang berbasis jabatan (roster paraf, paraf per baris, approve terkunci sampai semua slot terparaf) serta aturan rekonsiliasi penimbangan di bawah 2%. Menyebut pula path backend dan frontend-nya, letak menu, dan RBAC `system_roles.manufacture` per persona.",
+      "hash": "dd084ecd166a8c13255bc2dec23c8afb425d4b54827a33168fe80668e2b84898",
+      "ukuran_kb": 15.7,
+      "ringkasan": "Menjawab: bagaimana dokumen batch produksi (batch release dossier 7 lembar) yang dulu manual dikerjakan di WMS, siapa mengisi bagian mana (admin RM, admin produksi, QC/RnD, PPIC/SPV), dan bagaimana alur DRAFT ke DIAJUKAN ke LULUS atau DITOLAK dijaga di server. Menjelaskan mode pengecekan QC (field milik QC dikunci di form admin dan hanya bisa diisi di layar review), paraf by jabatan lewat roster, serta paraf digital berjenjang per baris yang mengunci approval sampai semua slot terparaf. Berguna untuk memahami isi tiap lembar, penimbangan dan rekonsiliasi, cetak PDF, serta rantai nomor batch dari MO ke Laporan Produksi.",
       "kata_kunci": [
-        "batch record",
         "dokumen produksi batch",
-        "manufacture",
-        "WMS",
+        "batch record",
         "batch release",
+        "dossier",
         "QC",
         "paraf digital",
-        "rekonsiliasi",
+        "approval produksi",
         "penimbangan",
-        "approval"
+        "rekonsiliasi MO",
+        "manufacture"
       ]
     },
     {
@@ -5887,23 +5912,21 @@
         "Manufacture - Issue ED Material after Stock Opname",
         "Manufacture - Order Production Workflow (Flow Source)"
       ],
-      "hash": "1cf76d2702e919de817bd9b6c2a8e2334e5ac3f707c06e4aa5c97ed6555d063d",
-      "ukuran_kb": 9.5,
-      "ringkasan": "Menjawab: desain to-be manajemen stok dan material produksi sebagai pengganti spreadsheet, mulai dari master material terstandar, stok per gudang termasuk karantina, BOM/resep, perencanaan kebutuhan, sampai perhitungan kekurangan yang diteruskan ke pengadaan. Juga menjawab bagian mana yang sudah nyata di manufacture-service versus masih TBD, koleksi apa saja yang ada di manufacture_db, dan status rollout Fase 1 hingga Fase 4 termasuk integrasi Accurate yang baru satu arah dan konversi satuan gram versus kg.",
+      "hash": "2aa7d64189fe33bf2461db87a5b46b25202469ce386d74aef8817702796c8953",
+      "ukuran_kb": 9.6,
+      "ringkasan": "Menjawab: seperti apa desain to-be manajemen stok dan material produksi sebagai pengganti spreadsheet manual, mencakup master material terstandar, stok per gudang termasuk karantina, BOM/resep, perencanaan kebutuhan, perhitungan kekurangan untuk pengadaan, dan stock opname. Menjelaskan mana yang sudah terwujud di manufacture-service (master, stok snapshot, transaksi, formula, baca stok dari Accurate satu arah, mutasi gudang fase 1) dan mana yang masih TBD (kebutuhan otomatis, opname digital penuh, multi-gudang sejati, tulis balik ke Accurate), lengkap dengan rollout bertahap fase 1 sampai 4. Berguna untuk melihat pemetaan nama konseptual (material, stock, bom, shortage, warehouse) ke koleksi nyata di manufacture_db serta catatan migrasi data spreadsheet.",
       "kata_kunci": [
-        "stok",
+        "stock management",
         "material management",
-        "master material",
+        "manajemen stok",
+        "bahan baku",
+        "bahan kemas",
         "BOM",
         "resep",
-        "kekurangan",
-        "shortage",
         "stock opname",
-        "karantina",
+        "kekurangan bahan",
         "multi-gudang",
-        "manufacture_db",
-        "rollout",
-        "Accurate"
+        "manufacture"
       ]
     },
     {

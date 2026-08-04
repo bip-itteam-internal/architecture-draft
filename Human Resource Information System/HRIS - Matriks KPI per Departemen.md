@@ -925,6 +925,7 @@ Template `Supervisor KPI`, 4 metrik.
 
 ## Dokumen Terkait
 
+- [[HRIS - Alur KPI Otomatis.excalidraw]] (diagram Excalidraw untuk pembaca non-teknis: kenapa matrik yang lengkap saja belum cukup)
 - [[RUN - Menambah Metrik KPI Otomatis]] (cara mengerjakan otomasinya)
 - [[HRIS - Otomasi Skor KPI]] (analisis kelayakan, peta sumber data, rencana bertahap)
 - [[HRIS - Key Performance Index]] (mekanisme scoring, RBAC, cakupan tim Leader)

@@ -293,6 +293,7 @@ Field `attribution_note` pada `mart_profit_attribution` di production menyatakan
 
 ## Dokumen Terkait
 
+- [[HRIS - Alur KPI Otomatis.excalidraw]] (diagram Excalidraw, penjelasan untuk non-teknis: rangkaiannya dan tiga syarat yang sering terlupa)
 - [[HRIS - Key Performance Index]] (mekanisme scoring, RBAC, cakupan tim Leader)
 - [[HRIS - Work Review]] (rencana menyatukan KPI kuantitatif dengan review kualitatif)
 - [[HRIS - Career & Promotion]] · [[HRIS - Personalia]] · [[HRIS - Attendance System]]
