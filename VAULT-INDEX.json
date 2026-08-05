@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-05",
-  "jumlah_dokumen": 260,
+  "jumlah_dokumen": 262,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -3191,6 +3191,39 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP.md",
+      "judul": "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "✅",
+      "status_teks": "Diputuskan dan dijalankan 2026-08-04. Sistemnya live; rinciannya di [[IT - Papan Aktivitas Developer]].",
+      "publik": true,
+      "tautan": [
+        "IT - Papan Aktivitas Developer",
+        "CORE - API Master Gateway",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0002 Database-per-Service",
+        "IT - Development Apps and Tools",
+        "IT - Big Pictures"
+      ],
+      "hash": "dc210d0b4ba650b618fa221c261185f3ff6bace4498c1d7d1ec3e7dec9c43052",
+      "ukuran_kb": 6.0,
+      "ringkasan": "Menjawab: kenapa papan peringkat aktivitas developer sengaja dibangun di luar arsitektur ERP (repo, stack, dan infrastruktur terpisah), serta stack apa yang dipakai (Cloudflare Workers + D1 + Durable Object, TypeScript, tanpa gateway dan tanpa SSO). Menjelaskan juga alternatif yang ditolak beserta alasannya (service Go di bip-erp, hosting di server ERP, GitHub Actions + Pages, Vercel), aturan privasi yang dipilih (judul commit tidak pernah disimpan, akses lewat tautan acak yang bukan autentikasi), dan kepemilikan akun atas nama tim. Berguna untuk memahami batas penyimpangan arsitektur ini, konsekuensi yang diterima (data di pihak ketiga, tanpa jejak audit pembaca), serta angka audit GitHub 3 bulan yang jadi latar belakang keputusan.",
+      "kata_kunci": [
+        "papan aktivitas developer",
+        "dev activity board",
+        "leaderboard",
+        "ADR 0034",
+        "Cloudflare Workers",
+        "D1",
+        "Durable Object",
+        "penyimpangan arsitektur",
+        "tanpa login",
+        "webhook GitHub"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -5332,21 +5365,23 @@
       "status_teks": "Aktif — referensi tools internal yang dipakai (Hoppscotch, OneBharata, dll).",
       "publik": false,
       "tautan": [
+        "IT - Papan Aktivitas Developer",
         "IT - Big Pictures",
         "IT - Server, VMs and Databases"
       ],
-      "hash": "91ccce7eb5f41a19277d7ca3c2f6a0953a70baf38ef58f4f95822a35ca7f6c2d",
-      "ukuran_kb": 1.1,
-      "ringkasan": "Menjawab: development tools apa yang dipakai tim internal untuk iterasi API (Hoppscotch, OneBharata), di mana masing-masing di-host untuk environment dev vs production, dan bagaimana cara mendapatkan credentials/akses ke tools tersebut.",
+      "hash": "14e723473d3c82d435a7e180c4d39b8da98aeda24f455d8f09c29727e0fde6c5",
+      "ukuran_kb": 1.6,
+      "ringkasan": "Menjawab: tool development internal apa saja yang dipakai tim, di mana masing-masing di-host, dan bagaimana cara dapat akses/credential-nya. Mencakup Hoppscotch (API client internal beserta workspace dan cara di-invite), OneBharata versi production maupun development lengkap dengan alamat VM-nya, serta papan aktivitas developer yang di-host di luar VM internal. Dipakai saat mencari URL tool internal atau memastikan lingkungan mana (dev atau prod) yang sedang diakses.",
       "kata_kunci": [
+        "development tools",
         "Hoppscotch",
         "OneBharata",
-        "API development tools",
-        "development tools",
-        "credentials",
-        "workspace BIP ERP",
+        "API client",
+        "internal tools",
+        "credential",
         "VM ERP-Development",
-        "VM ERP-Production"
+        "VM ERP-Production",
+        "workspace BIP ERP"
       ]
     },
     {
@@ -5561,6 +5596,38 @@
         "migrasi cloud",
         "subnet",
         "VLAN"
+      ]
+    },
+    {
+      "path": "IT/IT - Papan Aktivitas Developer.md",
+      "judul": "IT - Papan Aktivitas Developer",
+      "area": "IT",
+      "jenis": "domain",
+      "status_emoji": "✅",
+      "status_teks": "Implemented — live sejak 2026-08-04, terisi 3 bulan data (5.629 commit kerja, 1.719 PR).",
+      "publik": false,
+      "tautan": [
+        "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
+        "CORE - API Master Gateway",
+        "IT - Development Apps and Tools",
+        "IT - Big Pictures",
+        "IT - CI-CD",
+        "DEVELOPER GUIDE"
+      ],
+      "hash": "362e8a60d3f337c8a0b19fc645d8cbcfadb6bf4f24b9ae4ba86e7bf707841655",
+      "ukuran_kb": 5.8,
+      "ringkasan": "Menjawab: apa isi papan peringkat aktivitas developer, bagaimana angkanya dihitung, dan sejauh mana angka itu boleh dipakai. Menjelaskan tabel per developer, per repo, dan kepemilikan komponen per service bip-erp, grafik sebaran jam/hari, periode bergulir, alur realtime lewat webhook GitHub plus cron penambal, serta aturan perhitungan penting seperti hanya branch integrasi yang dicatat, merge commit dan review ke PR sendiri tidak dihitung, dan semua waktu dalam WIB. Memuat juga temuan data soal kesenjangan review kode dan pemusatan kepemilikan, batasan yang wajib disebut saat memakai angkanya, plus daftar hal yang belum ada seperti panel admin dan peringatan otomatis.",
+      "kata_kunci": [
+        "papan aktivitas developer",
+        "dev activity board",
+        "leaderboard",
+        "metrik commit",
+        "kepemilikan komponen",
+        "code review",
+        "webhook GitHub",
+        "Cloudflare Workers",
+        "lead time",
+        "WIB"
       ]
     },
     {

@@ -17,7 +17,13 @@
 - Di-host secara internal pada VM ERP-Development: http://10.10.10.121:9696/
 - Credentials dapat diubah untuk keperluan development, namun dokumen terkadang di-resync dengan database production
 
+**Papan Aktivitas Developer** — papan peringkat aktivitas developer se-organisasi GitHub, diperbarui seketika lewat webhook
+- Di-host di Cloudflare (akun bersama tim), **bukan** di VM internal: `https://dev-activity-board.bharataitteam.workers.dev/<DASHBOARD_SLUG>`
+- Dibuka lewat tautan tanpa login; potongan URL rahasianya ada di rahasia Worker
+- Rincian dan batasan pemakaian angkanya: [[IT - Papan Aktivitas Developer]]
+
 ## Dokumen Terkait
 
 - [[IT - Big Pictures]] — peta domain IT
 - [[IT - Server, VMs and Databases]] — VM tempat tool ini di-host
+- [[IT - Papan Aktivitas Developer]] — papan aktivitas developer (di-host di luar VM internal)
