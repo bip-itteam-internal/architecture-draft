@@ -205,6 +205,79 @@ Form berulang memakai jendela **periode berjalan**, bukan `start_date`/`end_date
 > [!warning] Periode kosong artinya KEBALIKAN di dua tempat
 > Di `analyticsFilter`, periode kosong berarti **seluruh periode**: pemilik form yang membuka halaman analisa tanpa memilih periode mengharapkan rekap penuh. Di `responseGuardFilter`, periode kosong berarti **hanya jawaban yang memang tak punya periode**, karena pertanyaannya "apakah orang ini sudah mengisi putaran ini". Menyamakan keduanya akan membuat salah satunya salah diam-diam.
 
+## Tipe `kaizen`: program pengumpulan ide bulanan
+
+> Status: **merged ke `main` 2026-08-06** lewat PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016). Dev naik otomatis lewat Harness, **belum diverifikasi**; prod tidak auto-deploy. Backend saja, **FE belum ada**. Konsep dan keputusan bisnisnya di [[HRIS - Kaizen (Ide Perbaikan)]].
+
+Tipe form **kelima**, dan seperti `evaluation` ia bukan sekadar label: seluruh perilaku barunya digerbang tipe ini, sehingga empat tipe lama tak berubah sedikit pun dan tak ada satu pun form lama yang perlu dimigrasi.
+
+**Ikatan dua arah** dengan blok `settings.kaizen`, meniru pola `evaluation` ↔ `subject`. Tipe `kaizen` wajib punya blok itu, dan blok itu hanya sah pada tipe `kaizen`. Selain itu tipe ini **wajib berulang bulanan** (kuota bulanan tanpa periode tak punya arti), serta **menolak** `single_response` (yang akan menghentikan pengaju tepat setelah ide pertama sehingga kuota lebih dari satu mustahil dipenuhi) dan menolak sasaran penilaian.
+
+**Kuota adalah lantai, bukan langit-langit.** Ide melebihi kuota tetap diterima; program yang tujuannya mengumpulkan ide tapi menolak ide keempat karena kuotanya tiga jelas keliru. Angka bawaan boleh ditimpa per departemen, dan entri berkuota `0` berarti departemen itu dikecualikan dari kewajiban tapi tetap boleh mengirim. Bentuknya daftar entri eksplisit, bukan map, supaya nol tak pernah rancu dengan "belum diatur".
+
+**Satu program aktif per `company_id`**, ditegakkan di jalur tulis saat menerbitkan (`409`). Menyaring daftar saja tak cukup karena gateway meneruskan permintaan apa adanya, dan aturan ini pula yang membuat "berapa kuota saya bulan ini" selalu punya jawaban tunggal.
+
+### Potret peserta: penyebut papan kepatuhan
+
+`FormPeriod` bertambah `participants`, `participants_at`, dan `participants_partial`. Isinya potret orang yang wajib mengisi pada periode itu, lengkap dengan nama, departemen, jabatan, dan **kuota yang dibekukan per orang**.
+
+Ini menggantikan `audience.estimated_size` yang diisi manual pembuat form. Angka yang diisi tangan tak bisa dipakai menyatakan seseorang menunggak.
+
+Diambil **tiap periode**, bukan sekali saat form terbit, dan itu sengaja **berbeda dari `subject.resolved`**: di sana yang dijaga keadilan pembanding penilaian sehingga daftarnya harus beku sepanjang umur form, di sini yang dijaga kejujuran laporan tiap bulan. Karyawan masuk dan keluar tiap bulan; potret sekali-seumur-form akan menagih orang yang sudah resign selamanya sekaligus tak pernah menagih karyawan baru. Kuota dibekukan per orang dengan alasan serupa: kalau dihitung ulang saat laporan dibaca, mengubah kuota di bulan Oktober akan mengubah status kepatuhan orang untuk bulan Agustus.
+
+> [!warning] Potret dijalankan dari cron, yang TIDAK punya `fiber.Ctx`
+> `fetchActiveEmployees` menuntut Ctx hidup karena header perusahaan diteruskan dari situ. Mengirim Ctx nil saja tidak cukup: `routes.InternalRequest` memang menjaga `c != nil` dan tak akan panic, tapi employee-service lalu jatuh ke `common.DefaultCompanyID` dan mengembalikan daftar **tenant yang salah**. Karena itu dipakai `InternalRequestCustomHeader` dengan `BIP-Company-ID` dipasang eksplisit dari `company_id` milik form. **Jalur ini belum pernah dijalankan sungguhan.**
+
+**Gagal memotret tidak menggagalkan periode.** Bila employee-service sedang mati, periode tetap dibuka sehingga orang tetap bisa mengirim ide, `participants_partial` ditandai, dan cron jam berikutnya mencoba lagi. Sengaja berbeda dari penerbitan form penilaian yang gagal-keras: di sana pengisi tak punya siapa pun untuk dinilai, di sini yang rusak cuma laporan. Batas potret 1000 orang, ditolak di muka dan tidak dipotong diam-diam.
+
+### Keputusan komite
+
+`FormResponse` bertambah `decision` (pointer, `omitempty`). Nil berarti **belum ditinjau**, dan itu pula keadaan seluruh jawaban form non-kaizen. Konsekuensinya pencocokan "belum ditinjau" wajib memakai `$exists: false` atau `$in: [null]`, bukan perbandingan dengan dokumen kosong — jebakan yang sama sudah menggigit `period_key` dan `subject_employee_id` di service ini.
+
+Keputusan disimpan **terpisah dari `answers`** dan tak pernah menyentuhnya, jadi analisa, daftar jawaban, dan export lama tetap jalan tanpa perubahan bentuk.
+
+Transisi yang sah: belum ditinjau → `accepted` atau `rejected`; `accepted` → `implemented` atau `rejected`. `rejected` dan `implemented` **terminal**. Membuka kembali ide yang sudah diputuskan akan mengubah angka KPI periode yang laporannya mungkin sudah dibaca dan ditandatangani orang.
+
+- **Menolak wajib beralasan** (`400` bila kosong). Penolakan tanpa alasan hanya mengajari orang berhenti mengirim ide. Aturan yang sama dipakai CSAT di [[Microservices - Task Management Service]].
+- **`implemented_at` wajib diisi**, tidak diisi otomatis dengan waktu sekarang: skor KPI menghitung ide yang diterapkan per periode, jadi komite yang menandai terlambat akan menyetorkan angka ke bulan yang salah.
+
+> [!warning] Penjaga balapan ada di FILTER TULIS, bukan cuma di validator
+> Validator bekerja atas keadaan yang dibaca beberapa saat sebelumnya. Komite di sini terpusat, jadi beberapa orang memang membuka antrean yang sama, dan satu orang yang menekan tombol dua kali cepat pun cukup. Tanpa prasyarat di filter tulis, yang menang adalah yang menulis terakhir — **termasuk menimpa status terminal**, sehingga ide yang sudah ditandai diterapkan bisa berubah jadi sekadar "diterima". Filter tulisnya membawa `{"decision": {"$in": [null]}}` atau `{"decision.status": <status saat dibaca>}`, dan `MatchedCount == 0` dibalas `409`. Bentuknya menyalin cara `ensurePeriod` bersandar pada index unik alih-alih pemeriksaan "sudah ada?".
+
+Aksi massal dibatasi **200 per kiriman** dan melapor **per id**: menggagalkan seluruh kiriman karena satu ide yang keburu diputuskan orang lain membuat komite mengulang pekerjaan yang sudah hampir selesai.
+
+### Papan kepatuhan
+
+Disusun dari potret peserta sebagai penyebut dan hitungan ide sebagai pembilang, lewat satu agregasi.
+
+- Orang yang **belum mengirim apa pun tetap muncul** dengan angka nol. Papan yang disusun dari jawaban yang masuk saja justru menghilangkan orang yang paling perlu ditindaklanjuti — pelajaran yang sudah dibayar sekali di rekap per orang form penilaian.
+- Kuota nol selalu terhitung terpenuhi.
+- **Persentase disembunyikan** bila potretnya parsial atau pesertanya kosong. Angka dari penyebut yang salah lebih menyesatkan daripada tidak ada angka. Periode yang dokumennya belum ada sama sekali diperlakukan **parsial**, bukan "nol peserta", karena nol peserta terbaca seolah tak seorang pun diwajibkan.
+- Export CSV menandai potret parsial lewat **header** `X-Kaizen-Participants-Partial`, bukan baris catatan di dalam berkas yang akan terbaca sebagai data oleh spreadsheet.
+
+### Rute komite hidup di luar grup `/forms`
+
+Prefix `/kaizen/*`, digerbang `requireEmployee` lalu diperiksa per-form oleh `loadCommitteeForm`. Grup `/forms` digerbang `requireFormManager` yang menuntut tingkat peran pengelola **dan** departemen aktif, sedangkan anggota komite ditunjuk HR dan bisa saja staf biasa dari departemen mana pun — menaruh rute ini di sana membuat komite tak pernah bisa membuka antreannya sendiri.
+
+Komite = anggota yang terdaftar di `settings.kaizen.committee_employee_ids` **atau** siapa pun yang boleh mengelola departemen pemilik form. Butir kedua pengaman, bukan kelonggaran: tanpa itu salah isi daftar komite membuat program jadi yatim dan tak seorang pun bisa memperbaikinya.
+
+**Seluruh permukaan komite dikunci `common.CompanyID`, bukan `EffectiveCompanyID`.** Override `?company=` milik admin pusat adalah lingkup baca, dan memutuskan nasib ide adalah menulis. Antrean dan papan ikut dikunci supaya yang dilihat dan yang bisa ditindak selalu sama; kalau berbeda, komite membaca daftar yang tombolnya justru menolak bekerja.
+
+### `settings.kaizen` yang absen berarti "jangan diubah"
+
+`PATCH /forms/:id` berperilaku ganti-seluruhnya. Untuk `title` itu wajar, untuk blok ini tidak: kehilangannya tak sekadar mengosongkan field melainkan **mengubah jenis form**. Satu kiriman tanpa `form_type` dan tanpa `settings.kaizen` akan mengubah program Kaizen yang masih draft jadi survei biasa, membuang kuota per departemen berikut seluruh daftar komite, tanpa satu pun galat.
+
+Aturannya menyalin `SpaceType.Fields` di [[Microservices - Task Management Service]] yang juga membedakan "tidak dikirim" dari "dikosongkan". **Konsekuensi yang disengaja: tipe kaizen tak bisa diubah ke tipe lain lewat `PATCH`.** Itu bukan alur kerja nyata — satu perusahaan hanya punya satu program aktif, dan menghentikannya dilakukan dengan menutup form.
+
+### Belum diverifikasi dan cacat yang diketahui
+
+Tiga jalur yang tak bisa dijamin unit test dan baru terbukti setelah dijalankan: agregasi hitungan ide per orang, potret peserta yang memanggil employee-service dari cron, dan penjaga balapan yang bersandar pada `MatchedCount` dari driver Mongo.
+
+Dua cacat yang sudah diketahui tapi sengaja belum diperbaiki:
+
+- Menandai ide "diterapkan" padahal belum pernah diterima dibalas `400`, seharusnya `409`. Tak ada data yang rusak.
+- `blocks_attendance` di `GET /me/forms` memakai `gateActiveAt` (tanggal statis), sedangkan gerbang sesungguhnya di `/internal/compliance` memakai `gateActiveForForm` (jendela periode). Pada form berulang ber-gerbang, aplikasi akan memberi tahu "kamu tidak ditahan" sementara attendance-service menahan clock-in. Laten selama belum ada form ber-mode `block` dan attendance-service masih pra-merge, tapi akan menggigit tepat pada hari service itu naik.
+
 ## Bagian (section): penanda di daftar datar, bukan struktur bersarang
 
 Form panjang bisa dipecah jadi beberapa halaman saat diisi. Bagian disimpan sebagai **item bertipe `section` di dalam `fields` yang tetap datar** — `label` jadi judulnya, `description` jadi keterangannya, jadi tak ada penambahan skema.

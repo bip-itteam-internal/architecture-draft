@@ -47,6 +47,28 @@
 
 > **Kenapa `/me/capability` ada di grup pengisian, bukan di balik `requireFormManager`.** Daftar departemen aktif tinggal di konfigurasi server; tanpa endpoint ini setiap klien harus menyalinnya dan pasti melenceng saat daftarnya berubah. Ditaruh di `/me` supaya yang tak berhak menerima `can_manage:false` yang bisa dibaca klien, bukan `403` yang harus ditebak artinya. `departments` sengaja dikosongkan bila `can_manage:false`.
 
+## Kaizen (komite program ide bulanan)
+
+> Merged ke `main` 2026-08-06 lewat PR #1016. Dev naik otomatis lewat Harness, **belum diverifikasi**; prod tidak auto-deploy. Konsepnya di [[HRIS - Kaizen (Ide Perbaikan)]].
+
+**Prefix `/kaizen/*`, SENGAJA di luar grup `/forms`.** Grup itu digerbang `requireFormManager` (tingkat peran pengelola + departemen aktif), sedangkan anggota komite ditunjuk HR dan bisa saja staf biasa dari departemen mana pun. Gerbangnya per-form: terdaftar di `settings.kaizen.committee_employee_ids` **atau** boleh mengelola departemen pemilik form.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/kaizen/forms/:id/responses` | Antrean komite. `?period=` (default periode berjalan), `?status=pending\|accepted\|rejected\|implemented`, `?department=`, `?page=`, `?limit=` maks 200. Membawa `fields` periode itu supaya label jawaban benar |
+| PATCH | `/kaizen/forms/:id/responses/:responseId/decision` | Keputusan atas satu ide |
+| POST | `/kaizen/forms/:id/responses/decisions` | Keputusan massal, maks **200** id sekali kirim. Membalas `{decided[], failed[{id,error}]}` — satu ide yang keburu diputuskan orang lain gagal sendirian, sisanya tetap tersimpan |
+| GET | `/kaizen/forms/:id/compliance` | Papan kepatuhan periode itu: `{period_key, summary, data[]}` |
+| GET | `/kaizen/forms/:id/compliance/export` | CSV kepatuhan. Header `X-Kaizen-Participants-Partial` muncul bila potret pesertanya belum lengkap |
+
+> **Seluruh permukaan ini terkunci ke perusahaan pemanggil** (`common.CompanyID`), termasuk jalur bacanya. Override `?company=` milik admin pusat TIDAK berlaku di sini: memutuskan nasib ide adalah menulis, dan antrean sengaja ikut dikunci supaya yang dilihat selalu sama dengan yang bisa ditindak.
+
+**Keputusan** (`decision` pada FormResponse): `{status, note, reviewed_by, reviewed_by_name, reviewed_at, implemented_at, pic_employee_id, pic_name, implementation_note}`. Absen = **belum ditinjau**; tak ada nilai `pending` yang tersimpan, jadi saringannya memakai `?status=pending` yang di server diterjemahkan jadi `$in: [null]`.
+
+Transisi sah: belum ditinjau → `accepted`/`rejected`; `accepted` → `implemented`/`rejected`. `rejected` dan `implemented` **terminal** (`409`). Menolak **wajib** `note` (`400`), menandai diterapkan **wajib** `implemented_at` (`400`, sengaja tidak diisi otomatis karena skor KPI menghitung per periode).
+
+⚠️ Menandai "diterapkan" pada ide yang belum pernah diterima saat ini dibalas `400`; seharusnya `409`. Diketahui, belum diperbaiki.
+
 ## Internal (dipanggil service lain)
 | Method | Path | Fungsi |
 |---|---|---|
@@ -66,7 +88,15 @@
 
 **Sasaran** (`audience.type`): `all` · `departments` (+`departments[]`) · `employees` (+`employee_ids[]`). `estimated_size` diisi manual sebagai penyebut tingkat pengisian; bila 0, `response_rate` tidak dikirim. Perhatikan `audience.departments` menjawab **siapa yang mengisi**, sedangkan `owner_department` menjawab **siapa yang memiliki** — keduanya tak harus sama.
 
-**Tipe form** (`form_type`): `survey` · `evaluation` · `request` · `checklist`. Kiriman kosong jadi `survey`; nilai tak dikenal ditolak `400` (bukan diam-diam diubah). **Terikat dua arah dengan `subject`**: `evaluation` wajib punya sasaran, dan yang punya sasaran wajib `evaluation`.
+**Tipe form** (`form_type`): `survey` · `evaluation` · `request` · `checklist` · `kaizen`. Kiriman kosong jadi `survey`; nilai tak dikenal ditolak `400` (bukan diam-diam diubah). **Terikat dua arah dengan `subject`**: `evaluation` wajib punya sasaran, dan yang punya sasaran wajib `evaluation`.
+
+**Pengaturan Kaizen** (`settings.kaizen`): `{quota_default, quota_by_department[{department,quota}], committee_employee_ids[], board_visible, board_hidden_fields[]}`. **Terikat dua arah dengan `form_type: "kaizen"`**: tipe itu wajib punya blok ini, dan blok ini hanya sah di tipe itu. Tipe `kaizen` juga wajib `recurrence.unit: "monthly"`, serta menolak `single_response: true` dan menolak `subject`.
+
+`quota_default` dan tiap `quota` antara 0 dan 31; departemen ganda ditolak `400`; `board_hidden_fields` wajib menunjuk key yang benar-benar ada. Kuota adalah **lantai**, bukan langit-langit: ide melebihi kuota tetap diterima, dan entri berkuota `0` berarti dikecualikan tapi tetap boleh mengirim. Menerbitkan form kaizen kedua saat masih ada yang `published` di perusahaan yang sama ditolak `409`.
+
+> ⚠️ **`settings.kaizen` yang ABSEN pada `PATCH` berarti "jangan diubah"**, bukan "hapus". Tanpa aturan ini satu kiriman tanpa blok itu akan mengubah program Kaizen yang masih draft jadi survei biasa dan membuang kuota berikut daftar komite, tanpa galat. Konsekuensinya **tipe kaizen tidak bisa diubah ke tipe lain lewat `PATCH`** — hentikan programnya dengan menutup form.
+
+**Potret peserta** (`participants`, `participants_at`, `participants_partial` pada dokumen periode): daftar orang yang wajib mengisi periode itu berikut kuota masing-masing, diambil cron **tiap periode**. Dipakai sebagai penyebut papan kepatuhan, menggantikan `audience.estimated_size` yang diisi manual. Gagal memotret tidak menggagalkan periode; yang ditahan hanya persentase di papan.
 
 **Sasaran PENILAIAN** (`subject`): `{rules[], departments[], positions[], employee_ids[], allow_self, anonymous, resolved[]}`. `rules` digabung **OR**, isinya `departments`/`positions`/`employees`, dan tiap aturan wajib membawa daftarnya sendiri. `resolved` adalah **potret** yang diisi backend saat terbit — kiriman klien diabaikan. `anonymous` mengosongkan identitas penilai di export dan daftar jawaban, tapi TIDAK di database.
 

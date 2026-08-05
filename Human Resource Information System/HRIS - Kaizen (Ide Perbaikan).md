@@ -4,8 +4,46 @@
 
 *Program pengumpulan ide perbaikan bulanan. Karyawan pada sasaran tertentu wajib mengirim sejumlah ide tiap bulan, jumlahnya diatur HR (satu angka bawaan untuk semua, boleh ditimpa per departemen). Ide masuk ke antrean komite Kaizen terpusat yang memutuskan diterima atau ditolak, lalu menandai mana yang benar-benar diterapkan. Ide yang disetujui tampil di papan yang bisa dibaca seluruh karyawan.*
 
-- **Status**: 🟡 **Konsep / Direncanakan.** Belum ada satu baris kode pun. Rancangan lengkap ada di `docs/superpowers/specs/2026-08-06-kaizen-pengumpulan-ide-design.md` di root workspace (bukan di vault).
+- **Status**: ⚠️ **Backend tahap 1 sampai 3 MERGED ke `main`** lewat PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016) (2026-08-06, merge commit `b59c64c4`). Dev naik otomatis dari `main` lewat Harness, **belum diverifikasi**; prod tidak auto-deploy. Yang sudah dibuktikan sejauh ini cuma `go build`, `go vet`, dan 183 unit test hijau — **tak satu pun jalur pernah dijalankan dengan Mongo hidup**. **FE belum ada sama sekali**, jadi belum ada layar untuk komite maupun pengaju. Tahap 4 sampai 7 belum dikerjakan.
 - **Rumah kode yang dipilih**: [[Microservices - Form Builder Service]], sebagai **tipe form kelima** (`form_type: "kaizen"`). Bukan service baru, bukan space di [[Microservices - Task Management Service]].
+- Rancangan lengkap: `docs/superpowers/specs/2026-08-06-kaizen-pengumpulan-ide-design.md`; rencana per tahap: `docs/superpowers/plans/2026-08-06-kaizen-pengumpulan-ide.md`. Keduanya di root workspace, bukan di vault.
+
+> [!warning] Merge ini tidak menyalakan program Kaizen bagi siapa pun
+> Seluruh perilaku baru digerbang `form_type: "kaizen"`, dan belum ada satu pun form kaizen di database mana pun. Yang benar-benar berubah bagi form yang sudah berjalan adalah pekerjaan **tahap 1** (snapshot periode jadi penopang beban), dan itu justru memperbaiki cacat yang selama ini hidup. Karena itu pula yang paling perlu diperhatikan setelah deploy dev bukan Kaizen, melainkan form berulang yang sudah ada: pastikan pengisian dan analisanya tidak berubah artinya.
+
+## Apa yang Sudah Ada di Kode
+
+Ketiganya di `services/form-builder`, seluruhnya backend.
+
+**Tahap 1, snapshot periode jadi penopang beban.** Memperbaiki cacat yang sudah hidup di semua form berulang, bukan cuma Kaizen: `FormPeriod.Fields` dulu ditulis tapi tak pernah dibaca. Kini menyajikan, memvalidasi, dan **membaca** (analisa, daftar jawaban, export ber-`?period=`) semuanya memakai snapshot periode, baru sesudah itu kunci `409` susunan pertanyaan dilonggarkan untuk form berulang. Urutan itu tak boleh dibalik; jalur baca sempat terlewat dan ketahuan saat review.
+
+**Tahap 2, tipe `kaizen` dan kuota.** Tipe terikat dua arah dengan `settings.kaizen`, wajib berulang bulanan, `single_response` dan sasaran penilaian dilarang. Kuota global dengan override per departemen, dan kuota adalah **lantai bukan langit-langit** (ide melebihi kuota tetap diterima; entri berkuota `0` berarti dikecualikan tapi tetap boleh mengirim). Potret peserta diambil cron **tiap periode** sebagai penyebut papan kepatuhan. Satu program kaizen aktif per `company_id`.
+
+**Tahap 3, keputusan komite.** Belum ditinjau → Diterima atau Ditolak → Diterapkan; menolak wajib beralasan, status terminal tak bisa diubah. Ditambah antrean komite, papan kepatuhan, dan export CSV.
+
+### Penyimpangan dari rancangan, semuanya disengaja
+
+| Yang direncanakan | Yang dikerjakan | Sebab |
+|---|---|---|
+| Rute komite di `/forms/:id/...` | Prefix **`/kaizen/*`** dengan gerbang per-form | Grup `/forms` digerbang `requireFormManager` yang menuntut peran pengelola dan departemen aktif; anggota komite bisa staf biasa dari departemen mana pun, jadi mereka akan kena `403` sebelum handler-nya jalan |
+| `implemented_at` opsional | **Wajib diisi**, tidak default hari ini | Skor KPI menghitung ide yang diterapkan per periode; komite yang menandai terlambat akan menyetorkan angka ke bulan yang salah |
+| (tak disebut) | Seluruh permukaan komite dikunci **`CompanyID`**, bukan `EffectiveCompanyID` | Memutuskan nasib ide adalah menulis, dan lingkup baca lintas perusahaan milik admin pusat tak boleh terbawa. Antrean dan papan ikut dikunci supaya yang dilihat dan yang bisa ditindak selalu sama |
+| (tak disebut) | `settings.kaizen` **absen berarti jangan diubah** | `PATCH` berperilaku ganti-seluruhnya; tanpa aturan ini satu kiriman tanpa blok kaizen mengubah program yang masih draft jadi survei biasa dan membuang kuota berikut daftar komite, tanpa galat. Konsekuensinya **tipe kaizen tak bisa diubah lewat `PATCH`** |
+| (tak disebut) | Periode yang dokumennya belum ada dianggap **potret parsial** | "Nol peserta" terbaca seolah tak seorang pun diwajibkan, padahal yang terjadi cuma cron belum sempat jalan |
+| Aksi massal | Dibatasi **200** dan melapor **per id** | Menggagalkan 200 ide karena satu yang keburu diputuskan orang lain membuat komite mengulang pekerjaan yang sudah hampir selesai |
+
+### Belum diverifikasi
+
+Tiga hal yang tak bisa dijamin unit test dan baru terbukti setelah naik ke dev:
+
+- agregasi hitungan ide per orang (`countIdeasByEmployee`)
+- potret peserta yang memanggil [[Microservices - Employee Service]] **dari cron**, termasuk apakah header `BIP-Company-ID` yang dipasang manual diterima (cron tak punya `fiber.Ctx`, jadi header identitasnya tak datang dari permintaan mana pun)
+- penjaga balapan keputusan, yang bersandar pada `MatchedCount` dari driver Mongo
+
+### Diketahui, belum diperbaiki
+
+- Menandai ide "diterapkan" padahal belum pernah diterima dibalas `400`, seharusnya `409`. Tak ada data yang rusak.
+- `blocks_attendance` di `GET /me/forms` memakai penilai gerbang berbasis tanggal statis, sedangkan gerbang sesungguhnya memakai jendela periode. Temuan lama di luar lingkup Kaizen, laten sampai [[Microservices - Attendance Service]] naik.
 
 ## Latar Belakang
 
