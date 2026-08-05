@@ -90,27 +90,42 @@ Kode mengikuti **matriks approval**. Alasannya: melewatkan GA pada pembelian ase
 
 Empat temuan berikut **bukan pendapat**, melainkan hasil hitung terhadap `employee_db` produksi. Semuanya menghalangi Fase 1 blueprint.
 
-### 1. Tiga dari tujuh divisi tidak cocok dengan master data
+### 1. "Divisi" di blueprint bukan "departemen" di ERP
 
-| Blueprint | Yang ada di sistem | Karyawan |
-|---|---|---:|
-| BH Beautyhacks | `Beauty Hacks` (ejaan berbeda) | 48 |
-| KY Kyura | `Kyura` | 31 |
-| GA General Affair | `General Affair` | 21 |
-| PU Purchasing | `Procurement` (nama berbeda) | 2 |
-| SK Sekretariat | `Kesekretariatan` (nama berbeda) | 11 |
-| **GTJ Gudang TJ** | **tidak ada** | — |
-| **BC Bharata Club** | **tidak ada** | — |
+Ketujuh baris plafon punya **tiga bentuk yang berbeda**, dan hanya lima di antaranya sepadan dengan satu departemen utuh.
 
-Gudang TJ dan Bharata Club belum menjadi departemen di sistem sama sekali. Bila plafon dikunci ke nama divisi, tiga baris ini gagal sejak hari pertama.
+| Blueprint | Induk di ERP | Bentuk | Karyawan induk |
+|---|---|---|---:|
+| BH Beautyhacks | `Beauty Hacks` (ejaan berbeda) | departemen utuh | 48 |
+| KY Kyura | `Kyura` | departemen utuh | 31 |
+| GA General Affair | `General Affair` | departemen utuh | 21 |
+| SK Sekretariat | `Kesekretariatan` (nama berbeda) | departemen utuh | 11 |
+| PU Purchasing | `Procurement` (nama berbeda) | departemen utuh | 2 |
+| **GTJ Gudang TJ** | **`Manufaktur`** | **sub-unit** | 36 |
+| **BC Bharata Club** | **`Human Resource`** | **sub-unit** | 7 |
 
-Catatan tambahan: `master_department` berisi **11** entri, sedangkan `work_data` memakai **12** nilai departemen. `Human Resource` (7 orang) ada di data karyawan tetapi **tidak ada di master departemen**, sehingga dropdown apa pun yang bersumber dari master akan melewatkannya.
+> **Koreksi 5 Agustus 2026.** Versi sebelumnya menyatakan Gudang TJ dan Bharata Club "belum menjadi departemen di sistem sama sekali" dan menyarankan keduanya didaftarkan sebagai departemen baru. **Itu keliru dan berbahaya**: keduanya sub-unit di dalam departemen yang sudah ada, dan mendaftarkannya sebagai departemen akan melahirkan dua departemen palsu sekaligus memisahkan orang keluar dari Manufaktur dan Human Resource. Dikoreksi setelah dikonfirmasi tim.
 
-### 2. Tujuh departemen tidak punya plafon
+**Konsekuensinya plafon TIDAK BOLEH dikunci ke `department`.** `work_data` hanya menyimpan `department` dan `position`; tidak ada field sub-unit, lokasi, maupun site. Bila plafon dipasang per departemen, plafon Gudang TJ sebesar Rp 2 juta akan mengalir ke **seluruh 36 orang Manufaktur**, termasuk 19 Operator Production yang tidak berurusan dengan kas gudang.
 
-Finance (19), Manufaktur (36), Percetakan (13), Tech Development (11), Human Resource (7), Quality (6), Marketing Offline Distribution (1). Totalnya **93 dari 206 karyawan**, atau 45 persen.
+Yang dibutuhkan: master **unit kas** tersendiri, dengan induk departemen dan daftar PIC yang boleh bertransaksi. Bentuk ini menampung ketiganya sekaligus, dan tidak menuntut perubahan apa pun pada struktur organisasi HRIS.
 
-Perlu dipastikan ke Finance: memang tidak punya kas kecil, atau terlewat dari daftar? Bila memang tidak punya, R-03 akan memblokir mereka dengan pesan "sisa saldo 0" yang membingungkan; lebih baik jalur kas kecilnya tidak ditampilkan sama sekali.
+Catatan tambahan yang masih berlaku: `master_department` berisi **11** entri sedangkan `work_data` memakai **12** nilai departemen. `Human Resource` (7 orang) ada di data karyawan tetapi **tidak ada di master departemen**, sehingga dropdown apa pun yang bersumber dari master akan melewatkannya.
+
+### 2. Empat departemen belum jelas status kas kecilnya
+
+| Departemen | Karyawan | Keterangan |
+|---|---:|---|
+| Percetakan | 13 | belum jelas |
+| Tech Development | 11 | belum jelas |
+| Quality | 6 | belum jelas |
+| Marketing Offline Distribution | 1 | belum jelas |
+
+Totalnya **31 dari 206 karyawan**.
+
+> **Koreksi 5 Agustus 2026.** Versi sebelumnya menyebut **tujuh** departemen dan **93** karyawan. Tiga di antaranya ternyata sudah terjelaskan: **Finance** (19) memang seharusnya tidak punya plafon karena perannya penyetuju dan pengatur aturan, bukan pembelanja; **Manufaktur** (36) tercakup lewat Gudang TJ; **Human Resource** (7) tercakup lewat Bharata Club.
+
+Untuk keempat yang tersisa perlu dipastikan ke Finance: memang tidak punya kas kecil, atau terlewat dari daftar? Bila memang tidak punya, jalur kas kecilnya sebaiknya tidak ditampilkan sama sekali, bukan ditampilkan lalu diblokir R-03 dengan pesan "sisa saldo 0" yang membingungkan.
 
 ### 3. Matriks approval mengandaikan hierarki yang datanya belum lengkap
 
@@ -153,8 +168,8 @@ Sepuluh pertanyaan pertama datang dari blueprint sendiri (§8), lengkap dengan a
 | 2 | Batas dihitung per transaksi atau per item? | Per nota | — |
 | 3 | Nominal termasuk PPN? | Ya, bruto | — |
 | 4 | Sisa saldo akhir bulan: hangus, kembali, atau carry-over? | Hangus | — |
-| 5 | Bharata Club perlu pagar maksimum? | Tanpa pagar | Divisinya belum ada di sistem |
-| 6 | Selain Purchasing dan Gudang TJ benar tidak boleh top-up? | Tidak boleh | Gudang TJ belum ada di sistem |
+| 5 | Bharata Club perlu pagar maksimum? | Tanpa pagar | Sub-unit di dalam `Human Resource`; perlu dipastikan ia tim atau anggaran kegiatan, sebab itu menentukan siapa yang boleh membelanjakan |
+| 6 | Selain Purchasing dan Gudang TJ benar tidak boleh top-up? | Tidak boleh | Gudang TJ sub-unit di dalam `Manufaktur`; belum jelas apakah ia mencakup 11 orang berposisi Warehouse atau hanya sebagian |
 | 7 | Larangan aset lewat kas kecil: hanya BH dan KY, atau semua? | Sebaiknya semua | — |
 | 8 | Batas nilai barang disebut aset | Perlu angka Finance | Register asetnya juga belum ada |
 | 9 | Berapa hari maksimal unggah bukti? | 3 hari kerja | — |
@@ -162,8 +177,8 @@ Sepuluh pertanyaan pertama datang dari blueprint sendiri (§8), lengkap dengan a
 
 Ditambah tiga pertanyaan baru dari pemeriksaan sistem:
 
-11. **Gudang TJ dan Bharata Club** didaftarkan sebagai departemen di master data, atau diperlakukan sebagai unit di bawah departemen yang sudah ada?
-12. **Tujuh departemen tanpa plafon** memang tidak punya kas kecil, atau terlewat?
+11. **Siapa anggota Gudang TJ dan Bharata Club?** Keduanya sub-unit (lihat Lubang Data nomor 1), jadi yang dibutuhkan bukan departemen baru melainkan daftar PIC yang boleh bertransaksi atas unit kas itu. Untuk Gudang TJ: seluruh 11 orang berposisi Warehouse di Manufaktur, atau sebagian? Untuk Bharata Club: sebuah tim, atau anggaran kegiatan yang dipegang PIC yang ditunjuk?
+12. **Empat departemen tanpa plafon** (Percetakan, Tech Development, Quality, Marketing Offline Distribution, total 31 karyawan) memang tidak punya kas kecil, atau terlewat?
 13. **Jurnal**: ERP berhenti di pencatatan, atau menulis ke Accurate?
 
 ## Tahapan Implementasi
@@ -172,7 +187,7 @@ Blueprint mengusulkan enam fase, kurang lebih 16 minggu. Satu perubahan yang per
 
 | Fase | Ruang lingkup | Catatan |
 |---|---|---|
-| 0 | Bereskan master divisi (Gudang TJ, Bharata Club, penyeragaman nama) dan penanda atasan minimal untuk General Affair dan Procurement | **Tambahan**, bukan dari blueprint. Pekerjaan data, bukan kode. **Belum dikerjakan** |
+| 0 | Isi penanda atasan untuk General Affair, Procurement, dan Percetakan; tambahkan `Human Resource` ke `master_department`; isi master unit kas beserta PIC-nya | **Tambahan**, bukan dari blueprint. Pekerjaan data, bukan kode. **Belum dikerjakan.** JANGAN mendaftarkan Gudang TJ atau Bharata Club sebagai departemen, lihat koreksi di Lubang Data nomor 1 |
 | 1 | Master data (divisi, plafon, kategori, parameter) + dashboard saldo | 2 minggu. **Mesin aturannya sudah ada** (PR #986); sisanya koleksi, endpoint, dan layar |
 | 2 | Transaksi kas kecil + R-01, R-03, R-06 + unggah bukti | 3 minggu |
 | 3 | Modul pengajuan + approval berjenjang + R-02, R-07 | 3 minggu |

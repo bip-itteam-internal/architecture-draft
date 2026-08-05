@@ -3437,20 +3437,20 @@
         "GA - Procurement System",
         "Finance - Big Pictures"
       ],
-      "hash": "57dd697b7212f1019f6234c442dba4800d776147ab0fff09b250870ffd8975b6",
-      "ukuran_kb": 13.5,
-      "ringkasan": "Menjawab: berapa plafon kas kecil tiap divisi per bulan, kapan sebuah pengeluaran cukup lewat kas kecil dan kapan wajib lewat jalur pengajuan dengan approval, serta siapa approver-nya menurut nominal dan jenis belanja (termasuk jalur khusus pembelian aset dan top-up saldo). Menjelaskan sembilan aturan bisnis R-01 sampai R-09 (blokir overbudget, larangan beli aset lewat kas kecil, deteksi pemecahan transaksi, kunci karena bukti telat), alur status kas kecil/pengajuan/top-up, dan berkas Go mana di service procurement yang memuat mesin perhitungannya beserta alasan pilihan teknisnya (uang int64, batas periode WIB). Berguna juga untuk menelusuri hasil sensus data produksi soal nama divisi yang tidak cocok master data, departemen tanpa plafon, dan hierarki atasan, serta titik gesekan dengan keputusan akuntansi via Accurate dan model data di database dokumen.",
+      "hash": "291153c065a2a57d4cb3941e60127530a09f217945a6d149178461701dd0a71c",
+      "ukuran_kb": 15.8,
+      "ringkasan": "Menjawab: berapa plafon kas kecil tiap divisi per bulan, kapan pengeluaran boleh lewat kas kecil dan kapan wajib lewat jalur pengajuan dengan approval, serta siapa saja approver-nya menurut nominal dan jenis belanja (termasuk pengajuan aset dan top-up). Menjelaskan sembilan aturan bisnis R-01 sampai R-09 (blokir overbudget, larangan beli aset lewat kas kecil, deteksi pemecahan transaksi, kunci karena bukti telat), alur status kas kecil/pengajuan/top-up, dan fungsi Go mana di service procurement yang sudah memuat mesin perhitungannya. Juga menjawab kenapa plafon tidak boleh dikunci ke field department (Gudang TJ dan Bharata Club hanya sub-unit dari Manufaktur dan Human Resource sehingga butuh master unit kas tersendiri), serta lubang data dan tabrakan arsitektur apa yang masih menghalangi tahap berikutnya.",
       "kata_kunci": [
         "kas kecil",
         "petty cash",
         "pengajuan budget",
         "budget request",
         "plafon divisi",
-        "approval matrix",
-        "top-up saldo",
+        "matriks approval",
         "pengajuan aset",
-        "procurement service",
-        "Finance"
+        "top-up saldo",
+        "unit kas",
+        "procurement service"
       ]
     },
     {
