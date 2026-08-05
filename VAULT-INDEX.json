@@ -1050,20 +1050,27 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "3d4f344be3a00bcff301d42d157af13624fce262f03ad1938c005be510fe947f",
+      "hash": "8c17a616609c9362714b0ab2994c002ea3e5f81a003dca1bc49e4725d14e1853",
       "ukuran_kb": 96.2,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS internal Bharata Group (hris-dashboard / \"One Bharata\"), stack dan repo mana yang dipakai (Next.js 16 + React 19 di `erp-frontend`), serta modul apa saja yang sudah ada di dalamnya. Menjelaskan cara login dan refresh token lewat gateway, bagaimana `system_roles` (map module ke role) menentukan menu yang tampil, dan bagaimana web ini bertindak sebagai SSO Identity Provider (mint one-time code, allowlist redirect) untuk app lain seperti Task Manager. Juga menjawab pertanyaan soal dukungan multi-perusahaan (company switcher, kelola perusahaan/departemen/shift/network per-company), susunan dan pengelompokan menu sidebar (menu induk bersarang, perataan induk tipis, Tampilan Menu per jabatan yang menyimpan `menu_hidden`), gerbang menu KPI untuk supervisor dan Leader, serta halaman Atasan Langsung.",
+      "ringkasan": "Menjawab pertanyaan tentang aplikasi web ERP (hris-dashboard/\"One Bharata\"): stack teknologi yang dipakai, bagaimana autentikasi dan SSO Identity Provider bekerja, bagaimana role/RBAC menentukan menu yang tampil di sidebar, dan fitur multi-perusahaan (company switcher, kelola departemen/shift per perusahaan). Juga menjawab bagaimana layar DAFTAR disusun di aplikasi ini: pola satu card (banner, garis pemisah, tabel), letak filter dan tombol export, kartu statistik di dalam kartu tabel, teks keadaan kosong yang mengikuti bahasa aktif berikut cara menggantinya per layar, serta jebakan komponen tabel bersama seperti sel tanpa garis dan kolom sticky yang butuh latar buram sendiri. Memuat pula catatan per-layar HRIS yang penting: Roster harian, Resign berikut kartu turnover, Jadwal Kerja, Laporan Kehadiran, dashboard per posisi, Atasan Langsung, dan menu KPI untuk Leader.",
       "kata_kunci": [
-        "web ERP",
         "erp-frontend",
-        "hris-dashboard",
+        "web ERP",
         "One Bharata",
+        "hris-dashboard",
         "SSO",
-        "system_roles",
-        "role gating",
+        "login",
+        "role",
+        "RBAC",
         "sidebar menu",
         "multi-perusahaan",
-        "company switcher"
+        "company switcher",
+        "pola satu card",
+        "tabel daftar",
+        "kartu statistik",
+        "keadaan kosong",
+        "banner filter",
+        "Atasan Langsung"
       ]
     },
     {
