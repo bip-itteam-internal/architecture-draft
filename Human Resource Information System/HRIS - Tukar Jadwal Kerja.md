@@ -146,6 +146,8 @@ Reviewer ditentukan secara dinamis berdasarkan peran pemohon:
 ## Aturan Bisnis / Validasi
 
 - **Pemohon harus karyawan berbasis shift** (Security, Production, Host Live) — *keputusan HRD 2026-06-26*. Di awal `POST /schedule-exchange/create`, backend lookup `WorkSchedule` pemohon lalu `IsShiftBasedSchedule(GroupID)`; bila bukan shift → **403** `tukar shift hanya untuk karyawan ber-shift (Security/Host Live/Production)`. Lookup gagal/jadwal tak ditemukan → **500**.
+- **Karyawan ber-roster DITUTUP dari Tukar Jadwal** (PR #1012, [[ADR - 0036 Roster Harian Menimpa Jadwal Dasar]]). Jadwal yang sudah bebas diatur leader membuat tukar shift mubazir, dan dua jalur yang mengubah tanggal yang sama menghasilkan urutan menang yang tak bisa dijelaskan ke pemakainya. Digerbang **tiga tempat**: pemohon di `create`, **sisi rekan** di `create` (dengan pesan yang menyebut sebabnya, bukan "tidak terjadwal kerja" yang menyesatkan), dan pemohon maupun kandidat di `/partners`. Penyaringan kandidat sebelumnya bersifat kebetulan **dan berlubang**: kandidat ber-roster yang selnya belum diisi jatuh ke jadwal dasar sehingga tetap muncul sebagai rekan yang bisa ditukar.
+	- Penegakannya **hanya di backend**. [[APP - MyBharata]] tidak menyembunyikan tombolnya, jadi host ber-roster tetap melihat menu Tukar Shift dan baru ditolak saat mengirim.
 - `exchange_date` harus **minimal 3 hari (H+3)** dari hari ini *(naik dari H+2)*
 - `work_date` dan `exchange_date` harus dalam **bulan yang sama**
 - **Tukar Shift (swap)**: `partner_employee_id` wajib karyawan **shift & role sama**, bukan diri sendiri (`validateSwapPartner`); pemohon & rekan harus terjadwal kerja pada tanggal itu

@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-05",
-  "jumlah_dokumen": 265,
+  "jumlah_dokumen": 266,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -43,6 +43,7 @@
       "tautan": [
         "Microservices - Attendance Service",
         "API - Index",
+        "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Perjalanan Dinas",
         "APP - MyBharata",
         "HRIS - Leave Request",
@@ -50,22 +51,28 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "e8d5ea43fd0f9faabfea04936b3065e75fb77ed43d0d9c16e6289f29ae50782b",
-      "ukuran_kb": 6.8,
-      "ringkasan": "Menjawab: bagaimana clock-in/clock-out multi-metode dan jadwal kerja bekerja, endpoint apa untuk mengajukan cuti/izin/sakit/dinas beserta alur approval dan idempotensi pengajuan ganda, serta bagaimana tukar jadwal kerja (shift/day exchange) dan koreksi absensi diproses termasuk aturan anti-fraud-nya. Juga menjawab endpoint perjalanan dinas, HR requests terpadu lintas jenis pengajuan (untuk kartu \"Aktivitas Saya\"/\"Review Submission\"), dan guestbook/WiFi kantor.",
+      "hash": "b1b7a5c357873c06bebfeb5a787f32e953557f3b0000aaaa2f8fb5d4cc10c6c1",
+      "ukuran_kb": 7.8,
+      "ringkasan": "Menjawab pertanyaan seputar endpoint API attendance-service secara lengkap: cara clock-in/out multi-metode, endpoint cuti/izin/dinas/koreksi/tukar jadwal/roster, laporan kehadiran & payroll-supplement, serta endpoint guestbook dan WiFi kantor beserta RBAC masing-masing. Juga menjawab endpoint mana yang dipakai untuk ringkasan lintas-jenis pengajuan HR (`/requests/mine`, `/hr/requests`).",
       "kata_kunci": [
         "attendance",
         "kehadiran",
-        "absensi",
+        "API",
+        "endpoint",
+        "tap",
+        "clock-in",
+        "clock-out",
         "cuti",
         "izin",
-        "lembur",
+        "leave request",
         "tukar shift",
         "schedule exchange",
-        "koreksi absensi",
+        "roster",
         "perjalanan dinas",
+        "business trip",
         "guestbook",
-        "clock-in"
+        "payroll-supplement",
+        "koreksi absen"
       ]
     },
     {
@@ -1008,6 +1015,7 @@
         "HRIS - Key Performance Index",
         "HRIS - Organization Structure",
         "Microservices - Manufacture Service",
+        "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "Microservices - Recruitment Service",
         "Microservices - Employee Service",
         "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
@@ -1038,21 +1046,23 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "46c86a9d21a8bd68b85dd3a9b7b0f7b3e724f042a087579d173bb12fb89f3a47",
-      "ukuran_kb": 87.6,
-      "ringkasan": "Menjawab: apa itu portal web internal `hris-dashboard` (\"One Bharata\"), stack dan repo mana yang dipakai, bagaimana login `employee_id` plus refresh token bekerja, dan bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain. Juga menjawab bagaimana role gating dari `system_roles` menentukan menu, bagaimana sidebar dikelompokkan lewat menu induk bersarang serta disembunyikan per jabatan (`menu_hidden`), dan bagaimana dukungan multi-perusahaan diterapkan (company switcher, buat karyawan, departemen, shift/rotasi, network WiFi, artikel lintas-perusahaan). Termasuk alat Atasan Langsung, menu KPI untuk Leader, dan halaman Resign / Non-Aktif Karyawan di grup Personalia.",
+      "hash": "80b4876d530dfd2353ba801e10e6f4cde4c49b9005a10c6a96b205e3dbf9a239",
+      "ukuran_kb": 88.9,
+      "ringkasan": "Menjawab pertanyaan tentang aplikasi web ERP (hris-dashboard/\"One Bharata\"): stack teknologi yang dipakai, bagaimana autentikasi & SSO Identity Provider bekerja, bagaimana role/RBAC menentukan menu yang tampil di sidebar, dan fitur multi-perusahaan (company switcher, kelola departemen/shift per perusahaan). Juga mendokumentasikan perubahan terkini seperti pengaturan tampilan menu per posisi, penataan menu KPI untuk Leader, dan fitur Atasan Langsung.",
       "kata_kunci": [
         "erp-frontend",
-        "hris-dashboard",
+        "web ERP",
         "One Bharata",
-        "Next.js",
+        "hris-dashboard",
         "SSO",
-        "system_roles",
+        "login",
+        "role",
+        "RBAC",
         "sidebar menu",
         "multi-perusahaan",
         "company switcher",
-        "atasan langsung",
-        "halaman resign"
+        "Atasan Langsung",
+        "KPI Leader"
       ]
     },
     {
@@ -1467,6 +1477,7 @@
         "APP - MyBharata",
         "IT - Form Builder",
         "HRIS - Tukar Jadwal Kerja",
+        "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Attendance Correction",
         "HRIS - Perjalanan Dinas",
         "Microservices - Employee Service",
@@ -1480,20 +1491,23 @@
         "HRIS - Attendance System",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "db88ef01a656226989b3c0ae4e8eea59f6a0241aecc98ceb977fb5b12c8b08c5",
-      "ukuran_kb": 16.0,
-      "ringkasan": "Menjawab: bagaimana clock-in/out dijalankan per metode (mobile dengan validasi MAC WiFi kantor atau GPS, fingerprint dengan allowlist serial, dan method `Website` yang berarti koreksi), bagaimana ambang telat dihitung, dan endpoint mana yang dipakai HRIS untuk report bulanan periode 26 ke 26 serta `payroll-supplement`. Juga menjawab alur workflow lengkap leave request (rantai review supervisor ke HR, kuota cuti, guard idempotensi berbasis konten), tukar jadwal kerja shift/hari, koreksi presensi, perjalanan dinas, guestbook tamu bertoken, dan hari libur. Menjelaskan pula bagaimana perlakuan dibayar atau dipotong diatur per status dan per subtipe lewat master `payroll_status_treatment`.",
+      "hash": "2cdc82c7d1df6a919b64fb74462986c52bfdedbe4f9cd31e5a322c4199e53c27",
+      "ukuran_kb": 19.2,
+      "ringkasan": "Menjawab pertanyaan implementasi teknis attendance-service: struktur endpoint per fitur (clock-in/out, leave request, tukar jadwal, roster, business trip, guestbook, payroll-supplement), bagaimana perhitungan payout/telat/status dikonfigurasi, serta gap multi-tenant. Cocok dirujuk saat butuh detail collection MongoDB, gerbang RBAC, dan cron/jalur idempotensi di balik tiap endpoint.",
       "kata_kunci": [
-        "attendance",
-        "presensi",
-        "clock-in",
-        "clock-out",
+        "attendance service",
+        "microservice",
+        "absensi",
+        "Go",
+        "Fiber",
+        "MongoDB",
+        "payroll-supplement",
         "leave request",
-        "cuti izin",
-        "payroll supplement",
+        "schedule exchange",
+        "roster",
         "guestbook",
-        "tukar shift",
-        "koreksi presensi"
+        "multi-tenant",
+        "company_id"
       ]
     },
     {
@@ -1528,6 +1542,8 @@
         "RUN - Onboarding Akun Eksternal (Vendor & Mitra)",
         "CORE - SSO Flow",
         "ADR - 0006 Swap Jadwal Same-Department",
+        "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
+        "Microservices - Inventory Service",
         "CORE - HRIS Orchestrator",
         "DB - Overview and Notes",
         "Microservices - Attendance Service",
@@ -1537,24 +1553,26 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "c59ea7935525b7c263239b2b2a8d3310ca59b3dd6442221ef0e3ea8ecde981fd",
-      "ukuran_kb": 38.2,
-      "ringkasan": "Menjawab: apa saja yang ditangani employee-service — kredensial & login, onboarding karyawan, master data departemen/system role/permission set, workspace Legal & R&D Regulatory, KPI, akun pihak luar (vendor/mitra), sampai catatan resign yang sekaligus menonaktifkan akun karyawan. Juga menjawab keputusan desainnya: kenapa akun vendor menumpang system_authentication dan tidak dijadikan record karyawan, kenapa catatan resign jadi koleksi sendiri alih-alih field status di work_data, dan kenapa `is_active` hanya ditulis lewat satu fungsi yang dipakai bersama jalur IT dan jalur HR. Memuat pula jebakan konkret seperti tanggal efektif kosong yang lolos validasi bila dinormalkan lebih dulu, dan cron 00:10 WIB yang menerapkan resign terjadwal.",
+      "hash": "6ad2b0f974ce9be13fe05c63b05b14bfccac1ec3bd4e630cdc79f15687be667b",
+      "ukuran_kb": 40.3,
+      "ringkasan": "Menjawab pertanyaan tentang employee-service sebagai master data karyawan dan sumber kebenaran autentikasi/SSO: alur login (username/PIN/biometric), endpoint admin akun (reset, forget-device, active-status), CRUD master department/system roles, serta modul workspace non-HR yang di-host di service ini (Legal, R&D Regulatory, Quality, Procurement) beserta alasan penempatannya. Juga menjelaskan status fitur multi-perusahaan, akun pihak luar, dan resign karyawan.",
       "kata_kunci": [
         "employee service",
-        "kredensial",
+        "master data karyawan",
         "login",
-        "onboarding",
-        "master data",
-        "akun eksternal",
-        "vendor",
-        "permission set",
-        "system roles",
-        "KPI",
+        "SSO",
+        "auth",
+        "PIN",
+        "biometric",
+        "system_roles",
+        "department",
+        "Legal",
+        "R&D Regulatory",
+        "Quality",
+        "Procurement",
         "resign",
-        "employee_resign",
-        "is_active",
-        "cron resign"
+        "akun pihak luar",
+        "multi-tenant"
       ]
     },
     {
@@ -3284,6 +3302,47 @@
         "PHK",
         "wewenang HR vs IT",
         "ADR 0035"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0036 Roster Harian Menimpa Jadwal Dasar.md",
+      "judul": "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "✅",
+      "status_teks": "Diputuskan 2026-08-05, **merged ke main** — bip-erp PR #1012 (`79e95038`), erp-frontend PR #805 (`5e1e61ae`). Auto-deploy ke DEV; produksi belum. Penyalaan `roster_enabled` untuk Host Live Kyura belum dijalankan.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Attendance Service",
+        "HRIS - Attendance Correction",
+        "APP - MyBharata",
+        "API - Attendance Service",
+        "Microservices - Employee Service",
+        "API - Employee Service",
+        "HRIS - Attendance System",
+        "HRIS - Tukar Jadwal Kerja",
+        "ADR - 0006 Swap Jadwal Same-Department",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "APP - Web ERP",
+        "IT - Background Jobs & Schedulers"
+      ],
+      "hash": "f1f992a298b9b099824bd6bad5ad93f54cf0baaf6136a74b94386e2a82749c94",
+      "ukuran_kb": 7.7,
+      "ringkasan": "Menjawab kenapa dan bagaimana fitur roster harian per-karyawan dirancang menimpa jadwal dasar (bukan menggantikan), termasuk urutan menang antara event perusahaan/roster/libur/jadwal dasar, serta kenapa Tukar Shift ditutup untuk karyawan ber-roster. Juga menjelaskan latar belakang kebutuhan (Host Live Kyura tanpa pola jadwal tetap, hardcode Ramadhan/HOSTLIVE), konsekuensi teknis (sinkronisasi satu arah company->attendance, proyeksi field, batas 500 sel), dan hal yang belum dikerjakan/diputuskan.",
+      "kata_kunci": [
+        "ADR 0036",
+        "roster harian",
+        "jadwal kerja",
+        "Host Live",
+        "Kyura",
+        "roster_enabled",
+        "schedule resolver",
+        "resolveEmployeeScheduleWithRoster",
+        "tukar shift",
+        "jadwal dasar",
+        "static",
+        "pattern"
       ]
     },
     {
@@ -5273,24 +5332,28 @@
       "tautan": [
         "HRIS - Attendance System",
         "ADR - 0006 Swap Jadwal Same-Department",
+        "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
+        "APP - MyBharata",
         "HRIS - Attendance Correction",
         "HRIS - Employee Request & Approval",
         "Microservices - Attendance Service",
-        "APP - MyBharata",
         "HRIS - Big Pictures"
       ],
-      "hash": "6315ce4d257218a9d95b470c86670433f2b6f2ed94e5701983200ce76e1567f0",
-      "ukuran_kb": 26.6,
-      "ringkasan": "Menjawab: apa bedanya Tukar Shift (swap slot jam antar-rekan dengan consent) dan Tukar Hari (geser hari kerja sendiri, unilateral), siapa saja yang menyetujui bertahap (rekan lalu atasan lalu HRD), aturan same-department/same-site untuk swap, dan mengapa fitur ini kini dibatasi hanya karyawan berbasis shift (Security/Production/Host Live).",
+      "hash": "c6839a251a2536315edcdbd44fc826b58acc66425f3931c0c968985b90df3a55",
+      "ukuran_kb": 27.4,
+      "ringkasan": "Menjawab bagaimana karyawan mengajukan tukar jadwal kerja (Tukar Shift swap dengan rekan vs Tukar Hari geser hari sendiri), siapa saja yang harus menyetujui (rekan lalu atasan lalu HRD), dan aturan bisnis seperti batas H+3 serta larangan swap lintas-departemen/lokasi, plus kenapa hanya karyawan berbasis shift (Security/Production/Host Live) yang bisa memakainya. Juga menjelaskan struktur data collection `schedule_exchange_request` dan dampaknya ke entri attendance setelah disetujui.",
       "kata_kunci": [
         "tukar jadwal kerja",
         "tukar shift",
         "tukar hari",
         "schedule exchange",
-        "swap shift",
+        "shift exchange",
+        "swap jadwal",
         "consent rekan",
-        "shift-based",
-        "same-department"
+        "HRD approval",
+        "same-department",
+        "ADR 0006",
+        "attendance"
       ]
     },
     {

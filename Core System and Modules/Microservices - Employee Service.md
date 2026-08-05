@@ -161,6 +161,9 @@
 **Feed Lintas-Service**
 - `GET /list?type=fcm-token|department|supervisor|employee|vacation` — dipakai attendance & notification
 - `GET /sync/work-schedules` — dipakai cron attendance; kini **enrich `department`** (dari `work_data`) untuk guard swap same-department ([[ADR - 0006 Swap Jadwal Same-Department]])
+	- **`roster_enabled` hidup di sini dan mengalir SATU ARAH** (PR #1012, [[ADR - 0036 Roster Harian Menimpa Jadwal Dasar]]). `SyncCollection` melakukan `DeleteMany({})` lalu `InsertMany` seluruh koleksi tiap 30 menit, jadi menyetel saklar itu di database attendance **akan terhapus pada tik berikutnya tanpa galat**. Setel di database employee.
+	- Dokumen `work_schedule` di sini **tidak menyimpan** `department` maupun `position` — keduanya di-enrich saat dibaca. Menyaring dengan keduanya (mis. untuk menyalakan roster massal) mencocokkan nol dokumen; turunkan `employee_id` dari `work_data` lebih dulu.
+	- `PUT /internal/schedule/factory-update` me-`ReplaceOne` dokumen utuh dari keluaran factory. `pertahankanSaklarRoster` membaca dokumen lama dan membawa `roster_enabled` maju; tanpa itu saklar hilang permanen tiap HR memindahkan jadwal, karena **tidak ada** jalur yang mengisinya ulang (beda dari `department`/`position`).
 - `GET /qr/:employee_id`, `GET /check-unique/:field/:value`, `GET /data-type/:dt`
 - MinIO uploads: `POST /upload`, `POST /upload/multiple`
 - Cron aktif
@@ -168,6 +171,8 @@
 ## Belum Diimplementasikan / Catatan
 
 - Tidak ada stub berarti — ini service paling lengkap dalam ekosistem bip-erp.
+- **Allowlist proyeksi agregat menjebak.** Respons detail karyawan dibangun lewat `JoinCollectionSpecify` dengan daftar field eksplisit di `services/employee/aggregate_projection.go`; field yang tidak disebut di sana **tidak pernah sampai ke frontend**, dan responsnya tetap tampak wajar sehingga tak ada galat yang muncul. `roster_enabled` sempat gagal total karena ini (PR #1012). Endpoint LIST memakai mekanisme berbeda (refleksi tag bson) sehingga tidak terkena.
+- **Cakupan supervisi: pakai versi ketat untuk gerbang TULIS.** `common.SupervisedDepartments` **jatuh ke `[departemen sendiri]` untuk siapa pun** bila klaimnya kosong, sehingga gerbang yang memakainya meloloskan setiap karyawan untuk departemennya sendiri, bukan hanya supervisornya. `common.SupervisedDepartmentsStrict` / `CanManageDepartment` (PR #1012) membaca header mentah tanpa fallback. Sejak PR itu `resolveSupervisedDepartments` juga berhenti mengosongkan cakupan berukuran 1, sehingga supervisor berdepartemen tunggal **perlu login ulang** (TTL token 72 jam) agar klaimnya terbit. `ApproveHandover` di [[Microservices - Inventory Service]] masih memakai pola lama dan berlubang dengan cara yang sama.
 - Department CRM sudah dihapus (di-merge ke BeautyHacks/Kyura); role warehouse belum aktif.
 - **Departments, positions, dan system roles** sudah dimigrasikan dari hardcoded source ke **MongoDB master data** (`master_department`, `master_system_role`). Dapat dikelola via CRUD endpoint atau frontend `/hris/master-data`.
 - `common.Roles` (tipe system_roles di JWT/MongoDB) diubah dari Go struct dengan fixed field menjadi `map[string]Role` — mendukung penambahan department/role tanpa ubah kode. Format serialisasi JSON/BSON tidak berubah (backward compatible).
