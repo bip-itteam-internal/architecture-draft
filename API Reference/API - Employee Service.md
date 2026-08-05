@@ -43,8 +43,8 @@
 
 > Konsumen FE: halaman `/hris/master-data` (di-link dari **menu IT**) & System Setup Personalia; tombol kelola disembunyikan bila role tak berhak.
 
-## Akun pihak luar (vendor/mitra) — ⚠️ merged, tanpa role & tanpa UI
-> Fondasi data untuk orang di luar perusahaan yang butuh akun, tanpa dijadikan record karyawan. Seluruh grup digerbang `RequireITSupervisor` — sengaja **lebih ketat** dari master data lain, karena ini menerbitkan kredensial, bukan mengelola data HR. Detail & alasannya: [[Microservices - Employee Service]].
+## Akun pihak luar (vendor/mitra) — ✅ lengkap (data, hak akses, UI)
+> Akun untuk orang di luar perusahaan, tanpa dijadikan record karyawan. Seluruh grup digerbang `RequireITSupervisor` — sengaja **lebih ketat** dari master data lain, karena ini menerbitkan kredensial, bukan mengelola data HR. Detail & alasannya: [[Microservices - Employee Service]]; prosedur operasionalnya: [[RUN - Onboarding Akun Eksternal (Vendor & Mitra)]].
 
 | Method | Path | Fungsi | RBAC |
 |---|---|---|---|
@@ -52,9 +52,15 @@
 | POST | `/master/external-accounts` | Terbitkan akun luar + baris kredensial di `system_authentication` (`account_type=external`). ID di-generate server berprefiks **`EXT-`**; `company_id` diisi dari perusahaan pembuat bila kosong. **Ditolak 400** bila `valid_until` sudah lewat (akun terbit dalam keadaan mati) atau `sponsor_employee_id` tak ada di `work_data` (penanggung jawab karangan = akun tanpa pemilik). Bila insert kredensial gagal, data pendamping di-rollback supaya tak tertinggal akun setengah jadi | `RequireITSupervisor` |
 | PUT | `/master/external-accounts/:employeeID` | Perbarui data pendamping; **perpanjangan `valid_until`** adalah alasan utamanya ada. `employee_id` & `company_id` **tak bisa diubah** (kunci identitas & batas tenant). Field kosong diabaikan, bukan dikosongkan | `RequireITSupervisor` |
 | DELETE | `/master/external-accounts/:employeeID` | **Menonaktifkan** (`is_active=false`), bukan menghapus — jejak siapa pernah punya akses tetap ada. ⚠️ Token yang sudah beredar **tidak ikut mati** (JWT TTL 72 jam, revoke masih placeholder); respons menyebutkannya eksplisit | `RequireITSupervisor` |
+| GET | `/master/external-accounts/:employeeID/permission-sets` | Baca paket hak yang menempel. Balas `[]` (bukan `null`) bila kosong | `RequireITSupervisor` |
+| PUT | `/master/external-accounts/:employeeID/permission-sets` | Pasang paket hak (sumbu **RBAC**: ticket, payroll, finance, monitoring, procurement). Key duplikat/kosong dirapikan; key di luar `master_permission_set` **ditolak 400** — paket fantom tak pernah menghasilkan izin tapi tampil terpasang di layar. Endpoint tersendiri (bukan `PATCH /account/permission-sets` milik karyawan) karena gerbangnya lebih ketat, kepemilikan tenant dicek eksplisit, dan pesan galatnya tak lagi menyebut "Employee ... not found" untuk sesuatu yang justru bukan karyawan | `RequireITSupervisor` |
+| GET | `/master/external-accounts/:employeeID/system-roles` | Baca role modul. Balas `{}` (bukan `null`) bila kosong | `RequireITSupervisor` |
+| PUT | `/master/external-accounts/:employeeID/system-roles` | Setel role modul (sumbu **`system_roles`**, dipakai modul seperti **warehouse** yang tak menggerbang di permission-set). Key modul **dan nilai role** divalidasi ke master data (`master_department` ditimpa `master_system_role`) → **400** bila tak cocok; katalog yang gagal dibaca **menolak segalanya**. Role `group` dibuang paksa (override lintas-perusahaan) | `RequireITSupervisor` |
+| POST | `/master/external-accounts/:employeeID/reset-password` | Terbitkan ulang kata sandi; balas `temporary_password` **sekali**. **Tidak** menyentuh `is_active` — sengaja terpisah dari `PATCH /account/reset` karyawan yang menyetel `is_active: true` sebagai efek samping dan akan menghidupkan kembali vendor yang sengaja dinonaktifkan | `RequireITSupervisor` |
 
-> 🔴 **Belum ada konsumen FE.** Pembuatan vendor sementara hanya lewat API. `permission_sets` untuk akun luar juga belum dipasang, jadi akun terbit bisa login tapi belum berhak atas modul apa pun.
-> ⚠️ Itu baru benar **setelah** penambalan `izinAkun`: sebelumnya akun vendor tanpa paket diam-diam dapat 6 izin modul `ticket` lewat fallback tier. Lihat [[Microservices - Employee Service]] §Akun pihak luar.
+> **Berlaku setelah login ulang.** Izin & role dirakit saat token **terbit**, jadi kedua endpoint `PUT` di atas baru terasa setelah vendor login ulang atau token 72 jamnya diperbarui. Respons menyebutkannya eksplisit.
+> **Akun terbit tanpa hak modul apa pun** sampai salah satu sumbu dipasang. Itu baru benar **setelah** penambalan `izinAkun`: sebelumnya akun vendor tanpa paket diam-diam dapat 6 izin modul `ticket` lewat fallback tier. Lihat [[Microservices - Employee Service]] §Akun pihak luar.
+> Konsumen FE: tab **Akun Eksternal** di `/hris/master-data` + dialog "Hak Akses Vendor" (tab *Paket Hak* / *Role Modul*).
 
 ## Training Program (HRIS) — ✅ merged (deploy dev pending)
 > BE+FE **merged ke main** (`services/employee/training.go`; UI `/hris/training`); **deploy dev pending**. **Department opsional** (peran penyelenggara — TIDAK membatasi peserta; peserta lintas dept di-assign HRD), tanpa Branch. RBAC tulis = `RequireHRISStaff`; GET open (di belakang gateway). Detail konsep: [[HRIS - Training Program]].
