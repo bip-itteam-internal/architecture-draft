@@ -1038,7 +1038,7 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "1b7a634f817b5d4a65ea1cfe043e7d21c44f72387980a83a1afc5821cb6a7edf",
+      "hash": "46c86a9d21a8bd68b85dd3a9b7b0f7b3e724f042a087579d173bb12fb89f3a47",
       "ukuran_kb": 87.6,
       "ringkasan": "Menjawab: apa itu portal web internal `hris-dashboard` (\"One Bharata\"), stack dan repo mana yang dipakai, bagaimana login `employee_id` plus refresh token bekerja, dan bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain. Juga menjawab bagaimana role gating dari `system_roles` menentukan menu, bagaimana sidebar dikelompokkan lewat menu induk bersarang serta disembunyikan per jabatan (`menu_hidden`), dan bagaimana dukungan multi-perusahaan diterapkan (company switcher, buat karyawan, departemen, shift/rotasi, network WiFi, artikel lintas-perusahaan). Termasuk alat Atasan Langsung, menu KPI untuk Leader, dan halaman Resign / Non-Aktif Karyawan di grup Personalia.",
       "kata_kunci": [
@@ -3270,9 +3270,9 @@
         "Microservices - File Service",
         "HRIS - Adaptasi ERPGo HRM"
       ],
-      "hash": "fabb426a7b1e0b4de6a4828d85b6eeab6c72a9d32f41fce2085d1867e9b471d2",
-      "ukuran_kb": 7.5,
-      "ringkasan": "Menjawab: kenapa HR boleh menonaktifkan akun karyawan sendiri padahal itu selama ini kewenangan tim IT, dan bagaimana kewenangan itu dibatasi supaya tidak jadi saklar bebas. Juga menjawab kenapa catatan resign disimpan sebagai koleksi sendiri dan bukan field status di work_data, kenapa status catatan disimpan alih-alih diturunkan dari tanggal, dan kenapa pembatalan resign tidak boleh menghidupkan kembali akun yang dimatikan IT. Memuat konsekuensi yang diterima (HR bisa menonaktifkan siapa pun di perusahaannya, tanpa maker-checker, jejak audit hanya sebagian, sesi bertahan sampai 72 jam) dan yang belum dikerjakan (karyawan non-aktif lenyap dari laporan absensi dan basis payroll bulan berjalan, exit clearance, revoke device).",
+      "hash": "772099761510c62d0e4854bd217f4d86623181dd28e2e2e3b1ea0bdce77f5e5d",
+      "ukuran_kb": 7.6,
+      "ringkasan": "Menjawab: kenapa HR boleh menonaktifkan akun karyawan sendiri padahal itu selama ini kewenangan tim IT, dan bagaimana kewenangan itu dibatasi supaya tidak jadi saklar bebas. Juga menjawab kenapa catatan resign disimpan sebagai koleksi sendiri dan bukan field status di work_data, kenapa status catatan disimpan alih-alih diturunkan dari tanggal, dan kenapa pembatalan resign tidak boleh menghidupkan kembali akun yang dimatikan IT. Memuat konsekuensi yang diterima (HR bisa menonaktifkan siapa pun di perusahaannya, tanpa maker-checker, jejak audit hanya sebagian, sesi bertahan sampai 72 jam tanpa diberitahukan ke HR) dan yang belum dikerjakan (karyawan non-aktif lenyap dari laporan absensi dan basis payroll bulan berjalan, exit clearance, revoke device).",
       "kata_kunci": [
         "resign",
         "non-aktif karyawan",
