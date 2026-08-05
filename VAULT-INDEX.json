@@ -1639,20 +1639,22 @@
         "CORE - SSO Flow",
         "Microservices - Employee Service"
       ],
-      "hash": "7f8759bb49a54b75bd76c29e9af765beaec4450c721bf3f0f66cbb026da94d99",
-      "ukuran_kb": 49.8,
-      "ringkasan": "Menjawab: apa itu Form Builder Service, di mana kodenya (`services/form-builder`, Go + Fiber + MongoDB `form_builder_db`, port 6986), dan bagaimana cara kerjanya dari menyusun pertanyaan sampai membaca rekap tanpa rilis kode per form. Menjelaskan sembilan tipe pertanyaan, empat tipe form (survey/evaluation/request/checklist), pemisah bagian (`section`), penentuan sasaran (`all`/`departments`/`employees`) dari header identitas gateway, kepemilikan form per departemen lewat `supervised_by`, penilaian karyawan lewat sumbu `subject`, form berulang per periode bulanan/mingguan, serta bedanya `response_count` dan `respondent_count`. Berguna untuk menjawab kenapa clock-in mobile bisa tertahan form wajib, kenapa notification-service wajib ikut di-deploy, dan alasan di balik keputusan rancangan yang menjaga presensi tetap hidup.",
+      "hash": "56df2c34de46c7032f4692162bb446a3ca9a01c1c96eae0831813bbd74a6397c",
+      "ukuran_kb": 51.0,
+      "ringkasan": "Menjawab: bagaimana sebuah departemen membuat form dinamis sendiri tanpa rilis kode, siapa yang boleh mengelola form (gerbang requireFormManager, kepemilikan per departemen), tipe pertanyaan dan tipe form apa saja yang tersedia, serta bagaimana sasaran (audience) diresolusi dari header identitas gateway. Juga menjelaskan cara satu form dipakai menilai karyawan lain (sumbu subject terpisah dari audience), cara kerja form berulang periode bulanan/mingguan beserta analisa dan export per periode, dan bagaimana form wajib bisa menahan clock-in mobile lewat endpoint kepatuhan yang dipanggil Attendance Service. Menerangkan pula notifikasi inbox form-published/form-submitted yang mengharuskan notification-service ikut di-deploy, serta perbedaan response_count dan respondent_count.",
       "kata_kunci": [
-        "form builder service",
+        "form builder",
         "form dinamis",
-        "microservice",
-        "Go Fiber MongoDB",
+        "survei",
+        "survey",
+        "kuesioner",
+        "tipe pertanyaan",
+        "audience",
+        "sasaran form",
+        "penilaian karyawan",
         "form berulang",
-        "periode",
         "gerbang presensi",
-        "attendance compliance",
-        "notifikasi inbox",
-        "multi-perusahaan"
+        "export CSV"
       ]
     },
     {
@@ -4589,7 +4591,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Backend tahap 1 sampai 3 MERGED ke `main`** lewat PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016) (2026-08-06, merge commit `b59c64c4`). Dev naik otomatis dari `main` lewat Harness, **belum diverifikasi**; prod tidak auto-deploy. Yang sudah dibuktikan sejauh ini cuma `go build`, `go vet`, dan 183 unit test hijau — **tak satu pun jalur pernah dijalankan dengan Mongo hidup**. **FE belum ada sama sekali**, jadi belum ada layar untuk komite maupun pengaju. Tahap 4 sampai 7 belum dikerjakan.",
+      "status_teks": "**Backend tahap 1 sampai 3 LIVE di dev DAN prod** sejak 2026-08-06 (PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016), ditambah perbaikan [#1018](https://github.com/bip-itteam-internal/bip-erp/pull/1018)). Prod di-deploy manual (`docker compose up -d --build form-builder-service --no-deps`) dan diverifikasi lewat probe perilaku dari dalam jaringan container. **FE belum ada sama sekali**, jadi belum ada layar untuk komite maupun pengaju, dan **belum satu pun form kaizen dibuat di lingkungan mana pun**. Tahap 4 sampai 7 belum dikerjakan.",
       "publik": true,
       "tautan": [
         "Microservices - Form Builder Service",
@@ -4613,20 +4615,20 @@
         "API - Form Builder Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "e2c376b15a584d161fc692135a4c512a1548430cf712077d2fd6016a67957a78",
-      "ukuran_kb": 19.6,
-      "ringkasan": "Menjawab: bagaimana program pengumpulan ide perbaikan (Kaizen) bulanan bekerja, siapa yang wajib mengirim ide, bagaimana kuota diatur HR (angka global dengan override per departemen, sifatnya lantai bukan langit-langit), dan bagaimana komite memutuskan ide diterima, ditolak, atau ditandai diterapkan. Menjelaskan kenapa fiturnya menumpang Form Builder sebagai tipe form kelima alih-alih service baru atau space di Task Management, kenapa rute komite hidup di prefix `/kaizen/*` di luar gerbang pengelola form, dan kenapa `implemented_at` wajib diisi manual. Berguna juga untuk menelusuri kaitannya dengan metrik KPI Kaizen yang selama ini tidak punya sumber data, potret peserta per periode sebagai penyebut papan kepatuhan, serta daftar penyimpangan rancangan dan hal yang belum terverifikasi.",
+      "hash": "80f16983fd433379c46eca84cef8e11c0e525944e1ab18106fc7c8479a2fb4a8",
+      "ukuran_kb": 20.3,
+      "ringkasan": "Menjawab: bagaimana program pengumpulan ide perbaikan bulanan dijalankan, siapa yang wajib mengirim ide dan berapa kuotanya (kuota global dengan override per departemen, bersifat lantai bukan langit-langit), bagaimana potret peserta per periode diambil cron sebagai penyebut papan kepatuhan, dan bagaimana komite memutuskan ide dari Belum ditinjau ke Diterima/Ditolak lalu Diterapkan. Juga menjelaskan kenapa modul ini dibangun sebagai tipe form kelima di Form Builder Service, bukan service baru atau space di Task Management, serta bagaimana kaitannya dengan metrik KPI kaizen/inovasi yang selama ini tidak punya sumber data. Memuat daftar penyimpangan rancangan yang disengaja (prefix rute /kaizen, implemented_at wajib, kunci CompanyID, settings.kaizen absen berarti jangan diubah) berikut hal yang belum diverifikasi.",
       "kata_kunci": [
         "kaizen",
         "ide perbaikan",
         "inovasi",
-        "continuous improvement",
+        "improvement idea",
         "komite kaizen",
-        "kuota bulanan",
+        "kuota ide",
         "papan kepatuhan",
-        "compliance",
         "KPI",
-        "form builder"
+        "form builder",
+        "periode bulanan"
       ]
     },
     {

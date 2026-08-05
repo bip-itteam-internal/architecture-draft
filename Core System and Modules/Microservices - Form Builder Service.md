@@ -269,6 +269,15 @@ Komite = anggota yang terdaftar di `settings.kaizen.committee_employee_ids` **at
 
 Aturannya menyalin `SpaceType.Fields` di [[Microservices - Task Management Service]] yang juga membedakan "tidak dikirim" dari "dikosongkan". **Konsekuensi yang disengaja: tipe kaizen tak bisa diubah ke tipe lain lewat `PATCH`.** Itu bukan alur kerja nyata — satu perusahaan hanya punya satu program aktif, dan menghentikannya dilakukan dengan menutup form.
 
+> [!warning] Cacat 502 yang ditemukan saat verifikasi, sudah diperbaiki di dev DAN prod
+> **Setiap jalur galat rute kelola form memanik**, dan cacatnya sudah hidup jauh sebelum Kaizen ada. `GET /forms/<id-ngawur>`, `GET /forms/<id-yang-tak-ada>`, beserta `analytics`, `responses`, dan `export` semuanya membalas **502**.
+>
+> Sebabnya `loadManagedForm` mengembalikan `c.Status(...).JSON(...)` sebagai nilai galat. `c.JSON()` mengembalikan `nil` saat penulisan berhasil, jadi baris itu sebenarnya `return nil, nil`; penjaga `if errResp != nil` tak pernah menyala, eksekusi lanjut dengan form nil, lalu dereferensi pointer nil. Service tidak mati, koneksinya yang diputus, dan di belakang gateway itu terbaca 502.
+>
+> Diperbaiki PR [#1018](https://github.com/bip-itteam-internal/bip-erp/pull/1018) dengan mengganti tanda tangan jadi `(*Form, bool)`. **Terverifikasi di dev dan prod 2026-08-06**: id ngawur `400`, id sah tapi tak ada `404`, rute tak dikenal tetap `404`, jalur normal tetap `200`.
+>
+> **183 unit test tetap hijau selama cacat ini hidup**, karena semuanya fungsi murni dan tak satu pun melewati Fiber. Regresinya kini dikunci `handler_guard_test.go` memakai `app.Test`, tanpa database sama sekali. Pelajaran lintas-service ini dicatat di ingatan tim.
+
 ### Belum diverifikasi dan cacat yang diketahui
 
 Tiga jalur yang tak bisa dijamin unit test dan baru terbukti setelah dijalankan: agregasi hitungan ide per orang, potret peserta yang memanggil employee-service dari cron, dan penjaga balapan yang bersandar pada `MatchedCount` dari driver Mongo.

@@ -4,12 +4,17 @@
 
 *Program pengumpulan ide perbaikan bulanan. Karyawan pada sasaran tertentu wajib mengirim sejumlah ide tiap bulan, jumlahnya diatur HR (satu angka bawaan untuk semua, boleh ditimpa per departemen). Ide masuk ke antrean komite Kaizen terpusat yang memutuskan diterima atau ditolak, lalu menandai mana yang benar-benar diterapkan. Ide yang disetujui tampil di papan yang bisa dibaca seluruh karyawan.*
 
-- **Status**: ⚠️ **Backend tahap 1 sampai 3 MERGED ke `main`** lewat PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016) (2026-08-06, merge commit `b59c64c4`). Dev naik otomatis dari `main` lewat Harness, **belum diverifikasi**; prod tidak auto-deploy. Yang sudah dibuktikan sejauh ini cuma `go build`, `go vet`, dan 183 unit test hijau — **tak satu pun jalur pernah dijalankan dengan Mongo hidup**. **FE belum ada sama sekali**, jadi belum ada layar untuk komite maupun pengaju. Tahap 4 sampai 7 belum dikerjakan.
+- **Status**: ⚠️ **Backend tahap 1 sampai 3 LIVE di dev DAN prod** sejak 2026-08-06 (PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016), ditambah perbaikan [#1018](https://github.com/bip-itteam-internal/bip-erp/pull/1018)). Prod di-deploy manual (`docker compose up -d --build form-builder-service --no-deps`) dan diverifikasi lewat probe perilaku dari dalam jaringan container. **FE belum ada sama sekali**, jadi belum ada layar untuk komite maupun pengaju, dan **belum satu pun form kaizen dibuat di lingkungan mana pun**. Tahap 4 sampai 7 belum dikerjakan.
+- **Yang sudah diuji sungguhan** baru jalur galat handler (id ngawur `400`, id tak ada `404`). Alur inti — membuat form kaizen, potret peserta oleh cron, kirim ide, keputusan komite, papan kepatuhan — **belum pernah dijalankan end-to-end di mana pun**.
 - **Rumah kode yang dipilih**: [[Microservices - Form Builder Service]], sebagai **tipe form kelima** (`form_type: "kaizen"`). Bukan service baru, bukan space di [[Microservices - Task Management Service]].
 - Rancangan lengkap: `docs/superpowers/specs/2026-08-06-kaizen-pengumpulan-ide-design.md`; rencana per tahap: `docs/superpowers/plans/2026-08-06-kaizen-pengumpulan-ide.md`. Keduanya di root workspace, bukan di vault.
 
-> [!warning] Merge ini tidak menyalakan program Kaizen bagi siapa pun
-> Seluruh perilaku baru digerbang `form_type: "kaizen"`, dan belum ada satu pun form kaizen di database mana pun. Yang benar-benar berubah bagi form yang sudah berjalan adalah pekerjaan **tahap 1** (snapshot periode jadi penopang beban), dan itu justru memperbaiki cacat yang selama ini hidup. Karena itu pula yang paling perlu diperhatikan setelah deploy dev bukan Kaizen, melainkan form berulang yang sudah ada: pastikan pengisian dan analisanya tidak berubah artinya.
+> [!warning] Deploy ini tidak menyalakan program Kaizen bagi siapa pun
+> Seluruh perilaku baru digerbang `form_type: "kaizen"`, dan belum ada satu pun form kaizen di database mana pun. Yang berpotensi menyentuh form berjalan hanyalah pekerjaan **tahap 1** (snapshot periode jadi penopang beban).
+>
+> **Diperiksa langsung ke database prod sebelum deploy 2026-08-06**: 4 form, **0 berulang**, **0 published**, 142 jawaban, 0 dokumen periode. Jadi tahap 1 pun inert di prod, karena tak ada satu pun form berulang yang perilakunya bisa berubah. Yang benar-benar berubah bagi pemakai prod hanyalah perbaikan 502 dari [#1018](https://github.com/bip-itteam-internal/bip-erp/pull/1018).
+>
+> Di lingkungan yang PUNYA form berulang, yang paling perlu diperhatikan setelah deploy bukan Kaizen melainkan form berulang yang sudah ada: pastikan pengisian dan analisanya tidak berubah artinya.
 
 ## Apa yang Sudah Ada di Kode
 
