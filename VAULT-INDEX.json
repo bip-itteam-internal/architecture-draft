@@ -2137,22 +2137,20 @@
         "IT - Background Jobs & Schedulers",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "e3577a469b75877239e17989353d781a9f3a88a607d68545f513def78e16725d",
-      "ukuran_kb": 20.7,
-      "ringkasan": "Menjawab: bagaimana arsitektur microservice warehouse (WMS Tinggarjaya) bekerja secara internal — stack (Go/Fiber/MongoDB `warehouse_db`/Redis), port, env kunci, dan struktur package flat. Dokumen ini menjelaskan mekanisme sinkronisasi order: event ingestion idempoten, reconciler 60 detik (cursor terpisah per status TO_SHIP/SHIPPED/COMPLETED/RETURNED, pagination, fix deadlock), dan open-order sweep 5 menit sebagai jaring pengaman self-healing berbasis kondisi WMS (bukan watermark). Menjawab juga soal operasi WMS (approve/pick/pack/RTS/label/handover), state machine `status_wms`, model data, keputusan teknis, dan alur \"Perlu Diproses\"/arrange untuk terbitkan resi.",
+      "hash": "db9d046c66cb4240c35d5bf51c5dd3bf309ccee7a33e360cafb317784ea8fcae",
+      "ukuran_kb": 21.8,
+      "ringkasan": "Menjawab: bagaimana warehouse-service menjalankan operasi WMS gudang Tinggarjaya — ingest event order, state machine fulfillment, antrian dan filternya, cetak resi tunggal maupun gabungan, RTS, serah-terima kurir, sampai riwayat cetak resi. Juga menjawab siapa boleh memanggil rute mana lewat role guard system_roles[\"warehouse\"], termasuk kenapa role mitra gudang Sadewa harus disebut eksplisit per-rute dan tidak mewarisi izin admin_gudang.",
       "kata_kunci": [
-        "warehouse-service",
-        "WMS Tinggarjaya",
-        "reconciler",
-        "open-order sweep",
-        "state machine status_wms",
-        "event ingestion",
-        "cursor sync",
-        "pick pack RTS",
+        "warehouse service",
+        "WMS",
         "fulfillment",
-        "MongoDB Redis",
-        "arrange resi",
-        "package_id backfill"
+        "antrian",
+        "cetak resi",
+        "RTS",
+        "handover",
+        "role guard",
+        "admin_gudang_sadewa",
+        "Tinggarjaya"
       ]
     },
     {
@@ -6746,9 +6744,9 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "APP - Web ERP"
       ],
-      "hash": "608c779c3b6bc061879bc3356bbe72e5262ebdb417904ce98aa13084be0c6abf",
-      "ukuran_kb": 12.8,
-      "ringkasan": "Menjawab: bagaimana menerbitkan akun ERP untuk vendor, mitra, atau kontraktor tanpa menjadikannya karyawan, lalu memberinya akses ke modul tertentu. Menjelaskan cara memilih antara dua sumbu hak akses yang paling sering tertukar (Paket Hak vs Role Modul), cara memperpanjang dan menutup akses, serta gejala umum saat vendor sudah dibuat tapi tetap tak bisa masuk.",
+      "hash": "0115ceffe21b522769faac6e9286fe16c1737ff46d15d0f58ff2e9333c9cd7f0",
+      "ukuran_kb": 14.0,
+      "ringkasan": "Menjawab: bagaimana menerbitkan akun ERP untuk vendor, mitra, atau kontraktor tanpa menjadikannya karyawan, lalu memberinya akses ke modul tertentu. Menjelaskan cara memilih antara dua sumbu hak akses yang paling sering tertukar (Paket Hak vs Role Modul), cara memperpanjang dan menutup akses beserta batasnya, serta gejala umum saat vendor sudah dibuat tapi tetap tak bisa masuk.",
       "kata_kunci": [
         "akun eksternal",
         "external account",

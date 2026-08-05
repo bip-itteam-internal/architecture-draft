@@ -74,6 +74,8 @@ Tidak ada "lupa kata sandi" mandiri untuk akun luar, dan memang tak seharusnya a
 
 Tombol **"Nonaktifkan"** → `is_active: false`. **Bukan menghapus** — jejak siapa pernah punya akses harus tetap ada.
 
+⚠️ **Satu arah dari layar ini**: tak ada tombol untuk menyalakannya kembali (lihat §Verifikasi). Kalau yang dimaksud cuma menjeda sementara, pakai **Perpanjang / Ubah** untuk memundurkan masa berlakunya. Dan ingat token yang sudah beredar tetap hidup sampai 72 jam — ini menutup pintu masuk berikutnya, bukan sesi yang sedang berjalan.
+
 ## Memilih Sumbu Hak Akses (Paket Hak vs Role Modul)
 
 **Ini bagian yang paling sering salah.** Tiap modul menggerbang pada **salah satu** sumbu, dan mencentang di sumbu yang salah **tidak menghasilkan galat apa pun** — cuma vendor yang tetap tak bisa masuk, dan pemasangnya menyangka sudah memberi akses.
@@ -109,9 +111,11 @@ Akun `EXT-0001-08-26` (Laili Faidatun Nisa, CV Sadewa) dengan keperluan "Akses s
 
 | Status | Artinya | Pemulihan |
 |---|---|---|
-| **Nonaktif** | `is_active: false` | terbitkan ulang akun / aktifkan kembali |
-| **Kedaluwarsa** | `valid_until` sudah lewat, **atau kosong** | Perpanjang / Ubah |
+| **Nonaktif** | `is_active: false` | ⚠️ **tak ada tombolnya di tab ini** — lihat catatan di bawah |
+| **Kedaluwarsa** | `valid_until` sudah lewat, **atau kosong** | tombol **Perpanjang / Ubah** |
 | **Aktif** | boleh login | — |
+
+> ⚠️ **Menonaktifkan akun luar adalah pintu satu arah dari layar ini.** Tab Akun Eksternal hanya punya enam aksi — buat, ubah/perpanjang, pasang paket hak, setel role modul, terbitkan ulang kata sandi, nonaktifkan — dan **tak satu pun menyalakan kembali `is_active`**. `PUT` hanya menyentuh data pendamping, dan tombol Terbitkan Ulang Kata Sandi sengaja tidak menyentuh `is_active`. Menghidupkan kembali harus lewat `PATCH /account/active-status` (gate `RequireITStaff`) yang **tidak ada di layar ini**. Jadi perlakukan Nonaktifkan sebagai keputusan final; untuk akun yang cuma perlu dijeda, **mundurkan masa berlakunya** lewat Perpanjang / Ubah — itu menutup akses lewat jalur yang punya tombol pemulihan. (Mengosongkan tanggalnya tidak bisa: `PUT` mengabaikan `valid_until` kosong, jadi nilai lama bertahan. Pemeriksaan "harus di masa depan" hanya ada saat **membuat**, tidak saat mengubah.)
 
 Kolom **"Hak Akses"** (kolomnya sekaligus tombol pembuka dialog) menampilkan paket yang terpasang.
 
