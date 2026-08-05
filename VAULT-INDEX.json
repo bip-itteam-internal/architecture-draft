@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-05",
-  "jumlah_dokumen": 264,
+  "jumlah_dokumen": 265,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -79,15 +79,18 @@
       "tautan": [
         "Microservices - Employee Service",
         "API - Index",
+        "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
         "RUN - Onboarding Akun Eksternal (Vendor & Mitra)",
         "HRIS - Training Program",
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
-        "HRIS - Payroll"
+        "Microservices - File Service",
+        "HRIS - Payroll",
+        "HRIS - Personalia"
       ],
-      "hash": "c94f802974b047f2af92e6ff5fbbc2dc064e31daa7ee8199c187384b33cfe162",
-      "ukuran_kb": 14.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service dan siapa yang boleh memanggilnya — dari login/refresh token, master data departemen & system role, sampai pengelolaan akun pihak luar (vendor/mitra) beserta pemasangan paket hak, role modul, dan penerbitan ulang kata sandinya. Juga menjawab gate RBAC tiap rute dan mana yang sengaja dibuat lebih ketat daripada master data lain.",
+      "hash": "153948e8795a1913e70ffaf7ee2573d389a7f677f77c69b109983590cfe666cd",
+      "ukuran_kb": 17.2,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service dan siapa yang boleh memanggilnya — dari login/refresh token, master data departemen & system role, akun pihak luar (vendor/mitra), sampai catatan resign / non-aktif karyawan beserta unggah dokumen pendukungnya. Juga menjawab gate RBAC tiap rute, mana yang sengaja dibuat lebih ketat daripada master data lain, dan aturan detail seperti kategori resign yang divalidasi persis huruf besar-kecilnya, batas 4 MB lampiran, serta kapan alasan pembatalan diwajibkan.",
       "kata_kunci": [
         "employee service",
         "endpoint",
@@ -98,7 +101,9 @@
         "external account",
         "permission set",
         "system roles",
-        "RBAC"
+        "RBAC",
+        "resign",
+        "non-aktif karyawan"
       ]
     },
     {
@@ -1004,6 +1009,10 @@
         "HRIS - Organization Structure",
         "Microservices - Manufacture Service",
         "Microservices - Recruitment Service",
+        "Microservices - Employee Service",
+        "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
+        "HRIS - Personalia",
+        "CORE - HRIS Orchestrator",
         "HRIS - Pengembangan Organisasi (Community of Interest)",
         "Microservices - Payroll Service",
         "Microservices - Attendance Service",
@@ -1020,9 +1029,7 @@
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "Microservices - Procurement Service",
         "API - Procurement Service",
-        "CORE - HRIS Orchestrator",
         "CORE - API Master Gateway",
-        "Microservices - Employee Service",
         "Microservices - Notification Service",
         "Microservices - Inventory Service",
         "CORE - IT Orchestrator",
@@ -1031,9 +1038,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "810fb67f4d6c1f74605510175b78997fd34bbbfe212783bc5c6729aa0d5cd74b",
-      "ukuran_kb": 85.5,
-      "ringkasan": "Menjawab: apa itu portal web internal `hris-dashboard` (\"One Bharata\"), stack dan repo mana yang dipakai, bagaimana login `employee_id` plus refresh token bekerja, dan bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain. Juga menjawab bagaimana role gating dari `system_roles` menentukan menu, bagaimana sidebar dikelompokkan lewat menu induk bersarang serta disembunyikan per jabatan (`menu_hidden`), dan bagaimana dukungan multi-perusahaan diterapkan (company switcher, buat karyawan, departemen, shift/rotasi, network WiFi, artikel lintas-perusahaan). Termasuk alat Atasan Langsung dan menu KPI untuk Leader.",
+      "hash": "1b7a634f817b5d4a65ea1cfe043e7d21c44f72387980a83a1afc5821cb6a7edf",
+      "ukuran_kb": 87.6,
+      "ringkasan": "Menjawab: apa itu portal web internal `hris-dashboard` (\"One Bharata\"), stack dan repo mana yang dipakai, bagaimana login `employee_id` plus refresh token bekerja, dan bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain. Juga menjawab bagaimana role gating dari `system_roles` menentukan menu, bagaimana sidebar dikelompokkan lewat menu induk bersarang serta disembunyikan per jabatan (`menu_hidden`), dan bagaimana dukungan multi-perusahaan diterapkan (company switcher, buat karyawan, departemen, shift/rotasi, network WiFi, artikel lintas-perusahaan). Termasuk alat Atasan Langsung, menu KPI untuk Leader, dan halaman Resign / Non-Aktif Karyawan di grup Personalia.",
       "kata_kunci": [
         "erp-frontend",
         "hris-dashboard",
@@ -1044,7 +1051,8 @@
         "sidebar menu",
         "multi-perusahaan",
         "company switcher",
-        "atasan langsung"
+        "atasan langsung",
+        "halaman resign"
       ]
     },
     {
@@ -1494,10 +1502,11 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · ⚠️ **akun pihak luar (vendor/mitra)**: fondasi data, gerbang masa berlaku, pemberian hak (2 sumbu), dan UI **lengkap & live**; sisa catatan: PR #972 (`/me` akun luar) belum ikut ter-deploy (lihat grup Akun pihak luar)",
+      "status_teks": "Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · ⚠️ **akun pihak luar (vendor/mitra)**: fondasi data, gerbang masa berlaku, pemberian hak (2 sumbu), dan UI **lengkap & live**; sisa catatan: PR #972 (`/me` akun luar) belum ikut ter-deploy (lihat grup Akun pihak luar) · ⚠️ **resign / non-aktif karyawan**: kode lengkap di branch `feat/employee`, **belum merge & belum deploy** ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]])",
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
         "CORE - IT Orchestrator",
         "CORE - RBAC dan Permission Set",
         "QA - Register Perizinan & Sertifikasi",
@@ -1512,6 +1521,10 @@
         "HRIS - Organization Structure",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "HRIS - Career & Promotion",
+        "HRIS - Personalia",
+        "HRIS - Attrition",
+        "Microservices - File Service",
+        "APP - Web ERP",
         "RUN - Onboarding Akun Eksternal (Vendor & Mitra)",
         "CORE - SSO Flow",
         "ADR - 0006 Swap Jadwal Same-Department",
@@ -1519,15 +1532,14 @@
         "DB - Overview and Notes",
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
-        "Microservices - File Service",
         "CORE - API Master Gateway",
         "APP - MyBharata",
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "0aebbc2416b0517acad743f88f54f366a8889d746f9d55f89eb6cbb846385362",
-      "ukuran_kb": 33.0,
-      "ringkasan": "Menjawab: apa saja yang ditangani employee-service — kredensial & login, onboarding karyawan, master data departemen/system role/permission set, workspace Legal & R&D Regulatory, KPI, sampai akun pihak luar (vendor/mitra). Juga menjawab keputusan desainnya: kenapa akun vendor menumpang system_authentication dan tidak dijadikan record karyawan, serta bagaimana masa berlaku dan hak aksesnya ditegakkan.",
+      "hash": "c59ea7935525b7c263239b2b2a8d3310ca59b3dd6442221ef0e3ea8ecde981fd",
+      "ukuran_kb": 38.2,
+      "ringkasan": "Menjawab: apa saja yang ditangani employee-service — kredensial & login, onboarding karyawan, master data departemen/system role/permission set, workspace Legal & R&D Regulatory, KPI, akun pihak luar (vendor/mitra), sampai catatan resign yang sekaligus menonaktifkan akun karyawan. Juga menjawab keputusan desainnya: kenapa akun vendor menumpang system_authentication dan tidak dijadikan record karyawan, kenapa catatan resign jadi koleksi sendiri alih-alih field status di work_data, dan kenapa `is_active` hanya ditulis lewat satu fungsi yang dipakai bersama jalur IT dan jalur HR. Memuat pula jebakan konkret seperti tanggal efektif kosong yang lolos validasi bila dinormalkan lebih dulu, dan cron 00:10 WIB yang menerapkan resign terjadwal.",
       "kata_kunci": [
         "employee service",
         "kredensial",
@@ -1538,7 +1550,11 @@
         "vendor",
         "permission set",
         "system roles",
-        "KPI"
+        "KPI",
+        "resign",
+        "employee_resign",
+        "is_active",
+        "cron resign"
       ]
     },
     {
@@ -3232,6 +3248,45 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign.md",
+      "judul": "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "Diputuskan 2026-08-05, **kode selesai tapi belum merge & belum deploy** — branch `feat/employee` di bip-erp dan `feat/hris-resign` di erp-frontend. Belum ada PR, belum masuk dev maupun produksi.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Employee Service",
+        "CORE - IT Orchestrator",
+        "APP - Web ERP",
+        "IT - Employee System",
+        "HRIS - Analysis",
+        "HRIS - Attrition",
+        "HRIS - Personalia",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "CORE - SSO Flow",
+        "API - Employee Service",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "Microservices - File Service",
+        "HRIS - Adaptasi ERPGo HRM"
+      ],
+      "hash": "fabb426a7b1e0b4de6a4828d85b6eeab6c72a9d32f41fce2085d1867e9b471d2",
+      "ukuran_kb": 7.5,
+      "ringkasan": "Menjawab: kenapa HR boleh menonaktifkan akun karyawan sendiri padahal itu selama ini kewenangan tim IT, dan bagaimana kewenangan itu dibatasi supaya tidak jadi saklar bebas. Juga menjawab kenapa catatan resign disimpan sebagai koleksi sendiri dan bukan field status di work_data, kenapa status catatan disimpan alih-alih diturunkan dari tanggal, dan kenapa pembatalan resign tidak boleh menghidupkan kembali akun yang dimatikan IT. Memuat konsekuensi yang diterima (HR bisa menonaktifkan siapa pun di perusahaannya, tanpa maker-checker, jejak audit hanya sebagian, sesi bertahan sampai 72 jam) dan yang belum dikerjakan (karyawan non-aktif lenyap dari laporan absensi dan basis payroll bulan berjalan, exit clearance, revoke device).",
+      "kata_kunci": [
+        "resign",
+        "non-aktif karyawan",
+        "penonaktifan akun",
+        "deactivate account",
+        "is_active",
+        "off-boarding",
+        "terminasi",
+        "PHK",
+        "wewenang HR vs IT",
+        "ADR 0035"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -3969,6 +4024,7 @@
         "HRIS - Payroll",
         "HRIS - Leave Request",
         "HRIS - Career & Promotion",
+        "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
         "HRIS - Retention",
         "HRIS - Roadmap",
         "HRIS - Big Pictures",
@@ -3980,9 +4036,9 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0013 HRD Documents"
       ],
-      "hash": "3a001793c888b17f6af4c3a8c0acf25e137c8b5c61109323e9795e1cce603988",
-      "ukuran_kb": 21.4,
-      "ringkasan": "Menjawab: fitur HRM ERPGo mana yang sudah benar-benar jalan di kode bip-erp, mana yang baru sebagian atau baru dokumen konsep, mana yang kandidat baru, dan mana yang sebaiknya dibuang, sebagai satu rujukan keputusan Product Owner. Juga menjawab apa kapabilitas riil lima service HR (employee, attendance, payroll, hrd-document, notification) hasil bedah route, handler, dan model, termasuk gap konkret seperti BPJS sisi perusahaan, multiplier lembur, PDF slip gaji, dan enforcement ack dokumen. Berisi pula kandidat perluasan (Announcements, Awards, Events, Kasbon) beserta prioritas dan daftar diskrepansi dok vault vs kode.",
+      "hash": "cf9c061e0b6a9774f5bd52c0b7aab3bb35fe61c06ef3347bd83776e15cede706",
+      "ukuran_kb": 21.7,
+      "ringkasan": "Menjawab: fitur HRM ERPGo mana yang sudah benar-benar jalan di kode bip-erp, mana yang baru sebagian atau baru dokumen konsep, mana yang kandidat baru, dan mana yang sebaiknya dibuang, sebagai satu rujukan keputusan Product Owner. Juga menjawab apa kapabilitas riil lima service HR (employee, attendance, payroll, hrd-document, notification) hasil bedah route, handler, dan model, termasuk gap konkret seperti BPJS sisi perusahaan, multiplier lembur, PDF slip gaji, dan enforcement ack dokumen. Berisi pula kandidat perluasan (Announcements, Awards, Events, Kasbon) beserta prioritas, daftar diskrepansi dok vault vs kode, dan status Employee Lifecycle di mana Resignations/Terminations sudah dikerjakan sedangkan Promotions/Transfers masih konsep.",
       "kata_kunci": [
         "ERPGo",
         "HRM",
@@ -3992,7 +4048,8 @@
         "bedah kode HR",
         "prioritas fitur",
         "diskrepansi dokumentasi",
-        "kandidat fitur baru"
+        "kandidat fitur baru",
+        "employee lifecycle"
       ]
     },
     {
@@ -4036,6 +4093,7 @@
       "status_teks": "Konsep / Draft — belum diimplementasi (contoh masih spreadsheet).",
       "publik": true,
       "tautan": [
+        "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
         "HRIS - Big Pictures",
         "HRIS - Recruitment",
         "HRIS - Retention",
@@ -4046,9 +4104,9 @@
         "HRIS - Personalia",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "44aba16669f4263a008d5b11f19367edba8b58fff4476fc95f27953568dfca73",
-      "ukuran_kb": 2.2,
-      "ringkasan": "Menjawab pertanyaan tentang rencana dashboard analitik HR untuk mengelola karyawan dari rekrutmen hingga off-boarding -- mencakup subsistem talent acquisition, interview, onboarding, retention, work review, conflict management, dan off-boarding (pengembalian aset, clearance, penonaktifan akun).",
+      "hash": "66bd01e5cedbc9c7701662b33264b2f1a21b84ffbb0d3f3bc617552dba19dc14",
+      "ukuran_kb": 2.7,
+      "ringkasan": "Menjawab pertanyaan tentang rencana dashboard analitik HR untuk mengelola karyawan dari rekrutmen hingga off-boarding — mencakup subsistem talent acquisition, interview, onboarding, retention, work review, conflict management, dan off-boarding. Juga menjawab kebutuhan data apa yang masih kurang untuk membangunnya, dan mencatat bahwa penonaktifan akun saat off-boarding tidak lagi diteruskan sebagai permintaan ke departemen IT melainkan dikerjakan HR sendiri lewat catatan resign.",
       "kata_kunci": [
         "HR analytics",
         "dashboard HR",
@@ -4058,7 +4116,8 @@
         "retention",
         "work review",
         "attrition",
-        "HRIS"
+        "HRIS",
+        "penonaktifan akun"
       ]
     },
     {
@@ -4129,15 +4188,17 @@
       "status_teks": "Konsep / Draft — belum diimplementasi (contoh masih spreadsheet).",
       "publik": true,
       "tautan": [
+        "Microservices - Employee Service",
+        "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
         "HRIS - Retention",
         "HRIS - Personalia",
         "HRIS - Analysis",
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "1961e0488c3125b91e6b1070427dd72dea0dd287786d89a6913fe80b53f49d1c",
-      "ukuran_kb": 1.0,
-      "ringkasan": "Menjawab pertanyaan tentang rencana dashboard attrition (karyawan masuk & keluar) per departemen, termasuk detail demografi (gender, tipe, alasan terminasi) untuk kebutuhan pelaporan ke stakeholder.",
+      "hash": "1aaf3c2f1e150d6731eb36c1191dd978e29e593c4efc08776801d6187d1b971a",
+      "ukuran_kb": 2.1,
+      "ringkasan": "Menjawab pertanyaan tentang rencana dashboard attrition (karyawan masuk & keluar) per departemen, termasuk detail demografi (gender, tipe, alasan terminasi) untuk kebutuhan pelaporan ke stakeholder. Juga menjawab prasyarat datanya: catatan terminasi kini tersedia lewat koleksi `employee_resign` yang menyimpan kategori dan alasan per karyawan, dan tanggal keluar yang dipercaya adalah `effective_date`, bukan `applied_at`.",
       "kata_kunci": [
         "attrition",
         "turnover",
@@ -4145,7 +4206,10 @@
         "terminasi",
         "demografi karyawan",
         "dashboard HR",
-        "retention"
+        "retention",
+        "catatan terminasi",
+        "alasan terminasi",
+        "employee_resign"
       ]
     },
     {
@@ -4889,8 +4953,8 @@
       "judul": "HRIS - Personalia",
       "area": "Human Resource Information System",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "Draft / Direncanakan",
+      "status_emoji": "⚠️",
+      "status_teks": "Sebagian diimplementasikan — **pencatatan resign & penonaktifan akun** sudah ada di kode (⚠️ branch `feat/employee`/`feat/hris-resign`, belum merge & belum deploy); sisa off-boarding (exit clearance) masih 🟡 konsep",
       "publik": true,
       "tautan": [
         "HRIS - Analysis",
@@ -4898,12 +4962,16 @@
         "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)",
         "GA - Inventory Management",
         "HRIS - Attrition",
+        "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
+        "IT - Employee System",
+        "API - Employee Service",
+        "APP - Web ERP",
         "Microservices - Notification Service",
         "HRIS - Big Pictures"
       ],
-      "hash": "94ebd5b1cc542387bf51b57eca95f03ffa0d1774dcec78b1ad7711b46d216c84",
-      "ukuran_kb": 1.7,
-      "ringkasan": "Menjawab: data administratif kepegawaian apa saja yang dikelola (data personal, kontrak PKWT, BPJS, riwayat masa kerja), bagaimana urutan proses off-boarding/exit clearance saat karyawan keluar (feedback, inventaris, NDA, paklaring), dan notifikasi apa yang berjalan menjelang kontrak habis.",
+      "hash": "612c5d50a2d339b049e6d36a8cf8a6217d1be0a28da8acb274165b6d8529e70a",
+      "ukuran_kb": 3.7,
+      "ringkasan": "Menjawab: data administratif kepegawaian apa saja yang dikelola (data personal, kontrak PKWT, BPJS, riwayat masa kerja), bagaimana urutan proses off-boarding/exit clearance saat karyawan keluar (feedback, inventaris, NDA, paklaring), dan notifikasi apa yang berjalan menjelang kontrak habis. Juga menjawab bagaimana catatan resign / non-aktif bekerja: lima kategori yang tersedia, arti tanggal efektif sebagai hari pertama karyawan non-aktif, kapan penonaktifan berlaku seketika versus dijadwalkan, serta aturan memperbaiki dan membatalkan catatan.",
       "kata_kunci": [
         "personalia",
         "administrasi kepegawaian",
@@ -4912,7 +4980,11 @@
         "off-boarding",
         "exit clearance",
         "paklaring",
-        "notifikasi kontrak habis"
+        "notifikasi kontrak habis",
+        "resign",
+        "non-aktif karyawan",
+        "PHK",
+        "pensiun"
       ]
     },
     {
@@ -5438,11 +5510,13 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented — operasi admin IT (akun aktif/nonaktif, reset, device, roles) via [[CORE - IT Orchestrator]] (guard RequireITStaff).",
+      "status_teks": "Implemented — operasi admin IT (akun aktif/nonaktif, reset, device, roles) via [[CORE - IT Orchestrator]] (guard RequireITStaff). ⚠️ **Penonaktifan akun bukan lagi eksklusif IT**: HR punya jalur kedua lewat catatan resign ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]; ada di kode, belum merge & belum deploy).",
       "publik": false,
       "tautan": [
         "CORE - IT Orchestrator",
         "APP - Web ERP",
+        "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
+        "HRIS - Personalia",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
         "APP - Dynamic Task Tracker",
@@ -5452,9 +5526,9 @@
         "CORE - API Master Gateway",
         "IT - Big Pictures"
       ],
-      "hash": "c4edbeb875f6bc36bb5ec1cd7e1c4d643636e6dc6480023cf2877553b6875b9e",
-      "ukuran_kb": 3.2,
-      "ringkasan": "Menjawab: operasi admin apa saja yang bisa dilakukan tim IT terhadap akun karyawan (aktifkan/nonaktifkan, reset password, reset device tertaut), bagaimana cara melihat/mengatur system_roles (akses per modul), dan bagaimana IT mengelola WiFi allow-list serta IT Helpdesk.",
+      "hash": "02e98aa1a776d8dbb2f29f32e721d8874efbc8581f51321dfa0e3d5905a4d639",
+      "ukuran_kb": 4.3,
+      "ringkasan": "Menjawab: operasi admin apa saja yang bisa dilakukan tim IT terhadap akun karyawan (aktifkan/nonaktifkan, reset password, reset device tertaut), bagaimana cara melihat/mengatur system_roles (akses per modul), dan bagaimana IT mengelola WiFi allow-list serta IT Helpdesk. Juga menjawab batas kewenangannya sekarang: penonaktifan akun bukan lagi eksklusif IT karena HR punya jalur kedua lewat catatan resign, keduanya menulis lewat fungsi yang sama, dan akun yang dinonaktifkan IT tidak ikut hidup kembali bila HR membatalkan catatan resign atas orang yang sama.",
       "kata_kunci": [
         "IT admin",
         "reset akun",
@@ -5465,7 +5539,8 @@
         "RBAC",
         "WiFi allowlist",
         "IT Orchestrator",
-        "aktivasi nonaktivasi akun"
+        "aktivasi nonaktivasi akun",
+        "resign"
       ]
     },
     {

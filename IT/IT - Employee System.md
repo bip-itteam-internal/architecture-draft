@@ -2,12 +2,14 @@
 
 *Ringkasan hal-hal yang dapat dilakukan **tim IT** di dalam ERP. Sebagian besar operasi admin IT berjalan lewat [[CORE - IT Orchestrator]] (semua route ber-guard `RequireITStaff`) dan diakses dari modul **IT** pada [[APP - Web ERP]].*
 
-- **Status**: ✅ Implemented — operasi admin IT (akun aktif/nonaktif, reset, device, roles) via [[CORE - IT Orchestrator]] (guard RequireITStaff).
+- **Status**: ✅ Implemented — operasi admin IT (akun aktif/nonaktif, reset, device, roles) via [[CORE - IT Orchestrator]] (guard RequireITStaff). ⚠️ **Penonaktifan akun bukan lagi eksklusif IT**: HR punya jalur kedua lewat catatan resign ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]; ada di kode, belum merge & belum deploy).
 
 ## Yang Bisa Dilakukan Tim IT
 
 ### Manajemen Akun Karyawan
 - **Aktifkan / nonaktifkan akun** karyawan (`is_active`) — menonaktifkan akun menghilangkan kemampuan karyawan login ke sistem perusahaan. (`/account/activate|deactivate|status|toggle`)
+	- ⚠️ **Bukan satu-satunya jalur lagi.** HR menonaktifkan akun sendiri lewat catatan resign di [[HRIS - Personalia]], karena berhentinya karyawan adalah peristiwa HR dan meneruskannya sebagai permintaan ke IT membuat akses tetap hidup selama jeda itu. Keduanya menulis lewat fungsi yang **sama** (`terapkanStatusAkun` di [[Microservices - Employee Service]]), jadi perilakunya tak bisa menyimpang diam-diam. Gerbang jalur IT ini **tidak** dilonggarkan, dan HR tidak mendapat saklar telanjang — satu-satunya cara HR menonaktifkan akun adalah lewat catatan yang wajib memuat kategori, tanggal, dan alasan. Rinciannya: [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]].
+	- Sebaliknya berlaku juga: akun yang **IT** nonaktifkan tak akan ikut hidup kembali bila HR membatalkan catatan resign atas orang yang sama, karena pembatalan hanya menghidupkan akun yang dimatikan catatan itu sendiri.
 - **Reset akun** karyawan — reset password ke `employee_id`, **clear PIN & device** (1-akun-1-device), role dipertahankan; sistem mengirim notif WhatsApp (akun di-reset) sehingga karyawan melakukan onboarding ulang. (`/reset-password`)
 - **Reset perangkat tertaut** — saat reset akun, **seluruh registered device karyawan dibersihkan** (kebijakan 1-akun-1-device). Dengan ini karyawan bisa login di **perangkat berbeda** meskipun akunnya sebelumnya masih tertaut ke device lama (mis. ganti HP). Sistem melaporkan jumlah device yang dibersihkan (`devices_cleared`). Selain lewat reset akun, ada **endpoint khusus `/account/forget-device`** (Employee Service) yang me-revoke semua device & browser **tanpa** reset password — pas untuk ganti HP tanpa mengganggu kredensial; lihat [[Microservices - Employee Service]].
 

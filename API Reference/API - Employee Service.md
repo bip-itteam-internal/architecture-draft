@@ -28,7 +28,7 @@
 |---|---|---|
 | POST/GET/PUT/DELETE | `/.../system-auth` | Kredensial/role akun |
 | PUT/GET | `/internal/auth/change-password/:username` · `/roles/:username` · `/disable/:employee_id` · `/user/:username` · `/employee/:employee_id` | Internal auth mgmt |
-| PATCH/GET | `/account/active-status` · `/forget-device` · `/reset` · `/roles` | Kelola akun (RequireITStaff) |
+| PATCH/GET | `/account/active-status` · `/forget-device` · `/reset` · `/roles` | Kelola akun (RequireITStaff). `active-status` menulis lewat `terapkanStatusAkun`, **satu-satunya** tempat `is_active` ditulis, dipakai berdua dengan jalur resign milik HR ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]). Kontraknya tak berubah: 404 akun tak ada, 400 bila status sudah sama |
 | GET/POST/DELETE | `/device` · `/web-browser` | Perangkat & sesi browser |
 
 ## Master Data (departemen & system role)
@@ -88,6 +88,18 @@
 | GET | `/internal/aggregate/employee/:id` · `/v2/internal/aggregate/employees[/summary|/it]` · `/internal/export/all` | Aggregate & export | HRIS / IT |
 | POST/PUT | `/internal/transaction/create-employee` · `/update-employee/:id` | Bulk create/update employee | HRIS |
 
+## Resign / Non-Aktif Karyawan — ⚠️ branch `feat/employee`, belum merge & belum deploy
+Seluruhnya `RequireHRISStaff` + isolasi tenant `EffectiveCompanyID`. Keputusan & konsekuensinya: [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]].
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/resign` | Daftar berpaginasi. Filter `category`·`status`(`scheduled`/`applied`/`cancelled`)·`department`·`search` (nama atau employee_id). Balasan `{data, pagination}` sama bentuk dengan `/contract`; tiap baris ditempeli `full_name`·`department`·`position` **saat baca** dari `personal_data`/`work_data`, sengaja tak disimpan di dokumen resign supaya tak basi saat karyawan pindah departemen |
+| GET | `/resign/employee/:employee_id` | Riwayat resign satu karyawan, termasuk yang sudah dibatalkan |
+| POST | `/resign` | Buat catatan. Wajib `employee_id`·`category`·`effective_date`·`reason`. Kategori divalidasi ke enum tetap (Mengundurkan Diri · PHK · Pensiun · Kontrak Berakhir · Meninggal Dunia) **persis huruf besar-kecilnya**. Karyawan dari perusahaan lain ditolak 404. Satu karyawan tak boleh punya dua catatan berjalan; yang sudah `cancelled` tidak memblokir. `effective_date` dinormalkan ke tengah malam WIB; tanggal hari ini atau mundur **langsung diterapkan**, tanggal di depan jadi `scheduled` |
+| PATCH | `/resign/:id` | Koreksi `category`/`effective_date`/`reason`. **Hanya `scheduled`** (409 selainnya): mengubah tanggal catatan yang sudah berlaku tak menghidupkan kembali akunnya, jadi dokumen dan kenyataan akan berbeda. Koreksi yang memajukan tanggal ke hari ini atau mundur langsung diterapkan |
+| POST | `/resign/:id/cancel` | Batalkan. `scheduled` → hanya ubah status. `applied` → status diubah **dan** akun diaktifkan kembali, tapi **hanya bila catatan ini yang mematikannya** (`account_deactivated`) — akun yang sudah dinonaktifkan IT lebih dulu tidak ikut dihidupkan. `reason` wajib hanya saat pembatalan membuka kembali akses |
+| POST/GET | `/resign/:id/file` | Unggah / ambil dokumen pendukung. PDF, gambar (JPG/PNG), Word (DOC/DOCX); cap **4 MB** yang dipaku [[Microservices - File Service]]. Dinilai dari ekstensi **terakhir** (`surat.pdf.exe` ditolak). Unggah ulang mengganti berkas dan menghapus objek lama |
+
 ## Listing · View · Me
 | Method | Path | Fungsi |
 |---|---|---|
@@ -100,4 +112,4 @@
 > ~90 endpoint. Daftar lengkap path per `:doc_type`/method ada di `services/employee/main.go`.
 
 ## Dokumen Terkait
-- [[Microservices - Employee Service]] · [[HRIS - Payroll]] · [[HRIS - Key Performance Index]] · [[API - Index]]
+- [[Microservices - Employee Service]] · [[HRIS - Payroll]] · [[HRIS - Key Performance Index]] · [[HRIS - Personalia]] · [[API - Index]]
