@@ -38,8 +38,23 @@
 | POST/PUT/DELETE | `/master/departments[/:key]` | CRUD departemen (key, name, positions, roles, **supervised_by**, **supervision_label**). ⚠️ `PUT` memakai `ReplaceOne`; dua field terakhir **dipertahankan** bila tak disebut di body, supaya pemanggil yang hanya mengirim sebagian field tak memutus relasi supervisi. Kirim eksplisit (boleh string kosong) untuk melepasnya — itu yang dilakukan form `/hris/master-data` | `RequireHRISOrITSupervisor` (supervisor/admin HRIS **atau** IT) |
 | POST/PUT/DELETE | `/master/system-roles[/:key]` | CRUD definisi system role | `RequireITSupervisor` (supervisor/admin IT) |
 | PUT | `/master/departments/:key/positions/:positionKey/menu-hidden` | Url menu yang **disembunyikan** dari sidebar bagi pemegang jabatan itu. **Setelan tampilan, BUKAN hak akses**: hanya mengurangi yang sudah boleh dilihat, tak pernah menambah, dan rutenya tetap terbuka lewat URL. Menyentuh satu posisi saja. Daftar kosong = tak menyembunyikan apa pun (aksi sah). Entri tanpa `/` di awal dibuang karena tak akan pernah cocok dengan menu mana pun | `RequireHRISOrITSupervisor` — sengaja lebih longgar daripada `permission-sets` karena tak bisa menaikkan hak siapa pun |
+| GET | `/master/job-levels` | Tangga jenjang jabatan (`key`, `name`, `rank`), urut rank menaik. Lima baris berisi nama tingkat, tak memuat data siapa pun | open (di belakang gateway) |
+| PUT | `/master/departments/:key/positions/:positionKey/level` | Jenjang jabatan sebuah posisi (`{"level_key":"supervisor"}`). **Penanda organisasi, BUKAN hak akses.** String kosong = melepas jenjang (aksi sah). Key tak dikenal **ditolak 400** beserta daftar key yang sah — jenjang hantu tak akan pernah tampil dan pemasangnya menyangka sudah tersimpan. Menyentuh satu field pada satu posisi; `permission_sets` & `menu_hidden` tak tersentuh. Berlaku **seketika** (tak ikut token, beda dari `permission-sets`) | `RequireHRISOrITSupervisor` — sama dengan `menu-hidden`, karena tak menaikkan hak siapa pun |
 
 > Konsumen FE: halaman `/hris/master-data` (di-link dari **menu IT**) & System Setup Personalia; tombol kelola disembunyikan bila role tak berhak.
+
+## Akun pihak luar (vendor/mitra) — ⚠️ merged, tanpa role & tanpa UI
+> Fondasi data untuk orang di luar perusahaan yang butuh akun, tanpa dijadikan record karyawan. Seluruh grup digerbang `RequireITSupervisor` — sengaja **lebih ketat** dari master data lain, karena ini menerbitkan kredensial, bukan mengelola data HR. Detail & alasannya: [[Microservices - Employee Service]].
+
+| Method | Path | Fungsi | RBAC |
+|---|---|---|---|
+| GET | `/master/external-accounts` | Daftar akun luar milik perusahaan pembaca (`EffectiveCompanyID`) | `RequireITSupervisor` |
+| POST | `/master/external-accounts` | Terbitkan akun luar + baris kredensial di `system_authentication` (`account_type=external`). ID di-generate server berprefiks **`EXT-`**; `company_id` diisi dari perusahaan pembuat bila kosong. **Ditolak 400** bila `valid_until` sudah lewat (akun terbit dalam keadaan mati) atau `sponsor_employee_id` tak ada di `work_data` (penanggung jawab karangan = akun tanpa pemilik). Bila insert kredensial gagal, data pendamping di-rollback supaya tak tertinggal akun setengah jadi | `RequireITSupervisor` |
+| PUT | `/master/external-accounts/:employeeID` | Perbarui data pendamping; **perpanjangan `valid_until`** adalah alasan utamanya ada. `employee_id` & `company_id` **tak bisa diubah** (kunci identitas & batas tenant). Field kosong diabaikan, bukan dikosongkan | `RequireITSupervisor` |
+| DELETE | `/master/external-accounts/:employeeID` | **Menonaktifkan** (`is_active=false`), bukan menghapus — jejak siapa pernah punya akses tetap ada. ⚠️ Token yang sudah beredar **tidak ikut mati** (JWT TTL 72 jam, revoke masih placeholder); respons menyebutkannya eksplisit | `RequireITSupervisor` |
+
+> 🔴 **Belum ada konsumen FE.** Pembuatan vendor sementara hanya lewat API. `permission_sets` untuk akun luar juga belum dipasang, jadi akun terbit bisa login tapi belum berhak atas modul apa pun.
+> ⚠️ Itu baru benar **setelah** penambalan `izinAkun`: sebelumnya akun vendor tanpa paket diam-diam dapat 6 izin modul `ticket` lewat fallback tier. Lihat [[Microservices - Employee Service]] §Akun pihak luar.
 
 ## Training Program (HRIS) — ✅ merged (deploy dev pending)
 > BE+FE **merged ke main** (`services/employee/training.go`; UI `/hris/training`); **deploy dev pending**. **Department opsional** (peran penyelenggara — TIDAK membatasi peserta; peserta lintas dept di-assign HRD), tanpa Branch. RBAC tulis = `RequireHRISStaff`; GET open (di belakang gateway). Detail konsep: [[HRIS - Training Program]].

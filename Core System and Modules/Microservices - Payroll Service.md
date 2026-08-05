@@ -27,6 +27,9 @@
 - `GET /employee-salary` (list) · `GET/PUT /employee-salary/:employeeId` (upsert; path = sumber kebenaran)
 - Field: `basic_salary`, **`upah_bpjs`** (dasar BPJS terpisah dari gaji pokok — temuan dari slip), `ptkp_status` (TK/0…K/3), `component_values[]`, `bpjs_enrollment`, `effective_date`
 - Referensi `employee_id` ke [[Microservices - Employee Service]] — NPWP/no.BPJS/rekening **di-join di FE**, tidak disalin.
+- ⚠️ **`upah_bpjs` = DASAR upah, bukan nominal potongan.** Engine memakainya sebagai pengali (`computeBpjsEmployee`), jadi mengisinya dengan nominal iuran membuat potongan mengecil sebesar rate itu sendiri (isi 4% dari dasar, potongan jadi 4% dari 4%, alias 25 kali lebih kecil). **Tidak ada validasi yang menahannya**: schema FE hanya `min(0)` dan `validateEmployeeSalary` hanya menolak negatif, jadi angka yang keliru lolos diam-diam sampai slip terbit.
+	- **Terjadi di production** (diperiksa 2026-08-05): 10 record `employee_salary` terisi, `upah_bpjs` hanya pernah bernilai **107.200** atau **128.800** dan sama sekali tidak mengikuti gaji pokok (yang bervariasi 1.444.250 sampai 3.000.000). Dibaca sebagai iuran keduanya konsisten: `107.200 = 4% × 2.680.000` dan `128.800 = 4% × 3.220.000` (4% = total rate karyawan Kesehatan 1% + JHT 2% + JP 1%). **Dasar upah yang dimaksud belum dikonfirmasi HR**, jadi koreksi datanya TBD. `effective_date` juga banyak terisi `2027-08-25` (satu record `2026-08-25`, menguatkan dugaan salah ketik tahun).
+	- FE sudah diberi penjaga (estimasi nominal + banner peringatan), lihat [[APP - Web ERP]]. Penjaga itu **tak berlaku surut**: record yang sudah terlanjur salah tetap perlu koreksi manual.
 
 ## Endpoint / Fitur (Sudah Diimplementasikan — Fase 2: Payroll Run)
 

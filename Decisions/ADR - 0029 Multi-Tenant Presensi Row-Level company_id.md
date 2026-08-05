@@ -74,6 +74,15 @@ Lewat gateway dev `10.10.10.121:6969` (read-only, akun admin pusat):
 - ELT sudah punya jadwal `ELT-REGULAR` (Senin sampai Jumat 08:00-17:00, Sabtu 08:00-13:00, `remote:false`).
 - **Belum lengkap untuk go-live pilot**: `master_department` ELT masih **0** (dropdown departemen ELT kosong walau karyawannya sudah berdepartemen), `company_group_rotation` ELT 0, dan **WiFi kantor ELT masih kosong** padahal jadwalnya WFO. PR #663 dibuat justru agar admin pusat bisa mendaftarkan WiFi itu, tapi datanya belum diisi.
 
+## Akun tanpa `work_data` (pihak luar) — ditutup 2026-08-04, PR [#956](https://github.com/bip-itteam-internal/bip-erp/pull/956)
+
+Seluruh ADR ini bertumpu pada satu asumsi diam-diam: **setiap pemegang akun punya `work_data`**. Akun pihak luar (vendor/mitra) mematahkannya, dan akibatnya `resolveCompanyID` jatuh ke `DefaultCompanyID` sehingga tiap vendor **diam-diam tercatat sebagai tenant BIP** — fail-open, tanpa satu pun galat.
+
+- Perbaikannya: koleksi `external_account` menyimpan `company_id` sendiri, dan `companyIDAkun` (`services/employee/external_account.go`) memilih sumbernya berdasarkan `system_authentication.account_type` — `work_data` untuk karyawan, `external_account` untuk pihak luar. Karyawan tetap memakai jalur lama apa adanya (dikunci uji).
+- **Konsekuensi untuk ADR ini**: `external_account` adalah koleksi employee **kedua** (selain `work_data`) yang memegang `company_id` kanonis. Jalur mana pun yang menurunkan tenant dari `work_data` wajib menyadari akun tanpa `work_data`, bukan menganggap ketiadaannya sebagai "data lama BIP".
+- Akun luar **tak masuk** himpunan `companyEmployeeIDs` (yang berangkat dari `work_data`), jadi otomatis terkecualikan dari direktori & agregat karyawan — diperiksa, bukan diasumsikan.
+- Masih terbuka di sisi ini: `permission_sets` untuk akun luar belum dipasang, sehingga akun vendor bisa login tapi belum berhak atas modul apa pun. Detail: [[Microservices - Employee Service]] §Akun pihak luar.
+
 ## Masih terbuka
 
 - **Cron presensi satu sweep global** — `cronScheduleCheck` membaca seluruh `work_schedule` tanpa filter perusahaan (`services/attendance/cron.go:62`). Entri hasilnya tetap ber-`company_id` (diturunkan dari `work_schedule`), jadi bukan kebocoran data, tapi belum ada pemisahan per tenant (mis. zona waktu / jadwal cron sendiri).

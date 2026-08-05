@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB (replica set)
 - **Path:** `services/employee`
-- **Status**: ✅ Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]
+- **Status**: ✅ Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · ⚠️ **akun pihak luar (vendor/mitra)**: fondasi data + gerbang masa berlaku merged, **role & UI belum ada** (lihat grup Akun pihak luar)
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
@@ -33,6 +33,27 @@
 - Data-type endpoint (`GET /data-type/:dt`) sekarang membaca dari collection `master_department` / `master_system_role` (sebelumnya hardcoded di source code)
 - Model: `MasterDepartment` (key, name, positions[], roles[]) dan `MasterSystemRole` (key, name, roles[]) di `shared-library/models/employee/master_data.go`
 - Frontend: halaman CRUD di `/hris/master-data` (tabs Departments + System Roles)
+
+**Legal — Register Perizinan, Kontrak & Dispute (⚠️ live di kode, runtime pending)**
+- Workspace posisi Staf Legal, di-host di service ini (`services/employee/legal_{perizinan,kontrak,dispute}.go`, `RegisterLegalRoutes`). Di-host di sini — bukan service `legal` baru — agar tak menambah modul/URL gateway (menghindari panic `ValidateInternalURL`).
+- CRUD `/legal/licenses`, `/legal/contracts`, `/legal/disputes` (GET/POST/PUT gate `RequireLegalStaff`; DELETE gate `RequireLegalSupervisor`), masing-masing dengan filter query. Dipanggil FE lewat `/api/employee/legal/*`.
+- Model `LegalLicense`/`LegalContract`/`LegalDispute` (`shared-library/models/employee/models.go`), collection `legal_license`/`legal_contract`/`legal_dispute`. Department `legal` di-seed di `DefaultDepartments`; role key `legal` (staff/supervisor) — lihat [[CORE - RBAC dan Permission Set]].
+- Unggah PDF memakai endpoint generik `POST /upload` (`minio.UploadSingleHandler`) yang sudah ada. Frontend `/legal/{perizinan,kontrak,dispute}` + alert H-90/H-60. Detail: [[QA - Register Perizinan & Sertifikasi]].
+
+**R&D Regulatory — Registrasi izin & pipeline produk (⚠️ live di kode, runtime pending)**
+- Workspace posisi R&D Regulatory, di-host di service ini (`services/employee/{rnd_regulatory.go,rnd_product.go}`, `RegisterRnDRoutes`). Pola sama dengan Legal.
+- CRUD `/rnd/registrations` (Register NIE/BPOM/Halal) & `/rnd/products` (Papan Pengembangan Produk) — GET/POST/PUT gate `RequireRnDStaff`, DELETE gate `RequireRnDSupervisor`. FE lewat `/api/employee/rnd/*`.
+- Model `RnDRegistration`/`RnDProduct`, collection `rnd_registration`/`rnd_product`. Department `rnd` (`R&D Regulatory`) di-seed di `DefaultDepartments`; role key `rnd`. Detail: [[QA - R&D Regulatory (Registrasi & Pipeline Produk)]].
+
+**Quality — CAPA, Incoming Inspection, Antrean Release Batch (⚠️ live di kode, runtime pending)**
+- Workspace divisi Quality, di-host di service ini (`services/employee/{quality_capa.go,quality_incoming.go,quality_batch.go}`, `RegisterQualityRoutes`). Pola sama dengan Legal/R&D.
+- CRUD `/quality/capa`, `/quality/incoming`, `/quality/batch-releases` — GET/POST/PUT gate `RequireQualityStaff`, DELETE gate `RequireQualitySupervisor`. FE lewat `/api/employee/quality/*`.
+- Model `QualityCAPA`/`QualityIncoming`/`QualityBatchRelease`, collection senama. Department `quality` sudah ada di seed; role key `quality`. CAPA dipakai bersama R&D. Detail: [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]].
+
+**Procurement — Kontrak Vendor & Register Penghematan (⚠️ live di kode, runtime pending)**
+- Register non-Accurate untuk posisi Procurement, di-host di service ini (`services/employee/{procurement_kontrak.go,procurement_saving.go}`, `RegisterProcurementRoutes`) — **terpisah** dari [[Microservices - Procurement Service]] yang berbasis Accurate.
+- CRUD `/procurement/contracts` (kontrak vendor non-inventory, alert H-60) & `/procurement/savings` (cost saving = harga acuan − jadi) — gate `RequireProcurementStaff`/`RequireProcurementSupervisor`. FE lewat `/api/employee/procurement/*`.
+- Model `ProcurementContract`/`ProcurementSaving`, collection `procurement_contract`/`procurement_saving`. Department `procurement` sudah ada di seed; role key `procurement`.
 
 **Training Program (HRIS) — ✅ merged ke main (deploy dev pending)**
 - Modul pelatihan karyawan (perluasan service ini, `services/employee/training.go`) + UI `/hris/training`. **Department opsional** (penyelenggara — tak membatasi peserta), **tanpa Branch**; peserta lintas dept di-assign HRD.
@@ -74,6 +95,30 @@
 - Service ini **sumber kebenaran** relasi tersebut: mengisi klaim JWT `supervised_departments` saat login, dan melayani `/list?type=supervisor` dengan urutan telusur departemen sendiri → induk.
 - Konsep, aturan, dan konsekuensinya: [[HRIS - Organization Structure]]
 
+**Jenjang jabatan — ✅ live di produksi 2026-08-03** (PR [#952](https://github.com/bip-itteam-internal/bip-erp/pull/952), `60e77d53`)
+- Koleksi baru `master_job_level` (`key`, `name`, `rank`) + `position_items[].level_key` di `master_department`. Lima tingkat bawaan: Pelaksana(10) · Senior/Officer(20) · Leader(30) · Supervisor(40) · Direktur(50). Model & helper di `shared-library/models/employee/master_data.go` (`JobLevel`, `DefaultJobLevels`, `RankOf`, `MinJarakRank`), handler di `services/employee/job_level.go`.
+- ⚠️ **Penanda ORGANISASI, BUKAN sumbu hak akses** ([[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]). `permission_resolve.go` & `permission_exceptions.go` **tidak boleh menyebutnya sama sekali**, dan itu dikunci `TestJenjangBukanSumbuHakAkses` yang membaca kedua berkas itu — pola sama dengan `internal_routes_guard_test.go`. Dijaga dari sumbernya karena pelanggarannya tak akan membuat satu pun test fungsional gagal.
+- **Rank renggang** supaya tingkat baru (mis. Manager ber-rank 45) cukup satu entri di `DefaultJobLevels()` + deploy, tanpa menyentuh dokumen jabatan/karyawan mana pun. Jarak minimalnya dikunci uji.
+- `seedJobLevels()` menyisipkan **per key**, bukan skip-if-nonempty seperti `seedMasterDepartments`/`seedMasterSystemRoles`/`seedPermissionSets` — pola itu menuntut fungsi `migrate*` sendiri tiap ada key baru, karena dev & prod tak pernah kosong. Nama yang sudah diubah HR tak ditimpa.
+- **GLOBAL**, tanpa `company_id`, beda dari `master_department`. Index unik `key` di `ensureTenantIndexes`.
+- `GET /master/job-levels` · `PUT /master/departments/:key/positions/:positionKey/level` (`RequireHRISOrITSupervisor`, sama dengan `menu-hidden`). Frontend: tab **Jenjang Jabatan** di `/hris/master-data`.
+- **Belum menghasilkan apa pun sampai HR mengisi**: verifikasi prod 2026-08-03 menunjukkan 5 jenjang ter-seed dan **0 dari 79 jabatan** berjenjang. Aturan & konsekuensinya: [[HRIS - Organization Structure]] · [[HRIS - Career & Promotion]]
+
+**Akun pihak luar (vendor/mitra) — ✅ merged 2026-08-04, deploy prod pending** (PR [#956](https://github.com/bip-itteam-internal/bip-erp/pull/956))
+- Koleksi baru `external_account` (`employee_id`, `full_name`, `organization`, `email_address`, `phone_number`, `company_id`, `sponsor_employee_id`, `valid_until`, `purpose`, `metadata`) + field `account_type` di `system_authentication` (kosong = `employee`). Model & helper di `shared-library/models/employee/external_account.go`, handler di `services/employee/external_account.go` + `external_account_routes.go`.
+- **Kredensialnya menumpang `system_authentication`**, bukan koleksi kedua — supaya login, SSO, device, dan `permission_sets` tetap satu jalur. Yang membedakan hanya `account_type`.
+- **Tidak dijadikan record karyawan** karena model karyawan menuntut NIK, KK, agama, status pernikahan, golongan darah, NPWP, dua nomor BPJS, rekening bank, dan `fingerprint_id` — untuk orang luar sebagian besar bukan kebetulan kosong melainkan memang tak boleh dikumpulkan. Sebaliknya tiga hal yang justru dibutuhkan (asal organisasi, penanggung jawab internal, masa berlaku) tak punya tempat di `work_data`/`personal_data`.
+- ⚠️ **Menutup fail-open `company_id`.** `resolveCompanyID` berpangkal pada `work_data`, dan akun luar tak punya `work_data`, jadi sebelumnya nilainya jatuh ke `DefaultCompanyID` dan tiap vendor diam-diam tercatat sebagai tenant **BIP** tanpa galat apa pun. `companyIDAkun` (`services/employee/external_account.go`) mengambilnya dari `external_account.company_id` untuk akun luar. Dasar isolasinya: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
+- **Masa berlaku ditegakkan di EMPAT jalur token**: `/auth/login`, `/auth/login-pin`, `/auth/login-biometrics`, dan `GET /auth/refresh`. Yang terakhir menentukan — refresh menerbitkan token baru tanpa kredensial, jadi menjaga tiga jalur login saja berarti akun kedaluwarsa bisa memperpanjang dirinya sendiri tanpa batas.
+- **Fail-closed dua tempat**: `ValidUntil` kosong dianggap **kedaluwarsa** (bukan berlaku selamanya), dan `NormalizeAccountType` memetakan nilai tak dikenal ke `external` (bukan `employee`).
+- **Tak bocor ke agregat karyawan** — diperiksa, bukan diasumsikan: `companyEmployeeIDs` berangkat dari `work_data.company_id` dan daftar karyawan dari `personal_data`; akun luar tak punya keduanya, jadi otomatis terkecualikan dari Total Karyawan, direktori, dan bagan organisasi.
+- `GET|POST /master/external-accounts` · `PUT|DELETE /master/external-accounts/:employeeID` (`RequireITSupervisor` — menerbitkan kredensial untuk orang di luar perusahaan lebih dekat ke memberi kunci daripada ke mengelola data HR, jadi sengaja **lebih ketat** dari master data lain). Penanggung jawab wajib & diverifikasi ada di `work_data`; `DELETE` menonaktifkan (`is_active=false`), tidak menghapus. ID berprefiks `EXT-` mengikuti pola `master_company.code`; index unik `employee_id`.
+- ⚠️ **Fail-open ticket yang ditemukan menyusul & sudah ditutup.** Klaim awal bahwa akun luar tanpa paket "tak bisa berbuat apa-apa" **TIDAK benar**: fallback tier di service konsumen dipicu oleh klaim `permissions` yang **absen**, dan `TicketTierDefault` memberi izin staff kepada tier apa pun yang tak dikenal (termasuk tier kosong) — jadi tiap akun vendor diam-diam mendapat **6 izin ticket** (`view`, `create`, `comment`, `attach`, `checklist.manage`, `status.update`) dengan reach `own`. Terverifikasi lewat uji, bukan pembacaan kode. Ditutup `izinAkun` (`services/employee/permission_resolve.go`) yang **selalu** mengisi klaim akun luar dengan penanda tanpa-hak `account.$type.external`, sehingga klaimnya jadi ADA-tapi-kosong dan setiap fallback yang berpatokan "klaim absen" otomatis tertutup — termasuk modul yang belum ditulis. Menambal `TicketTierDefault` saja akan menutup lubang hari ini dan membiarkan lubang sama terbuka di modul berikutnya. Dikunci uji di **kedua** sisi: `permission_akun_luar_test.go` (klaim terbit tak kosong) + `akun_luar_gate_test.go` di task-management (konsumen benar-benar menolak). Jalur karyawan sengaja tak tersentuh — klaim karyawan tanpa paket tetap kosong, kalau tidak seluruh fallback tier mati sekaligus.
+- **UI: tab Akun Eksternal di `/hris/master-data`** (erp-frontend PR [#777](https://github.com/bip-itteam-internal/erp-frontend/pull/777)) — daftar, buat, perpanjang, nonaktifkan. Ditaruh sebagai tab (bukan halaman sendiri) mengikuti Kelola Perusahaan yang juga digerbang IT tapi tinggal di area HRIS. Statusnya dibedakan **tiga**: nonaktif / kedaluwarsa / aktif, karena dua yang pertama sama-sama menutup akses tapi pemulihannya beda. Aturan kedaluwarsa disalin persis dari backend termasuk "tanggal kosong = kedaluwarsa"; melonggarkannya membuat layar menampilkan Aktif untuk akun yang ditolak saat login.
+- **Daftar membawa status kredensial** (PR [#961](https://github.com/bip-itteam-internal/bip-erp/pull/961), stacked di atas #960): `is_active`/`has_registered` digabung **saat baca** dari `system_authentication` lewat tipe respons `AkunLuarDenganStatus`, sengaja TIDAK diduplikasi ke `external_account` — dua salinan kebenaran yang sama pasti menyimpang, dan yang dipercaya saat login tetap `system_authentication`.
+- 🔴 **Belum ada role/permission.** Pemasangan `permission_sets` untuk akun luar ditunda atas keputusan pemilik keputusan; kini akun vendor benar-benar tak berhak atas modul apa pun sampai paket dipasang eksplisit. Menonaktifkan akun juga **tidak** memutus token yang sudah beredar (JWT TTL 72 jam, revoke masih placeholder — [[CORE - SSO Flow]] §Catatan & Keterbatasan).
+- ⚠️ **Jalur hak-dari-posisi mati untuk vendor**: `positionSetKeys` langsung berhenti bila `work_data.Department` kosong, dan akun luar tak punya `work_data`. Hak vendor hanya bisa datang dari `system_authentication.permission_sets` (jalur pengecualian per-akun). Menyusul dari itu, akun vendor **tak muncul** di layar "Siapa Boleh Apa"/pengecualian karena `companyEmployeeIDs` berpangkal pada `work_data` — blind spot audit yang justru jadi alasan layar itu dibuat. **TBD.**
+
 **Self-Service (`/me`)**
 - Profile, kpi-score, vacation, payroll-approx
 - Photo get/upload
@@ -110,7 +155,7 @@
 
 ## Dependencies & Integrasi
 
-- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`, `training_type`, `trainer`, `training`, `training_participant`. Lihat [[DB - Overview and Notes]].
+- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `external_account`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`, `master_company`, `master_job_level`, `training_type`, `trainer`, `training`, `training_participant`, `legal_license`, `legal_contract`, `legal_dispute`, `rnd_registration`, `rnd_product`, `quality_capa`, `quality_incoming`, `quality_batch_release`, `procurement_contract`, `procurement_saving`. Lihat [[DB - Overview and Notes]].
 - **MinIO** — client langsung untuk upload foto & dokumen.
 - [[Microservices - Attendance Service]] — memanggil `POST /vacation/decrement`, mengonsumsi feed `/list` dan cron `/sync/work-schedules`.
 - [[Microservices - Notification Service]] — mengonsumsi feed `/list` (fcm-token, supervisor, dll).

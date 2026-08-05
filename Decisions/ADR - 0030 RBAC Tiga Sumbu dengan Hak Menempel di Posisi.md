@@ -78,6 +78,18 @@ Begitu `position_key` mengalir ke frontend dan `hris` punya katalog izin, cukup 
 
 Catatan penting: penyaringan ini **kenyamanan tampilan, bukan kontrol akses**. `/hris/dashboard` tak dijaga middleware, penjaga sebenarnya tetap 403 backend.
 
+**Field kedua yang menempel di posisi tapi BUKAN hak — jenjang jabatan (2026-08-03, live di produksi):**
+
+`position_items[]` kini punya `level_key` di samping `permission_sets` dan `menu_hidden`. Ketiganya menempel pada jabatan, tapi hanya yang pertama menentukan akses.
+
+Ini titik yang mudah longgar. Begitu sebuah struktur jadi tempat menggantung banyak hal, godaan menjadikan salah satunya gerbang akses tumbuh sendiri: satu baris `if RankOf(...) >= ...` di resolver terasa praktis dan tak akan membuat satu pun test fungsional gagal. Akibatnya baru terasa berbulan-bulan kemudian, saat seseorang naik jenjang lalu diam-diam mendapat wewenang yang tak pernah diputuskan siapa pun, dan ada dua sumber hak yang bisa menyimpang.
+
+Karena itu larangannya **ditulis sebagai test yang membaca sumber**: `TestJenjangBukanSumbuHakAkses` menolak kemunculan `LevelKey`/`level_key`/`RankOf`/`JobLevel` di `permission_resolve.go` dan `permission_exceptions.go`. Pola sama dengan [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] yang dijaga `internal_routes_guard_test.go`. Kalau suatu saat gerbang berbasis jenjang memang dibutuhkan, itu keputusan arsitektur baru yang mengubah ADR ini, bukan penambahan satu `if`.
+
+Catatan gerbang: `PUT .../positions/:positionKey/level` memakai `RequireHRISOrITSupervisor`, sama dengan `menu-hidden` dan lebih longgar dari `permission-sets` yang dikunci IT. Konsisten dengan prinsip di atas — yang tak bisa menaikkan hak tak perlu dikunci seketat yang bisa. Sama seperti dua saudaranya, gerbang itu **berbasis peran, bukan cakupan departemen**: supervisor HRIS mana pun bisa menyetel jabatan departemen mana pun. Untuk jenjang dan menu dampak terburuknya label atau tampilan yang salah, tapi ini pola yang perlu diingat saat menambah setelan per-posisi berikutnya.
+
+Detail desainnya (rank renggang, pemisahan nama dari urutan) di [[HRIS - Organization Structure]].
+
 **Yang belum diputuskan (TBD):**
 
 - **Pemisahan per area gudang** (Admin Gudang RM vs FG) bukan soal permission melainkan cakupan area. Menempelkannya ke permission akan melahirkan `wms.rm.*` dan `wms.fg.*` dan membengkakkan katalog. Tahap pertama menyamakan dengan matriks FE yang berlaku; kemungkinan arah: cakupan mirip `reach`, bukan permission baru.

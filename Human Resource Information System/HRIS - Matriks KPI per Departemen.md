@@ -15,19 +15,19 @@ Kolom **Klasifikasi otomasi** per departemen memakai empat kategori dari [[HRIS 
 
 ## Ringkasan
 
-| Departemen | Template | Metrik | Otomatis | Semi | Terblokir data | Manual |
-|---|---:|---:|---:|---:|---:|---:|
-| Beauty Hacks | 11 | 30 | 14 | 2 | 0 | 14 |
-| Finance | 11 | 61 | 13 | 17 | 0 | 31 |
-| General Affair | 5 | 24 | 1 | 5 | 1 | 17 |
-| Human Resource | 5 | 31 | 7 | 5 | 10 | 9 |
-| Kesekretariatan | 7 | 28 | 0 | 0 | 0 | 28 |
-| Kyura | 9 | 27 | 16 | 1 | 0 | 10 |
-| Manufaktur | 9 | 52 | 3 | 16 | 16 | 17 |
-| Procurement | 2 | 10 | 4 | 2 | 0 | 4 |
-| Quality | 4 | 18 | 1 | 2 | 8 | 7 |
-| Tech Development | 7 | 30 | 14 | 9 | 0 | 7 |
-| **Total** | **70** | **311** | **73** | **59** | **35** | **144** |
+| Departemen       | Template |  Metrik | Otomatis |   Semi | Terblokir data |  Manual | by    |
+| ---------------- | -------: | ------: | -------: | -----: | -------------: | ------: | ----- |
+| Beauty Hacks     |       11 |      30 |       14 |      2 |              0 |      14 | kukuh |
+| Finance          |       11 |      61 |       13 |     17 |              0 |      31 | ozi   |
+| General Affair   |        5 |      24 |        1 |      5 |              1 |      17 | irfan |
+| Human Resource   |        5 |      31 |        7 |      5 |             10 |       9 | irfan |
+| Kesekretariatan  |        7 |      28 |        0 |      0 |              0 |      28 | ozi   |
+| Kyura            |        9 |      27 |       16 |      1 |              0 |      10 | kukuh |
+| Manufaktur       |        9 |      52 |        3 |     16 |             16 |      17 | izan  |
+| Procurement      |        2 |      10 |        4 |      2 |              0 |       4 | faiz  |
+| Quality          |        4 |      18 |        1 |      2 |              8 |       7 | faiz  |
+| Tech Development |        7 |      30 |       14 |      9 |              0 |       7 | izan  |
+| **Total**        |   **70** | **311** |   **73** | **59** |         **35** | **144** |       |
 
 Dua departemen di `work_data` **tidak muncul di sini karena belum punya template sama sekali**: Percetakan (13 karyawan) dan Marketing Offline Distribution (1 karyawan).
 
@@ -265,14 +265,14 @@ Template `KPI Supervisor Finance`, 5 metrik.
 
 Template `KPI Accounting CV`, 6 metrik.
 
-| Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
-|---:|---|---|---|---|
-| 0.3 | `Laporan keuangan` | Menyusun laporan keuangan dengan persentase laporan keuangan secara akurat dan tepat waktu max tgl 4 bulan berikutnya | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
-| 0.25 | `Pengelolaan kas` | Melakukan rekonsiliasi bank dan pencatatan kas laporan keuangan dengan Presentase selisih antara laporan keuangan perusahaan dengan rekening koran setiap bulan (Target 0% selisih) | Accurate live proxy + GET /transactions/reconciliation dan /reconciliation/missing. accurate_bank_accounts (44). | Bisa sebagian. Alat pencocokan data sudah ada, tapi perlu disepakati dulu apa yang dihitung sebagai selisih dan kapan batas waktunya. |
-| 0.15 | `Pengelolaan asset/perlengkapan` | Pengecekan dan depresiasi asset dengan Presentase aset dan perlengkapan tercatat secara akurat dan tepat waktu max tgl 4 bulan berikutnya | manufacture_resi (328.272) + warehouse_db.fulfillment_orders (38.949, event pick/pack/handover). | Bisa otomatis sekarang. Data resi dan proses gudang sudah tercatat lengkap. |
-| 0.1 | `Pajak` | Pajak terbayar tepat waktu dengan persentase pajak perusahaan dan karyawan terbayar tepat waktu (max 1 hari sebelum jatuh tempo) | Accurate live proxy: /accounting/profit-loss, /balance-sheet, /profit/cash-flow, /fixed-assets. | Bisa otomatis sekarang. Laporan laba rugi dan arus kas diambil langsung dari Accurate. |
-| 0.1 | `Minimal 5 ide inovasi baru dari tim pada setiap kuartal` | Mengidentifikasi peluang inovasi di proses accounting dengan Minimal 2 ide inovasi terdaftar perbulan di tiap kuartal | TIDAK ADA modul Kaizen/ide inovasi di sistem (pencarian nol hasil di services + shared-library). Perlu fitur baru. | Belum bisa otomatis. Sistem belum punya tempat mencatat ide perbaikan, jadi harus dibuatkan dulu. |
-| 0.1 | `Pertemuan 1-on-1 minimal 1 per bulan per staf, 100% terdokumentasi.` | Aktif memberikan update progres pekerjaan saat 1-on-1 dengan SPV | TIDAK ADA log 1-on-1. Perlu fitur baru. | Belum bisa otomatis. Belum ada tempat mencatat pertemuan atasan dengan anak buah. |
+| Bobot | Label                                                                 | Target / keterangan                                                                                                                                                                 | Sumber di sistem erp                                                                                                                                  | Rekomendasi                                                                                                                           |
+| ----: | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+|   0.3 | `Laporan keuangan`                                                    | Menyusun laporan keuangan dengan persentase laporan keuangan secara akurat dan tepat waktu max tgl 4 bulan berikutnya                                                               | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini.                                                 |
+|  0.25 | `Pengelolaan kas`                                                     | Melakukan rekonsiliasi bank dan pencatatan kas laporan keuangan dengan Presentase selisih antara laporan keuangan perusahaan dengan rekening koran setiap bulan (Target 0% selisih) | Accurate live proxy + GET /transactions/reconciliation dan /reconciliation/missing. accurate_bank_accounts (44).                                      | Bisa sebagian. Alat pencocokan data sudah ada, tapi perlu disepakati dulu apa yang dihitung sebagai selisih dan kapan batas waktunya. |
+|  0.15 | `Pengelolaan asset/perlengkapan`                                      | Pengecekan dan depresiasi asset dengan Presentase aset dan perlengkapan tercatat secara akurat dan tepat waktu max tgl 4 bulan berikutnya                                           | manufacture_resi (328.272) + warehouse_db.fulfillment_orders (38.949, event pick/pack/handover).                                                      | Bisa otomatis sekarang. Data resi dan proses gudang sudah tercatat lengkap.                                                           |
+|   0.1 | `Pajak`                                                               | Pajak terbayar tepat waktu dengan persentase pajak perusahaan dan karyawan terbayar tepat waktu (max 1 hari sebelum jatuh tempo)                                                    | Accurate live proxy: /accounting/profit-loss, /balance-sheet, /profit/cash-flow, /fixed-assets.                                                       | Bisa otomatis sekarang. Laporan laba rugi dan arus kas diambil langsung dari Accurate.                                                |
+|   0.1 | `Minimal 5 ide inovasi baru dari tim pada setiap kuartal`             | Mengidentifikasi peluang inovasi di proses accounting dengan Minimal 2 ide inovasi terdaftar perbulan di tiap kuartal                                                               | TIDAK ADA modul Kaizen/ide inovasi di sistem (pencarian nol hasil di services + shared-library). Perlu fitur baru.                                    | Belum bisa otomatis. Sistem belum punya tempat mencatat ide perbaikan, jadi harus dibuatkan dulu.                                     |
+|   0.1 | `Pertemuan 1-on-1 minimal 1 per bulan per staf, 100% terdokumentasi.` | Aktif memberikan update progres pekerjaan saat 1-on-1 dengan SPV                                                                                                                    | TIDAK ADA log 1-on-1. Perlu fitur baru.                                                                                                               | Belum bisa otomatis. Belum ada tempat mencatat pertemuan atasan dengan anak buah.                                                     |
 
 ### Junior Accountant
 
@@ -925,6 +925,7 @@ Template `Supervisor KPI`, 4 metrik.
 
 ## Dokumen Terkait
 
+- [[HRIS - Alur KPI Otomatis.excalidraw]] (diagram Excalidraw untuk pembaca non-teknis: kenapa matrik yang lengkap saja belum cukup)
 - [[RUN - Menambah Metrik KPI Otomatis]] (cara mengerjakan otomasinya)
 - [[HRIS - Otomasi Skor KPI]] (analisis kelayakan, peta sumber data, rencana bertahap)
 - [[HRIS - Key Performance Index]] (mekanisme scoring, RBAC, cakupan tim Leader)

@@ -10,10 +10,11 @@
 Doc: [[Microservices - Employee Service]]
 
 - **personal_data**: employee_id, photo (MinIOFile), full_name, gender, date_of_birth (time), religion, marital_status, blood_type, home_address, postal_code (int), email_address, phone_number, nik_number (int), kk_number (int), metadata
-- **work_data**: employee_id, department, position, join_date (time), employment_type, contract_ending (time), npwp_number, bpjs_ks_number, bpjs_kt_number, bank_detail?/bank_details? ([]BankDetail), fingerprint_id (int), is_supervisor (bool), vacation?, metadata
+- **work_data**: employee_id, department, position, position_key?, company_id (tenant; kosong pada data lama → `BIP`, [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]), join_date (time), employment_type, contract_ending (time), npwp_number, bpjs_ks_number, bpjs_kt_number, bank_detail?/bank_details? ([]BankDetail), fingerprint_id (int), is_supervisor (bool), vacation?, metadata
 - **work_schedule**: employee_id, full_name, fingerprint_id (int), schedule_type, schedule_id?, group_id?, department? (di-enrich saat `/sync/work-schedules` dari work_data — guard swap same-department, [[ADR - 0006 Swap Jadwal Same-Department]])
 - **company_work_schedule**: schedule_id, schedule (WeeklySchedule)
-- **system_authentication**: employee_id, username, system_roles (common.Roles), password, pin?, is_active (bool), has_registered (bool), device ([]Device), web_browser ([]WebBrowser)
+- **system_authentication**: employee_id, username, system_roles (common.Roles), password, pin?, is_active (bool), has_registered (bool), account_type? (`""`/`employee` = karyawan, `external` = pihak luar), device ([]Device), web_browser ([]WebBrowser)
+- **external_account**: employee_id (berprefiks `EXT-`, index unik), full_name, organization, email_address, phone_number, company_id, sponsor_employee_id, valid_until (time), purpose?, metadata — data pendamping akun **pihak luar** (vendor/mitra); kredensialnya tetap di `system_authentication`. Satu-satunya koleksi employee selain `work_data` yang menyimpan `company_id` sendiri, karena akun luar tak punya `work_data` ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]])
 - **kpi_score**: employee_id, period, template (KPITemplate), score (float64), metadata
 - **company_holiday**: struct di attendance (lihat bawah)
 - **personal_document**, **work_document**: struct tak ditemukan (kemungkinan dinamis/inline) — TBD
