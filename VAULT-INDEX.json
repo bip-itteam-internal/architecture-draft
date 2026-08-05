@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-05",
-  "jumlah_dokumen": 257,
+  "jumlah_dokumen": 260,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1027,20 +1027,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "4d262ae2c3dd1147fed583c20e3cd20551e6b283f19b661a36d1156c95a16873",
-      "ukuran_kb": 81.2,
-      "ringkasan": "Menjawab: apa itu portal web ERP internal (`hris-dashboard` / One Bharata), stack dan repo-nya, bagaimana login serta refresh token bekerja, dan bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain. Juga menjawab bagaimana sidebar dan menu di-gate oleh `system_roles`, bagaimana pengelompokan menu bersarang serta setelan Tampilan Menu per jabatan bekerja (centang = tampil, yang disimpan `menu_hidden`), dan bagian mana yang sadar multi-perusahaan (company switcher, shift, network, departemen, direktori karyawan). Cocok untuk mencari asal-usul keputusan UI seperti perataan induk menu tipis, menu KPI untuk Leader, dan halaman Atasan Langsung.",
+      "hash": "94502679cc48da674f74e44f4127f4a56902f45630ce5d0fc3d41aec0fd82c97",
+      "ukuran_kb": 81.3,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (hris-dashboard \"One Bharata\"), stack frontend apa yang dipakai, dan bagaimana alur login serta SSO handoff ke aplikasi lain seperti Task Manager. Juga menjawab: bagaimana sidebar dan menu di-gate oleh system_roles, bagaimana menu dikelompokkan per posisi lewat Pengaturan > Tampilan Menu, dan bagaimana dukungan multi-perusahaan (company switcher, shift, network, departemen) bekerja di sisi frontend. Berguna saat mencari letak fitur di erp-frontend, aturan i18n dua bahasa, atau alasan di balik keputusan bentuk menu (induk bersarang, perataan induk tipis, menu KPI untuk Leader, layar Atasan Langsung).",
       "kata_kunci": [
         "web ERP",
-        "hris-dashboard",
-        "One Bharata",
         "erp-frontend",
+        "One Bharata",
+        "hris-dashboard",
+        "Next.js",
         "SSO",
         "system_roles",
-        "sidebar",
-        "menu",
+        "sidebar menu",
         "multi-perusahaan",
-        "company switcher"
+        "i18n"
       ]
     },
     {
@@ -1280,6 +1280,10 @@
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "QA - Register Perizinan & Sertifikasi",
+        "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
+        "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
+        "Microservices - Procurement Service",
         "LOG - 2026-07-30 Audit Otorisasi Employee Service",
         "DB - Data Dictionary",
         "CORE - API Master Gateway",
@@ -1290,7 +1294,6 @@
         "Microservices - Recruitment Service",
         "Microservices - Manufacture Service",
         "Microservices - Warehouse Service",
-        "Microservices - Procurement Service",
         "Microservices - Integration Service",
         "Microservices - Insentive Service",
         "Microservices - Notification Service",
@@ -1302,19 +1305,19 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "e2a3ba6c2c7b0757459708ec1959aa547453e07a28e446c88fb196fd26f17257",
-      "ukuran_kb": 16.7,
-      "ringkasan": "Menjawab: bagaimana hak akses di seluruh bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi view/work/approve/manage, dan cakupan data own/division/all), bagaimana permission granular dirakit jadi paket bernama (permission set) yang menempel pada posisi/jabatan, dan bagaimana izin efektif diresolusi saat login lalu dibawa di klaim JWT sampai ditegakkan `RequirePermission` di service. Menjelaskan katalog per modul, endpoint master permission-set/catalog/modules/exceptions, gerbang penulisannya, kill-switch `TICKET_PERMISSION_ENFORCEMENT`, aturan pencocokan nama posisi (KanonPosisi/PosisiCocok), dan alasan backfill paket per-akun dicabut. Juga menjawab beda `permission_sets` (hak akses, ditegakkan backend) dengan `menu_hidden` (tampilan sidebar, hanya mengurangi, tidak pernah menambah akses).",
+      "hash": "a83572173633ce0feefc3511d6a3d488bee8cdfee843d91d942bdb541378c247",
+      "ukuran_kb": 18.5,
+      "ringkasan": "Menjawab: bagaimana hak akses bekerja di seluruh bip-erp lewat tiga sumbu (modul, tingkat aksi view/work/approve/manage, dan cakupan data own/division/all), serta bagaimana paket hak (permission set) menempel pada posisi/jabatan alih-alih per akun. Juga menjawab: bagaimana izin diresolusi saat login dan dibawa di klaim JWT, endpoint apa yang dipakai frontend untuk katalog/modul/pengecualian, dan bagaimana penegakan dilakukan di gateway dan service (RequirePermission, kill-switch TICKET_PERMISSION_ENFORCEMENT). Berguna juga untuk membedakan permission_sets (hak akses, ditegakkan backend) dari menu_hidden (setelan tampilan menu, tidak ditegakkan sama sekali).",
       "kata_kunci": [
         "RBAC",
         "permission set",
         "hak akses",
-        "izin per posisi",
-        "reach",
         "system_roles",
-        "JWT permissions",
+        "reach",
+        "JWT claims",
+        "gate",
         "menu_hidden",
-        "master_permission_set",
+        "posisi jabatan",
         "katalog permission"
       ]
     },
@@ -1491,6 +1494,11 @@
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "CORE - IT Orchestrator",
+        "CORE - RBAC dan Permission Set",
+        "QA - Register Perizinan & Sertifikasi",
+        "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
+        "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
+        "Microservices - Procurement Service",
         "HRIS - Training Program",
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
@@ -1511,19 +1519,19 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "eecadfeae4e406815a60b04dd2e9ef2d4636a37f8cc918981e7f91af5d63dcce",
-      "ukuran_kb": 23.6,
-      "ringkasan": "Menjawab: apa peran Employee Service sebagai master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding untuk seluruh ekosistem bip-erp, memakai stack apa (Go + Fiber v2 + MongoDB replica set, path `services/employee`), dan fitur apa saja yang sudah benar-benar ada di kode. Menjawab cara admin IT mengelola akun (set aktif/nonaktif, forget-device yang mencabut device dan browser tanpa mengubah password, hard reset yang memaksa onboarding ulang, baca/set system_roles), bagaimana master departemen dan system role di-seed lalu dibaca endpoint data-type, siapa gerbang RBAC tiap operasi, serta bagaimana modul Training Program dan agregasi karyawan bekerja. Berguna juga untuk memahami rancangan nilai otomatis metrik KPI (kosakata sumber otomatis/semi/manual, rumus rata_skor_tim dan persen_capai_target, cakupan department lewat master data dan team lewat supervisor_id, serta aturan hitungan gagal tidak diisi angka) dan status multi-perusahaan/tenant service ini.",
+      "hash": "eee374142ffaa50f5028b6d7368dbb457de4e15ede5f67b645271f59de3c7043",
+      "ukuran_kb": 27.0,
+      "ringkasan": "Menjawab: service mana yang jadi sumber kebenaran data karyawan sekaligus autentikasi (login employee_id/username, PIN, biometric, refresh token, onboarding register) dan endpoint apa saja yang disediakannya. Juga menjawab: bagaimana admin IT mengelola akun (reset, forget-device, roles), bagaimana master data departemen dan system role di-CRUD beserta gate-nya, serta mengapa banyak workspace posisi (Legal, R&D Regulatory, Quality, Procurement non-Accurate, Training) di-host di service ini alih-alih service baru. Berguna saat mencari collection, model, atau gate role untuk fitur-fitur yang menumpang di employee-service.",
       "kata_kunci": [
         "employee service",
-        "karyawan",
-        "employee",
-        "SSO autentikasi onboarding",
-        "master data departemen",
-        "system roles",
-        "KPI otomatis",
-        "account reset forget-device",
-        "multi-tenant company_id",
+        "auth login",
+        "SSO",
+        "onboarding register",
+        "master department",
+        "system role",
+        "account admin",
+        "workspace posisi",
+        "training",
         "Go Fiber MongoDB"
       ]
     },
@@ -1982,24 +1990,26 @@
         "CORE - API Master Gateway",
         "APP - Web ERP",
         "API - Procurement Service",
+        "Microservices - Employee Service",
+        "CORE - RBAC dan Permission Set",
         "ADR - 0001 Akuntansi via Accurate",
         "Microservices - Manufacture Service",
         "Microservices - Integration Service"
       ],
-      "hash": "b2f4075bd5832a03993354b20efcad753da708909f29870fea44d107f048d59e",
-      "ukuran_kb": 21.7,
-      "ringkasan": "Menjawab: bagaimana master Pemasok dan master Barang & Jasa diinput di BIP-ERP lalu disinkronkan ke Accurate Online, dan mengapa data Pembelian (pesanan, penerimaan, permintaan barang) justru mengalir sebaliknya sebagai cermin baca-saja dari Accurate. Juga menjawab endpoint apa saja yang tersedia (CRUD pemasok/barang, usul nomor dan usul kode BRG-, katalog kategori/satuan/pajak/syarat pembayaran, import awal, penandaan barang tidak sesuai), serta aturan main integrasinya seperti accurate_id yang tidak pernah diambil dari kiriman client dan field baca-saja yang diabaikan Accurate. Berguna untuk tahu stack, port, database, env kunci, struktur file kode, dan isi koleksi procurement_db.",
+      "hash": "31b09fc1690adec25e8252c41610863394cd42b6dd8761bd6a7fa20f515efbea",
+      "ukuran_kb": 23.2,
+      "ringkasan": "Menjawab: bagaimana master Pemasok dan master Barang & Jasa diinput di ERP lalu disinkronkan ke Accurate Online, dan bagaimana data Pembelian (pesanan, penerimaan, permintaan barang) ditarik balik dari Accurate sebagai cermin baca-saja. Juga menjawab: endpoint apa yang tersedia, bagaimana penomoran/usul kode dibuat, bagaimana worker sync dan import awal bekerja, serta jebakan integrasi Accurate yang sudah terbukti (field baca-saja, tipe boolean materialProduced, toggle pada edit parsial). Berguna untuk mengetahui koleksi dan volume data procurement di produksi serta batas antara service ini dan register procurement non-Accurate di employee-service.",
       "kata_kunci": [
         "procurement service",
         "pengadaan",
+        "Accurate Online",
         "pemasok",
         "vendor",
         "barang dan jasa",
-        "item master",
-        "Accurate Online",
         "pesanan pembelian",
         "purchase order",
-        "penerimaan barang"
+        "sync worker",
+        "faktur pembelian"
       ]
     },
     {
@@ -3575,16 +3585,16 @@
         "GA - Procurement System",
         "Microservices - Procurement Service",
         "Microservices - Form Builder Service",
-        "Microservices - File Service",
         "Microservices - Employee Service",
+        "Microservices - File Service",
         "CORE - RBAC dan Permission Set",
         "ADR - 0001 Akuntansi via Accurate",
         "GA - Inventory Management",
         "GA - Big Pictures"
       ],
-      "hash": "4db0a6f60171efbc0c5cfcb5ee4c35ba79034efdcd8e8f8d4d9b0beb09df891f",
-      "ukuran_kb": 11.5,
-      "ringkasan": "Menjawab: apa isi dua form kertas GA (Form Permintaan Barang dan Form Pengajuan Dana), apa bedanya, dan mengapa keduanya tetap dipisah alih-alih digabung (pembedanya adalah siapa yang membelanjakan uang). Juga menjawab dua menu apa yang diminta tim GA (Kas Kecil HRGA sebagai buku kas dengan saldo sungguhan, dan Permintaan Pembelian Kebutuhan Operasional lintas divisi), bagaimana sumber dana ditentukan dari besar nominal, field apa saja di tahap pengajuan dan realisasi, serta apa isi rekap bulanannya. Berguna untuk tahu keputusan mana yang sudah turun dan pertanyaan mana yang masih menunggu jawaban SPV HRGA maupun Finance.",
+      "hash": "d1fb156efe2d8849418ef9d5d6a860fbfa4158733a41cdd8131a807edd847a36",
+      "ukuran_kb": 12.3,
+      "ringkasan": "Menjawab: dua form kertas GA mana yang akan dipindahkan ke ERP (Form Permintaan Barang dan Form Pengajuan Dana), apa isi tiap form apa adanya, dan mengapa keduanya tetap dipisah (yang membedakan adalah siapa yang membelanjakan, bukan isi formnya). Juga menjawab: dua menu apa yang diminta tim GA (Kas Kecil HRGA sebagai buku kas bersaldo dan Permintaan Pembelian Kebutuhan Operasional lintas divisi), bagaimana sumber dana ditentukan dari besar nominal, dan apa yang sudah/belum ada di sistem hari ini (procurement-service jalan, buku kas dan approval bertingkat belum ada). Berguna sebagai daftar keputusan yang sudah turun dan pertanyaan terbuka untuk SPV HRGA serta Finance.",
       "kata_kunci": [
         "form permintaan barang",
         "pengajuan dana",
@@ -3592,10 +3602,10 @@
         "petty cash",
         "purchase request",
         "PR",
-        "sumber dana",
+        "GA",
+        "HRGA",
         "approval atasan",
-        "rekap bulanan",
-        "kas kardus"
+        "rekap bulanan"
       ]
     },
     {
@@ -6162,6 +6172,101 @@
         "batch",
         "traceability",
         "BPOM"
+      ]
+    },
+    {
+      "path": "Quality & Regulatory/QA - Quality Operasional (CAPA, Incoming, Batch Release).md",
+      "judul": "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
+      "area": "Quality & Regulatory",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan). Tiga register + unggah PDF **live di kode** (Go build + FE typecheck/eslint lolos), **belum diverifikasi runtime**. Sisanya (Dashboard, IPC/CPPB/Pre-Check, checklist, Komplain) belum.",
+      "publik": true,
+      "tautan": [
+        "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
+        "CORE - RBAC dan Permission Set",
+        "Microservices - Employee Service",
+        "CORE - API Master Gateway",
+        "APP - Web ERP",
+        "QA - Register Perizinan & Sertifikasi"
+      ],
+      "hash": "13fb45cc396a459d8a056d0613bad76dbd5400989fa2921cfa511ad1d34aa6c3",
+      "ukuran_kb": 5.4,
+      "ringkasan": "Menjawab: bagaimana divisi Quality mencatat temuan audit dan tindakan korektif (CAPA), memutuskan lulus/tolak bahan yang datang (Incoming Inspection), serta me-release atau hold batch produksi lewat ERP. Juga menjawab: endpoint dan field model tiap register, siapa yang boleh mengakses (quality:staff untuk kelola, quality:supervisor untuk hapus), dan bagaimana alert keterlambatan dihitung (CAPA H-7, incoming menunggu lebih dari 3 hari, batch menunggu lebih dari 24 jam). Berguna juga untuk tahu apa yang belum dibangun: Dashboard Mutu, IPC/Pre-Check/CPPB, checklist GMP/kalibrasi, dan Komplain produk.",
+      "kata_kunci": [
+        "quality",
+        "CAPA",
+        "temuan audit",
+        "incoming inspection",
+        "batch release",
+        "QA QC",
+        "BPOM",
+        "GMP",
+        "hold batch",
+        "mutu"
+      ]
+    },
+    {
+      "path": "Quality & Regulatory/QA - R&D Regulatory (Registrasi & Pipeline Produk).md",
+      "judul": "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
+      "area": "Quality & Regulatory",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan). Kedua register + unggah PDF **live di kode** (Go build + FE typecheck/eslint lolos), **belum diverifikasi runtime**. Simulasi HPP & CAPA belum; Papan Pengembangan berupa **tabel bertahap** (belum kanban drag-drop).",
+      "publik": true,
+      "tautan": [
+        "QA - Register Perizinan & Sertifikasi",
+        "CORE - RBAC dan Permission Set",
+        "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
+        "CORE - API Master Gateway",
+        "Microservices - Employee Service",
+        "APP - Web ERP"
+      ],
+      "hash": "04c0aca11582e228be6cd8ac51d2acdf1cb682cb0dfa0ed9103a26686b529a94",
+      "ukuran_kb": 5.2,
+      "ringkasan": "Menjawab: bagaimana proses registrasi izin edar produk (NIE/BPOM, Halal, SNI) dipantau di ERP sampai terbit beserta alert bila melewati target, dan bagaimana pipeline produk baru dilacak dari tahap ide, formulasi, trial, registrasi, hingga siap launching. Juga menjawab: endpoint dan field model kedua register, siapa yang berhak (rnd:staff dan rnd:supervisor), dan bagaimana unggah PDF hasil uji dilakukan. Berguna untuk memahami batas antara registrasi produk milik R&D dan izin perusahaan milik Legal, serta apa yang belum ada (simulasi HPP produk baru, kanban drag-drop, perhitungan lead time otomatis).",
+      "kata_kunci": [
+        "R&D Regulatory",
+        "NIE",
+        "BPOM",
+        "Halal",
+        "izin edar",
+        "registrasi produk",
+        "pipeline produk",
+        "product development",
+        "rnd",
+        "formulasi trial"
+      ]
+    },
+    {
+      "path": "Quality & Regulatory/QA - Register Perizinan & Sertifikasi.md",
+      "judul": "QA - Register Perizinan & Sertifikasi",
+      "area": "Quality & Regulatory",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan). Ketiga register (Perizinan, Kontrak & SLA, Dispute & Advis) + **unggah PDF** **live di kode** (Go build + FE typecheck/eslint lolos), **belum diverifikasi runtime** di stack dev (butuh redeploy container + akun ber-role `legal`). Pemisahan ke service `legal` tersendiri **belum**.",
+      "publik": true,
+      "tautan": [
+        "CORE - RBAC dan Permission Set",
+        "CORE - API Master Gateway",
+        "Microservices - Recruitment Service",
+        "Microservices - Employee Service",
+        "APP - Web ERP"
+      ],
+      "hash": "6618fd33ae2618ff7351eeb503030cb7ed38d2e34da70278697a7ad277a491e2",
+      "ukuran_kb": 7.3,
+      "ringkasan": "Menjawab: bagaimana Staf Legal mencatat dan memantau izin serta sertifikat perusahaan (BPOM, Halal, izin usaha, sertifikasi lain) di satu daftar terpusat lengkap dengan masa berlaku dan alert H-90 sebelum kedaluwarsa. Juga menjawab: endpoint dan field model untuk tiga register Legal (Perizinan, Kontrak & SLA dengan alert H-60, Dispute & Advis Hukum), siapa yang boleh membuat/mengubah versus menghapus (legal:staff dan legal:supervisor), dan bagaimana unggah PDF sertifikat memakai endpoint upload generik. Berguna juga untuk tahu alasan register ini di-host di employee-service dan catatan bahwa berkas disimpan di bucket uploads generik tanpa akses berbasis peran.",
+      "kata_kunci": [
+        "legal",
+        "perizinan",
+        "sertifikasi",
+        "izin usaha",
+        "kontrak SLA",
+        "dispute",
+        "masa berlaku",
+        "alert H-90",
+        "kedaluwarsa",
+        "compliance"
       ]
     },
     {

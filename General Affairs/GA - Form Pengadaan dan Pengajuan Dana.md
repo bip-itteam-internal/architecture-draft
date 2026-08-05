@@ -171,7 +171,10 @@ Dari empat ketentuan di Form Pengajuan Dana, mana yang harus membuat pengajuan *
 
 ## Belum Diputuskan (TBD)
 
-- Service mana yang memuat fitur ini: menumpang `procurement-service` (sudah punya master barang dan pemasok) atau service GA tersendiri.
+- **Service mana yang memuat fitur ini.** Tiga pilihan, dan yang ketiga punya preseden:
+  1. Menumpang `procurement-service` (sudah punya master barang dan pemasok, tetapi seluruh isinya berkiblat ke Accurate).
+  2. Service GA tersendiri (menambah satu modul gateway).
+  3. **Menumpang employee-service**, mengikuti pola register non-Accurate yang sudah dipakai Legal, R&D, Quality, dan Procurement. Dua register Procurement (Kontrak Vendor dan Penghematan) sengaja ditaruh di sana **supaya tidak menambah modul gateway**, dipanggil lewat `/api/employee/procurement/*`. Lihat catatan di [[Microservices - Procurement Service]] dan [[Microservices - Employee Service]]. Pilihan ini paling murah, tetapi perlu ditimbang karena buku kas bukan register sederhana.
 - Penomoran PR: format, per tahun atau berjalan, siapa yang menentukan.
 - Siapa yang boleh mengajukan: semua karyawan, atau hanya lewat SPV divisi.
 - Lampiran nota memakai [[Microservices - File Service]] (batas 4 MB per berkas).
