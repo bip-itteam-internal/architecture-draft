@@ -1,4 +1,4 @@
-**Status**: ✅ Diputuskan 2026-08-05, **merged ke main** — bip-erp PR #1012 (`79e95038`), erp-frontend PR #805 (`5e1e61ae`). Auto-deploy ke DEV; produksi belum. Penyalaan `roster_enabled` untuk Host Live Kyura belum dijalankan.
+**Status**: ✅ Diputuskan 2026-08-05, **live di produksi 2026-08-06** dan sudah dipakai — Host Live Kyura sudah dinyalakan `roster_enabled`-nya. bip-erp PR #1012 (`79e95038`) + #1014, erp-frontend PR #805 (`5e1e61ae`) + #808 + #809. Backend prod di `92b2b914`, frontend prod di `6da8443c` (deploy manual; merge ke main hanya menurunkan ke DEV). Tombol Panduan in-app menyusul di erp-frontend #811.
 
 ## Context
 
@@ -46,6 +46,13 @@ Aturan turunannya:
 - **Grup `HOSTLIVE-0226-*` dan tambalan Ramadhan tetap hidup** sebagai jadwal dasar tempat jatuh. Fitur ini tidak menghapus utang lama, ia membuat utang itu berhenti bertambah.
 - **Cron berjalan tiap 30 menit, sedangkan roster mengizinkan menit bebas.** Cabang roster karena itu memakai pemicu **jendela**, bukan kesetaraan menit; tanpa itu sel 09:15 tidak akan pernah menghasilkan entri dan orangnya tidak bisa tap masuk tanpa galat muncul di mana pun.
 - **Batas 500 sel per permintaan** adalah penjaga yang disengaja. Klien memecah kirimannya sendiri, dan tiap batch adalah transaksi tersendiri di server.
+- **Slice Go yang tak pernah terisi di-serialisasi sebagai `null`, bukan `[]`.** `GET /roster` sempat membalas `{"employees": null}` untuk departemen yang belum punya karyawan ber-roster — yaitu SETIAP departemen sebelum saklarnya dinyalakan pertama kali — dan halamannya jatuh ke error boundary begitu dibuka (diperbaiki PR #1014 di sisi server, #808 di sisi klien). Sekelas dengan jebakan allowlist proyeksi di [[Microservices - Employee Service]]: keduanya membuat respons tampak wajar sementara datanya tidak ada.
+- **Tipe frontend yang ditulis dari asumsi menutupi ketiganya.** Tiga bug dalam fitur ini lolos suite hijau dengan pola identik: `date` dikira tanggal telanjang padahal RFC3339, `RosterResponse` menyatakan array non-nullable padahal Go mengirim `null`, dan `ScheduleFormData` mewajibkan `schedule_id` serta tak mengenal `group_id` padahal karyawan `pattern` justru kebalikannya. Fixture test dibuat mengikuti tipe, bukan mengikuti respons sungguhan, sehingga yang diuji adalah dunia yang diasumsikan. Ketiga tipe kini dibuat jujur agar kelalaian serupa jadi galat kompilasi.
+
+**Yang tidak diantisipasi dan baru terlihat saat dipakai:**
+
+- **Menyalakan saklar sempat menuntut jadwal dipilih ulang.** Form edit jadwal membaca `schedule_id` saja, sedangkan karyawan `pattern` menyimpannya di `group_id`, sehingga kotaknya kosong dan validasi menolak. Digabung dengan saklar yang dulu hanya tersimpan setelah form jadwal lolos validasi, HR yang cuma ingin menyalakan roster dipaksa memilih ulang jadwal — dan salah pilih berarti mengubah jadwal kerja orang itu, dengan delapan varian grup Host Live yang bernama mirip. Diperbaiki di erp-frontend #809: jadwal dibaca `schedule_id ?? group_id`, dan jadwal hanya ditulis bila pemakai benar-benar menyentuhnya.
+- **Alur halaman tidak terbaca sendiri.** Pemakai harus memilih sel DULU sebelum tombol pengisian aktif, dan tombol itu bernama "Terapkan" walau fungsinya membuka editor. Ditambah bayangan jadwal dasar yang mencetak nama grup panjang di setiap kotak, grid terlihat seperti sudah terisi. Ditutup sementara lewat panduan in-app (#811); perbaikan tampilannya sendiri belum dikerjakan.
 
 **Yang belum dikerjakan (menyusul):**
 

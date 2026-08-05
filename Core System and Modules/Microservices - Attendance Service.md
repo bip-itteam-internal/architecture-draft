@@ -68,7 +68,7 @@
 - `POST /schedule-exchange/create`, `PATCH /schedule-exchange/consent`, `GET /schedule-exchange/view`, `PATCH /schedule-exchange/review`, `PATCH /schedule-exchange/cancel` — Tukar Shift (swap antar-rekan, 3 langkah: consent rekan → atasan → HRD) atau Tukar Hari (geser hari). Setelah disetujui menyesuaikan attendance (`applyApprovedShiftExchange`/`applyScheduleExchangeSwap`); cron seeding & kalender sadar-swap. Detail lengkap: [[HRIS - Tukar Jadwal Kerja]].
 
 **Roster Jadwal Bebas per Tanggal** — collection `attendance_roster` (✅ merged 2026-08-05, PR #1012; **belum dinyalakan untuk siapa pun di produksi**)
-- `GET /roster?department=&from=&to=` — sel roster + daftar karyawan ber-roster satu departemen.
+- `GET /roster?department=&from=&to=` — sel roster + daftar karyawan ber-roster satu departemen. Kedua daftarnya **selalu `[]`, tidak pernah `null`** (PR #1014): slice Go yang tak pernah terisi di-serialisasi sebagai `null`, dan itu menjatuhkan halaman roster untuk setiap departemen yang belum punya karyawan ber-roster — keadaan yang dilalui SETIAP departemen sebelum saklarnya dinyalakan pertama kali.
 - `PUT /roster` — simpan banyak sel sekaligus (`BulkWrite`, maksimal 500 sel per permintaan). Seluruh sel divalidasi **sebelum** satu pun ditulis, sehingga sel buruk di tengah batch tidak meninggalkan roster separuh tersimpan.
 - `DELETE /roster` — kosongkan sel; tanggal itu kembali ke jadwal dasar, dan entri presensi hari berjalan ikut dipulihkan.
 - Ketiganya bergerbang `common.CanManageDepartment` (supervisor departemen bersangkutan, atau pemegang modul `hris` untuk seluruh departemen dalam perusahaannya). Menolak tanggal lampau, penulisan lintas perusahaan, dan sel hari ini yang karyawannya sudah tap masuk atau sudah berstatus cuti/dinas.
