@@ -284,6 +284,7 @@ Daftar TikTok Ads advertiser yang belum di-assign aktif. Pool advertiser bersifa
 | **3** | Field `team` (auto-fill dari department), isolasi data per tim, shop/advertiser opsional, halaman Team Performance untuk SPV/Leader, route `/icc/mappings/me` untuk staff ICC | ✅ Selesai (2026-07-09) |
 | **4** | Integrasi Insentive Service: hitung KPI AM dari mapping ini | 🟡 Belum |
 | **5** | Relasi leader saat assign (lihat [[#Relasi Leader & Akumulasi Insentif]]) | ⚠️ Implemented (2026-08-01; branch `feat/icc-leader` + FE `dev`, belum deploy) |
+| **6** | Tampilan ICC Management dipisah per team (lihat [[#Tampilan ICC Management per Team]]) | 🟡 Rencana (2026-08-05) |
 
 ---
 
@@ -323,6 +324,75 @@ flowchart TD
     K -- "lolos" --> M["Simpan icc_account_mappings"]
     M --> N["Akumulasi insentif leader (Phase 4, belum):\nanggota team = mapping aktif se-team\nlevel ICC = toko sendiri\nlevel Leader = toko seluruh team\n(termasuk toko leader sendiri)"]
 ```
+
+## Tampilan ICC Management per Team
+
+*Permintaan (2026-08-05): tampilan ICC Management harus terpisah antara department **Kyura** dan **Beauty Hacks**, tidak lagi satu tabel campuran.*
+
+- **Status**: 🟡 Rencana — desain; belum ada di kode.
+
+### Masalah pada tampilan sekarang
+
+Halaman `/icc/management` merender **satu tabel datar** berisi seluruh mapping. Untuk pemakai IT (yang menerima semua team) baris Kyura dan Beauty Hacks tercampur **tanpa penanda team sama pun** — tidak ada kolom team di tabel. `LeaderBar` sudah dipisah per team sejak Fase 5, tetapi tabelnya belum, sehingga status per team ("team ini belum punya leader → assign terblokir") tidak nyambung dengan baris datanya.
+
+### Bentuk yang dipilih: satu kartu per team
+
+```text
+ICC Management
+
+┌─ KYURA ─────────────────────────────────────────────────────┐
+│ 👤 Leader: Rido (BIP-0021)     [Ganti Leader] [+ Assign] [▾] │
+│ 5 karyawan · 8 akun                                          │
+├──────────────────────────────────────────────────────────────┤
+│ Karyawan │ TikTok Shop │ Advertiser │ Shopee │ Status │ Aksi │
+│ Rido     │ kyura.id    │ —          │ —      │ Aktif  │  ⏻   │
+│ Sari     │ kyuracare   │ Kyura Ads  │ —      │ Aktif  │  ⏻   │
+└──────────────────────────────────────────────────────────────┘
+
+┌─ BEAUTY HACKS ──────────────────────────────────────────────┐
+│ ⚠ Belum ada leader — assign terblokir  [Set Leader] [▾]      │
+│ 3 karyawan · 4 akun                                          │
+├──────────────────────────────────────────────────────────────┤
+│ ... tabel yang sama                                          │
+└──────────────────────────────────────────────────────────────┘
+
+┌─ TANPA TEAM (data lama) ────────────────────────────── [▾] ──┐
+│ Mapping sebelum Fase 3 — nonaktifkan lalu assign ulang       │
+└──────────────────────────────────────────────────────────────┘
+```
+
+**Kartu, bukan tab.** Alasannya: status "belum ada leader" harus terlihat **serentak** untuk semua team karena assign terblokir per team — tab menyembunyikan team yang tidak aktif. Selain itu SPV/leader otomatis hanya menerima satu kartu (data mereka sudah difilter `?team=department`), sehingga tidak perlu cabang kode khusus; tab tunggal justru mubazir. Menaruh leader dan anggotanya dalam satu kotak juga membuat relasi leader ↔ anggota terbaca langsung — inti aturan leader-first.
+
+### Aturan pengelompokan
+
+- **Daftar kartu** = `daftarTeamMarketing` yang sudah dipakai `LeaderBar` (distinct department karyawan berposisi ICC + team leader terdaftar). Team **tanpa mapping** tetap muncul supaya leadernya bisa didaftarkan lebih dulu; team **tanpa leader** tetap muncul supaya terlihat sedang terblokir.
+- **Pencocokan `team` case-insensitive + trim**, mengikuti pola `cariLeaderTim` — nilai `team` pada mapping berasal dari header `BIP-Department` yang casing-nya bisa berbeda antar-sumber.
+- **Kartu "Tanpa team"** hanya dirender bila ada mapping ber-`team` kosong (data pra-Fase 3, lihat risiko di bawah). Tanpa tombol Set Leader; berisi anjuran nonaktifkan lalu assign ulang agar `team`-nya terisi. Tujuannya supaya tak ada data yang lenyap dari layar hanya karena tak punya induk.
+- **Urutan**: alfabet, kartu "Tanpa team" selalu terakhir.
+- **Kartu collapsible**, default terbuka. Isi kartu tetap tabel yang sekarang — satu baris per karyawan dengan seluruh tokonya ditumpuk (`kelompokkanMappingPerKaryawan`, sudah ada).
+
+### Tombol Assign pindah ke kartu
+
+Tombol **+ Assign** dipindah dari header halaman ke **tiap kartu**, dengan **team terkunci** — pola yang sama dengan `lockedTeam` pada dialog Set Leader (Fase 5). Ini menghilangkan kemungkinan IT salah memilih karyawan lintas team karena target team jadi eksplisit sejak awal. Pada kartu yang belum punya leader, tombol Assign **disabled** dengan penjelasan singkat; backend tetap penjaga sebenarnya lewat guard leader-first.
+
+### Penempatan satu baris mapping
+
+```mermaid
+flowchart TD
+    A["Mapping dari GET /icc/mappings"] --> B{"Punya field team?"}
+    B -- "tidak" --> C["Kartu TANPA TEAM\n(data pra-Fase 3)"]
+    B -- "ya" --> D{"Cocok dengan salah satu\nteam marketing?\n(case-insensitive + trim)"}
+    D -- "ya" --> E["Kartu team tsb"]
+    D -- "tidak" --> F["Kartu baru untuk team itu\n(muncul dari data, tanpa hardcode)"]
+    E --> G["Dikelompokkan per karyawan\n(toko ditumpuk satu baris)"]
+    F --> G
+```
+
+### Dampak teknis
+
+- **Tanpa perubahan backend** — semua data sudah tersedia: `GET /icc/mappings` (IT: semua team; SPV: team sendiri), `GET /icc/leaders`, dan daftar karyawan untuk derivasi team.
+- Helper murni baru `kelompokkanMappingPerTeam(mappings, teams)` (mengembalikan team → leader → kelompok karyawan) supaya aturan di atas bisa diuji unit, memakai ulang `kelompokkanMappingPerKaryawan` yang sudah ada.
+- `LeaderBar` versi IT melebur ke dalam header kartu; versi SPV tetap satu kartu dengan isi yang sama.
 
 ## Dependensi & Risiko
 
