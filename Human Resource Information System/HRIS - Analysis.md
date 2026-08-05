@@ -38,7 +38,7 @@
 - Off-boarding
 	- Pengembalian aset perusahaan (cek daftar aset yang tercatat pada master data karyawan)
 	- Clearance administrasi (cek ke departemen Finance)
-	- ~~Penonaktifan akun (cek ke departemen IT)~~ → **dikerjakan HR sendiri** lewat catatan resign, tidak lagi diteruskan sebagai permintaan ke IT ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]; ⚠️ ada di kode, belum merge & belum deploy). Menu IT tetap ada sebagai jalur kedua
+	- ~~Penonaktifan akun (cek ke departemen IT)~~ → **dikerjakan HR sendiri** lewat catatan resign, tidak lagi diteruskan sebagai permintaan ke IT ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]; ✅ live di produksi 2026-08-05). Menu IT tetap ada sebagai jalur kedua
 
 ## Kebutuhan
 
@@ -47,7 +47,7 @@
 - [ ] Master data karyawan (referensi pencarian)
 - [ ] Daftar aset karyawan saat ini
 - [ ] Clearance administrasi karyawan
-- [x] Status akun karyawan — `system_authentication.is_active`, kini bisa diubah HR sendiri lewat catatan resign berikut sebab & tanggalnya (⚠️ belum merge & belum deploy)
+- [x] Status akun karyawan — `system_authentication.is_active`, kini bisa diubah HR sendiri lewat catatan resign berikut sebab & tanggalnya (✅ live 2026-08-05)
 
 ## Dokumen Terkait
 

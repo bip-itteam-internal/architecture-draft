@@ -120,7 +120,7 @@ Ringkasan hasil bedah route/handler/model. Semua service Go + Fiber v2 + MongoDB
 | Item | Status | Grounded |
 |---|---|---|
 | Promotions · Transfers | 🟡 | Konsep [[HRIS - Career & Promotion]]; eksekusi = ubah `work_data` + workflow. |
-| Resignations · Terminations | ⚠️ | **Pencatatan + penonaktifan akun sudah ada di kode** (koleksi `employee_resign`, halaman `/hris/resign`) — ⚠️ belum merge & belum deploy, lihat [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]. Sisa exit clearance masih konsep di [[HRIS - Personalia]]; konsumennya [[HRIS - Attrition]]. |
+| Resignations · Terminations | ✅ | **Pencatatan + penonaktifan akun live di produksi 2026-08-05** (koleksi `employee_resign`, halaman `/hris/resign`), lihat [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]. ⚠️ Koleksinya masih 0 dokumen — live tapi belum dipakai. Sisa exit clearance masih konsep di [[HRIS - Personalia]]; konsumennya [[HRIS - Attrition]]. |
 | **Awards** | 🆕 | Belum ada di kode — kandidat di bawah. |
 
 ### 6. Disiplin, Dokumen & Komunikasi
@@ -190,7 +190,7 @@ Temuan bedah kode membalik asumsi awal: infrastruktur inti **sudah ada**.
   - **Events → Kalender Perusahaan** (numpang `/holiday` CRUD). 🆕
 - **Tier 3 — Butuh keputusan / eksekusi konsep:**
   - **Kasbon/Loan** — keputusan batas vs Accurate dulu. 🆕
-  - **Lifecycle** — **Resignations/Terminations sudah dikerjakan** (⚠️ belum merge & belum deploy); Promotions/Transfers masih dok konsep. 🟡
+  - **Lifecycle** — **Resignations/Terminations ✅ live di produksi**; Promotions/Transfers masih dok konsep. 🟡
   - **Warnings & Complaints** — dok konsep siap. 🟡
 - **Perbaikan Payroll (bukan ERPGo, tapi muncul dari bedah):** rekonsiliasi PPh21 tahunan · beban BPJS perusahaan · multiplier lembur.
 - **Buang:** Branches, IP Restricts, wizard 6-tahap sebagai fitur baru, form-builder apa pun.

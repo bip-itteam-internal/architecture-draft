@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB (replica set)
 - **Path:** `services/employee`
-- **Status**: ✅ Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · ⚠️ **akun pihak luar (vendor/mitra)**: fondasi data, gerbang masa berlaku, pemberian hak (2 sumbu), dan UI **lengkap & live**; sisa catatan: PR #972 (`/me` akun luar) belum ikut ter-deploy (lihat grup Akun pihak luar) · ⚠️ **resign / non-aktif karyawan**: kode lengkap di branch `feat/employee`, **belum merge & belum deploy** ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]])
+- **Status**: ✅ Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · ⚠️ **akun pihak luar (vendor/mitra)**: fondasi data, gerbang masa berlaku, pemberian hak (2 sumbu), dan UI **lengkap & live**; sisa catatan: PR #972 (`/me` akun luar) belum ikut ter-deploy (lihat grup Akun pihak luar) · ✅ **resign / non-aktif karyawan**: live di produksi 2026-08-05 ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]), tapi ⚠️ koleksinya masih **0 dokumen** — sudah live, belum dipakai
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
@@ -104,7 +104,7 @@
 - `GET /master/job-levels` · `PUT /master/departments/:key/positions/:positionKey/level` (`RequireHRISOrITSupervisor`, sama dengan `menu-hidden`). Frontend: tab **Jenjang Jabatan** di `/hris/master-data`.
 - **Belum menghasilkan apa pun sampai HR mengisi**: verifikasi prod 2026-08-03 menunjukkan 5 jenjang ter-seed dan **0 dari 79 jabatan** berjenjang. Aturan & konsekuensinya: [[HRIS - Organization Structure]] · [[HRIS - Career & Promotion]]
 
-**Resign / Non-Aktif Karyawan — ⚠️ branch `feat/employee`, belum merge & belum deploy** ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]], konsep: [[HRIS - Personalia]])
+**Resign / Non-Aktif Karyawan — ✅ live di produksi 2026-08-05** (PR [#1009](https://github.com/bip-itteam-internal/bip-erp/pull/1009); [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]], konsep: [[HRIS - Personalia]])
 - Koleksi baru `employee_resign` (`employee_id`, `company_id`, `category`, `effective_date`, `reason`, `file`, `status`, `applied_at`, `account_deactivated`, `cancelled_at`, `cancel_reason`, `metadata`). Model + enum di `shared-library/models/employee/models.go`, handler di `services/employee/resign.go` & `resign_file.go`.
 - **Koleksi sendiri, BUKAN field status di `work_data`.** Koleksi itu sudah menyimpan dua salinan kontrak yang butuh empat penjaga agar tak menyimpang; salinan ketiga mengulang pola yang sama. `system_authentication.is_active` tetap satu-satunya sumber status aktif, dan dokumen resign menjelaskan **mengapa** — inilah "catatan terminasi" yang diminta [[HRIS - Attrition]].
 - Lima kategori tetap di kode (`ResignCategories`): Mengundurkan Diri · PHK · Pensiun · Kontrak Berakhir · Meninggal Dunia. Bukan master data, jadi penambahan menuntut deploy.
@@ -119,6 +119,17 @@
 - Index: `{employee_id, status}` · `{company_id, effective_date}` · `{status, effective_date}` (dipakai sapuan cron).
 - Frontend: `/hris/resign` di menu **Personalia** ([[APP - Web ERP]]).
 - ⚠️ **Karyawan non-aktif lenyap, bukan sekadar tersembunyi**: setidaknya enam kueri di service ini menyaring `is_active: true` diam-diam (`/list?type=employee`, agregat direktori, dsb), jadi karyawan yang resign di tengah bulan hilang dari laporan absensi dan basis payroll bulan itu juga. **Belum ditangani.**
+- ⚠️ **Verifikasi produksi 2026-08-06**: `employee_resign` **0 dokumen**, akun aktif **183**. Fitur sudah live tapi belum dipakai, jadi angka apa pun yang diturunkan darinya masih nol.
+
+**Ringkasan turnover — ⚠️ branch `feat/employee-turnover`, belum merge & belum deploy** (konsep: [[HRIS - Attrition]])
+- `GET /resign/summary` (`RequireHRISStaff`, isolasi tenant) menyuplai kartu statistik di halaman Resign: `keluar` · `masuk` · `headcount_awal` · `headcount_kini` · `turnover_persen` · `target_persen`.
+- **Tanpa parameter bulan, dan itu disengaja.** Tak ada riwayat headcount di service ini, jadi headcount awal bulan **direkonstruksi** (`aktif sekarang + keluar − masuk`). Bulan lampau menuntut penguraian mundur berlapis yang tiap langkahnya menambah galat, dan hasilnya terlihat pasti padahal tidak.
+- Rumus **rata-rata headcount** (`keluar / ((awal+akhir)/2) × 100`), ambang `TargetTurnoverBulananPersen = 5.0` **dikirim lewat respons** dan tidak disalin ke frontend: dua salinan angka ambang pasti menyimpang, dan akibatnya kartu berwarna aman untuk angka yang menurut server sudah lewat batas.
+- `hitungTurnover` menjaga pembagian nol bukan demi kerapian angka: **NaN dan Inf tak bisa di-marshal `encoding/json`**, jadi tanpa penjagaan itu endpoint membalas 500 alih-alih angka. Tenant yang baru dibuat persis punya nol karyawan aktif.
+- `keluar` dihitung dari `effective_date` (bukan `applied_at`) dan hanya status `applied`.
+
+⚠️ **Jebakan lintas-fitur: tanggal di koleksi karyawan tersimpan DUA TIPE.** Hitungan produksi 2026-08-06 pada `work_data.join_date`: **145 dokumen bertipe `date`, 61 bertipe `string`**. Kueri rentang Mongo (`$gte`/`$lt`) **hanya mengenai yang bertipe date**, karena perbandingan antar-tipe BSON terjadi di bracket terpisah — 30% data lolos **tanpa galat apa pun**. Penyaringan tanggal untuk koleksi ini karena itu wajib dikerjakan **di Go** lewat `resolveTanggalFleksibel` (`services/employee/tanggal.go`, diangkat dari endpoint ulang tahun yang sudah lebih dulu kena masalah sama pada `date_of_birth`).
+Pengecualiannya kolom yang **selalu ditulis kode kita sendiri** — mis. `employee_resign.effective_date` yang lewat `normalisasiTanggalEfektif` — tipenya dijamin Date sehingga aman disaring di kueri.
 
 **Akun pihak luar (vendor/mitra) — ✅ merged & live di prod** (PR [#956](https://github.com/bip-itteam-internal/bip-erp/pull/956), dilanjut #960/#961/#968/#971/#972). Prosedur operasionalnya: [[RUN - Onboarding Akun Eksternal (Vendor & Mitra)]].
 - ⚠️ **Satu PR belum ikut ter-deploy.** Verifikasi biner produksi 2026-08-05 (`strings /service` di container `Employee-Service`): `gerbangAkunEksternal`, `companyIDAkun`, `muatKatalogRole`, `rapikanRoleModul`, `izinAkun` **ada**; `profilAkunLuar` (PR #972, `/me` akun luar) **tidak ada** — image dibangun 2026-08-04 15:18, commit-nya masuk 15:32. Frontend yang bergantung padanya sudah live, jadi vendor mendarat di dashboard karyawan berisi tanda hubung dan namanya tampil sebagai ID akun. Akses ke modul **tidak** terpengaruh. Perbaikan = rebuild + restart service, tanpa perubahan kode.

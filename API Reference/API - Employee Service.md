@@ -88,11 +88,12 @@
 | GET | `/internal/aggregate/employee/:id` · `/v2/internal/aggregate/employees[/summary|/it]` · `/internal/export/all` | Aggregate & export | HRIS / IT |
 | POST/PUT | `/internal/transaction/create-employee` · `/update-employee/:id` | Bulk create/update employee | HRIS |
 
-## Resign / Non-Aktif Karyawan — ⚠️ branch `feat/employee`, belum merge & belum deploy
+## Resign / Non-Aktif Karyawan — ✅ live di produksi 2026-08-05
 Seluruhnya `RequireHRISStaff` + isolasi tenant `EffectiveCompanyID`. Keputusan & konsekuensinya: [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]].
 
 | Method | Path | Fungsi |
 |---|---|---|
+| GET | `/resign/summary` | ⚠️ **belum merge & belum deploy** (branch `feat/employee-turnover`). Ringkasan turnover **bulan berjalan** untuk kartu statistik: `keluar`·`masuk`·`headcount_awal`·`headcount_kini`·`turnover_persen`·`target_persen`. **Tanpa parameter bulan**: tak ada riwayat headcount, jadi awal bulan direkonstruksi (`aktif + keluar − masuk`) dan bulan lampau akan menumpuk galat. `keluar` dari `effective_date` status `applied`; `masuk` dari `work_data.join_date` yang **disaring di Go** karena tipenya bercampur date/string. Detail: [[HRIS - Attrition]] |
 | GET | `/resign` | Daftar berpaginasi. Filter `category`·`status`(`scheduled`/`applied`/`cancelled`)·`department`·`search` (nama atau employee_id). Balasan `{data, pagination}` sama bentuk dengan `/contract`; tiap baris ditempeli `full_name`·`department`·`position` **saat baca** dari `personal_data`/`work_data`, sengaja tak disimpan di dokumen resign supaya tak basi saat karyawan pindah departemen |
 | GET | `/resign/employee/:employee_id` | Riwayat resign satu karyawan, termasuk yang sudah dibatalkan |
 | POST | `/resign` | Buat catatan. Wajib `employee_id`·`category`·`effective_date`·`reason`. Kategori divalidasi ke enum tetap (Mengundurkan Diri · PHK · Pensiun · Kontrak Berakhir · Meninggal Dunia) **persis huruf besar-kecilnya**. Karyawan dari perusahaan lain ditolak 404. Satu karyawan tak boleh punya dua catatan berjalan; yang sudah `cancelled` tidak memblokir. `effective_date` dinormalkan ke tengah malam WIB; tanggal hari ini atau mundur **langsung diterapkan**, tanggal di depan jadi `scheduled` |

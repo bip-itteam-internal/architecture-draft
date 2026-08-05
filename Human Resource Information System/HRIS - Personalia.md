@@ -2,7 +2,7 @@
 
 *Administrasi kepegawaian (personalia) — mengelola data administratif karyawan sepanjang masa kerja: data personal, kontrak (PKWT), BPJS, dokumen, riwayat masa kerja, hingga off-boarding/exit clearance. Beririsan dengan subsistem off-boarding di [[HRIS - Analysis]].*
 
-- **Status**: ⚠️ Sebagian diimplementasikan — **pencatatan resign & penonaktifan akun** sudah ada di kode (⚠️ branch `feat/employee`/`feat/hris-resign`, belum merge & belum deploy); sisa off-boarding (exit clearance) masih 🟡 konsep
+- **Status**: ⚠️ Sebagian diimplementasikan — **pencatatan resign & penonaktifan akun ✅ live di produksi 2026-08-05**; sisa off-boarding (exit clearance) masih 🟡 konsep
 
 ## Ruang Lingkup & Data
 
@@ -22,7 +22,7 @@ Saat karyawan keluar, urutan clearance:
 
 Hasil off-boarding (terminasi) menjadi sumber data [[HRIS - Attrition]].
 
-### Catatan Resign / Non-Aktif — ⚠️ ada di kode, belum merge & belum deploy
+### Catatan Resign / Non-Aktif — ✅ live di produksi 2026-08-05
 
 Langkah **pencatatan berhentinya karyawan sekaligus penonaktifan akunnya** sudah dibangun; empat langkah clearance di atas belum. Keputusan lengkap beserta konsekuensinya: [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]].
 

@@ -1,4 +1,4 @@
-**Status**: ⚠️ Diputuskan 2026-08-05, **kode selesai tapi belum merge & belum deploy** — branch `feat/employee` di bip-erp dan `feat/hris-resign` di erp-frontend. Belum ada PR, belum masuk dev maupun produksi.
+**Status**: ✅ Implemented. Diputuskan dan dijalankan 2026-08-05, **live di dev dan produksi** (PR bip-erp [#1009](https://github.com/bip-itteam-internal/bip-erp/pull/1009), erp-frontend [#803](https://github.com/bip-itteam-internal/erp-frontend/pull/803)). ⚠️ **Sudah live tapi belum dipakai**: verifikasi produksi 2026-08-06 menunjukkan `employee_resign` **0 dokumen** dengan 183 akun aktif, jadi seluruh konsekuensi di bawah baru akan terasa setelah HR mulai mencatat.
 
 ## Context
 
