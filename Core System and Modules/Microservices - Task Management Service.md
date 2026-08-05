@@ -8,7 +8,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB + WebSocket + file-service (MinIO via [[Microservices - File Service]])
 - **Path:** `services/task-management`
-- **Status**: ⚠️ Implemented, **sudah di `main`** (diperiksa langsung ke `origin/main` 2026-08-05; catatan lama "branch `feat/task-management-parity` belum merge" sudah tidak berlaku dan branch-nya tak ada lagi). Catatan: **WebSocket butuh rute ingress** (gateway tak proxy WS), **push FCM/inbox ke notification-service ditunda** (WS-only), **role hanya `supervisor`/`staff`** (admin lintas-divisi tidak diaktifkan). Pertanyaan per tipe (`SpaceType.Fields`) 🔜 **belum merge** — lihat bagiannya di bawah.
+- **Status**: ⚠️ Implemented, **sudah di `main`** (diperiksa langsung ke `origin/main` 2026-08-05; catatan lama "branch `feat/task-management-parity` belum merge" sudah tidak berlaku dan branch-nya tak ada lagi). Catatan: **WebSocket butuh rute ingress** (gateway tak proxy WS), **push FCM/inbox ke notification-service ditunda** (WS-only), **role hanya `supervisor`/`staff`** (admin lintas-divisi tidak diaktifkan). Pertanyaan per tipe (`SpaceType.Fields`) ✅ **LIVE di dev & prod** dan sudah terisi untuk seluruh tipe Tech Development — lihat bagiannya di bawah.
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
@@ -46,9 +46,13 @@ Penanda jenis permintaan yang **dipilih pemohon** saat membuat tiket (mis. Perba
 - `mergeTypes` **mempertahankan id** saat nama tipe diubah; id yang berganti akan membuat tugas lama kehilangan tipenya tanpa galat.
 - Pindah space (`PUT /tasks/:id/space`) ikut mengosongkan `type_id` karena daftarnya milik space lama. **Gap:** `priority_id` punya persoalan menggantung yang sama dan sengaja belum disentuh (prioritas menentukan target SLA).
 
-#### Pertanyaan per tipe (`SpaceType.Fields`) 🔜
+#### Pertanyaan per tipe (`SpaceType.Fields`) ✅
 
-> Status: branch `feat/task-type-fields` di `bip-erp` + `erp-frontend` (keduanya dari `main`), **belum merge, belum deploy**. Yang terbukti baru unit test dan test komponen; alur nyata buat sampai kirim **belum pernah dijalankan** di lingkungan mana pun. Dev pun belum bisa dipakai mencobanya: per 2026-08-05 **tak satu pun dari 16 space di dev punya `types`**.
+> Status: **merged & LIVE di dev DAN prod** per 2026-08-05 (BE PR [#989](https://github.com/bip-itteam-internal/bip-erp/pull/989), FE PR [#800](https://github.com/bip-itteam-internal/erp-frontend/pull/800)). Dev naik otomatis lewat Harness; prod di-deploy manual (`docker compose up -d --build task-management-service --no-deps`). Keduanya diverifikasi dengan **probe biner** (`grep` string khas kode baru di `/service`), bukan sekadar uptime container.
+>
+> **Sudah dipakai sungguhan**: seluruh **35 tipe di 9 space Tech Development** terisi **154 pertanyaan** (diverifikasi langsung ke `task_management_db` prod). Perilaku kontraknya diuji end-to-end lewat gateway dev: `fields` tersimpan, `key` diisi server, aturan absen-vs-kosong benar, dan validasi menolak `400` sambil menyebut nama tipe berikut nama pertanyaannya.
+>
+> ⚠️ Yang **belum** diuji formal: pengiriman tiket dari peramban sampai tampil di detail tiket. Bentuk markdown-nya dikunci test komponen, tapi tak ada catatan uji manual end-to-end.
 
 Menjawab keluhan bahwa permintaan yang masuk ke Tech Development tak jelas isinya. Tiap tipe boleh membawa daftar pertanyaan (`Fields []TypeField`) yang harus dijawab pemohon setelah memilih tipe itu.
 

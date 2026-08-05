@@ -17,9 +17,9 @@
 | POST/GET | `/spaces` · `/spaces/:id` | Buat/list/detail space (`?division=`). Body/response bawa `types` (tipe permintaan) + `visibility`/`allowed_divisions`/`allowed_employees`. **Disaring hak akses**: space `restricted` hilang dari list dan `403` di detail, kecuali supervisor divisinya, admin, anggota space, atau yang ada di daftar izin |
 | PUT/DELETE | `/spaces/:id` | Update/hapus space. `visibility` hanya menerima `public`/`restricted` (nilai lain `400`) |
 
-### `types[].fields` — pertanyaan per tipe permintaan 🔜
+### `types[].fields` — pertanyaan per tipe permintaan ✅
 
-> Status: branch `feat/task-type-fields` (dari `main`), **belum merge, belum deploy**.
+> Status: **merged & LIVE di dev DAN prod** per 2026-08-05 (PR [#989](https://github.com/bip-itteam-internal/bip-erp/pull/989)). Kontraknya diuji end-to-end lewat gateway dev, dan sudah dipakai sungguhan di prod: 35 tipe pada 9 space Tech Development terisi 154 pertanyaan.
 
 Tiap `SpaceType` boleh membawa `fields`, yaitu pertanyaan yang harus dijawab pemohon
 setelah memilih tipe itu. **Jawabannya tidak pernah dikirim sebagai data**: klien
