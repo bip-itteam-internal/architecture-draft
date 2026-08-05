@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-05",
-  "jumlah_dokumen": 262,
+  "jumlah_dokumen": 263,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -3411,6 +3411,44 @@
       ]
     },
     {
+      "path": "Finance System/Finance - Kas Kecil dan Pengajuan Budget.md",
+      "judul": "Finance - Kas Kecil dan Pengajuan Budget",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "Konsep. Belum ada kode. Blueprint sudah rinci, tetapi empat lubang data dan tiga tabrakan arsitektur harus dibereskan lebih dulu.",
+      "publik": true,
+      "tautan": [
+        "GA - Form Pengadaan dan Pengajuan Dana",
+        "HRIS - Organization Structure",
+        "ADR - 0001 Akuntansi via Accurate",
+        "Microservices - Procurement Service",
+        "ADR - 0002 Database-per-Service",
+        "GA - Inventory Management",
+        "Microservices - File Service",
+        "Microservices - Employee Service",
+        "CORE - RBAC dan Permission Set",
+        "External - Accurate",
+        "GA - Procurement System",
+        "Finance - Big Pictures"
+      ],
+      "hash": "45958cc46e6707de1fe5cdcba38f99a68a896fd69cac566110a7d425f40075fe",
+      "ukuran_kb": 11.1,
+      "ringkasan": "Menjawab: berapa plafon kas kecil tiap divisi per bulan, kapan sebuah pengeluaran wajib lewat jalur Pengajuan dengan approval alih-alih kas kecil (ambang Rp 500.000), siapa approver-nya menurut nominal dan jenis belanja, serta status apa saja yang dilewati kas kecil, pengajuan, dan top-up. Menjelaskan juga mengapa aturan itu belum bisa langsung dikodekan: nama divisi di blueprint tidak cocok dengan master department, banyak departemen tanpa plafon, data atasan langsung belum lengkap, dan master kategori belanja beserta flag aset belum ada. Memuat pula benturannya dengan arsitektur, yaitu rencana buku besar sendiri versus akuntansi di Accurate, model relasional di atas MongoDB per service, dan register aset yang belum tersedia.",
+      "kata_kunci": [
+        "kas kecil",
+        "petty cash",
+        "plafon divisi",
+        "pengajuan budget",
+        "budget request",
+        "matriks approval",
+        "top-up",
+        "kategori belanja",
+        "pengajuan aset",
+        "Accurate"
+      ]
+    },
+    {
       "path": "General Affairs/GA - Accident Prevention.md",
       "judul": "GA - Accident Prevention",
       "area": "General Affairs",
@@ -3616,6 +3654,7 @@
       "publik": true,
       "tautan": [
         "GA - Procurement System",
+        "Finance - Kas Kecil dan Pengajuan Budget",
         "Microservices - Procurement Service",
         "Microservices - Form Builder Service",
         "Microservices - Employee Service",
@@ -3625,20 +3664,20 @@
         "GA - Inventory Management",
         "GA - Big Pictures"
       ],
-      "hash": "d1fb156efe2d8849418ef9d5d6a860fbfa4158733a41cdd8131a807edd847a36",
-      "ukuran_kb": 12.3,
-      "ringkasan": "Menjawab: dua form kertas GA mana yang akan dipindahkan ke ERP (Form Permintaan Barang dan Form Pengajuan Dana), apa isi tiap form apa adanya, dan mengapa keduanya tetap dipisah (yang membedakan adalah siapa yang membelanjakan, bukan isi formnya). Juga menjawab: dua menu apa yang diminta tim GA (Kas Kecil HRGA sebagai buku kas bersaldo dan Permintaan Pembelian Kebutuhan Operasional lintas divisi), bagaimana sumber dana ditentukan dari besar nominal, dan apa yang sudah/belum ada di sistem hari ini (procurement-service jalan, buku kas dan approval bertingkat belum ada). Berguna sebagai daftar keputusan yang sudah turun dan pertanyaan terbuka untuk SPV HRGA serta Finance.",
+      "hash": "c863e2d830a83f758f8d387a0f2a9d7e27e436b1243d9b1f8a4bb31d3fb7d1f3",
+      "ukuran_kb": 12.9,
+      "ringkasan": "Menjawab: apa isi dua form kertas GA (Form Permintaan Barang dan Form Pengajuan Dana), apa bedanya, siapa yang membelanjakan di tiap alur, dan mengapa keduanya tetap dipisah. Menjelaskan dua menu yang diminta tim GA, yaitu Kas Kecil HRGA untuk admin GA dengan saldo dan pelaporan ke Finance, serta Permintaan Pembelian Kebutuhan Operasional dari seluruh divisi lengkap dengan field tahap pengajuan, tahap realisasi, dan rekap bulanan. Memuat pula keadaan sistem hari ini (procurement-service dengan master pemasok dan barang, cermin Accurate, purchase_order ERP masih kosong, belum ada pencatatan kas), keputusan yang sudah turun, dan daftar pertanyaan terbuka untuk SPV HRGA seperti ambang nominal pemisah dan nasib Kas Kardus.",
       "kata_kunci": [
         "form permintaan barang",
-        "pengajuan dana",
-        "kas kecil HRGA",
-        "petty cash",
+        "form pengajuan dana",
         "purchase request",
         "PR",
-        "GA",
-        "HRGA",
-        "approval atasan",
-        "rekap bulanan"
+        "kas kecil HRGA",
+        "kas kardus",
+        "pengadaan",
+        "procurement",
+        "rekap bulanan",
+        "sumber dana"
       ]
     },
     {

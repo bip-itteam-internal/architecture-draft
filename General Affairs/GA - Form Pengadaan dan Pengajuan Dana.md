@@ -3,6 +3,8 @@
 *Kajian awal pemindahan **dua form kertas GA** ke ERP: Form Permintaan Barang dan Form Pengajuan Dana, beserta rekap bulanannya yang kini dikerjakan di spreadsheet. Dokumen ini memuat isi form apa adanya, keadaan sistem yang sudah ada, dan pertanyaan yang menunggu jawaban SPV HRGA. Rencana lama yang lebih umum ada di [[GA - Procurement System]]; dokumen ini menggantikannya sebagai acuan kerja karena bertumpu pada form yang benar-benar dipakai.*
 
 - **Status**: 🟡 Konsep / kajian awal. Belum ada kode. Tiga keputusan sudah turun (lihat bab Sudah Diputuskan), sisanya menunggu jawaban SPV HRGA.
+
+> **Lingkupnya sudah membesar.** Blueprint dari Finance (4 Agustus 2026) menjadikan kas kecil sebagai **modul lintas divisi**, bukan fitur GA saja: tujuh divisi punya plafon bulanan sendiri, dan ambang pemisah jalurnya ditetapkan **Rp 500.000**. Dokumen induknya kini [[Finance - Kas Kecil dan Pengajuan Budget]]. Halaman ini tetap dipertahankan karena memuat isi dua form kertas GA apa adanya, yang tidak ada di blueprint.
 - **Sumber**: dua form kertas resmi (kop PT Bharata Internasional Pharmaceutical) + spreadsheet rekap PR + arahan tim GA, dikumpulkan 4 Agustus 2026.
 - **Keadaan sistem**: diperiksa langsung di produksi 4 Agustus 2026 (lihat bab Keadaan Sistem Hari Ini).
 
@@ -189,6 +191,7 @@ Dari empat ketentuan di Form Pengajuan Dana, mana yang harus membuat pengajuan *
 
 ## Dokumen Terkait
 
+- [[Finance - Kas Kecil dan Pengajuan Budget]] — dokumen induk: aturan lintas divisi dari Finance, plafon per divisi, sembilan aturan bisnis, dan lubang datanya
 - [[GA - Procurement System]] — rencana lama yang lebih umum, memuat peringatan tim sendiri agar fitur ini tidak dijadikan fitur pertama GA dan Finance
 - [[GA - Inventory Management]] — tujuan akhir barang yang diterima GA
 - [[GA - Big Pictures]] — peta domain General Affairs
