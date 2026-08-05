@@ -4,6 +4,9 @@
 
 - **Status**: 🟡 Konsep / Draft
 - **Penomoran aset (tag)**: implementasi saat ini `INV-BIP-DDMMYY-NAMA-n` (tanggal dari `purchase_date` WIB, `NAMA` = nama barang uppercase tanpa spasi, `n` = increment) — sudah menyertakan item, sejalan dengan arah yang diinginkan. Kategori & nama barang kini **bebas-ketik** (bukan lagi enum terbatas). Detail grounded: [[Microservices - Inventory Service]] · [[API - Inventory Service]].
+- **Sudah diimplementasikan (✅) di modul Aset**: daftar + kartu ringkasan (jumlah per status + biaya), pencarian/filter/paginasi client-side, **kolom Karyawan Pemegang** (kosong → "Tersedia di GA"), detail bertab, dan **export Excel**.
+- **Serah-terima aset (✅)**: pemegang **opsional** saat buat; alur **Serahkan → menunggu persetujuan SPV → SPV setujui** (tombol Setujui hanya untuk **SPV penaung** departemen penyerah — GA jatuh ke **SPV HR** via `supervised_by`), + **Tarik/Kembalikan**. Bukti serah-terima = **upload dokumen** (mengganti catatan teks).
+- **Lokasi & penyusutan (✅)**: aset punya **lokasi** (input manual) & **masa manfaat**; **nilai buku ditampilkan sebagai ESTIMASI** (garis lurus, dihitung frontend) — **bukan** angka pembukuan resmi (akuntansi via Accurate, [[ADR - 0001 Akuntansi via Accurate]]).
 - Terkait erat dengan [[GA - Procurement System]] (sumber masuknya barang) & [[WH - Management System]] (master data).
 
 ## Latar Belakang
