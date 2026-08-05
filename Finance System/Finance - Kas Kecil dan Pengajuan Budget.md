@@ -2,7 +2,7 @@
 
 *Modul kas kecil per divisi beserta jalur pengajuan budget, menggantikan aturan yang kini berjalan lewat kesepakatan lisan dan chat. **Lintas divisi**, bukan fitur satu departemen: Finance yang menetapkan plafon dan aturannya, tiap divisi yang memakainya. Dokumen ini menggabungkan blueprint dari Finance dengan hasil pemeriksaan langsung ke data produksi, supaya lubang datanya terlihat sebelum ada yang mulai menulis kode.*
 
-- **Status**: 🟡 Konsep. Belum ada kode. Blueprint sudah rinci, tetapi empat lubang data dan tiga tabrakan arsitektur harus dibereskan lebih dulu.
+- **Status**: ⚠️ Pondasi aturan **sudah merge** (PR #986, 5 Agustus 2026), **belum deploy** dan **belum punya satu pun endpoint**. Yang ada baru mesin perhitungannya. Empat lubang data dan tiga tabrakan arsitektur masih menghalangi bagian berikutnya.
 - **Sumber requirement**: Blueprint Modul Kas Kecil & Pengajuan Budget v1.0 (draft), disusun dari percakapan WhatsApp dengan Finance.
 - **Sumber angka sistem**: sensus langsung `employee_db` dan `procurement_db` produksi, **4 Agustus 2026**.
 - **Terkait**: [[GA - Form Pengadaan dan Pengajuan Dana]] mencatat dua form kertas GA yang menjadi bagian dari alur ini.
@@ -59,6 +59,32 @@ Nilai pada R-01, R-02, R-03, R-05, dan R-06 **wajib disimpan sebagai data**, buk
 - **Kas kecil**: DRAFT, TERPAKAI, MENUNGGU_BUKTI, TERVERIFIKASI, TERJURNAL
 - **Pengajuan**: DRAFT, DIAJUKAN, REVIEW_ATASAN, REVIEW_FINANCE, DISETUJUI / DITOLAK / REVISI, DICAIRKAN, REALISASI, SELESAI
 - **Top-up**: DIAJUKAN, REVIEW_FINANCE, DISETUJUI, DANA_DITAMBAHKAN
+
+## Sudah Ada di Kode (PR #986, merge 5 Agustus 2026)
+
+Seluruhnya **fungsi murni** di `bip-erp/services/procurement/`: tanpa Mongo, tanpa HTTP, tanpa jam dinding. Belum ada handler, koleksi, rute, maupun katalog izin. Bagian yang menentukan pengeluaran seseorang diterima atau ditolak sengaja dibuat dapat dibaca dan diuji tanpa menyalakan apa pun.
+
+| Berkas | Isi |
+|---|---|
+| `kas_periode.go` | Batas bulan WIB, `RentangPeriodeKas` dan `PeriodeKasDari` |
+| `kas_parameter.go` | Parameter berversi, `ParameterBerlaku` memilih versi menurut tanggal |
+| `kas_plafon.go` | `PlafonEfektif` (tetap vs dinamis) dan `SisaSaldo` |
+| `kas_aturan.go` | `PutuskanJalurKas` untuk R-01 sampai R-07 dan R-09, `DugaPemecahanTransaksi` untuk R-08 |
+
+Kesepuluh test case penerimaan blueprint §9 ditulis apa adanya sebagai tabel test dan seluruhnya lulus.
+
+**Empat keputusan teknis yang perlu diketahui sebelum melanjutkan:**
+
+- **Uang bertipe `int64`, bukan `float64`.** Rupiah adalah bilangan bulat, dan `float64` melahirkan sisa pecahan yang muncul sebagai selisih Rp 1 di rekonsiliasi lalu mustahil dijelaskan.
+- **Batas bulan WIB**, memakai ulang `lokasiWIB` milik `accurate_vendor.go`. Dua konstanta WIB dalam satu package akan berbeda diam-diam suatu hari nanti.
+- **R-08 berdiri terpisah** dari penentuan jalur, karena ia blokir lunak (tanda untuk Finance), bukan penolakan. Menggabungkannya akan menahan transaksi yang sah.
+- **Setiap penolakan membawa saran jalan keluar.** Penolakan buntu membuat pemakai kembali ke kertas, dan kegagalan semacam itu tidak muncul di log mana pun.
+
+### Pertentangan di dalam blueprint yang sudah dipilihkan sementara
+
+Bagan alir §4.1 mengirim barang **aset di atas ambang** ke jalur pengajuan biasa bila divisinya boleh membeli aset lewat kas kecil. Matriks approval §5 berkata lain: baris "Pengajuan Aset" berlaku untuk **semua nominal**, dengan rantai Kepala Divisi, GA, lalu Finance.
+
+Kode mengikuti **matriks approval**. Alasannya: melewatkan GA pada pembelian aset membuat aset masuk perusahaan tanpa sepengetahuan pihak yang mencatat register aset, dan itu baru ketahuan saat stock opname. Pilihan ini dikunci test `TestAsetDiAtasAmbangTetapLewatJalurAset` supaya terlihat, bukan tersembunyi. **Menunggu konfirmasi Finance**; bila jawabannya sebaliknya, yang berubah hanya satu cabang.
 
 ## Lubang Data (diukur langsung di produksi, 4 Agustus 2026)
 
@@ -146,8 +172,8 @@ Blueprint mengusulkan enam fase, kurang lebih 16 minggu. Satu perubahan yang per
 
 | Fase | Ruang lingkup | Catatan |
 |---|---|---|
-| 0 | Bereskan master divisi (Gudang TJ, Bharata Club, penyeragaman nama) dan penanda atasan minimal untuk General Affair dan Procurement | **Tambahan**, bukan dari blueprint. Pekerjaan data, bukan kode |
-| 1 | Master data (divisi, plafon, kategori, parameter) + dashboard saldo | 2 minggu |
+| 0 | Bereskan master divisi (Gudang TJ, Bharata Club, penyeragaman nama) dan penanda atasan minimal untuk General Affair dan Procurement | **Tambahan**, bukan dari blueprint. Pekerjaan data, bukan kode. **Belum dikerjakan** |
+| 1 | Master data (divisi, plafon, kategori, parameter) + dashboard saldo | 2 minggu. **Mesin aturannya sudah ada** (PR #986); sisanya koleksi, endpoint, dan layar |
 | 2 | Transaksi kas kecil + R-01, R-03, R-06 + unggah bukti | 3 minggu |
 | 3 | Modul pengajuan + approval berjenjang + R-02, R-07 | 3 minggu |
 | 4 | Top-up (R-05) + tutup buku bulanan + laporan | 2 minggu |

@@ -552,22 +552,24 @@
       "tautan": [
         "Microservices - Task Management Service",
         "API - Index",
+        "APP - MyBharata",
+        "API - Form Builder Service",
         "APP - Dynamic Task Tracker"
       ],
-      "hash": "c93e4d0a1c949f602b9b53f767fa7fea38eba311220f8f3fc6025f9ccc1fc89f",
-      "ukuran_kb": 4.8,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di task-management-service dan bagaimana memanggilnya lewat gateway `/api/task-management/*`. Merinci rute untuk membuat/menyaring tiket, ubah status, assign, approve/reject, kelola space beserta visibility dan tipe permintaan, lampiran via file-service, komentar, checklist, notifikasi, laporan tim, audit trail, serta koneksi WebSocket realtime. Juga menjelaskan aturan gating akses (403 untuk space restricted), validasi `type_id` harus milik space, dan mengapa `/tasks/pending-csat` dipisah dari `/tasks/counts`.",
+      "hash": "568773b8aeaf13918160888ff6066055ec529cfbddcc04b8f86e5c27a52a11e5",
+      "ukuran_kb": 6.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia untuk mengelola tiket/task dan space Kanban, bagaimana membuat tiket beserta type_id dan pertanyaan per tipe, serta bagaimana attachment, komentar, checklist, notifikasi, CSAT, audit, dan laporan diakses lewat gateway. Juga menjelaskan bagaimana space restricted disaring dari list maupun detail, kenapa /tasks/pending-csat sengaja terpisah dari /tasks/counts, dan bagaimana koneksi WebSocket realtime masuk lewat ingress dan bukan gateway.",
       "kata_kunci": [
         "task management service",
-        "API endpoint",
-        "tiket",
         "ticketing",
         "helpdesk",
-        "space",
+        "space Kanban",
+        "endpoint",
         "CSAT",
         "WebSocket",
-        "SLA",
-        "gateway"
+        "attachment",
+        "tipe permintaan",
+        "SLA"
       ]
     },
     {
@@ -1027,20 +1029,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "65c3e0d1c68b6c0377aa45411655163c445d318457f7ccfc523092211e846583",
-      "ukuran_kb": 82.4,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS internal Bharata (hris-dashboard \"One Bharata\"), stack dan repo mana yang dipakai, serta bagaimana login, refresh token, dan handoff SSO ke aplikasi lain seperti Task Manager bekerja. Menjelaskan juga bagaimana menu dan hak akses ditentukan dari cookie `system_roles` per modul, bagaimana sidebar dikelompokkan (menu induk bersarang, perataan induk tipis, Tampilan Menu per jabatan yang menyimpan `menu_hidden`), dan mengapa setelan tampilan menu berbeda dari RBAC. Berguna untuk pertanyaan soal dukungan multi-perusahaan di frontend (company switcher, kelola perusahaan/departemen/shift/network/karyawan per company), fitur Atasan Langsung dan menu KPI untuk Leader, plus gotcha urutan deploy BE sebelum FE.",
+      "hash": "2ee793b88508e4f3b236760d56edae981e4d70f1c7536f4b909555c3911fed76",
+      "ukuran_kb": 84.7,
+      "ringkasan": "Menjawab: apa itu portal web internal hris-dashboard (One Bharata), stack apa yang dipakai, bagaimana alur login serta refresh token bekerja, dan bagaimana web ini berperan sebagai SSO Identity Provider bagi aplikasi lain. Juga menjelaskan bagaimana sidebar dan menu digerbang oleh system_roles, bagaimana pengelompokan menu, pengaturan tampilan menu per jabatan, dan pengisian atasan langsung dirancang, serta bagian mana saja yang sudah sadar multi-perusahaan.",
       "kata_kunci": [
-        "web ERP",
+        "erp-frontend",
         "hris-dashboard",
         "One Bharata",
-        "erp-frontend",
-        "Next.js",
+        "web ERP",
         "SSO",
         "system_roles",
         "sidebar menu",
+        "Next.js",
         "multi-perusahaan",
-        "company switcher"
+        "atasan langsung"
       ]
     },
     {
@@ -1726,20 +1728,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "5eb96dd3827aae9ca1d08ff91a7028aee411e25884ef969f12b4ba9333035fdb",
-      "ukuran_kb": 192.0,
-      "ringkasan": "Menjawab: apa tugas integration-service, marketplace apa saja yang tersambung (TikTok Shop, TikTok Business/Ads, Shopee, Lazada), bagaimana order masuk realtime lewat webhook direct lalu dinormalkan jadi model transaction terpadu, dan bagaimana bridging akuntansi ke Accurate Online berjalan (invoice, ringkasan harian per shop, sales return). Juga menjawab bagaimana GMV Max monitoring/overview dan ICC video metrics dihitung, dari mana angka ROI/ROAS berasal, serta modul lain seperti profit per produk, review analytics, ACL marketing team, WMS bridge, dan job cron. Menjelaskan pula status Meta Ads yang masih konsep tanpa kode dan jalur Desty yang soft-disabled.",
+      "hash": "1517356f1791b96db6c7b9e8d7fa1d0806e9e9d09ad5071ac698bad72a6eae9f",
+      "ukuran_kb": 196.1,
+      "ringkasan": "Menjawab: bagaimana ERP tersambung ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada), bagaimana webhook masuk diautentikasi dan diproses async, serta bagaimana order dan laporan iklan dinormalkan jadi model transaction terpadu lalu dibridge ke Accurate sebagai invoice dan sales return. Juga menjelaskan laporan GMV Max (monitoring, overview per produk, ICC video metrics) berikut rumus ROAS/ROI-nya, cron sync master data dan penanganan rate limit TikTok, manajemen kredensial OAuth, status jalur Desty yang soft-disabled, serta bahwa client Meta Ads masih konsep tanpa kode.",
       "kata_kunci": [
         "integration service",
         "marketplace",
         "TikTok Shop",
-        "TikTok Business",
-        "GMV Max",
+        "TikTok Ads",
         "Shopee",
         "Accurate",
         "webhook",
-        "Desty",
-        "ICC"
+        "GMV Max",
+        "ROAS",
+        "Desty"
       ]
     },
     {
@@ -2059,13 +2061,14 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (branch `feat/task-management-parity`, dari `main`; belum merge). Paritas penuh dengan FE gateway-cutover. Catatan: **WebSocket butuh rute ingress** (gateway tak proxy WS), **push FCM/inbox ke notification-service ditunda** (WS-only), **role hanya `supervisor`/`staff`** (admin lintas-divisi tidak diaktifkan).",
+      "status_teks": "Implemented, **sudah di `main`** (diperiksa langsung ke `origin/main` 2026-08-05; catatan lama \"branch `feat/task-management-parity` belum merge\" sudah tidak berlaku dan branch-nya tak ada lagi). Catatan: **WebSocket butuh rute ingress** (gateway tak proxy WS), **push FCM/inbox ke notification-service ditunda** (WS-only), **role hanya `supervisor`/`staff`** (admin lintas-divisi tidak diaktifkan). Pertanyaan per tipe (`SpaceType.Fields`) 🔜 **belum merge** — lihat bagiannya di bawah.",
       "publik": true,
       "tautan": [
         "Microservices - File Service",
         "HRIS - Organization Structure",
-        "CORE - API Master Gateway",
         "APP - MyBharata",
+        "Microservices - Form Builder Service",
+        "CORE - API Master Gateway",
         "APP - Web ERP",
         "DB - Overview and Notes",
         "Microservices - Employee Service",
@@ -2073,20 +2076,20 @@
         "APP - Dynamic Task Tracker",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "b7525bfb61da52b7c9ea3e55088f938c55134f9efcd296ea339077a9ac96be28",
-      "ukuran_kb": 20.1,
-      "ringkasan": "Menjawab: bagaimana backend IT Helpdesk/ticketing internal ERP bekerja, mulai dari alur Kanban tiket (`Request → Todo → On Going → Testing → Done` plus jalur `Ditolak`), approval, hold/reopen, CSAT, automation auto-assign/auto-close, sampai SLA engine dua dimensi dengan scheduler eskalasi. Menjelaskan model Space per divisi (stage & priority default, tipe permintaan per-space, visibility public/restricted dan gerbang `canAccessSpace`) serta bagaimana cakupan divisi supervisor diturunkan dari header `BIP-Supervised-Departments` lewat `scopedDivisions()`. Berguna untuk memahami alasan desain dan jebakan integrasi, mis. `type_id` sengaja opsional demi klien mobile lama, `visibility` kosong harus dibaca sebagai `public`, dan WebSocket masuk lewat ingress langsung karena gateway tidak mem-proxy WS.",
+      "hash": "0b30655b0414e05a53ec4c55cae35491c689ac90c1bd3a9604bb47cfd1fc6236",
+      "ukuran_kb": 22.7,
+      "ringkasan": "Menjawab: bagaimana backend IT Helpdesk/ticketing bekerja, mulai dari space Kanban per divisi, alur stage Request sampai Done plus jalur Ditolak, gate approval, engine SLA dua dimensi dengan eskalasi, automation auto-assign dan auto-close, sampai CSAT, audit trail, dan reporting. Juga menjelaskan bagaimana cakupan divisi supervisor diturunkan dari klaim JWT dan kenapa itu berbeda dari pengelompokan KPI, bagaimana tipe permintaan per-space dan pertanyaan turunannya dirancang, serta kenapa Form Builder Service sengaja tidak dipakai untuk pertanyaan itu.",
       "kata_kunci": [
         "task management service",
         "IT Helpdesk",
         "ticketing",
-        "tiket",
         "Kanban",
-        "space",
         "SLA",
+        "approval",
         "CSAT",
+        "space visibility",
         "supervisor divisi",
-        "Go Fiber MongoDB"
+        "WebSocket"
       ]
     },
     {
@@ -2842,20 +2845,23 @@
         "ADR - 0012 Retur Refund-only Push-all",
         "ADR - 0017 Tanggal Retur TikTok via order_update_date",
         "Microservices - Integration Service",
+        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur"
       ],
-      "hash": "3eeeecf1a8d965f1d92231268a87c14a7fb4e3d08e849bc847fcdc2b28887f3c",
-      "ukuran_kb": 7.0,
-      "ringkasan": "Menjawab bagaimana sistem mencegah retur dibukukan dobel dengan koreksi income/receipt (gerbang payout mendekati nol vs payout positif), sumber tanggal retur per jenis solusi (refund-only vs barang balik) khusus Shopee, dan kenapa basis cutover retur diubah mengikuti hari-kirim faktur.",
+      "hash": "d62cd01e1d7cc22e646ed9a944c9bbe4f990dfb1f780dc3577c5b220211621bc",
+      "ukuran_kb": 10.3,
+      "ringkasan": "Menjawab: kenapa retur penjualan hanya dibukukan ke Accurate ketika payout order mendekati nol, dan kenapa order dengan payout lebih dari nol justru diserap lewat Auto Sync Income sehingga dobel pembukuan revenue mustahil terjadi. Juga menjelaskan bagaimana tanggal retur ditentukan per solution (refund-only pakai tanggal ajukan, barang-balik pakai reverse-tracking saat barang sampai), kenapa cutover retur mengikuti hari kirim faktur bukan tanggal retur, serta kenapa keputusan SKIP wajib meninggalkan baris jejak agar finance bisa menelusurinya.",
       "kata_kunci": [
-        "gerbang payout",
-        "escrow Shopee",
-        "retur dobel",
-        "refund Shopee",
-        "return_tracking",
-        "cutover hari kirim",
-        "receipt Accurate",
-        "Auto Sync Income"
+        "retur",
+        "sales return",
+        "payout",
+        "escrow",
+        "Accurate",
+        "Shopee",
+        "refund",
+        "cutover",
+        "auto sync income",
+        "ADR 0024"
       ]
     },
     {
@@ -2878,19 +2884,19 @@
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "7144f90edde6acfe2c0abe7e45e3e9fa89c5b602d6a9e8252ae2ce2b23990929",
-      "ukuran_kb": 18.5,
-      "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi dua sub-tab (SUMBER vs INPUT WMS), apa sumber data tiap menu (feed retur marketplace, resi, Procurement PO, Surat Jalan, Laporan Hasil Produksi), dan kenapa badge 'sudah/belum dicatat' hanya dipasang di tab yang punya kunci join. Juga menjawab status resi mana yang dihitung keluar gudang (COMPLETED plus SHIPPED, dengan alasan TO_SHIP sengaja dikecualikan), kenapa tab Keluar FG diagregasi per SKU dan bundle dipecah ke komponen, serta bagaimana jejak akuntabilitas penginput dijamin lewat `created_by_name` yang distempel server dari header username, bukan dikirim client.",
+      "hash": "06fe7ce303d45f873674bfc90156e6c824efc598167b2d12bf7c2622fdc3dcf9",
+      "ukuran_kb": 19.0,
+      "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi dua sub-tab (SUMBER vs INPUT WMS), menu apa saja yang terdampak beserta feed sumbernya, dan kenapa badge status sudah/belum dicatat hanya dipasang di tab yang punya kunci join. Juga menjelaskan status resi mana yang dihitung keluar gudang dan alasannya, kenapa tab sumber Keluar FG diagregasi per SKU dengan bundle dipecah ke komponen, bagaimana nama penginput distempel server lewat created_by_name alih-alih dikirim client, serta bagaimana gerbang gudang per-order untuk retur bekerja.",
       "kata_kunci": [
         "WMS",
-        "log sumber vs input",
-        "created_by_name",
-        "audit trail penginput",
+        "gudang",
+        "warehouse",
+        "log sumber",
+        "input WMS",
         "retur ekspedisi",
-        "Keluar FG",
-        "Inbound RM",
         "master resi",
-        "gerbang gudang",
+        "created_by_name",
+        "audit trail",
         "ADR 0025"
       ]
     },
@@ -3415,8 +3421,8 @@
       "judul": "Finance - Kas Kecil dan Pengajuan Budget",
       "area": "Finance System",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "Konsep. Belum ada kode. Blueprint sudah rinci, tetapi empat lubang data dan tiga tabrakan arsitektur harus dibereskan lebih dulu.",
+      "status_emoji": "⚠️",
+      "status_teks": "Pondasi aturan **sudah merge** (PR #986, 5 Agustus 2026), **belum deploy** dan **belum punya satu pun endpoint**. Yang ada baru mesin perhitungannya. Empat lubang data dan tiga tabrakan arsitektur masih menghalangi bagian berikutnya.",
       "publik": true,
       "tautan": [
         "GA - Form Pengadaan dan Pengajuan Dana",
@@ -3432,20 +3438,20 @@
         "GA - Procurement System",
         "Finance - Big Pictures"
       ],
-      "hash": "45958cc46e6707de1fe5cdcba38f99a68a896fd69cac566110a7d425f40075fe",
-      "ukuran_kb": 11.1,
-      "ringkasan": "Menjawab: berapa plafon kas kecil tiap divisi per bulan, kapan sebuah pengeluaran wajib lewat jalur Pengajuan dengan approval alih-alih kas kecil (ambang Rp 500.000), siapa approver-nya menurut nominal dan jenis belanja, serta status apa saja yang dilewati kas kecil, pengajuan, dan top-up. Menjelaskan juga mengapa aturan itu belum bisa langsung dikodekan: nama divisi di blueprint tidak cocok dengan master department, banyak departemen tanpa plafon, data atasan langsung belum lengkap, dan master kategori belanja beserta flag aset belum ada. Memuat pula benturannya dengan arsitektur, yaitu rencana buku besar sendiri versus akuntansi di Accurate, model relasional di atas MongoDB per service, dan register aset yang belum tersedia.",
+      "hash": "57dd697b7212f1019f6234c442dba4800d776147ab0fff09b250870ffd8975b6",
+      "ukuran_kb": 13.5,
+      "ringkasan": "Menjawab: berapa plafon kas kecil tiap divisi per bulan, kapan sebuah pengeluaran cukup lewat kas kecil dan kapan wajib lewat jalur pengajuan dengan approval, serta siapa approver-nya menurut nominal dan jenis belanja (termasuk jalur khusus pembelian aset dan top-up saldo). Menjelaskan sembilan aturan bisnis R-01 sampai R-09 (blokir overbudget, larangan beli aset lewat kas kecil, deteksi pemecahan transaksi, kunci karena bukti telat), alur status kas kecil/pengajuan/top-up, dan berkas Go mana di service procurement yang memuat mesin perhitungannya beserta alasan pilihan teknisnya (uang int64, batas periode WIB). Berguna juga untuk menelusuri hasil sensus data produksi soal nama divisi yang tidak cocok master data, departemen tanpa plafon, dan hierarki atasan, serta titik gesekan dengan keputusan akuntansi via Accurate dan model data di database dokumen.",
       "kata_kunci": [
         "kas kecil",
         "petty cash",
-        "plafon divisi",
         "pengajuan budget",
         "budget request",
-        "matriks approval",
-        "top-up",
-        "kategori belanja",
+        "plafon divisi",
+        "approval matrix",
+        "top-up saldo",
         "pengajuan aset",
-        "Accurate"
+        "procurement service",
+        "Finance"
       ]
     },
     {
@@ -7105,20 +7111,20 @@
         "ADR - 0009 Affiliate via Search Seller Affiliate Orders API",
         "Sales - Incentive"
       ],
-      "hash": "d32dd441bd5ed73a0b051e2d7ef6c3b29162aaaaddaebc2907c3b495bd49e02f",
-      "ukuran_kb": 17.7,
-      "ringkasan": "Menjawab: bagaimana karyawan ICC (Internal Content Creator) dipetakan ke akun TikTok Shop dan TikTok Ads yang mereka kelola, seperti apa model data koleksi icc_account_mappings di Integration Service, dan aturan apa yang berlaku (shop/advertiser opsional tapi minimal salah satu wajib, satu karyawan boleh banyak toko/ads, satu shop atau advertiser hanya untuk satu karyawan aktif). Menjelaskan alur SPV/Leader membuat mapping dengan team auto-fill dari header BIP-Department, halaman ICC Dashboard untuk staff melihat performa toko dan iklannya sendiri, Team Performance untuk atasan, serta cara rotasi atau pergantian Account Manager. Memuat juga daftar endpoint /icc/mappings, otorisasi lewat middleware RequireMarketingLeader, fase implementasi, dan kaitannya dengan insentif.",
+      "hash": "71d5df1b434c6ae009d787d8aafe78cac62cbd6af9726c1afcfb6b3ac51b644f",
+      "ukuran_kb": 23.7,
+      "ringkasan": "Menjawab: bagaimana karyawan ICC (Internal Content Creator) dipetakan ke akun TikTok Shop dan TikTok Ads yang mereka kelola, aturan kardinalitas dan unique index-nya, serta field apa saja yang disimpan di koleksi icc_account_mappings termasuk cara field team terisi otomatis dari header departemen. Juga menjelaskan siapa yang berhak membuat dan merotasi mapping menurut RBAC marketing leader, endpoint apa saja yang tersedia, dan bagaimana alur ICC Dashboard untuk staff maupun Team Performance untuk SPV/Leader mengambil data performa toko dan iklan.",
       "kata_kunci": [
         "ICC",
         "Internal Content Creator",
         "Account Manager",
-        "AM",
-        "icc_account_mappings",
+        "mapping",
         "TikTok Shop",
         "TikTok Ads",
-        "advertiser_id",
-        "integration service",
-        "mapping karyawan"
+        "advertiser",
+        "icc_account_mappings",
+        "insentif",
+        "RBAC"
       ]
     },
     {
