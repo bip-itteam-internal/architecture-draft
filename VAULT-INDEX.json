@@ -3440,8 +3440,19 @@
       ],
       "hash": "da5dba93ed1ea871a45e64fc9b6f5e762003169950bc61ccd0d81d582a058412",
       "ukuran_kb": 20.0,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: berapa plafon kas kecil tiap divisi per bulan, kapan sebuah pengeluaran cukup dipakai langsung dan kapan wajib lewat jalur Pengajuan dengan approval, serta siapa approver-nya menurut nominal (Kepala Divisi, Finance, Direksi, GA untuk aset). Merinci sembilan aturan bisnis R-01 sampai R-09 (blokir overbudget, larangan beli aset lewat kas kecil, hak top-up khusus Purchasing dan Gudang TJ, deteksi pemecahan transaksi, penguncian karena bukti menunggak), alur status transaksi kas kecil, pengajuan, dan top-up, plus endpoint berprefix /kas di procurement-service beserta permission dan koleksi Mongo-nya. Juga sumber jawaban untuk pertanyaan kenapa modul ini menumpang procurement-service, kenapa tidak ada fallback tier izin, kenapa uang bertipe int64 dan batas periode memakai WIB, serta apa lubang data 'divisi versus departemen' dan pertentangannya dengan ADR akuntansi via Accurate.",
+      "kata_kunci": [
+        "kas kecil",
+        "petty cash",
+        "pengajuan budget",
+        "budget request",
+        "plafon divisi",
+        "approval berjenjang",
+        "top-up kas",
+        "pengajuan aset",
+        "procurement-service",
+        "endpoint /kas"
+      ]
     },
     {
       "path": "General Affairs/GA - Accident Prevention.md",
@@ -8525,7 +8536,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Finance System/Finance - Kas Kecil dan Pengajuan Budget.md"
-  ]
+  "gagal": []
 }
