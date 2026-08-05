@@ -1046,9 +1046,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "80b4876d530dfd2353ba801e10e6f4cde4c49b9005a10c6a96b205e3dbf9a239",
-      "ukuran_kb": 88.9,
-      "ringkasan": "Menjawab pertanyaan tentang aplikasi web ERP (hris-dashboard/\"One Bharata\"): stack teknologi yang dipakai, bagaimana autentikasi & SSO Identity Provider bekerja, bagaimana role/RBAC menentukan menu yang tampil di sidebar, dan fitur multi-perusahaan (company switcher, kelola departemen/shift per perusahaan). Juga mendokumentasikan perubahan terkini seperti pengaturan tampilan menu per posisi, penataan menu KPI untuk Leader, dan fitur Atasan Langsung.",
+      "hash": "7ee69ed1f386b978d3d6c78515379e0c4f5fac5e7cc756de9cb2cc13a1d3c779",
+      "ukuran_kb": 93.3,
+      "ringkasan": "Menjawab pertanyaan tentang aplikasi web ERP (hris-dashboard/\"One Bharata\"): stack teknologi yang dipakai, bagaimana autentikasi dan SSO Identity Provider bekerja, bagaimana role/RBAC menentukan menu yang tampil di sidebar, dan fitur multi-perusahaan (company switcher, kelola departemen/shift per perusahaan). Juga menjawab bagaimana layar DAFTAR disusun di aplikasi ini: pola satu card (banner, garis pemisah, tabel), letak filter dan tombol export, serta jebakan komponen tabel bersama seperti sel tanpa garis, kolom sticky yang butuh latar buram sendiri, dan teks keadaan kosong yang terpaku bahasa Inggris. Memuat pula catatan per-layar HRIS yang penting: Roster harian, Resign, Jadwal Kerja, Laporan Kehadiran, dashboard per posisi, Atasan Langsung, dan menu KPI untuk Leader.",
       "kata_kunci": [
         "erp-frontend",
         "web ERP",
@@ -1061,8 +1061,10 @@
         "sidebar menu",
         "multi-perusahaan",
         "company switcher",
-        "Atasan Langsung",
-        "KPI Leader"
+        "pola satu card",
+        "tabel daftar",
+        "banner filter",
+        "Atasan Langsung"
       ]
     },
     {
