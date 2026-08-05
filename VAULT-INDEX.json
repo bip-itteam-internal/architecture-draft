@@ -1027,20 +1027,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "263ac0a5372ded396adb625fdffc778a35dd2975d8333a6b200d1832e896369d",
-      "ukuran_kb": 82.2,
-      "ringkasan": "Menjawab: apa itu portal web internal \"One Bharata\" (erp-frontend), stack apa yang dipakai, dan modul/fitur apa saja yang tersedia di dalamnya. Juga menjawab: bagaimana alur login dan refresh token, bagaimana peran SSO Identity Provider untuk aplikasi lain seperti Task Manager, serta bagaimana menu sidebar digerbang oleh system_roles per module (hris, finance, it, ga, kpi, dll). Menjelaskan pula cara kerja pengelompokan menu bersarang, pengaturan Tampilan Menu per jabatan (centang = tampil, yang disimpan menu_hidden), pengisian Atasan Langsung, serta dukungan multi-perusahaan (CompanySwitcher, kelola departemen/shift/network per perusahaan).",
+      "hash": "65c3e0d1c68b6c0377aa45411655163c445d318457f7ccfc523092211e846583",
+      "ukuran_kb": 82.4,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS internal Bharata (hris-dashboard \"One Bharata\"), stack dan repo mana yang dipakai, serta bagaimana login, refresh token, dan handoff SSO ke aplikasi lain seperti Task Manager bekerja. Menjelaskan juga bagaimana menu dan hak akses ditentukan dari cookie `system_roles` per modul, bagaimana sidebar dikelompokkan (menu induk bersarang, perataan induk tipis, Tampilan Menu per jabatan yang menyimpan `menu_hidden`), dan mengapa setelan tampilan menu berbeda dari RBAC. Berguna untuk pertanyaan soal dukungan multi-perusahaan di frontend (company switcher, kelola perusahaan/departemen/shift/network/karyawan per company), fitur Atasan Langsung dan menu KPI untuk Leader, plus gotcha urutan deploy BE sebelum FE.",
       "kata_kunci": [
-        "erp-frontend",
-        "One Bharata",
         "web ERP",
-        "frontend",
+        "hris-dashboard",
+        "One Bharata",
+        "erp-frontend",
         "Next.js",
         "SSO",
         "system_roles",
         "sidebar menu",
-        "role gating",
-        "multi-perusahaan"
+        "multi-perusahaan",
+        "company switcher"
       ]
     },
     {
