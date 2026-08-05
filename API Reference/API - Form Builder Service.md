@@ -2,7 +2,7 @@
 
 *Endpoint **form-builder-service** (form dinamis + analisa jawaban + kepatuhan presensi). Gateway: `/api/form-builder/*`. Kelola form butuh **tingkat peran** `staff`/`supervisor`/`admin` di modul mana pun DAN departemen pemanggil ada di daftar departemen aktif; mengisi cukup terautentikasi. Grounded ke `services/form-builder/routes.go` + handler terkait (`main`, PR #849; kepemilikan per departemen PR #869).*
 
-- **Implementasi**: [[Microservices - Form Builder Service]] · **Status**: ⚠️ (live di dev **dan prod** sejak 2026-08-01; **penilaian karyawan, tipe form, dan rekap per orang dinilai** merged 2026-08-02 lewat PR #907 + #908 — **live di dev DAN prod** sejak 2026-08-02)
+- **Implementasi**: [[Microservices - Form Builder Service]] · **Status**: ⚠️ (live di dev **dan prod** sejak 2026-08-01; **penilaian karyawan, tipe form, dan rekap per orang dinilai** merged 2026-08-02 lewat PR #907 + #908 — **live di dev DAN prod** sejak 2026-08-02). **Form berulang** (`recurrence`, `period_key`, `?period=`) ada di kode tapi baru didokumentasikan 2026-08-06; nomor PR-nya belum ditelusuri dan alurnya belum punya catatan uji end-to-end.
 - **Indeks**: [[API - Index]]
 - **Konsumen**: seluruh rute `/forms*` — termasuk `analytics`, `responses`, `export` — dipakai [[APP - Web ERP]]. Rute **`/me/*`** dipakai [[APP - MyBharata]] (section Survei di beranda + halaman pengisian).
 
@@ -17,7 +17,7 @@
 | POST | `/forms` | Buat form (lahir `draft`; `owner_department` wajib dan harus dalam cakupan pemanggil. Ejaannya **dikanonikkan** ke daftar departemen aktif) |
 | GET | `/forms` | Daftar form departemen yang boleh dikelola pemanggil (`?status=`, `?form_type=`, `?search=`, `?page=`, `?limit=` maks 100). Tiap item membawa `form_type`, `response_count` (jumlah jawaban) dan `respondent_count` (jumlah ORANG) |
 | GET | `/forms/:id` | Detail + `response_count` |
-| PATCH | `/forms/:id` | Sunting. `409` bila susunan field diubah padahal sudah ada jawaban. `owner_department` tak bisa dipindah |
+| PATCH | `/forms/:id` | Sunting. `409` bila susunan field diubah padahal sudah ada jawaban (**berlaku juga untuk form berulang**, lihat catatan di bawah). `409` juga bila `recurrence` **dinyalakan** pada form yang sudah punya jawaban; mematikannya tetap boleh. `owner_department` tak bisa dipindah |
 | PATCH | `/forms/:id/status` | `draft`→`published`→`closed`. `409` bila mencoba mundur dari `published` ke `draft`. Saat terbit: **memotret sasaran penilaian** (`422` bila gagal, kosong, atau >300 orang) lalu mengirim notifikasi inbox ke seluruh sasaran |
 | DELETE | `/forms/:id` | Hapus lunak (`deleted_at` + status `closed`) |
 
@@ -26,15 +26,17 @@
 ## Analisa & Export (RBAC per departemen)
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/forms/:id/analytics` | Rekap per pertanyaan + tren harian + tingkat pengisian (lihat bentuk respons di bawah) |
-| GET | `/forms/:id/responses` | Daftar jawaban berhalaman (`?page=`, `?limit=` maks 200), terbaru dulu |
-| GET | `/forms/:id/export` | CSV (`text/csv`). Header `X-Export-Truncated` muncul bila menyentuh batas 20.000 baris |
+| GET | `/forms/:id/analytics` | Rekap per pertanyaan + tren harian + tingkat pengisian (lihat bentuk respons di bawah). `?period=` menyaring satu putaran form berulang |
+| GET | `/forms/:id/responses` | Daftar jawaban berhalaman (`?page=`, `?limit=` maks 200), terbaru dulu. `?period=` |
+| GET | `/forms/:id/export` | CSV (`text/csv`). Header `X-Export-Truncated` muncul bila menyentuh batas 20.000 baris. `?period=` |
+
+> **`?period=` kosong berarti SELURUH periode di sini**, dan itu KEBALIKAN dari arti periode kosong pada penjaga duplikat saat mengisi (di sana kosong berarti "hanya jawaban yang memang tak punya periode"). Pemilik form yang membuka halaman analisa tanpa memilih periode mengharapkan rekap penuh, bukan rekap yang diam-diam menyusut.
 
 ## Pengisian (karyawan terautentikasi)
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/me/capability` | `{can_manage, departments[]}` — apa yang boleh dilakukan pemanggil di Form Builder |
-| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `submitted`, `blocks_attendance`, `gate_end_date`). Form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous` |
+| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `submitted`, `blocks_attendance`, `gate_end_date`). Form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous`. Pada form berulang, `submitted` dihitung terhadap **periode berjalan**, bukan seumur hidup form |
 | GET | `/me/forms/:id/subjects` | Daftar orang yang harus DINILAI pemanggil + `progress{done,total,anonymous}`. `409` bila form tak menilai siapa pun |
 | POST | `/me/forms/:id/responses` | Kirim jawaban (+`subject_employee_id` untuk form penilaian). `403` bila bukan sasaran atau menilai orang di luar daftar, `409` bila form tak `published` atau orang itu sudah dinilai. Balas `subject_done`, `subject_total`, `all_completed` |
 | GET | `/me/responses` | Riwayat jawaban sendiri |
@@ -68,7 +70,13 @@
 
 > **`subject` menjawab siapa yang DINILAI**, `audience` menjawab siapa yang MENGISI. Skenario "semua karyawan menilai tiap Office Boy" = `audience.type: all` + `subject.rules: ["positions"]`, `positions: ["Office Boy"]`. **Gerbang presensi ditolak `400`** pada form bersasaran penilaian.
 
-**Gerbang presensi** (`attendance_gate`): `{enabled, mode: "warn"|"block", start_date, end_date}`. Tanggal wajib **RFC3339** (`2026-08-01T00:00:00Z`); `"2026-08-01"` akan ditolak.
+**Form berulang** (`recurrence`): `{enabled, unit: "monthly"|"weekly", open_day}`. Nil atau `enabled:false` berarti form sekali jalan, dan perilakunya persis seperti sebelum fitur ini ada. `open_day` 1..28 untuk bulanan (dibatasi 28 karena Februari), 1..7 untuk mingguan mengikuti hari ISO Senin sampai Minggu. Nilai di luar rentang atau `unit` tak dikenal ditolak `400`.
+
+Jendela periode **selalu berakhir di ujung bulan atau minggu**, bukan sekian hari setelah buka, supaya dua periode tak pernah hidup bersamaan. Penandanya (`period_key`) `2026-08` untuk bulanan dan `2026-W32` untuk mingguan (penomoran **ISO**, supaya minggu yang melintasi pergantian tahun tak melahirkan dua penanda). Periode dibuka otomatis oleh cron **tiap jam** (`Asia/Jakarta`), hanya untuk form `published`.
+
+**`period_key` pada jawaban** (`FormResponse.period_key`): kosong untuk form biasa **dan** untuk seluruh jawaban yang tersimpan sebelum fitur ini. Klien tidak mengirimnya; backend menurunkannya dari aturan pengulangan dan waktu kirim. Kunci keunikan pengisian ikut bergeser jadi (form, pengisi, yang dinilai, periode), sehingga form bulanan bisa diisi ulang tiap putaran.
+
+**Gerbang presensi** (`attendance_gate`): `{enabled, mode: "warn"|"block", start_date, end_date}`. Tanggal wajib **RFC3339** (`2026-08-01T00:00:00Z`); `"2026-08-01"` akan ditolak. **Pada form berulang, `start_date`/`end_date` diabaikan** dan yang dipakai adalah jendela periode berjalan: tanggal statis akan lewat setelah bulan pertama dan gerbangnya tak pernah menyala lagi, padahal formnya terbit ulang tiap bulan.
 
 **Respons analytics**: `total_responses`, `unique_respondents`, `audience_size`, `sample_size`, `truncated`, `response_rate` (opsional), `daily[{date,count}]`, `fields[{key,label,type,answered,skipped,options[{option,count}],average,min,max,sample_text[]}]`. Saat `truncated=true`, `response_rate` sengaja tidak dikirim karena tak bisa dihitung jujur dari sebagian data.
 

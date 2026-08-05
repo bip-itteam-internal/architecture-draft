@@ -261,7 +261,7 @@ Batas service dan kepemilikan datanya diputuskan di [[ADR - 0032 Kepemilikan kpi
 10. Wajibkan pemakaian Production Log dan Batch Record (16 metrik), modul Training (6), modul Recruitment (6).
 
 **Fase 4, fitur baru menurut frekuensi kemunculan**
-11. Modul Kaizen / Ide Inovasi (16 metrik lintas departemen, kandidat implementasi paling hemat: space khusus di [[Microservices - Task Management Service]] yang sudah ada).
+11. Modul Kaizen / Ide Inovasi (16 metrik lintas departemen). **Sudah dirancang, lihat [[HRIS - Kaizen (Ide Perbaikan)]].** Kandidat lama "space khusus di [[Microservices - Task Management Service]]" **gugur** setelah diperiksa ke kode: jawaban pertanyaan per tipe di sana tidak disimpan sebagai data melainkan dirangkai jadi markdown di `description`, sehingga tidak bisa difilter atau dilaporkan per pertanyaan, padahal laporan per kategori dan hitungan kuota per periode justru inti fitur ini. Rumah yang dipilih: [[Microservices - Form Builder Service]] sebagai `form_type` kelima. Catatan penting soal metrik: sebagian metrik bernama Kaizen di matriks sebenarnya **bukan hitungan ide** (mis. "mengurangi jumlah CAPA produksi", "menjaga kualitas produk 98%"), jadi modul ini tidak menutup seluruh 16 metrik itu.
 12. Log 1-on-1 (9 metrik), sejalan dengan konsep [[HRIS - Work Review]].
 13. Field skor dan survei kepuasan pada modul Training (4 metrik).
 14. Checklist operasional berjadwal untuk patroli, 5R, GMP, dan preventive maintenance. Satu modul menutup General Affair, Quality, dan Warehouse sekaligus (kurang lebih 20 metrik). Lihat [[GA - Checklist Management]].

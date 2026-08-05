@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-05",
-  "jumlah_dokumen": 266,
+  "digenerate": "2026-08-06",
+  "jumlah_dokumen": 267,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -159,20 +159,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "36bb3d6656f5b79893c7f303087277cf2427b05ab3c2150eb136abd175eda3ee",
-      "ukuran_kb": 8.9,
-      "ringkasan": "Menjawab: bagaimana form dinamis dibuat, diterbitkan, dan ditutup; siapa yang boleh mengelolanya (cakupannya departemen, bukan modul); dan bagaimana karyawan mengisi form termasuk form penilaian orang lain. Juga menjawab bentuk datanya: tipe field, penanda section, beda audience (siapa mengisi) vs subject (siapa dinilai), gerbang presensi, plus endpoint analytics, export CSV, dan endpoint kepatuhan yang dipanggil attendance service saat clock-in.",
+      "hash": "541f1496b493c621e1cc295613edaf5bf3e6a9de94482a9073df1ae876a787ad",
+      "ukuran_kb": 11.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (tingkat peran staff/supervisor/admin plus cakupan departemen dari `SupervisedDepartments`), dan bagaimana karyawan mengisi form lewat rute `/me/*`. Menjelaskan juga bentuk data penting: 9 tipe field plus `section`, keterangan ujung skala, `owner_department` vs `audience`, `form_type` (survey/evaluation/request/checklist) yang terikat dua arah dengan sasaran penilaian `subject`, serta arti `?period=` pada analisa versus penjaga duplikat. Termasuk aturan idempotensi 2 menit, kode `409` saat susunan pertanyaan dikunci, dan rute internal `/internal/compliance` yang dipakai attendance service untuk menahan clock-in.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
+        "dynamic form",
         "survei",
         "survey",
-        "evaluation",
-        "penilaian karyawan",
+        "endpoint",
+        "owner_department",
         "audience",
-        "subject",
-        "attendance gate",
-        "export CSV"
+        "form_type",
+        "compliance clock-in"
       ]
     },
     {
@@ -1625,29 +1625,31 @@
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "HRIS - Organization Structure",
         "Microservices - Notification Service",
+        "IT - Background Jobs & Schedulers",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "IT - Form Builder",
         "Microservices - File Service",
+        "HRIS - Kaizen (Ide Perbaikan)",
         "DB - Overview and Notes",
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
         "Microservices - Employee Service"
       ],
-      "hash": "ca684ac784e949b99309bcb42ec2f98989a027b1016783c749f28e2e9d660682",
-      "ukuran_kb": 30.7,
-      "ringkasan": "Menjawab: untuk apa Form Builder ada, bagaimana kepemilikan form ditentukan per departemen (bukan per modul) lewat supervised_by, dan bagaimana form penilaian karyawan bekerja lewat sumbu subject yang terpisah dari audience. Juga menjawab tipe pertanyaan dan tipe form yang tersedia, cara sasaran diresolusi dari header gateway tanpa memanggil service lain, aturan idempotensi pengiriman, notifikasi inbox, dan kenapa notification-service wajib ikut di-deploy.",
+      "hash": "c2b28fc246d60bb6be3da8d174b1f7bd47952068989c4d4c735826574e558c19",
+      "ukuran_kb": 39.3,
+      "ringkasan": "Menjawab: bagaimana sebuah departemen membuat form tanpa rilis kode, siapa personanya (pengelola form vs karyawan pengisi), dan kenapa kepemilikan form memakai nama departemen `master_department` alih-alih key modul `system_roles`. Menjelaskan mekanika di baliknya: penilaian karyawan lain lewat sumbu `subject` yang terpisah dari `audience`, potret sasaran yang diambil sekali saat terbit, form berulang bulanan/mingguan beserta cron pembuka periode, notifikasi inbox, dan kenapa `notification-service` wajib ikut di-deploy. Juga menjawab keputusan desain yang menjaga presensi tetap hidup, misalnya kenapa gerbang presensi dilarang pada form penilaian dan kenapa sasaran tak dikenal gagal-tertutup.",
       "kata_kunci": [
-        "form builder",
+        "form builder service",
         "form dinamis",
-        "survei",
         "penilaian karyawan",
         "evaluation",
-        "owner_department",
         "subject",
         "audience",
+        "form berulang",
+        "recurrence",
         "section",
-        "notifikasi inbox"
+        "gerbang presensi"
       ]
     },
     {
@@ -4578,6 +4580,51 @@
       ]
     },
     {
+      "path": "Human Resource Information System/HRIS - Kaizen (Ide Perbaikan).md",
+      "judul": "HRIS - Kaizen (Ide Perbaikan)",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Konsep / Direncanakan.** Belum ada satu baris kode pun. Rancangan lengkap ada di `docs/superpowers/specs/2026-08-06-kaizen-pengumpulan-ide-design.md` di root workspace (bukan di vault).",
+      "publik": true,
+      "tautan": [
+        "Microservices - Form Builder Service",
+        "Microservices - Task Management Service",
+        "HRIS - Otomasi Skor KPI",
+        "HRIS - Matriks KPI per Departemen",
+        "HRIS - Key Performance Index",
+        "APP - MyBharata",
+        "HRIS - Personalia",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "Microservices - Employee Service",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "APP - Web ERP",
+        "Microservices - File Service",
+        "Microservices - Notification Service",
+        "DB - Overview and Notes",
+        "CORE - API Master Gateway",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "API - Form Builder Service",
+        "HRIS - Organization Structure"
+      ],
+      "hash": "520754f4328714aae853af95a9bf47a917d9ea09c9bce52ab0ae2e87774cca79",
+      "ukuran_kb": 14.9,
+      "ringkasan": "Menjawab: bagaimana program pengumpulan ide perbaikan bulanan dirancang bekerja — siapa yang wajib mengirim ide, berapa kuotanya (angka global dengan override per departemen), siapa yang memutuskan diterima/ditolak (komite Kaizen terpusat), dan sampai mana siklus ide dilacak hingga tahap Diterapkan. Menjelaskan alasan rumah kodenya dipilih di Form Builder Service sebagai tipe form kelima `kaizen` dan kenapa space di Task Management gugur (jawaban per pertanyaan di sana tak disimpan sebagai data), lengkap dengan harga yang harus dibayar karena menyentuh jalur clock-in. Juga memuat prasyarat kode yang harus dibereskan dulu, terutama snapshot `FormPeriod.Fields` yang ditulis tapi tak pernah dibaca sehingga pertanyaan terkunci selamanya setelah ide pertama masuk.",
+      "kata_kunci": [
+        "kaizen",
+        "ide perbaikan",
+        "improvement idea",
+        "inovasi",
+        "innovation",
+        "komite kaizen",
+        "kuota ide",
+        "papan kepatuhan",
+        "KPI kaizen",
+        "form builder"
+      ]
+    },
+    {
       "path": "Human Resource Information System/HRIS - Key Performance Index.md",
       "judul": "HRIS - Key Performance Index",
       "area": "Human Resource Information System",
@@ -4809,7 +4856,9 @@
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "RUN - Menambah Metrik KPI Otomatis",
         "HRIS - Matriks KPI per Departemen",
+        "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Task Management Service",
+        "Microservices - Form Builder Service",
         "HRIS - Work Review",
         "Microservices - Marketing Analytics Service",
         "Sales - Marketing Dashboard (Master Roadmap)",
@@ -4826,20 +4875,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "c0f617dc025c226acbf6d8232d6009bc3c20029951a814e4d336d7a0c79b1658",
-      "ukuran_kb": 30.3,
-      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, berapa yang bisa diisi otomatis dari data ERP, berapa yang butuh definisi atau mapping tambahan, berapa yang modulnya ada tapi datanya kosong, dan berapa yang memang tidak punya sumber sama sekali, dirinci per departemen. Memetakan tiap klaster metrik ke sumber datanya secara konkret (koleksi atau endpoint beserta volume production), mulai dari konversi iklan TikTok, ROAS, omzet, rating toko, piutang, uptime server, SLA dan CSAT tiket, sampai kehadiran dan lead time PO. Menjelaskan juga model kpi_template/kpi_score, aturan bobot total 1.0, dan mengapa label metrik menjadi kunci identitas yang mengikat setiap rencana auto-fill.",
+      "hash": "d46b46282a9788e82900efabbb211c1361b56711f4d37d31594ed9f2b84c2eab",
+      "ukuran_kb": 30.9,
+      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang sumber datanya sudah ada di ERP sehingga bisa diisi otomatis, mana yang modulnya jalan tapi koleksinya kosong, dan mana yang memang tidak punya sumber sama sekali (73 otomatis penuh, 59 semi-otomatis, 35 terblokir data, 144 manual). Memuat rekap persentase otomasi per departemen dan peta klaster metrik ke sumber datanya secara konkret — mulai konversi iklan TikTok, ROI/ROAS, omzet, piutang lewat Accurate, uptime dari monitoring service, SLA dan CSAT e-ticket, sampai kehadiran dan lead time procurement. Juga menjawab kenapa label metrik adalah kunci identitas yang mengikat setiap rencana auto-fill, dan apa yang masih kurang pada metrik semi-otomatis.",
       "kata_kunci": [
-        "otomasi KPI",
-        "auto-fill skor",
-        "kpi_score",
-        "kpi_template",
-        "sumber data KPI",
-        "employee service",
         "KPI",
+        "otomasi skor",
+        "auto-fill KPI",
+        "kpi_template",
+        "kpi_score",
+        "metrik",
+        "metrics",
+        "sumber data",
         "performance",
-        "kelayakan otomasi",
-        "metrik"
+        "employee service"
       ]
     },
     {

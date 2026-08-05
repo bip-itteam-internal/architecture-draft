@@ -6,6 +6,7 @@
 - **Path:** `services/form-builder`
 - **Port:** 6986 (internal, `expose`; tidak dipublish ke host)
 - **Status**: ⚠️ **Implemented & LIVE di dev DAN prod** (PR [#849](https://github.com/bip-itteam-internal/bip-erp/pull/849) + perbaikan [#855](https://github.com/bip-itteam-internal/bip-erp/pull/855)); prod naik 2026-08-01 dengan kepemilikan per departemen, bagian, dan keterangan ujung skala (PR [#869](https://github.com/bip-itteam-internal/bip-erp/pull/869), [#870](https://github.com/bip-itteam-internal/bip-erp/pull/870), [#871](https://github.com/bip-itteam-internal/bip-erp/pull/871)). FE web di [[APP - Web ERP]] sudah lengkap (kelola, builder, **analisa jawaban**) dan ikut ter-deploy; pengisian di [[APP - MyBharata]] sudah ada (section Survei di beranda + halaman isi berbagian). **Yang diverifikasi saat deploy hanya health `200` lewat gateway + backfill data lama**; alur buat→terbit→isi→analisa **belum diuji ulang** pada versi baru ini, baik di dev maupun prod.
+- **Form berulang (periode bulanan & mingguan)**: ada di kode `main` dan ikut ter-deploy bersama rilis di atas, tapi **tak pernah tercatat di dokumen ini maupun [[API - Form Builder Service]]** sampai 2026-08-06. Nomor PR-nya belum ditelusuri. Yang diverifikasi langsung ke kode: `period.go`, `models_period.go`, `period_store.go`, `cron.go`, dan pemakaiannya di `form_handlers.go`, `response_handlers.go`, `compliance.go`, `analytics.go`. **Belum ada catatan uji end-to-end** untuk alur berulang di lingkungan mana pun. Lihat bagian tersendiri di bawah.
 - **Penilaian karyawan lain + tipe form**: PR [#907](https://github.com/bip-itteam-internal/bip-erp/pull/907) **merged & LIVE di dev 2026-08-02** (log boot mencatat `8 form lama ditandai form_type="survey"`, handler jadi 31). Rekap per orang & tingkat penyelesaian: PR [#908](https://github.com/bip-itteam-internal/bip-erp/pull/908) **merged 2026-08-02**. ✅ **PROD naik 2026-08-02** (log boot: `2 form lama ditandai form_type="survey"`, handler 31, health lewat gateway `200`). ⚠️ Alur penilaian **belum diuji end-to-end** di lingkungan mana pun — yang terverifikasi baru boot service dan backfill.
 
 > [!warning] `notification-service` WAJIB ikut di-deploy, bukan hanya form-builder
@@ -151,6 +152,59 @@ Saat pengisian **selesai**, konfirmasi dikirim **sekali** ketika seluruh sasaran
 
 Kategori `form-published` dan `form-submitted` didaftarkan di `shared-library/models/notification`; notification-service menolak `400` kategori di luar daftar itu, jadi tanpa entri itu notifnya hilang tanpa jejak.
 
+## Form berulang: periode bulanan dan mingguan
+
+Sebuah form bisa terbit ulang dengan sendirinya tiap bulan atau tiap minggu, tanpa pemiliknya membuat form baru. Kasus nyata yang jadi acuan: survei pelayanan Office Boy dan Office Girl yang dibuka tiap tanggal 26 sampai akhir bulan.
+
+`Form.Recurrence` (`{enabled, unit, open_day}`) nil berarti form sekali jalan, dan perilakunya **persis** seperti sebelum fitur ini ada. Pointer, bukan nilai, supaya dokumen lama tidak terbaca sebagai "berulang dengan aturan kosong".
+
+**Satuannya sengaja hanya dua**, `monthly` dan `weekly`. Kuartalan dan tahunan belum punya kasus nyata, dan menambahkannya sekarang berarti menebak.
+
+- Bulanan: `open_day` 1..28. Dibatasi 28 karena Februari, dan karena "tanggal 31" pada bulan 30 hari tak punya arti yang jelas.
+- Mingguan: `open_day` 1..7 mengikuti hari ISO (Senin sampai Minggu).
+
+**Jendelanya SELALU berakhir di ujung bulan atau minggu**, bukan "sekian hari setelah buka". Durasi bebas bisa melewati batas bulan sehingga dua periode hidup bersamaan, dan begitu itu terjadi tak ada jawaban yang benar untuk pertanyaan "periode mana yang aktif sekarang".
+
+Penanda periode: `2026-08` untuk bulanan, `2026-W32` untuk mingguan. Penomoran minggu memakai **ISO** supaya minggu yang melintasi pergantian tahun tak melahirkan dua penanda berbeda untuk minggu yang sama.
+
+Seluruh aturan penanggalan di `period.go` adalah **fungsi murni**: `now` selalu diberikan pemanggil, jadi teruji tanpa menunggu tanggal tertentu tiba. Zona waktunya mengikuti `now`, bukan dipaksa UTC, karena memaksa UTC menggeser "tanggal 26" sehari bagi pemakai WIB dan pergeseran macam itu baru ketahuan saat periode terbuka di hari yang salah.
+
+### Cron pembuka periode
+
+`cronManager()` jalan **tiap jam** dengan zona `Asia/Jakarta`, bukan sekali di tengah malam: periode yang terlewat karena service mati saat pergantian hari akan terbuka pada jam berikutnya, bukan tertunda sehari penuh.
+
+Hanya form `published` yang dibukakan periode. Form `closed` yang tetap melahirkan periode baru tiap bulan hanya menumpuk putaran yang tak seorang pun mengisinya. Kegagalan satu form **tidak menghentikan** sisanya, karena satu aturan pengulangan yang rusak tidak boleh membekukan seluruh form berulang lainnya.
+
+> [!warning] Pemanggilan `cronManager()` di `main.go` tidak boleh hilang
+> Kegagalannya senyap total: build tetap hijau, seluruh test tetap lulus, dan tak satu pun periode pernah terbuka. `CronManager` milik integration-service jadi dead code justru karena langkah ini pernah terlewat. Lihat [[IT - Background Jobs & Schedulers]].
+
+Pembuatan periode **idempoten lewat index unik** `(form_id, period_key)`, bukan lewat pemeriksaan "sudah ada?" di baris sebelumnya. Dua instance cron yang berjalan bersamaan bisa sama-sama lolos pemeriksaan itu lalu sama-sama menyisip; yang kalah ditolak Mongo dengan galat duplicate-key dan diperlakukan sebagai "sudah dibuat orang lain". Tanpa penanganan itu cron mencatat galat tiap jam untuk keadaan yang sebenarnya benar.
+
+### Apa yang berubah pada jalur pengisian
+
+- `FormResponse.PeriodKey` menandai putaran mana sebuah jawaban milik. **Kosong untuk form biasa DAN untuk seluruh jawaban yang tersimpan sebelum fitur ini**, dan keduanya sah.
+- Kunci keunikan bergeser sekali lagi, kini ditambah periode: dari (form, pengisi, yang dinilai) jadi (form, pengisi, yang dinilai, periode). Tanpa itu form bulanan hanya bisa diisi **sekali seumur hidup**, karena jawaban Agustus akan menghentikan pengisi di bulan September.
+- Penanda `submitted` di `GET /me/forms` dihitung terhadap **periode berjalan**. Tanpa pembeda ini form bulanan yang sudah diisi Agustus tetap tersembunyi dari daftar di September, dan pengisi tak pernah tahu ada putaran baru.
+- Penanda periode **diturunkan dari `windowFor` dan waktu sekarang**, bukan dibaca dari koleksi periode. Jalur ini berjalan pada setiap pengiriman, jadi query tambahan di sana dihindari.
+
+> [!warning] `period_key` kosong tidak sama dengan field yang hilang
+> Jawaban yang tersimpan sebelum fitur ini tak punya `period_key` sama sekali (`omitempty`), dan di Mongo `{period_key: ""}` **tidak cocok** dengan dokumen yang field-nya hilang. Setiap pencocokan wajib lewat `periodQuery` (yang memakai `$in: ["", null]`), bukan perbandingan langsung. Tanpa itu penjaga duplikat dan `single_response` diam-diam berhenti bekerja pada **seluruh form lama**. Ini pola yang sama persis dengan `subjectQuery`, dan alasannya sama.
+
+### Gerbang presensi memakai jendela periode
+
+Form berulang memakai jendela **periode berjalan**, bukan `start_date`/`end_date` statis. Tanggal statis hanya masuk akal untuk form sekali jalan: pada survei bulanan ia akan lewat setelah bulan pertama dan gerbangnya tak pernah menyala lagi, padahal formnya justru terbit ulang tiap bulan. Form biasa jatuh ke perilaku lama persis.
+
+### Menyalakan pengulangan setelah ada jawaban DILARANG
+
+`PATCH /forms/:id` menolak `409` bila pengulangan dinyalakan pada form yang sudah punya jawaban. Sebabnya data campur: sebagian jawaban punya asal-usul periode, sebagian tidak, dan mengarang periode untuk data lama justru memalsukan kapan jawaban itu sebenarnya diberikan. **Mematikan** pengulangan tetap boleh; yang dilarang hanya menyalakannya.
+
+### Analisa per periode
+
+`GET /forms/:id/analytics`, `/responses`, dan `/export` menerima `?period=`.
+
+> [!warning] Periode kosong artinya KEBALIKAN di dua tempat
+> Di `analyticsFilter`, periode kosong berarti **seluruh periode**: pemilik form yang membuka halaman analisa tanpa memilih periode mengharapkan rekap penuh. Di `responseGuardFilter`, periode kosong berarti **hanya jawaban yang memang tak punya periode**, karena pertanyaannya "apakah orang ini sudah mengisi putaran ini". Menyamakan keduanya akan membuat salah satunya salah diam-diam.
+
 ## Bagian (section): penanda di daftar datar, bukan struktur bersarang
 
 Form panjang bisa dipecah jadi beberapa halaman saat diisi. Bagian disimpan sebagai **item bertipe `section` di dalam `fields` yang tetap datar** — `label` jadi judulnya, `description` jadi keterangannya, jadi tak ada penambahan skema.
@@ -217,6 +271,18 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 > **Pelajaran yang berlaku untuk service mana pun di repo ini:** 122 unit test service ini semuanya hijau saat bug ini hidup, karena setiap fixture dirakit tangan sebagai `[]interface{}` dan tak satu pun melewati BSON. Uji dengan data buatan sendiri **tidak** menguji lapisan decode database. Regresinya dikunci di `bson_values_test.go` memakai `primitive.A` asli.
 - **Upload file** belum didukung (menyusul via [[Microservices - File Service]], cap 4 MB).
 - **Logika percabangan** (lompat seksi berdasarkan jawaban) belum ada.
+
+> [!warning] `FormPeriod.Fields` ditulis tapi TIDAK PERNAH dibaca
+> Snapshot pertanyaan per periode dibuat `ensurePeriod` dan didokumentasikan di kodenya sebagai penjaga keabsahan pembanding antar-bulan, dengan janji "pemilik form boleh menyunting pertanyaan kapan saja, dan perubahannya berlaku mulai periode BERIKUTNYA".
+>
+> **Janji itu tidak ditepati siapa pun.** Jalur pengisian menyajikan dan memvalidasi dari `form.Fields`, bukan dari snapshot; pencarian `Collections.Periods` menunjukkan koleksi itu hanya ditulis (`period_store.go`, `cron.go`) dan tak pernah dibaca oleh handler mana pun. Snapshotnya menganggur.
+>
+> Yang benar-benar menjaga konsistensi adalah kunci `409` di `updateForm`, dan kunci itu **tidak memedulikan apakah form berulang**: begitu ada satu jawaban masuk, susunan pertanyaan terkunci selamanya. Untuk survei bulanan yang hidup bertahun-tahun, artinya pemiliknya tak akan pernah bisa memperbaiki satu pun pertanyaan.
+>
+> Perbaikannya punya urutan yang **tidak boleh dibalik**: jadikan snapshot penopang beban lebih dulu (sajikan dan validasi dari `Fields` periode berjalan untuk form berulang), baru longgarkan kuncinya. Kalau dibalik, menyunting pertanyaan di tengah bulan langsung merusak jawaban yang sudah masuk pada bulan itu. Dijadwalkan sebagai tahap 1 pekerjaan [[HRIS - Kaizen (Ide Perbaikan)]].
+
+- **Kuartalan dan tahunan belum ada** pada form berulang, sengaja: belum ada kasus nyatanya, dan menambahkannya sekarang berarti menebak bentuk yang benar.
+- **Kiriman sebelum `open_day` tetap diterima.** `windowFor` mengembalikan `active=false` sebelum hari buka, tapi `submitResponse` **membuang** nilai itu dan hanya memakai penandanya, sehingga jawaban yang masuk lebih awal tetap tersimpan atas periode berjalan. Gerbang presensi justru menghormati `active` lewat `gateActiveForForm`. Jadi pada rentang itu form belum menahan siapa pun tapi sudah bisa diisi. Belum tentu salah (survei yang dibuka lebih awal tidak merugikan), tapi ketidaksamaan kedua jalur ini **belum pernah diputuskan**, cuma terjadi.
 - **Jumlah PENGISI tidak dihitung otomatis.** Untuk `audience` bertipe `all`/`departments`, penyebut tingkat pengisian tetap memakai `audience.estimated_size` yang diisi manual pembuat form. Bila kosong, tingkat pengisian **tidak dilaporkan** (menampilkan 0% lebih menyesatkan daripada tak menampilkan apa pun). Berbeda dari `subject`, yang JUSTRU di-resolve otomatis dari employee-service saat terbit — sumbu yang dinilai butuh nama dan jabatan, sedangkan sumbu pengisi cukup dicocokkan dari header.
 - **Agregasi dibatasi 20.000 jawaban.** Bila terlampaui, total sebenarnya tetap dilaporkan dan hasil ditandai `truncated` + `sample_size`, sedangkan tingkat pengisian disembunyikan. Export menandai lewat header `X-Export-Truncated`.
 - **`attendance_gate.start_date`/`end_date` hanya menerima RFC3339** (mis. `2026-08-01T00:00:00Z`); kiriman `"2026-08-01"` akan ditolak dengan pesan parse JSON yang tidak informatif. Perlu dibereskan saat FE dibangun.
@@ -229,7 +295,8 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 
 ## Dependensi & Integrasi
 
-- **MongoDB** `form_builder_db` — koleksi `forms`, `form_responses`. Index dibuat idempoten saat boot. Lihat [[DB - Overview and Notes]].
+- **MongoDB** `form_builder_db` — koleksi `forms`, `form_responses`, `form_periods`. Index dibuat idempoten saat boot; `(form_id, period_key)` di `form_periods` **unik**, dan keunikan itulah yang membuat pembuatan periode oleh cron aman tanpa lock. Lihat [[DB - Overview and Notes]].
+- [[IT - Background Jobs & Schedulers]] — cron pembuka periode form berulang, tiap jam, zona `Asia/Jakarta`.
 - [[CORE - API Master Gateway]] — satu-satunya pintu masuk; modul `form-builder` di map `InternalURL`.
 - [[Microservices - Attendance Service]] — **konsumen** `GET /internal/compliance` pada jalur clock-in mobile.
 - Auth mengikuti [[CORE - SSO Flow]]; identitas datang sebagai header `BIP-*`.
@@ -245,6 +312,8 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 
 - [[IT - Form Builder]] — konsep & latar belakang
 - [[API - Form Builder Service]] — daftar endpoint
+- [[HRIS - Kaizen (Ide Perbaikan)]] — 🟡 konsep, akan menumpang service ini sebagai `form_type` kelima
+- [[IT - Background Jobs & Schedulers]] — cron pembuka periode
 - [[Microservices - Attendance Service]] · [[CORE - API Master Gateway]] · [[DB - Overview and Notes]]
 - [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] · [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]
 - [[APP - Web ERP]] · [[APP - MyBharata]] — klien yang belum dibangun
