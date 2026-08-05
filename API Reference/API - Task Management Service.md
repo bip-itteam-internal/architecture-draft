@@ -1,10 +1,10 @@
 ## Deskripsi
 
-*Endpoint **task-management-service** (task & space ala Kanban; kini diposisikan ticketing/helpdesk). Gateway: `/api/task-management/*` (WebSocket via ingress langsung ke service). RBAC `staff`/`supervisor` di-derive dari map `system_roles`. Grounded ke `services/task-management/routes.go` + `main.go` (branch `feat/task-management-parity`).*
+*Endpoint **task-management-service** (task & space ala Kanban; kini diposisikan ticketing/helpdesk). Gateway: `/api/task-management/*` (WebSocket via ingress langsung ke service). RBAC `staff`/`supervisor` di-derive dari map `system_roles`. Grounded ke `services/task-management/routes.go` + `main.go` di `origin/main`.*
 
-- **Implementasi**: [[Microservices - Task Management Service]] · **Status**: ⚠️ (branch belum merge; WS butuh rute ingress)
+- **Implementasi**: [[Microservices - Task Management Service]] · **Status**: ⚠️ (di `main`; WS butuh rute ingress)
 - **Indeks**: [[API - Index]]
-- > Catatan: branch `feat/task-management-parity` menambah attachment (via file-service), reports/stats, history/audit, users/departments, WebSocket, dan SLA — melengkapi paritas dengan FE gateway-cutover.
+- > Catatan: attachment (via file-service), reports/stats, history/audit, users/departments, WebSocket, dan SLA — yang dulu dicatat sebagai isi branch `feat/task-management-parity` — **sudah ada di `main`** (diperiksa langsung ke `origin/main` 2026-08-05). Branch itu sendiri tak ada lagi.
 
 ## Sistem
 | Method | Path | Fungsi |
@@ -16,6 +16,42 @@
 |---|---|---|
 | POST/GET | `/spaces` · `/spaces/:id` | Buat/list/detail space (`?division=`). Body/response bawa `types` (tipe permintaan) + `visibility`/`allowed_divisions`/`allowed_employees`. **Disaring hak akses**: space `restricted` hilang dari list dan `403` di detail, kecuali supervisor divisinya, admin, anggota space, atau yang ada di daftar izin |
 | PUT/DELETE | `/spaces/:id` | Update/hapus space. `visibility` hanya menerima `public`/`restricted` (nilai lain `400`) |
+
+### `types[].fields` — pertanyaan per tipe permintaan 🔜
+
+> Status: branch `feat/task-type-fields` (dari `main`), **belum merge, belum deploy**.
+
+Tiap `SpaceType` boleh membawa `fields`, yaitu pertanyaan yang harus dijawab pemohon
+setelah memilih tipe itu. **Jawabannya tidak pernah dikirim sebagai data**: klien
+merangkainya jadi markdown dan mengirimnya lewat `description` pada `POST /tasks` seperti
+biasa, sehingga kontrak tugas, notifikasi, laporan, dan [[APP - MyBharata]] tak berubah
+sama sekali.
+
+```jsonc
+"types": [{
+  "id": "...", "name": "Perbaikan Bug", "description": "", "color": "#FF0000",
+  "fields": [
+    { "key": "gejala", "label": "Apa yang terjadi?", "type": "long_text",
+      "hint": "", "required": true },
+    { "key": "sejak", "label": "Sejak kapan?", "type": "radio",
+      "required": false, "options": ["Baru saja", "Beberapa hari"] }
+  ]
+}]
+```
+
+- `type` ∈ `short_text` · `long_text` · `number` · `date` · `dropdown` · `radio` ·
+  `checkbox` — kosakata sama dengan [[API - Form Builder Service]] **dikurangi** `scale`,
+  `time`, dan `section` yang tak punya arti pada permintaan kerja.
+- `key` **diisi server** bila kosong, dan tak pernah ditulis ulang bila sudah ada.
+- Validasi `400` menyebut nama tipe yang bermasalah: label kosong atau >200 **karakter**
+  (dihitung per rune, bukan byte), tipe pertanyaan asing, tipe pilihan tanpa opsi terisi,
+  opsi kembar, opsi menempel di tipe bukan-pilihan, maksimal 20 pertanyaan dan 15 opsi.
+- ⚠️ **`fields` yang ABSEN berarti "jangan diubah"; array kosong yang dikirim eksplisit
+  berarti "hapus semua".** Pembedaan ini yang menjaga klien lama: setiap bagian Kelola
+  Space mengirim ulang seluruh daftar tipe, dan tanpa aturan ini satu build FE yang belum
+  mengenal `fields` akan menghapus seluruh pertanyaan tanpa satu pun galat muncul.
+- ⚠️ Tipe yang belum pernah punya pertanyaan mengembalikan `"fields": null` (bukan `[]`),
+  karena Mongo tak menyimpan kunci itu. Klien wajib membacanya lewat fallback.
 
 ## Tasks
 | Method | Path | Fungsi |
