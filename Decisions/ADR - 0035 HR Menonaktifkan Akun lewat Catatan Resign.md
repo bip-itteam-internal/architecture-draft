@@ -40,7 +40,7 @@ Aturan turunannya:
 - **Staf HR bisa menonaktifkan siapa pun di perusahaannya, termasuk direksi.** Tidak ada perlindungan berbasis jabatan. Yang membatasi hanya tenant: `POST /resign` menolak karyawan yang `work_data.company_id`-nya berbeda dari `EffectiveCompanyID` pemanggil.
 - **Tanpa maker-checker.** Satu staf HR cukup untuk mematikan akses seseorang. Ini sejalan dengan jalur IT yang juga tak menuntut persetujuan kedua, dan dengan tingkat gerbang `RequireHRISStaff` yang dipilih mengikuti alur HR lain (kontrak, bank detail).
 - **Jejaknya cuma sebagian.** `system_authentication` masih tanpa `updated_at`/`updated_by` dan tanpa koleksi riwayat ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]), jadi "siapa mematikan akun ini" hanya terjawab untuk jalur HR — lewat `employee_resign.metadata` — dan tetap **tak terjawab** untuk jalur IT.
-- **Akses tidak putus seketika.** Penonaktifan memblokir keempat jalur login dan `GET /auth/refresh`, tapi JWT yang sudah beredar tetap sah sampai TTL 72 jam habis karena revoke masih placeholder ([[CORE - SSO Flow]]). Peringatan di form HR menyebut ini eksplisit supaya tak disangka putus seketika.
+- **Akses tidak putus seketika.** Penonaktifan memblokir keempat jalur login dan `GET /auth/refresh`, tapi JWT yang sudah beredar tetap sah sampai TTL 72 jam habis karena revoke masih placeholder ([[CORE - SSO Flow]]). Peringatan di form HR **tidak** menyebut jeda ini (dihapus atas permintaan user, erp-frontend PR #804), jadi HR akan menganggap aksesnya putus seketika — selisih itu perlu diingat saat menangani kasus yang menuntut pemutusan segera.
 
 **Yang belum dikerjakan (menyusul):**
 
