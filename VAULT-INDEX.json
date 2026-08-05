@@ -1029,20 +1029,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "2ee793b88508e4f3b236760d56edae981e4d70f1c7536f4b909555c3911fed76",
-      "ukuran_kb": 84.7,
-      "ringkasan": "Menjawab: apa itu portal web internal hris-dashboard (One Bharata), stack apa yang dipakai, bagaimana alur login serta refresh token bekerja, dan bagaimana web ini berperan sebagai SSO Identity Provider bagi aplikasi lain. Juga menjelaskan bagaimana sidebar dan menu digerbang oleh system_roles, bagaimana pengelompokan menu, pengaturan tampilan menu per jabatan, dan pengisian atasan langsung dirancang, serta bagian mana saja yang sudah sadar multi-perusahaan.",
+      "hash": "b633bd4ec5e4d48c1b8e4c6473ed785f40367706ed6f7ea7515b9a32a5d59db8",
+      "ukuran_kb": 85.4,
+      "ringkasan": "Menjawab: modul apa saja yang tersedia di portal web internal ERP/HRIS \"One Bharata\" (erp-frontend), stack frontend-nya apa (Next.js 16 App Router, React 19, shadcn/ui, TanStack Query, react-i18next), dan bagaimana login serta role gating bekerja lewat cookie system_roles per modul. Juga menjawab bagaimana web ini bertindak sebagai SSO Identity Provider (one-time code, allowlist redirect_url), bagaimana sidebar disusun (menu induk bersarang, perataan induk tipis, pengaturan tampilan menu per jabatan yang menyimpan menu_hidden), dan bagaimana pemilih perusahaan memengaruhi halaman presensi, karyawan, departemen, shift, dan network WiFi.",
       "kata_kunci": [
         "erp-frontend",
-        "hris-dashboard",
         "One Bharata",
         "web ERP",
-        "SSO",
-        "system_roles",
-        "sidebar menu",
+        "frontend",
         "Next.js",
-        "multi-perusahaan",
-        "atasan langsung"
+        "sidebar menu",
+        "system_roles",
+        "role gating",
+        "SSO Identity Provider",
+        "CompanySwitcher"
       ]
     },
     {
@@ -1801,21 +1801,20 @@
         "DB - Overview and Notes",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
-      "hash": "73b9ded53958a5c78e08d640603acb586f77a1faca2f8b9d99abc326b85e64c6",
-      "ukuran_kb": 51.0,
-      "ringkasan": "Menjawab: bagaimana WMS manufaktur (manufacture-service) mengelola master bahan dan produk, stok, transaksi in/out, formula/BOM, produksi, material order, PO, dan proposal koreksi, termasuk port, database, dan letak kodenya. Menjelaskan dari mana master dan angka stok berasal (Accurate read-only, data HPP untuk barang jadi/bundle, formula dari import Excel setelah sync Google Sheets dihapus) serta bagaimana pergerakan WMS didorong balik ke Accurate lewat outbox dengan kill switch. Juga menjawab cara kerja saldo awal/akhir bulanan (snapshot idempoten, kunci saat bulan berganti, import hasil Stock Opname, revisi lewat approval PPIC ke SPV dan gate izin buka kunci edit).",
+      "hash": "b28805f6aa00681c8c57a1adaf607978367feeccbf9c98d98cb3df4175a35a61",
+      "ukuran_kb": 51.6,
+      "ringkasan": "Menjawab: bagaimana WMS manufaktur bekerja di manufacture-service, yaitu dari mana master bahan/produk dan angka stok berasal (sync Accurate dan data HPP, bukan lagi Google Sheets), endpoint apa yang dipakai untuk sync, align, dan rekonsiliasi stok, serta bagaimana bundle diperlakukan sebagai virtual tanpa stok sendiri. Juga menjawab bagaimana pergerakan WMS didorong balik ke Accurate sebagai Penyesuaian Persediaan lewat outbox dan kill switch ACCURATE_WMS_PUSH, serta bagaimana saldo awal/akhir bulanan dipotret, dikunci saat bulan berganti, direvisi lewat approval PPIC ke SPV, dan dikunci hasil Stock Opname (akhir_locked).",
       "kata_kunci": [
-        "manufacture service",
+        "manufacture-service",
         "WMS",
         "warehouse",
-        "master bahan",
         "stok",
-        "formula",
-        "BOM",
-        "saldo awal bulanan",
-        "stock opname",
+        "stock",
         "Accurate",
-        "manufacture_db"
+        "saldo awal bulanan",
+        "master bahan baku",
+        "formula BOM",
+        "stock opname"
       ]
     },
     {
@@ -1952,8 +1951,8 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
-        "Microservices - Employee Service",
         "APP - Web ERP",
+        "Microservices - Employee Service",
         "Microservices - Attendance Service",
         "HRIS - Payroll Persona",
         "Finance - Incentive",
@@ -1964,20 +1963,20 @@
         "Microservices - Insentive Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "ba93c481dca3d04e920fff06f9d1110c80a9e0ee2472bce09022f41c73225d02",
-      "ukuran_kb": 13.8,
-      "ringkasan": "Menjawab: bagaimana gaji karyawan dihitung dan diterbitkan, mulai dari setup komponen gaji, konfigurasi BPJS dan PPh21 metode TER (PMK 168/2023), penetapan gaji per karyawan, sampai payroll run dengan lifecycle draft, approved, published. Juga menjawab: endpoint apa saja yang tersedia, siapa yang boleh mengakses (role HR/HR admin/approver), bagaimana karyawan melihat slip gajinya sendiri lewat rute /my, dan bagaimana modul insentif mengambil beban pemberi kerja lewat /employer-cost (bruto plus iuran BPJS perusahaan, bukan gaji bersih). Memuat penjelasan penting soal upah_bpjs sebagai DASAR upah (bukan nominal iuran) beserta kasus salah isi di production, ruang lingkup yang berhenti di penerbitan slip tanpa pembayaran/transfer, serta batasan scope multi-perusahaan.",
+      "hash": "23086fae5a4ebb0cd8948d028bcb87576abfbc131895163b369d50af78a71143",
+      "ukuran_kb": 14.9,
+      "ringkasan": "Menjawab: bagaimana penggajian dijalankan di payroll-service, mulai dari setup komponen gaji, config BPJS dan pajak, master badan usaha penggaji untuk kop slip, sampai penetapan gaji per karyawan (basic_salary, upah_bpjs, ptkp_status). Juga menjawab bagaimana payroll run dihitung dan melewati siklus draft ke approved ke published, bagaimana PPh21 dihitung dengan metode TER PMK 168/2023 per kategori PTKP, bagaimana karyawan melihat slipnya sendiri lewat endpoint /my, serta bagaimana beban pemberi kerja (employer-cost) dan supplement kehadiran/lembur diambil antar-service. Memuat pula jebakan data seperti upah_bpjs yang terisi nominal iuran dan cakupan multi-perusahaan yang belum ter-scope.",
       "kata_kunci": [
         "payroll",
         "penggajian",
         "slip gaji",
         "payslip",
-        "PPh21",
-        "TER",
+        "PPh21 TER",
         "BPJS",
         "PTKP",
+        "payroll run",
         "THR",
-        "employer cost"
+        "employee_salary"
       ]
     },
     {
