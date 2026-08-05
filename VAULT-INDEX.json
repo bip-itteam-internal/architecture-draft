@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-04",
-  "jumlah_dokumen": 256,
+  "digenerate": "2026-08-05",
+  "jumlah_dokumen": 257,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1976,7 +1976,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — backend Pemasok + Barang & Jasa lengkap & terverifikasi lokal (boot, index, guard, CRUD, penomoran; 139 test PASS) ✅; **belum di-deploy** dan **import awal (pemasok maupun barang) belum dijalankan** di produksi (butuh kredensial Accurate). Modul **Pembelian** (PR #810, merged) ✅ terverifikasi lokal — 1.036 Pesanan, 1.835 Penerimaan, 234 Permintaan tertarik dari Accurate produksi (read-only, tanpa menulis). Frontend Master Pemasok, Barang & Jasa, **dan** ketiga tab Pembelian sudah ada di `erp-frontend` (`src/features/procurement/`) — lihat [[APP - Web ERP]].",
+      "status_teks": "Implemented (ada catatan) — **sudah deploy dan terisi di produksi**. Sensus langsung `procurement_db` produksi **4 Agustus 2026**: `pemasok` 139, `barang` 955, `pesanan_pembelian` 1.038, `penerimaan` 1.841, `faktur_pembelian` 2.055, `permintaan_barang` 235, `katalog` 653, `pengaturan` 1, `pembayaran` 0, `purchase_order` 0. Frontend Master Pemasok, Barang & Jasa, dan ketiga tab Pembelian ada di `erp-frontend` (`src/features/procurement/`) — lihat [[APP - Web ERP]].",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
@@ -1986,20 +1986,20 @@
         "Microservices - Manufacture Service",
         "Microservices - Integration Service"
       ],
-      "hash": "7b96c8392b0d1b21cdf8a59e54e714a6843cf46a080419c9e284a4705b56bb3d",
-      "ukuran_kb": 21.2,
-      "ringkasan": "Menjawab: bagaimana procurement-service mengelola master Pemasok, master Barang & Jasa, Tagihan Pemasok, dan cermin baca-saja Pembelian, termasuk arah datanya — master diinput di ERP lalu disinkronkan ke Accurate, sementara Pembelian dicatat di Accurate lalu ditarik ke ERP. Merinci susunan file di `services/procurement/`, port, database `procurement_db`, env kunci, worker sync, penomoran, dan import awal, plus alasan desain tiap endpoint (mis. `accurate_id` selalu dari data lama, toggle boolean yang hanya bisa diaktifkan pada edit parsial, usul kode barang global bukan per-kategori). Juga menjadi rujukan jebakan integrasi Accurate yang sudah terverifikasi, seperti `materialProduced`/`itemProduced` yang bertipe boolean sehingga salah tipe membuat import mengembalikan nol, field baca-saja yang tak ada di parameter `item/save.do`, dan alasan rute `/pesanan` dipisah dari `/po` lama.",
+      "hash": "b2f4075bd5832a03993354b20efcad753da708909f29870fea44d107f048d59e",
+      "ukuran_kb": 21.7,
+      "ringkasan": "Menjawab: bagaimana master Pemasok dan master Barang & Jasa diinput di BIP-ERP lalu disinkronkan ke Accurate Online, dan mengapa data Pembelian (pesanan, penerimaan, permintaan barang) justru mengalir sebaliknya sebagai cermin baca-saja dari Accurate. Juga menjawab endpoint apa saja yang tersedia (CRUD pemasok/barang, usul nomor dan usul kode BRG-, katalog kategori/satuan/pajak/syarat pembayaran, import awal, penandaan barang tidak sesuai), serta aturan main integrasinya seperti accurate_id yang tidak pernah diambil dari kiriman client dan field baca-saja yang diabaikan Accurate. Berguna untuk tahu stack, port, database, env kunci, struktur file kode, dan isi koleksi procurement_db.",
       "kata_kunci": [
         "procurement service",
-        "microservice",
+        "pengadaan",
         "pemasok",
+        "vendor",
         "barang dan jasa",
-        "pembelian",
-        "pesanan",
-        "penerimaan",
-        "Accurate",
-        "worker sync",
-        "import"
+        "item master",
+        "Accurate Online",
+        "pesanan pembelian",
+        "purchase order",
+        "penerimaan barang"
       ]
     },
     {
@@ -3564,6 +3564,41 @@
       ]
     },
     {
+      "path": "General Affairs/GA - Form Pengadaan dan Pengajuan Dana.md",
+      "judul": "GA - Form Pengadaan dan Pengajuan Dana",
+      "area": "General Affairs",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "Konsep / kajian awal. Belum ada kode. Tiga keputusan sudah turun (lihat bab Sudah Diputuskan), sisanya menunggu jawaban SPV HRGA.",
+      "publik": true,
+      "tautan": [
+        "GA - Procurement System",
+        "Microservices - Procurement Service",
+        "Microservices - Form Builder Service",
+        "Microservices - File Service",
+        "Microservices - Employee Service",
+        "CORE - RBAC dan Permission Set",
+        "ADR - 0001 Akuntansi via Accurate",
+        "GA - Inventory Management",
+        "GA - Big Pictures"
+      ],
+      "hash": "4db0a6f60171efbc0c5cfcb5ee4c35ba79034efdcd8e8f8d4d9b0beb09df891f",
+      "ukuran_kb": 11.5,
+      "ringkasan": "Menjawab: apa isi dua form kertas GA (Form Permintaan Barang dan Form Pengajuan Dana), apa bedanya, dan mengapa keduanya tetap dipisah alih-alih digabung (pembedanya adalah siapa yang membelanjakan uang). Juga menjawab dua menu apa yang diminta tim GA (Kas Kecil HRGA sebagai buku kas dengan saldo sungguhan, dan Permintaan Pembelian Kebutuhan Operasional lintas divisi), bagaimana sumber dana ditentukan dari besar nominal, field apa saja di tahap pengajuan dan realisasi, serta apa isi rekap bulanannya. Berguna untuk tahu keputusan mana yang sudah turun dan pertanyaan mana yang masih menunggu jawaban SPV HRGA maupun Finance.",
+      "kata_kunci": [
+        "form permintaan barang",
+        "pengajuan dana",
+        "kas kecil HRGA",
+        "petty cash",
+        "purchase request",
+        "PR",
+        "sumber dana",
+        "approval atasan",
+        "rekap bulanan",
+        "kas kardus"
+      ]
+    },
+    {
       "path": "General Affairs/GA - Guestbook System (Complete).md",
       "judul": "GA - Guestbook System (Complete)",
       "area": "General Affairs",
@@ -3662,23 +3697,26 @@
       "area": "General Affairs",
       "jenis": "domain",
       "status_emoji": "🟡",
-      "status_teks": "Konsep / Direncanakan",
+      "status_teks": "Konsep / Direncanakan. **Digantikan sebagai acuan kerja** oleh [[GA - Form Pengadaan dan Pengajuan Dana]], yang bertumpu pada dua form kertas yang benar-benar dipakai. Dokumen ini dipertahankan karena memuat pertimbangan urutan pengerjaan yang masih berlaku (lihat bab Pertimbangan).",
       "publik": true,
       "tautan": [
-        "GA - Inventory Management"
+        "GA - Inventory Management",
+        "GA - Form Pengadaan dan Pengajuan Dana"
       ],
-      "hash": "63d5447f87db0797b9215edd3445c2b7b29f9b9d0e30bd99a1d16445fa405e9f",
-      "ukuran_kb": 1.5,
-      "ringkasan": "Menjawab pertanyaan tentang bagaimana rencana sistem pengajuan barang & pengadaan online (menggantikan proses paper-based) berjalan, siapa saja yang harus approve (SPV divisi, GA, Finance, Dirut), dan mengapa fitur ini dipertimbangkan ditunda demi fitur GA/Finance lain lebih dulu.",
+      "hash": "962af889bde680ce6e4843fbe58a361498b40e5799871fb0fe2b59f958e1a432",
+      "ukuran_kb": 1.7,
+      "ringkasan": "Menjawab: seperti apa gagasan awal mengganti pengajuan barang paper-based dengan sistem pengadaan online lewat mobile app, siapa saja rantai approval-nya (SPV tiap divisi, GA, Finance, Dirut), dan bagaimana barang yang sudah disetujui diverifikasi GA untuk dicatat ke inventory sebelum diserahkan ke pemohon. Juga menjawab alasan urutan pengerjaan: fitur ini menuntut Finance System baru, sehingga lebih baik memperkenalkan fitur GA dan Finance yang lebih kecil lebih dulu. Menyebut prasyarat datanya (master karyawan, master aset) dan menunjuk dokumen Form Pengadaan dan Pengajuan Dana sebagai acuan kerja penggantinya.",
       "kata_kunci": [
         "procurement",
         "pengadaan",
         "pengajuan barang",
-        "e-procurement",
-        "approval",
+        "paper-based",
+        "approval bertingkat",
+        "General Affairs",
         "GA",
-        "Finance",
-        "paper-based"
+        "inventory management",
+        "master aset",
+        "mobile app"
       ]
     },
     {
