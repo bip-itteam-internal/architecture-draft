@@ -32,6 +32,8 @@
 
 > **`?period=` kosong berarti SELURUH periode di sini**, dan itu KEBALIKAN dari arti periode kosong pada penjaga duplikat saat mengisi (di sana kosong berarti "hanya jawaban yang memang tak punya periode"). Pemilik form yang membuka halaman analisa tanpa memilih periode mengharapkan rekap penuh, bukan rekap yang diam-diam menyusut.
 
+> **Kolom dan kartu analisa mengikuti pertanyaan PERIODE yang diminta**, bukan susunan terbaru milik form. Keduanya bisa berbeda karena pertanyaan form berulang boleh disunting untuk periode berikutnya. Tanpa `?period=`, yang dipakai adalah susunan terbaru — pada rentang banyak periode memang tak ada satu susunan yang benar.
+
 ## Pengisian (karyawan terautentikasi)
 | Method | Path | Fungsi |
 |---|---|---|

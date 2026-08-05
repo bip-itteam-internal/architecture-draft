@@ -159,20 +159,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "541f1496b493c621e1cc295613edaf5bf3e6a9de94482a9073df1ae876a787ad",
-      "ukuran_kb": 11.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (tingkat peran staff/supervisor/admin plus cakupan departemen dari `SupervisedDepartments`), dan bagaimana karyawan mengisi form lewat rute `/me/*`. Menjelaskan juga bentuk data penting: 9 tipe field plus `section`, keterangan ujung skala, `owner_department` vs `audience`, `form_type` (survey/evaluation/request/checklist) yang terikat dua arah dengan sasaran penilaian `subject`, serta arti `?period=` pada analisa versus penjaga duplikat. Termasuk aturan idempotensi 2 menit, kode `409` saat susunan pertanyaan dikunci, dan rute internal `/internal/compliance` yang dipakai attendance service untuk menahan clock-in.",
+      "hash": "9a9928aab5046a46a7b86d5c3e59db0c9af278792b83ead7d5ea43567c697040",
+      "ukuran_kb": 11.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (tingkat peran plus cakupan departemen) versus siapa yang cukup terautentikasi untuk mengisi, dan kode respons apa yang keluar saat aturan dilanggar (mis. 409 saat menyunting susunan field yang sudah punya jawaban). Menjawab juga bentuk datanya: 9 tipe field plus penanda `section`, beda `owner_department` (siapa pemilik) dengan `audience` (siapa yang mengisi), keterangan ujung skala, tipe form, serta bagaimana `?period=` menyaring analytics, responses, dan export CSV pada form berulang. Termasuk rute internal `/internal/compliance` yang dipakai Attendance Service untuk menahan clock-in, dan kenapa identitas pemanggil dikunci ke header alih-alih query.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
-        "dynamic form",
         "survei",
         "survey",
-        "endpoint",
-        "owner_department",
-        "audience",
-        "form_type",
-        "compliance clock-in"
+        "penilaian karyawan",
+        "evaluation",
+        "endpoint form-builder",
+        "analytics",
+        "export CSV",
+        "kepatuhan presensi"
       ]
     },
     {
@@ -1636,20 +1636,20 @@
         "CORE - SSO Flow",
         "Microservices - Employee Service"
       ],
-      "hash": "c2b28fc246d60bb6be3da8d174b1f7bd47952068989c4d4c735826574e558c19",
-      "ukuran_kb": 39.3,
-      "ringkasan": "Menjawab: bagaimana sebuah departemen membuat form tanpa rilis kode, siapa personanya (pengelola form vs karyawan pengisi), dan kenapa kepemilikan form memakai nama departemen `master_department` alih-alih key modul `system_roles`. Menjelaskan mekanika di baliknya: penilaian karyawan lain lewat sumbu `subject` yang terpisah dari `audience`, potret sasaran yang diambil sekali saat terbit, form berulang bulanan/mingguan beserta cron pembuka periode, notifikasi inbox, dan kenapa `notification-service` wajib ikut di-deploy. Juga menjawab keputusan desain yang menjaga presensi tetap hidup, misalnya kenapa gerbang presensi dilarang pada form penilaian dan kenapa sasaran tak dikenal gagal-tertutup.",
+      "hash": "197d94bc6453e46e395c1e45fb8ac03df2fc1d5e2ba306cec2a714b9e385e94e",
+      "ukuran_kb": 40.4,
+      "ringkasan": "Menjawab: apa itu Form Builder Service, bagaimana sebuah departemen bisa menyusun dan menerbitkan form sendiri tanpa rilis kode, dan kenapa kepemilikan form dipatok ke departemen (bukan modul) sehingga tim GA tidak melihat form milik IT. Menjelaskan mekanisme di baliknya: sumbu `subject` untuk menilai karyawan lain yang terpisah dari `audience`, potret sasaran yang diambil sekali saat terbit, form berulang berperiode bulanan dan mingguan beserta cron pembukanya, notifikasi inbox, serta alasan susunan pertanyaan dikunci begitu jawaban pertama masuk. Menjawab juga pertanyaan operasional: kenapa notification-service wajib ikut di-deploy bersama service ini, kenapa gerbang presensi dilarang pada form penilaian, dan bagaimana jalur pengisian menahan clock-in mobile tanpa memanggil service lain.",
       "kata_kunci": [
-        "form builder service",
+        "form builder",
         "form dinamis",
-        "penilaian karyawan",
-        "evaluation",
-        "subject",
-        "audience",
         "form berulang",
         "recurrence",
-        "section",
-        "gerbang presensi"
+        "penilaian karyawan",
+        "evaluation",
+        "owner_department",
+        "gerbang presensi",
+        "clock-in",
+        "notifikasi inbox"
       ]
     },
     {
