@@ -899,29 +899,30 @@
         "Microservices - Form Builder Service",
         "HRIS - Tukar Jadwal Kerja",
         "API - Attendance Service",
+        "Microservices - Attendance Service",
+        "Microservices - Payroll Service",
         "Microservices - Task Management Service",
         "APP - Web ERP",
         "APP - Dynamic Task Tracker",
         "API - Form Builder Service",
         "HRIS - Attendance System",
         "HRIS - Payroll",
-        "Microservices - Attendance Service",
         "Microservices - Employee Service",
         "Microservices - Notification Service"
       ],
-      "hash": "280e1c0f48b826827a0b7516ed2de88ba88dd3ce21321fedf03c4c4a7a645e72",
-      "ukuran_kb": 19.7,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, fitur HRIS apa saja yang bisa dipakai karyawan dari HP (presensi QR + geofencing + biometric, cuti/izin, lembur, payslip, KPI, tiket, survei), dan bagaimana arsitektur Flutter-nya disusun (Clean Architecture feature-first, BLoC, get_it, dio, go_router, Firebase). Menjelaskan cara autentikasi (JWT Bearer, PIN, biometric, 1 akun = 1 device) dan menegaskan bahwa aplikasi memanggil backend lewat API Master Gateway, bukan koneksi langsung. Juga menjawab bagaimana dukungan multi-perusahaan bekerja di mobile (scope via JWT, CompanyScope, konten per tenant) dan versi build mana yang sudah rilis vs baru di branch dev.",
+      "hash": "1d83b0b74f64e4117b30ae539976525d0de6baa624477e0fb07315a6aaca351b",
+      "ukuran_kb": 21.4,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, fitur HRIS apa saja yang tersedia untuk karyawan (clock-in/out QR + geofencing + biometric, cuti/izin, lembur, payroll, KPI, survei), dan bagaimana arsitektur Flutter-nya disusun (Clean Architecture feature-first, BLoC, get_it, dio, go_router, Firebase). Menjelaskan juga cara autentikasi (JWT Bearer lewat API Master Gateway, PIN, biometric, kebijakan 1 akun = 1 device) dan bagaimana konten di-scope per perusahaan lewat CompanyScope untuk pilot multi-tenant. Berguna untuk mencari versi build/rilis yang beredar, daftar endpoint modul yang dipakai app, serta batasan dan known issues aplikasi.",
       "kata_kunci": [
         "MyBharata",
-        "mobile",
+        "aplikasi mobile",
+        "mobile app",
         "Flutter",
         "HRIS mobile",
-        "presensi",
+        "absensi",
         "attendance",
-        "aplikasi karyawan",
         "geofencing",
-        "BLoC",
+        "biometric",
         "multi-perusahaan"
       ]
     },
@@ -1963,20 +1964,20 @@
         "Microservices - Insentive Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "23086fae5a4ebb0cd8948d028bcb87576abfbc131895163b369d50af78a71143",
-      "ukuran_kb": 14.9,
-      "ringkasan": "Menjawab: bagaimana penggajian dijalankan di payroll-service, mulai dari setup komponen gaji, config BPJS dan pajak, master badan usaha penggaji untuk kop slip, sampai penetapan gaji per karyawan (basic_salary, upah_bpjs, ptkp_status). Juga menjawab bagaimana payroll run dihitung dan melewati siklus draft ke approved ke published, bagaimana PPh21 dihitung dengan metode TER PMK 168/2023 per kategori PTKP, bagaimana karyawan melihat slipnya sendiri lewat endpoint /my, serta bagaimana beban pemberi kerja (employer-cost) dan supplement kehadiran/lembur diambil antar-service. Memuat pula jebakan data seperti upah_bpjs yang terisi nominal iuran dan cakupan multi-perusahaan yang belum ter-scope.",
+      "hash": "434198395891a46927f7486ccba54b23489b09549cd1e23df04f8fb3253107d4",
+      "ukuran_kb": 16.7,
+      "ringkasan": "Menjawab: bagaimana penggajian dihitung di bip-erp, mulai dari setup komponen gaji, config BPJS dan PPh21 metode TER, penetapan gaji per karyawan (basic_salary, upah_bpjs, ptkp_status), sampai payroll run dengan lifecycle draft, approved, published dan slip self-service karyawan. Menjelaskan juga master badan usaha penggaji untuk kop slip (41 entitas, PT induk plus 40 CV), endpoint employer-cost untuk modul insentif, serta integrasi ke Attendance Service untuk prorata Tunjangan Kehadiran dan lembur. Memuat gotcha penting: upah_bpjs adalah DASAR upah bukan nominal potongan (salah isi lolos tanpa validasi dan sudah terjadi di production), company_id menumpang di employee_salary sehingga backfill harus setelah struktur gaji terisi, dan service ini belum ter-scope multi-tenant.",
       "kata_kunci": [
         "payroll",
         "penggajian",
         "slip gaji",
         "payslip",
-        "PPh21 TER",
-        "BPJS",
+        "PPh21",
+        "TER",
         "PTKP",
-        "payroll run",
+        "BPJS",
         "THR",
-        "employee_salary"
+        "payroll run"
       ]
     },
     {
@@ -3421,7 +3422,7 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Pondasi aturan **sudah merge** (PR #986, 5 Agustus 2026), **belum deploy** dan **belum punya satu pun endpoint**. Yang ada baru mesin perhitungannya. Empat lubang data dan tiga tabrakan arsitektur masih menghalangi bagian berikutnya.",
+      "status_teks": "**Jalur pengeluaran kas kecil lengkap dan sudah merge** (delapan PR, 5 Agustus 2026), **belum deploy**. Pengajuan, approval berjenjang, top-up, tutup buku, laporan, dan jurnal belum ada. Empat lubang data dan tiga tabrakan arsitektur masih menghalangi bagian berikutnya.",
       "publik": true,
       "tautan": [
         "GA - Form Pengadaan dan Pengajuan Dana",
@@ -3437,21 +3438,10 @@
         "GA - Procurement System",
         "Finance - Big Pictures"
       ],
-      "hash": "291153c065a2a57d4cb3941e60127530a09f217945a6d149178461701dd0a71c",
-      "ukuran_kb": 15.8,
-      "ringkasan": "Menjawab: berapa plafon kas kecil tiap divisi per bulan, kapan pengeluaran boleh lewat kas kecil dan kapan wajib lewat jalur pengajuan dengan approval, serta siapa saja approver-nya menurut nominal dan jenis belanja (termasuk pengajuan aset dan top-up). Menjelaskan sembilan aturan bisnis R-01 sampai R-09 (blokir overbudget, larangan beli aset lewat kas kecil, deteksi pemecahan transaksi, kunci karena bukti telat), alur status kas kecil/pengajuan/top-up, dan fungsi Go mana di service procurement yang sudah memuat mesin perhitungannya. Juga menjawab kenapa plafon tidak boleh dikunci ke field department (Gudang TJ dan Bharata Club hanya sub-unit dari Manufaktur dan Human Resource sehingga butuh master unit kas tersendiri), serta lubang data dan tabrakan arsitektur apa yang masih menghalangi tahap berikutnya.",
-      "kata_kunci": [
-        "kas kecil",
-        "petty cash",
-        "pengajuan budget",
-        "budget request",
-        "plafon divisi",
-        "matriks approval",
-        "pengajuan aset",
-        "top-up saldo",
-        "unit kas",
-        "procurement service"
-      ]
+      "hash": "da5dba93ed1ea871a45e64fc9b6f5e762003169950bc61ccd0d81d582a058412",
+      "ukuran_kb": 20.0,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "General Affairs/GA - Accident Prevention.md",
@@ -8535,5 +8525,7 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "Finance System/Finance - Kas Kecil dan Pengajuan Budget.md"
+  ]
 }

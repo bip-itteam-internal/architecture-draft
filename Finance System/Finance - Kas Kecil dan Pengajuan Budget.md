@@ -2,7 +2,7 @@
 
 *Modul kas kecil per divisi beserta jalur pengajuan budget, menggantikan aturan yang kini berjalan lewat kesepakatan lisan dan chat. **Lintas divisi**, bukan fitur satu departemen: Finance yang menetapkan plafon dan aturannya, tiap divisi yang memakainya. Dokumen ini menggabungkan blueprint dari Finance dengan hasil pemeriksaan langsung ke data produksi, supaya lubang datanya terlihat sebelum ada yang mulai menulis kode.*
 
-- **Status**: ⚠️ Pondasi aturan **sudah merge** (PR #986, 5 Agustus 2026), **belum deploy** dan **belum punya satu pun endpoint**. Yang ada baru mesin perhitungannya. Empat lubang data dan tiga tabrakan arsitektur masih menghalangi bagian berikutnya.
+- **Status**: ⚠️ **Jalur pengeluaran kas kecil lengkap dan sudah merge** (delapan PR, 5 Agustus 2026), **belum deploy**. Pengajuan, approval berjenjang, top-up, tutup buku, laporan, dan jurnal belum ada. Empat lubang data dan tiga tabrakan arsitektur masih menghalangi bagian berikutnya.
 - **Sumber requirement**: Blueprint Modul Kas Kecil & Pengajuan Budget v1.0 (draft), disusun dari percakapan WhatsApp dengan Finance.
 - **Sumber angka sistem**: sensus langsung `employee_db` dan `procurement_db` produksi, **4 Agustus 2026**.
 - **Terkait**: [[GA - Form Pengadaan dan Pengajuan Dana]] mencatat dua form kertas GA yang menjadi bagian dari alur ini.
@@ -60,9 +60,13 @@ Nilai pada R-01, R-02, R-03, R-05, dan R-06 **wajib disimpan sebagai data**, buk
 - **Pengajuan**: DRAFT, DIAJUKAN, REVIEW_ATASAN, REVIEW_FINANCE, DISETUJUI / DITOLAK / REVISI, DICAIRKAN, REALISASI, SELESAI
 - **Top-up**: DIAJUKAN, REVIEW_FINANCE, DISETUJUI, DANA_DITAMBAHKAN
 
-## Sudah Ada di Kode (PR #986, merge 5 Agustus 2026)
+## Sudah Ada di Kode
 
-Seluruhnya **fungsi murni** di `bip-erp/services/procurement/`: tanpa Mongo, tanpa HTTP, tanpa jam dinding. Belum ada handler, koleksi, rute, maupun katalog izin. Bagian yang menentukan pengeluaran seseorang diterima atau ditolak sengaja dibuat dapat dibaca dan diuji tanpa menyalakan apa pun.
+Delapan PR merge **5 Agustus 2026** (#986, #988, #990, #991, #992, #993, #994, #996), seluruhnya di `bip-erp/services/procurement/`. **Belum deploy.**
+
+Jalur pengeluaran kas kecil sudah lengkap dari catat sampai pertanggungjawaban. Yang belum ada: pengajuan, approval berjenjang, top-up, tutup buku, laporan, dan jurnal.
+
+### Aturan dan perhitungan (fungsi murni, tanpa Mongo dan tanpa HTTP)
 
 | Berkas | Isi |
 |---|---|
@@ -70,8 +74,44 @@ Seluruhnya **fungsi murni** di `bip-erp/services/procurement/`: tanpa Mongo, tan
 | `kas_parameter.go` | Parameter berversi, `ParameterBerlaku` memilih versi menurut tanggal |
 | `kas_plafon.go` | `PlafonEfektif` (tetap vs dinamis) dan `SisaSaldo` |
 | `kas_aturan.go` | `PutuskanJalurKas` untuk R-01 sampai R-07 dan R-09, `DugaPemecahanTransaksi` untuk R-08 |
+| `kas_konteks.go` | `RakitKonteksKas`, titik sambung master ke mesin aturan |
+| `kas_kategori.go` | `AsetKarena`, dua jalan sebuah barang disebut aset |
+| `kas_transaksi.go` | Penomoran per periode, validasi, `AdaTunggakanBukti` (R-09) |
+| `kas_bukti.go` | `ValidasiBuktiKas` dan letak berkas di penyimpanan |
 
 Kesepuluh test case penerimaan blueprint §9 ditulis apa adanya sebagai tabel test dan seluruhnya lulus.
+
+### Endpoint
+
+Seluruhnya berprefix `/kas`, di belakang gateway `/api/procurement/*`.
+
+| Rute | Izin | Keterangan |
+|---|---|---|
+| `GET /kas/unit` · `POST /kas/unit` | `kaskecil.view` · `kaskecil.master.save` | Master unit kas |
+| `GET /kas/kategori` · `POST /kas/kategori` | `kaskecil.view` · `kaskecil.master.save` | Master kategori belanja |
+| `GET /kas/saldo?unit=&periode=` | `kaskecil.view` | Plafon, terpakai, sisa |
+| `GET /kas/transaksi` | `kaskecil.view` | Daftar, dapat disaring unit/periode/status/tertandai |
+| `POST /kas/transaksi` | `kaskecil.transaksi.save` | **Satu-satunya rute yang mengeluarkan uang** |
+| `POST /kas/transaksi/:nomor/bukti` | `kaskecil.transaksi.save` | Unggah bukti, hanya oleh pencatatnya |
+| `POST /kas/transaksi/:nomor/verifikasi` | `kaskecil.approve.finance` | Verifikasi bukti oleh Finance |
+
+Koleksi: `kas_unit`, `kas_kategori`, `kas_parameter`, `kas_plafon`, `kas_transaksi` di `procurement_db`.
+
+### Kenapa menumpang procurement-service
+
+Menghemat satu modul gateway. Isinya **bukan** cermin Accurate seperti sisa service itu; modul ini justru berhenti sebelum Accurate, dan pemakainya seluruh divisi. Rutenya berprefix `/kas` supaya batasnya terlihat dari URL.
+
+### Izin: tidak ada fallback tier
+
+Beda pokok dari modul lain di repo. Monitoring, payroll, dan procurement menyediakan fallback tier untuk menjaga akses yang sudah dipakai orang sebelum permission-set ada. Kas kecil belum punya satu pun pemakai, jadi tidak ada yang perlu dijaga; yang tersisa hanya risikonya. Memberi hak membelanjakan uang karena seseorang kebetulan supervisor di modul lain adalah cara termudah melahirkan pengeluaran yang tak seorang pun merasa memberikannya.
+
+**Semua orang ditolak sampai ditugaskan eksplisit lewat permission-set.** Bila setelah deploy ada yang mengeluh tidak bisa masuk, itu perilaku yang benar. Tujuh paket bawaan tersedia di `common.DefaultKasKecilSets()`, dengan Reach menyempit untuk staf dan atasan divisi.
+
+### Satu tahap status di luar blueprint
+
+Blueprint melompat dari `MENUNGGU_BUKTI` langsung ke `TERVERIFIKASI`, padahal keduanya dikerjakan pihak berbeda: pengaju yang mengunggah, Finance yang memeriksa. Ditambahkan `MENUNGGU_VERIFIKASI` di antaranya, sebab tanpa itu satu-satunya pilihan adalah membiarkan pengunggah memverifikasi buktinya sendiri, atau membiarkan status berbohong tentang apa yang sudah terjadi.
+
+Konsekuensinya R-09 memakai **ada tidaknya bukti**, bukan statusnya. Aturannya berbunyi "transaksi tanpa upload bukti", dan bila ia menunggu verifikasi, pengaju yang sudah mengunggah tetap terkunci karena kelambatan Finance.
 
 **Empat keputusan teknis yang perlu diketahui sebelum melanjutkan:**
 
@@ -188,17 +228,25 @@ Blueprint mengusulkan enam fase, kurang lebih 16 minggu. Satu perubahan yang per
 | Fase | Ruang lingkup | Catatan |
 |---|---|---|
 | 0 | Isi penanda atasan untuk General Affair, Procurement, dan Percetakan; tambahkan `Human Resource` ke `master_department`; isi master unit kas beserta PIC-nya | **Tambahan**, bukan dari blueprint. Pekerjaan data, bukan kode. **Belum dikerjakan.** JANGAN mendaftarkan Gudang TJ atau Bharata Club sebagai departemen, lihat koreksi di Lubang Data nomor 1 |
-| 1 | Master data (divisi, plafon, kategori, parameter) + dashboard saldo | 2 minggu. **Mesin aturannya sudah ada** (PR #986); sisanya koleksi, endpoint, dan layar |
-| 2 | Transaksi kas kecil + R-01, R-03, R-06 + unggah bukti | 3 minggu |
+| 1 | Master data (divisi, plafon, kategori, parameter) + dashboard saldo | **Backend selesai** (unit kas, kategori, parameter, plafon, saldo). Sisa: layar FE dan pengisian datanya |
+| 2 | Transaksi kas kecil + R-01, R-03, R-06 + unggah bukti | **Backend selesai**, termasuk R-02, R-07, R-08, R-09 dan verifikasi Finance. Sisa: layar FE. **Unggah bukti butuh `MINIO_PROCUREMENT_KEY` dibuat lebih dulu di MinIO** |
 | 3 | Modul pengajuan + approval berjenjang + R-02, R-07 | 3 minggu |
 | 4 | Top-up (R-05) + tutup buku bulanan + laporan | 2 minggu |
 | 5 | Register aset + R-08, R-09. **Integrasi jurnal menunggu keputusan** | 3 minggu |
 | 6 | UAT, migrasi data, pelatihan, go-live paralel sebulan | 3 minggu |
 
+## Perlu Tindakan Sebelum Deploy
+
+Tiga hal berikut bukan pekerjaan kode. Tanpa ketiganya, modul yang sudah merge tidak akan menghasilkan apa-apa selain penolakan.
+
+- **`MINIO_PROCUREMENT_KEY` belum ada, dan direktorinya belum dibuat di MinIO.** Kunci akses menentukan prefix object, sehingga modul ini butuh direktorinya sendiri: menumpang kunci employee akan mencampur bukti belanja dengan lampiran KPI di satu ruang yang sama. Selama belum dibuat, rute unggah bukti membalas 503 dengan pesan yang menyebut sebabnya, dan sisa procurement-service tetap jalan. Sengaja tidak divalidasi saat boot supaya satu env yang belum dipasang tidak mematikan master pemasok, barang, dan faktur.
+- **Paket izin kas kecil harus ditugaskan ke posisi** lewat layar Hak per Posisi. Modul ini tidak punya fallback tier, jadi sebelum penugasan itu ada, **semua orang ditolak**. Itu perilaku yang benar, bukan kerusakan.
+- **Master unit kas, kategori belanja, parameter, dan plafon periode berjalan harus diisi.** Plafon yang belum diatur diperlakukan sebagai saldo nol, bukan sebagai tanpa batas.
+
 ## Belum Diputuskan (TBD)
 
-- Service mana yang memuat modul ini. Karena lintas divisi dan aturannya milik Finance, menumpang service GA sudah tidak tepat. Pilihan dan preseden dibahas di [[GA - Form Pengadaan dan Pengajuan Dana]].
-- Penomoran transaksi dan pengajuan.
+- ~~Service mana yang memuat modul ini~~ **Sudah diputuskan: `procurement-service`**, dengan rute berprefix `/kas`. Menghemat satu modul gateway, dan isinya sengaja dipisahkan namanya karena modul ini bukan cermin Accurate seperti sisa service itu.
+- Penomoran pengajuan (penomoran transaksi sudah ada: `KK-<unit>-<YYYYMM>-<urut>`).
 - Apakah unggah bukti memakai [[Microservices - File Service]] (batas 4 MB per berkas).
 
 ## Dependensi & Integrasi
