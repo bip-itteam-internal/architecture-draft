@@ -198,16 +198,16 @@ Pemilik data ini **SPV/leader marketing, bukan HR**. ICC Management sudah memili
 
 Kardinalitasnya berbeda: satu karyawan bisa punya **banyak baris mapping** (satu per toko/advertiser/Shopee). Kalau username ditempelkan ke baris mapping, tidak jelas baris mana yang memegangnya dan nilainya terduplikasi setiap kali karyawan itu memegang toko baru. **Akun affiliate melekat pada KARYAWAN, bukan pada toko.**
 
-Koleksi baru `icc_affiliate_accounts` (Integration Service):
+Koleksi baru `icc_affiliate_accounts` (Integration Service) — **daftar akun internal**, bukan daftar penugasan:
 
 ```json
 {
   "_id": "UUID",
-  "employee_id":   "BIP-0114",
-  "employee_name": "Aan Budiyanto",
   "team":          "Beauty Hacks",
   "username":      "glowinajah",
   "alias":         ["glowinajah_lama"],
+  "employee_id":   "BIP-0114",
+  "employee_name": "Aan Budiyanto",
   "is_active":     true,
   "last_seen_at":  "2026-08-01T00:00:00Z",
   "notes":         "",
@@ -215,7 +215,22 @@ Koleksi baru `icc_affiliate_accounts` (Integration Service):
 }
 ```
 
-**Constraint**: unique `(employee_id, username)` untuk baris aktif — **BUKAN** unique username global. Satu username boleh dipegang lebih dari satu karyawan; ini fakta di data, bukan kelonggaran (lihat Dependensi & Risiko: akun bersama).
+**`employee_id` OPSIONAL — kosong berarti *belum ditugaskan*, BUKAN eksternal.** Ini keputusan paling penting di sini: yang dicampur selama ini adalah dua fakta berbeda —
+
+| Fakta | Sifat | Disimpan di |
+|---|---|---|
+| **Kepemilikan** — akun ini milik perusahaan | organisasi, jarang berubah | baris ini (`team` wajib) |
+| **Penugasan** — dipegang staf siapa | operasional, boleh kosong, sering bergilir | `employee_id` (opsional) |
+
+Klasifikasi internal **tidak boleh bergantung** pada ada-tidaknya pemegang. Akibatnya: akun tanpa pemegang tetap tergolong internal di laporan, tetapi **tidak menghasilkan insentif individu** karena tak ada orang yang dituju — perilaku yang justru benar.
+
+> **Jangan** memakai karyawan placeholder ("BELUM DITUGASKAN") sebagai penambal. Itu mencemari master karyawan, muncul di dropdown dan laporan KPI, lalu menciptakan "orang" palsu yang harus dibersihkan belakangan.
+
+**Constraint**: `team` wajib; unique `(employee_id, username)` untuk baris aktif — **BUKAN** unique username global. Satu username boleh dipegang lebih dari satu karyawan; ini fakta di data, bukan kelonggaran (lihat Dependensi & Risiko: akun bersama).
+
+### Untuk TOKO tidak perlu mekanisme serupa
+
+Toko yang **belum dipegang** staf ICC sudah otomatis internal karena kepemilikannya tercatat berlapis di tempat lain: `tt_shop_authorized_shops` (toko terautorisasi = milik kita) dan `department_shops` (toko milik departemen mana — di kodenya ditegaskan ini *kepemilikan*, berbeda dari `/marketing/teams` yang *kontrol akses*). `icc_account_mappings` hanya tahu soal **penugasan**. Kesalahan yang harus dihindari: memakai mapping ICC sebagai penentu "ini toko kita atau bukan".
 
 ### Field advertiser TIDAK diganti
 
@@ -244,7 +259,11 @@ Diisi dari data order affiliate: kapan terakhir username itu muncul. Username ya
 
 ### Dampak ke tampilan ICC Management
 
-Baris karyawan di kartu team saat ini diturunkan **hanya** dari mapping toko (`kelompokkanMappingPerTeam`). Karyawan yang cuma punya akun affiliate — tanpa toko — tidak akan muncul. Karena itu sumber baris harus menjadi **gabungan**: mapping toko ∪ akun affiliate. Tabel kartu mendapat kolom **Akun Affiliate**, dan tiap baris karyawan punya aksi kelola akun (tambah / rename→alias / nonaktifkan).
+Kartu team (Fase 6 di [[Sales - ICC Account Manager Mapping]]) mendapat **sub-tab**: **Toko & Iklan** (isi sekarang) dan **Akun Affiliate** (daftar akun internal team itu). Sub-tab ditaruh **di dalam kartu**, bukan di tingkat halaman, supaya pemisahan per team tetap terjaga.
+
+Daftar akun menampilkan **semua akun internal team**, termasuk yang **belum ditugaskan** — justru itu antrean kerja SPV, bukan data yang boleh menguap. Baris karyawan di tab Toko & Iklan saat ini diturunkan hanya dari mapping toko (`kelompokkanMappingPerTeam`); karyawan yang cuma punya akun affiliate tanpa toko tidak akan muncul, sehingga sumber barisnya harus menjadi **gabungan mapping toko ∪ akun affiliate**.
+
+Saat assign karyawan, field akun affiliate memakai dropdown dari daftar ini — mengikuti pola `available-shops`/`available-advertisers` yang sudah ada, **dengan satu perbedaan wajib**: akun bersama boleh dipegang lebih dari satu orang, jadi akun yang sudah dipegang **tidak boleh** dikeluarkan dari dropdown seperti perlakuan pada toko.
 
 ### Endpoint (usulan)
 
@@ -252,9 +271,9 @@ Semua di Integration Service, guard `RequireMarketingLeader`, `team` dari header
 
 | Endpoint | Keterangan |
 |---|---|
-| `GET /icc/affiliate-accounts` | filter `team`, `employee_id`, `is_active` |
-| `POST /icc/affiliate-accounts` | tambah akun (normalisasi + validasi di usecase) |
-| `PATCH /icc/affiliate-accounts/:id` | ubah username (lama → `alias`), `is_active`, `notes` |
+| `GET /icc/affiliate-accounts` | filter `team`, `employee_id`, `is_active`, `belum_ditugaskan` |
+| `POST /icc/affiliate-accounts` | tambah akun (normalisasi + validasi di usecase); `employee_id` boleh kosong |
+| `PATCH /icc/affiliate-accounts/:id` | ubah username (lama → `alias`), tetapkan/lepas `employee_id`, `is_active`, `notes` |
 | `DELETE /icc/affiliate-accounts/:id` | hanya bila sudah nonaktif (pola sama dengan mapping) |
 
 ### Alur input & pencocokan
@@ -279,27 +298,34 @@ flowchart TD
 
 Halaman itu sekarang menampilkan `creator` (username) + `collaboration_type` (internal/eksternal dari collaboration id), **tanpa identitas karyawan**. Dua hal ini **sumbu berbeda dan tidak saling menggantikan**: `collaboration_type` adalah sifat **order**-nya (datang dari TikTok), sedangkan kepemilikan adalah **siapa karyawan** di balik username (datang dari mapping kita).
 
-Justru karena independen, menggabungkannya memunculkan dua ketidakcocokan yang hari ini tak terlihat:
+> **JANGAN menimpa kolom golongan yang sudah ada.** Semantiknya dibangun dari dokumentasi resmi TikTok (`affiliate.go`: target collaboration = kreator yang KITA undang; open collaboration = kreator yang datang sendiri) berikut aturan "target menang atas open". Kepemilikan akun harus jadi **dimensi baru** (kolom "Kepemilikan": karyawan X / luar / belum terdaftar) yang berdampingan dengan "Golongan", bukan menggantikannya.
 
-1. order tergolong **internal** tetapi username-nya **belum terdaftar** → mapping masih kurang;
-2. kreator kita ber-order **open collaboration** → kolaborasinya belum disetel benar.
+Justru karena keduanya independen, **persilangannya** yang bernilai:
 
-**Cara mengalirkan datanya**: Integration menyertakan pemilik langsung di ringkasan internalnya — mengikuti pelajaran `mappingDariRingkasan` di `services/insentive/func.go`, di mana panggilan antar-service ke route ber-RBAC selalu kena 403 karena hanya membawa kunci gateway tanpa identitas pengguna. Jangan ulangi pola itu.
+| | Order target collab (internal) | Order open collab (eksternal) |
+|---|---|---|
+| **Username ada di daftar internal** | sehat | ⚠️ akun kita belum didaftarkan target collab di toko itu — persis yang dikejar sheet `DONE` per toko di file Excel |
+| **Belum ada di daftar** | ⚠️ kandidat akun internal yang belum terdaftar | wajar (kreator publik) |
+
+**Kandidat akun internal diturunkan dari data, bukan dari laporan manual.** Akun baru yang dibuat staf tanpa sepengetahuan tim IT tidak akan pernah tertangkap kalau menunggu dilaporkan. Sel kiri-bawah tabel di atas memberi deteksinya gratis: kreator yang ordernya **target collaboration** berarti diundang oleh toko kita sendiri — bila username-nya belum ada di daftar, itu kandidat akun internal. Tampilkan sebagai antrean dengan aksi "tandai internal" (sekali klik masuk daftar).
+
+**Cara mengalirkan datanya**: Marketing Analytics **membaca `integration_db` langsung secara baca-saja** — pola yang sudah berjalan di service itu untuk `icc_account_mappings` (kolom penanggung jawab toko), dijaga test `TestTidakAdaPenulisanKeIntegrationDB`. Jadi cukup tambahkan `icc_affiliate_accounts` ke daftar koleksi yang dibaca; **tidak perlu** endpoint HTTP baru. (Catatan: larangan memanggil route ber-RBAC antar-service — pelajaran `mappingDariRingkasan` di `services/insentive/func.go` yang selalu kena 403 — tetap berlaku untuk Insentive Service, bukan untuk jalur baca-DB ini.)
 
 ### Belum Diputuskan (TBD)
 
 - **Atribusi order akun bersama** — `@efcare` dipakai FIRA & IPUL, `@auraliaa__` dipakai BELIA & FADLY. Saat insentif dihitung, order dari akun itu masuk ke siapa: dibagi rata, salah satu ditandai pemilik utama, atau dihitung penuh ke keduanya? **Harus diputuskan sebelum fase insentif**, tetapi tidak menghalangi pengumpulan datanya.
+- **Akun internal tanpa pemegang** — nilainya ikut akumulasi insentif **leader/tim** (karena milik team) atau tidak dihitung sama sekali? Condong ke "masuk laporan tim, tidak masuk insentif individu", tetapi ini keputusan bisnis.
 - **Data Kyura** — belum ada file setara Beauty Hacks.
 
 ### Rencana Implementasi (Revisi 2026-08-06)
 
 | Fase | Scope | Status |
 |---|---|---|
-| **A** | Integration: koleksi `icc_affiliate_accounts` + endpoint + normalisasi/validasi + unit test | 🟡 Belum |
-| **B** | FE ICC Management: kolom Akun Affiliate di kartu team, dialog kelola (tambah/rename→alias/nonaktifkan), baris karyawan = mapping ∪ akun affiliate | 🟡 Belum |
+| **A** | Integration: koleksi `icc_affiliate_accounts` (`employee_id` opsional) + endpoint + normalisasi/validasi + unit test | 🟡 Belum |
+| **B** | FE ICC Management: sub-tab **Akun Affiliate** di kartu team (termasuk akun belum ditugaskan), dialog kelola (tambah/rename→alias/tetapkan pemegang/nonaktifkan), baris Toko & Iklan = mapping ∪ akun affiliate | 🟡 Belum |
 | **C** | Import awal dari Excel Beauty Hacks (script sekali jalan, setelah dibersihkan); Kyura menyusul | 🟡 Belum |
 | **D** | Pensiunkan `internal-creators.ts` — sumber pindah ke DB (halaman lamanya sudah tanpa menu) | 🟡 Belum |
-| **E** | Marketing Analytics → Affiliate: kolom Karyawan/Team, panel "belum termapping", pengisian `last_seen_at` | 🟡 Belum |
+| **E** | Marketing Analytics → Affiliate: kolom **Kepemilikan** (dimensi baru, bukan pengganti Golongan) + antrean kandidat akun internal + pengisian `last_seen_at`, lewat baca-langsung `integration_db` | 🟡 Belum |
 
 ## Dependensi & Risiko
 
@@ -329,5 +355,7 @@ Dari daftar ICC 2026-07-04 (33 anggota):
 - [[Microservices - Insentive Service]] — engine insentif ICC (pay-per-video, scoring)
 - [[Sales - Incentive]] — kriteria & aturan insentif ICC
 - [[Microservices - Integration Service]] — service yang menyimpan `affiliate_orders`
-- [[Microservices - Employee Service]] — target integrasi data karyawan
-- [[APP - Web ERP]] — frontend ERP (tab ICC di Affiliate Performance)
+- [[Microservices - Employee Service]] — dipertimbangkan sebagai sumber (Opsi A), tidak jadi dipakai
+- [[Microservices - Marketing Analytics Service]] — konsumen daftar akun internal; sudah membaca `integration_db` baca-saja untuk penanggung jawab toko
+- [[Sales - ICC Account Manager Mapping]] — mapping toko/iklan & kartu per team tempat sub-tab Akun Affiliate akan ditaruh
+- [[APP - Web ERP]] — frontend ERP (halaman ICC Management & Marketing Analytics → Affiliate)
