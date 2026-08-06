@@ -1050,20 +1050,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "b7aea46901d4028f045d1dd82415111fc3236c29272d5bc66bc8969a8be4a760",
-      "ukuran_kb": 97.2,
-      "ringkasan": "Menjawab: stack teknologi apa yang dipakai Web ERP (hris-dashboard/One Bharata), bagaimana alur login dan SSO ke aplikasi lain (mis. Task Manager), bagaimana sistem role (system_roles/RBAC) menentukan menu yang tampil di sidebar, serta bagaimana fitur multi-perusahaan (switcher, kelola departemen/shift/jaringan per perusahaan) dan pengaturan menu per posisi bekerja.",
+      "hash": "6c0ac3cdf115f601eb77484a5da840eed1885a16dc38fbbbfec05528f75028a7",
+      "ukuran_kb": 101.3,
+      "ringkasan": "Menjawab: portal web internal ERP/HRIS Bharata (\"One Bharata\", repo erp-frontend) memakai stack apa, bagaimana alur login employee_id + password, refresh token, dan perannya sebagai SSO Identity Provider bagi aplikasi lain seperti Task Manager. Juga menjawab bagaimana sidebar dan menu digerbang oleh cookie system_roles (module dan role), bagaimana menu dikelompokkan, diratakan, atau disembunyikan per jabatan lewat setelan Tampilan Menu (menu_hidden), dan bedanya setelan tampilan itu dari hak akses. Selain itu menjelaskan dukungan multi-perusahaan di frontend: company switcher admin pusat, Kelola Perusahaan, departemen, shift/rotasi, mesin fingerprint, network WiFi, serta halaman Atasan Langsung dan KPI Portal Saya untuk Leader.",
       "kata_kunci": [
+        "erp-frontend",
         "Web ERP",
-        "hris-dashboard",
         "One Bharata",
+        "hris-dashboard",
         "SSO",
-        "single sign-on",
+        "Identity Provider",
         "system_roles",
-        "RBAC",
-        "multi-perusahaan",
-        "multi-tenant",
-        "erp-frontend"
+        "sidebar menu",
+        "role gating",
+        "multi-perusahaan"
       ]
     },
     {
@@ -4653,12 +4653,12 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "9486f5d8b0e5db6f608d652a2091d7008d624fcdcb9d2d90568c5453fef5853c",
-      "ukuran_kb": 8.5,
-      "ringkasan": "Menjawab: bagaimana skor KPI dihitung, siapa yang membuat template per posisi, dan kenapa submit ditolak bila posisi template tidak sama dengan posisi karyawan. Membedakan dua hal yang sering tertukar: engine skor ke insentif untuk 9 role marketing versus appraisal KPI per-karyawan lintas departemen di employee-service. Juga menjelaskan RBAC per departemen, cakupan tim untuk Leader lewat supervisor_id, penggabungan tampilan departemen satu tim (misal HRGA) dari master data, serta rancangan siklus bulanan supervisor ke HR.",
+      "hash": "ea224e54216592a522b842d194e92e44e9ddf11f8840b9926542c3fbf491368c",
+      "ukuran_kb": 9.9,
+      "ringkasan": "Menjawab: bagaimana skor KPI dihitung di Bharata dan apa bedanya engine KPI ke insentif tim marketing (9 role, master-kpi, cron metrik iklan) dengan appraisal per-karyawan lintas departemen di employee-service (/kpi/*). Juga menjawab bagaimana template KPI per posisi dan metrik berbobot dibuat, bagaimana scoring per periode YYYY-MM dilakukan dengan snapshot template, dan kenapa posisi template wajib sama persis dengan posisi karyawan. Selain itu menjelaskan siapa yang boleh melihat KPI departemen mana (RBAC per departemen), bagaimana Leader melihat bawahan langsung lewat scope=team, penggabungan tampilan departemen satu tim (HRGA) dari master data, bentuk respons, dashboard agregat, serta bahwa pengisian nilai masih 100% manual.",
       "kata_kunci": [
         "KPI",
-        "key performance index",
+        "Key Performance Index",
         "appraisal",
         "penilaian kinerja",
         "performance review",
@@ -4666,7 +4666,7 @@
         "scoring",
         "insentif",
         "RBAC departemen",
-        "supervisor"
+        "HRGA"
       ]
     },
     {
