@@ -61,9 +61,10 @@ kedua ujung data. Implementasi: `LazadaClient.sign()`.
   manual yang tersedia: `POST /lazada/backfill-returns` dan fallback gudang "input nomor order".
 - **Angka JSON di payload webhook tersimpan sebagai BSON `double`.** `CreateWebhookLazada`
   mem-parse body ke `any`, jadi tiap angka JSON jadi `float64` lalu `double` di
-  `webhook_logs.payload`. Processor mendeklarasikan `reverse_order_id` sebagai `string`
-  → `bson.Unmarshal` gagal. Lihat §Push Mechanism di bawah; **bug ini live di prod
-  per 2026-08-06**.
+  `webhook_logs.payload`. Processor dulu mendeklarasikan `reverse_order_id` sebagai
+  `string` → `bson.Unmarshal` gagal & SELURUH webhook mati. **Diperbaiki 2026-08-06**
+  lewat tipe `lazadaID` (terima string/double/int32/int64/null, normalkan ke string
+  desimal) — **belum deploy prod**. Lihat §Push Mechanism di bawah.
 - **Jangan format float64 payload dengan `%v`/`fmt.Sprint`.** `fmt.Sprintf("%v", 1.234567890123e+12)`
   menghasilkan notasi ilmiah, bukan digit. `SyncReverseByID` mencocokkan dengan
   `strconv.FormatInt(item.ReverseOrderID, 10)` — string bernotasi ilmiah tak akan pernah cocok,
@@ -79,28 +80,42 @@ Selain endpoint yang KITA panggil (tabel di [[Index]]), Lazada mendorong notifik
 di-ack cepat, lalu diproses async oleh `LazadaPushProcessor`
 (`internal/webhook/processor/lazada_push.go`).
 
-Bentuk yang dibaca kode (`lazadaPushPayload`):
+Bentuk payload yang dikirim Lazada:
 
 ```
-seller_id                     string   → store_id (= seller_id numerik)
-message_type                  int      0 = trade order actions
+seller_id                     string|angka  → store_id (= seller_id numerik)
+message_type                  int           0 = trade order actions
 data.order_status             string
 data.status_update_time       int64
-data.trade_order_id           ?        dibaca sebagai string — tipe asli BELUM terverifikasi
-data.trade_order_line_id      ?        idem
-data.reverse_order_id         ANGKA    dibaca sebagai string → MISMATCH (lihat gotcha)
+data.trade_order_id           string        (di push trade-order; lihat Confidence)
+data.trade_order_line_id      ?             belum terverifikasi
+data.reverse_order_id         ANGKA         verified-live
 timestamp                     int64
 site                          string
 ```
+
+**Yang benar-benar di-decode kode** hanya tiga: `seller_id`, `data.trade_order_id`,
+`data.reverse_order_id` — semuanya bertipe `lazadaID` (menerima string maupun angka,
+selalu dinormalkan ke string desimal). Struct sengaja dipersempit: tiap field yang
+dideklarasikan ikut menentukan hidup-matinya webhook, karena `bson.Unmarshal` berjalan
+sebelum percabangan dan satu field salah tipe menggagalkan SEMUANYA. Field sisanya
+didokumentasikan di sini saja, tidak di struct. Kalau nanti perlu ditambahkan, pakai
+`lazadaID` untuk identitas dan pastikan tipe aslinya sudah terbukti — jangan diasumsikan.
 
 Percabangan processor: `reverse_order_id` terisi → `SyncReverseByID` (jalur retur); selain itu
 `trade_order_id` → `FetchAndTransformOrder` → upsert order.
 
 **Confidence**: jalur order `verified-by-usage` (jalan di prod sejak 23 Juli 2026).
 `reverse_order_id` bertipe **angka** = `verified-live` — dibuktikan error decode produksi
-2026-08-06 (`cannot decode double into a string type`). Tipe asli `trade_order_id`
-**TBD**: decoder BSON berhenti di key gagal pertama, jadi error itu tak membuktikan apa pun
-soal field lain.
+2026-08-06 (`cannot decode double into a string type`).
+
+`trade_order_id` & `seller_id` pada push **trade-order** = `verified-by-usage` **secara
+tak langsung**: sebelum perbaikan keduanya dideklarasikan `string`, dan karena decoder BSON
+menggagalkan seluruh dokumen begitu satu key salah tipe, jalur order yang jalan normal sejak
+23 Juli membuktikan keduanya memang datang sebagai string. Yang **masih TBD** adalah tipenya
+pada push **reverse** — error prod berhenti di key gagal pertama (`reverse_order_id`), jadi
+tak membuktikan apa pun soal field lain di pesan itu. Karena itu `lazadaID` tetap dipasang
+pada ketiganya, bukan hanya `reverse_order_id`.
 
 ## Confidence
 
