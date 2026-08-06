@@ -220,7 +220,9 @@ Form berulang memakai jendela **periode berjalan**, bukan `start_date`/`end_date
 
 ## Tipe `kaizen`: program pengumpulan ide bulanan
 
-> Status: seluruh backend **merged ke `main` 2026-08-06** — PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016) (tahap 1-3, **live dev + prod, teruji end-to-end**), [#1028](https://github.com/bip-itteam-internal/bip-erp/pull/1028) (papan ide + pengingat), [#1029](https://github.com/bip-itteam-internal/bip-erp/pull/1029) (setoran KPI), [#1034](https://github.com/bip-itteam-internal/bip-erp/pull/1034) (permukaan karyawan). Tiga PR terakhir **belum diverifikasi lewat gateway hidup**, dan pengingatnya **tidak akan sampai** sampai kategori inboxnya didaftarkan (lihat di bawah). Masih open: [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039) gerbang presensi, [#1023](https://github.com/bip-itteam-internal/bip-erp/pull/1023) upload berkas (**draft**, tertahan access key). Konsep dan keputusan bisnisnya di [[HRIS - Kaizen (Ide Perbaikan)]].
+> Status: ✅ **Seluruh backend LIVE di dev DAN prod** sejak 2026-08-06, teruji end-to-end di dev. PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016) (tahap 1-3), [#1028](https://github.com/bip-itteam-internal/bip-erp/pull/1028) (papan ide + pengingat), [#1029](https://github.com/bip-itteam-internal/bip-erp/pull/1029) (setoran KPI), [#1034](https://github.com/bip-itteam-internal/bip-erp/pull/1034) (permukaan karyawan), [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039) (gerbang presensi di `/me/kaizen`), [#1044](https://github.com/bip-itteam-internal/bip-erp/pull/1044) (kategori inbox), [#1046](https://github.com/bip-itteam-internal/bip-erp/pull/1046) (penemuan komite). Prod di-deploy manual bersama notification-service dan diverifikasi dengan kontrol positif+negatif. Masih open: [#1023](https://github.com/bip-itteam-internal/bip-erp/pull/1023) upload berkas (**draft**, tertahan pembuatan access key `form/`). Konsep dan keputusan bisnisnya di [[HRIS - Kaizen (Ide Perbaikan)]].
+>
+> **Fitur masih inert di prod**: belum ada satu pun form kaizen dibuat, jadi cron pengingat tak punya apa pun untuk dikirim.
 
 Tipe form **kelima**, dan seperti `evaluation` ia bukan sekadar label: seluruh perilaku barunya digerbang tipe ini, sehingga empat tipe lama tak berubah sedikit pun dan tak ada satu pun form lama yang perlu dimigrasi.
 
@@ -318,12 +320,14 @@ Dikirim **H-7 dan H-2** sebelum periode ditutup, hanya kepada peserta yang jumla
 
 Perbandingan jatuh temponya memakai **hari**, bukan detik, karena cron jalan tiap jam.
 
-> [!bug] Pengingat dan pemberitahuan keputusan TIDAK PERNAH SAMPAI
-> Kategori inbox `kaizen-reminder` dan `kaizen-decided` **tidak terdaftar** di `InboxCategories` (`shared-library/models/notification/models.go`). Notification-service memvalidasi kategori terhadap daftar itu dan membalas **`400`** untuk yang di luar daftar, sementara pengiriman di form-builder bersifat best-effort — kegagalannya hanya muncul di log. Jadi seluruh pengingat kuota dan pemberitahuan keputusan **hilang tanpa jejak**, sedangkan cron, papan kepatuhan, dan keputusan komite tampak bekerja normal.
+> [!success] Pengingat sempat TIDAK PERNAH SAMPAI — sudah diperbaiki dan dibuktikan
+> Kategori inbox `kaizen-reminder` dan `kaizen-decided` sempat **tidak terdaftar** di `InboxCategories` (`shared-library/models/notification/models.go`). Notification-service memvalidasi kategori terhadap daftar itu dan membalas **`400`** untuk yang di luar daftar, sementara pengiriman di form-builder bersifat best-effort — kegagalannya hanya muncul di log. Jadi seluruh pengingat kuota dan pemberitahuan keputusan **hilang tanpa jejak**, sedangkan cron, papan kepatuhan, dan keputusan komite tampak bekerja normal.
 >
-> Ini **persis kegagalan yang sudah diperingatkan** di rencana tahap 5 [[HRIS - Kaizen (Ide Perbaikan)]] dan di peringatan deploy di bagian atas dokumen ini, dan sudah pernah terjadi saat kategori `form-published` lahir. Terulang karena PR [#1028](https://github.com/bip-itteam-internal/bip-erp/pull/1028) menambah kategori di form-builder tanpa mendaftarkannya di shared-library.
+> Ini **persis kegagalan yang sudah diperingatkan** di rencana tahap 5 [[HRIS - Kaizen (Ide Perbaikan)]], dan sudah pernah terjadi saat kategori `form-published` lahir. Terulang karena PR [#1028](https://github.com/bip-itteam-internal/bip-erp/pull/1028) menambah kategori di form-builder tanpa mendaftarkannya di shared-library.
 >
-> Perbaikannya dua baris (daftar + testnya), tapi konsekuensinya **notification-service wajib ikut di-deploy** — kalau hanya form-builder yang naik, containernya masih memakai daftar lama dan penolakannya tetap terjadi.
+> **Diperbaiki PR [#1044](https://github.com/bip-itteam-internal/bip-erp/pull/1044)** (2026-08-06). Penjaganya dipindah dari komentar ke **test**: `notify_category_test.go` menegaskan tiap konstanta kategori di `notify.go` lolos `IsInboxCategoryValid`, plus test kedua yang menjaga agar validatornya sendiri tak berubah jadi meloloskan apa pun. Penjaga itu **dibuktikan menyala**, bukan sekadar hijau — dengan kedua kategori dihapus sementara dari daftar, test gagal dan menyebut persis kategori yang bermasalah.
+>
+> ✅ **Terbukti sampai di dev 2026-08-06**: kotak masuk bertambah 71 → 72 dengan judul "Ide Kaizen Anda sudah diterapkan". Percobaan pertama, 4 menit setelah merge, **gagal total** — deploy dev belum mendarat. Itu sekaligus bukti bahwa **notification-service wajib ikut naik**: daftarnya ikut terkompilasi ke dalam biner, jadi container lama tetap menolak. Prosedurnya kini di [[RUN - Deploy Microservices bip-erp]] §3a.
 
 ### Setoran metrik ke KPI
 
@@ -347,7 +351,19 @@ Yang **menulis** `kpi_score` tetap [[Microservices - Employee Service]], sesuai 
 
 Bukan sasaran program dibalas `has_program:false`, **bukan `404`**: menu Kaizen tetap bisa dibuka dan menjelaskan keadaannya alih-alih menampilkan layar galat untuk keadaan yang sebenarnya normal.
 
-> ⚠️ **Gerbang presensi belum ikut di `/me/kaizen`.** Karena form Kaizen dikeluarkan dari daftar survei di mobile, karyawan yang tertahan clock-in tak punya petunjuk di layar: kartunya tak ada lagi di beranda, dan menu Kaizen tak tahu ada gerbang yang menyala. PR [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039) menambahkannya, **masih open**.
+✅ **Gerbang presensi ikut di `/me/kaizen`** (`blocks_attendance`, `gate_end_date`) sejak PR [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039). Perlu karena form Kaizen dikeluarkan dari daftar survei di mobile: tanpa field ini, karyawan yang tertahan clock-in tak punya satu pun petunjuk di layar — kartunya tak ada lagi di beranda, dan menu Kaizen tak tahu ada gerbang yang menyala. Perhitungannya sama persis dengan `/me/forms`, termasuk `gateActiveAt`.
+
+### Penemuan program untuk komite
+
+> Merged ke `main` 2026-08-06 lewat PR [#1046](https://github.com/bip-itteam-internal/bip-erp/pull/1046), live dev + prod.
+
+`GET /me/kaizen/committee` menjawab pertanyaan yang sebelumnya **tak punya jawaban sama sekali**: "program Kaizen mana yang boleh saya tinjau?"
+
+Seluruh rute komite menuntut id form, dan satu-satunya cara menemukannya adalah `GET /forms` — yang digerbang `requireFormManager`, menuntut peran pengelola DAN departemen aktif. Anggota komite ditunjuk HR dan bisa saja staf biasa dari departemen mana pun, jadi **persis orang yang butuh justru dibalas `403`**. Sebelum endpoint ini, komite hanya bisa membuka antreannya bila ada yang mengirimkan URL-nya secara manual, dan layar komite di [[APP - Web ERP]] praktis tak terjangkau.
+
+Ada di grup `/me` (cukup karyawan terautentikasi), BUKAN `/kaizen` maupun `/forms`: rute ini justru harus bisa dipanggil orang yang haknya **belum diketahui** — itu memang pertanyaannya.
+
+Bukan komite dibalas `is_committee:false`, **bukan `403`**, supaya menunya menjelaskan keadaannya sendiri. "Tak ada program" dan "bukan tugas saya" sengaja tak dibedakan, sama seperti `has_program`: bagi pemakai ujungnya sama, dan membedakannya membocorkan keberadaan program ke orang di luar komite. Gerbangnya memakai predikat `isKaizenCommittee` yang sama persis dengan `loadCommitteeForm`, supaya menu tak pernah muncul untuk orang yang tombolnya justru menolak bekerja.
 
 ## Bagian (section): penanda di daftar datar, bukan struktur bersarang
 

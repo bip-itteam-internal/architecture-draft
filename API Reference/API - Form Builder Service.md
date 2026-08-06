@@ -3,7 +3,7 @@
 *Endpoint **form-builder-service** (form dinamis + analisa jawaban + kepatuhan presensi). Gateway: `/api/form-builder/*`. Kelola form butuh **tingkat peran** `staff`/`supervisor`/`admin` di modul mana pun DAN departemen pemanggil ada di daftar departemen aktif; mengisi cukup terautentikasi. Grounded ke `services/form-builder/routes.go` + handler terkait (`main`, PR #849; kepemilikan per departemen PR #869).*
 
 - **Status**: ⚠️ Implemented (live di dev **dan prod** sejak 2026-08-01; **penilaian karyawan, tipe form, dan rekap per orang dinilai** merged 2026-08-02 lewat PR #907 + #908 — **live di dev DAN prod** sejak 2026-08-02). **Form berulang** (`recurrence`, `period_key`, `?period=`) merged ke `main` 2026-08-03 lewat PR #938, #940, #942 — **setelah** deploy prod 08-01/08-02, jadi **status prod belum diverifikasi**. Baru didokumentasikan 2026-08-06 dan belum punya catatan uji end-to-end.
-- **Kaizen** (`form_type: "kaizen"`, rute `/kaizen/*`, `/me/kaizen*`, `/internal/kaizen/metrics`) merged ke `main` 2026-08-06 lewat PR #1016, #1028, #1029, #1034. Tahap 1-3 live dev + prod dan teruji end-to-end; sisanya **belum diverifikasi lewat gateway hidup**.
+- **Kaizen** (`form_type: "kaizen"`, rute `/kaizen/*`, `/me/kaizen*`, `/internal/kaizen/metrics`) ✅ **live dev + prod** sejak 2026-08-06 lewat PR #1016, #1028, #1029, #1034, #1039, #1044, #1046 — seluruhnya teruji end-to-end di dev. Belum ada satu pun form kaizen di prod, jadi masih inert.
 - **Implementasi**: [[Microservices - Form Builder Service]]
 - **Indeks**: [[API - Index]]
 - **Konsumen**: seluruh rute `/forms*` — termasuk `analytics`, `responses`, `export` — dipakai [[APP - Web ERP]]. Rute **`/me/*`** dipakai [[APP - MyBharata]] (section Survei di beranda + halaman pengisian), dan **`/me/kaizen*`** dipakai menu Kaizen tersendiri di aplikasi itu.
@@ -60,6 +60,9 @@
 | GET | `/me/kaizen` | Program berjalan untuk pemanggil: `{has_program, form_id, title, description, fields, progress, board_visible}`. `progress` = `{quota, submitted, fulfilled, period_key, opens_at, closes_at}` |
 | GET | `/me/kaizen/ideas` | Riwayat ide sendiri **lintas periode**, terbaru dulu. `?period=`, `?page=`, `?limit=` maks **50**. Balas `{data[{id,period_key,submitted_at,answers,decision}], total, page, limit, fields}` |
 | GET | `/me/kaizen/board` | Papan ide publik: `{data[{id,employee_name,department,status,submitted_at,answers}], period_key}`. `?period=` (default periode berjalan), maks **100** kartu |
+| GET | `/me/kaizen/committee` | Program mana yang boleh ditinjau pemanggil: `{is_committee, form_id, title, period_key, can_manage_form}`. Bukan komite dibalas `{is_committee:false}`, **bukan `403`** |
+
+> **Kenapa penemuan komite ada di `/me/*`, bukan `/kaizen/*`.** Seluruh rute komite menuntut id form, dan satu-satunya cara lain menemukannya adalah `GET /forms` — yang digerbang peran pengelola DAN departemen aktif, sedangkan komite ditunjuk HR dan bisa saja staf biasa dari departemen mana pun. Rute ini justru harus bisa dipanggil orang yang haknya **belum diketahui**, karena itu memang pertanyaannya. Dipakai menu **Komite Kaizen** di [[APP - Web ERP]]. `can_manage_form` membedakan anggota terdaftar dari pengelola departemen pemilik: keduanya boleh meninjau, hanya yang kedua boleh menyunting programnya.
 
 > **Bukan sasaran program dibalas `has_program:false`, BUKAN `404`.** Menu Kaizen tetap bisa dibuka dan menjelaskan keadaannya, alih-alih menampilkan layar galat untuk keadaan yang sebenarnya normal. `has_program:false` juga menjawab "perusahaan ini belum punya program" — backend tak membedakan keduanya karena bagi pemakai keduanya memang sama.
 
@@ -67,7 +70,7 @@
 
 > **Papan menyaring dengan DAFTAR IZIN tipe field**, bukan daftar larangan. Papan dibaca seluruh karyawan, jadi tipe pertanyaan yang ditambahkan nanti (lampiran berkas, yang nilainya cuma id unggahan) tersembunyi secara bawaan sampai seseorang sengaja mengizinkannya. Daftar larangan bekerja sebaliknya: tipe baru bocor lebih dulu, ketahuan setelah tampil di depan sekantor. Ide yang masih ditinjau maupun yang ditolak **tak pernah** muncul; papan juga kosong bila `board_visible:false`.
 
-> ⚠️ **Gerbang presensi belum ikut di `/me/kaizen`.** Karena form Kaizen dikeluarkan dari daftar survei di mobile, karyawan yang tertahan saat clock-in tak punya petunjuk di layar. PR [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039) menambah `blocks_attendance` + `gate_end_date` — **masih open**.
+> ✅ **`/me/kaizen` ikut membawa `blocks_attendance` dan `gate_end_date`** sejak PR [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039), memakai perhitungan yang sama persis dengan `/me/forms`. Perlu karena form Kaizen dikeluarkan dari daftar survei di mobile: tanpanya, karyawan yang tertahan saat clock-in tak punya satu pun petunjuk di layar.
 
 ## Kaizen (komite program ide bulanan)
 
