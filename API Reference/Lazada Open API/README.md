@@ -59,6 +59,48 @@ kedua ujung data. Implementasi: `LazadaClient.sign()`.
 - **Retur Lazada hanya masuk lewat webhook reverse-order.** Tak ada worker penyapu berkala
   (Shopee & TikTok punya). Kalau webhook meleset, retur tak masuk dengan sendirinya — pemicu
   manual yang tersedia: `POST /lazada/backfill-returns` dan fallback gudang "input nomor order".
+- **Angka JSON di payload webhook tersimpan sebagai BSON `double`.** `CreateWebhookLazada`
+  mem-parse body ke `any`, jadi tiap angka JSON jadi `float64` lalu `double` di
+  `webhook_logs.payload`. Processor mendeklarasikan `reverse_order_id` sebagai `string`
+  → `bson.Unmarshal` gagal. Lihat §Push Mechanism di bawah; **bug ini live di prod
+  per 2026-08-06**.
+- **Jangan format float64 payload dengan `%v`/`fmt.Sprint`.** `fmt.Sprintf("%v", 1.234567890123e+12)`
+  menghasilkan notasi ilmiah, bukan digit. `SyncReverseByID` mencocokkan dengan
+  `strconv.FormatInt(item.ReverseOrderID, 10)` — string bernotasi ilmiah tak akan pernah cocok,
+  dan `SyncReverseByID` mengembalikan `nil` (dianggap "belum muncul di list") saat tak cocok.
+  Hasilnya webhook **sukses tapi retur tak masuk** — gagal lebih senyap daripada bug sekarang.
+  Konversi yang benar: `strconv.FormatInt(int64(f), 10)`.
+
+## Push Mechanism (LPM) — payload webhook masuk
+
+Selain endpoint yang KITA panggil (tabel di [[Index]]), Lazada mendorong notifikasi ke
+`POST /webhooks/services/lazada` (handler `CreateWebhookLazada` di
+`internal/interface/http/webhook_handler.go`). Payload disimpan mentah ke `webhook_logs`,
+di-ack cepat, lalu diproses async oleh `LazadaPushProcessor`
+(`internal/webhook/processor/lazada_push.go`).
+
+Bentuk yang dibaca kode (`lazadaPushPayload`):
+
+```
+seller_id                     string   → store_id (= seller_id numerik)
+message_type                  int      0 = trade order actions
+data.order_status             string
+data.status_update_time       int64
+data.trade_order_id           ?        dibaca sebagai string — tipe asli BELUM terverifikasi
+data.trade_order_line_id      ?        idem
+data.reverse_order_id         ANGKA    dibaca sebagai string → MISMATCH (lihat gotcha)
+timestamp                     int64
+site                          string
+```
+
+Percabangan processor: `reverse_order_id` terisi → `SyncReverseByID` (jalur retur); selain itu
+`trade_order_id` → `FetchAndTransformOrder` → upsert order.
+
+**Confidence**: jalur order `verified-by-usage` (jalan di prod sejak 23 Juli 2026).
+`reverse_order_id` bertipe **angka** = `verified-live` — dibuktikan error decode produksi
+2026-08-06 (`cannot decode double into a string type`). Tipe asli `trade_order_id`
+**TBD**: decoder BSON berhenti di key gagal pertama, jadi error itu tak membuktikan apa pun
+soal field lain.
 
 ## Confidence
 
