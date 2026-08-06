@@ -141,6 +141,8 @@ Semua reuse `reportBaseFilter` + `parseReportRange` (default 30 hari; `start_dat
 - `GET /report/timeline` — timeline harian (total + per status).
 - `GET /report/manpower-performance` — performa per anggota: `total`, `done`, kini + `avg_response_hours`, `avg_resolution_hours` (rata-rata jam atas task yang punya `responded_at`/`completed_at`), `reopened` (jumlah task `reopen_count>0`). Agregasi in-memory via `accumulateManpower` (pure, tertes).
 - `GET /report/sla` — rate on-time response & resolution (overall + per divisi, dengan rentang tanggal).
+	- ⚠️ **Nama field BSON-nya snake_case**: `due_date`, `completed_at`, `response_due_at`, `responded_at` (lihat tag `bson:` di `models_task.go:62-75`), sedangkan `createdAt` justru camelCase. Campuran ini sudah sekali menghasilkan sensus nol palsu: menghitung `completedAt` memberi 0 dokumen, `completed_at` memberi 220. Rinciannya di [[HRIS - Otomasi Skor KPI]].
+	- Kepadatan prod 2026-08-06: 307 tiket, 271 ber-`due_date`, **214 terukur resolusi**, 63 terukur response, 17 ter-rating CSAT.
 - `GET /report/sla-breaches` — **daftar tiket yang lewat SLA** (bukan agregat): reuse `computeSLA` → satu baris per dimensi `breached` (response/resolution), tiket `on_hold` (state `held`) tak dihitung; field `{ticket_id,keluhan,space_name,assignee_name,priority,breach_type,overdue_hours,status}`. Untuk ditindaklanjuti supervisor.
 - `GET /report/csat` — agregat CSAT **flat** `{average, top2box_pct (bintang 4–5), count, distribution[1..5]}`; rentang tanggal atas `csat.rated_at` (bukan `createdAt`) + cakupan yang sama persis dengan laporan lain lewat `terapkanScopeLaporan`. Skalanya **1–5 bintang**; KPI departemen yang menargetkan skor 1–10 perlu konversi eksplisit, lihat [[HRIS - Matriks KPI per Departemen]].
 
