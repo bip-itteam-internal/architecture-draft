@@ -1,6 +1,6 @@
 ## ADR 0037 — Rekonsiliasi Aset GA ↔ Accurate: ceklis per-item untuk KPI, matrix per-golongan untuk kesehatan data
 
-- **Status**: ⚠️ Accepted — **Fase 0 & 1 Implemented** (2026-08-06): `accurate_asset_no`/`reconciled_at` + koleksi `asset_category_mapping` + rute `/category-mapping` ([[Microservices - Inventory Service]]); FE 3 tab (Kelola/Data Accurate/Cocokkan) dengan reconcile client-side. **Fase 2 (feed KPI via ADR-0032) masih konsep.**
+- **Status**: ⚠️ Accepted — **Fase 0 & 1 Implemented** (2026-08-06): `accurate_asset_no`/`reconciled_at` + koleksi `asset_category_mapping` + rute `/category-mapping` ([[Microservices - Inventory Service]]); FE 3 tab (Kelola/Data Accurate/Cocokkan) dengan reconcile client-side. **Fase 2 (feed KPI): kode di branch `feat/kpi-akurasi-aset`, belum merge/deploy** — sumber KPI `akurasi_aset_ga` di [[Microservices - Employee Service]] (jalur [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]); **sisa non-kode**: konfigurasi metrik `kpi_template` GA (label/bobot) + env `INVENTORY_MODULE_URL`/`INTEGRATION_MODULE_URL` saat deploy.
 - **Konteks dok**: [[GA - Inventory Management]] · [[Microservices - Inventory Service]] · [[Microservices - Integration Service]] · [[External - Accurate]]
 - **ADR terkait**: [[ADR - 0001 Akuntansi via Accurate]] · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] · [[ADR - 0002 Database-per-Service]]
 
@@ -11,7 +11,7 @@ HRGA meminta metrik KPI untuk **posisi staff GA**: kualitas input aset di modul 
 Fakta yang membatasi jawaban (grounded):
 
 - **Aset GA di ERP ≠ stok/persediaan.** [[Microservices - Inventory Service]] eksplisit "asset tracking, bukan stok-kuantitas gudang" (`services/inventory`). Item punya `master_data.item_category` yang **bebas-ketik** (disimpan apa adanya, dedup case-insensitive; dropdown dihapus), `purchase_price` **opsional**, dan **nilai buku dihitung frontend sebagai estimasi** garis lurus — bukan angka pembukuan. Service ini `InternalURL` kosong: **tidak memanggil service lain**.
-- **Item ERP tidak menyimpan siapa penginput.** `InventoryItem` punya `Metadata` tetapi `CreateInventory` **tidak** merekam `created_by` dari klaim login (`services/inventory/controller.go`). Tanpa ini, skor tak dapat dibebankan ke staff GA tertentu — persoalan yang sama dicatat [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] (§ "pemetaan karyawan belum memadai").
+- **Penginput aset terekam.** `CreateInventory` mengisi `metadata.created_by` = `employee_id` dari klaim login (`common.UpsertMetadata`, `services/inventory/controller.go`) — jadi skor **dapat dibebankan per staff GA** (fondasi atribusi Fase 2). Menjawab kekhawatiran "pemetaan karyawan belum memadai" di [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] untuk kasus aset GA.
 - **Padanan Accurate-nya adalah Aktiva Tetap, dan pembacanya SUDAH ADA.** integration-service menyimpan **salinan lokal** `accurate_fixed_assets` (Mongo), disegarkan **cron harian + trigger manual**, disajikan `GET /accounting/fixed-assets` + `/accounting/fixed-assets/summary` (lihat [[API - Integration Service]] §Accounting-FAT). Entity `entity.AsetTetap` sudah memodelkan — dari probe Accurate hidup, bukan tebakan — `BiayaPerolehan`, `PenyusutanTerakumulasi`, `NilaiBuku` (identitas `assetCost − depreciationAmount = bookValue` terbukti), `MasaManfaat` (bulan), status `Draft`/`Disposed`, dan yang paling penting **`GolonganNama` (`faType.name`) — satu-satunya penggolongan yang bersih dan selalu terisi**. Agregat `RingkasAsetTetap` (total per status/biaya, draft dipisah) juga sudah ada.
 - **Akses Accurate = eksklusif Finance.** Hanya tim Finance yang berhak menginput aset ke Accurate; **staff GA tidak boleh menyentuh Accurate sama sekali**. Konsekuensinya, aset yang **belum ada di Accurate adalah tanggung jawab Finance**, bukan GA — dan rekonsiliasi ini justru dirancang untuk **memicu koordinasi lapangan GA ↔ staff Finance inventory**.
 - **Akuntansi = domain Accurate.** [[ADR - 0001 Akuntansi via Accurate]]: ERP tidak membangun ledger sendiri; angka aset/penyusutan **resmi** milik Accurate. Nilai buku di ERP hanyalah estimasi operasional GA.
@@ -46,7 +46,7 @@ Karena "belum ada di Accurate = 100%", akurasi bisa terlihat sempurna padahal cu
 - **Data Accurate** tetap milik integration-service (`accurate_fixed_assets` + `/accounting/*`).
 - **Tabel pemetaan + hasil ceklis (`accurate_asset_no`, status/tanggal rekonsiliasi)** disimpan di **inventory-service** (master & data milik GA). inventory-service **tetap tak memanggil siapa pun** (`InternalURL` kosong dipertahankan).
 - **Komposisi Tab C** dilakukan **frontend** (tarik `/items` + `/accounting/fixed-assets` + pemetaan, hitung ceklis/matrix, simpan match balik ke inventory-service) — mengikuti pola client-side yang sudah dipakai export & estimasi penyusutan.
-- **Feed KPI** (Fase 2) = job server membaca status rekonsiliasi tersimpan → hitung akurasi per-item → setor via endpoint ADR-0032. Konsisten [[ADR - 0002 Database-per-Service]].
+- **Feed KPI** (Fase 2, kode di branch `feat/kpi-akurasi-aset`) = **sumber KPI `akurasi_aset_ga`** di [[Microservices - Employee Service]] (`kpi_sumber_aset.go`, `DaftarkanSumber`) yang menarik `/items` + `/category-mapping` (inventory) + `/accounting/fixed-assets` (integration) — **endpoint yang SUDAH ada** — lalu menghitung akurasi per staff (`created_by`) dengan util murni shared-library, mengisi `AutoValue` **DRAFT** lewat mekanisme [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]. **integration & inventory service + Mongo mereka TAK diubah**; URL modul dibaca dari env (`INVENTORY_MODULE_URL`/`INTEGRATION_MODULE_URL`), **bukan** `InternalURL` (hindari boot-dependency, pola monitoring). Konsisten [[ADR - 0002 Database-per-Service]].
 
 ### 6. Dua field baru di sisi ERP (prasyarat minimal)
 
@@ -80,7 +80,7 @@ FE modul Aset — 3 tab
 
 - **Fase 0** — `created_by` di `InventoryItem` + isi saat create; backfill via edit.
 - **Fase 1** — Tab B (Data Accurate + editor pemetaan) & Tab C (ceklis + akurasi/cakupan + matrix). Pencocokan menabung `accurate_asset_no`.
-- **Fase 2** — metrik akurasi per-item difinalkan + feed KPI lewat jalur ADR-0032; pemicu `kpi-collector` dievaluasi di sini.
+- **Fase 2 (kode ✅, branch `feat/kpi-akurasi-aset` — belum merge/deploy)** — util murni akurasi di shared-library (`ComputeFieldScore`/`PerItemKPIScores`, aturan ERP-only=100), scope baru `individu`, dan sumber `akurasi_aset_ga` di employee-service. Formula `rata_rata` (rata skor per-item) · Target 100 · Arah naik. **`kpi-collector` TIDAK dipisah** (2 konektor keluar < ambang 3, ADR-0032 §6). **Sisa non-kode**: konfigurasi metrik `kpi_template` GA (label + bobot) + env deploy.
 
 ## Consequences
 
@@ -100,10 +100,13 @@ FE modul Aset — 3 tab
 
 **Belum diputuskan (TBD):**
 
-- Toleransi "cocok" untuk selisih nilai/tanggal per item (mis. pembulatan harga).
-- Rumus & bobot pasti metrik akurasi per-item (kelengkapan vs kebenaran) + label metriknya di `kpi_template` GA.
-- Apakah Fase 2 memicu pemisahan service `kpi-collector` (ADR-0032 §6).
+- **Bobot & label** metrik akurasi di `kpi_template` GA (keputusan pemilik metrik/HRGA) — rumus & toleransi sudah tetap di kode (`rata_rata`, harga toleransi 1%, ERP-only=100).
+- Toleransi "cocok" untuk selisih tanggal (saat ini: hari yang sama persis).
 - Apakah saran pasangan Tab C cukup heuristik sederhana (nama+biaya) atau butuh skor kemiripan lebih kaya.
+
+**Sudah diputuskan sejak ditulis:**
+
+- **`kpi-collector` tidak dipisah** — Fase 2 menambah 2 konektor keluar (inventory + integration), masih di bawah ambang 3 (ADR-0032 §6); komputasi tetap di employee-service.
 
 ## Dokumen Terkait
 
