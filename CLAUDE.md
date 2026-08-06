@@ -75,6 +75,11 @@ Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
 - 🟡 **Konsep / Draft / Direncanakan** — belum di kode
 - 🔴 **Stub** — kosong/skeleton
 
+**Bentuk penulisan** — dua-duanya sah, pakai yang sesuai template dok yang sedang ditulis:
+`- **Status**: ✅ ...` (bullet di `## Deskripsi`; template Implementasi Service & Konsep Domain) atau
+`> **Status**: ✅ ...` (blockquote di baris pertama; template Runbook).
+Wajib berada di **15 baris pertama** — di bawah itu tak terbaca `VAULT-INDEX.json` sehingga dok jadi tak berstatus di `/ask`. Detail: `IT/IT - SOP Dokumentasi Vault.md`.
+
 ## 6. Template struktur dokumen
 
 ```

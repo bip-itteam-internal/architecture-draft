@@ -1136,21 +1136,20 @@
       "status_teks": null,
       "publik": true,
       "tautan": [],
-      "hash": "99476e00b526227b55b32bd62e377d4b34e80f390b0f16dda6d765f4a162e776",
-      "ukuran_kb": 12.2,
-      "ringkasan": "Menjawab: bagaimana aturan menulis dan menata dokumentasi di vault architecture-draft (struktur folder domain, konvensi penamaan file dengan prefix, format wikilink, status marker, template struktur dokumen), serta alur kerja sinkronisasi dokumentasi dengan kode dan aturan git untuk vault ini. Dipakai saat bingung di folder/prefix mana sebuah dokumen baru harus dibuat, atau bagaimana format status Implemented/Draft/Stub ditulis.",
+      "hash": "8313f6315601f4b4f8afaf68b65f203d3f8b1f36fb36a249c86b1f2b9d9797f9",
+      "ukuran_kb": 12.6,
+      "ringkasan": "Menjawab: aturan main menulis dokumentasi di vault arsitektur ERP Bharata — struktur folder per domain, konvensi penamaan berprefiks, kewajiban grounded-in-code, wikilink 0-broken, bentuk penulisan status marker, dan template per jenis dokumen. Juga menjawab repo kode mana dipetakan ke dokumen mana, serta alur sync dan aturan git yang harus diikuti tiap update.",
       "kata_kunci": [
-        "CLAUDE.md",
         "rulebook",
-        "vault",
-        "Obsidian",
-        "konvensi dokumentasi",
-        "prefix nama file",
+        "CLAUDE.md",
+        "konvensi penamaan",
+        "grounded-in-code",
         "wikilink",
         "status marker",
-        "grounded-in-code",
-        "sync-docs",
-        "template dokumen"
+        "template",
+        "vault",
+        "dokumentasi",
+        "prefix"
       ]
     },
     {
