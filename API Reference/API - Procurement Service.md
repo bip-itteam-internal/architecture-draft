@@ -320,6 +320,23 @@ Arah data kebalikan dari Pemasok/Barang: dicatat finance **langsung di Accurate*
 ```
 > `berhasil_pada: null` = modul ini **belum pernah** berhasil disegarkan. `gagal_pada` terisi hanya bila percobaan **terakhir** gagal — ditampilkan berdampingan dengan `berhasil_pada` supaya data lama yang masih tampil tidak dikira data terkini.
 
+## Permintaan Barang ERP — create + persetujuan (✅ Diimplementasikan 2026-08-06)
+
+Entitas **milik ERP** (bukan cermin Accurate), koleksi `permintaan_erp`. Arah data sama dengan Pemasok/Barang: dibuat di ERP. Prefix rute `/permintaan-erp` menandai bedanya dari cermin `GET /permintaan`.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/permintaan-erp` | Daftar berpaginasi. Query: `status`, `tipe`, `sudah_dicetak` (`true`/`false`/kosong=semua), `cari` (number+keterangan), `dari`/`sampai` (rentang `trans_date_ts`), `page`, `limit`. Role `akses`. |
+| POST | `/permintaan-erp` | Buat permintaan. Body: `tipe_permintaan`, `keterangan?`, `number?` (kosong=auto), `trans_date?` (dd/MM/yyyy), `rincian[]` (`nama_barang`, `kuantitas`, `satuan` wajib; `kode_barang`/`tgl_diminta`/`departemen`/`proyek`/`keterangan`/`harga_estimasi` opsional). Server menetapkan status/persetujuan awal, peminta (dari header identitas + `BIP-Department`), total, nomor. Role `tulisPO`. `409` bila nomor bentrok. |
+| GET | `/permintaan-erp/:id` | Detail satu permintaan. Role `akses`. |
+| GET | `/permintaan-erp/usul-nomor` | Usulan nomor berikut `PR.<YYYY>.<MM>.<NNNNN>` (reset per bulan). Role `akses`. |
+| GET | `/permintaan-erp/opsi-barang` | Daftar barang untuk pemilih form: `kode`, `nama`, `satuan`, `harga_beli` (tak dipaginasi). Role `akses`. |
+| GET | `/permintaan-erp/persetujuan` | Antrean **menunggu** yang jadi tanggung jawab atasan pemanggil, disaring server ke `peminta_departemen ∈ BIP-Supervised-Departments`. **Tanpa gerbang izin procurement** (atasan bisa lain modul); auth diperiksa di handler. Cakupan kosong → daftar kosong (bukan 403). |
+| POST | `/permintaan-erp/:id/setujui` | Menyetujui. Wewenang: `peminta_departemen` harus dalam cakupan supervisi pemanggil. `403` bila bukan atasan departemen itu; `409` bila sudah diputuskan. Tanpa gerbang izin procurement. |
+| POST | `/permintaan-erp/:id/tolak` | Menolak. Body `{"alasan": "..."}` **wajib** (`400` bila kosong). Wewenang & aturan status sama dengan setujui. |
+
+> **Routing persetujuan = atasan langsung departemen peminta.** `BolehSetujuiPermintaan(peminta_departemen, supervised)` mencocokkan (case-insensitive) departemen peminta terhadap `BIP-Supervised-Departments` (diisi gateway dari klaim JWT) — tidak memanggil employee-service. Departemen peminta kosong → tak seorang pun berhak.
+
 ## Belum Diimplementasikan / Catatan
 
 - Tidak ada endpoint **hapus pemasok** maupun **hapus barang** — penghapusan master dilakukan finance/procurement di Accurate.
@@ -333,7 +350,7 @@ Arah data kebalikan dari Pemasok/Barang: dicatat finance **langsung di Accurate*
   field WhatsApp untuk pemasok.
 - Pengosongan nilai belum tersinkron (`omitempty`) — TBD, lihat dok implementasi.
 - **Pembelian tidak punya endpoint tulis ke Accurate** — tak ada `POST`/`PUT`/`DELETE` yang mengirim pesanan/penerimaan/permintaan ke Accurate; seluruhnya dicatat finance di Accurate, ERP hanya mencerminkan. Pengecualian: `POST /penerimaan/:id/tandai-tidak-sesuai` dan `.../batal-tandai-tidak-sesuai` **menulis ke Mongo ERP saja** (catatan gudang internal) — Accurate tetap tidak pernah disentuh, penerimaan tetap cermin murni.
-- **Permintaan barang hanya tiga field tampil** (`number`/`trans_date`/`status_name`) — `requisitionType` tidak dikembalikan `purchase-requisition/list.do`, bukan bug pengambilan data.
+- **Cermin `GET /permintaan` hanya tiga field** (`number`/`trans_date`/`status_name`) — `requisitionType` tidak dikembalikan `purchase-requisition/list.do`, bukan bug pengambilan data. Berlaku HANYA untuk endpoint cermin; layar Permintaan Barang kini memakai entitas ERP-native `/permintaan-erp` (data lengkap, lihat bagian di atas).
 - **`purchaseOrderId` di penerimaan hanya terisi dalam jendela 6 bulan** — di luar jendela itu, `pesanan_nomor` kosong bukan karena pembelian langsung, melainkan detailnya belum pernah ditarik (`detail_terambil=false`).
 
 ## Dependensi & Integrasi
