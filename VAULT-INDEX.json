@@ -4589,7 +4589,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Backend tahap 1 sampai 3 LIVE di dev DAN prod** sejak 2026-08-06 (PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016), ditambah perbaikan [#1018](https://github.com/bip-itteam-internal/bip-erp/pull/1018)). Prod di-deploy manual (`docker compose up -d --build form-builder-service --no-deps`) dan diverifikasi lewat probe perilaku dari dalam jaringan container. **FE belum ada sama sekali**, jadi belum ada layar untuk komite maupun pengaju, dan **belum satu pun form kaizen dibuat di lingkungan mana pun**. Tahap 4 sampai 7 belum dikerjakan.",
+      "status_teks": "**Backend tahap 1 sampai 3 LIVE di dev DAN prod** sejak 2026-08-06: PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016) (fitur), [#1018](https://github.com/bip-itteam-internal/bip-erp/pull/1018) (panik jalur galat), [#1019](https://github.com/bip-itteam-internal/bip-erp/pull/1019) (pengikatan `recurrence`). Prod di-deploy manual (`docker compose up -d --build form-builder-service --no-deps`). **FE belum ada sama sekali**, jadi belum ada layar untuk komite maupun pengaju. Tahap 4 sampai 7 belum dikerjakan.",
       "publik": true,
       "tautan": [
         "Microservices - Form Builder Service",
@@ -4613,20 +4613,20 @@
         "API - Form Builder Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "fe5143f74dfd70379b4ec8e3643088ca91d42b2f6d8b4666420bfc2f1c3da1f0",
-      "ukuran_kb": 21.8,
-      "ringkasan": "Menjawab: bagaimana program pengumpulan ide perbaikan bulanan bekerja, siapa yang wajib menyetor ide, bagaimana kuota diatur HR (satu angka bawaan untuk semua, boleh ditimpa per departemen, dan sifatnya lantai bukan langit-langit), serta bagaimana komite Kaizen memutuskan ide diterima, ditolak, atau ditandai diterapkan. Menjelaskan juga kenapa Kaizen dibangun sebagai tipe form kelima di Form Builder Service alih-alih service baru atau space di Task Management, bagaimana potret peserta per periode jadi penyebut papan kepatuhan, dan penyimpangan-penyimpangan yang disengaja dari rancangan awal berikut alasannya. Berguna untuk menelusuri kaitannya dengan metrik KPI lintas departemen yang selama ini tidak punya sumber data.",
+      "hash": "4f73a8fc6b36ea674837bb9207919360a345c56036a3ffca4f2d445249a68ca4",
+      "ukuran_kb": 21.9,
+      "ringkasan": "Menjawab: bagaimana program pengumpulan ide perbaikan (Kaizen) bulanan berjalan, siapa karyawan yang wajib mengirim ide dan berapa kuotanya (satu angka global dengan override per departemen, sifatnya lantai bukan langit-langit), serta siapa yang memutuskan sebuah ide Diterima, Ditolak, atau Diterapkan. Menjelaskan juga kenapa fitur ini menumpang Form Builder Service sebagai tipe form kelima (form_type kaizen) alih-alih service baru atau space di Task Management, kenapa rute komite dipisah ke prefix /kaizen/* dengan gerbang sendiri, dan bagaimana potret peserta per periode dari cron dipakai sebagai penyebut papan kepatuhan. Berguna untuk menelusuri kaitan Kaizen dengan metrik KPI inovasi yang selama ini tak punya sumber data, serta melihat penyimpangan rancangan, hasil uji end-to-end, dan batasan yang sudah diketahui.",
       "kata_kunci": [
         "kaizen",
         "ide perbaikan",
-        "inovasi",
-        "kuota ide",
+        "improvement idea",
+        "form builder service",
+        "form_type kaizen",
         "komite kaizen",
+        "kuota ide",
         "papan kepatuhan",
-        "compliance",
-        "KPI",
-        "form builder",
-        "periode bulanan"
+        "KPI inovasi",
+        "form berulang"
       ]
     },
     {
