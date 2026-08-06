@@ -3125,9 +3125,9 @@
         "APP - Web ERP",
         "ADR - 0002 Database-per-Service"
       ],
-      "hash": "b6e37e1db606b0a06d85519535fd009f37a5a652fbb08a180647271d0c85a038",
-      "ukuran_kb": 16.2,
-      "ringkasan": "Menjawab: kenapa presensi bip-erp dibuat multi-tenant dengan penanda company_id row-level dalam satu database, bukan instance atau database terpisah per perusahaan. Menjelaskan bagaimana company_id mengalir dari work_data ke klaim JWT lalu header BIP-Company-ID, beda CompanyID (penulis) vs EffectiveCompanyID (pembaca dengan override ?company= untuk central admin), siapa yang dianggap admin pusat, serta aturan default BIP dan backfill data lama. Bisa dipakai untuk mengecek bagian mana yang sudah ter-scope (attendance, jadwal, rotasi, fingerprint, WiFi, artikel, departemen, direktori karyawan) dan mana yang belum (payroll, recruitment, HRD-document, task-management) beserta batasan yang masih terbuka.",
+      "hash": "298f792b4b48048bbd72daffbbcc72a0948daa3db46b3ef48b9f9372c342e8a4",
+      "ukuran_kb": 17.0,
+      "ringkasan": "Menjawab: kenapa presensi bip-erp dibuat multi-tenant dengan penanda company_id row-level dalam satu database, bukan instance atau database terpisah per perusahaan. Menjelaskan bagaimana company_id mengalir dari work_data ke klaim JWT lalu header BIP-Company-ID, beda CompanyID (penulis) vs EffectiveCompanyID (pembaca dengan override ?company= untuk admin pusat), siapa yang dianggap admin pusat (peran system_roles.group = admin, bukan lagi supervisor IT) dan bagaimana pemberian peran itu dijaga, serta aturan default BIP dan backfill data lama. Bisa dipakai untuk mengecek bagian mana yang sudah ter-scope (attendance, jadwal, rotasi, fingerprint, WiFi, artikel, departemen, direktori karyawan) dan mana yang belum (payroll, recruitment, HRD-document, task-management) beserta batasan yang masih terbuka.",
       "kata_kunci": [
         "multi-tenant",
         "multi perusahaan",
@@ -3136,7 +3136,7 @@
         "row-level scope",
         "EffectiveCompanyID",
         "master_company",
-        "admin pusat",
+        "admin pusat (system_roles.group = admin)",
         "presensi attendance",
         "tenant isolation"
       ]
