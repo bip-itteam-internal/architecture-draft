@@ -119,11 +119,20 @@ def rakit_index(entri: list[dict]) -> dict:
 
 
 def _peringatan_status(entri: list[dict]) -> list[str]:
-    """Status absen normal untuk meta/api; janggal untuk domain/adr."""
+    """Status absen normal untuk meta/api; janggal untuk domain/adr/runbook.
+
+    `runbook` ikut diperiksa karena `CLAUDE.md` §2 menegaskan Runbooks TIDAK
+    dikecualikan dari status marker — beda dari `log`, `template`, dan
+    `workspace` yang memang dikecualikan. Sebelumnya jenis ini tak diperiksa
+    sama sekali, sehingga 12 runbook yang statusnya salah terbaca (ditulis
+    blockquote, sementara parser hanya mengenal bullet) lolos tanpa satu pun
+    peringatan selama berbulan-bulan. Bugnya di parser, tapi yang membuatnya
+    tak terlihat adalah tak adanya yang memeriksa.
+    """
     return [
         e["path"]
         for e in entri
-        if e["jenis"] in ("domain", "adr")
+        if e["jenis"] in ("domain", "adr", "runbook")
         and e["status_emoji"] is None
         and e["status_teks"] is None
     ]

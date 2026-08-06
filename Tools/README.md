@@ -48,6 +48,17 @@ cd Tools && .venv/Scripts/python.exe -m pytest tests/ -v
 - **Status disimpan mentah**, tidak dinormalisasi. Enam emoji dipakai di vault
   (✅ ⚠️ 🟡 🔴 🔜 ⛔), dan sekitar sepertiga dokumen memang tidak punya status
   (seluruh dok meta root dan seluruh `API - *`).
+- **Dua format status, dua-duanya sah.** `- **Status**:` (bullet, dipakai template
+  Implementasi Service & Konsep Domain) dan `> **Status**:` (blockquote, dipakai
+  template Runbook). Sampai 2026-08-06 parser hanya mengenali yang pertama, jadi
+  12 runbook + 3 ADR + 2 Application + 1 Sales terbaca tanpa status — padahal
+  semuanya menulisnya dengan benar menurut templatenya. Menambah format ketiga?
+  Perbarui `_RE_STATUS` **dan** tesnya, jangan menyuruh dok menyesuaikan parser.
+- **Peringatan status memeriksa `domain`, `adr`, dan `runbook`.** Tiga jenis itu
+  wajib bawa status; `log`/`template`/`workspace` dikecualikan oleh `CLAUDE.md` §2,
+  sedangkan `api`/`meta` memang normal tanpa status. Runbook dulu tak diperiksa —
+  itu sebabnya salah-baca di atas tak pernah bersuara. Menambah jenis baru yang
+  wajib berstatus? Daftarkan di `_peringatan_status`.
 - **Rusak bukan berarti kosong.** Berkas hasil yang bentuknya tidak dikenali akan
   **menolak seluruh operasi**, bukan dianggap tidak berisi. Dua kali di proyek ini
   perlakuan "anggap kosong" menyebabkan kehilangan data.

@@ -9,7 +9,7 @@ from vault_index.parsing import (
 VAULT_ROOT = Path(__file__).resolve().parents[2]
 
 
-# --- status: tiga format yang benar-benar ada di vault ---
+# --- status: empat format yang benar-benar ada di vault ---
 
 def test_status_format_bullet_bold():
     teks = "## Deskripsi\n\n- **Status**: ✅ Accepted (mencerminkan kondisi kode)\n"
@@ -41,6 +41,40 @@ def test_status_berupa_prosa_bukan_emoji():
     emoji, txt = ekstrak_status(teks)
     assert emoji is None
     assert txt == "desain masih dibahas bersama HRD"
+
+
+def test_status_format_blockquote_bold():
+    """`Template - Runbook` MENETAPKAN format ini; seluruh 12 runbook memakainya.
+
+    Sebelum perbaikan ini parser hanya mengenali prefix bullet, sehingga tiap
+    runbook terbaca tanpa status — termasuk yang menandai dirinya belum pernah
+    dieksekusi. Bagi /ask dan /start-task keduanya tampak setara.
+    """
+    teks = "> **Status**: ⚠️ Implemented (ada catatan) — tahap 5 belum terjadi\n"
+    assert ekstrak_status(teks) == (
+        "⚠️",
+        "Implemented (ada catatan) — tahap 5 belum terjadi",
+    )
+
+
+def test_status_format_blockquote_tanpa_bold():
+    """`Sales - Landing page` memakai '> Status:' tanpa bold."""
+    teks = "> Status: 🟡 **Konsep**. Catatan: beda dari website korporat.\n"
+    emoji, txt = ekstrak_status(teks)
+    assert emoji == "🟡"
+    assert txt.startswith("**Konsep**")
+
+
+def test_status_blockquote_bersarang():
+    """Blockquote bersarang tetap terbaca; '>' boleh berulang."""
+    teks = "> > **Status**: ✅ Implemented\n"
+    assert ekstrak_status(teks) == ("✅", "Implemented")
+
+
+def test_status_bullet_di_dalam_blockquote():
+    """Urutan prefix yang mungkin: '>' lalu '-'. Kebalikannya bukan markdown sah."""
+    teks = "> - **Status**: 🔴 Stub\n"
+    assert ekstrak_status(teks) == ("🔴", "Stub")
 
 
 def test_status_absen_adalah_kondisi_normal():

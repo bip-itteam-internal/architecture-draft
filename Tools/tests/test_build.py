@@ -147,6 +147,32 @@ def test_peringatan_status_menandai_domain_tanpa_status():
     assert _peringatan_status(entri) == ["a.md", "b.md"]
 
 
+def test_peringatan_status_ikut_memeriksa_runbook():
+    """Runbook TIDAK dikecualikan dari status marker (CLAUDE.md §2, SOP baris 71).
+
+    Dulu jenis ini tak diperiksa sama sekali, sehingga 12 runbook yang statusnya
+    salah terbaca (format blockquote) lolos tanpa satu pun peringatan. Yang
+    membuatnya tak terlihat bukan kesalahan penulisnya, melainkan tak adanya
+    yang memeriksa.
+    """
+    entri = [
+        {"path": "r1.md", "jenis": "runbook", "status_emoji": None, "status_teks": None},
+        {"path": "r2.md", "jenis": "runbook", "status_emoji": "⚠️", "status_teks": None},
+    ]
+    assert _peringatan_status(entri) == ["r1.md"]
+
+
+def test_peringatan_status_tetap_melewati_jenis_yang_dikecualikan():
+    """`log`, `template`, `workspace` dikecualikan dari status marker oleh §2;
+    `api` dan `meta` memang normal tanpa status. Memperingatkannya = kebisingan
+    yang membuat peringatan sungguhan ikut diabaikan."""
+    entri = [
+        {"path": f"{j}.md", "jenis": j, "status_emoji": None, "status_teks": None}
+        for j in ("log", "template", "workspace", "api", "meta")
+    ]
+    assert _peringatan_status(entri) == []
+
+
 def test_peringatan_folder_tak_dikenal_menandai_jenis_none():
     entri = [
         {"path": "a.md", "jenis": None},

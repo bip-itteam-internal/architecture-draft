@@ -9,8 +9,16 @@ EMOJI_STATUS: frozenset[str] = frozenset({"✅", "⚠️", "🟡", "🔴", "🔜
 
 BARIS_KEPALA = 15
 
+# Prefix `>` diizinkan karena vault memakai DUA format status yang sama-sama sah,
+# ditetapkan oleh templatenya masing-masing: `Template - Implementasi Service`
+# memakai bullet di dalam `## Deskripsi`, sedangkan `Template - Runbook` memakai
+# blockquote di baris pertama. Tanpa cabang ini seluruh 12 runbook (plus 3 ADR,
+# 2 dok Application, dan 1 Sales) terbaca tanpa status — dan `_peringatan_status`
+# dulu tak memeriksa runbook, jadi salah bacanya tak pernah bersuara.
+# `*` bukan `?`: blockquote bersarang (`> >`) ikut terbaca.
+# Urutan `>` sebelum `-` mengikuti markdown: `> - **Status**` sah, kebalikannya tidak.
 _RE_STATUS = re.compile(
-    r"^\s*(?:-\s*)?(?:\*\*)?Status(?:\*\*)?\s*:\s*(\S+)[ \t]*(.*)$",
+    r"^\s*(?:>\s*)*(?:-\s*)?(?:\*\*)?Status(?:\*\*)?\s*:\s*(\S+)[ \t]*(.*)$",
     re.MULTILINE,
 )
 _RE_WIKILINK = re.compile(r"(?<!!)\[\[([^\]|#]+)")
