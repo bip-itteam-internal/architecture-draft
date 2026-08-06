@@ -55,6 +55,20 @@ Decision #1 memakai `payout > 0` sebagai proksi "receipt sudah menyerap refund".
 
 **Konsekuensi**: 5 dari 6 yang flip bersolution 0 → tertahan **PENDING** gerbang gudang, bukan langsung terbukukan. Ini benar per [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]].
 
+### Amandemen 2026-08-06 — cabang Shopee menuntut BUKTI, bukan kanal (✅ commit `03739530`, belum deploy)
+
+Amandemen di atas masih memakai **kanal** sebagai proksi: "Shopee → pasti ada penyerap". Proksi itu **terlalu lebar**. Penyerapnya satu hal yang sangat spesifik — mutasi dompet `ADJUSTMENT_FOR_RR_AFTER_ESCROW_VERIFIED` — dan mayoritas order Shopee ber-`payout>0` **tidak punya**. Sensus prod 2026-08-06 atas **23 order Shopee** yang gerbang ini skip: hanya **1** punya mutasi RR (`2607180VU58AJP`, −198.930, terverifikasi ke `INC/2026/07/28/014-BH`); **22 sisanya nol penyerap** dan `total_refund` 0 — penjualannya tak pernah terbalik dokumen apa pun, dan **stok barang-baliknya juga tak pernah bertambah** karena receipt tak menggerakkan stok. Menebak dari kanal = menghilangkan 22 pembalikan sah demi melindungi 1.
+
+**Keputusan**: cabang Shopee kini **bertanya** — `HasShopeeRefundAdjustment(orderSN)` pada `shopee_wallet_transactions` (tipe RR, status `COMPLETED`). Hanya tipe RR; `LOST_PARCEL_SELLER_ADD` & `AFFILIATE_SAMPLE_SHIPPING_FEE_DEDUCT` bukan pembalikan penjualan sehingga tak boleh membatalkan retur.
+
+Rinciannya:
+- **Lookup MALAS** — dipanggil hanya saat Shopee + settled + `payout>0` + post-cutover + `TotalRefund == 0`. `SyncOrderReturn` jalur panas; menanyakannya di luar kondisi itu = query DB sia-sia. Dua kasus tes mengunci bahwa jalur lain tak menyentuhnya sama sekali.
+- **Gagal baca / repo nil → BOOK**, bukan skip. Salah-book masih bisa dihapus (`sales-return/delete.do`); salah-skip menghilangkan pembalikan tanpa jejak. Arah kesalahan yang bisa diperbaiki dipilih sadar.
+- **Interface lokal `ReturnAbsorberRepo`** (1 method) + `NewReturnAbsorberRepo()` — interface Go struktural, jadi `repository.WalletRepository` dan seluruh fake-nya tak ikut berubah. Disuntik pasca-konstruksi (`SetWalletAbsorberRepo`) mengikuti pola `SetReturnBooker`.
+- **Pra-saring** di `triggerReturnAfterSettlement` & diagnostik `accurate_why` memakai `nil` (keduanya tanpa ctx/repo). Aman: gerbang yang mengikat tetap yang di `SyncOrderReturn`, jadi pra-saring longgar hanya menghasilkan satu panggilan yang berujung skip — bukan dobel. Diagnostik `accurate_why` jadi **meremehkan** penyerapan; itu arah yang benar untuk alat diagnosa.
+
+**Menunggu**: backfill **31 baris SKIPPED yang aman** (refund penuh / tanpa refund, Σ nilai barang ±Rp4.054.500 — TikTok 9, Shopee 22; 14 bersolution 0 akan tertahan gerbang gudang, 17 langsung terbukukan). **7 baris dikarantina** karena refund SEBAGIAN (receipt sudah menyerap lewat potongan penjualan) — baru boleh dibukukan setelah keputusan 🟡 di bawah diimplementasi.
+
 ### 🟡 Keputusan bisnis 2026-08-05 — nilai barang SELALU via retur (BELUM diimplementasi)
 
 **Status: 🟡 Diputuskan, belum ada di kode.** Gerbang payout masih aktif di produksi per 2026-08-06.
