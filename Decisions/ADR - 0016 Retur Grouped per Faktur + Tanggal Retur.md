@@ -34,6 +34,18 @@ Satu dokumen **Retur Penjualan** merekap semua retur yang berbagi faktur sumber 
 - **FE**: `auto-sync-return` menampilkan badge "N pesanan" + daftar order member; `GetDailyReturnDetail` mengembalikan baris **gabungan** semua member + `orders[]`.
 - Baris lama pra-grup (ber-`dedupe_key` = `return_sn`) tetap aman: `GetByMember` juga mencocokkan penanda representatif → tak dibukukan ulang.
 
+### Kunci grup punya TIGA cara jadi basi — semuanya berujung dokumen ganda
+
+Kunci `<faktur>|<tanggal>` menggabungkan dua nilai yang **bisa bergerak setelah baris dibuat**. Begitu salah satunya bergeser, lookup by-key meleset, rebuild tak menemukan dokumen lama untuk dihapus, dan lahirlah **dua Retur Penjualan untuk satu retur**. Ketiganya terpisah ditemukan, satu pola:
+
+1. **Tanggal bergeser** (didokumentasikan sejak awal, Decision #6) → ditutup guard anti-dobel **by-MEMBER** yang tak bergantung kunci.
+2. **`trans_date` tak diwarisi saat re-book** → ditutup PR #1000 `34ee2cd1` (2026-08-06): `SyncOrderReturn` mewarisi `trans_date`/`date_source` baris existing sebelum membentuk kunci. Lihat [[Microservices - Integration Service]].
+3. **Nomor faktur basi di dalam kunci** (ditemukan 2026-08-06 saat remediasi paket). Faktur yang dibuat ulang di Accurate berganti id/nomor, tapi `dedupe_key` baris retur masih menyimpan nomor lama → re-book membentuk kunci baru. Terjadi nyata: `RTR/2026/07/10/102` melahirkan `103` (Accurate id 113437) sementara 102 tetap hidup. **Terdeteksi dari cacah faktur 10 → 11**, bukan dari error apa pun — mekanisme ini **gagal senyap**. Sensus: **29 dari 1.652** baris SENT masih memikul nomor faktur basi. Belum ada guard; yang menahan kerusakan cuma guard by-member (#1), dan itu hanya menolong bila membernya benar-benar beririsan.
+
+⚠️ **Jebakan saat membetulkan data: re-book bisa MENGHIDUPKAN baris `SKIPPED`.** Membukukan ulang satu baris "penyintas" dari sepasang dokumen kembar akan ikut menarik member yang baris pasangannya sengaja `SKIPPED` — bila member pasangan itu **bukan himpunan bagian** dari member penyintas, hasilnya dokumen Accurate baru untuk retur yang sengaja tak dibukukan. Terjadi pada `RTR/2026/07/22/003` & `RTR/2026/07/23/055-BH`; ketahuan karena cacah SENT jadi 1.294, bukan 1.292 — **selalu cacah ulang sesudah remediasi, jangan percaya laporan alatnya saja.**
+
+- **Pembersihan dokumen kembar ✅ SELESAI 2026-08-06**: Agustus **8 pasang** (−Rp1.500.000); Juli **9 pasang** se-bulan + **4 pasang** lintas-bulan (−Rp1.033.500). Dihapus lewat `cmd/returndescope --return` (memakai `sales-return/delete.do`).
+
 ## Dokumen Terkait
 - [[Microservices - Integration Service]] — Auto-Sync Retur (model grup)
 - [[ADR - 0017 Tanggal Retur TikTok via order_update_date]]
