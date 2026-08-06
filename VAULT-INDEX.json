@@ -5158,19 +5158,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "fe30c40ad980190074f03557eb09639661b5be106e257c34326ad554f9099672",
-      "ukuran_kb": 43.7,
-      "ringkasan": "Menjawab pertanyaan tentang kelayakan mengisi skor KPI secara otomatis: metrik mana yang sudah punya sumber data, mana yang modulnya ada tapi belum dipakai, dan mana yang sama sekali tidak punya sumber. Juga menjelaskan metrik otomatis mana yang sudah benar-benar menyala di produksi, bagaimana hasilnya diverifikasi, dan bagaimana halaman diagnostik Otomasi KPI menampilkan status tiap metrik.",
+      "hash": "00f66b2dd7ed9bce570f1cbf8558fdede683de8cc726f734b479373b62c7fc29",
+      "ukuran_kb": 46.2,
+      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang sumber datanya sudah tersedia untuk diisi otomatis, mana yang modulnya sudah ada tapi belum dipakai, dan mana yang sama sekali tidak punya sumber data — lengkap dengan rekap per departemen dan matriks metrik per posisi. Menjelaskan cara kerja mesin otomasi (kontrak sumber nilai, mesin reduksi, arah target, registry), formula perhitungan seperti skor_tim dan uptime_sistem, syarat urutan penilaian antar-jenjang, serta batasan cakupan data (mis. supervisor_id yang belum lengkap) yang memengaruhi keakuratan angka otomatis. Juga menjawab bagaimana penilai melihat dan memakai nilai usulan otomatis, serta layar diagnostik yang menunjukkan metrik mana yang macet beserta sebabnya.",
       "kata_kunci": [
         "KPI",
-        "skor otomatis",
-        "auto-value",
+        "skor KPI",
+        "otomasi KPI",
+        "auto-values",
         "kpi_template",
         "kpi_score",
-        "otomasi KPI",
-        "uptime",
-        "dashboard KPI",
-        "diagnostik"
+        "skor_tim",
+        "uptime_sistem",
+        "supervisor_id",
+        "Otomasi KPI"
       ]
     },
     {
