@@ -2,7 +2,9 @@
 
 *Endpoint **form-builder-service** (form dinamis + analisa jawaban + kepatuhan presensi). Gateway: `/api/form-builder/*`. Kelola form butuh **tingkat peran** `staff`/`supervisor`/`admin` di modul mana pun DAN departemen pemanggil ada di daftar departemen aktif; mengisi cukup terautentikasi. Grounded ke `services/form-builder/routes.go` + handler terkait (`main`, PR #849; kepemilikan per departemen PR #869).*
 
-- **Implementasi**: [[Microservices - Form Builder Service]] · **Status**: ⚠️ (live di dev **dan prod** sejak 2026-08-01; **penilaian karyawan, tipe form, dan rekap per orang dinilai** merged 2026-08-02 lewat PR #907 + #908 — **live di dev DAN prod** sejak 2026-08-02). **Form berulang** (`recurrence`, `period_key`, `?period=`) merged ke `main` 2026-08-03 lewat PR #938, #940, #942 — **setelah** deploy prod 08-01/08-02, jadi **status prod belum diverifikasi**. Baru didokumentasikan 2026-08-06 dan belum punya catatan uji end-to-end.
+- **Status**: ⚠️ Implemented (live di dev **dan prod** sejak 2026-08-01; **penilaian karyawan, tipe form, dan rekap per orang dinilai** merged 2026-08-02 lewat PR #907 + #908 — **live di dev DAN prod** sejak 2026-08-02). **Form berulang** (`recurrence`, `period_key`, `?period=`) merged ke `main` 2026-08-03 lewat PR #938, #940, #942 — **setelah** deploy prod 08-01/08-02, jadi **status prod belum diverifikasi**. Baru didokumentasikan 2026-08-06 dan belum punya catatan uji end-to-end.
+- **Kaizen** (`form_type: "kaizen"`, rute `/kaizen/*`, `/me/kaizen*`, `/internal/kaizen/metrics`) merged ke `main` 2026-08-06 lewat PR #1016, #1028, #1029, #1034. Tahap 1-3 live dev + prod dan teruji end-to-end; sisanya **belum diverifikasi lewat gateway hidup**.
+- **Implementasi**: [[Microservices - Form Builder Service]]
 - **Indeks**: [[API - Index]]
 - **Konsumen**: seluruh rute `/forms*` — termasuk `analytics`, `responses`, `export` — dipakai [[APP - Web ERP]]. Rute **`/me/*`** dipakai [[APP - MyBharata]] (section Survei di beranda + halaman pengisian), dan **`/me/kaizen*`** dipakai menu Kaizen tersendiri di aplikasi itu.
 
