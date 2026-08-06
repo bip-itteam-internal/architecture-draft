@@ -40,7 +40,7 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 
 **Tipe pertanyaan (9)** — `short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`. Validasi struktur (key unik, options wajib untuk tipe pilihan, rentang scale maksimal 10 langkah, `min ≤ max`) dan validasi jawaban (tipe cocok, nilai ∈ options, batas angka & panjang teks, format `YYYY-MM-DD` dan `HH:MM`) keduanya **fungsi murni** — teruji tanpa Mongo.
 
-**Tipe form (4)** — `survey`, `evaluation`, `request`, `checklist`. Bukan sekadar label: tanpanya daftar form berisi survei, pengajuan, checklist, dan penilaian yang tampak serupa padahal cara mengisinya berbeda jauh. `GET /forms?form_type=` menyaringnya; nilai `survey` sengaja ikut menjaring dokumen yang field-nya belum ada, karena backfill baru mengisinya saat boot. Kiriman tanpa `form_type` diberi default `survey` (klien lama belum mengirimnya), tapi nilai **tak dikenal diteruskan apa adanya** supaya validasi menolaknya dengan pesan jelas alih-alih diam-diam berubah jadi survei.
+**Tipe form (5)** — `survey`, `evaluation`, `request`, `checklist`, `kaizen`. Bukan sekadar label: tanpanya daftar form berisi survei, pengajuan, checklist, dan penilaian yang tampak serupa padahal cara mengisinya berbeda jauh. `GET /forms?form_type=` menyaringnya; nilai `survey` sengaja ikut menjaring dokumen yang field-nya belum ada, karena backfill baru mengisinya saat boot. Kiriman tanpa `form_type` diberi default `survey` (klien lama belum mengirimnya), tapi nilai **tak dikenal diteruskan apa adanya** supaya validasi menolaknya dengan pesan jelas alih-alih diam-diam berubah jadi survei.
 
 **Bagian (`section`)** — penanda pemisah halaman, bukan pertanyaan. Lihat bagian tersendiri di bawah.
 
@@ -220,7 +220,7 @@ Form berulang memakai jendela **periode berjalan**, bukan `start_date`/`end_date
 
 ## Tipe `kaizen`: program pengumpulan ide bulanan
 
-> Status: **merged ke `main` 2026-08-06** lewat PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016). Dev naik otomatis lewat Harness, **belum diverifikasi**; prod tidak auto-deploy. Backend saja, **FE belum ada**. Konsep dan keputusan bisnisnya di [[HRIS - Kaizen (Ide Perbaikan)]].
+> Status: seluruh backend **merged ke `main` 2026-08-06** — PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016) (tahap 1-3, **live dev + prod, teruji end-to-end**), [#1028](https://github.com/bip-itteam-internal/bip-erp/pull/1028) (papan ide + pengingat), [#1029](https://github.com/bip-itteam-internal/bip-erp/pull/1029) (setoran KPI), [#1034](https://github.com/bip-itteam-internal/bip-erp/pull/1034) (permukaan karyawan). Tiga PR terakhir **belum diverifikasi lewat gateway hidup**, dan pengingatnya **tidak akan sampai** sampai kategori inboxnya didaftarkan (lihat di bawah). Masih open: [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039) gerbang presensi, [#1023](https://github.com/bip-itteam-internal/bip-erp/pull/1023) upload berkas (**draft**, tertahan access key). Konsep dan keputusan bisnisnya di [[HRIS - Kaizen (Ide Perbaikan)]].
 
 Tipe form **kelima**, dan seperti `evaluation` ia bukan sekadar label: seluruh perilaku barunya digerbang tipe ini, sehingga empat tipe lama tak berubah sedikit pun dan tak ada satu pun form lama yang perlu dimigrasi.
 
@@ -299,6 +299,55 @@ Dua cacat yang sudah diketahui tapi sengaja belum diperbaiki:
 
 - Menandai ide "diterapkan" padahal belum pernah diterima dibalas `400`, seharusnya `409`. Tak ada data yang rusak.
 - `blocks_attendance` di `GET /me/forms` memakai `gateActiveAt` (tanggal statis), sedangkan gerbang sesungguhnya di `/internal/compliance` memakai `gateActiveForForm` (jendela periode). Pada form berulang ber-gerbang, aplikasi akan memberi tahu "kamu tidak ditahan" sementara attendance-service menahan clock-in. Laten selama belum ada form ber-mode `block` dan attendance-service masih pra-merge, tapi akan menggigit tepat pada hari service itu naik.
+
+### Papan ide publik
+
+> Merged ke `main` 2026-08-06 lewat PR [#1028](https://github.com/bip-itteam-internal/bip-erp/pull/1028). Rute `GET /me/kaizen/board`, cukup karyawan terautentikasi.
+
+Yang menjaga isinya **bukan gerbang peran melainkan saringan status**: hanya ide `accepted` dan `implemented` yang tampil. Saringannya `$in` atas dua status itu, bukan "bukan pending", supaya ide yang **ditolak** juga tak pernah muncul. Ide yang masih ditinjau tak pernah tampil — menampilkannya berarti mempermalukan ide setengah matang di depan sekantor, dan itu cara tercepat membuat orang berhenti mengirim.
+
+Jawaban yang boleh tampil ditentukan **daftar izin tipe field**, bukan daftar larangan. Papan dibaca seluruh karyawan, jadi tipe pertanyaan yang ditambahkan nanti (lampiran berkas, yang nilainya cuma id unggahan) **tersembunyi secara bawaan** sampai seseorang sengaja mengizinkannya. Daftar larangan bekerja sebaliknya: tipe baru bocor lebih dulu, dan ketahuannya setelah tampil di depan sekantor. Di atasnya masih ada `board_hidden_fields` per form untuk menyembunyikan key tertentu (perkiraan biaya, misalnya).
+
+Dibatasi **100 kartu** terbaru. Papan berisi ribuan kartu tak dibaca siapa pun.
+
+### Pengingat kuota berjenjang
+
+Dikirim **H-7 dan H-2** sebelum periode ditutup, hanya kepada peserta yang jumlah idenya masih di bawah kuota. Isinya menyebut **angka** ("kurang 1 lagi dari 2") dan sisa hari: orang yang tak tahu kurang berapa akan menunda karena mengira pekerjaannya besar, dan dua pesan identik seminggu berturut-turut hanya melatih orang mengabaikannya.
+
+**Penjaga kirim-ganda STRUKTURAL**, bukan pemeriksaan. Koleksi `ReminderLog` punya index unik `(form_id, period_key, employee_id, tag)`. Cron pembuka periode jalan **tiap jam**, dan pemeriksaan "sudah dikirim?" sebelum mengirim bisa kalah balapan — hasilnya orang yang sama dikirimi 24 kali sehari. Pola yang sama dipakai `ensurePeriod`. Penanda tahapnya (`h7`, `h2`) **tersimpan**, jadi mengubah ejaannya akan mengirim ulang seluruh pengingat periode berjalan.
+
+Perbandingan jatuh temponya memakai **hari**, bukan detik, karena cron jalan tiap jam.
+
+> [!bug] Pengingat dan pemberitahuan keputusan TIDAK PERNAH SAMPAI
+> Kategori inbox `kaizen-reminder` dan `kaizen-decided` **tidak terdaftar** di `InboxCategories` (`shared-library/models/notification/models.go`). Notification-service memvalidasi kategori terhadap daftar itu dan membalas **`400`** untuk yang di luar daftar, sementara pengiriman di form-builder bersifat best-effort — kegagalannya hanya muncul di log. Jadi seluruh pengingat kuota dan pemberitahuan keputusan **hilang tanpa jejak**, sedangkan cron, papan kepatuhan, dan keputusan komite tampak bekerja normal.
+>
+> Ini **persis kegagalan yang sudah diperingatkan** di rencana tahap 5 [[HRIS - Kaizen (Ide Perbaikan)]] dan di peringatan deploy di bagian atas dokumen ini, dan sudah pernah terjadi saat kategori `form-published` lahir. Terulang karena PR [#1028](https://github.com/bip-itteam-internal/bip-erp/pull/1028) menambah kategori di form-builder tanpa mendaftarkannya di shared-library.
+>
+> Perbaikannya dua baris (daftar + testnya), tapi konsekuensinya **notification-service wajib ikut di-deploy** — kalau hanya form-builder yang naik, containernya masih memakai daftar lama dan penolakannya tetap terjadi.
+
+### Setoran metrik ke KPI
+
+> Merged ke `main` 2026-08-06 lewat PR [#1029](https://github.com/bip-itteam-internal/bip-erp/pull/1029).
+
+`GET /internal/kaizen/metrics?period=YYYY-MM` membalas hitungan per orang: `submitted`, `accepted`, `implemented`. **Tiga angka, bukan satu**, karena matriks KPI memakai dua redaksi berbeda — sebagian menghitung ide yang diajukan, sebagian yang benar-benar diterapkan. Menggabungkannya berarti salah satu departemen dinilai dengan angka yang bukan miliknya.
+
+Rutenya **menggerbang dirinya sendiri** ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]): identitas terkunci ke header, dan `?company=` hanya dihormati bila permintaan tak membawa identitas header sama sekali — ciri panggilan service-to-service. Tanpa aturan itu karyawan mana pun bisa mengintip hitungan perusahaan lain, persis kelas bug yang sudah ditutup di `/internal/compliance`.
+
+Yang **menulis** `kpi_score` tetap [[Microservices - Employee Service]], sesuai [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]. Service ini hanya melaporkan angkanya. Di sisi employee-service ada dua sumber terdaftar, `kaizen_ide_diajukan` dan `kaizen_ide_diterapkan`, yang menarik lewat `FORM_BUILDER_MODULE_URL` (sudah ada di `docker-compose.yml`). `has_program:false` membedakan "perusahaan ini belum menjalankan programnya" dari "gagal mengambil data"; hanya yang kedua dilaporkan sebagai metrik gagal hitung.
+
+### Permukaan karyawan: `/me/kaizen*`
+
+> Merged ke `main` 2026-08-06 lewat PR [#1034](https://github.com/bip-itteam-internal/bip-erp/pull/1034).
+
+`GET /me/kaizen` (program berjalan + progres kuota) dan `GET /me/kaizen/ideas` (riwayat ide sendiri lintas periode, berhalaman, membawa keputusannya).
+
+**Terpisah dari `/me/forms` dengan sengaja.** Program Kaizen bukan "satu form lagi" bagi pengisinya: berulang tiap periode, berkuota, punya riwayat keputusan, dan idenya dibaca orang lain di papan. Menumpangkan semua itu ke daftar survei berarti satu kartu yang harus menjelaskan lima hal sekaligus. [[APP - MyBharata]] menampilkannya di **menu tersendiri**.
+
+`/me/forms` ikut mengirim **`form_type`** supaya klien bisa mengecualikan program Kaizen dari daftar survei. Dokumen lama tak punya field itu dan dijawab `survey`: klien tak boleh bergantung pada urutan deploy, karena di jeda sebelum backfill jalan, klien yang menyaring berdasarkan tipe akan menjatuhkan form lama dari **semua** daftar dan formnya lenyap tanpa satu pun galat. Nilai **asing diteruskan apa adanya**, bukan disamarkan jadi `survey` — validator sudah menolaknya di jalur tulis, dan menyamarkan data yang tak dikenal membuat penyebabnya mustahil ditelusuri.
+
+Bukan sasaran program dibalas `has_program:false`, **bukan `404`**: menu Kaizen tetap bisa dibuka dan menjelaskan keadaannya alih-alih menampilkan layar galat untuk keadaan yang sebenarnya normal.
+
+> ⚠️ **Gerbang presensi belum ikut di `/me/kaizen`.** Karena form Kaizen dikeluarkan dari daftar survei di mobile, karyawan yang tertahan clock-in tak punya petunjuk di layar: kartunya tak ada lagi di beranda, dan menu Kaizen tak tahu ada gerbang yang menyala. PR [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039) menambahkannya, **masih open**.
 
 ## Bagian (section): penanda di daftar datar, bukan struktur bersarang
 
@@ -394,8 +443,8 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 
 ## Dependensi & Integrasi
 
-- **MongoDB** `form_builder_db` — koleksi `forms`, `form_responses`, `form_periods`. Index dibuat idempoten saat boot; `(form_id, period_key)` di `form_periods` **unik**, dan keunikan itulah yang membuat pembuatan periode oleh cron aman tanpa lock. Lihat [[DB - Overview and Notes]].
-- [[IT - Background Jobs & Schedulers]] — cron pembuka periode form berulang, tiap jam, zona `Asia/Jakarta`.
+- **MongoDB** `form_builder_db` — koleksi `forms`, `form_responses`, `form_periods`, `kaizen_reminder_logs`. Index dibuat idempoten saat boot; `(form_id, period_key)` di `form_periods` **unik**, dan keunikan itulah yang membuat pembuatan periode oleh cron aman tanpa lock. Index unik `(form_id, period_key, employee_id, tag)` pada catatan pengingat memainkan peran yang sama untuk pengingat kuota. Lihat [[DB - Overview and Notes]].
+- [[IT - Background Jobs & Schedulers]] — cron pembuka periode form berulang, tiap jam, zona `Asia/Jakarta`; cron yang sama memotret peserta Kaizen dan mengirim pengingat kuota H-7/H-2.
 - [[CORE - API Master Gateway]] — satu-satunya pintu masuk; modul `form-builder` di map `InternalURL`.
 - [[Microservices - Attendance Service]] — **konsumen** `GET /internal/compliance` pada jalur clock-in mobile.
 - Auth mengikuti [[CORE - SSO Flow]]; identitas datang sebagai header `BIP-*`.
@@ -411,8 +460,9 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 
 - [[IT - Form Builder]] — konsep & latar belakang
 - [[API - Form Builder Service]] — daftar endpoint
-- [[HRIS - Kaizen (Ide Perbaikan)]] — 🟡 konsep, akan menumpang service ini sebagai `form_type` kelima
+- [[HRIS - Kaizen (Ide Perbaikan)]] — ⚠️ konsep & keputusan bisnis; menumpang service ini sebagai `form_type` kelima
 - [[IT - Background Jobs & Schedulers]] — cron pembuka periode
 - [[Microservices - Attendance Service]] · [[CORE - API Master Gateway]] · [[DB - Overview and Notes]]
-- [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] · [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]
-- [[APP - Web ERP]] · [[APP - MyBharata]] — klien yang belum dibangun
+- [[Microservices - Employee Service]] — penarik metrik Kaizen ke `kpi_score`
+- [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] · [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]
+- [[APP - Web ERP]] · [[APP - MyBharata]] — klien

@@ -88,6 +88,14 @@
 - Index baru `kpi_score{employee_id, period}` di `ensureTenantIndexes` (koleksi itu di produksi sebelumnya hanya punya `_id_`).
 - **Belum menghasilkan apa pun** sampai HR mengisi konfigurasi `auto` pada metrik lewat `POST /kpi/templates`; tidak ada nama posisi yang di-hardcode. Frontend belum ada.
 
+**Registry sumber data KPI** — ⚠️ merged ke `main` (`ad4e9e35` registry, `264cd45a` sumber Kaizen lewat PR [#1029](https://github.com/bip-itteam-internal/bip-erp/pull/1029)), **belum diverifikasi lewat gateway hidup**
+
+- `DaftarkanSumber(<nama>, fn)` mendaftarkan pengambil angka dari service lain. Batasnya [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]: employee-service boleh **menarik** data, tapi tetap **pemilik tunggal** `kpi_score`. Sumber hanya melaporkan `Cuplikan` mentah; seluruh aturan penilaian (reduksi, arah target, pembatasan 100) tinggal di `shared-library` dan tak bisa dilewati sumber mana pun.
+- Sumber terdaftar saat ini: `uptime` (`kpi_sumber_uptime.go`) dan **dua sumber Kaizen** — `kaizen_ide_diajukan` dan `kaizen_ide_diterapkan`.
+- **Dua sumber Kaizen, bukan satu**, karena [[HRIS - Matriks KPI per Departemen]] memakai dua redaksi berbeda: sebagian menghitung ide yang **diajukan**, sebagian yang benar-benar **diterapkan**. Menggabungkannya berarti salah satu departemen dinilai dengan angka yang bukan miliknya.
+- Ditarik dari `GET /internal/kaizen/metrics` milik [[Microservices - Form Builder Service]] lewat env **`FORM_BUILDER_MODULE_URL`** (sudah ada di `docker-compose.yml`). Dibaca `os.Getenv` langsung, **bukan** lewat map yang divalidasi `ValidateInternalURL` — entri kosong di map itu memanic seluruh service.
+- `has_program:false` dari form-builder membedakan "perusahaan ini belum menjalankan programnya" dari "gagal mengambil data". Hanya yang kedua dilaporkan sebagai metrik gagal hitung; yang pertama bukan kegagalan.
+
 **Cakupan supervisi antar-departemen**
 - `master_department` punya `supervised_by` (key departemen induk) + `supervision_label` (nama pendek kelompok, mis. `HRGA`). Di-seed & di-migrasi idempoten saat startup (hanya mengisi bila field belum pernah ada, jadi nilai yang diatur admin tak tertimpa).
 - Service ini **sumber kebenaran** relasi tersebut: mengisi klaim JWT `supervised_departments` saat login, dan melayani `/list?type=supervisor` dengan urutan telusur departemen sendiri → induk.

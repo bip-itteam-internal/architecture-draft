@@ -4,7 +4,9 @@
 
 *Program pengumpulan ide perbaikan bulanan. Karyawan pada sasaran tertentu wajib mengirim sejumlah ide tiap bulan, jumlahnya diatur HR (satu angka bawaan untuk semua, boleh ditimpa per departemen). Ide masuk ke antrean komite Kaizen terpusat yang memutuskan diterima atau ditolak, lalu menandai mana yang benar-benar diterapkan. Ide yang disetujui tampil di papan yang bisa dibaca seluruh karyawan.*
 
-- **Status**: ⚠️ **Backend tahap 1 sampai 3 LIVE di dev DAN prod** sejak 2026-08-06: PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016) (fitur), [#1018](https://github.com/bip-itteam-internal/bip-erp/pull/1018) (panik jalur galat), [#1019](https://github.com/bip-itteam-internal/bip-erp/pull/1019) (pengikatan `recurrence`). Prod di-deploy manual (`docker compose up -d --build form-builder-service --no-deps`). **FE belum ada sama sekali**, jadi belum ada layar untuk komite maupun pengaju. Tahap 4 sampai 7 belum dikerjakan.
+- **Status**: ⚠️ **Backend tahap 1 sampai 3 LIVE di dev DAN prod** sejak 2026-08-06: PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016) (fitur), [#1018](https://github.com/bip-itteam-internal/bip-erp/pull/1018) (panik jalur galat), [#1019](https://github.com/bip-itteam-internal/bip-erp/pull/1019) (pengikatan `recurrence`). Prod di-deploy manual (`docker compose up -d --build form-builder-service --no-deps`). Tahap **5, 6, dan 7a merged ke `main` 2026-08-06** tapi **belum diverifikasi lewat gateway hidup**; tahap 4 masih draft dan 7b masih open. Ringkasan lengkap di tabel di bawah.
+- 🔴 **Pengingat kuota dan pemberitahuan keputusan TIDAK PERNAH SAMPAI.** Kategori inbox `kaizen-reminder` dan `kaizen-decided` tak terdaftar di `shared-library`, jadi notification-service menolaknya `400` dan notifnya hilang tanpa jejak. Ini persis kegagalan yang sudah diperingatkan di rencana tahap 5 di bawah, dan sudah pernah terjadi saat kategori `form-published` lahir. Detail di [[Microservices - Form Builder Service]].
+- **Belum ada satu pun form kaizen dibuat di lingkungan mana pun**, jadi seluruh perilaku barunya masih inert. Program baru bisa dinyalakan setelah HR menetapkan sasaran, kuota, dan komitenya (lihat TBD).
 - ✅ **Alur inti TERUJI end-to-end di dev 2026-08-06** lewat gateway, dengan Mongo dan employee-service hidup. Lihat bagian tersendiri di bawah.
 - ✅ **Prod lengkap sejak 2026-08-06**: #1016, #1018, dan [#1019](https://github.com/bip-itteam-internal/bip-erp/pull/1019) semuanya sudah naik (`23e8914a`). Diverifikasi probe biner dengan kontrol positif dan negatif, ditambah probe perilaku jalur galat. **Belum ada satu pun form kaizen dibuat di prod** — programnya baru bisa dinyalakan setelah HR menetapkan sasaran, kuota, dan komitenya.
 - **Rumah kode yang dipilih**: [[Microservices - Form Builder Service]], sebagai **tipe form kelima** (`form_type: "kaizen"`). Bukan service baru, bukan space di [[Microservices - Task Management Service]].
@@ -61,7 +63,7 @@ Dijalankan lewat gateway dev dengan akun nyata, sasaran dibatasi satu orang supa
 2. **Penjaga balapan keputusan.** Menerima ide yang sudah diterima dibalas `409`, mengubah ide yang sudah diterapkan juga `409`. Keduanya lewat `MatchedCount` dari driver Mongo, bukan fungsi murni.
 3. **Agregasi hitungan ide per orang**, yang jadi pembilang papan kepatuhan.
 
-Yang **belum** teruji karena memang belum dibangun: papan ide publik dan pengingat berjenjang (tahap 5), serta setoran KPI (tahap 6).
+Papan ide publik, pengingat berjenjang, setoran KPI, dan permukaan karyawan **sudah dibangun setelah uji ini** dan **belum masuk cakupannya**. Pengingatnya bahkan terbukti tak bisa sampai (lihat status di atas), dan itu ketahuan dari pembacaan kode, bukan dari uji — bukti tambahan bahwa uji end-to-end ini perlu diulang untuk tahap 5 sampai 7.
 
 ### Diketahui, belum diperbaiki
 
@@ -210,15 +212,28 @@ Setorannya lewat satu endpoint internal yang **menggerbang dirinya sendiri** ([[
 
 Tiap tahap berdiri sendiri dan bisa di-deploy tanpa menunggu berikutnya.
 
-1. **Prasyarat**: snapshot periode jadi penopang beban, lalu kunci `409` dilonggarkan untuk form berulang. BE saja, tanpa perubahan kontrak yang terlihat klien.
-2. **Tipe `kaizen` + kuota + potret peserta**. BE saja.
-3. **Keputusan komite + papan kepatuhan**. BE, lalu FE di [[APP - Web ERP]].
-4. **Upload file** (tipe field `file` lewat [[Microservices - File Service]], berlaku semua tipe form).
-5. **Papan ide + pengingat**. Kategori inbox baru wajib didaftarkan di `shared-library`, dan [[Microservices - Notification Service]] **wajib ikut di-deploy**, kalau tidak notifnya ditolak `400` dan hilang tanpa jejak. Ini sudah pernah terjadi persis saat kategori `form-published` lahir.
-6. **Setoran KPI** ke [[Microservices - Employee Service]].
-7. **[[APP - MyBharata]]**: pengisian dan papan ide di mobile. Kewajiban baru boleh diperluas ke departemen yang tidak pegang komputer **setelah** tahap ini naik.
+| # | Tahap | Status per 2026-08-06 |
+|---|---|---|
+| 1 | **Prasyarat**: snapshot periode jadi penopang beban, lalu kunci `409` dilonggarkan untuk form berulang. BE saja, tanpa perubahan kontrak yang terlihat klien | ✅ merged, **live dev + prod**, teruji end-to-end |
+| 2 | **Tipe `kaizen` + kuota + potret peserta**. BE saja | ✅ idem |
+| 3 | **Keputusan komite + papan kepatuhan**. BE, lalu FE di [[APP - Web ERP]] | ✅ BE idem · FE **PR erp-frontend #815 open** |
+| 4 | **Upload file** (tipe field `file` lewat [[Microservices - File Service]], berlaku semua tipe form) | 🟡 PR [#1023](https://github.com/bip-itteam-internal/bip-erp/pull/1023) **draft**, tertahan pembuatan access key berprefiks `form/` + env `MINIO_FORM_KEY` |
+| 5 | **Papan ide + pengingat**. Kategori inbox baru wajib didaftarkan di `shared-library`, dan [[Microservices - Notification Service]] **wajib ikut di-deploy**, kalau tidak notifnya ditolak `400` dan hilang tanpa jejak | ⚠️ PR [#1028](https://github.com/bip-itteam-internal/bip-erp/pull/1028) merged, **tapi peringatan di kolom kiri ini justru terjadi**: kategorinya tak didaftarkan, jadi pengingatnya mati |
+| 6 | **Setoran KPI** ke [[Microservices - Employee Service]] | ⚠️ PR [#1029](https://github.com/bip-itteam-internal/bip-erp/pull/1029) merged, belum diverifikasi |
+| 7 | **[[APP - MyBharata]]**: pengisian dan papan ide di mobile. Kewajiban baru boleh diperluas ke departemen yang tidak pegang komputer **setelah** tahap ini naik | ⚠️ BE PR [#1034](https://github.com/bip-itteam-internal/bip-erp/pull/1034) merged · gerbang presensi [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039) **open** · Flutter **PR my-bharata #108 open** |
 
 Konvensi tim: **BE di-deploy lebih dulu, baru FE**. Produksi tidak auto-deploy.
+
+> [!warning] Tiga cacat berturut-turut lolos karena test tak pernah menyentuh lingkungan nyata
+> Fitur form berulang mustahil dibuat lewat API selama 3 hari "live", seluruh jalur galat `/forms/:id*` membalas `502`, dan kini pengingat kuota ditolak notification-service. Ketiganya lolos dengan seluruh unit test hijau. **Tiap tahap wajib sekali dijalankan lewat gateway sebelum diklaim selesai**, dan angka nol yang mencurigakan diperlakukan sebagai pertanyaan, bukan kabar baik.
+
+### Yang mobile lakukan berbeda dari rencana awal
+
+Rancangan awal menyebut "pengisian dan papan ide di mobile" seolah menumpang daftar survei yang sudah ada. Yang dibangun adalah **menu Kaizen tersendiri**, dan form Kaizen justru **dikeluarkan** dari section Survei.
+
+Sebabnya program Kaizen bukan "satu form lagi" bagi pengisinya: berulang tiap periode, berkuota, punya riwayat keputusan. Satu kartu survei tak bisa menjelaskan semuanya, dan kartu yang menjelaskan setengahnya lebih membingungkan daripada tak ada. Menu itu memuat progres kuota, pengiriman ide, riwayat lintas periode, dan detail tiap ide berikut keputusan komitenya.
+
+Konsekuensi yang harus diingat: **karena kartunya hilang dari beranda, gerbang presensi jadi tak terlihat** kalau HR menyalakannya. Itulah yang ditutup PR #1039.
 
 ## Dependensi & Integrasi
 

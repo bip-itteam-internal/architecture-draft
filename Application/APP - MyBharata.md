@@ -113,6 +113,30 @@
 >
 > **`scale_min` bertag `omitempty` di backend**, jadi skala `0..N` datang **tanpa** field itu. Nilai bawaannya harus 0, bukan 1 — menebak 1 membuat pilihan terendah tak pernah bisa disentuh.
 
+### Kaizen (menu tersendiri)
+
+> Status: **PR my-bharata [#108](https://github.com/bip-itteam-internal/my-bharata/pull/108) open** (versionCode **137**), belum merge ke `dev`. Konsep: [[HRIS - Kaizen (Ide Perbaikan)]].
+
+Menu **Kaizen** di Lainnya → Pengembangan Diri, sebelah KPI. **Bukan** kartu di section Survei, dan form Kaizen justru **dikeluarkan** dari section itu.
+
+Sebabnya program Kaizen bukan "satu form lagi" bagi pengisinya: berulang tiap periode, berkuota, punya riwayat keputusan komite. Satu kartu survei tak bisa menjelaskan semuanya sekaligus, dan menampilkannya di dua tempat membuat karyawan mengira ada dua hal berbeda yang harus dikerjakan.
+
+- **Beranda menu** — kartu progres kuota ("1 dari 2 ide, sisa 9 hari") + tombol kirim ide. Tombolnya **tidak dimatikan** saat kuota terpenuhi: kuota adalah lantai, bukan langit-langit.
+- **Riwayat** — ide sendiri lintas periode, terbaru dulu, berhalaman. **Detail ide tak memanggil apa pun** karena jawaban sudah ikut di daftar, jadi terbuka seketika dan tetap terbaca tanpa jaringan.
+- **Menu selalu tampil**, tidak disembunyikan berdasarkan sasaran program. Sasaran ditentukan HR dan berubah tiap periode; menu yang muncul-hilang mengikutinya terbaca sebagai fitur rusak. Halamannya sendiri yang menjelaskan saat tak ada program.
+- **Riwayat yang gagal dimuat dibedakan dari riwayat kosong**, dan kegagalannya tak menjatuhkan kartu progres. "Belum ada ide" kepada orang yang sudah mengirim sepuluh membuatnya mengira datanya hilang.
+- Sumber data `GET /api/form-builder/me/kaizen` + `.../me/kaizen/ideas`; pengiriman idenya memakai `POST .../me/forms/:id/responses` **yang sama** dengan survei. `SurveyFillView` dan `SurveyBloc` dipakai ulang apa adanya, bukan ditiru.
+- Fitur `features/kaizen`.
+
+**Penyaringan Kaizen dari section Survei dikerjakan di `surveySectionOf`, bukan di dalam bloc.** Halaman pengisian form mencari formnya lewat `pendingOf`, dan menyaring di sana akan mematikan tautan lama dari notifikasi yang terlanjur terkirim. Form tanpa `form_type` (dokumen sebelum tipe form ada) **tetap tampil**: menjatuhkannya akan membuat form lenyap dari layar karyawan tanpa satu pun galat.
+
+> [!warning] Navigasi notifikasi digerakkan KATEGORI, bukan field `route` dari backend
+> `NotificationRouteMapper` memetakan kategori ke rute internal, dan field `route` yang dikirim backend (`/form/<id>`) **tak dibaca sama sekali** — rute itu bahkan tak ada di `RouteNames`. Kategori yang tak dikenal jatuh ke kotak masuk, jadi kategori baru **wajib** didaftarkan di mapper itu atau notifikasinya mendarat di tempat yang salah tanpa galat.
+>
+> PR #108 mendaftarkan `kaizen-reminder` dan `kaizen-decided` → menu Kaizen, dan menambahkan empat kategori form-builder ke `NotificationType` (`form-published` dan `form-submitted` sudah lama live tapi tak pernah dikenali, jadi tampil dengan ikon server).
+>
+> Terpisah dari itu: kategori Kaizen juga belum terdaftar di **`shared-library` sisi backend**, sehingga notifikasinya ditolak `400` dan tak pernah terkirim sejak awal. Dua lapis berbeda, keduanya harus dibereskan.
+
 ### Fitur pendukung lain
 - **QR Code**: tampilkan QR pribadi + akses scanner inventory
 - **Guest Book**: tamu eksternal mengisi buku tamu (scan QR, input manual, kategori)
@@ -162,4 +186,6 @@ Tercantum di menu tetapi masih placeholder (route `/coming-soon` atau stub):
 - [[Microservices - Employee Service]]
 - [[Microservices - Notification Service]]
 - [[Microservices - Task Management Service]]
+- [[Microservices - Form Builder Service]] · [[API - Form Builder Service]]
+- [[HRIS - Kaizen (Ide Perbaikan)]] — konsep program ide bulanan di balik menu Kaizen
 - [[APP - Dynamic Task Tracker]]
