@@ -70,7 +70,7 @@ Dua gerbang berbeda, karena pemanggilnya berbeda jenis.
 
 **Dashboard dan ekspor** memakai izin RBAC (`monitoring.view`, `monitoring.export`) dengan fallback peran tier lama (`isITStaff`, `isITSupervisor`) sebagai kill-switch lewat `MONITORING_PERMISSION_ENFORCEMENT=off`. Fallback ekspor sengaja memakai `isITSupervisor`, bukan `isITStaff`: kill-switch harus mengembalikan perilaku, bukan melonggarkannya.
 
-**Rute KPI** dipanggil MESIN (employee-service), yang tidak membawa identitas pemakai sehingga tak punya izin apa pun. Gerbangnya `MONITORING_SERVICE_KEY` — **terpisah dari `INTERNAL_GATEWAY_KEY`**. Alasannya penting: gateway memasang header `BIP-Gateway-ID` untuk SETIAP permintaan yang lolos JWT, jadi rute yang hanya bersandar padanya terbuka bagi semua karyawan yang sudah login lewat `/api/monitoring/kpi/uptime` (lihat [[ADR - 0031 Prefix Internal Bukan Batas Keamanan]]). Kunci yang belum dikonfigurasi **menutup** rute, bukan membukanya.
+**Rute KPI** dipanggil MESIN (employee-service), yang tidak membawa identitas pemakai sehingga tak punya izin apa pun. Gerbangnya `MONITORING_SERVICE_KEY` — **terpisah dari `INTERNAL_GATEWAY_KEY`**. Alasannya penting: gateway memasang header `BIP-Gateway-ID` untuk SETIAP permintaan yang lolos JWT, jadi rute yang hanya bersandar padanya terbuka bagi semua karyawan yang sudah login lewat `/api/monitoring/kpi/uptime` (lihat [[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Kunci yang belum dikonfigurasi **menutup** rute, bukan membukanya.
 
 Muatan KPI sengaja agregat saja, tanpa daftar monitor: nama monitor memaparkan topologi infrastruktur, sedangkan penilaian hanya butuh satu angka.
 
@@ -109,5 +109,5 @@ Angka 23 hari untuk Juli mengonfirmasi heartbeat terawal 9 Juli 2026 secara empi
 - [[HRIS - Otomasi Skor KPI]] — analisis kelayakan otomasi skor KPI
 - [[RUN - Menambah Metrik KPI Otomatis]] — cara menambah sumber metrik baru
 - [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] — batas service pengumpul
-- [[ADR - 0031 Prefix Internal Bukan Batas Keamanan]] — kenapa rute KPI butuh kunci sendiri
+- [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] — kenapa rute KPI butuh kunci sendiri
 - [[IT - Server, VMs and Databases]] — VPS produksi tempat Uptime Kuma berjalan

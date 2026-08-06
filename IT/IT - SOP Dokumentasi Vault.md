@@ -66,6 +66,11 @@ Konsep & implementasi **saling di-link**: konsep di folder domain ↔ implementa
 
 - **Grounded-in-code** (`CLAUDE.md` §1): tulis hanya yang ada di kode/sumber. Belum ada → **TBD**. Rencana ≠ implementasi → catat gap eksplisit. **Jangan mengarang.**
 - **Status marker** di awal dok (`CLAUDE.md` §5): ✅ Implemented · ⚠️ Implemented (ada catatan) · 🟡 Konsep/Draft · 🔴 Stub.
+  **Dua bentuk penulisan sama-sama sah**, ditetapkan template masing-masing — pakai yang sesuai template dok yang sedang ditulis, jangan dicampur:
+  - `- **Status**: ✅ ...` — bullet di dalam `## Deskripsi`. Dipakai [[Template - Implementasi Service]] & [[Template - Konsep Domain]].
+  - `> **Status**: ⚠️ ...` — blockquote di baris pertama. Dipakai [[Template - Runbook]].
+
+  Keduanya dibaca `VAULT-INDEX.json` dan muncul di `/ask`. **Harus di 15 baris pertama** — di bawah itu tak terbaca (mencegah heading seperti `## Status Rollout` ikut tertangkap). Sampai 2026-08-06 parser hanya mengenali bentuk bullet, sehingga seluruh runbook terbaca tanpa status; kalau menemui dok yang statusnya jelas ada tapi tak muncul di index, curigai formatnya lebih dulu.
 - **Wikilink 0-broken** (`CLAUDE.md` §4): semua `[[...]]` harus resolve sebelum commit; embed gambar harus ada filenya.
 - **Bahasa**: Indonesia; istilah teknis tetap English (endpoint, service, request, JWT, dll).
 - **Pengecualian**: dok di `Logs/` & file di `Templates/` **dikecualikan** dari grounded/status/template (point-in-time record & scaffold). Dok di `Workspace/` (Inbox + Meetings) **dikecualikan** dari grounded/status/template **dan** dari gate wikilink 0-broken (§4) — privat, tidak di-publish. `Runbooks/` **tidak** dikecualikan (grounded penuh + di-publish).
