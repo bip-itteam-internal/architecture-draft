@@ -7,6 +7,7 @@
 - **Sudah diimplementasikan (✅) di modul Aset**: daftar + kartu ringkasan (jumlah per status + biaya), pencarian/filter/paginasi client-side, **kolom Karyawan Pemegang** (kosong → "Tersedia di GA"), detail bertab, dan **export Excel**.
 - **Serah-terima aset (✅)**: pemegang **opsional** saat buat; alur **Serahkan → menunggu persetujuan SPV → SPV setujui** (tombol Setujui hanya untuk **SPV penaung** departemen penyerah — GA jatuh ke **SPV HR** via `supervised_by`), + **Tarik/Kembalikan**. Bukti serah-terima = **upload dokumen** (mengganti catatan teks).
 - **Lokasi & penyusutan (✅)**: aset punya **lokasi** (input manual) & **masa manfaat**; **nilai buku ditampilkan sebagai ESTIMASI** (garis lurus, dihitung frontend) — **bukan** angka pembukuan resmi (akuntansi via Accurate, [[ADR - 0001 Akuntansi via Accurate]]).
+- **Rekonsiliasi aset ↔ Accurate untuk KPI (⚠️ Fase 1 ✅, Fase 2 konsep)**: modul Aset kini **3 tab** — Kelola Aset · **Data Accurate** (Aktiva Tetap Accurate + editor pemetaan kategori→golongan) · **Cocokkan** (ceklis per-item + skor **Akurasi/Cakupan/KPI** + matrix per-golongan). Staff GA mencocokkan aset ERP dengan Aktiva Tetap Accurate; aset yang **belum ada di Accurate dihitung 100%** (input Accurate = wewenang Finance, bukan GA) sehingga mendorong koordinasi GA↔Finance. **Feed skor ke KPI (Fase 2) belum jalan.** Desain & keputusan: [[ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI]].
 - Terkait erat dengan [[GA - Procurement System]] (sumber masuknya barang) & [[WH - Management System]] (master data).
 
 ## Latar Belakang

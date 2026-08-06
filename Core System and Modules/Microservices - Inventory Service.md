@@ -17,10 +17,11 @@ _Inventory Service adalah microservice untuk manajemen **aset/inventaris General
   - `GET /item/master/:master_id/spec-template` — ambil template spesifikasi per master
   - `POST /item/` — create item; auto-create/reuse `DataMaster`, generate ID pola **`INV-BIP-DDMMYY-NAMA-n`** (DDMMYY dari `purchase_date` dibaca **WIB**; `NAMA` = `item_name` di-UPPERCASE tanpa spasi, maks 20 char; `n` = increment). Validasi spec; **pemegang (`held_by`) OPSIONAL** (aset boleh lahir "Tersedia di GA", diserahkan belakangan); simpan `location` & `useful_life_years` (opsional); verifikasi dokumen ada di MinIO sebelum simpan
   - `POST /item/upload/presigned-url` + `GET /item/upload/presigned-get` — MinIO presigned URL (upload/get); document yang diizinkan: `purchase` · `arrived` · **`handover`**; nama objek dibersihkan (`sanitizeObjectName`)
-  - `GET /item/:id` — detail item (termasuk `location`, `useful_life_years`, jejak serah-terima, dokumen)
-  - `PATCH /item/:id` — partial update (juga jalur **serahkan/ubah pemegang**: kirim `held_by`)
+  - `GET /item/:id` — detail item (termasuk `location`, `useful_life_years`, jejak serah-terima, dokumen, `accurate_asset_no`/`reconciled_at`)
+  - `PATCH /item/:id` — partial update (juga jalur **serahkan/ubah pemegang**: kirim `held_by`; **dan ceklis rekonsiliasi**: kirim `accurate_asset_no` — non-kosong → stempel `reconciled_at`, kosong → lepas pasangan)
   - `DELETE /item/:id` — hapus item
-- **List item:** `GET /items` — list `$lookup` ke master + filter `?status`. Respons memuat `held_by` (+ jejak serah-terima), `purchase_price`, `location`, `useful_life_years` (dipakai kolom & **export Excel** di FE)
+- **List item:** `GET /items` — list `$lookup` ke master + filter `?status`. Respons memuat `held_by` (+ jejak serah-terima), `purchase_price`, `location`, `useful_life_years`, `accurate_asset_no`/`reconciled_at` (dipakai kolom, **export Excel**, & ceklis rekonsiliasi di FE)
+- **Pemetaan kategori → golongan Accurate** (ADR-0037): `GET /category-mapping` (publik, dipakai FE Tab B/C), `POST /category-mapping` (upsert, dedup `category_key`), `DELETE /category-mapping/:id` — dua terakhir gate `RequireGeneralAffair`. Unique index `category_key` (`ensureCategoryMappingIndex`)
 - **Serah-terima aset (di luar grup `/item`):** `PATCH /item/:id/approve-handover` — **persetujuan SPV** atas penyerahan. **Bukan** di-gate `RequireGeneralAffair` (penyetuju = SPV, bukan GA); gate manual: departemen penyerah (`held_by.handover_dept`) harus ada di cakupan supervisi pemanggil (`common.SupervisedDepartments`, header `BIP-Supervised-Departments`). Set `handover_status=disetujui` + rekam SPV penyetuju
 - **Repair history** (`/item/repair`):
   - `POST /item/repair/:item_id` — tambah riwayat perbaikan; sinkron status ke item induk
@@ -39,14 +40,15 @@ _Inventory Service adalah microservice untuk manajemen **aset/inventaris General
 - **Serah-terima aset (`HeldBy`)**: alur = **Serahkan/Ubah Pemegang** (GA, via `PATCH /item/:id`) → `handover_status=menunggu_spv`, rekam penyerah (`handover_by`) & departemen penyerah (`handover_dept`) → **SPV penaung menyetujui** (`PATCH /item/:id/approve-handover`) → rekam `known_by_spv` + `handover_status=disetujui`. **Tarik/Kembalikan** = kosongkan pemegang + set `revoked_at` → "Tersedia di GA". Catatan pengganti tanda tangan surat serah terima = **`handover_document`** (upload, menggantikan catatan teks lama `handover_notes` yang kini deprecated).
 - **Lokasi & penyusutan**: `InventoryItem` + `location` (string) & `useful_life_years` (opsional). **Nilai buku & penyusutan/tahun TIDAK disimpan** — dihitung di **frontend** (garis lurus, residu 0) sebagai *estimasi operasional GA*, bukan angka pembukuan (akuntansi via Accurate, lihat [[ADR - 0001 Akuntansi via Accurate]]).
 - **Export**: daftar aset diekspor ke Excel **client-side** (frontend, `lib/export.ts`/exceljs) dari data `GET /items` yang terfilter — tak ada endpoint export di service.
+- **Rekonsiliasi aset ↔ Accurate (ADR-0037, Fase 1 ✅)**: `InventoryItem` + `accurate_asset_no` & `reconciled_at`; koleksi `asset_category_mapping` memetakan kategori-ERP (bebas-ketik) → golongan Aktiva Tetap Accurate. **Komputasi rekonsiliasi 100% di frontend** — service ini **tetap tak memanggil siapa pun**: FE mengomposisi `GET /items` (inventory) + `GET /accounting/fixed-assets` ([[Microservices - Integration Service]]) + pemetaan, menghitung skor (akurasi/cakupan/KPI, aturan ERP-only=100%) & menyimpan pasangan lewat `PATCH /item/:id`. FE modul Aset kini **3 tab**: Kelola Aset · Data Accurate (tabel FAT + editor pemetaan) · Cocokkan (ceklis + matrix per-golongan). **Feed KPI (Fase 2) belum** — lihat [[ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI]].
 
 ## Dependencies & Integrasi
 
-- **MongoDB** — collection: `inventory`, `data_master`, `repair_history`, `category`.
+- **MongoDB** — collection: `inventory`, `data_master`, `repair_history`, `category`, `asset_category_mapping`.
 - **MinIO** — diakses langsung untuk presigned URL serta upload image/PDF (limit 4MB); objek diverifikasi ada sebelum referensinya disimpan. Lihat [[Microservices - File Service]].
 - Diekspos via gateway — lihat [[CORE - API Master Gateway]].
 - Skema database — lihat [[DB - Overview and Notes]].
 
 ## Dokumen Terkait
 
-- [[GA - Inventory Management]]
+- [[GA - Inventory Management]] · [[ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI]] · [[Microservices - Integration Service]] · [[External - Accurate]]

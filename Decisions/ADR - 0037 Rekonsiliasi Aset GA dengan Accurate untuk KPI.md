@@ -1,6 +1,6 @@
 ## ADR 0037 — Rekonsiliasi Aset GA ↔ Accurate: ceklis per-item untuk KPI, matrix per-golongan untuk kesehatan data
 
-- **Status**: 🟡 Proposed / Draft — belum ada di kode (diusulkan 2026-08-06)
+- **Status**: ⚠️ Accepted — **Fase 0 & 1 Implemented** (2026-08-06): `accurate_asset_no`/`reconciled_at` + koleksi `asset_category_mapping` + rute `/category-mapping` ([[Microservices - Inventory Service]]); FE 3 tab (Kelola/Data Accurate/Cocokkan) dengan reconcile client-side. **Fase 2 (feed KPI via ADR-0032) masih konsep.**
 - **Konteks dok**: [[GA - Inventory Management]] · [[Microservices - Inventory Service]] · [[Microservices - Integration Service]] · [[External - Accurate]]
 - **ADR terkait**: [[ADR - 0001 Akuntansi via Accurate]] · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] · [[ADR - 0002 Database-per-Service]]
 

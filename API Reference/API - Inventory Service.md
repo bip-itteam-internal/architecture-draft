@@ -12,6 +12,9 @@
 | GET | `/data-type/category` · `/electronics` · `/item-status` · `/repair` · `/service` · `/repair-status` · `/component-action` | Enum | publik |
 | GET | `/categories` | Daftar kategori (registry, saran) | publik |
 | POST | `/categories` | Daftar kategori baru (bebas-ketik, disimpan apa adanya) | GeneralAffair |
+| GET | `/category-mapping` | Pemetaan kategori-ERP → golongan-Accurate (ADR-0037, dipakai FE Tab B/C) | publik |
+| POST | `/category-mapping` | Upsert pemetaan (dedup `category_key`) | GeneralAffair |
+| DELETE | `/category-mapping/:id` | Hapus pemetaan | GeneralAffair |
 | GET | `/summary` | Ringkasan (jumlah + biaya) | publik |
 | GET | `/health` | Health check | publik |
 
@@ -20,7 +23,7 @@
 |---|---|---|---|
 | POST | `/item` | Buat item inventaris | GeneralAffair |
 | GET | `/items` | List item | publik |
-| GET/PATCH/DELETE | `/item/:id` | Detail/update/hapus item (PATCH juga = serahkan/ubah pemegang) | GeneralAffair |
+| GET/PATCH/DELETE | `/item/:id` | Detail/update/hapus item (PATCH juga = serahkan/ubah pemegang **& ceklis rekonsiliasi** via `accurate_asset_no`) | GeneralAffair |
 | PATCH | `/item/:id/approve-handover` | SPV menyetujui serah-terima | **SPV penaung** (gate `SupervisedDepartments`, bukan GeneralAffair) |
 | GET | `/item/master/:master_id/spec-template` | Template spesifikasi | GeneralAffair |
 | POST/GET | `/item/upload/presigned-url` · `/item/upload/presigned-get` | Presigned upload/download dokumen (`purchase` · `arrived` · `handover`) | GeneralAffair |
@@ -51,11 +54,17 @@ Detail berikut grounded ke `services/inventory` (`controller.go`, `validation.go
 
 ### `PATCH /item/:id` — update (partial)
 - **Partial update**: hanya field yang dikirim yang di-`$set` (`buildUpdateBson`); semua field opsional. `held_by` di-set hanya bila dikirim (tanpa validasi wajib, beda dari create). Balas `400 "No update fields"` bila tidak ada field.
+- **Ceklis rekonsiliasi (ADR-0037)**: kirim `accurate_asset_no` untuk mengonfirmasi/lepas pasangan aset ke Aktiva Tetap Accurate. Non-kosong → `$set accurate_asset_no` + stempel `reconciled_at`; string kosong → `$unset` keduanya (lepas pasangan). `updated_at` tetap distempel walau perubahan hanya `$unset`.
 - Grounded: `UpdateInventory` + `buildUpdateBson`.
 
 ### `GET /items` — list
-- Mengembalikan **seluruh** item (⚠️ **tanpa pagination/search**). Hanya query `?status=` yang dihormati untuk filter server-side; `page` / `limit` / `search` **diabaikan**. Pencarian, filter, **dan paginasi** dilakukan **client-side** di frontend (list page: 10/hal). Respons menyertakan `held_by` (+ jejak serah-terima `handover_status`/`handover_by`/`known_by_spv`; ditampilkan kolom "Karyawan Pemegang", kosong → "Tersedia di GA"), serta `purchase_price`, `location`, `useful_life_years` — dipakai kolom & **export Excel** (FE, `lib/export.ts`). Nilai buku/penyusutan dihitung FE (estimasi garis lurus).
+- Mengembalikan **seluruh** item (⚠️ **tanpa pagination/search**). Hanya query `?status=` yang dihormati untuk filter server-side; `page` / `limit` / `search` **diabaikan**. Pencarian, filter, **dan paginasi** dilakukan **client-side** di frontend (list page: 10/hal). Respons menyertakan `held_by` (+ jejak serah-terima `handover_status`/`handover_by`/`known_by_spv`; ditampilkan kolom "Karyawan Pemegang", kosong → "Tersedia di GA"), serta `purchase_price`, `location`, `useful_life_years`, `accurate_asset_no`/`reconciled_at` — dipakai kolom, **export Excel** (FE, `lib/export.ts`), & **ceklis rekonsiliasi** (Tab Cocokkan). Nilai buku/penyusutan dihitung FE (estimasi garis lurus).
 - Grounded: `ListInventory` + `InventoryListResponse`.
+
+### `/category-mapping` — pemetaan kategori-ERP → golongan-Accurate (ADR-0037)
+- `GET` (publik) balas seluruh pemetaan; `POST` (GA) upsert by `category_key` (kategori dinormalisasi `NormalizeCategoryKey` = lowercase + rapikan spasi) — kategori yang sama **menimpa**, bukan menggandakan; `DELETE /:id` (GA) hapus satu. Unique index `category_key`.
+- Dipakai FE Tab B (editor) & Tab C (mengelompokkan aset per golongan untuk saran pasangan + matrix). Golongan Accurate diambil live dari `GET /accounting/fixed-assets` ([[API - Integration Service]]).
+- Grounded: `ListCategoryMapping` · `UpsertCategoryMapping` · `DeleteCategoryMapping` (`mapping.go`).
 
 ### `GET /summary` — ringkasan (jumlah + biaya)
 - Respons: `{ data: { overview: [{ total_assets, new_arrivals, total_purchase_cost }], by_category: [{ category, total }], by_status: [{ status, total }], by_department: [{ department, total }], total_repair_cost } }`. `new_arrivals` = item dengan `arrived_date` ≤ 30 hari terakhir. `total_purchase_cost` = Σ `purchase_price`; `total_repair_cost` = Σ biaya dari `repair_history`.
@@ -67,4 +76,4 @@ Detail berikut grounded ke `services/inventory` (`controller.go`, `validation.go
 - Grounded: `UploadRules` + `ValidateFileMeta` + `ValidateDocumentsExists`.
 
 ## Dokumen Terkait
-- [[Microservices - Inventory Service]] · [[GA - Asset Loan & Room Booking]] · [[API - Index]]
+- [[Microservices - Inventory Service]] · [[GA - Asset Loan & Room Booking]] · [[API - Index]] · [[ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI]] · [[API - Integration Service]]
