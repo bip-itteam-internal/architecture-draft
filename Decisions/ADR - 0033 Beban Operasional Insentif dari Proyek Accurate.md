@@ -1,6 +1,6 @@
 # ADR - 0033 Beban Operasional Insentif dari Proyek Accurate
 
-✅ **Accepted** — 2026-08-02. Terkait: [[ADR - 0001 Akuntansi via Accurate]], [[ADR - 0002 Database-per-Service]].
+**Status**: ✅ **Accepted** — 2026-08-02. Terkait: [[ADR - 0001 Akuntansi via Accurate]], [[ADR - 0002 Database-per-Service]].
 
 ## Context
 

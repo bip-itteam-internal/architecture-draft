@@ -2691,8 +2691,8 @@
       "judul": "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "✅",
+      "status_teks": "**Implemented** (kode + deploy 2026-07-17)",
       "publik": true,
       "tautan": [
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
@@ -2703,7 +2703,7 @@
         "Microservices - Integration Service",
         "APP - Web ERP"
       ],
-      "hash": "a41a980b5d511635062ae9df8a2abfc40849ccf4e1969910f46827fc094470ee",
+      "hash": "72f084f59221811cb0987a43012ba888bbc5923a04c782fc21ff4de15eb287ce",
       "ukuran_kb": 4.8,
       "ringkasan": "Menjawab bagaimana beberapa retur yang berbagi faktur sumber dan tanggal retur direkap jadi satu dokumen Retur Penjualan di Accurate, kenapa kunci grup wajib memuat nomor faktur, dan bagaimana mekanisme rebuild serta guard anti-dobel bekerja.",
       "kata_kunci": [
@@ -2723,8 +2723,8 @@
       "judul": "ADR - 0017 Tanggal Retur TikTok via order_update_date",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "✅",
+      "status_teks": "**Implemented** (kode + deploy 2026-07-17; 19 dokumen prod dikoreksi)",
       "publik": true,
       "tautan": [
         "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
@@ -2732,8 +2732,8 @@
         "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
         "Microservices - Integration Service"
       ],
-      "hash": "9535c7aa27ea11e10f473f2a724893153acbb57826d6a04571e3427efd8d9ad2",
-      "ukuran_kb": 4.9,
+      "hash": "076b1a4fb212adebd3801ec7b3443d492438a6a76da2345516b17d06f0ada9bb",
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab sumber tanggal yang dipakai untuk membukukan retur TikTok ke Accurate: kenapa update_time menyesatkan (ikut mundur karena settle refund) dan kenapa order_update_date dipilih sebagai gantinya, serta perbaikan zona waktu WIB untuk penomoran dokumen retur (RTR).",
       "kata_kunci": [
         "tanggal retur",
@@ -2751,8 +2751,8 @@
       "judul": "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "✅",
+      "status_teks": "**Implemented** (faktur permanen: PR #511; cabut guard HIGH-C: 2026-07-17; cancel pasca-kirim → retur: 2026-07-18; guardian wired + fix titik-baca dead-sub-doc: 2026-07-22)",
       "publik": true,
       "tautan": [
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
@@ -2762,7 +2762,7 @@
         "Microservices - Integration Service",
         "ADR - 0017 Tanggal Retur TikTok via order_update_date"
       ],
-      "hash": "2c71e83d0362cf083e08fbf7e72b847f15c4bc8396473c9d1af7f5755c1762db",
+      "hash": "c856188fec160816171f563ebb49ffcaa37897de8dbfba7902666b4d17c5971e",
       "ukuran_kb": 7.3,
       "ringkasan": "Menjawab: kenapa Faktur Penjualan di sistem finance tidak pernah diubah/dihapus setelah terbit, dan kenapa semua pembalikan (retur maupun pembatalan pasca-kirim) harus lewat dokumen Retur Penjualan alih-alih line-drop. Juga menjawab: apa itu guard 'HIGH-C' yang dicabut, bagaimana pembatalan COD/pasca-kirim disintesis jadi retur, dan bug apa yang sempat menyebabkan retur tak terbukukan diam-diam di faktur auto-sync.",
       "kata_kunci": [
@@ -2918,8 +2918,8 @@
       "judul": "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (sebagian digantikan)** — keputusan **#1 (tanggal accepted-seragam)** **digantikan** [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] (2026-07-18). Keputusan **#2**: struktur **split** (2 konstanta) tetap, TAPI **basis cutover retur diubah tanggal-retur → hari-kirim** (2026-07-19, ADR-0024).",
       "publik": true,
       "tautan": [
         "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
@@ -2928,7 +2928,7 @@
         "Microservices - Integration Service",
         "APP - Web ERP"
       ],
-      "hash": "de21387a718319473076347d6c052babf13fdb10073058adb0d40e5f00f3004b",
+      "hash": "941f1db418adcb3c3b19f95f795a195624b0f5b72344a6f4b55a31cd42299594",
       "ukuran_kb": 5.1,
       "ringkasan": "Menjawab keputusan awal soal tanggal retur (memakai tanggal accepted marketplace secara seragam lintas channel) dan kenapa cutover auto-sync faktur dipisah dari cutover retur (basis tanggal berbeda), termasuk kasus retur 'yatim' yang sempat tak bisa dibukukan.",
       "kata_kunci": [
@@ -2946,8 +2946,8 @@
       "judul": "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "✅",
+      "status_teks": "**Implemented & Deployed** (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel). **Amandemen 2026-08-05 (✅ DEPLOYED 2026-08-05, commit `779b0a06`; verifikasi prod: 38 baris jejak tersemai, dari 1):** janji \"SKIP → baris `SKIPPED`\" di Decision #1 akhirnya benar-benar dipenuhi — sebelumnya baris hanya ditandai bila kebetulan sudah ada, sehingga mayoritas retur payout>0 **tak berjejak sama sekali** di UI; sekaligus menutup lubang dobel-booking lewat konfirmasi gudang yang baru terlihat setelah baris jejak itu ada. Lihat Consequences.",
       "publik": true,
       "tautan": [
         "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
@@ -2959,8 +2959,8 @@
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur"
       ],
-      "hash": "e4f0ed53c6d0341daf376ea12d805e4da3f94f007305e43c77486d9c60c9d6f2",
-      "ukuran_kb": 17.1,
+      "hash": "5ef3b09e984c6e713fa8c69736824e065dbb93c942dc47b72277675bf0cad740",
+      "ukuran_kb": 17.0,
       "ringkasan": "Menjawab: kapan sebuah retur marketplace dibukukan sebagai Retur Penjualan di Accurate dan kapan justru di-skip karena refund-nya sudah diserap jalur Auto Sync Income, lewat gerbang payout (payout nol vs payout lebih dari nol) sehingga dobel pembukuan tidak terjadi. Juga menjawab tanggal apa yang dipakai per jenis solution retur (cancelled_at, requested_at, tanggal barang sampai gudang, order_update_date untuk TikTok), mengapa cutover retur mengikuti hari kirim faktur alih-alih tanggal retur, dan mengapa retur yang di-skip tetap wajib meninggalkan baris jejak SKIPPED di UI.",
       "kata_kunci": [
         "retur",
@@ -3277,8 +3277,8 @@
       "judul": "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "✅",
+      "status_teks": "**Accepted** — 2026-08-02. Terkait: [[ADR - 0001 Akuntansi via Accurate]], [[ADR - 0002 Database-per-Service]].",
       "publik": true,
       "tautan": [
         "ADR - 0001 Akuntansi via Accurate",
@@ -3291,7 +3291,7 @@
         "Microservices - Integration Service",
         "API - Integration Service"
       ],
-      "hash": "6893428313cda077b98a500eaf5371face989ea3493310e3b76418785872b943",
+      "hash": "067712344405f4a51dfe830b6ab8f19ce78e74873264a026a47a3ab3cc8e1d1c",
       "ukuran_kb": 4.9,
       "ringkasan": "Menjawab: dari mana angka biaya operasional pada rumus insentif diambil, yaitu beban karyawan dari payroll dan beban non-gaji dari saldo akun per proyek di Accurate yang berkode employee id. Juga menjawab kenapa filternya wajib memakai nomor proyek dan bukan nama proyek, kenapa akun induk 6000 tak boleh dipakai mentah-mentah, akun mana saja yang dikecualikan beserta alasannya, dan konsekuensi apa yang harus diterima selama datanya belum terisi.",
       "kata_kunci": [
@@ -3528,8 +3528,8 @@
       "judul": "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "✅",
+      "status_teks": "**Implemented & Deployed** (2026-08-06, PR #1017 commit `35b1860d`; koreksi data existing Juli+Agustus **SELESAI** hari yang sama). Menyempurnakan pembentukan baris Retur Penjualan untuk SKU **paket/bundle** — uang mengikuti harga paket di faktur, stok tetap mengikuti pecahan komponen.",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
@@ -3538,8 +3538,8 @@
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur"
       ],
-      "hash": "06b5d1c8ea965f65845eccb3f1243adc116d969dd04186cc5fc04faae58de577",
-      "ukuran_kb": 6.5,
+      "hash": "f53b6f9857a01b6b4d2dc6f82cd6fb2c6b458c277697fd1bd47e4e4bf19e8f7e",
+      "ukuran_kb": 6.4,
       "ringkasan": "Menjawab: bagaimana retur SKU paket/bundle dibentuk ke Accurate — membukukan BARIS INDUK paket seharga faktur (Accurate sendiri yang menurunkan sub-baris komponen @Rp0 penggerak stok), bukan memecahnya jadi komponen berharga yang totalnya bisa melampaui harga paket. Juga menjawab: bagaimana retur sebagian paket dinilai (alokasi proporsional dari nilai induk, largest remainder, bobot harga satuan all-or-nothing), mengapa refund per item dari marketplace tak bisa dipakai sebagai bobot (SKU retur selalu SKU listing), dan konsekuensinya pada bentuk dokumen retur, `lines_hash`, kopling ke kebijakan kondisi barang, serta guard nilai over-retur yang tetap audit-only.",
       "kata_kunci": [
         "retur paket",
@@ -3598,8 +3598,8 @@
       "judul": "Finance - Big Pictures",
       "area": "Finance System",
       "jenis": "domain",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "🟡",
+      "status_teks": "**Konsep / Overview** — peta domain Finance System: sistem lama terenkapsulasi (sinkron ke Accurate), direncanakan dibangun ulang dari awal.",
       "publik": true,
       "tautan": [
         "External - Accurate",
@@ -3607,7 +3607,7 @@
         "Finance - Incentive",
         "Vendor - CRM"
       ],
-      "hash": "8f05ff08972f1f8e9d8e0f6b849824cd3cf1208454013224c987490475b808d8",
+      "hash": "e327207691fffadbb4060116c9f4d34b79280252004eb0ccf7f6f05b99be4c31",
       "ukuran_kb": 0.9,
       "ringkasan": "Menjawab gambaran besar domain Finance System: bagaimana sistem finance saat ini menjembatani data ke Accurate, dan kenapa sistem lama itu sengaja tidak ditautkan detail ke arsitektur karena ada rencana dibangun ulang dari awal.",
       "kata_kunci": [
@@ -3624,8 +3624,8 @@
       "judul": "Finance - Bridging App New Golang",
       "area": "Finance System",
       "jenis": "domain",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — Fitur utama berjalan; beberapa endpoint direct-push Accurate masih di-comment dan digantikan alur summary-report.",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
@@ -3637,8 +3637,8 @@
         "Finance - Big Pictures",
         "Sales - Marketplace Integration"
       ],
-      "hash": "ef3638af9ecf55233e212c73376c5be52c44a23de12cb237d1fc13d2abc6833f",
-      "ukuran_kb": 16.3,
+      "hash": "ee317d4d8664cf3c5227bcf8d3d018f9648ff0b9fdc9228e35cc31d4144a5c89",
+      "ukuran_kb": 15.9,
       "ringkasan": "Menjawab endpoint dan alur kerja Finance Bridging versi Golang (penulisan ulang dari sistem Java): bagaimana membuat dan mengirim ringkasan transaksi Sales/Income/Return ke Accurate, halaman FE terkait per channel, status ringkasan, serta setting toko dan mapping produk.",
       "kata_kunci": [
         "Finance Bridging Golang",
@@ -3655,8 +3655,8 @@
       "judul": "Finance - Bridging App",
       "area": "Finance System",
       "jenis": "domain",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — sistem Finance **lama** (Java/PostgreSQL/ReactJS), masih berjalan; sedang dimigrasi ke Golang. Lihat [[Finance - Bridging App New Golang]].",
       "publik": true,
       "tautan": [
         "Finance - Bridging App New Golang",
@@ -3664,8 +3664,8 @@
         "External - Accurate",
         "Finance - Incentive"
       ],
-      "hash": "79b41bbe9d303ffaf640eb2616506eeb8d8ffe11e3b560a73e79a63d32bb659f",
-      "ukuran_kb": 19.6,
+      "hash": "8a3dba53269a5104fd1106064d8ed8159f96a7207b2c5a97ffc4a66f7a399504",
+      "ukuran_kb": 19.5,
       "ringkasan": "Menjawab fitur dan struktur sistem Finance lama (Java/PostgreSQL/ReactJS) sebagai jembatan antara Accurate dan marketplace: master data, upload Excel per platform (TikTok/Shopee/Lazada/Tokopedia/KiriminAja), sinkronisasi ke Accurate, dan lokasi repositori kodenya.",
       "kata_kunci": [
         "Finance Bridging lama",
@@ -3708,8 +3708,8 @@
       "judul": "Finance - Incentive",
       "area": "Finance System",
       "jenis": "domain",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — sejak **2026-07-30** skemanya **profit-based untuk SELURUH jabatan** (SK 010/DIR/Rev-SK6/VII/2026 & SK 011/DIR/SK6/VII/2026). Perhitungannya sudah di kode dan ter-test; yang menahan pemakaian adalah master data yang belum terisi, bukan enginenya. Backend: [[Microservices - Insentive Service]].",
       "publik": true,
       "tautan": [
         "Microservices - Insentive Service",
@@ -3725,8 +3725,8 @@
         "Finance - Bridging App",
         "HRIS - Compensation & Benefits"
       ],
-      "hash": "1861549712902e53a4f40a0bae2b801580f0c1df09c068fc81662b167e869167",
-      "ukuran_kb": 19.8,
+      "hash": "4438b6b78b580047c15c7524e71a6058e257938add761fd4e2c2144d996f5e42",
+      "ukuran_kb": 19.5,
       "ringkasan": "Menjawab: skema insentif tim marketing yang berlaku menurut SK 010 dan 011/2026 (profit-based lintas jabatan), tabel tarif per persentase pencapaian target, aturan gerbang retur 7%, dasar perhitungan uang cair, dan aturan hangus untuk order yang belum cair sampai tanggal 25. Juga memuat isi SK lama berbasis KPI-multiplier per jabatan (SPV Marketing, Advertiser, ICC, Host Live, Affiliator, CS, CRM) sebagai riwayat, plus daftar hal yang masih menahan pemakaiannya.",
       "kata_kunci": [
         "insentif marketing",
@@ -5392,8 +5392,8 @@
       "judul": "HRIS - Recruitment Roadmap (Adopsi ERPGo)",
       "area": "Human Resource Information System",
       "jenis": "domain",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "🟡",
+      "status_teks": "**Konsep / Roadmap** — pemetaan fitur modul Recruitment **ERPGo SaaS (WorkDo)** terhadap implementasi **bip-erp** saat ini + rekomendasi apa yang layak diadopsi, **disesuaikan dengan kondisi & keputusan perusahaan**. Bagian \"Status\" grounded ke kode (`services/recruitment` + `erp-frontend`); bagian \"Rekomendasi\" bersifat usulan (belum diputuskan kecuali ditandai).",
       "publik": true,
       "tautan": [
         "Microservices - Recruitment Service",
@@ -5403,7 +5403,7 @@
         "HRIS - Recruitment",
         "HRIS - Key Performance Index"
       ],
-      "hash": "e2c6094c53cbb4145fe180044f1d0721a4f08e421ab9733c387c774ae37650d0",
+      "hash": "65fe4c84e7d3305bdd880baa9006c43ec1240bb09d17c2e59e4489b6455d7823",
       "ukuran_kb": 11.0,
       "ringkasan": "Menjawab: fitur apa saja dari modul Recruitment ERPGo (job requisition, job posting, candidate, dashboard, offer & onboarding) yang sudah diadopsi bip-erp, apa yang sengaja tidak diadopsi (custom questions, dll), dan rekomendasi prioritas pengembangan berikutnya (mis. tanggal kedaluwarsa offer, status inline).",
       "kata_kunci": [

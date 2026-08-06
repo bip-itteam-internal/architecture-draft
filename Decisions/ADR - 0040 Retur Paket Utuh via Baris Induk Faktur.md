@@ -1,4 +1,4 @@
-✅ **Implemented & Deployed** (2026-08-06, PR #1017 commit `35b1860d`; koreksi data existing Juli+Agustus **SELESAI** hari yang sama). Menyempurnakan pembentukan baris Retur Penjualan untuk SKU **paket/bundle** — uang mengikuti harga paket di faktur, stok tetap mengikuti pecahan komponen.
+**Status**: ✅ **Implemented & Deployed** (2026-08-06, PR #1017 commit `35b1860d`; koreksi data existing Juli+Agustus **SELESAI** hari yang sama). Menyempurnakan pembentukan baris Retur Penjualan untuk SKU **paket/bundle** — uang mengikuti harga paket di faktur, stok tetap mengikuti pecahan komponen.
 
 # ADR - 0040 Retur Paket Utuh: Bukukan BARIS INDUK Faktur, Bukan Komponen
 

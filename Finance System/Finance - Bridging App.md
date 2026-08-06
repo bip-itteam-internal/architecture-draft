@@ -1,6 +1,6 @@
 # Finance System – Bridging Accurate & Marketplace
 
-⚠️ **Implemented (ada catatan)** — sistem Finance **lama** (Java/PostgreSQL/ReactJS), masih berjalan; sedang dimigrasi ke Golang. Lihat [[Finance - Bridging App New Golang]].
+**Status**: ⚠️ **Implemented (ada catatan)** — sistem Finance **lama** (Java/PostgreSQL/ReactJS), masih berjalan; sedang dimigrasi ke Golang. Lihat [[Finance - Bridging App New Golang]].
 
 ## Deskripsi
 

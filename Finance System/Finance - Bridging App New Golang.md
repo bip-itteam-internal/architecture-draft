@@ -1,6 +1,6 @@
 # Finance - Bridging App (Golang Rewrite)
 
-⚠️ **Implemented (ada catatan)** — Fitur utama berjalan; beberapa endpoint direct-push Accurate masih di-comment dan digantikan alur summary-report.
+**Status**: ⚠️ **Implemented (ada catatan)** — Fitur utama berjalan; beberapa endpoint direct-push Accurate masih di-comment dan digantikan alur summary-report.
 
 ## Deskripsi
 

@@ -1,4 +1,4 @@
-✅ **Implemented** (kode + deploy 2026-07-17; 19 dokumen prod dikoreksi)
+**Status**: ✅ **Implemented** (kode + deploy 2026-07-17; 19 dokumen prod dikoreksi)
 
 # ADR - 0017 Tanggal Retur TikTok via `order_update_date`
 

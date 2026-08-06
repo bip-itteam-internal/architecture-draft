@@ -1,4 +1,4 @@
-✅ **Implemented** (faktur permanen: PR #511; cabut guard HIGH-C: 2026-07-17; cancel pasca-kirim → retur: 2026-07-18; guardian wired + fix titik-baca dead-sub-doc: 2026-07-22)
+**Status**: ✅ **Implemented** (faktur permanen: PR #511; cabut guard HIGH-C: 2026-07-17; cancel pasca-kirim → retur: 2026-07-18; guardian wired + fix titik-baca dead-sub-doc: 2026-07-22)
 
 # ADR - 0018 Faktur Permanen — Semua Pembalikan via Retur Penjualan
 

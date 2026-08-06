@@ -1,6 +1,6 @@
 # Sistem Insentif untuk Adv dan SPV Marketing
 
-⚠️ **Implemented (ada catatan)** — sejak **2026-07-30** skemanya **profit-based untuk SELURUH jabatan** (SK 010/DIR/Rev-SK6/VII/2026 & SK 011/DIR/SK6/VII/2026). Perhitungannya sudah di kode dan ter-test; yang menahan pemakaian adalah master data yang belum terisi, bukan enginenya. Backend: [[Microservices - Insentive Service]].
+**Status**: ⚠️ **Implemented (ada catatan)** — sejak **2026-07-30** skemanya **profit-based untuk SELURUH jabatan** (SK 010/DIR/Rev-SK6/VII/2026 & SK 011/DIR/SK6/VII/2026). Perhitungannya sudah di kode dan ter-test; yang menahan pemakaian adalah master data yang belum terisi, bukan enginenya. Backend: [[Microservices - Insentive Service]].
 
 > ⛔ **Seluruh skema KPI-multiplier per-jabatan di bawah (§SPV Marketing s/d §CRM) sudah DICABUT** dan kodenya dihapus 2026-07-30. Dipertahankan di sini sebagai riwayat SK lama — **jangan dipakai sebagai acuan perhitungan**. Yang berlaku ada di §Skema Berlaku tepat di bawah ini.
 

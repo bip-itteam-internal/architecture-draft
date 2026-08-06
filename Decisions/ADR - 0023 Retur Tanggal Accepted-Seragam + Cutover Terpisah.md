@@ -1,4 +1,4 @@
-⚠️ **Implemented (sebagian digantikan)** — keputusan **#1 (tanggal accepted-seragam)** **digantikan** [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] (2026-07-18). Keputusan **#2**: struktur **split** (2 konstanta) tetap, TAPI **basis cutover retur diubah tanggal-retur → hari-kirim** (2026-07-19, ADR-0024).
+**Status**: ⚠️ **Implemented (sebagian digantikan)** — keputusan **#1 (tanggal accepted-seragam)** **digantikan** [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] (2026-07-18). Keputusan **#2**: struktur **split** (2 konstanta) tetap, TAPI **basis cutover retur diubah tanggal-retur → hari-kirim** (2026-07-19, ADR-0024).
 
 # ADR - 0023 Retur: Tanggal Accepted-Seragam + Cutover Terpisah Retur/Faktur
 

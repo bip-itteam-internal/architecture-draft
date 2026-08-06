@@ -1,4 +1,4 @@
-✅ **Implemented** (kode + deploy 2026-07-17)
+**Status**: ✅ **Implemented** (kode + deploy 2026-07-17)
 
 # ADR - 0016 Retur: Grouped per (Faktur Sumber + Tanggal Retur)
 

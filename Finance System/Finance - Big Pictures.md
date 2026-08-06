@@ -1,4 +1,4 @@
-🟡 **Konsep / Overview** — peta domain Finance System: sistem lama terenkapsulasi (sinkron ke Accurate), direncanakan dibangun ulang dari awal.
+**Status**: 🟡 **Konsep / Overview** — peta domain Finance System: sistem lama terenkapsulasi (sinkron ke Accurate), direncanakan dibangun ulang dari awal.
 
 ## Deskripsi
 

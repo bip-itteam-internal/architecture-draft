@@ -4,7 +4,7 @@ tags: [hris, recruitment, roadmap]
 
 # HRIS - Recruitment Roadmap (Adopsi ERPGo)
 
-> 🟡 **Konsep / Roadmap** — pemetaan fitur modul Recruitment **ERPGo SaaS (WorkDo)** terhadap implementasi **bip-erp** saat ini + rekomendasi apa yang layak diadopsi, **disesuaikan dengan kondisi & keputusan perusahaan**. Bagian "Status" grounded ke kode (`services/recruitment` + `erp-frontend`); bagian "Rekomendasi" bersifat usulan (belum diputuskan kecuali ditandai).
+> **Status**: 🟡 **Konsep / Roadmap** — pemetaan fitur modul Recruitment **ERPGo SaaS (WorkDo)** terhadap implementasi **bip-erp** saat ini + rekomendasi apa yang layak diadopsi, **disesuaikan dengan kondisi & keputusan perusahaan**. Bagian "Status" grounded ke kode (`services/recruitment` + `erp-frontend`); bagian "Rekomendasi" bersifat usulan (belum diputuskan kecuali ditandai).
 
 ## Deskripsi
 
