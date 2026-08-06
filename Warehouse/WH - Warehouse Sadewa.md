@@ -71,7 +71,7 @@ Untuk matriks akses WMS Tinggar/manufacture lengkap lihat [[Microservices - Manu
 - **Source ditentukan server dari JWT** (`sadewaActorContext`): role warehouse `admin_gudang_sadewa` → `SADEWA` (label "Admin Gudang Sadewa"); selain itu → `TINGGAR`. Aktor & label distempel server (anti-palsu).
 - **Mode di `PackingBoard`**: aktor Sadewa dapat `gating.mode="approval"` (tombol "Ajukan Cetak Resi" / badge status pengajuan; order PENDING tak bisa dipilih ulang), otoritas Tinggar dapat `gating.mode="direct"` (langsung "Cetak Resi"). `indexCetakResiByOrder` memetakan aksi→state per order (APPROVED > PENDING > REJECTED > NONE).
 
-**Antrian bersama**: halaman Sadewa memakai endpoint fulfillment **warehouse** yang identik dengan Tinggar (`/api/warehouse/fulfillment/{queue,rts,labels,labels/merged}`) — tidak ada antrian khusus Sadewa. Yang membedakan hanya lapisan `sadewa/actions`. Di service warehouse, `admin_gudang_sadewa` **mewarisi izin `admin_gudang`** di `warehouseGuard` (`services/warehouse/fulfillment_ops.go`) agar lolos ke endpoint antrian.
+**Antrian bersama**: halaman Sadewa memakai endpoint fulfillment **warehouse** yang identik dengan Tinggar (`/api/warehouse/fulfillment/{queue,rts,labels,labels/merged}`) — tidak ada antrian khusus Sadewa. Yang membedakan hanya lapisan `sadewa/actions`. ⚠️ **Pewarisan `admin_gudang_sadewa` → `admin_gudang` SUDAH DICABUT** (commit `435bb8ab`, live di prod sejak build 2026-08-04 14:50). Dulu role itu dipetakan buta ke `admin_gudang` di `warehouseGuard` (`services/warehouse/fulfillment_ops.go`) supaya lolos ke endpoint antrian — akibatnya mitra Sadewa lolos di **setiap** endpoint yang mengizinkan `admin_gudang`, termasuk approve/hold/pick/pack/handover, hapus produk, dan import massal produk. Pembatasan "hanya Sadewa" cuma ada di sidebar frontend, dan **sidebar bukan pagar**: mengetik `/warehouse/queue` di address bar sudah cukup untuk mendapatkan operasi gudang Tinggar sepenuhnya. Sekarang `admin_gudang_sadewa` **harus disebut eksplisit** di tiap rute yang memang dipakai keempat menu Warehouse Sadewa; daftarnya diturunkan dari endpoint yang benar-benar dipanggil halaman itu, bukan dari perkiraan. Jalur "akses penuh pengawas WMS" (PPIC & supervisor manufaktur) juga **sengaja tidak berlaku** bagi pemegang role Sadewa — ia orang luar.
 
 ---
 
@@ -80,7 +80,7 @@ Untuk matriks akses WMS Tinggar/manufacture lengkap lihat [[Microservices - Manu
 *Karena antrian & riwayat cetak resi **dikongsi** Tinggar+Sadewa dan history hanya menyimpan `actor` (employee ID, tanpa role/gudang), atribusi per gudang direkam saat cetak lalu dipakai memfilter menu riwayat Sadewa.*
 
 - **Rekam saat cetak** (`markLabelPrinted`, `services/warehouse/fulfillment_ops.go`): pada cetak awal, field top-level `printed_by_role` di dokumen `FulfillmentOrder` di-stempel dari `normRoleWms(id.SystemRoles["warehouse"])` aktor (mis. `admin_gudang` vs `admin_gudang_sadewa`); tiap entry `history` (cetak awal & cetak ulang) juga membawa `actor_role`. Diskriminatornya = **role aktor yang mencetak**, bukan asal order.
-- **Filter riwayat** (`fulfillment_label_history.go`): `buildLabelHistoryFilter` menerima query `actor_role` → `filter["printed_by_role"]` (dinormalisasi). Dipakai `GetLabelHistory` **dan** `ExportLabelHistory` (endpoint & guard tetap; `admin_gudang_sadewa` sudah lolos `warehouseGuard`). `labelHistoryRow` menambah `printed_by_role`.
+- **Filter riwayat** (`fulfillment_label_history.go`): `buildLabelHistoryFilter` menerima query `actor_role` → `filter["printed_by_role"]` (dinormalisasi). Dipakai `GetLabelHistory` **dan** `ExportLabelHistory` (endpoint & guard tetap; `admin_gudang_sadewa` **disebut eksplisit** di guard `/labels/history` & `/labels/history/export`). `labelHistoryRow` menambah `printed_by_role`.
 - **FE**: `LabelHistoryView` menerima prop opsional `actorRole`/`title`/`subtitle` (default = perilaku Tinggar tanpa filter). Halaman `/warehouse/sadewa/label-history` (dibungkus `SadewaAccessGuard`) memanggilnya dengan `actorRole="admin_gudang_sadewa"`; `useLabelHistory` meneruskan `actor_role`.
 - ⚠️ **Backfill**: resi yang tercetak **sebelum** perubahan ini belum ber-tag `printed_by_role` → tidak muncul di menu Sadewa (riwayat mulai terisi sejak deploy). Dampak minimal karena gudang Sadewa baru. Perlu **REBUILD+redeploy [[Microservices - Warehouse Service|warehouse service]]** agar tag & filter aktif.
 
@@ -135,7 +135,8 @@ Untuk matriks akses WMS Tinggar/manufacture lengkap lihat [[Microservices - Manu
 
 - [[WH - Fulfillment Flow & WMS Tinggarjaya]] — antrian fulfillment, `PackingBoard`, state machine, dan endpoint `/api/warehouse/fulfillment/*` yang dipakai bersama
 - [[Microservices - Manufacture Service]] — pemilik collection `manufacture_sadewa_action`, handler & guard aksi Sadewa, matriks akses WMS
-- [[Microservices - Warehouse Service]] — antrian/queue, RTS, labels; `warehouseGuard` yang mewariskan izin `admin_gudang` ke `admin_gudang_sadewa`
+- [[Microservices - Warehouse Service]] — antrian/queue, RTS, labels; `warehouseGuard` yang kini menuntut `admin_gudang_sadewa` disebut **eksplisit** per-rute (pewarisan ke `admin_gudang` sudah dicabut)
+- [[RUN - Onboarding Akun Eksternal (Vendor & Mitra)]] — cara memasang role `admin_gudang_sadewa` ke akun mitra
 - [[APP - Web ERP]] — modul FE `warehouse` (halaman `sadewa/*`, fitur `warehouse-sadewa/*`)
 
 ## Dokumen Terkait

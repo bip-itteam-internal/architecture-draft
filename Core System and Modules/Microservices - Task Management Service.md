@@ -8,7 +8,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB + WebSocket + file-service (MinIO via [[Microservices - File Service]])
 - **Path:** `services/task-management`
-- **Status**: ⚠️ Implemented (branch `feat/task-management-parity`, dari `main`; belum merge). Paritas penuh dengan FE gateway-cutover. Catatan: **WebSocket butuh rute ingress** (gateway tak proxy WS), **push FCM/inbox ke notification-service ditunda** (WS-only), **role hanya `supervisor`/`staff`** (admin lintas-divisi tidak diaktifkan).
+- **Status**: ⚠️ Implemented, **sudah di `main`** (diperiksa langsung ke `origin/main` 2026-08-05; catatan lama "branch `feat/task-management-parity` belum merge" sudah tidak berlaku dan branch-nya tak ada lagi). Catatan: **WebSocket butuh rute ingress** (gateway tak proxy WS), **push FCM/inbox ke notification-service ditunda** (WS-only), **role hanya `supervisor`/`staff`** (admin lintas-divisi tidak diaktifkan). Pertanyaan per tipe (`SpaceType.Fields`) ✅ **LIVE di dev & prod** dan sudah terisi untuk seluruh tipe Tech Development — lihat bagiannya di bawah.
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
@@ -45,6 +45,24 @@ Penanda jenis permintaan yang **dipilih pemohon** saat membuat tiket (mis. Perba
 - `PUT /tasks/:id/type` — supervisor membetulkan salah pilih (gated `PermTicketTriage` + supervisor/admin). Body kosong = mengosongkan tipe, bukan galat.
 - `mergeTypes` **mempertahankan id** saat nama tipe diubah; id yang berganti akan membuat tugas lama kehilangan tipenya tanpa galat.
 - Pindah space (`PUT /tasks/:id/space`) ikut mengosongkan `type_id` karena daftarnya milik space lama. **Gap:** `priority_id` punya persoalan menggantung yang sama dan sengaja belum disentuh (prioritas menentukan target SLA).
+
+#### Pertanyaan per tipe (`SpaceType.Fields`) ✅
+
+> Status: **merged & LIVE di dev DAN prod** per 2026-08-05 (BE PR [#989](https://github.com/bip-itteam-internal/bip-erp/pull/989), FE PR [#800](https://github.com/bip-itteam-internal/erp-frontend/pull/800)). Dev naik otomatis lewat Harness; prod di-deploy manual (`docker compose up -d --build task-management-service --no-deps`). Keduanya diverifikasi dengan **probe biner** (`grep` string khas kode baru di `/service`), bukan sekadar uptime container.
+>
+> **Sudah dipakai sungguhan**: seluruh **35 tipe di 9 space Tech Development** terisi **154 pertanyaan** (diverifikasi langsung ke `task_management_db` prod). Perilaku kontraknya diuji end-to-end lewat gateway dev: `fields` tersimpan, `key` diisi server, aturan absen-vs-kosong benar, dan validasi menolak `400` sambil menyebut nama tipe berikut nama pertanyaannya.
+>
+> ⚠️ Yang **belum** diuji formal: pengiriman tiket dari peramban sampai tampil di detail tiket. Bentuk markdown-nya dikunci test komponen, tapi tak ada catatan uji manual end-to-end.
+
+Menjawab keluhan bahwa permintaan yang masuk ke Tech Development tak jelas isinya. Tiap tipe boleh membawa daftar pertanyaan (`Fields []TypeField`) yang harus dijawab pemohon setelah memilih tipe itu.
+
+- **Jawabannya tidak disimpan sebagai data.** Klien merangkainya jadi markdown lalu mengirimnya sebagai `description` tugas seperti biasa. Itu keputusan sadar: kontrak `POST /tasks` tak berubah, [[APP - MyBharata]] yang tak mengenal `type_id` sama sekali tetap jalan, dan laporan tak perlu tahu fitur ini ada. Harganya, jawaban **tidak bisa difilter atau dilaporkan per pertanyaan**.
+- Tipe pertanyaan: `short_text` · `long_text` · `number` · `date` · `dropdown` · `radio` · `checkbox`. Kosakatanya **meniru [[Microservices - Form Builder Service]]** alih-alih mengarang dialek kedua, dikurangi `scale`, `time`, dan `section` yang tak punya arti pada permintaan kerja.
+- **Kenapa bukan memakai Form Builder Service.** Service itu punya siklus hidup sendiri (draft → published → closed), sasaran `audience`, dan menyimpan jawaban di database sendiri. Menempelkannya membuat pembuatan satu tiket bergantung pada service kedua dan jawabannya hidup di dua tempat, padahal yang diminta justru satu markdown di tiket. Yang diambil ulang hanya bentuk field dan pola validator murninya.
+- Validasi dan normalisasi = **fungsi murni** (`space_type_fields.go`), teruji tanpa Mongo. Batas label dihitung **per rune**, bukan byte, supaya cocok dengan hitungan karakter di FE.
+- ⚠️ **`fields` absen ≠ `fields` kosong.** Absen berarti "jangan diubah", array kosong berarti "hapus semua". Tanpa pembedaan ini satu build FE lama yang mengirim ulang daftar tipe tanpa `fields` akan menghapus seluruh pertanyaan tanpa galat apa pun. Diuji di kedua sisi.
+- ⚠️ Penegakan "wajib dijawab" **hanya di FE web**. `type_id` sendiri sudah opsional di API demi klien mobile lama, jadi API dan MyBharata tetap bisa mengirim deskripsi bebas.
+- ⚠️ `PUT /tasks/:id/type` (supervisor membetulkan tipe) **tidak menulis ulang** deskripsi yang terlanjur tersusun dari tipe lama.
 
 ### Kontrol akses space
 Space bisa disetel terbuka untuk semua karyawan (`public`, bawaan) atau dibatasi ke departemen/orang tertentu (`restricted`).

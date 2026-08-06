@@ -41,6 +41,15 @@
 | GET | `/correction/candidates` | Entri kandidat koreksi 7 hari terakhir (hari ini s/d H-7, lintas-bulan, tanpa month); `?type=clockin/clockout/any` — untuk pemilih tanggal FE | header |
 | PATCH | `/correction/:id/cancel` · `/correction/:id/review` | Batal / review koreksi | header |
 
+## Roster jadwal bebas per tanggal
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| GET | `/roster` | Sel roster + karyawan ber-roster satu departemen (`?department=` wajib, `?from=`/`?to=` YYYY-MM-DD) | `CanManageDepartment` |
+| PUT | `/roster` | Simpan banyak sel (`{department, cells[]}`; sel = `employee_id`, `date` **RFC3339 penuh**, `off`, `work_time`, `note`). Maks **500 sel** per permintaan; validasi seluruh sel dulu, baru `BulkWrite` | `CanManageDepartment` |
+| DELETE | `/roster` | Kosongkan sel (`{department, cells[{employee_id, date}]}`) → tanggal kembali ke jadwal dasar; entri hari berjalan ikut dipulihkan | `CanManageDepartment` |
+
+Menolak: tanggal lampau, penulisan lintas perusahaan, departemen di luar cakupan supervisi, dan sel hari ini yang karyawannya sudah tap masuk atau sudah berstatus cuti/dinas. `date` bertipe Go `time.Time` sehingga **tanggal telanjang `YYYY-MM-DD` gagal di-parse** — kirim timestamp RFC3339 utuh. Keputusan: [[ADR - 0036 Roster Harian Menimpa Jadwal Dasar]].
+
 ## Business trip (perjalanan dinas)
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|

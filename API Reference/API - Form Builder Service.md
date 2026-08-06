@@ -2,7 +2,7 @@
 
 *Endpoint **form-builder-service** (form dinamis + analisa jawaban + kepatuhan presensi). Gateway: `/api/form-builder/*`. Kelola form butuh **tingkat peran** `staff`/`supervisor`/`admin` di modul mana pun DAN departemen pemanggil ada di daftar departemen aktif; mengisi cukup terautentikasi. Grounded ke `services/form-builder/routes.go` + handler terkait (`main`, PR #849; kepemilikan per departemen PR #869).*
 
-- **Implementasi**: [[Microservices - Form Builder Service]] · **Status**: ⚠️ (live di dev **dan prod** sejak 2026-08-01; **penilaian karyawan, tipe form, dan rekap per orang dinilai** merged 2026-08-02 lewat PR #907 + #908 — **live di dev DAN prod** sejak 2026-08-02)
+- **Implementasi**: [[Microservices - Form Builder Service]] · **Status**: ⚠️ (live di dev **dan prod** sejak 2026-08-01; **penilaian karyawan, tipe form, dan rekap per orang dinilai** merged 2026-08-02 lewat PR #907 + #908 — **live di dev DAN prod** sejak 2026-08-02). **Form berulang** (`recurrence`, `period_key`, `?period=`) merged ke `main` 2026-08-03 lewat PR #938, #940, #942 — **setelah** deploy prod 08-01/08-02, jadi **status prod belum diverifikasi**. Baru didokumentasikan 2026-08-06 dan belum punya catatan uji end-to-end.
 - **Indeks**: [[API - Index]]
 - **Konsumen**: seluruh rute `/forms*` — termasuk `analytics`, `responses`, `export` — dipakai [[APP - Web ERP]]. Rute **`/me/*`** dipakai [[APP - MyBharata]] (section Survei di beranda + halaman pengisian).
 
@@ -17,7 +17,7 @@
 | POST | `/forms` | Buat form (lahir `draft`; `owner_department` wajib dan harus dalam cakupan pemanggil. Ejaannya **dikanonikkan** ke daftar departemen aktif) |
 | GET | `/forms` | Daftar form departemen yang boleh dikelola pemanggil (`?status=`, `?form_type=`, `?search=`, `?page=`, `?limit=` maks 100). Tiap item membawa `form_type`, `response_count` (jumlah jawaban) dan `respondent_count` (jumlah ORANG) |
 | GET | `/forms/:id` | Detail + `response_count` |
-| PATCH | `/forms/:id` | Sunting. `409` bila susunan field diubah padahal sudah ada jawaban. `owner_department` tak bisa dipindah |
+| PATCH | `/forms/:id` | Sunting. `409` bila susunan field diubah padahal sudah ada jawaban (**berlaku juga untuk form berulang**, lihat catatan di bawah). `409` juga bila `recurrence` **dinyalakan** pada form yang sudah punya jawaban; mematikannya tetap boleh. `owner_department` tak bisa dipindah |
 | PATCH | `/forms/:id/status` | `draft`→`published`→`closed`. `409` bila mencoba mundur dari `published` ke `draft`. Saat terbit: **memotret sasaran penilaian** (`422` bila gagal, kosong, atau >300 orang) lalu mengirim notifikasi inbox ke seluruh sasaran |
 | DELETE | `/forms/:id` | Hapus lunak (`deleted_at` + status `closed`) |
 
@@ -26,15 +26,19 @@
 ## Analisa & Export (RBAC per departemen)
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/forms/:id/analytics` | Rekap per pertanyaan + tren harian + tingkat pengisian (lihat bentuk respons di bawah) |
-| GET | `/forms/:id/responses` | Daftar jawaban berhalaman (`?page=`, `?limit=` maks 200), terbaru dulu |
-| GET | `/forms/:id/export` | CSV (`text/csv`). Header `X-Export-Truncated` muncul bila menyentuh batas 20.000 baris |
+| GET | `/forms/:id/analytics` | Rekap per pertanyaan + tren harian + tingkat pengisian (lihat bentuk respons di bawah). `?period=` menyaring satu putaran form berulang |
+| GET | `/forms/:id/responses` | Daftar jawaban berhalaman (`?page=`, `?limit=` maks 200), terbaru dulu. `?period=` |
+| GET | `/forms/:id/export` | CSV (`text/csv`). Header `X-Export-Truncated` muncul bila menyentuh batas 20.000 baris. `?period=` |
+
+> **`?period=` kosong berarti SELURUH periode di sini**, dan itu KEBALIKAN dari arti periode kosong pada penjaga duplikat saat mengisi (di sana kosong berarti "hanya jawaban yang memang tak punya periode"). Pemilik form yang membuka halaman analisa tanpa memilih periode mengharapkan rekap penuh, bukan rekap yang diam-diam menyusut.
+
+> **Kolom dan kartu analisa mengikuti pertanyaan PERIODE yang diminta**, bukan susunan terbaru milik form. Keduanya bisa berbeda karena pertanyaan form berulang boleh disunting untuk periode berikutnya. Tanpa `?period=`, yang dipakai adalah susunan terbaru — pada rentang banyak periode memang tak ada satu susunan yang benar.
 
 ## Pengisian (karyawan terautentikasi)
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/me/capability` | `{can_manage, departments[]}` — apa yang boleh dilakukan pemanggil di Form Builder |
-| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `submitted`, `blocks_attendance`, `gate_end_date`). Form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous` |
+| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `submitted`, `blocks_attendance`, `gate_end_date`). Form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous`. Pada form berulang, `submitted` dihitung terhadap **periode berjalan**, bukan seumur hidup form |
 | GET | `/me/forms/:id/subjects` | Daftar orang yang harus DINILAI pemanggil + `progress{done,total,anonymous}`. `409` bila form tak menilai siapa pun |
 | POST | `/me/forms/:id/responses` | Kirim jawaban (+`subject_employee_id` untuk form penilaian). `403` bila bukan sasaran atau menilai orang di luar daftar, `409` bila form tak `published` atau orang itu sudah dinilai. Balas `subject_done`, `subject_total`, `all_completed` |
 | GET | `/me/responses` | Riwayat jawaban sendiri |
@@ -42,6 +46,28 @@
 > **Idempoten**: pengiriman identik dalam 2 menit dibalas `200 {"duplicate": true}` tanpa insert baru (sidik jawaban di-hash setelah kunci diurutkan, jadi payload yang disusun ulang saat retry tetap terdeteksi).
 
 > **Kenapa `/me/capability` ada di grup pengisian, bukan di balik `requireFormManager`.** Daftar departemen aktif tinggal di konfigurasi server; tanpa endpoint ini setiap klien harus menyalinnya dan pasti melenceng saat daftarnya berubah. Ditaruh di `/me` supaya yang tak berhak menerima `can_manage:false` yang bisa dibaca klien, bukan `403` yang harus ditebak artinya. `departments` sengaja dikosongkan bila `can_manage:false`.
+
+## Kaizen (komite program ide bulanan)
+
+> Merged ke `main` 2026-08-06 lewat PR #1016. Dev naik otomatis lewat Harness, **belum diverifikasi**; prod tidak auto-deploy. Konsepnya di [[HRIS - Kaizen (Ide Perbaikan)]].
+
+**Prefix `/kaizen/*`, SENGAJA di luar grup `/forms`.** Grup itu digerbang `requireFormManager` (tingkat peran pengelola + departemen aktif), sedangkan anggota komite ditunjuk HR dan bisa saja staf biasa dari departemen mana pun. Gerbangnya per-form: terdaftar di `settings.kaizen.committee_employee_ids` **atau** boleh mengelola departemen pemilik form.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/kaizen/forms/:id/responses` | Antrean komite. `?period=` (default periode berjalan), `?status=pending\|accepted\|rejected\|implemented`, `?department=`, `?page=`, `?limit=` maks 200. Membawa `fields` periode itu supaya label jawaban benar |
+| PATCH | `/kaizen/forms/:id/responses/:responseId/decision` | Keputusan atas satu ide |
+| POST | `/kaizen/forms/:id/responses/decisions` | Keputusan massal, maks **200** id sekali kirim. Membalas `{decided[], failed[{id,error}]}` — satu ide yang keburu diputuskan orang lain gagal sendirian, sisanya tetap tersimpan |
+| GET | `/kaizen/forms/:id/compliance` | Papan kepatuhan periode itu: `{period_key, summary, data[]}` |
+| GET | `/kaizen/forms/:id/compliance/export` | CSV kepatuhan. Header `X-Kaizen-Participants-Partial` muncul bila potret pesertanya belum lengkap |
+
+> **Seluruh permukaan ini terkunci ke perusahaan pemanggil** (`common.CompanyID`), termasuk jalur bacanya. Override `?company=` milik admin pusat TIDAK berlaku di sini: memutuskan nasib ide adalah menulis, dan antrean sengaja ikut dikunci supaya yang dilihat selalu sama dengan yang bisa ditindak.
+
+**Keputusan** (`decision` pada FormResponse): `{status, note, reviewed_by, reviewed_by_name, reviewed_at, implemented_at, pic_employee_id, pic_name, implementation_note}`. Absen = **belum ditinjau**; tak ada nilai `pending` yang tersimpan, jadi saringannya memakai `?status=pending` yang di server diterjemahkan jadi `$in: [null]`.
+
+Transisi sah: belum ditinjau → `accepted`/`rejected`; `accepted` → `implemented`/`rejected`. `rejected` dan `implemented` **terminal** (`409`). Menolak **wajib** `note` (`400`), menandai diterapkan **wajib** `implemented_at` (`400`, sengaja tidak diisi otomatis karena skor KPI menghitung per periode).
+
+⚠️ Menandai "diterapkan" pada ide yang belum pernah diterima saat ini dibalas `400`; seharusnya `409`. Diketahui, belum diperbaiki.
 
 ## Internal (dipanggil service lain)
 | Method | Path | Fungsi |
@@ -62,13 +88,27 @@
 
 **Sasaran** (`audience.type`): `all` · `departments` (+`departments[]`) · `employees` (+`employee_ids[]`). `estimated_size` diisi manual sebagai penyebut tingkat pengisian; bila 0, `response_rate` tidak dikirim. Perhatikan `audience.departments` menjawab **siapa yang mengisi**, sedangkan `owner_department` menjawab **siapa yang memiliki** — keduanya tak harus sama.
 
-**Tipe form** (`form_type`): `survey` · `evaluation` · `request` · `checklist`. Kiriman kosong jadi `survey`; nilai tak dikenal ditolak `400` (bukan diam-diam diubah). **Terikat dua arah dengan `subject`**: `evaluation` wajib punya sasaran, dan yang punya sasaran wajib `evaluation`.
+**Tipe form** (`form_type`): `survey` · `evaluation` · `request` · `checklist` · `kaizen`. Kiriman kosong jadi `survey`; nilai tak dikenal ditolak `400` (bukan diam-diam diubah). **Terikat dua arah dengan `subject`**: `evaluation` wajib punya sasaran, dan yang punya sasaran wajib `evaluation`.
+
+**Pengaturan Kaizen** (`settings.kaizen`): `{quota_default, quota_by_department[{department,quota}], committee_employee_ids[], board_visible, board_hidden_fields[]}`. **Terikat dua arah dengan `form_type: "kaizen"`**: tipe itu wajib punya blok ini, dan blok ini hanya sah di tipe itu. Tipe `kaizen` juga wajib `recurrence.unit: "monthly"`, serta menolak `single_response: true` dan menolak `subject`.
+
+`quota_default` dan tiap `quota` antara 0 dan 31; departemen ganda ditolak `400`; `board_hidden_fields` wajib menunjuk key yang benar-benar ada. Kuota adalah **lantai**, bukan langit-langit: ide melebihi kuota tetap diterima, dan entri berkuota `0` berarti dikecualikan tapi tetap boleh mengirim. Menerbitkan form kaizen kedua saat masih ada yang `published` di perusahaan yang sama ditolak `409`.
+
+> ⚠️ **`settings.kaizen` yang ABSEN pada `PATCH` berarti "jangan diubah"**, bukan "hapus". Tanpa aturan ini satu kiriman tanpa blok itu akan mengubah program Kaizen yang masih draft jadi survei biasa dan membuang kuota berikut daftar komite, tanpa galat. Konsekuensinya **tipe kaizen tidak bisa diubah ke tipe lain lewat `PATCH`** — hentikan programnya dengan menutup form.
+
+**Potret peserta** (`participants`, `participants_at`, `participants_partial` pada dokumen periode): daftar orang yang wajib mengisi periode itu berikut kuota masing-masing, diambil cron **tiap periode**. Dipakai sebagai penyebut papan kepatuhan, menggantikan `audience.estimated_size` yang diisi manual. Gagal memotret tidak menggagalkan periode; yang ditahan hanya persentase di papan.
 
 **Sasaran PENILAIAN** (`subject`): `{rules[], departments[], positions[], employee_ids[], allow_self, anonymous, resolved[]}`. `rules` digabung **OR**, isinya `departments`/`positions`/`employees`, dan tiap aturan wajib membawa daftarnya sendiri. `resolved` adalah **potret** yang diisi backend saat terbit — kiriman klien diabaikan. `anonymous` mengosongkan identitas penilai di export dan daftar jawaban, tapi TIDAK di database.
 
 > **`subject` menjawab siapa yang DINILAI**, `audience` menjawab siapa yang MENGISI. Skenario "semua karyawan menilai tiap Office Boy" = `audience.type: all` + `subject.rules: ["positions"]`, `positions: ["Office Boy"]`. **Gerbang presensi ditolak `400`** pada form bersasaran penilaian.
 
-**Gerbang presensi** (`attendance_gate`): `{enabled, mode: "warn"|"block", start_date, end_date}`. Tanggal wajib **RFC3339** (`2026-08-01T00:00:00Z`); `"2026-08-01"` akan ditolak.
+**Form berulang** (`recurrence`): `{enabled, unit: "monthly"|"weekly", open_day}`. ⚠️ **Baru benar-benar bisa dikirim sejak PR #1019 (2026-08-06)**; sebelum itu `formRequest` tak punya fieldnya sehingga form berulang mustahil dibuat lewat API. Pada `PATCH`, **absen berarti jangan diubah** — kirim `{"enabled": false, ...}` eksplisit untuk mematikannya. Nil atau `enabled:false` berarti form sekali jalan, dan perilakunya persis seperti sebelum fitur ini ada. `open_day` 1..28 untuk bulanan (dibatasi 28 karena Februari), 1..7 untuk mingguan mengikuti hari ISO Senin sampai Minggu. Nilai di luar rentang atau `unit` tak dikenal ditolak `400`.
+
+Jendela periode **selalu berakhir di ujung bulan atau minggu**, bukan sekian hari setelah buka, supaya dua periode tak pernah hidup bersamaan. Penandanya (`period_key`) `2026-08` untuk bulanan dan `2026-W32` untuk mingguan (penomoran **ISO**, supaya minggu yang melintasi pergantian tahun tak melahirkan dua penanda). Periode dibuka otomatis oleh cron **tiap jam** (`Asia/Jakarta`), hanya untuk form `published`.
+
+**`period_key` pada jawaban** (`FormResponse.period_key`): kosong untuk form biasa **dan** untuk seluruh jawaban yang tersimpan sebelum fitur ini. Klien tidak mengirimnya; backend menurunkannya dari aturan pengulangan dan waktu kirim. Kunci keunikan pengisian ikut bergeser jadi (form, pengisi, yang dinilai, periode), sehingga form bulanan bisa diisi ulang tiap putaran.
+
+**Gerbang presensi** (`attendance_gate`): `{enabled, mode: "warn"|"block", start_date, end_date}`. Tanggal wajib **RFC3339** (`2026-08-01T00:00:00Z`); `"2026-08-01"` akan ditolak. **Pada form berulang, `start_date`/`end_date` diabaikan** dan yang dipakai adalah jendela periode berjalan: tanggal statis akan lewat setelah bulan pertama dan gerbangnya tak pernah menyala lagi, padahal formnya terbit ulang tiap bulan.
 
 **Respons analytics**: `total_responses`, `unique_respondents`, `audience_size`, `sample_size`, `truncated`, `response_rate` (opsional), `daily[{date,count}]`, `fields[{key,label,type,answered,skipped,options[{option,count}],average,min,max,sample_text[]}]`. Saat `truncated=true`, `response_rate` sengaja tidak dikirim karena tak bisa dihitung jujur dari sebagian data.
 

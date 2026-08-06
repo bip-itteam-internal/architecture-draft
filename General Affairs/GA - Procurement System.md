@@ -2,7 +2,7 @@
 
 *Sistem pengajuan barang & pengadaan (procurement) online untuk menggantikan proses paper-based yang lambat, terintegrasi dengan [[GA - Inventory Management]].*
 
-- **Status**: 🟡 Konsep / Direncanakan
+- **Status**: 🟡 Konsep / Direncanakan. **Digantikan sebagai acuan kerja** oleh [[GA - Form Pengadaan dan Pengajuan Dana]], yang bertumpu pada dua form kertas yang benar-benar dipakai. Dokumen ini dipertahankan karena memuat pertimbangan urutan pengerjaan yang masih berlaku (lihat bab Pertimbangan).
 
 ## Latar Belakang
 

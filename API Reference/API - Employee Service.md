@@ -28,7 +28,7 @@
 |---|---|---|
 | POST/GET/PUT/DELETE | `/.../system-auth` | Kredensial/role akun |
 | PUT/GET | `/internal/auth/change-password/:username` · `/roles/:username` · `/disable/:employee_id` · `/user/:username` · `/employee/:employee_id` | Internal auth mgmt |
-| PATCH/GET | `/account/active-status` · `/forget-device` · `/reset` · `/roles` | Kelola akun (RequireITStaff) |
+| PATCH/GET | `/account/active-status` · `/forget-device` · `/reset` · `/roles` | Kelola akun (RequireITStaff). `active-status` menulis lewat `terapkanStatusAkun`, **satu-satunya** tempat `is_active` ditulis, dipakai berdua dengan jalur resign milik HR ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]). Kontraknya tak berubah: 404 akun tak ada, 400 bila status sudah sama |
 | GET/POST/DELETE | `/device` · `/web-browser` | Perangkat & sesi browser |
 
 ## Master Data (departemen & system role)
@@ -43,8 +43,8 @@
 
 > Konsumen FE: halaman `/hris/master-data` (di-link dari **menu IT**) & System Setup Personalia; tombol kelola disembunyikan bila role tak berhak.
 
-## Akun pihak luar (vendor/mitra) — ⚠️ merged, tanpa role & tanpa UI
-> Fondasi data untuk orang di luar perusahaan yang butuh akun, tanpa dijadikan record karyawan. Seluruh grup digerbang `RequireITSupervisor` — sengaja **lebih ketat** dari master data lain, karena ini menerbitkan kredensial, bukan mengelola data HR. Detail & alasannya: [[Microservices - Employee Service]].
+## Akun pihak luar (vendor/mitra) — ✅ lengkap (data, hak akses, UI)
+> Akun untuk orang di luar perusahaan, tanpa dijadikan record karyawan. Seluruh grup digerbang `RequireITSupervisor` — sengaja **lebih ketat** dari master data lain, karena ini menerbitkan kredensial, bukan mengelola data HR. Detail & alasannya: [[Microservices - Employee Service]]; prosedur operasionalnya: [[RUN - Onboarding Akun Eksternal (Vendor & Mitra)]].
 
 | Method | Path | Fungsi | RBAC |
 |---|---|---|---|
@@ -52,9 +52,15 @@
 | POST | `/master/external-accounts` | Terbitkan akun luar + baris kredensial di `system_authentication` (`account_type=external`). ID di-generate server berprefiks **`EXT-`**; `company_id` diisi dari perusahaan pembuat bila kosong. **Ditolak 400** bila `valid_until` sudah lewat (akun terbit dalam keadaan mati) atau `sponsor_employee_id` tak ada di `work_data` (penanggung jawab karangan = akun tanpa pemilik). Bila insert kredensial gagal, data pendamping di-rollback supaya tak tertinggal akun setengah jadi | `RequireITSupervisor` |
 | PUT | `/master/external-accounts/:employeeID` | Perbarui data pendamping; **perpanjangan `valid_until`** adalah alasan utamanya ada. `employee_id` & `company_id` **tak bisa diubah** (kunci identitas & batas tenant). Field kosong diabaikan, bukan dikosongkan | `RequireITSupervisor` |
 | DELETE | `/master/external-accounts/:employeeID` | **Menonaktifkan** (`is_active=false`), bukan menghapus — jejak siapa pernah punya akses tetap ada. ⚠️ Token yang sudah beredar **tidak ikut mati** (JWT TTL 72 jam, revoke masih placeholder); respons menyebutkannya eksplisit | `RequireITSupervisor` |
+| GET | `/master/external-accounts/:employeeID/permission-sets` | Baca paket hak yang menempel. Balas `[]` (bukan `null`) bila kosong | `RequireITSupervisor` |
+| PUT | `/master/external-accounts/:employeeID/permission-sets` | Pasang paket hak (sumbu **RBAC**: ticket, payroll, finance, monitoring, procurement). Key duplikat/kosong dirapikan; key di luar `master_permission_set` **ditolak 400** — paket fantom tak pernah menghasilkan izin tapi tampil terpasang di layar. Endpoint tersendiri (bukan `PATCH /account/permission-sets` milik karyawan) karena gerbangnya lebih ketat, kepemilikan tenant dicek eksplisit, dan pesan galatnya tak lagi menyebut "Employee ... not found" untuk sesuatu yang justru bukan karyawan | `RequireITSupervisor` |
+| GET | `/master/external-accounts/:employeeID/system-roles` | Baca role modul. Balas `{}` (bukan `null`) bila kosong | `RequireITSupervisor` |
+| PUT | `/master/external-accounts/:employeeID/system-roles` | Setel role modul (sumbu **`system_roles`**, dipakai modul seperti **warehouse** yang tak menggerbang di permission-set). Key modul **dan nilai role** divalidasi ke master data (`master_department` ditimpa `master_system_role`) → **400** bila tak cocok; katalog yang gagal dibaca **menolak segalanya**. Role `group` dibuang paksa (override lintas-perusahaan) | `RequireITSupervisor` |
+| POST | `/master/external-accounts/:employeeID/reset-password` | Terbitkan ulang kata sandi; balas `temporary_password` **sekali**. **Tidak** menyentuh `is_active` — sengaja terpisah dari `PATCH /account/reset` karyawan yang menyetel `is_active: true` sebagai efek samping dan akan menghidupkan kembali vendor yang sengaja dinonaktifkan | `RequireITSupervisor` |
 
-> 🔴 **Belum ada konsumen FE.** Pembuatan vendor sementara hanya lewat API. `permission_sets` untuk akun luar juga belum dipasang, jadi akun terbit bisa login tapi belum berhak atas modul apa pun.
-> ⚠️ Itu baru benar **setelah** penambalan `izinAkun`: sebelumnya akun vendor tanpa paket diam-diam dapat 6 izin modul `ticket` lewat fallback tier. Lihat [[Microservices - Employee Service]] §Akun pihak luar.
+> **Berlaku setelah login ulang.** Izin & role dirakit saat token **terbit**, jadi kedua endpoint `PUT` di atas baru terasa setelah vendor login ulang atau token 72 jamnya diperbarui. Respons menyebutkannya eksplisit.
+> **Akun terbit tanpa hak modul apa pun** sampai salah satu sumbu dipasang. Itu baru benar **setelah** penambalan `izinAkun`: sebelumnya akun vendor tanpa paket diam-diam dapat 6 izin modul `ticket` lewat fallback tier. Lihat [[Microservices - Employee Service]] §Akun pihak luar.
+> Konsumen FE: tab **Akun Eksternal** di `/hris/master-data` + dialog "Hak Akses Vendor" (tab *Paket Hak* / *Role Modul*).
 
 ## Training Program (HRIS) — ✅ merged (deploy dev pending)
 > BE+FE **merged ke main** (`services/employee/training.go`; UI `/hris/training`); **deploy dev pending**. **Department opsional** (peran penyelenggara — TIDAK membatasi peserta; peserta lintas dept di-assign HRD), tanpa Branch. RBAC tulis = `RequireHRISStaff`; GET open (di belakang gateway). Detail konsep: [[HRIS - Training Program]].
@@ -82,6 +88,19 @@
 | GET | `/internal/aggregate/employee/:id` · `/v2/internal/aggregate/employees[/summary|/it]` · `/internal/export/all` | Aggregate & export | HRIS / IT |
 | POST/PUT | `/internal/transaction/create-employee` · `/update-employee/:id` | Bulk create/update employee | HRIS |
 
+## Resign / Non-Aktif Karyawan — ✅ live di produksi 2026-08-05
+Seluruhnya `RequireHRISStaff` + isolasi tenant `EffectiveCompanyID`. Keputusan & konsekuensinya: [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]].
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/resign/summary` | ⚠️ **belum merge & belum deploy** (branch `feat/employee-turnover`). Ringkasan turnover **bulan berjalan** untuk kartu statistik: `keluar`·`masuk`·`headcount_awal`·`headcount_kini`·`turnover_persen`·`target_persen`. **Tanpa parameter bulan**: tak ada riwayat headcount, jadi awal bulan direkonstruksi (`aktif + keluar − masuk`) dan bulan lampau akan menumpuk galat. `keluar` dari `effective_date` status `applied`; `masuk` dari `work_data.join_date` yang **disaring di Go** karena tipenya bercampur date/string. Detail: [[HRIS - Attrition]] |
+| GET | `/resign` | Daftar berpaginasi. Filter `category`·`status`(`scheduled`/`applied`/`cancelled`)·`department`·`search` (nama atau employee_id). Balasan `{data, pagination}` sama bentuk dengan `/contract`; tiap baris ditempeli `full_name`·`department`·`position` **saat baca** dari `personal_data`/`work_data`, sengaja tak disimpan di dokumen resign supaya tak basi saat karyawan pindah departemen |
+| GET | `/resign/employee/:employee_id` | Riwayat resign satu karyawan, termasuk yang sudah dibatalkan |
+| POST | `/resign` | Buat catatan. Wajib `employee_id`·`category`·`effective_date`·`reason`. Kategori divalidasi ke enum tetap (Mengundurkan Diri · PHK · Pensiun · Kontrak Berakhir · Meninggal Dunia) **persis huruf besar-kecilnya**. Karyawan dari perusahaan lain ditolak 404. Satu karyawan tak boleh punya dua catatan berjalan; yang sudah `cancelled` tidak memblokir. `effective_date` dinormalkan ke tengah malam WIB; tanggal hari ini atau mundur **langsung diterapkan**, tanggal di depan jadi `scheduled` |
+| PATCH | `/resign/:id` | Koreksi `category`/`effective_date`/`reason`. **Hanya `scheduled`** (409 selainnya): mengubah tanggal catatan yang sudah berlaku tak menghidupkan kembali akunnya, jadi dokumen dan kenyataan akan berbeda. Koreksi yang memajukan tanggal ke hari ini atau mundur langsung diterapkan |
+| POST | `/resign/:id/cancel` | Batalkan. `scheduled` → hanya ubah status. `applied` → status diubah **dan** akun diaktifkan kembali, tapi **hanya bila catatan ini yang mematikannya** (`account_deactivated`) — akun yang sudah dinonaktifkan IT lebih dulu tidak ikut dihidupkan. `reason` wajib hanya saat pembatalan membuka kembali akses |
+| POST/GET | `/resign/:id/file` | Unggah / ambil dokumen pendukung. PDF, gambar (JPG/PNG), Word (DOC/DOCX); cap **4 MB** yang dipaku [[Microservices - File Service]]. Dinilai dari ekstensi **terakhir** (`surat.pdf.exe` ditolak). Unggah ulang mengganti berkas dan menghapus objek lama |
+
 ## Listing · View · Me
 | Method | Path | Fungsi |
 |---|---|---|
@@ -94,4 +113,4 @@
 > ~90 endpoint. Daftar lengkap path per `:doc_type`/method ada di `services/employee/main.go`.
 
 ## Dokumen Terkait
-- [[Microservices - Employee Service]] · [[HRIS - Payroll]] · [[HRIS - Key Performance Index]] · [[API - Index]]
+- [[Microservices - Employee Service]] · [[HRIS - Payroll]] · [[HRIS - Key Performance Index]] · [[HRIS - Personalia]] · [[API - Index]]

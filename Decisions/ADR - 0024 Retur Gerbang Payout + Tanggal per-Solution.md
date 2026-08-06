@@ -1,4 +1,4 @@
-✅ **Implemented & Deployed** (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel)
+✅ **Implemented & Deployed** (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel). **Amandemen 2026-08-05 (belum deploy):** janji "SKIP → baris `SKIPPED`" di Decision #1 akhirnya benar-benar dipenuhi — sebelumnya baris hanya ditandai bila kebetulan sudah ada, sehingga mayoritas retur payout>0 **tak berjejak sama sekali** di UI; sekaligus menutup lubang dobel-booking lewat konfirmasi gudang yang baru terlihat setelah baris jejak itu ada. Lihat Consequences.
 
 # ADR - 0024 Retur: Gerbang Payout≈0 (Income vs Retur) + Tanggal per-Solution
 
@@ -37,8 +37,19 @@ Dipasang di `SyncOrderReturn` (auto) & `RetryDailyReturn` (manual tolak payout>0
 - **Cleanup data existing (✅ SELESAI 2026-07-19)**: `cmd/returndescope` mengeluarkan **1565 retur hari-kirim < 1 Jul** dari auto (**1007 dok Retur Penjualan dihapus dari Accurate** via `delete.do`, semua ditandai `SKIPPED`); **1 dobel post-cutover** `RTR/2026/07/16/006-BH` (payout>0 + receipt) di-void. Era kept ≥ 1 Jul: 615 SENT sah + 8 FAILED (SKU era-baru, ditunda).
 - **Edge butuh finance**: barang-balik `solution=0` **payout>0** (~48, ~1–2 SENT) — receipt urus revenue, tapi **stok tak balik** (Accurate under-stock). Konservatif (stok-opname backstop), idealnya retur-stok-saja — **ditahan untuk finance**.
 
+### Amandemen 2026-08-05 — keputusan SKIP wajib berjejak (un-deployed)
+
+**Masalah**: Decision #1 menuliskan "SKIP (baris `SKIPPED`)", tapi implementasinya hanya menandai baris yang **kebetulan sudah ada**; bila belum ada, keputusan itu cuma masuk log. Akibatnya retur payout>0 **lenyap total** dari halaman Auto-Sync Retur dan finance tak punya cara tahu pembalikannya ada di dokumen lain. Terukur prod 2026-08-04 pada order Shopee `2607180VU58AJP`: refund pasca-cair **Rp198.930** nyata terbukukan di receipt `INC/2026/07/28/014-BH` (diverifikasi ke Accurate: Bayar faktur −184.000, akun 6112 −32.070, akun 6114 +47.000 = net −198.930), tapi nol jejak di UI retur.
+
+**Keputusan**: `SyncOrderReturn` cabang skip kini **membuat** baris jejak (`seedSkippedReturnRow`) bila belum ada. Baris ini **bukan antrean kerja** — tak ada dokumen Accurate yang lahir darinya — sehingga: dedupe **per-retur (`return_sn`)**, bukan group-key `<faktur>|<tanggal>`; `attempts` tetap 0; `trans_date` **wajib** diisi (filter tanggal FE menyaring lewat field itu — jejak yang tak bisa ditemukan sama saja dengan tak ada). Baris SENT tak pernah diturunkan. **DEFER tetap tanpa baris**: payout belum diketahui, keputusannya belum final, mencatatnya hanya menghasilkan baris yang berubah-ubah sendiri.
+
+**Lubang yang ikut ditutup — dobel-booking lewat scan gudang.** Justru keberadaan baris jejak membukanya: kunci yang dipegang gudang (`return_sn`) seformat `dedupe_key` baris non-grup, sehingga **cadangan pencarian by-key** di `ConfirmReturnFromWarehouse` memungutnya, lalu `rebuildAndSendGroup` — yang **tak punya gerbang payout sendiri** — mengirim Retur Penjualan ke Accurate. Terbukti lewat tes regresi: 1 dokumen terbukukan sebelum diperbaiki, tepat pembalikan dobel yang ADR ini ada untuk mencegah. Lookup utama (`GetByMemberOrderIDAny`) sudah mengabaikan `SKIPPED`; cadangannya yang melewatkan — kini disamakan. Efek sampingnya menutup lubang yang **sudah ada sebelumnya**: baris `SKIPPED` **pra-cutover** pun tadinya bisa dibukukan lewat scan gudang, melanggar cutover Decision #3.
+
+**Konsekuensi**: baris "DILEWATI" kelas ini kini muncul di UI untuk SEMUA channel, termasuk edge `solution=0` payout>0 di atas — justru bagus, finance akhirnya melihatnya. Baris tetap **inert** bagi seluruh proses terjadwal (sweep rekonsiliasi, laporan summary, anomaly check, unmapped-SKU semuanya memfilter SENT/FAILED/PENDING). **Batas yang disadari**: bila payout suatu order suatu saat berbalik ke ≈0 setelah jejaknya dibuat, jalur booking memakai group-key sehingga lahir baris kedua dan jejak lama tertinggal dengan keterangan basi — sangat jarang (penyesuaian wallet tak mengubah `total_settlement_amount`) dan tak menimbulkan kesalahan angka, jadi tak dibuatkan mesin khusus.
+
 ## Dokumen Terkait
 - [[Microservices - Integration Service]] — Auto-Sync Retur (gerbang payout, tanggal per-solution) & Auto Sync Income (receipt)
+- [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] — gerbang gudang; jalur konfirmasinya sempat bisa menghidupkan baris `SKIPPED` jadi pembukuan dobel (amandemen 2026-08-05)
 - [[ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah]] — keputusan #1 digantikan; #2 tetap
 - [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]]
 - [[ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur]]

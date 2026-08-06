@@ -19,7 +19,7 @@
 - **Routing**: `go_router` dengan redirect terpusat (intro → login → PIN → auth)
 - **Lokalisasi**: `flutter_localizations` + `intl`; **Bahasa Indonesia (default)** & **English** via file ARB, diakses lewat `context.l10n.<key>`
 - **Firebase**: Core, Analytics, Crashlytics, Messaging (FCM), Performance — dengan dua flavor `dev`/`prod` (project `hris-bharata-dev` & `hris-bharata-prod`)
-- **Library penting lain**: `mobile_scanner` + `pretty_qr_code` (QR), `geolocator`/`geocoding` (geofencing), `local_auth` (biometric), `pinput` (PIN), `flutter_secure_storage` + `jwt_decoder` (auth), `syncfusion_flutter_pdfviewer` (payslip), `fl_chart` (grafik KPI), `table_calendar`, `flutter_local_notifications`
+- **Library penting lain**: `mobile_scanner` + `pretty_qr_code` (QR), `geolocator`/`geocoding` (geofencing), `local_auth` (biometric), `pinput` (PIN), `flutter_secure_storage` + `jwt_decoder` (auth), `syncfusion_flutter_pdfviewer` (**PDF kebijakan perusahaan dari asset**, bukan payslip — dikoreksi 2026-08-05), `fl_chart` (grafik KPI), `table_calendar`, `flutter_local_notifications`
 - **CI/CD**: Codemagic
 
 ## Arsitektur
@@ -68,7 +68,12 @@
 - Pengajuan lembur (form tanggal, alasan, upload file) dengan alur **approval SPKL** oleh supervisor
 
 ### Payroll
-- Lihat **payslip** bulanan (PDF terenkripsi, **dilindungi PIN**, ditampilkan in-app) dan riwayat payslip tahunan
+> **Dikoreksi 2026-08-05 (grounded ke kode).** Catatan lama di sini menyebut "payslip bulanan PDF terenkripsi, dilindungi PIN, ditampilkan in-app" beserta riwayat tahunan. **Tak satu pun ada di kode `my-bharata`** — tidak ada enkripsi, tidak ada PIN, dan sampai hari ini aplikasi belum pernah memanggil endpoint slip terbit. Deskripsi itu kemungkinan terbawa dari aplikasi lama `hris_bharata`. Jangan dijadikan rujukan.
+
+- **Perkiraan gaji bulan berjalan** (`api/employee/me/payroll-approx`) — yang selama ini tampil di halaman "Slip Gaji". Endpoint itu **proxy ke [[Microservices - Attendance Service]] `/payroll-supplement`**, yaitu data turunan presensi (`payout_pct`, jam kerja, lembur) yang jadi **bahan masukan** perhitungan gaji, **bukan slip**.
+- **Slip gaji terbit + unduh PDF** (branch `feat/payroll-slip-pdf`, **belum merge**): `GET /payroll-runs/my` menampilkan slip dari run **published** saja, tiap kartu punya tombol unduh yang mengambil `…/pdf` (lihat [[Microservices - Payroll Service]]). Keduanya **hidup berdampingan** dengan kartu perkiraan: perkiraan tetap berguna sebelum gajian, dan menggantinya akan membuat halaman kosong sampai run pertama diterbitkan.
+	- Bytes diambil lewat `ApiInterface.getBytes` yang baru (`BaseResponse` mengasumsikan JSON), disimpan ke **direktori aplikasi** lalu dibuka lewat lembar berbagi (`ShareUtil.shareBytes`). **Sengaja bukan folder Unduhan bersama** — itu menuntut izin storage, dan justru itulah sumber Known Issue unduh Android 13+ pada aplikasi lama.
+	- BLoC terpisah dari `PayrollBloc` karena sumber & daur hidupnya beda: mengganti bulan tak boleh ikut memuat ulang daftar slip.
 
 ### KPI & Task Management
 - **KPI**: laporan performa kuartalan (read-only di mobile) dengan grafik
@@ -141,7 +146,7 @@ Tercantum di menu tetapi masih placeholder (route `/coming-soon` atau stub):
 ## Known Issues
 
 1. **Selisih waktu attendance lintas timezone** — perjalanan dinas lintas zona (mis. WIB → WITA) menampilkan jam clock-in yang salah; sebagian presentation pakai `DateTime.now()` lokal alih-alih konversi dari UTC server
-2. **Download payslip gagal di sebagian Android 13+** — permission storage lama ditolak Android 13 (API 33); workaround: lihat payslip via viewer in-app
+2. ⛔ **(Tidak berlaku) Download payslip gagal di sebagian Android 13+** — dicabut 2026-08-05: **tidak ada kode unduh payslip** di `my-bharata` yang bisa gagal; ini terbawa dari aplikasi lama. Unduhan PDF yang baru menulis ke direktori aplikasi sendiri sehingga tak menyentuh izin storage yang jadi sebab masalah itu.
 3. **JWT expiry setelah lama di background** — setelah >2 jam, app bisa freeze/terlempar ke Login akibat tabrakan refresh token pada request paralel
 
 ## Dependencies & Integrasi

@@ -38,7 +38,7 @@
 - Off-boarding
 	- Pengembalian aset perusahaan (cek daftar aset yang tercatat pada master data karyawan)
 	- Clearance administrasi (cek ke departemen Finance)
-	- Penonaktifan akun (cek ke departemen IT)
+	- ~~Penonaktifan akun (cek ke departemen IT)~~ → **dikerjakan HR sendiri** lewat catatan resign, tidak lagi diteruskan sebagai permintaan ke IT ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]; ✅ live di produksi 2026-08-05). Menu IT tetap ada sebagai jalur kedua
 
 ## Kebutuhan
 
@@ -47,10 +47,11 @@
 - [ ] Master data karyawan (referensi pencarian)
 - [ ] Daftar aset karyawan saat ini
 - [ ] Clearance administrasi karyawan
-- [ ] Status akun karyawan
+- [x] Status akun karyawan — `system_authentication.is_active`, kini bisa diubah HR sendiri lewat catatan resign berikut sebab & tanggalnya (✅ live 2026-08-05)
 
 ## Dokumen Terkait
 
 - [[HRIS - Big Pictures]] — peta domain HRIS
 - Subsistem turunan: [[HRIS - Recruitment]] · [[HRIS - Retention]] · [[HRIS - Work Review]] · [[HRIS - Conflict Management]] · [[HRIS - Career & Promotion]]
 - [[HRIS - Attrition]] · [[HRIS - Personalia]] (off-boarding) · [[HRIS - Interrelationship Matrices]]
+- [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]] — penonaktifan akun pindah ke HR
