@@ -14,8 +14,23 @@
 ## Spaces
 | Method | Path | Fungsi |
 |---|---|---|
-| POST/GET | `/spaces` · `/spaces/:id` | Buat/list/detail space (`?division=`). Body/response bawa `types` (tipe permintaan) + `visibility`/`allowed_divisions`/`allowed_employees`. **Disaring hak akses**: space `restricted` hilang dari list dan `403` di detail, kecuali supervisor divisinya, admin, anggota space, atau yang ada di daftar izin |
-| PUT/DELETE | `/spaces/:id` | Update/hapus space. `visibility` hanya menerima `public`/`restricted` (nilai lain `400`) |
+| POST/GET | `/spaces` · `/spaces/:id` | Buat/list/detail space (`?division=`). Body/response bawa `types` (tipe permintaan) + `visibility`/`allowed_divisions`/`allowed_employees` + `admins` (🟡). **Disaring hak akses**: space `restricted` hilang dari list dan `403` di detail, kecuali supervisor divisinya, admin, admin space, anggota space, atau yang ada di daftar izin |
+| PUT | `/spaces/:id` | Update space. `visibility` hanya menerima `public`/`restricted` (nilai lain `400`). Boleh dilakukan supervisor divisi, admin, ATAU **admin space** (🟡). `admins` kosong yang dikirim admin space sendiri → `400` |
+| DELETE | `/spaces/:id` | Hapus space — tetap **hanya** supervisor divisi & admin |
+| GET | `/spaces/my-roles` 🟡 | `{admin_space_ids:[...]}` space yang dipegang pemanggil sebagai admin. Rute kecil tersendiri supaya sidebar tak memuat seluruh `/spaces`. **Didaftarkan sebelum `/spaces/:id`** |
+
+### `admins` — admin per space 🟡
+
+> Status: **branch `feat/task-space-admin`, belum merge & belum deploy** (2026-08-06). Keputusannya di [[ADR - 0038 Hak Per-Objek Admin Space Task Management]].
+
+Daftar `employee_id` yang ditunjuk memegang space: menerima permintaan masuk, meninjau,
+menugaskan, melihat Laporan Tim space itu, dan mengubah pengaturannya — **sebatas space
+tersebut**, walau tier-nya `staff` dan walau ia dari departemen lain.
+
+- Absen/kosong = perilaku lama persis (hanya supervisor divisi & admin), jadi **tanpa migrasi**.
+- Jangan tertukar dengan `members` (tim penangan, sasaran auto-assign), yang **bukan** pemegang wewenang.
+- Perubahannya tercatat sebagai audit ber-`space_id` dengan action `space_admins` di `GET /audits`.
+- Berlaku **seketika** karena tersimpan di dokumen space, bukan di klaim JWT.
 
 ### `types[].fields` — pertanyaan per tipe permintaan ✅
 
@@ -65,7 +80,7 @@ sama sekali.
 | PUT | `/tasks/:id` | Edit generik (partial) |
 | PUT | `/tasks/:id/status` · `/archive` · `/unarchive` · `/due-date` · `/priority` · `/space` | Ubah status/arsip/jadwal/prioritas/pindah. `/space` ikut mengosongkan `type_id` (daftar tipe milik space lama) |
 | PUT | `/tasks/:id/type` | Supervisor membetulkan tipe (gated izin triase). `type_id` wajib milik space tugas tsb; body kosong = kosongkan tipe |
-| PUT/POST | `/tasks/:id/assign` · `/approve` · `/reject` | Assign/approve (body `start_date/due_date/priority_id/assign_to`)/reject (supervisor) |
+| PUT/POST | `/tasks/:id/assign` · `/approve` · `/reject` | Assign/approve (body `start_date/due_date/priority_id/assign_to`)/reject. Boleh supervisor divisi space, admin, ATAU **admin space** (🟡). Supervisor divisi LAIN kini `403` — sebelumnya lolos karena ketiga rute ini tak pernah mengecek space sama sekali |
 | GET | `/tasks/:id/history` | Riwayat perubahan (array) |
 | DELETE | `/tasks/:id` | Hapus task (supervisor) |
 
@@ -81,9 +96,9 @@ sama sekali.
 ## Reports & Users
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/report/summary-by-department` · `/report/timeline` · `/report/manpower-performance` · `/report/sla` | Laporan (scope supervisor→divisi, staff→sendiri) |
+| GET | `/report/summary-by-department` · `/report/timeline` · `/report/manpower-performance` · `/report/sla` | Laporan (scope supervisor→divisi + space yang ia pegang, **admin space**→space yang ia pegang + tugasnya sendiri, staff→sendiri) |
 | GET | `/users` · `/users/byDivision` · `/departments` | Dropdown assignee & divisi (dari ERP) |
-| GET | `/audits` | Audit trail lintas-task (`{items,total}`, scope divisi supervisor) |
+| GET | `/audits` | Audit trail lintas-task (`{items,total}`). Scope: admin→semua, supervisor→divisinya, **admin space**→space yang ia pegang (🟡). Memuat juga audit yang menempel pada SPACE (`space_admins`) yang tak punya `task_id` |
 
 ## WebSocket
 | Path | Fungsi |
@@ -98,4 +113,4 @@ sama sekali.
 | GET/PUT/DELETE | `/notifications` · `/notifications/unread-count` · `/read-all` · `/:id/read` · `/:id` | Notifikasi |
 
 ## Dokumen Terkait
-- [[Microservices - Task Management Service]] · [[APP - Dynamic Task Tracker]] · [[API - Index]]
+- [[Microservices - Task Management Service]] · [[APP - Dynamic Task Tracker]] · [[API - Index]] · [[ADR - 0038 Hak Per-Objek Admin Space Task Management]]

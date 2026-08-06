@@ -34,6 +34,25 @@ Supervisor yang membawahi **lebih dari satu departemen** melihat dan menindak ti
 - Config **automation** per-space (diterima `createSpace`/`updateSpace`): `auto_assign` (bool), `auto_close_days` (int, `0`=nonaktif) — lihat **### Automation**.
 - **Tipe permintaan per-space ✅** `Space.Types []SpaceType` (`{id,name,description,color}`), diterima `createSpace`/`updateSpace` lewat field `types`. Lihat **### Tipe permintaan**.
 - **Visibility ✅** `Space.Visibility` (`public` bawaan / `restricted`) + `AllowedDivisions` + `AllowedEmployees`. Lihat **### Kontrol akses space**.
+- **Admin space 🟡** `Space.Admins []string` (employee_id) — orang yang ditunjuk memegang space itu. Lihat **### Admin space**.
+- `GET /spaces/my-roles` 🟡 — `{admin_space_ids:[...]}` untuk pemanggil; dipakai klien memutuskan menu/tab. Didaftarkan **sebelum** `/spaces/:id`.
+
+### Admin space 🟡
+
+> Status: **kode selesai di branch `feat/task-space-admin`, BELUM merge dan BELUM deploy** (2026-08-06). Diverifikasi lewat HTTP di lingkungan lokal (service + Mongo lokal, header identitas dipasang seperti gateway): 20 pemeriksaan lolos, termasuk approve oleh admin space bertier staf, penolakan supervisor divisi lain, dan pencabutan yang berlaku seketika. **Belum** dijalankan lewat gateway dev/prod. Keputusannya di [[ADR - 0038 Hak Per-Objek Admin Space Task Management]].
+
+Menjawab kalimat yang tak bisa dinyatakan model divisi: *"orang ini yang menerima permintaan di space ini"*. Wewenangnya **menempel pada objek**, bukan pada posisi seperti [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].
+
+- Cakupannya **sebatas space itu**: triase (approve/reject), tinjauan `Testing → Done`, assign, betulkan tipe, Laporan Tim space tersebut, dan ubah pengaturan space. Di luar itu ia staf biasa.
+- **Kandidatnya karyawan mana pun**, termasuk dari departemen lain. `canAccessSpace` meloloskan admin space supaya ia tak terkunci dari space `restricted` yang justru ia kelola.
+- **Membuat & menghapus space tetap milik supervisor divisi/admin** — space baru belum punya admin yang bisa menunjuk dirinya, dan menghapus space menyeret seluruh riwayat tiket.
+- **Disimpan di dokumen space, bukan klaim JWT** → perubahan berlaku **seketika**, tak menunggu login ulang seperti `permission_sets`/`supervised_departments` yang ikut token 72 jam.
+- **Satu pintu** `canActOnSpace` (`space_admin.go`): admin space menang lebih dulu tanpa izin katalog; selain itu izin **dan** cakupan divisi harus terpenuhi bersama.
+- **Gerbang rute cuma membuka pintu.** `gateOrSpaceAdmin` meloloskan pemegang izin ATAU admin di space mana pun (satu `CountDocuments` per request, hanya bagi yang tak lolos lewat izin); space tertentu diputuskan handler. Tanpa pembagian itu admin space bertier staf ditolak 403 sebelum handler melihat space tujuannya.
+- ⚠️ **Menutup lubang lama**: `approveTask`/`rejectTask` **tak pernah** mengecek divisi maupun space — gerbangnya hanya izin `ticket.triage` di rute, sehingga supervisor departemen mana pun bisa menyetujui tiket departemen lain lewat API. Kini 403.
+- **Daftar admin tak boleh dikosongkan oleh admin space sendiri** (400); supervisor divisi boleh. Perubahannya ditulis sebagai audit ber-`space_id` (action `space_admins`), bukan audit tugas.
+- Notifikasi **aditif**: permintaan baru & eskalasi SLA response menyapa admin space **di samping** supervisor divisi.
+- `Space.OwnerID` **tetap tak dipakai**: tunggal & bertipe ObjectID, sedangkan yang dibutuhkan daftar employee_id.
 
 ### Tipe permintaan
 Penanda jenis permintaan yang **dipilih pemohon** saat membuat tiket (mis. Perbaikan Bug, Penambahan Fitur). Bentuknya meniru `Priority`, tapi perannya berbeda: prioritas ditetapkan **supervisor saat triase** dan menentukan target SLA resolusi, sedangkan tipe **murni penanda** untuk filter dan laporan — tidak memengaruhi SLA maupun penugasan.
@@ -68,7 +87,7 @@ Menjawab keluhan bahwa permintaan yang masuk ke Tech Development tak jelas isiny
 Space bisa disetel terbuka untuk semua karyawan (`public`, bawaan) atau dibatasi ke departemen/orang tertentu (`restricted`).
 
 - `canAccessSpace(id, sp)` digerbang di **tiga tempat**: `GET /spaces` (menyaring daftar), `GET /spaces/:id` (403), dan `POST /tasks` (403). Menyaring daftar saja tidak cukup — gateway meneruskan permintaan apa adanya, jadi siapa pun bisa mengirim `space_id` langsung ke endpoint create (lihat [[CORE - API Master Gateway]]).
-- **Tim pemilik tak pernah terkunci**: supervisor divisi space, admin, dan anggota space (`members`) selalu lolos lebih dulu. Tanpa itu salah isi daftar izin membuat space jadi yatim dan tak bisa diperbaiki siapa pun.
+- **Tim pemilik tak pernah terkunci**: supervisor divisi space, admin, **admin space** (🟡, lihat bagiannya), dan anggota space (`members`) selalu lolos lebih dulu. Tanpa itu salah isi daftar izin membuat space jadi yatim dan tak bisa diperbaiki siapa pun.
 - Nilai `visibility` asing **ditolak saat menulis** (`normalizeVisibility`). Bila boleh tersimpan, pembacaan akan menganggapnya publik dan space yang dikira terbatas diam-diam terbuka.
 - ⚠️ Space lama tak punya field ini di Mongo, sehingga API mengirim `"visibility": ""` (string kosong, **bukan** null). Klien wajib memperlakukan kosong sebagai `public`; `?? "public"` di TypeScript **tidak cukup** karena hanya menangkap null/undefined.
 - Gerbang ini mengatur **siapa boleh mengajukan**, bukan visibilitas tiket yang sudah dibuat.
@@ -134,7 +153,9 @@ Semua reuse `reportBaseFilter` (scope: supervisor→space divisinya, admin→sem
 
 - **WebSocket butuh rute ingress** `/ws/task-management → service:/ws` (gateway tak proxy WS); tanpa itu realtime mati tapi app tetap jalan via polling REST. Lihat `WEBSOCKET.md`.
 - **Push FCM/inbox via notification-service: TBD** (saat ini WS-only atas keputusan; BE lama punya jalur WA+FCM).
-- **Role admin lintas-divisi tidak diaktifkan** — hanya `supervisor`/`staff` (di-derive dari `system_roles`).
+- **Role admin lintas-divisi tidak diaktifkan** — hanya `supervisor`/`staff` (di-derive dari `system_roles`). Wewenang per-space kini ditempuh lewat **admin space** (🟡, belum merge), bukan dengan menaikkan tier.
+- **Admin space belum dijalankan lewat gateway** (dev maupun prod): verifikasinya baru di lingkungan lokal. Selama itu belum terjadi, fitur ini tidak boleh dianggap hidup.
+- **Belum ada layar "siapa memegang space mana"** lintas space, dan belum ada batas jumlah admin per space (sepuluh admin berarti sepuluh penerima tiap notifikasi permintaan baru).
 - **Deteksi supervisor divisi utk notifikasi** (`findDivisionSupervisors`) memakai `work_data` ERP (flag `is_supervisor`, fallback jabatan regex `Supervisor|^Leader$`), **bukan** `system_roles` (key `system_roles` = kode modul spt "it"/"finance", tak pernah cocok dgn nama departemen). Hanya akun aktif.
 - Notif **"Permintaan baru"** (`NotifTaskRequest`, ke supervisor divisi + admin saat tiket dibuat) menyertakan arahan **buka website ERP** — sebab **approve/reject hanya tersedia di web**; mobile ([[APP - MyBharata]]) belum punya alur approval.
 - **Override SLA resolution per-priority ✅ implemented** (`Priority.resolution_hours` per-space, fallback 72 jam; approve auto-`due_date` + reopen; PR #337). Override **response** per-priority tetap TBD (response fix 24 jam).
@@ -157,3 +178,4 @@ Semua reuse `reportBaseFilter` (scope: supervisor→space divisinya, admin→sem
 
 - [[APP - Dynamic Task Tracker]] — sisi FE/aplikasi task tracker.
 - [[IT - Background Jobs & Schedulers]] — scheduler service ini (eskalasi SLA tiap jam)
+- [[ADR - 0038 Hak Per-Objek Admin Space Task Management]] — keputusan admin per space (menyimpang dari [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]])
