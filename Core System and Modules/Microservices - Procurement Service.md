@@ -74,6 +74,20 @@ Entitas permintaan barang yang **dibuat & disetujui di ERP** sebagai sumber kebe
 - **Penomoran** `PR.<YYYY>.<MM>.<NNNNN>` — periode di dalam nomor, urut **reset per bulan** (`UsulNomorPermintaan`, pola `UsulNomorTransaksiKas`). Nomor tertinggi rusak diabaikan; index unik `permintaan_erp_number_unique` penjaga akhir, bentrok → 409 "simpan ulang". Plus index `(peminta_departemen, persetujuan)` untuk antrean persetujuan.
 - Tes pure (`permintaan_erp_test.go`): penomoran (reset/rusak), validasi, filter tri-state, routing `BolehSetujuiPermintaan`.
 
+### Pesanan Pembelian ERP — create + Ambil Permintaan + persetujuan (`pesanan_erp.go`, `pesanan_erp_handler.go`) ✅ 2026-08-06
+
+Pesanan pembelian yang **dibuat & disetujui di ERP** (koleksi `pesanan_erp`), sejajar dengan Permintaan Barang ERP. TERPISAH dari cermin `pesanan_pembelian` DAN dari `purchase_order` (po.go, yang MENGIRIM PO ke Accurate lewat worker — dibiarkan dormant). Menyatukannya membuat antrean sync mengirim dokumen ERP ke Accurate.
+
+- **`POST /pesanan-erp`** (`tulisPO`) — buat. Body: `vendor_no` (wajib), `rincian[]` (nama/kuantitas/satuan wajib; harga boleh 0; + diskon_persen/pajak/gudang + departemen/proyek/keterangan/no_permintaan), Info lainnya header (syarat_pembayaran/rekening/alamat_kirim/pengiriman/fob/kena_pajak), `diskon_header_persen`, `number` opsional. Server hitung `total_harga` per baris (`kuantitas × harga × (1−diskon%)`, diskon dijepit 0–100), `sub_total`/`total`, nama pemasok dari master, status awal **`diajukan`** + persetujuan `menunggu`, nomor.
+- **`GET /pesanan-erp`** (`akses`) — daftar + filter `status`/`vendor_no`/`cari`/rentang `dari`–`sampai`.
+- **`GET /pesanan-erp/:id`**, **`/usul-nomor`** (`akses`).
+- **`GET /pesanan-erp/permintaan-disetujui`** (`akses`) — daftar Permintaan yang **sudah disetujui**, dasar fitur "Ambil → Permintaan" (rincian disalin jadi baris PO). Hanya yang disetujui yang boleh jadi dasar pesanan.
+- **`GET /pesanan-erp/persetujuan`**, **`POST /pesanan-erp/:id/setujui`**, **`/tolak`** — antrean & keputusan **pemegang jabatan approver**. **TIDAK digerbang izin procurement**: PO disetujui berdasarkan JABATAN (`BolehSetujuiPesanan(BIP-Position)` cocok const `PosisiApproverPO` = **"Direktur"**, case-insensitive), bukan izin modul. Menyetujui menaikkan status `diajukan` → `menunggu_diproses`. `/tolak` menuntut `alasan`.
+- **Status proses**: `diajukan` → `menunggu_diproses` → `sebagian_diproses` → `terproses` (dua terakhir status pengiriman, belum digerakkan). **Penomoran** `PO.<YYYY>.<MM>.<NNNNN>` reset per bulan; index unik `pesanan_erp_number_unique` (bentrok → 409) + index `(persetujuan, status)`.
+- Tes pure (`pesanan_erp_test.go`): penomoran, total baris/header (diskon dijepit), validasi (harga 0 sah), filter, approval jabatan.
+
+> **Ubah jabatan approver di DUA tempat** bila bukan Direktur: const `PosisiApproverPO` (backend) + `POSISI_APPROVER_PO` (FE, `features/procurement/pesanan/types/pesanan-erp.ts`). Keduanya harus sama.
+
 ### Penomoran (`nomor.go`)
 
 Nomor diketik manual oleh user; ERP hanya **mengusulkan** nomor berikut berdasarkan yang tertinggi per kategori (`PBB-060` → usul `PBB-061`). Prefix memetakan 1:1 ke kategori dan konsisten pada seluruh 139 pemasok produksi: `PBB` → Pemasok Bahan Baku, `PBK` → Pemasok Bahan Kemas, `PU` → Umum.

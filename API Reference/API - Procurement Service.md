@@ -337,6 +337,23 @@ Entitas **milik ERP** (bukan cermin Accurate), koleksi `permintaan_erp`. Arah da
 
 > **Routing persetujuan = atasan langsung departemen peminta.** `BolehSetujuiPermintaan(peminta_departemen, supervised)` mencocokkan (case-insensitive) departemen peminta terhadap `BIP-Supervised-Departments` (diisi gateway dari klaim JWT) — tidak memanggil employee-service. Departemen peminta kosong → tak seorang pun berhak.
 
+## Pesanan Pembelian ERP — create + Ambil Permintaan + persetujuan (✅ Diimplementasikan 2026-08-06)
+
+Entitas **milik ERP** (koleksi `pesanan_erp`), TERPISAH dari cermin `pesanan_pembelian` dan dari `purchase_order` (push Accurate). Prefix `/pesanan-erp`.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/pesanan-erp` | Daftar berpaginasi. Query: `status`, `vendor_no`, `cari` (number+keterangan), `dari`/`sampai`, `page`, `limit`. Role `akses`. |
+| POST | `/pesanan-erp` | Buat PO. Body: `vendor_no` (wajib), `rincian[]` (`nama_barang`/`kuantitas`/`satuan` wajib; `harga` boleh 0; `diskon_persen`/`pajak`/`gudang`/`departemen`/`proyek`/`keterangan`/`no_permintaan` opsional), Info lainnya header, `diskon_header_persen`, `number?`. Server hitung total & status awal **`diajukan`**. Role `tulisPO`. `409` nomor bentrok. |
+| GET | `/pesanan-erp/:id` | Detail. Role `akses`. |
+| GET | `/pesanan-erp/usul-nomor` | Usulan `PO.<YYYY>.<MM>.<NNNNN>` (reset per bulan). Role `akses`. |
+| GET | `/pesanan-erp/permintaan-disetujui` | Permintaan yang SUDAH disetujui (untuk "Ambil → Permintaan"). Role `akses`. |
+| GET | `/pesanan-erp/persetujuan` | Antrean PO menunggu, HANYA untuk pemegang jabatan approver (cek `BIP-Position` = `PosisiApproverPO`). Jabatan lain → daftar kosong. Tanpa gerbang izin procurement. |
+| POST | `/pesanan-erp/:id/setujui` | Setujui → status `diajukan`→`menunggu_diproses`. `403` bila bukan jabatan approver; `409` bila sudah diputuskan. |
+| POST | `/pesanan-erp/:id/tolak` | Tolak. Body `{"alasan": "..."}` wajib. Wewenang & aturan status sama. |
+
+> **Approval PO = jabatan**, bukan izin modul (beda dari Permintaan yang per-departemen supervisi). `PosisiApproverPO` = "Direktur" ("Pak Widi"), dicocokkan case-insensitive dengan `BIP-Position`. Ubah bersama padanan FE `POSISI_APPROVER_PO`.
+
 ## Belum Diimplementasikan / Catatan
 
 - Tidak ada endpoint **hapus pemasok** maupun **hapus barang** — penghapusan master dilakukan finance/procurement di Accurate.
