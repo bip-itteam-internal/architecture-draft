@@ -169,6 +169,8 @@ Pengecualiannya kolom yang **selalu ditulis kode kita sendiri** — mis. `employ
 
 **Contract / BPJS / Analysis**
 - Endpoint contract, BPJS, dan analysis (`RequireHRISStaff`)
+- `GET /bpjs` — nomor kepesertaan KS & KT per karyawan. Dua mode: **single** (`?employee_id=`, respons datar) dan **list** (paginasi + `search` nama/NIK + filter `department`). Hanya karyawan **aktif** (`system_authentication.is_active`) dan dibatasi perusahaan pemakai. **Hanya baca** — tak ada endpoint tulis; nomor BPJS diubah lewat `PATCH /work-data` milik [[CORE - HRIS Orchestrator]] yang bersifat partial.
+	- Sempat **yatim**: lengkap sejak lama tapi tak punya pemanggil sama sekali. Kini dikonsumsi menu **Kelola BPJS** di [[APP - Web ERP]] (dikoreksi 2026-08-06).
 - Device/browser management + FCM token
 
 **Feed Lintas-Service**

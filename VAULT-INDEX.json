@@ -1085,20 +1085,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "fa377c544e130796964b209eb7b2ca62ab38a77c25f876857e48a7640c7bfc08",
-      "ukuran_kb": 107.4,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal internal One Bharata (hris-dashboard) untuk HR, presensi, finance/insentif, integrasi marketplace, WMS, procurement, IT, dan GA; bagaimana login, refresh token, dan perannya sebagai SSO Identity Provider bekerja; serta bagaimana sidebar digerbangi system_roles, dikelompokkan lewat menu induk, dan disaring per jabatan. Juga menjawab bagaimana multi-perusahaan tampil di layar (CompanySwitcher, master data per-perusahaan), bagaimana admin per space membuka menu pengelola Task Management bagi orang bertier staf lewat GET /spaces/my-roles, konvensi UI layar daftar, cakupan i18n dua bahasa, serta layar mana yang masih stub/mock dan jebakan yang sudah terbukti di produksi.",
+      "hash": "93d35bc2c000a9ad16dde430994a3693ba5abbc49330077c49ab105be7fd94fa",
+      "ukuran_kb": 108.7,
+      "ringkasan": "Menjawab: web ERP internal Bharata (hris-dashboard / One Bharata) dibangun dengan stack apa, bagaimana alur login dan perannya sebagai SSO Identity Provider bagi aplikasi lain, serta bagaimana sidebar dan halaman digerbang oleh system_roles per module. Juga menjawab cara kerja multi-perusahaan di frontend (company switcher, kelola perusahaan, departemen, shift, dan network per company), pengaturan Tampilan Menu per jabatan beserta bedanya dengan hak akses, dan menu atau modul apa saja yang sudah tersedia.",
       "kata_kunci": [
-        "Web ERP",
+        "web ERP",
+        "erp-frontend",
         "hris-dashboard",
         "One Bharata",
-        "erp-frontend",
-        "Next.js",
-        "sidebar menu",
+        "SSO",
+        "system_roles",
+        "sidebar",
         "role gating",
-        "SSO identity provider",
-        "i18n dua bahasa",
-        "admin space"
+        "multi-perusahaan",
+        "company switcher"
       ]
     },
     {
@@ -1615,10 +1615,10 @@
         "RUN - Onboarding Akun Eksternal (Vendor & Mitra)",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "CORE - SSO Flow",
+        "CORE - HRIS Orchestrator",
         "ADR - 0006 Swap Jadwal Same-Department",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "Microservices - Inventory Service",
-        "CORE - HRIS Orchestrator",
         "DB - Overview and Notes",
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
@@ -1627,20 +1627,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "0faacb09d704861dc70f4e1517d95706b7f1e4c1e42f2827842a56010713aed8",
-      "ukuran_kb": 44.0,
-      "ringkasan": "Menjawab: bagaimana autentikasi ekosistem bip-erp bekerja (login username/employee_id, PIN, biometric, refresh, onboarding registrasi) dan operasi admin akun apa yang tersedia (reset, forget-device, set role), serta endpoint master data departemen, jabatan, jenjang jabatan, dan system role. Juga menjawab: bagaimana data karyawan, KPI, kontrak, BPJS, cuti, resign/non-aktif, dan akun pihak luar (vendor/mitra) dikelola di sini, feed apa yang dikonsumsi service lain, dan jebakan lintas-fitur yang sudah terukur (tanggal tersimpan dua tipe BSON, allowlist proyeksi agregat, penyaring `is_active` yang menghilangkan karyawan dari laporan).",
+      "hash": "1fa7732f59afcc334009f5dfbd37235717fde07a4f6019f96485c91ba3186258",
+      "ukuran_kb": 44.6,
+      "ringkasan": "Menjawab: service mana yang menjadi sumber kebenaran data karyawan sekaligus autentikasi, dan endpoint apa saja yang dipakai untuk login (employee_id, PIN, biometric), refresh token, serta onboarding registrasi karyawan baru. Juga menjawab bagaimana IT mengelola akun (aktif/nonaktif, reset, forget-device, system roles), bagaimana master data department dan system role dikelola, serta workspace divisi apa saja (Legal, R&D Regulatory, Quality, Procurement) yang di-host di service ini berikut gerbang RBAC tiap rutenya.",
       "kata_kunci": [
         "employee service",
-        "autentikasi login",
-        "SSO",
-        "onboarding karyawan",
-        "master data departemen",
-        "resign non-aktif",
-        "akun eksternal vendor",
-        "jenjang jabatan job level",
-        "company_id multi-tenant",
-        "feed lintas-service"
+        "karyawan",
+        "employee",
+        "autentikasi",
+        "login",
+        "master data",
+        "department",
+        "system roles",
+        "onboarding",
+        "kelola akun"
       ]
     },
     {
@@ -1838,20 +1838,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "3f0f71dd4e24dcae2ac1e7d7d94d6ad933628144a7f87ebbc5d3aaee7f577435",
-      "ukuran_kb": 200.0,
-      "ringkasan": "Menjawab: bagaimana order dan laporan iklan marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk lewat webhook direct dan cron sync, bagaimana dinormalkan jadi model transaksi terpadu, lalu di-bridge ke Accurate Online sebagai Sales Invoice, Retur Penjualan, dan Bukti Terima Kas — termasuk aturan cutover faktur vs retur, anchor `shipped_at`, dan dari mana harga baris faktur diambil. Juga menjawab: bagaimana kredensial OAuth per marketplace, automasi auto-ship sadar-holiday, worker terjadwal, modul profit/HPP, ICC mapping, dan ulasan marketplace bekerja, serta bagian mana yang masih kosong atau di-disable (Meta Ads, KiriminAja, jalur Desty) dan gap Lazada yang tercatat.",
+      "hash": "22c062532638da6fa35d35b789078281a031aa1faa1b99543c814a1eb18cf4bb",
+      "ukuran_kb": 201.3,
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada), bagaimana order masuk lewat webhook per platform, dan bagaimana order serta laporan iklan dinormalkan jadi model transaction terpadu. Juga menjawab cara bridging akuntansi ke Accurate Online (invoice, sales invoice dan sales return, ringkasan transaksi harian per shop), cara kerja laporan GMV Max dan metrik video ICC untuk insentif, pengelolaan kredensial OAuth, job sync terjadwal, serta automasi auto-ship/auto-approve yang sadar hari libur.",
       "kata_kunci": [
         "integration service",
         "marketplace",
         "TikTok Shop",
+        "TikTok Ads",
         "Shopee",
-        "Lazada",
-        "Accurate bridging",
-        "auto-sync faktur",
         "webhook",
-        "worker cron",
-        "GMV Max"
+        "Accurate",
+        "GMV Max",
+        "OAuth",
+        "sync order"
       ]
     },
     {
@@ -2996,20 +2996,20 @@
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur"
       ],
-      "hash": "50f49a24ae6aa10d0e081ab497c9b9c841e3e3bea59e470074ace6ff1cd5aad0",
-      "ukuran_kb": 14.5,
-      "ringkasan": "Menjawab: kapan sebuah retur marketplace boleh dibukukan sebagai Retur Penjualan di Accurate dan kapan justru dilewati karena refund-nya sudah terserap jalur income/Bukti Terima Kas — lewat gerbang payout (CANCELLED book, belum settle DEFER, payout>0 skip, payout≈0 book) yang membuat pembukuan dobel mustahil. Juga menjawab: tanggal mana yang dipakai per solution (refund-only pakai tanggal ajukan, barang-balik pakai tanggal fisik barang sampai, TikTok pakai `order_update_date`, CANCELLED pakai `cancelled_at`), mengapa cutover retur mengikuti hari kirim faktur sumbernya, bagaimana baris `SKIPPED` berjejak di UI, dan apa amandemen serta keputusan bisnis lanjutan yang tercatat (gerbang menuntut bukti penyerapan; usulan nilai barang selalu lewat retur untuk semua kanal).",
+      "hash": "e4f0ed53c6d0341daf376ea12d805e4da3f94f007305e43c77486d9c60c9d6f2",
+      "ukuran_kb": 17.1,
+      "ringkasan": "Menjawab: kapan sebuah retur marketplace dibukukan sebagai Retur Penjualan di Accurate dan kapan justru di-skip karena refund-nya sudah diserap jalur Auto Sync Income, lewat gerbang payout (payout nol vs payout lebih dari nol) sehingga dobel pembukuan tidak terjadi. Juga menjawab tanggal apa yang dipakai per jenis solution retur (cancelled_at, requested_at, tanggal barang sampai gudang, order_update_date untuk TikTok), mengapa cutover retur mengikuti hari kirim faktur alih-alih tanggal retur, dan mengapa retur yang di-skip tetap wajib meninggalkan baris jejak SKIPPED di UI.",
       "kata_kunci": [
         "retur",
+        "return",
+        "retur penjualan",
         "sales return",
-        "gerbang payout",
+        "payout",
         "escrow",
         "refund",
         "Accurate",
-        "cutover retur",
-        "tanggal retur",
-        "bukti terima kas",
-        "Shopee TikTok"
+        "cutover",
+        "Shopee"
       ]
     },
     {
@@ -5122,7 +5122,7 @@
         "REF - Glossary"
       ],
       "hash": "c6cf1f00150ced4778be0850a0c82424860d1be9f236496230926adf9bc90c8a",
-      "ukuran_kb": 32.0,
+      "ukuran_kb": 32.3,
       "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang sumber datanya sudah ada di ERP sehingga bisa diisi otomatis, mana yang modulnya jalan tapi koleksinya kosong, dan mana yang memang tidak punya sumber sama sekali. Memuat rekap persentase otomasi per departemen dan peta klaster metrik ke sumber datanya secara konkret, mulai konversi iklan TikTok, ROI/ROAS, omzet, piutang lewat Accurate, uptime dari monitoring service, SLA dan CSAT e-ticket, sampai kehadiran dan lead time procurement. Juga menjawab kenapa label metrik adalah kunci identitas yang mengikat setiap rencana auto-fill, dan penghalang apa yang tersisa di Tech Development: CSAT berskala 1 sampai 5 sedangkan KPI menargetkan 1 sampai 10, SLA resolusi tanpa sampel, dan laporan tiket yang tak bisa disaring per space.",
       "kata_kunci": [
         "KPI",
