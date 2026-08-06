@@ -2,7 +2,9 @@
 
 *Cara dev departemen menambahkan satu metrik KPI yang terisi otomatis, tanpa menyentuh aturan penilaian dan tanpa bertabrakan dengan dev departemen lain. Latar belakang dan peta metriknya ada di [[HRIS - Otomasi Skor KPI]]; keputusan batas servicenya di [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]].*
 
-- **Status**: ⚠️ Mesinnya **sudah deploy ke produksi 1 Agustus 2026** (PR #843 kontrak sumber, #857 mesin reduksi dan registry, #866 sumber `uptime_sistem`) dan terverifikasi terhadap data sungguhan. Prosedur di bawah final terhadap kode itu. Yang belum: **nol template punya konfigurasi `auto`** (sensus 2026-08-06), dan **layar Score KPI belum menampilkan `auto_value`**, sehingga usulan sistem belum terlihat penilai walau endpointnya hidup.
+- **Status**: ✅ Mesinnya **deploy ke produksi 1 Agustus 2026** (PR #843 kontrak sumber, #857 mesin reduksi dan registry, #866 sumber `uptime_sistem`), dan **metrik otomatis pertama menyala 6 Agustus 2026**: tiga metrik Tech Development kini benar-benar menghasilkan angka di produksi. Prosedur di bawah final terhadap kode itu dan sudah pernah dijalankan sampai tuntas. Rinciannya di [[HRIS - Otomasi Skor KPI]].
+	- ⚠️ Yang masih tertinggal: **frontend produksi belum menampilkan `auto_value`** (FE prod terakhir deploy 6 Agustus 16:38, sebelum PR erp-frontend #831 merged), jadi usulan sistem hidup di API tetapi belum terlihat penilai.
+	- ⚠️ **Di DEV, `MONITORING_SERVICE_KEY` dan `MARKETING_ANALYTICS_SERVICE_KEY` kosong** (prod terisi). Gerbang kunci layanan fail-closed, jadi sumber yang menariknya **mustahil menghasilkan angka di dev**. Kalau metrikmu memakai salah satunya, jangan buang waktu menguji di dev sebelum kuncinya diisi.
 
 Sumber yang sudah ada dan bisa dipakai sebagai contoh:
 
@@ -176,6 +178,46 @@ Terakhir, env barunya dipasang di **dua** blok `docker-compose.yml`: service sum
 ## Langkah 3: isi konfigurasi metrik
 
 Lewat `POST /kpi/templates` yang sudah ada. Tidak perlu deploy untuk mengubahnya.
+
+### Contoh yang benar-benar terpasang di produksi
+
+Ketiganya dinyalakan 2026-08-06 dan sudah diverifikasi menghasilkan angka:
+
+```jsonc
+// Tech Development Leader / "Performance Monitoring Team" (bobot 0,4)
+{ "sumber": "skor_tim", "formula": "rata_rata", "target": 70, "arah": "naik", "scope": "team" }
+
+// Tech Development Supervisor / "Performance Monitoring Team" (bobot 0,3)
+{ "sumber": "skor_tim", "formula": "rata_rata", "target": 70, "arah": "naik", "scope": "department" }
+
+// IT Support / "Network " (bobot 0,4)   <- perhatikan spasi di ujung labelnya
+{ "sumber": "uptime_sistem", "formula": "rata_rata", "target": 90, "arah": "naik", "scope": "department" }
+```
+
+**Pilihan `scope` harus berdasar data, bukan selera.** Untuk Leader dipilih `team` karena `work_data.supervisor_id` memang menunjuk 5 bawahan langsung yang semuanya aktif; kalau kolom itu kosong, `team` menghasilkan populasi nol dan metriknya gagal hitung. Periksa dulu: `db.work_data.countDocuments({ supervisor_id: "<employee_id atasan>" })`.
+
+**Uptime tidak peduli `scope`**, tetapi fieldnya tetap wajib berisi nilai yang dikenal (`department` atau `team`), karena `ValidateKPIAutoConfig` menolak yang lain.
+
+### ⚠️ Cara menerapkannya menentukan seberapa besar risikonya
+
+`POST /kpi/templates` melakukan **`ReplaceOne`**: ia mengganti seluruh dokumen template. Payload yang kurang satu field berarti field itu **terhapus diam-diam**, dan template KPI memuat label, deskripsi, bobot, serta kunci metrik yang semuanya harus utuh.
+
+Untuk menyalakan satu-dua metrik pada template yang sudah ada, bedah per-metrik jauh lebih sempit:
+
+```js
+db.kpi_template.updateOne(
+  { _id: ObjectId("...") },
+  { $set: { "metrics.$[m].auto": { sumber: "skor_tim", formula: "rata_rata",
+                                   target: 70, arah: "naik", scope: "team" } } },
+  { arrayFilters: [{ "m.key": "performance-monitoring-team" }] }
+)
+```
+
+Menyaring lewat **`m.key`**, bukan `m.label`: label produksi memuat spasi di ujung dan typo, sedangkan `key` memang identitas stabilnya.
+
+Konsekuensinya jalur ini **melewati `ValidateKPIAutoConfig`**, jadi konfigurasinya harus dicocokkan sendiri: formula dan scope termasuk kosakata yang dikenal, `arah` diisi sadar, dan `target > 0` untuk arah `naik`.
+
+Apa pun jalurnya, **cetak konfigurasi sebelum dan sesudah**, lalu periksa dua penjaga: jumlah template ber-`auto` bertambah persis sebanyak yang diniatkan, dan `kpi_score` ber-`auto_value` **tidak berubah** (menyalakan konfigurasi tak boleh menyentuh penilaian yang sudah tersimpan).
 
 ```json
 {

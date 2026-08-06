@@ -2,12 +2,45 @@
 
 *Analisis kelayakan **mengisi skor KPI secara otomatis** dari data yang sudah dimiliki ERP, bukan diketik manual oleh supervisor. Menjawab: dari 311 metrik yang benar-benar terpasang di production, mana yang sumber datanya sudah ada, mana yang modulnya ada tapi belum dipakai, dan mana yang memang tidak punya sumber sama sekali. Melengkapi [[HRIS - Key Performance Index]] yang menjelaskan mekanisme scoring-nya.*
 
-- **Status**: ⚠️ Mesin dan sumber pertamanya **sudah jalan di produksi** (PR #843 kontrak sumber nilai, #857 mesin reduksi + arah target + registry sumber, #866 sumber `uptime_sistem`; deploy 1 Agustus 2026 dan terverifikasi terhadap `kuma.db` sungguhan). **Tetapi belum ada satu pun metrik yang terisi otomatis**, karena belum satu pun `kpi_template` diisi konfigurasi `auto`-nya — itu pekerjaan data, bukan kode. Departemen pertama yang dikerjakan: **Tech Development**. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.
+- **Status**: ⚠️ **Metrik otomatis PERTAMA menyala di produksi 6 Agustus 2026**, lima hari sesudah mesinnya deploy. Tiga metrik Tech Development kini punya konfigurasi `auto` dan benar-benar menghasilkan angka (rincian dan buktinya di bab **Metrik otomatis yang sudah menyala** di bawah). Catatan lama "belum ada satu pun metrik yang terisi otomatis" **sudah tidak berlaku**. Mesinnya sendiri jalan sejak PR #843 (kontrak sumber nilai), #857 (mesin reduksi + arah target + registry), dan #866 (sumber `uptime_sistem`), deploy 1 Agustus 2026. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.
+	- ⚠️ **Penilai belum melihatnya.** Angkanya nyata dan terambil lewat `GET /kpi/auto-values`, tetapi frontend produksi terakhir di-deploy 6 Agustus 16:38 dan belum memuat layar yang menampilkannya (PR erp-frontend #831 merged sesudah itu). Sampai FE prod di-deploy, otomasi ini hidup di API saja.
 - **Ruang lingkup**: `kpi_template` / `kpi_score` di [[Microservices - Employee Service]]. **Bukan** engine insentif marketing di [[Microservices - Insentive Service]], walau bab 6 mengusulkan menyambungkan keduanya.
+
+## Metrik otomatis yang sudah menyala
+
+Dinyalakan di produksi **2026-08-06** dengan menulis blok `auto` pada tiga metrik `kpi_template`. Tidak menyentuh `kpi_score` sama sekali, jadi seluruh penilaian yang sudah tersimpan tetap beku.
+
+| Posisi | Metrik | Bobot | Sumber | Formula | Scope | Target |
+|---|---|---:|---|---|---|---:|
+| Tech Development Leader | `Performance Monitoring Team` | 0,4 | `skor_tim` | `rata_rata` | `team` | 70 |
+| Tech Development Supervisor | `Performance Monitoring Team` | 0,3 | `skor_tim` | `rata_rata` | `department` | 70 |
+| IT Support | `Network ` | 0,4 | `uptime_sistem` | `rata_rata` | `department` | 90 |
+
+**Hasil nyata, diverifikasi lewat `GET /kpi/auto-values` untuk orang sungguhan pada hari yang sama:**
+
+| Siapa | Periode | `auto_value` | Cakupan | Sumber | `auto_basis` |
+|---|---|---:|---:|---|---|
+| Tech Dev Leader | 2026-07 | **100** | 100% | `otomatis` | rata-rata 86.00 dari 5 pengukuran (populasi 5); target naik 70.00 |
+| IT Support | 2026-07 | **100** | 74,19% | `semi` | rata-rata 99.81 dari 1 pengukuran; 23 dari 31 hari berdata; target naik 90.00 |
+| Tech Dev Leader | 2026-08 | — | — | `manual` | belum dapat dihitung: belum ada satu pun pengukuran pada periode ini |
+
+Tiga hal yang dibuktikan baris-baris itu, dan ketiganya inti rancangannya:
+
+1. **Cakupan penuh menghasilkan `otomatis`, cakupan parsial menghasilkan `semi`.** Uptime Juli melampaui targetnya, tetapi heartbeat baru ada 23 dari 31 hari, jadi angkanya dipakai sambil menyatakan ia berdiri di atas data parsial.
+2. **Bulan berjalan tidak dikarang.** Agustus belum punya penilaian, dan sistem menjawab "belum dapat dihitung" beserta alasannya, bukan nol.
+3. **Nilai dibatasi 100.** Realisasi Leader 86 atas target 70 sebenarnya 122,8.
+
+**Dampak ke skor yang sudah ada: nol.** Juli sudah dinilai manual dengan angka yang kebetulan sama persis (100 pada kedua metrik), dan snapshot `kpi_score` beku sehingga tak tersentuh. Angka otomatis baru terpakai pada penilaian **Agustus**, yang dikerjakan awal September.
+
+**Kenapa tiga ini yang didahulukan**: sumbernya sudah ada di produksi dan tak menunggu siapa pun mengisi data. `skor_tim` membaca `kpi_score` sendiri, `uptime_sistem` membaca heartbeat yang tercatat otomatis. Metrik IT lain (SLA tiket, CSAT) menunggu produksi ditarik ke `main` terbaru agar sumber `kinerja_tiket` ikut.
+
+**Yang sengaja dilewati**: `Revenue 240M` pada Leader dan Supervisor. Deskripsinya di sistem berbunyi "Menjamin operasional IT tanpa gangguan" sementara dokumen KPI menyebut targetnya persentase tiket support yang selesai; dua sumber berbeda untuk satu label, dan itu keputusan pemilik metrik, bukan keputusan teknis.
 
 ## Kondisi Saat Ini
 
-Seluruh 311 metrik diisi manusia. Tidak ada jalur auto-fill di kode.
+> Bab ini menggambarkan keadaan **sebelum** otomasi menyala, dan sengaja dipertahankan sebagai titik banding. Per 2026-08-06 tiga metrik sudah otomatis (bab di atas); sisanya, 308 dari 311, masih diisi manusia.
+
+Semula seluruh 311 metrik diisi manusia dan tidak ada jalur auto-fill di kode.
 
 | Aspek | Kondisi (grounded) |
 |---|---|
@@ -278,7 +311,9 @@ Field `attribution_note` pada `mart_profit_attribution` di production menyatakan
 
 ## Belum Diimplementasikan / Catatan
 
-- Tidak ada satu pun metrik yang terisi otomatis hari ini. Mesin dan endpointnya sudah hidup di produksi; yang kurang adalah konfigurasi `auto` pada `kpi_template`, diisi lewat `POST /kpi/templates` tanpa perlu deploy.
+- **308 dari 311 metrik masih diisi manusia.** Tiga yang otomatis sejak 2026-08-06 ada di bab **Metrik otomatis yang sudah menyala**. Sisanya menunggu konfigurasi `auto` pada `kpi_template`, yang diisi lewat `POST /kpi/templates` tanpa perlu deploy.
+- ⚠️ **Frontend produksi belum menampilkan usulan sistem.** FE prod terakhir di-deploy 2026-08-06 16:38, sebelum PR erp-frontend #831 merged. Jadi supervisor yang membuka modal Score KPI belum melihat angka otomatis walau angkanya sudah ada di API. Deploy FE prod adalah langkah yang membuat otomasi ini terasa.
+- ⚠️ **Di DEV, `MONITORING_SERVICE_KEY` dan `MARKETING_ANALYTICS_SERVICE_KEY` kosong** (diperiksa 2026-08-06; di prod keduanya terisi 32 karakter). Gerbang kunci layanan fail-closed, jadi sumber `uptime_sistem` dan `kinerja_toko` **mustahil menghasilkan angka di dev** dan selalu gagal dengan alasan "SERVICE_KEY belum diatur". Itu menjelaskan kenapa uji end-to-end otomasi KPI di dev selalu buntu tanpa sebab yang kelihatan.
 - **Uptime bulan Juni 2026 dan sebelumnya tidak dapat dihitung.** Diverifikasi di produksi 1 Agustus 2026: Juni membalas `null` dengan 0 dari 30 hari, Juli 99,81% dengan 23 dari 31 hari (membenarkan heartbeat terawal 9 Juli). Agustus adalah periode penuh pertama.
 - **Selama bulan berjalan, metrik uptime akan dilaporkan `semi`, bukan `otomatis`.** Cakupannya memang belum penuh, dan uptime satu hari bukan uptime sebulan. Ia menjadi `otomatis` setelah bulannya tutup, yaitu saat penilaian dilakukan.
 - **`System uptime` dan `Server uptime` belum dapat dibedakan.** Seluruh monitor bertipe `docker` (33) dan `http` (1); memisahkannya butuh monitor tingkat host di Kuma, pekerjaan tim IT.

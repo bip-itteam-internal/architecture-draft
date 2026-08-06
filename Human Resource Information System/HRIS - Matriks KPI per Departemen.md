@@ -826,7 +826,11 @@ Template `KPI Quality Supervisor`, 5 metrik.
 
 > **Departemen pertama yang dikerjakan.** Kodenya **sudah merge (PR #866) dan deploy ke produksi 1 Agustus 2026**, terverifikasi terhadap data sungguhan. Lihat [[Microservices - Monitoring Service]].
 >
-> **Belum satu pun metrik benar-benar otomatis.** Sensus `kpi_template` produksi 1 Agustus 2026: dari 70 template, **0 punya konfigurasi `auto`**, dan dari 406 dokumen `kpi_score`, **0 punya `auto_value`**. Mesin dan sumbernya siap; yang kurang konfigurasinya, diisi lewat `POST /kpi/templates` tanpa perlu deploy.
+> ✅ **TIGA metrik menyala otomatis sejak 2026-08-06.** Catatan lama di sini ("belum satu pun metrik benar-benar otomatis", sensus 1 Agustus: 0 dari 70 template) sudah tidak berlaku. Yang dinyalakan: `Performance Monitoring Team` pada **Leader** (`skor_tim`, scope `team`, target 70) dan **Supervisor** (scope `department`), serta `Network ` pada **IT Support** (`uptime_sistem`, target 90).
+>
+> Diverifikasi hari itu juga untuk orang sungguhan: Leader periode 2026-07 menghasilkan **100** dengan cakupan penuh (`otomatis`, basis "rata-rata 86.00 dari 5 pengukuran"), IT Support **100** dengan cakupan 74,19% sehingga dilaporkan **`semi`** (heartbeat baru 23 dari 31 hari), dan periode 2026-08 yang belum dinilai menjawab "belum dapat dihitung" alih-alih nol. Rinciannya di [[HRIS - Otomasi Skor KPI]].
+>
+> **`kpi_score` tidak tersentuh** (tetap 0 dokumen ber-`auto_value`): snapshot penilaian yang sudah ada beku, jadi angka otomatis baru terpakai pada penilaian **Agustus** di awal September. Kebetulan angkanya sama persis dengan yang sudah diisi manual, jadi tak ada selisih yang perlu dijelaskan ke siapa pun.
 >
 > **Tujuh metrik punya sumber terdaftar, tetapi hanya lima menyentuh orang.** Posisi `IT Infrastructure` **tidak punya karyawan sama sekali (0 orang)**, sehingga `System` 0,1 dan `Server` 0,1 menempel di template yang tak dipegang siapa pun. Yang nyata:
 >

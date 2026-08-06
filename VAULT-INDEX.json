@@ -539,8 +539,8 @@
         "ADR - 0001 Akuntansi via Accurate",
         "CORE - API Master Gateway"
       ],
-      "hash": "ee82c57c7bdde8706d2eb8929a3e42e85af6510ead13496ff9b84df494ad7aad",
-      "ukuran_kb": 17.3,
+      "hash": "dcb5e3a50d5db78c9ea644898d78ba885371fecf2deec671fa40938bc74f55d9",
+      "ukuran_kb": 19.8,
       "ringkasan": "Menjawab: endpoint apa saja di `/api/procurement/*` untuk master Pemasok dan master Barang & Jasa (CRUD, usulan nomor/kode, katalog dari Accurate, import awal) serta cermin baca-saja modul Pembelian (Pesanan, Penerimaan, Permintaan Barang). Memuat bentuk request body dan response lengkap `Pemasok` dan `Barang` beserta arti tiap field, pemetaan field ke Accurate (mis. `no_wa` → `bbmPin`, `telp_bisnis` → `workPhone`), nilai enum `jenis_barang` dan `tipe_nomor_seri`, serta arti `sync_status` PENDING/SYNCED/FAILED. Juga menjelaskan kode status HTTP tiap rute (400/404/409/502), aturan auth gateway key plus role guard `system_roles[\"procurement\"]`, dan field baca-saja `merek`/`tipe_persediaan` yang hanya terisi lewat import.",
       "kata_kunci": [
         "procurement service",
@@ -1092,8 +1092,8 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "43a9353ad72b3796521a3b4dd4ee3bbd336157804d1f33913c7b039dfc69a8cc",
-      "ukuran_kb": 113.0,
+      "hash": "f1cd118c9096edd8a3d41b1538bd06b71fbc5560352512ee3284e24d6aafd215",
+      "ukuran_kb": 115.6,
       "ringkasan": "Menjawab: modul dan menu apa saja yang ada di portal web ERP internal (hris-dashboard / One Bharata), bagaimana login serta role gating lewat system_roles bekerja, dan bagaimana web ini berperan sebagai SSO Identity Provider bagi aplikasi lain. Juga menjawab cara menu dikelompokkan di sidebar, pengaturan tampilan menu per jabatan (menu_hidden) dan bedanya dari hak akses, serta perilaku multi-perusahaan lewat company switcher.",
       "kata_kunci": [
         "web erp",
@@ -2169,8 +2169,8 @@
         "Microservices - Manufacture Service",
         "Microservices - Integration Service"
       ],
-      "hash": "31b09fc1690adec25e8252c41610863394cd42b6dd8761bd6a7fa20f515efbea",
-      "ukuran_kb": 23.2,
+      "hash": "aaab209373e12029f598cfce287529db44d6b5bd2f8603fc2ebc0835da1470ee",
+      "ukuran_kb": 25.8,
       "ringkasan": "Menjawab: bagaimana master Pemasok dan master Barang & Jasa diinput di ERP lalu disinkronkan ke Accurate Online, dan bagaimana data Pembelian (pesanan, penerimaan, permintaan barang) ditarik balik dari Accurate sebagai cermin baca-saja. Juga menjawab: endpoint apa yang tersedia, bagaimana penomoran/usul kode dibuat, bagaimana worker sync dan import awal bekerja, serta jebakan integrasi Accurate yang sudah terbukti (field baca-saja, tipe boolean materialProduced, toggle pada edit parsial). Berguna untuk mengetahui koleksi dan volume data procurement di produksi serta batas antara service ini dan register procurement non-Accurate di employee-service.",
       "kata_kunci": [
         "procurement service",
@@ -5049,9 +5049,9 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "998b3cefc4128d0ed48b884a7f6200e0ed980172fc787872c3aa73c682803748",
-      "ukuran_kb": 133.1,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang di produksi hari ini, per departemen dan per posisi, lengkap dengan label persis seperti tersimpan (termasuk typo dan spasi di ujung), bobot, dan target yang tersembunyi di kolom description. Untuk tiap metrik menjawab pula sumber data mana di ERP yang bisa mengisinya beserta volumenya, dan rekomendasi tanpa istilah teknis tentang apa yang harus dikerjakan lebih dulu. Memuat daftar cacat data yang sengaja disalin apa adanya (template uji ikut produksi, metrik duplikat, label memakai target korporat) serta koreksi kepadatan data e-ticket yang sebelumnya salah dilaporkan nol karena keliru nama field.",
+      "hash": "7bedc37461a6ff22c94fdbd92c9df3d4edd1096ce407b8eb806764d70e1840ae",
+      "ukuran_kb": 133.9,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang di produksi hari ini, per departemen dan per posisi, lengkap dengan label persis seperti tersimpan (termasuk typo dan spasi di ujung), bobot, dan target yang tersembunyi di kolom description. Untuk tiap metrik menjawab pula sumber data mana di ERP yang bisa mengisinya beserta volumenya, dan rekomendasi tanpa istilah teknis tentang apa yang harus dikerjakan lebih dulu. Memuat daftar cacat data yang sengaja disalin apa adanya, koreksi kepadatan data e-ticket yang sebelumnya salah dilaporkan nol, dan catatan metrik Tech Development mana yang kini sudah menyala otomatis.",
       "kata_kunci": [
         "matriks KPI",
         "KPI per departemen",
@@ -5111,7 +5111,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Mesin dan sumber pertamanya **sudah jalan di produksi** (PR #843 kontrak sumber nilai, #857 mesin reduksi + arah target + registry sumber, #866 sumber `uptime_sistem`; deploy 1 Agustus 2026 dan terverifikasi terhadap `kuma.db` sungguhan). **Tetapi belum ada satu pun metrik yang terisi otomatis**, karena belum satu pun `kpi_template` diisi konfigurasi `auto`-nya — itu pekerjaan data, bukan kode. Departemen pertama yang dikerjakan: **Tech Development**. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.",
+      "status_teks": "**Metrik otomatis PERTAMA menyala di produksi 6 Agustus 2026**, lima hari sesudah mesinnya deploy. Tiga metrik Tech Development kini punya konfigurasi `auto` dan benar-benar menghasilkan angka (rincian dan buktinya di bab **Metrik otomatis yang sudah menyala** di bawah). Catatan lama \"belum ada satu pun metrik yang terisi otomatis\" **sudah tidak berlaku**. Mesinnya sendiri jalan sejak PR #843 (kontrak sumber nilai), #857 (mesin reduksi + arah target + registry), dan #866 (sumber `uptime_sistem`), deploy 1 Agustus 2026. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.",
       "publik": true,
       "tautan": [
         "HRIS - Key Performance Index",
@@ -5166,20 +5166,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "a86a5ade27b8f9f996ffd22756468f3ee7ed0f2ebdde313a8eeb70d3ae05a7fe",
-      "ukuran_kb": 33.9,
-      "ringkasan": "Menjawab: dari seluruh metrik KPI yang terpasang di production, mana yang sumber datanya sudah siap otomatis, mana yang masih butuh definisi atau mapping, mana yang modulnya jalan tapi datanya kosong, dan mana yang memang manual, lengkap dengan rekap per departemen. Juga menjawab metrik mana dipetakan ke koleksi atau endpoint sumber yang mana, dan kenapa label metrik menjadi kunci pengikat setiap rencana auto-fill.",
+      "hash": "7db72e25b6d3ed1af842b7211b31779c1d57fe8ca8a8aeae05f68f4e3e86212d",
+      "ukuran_kb": 37.8,
+      "ringkasan": "Menjawab: metrik KPI mana yang sudah benar-benar terisi otomatis di produksi beserta bukti angkanya, dan dari 311 metrik yang terpasang mana yang sumber datanya sudah ada, mana yang modulnya jalan tapi koleksinya kosong, dan mana yang tidak punya sumber sama sekali. Memuat rekap otomasi per departemen, peta klaster metrik ke sumber datanya, serta kenapa label metrik adalah kunci identitas yang mengikat setiap rencana auto-fill. Juga menjawab apa yang masih menahan otomasi terasa oleh penilai: layar produksi yang belum menampilkan usulan, dan kunci layanan yang kosong di dev sehingga sumber tertentu mustahil diuji di sana.",
       "kata_kunci": [
         "KPI",
         "otomasi skor",
-        "auto-fill",
+        "auto-fill KPI",
         "kpi_template",
         "kpi_score",
-        "metrik",
+        "metrik otomatis",
         "sumber data",
-        "bobot",
-        "klasifikasi metrik",
-        "per departemen"
+        "skor_tim",
+        "uptime_sistem",
+        "Tech Development"
       ]
     },
     {
@@ -7178,8 +7178,8 @@
       "judul": "RUN - Menambah Metrik KPI Otomatis",
       "area": "Runbooks",
       "jenis": "runbook",
-      "status_emoji": "⚠️",
-      "status_teks": "Mesinnya **sudah deploy ke produksi 1 Agustus 2026** (PR #843 kontrak sumber, #857 mesin reduksi dan registry, #866 sumber `uptime_sistem`) dan terverifikasi terhadap data sungguhan. Prosedur di bawah final terhadap kode itu. Yang belum: **nol template punya konfigurasi `auto`** (sensus 2026-08-06), dan **layar Score KPI belum menampilkan `auto_value`**, sehingga usulan sistem belum terlihat penilai walau endpointnya hidup.",
+      "status_emoji": "✅",
+      "status_teks": "Mesinnya **deploy ke produksi 1 Agustus 2026** (PR #843 kontrak sumber, #857 mesin reduksi dan registry, #866 sumber `uptime_sistem`), dan **metrik otomatis pertama menyala 6 Agustus 2026**: tiga metrik Tech Development kini benar-benar menghasilkan angka di produksi. Prosedur di bawah final terhadap kode itu dan sudah pernah dijalankan sampai tuntas. Rinciannya di [[HRIS - Otomasi Skor KPI]].",
       "publik": true,
       "tautan": [
         "HRIS - Otomasi Skor KPI",
@@ -7195,9 +7195,9 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "5b1154aa17821c6dd2a0054c60f7d83f696baef13c8748c4eae4ca3efed02286",
-      "ukuran_kb": 22.4,
-      "ringkasan": "Menjawab: bagaimana data KPI otomatis sebenarnya dikumpulkan (tidak ada tabel penampung KPI; data mentah tertampung di service asalnya lalu dihitung ulang saat dibaca dan saat dinilai, dan dibekukan di kpi_score setelah disimpan), kapan snapshot harian memang diperlukan, dan langkah apa saja yang harus dilakukan dev departemen untuk menambah satu metrik yang terisi otomatis. Memuat daftar sumber yang sudah ada sebagai contoh, kapan satu sumber sebaiknya melayani banyak metrik lewat KPIAutoConfig.Metrik, cetak biru rute di service sumber beserta gerbang kunci layanan yang menutup saat env kosong, katalog formula reduksi, bahaya salah mengisi arah, serta jebakan nol palsu akibat salah nama field.",
+      "hash": "3217d71ab2813222a18bae3a241fab302639b886489c65af8b56cd8d12dd7556",
+      "ukuran_kb": 25.4,
+      "ringkasan": "Menjawab: bagaimana data KPI otomatis dikumpulkan (tidak ada tabel penampung KPI; data mentah tertampung di service asalnya lalu dihitung ulang saat dibaca dan saat dinilai, lalu dibekukan di kpi_score), kapan snapshot harian memang diperlukan, dan langkah apa saja untuk menambah satu metrik yang terisi otomatis. Memuat daftar sumber yang sudah ada sebagai contoh, kapan satu sumber sebaiknya melayani banyak metrik, cetak biru rute di service sumber beserta gerbang kunci layanan yang menutup saat env kosong, katalog formula reduksi, bahaya salah arah target, contoh konfigurasi yang benar-benar terpasang di produksi, serta kenapa POST /kpi/templates yang ber-ReplaceOne lebih berisiko daripada bedah per-metrik.",
       "kata_kunci": [
         "runbook KPI",
         "metrik otomatis",
@@ -7208,7 +7208,7 @@
         "target",
         "kunci layanan",
         "nol palsu",
-        "snapshot beku"
+        "scope team"
       ]
     },
     {
