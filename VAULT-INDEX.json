@@ -162,20 +162,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "bfd4c2cf05149cde69f3f25bb5b44bd556da793992a851ec83a51bdd9c33831e",
-      "ukuran_kb": 15.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (tingkat peran + cakupan departemen, bukan modul), dan bagaimana karyawan mengisi form lewat rute `/me/*`. Menjelaskan juga aturan kode balasan penting seperti `409` saat susunan pertanyaan diubah padahal sudah ada jawaban, idempotensi pengiriman 2 menit, arti `?period=` pada analisa/export vs penjaga duplikat, serta batas ekspor CSV. Memuat kontrak rute komite Kaizen (`/kaizen/*`) berikut transisi keputusan ide, aksi massal maks 200 id, dan papan kepatuhan.",
+      "hash": "67f6972b8d68bce7a35384935c87083bebb05855ae6ee3991c55698ac1cfc817",
+      "ukuran_kb": 15.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (tingkat peran staff/supervisor/admin plus departemen ada di daftar departemen aktif) versus siapa yang cukup terautentikasi untuk mengisi, dan apa arti tiap kode respons penting seperti 409 saat susunan pertanyaan diubah padahal sudah ada jawaban. Menjelaskan juga rute pengisian `/me/*` (daftar form yang ditujukan ke pemanggil, daftar orang yang harus dinilai, idempotensi pengiriman 2 menit), arti parameter `?period=` pada analytics/responses/export form berulang, dan rute komite Kaizen `/kaizen/*` untuk antrean ide, keputusan satuan maupun massal, papan kepatuhan, serta export CSV-nya. Dipakai saat perlu tahu kontrak persis sebelum memanggil dari Web ERP atau MyBharata.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
-        "survey",
-        "endpoint",
-        "API reference",
-        "RBAC departemen",
-        "analytics",
-        "export CSV",
+        "endpoint form-builder",
         "kaizen",
-        "penilaian karyawan"
+        "survei",
+        "survey",
+        "analytics form",
+        "export CSV",
+        "form berulang",
+        "RBAC departemen"
       ]
     },
     {
@@ -1639,22 +1639,20 @@
         "CORE - SSO Flow",
         "Microservices - Employee Service"
       ],
-      "hash": "56df2c34de46c7032f4692162bb446a3ca9a01c1c96eae0831813bbd74a6397c",
-      "ukuran_kb": 51.0,
-      "ringkasan": "Menjawab: bagaimana sebuah departemen membuat form dinamis sendiri tanpa rilis kode, siapa yang boleh mengelola form (gerbang requireFormManager, kepemilikan per departemen), tipe pertanyaan dan tipe form apa saja yang tersedia, serta bagaimana sasaran (audience) diresolusi dari header identitas gateway. Juga menjelaskan cara satu form dipakai menilai karyawan lain (sumbu subject terpisah dari audience), cara kerja form berulang periode bulanan/mingguan beserta analisa dan export per periode, dan bagaimana form wajib bisa menahan clock-in mobile lewat endpoint kepatuhan yang dipanggil Attendance Service. Menerangkan pula notifikasi inbox form-published/form-submitted yang mengharuskan notification-service ikut di-deploy, serta perbedaan response_count dan respondent_count.",
+      "hash": "6308128535089323b4a5dc3e50710ccbbf0d7c5526ad51144876b27492d6e2e0",
+      "ukuran_kb": 53.1,
+      "ringkasan": "Menjawab: bagaimana sebuah departemen bisa membuat form sendiri tanpa rilis kode, tipe pertanyaan dan tipe form apa saja yang didukung, bagaimana sasaran form (audience) diresolusi, dan kenapa kepemilikan form memakai departemen alih-alih modul. Menjelaskan juga mekanisme penilaian karyawan lain lewat sumbu `subject` yang terpisah dari `audience`, form berulang berperiode bulanan/mingguan beserta cron pembuka periode, notifikasi inbox, tipe `kaizen`, dan bagaimana service ini menahan clock-in mobile lewat endpoint kepatuhan yang dipanggil Attendance Service. Berguna saat ingin memahami keputusan rancangan, batasan yang disengaja, dan dependensi deploy service ini.",
       "kata_kunci": [
-        "form builder",
+        "form builder service",
         "form dinamis",
-        "survei",
-        "survey",
-        "kuesioner",
         "tipe pertanyaan",
-        "audience",
-        "sasaran form",
         "penilaian karyawan",
+        "evaluation",
         "form berulang",
         "gerbang presensi",
-        "export CSV"
+        "kaizen",
+        "audience sasaran",
+        "multi-perusahaan"
       ]
     },
     {
@@ -3795,7 +3793,7 @@
         "GA - Big Pictures"
       ],
       "hash": "c863e2d830a83f758f8d387a0f2a9d7e27e436b1243d9b1f8a4bb31d3fb7d1f3",
-      "ukuran_kb": 12.7,
+      "ukuran_kb": 12.9,
       "ringkasan": "Menjawab: apa isi dua form kertas GA (Form Permintaan Barang dan Form Pengajuan Dana), apa bedanya, siapa yang membelanjakan di tiap alur, dan mengapa keduanya tetap dipisah. Menjelaskan dua menu yang diminta tim GA, yaitu Kas Kecil HRGA untuk admin GA dengan saldo dan pelaporan ke Finance, serta Permintaan Pembelian Kebutuhan Operasional dari seluruh divisi lengkap dengan field tahap pengajuan, tahap realisasi, dan rekap bulanan. Memuat pula keadaan sistem hari ini (procurement-service dengan master pemasok dan barang, cermin Accurate, purchase_order ERP masih kosong, belum ada pencatatan kas), keputusan yang sudah turun, dan daftar pertanyaan terbuka untuk SPV HRGA seperti ambang nominal pemisah dan nasib Kas Kardus.",
       "kata_kunci": [
         "form permintaan barang",
@@ -4615,17 +4613,17 @@
         "API - Form Builder Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "80f16983fd433379c46eca84cef8e11c0e525944e1ab18106fc7c8479a2fb4a8",
-      "ukuran_kb": 20.3,
-      "ringkasan": "Menjawab: bagaimana program pengumpulan ide perbaikan bulanan dijalankan, siapa yang wajib mengirim ide dan berapa kuotanya (kuota global dengan override per departemen, bersifat lantai bukan langit-langit), bagaimana potret peserta per periode diambil cron sebagai penyebut papan kepatuhan, dan bagaimana komite memutuskan ide dari Belum ditinjau ke Diterima/Ditolak lalu Diterapkan. Juga menjelaskan kenapa modul ini dibangun sebagai tipe form kelima di Form Builder Service, bukan service baru atau space di Task Management, serta bagaimana kaitannya dengan metrik KPI kaizen/inovasi yang selama ini tidak punya sumber data. Memuat daftar penyimpangan rancangan yang disengaja (prefix rute /kaizen, implemented_at wajib, kunci CompanyID, settings.kaizen absen berarti jangan diubah) berikut hal yang belum diverifikasi.",
+      "hash": "fe5143f74dfd70379b4ec8e3643088ca91d42b2f6d8b4666420bfc2f1c3da1f0",
+      "ukuran_kb": 21.8,
+      "ringkasan": "Menjawab: bagaimana program pengumpulan ide perbaikan bulanan bekerja, siapa yang wajib menyetor ide, bagaimana kuota diatur HR (satu angka bawaan untuk semua, boleh ditimpa per departemen, dan sifatnya lantai bukan langit-langit), serta bagaimana komite Kaizen memutuskan ide diterima, ditolak, atau ditandai diterapkan. Menjelaskan juga kenapa Kaizen dibangun sebagai tipe form kelima di Form Builder Service alih-alih service baru atau space di Task Management, bagaimana potret peserta per periode jadi penyebut papan kepatuhan, dan penyimpangan-penyimpangan yang disengaja dari rancangan awal berikut alasannya. Berguna untuk menelusuri kaitannya dengan metrik KPI lintas departemen yang selama ini tidak punya sumber data.",
       "kata_kunci": [
         "kaizen",
         "ide perbaikan",
         "inovasi",
-        "improvement idea",
-        "komite kaizen",
         "kuota ide",
+        "komite kaizen",
         "papan kepatuhan",
+        "compliance",
         "KPI",
         "form builder",
         "periode bulanan"

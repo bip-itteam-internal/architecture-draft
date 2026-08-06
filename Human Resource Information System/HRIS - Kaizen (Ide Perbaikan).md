@@ -5,7 +5,8 @@
 *Program pengumpulan ide perbaikan bulanan. Karyawan pada sasaran tertentu wajib mengirim sejumlah ide tiap bulan, jumlahnya diatur HR (satu angka bawaan untuk semua, boleh ditimpa per departemen). Ide masuk ke antrean komite Kaizen terpusat yang memutuskan diterima atau ditolak, lalu menandai mana yang benar-benar diterapkan. Ide yang disetujui tampil di papan yang bisa dibaca seluruh karyawan.*
 
 - **Status**: ⚠️ **Backend tahap 1 sampai 3 LIVE di dev DAN prod** sejak 2026-08-06 (PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016), ditambah perbaikan [#1018](https://github.com/bip-itteam-internal/bip-erp/pull/1018)). Prod di-deploy manual (`docker compose up -d --build form-builder-service --no-deps`) dan diverifikasi lewat probe perilaku dari dalam jaringan container. **FE belum ada sama sekali**, jadi belum ada layar untuk komite maupun pengaju, dan **belum satu pun form kaizen dibuat di lingkungan mana pun**. Tahap 4 sampai 7 belum dikerjakan.
-- **Yang sudah diuji sungguhan** baru jalur galat handler (id ngawur `400`, id tak ada `404`). Alur inti — membuat form kaizen, potret peserta oleh cron, kirim ide, keputusan komite, papan kepatuhan — **belum pernah dijalankan end-to-end di mana pun**.
+- ✅ **Alur inti TERUJI end-to-end di dev 2026-08-06** lewat gateway, dengan Mongo dan employee-service hidup. Lihat bagian tersendiri di bawah.
+- ⚠️ **Prod belum bisa memakainya.** Prod punya #1016 dan #1018, tapi **belum** PR [#1019](https://github.com/bip-itteam-internal/bip-erp/pull/1019) yang mengikat `recurrence` dari request. Tanpa itu form berulang maupun kaizen **mustahil dibuat di prod**.
 - **Rumah kode yang dipilih**: [[Microservices - Form Builder Service]], sebagai **tipe form kelima** (`form_type: "kaizen"`). Bukan service baru, bukan space di [[Microservices - Task Management Service]].
 - Rancangan lengkap: `docs/superpowers/specs/2026-08-06-kaizen-pengumpulan-ide-design.md`; rencana per tahap: `docs/superpowers/plans/2026-08-06-kaizen-pengumpulan-ide.md`. Keduanya di root workspace, bukan di vault.
 
@@ -37,13 +38,30 @@ Ketiganya di `services/form-builder`, seluruhnya backend.
 | (tak disebut) | Periode yang dokumennya belum ada dianggap **potret parsial** | "Nol peserta" terbaca seolah tak seorang pun diwajibkan, padahal yang terjadi cuma cron belum sempat jalan |
 | Aksi massal | Dibatasi **200** dan melapor **per id** | Menggagalkan 200 ide karena satu yang keburu diputuskan orang lain membuat komite mengulang pekerjaan yang sudah hampir selesai |
 
-### Belum diverifikasi
+### Hasil uji end-to-end di dev (2026-08-06)
 
-Tiga hal yang tak bisa dijamin unit test dan baru terbukti setelah naik ke dev:
+Dijalankan lewat gateway dev dengan akun nyata, sasaran dibatasi satu orang supaya tidak mengirim notifikasi ke karyawan lain, dan seluruh data ujinya dihapus setelah selesai.
 
-- agregasi hitungan ide per orang (`countIdeasByEmployee`)
-- potret peserta yang memanggil [[Microservices - Employee Service]] **dari cron**, termasuk apakah header `BIP-Company-ID` yang dipasang manual diterima (cron tak punya `fiber.Ctx`, jadi header identitasnya tak datang dari permintaan mana pun)
-- penjaga balapan keputusan, yang bersandar pada `MatchedCount` dari driver Mongo
+| Langkah | Hasil |
+|---|---|
+| Buat form kaizen berulang bulanan | id terbentuk, `recurrence` tersimpan |
+| Terbitkan | `published`, periode `2026-08` terbentuk sendiri |
+| `GET /me/forms` | blok kaizen tampil: kuota 2, terkirim 0 |
+| Kirim ide ke-1 | terkirim 1, **terpenuhi false** |
+| Kirim ide ke-2 | terkirim 2, **terpenuhi true**, form ditandai selesai |
+| Antrean komite | 2 ide, membawa `fields` snapshot periode |
+| 8 transisi keputusan | 8 dari 8 sesuai aturan, termasuk dua `409` |
+| Papan kepatuhan | peserta 1, terpenuhi 1, total ide 2, `partial=false`, rate 100 |
+| Export CSV | `200`, kolom benar, tanpa header parsial |
+| Saringan status antrean | `pending` 0, `rejected` 1, `implemented` 1 |
+
+**Tiga hal yang sebelumnya ditandai paling rawan, semuanya terbukti bekerja:**
+
+1. **Potret peserta dari cron.** Papan menampilkan nama dan jabatan karyawan, dan data itu hanya bisa datang dari [[Microservices - Employee Service]] — jadi panggilan tanpa `fiber.Ctx` dengan header `BIP-Company-ID` dipasang manual memang berhasil.
+2. **Penjaga balapan keputusan.** Menerima ide yang sudah diterima dibalas `409`, mengubah ide yang sudah diterapkan juga `409`. Keduanya lewat `MatchedCount` dari driver Mongo, bukan fungsi murni.
+3. **Agregasi hitungan ide per orang**, yang jadi pembilang papan kepatuhan.
+
+Yang **belum** teruji karena memang belum dibangun: papan ide publik dan pengingat berjenjang (tahap 5), serta setoran KPI (tahap 6).
 
 ### Diketahui, belum diperbaiki
 

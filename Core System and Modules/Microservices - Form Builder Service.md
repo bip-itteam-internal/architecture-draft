@@ -169,6 +169,19 @@ Penanda periode: `2026-08` untuk bulanan, `2026-W32` untuk mingguan. Penomoran m
 
 Seluruh aturan penanggalan di `period.go` adalah **fungsi murni**: `now` selalu diberikan pemanggil, jadi teruji tanpa menunggu tanggal tertentu tiba. Zona waktunya mengikuti `now`, bukan dipaksa UTC, karena memaksa UTC menggeser "tanggal 26" sehari bagi pemakai WIB dan pergeseran macam itu baru ketahuan saat periode terbuka di hari yang salah.
 
+> [!warning] Fitur ini SEMPAT ter-merge, ter-deploy, dan tetap mustahil dipakai
+> Dari PR #938 (2026-08-03) sampai PR [#1019](https://github.com/bip-itteam-internal/bip-erp/pull/1019) (2026-08-06), **`recurrence` tidak pernah bisa diset lewat API**. `formRequest` — satu-satunya badan request untuk create dan update form — tak punya fieldnya, dan `git log -S "req.Recurrence"` menunjukkan tak pernah punya sepanjang sejarah repo.
+>
+> Seluruh lapisan domainnya lengkap dan teruji: aturan penanggalan, snapshot, cron, gerbang presensi berjendela periode, analisa per periode. Yang hilang cuma satu baris pengikatan, dan tanpa itu **tak seorang pun bisa membuat form berulang**. Bukti diamnya: prod punya **0 form berulang dan 0 dokumen periode** setelah tiga hari fiturnya "live".
+>
+> Efek ikutannya, `form_type: "kaizen"` yang mewajibkan pengulangan bulanan jadi **mustahil dibuat sama sekali**, sehingga tahap 1 sampai 3 Kaizen praktis tak bisa disentuh siapa pun meski sudah merge dan deploy.
+>
+> Penjaga "pengulangan tak boleh dinyalakan pada form yang sudah punya jawaban" juga **kode mati** selama itu: `sudahBerulang` dan `akanBerulang` selalu bernilai sama karena `updated` cuma salinan dokumen tersimpan. Baru hidup setelah #1019.
+>
+> Ketahuan hanya lewat uji end-to-end. 185 unit test hijau, termasuk yang menguji aturan periode sampai kasus tahun kabisat, tapi tak satu pun memeriksa apakah field itu bisa SAMPAI ke sana dari JSON. Dikunci sekarang oleh `form_request_test.go`.
+>
+> Setelah #1019, `recurrence` pada `PATCH` mengikuti kaidah **absen berarti jangan diubah** (seperti blok kaizen), supaya satu kiriman parsial tak diam-diam mengubah survei bulanan jadi form sekali jalan.
+
 ### Cron pembuka periode
 
 `cronManager()` jalan **tiap jam** dengan zona `Asia/Jakarta`, bukan sekali di tengah malam: periode yang terlewat karena service mati saat pergantian hari akan terbuka pada jam berikutnya, bukan tertunda sehari penuh.
