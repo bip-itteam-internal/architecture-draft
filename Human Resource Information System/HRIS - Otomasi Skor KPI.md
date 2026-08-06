@@ -3,7 +3,8 @@
 *Analisis kelayakan **mengisi skor KPI secara otomatis** dari data yang sudah dimiliki ERP, bukan diketik manual oleh supervisor. Menjawab: dari 311 metrik yang benar-benar terpasang di production, mana yang sumber datanya sudah ada, mana yang modulnya ada tapi belum dipakai, dan mana yang memang tidak punya sumber sama sekali. Melengkapi [[HRIS - Key Performance Index]] yang menjelaskan mekanisme scoring-nya.*
 
 - **Status**: ⚠️ **Metrik otomatis PERTAMA menyala di produksi 6 Agustus 2026**, lima hari sesudah mesinnya deploy. Tiga metrik Tech Development kini punya konfigurasi `auto` dan benar-benar menghasilkan angka (rincian dan buktinya di bab **Metrik otomatis yang sudah menyala** di bawah). Catatan lama "belum ada satu pun metrik yang terisi otomatis" **sudah tidak berlaku**. Mesinnya sendiri jalan sejak PR #843 (kontrak sumber nilai), #857 (mesin reduksi + arah target + registry), dan #866 (sumber `uptime_sistem`), deploy 1 Agustus 2026. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.
-	- ⚠️ **Penilai belum melihatnya.** Angkanya nyata dan terambil lewat `GET /kpi/auto-values`, tetapi frontend produksi terakhir di-deploy 6 Agustus 16:38 dan belum memuat layar yang menampilkannya (PR erp-frontend #831 merged sesudah itu). Sampai FE prod di-deploy, otomasi ini hidup di API saja.
+	- ✅ **Penilai kini bisa melihatnya.** Frontend produksi di-deploy ulang **6 Agustus 19:02 WIB** (container `frontend-hris-dashboard`), sesudah PR erp-frontend #831 dan #834 merged, jadi modal Score KPI di produksi sudah memuat pengambilan `auto-values`. Catatan lama "penilai belum melihatnya, otomasi hidup di API saja" sudah tidak berlaku. Perlu diketahui: nilainya muncul sebagai **usulan yang harus ditekan** lewat tombol "Pakai usulan" (#831 sengaja tidak mengisi kolom otomatis), jadi supervisor yang tidak menekannya tetap melihat kolom kosong — itu perilaku yang dirancang, bukan kegagalan pengambilan data.
+	- 🟡 **Belum ada layar yang menjawab "metrik mana yang macet".** Modal Score KPI menjawab satu orang satu periode; untuk melihat seluruh metrik satu departemen sekaligus beserta sebab yang gagal, halaman **Otomasi KPI** menunggu merge (bip-erp PR [#1066](https://github.com/bip-itteam-internal/bip-erp/pull/1066) + erp-frontend PR [#843](https://github.com/bip-itteam-internal/erp-frontend/pull/843)). Rinciannya di bab **Layar diagnostik** di bawah.
 - **Ruang lingkup**: `kpi_template` / `kpi_score` di [[Microservices - Employee Service]]. **Bukan** engine insentif marketing di [[Microservices - Insentive Service]], walau bab 6 mengusulkan menyambungkan keduanya.
 
 ## Metrik otomatis yang sudah menyala
@@ -32,9 +33,38 @@ Tiga hal yang dibuktikan baris-baris itu, dan ketiganya inti rancangannya:
 
 **Dampak ke skor yang sudah ada: nol.** Juli sudah dinilai manual dengan angka yang kebetulan sama persis (100 pada kedua metrik), dan snapshot `kpi_score` beku sehingga tak tersentuh. Angka otomatis baru terpakai pada penilaian **Agustus**, yang dikerjakan awal September.
 
-**Kenapa tiga ini yang didahulukan**: sumbernya sudah ada di produksi dan tak menunggu siapa pun mengisi data. `skor_tim` membaca `kpi_score` sendiri, `uptime_sistem` membaca heartbeat yang tercatat otomatis. Metrik IT lain (SLA tiket, CSAT) menunggu produksi ditarik ke `main` terbaru agar sumber `kinerja_tiket` ikut.
+**Kenapa tiga ini yang didahulukan**: sumbernya sudah ada di produksi dan tak menunggu siapa pun mengisi data. `skor_tim` membaca `kpi_score` sendiri, `uptime_sistem` membaca heartbeat yang tercatat otomatis. Metrik IT lain (SLA tiket, CSAT) semula menunggu produksi ditarik ke `main` terbaru agar sumber `kinerja_tiket` ikut; **penantian itu selesai** — `Employee-Service` dan `Task-Management-Service` produksi di-recreate 6 Agustus 2026 sekitar pukul 19:00 WIB, jadi sumber `kinerja_tiket` sudah ada di prod. Yang menahannya sekarang bukan lagi kode melainkan **kesepakatan target**: tingkat ketepatan waktu Juli berkisar 8,7%–56,3% tergantung ambang yang dipakai, dan menyalakan metrik dengan target yang belum disepakati berarti menerbitkan angka merah yang tak seorang pun setujui dasarnya.
 
 **Yang sengaja dilewati**: `Revenue 240M` pada Leader dan Supervisor. Deskripsinya di sistem berbunyi "Menjamin operasional IT tanpa gangguan" sementara dokumen KPI menyebut targetnya persentase tiket support yang selesai; dua sumber berbeda untuk satu label, dan itu keputusan pemilik metrik, bukan keputusan teknis.
+
+## Layar diagnostik: Otomasi KPI
+
+> **Status**: 🟡 belum merge — bip-erp PR [#1066](https://github.com/bip-itteam-internal/bip-erp/pull/1066) (endpoint) + erp-frontend PR [#843](https://github.com/bip-itteam-internal/erp-frontend/pull/843) (layar). Belum dijalankan lewat gateway sungguhan.
+
+Tiga metrik menyala di antara 311, dan tak ada satu pun tempat untuk melihat itu. Sampai layar ini ada, pertanyaan "metrik mana yang sudah otomatis" hanya bisa dijawab dengan membuka modal penilaian satu orang satu periode, atau membaca `kpi_template` langsung di Mongo. Pertanyaan yang lebih penting, "kenapa metrik ini tidak menghasilkan angka", tak punya jawaban sama sekali di antarmuka.
+
+**HRIS › Otomasi KPI** (`/hris/kpi/otomasi`) menampilkan satu departemen satu periode sekaligus: tiap metrik tiap posisi, statusnya, dan bila macet, alasannya apa adanya dari backend.
+
+| Status | Artinya | Warna |
+|---|---|---|
+| `otomatis` | semua yang dinilai menghasilkan angka, cakupan penuh | hijau |
+| `semi` | menghasilkan angka, cakupan datanya parsial | biru |
+| `manual` | ada yang gagal dihitung; sebabnya ada di `alasan_gagal` | kuning |
+| `belum` | metrik belum punya blok `auto` sama sekali | netral |
+| `tanpa_karyawan` | sudah dikonfigurasi, tetapi posisinya tak dipegang siapa pun | kuning |
+
+Tiga status pertama memakai nama yang sama persis dengan `KPISources` di `shared-library`, bukan istilah tandingan. Dua terakhir khusus layar ini karena keduanya keadaan yang tak pernah dialami satu metrik satu orang: sebuah metrik hanya bisa "belum dikonfigurasi" pada tingkat template, dan hanya bisa "tak ada yang memegang posisinya" pada tingkat departemen.
+
+`semi` dihitung sebagai **menghasilkan**, karena angkanya nyata dan dipakai penilai; yang parsial adalah cakupan datanya. `tanpa_karyawan` masuk **perlu perhatian** bersama `manual`, karena keduanya menuntut tindakan manusia, sementara `belum` tidak.
+
+**Keputusan rancangan yang perlu diketahui sebelum menirunya:**
+
+- **Perhitungannya memanggil `terapkanOtomatis` yang sudah dipakai `/kpi/auto-values`**, bukan menyalin rumusnya. Kalau aturan reduksi, cakupan, atau pembatasan 100 berubah, kedua layar ikut berubah bersama. Layar diagnostik yang menghitung dengan rumusnya sendiri akan berbohong justru saat perbedaannya paling penting.
+- **Evaluasi dibatasi 10 orang per metrik.** Sebagian sumber memanggil service lain lewat HTTP secara berurutan; satu posisi berisi 15 orang berarti 15 panggilan serial, dan timeout-nya menumpuk persis saat service sumbernya mati — yaitu saat layar ini justru dibuka. Batasnya meniru `maksPratinjauKaryawan` yang sudah dipakai endpoint pratinjau untuk alasan yang sama.
+- **Rutenya dikeluarkan dari cache Redis gateway.** `GET /api/employee/*` dicache tiga menit; pada layar yang gunanya melihat apakah metrik yang baru dibetulkan sudah menghasilkan angka, tombol Segarkan akan berbohong selama tiga menit.
+- **Frontend tidak memegang default departemen.** Backend yang memilih departemen pertama yang berhak dilihat pemanggil, dan badan 403 ikut membawa daftar departemen yang berhak, supaya pengguna bisa pindah tab alih-alih terdampar.
+
+Kontrak lengkapnya di [[API - Employee Service]]; cara menambah metrik otomatis baru dan memverifikasinya lewat layar ini di [[RUN - Menambah Metrik KPI Otomatis]].
 
 ## Kondisi Saat Ini
 
