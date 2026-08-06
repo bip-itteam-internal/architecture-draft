@@ -46,6 +46,23 @@
 - **`GET /employer-cost?employee_ids=a,b,c&period=YYYY-MM`** — beban **PERUSAHAAN** per karyawan: `bruto` (total pendapatan slip) + `iuran_bpjs_perusahaan` = `total`. Batch (dipisah koma) karena satu dashboard insentif memuat puluhan orang.
 - **BUKAN gaji bersih yang diterima karyawan.** Potongan PPh21 & BPJS karyawan tetap uang yang keluar perusahaan (disetor ke kantor pajak/BPJS), jadi memakai gaji bersih akan mengecilkan biaya dan membuat profit insentif tampak lebih besar. Keputusan client 2026-08-02; dikunci test `b.Total <= slip.Net` → merah.
 - **`computeBpjsCompany`** (kembaran `computeBpjsEmployee`) — memakai `CompanyRate` + batas upah yang sama. Rate-nya **sudah ada di config sejak awal tapi tak pernah dihitung**, karena iuran pemberi kerja bukan potongan karyawan sehingga tak muncul di slip. Slip nyata: bruto 4.328.500 + iuran 329.728 = **4.658.228** (vs gaji bersih 4.094.423 — selisih 13,8%).
+- ⚠️ **Kini mengembalikan DESIMAL**, bukan bilangan bulat (lihat aturan pembulatan di bawah). Konsumen `/employer-cost` (modul insentif) perlu memformatnya; `Total` bisa berbunyi 4.658.228,04.
+
+### Pembulatan BPJS — dua aturan berbeda, disengaja
+
+Grounded ke **Formulir 2a PU BPJS Ketenagakerjaan** milik BHARATA INTERNASIONAL PHARMACEUTICAL (NPP 23222228, periode 08/2026).
+
+| Sisi | Pembulatan | Alasan |
+|---|---|---|
+| **Iuran karyawan** (`computeBpjsEmployee`) | **KE BAWAH ke kelipatan 100**, per program | Praktik payroll Bharata: yang dipotong dari gaji selalu kelipatan 100. Ini angka yang masuk slip |
+| **Iuran perusahaan** (`computeBpjsCompany`) | **Ke sen** (2 desimal) | Ini yang benar-benar disetor, dan BPJS menagih sampai sen |
+
+- Untuk upah 2.773.184: potongan karyawan Kesehatan **27.700** (eksak 27.731,84), JHT **55.400**, JP **27.700**. Iuran perusahaan JHT **102.607,81**, persis seperti kolom Formulir 2a.
+- ⚠️ **Selisihnya ditanggung perusahaan.** Karyawan dipotong 110.800 sementara yang disetor 110.927,36, jadi ~127 rupiah per orang per bulan jadi beban perusahaan. Konsekuensi yang disengaja, **dikunci test** (`TestPotonganSlipLebihKecilDariSetoran`) agar arahnya tak pernah terbalik.
+- `computeBpjsEmployeeEksak` menyediakan nilai karyawan **tanpa** pembulatan ke bawah, untuk rekonsiliasi dengan tagihan.
+- **`roundSen` wajib**, bukan kosmetik: tanpa itu float mentah bocor ke JSON sebagai `214565.88799999998`. Dua desimal juga kebetulan pembulatan yang sama dengan yang dipakai BPJS.
+- 🔜 **Belum diputuskan**: pembulatan karyawan dilakukan **per program** (yang dipakai sekarang) atau atas gabungan per lembaga. Untuk upah 2.773.184 hasilnya sama; pada upah lain bisa beda 100 rupiah. Butuh satu slip manual berupah bukan kelipatan 10.000 untuk memastikan.
+- 🔜 **JKP belum dikenal** config BPJS (hanya 5 program). Formulir 2a punya kolom Iuran JKP (pemberi kerja + pemerintah), nol di periode ini.
 - Angkanya dirakit lewat `buildPayslip` yang **sama persis** dengan payroll run sungguhan, bukan dijumlah ulang — menyalin rumus bruto akan melahirkan rumus tandingan yang menyimpang diam-diam.
 - ⚠️ **Sengaja TANPA `gate()`** — tak seperti `/employee-salary`. Pemanggilnya service lain yang tak membawa identitas orang, dan `gate()` membalas **401** begitu header employee id kosong. Pola menyalin `/payroll-supplement` milik [[Microservices - Attendance Service]]: dijaga kunci gateway (`app.Use(ValidateGateway)`) dan **hanya memulangkan satu angka beban per karyawan** — tanpa rincian komponen, tanpa gaji pokok, tanpa slip. Karyawan tanpa penetapan gaji dibalas `ditemukan:false`, bukan dihilangkan dari hasil dan bukan 404: pemanggil harus bisa membedakan "belum ditetapkan" dari "nol".
 - Grounded: **golden test reproduksi slip nyata** (gross 4.328.500 & BPJS 32.200/96.600 cocok persis; net 4.094.423 ~slip, selisih ~4 rp krn payout dibulatkan 1 desimal) + smoke E2E lolos.

@@ -355,23 +355,14 @@
       "tautan": [
         "Microservices - Inventory Service",
         "API - Index",
-        "GA - Asset Loan & Room Booking"
+        "API - Integration Service",
+        "GA - Asset Loan & Room Booking",
+        "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI"
       ],
-      "hash": "d1cb6d76cd97d97789b63478d424f90df47a088b3c53db5ef6735c2a387cb0f2",
-      "ukuran_kb": 6.0,
-      "ringkasan": "Menjawab: endpoint apa saja di inventory-service (aset/inventaris General Affairs) dan level auth tiap rutenya — master item & data-type enum, CRUD item, upload dokumen lewat presigned URL MinIO, serah-terima aset, riwayat perbaikan, dan ringkasan biaya. Dipakai saat mencari path persis di balik gateway /api/inventory/*.",
-      "kata_kunci": [
-        "inventory service",
-        "aset",
-        "asset",
-        "endpoint",
-        "API",
-        "General Affairs",
-        "GA",
-        "repair history",
-        "presigned url",
-        "MinIO"
-      ]
+      "hash": "870f5d5414846884ccc48e5ed7f599434cd6037a509af750b648938b7abcd9b9",
+      "ukuran_kb": 7.4,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "API Reference/API - IT Orchestrator.md",
@@ -1802,26 +1793,18 @@
       "publik": true,
       "tautan": [
         "ADR - 0001 Akuntansi via Accurate",
+        "Microservices - Integration Service",
+        "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "Microservices - File Service",
         "CORE - API Master Gateway",
         "DB - Overview and Notes",
-        "GA - Inventory Management"
+        "GA - Inventory Management",
+        "External - Accurate"
       ],
-      "hash": "67df718918caab73b4e3ee7fdae6a304d736b8fdbfe99a285bc256d8379b1c0b",
-      "ukuran_kb": 6.1,
-      "ringkasan": "Menjawab: bagaimana aset/inventaris General Affairs dilacak — pembuatan item beserta pola ID INV-BIP-DDMMYY-NAMA-n, pemegang aset yang opsional, alur serah-terima dengan persetujuan supervisor, dokumen pembelian/kedatangan di MinIO, dan riwayat perbaikan. Fokusnya asset tracking, bukan stok-kuantitas gudang.",
-      "kata_kunci": [
-        "inventory service",
-        "aset",
-        "asset tracking",
-        "General Affairs",
-        "GA",
-        "serah terima",
-        "handover",
-        "repair history",
-        "MinIO",
-        "penyusutan"
-      ]
+      "hash": "9881fcfb23cd2f585e113e0279c405d8001ec9b99fd6ed75aca914ac89dba85f",
+      "ukuran_kb": 7.6,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Core System and Modules/Microservices - Manufacture Service.md",
@@ -2012,20 +1995,20 @@
         "Microservices - Insentive Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "434198395891a46927f7486ccba54b23489b09549cd1e23df04f8fb3253107d4",
-      "ukuran_kb": 16.7,
-      "ringkasan": "Menjawab: bagaimana penggajian dihitung di bip-erp, mulai dari setup komponen gaji, config BPJS dan PPh21 metode TER, penetapan gaji per karyawan (basic_salary, upah_bpjs, ptkp_status), sampai payroll run dengan lifecycle draft, approved, published dan slip self-service karyawan. Menjelaskan juga master badan usaha penggaji untuk kop slip (41 entitas, PT induk plus 40 CV), endpoint employer-cost untuk modul insentif, serta integrasi ke Attendance Service untuk prorata Tunjangan Kehadiran dan lembur. Memuat gotcha penting: upah_bpjs adalah DASAR upah bukan nominal potongan (salah isi lolos tanpa validasi dan sudah terjadi di production), company_id menumpang di employee_salary sehingga backfill harus setelah struktur gaji terisi, dan service ini belum ter-scope multi-tenant.",
+      "hash": "b95b6602f225b94b3b656eb23484c1977e1d736b2cc765c26c838726aad46334",
+      "ukuran_kb": 18.7,
+      "ringkasan": "Menjawab: bagaimana gaji dihitung di bip-erp, mulai dari setup komponen gaji, config BPJS/PPh21 TER dan PTKP, penetapan gaji per karyawan (basic_salary, upah_bpjs, ptkp_status), sampai siklus payroll run draft ke approved ke published dan slip self-service karyawan. Menjelaskan juga master badan usaha penggaji (kop slip, 41 entitas) beserta endpoint terkait, THR, endpoint /employer-cost untuk beban perusahaan, serta aturan pembulatan BPJS yang berbeda antara sisi karyawan dan perusahaan. Berguna untuk menelusuri jebakan data seperti upah_bpjs yang salah diisi sebagai nominal iuran, keterbatasan scoping multi-perusahaan, dan batas scope yang tidak mencakup pembayaran/transfer.",
       "kata_kunci": [
         "payroll",
         "penggajian",
         "slip gaji",
         "payslip",
-        "PPh21",
-        "TER",
-        "PTKP",
+        "PPh21 TER",
         "BPJS",
+        "upah_bpjs",
+        "payroll run",
         "THR",
-        "payroll run"
+        "badan usaha penggaji"
       ]
     },
     {
@@ -3361,12 +3344,12 @@
       "judul": "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "Proposed / Draft — belum ada di kode (diusulkan 2026-08-06)",
+      "status_emoji": "⚠️",
+      "status_teks": "Accepted — **Fase 0 & 1 Implemented** (2026-08-06): `accurate_asset_no`/`reconciled_at` + koleksi `asset_category_mapping` + rute `/category-mapping` ([[Microservices - Inventory Service]]); FE 3 tab (Kelola/Data Accurate/Cocokkan) dengan reconcile client-side. **Fase 2 (feed KPI via ADR-0032) masih konsep.**",
       "publik": true,
       "tautan": [
-        "GA - Inventory Management",
         "Microservices - Inventory Service",
+        "GA - Inventory Management",
         "Microservices - Integration Service",
         "External - Accurate",
         "ADR - 0001 Akuntansi via Accurate",
@@ -3379,21 +3362,10 @@
         "RUN - Menambah Metrik KPI Otomatis",
         "Microservices - Employee Service"
       ],
-      "hash": "9db72d224e35bf6f0ea9f0925cbacffd203ac6ef72f96c9cae3ce2fb553c4b29",
-      "ukuran_kb": 12.1,
-      "ringkasan": "Menjawab: bagaimana kualitas input aset GA di ERP diukur untuk KPI staff dengan membandingkannya ke data padanan di Accurate — apa padanan asetnya, bagaimana pencocokannya dilakukan, dan bagaimana skornya dibebankan ke orang secara adil. Juga menjawab kendala yang membatasi jawaban itu: aset GA bukan stok gudang, kategori bebas-ketik, nilai buku cuma estimasi, dan item ERP belum merekam siapa penginputnya.",
-      "kata_kunci": [
-        "ADR",
-        "aset GA",
-        "Accurate",
-        "rekonsiliasi",
-        "KPI",
-        "staff GA",
-        "inventory",
-        "ceklis per-item",
-        "kesehatan data",
-        "General Affairs"
-      ]
+      "hash": "3f1255690c205c6a8ea8009091f7b0e48ca41913b1088cbf0d2ae29377e186e9",
+      "ukuran_kb": 12.3,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Decisions/ADR - 0038 Hak Per-Objek Admin Space Task Management.md",
@@ -3924,6 +3896,7 @@
         "Microservices - Inventory Service",
         "API - Inventory Service",
         "ADR - 0001 Akuntansi via Accurate",
+        "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "GA - Procurement System",
         "WH - Management System",
         "GA - Big Pictures",
@@ -3931,21 +3904,10 @@
         "CORE - OCR Document Service",
         "Form Permintaan Barang GA.pdf"
       ],
-      "hash": "70d8207da442b0cde016a8a45168f083548f0fb93850d3c77616fc443cbd2895",
-      "ukuran_kb": 7.8,
-      "ringkasan": "Menjawab: apa cakupan sistem inventory General Affairs dan ke mana arahnya — pencatatan & kontrol aset perusahaan, penomoran tag aset, serah-terima dengan persetujuan SPV, lokasi & masa manfaat, serta nilai buku yang sengaja hanya estimasi karena pembukuan resmi ada di Accurate. Juga menjawab kenapa nama modulnya menyesatkan dan apa rencana GA sebagai pengelola inventory seluruh perusahaan.",
-      "kata_kunci": [
-        "inventory",
-        "aset",
-        "General Affairs",
-        "GA",
-        "serah terima",
-        "penyusutan",
-        "nilai buku",
-        "lokasi aset",
-        "procurement",
-        "paperless"
-      ]
+      "hash": "c3ca4d07ce005fe191168073109521b43337e6e8b57b35ba563c5161a8de9cb6",
+      "ukuran_kb": 8.4,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "General Affairs/GA - Machine & Utility Maintenance.md",
@@ -4176,20 +4138,20 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0013 HRD Documents"
       ],
-      "hash": "1c3ae2423158eecd10b212245c1cc970200a27f92b2de24e6f7c440e9b5d705a",
-      "ukuran_kb": 21.7,
-      "ringkasan": "Menjawab: fitur HRM ERPGo mana yang sudah benar-benar jalan di kode bip-erp, mana yang baru sebagian atau baru dokumen konsep, mana yang kandidat baru, dan mana yang sebaiknya dibuang, sebagai satu rujukan keputusan Product Owner. Juga menjawab apa kapabilitas riil lima service HR (employee, attendance, payroll, hrd-document, notification) hasil bedah route, handler, dan model, termasuk gap konkret seperti BPJS sisi perusahaan, multiplier lembur, PDF slip gaji, dan enforcement ack dokumen. Berisi pula kandidat perluasan (Announcements, Awards, Events, Kasbon) beserta prioritas, daftar diskrepansi dok vault vs kode, dan status Employee Lifecycle di mana Resignations/Terminations sudah live sedangkan Promotions/Transfers masih konsep.",
+      "hash": "7b5072f13ba6827e1f117bfdaa40b38728528bc897a969698648f4cb600bc95f",
+      "ukuran_kb": 21.9,
+      "ringkasan": "Menjawab: fitur HRM ERPGo mana yang sudah benar-benar berjalan di kode bip-erp, mana yang baru sebagian, mana yang masih dok konsep, dan mana yang layak dibuang, lengkap dengan legenda status per-item. Memuat hasil bedah route/handler/model lima service HR (employee, attendance, payroll, hrd-document, notification) sehingga bisa dipakai mengecek kapabilitas riil per service tanpa membuka kode. Juga menjawab kandidat fitur baru (Announcements, Awards, Events/kalender, Kasbon), rekomendasi prioritas untuk Product Owner, serta daftar diskrepansi antara dokumen vault dan kode yang perlu disinkronkan.",
       "kata_kunci": [
         "ERPGo",
         "HRM",
         "gap analysis",
-        "adaptasi ERPGo",
-        "checklist HR",
-        "bedah kode HR",
-        "prioritas fitur",
-        "diskrepansi dokumentasi",
-        "kandidat fitur baru",
-        "employee lifecycle"
+        "adaptasi",
+        "HRIS",
+        "bedah kode",
+        "employee service",
+        "attendance service",
+        "announcements",
+        "kasbon"
       ]
     },
     {
@@ -8843,5 +8805,10 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "API Reference/API - Inventory Service.md",
+    "Core System and Modules/Microservices - Inventory Service.md",
+    "Decisions/ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI.md",
+    "General Affairs/GA - Inventory Management.md"
+  ]
 }
