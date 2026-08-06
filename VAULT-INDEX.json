@@ -1907,18 +1907,19 @@
         "APP - Web ERP",
         "API - Index"
       ],
-      "hash": "2eb84de6dd917055d40750fcc7d22e84b2b7c9cea6d60458ac53871d5d0f3214",
-      "ukuran_kb": 6.2,
-      "ringkasan": "Menjawab: kenapa modul Training dipindah menjadi service `learning` tersendiri sebagai fondasi LMS People Development, fitur apa saja yang sudah dipindah (master jenis pelatihan/trainer, event training, peserta & kehadiran), serta detail perubahan perilaku verifikasi department_key lewat panggilan internal ke employee-service. Juga mencatat fitur LMS lanjutan yang belum ada dan gap multi-tenant company_id.",
+      "hash": "aa52a8054f8b86ab37b374c2fa6fba2f0d0c5be2bae78914cc35363fe02fc34d",
+      "ukuran_kb": 7.6,
+      "ringkasan": "Menjelaskan microservice Learning Service untuk mengelola training karyawan: stack teknologi (Go + Fiber + MongoDB), endpoint CRUD yang sudah hidup untuk jenis training, trainer, event, dan peserta dengan kehadiran, status implementasi di dev dan produksi, serta catatan penting tentang multi-tenant company_id yang wajib di-implement di fase berikutnya.",
       "kata_kunci": [
-        "learning service",
-        "LMS",
+        "learning",
         "training",
         "pelatihan",
-        "pemindahan service",
-        "department_key verifikasi",
-        "employee-service",
-        "multi-tenant"
+        "microservice",
+        "LMS",
+        "course",
+        "multi-tenant",
+        "kehadiran",
+        "attendance"
       ]
     },
     {

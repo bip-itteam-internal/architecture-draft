@@ -37,7 +37,25 @@ Diganti panggilan `GET {EMPLOYEE_MODULE_URL}/master/departments/{key}` lewat `ro
 ## Belum Diimplementasikan / Catatan
 
 - **Seluruh fitur LMS belum ada.** Course, materi PDF & video, bank soal, pre/post test, skoring otomatis, kurikulum per jabatan, tenggat, Talent Pool, penilaian trainer — semuanya Fase 1 ke atas. Desainnya sudah lengkap, lihat [[HRIS - Training Program]].
-- ⚠️ **Koleksi `training` belum punya `company_id`**, dan `GET /training` tidak menyaring perusahaan, sehingga semua tenant melihat semua pelatihan. Sementara itu verifikasi departemen **tersaring perusahaan** (endpoint employee-service memfilter `company_id`), padahal kueri lama tidak. Hari ini dampaknya nol karena seluruh data Training milik `BIP`, tapi begitu `ELT` memakai modul ini, pengguna BIP akan melihat pelatihan ELT di daftar lalu gagal mengeditnya dengan pesan 400 yang menyesatkan. **Fase 1 wajib memasang `company_id` + backfill + saring daftar per perusahaan** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]).
+- ⚠️ **Keempat koleksi belum punya `company_id`**, dan `GET /training` tidak menyaring perusahaan, sehingga semua tenant melihat semua pelatihan. Sementara itu verifikasi departemen **sudah tersaring perusahaan** (endpoint employee-service memfilter `company_id`), padahal kueri Mongo langsung yang dipakai sebelum pemindahan tidak. Dua lapisan yang tidak sepakat: begitu `ELT` membuat pelatihan, pengguna BIP akan melihatnya di daftar lalu **gagal mengeditnya** dengan pesan 400 "department not found" yang menuduh data yang sebenarnya benar. **Fase 1 wajib memasang `company_id` + backfill `BIP` + saring seluruh kueri** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]).
+
+### 🔒 Aturan operasional sampai `company_id` terpasang
+
+**Jangan berikan role `hris` ke akun perusahaan selain BIP.** Ini satu-satunya penjagaan yang berlaku sekarang, dan sudah menutup jalur yang benar-benar dipakai orang tanpa perubahan kode.
+
+Diukur di produksi 2026-08-06, bukan diasumsikan:
+
+| Jalur | Keadaan | Sebabnya |
+|---|---|---|
+| Tulis (buat/ubah pelatihan) | **Tertutup** | Digerbang `RequireHRISStaff`; **0 dari 14** karyawan ELT punya role `hris` |
+| Menu di layar | **Tertutup** | Sidebar dirender per modul dari `system_roles`; tanpa `hris` seluruh menu HRIS tak muncul |
+| Baca lewat API langsung | ⚠️ **Terbuka** | `GET /training*` tak digerbang role sama sekali, jadi token ELT yang sah bisa membacanya |
+
+Sisa paparannya disadari dan kecil: empat dokumen milik BIP yang tak terjangkau lewat layar mana pun. **Tambalan kode sengaja tidak dibuat** — menolak non-BIP di tingkat modul menuntut satu PR dan satu deploy produksi demi itu, lalu harus dicabut lagi saat `company_id` terpasang.
+
+⚠️ **Yang membalik keputusan ini**: ada akun ELT diberi role `hris`, atau ELT mulai mengisi data pelatihannya sendiri. Pada titik itu penjagaan lewat RBAC tak lagi cukup.
+
+- **Rute baca Training tidak punya gerbang role sama sekali.** Diwarisi apa adanya dari kode lama, bukan akibat pemindahan. Pantas ditinjau ulang di Fase 1, karena modul ini akan memuat nilai ujian karyawan.
 - **Belum ada uji level handler** (`app.Test`), hanya fungsi murni. Bukan regresi, kode lama pun tidak punya, tapi kelas cacat glue handler tak tertangkap uji fungsi murni.
 - Bawaan dari kode lama, belum diperbaiki: `PUT` bersifat full-replace sehingga frontend wajib mengirim objek lengkap, pendaftaran peserta belum memeriksa karyawan benar-benar ada di `work_data`, dan daftar belum berpaginasi.
 - **Rute lama `/api/employee/training/*` masih hidup di produksi.** `employee-service` sengaja tidak di-rebuild saat cut-over agar tidak ikut mendorong perubahan orang lain ke produksi. Tidak ada pemanggil yang tersisa. Koleksi Training lama juga masih ada di `employee_db` sebagai jalan pulang.
