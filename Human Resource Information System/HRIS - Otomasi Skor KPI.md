@@ -33,6 +33,20 @@ Tiga hal yang dibuktikan baris-baris itu, dan ketiganya inti rancangannya:
 
 **Dampak ke skor yang sudah ada: nol.** Juli sudah dinilai manual dengan angka yang kebetulan sama persis (100 pada kedua metrik), dan snapshot `kpi_score` beku sehingga tak tersentuh. Angka otomatis baru terpakai pada penilaian **Agustus**, yang dikerjakan awal September.
 
+### Dua hal yang menentukan apakah otomasi Agustus benar-benar terpakai
+
+Diperiksa langsung ke database produksi 2026-08-07.
+
+**1. `skor_tim` menuntut urutan penilaian, dan salah urutan tak bisa diperbaiki.** Metrik `Performance Monitoring Team` membaca `kpi_score` **periode yang sama**. Per 7 Agustus, `kpi_score` periode `2026-08` masih **nol dokumen** (periode terakhir yang terisi 2026-07 dengan 150 dokumen), jadi kedua metrik itu wajar berstatus `manual` di layar Otomasi KPI sekarang — sistem menjawab "belum ada satu pun pengukuran pada periode ini", bukan mengarang nol.
+
+Konsekuensinya di awal September: **anggota tim harus dinilai lebih dulu, baru Leader dan Supervisor.** Kalau Leader dinilai duluan, `auto_value`-nya kosong, penilai mengisi manual, lalu `POST /kpi` membekukan snapshot itu — dan angka otomatis untuk bulan itu tak pernah terpakai meski datanya muncul beberapa jam kemudian. Snapshot beku adalah inti desain penilaian, jadi ini tidak bisa dibatalkan dengan menilai ulang tanpa menimpa penilaian yang sudah tersimpan.
+
+**2. Metrik Leader hanya mencakup separuh departemen, karena `supervisor_id` belum lengkap.** Tech Development punya 11 orang, tetapi hanya **5 yang punya `supervisor_id`** — semuanya menunjuk Leader (`BIP-0221-10-25`). Yang kosong: Supervisor sendiri, Frontend Developer, dua Backend Developer, dan satu IT Support.
+
+Karena metrik Leader memakai `scope: team` (bawahan langsung lewat `supervisor_id`), angkanya mengukur 5 orang, bukan 10 anggota departemen. Metrik Supervisor memakai `scope: department` sehingga tak terpengaruh. Ini bukan cacat kode — perhitungannya persis seperti yang dikonfigurasi — tetapi **pembacanya perlu tahu bahwa "Performance Monitoring Team" milik Leader bukan cerminan seluruh Tech Development.** Rata-rata Juli 86,00 yang tercatat di atas berasal dari lima bawahan itu (91,6 · 91,6 · 83,575 · 81,6 · 81,6), dan angkanya cocok persis dengan yang dilaporkan `GET /kpi/auto-values` — bukti reduksinya benar. Melengkapi `supervisor_id` akan **mengubah angka metrik ini**, jadi lakukan sebelum penilaian September, bukan di tengah-tengah. Konteks lengkap soal hierarki: [[HRIS - Key Performance Index]].
+
+Metrik ketiga, `Network` milik IT Support, tidak bergantung pada penilaian siapa pun: `Monitoring-Service` hidup di produksi dan `MONITORING_SERVICE_KEY` terpasang 32 karakter di employee-service, jadi ia menghasilkan angka dari heartbeat harian sejak hari pertama bulan berjalan — dengan cakupan parsial selama bulannya belum habis, dan itulah sebabnya statusnya `semi`.
+
 **Kenapa tiga ini yang didahulukan**: sumbernya sudah ada di produksi dan tak menunggu siapa pun mengisi data. `skor_tim` membaca `kpi_score` sendiri, `uptime_sistem` membaca heartbeat yang tercatat otomatis. Metrik IT lain (SLA tiket, CSAT) semula menunggu produksi ditarik ke `main` terbaru agar sumber `kinerja_tiket` ikut; **penantian itu selesai** — `Employee-Service` dan `Task-Management-Service` produksi di-recreate 6 Agustus 2026 sekitar pukul 19:00 WIB, jadi sumber `kinerja_tiket` sudah ada di prod. Yang menahannya sekarang bukan lagi kode melainkan **kesepakatan target**: tingkat ketepatan waktu Juli berkisar 8,7%–56,3% tergantung ambang yang dipakai, dan menyalakan metrik dengan target yang belum disepakati berarti menerbitkan angka merah yang tak seorang pun setujui dasarnya.
 
 **Yang sengaja dilewati**: `Revenue 240M` pada Leader dan Supervisor. Deskripsinya di sistem berbunyi "Menjamin operasional IT tanpa gangguan" sementara dokumen KPI menyebut targetnya persentase tiket support yang selesai; dua sumber berbeda untuk satu label, dan itu keputusan pemilik metrik, bukan keputusan teknis.
