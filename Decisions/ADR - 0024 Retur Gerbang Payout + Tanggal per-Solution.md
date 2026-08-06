@@ -1,4 +1,4 @@
-✅ **Implemented & Deployed** (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel). **Amandemen 2026-08-05 (belum deploy):** janji "SKIP → baris `SKIPPED`" di Decision #1 akhirnya benar-benar dipenuhi — sebelumnya baris hanya ditandai bila kebetulan sudah ada, sehingga mayoritas retur payout>0 **tak berjejak sama sekali** di UI; sekaligus menutup lubang dobel-booking lewat konfirmasi gudang yang baru terlihat setelah baris jejak itu ada. Lihat Consequences.
+✅ **Implemented & Deployed** (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel). **Amandemen 2026-08-05 (✅ DEPLOYED 2026-08-05, commit `779b0a06`; verifikasi prod: 38 baris jejak tersemai, dari 1):** janji "SKIP → baris `SKIPPED`" di Decision #1 akhirnya benar-benar dipenuhi — sebelumnya baris hanya ditandai bila kebetulan sudah ada, sehingga mayoritas retur payout>0 **tak berjejak sama sekali** di UI; sekaligus menutup lubang dobel-booking lewat konfirmasi gudang yang baru terlihat setelah baris jejak itu ada. Lihat Consequences.
 
 # ADR - 0024 Retur: Gerbang Payout≈0 (Income vs Retur) + Tanggal per-Solution
 
@@ -47,8 +47,31 @@ Dipasang di `SyncOrderReturn` (auto) & `RetryDailyReturn` (manual tolak payout>0
 
 **Konsekuensi**: baris "DILEWATI" kelas ini kini muncul di UI untuk SEMUA channel, termasuk edge `solution=0` payout>0 di atas — justru bagus, finance akhirnya melihatnya. Baris tetap **inert** bagi seluruh proses terjadwal (sweep rekonsiliasi, laporan summary, anomaly check, unmapped-SKU semuanya memfilter SENT/FAILED/PENDING). **Batas yang disadari**: bila payout suatu order suatu saat berbalik ke ≈0 setelah jejaknya dibuat, jalur booking memakai group-key sehingga lahir baris kedua dan jejak lama tertinggal dengan keterangan basi — sangat jarang (penyesuaian wallet tak mengubah `total_settlement_amount`) dan tak menimbulkan kesalahan angka, jadi tak dibuatkan mesin khusus.
 
+### Amandemen 2026-08-05 — gerbang menuntut BUKTI penyerapan (✅ deployed, PR #995 `4bb89eb2`)
+
+Decision #1 memakai `payout > 0` sebagai proksi "receipt sudah menyerap refund". Proksi itu **tak berlaku untuk TikTok**: penyerap yang dimaksud (`ADJUSTMENT_FOR_RR_AFTER_ESCROW_VERIFIED` di `accurate_receipt_wallet_adjustment.go`) **Shopee-only**, dan `tt_shop_transaction_by_orders` menyimpan **1 dokumen per order** (upsert by `order_id`) sehingga clawback pasca-settle tak bisa hidup berdampingan dengan record aslinya. Terukur prod 2026-08-05 pada 38 baris jejak: ke-11 order TikTok yang kena gate masih bersettlement **positif**, nol clawback terlihat; sisi Shopee pun tipis (`shopee_wallet_transactions` tipe RR cuma **35 dokumen total**, dan dari 27 baris gate hanya **2** yang punya).
+
+**Keputusan**: `returnPayoutGate` kini SKIP hanya bila ada bukti penyerapan — kanal **Shopee** (penyerap wallet-adjustment memang ada) **ATAU** `income.TotalRefund != 0` (refund sudah ternetto di settlement). Dipakai `!= 0` karena **tandanya berbeda antar kanal**: TikTok positif (negasi `refund_subtotal`), Shopee negatif (`seller_return_refund + drc_adjustable_refund`). Diuji terhadap 11 order TikTok: 6 flip→book, 2 tetap skip (refund memang ternetto), 3 sudah book sendiri — payout jadi **negatif** setelah TikTok meng-upsert record settlement order yang sama, jadi TikTok **bisa** claw back lewat penimpaan dokumen, bukan dokumen baru.
+
+**Konsekuensi**: 5 dari 6 yang flip bersolution 0 → tertahan **PENDING** gerbang gudang, bukan langsung terbukukan. Ini benar per [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]].
+
+### 🟡 Keputusan bisnis 2026-08-05 — nilai barang SELALU via retur (BELUM diimplementasi)
+
+**Status: 🟡 Diputuskan, belum ada di kode.** Gerbang payout masih aktif di produksi per 2026-08-06.
+
+Pemilik memutuskan menghapus asimetri kanal: **nilai barang selalu dibalik Retur Penjualan untuk SEMUA kanal**, sedangkan **komisi/fee/ongkir/kompensasi tetap di jalur income**. Dua peristiwa diperlakukan **independen**: (1) penjualan batal → retur membalik nilai faktur + stok, tak peduli siapa menanggung; (2) pergerakan uang → jalur income/kas. Konsekuensi praktis: kasus "marketplace TIDAK memotong refund dari kita" jadi **decidable** — retur tetap dibukukan, dan uang yang kita pegang muncul sebagai pendapatan lain-lain/kompensasi. Akun other-income **sudah ada & dipakai** (`resolvedCompFallback`), jadi tak ada akun baru yang perlu diputuskan finance.
+
+Alasan: aturan lama (Shopee→receipt, TikTok→retur) bukan prinsip akuntansi melainkan kebetulan teknis (ada/tidaknya penyerap), dan efeknya nyata — laporan retur **understate** Shopee, dan **stok Shopee barang-balik tak pernah bertambah** karena receipt tak menggerakkan stok.
+
+**Dua tempat WAJIB berubah bersamaan** (kalau tidak → dobel seketika): (a) baris wallet-adjustment Shopee berhenti mengurangi bayar-faktur untuk porsi **nilai barang**; (b) `buildReceiptPayload` — refund tak lagi jatuh ke akun discount (`loadReceiptAccounts`: *"Refund tidak punya akun sendiri — digabung ke discount"*), melainkan mengurangi `basePorsi` order, sehingga piutang sisa dilunasi retur.
+
+**Paparan terukur 2026-08-06** (dasar prioritas): dari **1.645** retur SENT sejak 1 Juli, **1.274 (77%)** punya ≥1 order ber-`TotalRefund` ≠ 0. Sisi sebaliknya: **38 baris SKIPPED** = nilai barang **tak pernah** dibalik sama sekali. ⚠️ Nilai Rp197 jt pada 1.274 dokumen itu **total nilai dokumennya, BUKAN jumlah yang dobel** — satu dokumen grup memuat banyak order.
+
+⚠️ **Batas pengetahuan**: refund **penuh** terbukti **tidak** dobel — `buildReceiptPayload` men-**skip** faktur ber-payment 0 (`accurate_receipt_usecase.go` ~488: *"koreksi pendapatan order refund lewat retur faktur"*), diverifikasi ke dokumen terposting `INC/2026/07/14/015-KY+GB`: potongannya murni akun beban 6112/6113/6114, faktur order refund penuh **tak ada** di receipt. Yang **belum** diverifikasi = refund **sebagian** (payout > 0), yaitu justru kasus yang gerbang ini jaga.
+
 ## Dokumen Terkait
 - [[Microservices - Integration Service]] — Auto-Sync Retur (gerbang payout, tanggal per-solution) & Auto Sync Income (receipt)
+- [[ADR - 0040 Retur Paket Utuh via Baris Induk Faktur]] — pembentukan baris & harga retur paket (tak mengubah gerbang ini)
 - [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] — gerbang gudang; jalur konfirmasinya sempat bisa menghidupkan baris `SKIPPED` jadi pembukuan dobel (amandemen 2026-08-05)
 - [[ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah]] — keputusan #1 digantikan; #2 tetap
 - [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]]
