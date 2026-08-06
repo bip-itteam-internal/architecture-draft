@@ -3,8 +3,8 @@
 *Mekanisme hak akses bersama seluruh bip-erp: tiga sumbu (modul, tingkat aksi, cakupan data), paket hak bernama yang menempel pada posisi/jabatan, dan penegakannya di gateway, service, serta frontend. Dokumen ini adalah katalog acuan; keputusan arsitekturnya di [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].*
 
 - **Stack**: Go (fiber middleware) + MongoDB (`master_permission_set`, `master_department`, `system_authentication`) + JWT HS256 sebagai pembawa izin efektif; frontend Next.js membaca klaim yang sama.
-- **Path di repo**: `bip-erp/shared-library/common/{permissions.go,catalog_ticket.go,roles.go,position.go}` · `bip-erp/shared-library/models/employee/permission_set.go` · `bip-erp/services/employee/permission_resolve.go` · `bip-erp/services/task-management/{rbac.go,routes.go}` · `erp-frontend/src/utils/access.ts` · `erp-frontend/src/features/hris/master-data/*`
-- **Status**: ⚠️ Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, serta **monitoring**. **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul lain masih bertumpu pada `system_roles` tier.
+- **Path di repo**: `bip-erp/shared-library/common/{permissions.go,catalog_ticket.go,catalog_menu.go,roles.go,position.go}` · `bip-erp/shared-library/models/employee/permission_set.go` · `bip-erp/services/employee/{permission_resolve.go,menu_terbatas.go}` · `bip-erp/services/task-management/{rbac.go,routes.go}` · `erp-frontend/src/utils/{access.ts,menu-terbatas.ts}` · `erp-frontend/src/features/hris/master-data/*`
+- **Status**: ⚠️ Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, serta **monitoring**. **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) sudah berkatalog + bergerbang tapi **belum merge**. Modul lain masih bertumpu pada `system_roles` tier.
 
 ## Persona / Pengguna
 
@@ -50,6 +50,22 @@ Aturan yang mengikat: `tampil = (boleh menurut role/izin) DAN (tidak ada di menu
 
 Disimpan sebagai daftar yang **disembunyikan**, bukan yang ditampilkan, supaya menu baru otomatis muncul untuk semua posisi alih-alih hilang diam-diam sampai ada yang mendaftarkannya ke 79 jabatan.
 
+**Menu terbatas — modul `menu` (2026-08-06, branch `feat/oneForAll`, belum merge):**
+
+Whitelist **per akun** untuk satu menu, dipakai pertama kali oleh halaman Laporan Keuangan (`/finance/accounting`) yang memuat posisi keuangan seluruh perusahaan. Keputusan & konsekuensinya di [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]]; yang perlu diketahui di sini adalah **bentuknya berbeda dari izin modul biasa**, dan ia menu-ketiga yang menyentuh sidebar sehingga mudah tertukar dengan dua saudaranya:
+
+| | `permission_sets` | `menu_hidden` | modul `menu` (menu terbatas) |
+|---|---|---|---|
+| Jenis | hak akses | tampilan | hak akses |
+| Menempel pada | posisi (+akun) | posisi | **akun** (+posisi) |
+| Arah | memberi | hanya mengurangi | memberi ke yang ditunjuk, **menutup yang lain** |
+| Bawaan | deny-by-default | tampil | **terbuka sampai ada yang di-assign** |
+| Ditegakkan | gerbang backend | tidak sama sekali | gerbang backend (parsial, lihat ADR) |
+
+Yang membedakannya dari izin modul biasa: **default terbuka**. Selama paketnya belum dipasang ke siapa pun, menu berperilaku persis seperti sebelum fitur ada; begitu ada ≥1 assignment, hanya pemegang paket yang boleh. Fakta "sudah ada yang di-assign" bersifat global, jadi employee-service menghitungnya saat token terbit lalu menempelkan penanda `$menulock.<kunci>` ke klaim **setiap orang** — tanpa penanda itu konsumen tak bisa membedakan "belum aktif" dari "aktif tapi saya tak di-assign". Penandanya sengaja **di luar namespace `menu.`** agar tak terhitung sebagai izin modul, sama alasannya dengan penanda reach.
+
+Batas pemakaian: satu izin + satu paket per menu. Kalau dipakai berlebihan, katalog `menu` akan tumbuh jadi daftar halaman — persis yang ditolak ADR 0030 lewat "satu permission per keputusan akses, bukan per endpoint". Kunci yang ada baru `menu.finance.laporan`.
+
 **Pencocokan posisi (hasil pembenahan 2026-07-29):** `common.KanonPosisi` + `common.PosisiCocok` (`shared-library/common/position.go`) menyatukan aturan pencocokan nama posisi (huruf kecil, non-alfanumerik jadi underscore, exact match atas bentuk kanonik), dipakai `checkPosition` dan `isCostControl`.
 
 ## Katalog acuan
@@ -83,6 +99,7 @@ Disimpan sebagai daftar yang **disembunyikan**, bukan yang ditampilkan, supaya m
 | `admin` | ✅ | | | ✅ | `admin.permissionset.manage`, `admin.assignment.manage` | all |
 | `ticket` | 15 permission granular (sudah live, tidak diubah) | | | | | own/div/all |
 | `finance` | (live, TIDAK memakai tangga — lihat catatan di bawah) | | | | | all |
+| `menu` | (di luar tangga sepenuhnya: satu izin per MENU, bukan per aksi — `menu.finance.laporan`) | | | | | all |
 
 > **Penyimpangan rencana vs implementasi (per 2026-07-30).** Katalog `finance` yang sudah live memakai izin **per-objek**, bukan tangga tingkat: `finance.ar.view`, `finance.ar.export`, `finance.ap.view`, `finance.profit.view`, `finance.payout.view`, `finance.kastoko.view`. Bentuk itu masuk akal untuk finance karena tiap objek (piutang, utang, laba, pencairan, kas toko) memang ditinjau orang berbeda, tapi ia belum diselaraskan dengan ADR 0030 yang menetapkan tangga `view/work/approve/manage` plus pengecualian terbatas. **Perlu diputuskan:** perlebar ADR untuk mengizinkan pola per-objek pada modul multi-objek, atau selaraskan finance ke tangga. Selama belum diputuskan, dua pola hidup berbarengan dan itu akan membingungkan modul berikutnya.
 
@@ -134,7 +151,8 @@ Total **557 rute user-facing tanpa gerbang, 230 di antaranya tulis**.
 
 **Yang belum ada:**
 - **Rute `/internal` service lain belum disapu.** employee-service sudah bereskan + dijaga uji, tapi integration, manufacture, attendance, dan insentive belum diperiksa dengan asumsi yang benar (bahwa `/internal` terbuka ke internet). Pertahanan di tepi (gateway menolak `/internal/` dari luar) menutup kelas ini sekaligus, tapi menunggu `erp-frontend` memindahkan `/api/attendance/internal/fingerprint/*` keluar namespace tersebut. Rinciannya di [[ADR - 0031 Prefix internal Bukan Batas Keamanan]].
-- **finance belum punya gerbang.** Katalog + 3 paket sudah live dan bisa dipasang ke posisi, tapi **tak satu pun endpoint memeriksanya** — jadi paketnya masih dekoratif. Tak ada `RegisterCatalog(ModuleFinance, ...)` di service pemilik data finance (hanya di employee-service untuk validasi), dan tak ada pemakaian `PermFinance*` di `services/`.
+- **finance belum punya gerbang.** Katalog + 3 paket sudah live dan bisa dipasang ke posisi, tapi **tak satu pun endpoint memeriksanya** — jadi paketnya masih dekoratif. Tak ada `RegisterCatalog(ModuleFinance, ...)` di service pemilik data finance (hanya di employee-service untuk validasi), dan tak ada pemakaian `PermFinance*` di `services/`. Gerbang pertama yang mendarat di endpoint akuntansi justru milik modul **`menu`**, bukan `finance` — dan hanya pada `/accounting/balance-sheet`; lihat butir berikutnya.
+- **Menu terbatas: gerbang backend sengaja parsial, dan celahnya belum terukur.** Hanya `/accounting/balance-sheet` yang digerbang (satu-satunya endpoint eksklusif halaman itu); `/profit-loss` & `/account-balance` dibiarkan terbuka karena halaman posisi SPV, Tax, dan Cost Control ikut memakainya. Jadi ini kontrol **menu**, bukan segel data. Selain itu penanda kunci hanya menumpang pada klaim yang sudah tak kosong — akibatnya akun ber-`system_roles.finance` yang **belum punya paket apa pun** tetap melihat halaman walau restriksi menyala. Besarnya celah itu **belum diukur** (butuh query di Employee DB); rinciannya di [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]].
 - **Katalog 12 modul lain belum ditulis** (hris, recruitment, kpi, training, hrdoc, wms, warehouse, integration, insentive, ga, notification, admin). `procurement` dan `monitoring` **sudah** — dikoreksi 2026-07-31 setelah ditemukan masih tercatat belum ditulis di sini padahal keduanya hidup di kode.
 - **`master_permission_set` dan `system_authentication.permission_sets` belum terdaftar** di [[DB - Data Dictionary]].
 - **Empat gate posisi hardcoded belum dicabut** (Cost Control, Security, Personalia, ICC) — menunggu katalog modul yang bersangkutan.
@@ -157,6 +175,7 @@ Total **557 rute user-facing tanpa gerbang, 230 di antaranya tulis**.
 ## Dokumen Terkait
 
 - [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] (keputusan & konsekuensi)
+- [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]] (modul `menu`, penanda kunci, batas penegakannya)
 - [[ADR - 0003 SSO-only Gateway]] · [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]
 - [[DB - Data Dictionary]] · [[DB - Overview and Notes]]
 - [[APP - Web ERP]] · [[HRIS - Organization Structure]]
