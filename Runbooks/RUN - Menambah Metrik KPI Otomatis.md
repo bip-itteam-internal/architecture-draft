@@ -305,7 +305,7 @@ Empat contoh nyata, semuanya bertipe sama: salah yang tidak menimbulkan error.
 - [ ] Bila menarik dari service lain: rute sumber punya test yang **melewati Fiber** untuk tanpa kunci, kunci salah, dan env kosong
 - [ ] Env kunci layanan terpasang di **dua** blok compose (service sumber dan employee-service)
 - [ ] Sudah dijalankan **sekali lewat gateway** sungguhan, bukan hanya lokal
-- [ ] Metriknya dibuka di layar **Otomasi KPI** (`/hris/kpi/otomasi`) dan berstatus `otomatis` atau `semi` — bukan `manual` (🟡 layar menyusul, PR erp-frontend [#843](https://github.com/bip-itteam-internal/erp-frontend/pull/843))
+- [ ] Metriknya dibuka di layar **Otomasi KPI** (`/hris/kpi/otomasi`) dan berstatus `otomatis` atau `semi` — bukan `manual`
 
 Butir terakhir adalah cara termurah membuktikan metrikmu benar-benar hidup untuk **semua** orang di posisi itu, bukan cuma untuk satu karyawan yang kebetulan kamu uji. Statusnya `semi` bukan kegagalan — itu berarti angkanya nyata tetapi cakupan datanya parsial, dan layar itu menyebutkan berapa persen. Yang harus membuat berhenti adalah `manual`: berarti hitungannya gagal, dan sebabnya sudah tertulis di kolom keterangan.
 
