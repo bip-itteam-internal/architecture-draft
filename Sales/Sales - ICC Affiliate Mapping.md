@@ -323,29 +323,50 @@ Justru karena keduanya independen, **persilangannya** yang bernilai:
 |---|---|---|
 | **A** | Integration: koleksi `icc_affiliate_accounts` (`employee_id` opsional) + endpoint + normalisasi/validasi + unit test | 🟡 Belum |
 | **B** | FE ICC Management: sub-tab **Akun Affiliate** di kartu team (termasuk akun belum ditugaskan), dialog kelola (tambah/rename→alias/tetapkan pemegang/nonaktifkan), baris Toko & Iklan = mapping ∪ akun affiliate | 🟡 Belum |
-| **C** | Import awal dari Excel Beauty Hacks (script sekali jalan, setelah dibersihkan); Kyura menyusul | 🟡 Belum |
+| **C** | Import awal dari Excel Beauty Hacks (script sekali jalan, lihat [[#Aturan impor dari Excel]]); Kyura menyusul | 🟡 Belum |
 | **D** | Pensiunkan `internal-creators.ts` — sumber pindah ke DB (halaman lamanya sudah tanpa menu) | 🟡 Belum |
 | **E** | Marketing Analytics → Affiliate: kolom **Kepemilikan** (dimensi baru, bukan pengganti Golongan) + antrean kandidat akun internal + pengisian `last_seen_at`, lewat baca-langsung `integration_db` | 🟡 Belum |
+
+### Aturan impor dari Excel
+
+Ditetapkan setelah verifikasi berkas versi 2026-08-06 (`z-file-hasil/DATA NAMA AKUN TIKTOK ICC BEAUTYHACKS.xlsx`, tab **AKUN TIKTOK ICC**; tidak ada sel merge — kolom nama benar-benar kosong pada baris tertentu):
+
+1. **Sel NAMA kosong = akun tidak dipakai siapa pun** (dikonfirmasi pemilik data). Impor sebagai akun internal dengan `employee_id` **kosong** — bukan dilewati, bukan ditempelkan ke nama baris di atasnya. Terhitung **14 username** dalam keadaan ini (baris 5, 6, 7, 8, 14, 17, 22, 23, 26, 31).
+2. **Username sama muncul dua kali, satu bernama satu kosong → yang bernama menang**, baris kosongnya dibuang. Bukan dijadikan dua baris. Kasus nyata: `efcare` ada di baris 16 (FIRA) dan baris 17 (tanpa nama).
+3. **Normalisasi**: lowercase, buang `@`, trim.
+4. **Lewati** placeholder dan sel rusak: `-`, `@` sendirian, sel yang berisi objek hyperlink (baris YOGI), serta baris tanpa username sama sekali.
+5. **Tahan dan konfirmasi manual** username yang mengandung spasi — `zestique beauty` bukan handle valid; versi terverifikasi sebelumnya `zestique_beauty`.
 
 ## Dependensi & Risiko
 
 | Item | Detail |
 |---|---|
-| **Prereq** | [[Microservices - Employee Service]] harus sudah bisa menerima field `tiktok_usernames` |
-| **Risiko: username berubah** | Kreator bisa ganti username TikTok kapan saja; tidak ada notifikasi otomatis dari API TikTok |
-| **Akun bersama (by design)** | Satu username bisa dimiliki >1 karyawan ICC (mis. `auraliaa__`, `efcare`, `gumince`); model data harus many-to-many (username → [employee_id]) — bukan unique constraint per username |
+| **Risiko: username berubah** | Kreator bisa ganti username TikTok kapan saja; tidak ada notifikasi otomatis dari API TikTok. Ditangani lewat edit + `alias` + `last_seen_at` |
+| **Akun bersama — tidak diharapkan, tetap ditoleransi** | Kebijakan per 2026-08-06: satu akun dipegang satu orang; berkas sumber sudah dirapikan (`auraliaa__` dan `gumince` tidak lagi dobel). Model data **tetap** permisif (unik per pasangan karyawan–username, bukan unik global) karena kasusnya masih muncul di data (`efcare`) dan constraint global akan membuat impor gagal diam-diam. Yang benar: **peringatkan** saat satu akun hendak diberikan ke orang kedua, jangan tolak tanpa penjelasan |
 | **Risiko: akun tidak aktif** | Kreator yang resign tidak otomatis off dari daftar ICC |
 | **Dependency runtime** | Fase 2 menambah HTTP call ke Employee Service; pastikan timeout + fallback (jika Employee Service down, fallback ke cache lama) |
 
 ### Catatan Data Saat Ini
 
-Dari daftar ICC 2026-07-04 (33 anggota):
+**Berkas 2026-08-06** (terverifikasi langsung; menggantikan hitungan 2026-07-04 di bawah):
+
+- **36 baris nama**, **45 username unik** (46 pasangan nama–username, selisihnya `efcare` yang muncul dua kali)
+- **14 username tanpa pemegang** — sel nama kosong, artinya akun tidak dipakai siapa pun (baris 5, 6, 7, 8, 14, 17, 22, 23, 26, 31). Ini bukan kerusakan data: dikonfirmasi pemilik data, dan justru alasan `employee_id` dibuat opsional
+- **5 orang tanpa username**: SATRIO, FUAD (`@` kosong), TAMA, VIRGIE, FAJAR
+- `auraliaa__` dan `gumince` **tidak lagi dobel**; `efcare` masih (baris 16 FIRA + baris 17 tanpa nama) → diselesaikan aturan impor no. 2
+- `zestique beauty` masih mengandung spasi; sel YOGI berisi objek hyperlink, bukan teks
+- Tab per toko (`BH.STORE`, `BH.ID`, `BH.CO`, `BHS`) = **checklist pendaftaran akun ke tiap toko** (kolom `DONE`), bukan daftar pemegang toko. **Jangan diimpor** sebagai struktur data — status itu bisa diturunkan dari order (lihat tabel persilangan di [[#Integrasi ke Marketing Analytics → Affiliate]])
+
+<details><summary>Hitungan lama 2026-07-04 (33 anggota) — arsip</summary>
+
 - **41 username** aktif (beberapa anggota punya 2 akun)
 - **SATRIO** — username TikTok belum diketahui (TBD)
 - **HANIF** — username diverifikasi `zestique_beauty` (bukan `zestique beauty`)
-- **BELIA & FADLY** — berbagi akun `auraliaa__` (dikelola bersama — by design)
-- **FIRA & IPUL** — berbagi akun `efcare` (dikelola bersama — by design)
-- **GUMILANG & FUAD** — berbagi akun `gumince` (dikelola bersama — by design)
+- **BELIA & FADLY** — berbagi akun `auraliaa__`
+- **FIRA & IPUL** — berbagi akun `efcare`
+- **GUMILANG & FUAD** — berbagi akun `gumince`
+
+</details>
 
 ---
 
