@@ -10,7 +10,7 @@
 ## Gotchas lingkungan (dev Windows)
 - **Git hang**: `core.fsmonitor` bikin git menggantung di path ber-spasi (`c:\Data utama\...`). Selalu jalankan `git -c core.fsmonitor=false ...` (atau sekali: `git config --global core.fsmonitor false`). Perintah yang men-scan worktree (`status`/`diff`) tetap lambat karena `node_modules` → pakai perintah ref-only (`rev-parse`, `log`, `diff <a>..<b>`) bila bisa.
 - **`.claude/` BUKAN git repo** (root `erp/` bukan repo). Isinya di-generate `init` dari agent-kit. Ubah standar/hook/command/**rules** → edit **`architecture-draft/.agent-kit/`** lalu re-run `init`; JANGAN edit file di `.claude/` (akan ketimpa saat init).
-- **bip-erp auto-push**: commit lokal otomatis ter-push ke origin → perlakukan **commit = published**. Repo lain — `erp-frontend`, `mybharata` — **TIDAK** auto-push (push manual / izin eksplisit user).
+- **Semua repo wajib PR** — termasuk `bip-erp`. Jangan commit langsung ke `main`. Alur: buat branch `feat/<nama>` dari `origin/main` → commit → push branch → buat PR. Info lama "bip-erp auto-push" adalah **SALAH** dan sudah dihapus.
 
 ## Konvensi git & rilis
 - Branch **per service** dari `main` (mis. `feat/<service>`); jangan commit langsung di `main`.

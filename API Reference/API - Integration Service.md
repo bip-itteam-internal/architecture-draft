@@ -114,7 +114,7 @@
 
 ## Accounting — Dashboard FAT (`/accounting/*`)
 
-*Grup **baca-saja** dari Accurate (nol tulis), menyuplai dashboard divisi FAT di [[APP - Web ERP]] `/finance`. Seluruhnya `cache10` kecuali anggaran & varians — koreksi yang baru disimpan harus langsung terlihat, kalau tidak terbaca seperti simpanannya gagal.*
+*Grup pembaca Accurate (**nol tulis ke Accurate** — POST yang ada hanya memicu penyegaran salinan lokal), menyuplai dashboard divisi FAT di [[APP - Web ERP]] `/finance`. Seluruhnya `cache10` kecuali anggaran & varians (koreksi baru harus langsung terlihat) dan persetujuan (`cache2` — antrean approval cepat basi).*
 
 | Method | Path | Fungsi |
 |---|---|---|
@@ -127,10 +127,15 @@
 | POST/PUT/DELETE | `/accounting/anggaran` | Simpan (upsert) & hapus satu baris anggaran |
 | POST | `/accounting/anggaran/upload` | Unggah Excel. Kolom wajib `akun`/`tahun`/`bulan`/`nominal`, opsional `departemen` (kosong = seluruh perusahaan) & `catatan`. Baris tak sah ditolak **sendiri-sendiri dengan nomor barisnya**; nominal berambigu (mis. `10.5`) ditolak, bukan ditebak. ⚠️ Badan respons berbentuk sama pada 200/400/500 — alasan penolakan ada di respons galat |
 | GET | `/accounting/anggaran/varians` | Anggaran vs realisasi + agregat. Membedakan **tiga jenis nol** lewat penanda terpisah: `anggaran_belum_diisi`, `realisasi_belum_disinkron`, `departemen_tak_dikenal` (+`sebab`), digerbangi `varians_terdefinisi`. `persen_terpakai` **null** saat anggaran nol |
+| GET | `/accounting/ppn-masukan?tahun=&bulan=` | PPN masukan dari **salinan Mongo** (`accurate_ppn_masukan`, task 03:30) — ringkas DPP/PPN + hitung taxable/non-taxable per periode. `salinan_kosong: true` = belum sinkron, **bukan** PPN nol. ⚠️ `taxNumber` faktur pembelian 0/22 terisi — jangan janjikan nomor e-Faktur; sisi penjualan sah nol (digunggung) |
+| POST | `/accounting/fixed-assets/segarkan` · `/anggaran/realisasi/segarkan` · `/ppn-masukan/segarkan` | Tombol **Segarkan** FE → picu job refresh salinan (`TriggerNow`). **202 fire-and-forget** (menunggu selesai kena timeout gateway 30s); 409 saat job masih jalan/disabled, pesan kalimat manusia. Respons memuat `pantau.tanda_kesegaran: "disinkron_pada"` |
+| GET | `/accounting/persetujuan` | **Kotak persetujuan SPV** — fan-out HTTP internal ke manufacture (proposal `PENDING_*` + sadewa `PENDING`) dan insentive (results `DRAFT`). Degradasi per-sumber: service mati → `tersedia: false` + catatan, **bukan** 500 total. Jendela **baca-saja**; approve tetap di modul pemilik. Butuh env `INSENTIVE_MODULE_URL` di container |
 
 > **Realisasi OPEX per departemen wajib `glaccount/get-balance.do`, BUKAN `get-pl-account-amount.do`.** Yang kedua **mengabaikan** `departmentName` diam-diam — kontrol negatif dengan nama departemen ngawur tetap mengembalikan angka penuh, sehingga tiap departemen akan menampilkan total seluruh perusahaan dan variansnya tampak wajar padahal palsu. Yang pertama lolos kontrol negatif (`s=false` untuk nama tak dikenal). Dimensi departemen terbukti terisi: menjumlahkan 13 departemen = persis total tanpa filter (selisih Rp 0,00 pada dua akun, setahun penuh).
 
-> **Salinan lokal & penyegar:** aset tetap (task harian 02:15) dan realisasi OPEX (02:45) diimpor ke Mongo mengikuti pola `accurate_stocks`. Impor realisasi sengaja hanya menarik kombinasi **yang punya anggaran** — 56 akun × 13 departemen × 2 periode ≈ 1.456 panggilan akan menduduki limiter Accurate 6 req/s yang dibagi lintas service, demi angka yang tak punya pembanding.
+> **Salinan lokal & penyegar:** aset tetap (task harian 02:15), realisasi OPEX (02:45), dan PPN masukan (03:30) diimpor ke Mongo mengikuti pola `accurate_stocks`; jam digeser agar tak berebut limiter. Impor realisasi sengaja hanya menarik kombinasi **yang punya anggaran** — 56 akun × 13 departemen × 2 periode ≈ 1.456 panggilan akan menduduki limiter Accurate 6 req/s yang dibagi lintas service, demi angka yang tak punya pembanding. Konsekuensi: periode tanpa anggaran **dilewati** task — menekan Segarkan tak menarik apa pun sampai anggarannya diunggah.
+
+> **Agregat FAT di grup lain** (dibangun untuk dashboard yang sama): `GET /transactions/orders/piutang/tren?bulan=N` — rekonstruksi posisi piutang per akhir-bulan historis; ⚠️ sengaja **tidak** meniru filter pipeline live (`status=="SHIPPED"` saja) karena status = nilai kini → historis naif under-count; populasi `{SHIPPED, COMPLETED}` dengan batal/retur dikeluarkan per tanggal kejadian dan terbuka = `income.paid_at` null/`> T`. `GET /accurate/receipts/mingguan?minggu=N` — agregasi per pekan (Senin WIB) di Go atas 3 koleksi receipt; `date_wib` string `YYYYMMDD` sudah WIB, tanpa konversi timezone. `GET /wallet/reconciliation/missing/agregat` — ekspos `CountSettledMissingPaidAtRange` (satu `$group` semua toko×kanal) tanpa kewajiban `shop_id+channel`.
 
 ## Items · Credentials · Holidays
 | Method | Path | Fungsi |
