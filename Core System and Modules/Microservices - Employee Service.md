@@ -55,13 +55,11 @@
 - CRUD `/procurement/contracts` (kontrak vendor non-inventory, alert H-60) & `/procurement/savings` (cost saving = harga acuan − jadi) — gate `RequireProcurementStaff`/`RequireProcurementSupervisor`. FE lewat `/api/employee/procurement/*`.
 - Model `ProcurementContract`/`ProcurementSaving`, collection `procurement_contract`/`procurement_saving`. Department `procurement` sudah ada di seed; role key `procurement`.
 
-**Training Program (HRIS) — ✅ merged ke main (deploy dev pending)**
-- Modul pelatihan karyawan (perluasan service ini, `services/employee/training.go`) + UI `/hris/training`. **Department opsional** (penyelenggara — tak membatasi peserta), **tanpa Branch**; peserta lintas dept di-assign HRD.
-- **Master**: CRUD `/training/types` (jenis) & `/training/trainers` (internal via `employee_id` / eksternal), by ObjectID.
-- **Transaksi**: CRUD `/training` + filter `?department_key=&status=`; cek FK type/trainer (department **opsional**); **guard transisi status** (Scheduled→Ongoing→Completed / →Cancelled); delete cascade ke peserta.
-- **Peserta & kehadiran**: `/training/:id/participants` (enroll — **unique index** `{training_id, employee_id}` anti-duplikat, **tanpa cap keras**; kapasitas = jumlah peserta; FE assign **multi-select** lintas dept), PATCH kehadiran boolean, `GET /training/history/:employeeId`.
-- RBAC tulis = `RequireHRISStaff`; GET open (di belakang gateway). Model + validasi murni + unit test di `shared-library/models/employee/training.go`.
-- **Backlog/hardening**: PUT = full-replace (FE wajib kirim objek lengkap); enroll belum cek employee ada di `work_data`; list tanpa pagination. Detail konsep: [[HRIS - Training Program]].
+**Training Program (HRIS) — ⛔ SUDAH PINDAH ke [[Microservices - Learning Service]]**
+- Sejak **LMS Fase 0** (2026-08-06, PR [#1020](https://github.com/bip-itteam-internal/bip-erp/pull/1020)), seluruh modul pelatihan pindah ke service `learning`: berkas `services/employee/training.go` beserta `shared-library/models/employee/training.go` **dihapus**, dan empat entri Training di struct `Collections` ikut dicabut. Data 4 koleksi sudah dipindah ke `learning_db` di dev maupun produksi.
+- Alasan pindah: LMS menuntut kelas tatap muka dan belajar mandiri berbagi satu angka progres, sehingga keduanya harus tinggal di satu service ([[ADR - 0002 Database-per-Service]]).
+- **Yang tersisa di service ini**: endpoint `GET /master/departments/:key` kini juga dipakai `learning` untuk memverifikasi `department_key` lewat panggilan internal. Endpoint itu menyaring `company_id`, sedangkan kueri langsung yang dulu dipakai tidak — penyempitan yang disengaja, dampaknya nol selama seluruh data Training milik `BIP`. Detail: [[Microservices - Learning Service]].
+- ⚠️ **Di produksi rute lama `/training/*` masih terdaftar** karena `employee-service` sengaja tidak di-rebuild saat cut-over (menghindari ikut mendorong perubahan orang lain ke produksi). Koleksi Training lama juga masih ada di `employee_db` sebagai jalan pulang. Keduanya tidak dipakai siapa pun.
 
 **CRUD Employee Data**
 - CRUD personal data, personal-documents, work data, work-documents, schedule, dan system-auth
@@ -198,7 +196,7 @@ Pengecualiannya kolom yang **selalu ditulis kode kita sendiri** — mis. `employ
 
 ## Dependencies & Integrasi
 
-- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `external_account`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`, `master_company`, `master_job_level`, `training_type`, `trainer`, `training`, `training_participant`, `legal_license`, `legal_contract`, `legal_dispute`, `rnd_registration`, `rnd_product`, `quality_capa`, `quality_incoming`, `quality_batch_release`, `procurement_contract`, `procurement_saving`. Lihat [[DB - Overview and Notes]].
+- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `external_account`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`, `master_company`, `master_job_level`, `legal_license`, `legal_contract`, `legal_dispute`, `rnd_registration`, `rnd_product`, `quality_capa`, `quality_incoming`, `quality_batch_release`, `procurement_contract`, `procurement_saving`. Lihat [[DB - Overview and Notes]].
 - **MinIO** — client langsung untuk upload foto & dokumen.
 - [[Microservices - Attendance Service]] — memanggil `POST /vacation/decrement`, mengonsumsi feed `/list` dan cron `/sync/work-schedules`.
 - [[Microservices - Notification Service]] — mengonsumsi feed `/list` (fcm-token, supervisor, dll).

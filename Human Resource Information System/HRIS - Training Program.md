@@ -2,9 +2,10 @@
 
 *Manajemen program **pelatihan & pengembangan karyawan** (training & development). Dokumen ini menaikkan status dari konsep-mentah menjadi **usulan desain MVP** — hasil adaptasi modul **Training ERPGo** ke kondisi Bharata. **Backend & Frontend MVP sudah diimplementasi & merged ke main**, grounded ke pola service & master data yang ada. **Cakupan sengaja dibatasi ke MVP inti**; fitur lanjut ditandai fase-lanjut/TBD.*
 
-- **Status**: ⚠️ **MVP implemented & merged ke main** (BE bip-erp #545/#550 + FE erp-frontend #390/#391; refine FE #396) — endpoint di [[Microservices - Employee Service]] · [[API - Employee Service]], UI `/hris/training`. **Deploy dev + smoke test masih pending**. Desain di bawah = acuan.
+- **Status**: ✅ **MVP live di dev + produksi 2026-08-06**, kini dilayani **[[Microservices - Learning Service]]** (`/api/learning/*`), UI `/hris/training`. Sebelumnya menumpang Employee Service; dipindah lewat **LMS Fase 0** (bip-erp [#1020](https://github.com/bip-itteam-internal/bip-erp/pull/1020), erp-frontend [#814](https://github.com/bip-itteam-internal/erp-frontend/pull/814)). MVP awal: BE #545/#550 + FE #390/#391, refine FE #396.
 - **Referensi bentuk**: modul **Training ERPGo** (3 sub-menu: Training Types · Trainers · Training List) — diambil selektif, **bukan** disalin utuh
-- **Penempatan usulan**: perluasan [[Microservices - Employee Service]] (bukan microservice baru) — lihat **Penempatan Arsitektur**
+- **Penempatan**: ✅ **service `learning` sendiri** — lihat **Penempatan Arsitektur** (usulan lama "perluasan Employee Service" sudah ditinggalkan)
+- **Kelanjutan**: modul ini jadi fondasi **LMS People Development** (materi PDF & video, pre/post test, skoring otomatis, kurikulum per jabatan, Talent Pool). Desain lengkapnya ada di `erp/docs/superpowers/specs/2026-08-05-lms-people-development-design.md`; ringkasannya di **Rollout Bertahap** di bawah
 - **Prioritas**: Fase E di [[HRIS - Roadmap]] (HR lifecycle, setelah Recruitment) — belum urgen; dokumen ini menyiapkan desain agar cepat dieksekusi saat gilirannya
 
 ## Latar Belakang
@@ -85,17 +86,29 @@ Collection baru di database Employee Service (MongoDB), sejajar dengan `master_d
 
 ## Penempatan Arsitektur
 
-**Usulan: perluas [[Microservices - Employee Service]]** (bukan microservice baru). Grounded:
+✅ **Keputusan akhir (2026-08-06): service `learning` sendiri** — [[Microservices - Learning Service]], MongoDB `learning_db`, modul gateway `learning`.
+
+Pemicunya bukan ukuran modul Training, melainkan arah LMS: kelas tatap muka dan belajar mandiri harus **berbagi satu angka progres**. Bila keduanya tinggal di service berbeda, tiap perhitungan progres jadi panggilan lintas-service. Sesuai [[ADR - 0002 Database-per-Service]], modul baru = service + database sendiri.
+
+⚠️ **Pelajaran dari pemindahannya**: "pindahkan apa adanya" ternyata tidak cukup. `verifyTrainingRefs` diam-diam mengueri koleksi `master_department` yang **dimiliki Employee Service**, sehingga setelah pindah kueri itu mengarah ke database yang tidak memilikinya dan setiap pelatihan berdepartemen ditolak "department not found". Diganti panggilan HTTP internal. Tiap handler yang dipindah antar-service wajib diaudit kueri Mongo-nya satu per satu.
+
+<details><summary>Usulan lama (2026, sebelum LMS diputuskan): perluas Employee Service</summary>
+
+Alasan yang dipakai saat itu, disimpan sebagai jejak keputusan:
 
 - Employee Service **sudah** memegang master org (`master_department`), master karyawan (`work_data`), dan **MinIO upload** — semua yang dibutuhkan Training tinggal reuse, tanpa duplikasi data lintas-service.
 - Sudah ada helper RBAC (`RequireHRISStaff`, `RequireHRISOrITSupervisor`) & feed karyawan (`GET /list`) → picker peserta/trainer-internal langsung tersedia.
 - Konsisten dengan stack: Go + Fiber v2 + MongoDB, di belakang [[CORE - API Master Gateway]] + SSO ([[CORE - SSO Flow]]).
 - **Trade-off** (disadari): menambah beban ke service terbesar; alternatif microservice terpisah (pola [[Microservices - Recruitment Service]], sesuai [[ADR - 0002 Database-per-Service]]) tetap opsi bila modul Training tumbuh besar (evaluasi/sertifikat/request kompleks). Untuk **MVP**, extend Employee Service dipilih demi kecepatan & reuse master.
 
+*Trade-off terakhir itulah yang akhirnya terjadi: modul memang tumbuh, dan pemisahannya dieksekusi di LMS Fase 0.*
+
+</details>
+
 ## Keputusan (dikonfirmasi sesi ini)
 
 - **Cakupan** = **MVP inti** (Types + Trainers + Training + peserta/kehadiran) + roadmap bertahap; fitur lanjut ditunda.
-- **Penempatan** = **perluas Employee Service** (bukan service baru) untuk MVP.
+- **Penempatan** = ~~perluas Employee Service~~ → **service `learning` sendiri** sejak 2026-08-06 ([[Microservices - Learning Service]]).
 - **Branch dibuang** (adaptasi ERPGo). **Department = OPSIONAL** (peran *Penyelenggara*) — **tidak** membatasi peserta; peserta lintas semua departemen, di-assign HRD. *(Revisi: semula wajib satu dept.)*
 - **Cost** informasional (tanpa integrasi akunting; Accurate = [[ADR - 0001 Akuntansi via Accurate]]).
 - **Evaluasi** (bila dibangun) = **purpose-built**, bukan form builder.
@@ -104,9 +117,11 @@ Collection baru di database Employee Service (MongoDB), sejajar dengan `master_d
 - **Kapasitas** = **otomatis mengikuti jumlah peserta yang di-assign** (cap keras `max_participants` **dibuang**); assign via **multi-select** karyawan. *(Revisi keputusan lama.)*
 - **Approval pengajuan pelatihan** (fase lanjut) = **SPV → HR Training Officer → Direktur**, bersifat **administratif** (Cost informasional, **tanpa** approval anggaran / integrasi keuangan).
 
-## Implementasi (BE+FE — ✅ merged ke main; deploy dev pending)
+## Implementasi (BE+FE — ✅ live di dev + produksi 2026-08-06)
 
-*Dibangun sebagai perluasan [[Microservices - Employee Service]] (`services/employee/training.go` + model/validasi di `shared-library/models/employee/training.go`) + UI [[APP - Web ERP]] (`src/features/hris/training/*`). Endpoint lengkap: [[API - Employee Service]] §Training Program.*
+*Kini di [[Microservices - Learning Service]] (`services/learning/training.go` + model/validasi di `services/learning/models_training.go`) + UI [[APP - Web ERP]] (`src/features/hris/training/*`, memanggil `/api/learning/training/*`). Endpoint lengkap: [[API - Learning Service]].*
+
+> Berkas lamanya (`services/employee/training.go`, `shared-library/models/employee/training.go`) sudah **dihapus**. Data 4 koleksi dipindah ke `learning_db` di dev dan produksi, jumlah terverifikasi cocok, salinan lama di `employee_db` sengaja dibiarkan sebagai jalan pulang.
 
 - **Master** ✅ — CRUD `/training/types` & `/training/trainers` (internal/eksternal).
 - **Transaksi** ✅ — CRUD `/training` (filter Department+Status), cek FK, guard transisi status, delete cascade.

@@ -62,18 +62,13 @@
 > **Akun terbit tanpa hak modul apa pun** sampai salah satu sumbu dipasang. Itu baru benar **setelah** penambalan `izinAkun`: sebelumnya akun vendor tanpa paket diam-diam dapat 6 izin modul `ticket` lewat fallback tier. Lihat [[Microservices - Employee Service]] §Akun pihak luar.
 > Konsumen FE: tab **Akun Eksternal** di `/hris/master-data` + dialog "Hak Akses Vendor" (tab *Paket Hak* / *Role Modul*).
 
-## Training Program (HRIS) — ✅ merged (deploy dev pending)
-> BE+FE **merged ke main** (`services/employee/training.go`; UI `/hris/training`); **deploy dev pending**. **Department opsional** (peran penyelenggara — TIDAK membatasi peserta; peserta lintas dept di-assign HRD), tanpa Branch. RBAC tulis = `RequireHRISStaff`; GET open (di belakang gateway). Detail konsep: [[HRIS - Training Program]].
+## Training Program (HRIS) — ⛔ PINDAH ke service `learning`
 
-| Method | Path | Fungsi |
-|---|---|---|
-| GET · POST | `/training/types` · `/training/trainers` | List / buat master jenis pelatihan & trainer (internal/eksternal) |
-| GET · PUT · DELETE | `/training/types/:id` · `/training/trainers/:id` | Detail/ubah/hapus master (by ObjectID) |
-| GET · POST | `/training` (`?department_key=&status=`) | List / buat event pelatihan (cek FK type/trainer; department **opsional**) |
-| GET · PUT · DELETE | `/training/:id` | Detail / ubah (guard transisi status) / hapus (cascade peserta) |
-| GET · POST | `/training/:id/participants` | List / enroll peserta (unique index anti-duplikat, **tanpa cap keras** — kapasitas = jumlah peserta; FE assign multi-select lintas dept) |
-| PATCH · DELETE | `/training/:id/participants/:employeeId` | Tandai kehadiran (boolean) / batalkan peserta |
-| GET | `/training/history/:employeeId` | Riwayat pelatihan per karyawan |
+> Seluruh endpoint `/training/*` **sudah tidak ada di service ini** sejak LMS Fase 0 (2026-08-06, PR [#1020](https://github.com/bip-itteam-internal/bip-erp/pull/1020)). Rumah barunya: **[[API - Learning Service]]** dengan prefix `/api/learning/*`. Path internalnya tidak berubah, hanya modulnya.
+>
+> ⚠️ Di **produksi** rute lama `/api/employee/training/*` **masih menjawab**, karena `employee-service` sengaja tidak di-rebuild saat cut-over agar tidak ikut mendorong perubahan orang lain. Tidak ada pemanggil yang tersisa; frontend sudah beralih. Jangan dipakai untuk integrasi baru.
+>
+> Satu perilaku berubah saat pindah: verifikasi `department_key` kini panggilan HTTP internal ke service ini (`GET /master/departments/:key`), bukan kueri Mongo langsung. Detail beserta pemetaan kode statusnya: [[API - Learning Service]].
 
 ## KPI · Vacation · Reports (HRIS)
 | Method | Path | Fungsi | RBAC |

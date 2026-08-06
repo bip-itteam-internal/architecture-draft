@@ -108,6 +108,15 @@ Doc: [[Microservices - Payroll Service]] (⚠️ Fase 1 — Salary Setup & Confi
 - employee_salary
 - payroll_config
 
+### learning — `learning-mongo-db` ✅
+Doc: [[Microservices - Learning Service]] (live dev + prod 2026-08-06)
+- training_type (master jenis pelatihan)
+- trainer (master pengajar, internal via `employee_id` atau eksternal)
+- training (event pelatihan; `department_key` opsional, diverifikasi ke employee-service lewat HTTP internal)
+- training_participant (peserta + kehadiran boolean; unique index `{training_id, employee_id}`)
+
+> Keempatnya **pindahan dari `employee_db`** pada LMS Fase 0, nama koleksi sengaja dipertahankan supaya data terbaca tanpa penyesuaian. Salinan lama di `employee_db` **belum dihapus** (jalan pulang). ⚠️ Belum ada `company_id` di koleksi ini — Fase 1 wajib memasangnya, lihat [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
+
 ### form-builder — `form-builder-mongo-db` ⚠️
 Doc: [[Microservices - Form Builder Service]] (⚠️ merged 2026-08-01, belum live di dev)
 - forms (definisi form + sasaran + pengaturan gerbang presensi)

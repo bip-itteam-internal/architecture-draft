@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-06",
-  "jumlah_dokumen": 269,
+  "jumlah_dokumen": 271,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -88,7 +88,7 @@
         "API - Index",
         "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
         "RUN - Onboarding Akun Eksternal (Vendor & Mitra)",
-        "HRIS - Training Program",
+        "API - Learning Service",
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "HRIS - Attrition",
@@ -96,23 +96,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "d0768fbcdf373b0bfdf738ac7a3f734e370bc69a176d0c8f743846057ce5c3c8",
-      "ukuran_kb": 17.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service dan siapa yang boleh memanggilnya — dari login/refresh token, master data departemen & system role, akun pihak luar (vendor/mitra), catatan resign / non-aktif karyawan beserta dokumen pendukungnya, sampai ringkasan turnover bulan berjalan. Juga menjawab gate RBAC tiap rute, mana yang sengaja dibuat lebih ketat daripada master data lain, dan aturan detail seperti kategori resign yang divalidasi persis huruf besar-kecilnya, batas 4 MB lampiran, serta kapan alasan pembatalan diwajibkan.",
+      "hash": "fad0c8b42ff8d4f0cac994f7c452404ed3170bed4d6e21be850ca506c78c10cc",
+      "ukuran_kb": 17.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service untuk login/onboarding karyawan, CRUD data personal & pekerjaan, kelola akun sistem (aktivasi, reset, forget-device, role), serta master data departemen & system role. Juga menjelaskan endpoint akun pihak luar (vendor/mitra) termasuk penerbitan, perpanjangan, dan pencabutan hak akses, serta rute resign/non-aktif karyawan, KPI, vacation, dan reports.",
       "kata_kunci": [
-        "employee service",
-        "endpoint",
-        "API",
-        "login",
-        "master data",
-        "akun eksternal",
-        "external account",
-        "permission set",
-        "system roles",
-        "RBAC",
-        "resign",
-        "non-aktif karyawan",
-        "turnover"
+        "employee-service",
+        "endpoint API",
+        "login onboarding",
+        "master data departemen",
+        "system role",
+        "akun eksternal vendor",
+        "resign non-aktif",
+        "KPI",
+        "vacation",
+        "system-auth"
       ]
     },
     {
@@ -251,22 +248,23 @@
         "Microservices - Form Builder Service",
         "API - Marketing Analytics Service",
         "Microservices - Marketing Analytics Service",
+        "API - Learning Service",
+        "Microservices - Learning Service",
         "DB - Overview and Notes",
         "HOMEPAGE"
       ],
-      "hash": "3b7b4330e280adc447446fa98c0245fa69a631e950726efe8b8a60b46a028cf0",
-      "ukuran_kb": 3.4,
-      "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, prefix gateway tiap service, dan di file API mana daftar endpoint lengkapnya; juga bagaimana routing, auth JWT via header BIP-*, open route ber-service-key, dan jalur public/ext bekerja.",
+      "hash": "2de9739f0d94b5bce556ab857adbe9077743197193ecc100a1a38aaa3d213e6a",
+      "ukuran_kb": 3.5,
+      "ringkasan": "Menjawab: service apa saja yang ada di ekosistem bip-erp beserta prefix gateway dan dokumen API masing-masing, dan bagaimana cara routing request lewat API Master Gateway bekerja secara umum (JWT, header BIP-*, open routes, rute public/ext).",
       "kata_kunci": [
-        "api index",
+        "API index",
         "daftar service",
-        "prefix gateway",
-        "routing",
-        "endpoint",
+        "gateway routing",
         "JWT",
         "BIP header",
         "open route",
-        "service key"
+        "public route",
+        "prefix modul"
       ]
     },
     {
@@ -361,8 +359,18 @@
       ],
       "hash": "870f5d5414846884ccc48e5ed7f599434cd6037a509af750b648938b7abcd9b9",
       "ukuran_kb": 7.4,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: endpoint apa saja untuk mengelola aset/inventaris GA (buat/list/update item, serah-terima aset & persetujuan SPV, riwayat perbaikan), serta detail kontrak request seperti field wajib saat membuat item, pemetaan kategori-ERP ke golongan Accurate, dan batasan upload dokumen presigned URL.",
+      "kata_kunci": [
+        "inventory-service",
+        "API aset",
+        "GA",
+        "serah terima aset",
+        "approve handover",
+        "repair history",
+        "category mapping",
+        "Accurate",
+        "upload dokumen"
+      ]
     },
     {
       "path": "API Reference/API - IT Orchestrator.md",
@@ -389,6 +397,36 @@
         "jaringan",
         "network",
         "deaktivasi karyawan"
+      ]
+    },
+    {
+      "path": "API Reference/API - Learning Service.md",
+      "judul": "API - Learning Service",
+      "area": "API Reference",
+      "jenis": "api",
+      "status_emoji": "✅",
+      "status_teks": "Grounded ke kode, live di dev + produksi 2026-08-06",
+      "publik": true,
+      "tautan": [
+        "Microservices - Employee Service",
+        "Microservices - Learning Service",
+        "HRIS - Training Program",
+        "API - Employee Service",
+        "API - Index",
+        "CORE - API Master Gateway"
+      ],
+      "hash": "b08a85de5bba62fdb3c5f58b27185aacb64e010863cd4c7b58b5270601a6fdd2",
+      "ukuran_kb": 3.5,
+      "ringkasan": "Menjawab: endpoint apa saja di service learning untuk mengelola jenis pelatihan, trainer, event training (dengan transisi status), serta pendaftaran & kehadiran peserta, termasuk kode status saat verifikasi department_key ke employee-service dan fitur LMS lanjutan yang belum ada.",
+      "kata_kunci": [
+        "learning service",
+        "API training",
+        "pelatihan",
+        "trainer",
+        "event training",
+        "peserta kehadiran",
+        "department_key verifikasi",
+        "LMS"
       ]
     },
     {
@@ -1155,6 +1193,7 @@
       "tautan": [
         "CORE - SSO Flow",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "Microservices - Learning Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
@@ -1172,20 +1211,19 @@
         "APP - MyBharata",
         "DB - Overview and Notes"
       ],
-      "hash": "a8f3fd3c809b1a8e9fa392b43899bb3467d1d68dbfddb6d9d9956dd708a37f17",
-      "ukuran_kb": 7.5,
-      "ringkasan": "Menjawab: bagaimana request dari luar masuk ke ekosistem bip-erp, bagaimana login menghasilkan JWT (termasuk login PIN/biometrics, refresh, logout, dan handoff SSO one-time-code), serta bagaimana gateway mem-proxy ke tiap service internal lewat pola /api/:module/* dan rute khusus /auth, /public, /ext. Juga menjawab: header identitas apa yang di-inject gateway dari klaim JWT (BIP-Employee-Id, BIP-System-Roles, BIP-Company-ID) sebagai fondasi multi-perusahaan, bagaimana response caching Redis dan rate limiting bekerja, serta module mana yang boleh skip JWT lewat query key. Menjelaskan pula kenapa routing catch-all membuat prefix /internal/ ikut terbuka ke internet dan limiter khusus bisa dilewati, plus daftar port internal tiap service.",
+      "hash": "9b52247165fa185977e319608df4be37ea126dce00fb1fa833478af3e2167d71",
+      "ukuran_kb": 7.6,
+      "ringkasan": "Menjawab: bagaimana API Master Gateway berfungsi sebagai satu-satunya pintu masuk ekosistem bip-erp — autentikasi JWT & SSO, cara routing request ke service via `/api/:module/*`, header identitas BIP-*, response caching Redis — serta catatan keamanan kenapa prefix `/internal/` bukan batas keamanan dan fitur apa yang belum diimplementasikan (revoke token, route /dev berbahaya).",
       "kata_kunci": [
-        "api gateway",
-        "API Master Gateway",
+        "API gateway",
         "JWT",
-        "auth login",
         "SSO",
-        "reverse proxy",
-        "routing module",
-        "rate limiting",
-        "CORS",
-        "Redis cache"
+        "routing",
+        "BIP header",
+        "internal gateway key",
+        "response caching Redis",
+        "keamanan internal",
+        "ADR 0031"
       ]
     },
     {
@@ -1359,20 +1397,19 @@
         "Microservices - Task Management Service",
         "BASE - Enterance Point"
       ],
-      "hash": "3d4d4939e9b831b30623f3a6c9a3a53f7c17ce3ec09112f47fc47d2a155f0282",
-      "ukuran_kb": 12.6,
-      "ringkasan": "Menjawab: bagaimana karyawan login sekali di Web ERP lalu berpindah ke aplikasi internal lain tanpa login ulang — lewat one-time-code handoff di API Master Gateway, bukan Identity Provider pihak ketiga. Juga menjawab bagaimana role dan cakupan supervisi diturunkan ke service lewat header BIP-*, bagaimana hak akun pihak luar dipasang, dan langkah menambah aplikasi konsumen SSO baru.",
+      "hash": "cedcedf8292bbc5ea7ebbe65a3d6832b7828f4d20811d2bdb5fbd6ccc164b392",
+      "ukuran_kb": 13.0,
+      "ringkasan": "Menjawab: bagaimana mekanisme Single Sign-On bip-erp bekerja (one-time-code handoff, bukan IdP eksternal), alur lengkap login dari Web ERP ke aplikasi konsumen seperti Task Manager, dan panduan langkah demi langkah menambahkan aplikasi konsumen SSO baru. Juga menjelaskan sumber & struktur role/otorisasi (system_roles) termasuk aturan khusus akun pihak luar (vendor/mitra).",
       "kata_kunci": [
         "SSO",
         "single sign-on",
-        "JWT",
         "one-time code",
-        "gateway",
-        "login",
-        "token",
-        "system roles",
-        "akun eksternal",
-        "redirect"
+        "JWT",
+        "redirect login",
+        "Task Manager",
+        "system_roles",
+        "RBAC",
+        "akun eksternal"
       ]
     },
     {
@@ -1436,23 +1473,22 @@
         "Microservices - Task Management Service",
         "Microservices - Recruitment Service",
         "Microservices - Payroll Service",
+        "Microservices - Learning Service",
         "Microservices - Form Builder Service",
         "Microservices - File Service"
       ],
-      "hash": "30e4043042d196a21236ea2a6b41de54172c42d20fecbfb70333082939eaedcd",
-      "ukuran_kb": 6.9,
-      "ringkasan": "Menjawab: database mana milik service mana pada pola database-per-service, dan collection apa saja yang ada di tiap MongoDB (employee, attendance, notification, insentive, integration, inventory, tiktok-shop, task-management, recruitment, payroll, form-builder). Juga menjawab service mana yang berjalan sebagai replica set dan boleh dibaca read-only, koleksi mana yang membawa `company_id` untuk multi-perusahaan, index apa yang dibuat idempoten saat boot, serta mengapa satu-jawaban-per-orang di form builder ditegakkan di handler alih-alih index unik. Menjelaskan pula peran infrastruktur data bersama Redis dan MinIO termasuk konvensi prefix objek per domain dan aturan waktu disimpan UTC.",
+      "hash": "19aa207b913591517aabbe771d9ad0ab84c547154526ad41f05bf8252c44aa8c",
+      "ukuran_kb": 7.6,
+      "ringkasan": "Menjawab: database MongoDB apa yang dipakai tiap microservice bip-erp beserta daftar collection utamanya, mengapa polanya database-per-service, dan bagaimana Redis (cache/queue) serta MinIO (object storage) dipakai bersama lintas service.",
       "kata_kunci": [
-        "database",
+        "database per service",
         "MongoDB",
-        "database-per-service",
         "collection",
-        "replica set",
-        "company_id",
-        "multi-tenant",
         "Redis",
         "MinIO",
-        "index"
+        "employee_db",
+        "multi-tenant company_id",
+        "replica set"
       ]
     },
     {
@@ -1522,7 +1558,8 @@
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "Microservices - Procurement Service",
-        "HRIS - Training Program",
+        "Microservices - Learning Service",
+        "ADR - 0002 Database-per-Service",
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "HRIS - Otomasi Skor KPI",
@@ -1548,29 +1585,21 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "d2129b7a30b46face5b607ec0b8bef972d5b06e4f2109b7c72f0c907a31a8f37",
+      "hash": "3a399c90451603449f7d334d46652ee4ed0903429b7d7c5e5bfb44d45b5a636d",
       "ukuran_kb": 42.6,
-      "ringkasan": "Menjawab pertanyaan tentang employee-service sebagai master data karyawan dan sumber kebenaran autentikasi/SSO: alur login (username/PIN/biometric), endpoint admin akun (reset, forget-device, active-status), CRUD master department/system roles, serta modul workspace non-HR yang di-host di service ini (Legal, R&D Regulatory, Quality, Procurement) beserta alasan penempatannya. Juga menjelaskan status fitur multi-perusahaan, akun pihak luar, resign karyawan, dan ringkasan turnover. Memuat satu jebakan data yang berlaku lintas fitur: tanggal di koleksi karyawan tersimpan dalam DUA tipe (BSON Date dan string), sehingga kueri rentang Mongo melewatkan sebagian data tanpa galat dan penyaringan tanggal harus dikerjakan di Go.",
+      "ringkasan": "Menjawab: apa peran Employee Service sebagai master data karyawan sekaligus sumber kebenaran autentikasi/onboarding bip-erp, fitur apa saja yang sudah diimplementasikan (login, admin akun, master department & system role, workspace Legal/R&D Regulatory/Quality/Procurement), serta status multi-perusahaan dan resign/non-aktif karyawan.",
       "kata_kunci": [
         "employee service",
-        "master data karyawan",
-        "login",
-        "SSO",
         "auth",
-        "PIN",
-        "biometric",
-        "system_roles",
+        "onboarding",
+        "master data",
+        "system role",
         "department",
-        "Legal",
-        "R&D Regulatory",
-        "Quality",
-        "Procurement",
-        "resign",
-        "turnover",
-        "akun pihak luar",
+        "legal",
+        "R&D regulatory",
+        "procurement",
         "multi-tenant",
-        "join_date",
-        "tanggal string vs date"
+        "resign"
       ]
     },
     {
@@ -1803,8 +1832,52 @@
       ],
       "hash": "9881fcfb23cd2f585e113e0279c405d8001ec9b99fd6ed75aca914ac89dba85f",
       "ukuran_kb": 7.6,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana Inventory Service mengelola aset/inventaris General Affairs (bukan stok gudang) — pembuatan item dengan ID otomatis, alur serah-terima aset dengan persetujuan SPV, riwayat perbaikan, dan rekonsiliasi ke Accurate untuk KPI (ADR-0037). Juga menjelaskan integrasi MinIO untuk dokumen dan batasan yang belum diimplementasikan.",
+      "kata_kunci": [
+        "inventory service",
+        "aset GA",
+        "asset tracking",
+        "serah terima",
+        "repair history",
+        "MinIO",
+        "rekonsiliasi Accurate",
+        "ADR 0037",
+        "kategori bebas ketik"
+      ]
+    },
+    {
+      "path": "Core System and Modules/Microservices - Learning Service.md",
+      "judul": "Microservices - Learning Service",
+      "area": "Core System and Modules",
+      "jenis": "domain",
+      "status_emoji": "✅",
+      "status_teks": "**Implemented & live di dev + produksi 2026-08-06** (bip-erp PR [#1020](https://github.com/bip-itteam-internal/bip-erp/pull/1020), frontend [erp-frontend#814](https://github.com/bip-itteam-internal/erp-frontend/pull/814)). Data 4 koleksi sudah dipindah di kedua lingkungan, jumlah terverifikasi cocok. Konsep & rencana lanjutan: [[HRIS - Training Program]]",
+      "publik": true,
+      "tautan": [
+        "Microservices - Employee Service",
+        "HRIS - Training Program",
+        "ADR - 0002 Database-per-Service",
+        "API - Learning Service",
+        "Microservices - Form Builder Service",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "DB - Overview and Notes",
+        "CORE - API Master Gateway",
+        "APP - Web ERP",
+        "API - Index"
+      ],
+      "hash": "2eb84de6dd917055d40750fcc7d22e84b2b7c9cea6d60458ac53871d5d0f3214",
+      "ukuran_kb": 6.2,
+      "ringkasan": "Menjawab: kenapa modul Training dipindah menjadi service `learning` tersendiri sebagai fondasi LMS People Development, fitur apa saja yang sudah dipindah (master jenis pelatihan/trainer, event training, peserta & kehadiran), serta detail perubahan perilaku verifikasi department_key lewat panggilan internal ke employee-service. Juga mencatat fitur LMS lanjutan yang belum ada dan gap multi-tenant company_id.",
+      "kata_kunci": [
+        "learning service",
+        "LMS",
+        "training",
+        "pelatihan",
+        "pemindahan service",
+        "department_key verifikasi",
+        "employee-service",
+        "multi-tenant"
+      ]
     },
     {
       "path": "Core System and Modules/Microservices - Manufacture Service.md",
@@ -3364,8 +3437,18 @@
       ],
       "hash": "3f1255690c205c6a8ea8009091f7b0e48ca41913b1088cbf0d2ae29377e186e9",
       "ukuran_kb": 12.3,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: mengapa dan bagaimana keputusan mendesain rekonsiliasi aset GA dengan data Aktiva Tetap Accurate untuk KPI staff GA diambil — termasuk skema 3 tab (Kelola Aset/Data Accurate/Cocokkan), mekanisme pencocokan ceklis manual berbantuan, cara skor akurasi & cakupan dihitung agar gap di Accurate tidak menghukum GA, dan pembagian tanggung jawab data antara inventory-service dan integration-service.",
+      "kata_kunci": [
+        "ADR 0037",
+        "rekonsiliasi aset",
+        "Accurate",
+        "KPI GA",
+        "ceklis",
+        "akurasi cakupan",
+        "aktiva tetap",
+        "category mapping",
+        "fixed assets"
+      ]
     },
     {
       "path": "Decisions/ADR - 0038 Hak Per-Objek Admin Space Task Management.md",
@@ -3906,8 +3989,18 @@
       ],
       "hash": "c3ca4d07ce005fe191168073109521b43337e6e8b57b35ba563c5161a8de9cb6",
       "ukuran_kb": 8.4,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: apa visi & ruang lingkup jangka panjang sistem Inventory Management GA (GA sebagai pengelola aset perusahaan secara berhierarki), fitur apa yang sudah berjalan (penomoran aset, serah-terima, lokasi/penyusutan, rekonsiliasi Accurate), serta alur proses pengajuan barang dari user hingga menjadi aset dan pertimbangan/keputusan yang masih terbuka (TBD).",
+      "kata_kunci": [
+        "inventory management",
+        "GA",
+        "aset perusahaan",
+        "penomoran aset",
+        "serah terima",
+        "procurement",
+        "warehouse master data",
+        "rekonsiliasi Accurate",
+        "petty cash"
+      ]
     },
     {
       "path": "General Affairs/GA - Machine & Utility Maintenance.md",
@@ -5375,15 +5468,15 @@
       "judul": "HRIS - Training Program",
       "area": "Human Resource Information System",
       "jenis": "domain",
-      "status_emoji": "⚠️",
-      "status_teks": "**MVP implemented & merged ke main** (BE bip-erp #545/#550 + FE erp-frontend #390/#391; refine FE #396) — endpoint di [[Microservices - Employee Service]] · [[API - Employee Service]], UI `/hris/training`. **Deploy dev + smoke test masih pending**. Desain di bawah = acuan.",
+      "status_emoji": "✅",
+      "status_teks": "**MVP live di dev + produksi 2026-08-06**, kini dilayani **[[Microservices - Learning Service]]** (`/api/learning/*`), UI `/hris/training`. Sebelumnya menumpang Employee Service; dipindah lewat **LMS Fase 0** (bip-erp [#1020](https://github.com/bip-itteam-internal/bip-erp/pull/1020), erp-frontend [#814](https://github.com/bip-itteam-internal/erp-frontend/pull/814)). MVP awal: BE #545/#550 + FE #390/#391, refine FE #396.",
       "publik": true,
       "tautan": [
-        "Microservices - Employee Service",
-        "API - Employee Service",
+        "Microservices - Learning Service",
         "HRIS - Roadmap",
         "HRIS - Recruitment",
         "Microservices - Recruitment Service",
+        "Microservices - Employee Service",
         "ADR - 0001 Akuntansi via Accurate",
         "HRIS - Key Performance Index",
         "Microservices - File Service",
@@ -5391,27 +5484,29 @@
         "Microservices - Notification Service",
         "HRIS - Organization Structure",
         "APP - MyBharata",
+        "ADR - 0002 Database-per-Service",
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
-        "ADR - 0002 Database-per-Service",
         "APP - Web ERP",
+        "API - Learning Service",
         "HRIS - Career & Promotion",
         "HRIS - Work Review",
         "HRIS - Big Pictures",
         "HRIS - Analysis"
       ],
-      "hash": "15239ce2c7368a57f604fda708809286dda84f7473af01f20c0758b9b65ad954",
-      "ukuran_kb": 14.7,
-      "ringkasan": "Menjawab: bagaimana rancangan/MVP manajemen pelatihan karyawan bekerja (katalog Training Types, master Trainers internal/eksternal, event Training, peserta & kehadiran), fitur apa dari modul Training ERPGo yang diambil/disesuaikan/dibuang, dan model data yang diusulkan di Employee Service.",
+      "hash": "8ab2832b5b6e03b47f5fe5fa8305450d95b4803aa218cc7bc96bd178109853ea",
+      "ukuran_kb": 16.6,
+      "ringkasan": "Menjawab: bagaimana desain modul Training & Development karyawan dirancang mengikuti struktur ERPGo yang diadaptasi ke kondisi Bharata (Training Types, Trainers, Training event, peserta & kehadiran), model data collection yang dipakai, alur proses bisnis dari persiapan master hingga pencatatan kehadiran, serta rencana rollout bertahap menuju LMS People Development lengkap.",
       "kata_kunci": [
-        "training program",
+        "HRIS training",
         "pelatihan karyawan",
+        "LMS",
+        "training types",
         "trainer",
-        "training type",
-        "peserta pelatihan",
-        "kehadiran training",
         "ERPGo",
-        "MVP pelatihan"
+        "rollout bertahap",
+        "people development",
+        "kehadiran peserta"
       ]
     },
     {
@@ -8805,10 +8900,5 @@
       ]
     }
   ],
-  "gagal": [
-    "API Reference/API - Inventory Service.md",
-    "Core System and Modules/Microservices - Inventory Service.md",
-    "Decisions/ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI.md",
-    "General Affairs/GA - Inventory Management.md"
-  ]
+  "gagal": []
 }

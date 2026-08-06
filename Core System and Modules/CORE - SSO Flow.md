@@ -104,7 +104,7 @@ sequenceDiagram
 |---|---|---|
 | [[APP - Web ERP]] (web ERP) | ✅ (IdP) | Tempat login utama + pemicu handoff |
 | [[APP - Dynamic Task Tracker]] (Task Manager) | ✅ (konsumen) | Gateway-cutover selesai; tanpa login lokal |
-| [[APP - MyBharata]] (MyBharata) | ❌ | Login JWT **langsung** ke HRIS backend (`admin.hris-bharata.com`), ekosistem terpisah |
+| [[APP - MyBharata]] (MyBharata) | ❌ tak perlu | ⚠️ **Bukan lagi ekosistem terpisah** (diverifikasi ke kode 2026-08-06). `mybharata-app/lib/src/core/api/url.dart:4` menunjuk gateway yang **sama** (`https://api.bharatainternasional.com/`) dan login lewat `/auth/login` yang sama, jadi aplikasi sudah memegang ERP JWT dan bisa memanggil `/api/<modul>/*` langsung **tanpa** handoff SSO. Catatan lama soal `admin.hris-bharata.com` sudah usang |
 | [[GA - Guestbook System (Complete)]] | ❌ | Publik, akses via token kunjungan (bukan SSO) |
 
 ## Catatan & Keterbatasan
@@ -112,7 +112,7 @@ sequenceDiagram
 - **`ssoStore` in-memory** tidak aman untuk deployment multi-instance gateway (kode di satu instance tak terlihat instance lain) — sudah ditandai di kode, disarankan pindah ke Mongo TTL.
 - **Revoke token saat refresh/biometrics** masih placeholder — JWT lama tidak benar-benar di-revoke.
 - Route `/dev/*` & `/debug/get-jwt` (mint admin token) **insecure**, khusus dev, harus dihapus di production.
-- **Allowlist redirect masih single-app** (`startsWith(NEXT_PUBLIC_TASK_MANAGER_APP_URL)`) — generalisasi multi-origin masih TBD; `startsWith` rawan **open redirect**, sebaiknya pindah ke pencocokan per-origin sebelum membuka untuk banyak app.
+- ~~Allowlist redirect masih single-app~~ — **sudah tidak berlaku** (diverifikasi ke kode 2026-08-06). `erp-frontend/src/app/login/page.tsx:60` sudah mencocokkan **per-origin** dan mengizinkan seluruh host `*.bharatainternasional.com` plus `localhost`, sehingga aplikasi konsumen baru tak perlu didaftarkan ke env. Pencocokan `startsWith(NEXT_PUBLIC_TASK_MANAGER_APP_URL)` masih ada sebagai cabang tambahan.
 - **Re-login paksa**: login page meng-auto-logout saat mount (hapus cookie `token` dkk), sehingga user ERP yang sudah login lalu diarahkan ke `/login?redirect_url=...` tetap dipaksa login ulang. Perbaikan TBD: bila token masih valid + origin allowlist, langsung mint code tanpa minta password.
 - **Silent fallback**: bila `/auth/sso/ticket` gagal, user diam-diam mendarat di `/dashboard` ERP tanpa pesan ke app asal.
 
