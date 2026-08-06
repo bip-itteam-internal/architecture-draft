@@ -285,6 +285,7 @@ Daftar TikTok Ads advertiser yang belum di-assign aktif. Pool advertiser bersifa
 | **4** | Integrasi Insentive Service: hitung KPI AM dari mapping ini | 🟡 Belum |
 | **5** | Relasi leader saat assign (lihat [[#Relasi Leader & Akumulasi Insentif]]) | ⚠️ Implemented (2026-08-01; branch `feat/icc-leader` + FE `dev`, belum deploy) |
 | **6** | Tampilan ICC Management dipisah per team (lihat [[#Tampilan ICC Management per Team]]) | 🟡 Rencana (2026-08-05) |
+| **7** | Akun affiliate (username TikTok) ikut dikelola di ICC Management — desain & fasenya di [[Sales - ICC Affiliate Mapping]] | 🟡 Rencana (2026-08-06) |
 
 ---
 
