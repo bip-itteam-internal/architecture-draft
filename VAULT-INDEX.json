@@ -161,20 +161,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "7d0466e4c1e5e547e3f9af1f84ef846d418d59dff79453a49cb12484d639cb9d",
-      "ukuran_kb": 20.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service, siapa yang boleh mengelola form (cakupannya departemen, bukan modul), dan bagaimana karyawan mengambil serta mengirim jawaban lewat rute /me/*. Juga menjawab cara membaca analisa dan export CSV, arti parameter ?period= pada form berulang, serta rute Kaizen untuk karyawan dan komite beserta alasan penempatannya.",
+      "hash": "77ba39fe1a4f49ea73aced3c91c5a701634aa74c12fbf6728a22b9b78b6dae7b",
+      "ukuran_kb": 21.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway /api/form-builder/*, siapa yang boleh mengelola form versus sekadar mengisinya, dan bagaimana bentuk request/response untuk membuat, menerbitkan, mengisi, menganalisa, serta mengekspor form ke CSV. Juga menjawab arti parameter ?period= pada form berulang (kosong berarti seluruh periode saat analisa, tapi sebaliknya pada penjaga duplikat), alur lampiran yang harus diunggah dulu lalu dikirim sebagai upload_id, dan rute Kaizen untuk karyawan (/me/kaizen*) maupun komite. Berguna untuk mencari kode status yang dibalas tiap jalur galat, seperti 409 saat susunan pertanyaan diubah padahal sudah ada jawaban.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
+        "endpoint",
+        "API reference",
         "survei",
         "survey",
-        "endpoint",
-        "RBAC departemen",
-        "analytics",
-        "export CSV",
         "kaizen",
-        "form berulang"
+        "RBAC departemen",
+        "export CSV",
+        "lampiran"
       ]
     },
     {
@@ -1667,6 +1667,7 @@
       "status_teks": "Implemented (1 file by design)",
       "publik": true,
       "tautan": [
+        "Microservices - Form Builder Service",
         "CORE - API Master Gateway",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
@@ -1676,18 +1677,20 @@
         "Microservices - Notification Service",
         "APP - MyBharata"
       ],
-      "hash": "f0541aeeb94686a038dc0d00fd4dc584dcac66321f249d43a9efc98ab68fe0df",
-      "ukuran_kb": 2.6,
-      "ringkasan": "Menjawab: bagaimana upload, download, preview, dan presigned URL file bekerja di storage gateway berbasis MinIO, serta bagaimana otorisasi akses per-prefix folder (employee/, attendance/, task/, notification/) diatur via access-key. Juga menjelaskan keterbatasannya, seperti akses JWT/RBAC native yang belum didukung dan overwrite diam-diam saat upload.",
+      "hash": "fe34ae094bb641cfb82c619f78138806f67eb871c5b8f61dec915e350f1dc6b8",
+      "ukuran_kb": 4.7,
+      "ringkasan": "Menjawab: bagaimana upload, download, preview, copy, move, dan delete berkas dilayani satu storage gateway terpusat di atas MinIO, dan bagaimana otorisasi access-key (?key=) memetakan tiap pemanggil ke satu prefix direktori seperti employee/, attendance/, task/, notification/, dan form/. Juga menjawab batas ukuran unggahan 4 MB, kapan presigned URL tersedia (dan kenapa presigned PUT cuma untuk inventory), serta kenapa menambah prefix baru wajib dikerjakan di dua sisi supaya unggahannya tidak dibalas invalid access key. Memuat catatan bahwa akses lewat JWT/RBAC tanpa access-key masih 501 dan upload menimpa object lama tanpa versioning.",
       "kata_kunci": [
         "file service",
         "MinIO",
         "upload",
         "download",
         "presigned URL",
-        "access-key",
+        "access key",
+        "prefix direktori",
         "object storage",
-        "otorisasi folder"
+        "lampiran",
+        "attachment"
       ]
     },
     {
@@ -1713,27 +1716,27 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "Microservices - Employee Service",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "Microservices - File Service",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "IT - Form Builder",
-        "Microservices - File Service",
         "DB - Overview and Notes",
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "8df93332256763ac82a16c76c3c7139d76596a607601aa15775ec7fee49e84ec",
-      "ukuran_kb": 63.0,
-      "ringkasan": "Menjawab: bagaimana sebuah departemen membuat form dinamis tanpa rilis kode, tipe pertanyaan dan tipe form apa saja yang didukung, siapa pemilik form, dan bagaimana sasaran (audience) diresolusi tanpa memanggil service lain. Juga menjawab cara kerja penilaian karyawan lain lewat sumbu subject, form berulang per periode beserta cron pembukanya, gerbang kepatuhan yang menahan clock-in, dan program Kaizen sebagai tipe form kelima.",
+      "hash": "1497c36190685d29b4a032a228001847c70e226c4613919b0085f6286b1779ce",
+      "ukuran_kb": 65.3,
+      "ringkasan": "Menjawab: bagaimana sebuah departemen menyusun form sendiri tanpa rilis kode, tipe pertanyaan dan tipe form apa saja yang tersedia, siapa yang berhak mengelola (cakupannya departemen lewat SupervisedDepartments, bukan modul), dan bagaimana sasaran form diresolusi langsung dari header identitas gateway tanpa memanggil service lain. Juga menjawab cara kerja form penilaian karyawan lain lewat sumbu subject yang terpisah dari audience, form berulang per periode bulanan/mingguan berikut cron pembukanya, program Kaizen sebagai tipe form kelima, serta endpoint kepatuhan yang dipakai attendance-service untuk menahan clock-in mobile. Menerangkan pula kenapa notification-service wajib ikut di-deploy bersama service ini.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
-        "survey",
-        "evaluation",
-        "kaizen",
         "form berulang",
         "recurrence",
-        "audience",
+        "periode",
+        "penilaian karyawan",
+        "evaluation",
+        "kaizen",
         "gerbang presensi",
-        "tipe pertanyaan"
+        "notifikasi inbox"
       ]
     },
     {
@@ -2249,20 +2252,20 @@
         "APP - Dynamic Task Tracker",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "46296c4944d5d70f38cb092ed21ca009daf4383ff73698ed0fb9dd78b3f56ec9",
-      "ukuran_kb": 30.9,
-      "ringkasan": "Menjawab: bagaimana task-management-service bekerja sebagai backend IT Helpdesk yang dipadu board Kanban, dari alur status sampai gate approval, SLA dua dimensi, automation, CSAT, attachment, dan realtime WebSocket. Menjawab juga wewenang admin per space, cakupan Laporan Tim beserta batasnya yang tanpa penyaring space, dan rute panggilan mesin untuk penilaian KPI. Memuat dua jebakan yang terbukti di data produksi: status selesai dinamai per-space sehingga menghitung Done saja membuang tiket berikut rating CSAT-nya, dan nama field BSON yang campur snake_case dengan camelCase.",
+      "hash": "5c28ee401d482c19335023780f87c02efccfa531f94837d32a0aee9f10066f65",
+      "ukuran_kb": 31.9,
+      "ringkasan": "Menjawab: bagaimana tiket helpdesk IT dibuat, ditriase, dan dijalankan lewat board Kanban (Request, Todo, On Going, Testing, Done, plus jalur Ditolak), siapa yang berwenang menyetujui atau menolak, dan bagaimana cakupan divisi supervisor dihitung dari header BIP-Supervised-Departments. Juga menjawab cara kerja Space per divisi berikut visibility public/restricted dan admin space (hak yang menempel pada objek, tersimpan di dokumen space sehingga berlaku seketika tanpa login ulang), tipe permintaan beserta pertanyaan per tipe, SLA dua dimensi dengan scheduler eskalasi, CSAT, automation auto-assign/auto-close, WebSocket realtime, dan reporting. Menjelaskan pula kenapa WebSocket masuk lewat ingress langsung dan bukan gateway.",
       "kata_kunci": [
-        "task management service",
-        "helpdesk",
-        "tiket",
+        "task management",
+        "support ticket",
+        "helpdesk IT",
         "Kanban",
-        "SLA",
-        "CSAT",
-        "laporan tim",
+        "space",
         "admin space",
-        "KPI",
-        "status terminal"
+        "SLA",
+        "approval",
+        "CSAT",
+        "WebSocket"
       ]
     },
     {
@@ -4868,7 +4871,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Seluruh tahap kecuali upload berkas LIVE di dev DAN prod** sejak 2026-08-06, teruji end-to-end di dev. Backend, Web ERP, dan MyBharata semuanya sudah merge. Yang tersisa: tahap 4 (upload berkas) masih draft, dan MyBharata belum dirilis ke store. Ringkasan per tahap di tabel di bawah.",
+      "status_teks": "**SELURUH tahap LIVE di dev DAN prod** sejak 2026-08-06, teruji end-to-end di dev. Backend, Web ERP, dan MyBharata semuanya sudah merge; lampiran berkas ikut menyusul dan terbukti bekerja. Yang tersisa bukan pekerjaan kode: **HR menetapkan sasaran/kuota/komite/tanggal mulai**, dan **MyBharata belum dirilis ke store**. Ringkasan per tahap di tabel di bawah.",
       "publik": true,
       "tautan": [
         "RUN - Deploy Microservices bip-erp",
@@ -4893,20 +4896,20 @@
         "API - Form Builder Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "a26f2596c067f5cd83ea015ea69e1c5083ed33c398a8cfb921f942b0959b1ced",
-      "ukuran_kb": 27.5,
-      "ringkasan": "Menjawab: bagaimana program pengumpulan ide perbaikan bulanan bekerja, siapa yang wajib mengirim ide dan berapa kuotanya (angka global dengan override per departemen), serta bagaimana komite memutuskan ide diterima, ditolak, atau diterapkan. Juga menjawab kenapa Kaizen ditempatkan di Form Builder alih-alih service atau space baru, bagaimana papan ide publik dan papan kepatuhan dihitung, serta bagaimana hasilnya disetorkan ke skor KPI.",
+      "hash": "b61f53024d9e6be9ff97ea17f4673b4a825582d0b40e4bb43978c74a2299f06f",
+      "ukuran_kb": 27.7,
+      "ringkasan": "Menjawab: bagaimana program pengumpulan ide perbaikan bulanan berjalan, siapa saja yang wajib mengirim ide dan berapa kuotanya (satu angka global yang boleh ditimpa per departemen, dengan kuota diperlakukan sebagai lantai bukan langit-langit), serta bagaimana komite memutuskan Belum ditinjau ke Diterima/Ditolak lalu Diterapkan. Juga menjawab kenapa Kaizen ditempatkan sebagai tipe form kelima di Form Builder dan bukan service baru atau space Task Management, bagaimana potret peserta per periode jadi penyebut papan kepatuhan, dan bagaimana papan ide publik serta setoran metrik ke KPI bekerja. Memuat daftar penyimpangan yang disengaja dari rancangan (rute komite di luar grup /forms, implemented_at wajib, settings.kaizen absen berarti jangan diubah) dan hal yang masih harus ditetapkan HR: sasaran, kuota, komite, dan tanggal mulai.",
       "kata_kunci": [
         "kaizen",
         "ide perbaikan",
         "improvement idea",
-        "kuota",
+        "kuota ide",
         "komite kaizen",
-        "papan ide",
         "papan kepatuhan",
+        "papan ide",
         "form builder",
-        "KPI",
-        "periode bulanan"
+        "periode bulanan",
+        "KPI"
       ]
     },
     {

@@ -192,7 +192,10 @@ Semua reuse `reportBaseFilter` + `parseReportRange` (default 30 hari; `start_dat
 - **MongoDB** sendiri (`task_management_db`) untuk koleksi `tasks`, `space`, `notifications`, `audits`. Lihat [[DB - Overview and Notes]].
 - **ERP employee_db (read-only)** untuk nama/divisi/supervisor (`MONGO_URI_ERP`/`DB_NAME_ERP`). Lihat [[Microservices - Employee Service]].
 - **file-service** untuk attachment (upload/delete/presigned via `FILE_MODULE_URL` + `MINIO_TASK_KEY`, prefix `task/`). Lihat [[Microservices - File Service]].
-- **notification-service** (push FCM/inbox): **belum diintegrasikan (TBD)** — notifikasi saat ini Mongo + WebSocket. Lihat [[Microservices - Notification Service]].
+- **notification-service** — ✅ **sudah terintegrasi** (`fcm.go`): tiap notifikasi in-app juga dikirim sebagai **inbox** dan **push FCM**, di samping Mongo + WebSocket. Catatan lama "belum diintegrasikan (TBD)" sudah tidak benar. Lihat [[Microservices - Notification Service]].
+	- `inboxCategoryFor` memetakan tipe notifikasi service ini ke kategori inbox. Kategori **bukan penanda teknis**: [[APP - MyBharata]] memilih label, warna, dan ikon darinya.
+	- ⚠️ **Lima tipe dulu jatuh ke `default` dan terkirim `task-created`**, sehingga "Tiket ditutup otomatis" dan "Tiket selesai — beri rating" tampil berlabel **"Tugas Baru"** dengan ikon pensil. Tak ada galat dan tak ada `400` — `task-created` memang terdaftar, cuma salah — jadi cacatnya tak terlihat dari log maupun test. Diperbaiki PR [#1050](https://github.com/bip-itteam-internal/bip-erp/pull/1050): hold/unhold/reopen → `task-status-updated`, rate-me/auto-closed → `task-completed`.
+	- Penjaganya `fcm_category_test.go`, yang menguji kategori **benar**, bukan sekadar terdaftar — celah yang meloloskan cacat di atas, karena test lama hanya memeriksa tipe yang memang sudah dipetakan.
 - **shared-library** untuk utilitas bersama (`routes.InternalRequest*`, `common.Env/Header`, `auth`, `mongodb`).
 
 ## Dokumen Terkait

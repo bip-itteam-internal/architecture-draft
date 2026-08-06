@@ -44,6 +44,11 @@
 | GET | `/me/forms/:id/subjects` | Daftar orang yang harus DINILAI pemanggil + `progress{done,total,anonymous}`. `409` bila form tak menilai siapa pun |
 | POST | `/me/forms/:id/responses` | Kirim jawaban (+`subject_employee_id` untuk form penilaian). `403` bila bukan sasaran atau menilai orang di luar daftar, `409` bila form tak `published` atau orang itu sudah dinilai. Balas `subject_done`, `subject_total`, `all_completed` |
 | GET | `/me/responses` | Riwayat jawaban sendiri |
+| POST | `/me/forms/:id/uploads` | Unggah satu lampiran (**multipart**, field `file` + `field_key`). `201` membalas `{file_name, size, upload_id}`. Cap 4 MB milik file-service; `413` bila lewat |
+| GET | `/me/uploads/:uploadId/preview` | Presigned URL lampiran sendiri. `404` untuk id yang bukan miliknya |
+| GET | `/forms/:id/uploads/:uploadId/preview` | Idem untuk **pengelola form** (grup `/forms`, digerbang `requireFormManager`) |
+
+> **Unggah dulu, kirim jawaban kemudian.** Satu jawaban dikirim sebagai satu JSON, jadi berkas tak bisa ikut di dalamnya. Nilai jawaban untuk field bertipe `file` adalah **`upload_id`**, bukan isi berkasnya. Unggahan yang jawabannya tak pernah dikirim dibersihkan cron harian 03:00.
 
 > **Idempoten**: pengiriman identik dalam 2 menit dibalas `200 {"duplicate": true}` tanpa insert baru (sidik jawaban di-hash setelah kunci diurutkan, jadi payload yang disusun ulang saat retry tetap terdeteksi).
 
@@ -106,7 +111,7 @@ Transisi sah: belum ditinjau → `accepted`/`rejected`; `accepted` → `implemen
 
 ## Bentuk data penting
 
-**Tipe field** (`fields[].type`): `short_text` · `long_text` · `number` · `date` (`YYYY-MM-DD`) · `time` (`HH:MM`) · `dropdown` · `radio` · `checkbox` (jawaban berupa array) · `scale` (rentang maks 10 langkah) · **`section`**.
+**Tipe field** (`fields[].type`): `short_text` · `long_text` · `number` · `date` (`YYYY-MM-DD`) · `time` (`HH:MM`) · `dropdown` · `radio` · `checkbox` (jawaban berupa array) · `scale` (rentang maks 10 langkah) · **`file`** (nilai jawaban = `upload_id`) · **`section`**.
 
 **`section` bukan pertanyaan** melainkan penanda awal bagian, hidup di dalam `fields` yang tetap datar. `label` jadi judul bagian, `description` jadi keterangannya. Aturannya: tak boleh `required`, tak boleh membawa `options`/`min`/`max`/`max_length`/`scale_*`, dan **jawaban yang menunjuk key bagian ditolak** (`400`). Bagian tak muncul di `analytics.fields` maupun kolom CSV.
 

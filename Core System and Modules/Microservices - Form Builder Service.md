@@ -38,7 +38,7 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 - `GET /me/capability` — `{can_manage, departments[]}` untuk klien, supaya daftar departemen aktif tak perlu disalin ke FE.
 - **Susunan pertanyaan terkunci begitu ada jawaban masuk** (balas `409`). Menyunting field setelah orang menjawab membuat jawaban lama menunjuk pertanyaan yang sudah berubah arti, dan analisanya diam-diam jadi salah.
 
-**Tipe pertanyaan (9)** — `short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`. Validasi struktur (key unik, options wajib untuk tipe pilihan, rentang scale maksimal 10 langkah, `min ≤ max`) dan validasi jawaban (tipe cocok, nilai ∈ options, batas angka & panjang teks, format `YYYY-MM-DD` dan `HH:MM`) keduanya **fungsi murni** — teruji tanpa Mongo.
+**Tipe pertanyaan (10)** — `short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`, **`file`**. Validasi struktur (key unik, options wajib untuk tipe pilihan, rentang scale maksimal 10 langkah, `min ≤ max`) dan validasi jawaban (tipe cocok, nilai ∈ options, batas angka & panjang teks, format `YYYY-MM-DD` dan `HH:MM`) keduanya **fungsi murni** — teruji tanpa Mongo.
 
 **Tipe form (5)** — `survey`, `evaluation`, `request`, `checklist`, `kaizen`. Bukan sekadar label: tanpanya daftar form berisi survei, pengajuan, checklist, dan penilaian yang tampak serupa padahal cara mengisinya berbeda jauh. `GET /forms?form_type=` menyaringnya; nilai `survey` sengaja ikut menjaring dokumen yang field-nya belum ada, karena backfill baru mengisinya saat boot. Kiriman tanpa `form_type` diberi default `survey` (klien lama belum mengirimnya), tapi nilai **tak dikenal diteruskan apa adanya** supaya validasi menolaknya dengan pesan jelas alih-alih diam-diam berubah jadi survei.
 
@@ -220,7 +220,7 @@ Form berulang memakai jendela **periode berjalan**, bukan `start_date`/`end_date
 
 ## Tipe `kaizen`: program pengumpulan ide bulanan
 
-> Status: ✅ **Seluruh backend LIVE di dev DAN prod** sejak 2026-08-06, teruji end-to-end di dev. PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016) (tahap 1-3), [#1028](https://github.com/bip-itteam-internal/bip-erp/pull/1028) (papan ide + pengingat), [#1029](https://github.com/bip-itteam-internal/bip-erp/pull/1029) (setoran KPI), [#1034](https://github.com/bip-itteam-internal/bip-erp/pull/1034) (permukaan karyawan), [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039) (gerbang presensi di `/me/kaizen`), [#1044](https://github.com/bip-itteam-internal/bip-erp/pull/1044) (kategori inbox), [#1046](https://github.com/bip-itteam-internal/bip-erp/pull/1046) (penemuan komite). Prod di-deploy manual bersama notification-service dan diverifikasi dengan kontrol positif+negatif. Masih open: [#1023](https://github.com/bip-itteam-internal/bip-erp/pull/1023) upload berkas (**draft**, tertahan pembuatan access key `form/`). Konsep dan keputusan bisnisnya di [[HRIS - Kaizen (Ide Perbaikan)]].
+> Status: ✅ **Seluruh backend LIVE di dev DAN prod** sejak 2026-08-06, teruji end-to-end di dev. PR [#1016](https://github.com/bip-itteam-internal/bip-erp/pull/1016) (tahap 1-3), [#1028](https://github.com/bip-itteam-internal/bip-erp/pull/1028) (papan ide + pengingat), [#1029](https://github.com/bip-itteam-internal/bip-erp/pull/1029) (setoran KPI), [#1034](https://github.com/bip-itteam-internal/bip-erp/pull/1034) (permukaan karyawan), [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039) (gerbang presensi di `/me/kaizen`), [#1044](https://github.com/bip-itteam-internal/bip-erp/pull/1044) (kategori inbox), [#1046](https://github.com/bip-itteam-internal/bip-erp/pull/1046) (penemuan komite). Prod di-deploy manual bersama notification-service dan diverifikasi dengan kontrol positif+negatif. Lampiran berkas ikut menyusul lewat [#1023](https://github.com/bip-itteam-internal/bip-erp/pull/1023) + [#1057](https://github.com/bip-itteam-internal/bip-erp/pull/1057), **live dan teruji end-to-end**. Konsep dan keputusan bisnisnya di [[HRIS - Kaizen (Ide Perbaikan)]].
 >
 > **Fitur masih inert di prod**: belum ada satu pun form kaizen dibuat, jadi cron pengingat tak punya apa pun untuk dikirim.
 
@@ -364,6 +364,33 @@ Seluruh rute komite menuntut id form, dan satu-satunya cara menemukannya adalah 
 Ada di grup `/me` (cukup karyawan terautentikasi), BUKAN `/kaizen` maupun `/forms`: rute ini justru harus bisa dipanggil orang yang haknya **belum diketahui** — itu memang pertanyaannya.
 
 Bukan komite dibalas `is_committee:false`, **bukan `403`**, supaya menunya menjelaskan keadaannya sendiri. "Tak ada program" dan "bukan tugas saya" sengaja tak dibedakan, sama seperti `has_program`: bagi pemakai ujungnya sama, dan membedakannya membocorkan keberadaan program ke orang di luar komite. Gerbangnya memakai predikat `isKaizenCommittee` yang sama persis dengan `loadCommitteeForm`, supaya menu tak pernah muncul untuk orang yang tombolnya justru menolak bekerja.
+
+## Lampiran berkas (tipe field `file`)
+
+> PR [#1023](https://github.com/bip-itteam-internal/bip-erp/pull/1023) + [#1057](https://github.com/bip-itteam-internal/bip-erp/pull/1057), ✅ **live dev + prod 2026-08-06 dan TERUJI end-to-end di dev**. Berlaku **semua tipe form**, bukan cuma Kaizen.
+
+**Unggah dulu, kirim jawaban kemudian.** Satu jawaban dikirim sebagai satu JSON, jadi berkas tak bisa ikut di dalamnya. `POST /me/forms/:id/uploads` (multipart) membalas `upload_id`, dan id itulah yang jadi **nilai jawaban** untuk field bertipe `file`.
+
+Berkasnya sendiri tinggal di [[Microservices - File Service]] dengan prefix **`form/`**; service ini hanya menyimpan penunjuknya di koleksi `form_uploads`.
+
+**Berkas yatim dibersihkan cron harian 03:00** — unggahan yang pengisiannya tak pernah diselesaikan. Harian, bukan tiap jam: batas umurnya 24 jam, jadi memeriksanya lebih sering hanya membaca koleksi yang sama tanpa temuan. Jam 3 pagi karena penghapusan objek memanggil file-service satu per satu.
+
+**`FILE_MODULE_URL` dan `MINIO_FORM_KEY` dibaca `os.Getenv` langsung, di luar map `InternalURL`.** `ValidateInternalURL` panic pada entri kosong, jadi menaruhnya di sana berarti seluruh service mati — termasuk gerbang presensi dan pengisian form biasa — hanya karena env satu fitur belum diisi. Selama env belum ada, unggahan gagal dengan pesan "file-service belum dikonfigurasi" sementara sisa service tetap jalan.
+
+**Export CSV menulis path preview, bukan presigned URL**: presigned URL kedaluwarsa dalam hitungan menit sementara berkas export dibaca berhari-hari kemudian.
+
+### Hasil uji end-to-end di dev (2026-08-06)
+
+| Langkah | Hasil |
+|---|---|
+| `POST /me/forms/:id/uploads` | `201`, membalas `{file_name, size, upload_id}` |
+| Kirim jawaban memakai `upload_id` | OK |
+| `GET /me/uploads/:id/preview` | `200`, presigned URL ke `app-bucket/`**`form/`**`<id>.txt` |
+| `upload_id` karangan (kontrol negatif) | `404` |
+
+Objeknya benar-benar mendarat di prefix `form/` — bagian yang paling mungkin diam-diam salah. Data ujinya dihapus dan diverifikasi bersih.
+
+> Percobaan pertama dibalas `403`, dan itu **benar**: skrip ujinya salah membaca `employee_id` (respons `/api/employee/me` datar, bukan bersarang di `data`), sehingga formnya menyasar daftar kosong dan pemanggil memang bukan sasarannya sendiri.
 
 ## Bagian (section): penanda di daftar datar, bukan struktur bersarang
 
