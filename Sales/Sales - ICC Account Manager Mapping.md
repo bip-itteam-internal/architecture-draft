@@ -283,8 +283,8 @@ Daftar TikTok Ads advertiser yang belum di-assign aktif. Pool advertiser bersifa
 | **2** | Frontend: sidebar "MARKETING ICC", halaman ICC Management (CRUD assign), ICC Dashboard (performa toko + iklan per staff) | ✅ Selesai (2026-07-09) |
 | **3** | Field `team` (auto-fill dari department), isolasi data per tim, shop/advertiser opsional, halaman Team Performance untuk SPV/Leader, route `/icc/mappings/me` untuk staff ICC | ✅ Selesai (2026-07-09) |
 | **4** | Integrasi Insentive Service: hitung KPI AM dari mapping ini | 🟡 Belum |
-| **5** | Relasi leader saat assign (lihat [[#Relasi Leader & Akumulasi Insentif]]) | ⚠️ Implemented (2026-08-01; branch `feat/icc-leader` + FE `dev`, belum deploy) |
-| **6** | Tampilan ICC Management dipisah per team (lihat [[#Tampilan ICC Management per Team]]) | 🟡 Rencana (2026-08-05) |
+| **5** | Relasi leader saat assign (lihat [[#Relasi Leader & Akumulasi Insentif]]) | ✅ Selesai (2026-08-01; sudah ter-merge ke `main`) |
+| **6** | Tampilan ICC Management dipisah per team (lihat [[#Tampilan ICC Management per Team]]) | ✅ Selesai (2026-08-06; sudah ter-merge ke `main`) |
 | **7** | Akun affiliate (username TikTok) ikut dikelola di ICC Management — desain & fasenya di [[Sales - ICC Affiliate Mapping]] | 🟡 Rencana (2026-08-06) |
 
 ---
@@ -293,7 +293,7 @@ Daftar TikTok Ads advertiser yang belum di-assign aktif. Pool advertiser bersifa
 
 *Permintaan dirut (tiket, 2026-08-01): sebelum SPV/leader meng-assign karyawan ICC ke toko, harus jelas karyawan itu di bawah leader siapa — dipakai untuk akumulasi perhitungan insentif leader.*
 
-- **Status**: ⚠️ Implemented (2026-08-01) — kode di `feat/icc-leader` (Integration Service) + FE branch `dev`; belum merge/deploy. Konsumsi oleh Insentive Service (Phase 4) belum.
+- **Status**: ⚠️ Implemented (2026-08-01) — backend (Integration Service) + FE sudah ter-merge ke `main`. Konsumsi oleh Insentive Service (Phase 4) belum, jadi akumulasi insentif leader belum berjalan.
 
 **Desain final (leader-first, menyederhanakan draf sebelumnya):**
 
@@ -330,9 +330,9 @@ flowchart TD
 
 *Permintaan (2026-08-05): tampilan ICC Management harus terpisah antara department **Kyura** dan **Beauty Hacks**, tidak lagi satu tabel campuran.*
 
-- **Status**: 🟡 Rencana — desain; belum ada di kode.
+- **Status**: ✅ Implemented (2026-08-06) — sudah ter-merge ke `main`. File: `components/team-card.tsx` (kartu per team), `lib/kelompokkan-mapping.ts` (`kelompokkanMappingPerTeam`, 7 unit test), `app/(main)/icc/management/page.tsx`; `leader-bar.tsx` dihapus karena isinya melebur ke header kartu.
 
-### Masalah pada tampilan sekarang
+### Masalah pada tampilan sebelumnya
 
 Halaman `/icc/management` merender **satu tabel datar** berisi seluruh mapping. Untuk pemakai IT (yang menerima semua team) baris Kyura dan Beauty Hacks tercampur **tanpa penanda team sama pun** — tidak ada kolom team di tabel. `LeaderBar` sudah dipisah per team sejak Fase 5, tetapi tabelnya belum, sehingga status per team ("team ini belum punya leader → assign terblokir") tidak nyambung dengan baris datanya.
 

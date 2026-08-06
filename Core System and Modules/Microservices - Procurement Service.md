@@ -88,6 +88,18 @@ Pesanan pembelian yang **dibuat & disetujui di ERP** (koleksi `pesanan_erp`), se
 
 > **Ubah jabatan approver di DUA tempat** bila bukan Direktur: const `PosisiApproverPO` (backend) + `POSISI_APPROVER_PO` (FE, `features/procurement/pesanan/types/pesanan-erp.ts`). Keduanya harus sama.
 
+### Penerimaan Barang ERP — create + Ambil Pesanan (`penerimaan_erp.go`, `penerimaan_erp_handler.go`) ✅ 2026-08-06
+
+Penerimaan barang yang **dicatat gudang/QC di ERP** (koleksi `penerimaan_erp`), melengkapi rantai `permintaan_erp` → `pesanan_erp` → `penerimaan_erp`. TERPISAH dari cermin `penerimaan` Accurate (yang tetap ada, menyuplai layar Barang Tidak Sesuai). **TANPA persetujuan** — dicatat saat barang tiba, langsung status `diterima`.
+
+- **`POST /penerimaan-erp`** (`tulisPO`) — buat. Body: `vendor_no` (wajib), **`no_terima`** (wajib, surat jalan pemasok — diisi manual), `trans_date` (tanggal kedatangan, manual), `rincian[]` (nama/kuantitas/satuan/**gudang** wajib; + departemen/proyek/keterangan/no_permintaan/no_pesanan), Info lainnya header (alamat/keterangan/tgl_kirim/pengiriman/fob), `number` opsional. Server set status `diterima`, nama pemasok dari master, No Form.
+- **`GET /penerimaan-erp`** (`akses`) — daftar + filter `status`/`vendor_no`/`cari` (number+no_terima+keterangan)/rentang `dari`–`sampai`.
+- **`GET /penerimaan-erp/:id`**, **`/usul-nomor`** (`akses`).
+- **`GET /penerimaan-erp/pesanan-disetujui`** (`akses`) — daftar PO yang **sudah disetujui**, dasar "Ambil → Pesanan" (pemasok + rincian disalin jadi baris penerimaan; tiap baris bawa `no_pesanan` + `no_permintaan`). Hanya PO disetujui yang boleh diterima barangnya.
+- **Penomoran** No Form `RI.<YYYY>.<MM>.<NNNNN>` reset per bulan; index unik `penerimaan_erp_number_unique` (bentrok → 409). No Terima **bukan** No Form — nomor surat jalan pemasok yang diketik manual, tak dijamin unik.
+- **Status**: `diterima` → `difaktur` (menyusul, lintas modul Tagihan).
+- Tes pure (`penerimaan_erp_test.go`): penomoran, validasi (no_terima & gudang wajib), filter (tiga klausa cari).
+
 ### Penomoran (`nomor.go`)
 
 Nomor diketik manual oleh user; ERP hanya **mengusulkan** nomor berikut berdasarkan yang tertinggi per kategori (`PBB-060` → usul `PBB-061`). Prefix memetakan 1:1 ke kategori dan konsisten pada seluruh 139 pemasok produksi: `PBB` → Pemasok Bahan Baku, `PBK` → Pemasok Bahan Kemas, `PU` → Umum.

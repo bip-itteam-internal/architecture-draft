@@ -19,7 +19,7 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 
 - **Master Material** — kode terstandar (migrasi + cleanup dari spreadsheet: kode pembantu → kode penyesuaian), nama, kategori, jenis, satuan, dan **status pergerakan** (fast / medium / slow moving, bad stock, tidak aktif, belum launching)
 - **Stok per gudang/lokasi** — termasuk **gudang karantina** untuk barang rusak/kadaluarsa (ED)
-- **BOM / Resep** (hybrid) — komponen bahan baku/kemas per barang jadi/WIP
+- **BOM / Resep** (hybrid) — komponen bahan baku/kemas per barang jadi/WIP. **Dua varian resep** (Formula 1 / Formula 2): sebagian produk punya resep alternatif dengan bahan sama tapi qty beda (dari import Excel grup kolom `FURMULA 2`). Menu operasional (**RM Keluar Ke Produksi**, **Material Order**, **Batch Record**) menampilkan pilihan Formula 1/2 **hanya bila produk punya F2** — kalau tidak, langsung Formula 1. Rencana Produksi (kapasitas) tetap default Formula 1.
 - **Perencanaan kebutuhan** — rencana produksi/target → kebutuhan dihitung otomatis via BOM, **bisa di-override/tambah manual** (hybrid)
 - **Perhitungan kekurangan** — kebutuhan vs stok → daftar kekurangan → diteruskan ke [[GA - Procurement System]] untuk pengadaan
 - **Stock opname & penyesuaian** — integrasi flow yang sudah ada: hitung fisik → selisih sistem vs fisik → barang rusak/ED ke karantina (input + foto via [[APP - MyBharata]]) → berita acara → adjustment. Flowchart: [[Manufacture - Stok Pengecekan Fisik (Flow Source)]]
@@ -53,7 +53,7 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 ## Rollout Bertahap
 
 - [x] **Fase 1** — Master material (bahan + produk) terstandar + stok (snapshot) + transaksi in/out ✅ *(sumber master sudah pindah dari Google Sheets ke Accurate/HPP; per-gudang & kekurangan otomatis masih TBD)*
-- [~] **Fase 2** — BOM/resep ✅ (import Excel layout NEW FORMULA); kebutuhan otomatis dari rencana produksi (hybrid + override manual) — *belum*
+- [~] **Fase 2** — BOM/resep ✅ (import Excel header-driven, layout NEW FORMULA FIX; mendukung dua varian Formula 1/2); kebutuhan otomatis dari rencana produksi (hybrid + override manual) — *belum*
 - [~] **Fase 3** — Integrasi Accurate: **baca stok bahan & barang jadi sudah jalan (satu arah)** ✅; tulis balik ke Accurate + stock opname digital (selisih, karantina, berita acara) — *belum*
 - [ ] **Fase 4** — Inbound/outbound digital + multi-gudang/dispatch; `manufacture-service` jadi **source of truth** stok
 
