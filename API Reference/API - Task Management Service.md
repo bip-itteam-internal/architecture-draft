@@ -104,6 +104,26 @@ sama sekali.
 
 > **Seluruh rute `/report/*` (dan `/tasks/admin-stats`) digerbang `reportGate = gateOrSpaceAdmin(ticket.report.team, "supervisor", "admin")`, dan cakupannya satu aturan bersama**: admin→semua divisi; supervisor→space divisinya ditambah space yang ia pegang; admin space bertier staf→space yang ia pegang ditambah tugasnya sendiri; sisanya→tugasnya sendiri. Parameternya **hanya** `start_date`/`end_date` (default 30 hari terakhir); **tidak ada penyaring `space_id`**, sehingga angka SLA dan CSAT selalu gabungan seluruh space dalam cakupan pemanggil.
 
+## KPI (panggilan mesin)
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/kpi/ticket` 🟡 | **belum merge** (branch `feat/kpi-sumber-tiket`). Agregat tiket satu orang satu periode untuk penilaian KPI. Query wajib `employee_id`·`periode=YYYY-MM`·`key`. Balasan `{ditugaskan, selesai, sla_terukur, selisih_jam[], csat_rating[]}` |
+
+> **Kenapa tidak memakai `/report/*` yang angkanya bertetangga.** Rute laporan digerbang izin PEMANGGIL dan cakupannya mengikuti siapa yang memanggil; ia menjawab *"apa yang boleh dilihat orang ini"*. Yang dibutuhkan employee-service pertanyaan lain, *"berapa angka si A pada Juli"*, tanpa membawa identitas pemakai sama sekali. Memaksakan satu rute untuk dua pertanyaan berarti salah satunya harus melonggarkan gerbangnya.
+
+Gerbangnya **kunci layanan sendiri** (`TASK_MANAGEMENT_SERVICE_KEY` lewat query `key`), bukan `INTERNAL_GATEWAY_KEY` yang dipasang gateway untuk setiap permintaan ber-JWT ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). **Kunci yang belum dikonfigurasi MENUTUP rute**, supaya env yang lupa dipasang tidak berubah jadi pintu terbuka. Polanya menyalin `/kpi/uptime` [[Microservices - Monitoring Service]] dan `/kpi/kinerja-toko` [[Microservices - Marketing Analytics Service]].
+
+Aturan isi muatannya, semuanya supaya sumber tidak diam-diam menilai:
+
+- **Tanpa angka target.** Rute ini melapor apa yang terukur dan berapa yang seharusnya terukur; target, bobot, ambang, dan arah diisi HR lewat `POST /kpi/templates`.
+- **`selisih_jam` dikirim per tiket**, bukan sudah dirata-rata, karena reduksi `rasio_ambang` di employee-service yang berhak mencacahnya. **Positif berarti tepat waktu.**
+- **`sla_terukur` dipisah dari `selesai`.** Tiket tanpa tenggat tak dapat dinilai ketepatan waktunya, dan itu bukan kesalahan penangannya; bedanya menjadi cakupan.
+- **Muatan sempit**: tanpa judul tiket, nama space, maupun nama orang. Keluhan pemakai memuat isi pekerjaan; penilaian hanya butuh cacahan.
+- ⚠️ **Selesai BUKAN berarti `status == "Done"`.** Stage terakhir dinamai per-space, dan `isTerminalStatus` mengenali `Done`, `Selesai`, serta `Archive`. Tiga space Tech Development memakai `Archive`; menghitung `Done` saja membuang 18 tiket ber-assignee di produksi, 5 di antaranya membawa rating CSAT alias 29% dari seluruh rating yang pernah masuk.
+- Tiket **`Ditolak` tidak masuk penyebut** sama sekali: permintaan yang batal dikerjakan, bukan pekerjaan yang gagal diselesaikan.
+- Tiket **arsip TETAP dihitung**, beda dari `reportBaseFilter`. Tiket yang selesai lalu diarsipkan auto-close tetap pekerjaan orang itu.
+
 ## WebSocket
 | Path | Fungsi |
 |---|---|

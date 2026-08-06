@@ -2,9 +2,11 @@
 
 *Endpoint **form-builder-service** (form dinamis + analisa jawaban + kepatuhan presensi). Gateway: `/api/form-builder/*`. Kelola form butuh **tingkat peran** `staff`/`supervisor`/`admin` di modul mana pun DAN departemen pemanggil ada di daftar departemen aktif; mengisi cukup terautentikasi. Grounded ke `services/form-builder/routes.go` + handler terkait (`main`, PR #849; kepemilikan per departemen PR #869).*
 
-- **Implementasi**: [[Microservices - Form Builder Service]] · **Status**: ⚠️ (live di dev **dan prod** sejak 2026-08-01; **penilaian karyawan, tipe form, dan rekap per orang dinilai** merged 2026-08-02 lewat PR #907 + #908 — **live di dev DAN prod** sejak 2026-08-02). **Form berulang** (`recurrence`, `period_key`, `?period=`) merged ke `main` 2026-08-03 lewat PR #938, #940, #942 — **setelah** deploy prod 08-01/08-02, jadi **status prod belum diverifikasi**. Baru didokumentasikan 2026-08-06 dan belum punya catatan uji end-to-end.
+- **Status**: ⚠️ Implemented (live di dev **dan prod** sejak 2026-08-01; **penilaian karyawan, tipe form, dan rekap per orang dinilai** merged 2026-08-02 lewat PR #907 + #908 — **live di dev DAN prod** sejak 2026-08-02). **Form berulang** (`recurrence`, `period_key`, `?period=`) merged ke `main` 2026-08-03 lewat PR #938, #940, #942 — **setelah** deploy prod 08-01/08-02, jadi **status prod belum diverifikasi**. Baru didokumentasikan 2026-08-06 dan belum punya catatan uji end-to-end.
+- **Kaizen** (`form_type: "kaizen"`, rute `/kaizen/*`, `/me/kaizen*`, `/internal/kaizen/metrics`) ✅ **live dev + prod** sejak 2026-08-06 lewat PR #1016, #1028, #1029, #1034, #1039, #1044, #1046 — seluruhnya teruji end-to-end di dev. Belum ada satu pun form kaizen di prod, jadi masih inert.
+- **Implementasi**: [[Microservices - Form Builder Service]]
 - **Indeks**: [[API - Index]]
-- **Konsumen**: seluruh rute `/forms*` — termasuk `analytics`, `responses`, `export` — dipakai [[APP - Web ERP]]. Rute **`/me/*`** dipakai [[APP - MyBharata]] (section Survei di beranda + halaman pengisian).
+- **Konsumen**: seluruh rute `/forms*` — termasuk `analytics`, `responses`, `export` — dipakai [[APP - Web ERP]]. Rute **`/me/*`** dipakai [[APP - MyBharata]] (section Survei di beranda + halaman pengisian), dan **`/me/kaizen*`** dipakai menu Kaizen tersendiri di aplikasi itu.
 
 ## Sistem
 | Method | Path | Fungsi |
@@ -38,14 +40,42 @@
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/me/capability` | `{can_manage, departments[]}` — apa yang boleh dilakukan pemanggil di Form Builder |
-| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `submitted`, `blocks_attendance`, `gate_end_date`). Form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous`. Pada form berulang, `submitted` dihitung terhadap **periode berjalan**, bukan seumur hidup form |
+| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `form_type`, `submitted`, `blocks_attendance`, `gate_end_date`). Form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous`. Pada form berulang, `submitted` dihitung terhadap **periode berjalan**, bukan seumur hidup form |
 | GET | `/me/forms/:id/subjects` | Daftar orang yang harus DINILAI pemanggil + `progress{done,total,anonymous}`. `409` bila form tak menilai siapa pun |
 | POST | `/me/forms/:id/responses` | Kirim jawaban (+`subject_employee_id` untuk form penilaian). `403` bila bukan sasaran atau menilai orang di luar daftar, `409` bila form tak `published` atau orang itu sudah dinilai. Balas `subject_done`, `subject_total`, `all_completed` |
 | GET | `/me/responses` | Riwayat jawaban sendiri |
+| POST | `/me/forms/:id/uploads` | Unggah satu lampiran (**multipart**, field `file` + `field_key`). `201` membalas `{file_name, size, upload_id}`. Cap 4 MB milik file-service; `413` bila lewat |
+| GET | `/me/uploads/:uploadId/preview` | Presigned URL lampiran sendiri. `404` untuk id yang bukan miliknya |
+| GET | `/forms/:id/uploads/:uploadId/preview` | Idem untuk **pengelola form** (grup `/forms`, digerbang `requireFormManager`) |
+
+> **Unggah dulu, kirim jawaban kemudian.** Satu jawaban dikirim sebagai satu JSON, jadi berkas tak bisa ikut di dalamnya. Nilai jawaban untuk field bertipe `file` adalah **`upload_id`**, bukan isi berkasnya. Unggahan yang jawabannya tak pernah dikirim dibersihkan cron harian 03:00.
 
 > **Idempoten**: pengiriman identik dalam 2 menit dibalas `200 {"duplicate": true}` tanpa insert baru (sidik jawaban di-hash setelah kunci diurutkan, jadi payload yang disusun ulang saat retry tetap terdeteksi).
 
 > **Kenapa `/me/capability` ada di grup pengisian, bukan di balik `requireFormManager`.** Daftar departemen aktif tinggal di konfigurasi server; tanpa endpoint ini setiap klien harus menyalinnya dan pasti melenceng saat daftarnya berubah. Ditaruh di `/me` supaya yang tak berhak menerima `can_manage:false` yang bisa dibaca klien, bukan `403` yang harus ditebak artinya. `departments` sengaja dikosongkan bila `can_manage:false`.
+
+## Kaizen untuk karyawan (`/me/kaizen*`)
+
+> Merged ke `main` 2026-08-06: papan ide lewat PR [#1028](https://github.com/bip-itteam-internal/bip-erp/pull/1028), permukaan karyawan lewat PR [#1034](https://github.com/bip-itteam-internal/bip-erp/pull/1034). **Belum diverifikasi lewat gateway hidup.**
+
+**Terpisah dari `/me/forms` dengan sengaja.** Program Kaizen bukan "satu form lagi" bagi pengisinya: ia berulang tiap periode, berkuota, punya riwayat keputusan, dan idenya dibaca orang lain. [[APP - MyBharata]] menampilkannya di **menu tersendiri**, bukan bercampur di daftar survei.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/me/kaizen` | Program berjalan untuk pemanggil: `{has_program, form_id, title, description, fields, progress, board_visible}`. `progress` = `{quota, submitted, fulfilled, period_key, opens_at, closes_at}` |
+| GET | `/me/kaizen/ideas` | Riwayat ide sendiri **lintas periode**, terbaru dulu. `?period=`, `?page=`, `?limit=` maks **50**. Balas `{data[{id,period_key,submitted_at,answers,decision}], total, page, limit, fields}` |
+| GET | `/me/kaizen/board` | Papan ide publik: `{data[{id,employee_name,department,status,submitted_at,answers}], period_key}`. `?period=` (default periode berjalan), maks **100** kartu |
+| GET | `/me/kaizen/committee` | Program mana yang boleh ditinjau pemanggil: `{is_committee, form_id, title, period_key, can_manage_form}`. Bukan komite dibalas `{is_committee:false}`, **bukan `403`** |
+
+> **Kenapa penemuan komite ada di `/me/*`, bukan `/kaizen/*`.** Seluruh rute komite menuntut id form, dan satu-satunya cara lain menemukannya adalah `GET /forms` — yang digerbang peran pengelola DAN departemen aktif, sedangkan komite ditunjuk HR dan bisa saja staf biasa dari departemen mana pun. Rute ini justru harus bisa dipanggil orang yang haknya **belum diketahui**, karena itu memang pertanyaannya. Dipakai menu **Komite Kaizen** di [[APP - Web ERP]]. `can_manage_form` membedakan anggota terdaftar dari pengelola departemen pemilik: keduanya boleh meninjau, hanya yang kedua boleh menyunting programnya.
+
+> **Bukan sasaran program dibalas `has_program:false`, BUKAN `404`.** Menu Kaizen tetap bisa dibuka dan menjelaskan keadaannya, alih-alih menampilkan layar galat untuk keadaan yang sebenarnya normal. `has_program:false` juga menjawab "perusahaan ini belum punya program" — backend tak membedakan keduanya karena bagi pemakai keduanya memang sama.
+
+> **Definisi pertanyaan dikirim SEKALI di tingkat atas** pada `/me/kaizen/ideas`, tidak diulang tiap ide. Riwayat 50 ide yang masing-masing membawa salinan definisi form akan berlipat ukurannya tanpa menambah satu pun informasi.
+
+> **Papan menyaring dengan DAFTAR IZIN tipe field**, bukan daftar larangan. Papan dibaca seluruh karyawan, jadi tipe pertanyaan yang ditambahkan nanti (lampiran berkas, yang nilainya cuma id unggahan) tersembunyi secara bawaan sampai seseorang sengaja mengizinkannya. Daftar larangan bekerja sebaliknya: tipe baru bocor lebih dulu, ketahuan setelah tampil di depan sekantor. Ide yang masih ditinjau maupun yang ditolak **tak pernah** muncul; papan juga kosong bila `board_visible:false`.
+
+> ✅ **`/me/kaizen` ikut membawa `blocks_attendance` dan `gate_end_date`** sejak PR [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039), memakai perhitungan yang sama persis dengan `/me/forms`. Perlu karena form Kaizen dikeluarkan dari daftar survei di mobile: tanpanya, karyawan yang tertahan saat clock-in tak punya satu pun petunjuk di layar.
 
 ## Kaizen (komite program ide bulanan)
 
@@ -73,12 +103,15 @@ Transisi sah: belum ditinjau → `accepted`/`rejected`; `accepted` → `implemen
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/internal/compliance` | Form wajib yang belum diisi: `{blocking:[{id,title}], warning:[...]}`. Dipakai [[Microservices - Attendance Service]] saat clock-in |
+| GET | `/internal/kaizen/metrics` | Hitungan ide per orang pada satu periode: `{data{<employee_id>:{submitted,accepted,implemented}}, period_key, has_program}`. `?period=YYYY-MM` (default periode berjalan). Ditarik [[Microservices - Employee Service]] untuk skor KPI |
+
+> **Tiga angka, bukan satu.** Kepatuhan dihitung dari ide yang **diajukan** (karyawan memegang kendali penuh atas kepatuhannya sendiri), skor KPI dari ide yang **diterapkan** — begitulah redaksi metriknya di [[HRIS - Matriks KPI per Departemen]]. `has_program:false` membedakan "perusahaan ini belum menjalankan programnya" dari "gagal mengambil data"; hanya yang kedua layak dilaporkan sebagai metrik gagal hitung.
 
 > **Identitas terkunci ke header.** Query `?employee_id=&department=&company_id=` HANYA dihormati bila request tak membawa `BIP-Employee-ID` sama sekali (ciri panggilan service-to-service). Request pemakai lewat gateway selalu terkunci ke dirinya sendiri — tanpa aturan ini rute ini jadi jalan mengintip form tertunda orang lain lintas perusahaan. Lihat [[ADR - 0031 Prefix internal Bukan Batas Keamanan]].
 
 ## Bentuk data penting
 
-**Tipe field** (`fields[].type`): `short_text` · `long_text` · `number` · `date` (`YYYY-MM-DD`) · `time` (`HH:MM`) · `dropdown` · `radio` · `checkbox` (jawaban berupa array) · `scale` (rentang maks 10 langkah) · **`section`**.
+**Tipe field** (`fields[].type`): `short_text` · `long_text` · `number` · `date` (`YYYY-MM-DD`) · `time` (`HH:MM`) · `dropdown` · `radio` · `checkbox` (jawaban berupa array) · `scale` (rentang maks 10 langkah) · **`file`** (nilai jawaban = `upload_id`) · **`section`**.
 
 **`section` bukan pertanyaan** melainkan penanda awal bagian, hidup di dalam `fields` yang tetap datar. `label` jadi judul bagian, `description` jadi keterangannya. Aturannya: tak boleh `required`, tak boleh membawa `options`/`min`/`max`/`max_length`/`scale_*`, dan **jawaban yang menunjuk key bagian ditolak** (`400`). Bagian tak muncul di `analytics.fields` maupun kolom CSV.
 

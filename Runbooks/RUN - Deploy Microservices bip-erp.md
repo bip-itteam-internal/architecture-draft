@@ -39,6 +39,32 @@ Bila dua service dirilis bersama dan salah satu memanggil yang lain saat boot/ru
 
 Urutan terbalik hanya berisiko sementara (warehouse memanggil endpoint yang belum paham param baru → filter diabaikan) sampai integration ter-update; bukan fatal, tapi hindari di jam rawan.
 
+## 3a. Perubahan `shared-library` → SERVICE PEMBACA WAJIB IKUT NAIK
+
+Kopling ini **berbeda dari §3** dan lebih mudah terlewat: bukan soal urutan panggilan API, melainkan daftar yang **ikut terkompilasi ke dalam biner** tiap service.
+
+`shared-library` dipakai lewat `replace` ke path lokal (`go.mod` tiap service), jadi tak ada versi yang perlu dinaikkan — tapi **service yang tidak di-rebuild tetap memegang salinan lama**.
+
+**Kasus nyata, sudah menggigit DUA KALI**: `notification.InboxCategories` adalah daftar-izin kategori inbox. `notification-service` menolak kategori di luar daftar itu dengan **`400`**, dan pengiriman di service pengirim bersifat **best-effort** — kegagalannya hanya masuk log.
+
+Hasilnya fitur yang **tampak jalan sepenuhnya** sementara tak satu pun notifikasinya sampai:
+
+- Saat kategori `form-published` lahir (2026-08-02).
+- Saat `kaizen-reminder` dan `kaizen-decided` lahir (terdeteksi 2026-08-06, diperbaiki PR [#1044](https://github.com/bip-itteam-internal/bip-erp/pull/1044)).
+
+**Aturannya**: menambah kategori inbox berarti deploy **dua** container, `<service-pengirim>` DAN `notification-service`. Untuk program Kaizen:
+
+```bash
+docker compose up -d --build form-builder-service --no-deps
+docker compose up -d --build notification-service --no-deps
+```
+
+Urutannya tak kritis di sini — yang kritis keduanya naik. Selama hanya satu yang naik, gejalanya **senyap**: tak ada galat di layar, tak ada alert, cuma notifikasi yang tak pernah tiba.
+
+**Verifikasi setelah deploy**, bukan sekadar melihat health: picu satu notifikasi sungguhan lalu pastikan ia muncul di kotak masuk penerimanya. Di dev 2026-08-06 hal ini terbukti membedakan "sudah naik" dari "belum": percobaan 4 menit setelah merge gagal total, percobaan ulang setelah deploy mendarat berhasil.
+
+Penjaganya di sisi kode ada di `services/form-builder/notify_category_test.go` — menambah kategori tanpa mendaftarkannya di `shared-library` menggagalkan test. Penjaga itu tidak bisa tahu container mana yang sudah naik, jadi langkah deploy ini tetap manual.
+
 ## 3b. Fitur dorman di balik feature flag (aman deploy siapa pun)
 
 Beberapa fitur landing **DORMANT** — kode ada di produksi tapi tidak jalan sampai env flag dinyalakan sengaja. **Deploy integration-service oleh siapa pun TIDAK mengaktifkannya** selama flag tidak di-set `true` di `.env`.
@@ -62,10 +88,13 @@ docker logs <Container-Name> --tail 40
 | Service gagal start "connection refused" mongo/redis | dependensi mati + `--no-deps` melewati gating | nyalakan dependensi dulu / deploy tanpa `--no-deps` |
 | Perubahan env/port tak terbaca | `up -d --build` saja kadang tak recreate | tambahkan `--force-recreate` (env berubah) |
 | Sweep/reconciler tak jalan | `REDIS_URL` kosong | pastikan env redis terisi; log akan bilang "tidak diaktifkan" |
+| Fitur jalan normal tapi **notifikasinya tak pernah tiba**, tanpa galat di layar | kategori inbox baru; `notification-service` masih memegang `InboxCategories` lama dan menolak `400`, sementara pengiriman best-effort hanya nge-log | rebuild `notification-service` juga (§3a), lalu picu satu notifikasi sungguhan untuk memastikan |
 
 ## Dokumen Terkait
 
 - [[Microservices - Warehouse Service]] · [[Microservices - Integration Service]] — implementasi service
+- [[Microservices - Form Builder Service]] · [[Microservices - Notification Service]] — pasangan yang wajib naik bersama saat kategori inbox bertambah (§3a)
+- [[HRIS - Kaizen (Ide Perbaikan)]] — fitur yang kegagalan senyapnya jadi contoh di §3a
 - [[IT - Background Jobs & Schedulers]] — poller in-process (reconciler + sweep) yang restart otomatis
 - [[RUN - Deploy Task Management Service]] — runbook deploy service lain (dengan migrasi data)
 - [[CORE - API Master Gateway]] — health via gateway
