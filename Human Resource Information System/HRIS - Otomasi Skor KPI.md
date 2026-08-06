@@ -288,7 +288,8 @@ Field `attribution_note` pada `mart_profit_attribution` di production menyatakan
 ## Dependensi & Integrasi
 
 - **Sumber skor manual**: [[Microservices - Employee Service]] (`/kpi/*`), FE di [[APP - Web ERP]]
-- **Sumber otomatis yang sudah terpasang**: [[Microservices - Monitoring Service]] (`uptime_sistem`) · [[Microservices - Employee Service]] sendiri (`skor_tim`)
+- **Sumber otomatis yang sudah terpasang**: [[Microservices - Monitoring Service]] (`uptime_sistem`) · [[Microservices - Employee Service]] sendiri (`skor_tim`) · [[Microservices - Form Builder Service]] (`kaizen`) · [[Microservices - Marketing Analytics Service]] (`kinerja_toko`, PR #1042)
+- **Sumber yang sedang dikerjakan** 🟡: [[Microservices - Task Management Service]] (`kinerja_tiket`, branch `feat/kpi-sumber-tiket`, belum merge). Tiga metrik dari satu agregat: `ontime` (ketepatan waktu penyelesaian, dipasangkan `rasio_ambang` ambang 0), `csat` (kepuasan pemohon skala 1..5, dinyatakan sebagai target 5 sehingga **tidak perlu konversi skala** walau KPI menulis "rating 10 dari 1-10"), dan `selesai_persen`. Rincian keputusan penyebutnya di [[API - Task Management Service]]
 - **Kandidat sumber otomatis**: [[Microservices - Insentive Service]] · [[Microservices - Integration Service]] · [[Microservices - Attendance Service]] · [[Microservices - Task Management Service]] · [[Microservices - Procurement Service]] · [[Microservices - Warehouse Service]] · [[Microservices - Inventory Service]] · [[External - Accurate]] · [[IT - Monitoring System]]
 - **Terblokir adopsi**: [[Microservices - Manufacture Service]] · [[Microservices - Recruitment Service]] · [[HRIS - Training Program]]
 - **Penjadwalan**: [[IT - Background Jobs & Schedulers]]

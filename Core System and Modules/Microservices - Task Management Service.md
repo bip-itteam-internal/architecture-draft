@@ -128,6 +128,19 @@ Konfigurasi **per-space** (`Space.auto_assign` bool, `auto_close_days` int `0`=n
 - Default: response **24 jam** (diset saat create), resolution **72 jam** (referensi resolution: `start_date`/`responded_at`/`created_at` → `due_date`). **Override resolution per-priority ✅**: tiap `Priority` punya `resolution_hours` (per-space, satuan jam) → dipakai `resolutionHoursOf(space, priority_id)` saat approve (default `due_date`) & reopen; fallback 72 jam bila `resolution_hours ≤ 0` / prioritas tak ada. (Response tetap 24 jam, bukan per-priority.)
 - Scheduler eskalasi (`sla_scheduler.go`): goroutine per jam, mengirim notifikasi **breach sekali** per task (ditandai array `sla_notified`): response breach → **supervisor divisi**; resolution breach → **assignee + supervisor**. (Warning hanya untuk badge, belum dieskalasi via notifikasi.)
 
+### KPI (panggilan mesin) 🟡
+
+> Status: **branch `feat/kpi-sumber-tiket`, belum merge dan belum deploy** (2026-08-06).
+
+`GET /kpi/ticket?employee_id=&periode=YYYY-MM&key=` — agregat tiket satu orang satu periode, dipakai sumber `kinerja_tiket` di [[Microservices - Employee Service]] saat menghitung skor KPI. Kontrak lengkap di [[API - Task Management Service]].
+
+Rute ini sengaja **terpisah dari `/report/*`** walau angkanya bertetangga: rute laporan menjawab "apa yang boleh dilihat pemanggil", sedangkan ini "berapa angka si A pada Juli" tanpa membawa identitas pemakai. Gerbangnya kunci layanan sendiri (`TASK_MANAGEMENT_SERVICE_KEY`), dan kunci yang belum dikonfigurasi **menutup** rute.
+
+⚠️ **Dua jebakan yang sudah terbukti di data produksi saat fitur ini dibuat:**
+
+- **Selesai bukan berarti `status == "Done"`.** `isTerminalStatus` mengenali `Done`, `Selesai`, dan `Archive`, dan tiga space Tech Development (Infrastructure, MyBharata/HRIS, System Marketing) memakai `Archive` sesudah Done. Menghitung `Done` saja membuang **18 tiket ber-assignee**, 13 di antaranya ber-`completed_at` dan **5 membawa rating CSAT** alias 29% dari seluruh rating yang pernah masuk. Tak satu pun galat muncul; gejalanya cuma angka yang tampak wajar.
+- **Tiket `Ditolak` tidak boleh masuk penyebut.** Itu permintaan yang batal dikerjakan, bukan pekerjaan yang gagal diselesaikan.
+
 ### Reports / Dashboard
 Semua reuse `reportBaseFilter` + `parseReportRange` (default 30 hari; `start_date`/`end_date`). Dikonsumsi halaman **Laporan Tim** supervisor di [[APP - Web ERP]]. Seluruh rutenya digerbang `reportGate = gateOrSpaceAdmin(PermTicketReportTeam, "supervisor", "admin")`.
 

@@ -96,20 +96,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "fad0c8b42ff8d4f0cac994f7c452404ed3170bed4d6e21be850ca506c78c10cc",
-      "ukuran_kb": 17.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service untuk login/onboarding karyawan, CRUD data personal & pekerjaan, kelola akun sistem (aktivasi, reset, forget-device, role), serta master data departemen & system role. Juga menjelaskan endpoint akun pihak luar (vendor/mitra) termasuk penerbitan, perpanjangan, dan pencabutan hak akses, serta rute resign/non-aktif karyawan, KPI, vacation, dan reports.",
+      "hash": "6e223f8112e04cf9d97fe639413a1379a2fbb442a7bcb2c15a93b03a0002a8df",
+      "ukuran_kb": 18.2,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di employee-service lewat gateway /api/employee/*, mencakup data karyawan, autentikasi, KPI, jadwal kerja, kontrak, dan dokumen, beserta RBAC yang menggerbangi tiap kelompok rute. Menjawab juga bentuk parameter dan balasan rute KPI, termasuk pratinjau nilai otomatis lewat /kpi/auto-values dan pembacaan skor yang sudah tersimpan lewat /kpi/score, serta kenapa belum-dinilai dijawab 200 dengan penanda alih-alih 404. Dipakai saat merakit request klien atau menelusuri penyebab 400 dan 403.",
       "kata_kunci": [
-        "employee-service",
-        "endpoint API",
-        "login onboarding",
-        "master data departemen",
-        "system role",
-        "akun eksternal vendor",
-        "resign non-aktif",
+        "employee service",
+        "API",
+        "endpoint",
         "KPI",
-        "vacation",
-        "system-auth"
+        "auto-values",
+        "skor tersimpan",
+        "RBAC",
+        "karyawan",
+        "gateway",
+        "jadwal"
       ]
     },
     {
@@ -329,8 +329,8 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "4b72ffb73303e7fa3cd9088773d49d0ff2fca1aa8b44bd8b53c2a258ddb603fd",
-      "ukuran_kb": 36.4,
+      "hash": "0096c2da277562451b51268d890090c3f3b4c9666a26b0c9ddba40234af3a354",
+      "ukuran_kb": 38.4,
       "ringkasan": "Menjawab: endpoint mana yang dipanggil untuk order marketplace terpadu, feed retur lintas-channel, packet tracking, bridging Accurate (faktur harian, Retur Penjualan, Bukti Terima Kas), dashboard FAT akuntansi (laba rugi, neraca, jurnal, anggaran & varians), kas toko/wallet, ulasan marketplace, profit per produk, dasar insentif profit-based, ICC mapping, dan WMS bridge — lengkap dengan parameter query dan aturan filternya. Juga menjawab: mana rute publik (webhook via `/ext/webhook/*`) versus yang butuh gateway key, endpoint mana yang sudah bergerbang izin, dan jebakan pemakaian yang mudah salah (mis. kenapa daftar retur lintas-channel tak boleh diambil dari endpoint retur Shopee, atau kenapa filter proyek Accurate harus pakai `projectNo`).",
       "kata_kunci": [
         "integration service",
@@ -603,11 +603,14 @@
         "ADR - 0038 Hak Per-Objek Admin Space Task Management",
         "APP - MyBharata",
         "API - Form Builder Service",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "Microservices - Monitoring Service",
+        "Microservices - Marketing Analytics Service",
         "APP - Dynamic Task Tracker"
       ],
-      "hash": "114491f8ed19fc186f10d8f285b3d0e3e19218909f04bb572838c91b7ea14336",
-      "ukuran_kb": 10.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di task-management-service lewat gateway /api/task-management/*, mulai dari space, task, attachment, laporan, audit, sampai WebSocket. Menjawab juga siapa yang boleh approve, assign, melihat Laporan Tim, dan mengubah pengaturan space (supervisor divisi, admin, atau admin space), serta bagaimana bentuk payload types[].fields untuk pertanyaan per tipe permintaan beserta beda arti fields yang absen (jangan diubah) dengan array kosong (hapus semua). Memuat pula parameter yang diterima seluruh rute laporan: hanya rentang tanggal, tanpa penyaring per space, sehingga angka SLA dan CSAT selalu gabungan seluruh space dalam cakupan pemanggil.",
+      "hash": "607270548da38165cde28464c89e3e04fb0ac453518011527e98624abfd75eed",
+      "ukuran_kb": 12.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di task-management-service lewat gateway /api/task-management/*, mulai dari space, task, attachment, laporan, audit, sampai WebSocket, dan siapa yang boleh approve, assign, serta melihat Laporan Tim. Menjawab juga bentuk payload types[].fields untuk pertanyaan per tipe permintaan, batas rute laporan yang hanya menerima rentang tanggal tanpa penyaring space, dan kontrak rute panggilan mesin /kpi/ticket beserta alasan ia dipisah dari rute laporan. Memuat dua jebakan yang sudah terbukti di produksi: status selesai tidak selalu bernama Done, dan tiket ditolak tidak boleh masuk penyebut penilaian.",
       "kata_kunci": [
         "task management",
         "ticketing",
@@ -618,7 +621,7 @@
         "tiket",
         "CSAT",
         "SLA",
-        "laporan tim"
+        "kpi/ticket"
       ]
     },
     {
@@ -1089,8 +1092,8 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "c98aad050bb4cd201c6c97304a268341486721ad0c352d33f3153f57ea7014ed",
-      "ukuran_kb": 110.3,
+      "hash": "43a9353ad72b3796521a3b4dd4ee3bbd336157804d1f33913c7b039dfc69a8cc",
+      "ukuran_kb": 113.0,
       "ringkasan": "Menjawab: modul dan menu apa saja yang ada di portal web ERP internal (hris-dashboard / One Bharata), bagaimana login serta role gating lewat system_roles bekerja, dan bagaimana web ini berperan sebagai SSO Identity Provider bagi aplikasi lain. Juga menjawab cara menu dikelompokkan di sidebar, pengaturan tampilan menu per jabatan (menu_hidden) dan bedanya dari hak akses, serta perilaku multi-perusahaan lewat company switcher.",
       "kata_kunci": [
         "web erp",
@@ -1612,6 +1615,9 @@
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "HRIS - Otomasi Skor KPI",
         "Microservices - Insentive Service",
+        "Microservices - Marketing Analytics Service",
+        "Microservices - Task Management Service",
+        "API - Employee Service",
         "HRIS - Matriks KPI per Departemen",
         "Microservices - Form Builder Service",
         "HRIS - Organization Structure",
@@ -1636,20 +1642,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "4d3dbac154a8bd937efcd2e9e78362597fbd7d4766254d34ee11dc2209ccc834",
-      "ukuran_kb": 46.1,
-      "ringkasan": "Menjawab: di mana master data karyawan dan autentikasi ekosistem bip-erp berada, endpoint apa yang dipakai untuk login (username/employee_id, PIN, biometric), refresh token, onboarding, dan administrasi akun oleh IT (reset, forget-device, roles). Juga menjawab siapa pemilik master department dan system roles, serta workspace divisi mana saja (Legal, R&D Regulatory, Quality, Procurement non-Accurate) yang ikut di-host di service ini beserta alasannya.",
+      "hash": "15a2e02f1a3d48fd38e4e557e59ba3762d11a5b99331e80af2720dd968323510",
+      "ukuran_kb": 47.8,
+      "ringkasan": "Menjawab: bagaimana employee-service bekerja sebagai inti HRIS, dari data karyawan, autentikasi dan SSO, KPI, jadwal kerja, kontrak, sampai cakupan supervisi antar-departemen. Menjawab juga bagaimana registry sumber data KPI bekerja, sumber apa saja yang sudah terdaftar beserta service asalnya, kenapa employee-service boleh menarik data tetapi tetap pemilik tunggal kpi_score, dan bagaimana penyebut tiap metrik menentukan adil-tidaknya angka yang keluar. Memuat pula endpoint pembacaan skor tersimpan dan alasan keberadaannya.",
       "kata_kunci": [
         "employee service",
-        "master data karyawan",
-        "autentikasi",
-        "login",
-        "PIN",
-        "biometric",
-        "system_roles",
-        "master department",
-        "onboarding",
-        "account admin"
+        "HRIS",
+        "KPI",
+        "registry sumber",
+        "kpi_score",
+        "kpi_template",
+        "supervisi",
+        "kontrak",
+        "jadwal",
+        "SSO"
       ]
     },
     {
@@ -2233,29 +2239,30 @@
         "APP - MyBharata",
         "Microservices - Form Builder Service",
         "CORE - API Master Gateway",
+        "Microservices - Employee Service",
+        "API - Task Management Service",
         "APP - Web ERP",
         "HRIS - Otomasi Skor KPI",
         "HRIS - Matriks KPI per Departemen",
         "DB - Overview and Notes",
-        "Microservices - Employee Service",
         "Microservices - Notification Service",
         "APP - Dynamic Task Tracker",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "a809c28e2a33c3b6bd9596d34e4b0a44149216833ad030b25ca94e0d604e1e62",
-      "ukuran_kb": 29.6,
-      "ringkasan": "Menjawab: bagaimana task-management-service bekerja sebagai backend IT Helpdesk yang dipadu board Kanban, dari alur status Request sampai Done plus jalur Ditolak, gate approval, SLA dua dimensi dengan eskalasi terjadwal, automation auto-assign dan auto-close, CSAT, attachment via file-service, sampai update realtime lewat WebSocket. Menjawab juga bagaimana cakupan divisi supervisor diturunkan dari header BIP-Supervised-Departments, apa wewenang admin per space dan bagaimana ia ikut menentukan cakupan Laporan Tim, kenapa rute laporan hanya menerima rentang tanggal tanpa penyaring per space, serta nama field BSON mana yang snake_case dan mana yang camelCase beserta kepadatan datanya di produksi.",
+      "hash": "46296c4944d5d70f38cb092ed21ca009daf4383ff73698ed0fb9dd78b3f56ec9",
+      "ukuran_kb": 30.9,
+      "ringkasan": "Menjawab: bagaimana task-management-service bekerja sebagai backend IT Helpdesk yang dipadu board Kanban, dari alur status sampai gate approval, SLA dua dimensi, automation, CSAT, attachment, dan realtime WebSocket. Menjawab juga wewenang admin per space, cakupan Laporan Tim beserta batasnya yang tanpa penyaring space, dan rute panggilan mesin untuk penilaian KPI. Memuat dua jebakan yang terbukti di data produksi: status selesai dinamai per-space sehingga menghitung Done saja membuang tiket berikut rating CSAT-nya, dan nama field BSON yang campur snake_case dengan camelCase.",
       "kata_kunci": [
         "task management service",
         "helpdesk",
         "tiket",
-        "ticket",
         "Kanban",
         "SLA",
         "CSAT",
         "laporan tim",
         "admin space",
-        "nama field BSON"
+        "KPI",
+        "status terminal"
       ]
     },
     {
@@ -5142,6 +5149,7 @@
         "Microservices - Marketing Analytics Service",
         "Sales - Marketing Dashboard (Master Roadmap)",
         "APP - Web ERP",
+        "API - Task Management Service",
         "Microservices - Attendance Service",
         "IT - Monitoring System",
         "DB - Overview and Notes",
@@ -5155,8 +5163,8 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "323e9fda79749ff32087b60f623a18d9c2de0580ba0e888b40cd28963aff240c",
-      "ukuran_kb": 33.2,
+      "hash": "a86a5ade27b8f9f996ffd22756468f3ee7ed0f2ebdde313a8eeb70d3ae05a7fe",
+      "ukuran_kb": 33.9,
       "ringkasan": "Menjawab: dari seluruh metrik KPI yang terpasang di production, mana yang sumber datanya sudah siap otomatis, mana yang masih butuh definisi atau mapping, mana yang modulnya jalan tapi datanya kosong, dan mana yang memang manual, lengkap dengan rekap per departemen. Juga menjawab metrik mana dipetakan ke koleksi atau endpoint sumber yang mana, dan kenapa label metrik menjadi kunci pengikat setiap rencana auto-fill.",
       "kata_kunci": [
         "KPI",
@@ -7184,20 +7192,20 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "47cd35c8044fa02a97e16d385fad7bbee902c83e036737f9726c2129ac1bbde5",
-      "ukuran_kb": 20.7,
-      "ringkasan": "Menjawab: langkah konkret bagi dev departemen untuk menambah satu metrik KPI yang terisi otomatis, mulai dari menguji kelayakan metriknya, mendaftarkan sumber di employee-service, sampai mengisi konfigurasi auto pada template. Juga menjawab kenapa tidak ada tabel penampung KPI dan angkanya dihitung ulang saat layar dibuka, kapan snapshot harian benar-benar diperlukan, serta pembagian tanggung jawab tiga lapis Sumber, Reduksi, dan Arah/Target.",
+      "hash": "5b1154aa17821c6dd2a0054c60f7d83f696baef13c8748c4eae4ca3efed02286",
+      "ukuran_kb": 22.4,
+      "ringkasan": "Menjawab: bagaimana data KPI otomatis sebenarnya dikumpulkan (tidak ada tabel penampung KPI; data mentah tertampung di service asalnya lalu dihitung ulang saat dibaca dan saat dinilai, dan dibekukan di kpi_score setelah disimpan), kapan snapshot harian memang diperlukan, dan langkah apa saja yang harus dilakukan dev departemen untuk menambah satu metrik yang terisi otomatis. Memuat daftar sumber yang sudah ada sebagai contoh, kapan satu sumber sebaiknya melayani banyak metrik lewat KPIAutoConfig.Metrik, cetak biru rute di service sumber beserta gerbang kunci layanan yang menutup saat env kosong, katalog formula reduksi, bahaya salah mengisi arah, serta jebakan nol palsu akibat salah nama field.",
       "kata_kunci": [
-        "KPI otomatis",
-        "auto_value",
-        "daftarkan sumber",
+        "runbook KPI",
+        "metrik otomatis",
+        "pengumpulan data KPI",
+        "sumber nilai",
         "reduksi",
-        "arah target",
-        "kpi_template",
-        "metrik",
-        "runbook",
-        "employee service",
-        "cakupan"
+        "ambang",
+        "target",
+        "kunci layanan",
+        "nol palsu",
+        "snapshot beku"
       ]
     },
     {

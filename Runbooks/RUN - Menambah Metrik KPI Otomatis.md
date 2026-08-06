@@ -4,12 +4,19 @@
 
 - **Status**: ⚠️ Mesinnya **sudah deploy ke produksi 1 Agustus 2026** (PR #843 kontrak sumber, #857 mesin reduksi dan registry, #866 sumber `uptime_sistem`) dan terverifikasi terhadap data sungguhan. Prosedur di bawah final terhadap kode itu. Yang belum: **nol template punya konfigurasi `auto`** (sensus 2026-08-06), dan **layar Score KPI belum menampilkan `auto_value`**, sehingga usulan sistem belum terlihat penilai walau endpointnya hidup.
 
-Dua sumber sudah terdaftar dan bisa dipakai sebagai contoh:
+Sumber yang sudah ada dan bisa dipakai sebagai contoh:
 
 | Nama sumber | Datanya dari | Contoh yang mewakili |
 |---|---|---|
 | `skor_tim` | Koleksi `kpi_score` di employee-service sendiri | Sumber yang membaca data lokal, disempitkan ke tim atau departemen |
-| `uptime_sistem` | monitoring-service lewat HTTP | Sumber yang menarik dari service lain, dan cakupannya bukan rasio unit |
+| `uptime_sistem` | monitoring-service lewat HTTP | Sumber yang menarik dari service lain, dan cakupannya bersifat WAKTU sehingga `CakupanPersen` ditimpa |
+| `kaizen` | form-builder lewat HTTP | Sumber yang mencacah kiriman per periode |
+| `kinerja_toko` | marketing-analytics lewat HTTP | **Satu sumber melayani banyak metrik** lewat `KPIAutoConfig.Metrik` (revenue, roi, roi_bersih, retur_persen), tiap entri katalog menghasilkan SATU angka |
+| `kinerja_tiket` 🟡 | task-management lewat HTTP | Pola yang sama, tetapi tiap entri katalog menghasilkan **Cuplikan utuh** karena bentuk cakupan tiap metriknya berbeda (belum merge, branch `feat/kpi-sumber-tiket`) |
+
+**Kalau sumbermu menyediakan lebih dari satu angka, jangan bikin sumber baru per metrik.** Pakai `KPIAutoConfig.Metrik` sebagai pemilihnya, seperti `kinerja_toko` dan `kinerja_tiket`. Dengan begitu mengganti metrik sebuah baris KPI cukup mengubah konfigurasi, tanpa sumber baru dan tanpa deploy.
+
+Bentuk katalognya ikuti kebutuhan, bukan contoh terdekat. `kinerja_toko` memakai `map[string]func(M) (float64, error)` karena semua metriknya satu angka dengan cakupan yang sama. `kinerja_tiket` memakai `map[string]func(M) (employee.Cuplikan, error)` karena cakupan tiap metriknya memang tidak sama: dua metriknya membawa banyak pengukuran dengan penyebut berbeda, satu lagi cuma satu angka. Memaksakan bentuk satu-angka di situ akan menyembunyikan perbedaan itu, dan **cakupan yang salah membuat metrik setengah-terisi dilaporkan seolah lengkap**.
 
 ## Model mental: dari orang bekerja sampai angka di layar
 
