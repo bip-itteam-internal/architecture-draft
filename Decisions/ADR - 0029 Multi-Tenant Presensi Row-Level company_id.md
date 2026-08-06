@@ -65,6 +65,44 @@ Perbaikan: orchestrator meneruskan body sebagai **map** (`orchestrator/hris/part
 
 **Status kerusakan di dev (verifikasi 2026-07-30):** belum terjadi. **Nol** dokumen ber-`company_id` kosong, dan tak ada `vacation` yang ter-nol-kan jalur ini. Sebabnya 31 dokumen yang membawa jejak jalur edit itu terakhir disentuh sekitar **25 Mei 2026**, yaitu **sebelum** `company_id` (24 Juli 2026) dan `Vacation` masuk struct `WorkData` — dibuktikan 14 di antaranya bahkan tak punya field `vacation` sama sekali. **Produksi belum diperiksa.** Yang sudah terlanjur rusak justru tipe BSON-nya (lihat §Masih terbuka).
 
+## Setelan per-jabatan ikut perusahaan terpilih (2026-08-06, branch — belum merge)
+
+Empat layar pengelolaan jabatan di `erp-frontend` membaca dan menulis `master_department`
+yang sudah ter-scope `company_id` sejak PR #652, tapi tak satu pun meneruskan perusahaan
+yang sedang dipantau di `CompanySwitcher`: **Tampilan Menu** (`/it/settings` dan Pengaturan
+HRGA), **Hak per Posisi**, **Jenjang Jabatan**, dan **Siapa Boleh Apa**. Akibatnya admin
+pusat yang beralih ke tenant lain tetap melihat dan menyunting jabatan perusahaannya
+sendiri, tanpa satu tanda pun bahwa yang tampil bukan yang dipilih. Backend-nya sudah benar
+sejak awal (`EffectiveCompanyID` di `master_data.go:352`, `position_assign.go:97/200/265`,
+dan `permission_exceptions.go:51`); yang tertinggal murni sisi frontend.
+
+Diperbaiki di branch `fix/setelan-posisi-per-perusahaan` (erp-frontend) dengan meneruskan
+`readSelectedCompany()` ke pembacaan **dan** penulisan tiap layar, plus dua hook yang belum
+menerima perusahaan (`use-fetch-department-groups`, `use-fetch-permission-exceptions`).
+Ketiga hook mutasinya ternyata sudah menyediakan parameter itu sejak awal dan tak pernah
+ada yang mengisinya. Dikunci empat berkas test yang memeriksa kedua arah sekaligus,
+termasuk bahwa tanpa cookie yang dikirim `undefined` dan bukan tebakan `"BIP"` — string
+apa pun di situ akan menimpa perusahaan asli pemakai.
+
+`COMPANY_SCOPED_READS` di `lib/axios.ts` sengaja **tidak** disentuh: `useFetchDepartments`
+sudah mengirim `?company` sebagai parameter eksplisit, sedangkan menambahkan fragmen
+`/master/departments` ke daftar interceptor akan ikut mengubah picker Form Builder, form
+Pelatihan, target Dokumen HRD, dan halaman Department di Integration sekaligus.
+
+**Perilaku tulis lintas perusahaan TIDAK seragam, dan itu disengaja per endpoint.** Presensi
+menulis dengan `CompanyID` supaya karyawan selalu tercatat di perusahaannya sendiri,
+sementara master data pengelolaan menulis dengan `EffectiveCompanyID` justru agar admin
+pusat bisa menyiapkan perusahaan pilot yang belum punya pengelola sendiri: WiFi kantor (PR
+#663) dan kini setelan jabatan. Pembagian ini sebelumnya hanya tersirat, dan komentar di
+`CompanySwitcher` bahkan menyatakan sebaliknya ("operasi tulis tetap ke perusahaan asli
+pemakai") sampai diluruskan di branch yang sama. Konsekuensi turunannya: layar yang memakai
+cookie switcher untuk MENULIS wajib meneruskannya sendiri lewat `readSelectedCompany`,
+sebab interceptor axios hanya menempel pada GET.
+
+Seperti perbaikan FE lain di ADR ini, efeknya **hanya terasa bagi akun ber-`system_roles.group
+= admin`**; pemegang switcher yang cuma supervisor IT tetap diabaikan BE (lihat §Masih
+terbuka).
+
 ## Status pilot (verifikasi live dev 2026-07-28)
 
 Lewat gateway dev `10.10.10.121:6969` (read-only, akun admin pusat):
