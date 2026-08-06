@@ -7144,7 +7144,7 @@
       "area": "Runbooks",
       "jenis": "runbook",
       "status_emoji": "⚠️",
-      "status_teks": "Mesinnya **sudah merge ke `main`** (PR #857, 1 Agustus 2026) tetapi **belum deploy**. Prosedur di bawah sudah final terhadap kode itu.",
+      "status_teks": "Mesinnya **sudah deploy ke produksi 1 Agustus 2026** (PR #843 kontrak sumber, #857 mesin reduksi dan registry, #866 sumber `uptime_sistem`) dan terverifikasi terhadap data sungguhan. Prosedur di bawah final terhadap kode itu. Yang belum: **nol template punya konfigurasi `auto`** (sensus 2026-08-06), dan **layar Score KPI belum menampilkan `auto_value`**, sehingga usulan sistem belum terlihat penilai walau endpointnya hidup.",
       "publik": true,
       "tautan": [
         "HRIS - Otomasi Skor KPI",
@@ -7158,20 +7158,20 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "b2ddff0dc8641cd1d802c163cf4dc1967a5c09be998d6d96cb9a5ca140922b3c",
-      "ukuran_kb": 12.5,
-      "ringkasan": "Menjawab: langkah apa saja yang harus dilakukan dev departemen untuk menambah satu metrik KPI yang terisi otomatis, mulai dari memastikan datanya cukup terisi dan nama fieldnya benar, memastikan metriknya bisa diatribusikan ke satu orang, mendaftarkan sumber baru di employee-service, sampai mengisi konfigurasi lewat POST /kpi/templates. Menjelaskan pembagian tiga lapis (sumber, reduksi, arah dan target), kenapa sumber tidak boleh menghitung nilai sendiri, aturan Cuplikan, katalog formula reduksi, beda ambang dengan target, dan bahaya salah mengisi arah naik atau turun. Memuat pula jebakan nol palsu: mengambil nama field dari respons API alih-alih dari tag bson di struct Go bisa membuat metrik yang sebenarnya terukur dilaporkan kosong.",
+      "hash": "f1003623c56c8a1d848b46a6c1b59d0b6781d59a747f2274cb715cf9451030ae",
+      "ukuran_kb": 20.6,
+      "ringkasan": "Menjawab: bagaimana data KPI otomatis sebenarnya dikumpulkan (tidak ada tabel penampung KPI; data mentah tertampung di service asalnya lalu dihitung ulang saat dibaca dan saat dinilai, dan dibekukan di kpi_score setelah disimpan), kapan snapshot harian memang diperlukan, dan langkah apa saja yang harus dilakukan dev departemen untuk menambah satu metrik yang terisi otomatis. Memuat cetak biru rute di service sumber beserta gerbang kunci layanan yang menutup saat env kosong, katalog formula reduksi, beda ambang dengan target, bahaya salah mengisi arah naik atau turun, serta jebakan nol palsu akibat mengambil nama field dari respons API alih-alih dari tag bson di struct Go. Juga menjawab metrik seperti apa yang layak diotomatiskan, yaitu yang data penentunya tidak diisi oleh orang yang dinilai itu sendiri.",
       "kata_kunci": [
         "runbook KPI",
         "metrik otomatis",
+        "pengumpulan data KPI",
         "sumber nilai",
         "reduksi",
         "ambang",
         "target",
-        "kpi_template",
+        "kunci layanan",
         "nol palsu",
-        "nama field bson",
-        "auto-fill"
+        "snapshot beku"
       ]
     },
     {

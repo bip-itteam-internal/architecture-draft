@@ -2,7 +2,7 @@
 
 *Cara dev departemen menambahkan satu metrik KPI yang terisi otomatis, tanpa menyentuh aturan penilaian dan tanpa bertabrakan dengan dev departemen lain. Latar belakang dan peta metriknya ada di [[HRIS - Otomasi Skor KPI]]; keputusan batas servicenya di [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]].*
 
-- **Status**: ⚠️ Mesinnya **sudah merge ke `main`** (PR #857, 1 Agustus 2026) tetapi **belum deploy**. Prosedur di bawah sudah final terhadap kode itu.
+- **Status**: ⚠️ Mesinnya **sudah deploy ke produksi 1 Agustus 2026** (PR #843 kontrak sumber, #857 mesin reduksi dan registry, #866 sumber `uptime_sistem`) dan terverifikasi terhadap data sungguhan. Prosedur di bawah final terhadap kode itu. Yang belum: **nol template punya konfigurasi `auto`** (sensus 2026-08-06), dan **layar Score KPI belum menampilkan `auto_value`**, sehingga usulan sistem belum terlihat penilai walau endpointnya hidup.
 
 Dua sumber sudah terdaftar dan bisa dipakai sebagai contoh:
 
@@ -10,6 +10,56 @@ Dua sumber sudah terdaftar dan bisa dipakai sebagai contoh:
 |---|---|---|
 | `skor_tim` | Koleksi `kpi_score` di employee-service sendiri | Sumber yang membaca data lokal, disempitkan ke tim atau departemen |
 | `uptime_sistem` | monitoring-service lewat HTTP | Sumber yang menarik dari service lain, dan cakupannya bukan rasio unit |
+
+## Model mental: dari orang bekerja sampai angka di layar
+
+Pertanyaan pertama yang selalu muncul, dan sudah ditanyakan berkali-kali: *"datanya ditampung dulu di mana? apa perlu dihitung tiap hari?"*
+
+**Tidak ada tabel penampung KPI, dan itu disengaja.** Yang menampung adalah database service tempat orang bekerja, dan ia terisi sendiri setiap hari karena orang memang bekerja di sana. Polanya sama dengan absensi: tap masuk dan keluar tercatat harian di `attendance`, tetapi tidak ada tabel "rekap absensi harian" yang ditulis tiap malam; laporan bulanan dihitung dari entri harian saat dibuka.
+
+```
+Sepanjang bulan   orang bekerja  -> data mentah tersimpan di service asalnya
+                                    (tiket, video, heartbeat, order)
+                                    TIDAK ADA pekerjaan tambahan, tidak ada cron KPI
+
+Kapan saja        layar dibuka   -> GET /kpi/auto-values menghitung SAAT ITU dari data mentah
+                                    cakupan < 100% -> dilabeli `semi` (bulan belum habis)
+                                    tidak menyimpan apa pun
+
+Saat menilai      POST /kpi      -> dihitung ULANG, hasilnya distempel jadi auto_value
+                                    penilai boleh menerima atau menimpa
+
+Setelah simpan    kpi_score      -> snapshot template + nilai DIBEKUKAN
+                                    data mentah boleh berubah, skor tidak ikut
+```
+
+Angka hanya hidup di dua tempat, dan keduanya punya pemilik yang jelas:
+
+| Tempat | Isinya | Boleh berubah? |
+|---|---|---|
+| Database service sumber | data mentah bertanggal (tiket, video, heartbeat) | Ya, terus-menerus |
+| `kpi_score.template` | snapshot penilaian satu orang satu periode | **Tidak**, kecuali periode itu dinilai ulang |
+| `kpi_template` | **konfigurasi saja, bukan angka** | Ya, dan tidak menyeret skor lampau |
+
+Baris ketiga dijaga kode, bukan sekadar kesepakatan: `BersihkanNilaiOtomatis` membuang setiap hasil pengukuran per orang yang coba dititipkan ke master template. Tanpa itu, pemanggil bisa menitipkan `auto_value` karangan yang ikut tersalin ke tiap snapshot.
+
+### Kenapa dihitung ulang, bukan diakumulasi harian
+
+Tiga alasan, dan ketiganya sudah terbukti di sini:
+
+1. **Data mentahnya sudah bertanggal.** Tiket punya `createdAt` dan `completed_at`, video punya `published_at`. Menghitung ulang satu bulan itu murah dan selalu benar. Penampung harian adalah salinan kedua, dan salinan kedua selalu berakhir menyimpang.
+2. **Masa lalu berubah, dan itu normal.** Tiket di-reopen dan `due_date`-nya di-reset, CSAT dikirim terlambat dan boleh ditimpa, supervisor membetulkan tenggat. Angka harian yang terlanjur ditulis tidak ikut terkoreksi; hitung ulang benar dengan sendirinya.
+3. **Pembekuannya sudah ada di tempat yang tepat.** Yang memang harus beku adalah angka saat dinilai, dan `kpi_score` sudah mengerjakannya. Menambah penampung harian berarti tiga lapis untuk pekerjaan satu lapis.
+
+### Satu-satunya kasus yang memang butuh snapshot harian
+
+Ketika **sumbernya tidak bisa ditanya soal masa lalu**. Contoh nyata sudah ada: `GET /monitors` di Uptime Kuma hanya membalas "30 hari terakhir", dan itu bukan nilai bulan mana pun, sehingga sengaja TIDAK dipakai untuk KPI; yang dipakai `GET /monitoring/kpi/uptime?periode=` yang membaca heartbeat sungguhan. Kalau retensi sumbermu pendek atau API pihak ketiga hanya memberi jendela berjalan, snapshot harian memang wajib.
+
+Bila itu terjadi, **snapshot adalah tanggung jawab service sumber**, bukan modul KPI. Metrik tetap tidak menyimpan apa pun, dan sumbermu tetap menjawab pertanyaan "berapa untuk periode YYYY-MM ini".
+
+### Yang menentukan sebuah metrik layak diotomatiskan
+
+Bukan "apakah datanya ada", melainkan **siapa yang mengisi data penentunya**. Metrik yang datanya diisi oleh orang yang dinilai itu sendiri menaruh sebagian kemudi di tangan yang dinilai. Contoh nyata di modul tiket: CSAT diisi requester sehingga aman, tetapi `completed_at` distempel saat status menjadi Done, dan yang menandai Done adalah penangan tiket itu sendiri. Itu bukan alasan membatalkan metriknya, tetapi wajib disadari saat menyepakati bobot, dan itulah gunanya `auto_basis` beserta pembedaan `value != auto_value`: keduanya membuat "angka ini dari mesin atau dari atasan" tetap terjawab dari datanya sendiri.
 
 ## Yang perlu dipahami lebih dulu
 
@@ -83,6 +133,37 @@ Boleh ditarik lewat HTTP; [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul
 - **Jangan masukkan URL-nya ke `InternalURL`.** Peta itu divalidasi saat boot dengan `panic`, sehingga satu env yang belum dipasang saat deploy akan mematikan seluruh employee-service demi satu metrik KPI. Baca env-nya langsung.
 - **Beri batas waktu klien HTTP-nya.** Tanpa itu, satu service yang tersendat menahan `GET /kpi` sampai frontend menyerah.
 
+#### Cetak biru rute di service sumber
+
+Bagian ini yang paling sering terlewat: **service sumber perlu rute baru**, karena rute laporan yang sudah ada hampir selalu tidak cocok. Rute laporan digerbang RBAC **pemanggil** dan cakupannya mengikuti siapa yang memanggil, sedangkan ini panggilan **mesin** yang menanyakan **orang lain**. Contohnya `/report/sla` di task-management: ada, tetapi menjawab "apa yang boleh dilihat pemanggil", bukan "berapa angka si A pada Juli".
+
+Salin pola `services/monitoring/kpi_uptime.go`:
+
+```go
+// Kunci layanan TERPISAH dari INTERNAL_GATEWAY_KEY. Gateway memasang header itu
+// pada SETIAP permintaan yang lolos JWT, jadi rute yang bersandar padanya
+// terbuka bagi seluruh karyawan yang sudah login (ADR 0031).
+var kunciLayananKPI = os.Getenv(common.Env.<Service>ServiceKey)
+
+func gerbangKunciLayanan(c *fiber.Ctx) error {
+    // Kunci yang belum dikonfigurasi MENUTUP rute, bukan membukanya.
+    if kunciLayananKPI == "" || c.Query("key") != kunciLayananKPI {
+        return c.Status(fiber.StatusUnauthorized).JSON(common.ErrorMessage.InvalidGatewayKey)
+    }
+    return c.Next()
+}
+```
+
+Tiga hal yang membuat muatannya benar:
+
+- **Sempitkan muatannya.** `KPIUptime` sengaja tanpa daftar monitor: nama monitor memaparkan topologi infrastruktur, sementara penilaian hanya butuh angka. Kalau kunci layanan bocor, yang terpapar sebatas itu. Terapkan hal sama pada rutemu: kirim angka dan cacahan, jangan judul tiket, nama toko, atau nama orang.
+- **Bawa cakupannya, dan itu bukan hiasan.** Yang menilai orang berhak tahu bahwa angkanya berdiri di atas 23 dari 31 hari, atau 13 dari 51 tiket.
+- **Bedakan "tidak ada data" dari "nol".** `Uptime *float64` memakai pointer supaya `null` berarti tidak ada heartbeat, bukan sistem mati sebulan penuh. Sumber lalu mengembalikan **error**, dan metriknya jatuh ke `manual` dengan alasan tertulis, bukan bernilai 0.
+
+**Wajib ada test yang melewati Fiber**, bukan hanya test fungsi murni: `app.Test(httptest.NewRequest(...))` untuk tanpa `key`, `key` salah, dan env kosong. Alasannya tercatat sebagai kejadian nyata di ingatan tim: satu service pernah punya 183 test hijau sementara seluruh jalur galatnya membalas 502, karena tak satu pun test melewati Fiber.
+
+Terakhir, env barunya dipasang di **dua** blok `docker-compose.yml`: service sumber (yang memeriksa kunci) dan employee-service (yang mengirimnya). Lupa salah satu membuat metrik diam-diam jatuh ke `manual`, dan gejalanya hanya kalimat di `auto_basis` yang tak dibaca siapa pun sampai ada yang bertanya.
+
 ## Langkah 3: isi konfigurasi metrik
 
 Lewat `POST /kpi/templates` yang sudah ada. Tidak perlu deploy untuk mengubahnya.
@@ -145,7 +226,8 @@ Jangan menunggu reduksi baru untuk keduanya, karena tidak akan datang.
 - **Jangan pernah mengarang angka saat data belum ada.** Metrik yang gagal dihitung dibiarkan kosong dengan alasannya di `auto_basis`, dan sumbernya otomatis jatuh ke `manual`. Mengisinya 0 akan menekan skor orang tanpa dasar dan tak terbedakan dari hasil yang memang nol.
 - **Jangan memakai `label` sebagai kunci.** Label metrik di produksi memuat typo (`Perfomance Monitoring`) dan spasi di ujung (`Monitoring Team `). Kunci identitasnya `key`, diturunkan sekali lalu dipertahankan, pola sama dengan `position_items[].key` di [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].
 - **Jangan mencocokkan entitas lewat nama.** Nama toko di produksi ada yang berspasi di ujung (`Kyura Beauty Official Store `). Pakai id.
-- **Jangan membuat kosakata baru** untuk hal yang sudah punya nama. Sumber angka memakai `otomatis`/`semi`/`manual`, sama persis dengan frontend di `finance/posisi/lib/status-sumber.ts`.
+- **Jangan membuat kosakata baru** untuk hal yang sudah punya nama. Sumber angka memakai `otomatis`/`semi`/`manual` (`KPISources` di `shared-library/models/employee/kpi_source.go`), dan `SumberMetrik` yang menentukannya, bukan pemanggil: konfigurasi saja tidak membuat metrik otomatis, dan cakupan di bawah 100% selalu `semi`.
+	- ⚠️ **Koreksi 2026-08-06**: dua rujukan lama ke frontend keliru dan akan menyesatkan siapa pun yang mencarinya. Komentar `SumberMetrik` menyebut *"meniru `tampilanSumberKpi()` di frontend"*, padahal fungsi itu **tidak ada** di `erp-frontend` `origin/main`. Versi lama runbook ini menyebut kosakatanya sama dengan `finance/posisi/lib/status-sumber.ts`, padahal berkas itu memakai `ada`/`sebagian`/`belum` untuk keperluan yang berbeda (audit ketersediaan sumber di dashboard FAT). Jadi **kosakata tampilan `otomatis`/`semi`/`manual` di frontend belum ada dan memang perlu dibuat** saat layar Score KPI dikerjakan; itu bukan pelanggaran aturan ini.
 - **Hormati batas perusahaan.** Data disempitkan memakai perusahaan **karyawan yang dinilai**, bukan pemanggil ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]). Produksi berisi lebih dari satu perusahaan.
 - **Rute baru menggerbangi dirinya sendiri** ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]).
 
@@ -169,6 +251,9 @@ Empat contoh nyata, semuanya bertipe sama: salah yang tidak menimbulkan error.
 - [ ] Sumber diuji dengan data palsu, tanpa Mongo
 - [ ] Hasil hitung dibandingkan dengan skor manual periode terakhir, dan selisihnya dijelaskan
 - [ ] Metrik yang gagal dihitung terbukti tetap kosong, bukan bernilai 0
+- [ ] Bila menarik dari service lain: rute sumber punya test yang **melewati Fiber** untuk tanpa kunci, kunci salah, dan env kosong
+- [ ] Env kunci layanan terpasang di **dua** blok compose (service sumber dan employee-service)
+- [ ] Sudah dijalankan **sekali lewat gateway** sungguhan, bukan hanya lokal
 
 Butir kedua dari terakhir bukan formalitas. Perbandingan itulah yang menemukan bahwa skor ICC manual meleset ke dua arah, dan tanpa itu otomasi akan diam-diam menggantikan satu kesalahan dengan kesalahan lain.
 
