@@ -13,6 +13,8 @@ Dua sumber sudah terdaftar dan bisa dipakai sebagai contoh:
 
 ## Model mental: dari orang bekerja sampai angka di layar
 
+> Versi gambarnya: [[HRIS - Pengumpulan Data KPI Otomatis.excalidraw]]. Bab ini dan diagram itu menjelaskan hal yang sama; pakai yang mana pun lebih cepat kamu pahami.
+
 Pertanyaan pertama yang selalu muncul, dan sudah ditanyakan berkali-kali: *"datanya ditampung dulu di mana? apa perlu dihitung tiap hari?"*
 
 **Tidak ada tabel penampung KPI, dan itu disengaja.** Yang menampung adalah database service tempat orang bekerja, dan ia terisi sendiri setiap hari karena orang memang bekerja di sana. Polanya sama dengan absensi: tap masuk dan keluar tercatat harian di `attendance`, tetapi tidak ada tabel "rekap absensi harian" yang ditulis tiap malam; laporan bulanan dihitung dari entri harian saat dibuka.
@@ -259,6 +261,8 @@ Butir kedua dari terakhir bukan formalitas. Perbandingan itulah yang menemukan b
 
 ## Dokumen Terkait
 
+- [[HRIS - Pengumpulan Data KPI Otomatis.excalidraw]] (diagram: di mana data ditampung, kapan dihitung, kapan beku)
+- [[HRIS - Alur KPI Otomatis Rinci.excalidraw]] (diagram: jalur request employee-service, langkah demi langkah)
 - [[HRIS - Otomasi Skor KPI]] (peta metrik, matriks label per posisi, temuan data)
 - [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] (batas service, pemicu ekstraksi collector)
 - [[HRIS - Key Performance Index]] (mekanisme scoring, RBAC, cakupan tim Leader)
