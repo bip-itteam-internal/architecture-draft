@@ -5158,20 +5158,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "00f66b2dd7ed9bce570f1cbf8558fdede683de8cc726f734b479373b62c7fc29",
-      "ukuran_kb": 46.2,
-      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang sumber datanya sudah tersedia untuk diisi otomatis, mana yang modulnya sudah ada tapi belum dipakai, dan mana yang sama sekali tidak punya sumber data — lengkap dengan rekap per departemen dan matriks metrik per posisi. Menjelaskan cara kerja mesin otomasi (kontrak sumber nilai, mesin reduksi, arah target, registry), formula perhitungan seperti skor_tim dan uptime_sistem, syarat urutan penilaian antar-jenjang, serta batasan cakupan data (mis. supervisor_id yang belum lengkap) yang memengaruhi keakuratan angka otomatis. Juga menjawab bagaimana penilai melihat dan memakai nilai usulan otomatis, serta layar diagnostik yang menunjukkan metrik mana yang macet beserta sebabnya.",
+      "hash": "a1032bbb0986e5a8cdbd661a0eb764f00e9378f1fdf4e9a76069e3bb7a4e0762",
+      "ukuran_kb": 47.1,
+      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang sumber datanya sudah tersedia untuk diisi otomatis, mana yang modulnya ada tapi datanya belum dipakai, dan mana yang memang tidak punya sumber data sama sekali. Menjawab juga metrik mana yang sudah benar-benar menyala di produksi (Tech Development, IT Support), bagaimana membaca status di layar diagnostik Otomasi KPI (otomatis/semi/manual/tanpa_karyawan), dan urutan penilaian yang harus dijaga (anggota tim dulu baru Leader/Supervisor) supaya angka otomatis benar-benar terpakai dan tidak keburu tertimpa penilaian manual.",
       "kata_kunci": [
         "KPI",
         "skor KPI",
         "otomasi KPI",
-        "auto-values",
+        "auto-value",
         "kpi_template",
         "kpi_score",
         "skor_tim",
-        "uptime_sistem",
-        "supervisor_id",
-        "Otomasi KPI"
+        "Employee Service",
+        "auto_basis",
+        "uptime_sistem"
       ]
     },
     {
