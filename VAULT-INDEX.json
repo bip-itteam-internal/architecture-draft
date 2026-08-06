@@ -1849,8 +1849,19 @@
       ],
       "hash": "b6dc0c5974b8af666e46892ecaeee591e064aac8e36d864babf191791ca7d5d9",
       "ukuran_kb": 206.4,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana order marketplace (TikTok Shop, Shopee, Lazada) masuk ke ERP lewat webhook direct, bagaimana order dan laporan iklan dinormalkan jadi model transaction terpadu, serta bagaimana invoice dan retur didorong ke Accurate Online. Juga memuat daftar endpoint TikTok Business/Ads (GMV Max monitoring/overview, ICC video metrics), manajemen kredensial OAuth per marketplace, cron sync master data, automasi auto-ship/auto-approve yang sadar hari libur, modul gross profit, dan review analytics marketplace. Dipakai saat menelusuri kenapa data order, angka iklan, atau bridging akuntansi marketplace tidak sinkron.",
+      "kata_kunci": [
+        "integration service",
+        "marketplace",
+        "TikTok Shop",
+        "Shopee",
+        "Lazada",
+        "webhook",
+        "Accurate Online",
+        "GMV Max",
+        "sinkronisasi order",
+        "ads report"
+      ]
     },
     {
       "path": "Core System and Modules/Microservices - Inventory Service.md",
@@ -2742,8 +2753,19 @@
       ],
       "hash": "6fba6a87f46dc9d0e5d3a241a4bf8c23074dc28b015b742fdb54b546b19d535d",
       "ukuran_kb": 7.0,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: kenapa satu dokumen Retur Penjualan merekap semua retur yang berbagi faktur sumber dan tanggal retur, bagaimana group key dibentuk, dan kenapa retur lintas faktur mustahil digabung karena Accurate hanya punya satu invoiceNumber di header. Juga menjelaskan mekanisme rebuild (hapus dokumen lama lalu book ulang, bukan edit in-place), guard anti-dobel by-member, sanity check over-retur per grup, dan tiga cara kunci grup jadi basi yang berujung dokumen retur ganda. Berguna saat menyelidiki dokumen RTR kembar atau menanyakan granularitas rekap retur.",
+      "kata_kunci": [
+        "retur penjualan",
+        "sales return",
+        "grouping",
+        "dedupe_key",
+        "faktur",
+        "invoice",
+        "Accurate",
+        "RTR",
+        "dokumen kembar",
+        "rebuild"
+      ]
     },
     {
       "path": "Decisions/ADR - 0017 Tanggal Retur TikTok via order_update_date.md",
@@ -2988,8 +3010,19 @@
       ],
       "hash": "778f7fbc19380deb21070aa5276d98c5d6d38baddffda84a84509feec9ee615d",
       "ukuran_kb": 19.0,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: kapan sebuah retur marketplace dibukukan sebagai Retur Penjualan dan kapan cukup diserap Auto Sync Income, lewat gerbang payout (payout mendekati nol berarti book, payout di atas nol berarti skip, income belum settle berarti defer). Juga menjelaskan kenapa refund Shopee sebenarnya penyesuaian escrow/income dan bukan dokumen retur, bagaimana tanggal retur ditentukan per-solution (cancelled_at, order_update_date TikTok, requested_at untuk refund-only, arrival reverse-tracking untuk barang balik), serta kenapa cutover retur memakai hari kirim yang mengikuti era faktur. Dipakai saat menelusuri dobel-booking revenue, retur yang tak muncul di UI, atau tanggal retur yang tidak cocok dengan Shopee.",
+      "kata_kunci": [
+        "retur",
+        "return",
+        "payout",
+        "escrow",
+        "Shopee",
+        "income",
+        "receipt",
+        "tanggal retur",
+        "cutover",
+        "dobel booking"
+      ]
     },
     {
       "path": "Decisions/ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput.md",
@@ -3015,8 +3048,19 @@
       ],
       "hash": "150340bdd81f766efdea8928aaf971bbb859f369472ead77662e6f7913aa680d",
       "ukuran_kb": 20.5,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi dua sub-tab (data SUMBER vs INPUT gudang), menu mana saja yang kena pemecahan itu, dan kenapa badge sudah/belum dicatat hanya dipasang di tab yang punya kunci join. Juga menjelaskan agregasi tab Keluar FG per SKU dengan pemecahan bundle ke komponen, status resi mana yang dihitung sebagai keluar gudang (COMPLETED plus SHIPPED, TO_SHIP dikecualikan), gerbang gudang untuk retur barang balik, dan kenapa nama penginput created_by_name distempel server dari header BIP-Username alih-alih dikirim client. Berguna untuk pertanyaan soal rekonsiliasi stok gudang vs marketplace dan jejak akuntabilitas input WMS.",
+      "kata_kunci": [
+        "WMS",
+        "warehouse",
+        "gudang",
+        "log sumber",
+        "input gudang",
+        "Keluar FG",
+        "Inbound RM",
+        "resi",
+        "created_by_name",
+        "audit trail"
+      ]
     },
     {
       "path": "Decisions/ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri).md",
@@ -3547,8 +3591,19 @@
       ],
       "hash": "5f97e80afe142e8d04ef86571432153b7c9e475a4c4aea5adfc764abf33d900d",
       "ukuran_kb": 9.0,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana retur SKU paket/bundle dibukukan ke Accurate, yaitu memakai baris INDUK faktur berharga paket sehingga nilai uang mengikuti harga faktur sementara stok tetap turun per komponen. Juga menjelaskan akar over-reversal (satu paket dihargai dua aturan sekaligus karena konteks paket hilang di buildWarehouseDetailItems), aturan alokasi proporsional untuk retur sebagian, bobot all-or-nothing, dan pelajaran remediasi data seperti audit wajib per-bundle, batas 8 request per detik Accurate, serta dampak naiknya pendapatan yang harus disampaikan ke finance. Cocok dicari saat menelusuri nilai retur bundle yang melebihi harga jualnya.",
+      "kata_kunci": [
+        "retur paket",
+        "bundle",
+        "baris induk",
+        "itemType GROUP",
+        "over-reversal",
+        "alokasi proporsional",
+        "returnfix",
+        "Accurate",
+        "faktur",
+        "stok"
+      ]
     },
     {
       "path": "DEVELOPER GUIDE.md",
@@ -7034,25 +7089,26 @@
         "External - Desty",
         "Microservices - Warehouse Service",
         "Microservices - Integration Service",
+        "Microservices - Form Builder Service",
+        "Microservices - Notification Service",
+        "HRIS - Kaizen (Ide Perbaikan)",
         "RUN - Deploy Task Management Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "e050fdbedf0f1c8f722c81edb13dacd89b2b0e72fa64068811e4bdf6d20b5679",
-      "ukuran_kb": 4.7,
-      "ringkasan": "Menjawab: bagaimana men-deploy ulang satu microservice bip-erp ke produksi dengan aman - perintah `docker compose up -d --build <service> --no-deps`, kenapa `--no-deps` wajib di jam rawan (batasi blast radius, jangan recreate MongoDB dependensi) dan kapan justru tak boleh dipakai. Menjelaskan urutan aman antar-service saling bergantung (deploy penyedia API dulu), fitur dorman di balik feature flag (AUTO_ARRANGE_ENABLED default off), verifikasi pasca-deploy via log/health, dan tabel troubleshooting gejala-akar-fix.",
+      "hash": "d6e3ecd9953f78035502e5e5f7cbbf1b1628625dfd5007f4d84a79f6ba970258",
+      "ukuran_kb": 7.3,
+      "ringkasan": "Menjawab: bagaimana cara men-deploy ulang satu microservice bip-erp ke produksi tanpa menyentuh dependensinya, kenapa flag --no-deps wajib saat jam rawan banyak order, dan kapan flag itu justru tidak boleh dipakai. Juga memuat urutan aman deploy antar-service yang saling bergantung, kewajiban ikut me-rebuild notification-service saat kategori inbox di shared-library bertambah (kegagalan senyap tanpa error), feature flag dorman seperti AUTO_ARRANGE_ENABLED, langkah verifikasi pasca-deploy lewat docker logs dan health, plus tabel troubleshooting gejala ke akar ke fix.",
       "kata_kunci": [
         "deploy",
-        "microservice",
         "docker compose",
         "--no-deps",
-        "runbook",
+        "microservice",
+        "bip-erp",
         "produksi",
-        "warehouse-service",
-        "integration-service",
+        "shared-library",
+        "notification-service",
         "feature flag",
-        "AUTO_ARRANGE_ENABLED",
-        "rollout",
-        "jam rawan"
+        "troubleshooting"
       ]
     },
     {
@@ -8973,11 +9029,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Core System and Modules/Microservices - Integration Service.md",
-    "Decisions/ADR - 0016 Retur Grouped per Faktur + Tanggal Retur.md",
-    "Decisions/ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution.md",
-    "Decisions/ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput.md",
-    "Decisions/ADR - 0040 Retur Paket Utuh via Baris Induk Faktur.md"
-  ]
+  "gagal": []
 }
