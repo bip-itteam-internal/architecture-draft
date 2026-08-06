@@ -354,6 +354,20 @@ Entitas **milik ERP** (koleksi `pesanan_erp`), TERPISAH dari cermin `pesanan_pem
 
 > **Approval PO = jabatan**, bukan izin modul (beda dari Permintaan yang per-departemen supervisi). `PosisiApproverPO` = "Direktur" ("Pak Widi"), dicocokkan case-insensitive dengan `BIP-Position`. Ubah bersama padanan FE `POSISI_APPROVER_PO`.
 
+## Penerimaan Barang ERP — create + Ambil Pesanan (✅ Diimplementasikan 2026-08-06)
+
+Entitas **milik ERP** (koleksi `penerimaan_erp`), melengkapi rantai PR→PO→RI. TERPISAH dari cermin `penerimaan`. Prefix `/penerimaan-erp`. **Tanpa persetujuan.**
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/penerimaan-erp` | Daftar berpaginasi. Query: `status`, `vendor_no`, `cari` (number+no_terima+keterangan), `dari`/`sampai`, `page`, `limit`. Role `akses`. |
+| POST | `/penerimaan-erp` | Buat penerimaan. Body: `vendor_no` (wajib), `no_terima` (wajib), `trans_date` (kedatangan), `rincian[]` (`nama_barang`/`kuantitas`/`satuan`/`gudang` wajib; `departemen`/`proyek`/`keterangan`/`no_permintaan`/`no_pesanan` opsional), Info lainnya header, `number?`. Server set status `diterima`. Role `tulisPO`. `409` No Form bentrok. |
+| GET | `/penerimaan-erp/:id` | Detail. Role `akses`. |
+| GET | `/penerimaan-erp/usul-nomor` | Usulan No Form `RI.<YYYY>.<MM>.<NNNNN>` (reset per bulan). Role `akses`. |
+| GET | `/penerimaan-erp/pesanan-disetujui` | Pesanan pembelian yang SUDAH disetujui (untuk "Ambil → Pesanan"). Role `akses`. |
+
+> **No Terima ≠ No Form.** No Form (`number`) di-generate sistem & unik; No Terima (`no_terima`) nomor surat jalan pemasok yang **diketik manual** gudang/QC, wajib tapi tak dijamin unik. Gudang **wajib** per baris.
+
 ## Belum Diimplementasikan / Catatan
 
 - Tidak ada endpoint **hapus pemasok** maupun **hapus barang** — penghapusan master dilakukan finance/procurement di Accurate.
