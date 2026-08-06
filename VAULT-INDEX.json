@@ -1331,7 +1331,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, serta **monitoring**. **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) sudah berkatalog + bergerbang tapi **belum merge**. Modul lain masih bertumpu pada `system_roles` tier.",
+      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, serta **monitoring**. **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) sudah berkatalog + bergerbang tapi **belum merge dan belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -1363,20 +1363,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "535f5c11c81d4fcf0d93b3a8495f24b2549cc31924f9c87e476da21177d4c9d6",
-      "ukuran_kb": 22.2,
-      "ringkasan": "Menjawab: bagaimana hak akses lintas bip-erp disusun atas tiga sumbu (modul, tingkat aksi view/work/approve/manage, cakupan own/division/all), bagaimana paket hak menempel pada posisi/jabatan lalu dirakit jadi klaim JWT `permissions` saat login, dan bagaimana gateway mencegah klaim itu dipalsukan klien. Juga menjawab: modul mana yang sudah punya katalog dan benar-benar ditegakkan versus yang masih bertumpu tier `system_roles`, berapa rute per service yang masih tanpa gerbang, serta beda tiga mekanisme yang menyentuh sidebar dan gampang tertukar (`permission_sets`, `menu_hidden`, modul `menu`).",
+      "hash": "171be79a18a3741159c2eb49f99511e5d45513d9bcd755c980f1e1411bd53326",
+      "ukuran_kb": 22.6,
+      "ringkasan": "Menjawab: bagaimana hak akses di bip-erp disusun dari tiga sumbu (modul, tingkat aksi view/work/approve/manage, dan cakupan own/division/all), bagaimana paket permission-set menempel pada posisi lalu diresolusi jadi klaim JWT saat login, dan endpoint mana yang dipakai untuk mengelola katalog, paket, serta assignment-nya. Juga menjawab modul mana yang sudah menegakkan izin per-aksi dan mana yang masih bertumpu pada tier system_roles, berapa rute user-facing yang masih tanpa middleware per service, serta gap yang masih terbuka (katalog modul yang belum ditulis, gate posisi hardcoded, finance tanpa gerbang endpoint). Sekaligus tempat membedakan tiga mekanisme yang mudah tertukar: permission_sets (hak akses), menu_hidden (tampilan sidebar per jabatan), dan modul menu (menu terbatas per akun).",
       "kata_kunci": [
         "RBAC",
         "permission set",
         "hak akses",
+        "permission catalog",
+        "reach",
+        "cakupan data",
+        "posisi",
+        "klaim JWT permissions",
         "system_roles",
-        "reach cakupan",
-        "katalog permission",
-        "menu_hidden",
-        "menu terbatas",
-        "posisi jabatan",
-        "gerbang endpoint"
+        "menu_hidden"
       ]
     },
     {
@@ -3492,7 +3492,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Kode selesai di branch `feat/oneForAll` (2026-08-06), seluruh uji hijau — **belum merge dan belum deploy**, jadi belum ada satu pun akun yang di-assign. Catatan yang belum tertutup: satu celah pada akun tanpa paket (belum terukur di produksi) dan penegakan backend yang sengaja parsial; keduanya di §Consequences.",
+      "status_teks": "Implemented (ada catatan) — **belum berfungsi sebagaimana dimaksud.** Kode selesai di branch `feat/oneForAll` (2026-08-06), seluruh uji hijau, **belum merge dan belum deploy**. Aman dipasang (tak ada yang kehilangan akses), tetapi **mengaktifkannya belum benar-benar membatasi**: celah \"akun tanpa paket\" yang semula diduga kosong kini **terbukti tidak kosong** (bukti 2026-08-06 di §Consequences), sehingga akun finance/IT tanpa permission-set tetap bisa membuka halaman walau restriksi menyala. Prasyarat agar berfungsi: perbaiki fallback task-management lebih dulu. Penegakan backend juga sengaja parsial.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -3504,20 +3504,20 @@
         "APP - Web ERP",
         "API - Integration Service"
       ],
-      "hash": "38d198885b0f560096fde618afb1360fb8178b24ee93f5449b6413d4f412f313",
-      "ukuran_kb": 9.3,
-      "ringkasan": "Menjawab: bagaimana sebuah menu (kasus pertama: Laporan Keuangan `/finance/accounting`) dibatasi ke akun tertentu tanpa memadamkannya bagi semua orang saat deploy — pola \"default terbuka, mengunci begitu ada ≥1 assignment\" lewat modul `menu` berdiri sendiri, satu izin + satu paket per menu, dan penanda global `$menulock.<kunci>` yang ditempel employee-service saat token terbit. Juga menjawab: mengapa penandanya sengaja di luar namespace `menu.`, mengapa ia hanya menumpang klaim yang sudah tak kosong (agar hak tiket karyawan tak lenyap senyap), mengapa gerbang backend hanya dipasang di `/accounting/balance-sheet` sehingga ini kontrol menu bukan segel data, dan apa bedanya dari `menu_hidden`.",
+      "hash": "9d117ccec1b7f2fdf4e22d4861ecd566d70bb88fde8d9b381ff80250326fddbf",
+      "ukuran_kb": 11.3,
+      "ringkasan": "Menjawab: mengapa pembatasan halaman Laporan Keuangan (/finance/accounting) dipilih berbentuk \"default terbuka, mengunci begitu ada yang di-assign\" alih-alih izin deny-by-default, dan mengapa modul menu berdiri sendiri dengan satu izin plus satu paket per menu (menu.finance.laporan). Menerangkan cara kerja penanda kunci $menulock.<kunci> yang ditempelkan employee-service saat token terbit, aturan tiga langkah common.HasMenuAccess (punya izin lalu punya penanda lalu fallback lama), dan mengapa prefiksnya sengaja di luar namespace menu. Juga menjawab batas nyata mekanisme ini: mengapa hanya /accounting/balance-sheet yang digerbang sementara profit-loss dan account-balance dibiarkan terbuka, mengapa akun tanpa permission-set masih lolos lewat fallback, dan perubahan apa pada effectiveTicketPermissions di task-management yang jadi prasyarat sebelum restriksi ini benar-benar menutup akses.",
       "kata_kunci": [
         "menu terbatas",
         "restricted menu",
-        "menulock",
-        "modul menu",
-        "laporan keuangan",
-        "balance-sheet",
+        "$menulock",
+        "menu.finance.laporan",
+        "Laporan Keuangan",
+        "accounting balance sheet",
         "default terbuka",
-        "permission set",
-        "klaim JWT",
-        "RBAC"
+        "deny-by-default",
+        "fallback",
+        "HasMenuAccess"
       ]
     },
     {
