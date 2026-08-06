@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-06",
+  "digenerate": "2026-08-07",
   "jumlah_dokumen": 274,
   "dokumen": [
     {
@@ -98,22 +98,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "9b18c2057fbcc0ea29dd25224cfe96e7905e6df37bb2fe37553750206a3dc90a",
+      "hash": "189c3ce04668c8908fadec0ef82c5c3e1d8e284bc8cb737b76d06edd6c66bf47",
       "ukuran_kb": 20.1,
-      "ringkasan": "Menjawab pertanyaan seputar endpoint employee-service: cara login/auth (termasuk PIN dan biometrik), CRUD data personal & pekerjaan karyawan, kelola akun sistem (aktif/nonaktif/reset/revoke device), CRUD master departemen & system role, serta pengelolaan akun pihak luar (vendor/mitra) beserta hak aksesnya.",
+      "ringkasan": "Menjawab pertanyaan seputar endpoint employee-service: cara login/registrasi karyawan, CRUD data pribadi/kerja/dokumen, pengelolaan master data departemen & system role, serta bagaimana akun pihak luar (vendor/mitra) diterbitkan dan diberi hak akses. Juga menjawab endpoint mana yang digerbang RBAC apa (HR, IT, atau internal) dan bagaimana status aktif/nonaktif karyawan (resign) ditangani.",
       "kata_kunci": [
         "employee-service",
-        "auth",
+        "API",
+        "endpoint",
         "login",
-        "onboarding",
+        "auth",
+        "RBAC",
         "master data",
         "departemen",
         "system role",
-        "akun eksternal",
-        "vendor",
-        "RBAC",
-        "resign",
-        "KPI"
+        "akun eksternal vendor"
       ]
     },
     {
@@ -1097,20 +1095,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "779d119df4680abe1c7a80f165d9f0b0bc444e9f37e433c8a8eabfcc2e42e837",
+      "hash": "a9a774482e201a9f8e76817d553ac3d1087f0f0d4dc781fe40182cc54697a492",
       "ukuran_kb": 124.7,
-      "ringkasan": "Menjawab pertanyaan tentang arsitektur frontend ERP (hris-dashboard / One Bharata): stack yang dipakai, mekanisme login & peran sebagai SSO Identity Provider untuk aplikasi lain, cara role dan sidebar menu diatur per posisi/departemen, serta fitur multi-perusahaan seperti kelola perusahaan dan pemilih perusahaan (company switcher).",
+      "ringkasan": "Menjawab pertanyaan tentang arsitektur frontend hris-dashboard (\"One Bharata\"): stack teknologi yang dipakai, cara kerja autentikasi & SSO, bagaimana role dan menu sidebar diatur per departemen/posisi, dan fitur multi-perusahaan apa saja yang sudah tersedia. Juga menjelaskan fitur yang sedang dikembangkan (belum merge) seperti pengaturan tampilan menu per posisi dan menu KPI untuk Leader.",
       "kata_kunci": [
         "erp-frontend",
         "hris-dashboard",
         "One Bharata",
+        "Next.js",
         "SSO",
-        "role",
+        "RBAC",
         "sidebar menu",
         "multi-perusahaan",
-        "company switcher",
-        "system_roles",
-        "RBAC menu"
+        "i18n",
+        "role"
       ]
     },
     {
@@ -1649,22 +1647,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "6bb87d56ee8ed4b5eddd33f5716bbea4d3171222278039d2378b3c7bde1fdd20",
+      "hash": "0bf01fb17dc7dfd1d4a6ceebe9d5f5824efd04c977d7ea9fdf0c8b7485ff2a5b",
       "ukuran_kb": 50.7,
-      "ringkasan": "Menjawab pertanyaan tentang employee-service sebagai source of truth autentikasi & data karyawan: fitur login/registrasi/SSO, pengelolaan akun (aktif/nonaktif/reset/revoke device), master departemen & system role, serta workspace tambahan (Legal, R&D Regulatory, Quality, Procurement) yang dihosting di service ini.",
+      "ringkasan": "Menjawab pertanyaan tentang arsitektur backend employee-service: endpoint apa saja yang sudah diimplementasikan (auth, master data, akun eksternal, workspace Legal/R&D/Quality/Procurement), stack teknologi, dan status tiap fitur (live, pending runtime, atau TBD). Juga menjelaskan kenapa beberapa workspace posisi di-host di service ini alih-alih membuat service baru.",
       "kata_kunci": [
         "employee-service",
-        "autentikasi",
-        "SSO",
+        "microservice",
+        "Go Fiber",
+        "MongoDB",
+        "auth",
         "master data",
-        "departemen",
-        "system role",
-        "akun karyawan",
         "legal",
-        "R&D regulatory",
+        "R&D",
         "quality",
-        "procurement",
-        "KPI"
+        "procurement"
       ]
     },
     {
@@ -5162,19 +5158,19 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "3d2ca156ba93ed3b6d82c09ac0512e29ac971d42a0a8a24a48ec7f7dfb79d13d",
-      "ukuran_kb": 42.3,
-      "ringkasan": "Menjawab pertanyaan tentang kelayakan dan status otomasi skor KPI: metrik mana yang sudah menyala otomatis di produksi, bagaimana cakupan data memengaruhi status otomatis/semi/manual, dan rencana layar diagnostik Otomasi KPI untuk memantau metrik yang macet.",
+      "hash": "fe30c40ad980190074f03557eb09639661b5be106e257c34326ad554f9099672",
+      "ukuran_kb": 43.7,
+      "ringkasan": "Menjawab pertanyaan tentang kelayakan mengisi skor KPI secara otomatis: metrik mana yang sudah punya sumber data, mana yang modulnya ada tapi belum dipakai, dan mana yang sama sekali tidak punya sumber. Juga menjelaskan metrik otomatis mana yang sudah benar-benar menyala di produksi, bagaimana hasilnya diverifikasi, dan bagaimana halaman diagnostik Otomasi KPI menampilkan status tiap metrik.",
       "kata_kunci": [
-        "otomasi KPI",
-        "auto_value",
-        "kpi_score",
+        "KPI",
+        "skor otomatis",
+        "auto-value",
         "kpi_template",
-        "skor tim",
-        "uptime_sistem",
-        "layar diagnostik",
-        "cakupan data",
-        "semi-otomatis"
+        "kpi_score",
+        "otomasi KPI",
+        "uptime",
+        "dashboard KPI",
+        "diagnostik"
       ]
     },
     {
@@ -7189,20 +7185,19 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "10eef57f049aa21745b11f5382a2ebacdd0059cdf708aa0ec24e809bbab80ee9",
-      "ukuran_kb": 26.0,
-      "ringkasan": "Menjawab pertanyaan langkah demi langkah bagi dev departemen untuk menambahkan metrik KPI yang terisi otomatis: cara mendaftarkan sumber data, contoh sumber yang sudah dipakai (skor_tim, uptime_sistem, kaizen, kinerja_toko, kinerja_tiket), dan alasan nilai dihitung ulang saat dibuka alih-alih diakumulasi harian.",
+      "hash": "4849ff158f5cc7b45bfedd06b704b4fe4aa05cc6fdb51e76752ae330972831a6",
+      "ukuran_kb": 25.9,
+      "ringkasan": "Menjawab pertanyaan \"bagaimana cara dev departemen menambahkan satu metrik KPI otomatis baru\" tanpa menyentuh aturan penilaian dan tanpa bertabrakan dengan dev departemen lain. Menjelaskan model mental perhitungan (sumber -> reduksi -> arah target), kenapa dihitung ulang bukan diakumulasi harian, dan langkah konkret mendaftarkan sumber data baru beserta contoh yang sudah terpasang di produksi.",
       "kata_kunci": [
-        "KPI otomatis",
+        "KPI",
+        "metrik otomatis",
         "runbook",
-        "sumber KPI",
-        "KPIAutoConfig",
-        "auto_value",
+        "kpi_template",
+        "sumber data",
         "reduksi",
         "target",
-        "kpi_score",
-        "kpi_template",
-        "cakupan"
+        "auto_basis",
+        "panduan implementasi"
       ]
     },
     {
@@ -7658,24 +7653,24 @@
         "Microservices - Insentive Service",
         "APP - Web ERP",
         "Sales - ICC Account Manager Mapping",
-        "Microservices - Employee Service",
         "Sales - Incentive",
         "Microservices - Integration Service",
+        "Microservices - Employee Service",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "4e20f2b2adc2dd48f2b08312c7e7f6ee54caf5eddaeeb4db8cca43053cd54572",
-      "ukuran_kb": 22.8,
-      "ringkasan": "Menjawab pertanyaan tentang pengelolaan daftar username TikTok affiliate milik ICC: kondisi implementasi lama yang hardcode di frontend, opsi arsitektur penggantinya, serta keputusan desain terbaru (2026-08-06) untuk dikelola lewat ICC Management alih-alih disinkronkan dari Employee Service.",
+      "hash": "837da112933a3cdd235834626fb7cd0e4dc32a6a8e7548ca1e272b92c132b462",
+      "ukuran_kb": 25.1,
+      "ringkasan": "Menjawab pertanyaan tentang bagaimana daftar akun TikTok affiliate milik ICC (Internal Content Creator) dikelola: kondisi saat ini yang masih hardcoded di frontend, opsi arsitektur yang dipertimbangkan (integrasi ke Employee Service vs koleksi terpisah), dan keputusan desain terbaru untuk mengelolanya lewat ICC Management. Juga menjelaskan masalah pendekatan hardcode dan rencana implementasi bertahap yang sudah direvisi.",
       "kata_kunci": [
         "ICC",
-        "affiliate",
-        "TikTok",
-        "internal creator",
+        "Internal Content Creator",
+        "TikTok affiliate",
+        "marketing insight",
         "hardcoded",
-        "icc_creators",
+        "Integration Service",
+        "Employee Service",
         "ICC Management",
-        "mapping username",
-        "insentif"
+        "GMV"
       ]
     },
     {
