@@ -1,4 +1,4 @@
-**Status**: 🟡 Diputuskan 2026-08-06, **kode selesai tapi BELUM merge dan BELUM deploy** — branch `feat/task-space-admin` di bip-erp dan erp-frontend. Uji lewat gateway (syarat "sekali dijalankan sungguhan") **belum dilakukan**; sampai itu terjadi, dokumen ini menyatakan keputusan, bukan keadaan produksi.
+**Status**: ⚠️ Diputuskan 2026-08-06 dan **kodenya MERGED ke `main` hari yang sama, pukul 10:14 WIB**: bip-erp PR [#1027](https://github.com/bip-itteam-internal/bip-erp/pull/1027) (merge commit `e4798f61`) dan erp-frontend PR [#818](https://github.com/bip-itteam-internal/erp-frontend/pull/818). Branch `feat/task-space-admin` sudah tidak ada di kedua repo. **Uji lewat gateway (syarat "sekali dijalankan sungguhan") masih BELUM dilakukan**, di dev maupun prod, dan prod belum di-deploy. Sampai uji itu terjadi, dokumen ini menyatakan keputusan yang sudah terpasang di `main`, bukan keadaan produksi.
 
 ## Context
 

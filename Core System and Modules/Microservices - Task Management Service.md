@@ -8,7 +8,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB + WebSocket + file-service (MinIO via [[Microservices - File Service]])
 - **Path:** `services/task-management`
-- **Status**: ⚠️ Implemented, **sudah di `main`** (diperiksa langsung ke `origin/main` 2026-08-05; catatan lama "branch `feat/task-management-parity` belum merge" sudah tidak berlaku dan branch-nya tak ada lagi). Catatan: **WebSocket butuh rute ingress** (gateway tak proxy WS), **push FCM/inbox ke notification-service ditunda** (WS-only), **role hanya `supervisor`/`staff`** (admin lintas-divisi tidak diaktifkan). Pertanyaan per tipe (`SpaceType.Fields`) ✅ **LIVE di dev & prod** dan sudah terisi untuk seluruh tipe Tech Development — lihat bagiannya di bawah.
+- **Status**: ⚠️ Implemented, **sudah di `main`** (diperiksa langsung ke `origin/main` 2026-08-05; catatan lama "branch `feat/task-management-parity` belum merge" sudah tidak berlaku dan branch-nya tak ada lagi). Catatan: **WebSocket butuh rute ingress** (gateway tak proxy WS), **push FCM/inbox ke notification-service ditunda** (WS-only), **role hanya `supervisor`/`staff`** (admin lintas-divisi tidak diaktifkan). Pertanyaan per tipe (`SpaceType.Fields`) ✅ **LIVE di dev & prod** dan sudah terisi untuk seluruh tipe Tech Development — lihat bagiannya di bawah. **Admin space** ✅ MERGED ke `main` 2026-08-06 (PR #1027 + FE #818), tapi **belum diuji lewat gateway** dan prod belum di-deploy.
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
@@ -34,12 +34,12 @@ Supervisor yang membawahi **lebih dari satu departemen** melihat dan menindak ti
 - Config **automation** per-space (diterima `createSpace`/`updateSpace`): `auto_assign` (bool), `auto_close_days` (int, `0`=nonaktif) — lihat **### Automation**.
 - **Tipe permintaan per-space ✅** `Space.Types []SpaceType` (`{id,name,description,color}`), diterima `createSpace`/`updateSpace` lewat field `types`. Lihat **### Tipe permintaan**.
 - **Visibility ✅** `Space.Visibility` (`public` bawaan / `restricted`) + `AllowedDivisions` + `AllowedEmployees`. Lihat **### Kontrol akses space**.
-- **Admin space 🟡** `Space.Admins []string` (employee_id) — orang yang ditunjuk memegang space itu. Lihat **### Admin space**.
-- `GET /spaces/my-roles` 🟡 — `{admin_space_ids:[...]}` untuk pemanggil; dipakai klien memutuskan menu/tab. Didaftarkan **sebelum** `/spaces/:id`.
+- **Admin space ✅** `Space.Admins []string` (employee_id) — orang yang ditunjuk memegang space itu. Lihat **### Admin space**.
+- `GET /spaces/my-roles` ✅ — `{admin_space_ids:[...]}` untuk pemanggil; dipakai klien memutuskan menu/tab. Didaftarkan **sebelum** `/spaces/:id`.
 
-### Admin space 🟡
+### Admin space ✅
 
-> Status: **kode selesai di branch `feat/task-space-admin`, BELUM merge dan BELUM deploy** (2026-08-06). Diverifikasi lewat HTTP di lingkungan lokal (service + Mongo lokal, header identitas dipasang seperti gateway): 20 pemeriksaan lolos, termasuk approve oleh admin space bertier staf, penolakan supervisor divisi lain, dan pencabutan yang berlaku seketika. **Belum** dijalankan lewat gateway dev/prod. Keputusannya di [[ADR - 0038 Hak Per-Objek Admin Space Task Management]].
+> Status: **MERGED ke `main` 2026-08-06 pukul 10:14 WIB** (PR [#1027](https://github.com/bip-itteam-internal/bip-erp/pull/1027), merge commit `e4798f61`; FE menyusul di PR erp-frontend [#818](https://github.com/bip-itteam-internal/erp-frontend/pull/818)). Branch `feat/task-space-admin` sudah tidak ada. Diverifikasi lewat HTTP di lingkungan lokal (service + Mongo lokal, header identitas dipasang seperti gateway): 20 pemeriksaan lolos, termasuk approve oleh admin space bertier staf, penolakan supervisor divisi lain, dan pencabutan yang berlaku seketika. ⚠️ **Masih belum dijalankan lewat gateway dev maupun prod**, dan prod belum di-deploy. Keputusannya di [[ADR - 0038 Hak Per-Objek Admin Space Task Management]].
 
 Menjawab kalimat yang tak bisa dinyatakan model divisi: *"orang ini yang menerima permintaan di space ini"*. Wewenangnya **menempel pada objek**, bukan pada posisi seperti [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].
 
@@ -87,7 +87,7 @@ Menjawab keluhan bahwa permintaan yang masuk ke Tech Development tak jelas isiny
 Space bisa disetel terbuka untuk semua karyawan (`public`, bawaan) atau dibatasi ke departemen/orang tertentu (`restricted`).
 
 - `canAccessSpace(id, sp)` digerbang di **tiga tempat**: `GET /spaces` (menyaring daftar), `GET /spaces/:id` (403), dan `POST /tasks` (403). Menyaring daftar saja tidak cukup — gateway meneruskan permintaan apa adanya, jadi siapa pun bisa mengirim `space_id` langsung ke endpoint create (lihat [[CORE - API Master Gateway]]).
-- **Tim pemilik tak pernah terkunci**: supervisor divisi space, admin, **admin space** (🟡, lihat bagiannya), dan anggota space (`members`) selalu lolos lebih dulu. Tanpa itu salah isi daftar izin membuat space jadi yatim dan tak bisa diperbaiki siapa pun.
+- **Tim pemilik tak pernah terkunci**: supervisor divisi space, admin, **admin space** (lihat bagiannya), dan anggota space (`members`) selalu lolos lebih dulu. Tanpa itu salah isi daftar izin membuat space jadi yatim dan tak bisa diperbaiki siapa pun.
 - Nilai `visibility` asing **ditolak saat menulis** (`normalizeVisibility`). Bila boleh tersimpan, pembacaan akan menganggapnya publik dan space yang dikira terbatas diam-diam terbuka.
 - ⚠️ Space lama tak punya field ini di Mongo, sehingga API mengirim `"visibility": ""` (string kosong, **bukan** null). Klien wajib memperlakukan kosong sebagai `public`; `?? "public"` di TypeScript **tidak cukup** karena hanya menangkap null/undefined.
 - Gerbang ini mengatur **siapa boleh mengajukan**, bukan visibilitas tiket yang sudah dibuat.
@@ -129,14 +129,20 @@ Konfigurasi **per-space** (`Space.auto_assign` bool, `auto_close_days` int `0`=n
 - Scheduler eskalasi (`sla_scheduler.go`): goroutine per jam, mengirim notifikasi **breach sekali** per task (ditandai array `sla_notified`): response breach → **supervisor divisi**; resolution breach → **assignee + supervisor**. (Warning hanya untuk badge, belum dieskalasi via notifikasi.)
 
 ### Reports / Dashboard
-Semua reuse `reportBaseFilter` (scope: supervisor→space divisinya, admin→semua, staff→task sendiri) + `parseReportRange` (default 30 hari; `start_date`/`end_date`). Dikonsumsi halaman **Laporan Tim** supervisor di [[APP - Web ERP]].
+Semua reuse `reportBaseFilter` + `parseReportRange` (default 30 hari; `start_date`/`end_date`). Dikonsumsi halaman **Laporan Tim** supervisor di [[APP - Web ERP]]. Seluruh rutenya digerbang `reportGate = gateOrSpaceAdmin(PermTicketReportTeam, "supervisor", "admin")`.
+
+**Cakupannya satu aturan, dipakai dua tempat** (`scopeSpaceLaporan` + `terapkanScopeLaporan`): admin→semua divisi; supervisor→space divisinya **ditambah** space yang ia pegang sebagai admin space; admin space bertier staf→space yang ia pegang **ditambah** tugasnya sendiri; sisanya→task yang di-assign ke dirinya. Aturan itu sengaja dipisah ke fungsi tersendiri karena `reportCSAT` punya rentang tanggalnya sendiri (`csat.rated_at`) sehingga tak bisa memakai `reportBaseFilter` apa adanya; sebelumnya keduanya menyimpan salinan aturan masing-masing, dan salinan itulah yang membuat kartu CSAT menampilkan angka pribadi sementara kartu lain menampilkan angka tim (diperbaiki di commit `1e4635ee`).
+
+> ⚠️ **Pemanggil `terapkanScopeLaporan` tak boleh sudah mengisi `$and`**; kunci itu dipakai cabang admin space. `$or` di akar aman, dan justru karena itu cabang terakhir memakai `$and`: `reportBaseFilter` sudah memakai `$or` untuk aturan arsip, dan menimpanya akan menyeret tiket arsip ikut terhitung.
+
+- **Tidak ada penyaring per space.** Rute laporan hanya menerima `start_date`/`end_date`; tak ada parameter `space_id`. Konsekuensinya angka SLA dan CSAT selalu gabungan seluruh space dalam cakupan pemanggil, dan tim yang satu divisinya memegang beberapa desk (mis. IT Support dan Software Development) tak bisa memisahkan angkanya dari layar. Rincian per space yang tersedia cuma `summary-by-department` (total/open/done), tanpa SLA maupun CSAT.
 - `GET /tasks/stats` — statistik status task (scope role). `GET /tasks/admin-stats` — status divisi supervisor **FLAT**, kini + `reopened` & `reopen_rate` (persen 0–100, `reopened/total`).
 - `GET /report/summary-by-department` — ringkasan per space × status.
 - `GET /report/timeline` — timeline harian (total + per status).
 - `GET /report/manpower-performance` — performa per anggota: `total`, `done`, kini + `avg_response_hours`, `avg_resolution_hours` (rata-rata jam atas task yang punya `responded_at`/`completed_at`), `reopened` (jumlah task `reopen_count>0`). Agregasi in-memory via `accumulateManpower` (pure, tertes).
 - `GET /report/sla` — rate on-time response & resolution (overall + per divisi, dengan rentang tanggal).
 - `GET /report/sla-breaches` — **daftar tiket yang lewat SLA** (bukan agregat): reuse `computeSLA` → satu baris per dimensi `breached` (response/resolution), tiket `on_hold` (state `held`) tak dihitung; field `{ticket_id,keluhan,space_name,assignee_name,priority,breach_type,overdue_hours,status}`. Untuk ditindaklanjuti supervisor.
-- `GET /report/csat` — agregat CSAT **flat** `{average, top2box_pct (bintang 4–5), count, distribution[1..5]}`; rentang tanggal (`csat.rated_at`) + scope role meniru `/report/sla`.
+- `GET /report/csat` — agregat CSAT **flat** `{average, top2box_pct (bintang 4–5), count, distribution[1..5]}`; rentang tanggal atas `csat.rated_at` (bukan `createdAt`) + cakupan yang sama persis dengan laporan lain lewat `terapkanScopeLaporan`. Skalanya **1–5 bintang**; KPI departemen yang menargetkan skor 1–10 perlu konversi eksplisit, lihat [[HRIS - Matriks KPI per Departemen]].
 
 ### Lain-lain
 - **Attachments** — lewat **[[Microservices - File Service]]** (bukan MinIO langsung; prefix object `task/`, key `MINIO_TASK_KEY`), bukan temp-upload (FE create-task-lalu-upload). Endpoint (`attachment_handlers.go`, `fileclient.go`):
@@ -147,14 +153,14 @@ Semua reuse `reportBaseFilter` (scope: supervisor→space divisinya, admin→sem
 - **Comments** & **Checklist** — kolaborasi pada task. **Izin ubah checklist** (tambah/centang/hapus item) di-gate `canHandleTask` = **privileged (admin/supervisor) ATAU assignee**; **pembuat/pemohon TIDAK boleh** (read-only) — beda dari `canEditTask` yang masih memasukkan creator. Checklist **dibuat lewat web** ([[APP - Web ERP]]); mobile ([[APP - MyBharata]]) hanya bisa mencentang.
 - **Notifications** — `GET /notifications` (paginate), `/unread-count`, `PUT /read-all`, `/:id/read`, `DELETE /:id`. Fan-out ke **Mongo + WebSocket live** (`notify.go` → `hub.sendToUser`). **FCM/inbox via notification-service: ditunda (TBD)**.
 - **Users/departments** — dari ERP employee_db (`users_handlers.go`): `GET /users`, `GET /users/byDivision?division=`, `GET /departments` (array string). Join `system_authentication`+`personal_data`+`work_data`.
-- **Audit** — `GET /tasks/:id/history` (array, per task) & `GET /audits` (`{items,total}`, scope divisi supervisor). Audit ditulis di semua mutasi task/comment/checklist/attachment (`audit.go`, `writeAudit`).
+- **Audit** — `GET /tasks/:id/history` (array, per task) & `GET /audits` (`{items,total}`; scope: admin→semua, supervisor→divisinya, admin space→space yang ia pegang). Audit ditulis di semua mutasi task/comment/checklist/attachment (`audit.go`, `writeAudit`), termasuk audit yang menempel pada SPACE (action `space_admins`, ber-`space_id` tanpa `task_id`).
 
 ## Belum Diimplementasikan / Catatan
 
 - **WebSocket butuh rute ingress** `/ws/task-management → service:/ws` (gateway tak proxy WS); tanpa itu realtime mati tapi app tetap jalan via polling REST. Lihat `WEBSOCKET.md`.
 - **Push FCM/inbox via notification-service: TBD** (saat ini WS-only atas keputusan; BE lama punya jalur WA+FCM).
-- **Role admin lintas-divisi tidak diaktifkan** — hanya `supervisor`/`staff` (di-derive dari `system_roles`). Wewenang per-space kini ditempuh lewat **admin space** (🟡, belum merge), bukan dengan menaikkan tier.
-- **Admin space belum dijalankan lewat gateway** (dev maupun prod): verifikasinya baru di lingkungan lokal. Selama itu belum terjadi, fitur ini tidak boleh dianggap hidup.
+- **Role admin lintas-divisi tidak diaktifkan** — hanya `supervisor`/`staff` (di-derive dari `system_roles`). Wewenang per-space ditempuh lewat **admin space**, bukan dengan menaikkan tier.
+- **Admin space sudah MERGED tapi belum dijalankan lewat gateway** (dev maupun prod): verifikasinya baru di lingkungan lokal, dan prod belum di-deploy. Selama uji gateway belum terjadi, fitur ini tidak boleh dianggap hidup.
 - **Belum ada layar "siapa memegang space mana"** lintas space, dan belum ada batas jumlah admin per space (sepuluh admin berarti sepuluh penerima tiap notifikasi permintaan baru).
 - **Deteksi supervisor divisi utk notifikasi** (`findDivisionSupervisors`) memakai `work_data` ERP (flag `is_supervisor`, fallback jabatan regex `Supervisor|^Leader$`), **bukan** `system_roles` (key `system_roles` = kode modul spt "it"/"finance", tak pernah cocok dgn nama departemen). Hanya akun aktif.
 - Notif **"Permintaan baru"** (`NotifTaskRequest`, ke supervisor divisi + admin saat tiket dibuat) menyertakan arahan **buka website ERP** — sebab **approve/reject hanya tersedia di web**; mobile ([[APP - MyBharata]]) belum punya alur approval.
