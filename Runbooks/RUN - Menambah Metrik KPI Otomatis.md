@@ -241,6 +241,10 @@ Apa pun jalurnya, **cetak konfigurasi sebelum dan sesudah**, lalu periksa dua pe
 
 Metrik yang sumbernya sudah berupa persentase (uptime, konversi) memakai `rata_rata` atas satu `Nilai`: realisasinya dipakai apa adanya, lalu dibandingkan dengan target seperti metrik lain.
 
+**Persentase yang menempel di ujung skala tidak bisa diukur dengan rasio.** Uptime produksi bergerak di 99,8–99,9%, dan `realisasi/target` dibatasi 100, jadi metriknya bernilai 100 setiap bulan berapa pun targetnya dinaikkan — target 99,5 pun masih memberi 100, dan target 99,9 memberi 99,9. Metrik berbobot besar yang selalu penuh tidak membedakan bulan baik dari bulan buruk.
+
+Penawarnya bukan menaikkan target, melainkan **membalik besarannya**: ukur yang tersisa (downtime, cacat, keterlambatan) dengan `arah: turun`, dan jadikan targetnya **anggaran** — berapa banyak yang masih dapat diterima. Downtime bergerak dari 0,07% sampai berkali lipat, sehingga dengan anggaran 0,5% (SLA 99,5%) bulan normal tetap 100 sementara downtime 1% jatuh ke 50 dan 2% ke 25. Sumber `uptime_sistem` karena itu menyediakan dua metrik: `uptime` dan `downtime`. Aturan umumnya: **kalau realisasi wajar selalu melampaui target, metriknya salah bentuk, bukan salah angka.**
+
 **`ambang` dan `target` adalah dua hal berbeda.** `ambang` dipakai mencacah, `target` dipakai membandingkan. Metrik ICC membutuhkan keduanya sekaligus: ambang GMV 10.000 per video, target 70% video yang melewatinya.
 
 ### Arah target: bagian yang paling mudah salah
