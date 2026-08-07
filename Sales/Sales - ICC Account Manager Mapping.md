@@ -75,7 +75,9 @@ ICC Employee → {
 }
 ```
 
-**Field `team`** — diisi otomatis dari header `BIP-Department` si pemanggil endpoint `POST /icc/mappings`. Nilainya sama dengan department SPV/Leader yang melakukan assign (mis. `"beautyhacks"`, `"kyura"`). Tidak perlu dipilih manual.
+**Field `team`** — diisi otomatis dari **department KARYAWAN yang di-assign** (`employee_team`, dikirim FE), dengan header `BIP-Department` si pemanggil hanya sebagai cadangan. Tidak perlu dipilih manual.
+
+> ⚠️ **Sampai 2026-08-07 nilainya salah diambil dari department PEMANGGIL.** Karena assign dilakukan akun IT, seluruh 12 mapping aktif di produksi tersimpan sebagai `team="Tech Development"` — padahal tak ada staff ICC di sana. Akibatnya kartu team salah dan SPV pemiliknya tak menemukan datanya (daftarnya disaring `?team=`). Akar penyebab sudah ditutup; baris lama dibetulkan lewat tombol **"Pindahkan ke team karyawan"** di kartu ICC Management, yang membandingkan `team` mapping dengan department karyawan di HRIS.
 
 **Constraints:**
 - `tiktok_shop_id` opsional; jika diisi, harus ada di `tt_shop_authorized_shops`
@@ -95,7 +97,8 @@ ICC Employee → {
 ```
 SPV Marketing (misal BeautyHacks)
   → POST /icc/mappings
-    header: BIP-Department: beautyhacks   ← auto-fill team
+    body: employee_team = department karyawan  ← sumber `team`
+    header: BIP-Department: beautyhacks        ← cadangan saja
     body: {
       employee_id, employee_name,
       tiktok_shop_id,       ← opsional
@@ -185,7 +188,7 @@ Middleware `RequireMarketingLeader` di `shared-library/common/roles.go`:
 | IT Admin (fallback) | `integration` | `supervisor` / `admin` | Lihat semua + assign |
 | Staff ICC | `position=icc` atau `systemRoles.insentive=icc` | — | Hanya endpoint `/me` |
 
-> **Isolasi data per tim (Phase 3)**: SPV Kyura hanya melihat mapping dengan `team="kyura"`; SPV BeautyHacks hanya melihat `team="beautyhacks"`. IT Supervisor tetap super-akses (lihat semua). Field `team` diisi otomatis dari `BIP-Department` header saat Create — SPV tidak bisa isi manual.
+> **Isolasi data per tim (Phase 3)**: SPV Kyura hanya melihat mapping dengan `team="kyura"`; SPV BeautyHacks hanya melihat `team="beautyhacks"`. IT Supervisor tetap super-akses (lihat semua). Field `team` diisi otomatis dari department karyawan saat Create — SPV tidak bisa isi manual.
 
 ---
 
@@ -232,7 +235,7 @@ Buat mapping baru. Dilindungi `RequireMarketingLeader`.
 ```
 
 > `tiktok_shop_id` dan `tiktok_advertiser_id` opsional — minimal salah satu wajib diisi.
-> Field `team` **tidak** ada di request body — diisi otomatis dari `BIP-Department` header si pemanggil.
+> Field `team` **tidak** dipilih manual — diturunkan dari `employee_team` (department karyawan), fallback header `BIP-Department`. `PATCH /icc/mappings/:id` menerima `team` khusus untuk membetulkan baris lama.
 
 **Response 201:** data mapping yang dibuat.
 

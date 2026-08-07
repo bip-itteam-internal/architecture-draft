@@ -2,7 +2,9 @@
 
 *Cara dev departemen menambahkan satu metrik KPI yang terisi otomatis, tanpa menyentuh aturan penilaian dan tanpa bertabrakan dengan dev departemen lain. Latar belakang dan peta metriknya ada di [[HRIS - Otomasi Skor KPI]]; keputusan batas servicenya di [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]].*
 
-- **Status**: ⚠️ Mesinnya **sudah deploy ke produksi 1 Agustus 2026** (PR #843 kontrak sumber, #857 mesin reduksi dan registry, #866 sumber `uptime_sistem`) dan terverifikasi terhadap data sungguhan. Prosedur di bawah final terhadap kode itu. Yang belum: **nol template punya konfigurasi `auto`** (sensus 2026-08-06), dan **layar Score KPI belum menampilkan `auto_value`**, sehingga usulan sistem belum terlihat penilai walau endpointnya hidup.
+- **Status**: ✅ Mesinnya **deploy ke produksi 1 Agustus 2026** (PR #843 kontrak sumber, #857 mesin reduksi dan registry, #866 sumber `uptime_sistem`), dan **metrik otomatis pertama menyala 6 Agustus 2026**: tiga metrik Tech Development kini benar-benar menghasilkan angka di produksi. Prosedur di bawah final terhadap kode itu dan sudah pernah dijalankan sampai tuntas. Rinciannya di [[HRIS - Otomasi Skor KPI]].
+	- ⚠️ Yang masih tertinggal: **frontend produksi belum menampilkan `auto_value`** (FE prod terakhir deploy 6 Agustus 16:38, sebelum PR erp-frontend #831 merged), jadi usulan sistem hidup di API tetapi belum terlihat penilai.
+	- ⚠️ **Di DEV, `MONITORING_SERVICE_KEY` dan `MARKETING_ANALYTICS_SERVICE_KEY` kosong** (prod terisi). Gerbang kunci layanan fail-closed, jadi sumber yang menariknya **mustahil menghasilkan angka di dev**. Kalau metrikmu memakai salah satunya, jangan buang waktu menguji di dev sebelum kuncinya diisi.
 
 Sumber yang sudah ada dan bisa dipakai sebagai contoh:
 
@@ -177,6 +179,46 @@ Terakhir, env barunya dipasang di **dua** blok `docker-compose.yml`: service sum
 
 Lewat `POST /kpi/templates` yang sudah ada. Tidak perlu deploy untuk mengubahnya.
 
+### Contoh yang benar-benar terpasang di produksi
+
+Ketiganya dinyalakan 2026-08-06 dan sudah diverifikasi menghasilkan angka:
+
+```jsonc
+// Tech Development Leader / "Performance Monitoring Team" (bobot 0,4)
+{ "sumber": "skor_tim", "formula": "rata_rata", "target": 70, "arah": "naik", "scope": "team" }
+
+// Tech Development Supervisor / "Performance Monitoring Team" (bobot 0,3)
+{ "sumber": "skor_tim", "formula": "rata_rata", "target": 70, "arah": "naik", "scope": "department" }
+
+// IT Support / "Network " (bobot 0,4)   <- perhatikan spasi di ujung labelnya
+{ "sumber": "uptime_sistem", "formula": "rata_rata", "target": 90, "arah": "naik", "scope": "department" }
+```
+
+**Pilihan `scope` harus berdasar data, bukan selera.** Untuk Leader dipilih `team` karena `work_data.supervisor_id` memang menunjuk 5 bawahan langsung yang semuanya aktif; kalau kolom itu kosong, `team` menghasilkan populasi nol dan metriknya gagal hitung. Periksa dulu: `db.work_data.countDocuments({ supervisor_id: "<employee_id atasan>" })`.
+
+**Uptime tidak peduli `scope`**, tetapi fieldnya tetap wajib berisi nilai yang dikenal (`department` atau `team`), karena `ValidateKPIAutoConfig` menolak yang lain.
+
+### ⚠️ Cara menerapkannya menentukan seberapa besar risikonya
+
+`POST /kpi/templates` melakukan **`ReplaceOne`**: ia mengganti seluruh dokumen template. Payload yang kurang satu field berarti field itu **terhapus diam-diam**, dan template KPI memuat label, deskripsi, bobot, serta kunci metrik yang semuanya harus utuh.
+
+Untuk menyalakan satu-dua metrik pada template yang sudah ada, bedah per-metrik jauh lebih sempit:
+
+```js
+db.kpi_template.updateOne(
+  { _id: ObjectId("...") },
+  { $set: { "metrics.$[m].auto": { sumber: "skor_tim", formula: "rata_rata",
+                                   target: 70, arah: "naik", scope: "team" } } },
+  { arrayFilters: [{ "m.key": "performance-monitoring-team" }] }
+)
+```
+
+Menyaring lewat **`m.key`**, bukan `m.label`: label produksi memuat spasi di ujung dan typo, sedangkan `key` memang identitas stabilnya.
+
+Konsekuensinya jalur ini **melewati `ValidateKPIAutoConfig`**, jadi konfigurasinya harus dicocokkan sendiri: formula dan scope termasuk kosakata yang dikenal, `arah` diisi sadar, dan `target > 0` untuk arah `naik`.
+
+Apa pun jalurnya, **cetak konfigurasi sebelum dan sesudah**, lalu periksa dua penjaga: jumlah template ber-`auto` bertambah persis sebanyak yang diniatkan, dan `kpi_score` ber-`auto_value` **tidak berubah** (menyalakan konfigurasi tak boleh menyentuh penilaian yang sudah tersimpan).
+
 ```json
 {
   "sumber":  "video_toko",
@@ -198,6 +240,10 @@ Lewat `POST /kpi/templates` yang sudah ada. Tidak perlu deploy untuk mengubahnya
 | `rasio_ambang` | persen `Nilai` ≥ `ambang`, terhadap `Populasi` | `Video ... Indikator 10.000/video`, ambang 10.000 target 70 |
 
 Metrik yang sumbernya sudah berupa persentase (uptime, konversi) memakai `rata_rata` atas satu `Nilai`: realisasinya dipakai apa adanya, lalu dibandingkan dengan target seperti metrik lain.
+
+**Persentase yang menempel di ujung skala tidak bisa diukur dengan rasio.** Uptime produksi bergerak di 99,8–99,9%, dan `realisasi/target` dibatasi 100, jadi metriknya bernilai 100 setiap bulan berapa pun targetnya dinaikkan — target 99,5 pun masih memberi 100, dan target 99,9 memberi 99,9. Metrik berbobot besar yang selalu penuh tidak membedakan bulan baik dari bulan buruk.
+
+Penawarnya bukan menaikkan target, melainkan **membalik besarannya**: ukur yang tersisa (downtime, cacat, keterlambatan) dengan `arah: turun`, dan jadikan targetnya **anggaran** — berapa banyak yang masih dapat diterima. Downtime bergerak dari 0,07% sampai berkali lipat, sehingga dengan anggaran 0,5% (SLA 99,5%) bulan normal tetap 100 sementara downtime 1% jatuh ke 50 dan 2% ke 25. Sumber `uptime_sistem` karena itu menyediakan dua metrik: `uptime` dan `downtime`. Aturan umumnya: **kalau realisasi wajar selalu melampaui target, metriknya salah bentuk, bukan salah angka.**
 
 **`ambang` dan `target` adalah dua hal berbeda.** `ambang` dipakai mencacah, `target` dipakai membandingkan. Metrik ICC membutuhkan keduanya sekaligus: ambang GMV 10.000 per video, target 70% video yang melewatinya.
 
@@ -263,6 +309,9 @@ Empat contoh nyata, semuanya bertipe sama: salah yang tidak menimbulkan error.
 - [ ] Bila menarik dari service lain: rute sumber punya test yang **melewati Fiber** untuk tanpa kunci, kunci salah, dan env kosong
 - [ ] Env kunci layanan terpasang di **dua** blok compose (service sumber dan employee-service)
 - [ ] Sudah dijalankan **sekali lewat gateway** sungguhan, bukan hanya lokal
+- [ ] Metriknya dibuka di layar **Otomasi KPI** (`/hris/kpi/otomasi`) dan berstatus `otomatis` atau `semi` — bukan `manual`
+
+Butir terakhir adalah cara termurah membuktikan metrikmu benar-benar hidup untuk **semua** orang di posisi itu, bukan cuma untuk satu karyawan yang kebetulan kamu uji. Statusnya `semi` bukan kegagalan — itu berarti angkanya nyata tetapi cakupan datanya parsial, dan layar itu menyebutkan berapa persen. Yang harus membuat berhenti adalah `manual`: berarti hitungannya gagal, dan sebabnya sudah tertulis di kolom keterangan.
 
 Butir kedua dari terakhir bukan formalitas. Perbandingan itulah yang menemukan bahwa skor ICC manual meleset ke dua arah, dan tanpa itu otomasi akan diam-diam menggantikan satu kesalahan dengan kesalahan lain.
 
