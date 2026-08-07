@@ -188,7 +188,7 @@ Alasan memilih Opsi A: konsisten dengan pola yang sudah ada di [[Microservices -
 
 *Permintaan: username akun affiliate bisa diinput di ICC Management, lalu dipakai memetakan data affiliate di [[APP - Web ERP]] menu Marketing Analytics → Affiliate. Sumber data awal: `z-file-hasil/DATA NAMA AKUN TIKTOK ICC BEAUTYHACKS.xlsx` tab **AKUN TIKTOK ICC** — 36 staff, 49 username (Beauty Hacks saja; Kyura belum ada).*
 
-- **Status**: ⚠️ Sebagian terimplementasi — **Fase A (backend) selesai** 2026-08-07: koleksi `icc_affiliate_accounts`, endpoint `/icc/affiliate-accounts`, `NormalisasiUsername`, index & alias. Fase B–E belum; rinciannya di [[#Rencana Implementasi (Revisi 2026-08-06)]].
+- **Status**: ⚠️ Sebagian terimplementasi (2026-08-07) — **Fase A–C selesai**: koleksi `icc_affiliate_accounts` + endpoint, sub-tab Akun Affiliate di ICC Management, dan alat impor `cmd/iccaffiliateimport`. **Fase D ditahan sampai E**; datanya belum diimpor ke produksi. Rinciannya di [[#Rencana Implementasi (Revisi 2026-08-06)]].
 
 ### Mengapa bukan Opsi A (Employee Service)
 
@@ -322,10 +322,16 @@ Justru karena keduanya independen, **persilangannya** yang bernilai:
 | Fase | Scope | Status |
 |---|---|---|
 | **A** | Integration: koleksi `icc_affiliate_accounts` (`employee_id` opsional) + endpoint + normalisasi/validasi + unit test | ✅ Selesai (2026-08-07; branch `feat/icc-affiliate-accounts`) |
-| **B** | FE ICC Management: sub-tab **Akun Affiliate** di kartu team (termasuk akun belum ditugaskan), dialog kelola (tambah/rename→alias/tetapkan pemegang/nonaktifkan), baris Toko & Iklan = mapping ∪ akun affiliate | 🟡 Belum |
-| **C** | Import awal dari Excel Beauty Hacks (script sekali jalan, lihat [[#Aturan impor dari Excel]]); Kyura menyusul | 🟡 Belum |
-| **D** | Pensiunkan `internal-creators.ts` — sumber pindah ke DB (halaman lamanya sudah tanpa menu) | 🟡 Belum |
+| **B** | FE ICC Management: sub-tab **Akun Affiliate** di kartu team (termasuk akun belum ditugaskan), dialog kelola (tambah/rename→alias/tetapkan pemegang/nonaktifkan) | ✅ Selesai (2026-08-07) |
+| **C** | Alat impor `cmd/iccaffiliateimport` (dry-run bawaan, `-apply` untuk menulis) — lihat [[#Aturan impor dari Excel]]. **Belum dijalankan ke produksi**; Kyura belum ada berkasnya | ✅ Alat siap (2026-08-07) |
+| **D** | Pensiunkan `internal-creators.ts` — sumber pindah ke DB | ⛔ Ditahan sampai Fase E (lihat catatan di bawah) |
 | **E** | Marketing Analytics → Affiliate: kolom **Kepemilikan** (dimensi baru, bukan pengganti Golongan) + antrean kandidat akun internal + pengisian `last_seen_at`, lewat baca-langsung `integration_db` | 🟡 Belum |
+
+**Fase B — penyimpangan yang disengaja**: baris karyawan di tab *Toko & Iklan* **tidak** digabung dengan akun affiliate seperti rancangan awal. Dengan adanya sub-tab, karyawan yang hanya punya akun affiliate sudah terlihat sebagai pemegang akun di tab sebelahnya; menggabungkannya hanya menambah baris yang seluruh kolom tokonya kosong.
+
+**Fase D ditahan, bukan terlewat**: `internal-creators.ts` adalah satu-satunya sumber tab ICC di halaman lama `/marketing-insight/affiliate`. Halaman itu memang sudah tak punya menu, tetapi rutenya **sengaja dipertahankan** agar tautan lama tidak putus. Mempensiunkan konstantanya sebelum Fase E berarti menghapus satu-satunya cara melihat daftar kreator internal, sementara penggantinya belum ada. Urutan yang benar: **E dulu, baru D**.
+
+**Prasyarat Fase E**: koleksi harus sudah terisi (jalankan Fase C ke produksi) — kolom Kepemilikan pada tabel yang kosong tak memberi tahu apa pun.
 
 ### Aturan impor dari Excel
 
