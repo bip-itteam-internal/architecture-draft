@@ -15,7 +15,9 @@ Dinyalakan di produksi **2026-08-06** dengan menulis blok `auto` pada tiga metri
 |---|---|---:|---|---|---|---:|
 | Tech Development Leader | `Performance Monitoring Team` | 0,4 | `skor_tim` | `rata_rata` | `team` | 70 |
 | Tech Development Supervisor | `Performance Monitoring Team` | 0,3 | `skor_tim` | `rata_rata` | `department` | 70 |
-| IT Support | `Network ` | 0,4 | `uptime_sistem` | `rata_rata` | `department` | 90 |
+| IT Support | `Network ` | 0,4 | `uptime_sistem` metrik `downtime` | `rata_rata` | `department` | 0,5 **arah turun** |
+
+> Baris ketiga diubah 7 Agustus 2026 dari `uptime` target 90 menjadi `downtime` target 0,5 arah turun. Alasannya di bab **Kenapa tiga ini yang didahulukan** di bawah: target 90 atas uptime memberi 100 setiap bulan, dan metrik yang selalu penuh tidak mengukur apa pun.
 
 **Hasil nyata, diverifikasi lewat `GET /kpi/auto-values` untuk orang sungguhan pada hari yang sama:**
 
@@ -55,7 +57,19 @@ Heartbeatnya diperiksa 7 Agustus 2026 lewat endpoint yang sama dengan yang dipak
 
 **Tetapi bentuk metriknya salah, dan itu ditemukan justru karena angkanya terlalu bagus.** Uptime 99,9% terhadap target 90 menghasilkan 111%, dibatasi 100 — dan akan 100 setiap bulan selama sistem tidak mati lebih dari tiga hari berturut-turut. Metrik berbobot 0,4 yang selalu penuh tidak mengukur apa pun. Menaikkan target tidak menolong: pada target 99,5 pun Juli tetap 100, dan pada 99,9 masih 99,9, sebab uptime memang menempel di ujung skala.
 
-Penawarnya membalik besarannya: metrik **`downtime`** dengan `arah: turun` dan target berupa **anggaran downtime bulanan**. Dengan SLA 99,5% yang disepakati (anggaran 0,5%), Juli yang 0,19% tetap dinilai 100, sedangkan bulan dengan downtime 1% jatuh ke 50 dan 2% ke 25. Kemampuannya ditambahkan di bip-erp PR [#1069](https://github.com/bip-itteam-internal/bip-erp/pull/1069) sebagai metrik kedua pada sumber `uptime_sistem` (🟡 belum merge). **Konfigurasi metrik `Network` masih perlu diubah setelah deploy**, dan sebaiknya sebelum 1 September — mengubah aturan sesudah periode Agustus dinilai berarti angkanya dihitung dengan aturan yang berbeda dari yang berlaku saat bulannya berjalan.
+Penawarnya membalik besarannya: metrik **`downtime`** dengan `arah: turun` dan target berupa **anggaran downtime bulanan**. Dengan SLA 99,5% yang disepakati (anggaran 0,5%), Juli yang 0,19% tetap dinilai 100, sedangkan bulan dengan downtime 1% jatuh ke 50 dan 2% ke 25. Kemampuannya ditambahkan di bip-erp PR [#1069](https://github.com/bip-itteam-internal/bip-erp/pull/1069) sebagai metrik kedua pada sumber `uptime_sistem`.
+
+✅ **Sudah berlaku di produksi 7 Agustus 2026.** employee-service di-deploy lebih dulu, baru konfigurasinya diubah — urutan itu wajib, sebab sebelum binary mengenal `downtime` metriknya akan jatuh ke `manual`. Konfigurasi metrik `Network` (template IT Support, `6a02a536551518dc794afc1a`, bobot 0,4):
+
+| | sebelum | sesudah |
+|---|---|---|
+| `metrik` | — (berarti `uptime`) | `downtime` |
+| `target` | 90 | 0.5 |
+| `arah` | `naik` | `turun` |
+
+Sisanya tidak disentuh (`sumber: uptime_sistem`, `formula: rata_rata`, `scope: department`), dan `kpi_score` tidak disentuh sama sekali sehingga penilaian yang sudah tersimpan tetap beku.
+
+**Perubahan ini tidak menurunkan skor siapa pun sekarang.** Uptime Agustus 99,93% berarti downtime 0,07%, jauh di dalam anggaran, jadi nilainya tetap 100 — sama seperti sebelumnya. Yang berubah adalah metriknya kini **bisa** turun: dampaknya baru terasa pada bulan yang benar-benar buruk, dan itulah gunanya.
 
 **Kenapa tiga ini yang didahulukan**: sumbernya sudah ada di produksi dan tak menunggu siapa pun mengisi data. `skor_tim` membaca `kpi_score` sendiri, `uptime_sistem` membaca heartbeat yang tercatat otomatis. Metrik IT lain (SLA tiket, CSAT) semula menunggu produksi ditarik ke `main` terbaru agar sumber `kinerja_tiket` ikut; **penantian itu selesai** — `Employee-Service` dan `Task-Management-Service` produksi di-recreate 6 Agustus 2026 sekitar pukul 19:00 WIB, jadi sumber `kinerja_tiket` sudah ada di prod. Yang menahannya sekarang bukan lagi kode melainkan **kesepakatan target**: tingkat ketepatan waktu Juli berkisar 8,7%–56,3% tergantung ambang yang dipakai, dan menyalakan metrik dengan target yang belum disepakati berarti menerbitkan angka merah yang tak seorang pun setujui dasarnya.
 
