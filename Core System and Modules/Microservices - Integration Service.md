@@ -180,6 +180,33 @@
 
 Koleksi `icc_account_mappings`. Field baru (Phase 3): **`team string`** (diisi otomatis dari `BIP-Department`). Index: partial unique `(tiktok_shop_id != "", is_active=true)` + `(tiktok_advertiser_id != "", is_active=true)` — guard `!= ""` mengizinkan baris tanpa shop/advertiser; compound `(employee_id, is_active)`.
 
+### Leader team ICC (leader-first)
+
+> Grounded ke `internal/interface/http/icc_leader_handler.go` + `usecase/icc_leader_usecase.go`. Lihat [[Sales - ICC Account Manager Mapping]].
+
+- `GET /icc/leaders` — daftar leader aktif; filter `team`, `is_active`
+- `POST /icc/leaders` — tetapkan/ganti leader; `team` dari body atau `BIP-Department`; mengganti leader **menonaktifkan** baris lama lalu membuat yang baru (riwayat tersimpan, bukan ditimpa); idempotent bila karyawannya sama
+- `PATCH /icc/leaders/:id/deactivate` — nonaktifkan
+
+Koleksi `icc_leaders`; partial unique `(team, is_active=true)` — satu leader aktif per team, baris nonaktif bebas menumpuk sebagai riwayat. **`POST /icc/mappings` menolak** bila team karyawan belum punya leader aktif; pengecekan memakai `employee_team` dari body (department karyawan yang di-assign) dengan fallback `BIP-Department`, supaya assign lintas department oleh IT tetap tervalidasi ke team karyawan, bukan team pemanggil.
+
+### Akun affiliate ICC (daftar akun internal)
+
+> Grounded ke `internal/interface/http/icc_affiliate_account_handler.go` + `usecase/icc_affiliate_account_usecase.go`. Lihat [[Sales - ICC Affiliate Mapping]].
+
+- `GET /icc/affiliate-accounts` — filter `team`, `employee_id`, `username`, `belum_ditugaskan`, `is_active`
+- `POST /icc/affiliate-accounts` — tambah akun; `employee_id` **opsional**
+- `PATCH /icc/affiliate-accounts/:id` — ubah username / tetapkan / lepas pemegang / `is_active` / `notes`
+- `DELETE /icc/affiliate-accounts/:id` — hanya bila sudah nonaktif
+
+Koleksi `icc_affiliate_accounts` — **terpisah dari `icc_account_mappings`**: akun affiliate melekat pada KARYAWAN, bukan pada toko, sedangkan satu karyawan bisa punya banyak baris mapping toko. Tiga keputusan yang mudah salah bila dibaca sekilas:
+
+1. **`employee_id` opsional.** Kosong = *belum ditugaskan*, bukan akun luar. Klasifikasi internal tidak boleh bergantung pada ada-tidaknya pemegang; kalau digantungkan, akun perusahaan yang sedang tak dipegang akan terbaca sebagai kreator luar dan omzetnya hilang dari laporan internal.
+2. **Partial unique `(employee_id, username)` hanya difilter `is_active=true`** — sengaja BERBEDA dari `icc_account_mappings` yang memakai guard `!= ""`. Di sini `employee_id` kosong justru sah dan tetap harus dijaga: tanpa itu satu username tak bertuan bisa masuk berkali-kali. Username yang sama pada pemegang berbeda tetap boleh (akun bersama tidak diharapkan, tetapi masih ada di data).
+3. **Rename = edit di tempat + `alias`.** Username lama turun ke `alias` dan tidak pernah dihapus, karena order affiliate lampau tetap tercatat dengan handle lama; pencocokan membaca `username` ∪ `alias`. Index terpasang untuk keduanya. `last_seen_at` disediakan untuk mendeteksi handle basi, pengisinya menyusul.
+
+`NormalisasiUsername` (fungsi murni, `usecase/icc_affiliate_account_usecase.go`) membuang `@`, merapatkan spasi tepi, menyamakan ke huruf kecil, lalu memvalidasi `^[a-z0-9._]{2,24}$`. Placeholder (`-`, `@`) dan handle berspasi **ditolak, bukan ditebak** — keduanya butuh keputusan manusia.
+
 ### Marketing Team & Shop ACL (admin only)
 - `/marketing/teams` — CRUD tim marketing (gated `RequireIntegrationAdmin` = supervisor/admin module integration)
 - Anggota tim: assign/unassign member (`/marketing/teams/:id/members`)
