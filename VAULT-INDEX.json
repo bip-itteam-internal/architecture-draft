@@ -1097,20 +1097,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "a9a774482e201a9f8e76817d553ac3d1087f0f0d4dc781fe40182cc54697a492",
-      "ukuran_kb": 124.7,
-      "ringkasan": "Menjawab pertanyaan tentang arsitektur frontend hris-dashboard (\"One Bharata\"): stack teknologi yang dipakai, cara kerja autentikasi & SSO, bagaimana role dan menu sidebar diatur per departemen/posisi, dan fitur multi-perusahaan apa saja yang sudah tersedia. Juga menjelaskan fitur yang sedang dikembangkan (belum merge) seperti pengaturan tampilan menu per posisi dan menu KPI untuk Leader.",
+      "hash": "bf7e4cd6015f75c35b90aefc58ddc1f23f76b2b23d17fec26288b820e2bf9709",
+      "ukuran_kb": 125.4,
+      "ringkasan": "Menjawab: apa itu portal web internal `hris-dashboard` (\"One Bharata\"), stack dan repo-nya (Next.js 16 + React 19 di `erp-frontend`), serta bagaimana login, refresh token, dan SSO Identity Provider (mint one-time code, allowlist redirect_url) bekerja. Menjelaskan juga bagaimana akses dibatasi lewat cookie `system_roles` (map module → role) dan role gating sidebar per modul HR, finance/insentif, integrasi, IT, GA. Menerangkan perilaku UI multi-perusahaan (CompanySwitcher, shift/rotasi/mesin fingerprint/network/departemen per-perusahaan) dan aturan bentuk menu: pengelompokan lewat menu induk bersarang alih-alih field `group`, perataan induk tipis berdasarkan jumlah anak yang terlihat, setelan \"Tampilan Menu\" per jabatan yang menyimpan `menu_hidden` (centang = tampil), menu KPI untuk Leader berdasar keberadaan bawahan langsung, serta layar Atasan Langsung (pilih atasan lalu centang bawahan, karyawan non-aktif disembunyikan, departemen `grouped`).",
       "kata_kunci": [
-        "erp-frontend",
+        "web ERP",
         "hris-dashboard",
         "One Bharata",
-        "Next.js",
-        "SSO",
-        "RBAC",
+        "erp-frontend",
+        "Next.js App Router",
+        "SSO Identity Provider",
+        "system_roles",
+        "role gating",
         "sidebar menu",
-        "multi-perusahaan",
-        "i18n",
-        "role"
+        "multi-perusahaan"
       ]
     },
     {
@@ -1863,20 +1863,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "e2e9c11108f0b3686779975d5a7d918590bfe1825d7a14cbb344fa219d89b0a3",
-      "ukuran_kb": 214.0,
-      "ringkasan": "Menjawab: apa peran integration-service sebagai jembatan marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) ke Accurate Online — dari ingest webhook, normalisasi order menjadi model transaction terpadu, push Sales Invoice dan Sales Return, sampai automasi auto-ship/auto-approve sadar-holiday, manajemen kredensial OAuth, dan job sync terjadwal. Juga menjawab bagaimana webhook Shopee diautentikasi HMAC-SHA256 per `app_type` (dan kenapa verifikasi signature sementara di-bypass), bagaimana metrik GMV Max Monitoring/Overview dan ICC Video Metrics diagregasi termasuk perlakuan bucket atribusi `item_id=-1`, serta perbaikan rate limit cron master data TikTok. Menjelaskan pula bagian yang masih konsep tanpa kode (Meta Ads) dan jalur yang dicabut (Desty soft-disabled).",
+      "hash": "a4156feeefa829a07c76631e068e93db59f8de1641cd6bd3163b607cc98bf20b",
+      "ukuran_kb": 216.3,
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) — order masuk realtime lewat webhook direct per platform, dinormalkan jadi model \"transaction\" terpadu, lalu di-bridge ke Accurate Online sebagai Sales Invoice dan Sales Return. Menjelaskan endpoint webhook dan auth-nya (HMAC-SHA256 Shopee dengan key per `app_type`, dan catatan bahwa verifikasi signature sementara di-bypass), manajemen kredensial OAuth, holiday untuk auto-ship/auto-approve, serta job sync terjadwal dan background worker. Bisa dipakai untuk mencari detail report TikTok Ads dan GMV Max (monitoring per campaign dengan aturan GMV winner ROI ≥ 3,2 & order ≥ 15, overview per produk dengan ROAS/ROI dan join SKU, ICC video metrics untuk insentif), status jalur Desty yang soft-disabled, rencana Meta Ads yang belum berkode, dan sejarah bug rate limit TikTok serta salah field path `advertiser_id`.",
       "kata_kunci": [
         "integration service",
         "marketplace integration",
+        "webhook",
+        "TikTok Shop",
+        "Shopee",
+        "Lazada",
         "Accurate Online",
-        "webhook Shopee HMAC",
-        "TikTok Business / Ads",
+        "Sales Invoice",
         "GMV Max",
-        "ICC video metrics",
-        "Meta Ads",
-        "cron worker / background job",
-        "Desty"
+        "transaction orders"
       ]
     },
     {
@@ -2005,6 +2005,7 @@
         "API - Marketing Analytics Service",
         "IT - Background Jobs & Schedulers",
         "APP - Web ERP",
+        "Sales - ICC Affiliate Mapping",
         "Microservices - Insentive Service",
         "Sales - Marketplace Integration",
         "CORE - API Master Gateway",
@@ -2015,26 +2016,23 @@
         "DB - Overview and Notes",
         "ADR - 0011 Integration Read Cache + Singleflight (Fase 1 Perf)",
         "Sales - GMV Creative",
-        "Sales - ICC Affiliate Mapping",
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "HRIS - Otomasi Skor KPI"
       ],
-      "hash": "fb0924445323f3e35c9404d6310ca13735652a36cd3541e5c256106098278d4a",
-      "ukuran_kb": 24.3,
-      "ringkasan": "Menjawab: bagaimana laba per toko/produk/kampanye/iklan/video dihitung dan disimpan ke mart, kenapa channel TikTok+Shopee punya jebakan data (order_date vs created_at, CANCELLED, Long BSON, primitive.DateTime, jam 19:00 UTC), bagaimana bundel & mapping SKU dialokasikan, bagaimana ICC tiga sumber digabung, dan bagaimana penjadwal internal 48 jam bekerja beserta cara memeriksanya lewat /jobs/status.",
+      "hash": "60066d58237cdf65aa90d4343e468c3d5f1128563fa1bb5eeab550417b9fac63",
+      "ukuran_kb": 24.9,
+      "ringkasan": "Menjawab: dari mana angka laba dan performa marketing di dashboard berasal — service Go + Fiber yang membaca `integration_db` **baca-saja** lalu menyimpan hasil pre-agregasi ke koleksi `mart_*` miliknya sendiri di `marketing_analytics_db`, lengkap dengan port, prefix gateway, dan daftar 21 route-nya. Menjelaskan endpoint laba per toko/produk/campaign/ad beserta drill ke order penyusun, performa video (tab VSA / GMV Max / organik) dan drill order affiliate, breakdown & detail retur, affiliate/cohort/audience, price floor effective-dated, trigger job manual, serta `/jobs/status` dan `/health` yang jadi `degraded` (503) bila index unik gagal dibuat. Berguna untuk memahami dua prinsip yang wajib dijaga (larangan menulis ke database service lain, dijaga tiga lapis termasuk test pemindai AST dan read preference `secondaryPreferred`), kontrak amplop respons `kolom_tidak_berlaku` sebagai satu-satunya penanda sah menghapus kolom di FE, dan penjadwal internal 48 jam (03:00 WIB, urutan job berurutan, jendela 14 hari, kegagalan tidak senyap).",
       "kata_kunci": [
         "marketing analytics",
         "mart_profit_attribution",
-        "laba",
-        "HPP",
-        "ads_cost",
-        "Shopee GMS",
-        "ICC penanggung jawab",
-        "attribution_kolom",
+        "gross profit",
+        "laba per produk",
+        "dashboard marketing",
         "penjadwal",
-        "bundel",
-        "master_sku",
-        "order_date"
+        "scheduler",
+        "price floor",
+        "retur breakdown",
+        "read-only integration_db"
       ]
     },
     {
@@ -7648,8 +7646,8 @@
       "judul": "Sales - ICC Affiliate Mapping",
       "area": "Sales",
       "jenis": "domain",
-      "status_emoji": "⚠️",
-      "status_teks": "Implemented parsial — daftar internal di frontend masih hardcoded, **tetapi penggantinya sudah mulai dibangun**: backend `icc_affiliate_accounts` (Fase A) selesai 2026-08-07. Lihat [[#Keputusan Desain 2026-08-06 — Dikelola lewat ICC Management]] dan [[#Rencana Implementasi (Revisi 2026-08-06)]]",
+      "status_emoji": "✅",
+      "status_teks": "Implemented (2026-08-07) — daftar akun internal kini hidup di DB (`icc_affiliate_accounts`), dikelola SPV lewat **ICC Management** dan tampil sebagai kolom **Pemegang** di **Marketing Analytics → Affiliate**. Konstanta hardcoded sudah dihapus. Lihat [[#Keputusan Desain 2026-08-06 — Dikelola lewat ICC Management]] dan [[#Rencana Implementasi (Revisi 2026-08-06)]].",
       "publik": true,
       "tautan": [
         "ADR - 0009 Affiliate via Search Seller Affiliate Orders API",
@@ -7661,20 +7659,20 @@
         "Microservices - Employee Service",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "72d6a7fc40806ce7de8959953ecda0dfab3dd1422ae878a8d71069b37d13fa64",
-      "ukuran_kb": 26.5,
-      "ringkasan": "Menjawab: bagaimana sistem membedakan kreator affiliate internal (ICC) dari kreator eksternal — saat ini lewat konstanta hardcoded `internal-creators.ts` (`ICC_MEMBER_ACCOUNTS`, `isInternalCreator`) yang dipakai tab ICC di halaman Affiliate Performance — dan apa saja kelemahan pendekatan itu (butuh deploy, tak ada audit trail, nama karyawan tidak sinkron). Juga menjawab opsi arsitektur pengganti yang dipertimbangkan (field `tiktok_usernames` di Employee Service, koleksi sendiri di Integration Service, atau endpoint baru) serta keputusan 2026-08-06 yang membatalkan Opsi A dan memilih pengelolaan lewat ICC Management dengan koleksi terpisah `icc_affiliate_accounts`. Menjelaskan pula aturan normalisasi & validasi username, rename dengan alias, `last_seen_at` untuk mendeteksi handle basi, aturan impor Excel, dan risiko akun bersama antar-karyawan.",
+      "hash": "02140ab8929873ac5a049c806df83f4e744dd799dd74fa44640100680753029a",
+      "ukuran_kb": 27.6,
+      "ringkasan": "Menjawab: bagaimana sistem membedakan order affiliate TikTok dari kreator internal (ICC — karyawan Bharata peserta program Internal Content Creator) versus kreator eksternal, yang sebelumnya hanya tampak sebagai `creator_username` di `affiliate_orders`. Menjelaskan mekanisme lama yang hardcoded di `internal-creators.ts` (33 anggota, 41 username) beserta alasan pencabutannya, tiga opsi arsitektur yang dipertimbangkan (field di Employee Service, koleksi tersendiri di Integration Service, atau endpoint baru untuk FE), dan mengapa rekomendasi Opsi A akhirnya di-supersede oleh pengelolaan langsung lewat ICC Management dengan koleksi `icc_affiliate_accounts`. Memuat juga aturan normalisasi & validasi username, penanganan rename lewat edit di tempat + alias, deteksi handle basi via `last_seen_at`, risiko akun bersama (satu username bisa dipegang lebih dari satu karyawan), aturan impor Excel, dan tampilnya kolom Pemegang di Marketing Analytics → Affiliate.",
       "kata_kunci": [
         "ICC",
-        "affiliate",
-        "internal creator",
+        "Internal Content Creator",
+        "affiliate mapping",
         "creator_username",
         "icc_affiliate_accounts",
-        "internal-creators.ts",
-        "TikTok affiliate",
-        "Employee Service",
         "ICC Management",
-        "marketing insight"
+        "akun TikTok affiliate",
+        "insentif kreator",
+        "employee service",
+        "affiliate_orders"
       ]
     },
     {
