@@ -188,6 +188,27 @@
 | GET | `/icc/mappings/available-shops` | TikTok Shop belum di-assign aktif (pool global) |
 | GET | `/icc/mappings/available-advertisers` | Advertiser belum di-assign aktif (pool global; deduplikasi via `$group`) |
 
+### Leader team ICC
+
+> Satu leader aktif per team. `POST /icc/mappings` **ditolak** bila team karyawan belum punya leader (leader-first). Lihat [[Sales - ICC Account Manager Mapping]].
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/icc/leaders` | Daftar leader (filter: `team`, `is_active`; default `true`) |
+| POST | `/icc/leaders` | Tetapkan/ganti leader team — `team` dari body atau `BIP-Department`; leader lama otomatis dinonaktifkan (riwayat tersimpan); idempotent untuk karyawan yang sama |
+| PATCH | `/icc/leaders/:id/deactivate` | Nonaktifkan leader |
+
+### Akun affiliate ICC
+
+> Daftar akun affiliate TikTok **milik perusahaan**. `employee_id` **opsional** — kosong berarti belum ditugaskan, bukan akun luar. **Tanpa** guard leader-first: pendataan akun tak boleh tertahan urusan struktur tim. Lihat [[Sales - ICC Affiliate Mapping]].
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/icc/affiliate-accounts` | Daftar akun (filter: `team`, `employee_id`, `username`, `belum_ditugaskan`, `is_active`; default `true`). Dua saringan pemegang yang bertentangan digabung `$and` → nol baris, bukan salah satunya diabaikan |
+| POST | `/icc/affiliate-accounts` | Tambah akun — `team` dari body atau `BIP-Department`; username dinormalisasi (buang `@`, trim, lowercase, pola `[a-z0-9._]{2,24}`); `employee_id` boleh kosong; 409 bila duplikat untuk pemegang yang sama |
+| PATCH | `/icc/affiliate-accounts/:id` | Ubah username (handle lama otomatis turun jadi `alias`), tetapkan/lepas pemegang (`employee_id: ""`), `is_active`, `notes`. 400 bila `employee_name` diisi pada akun tanpa pemegang |
+| DELETE | `/icc/affiliate-accounts/:id` | Hapus (hanya jika `is_active=false`; else 409) |
+
 ## Fulfillment (WMS Bridge — internal)
 
 > Auth: gateway key global (semua rute `POST /fulfillment/*` di-cover `ValidateGateway`). Grounded: `usecase/warehouse_bridge_usecase.go`, `interface/http/warehouse_bridge_handler.go`.
