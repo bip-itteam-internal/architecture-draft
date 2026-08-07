@@ -1,8 +1,8 @@
 ## Deskripsi
 
-*Daftar endpoint **Marketing Analytics Service** — grounded ke kode (`routes.go`, `handler_mart.go`, `price_floor_handler.go`, `jobs.go`, `penjadwal_status.go`; audit 2026-08-02, 21 route). Arsitektur & semantik data: [[Microservices - Marketing Analytics Service]].*
+*Daftar endpoint **Marketing Analytics Service** — grounded ke kode (`routes.go`, `handler_mart.go`, `price_floor_handler.go`, `jobs.go`, `penjadwal_status.go`, `beranda.go`, `ambang_handler.go`; audit 2026-08-07, **28 route** di berkas produksi). Arsitektur & semantik data: [[Microservices - Marketing Analytics Service]].*
 
-- **Status**: ✅ Grounded ke kode (2026-08-02)
+- **Status**: ⚠️ Grounded ke kode (2026-08-07), **3 route belum terdokumentasi** — lihat catatan di kaki.
 - **Prefix gateway**: `/api/marketing-analytics/*` → path internal tanpa prefix. Routing & auth: [[API - Index]].
 
 ## Konvensi respons
@@ -11,6 +11,24 @@
 - **`kolom_tidak_berlaku`** (bila ada): kolom yang di level itu tak punya sumber sama sekali — FE wajib menghilangkan kolomnya, bukan merender "—" per baris.
 - Parameter enum yang tak dikenal → **400 + daftar nilai sah** (tidak jatuh diam-diam ke bawaan). Batas tanggal **hari WIB**, batas atas eksklusif.
 - Endpoint drill berpaginasi: `limit` bawaan 50 maks 500, `offset`; `total: -1` = cacah gagal (bukan 0).
+
+## Halaman depan & ambang keputusan
+
+Lapisan baca murni di atas mart yang sudah ada; tak ada job atau koleksi `mart_*` baru selain `mart_ambang`. Status: 🟡 **belum terverifikasi lewat gateway** (PR [#1080](https://github.com/bip-itteam-internal/bip-erp/pull/1080), belum merge).
+
+| Method | Path | Catatan |
+|---|---|---|
+| GET | `/beranda` | Merakit vonis laba + `pembanding` + `tren` + `penggerus`/`peluang` + `penanggung_jawab`/`per_tim` + `cakupan` + `kesegaran`. Parameter sama dengan halaman lain (`dari`, `sampai`, `divisi`, `channel`) + `limit_sorotan` (bawaan 5, maks 20; nilai cacat → **400**, tidak jatuh ke bawaan). **Tidak membangun query sendiri** — memanggil ulang sumber halaman rincian, dijaga uji AST yang sama dengan `/summary` |
+| GET | `/ambang` | Seluruh riwayat ambang + penanda `aktif`. **Tidak digerbang**: tiap pembaca perlu tahu terhadap apa angkanya dinilai |
+| POST | `/ambang` | Tambah baris ambang. Digerbang `common.RequireMarketingLeader` (**403** tanpa role); identitas penulis dari header gateway, tak pernah dari body; `roas_min`/`cpa_maks` wajib `> 0`, `effective_from` `YYYY-MM-DD`; cacat → **400 menyebut field-nya** |
+
+**Vonis punya EMPAT nilai**: `tanpa_data` (tak ada satu baris pun), `rugi` (laba `< 0`), `waspada` (laba `>= 0` tapi ROAS `< roas_min`), `sehat`. `tanpa_data` ada karena tanpanya periode kosong divonis `sehat` dan melukis lencana hijau di atas nol.
+
+**Nilai `null` berarti tak terhitung, bukan nol**: `roas` saat belanja nol, `iklan_persen_revenue` saat revenue nol, `delta_persen` saat pembanding nol.
+
+**`cpa_maks` tersimpan dan dikirim tetapi TIDAK DIBACA apa pun** — `mart_profit_attribution` sengaja tak menyimpan cacah order, jadi CPA tak dapat dihitung. Separuh ambang keputusan menunggu keputusan produk.
+
+`unavailable_channels` pada endpoint ini dapat memuat penanda **pemancungan** ber-channel `SEMUA`: baris sumber menyentuh batas keamanan pembacaan, jadi angkanya bisa kurang. Itu bukan kegagalan — barisnya ada — jadi layar tetap menampilkannya sambil menyebut jumlahnya mungkin belum utuh.
 
 ## Laba (`mart_profit_attribution`)
 
@@ -57,6 +75,18 @@
 | POST | `/jobs/:name/trigger` | `:name` = `sync-ad-creative-link` · `sync-video-performance` · `sync-profit-attribution`. `?hari` bawaan 7 maks 120 (hanya profit-attribution yang memakainya); job berjalan → **409**; `hari` cacat → **400, job tidak jalan** |
 | GET | `/jobs/status` | `penjadwal_hidup`, `dinonaktifkan`, alasan, interval, ambang mati 72 jam, `sync_state` tiap job |
 | GET | `/health` | `ok` / `degraded` (503) bila index unik gagal dibuat |
+
+## Belum terdokumentasi (ada di kode, bukan di dok ini)
+
+Terhitung 2026-08-07, tiga route produksi terdaftar tetapi belum punya baris di tabel mana pun di atas. Ketiganya mendarat di `main` **sesudah** audit 2026-08-02 dan **bukan** bagian dari pekerjaan halaman depan, jadi didaftar apa adanya di sini alih-alih dikarang semantiknya:
+
+| Method | Path | Berkas |
+|---|---|---|
+| GET | `/toko` | `toko.go` |
+| GET | `/kpi/kinerja-toko` | `kpi_kinerja_toko.go` |
+| GET | `/profit/items` | `handler_mart.go` |
+
+Menyebutkan keberadaannya lebih berguna daripada menghilangkannya: dok yang diam soal route yang ada membuat pembacanya mengira daftar ini lengkap. `/sync-docs` berikutnya yang menyentuh service ini semestinya melengkapinya.
 
 ## Dokumen Terkait
 

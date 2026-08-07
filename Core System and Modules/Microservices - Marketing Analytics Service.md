@@ -6,7 +6,7 @@
 - **Path di repo**: `bip-erp/services/marketing-analytics/`
 - **Port**: env `PORT`, alias `SERVICE_PORT`, fallback `6985` (`main.go`)
 - **Prefix gateway**: `marketing-analytics` (`api-gateway/main.go`, env `MARKETING_ANALYTICS_MODULE_URL`)
-- **Status**: ⚠️ Implemented dengan catatan (audit kode 2026-08-02). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan 21 route. Catatan: `/matrix/sku-shop` masih stub, `mart_live_sessions` & `mart_buyer_cohort` kosong, lock job hanya in-process.
+- **Status**: ⚠️ Implemented dengan catatan (audit kode 2026-08-07). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **28 route** di berkas produksi. Catatan: `/matrix/sku-shop` masih stub, `mart_live_sessions` & `mart_buyer_cohort` kosong, lock job hanya in-process. **Halaman depan (`/beranda`) dan ambang keputusan (`/ambang`) menunggu merge** PR [#1080](https://github.com/bip-itteam-internal/bip-erp/pull/1080) dan **belum pernah dijalankan lewat gateway**.
 
 ## Prinsip Arsitektur
 
@@ -24,7 +24,22 @@ Penjaga yang sama sudah dibuktikan menutup `insentive_db` (sumber ICC) — arahn
 
 ## Endpoint (Sudah Diimplementasikan)
 
-21 route (audit kode 2026-08-02, `routes.go` + `handler_mart.go` + `price_floor_handler.go` + `jobs.go` + `penjadwal_status.go`). Daftar lengkap per-route: [[API - Marketing Analytics Service]]. Seluruhnya `GET` kecuali disebut lain.
+28 route di berkas produksi (audit kode 2026-08-07, `routes.go` + `handler_mart.go` + `price_floor_handler.go` + `jobs.go` + `penjadwal_status.go` + `beranda.go` + `ambang_handler.go`). Daftar lengkap per-route: [[API - Marketing Analytics Service]] — termasuk tiga route (`/toko`, `/kpi/kinerja-toko`, `/profit/items`) yang ada di kode tetapi belum terdokumentasi. Seluruhnya `GET` kecuali disebut lain.
+
+### Halaman depan & ambang keputusan (🟡 menunggu merge)
+
+| Endpoint | Isi |
+|---|---|
+| `/beranda` | Vonis laba terhadap ambang + pembanding periode + tren enam bulan + penggerus & peluang tiga level + penanggung jawab & cakupan + kesegaran data |
+| `GET /ambang` · `POST /ambang` | Ambang keputusan (`roas_min`, `cpa_maks`), **effective-dated**, pola sama dengan `mart_price_floor`. `POST` digerbang `common.RequireMarketingLeader` |
+
+**`/beranda` tidak menulis query sendiri.** Ia memanggil ulang fungsi sumber halaman rincian lalu menjumlahkan, sehingga halaman depan tak dapat menyimpang dari halaman yang ditautkannya. Ini aturan yang sama dengan `/summary`, dan sejak PR ini **dijaga uji AST yang sama** (`TestHalamanAgregatTidakMembangunPipelineSendiri`, kini bertabel atas kedua berkas) alih-alih hanya oleh komentar.
+
+**Vonis dijumlahkan dari level SHOP saja.** Satu order muncul di baris tokonya, produknya, dan kampanyenya sekaligus; menjumlahkan ketiganya menghitung uang yang sama tiga kali. Ketiga level tetap dihitung untuk daftar sorotan supaya berpindah tab di FE tak memicu permintaan baru.
+
+**Vonisnya EMPAT keadaan**, dan yang keempat lahir dari review: `tanpa_data` untuk periode tanpa satu baris pun. Tanpanya, laba nol bukan `< 0` dan ROAS-nya `null`, sehingga aturan lama menjatuhkannya ke `sehat` dan melukis lencana hijau di atas nol.
+
+**Pembacaan agregat WAJIB menaikkan `Limit` sendiri.** `filterMart.Limit` bernilai nol berarti `limitReturBawaan` (500), yang merupakan ukuran halaman untuk tabel, bukan batas untuk penjumlahan. Karena urutannya `gross_profit` menurun, pemancungan membuang barisnya yang **merugi** lebih dulu: vonis jadi terlalu optimis dan daftar penggerus permanen kosong. Ketika pembacaan menyentuh `limitReturMaks`, amplopnya melaporkan diri lewat `unavailable_channels` (pola `ReasonMatrixSumberTerpancung`).
 
 ### Laba (baca `mart_profit_attribution`)
 
@@ -107,6 +122,7 @@ Index unik dibuat saat boot (`index.go`). `CreateOne` **tidak mengganti** index 
 | `sync_state` | `channel + job` | Cursor, `last_run_at`, `last_ok_at`, `last_error` per job + kunci `penjadwal` |
 | `mart_live_sessions` · `mart_buyer_cohort` | — | **Masih kosong** di production |
 | `mart_price_floor` | `sku + effective_from` | Harga minimal per SKU |
+| `mart_ambang` | `nama + effective_from` | Ambang keputusan (`roas_min`, `cpa_maks`). **Append-only**: mengubah ambang berarti menambah baris bertanggal baru, bukan menimpa. Menimpa membuat vonis periode lampau ikut berubah surut tanpa jejak, dan yang membandingkan dengan tangkapan layar minggu lalu tak punya cara tahu mengapa angkanya berbeda. Koleksi BARU, tak ada index lama yang perlu di-`dropIndex` saat deploy. Field `nama` konstan (`global`) hari ini, disediakan sejak awal karena menambah dimensi ke kunci unik SESUDAH koleksi berisi menuntut migrasi manual |
 
 ### Kenapa `mart_video_performance` tidak punya dimensi hari
 
@@ -170,6 +186,10 @@ Service ini menyimpan **alasan ketidaklengkapan bersama datanya**, bukan membiar
 
 ## Belum Diimplementasikan / Catatan
 
+- **`cpa_maks` tersimpan, tervalidasi, terindeks, dan dikirim ke FE — tetapi TIDAK DIBACA apa pun.** `mart_profit_attribution` sengaja tak menyimpan cacah order (tercatat di `matrix_sku_shop.go`: "orders SENGAJA tak ada"), jadi CPA tak dapat dihitung dari mart ini. Separuh dari "ambang keputusan" karena itu mati. Perlu keputusan produk: tambah cacah order ke agregasi laba, buang `cpa_maks` dari ambang, atau biarkan sebagai angka rujukan yang sengaja tak memvonis. Sampai diputuskan, layar tak boleh menampilkannya seolah ia sedang menilai sesuatu.
+- **`/beranda` dan `/ambang` belum pernah dijalankan lewat gateway.** Seluruh pengujiannya memakai sumber palsu. Dua bug terparah yang tertangkap review hanya muncul terhadap Mongo sungguhan dan keduanya membalas **200** dengan rapi: sort kosong yang ditolak Mongo, dan `Limit` tak disetel yang memotong 500 baris teratas.
+- **Tiga route ada di kode tetapi belum terdokumentasi**: `/toko`, `/kpi/kinerja-toko`, `/profit/items`. Mendarat di `main` sesudah audit 2026-08-02. Lihat [[API - Marketing Analytics Service]].
+- **`TestMuatHariProfitMerakitLewatRakitInputProfit` merah di `main`** (`spend_per_sku_test.go`): ia memindai teks sumber `spend_per_sku.go`, yang blob-nya ber-CRLF. Selama merah, hasil `go test ./...` tiap branch di service ini tak terbaca. Layak PR tersendiri.
 - **`GET /matrix/sku-shop` masih stub** (envelope kosong yang sah; komentar "SISA STUB").
 - **`mart_live_sessions` dan `mart_buyer_cohort` kosong** di production; `/lives` dan `/cohort` membalas kosong.
 - **Lock job & penjadwal hanya in-process** — belum aman di-scale horizontal.
