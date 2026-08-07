@@ -176,12 +176,13 @@ Service ini menyimpan **alasan ketidaklengkapan bersama datanya**, bukan membiar
 - **Interval penjadwal belum bisa diubah lewat env** (hanya jam, jendela, dan flag aktif).
 - **Job laba Lazada sengaja mati** di `channelProfitBawaan`.
 - **Cakupan ICC 51,2%** — sisanya butuh tim melengkapi `icc_account_mappings`, bukan perubahan kode.
+- **Kolom Pemegang di `/affiliate`** (2026-08-07) — kepemilikan akun kreator dari `integration_db.icc_affiliate_accounts`, **sumbu berbeda** dari `collaboration_type`: yang satu sifat order (target vs open collab, dari TikTok), yang lain siapa karyawan di balik username (dari daftar akun kita). Alias ikut dicocokkan agar order lampau tak terbaca "belum terdaftar" saat handle berganti. Tiga keadaan dibedakan: ada nama · `belum ditugaskan` (akun perusahaan tanpa pemegang) · `belum terdaftar` (di luar daftar). Bersifat pelengkap — bila koleksinya gagal dibaca, angka lain tetap tampil dan kolomnya kosong. Lihat [[Sales - ICC Affiliate Mapping]].
 - `InternalURL` divalidasi saat boot tapi nilainya belum dipakai.
 - Index `affiliate_orders {content_id, order_create_time}` untuk `/videos/orders` dibuat manual di production 2026-08-02 (tulis `integration_db` = di luar wewenang service ini; tercatat di komentar `cocokOrderVideo`).
 
 ## Dependensi & Integrasi
 
-- **Sumber data (baca-saja)**: `integration_db` milik [[Microservices - Integration Service]] — `transaction_orders`, `product_sku_mappings`, `product_costs`, `tt_business_*`, `tt_shop_video_performances`, `shopee_gms_*`, `affiliate_orders`, `icc_account_mappings`, `team_shops`, `marketing_teams`; plus `insentive_db` milik [[Microservices - Insentive Service]] (`employee_performance_mappings`, env `INSENTIVE_MONGO_URI`). Lihat juga [[Sales - Marketplace Integration]].
+- **Sumber data (baca-saja)**: `integration_db` milik [[Microservices - Integration Service]] — `transaction_orders`, `product_sku_mappings`, `product_costs`, `tt_business_*`, `tt_shop_video_performances`, `shopee_gms_*`, `affiliate_orders`, `icc_account_mappings`, `icc_affiliate_accounts`, `team_shops`, `marketing_teams`; plus `insentive_db` milik [[Microservices - Insentive Service]] (`employee_performance_mappings`, env `INSENTIVE_MONGO_URI`). Lihat juga [[Sales - Marketplace Integration]].
 - **API pihak ketiga**: TikTok Ads API `/open_api/v1.3/ad/get/` (`client_tiktok_ads_http.go`) hanya untuk tautan ad→video; metrik iklan dibaca dari Mongo, bukan API langsung. Kredensial gagal didekripsi dilewati **tapi dihitung dan dilaporkan**.
 - **Gerbang**: [[CORE - API Master Gateway]] · **Konsumen**: dashboard marketing di [[APP - Web ERP]]
 - **Konsep & rancangan**: [[Sales - Marketing Dashboard (Master Roadmap)]] · [[Sales - Marketing Dashboard (Index)]] · [[Sales - Profit Engine (Design)]] · [[Sales - HPP Master (Plan)]] · [[ADR - 0008 Profit Engine Join via item_group_id]]
