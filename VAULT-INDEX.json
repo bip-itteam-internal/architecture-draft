@@ -95,23 +95,24 @@
         "HRIS - Otomasi Skor KPI",
         "HRIS - Attrition",
         "Microservices - File Service",
+        "APP - MyBharata",
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "189c3ce04668c8908fadec0ef82c5c3e1d8e284bc8cb737b76d06edd6c66bf47",
-      "ukuran_kb": 20.1,
-      "ringkasan": "Menjawab pertanyaan seputar endpoint employee-service: cara login/registrasi karyawan, CRUD data pribadi/kerja/dokumen, pengelolaan master data departemen & system role, serta bagaimana akun pihak luar (vendor/mitra) diterbitkan dan diberi hak akses. Juga menjawab endpoint mana yang digerbang RBAC apa (HR, IT, atau internal) dan bagaimana status aktif/nonaktif karyawan (resign) ditangani.",
+      "hash": "8b16481b56963d5539e58191b1fadb8d848171460b4b6bf0ddd465f370a330d3",
+      "ukuran_kb": 21.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service untuk auth/login, CRUD data personal & pekerjaan karyawan, kredensial system-auth, master data (departemen, system role, job level), serta akun eksternal vendor/mitra, beserta RBAC yang menggerbang tiap endpoint. Juga menjawab perilaku non-obvious seperti PUT master departemen yang mempertahankan field supervisi bila tak disebut, endpoint mana yang mengubah is_active karyawan, dan bagaimana proses resign/non-aktif serta training program (yang sudah pindah ke service learning) ditangani.",
       "kata_kunci": [
         "employee-service",
-        "API",
-        "endpoint",
-        "login",
+        "API endpoint",
         "auth",
-        "RBAC",
+        "login",
         "master data",
         "departemen",
         "system role",
-        "akun eksternal vendor"
+        "RBAC",
+        "akun eksternal vendor mitra",
+        "job level"
       ]
     },
     {
@@ -1561,7 +1562,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — irisan 1 **live di DEV** dan terverifikasi lewat gateway (PR [#1040](https://github.com/bip-itteam-internal/bip-erp/pull/1040), [#1041](https://github.com/bip-itteam-internal/bip-erp/pull/1041), erp-frontend [#823](https://github.com/bip-itteam-internal/erp-frontend/pull/823), 2026-08-06). **PROD belum di-deploy.** Irisan 2 dan 3 belum ada kode.",
+      "status_teks": "Implemented (ada catatan) — agregasi + agenda mandiri **live di DEV** dan terverifikasi lewat gateway. Terakhir: PATCH sebagian ([#1067](https://github.com/bip-itteam-internal/bip-erp/pull/1067), 2026-08-07). **PROD tertinggal**: baru sampai irisan 1. Irisan 3 (sesi wajib) belum ada kode.",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
@@ -1569,8 +1570,6 @@
         "GA - Asset Loan & Room Booking",
         "Microservices - Inventory Service",
         "Microservices - Attendance Service",
-        "Microservices - Learning Service",
-        "Microservices - Recruitment Service",
         "Microservices - Task Management Service",
         "Microservices - Form Builder Service",
         "Microservices - Notification Service",
@@ -1578,21 +1577,20 @@
         "CORE - RBAC dan Permission Set",
         "APP - Web ERP"
       ],
-      "hash": "56e475279da5dbaf33205397e35f5e1bda572243f9c5d8294b581d6da17aede3",
-      "ukuran_kb": 10.0,
-      "ringkasan": "Menjawab: bagaimana cara mendaftarkan agenda modul baru ke kalender terpusat lewat endpoint feed `/internal/calendar-feed`, bentuk item apa yang wajib dipakai (id berprefiks, kind, all_day, scope, deep_link, status), dan mengapa dilarang membangun halaman kalender sendiri. Menjelaskan juga di mana penyaringan hak akses harus dikerjakan (di service sumber, bukan di kalender), bagaimana feed yang gagal turun kelas jadi penanda degraded, serta feed apa saja yang sudah terdaftar (holiday, leave, shift, contract_end) dan urutan feed berikutnya. Berguna untuk cek keputusan seperti ulang tahun karyawan dan Tukar Shift yang sengaja tidak dijadikan feed.",
+      "hash": "359c9c2e32d46cd833ab79ee66ee90269cd5af5105d6f4c917cf213c0be8e934",
+      "ukuran_kb": 16.6,
+      "ringkasan": "Menjawab: bagaimana cara mendaftarkan feed kalender baru dari service lain (kontrak GET /internal/calendar-feed, bentuk item wajib seperti kind/deep_link/all_day/scope), aturan visibilitas dan penyaringan hak akses yang wajib dikerjakan di service sumber bukan di kalender, serta endpoint publik kalender untuk agregasi lintas modul dan agenda mandiri (event). Juga menjawab kenapa fitur bertanggal dilarang membangun halaman kalender sendiri, dan feed apa saja yang sudah terdaftar (holiday, leave, contract_end, task_due, form_period).",
       "kata_kunci": [
+        "calendar-service",
         "kalender",
-        "calendar service",
-        "calendar-feed",
-        "agenda",
+        "calendar feed",
         "deep_link",
-        "all_day",
-        "scope",
         "providerRegistry",
-        "shift",
-        "holiday",
-        "degraded"
+        "visibilitas agenda",
+        "agenda mandiri",
+        "event",
+        "internal endpoint",
+        "scope personal department company"
       ]
     },
     {
@@ -5158,20 +5156,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "9d9ad2372198b6406c7037ff858ab8ed28ec7d1ef1bee91e30a0c24def8290e5",
-      "ukuran_kb": 49.6,
-      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang sumber datanya sudah siap dihitung otomatis, mana yang modulnya ada tapi datanya masih kosong, dan mana yang sama sekali tidak punya sumber data. Juga menjelaskan metrik apa saja yang sudah menyala otomatis di produksi (skor_tim, uptime_sistem/downtime), syarat urutan penilaian agar nilai otomatis benar-benar terpakai, dan cara membaca halaman diagnostik Otomasi KPI untuk melihat metrik mana yang macet beserta sebabnya.",
+      "hash": "439fabcebc0a9d24525e9ff1bdefaa2eabe1832313157a17bac315bb0471f506",
+      "ukuran_kb": 52.2,
+      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di produksi, mana yang sumber datanya sudah tersedia untuk diisi otomatis, mana yang modulnya ada tapi datanya kosong, dan mana yang belum punya sumber data sama sekali. Juga menjawab metrik apa saja yang sudah benar-benar menyala otomatis di produksi (Performance Monitoring Team, Network/uptime), bagaimana urutan penilaian anggota tim vs leader/supervisor mempengaruhi hasil auto_value, dan bagaimana membaca layar diagnostik Otomasi KPI beserta status seperti tanpa_karyawan.",
       "kata_kunci": [
-        "KPI otomatis",
-        "auto value",
-        "auto-values",
+        "KPI",
         "skor KPI",
-        "skor_tim",
-        "uptime_sistem",
+        "otomasi KPI",
+        "auto-values",
         "kpi_template",
         "kpi_score",
-        "Otomasi KPI",
-        "target metrik"
+        "skor_tim",
+        "scope team",
+        "auto_basis",
+        "Otomasi KPI diagnostik"
       ]
     },
     {
