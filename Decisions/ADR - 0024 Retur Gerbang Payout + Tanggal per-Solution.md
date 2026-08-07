@@ -1,4 +1,4 @@
-**Status**: ✅ **Implemented & Deployed** (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel). **Amandemen 2026-08-05 (✅ DEPLOYED 2026-08-05, commit `779b0a06`; verifikasi prod: 38 baris jejak tersemai, dari 1):** janji "SKIP → baris `SKIPPED`" di Decision #1 akhirnya benar-benar dipenuhi — sebelumnya baris hanya ditandai bila kebetulan sudah ada, sehingga mayoritas retur payout>0 **tak berjejak sama sekali** di UI; sekaligus menutup lubang dobel-booking lewat konfirmasi gudang yang baru terlihat setelah baris jejak itu ada. **Amandemen 2026-08-06 (✅ DEPLOYED, PR #1038):** cabang Shopee berhenti menebak dari kanal dan **menuntut bukti** mutasi penyerap; backfill + sensus penutup SELESAI hari yang sama (129 dari 131 retur ACCEPTED sudah berbaris; 2 sisanya DEFER benar). Lihat Consequences.
+**Status**: ⚠️ **Implemented & Deployed, ada CACAT diketahui** (2026-08-07: cabang bukti-mutasi-dompet men-skip kasus yang justru TIDAK dobel — lihat amandemen 2026-08-07; paparan 1 order). Riwayat: (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel). **Amandemen 2026-08-05 (✅ DEPLOYED 2026-08-05, commit `779b0a06`; verifikasi prod: 38 baris jejak tersemai, dari 1):** janji "SKIP → baris `SKIPPED`" di Decision #1 akhirnya benar-benar dipenuhi — sebelumnya baris hanya ditandai bila kebetulan sudah ada, sehingga mayoritas retur payout>0 **tak berjejak sama sekali** di UI; sekaligus menutup lubang dobel-booking lewat konfirmasi gudang yang baru terlihat setelah baris jejak itu ada. **Amandemen 2026-08-06 (✅ DEPLOYED, PR #1038):** cabang Shopee berhenti menebak dari kanal dan **menuntut bukti** mutasi penyerap; backfill + sensus penutup SELESAI hari yang sama (129 dari 131 retur ACCEPTED sudah berbaris; 2 sisanya DEFER benar). Lihat Consequences.
 
 # ADR - 0024 Retur: Gerbang Payout≈0 (Income vs Retur) + Tanggal per-Solution
 
@@ -74,6 +74,29 @@ Rinciannya:
 Pengecekan ulang sore harinya menutup keraguan yang sempat muncul. Sempat disimpulkan bahwa TikTok **tak punya** pemicu retur pasca-settle sehingga order DEFER-nya akan hilang — dasarnya benar (`triggerReturnAfterSettlement` memang hanya ada di `shopee_new_usecase.go`), tapi **kesimpulannya salah**: `585194325258241785` yang escrow-nya cair 6 Agustus **kini punya baris** dan berstatus PENDING menunggu scan gudang, yang memang benar untuk `solution=0`. Jalur susulannya adalah **ingestion `SyncReturns`** yang gate-nya menilai income settled (Decision #1, urutan terbalik) — bukan pemicu escrow. Sensus akhir: TikTok ber-retur ACCEPTED tanpa baris tinggal **1**, dan escrow-nya memang belum cair. ⚠️ Pemicu persisnya belum dipastikan (bisa juga efek restart container); uji sekali lagi pada order TikTok DEFER berikutnya.
 
 **Lima order `RETURNED` ber-faktur SENT tanpa pembalikan — ✅ TERJAWAB, bukan lubang.** Sempat dicurigai sebagai penjualan yang tak pernah terbalik. Diukur: kelimanya (`260713J5X2GM5Q`, `2607217RQW2HPB`, `260715QC755Y4M`, `26073018U2FJBX`, `260714KY4EA1CF`, semua Shopee) punya `return.status = CANCELLED`, **refund Rp0**, settlement **positif** (dibayar penuh), dan **nol scan gudang**. Artinya permintaan returnya dibatalkan, barang tetap di pembeli, uang tetap di kita — **tak ada yang perlu dibalik, pembukuannya sudah benar**. Yang salah hanya **label `order.status`** yang tertulis `RETURNED`; itu mengganggu laporan yang menyaring per status, bukan angka. Barisnya semua `SKIPPED`/acc 0 — konsisten.
+
+### ⚠️ Amandemen 2026-08-07 — DUA mekanisme penyerapan, efek akuntansi BERBEDA (gerbang men-skip kasus yang SALAH)
+
+Seluruh ADR ini berdiri di atas satu premis: "kalau receipt sudah menyerap refund, retur akan jadi pembalikan **dobel**". Premis itu **hanya benar untuk satu dari dua** mekanisme penyerapan, dan keduanya selama ini disamakan.
+
+| Mekanisme | Akun yang dipakai | Efek ke **pendapatan** | Retur akan dobel? |
+|---|---|---|---|
+| **Potongan Penjualan** (refund SEBAGIAN, `buildReceiptPayload`) | **4003** — kontra-pendapatan | **BERKURANG** | **YA** → gerbang BENAR |
+| **Mutasi dompet RR pasca-cair** (`accurate_receipt_wallet_adjustment.go` §2 *Refund pasca-cair*) | 6112/6114 — akun **beban**, plus mengurangi `PaymentAmount` | **TIDAK BERUBAH** | **TIDAK** → gerbang SALAH |
+
+Grounded ke kode: cabang refund pasca-cair menghitung `dana := -r.Tx.Amount + feeBack - shipping`, lalu `di.PaymentAmount -= dana` dan menambahkan diskon hanya ke `acc.Admin` (−feeBack) & `acc.Shipping` (+shipping). **Nol akun kontra-pendapatan.** Mengurangi `PaymentAmount` mencatat **UANG** — piutang fakturnya justru tetap terbuka — bukan membalik **PENDAPATAN**.
+
+Terverifikasi aritmetik pada `2607180VU58AJP`: `198.930 + 32.070 − 47.000 = ` **184.000**, tepat nilai barang di faktur (PJB-003 ×2 @92.000), dan cocok dengan dokumen terposting `INC/2026/07/28/014-BH` (Bayar faktur −184.000 · 6112 −32.070 · 6114 +47.000).
+
+**Konsekuensinya tajam**: amandemen 2026-08-06 membuat gerbang **menuntut bukti mutasi dompet lalu men-SKIP saat bukti itu ada** — yaitu persis kasus di mana skip **tidak** melindungi apa pun. Yang tertinggal: pendapatan tetap diakui dan piutangnya menggantung tanpa ada dokumen yang menutupnya.
+
+**Paparan kecil** (itu yang menyelamatkan): dari 23 order Shopee yang gerbang ini skip, hanya **1** punya mutasi RR. Sensus `shopee_wallet_transactions` tipe RR di seluruh DB juga hanya puluhan dokumen.
+
+**Obat untuk `2607180VU58AJP`** — pendapatan lebih catat Rp184.000, piutang menggantung Rp184.000, sedangkan **stok & kas sudah benar**: satu **Retur Penjualan Rp184.000 mode `NOT_RETURNED`** (refund-only; `return_solution=1`, barang tidak dikirim balik — mode `RETURNED` akan menambah stok 2 unit untuk barang yang tak pernah datang). Berdiri sendiri: **tidak menunggu** keputusan 🟡 di bawah, karena sisi receipt-nya memang tak menyentuh pendapatan. Yang menunggu 🟡 hanya 7 baris karantina kelas Potongan-Penjualan.
+
+⚠️ **Revisi untuk rencana 🟡 di bawah**: butir *"baris wallet-adjustment Shopee berhenti mengurangi bayar-faktur untuk porsi nilai barang"* **jangan diterapkan apa adanya**. Untuk jalur ini justru keliru — kas yang benar-benar keluar tak punya tempat mendarat sehingga receipt tak seimbang. Butir itu ditulis dengan asumsi receipt menyerap **pendapatan**; benar untuk jalur 4003, salah untuk jalur dompet. Yang mengurangi bayar-faktur mencatat **uang**, yang mengurangi pendapatan adalah **retur** — keduanya memang perlu ada berdampingan.
+
+> **Pelajaran umum**: "sudah diserap di tempat lain" bukan satu pernyataan, melainkan pertanyaan **akun mana**. Sebelum memakai keberadaan suatu dokumen sebagai alasan tidak membukukan dokumen lain, telusuri **akun** yang tersentuh — bukan sekadar ada/tidaknya penyerap.
 
 ### 🟡 Keputusan bisnis 2026-08-05 — nilai barang SELALU via retur (BELUM diimplementasi)
 
