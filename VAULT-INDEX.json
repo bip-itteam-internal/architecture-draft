@@ -2022,22 +2022,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "HRIS - Otomasi Skor KPI"
       ],
-      "hash": "c8bc9936d92b0732d35277bb1c8c34327e1499a3a48d39fd4a822e2471e8e43a",
-      "ukuran_kb": 29.0,
-      "ringkasan": "Menjawab bagaimana arsitektur Marketing Analytics Service bekerja: kenapa ia membaca integration_db secara read-only dan lewat lapis penjagaan apa, bagaimana pre-agregasi ke koleksi mart_* dilakukan, bagaimana vonis laba dihitung (empat status tanpa_data/rugi/waspada/sehat) dan kenapa harus dijumlah dari level shop saja, serta kapan /health turun jadi degraded. Juga menjawab channel data apa saja yang didukung (TikTok/Shopee/Lazada) dan fitur mana yang masih stub atau menunggu merge.",
+      "hash": "22204aa23515f6ef15b25e881b77c87e2ad57cd2018d2c31ad05e8745ef4f6f2",
+      "ukuran_kb": 29.5,
+      "ringkasan": "Menjawab: bagaimana laba dan performa marketing dihitung per toko, produk, kampanye, iklan, video, dan sesi live, serta endpoint apa saja yang tersedia untuk itu (profit, retur, affiliate, price floor, job sync). Menjelaskan juga bagaimana penjaga tiga lapis mencegah service ini menulis ke integration_db milik service lain, kenapa vonis laba di halaman beranda dijumlahkan dari level toko saja (bukan toko+produk+kampanye sekaligus), dan bagaimana channel TikTok/Shopee/Lazada disinkronkan lewat penjadwal internal 48 jam.",
       "kata_kunci": [
-        "marketing analytics service",
-        "mart",
-        "integration_db",
-        "vonis laba",
+        "marketing analytics",
+        "profit attribution",
+        "laba marketing",
         "ROAS",
-        "ambang keputusan",
+        "CPA",
         "price floor",
         "TikTok",
         "Shopee",
         "Lazada",
-        "beranda",
-        "read-only"
+        "integration_db read-only"
       ]
     },
     {
