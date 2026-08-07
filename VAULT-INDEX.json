@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-07",
+  "digenerate": "2026-08-08",
   "jumlah_dokumen": 276,
   "dokumen": [
     {
@@ -2021,22 +2021,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "HRIS - Otomasi Skor KPI"
       ],
-      "hash": "626d81b1b2548b94d6f9bd27157802b9f08c193c1c7528cdbbc9375583e0528a",
-      "ukuran_kb": 30.7,
-      "ringkasan": "Menjawab bagaimana Marketing Analytics Service bekerja secara arsitektural: cara ia membaca `integration_db` service lain secara baca-saja dengan penjagaan tiga lapis, kenapa `/health` bisa turun jadi `degraded`, channel apa saja yang didukung (TikTok, Shopee, Lazada), dan bagaimana koleksi `mart_*` disusun dari penjadwal sync 48 jam. Juga menjawab bagaimana vonis laba di halaman `/beranda` dihitung (lima keadaan: tanpa_data/belum_matang/rugi/waspada/sehat), kenapa `belum_matang` bukan berarti rugi, dan gotcha akurasi seperti dampak `Limit` bawaan terhadap kelengkapan agregasi.",
+      "hash": "d120e0bed4c4af4cada0e58be047f20e0283c197e03955b3dc7657825d39144a",
+      "ukuran_kb": 34.0,
+      "ringkasan": "Menjawab: apa fungsi Marketing Analytics Service (agregasi laba dan performa marketing per toko/produk/kampanye/video/live dari channel TikTok dan Shopee ke koleksi mart_*), endpoint apa saja yang tersedia (termasuk /beranda dan /ambang yang masih menunggu merge PR #1080), dan bagaimana logika vonis laba lima-keadaan (tanpa_data, belum_matang, rugi, waspada, sehat) dihitung dari proporsi settlement yang belum matang beserta riwayat empat iterasi ambangnya. Juga menjelaskan kenapa integration_db hanya boleh dibaca (bukan ditulis) dengan tiga lapis penjagaan, konvensi tanggal hari WIB vs UTC, serta penjadwal sync internal 48 jam dan status endpoint per channel data.",
       "kata_kunci": [
-        "marketing analytics service",
-        "arsitektur microservice",
-        "mart_profit_attribution",
-        "integration_db read-only",
+        "marketing analytics",
+        "ROAS",
+        "vonis laba",
+        "belum matang",
+        "settlement matang",
         "TikTok",
         "Shopee",
         "Lazada",
-        "vonis laba",
-        "ROAS",
-        "penjadwal sync",
-        "beranda",
-        "mart_*"
+        "price floor",
+        "beranda ambang"
       ]
     },
     {

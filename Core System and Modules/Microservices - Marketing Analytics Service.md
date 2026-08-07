@@ -44,11 +44,39 @@ Penjaga yang sama sudah dibuktikan menutup `insentive_db` (sumber ICC) — arahn
 `belum_matang` datang dari **verifikasi produksi**. Terukur 1-7 Agustus 2026: laba -418.450.632 dengan ROAS 7,43 (ambang 3,2), sementara `catatan_perkiraan` pada respons yang sama berbunyi "Laba minus di baris ini berarti BELUM MATANG, bukan rugi". Tren enam bulannya positif kuat seluruhnya; hanya jendela tujuh hari itu negatif. Lencananya membantah catatannya sendiri. Aturannya penguraian, tanpa ambang:
 
 ```
-labaMatang = jumlah gross_profit baris level shop yang TIDAK bertanda SettlementBelumMatang
-belum_matang  <=>  labaKotor < 0 DAN labaMatang >= 0
+labaTakPulih = jumlah gross_profit baris level shop yang TIDAK bertanda SettlementBelumMatang
+
+belum_matang  <=>  labaKotor < 0
+                   DAN ( labaTakPulih >= 0
+                         ATAU abs(labaTakPulih) <= AmbangMaterialitasTakPulih * abs(labaKotor) )
 ```
 
+**Aturan ini butuh EMPAT iterasi, dan ketiga kegagalannya berbentuk sama: sebagian kecil sinyal mengalahkan sebagian besar, cuma berganti arah.** Riwayatnya ditulis di sini karena tiap percobaan tampak masuk akal saat dirancang:
+
+| Percobaan | Aturan | Gagalnya |
+|---|---|---|
+| 1 | penularan satu-baris ala `GabungBulanan` | satu baris mentah mengalahkan 50 toko rugi nyata |
+| 2 | `labaTakPulih >= 0` saja | produksi: -231.857 memveto -430.711.202 (0,05% mengalahkan 99,95%) |
+| 3 | plus keluarkan baris beromzet nol | kebalikannya: -20 jt iklan hangus ditutupi +5 rb matang |
+| 4 | plus pita materialitas | keempat bentuk terjawab |
+
+Sebabnya struktural, dan itu pelajaran yang berlaku di luar kasus ini: **vonis biner tak dapat menyatakan "hampir seluruhnya belum matang dengan komponen nyata yang tak berarti" tanpa penilaian materialitas.** Setiap aturan tanpa ambang akan jatuh ke salah satu sisi. Menghindari ambang di sini bukan kehati-hatian melainkan penyebab tiga iterasi.
+
+`AmbangMaterialitasTakPulih = 0.05` ditandai eksplisit di kode sebagai **nilai awal yang belum dibuktikan dari data**, berbeda dari `AmbangSettlementMatang` (0,70) yang diturunkan dari 1.586 pasangan berlabel. Batasnya `<=` dan dikunci dua sisi oleh test. Ambangnya **murni relatif tanpa lantai mutlak**: pada skala miliaran, 5% tetap berarti ratusan juta kerugian matang yang diampuni. Bila kelak perlu direvisi, pola ambang ganda relatif-plus-mutlak sudah ada di `toleransiInvarianShopee`.
+
+Periode tanpa satu pun baris bertanda tak butuh penanganan khusus: `labaTakPulih` identik dengan `labaKotor` secara aljabar, rasionya 100%, vonisnya `rugi`.
+
 **Penularan gaya `GabungBulanan` sengaja DITOLAK di sini.** Fungsi itu menodai total satu entitas dari hari-hari entitas itu sendiri, di mana hari yang ternoda memang bagian berarti dari total yang sama. `hitungBeranda` menjumlahkan lusinan toko tak berkaitan jadi satu lencana perusahaan: 50 toko rugi matang plus satu toko baru dengan satu order nyangkut akan membalik seluruh lencana dan memberi tahu direktur "nanti pulih sendiri" tentang kerugian yang nyata. Urutan evaluasi `tanpa_data` → `belum_matang` → `rugi` → `waspada` → `sehat`; menaruh `belum_matang` sesudah `rugi` membuatnya tak pernah menyala.
+
+### Hari WIB, dan kapan UTC justru yang benar
+
+Konvensi tanggal modul ini **"hari WIB dikodekan sebagai tengah malam UTC"**, terverifikasi dari data produksi: baris mart membawa `2026-08-01T00:00:00Z` untuk hari WIB 1 Agustus, dan `waktuKueriSah` mengurai `2026-08-01` jadi nilai yang sama persis. Karena itu seluruh aritmetika tanggal di atas nilai hasil urai query sudah konsisten dan **tak boleh "diseragamkan"** ke WIB.
+
+Yang salah adalah pertanyaan yang berbeda: **"hari ini tanggal berapa?"**. Antara pukul 00:00 dan 07:00 WIB, `time.Now().UTC()` masih menunjuk hari kemarin, sehingga rentang bawaan berakhir kemarin dan hari berjalan lenyap dari layar tanpa satu pun tanda. Terjadi di **sebelas** tempat: `/beranda`, `/ambang`, dan sembilan handler lain lewat `denganBawaan(...)`. Diperbaiki dengan `hariIniWIB` di `bacaan.go`, memakai `zonaWIB` yang sudah ada (offset tetap, bukan `time.LoadLocation` — Indonesia tak punya DST dan tzdata sistem tak dapat diandalkan).
+
+**Yang TETAP UTC dan memang benar**: `st.LastOKAt`, `SyncedAt`, `CreatedAt`, `dibuatPada`, `batasBasi`, dan argumen `hitungKesegaran`. Semuanya instant atau stempel waktu audit, bukan tanggal. Membedakan keduanya adalah inti persoalannya: enam tempat sempat dicurigai salah, empat di antaranya ternyata benar.
+
+Penjaganya `TestRentangBawaanPakaiHariWIBBukanUTCPolos` — pemindai AST berdaftar **dinamis** (`filepath.Glob`), jadi berkas baru ikut terjaga. Batasnya jujur tertulis di komentarnya: ia mencocokkan ekspresi harfiah, jadi variabel antara (`n := time.Now().UTC()`) dan helper pembungkus lolos.
 
 **Pembacaan agregat WAJIB menaikkan `Limit` sendiri.** `filterMart.Limit` bernilai nol berarti `limitReturBawaan` (500), yang merupakan ukuran halaman untuk tabel, bukan batas untuk penjumlahan. Karena urutannya `gross_profit` menurun, pemancungan membuang barisnya yang **merugi** lebih dulu: vonis jadi terlalu optimis dan daftar penggerus permanen kosong. Ketika pembacaan menyentuh `limitReturMaks`, amplopnya melaporkan diri lewat `unavailable_channels` (pola `ReasonMatrixSumberTerpancung`).
 
