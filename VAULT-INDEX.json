@@ -1647,20 +1647,22 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "0bf01fb17dc7dfd1d4a6ceebe9d5f5824efd04c977d7ea9fdf0c8b7485ff2a5b",
-      "ukuran_kb": 50.7,
-      "ringkasan": "Menjawab pertanyaan tentang arsitektur backend employee-service: endpoint apa saja yang sudah diimplementasikan (auth, master data, akun eksternal, workspace Legal/R&D/Quality/Procurement), stack teknologi, dan status tiap fitur (live, pending runtime, atau TBD). Juga menjelaskan kenapa beberapa workspace posisi di-host di service ini alih-alih membuat service baru.",
+      "hash": "0f9ba1ad2564e6829cd8b64a5a41267fc52f73fc736c2c6e5970f4199e1bba49",
+      "ukuran_kb": 51.5,
+      "ringkasan": "Menjawab: apa saja endpoint Employee Service (auth/login/PIN/biometric, onboarding, account admin seperti reset akun dan forget-device, CRUD master data departemen & system role), dan bagaimana service ini jadi sumber kebenaran autentikasi serta feed data lintas-service. Juga menjelaskan workspace posisi lain (Legal, R&D Regulatory, Quality, Procurement) yang ikut di-host di service ini beserta status implementasinya.",
       "kata_kunci": [
-        "employee-service",
-        "microservice",
-        "Go Fiber",
-        "MongoDB",
+        "employee service",
         "auth",
-        "master data",
+        "login",
+        "SSO",
+        "onboarding",
+        "master data departemen",
+        "system roles",
+        "RBAC",
+        "account reset",
         "legal",
-        "R&D",
-        "quality",
-        "procurement"
+        "procurement",
+        "quality"
       ]
     },
     {
@@ -5158,20 +5160,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "a1032bbb0986e5a8cdbd661a0eb764f00e9378f1fdf4e9a76069e3bb7a4e0762",
-      "ukuran_kb": 47.1,
-      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di production, mana yang sumber datanya sudah tersedia untuk diisi otomatis, mana yang modulnya ada tapi datanya belum dipakai, dan mana yang memang tidak punya sumber data sama sekali. Menjawab juga metrik mana yang sudah benar-benar menyala di produksi (Tech Development, IT Support), bagaimana membaca status di layar diagnostik Otomasi KPI (otomatis/semi/manual/tanpa_karyawan), dan urutan penilaian yang harus dijaga (anggota tim dulu baru Leader/Supervisor) supaya angka otomatis benar-benar terpakai dan tidak keburu tertimpa penilaian manual.",
+      "hash": "6f2f1d65a0799cfc056cec2e4a509a9fbe3d9c405ccf904f1eeb567bb82ce68c",
+      "ukuran_kb": 48.6,
+      "ringkasan": "Menjawab: metrik KPI mana saja dari 311 metrik yang bisa diisi otomatis dari data ERP yang sudah ada, mana yang modulnya ada tapi datanya kosong, dan mana yang sama sekali tidak punya sumber. Juga menjelaskan status terkini metrik otomatis yang sudah menyala di produksi (skor_tim, uptime_sistem), cara kerja perhitungannya (cakupan otomatis vs semi-otomatis), dan bagaimana melihat metrik mana yang macet lewat halaman diagnostik Otomasi KPI.",
       "kata_kunci": [
         "KPI",
         "skor KPI",
         "otomasi KPI",
-        "auto-value",
+        "auto_value",
         "kpi_template",
         "kpi_score",
         "skor_tim",
-        "Employee Service",
-        "auto_basis",
-        "uptime_sistem"
+        "uptime_sistem",
+        "performance monitoring",
+        "auto_basis"
       ]
     },
     {
@@ -7186,19 +7188,20 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "4849ff158f5cc7b45bfedd06b704b4fe4aa05cc6fdb51e76752ae330972831a6",
-      "ukuran_kb": 25.9,
-      "ringkasan": "Menjawab pertanyaan \"bagaimana cara dev departemen menambahkan satu metrik KPI otomatis baru\" tanpa menyentuh aturan penilaian dan tanpa bertabrakan dengan dev departemen lain. Menjelaskan model mental perhitungan (sumber -> reduksi -> arah target), kenapa dihitung ulang bukan diakumulasi harian, dan langkah konkret mendaftarkan sumber data baru beserta contoh yang sudah terpasang di produksi.",
+      "hash": "d5165d68a541689b55fadbde2127c4a33db0c2e01934e22c987ef55faa8a2ac3",
+      "ukuran_kb": 26.9,
+      "ringkasan": "Menjawab: bagaimana langkah-langkah dev departemen menambahkan satu metrik KPI baru yang terisi otomatis tanpa menyentuh aturan penilaian, apa saja tiga lapis perhitungannya (sumber, reduksi, arah+target), dan kapan datanya perlu dihitung ulang versus disnapshot harian. Menyertakan contoh sumber yang sudah terpasang di produksi (skor_tim, uptime_sistem, kaizen, kinerja_toko, kinerja_tiket) sebagai rujukan implementasi.",
       "kata_kunci": [
-        "KPI",
-        "metrik otomatis",
-        "runbook",
+        "KPI otomatis",
+        "runbook KPI",
+        "sumber metrik",
         "kpi_template",
-        "sumber data",
+        "KPIAutoConfig",
         "reduksi",
-        "target",
-        "auto_basis",
-        "panduan implementasi"
+        "skor_tim",
+        "uptime_sistem",
+        "kaizen",
+        "cakupan data"
       ]
     },
     {
