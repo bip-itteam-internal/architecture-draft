@@ -5,7 +5,7 @@
 - **Stack:** Next.js (frontend) · Go + Fiber v2 + MongoDB (backend)
 - **Path frontend:** `frontend/src/features/marketing-insight/affiliate/`
 - **Path backend (target):** `bip-erp/services/integration/` · `bip-erp/services/employee/` (TBD)
-- **Status**: ⚠️ Implemented parsial — mapping berjalan tapi hardcoded di frontend; **rancangan penggantinya sudah diputuskan**, lihat [[#Keputusan Desain 2026-08-06 — Dikelola lewat ICC Management]] (🟡 belum dikerjakan)
+- **Status**: ⚠️ Implemented parsial — daftar internal di frontend masih hardcoded, **tetapi penggantinya sudah mulai dibangun**: backend `icc_affiliate_accounts` (Fase A) selesai 2026-08-07. Lihat [[#Keputusan Desain 2026-08-06 — Dikelola lewat ICC Management]] dan [[#Rencana Implementasi (Revisi 2026-08-06)]]
 
 ---
 
@@ -188,7 +188,7 @@ Alasan memilih Opsi A: konsisten dengan pola yang sudah ada di [[Microservices -
 
 *Permintaan: username akun affiliate bisa diinput di ICC Management, lalu dipakai memetakan data affiliate di [[APP - Web ERP]] menu Marketing Analytics → Affiliate. Sumber data awal: `z-file-hasil/DATA NAMA AKUN TIKTOK ICC BEAUTYHACKS.xlsx` tab **AKUN TIKTOK ICC** — 36 staff, 49 username (Beauty Hacks saja; Kyura belum ada).*
 
-- **Status**: 🟡 Rencana — desain disetujui, belum ada di kode.
+- **Status**: ⚠️ Sebagian terimplementasi — **Fase A (backend) selesai** 2026-08-07: koleksi `icc_affiliate_accounts`, endpoint `/icc/affiliate-accounts`, `NormalisasiUsername`, index & alias. Fase B–E belum; rinciannya di [[#Rencana Implementasi (Revisi 2026-08-06)]].
 
 ### Mengapa bukan Opsi A (Employee Service)
 
@@ -321,7 +321,7 @@ Justru karena keduanya independen, **persilangannya** yang bernilai:
 
 | Fase | Scope | Status |
 |---|---|---|
-| **A** | Integration: koleksi `icc_affiliate_accounts` (`employee_id` opsional) + endpoint + normalisasi/validasi + unit test | 🟡 Belum |
+| **A** | Integration: koleksi `icc_affiliate_accounts` (`employee_id` opsional) + endpoint + normalisasi/validasi + unit test | ✅ Selesai (2026-08-07; branch `feat/icc-affiliate-accounts`) |
 | **B** | FE ICC Management: sub-tab **Akun Affiliate** di kartu team (termasuk akun belum ditugaskan), dialog kelola (tambah/rename→alias/tetapkan pemegang/nonaktifkan), baris Toko & Iklan = mapping ∪ akun affiliate | 🟡 Belum |
 | **C** | Import awal dari Excel Beauty Hacks (script sekali jalan, lihat [[#Aturan impor dari Excel]]); Kyura menyusul | 🟡 Belum |
 | **D** | Pensiunkan `internal-creators.ts` — sumber pindah ke DB (halaman lamanya sudah tanpa menu) | 🟡 Belum |
