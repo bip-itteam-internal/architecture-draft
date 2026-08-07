@@ -108,6 +108,24 @@ Tiga status pertama memakai nama yang sama persis dengan `KPISources` di `shared
 
 Kontrak lengkapnya di [[API - Employee Service]]; cara menambah metrik otomatis baru dan memverifikasinya lewat layar ini di [[RUN - Menambah Metrik KPI Otomatis]].
 
+## Progres bulan berjalan di MyBharata
+
+> **Status**: 🟡 belum merge — bip-erp PR [#1071](https://github.com/bip-itteam-internal/bip-erp/pull/1071) (endpoint) + my-bharata PR [#109](https://github.com/bip-itteam-internal/my-bharata/pull/109) (layar, ke branch `dev`).
+
+Metrik otomatis hidup di produksi sejak 6 Agustus, tetapi **orang yang dinilai tak pernah melihatnya**. `GET /me/kpi-score` membaca dokumen `kpi_score` tersimpan dan membalas 404 bila belum ada, sedangkan layar KPI MyBharata mematok batas tombol maju di **bulan kemarin** — jadi bulan berjalan tak punya isi sekaligus tak bisa dibuka. Yang bisa melihat angka otomatis hanya penilai, lewat modal Score KPI dan halaman Otomasi KPI.
+
+`?preview=true` pada periode yang belum dinilai kini membalas 200 dengan progres berjalan: metrik yang sudah punya angka beserta basisnya, ditambah **cacahan** metrik yang masih menunggu atasan.
+
+**Tidak ada skor total di respons maupun di layar, dan itu keputusan utamanya.** Metrik otomatis baru menutupi sebagian bobot template — untuk IT Support baru satu metrik berbobot 0,4 dari empat. Total apa pun yang dihitung dari sebagian itu menyesatkan: menganggap sisanya nol memberi 40, menormalisasi ke yang ada memberi 100, dan keduanya terlihat meyakinkan padahal keduanya salah. Angka besar di layar selalu terbaca sebagai kesimpulan, bukan perkiraan.
+
+Keputusan lain yang perlu diketahui sebelum menirunya:
+
+- **Metrik yang GAGAL dihitung diperlakukan sama dengan metrik manual**, tidak dikirim beserta alasannya. Kalimat seperti "belum ada tiket bertenggat" ditulis untuk penilai yang bisa menindaklanjuti, bukan untuk karyawan yang cuma akan membacanya sebagai tuduhan. Bagi yang dinilai, keduanya sama-sama menunggu atasan.
+- **`preview` opt-in, bukan perilaku baru yang dipaksakan.** Aplikasi yang telanjur terpasang di ponsel tetap menerima 404 yang sama. Tanpa itu, bentuk respons yang berbeda membuat parser lamanya pecah pada field `template` yang tak ada — `KpiModel.fromJson` melakukan `json['template'] as Map<String, dynamic>` tanpa penjagaan.
+- **`dinilai: false` adalah inti kontraknya.** Tanpa penanda itu aplikasi akan menampilkan angka berjalan dengan gaya yang sama seperti skor final.
+- **Basis ditampilkan apa adanya** (`uptime 99.93%; 7 dari 31 hari berdata`) supaya angkanya bisa ditelusuri tanpa bertanya. Metrik bersumber `semi` diberi keterangan bahwa datanya belum lengkap — pada bulan berjalan itu keadaan normal, dan tanpa keterangan akan terbaca sebagai cacat.
+- **Perhitungannya memanggil `terapkanOtomatis`**, bukan menyalin rumusnya: karyawan dan penilai harus melihat angka yang sama.
+
 ## Kondisi Saat Ini
 
 > Bab ini menggambarkan keadaan **sebelum** otomasi menyala, dan sengaja dipertahankan sebagai titik banding. Per 2026-08-06 tiga metrik sudah otomatis (bab di atas); sisanya, 308 dari 311, masih diisi manusia.
