@@ -10,5 +10,6 @@
 
 - [[Finance - Bridging App]] — implementasi bridging
 - [[Finance - Incentive]] — perhitungan insentif
+- [[Finance - Dashboard per Posisi (FAT)]] — dashboard keuangan per posisi (kartu + grafik keputusan)
 - [[External - Accurate]] (akuntansi) · [[Vendor - CRM]] (sumber data purchase order)
 
