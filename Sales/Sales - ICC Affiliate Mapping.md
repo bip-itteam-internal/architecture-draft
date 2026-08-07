@@ -5,7 +5,8 @@
 - **Stack:** Next.js (frontend) · Go + Fiber v2 + MongoDB (backend)
 - **Path frontend:** `frontend/src/features/marketing-insight/affiliate/`
 - **Path backend (target):** `bip-erp/services/integration/` · `bip-erp/services/employee/` (TBD)
-- **Status**: ⚠️ Implemented parsial — daftar internal di frontend masih hardcoded, **tetapi penggantinya sudah mulai dibangun**: backend `icc_affiliate_accounts` (Fase A) selesai 2026-08-07. Lihat [[#Keputusan Desain 2026-08-06 — Dikelola lewat ICC Management]] dan [[#Rencana Implementasi (Revisi 2026-08-06)]]
+- **Status**: ✅ Implemented (2026-08-07) — daftar akun internal kini hidup di DB (`icc_affiliate_accounts`), dikelola SPV lewat **ICC Management** dan tampil sebagai kolom **Pemegang** di **Marketing Analytics → Affiliate**. Konstanta hardcoded sudah dihapus. Lihat [[#Keputusan Desain 2026-08-06 — Dikelola lewat ICC Management]] dan [[#Rencana Implementasi (Revisi 2026-08-06)]].
+- **Belum**: data produksi belum diimpor (alat siap, lihat Fase C), Kyura belum ada berkasnya, serta antrean kandidat akun internal & pengisian `last_seen_at` belum dibuat.
 
 ---
 
@@ -17,7 +18,9 @@ Data performa affiliate (GMV, komisi, order) sudah ter-capture otomatis dari Tik
 
 ---
 
-## Implementasi Saat Ini (Hardcoded — ⚠️)
+## Implementasi Lama (Hardcoded — sudah dicabut 2026-08-07)
+
+> 🗄️ **Arsip.** `internal-creators.ts` sudah dihapus dan tab ICC di `/marketing-insight/affiliate` dicabut. Bagian ini dipertahankan sebagai jejak: ia menerangkan mengapa penggantinya dirancang seperti sekarang. Keadaan yang berlaku ada di [[#Keputusan Desain 2026-08-06 — Dikelola lewat ICC Management]].
 
 ### Lokasi
 
@@ -324,14 +327,16 @@ Justru karena keduanya independen, **persilangannya** yang bernilai:
 | **A** | Integration: koleksi `icc_affiliate_accounts` (`employee_id` opsional) + endpoint + normalisasi/validasi + unit test | ✅ Selesai (2026-08-07; branch `feat/icc-affiliate-accounts`) |
 | **B** | FE ICC Management: sub-tab **Akun Affiliate** di kartu team (termasuk akun belum ditugaskan), dialog kelola (tambah/rename→alias/tetapkan pemegang/nonaktifkan) | ✅ Selesai (2026-08-07) |
 | **C** | Alat impor `cmd/iccaffiliateimport` (dry-run bawaan, `-apply` untuk menulis) — lihat [[#Aturan impor dari Excel]]. **Belum dijalankan ke produksi**; Kyura belum ada berkasnya | ✅ Alat siap (2026-08-07) |
-| **D** | Pensiunkan `internal-creators.ts` — sumber pindah ke DB | ⛔ Ditahan sampai Fase E (lihat catatan di bawah) |
-| **E** | Marketing Analytics → Affiliate: kolom **Kepemilikan** (dimensi baru, bukan pengganti Golongan) + antrean kandidat akun internal + pengisian `last_seen_at`, lewat baca-langsung `integration_db` | 🟡 Belum |
+| **D** | Pensiunkan `internal-creators.ts` — sumber pindah ke DB | ✅ Selesai (2026-08-07) |
+| **E** | Marketing Analytics → Affiliate: kolom **Pemegang** (sumbu baru, bukan pengganti Golongan) lewat baca-langsung `integration_db` | ✅ Selesai (2026-08-07). Sisa: antrean kandidat akun internal & pengisian `last_seen_at` — 🟡 belum |
 
 **Fase B — penyimpangan yang disengaja**: baris karyawan di tab *Toko & Iklan* **tidak** digabung dengan akun affiliate seperti rancangan awal. Dengan adanya sub-tab, karyawan yang hanya punya akun affiliate sudah terlihat sebagai pemegang akun di tab sebelahnya; menggabungkannya hanya menambah baris yang seluruh kolom tokonya kosong.
 
-**Fase D ditahan, bukan terlewat**: `internal-creators.ts` adalah satu-satunya sumber tab ICC di halaman lama `/marketing-insight/affiliate`. Halaman itu memang sudah tak punya menu, tetapi rutenya **sengaja dipertahankan** agar tautan lama tidak putus. Mempensiunkan konstantanya sebelum Fase E berarti menghapus satu-satunya cara melihat daftar kreator internal, sementara penggantinya belum ada. Urutan yang benar: **E dulu, baru D**.
+**Fase D — yang dicabut hanya tab ICC, bukan halamannya**: `internal-creators.ts` sudah dihapus setelah penggantinya (kolom Pemegang, Fase E) ada. Halaman lama `/marketing-insight/affiliate` **tetap hidup** karena masih memuat validasi komisi, riwayat sync, dan view Shopee yang belum ada di penggantinya, dan rutenya sengaja dipertahankan agar tautan lama tidak putus. Tab ICC-nya diganti satu paragraf yang menunjuk ke kolom Pemegang.
 
-**Prasyarat Fase E**: koleksi harus sudah terisi (jalankan Fase C ke produksi) — kolom Kepemilikan pada tabel yang kosong tak memberi tahu apa pun.
+**Fase E — tiga keadaan yang dibedakan** di kolom Pemegang, karena tindakannya berbeda: ada nama pemegang · **belum ditugaskan** (akun perusahaan, pekerjaan SPV di ICC Management) · **belum terdaftar** (di luar daftar — sengaja bukan disebut "luar", sebab daftar bisa belum lengkap). Alias ikut dicocokkan supaya order lampau tak mendadak terbaca belum terdaftar saat handle berganti; username aktif menang atas alias milik akun lain. Kepemilikan bersifat **pelengkap**: bila daftar akun gagal dibaca, halaman tetap tampil dengan angka yang benar dan kolomnya kosong.
+
+**Catatan operasional**: kolom Pemegang baru berisi setelah Fase C dijalankan ke produksi dan SPV menetapkan pemegangnya.
 
 ### Aturan impor dari Excel
 
