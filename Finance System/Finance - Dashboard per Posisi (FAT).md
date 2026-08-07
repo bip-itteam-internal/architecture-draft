@@ -7,7 +7,7 @@ Menu **Finance** menyediakan **dashboard per posisi** (Finance/Accounting/Tax �
 Kode: `erp-frontend/src/features/finance/posisi/`
 - `components/halaman-posisi.tsx` — perender generik (kartu/bagan/tabel/peringatan) dari `data/<posisi>.ts`.
 - `components/isi-<posisi>.tsx` — isi tiap posisi; yang hook-nya sudah tersambung merender kartu/grafik **nyata** lewat slot `atas`, judulnya didaftarkan ke `elemenDilewati` agar tak dobel dengan panel "menunggu penyambungan".
-- `components/bagan/` — pustaka grafik lokal: `BaganBatang`, `BaganBatangHorizontal`, `BaganGaris`, `BaganPersen`. Warna dari token tema `WARNA_SERI` (`var(--fat-*)`), bukan heksa.
+- `components/bagan/` — pustaka grafik lokal: `BaganBatang`, `BaganBatangHorizontal`, `BaganGaris`, `BaganPersen`, `BaganDonat` (donat komposisi, SVG + legenda). Warna dari token tema `WARNA_SERI` (`var(--fat-*)`), bukan heksa.
 - Rute: `app/(main)/finance/posisi/<posisi>/page.tsx` (guard izin di pemanggil). Posisi: `spv`, `ar-staf`, `ar-leader`, `junior-accounting`, `senior-accounting`, `cost-control`, `tax`, `ap`, `cv`.
 
 Hak akses per posisi mengikuti model RBAC yang hak-nya menempel di posisi — lihat [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].
@@ -24,12 +24,16 @@ Per pembaruan **2026-08-07** (FE), grafik hidup dari data yang hook‑nya sudah 
 
 | Posisi | Elemen hidup | Sumber |
 |---|---|---|
-| SPV | Tren AR >60 hari (garis); Beban per kelompok (persen); kotak persetujuan | agregator persetujuan, laba rugi Accurate |
+| Ringkasan Divisi | Aging piutang & Aging utang (donat komposisi); OPEX anggaran vs realisasi (batang) | `useFetchPiutangSummary`, `useAgingUtang`, `useFetchVariansEnamBulan` |
+| SPV | Tren AR >60 hari (garis); Beban per kelompok (persen); **Aging piutang** (donat); kotak persetujuan | agregator persetujuan, laba rugi & piutang Accurate |
 | AR Staf | Status penyelesaian retur (batang); Belum dicocokkan per kanal (persen); indikator target **Piutang >14 hari** & **Retur >14 hari** (maks 5%) | `useFetchReturnStats`, `useFetchMissingAgregat` |
 | AR Leader | Uang tertagih per minggu (batang); **Komposisi piutang per umur** (persen) | `useFetchReceiptMingguan`, `useFetchPiutangSummary` |
 | Cost Control | Varians per pos biaya (batang‑horizontal); **Anggaran vs Realisasi per pos** (batang 2 seri) | `useFetchVariansAnggaran` |
 | Junior Acc | **Transaksi hari ini vs rata‑rata** (batang) | `useFetchJurnal` |
 | AP | Aging utang (batang) | `useAgingUtang` |
+| Accounting CV | Penjualan per toko (bilah, 8 teratas) | `useFetchPenjualanToko` |
+| Senior Acc | Komposisi aset tetap (donat: nilai buku vs penyusutan) | `useFetchAsetTetap` |
+| Tax | Beban per kelompok (donat) | `useFetchLabaRugi` |
 
 Komponen indikator: `components/kartu-indikator-target.tsx` (pil hijau/amber/merah + bar target), status dihitung `lib/status-ambang.ts` (`statusAmbang({nilai,target,arah})` → `sehat|waspada|kritis`). Transform data grafik ada di `lib/bagan-*.ts` (murni, ber‑unit test).
 
