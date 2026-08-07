@@ -37,7 +37,18 @@ Penjaga yang sama sudah dibuktikan menutup `insentive_db` (sumber ICC) — arahn
 
 **Vonis dijumlahkan dari level SHOP saja.** Satu order muncul di baris tokonya, produknya, dan kampanyenya sekaligus; menjumlahkan ketiganya menghitung uang yang sama tiga kali. Ketiga level tetap dihitung untuk daftar sorotan supaya berpindah tab di FE tak memicu permintaan baru.
 
-**Vonisnya EMPAT keadaan**, dan yang keempat lahir dari review: `tanpa_data` untuk periode tanpa satu baris pun. Tanpanya, laba nol bukan `< 0` dan ROAS-nya `null`, sehingga aturan lama menjatuhkannya ke `sehat` dan melukis lencana hijau di atas nol.
+**Vonisnya LIMA keadaan**, dan dua di antaranya lahir dari pemeriksaan, bukan dari perancangan.
+
+`tanpa_data` datang dari review: tanpanya, laba nol bukan `< 0` dan ROAS-nya `null`, sehingga aturan lama menjatuhkannya ke `sehat` dan melukis lencana hijau di atas nol.
+
+`belum_matang` datang dari **verifikasi produksi**. Terukur 1-7 Agustus 2026: laba -418.450.632 dengan ROAS 7,43 (ambang 3,2), sementara `catatan_perkiraan` pada respons yang sama berbunyi "Laba minus di baris ini berarti BELUM MATANG, bukan rugi". Tren enam bulannya positif kuat seluruhnya; hanya jendela tujuh hari itu negatif. Lencananya membantah catatannya sendiri. Aturannya penguraian, tanpa ambang:
+
+```
+labaMatang = jumlah gross_profit baris level shop yang TIDAK bertanda SettlementBelumMatang
+belum_matang  <=>  labaKotor < 0 DAN labaMatang >= 0
+```
+
+**Penularan gaya `GabungBulanan` sengaja DITOLAK di sini.** Fungsi itu menodai total satu entitas dari hari-hari entitas itu sendiri, di mana hari yang ternoda memang bagian berarti dari total yang sama. `hitungBeranda` menjumlahkan lusinan toko tak berkaitan jadi satu lencana perusahaan: 50 toko rugi matang plus satu toko baru dengan satu order nyangkut akan membalik seluruh lencana dan memberi tahu direktur "nanti pulih sendiri" tentang kerugian yang nyata. Urutan evaluasi `tanpa_data` → `belum_matang` → `rugi` → `waspada` → `sehat`; menaruh `belum_matang` sesudah `rugi` membuatnya tak pernah menyala.
 
 **Pembacaan agregat WAJIB menaikkan `Limit` sendiri.** `filterMart.Limit` bernilai nol berarti `limitReturBawaan` (500), yang merupakan ukuran halaman untuk tabel, bukan batas untuk penjumlahan. Karena urutannya `gross_profit` menurun, pemancungan membuang barisnya yang **merugi** lebih dulu: vonis jadi terlalu optimis dan daftar penggerus permanen kosong. Ketika pembacaan menyentuh `limitReturMaks`, amplopnya melaporkan diri lewat `unavailable_channels` (pola `ReasonMatrixSumberTerpancung`).
 

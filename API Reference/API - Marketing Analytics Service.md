@@ -22,7 +22,9 @@ Lapisan baca murni di atas mart yang sudah ada; tak ada job atau koleksi `mart_*
 | GET | `/ambang` | Seluruh riwayat ambang + penanda `aktif`. **Tidak digerbang**: tiap pembaca perlu tahu terhadap apa angkanya dinilai |
 | POST | `/ambang` | Tambah baris ambang. Digerbang `common.RequireMarketingLeader` (**403** tanpa role); identitas penulis dari header gateway, tak pernah dari body; `roas_min`/`cpa_maks` wajib `> 0`, `effective_from` `YYYY-MM-DD`; cacat → **400 menyebut field-nya** |
 
-**Vonis punya EMPAT nilai**: `tanpa_data` (tak ada satu baris pun), `rugi` (laba `< 0`), `waspada` (laba `>= 0` tapi ROAS `< roas_min`), `sehat`. `tanpa_data` ada karena tanpanya periode kosong divonis `sehat` dan melukis lencana hijau di atas nol.
+**Vonis punya LIMA nilai**, dievaluasi berurutan: `tanpa_data` (tak ada satu baris pun) → `belum_matang` (laba `< 0` tapi minusnya hilang bila baris yang settlement-nya belum cair dikeluarkan) → `rugi` (laba `< 0`) → `waspada` (laba `>= 0` tapi ROAS `< roas_min`) → `sehat`.
+
+`tanpa_data` ada karena tanpanya periode kosong divonis `sehat` dan melukis lencana hijau di atas nol. `belum_matang` ada karena verifikasi produksi menemukan lencana RUGI di atas angka yang catatannya sendiri sebut "belum matang, bukan rugi". **Untuk FE: `belum_matang` bukan kabar buruk dan tak boleh berlencana merah** — artinya angkanya akan naik sendiri setelah settlement cair.
 
 **Nilai `null` berarti tak terhitung, bukan nol**: `roas` saat belanja nol, `iklan_persen_revenue` saat revenue nol, `delta_persen` saat pembanding nol.
 

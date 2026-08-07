@@ -486,23 +486,22 @@
         "API - Index",
         "CORE - API Master Gateway"
       ],
-      "hash": "666083ac79b51431b71d12dd6fe50fa657eb80b2c748d6c1d410920649c07817",
-      "ukuran_kb": 6.9,
-      "ringkasan": "Menjawab apa saja endpoint yang tersedia di Marketing Analytics Service — halaman depan/beranda dan ambang keputusan (ROAS/CPA), laba per toko/produk/kampanye/iklan/order, performa video & live, retur, price floor, serta job & health — beserta parameter, aturan validasi, dan format respons tiap route. Juga menjawab route mana yang sudah ada di kode produksi tetapi belum terdokumentasi di tabel manapun.",
+      "hash": "30c79c8e2fdb625454cc2aecd8a477bd5ad92e6177f07cbc96a58e637c46da8c",
+      "ukuran_kb": 7.3,
+      "ringkasan": "Menjawab endpoint apa saja yang tersedia di Marketing Analytics Service — halaman depan (`/beranda`) dan ambang keputusan ROAS/CPA, laba per toko/produk/kampanye/iklan/order (`/profit/*`), performa video & live, retur & analitik pembeli, price floor, serta trigger job dan status penjadwal/health — lengkap dengan parameter, aturan validasi (mis. enum tak dikenal jadi 400), dan konvensi amplop respons. Juga menjawab endpoint mana yang masih menunggu merge (`/beranda`, `/ambang`), route mana yang masih stub (`/matrix/sku-shop`), dan route mana yang sudah ada di kode tapi belum sempat terdokumentasi (`/toko`, `/kpi/kinerja-toko`, `/profit/items`).",
       "kata_kunci": [
         "marketing analytics",
-        "endpoint",
-        "API",
+        "API endpoint",
         "beranda",
-        "ambang",
+        "dashboard laba",
+        "ambang keputusan",
         "ROAS",
         "CPA",
         "profit attribution",
         "price floor",
-        "video",
+        "video performance",
         "retur",
-        "affiliate",
-        "gateway"
+        "drill order"
       ]
     },
     {
@@ -2022,20 +2021,22 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "HRIS - Otomasi Skor KPI"
       ],
-      "hash": "22204aa23515f6ef15b25e881b77c87e2ad57cd2018d2c31ad05e8745ef4f6f2",
-      "ukuran_kb": 29.5,
-      "ringkasan": "Menjawab: bagaimana laba dan performa marketing dihitung per toko, produk, kampanye, iklan, video, dan sesi live, serta endpoint apa saja yang tersedia untuk itu (profit, retur, affiliate, price floor, job sync). Menjelaskan juga bagaimana penjaga tiga lapis mencegah service ini menulis ke integration_db milik service lain, kenapa vonis laba di halaman beranda dijumlahkan dari level toko saja (bukan toko+produk+kampanye sekaligus), dan bagaimana channel TikTok/Shopee/Lazada disinkronkan lewat penjadwal internal 48 jam.",
+      "hash": "626d81b1b2548b94d6f9bd27157802b9f08c193c1c7528cdbbc9375583e0528a",
+      "ukuran_kb": 30.7,
+      "ringkasan": "Menjawab bagaimana Marketing Analytics Service bekerja secara arsitektural: cara ia membaca `integration_db` service lain secara baca-saja dengan penjagaan tiga lapis, kenapa `/health` bisa turun jadi `degraded`, channel apa saja yang didukung (TikTok, Shopee, Lazada), dan bagaimana koleksi `mart_*` disusun dari penjadwal sync 48 jam. Juga menjawab bagaimana vonis laba di halaman `/beranda` dihitung (lima keadaan: tanpa_data/belum_matang/rugi/waspada/sehat), kenapa `belum_matang` bukan berarti rugi, dan gotcha akurasi seperti dampak `Limit` bawaan terhadap kelengkapan agregasi.",
       "kata_kunci": [
-        "marketing analytics",
-        "profit attribution",
-        "laba marketing",
-        "ROAS",
-        "CPA",
-        "price floor",
+        "marketing analytics service",
+        "arsitektur microservice",
+        "mart_profit_attribution",
+        "integration_db read-only",
         "TikTok",
         "Shopee",
         "Lazada",
-        "integration_db read-only"
+        "vonis laba",
+        "ROAS",
+        "penjadwal sync",
+        "beranda",
+        "mart_*"
       ]
     },
     {
