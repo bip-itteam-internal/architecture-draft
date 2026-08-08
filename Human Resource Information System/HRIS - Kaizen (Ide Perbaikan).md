@@ -9,7 +9,7 @@
 - **Belum ada satu pun form kaizen dibuat di prod**, jadi seluruh perilaku barunya masih **inert** di sana: cron pengingat tak punya apa pun untuk dikirim, dan menu Komite Kaizen menampilkan "tidak ada program untuk Anda tinjau" — jawaban yang memang benar. Program baru bisa dinyalakan setelah HR menetapkan sasaran, kuota, komite, dan tanggal mulai (lihat TBD).
 - ✅ **Alur inti TERUJI end-to-end di dev 2026-08-06** lewat gateway, dengan Mongo dan employee-service hidup. Lihat bagian tersendiri di bawah.
 - ✅ **Prod lengkap sejak 2026-08-06**: #1016, #1018, dan [#1019](https://github.com/bip-itteam-internal/bip-erp/pull/1019) semuanya sudah naik (`23e8914a`). Diverifikasi probe biner dengan kontrol positif dan negatif, ditambah probe perilaku jalur galat. **Belum ada satu pun form kaizen dibuat di prod** — programnya baru bisa dinyalakan setelah HR menetapkan sasaran, kuota, dan komitenya.
-- **Rumah kode yang dipilih**: [[Microservices - Form Builder Service]], sebagai **tipe form kelima** (`form_type: "kaizen"`). Bukan service baru, bukan space di [[Microservices - Task Management Service]].
+- **Rumah kode yang dipilih**: [[Microservices - Form Builder Service]], sebagai **tipe form tersendiri** (`form_type: "kaizen"`; kelima saat ditambahkan, sebelum `request` dihapus). Bukan service baru, bukan space di [[Microservices - Task Management Service]].
 - Rancangan lengkap: `docs/superpowers/specs/2026-08-06-kaizen-pengumpulan-ide-design.md`; rencana per tahap: `docs/superpowers/plans/2026-08-06-kaizen-pengumpulan-ide.md`. Keduanya di root workspace, bukan di vault.
 
 > [!warning] Deploy ini tidak menyalakan program Kaizen bagi siapa pun

@@ -40,7 +40,16 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 
 **Tipe pertanyaan (10)** — `short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`, **`file`**. Validasi struktur (key unik, options wajib untuk tipe pilihan, rentang scale maksimal 10 langkah, `min ≤ max`) dan validasi jawaban (tipe cocok, nilai ∈ options, batas angka & panjang teks, format `YYYY-MM-DD` dan `HH:MM`) keduanya **fungsi murni** — teruji tanpa Mongo.
 
-**Tipe form (5)** — `survey`, `evaluation`, `request`, `checklist`, `kaizen`. Bukan sekadar label: tanpanya daftar form berisi survei, pengajuan, checklist, dan penilaian yang tampak serupa padahal cara mengisinya berbeda jauh. `GET /forms?form_type=` menyaringnya; nilai `survey` sengaja ikut menjaring dokumen yang field-nya belum ada, karena backfill baru mengisinya saat boot. Kiriman tanpa `form_type` diberi default `survey` (klien lama belum mengirimnya), tapi nilai **tak dikenal diteruskan apa adanya** supaya validasi menolaknya dengan pesan jelas alih-alih diam-diam berubah jadi survei.
+**Tipe form (4)** — `survey`, `evaluation`, `checklist`, `kaizen`. Bukan sekadar label: tanpanya daftar form berisi survei, checklist, dan penilaian yang tampak serupa padahal cara mengisinya berbeda jauh. `GET /forms?form_type=` menyaringnya; nilai `survey` sengaja ikut menjaring dokumen yang field-nya belum ada, karena backfill baru mengisinya saat boot. Kiriman tanpa `form_type` diberi default `survey` (klien lama belum mengirimnya), tapi nilai **tak dikenal diteruskan apa adanya** supaya validasi menolaknya dengan pesan jelas alih-alih diam-diam berubah jadi survei.
+
+> [!warning] Tipe `request` ("Pengajuan") DIHAPUS — 🟡 belum merge, belum deploy
+> Status per 2026-08-08: ada di branch `feat/form-builder-hapus-tipe-request` (bip-erp + erp-frontend), **belum di-push dan belum ada PR**. Sampai itu terjadi, `main` masih memuat lima tipe; bagian ini mendahului kode.
+>
+> Dari lima tipe, hanya `evaluation` (terikat `subject`), `kaizen` (terikat `settings.kaizen`), dan `survey` (default `normalizeFormType`, sasaran backfill, punya cabang filternya sendiri) yang benar-benar mengubah perilaku. `request` dan `checklist` sama-sama label murni, jadi yang membedakan nasib keduanya **keputusan produk, bukan keterikatan di kode**; menghapus `request` tak menyentuh satu pun jalur pengisian, analisa, atau gerbang presensi.
+>
+> Yang berisiko datanya, bukan perilakunya. Begitu entri hilang dari `knownFormTypes`, `validateFormType` menolaknya, sehingga form yang tertinggal bertipe itu **gagal disunting dengan `400` tanpa jalan keluar** — `FormType` hanya bisa diubah selagi status `draft` (lihat `updateFormHandler`), jadi form `published`/`closed` yang tertinggal terkunci selamanya. Karena itu pemindahan `request` → `survey` dijalankan **saat boot** lewat `retiredFormTypes`/`backfillRetiredFormType` di `migrate.go`, meniru `backfillOwnerDepartment`: deploy dev otomatis dari `main` sehingga jedanya tak bisa dijadwalkan. Prod diverifikasi **0 dokumen** bertipe `request` sebelum perubahan dibuat; dev tak terjangkau saat itu, dan backfill inilah yang menutupinya.
+>
+> **Urutan deploy TERBALIK dari kebiasaan "BE dulu, FE menyusul".** Aturan itu untuk penambahan field, di mana FE lama aman karena fallback. Untuk **penghapusan nilai enum** kebalikannya: BE dulu berarti FE lama masih menawarkan "Pengajuan" dan siapa pun yang memilihnya kena `400`, sedangkan FE dulu menghilangkan pilihannya sementara BE masih menerima — tak ada jendela galat sama sekali.
 
 **Bagian (`section`)** — penanda pemisah halaman, bukan pertanyaan. Lihat bagian tersendiri di bawah.
 
@@ -224,7 +233,7 @@ Form berulang memakai jendela **periode berjalan**, bukan `start_date`/`end_date
 >
 > **Fitur masih inert di prod**: belum ada satu pun form kaizen dibuat, jadi cron pengingat tak punya apa pun untuk dikirim.
 
-Tipe form **kelima**, dan seperti `evaluation` ia bukan sekadar label: seluruh perilaku barunya digerbang tipe ini, sehingga empat tipe lama tak berubah sedikit pun dan tak ada satu pun form lama yang perlu dimigrasi.
+Tipe form yang **ditambahkan terakhir** (kelima saat itu, sebelum `request` dihapus), dan seperti `evaluation` ia bukan sekadar label: seluruh perilaku barunya digerbang tipe ini, sehingga tipe-tipe lama tak berubah sedikit pun dan tak ada satu pun form lama yang perlu dimigrasi.
 
 **Ikatan dua arah** dengan blok `settings.kaizen`, meniru pola `evaluation` ↔ `subject`. Tipe `kaizen` wajib punya blok itu, dan blok itu hanya sah pada tipe `kaizen`. Selain itu tipe ini **wajib berulang bulanan** (kuota bulanan tanpa periode tak punya arti), serta **menolak** `single_response` (yang akan menghentikan pengaju tepat setelah ide pertama sehingga kuota lebih dari satu mustahil dipenuhi) dan menolak sasaran penilaian.
 
@@ -503,7 +512,7 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 
 - [[IT - Form Builder]] — konsep & latar belakang
 - [[API - Form Builder Service]] — daftar endpoint
-- [[HRIS - Kaizen (Ide Perbaikan)]] — ⚠️ konsep & keputusan bisnis; menumpang service ini sebagai `form_type` kelima
+- [[HRIS - Kaizen (Ide Perbaikan)]] — ⚠️ konsep & keputusan bisnis; menumpang service ini sebagai `form_type` tersendiri
 - [[IT - Background Jobs & Schedulers]] — cron pembuka periode
 - [[Microservices - Attendance Service]] · [[CORE - API Master Gateway]] · [[DB - Overview and Notes]]
 - [[Microservices - Employee Service]] — penarik metrik Kaizen ke `kpi_score`
