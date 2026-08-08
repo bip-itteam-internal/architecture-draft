@@ -36,7 +36,7 @@
 
 **Tampilan menu per posisi — BUKAN bagian dari RBAC (2026-07-31, branch `feat/menu-per-posisi` + `feat/pengaturan-menu-posisi`, belum merge):**
 
-`master_department.position_items[].menu_hidden` menyimpan url menu yang **disembunyikan** dari sidebar bagi pemegang sebuah jabatan, disetel di **HRIS → Personalia → Pengaturan → Tampilan Menu**. Ditaruh di dokumen ini karena menempel pada objek yang sama dengan `permission_sets` dan gampang tertukar dengannya. **Keduanya berbeda jenis dan jangan disatukan:**
+`master_department.position_items[].menu_hidden` menyimpan url menu yang **disembunyikan** dari sidebar bagi pemegang sebuah jabatan, disetel di dua layar: **HRGA → Pengaturan → Organisasi & Jabatan → Tampilan Menu** (lingkup HRGA) dan **IT → Konfigurasi Sistem → Pengaturan** (seluruh departemen). Ditaruh di dokumen ini karena menempel pada objek yang sama dengan `permission_sets` dan gampang tertukar dengannya. **Keduanya berbeda jenis dan jangan disatukan:**
 
 | | `permission_sets` | `menu_hidden` |
 |---|---|---|
@@ -47,6 +47,8 @@
 | Berlaku | setelah login ulang | setelah muat ulang halaman |
 
 Aturan yang mengikat: `tampil = (boleh menurut role/izin) DAN (tidak ada di menu_hidden)`. Karena itu ia dijalankan **setelah** seluruh penyaringan izin dan tak pernah bisa memperluas akses; salah setel paling buruk menyembunyikan menu. Rutenya tetap terbuka lewat URL — menyembunyikan menu **bukan keamanan**, konsisten dengan [[ADR - 0031 Prefix internal Bukan Batas Keamanan]]. Gerbang tulisnya sengaja lebih longgar daripada pemasangan paket justru karena ia tak bisa menaikkan hak siapa pun.
+
+⚠️ **Karena yang disimpan url, memindahkan sebuah menu ke rute baru membatalkan setelannya secara SENYAP** — pencocokannya persis, jadi entri lama jadi basi dan menunya muncul kembali tanpa satu pun galat. Penawarnya `terjemahkanTersembunyi` (`components/layout/sidebar-menu-shape.ts`), yang **mengganti** url lama dengan penerusnya saat dibaca dan **wajib dipakai di kedua sisi**: sidebar yang membaca setelan dan layar Tampilan Menu yang menyuntingnya. Dipakai di satu sisi saja menghasilkan kegagalan yang lebih halus daripada bug aslinya — kedua layar tak sepakat, dan mencentang menu agar tampil tak mengubah apa pun karena penyimpanannya juga mencocokkan url persis sehingga url lamanya tetap tinggal. Detail pemetaan & alasan menu yang pecah tidak dipetakan penuh: [[APP - Web ERP]].
 
 Disimpan sebagai daftar yang **disembunyikan**, bukan yang ditampilkan, supaya menu baru otomatis muncul untuk semua posisi alih-alih hilang diam-diam sampai ada yang mendaftarkannya ke 79 jabatan.
 

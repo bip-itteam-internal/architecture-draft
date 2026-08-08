@@ -1057,6 +1057,7 @@
       "tautan": [
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "CORE - RBAC dan Permission Set",
         "HRIS - Key Performance Index",
         "HRIS - Organization Structure",
@@ -1101,20 +1102,22 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "53c4b20cb14b8afac320a3a77a91823c1224fd039168c9468082d5e0c965732a",
-      "ukuran_kb": 128.3,
-      "ringkasan": "Menjawab: apa itu portal web `erp-frontend` (\"One Bharata\"), stack apa yang dipakai (Next.js 16, React 19, shadcn/Radix/Tailwind, TanStack Query, react-i18next), dan bagaimana login serta refresh token bekerja. Menjelaskan pula perannya sebagai SSO Identity Provider (mint one-time code, allowlist redirect), cara sidebar dan menu digerbang oleh `system_roles` per modul, konvensi pengelompokan menu induk bersarang, serta halaman-halaman multi-perusahaan (company switcher, kelola perusahaan/departemen/shift/network per company). Cocok untuk mencari di mana sebuah fitur ERP dirender di web dan aturan tampilan menu per jabatan.",
+      "hash": "4e22ebd31b3ab70f845fad68fceb4a78220694934d50d0bbd25dbbc23df30045",
+      "ukuran_kb": 134.0,
+      "ringkasan": "Menjawab: apa saja modul dan halaman di portal web ERP internal (One Bharata), siapa yang bisa melihat menu apa, dan bagaimana sidebar disusun serta disaring per role, posisi, dan izin. Memuat juga cara kerja SSO Identity Provider, matriks akses WMS lintas divisi, menu terbatas per akun, i18n dua bahasa, dan halaman Pengaturan HRGA terpusat beserta gerbang tiap tabnya. Sumber jawaban untuk pertanyaan 'kenapa menu ini tidak muncul' dan 'di mana setelan X sekarang'.",
       "kata_kunci": [
         "erp-frontend",
+        "web ERP",
         "One Bharata",
-        "hris-dashboard",
-        "Next.js",
-        "SSO identity provider",
-        "system_roles",
-        "role gating sidebar",
-        "multi-perusahaan",
-        "company switcher",
-        "i18n"
+        "sidebar",
+        "menu",
+        "role gating",
+        "menu_hidden",
+        "tampilan menu per posisi",
+        "pengaturan HRGA",
+        "SSO",
+        "i18n",
+        "Next.js"
       ]
     },
     {
@@ -1353,6 +1356,7 @@
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "APP - Web ERP",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "QA - Register Perizinan & Sertifikasi",
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
@@ -1374,26 +1378,26 @@
         "Microservices - Notification Service",
         "Microservices - Inventory Service",
         "Microservices - HRD Document Service",
-        "APP - Web ERP",
         "HRIS - Organization Structure",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "da2c03aa6eeaf05b6ef9c7204c3fbd7bc47512040778bd502623466960cb12ac",
-      "ukuran_kb": 22.7,
-      "ringkasan": "Menjawab: bagaimana hak akses di bip-erp disusun dari tiga sumbu (modul, tingkat aksi view/work/approve/manage, dan cakupan own/division/all), bagaimana paket permission-set menempel pada posisi lalu diresolusi jadi klaim JWT saat login, dan endpoint mana yang dipakai mengelola katalog, paket, serta assignment-nya. Juga menjawab modul mana yang sudah menegakkan izin per-aksi dan mana yang masih bertumpu pada tier system_roles, kenapa pola izin nyata menyimpang dari tangga, serta munculnya sumbu keempat pada modul ticket berupa hak yang menempel pada OBJEK (admin per space) yang tak lewat katalog dan tak terlihat di layar Siapa Boleh Apa. Sekaligus tempat membedakan permission_sets, menu_hidden, dan modul menu yang mudah tertukar.",
+      "hash": "34c824cc3491b576d6b9753e9aba83ff31dc255d5ab01a9c884b54cc5fe5cdc1",
+      "ukuran_kb": 23.5,
+      "ringkasan": "Menjawab: bagaimana hak akses ditentukan di seluruh bip-erp lewat tiga sumbu (modul, tingkat aksi, cakupan data), siapa yang memasang paket hak ke sebuah posisi, dan siapa yang menyusun isi paketnya. Menjelaskan pembedaan tiga hal yang gampang tertukar: permission_sets (hak akses), menu_hidden (tampilan per jabatan), dan modul menu (menu terbatas per akun), termasuk kenapa memindahkan rute menu bisa membatalkan setelan tersimpan secara senyap. Memuat katalog acuan tingkat dan modul, plus daftar modul yang belum berkatalog.",
       "kata_kunci": [
         "RBAC",
         "permission set",
-        "hak akses",
-        "permission catalog",
+        "paket hak",
+        "hak per posisi",
+        "siapa boleh apa",
         "reach",
         "cakupan data",
-        "posisi",
-        "klaim JWT permissions",
-        "system_roles",
-        "admin space"
+        "menu_hidden",
+        "menu terbatas",
+        "katalog permission",
+        "system_roles"
       ]
     },
     {
