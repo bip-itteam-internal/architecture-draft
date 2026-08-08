@@ -1080,9 +1080,10 @@
         "API - Integration Service",
         "Microservices - Insentive Service",
         "Microservices - Integration Service",
+        "CORE - IT Orchestrator",
+        "APP - MyBharata",
         "Microservices - Form Builder Service",
         "IT - Form Builder",
-        "APP - MyBharata",
         "HRIS - Kaizen (Ide Perbaikan)",
         "API - Form Builder Service",
         "ADR - 0041 Izin Tipe Form Menempel di Departemen",
@@ -1098,27 +1099,25 @@
         "CORE - API Master Gateway",
         "Microservices - Notification Service",
         "Microservices - Inventory Service",
-        "CORE - IT Orchestrator",
         "BASE - Enterance Point",
         "Finance - Incentive",
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "32282f9f0abc39e401ab2ccd4a1e648d15ebd34be09be3d2a052d74d1e32a857",
-      "ukuran_kb": 138.7,
-      "ringkasan": "Menjawab: apa itu aplikasi Web ERP (hris-dashboard / One Bharata), stack teknologi yang dipakainya, dan bagaimana alur login serta SSO Identity Provider bekerja untuk aplikasi lain seperti Task Manager. Juga menjawab bagaimana role/system_roles menggerbang tampilan menu per modul, struktur pengelompokan sidebar (termasuk rencana Pengaturan HRGA terpusat yang belum merge), dan fitur multi-perusahaan seperti CompanySwitcher.",
+      "hash": "8e829de9470425035486b1f5c72db4ca25138e521483cc288bf6c266b215cd52",
+      "ukuran_kb": 140.1,
+      "ringkasan": "Menjawab: apa itu portal web internal One Bharata (erp-frontend), stack apa yang dipakainya, dan bagaimana login, refresh token, serta perannya sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager. Juga menjawab bagaimana sidebar dan menu digerbang oleh cookie system_roles per modul dan role, bagaimana menu dikelompokkan lewat menu induk bersarang, dan bagaimana dukungan multi-perusahaan bekerja lewat CompanySwitcher pada presensi, karyawan, shift, network, dan artikel. Termasuk cara halaman Pengaturan HRGA terpusat menyaring akses per tab, bukan per halaman, beserta alasan rute lama tetap diteruskan.",
       "kata_kunci": [
+        "erp-frontend",
         "Web ERP",
-        "hris-dashboard",
         "One Bharata",
-        "SSO",
-        "Identity Provider",
+        "hris-dashboard",
+        "SSO Identity Provider",
         "system_roles",
-        "RBAC",
         "sidebar menu",
-        "Pengaturan HRGA",
         "multi-perusahaan",
-        "Next.js"
+        "CompanySwitcher",
+        "Pengaturan HRGA"
       ]
     },
     {
@@ -1293,6 +1292,8 @@
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
+        "APP - MyBharata",
+        "APP - Web ERP",
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
         "DB - Overview and Notes",
@@ -1300,18 +1301,20 @@
         "CORE - HRIS Orchestrator",
         "IT - Employee System"
       ],
-      "hash": "9cc858975766b9059d63157e7dbd1163bd5a793ca7041445af2ba119999e0e4e",
-      "ukuran_kb": 2.8,
-      "ringkasan": "Menjawab: bagaimana staf IT mengelola role/akun karyawan lintas-service (reset password, aktivasi/nonaktivasi akun, allow-list WiFi) lewat satu orchestrator ber-RBAC ketat. Menjelaskan pula bug yang diketahui (response payload sebagian endpoint dibuang, route role per-departemen masih di-comment) yang perlu diperhatikan saat mengintegrasikan atau debugging fitur ini.",
+      "hash": "37333f897e232a96ef27273ae0152a4921ffe4b9ce25075e8b63ccdb6a7aa6a1",
+      "ukuran_kb": 4.0,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan IT Orchestrator untuk operasi IT-admin lintas service, yaitu baca dan set system_roles, reset password beserta pembersihan PIN dan device, aktivasi atau deaktivasi akun, daftar karyawan agregat, dan allow-list jaringan WiFi yang di-proxy ke attendance service. Juga menjawab siapa yang boleh memanggilnya, karena seluruh route dilindungi blanket ValidateGateway plus RequireITStaff, dan rute mana yang sudah punya pengganti di Employee Service tetapi sengaja belum dihapus. Berisi pula catatan bug: response payload dibuang jadi hanya balas pesan generik, route role per-departemen masih di-comment, dan log startup menyesatkan.",
       "kata_kunci": [
-        "IT orchestrator",
+        "IT Orchestrator",
+        "orchestrator/it",
         "reset password",
-        "manajemen role",
         "system_roles",
-        "aktivasi akun",
-        "WiFi allow-list",
+        "allow-list WiFi",
+        "network",
         "RequireITStaff",
-        "bug response payload"
+        "akun karyawan",
+        "activate deactivate",
+        "Employee Service"
       ]
     },
     {

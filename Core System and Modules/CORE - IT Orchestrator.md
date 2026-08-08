@@ -16,6 +16,13 @@
 
 > Catatan: orchestrator **tidak** punya aksi "revoke device saja" — `/reset-password` membersihkan device hanya sebagai efek samping. Untuk lepas device **tanpa** reset password (mis. karyawan ganti HP), gunakan Employee Service `/account/forget-device` (lihat [[Microservices - Employee Service]]).
 
+> [!warning] Lima rute di bawah ini KEHILANGAN pemakai terakhirnya
+> `/reset-password` dan `/account/activate|deactivate` digantikan grup `/account` milik [[Microservices - Employee Service]], yang menandai dirinya sendiri sebagai pengganti (`// region Employee account operations to replaces orchestrator/it/*`). [[APP - MyBharata]] sudah lama memakai pengganti itu; [[APP - Web ERP]] menyusul lewat branch `feat/it-akun-karyawan` (**belum merge**). `/account/status` dan `/account/toggle` bahkan sudah tak dipanggil klien mana pun sebelum itu.
+>
+> **Jangan langsung dihapus.** Penghapusan rute menuntut pemeriksaan pemakai lain lebih dulu — skrip, integrasi, atau klien yang tak terlihat dari repo frontend mana pun. Pelajaran dari penghapusan `form_type: "request"` masih relevan: yang tampak tak terpakai tetap layak diverifikasi sebelum dibuang, dan pemeriksaannya murah dibanding memulihkan jalur yang mati diam-diam.
+>
+> Yang **tetap tinggal** di orchestrator dan belum punya pengganti: `/roles/get`, `/roles/set`, `/network*`, dan `/v2/multi` — daftar karyawan versi ini punya filter departemen yang `GET /employee/view?system=it` belum punya.
+
 ## Belum Diimplementasikan / Catatan
 
 > ⚠️ Bagian ini berisi bug penting.
