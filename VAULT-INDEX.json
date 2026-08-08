@@ -1865,20 +1865,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "27882ad62a60eda365b240792d58ed5055aec2acf499169a95f969151291df87",
-      "ukuran_kb": 221.2,
-      "ringkasan": "Menjawab: bagaimana ERP tersambung ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) dan ke Accurate Online — dari ingest webhook, normalisasi order jadi model transaksi terpadu, sampai push Sales Invoice/Sales Return. Menjelaskan fitur per-modul beserta grounding filenya: verifikasi HMAC webhook Shopee (dan bypass sementaranya), OAuth & kredensial, laporan iklan/GMV Max (monitoring, overview per produk, ICC video metrics) berikut aturan agregasi dan bug ROI yang sudah diperbaiki, cron master data dan penanganan rate limit TikTok, ICC account mapping, bridge WMS, katalog item, gross profit, beban operasional insentif per proyek Accurate, review analytics, serta worker/cron. Juga menjawab apa yang belum ada — misalnya tidak adanya client Meta Ads di backend (masih manual entry di FE) dan status soft-disabled jalur Desty.",
+      "hash": "9effa5fee81d5cd231f5c3031fdcbb90e6fe5cd0b331c184c27d29b2e1c5b115",
+      "ukuran_kb": 223.7,
+      "ringkasan": "Menjawab: marketplace apa saja yang tersambung ke ERP (TikTok Shop, TikTok Business/Ads, Shopee, Lazada), bagaimana order masuk lewat webhook direct per platform beserta skema auth-nya, dan bagaimana order/laporan iklan dinormalkan jadi model transaction terpadu. Juga menjelaskan bridging finansial ke Accurate Online (Sales Invoice, Sales Return, ringkasan transaksi harian per shop/channel), manajemen kredensial OAuth, automasi auto-ship/auto-approve yang sadar hari libur, serta cron dan background worker sync. Bisa dipakai untuk menelusuri endpoint report GMV Max (monitoring, overview per produk), metrik video ICC untuk insentif, status jalur Desty yang soft-disabled, dan posisi Meta Ads yang masih rencana.",
       "kata_kunci": [
         "integration service",
         "marketplace",
-        "TikTok Shop",
-        "TikTok Business",
         "Shopee",
-        "Accurate",
-        "webhook",
+        "TikTok Shop",
+        "TikTok Business Ads",
+        "Lazada",
+        "webhook push",
+        "Accurate Online",
         "GMV Max",
-        "Meta Ads",
-        "cron worker"
+        "kredensial OAuth"
       ]
     },
     {
@@ -3024,26 +3024,24 @@
         "ADR - 0012 Retur Refund-only Push-all",
         "ADR - 0017 Tanggal Retur TikTok via order_update_date",
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
-        "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "Microservices - Integration Service",
+        "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur"
       ],
-      "hash": "8b8bb1d560056739c19625175716a94ce74ff5eaaa742de59a9730ea4503884e",
-      "ukuran_kb": 26.5,
-      "ringkasan": "Menjawab: kapan sebuah retur marketplace boleh dibukukan sebagai Retur Penjualan di Accurate dan kapan justru harus di-skip karena refund-nya sudah terserap di sisi kas — aturannya lewat `returnPayoutGate` (CANCELLED langsung book, income belum settle jadi DEFER, payout > 0 pasca-cutover di-SKIP, payout ≈ 0 di-book) beserta alasan mengapa dobel jadi mustahil by-design. Menjelaskan juga tanggal retur ditentukan per-solution: cancelled_at untuk cancel, order_update_date untuk TikTok, requested_at untuk Shopee refund-only, dan tanggal fisik barang sampai dari reverse-tracking RECEIVED untuk Shopee barang-balik — berikut bukti bahwa `update_time` Shopee melar mundur median tiga hari saat settle refund. Berguna untuk memahami cutover retur yang mengikuti hari-kirim faktur (≥ 1 Juli), hasil cleanup data lama lewat `cmd/returndescope`, serta rangkaian amandemen ketika gerbang berubah dari menebak kanal menjadi menuntut bukti mutasi dompet lalu menuntut angka.",
+      "hash": "e353ed17e3c578776d2541a5803071b0455d669f23468f08381c91d1a554a56d",
+      "ukuran_kb": 27.2,
+      "ringkasan": "Menjawab: kapan sebuah retur boleh dibukukan sebagai Retur Penjualan di Accurate dan kapan harus di-skip karena refund-nya sudah terserap di sisi kas (gerbang payout≈0, dengan cabang CANCELLED, income belum settle/DEFER, dan syarat cutover). Menjelaskan juga tanggal retur ditentukan dari sumber apa per solution — cancelled_at, order_update_date TikTok, requested_at untuk refund-only Shopee, tanggal fisik barang sampai untuk barang-balik — serta alasan cutover retur mengikuti hari kirim faktur, bukan tanggal retur. Berguna untuk menelusuri akar dobel-booking revenue/piutang, jejak baris SKIPPED di UI Auto-Sync Retur, hasil cleanup data lama, dan rangkaian amandemen yang menuntut bukti penyerapan mutasi.",
       "kata_kunci": [
-        "ADR 0024",
         "retur",
-        "sales return",
-        "retur penjualan",
-        "payout gate",
+        "return",
+        "Retur Penjualan",
+        "Sales Return",
+        "gerbang payout",
         "escrow",
-        "refund",
-        "Accurate",
-        "cutover",
-        "reverse tracking",
-        "double booking",
-        "Shopee"
+        "refund Shopee",
+        "dobel booking",
+        "cutover retur",
+        "Accurate receipt"
       ]
     },
     {
