@@ -26,7 +26,7 @@ Penjaga yang sama sudah dibuktikan menutup `insentive_db` (sumber ICC) — arahn
 
 28 route di berkas produksi (audit kode 2026-08-07, `routes.go` + `handler_mart.go` + `price_floor_handler.go` + `jobs.go` + `penjadwal_status.go` + `beranda.go` + `ambang_handler.go`). Daftar lengkap per-route: [[API - Marketing Analytics Service]] — termasuk tiga route (`/toko`, `/kpi/kinerja-toko`, `/profit/items`) yang ada di kode tetapi belum terdokumentasi. Seluruhnya `GET` kecuali disebut lain.
 
-### Halaman depan & ambang keputusan (🟡 menunggu merge)
+### Halaman depan & ambang keputusan (✅ live di PROD)
 
 | Endpoint | Isi |
 |---|---|
@@ -200,6 +200,46 @@ Nol koleksi iklan/video/live di `integration_db` (hanya finance). Order Lazada m
 ## Kejujuran Data (bagian yang tidak boleh dihapus)
 
 Service ini menyimpan **alasan ketidaklengkapan bersama datanya**, bukan membiarkan angka kosong dibaca sebagai nol.
+
+### `revenue` adalah HARGA LIST, bukan penjualan (terukur 2026-08-09)
+
+Bagian ini ditulis paling atas karena ia mengubah cara membaca setiap angka turunannya.
+
+`sumber_agregasi.go` mengisi `Revenue: it.Total`, yaitu jumlah `items[].total` order. Diukur di produksi atas 20.000 order, jumlah itu sama dengan `income.total_original_price` **tepat 100,0%** di kedua channel. Jadi `revenue` di mart adalah **harga banderol sebelum diskon penjual**, bukan yang dibayar pembeli dan bukan yang diterima.
+
+Dengan `sum(items[].total)` sebagai 100:
+
+| Channel | n | Diskon penjual | Dibayar pembeli | Settlement |
+|---|---|---|---|---|
+| TIKTOK | 16.574 | **31,0%** | 71,0% | **49,8%** |
+| SHOPEE | 3.426 | 7,2% | 82,2% | 71,0% |
+
+**Kita mendiskon TikTok empat kali lebih dalam daripada Shopee**, dan tak ada satu kolom pun yang menampilkannya. Potongan marketplace justru lebih besar di Shopee (21,8% berbanding 19,2%); yang membuat TikTok mahal adalah diskon kita sendiri.
+
+Konsekuensinya:
+
+- **`roasAgregat = revenue / adsCost`** berdiri di atas harga banderol. ROAS TikTok yang tampil 4,0 menyettle sekitar 2,0 dalam uang nyata.
+- **`iklanPersenRevenue = adsCost / revenue`** understated: "iklan 9,4% dari revenue" untuk TikTok mendekati 18,9% dari uang yang benar-benar masuk.
+- Ambang `roas_min` 3,2 adalah angka tim dari Master Roadmap yang **basisnya tak pernah dinyatakan**, jadi ROAS berbasis harga banderol dibandingkan terhadap ambang yang tak diketahui basisnya.
+- **`gross_profit` TIDAK terpengaruh.** Ia dihitung dari `net_settlement`, jadi jujur. Gerbang laba pada vonis halaman depan tetap sehat.
+
+`fee_marketplace` = `TotalPlatformCommission + TotalServiceFee + TotalAffiliateCommissionFee`, diprorata per item. **Komisi affiliate sudah termasuk.** Yang tak punya kolom sama sekali: **diskon, ongkir, dan adjustment**.
+
+Identitasnya lebih dulu dibuktikan tim di `services/integration/cmd/insentifprobe` terhadap data TikTok Juni 2026: `total_original_price − total_discount = subtotal_after_seller_discount`, lalu `subtotal − (service + shipping + affiliate + commission + adjustment + refund) = total_settlement_amount`.
+
+**Keputusan basis ROAS masih terbuka (TBD)** dan bukan keputusan teknis: ia menentukan lencana yang sudah menilai belanja iklan berjalan.
+
+### Kolom "Kebocoran" DIBATALKAN, dan sebabnya bukan aritmetika
+
+Kolom yang menjumlahkan jarak revenue ke settlement dibangun penuh, diuji, lalu **dibatalkan sebelum dikirim**. Rumusnya `(revenue − net_settlement) + retur` dan ia **tertutup persis**: `revenue − kebocoran − hpp − ads_cost = gross_profit`, terverifikasi terhadap `ComputeGrossProfit` termasuk lewat agregasi bulanan, lintas-toko, dan lintas-channel.
+
+**Aritmetika yang benar tidak membuat namanya benar.** Rumus itu menjumlahkan diskon kita sendiri, potongan marketplace, ongkir, komisi kreator, dan retur menjadi satu angka yang pemiliknya berbeda-beda, lalu menyebutnya kebocoran. Menamai diskon yang kita putuskan sendiri sebagai kebocoran menyembunyikan satu-satunya suku yang benar-benar dapat ditindaklanjuti.
+
+Satu entri Kamus Metrik dengan definisi itu sempat tayang sehari lalu dicabut (erp-frontend PR #867). Penggantinya **rantai pengurangan bernama** yang menyebut pemilik tiap suku, dan itu menuntut `total_original_price` serta `total_discount` masuk mart lebih dulu (TBD).
+
+Dicatat di sini justru karena rumusnya terlihat benar: tanpa catatan ini, orang berikutnya akan membangunnya lagi dan tak satu pun test akan memerahkannya.
+
+### Penanda lain
 
 - **`attribution_kolom` — penanda aktual vs perkiraan melekat PER KOLOM**, bukan per baris. Peta `nama kolom → alasan terbaca manusia`; kolom yang tidak ada di peta = **aktual**; kunci = persis tag json kolom. Penanda tingkat-baris sebelumnya memvonis seluruh baris: 2.384 baris campaign bertanda `estimated` dibaca pengguna sebagai "biaya iklan tidak valid" — padahal `ads_cost`-nya aktual, Rp1.289.007.856 cocok persis belanja GMV Max; yang perkiraan **labanya** (retur tak teratribusi ke level iklan, dasar revenue kotor). `attribution`/`attribution_note` kini **turunan** — utang teknis, dihapus setelah FE membaca `attribution_kolom`.
 - **`kolom_tidak_berlaku`** (lihat *Kontrak amplop*) membedakan "kolom ini tak akan pernah berisi di level ini → hilangkan" dari "sel ini kosong → tak tersedia". Kolom struktural yang membawa angka nyata tetap dikirim; hanya nilai nol yang dinihilkan — `retur = 0` di level shop adalah kabar baik nyata dan tetap `0`.
