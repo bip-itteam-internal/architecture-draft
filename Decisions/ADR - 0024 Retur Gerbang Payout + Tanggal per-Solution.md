@@ -110,6 +110,8 @@ Menutup cacat di atas. `returnPayoutGate` tak lagi menerima `func() bool` ("ada 
 
 ⚠️ **Residu yang diterima sadar**: nilai retur memakai **harga faktur** (`2607180VU58AJP` = 2 × 99.000 = Rp198.000), sedangkan `dana` di wallet-adjustment memakai **angka dompet** (Rp184.000) — dua basis berbeda, sehingga piutang berakhir **−Rp14.000**. Σ untuk seluruh populasi 15 order = **−Rp9.000**. Kelas selisih yang sama dengan "base vs realisasi" yang memang sudah diserap baris potongan receipt. Perbaikan basis `dana` → `basePorsi` layak menyusul, **bukan prasyarat**.
 
+⚠️ **Perbaikan ini sempat INERT — diblokir bug hulu (ditemukan saat verifikasi deploy, ditutup PR #1096).** Gerbang barunya memang memutuskan BOOK untuk `2607180VU58AJP` (kas akhir −49.042), tapi `resolveReturnMode` sesudahnya menolak karena sub-dokumen `order.return` ternyata memuat record yang **CANCELLED**: satu order punya beberapa record retur sementara sub-dokumennya cuma satu slot, dan `SetOrderReturn` menulis tanpa syarat sehingga yang disinkron terakhir menang (ACCEPTED 06:00:08 → CANCELLED 06:00:09). **Pelajaran**: memperbaiki gerbang tak ada gunanya bila data yang dibacanya salah orang — verifikasi pasca-deploy harus menelusuri sampai hasil akhirnya, bukan berhenti di "kode sudah benar". Detail di [[Microservices - Integration Service]].
+
 📌 **Belum dikerjakan**: menyembunyikan baris jejak `SKIPPED` saat ordernya sudah punya baris hidup. Menyaring setelah paginasi merusak ukuran halaman; menandai baris saat booking adalah perubahan tulis tersendiri. Sesudah PR ini `2607180VU58AJP` tampil **2 baris** (1 jejak + 1 retur nyata), bukan 3.
 
 ### 🟡 Keputusan bisnis 2026-08-05 — nilai barang SELALU via retur (BELUM diimplementasi)
