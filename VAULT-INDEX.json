@@ -164,18 +164,18 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "94997c02726fc05b81ddc4fe192806d2724e8d8573000a41c8a8a948b066be6a",
-      "ukuran_kb": 21.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form versus sekadar mengisinya, dan bagaimana bentuk request/response tiap rute. Memuat rute kelola form, analisa & export CSV per periode, pengisian karyawan (`/me/*`), unggah lampiran, program Kaizen (`/kaizen/*` dan `/me/kaizen*`), serta rute internal yang dipakai service lain. Menjelaskan juga arti `?period=` pada form berulang, kapan permintaan dibalas `409`, dan bahwa cakupan RBAC-nya departemen, bukan modul.",
+      "hash": "85f8779bb2e908dc7049650d8fb3dd426941719178391318724efec05204f019",
+      "ukuran_kb": 21.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (cakupan per departemen, bukan per modul) versus siapa yang cukup terautentikasi untuk mengisi. Menjelaskan cara membuat/menerbitkan/menutup form, membaca analisa dan export CSV per periode, mengirim jawaban termasuk form penilaian karyawan lain, mengunggah lampiran, serta rute Kaizen untuk karyawan dan komite. Juga menerangkan arti kode balasan penting (409 saat field diubah setelah ada jawaban, 403 di luar sasaran, 413 lampiran lewat 4 MB) dan perbedaan makna `?period=` kosong antara analisa dan penjaga duplikat.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
-        "dynamic form",
         "endpoint",
+        "API",
         "survei",
         "survey",
         "kaizen",
-        "form berulang",
+        "analytics",
         "export CSV",
         "RBAC departemen"
       ]
@@ -1712,13 +1712,13 @@
         "APP - Web ERP",
         "APP - MyBharata",
         "API - Form Builder Service",
+        "RUN - Deploy Microservices bip-erp",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "HRIS - Organization Structure",
         "Microservices - Notification Service",
         "IT - Background Jobs & Schedulers",
         "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Task Management Service",
-        "RUN - Deploy Microservices bip-erp",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "Microservices - Employee Service",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
@@ -1729,20 +1729,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "3f11810f0ce7bf80f8d0fd0296f14d3bd81f29b70af9655128e0ac5dd523b5f3",
-      "ukuran_kb": 67.2,
-      "ringkasan": "Menjawab: bagaimana Form Builder Service bekerja secara teknis, mulai dari kepemilikan form per departemen, 10 tipe pertanyaan dan tipe form yang ada, penilaian karyawan lain lewat sumbu `subject`, form berulang berperiode bulanan/mingguan, lampiran berkas, sampai program Kaizen. Menjelaskan alasan di balik keputusan desainnya (kenapa susunan pertanyaan terkunci begitu ada jawaban, kenapa rute komite hidup di luar grup `/forms`, kenapa `settings.kaizen` yang absen berarti jangan diubah) dan bagaimana service ini menahan clock-in mobile lewat endpoint kepatuhan presensi. Memuat stack, path repo, port, persona pengguna, dan catatan deploy termasuk keharusan menaikkan notification-service bersamaan.",
+      "hash": "5f8f7a5a66a1f5d0965032c8b5f9deb42cff29a1e1956c98cdce53daadadb2ad",
+      "ukuran_kb": 68.0,
+      "ringkasan": "Menjawab: bagaimana Form Builder Service dibangun dan mengapa aturannya seperti itu — stack Go + Fiber + MongoDB (`form_builder_db`), path `services/form-builder`, port 6986, siapa personanya, dan tipe pertanyaan serta tipe form apa saja yang didukung. Menjelaskan keputusan desain kunci: kepemilikan form per departemen, sumbu `subject` untuk penilaian karyawan lain yang terpisah dari `audience`, potret sasaran saat terbit, form berulang bulanan/mingguan beserta cron pembuka periode, gerbang kepatuhan presensi yang dipakai attendance-service, program Kaizen, dan lampiran berkas. Memuat pula peringatan operasional bahwa notification-service wajib ikut di-deploy agar kategori inbox `form-published`/`form-submitted` tidak ditolak diam-diam.",
       "kata_kunci": [
         "form builder service",
+        "microservice",
         "form dinamis",
         "form berulang",
         "recurrence",
-        "kaizen",
         "penilaian karyawan",
         "evaluation",
+        "kaizen",
         "gerbang presensi",
-        "Go Fiber",
-        "MongoDB"
+        "notifikasi inbox"
       ]
     },
     {
