@@ -25,6 +25,21 @@
 
 > **Cakupannya departemen, bukan modul.** Diambil dari `common.SupervisedDepartments` (departemen sendiri + yang dibawahi lewat `master_department.supervised_by`) lalu diiris daftar departemen aktif. SPV HRGA karena itu melihat form Human Resource **dan** General Affair, tapi tidak Tech Development. Daftar aktifnya konfigurasi `FORM_BUILDER_DEPARTMENTS`; bila kosong dipakai bawaan `Human Resource, General Affair, Tech Development`.
 
+## Aturan Tipe Form per Departemen (khusus IT)
+
+> ⚠️ **Diimplementasikan 2026-08-08, BELUM merge dan belum deploy** — branch `feat/form-builder-izin-tipe-per-departemen`. Keputusan: [[ADR - 0041 Izin Tipe Form Menempel di Departemen]].
+
+Digerbang `system_roles["it"]` tingkat `supervisor`/`admin` — **kunci MODUL, bukan nama departemen** `"Tech Development"`. `staff` ditolak. Grupnya sengaja di luar `/forms` karena yang menetapkan aturan adalah IT untuk departemen yang bukan miliknya.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/form-type-rules` | Aturan **seluruh** departemen aktif, termasuk yang belum diatur (`blocked_types: []`). Membawa juga `form_types` (daftar tipe master) supaya klien tak pernah menyalinnya |
+| PUT | `/form-type-rules/:department` | Tetapkan `{blocked_types[]}`. **PUT, menimpa penuh** — layarnya memang mengirim seluruh keadaan centang. `400` bila ada nilai di luar tipe dikenal (pesannya menyebut nilainya) atau departemen di luar daftar aktif |
+
+Membuat form atau mengganti tipenya pada form `draft` dibalas **`403`** bila tipe itu dilarang untuk departemen pemiliknya; pesannya menyebut departemen, tipe, dan arahan menghubungi IT. Menyunting form yang **sudah** bertipe terlarang tetap boleh — lihat [[Microservices - Form Builder Service]] untuk alasannya.
+
+Jalur tulis dikunci `common.CompanyID`, bukan `EffectiveCompanyID`: `?company=` milik admin pusat adalah lingkup baca.
+
 ## Analisa & Export (RBAC per departemen)
 | Method | Path | Fungsi |
 |---|---|---|
@@ -39,7 +54,7 @@
 ## Pengisian (karyawan terautentikasi)
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/me/capability` | `{can_manage, departments[]}` — apa yang boleh dilakukan pemanggil di Form Builder |
+| GET | `/me/capability` | `{can_manage, can_manage_type_rules, departments[], form_types_by_department{}}` — apa yang boleh dilakukan pemanggil di Form Builder |
 | GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `form_type`, `submitted`, `blocks_attendance`, `gate_end_date`). Form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous`. Pada form berulang, `submitted` dihitung terhadap **periode berjalan**, bukan seumur hidup form |
 | GET | `/me/forms/:id/subjects` | Daftar orang yang harus DINILAI pemanggil + `progress{done,total,anonymous}`. `409` bila form tak menilai siapa pun |
 | POST | `/me/forms/:id/responses` | Kirim jawaban (+`subject_employee_id` untuk form penilaian). `403` bila bukan sasaran atau menilai orang di luar daftar, `409` bila form tak `published` atau orang itu sudah dinilai. Balas `subject_done`, `subject_total`, `all_completed` |
@@ -53,6 +68,8 @@
 > **Idempoten**: pengiriman identik dalam 2 menit dibalas `200 {"duplicate": true}` tanpa insert baru (sidik jawaban di-hash setelah kunci diurutkan, jadi payload yang disusun ulang saat retry tetap terdeteksi).
 
 > **Kenapa `/me/capability` ada di grup pengisian, bukan di balik `requireFormManager`.** Daftar departemen aktif tinggal di konfigurasi server; tanpa endpoint ini setiap klien harus menyalinnya dan pasti melenceng saat daftarnya berubah. Ditaruh di `/me` supaya yang tak berhak menerima `can_manage:false` yang bisa dibaca klien, bukan `403` yang harus ditebak artinya. `departments` sengaja dikosongkan bila `can_manage:false`.
+>
+> **`form_types_by_department` adalah daftar POSITIF per departemen** (tipe yang boleh dibuat, sudah dihitung server), supaya klien tak memegang satu baris pun logika aturan. Per departemen, bukan datar: SPV HRGA membawahi dua sekaligus, dan meratakannya salah ke dua arah — irisan menyembunyikan tipe yang sebenarnya boleh, gabungan menawarkan tipe yang pasti ditolak `403`. Field ini **absen pada versi lama**; klien wajib menganggap absen = semua tipe boleh, karena BE dan FE tak naik bersamaan. **`can_manage_type_rules` dihitung TERPISAH dari `can_manage`** — admin IT belum tentu mengelola satu departemen pun.
 
 ## Kaizen untuk karyawan (`/me/kaizen*`)
 

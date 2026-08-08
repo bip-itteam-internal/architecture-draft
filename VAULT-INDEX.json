@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-08",
+  "digenerate": "2026-08-09",
   "jumlah_dokumen": 277,
   "dokumen": [
     {
@@ -155,6 +155,7 @@
         "API - Index",
         "APP - Web ERP",
         "APP - MyBharata",
+        "ADR - 0041 Izin Tipe Form Menempel di Departemen",
         "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Attendance Service",
         "Microservices - Employee Service",
@@ -164,19 +165,19 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "85f8779bb2e908dc7049650d8fb3dd426941719178391318724efec05204f019",
-      "ukuran_kb": 21.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (cakupan per departemen, bukan per modul) versus siapa yang cukup terautentikasi untuk mengisi. Menjelaskan cara membuat/menerbitkan/menutup form, membaca analisa dan export CSV per periode, mengirim jawaban termasuk form penilaian karyawan lain, mengunggah lampiran, serta rute Kaizen untuk karyawan dan komite. Juga menerangkan arti kode balasan penting (409 saat field diubah setelah ada jawaban, 403 di luar sasaran, 413 lampiran lewat 4 MB) dan perbedaan makna `?period=` kosong antara analisa dan penjaga duplikat.",
+      "hash": "67139a04a07d0e5d38c08af923887ac4397591a840a295a303a1604c05eaf092",
+      "ukuran_kb": 23.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service di balik gateway `/api/form-builder/*`, siapa yang boleh mengelola form (tingkat peran pengelola + departemen ada di daftar aktif) versus siapa yang cukup terautentikasi untuk mengisi, dan apa arti tiap kode balasan seperti 403/409/413. Menjelaskan juga rute analisa, daftar jawaban, dan export CSV beserta arti filter `?period=` pada form berulang, alur unggah lampiran (jawaban menyimpan `upload_id`, bukan berkasnya), rute Kaizen untuk karyawan dan komite, serta grup `/form-type-rules` yang digerbang `system_roles[\"it\"]`. Bisa dipakai untuk mengecek bentuk request/response sebelum memanggil dari web atau mobile.",
       "kata_kunci": [
         "form builder",
-        "form dinamis",
-        "endpoint",
-        "API",
+        "API endpoint",
+        "/api/form-builder",
+        "kaizen",
         "survei",
         "survey",
-        "kaizen",
-        "analytics",
         "export CSV",
+        "analytics analisa jawaban",
+        "form berulang recurrence",
         "RBAC departemen"
       ]
     },
@@ -1083,6 +1084,7 @@
         "APP - MyBharata",
         "HRIS - Kaizen (Ide Perbaikan)",
         "API - Form Builder Service",
+        "ADR - 0041 Izin Tipe Form Menempel di Departemen",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
         "ADR - 0012 Retur Refund-only Push-all",
         "API - Manufacture Service",
@@ -1099,20 +1101,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "cafce6319ac1a8d4a4ae2c222b545cf8facbdc1acdaee4bc00aa0695f084f440",
-      "ukuran_kb": 126.6,
-      "ringkasan": "Menjawab: modul dan fitur apa saja yang ada di portal web ERP internal (`erp-frontend` / One Bharata), bagaimana login serta role gating `system_roles` bekerja, dan bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager. Menjelaskan struktur menu sidebar (menu induk bersarang, tampilan menu per jabatan, perataan induk tipis) dan dukungan multi-perusahaan: company switcher, kelola perusahaan/departemen/shift/network per tenant. Memuat juga stack front-end yang dipakai: Next.js 16 App Router, shadcn/ui, TanStack Query, react-hook-form, dan react-i18next.",
+      "hash": "1b097974f25bb3a7915d0a1e7ff90d9fb575a64b3767529a3ae742b35fc5ecfa",
+      "ukuran_kb": 128.2,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal \"One Bharata\" (`hris-dashboard`/`erp-frontend`), stack dan repo mana yang dipakai, bagaimana login serta refresh token bekerja, dan bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain. Menjawab juga bagaimana sidebar dan menu digerbang `system_roles` per modul, bagaimana menu dikelompokkan lewat induk bersarang (bukan header section), dan bagaimana tampilan menu bisa diatur per jabatan lewat `menu_hidden`. Bisa dipakai untuk memahami dukungan multi-perusahaan di FE: CompanySwitcher admin pusat, kelola departemen/shift/network per perusahaan, sampai halaman Atasan Langsung.",
       "kata_kunci": [
-        "Web ERP",
         "erp-frontend",
-        "One Bharata",
         "hris-dashboard",
-        "SSO",
-        "system_roles",
-        "role gating",
+        "One Bharata",
+        "web ERP",
+        "Next.js",
+        "SSO identity provider",
+        "system_roles role gating",
         "sidebar menu",
         "multi-perusahaan",
-        "Next.js"
+        "CompanySwitcher"
       ]
     },
     {
@@ -1713,6 +1715,7 @@
         "APP - MyBharata",
         "API - Form Builder Service",
         "RUN - Deploy Microservices bip-erp",
+        "ADR - 0041 Izin Tipe Form Menempel di Departemen",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "HRIS - Organization Structure",
         "Microservices - Notification Service",
@@ -1729,20 +1732,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "5f8f7a5a66a1f5d0965032c8b5f9deb42cff29a1e1956c98cdce53daadadb2ad",
-      "ukuran_kb": 68.0,
-      "ringkasan": "Menjawab: bagaimana Form Builder Service dibangun dan mengapa aturannya seperti itu — stack Go + Fiber + MongoDB (`form_builder_db`), path `services/form-builder`, port 6986, siapa personanya, dan tipe pertanyaan serta tipe form apa saja yang didukung. Menjelaskan keputusan desain kunci: kepemilikan form per departemen, sumbu `subject` untuk penilaian karyawan lain yang terpisah dari `audience`, potret sasaran saat terbit, form berulang bulanan/mingguan beserta cron pembuka periode, gerbang kepatuhan presensi yang dipakai attendance-service, program Kaizen, dan lampiran berkas. Memuat pula peringatan operasional bahwa notification-service wajib ikut di-deploy agar kategori inbox `form-published`/`form-submitted` tidak ditolak diam-diam.",
+      "hash": "f3af5ff06153b8f9548be2ab789fac244213e3912fb7cb16ac0f2897ce5b84fb",
+      "ukuran_kb": 71.9,
+      "ringkasan": "Menjawab: bagaimana Form Builder Service dibangun dan dijalankan (Go + Fiber v2 + MongoDB `form_builder_db`, port internal 6986), tipe pertanyaan dan tipe form apa saja yang didukung, dan kenapa kepemilikan form memakai `owner_department` alih-alih modul. Menjawab juga bagaimana form penilaian bekerja lewat sumbu `subject` yang terpisah dari `audience` (potret sasaran saat terbit, kerahasiaan penilai, rekap per orang), bagaimana form berulang berperiode dibuka cron, dan bagaimana program Kaizen bulanan menghitung kepatuhan serta menyetor metrik ke KPI. Menjelaskan pula lampiran berkas, notifikasi inbox dan syarat deploy notification-service, serta gerbang kepatuhan yang bisa menahan clock-in mobile.",
       "kata_kunci": [
         "form builder service",
-        "microservice",
         "form dinamis",
-        "form berulang",
-        "recurrence",
-        "penilaian karyawan",
-        "evaluation",
+        "Go Fiber MongoDB",
         "kaizen",
-        "gerbang presensi",
-        "notifikasi inbox"
+        "penilaian karyawan evaluation",
+        "form berulang recurrence",
+        "gerbang presensi clock-in",
+        "owner_department",
+        "notifikasi inbox",
+        "lampiran file upload"
       ]
     },
     {
@@ -3631,8 +3634,8 @@
       "judul": "ADR - 0041 Izin Tipe Form Menempel di Departemen",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "Diputuskan 2026-08-08, **belum diimplementasikan**. Desain kerja: `erp/docs/superpowers/specs/2026-08-08-tipe-form-per-departemen-design.md`",
+      "status_emoji": "⚠️",
+      "status_teks": "**Diimplementasikan penuh 2026-08-08 (BE + FE), BELUM merge dan belum deploy** — branch `feat/form-builder-izin-tipe-per-departemen` di `bip-erp` dan `erp-frontend`. Desain kerja: `erp/docs/superpowers/specs/2026-08-08-tipe-form-per-departemen-design.md`",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -3643,20 +3646,20 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "HRIS - Kaizen (Ide Perbaikan)"
       ],
-      "hash": "497b63610cffe47db9bf33bbe67de97e50405ae78da33b8d9963fe8e3035e664",
-      "ukuran_kb": 6.8,
-      "ringkasan": "Menjawab: kenapa izin membuat tipe form (survey, evaluation, checklist, kaizen) menempel di departemen dan bukan di posisi seperti ADR 0030, kenapa yang disimpan adalah daftar-larangan (bawaannya semua boleh) bukan daftar-izin, dan kapan aturan itu ditegakkan (hanya saat tipe ditetapkan di pembuatan atau penggantian tipe selagi draft, bukan saat form disunting). Juga menjawab siapa yang berwenang mengatur (IT tingkat supervisor atau admin lewat system_roles, bukan tiap departemen sendiri) dan kenapa frontend tidak memegang logika aturan karena daftar positif dikirim server via GET /me/capability. Berisi pula konsekuensinya: tidak ada migrasi form lama, tipe form baru otomatis tersedia di semua departemen, ada dua cara mematikan Form Builder untuk sebuah departemen, jangkauan audience dan subject tetap tak digerbang, serta tabel alternatif yang ditolak beserta alasannya.",
+      "hash": "661835360d2f222c60a1f00bd593158ee8c06751d48ae1d8c5907b9bf143ee64",
+      "ukuran_kb": 6.9,
+      "ringkasan": "Menjawab: kenapa izin membuat tipe form tertentu ditempelkan pada departemen dan bukan pada posisi seperti ADR 0030, kenapa yang disimpan adalah daftar tipe yang DILARANG (bawaannya semua boleh) alih-alih daftar-izin, dan kapan aturannya ditegakkan — hanya saat tipe ditetapkan di pembuatan atau penggantian tipe selagi draft. Menjawab juga siapa yang berhak menetapkan aturan (`system_roles[\"it\"]` tingkat supervisor/admin, bukan tiap departemen sendiri) dan konsekuensinya: form lama tak perlu dimigrasi, tipe form baru otomatis tersedia di semua departemen, dan jangkauan `audience`/`subject` tetap tak digerbang. Memuat tabel alternatif yang ditolak beserta alasannya.",
       "kata_kunci": [
-        "tipe form",
-        "form type",
-        "Form Builder",
-        "izin per departemen",
-        "daftar-larangan",
-        "blocklist",
-        "allowlist",
-        "RBAC",
         "ADR 0041",
-        "me/capability"
+        "izin tipe form",
+        "daftar-larangan blocklist",
+        "form builder",
+        "departemen",
+        "RBAC",
+        "ADR 0030",
+        "form-type-rules",
+        "tata kelola",
+        "keputusan arsitektur"
       ]
     },
     {
@@ -6071,26 +6074,27 @@
         "Microservices - Attendance Service",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0041 Izin Tipe Form Menempel di Departemen",
         "Microservices - File Service",
         "CORE - SSO Flow",
         "CORE - API Master Gateway",
         "DB - Overview and Notes",
         "ROADMAP"
       ],
-      "hash": "8d800adc5bf9e3b3812f284d7142252a9003afe127f9a92b7382ec995268e973",
-      "ukuran_kb": 6.1,
-      "ringkasan": "Menjawab: kenapa Form Builder dibangun, sampai mana ruang lingkupnya, dan keputusan produk apa saja yang menyertainya. Mencatat perubahan scope dari rencana asli, keputusan menampilkan identitas responden secara penuh beserta konsekuensi privasinya dan bagaimana lingkarannya menyempit setelah kepemilikan pindah ke departemen, status deploy, serta hal yang masih belum diputuskan. Dokumen konsep dan latar belakang, bukan rincian implementasi.",
+      "hash": "deccfc3f989428bcbd9a047e278a7032329223fe9892441af092b17bc32eda53",
+      "ukuran_kb": 6.5,
+      "ringkasan": "Menjawab: kenapa Form Builder dibuat, masalah apa yang dipecahkannya dibanding form request yang selama ini di-hardcode per kasus, dan seberapa jauh scope yang benar-benar dibangun menyimpang dari rencana asli (RBAC per departemen, analisa jawaban, sasaran form, dan dampak nyata ke service presensi). Menjawab juga keputusan intersep presensi: kenapa mode `block` hanya menahan jalur mobile, kenapa gerbangnya gagal-terbuka, dan kenapa `block` sebaiknya menunggu MyBharata siap. Memuat keputusan sadar menampilkan identitas responden secara penuh beserta konsekuensi privasinya, plus daftar hal yang masih TBD seperti form publik dan pencarian karyawan untuk sasaran per-orang.",
       "kata_kunci": [
         "form builder",
-        "konsep",
-        "scope",
-        "identitas responden",
-        "privasi",
-        "survei internal",
-        "deklarasi kesehatan",
-        "pendataan",
-        "keputusan produk",
-        "TBD"
+        "konsep IT",
+        "form ad-hoc",
+        "intersep presensi",
+        "block warn clock-in",
+        "identitas responden privasi",
+        "tooling platform",
+        "HRGA",
+        "TBD",
+        "deklarasi kesehatan"
       ]
     },
     {

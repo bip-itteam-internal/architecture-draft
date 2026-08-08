@@ -59,7 +59,7 @@ Dicatat di sini supaya keputusannya terekam dan bisa ditinjau ulang, bukan terse
 - Pencarian karyawan untuk sasaran per-orang (sementara diketik sebagai Employee ID per baris).
 - Form berulang: gerbang presensi menganggap "sudah pernah mengisi" selamanya, jadi belum ada bentuk deklarasi **harian**. Form contoh di dev diberi nama per bulan sebagai siasat.
 - Apakah form publik (tanpa login) akan didukung — belum dikerjakan.
-- Apakah RBAC akan dinaikkan ke permission-set [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].
+- Apakah RBAC akan dinaikkan ke permission-set [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]. **Terjawab sebagian**: izin *tipe form* ditempelkan di **departemen**, bukan posisi, lewat [[ADR - 0041 Izin Tipe Form Menempel di Departemen]] — pertanyaan yang dijawabnya "departemen ini menjalankan proses apa", dan semua orang di satu departemen menjawabnya sama. Yang masih terbuka hak *mengelola form* itu sendiri (`requireFormManager`), yang sampai kini masih tingkat peran + departemen aktif.
 
 ## Dokumen Terkait
 

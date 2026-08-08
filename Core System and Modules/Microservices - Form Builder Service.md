@@ -81,6 +81,31 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 **Kepatuhan presensi**
 - `GET /internal/compliance` — dipakai attendance-service saat clock-in. Membalas `blocking` (mode `block`) dan `warning` (mode `warn`).
 
+## Izin tipe form per departemen
+
+> Status: ⚠️ **Diimplementasikan penuh (BE + FE) 2026-08-08, BELUM merge dan belum deploy** — branch `feat/form-builder-izin-tipe-per-departemen`. Keputusan dan alasannya: [[ADR - 0041 Izin Tipe Form Menempel di Departemen]].
+
+Tiap departemen bisa dibatasi tipe form apa yang boleh **dibuatnya**. Ditetapkan tim IT lewat layar tersendiri, bukan konfigurasi env.
+
+**Yang disimpan adalah tipe yang DILARANG** (koleksi `form_type_rules`, index unik `(company_id, department)`), bawaannya semua boleh. Tak ada dokumen untuk sebuah departemen berarti tak ada larangan, jadi tak satu pun form lama perlu dimigrasi dan departemen yang baru ditambahkan ke `FORM_BUILDER_DEPARTMENTS` langsung bekerja tanpa menunggu siapa pun mengatur barisnya.
+
+Arah bawaan itu dipilih karena **kegagalannya berbalik arah**: dengan daftar-izin, tipe form yang ditambahkan nanti tak terlihat oleh satu pun departemen sampai tiap baris disunting — merge, deploy, lalu diam, persis pola `recurrence` dan kategori inbox Kaizen. Dengan daftar-larangan, yang terjadi cuma sebuah departemen mendapat tipe yang tak diniatkan IT: terlihat, tak merusak data, diperbaiki dalam semenit. **Ini tidak membatalkan pilihan daftar-izin di papan ide Kaizen** — di sana yang dijaga kebocoran ke layar sekantor, di sini tak ada yang bocor.
+
+> [!warning] Aturan berlaku saat tipe DITETAPKAN, bukan saat form disunting
+> Hanya dua titik: `createForm` (setelah `owner_department` dikanonikkan — mencarinya dengan ejaan kiriman akan meleset lalu meloloskan tipe yang sengaja ditutup) dan `updateForm` **bila tipenya benar-benar berganti pada form draft**.
+>
+> Mencabut sebuah tipe **tidak menyentuh** form yang sudah terlanjur bertipe itu. Ini syarat kebenaran, bukan kelonggaran: `FormType` cuma bisa diubah selagi draft dan form terbit tak bisa mundur ke draft, jadi memeriksa aturan pada tiap penyuntingan akan **mengunci form itu selamanya** — pemiliknya bahkan tak bisa mengganti judul. Pelajaran yang dibayar hari yang sama saat tipe `request` dihapus. Penempatannya dijadikan predikat murni `typeCheckNeeded` supaya bisa diuji, bukan cuma diyakini; **jangan pindahkan ke `validateFormDefinition`** meski di sana terlihat lebih rapi.
+
+**Nilai tak dikenal ditolak saat MENULIS, diabaikan saat MEMBACA.** Asimetri disengaja: saat menulis orangnya ada di depan layar dan bisa diberi tahu mana yang salah; saat membaca, satu nilai basi (mis. `request` yang sudah dihapus) tak boleh berubah jadi pemadaman Form Builder yang sebabnya tak terbaca dari pesan galat mana pun.
+
+**Gerbangnya kunci MODUL `system_roles["it"]`**, tingkat `supervisor` atau `admin` — bukan nama departemen `"Tech Development"`. Keduanya sumbu berbeda dan sudah pernah tertukar di service ini (PR #869). `staff` dikecualikan karena aturan ini membatasi departemen lain; `admin`-saja ditolak karena bila tak seorang pun memegang `it:admin`, layarnya tak bisa dibuka siapa pun dan gejalanya senyap.
+
+Rute `/form-type-rules/*` hidup **di luar grup `/forms`**, meniru pemisahan rute komite Kaizen: grup itu menuntut keanggotaan departemen aktif, sedangkan yang menetapkan aturan justru IT untuk departemen yang **bukan** miliknya.
+
+**`GET /me/capability` menjawab daftar POSITIF per departemen** (`form_types_by_department`), sehingga frontend tak memegang satu baris pun logika aturan. Per departemen, bukan datar: SPV HRGA membawahi dua sekaligus, dan meratakannya salah ke dua arah — irisan menyembunyikan tipe yang sebenarnya boleh, gabungan menawarkan tipe yang pasti ditolak. `can_manage_type_rules` dihitung **terpisah** dari `can_manage`, karena admin IT belum tentu mengelola satu departemen pun dan kalau haknya ikut mati ia tak pernah melihat pintu masuk layarnya.
+
+Yang **tidak** diselesaikan: `audience` dan `subject` masih hanya diperiksa bentuknya, bukan jangkauannya. Departemen yang dibatasi tipenya tetap bisa menyasar karyawan departemen lain memakai tipe yang masih boleh dibuatnya.
+
 ## Kepemilikan form: departemen, bukan modul
 
 Sampai PR #869, pemilik form adalah key `system_roles` (`it`/`ga`). Itu **salah sumbu**: `system_roles` adalah hak akses modul/menu, bukan hierarki organisasi (lihat [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]). Akibatnya orang yang kebetulan punya peran di dua modul melihat form dua tim sekaligus — SPV HRD sempat melihat form IT di daftarnya.
