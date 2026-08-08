@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-08",
-  "jumlah_dokumen": 276,
+  "jumlah_dokumen": 277,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -3624,6 +3624,39 @@
         "Sales Return",
         "alokasi proporsional",
         "ADR 0040"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0041 Izin Tipe Form Menempel di Departemen.md",
+      "judul": "ADR - 0041 Izin Tipe Form Menempel di Departemen",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "Diputuskan 2026-08-08, **belum diimplementasikan**. Desain kerja: `erp/docs/superpowers/specs/2026-08-08-tipe-form-per-departemen-design.md`",
+      "publik": true,
+      "tautan": [
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "Microservices - Form Builder Service",
+        "APP - Web ERP",
+        "API - Form Builder Service",
+        "IT - Form Builder",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "HRIS - Kaizen (Ide Perbaikan)"
+      ],
+      "hash": "497b63610cffe47db9bf33bbe67de97e50405ae78da33b8d9963fe8e3035e664",
+      "ukuran_kb": 6.8,
+      "ringkasan": "Menjawab: kenapa izin membuat tipe form (survey, evaluation, checklist, kaizen) menempel di departemen dan bukan di posisi seperti ADR 0030, kenapa yang disimpan adalah daftar-larangan (bawaannya semua boleh) bukan daftar-izin, dan kapan aturan itu ditegakkan (hanya saat tipe ditetapkan di pembuatan atau penggantian tipe selagi draft, bukan saat form disunting). Juga menjawab siapa yang berwenang mengatur (IT tingkat supervisor atau admin lewat system_roles, bukan tiap departemen sendiri) dan kenapa frontend tidak memegang logika aturan karena daftar positif dikirim server via GET /me/capability. Berisi pula konsekuensinya: tidak ada migrasi form lama, tipe form baru otomatis tersedia di semua departemen, ada dua cara mematikan Form Builder untuk sebuah departemen, jangkauan audience dan subject tetap tak digerbang, serta tabel alternatif yang ditolak beserta alasannya.",
+      "kata_kunci": [
+        "tipe form",
+        "form type",
+        "Form Builder",
+        "izin per departemen",
+        "daftar-larangan",
+        "blocklist",
+        "allowlist",
+        "RBAC",
+        "ADR 0041",
+        "me/capability"
       ]
     },
     {
