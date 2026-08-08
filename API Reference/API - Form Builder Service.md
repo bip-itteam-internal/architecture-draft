@@ -27,7 +27,7 @@
 
 ## Aturan Tipe Form per Departemen (khusus IT)
 
-> ✅ **LIVE di dev, teruji end-to-end lewat gateway 2026-08-09; prod belum.** Merged 2026-08-08 (BE [#1099](https://github.com/bip-itteam-internal/bip-erp/pull/1099), FE [erp-frontend#866](https://github.com/bip-itteam-internal/erp-frontend/pull/866)). Keputusan: [[ADR - 0041 Izin Tipe Form Menempel di Departemen]].
+> ⚠️ **LIVE di dev DAN prod** (prod deploy manual 2026-08-09). Teruji end-to-end lewat gateway di dev; **di prod baru sampai boot**. Merged 2026-08-08 (BE [#1099](https://github.com/bip-itteam-internal/bip-erp/pull/1099), FE [erp-frontend#866](https://github.com/bip-itteam-internal/erp-frontend/pull/866)). Keputusan: [[ADR - 0041 Izin Tipe Form Menempel di Departemen]].
 
 Digerbang `system_roles["it"]` tingkat `supervisor`/`admin` — **kunci MODUL, bukan nama departemen** `"Tech Development"`. `staff` ditolak. Grupnya sengaja di luar `/forms` karena yang menetapkan aturan adalah IT untuk departemen yang bukan miliknya.
 

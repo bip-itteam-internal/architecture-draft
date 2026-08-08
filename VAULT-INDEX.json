@@ -165,20 +165,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "69e230e9ff38bdb1265596005ecd4e532939cb8a5674d0d3dda5c56d89516ec6",
-      "ukuran_kb": 23.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (tingkat peran staff/supervisor/admin plus cakupan departemen) dan siapa yang cukup terautentikasi untuk mengisi. Menjelaskan juga kontrak rute pengisian `/me/*`, unggah lampiran dua langkah (upload_id, bukan isi berkas), form penilaian bersasaran subject, penyaringan `?period=` untuk form berulang, serta rute Kaizen dan aturan tipe form per departemen (`/form-type-rules`). Berguna untuk menelusuri arti kode respons seperti 409 saat susunan pertanyaan diubah setelah ada jawaban, 403 saat tipe form dilarang, dan 413 saat lampiran melebihi 4 MB.",
+      "hash": "11bbeeb70deb87131ef2ff79b319848076d86fc3cd0373b5503f50bc4371084e",
+      "ukuran_kb": 23.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (tingkat peran staff/supervisor/admin plus departemen dalam cakupan pemanggil) versus siapa yang cukup terautentikasi untuk mengisi. Juga menjawab cara memakai rute penilaian karyawan (`subject`), form berulang lewat `?period=`, unggah lampiran dua langkah (`upload_id`), aturan tipe form per departemen di `/form-type-rules` yang digerbang `system_roles[\"it\"]`, rute Kaizen `/me/kaizen*`, serta analisa, responses, dan export CSV. Berguna saat perlu bentuk request/response persis, kode galat (403/409/413/422), dan batas paginasi tiap rute.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
         "endpoint",
+        "API reference",
         "RBAC departemen",
         "form berulang",
         "recurrence",
+        "period",
         "kaizen",
-        "analytics dan export CSV",
-        "lampiran upload",
-        "penilaian karyawan"
+        "export CSV"
       ]
     },
     {
@@ -1736,19 +1736,19 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "4d4e2651eaad0bf9b14a06ae8997f030084dfaa7c494bf4918de135696bd495e",
-      "ukuran_kb": 73.0,
-      "ringkasan": "Menjawab: bagaimana Form Builder Service bekerja di dalam (Go + Fiber v2 + MongoDB `form_builder_db`, path `services/form-builder`, port 6986) dan keputusan desain di baliknya. Menjelaskan kenapa kepemilikan form memakai `owner_department` alih-alih modul, bagaimana sumbu `subject` untuk menilai karyawan lain dipisahkan dari `audience`, cara form berulang beserta cron pembuka periode berjalan, mekanisme tipe form dan tipe pertanyaan, lampiran berkas, notifikasi inbox, sampai program Kaizen (potret peserta, papan kepatuhan, papan ide, setoran metrik KPI). Juga menerangkan gerbang kepatuhan yang dipakai attendance-service untuk menahan clock-in mobile dan kenapa notification-service wajib ikut di-deploy.",
+      "hash": "dcb0d01ce80758e2aee76fd7c185d03af72ae12f4a1b4e1929808d99bb77d21b",
+      "ukuran_kb": 74.2,
+      "ringkasan": "Menjawab: bagaimana Form Builder Service dibangun dan berperilaku, mulai dari stack (Go + Fiber + MongoDB `form_builder_db`), port, kepemilikan form per departemen (`owner_department`, bukan modul), 10 tipe pertanyaan dan 4 tipe form, sumbu `subject` untuk menilai karyawan lain, periode form berulang beserta cron pembukanya, program ide Kaizen, dan lampiran berkas. Juga menjawab alasan di balik keputusan desainnya, misalnya kenapa susunan pertanyaan terkunci begitu ada jawaban, kenapa gerbang presensi dilarang pada form penilaian, dan kenapa potret sasaran diambil sekali saat terbit. Berguna pula untuk tahu dependensi deploy, terutama kewajiban menaikkan notification-service bersamaan agar notifikasi inbox tidak hilang senyap.",
       "kata_kunci": [
         "form builder service",
-        "Go Fiber MongoDB",
+        "microservice",
+        "form_builder_db",
         "owner_department",
-        "subject penilaian karyawan",
-        "form berulang periode",
+        "form penilaian",
+        "evaluation",
         "kaizen",
-        "gerbang presensi clock-in",
-        "notifikasi inbox",
-        "tipe pertanyaan",
+        "gerbang presensi",
+        "notification-service",
         "lampiran file"
       ]
     },
@@ -3638,8 +3638,8 @@
       "judul": "ADR - 0041 Izin Tipe Form Menempel di Departemen",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "✅",
-      "status_teks": "**LIVE di dev dan teruji end-to-end 2026-08-09; prod belum.** Merged 2026-08-08 (BE [#1099](https://github.com/bip-itteam-internal/bip-erp/pull/1099), FE [erp-frontend#866](https://github.com/bip-itteam-internal/erp-frontend/pull/866)). Bukti verifikasinya di [[Microservices - Form Builder Service]]. Desain kerja: `erp/docs/superpowers/specs/2026-08-08-tipe-form-per-departemen-design.md`",
+      "status_emoji": "⚠️",
+      "status_teks": "**LIVE di dev DAN prod** (prod deploy manual 2026-08-09). Teruji end-to-end di dev; **di prod baru terverifikasi sampai boot**, alur berautentikasinya belum dijalankan. Merged 2026-08-08 (BE [#1099](https://github.com/bip-itteam-internal/bip-erp/pull/1099), FE [erp-frontend#866](https://github.com/bip-itteam-internal/erp-frontend/pull/866)). Bukti dan batasnya di [[Microservices - Form Builder Service]]. Desain kerja: `erp/docs/superpowers/specs/2026-08-08-tipe-form-per-departemen-design.md`",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -3650,20 +3650,20 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "HRIS - Kaizen (Ide Perbaikan)"
       ],
-      "hash": "4be1156f0ff2c4818048350eb7f79be9f44fd45015999f3fc4ba820999714512",
-      "ukuran_kb": 7.1,
-      "ringkasan": "Menjawab: kenapa izin membuat tipe form tertentu ditempelkan pada departemen dan bukan pada posisi seperti ADR 0030, kenapa yang disimpan adalah daftar-larangan (blocklist) yang bawaannya membolehkan semua, kapan aturan itu ditegakkan (saat tipe ditetapkan atau diganti selagi draft, bukan saat form lama disunting), dan siapa yang berwenang menetapkannya (`system_roles[\"it\"]` tingkat supervisor atau admin). Memuat pula alternatif yang ditolak (allowlist, matriks penuh, env, konstanta di kode, tiap SPV mengatur dirinya sendiri) beserta konsekuensinya, termasuk catatan bahwa jangkauan `audience`/`subject` tetap tidak digerbang oleh keputusan ini.",
+      "hash": "60572524f3e151899b30cca570933700f1ab27c45843c9e540d54e74ac0b0254",
+      "ukuran_kb": 7.2,
+      "ringkasan": "Menjawab: kenapa izin membuat tipe form ditempelkan pada departemen dan bukan pada posisi seperti ADR 0030, kenapa yang disimpan adalah daftar tipe yang DILARANG (blocklist, bawaan semua boleh) dan bukan daftar-izin, serta kenapa aturannya hanya ditegakkan saat tipe ditetapkan dan tidak saat form lama disunting. Juga menjawab siapa yang berhak menetapkan aturan itu (IT tingkat supervisor atau admin, bukan tiap departemen sendiri) dan alternatif apa saja yang ditolak beserta alasannya. Konsekuensinya ikut dijelaskan, termasuk bahwa jangkauan `audience` dan `subject` tetap tidak digerbang sehingga ADR ini bukan solusi untuk kebocoran sasaran lintas departemen.",
       "kata_kunci": [
         "ADR 0041",
         "izin tipe form",
-        "daftar-larangan",
+        "form type rules",
         "blocklist",
-        "form-type-rules",
+        "daftar-larangan",
+        "allowlist",
         "departemen",
         "RBAC",
-        "ADR 0030",
-        "tata kelola form",
-        "form builder"
+        "form builder",
+        "tata kelola"
       ]
     },
     {
