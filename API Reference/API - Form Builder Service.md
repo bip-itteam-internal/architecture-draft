@@ -27,7 +27,7 @@
 
 ## Aturan Tipe Form per Departemen (khusus IT)
 
-> ⚠️ **Diimplementasikan 2026-08-08, BELUM merge dan belum deploy** — branch `feat/form-builder-izin-tipe-per-departemen`. Keputusan: [[ADR - 0041 Izin Tipe Form Menempel di Departemen]].
+> ✅ **LIVE di dev, teruji end-to-end lewat gateway 2026-08-09; prod belum.** Merged 2026-08-08 (BE [#1099](https://github.com/bip-itteam-internal/bip-erp/pull/1099), FE [erp-frontend#866](https://github.com/bip-itteam-internal/erp-frontend/pull/866)). Keputusan: [[ADR - 0041 Izin Tipe Form Menempel di Departemen]].
 
 Digerbang `system_roles["it"]` tingkat `supervisor`/`admin` — **kunci MODUL, bukan nama departemen** `"Tech Development"`. `staff` ditolak. Grupnya sengaja di luar `/forms` karena yang menetapkan aturan adalah IT untuk departemen yang bukan miliknya.
 
@@ -138,7 +138,7 @@ Transisi sah: belum ditinjau → `accepted`/`rejected`; `accepted` → `implemen
 
 **Sasaran** (`audience.type`): `all` · `departments` (+`departments[]`) · `employees` (+`employee_ids[]`). `estimated_size` diisi manual sebagai penyebut tingkat pengisian; bila 0, `response_rate` tidak dikirim. Perhatikan `audience.departments` menjawab **siapa yang mengisi**, sedangkan `owner_department` menjawab **siapa yang memiliki** — keduanya tak harus sama.
 
-**Tipe form** (`form_type`): `survey` · `evaluation` · `checklist` · `kaizen`. Kiriman kosong jadi `survey`; nilai tak dikenal ditolak `400` (bukan diam-diam diubah). **Terikat dua arah dengan `subject`**: `evaluation` wajib punya sasaran, dan yang punya sasaran wajib `evaluation`. ⚠️ `request` ("Pengajuan") **dihapus** dan kini masuk kelompok "tak dikenal" — merged ke `main` 2026-08-08 (BE [#1097](https://github.com/bip-itteam-internal/bip-erp/pull/1097), FE [erp-frontend#864](https://github.com/bip-itteam-internal/erp-frontend/pull/864)); **deploy belum diverifikasi di lingkungan mana pun**. Alasan, backfill dokumen lama, dan urutan deploy: [[Microservices - Form Builder Service]].
+**Tipe form** (`form_type`): `survey` · `evaluation` · `checklist` · `kaizen`. Kiriman kosong jadi `survey`; nilai tak dikenal ditolak `400` (bukan diam-diam diubah). **Terikat dua arah dengan `subject`**: `evaluation` wajib punya sasaran, dan yang punya sasaran wajib `evaluation`. ✅ `request` ("Pengajuan") **dihapus** dan kini masuk kelompok "tak dikenal" — merged 2026-08-08 (BE [#1097](https://github.com/bip-itteam-internal/bip-erp/pull/1097), FE [erp-frontend#864](https://github.com/bip-itteam-internal/erp-frontend/pull/864)), **live di dev** dan terverifikasi lewat gateway 2026-08-09 (`form_types` membalas empat nilai); prod belum. Alasan, backfill dokumen lama, dan urutan deploy: [[Microservices - Form Builder Service]].
 
 **Pengaturan Kaizen** (`settings.kaizen`): `{quota_default, quota_by_department[{department,quota}], committee_employee_ids[], board_visible, board_hidden_fields[]}`. **Terikat dua arah dengan `form_type: "kaizen"`**: tipe itu wajib punya blok ini, dan blok ini hanya sah di tipe itu. Tipe `kaizen` juga wajib `recurrence.unit: "monthly"`, serta menolak `single_response: true` dan menolak `subject`.
 

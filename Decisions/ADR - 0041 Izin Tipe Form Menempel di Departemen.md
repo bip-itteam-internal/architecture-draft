@@ -2,7 +2,7 @@
 
 *Izin membuat tipe form tertentu ditempelkan pada **departemen**, bukan pada posisi atau peran modul, dan disimpan sebagai **daftar-larangan** yang bawaannya membolehkan semua. Ini sumbu izin di luar [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]], dan ADR ini menjelaskan kenapa itu dibenarkan.*
 
-- **Status**: ⚠️ **Diimplementasikan penuh 2026-08-08 (BE + FE), BELUM merge dan belum deploy** — branch `feat/form-builder-izin-tipe-per-departemen` di `bip-erp` dan `erp-frontend`. Desain kerja: `erp/docs/superpowers/specs/2026-08-08-tipe-form-per-departemen-design.md`
+- **Status**: ✅ **LIVE di dev dan teruji end-to-end 2026-08-09; prod belum.** Merged 2026-08-08 (BE [#1099](https://github.com/bip-itteam-internal/bip-erp/pull/1099), FE [erp-frontend#866](https://github.com/bip-itteam-internal/erp-frontend/pull/866)). Bukti verifikasinya di [[Microservices - Form Builder Service]]. Desain kerja: `erp/docs/superpowers/specs/2026-08-08-tipe-form-per-departemen-design.md`
 - **Berlaku untuk**: [[Microservices - Form Builder Service]] · [[APP - Web ERP]]
 
 ## Context

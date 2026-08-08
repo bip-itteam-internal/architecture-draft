@@ -42,10 +42,10 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 
 **Tipe form (4)** — `survey`, `evaluation`, `checklist`, `kaizen`. Bukan sekadar label: tanpanya daftar form berisi survei, checklist, dan penilaian yang tampak serupa padahal cara mengisinya berbeda jauh. `GET /forms?form_type=` menyaringnya; nilai `survey` sengaja ikut menjaring dokumen yang field-nya belum ada, karena backfill baru mengisinya saat boot. Kiriman tanpa `form_type` diberi default `survey` (klien lama belum mengirimnya), tapi nilai **tak dikenal diteruskan apa adanya** supaya validasi menolaknya dengan pesan jelas alih-alih diam-diam berubah jadi survei.
 
-> [!warning] Tipe `request` ("Pengajuan") DIHAPUS — ⚠️ merged, BELUM deploy di mana pun
-> **Merged ke `main` 2026-08-08**: FE [erp-frontend#864](https://github.com/bip-itteam-internal/erp-frontend/pull/864) pukul 13:43 UTC lebih dulu, lalu BE [#1097](https://github.com/bip-itteam-internal/bip-erp/pull/1097) 13:44 UTC — urutan itu disengaja, lihat di bawah.
+> [!success] Tipe `request` ("Pengajuan") DIHAPUS — ✅ live di dev, prod belum
+> **Merged ke `main` 2026-08-08**: FE [erp-frontend#864](https://github.com/bip-itteam-internal/erp-frontend/pull/864) pukul 13:43 UTC lebih dulu, lalu BE [#1097](https://github.com/bip-itteam-internal/bip-erp/pull/1097) 13:44 UTC — urutan itu disengaja, lihat di bawah. **Live di dev** dan terverifikasi lewat gateway 2026-08-09: `GET /form-type-rules` membalas `form_types` berisi **empat** nilai, tanpa `request`. **Prod belum**, dan prod menuntut langkah manual.
 >
-> **Merge BUKAN deploy.** Diperiksa 20 menit setelah merge: container `Form-Builder-Service` di dev masih `Up 39 hours`, jadi dev **tidak** naik otomatis meski `main` sudah berubah — sejalan dengan [[RUN - Deploy Microservices bip-erp]] dan jangan diasumsikan dari kebiasaan lama. Prod juga belum, dan prod memang menuntut langkah manual. Alur `form_type: "request"` → `400` lewat gateway **belum pernah dijalankan sungguhan** di lingkungan mana pun.
+> **Merge tidak langsung berarti deploy, dan jedanya tak bisa ditebak.** Diperiksa 20 menit setelah merge, container `Form-Builder-Service` di dev masih `Up 39 hours` — belum tersentuh. Diperiksa lagi keesokan harinya, perubahan itu sudah mendarat. Jadi dev memang naik sendiri, tapi **tidak seketika**, dan menyimpulkan "sudah ter-deploy" dari waktu merge sama salahnya dengan menyimpulkan "tidak akan ter-deploy" dari satu kali pemeriksaan. Yang benar: **periksa uptime containernya**, jangan diasumsikan dari kedua arah.
 >
 > Dari lima tipe, hanya `evaluation` (terikat `subject`), `kaizen` (terikat `settings.kaizen`), dan `survey` (default `normalizeFormType`, sasaran backfill, punya cabang filternya sendiri) yang benar-benar mengubah perilaku. `request` dan `checklist` sama-sama label murni, jadi yang membedakan nasib keduanya **keputusan produk, bukan keterikatan di kode**; menghapus `request` tak menyentuh satu pun jalur pengisian, analisa, atau gerbang presensi.
 >
@@ -83,7 +83,9 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 
 ## Izin tipe form per departemen
 
-> Status: ⚠️ **Diimplementasikan penuh (BE + FE) 2026-08-08, BELUM merge dan belum deploy** — branch `feat/form-builder-izin-tipe-per-departemen`. Keputusan dan alasannya: [[ADR - 0041 Izin Tipe Form Menempel di Departemen]].
+> Status: ✅ **LIVE di dev, teruji end-to-end lewat gateway 2026-08-09. Prod belum.** Merged 2026-08-08: BE [#1099](https://github.com/bip-itteam-internal/bip-erp/pull/1099) 17:23 UTC lebih dulu, FE [erp-frontend#866](https://github.com/bip-itteam-internal/erp-frontend/pull/866) 17:24 UTC. Keputusan dan alasannya: [[ADR - 0041 Izin Tipe Form Menempel di Departemen]].
+>
+> Yang dibuktikan di dev, bukan sekadar boot `200`: akun ber-`it:staff` ditolak `403` sementara `it:supervisor` lolos (jadi gerbangnya membedakan **tingkat**, bukan sekadar keberadaan kunci modul) · melarang sebuah tipe langsung terbaca di `GET /me/capability` milik **pemakai lain** · nilai tipe tak dikenal ditolak `400` · membuat form bertipe terlarang ditolak `403` sementara tipe yang sama **berhasil** dibuat saat aturannya dilonggarkan — kontrol negatif **dan** positif, karena `403` juga muncul bila gerbangnya salah pasang. Pesan penolakannya sampai utuh lewat gateway: `departemen Tech Development tidak diizinkan membuat form bertipe evaluation. Hubungi tim IT bila ini keliru`.
 
 Tiap departemen bisa dibatasi tipe form apa yang boleh **dibuatnya**. Ditetapkan tim IT lewat layar tersendiri, bukan konfigurasi env.
 
