@@ -2,7 +2,7 @@
 
 *Daftar endpoint **Marketing Analytics Service** — grounded ke kode (`routes.go`, `handler_mart.go`, `price_floor_handler.go`, `jobs.go`, `penjadwal_status.go`, `beranda.go`, `ambang_handler.go`; audit 2026-08-07, **28 route** di berkas produksi). Arsitektur & semantik data: [[Microservices - Marketing Analytics Service]].*
 
-- **Status**: ⚠️ Grounded ke kode (2026-08-07), **3 route belum terdokumentasi** — lihat catatan di kaki.
+- **Status**: ⚠️ Grounded ke kode (2026-08-09), seluruh route **live di PROD**; **3 route belum terdokumentasi** — lihat catatan di kaki.
 - **Prefix gateway**: `/api/marketing-analytics/*` → path internal tanpa prefix. Routing & auth: [[API - Index]].
 
 ## Konvensi respons
@@ -14,7 +14,9 @@
 
 ## Halaman depan & ambang keputusan
 
-Lapisan baca murni di atas mart yang sudah ada; tak ada job atau koleksi `mart_*` baru selain `mart_ambang`. Status: 🟡 **belum terverifikasi lewat gateway** (PR [#1080](https://github.com/bip-itteam-internal/bip-erp/pull/1080), belum merge).
+Lapisan baca murni di atas mart yang sudah ada; tak ada job atau koleksi `mart_*` baru selain `mart_ambang`. Status: ✅ **live di PROD dan terverifikasi lewat gateway** (2026-08-07, akun `panpan`). PR [#1080](https://github.com/bip-itteam-internal/bip-erp/pull/1080) merged, disusul [#1083](https://github.com/bip-itteam-internal/bip-erp/pull/1083), [#1084](https://github.com/bip-itteam-internal/bip-erp/pull/1084), dan [#1086](https://github.com/bip-itteam-internal/bip-erp/pull/1086).
+
+Verifikasinya menemukan yang test tak bisa: `vonis.laba_kotor` **cocok sampai rupiah** dengan jumlah `gross_profit` di `/profit/shops`, tetapi lencananya berbunyi `rugi` di atas periode yang `catatan_perkiraan`-nya sendiri sebut belum matang. Keadaan `belum_matang` lahir dari situ, bukan dari perancangan.
 
 | Method | Path | Catatan |
 |---|---|---|

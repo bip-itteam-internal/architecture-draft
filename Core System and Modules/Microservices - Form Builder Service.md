@@ -42,10 +42,10 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 
 **Tipe form (4)** — `survey`, `evaluation`, `checklist`, `kaizen`. Bukan sekadar label: tanpanya daftar form berisi survei, checklist, dan penilaian yang tampak serupa padahal cara mengisinya berbeda jauh. `GET /forms?form_type=` menyaringnya; nilai `survey` sengaja ikut menjaring dokumen yang field-nya belum ada, karena backfill baru mengisinya saat boot. Kiriman tanpa `form_type` diberi default `survey` (klien lama belum mengirimnya), tapi nilai **tak dikenal diteruskan apa adanya** supaya validasi menolaknya dengan pesan jelas alih-alih diam-diam berubah jadi survei.
 
-> [!warning] Tipe `request` ("Pengajuan") DIHAPUS — ⚠️ merged, BELUM deploy di mana pun
-> **Merged ke `main` 2026-08-08**: FE [erp-frontend#864](https://github.com/bip-itteam-internal/erp-frontend/pull/864) pukul 13:43 UTC lebih dulu, lalu BE [#1097](https://github.com/bip-itteam-internal/bip-erp/pull/1097) 13:44 UTC — urutan itu disengaja, lihat di bawah.
+> [!success] Tipe `request` ("Pengajuan") DIHAPUS — ✅ live di dev DAN prod
+> **Merged ke `main` 2026-08-08**: FE [erp-frontend#864](https://github.com/bip-itteam-internal/erp-frontend/pull/864) pukul 13:43 UTC lebih dulu, lalu BE [#1097](https://github.com/bip-itteam-internal/bip-erp/pull/1097) 13:44 UTC — urutan itu disengaja, lihat di bawah. **Live di dev** dan terverifikasi lewat gateway 2026-08-09: `GET /form-type-rules` membalas `form_types` berisi **empat** nilai, tanpa `request`. **Prod ikut naik 2026-08-09** lewat deploy manual yang sama; prod tetap 0 dokumen `request` (`evaluation` 2, `survey` 2, `checklist` 1) sehingga backfill senyap — dan senyap di sini adalah keadaan yang BENAR, bukan tanda backfill gagal jalan.
 >
-> **Merge BUKAN deploy.** Diperiksa 20 menit setelah merge: container `Form-Builder-Service` di dev masih `Up 39 hours`, jadi dev **tidak** naik otomatis meski `main` sudah berubah — sejalan dengan [[RUN - Deploy Microservices bip-erp]] dan jangan diasumsikan dari kebiasaan lama. Prod juga belum, dan prod memang menuntut langkah manual. Alur `form_type: "request"` → `400` lewat gateway **belum pernah dijalankan sungguhan** di lingkungan mana pun.
+> **Merge tidak langsung berarti deploy, dan jedanya tak bisa ditebak.** Diperiksa 20 menit setelah merge, container `Form-Builder-Service` di dev masih `Up 39 hours` — belum tersentuh. Diperiksa lagi keesokan harinya, perubahan itu sudah mendarat. Jadi dev memang naik sendiri, tapi **tidak seketika**, dan menyimpulkan "sudah ter-deploy" dari waktu merge sama salahnya dengan menyimpulkan "tidak akan ter-deploy" dari satu kali pemeriksaan. Yang benar: **periksa uptime containernya**, jangan diasumsikan dari kedua arah.
 >
 > Dari lima tipe, hanya `evaluation` (terikat `subject`), `kaizen` (terikat `settings.kaizen`), dan `survey` (default `normalizeFormType`, sasaran backfill, punya cabang filternya sendiri) yang benar-benar mengubah perilaku. `request` dan `checklist` sama-sama label murni, jadi yang membedakan nasib keduanya **keputusan produk, bukan keterikatan di kode**; menghapus `request` tak menyentuh satu pun jalur pengisian, analisa, atau gerbang presensi.
 >
@@ -80,6 +80,39 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 
 **Kepatuhan presensi**
 - `GET /internal/compliance` — dipakai attendance-service saat clock-in. Membalas `blocking` (mode `block`) dan `warning` (mode `warn`).
+
+## Izin tipe form per departemen
+
+> Status: ✅ **LIVE dan teruji end-to-end di dev DAN prod.** Merged 2026-08-08: BE [#1099](https://github.com/bip-itteam-internal/bip-erp/pull/1099) 17:23 UTC lebih dulu, FE [erp-frontend#866](https://github.com/bip-itteam-internal/erp-frontend/pull/866) 17:24 UTC. Prod di-deploy manual 2026-08-09. Keputusan dan alasannya: [[ADR - 0041 Izin Tipe Form Menempel di Departemen]].
+>
+> Yang dibuktikan di dev, bukan sekadar boot `200`: akun ber-`it:staff` ditolak `403` sementara `it:supervisor` lolos (jadi gerbangnya membedakan **tingkat**, bukan sekadar keberadaan kunci modul) · melarang sebuah tipe langsung terbaca di `GET /me/capability` milik **pemakai lain** · nilai tipe tak dikenal ditolak `400` · membuat form bertipe terlarang ditolak `403` sementara tipe yang sama **berhasil** dibuat saat aturannya dilonggarkan — kontrol negatif **dan** positif, karena `403` juga muncul bila gerbangnya salah pasang. Pesan penolakannya sampai utuh lewat gateway: `departemen Tech Development tidak diizinkan membuat form bertipe evaluation. Hubungi tim IT bila ini keliru`.
+>
+> **Di prod diuji ulang penuh 2026-08-09** dengan cara yang **tidak membuat satu dokumen pun**, memanfaatkan urutan validasi `createForm`: `validateRecurrence` berjalan SESUDAH gerbang tipe. Payload sah bermuatan `open_day: 99` karena itu dibalas `400 open_day untuk bulanan harus 1..28` saat tipenya diizinkan (**bukti gerbangnya dilewati**) dan `403` saat tipenya dilarang (**bukti gerbangnya menahan**) — kontrol positif dan negatif dari satu payload, tanpa residu. Diperiksa sesudahnya: prod tetap 5 form dengan distribusi tak bergeser. `/me/capability` ikut berubah bolak-balik mengikuti aturannya.
+>
+> Dua percobaan membuktikan rute lewat probe **tanpa token** sebelumnya gagal memberi informasi, dan keduanya ketahuan justru karena disertai kontrol negatif: lewat gateway, rute karangan pun dibalas `401`; langsung ke service, sama saja, karena penjaga kunci-gateway dipasang **global** sebelum routing. Kalau kontrol negatifnya dilewatkan, `401` pada rute baru akan terbaca sebagai "rute terdaftar" padahal tak membuktikan apa-apa. Yang akhirnya membuktikan adalah panggilan **berautentikasi**.
+>
+> ⚠️ **Peran akun bisa BERBEDA antara dev dan prod.** `panpan` ber-`it:staff` di dev (karena itu dipakai sebagai kontrol negatif di sana) tetapi lolos `can_manage_type_rules` di prod. Jangan menyalin asumsi peran antar-lingkungan; baca `/me/capability` di lingkungan yang sedang diuji.
+
+Tiap departemen bisa dibatasi tipe form apa yang boleh **dibuatnya**. Ditetapkan tim IT lewat layar tersendiri, bukan konfigurasi env.
+
+**Yang disimpan adalah tipe yang DILARANG** (koleksi `form_type_rules`, index unik `(company_id, department)`), bawaannya semua boleh. Tak ada dokumen untuk sebuah departemen berarti tak ada larangan, jadi tak satu pun form lama perlu dimigrasi dan departemen yang baru ditambahkan ke `FORM_BUILDER_DEPARTMENTS` langsung bekerja tanpa menunggu siapa pun mengatur barisnya.
+
+Arah bawaan itu dipilih karena **kegagalannya berbalik arah**: dengan daftar-izin, tipe form yang ditambahkan nanti tak terlihat oleh satu pun departemen sampai tiap baris disunting — merge, deploy, lalu diam, persis pola `recurrence` dan kategori inbox Kaizen. Dengan daftar-larangan, yang terjadi cuma sebuah departemen mendapat tipe yang tak diniatkan IT: terlihat, tak merusak data, diperbaiki dalam semenit. **Ini tidak membatalkan pilihan daftar-izin di papan ide Kaizen** — di sana yang dijaga kebocoran ke layar sekantor, di sini tak ada yang bocor.
+
+> [!warning] Aturan berlaku saat tipe DITETAPKAN, bukan saat form disunting
+> Hanya dua titik: `createForm` (setelah `owner_department` dikanonikkan — mencarinya dengan ejaan kiriman akan meleset lalu meloloskan tipe yang sengaja ditutup) dan `updateForm` **bila tipenya benar-benar berganti pada form draft**.
+>
+> Mencabut sebuah tipe **tidak menyentuh** form yang sudah terlanjur bertipe itu. Ini syarat kebenaran, bukan kelonggaran: `FormType` cuma bisa diubah selagi draft dan form terbit tak bisa mundur ke draft, jadi memeriksa aturan pada tiap penyuntingan akan **mengunci form itu selamanya** — pemiliknya bahkan tak bisa mengganti judul. Pelajaran yang dibayar hari yang sama saat tipe `request` dihapus. Penempatannya dijadikan predikat murni `typeCheckNeeded` supaya bisa diuji, bukan cuma diyakini; **jangan pindahkan ke `validateFormDefinition`** meski di sana terlihat lebih rapi.
+
+**Nilai tak dikenal ditolak saat MENULIS, diabaikan saat MEMBACA.** Asimetri disengaja: saat menulis orangnya ada di depan layar dan bisa diberi tahu mana yang salah; saat membaca, satu nilai basi (mis. `request` yang sudah dihapus) tak boleh berubah jadi pemadaman Form Builder yang sebabnya tak terbaca dari pesan galat mana pun.
+
+**Gerbangnya kunci MODUL `system_roles["it"]`**, tingkat `supervisor` atau `admin` — bukan nama departemen `"Tech Development"`. Keduanya sumbu berbeda dan sudah pernah tertukar di service ini (PR #869). `staff` dikecualikan karena aturan ini membatasi departemen lain; `admin`-saja ditolak karena bila tak seorang pun memegang `it:admin`, layarnya tak bisa dibuka siapa pun dan gejalanya senyap.
+
+Rute `/form-type-rules/*` hidup **di luar grup `/forms`**, meniru pemisahan rute komite Kaizen: grup itu menuntut keanggotaan departemen aktif, sedangkan yang menetapkan aturan justru IT untuk departemen yang **bukan** miliknya.
+
+**`GET /me/capability` menjawab daftar POSITIF per departemen** (`form_types_by_department`), sehingga frontend tak memegang satu baris pun logika aturan. Per departemen, bukan datar: SPV HRGA membawahi dua sekaligus, dan meratakannya salah ke dua arah — irisan menyembunyikan tipe yang sebenarnya boleh, gabungan menawarkan tipe yang pasti ditolak. `can_manage_type_rules` dihitung **terpisah** dari `can_manage`, karena admin IT belum tentu mengelola satu departemen pun dan kalau haknya ikut mati ia tak pernah melihat pintu masuk layarnya.
+
+Yang **tidak** diselesaikan: `audience` dan `subject` masih hanya diperiksa bentuknya, bukan jangkauannya. Departemen yang dibatasi tipenya tetap bisa menyasar karyawan departemen lain memakai tipe yang masih boleh dibuatnya.
 
 ## Kepemilikan form: departemen, bukan modul
 

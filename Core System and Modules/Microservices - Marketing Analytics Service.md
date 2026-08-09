@@ -26,7 +26,7 @@ Penjaga yang sama sudah dibuktikan menutup `insentive_db` (sumber ICC) — arahn
 
 28 route di berkas produksi (audit kode 2026-08-07, `routes.go` + `handler_mart.go` + `price_floor_handler.go` + `jobs.go` + `penjadwal_status.go` + `beranda.go` + `ambang_handler.go`). Daftar lengkap per-route: [[API - Marketing Analytics Service]] — termasuk tiga route (`/toko`, `/kpi/kinerja-toko`, `/profit/items`) yang ada di kode tetapi belum terdokumentasi. Seluruhnya `GET` kecuali disebut lain.
 
-### Halaman depan & ambang keputusan (🟡 menunggu merge)
+### Halaman depan & ambang keputusan (✅ live di PROD)
 
 | Endpoint | Isi |
 |---|---|
@@ -201,6 +201,55 @@ Nol koleksi iklan/video/live di `integration_db` (hanya finance). Order Lazada m
 
 Service ini menyimpan **alasan ketidaklengkapan bersama datanya**, bukan membiarkan angka kosong dibaca sebagai nol.
 
+### `revenue`: TikTok sudah setelah diskon (PR #1109), Shopee masih harga list
+
+Bagian ini ditulis paling atas karena ia mengubah cara membaca setiap angka turunannya.
+
+`sumber_agregasi.go` mengisi `Revenue: it.Total`, yaitu jumlah `items[].total` order — jadi maknanya ditentukan oleh apa yang ditulis [[Microservices - Integration Service]] ke field itu.
+
+**TikTok — SUDAH DIPERBAIKI (PR [#1109](https://github.com/bip-itteam-internal/bip-erp/pull/1109), live 2026-08-09).** `TransformFromTiktok` kini memetakan `items[].price` dari `line_items[].sale_price` (harga setelah diskon penjual), bukan `original_price`. Pemicunya: kolom omzet ERP **46% lebih besar** daripada yang ditampilkan Seller Center dan Desty. Terverifikasi terhadap ekspor Desty 9 Jul–7 Agt — ERP `5.284.842.600` vs Desty `3.608.539.700`; memakai `sale_price` memberi `3.625.632.734`, **selisih 0,47%**. Desty mendokumentasikan sendiri bahwa hanya TikTok yang memakai subtotal setelah diskon sementara marketplace lain memakai harga sebelum diskon.
+
+Backfill `transaction_orders` dijalankan sejak **1 Agustus 2026** (`cmd/ttitempricebackfill`, 12.806 order diubah, 0 mismatch); sesudahnya **13.152 dari 13.152 order** cocok `payment.sub_total` dengan beda Rp0, dan mart sejajar dengan sumber tanpa selisih. Periode sebelum 1 Agustus sengaja dibiarkan — fakturnya sudah terbukukan dan dilindungi gerbang faktur-permanen.
+
+**Shopee & Lazada — tetap harga sebelum diskon, dan itu benar.** Keduanya sudah sejajar dengan Desty apa adanya (Shopee +1,80%, Lazada −1,20%); mengubahnya justru akan menjauhkan sejauh Rp27,7 juta ke arah sebaliknya.
+
+Angka historis di bawah ini diukur **sebelum** perbaikan dan tetap dipertahankan karena menjelaskan mengapa perbaikan itu diperlukan — untuk TikTok kolom "Diskon penjual" kini sudah tercermin di `revenue`, untuk Shopee belum.
+
+Dengan `sum(items[].total)` **pra-#1109** sebagai 100:
+
+| Channel | n | Diskon penjual | Dibayar pembeli | Settlement |
+|---|---|---|---|---|
+| TIKTOK | 16.574 | **31,0%** | 71,0% | **49,8%** |
+| SHOPEE | 3.426 | 7,2% | 82,2% | 71,0% |
+
+**Kita mendiskon TikTok empat kali lebih dalam daripada Shopee**, dan tak ada satu kolom pun yang menampilkannya. Potongan marketplace justru lebih besar di Shopee (21,8% berbanding 19,2%); yang membuat TikTok mahal adalah diskon kita sendiri.
+
+Konsekuensinya — **sejak PR #1109 hanya berlaku penuh untuk Shopee**; untuk TikTok diskon penjual kini sudah terpotong di `revenue`, sehingga jarak ke uang nyata tinggal potongan marketplace:
+
+- **`roasAgregat = revenue / adsCost`** untuk **Shopee** masih berdiri di atas harga banderol. Untuk **TikTok** sekarang berbasis harga setelah diskon — masih di atas settlement (potongan marketplace ~19,2% belum terpotong), tapi tak lagi melebih-lebihkan sebesar dua kali lipat seperti sebelumnya.
+- **`iklanPersenRevenue = adsCost / revenue`** ikut mengencang untuk TikTok dengan alasan yang sama; untuk Shopee tetap understated.
+- Ambang `roas_min` 3,2 adalah angka tim dari Master Roadmap yang **basisnya tak pernah dinyatakan** — dan basis pembandingnya kini **berbeda antar-channel**, sehingga membandingkan ROAS TikTok dan Shopee terhadap satu ambang yang sama menjadi tidak setara. Perlu diputuskan ulang.
+- **`gross_profit` TIDAK terpengaruh — terverifikasi ulang sesudah #1109.** Ia dihitung dari `net_settlement`, HPP dari `o.Qty`, dan `revenue` tidak muncul dalam rumusnya (`attribution.go:133`). Yang bergeser hanya sebaran `ads_cost` antar-SKU pada jalur prorata (totalnya tetap). Gerbang laba pada vonis halaman depan tetap sehat.
+- **Efek samping menguntungkan**: margin yang dihitung manual (`gross_profit ÷ revenue`) untuk TikTok membaik dari 18% ke 26%, mendekati margin sejati 35% (`gross_profit ÷ net_settlement`) — sebelumnya pembilang memakai settlement sementara penyebut memakai harga banderol.
+
+`fee_marketplace` = `TotalPlatformCommission + TotalServiceFee + TotalAffiliateCommissionFee`, diprorata per item. **Komisi affiliate sudah termasuk.** Yang tak punya kolom sama sekali: **diskon, ongkir, dan adjustment**.
+
+Identitasnya lebih dulu dibuktikan tim di `services/integration/cmd/insentifprobe` terhadap data TikTok Juni 2026: `total_original_price − total_discount = subtotal_after_seller_discount`, lalu `subtotal − (service + shipping + affiliate + commission + adjustment + refund) = total_settlement_amount`.
+
+**Keputusan basis ROAS masih terbuka (TBD)** dan bukan keputusan teknis: ia menentukan lencana yang sudah menilai belanja iklan berjalan.
+
+### Kolom "Kebocoran" DIBATALKAN, dan sebabnya bukan aritmetika
+
+Kolom yang menjumlahkan jarak revenue ke settlement dibangun penuh, diuji, lalu **dibatalkan sebelum dikirim**. Rumusnya `(revenue − net_settlement) + retur` dan ia **tertutup persis**: `revenue − kebocoran − hpp − ads_cost = gross_profit`, terverifikasi terhadap `ComputeGrossProfit` termasuk lewat agregasi bulanan, lintas-toko, dan lintas-channel.
+
+**Aritmetika yang benar tidak membuat namanya benar.** Rumus itu menjumlahkan diskon kita sendiri, potongan marketplace, ongkir, komisi kreator, dan retur menjadi satu angka yang pemiliknya berbeda-beda, lalu menyebutnya kebocoran. Menamai diskon yang kita putuskan sendiri sebagai kebocoran menyembunyikan satu-satunya suku yang benar-benar dapat ditindaklanjuti.
+
+Satu entri Kamus Metrik dengan definisi itu sempat tayang sehari lalu dicabut (erp-frontend PR #867). Penggantinya **rantai pengurangan bernama** yang menyebut pemilik tiap suku, dan itu menuntut `total_original_price` serta `total_discount` masuk mart lebih dulu (TBD).
+
+Dicatat di sini justru karena rumusnya terlihat benar: tanpa catatan ini, orang berikutnya akan membangunnya lagi dan tak satu pun test akan memerahkannya.
+
+### Penanda lain
+
 - **`attribution_kolom` — penanda aktual vs perkiraan melekat PER KOLOM**, bukan per baris. Peta `nama kolom → alasan terbaca manusia`; kolom yang tidak ada di peta = **aktual**; kunci = persis tag json kolom. Penanda tingkat-baris sebelumnya memvonis seluruh baris: 2.384 baris campaign bertanda `estimated` dibaca pengguna sebagai "biaya iklan tidak valid" — padahal `ads_cost`-nya aktual, Rp1.289.007.856 cocok persis belanja GMV Max; yang perkiraan **labanya** (retur tak teratribusi ke level iklan, dasar revenue kotor). `attribution`/`attribution_note` kini **turunan** — utang teknis, dihapus setelah FE membaca `attribution_kolom`.
 - **`kolom_tidak_berlaku`** (lihat *Kontrak amplop*) membedakan "kolom ini tak akan pernah berisi di level ini → hilangkan" dari "sel ini kosong → tak tersedia". Kolom struktural yang membawa angka nyata tetap dikirim; hanya nilai nol yang dinihilkan — `retur = 0` di level shop adalah kabar baik nyata dan tetap `0`.
 - **`master_sku` + `belum_termapping`** pada level product: baris ber-master kosong tetap tampil sendiri dengan SKU aslinya — tidak dibuang, tidak dilebur jadi "lain-lain". Sisa terbesar kini SKU **bundel ber-master-kosong** yang isi paketnya perlu konfirmasi bisnis (menetapkan komponen paket bukan urusan tebakan kode).
@@ -253,4 +302,5 @@ Service ini menyimpan **alasan ketidaklengkapan bersama datanya**, bukan membiar
 - [[IT - Background Jobs & Schedulers]] (penjadwal internal service ini tercatat di sana)
 - [[ADR - 0002 Database-per-Service]] · [[ADR - 0011 Integration Read Cache + Singleflight (Fase 1 Perf)]]
 - [[Sales - GMV Creative]] · [[Sales - ICC Affiliate Mapping]] · [[Sales - Marketing Dashboard (Analisis Rekap)]]
+- [[Sales - Marketing Analytics (Audit Ketersediaan Data)]] — metrik prototipe Direktur diperiksa satu per satu terhadap field yang benar-benar ada di service ini (ADA · RAKIT · TIPIS · TIDAK ADA)
 - [[HRIS - Otomasi Skor KPI]] (memakai `mart_profit_attribution` dan `mart_video_performance` sebagai calon sumber skor KPI otomatis)
