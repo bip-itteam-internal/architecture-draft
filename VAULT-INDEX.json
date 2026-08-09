@@ -1105,23 +1105,10 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "f7fa0950f4c8d9ba8a8f0afb57b3fadf603bcc8cb9fe468d78b58a5512de733d",
-      "ukuran_kb": 156.7,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP One Bharata, bagaimana login, SSO, dan role gating sidebar bekerja, serta konvensi UI mana yang berlaku (MainTable + Banner sebagai lapisan tabel utama, IntegrationTable sebagai pengecualian, i18n dua bahasa). Juga menjawab: apa itu struktur halaman HRIS, yakni Banner bare yang duduk di dalam kartu MainTable lewat prop toolbar, layar mana saja yang sudah memakainya, dan apa yang biasanya ikut rusak di layar yang belum (kotak cari yang tak menyaring apa pun, penyaring backend yang tak pernah dipanggil, tak ada paginasi maupun export). Menjelaskan keputusan tampilan per modul beserta konsekuensinya, termasuk mana yang sudah live dan mana yang masih di branch.",
-      "kata_kunci": [
-        "erp-frontend",
-        "One Bharata",
-        "web ERP",
-        "MainTable",
-        "Banner",
-        "toolbar",
-        "struktur halaman HRIS",
-        "IntegrationTable",
-        "sidebar",
-        "role gating",
-        "SSO",
-        "i18n"
-      ]
+      "hash": "7dc2788d38413406f8099efa56aa30cb8ea79dd6cfeedbdc46232480a6b66a6d",
+      "ukuran_kb": 161.4,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Application/APP - Website Bharata Internasional.md",
@@ -1358,13 +1345,14 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, serta **legal** (yang terakhir ⚠️ belum merge). **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) sudah berkatalog + bergerbang tapi **belum merge dan belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
+      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, serta **legal** (yang terakhir ⚠️ belum merge). **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "APP - Web ERP",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
+        "Finance - Kas Kecil dan Pengajuan Budget",
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "Microservices - Procurement Service",
@@ -1389,24 +1377,22 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "ce0a1753e2dde1c9b1ac5f718716ec79234362f0dba8de7ded459c39bec88fcf",
-      "ukuran_kb": 37.2,
-      "ringkasan": "Menjawab: bagaimana hak akses bekerja di seluruh bip-erp lewat tiga sumbu (modul, tingkat aksi view/work/approve/manage, dan reach own/division/all), izin apa saja yang berlaku per modul, dan paket bawaan mana yang bisa dipilih HR untuk sebuah posisi. Juga menjawab: modul mana yang sudah berkatalog dan ditegakkan per-aksi versus mana yang masih memakai tier system_roles lama, bagaimana fallback tier menjaga agar tak ada yang kehilangan akses saat enforcement dinyalakan, dan kenapa katalog izin TIDAK membuka menunya sendiri (sidebar dan proxy masih memilih modul dari system_roles). Berguna juga untuk membedakan permission_sets dari menu_hidden dan dari modul menu terbatas, tiga hal yang menempel pada objek yang sama dan mudah tertukar.",
+      "hash": "e62c656a57632b1ebeda93f02b8df4685b7c6ccfdceedf6e2c0070e5bb5ea08f",
+      "ukuran_kb": 40.5,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja sekarang, yaitu tiga sumbu (modul, tingkat aksi view/work/approve/manage, dan cakupan own/division/all) dengan paket hak bernama yang menempel pada jabatan, bukan pada orang. Memuat katalog izin per modul beserta modul mana yang sudah benar-benar ditegakkan, dan menjelaskan kenapa system_roles lama belum tergantikan: ia masih penentu modul mana yang muncul untuk seseorang, sedangkan permission-set hanya mengatur boleh apa di dalamnya. Juga mencatat status penegakan per service, rute yang masih tanpa gerbang, serta beda permission_sets, menu_hidden, dan menu terbatas yang mudah tertukar.",
       "kata_kunci": [
         "RBAC",
         "permission set",
+        "hak akses",
         "izin",
         "permission",
-        "katalog",
-        "hak akses",
+        "katalog izin",
         "reach",
         "system_roles",
-        "fallback tier",
-        "kill-switch",
-        "menu_hidden",
+        "paket hak",
+        "posisi",
         "menu terbatas",
-        "gerbang",
-        "otorisasi"
+        "kill-switch"
       ]
     },
     {
@@ -9221,6 +9207,7 @@
     }
   ],
   "gagal": [
+    "Application/APP - Web ERP.md",
     "Decisions/ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign.md",
     "Human Resource Information System/HRIS - Career & Promotion.md",
     "Human Resource Information System/HRIS - Training Program.md"
