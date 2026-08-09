@@ -28,7 +28,9 @@ Satu endpoint melihat **semua** pengajuan lintas koleksi — `services/attendanc
 
 **Keputusan tahap HRD** (setujui/tolak di keempat jenis) digerbang **`hris.pengajuan.approve`**, fallback union `department == "Human Resource"`. Cost Control **tidak** termasuk. Perlu diketahui: sebelum ini siapa pun berdepartemen HR boleh memutuskan pengajuan siapa pun yang sudah lolos SPV, tanpa peran maupun jabatan tertentu; pembatasan sebenarnya baru berlaku saat fase dua (`HRIS_TIER_FALLBACK=off`) dinyalakan.
 
-**Antrean peninjau ikut hak yang sama.** `build*ReviewFilter` menerima `bolehTahapHR` dari predikat yang sama dengan tombolnya, supaya daftar tak pernah menampilkan pengajuan yang menolak saat ditindak. Yang **tidak** digerbang izin dan memang tak boleh: mode `?as=reviewer|reviewed` (relasional, siapa yang ditunjuk di `spv_status`/`hr_status`), `?as=self`, `/requests/mine`, dan penunjukan personal di slot HR.
+**Antrean peninjau ikut hak yang sama.** `build*ReviewFilter` menerima `bolehTahapHR` dari predikat yang sama dengan tombolnya, supaya daftar tak pernah menampilkan pengajuan yang menolak saat ditindak.
+
+⚠️ **Tahap HRD tak selalu duduk di slot `hr_status`** ([#1127](https://github.com/bip-itteam-internal/bip-erp/pull/1127)). Dua alur memakai SATU tahap dan menaruh peninjau HR di slot `spv_status`: **Koreksi milik staf HR** (di situ HR penyetuju final) dan **Tukar milik atasan** departemen mana pun atau orang HR. Keduanya tetap keputusan HRD dan karena itu ikut `hris.pengajuan.approve`, dikenali dari data slotnya (`slotHRLevelDepartemen`), bukan dari nama fieldnya. Cabang atasan biasa tak tersentuh. Yang **tidak** digerbang izin dan memang tak boleh: mode `?as=reviewer|reviewed` (relasional, siapa yang ditunjuk di `spv_status`/`hr_status`), `?as=self`, `/requests/mine`, dan penunjukan personal di slot HR.
 
 ## Komponen Bersama (di kode)
 

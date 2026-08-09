@@ -1383,20 +1383,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "c25d2d372ad856f9f15ac92ad56bbf53be7cc4e9c6ae9f191d71f9934a7b25ca",
-      "ukuran_kb": 58.2,
-      "ringkasan": "Menjawab: bagaimana hak akses seluruh bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan/reach), bagaimana permission set menempel di posisi lalu di-resolve jadi klaim JWT saat login, dan modul mana yang katalognya sudah terdaftar serta sudah ditegakkan per-aksi. Juga menjawab beda permission_sets dengan menu_hidden (hak akses vs tampilan) dan kenapa keduanya tak boleh disatukan. Termasuk endpoint katalog/modul/assign yang dipakai frontend, tier fallback, dan kill-switch penegakan per modul.",
+      "hash": "56f1be6245ca83565a7b99fb648530f3251c6fa8e452134c89c90de0e3c24a47",
+      "ukuran_kb": 61.7,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp disusun lewat tiga sumbu (modul, aksi, cakupan data/reach own-division-all), bagaimana permission granular dibundel jadi permission set bernama, dan mengapa paket hak menempel pada posisi/jabatan bukan pada akun. Juga menjawab: modul apa saja yang punya katalog permission, endpoint mana yang dipakai frontend untuk mengambil katalog/daftar modul dan memasang paket ke posisi, bagaimana permission efektif diresolusi saat login lalu dibawa di klaim JWT dan header BIP-* dari gateway, serta bagaimana kill-switch tier fallback per modul bekerja. Sekaligus membedakan permission_sets (hak akses, ditegakkan backend) dari menu_hidden (tampilan sidebar per jabatan, hanya mengurangi dan bukan mekanisme keamanan).",
       "kata_kunci": [
         "RBAC",
         "permission set",
         "hak akses",
+        "izin",
         "reach",
-        "katalog permission",
+        "cakupan data",
         "system_roles",
-        "tier fallback",
         "posisi",
         "jabatan",
-        "klaim JWT"
+        "tier fallback"
       ]
     },
     {
@@ -4934,20 +4934,20 @@
         "Microservices - Employee Service",
         "APP - MyBharata"
       ],
-      "hash": "7ed1ab0661cf7b029843ed079c52c9dde54c51bec29dd10d9232f5644d390ff2",
-      "ukuran_kb": 6.8,
-      "ringkasan": "Menjawab: pola bersama seluruh pengajuan karyawan di HRIS, yaitu jenis request apa saja yang ada (izin/cuti/sakit, dinas, koreksi absen, tukar jadwal, lembur), koleksi dan endpoint masing-masing, siapa reviewer di tiap tahap, serta bagaimana hasil approval otomatis diterapkan ke data attendance. Juga menjawab: siapa yang berhak melihat seluruh pengajuan dan siapa yang berhak memutuskan di tahap HRD, plus komponen bersama apa yang dipakai ulang (model review, resolusi status, penentuan reviewer, notifikasi). Memuat pula batas tanggal tiap jenis request dan gap yang diketahui terhadap periode gaji 26 sampai 25.",
+      "hash": "873708f2d83895b109baca129a019d782d38a4c05cc7c785e8614fdf6535ed47",
+      "ukuran_kb": 7.3,
+      "ringkasan": "Menjawab: bagaimana pola umum pengajuan karyawan di HRIS bekerja, mulai dari karyawan mengajukan, review berjenjang SPV lalu HRD, sampai hasilnya diterapkan otomatis ke attendance. Menjelaskan jenis request apa saja yang berbagi infrastruktur ini (izin/cuti/sakit, perjalanan dinas, koreksi clock-in/out, tukar shift atau hari, plus lembur yang direncanakan), komponen bersama di attendance service (ReviewData, ReviewStatus, getSupervisorData, filter reviewer, notifikasi), serta endpoint admin HR untuk melihat semua pengajuan lintas koleksi berikut siapa yang berhak melihat dan memutuskannya. Juga menjawab: apa batas tanggal tiap jenis request dan mengapa pengajuan bisa di-backdate melewati cutoff periode gaji tanpa rekonsiliasi ke payroll.",
       "kata_kunci": [
-        "pengajuan",
+        "pengajuan karyawan",
         "employee request",
         "approval",
+        "persetujuan berjenjang",
         "reviewer",
-        "supervisor",
+        "SPV",
         "HRD",
-        "cuti",
-        "koreksi absen",
-        "tukar jadwal",
-        "perjalanan dinas"
+        "attendance",
+        "submission",
+        "batas tanggal"
       ]
     },
     {
