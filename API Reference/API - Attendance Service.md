@@ -14,8 +14,8 @@
 | GET | `/report` | Laporan periode 26→25 (`?yyyy-mm`); tiap entry juga membawa `leave_subtype` (bedakan Izin urusan kantor vs pribadi di FE) | HRIS |
 | PATCH | `/:id/update` | Update entri (+dokumen/status/comment) | HRIS |
 | GET | `/payroll-supplement` | Agregasi jam → payout_pct (`?employee_id`); dibayar/dipotong per status dari master treatment | open |
-| GET | `/payroll-status-treatment` | Perlakuan dibayar/dipotong per status (untuk payout) | HR |
-| PUT | `/payroll-status-treatment` | Set flag `paid` satu status (`{status, paid}`) | HR |
+| GET | `/payroll-status-treatment` | Perlakuan dibayar/dipotong per status (untuk payout) | `payroll.view` |
+| PUT | `/payroll-status-treatment` | Set flag `paid` satu status (`{status, paid}`) | `payroll.manage` |
 | GET | `/today` · `/schedule` · `/sync/company-work-schedules` · `/data-type/:dt` | Jadwal harian/bulanan/sync/enum | open |
 | GET/PATCH | `/mood` | Mood check-in harian | header |
 

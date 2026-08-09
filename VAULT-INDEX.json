@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-09",
-  "jumlah_dokumen": 279,
+  "jumlah_dokumen": 280,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -51,19 +51,19 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "2ed908b01af97212194725a7a4df7ff349a2947a09f4cc99db4ec931005bd20c",
-      "ukuran_kb": 8.4,
-      "ringkasan": "Menjawab: endpoint apa yang dipakai untuk clock-in/out, melihat jadwal, mengajukan cuti/izin, mengoreksi absen, menukar jadwal kerja, mengajukan perjalanan dinas, mengatur roster, dan mencatat tamu, lengkap dengan method, path, parameter, serta auth tiap rute di gateway `/api/attendance/*`. Juga menjawab: bagaimana pengajuan HR lintas jenis diambil dari satu endpoint terpadu (`/requests/mine` dan `/hr/requests`), apa arti parameter `?as=reviewer|reviewed|self`, dan siapa yang berhak memanggil mode admin. Rujukan utama saat menyambungkan frontend web atau aplikasi mobile ke attendance-service.",
+      "hash": "eee7c6fee3b9bd6f2fbc7046c038b5c825b51388c5e5135b4dd461e0f992384d",
+      "ukuran_kb": 8.5,
+      "ringkasan": "Menjawab: endpoint mana yang dipakai untuk clock-in/out, mengajukan cuti/izin, perjalanan dinas, tukar jadwal kerja, dan koreksi absensi, lengkap dengan auth/RBAC tiap rute. Juga menjawab bagaimana daftar pengajuan lintas jenis diambil pemohon, peninjau, maupun admin HR lewat endpoint terpadu, dan bagaimana roster harian per departemen ditulis atau dikosongkan. Termasuk rute penyuplai data payroll (payroll-supplement, payroll-status-treatment), hari libur, guestbook, dan WiFi.",
       "kata_kunci": [
         "attendance",
         "absensi",
         "clock-in",
-        "endpoint",
-        "leave request",
+        "tap",
         "cuti",
-        "koreksi absen",
-        "tukar jadwal",
+        "leave request",
         "perjalanan dinas",
+        "business trip",
+        "tukar jadwal",
         "guestbook"
       ]
     },
@@ -1097,20 +1097,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "d3fc54b36686a1c29296ffb655d7f64c6cdda6a16ffeb0683a347a67c8278c22",
-      "ukuran_kb": 162.5,
-      "ringkasan": "Menjawab: apa itu portal web internal `hris-dashboard` (\"One Bharata\"), stack apa yang dipakainya, bagaimana login dan alur SSO bekerja, serta bagaimana sidebar disaring berdasarkan `system_roles` per modul. Juga menjawab: bagaimana dukungan multi-perusahaan diterapkan di frontend (pemilih perusahaan, kelola departemen/shift/network per perusahaan) dan bagaimana setelan HRGA dikumpulkan di satu induk menu Pengaturan, termasuk kenapa penyaringannya per tab dan bukan per halaman. Tempat mencari alasan di balik pengelompokan menu, gerbang rute di proxy, dan penerusan rute lama.",
+      "hash": "1eb6335441e934cb9e25052cfac88a72df8c90c4a3e1852fd61c8beb7896b706",
+      "ukuran_kb": 163.0,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal (hris-dashboard / \"One Bharata\"), stack apa yang dipakai, dan modul apa saja yang tersedia untuk HR, attendance, finance/insentif, IT, dan GA. Juga menjawab bagaimana login, refresh token, dan peran sebagai SSO Identity Provider bekerja, serta bagaimana sidebar digerbang oleh system_roles dan dikelompokkan lewat menu induk bersarang. Termasuk bagaimana dukungan multi-perusahaan tampil di UI dan bagaimana setelan HRGA dikumpulkan jadi satu menu Pengaturan dengan penyaringan per tab.",
       "kata_kunci": [
         "erp-frontend",
-        "hris-dashboard",
+        "web ERP",
         "One Bharata",
-        "Next.js",
-        "SSO",
-        "system_roles",
+        "hris-dashboard",
         "sidebar",
         "menu",
+        "SSO",
+        "role gating",
         "multi-perusahaan",
-        "pengaturan HRGA"
+        "Next.js"
       ]
     },
     {
@@ -1287,6 +1287,7 @@
         "Microservices - Employee Service",
         "APP - MyBharata",
         "APP - Web ERP",
+        "CORE - RBAC dan Permission Set",
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
         "DB - Overview and Notes",
@@ -1294,20 +1295,19 @@
         "CORE - HRIS Orchestrator",
         "IT - Employee System"
       ],
-      "hash": "dba7a4ec8d5b42edc59829ef914a252cf71cb7f2dd3774dd9172f64189e99653",
-      "ukuran_kb": 4.0,
-      "ringkasan": "Menjawab: apa yang dikerjakan IT Orchestrator (service Go + Fiber di `orchestrator/it`, port 7001) sebagai perekat operasi IT-admin lintas employee, attendance, dan notification service, serta bagaimana RBAC-nya diterapkan blanket ke SEMUA route lewat `ValidateGateway` + `RequireITStaff` dan di-route gateway pada prefix `/api/it/*`. Juga menjawab: endpoint apa saja yang tersedia untuk baca/ganti `system_roles`, reset password (yang sekalian membersihkan PIN dan device lalu mengirim notifikasi WhatsApp), aktivasi/deaktivasi akun, dan allow-list WiFi yang diproxy ke attendance service. Berguna saat menelusuri rute mana yang sudah punya pengganti di Employee Service, cara melepas device tanpa reset password, dan daftar cacat yang tercatat seperti response payload yang dibuang serta route role per-departemen yang masih di-comment.",
+      "hash": "bd595090f947e7afe6d555b8c16b650dd5a11419c53e22ec22606b5e9d1fabae",
+      "ukuran_kb": 6.1,
+      "ringkasan": "Menjawab: operasi IT-admin apa saja yang diorkestrasi lintas service (reset password, aktif/nonaktif akun, baca dan set system_roles, allow-list WiFi kantor) serta bagaimana RBAC-nya diterapkan blanket lewat ValidateGateway + RequireITStaff. Juga menjawab rute mana yang sudah punya pengganti di grup /account milik Employee Service dan kenapa belum boleh dihapus. Termasuk bug yang diketahui: response payload dibuang, role per-departemen masih di-comment, dan penyebab /roles/set membalas 502 selama sepuluh hari di dev.",
       "kata_kunci": [
-        "IT Orchestrator",
-        "orchestrator/it",
-        "IT admin",
+        "IT orchestrator",
         "reset password",
         "system_roles",
-        "RBAC",
+        "akun karyawan",
+        "activate",
+        "deactivate",
+        "WiFi allowlist",
         "RequireITStaff",
-        "aktivasi akun",
-        "account activate",
-        "allow-list WiFi"
+        "502"
       ]
     },
     {
@@ -1348,13 +1348,14 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, serta **legal** (yang terakhir ⚠️ belum merge). **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
+      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, serta **legal** (yang terakhir ⚠️ belum merge). **finance** punya katalog + 5 paket dan menunya sudah bertanda izin, tetapi **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "APP - Web ERP",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
+        "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "Finance - Kas Kecil dan Pengajuan Budget",
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
@@ -1362,6 +1363,8 @@
         "LOG - 2026-07-30 Audit Otorisasi Employee Service",
         "ADR - 0038 Hak Per-Objek Admin Space Task Management",
         "DB - Data Dictionary",
+        "CORE - IT Orchestrator",
+        "RUN - Deploy Microservices bip-erp",
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
         "Microservices - Employee Service",
@@ -1380,20 +1383,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "acbf88e6e82e64a29bbe7e5a0549a78e1bfe1f1100757c7c5dd6b1f37104be79",
-      "ukuran_kb": 45.7,
-      "ringkasan": "Menjawab: bagaimana hak akses bekerja di seluruh bip-erp, yaitu tiga sumbu (modul, tingkat aksi, cakupan/reach), paket hak bernama yang menempel di posisi/jabatan, dan bagaimana izin efektif dihitung saat login lalu dibawa di klaim JWT. Juga menjawab: modul mana saja yang katalognya sudah terdaftar, endpoint apa untuk mengambil katalog/daftar modul dan memasang paket ke posisi, serta bagaimana gateway mencegah header izin palsu. Sekaligus tempat memastikan beda `permission_sets` (hak akses, ditegakkan backend) dengan `menu_hidden` (tampilan sidebar, hanya mengurangi, bukan keamanan).",
+      "hash": "c25d2d372ad856f9f15ac92ad56bbf53be7cc4e9c6ae9f191d71f9934a7b25ca",
+      "ukuran_kb": 58.2,
+      "ringkasan": "Menjawab: bagaimana hak akses seluruh bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan/reach), bagaimana permission set menempel di posisi lalu di-resolve jadi klaim JWT saat login, dan modul mana yang katalognya sudah terdaftar serta sudah ditegakkan per-aksi. Juga menjawab beda permission_sets dengan menu_hidden (hak akses vs tampilan) dan kenapa keduanya tak boleh disatukan. Termasuk endpoint katalog/modul/assign yang dipakai frontend, tier fallback, dan kill-switch penegakan per modul.",
       "kata_kunci": [
         "RBAC",
         "permission set",
         "hak akses",
-        "system_roles",
         "reach",
+        "katalog permission",
+        "system_roles",
+        "tier fallback",
         "posisi",
         "jabatan",
-        "katalog permission",
-        "menu_hidden",
-        "JWT"
+        "klaim JWT"
       ]
     },
     {
@@ -1524,13 +1527,13 @@
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "HRIS - Leave Request",
+        "CORE - RBAC dan Permission Set",
         "HRIS - Payroll",
         "HRIS - Employee Request & Approval",
         "Microservices - Form Builder Service",
         "APP - MyBharata",
         "IT - Form Builder",
         "API - Attendance Service",
-        "CORE - RBAC dan Permission Set",
         "HRIS - Tukar Jadwal Kerja",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Attendance Correction",
@@ -1546,20 +1549,20 @@
         "HRIS - Attendance System",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "0669075ad083b0ecbd470689517fda19905940c8ada05ee7110d1ff0b388f95f",
-      "ukuran_kb": 20.2,
-      "ringkasan": "Menjawab: fitur apa saja yang ditangani attendance-service dan bagaimana logikanya bekerja, mulai dari tap multi-metode (fingerprint, mobile, website), validasi WiFi/GPS, resolusi jadwal kerja statis maupun rotasi shift, hari libur, sampai agregasi `payroll-supplement` beserta perlakuan dibayar/dipotong per status dan per subtipe. Juga menjawab: bagaimana workflow leave request, koreksi absensi, tukar jadwal, perjalanan dinas, dan roster diterapkan kembali ke data attendance, termasuk aturan idempotensi pengajuan cuti. Titik masuk untuk memahami integrasinya dengan form-builder, notification service, dan konsumen payroll.",
+      "hash": "d2d10fa75bac279f412d274285be0aeee6b16722573411d6c6f4193d0a67ec11",
+      "ukuran_kb": 20.8,
+      "ringkasan": "Menjawab: fitur apa saja yang ditangani service absensi end-to-end (tap multi-metode mobile/fingerprint/website, resolusi dan rotasi jadwal kerja, leave request, perjalanan dinas, tukar jadwal, guestbook, hari libur) dan bagaimana implementasinya di services/attendance. Juga menjawab bagaimana payout_pct pada payroll-supplement dihitung, termasuk perlakuan dibayar/dipotong per status dan override per subtipe. Termasuk gerbang izin pada rute pengajuan terpadu serta gerbang form wajib sebelum clock-in.",
       "kata_kunci": [
         "attendance service",
         "absensi",
         "clock-in",
-        "shift",
-        "rotasi jadwal",
-        "payroll supplement",
+        "jadwal kerja",
+        "shift rotation",
         "leave request",
-        "roster",
+        "payroll supplement",
         "guestbook",
-        "Go Fiber"
+        "hari libur",
+        "holiday"
       ]
     },
     {
@@ -1638,6 +1641,7 @@
         "HRIS - Attrition",
         "Microservices - File Service",
         "RUN - Onboarding Akun Eksternal (Vendor & Mitra)",
+        "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "CORE - SSO Flow",
         "CORE - HRIS Orchestrator",
@@ -1651,20 +1655,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "32d4d5bb5991626783e2f4910fefef8fca120fbd8d07464da53cafe9dd39e7cc",
-      "ukuran_kb": 51.6,
-      "ringkasan": "Menjawab: apa saja endpoint Employee Service (login/auth, registrasi onboarding, reset akun, forget-device, CRUD master data departemen & system roles) dan bagaimana service ini berperan sebagai sumber SSO (username, PIN, biometric) untuk seluruh ekosistem bip-erp. Juga menjawab modul workspace apa saja (Legal, R&D Regulatory, Quality, Procurement non-Accurate) yang di-host di service ini beserta gate RBAC dan status implementasinya masing-masing.",
+      "hash": "c874a8be5a6dc51288e59f4939b241d2b078e0c98b39ad164cb54bbb8a328cb3",
+      "ukuran_kb": 52.5,
+      "ringkasan": "Menjawab: bagaimana autentikasi dan onboarding karyawan bekerja (login via username atau employee_id, PIN, biometrik, refresh token, registrasi) dan operasi admin akun apa yang tersedia untuk IT seperti reset, forget-device, serta baca/set system_roles. Juga menjawab di mana master data departemen, jabatan, dan system role dikelola beserta gerbang aksesnya. Termasuk kenapa workspace Legal, R&D Regulatory, Quality, dan Procurement ikut di-host di service ini alih-alih jadi service sendiri.",
       "kata_kunci": [
         "employee service",
-        "auth",
         "login",
+        "autentikasi",
         "SSO",
-        "master data departemen",
-        "system roles",
-        "legal",
-        "R&D regulatory",
-        "quality",
-        "procurement"
+        "onboarding",
+        "master data",
+        "departemen",
+        "system_roles",
+        "akun karyawan",
+        "resign"
       ]
     },
     {
@@ -2147,20 +2151,20 @@
         "Microservices - Insentive Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "b95b6602f225b94b3b656eb23484c1977e1d736b2cc765c26c838726aad46334",
-      "ukuran_kb": 18.7,
-      "ringkasan": "Menjawab: bagaimana gaji dihitung di bip-erp, mulai dari setup komponen gaji, config BPJS/PPh21 TER dan PTKP, penetapan gaji per karyawan (basic_salary, upah_bpjs, ptkp_status), sampai siklus payroll run draft ke approved ke published dan slip self-service karyawan. Menjelaskan juga master badan usaha penggaji (kop slip, 41 entitas) beserta endpoint terkait, THR, endpoint /employer-cost untuk beban perusahaan, serta aturan pembulatan BPJS yang berbeda antara sisi karyawan dan perusahaan. Berguna untuk menelusuri jebakan data seperti upah_bpjs yang salah diisi sebagai nominal iuran, keterbatasan scoping multi-perusahaan, dan batas scope yang tidak mencakup pembayaran/transfer.",
+      "hash": "3a50135e61be47e3a0569c5f683271d3a812ff5568199509c554a4fd86b0ae80",
+      "ukuran_kb": 19.3,
+      "ringkasan": "Menjawab: bagaimana penggajian disiapkan dan diterbitkan — setup komponen gaji, config BPJS dan pajak PPh21 metode TER, penetapan gaji per karyawan, payroll run dengan lifecycle draft-approved-published, slip self-service, THR, dan slip PDF. Juga menjawab batas scope-nya (sampai terbitkan slip, tanpa pembayaran atau transfer) serta peran master badan usaha yang hanya menentukan identitas kop slip. Termasuk jebakan data yang sudah terjadi di produksi seperti upah_bpjs yang diisi nominal iuran, bukan dasar upah.",
       "kata_kunci": [
         "payroll",
         "penggajian",
         "slip gaji",
         "payslip",
-        "PPh21 TER",
         "BPJS",
-        "upah_bpjs",
-        "payroll run",
+        "PPh21",
+        "TER",
         "THR",
-        "badan usaha penggaji"
+        "payroll run",
+        "employee salary"
       ]
     },
     {
@@ -3249,6 +3253,7 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "LOG - 2026-07-30 Audit Otorisasi Employee Service",
         "HRIS - Organization Structure",
+        "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "Microservices - Employee Service",
         "Microservices - Task Management Service",
@@ -3261,20 +3266,19 @@
         "DB - Data Dictionary",
         "ADR - 0003 SSO-only Gateway"
       ],
-      "hash": "10a13a8381469d03551af64434e431a06cee99a92a0b2b8c4eafbf0a6ad7d61b",
-      "ukuran_kb": 18.6,
-      "ringkasan": "Menjawab: kenapa bip-erp beralih dari `system_roles` ke model RBAC tiga sumbu, dan kenapa hak default diputuskan menempel pada posisi/jabatan alih-alih pada akun. Juga menjawab: bagaimana modul, tingkat aksi (view/work/approve/manage), dan cakupan (own/division/all) ditetapkan, kenapa jumlah permission dipangkas jadi paket bernama, pengecualian granular apa yang disepakati, dan mana yang self-service tanpa permission. Konsekuensinya ikut dijelaskan: hak ikut token sehingga perlu login ulang, fallback tier selama migrasi, pencabutan gate posisi hardcoded, dan aturan satu PR satu modul.",
+      "hash": "f2585315101a5b1e6f39fbe8068676b07e838c9b717f300b4726ecfcd3fbdb57",
+      "ukuran_kb": 20.1,
+      "ringkasan": "Menjawab: kenapa hak akses bip-erp dipindahkan ke model tiga sumbu (modul, tingkat aksi view/work/approve/manage, dan reach own/division/all) dengan paket hak default menempel pada posisi, bukan pada akun. Juga menjawab keputusan turunannya: jumlah permission, pengecualian granular yang dibenarkan, self-service tanpa permission, fallback tier wajib selama migrasi, dan aturan satu PR sama dengan satu modul. Termasuk konsekuensi yang diterima seperti hak ikut token 72 jam sehingga perlu login ulang, dan rencana pencabutan gerbang posisi hardcoded.",
       "kata_kunci": [
         "ADR 0030",
         "RBAC",
         "permission set",
         "posisi",
+        "jabatan",
         "reach",
-        "fallback tier",
-        "system_roles",
-        "kill-switch",
         "hak akses",
-        "migrasi izin"
+        "tier fallback",
+        "system_roles"
       ]
     },
     {
@@ -3705,6 +3709,39 @@
         "area",
         "shared-library",
         "scope data"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0043 Peran Sistem Diturunkan dari Jabatan.md",
+      "judul": "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "✅",
+      "status_teks": "Implemented (dev, 2026-08-09). Tabel `services/employee/peran_dari_jabatan.go` mengisi `system_roles` yang kosong dari (departemen, jabatan) di keempat jalur penerbitan token. Menyentuh 13 akun Manufaktur/Quality dan 11 akun Beauty Hacks/Kyura. Sakelar `ROLE_FROM_POSITION=off`. **Jembatan sementara**, bukan pengganti [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].",
+      "publik": true,
+      "tautan": [
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "CORE - RBAC dan Permission Set",
+        "Microservices - Employee Service",
+        "Microservices - Manufacture Service",
+        "Microservices - Insentive Service",
+        "HRIS - Organization Structure",
+        "APP - Web ERP"
+      ],
+      "hash": "796c50cb697a1d107ee410847c66914bd4e1d6f5112d304e0838d7f5f3e46709",
+      "ukuran_kb": 7.0,
+      "ringkasan": "Menjawab: kenapa system_roles yang kosong diisi otomatis dari pasangan departemen dan jabatan saat token diterbitkan, dan empat aturan yang mengikat penurunan itu (tak pernah menimpa, dinilai per modul, hanya untuk peran yang menentukan akses, jabatan ambigu tidak ditebak). Juga menjawab jabatan mana yang sengaja tidak dipetakan beserta alasannya, dan sakelar apa yang mengembalikan perilaku lama. Termasuk konsekuensi bahwa kini ada dua sumber system_roles sehingga memeriksa akses dari database saja bisa menyesatkan, serta kenapa keputusan ini jembatan sementara menuju ADR 0030.",
+      "kata_kunci": [
+        "ADR 0043",
+        "system_roles",
+        "peran sistem",
+        "jabatan",
+        "posisi",
+        "WMS",
+        "manufacture",
+        "insentive",
+        "ROLE_FROM_POSITION",
+        "penerbitan token"
       ]
     },
     {
@@ -5379,19 +5416,20 @@
         "HRIS - Compensation & Benefits",
         "Finance - Big Pictures"
       ],
-      "hash": "430d7530132d083cb27b4e488b5047e73da75284c618036554bbfd13470ab323",
-      "ukuran_kb": 5.3,
-      "ringkasan": "Menjawab: bagaimana komponen gaji, BPJS, dan PPh21 metode TER dihitung dalam engine payroll run, apa itu payroll-supplement dari attendance untuk prorata tunjangan kehadiran, dan apa saja yang sudah vs belum diimplementasikan (slip PDF cetak, rekonsiliasi PPh21 Desember, batas scope terhadap Accurate).",
+      "hash": "efe3a0204f468de447ee95564b5be77645554b9ee4cc1695daf91dee2ef9480b",
+      "ukuran_kb": 5.4,
+      "ringkasan": "Menjawab: konsep penggajian HRIS Bharata — bagian mana yang sudah ada di kode (supplement kehadiran, setup komponen gaji, config BPJS dan pajak, payroll run, PPh21 TER, THR) dan bagian mana yang belum (slip PDF, rekonsiliasi PPh21 tahunan, dashboard, handoff ke Accounting). Juga menjawab bagaimana kehadiran memengaruhi gaji lewat payroll-supplement periode 26 sampai 25, termasuk status mana yang dibayar atau dipotong dan override per subtipe izin. Termasuk daftar kebutuhan data dan batas scope payroll versus Accurate yang masih perlu diputuskan.",
       "kata_kunci": [
         "payroll",
+        "penggajian",
         "gaji",
         "BPJS",
-        "PPh21 TER",
-        "tunjangan kehadiran",
-        "payroll-supplement",
+        "PPh21",
+        "TER",
+        "THR",
         "slip gaji",
-        "Accurate",
-        "komponen gaji"
+        "payroll supplement",
+        "tunjangan kehadiran"
       ]
     },
     {
@@ -7243,6 +7281,7 @@
       "publik": true,
       "tautan": [
         "IT - Background Jobs & Schedulers",
+        "CORE - IT Orchestrator",
         "External - Desty",
         "Microservices - Warehouse Service",
         "Microservices - Integration Service",
@@ -7252,20 +7291,20 @@
         "RUN - Deploy Task Management Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "d6e3ecd9953f78035502e5e5f7cbbf1b1628625dfd5007f4d84a79f6ba970258",
-      "ukuran_kb": 7.3,
-      "ringkasan": "Menjawab: bagaimana cara men-deploy ulang satu microservice bip-erp ke produksi tanpa menyentuh dependensinya, kenapa flag --no-deps wajib di jam rawan, dan kapan flag itu justru tidak boleh dipakai. Juga menjawab urutan aman deploy antar-service yang saling bergantung, kenapa perubahan shared-library mengharuskan service pembaca ikut di-rebuild (kasus kategori inbox notification-service), serta cara verifikasi log dan troubleshooting pasca-deploy.",
+      "hash": "0979f684fa91984c615c3673f5b5c53ed0ccf33ff5fb6def9d71cced0715564e",
+      "ukuran_kb": 9.6,
+      "ringkasan": "Menjawab: bagaimana cara men-deploy ulang satu microservice bip-erp ke produksi tanpa menyentuh dependensinya, kenapa --no-deps wajib di jam rawan, dan kapan justru tidak boleh dipakai. Juga menjawab urutan aman ketika dua service yang saling bergantung dirilis bersama, dan kenapa perubahan shared-library menuntut seluruh service pembacanya ikut di-rebuild (kategori inbox yang gagal senyap, image lama yang membuang klaim JWT). Termasuk cara memeriksa umur image container, fitur dorman di balik feature flag, langkah verifikasi pasca-deploy, dan tabel troubleshooting.",
       "kata_kunci": [
         "deploy",
         "docker compose",
         "no-deps",
-        "produksi",
         "microservice",
-        "bip-erp",
+        "produksi",
         "shared-library",
+        "rebuild",
         "notification-service",
         "runbook",
-        "troubleshooting"
+        "verifikasi"
       ]
     },
     {
