@@ -293,4 +293,5 @@ Dicatat di sini justru karena rumusnya terlihat benar: tanpa catatan ini, orang 
 - [[IT - Background Jobs & Schedulers]] (penjadwal internal service ini tercatat di sana)
 - [[ADR - 0002 Database-per-Service]] · [[ADR - 0011 Integration Read Cache + Singleflight (Fase 1 Perf)]]
 - [[Sales - GMV Creative]] · [[Sales - ICC Affiliate Mapping]] · [[Sales - Marketing Dashboard (Analisis Rekap)]]
+- [[Sales - Marketing Analytics (Audit Ketersediaan Data)]] — metrik prototipe Direktur diperiksa satu per satu terhadap field yang benar-benar ada di service ini (ADA · RAKIT · TIPIS · TIDAK ADA)
 - [[HRIS - Otomasi Skor KPI]] (memakai `mart_profit_attribution` dan `mart_video_performance` sebagai calon sumber skor KPI otomatis)
