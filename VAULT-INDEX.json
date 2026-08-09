@@ -1104,20 +1104,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "3462dad5c0e772ebc9dbd770c40fb5653a6edb022cf1ba364d93e26e946c30f5",
-      "ukuran_kb": 140.1,
-      "ringkasan": "Menjawab: apa itu portal web internal \"One Bharata\" (`erp-frontend`), stack apa yang dipakai (Next.js 16 + React 19, shadcn/Radix/Tailwind, TanStack Query, react-i18next), dan bagaimana login serta pembagian hak akses bekerja lewat cookie `system_roles` (map module ke role) plus perannya sebagai SSO Identity Provider yang mencetak one-time code via `POST /auth/sso/ticket`. Juga menjawab: bagaimana dukungan multi-perusahaan diterapkan di UI (CompanySwitcher, kelola perusahaan/departemen/shift/network/mesin fingerprint per-perusahaan), bagaimana sidebar dikelompokkan memakai menu induk bersarang alih-alih field `group`, dan bagaimana halaman Pengaturan HRGA terpusat menyaring akses per-tab memakai cermin gerbang backend. Berguna saat mencari alasan keputusan UI/rute frontend, mis. mengapa Pengaturan Aset ditaruh di kategori `ga`, mengapa rute lama diteruskan bukan dihapus, dan mengapa penyaringan memakai predikat role bukan permission_sets.",
+      "hash": "cb2d30baaaffe086286edffc976192333549353bea5ff3b400ad8e13ead92293",
+      "ukuran_kb": 143.8,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (\"One Bharata\" / repo erp-frontend), stack apa yang dipakainya, dan bagaimana login, refresh token, serta perannya sebagai SSO Identity Provider untuk aplikasi lain bekerja. Menjawab juga bagaimana cookie system_roles menentukan module dan menu yang tampil di sidebar, bagaimana menu HRIS dikelompokkan lewat menu induk bersarang, dan bagaimana halaman Pengaturan HRGA terpusat menyaring akses per tab, bukan per halaman. Selain itu menjelaskan dukungan multi-perusahaan di frontend: pemilih perusahaan admin pusat, kelola perusahaan, departemen, shift, rotasi, mesin fingerprint, dan network WiFi per-perusahaan.",
       "kata_kunci": [
         "erp-frontend",
         "One Bharata",
-        "web ERP",
-        "frontend",
-        "Next.js",
-        "SSO",
+        "hris-dashboard",
+        "portal web ERP",
+        "Next.js App Router",
+        "SSO Identity Provider",
         "system_roles",
-        "sidebar menu",
-        "Pengaturan HRGA",
-        "multi-perusahaan"
+        "role gating (RBAC)",
+        "multi-perusahaan (multi-company) CompanySwitcher",
+        "Pengaturan HRGA"
       ]
     },
     {
