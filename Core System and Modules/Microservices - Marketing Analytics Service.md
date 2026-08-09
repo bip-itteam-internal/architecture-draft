@@ -201,13 +201,21 @@ Nol koleksi iklan/video/live di `integration_db` (hanya finance). Order Lazada m
 
 Service ini menyimpan **alasan ketidaklengkapan bersama datanya**, bukan membiarkan angka kosong dibaca sebagai nol.
 
-### `revenue` adalah HARGA LIST, bukan penjualan (terukur 2026-08-09)
+### `revenue`: TikTok sudah setelah diskon (PR #1109), Shopee masih harga list
 
 Bagian ini ditulis paling atas karena ia mengubah cara membaca setiap angka turunannya.
 
-`sumber_agregasi.go` mengisi `Revenue: it.Total`, yaitu jumlah `items[].total` order. Diukur di produksi atas 20.000 order, jumlah itu sama dengan `income.total_original_price` **tepat 100,0%** di kedua channel. Jadi `revenue` di mart adalah **harga banderol sebelum diskon penjual**, bukan yang dibayar pembeli dan bukan yang diterima.
+`sumber_agregasi.go` mengisi `Revenue: it.Total`, yaitu jumlah `items[].total` order — jadi maknanya ditentukan oleh apa yang ditulis [[Microservices - Integration Service]] ke field itu.
 
-Dengan `sum(items[].total)` sebagai 100:
+**TikTok — SUDAH DIPERBAIKI (PR [#1109](https://github.com/bip-itteam-internal/bip-erp/pull/1109), live 2026-08-09).** `TransformFromTiktok` kini memetakan `items[].price` dari `line_items[].sale_price` (harga setelah diskon penjual), bukan `original_price`. Pemicunya: kolom omzet ERP **46% lebih besar** daripada yang ditampilkan Seller Center dan Desty. Terverifikasi terhadap ekspor Desty 9 Jul–7 Agt — ERP `5.284.842.600` vs Desty `3.608.539.700`; memakai `sale_price` memberi `3.625.632.734`, **selisih 0,47%**. Desty mendokumentasikan sendiri bahwa hanya TikTok yang memakai subtotal setelah diskon sementara marketplace lain memakai harga sebelum diskon.
+
+Backfill `transaction_orders` dijalankan sejak **1 Agustus 2026** (`cmd/ttitempricebackfill`, 12.806 order diubah, 0 mismatch); sesudahnya **13.152 dari 13.152 order** cocok `payment.sub_total` dengan beda Rp0, dan mart sejajar dengan sumber tanpa selisih. Periode sebelum 1 Agustus sengaja dibiarkan — fakturnya sudah terbukukan dan dilindungi gerbang faktur-permanen.
+
+**Shopee & Lazada — tetap harga sebelum diskon, dan itu benar.** Keduanya sudah sejajar dengan Desty apa adanya (Shopee +1,80%, Lazada −1,20%); mengubahnya justru akan menjauhkan sejauh Rp27,7 juta ke arah sebaliknya.
+
+Angka historis di bawah ini diukur **sebelum** perbaikan dan tetap dipertahankan karena menjelaskan mengapa perbaikan itu diperlukan — untuk TikTok kolom "Diskon penjual" kini sudah tercermin di `revenue`, untuk Shopee belum.
+
+Dengan `sum(items[].total)` **pra-#1109** sebagai 100:
 
 | Channel | n | Diskon penjual | Dibayar pembeli | Settlement |
 |---|---|---|---|---|
@@ -216,12 +224,13 @@ Dengan `sum(items[].total)` sebagai 100:
 
 **Kita mendiskon TikTok empat kali lebih dalam daripada Shopee**, dan tak ada satu kolom pun yang menampilkannya. Potongan marketplace justru lebih besar di Shopee (21,8% berbanding 19,2%); yang membuat TikTok mahal adalah diskon kita sendiri.
 
-Konsekuensinya:
+Konsekuensinya — **sejak PR #1109 hanya berlaku penuh untuk Shopee**; untuk TikTok diskon penjual kini sudah terpotong di `revenue`, sehingga jarak ke uang nyata tinggal potongan marketplace:
 
-- **`roasAgregat = revenue / adsCost`** berdiri di atas harga banderol. ROAS TikTok yang tampil 4,0 menyettle sekitar 2,0 dalam uang nyata.
-- **`iklanPersenRevenue = adsCost / revenue`** understated: "iklan 9,4% dari revenue" untuk TikTok mendekati 18,9% dari uang yang benar-benar masuk.
-- Ambang `roas_min` 3,2 adalah angka tim dari Master Roadmap yang **basisnya tak pernah dinyatakan**, jadi ROAS berbasis harga banderol dibandingkan terhadap ambang yang tak diketahui basisnya.
-- **`gross_profit` TIDAK terpengaruh.** Ia dihitung dari `net_settlement`, jadi jujur. Gerbang laba pada vonis halaman depan tetap sehat.
+- **`roasAgregat = revenue / adsCost`** untuk **Shopee** masih berdiri di atas harga banderol. Untuk **TikTok** sekarang berbasis harga setelah diskon — masih di atas settlement (potongan marketplace ~19,2% belum terpotong), tapi tak lagi melebih-lebihkan sebesar dua kali lipat seperti sebelumnya.
+- **`iklanPersenRevenue = adsCost / revenue`** ikut mengencang untuk TikTok dengan alasan yang sama; untuk Shopee tetap understated.
+- Ambang `roas_min` 3,2 adalah angka tim dari Master Roadmap yang **basisnya tak pernah dinyatakan** — dan basis pembandingnya kini **berbeda antar-channel**, sehingga membandingkan ROAS TikTok dan Shopee terhadap satu ambang yang sama menjadi tidak setara. Perlu diputuskan ulang.
+- **`gross_profit` TIDAK terpengaruh — terverifikasi ulang sesudah #1109.** Ia dihitung dari `net_settlement`, HPP dari `o.Qty`, dan `revenue` tidak muncul dalam rumusnya (`attribution.go:133`). Yang bergeser hanya sebaran `ads_cost` antar-SKU pada jalur prorata (totalnya tetap). Gerbang laba pada vonis halaman depan tetap sehat.
+- **Efek samping menguntungkan**: margin yang dihitung manual (`gross_profit ÷ revenue`) untuk TikTok membaik dari 18% ke 26%, mendekati margin sejati 35% (`gross_profit ÷ net_settlement`) — sebelumnya pembilang memakai settlement sementara penyebut memakai harga banderol.
 
 `fee_marketplace` = `TotalPlatformCommission + TotalServiceFee + TotalAffiliateCommissionFee`, diprorata per item. **Komisi affiliate sudah termasuk.** Yang tak punya kolom sama sekali: **diskon, ongkir, dan adjustment**.
 
