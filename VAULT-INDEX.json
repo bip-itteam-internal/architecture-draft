@@ -1082,6 +1082,7 @@
         "Microservices - Integration Service",
         "CORE - IT Orchestrator",
         "APP - MyBharata",
+        "QA - Register Perizinan & Sertifikasi",
         "Microservices - Form Builder Service",
         "IT - Form Builder",
         "HRIS - Kaizen (Ide Perbaikan)",
@@ -1104,15 +1105,17 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "39138a80ced66baba8d5a54e28d805cfcba10112dfd6d6ff4014aeff72f15011",
-      "ukuran_kb": 147.6,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP One Bharata, bagaimana login, SSO, dan role gating sidebar bekerja, serta konvensi UI mana yang berlaku (MainTable + Banner sebagai lapisan tabel utama, IntegrationTable sebagai pengecualian, i18n dua bahasa). Juga menjelaskan keputusan tampilan per modul beserta konsekuensinya, termasuk mana yang sudah live dan mana yang masih di branch.",
+      "hash": "5af3be8a203c43d8b08f90041ff7f5f703fddd486d89dd20ee37f7d8dbee1861",
+      "ukuran_kb": 152.4,
+      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP One Bharata, bagaimana login, SSO, dan role gating sidebar bekerja, serta konvensi UI mana yang berlaku (MainTable + Banner sebagai lapisan tabel utama, IntegrationTable sebagai pengecualian, i18n dua bahasa). Juga menjawab: apa itu struktur halaman HRIS, yakni Banner bare yang duduk di dalam kartu MainTable lewat prop toolbar, layar mana saja yang sudah memakainya, dan apa yang biasanya ikut rusak di layar yang belum (kotak cari yang tak menyaring apa pun, penyaring backend yang tak pernah dipanggil, tak ada paginasi maupun export). Menjelaskan keputusan tampilan per modul beserta konsekuensinya, termasuk mana yang sudah live dan mana yang masih di branch.",
       "kata_kunci": [
         "erp-frontend",
         "One Bharata",
         "web ERP",
         "MainTable",
         "Banner",
+        "toolbar",
+        "struktur halaman HRIS",
         "IntegrationTable",
         "sidebar",
         "role gating",
@@ -1355,7 +1358,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, serta **hris**. **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) sudah berkatalog + bergerbang tapi **belum merge dan belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
+      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, serta **training**. **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) sudah berkatalog + bergerbang tapi **belum merge dan belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -1387,8 +1390,8 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "97cb7d3bf8a4a372e081064dc89756691b3f18427ec5f41fbccde5fba2fe02ce",
-      "ukuran_kb": 28.4,
+      "hash": "beb8b5d441f45941b90ad1e55030552939f136d83b62461b6c397acdf8b1cada",
+      "ukuran_kb": 32.6,
       "ringkasan": null,
       "kata_kunci": []
     },
@@ -6917,15 +6920,17 @@
       "status_teks": "Implemented (ada catatan). Ketiga register (Perizinan, Kontrak & SLA, Dispute & Advis) + **unggah PDF** **live di kode** (Go build + FE typecheck/eslint lolos), **belum diverifikasi runtime** di stack dev (butuh redeploy container + akun ber-role `legal`). Pemisahan ke service `legal` tersendiri **belum**.",
       "publik": true,
       "tautan": [
+        "APP - Web ERP",
         "CORE - RBAC dan Permission Set",
         "CORE - API Master Gateway",
         "Microservices - Recruitment Service",
+        "HRIS - Organization Structure",
         "Microservices - Employee Service",
-        "APP - Web ERP"
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
       ],
-      "hash": "6618fd33ae2618ff7351eeb503030cb7ed38d2e34da70278697a7ad277a491e2",
-      "ukuran_kb": 7.3,
-      "ringkasan": "Menjawab: bagaimana Staf Legal mencatat dan memantau izin serta sertifikat perusahaan (BPOM, Halal, izin usaha, sertifikasi lain) di satu daftar terpusat lengkap dengan masa berlaku dan alert H-90 sebelum kedaluwarsa. Juga menjawab: endpoint dan field model untuk tiga register Legal (Perizinan, Kontrak & SLA dengan alert H-60, Dispute & Advis Hukum), siapa yang boleh membuat/mengubah versus menghapus (legal:staff dan legal:supervisor), dan bagaimana unggah PDF sertifikat memakai endpoint upload generik. Berguna juga untuk tahu alasan register ini di-host di employee-service dan catatan bahwa berkas disimpan di bucket uploads generik tanpa akses berbasis peran.",
+      "hash": "aae6c86892639353b18154e2b72b3778b89234be145fc9be098d16b92ad69ce2",
+      "ukuran_kb": 9.3,
+      "ringkasan": "Menjawab: bagaimana Staf Legal mencatat dan memantau izin serta sertifikat perusahaan (BPOM, Halal, izin usaha, sertifikasi lain) di satu daftar terpusat lengkap dengan masa berlaku dan alert H-90 sebelum kedaluwarsa. Juga menjawab: endpoint dan field model untuk tiga register Legal (Perizinan, Kontrak & SLA dengan alert H-60, Dispute & Advis Hukum), penyaring apa saja yang diterima tiap handler, siapa yang boleh membuat/mengubah versus menghapus (legal:staff dan legal:supervisor), dan bagaimana unggah PDF sertifikat memakai endpoint upload generik. Berguna juga untuk tahu alasan register ini di-host di employee-service, bahwa tombol Hapus masih tampil bagi staf yang tak berhak, bahwa modulnya belum pernah dijalankan lewat gateway, dan bahwa tiga representasi legal masih hidup berdampingan di master data.",
       "kata_kunci": [
         "legal",
         "perizinan",
@@ -6936,7 +6941,9 @@
         "masa berlaku",
         "alert H-90",
         "kedaluwarsa",
-        "compliance"
+        "compliance",
+        "penyaring",
+        "Staf Legal"
       ]
     },
     {

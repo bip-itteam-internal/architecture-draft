@@ -5,7 +5,7 @@
 - **Stack**: Go (Fiber, di-host di employee-service) + MongoDB (`legal_license`) + JWT/`system_roles` sebagai pembawa peran; frontend Next.js (App Router, TanStack Query).
 - **Path di repo**:
   - Backend: `bip-erp/services/employee/{legal_perizinan.go,legal_kontrak.go,legal_dispute.go}` (routes+handler CRUD) · model `LegalLicense`/`LegalContract`/`LegalDispute` di `bip-erp/shared-library/models/employee/models.go` · collection `legal_license`/`legal_contract`/`legal_dispute` · RBAC `RequireLegalStaff`/`RequireLegalSupervisor` di `bip-erp/shared-library/common/roles.go` · seed department `legal` di `.../master_data.go` (`DefaultDepartments`). Unggah PDF memakai endpoint generik `POST /upload` yang sudah ada (`minio.UploadSingleHandler`).
-  - Frontend: `erp-frontend/src/app/(main)/legal/{perizinan,kontrak,dispute}/page.tsx` · `erp-frontend/src/features/legal/{perizinan,kontrak,dispute}/*` (types, hooks fetch/upsert/delete, form modal) · helper unggah `features/legal/shared/upload.ts` · tiga entri menu `legal` di `src/components/layout/sidebar.tsx` · gating rute di `src/proxy.ts`.
+  - Frontend: `erp-frontend/src/app/(main)/legal/{perizinan,kontrak,dispute}/page.tsx` · `erp-frontend/src/features/legal/{perizinan,kontrak,dispute}/*` (types, hooks fetch/upsert/delete, form modal) · helper unggah `features/legal/shared/upload.ts` · helper daftar `features/legal/shared/daftar.ts` (pencarian + param penyaring) · tiga entri menu `legal` di `src/components/layout/sidebar-menus.tsx` (**bukan** `sidebar.tsx`) · gating rute di `src/proxy.ts`.
 - **Status**: ⚠️ Implemented (ada catatan). Ketiga register (Perizinan, Kontrak & SLA, Dispute & Advis) + **unggah PDF** **live di kode** (Go build + FE typecheck/eslint lolos), **belum diverifikasi runtime** di stack dev (butuh redeploy container + akun ber-role `legal`). Pemisahan ke service `legal` tersendiri **belum**.
 
 ## Persona / Pengguna
@@ -40,25 +40,31 @@
 
 **Unggah PDF** — reuse endpoint generik `POST /api/employee/upload` (field multipart `file`, `minio.UploadSingleHandler`) yang sudah ada; FE (`features/legal/shared/upload.ts`) unggah lebih dulu, simpan `full_url`→`file_object` di payload. Tiap halaman menautkan `file_object` (buka PDF di tab baru).
 
-- **Frontend**: tiga halaman list (Perizinan/Kontrak/Dispute) + modal create/edit (react-hook-form + zod) + hapus (ActionDialog) + unggah PDF. Tiga menu muncul di sidebar untuk pemegang role `legal`; rute `/legal/*` digating di `proxy.ts`.
+- **Frontend**: tiga halaman list (Perizinan/Kontrak/Dispute) + modal create/edit (react-hook-form + zod) + hapus (ActionDialog) + unggah PDF. Tiga menu muncul di sidebar untuk pemegang role `legal`; rute `/legal/*` digating di `proxy.ts`. Sejak branch `refactor/legal-struktur-halaman-hris` (⚠️ **belum merge**) ketiganya memakai **struktur halaman HRIS** berikut pencarian, penyaring, paginasi, export, dan i18n dua bahasa — rinciannya beserta alasan tiap keputusan di [[APP - Web ERP]] bagian **Legal**.
 - **RBAC & seed**: role key `legal` pada tier `system_roles` (`legal:staff|supervisor`), department `legal` di-seed di `DefaultDepartments` sehingga peran bisa di-assign lewat Master Data. Lihat [[CORE - RBAC dan Permission Set]].
 
 ## Belum Diimplementasikan / Catatan
 
 - **Unggah PDF pakai bucket `uploads/` generik**: berkas disimpan lewat `POST /upload` (prefix `uploads/`, bukan `legal/...` khusus) dan `file_object` menyimpan `full_url` publik langsung — belum ada preview presigned/akses berbasis-peran. Cukup untuk sekarang; perlu ditinjau bila dokumen legal harus dibatasi.
 - **Hosting sementara di employee-service** (TBD): dipilih agar tidak menambah modul gateway/URL baru (menghindari panic `ValidateInternalURL`) dan bisa langsung boot. Bila beban Legal tumbuh, ekstrak ke service `legal` tersendiri (env `LEGAL_MODULE_URL` + entri `InternalURL` di [[CORE - API Master Gateway]] + service data-owning meniru [[Microservices - Recruitment Service]]).
-- **Verifikasi runtime**: build Go & typecheck FE lolos; smoke-test end-to-end (login akun `legal`, CRUD terhadap employee-service berjalan) belum dijalankan — perlu redeploy `docker-compose.dev.yml`.
-- **Domain**: perizinan (BPOM/Halal/izin edar) masuk cakupan Quality & Regulatory; sebagian isi (izin usaha, kontrak) beririsan dengan fungsi Legal/GA. Posisi `Staf Legal` dulunya terdaftar di department `ga`/`secretary`; kini punya department key `legal` sendiri.
+- **Verifikasi runtime**: build Go & typecheck FE lolos; smoke-test end-to-end (login akun `legal`, CRUD terhadap employee-service berjalan) **belum dijalankan** — perlu redeploy `docker-compose.dev.yml`. Yang khususnya tak bisa ditutup test: apakah nilai enum penyaring (`Aktif`, `BPOM`, `Draft`, dst) benar-benar cocok dengan yang tersimpan di Mongo. Bila meleset, gejalanya tabel kosong **tanpa satu pun pesan galat**.
+- ⚠️ **Tombol Hapus tampil untuk `legal:staff` yang tak berhak.** DELETE digerbangi `RequireLegalSupervisor` di backend, sementara frontend merender `ActionDialog` tanpa memeriksa peran — staf menekan Hapus, mengkonfirmasi dialognya, lalu dapat toast gagal. Ada sejak register ini lahir; **belum diperbaiki**.
+- **Penyaring backend sempat dirakit tanpa pemanggil.** `license_type`, `status`, `contract_type`, `review_status`, dan `dispute_type` diterima handler sejak awal dan tak pernah dikirim frontend sampai `refactor/legal-struktur-halaman-hris`. Sekelas dengan `formRequest` yang tak punya field `recurrence` di form-builder: dirakit benar, tak dibaca siapa pun, nol test merah. **Pencarian teks masih tak ada di backend** dan dikerjakan di klien; sah selama register ini masih puluhan baris, perlu ditinjau ulang bila tumbuh.
+- **Domain**: perizinan (BPOM/Halal/izin edar) masuk cakupan Quality & Regulatory; sebagian isi (izin usaha, kontrak) beririsan dengan fungsi Legal/GA. Posisi `Staf Legal` dulunya terdaftar di department `ga`/`secretary`; kini punya department key `legal` sendiri. ⚠️ **Tiga representasi legal kini hidup berdampingan di master data** dan belum diputuskan mana yang benar: department `legal` (`Legal Supervisor`, `Staf Legal`), posisi `Legal Staff` di department `ga`, dan posisi `Legal` di `secretary` — ketiganya di `DefaultDepartments`. Lihat [[HRIS - Organization Structure]].
 
 ## Dependensi & Integrasi
 
 - [[Microservices - Employee Service]] — host endpoint `/legal/*`, koneksi Mongo, seed department.
 - [[CORE - API Master Gateway]] — meneruskan `/api/employee/legal/*` + header `BIP-*` (termasuk `BIP-System-Roles` yang dipakai `RequireLegal*`).
 - [[CORE - RBAC dan Permission Set]] — role key `legal` pada tier `system_roles`.
-- [[APP - Web ERP]] — modul frontend `legal` (sidebar, gating, halaman Perizinan/Kontrak/Dispute).
+- [[APP - Web ERP]] — modul frontend `legal` (sidebar, gating, halaman Perizinan/Kontrak/Dispute, struktur halaman HRIS).
+- [[HRIS - Organization Structure]] — department `legal` beserta dua posisi legal lain yang masih hidup di `ga` dan `secretary`.
+- [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]] — namespace `legal.*` di kedua locale.
 
 ## Dokumen Terkait
 
 - [[Microservices - Employee Service]]
 - [[CORE - RBAC dan Permission Set]]
 - [[APP - Web ERP]]
+- [[HRIS - Organization Structure]]
+- [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
