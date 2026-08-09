@@ -40,6 +40,10 @@
 - `GET /today?view=resolve|team` — kehadiran hari ini (mode resolve atau team).
 - `PATCH /mood` + `GET /mood` — set & ambil mood karyawan.
 
+**Pengajuan terpadu (`hr_admin.go`)**
+- `GET /hr/requests` + `/hr/requests/detail` — daftar & detail lintas jenis. Mode admin (tanpa `?as`) digerbang **`hris.pengajuan.view`**; mode `?as=reviewer|reviewed|self` relasional, tak digerbang izin. Kontrak lengkapnya di [[API - Attendance Service]].
+- Cabang **tahap HRD** di keempat rute `review` digerbang **`hris.pengajuan.approve`**, dan `build*ReviewFilter` menerima hak yang sama supaya antrean tak menampilkan pengajuan yang menolak saat ditindak. Gerbangnya di dalam handler (predikat `izinPengajuan`), bukan middleware, karena satu rute melayani tahap SPV dan tahap HRD sekaligus. Fallback union + kill-switch: [[CORE - RBAC dan Permission Set]].
+
 **Holidays**
 - `GET /holiday` — daftar hari libur.
 - `POST /holiday` — tambah hari libur (RequireHRISStaff).

@@ -65,10 +65,12 @@ Ringkasan/detail **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar) dari sat
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
 | GET | `/requests/mine` | Ringkasan pengajuan **milik pemanggil** ("Aktivitas Saya"); `?filter=ongoing/past`. Bentuk `HRRequestSummary` (header + `steps` timeline review + tanggal per jenis) | header |
-| GET | `/hr/requests` | Daftar ringkas untuk **peninjau / admin HR**. `?as=reviewer` (antrian) / `reviewed` (sudah) = difilter per peran **rekan / atasan(SPV) / HRD** (rekan hanya untuk Tukar); tanpa `as` = mode admin HR (dept HR; hanya yang sudah sampai HRD). Filter `?type=`, `?status=`, `?department=`, `?search=`, `?from=`/`?to=` (yyyy-MM-dd, atas `metadata.created_at`), `?page=`/`?limit=`. Guard: pemohon tak muncul atas pengajuan sendiri | header |
-| GET | `/hr/requests/detail` | Dokumen penuh satu pengajuan by `?type=` & `?id=`; `?as=self` (pemilik) / `reviewer\|reviewed` (peninjau, filter per jenis; item tab "sudah" hanya cocok `as=reviewed`) / tanpa = admin HR. Body = doc per jenis (sama dengan `/*/view`) | header |
+| GET | `/hr/requests` | Daftar ringkas untuk **peninjau / admin HR**. `?as=reviewer` (antrian) / `reviewed` (sudah) = difilter per peran **rekan / atasan(SPV) / HRD** (rekan hanya untuk Tukar); tanpa `as` = mode admin HR (hanya yang sudah sampai HRD). Filter `?type=`, `?status=`, `?department=`, `?search=`, `?from=`/`?to=` (yyyy-MM-dd, atas `metadata.created_at`), `?page=`/`?limit=`. Guard: pemohon tak muncul atas pengajuan sendiri | header; mode admin: `hris.pengajuan.view` (fallback dept HR / posisi Cost Control) |
+| GET | `/hr/requests/detail` | Dokumen penuh satu pengajuan by `?type=` & `?id=`; `?as=self` (pemilik) / `reviewer\|reviewed` (peninjau, filter per jenis; item tab "sudah" hanya cocok `as=reviewed`) / tanpa = admin HR. Body = doc per jenis (sama dengan `/*/view`) | header; mode admin: `hris.pengajuan.view` (fallback sama) |
 
-> FE mybharata: "Aktivitas Saya" pakai `/requests/mine`; "Review Submission" + kartu beranda pending pakai `/hr/requests` (+ `/hr/requests/detail` fetch-on-tap). Detail: [[APP - MyBharata]].
+> FE mybharata: "Aktivitas Saya" pakai `/requests/mine`; "Review Submission" + kartu beranda pending pakai `/hr/requests` (+ `/hr/requests/detail` fetch-on-tap). Detail: [[APP - MyBharata]]. Aplikasi **selalu** mengirim `as`, jadi ia tak pernah menyentuh mode admin dan tak terpengaruh gerbang izinnya.
+
+> **Rute `review` keempat jenis** (`PATCH /request/review`, `/business-trip/review`, `/correction/:id/review`, `/schedule-exchange/review`) tetap tanpa middleware, tapi **cabang tahap HRD**-nya sejak 2026-08-09 digerbang `hris.pengajuan.approve` (fallback union `department == "Human Resource"`). Tahap SPV dan consent rekan tak tersentuh: keduanya relasional. Gerbangnya di dalam handler, bukan middleware, karena satu rute melayani kedua tahap sekaligus.
 
 ## Guestbook · WiFi · Internal
 | Method | Path | Fungsi | Auth |

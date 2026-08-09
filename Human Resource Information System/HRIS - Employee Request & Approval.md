@@ -18,11 +18,17 @@ Enam jenis HR request (Lembur menyusul). Sejak **penyeragaman 2026-07**, keempat
 
 ## Endpoint Admin HR (lihat semua request)
 
-Untuk **admin HR** (`department == "Human Resource"`), satu endpoint melihat **semua** pengajuan lintas koleksi — `services/attendance/hr_admin.go` (lihat [[Microservices - Attendance Service]]):
+Satu endpoint melihat **semua** pengajuan lintas koleksi — `services/attendance/hr_admin.go` (lihat [[Microservices - Attendance Service]]):
 
 - `GET /hr/requests` — daftar ringkas. `request_type` **granular**: **Izin, Cuti, Sakit, Dinas, Koreksi, Tukar** (Izin/Cuti/Sakit = nilai `leave_type` pada `leave_request`). Filter: `type`, `status`, `department`, `search`, `from`, `to` + pagination `page`/`limit`. Balas `{ data, total, page, limit }` (urut `created_at` desc); `data[]` = `{ id, request_type, employee_id, full_name, department, subtype, status, created_at }`.
 - `GET /hr/requests/detail?type=&id=` — full doc satu pengajuan (bypass filter per-user; admin boleh lihat semua).
-- Non-HR → `403`.
+- Tak berhak → `403`.
+
+**Siapa yang berhak (sejak 2026-08-09, ADR 0030 irisan ketiga):** digerbang izin **`hris.pengajuan.view`**, dengan gerbang lama sebagai **fallback union** selama `HRIS_TIER_FALLBACK` menyala — yaitu `department == "Human Resource"` **atau** posisi **`Cost Control`** (yang terakhir baca saja, memantau biaya pengajuan; ia sudah lama ada di kode tapi tak pernah tercatat di sini). Paket bawaannya "HRIS: Pemantau Pengajuan" dan "HRIS: Penyetuju Pengajuan". Rinciannya di [[CORE - RBAC dan Permission Set]].
+
+**Keputusan tahap HRD** (setujui/tolak di keempat jenis) digerbang **`hris.pengajuan.approve`**, fallback union `department == "Human Resource"`. Cost Control **tidak** termasuk. Perlu diketahui: sebelum ini siapa pun berdepartemen HR boleh memutuskan pengajuan siapa pun yang sudah lolos SPV, tanpa peran maupun jabatan tertentu; pembatasan sebenarnya baru berlaku saat fase dua (`HRIS_TIER_FALLBACK=off`) dinyalakan.
+
+**Antrean peninjau ikut hak yang sama.** `build*ReviewFilter` menerima `bolehTahapHR` dari predikat yang sama dengan tombolnya, supaya daftar tak pernah menampilkan pengajuan yang menolak saat ditindak. Yang **tidak** digerbang izin dan memang tak boleh: mode `?as=reviewer|reviewed` (relasional, siapa yang ditunjuk di `spv_status`/`hr_status`), `?as=self`, `/requests/mine`, dan penunjukan personal di slot HR.
 
 ## Komponen Bersama (di kode)
 

@@ -6,7 +6,7 @@ Hari ini ada **tiga mekanisme akses yang hidup berdampingan** di bip-erp, tanpa 
 
 1. **`system_roles`** (map modul ke satu nilai role: `staff`/`supervisor`/`admin` plus nilai granular seperti `admin_gudang_rm`, `ppic`, `icc`). Ditegakkan `common.Require*` / `checkRole` (`shared-library/common/roles.go`). Ini yang dipakai hampir semua service.
 2. **Permission-set** (bundel permission granular + `reach`), pilot di modul **ticket**: katalog `shared-library/common/catalog_ticket.go` (15 permission), validasi set `shared-library/models/employee/permission_set.go`, resolusi izin efektif saat login `services/employee/permission_resolve.go`, penegakan `common.RequirePermission` + `gate()` di `services/task-management/routes.go`.
-3. **Posisi** (`work_data.position`) sebagai pengecualian lintas-modul di **empat titik**: Cost Control (BE `checkPosition` + `isCostControl`), Security, Personalia, dan ICC (ketiganya **hanya di FE**). Sejak 2026-07-30 bertambah **titik kelima**, lihat §Consequences.
+3. **Posisi** (`work_data.position`) sebagai pengecualian lintas-modul di **empat titik**: Cost Control (BE `checkPosition` + `isCostControl`), Security, Personalia, dan ICC (ketiganya **hanya di FE**). Sejak 2026-07-30 bertambah **titik kelima**, lihat §Consequences. *(Cost Control sudah dicabut sebagian pada 2026-08-09; `isCostControl` kini hanya fallback union, bukan gerbang utama.)*
 
 Empat fakta hasil audit 2026-07-29 yang membentuk keputusan ini:
 
@@ -44,6 +44,10 @@ Keputusan turunan:
 
 - **Hak ikut token, berlaku 72 jam** (`shared-library/auth/jwt.go`). Mengubah posisi atau isi paket baru terasa setelah pemakai login ulang. Ini pertukaran yang sama dengan `supervised_departments` dan sudah jadi gotcha yang dikenal (SPV HRGA wajib login ulang).
 - **Empat gate posisi hardcoded akan dicabut** dan diganti paket: Cost Control jadi "Kepegawaian: Pemantau Pengajuan", Personalia jadi "Payroll: Pelaksana", Security jadi "WMS: Pencatat Selisih", ICC jadi "Insentive: Lihat Sendiri".
+
+	✅ **Yang pertama sudah dijalankan 2026-08-09** (bip-erp [#1123](https://github.com/bip-itteam-internal/bip-erp/pull/1123) + erp-frontend [#920](https://github.com/bip-itteam-internal/erp-frontend/pull/920), merged): paketnya bernama **"HRIS: Pemantau Pengajuan"**, bukan "Kepegawaian: …", mengikuti awalan yang sudah dipakai seluruh paket modul ini. Pencabutannya **sebagian**: hanya untuk halaman Pengajuan; `checkPosition(PosisiCostControl)` di `RequireGuestbookRBAC` masih hidup karena buku tamu modul lain.
+
+	Dua hal yang ditemukan saat menjalankannya, dan keduanya berlaku untuk tiga gate sisanya. **Pertama, izinnya tak bisa memakai ulang izin modulnya** (`hris.view`): gate posisi ada justru karena himpunan pemakainya berbeda dari tier, jadi memakai ulang berarti memberi hak itu ke seluruh pemegang tier. Yang lahir sepasang izin berlingkup objek, `hris.pengajuan.view` dan `hris.pengajuan.approve`. **Kedua, fallback tier tak sanggup mencerminkan gate posisi**, sebab `*TierDefault` hanya membaca `system_roles` sementara gate-nya berbasis departemen dan jabatan. Fallback-nya karena itu tinggal di service, di tempat headernya terbaca, dan diikat ke sakelar `<MODUL>_TIER_FALLBACK` yang sudah ada supaya fase dua tetap satu langkah. Rinciannya di [[CORE - RBAC dan Permission Set]] §irisan ketiga.
 - **`admin.permissionset.manage` dan `admin.assignment.manage` adalah hak yang bisa menaikkan hak sendiri**, jadi wajib menempel di satu posisi saja dan setiap perubahannya diaudit. Tanpa itu, seluruh pondasi ini bisa dilewati dari dalam.
 - **Katalog tanpa gerbang BE adalah dekorasi.** Modul dengan rute telanjang (WMS, integration, insentive, notification, sebagian employee dan attendance) tidak boleh dinyalakan penyaringan FE-nya sebelum endpoint-nya digerbang, karena hasilnya persis masalah WMS sekarang: menu rapi, endpoint tetap bisa dipanggil langsung.
 
