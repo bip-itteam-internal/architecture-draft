@@ -68,6 +68,10 @@ Batas pemakaian: satu izin + satu paket per menu. Kalau dipakai berlebihan, kata
 
 **Pencocokan posisi (hasil pembenahan 2026-07-29):** `common.KanonPosisi` + `common.PosisiCocok` (`shared-library/common/position.go`) menyatukan aturan pencocokan nama posisi (huruf kecil, non-alfanumerik jadi underscore, exact match atas bentuk kanonik), dipakai `checkPosition` dan `isCostControl`.
 
+**Frontend menyusul (2026-08-09):** pembenahan di atas hanya menyentuh backend; sidebar masih memakai tiga gaya berbeda, dan menu **Payroll** membandingkan string MENTAH (`position !== "Personalia"`) sehingga "personalia" atau "Personalia " melenyapkan menu itu bagi staf Personalia yang sah — tanpa error, tanpa penjelasan. `erp-frontend/src/utils/posisi.ts` (`kanonPosisi`/`posisiCocok`) kini jadi cerminan `KanonPosisi`/`PosisiCocok`, dipakai gerbang Payroll (`sidebar.tsx`) dan Cost Control (`portal-menu.ts`). **Satu pengecualian yang disengaja:** `isSecurityPosition` (`services/manufacture/rbac.go`) dan padanannya di sidebar tetap memakai **substring** `"security"` — menyempitkannya ke exact akan mencabut akses "Security Officer" dkk. yang hari ini memilikinya, jadi itu keputusan bisnis, bukan pembersihan kode. Ditandai di kedua sisi supaya tak "diseragamkan" tanpa keputusan.
+
+**Resolusi paket posisi tak lagi gagal karena ejaan departemen (2026-08-09).** `positionSetKeys` (`services/employee/permission_resolve.go`) mencari dokumen departemen lewat query Mongo yang sama persis huruf demi huruf, sedangkan `/me/menu-hidden` mencocokkannya dengan `EqualFold`. Untuk pasangan (departemen, posisi) yang SAMA, keduanya bisa berbeda pendapat: menu tersembunyi sesuai setelan, tapi paket hak dari jabatan **diam-diam tak terbentuk** sehingga izinnya hilang dan pemakai jatuh ke tier lama tanpa satu pesan pun. Karena `work_data.department` datang dari dropdown, impor lama, dan input manual, beda kapitalisasi/spasi memang terjadi. Keduanya kini memakai satu helper `indeksDepartemen` (`position_assign.go`, saudara `indeksItemPosisi`), dijaga `TestIndeksDepartemenCocokTanpaPeduliHurufDanSpasi`. Ini menyentuh **fondasi** ADR 0030 (hak menempel di posisi), jadi dampaknya bukan kosmetik.
+
 ## Katalog acuan
 
 **Tangga tingkat**, sama di semua modul. Tingkat tidak otomatis bertingkat; paket yang menggabungkan.
@@ -121,13 +125,15 @@ Paket WMS adalah terjemahan langsung matriks tab yang sudah berjalan di `erp-fro
 
 **Status penegakan per service** (scan 950 rute, 2026-07-29). "Telanjang" = rute user-facing tanpa middleware apa pun; rute sistem (`/internal`, `/public`, `/health`, `/webhook`) tidak dihitung.
 
-> ⚠️ **Angka di bawah UNDER-COUNT.** Pengecualian `/internal` pada scan itu keliru: prefix tersebut **bukan** batas keamanan. Gateway meneruskan seluruh sub-path `/api/<module>/*` apa adanya dan `Reroute` mengisi sendiri `BIP-Gateway-ID`, jadi rute `/internal/...` bisa dipanggil dari internet oleh siapa pun yang punya token login. Audit 2026-07-30 di employee-service menemukan 3 rute tulis `/internal/auth/*` tanpa gerbang (satu di antaranya menulis `system_roles` apa pun, termasuk `group=admin`) plus 6 rute yang membocorkan peran dan dokumen pribadi. Semuanya ditambal dan ter-deploy hari itu, dan employee-service kini dijaga uji `internal_routes_guard_test.go`. **Scan ulang service lain harus memasukkan `/internal`.** Lihat [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] dan [[LOG - 2026-07-30 Audit Otorisasi Employee Service]].
+> ⚠️ **Angka di bawah UNDER-COUNT.** Pengecualian `/internal` pada scan itu keliru: prefix tersebut **bukan** batas keamanan. Gateway meneruskan seluruh sub-path `/api/<module>/*` apa adanya dan `Reroute` mengisi sendiri `BIP-Gateway-ID`, jadi rute `/internal/...` bisa dipanggil dari internet oleh siapa pun yang punya token login. Audit 2026-07-30 di employee-service menemukan 3 rute tulis `/internal/auth/*` tanpa gerbang (satu di antaranya menulis `system_roles` apa pun, termasuk `group=admin`) plus 6 rute yang membocorkan peran dan dokumen pribadi. Semuanya ditambal dan ter-deploy hari itu, dan employee-service kini dijaga uji `internal_routes_guard_test.go`. **Scan ulang service lain harus memasukkan `/internal`.**
+>
+> ⚠️ **Sapuan itu sendiri punya titik buta, dan satu rute lolos (ditemukan & ditambal 2026-08-09).** `internal_routes_guard_test.go` hanya menelusuri prefix `/internal/`, sehingga rute sensitif di AKAR tak pernah diperiksa. `GET /system` (employee-service) terdaftar **tanpa gerbang sama sekali** dan mengembalikan dokumen `system_authentication` apa adanya — termasuk **hash password**, karena field `Password` ber-tag `json:"password"` (bukan `json:"-"` seperti `PIN`), sementara komentar di sebelahnya keliru menyatakan keduanya "skipped on JSON". Siapa pun bertoken login sah bisa menarik hash + `system_roles` karyawan mana pun lewat gateway, lalu menebaknya offline tanpa meninggalkan jejak login. Saudaranya `GET /get/:employee_id/system-auth` sudah bergerbang + meredaksi sejak lama, jadi ini murni rute yang terlewat. Kini bergerbang `RequireHRISOrITStaff` + diredaksi lewat helper `tanpaKredensial` (dipakai kedua rute), dijaga uji `system_auth_response_test.go` yang menuntut gerbang peran pada setiap rute penyaji `system_authentication`. **Pelajaran: penjaga berbasis prefix hanya menjaga prefix itu** — kelas rute sensitif perlu penjaganya sendiri. Lihat [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] dan [[LOG - 2026-07-30 Audit Otorisasi Employee Service]].
 
 | Service | Rute | Ber-middleware | Telanjang | Tulis telanjang |
 |---|---|---|---|---|
 | integration | 318 | 43 RBAC (+29 cache) | 241 | 74 |
 | employee | 132 | 35 | 84 | 38 |
-| manufacture | 96 | 0 | 95 | 60 |
+| manufacture | 96 | **seluruhnya (sejak 2026-07-29)** | 0 | 0 |
 | recruitment | 92 | 86 | 3 | 1 |
 | attendance | 65 | 19 | 45 | 19 |
 | task-management | 57 | 54 | 2 | 0 |
@@ -141,7 +147,9 @@ Paket WMS adalah terjemahan langsung matriks tab yang sudah berjalan di `erp-fro
 | file | 11 | 0 | 10 | 4 |
 | tiktok-shop | 4 | 0 | 2 | 0 |
 
-Total **557 rute user-facing tanpa gerbang, 230 di antaranya tulis**.
+Total **557 rute user-facing tanpa gerbang, 230 di antaranya tulis** (angka scan 2026-07-29; baris `manufacture` sudah dikoreksi di atas, jadi total nyatanya kini **±462 / ±170**).
+
+> **Baris `manufacture` dikoreksi 2026-08-09.** Scan aslinya dijalankan pada hari yang sama dengan mendaratnya `services/manufacture/rbac.go`, sehingga mencatat service itu 0 ber-middleware. Sejak commit tersebut **seluruh** rute WMS bergerbang (`requireTabRead`/`requireTabWrite`/`requireWmsSupervisor`/`requireBatch*`/gerbang Sadewa) — terverifikasi ulang dengan membaca `services/manufacture/main.go`. Baris service lain **belum** diverifikasi ulang dan masih memakai angka scan lama.
 
 **Sudah selesai sejak dok ini pertama ditulis** (semua terverifikasi live di dev): posisi ber-`key` stabil + `work_data.position_key` + migrasi; posisi bisa memegang paket dan ikut resolusi login (union dengan paket akun, reach tertinggi); layar **Hak per Posisi** & **Siapa Boleh Apa** termasuk daftar pengecualian per-akun; penyaringan menu FE dari klaim `permissions`; katalog **payroll** (5 izin, ditegakkan), **procurement** (7 izin, ditegakkan), **monitoring** (2 izin, ditegakkan), dan **finance** (6 izin, belum ditegakkan).
 
