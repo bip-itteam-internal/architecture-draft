@@ -41,9 +41,30 @@
 **Unggah PDF** — reuse endpoint generik `POST /api/employee/upload` (field multipart `file`, `minio.UploadSingleHandler`) yang sudah ada; FE (`features/legal/shared/upload.ts`) unggah lebih dulu, simpan `full_url`→`file_object` di payload. Tiap halaman menautkan `file_object` (buka PDF di tab baru).
 
 - **Frontend**: tiga halaman list (Perizinan/Kontrak/Dispute) + modal create/edit (react-hook-form + zod) + hapus (ActionDialog) + unggah PDF. Tiga menu muncul di sidebar untuk pemegang role `legal`; rute `/legal/*` digating di `proxy.ts`. Sejak branch `refactor/legal-struktur-halaman-hris` (⚠️ **belum merge**) ketiganya memakai **struktur halaman HRIS** berikut pencarian, penyaring, paginasi, export, dan i18n dua bahasa — rinciannya beserta alasan tiap keputusan di [[APP - Web ERP]] bagian **Legal**.
-- **RBAC & seed**: role key `legal` pada tier `system_roles` (`legal:staff|supervisor`), department `legal` di-seed di `DefaultDepartments` sehingga peran bisa di-assign lewat Master Data. Lihat [[CORE - RBAC dan Permission Set]].
+- **RBAC & seed**: role key `legal` pada tier `system_roles` (`legal:staff|supervisor`), department `legal` di-seed di `DefaultDepartments`. Sejak branch `feat/legal-permission-set` (⚠️ **belum merge**) modul ini **berkatalog penuh**: tiga izin `legal.view` / `legal.work` / `legal.manage` menggerbang kelima belas rute lewat `gateLegal`, dengan fallback tier di tiap rute dan kill-switch `LEGAL_PERMISSION_ENFORCEMENT=off`. Tiga paket bawaan: **Lihat** (baru, tak punya padanan tier lama), **Pelaksana** (setara `legal:staff`), **Admin** (setara `legal:supervisor`). Rincian keputusan: [[CORE - RBAC dan Permission Set]].
 
 ## Belum Diimplementasikan / Catatan
+
+> [!warning] Sensus produksi 2026-08-09: modul ini **tidak dipakai siapa pun**, dan tak bisa dipakai
+> Dihitung langsung ke `employee_db` produksi:
+>
+> | | |
+> |---|---|
+> | total akun (`system_authentication`) | 208 |
+> | punya `system_roles.legal` | **0** |
+> | supervisor IT (super-akses) | 12 |
+>
+> **Nol, bukan sedikit.** Sebabnya berantai dan tak satu pun ada di kode register ini:
+>
+> 1. **Departemen `legal` tak ada di produksi.** `master_department` berisi 12 dokumen — `hris`, `ga`, `it`, `secretary`, `finance`, `beauty_hacks`, `kyura`, `manufacture`, `quality`, `procurement`, plus **`marketing`** dan **`pct`** yang tak pernah ada di seed. Master data prod sudah lama dikelola manual.
+> 2. **Deploy tak akan membuatnya.** `seedMasterDepartments` (`services/employee/master_data.go`) berhenti total begitu koleksinya tidak kosong — ia tidak menambahkan yang kurang, melainkan melewati semuanya. Prod punya 12, jadi seed tak pernah jalan lagi.
+> 3. **Tanpa departemen `legal`, dropdown role di Master Data tak punya pilihan `legal`**, jadi HR tak bisa memberikannya kepada siapa pun.
+>
+> Praktisnya modul ini hanya bisa dibuka **12 supervisor IT** lewat super-akses. Itu sebabnya cabang super-akses IT di `catalog_legal.go` bukan pelengkap melainkan satu-satunya yang menahan modul ini tetap terbuka.
+>
+> Dan orangnya sebenarnya ada: **satu** karyawan berjabatan legal di produksi, `BIP-0184-08-25`, departemen **Kesekretariatan**, jabatan `Legal` — persis posisi yang jadi alasan register ini dibangun. Ia duduk di `secretary`, bukan di departemen `legal` yang di-seed, dan tak punya akses ke modulnya sendiri.
+>
+> **Yang perlu diputuskan orang, bukan kode**: buat departemen `legal` di Master Data prod lalu assign rolenya, ATAU akui Legal memang tinggal di Kesekretariatan dan sesuaikan `deptKeyToNames`. Selama belum, seluruh mesin izin di atas tak akan terasa oleh siapa pun.
 
 - **Unggah PDF pakai bucket `uploads/` generik**: berkas disimpan lewat `POST /upload` (prefix `uploads/`, bukan `legal/...` khusus) dan `file_object` menyimpan `full_url` publik langsung — belum ada preview presigned/akses berbasis-peran. Cukup untuk sekarang; perlu ditinjau bila dokumen legal harus dibatasi.
 - **Hosting sementara di employee-service** (TBD): dipilih agar tidak menambah modul gateway/URL baru (menghindari panic `ValidateInternalURL`) dan bisa langsung boot. Bila beban Legal tumbuh, ekstrak ke service `legal` tersendiri (env `LEGAL_MODULE_URL` + entri `InternalURL` di [[CORE - API Master Gateway]] + service data-owning meniru [[Microservices - Recruitment Service]]).

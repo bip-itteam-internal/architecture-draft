@@ -1105,8 +1105,8 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "5af3be8a203c43d8b08f90041ff7f5f703fddd486d89dd20ee37f7d8dbee1861",
-      "ukuran_kb": 152.4,
+      "hash": "f7fa0950f4c8d9ba8a8f0afb57b3fadf603bcc8cb9fe468d78b58a5512de733d",
+      "ukuran_kb": 156.7,
       "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP One Bharata, bagaimana login, SSO, dan role gating sidebar bekerja, serta konvensi UI mana yang berlaku (MainTable + Banner sebagai lapisan tabel utama, IntegrationTable sebagai pengecualian, i18n dua bahasa). Juga menjawab: apa itu struktur halaman HRIS, yakni Banner bare yang duduk di dalam kartu MainTable lewat prop toolbar, layar mana saja yang sudah memakainya, dan apa yang biasanya ikut rusak di layar yang belum (kotak cari yang tak menyaring apa pun, penyaring backend yang tak pernah dipanggil, tak ada paginasi maupun export). Menjelaskan keputusan tampilan per modul beserta konsekuensinya, termasuk mana yang sudah live dan mana yang masih di branch.",
       "kata_kunci": [
         "erp-frontend",
@@ -1358,14 +1358,13 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, serta **training**. **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) sudah berkatalog + bergerbang tapi **belum merge dan belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
+      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, serta **legal** (yang terakhir ⚠️ belum merge). **finance** baru punya katalog + paket, **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) sudah berkatalog + bergerbang tapi **belum merge dan belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "APP - Web ERP",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
-        "QA - Register Perizinan & Sertifikasi",
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "Microservices - Procurement Service",
@@ -1390,10 +1389,25 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "beb8b5d441f45941b90ad1e55030552939f136d83b62461b6c397acdf8b1cada",
-      "ukuran_kb": 32.6,
-      "ringkasan": null,
-      "kata_kunci": []
+      "hash": "ce0a1753e2dde1c9b1ac5f718716ec79234362f0dba8de7ded459c39bec88fcf",
+      "ukuran_kb": 37.2,
+      "ringkasan": "Menjawab: bagaimana hak akses bekerja di seluruh bip-erp lewat tiga sumbu (modul, tingkat aksi view/work/approve/manage, dan reach own/division/all), izin apa saja yang berlaku per modul, dan paket bawaan mana yang bisa dipilih HR untuk sebuah posisi. Juga menjawab: modul mana yang sudah berkatalog dan ditegakkan per-aksi versus mana yang masih memakai tier system_roles lama, bagaimana fallback tier menjaga agar tak ada yang kehilangan akses saat enforcement dinyalakan, dan kenapa katalog izin TIDAK membuka menunya sendiri (sidebar dan proxy masih memilih modul dari system_roles). Berguna juga untuk membedakan permission_sets dari menu_hidden dan dari modul menu terbatas, tiga hal yang menempel pada objek yang sama dan mudah tertukar.",
+      "kata_kunci": [
+        "RBAC",
+        "permission set",
+        "izin",
+        "permission",
+        "katalog",
+        "hak akses",
+        "reach",
+        "system_roles",
+        "fallback tier",
+        "kill-switch",
+        "menu_hidden",
+        "menu terbatas",
+        "gerbang",
+        "otorisasi"
+      ]
     },
     {
       "path": "Core System and Modules/CORE - SSO Flow.md",
@@ -3250,9 +3264,9 @@
         "DB - Data Dictionary",
         "ADR - 0003 SSO-only Gateway"
       ],
-      "hash": "8a12d21081e8f64fa214c736562ccbd2eba5db33ba8bec4e779e5730c7fb9f8b",
-      "ukuran_kb": 15.7,
-      "ringkasan": "Menjawab: kenapa hak akses di bip-erp menempel pada POSISI/jabatan dan bukan hanya pada akun, serta bagaimana tiga sumbu modul, tingkat aksi, dan reach dipakai bersama. Menjelaskan permission-set sebagai paket bernama yang dipilih HR, penggabungan hak akun dengan hak posisi, fallback tier selama migrasi, dan kenapa jalur pengecualian per-akun tetap dipertahankan. Memuat konsekuensi nyata yang muncul saat dijalankan, termasuk aturan bahwa jenjang jabatan tidak boleh jadi sumbu hak akses keempat.",
+      "hash": "b0f8a73dc200bff59ee14bdb8df77d3c46da5ca46f553e741564666c339b3ff7",
+      "ukuran_kb": 17.2,
+      "ringkasan": "Menjawab: kenapa hak akses di bip-erp menempel pada POSISI/jabatan dan bukan hanya pada akun, serta bagaimana tiga sumbu modul, tingkat aksi, dan reach dipakai bersama. Menjelaskan permission-set sebagai paket bernama yang dipilih HR, penggabungan hak akun dengan hak posisi, fallback tier selama migrasi, kenapa jalur pengecualian per-akun tetap dipertahankan, dan bahwa daftar modulnya memang boleh bertambah selama aturan pembentuknya dipenuhi. Memuat konsekuensi nyata yang muncul saat dijalankan, termasuk aturan bahwa jenjang jabatan tidak boleh jadi sumbu hak akses keempat, dan bahwa bukti 'tak ada yang kehilangan akses' menjadi palsu bila acuan ujinya menyalin asumsi kode yang diujinya.",
       "kata_kunci": [
         "RBAC",
         "permission set",
@@ -3267,7 +3281,8 @@
         "jenjang jabatan",
         "job level",
         "gerbang",
-        "otorisasi"
+        "otorisasi",
+        "fallback tier"
       ]
     },
     {
@@ -6928,9 +6943,9 @@
         "Microservices - Employee Service",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
       ],
-      "hash": "aae6c86892639353b18154e2b72b3778b89234be145fc9be098d16b92ad69ce2",
-      "ukuran_kb": 9.3,
-      "ringkasan": "Menjawab: bagaimana Staf Legal mencatat dan memantau izin serta sertifikat perusahaan (BPOM, Halal, izin usaha, sertifikasi lain) di satu daftar terpusat lengkap dengan masa berlaku dan alert H-90 sebelum kedaluwarsa. Juga menjawab: endpoint dan field model untuk tiga register Legal (Perizinan, Kontrak & SLA dengan alert H-60, Dispute & Advis Hukum), penyaring apa saja yang diterima tiap handler, siapa yang boleh membuat/mengubah versus menghapus (legal:staff dan legal:supervisor), dan bagaimana unggah PDF sertifikat memakai endpoint upload generik. Berguna juga untuk tahu alasan register ini di-host di employee-service, bahwa tombol Hapus masih tampil bagi staf yang tak berhak, bahwa modulnya belum pernah dijalankan lewat gateway, dan bahwa tiga representasi legal masih hidup berdampingan di master data.",
+      "hash": "5214dcb7a7b3fc8ace6f07e4989188f2c99cdc4c91d6df35eb1b1b691dcc80e9",
+      "ukuran_kb": 11.6,
+      "ringkasan": "Menjawab: bagaimana Staf Legal mencatat dan memantau izin serta sertifikat perusahaan (BPOM, Halal, izin usaha, sertifikasi lain) di satu daftar terpusat lengkap dengan masa berlaku dan alert H-90 sebelum kedaluwarsa. Juga menjawab: endpoint dan field model untuk tiga register Legal (Perizinan, Kontrak & SLA dengan alert H-60, Dispute & Advis Hukum), penyaring apa saja yang diterima tiap handler, izin dan paket RBAC apa yang menggerbangnya (legal.view/work/manage beserta paket Lihat, Pelaksana, Admin), dan bagaimana unggah PDF sertifikat memakai endpoint upload generik. Berguna terutama untuk tahu bahwa modul ini praktis BELUM DIPAKAI SIAPA PUN di produksi: nol dari 208 akun punya role legal, departemen legal tak ada di master data prod dan tak akan dibuat oleh deploy, sehingga hanya supervisor IT yang bisa membukanya.",
       "kata_kunci": [
         "legal",
         "perizinan",
@@ -6943,7 +6958,9 @@
         "kedaluwarsa",
         "compliance",
         "penyaring",
-        "Staf Legal"
+        "Staf Legal",
+        "legal.view",
+        "permission set"
       ]
     },
     {
@@ -9204,7 +9221,6 @@
     }
   ],
   "gagal": [
-    "Core System and Modules/CORE - RBAC dan Permission Set.md",
     "Decisions/ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign.md",
     "Human Resource Information System/HRIS - Career & Promotion.md",
     "Human Resource Information System/HRIS - Training Program.md"
