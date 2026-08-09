@@ -97,9 +97,15 @@ Catatan gerbang: `PUT .../positions/:positionKey/level` memakai `RequireHRISOrIT
 
 Detail desainnya (rank renggang, pemisahan nama dari urutan) di [[HRIS - Organization Structure]].
 
+**Premisnya sempat tak lengkap, dan itu baru ketahuan saat dipakai sungguhan (2026-08-09).** Keputusan ini menyatakan hak menempel di posisi lewat paket, tapi paket hanya bisa **menyempitkan** di dalam modul yang sudah dibuka `system_roles` — kategori sidebar lahir semata dari sana, sehingga paket tak pernah bisa **membuka** modul. Finance memperlihatkannya paling telanjang: 16 dari 18 akunnya tak punya satu pun `system_role`, jadi memasang paket ke jabatan AR Staff tak mengubah apa pun. Sejak `kunciModulAktif` (`erp-frontend/src/components/layout/modul-aktif.ts`), paket ikut menentukan kategori. Cakupannya sempit dengan sendirinya — hanya modul yang punya katalog **dan** kategori sidebar; hari ini `finance` dan `procurement`.
+
+**Dua modul justru tak akan dikatalogkan, dan itu keputusan terpisah.** `manufacture` dan `insentive` sudah punya pembedaan per pekerjaan yang halus dan sudah ditegakkan; yang rusak di sana datanya, bukan aturannya. Menyalin matriks WMS 400 baris ke bentuk katalog akan melipatgandakan permukaan yang bisa menyimpang. Jembatannya di [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]] — yang eksplisit menyatakan dirinya sementara dan dicabut begitu kedua modul berkatalog.
+
 **Yang belum diputuskan (TBD):**
 
 - **Pemisahan per area gudang** (Admin Gudang RM vs FG) bukan soal permission melainkan cakupan area. Menempelkannya ke permission akan melahirkan `wms.rm.*` dan `wms.fg.*` dan membengkakkan katalog. Tahap pertama menyamakan dengan matriks FE yang berlaku; kemungkinan arah: cakupan mirip `reach`, bukan permission baru.
+
+	TBD ini kini **menghalangi hal yang konkret**: jabatan `Admin Warehouse` dan `Warehouse Leader` tak bisa dipetakan ke peran WMS mana pun karena gudangnya RM atau FG tak bisa disimpulkan dari namanya, sehingga keduanya tertinggal tanpa akses di [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]. Menunggu jawaban pengelola.
 - **Perilaku saat pemakai membuka URL tanpa hak**: halaman 403 yang menyebut permission yang dibutuhkan, atau pengalihan ke dashboard (perilaku WMS sekarang). Perlu satu perilaku seragam.
 - **Peran "admin pusat"** masih dipetakan interim ke `system_roles.group = admin` (lihat [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]); hubungannya dengan modul `admin` di katalog ini perlu dirapikan.
 - **Cara posisi GA (GA Staff, Security, Office Boy) mendapat dashboardnya**: diberi `system_roles.hris`, atau dibuatkan dashboard sendiri di bawah `/ga/`. Pilihan pertama membuka seluruh menu HRIS untuk mereka, jadi kemungkinan besar bukan yang diinginkan.

@@ -1,0 +1,67 @@
+**Status**: ✅ Implemented (dev, 2026-08-09). Tabel `services/employee/peran_dari_jabatan.go` mengisi `system_roles` yang kosong dari (departemen, jabatan) di keempat jalur penerbitan token. Menyentuh 13 akun Manufaktur/Quality dan 11 akun Beauty Hacks/Kyura. Sakelar `ROLE_FROM_POSITION=off`. **Jembatan sementara**, bukan pengganti [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].
+
+## Context
+
+[[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] menetapkan hak menempel pada posisi lewat permission-set. Jalan itu benar, tapi menuntut modulnya berkatalog lebih dulu — dan dua modul yang paling banyak dikeluhkan justru **sudah punya pembedaan per pekerjaan yang halus dan sudah ditegakkan**, hanya saja bukan lewat katalog:
+
+- **`manufacture`** — `MATRIKS_TAB_WMS` (`erp-frontend/src/features/manufacture/akses.ts`) dengan enam peran granular (`admin_gudang_rm`, `admin_gudang_fg`, `admin_produksi`, `ppic`, `qc`, `supervisor`), dicerminkan **per-endpoint** di `services/manufacture/rbac.go`. Keputusan pengelola 17 Juli 2026.
+- **`insentive`** — nilai perannya sendiri sudah berbentuk pekerjaan: `icc`, `host_live`, `crm`, `affiliate`, `adv_meta`, `adv_marketplace`, `adv_leader`, `supervisor`.
+
+Pemeriksaan data dev 2026-08-09 menunjukkan **yang rusak bukan aturannya melainkan datanya**. Peran itu dipasang satu per satu ke akun, dan pemasangannya tak pernah tuntas:
+
+| Departemen | Temuan |
+|---|---|
+| Manufaktur & Quality | Dari 22 akun hanya 9 yang memegang peran WMS — dan **kesembilannya akun uji** (`*.test`). Tak satu pun karyawan sungguhan punya akses WMS, termasuk seluruh Leader Production (4), QC Production (3), dan separuh PPIC. |
+| Beauty Hacks & Kyura | 11 akun tanpa peran (4 Host Live, 3 ICC, sisanya Customer Support/Marketplace Advertiser/Meta Advertiser/SPV), plus 3 akun bernilai keliru. |
+
+Membangun katalog izin untuk kedua modul berarti **menyalin aturan yang sudah ada ke bentuk kedua** yang harus dijaga tetap sama selamanya — matriks WMS saja 400 baris, dan ia sudah punya cerminan backend yang wajib sinkron. Menambah bentuk ketiga melipatgandakan permukaan yang bisa menyimpang.
+
+## Decision
+
+**Peran sistem yang KOSONG diisi dari jabatan saat token diterbitkan.**
+
+Satu tabel `departemen → jabatan → modul → nilai peran` (`services/employee/peran_dari_jabatan.go`), dipanggil di **keempat** jalur penerbitan token (login, PIN, biometrik, refresh). Karena penurunannya terjadi di titik itu, frontend maupun backend ikut benar sekaligus: keduanya membaca `system_roles` yang sama dari header yang distempel gateway. Nol gerbang disentuh.
+
+Empat aturan yang mengikat:
+
+**1. Tak pernah menimpa, dinilai PER MODUL.** Pengelola kadang sengaja memberi seseorang peran berbeda dari jabatannya; menimpanya berarti mencabut keputusan itu tanpa jejak. Penilaian per modul juga yang membuat kasus campuran tertangani benar — seorang Meta Advertiser Kyura yang memegang `kyura: staff` (keliru) **dan** kehilangan peran insentifnya kini menerima `adv_meta` yang hilang, sementara peran keliru itu dibiarkan untuk diputuskan manusia. Membedakan "salah isi" dari "sengaja dibedakan" bukan urusan kode.
+
+**2. Hanya untuk peran yang menentukan AKSES, bukan perhitungan.** `insentive` lolos syarat ini karena `services/insentive` **tak membaca `system_roles` sama sekali** — keanggotaan tim insentif datang dari data tim — sehingga penurunan ini tak menyentuh perhitungan uang siapa pun. Syarat ini wajib diperiksa ulang untuk tiap modul berikutnya, dan ditulis sebagai pagar di berkas implementasinya.
+
+**3. Jabatan yang ambigu TIDAK ditebak.** Menebak berarti melebarkan hak diam-diam: arah kesalahan yang tak punya gejala sama sekali.
+
+**4. Bentuk kanonik yang dipakai adalah `common.KanonPosisi`** — sama dengan `positionSetKeys` dan `/me/menu-hidden`. Membuatnya lebih longgar berarti satu jabatan bisa cocok di satu tempat dan tidak di tempat lain, yaitu kelas bug yang justru sedang diperbaiki. Batas itu dikunci uji.
+
+Sakelar `ROLE_FROM_POSITION=off` mengembalikan perilaku lama tanpa deploy kode.
+
+### Yang sengaja tidak dipetakan
+
+| Departemen | Jabatan | Alasan |
+|---|---|---|
+| Manufaktur | Operator Production, Warehouse Staff | matriks memang menetapkan mereka tanpa akses WMS |
+| Manufaktur | Admin Warehouse, Warehouse Leader | gudangnya RM atau FG tak bisa disimpulkan dari nama jabatan |
+| Quality | Quality Supervisor | `supervisor` di modul `manufacture` berarti SELURUH akses WMS, jauh melebihi pengawasan mutu |
+| Beauty Hacks | Buzzer | bukan salah satu peran insentif yang ada; satu Buzzer hari ini memegang `icc` dan itu membuka dasbor yang bukan pekerjaannya |
+| Beauty Hacks, Kyura | Video Editor, Videographer | tak punya padanan peran insentif |
+| Kyura | `?` | jabatan kosong di data (3 akun) |
+
+`integration` juga tidak diturunkan untuk atasan brand walau satu SPV Beauty Hacks hari ini memegangnya: peran itu membuka kategori Integration dengan 26 menu, jauh melebihi apa pun yang bisa disimpulkan dari nama jabatan "supervisor brand".
+
+## Consequences
+
+**Yang membaik.** 24 karyawan mendapat akses yang sesuai jabatannya tanpa satu gerbang pun berubah. Karyawan baru di jabatan yang terpetakan otomatis benar sejak login pertama — sebelumnya menunggu seseorang ingat memasang perannya. Dan karena tabelnya satu, "jabatan ini dapat peran apa" jadi pertanyaan yang bisa dijawab dengan membaca satu berkas.
+
+**Yang memburuk, dan ini nyata.** Sekarang ada **dua** sumber `system_roles`: yang tersimpan di akun dan yang diturunkan dari jabatan. Dokumen `system_authentication` di database tak lagi menceritakan seluruh kebenaran, sehingga siapa pun yang memeriksa akses lewat database saja akan salah menyimpulkan. Penawarnya endpoint audit `GET /master/peran-jabatan` dan panel **Peran vs Jabatan** — keduanya membaca hasil akhir, bukan data mentah.
+
+**Ini jembatan, dan jembatan harus dibongkar.** Begitu `manufacture` dan `insentive` berkatalog sesuai [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]], hak keduanya pindah ke permission-set yang menempel di posisi, dan tabel ini dicabut. Membiarkannya hidup berdampingan dengan katalog akan menghasilkan dua sumber hak yang bisa menyimpang — persis keadaan yang ADR 0030 hendak akhiri.
+
+**Anomali tidak ikut tertutup.** Tiga akun marketing bernilai keliru (`Rifki` Affiliate memegang `icc`; `Annisa` dan `priyastama` ICC memegang `crm`) tetap keliru — aturan tak-menimpa memang tak menyentuhnya. Itu keputusan pengelola, bukan kode, dan tercatat di sini supaya tidak hilang.
+
+## Terkait
+
+- [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] (arah akhirnya; ADR ini jembatan menuju ke sana)
+- [[CORE - RBAC dan Permission Set]] (katalog, paket, status penegakan per modul)
+- [[Microservices - Employee Service]] (pemilik jalur penerbitan token)
+- [[Microservices - Manufacture Service]] (matriks WMS yang dicerminkan) · [[Microservices - Insentive Service]]
+- [[HRIS - Organization Structure]] (jabatan & departemen sebagai master data)
+- [[APP - Web ERP]] (sidebar membaca `system_roles` hasil akhir)

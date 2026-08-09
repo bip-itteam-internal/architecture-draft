@@ -31,6 +31,27 @@
 - **Role per-departemen nonaktif:** fungsi `setDepartmentRole`, `removeDepartmentRole`, dan `getRolesByDepartment` sudah ditulis penuh TAPI route-nya (`/roles/get-department`, `/set-department`, `/remove-department`) masih di-comment — sehingga manajemen role per-departemen efektif belum diekspos.
 - **Log startup menyesatkan:** mencetak "routes registered" untuk route yang sebenarnya masih di-comment.
 
+### `/roles/set` membalas 502 selama sepuluh hari di dev (2026-07-30 → 2026-08-09)
+
+Mengubah role akun lewat Web ERP gagal dengan `502 Service unavailable`, dan sebabnya **bukan** kode yang salah melainkan container yang tak pernah dibangun ulang.
+
+Tiga commit pada 30 Juli, berurutan dan saling melengkapi:
+
+| Jam | Commit | Isi |
+|---|---|---|
+| 11:22 | `541ff172` | rute `/internal/*` employee-service digerbang (perbaikan keamanan, benar) |
+| 15:21 | `1b17dd2f` | orchestrator meneruskan `ctx` pada lompatan **tulis** system-auth |
+| 15:27 | `40dcc7c7` | idem untuk lompatan **baca** (`getCurrentRoles`) |
+
+Dua yang terakhir justru antisipasi atas yang pertama. Tapi image IT-Orchestrator masih **12 Juli**, yang memanggil `getCurrentRoles(employeeID)` tanpa `ctx` — sehingga header `BIP-System-Roles` milik pemanggil tak ikut terkirim, employee-service membalas **403**, dan `setAllRoles` menerjemahkan status ≥400 apa pun (selain 404) jadi **502**. Perbaikannya sudah ada di repo sepuluh hari, hanya tak pernah sampai ke dev.
+
+Dua hal yang memperlambat pelacakan, keduanya sudah ditambal:
+
+- **Galat aslinya tak pernah dicatat.** Yang sampai ke pemakai hanya "Service unavailable", dan tiga sebab yang sangat berbeda — tak terjangkau, ditolak, atau balasan tak terbaca — tampak persis sama. Kini status dan galatnya di-log (`[ERROR] getCurrentRoles ... status=%d err=%v`).
+- **Cache Redis di gateway sempat menyesatkan reproduksi.** Kuncinya `employee_id` + path tanpa melihat izin, sehingga dua token berbeda memberi hasil identik sampai cache dikosongkan. Ini juga berarti perubahan hak seseorang bisa tertutup respons GET yang sudah ter-cache untuk sesaat.
+
+> **Pola yang sama menggigit dua kali dalam satu hari.** Sebelumnya `api-gateway` — image 12 Juli yang belum mengenal klaim `permissions` — membuat SELURUH permission-set tak pernah aktif di dev (lihat [[CORE - RBAC dan Permission Set]]). Tujuh service lain masih memakai image 12 Juli. Membaca kode di repo tidak cukup untuk menyimpulkan perilaku lingkungan.
+
 ## Dependencies & Integrasi
 
 - [[Microservices - Employee Service]] — sumber/target data employee, roles, system-auth, dan status akun.

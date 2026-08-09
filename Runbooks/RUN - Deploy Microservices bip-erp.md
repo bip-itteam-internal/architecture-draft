@@ -65,6 +65,26 @@ Urutannya tak kritis di sini — yang kritis keduanya naik. Selama hanya satu ya
 
 Penjaganya di sisi kode ada di `services/form-builder/notify_category_test.go` — menambah kategori tanpa mendaftarkannya di `shared-library` menggagalkan test. Penjaga itu tidak bisa tahu container mana yang sudah naik, jadi langkah deploy ini tetap manual.
 
+**Kasus yang sama, gejala yang jauh lebih besar (dev, ditemukan 2026-08-09):** dua container memegang biner yang mendahului perubahan `shared-library`, dan keduanya menyesatkan pelacakan berjam-jam.
+
+| Container | Umur image | Akibat |
+|---|---|---|
+| `api-gateway` | 12 Juli | `common.PayloadJWT` versi lama tak punya field `Permissions`/`SupervisedDepartments`, jadi gateway mem-parse balasan employee-service, **membuang kedua klaim**, lalu menandatangani token tanpanya. **SELURUH permission-set tak pernah aktif di dev** — payroll, finance, procurement, monitoring, hris — dan `reach: division` tak pernah punya cakupan untuk dinilai. |
+| `it-orchestrator` | 12 Juli | Memanggil `getCurrentRoles(employeeID)` tanpa `ctx`, sehingga header `BIP-System-Roles` tak ikut terkirim ke rute `/internal/*` employee-service yang baru digerbang. Ubah-role membalas **502** selama sepuluh hari. Rinciannya di [[CORE - IT Orchestrator]]. |
+
+Yang membuat keduanya mahal: **gejalanya menunjuk ke arah yang keliru**. Menu tetap hilang meski paket sudah dipasang dan sudah login ulang berkali-kali; tuduhan pertama jatuh ke logika RBAC. Dan gateway tak bisa dibangun ulang sama sekali — ia memanggil `ValidateInternalURL` untuk SELURUH `InternalURL` saat start, dan tujuh modul yang belum jalan di dev tak punya entri `*_MODULE_URL`, jadi tiap percobaan build berakhir restart-loop. Port ketujuhnya ada di `.env.example` tapi tak pernah tersalin ke `.env` lokal. Karena itulah tak ada yang pernah merebuild-nya.
+
+**Cara memeriksa cepat** — bandingkan umur image dengan tanggal perubahan `shared-library` yang relevan:
+
+```bash
+docker inspect <Container> --format '{{.State.StartedAt}}'
+docker image inspect <image> --format '{{.Created}}'
+```
+
+Kalau image lebih tua daripada commit yang menambah field/klaim yang sedang dicari, biner itu tak mengenalnya. Untuk klaim JWT, `strings /service | grep permissions` di dalam container menjawabnya langsung.
+
+> **Aturan yang lebih luas:** membaca kode di repo tidak cukup untuk menyimpulkan perilaku sebuah lingkungan. Sebelum menuduh logika, pastikan biner yang berjalan memang memuat logika itu. Per 2026-08-09 **tujuh service dev masih memakai image 12 Juli** (attendance, hris-orchestrator, insentive, inventory, notification, task-management, tiktok-shop).
+
 ## 3b. Fitur dorman di balik feature flag (aman deploy siapa pun)
 
 Beberapa fitur landing **DORMANT** — kode ada di produksi tapi tidak jalan sampai env flag dinyalakan sengaja. **Deploy integration-service oleh siapa pun TIDAK mengaktifkannya** selama flag tidak di-set `true` di `.env`.
