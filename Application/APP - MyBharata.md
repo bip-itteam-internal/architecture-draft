@@ -6,7 +6,8 @@
 - **Multi-perusahaan** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]): presensi (absen/jadwal/izin) ter-scope **otomatis via JWT** (tak ada perubahan). **Profil Perusahaan** dari `/me` (BIP profil penuh; perusahaan lain nama saja) & **onboarding** (welcome + setup-selesai) dari respons login `new_user`, membuang hardcode "PT Bharata". **Konten dinamis per tenant (F2-C, PR #90)**: helper `CompanyScope` / `companyScopeOf(context)` dari `UserProfileBloc` (key kosong = BIP demi kompatibilitas token lama); blok "Tentang Perusahaan" (Visi/Misi/Company Info/SOP) & "Bharata Community" hanya untuk BIP, sedangkan kartu cuaca kantor dan nama pada strap QR lanyard kini ikut nama perusahaan user. **Menu Pengajuan disembunyikan untuk non-BIP (PR #91)** selama pilot, di dua entry point (`home_menu_grid` + `more_menu`), karena perusahaan lain fokus presensi dulu. **Status rilis**: PR #89/#90/#91 sudah **merged ke `dev`** (versionCode 120), belum naik ke `main`. **Masih TBD (butuh data per-perusahaan di BE):** kontak HR, nama gedung + guestbook, handbook/SOP PDF. Kontak IT sengaja tetap pusat (helpdesk grup, dipakai juga pra-login sebelum perusahaan diketahui).
 
 - Pengguna: karyawan, supervisor, HRD, IT admin, dan tamu eksternal (guest book)
-- Versi build saat ini: **1.14.5+135** (`origin/dev`; `pubspec.yaml`) — naik berturut-turut lewat PR #94 (kontrak `owner_department`), #95 (bagian + dropdown lembar bawah + label skala), #96 (pengingat penilaian tiket), #104 (penilaian karyawan berurutan), dan #105 (tipe permintaan saat buat tiket). ⚠️ **Belum ada rilis** untuk versi-versi ini: `main` belum ditarik dari `dev` dan tag/GitHub Release belum dibuat, jadi yang terpasang di HP pemakai masih **1.14.2+132**
+- Versi build saat ini: **1.14.6+139** (`origin/dev`; `pubspec.yaml`) — naik dari 135 lewat PR #107 (slip gaji terbit + unduh PDF), #108 (menu Kaizen), #109 (progres KPI bulan berjalan), dan #110 (kategori notifikasi `employee-moved`). PR #111 (posisi section Survei) masih terbuka di versionCode **140**.
+- Versi rilis: **1.14.5+135** (`origin/main`, tag `v1.14.5+135`, GitHub Release 2026-08-03) — itulah yang terpasang di HP pemakai. Empat PR di atas **belum ikut rilis**; catatan lama di sini menyebut rilis terakhir masih `1.14.2+132` dan `main` belum pernah ditarik dari `dev`, dua-duanya sudah tidak berlaku.
 - Target platform: Android (minSdk 23 / Android 6.0+), iOS 13+
 - Survei perangkat mobile karyawan [terdaftar di sini](https://docs.google.com/spreadsheets/d/1w2blhMgFx1BI9zu6ni5gmQJab_NfMhdocm0cj5pyO_s/edit?usp=sharing)
 
@@ -89,7 +90,8 @@
 > Menuju **daftar** tiket, bukan langsung ke satu tiket: saat ada beberapa yang menunggu, memilihkan salah satunya berarti menebak. Hilang sepenuhnya saat tak ada yang menunggu maupun saat gagal memuat (termasuk `404` dari server yang belum memuat rute ini) — pengingat bukan sesuatu yang diminta pemakai, jadi kegagalannya tak layak memakan layar utama.
 
 ### Survei / Form Builder
-- **Section "Survei" di beranda**, tepat di bawah quick menu, berisi form terbit yang ditujukan ke karyawan itu dan **belum** ia isi. Tiap kartu menampilkan jumlah pertanyaan, tenggat gerbang, dan penanda merah **"Wajib sebelum absen"** bila form-nya menahan clock-in.
+- **Section "Survei" di beranda**, berisi form terbit yang ditujukan ke karyawan itu dan **belum** ia isi. Tiap kartu menampilkan jumlah pertanyaan, tenggat gerbang, dan penanda merah **"Wajib sebelum absen"** bila form-nya menahan clock-in.
+- **Posisinya paling atas** di daftar beranda — anak pertama `SliverList`, **di atas** kartu "menunggu persetujuan" (PR [#111](https://github.com/bip-itteam-internal/my-bharata/pull/111), versionCode **140**). Sebelumnya berada di bawah section "Akses Cepat". Tak ada `SizedBox` pemisah yang dipasang di puncak daftar: section membawa jaraknya sendiri di dua sisi (atas 16 dari `padding` bawaan `SectionHeader`, bawah 16 dari `SizedBox` terakhir di `Column`-nya), sehingga saat ia menyembunyikan diri — yang terjadi pada mayoritas pemakai, lihat catatan di bawah — puncak beranda tak meninggalkan celah menggantung.
 - **Halaman pengisian `/survey/:id`** merender **9 tipe pertanyaan** (`short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`), memvalidasi cermin aturan backend sebelum kirim, lalu menyegarkan section supaya form yang baru diisi langsung lenyap.
 - **Dropdown, tanggal, dan jam memakai satu jalur yang sama** (PR [#95](https://github.com/bip-itteam-internal/my-bharata/pull/95)): mode nilai `CustomFormField` + pemilih milik aplikasi. Dropdown memakai **`CustomSelectBottomSheet`**, bukan `DropdownButtonFormField` bawaan Material — repo sudah punya komponennya, dan menu melayang di layar sempit sering terpotong sedangkan lembar bawah memang dirancang untuk jempol. Ketiganya kini punya tombol **"Kosongkan"** saat pertanyaannya opsional; sebelumnya tanggal dan jam terkunci begitu tersentuh karena pemilih tak punya cara bawaan membatalkan pilihan.
 - **Keterangan ujung skala** digambar di bawah deretan angka bila dikirim backend; satu ujung saja tetap digambar.
@@ -115,7 +117,7 @@
 
 ### Kaizen (menu tersendiri)
 
-> Status: **PR my-bharata [#108](https://github.com/bip-itteam-internal/my-bharata/pull/108) open** (versionCode **137**), belum merge ke `dev`. Konsep: [[HRIS - Kaizen (Ide Perbaikan)]].
+> Status: **merged ke `dev`** lewat PR my-bharata [#108](https://github.com/bip-itteam-internal/my-bharata/pull/108) (versionCode **137**); belum ikut rilis, `main` masih di `v1.14.5+135`. Konsep: [[HRIS - Kaizen (Ide Perbaikan)]].
 
 Menu **Kaizen** di Lainnya → Pengembangan Diri, sebelah KPI. **Bukan** kartu di section Survei, dan form Kaizen justru **dikeluarkan** dari section itu.
 
