@@ -6,6 +6,7 @@
 - **Referensi bentuk**: modul **Training ERPGo** (3 sub-menu: Training Types · Trainers · Training List) — diambil selektif, **bukan** disalin utuh
 - **Penempatan**: ✅ **service `learning` sendiri** — lihat **Penempatan Arsitektur** (usulan lama "perluasan Employee Service" sudah ditinggalkan)
 - **Kelanjutan**: modul ini jadi fondasi **LMS People Development** (materi PDF & video, pre/post test, skoring otomatis, kurikulum per jabatan, Talent Pool). Desain lengkapnya ada di `erp/docs/superpowers/specs/2026-08-05-lms-people-development-design.md`; ringkasannya di **Rollout Bertahap** di bawah
+	- **Kaderisasi / Talent Pool dicatat di [[HRIS - Career & Promotion]]**, bukan di sini. Pelatihan cuma alat ukurnya; yang dikelola adalah perpindahan jenjang
 - **Prioritas**: Fase E di [[HRIS - Roadmap]] (HR lifecycle, setelah Recruitment) — belum urgen; dokumen ini menyiapkan desain agar cepat dieksekusi saat gilirannya
 
 ## Latar Belakang

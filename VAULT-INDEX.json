@@ -92,20 +92,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "f01ccaf63d9fb92891932955e0051bcc11ccd01f5fd561bc935792c218bf667e",
-      "ukuran_kb": 23.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik gateway `/api/employee/*`, mulai dari login (password/PIN/biometrik), refresh token, dan onboarding akun, sampai CRUD personal_data, work_data, dokumen pribadi/kerja, jadwal kerja, ulang tahun karyawan, KPI, cuti, laporan, resign/non-aktif, serta promosi & mutasi. Menjelaskan juga siapa yang boleh memanggil tiap grup endpoint (RequireHRISStaff, RequireITStaff, RequireITSupervisor, RequireHRISOrITSupervisor, RBAC KPI per departemen) dan aturan khusus master data: CRUD departemen beserta supervised_by, definisi system role, job level per posisi, dan menu_hidden sebagai setelan tampilan yang bukan hak akses. Berguna pula untuk menjawab bagaimana akun pihak luar (vendor/mitra) berprefiks EXT- diterbitkan, diperpanjang, dinonaktifkan, dan dipasangi permission set maupun system role.",
+      "hash": "2afc797d9c1b90cc71bbe5810c0172121d983a485ba931c4ab57330c00733aeb",
+      "ukuran_kb": 23.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di employee-service lewat gateway `/api/employee/*`, mulai dari login (username/PIN/biometrik), onboarding, CRUD personal_data & work_data, dokumen, jadwal kerja, sampai master data departemen, system role, dan jenjang jabatan. Juga menjawab siapa yang boleh memanggil tiap grup rute (RBAC seperti `RequireHRISStaff`, `RequireITSupervisor`, `RequireHRISOrITSupervisor`) serta perilaku khusus tiap endpoint, misalnya PUT departemen yang mempertahankan `supervised_by`, `menu_hidden` yang hanya menyembunyikan menu tanpa mengubah hak akses, dan penolakan 400 untuk key jenjang yang tak dikenal. Termasuk grup akun pihak luar (vendor/mitra) berprefiks `EXT-`: penerbitan, perpanjangan masa berlaku, penonaktifan, permission set, dan system role.",
       "kata_kunci": [
-        "employee-service",
-        "karyawan",
-        "employee",
-        "HRIS",
+        "employee service",
         "endpoint",
-        "RBAC",
-        "auth login",
-        "master data departemen",
+        "API HRIS",
+        "auth",
+        "login",
+        "master data",
+        "departemen",
         "system roles",
-        "akun eksternal vendor"
+        "RBAC",
+        "akun eksternal"
       ]
     },
     {
@@ -1620,20 +1620,20 @@
         "CORE - RBAC dan Permission Set",
         "APP - Web ERP"
       ],
-      "hash": "b6d6cac5595a82574ae57e839e620eae302d3b1f96c6665435743cb446684d3a",
-      "ukuran_kb": 17.2,
-      "ringkasan": "Menjawab: bagaimana sebuah modul mendaftarkan fitur bertanggal ke kalender terpusat (endpoint `/internal/calendar-feed`, entri `providerRegistry`, env `<SERVICE>_MODULE_URL`), bentuk item feed apa yang wajib dipenuhi (`id` berprefiks sumber, `kind`, `all_day`, `scope`, `deep_link`, `status`), dan siapa yang boleh melihat sebuah agenda. Menjelaskan prinsip tiga lapis (data diri sendiri, pekerjaan sendiri, agenda perusahaan) beserta alasan mengapa penyaringan hak akses dikerjakan di service sumber, bukan di kalender. Juga memuat daftar endpoint publik lewat gateway (`GET /api/calendar`, CRUD agenda mandiri `event` termasuk PATCH sebagian dan pembatalan lunak), feed yang sudah terdaftar per service, serta gotcha seperti larangan memasukkan URL provider ke `ValidateInternalURL` dan perlakuan feed gagal sebagai `degraded`.",
+      "hash": "08273f46308669fff268ab2d1e4aa15cbf28639cb96f59de7c86725db7844ee2",
+      "ukuran_kb": 17.3,
+      "ringkasan": "Menjawab: bagaimana cara mendaftarkan feed agenda dari modul lain ke kalender terpusat (`GET /internal/calendar-feed` + satu baris di `providerRegistry` + env `<SERVICE>_MODULE_URL`), bentuk item apa yang wajib dikirim (`id` berprefiks sumber, `kind`, `all_day`, `scope`, `deep_link`, `status`), dan siapa yang boleh melihat tiap item. Juga menjawab mengapa fitur bertanggal dilarang membangun halaman kalender sendiri, apa isi prinsip tiga lapis visibilitas (data diri sendiri, pekerjaan sendiri, agenda perusahaan), dan mengapa penyaringan hak akses dikerjakan di service sumber, bukan di kalender. Memuat pula endpoint agenda mandiri (`event`), termasuk PATCH sebagian, pembatalan lunak, balasan 404 alih-alih 403, dan gotcha seperti larangan memasukkan URL provider ke `ValidateInternalURL`.",
       "kata_kunci": [
         "kalender",
-        "calendar service",
+        "calendar",
         "calendar feed",
         "agenda",
         "event",
         "deep_link",
+        "visibilitas",
+        "jadwal",
         "provider registry",
-        "all_day",
-        "visibilitas kalender",
-        "task_due"
+        "all_day"
       ]
     },
     {
@@ -1691,20 +1691,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "cb0c4f8d60b13f0b69dc7aeb5f007d748ed3a49af52f36cc913b9d5a2c169f15",
-      "ukuran_kb": 58.0,
-      "ringkasan": "Menjawab: di mana login dan onboarding karyawan diproses (`/auth/login`, login PIN/biometric, refresh token, `/onboarding/register`), bagaimana IT mengelola akun karyawan (aktif/nonaktif, forget-device, hard reset, `system_roles`), dan di mana master data departemen, posisi, serta system role disimpan dan di-CRUD. Menjelaskan pula bahwa service ini menjadi source of truth data karyawan (KPI, contract, BPJS, kuota cuti) sekaligus feed lintas-service, dan bahwa beberapa workspace divisi (Legal, R&D Regulatory, Quality, Procurement non-Accurate) sengaja dititipkan di sini agar tak menambah modul gateway baru. Berguna untuk menelusuri route mana yang gated oleh peran apa dan bagaimana multi-perusahaan (tenant) serta akun pihak luar diperlakukan.",
+      "hash": "0af906330bc3076bf5a384c9ce05ab6d51ab44ffb08be4ff5c02b67239db8503",
+      "ukuran_kb": 58.2,
+      "ringkasan": "Menjawab: apa saja yang ditangani employee-service sebagai sumber kebenaran autentikasi, onboarding, dan master data karyawan di seluruh ekosistem bip-erp, termasuk login (username/employee_id, PIN, biometrik), refresh token, hashing password/PIN, serta rute internal yang dikonsumsi service lain. Juga menjawab operasi admin akun oleh IT (`/account/active-status`, `forget-device`, `reset`, `roles`), CRUD departemen dan system role beserta gerbang RBAC-nya, dan mengapa workspace Legal, R&D Regulatory, Quality, dan Procurement non-Accurate ikut di-host di service ini alih-alih jadi service baru. Menjelaskan pula batas kepemilikan data seperti `work_data` dan satu-satunya tempat `is_active` ditulis.",
       "kata_kunci": [
         "employee service",
         "karyawan",
-        "login",
+        "employee",
+        "autentikasi",
         "auth",
         "SSO",
-        "onboarding",
+        "work_data",
         "master data",
-        "departemen",
-        "system roles",
-        "multi-tenant"
+        "akun eksternal",
+        "legal"
       ]
     },
     {
@@ -3787,8 +3787,8 @@
       "judul": "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "Diputuskan, kode di branch — belum merge, belum deploy. Irisan 1 (catat + terapkan) ada di branch `feat/employee-mutasi` (bip-erp); approval, kontrak baru, dan frontend belum dibangun.",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan). Irisan 1 (catat + terapkan) **merged ke `main`** 2026-08-10 lewat PR [#1142](https://github.com/bip-itteam-internal/bip-erp/pull/1142) (`a9a323dd`). ⚠️ **Belum diverifikasi lewat gateway hidup**, dan produksi belum di-deploy. Approval, kontrak baru, notifikasi, dan frontend belum dibangun.",
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
@@ -3805,20 +3805,20 @@
         "Microservices - File Service",
         "APP - Web ERP"
       ],
-      "hash": "dbec21da1b8d53e74263028f46ab3ab07ed1ff2a8725c8a28a489cd5bbc9e9c8",
-      "ukuran_kb": 9.4,
-      "ringkasan": "Menjawab: apa yang terjadi pada `employee_id` ketika karyawan pindah badan usaha (jawabannya: tidak pernah diterbitkan ulang, sehingga prefix perusahaan pada ID berhenti berarti dan `work_data.company_id` menjadi satu-satunya sumber kebenaran tenant). Menjelaskan bagaimana promosi dan mutasi disimpan dalam satu koleksi `employee_movement` dengan pembeda `type` yang dipilih HR (bukan disimpulkan dari jenjang), pola status `scheduled`/`applied`/`cancelled` plus cron harian 00:15 WIB, dan mengapa `company_id` catatan memakai perusahaan asal sementara sisi tujuan dibaca lewat `to_company_id`. Berisi pula konsekuensi yang diterima sadar (riwayat presensi tetap milik perusahaan lama, perusahaan tujuan tak punya suara, modul tanpa `company_id` tak ikut berpindah) dan daftar yang belum dikerjakan (approval, kontrak baru, frontend, notifikasi).",
+      "hash": "1affb4a0c906595cdb6363f2d45169e8d62c9680e877e810a4d51d93a84cba68",
+      "ukuran_kb": 9.6,
+      "ringkasan": "Menjawab: apa yang terjadi pada `employee_id` saat karyawan pindah perusahaan (tenant), dan mengapa ID sengaja tidak diterbitkan ulang walaupun prefiksnya adalah kode perusahaan sehingga prefix itu berhenti menandakan tenant. Juga menjawab bagaimana promosi dan mutasi disimpan dalam satu koleksi `employee_movement` yang dibedakan `type`, mengapa jenis perpindahan dipilih HR dan tidak disimpulkan dari jenjang, bagaimana status `scheduled`/`applied`/`cancelled` diterapkan cron harian, dan mengapa `company_id` catatan memakai perusahaan asal sementara sisi tujuan dibaca lewat `to_company_id`. Memuat konsekuensi yang sengaja diterima: perusahaan tujuan tanpa suara, riwayat lama tertinggal di tenant asal, atasan langsung dilepas, serta approval, kontrak baru, notifikasi, dan frontend yang belum dibangun.",
       "kata_kunci": [
         "mutasi",
-        "mutasi antar-perusahaan",
+        "mutation",
         "promosi",
-        "employee_movement",
+        "promotion",
         "employee_id",
         "multi-tenant",
         "company_id",
-        "transfer karyawan",
+        "employee_movement",
         "ADR 0044",
-        "cron mutasi"
+        "perpindahan antar-perusahaan"
       ]
     },
     {
@@ -4867,16 +4867,17 @@
       "judul": "HRIS - Career & Promotion",
       "area": "Human Resource Information System",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "Konsep / Draft — **tangga jenjang sudah di kode**; promosi/mutasi/riwayat belum ada, kaderisasi baru desain",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan) — **tangga jenjang** dan **modul promosi/mutasi** sudah di kode (yang kedua merged 2026-08-10, belum diverifikasi lewat gateway & belum punya frontend); **kaderisasi** baru desain",
       "publik": true,
       "tautan": [
         "HRIS - Organization Structure",
+        "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
+        "Microservices - Employee Service",
         "Microservices - Learning Service",
         "HRIS - Training Program",
         "HRIS - Matriks KPI per Departemen",
         "HRIS - Work Review",
-        "Microservices - Employee Service",
         "ADR - 0002 Database-per-Service",
         "HRIS - Key Performance Index",
         "HRIS - Compensation & Benefits",
@@ -4884,9 +4885,9 @@
         "HRIS - Analysis",
         "HRIS - Personalia"
       ],
-      "hash": "d837be80d96f6e738d57857d7e0c8bfe4026f7df1d56b8d702fe217321f86390",
-      "ukuran_kb": 9.1,
-      "ringkasan": "Menjawab: bagaimana jenjang karier, promosi, mutasi, dan kaderisasi direncanakan di ERP, termasuk lima tingkat jenjang di master_job_level dan cara jenjang menempel ke jabatan lewat position_items[].level_key. Menjelaskan desain Talent Pool (alur usulan atasan sampai persetujuan HR, status kandidat, model data talent_candidate di service learning) beserta pemisahan tegas antara yang dihitung sistem (penyelesaian kurikulum, nilai rata-rata) dan yang tetap keputusan manusia (layak dipromosikan), serta batas bahwa Talent Pool tidak menulis apa pun ke work_data.",
+      "hash": "a68528120c791ef4a1ae2daf2eb9f862d1832cb0e4537d00b627ace0eefa1c02",
+      "ukuran_kb": 10.6,
+      "ringkasan": "Menjawab: bagaimana jenjang karier, promosi, mutasi, dan kaderisasi dikelola di HRIS, apa yang tercatat saat karyawan berpindah posisi (tanggal efektif, alasan, dokumen SK, jejak yang bisa dibatalkan), dan mengapa jenis perpindahan dipilih HR alih-alih disimpulkan dari jenjang jabatan. Juga menjawab rancangan Kaderisasi/Talent Pool: alur usulan atasan sampai persetujuan HR, kapan kandidat mengetahui pencalonannya, apa yang dihitung sistem (persen penyelesaian kurikulum jabatan tujuan dan rata-rata nilai) versus yang sengaja tidak dihitung (putusan layak atau tidak layak), model data `talent_candidate` beserta transisi statusnya. Menjelaskan pula batas Talent Pool dengan modul promosi, yaitu mencatat persiapan tanpa pernah menulis ke `work_data`.",
       "kata_kunci": [
         "karier",
         "career",
@@ -4897,7 +4898,7 @@
         "talent pool",
         "succession planning",
         "jenjang jabatan",
-        "job level"
+        "employee_movement"
       ]
     },
     {
@@ -5313,21 +5314,20 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "c617b6b0257512b111cb97b375487c030eb269bf539ef92717b002023688a238",
-      "ukuran_kb": 21.1,
-      "ringkasan": "Menjawab: bagaimana departemen, posisi/jabatan, jenjang jabatan, dan hierarki atasan disusun serta di mana masing-masing disimpan (`master_department` dengan `positions[]` dan `position_items[]`, koleksi `master_job_level`, `work_data.supervisor_id`). Menjelaskan mengapa jenjang jabatan (Pelaksana, Senior/Officer, Leader, Supervisor, Direktur) adalah penanda organisasi dan bukan sumbu hak akses, bagaimana `rank` renggang memungkinkan penyisipan tingkat baru tanpa menyentuh dokumen jabatan, serta bagaimana departemen ter-scope per perusahaan sementara supervisi dan RBAC sengaja tetap global. Berguna untuk menjawab siapa atasan langsung seseorang, bagaimana cakupan supervisi antar-departemen (`supervised_by`) bekerja, dan di layar mana semua itu dikelola (`/hris/master-data`, `/hris/org-chart`, halaman atasan langsung).",
+      "hash": "2d0dbc8c510ed347ff9cb0bddcec987f8b7e428e9d87ae4b995f634f510d2e86",
+      "ukuran_kb": 21.2,
+      "ringkasan": "Menjawab: bagaimana struktur organisasi disusun di ERP, yaitu di mana departemen, posisi/jabatan, jenjang, dan hierarki atasan disimpan (`master_department`, `position_items[]`, `master_job_level`, `work_data.position_key`, `work_data.supervisor_id`) dan bagaimana cara mengelolanya lewat `/hris/master-data`. Juga menjawab mengapa jenjang jabatan adalah penanda organisasi dan bukan sumbu hak akses, mengapa nama jenjang dipisah dari angka `rank` yang dibuat renggang, mengapa tangga jenjang global sementara departemen ter-scope `company_id`, dan bagaimana `seedJobLevels` menilai per key tanpa menimpa nama yang sudah diubah HR. Memuat pula cakupan supervisi antar-departemen (`supervised_by`) dan urutan pencarian atasan langsung.",
       "kata_kunci": [
         "struktur organisasi",
         "organization structure",
         "departemen",
+        "department",
         "jabatan",
-        "posisi",
+        "position",
         "jenjang jabatan",
         "job level",
         "atasan langsung",
-        "supervisor",
-        "org chart",
-        "master data"
+        "supervisor"
       ]
     },
     {

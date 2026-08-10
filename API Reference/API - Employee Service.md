@@ -98,6 +98,21 @@ Seluruhnya `RequireHRISStaff` + isolasi tenant `EffectiveCompanyID`. Keputusan &
 | POST | `/resign/:id/cancel` | Batalkan. `scheduled` → hanya ubah status. `applied` → status diubah **dan** akun diaktifkan kembali, tapi **hanya bila catatan ini yang mematikannya** (`account_deactivated`) — akun yang sudah dinonaktifkan IT lebih dulu tidak ikut dihidupkan. `reason` wajib hanya saat pembatalan membuka kembali akses |
 | POST/GET | `/resign/:id/file` | Unggah / ambil dokumen pendukung. PDF, gambar (JPG/PNG), Word (DOC/DOCX); cap **4 MB** yang dipaku [[Microservices - File Service]]. Dinilai dari ekstensi **terakhir** (`surat.pdf.exe` ditolak). Unggah ulang mengganti berkas dan menghapus objek lama |
 
+## Promosi & Mutasi — ⚠️ merged ke `main` 2026-08-10 (PR [#1142](https://github.com/bip-itteam-internal/bip-erp/pull/1142)), belum diverifikasi lewat gateway & prod belum deploy
+Baca digerbang `gateHris(PermHrisView, RequireHRISStaff)`, tulis `gateHris(PermHrisWork, …)`. Keputusan & konsekuensinya: [[ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id]].
+
+Isolasi tenant **dua arah**: catatan distempel `company_id` = perusahaan **asal** supaya tak lenyap dari layar HR yang membuatnya, dan sisi tujuan membacanya lewat `to_company_id`.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/mutasi` | Daftar berpaginasi. Filter `type`·`status`(`scheduled`/`applied`/`cancelled`)·`department`·`search`. Dibaca dari dua arah (`company_id` ATAU `to_company_id`). Filter departemen mengenai **snapshot catatan** (`from_department`/`to_department`), bukan `work_data` hari ini — menyaring lewat `work_data` justru menyembunyikan orang yang sudah pindah, padahal merekalah isi daftar ini |
+| GET | `/mutasi/types` | Daftar jenis sah (`Promosi` · `Mutasi` · `Mutasi Antar-Perusahaan`). Dikirim server supaya form tak pernah menawarkan pilihan yang lalu ditolak validator |
+| GET | `/mutasi/employee/:employee_id` | Riwayat perpindahan satu karyawan, dua arah, termasuk yang dibatalkan |
+| POST | `/mutasi` | Body `employee_id`·`type`·`to_company_id`(hanya untuk jenis antar-perusahaan)·`to_department`·`to_position`·`effective_date`·`reason`. `position_key` & `level_key` diambil dari master, **tak pernah** dari body. Departemen/jabatan tujuan diverifikasi ke `master_department` perusahaan **tujuan** (400 bila tak ada). Tanggal hari ini atau mundur langsung diterapkan. 409 bila karyawan sudah punya catatan resign `applied`, atau sudah punya perpindahan `scheduled` |
+| PATCH | `/mutasi/:id` | Koreksi `effective_date`/`reason` saja. **Hanya `scheduled`** (409 selainnya). Tujuan sengaja tak bisa diubah: itu perpindahan yang berbeda, dan menumpangkannya membuat snapshot asal menceritakan perjalanan yang tak pernah terjadi. Koreksi yang memajukan tanggal ke hari ini atau mundur langsung diterapkan |
+| POST | `/mutasi/:id/cancel` | Batalkan. `scheduled` → hanya ubah status. `applied` → posisi **dikembalikan dari snapshot asal**, termasuk `company_id` dan `supervisor_id`; filternya menyebut posisi tujuan sehingga hanya karyawan yang masih duduk di sana yang dikembalikan (409 bila datanya sudah berubah). `reason` wajib hanya bila pembatalan benar-benar mengembalikan jabatan |
+| POST/GET | `/mutasi/:id/file` | Unggah / ambil SK. Aturan berkas **dipakai bersama** lampiran resign: PDF, gambar, Word; cap 4 MB; dinilai dari ekstensi terakhir. GET dibaca dua arah supaya perusahaan tujuan bisa membuka SK orang yang masuk |
+
 ## Listing · View · Me
 | Method | Path | Fungsi |
 |---|---|---|
