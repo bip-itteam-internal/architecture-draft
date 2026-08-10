@@ -53,6 +53,7 @@ Aturan turunannya:
 
 - **Menyalakan saklar sempat menuntut jadwal dipilih ulang.** Form edit jadwal membaca `schedule_id` saja, sedangkan karyawan `pattern` menyimpannya di `group_id`, sehingga kotaknya kosong dan validasi menolak. Digabung dengan saklar yang dulu hanya tersimpan setelah form jadwal lolos validasi, HR yang cuma ingin menyalakan roster dipaksa memilih ulang jadwal — dan salah pilih berarti mengubah jadwal kerja orang itu, dengan delapan varian grup Host Live yang bernama mirip. Diperbaiki di erp-frontend #809: jadwal dibaca `schedule_id ?? group_id`, dan jadwal hanya ditulis bila pemakai benar-benar menyentuhnya.
 - **Alur halaman tidak terbaca sendiri.** Pemakai harus memilih sel DULU sebelum tombol pengisian aktif, dan tombol itu bernama "Terapkan" walau fungsinya membuka editor. Ditambah bayangan jadwal dasar yang mencetak nama grup panjang di setiap kotak, grid terlihat seperti sudah terisi. Ditutup sementara lewat panduan in-app (#811); perbaikan tampilannya sendiri belum dikerjakan.
+- **Dua menu untuk satu urusan.** Personalia berakhir dengan "Jadwal" dan "Roster" bersebelahan, padahal keputusan nomor 1 di atas justru menyatakan roster adalah lapisan DI ATAS jadwal dasar dan bukan penggantinya — dua entri sejajar menyembunyikan hubungan itu, dan pemakai tak punya petunjuk mana yang harus dibuka lebih dulu. Roster karena itu **dibubarkan jadi tab keempat di `/hris/schedule`** (branch `feat/gabung-jadwal-roster`, ⚠️ **belum merge**); `/hris/roster` tetap hidup sebagai penerus ke `?tab=roster`. Rincian bentuk dan konsekuensinya, termasuk **gerbang rutenya yang ikut menyempit jadi menuntut `roles.hris`**, ada di [[APP - Web ERP]].
 
 **Yang belum dikerjakan (menyusul):**
 
@@ -75,4 +76,4 @@ Aturan turunannya:
 - [[HRIS - Attendance System]] (konsep presensi) · [[HRIS - Attendance Correction]] (jalur perbaikan masa lalu)
 - [[HRIS - Tukar Jadwal Kerja]] (ditutup untuk karyawan roster) · [[ADR - 0006 Swap Jadwal Same-Department]]
 - [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] (isolasi tenant) · [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] (gerbang hak akses)
-- [[APP - Web ERP]] (halaman HRIS → Personalia → Roster) · [[IT - Background Jobs & Schedulers]] (cron penyemaian)
+- [[APP - Web ERP]] (HRIS → Personalia → **Jadwal**, tab Roster) · [[IT - Background Jobs & Schedulers]] (cron penyemaian)

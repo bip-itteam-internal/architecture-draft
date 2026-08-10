@@ -972,20 +972,20 @@
         "Microservices - Employee Service",
         "Microservices - Notification Service"
       ],
-      "hash": "cf1bb65cdfc10e94300ffdc9e40ed0a7013c2d1523b5146aba775887b419e61a",
-      "ukuran_kb": 24.6,
-      "ringkasan": "Menjawab: fitur apa saja yang tersedia di aplikasi mobile HRIS karyawan (absensi, cuti/izin, lembur, payroll, KPI, survei, Kaizen), bagaimana login dan pengamanannya bekerja (JWT, PIN, biometric, 1 akun 1 device), dan bagaimana aplikasi terhubung ke backend lewat gateway. Juga menjawab tech stack Flutter dan pola Clean Architecture per fitur, serta bagian mana yang berbeda untuk perusahaan non-BIP dalam skema multi-perusahaan.",
+      "hash": "99640b6edf0039e1c572440349fbdc1f2a265481dc8639f8eb173e40b328a93d",
+      "ukuran_kb": 25.4,
+      "ringkasan": "Menjawab: apa saja yang bisa dikerjakan karyawan lewat aplikasi mobile HRIS MyBharata (absen QR + geofencing + biometric, cuti/izin, lembur, slip gaji, KPI, survei, Kaizen), dan bagaimana aplikasinya dibangun (Flutter, Clean Architecture feature-first, BLoC, dio lewat API Gateway, JWT Bearer bukan SSO ticket). Menjawab juga versi mana yang sedang beredar di HP pemakai versus yang masih menggantung di dev, dan bagian mana yang sudah ter-scope multi-perusahaan sedangkan sisanya masih TBD di backend.",
       "kata_kunci": [
-        "mybharata",
-        "mobile",
-        "flutter",
-        "aplikasi karyawan",
-        "HRIS mobile",
-        "attendance",
+        "MyBharata",
+        "aplikasi mobile",
+        "Flutter",
         "absensi",
+        "attendance",
         "cuti",
+        "leave",
         "lembur",
-        "biometric"
+        "payroll",
+        "multi-perusahaan"
       ]
     },
     {
@@ -1114,20 +1114,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "ff93351ee526c7f37956f9478b4e4a26d2f428a5ef9326290e5b199e839a4c83",
-      "ukuran_kb": 194.9,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS internal Bharata (hris-dashboard \"One Bharata\"), stack dan repo mana yang dipakai, serta modul apa saja yang tersedia di dalamnya. Menjelaskan cara login dan refresh token, bagaimana role dari system_roles menentukan menu yang tampil, dan bagaimana web ini berperan sebagai SSO Identity Provider bagi aplikasi lain seperti Task Manager. Juga menjawab pertanyaan seputar dukungan multi-perusahaan (company switcher, departemen/shift/network per-perusahaan), struktur pengelompokan menu sidebar, dan bagaimana halaman Pengaturan HRGA terpusat menyaring akses per tab.",
+      "hash": "1994844553d65ab97a93c4f81ebdf676bf0c5f6e34e58ee188718facac3e2cbd",
+      "ukuran_kb": 198.6,
+      "ringkasan": "Menjawab: modul apa saja yang ada di portal web ERP/HRIS internal (hris-dashboard \"One Bharata\"), siapa yang boleh melihat menu mana, dan bagaimana halaman-halaman itu dirakit (pola satu kartu, Banner di dalam MainTable, CustomTabs, i18n dua bahasa). Menjawab juga bagaimana login, SSO Identity Provider, dan gerbang rute `proxy.ts` bekerja, termasuk rute lama yang meneruskan setelah menu dibubarkan jadi tab. Bagian \"Belum Diimplementasikan / Catatan\" merekam gap yang masih terbuka beserta jebakan komponen bersama yang sudah terbukti menggigit.",
       "kata_kunci": [
-        "web ERP",
         "erp-frontend",
-        "hris-dashboard",
+        "web ERP",
         "One Bharata",
-        "frontend Next.js",
-        "SSO Identity Provider",
-        "system_roles",
+        "Next.js",
+        "sidebar",
+        "menu",
         "role gating",
-        "multi-perusahaan",
-        "Pengaturan HRGA"
+        "SSO",
+        "proxy.ts",
+        "middleware"
       ]
     },
     {
@@ -3520,6 +3520,7 @@
         "Microservices - Attendance Service",
         "HRIS - Attendance Correction",
         "Microservices - Employee Service",
+        "APP - Web ERP",
         "APP - MyBharata",
         "API - Attendance Service",
         "API - Employee Service",
@@ -3528,24 +3529,22 @@
         "ADR - 0006 Swap Jadwal Same-Department",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
-        "APP - Web ERP",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "1d31dc122c37f580aac288f61d13c813a92bc43389b84ae2fc638c4fc280d848",
-      "ukuran_kb": 9.9,
-      "ringkasan": "Menjawab: kenapa fitur roster harian dibuat (untuk posisi tanpa pola jadwal tetap seperti Host Live Kyura), aturan urutan menang antara roster, jadwal dasar, hari libur, dan event perusahaan, serta konsekuensi dan bug yang muncul saat fitur ini dipakai di produksi (sinkronisasi satu arah roster_enabled, slice null, tipe frontend yang keliru asumsi).",
+      "hash": "fbfbc97f21b89ad93036b820146af01904988d716c31ecdea9d4fa0c48643cda",
+      "ukuran_kb": 10.6,
+      "ringkasan": "Menjawab: kenapa jadwal boleh ditentukan per orang per tanggal untuk posisi yang tak berpola seperti Host Live, dan apa saja aturan turunannya (roster menumpuk di atas jadwal dasar bukan menggantikannya, tanggal kosong berperilaku seperti sebelum fitur ada, urutan menang event perusahaan lalu roster lalu libur lalu jadwal dasar, tanggal lampau read-only, Tukar Shift ditutup). Menjawab juga konsekuensi yang sudah terasa saat dipakai: saklar `roster_enabled` mengalir satu arah dari database employee, allowlist proyeksi bisa menelan field baru, dan menu Roster akhirnya dibubarkan jadi tab di halaman Jadwal.",
       "kata_kunci": [
         "roster",
-        "jadwal dasar",
-        "ADR 0036",
+        "jadwal harian",
         "Host Live",
         "Kyura",
         "roster_enabled",
-        "resolveEmployeeScheduleWithRoster",
-        "schedule override",
+        "schedule_type",
+        "shift",
+        "attendance",
         "tukar shift",
-        "static",
-        "pattern"
+        "resolver jadwal"
       ]
     },
     {
