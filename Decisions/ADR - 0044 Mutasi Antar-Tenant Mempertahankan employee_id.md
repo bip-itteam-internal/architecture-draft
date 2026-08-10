@@ -63,7 +63,11 @@ Ditandai **sementara** oleh pemutusnya sendiri. Konsekuensi yang perlu disadari 
 
 **Prasyarat perpindahan (post-test LMS) — PONDASI, belum gerbang:**
 
-Aturan yang dituju: naik jabatan atau pindah posisi menuntut post-test LMS jabatan tujuan lebih dulu. LMS-nya belum ada ([[Microservices - Learning Service]] baru memuat pelatihan tatap muka), jadi **belum ada satu pun pemeriksa terdaftar dan tak ada perpindahan yang tertahan**. Yang dipasang cuma sambungannya (`DaftarkanPrasyarat`, meniru idiom `DaftarkanSumber` sumber KPI), plus tempat menyimpan jawabannya di catatan.
+Aturan yang dituju (diputuskan 2026-08-10): **naik jabatan atau pindah posisi menuntut LULUS POST-TEST seluruh course wajib pada kurikulum jabatan TUJUAN.** LMS-nya belum ada ([[Microservices - Learning Service]] baru memuat pelatihan tatap muka), jadi **belum ada satu pun pemeriksa terdaftar dan tak ada perpindahan yang tertahan**.
+
+Yang diukur adalah **course**, bukan kehadiran kelas. Kehadiran bukan penguasaan — orang bisa duduk tiga jam di ruang pelatihan tanpa memahami apa pun, dan modul Pelatihan yang ada akan mencatatnya sebagai hadir dan selesai tanpa ada yang terlihat salah. Jalur belajarnya sendiri **bebas**: mandiri atau ikut kelas tatap muka, yang menentukan tetap post-test-nya. Ikut kelas tanpa lulus post-test **tidak** memenuhi prasyarat.
+
+Pilihan itu juga yang membuat pemeriksanya cukup satu lookup: `curriculum` berkunci `{department_key, position_key}`, persis kunci yang dipakai jabatan, jadi "sudah lulus post-test jabatan tujuan?" tak perlu ditafsirkan dari dua jalur berbeda. Yang dipasang cuma sambungannya (`DaftarkanPrasyarat`, meniru idiom `DaftarkanSumber` sumber KPI), plus tempat menyimpan jawabannya di catatan.
 
 Dua sifat menjaganya tidak berubah jadi jebakan, keduanya dikunci uji: tanpa pemeriksa terdaftar **tak ada yang tertahan**, dan pemeriksa yang **gagal dihubungi tidak menahan** — kalau menahan, satu service yang mati mengunci pencatatan mutasi seluruh perusahaan padahal tanggal perpindahan sudah berjalan.
 

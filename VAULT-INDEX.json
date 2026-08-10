@@ -1980,25 +1980,28 @@
         "ADR - 0002 Database-per-Service",
         "API - Learning Service",
         "Microservices - Form Builder Service",
-        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "HRIS - Recruitment",
         "DB - Overview and Notes",
+        "Microservices - Notification Service",
         "CORE - API Master Gateway",
         "APP - Web ERP",
-        "API - Index"
+        "API - Index",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id"
       ],
-      "hash": "aa52a8054f8b86ab37b374c2fa6fba2f0d0c5be2bae78914cc35363fe02fc34d",
-      "ukuran_kb": 7.6,
-      "ringkasan": "Menjelaskan microservice Learning Service untuk mengelola training karyawan: stack teknologi (Go + Fiber + MongoDB), endpoint CRUD yang sudah hidup untuk jenis training, trainer, event, dan peserta dengan kehadiran, status implementasi di dev dan produksi, serta catatan penting tentang multi-tenant company_id yang wajib di-implement di fase berikutnya.",
+      "hash": "b5ef605bb39d7ff1bc575958256a35a813e0d457659ca69b66de2d95ce5ce763",
+      "ukuran_kb": 11.9,
+      "ringkasan": "Menjawab: service mana yang melayani modul pelatihan karyawan (Go + Fiber + MongoDB `learning_db`, port 6987, modul gateway `learning`), kenapa Training dipisah dari Employee Service, dan endpoint apa saja yang tersedia (master jenis pelatihan, trainer, event training, peserta & kehadiran, pengajuan, evaluasi). Menjelaskan cara verifikasi departemen lewat panggilan internal ke Employee Service beserta pemetaan galatnya (404 jadi 400, sisanya 502) dan kenapa `EMPLOYEE_MODULE_URL` sengaja tidak masuk map `InternalURL`. Juga menjawab bagaimana rantai approval pengajuan pelatihan SPV lalu HR bekerja (siapa yang dilewati, kenapa penolakan final) dan bagaimana privasi evaluasi trainer dijaga (penilai anonim, agregat minimal tiga responden).",
       "kata_kunci": [
-        "learning",
-        "training",
+        "learning service",
         "pelatihan",
-        "microservice",
+        "training",
         "LMS",
-        "course",
-        "multi-tenant",
-        "kehadiran",
-        "attendance"
+        "training request",
+        "pengajuan pelatihan",
+        "evaluasi trainer",
+        "trainer evaluation",
+        "peserta pelatihan",
+        "EMPLOYEE_MODULE_URL"
       ]
     },
     {
@@ -5877,20 +5880,20 @@
         "HRIS - Big Pictures",
         "HRIS - Analysis"
       ],
-      "hash": "00ff39365a8f0d0fc3eeaf74595c33979256bcfcd531a0d6401c30f8659da39c",
-      "ukuran_kb": 16.9,
-      "ringkasan": "Menjawab: bagaimana program pelatihan karyawan dirancang dan dijalankan, mulai dari master Training Types dan Trainers sampai transaksi Training plus pencatatan peserta dan kehadiran. Menjelaskan fitur mana dari modul Training ERPGo yang diambil, disesuaikan, atau dibuang (misalnya Branch diganti Department, Cost hanya informasional karena pembukuan lewat Accurate), model data yang diusulkan, alur proses bisnis MVP, keputusan menempatkannya di service learning tersendiri, serta rencana lanjutannya menjadi LMS People Development.",
+      "hash": "ad208cf37bfee15dc998df8f6b8b6ca540145f17e6e6f1d6c2a2676b1fcf3607",
+      "ukuran_kb": 18.6,
+      "ringkasan": "Menjawab: apa cakupan MVP program pelatihan & pengembangan karyawan (training types, trainers, event training, peserta & kehadiran), bagaimana alur prosesnya dari penyiapan master, penjadwalan, penugasan peserta, sampai riwayat per karyawan. Menjelaskan fitur modul Training ERPGo mana yang diambil, disesuaikan, atau dibuang (mis. Branch diganti Department karena perusahaan single-site, Cost hanya informasional karena pembukuan lewat Accurate) serta bentuk model datanya per collection. Juga menjawab di mana modul ini ditempatkan secara arsitektur (kini Learning Service, UI `/hris/training`) dan apa saja yang ditunda ke fase lanjut seperti sertifikat PDF, notifikasi undangan, dan kelanjutan ke LMS People Development.",
       "kata_kunci": [
-        "training",
-        "pelatihan",
         "training program",
+        "pelatihan karyawan",
+        "training & development",
+        "training types",
         "trainer",
-        "training type",
-        "peserta kehadiran",
-        "LMS",
-        "people development",
-        "learning service",
-        "ERPGo"
+        "kehadiran peserta",
+        "ERPGo",
+        "LMS People Development",
+        "HRIS",
+        "MVP pelatihan"
       ]
     },
     {

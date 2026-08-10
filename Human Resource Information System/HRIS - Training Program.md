@@ -68,7 +68,9 @@ Collection baru di database Employee Service (MongoDB), sejajar dengan `master_d
 4. **Eksekusi & monitoring** — status mengikuti siklus **Scheduled → Ongoing → Completed** (atau **Cancelled**). Saat/'sesudah acara, HR menandai **kehadiran** peserta.
 5. **Riwayat** — dari `training_participant`, muncul **riwayat pelatihan per-karyawan** (fondasi untuk umpan KPI & pengembangan karir di fase lanjut).
 
-**Karakteristik:** seluruh entitas tersegmentasi per **Department** (bukan Branch). Field **Cost** = **informasional** (perencanaan anggaran; tanpa integrasi akunting). **Max Participants** = **cap keras** — penugasan peserta ditolak saat kuota penuh.
+**Karakteristik:** seluruh entitas tersegmentasi per **Department** (bukan Branch). Field **Cost** = **informasional** (perencanaan anggaran; tanpa integrasi akunting). **Max Participants** = **cap keras** — penugasan peserta ditolak saat kuota penuh; `0` berarti tanpa batas.
+
+> ⚠️ Kalimat "cap keras" di atas **tidak benar sampai 2026-08-10**. Kolomnya dikumpulkan, disimpan, dan disebut cap keras di tiga tempat sekaligus (komentar field, komentar rute, dan dokumen ini) sementara `CanEnroll` tak pernah menerima kapasitasnya — HR mengisi kuota 20, orang ke-21 masuk tanpa keluhan apa pun. Ditegakkan di PR [#1147](https://github.com/bip-itteam-internal/bip-erp/pull/1147). Dicatat, bukan dihapus: dokumentasi yang menyatakan aturan yang tak ditegakkan kode adalah kelas kesalahan tersendiri, dan menghapus jejaknya menghapus juga pelajarannya.
 
 ## Aktor & Role / Persona
 
@@ -136,16 +138,16 @@ Alasan yang dipakai saat itu, disimpan sebagai jejak keputusan:
 - [x] **MVP-1 — Master** (✅ BE+FE) — `training_type` + `trainer` (internal/eksternal) CRUD.
 - [x] **MVP-2 — Transaksi** (✅ BE+FE) — `training` CRUD + list (filter Department+Status) + status lifecycle.
 - [x] **MVP-3 — Peserta & Kehadiran** (✅ BE+FE) — assign multi-select + tandai hadir + **riwayat per-karyawan**.
-- [ ] **Fase lanjut A** — **Evaluasi pasca-pelatihan** (rating purpose-built) → umpan [[HRIS - Key Performance Index]].
+- [x] **Fase lanjut A — Evaluasi pasca-pelatihan** (✅ BE, 2026-08-10, PR [#1149](https://github.com/bip-itteam-internal/bip-erp/pull/1149)) — **peserta menilai trainer**, empat aspek tetap 1..5. Agregat baru tampil setelah **minimal 3 responden** dan identitas penilai tak pernah keluar, sebab trainer internal bisa jadi atasan pesertanya sendiri. Umpan ke [[HRIS - Key Performance Index]] **belum** disambung. FE belum ada.
 - [ ] **Fase lanjut B** — **Sertifikat PDF** (MinIO via [[Microservices - File Service]]).
-- [ ] **Fase lanjut C** — **Request/approval pelatihan** (rantai **SPV → HR Training Officer → Direktur**, administratif; pola [[HRIS - Employee Request & Approval]]) + **notifikasi** ([[Microservices - Notification Service]]).
+- [x] **Fase lanjut C — Request/approval pelatihan** (✅ BE, 2026-08-10, PR [#1148](https://github.com/bip-itteam-internal/bip-erp/pull/1148)) — rantainya **SPV → HR**, ⚠️ **bukan** SPV → HR → Direktur seperti tertulis semula. [[HRIS - Recruitment]] pernah memakai bentuk tiga tahap itu lalu membuang tahap Direktur; meminta pelatihan lebih ringan daripada meminta tambahan karyawan, jadi membuatnya lebih berat akan terbalik. `estimated_cost` disimpan supaya ambang biaya bisa ditambahkan tanpa migrasi. Notifikasi memakai kategori `request-*` yang sudah ada ([[Microservices - Notification Service]]), jadi tanpa deploy dua container. FE belum ada.
 - [ ] **Fase lanjut D (opsional)** — AI assist deskripsi · grid view · integrasi ke [[HRIS - Career & Promotion]] / [[HRIS - Work Review]].
 
 ## Belum Diputuskan (TBD)
 
 > *Sebagian TBD sebelumnya sudah diputuskan — lihat **Keputusan** (pemilik proses, kehadiran, kapasitas, rantai approval).*
 
-- **Evaluasi**: aspek yang dinilai & bobot; siapa menilai (peserta menilai trainer, atau trainer/HR menilai peserta, atau keduanya?); apakah hasil masuk KPI.
+- ~~**Evaluasi**: aspek yang dinilai; siapa menilai~~ — **diputuskan & dibangun 2026-08-10**: peserta menilai trainer, empat aspek tetap tanpa bobot. Arahnya sengaja satu — menilai peserta sudah jadi urusan post-test nanti, dan menambahkan penilaian trainer atas peserta melahirkan dua angka yang mengukur hal sama dengan cara tak sebanding. **Yang masih terbuka**: apakah hasilnya masuk KPI, dan bagaimana agregat di bawah 3 responden ditampilkan di layar (server sudah menyembunyikan angkanya).
 - **Sertifikasi/kompetensi**: apakah dilacak sebagai kompetensi karyawan (link ke [[HRIS - Career & Promotion]]).
 - **Trigger onboarding**: apakah karyawan baru ([[HRIS - Recruitment]]) otomatis di-enroll pelatihan awal.
 - **Penuh-kuota**: perilaku saat `max_participants` tercapai — tolak keras + waitlist, atau tolak saja? (default MVP: tolak tanpa waitlist).
