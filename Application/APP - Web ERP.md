@@ -404,8 +404,11 @@ Isinya menyusun dari yang sudah ada, bukan membangun sumber baru:
 | Riwayat keputusan | `as=reviewed` | — |
 | Payroll run menunggu | `/payroll-runs` status `draft` | menautkan ke halaman run |
 | Pesanan Pembelian menunggu | `/pesanan-erp/persetujuan` | menautkan ke `/persetujuan/pesanan-pembelian` |
+| Rekrutmen — penawaran & permintaan karyawan | `/offers` + `/requisitions` | menautkan ke halaman Rekrutmen |
 | Kinerja seluruh divisi | `/kpi/dashboard` | — |
 | Posisi keuangan | `/profit/products` (omzet, laba kotor, margin) | — |
+
+Penyaringan penawaran menuntut **dua** syarat, bukan satu: `status = Draft` DAN approval belum `Approved`. Offer yang sudah disetujui TETAP berstatus Draft sampai dikirim ke kandidat, jadi menyaring dari status saja memunculkan kembali offer yang baru diputus — dan penyetujunya akan mengira keputusannya tak tersimpan.
 
 **Empat endpoint di atas sudah lama ada dan TAK PUNYA satu pun pemanggil di frontend** sebelum layar ini: `request/view`, `business-trip/view`, `kpi/dashboard`, dan `pesanan-erp/persetujuan`. Yang terakhir bahkan punya layar keputusan lengkap yang tak bisa dicapai siapa pun sejak menunya dicabut dari Portal Saya — lihat [[REF - Alur Persetujuan]].
 
