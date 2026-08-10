@@ -1,0 +1,274 @@
+# Checklist Review — bip-erp
+
+> Dipakai oleh `/review`. **Jangan** di-import ke `CLAUDE.md` (akan membakar konteks tiap
+> sesi); dibaca **on-demand** saat `/review` dijalankan.
+>
+> Sumber: diadaptasi dari checklist review [gstack](https://github.com/garrytan/gstack)
+> (MIT) + gotcha yang sudah terbukti menggigit di bip-erp (lihat `team-memory.md`).
+> Kategori Rails/Python/SQL asli dibuang, diganti padanan Go/Fiber/MongoDB/Next.js.
+
+Update file ini cukup `git pull architecture-draft` (tak perlu re-run `init`).
+
+---
+
+## Cara pakai
+
+Baca diff, cari **masalah nyata**. Lewati yang sudah benar. Tiap temuan wajib
+`file:line` + saran fix konkret. Jangan menulis ringkasan "secara umum sudah bagus".
+
+**Dua pass:**
+- **Pass 1 (KRITIS)** — jalankan lebih dulu. Kelas bug yang sudah pernah lolos ke dev/prod.
+- **Pass 2 (INFORMASIONAL)** — severity lebih rendah, tetap ditindak.
+
+**Format keluaran:**
+
+```
+Review: N temuan (X kritis, Y informasional)
+
+**SUDAH DIPERBAIKI:**
+- [file:line] Masalah -> fix yang diterapkan
+
+**BUTUH KEPUTUSAN:**
+- [file:line] Deskripsi masalah
+  Saran fix: ...
+```
+
+Bila bersih: `Review: tidak ada temuan.`
+
+---
+
+## Gerbang verifikasi SEBELUM melapor (wajib)
+
+Kelas false-positive paling sering adalah "field/fungsi ini tidak ada" padahal ada,
+atau "tidak ditangani" padahal ditangani di berkas lain. Diff saja tidak cukup.
+
+Sebelum menulis satu pun temuan:
+
+1. **Baca berkasnya utuh**, bukan cuma potongan diff. Perubahan di baris 40 bisa sudah
+   ditangani di baris 12 yang tidak muncul di diff.
+2. **Bila temuan menyebut sesuatu "tidak ada"** (field, handler, konstanta, key locale),
+   buktikan dengan Grep dulu. Tidak ketemu di diff bukan berarti tidak ada di repo.
+3. **Bila temuan menyebut consumer "tidak menangani" nilai baru**, buka berkas consumer-nya
+   dan baca. Jangan menyimpulkan dari nama berkas.
+4. **Bila ragu, turunkan jadi pertanyaan**, bukan pernyataan. Review yang sering salah
+   akan diabaikan, dan itu lebih buruk daripada review yang melewatkan satu hal.
+
+---
+
+## Pass 1 — KRITIS
+
+### A. Lapisan glue: rute, binding, gateway
+
+Kelas bug paling mahal di bip-erp: kodenya benar, tapi tak pernah terpanggil.
+
+- **Rute akar modul didaftarkan di `app.Get("/<module>")`.** Gateway MEMBUANG prefix
+  `/api/<module>` sebelum meneruskan (`routes.Reroute` -> `strings.TrimPrefix`), jadi
+  rute akar harus `app.Get("/")`. Salah taruh = 404 untuk SEMUA permintaan lewat jalur
+  normal, sementara unit test tetap hijau karena memanggil path lokal langsung ke Fiber.
+  (calendar-service 2026-08-06, PR #1041)
+- **Struct request tidak ikut diperbarui saat menambah field fitur.** Fitur bisa MERGED,
+  DEPLOYED, dan tetap mustahil dipakai karena `<x>Request` tak punya field-nya. Telusuri
+  field baru dari body JSON -> struct binding -> service -> repository. Putus di mana pun =
+  fitur mati senyap. (form-builder `recurrence`, PR terkait #1018)
+- **`c.JSON()` dipakai sebagai nilai galat.** `c.JSON()` mengembalikan `nil` saat sukses,
+  jadi `return nil, c.Status(400).JSON(x)` sebenarnya `return nil, nil`; penjaga
+  `if err != nil` tak pernah menyala, lalu memanik dengan pointer nil dan gateway membalas
+  502. Pola aman: kembalikan `(*T, bool)`, pemanggil `return nil` saat `ok` false.
+  Mengembalikan error non-nil juga salah (Fiber menulis respons kedua). (PR #1018)
+- **`mongodb.GetCollection` dipanggil tanpa penjaga `mongodb.DB == nil`.** Panic-nya tak
+  terlihat sebagai panic: fasthttp memutus koneksi, gateway membalas 502, respons tanpa
+  petunjuk.
+
+### B. Hak akses & visibilitas
+
+- **Rute `/internal/` tanpa gerbang identitas sendiri.** `/internal/` **bukan** privat:
+  gateway tetap meneruskannya dari internet. Tiap rute internal wajib memeriksa identitas
+  pemanggil sendiri.
+- **RBAC: key `system_roles` dipakai sebagai nama departemen.** Key = **kode MODUL**
+  (`it`, `hris`, `finance`, `ga`), bukan nama departemen. `system_roles` = hak akses
+  modul/menu, **bukan hierarki org**; atasan/supervisor ada di `work_data`
+  (`is_supervisor:true` + `department`).
+- **Feed kalender menyaring pakai RBAC modul asalnya.** "Boleh diakses" bukan "layak muncul
+  di kalender". Prinsip tiga lapis: kalender memuat data DIRI SENDIRI, PEKERJAAN sendiri,
+  dan AGENDA PERUSAHAAN. Data pribadi orang lain tak boleh masuk sekalipun pemanggilnya
+  supervisor. (PR #1047)
+- **Fallback yang meloloskan semua orang.** Bila resolver hak akses gagal/kosong lalu
+  jatuh ke "izinkan", itu bug keamanan, bukan ketahanan. Cek arah fallback-nya.
+
+### C. Kelengkapan enum & nilai baru
+
+Kelas bug berulang nomor satu. Bila diff memperkenalkan nilai enum, status, tipe, atau
+kategori baru:
+
+- **Telusuri ke SEMUA consumer, dengan MEMBACA berkasnya, bukan grep saja.** Grep nilai
+  saudaranya (mis. nilai lama di enum yang sama) untuk menemukan tiap `switch`, filter,
+  daftar-izin, dan tampilan. Kesalahan lazim: nilai ditambah di dropdown frontend tapi
+  model/compute backend tak menyimpannya.
+- **Kategori inbox notifikasi**: `notification.InboxCategories` di `shared-library` adalah
+  **daftar-izin**. Kategori di luar daftar ditolak 400 dan pengiriman best-effort, jadi
+  gagalnya **senyap**. Kategori terdaftar-tapi-KELIRU lebih sering dan lebih senyap lagi
+  (MyBharata memilih label/warna/ikon dari kategori). **Jangan andalkan `default`** pada
+  pemetaan kategori; petakan tiap tipe eksplisit dan uji kategori yang BENAR, bukan sekadar
+  terdaftar. (PR #1050)
+- **Rantai `if-else` / `switch`**: apakah nilai baru jatuh ke default yang salah?
+
+### D. Konkurensi & keutuhan data (MongoDB)
+
+- **Read-check-write tanpa unique index.** `FindOne` lalu `InsertOne` tanpa indeks unik =
+  duplikat saat permintaan paralel. Tangani duplicate-key error dan retry.
+- **Transisi status tidak atomik.** Pakai `UpdateOne` dengan filter menyertakan status LAMA,
+  bukan baca-lalu-tulis. Tanpa itu, dua permintaan bisa melewati atau menggandakan transisi.
+  (kelas bug pengajuan ganda, PR #494)
+- **`PATCH` yang sebenarnya menimpa penuh.** Permintaan tanpa sebuah field menghapus isinya
+  tanpa pesan. Pola aman: struct patch **seluruhnya pointer** (nil = jangan sentuh) supaya
+  nilai kosong bisa dibedakan dari tak-disebut, lalu validasi **HASIL GABUNGAN**, bukan
+  perubahannya saja. (PR #1067)
+- **N+1**: memanggil service/koleksi lain di dalam loop. Kumpulkan id lalu satu query
+  `$in`.
+- **Menulis ulang resolusi milik modul lain.** Panggil resolver aslinya; urutan menangnya
+  sering berlapis dan menyalinnya melahirkan sumber kebenaran kedua yang pasti menyimpang.
+
+### E. Batas kepercayaan input eksternal
+
+Berlaku untuk keluaran LLM (scraping, sentiment, Veo), webhook marketplace, dan upload.
+
+- Nilai dari LLM/pihak ketiga ditulis ke DB atau diteruskan ke mailer tanpa validasi bentuk.
+- Keluaran terstruktur (array/objek) diterima tanpa cek tipe sebelum ditulis ke DB.
+- URL dari sumber luar di-fetch tanpa allowlist (risiko SSRF ke jaringan internal).
+- Nilai user-controlled dirender tanpa escape (`dangerouslySetInnerHTML`).
+- Upload: file-service dibatasi **4 MB** dan prefix per access key. Cek batas ditegakkan
+  di sisi pemanggil, jangan mengandalkan pesan galat service.
+
+---
+
+## Pass 2 — INFORMASIONAL
+
+### F. Nama field & tag bson/json
+
+- **Tag `bson` tidak cocok dengan nama field di koleksi.** Gejalanya senyap: field terbaca
+  sebagai nilai nol, bukan error. Cocokkan dengan dokumen nyata atau Data Dictionary di vault.
+- **Fixture rakitan tangan tak pernah melewati decode BSON**, jadi ketidakcocokan tipe
+  (mis. `primitive.A`) lolos di test tapi jatuh di runtime.
+- **Pemeriksa request yang cuma mengecek string** meloloskan field `time.Time`/`int` sebagai
+  nilai nol. Cek eksplisit per tipe.
+
+### G. Kontrak API & kompatibilitas mundur
+
+- Field dihapus/berganti tipe di respons, atau parameter wajib baru di endpoint lama.
+- Status code atau method berubah tanpa alias path lama.
+- **MyBharata tidak bisa dipaksa update.** Perubahan kontrak wajib aman untuk versi app
+  lama yang masih beredar. **Deploy BE sebelum FE** untuk perubahan kontrak (FE fallback
+  aman bila field baru belum ada).
+- Dok `API - <Service>.md` di vault tidak ikut diperbarui saat rute berubah.
+
+### H. Frontend (erp-frontend / mybharata)
+
+- **Teks user-facing baru di-hardcode.** Wajib lewat `t("domain.key")`, key ditaruh di
+  **dua** berkas `src/i18n/locales/id.ts` **dan** `en.ts`. Istilah teknis lazim English
+  biarkan English di kedua locale. (ADR 0010)
+- **Variabel interpolasi bernama `count` menyalakan pluralisasi i18next** (`key_one`/
+  `key_other` dicari lebih dulu). Uji halaman memakai `t` tiruan sehingga BUTA terhadap ini.
+- **Format tanggal/uang di lapisan fetch.** `toLocaleDateString("id-ID")` di dalam fungsi
+  transform membuat kolomnya mustahil ikut bahasa aktif. Format di `render` kolom pakai
+  `intlLocale(lang)`.
+- **`FilterTable` hanya mengenal `select` dan `date`.** Tidak ada filter angka. Ambang
+  numerik jadi preset select atau kontrol sendiri di slot `actions`.
+- **Aturan saling-kunci antar filter tidak menggabungkan `{...sebelum, ...sesudah}`.**
+  Draft `FilterTable` disemai SEKALI saat panel dibuka; key yang hilang berarti "tak
+  berubah", bukan "dikosongkan". Objek kosong `{}` ditangani lebih dulu = kosongkan semua.
+- **Halaman daftar tidak memakai struktur tabel HRIS**: satu kartu, `Banner bare` di dalam
+  prop `toolbar` milik `MainTable`, seluruh keadaan di `useTableState`. Jangan merakit
+  tabel/filter/paginasi sendiri.
+- **Loading pakai spinner**, bukan `ShimmerBox`.
+- **Komponen tiruan look-alike** alih-alih reuse komponen shared via adapter.
+- Error validasi form tidak lewat `showFormErrorsToast`.
+
+### I. Celah test
+
+- Jalur galat/guard baru tanpa test negatif sama sekali.
+- **Test fungsi murni tidak menangkap cacat glue handler.** Tambahkan minimal satu
+  `app.Test(httptest.NewRequest(...))` untuk jalur galat tiap handler; tak butuh database
+  bila kasusnya gagal di penguraian ID.
+- Cek auth/authz yang ada di kode tapi tak pernah diuji untuk kasus "ditolak".
+- **Uji Radix Tabs memakai `click`.** Harus `fireEvent.mouseDown`, kalau tidak tabnya tak
+  berpindah dan testnya lolos-diam.
+- Test bergantung jam sistem, timezone, atau urutan eksekusi.
+- Uji i18n memakai `t` tiruan sehingga buta terhadap key yang hilang; uji terpisah dengan
+  instance i18next asli + kontrol negatif bahwa `en` bukan hasil fallback ke `id`.
+
+### J. Deploy & konfigurasi
+
+- **Menambah env tanpa mencatat bahwa container harus `--force-recreate`.** Env dibaca saat
+  container DIBUAT, `restart` saja tidak cukup.
+- **Menambah kategori inbox tanpa menaikkan DUA container.** Service pengirim memegang
+  salinan `shared-library` lama meski dipakai lewat `replace` lokal. Naikkan
+  `<pengirim>` + `notification-service` bersama.
+- **URL provider dimasukkan ke map yang divalidasi `ValidateInternalURL`.** Panic bila
+  kosong = seluruh fitur padam hanya karena satu service belum di-deploy. Dependensi
+  opsional taruh di luar map (URL kosong = dilewati diam-diam).
+- **Seed master data** berhenti bila koleksi tak kosong, jadi data baru tak masuk ke
+  environment yang sudah terisi. Sediakan migrasi terpisah.
+
+### K. Kode mati & konsistensi
+
+- Variabel/fungsi/import yang tak terpakai setelah perubahan.
+- Komentar yang bertentangan dengan kode setelah diubah.
+- Angka ajaib yang muncul di lebih dari satu tempat.
+- Perubahan yang menyimpang dari dok di `architecture-draft/` (endpoint, kontrak,
+  ownership data) tanpa dok-nya ikut diperbarui. Bila menyimpang dari ADR, sebutkan
+  ADR-nya dan katakan apakah ini penyimpangan sadar atau kelalaian.
+
+---
+
+## Klasifikasi severity
+
+```
+KRITIS                              INFORMASIONAL
+├─ Lapisan glue (rute/binding)      ├─ Nama field & tag bson
+├─ Hak akses & visibilitas          ├─ Kontrak API & kompatibilitas mundur
+├─ Kelengkapan enum & nilai baru    ├─ Frontend (i18n, filter, format, komponen)
+├─ Konkurensi & keutuhan data       ├─ Celah test
+└─ Batas kepercayaan input          ├─ Deploy & konfigurasi
+                                     └─ Kode mati & konsistensi
+```
+
+---
+
+## Heuristik Fix-First
+
+```
+PERBAIKI LANGSUNG                    TANYAKAN DULU
+├─ Kode mati / variabel tak terpakai ├─ Keamanan (auth, escape, injection)
+├─ N+1 yang jelas                    ├─ Konkurensi / atomisitas
+├─ Komentar basi                     ├─ Keputusan desain
+├─ Angka ajaib -> konstanta bernama  ├─ Fix > 20 baris
+├─ Key i18n hilang di salah satu     ├─ Kelengkapan enum
+│  locale                            ├─ Menghapus fungsionalitas
+├─ Format tanggal pindah ke render   └─ Apa pun yang mengubah perilaku
+└─ Ketidakcocokan versi/path            yang terlihat user
+```
+
+Patokan: bila fix-nya mekanis dan senior engineer akan menerapkannya tanpa diskusi,
+perbaiki langsung. Bila engineer yang wajar bisa berbeda pendapat, tanyakan.
+Temuan kritis condong ke TANYAKAN (risikonya lebih besar), informasional condong ke
+PERBAIKI LANGSUNG.
+
+---
+
+## JANGAN dilaporkan
+
+- **Plaintext credentials di dok IT vault** (`IT - Server, VMs and Databases`,
+  `IT - Monitoring System`) **DISENGAJA** sebagai referensi akses internal tim IT. Jangan
+  diflag sebagai isu keamanan, jangan usulkan rotasi atau scrub.
+- **Merah/hijau di tab Actions erp-frontend bukan sinyal.** `.github/workflows/ci.yml`
+  kehilangan blok trigger sejak 2026-07-29 (`on:` kosong); tiap run merah adalah **startup
+  failure**, bukan test gagal. Jangan menyimpulkan apa pun dari situ, dan jangan menyuruh
+  "perbaiki CI yang gagal". Verifikasi wajib lokal.
+- **`pnpm test` erp-frontend tidak pernah hijau penuh di `main`.** Bandingkan kegagalan
+  dengan baseline `origin/main` sebelum menyalahkan perubahan sendiri.
+- Redundansi yang tidak berbahaya dan justru menolong keterbacaan.
+- "Tambahkan komentar yang menjelaskan ambang ini" (ambang berubah saat tuning, komentar
+  membusuk).
+- Saran konsistensi murni tanpa dampak perilaku.
+- "Regex tidak menangani kasus X" ketika input-nya terbatas dan X tak pernah terjadi.
+- **Apa pun yang SUDAH ditangani di diff yang sedang direview.** Baca diff utuh dulu.
