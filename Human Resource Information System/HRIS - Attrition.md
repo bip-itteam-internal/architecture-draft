@@ -28,7 +28,11 @@ Yang berubah dengan adanya catatan resign adalah **prasyarat datanya terpenuhi**
 
 Cicilan pertama Dashboard: empat kartu di halaman Resign ([[APP - Web ERP]]) yang disuplai `GET /resign/summary`, kini juga tampil sebagai `KartuAmbang` di tab **Ringkasan** dan **HRD Supervisor** Dashboard HRGA.
 
-⚠️ **Di dashboard, turnover 0% tampil HIJAU "aman"** karena `statusAmbang` menilai `0 <= target` sebagai memenuhi. Selama `employee_resign` masih kosong itu mengabarkan retensi sempurna yang sebenarnya berarti "belum ada yang dicatat". Halaman Resign sudah menyelesaikan ini lebih dulu dengan **keterangan permanen di bawah kartu** bahwa hitungannya hanya mencakup yang tercatat lewat menu itu; keterangan yang sama **belum ada di dashboard**. 🔜 Direncanakan. Rumusnya **rata-rata headcount**, `keluar / ((awal + akhir) / 2) × 100`, dengan target **5% bulanan** yang dikirim server (bukan disalin frontend, supaya warna kartu tak pernah berbeda pendapat dengan servernya).
+⚠️ **Turnover 0% tampil HIJAU "aman"** karena `statusAmbang` menilai `0 <= target` sebagai memenuhi. Selama `employee_resign` masih kosong itu mengabarkan retensi sempurna yang sebenarnya berarti "belum ada yang dicatat".
+
+✅ **Sudah ditangani di dashboard** (erp-frontend [#951](https://github.com/bip-itteam-internal/erp-frontend/pull/951)): `KartuAmbang` mendapat prop `keterangan` yang dirender **permanen**, dan kartu turnover di tab Ringkasan maupun HRD Supervisor memakainya. Aturannya **dipinjam** dari halaman Resign yang sudah memutuskannya lebih dulu untuk angka yang sama persis, bukan dibuat yang kedua — dua layar yang menyebut angka yang sama tak boleh menerangkannya dengan cara berbeda. Sengaja bukan tooltip (praktis tak pernah terbaca) dan sengaja **tidak bersyarat status**: menampilkannya hanya saat nilainya nol membuat syaratnya hilang persis ketika angkanya mulai dipercaya orang.
+
+Rumusnya **rata-rata headcount**, `keluar / ((awal + akhir) / 2) × 100`, dengan target **5% bulanan** yang dikirim server (bukan disalin frontend, supaya warna kartu tak pernah berbeda pendapat dengan servernya).
 
 Tiga keterbatasan yang menempel pada angkanya, dan semuanya berasal dari bentuk datanya, bukan dari implementasinya:
 

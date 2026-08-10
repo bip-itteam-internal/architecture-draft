@@ -1102,20 +1102,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "45997b5700e0727451977fb3d3d73d7942d5abd6dcfe127507a54bc7dac1e2a0",
-      "ukuran_kb": 179.5,
-      "ringkasan": "Menjawab: apa itu portal web internal ERP/HRIS Bharata (hris-dashboard \"One Bharata\"), stack frontend apa yang dipakai, dan di repo mana kodenya. Menjelaskan cara login employee_id + password, bagaimana refresh token dan retry 401 bekerja, bagaimana web ini bertindak sebagai SSO Identity Provider (mint code lewat ticket, allowlist redirect_url) untuk aplikasi lain seperti Task Manager, serta bagaimana system_roles per modul menggerbang sidebar dan menu. Juga menjawab bagaimana dukungan multi-perusahaan bekerja (pemilih perusahaan admin pusat, departemen/shift/network/karyawan per perusahaan), bagaimana menu dikelompokkan lewat menu induk bersarang alih-alih header section, dan bagaimana setelan HRGA dikumpulkan jadi satu induk Pengaturan dengan penyaringan per tab beserta alasan tiap keputusannya.",
+      "hash": "b6311f44c3b3bc25ad9ffabf6563432d3e46e1a75b702b583a0897b50bfb8cd0",
+      "ukuran_kb": 184.0,
+      "ringkasan": "Menjawab: apa itu portal web internal ERP/HRIS Bharata (\"One Bharata\"), stack dan repo mana yang dipakai, serta bagaimana login, refresh token, dan SSO handoff ke aplikasi lain bekerja. Menjelaskan juga bagaimana sidebar dan menu digerbang lewat cookie `system_roles` (module + role), bagaimana menu HRIS dikelompokkan pakai menu induk bersarang, dan bagaimana halaman Pengaturan HRGA terpusat menyaring akses per-tab memakai cermin gerbang backend. Berguna untuk pertanyaan seputar dukungan multi-perusahaan di frontend (company switcher, kelola perusahaan/departemen/shift/network per-perusahaan) dan mengapa rute lama diteruskan, bukan dihapus.",
       "kata_kunci": [
         "erp-frontend",
         "hris-dashboard",
         "One Bharata",
         "web ERP",
-        "SSO Identity Provider",
+        "SSO",
         "system_roles",
         "role gating",
         "sidebar menu",
-        "multi-perusahaan",
-        "Pengaturan HRGA"
+        "Pengaturan HRGA",
+        "multi-perusahaan"
       ]
     },
     {
@@ -4704,9 +4704,9 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "0d50a1519c006bed817ae2ee949989e16185d18f189e4f6f3cc93bd677f224b4",
-      "ukuran_kb": 4.3,
-      "ringkasan": "Menjawab: apa saja yang ingin ditampilkan dashboard attrition (ikhtisar, detail per departemen, demografi gender/tipe/alasan terminasi) dan data apa yang jadi prasyaratnya. Menjelaskan bagaimana catatan terminasi di koleksi employee_resign melengkapi prasyarat itu, bagaimana kartu turnover bulan berjalan dihitung memakai rata-rata headcount dengan target 5% bulanan, dan tiga keterbatasan angkanya karena tidak ada riwayat headcount, termasuk kenapa hanya bulan berjalan yang disajikan dan kenapa effective_date lebih dipercaya daripada applied_at.",
+      "hash": "226533bd085d49583110ac3fa9beb753e2322a5bc49f0410df3fbef6177fd725",
+      "ukuran_kb": 4.8,
+      "ringkasan": "Menjawab: apa saja isi dashboard attrition (ikhtisar, detail per departemen, demografi gender/tipe/alasan terminasi) dan data apa yang harus ada lebih dulu supaya bisa dihitung. Menjelaskan koleksi `employee_resign` sebagai sumber catatan terminasi (kategori, tanggal efektif, alasan, dokumen pendukung) serta kartu turnover bulan berjalan yang disuplai `GET /resign/summary`, termasuk rumusnya `keluar / ((awal + akhir) / 2) x 100` dengan target 5% bulanan yang dikirim server. Berguna untuk memahami kenapa hanya bulan berjalan yang disajikan, kenapa turnover 0% bisa menyesatkan, dan kenapa tanggal keluar yang dipercaya adalah `effective_date` bukan `applied_at`.",
       "kata_kunci": [
         "attrition",
         "turnover",
@@ -4714,10 +4714,10 @@
         "terminasi",
         "employee_resign",
         "headcount",
-        "demografi",
-        "dashboard HRGA",
         "off-boarding",
-        "retention"
+        "PHK",
+        "retention",
+        "dashboard HRGA"
       ]
     },
     {
