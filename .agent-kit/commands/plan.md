@@ -6,6 +6,9 @@ Lanjutan dari /start-task. Susun rencana implementasi yang grounded ke arsitektu
 
 Langkah:
 1. Pastikan ada konteks dari /start-task. Bila belum, minta user jalankan /start-task dulu.
+   Lalu baca `architecture-draft/.agent-kit/rules/plan-checklist.md` — di situ ada cara
+   mencari kode yang sudah ada, analisis mode kegagalan, matriks pilih jenis test, dan
+   aturan regresi.
 2. Susun rencana bertahap:
    - Perubahan per file (path eksak) + alasan. Sebut **repo mana** untuk tiap berkas;
      satu fitur biasanya menyentuh lebih dari satu repo sibling.
@@ -32,6 +35,10 @@ Bentuk artefak (judul persis, `/wrap` mencarinya):
 ## Konteks
 <1 sampai 2 paragraf: kenapa, dan dok arsitektur apa yang jadi landasan>
 
+## Apa yang Sudah Ada
+- <kode/komponen/master data/resolver yang sudah menyelesaikan sebagian masalah ini>
+  — dipakai ulang / dibangun tandingannya karena <alasan>
+
 ## Ruang Lingkup
 - [ ] <repo> `<path/eksak>` — <apa yang berubah>
 - [ ] <repo> `<path/eksak>` — <apa yang berubah>
@@ -42,12 +49,16 @@ Bentuk artefak (judul persis, `/wrap` mencarinya):
 ## Migrasi / Konfig / Deploy
 - [ ] <env, indeks, seed, urutan deploy; kosongkan bila tidak ada>
 
+## Mode Kegagalan
+- <jalur kode baru> — gagal karena <sebab realistis>; ada test? ada penanganan galat?
+  user lihat pesan atau senyap? <tandai CELAH KRITIS bila tidak, tidak, dan senyap>
+
 ## Cara Verifikasi
 - [ ] <langkah konkret yang membuktikan fiturnya JALAN, bukan cuma test hijau.
       Untuk backend: sebut panggilan lewat gateway `/api/<module>/...`>
 
 ## Di Luar Lingkup
-- <hal yang sengaja tidak dikerjakan; `/wrap` mengabaikan bagian ini>
+- <hal yang sengaja tidak dikerjakan> — <satu baris alasan, wajib>
 ```
 
 Isi `## Cara Verifikasi` jangan dikosongkan. Test hijau bukan bukti fitur bisa dipakai:
