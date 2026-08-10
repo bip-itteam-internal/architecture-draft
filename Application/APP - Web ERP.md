@@ -387,6 +387,32 @@
 - **`placeholderData` sengaja tidak dipakai.** Menahan data departemen sebelumnya saat tab berganti akan menampilkan metrik milik departemen lain di bawah judul yang sudah berubah; pada layar yang tujuannya menemukan yang macet, itu menyesatkan.
 - **Judul menu diterjemahkan lewat `keySidebar`/`tr()` di `navigation.tsx`**, bukan `t()` di `sidebar-menus.tsx` (data statis tingkat modul, tak punya hook). Tetangganya ("KPI Scoring", "KPI Templates") memang literal, tetapi keduanya istilah English yang sah di kedua bahasa; "Otomasi KPI" akan jadi satu-satunya label Indonesia yang bertahan saat aplikasi dialihkan ke English.
 
+**Ruang Direktur — `/direktur`** (2026-08-10). Layar milik jabatan Direktur & Corporate Secretary, tiga tab: **Persetujuan**, **Kinerja Divisi**, **Keuangan**.
+
+Rute sendiri, BUKAN tab di Dashboard HRGA. Tab "direktur" pernah ada di sana dan dihapus karena isinya angka HRGA lagi — "potongan angka yang sama, cuma memaksanya memilih" (catatan di `features/hris/dashboard/lib/position-view.ts`). Alasan itu tetap berlaku: model seksi dashboard tersebut hanya mengenal metrik kepegawaian, dan menaruh keuangan perusahaan di layar milik HR akan diprotes dengan alasan yang sama.
+
+Isinya menyusun dari yang sudah ada, bukan membangun sumber baru:
+
+| Bagian | Sumber | Bisa ditindaklanjuti? |
+|---|---|---|
+| Cuti & perjalanan dinas | `/request/view?as=reviewer` + `/business-trip/view?as=reviewer` | ya — setujui/tolak di tempat |
+| Riwayat keputusan | `as=reviewed` | — |
+| Payroll run menunggu | `/payroll-runs` status `draft` | menautkan ke halaman run |
+| Pesanan Pembelian menunggu | `/pesanan-erp/persetujuan` | menautkan ke `/persetujuan/pesanan-pembelian` |
+| Kinerja seluruh divisi | `/kpi/dashboard` | — |
+| Posisi keuangan | `/profit/products` (omzet, laba kotor, margin) | — |
+
+**Empat endpoint di atas sudah lama ada dan TAK PUNYA satu pun pemanggil di frontend** sebelum layar ini: `request/view`, `business-trip/view`, `kpi/dashboard`, dan `pesanan-erp/persetujuan`. Yang terakhir bahkan punya layar keputusan lengkap yang tak bisa dicapai siapa pun sejak menunya dicabut dari Portal Saya — lihat [[REF - Alur Persetujuan]].
+
+Empat jebakan yang ditemukan saat membangunnya, seluruhnya hanya terlihat setelah dijalankan dengan data sungguhan:
+
+- **Nilai status persetujuan adalah KALIMAT**, bukan kode: `"Menunggu persetujuan"`, bukan `"waiting"`. Tebakan dari nama fieldnya membuat antrean selalu kosong tanpa satu pun galat — dan di lingkungan yang belum punya pengajuan, kekosongan itu terlihat wajar.
+- **`average: 0` dari `/kpi/dashboard` berarti BELUM DINILAI**, bukan nilai nol; pembobotnya `total_scored`, bukan `total_employees`. Versi pertama menampilkan "10 divisi dinilai, rata-rata 0.0" untuk perusahaan tanpa satu pun penilaian.
+- **Item Portal Saya wajib `public: true`.** Saringan terakhir sidebar hanya menyisakan item ber-`public` untuk kategori yang bukan modul si pembaca, dan `erp` hampir tak pernah termasuk. Tanpa itu menunya lenyap tanpa galat.
+- **Dialog Radix mode modal mengunci `<body>`** (`pointer-events: none` + `data-scroll-locked`) dan tak melepasnya saat ditutup sesudah mutasi — SELURUH halaman berhenti bisa diklik, tanpa galat, dan gejalanya tampak seperti tab yang rusak. Ditutup dengan `modal={false}`; menunda invalidasi, mencegah `onCloseAutoFocus`, dan menahan baris agar tak lenyap semuanya TIDAK menolong.
+
+Digerbang `finance.profit.view` di sidebar — izin paling sempit yang benar-benar dituntut halamannya. Konsekuensi yang disengaja: admin finance ikut melihat menunya; tiap tab tetap memeriksa izinnya sendiri, dan tab yang tak berhak dibuang, bukan dinonaktifkan.
+
 **Internasionalisasi (i18n)** — dukungan dua bahasa **Indonesia (default) / English** via `react-i18next` (`src/i18n/`); switcher di header (samping tema), pilihan disimpan cookie `lang` (dibaca SSR). Rollout **bertahap**; sudah: HRIS Ulang Tahun, KPI, Announcements, Recruitment System Setup, Payroll Pengaturan Gaji (`hris.payroll.*`), Task Management, Pengembangan Organisasi (`hris.community.*` + header grup sidebar), **Aset GA** (`ga.asset`, 2026-08-09), **Legal** (`legal.*`, ⚠️ belum merge). Dua yang terakhir dikerjakan **sekalian** dengan perombakan struktur halamannya, bukan sebagai giliran tersendiri — modul yang layarnya sedang dibongkar adalah saat termurah untuk menambahkan kuncinya. Aturan lengkap: [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
 
 ## Belum Diimplementasikan / Catatan

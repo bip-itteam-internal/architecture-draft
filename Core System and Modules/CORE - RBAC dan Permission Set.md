@@ -114,6 +114,12 @@ Dua sakelar terakhir menuntut penegaknya tinggal di shared-library (dipakai empl
 
 **Biaya transisinya nyata:** paket menempel di token, jadi selama satu siklus token (72 jam) siapa pun yang belum login ulang kehilangan sementara menu modul yang fase duanya menyala.
 
+**Wewenang setingkat Direktur: satu-satunya gerbang berbasis NAMA JABATAN (2026-08-10).** Di luar seluruh mekanisme di atas — peran, izin, paket — ada satu kelas wewenang yang diperiksa dari nama jabatan pemanggil: persetujuan Pesanan Pembelian (`services/procurement`) dan slot cuti/dinas yang dialihkan ke "Direktur" saat pemohonnya supervisor sendiri (`services/attendance`). Sampai tanggal itu ketiganya — dua service plus cerminan frontend — menuliskan daftar jabatannya masing-masing; kini semuanya menunjuk `common.SetaraDirektur` (Direktur & **Corporate Secretary**, berwenang sama).
+
+⚠️ Daftar yang terlewat di salah satu tempat **tak bergejala**: orangnya MELIHAT antrean — daftar juga mencocokkan nama departemen — lalu ditolak saat memutus. Antrean berisi, tombolnya balas 403, tanpa pesan apa pun. Inventaris lengkap seluruh alur persetujuan beserta penyetujunya: [[REF - Alur Persetujuan]].
+
+**Payroll: paket menutup niat yang tak pernah terlaksana.** `isApprover` di payroll-service berkomentar "persetujuan final payroll run (Direktur)" tapi isinya `isHRAdmin`, sehingga kepala perusahaan tak bisa menyetujui payroll dan HR admin melakukannya atas namanya. Ditutup dengan memasang paket `payroll_penyetuju` ke jabatan Direktur & Corporate Secretary — **tanpa menyentuh gerbangnya**, sebab `gate()` mendahulukan izin dari klaim di atas tier. Contoh terbersih sejauh ini bahwa paket-di-jabatan bisa memperbaiki hak tanpa mengubah satu baris pun aturan akses.
+
 ## Katalog acuan
 
 **Tangga tingkat**, sama di semua modul. Tingkat tidak otomatis bertingkat; paket yang menggabungkan.
