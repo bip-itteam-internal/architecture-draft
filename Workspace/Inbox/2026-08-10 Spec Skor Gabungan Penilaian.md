@@ -36,10 +36,53 @@ Ditulis lebih dulu karena tiga hal ini sempat masuk pembahasan lalu sengaja dike
 Analisa yang ada memasukkan `number` dan `scale`. Untuk angka gabungan hanya `scale` yang
 boleh ikut, karena hanya dia punya `ScaleMin`/`ScaleMax` sehingga bisa dinormalisasi.
 
-Pertanyaan `number` seperti "berapa kali terlambat" tidak punya batas atas, dan
-merata-ratakannya bersama skala 1..5 menghasilkan angka yang tidak berarti apa-apa.
+| Tipe | Ikut skor | Alasan |
+|---|---|---|
+| `scale` | ya | batasnya diketahui, bisa dinormalisasi |
+| `radio`, `dropdown` | belum | lihat bagian berikutnya |
+| `number` | tidak | tak punya batas atas; "berapa kali terlambat" dirata-ratakan bersama skala 1..5 menghasilkan angka tanpa arti |
+| `checkbox` | tidak | pilihan ganda, tak punya urutan |
+| `short_text`, `long_text`, `date`, `time`, `file` | tidak | bukan pengukuran |
+| `section` | tidak | pemisah halaman |
 
 Form yang tidak punya satu pun pertanyaan `scale` menghasilkan `Overall` kosong, bukan nol.
+
+### Kenapa `radio`/`dropdown` belum ikut, dan apa gantinya
+
+`Options` disimpan sebagai `[]string` polos — cuma teks, tanpa nilai per opsi. Tak ada yang
+menyatakan bahwa "Sangat Baik" bernilai 4 dan "Kurang" bernilai 1.
+
+Alternatif yang **ditolak**: menurunkan nilai dari URUTAN opsi (indeks 0 = terendah). Itu
+tampak masuk akal sampai ada pembuat form yang menuliskan "Sangat Baik" lebih dulu, dan
+skornya terbalik total tanpa satu pun tanda di layar. Asumsi yang tak terlihat dan tak
+tervalidasi adalah kelas kesalahan terburuk untuk angka yang dipakai menilai orang.
+
+Mendukungnya dengan benar menuntut `Options` berubah jadi berstruktur (teks + nilai), yang
+menyentuh builder, validasi, dan seluruh form yang sudah ada. Ditunda, dan tak membongkar
+apa pun bila kelak dikerjakan.
+
+**Gantinya bukan kompromi**: `scale` punya `ScaleMinLabel`/`ScaleMaxLabel`, sehingga penilai
+tetap melihat kata ("Sangat Kurang" ... "Sangat Baik") sambil angkanya tetap tersimpan.
+Yang hilang hanya label per titik tengah; untuk skala 1..5, bentuk Likert itu lazim dipahami.
+Pertanyaan yang memang bukan penilaian — "Rekomendasi: Lanjutkan / Tidak" — tetap `radio`,
+dan mengeluarkannya dari skor justru benar.
+
+### Cakupan skor dilaporkan, tidak disembunyikan
+
+`Overall` disertai dua angka:
+
+```go
+Overall        *float64 `json:"overall,omitempty"`
+OverallFields  int      `json:"overall_fields"`   // pertanyaan yang IKUT menghitung
+TotalQuestions int      `json:"total_questions"`  // seluruh pertanyaan form
+```
+
+Layar berbunyi **"Skor dihitung dari 5 dari 12 pertanyaan"**. Tanpa itu, seseorang yang
+membangun form penilaian memakai `radio` akan melihat satu angka yang tampak mewakili
+keseluruhan padahal cuma sebagian, dan tak ada apa pun yang memberitahunya.
+
+Polanya sama dengan `Populasi` dan `Catatan` di mesin KPI, yang memang dibuat supaya cakupan
+tak pernah tersembunyi di balik satu angka.
 
 ### Bobot per pertanyaan, angka relatif yang dinormalisasi
 
