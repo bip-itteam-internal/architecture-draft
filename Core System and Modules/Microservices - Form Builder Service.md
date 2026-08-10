@@ -137,6 +137,34 @@ Hasilnya "HRGA" tak pernah jadi nilai tersimpan di mana pun: ia gabungan dua dep
 
 **Siapa yang berubah aksesnya**: staf HR (`hris:staff`) yang dulu terkunci kini bisa membangun form; pemegang peran `it`/`ga` yang departemennya di luar daftar aktif kehilangan akses; karyawan tanpa `department` di `work_data` kini tertutup (fail-closed, disengaja untuk perubahan kontrol akses). Token berlaku 72 jam, jadi SPV HRGA yang belum login ulang sementara hanya melihat departemennya sendiri — fallback `SupervisedDepartments` menanganinya tanpa error.
 
+⚠️ **Gerbang ini lebih lebar daripada yang dibaca sepintas.** `managedDepartments` memakai `common.SupervisedDepartments` yang **selalu menyertakan departemen sendiri**, bukan versi `Strict`. Jadi yang lolos bukan "atasan di departemen aktif", melainkan **siapa pun yang bekerja di sana dan punya peran apa pun di modul apa pun** — staf dengan `ticket:staff` sekalipun. Shared-library menandai perbedaan itu sendiri: docstring `SupervisedDepartmentsStrict` menyebut versi non-strict "membuat SETIAP karyawan tampak sebagai supervisor departemennya sendiri" dan mensyaratkan jalur tulis memakai yang strict. Apakah itu memang dikehendaki **belum pernah diputuskan tertulis**; komentar gerbangnya berbunyi "berada di departemen yang diaktifkan", yang mengesankan disengaja.
+
+## Izin: katalog `formbuilder` (fase satu)
+
+> **Status**: 🟡 PR [#1138](https://github.com/bip-itteam-internal/bip-erp/pull/1138) **terbuka**, belum merged dan belum di-deploy per 2026-08-10. Bagian ini menggambarkan isi PR itu, bukan keadaan yang sudah berlaku. Yang berlaku sekarang tetap tingkat peran tier lama seperti di bagian sebelumnya.
+
+Sampai PR itu masuk, Form Builder adalah **satu-satunya modul ber-UI yang aksesnya tak bisa diatur dari layar Hak per Posisi**: gerbangnya tier lama, dan daftar departemennya env yang menuntut `--force-recreate`.
+
+Tiga izin, masing-masing cermin gerbang yang berlaku hari ini:
+
+| Izin | Menggerbang | Cermin gerbang lama |
+|---|---|---|
+| `formbuilder.view` | rute baca di `/forms/*` | `requireFormManager` |
+| `formbuilder.work` | buat, ubah, terbitkan atau tutup, hapus | idem — grup lama tak memisahkan baca dari tulis |
+| `formbuilder.rules.manage` | `/form-type-rules/*` | `requireTypeRulesAdmin` (`it` supervisor/admin; `staff` dikecualikan) |
+
+Tiga paket: `formbuilder_lihat`, `formbuilder_pengelola`, dan `formbuilder_penata_aturan`.
+
+**Dua sumbu, dan hanya satu yang pindah.** Gerbang lama menggabungkan tingkat peran DAN keanggotaan departemen aktif. Izin menggantikan syarat **pertama saja**; cakupan departemen tetap dikerjakan `managedDepartments` + `canManageDepartment`, tidak dipindah ke `reach`.
+
+Itu keputusan sadar. Penyaringan `reach: division` belum ditegakkan di mana pun selain [[Microservices - Task Management Service]], jadi memindahkannya sekarang berarti menukar penjaga yang bekerja dengan penanda yang tak dibaca siapa pun. Seluruh paket karena itu ber-reach `all`, dan itu menyatakan apa adanya alih-alih menjanjikan pembatasan tanpa penegak. Akibat yang harus diterima: **pembatasan per-departemen lewat paket belum mungkin** — paket ber-reach `division` akan tersimpan rapi lalu berperilaku persis `all`.
+
+**Fase satu tidak mengubah akses siapa pun.** Sakelarnya `FORMBUILDER_PERMISSION_ENFORCEMENT` dan `FORMBUILDER_TIER_FALLBACK`, keduanya default menyala, mengikuti pola [[Microservices - Recruitment Service]] dan [[Microservices - Learning Service]]. Yang baru hanya dua kemampuan yang sebelumnya mustahil: memberi akses **baca jawaban tanpa hak menghapus form**, dan memberi hak **menata aturan tipe tanpa hak mengelola form**.
+
+⚠️ **`capabilityHandler` ikut berubah** dan mendapat field `can_write`. Membiarkannya menilai sendiri lewat `hasManagerRole` akan membuat layar dan server berbeda pendapat begitu paket pertama dipasang: tombol muncul lalu setiap aksinya ditolak `403`. **Frontend nol perubahan** — Form Builder tak pernah menyalin aturan aksesnya ke FE, dan justru itu yang membuatnya lolos dari divergensi yang sedang terjadi di `recruitment`/`training`, di mana tabel `FALLBACK` frontend sudah fase dua sementara backend masih fase satu ([[CORE - RBAC dan Permission Set]]).
+
+**Celah yang ikut tertutup di PR yang sama**: `recruitment` dan `training` tak pernah didaftarkan `RegisterCatalog` di employee-service sejak katalognya dibuat, sehingga paket keduanya tak muncul di `GET /master/permission-modules` dan setiap upaya mengubahnya ditolak "permission tak terdaftar di katalog" — padahal paketnya tetap bisa dipasang ke posisi, jadi gejalanya senyap. Registrasinya kini fungsi bernama dengan penjaga yang menilai dari sisi **seed**, bukan daftar modul yang diketik ulang.
+
 ## Penilaian karyawan lain: sumbu `subject`, terpisah dari `audience`
 
 Kasus nyata yang jadi acuan: **seluruh karyawan menilai tiap Office Boy, satu per satu**. Di produksi itu 185 karyawan × 4 Office Boy = **740 penilaian**, dan tiap orang mengisi 4 kali dalam satu duduk.
@@ -526,7 +554,8 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 - **Jumlah PENGISI tidak dihitung otomatis.** Untuk `audience` bertipe `all`/`departments`, penyebut tingkat pengisian tetap memakai `audience.estimated_size` yang diisi manual pembuat form. Bila kosong, tingkat pengisian **tidak dilaporkan** (menampilkan 0% lebih menyesatkan daripada tak menampilkan apa pun). Berbeda dari `subject`, yang JUSTRU di-resolve otomatis dari employee-service saat terbit — sumbu yang dinilai butuh nama dan jabatan, sedangkan sumbu pengisi cukup dicocokkan dari header.
 - **Agregasi dibatasi 20.000 jawaban.** Bila terlampaui, total sebenarnya tetap dilaporkan dan hasil ditandai `truncated` + `sample_size`, sedangkan tingkat pengisian disembunyikan. Export menandai lewat header `X-Export-Truncated`.
 - **`attendance_gate.start_date`/`end_date` hanya menerima RFC3339** (mis. `2026-08-01T00:00:00Z`); kiriman `"2026-08-01"` akan ditolak dengan pesan parse JSON yang tidak informatif. Perlu dibereskan saat FE dibangun.
-- **RBAC belum berkatalog permission-set** per [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]. Pindah ke sumbu departemen **mendekatkan** ke ADR itu (hak menempel pada tempat orang bekerja, bukan pada key modul) tapi belum memenuhinya: tingkat perannya masih tier lama `staff`/`supervisor`/`admin`, bukan permission-set granular.
+- ⚠️ **RBAC berkatalog permission-set: katalognya sudah ditulis, BELUM merged.** Modul `formbuilder` beserta tiga izin dan tiga paket ada di PR [#1138](https://github.com/bip-itteam-internal/bip-erp/pull/1138), yang **masih terbuka** per 2026-08-10. Selama belum merged dan belum di-deploy, yang berlaku tetap tier lama `staff`/`supervisor`/`admin` — pindah ke sumbu departemen (PR #869) sudah **mendekatkan** ke [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] tapi belum memenuhinya. Rancangan lengkap + alasan cakupan departemen tak ikut pindah ke `reach`: §Izin: katalog `formbuilder` di atas.
+- **Cakupan departemen belum bisa dibatasi lewat paket.** Konsekuensi langsung dari keputusan di atas: `reach: division` tak punya penegak di modul ini, jadi paket yang disetel "divisi sendiri" akan berperilaku persis "semua departemen". Bila pembatasan itu memang dibutuhkan, yang harus dibangun adalah penegaknya, bukan nilai di layar.
 - ✅ **Section/multi-halaman sudah ada** (PR [#870](https://github.com/bip-itteam-internal/bip-erp/pull/870)).
 - ✅ **Keterangan ujung skala sudah ada** (PR [#871](https://github.com/bip-itteam-internal/bip-erp/pull/871)).
 - **Upload file, percabangan, grid, dan opsi "Lainnya" belum ada** — jarak yang tersisa terhadap Google Forms. Urutan yang disarankan: opsi "Lainnya" (murah) → upload file → percabangan. Percabangan menuju bagian, jadi kini sudah punya landasannya.

@@ -17,13 +17,28 @@ Rencana yang terkunci di dokumen ini sebelumnya (RBAC `it` saja, tanpa FE, tanpa
 
 | Aspek | Rencana asli | Yang dibangun |
 |---|---|---|
-| RBAC | `system_roles["it"]` saja | **per departemen** (PR #869): tingkat peran pengelola + departemen ada di daftar aktif. Sekarang HRGA (Human Resource + General Affair) dan IT (Tech Development); departemen berikutnya cukup ubah env |
+| RBAC | `system_roles["it"]` saja | **per departemen** (PR #869): tingkat peran pengelola + departemen ada di daftar aktif. Sekarang HRGA (Human Resource + General Affair) dan IT (Tech Development); departemen berikutnya cukup ubah env. 🟡 Katalog permission-set sedang menyusul (PR #1138, **belum merged**) — lihat §Menuju hak per jabatan |
 | Hasil jawaban | export CSV saja | analisa per pertanyaan + tren harian + tingkat pengisian, **plus** CSV |
 | Sasaran form | (tak ada) | semua / per departemen / per karyawan |
 | Dampak ke service lain | "nol dampak" | **menyentuh [[Microservices - Attendance Service]]**: clock-in mobile bisa ditahan bila ada form wajib belum diisi |
 | Multi-perusahaan | (tak dibahas) | `company_id` sejak awal ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]) |
 
 Yang **tetap** ditunda sesuai rencana asli: **upload file** dan **logika percabangan** (lompat seksi berdasarkan jawaban).
+
+## Menuju hak per jabatan
+
+> **Status**: 🟡 PR [#1138](https://github.com/bip-itteam-internal/bip-erp/pull/1138) **terbuka**, belum merged dan belum di-deploy per 2026-08-10.
+
+Perpindahan ke sumbu departemen (PR #869) menjawab "form ini milik tim siapa", tapi belum menjawab "siapa di tim itu yang boleh membangunnya". Akibatnya hari ini **siapa pun yang bekerja di ketiga departemen aktif dan punya peran apa pun di modul mana pun** sudah bisa membuat dan menerbitkan form — staf dengan peran tiket sekalipun.
+
+Katalog `formbuilder` ([[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]) memindahkan pertanyaan kedua itu ke jabatan, sehingga populasinya jadi eksplisit dan bisa dicabut lewat layar Hak per Posisi alih-alih lewat env yang menuntut container dibuat ulang. Tiga paket: **Lihat**, **Pengelola**, dan **Penata Aturan**.
+
+Dua hal yang perlu diketahui pemilik produk:
+
+- **Fase satu tidak mengubah akses siapa pun.** Yang berubah baru muncul setelah paket benar-benar dipasang ke jabatan, dan itu keputusan HR, bukan keputusan rilis.
+- **Pembatasan per-departemen lewat paket belum mungkin.** Cakupan departemen tetap ditentukan tempat orang bekerja, bukan oleh paketnya. Menyetel sebuah paket ke "divisi sendiri" tidak akan membatasi apa pun sampai penegaknya dibangun.
+
+Detail teknis + alasan keputusan itu: [[Microservices - Form Builder Service]] §Izin.
 
 ## Intersep Presensi
 

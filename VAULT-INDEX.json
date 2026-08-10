@@ -157,20 +157,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "a9d2870f422311f8a0e02455fea1f7de5762a80482c2af2a491ed11b25db7fe8",
-      "ukuran_kb": 23.8,
-      "ringkasan": "Menjawab: endpoint mana yang dipakai untuk membuat, menerbitkan, menyunting, dan menghapus form dinamis lewat gateway `/api/form-builder/*`, serta siapa yang boleh mengelolanya (tingkat peran plus cakupan departemen). Menjawab juga bagaimana karyawan melihat form yang ditujukan kepadanya, mengirim jawaban, menilai karyawan lain, dan mengunggah lampiran, termasuk aturan idempotensi pengiriman ganda. Menjelaskan cara membaca analisa, daftar jawaban, dan export CSV per periode form berulang, aturan tipe form per departemen yang digerbang modul IT, rute Kaizen untuk karyawan dan komite, serta endpoint internal untuk service lain.",
+      "hash": "c42c5dc142aa00ac1309b731c1f0f0ab95a2c7a48e802b344dfaf8cd39c5f110",
+      "ukuran_kb": 24.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang dilayani form-builder-service lewat gateway /api/form-builder/*, siapa yang boleh membuat/menerbitkan/menyunting form (cakupan departemen lewat SupervisedDepartments, bukan modul), dan bagaimana karyawan melihat serta mengisi form lewat rute /me/*. Menjelaskan juga arti parameter ?period= untuk form berulang, aturan tipe form per departemen yang ditetapkan IT (/form-type-rules), alur unggah lampiran (upload_id) sebelum kirim jawaban, rute Kaizen, analitik/export CSV, serta endpoint internal yang dipanggil service lain.",
       "kata_kunci": [
         "form builder",
+        "API endpoint",
         "form dinamis",
-        "kuesioner",
-        "survey",
-        "endpoint",
-        "RBAC departemen",
+        "dynamic form",
         "kaizen",
-        "form berulang",
+        "form-type-rules",
+        "RBAC departemen",
         "export CSV",
-        "gerbang presensi"
+        "form berulang",
+        "penilaian karyawan"
       ]
     },
     {
@@ -1058,12 +1058,15 @@
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
+        "HRIS - Attrition",
+        "Finance - Dashboard per Posisi (FAT)",
+        "HRIS - Matriks KPI per Departemen",
+        "Microservices - Calendar Service",
         "Microservices - Recruitment Service",
         "Microservices - Employee Service",
         "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
         "HRIS - Personalia",
         "CORE - HRIS Orchestrator",
-        "HRIS - Attrition",
         "HRIS - Pengembangan Organisasi (Community of Interest)",
         "Microservices - Payroll Service",
         "Microservices - Attendance Service",
@@ -1089,6 +1092,7 @@
         "Microservices - Procurement Service",
         "API - Procurement Service",
         "HRIS - Otomasi Skor KPI",
+        "RUN - Deploy Microservices bip-erp",
         "REF - Alur Persetujuan",
         "CORE - API Master Gateway",
         "Microservices - Notification Service",
@@ -1098,19 +1102,19 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "542a92a23f3455f2593f9862108de29fb1f7cdd5b9d32b765a258c42b0bf73df",
-      "ukuran_kb": 173.3,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di Web ERP (erp-frontend) untuk tiap role, bagaimana halaman daftar disusun mengikuti pola satu kartu (Banner bare di dalam prop toolbar milik MainTable), dan keputusan tampilan apa yang sudah diambil berikut alasannya. Juga menjawab halaman mana yang sudah live di dev atau produksi dan mana yang masih berupa branch, sebab tiap fitur dicatat lengkap dengan nomor PR dan status deploy-nya. Dipakai sebagai titik awal sebelum menyentuh halaman mana pun di erp-frontend.",
+      "hash": "a37f3cd121afc00ddbd672a2eed5ab3734ce81cba49e90bfec4fcba310742be3",
+      "ukuran_kb": 178.8,
+      "ringkasan": "Menjawab: apa itu portal web One Bharata (erp-frontend), stack teknologinya (Next.js 16, React 19, shadcn/Radix/Tailwind, TanStack Query, react-i18next), dan bagaimana login, refresh token, serta peran SSO Identity Provider bekerja. Menjelaskan juga cara sidebar dan menu di-gate oleh system_roles, struktur pengelompokan menu HRIS (menu induk bersarang, bukan field group), halaman Pengaturan HRGA terpusat beserta penyaringan per tab, dan bagaimana dukungan multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/network per perusahaan) muncul di UI.",
       "kata_kunci": [
+        "web ERP",
         "erp-frontend",
-        "Web ERP",
-        "frontend",
+        "hris-dashboard",
+        "One Bharata",
         "Next.js",
-        "MainTable",
-        "Banner",
-        "struktur tabel HRIS",
-        "halaman daftar",
-        "sidebar menu per role",
+        "SSO",
+        "sidebar menu",
+        "role gating",
+        "multi-perusahaan",
         "i18n"
       ]
     },
@@ -1211,6 +1215,7 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "Microservices - Learning Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "CORE - RBAC dan Permission Set",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
@@ -1227,19 +1232,20 @@
         "APP - MyBharata",
         "DB - Overview and Notes"
       ],
-      "hash": "9b52247165fa185977e319608df4be37ea126dce00fb1fa833478af3e2167d71",
-      "ukuran_kb": 7.6,
-      "ringkasan": "Menjawab: bagaimana API Master Gateway berfungsi sebagai satu-satunya pintu masuk ekosistem bip-erp — autentikasi JWT & SSO, cara routing request ke service via `/api/:module/*`, header identitas BIP-*, response caching Redis — serta catatan keamanan kenapa prefix `/internal/` bukan batas keamanan dan fitur apa yang belum diimplementasikan (revoke token, route /dev berbahaya).",
+      "hash": "86c73ad38e5407a0f231a818b8316d4016be155ba4ea6d66915bdb7860cf8fe6",
+      "ukuran_kb": 8.5,
+      "ringkasan": "Menjawab: bagaimana request dari internet masuk ke ekosistem bip-erp lewat satu gateway (Go + Fiber, port 6969), bagaimana JWT diterbitkan saat login, dan bagaimana routing /api/:module/* meneruskan ke tiap microservice memakai internal gateway key. Menjelaskan juga alur SSO one-time-code, header identitas BIP-Employee-Id / BIP-System-Roles / BIP-Company-ID yang di-inject dari klaim, response caching Redis beserta jebakan kunci cache yang tak memuat hak, rute publik /public/* dan /ext/*, serta kenapa prefix /internal/ tetap terbuka ke internet karena routing bersifat catch-all.",
       "kata_kunci": [
-        "API gateway",
+        "api gateway",
         "JWT",
         "SSO",
-        "routing",
-        "BIP header",
+        "reverse proxy",
+        "routing module",
+        "redis cache",
+        "rate limit",
         "internal gateway key",
-        "response caching Redis",
-        "keamanan internal",
-        "ADR 0031"
+        "CORS",
+        "BIP-Company-ID"
       ]
     },
     {
@@ -1364,9 +1370,9 @@
         "Microservices - Procurement Service",
         "LOG - 2026-07-30 Audit Otorisasi Employee Service",
         "ADR - 0038 Hak Per-Objek Admin Space Task Management",
+        "RUN - Deploy Microservices bip-erp",
         "DB - Data Dictionary",
         "CORE - IT Orchestrator",
-        "RUN - Deploy Microservices bip-erp",
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
         "Microservices - Employee Service",
@@ -1385,20 +1391,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "a483113212b00b4a4f7542939276e4f1ddeb1ce2d23587066fe650e49b96fe23",
-      "ukuran_kb": 66.0,
-      "ringkasan": "Menjawab: bagaimana hak akses ditentukan di seluruh bip-erp lewat tiga sumbu (modul, tingkat aksi, cakupan/reach), paket izin bernama (permission set) yang menempel di posisi/jabatan, dan bagaimana izin efektif dirakit saat login lalu ditegakkan di gateway, service, serta frontend. Juga menjawab modul mana yang sudah punya katalog permission dan mana yang masih jatuh ke tier `system_roles` lama, plus beda `permission_sets` (hak akses) dengan `menu_hidden` (tampilan menu).",
+      "hash": "db882592a8c7962a4dd0047a6f552b496ee558130ec8502321cf33b681e3ea4c",
+      "ukuran_kb": 67.1,
+      "ringkasan": "Menjawab: bagaimana hak akses di bip-erp disusun dari tiga sumbu (modul, tingkat aksi, cakupan/reach), bagaimana paket hak (permission set) menempel pada posisi/jabatan, dan bagaimana izin efektif diresolusi saat login lalu dibawa di klaim JWT. Menjelaskan katalog permission per modul yang terdaftar, endpoint pengelolaannya (permission-catalog, permission-modules, pemasangan set ke posisi), penegakan lewat RequirePermission dan tier fallback, serta perbedaan tegas antara permission_sets (hak akses) dan menu_hidden (tampilan menu yang hanya mengurangi dan tidak ditegakkan backend).",
       "kata_kunci": [
         "RBAC",
         "permission set",
-        "hak akses",
         "system_roles",
         "reach",
+        "hak per posisi",
         "katalog permission",
-        "posisi",
-        "jabatan",
+        "tier fallback",
         "menu_hidden",
-        "tier fallback"
+        "JWT claim",
+        "master_permission_set"
       ]
     },
     {
@@ -1657,20 +1663,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "c874a8be5a6dc51288e59f4939b241d2b078e0c98b39ad164cb54bbb8a328cb3",
-      "ukuran_kb": 52.5,
-      "ringkasan": "Menjawab: bagaimana autentikasi dan onboarding karyawan bekerja (login via username atau employee_id, PIN, biometrik, refresh token, registrasi) dan operasi admin akun apa yang tersedia untuk IT seperti reset, forget-device, serta baca/set system_roles. Juga menjawab di mana master data departemen, jabatan, dan system role dikelola beserta gerbang aksesnya. Termasuk kenapa workspace Legal, R&D Regulatory, Quality, dan Procurement ikut di-host di service ini alih-alih jadi service sendiri.",
+      "hash": "c19202f826ea1297e542a26402e7f0493ad95f409778ae522baf1116414b97a5",
+      "ukuran_kb": 52.9,
+      "ringkasan": "Menjawab: service mana yang jadi sumber kebenaran data karyawan, autentikasi, dan onboarding, serta endpoint apa saja yang disediakannya (login username/PIN/biometrik, register, refresh, verifikasi, dan rute internal auth). Menjelaskan juga operasi admin akun oleh IT (aktif/nonaktif, forget-device, hard reset, kelola roles), master data departemen dan system role beserta seed otomatisnya, dan workspace tambahan yang menumpang di service ini (Legal, R&D Regulatory, Quality, Procurement non-Accurate) lengkap dengan gerbang perannya.",
       "kata_kunci": [
         "employee service",
-        "login",
-        "autentikasi",
-        "SSO",
+        "auth login",
         "onboarding",
         "master data",
-        "departemen",
-        "system_roles",
+        "master_department",
+        "system roles",
         "akun karyawan",
-        "resign"
+        "resign",
+        "multi-tenant company_id",
+        "legal quality rnd procurement"
       ]
     },
     {
@@ -1724,10 +1730,13 @@
         "ADR - 0041 Izin Tipe Form Menempel di Departemen",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "HRIS - Organization Structure",
+        "Microservices - Task Management Service",
+        "Microservices - Recruitment Service",
+        "Microservices - Learning Service",
+        "CORE - RBAC dan Permission Set",
         "Microservices - Notification Service",
         "IT - Background Jobs & Schedulers",
         "HRIS - Kaizen (Ide Perbaikan)",
-        "Microservices - Task Management Service",
         "RUN - Deploy Microservices bip-erp",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "Microservices - Employee Service",
@@ -1739,20 +1748,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "2b5c22d3443b1063f41d560facaae38b1ed3091650ccf4c578e6a1a2caf6d0ba",
-      "ukuran_kb": 75.2,
-      "ringkasan": "Menjawab: bagaimana form dinamis dibuat tanpa coding, mulai dari 10 tipe pertanyaan, 4 tipe form, alur draft sampai published dan closed, siapa yang boleh mengelola (departemen pemilik), sampai cara membaca rekap jawaban dan mengekspornya ke CSV. Juga menjawab cara kerja form berulang per periode bulanan/mingguan, penilaian karyawan lain lewat sumbu `subject`, program ide Kaizen, lampiran berkas, notifikasi inbox, dan endpoint kepatuhan yang menahan clock-in mobile bila ada form wajib yang belum diisi.",
+      "hash": "ea95a84760a62462f510f7d377de9998e66a2338f0a02d57e36707fcc18effe9",
+      "ukuran_kb": 79.9,
+      "ringkasan": "Menjawab: bagaimana form dinamis dibuat tanpa rilis kode, siapa personanya, dan bagaimana kepemilikan form ditentukan per departemen alih-alih per modul. Menjelaskan 10 tipe pertanyaan dan 4 tipe form, aturan penguncian susunan pertanyaan setelah ada jawaban, mekanisme penilaian karyawan lain lewat sumbu subject, form berulang beserta cron pembuka periode, program Kaizen, lampiran berkas, notifikasi inbox, serta gerbang kepatuhan yang bisa menahan clock-in mobile beserta keputusan gagal-terbuka yang menjaga presensi tetap hidup.",
       "kata_kunci": [
-        "form builder",
+        "form builder service",
         "form dinamis",
-        "survey",
-        "kuesioner",
         "kaizen",
-        "evaluation",
-        "checklist",
         "form berulang",
-        "form-builder-service",
-        "gerbang presensi"
+        "recurrence",
+        "penilaian karyawan",
+        "evaluation",
+        "gerbang presensi",
+        "owner_department",
+        "notifikasi inbox"
       ]
     },
     {
@@ -4683,7 +4692,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Sebagian diimplementasikan — **catatan terminasi sudah live di produksi** (koleksi `employee_resign`, sejak 2026-08-05), dan **kartu turnover bulan berjalan** sudah ada di kode (⚠️ belum merge & belum deploy). Dashboard penuh (ikhtisar, detail per departemen, demografi) masih 🟡 konsep; contohnya masih spreadsheet.",
+      "status_teks": "Sebagian diimplementasikan — **catatan terminasi sudah live di produksi** (koleksi `employee_resign`, sejak 2026-08-05), dan **kartu turnover bulan berjalan ✅ live** di halaman Resign serta di Dashboard HRGA (verifikasi produksi 2026-08-10). Dashboard penuh (ikhtisar, detail per departemen, demografi) masih 🟡 konsep; contohnya masih spreadsheet.",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
@@ -4695,21 +4704,20 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "fb2fadd1984fc59176d417173523f485a297f48a58b5860205de6c271d558175",
-      "ukuran_kb": 3.8,
-      "ringkasan": "Menjawab pertanyaan tentang dashboard attrition (karyawan masuk & keluar) per departemen, termasuk detail demografi (gender, tipe, alasan terminasi) untuk pelaporan ke stakeholder. Juga menjawab bagaimana tingkat turnover bulanan dihitung: rumus rata-rata headcount dengan target 5%, dari mana tiap angkanya berasal, dan kenapa hanya bulan berjalan yang disajikan. Memuat keterbatasan yang menempel pada angka itu: tak ada riwayat headcount sama sekali sehingga jumlah awal bulan harus direkonstruksi, rekonstruksinya buta terhadap penonaktifan yang tak lewat menu Resign, dan tanggal keluar yang dipercaya adalah effective_date bukan applied_at.",
+      "hash": "0d50a1519c006bed817ae2ee949989e16185d18f189e4f6f3cc93bd677f224b4",
+      "ukuran_kb": 4.3,
+      "ringkasan": "Menjawab: apa saja yang ingin ditampilkan dashboard attrition (ikhtisar, detail per departemen, demografi gender/tipe/alasan terminasi) dan data apa yang jadi prasyaratnya. Menjelaskan bagaimana catatan terminasi di koleksi employee_resign melengkapi prasyarat itu, bagaimana kartu turnover bulan berjalan dihitung memakai rata-rata headcount dengan target 5% bulanan, dan tiga keterbatasan angkanya karena tidak ada riwayat headcount, termasuk kenapa hanya bulan berjalan yang disajikan dan kenapa effective_date lebih dipercaya daripada applied_at.",
       "kata_kunci": [
         "attrition",
         "turnover",
-        "tingkat turnover bulanan",
-        "karyawan keluar",
+        "resign",
         "terminasi",
-        "demografi karyawan",
-        "dashboard HR",
+        "employee_resign",
         "headcount",
-        "retention",
-        "catatan terminasi",
-        "employee_resign"
+        "demografi",
+        "dashboard HRGA",
+        "off-boarding",
+        "retention"
       ]
     },
     {
@@ -4812,8 +4820,19 @@
       ],
       "hash": "d837be80d96f6e738d57857d7e0c8bfe4026f7df1d56b8d702fe217321f86390",
       "ukuran_kb": 9.1,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana jenjang karier, promosi, mutasi, dan kaderisasi direncanakan di ERP, termasuk lima tingkat jenjang di master_job_level dan cara jenjang menempel ke jabatan lewat position_items[].level_key. Menjelaskan desain Talent Pool (alur usulan atasan sampai persetujuan HR, status kandidat, model data talent_candidate di service learning) beserta pemisahan tegas antara yang dihitung sistem (penyelesaian kurikulum, nilai rata-rata) dan yang tetap keputusan manusia (layak dipromosikan), serta batas bahwa Talent Pool tidak menulis apa pun ke work_data.",
+      "kata_kunci": [
+        "karier",
+        "career",
+        "promosi",
+        "promotion",
+        "mutasi",
+        "kaderisasi",
+        "talent pool",
+        "succession planning",
+        "jenjang jabatan",
+        "job level"
+      ]
     },
     {
       "path": "Human Resource Information System/HRIS - Compensation & Benefits.md",
@@ -5798,8 +5817,19 @@
       ],
       "hash": "00ff39365a8f0d0fc3eeaf74595c33979256bcfcd531a0d6401c30f8659da39c",
       "ukuran_kb": 16.9,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana program pelatihan karyawan dirancang dan dijalankan, mulai dari master Training Types dan Trainers sampai transaksi Training plus pencatatan peserta dan kehadiran. Menjelaskan fitur mana dari modul Training ERPGo yang diambil, disesuaikan, atau dibuang (misalnya Branch diganti Department, Cost hanya informasional karena pembukuan lewat Accurate), model data yang diusulkan, alur proses bisnis MVP, keputusan menempatkannya di service learning tersendiri, serta rencana lanjutannya menjadi LMS People Development.",
+      "kata_kunci": [
+        "training",
+        "pelatihan",
+        "training program",
+        "trainer",
+        "training type",
+        "peserta kehadiran",
+        "LMS",
+        "people development",
+        "learning service",
+        "ERPGo"
+      ]
     },
     {
       "path": "Human Resource Information System/HRIS - Tukar Jadwal Kerja.md",
@@ -6151,20 +6181,20 @@
         "DB - Overview and Notes",
         "ROADMAP"
       ],
-      "hash": "deccfc3f989428bcbd9a047e278a7032329223fe9892441af092b17bc32eda53",
-      "ukuran_kb": 6.5,
-      "ringkasan": "Menjawab: kenapa Form Builder dibuat, masalah apa yang dipecahkannya dibanding form request yang selama ini di-hardcode per kasus, dan seberapa jauh scope yang benar-benar dibangun menyimpang dari rencana asli (RBAC per departemen, analisa jawaban, sasaran form, dan dampak nyata ke service presensi). Menjawab juga keputusan intersep presensi: kenapa mode `block` hanya menahan jalur mobile, kenapa gerbangnya gagal-terbuka, dan kenapa `block` sebaiknya menunggu MyBharata siap. Memuat keputusan sadar menampilkan identitas responden secara penuh beserta konsekuensi privasinya, plus daftar hal yang masih TBD seperti form publik dan pencarian karyawan untuk sasaran per-orang.",
+      "hash": "182e53af08e0b178810251be4697c6e3e0e03089ce29dddbc655700a464e6458",
+      "ukuran_kb": 8.0,
+      "ringkasan": "Menjawab: kenapa Form Builder dibangun, masalah apa yang diselesaikannya dibanding form request yang dulu di-hardcode per kasus, dan bagaimana scope yang dieksekusi berbeda jauh dari rencana asli (RBAC per departemen, analitik jawaban, sasaran form, multi-perusahaan, dan dampak ke Attendance Service). Menjelaskan juga rencana memindahkan hak mengelola form ke katalog izin per jabatan, aturan intersep presensi (mode block vs warn, hanya jalur mobile, gagal-terbuka, jendela tanggal wajib), urutan rilis yang mengikat, dan keputusan sadar menampilkan identitas responden secara penuh di halaman analisa.",
       "kata_kunci": [
         "form builder",
-        "konsep IT",
-        "form ad-hoc",
+        "konsep",
         "intersep presensi",
-        "block warn clock-in",
-        "identitas responden privasi",
-        "tooling platform",
-        "HRGA",
-        "TBD",
-        "deklarasi kesehatan"
+        "block warn",
+        "clock-in",
+        "identitas responden",
+        "analisa jawaban",
+        "RBAC departemen",
+        "katalog formbuilder",
+        "form request"
       ]
     },
     {
@@ -7297,6 +7327,8 @@
       "tautan": [
         "IT - Background Jobs & Schedulers",
         "CORE - IT Orchestrator",
+        "APP - Web ERP",
+        "CORE - RBAC dan Permission Set",
         "External - Desty",
         "Microservices - Warehouse Service",
         "Microservices - Integration Service",
@@ -7306,20 +7338,20 @@
         "RUN - Deploy Task Management Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "0979f684fa91984c615c3673f5b5c53ed0ccf33ff5fb6def9d71cced0715564e",
-      "ukuran_kb": 9.6,
-      "ringkasan": "Menjawab: bagaimana cara men-deploy ulang satu microservice bip-erp ke produksi tanpa menyentuh dependensinya, kenapa --no-deps wajib di jam rawan, dan kapan justru tidak boleh dipakai. Juga menjawab urutan aman ketika dua service yang saling bergantung dirilis bersama, dan kenapa perubahan shared-library menuntut seluruh service pembacanya ikut di-rebuild (kategori inbox yang gagal senyap, image lama yang membuang klaim JWT). Termasuk cara memeriksa umur image container, fitur dorman di balik feature flag, langkah verifikasi pasca-deploy, dan tabel troubleshooting.",
+      "hash": "30c9ff0b2e029d8388dbc61124f36b5527dd9d5a06cad4cdd006d9d6fee38f2e",
+      "ukuran_kb": 12.1,
+      "ringkasan": "Menjawab: bagaimana cara men-deploy ulang satu microservice bip-erp ke produksi tanpa menyentuh dependensinya, kenapa flag --no-deps wajib di jam rawan, dan kapan justru tidak boleh dipakai. Menjelaskan urutan aman antar-service yang saling bergantung, aturan bahwa perubahan shared-library menuntut service pembacanya ikut di-rebuild (kasus kategori inbox dan klaim JWT yang gagal senyap), cara memeriksa umur image container untuk membuktikan biner memuat logika yang dicari, perbedaan compose dev vs produksi, verifikasi pasca-deploy, serta troubleshooting gejala ke akar masalah.",
       "kata_kunci": [
         "deploy",
-        "docker compose",
-        "no-deps",
-        "microservice",
-        "produksi",
-        "shared-library",
-        "rebuild",
-        "notification-service",
         "runbook",
-        "verifikasi"
+        "docker compose",
+        "--no-deps",
+        "microservice",
+        "shared-library",
+        "rebuild container",
+        "notification-service",
+        "produksi",
+        "troubleshooting"
       ]
     },
     {
@@ -9305,8 +9337,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Human Resource Information System/HRIS - Career & Promotion.md",
-    "Human Resource Information System/HRIS - Training Program.md"
-  ]
+  "gagal": []
 }
