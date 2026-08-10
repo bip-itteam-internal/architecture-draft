@@ -1693,20 +1693,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "fb251a7951f730d825e992c294105c9aaafaba1a5d9f6f84e62d63378cf90550",
-      "ukuran_kb": 59.4,
-      "ringkasan": "Menjawab: apa tanggung jawab employee-service sebagai master data karyawan sekaligus sumber kebenaran autentikasi, onboarding, dan SSO di seluruh bip-erp, serta fitur mana yang sudah ada di kode (login username/PIN/biometrik, account admin seperti forget-device dan hard reset, CRUD master department & system role beserta seed-nya). Menjawab juga kenapa workspace non-HRIS seperti Legal, R&D Regulatory, Quality, dan Procurement dititipkan di service ini (agar tidak menambah modul/URL gateway dan menghindari panic ValidateInternalURL), modul mana yang sudah pindah keluar (Training ke learning-service), serta bagaimana multi-tenant company_id, akun pihak luar, dan resign/non-aktif ditangani. Titik masuk untuk memahami stack, path repo `services/employee`, dan integrasi lintas-service.",
+      "hash": "b316bf445550ba92c05625584c2507f22acaf4dd8f271f4f5c2552ae250645b6",
+      "ukuran_kb": 61.2,
+      "ringkasan": "Menjawab: bagaimana karyawan login ke seluruh ekosistem bip-erp (username/employee_id, PIN, biometric, refresh token) dan bagaimana registrasi/onboarding akun berjalan. Menjelaskan juga endpoint admin akun oleh IT (reset akun, forget-device, set role), CRUD master data department & system role beserta gerbang RBAC-nya, serta di mana data KPI, contract, BPJS, dan kuota cuti karyawan berada. Berguna untuk mencari endpoint workspace divisi yang dititipkan di service ini (Legal, R&D Regulatory, Quality, Procurement non-Accurate) dan bagaimana scoping multi-perusahaan serta jalur non-aktif akun ditangani.",
       "kata_kunci": [
         "employee service",
-        "microservice",
-        "autentikasi SSO",
+        "karyawan",
+        "login",
+        "autentikasi",
+        "authentication",
+        "SSO",
         "onboarding",
-        "master data karyawan",
-        "multi-tenant company_id",
-        "legal perizinan",
-        "R&D regulatory",
-        "quality CAPA",
-        "Go Fiber MongoDB"
+        "master data department",
+        "system roles",
+        "employee_id"
       ]
     },
     {
@@ -2141,30 +2141,31 @@
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "Microservices - Employee Service",
+        "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "Microservices - Recruitment Service",
         "APP - Web ERP",
         "ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri)",
-        "Microservices - Employee Service",
         "Microservices - File Service",
         "CORE - API Master Gateway",
         "DB - Overview and Notes",
         "APP - MyBharata",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "65f78691316566cbf4c8e0701dc58105033547c366c730cfb03375d24f7a9afe",
-      "ukuran_kb": 5.9,
-      "ringkasan": "Menjawab: channel notifikasi apa saja yang tersedia untuk seluruh ekosistem (inbox in-app, FCM push personal/departemen/broadcast, WhatsApp, email lewat Resend, splash promotion, article) dan endpoint mana yang dipakai untuk mengirimnya, termasuk route yang dijaga service key. Juga menjelaskan pola identitas pengirim email per-service (default RESEND_FROM_EMAIL versus field from milik tiap service), scoping feed artikel per perusahaan dengan flag group_wide untuk broadcast grup, serta cron harian pembersih inbox berumur lebih dari 2 bulan.",
+      "hash": "260019e8208503d5eaf2900d7aff2f02aab00047b1a56c611aa8ff3f5d59a643",
+      "ukuran_kb": 7.3,
+      "ringkasan": "Menjawab: lewat channel apa saja sebuah service bisa memberi tahu karyawan (in-app inbox, FCM push, WhatsApp, email, splash promotion, article) dan endpoint mana yang dipanggil untuk tiap channel, termasuk aturan service key pada route pengiriman. Menjelaskan cara kerja daftar-izin kategori inbox, akibat kategori yang absen atau salah petak, serta pola identitas pengirim email per-service lewat Resend (`from`, RESEND_FROM_EMAIL, domain terverifikasi). Berguna juga untuk memahami retensi inbox lewat cron dan bagaimana feed Article dibatasi per perusahaan/tenant.",
       "kata_kunci": [
-        "notification service",
         "notifikasi",
+        "notification service",
+        "inbox",
         "FCM",
         "push notification",
         "WhatsApp",
         "email",
         "Resend",
-        "inbox",
-        "article",
-        "splash"
+        "kategori inbox",
+        "article"
       ]
     },
     {
@@ -3790,7 +3791,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Backend + frontend + notifikasi **merged ke `main`** 2026-08-10 (bip-erp [#1142](https://github.com/bip-itteam-internal/bip-erp/pull/1142) · [#1143](https://github.com/bip-itteam-internal/bip-erp/pull/1143), erp-frontend [#962](https://github.com/bip-itteam-internal/erp-frontend/pull/962); notifikasi bip-erp [#1145](https://github.com/bip-itteam-internal/bip-erp/pull/1145) + my-bharata [#110](https://github.com/bip-itteam-internal/my-bharata/pull/110) masih terbuka). ⚠️ **Belum diverifikasi lewat gateway hidup**, produksi belum di-deploy. **Approval sengaja ditunda** — lihat §Consequences.",
+      "status_teks": "Implemented (ada catatan). Seluruh backend + frontend **merged ke `main`** 2026-08-10: bip-erp [#1142](https://github.com/bip-itteam-internal/bip-erp/pull/1142) · [#1143](https://github.com/bip-itteam-internal/bip-erp/pull/1143) · [#1145](https://github.com/bip-itteam-internal/bip-erp/pull/1145), erp-frontend [#962](https://github.com/bip-itteam-internal/erp-frontend/pull/962). Pemetaan kategori mobile ikut merged ke `dev` (my-bharata [#110](https://github.com/bip-itteam-internal/my-bharata/pull/110)). ⚠️ **Belum diverifikasi lewat gateway hidup dan produksi belum di-deploy**; kategori inbox baru menuntut `Employee-Service` + `Notification-Service` naik **bersama**. **Approval sengaja ditunda** — lihat §Consequences.",
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
@@ -3798,6 +3799,7 @@
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
         "Microservices - Calendar Service",
+        "Microservices - Learning Service",
         "Microservices - Notification Service",
         "Microservices - Employee Service",
         "API - Employee Service",
@@ -3807,20 +3809,20 @@
         "Microservices - File Service",
         "APP - Web ERP"
       ],
-      "hash": "7647219d7a6cd73114e6c646fe1b9180ffe6d26668399d5baa394bf729b55d36",
-      "ukuran_kb": 11.2,
-      "ringkasan": "Menjawab: apa yang terjadi pada `employee_id` ketika karyawan pindah badan usaha (mis. BIP ke ELT), dan kenapa ID sengaja tidak pernah diterbitkan ulang meski prefix perusahaan jadi berhenti berarti (agar riwayat presensi, KPI, cuti, payroll, tiket, dan dokumen tidak terputus). Menjawab pula bagaimana promosi dan mutasi disatukan di koleksi `employee_movement` dengan pembeda `type`, kenapa jenis perpindahan dipilih HR dan bukan disimpulkan dari `level_key`, bagaimana status scheduled/applied/cancelled diterapkan cron harian 00:15 WIB, kenapa `company_id` catatan memakai perusahaan asal, dan bagaimana `work_data` ditulis lewat `$set` sendiri. Merinci konsekuensi yang diterima: masa kerja, kuota cuti, dan BPJS ikut pindah apa adanya, atasan langsung dilepas, dan approval sengaja ditunda sehingga perusahaan tujuan belum punya suara.",
+      "hash": "08c3274ffec7957839d57a1778a7fa5b79304ed038026b66b1f8cab2c4d41113",
+      "ukuran_kb": 14.3,
+      "ringkasan": "Menjawab: apa yang terjadi pada `employee_id` ketika karyawan pindah badan usaha di dalam satu instans bip-erp, dan mengapa ID tidak pernah diterbitkan ulang meski prefix perusahaan jadi tak lagi berarti. Menjelaskan model pencatatan promosi dan mutasi dalam satu koleksi `employee_movement` dengan jenis dipilih HR, status scheduled/applied/cancelled, cron harian penerap, snapshot posisi asal, serta aturan kepemilikan `company_id` perusahaan asal dan pembacaan dua arah. Berguna untuk mengetahui apa yang ikut pindah (masa kerja, kuota cuti, BPJS), apa yang tertinggal (riwayat presensi, modul tanpa scoping tenant), dan mengapa persetujuan perusahaan tujuan belum ada.",
       "kata_kunci": [
+        "mutasi",
         "mutasi antar-perusahaan",
-        "cross-tenant transfer",
         "promosi",
-        "employee_id",
         "employee_movement",
-        "multi-tenant company_id",
-        "ADR 0044",
-        "tanggal efektif",
-        "cron idempoten",
-        "work_data"
+        "employee_id",
+        "multi-tenant",
+        "company_id",
+        "perpindahan jabatan",
+        "career",
+        "ADR 0044"
       ]
     },
     {
@@ -5161,6 +5163,7 @@
         "Sales - Incentive",
         "DB - Overview and Notes",
         "APP - Web ERP",
+        "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "HRIS - Organization Structure",
         "HRIS - Otomasi Skor KPI",
         "HRIS - Work Review",
@@ -5169,18 +5172,18 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "ea224e54216592a522b842d194e92e44e9ddf11f8840b9926542c3fbf491368c",
-      "ukuran_kb": 9.9,
-      "ringkasan": "Menjawab: bagaimana skor KPI dihitung di Bharata dan apa bedanya engine KPI ke insentif tim marketing (9 role, master-kpi, cron metrik iklan) dengan appraisal per-karyawan lintas departemen di employee-service (/kpi/*). Juga menjawab bagaimana template KPI per posisi dan metrik berbobot dibuat, bagaimana scoring per periode YYYY-MM dilakukan dengan snapshot template, dan kenapa posisi template wajib sama persis dengan posisi karyawan. Selain itu menjelaskan siapa yang boleh melihat KPI departemen mana (RBAC per departemen), bagaimana Leader melihat bawahan langsung lewat scope=team, penggabungan tampilan departemen satu tim (HRGA) dari master data, bentuk respons, dashboard agregat, serta bahwa pengisian nilai masih 100% manual.",
+      "hash": "923116ac57292a349fa28efd29584952f1d3ef3543aa1615bb892f7e58ce20b0",
+      "ukuran_kb": 10.8,
+      "ringkasan": "Menjawab: apa beda engine skor KPI untuk insentif tim marketing dengan appraisal KPI per-karyawan lintas departemen, dan di service mana masing-masing berjalan. Menjelaskan cara template KPI dibuat per departemen/posisi, bagaimana scoring per periode `YYYY-MM` dihitung dan di-snapshot, serta aturan bahwa posisi template harus cocok dengan jabatan karyawan pada periode yang dinilai. Berguna untuk memahami siapa yang boleh melihat KPI siapa (RBAC per departemen, cakupan tim untuk Leader lewat bawahan langsung, supervisor menang), bagaimana departemen satu tim seperti HRGA ditampilkan menyatu dari master data, dan bentuk respons serta dashboard agregasinya.",
       "kata_kunci": [
         "KPI",
         "Key Performance Index",
-        "appraisal",
         "penilaian kinerja",
-        "performance review",
+        "appraisal",
         "template KPI",
         "scoring",
         "insentif",
+        "incentive",
         "RBAC departemen",
         "HRGA"
       ]

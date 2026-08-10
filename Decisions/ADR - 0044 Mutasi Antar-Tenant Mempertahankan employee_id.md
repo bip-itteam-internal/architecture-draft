@@ -1,4 +1,4 @@
-**Status**: ⚠️ Implemented (ada catatan). Backend + frontend + notifikasi **merged ke `main`** 2026-08-10 (bip-erp [#1142](https://github.com/bip-itteam-internal/bip-erp/pull/1142) · [#1143](https://github.com/bip-itteam-internal/bip-erp/pull/1143), erp-frontend [#962](https://github.com/bip-itteam-internal/erp-frontend/pull/962); notifikasi bip-erp [#1145](https://github.com/bip-itteam-internal/bip-erp/pull/1145) + my-bharata [#110](https://github.com/bip-itteam-internal/my-bharata/pull/110) masih terbuka). ⚠️ **Belum diverifikasi lewat gateway hidup**, produksi belum di-deploy. **Approval sengaja ditunda** — lihat §Consequences.
+**Status**: ⚠️ Implemented (ada catatan). Seluruh backend + frontend **merged ke `main`** 2026-08-10: bip-erp [#1142](https://github.com/bip-itteam-internal/bip-erp/pull/1142) · [#1143](https://github.com/bip-itteam-internal/bip-erp/pull/1143) · [#1145](https://github.com/bip-itteam-internal/bip-erp/pull/1145), erp-frontend [#962](https://github.com/bip-itteam-internal/erp-frontend/pull/962). Pemetaan kategori mobile ikut merged ke `dev` (my-bharata [#110](https://github.com/bip-itteam-internal/my-bharata/pull/110)). ⚠️ **Belum diverifikasi lewat gateway hidup dan produksi belum di-deploy**; kategori inbox baru menuntut `Employee-Service` + `Notification-Service` naik **bersama**. **Approval sengaja ditunda** — lihat §Consequences.
 
 ## Context
 
@@ -55,9 +55,24 @@ Ditandai **sementara** oleh pemutusnya sendiri. Konsekuensi yang perlu disadari 
 
 **Approval ditunda (2026-08-10).** Lingkupnya sudah ditetapkan untuk kelak: **hanya perpindahan antar-perusahaan** yang akan digerbang; promosi dan mutasi dalam satu perusahaan tetap langsung terjadwal. Sampai itu dibangun, satu-satunya hal yang memberi tahu perusahaan tujuan adalah notifikasi — yang karena itu bukan pelengkap melainkan penambal, dan kalimatnya sengaja menyatakan orangnya sudah masuk alih-alih meminta persetujuan yang tombolnya tak ada. Status `pending` tetap bisa disisipkan di depan `scheduled` tanpa migrasi, sebab status disimpan dan cron hanya menyapu `scheduled`.
 
+**Tiga akibat yang ketahuan setelah modulnya jadi, dan ketiganya sudah ditutup:**
+
+- **KPI dinilai dengan jabatan PERIODE, bukan jabatan hari ini.** `POST /kpi` membandingkan template dengan jabatan karyawan, dan patokan "jabatan terkini" pecah begitu modul ini ada: karyawan yang pindah 1 September membuat penilaian Agustus-nya mustahil diisi benar — template yang BENAR untuk Agustus ditolak 400, dan satu-satunya yang diterima justru template jabatan yang belum dipegangnya sepanjang bulan itu. Jawabannya kini diambil dari `employee_movement`, dan inilah pembenaran retroaktif untuk menyimpan snapshot jabatan asal secara permanen: tanpa snapshot itu pertanyaan "jabatan apa yang dia pegang Agustus lalu" tak punya jawaban di mana pun. Patokannya jabatan pada AKHIR periode, sebab penilaian bulanan harus punya satu jawaban.
+- **Bawahan tidak ikut pindah, dan itu senyap.** Perpindahan memutus relasi atasan-bawahan DUA arah, tapi semula hanya satu yang ditangani. `bawahanAktif` menyaring `supervisor_id` PLUS `company_id`, sehingga Leader yang pindah departemen **di dalam satu perusahaan** tetap mengagregasi skor tim yang sudah bukan timnya, tanpa satu pun galat. Kedua arah kini dijawab satu aturan (`pindahDepartemen`), dan daftar bawahan disnapshot ke catatan supaya pembatalan punya jalan pulang — kelas kesalahan yang sama persis dengan `from_supervisor_id`, yang sudah pernah lolos sekali di modul ini.
+- **Pengembalian bawahan hanya menyentuh yang atasannya masih kosong**, supaya membatalkan perpindahan lama tak menarik kembali orang yang sudah diberi atasan baru.
+
+**Prasyarat perpindahan (post-test LMS) — PONDASI, belum gerbang:**
+
+Aturan yang dituju: naik jabatan atau pindah posisi menuntut post-test LMS jabatan tujuan lebih dulu. LMS-nya belum ada ([[Microservices - Learning Service]] baru memuat pelatihan tatap muka), jadi **belum ada satu pun pemeriksa terdaftar dan tak ada perpindahan yang tertahan**. Yang dipasang cuma sambungannya (`DaftarkanPrasyarat`, meniru idiom `DaftarkanSumber` sumber KPI), plus tempat menyimpan jawabannya di catatan.
+
+Dua sifat menjaganya tidak berubah jadi jebakan, keduanya dikunci uji: tanpa pemeriksa terdaftar **tak ada yang tertahan**, dan pemeriksa yang **gagal dihubungi tidak menahan** — kalau menahan, satu service yang mati mengunci pencatatan mutasi seluruh perusahaan padahal tanggal perpindahan sudah berjalan.
+
+Hasilnya **disimpan** di catatan, bukan dihitung ulang saat dibaca: kelayakan dinilai saat perpindahan diputuskan, dan menghitungnya ulang setahun kemudian membuat catatan lama tampak melanggar aturan yang belum ada waktu itu. Pelewatan disiapkan sejak awal dan **wajib beralasan berikut pelakunya**, sebab gerbang tanpa jalan keluar yang tercatat akan dilewati dengan cara mematikan gerbangnya.
+
 **Yang belum dikerjakan:**
 
 - **Belum pernah dijalankan lewat gateway hidup.** Seluruh verifikasi masih lokal.
+- **Frontend belum tahu soal pelewatan prasyarat.** `skip_prasyarat` diterima backend tapi tak ada kontrolnya di form. Tak berpengaruh selama belum ada pemeriksa terdaftar; begitu LMS tersambung, formnya wajib menyusul.
 - **Prod belum di-deploy.** Kategori inbox baru menuntut `Employee-Service` dan `Notification-Service` naik **bersama** ([[Microservices - Notification Service]]); yang tak di-rebuild memegang salinan `shared-library` lama dan notifikasinya hilang tanpa jejak.
 - **Riwayat seorang karyawan terbelah di dua tenant** dan tak ada satu layar pun yang menyatukannya.
 
