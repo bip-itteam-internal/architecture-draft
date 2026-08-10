@@ -17,7 +17,7 @@ Rencana yang terkunci di dokumen ini sebelumnya (RBAC `it` saja, tanpa FE, tanpa
 
 | Aspek | Rencana asli | Yang dibangun |
 |---|---|---|
-| RBAC | `system_roles["it"]` saja | **per departemen** (PR #869): tingkat peran pengelola + departemen ada di daftar aktif. Sekarang HRGA (Human Resource + General Affair) dan IT (Tech Development); departemen berikutnya cukup ubah env. 🟡 Katalog permission-set sedang menyusul (PR #1138, **belum merged**) — lihat §Menuju hak per jabatan |
+| RBAC | `system_roles["it"]` saja | **per departemen** (PR #869): tingkat peran pengelola + departemen ada di daftar aktif. Sekarang HRGA (Human Resource + General Affair) dan IT (Tech Development); departemen berikutnya cukup ubah env. ⚠️ Katalog permission-set merged & live dev+prod 2026-08-10 (PR #1138), paket belum dipasang ke jabatan — lihat §Menuju hak per jabatan |
 | Hasil jawaban | export CSV saja | analisa per pertanyaan + tren harian + tingkat pengisian, **plus** CSV |
 | Sasaran form | (tak ada) | semua / per departemen / per karyawan |
 | Dampak ke service lain | "nol dampak" | **menyentuh [[Microservices - Attendance Service]]**: clock-in mobile bisa ditahan bila ada form wajib belum diisi |
@@ -27,7 +27,7 @@ Yang **tetap** ditunda sesuai rencana asli: **upload file** dan **logika percaba
 
 ## Menuju hak per jabatan
 
-> **Status**: 🟡 PR [#1138](https://github.com/bip-itteam-internal/bip-erp/pull/1138) **terbuka**, belum merged dan belum di-deploy per 2026-08-10.
+> **Status**: ⚠️ **Merged & live di dev DAN prod, 2026-08-10** (PR [#1138](https://github.com/bip-itteam-internal/bip-erp/pull/1138)), keduanya terverifikasi. Tapi **belum ada satu jabatan pun yang dipasangi paketnya**, jadi bagi semua orang akses hari ini masih sama persis seperti sebelumnya. Manfaatnya baru terasa setelah HR memasang paket ke jabatan — itu keputusan organisasi, bukan langkah rilis.
 
 Perpindahan ke sumbu departemen (PR #869) menjawab "form ini milik tim siapa", tapi belum menjawab "siapa di tim itu yang boleh membangunnya". Akibatnya hari ini **siapa pun yang bekerja di ketiga departemen aktif dan punya peran apa pun di modul mana pun** sudah bisa membuat dan menerbitkan form — staf dengan peran tiket sekalipun.
 

@@ -157,20 +157,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "c42c5dc142aa00ac1309b731c1f0f0ab95a2c7a48e802b344dfaf8cd39c5f110",
+      "hash": "a59077c0635907484e84f44c2643880cb740de566a7dffaab798880a48f4852a",
       "ukuran_kb": 24.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang dilayani form-builder-service lewat gateway /api/form-builder/*, siapa yang boleh membuat/menerbitkan/menyunting form (cakupan departemen lewat SupervisedDepartments, bukan modul), dan bagaimana karyawan melihat serta mengisi form lewat rute /me/*. Menjelaskan juga arti parameter ?period= untuk form berulang, aturan tipe form per departemen yang ditetapkan IT (/form-type-rules), alur unggah lampiran (upload_id) sebelum kirim jawaban, rute Kaizen, analitik/export CSV, serta endpoint internal yang dipanggil service lain.",
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (tingkat peran + cakupan departemen) versus siapa yang cukup mengisi, dan bagaimana bentuk request/response tiap rute. Menjelaskan juga rute analisa/export beserta arti `?period=` pada form berulang, alur unggah lampiran (upload dulu, `upload_id` jadi nilai jawaban), rute penilaian karyawan (`/me/forms/:id/subjects`), aturan tipe form per departemen (`/form-type-rules`, khusus modul `it`), rute Kaizen, dan endpoint internal yang dipakai service lain seperti gerbang kepatuhan presensi. Berguna untuk mencari kode status spesifik (403/409/413/422) beserta penyebabnya.",
       "kata_kunci": [
         "form builder",
-        "API endpoint",
         "form dinamis",
-        "dynamic form",
-        "kaizen",
-        "form-type-rules",
+        "API form builder",
+        "endpoint",
         "RBAC departemen",
+        "form-type-rules",
+        "kaizen",
+        "analytics",
         "export CSV",
-        "form berulang",
-        "penilaian karyawan"
+        "lampiran upload"
       ]
     },
     {
@@ -1748,20 +1748,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "ea95a84760a62462f510f7d377de9998e66a2338f0a02d57e36707fcc18effe9",
-      "ukuran_kb": 79.9,
-      "ringkasan": "Menjawab: bagaimana form dinamis dibuat tanpa rilis kode, siapa personanya, dan bagaimana kepemilikan form ditentukan per departemen alih-alih per modul. Menjelaskan 10 tipe pertanyaan dan 4 tipe form, aturan penguncian susunan pertanyaan setelah ada jawaban, mekanisme penilaian karyawan lain lewat sumbu subject, form berulang beserta cron pembuka periode, program Kaizen, lampiran berkas, notifikasi inbox, serta gerbang kepatuhan yang bisa menahan clock-in mobile beserta keputusan gagal-terbuka yang menjaga presensi tetap hidup.",
+      "hash": "baca2a1963debb3cbb3aff732a9b677df1671794f1864e749905b85d975cbfd1",
+      "ukuran_kb": 81.1,
+      "ringkasan": "Menjawab: bagaimana Form Builder Service dibangun dan mengapa keputusan desainnya diambil — stack, path repo, port, database sendiri, serta siapa persona penggunanya. Menjelaskan mekanisme inti: kepemilikan form per departemen (bukan modul), 10 tipe pertanyaan dan 4 tipe form, penguncian susunan pertanyaan begitu ada jawaban, sumbu `subject` untuk penilaian karyawan lain beserta potret sasaran saat terbit dan kerahasiaan penilai, form berulang (periode bulanan/mingguan + cron pembuka periode), program ide Kaizen, notifikasi inbox, lampiran berkas, dan multi-tenant `company_id`. Juga menjawab mengapa gerbang presensi dirancang gagal-terbuka dan mengapa notification-service wajib ikut di-deploy.",
       "kata_kunci": [
         "form builder service",
         "form dinamis",
-        "kaizen",
+        "microservice",
         "form berulang",
         "recurrence",
+        "kaizen",
         "penilaian karyawan",
         "evaluation",
         "gerbang presensi",
-        "owner_department",
-        "notifikasi inbox"
+        "permission set formbuilder"
       ]
     },
     {
@@ -6181,20 +6181,20 @@
         "DB - Overview and Notes",
         "ROADMAP"
       ],
-      "hash": "182e53af08e0b178810251be4697c6e3e0e03089ce29dddbc655700a464e6458",
-      "ukuran_kb": 8.0,
-      "ringkasan": "Menjawab: kenapa Form Builder dibangun, masalah apa yang diselesaikannya dibanding form request yang dulu di-hardcode per kasus, dan bagaimana scope yang dieksekusi berbeda jauh dari rencana asli (RBAC per departemen, analitik jawaban, sasaran form, multi-perusahaan, dan dampak ke Attendance Service). Menjelaskan juga rencana memindahkan hak mengelola form ke katalog izin per jabatan, aturan intersep presensi (mode block vs warn, hanya jalur mobile, gagal-terbuka, jendela tanggal wajib), urutan rilis yang mengikat, dan keputusan sadar menampilkan identitas responden secara penuh di halaman analisa.",
+      "hash": "9e21abe287fb90a18b77946aa169ca36407efb959c2d37f06d5df4f5e4172a03",
+      "ukuran_kb": 8.3,
+      "ringkasan": "Menjawab: mengapa Bharata membangun Form Builder, masalah apa yang dipecahkannya (tiap form baru sebelumnya butuh siklus development), dan bagaimana scope yang dieksekusi berbeda dari rencana awal (RBAC per departemen, analitik, sasaran form, dampak ke Attendance Service, multi-perusahaan). Menjelaskan keputusan produk yang mengikat: intersep presensi mode `block` versus `warn` dan syarat rilisnya, keputusan sadar menampilkan identitas responden penuh di halaman analisa beserta konsekuensi privasinya, serta rencana memindahkan hak mengelola form ke jabatan lewat katalog permission-set. Memuat juga daftar hal yang sengaja belum diputuskan (form publik, pencarian karyawan untuk sasaran, logika percabangan).",
       "kata_kunci": [
         "form builder",
-        "konsep",
+        "konsep form dinamis",
+        "IT tooling",
         "intersep presensi",
-        "block warn",
-        "clock-in",
+        "clock-in block warn",
         "identitas responden",
-        "analisa jawaban",
-        "RBAC departemen",
-        "katalog formbuilder",
-        "form request"
+        "privasi jawaban",
+        "permission set",
+        "hak per jabatan",
+        "scope rencana"
       ]
     },
     {
