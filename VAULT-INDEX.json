@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-10",
+  "digenerate": "2026-08-11",
   "jumlah_dokumen": 282,
   "dokumen": [
     {
@@ -1114,24 +1114,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "a56b030884243197dd8baab5f4edb58d96666f5c8ba0912818ea5ef326ab3898",
-      "ukuran_kb": 192.0,
-      "ringkasan": "Menjawab: apa itu portal web internal hris-dashboard (One Bharata), stack apa yang dipakainya, dan modul apa saja yang ada di dalamnya. Menjelaskan cara kerja login employee_id plus password, refresh token, perannya sebagai SSO Identity Provider bagi aplikasi lain, serta bagaimana sidebar dan halaman digerbangi lewat system_roles per modul, menu induk bersarang, dan penyaringan per tab. Berguna untuk memahami dukungan multi-perusahaan di frontend (company switcher, shift, departemen, WiFi WFO) dan bagaimana setelan HRGA dikumpulkan ke satu induk Pengaturan tanpa mengubah kontrak backend.",
+      "hash": "ff93351ee526c7f37956f9478b4e4a26d2f428a5ef9326290e5b199e839a4c83",
+      "ukuran_kb": 194.9,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS internal Bharata (hris-dashboard \"One Bharata\"), stack dan repo mana yang dipakai, serta modul apa saja yang tersedia di dalamnya. Menjelaskan cara login dan refresh token, bagaimana role dari system_roles menentukan menu yang tampil, dan bagaimana web ini berperan sebagai SSO Identity Provider bagi aplikasi lain seperti Task Manager. Juga menjawab pertanyaan seputar dukungan multi-perusahaan (company switcher, departemen/shift/network per-perusahaan), struktur pengelompokan menu sidebar, dan bagaimana halaman Pengaturan HRGA terpusat menyaring akses per tab.",
       "kata_kunci": [
+        "web ERP",
         "erp-frontend",
         "hris-dashboard",
         "One Bharata",
-        "web ERP",
-        "frontend",
-        "Next.js",
-        "SSO",
+        "frontend Next.js",
+        "SSO Identity Provider",
         "system_roles",
-        "sidebar menu",
         "role gating",
         "multi-perusahaan",
-        "company switcher",
-        "pengaturan HRGA",
-        "i18n"
+        "Pengaturan HRGA"
       ]
     },
     {
