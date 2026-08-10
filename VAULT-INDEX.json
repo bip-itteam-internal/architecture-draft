@@ -1098,20 +1098,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "38d75fcf0abe2fbbd45b5c342b663e83944e331657d411f1255f18858aa45c25",
-      "ukuran_kb": 170.4,
-      "ringkasan": "Menjawab: aplikasi web ERP/HRIS internal Bharata (erp-frontend, \"One Bharata\") memakai stack apa, bagaimana login, refresh token, dan perannya sebagai SSO Identity Provider bekerja, serta bagaimana sidebar dan menu digerbangi lewat cookie system_roles (module dan role apa saja yang dikenal). Juga menjelaskan dukungan multi-perusahaan (CompanySwitcher, halaman kelola perusahaan/departemen/shift/network per-perusahaan) dan bagaimana setelan HRGA dikumpulkan ke satu induk Pengaturan dengan penyaringan per tab, termasuk alasan gerbangnya memakai predikat role alih-alih permission_sets.",
+      "hash": "fb710d4a0ec674161c22c021172ab7b131fa6c3c354b234680af1430d46bf907",
+      "ukuran_kb": 170.5,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (repo `erp-frontend`, \"One Bharata\"), stack teknologinya, dan bagaimana alur login, refresh token, serta perannya sebagai SSO Identity Provider bagi aplikasi lain seperti Task Manager. Menjelaskan juga bagaimana hak akses menu diturunkan dari cookie `system_roles` per modul dan per role, bagaimana menu HRIS dikelompokkan lewat menu induk bersarang, dan bagaimana halaman Pengaturan HRGA terpusat menyaring akses per tab (bukan per halaman) beserta rute lama yang diteruskan ke rute baru. Berguna untuk pertanyaan soal dukungan multi-perusahaan di frontend: pemilih perusahaan admin pusat, kelola departemen/shift/rotasi/mesin fingerprint/network per-perusahaan, dan broadcast artikel lintas-perusahaan.",
       "kata_kunci": [
         "erp-frontend",
         "One Bharata",
-        "hris-dashboard",
+        "web ERP",
         "SSO",
+        "identity provider",
         "system_roles",
         "role gating",
         "sidebar menu",
-        "multi-perusahaan",
-        "CompanySwitcher",
-        "Next.js"
+        "Pengaturan HRGA",
+        "multi-perusahaan"
       ]
     },
     {
