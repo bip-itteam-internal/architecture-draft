@@ -404,12 +404,15 @@ Isinya menyusun dari yang sudah ada, bukan membangun sumber baru:
 
 **Empat endpoint di atas sudah lama ada dan TAK PUNYA satu pun pemanggil di frontend** sebelum layar ini: `request/view`, `business-trip/view`, `kpi/dashboard`, dan `pesanan-erp/persetujuan`. Yang terakhir bahkan punya layar keputusan lengkap yang tak bisa dicapai siapa pun sejak menunya dicabut dari Portal Saya — lihat [[REF - Alur Persetujuan]].
 
-Empat jebakan yang ditemukan saat membangunnya, seluruhnya hanya terlihat setelah dijalankan dengan data sungguhan:
+Lima jebakan yang ditemukan saat membangunnya, seluruhnya hanya terlihat setelah dijalankan dengan data sungguhan:
 
 - **Nilai status persetujuan adalah KALIMAT**, bukan kode: `"Menunggu persetujuan"`, bukan `"waiting"`. Tebakan dari nama fieldnya membuat antrean selalu kosong tanpa satu pun galat — dan di lingkungan yang belum punya pengajuan, kekosongan itu terlihat wajar.
 - **`average: 0` dari `/kpi/dashboard` berarti BELUM DINILAI**, bukan nilai nol; pembobotnya `total_scored`, bukan `total_employees`. Versi pertama menampilkan "10 divisi dinilai, rata-rata 0.0" untuk perusahaan tanpa satu pun penilaian.
 - **Item Portal Saya wajib `public: true`.** Saringan terakhir sidebar hanya menyisakan item ber-`public` untuk kategori yang bukan modul si pembaca, dan `erp` hampir tak pernah termasuk. Tanpa itu menunya lenyap tanpa galat.
+- **Daftar tab yang diturunkan dari IZIN memicu hydration mismatch.** Izin dibaca dari klaim JWT di sisi klien; saat SSR token itu tak ada, jadi server merender SATU tab (hanya Persetujuan, satu-satunya yang tak menuntut izin) sementara klien merender tiga. Jejak galatnya menunjuk `TabsTrigger` di dalam Radix — jauh dari sebabnya. Ditutup dengan pola `isClient` yang **sudah dipakai `components/layout/sidebar.tsx`** untuk alasan sama persis; kepala halaman tetap dirender di server karena statis.
 - **Dialog Radix mode modal mengunci `<body>`** (`pointer-events: none` + `data-scroll-locked`) dan tak melepasnya saat ditutup sesudah mutasi — SELURUH halaman berhenti bisa diklik, tanpa galat, dan gejalanya tampak seperti tab yang rusak. Ditutup dengan `modal={false}`; menunda invalidasi, mencegah `onCloseAutoFocus`, dan menahan baris agar tak lenyap semuanya TIDAK menolong.
+
+> **Cara memeriksa hydration error yang menyesatkan:** riwayat konsol peramban **menumpuk lintas navigasi**, jadi galat dari kunjungan sebelumnya terbaca seolah masih terjadi. Hydration mismatch di atas sempat disimpulkan "pre-existing" justru karena itu — galat serupa memang muncul di `/dashboard`. Periksa di **tab baru**, bukan dengan memuat ulang.
 
 Digerbang `finance.profit.view` di sidebar — izin paling sempit yang benar-benar dituntut halamannya. Konsekuensi yang disengaja: admin finance ikut melihat menunya; tiap tab tetap memeriksa izinnya sendiri, dan tab yang tak berhak dibuang, bukan dinonaktifkan.
 
