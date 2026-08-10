@@ -399,9 +399,12 @@ Isinya menyusun dari yang sudah ada, bukan membangun sumber baru:
 | Riwayat keputusan | `as=reviewed` | — |
 | Payroll run menunggu | `/payroll-runs` status `draft` | menautkan ke halaman run |
 | Pesanan Pembelian menunggu | `/pesanan-erp/persetujuan` | menautkan ke `/persetujuan/pesanan-pembelian` |
+| Permintaan Barang menunggu | `/permintaan-erp/persetujuan` | menautkan ke `/persetujuan/permintaan-barang` |
 | Rekrutmen — penawaran & permintaan karyawan | `/offers` + `/requisitions` | menautkan ke halaman Rekrutmen |
 | Kinerja seluruh divisi | `/kpi/dashboard` | — |
 | Posisi keuangan | `/profit/products` (omzet, laba kotor, margin) | — |
+
+⚠️ **Cakupan tiap panel BERBEDA, dan itu disengaja.** Cuti/dinas & Pesanan Pembelian digerbang nama JABATAN setingkat Direktur; Payroll & Rekrutmen digerbang IZIN, jadi antreannya sama dengan yang dilihat penyetuju lain; **Permintaan Barang digerbang CAKUPAN SUPERVISI**, sehingga isinya hanya departemen yang dinaungi pemakai — bagi pemegang jabatan Direktur hari ini, Kesekretariatan saja. Permintaan barang memang keputusan atasan departemen peminta; persetujuan tingkat perusahaan terjadi belakangan di Pesanan Pembelian. Layarnya menyatakan batas itu ("Hanya dari departemen yang Anda naungi") supaya kekosongan tak terbaca sebagai kerusakan.
 
 Penyaringan penawaran menuntut **dua** syarat, bukan satu: `status = Draft` DAN approval belum `Approved`. Offer yang sudah disetujui TETAP berstatus Draft sampai dikirim ke kandidat, jadi menyaring dari status saja memunculkan kembali offer yang baru diputus — dan penyetujunya akan mengira keputusannya tak tersimpan.
 
