@@ -5,7 +5,7 @@
 - **Stack**: Go (fiber middleware) + MongoDB (`master_permission_set`, `master_department`, `system_authentication`) + JWT HS256 sebagai pembawa izin efektif; frontend Next.js membaca klaim yang sama.
 - **Path di repo**: `bip-erp/shared-library/common/{permissions.go,catalog_ticket.go,catalog_menu.go,catalog_hris.go,catalog_payroll.go,catalog_legal.go,roles.go,position.go,tier_fallback.go}` · `bip-erp/services/employee/{legal_gate.go,hris_gate.go,peran_dari_jabatan.go}` · `bip-erp/shared-library/models/employee/permission_set.go` · `bip-erp/services/employee/{permission_resolve.go,menu_terbatas.go,hris_gate.go}` · `bip-erp/services/attendance/{hris_gate.go,payroll_gate.go}` · `bip-erp/services/payroll/rbac.go` · `bip-erp/services/task-management/{rbac.go,routes.go}` · `erp-frontend/src/utils/{access.ts,menu-permission.ts,menu-terbatas.ts,posisi.ts}` · `erp-frontend/src/components/layout/{sidebar-menus.tsx,portal-menu.ts,modul-aktif.ts}` · `erp-frontend/src/features/hris/master-data/*`
 - **Status**: ⚠️ Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, serta **legal** (yang terakhir ⚠️ belum merge). **finance** punya katalog + 5 paket dan menunya sudah bertanda izin, tetapi **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.
-- **FASE DUA dimulai 2026-08-09 di dev**: `recruitment` dan `kpi` tak lagi menolong akun tanpa paket (`RECRUITMENT_TIER_FALLBACK=off`, `KPI_TIER_FALLBACK=off`), setelah 17 jabatan dipasangi paket padanannya. `hris` sengaja tetap di fase satu. Lihat §Fase dua.
+- **FASE DUA sempat dinyalakan lalu DICABUT di hari yang sama (2026-08-09)**. Sakelar `RECRUITMENT_TIER_FALLBACK=off` dan `KPI_TIER_FALLBACK=off` dipasang setelah 17 jabatan dipasangi paket di dev, lalu dicabut kembali (`e7966f43`) karena prasyaratnya tak berlaku di semua lingkungan. `hris` tak pernah dinyalakan. Lihat §Fase dua — termasuk kenapa keadaan container **tidak** otomatis mengikuti isi compose.
 - **Katalog yang benar-benar terdaftar per 2026-08-09 ada 11**, terverifikasi dari `origin/main` (berkas `shared-library/common/catalog_*.go` + titik `common.RegisterCatalog`): `finance`, `hris`, `kaskecil`, `kpi`, `menu`, `monitoring`, `payroll`, `procurement`, `recruitment`, `ticket`, `training`. `legal` belum ada di `main`. Daftar ini yang mengisi `GET /api/employee/master/permission-modules`, jadi ia juga yang menentukan modul mana yang bisa dipilih HR saat menyusun paket.
 
 ## Persona / Pengguna
@@ -88,12 +88,19 @@ Tiap modul berkatalog melewati dua fase. **Fase satu** memasang gerbang tanpa me
 
 Sakelar per modul, semuanya env sehingga peralihan fase tak menuntut deploy dan bisa dikembalikan seketika:
 
-| Modul | Sakelar | Status dev |
+| Modul | Sakelar | Status dev per 2026-08-09 |
 |---|---|---|
-| `recruitment` | `RECRUITMENT_TIER_FALLBACK` | **off** sejak 2026-08-09 |
-| `kpi` | `KPI_TIER_FALLBACK` | **off** sejak 2026-08-09 |
-| `training` | `TRAINING_TIER_FALLBACK` | masih fase satu (service `learning` belum terpasang di dev) |
+| `recruitment` | `RECRUITMENT_TIER_FALLBACK` | dicabut dari compose; **container yang berjalan masih membawa `off`** |
+| `kpi` | `KPI_TIER_FALLBACK` | dicabut dari compose, container sudah dibuat ulang → fase satu |
+| `training` | `TRAINING_TIER_FALLBACK` | belum pernah dinyalakan (service `learning` tak terpasang di dev) |
 | `hris` | `HRIS_TIER_FALLBACK` | sengaja fase satu — modul dasar seluruh tim HR |
+
+⚠️ **Dinyalakan lalu dicabut di hari yang sama, dan pelajarannya bukan soal RBAC.** Kedua sakelar dipasang setelah 17 jabatan dipasangi paket di dev, lalu dicabut (`e7966f43`) atas keberatan yang sah: **env dibaca saat container DIBUAT**, jadi baris di compose bisa menyala tak terduga pada `docker compose up -d` berikutnya — deploy rutin sekalipun — di lingkungan yang paketnya belum terpasang.
+
+Dua hal yang perlu diingat dari kejadian itu:
+
+- **Isi compose ≠ keadaan container.** Baris sudah dicabut, tapi `printenv` di Recruitment-Service masih menjawab `off` karena container itu dibuat sebelum pencabutan. Arah sebaliknya juga berlaku dan lebih berbahaya: baris yang baru ditambahkan belum berefek sampai container dibuat ulang, sehingga "sudah saya set" dan "sudah berlaku" adalah dua pernyataan berbeda. Periksa dengan `docker exec <c> printenv <VAR>`, bukan dengan membaca compose.
+- **Prasyaratnya diukur per lingkungan.** Pengukuran yang mendasari penyalaan dilakukan di **dev** (25 jabatan berpaket, 10 di antaranya memuat `kpi_*`); pengukuran yang mendasari pencabutan menemukan angka yang jauh berbeda. Klaim "prasyarat terpenuhi" tak berpindah antar-lingkungan dengan sendirinya — dan fase dua di lingkungan yang paketnya kosong berarti modul itu menolak **semua orang**.
 
 Dua sakelar terakhir menuntut penegaknya tinggal di shared-library (dipakai employee & attendance untuk `hris`), jadi keduanya dipusatkan di `shared-library/common/tier_fallback.go`: dibaca sekali per proses, bawaannya menyala, dan **hanya nilai `off` yang mematikan** sehingga salah ketik menyisakan akses alih-alih mencabutnya. Keputusannya dipisah jadi bentuk murni ber-parameter (`izinHrisEfektifDenganFallback`, `kpiRBACDenganFallback`) supaya kedua fase bisa diuji tanpa menyentuh env proses yang global.
 
