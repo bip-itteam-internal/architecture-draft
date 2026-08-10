@@ -88,6 +88,16 @@ Ketiganya kini menunjuk **`common.SetaraDirektur`** (`shared-library/common/jaba
 - **Tak ada lagi alur persetujuan tanpa gerbang** sejak 2026-08-10. Satu-satunya yang benar-benar terbuka (insentif) sudah ditutup; klaim kedua (inventory) ternyata salah baca.
 - **Payroll: niat vs kenyataan.** Komentar di `services/payroll/rbac.go` menulis `isApprover` = "persetujuan final payroll run (Direktur)", tapi isinya `isHRAdmin`. Selama Direktur tak punya paket payroll, HR admin-lah yang menyetujui atas namanya. Ditutup 2026-08-10 dengan memasang paket `payroll_penyetuju` ke jabatannya — **tanpa mengubah gerbang**, sebab `gate()` mendahulukan izin dari klaim.
 - **Persetujuan Pesanan & Permintaan tak punya pintu masuk dari navigasi.** Menunya dicabut dari Portal Saya; halamannya (`/persetujuan/pesanan-pembelian`, `/persetujuan/permintaan-barang`) dibiarkan dormant dan hanya bisa dibuka lewat URL langsung. Sejak 2026-08-10 antrean PO punya pintu lewat [[APP - Web ERP]] (Ruang Direktur); **Permintaan Barang masih tanpa pintu**.
+- ⚠️ **Wewenang memutus tanpa kemampuan melihat adalah kelas cacat yang berulang di ERP ini**, dan yang membuatnya sulit ditemukan: gejalanya "tak ada apa-apa", bukan penolakan. Tiga contoh sejauh ini, ketiganya baru ketahuan saat antreannya ditampilkan di satu layar:
+
+	| Alur | Berwenang | Tapi daftarnya |
+	|---|---|---|
+	| Cuti & dinas | Direktur (dari slot) | tak punya layar sama sekali sampai 2026-08-10 |
+	| Pesanan Pembelian | Direktur (`SetaraDirektur`) | menunya dicabut, halamannya dormant |
+	| Job requisition | pemegang `recruitment.approve` | `listRequisitions` menyaring ke pengaju sendiri kecuali tier `hris` — Direktur selalu menerima daftar KOSONG |
+
+	Yang ketiga ditutup 2026-08-10: syaratnya kini `isHR` **atau** memegang `recruitment.view` (union, jadi pemegang tier tak kehilangan apa pun).
+
 - **Persetujuan PO di Accurate tak bisa ditindaklanjuti dari ERP.** ERP menyimpan salinan pesanan Accurate (`status_name: "Diajukan"`), tapi Accurate hanya menyediakan `save.do` — tak ada endpoint approval. Alur yang bisa diputus dari ERP adalah `pesanan_erp`, yang terpisah dari cermin itu.
 
 ## Dokumen Terkait
