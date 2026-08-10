@@ -12,9 +12,12 @@
 - **Promosi & Mutasi** — ⚠️ **sudah ada** sejak 2026-08-10, satu modul dan satu koleksi `employee_movement` dibedakan `type` (`Promosi` · `Mutasi` · `Mutasi Antar-Perusahaan`). Menutup kekosongan lama: perpindahan kini punya tanggal efektif, alasan, dokumen SK, dan jejak yang bisa dibatalkan. Keputusannya di [[ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id]], rincian teknis di [[Microservices - Employee Service]]
 	- **Termasuk perpindahan ANTAR-PERUSAHAAN** (BIP ↔ ELT), dan `employee_id` sengaja **tidak** diterbitkan ulang supaya riwayat presensi/KPI/cuti/payroll tak terputus. Konsekuensinya prefix ID berhenti menandakan perusahaan
 	- **Jenis dipilih HR, tidak disimpulkan dari jenjang** — nol dari 79 jabatan berjenjang, jadi menyimpulkannya berarti menyimpulkan dari data kosong
-	- ⚠️ **Belum ada approval**, sehingga perusahaan tujuan tidak punya suara atas karyawan yang didorong masuk. Ini konsekuensi sadar irisan pertama dan alasan terkuat approval berikutnya wajib menyertakan pihak tujuan
-	- ⚠️ **Belum ada frontend**, belum ada notifikasi, dan **belum diverifikasi lewat gateway hidup**
-	- **Belum tersambung ke kontrak & payroll**: pindah badan usaha semestinya menerbitkan kontrak baru, tapi modul ini sengaja tak menyentuh `employment_type`/`contract_ending` yang milik modul kontrak
+	- **Layar**: menu HRIS → Personalia → **Promosi & Mutasi** (`/hris/mutasi`), lengkap dengan panel detail bergambar sebelum → sesudah dan lampiran SK
+	- **Pemberitahuan** dikirim saat perpindahan benar-benar diterapkan: ke karyawannya, dan untuk perpindahan lintas tenant juga ke supervisor HR perusahaan tujuan
+	- ⚠️ **Approval sengaja DITUNDA** (2026-08-10), sehingga perusahaan tujuan tidak punya suara atas karyawan yang didorong masuk. Lingkupnya sudah ditetapkan untuk kelak: hanya perpindahan antar-perusahaan yang akan digerbang. Sampai itu ada, notifikasi ke HR tujuan adalah **penambal**, bukan pelengkap
+	- **Masa kerja, kuota cuti, dan BPJS IKUT PINDAH apa adanya** saat ganti badan usaha (keputusan HR 2026-08-10, **sementara**). Modul ini karena itu tak menyentuh ketiganya, dikunci uji
+	- **Kontrak kerja baru wajib tapi tidak dibuat sistem**: nomor, jenis, dan dokumen bertanda tangan tak bisa diturunkan dari data perpindahan. HR tujuan diingatkan lewat pemberitahuan yang sama
+	- ⚠️ **Belum diverifikasi lewat gateway hidup**, prod belum di-deploy
 - **Kaderisasi / Talent Pool** — 🟡 desainnya lengkap, kodenya belum ada. Pencatatan calon penerus jabatan beserta kesiapannya, dirancang sebagai Fase 2 LMS di [[Microservices - Learning Service]]. Rinciannya di bagian **Kaderisasi & Talent Pool** di bawah
 - **Mutasi** — perpindahan departemen/lokasi/posisi (mis. *Bootcamp Content Creator* yang pindah HR → GA)
 - Riwayat perubahan posisi per karyawan (work history)
@@ -85,8 +88,9 @@ Menu **Talent Pool** di `/hris/learning/talent` (baru, Fase 2): usulan kandidat 
 - **Penempatan 79 jabatan ke tingkatnya** — nol terisi; berkas usulan menunggu koreksi HR. Ini juga yang menghalangi saran kandidat otomatis di Talent Pool
 - **Angka bawaan Talent Pool** — `talent_min_average` baru **usulan** 75, belum ditetapkan HR
 - ~~**Modul Promosi** — ditunda sebagai spec terpisah~~ — **dibangun 2026-08-10**, lihat §Ruang Lingkup & [[ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id]]
-- Aturan & syarat promosi; alur **approval** promosi/mutasi — **masih terbuka**, dan kini jadi yang paling mendesak karena modulnya sudah jalan tanpa persetujuan siapa pun
-- **Masa kerja, kuota cuti, dan BPJS saat pindah badan usaha** — ikut pindah atau di-reset, belum diputuskan HR
+- Alur **approval** perpindahan — **ditunda sadar** 2026-08-10, bukan terlupa. Lingkupnya sudah ditetapkan (hanya antar-perusahaan); yang belum adalah siapa penyetujunya. Tetap yang paling mendesak, sebab modulnya sudah jalan tanpa persetujuan siapa pun
+- ~~**Masa kerja, kuota cuti, dan BPJS saat pindah badan usaha**~~ — **diputuskan 2026-08-10**: ketiganya ikut pindah apa adanya, **sementara**. Perlu ditinjau ulang bila pesangon lintas-entitas jadi persoalan, sebab masa kerja yang berjalan terus berarti perhitungannya memakai tanggal masuk di perusahaan lama
+- Aturan & syarat promosi (kapan seseorang layak naik) — masih terbuka, dan bergantung pada matriks kompetensi yang juga belum ada
 - Dampak ke payroll/komponen gaji — **rentang gaji per jenjang** adalah salah satu alasan utama jenjang dibuat, tapi belum ada apa pun yang menghubungkan keduanya
 - Pencatatan riwayat (efektif tanggal, alasan) — sengaja **di luar lingkup** pekerjaan jenjang 2026-08-03 supaya task-nya tak membengkak
 

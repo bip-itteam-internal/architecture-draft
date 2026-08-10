@@ -92,20 +92,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "2afc797d9c1b90cc71bbe5810c0172121d983a485ba931c4ab57330c00733aeb",
-      "ukuran_kb": 23.8,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di employee-service lewat gateway `/api/employee/*`, mulai dari login (username/PIN/biometrik), onboarding, CRUD personal_data & work_data, dokumen, jadwal kerja, sampai master data departemen, system role, dan jenjang jabatan. Juga menjawab siapa yang boleh memanggil tiap grup rute (RBAC seperti `RequireHRISStaff`, `RequireITSupervisor`, `RequireHRISOrITSupervisor`) serta perilaku khusus tiap endpoint, misalnya PUT departemen yang mempertahankan `supervised_by`, `menu_hidden` yang hanya menyembunyikan menu tanpa mengubah hak akses, dan penolakan 400 untuk key jenjang yang tak dikenal. Termasuk grup akun pihak luar (vendor/mitra) berprefiks `EXT-`: penerbitan, perpanjangan masa berlaku, penonaktifan, permission set, dan system role.",
+      "hash": "0a35ddca7a0caa1caaa6dd81c18772305f4f3c7440b454175c48d98bb51b81ac",
+      "ukuran_kb": 24.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service lewat gateway `/api/employee/*`, dan siapa yang boleh memanggil tiap grup rute (RBAC seperti RequireHRISStaff, RequireITSupervisor, RequireHRISOrITSupervisor). Mencakup path pasti untuk login/refresh/verify-PIN, onboarding, CRUD personal & work data, dokumen pribadi/kerja, jadwal, ulang tahun, kelola akun & device, master data departemen/system role/job level/menu-hidden, akun pihak luar (vendor/mitra), KPI, cuti, laporan, resign, serta promosi & mutasi. Berguna saat perlu memastikan path, method, dan gerbang akses sebuah operasi HRIS sebelum memanggilnya dari frontend atau service lain.",
       "kata_kunci": [
         "employee service",
-        "endpoint",
-        "API HRIS",
-        "auth",
-        "login",
-        "master data",
-        "departemen",
-        "system roles",
+        "API endpoint",
+        "/api/employee",
         "RBAC",
-        "akun eksternal"
+        "auth login",
+        "master data departemen",
+        "system roles",
+        "job level",
+        "akun eksternal vendor",
+        "work data"
       ]
     },
     {
@@ -1693,20 +1693,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "0af906330bc3076bf5a384c9ce05ab6d51ab44ffb08be4ff5c02b67239db8503",
-      "ukuran_kb": 58.2,
-      "ringkasan": "Menjawab: apa saja yang ditangani employee-service sebagai sumber kebenaran autentikasi, onboarding, dan master data karyawan di seluruh ekosistem bip-erp, termasuk login (username/employee_id, PIN, biometrik), refresh token, hashing password/PIN, serta rute internal yang dikonsumsi service lain. Juga menjawab operasi admin akun oleh IT (`/account/active-status`, `forget-device`, `reset`, `roles`), CRUD departemen dan system role beserta gerbang RBAC-nya, dan mengapa workspace Legal, R&D Regulatory, Quality, dan Procurement non-Accurate ikut di-host di service ini alih-alih jadi service baru. Menjelaskan pula batas kepemilikan data seperti `work_data` dan satu-satunya tempat `is_active` ditulis.",
+      "hash": "fb251a7951f730d825e992c294105c9aaafaba1a5d9f6f84e62d63378cf90550",
+      "ukuran_kb": 59.4,
+      "ringkasan": "Menjawab: apa tanggung jawab employee-service sebagai master data karyawan sekaligus sumber kebenaran autentikasi, onboarding, dan SSO di seluruh bip-erp, serta fitur mana yang sudah ada di kode (login username/PIN/biometrik, account admin seperti forget-device dan hard reset, CRUD master department & system role beserta seed-nya). Menjawab juga kenapa workspace non-HRIS seperti Legal, R&D Regulatory, Quality, dan Procurement dititipkan di service ini (agar tidak menambah modul/URL gateway dan menghindari panic ValidateInternalURL), modul mana yang sudah pindah keluar (Training ke learning-service), serta bagaimana multi-tenant company_id, akun pihak luar, dan resign/non-aktif ditangani. Titik masuk untuk memahami stack, path repo `services/employee`, dan integrasi lintas-service.",
       "kata_kunci": [
         "employee service",
-        "karyawan",
-        "employee",
-        "autentikasi",
-        "auth",
-        "SSO",
-        "work_data",
-        "master data",
-        "akun eksternal",
-        "legal"
+        "microservice",
+        "autentikasi SSO",
+        "onboarding",
+        "master data karyawan",
+        "multi-tenant company_id",
+        "legal perizinan",
+        "R&D regulatory",
+        "quality CAPA",
+        "Go Fiber MongoDB"
       ]
     },
     {
@@ -3790,7 +3790,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Irisan 1 (catat + terapkan) **merged ke `main`** 2026-08-10 lewat PR [#1142](https://github.com/bip-itteam-internal/bip-erp/pull/1142) (`a9a323dd`). ⚠️ **Belum diverifikasi lewat gateway hidup**, dan produksi belum di-deploy. Approval, kontrak baru, notifikasi, dan frontend belum dibangun.",
+      "status_teks": "Implemented (ada catatan). Backend + frontend + notifikasi **merged ke `main`** 2026-08-10 (bip-erp [#1142](https://github.com/bip-itteam-internal/bip-erp/pull/1142) · [#1143](https://github.com/bip-itteam-internal/bip-erp/pull/1143), erp-frontend [#962](https://github.com/bip-itteam-internal/erp-frontend/pull/962); notifikasi bip-erp [#1145](https://github.com/bip-itteam-internal/bip-erp/pull/1145) + my-bharata [#110](https://github.com/bip-itteam-internal/my-bharata/pull/110) masih terbuka). ⚠️ **Belum diverifikasi lewat gateway hidup**, produksi belum di-deploy. **Approval sengaja ditunda** — lihat §Consequences.",
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
@@ -3807,20 +3807,20 @@
         "Microservices - File Service",
         "APP - Web ERP"
       ],
-      "hash": "1affb4a0c906595cdb6363f2d45169e8d62c9680e877e810a4d51d93a84cba68",
-      "ukuran_kb": 9.6,
-      "ringkasan": "Menjawab: apa yang terjadi pada `employee_id` saat karyawan pindah perusahaan (tenant), dan mengapa ID sengaja tidak diterbitkan ulang walaupun prefiksnya adalah kode perusahaan sehingga prefix itu berhenti menandakan tenant. Juga menjawab bagaimana promosi dan mutasi disimpan dalam satu koleksi `employee_movement` yang dibedakan `type`, mengapa jenis perpindahan dipilih HR dan tidak disimpulkan dari jenjang, bagaimana status `scheduled`/`applied`/`cancelled` diterapkan cron harian, dan mengapa `company_id` catatan memakai perusahaan asal sementara sisi tujuan dibaca lewat `to_company_id`. Memuat konsekuensi yang sengaja diterima: perusahaan tujuan tanpa suara, riwayat lama tertinggal di tenant asal, atasan langsung dilepas, serta approval, kontrak baru, notifikasi, dan frontend yang belum dibangun.",
+      "hash": "7647219d7a6cd73114e6c646fe1b9180ffe6d26668399d5baa394bf729b55d36",
+      "ukuran_kb": 11.2,
+      "ringkasan": "Menjawab: apa yang terjadi pada `employee_id` ketika karyawan pindah badan usaha (mis. BIP ke ELT), dan kenapa ID sengaja tidak pernah diterbitkan ulang meski prefix perusahaan jadi berhenti berarti (agar riwayat presensi, KPI, cuti, payroll, tiket, dan dokumen tidak terputus). Menjawab pula bagaimana promosi dan mutasi disatukan di koleksi `employee_movement` dengan pembeda `type`, kenapa jenis perpindahan dipilih HR dan bukan disimpulkan dari `level_key`, bagaimana status scheduled/applied/cancelled diterapkan cron harian 00:15 WIB, kenapa `company_id` catatan memakai perusahaan asal, dan bagaimana `work_data` ditulis lewat `$set` sendiri. Merinci konsekuensi yang diterima: masa kerja, kuota cuti, dan BPJS ikut pindah apa adanya, atasan langsung dilepas, dan approval sengaja ditunda sehingga perusahaan tujuan belum punya suara.",
       "kata_kunci": [
-        "mutasi",
-        "mutation",
+        "mutasi antar-perusahaan",
+        "cross-tenant transfer",
         "promosi",
-        "promotion",
         "employee_id",
-        "multi-tenant",
-        "company_id",
         "employee_movement",
+        "multi-tenant company_id",
         "ADR 0044",
-        "perpindahan antar-perusahaan"
+        "tanggal efektif",
+        "cron idempoten",
+        "work_data"
       ]
     },
     {
@@ -4887,20 +4887,20 @@
         "HRIS - Analysis",
         "HRIS - Personalia"
       ],
-      "hash": "a68528120c791ef4a1ae2daf2eb9f862d1832cb0e4537d00b627ace0eefa1c02",
-      "ukuran_kb": 10.6,
-      "ringkasan": "Menjawab: bagaimana jenjang karier, promosi, mutasi, dan kaderisasi dikelola di HRIS, apa yang tercatat saat karyawan berpindah posisi (tanggal efektif, alasan, dokumen SK, jejak yang bisa dibatalkan), dan mengapa jenis perpindahan dipilih HR alih-alih disimpulkan dari jenjang jabatan. Juga menjawab rancangan Kaderisasi/Talent Pool: alur usulan atasan sampai persetujuan HR, kapan kandidat mengetahui pencalonannya, apa yang dihitung sistem (persen penyelesaian kurikulum jabatan tujuan dan rata-rata nilai) versus yang sengaja tidak dihitung (putusan layak atau tidak layak), model data `talent_candidate` beserta transisi statusnya. Menjelaskan pula batas Talent Pool dengan modul promosi, yaitu mencatat persiapan tanpa pernah menulis ke `work_data`.",
+      "hash": "3169e1b7538ac1985e098fead7f1ebae6f0fdbd27d16ea8e47d8e2eeb18507fa",
+      "ukuran_kb": 11.6,
+      "ringkasan": "Menjawab: bagaimana jenjang karier karyawan diatur (lima tingkat di koleksi `master_job_level`, menempel ke jabatan lewat `position_items[].level_key`, dikelola di tab Jenjang Jabatan pada `/hris/master-data`) dan bagaimana promosi serta mutasi dicatat, termasuk perpindahan antar-perusahaan, layar `/hris/mutasi`, dokumen SK, pembatalan, dan pemberitahuan ke karyawan maupun HR perusahaan tujuan. Menjawab juga rancangan kaderisasi/Talent Pool: alur usulan atasan sampai status siap dan dipromosikan, model data `talent_candidate` di service `learning`, apa yang dihitung sistem (penyelesaian kurikulum dan nilai rata-rata) dan apa yang sengaja tidak disimpulkan sistem (kelayakan promosi). Berguna untuk melihat prasyarat succession planning mana yang sudah terjawab dan mana yang masih TBD, terutama matriks kompetensi.",
       "kata_kunci": [
-        "karier",
-        "career",
+        "jenjang karier",
+        "career path",
         "promosi",
-        "promotion",
         "mutasi",
         "kaderisasi",
         "talent pool",
         "succession planning",
-        "jenjang jabatan",
-        "employee_movement"
+        "job level",
+        "matriks kompetensi",
+        "riwayat jabatan"
       ]
     },
     {

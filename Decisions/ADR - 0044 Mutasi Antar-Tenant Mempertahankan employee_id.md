@@ -1,4 +1,4 @@
-**Status**: ⚠️ Implemented (ada catatan). Irisan 1 (catat + terapkan) **merged ke `main`** 2026-08-10 lewat PR [#1142](https://github.com/bip-itteam-internal/bip-erp/pull/1142) (`a9a323dd`). ⚠️ **Belum diverifikasi lewat gateway hidup**, dan produksi belum di-deploy. Approval, kontrak baru, notifikasi, dan frontend belum dibangun.
+**Status**: ⚠️ Implemented (ada catatan). Backend + frontend + notifikasi **merged ke `main`** 2026-08-10 (bip-erp [#1142](https://github.com/bip-itteam-internal/bip-erp/pull/1142) · [#1143](https://github.com/bip-itteam-internal/bip-erp/pull/1143), erp-frontend [#962](https://github.com/bip-itteam-internal/erp-frontend/pull/962); notifikasi bip-erp [#1145](https://github.com/bip-itteam-internal/bip-erp/pull/1145) + my-bharata [#110](https://github.com/bip-itteam-internal/my-bharata/pull/110) masih terbuka). ⚠️ **Belum diverifikasi lewat gateway hidup**, produksi belum di-deploy. **Approval sengaja ditunda** — lihat §Consequences.
 
 ## Context
 
@@ -45,13 +45,21 @@ Aturan turunannya:
 - **Atasan langsung dilepas saat departemen berubah.** `validasiAtasan` menolak atasan beda perusahaan, jadi membiarkannya menghasilkan keadaan yang validator sistem sendiri anggap tak sah. Nilai lamanya disnapshot di catatan supaya pembatalan punya jalan pulang; tanpa itu ia hilang permanen.
 - **Karyawan yang perpindahannya mustahil terlaksana ditutup otomatis.** Catatan `scheduled` milik orang yang keburu non-aktif dibatalkan cron dengan alasan tercatat. Hanya untuk sebab itu; posisi yang tak cocok tetap dicoba lagi karena sebabnya bisa pulih.
 
+**Yang dibawa serta saat pindah badan usaha (keputusan HR 2026-08-10, sementara):**
+
+**Masa kerja (`join_date`), kuota cuti, dan nomor BPJS IKUT PINDAH apa adanya — tidak satu pun di-reset.** Modul ini karena itu tidak menyentuh ketiganya sama sekali, dan itu dikunci uji dari arah sebaliknya: `$set` yang disusunnya tak boleh pernah memuat `join_date`, `vacation`, maupun kolom BPJS.
+
+Ditandai **sementara** oleh pemutusnya sendiri. Konsekuensi yang perlu disadari bila kelak berubah: masa kerja yang berjalan terus melintasi badan usaha berarti perhitungan pesangon memakai tanggal masuk di perusahaan LAMA, dan kuota cuti berjalan tidak dihitung ulang di entitas baru. Keduanya berpihak kepada karyawan, dan itulah sebabnya aman dipakai sementara.
+
+**Kontrak kerja baru wajib, tapi TIDAK dibuat sistem.** Nomor kontrak, jenis, dan dokumen bertanda tangan tak satu pun bisa diturunkan dari data perpindahan, dan kontrak yang terbit dengan nilai tebakan lebih buruk daripada kontrak yang belum ada. Yang dikerjakan sistem hanya memastikan HR perusahaan tujuan diberi tahu bahwa ia harus menerbitkannya, lewat pemberitahuan yang sama yang mengabarkan kedatangan orangnya.
+
+**Approval ditunda (2026-08-10).** Lingkupnya sudah ditetapkan untuk kelak: **hanya perpindahan antar-perusahaan** yang akan digerbang; promosi dan mutasi dalam satu perusahaan tetap langsung terjadwal. Sampai itu dibangun, satu-satunya hal yang memberi tahu perusahaan tujuan adalah notifikasi — yang karena itu bukan pelengkap melainkan penambal, dan kalimatnya sengaja menyatakan orangnya sudah masuk alih-alih meminta persetujuan yang tombolnya tak ada. Status `pending` tetap bisa disisipkan di depan `scheduled` tanpa migrasi, sebab status disimpan dan cron hanya menyapu `scheduled`.
+
 **Yang belum dikerjakan:**
 
-- **Approval** belum ada. Irisan pertama mencatat dan menerapkan, tanpa persetujuan siapa pun. Status `pending` dirancang bisa disisipkan di depan `scheduled` tanpa migrasi, sebab status disimpan dan cron hanya menyapu `scheduled`.
-- **Kontrak kerja baru** belum otomatis. Pindah badan usaha berarti kontrak baru, dan modul ini sengaja tak menyentuh `employment_type`/`contract_ending`. Belum diputuskan apakah `join_date` (masa kerja), kuota cuti, dan nomor BPJS ikut pindah atau di-reset.
-- **Frontend** belum ada; `deep_link` feed kalender karena itu menunjuk halaman yang belum dibangun.
-- **Notifikasi** ke karyawan yang dipindahkan belum ada. Kategori inbox baru menuntut deploy dua container ([[Microservices - Notification Service]]).
 - **Belum pernah dijalankan lewat gateway hidup.** Seluruh verifikasi masih lokal.
+- **Prod belum di-deploy.** Kategori inbox baru menuntut `Employee-Service` dan `Notification-Service` naik **bersama** ([[Microservices - Notification Service]]); yang tak di-rebuild memegang salinan `shared-library` lama dan notifikasinya hilang tanpa jejak.
+- **Riwayat seorang karyawan terbelah di dua tenant** dan tak ada satu layar pun yang menyatukannya.
 
 ## Alternatif yang ditolak
 
