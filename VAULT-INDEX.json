@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-10",
-  "jumlah_dokumen": 281,
+  "jumlah_dokumen": 282,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -87,24 +87,25 @@
         "HRIS - Otomasi Skor KPI",
         "HRIS - Attrition",
         "Microservices - File Service",
+        "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "APP - MyBharata",
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "8b16481b56963d5539e58191b1fadb8d848171460b4b6bf0ddd465f370a330d3",
-      "ukuran_kb": 21.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service untuk auth/login, CRUD data personal & pekerjaan karyawan, kredensial system-auth, master data (departemen, system role, job level), serta akun eksternal vendor/mitra, beserta RBAC yang menggerbang tiap endpoint. Juga menjawab perilaku non-obvious seperti PUT master departemen yang mempertahankan field supervisi bila tak disebut, endpoint mana yang mengubah is_active karyawan, dan bagaimana proses resign/non-aktif serta training program (yang sudah pindah ke service learning) ditangani.",
+      "hash": "f01ccaf63d9fb92891932955e0051bcc11ccd01f5fd561bc935792c218bf667e",
+      "ukuran_kb": 23.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik gateway `/api/employee/*`, mulai dari login (password/PIN/biometrik), refresh token, dan onboarding akun, sampai CRUD personal_data, work_data, dokumen pribadi/kerja, jadwal kerja, ulang tahun karyawan, KPI, cuti, laporan, resign/non-aktif, serta promosi & mutasi. Menjelaskan juga siapa yang boleh memanggil tiap grup endpoint (RequireHRISStaff, RequireITStaff, RequireITSupervisor, RequireHRISOrITSupervisor, RBAC KPI per departemen) dan aturan khusus master data: CRUD departemen beserta supervised_by, definisi system role, job level per posisi, dan menu_hidden sebagai setelan tampilan yang bukan hak akses. Berguna pula untuk menjawab bagaimana akun pihak luar (vendor/mitra) berprefiks EXT- diterbitkan, diperpanjang, dinonaktifkan, dan dipasangi permission set maupun system role.",
       "kata_kunci": [
         "employee-service",
-        "API endpoint",
-        "auth",
-        "login",
-        "master data",
-        "departemen",
-        "system role",
+        "karyawan",
+        "employee",
+        "HRIS",
+        "endpoint",
         "RBAC",
-        "akun eksternal vendor mitra",
-        "job level"
+        "auth login",
+        "master data departemen",
+        "system roles",
+        "akun eksternal vendor"
       ]
     },
     {
@@ -326,20 +327,26 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "1e68535971118a274d4f153453e9596d71c2eab17a73fe956260862555bfe976",
-      "ukuran_kb": 40.9,
-      "ringkasan": "Menjawab: rute HTTP apa saja yang disediakan integration-service dan bagaimana cara memanggilnya — mulai dari webhook publik marketplace (Shopee/TikTok/Accurate lewat /ext/webhook/*), order terpadu (list, detail, export xlsx, perbandingan periode, dashboard summary), aging piutang, feed retur lintas-channel, packet tracking, sampai modul TikTok Shop/Business, Shopee, Accurate, dashboard FAT accounting, items, profit & profit insentif, ICC account mapping, bridge WMS, kas toko/wallet, ulasan marketplace, dan worker/jobs. Menjelaskan pula parameter penting tiap endpoint (mis. updated_since/order_ids yang memicu enrich tracking_number, date_basis piutang, dedupe_key & accurate_booking pada feed retur) serta aturan autentikasi gateway key termasuk kekhususan /health. Berguna untuk memutuskan endpoint mana yang benar dipakai, misalnya kenapa daftar retur lintas-channel harus lewat /transactions/returns dan bukan /shopee/returns/list atau /accurate/daily-returns.",
+      "hash": "c2865c39e270ccf5cb53823c1d1a04d46dc3e7c84fb514940d2b47c62011d1da",
+      "ukuran_kb": 41.0,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di integration-service untuk menarik order marketplace (TikTok Shop/Business, Shopee) dan membukukannya ke Accurate, termasuk path gateway `/api/integration/*` dan webhook publik `/ext/webhook/:service`. Menjelaskan cara mengambil daftar dan detail order, export xlsx, ringkasan dashboard, perbandingan periode, aging piutang per bucket umur, feed retur lintas-channel untuk gudang, packet tracking beserta backfill checkpoint, serta feed resi untuk WMS. Juga jadi rujukan saat memilih endpoint retur yang benar (kenapa `/transactions/returns` dipakai, bukan `status=RETURNED`, bukan `/shopee/returns/list`, bukan `/accurate/daily-returns`) dan area lain seperti profit, insentif profit-based, ICC account mapping, kas toko/wallet, ulasan marketplace, serta worker/jobs.",
       "kata_kunci": [
-        "integration service",
-        "endpoint",
-        "API reference",
-        "webhook marketplace",
-        "transaction orders",
+        "integration-service",
+        "marketplace",
+        "TikTok Shop",
+        "Shopee",
+        "Accurate",
+        "webhook",
+        "order",
         "retur",
         "return",
         "piutang",
         "accounts receivable",
-        "gateway key"
+        "tracking resi",
+        "AWB",
+        "endpoint API",
+        "ICC mapping",
+        "kas toko"
       ]
     },
     {
@@ -1102,20 +1109,25 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "d47681e830b2ea18fe34cea31b352f0e765c4069ab3ad404b4ee7df163482c43",
-      "ukuran_kb": 186.1,
-      "ringkasan": "Menjawab: apa itu portal web hris-dashboard (One Bharata), stack frontend apa yang dipakai (Next.js 16, React 19, shadcn/Radix/Tailwind, TanStack Query, react-i18next), serta bagaimana login, refresh token, dan SSO Identity Provider bekerja. Menjelaskan pemetaan system_roles ke modul dan role, cara sidebar menggerbang menu, dan kenapa pengelompokan menu memakai induk bersarang alih-alih field group. Juga menjawab bagaimana dukungan multi-perusahaan diterapkan (CompanySwitcher, kelola perusahaan/departemen/shift/network per perusahaan) dan bagaimana Pengaturan HRGA terpusat menyaring akses per tab, bukan per halaman.",
+      "hash": "fd52841315105e7c4cd49aa6e60340fcfc24bef18b71ea39c0fd56053a9f408f",
+      "ukuran_kb": 186.5,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (`hris-dashboard` / One Bharata), teknologi apa yang dipakainya, dan modul apa saja yang sudah ada di dalamnya. Menjelaskan cara login dan refresh token, bagaimana peran dari `system_roles` menentukan menu dan halaman yang muncul, serta bagaimana web ini bertindak sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager. Juga jadi rujukan untuk dukungan multi-perusahaan (company switcher, departemen, shift, jaringan WiFi per perusahaan), struktur pengelompokan menu sidebar bersarang, dan halaman Pengaturan HRGA terpusat beserta aturan penyaringan aksesnya per tab.",
       "kata_kunci": [
-        "erp-frontend",
         "web ERP",
-        "One Bharata",
         "hris-dashboard",
+        "One Bharata",
+        "erp-frontend",
+        "frontend",
+        "Next.js",
         "SSO",
+        "login",
         "system_roles",
         "role gating",
         "sidebar menu",
         "multi-perusahaan",
-        "pengaturan HRGA"
+        "company switcher",
+        "pengaturan HRGA",
+        "i18n"
       ]
     },
     {
@@ -1392,20 +1404,25 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "544adaf968f8996876b631c71f84fd5879a2c6e3499e5bf72dc0ec8a5d96b496",
-      "ukuran_kb": 71.8,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi view/work/approve/manage, dan cakupan data own/division/all), modul apa saja yang sudah punya katalog permission, serta bagaimana paket hak bernama (permission set) dipasang ke posisi/jabatan lalu diwarisi akun. Menjelaskan juga di mana penegakannya terjadi (RequirePermission di service, penulisan ulang header BIP-* di gateway, penyaringan menu di frontend), endpoint master untuk katalog, daftar modul, assignment ke posisi, dan pengecualian per-akun. Berguna saat mencari kenapa seseorang tak bisa membuka menu/aksi tertentu, cara menambah katalog modul baru, atau bagaimana fallback tier system_roles bekerja selama migrasi.",
+      "hash": "c9cd82ce715ba568cf5f2839f554e42535b071690161b39e5a2eeceb6c7af3af",
+      "ukuran_kb": 72.1,
+      "ringkasan": "Menjawab: bagaimana hak akses bekerja di seluruh bip-erp lewat tiga sumbu (modul, tingkat aksi, cakupan data) dan bagaimana paket hak (permission set) menempel pada posisi/jabatan, bukan pada akun. Menjelaskan alur dari katalog permission per modul, validasi isi paket, resolusi izin efektif saat login ke klaim JWT, transport header `BIP-*` yang diisi ulang gateway, sampai penegakan `RequirePermission` di service dan pembacaan klaim yang sama di frontend. Juga jadi rujukan untuk daftar modul yang sudah berkatalog, endpoint API katalog/modul/pengecualian per akun, tempat pendaftaran katalog di kode, mekanisme fallback tier, serta perbedaan antara hak akses dan setelan tampilan menu per posisi.",
       "kata_kunci": [
         "RBAC",
         "permission set",
-        "paket hak",
         "hak akses",
+        "system_roles",
         "reach",
         "cakupan data",
-        "system_roles",
         "posisi",
         "jabatan",
-        "katalog permission"
+        "JWT claims",
+        "katalog permission",
+        "gateway",
+        "tier fallback",
+        "master_permission_set",
+        "menu terbatas",
+        "authorization"
       ]
     },
     {
@@ -1458,6 +1475,9 @@
         "Microservices - Employee Service",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "ADR - 0006 Swap Jadwal Same-Department",
+        "CORE - RBAC dan Permission Set",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
         "Microservices - Insentive Service",
@@ -1469,21 +1489,25 @@
         "Microservices - File Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "7a4514f77128f76728a8c71208e81bc787e8baeda1dd9e05221e62313f0f971d",
-      "ukuran_kb": 11.3,
-      "ringkasan": "Menjawab: field apa saja yang ada di tiap koleksi MongoDB per service (mis. employee, attendance, notification, insentive, integration), beserta tipe datanya dan mana yang opsional (omitempty) -- berguna saat perlu tahu nama field persis sebelum menulis query, menambah field baru, atau memeriksa apakah suatu field sudah ada. Juga menandai koleksi yang strukturnya dinamis (bson.M) atau belum ditemukan di kode (TBD).",
+      "hash": "c279df3ddac18d961b933cde4abb617efbd57a0d1627ec6e554b47fc6c7bd4b1",
+      "ukuran_kb": 14.0,
+      "ringkasan": "Menjawab: koleksi MongoDB apa saja yang dimiliki tiap service bip-erp dan field apa saja isinya, lengkap dengan tipe non-string dan penanda `omitempty`. Berguna saat perlu tahu di mana sebuah data disimpan (misalnya data pribadi, data kerja, akun sistem, paket hak, departemen dan posisi, entri absensi, pengajuan cuti, tukar jadwal, koreksi presensi, guestbook, inbox notifikasi) serta nama field persis untuk query atau perubahan struct. Juga menandai koleksi yang disimpan dinamis (`bson.M`) atau strukturnya belum ditemukan, dan mencatat jebakan field seperti hash password yang ikut terserialisasi bila tidak diredaksi.",
       "kata_kunci": [
         "data dictionary",
         "kamus data",
-        "field",
-        "koleksi",
         "MongoDB",
+        "koleksi",
+        "collection",
+        "schema",
+        "field",
         "bson",
-        "struct",
+        "struct Go",
         "database-per-service",
-        "employee",
-        "attendance",
-        "skema"
+        "work_data",
+        "system_authentication",
+        "attendance_entries",
+        "master_department",
+        "employee-mongo"
       ]
     },
     {
@@ -1588,6 +1612,7 @@
         "GA - Asset Loan & Room Booking",
         "Microservices - Inventory Service",
         "Microservices - Attendance Service",
+        "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "Microservices - Task Management Service",
         "Microservices - Form Builder Service",
         "Microservices - Notification Service",
@@ -1595,20 +1620,20 @@
         "CORE - RBAC dan Permission Set",
         "APP - Web ERP"
       ],
-      "hash": "359c9c2e32d46cd833ab79ee66ee90269cd5af5105d6f4c917cf213c0be8e934",
-      "ukuran_kb": 16.6,
-      "ringkasan": "Menjawab: bagaimana cara mendaftarkan feed kalender baru dari service lain (kontrak GET /internal/calendar-feed, bentuk item wajib seperti kind/deep_link/all_day/scope), aturan visibilitas dan penyaringan hak akses yang wajib dikerjakan di service sumber bukan di kalender, serta endpoint publik kalender untuk agregasi lintas modul dan agenda mandiri (event). Juga menjawab kenapa fitur bertanggal dilarang membangun halaman kalender sendiri, dan feed apa saja yang sudah terdaftar (holiday, leave, contract_end, task_due, form_period).",
+      "hash": "b6d6cac5595a82574ae57e839e620eae302d3b1f96c6665435743cb446684d3a",
+      "ukuran_kb": 17.2,
+      "ringkasan": "Menjawab: bagaimana sebuah modul mendaftarkan fitur bertanggal ke kalender terpusat (endpoint `/internal/calendar-feed`, entri `providerRegistry`, env `<SERVICE>_MODULE_URL`), bentuk item feed apa yang wajib dipenuhi (`id` berprefiks sumber, `kind`, `all_day`, `scope`, `deep_link`, `status`), dan siapa yang boleh melihat sebuah agenda. Menjelaskan prinsip tiga lapis (data diri sendiri, pekerjaan sendiri, agenda perusahaan) beserta alasan mengapa penyaringan hak akses dikerjakan di service sumber, bukan di kalender. Juga memuat daftar endpoint publik lewat gateway (`GET /api/calendar`, CRUD agenda mandiri `event` termasuk PATCH sebagian dan pembatalan lunak), feed yang sudah terdaftar per service, serta gotcha seperti larangan memasukkan URL provider ke `ValidateInternalURL` dan perlakuan feed gagal sebagai `degraded`.",
       "kata_kunci": [
-        "calendar-service",
         "kalender",
+        "calendar service",
         "calendar feed",
-        "deep_link",
-        "providerRegistry",
-        "visibilitas agenda",
-        "agenda mandiri",
+        "agenda",
         "event",
-        "internal endpoint",
-        "scope personal department company"
+        "deep_link",
+        "provider registry",
+        "all_day",
+        "visibilitas kalender",
+        "task_due"
       ]
     },
     {
@@ -1649,6 +1674,8 @@
         "HRIS - Personalia",
         "HRIS - Attrition",
         "Microservices - File Service",
+        "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
+        "Microservices - Calendar Service",
         "RUN - Onboarding Akun Eksternal (Vendor & Mitra)",
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
@@ -1664,20 +1691,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "c19202f826ea1297e542a26402e7f0493ad95f409778ae522baf1116414b97a5",
-      "ukuran_kb": 52.9,
-      "ringkasan": "Menjawab: service mana yang jadi sumber kebenaran data karyawan, autentikasi, dan onboarding, serta endpoint apa saja yang disediakannya (login username/PIN/biometrik, register, refresh, verifikasi, dan rute internal auth). Menjelaskan juga operasi admin akun oleh IT (aktif/nonaktif, forget-device, hard reset, kelola roles), master data departemen dan system role beserta seed otomatisnya, dan workspace tambahan yang menumpang di service ini (Legal, R&D Regulatory, Quality, Procurement non-Accurate) lengkap dengan gerbang perannya.",
+      "hash": "cb0c4f8d60b13f0b69dc7aeb5f007d748ed3a49af52f36cc913b9d5a2c169f15",
+      "ukuran_kb": 58.0,
+      "ringkasan": "Menjawab: di mana login dan onboarding karyawan diproses (`/auth/login`, login PIN/biometric, refresh token, `/onboarding/register`), bagaimana IT mengelola akun karyawan (aktif/nonaktif, forget-device, hard reset, `system_roles`), dan di mana master data departemen, posisi, serta system role disimpan dan di-CRUD. Menjelaskan pula bahwa service ini menjadi source of truth data karyawan (KPI, contract, BPJS, kuota cuti) sekaligus feed lintas-service, dan bahwa beberapa workspace divisi (Legal, R&D Regulatory, Quality, Procurement non-Accurate) sengaja dititipkan di sini agar tak menambah modul gateway baru. Berguna untuk menelusuri route mana yang gated oleh peran apa dan bagaimana multi-perusahaan (tenant) serta akun pihak luar diperlakukan.",
       "kata_kunci": [
         "employee service",
-        "auth login",
+        "karyawan",
+        "login",
+        "auth",
+        "SSO",
         "onboarding",
         "master data",
-        "master_department",
+        "departemen",
         "system roles",
-        "akun karyawan",
-        "resign",
-        "multi-tenant company_id",
-        "legal quality rnd procurement"
+        "multi-tenant"
       ]
     },
     {
@@ -3599,7 +3626,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — **belum berfungsi sebagaimana dimaksud.** Kode selesai di branch `feat/oneForAll` (2026-08-06), seluruh uji hijau, **belum merge dan belum deploy**. Aman dipasang (tak ada yang kehilangan akses), tetapi **mengaktifkannya belum benar-benar membatasi**: celah \"akun tanpa paket\" yang semula diduga kosong kini **terbukti tidak kosong** (bukti 2026-08-06 di §Consequences), sehingga akun finance/IT tanpa permission-set tetap bisa membuka halaman walau restriksi menyala. Prasyarat agar berfungsi: perbaiki fallback task-management lebih dulu. Penegakan backend juga sengaja parsial.",
+      "status_teks": "Implemented (ada catatan) — **sudah merge, tetapi belum berfungsi sebagaimana dimaksud.** Kode selesai di branch `feat/oneForAll` (2026-08-06), seluruh uji hijau, dan sejak itu **sudah mendarat di `main` kedua repo** (terverifikasi 2026-08-10: `services/employee/menu_terbatas.go`, `shared-library/common/catalog_menu.go`, gerbang di `services/integration/main.go`; sisi FE `utils/menu-terbatas.ts` + `components/menu-terbatas-guard.tsx`). Merge menaikkan taruhannya, bukan menurunkannya: yang menahan fitur ini kini tinggal keputusan untuk tidak memasang paketnya ke siapa pun. Aman dipasang (tak ada yang kehilangan akses), tetapi **mengaktifkannya belum benar-benar membatasi**: celah \"akun tanpa paket\" yang semula diduga kosong kini **terbukti tidak kosong** (bukti 2026-08-06 di §Consequences), sehingga akun finance/IT tanpa permission-set tetap bisa membuka halaman walau restriksi menyala. Prasyarat agar berfungsi: perbaiki fallback task-management lebih dulu. Penegakan backend juga sengaja parsial.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -3611,24 +3638,20 @@
         "APP - Web ERP",
         "API - Integration Service"
       ],
-      "hash": "243fd3cdb955336383298eeb784ea6bd9965264ac0eb0c276d8396bad14fad07",
-      "ukuran_kb": 12.0,
-      "ringkasan": "Menjawab: bagaimana cara membatasi satu menu tertentu (mis. Laporan Keuangan `/finance/accounting`) ke akun tertentu tanpa memadamkan halaman bagi semua orang saat deploy — lewat pola \"default terbuka, mengunci begitu ada yang di-assign\" dengan modul izin `menu` terpisah, satu izin dan satu paket per menu. Juga menjawab: bagaimana penanda kunci global `$menulock.<kunci>` dihitung employee-service saat token terbit, mengapa prefiksnya sengaja bukan `menu.`, dan bagaimana aturan tiga langkah `common.HasMenuAccess` (punya izin → boleh; punya penanda → tolak; selain itu → fallback lama) dicerminkan di frontend. Serta menjawab: mengapa fitur ini belum benar-benar membatasi — akun tanpa permission-set sama sekali tak pernah menerima penanda (agar hak tiket task-management tidak lenyap), sehingga jatuh ke fallback dan tetap bisa membuka halaman, plus apa prasyarat perbaikannya.",
+      "hash": "c4687a2c1613ad9e96494aa6a05b4de3fd9e7e1cfbff23fe6b1a6bc8f3a2cd83",
+      "ukuran_kb": 12.4,
+      "ringkasan": "Menjawab: bagaimana cara membatasi satu menu tertentu (mis. Laporan Keuangan /finance/accounting) untuk akun pilihan tanpa memadamkan halaman bagi semua orang saat deploy, dan mengapa polanya dipilih default terbuka lalu mengunci begitu ada yang di-assign. Menjelaskan modul izin menu.<kunci>, paket menu_<kunci>, penanda kunci $menulock.<kunci> di klaim JWT, urutan tiga langkah HasMenuAccess, dan mengapa prefiksnya sengaja bukan menu.. Juga merekam celah akun tanpa permission-set yang membuat pemegang fallback lama tetap lolos, kaitannya dengan effectiveTicketPermissions di task-management, dan berkas mana yang menyimpan aturannya di backend maupun frontend.",
       "kata_kunci": [
-        "ADR 0039",
         "menu terbatas",
         "restricted menu",
-        "RBAC",
-        "permission set",
         "menulock",
-        "HasMenuAccess",
-        "Laporan Keuangan",
-        "finance.accounting.view",
+        "permission set",
+        "RBAC",
+        "finance accounting",
+        "laporan keuangan",
         "fallback",
-        "default terbuka",
-        "deny by default",
-        "JWT claim",
-        "menu-terbatas.ts"
+        "JWT claims",
+        "ADR 0039"
       ]
     },
     {
@@ -3757,6 +3780,45 @@
         "penerbitan token",
         "manufacture",
         "insentive"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id.md",
+      "judul": "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "Diputuskan, kode di branch — belum merge, belum deploy. Irisan 1 (catat + terapkan) ada di branch `feat/employee-mutasi` (bip-erp); approval, kontrak baru, dan frontend belum dibangun.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "HRIS - Career & Promotion",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
+        "Microservices - Calendar Service",
+        "Microservices - Notification Service",
+        "Microservices - Employee Service",
+        "API - Employee Service",
+        "HRIS - Organization Structure",
+        "HRIS - Personalia",
+        "ADR - 0002 Database-per-Service",
+        "Microservices - File Service",
+        "APP - Web ERP"
+      ],
+      "hash": "dbec21da1b8d53e74263028f46ab3ab07ed1ff2a8725c8a28a489cd5bbc9e9c8",
+      "ukuran_kb": 9.4,
+      "ringkasan": "Menjawab: apa yang terjadi pada `employee_id` ketika karyawan pindah badan usaha (jawabannya: tidak pernah diterbitkan ulang, sehingga prefix perusahaan pada ID berhenti berarti dan `work_data.company_id` menjadi satu-satunya sumber kebenaran tenant). Menjelaskan bagaimana promosi dan mutasi disimpan dalam satu koleksi `employee_movement` dengan pembeda `type` yang dipilih HR (bukan disimpulkan dari jenjang), pola status `scheduled`/`applied`/`cancelled` plus cron harian 00:15 WIB, dan mengapa `company_id` catatan memakai perusahaan asal sementara sisi tujuan dibaca lewat `to_company_id`. Berisi pula konsekuensi yang diterima sadar (riwayat presensi tetap milik perusahaan lama, perusahaan tujuan tak punya suara, modul tanpa `company_id` tak ikut berpindah) dan daftar yang belum dikerjakan (approval, kontrak baru, frontend, notifikasi).",
+      "kata_kunci": [
+        "mutasi",
+        "mutasi antar-perusahaan",
+        "promosi",
+        "employee_movement",
+        "employee_id",
+        "multi-tenant",
+        "company_id",
+        "transfer karyawan",
+        "ADR 0044",
+        "cron mutasi"
       ]
     },
     {
@@ -5244,31 +5306,27 @@
         "Microservices - Employee Service",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "HRIS - Career & Promotion",
+        "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "HRIS - Key Performance Index",
         "HRIS - Interrelationship Matrices",
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "e0c24a0adc2373b98a61b287b88e2628c09316fbde2f61ee0655771ba58dc2ec",
-      "ukuran_kb": 20.9,
-      "ringkasan": "Menjawab: bagaimana departemen, jabatan, jenjang, dan hubungan atasan disusun di ERP, dan ke mana pengajuan mengalir bila sebuah departemen tak punya supervisor sendiri. Menjelaskan master_department beserta supervised_by/supervision_label (mis. General Affair dibawahi Human Resource dengan label HRGA), atasan langsung per orang, bagan organisasi, dan tangga jenjang jabatan lima tingkat. Memuat peringatan penting sebelum mengubah data departemen, karena salah ubah bisa membuat belasan orang kehilangan penyetuju tanpa pesan error.",
+      "hash": "c617b6b0257512b111cb97b375487c030eb269bf539ef92717b002023688a238",
+      "ukuran_kb": 21.1,
+      "ringkasan": "Menjawab: bagaimana departemen, posisi/jabatan, jenjang jabatan, dan hierarki atasan disusun serta di mana masing-masing disimpan (`master_department` dengan `positions[]` dan `position_items[]`, koleksi `master_job_level`, `work_data.supervisor_id`). Menjelaskan mengapa jenjang jabatan (Pelaksana, Senior/Officer, Leader, Supervisor, Direktur) adalah penanda organisasi dan bukan sumbu hak akses, bagaimana `rank` renggang memungkinkan penyisipan tingkat baru tanpa menyentuh dokumen jabatan, serta bagaimana departemen ter-scope per perusahaan sementara supervisi dan RBAC sengaja tetap global. Berguna untuk menjawab siapa atasan langsung seseorang, bagaimana cakupan supervisi antar-departemen (`supervised_by`) bekerja, dan di layar mana semua itu dikelola (`/hris/master-data`, `/hris/org-chart`, halaman atasan langsung).",
       "kata_kunci": [
         "struktur organisasi",
         "organization structure",
         "departemen",
-        "department",
         "jabatan",
         "posisi",
-        "position",
         "jenjang jabatan",
         "job level",
-        "HRGA",
-        "supervised_by",
-        "supervisor",
         "atasan langsung",
+        "supervisor",
         "org chart",
-        "bagan organisasi",
         "master data"
       ]
     },
@@ -7026,24 +7084,20 @@
         "Microservices - Employee Service",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
       ],
-      "hash": "5214dcb7a7b3fc8ace6f07e4989188f2c99cdc4c91d6df35eb1b1b691dcc80e9",
-      "ukuran_kb": 11.6,
-      "ringkasan": "Menjawab: bagaimana Staf Legal mencatat dan memantau izin serta sertifikat perusahaan (BPOM, Halal, izin usaha, sertifikasi lain) di satu daftar terpusat lengkap dengan masa berlaku dan alert H-90 sebelum kedaluwarsa. Juga menjawab: endpoint dan field model untuk tiga register Legal (Perizinan, Kontrak & SLA dengan alert H-60, Dispute & Advis Hukum), penyaring apa saja yang diterima tiap handler, izin dan paket RBAC apa yang menggerbangnya (legal.view/work/manage beserta paket Lihat, Pelaksana, Admin), dan bagaimana unggah PDF sertifikat memakai endpoint upload generik. Berguna terutama untuk tahu bahwa modul ini praktis BELUM DIPAKAI SIAPA PUN di produksi: nol dari 208 akun punya role legal, departemen legal tak ada di master data prod dan tak akan dibuat oleh deploy, sehingga hanya supervisor IT yang bisa membukanya.",
+      "hash": "f3670b523cdb37ec791b423348024727ec83d96857b36d9afa2b29e4f22d493c",
+      "ukuran_kb": 11.7,
+      "ringkasan": "Menjawab: di mana izin edar BPOM, sertifikat Halal, izin usaha, kontrak/SLA, dan perkara dispute perusahaan dicatat, field apa saja yang disimpan, serta bagaimana alert H-90 (izin) dan H-60 (kontrak) dihitung. Menjelaskan endpoint CRUD /legal/licenses, /legal/contracts, dan /legal/disputes yang di-host di employee-service beserta gate RequireLegalStaff/RequireLegalSupervisor, katalog izin legal.view/work/manage, cara unggah PDF lewat endpoint upload generik, dan halaman frontend /legal/*. Juga menjawab mengapa modul ini praktis tak bisa dipakai di produksi: departemen legal tak ada di master data prod dan seed berhenti bila koleksi sudah terisi, sehingga role legal tak bisa diberikan ke siapa pun.",
       "kata_kunci": [
-        "legal",
         "perizinan",
+        "license",
         "sertifikasi",
-        "izin usaha",
+        "BPOM",
+        "Halal",
+        "legal",
         "kontrak SLA",
         "dispute",
-        "masa berlaku",
         "alert H-90",
-        "kedaluwarsa",
-        "compliance",
-        "penyaring",
-        "Staf Legal",
-        "legal.view",
-        "permission set"
+        "workspace posisi"
       ]
     },
     {

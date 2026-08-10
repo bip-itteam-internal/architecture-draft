@@ -308,7 +308,7 @@ Sisi FE: menu **HRIS > Personalia > Pengajuan** kini ber-`perm: "hris.pengajuan.
 
 ⚠️ Catatan sisi FE yang mudah terlewat: `bolehMenu` mengembalikan `true` untuk izin yang tak punya entri `FALLBACK`, mengikuti aturan "modul belum berkatalog, jangan sembunyikan apa pun". Begitu sebuah modul BERKATALOG, aturan itu tak lagi berlaku untuknya — entri fallback wajib ada bahkan untuk izin yang belum dipakai menu mana pun, kalau tidak tombol yang kelak ditandai `hris.manage` akan tampil bagi orang non-HR.
 
-- **`master_permission_set` dan `system_authentication.permission_sets` belum terdaftar** di [[DB - Data Dictionary]].
+- ✅ **`master_permission_set` dan `system_authentication.permission_sets` sudah terdaftar** di [[DB - Data Dictionary]] (2026-08-10), berikut `master_department.position_items[]` yang memuat `permission_sets` dan `menu_hidden`, `master_system_role`, dan `master_job_level` — seluruh koleksi yang menyimpan keputusan akses kini punya entri field-level.
 - **Tiga dari empat gate posisi hardcoded belum dicabut** (Security, Personalia, ICC) — menunggu katalog modul yang bersangkutan. **Cost Control sudah dicabut SEBAGIAN** (2026-08-09): untuk halaman Pengajuan ia kini paket "HRIS: Pemantau Pengajuan", tapi `checkPosition(PosisiCostControl)` di `RequireGuestbookRBAC` masih hidup karena modulnya lain (buku tamu). Konstanta `common.PosisiCostControl` karena itu belum boleh dihapus.
 - **Gate `admin.assignment.manage` belum ada**, jadi pemasangan hak ke posisi masih dikunci interim ke `RequireITSupervisor`, bukan ke HR.
 - **TBD**: pemisahan per area gudang (RM vs FG) sebagai cakupan alih-alih permission; perilaku seragam saat pemakai membuka URL tanpa hak (403 informatif vs pengalihan); penyelarasan pola izin finance (per-objek) dengan tangga ADR 0030.
@@ -342,7 +342,7 @@ Akar teknisnya satu angka: penanda izin di menu. Angka itu **bergerak, tapi bent
 - [[CORE - API Master Gateway]] — menerbitkan JWT dan menstempel `BIP-Permissions`/`BIP-Position`/`BIP-System-Roles` ke setiap request internal; tanpa ini semua sumbu bisa dipalsukan klien.
 - [[CORE - SSO Flow]] — konsumen SSO ikut membawa klaim yang sama.
 - [[Microservices - Employee Service]] — pemilik master posisi, departemen, permission-set, dan resolusi izin saat login.
-- [[Microservices - Task Management Service]] — satu-satunya modul yang sudah menegakkan permission-set (acuan bentuk).
+- [[Microservices - Task Management Service]] — modul PILOT permission-set dan acuan bentuknya. Sudah lama bukan satu-satunya yang menegakkan (per 2026-08-10 ada 12 modul), tapi ia yang paling granular (15 izin) dan yang pertama memakai `reach`.
 - [[Microservices - Payroll Service]] · [[Microservices - Recruitment Service]] · [[Microservices - Form Builder Service]] · [[Microservices - Manufacture Service]] · [[Microservices - Warehouse Service]] · [[Microservices - Procurement Service]] · [[Microservices - Integration Service]] · [[Microservices - Insentive Service]] · [[Microservices - Notification Service]] · [[Microservices - Inventory Service]] · [[Microservices - HRD Document Service]] — konsumen katalog per modul.
 - [[APP - Web ERP]] — penyaringan menu dan tombol dari klaim `permissions`.
 - [[HRIS - Organization Structure]] — posisi dan departemen sebagai master data, termasuk relasi supervisi yang menentukan makna `reach: division`.
