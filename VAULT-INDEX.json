@@ -1114,20 +1114,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "1994844553d65ab97a93c4f81ebdf676bf0c5f6e34e58ee188718facac3e2cbd",
-      "ukuran_kb": 198.6,
-      "ringkasan": "Menjawab: modul apa saja yang ada di portal web ERP/HRIS internal (hris-dashboard \"One Bharata\"), siapa yang boleh melihat menu mana, dan bagaimana halaman-halaman itu dirakit (pola satu kartu, Banner di dalam MainTable, CustomTabs, i18n dua bahasa). Menjawab juga bagaimana login, SSO Identity Provider, dan gerbang rute `proxy.ts` bekerja, termasuk rute lama yang meneruskan setelah menu dibubarkan jadi tab. Bagian \"Belum Diimplementasikan / Catatan\" merekam gap yang masih terbuka beserta jebakan komponen bersama yang sudah terbukti menggigit.",
+      "hash": "7f1a1c3ce0bc2c0bc8575ce2681e8d5474878c01ae1ecf26f87737e2de2c8b84",
+      "ukuran_kb": 195.8,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (`erp-frontend` / hris-dashboard \"One Bharata\"), stack dan repo-nya apa, serta bagaimana alur login `employee_id`, refresh token, dan perannya sebagai SSO Identity Provider untuk app lain seperti Task Manager. Menjelaskan juga bagaimana sidebar dan halaman digerbang: key `system_roles` per modul, pengelompokan menu induk bersarang, matriks akses WMS beserta pengecualian read-only lintas-modul (Finance, Quality, R&D, Procurement, Legal), menu terbatas per akun, akun integration-only, dan dukungan multi-perusahaan lewat CompanySwitcher. Dipakai untuk menelusuri halaman/rute apa saja yang tersedia per divisi (ERP publik, HRIS, KPI, Task Management, Finance/FAT, IT, GA, Legal, Form Builder, Marketing Analytics, Manufacture WMS, Ruang Direktur), service backend apa yang dikonsumsi lewat gateway, serta catatan gap dan TBD yang tercatat di dokumen.",
       "kata_kunci": [
         "erp-frontend",
-        "web ERP",
+        "hris-dashboard",
         "One Bharata",
-        "Next.js",
-        "sidebar",
-        "menu",
-        "role gating",
-        "SSO",
-        "proxy.ts",
-        "middleware"
+        "web ERP portal",
+        "SSO Identity Provider",
+        "system_roles",
+        "role gating / hak akses menu",
+        "sidebar menu",
+        "Next.js App Router",
+        "multi-perusahaan (multi-company)"
       ]
     },
     {
@@ -5167,21 +5167,10 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "923116ac57292a349fa28efd29584952f1d3ef3543aa1615bb892f7e58ce20b0",
-      "ukuran_kb": 10.8,
-      "ringkasan": "Menjawab: apa beda engine skor KPI untuk insentif tim marketing dengan appraisal KPI per-karyawan lintas departemen, dan di service mana masing-masing berjalan. Menjelaskan cara template KPI dibuat per departemen/posisi, bagaimana scoring per periode `YYYY-MM` dihitung dan di-snapshot, serta aturan bahwa posisi template harus cocok dengan jabatan karyawan pada periode yang dinilai. Berguna untuk memahami siapa yang boleh melihat KPI siapa (RBAC per departemen, cakupan tim untuk Leader lewat bawahan langsung, supervisor menang), bagaimana departemen satu tim seperti HRGA ditampilkan menyatu dari master data, dan bentuk respons serta dashboard agregasinya.",
-      "kata_kunci": [
-        "KPI",
-        "Key Performance Index",
-        "penilaian kinerja",
-        "appraisal",
-        "template KPI",
-        "scoring",
-        "insentif",
-        "incentive",
-        "RBAC departemen",
-        "HRGA"
-      ]
+      "hash": "2a142c0dd3db9292abd22ca4c2b3f93f43c66d349f1fa3af10fcf4ebe55988ef",
+      "ukuran_kb": 11.6,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Human Resource Information System/HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai).md",
@@ -9395,5 +9384,7 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "Human Resource Information System/HRIS - Key Performance Index.md"
+  ]
 }
