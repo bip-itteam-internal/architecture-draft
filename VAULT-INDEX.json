@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-10",
-  "jumlah_dokumen": 281,
+  "jumlah_dokumen": 282,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1102,20 +1102,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "a37f3cd121afc00ddbd672a2eed5ab3734ce81cba49e90bfec4fcba310742be3",
-      "ukuran_kb": 178.8,
-      "ringkasan": "Menjawab: apa itu portal web One Bharata (erp-frontend), stack teknologinya (Next.js 16, React 19, shadcn/Radix/Tailwind, TanStack Query, react-i18next), dan bagaimana login, refresh token, serta peran SSO Identity Provider bekerja. Menjelaskan juga cara sidebar dan menu di-gate oleh system_roles, struktur pengelompokan menu HRIS (menu induk bersarang, bukan field group), halaman Pengaturan HRGA terpusat beserta penyaringan per tab, dan bagaimana dukungan multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/network per perusahaan) muncul di UI.",
+      "hash": "45997b5700e0727451977fb3d3d73d7942d5abd6dcfe127507a54bc7dac1e2a0",
+      "ukuran_kb": 179.5,
+      "ringkasan": "Menjawab: apa itu portal web internal ERP/HRIS Bharata (hris-dashboard \"One Bharata\"), stack frontend apa yang dipakai, dan di repo mana kodenya. Menjelaskan cara login employee_id + password, bagaimana refresh token dan retry 401 bekerja, bagaimana web ini bertindak sebagai SSO Identity Provider (mint code lewat ticket, allowlist redirect_url) untuk aplikasi lain seperti Task Manager, serta bagaimana system_roles per modul menggerbang sidebar dan menu. Juga menjawab bagaimana dukungan multi-perusahaan bekerja (pemilih perusahaan admin pusat, departemen/shift/network/karyawan per perusahaan), bagaimana menu dikelompokkan lewat menu induk bersarang alih-alih header section, dan bagaimana setelan HRGA dikumpulkan jadi satu induk Pengaturan dengan penyaringan per tab beserta alasan tiap keputusannya.",
       "kata_kunci": [
-        "web ERP",
         "erp-frontend",
         "hris-dashboard",
         "One Bharata",
-        "Next.js",
-        "SSO",
-        "sidebar menu",
+        "web ERP",
+        "SSO Identity Provider",
+        "system_roles",
         "role gating",
+        "sidebar menu",
         "multi-perusahaan",
-        "i18n"
+        "Pengaturan HRGA"
       ]
     },
     {
@@ -9033,6 +9033,31 @@
         "TanStack Query",
         "enabled",
         "performa frontend"
+      ]
+    },
+    {
+      "path": "Workspace/Inbox/2026-08-10 Spec Skor Gabungan Penilaian.md",
+      "judul": "2026-08-10 Spec Skor Gabungan Penilaian",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": "disetujui, siap direncanakan",
+      "publik": false,
+      "tautan": [],
+      "hash": "8f75b6d1798de2330ed153d33ad2027efeadaf8da2861724a6e9cb06016cd700",
+      "ukuran_kb": 12.7,
+      "ringkasan": "Menjawab: bagaimana satu angka skor gabungan (overall) per karyawan dihitung dari form penilaian di form-builder, yaitu hanya dari pertanyaan bertipe scale yang dinormalisasi ke 0..100, dirata-ratakan berbobot di dalam satu penilai, lalu dirata-ratakan polos antar penilai (satu orang satu suara) dengan penyebut bobot dari pertanyaan yang benar-benar dijawab. Menjelaskan kenapa tipe number, radio/dropdown, dan checkbox dikeluarkan dari skor, kenapa bobot dipakai sebagai angka relatif (bawaan 1) alih-alih persentase wajib 100, dan bagaimana cakupan skor dilaporkan lewat overall_fields dan total_questions supaya tak ada angka yang tampak mewakili seluruh form padahal sebagian. Juga menjawab batasan lingkupnya: angka ini berhenti di layar analisa dan tidak disambungkan ke kpi_score, bobot tidak menempel di seksi, belum dinilai berarti kosong bukan nol, dan form lama tidak perlu migrasi.",
+      "kata_kunci": [
+        "skor gabungan",
+        "overall score",
+        "form penilaian",
+        "form-builder",
+        "bobot pertanyaan",
+        "weight",
+        "scale",
+        "normalisasi 0-100",
+        "analisa penilaian",
+        "SubjectScore"
       ]
     },
     {
