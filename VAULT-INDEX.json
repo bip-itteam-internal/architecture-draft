@@ -1114,20 +1114,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "7f1a1c3ce0bc2c0bc8575ce2681e8d5474878c01ae1ecf26f87737e2de2c8b84",
-      "ukuran_kb": 195.8,
-      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (`erp-frontend` / hris-dashboard \"One Bharata\"), stack dan repo-nya apa, serta bagaimana alur login `employee_id`, refresh token, dan perannya sebagai SSO Identity Provider untuk app lain seperti Task Manager. Menjelaskan juga bagaimana sidebar dan halaman digerbang: key `system_roles` per modul, pengelompokan menu induk bersarang, matriks akses WMS beserta pengecualian read-only lintas-modul (Finance, Quality, R&D, Procurement, Legal), menu terbatas per akun, akun integration-only, dan dukungan multi-perusahaan lewat CompanySwitcher. Dipakai untuk menelusuri halaman/rute apa saja yang tersedia per divisi (ERP publik, HRIS, KPI, Task Management, Finance/FAT, IT, GA, Legal, Form Builder, Marketing Analytics, Manufacture WMS, Ruang Direktur), service backend apa yang dikonsumsi lewat gateway, serta catatan gap dan TBD yang tercatat di dokumen.",
+      "hash": "7af2f86d5ce8fe40676ac133b84aadd4872ab85a810c00bbb9144b821d2ec4d9",
+      "ukuran_kb": 197.3,
+      "ringkasan": "Menjawab: apa itu portal web internal One Bharata (erp-frontend), stack apa yang dipakai, dan bagaimana login serta SSO Identity Provider bekerja (mint one-time code, allowlist redirect_url). Menjelaskan juga bagaimana menu dan hak akses digerbang lewat cookie system_roles per modul, bagaimana sub-menu HRIS dikelompokkan dengan menu induk bersarang, dan bagaimana halaman Pengaturan HRGA terpusat menyaring akses per tab, bukan per halaman. Menjadi rujukan untuk pertanyaan multi-perusahaan di sisi frontend: CompanySwitcher, kelola perusahaan, departemen, shift, network WiFi, dan direktori karyawan yang ikut perusahaan terpilih.",
       "kata_kunci": [
-        "erp-frontend",
+        "web ERP",
         "hris-dashboard",
+        "erp-frontend",
         "One Bharata",
-        "web ERP portal",
-        "SSO Identity Provider",
+        "SSO",
         "system_roles",
-        "role gating / hak akses menu",
+        "role gating",
         "sidebar menu",
-        "Next.js App Router",
-        "multi-perusahaan (multi-company)"
+        "Pengaturan HRGA",
+        "multi-perusahaan"
       ]
     },
     {
@@ -3804,20 +3804,20 @@
         "Microservices - File Service",
         "APP - Web ERP"
       ],
-      "hash": "08c3274ffec7957839d57a1778a7fa5b79304ed038026b66b1f8cab2c4d41113",
-      "ukuran_kb": 14.3,
-      "ringkasan": "Menjawab: apa yang terjadi pada `employee_id` ketika karyawan pindah badan usaha di dalam satu instans bip-erp, dan mengapa ID tidak pernah diterbitkan ulang meski prefix perusahaan jadi tak lagi berarti. Menjelaskan model pencatatan promosi dan mutasi dalam satu koleksi `employee_movement` dengan jenis dipilih HR, status scheduled/applied/cancelled, cron harian penerap, snapshot posisi asal, serta aturan kepemilikan `company_id` perusahaan asal dan pembacaan dua arah. Berguna untuk mengetahui apa yang ikut pindah (masa kerja, kuota cuti, BPJS), apa yang tertinggal (riwayat presensi, modul tanpa scoping tenant), dan mengapa persetujuan perusahaan tujuan belum ada.",
+      "hash": "f4587159f143c7b21ebb91ce9eb101bf36e613b2af9da3a3e53476128f3a8198",
+      "ukuran_kb": 15.0,
+      "ringkasan": "Menjawab: apa yang terjadi pada employee_id saat karyawan pindah badan usaha (BIP ke ELT), dan mengapa ID sengaja tidak diterbitkan ulang meski prefix ID berasal dari master_company.code. Menjelaskan desain koleksi employee_movement (satu koleksi untuk Promosi, Mutasi, dan Mutasi Antar-Perusahaan), aturan status scheduled/applied/cancelled, cron harian 00:15 WIB, penulisan work_data lewat $set eksplisit, kepemilikan dokumen di perusahaan asal (company_id) plus pembacaan dua arah lewat to_company_id, dan pendaftaran feed kalender kind movement berlingkup personal. Memuat pula konsekuensi yang diterima sadar: approval ditunda sehingga perusahaan tujuan tak punya suara, riwayat presensi tetap milik tenant lama, atasan langsung dilepas, serta masa kerja, kuota cuti, dan BPJS ikut pindah apa adanya.",
       "kata_kunci": [
         "mutasi",
-        "mutasi antar-perusahaan",
         "promosi",
         "employee_movement",
         "employee_id",
         "multi-tenant",
         "company_id",
-        "perpindahan jabatan",
-        "career",
-        "ADR 0044"
+        "antar-perusahaan",
+        "transfer",
+        "ADR 0044",
+        "tanggal efektif"
       ]
     },
     {
@@ -4884,20 +4884,20 @@
         "HRIS - Analysis",
         "HRIS - Personalia"
       ],
-      "hash": "3169e1b7538ac1985e098fead7f1ebae6f0fdbd27d16ea8e47d8e2eeb18507fa",
-      "ukuran_kb": 11.6,
-      "ringkasan": "Menjawab: bagaimana jenjang karier karyawan diatur (lima tingkat di koleksi `master_job_level`, menempel ke jabatan lewat `position_items[].level_key`, dikelola di tab Jenjang Jabatan pada `/hris/master-data`) dan bagaimana promosi serta mutasi dicatat, termasuk perpindahan antar-perusahaan, layar `/hris/mutasi`, dokumen SK, pembatalan, dan pemberitahuan ke karyawan maupun HR perusahaan tujuan. Menjawab juga rancangan kaderisasi/Talent Pool: alur usulan atasan sampai status siap dan dipromosikan, model data `talent_candidate` di service `learning`, apa yang dihitung sistem (penyelesaian kurikulum dan nilai rata-rata) dan apa yang sengaja tidak disimpulkan sistem (kelayakan promosi). Berguna untuk melihat prasyarat succession planning mana yang sudah terjawab dan mana yang masih TBD, terutama matriks kompetensi.",
+      "hash": "4740a21a6985c941ee1599c266adc1e27dacf9eff481468d784df7210673e4fb",
+      "ukuran_kb": 12.3,
+      "ringkasan": "Menjawab: bagaimana jenjang karier, promosi, mutasi, dan kaderisasi dikelola di HRIS, termasuk tangga lima tingkat master_job_level yang menempel ke jabatan lewat position_items[].level_key dan dikelola di tab Jenjang Jabatan. Menjelaskan modul Promosi & Mutasi di /hris/mutasi (jenis dipilih HR bukan disimpulkan sistem, notifikasi saat perpindahan diterapkan, kontrak kerja baru wajib tapi tidak dibuat sistem) dan batasannya terhadap Talent Pool. Menjadi rujukan desain Kaderisasi / Talent Pool: alur usulan atasan ke persetujuan HR ke status siap, koleksi talent_candidate di service learning, syarat belajar terpenuhi lewat kurikulum jabatan tujuan, dan pemisahan tegas antara yang dihitung sistem dengan penilaian kelayakan yang tetap milik HR.",
       "kata_kunci": [
-        "jenjang karier",
+        "karier",
         "career path",
         "promosi",
+        "promotion",
         "mutasi",
         "kaderisasi",
         "talent pool",
         "succession planning",
-        "job level",
-        "matriks kompetensi",
-        "riwayat jabatan"
+        "jenjang jabatan",
+        "job level"
       ]
     },
     {
@@ -5169,8 +5169,19 @@
       ],
       "hash": "2a142c0dd3db9292abd22ca4c2b3f93f43c66d349f1fa3af10fcf4ebe55988ef",
       "ukuran_kb": 11.6,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: apa beda engine KPI ke insentif untuk tim marketing (9 role, master-kpi bobot total 100, cron metrik iklan) dengan appraisal KPI per-karyawan lintas departemen di employee-service (/kpi/*). Menjelaskan cara kerja template KPI per posisi, scoring per karyawan dan periode YYYY-MM dengan snapshot template, serta aturan bahwa posisi template harus cocok dengan jabatan yang dipegang pada akhir periode yang dinilai (dijawab dari employee_movement, bukan dari work_data hari ini) beserta field posisi_periode yang dipakai frontend. Menjadi rujukan untuk pertanyaan RBAC KPI per departemen, cakupan tim untuk Leader (scope=team lewat supervisor_id), penggabungan tampilan departemen satu tim seperti HRGA dari master_department.supervised_by, bentuk respons, dan dashboard rata-rata, coverage, need training, top performer.",
+      "kata_kunci": [
+        "KPI",
+        "key performance index",
+        "appraisal",
+        "penilaian kinerja",
+        "kpi_score",
+        "template KPI",
+        "scoring",
+        "insentif",
+        "RBAC departemen",
+        "scope team"
+      ]
     },
     {
       "path": "Human Resource Information System/HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai).md",
@@ -9384,7 +9395,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Human Resource Information System/HRIS - Key Performance Index.md"
-  ]
+  "gagal": []
 }
