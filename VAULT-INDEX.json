@@ -1098,21 +1098,10 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "cbe87275334c54134e7e77139bb41bb540f396dbf378ce45ab914dc0596cb565",
-      "ukuran_kb": 169.2,
-      "ringkasan": "Menjawab: stack dan struktur portal web ERP internal One Bharata (erp-frontend), bagaimana login serta SSO handoff dan refresh token bekerja, dan bagaimana sidebar disaring per modul dari `system_roles`. Juga menjelaskan dukungan multi-perusahaan (pemilih perusahaan, shift, network WiFi, direktori karyawan) dan bagaimana setelan HRGA dikumpulkan jadi satu menu Pengaturan berisi enam sub-menu yang penyaringannya per tab, bukan per halaman.",
-      "kata_kunci": [
-        "erp-frontend",
-        "One Bharata",
-        "portal web ERP",
-        "SSO identity provider",
-        "login",
-        "system_roles",
-        "sidebar menu",
-        "role gating",
-        "multi-perusahaan",
-        "Pengaturan HRGA"
-      ]
+      "hash": "79aca1ec7f1d138f36dc935b00f205b19b4269358d0281408d5f06df8527aeb5",
+      "ukuran_kb": 172.5,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Application/APP - Website Bharata Internasional.md",
@@ -7075,20 +7064,20 @@
         "Microservices - Procurement Service",
         "Microservices - Manufacture Service"
       ],
-      "hash": "55544eaca464d2be135dd6be8deaae69243ae8193ccd804d7e0953352c5fa3dd",
-      "ukuran_kb": 8.0,
-      "ringkasan": "Menjawab: alur persetujuan apa saja yang ada di ERP Bharata dan siapa yang berwenang memutuskan tiap alur, mulai dari cuti, perjalanan dinas, koreksi presensi, dan tukar jadwal, sampai pesanan pembelian, permintaan barang, handover aset, payroll run, rekrutmen, CAPA, WMS, task management, dan insentif. Juga menjawab tiga cara gerbang persetujuan ditulis (middleware di daftar rute, di dalam handler, slot pada dokumen), jabatan apa saja yang setingkat Direktur lewat `common.SetaraDirektur`, dan alur mana yang belum punya pintu masuk dari navigasi.",
+      "hash": "5f72ac3299aac6e19fe218d64f96fbabf4f72363f5ec136a892c60e3eb1fcf0f",
+      "ukuran_kb": 8.8,
+      "ringkasan": "Menjawab: alur persetujuan apa saja yang ada di seluruh ERP Bharata dan siapa yang berwenang memutuskannya, dikelompokkan per cara gerbangnya ditulis (slot pada dokumen, jabatan, atau izin/peran). Menjelaskan kenapa membaca routes.go saja menghasilkan kesimpulan salah, siapa yang setara Direktur (common.SetaraDirektur berisi Direktur dan Corporate Secretary), dan bedanya melihat antrean versus boleh memutus. Juga menjawab approval mana yang dulu tanpa gerbang lalu ditutup (insentif), serta pola cacat berulang berupa pihak berwenang yang antreannya kosong atau menunya dicabut (cuti dan dinas, Pesanan Pembelian, job requisition).",
       "kata_kunci": [
         "alur persetujuan",
         "approval",
         "approver",
         "penyetuju",
-        "cuti",
-        "Direktur",
+        "RBAC",
         "SetaraDirektur",
+        "Direktur",
+        "cuti",
         "purchase order",
-        "handover aset",
-        "payroll approve"
+        "gerbang otorisasi"
       ]
     },
     {
@@ -9327,5 +9316,7 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "Application/APP - Web ERP.md"
+  ]
 }
