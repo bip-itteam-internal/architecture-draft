@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-09",
-  "jumlah_dokumen": 280,
+  "digenerate": "2026-08-10",
+  "jumlah_dokumen": 281,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1089,6 +1089,7 @@
         "Microservices - Procurement Service",
         "API - Procurement Service",
         "HRIS - Otomasi Skor KPI",
+        "REF - Alur Persetujuan",
         "CORE - API Master Gateway",
         "Microservices - Notification Service",
         "Microservices - Inventory Service",
@@ -1097,20 +1098,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "1eb6335441e934cb9e25052cfac88a72df8c90c4a3e1852fd61c8beb7896b706",
-      "ukuran_kb": 163.0,
-      "ringkasan": "Menjawab: apa itu portal web ERP internal (hris-dashboard / \"One Bharata\"), stack apa yang dipakai, dan modul apa saja yang tersedia untuk HR, attendance, finance/insentif, IT, dan GA. Juga menjawab bagaimana login, refresh token, dan peran sebagai SSO Identity Provider bekerja, serta bagaimana sidebar digerbang oleh system_roles dan dikelompokkan lewat menu induk bersarang. Termasuk bagaimana dukungan multi-perusahaan tampil di UI dan bagaimana setelan HRGA dikumpulkan jadi satu menu Pengaturan dengan penyaringan per tab.",
+      "hash": "cbe87275334c54134e7e77139bb41bb540f396dbf378ce45ab914dc0596cb565",
+      "ukuran_kb": 169.2,
+      "ringkasan": "Menjawab: stack dan struktur portal web ERP internal One Bharata (erp-frontend), bagaimana login serta SSO handoff dan refresh token bekerja, dan bagaimana sidebar disaring per modul dari `system_roles`. Juga menjelaskan dukungan multi-perusahaan (pemilih perusahaan, shift, network WiFi, direktori karyawan) dan bagaimana setelan HRGA dikumpulkan jadi satu menu Pengaturan berisi enam sub-menu yang penyaringannya per tab, bukan per halaman.",
       "kata_kunci": [
         "erp-frontend",
-        "web ERP",
         "One Bharata",
-        "hris-dashboard",
-        "sidebar",
-        "menu",
-        "SSO",
+        "portal web ERP",
+        "SSO identity provider",
+        "login",
+        "system_roles",
+        "sidebar menu",
         "role gating",
         "multi-perusahaan",
-        "Next.js"
+        "Pengaturan HRGA"
       ]
     },
     {
@@ -1356,6 +1357,7 @@
         "APP - Web ERP",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
+        "REF - Alur Persetujuan",
         "Finance - Kas Kecil dan Pengajuan Budget",
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
@@ -1383,19 +1385,19 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "56f1be6245ca83565a7b99fb648530f3251c6fa8e452134c89c90de0e3c24a47",
-      "ukuran_kb": 61.7,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp disusun lewat tiga sumbu (modul, aksi, cakupan data/reach own-division-all), bagaimana permission granular dibundel jadi permission set bernama, dan mengapa paket hak menempel pada posisi/jabatan bukan pada akun. Juga menjawab: modul apa saja yang punya katalog permission, endpoint mana yang dipakai frontend untuk mengambil katalog/daftar modul dan memasang paket ke posisi, bagaimana permission efektif diresolusi saat login lalu dibawa di klaim JWT dan header BIP-* dari gateway, serta bagaimana kill-switch tier fallback per modul bekerja. Sekaligus membedakan permission_sets (hak akses, ditegakkan backend) dari menu_hidden (tampilan sidebar per jabatan, hanya mengurangi dan bukan mekanisme keamanan).",
+      "hash": "a483113212b00b4a4f7542939276e4f1ddeb1ce2d23587066fe650e49b96fe23",
+      "ukuran_kb": 66.0,
+      "ringkasan": "Menjawab: bagaimana hak akses ditentukan di seluruh bip-erp lewat tiga sumbu (modul, tingkat aksi, cakupan/reach), paket izin bernama (permission set) yang menempel di posisi/jabatan, dan bagaimana izin efektif dirakit saat login lalu ditegakkan di gateway, service, serta frontend. Juga menjawab modul mana yang sudah punya katalog permission dan mana yang masih jatuh ke tier `system_roles` lama, plus beda `permission_sets` (hak akses) dengan `menu_hidden` (tampilan menu).",
       "kata_kunci": [
         "RBAC",
         "permission set",
         "hak akses",
-        "izin",
-        "reach",
-        "cakupan data",
         "system_roles",
+        "reach",
+        "katalog permission",
         "posisi",
         "jabatan",
+        "menu_hidden",
         "tier fallback"
       ]
     },
@@ -1737,20 +1739,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "0e506ad641ce8ff287d9cf548b66541b84b41774048a721c1536d00df34f2c47",
-      "ukuran_kb": 74.5,
-      "ringkasan": "Menjawab: bagaimana Form Builder Service dirancang dan dijalankan (stack Go plus Fiber, MongoDB `form_builder_db`, port internal, path repo), siapa personanya, dan kenapa kepemilikan form memakai `owner_department` alih-alih modul. Menjelaskan mekanisme yang tidak terlihat dari daftar endpoint: sumbu `subject` untuk penilaian karyawan lain yang terpisah dari `audience`, potret sasaran saat terbit, kerahasiaan penilai, form berulang periode bulanan dan mingguan beserta cron pembukanya, tipe `kaizen` dengan papan kepatuhan dan setoran metrik ke KPI, serta lampiran berkas. Menjadi rujukan untuk alasan di balik larangan tertentu, misalnya kenapa susunan pertanyaan terkunci setelah ada jawaban, kenapa gerbang presensi dilarang pada form penilaian, dan kenapa notification-service wajib ikut di-deploy.",
+      "hash": "2b5c22d3443b1063f41d560facaae38b1ed3091650ccf4c578e6a1a2caf6d0ba",
+      "ukuran_kb": 75.2,
+      "ringkasan": "Menjawab: bagaimana form dinamis dibuat tanpa coding, mulai dari 10 tipe pertanyaan, 4 tipe form, alur draft sampai published dan closed, siapa yang boleh mengelola (departemen pemilik), sampai cara membaca rekap jawaban dan mengekspornya ke CSV. Juga menjawab cara kerja form berulang per periode bulanan/mingguan, penilaian karyawan lain lewat sumbu `subject`, program ide Kaizen, lampiran berkas, notifikasi inbox, dan endpoint kepatuhan yang menahan clock-in mobile bila ada form wajib yang belum diisi.",
       "kata_kunci": [
-        "form builder service",
-        "microservice",
+        "form builder",
         "form dinamis",
-        "penilaian karyawan",
-        "evaluation",
+        "survey",
+        "kuesioner",
         "kaizen",
+        "evaluation",
+        "checklist",
         "form berulang",
-        "recurrence",
-        "notifikasi inbox",
-        "multi-tenant"
+        "form-builder-service",
+        "gerbang presensi"
       ]
     },
     {
@@ -3664,20 +3666,20 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "HRIS - Kaizen (Ide Perbaikan)"
       ],
-      "hash": "8adb0e0419a30aa6e07ab56f711dc6d6466760d8c4d7550283f9abfc8b4e133a",
-      "ukuran_kb": 7.1,
-      "ringkasan": "Menjawab: kenapa izin membuat tipe form tertentu ditempelkan pada departemen dan bukan pada posisi atau peran modul seperti ADR 0030, dan kenapa itu dianggap konfigurasi departemen alih-alih perluasan RBAC. Menjelaskan kenapa aturannya disimpan sebagai daftar-larangan yang bawaannya membolehkan semua (bukan daftar-izin), kapan aturan itu ditegakkan (saat tipe ditetapkan, bukan saat form disunting), dan siapa yang berhak menetapkannya. Memuat konsekuensinya, termasuk dua cara mematikan Form Builder untuk sebuah departemen dan catatan bahwa jangkauan `audience` atau `subject` tetap tidak digerbang, plus tabel alternatif yang ditolak.",
+      "hash": "0e0e3001188a0a7161d5cf62bb5d8b1dcf5790a2476ed3509a7bd7c31ae0eafa",
+      "ukuran_kb": 7.6,
+      "ringkasan": "Menjawab: kenapa izin membuat tipe form ditempelkan di departemen dan bukan di posisi seperti ADR 0030, dan kenapa yang disimpan adalah daftar-larangan (blocklist) yang bawaannya membolehkan semua tipe. Juga menjawab siapa yang berwenang menetapkan aturan itu (supervisor/admin IT), kapan aturan diperiksa (saat tipe ditetapkan, bukan tiap kali form disunting), serta konsekuensinya termasuk tab tipe di daftar form yang ikut tersaring dan alternatif apa saja yang ditolak.",
       "kata_kunci": [
         "ADR 0041",
         "izin tipe form",
-        "form type rules",
+        "form builder",
+        "departemen",
         "daftar-larangan",
         "blocklist",
+        "allowlist",
         "RBAC",
-        "departemen",
-        "form builder",
-        "tata kelola",
-        "allowlist"
+        "me/capability",
+        "tata kelola"
       ]
     },
     {
@@ -3717,7 +3719,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "✅",
-      "status_teks": "Implemented (dev, 2026-08-09). Tabel `services/employee/peran_dari_jabatan.go` mengisi `system_roles` yang kosong dari (departemen, jabatan) di keempat jalur penerbitan token. Menyentuh 13 akun Manufaktur/Quality dan 11 akun Beauty Hacks/Kyura. Sakelar `ROLE_FROM_POSITION=off`. **Jembatan sementara**, bukan pengganti [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].",
+      "status_teks": "Implemented (dev, 2026-08-09). Tabel `services/employee/peran_dari_jabatan.go` mengisi `system_roles` yang kosong dari (departemen, jabatan) di keempat jalur penerbitan token. Menyentuh 13 akun Manufaktur/Quality, 11 akun Beauty Hacks/Kyura, 1 akun General Affair, dan 1 akun Kesekretariatan. Sakelar `ROLE_FROM_POSITION=off`. **Jembatan sementara**, bukan pengganti [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -3728,20 +3730,20 @@
         "HRIS - Organization Structure",
         "APP - Web ERP"
       ],
-      "hash": "796c50cb697a1d107ee410847c66914bd4e1d6f5112d304e0838d7f5f3e46709",
-      "ukuran_kb": 7.0,
-      "ringkasan": "Menjawab: kenapa system_roles yang kosong diisi otomatis dari pasangan departemen dan jabatan saat token diterbitkan, dan empat aturan yang mengikat penurunan itu (tak pernah menimpa, dinilai per modul, hanya untuk peran yang menentukan akses, jabatan ambigu tidak ditebak). Juga menjawab jabatan mana yang sengaja tidak dipetakan beserta alasannya, dan sakelar apa yang mengembalikan perilaku lama. Termasuk konsekuensi bahwa kini ada dua sumber system_roles sehingga memeriksa akses dari database saja bisa menyesatkan, serta kenapa keputusan ini jembatan sementara menuju ADR 0030.",
+      "hash": "6485260ad5f9cf1cb9f9a84db7222cfeb6d6864fdb619007764a6e7ffb98168d",
+      "ukuran_kb": 10.9,
+      "ringkasan": "Menjawab: kenapa `system_roles` yang kosong diisi otomatis dari pasangan departemen dan jabatan saat token diterbitkan, serta empat aturan yang membatasinya (tak pernah menimpa, dinilai per modul, hanya untuk peran akses bukan perhitungan, jabatan ambigu tak ditebak). Juga menjawab jabatan mana yang sengaja tidak dipetakan beserta alasannya, kenapa `secretary: staff` tak pernah diturunkan, dan bagaimana sakelar `ROLE_FROM_POSITION=off` mengembalikan perilaku lama tanpa deploy kode.",
       "kata_kunci": [
         "ADR 0043",
         "system_roles",
-        "peran sistem",
-        "jabatan",
-        "posisi",
-        "WMS",
-        "manufacture",
-        "insentive",
+        "peran dari jabatan",
+        "role from position",
         "ROLE_FROM_POSITION",
-        "penerbitan token"
+        "RBAC",
+        "jabatan",
+        "penerbitan token",
+        "manufacture",
+        "insentive"
       ]
     },
     {
@@ -7052,6 +7054,41 @@
         "wiki",
         "publish",
         "architecture-draft"
+      ]
+    },
+    {
+      "path": "Reference/REF - Alur Persetujuan.md",
+      "judul": "REF - Alur Persetujuan",
+      "area": "Reference",
+      "jenis": "reference",
+      "status_emoji": "✅",
+      "status_teks": "Implemented — seluruh baris terverifikasi di kode.",
+      "publik": true,
+      "tautan": [
+        "APP - Web ERP",
+        "CORE - RBAC dan Permission Set",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "Microservices - Payroll Service",
+        "Microservices - Recruitment Service",
+        "Microservices - Procurement Service",
+        "Microservices - Manufacture Service"
+      ],
+      "hash": "55544eaca464d2be135dd6be8deaae69243ae8193ccd804d7e0953352c5fa3dd",
+      "ukuran_kb": 8.0,
+      "ringkasan": "Menjawab: alur persetujuan apa saja yang ada di ERP Bharata dan siapa yang berwenang memutuskan tiap alur, mulai dari cuti, perjalanan dinas, koreksi presensi, dan tukar jadwal, sampai pesanan pembelian, permintaan barang, handover aset, payroll run, rekrutmen, CAPA, WMS, task management, dan insentif. Juga menjawab tiga cara gerbang persetujuan ditulis (middleware di daftar rute, di dalam handler, slot pada dokumen), jabatan apa saja yang setingkat Direktur lewat `common.SetaraDirektur`, dan alur mana yang belum punya pintu masuk dari navigasi.",
+      "kata_kunci": [
+        "alur persetujuan",
+        "approval",
+        "approver",
+        "penyetuju",
+        "cuti",
+        "Direktur",
+        "SetaraDirektur",
+        "purchase order",
+        "handover aset",
+        "payroll approve"
       ]
     },
     {

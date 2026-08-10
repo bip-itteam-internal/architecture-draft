@@ -112,6 +112,9 @@ Rute `/form-type-rules/*` hidup **di luar grup `/forms`**, meniru pemisahan rute
 
 **`GET /me/capability` menjawab daftar POSITIF per departemen** (`form_types_by_department`), sehingga frontend tak memegang satu baris pun logika aturan. Per departemen, bukan datar: SPV HRGA membawahi dua sekaligus, dan meratakannya salah ke dua arah — irisan menyembunyikan tipe yang sebenarnya boleh, gabungan menawarkan tipe yang pasti ditolak. `can_manage_type_rules` dihitung **terpisah** dari `can_manage`, karena admin IT belum tentu mengelola satu departemen pun dan kalau haknya ikut mati ia tak pernah melihat pintu masuk layarnya.
 
+> [!note] "Jangan diratakan" berlaku untuk PEMBUATAN, bukan untuk penyaringan daftar
+> Peringatan di atas menjawab dropdown tipe di editor, tempat setiap pilihan berakhir jadi permintaan tulis yang bisa ditolak `403`. Sejak 2026-08-10 frontend juga memakai jawaban ini untuk **tab penyaring di daftar form**, dan di sana yang benar justru **gabungan** seluruh departemen dalam cakupan: daftarnya memuat form kedua departemen, jadi mengiris akan menyembunyikan tab untuk form yang benar-benar ada, sementara "menawarkan tipe yang pasti ditolak" tak berlaku karena menyaring bukan menulis. Dua sumbu berbeda dari satu jawaban yang sama; detail di [[APP - Web ERP]].
+
 Yang **tidak** diselesaikan: `audience` dan `subject` masih hanya diperiksa bentuknya, bukan jangkauannya. Departemen yang dibatasi tipenya tetap bisa menyasar karyawan departemen lain memakai tipe yang masih boleh dibuatnya.
 
 ## Kepemilikan form: departemen, bukan modul
