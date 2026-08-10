@@ -85,6 +85,19 @@ Kalau image lebih tua daripada commit yang menambah field/klaim yang sedang dica
 
 > **Aturan yang lebih luas:** membaca kode di repo tidak cukup untuk menyimpulkan perilaku sebuah lingkungan. Sebelum menuduh logika, pastikan biner yang berjalan memang memuat logika itu. Per 2026-08-09 **tujuh service dev masih memakai image 12 Juli** (attendance, hris-orchestrator, insentive, inventory, notification, task-management, tiktok-shop).
 
+## 3a2. Service yang ada di compose PRODUKSI tapi tidak di compose DEV
+
+`docker-compose.yml` dan `docker-compose.dev.yml` **bukan cerminan satu sama lain**. Beberapa service hanya didefinisikan di yang pertama, sementara `*_MODULE_URL`-nya tetap dipasang di gateway dev — memang harus, sebab gateway memanggil `ValidateInternalURL` untuk SELURUH `InternalURL` saat start dan akan restart-loop bila ada yang kosong (§3a).
+
+Akibatnya URL-nya ADA tapi container-nya TIDAK. Panggilan mati di resolusi DNS dan kembali sebagai **502**, bukan 404 — jadi gejalanya terbaca seperti "service-nya rusak" atau "gerbangnya menolak", padahal service-nya memang tak pernah dijalankan. Layar yang bersangkutan hanya bisa diuji pada **jalur gagalnya**.
+
+| Service | Status di compose dev |
+|---|---|
+| `procurement-service` (+ `procurement-mongo-db`) | **Ditambahkan 2026-08-10.** Panel Permintaan Barang & Pesanan Pembelian di Ruang Direktur ([[APP - Web ERP]]) baru bisa diuji dengan data sungguhan sejak saat itu. |
+| `payroll-service` | **Masih absen.** `/api/payroll/*` tetap 502 di dev; `PayrollMenungguPanel` masih hanya teruji pada jalur gagalnya. |
+
+> ⚠️ **`env_file: .env` memuat SELURUH `.env` ke container, termasuk yang tak disebut di blok `environment`.** Di dev itu berarti kredensial **Accurate produksi** ikut masuk ke setiap service — dibuktikan log boot procurement yang menyebut "mode token statis" walau blok `environment`-nya tak menyertakan satu pun `ACCURATE_*`. Berlaku untuk semua service dev, bukan satu. Konsekuensi praktisnya: **jangan pakai dev untuk mencoba sync/push dokumen ke Accurate.** Yang sengaja TIDAK diteruskan ke procurement dev hanyalah `INTEGRATION_MONGO_URI`, supaya dev tak ikut membaca/menyegarkan token OAuth milik integration-service.
+
 ## 3b. Fitur dorman di balik feature flag (aman deploy siapa pun)
 
 Beberapa fitur landing **DORMANT** — kode ada di produksi tapi tidak jalan sampai env flag dinyalakan sengaja. **Deploy integration-service oleh siapa pun TIDAK mengaktifkannya** selama flag tidak di-set `true` di `.env`.
@@ -108,6 +121,7 @@ docker logs <Container-Name> --tail 40
 | Service gagal start "connection refused" mongo/redis | dependensi mati + `--no-deps` melewati gating | nyalakan dependensi dulu / deploy tanpa `--no-deps` |
 | Perubahan env/port tak terbaca | `up -d --build` saja kadang tak recreate | tambahkan `--force-recreate` (env berubah) |
 | Sweep/reconciler tak jalan | `REDIS_URL` kosong | pastikan env redis terisi; log akan bilang "tidak diaktifkan" |
+| Endpoint balas **502** di dev padahal rute & gerbangnya benar | service-nya tak didefinisikan di `docker-compose.dev.yml` walau `*_MODULE_URL`-nya terpasang → mati di resolusi DNS | tambahkan service + mongo-nya ke compose dev (§3a2), bukan mengubah kode |
 | Fitur jalan normal tapi **notifikasinya tak pernah tiba**, tanpa galat di layar | kategori inbox baru; `notification-service` masih memegang `InboxCategories` lama dan menolak `400`, sementara pengiriman best-effort hanya nge-log | rebuild `notification-service` juga (§3a), lalu picu satu notifikasi sungguhan untuk memastikan |
 
 ## Dokumen Terkait
