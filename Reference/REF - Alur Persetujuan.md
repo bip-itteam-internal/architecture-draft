@@ -34,6 +34,7 @@ Yang membuat inventaris ini sulit disusun, dan mudah salah:
 |---|---|---|
 | Pesanan Pembelian ERP | procurement | `common.SetaraDirektur` — Direktur & Corporate Secretary |
 | Permintaan Barang ERP | procurement | atasan departemen peminta (dari cakupan supervisi) |
+| Inventory — approve handover aset | inventory | atasan departemen **penyerah**, dari `common.SupervisedDepartments`; diperiksa di dalam `ApproveHandover` |
 
 ### Berbasis IZIN / PERAN
 
@@ -50,14 +51,21 @@ Yang membuat inventaris ini sulit disusun, dan mudah salah:
 | Task Management — approve/reject tugas | task-management | `ticket.triage` / admin space |
 | Kotak Adopsi — adopt & reject draft | integration | peran integration |
 
-### ⚠️ Tanpa gerbang
+### Ditutup 2026-08-10
 
-| Alur | Service | Catatan |
+| Alur | Service | Penyetuju sekarang |
 |---|---|---|
-| Insentif — approve / unapprove hasil, termasuk bulk | insentive | menyentuh perhitungan insentif |
-| Inventory — approve handover | inventory | serah-terima aset |
+| Insentif — approve / unapprove hasil, termasuk bulk | insentive | `common.RequireInsentiveApprover` — `finance`, atasan marketing (supervisor / adv_leader / adv_marketplace / adv_meta), IT supervisor |
 
-Keduanya bisa dipanggil siapa pun bertoken sah. Sejalan dengan [[ADR - 0031 Prefix internal Bukan Batas Keamanan]], letak rute tak menjadikannya terlindungi.
+Keempat rutenya sebelumnya tak punya gerbang APA PUN — bukan di middleware, bukan pula di handler. Daftar yang berhak diturunkan dari niat yang sudah ada di frontend: menu Dashboard Insentif, tempat seluruh tombolnya hidup, hanya tampil untuk `finance` atau atasan marketing.
+
+Yang paling penting ditutup, dan dikunci uji: peran insentif **operasional** — ICC, host live, CRM, affiliate. Merekalah yang hasilnya sedang dinilai; membiarkan mereka menyetujui berarti membiarkan penilaian diputuskan oleh yang dinilai.
+
+⚠️ Halaman dashboard-nya sendiri masih lebih longgar daripada menunya (meloloskan peran insentif apa pun), jadi staf operasional yang membuka URL langsung tetap melihat layarnya — tombolnya kini balas 403 alih-alih diam-diam berhasil. Menyamakan gerbang halaman dengan menunya adalah rapikan tersendiri.
+
+> **KOREKSI.** Versi pertama dokumen ini menyebut **Inventory — approve handover** juga tanpa gerbang. Keliru: otorisasinya ADA, di dalam `ApproveHandover` (`services/inventory/controller.go`), memeriksa bahwa pemanggil menaungi departemen penyerah lewat `common.SupervisedDepartments` dan membalas 403 bila tidak.
+>
+> Ini kesalahan yang SAMA dengan yang sudah diperingatkan di bagian atas dokumen ini — menyapu daftar rute lalu menyimpulkan "tanpa gerbang" — dan ia terulang setelah peringatannya ditulis. Bukti bahwa peringatan itu memang perlu ada, dan bahwa satu-satunya pemeriksaan yang sah adalah **membaca handler-nya**.
 
 ## Wewenang setingkat Direktur
 
@@ -77,7 +85,7 @@ Ketiganya kini menunjuk **`common.SetaraDirektur`** (`shared-library/common/jaba
 
 ## Belum Diimplementasikan / Catatan
 
-- **Dua alur tanpa gerbang** di tabel di atas belum ditutup.
+- **Tak ada lagi alur persetujuan tanpa gerbang** sejak 2026-08-10. Satu-satunya yang benar-benar terbuka (insentif) sudah ditutup; klaim kedua (inventory) ternyata salah baca.
 - **Payroll: niat vs kenyataan.** Komentar di `services/payroll/rbac.go` menulis `isApprover` = "persetujuan final payroll run (Direktur)", tapi isinya `isHRAdmin`. Selama Direktur tak punya paket payroll, HR admin-lah yang menyetujui atas namanya. Ditutup 2026-08-10 dengan memasang paket `payroll_penyetuju` ke jabatannya — **tanpa mengubah gerbang**, sebab `gate()` mendahulukan izin dari klaim.
 - **Persetujuan Pesanan & Permintaan tak punya pintu masuk dari navigasi.** Menunya dicabut dari Portal Saya; halamannya (`/persetujuan/pesanan-pembelian`, `/persetujuan/permintaan-barang`) dibiarkan dormant dan hanya bisa dibuka lewat URL langsung. Sejak 2026-08-10 antrean PO punya pintu lewat [[APP - Web ERP]] (Ruang Direktur); **Permintaan Barang masih tanpa pintu**.
 - **Persetujuan PO di Accurate tak bisa ditindaklanjuti dari ERP.** ERP menyimpan salinan pesanan Accurate (`status_name: "Diajukan"`), tapi Accurate hanya menyediakan `save.do` — tak ada endpoint approval. Alur yang bisa diputus dari ERP adalah `pesanan_erp`, yang terpisah dari cermin itu.
