@@ -1098,10 +1098,21 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "79aca1ec7f1d138f36dc935b00f205b19b4269358d0281408d5f06df8527aeb5",
-      "ukuran_kb": 172.5,
-      "ringkasan": null,
-      "kata_kunci": []
+      "hash": "94df7d72ad561d567ba85d91978bca903bcad79466c49ea85e189b6bc5a115af",
+      "ukuran_kb": 172.4,
+      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di Web ERP (erp-frontend) untuk tiap role, bagaimana halaman daftar disusun mengikuti pola satu kartu (Banner bare di dalam prop toolbar milik MainTable), dan keputusan tampilan apa yang sudah diambil berikut alasannya. Juga menjawab halaman mana yang sudah live di dev atau produksi dan mana yang masih berupa branch, sebab tiap fitur dicatat lengkap dengan nomor PR dan status deploy-nya. Dipakai sebagai titik awal sebelum menyentuh halaman mana pun di erp-frontend.",
+      "kata_kunci": [
+        "erp-frontend",
+        "Web ERP",
+        "frontend",
+        "Next.js",
+        "MainTable",
+        "Banner",
+        "struktur tabel HRIS",
+        "halaman daftar",
+        "sidebar menu per role",
+        "i18n"
+      ]
     },
     {
       "path": "Application/APP - Website Bharata Internasional.md",
@@ -4800,7 +4811,7 @@
         "HRIS - Personalia"
       ],
       "hash": "d837be80d96f6e738d57857d7e0c8bfe4026f7df1d56b8d702fe217321f86390",
-      "ukuran_kb": 9.0,
+      "ukuran_kb": 9.1,
       "ringkasan": "Menjawab: bagaimana jenjang karier, promosi, dan mutasi karyawan diperlakukan di ERP, apa yang sudah punya bentuk di sistem (tangga jenjang jabatan lewat `master_job_level` dan `level_key`) dan apa yang masih berupa desain. Juga menjawab: bagaimana kaderisasi/Talent Pool dirancang, siapa yang mengusulkan dan menyetujui kandidat, alur status dari diusulkan sampai dipromosikan, apa yang boleh dihitung sistem versus apa yang tetap keputusan manusia. Sekaligus menjelaskan kenapa Talent Pool sengaja tidak menulis apa pun ke `work_data` dan di mana batasnya dengan modul promosi.",
       "kata_kunci": [
         "karier",
@@ -5797,7 +5808,7 @@
         "HRIS - Analysis"
       ],
       "hash": "00ff39365a8f0d0fc3eeaf74595c33979256bcfcd531a0d6401c30f8659da39c",
-      "ukuran_kb": 16.8,
+      "ukuran_kb": 16.9,
       "ringkasan": "Menjawab: bagaimana modul pelatihan karyawan dirancang, entitas inti apa saja yang dipakai (training type, trainer internal/eksternal, training, peserta dan kehadiran), dan bagaimana alurnya dari penyiapan master, penjadwalan, penugasan peserta, sampai pencatatan kehadiran dan riwayat per karyawan. Juga menjawab: bagian mana dari modul Training ERPGo yang diambil, disesuaikan, atau dibuang beserta alasannya (mis. Branch dibuang karena perusahaan single-site, Cost hanya informasional karena pembukuan di Accurate). Sekaligus menerangkan di service mana modul ini tinggal, rute UI-nya, dan apa yang sengaja disisakan untuk fase lanjut seperti evaluasi, sertifikat, dan LMS People Development.",
       "kata_kunci": [
         "training",
@@ -9316,7 +9327,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Application/APP - Web ERP.md"
-  ]
+  "gagal": []
 }
