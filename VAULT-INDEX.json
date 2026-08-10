@@ -1355,7 +1355,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, serta **legal** (yang terakhir ⚠️ belum merge). **finance** punya katalog + 5 paket dan menunya sudah bertanda izin, tetapi **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
+      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, **legal**, serta **formbuilder**. **finance** punya katalog + 5 paket (`finance_view`, `finance_pelaksana`, `finance_admin`, `finance_ar`, `finance_ap`) dan menunya sudah bertanda izin, tetapi **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -1370,6 +1370,7 @@
         "Microservices - Procurement Service",
         "LOG - 2026-07-30 Audit Otorisasi Employee Service",
         "ADR - 0038 Hak Per-Objek Admin Space Task Management",
+        "Microservices - Form Builder Service",
         "RUN - Deploy Microservices bip-erp",
         "DB - Data Dictionary",
         "CORE - IT Orchestrator",
@@ -1391,20 +1392,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "db882592a8c7962a4dd0047a6f552b496ee558130ec8502321cf33b681e3ea4c",
-      "ukuran_kb": 67.1,
-      "ringkasan": "Menjawab: bagaimana hak akses di bip-erp disusun dari tiga sumbu (modul, tingkat aksi, cakupan/reach), bagaimana paket hak (permission set) menempel pada posisi/jabatan, dan bagaimana izin efektif diresolusi saat login lalu dibawa di klaim JWT. Menjelaskan katalog permission per modul yang terdaftar, endpoint pengelolaannya (permission-catalog, permission-modules, pemasangan set ke posisi), penegakan lewat RequirePermission dan tier fallback, serta perbedaan tegas antara permission_sets (hak akses) dan menu_hidden (tampilan menu yang hanya mengurangi dan tidak ditegakkan backend).",
+      "hash": "544adaf968f8996876b631c71f84fd5879a2c6e3499e5bf72dc0ec8a5d96b496",
+      "ukuran_kb": 71.8,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi view/work/approve/manage, dan cakupan data own/division/all), modul apa saja yang sudah punya katalog permission, serta bagaimana paket hak bernama (permission set) dipasang ke posisi/jabatan lalu diwarisi akun. Menjelaskan juga di mana penegakannya terjadi (RequirePermission di service, penulisan ulang header BIP-* di gateway, penyaringan menu di frontend), endpoint master untuk katalog, daftar modul, assignment ke posisi, dan pengecualian per-akun. Berguna saat mencari kenapa seseorang tak bisa membuka menu/aksi tertentu, cara menambah katalog modul baru, atau bagaimana fallback tier system_roles bekerja selama migrasi.",
       "kata_kunci": [
         "RBAC",
         "permission set",
-        "system_roles",
+        "paket hak",
+        "hak akses",
         "reach",
-        "hak per posisi",
-        "katalog permission",
-        "tier fallback",
-        "menu_hidden",
-        "JWT claim",
-        "master_permission_set"
+        "cakupan data",
+        "system_roles",
+        "posisi",
+        "jabatan",
+        "katalog permission"
       ]
     },
     {
@@ -3258,10 +3259,11 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Keputusan ini **sudah dijalankan dan terverifikasi live di dev DAN produksi** (2026-07-30): posisi memegang paket hak, izin efektif digabung dari posisi + akun dengan reach tertinggi, layar Hak per Posisi & Siapa Boleh Apa jalan, dan penegakan per-aksi aktif di `ticket` serta `payroll`. Paket per-akun sudah dirapikan (dev 5 jadi 1, prod 4 jadi 0, sehingga hampir semua hak kini berasal dari jabatan). Catatan: `finance` baru berkatalog tanpa gerbang, 11 modul lain belum berkatalog, dan pola izin antar-modul belum seragam (lihat Consequences).",
+      "status_teks": "Implemented (ada catatan). Keputusan ini **sudah dijalankan dan terverifikasi live di dev DAN produksi** (2026-07-30): posisi memegang paket hak, izin efektif digabung dari posisi + akun dengan reach tertinggi, layar Hak per Posisi & Siapa Boleh Apa jalan, dan penegakan per-aksi aktif di `ticket` serta `payroll`. Paket per-akun sudah dirapikan (dev 5 jadi 1, prod 4 jadi 0, sehingga hampir semua hak kini berasal dari jabatan). Catatan per 2026-08-10: **13 modul sudah berkatalog** dan penegakannya jalan di semuanya kecuali `finance`, yang berkatalog tanpa satu pun gerbang endpoint; **8 modul dari daftar asli belum berkatalog** (`hrdoc`, `wms`, `warehouse`, `integration`, `insentive`, `ga`, `notification`, `admin`); dan pola izin antar-modul belum seragam (lihat Consequences). Yang menahan dampaknya bukan katalog melainkan dua hal lain: fase dua belum menyala di modul mana pun, dan baru 29 dari 171 entri menu yang ditandai izin — rinciannya di [[CORE - RBAC dan Permission Set]].",
       "publik": true,
       "tautan": [
         "CORE - RBAC dan Permission Set",
+        "Microservices - Form Builder Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "LOG - 2026-07-30 Audit Otorisasi Employee Service",
         "HRIS - Organization Structure",
@@ -3278,19 +3280,20 @@
         "DB - Data Dictionary",
         "ADR - 0003 SSO-only Gateway"
       ],
-      "hash": "f2585315101a5b1e6f39fbe8068676b07e838c9b717f300b4726ecfcd3fbdb57",
-      "ukuran_kb": 20.1,
-      "ringkasan": "Menjawab: kenapa hak akses bip-erp dipindahkan ke model tiga sumbu (modul, tingkat aksi view/work/approve/manage, dan reach own/division/all) dengan paket hak default menempel pada posisi, bukan pada akun. Juga menjawab keputusan turunannya: jumlah permission, pengecualian granular yang dibenarkan, self-service tanpa permission, fallback tier wajib selama migrasi, dan aturan satu PR sama dengan satu modul. Termasuk konsekuensi yang diterima seperti hak ikut token 72 jam sehingga perlu login ulang, dan rencana pencabutan gerbang posisi hardcoded.",
+      "hash": "da5880f781a22d55ebdcdaa8c4126ad545219b25fcd1865186c486bd94b34ff4",
+      "ukuran_kb": 21.1,
+      "ringkasan": "Menjawab: kenapa bip-erp memilih RBAC tiga sumbu dengan hak default menempel pada POSISI dan bukan pada akun, serta apa dasar keputusannya (audit tiga mekanisme akses yang hidup berdampingan, 557 rute user-facing tanpa middleware, dan katalog per-endpoint yang terlalu rinci untuk dipakai HR). Menjelaskan aturan pembentuk modul, tangga empat tingkat aksi, aturan cakupan (reach), self-service tanpa permission, kewajiban fallback tier saat migrasi, dan syarat satu PR sama dengan satu modul. Berguna saat menimbang apakah sebuah modul baru boleh punya katalog sendiri, atau saat menelusuri konsekuensi yang sudah diterima seperti hak ikut token JWT 72 jam dan pencabutan gate posisi hardcoded.",
       "kata_kunci": [
         "ADR 0030",
         "RBAC",
+        "tiga sumbu",
         "permission set",
         "posisi",
-        "jabatan",
+        "position_key",
         "reach",
-        "hak akses",
-        "tier fallback",
-        "system_roles"
+        "fallback tier",
+        "keputusan arsitektur",
+        "hak akses"
       ]
     },
     {
