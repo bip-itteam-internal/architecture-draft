@@ -52,6 +52,10 @@
 - Cache key: `cache:{module}:{employeeID}:{url}`
 - Module dikecualikan dari cache: file, hris, integration, inventory
 
+> ⚠️ **Kunci cache tidak memuat hak apa pun — hanya employee & URL.** Dua token milik ORANG YANG SAMA dengan klaim berbeda karena itu berbagi satu entri. Balasan token lama (mis. terbit sebelum `supervised_departments` atau sebuah permission-set dipasang) tersaji ke token baru selama TTL 3 menit, dan sebaliknya. Gejalanya: daftar yang seharusnya terisi tetap **kosong tanpa galat** sesaat setelah hak berubah — persis seperti "jabatan ini tak berhak", padahal cuma cache.
+>
+> Terbukti di dev 2026-08-10: panel Permintaan Barang yang sudah terisi mendadak hilang setelah tab lama (token pra-perubahan) memuat halaman lebih dulu; `redis-cli FLUSHALL` memulihkannya seketika. Karena itu **setiap pengukuran RBAC harus didahului flush cache**, dan perubahan hak selalu menuntut login ulang PLUS menunggu TTL habis — lihat [[CORE - RBAC dan Permission Set]].
+
 **Lain-lain**
 - CORS dan rate limiting di level gateway
 

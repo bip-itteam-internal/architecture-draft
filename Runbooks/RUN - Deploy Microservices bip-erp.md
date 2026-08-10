@@ -94,7 +94,9 @@ Akibatnya URL-nya ADA tapi container-nya TIDAK. Panggilan mati di resolusi DNS d
 | Service | Status di compose dev |
 |---|---|
 | `procurement-service` (+ `procurement-mongo-db`) | **Ditambahkan 2026-08-10.** Panel Permintaan Barang & Pesanan Pembelian di Ruang Direktur ([[APP - Web ERP]]) baru bisa diuji dengan data sungguhan sejak saat itu. |
-| `payroll-service` | **Masih absen.** `/api/payroll/*` tetap 502 di dev; `PayrollMenungguPanel` masih hanya teruji pada jalur gagalnya. |
+| `payroll-service` (+ `payroll-mongo-db`) | **Ditambahkan 2026-08-10.** Mongo-nya memakai host port **32795**, bukan 32792 seperti di compose produksi — di dev 32792 sudah dipakai `warehouse-mongo-db`. |
+
+Setelah `payroll-service` hidup, `PAYROLL_PERMISSION_ENFORCEMENT` **sengaja tidak diset di compose dev**, jadi dev menegakkan izin di kedua permukaan payroll. Produksi tidak: nilainya `"off"` di sana, tapi **hanya di blok `attendance-service`** — sementara `payroll-service` membaca nama env yang sama justru supaya satu modul punya satu sakelar. Ketimpangannya dicatat, bukan ditiru ke dev; lihat [[CORE - RBAC dan Permission Set]].
 
 > ⚠️ **`env_file: .env` memuat SELURUH `.env` ke container, termasuk yang tak disebut di blok `environment`.** Di dev itu berarti kredensial **Accurate produksi** ikut masuk ke setiap service — dibuktikan log boot procurement yang menyebut "mode token statis" walau blok `environment`-nya tak menyertakan satu pun `ACCURATE_*`. Berlaku untuk semua service dev, bukan satu. Konsekuensi praktisnya: **jangan pakai dev untuk mencoba sync/push dokumen ke Accurate.** Yang sengaja TIDAK diteruskan ke procurement dev hanyalah `INTEGRATION_MONGO_URI`, supaya dev tak ikut membaca/menyegarkan token OAuth milik integration-service.
 
