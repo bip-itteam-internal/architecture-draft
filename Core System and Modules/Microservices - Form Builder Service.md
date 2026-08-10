@@ -171,6 +171,28 @@ Itu keputusan sadar. Penyaringan `reach: division` belum ditegakkan di mana pun 
 
 **Celah yang ikut tertutup di PR yang sama**: `recruitment` dan `training` tak pernah didaftarkan `RegisterCatalog` di employee-service sejak katalognya dibuat, sehingga paket keduanya tak muncul di `GET /master/permission-modules` dan setiap upaya mengubahnya ditolak "permission tak terdaftar di katalog" — padahal paketnya tetap bisa dipasang ke posisi, jadi gejalanya senyap. Registrasinya kini fungsi bernama dengan penjaga yang menilai dari sisi **seed**, bukan daftar modul yang diketik ulang.
 
+## Skor gabungan: satu angka per orang yang dinilai
+
+> **Status**: ✅ **Merged & live di dev 2026-08-10** (BE [#1141](https://github.com/bip-itteam-internal/bip-erp/pull/1141), FE [erp-frontend #954](https://github.com/bip-itteam-internal/erp-frontend/pull/954)). Terverifikasi lewat gateway dev dengan form penilaian sungguhan. **PROD belum.**
+
+Rekap per pertanyaan menjawab "aspek mana yang lemah"; `Overall` menjawab "siapa yang perlu ditindaklanjuti" tanpa membandingkan delapan kolom sekaligus.
+
+**Dua lapis rata-rata, perlakuannya sengaja berbeda.** Di dalam satu penilai **berbobot**, sebab bobot menyatakan pertanyaan mana yang lebih penting. Antar penilai **polos**, sebab tak ada penilai yang lebih penting dari penilai lain. Menjadikan lapis kedua berbobot berarti diam-diam memutuskan suara sebagian orang lebih berat.
+
+⚠️ **Penyebut bobot dihitung dari pertanyaan yang DIJAWAB penilai itu**, bukan dari seluruh bobot form. Memakai total form sama saja menghitung pertanyaan kosong sebagai nol, sehingga penilai yang melewati satu pertanyaan berbobot besar terlihat memberi nilai rendah di situ padahal ia cuma tak menilainya.
+
+**Bobot (`FormField.Weight`) bernilai RELATIF, bukan persentase wajib-100.** Bobot 3 berarti tiga kali lebih berat dari 1. Dipilih relatif supaya menghapus satu pertanyaan tak memaksa menyetel ulang seluruh bobot lain; angka persen tetap bisa diisi apa adanya karena jumlahnya memang 100. Pointer, sebab **0 adalah bobot yang sah** (pertanyaan pelengkap yang sengaja tak ikut) dan harus bisa dibedakan dari tak-diisi. Kosong berarti 1, jadi **form lama tak menuntut migrasi** — dikunci uji tersendiri.
+
+**Hanya tipe `scale` yang ikut**, sengaja lebih sempit dari `numericFields` yang memasok kolom per-pertanyaan. `number` tak punya batas atas: nilai 90 pada "berapa kali terlambat" akan menenggelamkan skala 1..5 di sebelahnya. `numericFields` **tidak disentuh**, dan ada uji yang menjaga agar keduanya tak pernah disatukan "supaya rapi".
+
+**Cakupan dilaporkan, tidak disembunyikan.** `OverallFields`/`TotalQuestions` membuat layar berbunyi "Skor dihitung dari 5 dari 12 pertanyaan". Tanpa itu, form yang dibangun memakai `radio` menghasilkan skor dari sebagian kecil pertanyaan dan tak ada apa pun yang memberitahu pembacanya. Pola yang sama dipakai `Populasi` di mesin KPI ([[HRIS - Otomasi Skor KPI]]).
+
+**Kosong bukan nol.** `Overall` dihilangkan dari muatan JSON saat belum ada yang menilai — nol berarti "sudah dinilai dan hasilnya buruk", tuduhan yang tak dibuat siapa pun. Dikunci uji kontrak JSON.
+
+Nilai di luar rentang **diklem**: validasi menolaknya saat menulis, tapi dokumen lama bisa menyimpannya dan satu jawaban 7 pada skala 1..5 tak boleh keluar sebagai 150.
+
+> **Belum masuk KPI, dan itu disengaja.** Angkanya berhenti di layar analisa. Menyambungkannya ke `kpi_score` menuntut definisi yang stabil selamanya, sebab angka periode lalu harus tetap berarti saat rumusnya berubah. Melihatnya dulu di analisa memberi kesempatan mengoreksi rumus tanpa merusak riwayat siapa pun. Bila kelak dilanjutkan, polanya sudah ada di `kpi_sumber_kaizen.go`, dan [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] menetapkan employee-service tetap pemilik tunggal `kpi_score`.
+
 ## Penilaian karyawan lain: sumbu `subject`, terpisah dari `audience`
 
 Kasus nyata yang jadi acuan: **seluruh karyawan menilai tiap Office Boy, satu per satu**. Di produksi itu 185 karyawan × 4 Office Boy = **740 penilaian**, dan tiap orang mengisi 4 kali dalam satu duduk.
@@ -565,7 +587,9 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 - **Cakupan departemen belum bisa dibatasi lewat paket.** Konsekuensi langsung dari keputusan di atas: `reach: division` tak punya penegak di modul ini, jadi paket yang disetel "divisi sendiri" akan berperilaku persis "semua departemen". Bila pembatasan itu memang dibutuhkan, yang harus dibangun adalah penegaknya, bukan nilai di layar.
 - ✅ **Section/multi-halaman sudah ada** (PR [#870](https://github.com/bip-itteam-internal/bip-erp/pull/870)).
 - ✅ **Keterangan ujung skala sudah ada** (PR [#871](https://github.com/bip-itteam-internal/bip-erp/pull/871)).
-- **Upload file, percabangan, grid, dan opsi "Lainnya" belum ada** — jarak yang tersisa terhadap Google Forms. Urutan yang disarankan: opsi "Lainnya" (murah) → upload file → percabangan. Percabangan menuju bagian, jadi kini sudah punya landasannya.
+- ✅ **Upload file SUDAH ada** — tipe `file` terdaftar di `knownFieldTypes`, dengan `POST /me/forms/:id/uploads` dan dua rute pratinjau. Butir ini sempat berbunyi "belum ada" jauh setelah fiturnya mendarat; diperbaiki 2026-08-10.
+- **Percabangan, grid, dan opsi "Lainnya" belum ada** — jarak yang tersisa terhadap Google Forms. Urutan yang disarankan: opsi "Lainnya" (murah) → percabangan. Percabangan menuju bagian, jadi kini sudah punya landasannya.
+- **Nilai per opsi pada `radio`/`dropdown` belum ada**, dan itulah yang menahan keduanya keluar dari skor gabungan. `Options` masih `[]string` polos. Menurunkan nilai dari URUTAN opsi sudah ditolak eksplisit: skornya terbalik total begitu ada pembuat form yang menuliskan "Sangat Baik" lebih dulu, tanpa satu pun tanda di layar.
 - **Analisa belum mengelompokkan hasil per bagian.** Yang dijamin sekarang hanya bagian tak muncul sebagai kartu kosong; pengelompokan visualnya polesan yang belum dikerjakan.
 - **Form approval yang sudah matang JANGAN dimigrasikan ke sini** (leave/overtime/koreksi presensi) — semuanya punya workflow & rantai approval sendiri. Form Builder untuk kasus baru/ad-hoc.
 

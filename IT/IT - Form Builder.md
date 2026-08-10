@@ -23,7 +23,21 @@ Rencana yang terkunci di dokumen ini sebelumnya (RBAC `it` saja, tanpa FE, tanpa
 | Dampak ke service lain | "nol dampak" | **menyentuh [[Microservices - Attendance Service]]**: clock-in mobile bisa ditahan bila ada form wajib belum diisi |
 | Multi-perusahaan | (tak dibahas) | `company_id` sejak awal ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]) |
 
-Yang **tetap** ditunda sesuai rencana asli: **upload file** dan **logika percabangan** (lompat seksi berdasarkan jawaban).
+**Upload file sudah ada** (tipe `file`), berbeda dari rencana asli yang menundanya; butir ini sempat berbunyi "tetap ditunda" jauh setelah fiturnya mendarat, diperbaiki 2026-08-10. Yang **masih** ditunda: **logika percabangan** (lompat seksi berdasarkan jawaban).
+
+## Skor gabungan pada form penilaian
+
+> **Status**: ✅ **Merged & live di dev 2026-08-10** (BE [#1141](https://github.com/bip-itteam-internal/bip-erp/pull/1141), FE [erp-frontend #954](https://github.com/bip-itteam-internal/erp-frontend/pull/954)). **Prod belum.**
+
+Form penilaian kini menghasilkan **satu angka 0–100 per karyawan**, di samping rata-rata per pertanyaan yang sudah ada. Menjawab pertanyaan yang tak bisa dijawab delapan kolom sekaligus: siapa yang perlu ditindaklanjuti.
+
+Tiap pertanyaan skala bisa diberi **bobot**, dan layar menampilkan porsinya dalam persen. Bobotnya relatif, jadi menghapus satu pertanyaan tak memaksa menyetel ulang bobot yang lain — sekaligus tetap menerima angka persen apa adanya bila kebijakan HR memang sudah berbunyi persen.
+
+Tiga hal yang perlu diketahui pemilik produk:
+
+- **Hanya pertanyaan berskala yang ikut.** Pilihan ganda seperti "Sangat Baik / Baik / Cukup" belum bisa dihitung karena opsinya menyimpan teks tanpa nilai. Gantinya bukan kompromi: tipe skala punya keterangan ujung, sehingga penilai tetap melihat kata sambil angkanya tersimpan. Layar selalu menyebut skor dihitung dari berapa pertanyaan, jadi form yang terlanjur memakai pilihan ganda ketahuan dari angkanya sendiri.
+- **Satu orang satu suara.** Penilai yang menjawab semua pertanyaan dan yang menjawab sebagian sama beratnya. Yang berbobot adalah pertanyaannya, bukan orangnya.
+- **Belum masuk KPI, dan itu disengaja.** Angkanya berhenti di layar analisa supaya rumusnya masih bisa dikoreksi tanpa merusak riwayat penilaian siapa pun.
 
 ## Menuju hak per jabatan
 

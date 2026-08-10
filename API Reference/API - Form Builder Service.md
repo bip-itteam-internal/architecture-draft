@@ -134,6 +134,8 @@ Transisi sah: belum ditinjau → `accepted`/`rejected`; `accepted` → `implemen
 
 **Keterangan ujung skala** (`scale_min_label`, `scale_max_label`) — mis. `"Sangat tidak puas"` .. `"Sangat puas"`. Keduanya opsional dan satu ujung saja pun sah; maksimal **40 karakter**; hanya berlaku untuk tipe `scale` (menempel di tipe lain ditolak `400`). Murni keterangan tampilan: nilai jawaban tetap angka, dan mengirim teks labelnya sebagai jawaban tetap ditolak.
 
+**Bobot** (`weight`) — angka **relatif**, bukan persentase yang wajib berjumlah 100: bobot 3 berarti tiga kali lebih berat dari 1. Hanya berarti pada tipe `scale`, dan hanya dipakai menghitung `overall` di analisa form penilaian. Kosong berarti **1**, sehingga form lama tak berubah artinya. Nol **sah** (pertanyaan pelengkap yang tak ikut menghitung); negatif ditolak `400`, sebab akan membalik arah penilaian tanpa satu pun tanda di layar. Angka persen tetap bisa diisi apa adanya (40/20/10/30) karena jumlahnya memang 100.
+
 **Pemilik** (`owner_department`): nama departemen `master_department` (mis. `"General Affair"`), BUKAN key `system_roles`. Form lama yang masih menyimpan `owner_module` dipindah otomatis saat service boot (`it`→`Tech Development`, `ga`→`General Affair`).
 
 **Sasaran** (`audience.type`): `all` · `departments` (+`departments[]`) · `employees` (+`employee_ids[]`). `estimated_size` diisi manual sebagai penyebut tingkat pengisian; bila 0, `response_rate` tidak dikirim. Perhatikan `audience.departments` menjawab **siapa yang mengisi**, sedangkan `owner_department` menjawab **siapa yang memiliki** — keduanya tak harus sama.
@@ -162,7 +164,7 @@ Jendela periode **selalu berakhir di ujung bulan atau minggu**, bukan sekian har
 
 **Respons analytics**: `total_responses`, `unique_respondents`, `audience_size`, `sample_size`, `truncated`, `response_rate` (opsional), `daily[{date,count}]`, `fields[{key,label,type,answered,skipped,options[{option,count}],average,min,max,sample_text[]}]`. Saat `truncated=true`, `response_rate` sengaja tidak dikirim karena tak bisa dihitung jujur dari sebagian data.
 
-**Respons analytics form penilaian** (absen pada form biasa): `evaluation{subject_count, evaluators_started, evaluators_completed, pairs_done}`, `subjects[{employee_id,name,department,position,responses,scores[{key,label,answered,average}]}]`, `subjects_truncated`. `scores` hanya untuk pertanyaan `number`/`scale`, dan `average` **absen** (bukan 0) bila belum ada yang menilai. `response_rate` di sini = `evaluators_completed / audience_size` — yang dihitung penilai yang menyelesaikan SELURUH daftarnya, bukan yang sekadar mengirim satu penilaian.
+**Respons analytics form penilaian** (absen pada form biasa): `evaluation{subject_count, evaluators_started, evaluators_completed, pairs_done}`, `subjects[{employee_id,name,department,position,responses,scores[{key,label,answered,average}],overall,overall_fields,total_questions}]`, `subjects_truncated`. `scores` hanya untuk pertanyaan `number`/`scale`, dan `average` **absen** (bukan 0) bila belum ada yang menilai. `response_rate` di sini = `evaluators_completed / audience_size` — yang dihitung penilai yang menyelesaikan SELURUH daftarnya, bukan yang sekadar mengirim satu penilaian.
 
 ## Dokumen Terkait
 

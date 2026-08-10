@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-10",
-  "jumlah_dokumen": 282,
+  "jumlah_dokumen": 281,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -157,20 +157,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "a59077c0635907484e84f44c2643880cb740de566a7dffaab798880a48f4852a",
-      "ukuran_kb": 24.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (tingkat peran + cakupan departemen) versus siapa yang cukup mengisi, dan bagaimana bentuk request/response tiap rute. Menjelaskan juga rute analisa/export beserta arti `?period=` pada form berulang, alur unggah lampiran (upload dulu, `upload_id` jadi nilai jawaban), rute penilaian karyawan (`/me/forms/:id/subjects`), aturan tipe form per departemen (`/form-type-rules`, khusus modul `it`), rute Kaizen, dan endpoint internal yang dipakai service lain seperti gerbang kepatuhan presensi. Berguna untuk mencari kode status spesifik (403/409/413/422) beserta penyebabnya.",
+      "hash": "f205f3603d46b3b24beb6a92f92c6db5fe5690033d3ee648141db25788b7a936",
+      "ukuran_kb": 24.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway /api/form-builder/*, siapa yang boleh mengelola form (cakupan departemen lewat SupervisedDepartments, bukan modul), dan bagaimana karyawan mengisi form lewat rute /me/*. Menjelaskan juga cara membaca analisa per pertanyaan, mengekspor CSV, menyaring satu putaran form berulang dengan ?period=, mengunggah lampiran (upload_id, cap 4 MB), serta aturan tipe form per departemen yang digerbang system_roles it tingkat supervisor/admin. Termasuk rute Kaizen untuk karyawan dan komite, rute internal yang dipanggil service lain, dan bentuk respons capability.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
-        "API form builder",
-        "endpoint",
+        "API endpoint",
         "RBAC departemen",
-        "form-type-rules",
+        "form penilaian",
+        "evaluation",
+        "form berulang",
+        "period",
         "kaizen",
-        "analytics",
-        "export CSV",
-        "lampiran upload"
+        "export CSV"
       ]
     },
     {
@@ -1102,20 +1102,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "b6311f44c3b3bc25ad9ffabf6563432d3e46e1a75b702b583a0897b50bfb8cd0",
-      "ukuran_kb": 184.0,
-      "ringkasan": "Menjawab: apa itu portal web internal ERP/HRIS Bharata (\"One Bharata\"), stack dan repo mana yang dipakai, serta bagaimana login, refresh token, dan SSO handoff ke aplikasi lain bekerja. Menjelaskan juga bagaimana sidebar dan menu digerbang lewat cookie `system_roles` (module + role), bagaimana menu HRIS dikelompokkan pakai menu induk bersarang, dan bagaimana halaman Pengaturan HRGA terpusat menyaring akses per-tab memakai cermin gerbang backend. Berguna untuk pertanyaan seputar dukungan multi-perusahaan di frontend (company switcher, kelola perusahaan/departemen/shift/network per-perusahaan) dan mengapa rute lama diteruskan, bukan dihapus.",
+      "hash": "d47681e830b2ea18fe34cea31b352f0e765c4069ab3ad404b4ee7df163482c43",
+      "ukuran_kb": 186.1,
+      "ringkasan": "Menjawab: apa itu portal web hris-dashboard (One Bharata), stack frontend apa yang dipakai (Next.js 16, React 19, shadcn/Radix/Tailwind, TanStack Query, react-i18next), serta bagaimana login, refresh token, dan SSO Identity Provider bekerja. Menjelaskan pemetaan system_roles ke modul dan role, cara sidebar menggerbang menu, dan kenapa pengelompokan menu memakai induk bersarang alih-alih field group. Juga menjawab bagaimana dukungan multi-perusahaan diterapkan (CompanySwitcher, kelola perusahaan/departemen/shift/network per perusahaan) dan bagaimana Pengaturan HRGA terpusat menyaring akses per tab, bukan per halaman.",
       "kata_kunci": [
         "erp-frontend",
-        "hris-dashboard",
-        "One Bharata",
         "web ERP",
+        "One Bharata",
+        "hris-dashboard",
         "SSO",
         "system_roles",
         "role gating",
         "sidebar menu",
-        "Pengaturan HRGA",
-        "multi-perusahaan"
+        "multi-perusahaan",
+        "pengaturan HRGA"
       ]
     },
     {
@@ -1734,13 +1734,14 @@
         "Microservices - Recruitment Service",
         "Microservices - Learning Service",
         "CORE - RBAC dan Permission Set",
+        "HRIS - Otomasi Skor KPI",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "Microservices - Notification Service",
         "IT - Background Jobs & Schedulers",
         "HRIS - Kaizen (Ide Perbaikan)",
         "RUN - Deploy Microservices bip-erp",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "Microservices - Employee Service",
-        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "Microservices - File Service",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "IT - Form Builder",
@@ -1748,19 +1749,19 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "baca2a1963debb3cbb3aff732a9b677df1671794f1864e749905b85d975cbfd1",
-      "ukuran_kb": 81.1,
-      "ringkasan": "Menjawab: bagaimana Form Builder Service dibangun dan mengapa keputusan desainnya diambil — stack, path repo, port, database sendiri, serta siapa persona penggunanya. Menjelaskan mekanisme inti: kepemilikan form per departemen (bukan modul), 10 tipe pertanyaan dan 4 tipe form, penguncian susunan pertanyaan begitu ada jawaban, sumbu `subject` untuk penilaian karyawan lain beserta potret sasaran saat terbit dan kerahasiaan penilai, form berulang (periode bulanan/mingguan + cron pembuka periode), program ide Kaizen, notifikasi inbox, lampiran berkas, dan multi-tenant `company_id`. Juga menjawab mengapa gerbang presensi dirancang gagal-terbuka dan mengapa notification-service wajib ikut di-deploy.",
+      "hash": "fce3cbfdcb996253ca9fce95ff638080e3d0a9e8be79e85ef77f484832656d2f",
+      "ukuran_kb": 84.8,
+      "ringkasan": "Menjawab: bagaimana form-builder-service dibangun dan dijalankan (Go + Fiber v2 + MongoDB form_builder_db, port 6986 internal), siapa personanya, dan endpoint apa yang sudah ada. Menjelaskan keputusan desain intinya: kepemilikan form menempel di departemen bukan modul, kunci susunan pertanyaan begitu ada jawaban, sumbu subject untuk penilaian karyawan lain, skor gabungan per orang, periode form berulang beserta cron pembuka periode, tipe kaizen, dan lampiran berkas. Juga menjawab kenapa gerbang presensi gagal-terbuka dan hanya menahan jalur mobile, serta kenapa notification-service wajib ikut di-deploy bersama service ini.",
       "kata_kunci": [
         "form builder service",
         "form dinamis",
-        "microservice",
+        "Go Fiber",
+        "form_builder_db",
+        "subject penilaian",
         "form berulang",
-        "recurrence",
         "kaizen",
-        "penilaian karyawan",
-        "evaluation",
         "gerbang presensi",
+        "notifikasi inbox",
         "permission set formbuilder"
       ]
     },
@@ -6181,20 +6182,20 @@
         "DB - Overview and Notes",
         "ROADMAP"
       ],
-      "hash": "9e21abe287fb90a18b77946aa169ca36407efb959c2d37f06d5df4f5e4172a03",
-      "ukuran_kb": 8.3,
-      "ringkasan": "Menjawab: mengapa Bharata membangun Form Builder, masalah apa yang dipecahkannya (tiap form baru sebelumnya butuh siklus development), dan bagaimana scope yang dieksekusi berbeda dari rencana awal (RBAC per departemen, analitik, sasaran form, dampak ke Attendance Service, multi-perusahaan). Menjelaskan keputusan produk yang mengikat: intersep presensi mode `block` versus `warn` dan syarat rilisnya, keputusan sadar menampilkan identitas responden penuh di halaman analisa beserta konsekuensi privasinya, serta rencana memindahkan hak mengelola form ke jabatan lewat katalog permission-set. Memuat juga daftar hal yang sengaja belum diputuskan (form publik, pencarian karyawan untuk sasaran, logika percabangan).",
+      "hash": "1ebc191dc0a64e3ba83e5ae2810a1e6717875ddd3dcf31dabea5ba21d8c2174e",
+      "ukuran_kb": 9.9,
+      "ringkasan": "Menjawab: kenapa Form Builder dibuat, masalah apa yang diselesaikannya dibanding form request yang di-hardcode per kasus, dan seberapa jauh scope yang dieksekusi menyimpang dari rencana asli (RBAC per departemen, analitik jawaban, pengisian mobile, upload file, multi-perusahaan). Menjelaskan keputusan produk yang sudah diambil: identitas responden ditampilkan penuh, skor gabungan 0 sampai 100 pada form penilaian dan batasannya, serta arah hak per jabatan lewat katalog permission-set. Juga menjawab aturan intersep presensi (mode block vs warn, hanya mobile, gagal-terbuka, jendela tanggal wajib) dan urutan rilis yang mengikat.",
       "kata_kunci": [
         "form builder",
         "konsep form dinamis",
-        "IT tooling",
         "intersep presensi",
-        "clock-in block warn",
-        "identitas responden",
-        "privasi jawaban",
-        "permission set",
+        "clock-in",
+        "skor gabungan",
         "hak per jabatan",
-        "scope rencana"
+        "permission set",
+        "privasi responden",
+        "RBAC departemen",
+        "logika percabangan"
       ]
     },
     {
@@ -9033,31 +9034,6 @@
         "TanStack Query",
         "enabled",
         "performa frontend"
-      ]
-    },
-    {
-      "path": "Workspace/Inbox/2026-08-10 Spec Skor Gabungan Penilaian.md",
-      "judul": "2026-08-10 Spec Skor Gabungan Penilaian",
-      "area": "Workspace",
-      "jenis": "workspace",
-      "status_emoji": null,
-      "status_teks": "disetujui, siap direncanakan",
-      "publik": false,
-      "tautan": [],
-      "hash": "8f75b6d1798de2330ed153d33ad2027efeadaf8da2861724a6e9cb06016cd700",
-      "ukuran_kb": 12.7,
-      "ringkasan": "Menjawab: bagaimana satu angka skor gabungan (overall) per karyawan dihitung dari form penilaian di form-builder, yaitu hanya dari pertanyaan bertipe scale yang dinormalisasi ke 0..100, dirata-ratakan berbobot di dalam satu penilai, lalu dirata-ratakan polos antar penilai (satu orang satu suara) dengan penyebut bobot dari pertanyaan yang benar-benar dijawab. Menjelaskan kenapa tipe number, radio/dropdown, dan checkbox dikeluarkan dari skor, kenapa bobot dipakai sebagai angka relatif (bawaan 1) alih-alih persentase wajib 100, dan bagaimana cakupan skor dilaporkan lewat overall_fields dan total_questions supaya tak ada angka yang tampak mewakili seluruh form padahal sebagian. Juga menjawab batasan lingkupnya: angka ini berhenti di layar analisa dan tidak disambungkan ke kpi_score, bobot tidak menempel di seksi, belum dinilai berarti kosong bukan nol, dan form lama tidak perlu migrasi.",
-      "kata_kunci": [
-        "skor gabungan",
-        "overall score",
-        "form penilaian",
-        "form-builder",
-        "bobot pertanyaan",
-        "weight",
-        "scale",
-        "normalisasi 0-100",
-        "analisa penilaian",
-        "SubjectScore"
       ]
     },
     {
