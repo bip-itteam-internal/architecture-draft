@@ -443,6 +443,26 @@ Isinya menyusun dari yang sudah ada, bukan membangun sumber baru:
 | Kinerja seluruh divisi | `/kpi/dashboard` | — |
 | Posisi keuangan | `/profit/products` (omzet, laba kotor, margin) | — |
 
+**Kelima antrean dipisah per TAB, tidak lagi bertumpuk (2026-08-10).** Sebelumnya kelima tabel dirender sekaligus; kolomnya berbeda-beda — pemohon & tanggal untuk cuti, periode & jenis untuk payroll, nomor & estimasi untuk permintaan barang — sehingga membacanya menuntut pemakai mengganti kerangka pikirnya tiap beberapa baris sambil menggulir jauh. Tiga aturannya ada di `features/direktur/lib/tab-antrean.ts`, terpisah dari render supaya bisa diuji tanpa memasang DOM:
+
+1. **Antrean tanpa isi tidak punya tab** — di tampilan mana pun. Riwayat ikut dihitung, kalau tidak tab justru lenyap bagi atasan yang sudah membereskan seluruh antreannya, yaitu orang yang paling berhak melihat keputusannya sendiri.
+2. **Tab aktif DITURUNKAN tiap render, bukan disimpan.** Karena aturan (1), bilah tab berubah isi seiring keputusan diambil: menyetujui run payroll terakhir MELENYAPKAN tab yang sedang dibuka. `normalkanAntrean` memindahkan pemakai ke antrean pertama yang masih ada.
+3. **Lencana tetap menghitung yang MENUNGGU saja.** "Tab ada" berarti ada yang bisa dilihat; "lencana berisi" berarti ada yang harus diputus. Dua pertanyaan berbeda, dua sumber angka berbeda.
+
+Bilah "Menunggu | Riwayat" berdiri **sebaris** dengan bilah jenis antrean dan bergaya sama (pill) — dua gaya di dua baris membuat yang kedua terbaca sebagai tingkat navigasi berbeda, padahal keduanya sama-sama menjawab "tampilkan yang mana". Bilah itu **selalu** dirender; menyembunyikannya saat tak berlaku membuat barisnya melompat tiap ganti tab.
+
+**Riwayat tersedia untuk kelimanya**, tapi asalnya tidak seragam — dan perbedaannya menentukan MAKNANYA:
+
+| Antrean | Sumber riwayat | Artinya |
+|---|---|---|
+| Cuti & Dinas | `?as=reviewed` | **keputusan ANDA** (disaring per pemanggil) |
+| Payroll · Rekrutmen | handler memakai filter kosong, baris terputus memang sudah ikut terkirim | "sudah diputus" oleh siapa pun |
+| Permintaan Barang · Pesanan Pembelian | `?tampilan=riwayat`, ditambahkan 2026-08-10 | "sudah diputus"; gerbangnya TIDAK ikut longgar |
+
+Kolom **Hasil** wajib ada di tiap tabel riwayat. Tanpanya tabel riwayat berkolom sama persis dengan tabel menunggunya — dan baris yang DITOLAK tampak identik dengan yang DISETUJUI. Alasan penolakan ikut ditampilkan; penolakan tanpa sebab memaksa pemohon bertanya lewat jalur lain dan jawabannya tak pernah kembali ke sistem.
+
+Tiap baris berakhir dengan tautan **Tinjau** di kolom Tindakan. Untuk baris riwayat, tautannya membawa `?tampilan=riwayat` — tanpa itu ia mendarat di halaman yang cuma memuat antrean menunggu, sehingga dokumen yang baru diklik justru tak ada di halaman tujuannya.
+
 ⚠️ **Cakupan tiap panel BERBEDA, dan itu disengaja.** Cuti/dinas & Pesanan Pembelian digerbang nama JABATAN setingkat Direktur; Payroll & Rekrutmen digerbang IZIN, jadi antreannya sama dengan yang dilihat penyetuju lain; **Permintaan Barang digerbang CAKUPAN SUPERVISI**, sehingga isinya hanya departemen yang dinaungi pemakai — bagi pemegang jabatan Direktur hari ini, Kesekretariatan saja. Permintaan barang memang keputusan atasan departemen peminta; persetujuan tingkat perusahaan terjadi belakangan di Pesanan Pembelian. Layarnya menyatakan batas itu ("Hanya dari departemen yang Anda naungi") supaya kekosongan tak terbaca sebagai kerusakan.
 
 **Antrean cuti/dinas diverifikasi ujung ke ujung 2026-08-10**, termasuk jalur TULISnya — satu pengajuan benar-benar disetujui lewat dialog di layar ini, dan `spv_status` di `leave_request` berubah jadi `Disetujui` dengan `reviewed_at` serta `employee_id` penyetuju tercatat. Empat pengajuan uji disemai, satu di antaranya sengaja berdepartemen Finance dan memang tak muncul. Yang paling penting terbukti di sini: **status dokumen tetap "Menunggu persetujuan"** setelah disetujui, sebab tahap HRD belum jalan — persis alasan tab Riwayat membaca slot `spv_status`, bukan status dokumen. Membaca status dokumen akan membuat keputusan yang sudah diambil tampak tak tersimpan.

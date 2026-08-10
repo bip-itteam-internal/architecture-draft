@@ -331,7 +331,7 @@ Entitas **milik ERP** (bukan cermin Accurate), koleksi `permintaan_erp`. Arah da
 | GET | `/permintaan-erp/:id` | Detail satu permintaan. Role `akses`. |
 | GET | `/permintaan-erp/usul-nomor` | Usulan nomor berikut `PR.<YYYY>.<MM>.<NNNNN>` (reset per bulan). Role `akses`. |
 | GET | `/permintaan-erp/opsi-barang` | Daftar barang untuk pemilih form: `kode`, `nama`, `satuan`, `harga_beli` (tak dipaginasi). Role `akses`. |
-| GET | `/permintaan-erp/persetujuan` | Antrean **menunggu** yang jadi tanggung jawab atasan pemanggil, disaring server ke `peminta_departemen ∈ BIP-Supervised-Departments`. **Tanpa gerbang izin procurement** (atasan bisa lain modul); auth diperiksa di handler. Cakupan kosong → daftar kosong (bukan 403). |
+| GET | `/permintaan-erp/persetujuan?tampilan=` | Antrean yang jadi tanggung jawab atasan pemanggil, disaring server ke `peminta_departemen ∈ BIP-Supervised-Departments`. **Tanpa gerbang izin procurement** (atasan bisa lain modul); auth diperiksa di handler. Cakupan kosong → daftar kosong (bukan 403). **`tampilan=riwayat`** (2026-08-10) membalik sumbu status ke yang SUDAH diputus (`$ne menunggu`); nilai lain — termasuk kosong & salah ketik — jatuh ke **menunggu**, jadi pemanggil lama tak berubah perilakunya. Penyaring cakupan supervisi TIDAK ikut longgar. |
 | POST | `/permintaan-erp/:id/setujui` | Menyetujui. Wewenang: `peminta_departemen` harus dalam cakupan supervisi pemanggil. `403` bila bukan atasan departemen itu; `409` bila sudah diputuskan. Tanpa gerbang izin procurement. |
 | POST | `/permintaan-erp/:id/tolak` | Menolak. Body `{"alasan": "..."}` **wajib** (`400` bila kosong). Wewenang & aturan status sama dengan setujui. |
 
@@ -348,7 +348,7 @@ Entitas **milik ERP** (koleksi `pesanan_erp`), TERPISAH dari cermin `pesanan_pem
 | GET | `/pesanan-erp/:id` | Detail. Role `akses`. |
 | GET | `/pesanan-erp/usul-nomor` | Usulan `PO.<YYYY>.<MM>.<NNNNN>` (reset per bulan). Role `akses`. |
 | GET | `/pesanan-erp/permintaan-disetujui` | Permintaan yang SUDAH disetujui (untuk "Ambil → Permintaan"). Role `akses`. |
-| GET | `/pesanan-erp/persetujuan` | Antrean PO menunggu, HANYA untuk pemegang jabatan approver (cek `BIP-Position` = `PosisiApproverPO`). Jabatan lain → daftar kosong. Tanpa gerbang izin procurement. |
+| GET | `/pesanan-erp/persetujuan?tampilan=` | Antrean PO, HANYA untuk pemegang jabatan setingkat Direktur (`BolehSetujuiPesanan` → `common.SetaraDirektur`). Jabatan lain → daftar kosong. Tanpa gerbang izin procurement. **`tampilan=riwayat`** (2026-08-10) sama seperti Permintaan Barang; gerbang jabatan tetap diperiksa LEBIH DULU, jadi yang bukan penyetuju menerima daftar kosong di kedua sumbu. Diverifikasi: Finance Supervisor → 0 pada `menunggu` maupun `riwayat`. |
 | POST | `/pesanan-erp/:id/setujui` | Setujui → status `diajukan`→`menunggu_diproses`. `403` bila bukan jabatan approver; `409` bila sudah diputuskan. |
 | POST | `/pesanan-erp/:id/tolak` | Tolak. Body `{"alasan": "..."}` wajib. Wewenang & aturan status sama. |
 

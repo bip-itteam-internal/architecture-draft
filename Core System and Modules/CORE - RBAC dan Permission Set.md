@@ -128,6 +128,17 @@ Dua sakelar terakhir menuntut penegaknya tinggal di shared-library (dipakai empl
 
 ⚠️ Daftar yang terlewat di salah satu tempat **tak bergejala**: orangnya MELIHAT antrean — daftar juga mencocokkan nama departemen — lalu ditolak saat memutus. Antrean berisi, tombolnya balas 403, tanpa pesan apa pun. Inventaris lengkap seluruh alur persetujuan beserta penyetujunya: [[REF - Alur Persetujuan]].
 
+**Paket jabatan Direktur & Corporate Secretary dirampingkan (2026-08-10), dan satu pelajaran ikut dibayar mahal.** Keduanya semula memegang `kpi_semua · finance_admin · recruitment_penyetuju · payroll_penyetuju · procurement_lihat`. Dua dicabut:
+
+- **`procurement_lihat` dibuang.** Ia satu-satunya sebab kategori PROCUREMENT muncul di sidebar Direktur — dan karena **menu procurement tak bertanda `perm` sama sekali**, kategori yang terbuka berarti SELURUH pohonnya ikut terlihat (Pembelian, Master & Referensi, sampai Gudang & Material). Persetujuan PO & Permintaan Barang tak membutuhkannya: rutenya digerbang jabatan / cakupan supervisi di dalam handler, dan halaman keputusannya sengaja di luar `ProcurementGuard`. Diverifikasi setelah pencabutan — kedua endpoint tetap 200.
+- **`finance_admin` → `finance_view`**, lalu **dikoreksi jadi `finance_direktur`** (paket baru: `ar.view` + `ap.view` + `accounting.view` + `profit.view`).
+
+Koreksi itu perlu karena penurunan ke `finance_view` **melenyapkan menu Ruang Direktur sepenuhnya** — item sidebarnya digerbang `perm: "finance.profit.view"`, dan hanya `finance_admin` yang membawanya. Laporan awal menyebut akibatnya "tab Keuangan kosong"; itu keliru, sebab yang diperiksa cuma gerbang tab dan gerbang panel, bukan gerbang MENU. Satu `grep -rn "finance.profit.view"` akan menangkapnya sebelum apa pun diubah.
+
+> ⚠️ **Aturan kerja yang lahir dari situ: sebelum mencabut sebuah izin dari jabatan, grep string izinnya ke SELURUH repo frontend.** Satu izin bisa menggerbangi tiga hal sekaligus — item menu, tab halaman, dan isi panel — dan memeriksa satu di antaranya menghasilkan laporan yang salah dengan percaya diri.
+
+`profit.view` sengaja TIDAK ditambahkan ke `finance_view`: paket itu juga dipegang Junior Accountant, Cost Control, dan Tax Staff, sehingga angka laba akan ikut terbuka ke tiga jabatan itu. Yang turun tetap turun — `ar.export`, `payout.view`, dan `kastoko.view` lepas dari Direktur.
+
 **Payroll: paket menutup niat yang tak pernah terlaksana.** `isApprover` di payroll-service berkomentar "persetujuan final payroll run (Direktur)" tapi isinya `isHRAdmin`, sehingga kepala perusahaan tak bisa menyetujui payroll dan HR admin melakukannya atas namanya. Ditutup dengan memasang paket `payroll_penyetuju` ke jabatan Direktur & Corporate Secretary — **tanpa menyentuh gerbangnya**, sebab `gate()` mendahulukan izin dari klaim di atas tier. Contoh terbersih sejauh ini bahwa paket-di-jabatan bisa memperbaiki hak tanpa mengubah satu baris pun aturan akses.
 
 ## Katalog acuan
