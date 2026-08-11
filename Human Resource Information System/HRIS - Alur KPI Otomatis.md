@@ -42,6 +42,72 @@ Rangkaian di atas terlihat mulus, tetapi tiap langkah punya syarat yang selama i
 | Sistem tahu data itu milik siapa | **86.845 video** tersimpan, tapi baru **10 dari 41 ICC** tercatat memegang toko. Datanya ada, pemiliknya yang belum |
 | Matriknya mungkin diukur | Satu metrik meminta 70% video berjenis VSA, padahal dari **104.269 video hanya ada 73**. Semua orang akan dapat nol, selamanya |
 
+## Metrik yang bahannya skor orang lain
+
+Lima langkah di atas menggambarkan garis lurus dari pekerjaan ke skor. **Satu jenis metrik tidak mengikuti garis itu**: metrik tim, yang bahannya justru skor anggota. Ia menjelaskan pertanyaan yang paling sering muncul dari atasan — *"kenapa skor tim saya rendah padahal anak buah saya bagus?"*
+
+### Dua kelas metrik
+
+```mermaid
+flowchart TB
+    subgraph A["Kelas A — dari data sistem · TIDAK berantai"]
+        A1[("Order · Accurate · tiket · absensi")] --> A2["sumber metrik<br/>misal kinerja_ar, kinerja_tiket"]
+        A2 --> A3["KPI staf"]
+        A2 --> A4["KPI leader"]
+    end
+
+    subgraph B["Kelas B — bahannya skor orang lain · BERANTAI"]
+        B2["sumber skor_tim"] --> B3["Monitoring Team<br/>leader"]
+        B2 --> B4["Performance Monitoring Team<br/>supervisor"]
+    end
+
+    A3 -.->|dinilai lalu disimpan| KS
+    A4 -.->|dinilai lalu disimpan| KS
+    KS[("kpi_score<br/>employee_id + period")] --> B2
+```
+
+Kelas A terisi sendiri dan urutannya bebas. Hanya panah putus-putus itu yang berantai — dan ia mengikat **di akhir periode**, bukan saat konfigurasi dipasang. Metrik tim tetap boleh dikonfigurasi lebih dulu; ia hanya melaporkan cakupan rendah sampai anggotanya dinilai.
+
+Satu koreksi istilah yang sering keliru: yang mengisi skor staf **bukan stafnya sendiri**, melainkan **penilai** yang menyimpannya. Staf tidak menginput KPI-nya.
+
+### Kenapa tidak bisa dicurangi — mekanisme cakupan
+
+`skor_tim` melaporkan dua hal terpisah: **Nilai** (skor anggota yang sudah tersimpan) dan **Populasi** (seluruh anggota dalam cakupan).
+
+```mermaid
+flowchart TB
+    P["Populasi = seluruh anggota<br/>dalam cakupan, misal 5"] --> C{"berapa yang<br/>sudah dinilai?"}
+    N["Nilai = skor yang<br/>sudah tersimpan"] --> C
+    C -->|3 dari 5| L["cakupan 60 persen"]
+    L --> LR["reduksi berlaku<br/>skor atasan TURUN"]
+    C -->|5 dari 5| F["cakupan 100 persen"]
+    F --> FR["skor penuh dari rata-rata"]
+```
+
+Atasan karena itu **tidak dapat memperoleh nilai penuh dari tiga orang yang kebetulan bagus** — sistem tahu dua lagi belum dinilai, dan ketidaklengkapan itu menurunkan skornya. Inilah kegunaan `Populasi` yang dibedakan dari jumlah pengukuran.
+
+### Cakupan tim menuntut atasan tercatat, cakupan departemen tidak
+
+```mermaid
+flowchart TB
+    K["penentuan anggota cakupan"] --> T{"scope?"}
+    T -->|Team| TA["diambil dari supervisor_id<br/>bawahan langsung"]
+    T -->|Department| DA["diambil dari master data<br/>departemen yang disupervisi"]
+
+    TA --> TB{"supervisor_id terisi?"}
+    TB -->|tidak| TC["populasi NOL<br/>metrik GAGAL HITUNG"]
+    TB -->|ya| TD["daftar anggota tim"]
+    DA --> DD["daftar anggota departemen"]
+
+    TC --> X["metrik tim leader terhenti"]
+    TD --> X
+    DD --> Y["metrik tim supervisor jalan"]
+```
+
+⚠️ **Ini penghambat nyata, bukan hipotetis.** Seluruh **19 karyawan Finance** tidak punya `supervisor_id` terisi, sehingga metrik `Monitoring Team` milik AR Leader mustahil dihitung dengan cakupan tim — populasinya nol. Cakupan **departemen** tidak terpengaruh, jadi `Performance Monitoring Team` milik Supervisor FAT tetap dapat berjalan.
+
+Mengisinya adalah **pekerjaan data HR**, sekali jalan, dan ia membuka beberapa metrik sekaligus.
+
 ## Prinsip yang mengikat mesinnya
 
 Kalau salah satu syarat belum terpenuhi, sistem **tidak mengarang angka**. Metrik itu ditandai "belum bisa dihitung" beserta alasannya, dan penilaiannya kembali manual seperti sekarang.
