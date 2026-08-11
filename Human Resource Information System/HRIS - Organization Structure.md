@@ -51,6 +51,12 @@
 
 Sebagian departemen sengaja **tidak punya supervisor sendiri** dan dibawahi supervisor departemen lain. Saat ini: **General Affair dibawahi supervisor Human Resource** (`work_data.is_supervisor` = `true` nol orang di GA). Kedua departemen **tetap terpisah sebagai data** — 15 orang GA (mayoritas Security & Office Boy) tetap ber-`work_data.department` = `General Affair`.
 
+> **Peleburan HR + GA jadi HRGA sudah jadi keputusan organisasi (2026-08-09), tapi yang dilebur baru lapisan tampilan dan wewenang, BUKAN data.** Keputusan itu sejauh ini hanya tercatat sebagai komentar di `services/employee/peran_dari_jabatan.go` ("General Affair — kini bergabung dengan HR menjadi HRGA"), dan konsekuensi konkretnya di sana: puncak GA kini **Leader**, bukan "GA Supervisor", sebab setelah penggabungan tak ada lagi supervisor di sisi GA.
+>
+> Yang sudah menyatu tanpa satu pun nilai `department` diubah: kelompok supervisi (`supervised_by` + `supervision_label`), cakupan supervisor di klaim JWT, tampilan KPI, org chart, layar Tampilan Menu (`MODUL_HRGA`), dan **satu blok sidebar** (branch `feat/sidebar-blok-hrga`, ⚠️ belum merge — `gabungBlokHrga` menyatukan blok `hris` dan `ga` SETELAH penyaringan izin, bukan dengan memindahkan menu GA ke kategori `hris`, sebab pemegang role `ga` saja tak pernah melihat kategori `hris`).
+>
+> Yang belum, dan syaratnya ada di bawah: mengganti nilai `work_data.department` jadi `HRGA`.
+
 Relasinya disimpan sebagai **master data**, bukan di kode: `master_department.supervised_by` berisi **key** departemen induk (GA → `hris`). Pasangannya `master_department.supervision_label` memberi nama pendek untuk kelompok gabungan (HR → `HRGA`).
 
 ### Dua konsep terpisah yang jangan dicampur
@@ -83,6 +89,16 @@ Mencampur keduanya berbahaya dua arah: menyempitkan tampilan bikin staf HR melih
 - **Relasi satu arah dan satu tingkat.** Induk membawa yang dibawahinya, bukan sebaliknya; cucu tidak ikut naik ke kakek.
 - **Perubahan cakupan baru terasa setelah pemakai login ulang**, karena cakupannya ikut di token (berlaku 72 jam). Label kelompok dibaca per-permintaan, jadi perubahannya langsung terlihat.
 - **Tahap review HR bersifat dept-level**: slot `hr_status` diisi pseudo-user tanpa `employee_id`, sehingga **semua** orang berdepartemen `Human Resource` dapat melihat & menindak antrian tahap HR, termasuk pengajuan milik orang GA. Tahap SPV tidak begitu (diisi `employee_id` spesifik). Ini alasan kuat untuk **tidak** menggabungkan kedua departemen di level data: bila GA dipindah ke HR, Security & Office Boy ikut bisa melihat antrian pengajuan seluruh perusahaan.
+
+	> **Keberatan itu bukan tembok permanen, melainkan URUTAN KERJA.** Izin `hris.pengajuan.view` dan `hris.pengajuan.approve` beserta paketnya ("HRIS: Pemantau Pengajuan" / "HRIS: Penyetuju Pengajuan") **sudah merged** dan justru dibuat berlingkup pengajuan supaya himpunan pemakainya lebih sempit daripada pemegang role hris. Begitu keduanya berlaku eksklusif, yang menentukan siapa melihat antrean adalah **paket yang menempel di jabatan**, bukan nama departemen — dan Security yang tak dipasangi paket tak melihat apa pun meski departemennya sudah bernama HRGA.
+	>
+	> Hari ini belum eksklusif: gerbangnya masih **union** (`bolehPengajuan` di `services/attendance/hris_gate.go`), jadi `gerbangLamaBacaPengajuan = isHRDept || isCostControl` tetap meloloskan siapa pun berdepartemen HR. Tiga prasyarat sebelum sakelarnya boleh disentuh:
+	>
+	> 1. **Pasang paketnya lebih dulu** — pengukuran ke data dev 2026-08-09 menemukan NOL posisi memegang paket `hris_*` mana pun, jadi fase dua hari ini menolak semua orang alih-alih menyaring.
+	> 2. **Sakelarnya belum bisa dipakai untuk pengajuan saja** — union diikat ke `HRIS_TIER_FALLBACK` yang berlaku untuk SELURUH modul hris, jadi mematikannya ikut mencabut Kontrak, Resign, Kuota Cuti, dan Laporan Kehadiran. Pilihannya: siapkan seluruh modul hris sekaligus, atau pecah sakelarnya.
+	> 3. **Tahap HRD tak selalu duduk di `hr_status`** — koreksi milik staf HR dan tukar jadwal milik atasan menaruh peninjau HR di slot `spv_status`.
+	>
+	> Rinciannya di [[CORE - RBAC dan Permission Set]] §Irisan ketiga. Urutan yang benar: pasang paket → siapkan sakelar → nyalakan fase dua → verifikasi antrean menyusut ke yang berhak → **baru** lebur departemennya.
 - **Dikelola dari `/hris/master-data`**, blok "Supervisi Antar-Departemen" pada form Departemen. `supervised_by` diisi **key** departemen induk (mis. `hris`), bukan nama tampilannya; `supervision_label` diisi di departemen **induk**, bukan anaknya.
 	- Form **selalu mengirim** kedua field (boleh kosong), dan itu satu-satunya cara melepas relasi dari UI. `PUT /master/departments/:key` memakai `ReplaceOne` tapi **mempertahankan** kedua field bila tak disebut di body, sehingga pemanggil lain yang hanya mengirim sebagian field tak diam-diam memutus relasi.
 	- Form memuat peringatan bahwa mengosongkan relasi tanpa mengangkat supervisor lebih dulu membuat anggotanya kehilangan penyetuju **tanpa pesan error**.
