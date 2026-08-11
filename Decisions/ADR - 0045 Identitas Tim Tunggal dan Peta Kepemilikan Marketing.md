@@ -26,6 +26,21 @@ Kenyataannya: **0 dokumen, tanpa UI, tanpa satu pun pembaca**. Ia terbangun teta
 2. **Kopling nama sudah terbukti membusuk di sini.** 2026-08-07 ditemukan **12 mapping aktif** tersimpan sebagai `team: "Tech Development"` — department akun IT yang meng-assign, bukan department karyawannya. Akibatnya SPV Kyura dan Beauty Hacks tidak menemukan datanya sama sekali, karena daftar mereka disaring `?team=`. Sudah diperbaiki, tetapi membuktikan kelas kegagalannya nyata.
 3. **Mencabut Teams begitu saja merusak dua hal.** `team_shops` adalah **satu-satunya sumber Shopee** untuk kolom penanggung jawab toko (3 dari 5 barisnya Shopee), dan `marketing_teams` memasok **saringan divisi** yang juga dipakai halaman Affiliate. `icc_account_mappings` punya `shopee_shop_id`, tetapi **kosong di seluruh baris aktif**.
 4. **Ada tiga ruang-nama string yang mudah tertukar**: nama department (`"Kyura"`), kode modul `system_roles` (`"kyura"` — bukan nama departemen, pemetaannya di `deptKeyToNames`), dan nama tim bebas (`"GB-KY"`).
+5. **Sumber insentif sudah tidak dirawat** (dikonfirmasi pemilik fitur 2026-08-11). `insentive_db.employee_performance_mappings` berisi **3 dokumen**, seluruhnya dibuat **10 Juli 2026** dengan `updated_at` sama persis dengan `created_at` — tak pernah disentuh sejak dibuat. Saat fitur ICC dibangun, yang dipinjam dari modul insentif sebenarnya hanya **nama peran posisi** (`adv_leader`, `adv_marketplace`, `icc`), bukan datanya. Arah yang benar justru sebaliknya: insentif yang mengambil dari sini.
+
+### Inventaris nyata yang harus dimigrasi (2026-08-11)
+
+Seluruh `team_shops` ternyata milik **satu tim** — `aris`, nama SPV Beauty Hacks. Tim `BH` dan `GB-KY` **kosong** (nol toko, nol anggota), jadi keduanya tinggal dihapus tanpa migrasi.
+
+| Toko | Bukti pemegang | Divisi |
+|---|---|---|
+| TIKTOK `Beautyhack's` | Satrio Jatmiko — `icc_account_mappings`, team Beauty Hacks | **Beauty Hacks** (pasti) |
+| TIKTOK `Beautyhacks.store` | hanya di sumber insentif yang **basi** | belum diputuskan |
+| SHOPEE `Beautyhack's Original Shop` | hanya di sumber insentif yang **basi** | belum diputuskan |
+| SHOPEE `Beautyhacks Official Shop` | tak ada di sumber mana pun | belum diputuskan |
+| SHOPEE `Bumble beauty` | tak ada di sumber mana pun; namanya pun bukan brand yang dikenali | belum diputuskan |
+
+`Beautyhacks.store` sempat terbaca sebagai konflik — namanya Beauty Hacks, pemegangnya Ridho Feldiansyah yang justru **leader Kyura**. Setelah sumber insentif dinyatakan basi, konflik itu bubar: yang tersisa bukan pertentangan bukti, melainkan **ketiadaan bukti**.
 
 ## Decision
 
@@ -39,6 +54,9 @@ Kenyataannya: **0 dokumen, tanpa UI, tanpa satu pun pembaca**. Ia terbangun teta
 6. **Keanggotaan tim TIDAK disimpan di mana pun** — diturunkan dari `work_data.department`. `team_members` (1 baris) dibuang.
 7. **Sub-tim di dalam divisi DITOLAK untuk sekarang.** Bila kelak dibutuhkan, bentuknya wajib entitas tim ber-ID stabil **dengan induk `department_key`** — bukan nama bebas seperti `marketing_teams`. Syarat memperkenalkannya: ada lebih dari satu tim nyata dalam satu divisi yang perlu dibedakan atribusinya, dan pemiliknya bersedia merawat datanya.
 8. **Migrasi wajib expand → migrate → contract**, dengan gerbang cakupan (lihat §Migrasi). Big-bang swap dilarang.
+9. **Arah ketergantungan dibalik: Integration jadi sumber, Insentif jadi konsumen.** `insentive_db.employee_performance_mappings` **berhenti** dipakai sebagai sumber penanggung jawab toko; modul insentif yang mengambil dari `icc_account_mappings` + `department_shops`, bukan sebaliknya. Yang tetap dipinjam dari modul insentif hanyalah **nama peran** (`adv_leader`, `adv_marketplace`, `icc`) yang sudah menempel di `system_roles` — itu kosakata, bukan data kepemilikan.
+
+> **Pencabutan sumber insentif punya urutannya sendiri.** Ia menyumbang 2 toko ke cakupan 51,2%, dan salah satunya (`Beautyhacks.store`) **belum punya pemegang di `icc_account_mappings`**. Melepasnya sebelum ICC menutupi kedua toko itu akan menurunkan cakupan — persis yang dilarang gerbang di §Migrasi. Urutannya: isi di ICC dulu, verifikasi, baru lepas.
 
 ### Aktor dan wewenang
 
@@ -131,7 +149,11 @@ Persilangan keduanya yang bernilai: akun kita yang ordernya masih open collab be
 Urutannya mengikat. Mencabut lebih dulu tidak menghasilkan error — hanya kolom yang diam-diam kosong.
 
 1. **Expand** — tambahkan `department_shops` sebagai sumber **tambahan** di `penanggung_jawab.go` dan `divisi.go`, mengikuti pola `indeksICCGabungan` yang sudah berlaku: *sumber menambah, tidak menimpa*; satu sumber gagal, sumber lain tetap dipakai. Selama fase ini `team_shops` tetap hidup, sehingga mengisi koleksi baru tidak dapat merusak apa pun.
-2. **Migrate** — pindahkan 5 baris `team_shops` ke `department_shops`, memakai `shop_id` + `channel` (**bukan** nama toko: nama di produksi ada yang berspasi di ujung dan ada yang beda hanya huruf besar-kecil). Petakan tiga nama tim ke department, dan **putuskan** nasib `aris` — ia data sampah, bukan tim.
+2. **Migrate** — pindahkan 5 baris `team_shops` ke `department_shops`, memakai `shop_id` + `channel` (**bukan** nama toko: nama di produksi ada yang berspasi di ujung dan ada yang beda hanya huruf besar-kecil). Tim `BH` dan `GB-KY` kosong → hapus tanpa migrasi. Tim `aris` (nama SPV Beauty Hacks) memegang kelimanya; divisinya ditentukan **per toko** lewat aturan berjenjang di bawah, bukan dari nama timnya.
+   1. Ada pemegang di `icc_account_mappings` → pakai department pemegang. (1 dari 5 toko)
+   2. Tidak ada → **keputusan manusia**, dan pertanyaannya bukan "siapa yang mengerjakan" melainkan **omzet toko ini dihitung sebagai capaian divisi mana**. Mengerjakan iklan sebuah toko tidak sama dengan memiliki omzetnya.
+   3. Sumber insentif **tidak dipakai** sebagai bukti (keputusan #9).
+   4. Toko yang benar-benar tak bisa diputuskan **dibiarkan kosong**, muncul sebagai yatim di `/kesehatan`. Pemetaan kosong yang terlihat lebih baik daripada pemetaan salah yang terlihat benar.
 3. **Gerbang** — cakupan penanggung jawab toko **tidak boleh turun** dari **51,2% (15 toko)**. Verifikasi lewat `/department-shops/kesehatan` (toko yatim & pemetaan sisa). Gagal memenuhi ini = migrasi belum selesai, bukan alasan melanjutkan.
 4. **Contract** — baru cabut `marketing_teams`, `team_shops`, `team_members`, dan menu Teams.
 5. **Kunci stabil** — tulis `department_key` berdampingan dengan nama, lalu pindahkan pencocokan ke key. Boleh menyusul setelah langkah 4, tetapi jangan dilupakan: selama kuncinya nama, kelas kegagalan "Tech Development" tetap terbuka.
