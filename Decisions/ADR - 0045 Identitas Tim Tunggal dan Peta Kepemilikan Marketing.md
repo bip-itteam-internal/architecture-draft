@@ -1,4 +1,4 @@
-**Status**: 🟡 Diusulkan (2026-08-11) — belum dieksekusi. Seluruh angka di bawah terverifikasi langsung dari produksi pada tanggal yang sama. Menyusul [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] dan [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]; **tidak** menggantikan keduanya.
+**Status**: 🟡 Diusulkan (2026-08-11) — belum dieksekusi, tetapi **seluruh keputusan datanya sudah lengkap**: pemetaan kelima toko `team_shops` diputuskan pemilik fitur, dan sumber penyemaian kedua (`icc_account_mappings`) sudah terhitung. Seluruh angka di bawah terverifikasi langsung dari produksi pada tanggal yang sama. Menyusul [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] dan [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]; **tidak** menggantikan keduanya.
 
 ## Context
 
@@ -32,15 +32,29 @@ Kenyataannya: **0 dokumen, tanpa UI, tanpa satu pun pembaca**. Ia terbangun teta
 
 Seluruh `team_shops` ternyata milik **satu tim** — `aris`, nama SPV Beauty Hacks. Tim `BH` dan `GB-KY` **kosong** (nol toko, nol anggota), jadi keduanya tinggal dihapus tanpa migrasi.
 
-| Toko | Bukti pemegang | Divisi |
-|---|---|---|
-| TIKTOK `Beautyhack's` | Satrio Jatmiko — `icc_account_mappings`, team Beauty Hacks | **Beauty Hacks** (pasti) |
-| TIKTOK `Beautyhacks.store` | hanya di sumber insentif yang **basi** | belum diputuskan |
-| SHOPEE `Beautyhack's Original Shop` | hanya di sumber insentif yang **basi** | belum diputuskan |
-| SHOPEE `Beautyhacks Official Shop` | tak ada di sumber mana pun | belum diputuskan |
-| SHOPEE `Bumble beauty` | tak ada di sumber mana pun; namanya pun bukan brand yang dikenali | belum diputuskan |
+| Toko | `shop_id` | Bukti | Divisi |
+|---|---|---|---|
+| TIKTOK `Beautyhack's` | `7494710464840632749` | Satrio Jatmiko — `icc_account_mappings` | **Beauty Hacks** (diturunkan) |
+| TIKTOK `Beautyhacks.store` | `7495537364189547259` | tak ada bukti sah | **Beauty Hacks** (keputusan pemilik) |
+| SHOPEE `Beautyhack's Original Shop` | `940147456` | tak ada bukti sah | **Beauty Hacks** (keputusan pemilik) |
+| SHOPEE `Beautyhacks Official Shop` | `908963392` | tak ada bukti sah | **Beauty Hacks** (keputusan pemilik) |
+| SHOPEE `Bumble beauty` | `823286268` | tak ada bukti sah; namanya bukan brand yang dikenali | **Beauty Hacks** (keputusan pemilik) |
 
-`Beautyhacks.store` sempat terbaca sebagai konflik — namanya Beauty Hacks, pemegangnya Ridho Feldiansyah yang justru **leader Kyura**. Setelah sumber insentif dinyatakan basi, konflik itu bubar: yang tersisa bukan pertentangan bukti, melainkan **ketiadaan bukti**.
+Keempat baris terakhir **diputuskan pemilik fitur pada 2026-08-11**, bukan diturunkan dari data. Dicatat begitu supaya pembaca berikutnya tahu mana yang berbukti dan mana yang berdasar wewenang — `Bumble beauty` khususnya, karena namanya tidak menunjukkan brand mana pun dan akan terus memancing pertanyaan.
+
+`Beautyhacks.store` sempat terbaca sebagai konflik — namanya Beauty Hacks, pemegangnya Ridho Feldiansyah yang justru **leader Kyura**. Setelah sumber insentif dinyatakan basi, konflik itu bubar: yang tersisa bukan pertentangan bukti, melainkan ketiadaan bukti — lalu diisi oleh keputusan pemilik.
+
+### Yang ikut termigrasi dari `icc_account_mappings`
+
+Memindahkan `team_shops` saja **tidak cukup**: kelima tokonya semua Beauty Hacks, sehingga Kyura akan berakhir tanpa satu pun toko terpetakan padahal 10 tokonya sudah punya pemegang. Karena itu penyemaian `department_shops` mengambil **dua sumber sekaligus**, memakai aturan berjenjang yang sama:
+
+| Sumber | Toko | Hasil |
+|---|---|---|
+| `icc_account_mappings` (department pemegang) | 12 | Kyura 10, Beauty Hacks 2 |
+| `team_shops` (keputusan di atas) | 5 | Beauty Hacks 5 |
+| **Gabungan unik** | **16** | 1 tumpang tindih (`7494710464840632749`), **kedua sumber sepakat Beauty Hacks** |
+
+16 pemetaan jauh di atas 5, sehingga penyemaian ini **menaikkan** cakupan alih-alih mengancamnya — sekaligus menutupi dua toko yang selama ini hanya ditopang sumber insentif, yang jadi syarat pencabutannya (keputusan #9).
 
 ## Decision
 
@@ -154,6 +168,7 @@ Urutannya mengikat. Mencabut lebih dulu tidak menghasilkan error — hanya kolom
    2. Tidak ada → **keputusan manusia**, dan pertanyaannya bukan "siapa yang mengerjakan" melainkan **omzet toko ini dihitung sebagai capaian divisi mana**. Mengerjakan iklan sebuah toko tidak sama dengan memiliki omzetnya.
    3. Sumber insentif **tidak dipakai** sebagai bukti (keputusan #9).
    4. Toko yang benar-benar tak bisa diputuskan **dibiarkan kosong**, muncul sebagai yatim di `/kesehatan`. Pemetaan kosong yang terlihat lebih baik daripada pemetaan salah yang terlihat benar.
+   5. Semai **juga** dari `icc_account_mappings` (department pemegang), bukan dari `team_shops` saja — lihat §Yang ikut termigrasi. Hasilnya 16 pemetaan, bukan 5.
 3. **Gerbang** — cakupan penanggung jawab toko **tidak boleh turun** dari **51,2% (15 toko)**. Verifikasi lewat `/department-shops/kesehatan` (toko yatim & pemetaan sisa). Gagal memenuhi ini = migrasi belum selesai, bukan alasan melanjutkan.
 4. **Contract** — baru cabut `marketing_teams`, `team_shops`, `team_members`, dan menu Teams.
 5. **Kunci stabil** — tulis `department_key` berdampingan dengan nama, lalu pindahkan pencocokan ke key. Boleh menyusul setelah langkah 4, tetapi jangan dilupakan: selama kuncinya nama, kelas kegagalan "Tech Development" tetap terbuka.
