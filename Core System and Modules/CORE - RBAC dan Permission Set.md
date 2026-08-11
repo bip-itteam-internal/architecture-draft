@@ -203,7 +203,7 @@ Yang dilonggarkan **menu, bukan data**. Angka labanya dijaga dua lapis yang tak 
 
 | Modul | view | work | approve | manage | Pengecualian | Reach |
 |---|---|---|---|---|---|---|
-| `hris` | ✅ | ✅ | | ✅ | `hris.pengajuan.view`, `hris.pengajuan.approve` | own/div/all |
+| `hris` | ✅ | ✅ | | ✅ | `hris.pengajuan.view`, `hris.pengajuan.approve`, `hris.divisi.view` | own/div/all |
 | `payroll` | ✅ | ✅ | ✅ | ✅ | | all |
 | `recruitment` | ✅ | ✅ | ✅ | ✅ | | div/all |
 | `kpi` | ✅ | ✅ | | ✅ | | own/div/all |
@@ -239,7 +239,7 @@ Yang dilonggarkan **menu, bukan data**. Angka labanya dijaga dua lapis yang tak 
 
 | Modul | Paket |
 |---|---|
-| hris | **Yang benar-benar di-seed** (`DefaultHrisSets`, lima): HRIS: Lihat (view) · HRIS: Pelaksana (view+work) · HRIS: Admin (view+work+manage) · HRIS: Pemantau Pengajuan (`pengajuan.view`) · HRIS: Penyetuju Pengajuan (`pengajuan.view`+`approve`). Semuanya reach `all` |
+| hris | **Yang benar-benar di-seed** (`DefaultHrisSets`, enam): HRIS: Lihat (view) · HRIS: Pelaksana (view+work) · HRIS: Admin (view+work+manage) · HRIS: Pemantau Pengajuan (`pengajuan.view`) · HRIS: Penyetuju Pengajuan (`pengajuan.view`+`approve`) · **HRIS: Pemantau Divisi** (`divisi.view` saja). Semuanya reach `all` |
 | payroll | Lihat · Pelaksana (view+work) · Penyetuju (view+approve) · Admin (semua) |
 | wms | Admin Gudang RM · Admin Gudang FG · Admin Produksi · PPIC/Pengawas · Pencatat Selisih (`wms.selisih.create` saja) · Pemantau |
 
@@ -378,6 +378,46 @@ Peringatan yang ditinggalkan penulis irisan pertama kini dikunci uji. `POST /hol
 Sisi FE: menu **HRIS > Personalia > Pengajuan** kini ber-`perm: "hris.pengajuan.view"` (sebelumnya tanpa `perm` sama sekali, jadi tampil untuk setiap pemegang kategori `hris` walau endpoint-nya membalas 403), dan tabel `FALLBACK` di `menu-permission.ts` menerima konteks identitas (departemen + jabatan) karena gerbang backend izin ini memang bukan role. Pintasan Portal Saya memakai `can()` langsung, bukan `bolehMenu()`, supaya orang HR tak melihat pintasan kedua ke halaman yang sudah ada di menu HRIS-nya. Menu **Tim Terlambat** sengaja TIDAK ikut pindah meski dulu menumpang `case` yang sama: halamannya buku tamu, digerbang `RequireGuestbookRBAC`, modul lain.
 
 ⚠️ Catatan sisi FE yang mudah terlewat: `bolehMenu` mengembalikan `true` untuk izin yang tak punya entri `FALLBACK`, mengikuti aturan "modul belum berkatalog, jangan sembunyikan apa pun". Begitu sebuah modul BERKATALOG, aturan itu tak lagi berlaku untuknya — entri fallback wajib ada bahkan untuk izin yang belum dipakai menu mana pun, kalau tidak tombol yang kelak ditandai `hris.manage` akan tampil bagi orang non-HR.
+
+### Irisan KEEMPAT `hris` — `hris.divisi.view`, izin TAMPILAN (2026-08-11)
+
+⚠️ Branch `feat/hris-izin-divisi` + `feat/hris-izin-divisi-fe`, **belum merge & belum deploy**.
+
+Menggantikan gerbang "siapa melihat SELURUH tab Ringkasan Divisi HRGA" (`/hris`), yang hari
+ini `isAnySupervisor(systemRoles) || isItMember(systemRoles)`. Yang diperbaiki bukan
+kelonggarannya melainkan **bentuknya**: kewenangan itu bukan fakta yang bisa ditugaskan
+melainkan efek samping memegang role supervisor di modul tak berhubungan, sehingga
+supervisor Warehouse, Quality, dan Procurement ikut melihat meja kerja Personalia. Ini
+titik pengecualian posisi KELIMA di [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]],
+sebagian dicabut.
+
+- **Izin TAMPILAN, tanpa gerbang BE, dan itu BUKAN pelanggaran "katalog tanpa gerbang BE
+  adalah dekorasi".** Yang digerbang komposisi TAB, bukan data — endpoint di balik tiap tab
+  sudah digerbang per modul masing-masing, jadi menyembunyikan tab tak menahan satu byte pun
+  yang tak sudah tertahan. Aturan itu ditulis untuk izin atas DATA. Penyimpangan sadar,
+  ditulis di kodenya.
+- **Berlingkup `divisi`, bukan memakai ulang `hris.view`** — alasan yang sama persis dengan
+  irisan ketiga: `hris.view` dipegang SETIAP tier hris, jadi memakainya ulang justru
+  MELEBARKAN (tiap staf HR melihat seluruh tab), padahal yang dicari kebalikannya.
+- **Tier sengaja tak menyintesisnya**, dan paket "HRIS: Admin" tak ikut tumbuh. Keduanya
+  berbagi satu sumber (`hrisIzinAdministrasi()`), jadi satu baris salah menyalakan dua jalur
+  sekaligus. Dikunci `TestIzinDivisiTidakBocorKeTierDanPaketAdmin`, yang memeriksa
+  AKIBATNYA (tier dan tiap paket) bukan sumbernya.
+- ⚠️ **`can(perms, izin, fallback)` MENGABAIKAN argumen fallback-nya** begitu token memuat
+  izin modul yang sama (`utils/access.ts`: `modulPunyaIzin(...) ? false : fallback`). Setiap
+  supervisor HR sudah memegang izin tier `hris`, jadi bentuk `can(izin, aturanLama)` — yang
+  paling wajar ditulis — menolak mereka semua di fase satu, tanpa galat dan tanpa pesan.
+  **Bentuk aman: `can(..., false)` lalu aturan lama di-OR terpisah.** Fallback tinggal di
+  tempat informasinya terbaca, sama seperti irisan ketiga; di sini informasinya
+  `system_roles` LINTAS MODUL, yang tak terlihat `HrisTierDefault` maupun `can()`.
+  Uji jebakan ini sudah dibuktikan menangkap: implementasi bentuk lama membuatnya merah.
+- **Sakelar fase konstanta FE (`FALLBACK_DIVISI_AKTIF`), bukan env.** `NEXT_PUBLIC_*`
+  di-inline saat build, jadi env tetap menuntut rebuild — sama mahal, tanpa keuntungan, dan
+  satu tempat lagi yang bisa menyimpang.
+- Entri `FALLBACK` di `menu-permission.ts` diisi **`tolak`**, bukan cermin aturan lama:
+  gerbang sebenarnya `bolehLihatSeluruhDivisi`, dan dua resolver untuk satu izin pasti
+  menyimpang. Entrinya tetap wajib ada karena izin tanpa entri DILOLOSKAN (lihat catatan
+  di atas) — tanpa baris itu, supervisor Warehouse justru lolos.
 
 - ✅ **`master_permission_set` dan `system_authentication.permission_sets` sudah terdaftar** di [[DB - Data Dictionary]] (2026-08-10), berikut `master_department.position_items[]` yang memuat `permission_sets` dan `menu_hidden`, `master_system_role`, dan `master_job_level` — seluruh koleksi yang menyimpan keputusan akses kini punya entri field-level.
 - **Tiga dari empat gate posisi hardcoded belum dicabut** (Security, Personalia, ICC) — menunggu katalog modul yang bersangkutan. **Cost Control sudah dicabut SEBAGIAN** (2026-08-09): untuk halaman Pengajuan ia kini paket "HRIS: Pemantau Pengajuan", tapi `checkPosition(PosisiCostControl)` di `RequireGuestbookRBAC` masih hidup karena modulnya lain (buku tamu). Konstanta `common.PosisiCostControl` karena itu belum boleh dihapus.
