@@ -28,7 +28,7 @@ Daftar portal ditampilkan di sisi kiri layar: judul module (HRIS, IT, dll) hanya
 - Lookup employee master data + informasi role sebagai dasar portal
 
 **Belum diimplementasikan**
-- [ ] Status **Surat Peringatan (SP)** di landing belum ada
+- [ ] Status **Surat Peringatan (SP)** di landing belum ada. Modul SP-nya sendiri sudah dibangun ([[HRIS - Disciplinary (Surat Peringatan)]], ⚠️ belum merge), termasuk masa berlaku 6 bulan yang disebut di atas; yang belum ada adalah endpoint ringkasan "jumlah SP aktif" dan kartunya di landing
 - [ ] **Flag maintenance** per fitur (menandai sistem sementara tidak tersedia, alih-alih menyembunyikannya)
 
 ## Kebutuhan

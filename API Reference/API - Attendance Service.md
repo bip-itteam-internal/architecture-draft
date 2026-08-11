@@ -80,6 +80,9 @@ Ringkasan/detail **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar) dari sat
 | POST/GET | `/fingerprint/export` | Upsert/list ekspor fingerprint | open (serial) |
 | GET/POST/DELETE | `/networks` · `/internal/wifi/add` · `/delete` | WiFi kantor (validasi on-site) | open / ITStaff |
 | GET | `/internal/summary` | Ringkasan 24 jam (utk HRIS orchestrator) | HRIS |
+| GET | `/internal/late-recap` | ⚠️ **belum merge & belum deploy** (branch `feat/employee-surat-peringatan`). Jumlah telat **per karyawan** satu periode, untuk usulan SP1 di [[HRIS - Disciplinary (Surat Peringatan)]]. `?period=YYYY-MM` (wajib, 400 bila tak terurai) · `?min=` (bawaan 1). Periodenya **26 bulan lalu sampai 25 bulan ini**, dihitung `rentangPeriodeTelat` yang sama dengan `/history?late=true` supaya tak lahir dua angka "telat bulan ini". Balasan `{period, from, to, min, data[]{employee_id, late_count}}`, `data` selalu slice non-nil. Menghormati `?company=` bagi admin pusat | HRIS |
+
+**`/internal/` bukan berarti privat** pada tabel di atas: gateway tetap meneruskannya dari internet, jadi tiap rute memeriksa identitas pemanggilnya sendiri. `/internal/late-recap` memaparkan siapa saja yang sering terlambat di seluruh perusahaan, karena itu digerbang `RequireHRISStaff`.
 
 ## Dokumen Terkait
-- [[Microservices - Attendance Service]] · [[HRIS - Leave Request]] · [[HRIS - Tukar Jadwal Kerja]] · [[HRIS - Attendance Correction]] · [[HRIS - Perjalanan Dinas]] · [[HRIS - Payroll]] · [[API - Index]]
+- [[Microservices - Attendance Service]] · [[HRIS - Leave Request]] · [[HRIS - Tukar Jadwal Kerja]] · [[HRIS - Attendance Correction]] · [[HRIS - Perjalanan Dinas]] · [[HRIS - Payroll]] · [[HRIS - Disciplinary (Surat Peringatan)]] · [[API - Index]]

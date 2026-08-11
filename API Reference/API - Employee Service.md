@@ -116,6 +116,25 @@ Isolasi tenant **dua arah**: catatan distempel `company_id` = perusahaan **asal*
 | POST | `/mutasi/:id/cancel` | Batalkan. `scheduled` → hanya ubah status. `applied` → posisi **dikembalikan dari snapshot asal**, termasuk `company_id` dan `supervisor_id`; filternya menyebut posisi tujuan sehingga hanya karyawan yang masih duduk di sana yang dikembalikan (409 bila datanya sudah berubah). `reason` wajib hanya bila pembatalan benar-benar mengembalikan jabatan |
 | POST/GET | `/mutasi/:id/file` | Unggah / ambil SK. Aturan berkas **dipakai bersama** lampiran resign: PDF, gambar, Word; cap 4 MB; dinilai dari ekstensi terakhir. GET dibaca dua arah supaya perusahaan tujuan bisa membuka SK orang yang masuk |
 
+## Surat Peringatan (SP1/SP2/SP3) — ⚠️ selesai di branch `feat/employee-surat-peringatan`, belum di-push/PR/merge/deploy
+Baca digerbang `gateHris(PermHrisView, RequireHRISStaff)`, tulis `gateHris(PermHrisWork, …)`, isolasi tenant `EffectiveCompanyID`. Aturan bisnis & keputusannya: [[HRIS - Disciplinary (Surat Peringatan)]].
+
+**Gerbang baca TIGA arah** pada rute per-karyawan: HR seluruh perusahaan, karyawan atas dirinya sendiri, atasan atas departemen bawahannya. Cakupan supervisi diambil `SupervisedDepartmentsStrict` (**tanpa** fallback ke departemen sendiri); permintaan non-HR yang bukan dirinya sendiri dan tanpa klaim supervisi ditolak **sebelum** menyentuh database.
+
+**Status tidak disimpan**, diturunkan saat baca: `revoked_at` terisi → `revoked`; `now >= expires_at` → `expired`; selainnya `active`. Filter `?status=` menerjemahkannya balik jadi kueri Mongo.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/warnings` | Daftar berpaginasi. Filter `level`(`SP1`/`SP2`/`SP3`)·`category`·`status`(`active`/`expired`/`revoked`)·`employee_id`. Balasan `{data, pagination}` **sama bentuk** dengan `/resign` dan `/contract`; tiap baris ditempeli `full_name`·`department`·`position` saat baca dari `personal_data`/`work_data`. `status` tak dikenal dibalas 400 |
+| GET | `/warnings/me` | SP milik pemanggil sendiri. **Tanpa gerbang peran**: tiap karyawan berhak tahu sanksi atas dirinya, dan itu prasyarat agar ia bisa mengajukan keberatan |
+| GET | `/warnings/employee/:employee_id` | Riwayat SP satu karyawan, gerbang tiga arah di atas. 403 bila di luar ketiganya |
+| GET | `/warnings/suggestions` | Usulan **SP1** dari akumulasi telat. `?period=YYYY-MM` (bawaan: periode payroll berjalan, yaitu 26 bulan lalu sampai 25 bulan ini). Memanggil [[API - Attendance Service]] `GET /internal/late-recap`; hitungannya **tidak disalin**. Balasan `{period, threshold, data[]{employee_id, full_name, department, position, late_count, period, suggested_from}}`. Karyawan non-aktif dan yang SP-nya untuk periode itu sudah terbit & masih berlaku disaring keluar. **Attendance tak terjangkau dibalas 503 berisi `error`, TANPA kunci `data`** — daftar kosong akan terbaca "tak ada yang terlambat" dan HR tak punya cara tahu fiturnya rusak |
+| POST | `/warnings` | Terbitkan. Wajib `employee_id`·`level`·`category`·`reason`·`issued_date`; opsional `suggested_from` (jejak asal usulan). `level` & `category` divalidasi ke enum tetap **persis huruf besar-kecilnya**. `issued_date` dinormalkan ke tengah malam WIB; `expires_at` dihitung **6 bulan** dan **dijepit ke hari terakhir bulan tujuan** (tanpa itu 31 Agustus + 6 bulan jadi 3 Maret, bukan 28 Februari). Karyawan non-aktif ditolak 400 dengan pesan yang menyebut sebabnya |
+| PATCH | `/warnings/:id/revoke` | Cabut, `reason` wajib. **FINAL**: tak ada jalan kembali ke aktif. Transisinya **atomik** — `revoked_at: nil` ikut di filter `UpdateOne`, jadi dua pencabutan bersamaan tak menghasilkan dua notifikasi untuk satu surat; yang kalah dibalas 400 |
+| POST/GET | `/warnings/:id/file` | Unggah / ambil salinan surat bertanda tangan. Aturan berkas **dipakai bersama** lampiran resign: PDF, gambar, Word; cap **4 MB** yang dipaku [[Microservices - File Service]]; dinilai dari ekstensi terakhir. GET mengulang gerbang tiga arah **di dalam handler**, karena tautan berkas bisa dibuka langsung tanpa melewati halaman mana pun |
+
+**Tidak ada `PATCH /warnings/:id`**, dan itu disengaja: surat yang sudah diterbitkan dan diberitahukan ke karyawan tak boleh bisa ditulis ulang tanpa bekas. Yang tersedia hanya pencabutan, yang meninggalkan jejak beserta alasannya.
+
 ## Listing · View · Me
 | Method | Path | Fungsi |
 |---|---|---|
