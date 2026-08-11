@@ -979,20 +979,22 @@
         "Microservices - Employee Service",
         "Microservices - Notification Service"
       ],
-      "hash": "48766a5d4bb49e3e42243b4c50bea723a806452fc951192e62ac91112ec439ca",
-      "ukuran_kb": 27.9,
-      "ringkasan": "Menjawab: apa saja fitur aplikasi mobile HRIS MyBharata, bagaimana arsitektur Flutter (Clean Architecture feature-first + BLoC) disusun, dan bagaimana autentikasi bekerja (JWT, biometric, PIN, kebijakan 1 akun 1 device). Menjelaskan juga bahwa aplikasi memanggil backend lewat API Master Gateway dengan prefix /api/<module>, bagaimana konten dan menu di-scope per perusahaan (multi-tenant), serta versi build di dev versus versi yang benar-benar terpasang di HP pemakai. Berguna saat menelusuri fitur mana yang sudah rilis dibanding yang masih di branch/PR, dan library apa yang dipakai untuk QR, geofencing, PDF, dan grafik.",
+      "hash": "739db07dc7ef6ddd391d10d9b1b6d8c9747617e844c559ee79d3a3e40b7f2ec8",
+      "ukuran_kb": 31.4,
+      "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile MyBharata dan di mana letak menunya, bagaimana karyawan absen, mengajukan cuti/izin/lembur, melihat slip gaji, mengisi survei dan ide Kaizen, serta menandai kehadiran pelatihan dan menilai trainer. Menjawab juga bagaimana aplikasi di-scope per perusahaan (multi-tenant lewat JWT), bagaimana notifikasi diarahkan ke halaman lewat kategori bukan field route, versi build dan versi rilis mana yang sedang beredar, dan fitur mana yang masih placeholder Coming Soon. Memuat struktur menu beranda dan sebab sebuah menu bisa merged, ter-build, tapi tak pernah terjangkau pemakai.",
       "kata_kunci": [
         "mybharata",
         "aplikasi mobile",
-        "flutter",
+        "Flutter",
         "HRIS mobile",
-        "bloc",
-        "geofencing",
-        "biometric",
-        "multi-perusahaan",
-        "portal karyawan",
-        "mobile app"
+        "absensi attendance",
+        "slip gaji payslip",
+        "Kaizen",
+        "pelatihan training learning",
+        "menu beranda Quick Access",
+        "multi-tenant perusahaan",
+        "notifikasi push",
+        "versionCode rilis"
       ]
     },
     {

@@ -6,7 +6,7 @@
 - **Multi-perusahaan** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]): presensi (absen/jadwal/izin) ter-scope **otomatis via JWT** (tak ada perubahan). **Profil Perusahaan** dari `/me` (BIP profil penuh; perusahaan lain nama saja) & **onboarding** (welcome + setup-selesai) dari respons login `new_user`, membuang hardcode "PT Bharata". **Konten dinamis per tenant (F2-C, PR #90)**: helper `CompanyScope` / `companyScopeOf(context)` dari `UserProfileBloc` (key kosong = BIP demi kompatibilitas token lama); blok "Tentang Perusahaan" (Visi/Misi/Company Info/SOP) & "Bharata Community" hanya untuk BIP, sedangkan kartu cuaca kantor dan nama pada strap QR lanyard kini ikut nama perusahaan user. **Menu Pengajuan disembunyikan untuk non-BIP (PR #91)** selama pilot, di dua entry point (`home_menu_grid` + `more_menu`), karena perusahaan lain fokus presensi dulu. ✅ **Gerbang itu DIBUKA di PR [#113](https://github.com/bip-itteam-internal/my-bharata/pull/113)** (**merged ke `dev`**; `companyScopeOf(context).isBip` dicabut di kedua entry point): `attendance-service` kini menyaring per `company_id` di seluruh jalurnya, jadi menahannya lebih lama berarti seluruh karyawan CV Elit dan Sadewa tak bisa mengajukan cuti lewat aplikasi sama sekali padahal servernya sudah siap. ⚠️ Dua gerbang KONTEN (visi-misi + Bharata Community di beranda, profil perusahaan lengkap) **sengaja TIDAK ikut dibuka**: di baliknya `CompanyInfoModel.dummy()` dan `ClubEntity.sample()`, yaitu data BIP yang dipaku di kode. Mencabut kondisinya tidak membuka akses, melainkan menampilkan visi-misi dan alamat PT Bharata Internasional kepada karyawan CV Elit seolah itu perusahaannya sendiri. Yang dibutuhkan di sana konten per-tenant, bukan penghapusan `if`. **Status rilis**: PR #89/#90/#91 sudah **merged ke `dev`** (versionCode 120), belum naik ke `main`. **Masih TBD (butuh data per-perusahaan di BE):** kontak HR, nama gedung + guestbook, handbook/SOP PDF. Kontak IT sengaja tetap pusat (helpdesk grup, dipakai juga pra-login sebelum perusahaan diketahui).
 
 - Pengguna: karyawan, supervisor, HRD, IT admin, dan tamu eksternal (guest book)
-- Versi build saat ini: **1.14.8+142** (`origin/dev`; `pubspec.yaml`) — naik dari 135 lewat PR #107 (slip gaji terbit + unduh PDF), #108 (menu Kaizen), #109 (progres KPI bulan berjalan), #110 (kategori notifikasi `employee-moved`), #111 (section Survei ke puncak beranda), #112 (menu Pelatihan), dan #113 (membuka Pengajuan untuk non-BIP).
+- Versi build saat ini: **1.14.8+142** (`origin/dev`; `pubspec.yaml`) — naik dari 135 lewat PR #107 (slip gaji terbit + unduh PDF), #108 (menu Kaizen), #109 (progres KPI bulan berjalan), #110 (kategori notifikasi `employee-moved`), #111 (section Survei ke puncak beranda), #112 (menu Pelatihan), dan #113 (membuka Pengajuan untuk non-BIP). PR [#114](https://github.com/bip-itteam-internal/my-bharata/pull/114) (versionCode **143**) **masih OPEN**: memunculkan menu Kaizen & Pelatihan yang ternyata tak pernah terjangkau — lihat [[#Struktur menu beranda]].
 - Versi rilis: **1.14.5+135** (`origin/main`, tag `v1.14.5+135`, GitHub Release 2026-08-03) — itulah yang terpasang di HP pemakai. Seluruh PR di atas **belum ikut rilis**; catatan lama di sini menyebut rilis terakhir masih `1.14.2+132` dan `main` belum pernah ditarik dari `dev`, dua-duanya sudah tidak berlaku.
 - Target platform: Android (minSdk 23 / Android 6.0+), iOS 13+
 - Survei perangkat mobile karyawan [terdaftar di sini](https://docs.google.com/spreadsheets/d/1w2blhMgFx1BI9zu6ni5gmQJab_NfMhdocm0cj5pyO_s/edit?usp=sharing)
@@ -115,11 +115,33 @@
 >
 > **`scale_min` bertag `omitempty` di backend**, jadi skala `0..N` datang **tanpa** field itu. Nilai bawaannya harus 0, bukan 1 — menebak 1 membuat pilihan terendah tak pernah bisa disentuh.
 
+### Struktur menu beranda
+
+> Status: ⚠️ Implemented (ada catatan) — diperbaiki di PR [#114](https://github.com/bip-itteam-internal/my-bharata/pull/114) (**masih OPEN**).
+
+**Hanya ada SATU daftar menu yang benar-benar dirender: `home_quick_access.dart`.** Grid beranda menampilkan favorit tersimpan pemakai, dan tombol **"Semua Menu"** membuka `showQuickAccessMoreBottomSheet` yang merender daftar yang sama tanpa penyaring. Menu baru **wajib** masuk ke situ.
+
+Grid hijau di atasnya (`home_menu_grid.dart`) bukan daftar menu umum: isinya empat pintasan tetap (Jadwal, Pengajuan, Slip Gaji, QR Code).
+
+> [!warning] Sheet "Lainnya" mati diam-diam selama hampir enam bulan
+> `more_menu_page.dart` (`MoreMenuBottomSheet`) berisi 19 menu dan **tak pernah bisa dibuka sejak commit `e125b6e0`, 2026-02-21**. Pemanggilnya digerbang item ber-route `RouteNames.moreMenu`, dan item itu hilang saat UI beranda dirombak, sementara cabang `if`-nya tertinggal. Berkasnya jadi terlihat persis seperti tempat yang benar untuk menambah menu, lalu memakan **dua fitur berturut-turut**: Kaizen (PR #108, 2026-08-06) dan Pelatihan (PR #112, 2026-08-11). Keduanya merged, ter-build, dan mustahil dibuka pemakai.
+>
+> Tak satu pun test merah, karena **tak ada test yang pernah menanyakan apakah sebuah menu bisa dicapai**. Penjaganya kini `quick_access_items_test.dart`: menu ada di daftar yang benar, **dan** tiap rute menu benar-benar terdaftar di router.
+>
+> Berkasnya dihapus di PR #114 setelah diaudit: dari 19 item, 7 placeholder `comingSoon`, 8 sudah punya pintu lain, 1 (`inbox`) rutenya memang tak pernah terdaftar, 1 (`overtime`) rutenya sah tapi tanpa pintu lain. Tak ada menu berfungsi yang hilang.
+
+**Cacat sejenis yang belum ditutup** (dicatat, belum dikerjakan):
+
+- **Lembur** (`RouteNames.overtime`) punya `GoRoute` dan halaman sah, tapi **nol pintu masuk** untuk pemakai biasa sejak Februari 2026. Hanya ada di menu developer.
+- **`/inbox`** dideklarasikan di `names.dart` **tanpa `GoRoute` maupun halaman**. Halaman notifikasi yang asli adalah `/notifications`.
+
 ### Kaizen (menu tersendiri)
 
-> Status: **merged ke `dev`** lewat PR my-bharata [#108](https://github.com/bip-itteam-internal/my-bharata/pull/108) (versionCode **137**); belum ikut rilis, `main` masih di `v1.14.5+135`. Konsep: [[HRIS - Kaizen (Ide Perbaikan)]].
+> Status: **merged ke `dev`** lewat PR my-bharata [#108](https://github.com/bip-itteam-internal/my-bharata/pull/108) (versionCode **137**). ⚠️ **Menunya tak pernah benar-benar bisa dibuka** sampai PR [#114](https://github.com/bip-itteam-internal/my-bharata/pull/114) — lihat [[#Struktur menu beranda]]. Konsep: [[HRIS - Kaizen (Ide Perbaikan)]].
 
-Menu **Kaizen** di Lainnya → Pengembangan Diri, sebelah KPI. **Bukan** kartu di section Survei, dan form Kaizen justru **dikeluarkan** dari section itu.
+Menu **Kaizen** di **Quick Access** (`home_quick_access.dart`), sebelah KPI. **Bukan** kartu di section Survei, dan form Kaizen justru **dikeluarkan** dari section itu.
+
+> Catatan koreksi: PR #108 menaruhnya di "Lainnya → Pengembangan Diri", dan catatan lama di dok ini menyebut lokasi itu. Sheet "Lainnya" ternyata sudah mati sejak Februari 2026, jadi selama dua bulan Kaizen hanya terjangkau lewat deep link notifikasi. Dipindahkan ke Quick Access di PR #114.
 
 Sebabnya program Kaizen bukan "satu form lagi" bagi pengisinya: berulang tiap periode, berkuota, punya riwayat keputusan komite. Satu kartu survei tak bisa menjelaskan semuanya sekaligus, dan menampilkannya di dua tempat membuat karyawan mengira ada dua hal berbeda yang harus dikerjakan.
 
@@ -159,12 +181,14 @@ Sebabnya program Kaizen bukan "satu form lagi" bagi pengisinya: berulang tiap pe
 
 ## Fitur "Coming Soon" (Belum Tersedia)
 
-Tercantum di menu tetapi masih placeholder (route `/coming-soon` atau stub):
+Semula tercantum di menu tetapi masih placeholder (route `/coming-soon` atau stub):
 - Digital ID, My Documents, Policy/Handbook, Insurance, Loan, Meeting Room, Vehicle, Inbox, Chat HRD
 
-🔜 **Learning** tak lagi placeholder di PR [#112](https://github.com/bip-itteam-internal/my-bharata/pull/112) (belum merge) — lihat di bawah.
+⚠️ **Tujuh di antaranya (Digital ID sampai Vehicle) sudah tak tercantum di menu mana pun** sejak `more_menu_page.dart` dihapus di PR #114 — dan sebenarnya sudah tak terjangkau sejak Februari 2026, lihat [[#Struktur menu beranda]]. Key l10n-nya sengaja **dibiarkan** di kedua berkas ARB sebagai satu-satunya catatan tersisa bahwa menu ini pernah direncanakan. Menghidupkannya kembali berarti menambahkannya ke `home_quick_access.dart`.
 
-## Pelatihan Saya — 🔜 PR [#112](https://github.com/bip-itteam-internal/my-bharata/pull/112) (belum merge)
+✅ **Learning** tak lagi placeholder sejak PR [#112](https://github.com/bip-itteam-internal/my-bharata/pull/112) **merged ke `dev`** — lihat di bawah.
+
+## Pelatihan Saya — ✅ PR [#112](https://github.com/bip-itteam-internal/my-bharata/pull/112) merged ke `dev`
 
 Mengisi menu **Learning** yang selama ini `ComingSoon`. Daftar pelatihan yang diikuti (berjalan / riwayat), **tandai hadir mandiri**, dan **penilaian trainer** empat aspek.
 
@@ -175,6 +199,7 @@ Ini menutup lubang lama: `/me/trainings` di [[Microservices - Learning Service]]
 - **Pesan galat server diteruskan apa adanya** — sebagian penolakan memberi tahu, bukan sekadar gagal.
 - ⚠️ **Pengajuan pelatihan TIDAK termasuk**: `POST /training/requests` semula menuntut `department_key`, sedangkan aplikasi tak punya endpoint master departemen dan profilnya hanya menyimpan nama. Prasyaratnya ada di bip-erp PR #1153; sesudah itu baru bisa dibangun.
 - ⚠️ **Publish sebelum `learning-service` di dev naik = menu terlihat tapi kosong**, dan tombol Nilai Trainer tak pernah muncul (gagal-tertutup di atas).
+- ⚠️ **Rute `/pelatihan-saya` tak pernah didaftarkan di PR #112.** Halamannya ada di `misc_pages.dart`, `GoRoute`-nya tidak, jadi menekan menunya akan mendarat di layar galat go_router, bukan di halamannya. **Halaman terdaftar di `AppPages.getPage` bukan berarti rutenya ada** — keduanya berkas terpisah dan tak ada yang memaksa keduanya sinkron. Diperbaiki di PR #114 beserta test regresinya.
 
 ## Roadmap (Belum Diimplementasikan)
 
