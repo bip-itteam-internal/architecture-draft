@@ -1,4 +1,4 @@
-**Status**: ⚠️ **Implemented (sebagian digantikan)** — keputusan **#1 (tanggal accepted-seragam)** **digantikan** [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] (2026-07-18). Keputusan **#2**: struktur **split** (2 konstanta) tetap, TAPI **basis cutover retur diubah tanggal-retur → hari-kirim** (2026-07-19, ADR-0024).
+**Status**: ⚠️ **Implemented (sebagian digantikan)** — keputusan **#1 (tanggal accepted-seragam)** **digantikan** [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] (2026-07-18). Keputusan **#2**: struktur **split** (2 konstanta) tetap, TAPI **basis cutover retur diubah tanggal-retur → hari-kirim** (2026-07-19, ADR-0024). **2026-08-12:** jaring terakhir `shipped` (hari-kirim) yang disebut ANOMALI di bawah kini **DIBUANG total** — ganti `order.returned_at` lalu tanggal deteksi (`detected`); lihat [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] amandemen 2026-08-12.
 
 # ADR - 0023 Retur: Tanggal Accepted-Seragam + Cutover Terpisah Retur/Faktur
 
