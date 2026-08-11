@@ -376,6 +376,18 @@ Metrik >60 hari tinggal `lebih60 ÷ total_terbuka × 100`.
 
 Kelas kekeliruan yang sama dengan metrik temuan pajak: sumber datanya ada, tetapi bukan sumber untuk hal yang diukur. Wajib diperiksa ke pemilik metrik sebelum dijanjikan otomatis.
 
+### Nol perubahan frontend — dan itu fakta terpenting bagi yang mengerjakannya
+
+Jalur AR **tidak menuntut satu baris frontend pun**. Seluruh UI otomasi KPI sudah terbangun di `erp-frontend`: halaman `/hris/kpi/otomasi`, `auto-overview-view`, `konfigurasi-otomatis-field`, `use-sumber-katalog`, `use-pratinjau-otomatis`, `target-massal-modal`, dan `score-form` yang menampilkan `auto_value` — seluruhnya beserta test.
+
+Dropdown pilihan sumber **mengisi dirinya sendiri** dari `GET /kpi/sumber-katalog`. Jadi begitu `kinerja_finance` didaftarkan lewat `DaftarkanSumberBermetrik`, sumber itu muncul di layar konfigurasi beserta daftar metriknya, tanpa menyentuh frontend. Skornya tampil di halaman yang sudah ada (`/hris/kpi` dan `/finance/kpi` yang terkunci ke departemen Finance).
+
+Pekerjaan AR karena itu **seluruhnya backend**: satu handler `/internal/kpi/metrics` di finance-service, satu berkas `kpi_sumber_finance.go` di employee-service, dan satu field `Lebih14` di `PiutangPosisiRow`.
+
+> ⚠️ **Yang mengonfigurasi metriknya adalah HR, bukan Finance.** `kpi.view` tinggal di katalog modul `kpi` dan dikunci uji sebagai hak tier `hris:*`, sedangkan entri menu Otomasi KPI berada di kategori HRIS. SPV FAT kemungkinan besar tidak melihat menu itu sama sekali. Ini bukan cacat yang perlu diperbaiki untuk AR, tetapi **pemilik langkah konfigurasi wajib disepakati** — tanpa itu, hasil kerja berhenti di "terdaftar tetapi tak pernah dinyalakan", nasib yang sama dengan master anggaran.
+
+> Menampilkan skor KPI di dashboard posisi AR adalah **keputusan tersendiri**, dan presedennya justru sebaliknya: papan skor KPI per posisi sudah pernah **dihapus** dari halaman posisi pada 2026-08-01 karena KPI punya modulnya sendiri, dan menyalin papannya ke tiap tab hanya mengulang bobot dan target tanpa satu pun angka aktual ([[APP - Web ERP]]).
+
 ### Penghalang di luar data
 
 Keduanya sudah tercatat di audit KPI dan **bukan pekerjaan dev**: template duplikat `AR STAFF PIUTANG` (empat template berbeda sama-sama berposisi `AR Staff`; menyalakan otomasi sebelum dibereskan membuat hasilnya menempel di rubrik yang salah), dan `supervisor_id` kosong untuk seluruh 19 karyawan Finance.
@@ -468,6 +480,8 @@ Rekomendasi: mulai dari **(a)**. Metrik yang terisi bulanan lebih berguna daripa
 5. **Forecast kas** → terakhir, setelah bentuknya disepakati
 
 ## Rancangan Frontend
+
+> ⚠️ **Bab ini hanya berlaku untuk OPEX, Cost Control, dan Pajak.** Rumpun **AR tidak menuntut frontend sama sekali** — seluruh UI otomasi KPI sudah terbangun dan dropdown sumbernya mengisi diri dari katalog backend. Jangan membaca tiga halaman di bawah seolah AR termasuk di dalamnya; alasannya di bab **Rumpun AR**.
 
 ### Jalur entri ditentukan volume × frekuensi, bukan selera
 
