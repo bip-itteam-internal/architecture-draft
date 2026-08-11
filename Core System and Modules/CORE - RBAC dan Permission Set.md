@@ -124,6 +124,31 @@ Dua sakelar terakhir menuntut penegaknya tinggal di shared-library (dipakai empl
 
 **Biaya transisinya nyata:** paket menempel di token, jadi selama satu siklus token (72 jam) siapa pun yang belum login ulang kehilangan sementara menu modul yang fase duanya menyala.
 
+**Audit RBAC Procurement (2026-08-11) — dua lubang, satu membuat alur mustahil selesai.**
+
+- 🔴 **Departemen Procurement tak punya atasan sama sekali.** Ke-14 akun ber-`is_supervisor: true` ditanyai lewat jalur penerbitan token: tak satu pun cakupannya memuat "Procurement", dan `master_department.supervised_by`-nya `null`. Akibatnya tiap **Permintaan Barang** yang diajukan orang Procurement menggantung selamanya — tak muncul di antrean siapa pun, tanpa galat, tanpa pemilik. Dibuktikan dengan permintaan uji: tak terlihat oleh atasan Kesekretariatan maupun Finance, dan langsung terlihat begitu Leader ditandai atasan. Diperbaiki dengan `is_supervisor: true` pada Leader.
+- **Kedua jabatan staf tak punya hak apa pun** — tak berpaket, akunnya tak berperan, dan procurement tak ada di tabel penurunan peran. Tiga sumber hak, ketiganya kosong. Diberi paket `procurement_lihat`, DAN peran diturunkan dari jabatan. Keduanya perlu: paket menentukan IZIN (klaim mengalahkan tier, jadi staf tetap view-only — tier `staff` yang membawa `bayar.save` tidak berlaku), sementara peran menentukan MENU (empat menu WMS baca-saja digerbang `systemRoles.procurement`, bukan izin). Tanpa sisi peran, memberi paket justru memunculkan empat menu yang halamannya menolak.
+
+Dua temuan yang **tidak** dikerjakan dan menunggu keputusan: (1) ketiga paket procurement membundel `bayar.save`, sehingga pemisahan per-risiko di katalog — yang alasannya ditulis sendiri di kodenya: *membuat tagihan hanya mengakui utang, membayar memindahkan uang* — tak terpakai di tingkat paket; (2) 17 menu procurement tak satu pun bertanda izin, jadi kategori yang terbuka menampilkan seluruh pohonnya.
+
+🔴 **Direktur = akses penuh seluruh sistem (2026-08-11). Corporate Secretary TIDAK.** Keputusan pemilik produk, dengan **hak tulis diterima eksplisit**. Ini titik di mana kesetaraan Direktur–Corporate Secretary **berhenti**: keduanya tetap setara dalam MEMUTUS (lihat paragraf berikutnya), tapi tidak dalam mengakses.
+
+Dikerjakan di tiga lapis, sebab satu lapis saja menghasilkan menu yang terbuka lalu halaman yang menolak:
+
+| Lapis | Isi | Berkas |
+|---|---|---|
+| Menu | jabatan Direktur ikut jalur super-akses yang selama ini milik IT supervisor | `erp-frontend/src/utils/akses-penuh.ts`, dipakai di 3 titik `sidebar.tsx` |
+| Izin | paket tingkat-lihat untuk seluruh modul berkatalog, dipasang di POSISI | data `master_department.position_items` |
+| Peran | 15 modul diturunkan dari jabatan | `services/employee/peran_dari_jabatan.go` |
+
+Lapis ketiga perlu karena **delapan modul digerbang `system_roles` dan tak punya jalur izin sama sekali** — manufacture, warehouse, insentive, integration, quality, rnd, ga, it. Paket tak bisa membukanya; hanya peran yang bisa. Nilainya diambil dari kosakata yang benar-benar dikenali tiap gerbang, bukan diseragamkan: `warehouse` memakai **`spv`** (bukan `supervisor`), `insentive` hanya mengenal `supervisor`.
+
+Terverifikasi lewat header identik stempel gateway: `manufacture /master-bahan` **403 → 200**, `insentive /audit-logs` 200, `integration /holidays` 200; jalur izin (`procurement`, `payroll`) tak berubah. **`warehouse` belum dibuktikan** — perannya terpasang, tapi belum pernah dilihat 200.
+
+> ⚠️ **`it: supervisor` adalah yang paling berat, dan itu bukan efek samping.** Peran itu membuka IT Orchestrator, yaitu pengelolaan peran & akses SELURUH karyawan — jadi jabatan Direktur kini bisa mengubah RBAC-nya sendiri dan siapa pun. Diterima sadar saat memilih "hak tulis diterima". Siapa pun yang kelak mempersempit ini harus tahu bahwa itu keputusan organisasi, bukan pembersihan kode.
+
+Penjagaan agar Corporate Secretary tak ikut melebar ada di DUA tempat, sengaja terpisah dari daftar `SetaraDirektur`: `jabatanAksesSemuaMenu` (frontend) dan tabel penurunan peran (backend), keduanya dikunci uji. Menyatukannya dengan `JABATAN_SETARA_DIREKTUR` akan memberi Corporate Secretary seluruh sistem pada perubahan berikutnya, dan tak ada yang menyadarinya sampai seseorang membuka sidebar.
+
 **Wewenang setingkat Direktur: satu-satunya gerbang berbasis NAMA JABATAN (2026-08-10).** Di luar seluruh mekanisme di atas — peran, izin, paket — ada satu kelas wewenang yang diperiksa dari nama jabatan pemanggil: persetujuan Pesanan Pembelian (`services/procurement`) dan slot cuti/dinas yang dialihkan ke "Direktur" saat pemohonnya supervisor sendiri (`services/attendance`). Sampai tanggal itu ketiganya — dua service plus cerminan frontend — menuliskan daftar jabatannya masing-masing; kini semuanya menunjuk `common.SetaraDirektur` (Direktur & **Corporate Secretary**, berwenang sama).
 
 ⚠️ Daftar yang terlewat di salah satu tempat **tak bergejala**: orangnya MELIHAT antrean — daftar juga mencocokkan nama departemen — lalu ditolak saat memutus. Antrean berisi, tombolnya balas 403, tanpa pesan apa pun. Inventaris lengkap seluruh alur persetujuan beserta penyetujunya: [[REF - Alur Persetujuan]].
@@ -134,6 +159,12 @@ Dua sakelar terakhir menuntut penegaknya tinggal di shared-library (dipakai empl
 - **`finance_admin` → `finance_view`**, lalu **dikoreksi jadi `finance_direktur`** (paket baru: `ar.view` + `ap.view` + `accounting.view` + `profit.view`).
 
 Koreksi itu perlu karena penurunan ke `finance_view` **melenyapkan menu Ruang Direktur sepenuhnya** — item sidebarnya digerbang `perm: "finance.profit.view"`, dan hanya `finance_admin` yang membawanya. Laporan awal menyebut akibatnya "tab Keuangan kosong"; itu keliru, sebab yang diperiksa cuma gerbang tab dan gerbang panel, bukan gerbang MENU. Satu `grep -rn "finance.profit.view"` akan menangkapnya sebelum apa pun diubah.
+
+**Menu Ruang Direktur juga terbuka untuk supervisor & admin IT (2026-08-10).** `finance.profit.view` menggerbangi **satu** menu saja, jadi fallback perannya sebenarnya menjawab *"boleh membuka layar itu"*, bukan *"boleh melihat angka laba"* — dan selama ia `financeAdminSaja`, tim yang merawat ERP tak bisa membuka layar yang mereka rawat. Kini `financeAdminSaja || itSupervisorPlus` di `utils/menu-permission.ts`. **Staf IT sengaja di luar**: yang diminta supervisor, sementara `isItMember` (dipakai fallback finance lain) memasukkan staf juga.
+
+Yang dilonggarkan **menu, bukan data**. Angka labanya dijaga dua lapis yang tak tersentuh: panel Ringkasan Keuangan memeriksa `can(permissions, "finance.profit.view", false)` — klaim saja, tanpa fallback peran — dan `useCanViewProfit` memakai whitelist `employee_id`. Konsisten dengan [[ADR - 0031 Prefix internal Bukan Batas Keamanan]]: menu bukan gerbang.
+
+⚠️ **Jalur klaim mendahului fallback peran** (`bolehMenu`: `klaimMemuatModul` dulu, baru `FALLBACK`). Akibatnya supervisor IT yang kebetulan memegang paket finance **tanpa** izin laba tetap tak melihat menunya. Bukan regresi — aturan lama — tapi kini ada tesnya, sebab perilaku ini paling mungkin ditemukan lewat kebingungan.
 
 > ⚠️ **Aturan kerja yang lahir dari situ: sebelum mencabut sebuah izin dari jabatan, grep string izinnya ke SELURUH repo frontend.** Satu izin bisa menggerbangi tiga hal sekaligus — item menu, tab halaman, dan isi panel — dan memeriksa satu di antaranya menghasilkan laporan yang salah dengan percaya diri.
 
