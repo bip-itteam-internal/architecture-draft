@@ -1126,8 +1126,19 @@
       ],
       "hash": "62cdc45aa09af2957e2cc3a4bc661a6de8c6f7c949c13183b5b5d6f6f2e45660",
       "ukuran_kb": 204.0,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: apa itu portal web internal One Bharata (erp-frontend), stack yang dipakai, bagaimana login dan alur SSO Identity Provider bekerja, serta bagaimana menu sidebar digerbang oleh cookie system_roles per modul dan role. Menjawab juga bagaimana dukungan multi-perusahaan diwujudkan di UI (CompanySwitcher, kelola perusahaan, departemen, shift, network per perusahaan) dan bagaimana setelan HRGA dikumpulkan ke satu induk Pengaturan dengan penyaringan per tab, bukan per halaman. Cocok dicari saat mempertanyakan struktur menu, gating akses halaman, atau rute lama yang diteruskan ke rute pengaturan baru.",
+      "kata_kunci": [
+        "erp-frontend",
+        "Web ERP",
+        "One Bharata",
+        "hris-dashboard",
+        "SSO Identity Provider",
+        "system_roles",
+        "role gating",
+        "sidebar menu",
+        "multi-perusahaan",
+        "Pengaturan HRGA"
+      ]
     },
     {
       "path": "Application/APP - Website Bharata Internasional.md",
@@ -1177,8 +1188,19 @@
       ],
       "hash": "7560994f40ca1f776d73b51efb00a404f9c6f5e96bedbab37028932a89f32622",
       "ukuran_kb": 3.0,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: informasi apa saja yang seharusnya tampil di titik masuk (landing page) aplikasi bagi karyawan, yaitu data pribadi read-only, kalender jadwal kerja dan shift, status kehadiran, serta status Surat Peringatan aktif. Menjawab juga mana bagian konsep itu yang sudah nyata di web ERP (login employee_id dengan handoff SSO, halaman login dwibahasa id/en, dashboard kehadiran, portal sidebar per role) dan mana yang belum ada (kartu jumlah SP aktif dan flag maintenance per fitur). Berguna sebagai rujukan asal-usul konsep portal dan daftar kebutuhan datanya.",
+      "kata_kunci": [
+        "landing page",
+        "titik masuk",
+        "entrance point",
+        "portal sidebar",
+        "login",
+        "dashboard karyawan",
+        "SSO",
+        "Surat Peringatan",
+        "SP",
+        "flag maintenance"
+      ]
     },
     {
       "path": "CLAUDE.md",
@@ -1566,8 +1588,19 @@
       ],
       "hash": "0ad4fb685ca0c8d4bd8c508a6423b150ecee4ee615246da10476d6fa448a70d2",
       "ukuran_kb": 21.9,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana absensi karyawan dikerjakan end-to-end, meliputi clock-in/out per metode (mobile dengan validasi MAC WiFi kantor atau GPS, fingerprint dengan allowlist serial, website), ambang telat, resolusi jadwal kerja statis maupun rotasi shift, serta endpoint riwayat, report bulanan, dan hari libur. Menjawab juga bagaimana payout_pct pada payroll supplement dihitung, bagaimana perlakuan dibayar atau dipotong diatur per status dan per subtipe cuti/izin, dan izin apa yang menggerbang rute pengajuan terpadu beserta tahap review HRD. Termasuk guestbook tamu, export fingerprint, feed internal ke HRIS, dan gerbang form wajib sebelum clock-in.",
+      "kata_kunci": [
+        "attendance service",
+        "absensi",
+        "presensi",
+        "clock-in",
+        "clock-out",
+        "leave request",
+        "cuti",
+        "payroll supplement",
+        "hari libur",
+        "guestbook"
+      ]
     },
     {
       "path": "Core System and Modules/Microservices - Calendar Service.md",
@@ -1666,8 +1699,19 @@
       ],
       "hash": "39f6a0ef61d7058cb8d9b384a79e2585ef27b4efde9f2f31bbf0a94b8a8cdc64",
       "ukuran_kb": 70.5,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: di mana sumber kebenaran autentikasi dan master data karyawan berada, endpoint login apa saja yang tersedia (username atau employee_id, PIN, biometric), bagaimana refresh token dan registrasi onboarding berjalan, serta operasi admin akun oleh IT seperti reset akun, forget-device, dan set system_roles. Menjawab juga di mana master department dan system role di-CRUD, digerbang siapa, dan bagaimana seed default-nya bekerja. Menjelaskan pula alasan workspace Legal, R&D Regulatory, Quality, dan Procurement dihost di service ini alih-alih membuat service baru, serta status multi-perusahaan, akun pihak luar, dan jalur resign/non-aktif karyawan.",
+      "kata_kunci": [
+        "employee service",
+        "master data karyawan",
+        "autentikasi",
+        "login",
+        "employee_id",
+        "PIN",
+        "biometric",
+        "onboarding",
+        "system_roles",
+        "master department"
+      ]
     },
     {
       "path": "Core System and Modules/Microservices - File Service.md",
@@ -9377,10 +9421,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Application/APP - Web ERP.md",
-    "Application/BASE - Enterance Point.md",
-    "Core System and Modules/Microservices - Attendance Service.md",
-    "Core System and Modules/Microservices - Employee Service.md"
-  ]
+  "gagal": []
 }
