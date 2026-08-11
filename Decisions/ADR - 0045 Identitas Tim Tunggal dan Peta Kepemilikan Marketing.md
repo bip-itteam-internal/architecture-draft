@@ -72,6 +72,16 @@ Memindahkan `team_shops` saja **tidak cukup**: kelima tokonya semua Beauty Hacks
 
 > **Pencabutan sumber insentif punya urutannya sendiri.** Ia menyumbang 2 toko ke cakupan 51,2%, dan salah satunya (`Beautyhacks.store`) **belum punya pemegang di `icc_account_mappings`**. Melepasnya sebelum ICC menutupi kedua toko itu akan menurunkan cakupan — persis yang dilarang gerbang di §Migrasi. Urutannya: isi di ICC dulu, verifikasi, baru lepas.
 
+### Alternatif yang ditolak: ICC sebagai satu-satunya sumber
+
+Ditanyakan pemilik fitur 2026-08-11: kalau ICC Management sudah punya datanya, kenapa tidak cukup satu sumber dan `department_shops` dihapus saja?
+
+Ditolak karena **ICC menjawab pertanyaan yang berbeda dan secara struktural tak dapat menampung jawabannya**: `POST /icc/mappings` menolak dengan `employee_id is required`, sehingga toko yang **belum ada pemegangnya tidak dapat dicatat di sana sama sekali**. Empat dari enam belas toko hari ini persis dalam keadaan itu — tiga Shopee dan `Beautyhacks.store`.
+
+Menyandarkan kepemilikan divisi pada penugasan orang juga membuatnya **hilang setiap kali pemegangnya kosong** — rotasi, resign, atau cuti panjang. Omzet toko itu lepas dari atribusi sampai ada pengganti, tanpa satu pun tanda bahwa sesuatu hilang. Itu kelas kegagalan yang sama dengan yang sudah kita tolak untuk akun affiliate, dan alasannya sama: *belum ditugaskan bukan berarti bukan milik kita*.
+
+**Penyemaian dua sumber bukan dua sumber permanen.** Ia sekali jalan; setelahnya hanya ada satu tempat mengisi — kartu team di ICC Management — dengan `department_shops` sebagai penyimpanannya, bukan sebagai menu kedua.
+
 ### Aktor dan wewenang
 
 Tidak ada gerbang baru yang diciptakan ADR ini; semuanya memakai yang sudah ada.
