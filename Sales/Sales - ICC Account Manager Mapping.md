@@ -5,7 +5,7 @@
 - **Stack:** Go + Fiber v2 + MongoDB (backend) · Next.js (frontend)
 - **Path target:** `bip-erp/services/integration/` (koleksi & endpoint baru)
 - **Status**: ⚠️ Implemented (ada catatan) — Phase 1–3 selesai; Phase 4 belum
-- **Dokumen terkait:** [[Sales - ICC Affiliate Mapping]] · [[Microservices - Integration Service]] · [[Microservices - Insentive Service]]
+- **Dokumen terkait:** [[Sales - ICC Affiliate Mapping]] · [[Microservices - Integration Service]] · [[Microservices - Insentive Service]] · [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]
 
 ---
 
