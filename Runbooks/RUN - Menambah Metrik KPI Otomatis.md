@@ -3,7 +3,8 @@
 *Cara dev departemen menambahkan satu metrik KPI yang terisi otomatis, tanpa menyentuh aturan penilaian dan tanpa bertabrakan dengan dev departemen lain. Latar belakang dan peta metriknya ada di [[HRIS - Otomasi Skor KPI]]; keputusan batas servicenya di [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]].*
 
 - **Status**: ✅ Mesinnya **deploy ke produksi 1 Agustus 2026** (PR #843 kontrak sumber, #857 mesin reduksi dan registry, #866 sumber `uptime_sistem`), dan **metrik otomatis pertama menyala 6 Agustus 2026**: tiga metrik Tech Development kini benar-benar menghasilkan angka di produksi. Prosedur di bawah final terhadap kode itu dan sudah pernah dijalankan sampai tuntas. Rinciannya di [[HRIS - Otomasi Skor KPI]].
-	- ⚠️ Yang masih tertinggal: **frontend produksi belum menampilkan `auto_value`** (FE prod terakhir deploy 6 Agustus 16:38, sebelum PR erp-frontend #831 merged), jadi usulan sistem hidup di API tetapi belum terlihat penilai.
+	- ⚠️ **Prosedur di bawah berubah pada dua titik oleh batch 6 Agustus 2026 yang MERGED tetapi BELUM di-deploy** (bip-erp PR [#1049](https://github.com/bip-itteam-internal/bip-erp/pull/1049)/[#1051](https://github.com/bip-itteam-internal/bip-erp/pull/1051)/[#1053](https://github.com/bip-itteam-internal/bip-erp/pull/1053)): sumber bermetrik kini didaftarkan lewat **`DaftarkanSumberBermetrik`** agar ikut masuk katalog, dan **`TargetPeriode` sudah tidak ada** — penggantinya `TargetBerlaku`. Bab **Langkah 2** dan **Target yang berubah tiap bulan** sudah menyesuaikan. Sampai batch itu di-deploy, `GET /kpi/sumber-katalog` dan `POST /kpi/auto-values/pratinjau` belum dapat dipakai di produksi.
+	- Catatan lama "frontend produksi belum menampilkan `auto_value`" **sudah tidak berlaku**: FE prod di-deploy ulang 6 Agustus 19:02 WIB sesudah PR erp-frontend #831 merged.
 	- ⚠️ **Di DEV, `MONITORING_SERVICE_KEY` dan `MARKETING_ANALYTICS_SERVICE_KEY` kosong** (prod terisi). Gerbang kunci layanan fail-closed, jadi sumber yang menariknya **mustahil menghasilkan angka di dev**. Kalau metrikmu memakai salah satunya, jangan buang waktu menguji di dev sebelum kuncinya diisi.
 
 Sumber yang sudah ada dan bisa dipakai sebagai contoh:
@@ -13,7 +14,7 @@ Sumber yang sudah ada dan bisa dipakai sebagai contoh:
 | `skor_tim` | Koleksi `kpi_score` di employee-service sendiri | Sumber yang membaca data lokal, disempitkan ke tim atau departemen |
 | `uptime_sistem` | monitoring-service lewat HTTP | Sumber yang menarik dari service lain, dan cakupannya bersifat WAKTU sehingga `CakupanPersen` ditimpa |
 | `kaizen` | form-builder lewat HTTP | Sumber yang mencacah kiriman per periode |
-| `kinerja_toko` | marketing-analytics lewat HTTP | **Satu sumber melayani banyak metrik** lewat `KPIAutoConfig.Metrik` (revenue, roi, roi_bersih, retur_persen), tiap entri katalog menghasilkan SATU angka |
+| `kinerja_toko` | marketing-analytics lewat HTTP | **Satu sumber melayani banyak metrik** lewat `KPIAutoConfig.Metrik` — kini **tujuh**: `revenue`, `ads_cost`, `gross_profit`, `jumlah_video`, `roi`, `roi_bersih`, `retur_persen`; tiap entri katalog menghasilkan SATU angka |
 | `kinerja_tiket` 🟡 | task-management lewat HTTP | Pola yang sama, tetapi tiap entri katalog menghasilkan **Cuplikan utuh** karena bentuk cakupan tiap metriknya berbeda (belum merge, branch `feat/kpi-sumber-tiket`) |
 
 **Kalau sumbermu menyediakan lebih dari satu angka, jangan bikin sumber baru per metrik.** Pakai `KPIAutoConfig.Metrik` sebagai pemilihnya, seperti `kinerja_toko` dan `kinerja_tiket`. Dengan begitu mengganti metrik sebuah baris KPI cukup mengubah konfigurasi, tanpa sumber baru dan tanpa deploy.
@@ -112,6 +113,14 @@ func init() {
 }
 ```
 
+**Kalau sumbermu menyediakan beberapa metrik, daftarkan dengan `DaftarkanSumberBermetrik`, bukan `DaftarkanSumber`:**
+
+```go
+DaftarkanSumberBermetrik(SumberVideoToko, []string{"jumlah_video", "gmv_per_video"}, fn)
+```
+
+Daftar metrik itu yang **masuk katalog** `GET /kpi/sumber-katalog` dan menjadi isi dropdown form konfigurasi. Menuliskannya di sini berarti tak ada daftar kedua di frontend yang bisa ketinggalan saat kamu menambah metrik. `DaftarkanSumber` tetap ada dan tetap benar untuk sumber satu-angka — ia hanya memanggil `DaftarkanSumberBermetrik` dengan daftar `nil`. **Daftar KOSONG (`[]string{}`) berbeda maknanya dari `nil`**: ia menyatakan sumber itu memang hanya menyediakan satu angka, sehingga form tidak menampilkan pilihan metrik — bukan menampilkannya kosong dan membuat pengisi mencari isian yang tak ada.
+
 Aturan yang mengikat:
 
 - **Nama sumber unik.** Nama ganda membuat `panic` saat boot, bukan penimpaan diam-diam, karena dua sumber bernama sama berarti separuh metrik mengambil data dari tempat yang salah dan gejalanya cuma angka keliru.
@@ -178,6 +187,8 @@ Terakhir, env barunya dipasang di **dua** blok `docker-compose.yml`: service sum
 ## Langkah 3: isi konfigurasi metrik
 
 Lewat `POST /kpi/templates` yang sudah ada. Tidak perlu deploy untuk mengubahnya.
+
+⚠️ **Sesudah batch 6 Agustus 2026 di-deploy, langkah ini tidak lagi harus dikerjakan dev.** Form konfigurasi otomasi (erp-frontend PR [#832](https://github.com/bip-itteam-internal/erp-frontend/pull/832)) mengisi dropdown-nya dari `GET /kpi/sumber-katalog`, jadi sumber yang kamu daftarkan di Langkah 2 **langsung muncul di layar HR tanpa perubahan frontend apa pun**. Tugasmu berhenti setelah sumbernya terdaftar dan terbukti menghasilkan angka; yang menyalakan metriknya adalah pemilik metrik. Bedah Mongo di bawah tetap dipakai untuk template yang sudah ada, atau selama batch itu belum di-deploy. **Catatan gap**: menu **KPI Templates** hari ini hanya terlihat oleh pemilik `system_roles.hris`, jadi SPV departemen belum benar-benar dapat mengisinya sendiri walau backend mengizinkan — lihat [[HRIS - Otomasi Skor KPI]].
 
 ### Contoh yang benar-benar terpasang di produksi
 
@@ -260,13 +271,43 @@ Dari 311 metrik produksi, **43 berarah turun** dan menumpuk di Finance, Manufakt
 
 Untuk arah `turun`, **`target: 0` sah dan bermakna**: "zero accident", "zero major finding", "selisih 0%". Realisasi 0 bernilai penuh; sekali melanggar langsung jatuh ke 0, karena tidak ada yang namanya sedikit zero accident.
 
-### Target yang berubah tiap bulan
+### Target berlapis tiga: per karyawan, per periode, umum
 
 ```json
-{ "target": 4090000000, "target_per_periode": { "2026-08": 4500000000 } }
+{
+  "target": 4090000000,
+  "target_per_periode":  { "2026-08": 4500000000 },
+  "target_per_karyawan": { "BIP-0086-09-24": 250000000 }
+}
 ```
 
-Periode yang tak terdaftar jatuh ke `target`. Dengan begitu mengubah target bulan depan tidak mengubah penilaian bulan lalu.
+Yang menentukan target berlaku adalah **`TargetBerlaku(cfg, periode, employeeID)`**. ⚠️ **`TargetPeriode(cfg, periode)` sudah TIDAK ADA** — diganti fungsi itu di PR [#1051](https://github.com/bip-itteam-internal/bip-erp/pull/1051); kode yang masih memanggilnya tidak akan kompilasi.
+
+Urutan menangnya dari yang paling khusus:
+
+1. **`target_per_karyawan[employee_id]`** — menang atas semuanya
+2. **`target_per_periode[periode]`**
+3. **`target`** — lapis paling umum
+
+Yang tak terdaftar jatuh ke lapis berikutnya, **bukan nol**. Pemeriksaannya memakai bentuk dua-nilai (`t, ada :=`), bukan membandingkan hasil dengan nol, sebab **target 0 sah** untuk arah `turun` dan memperlakukannya sebagai "tak diisi" akan diam-diam mengembalikan target umum yang bukan maksudmu.
+
+**Pakai `target_per_karyawan` untuk metrik NOMINAL, bukan untuk rasio.** Alasannya bukan kelenturan melainkan ketimpangan yang terukur: profit antar toko ICC Juli 2026 berentang **570×**, dari Rp342.585.503 sampai minus Rp3.471.743. Satu garis target di situ meloloskan pemegang toko besar dan menggagalkan sisanya tanpa ada kaitannya dengan kinerja. Metrik rasio (ROI, persentase retur) sudah ternormalisasi, jadi target seragam justru yang benar di sana.
+
+⚠️ **Target per karyawan menggeser bebannya, bukan menghapusnya.** Sekali dipakai, target tiap orang jadi keputusan yang harus dipertanggungjawabkan tiap periode dan tak lagi terbaca dari satu angka di template. Isi lewat tabel massal di form konfigurasi (erp-frontend PR [#832](https://github.com/bip-itteam-internal/erp-frontend/pull/832)), dan **pratinjau dulu sebarannya** sebelum menyimpan.
+
+### Pratinjau sebelum menyimpan
+
+⚠️ Tersedia sejak PR [#1053](https://github.com/bip-itteam-internal/bip-erp/pull/1053) (**merged, belum di-deploy**).
+
+`POST /kpi/auto-values/pratinjau` menghitung konfigurasi yang **belum tersimpan** untuk sampai **10** karyawan sekaligus, memakai jalur hitung yang sama dengan `/kpi/auto-values`. Gunanya satu: salah konfigurasi tidak menimbulkan galat, hanya angka salah yang tampak wajar. Yang dibaca dari sebarannya:
+
+| Yang terlihat | Kemungkinan besar artinya |
+|---|---|
+| Semua 100 | Target terlalu rendah — metriknya tak membedakan apa pun |
+| Semua 0 | Target terlalu tinggi, **atau arahnya terbalik** |
+| Sebagian besar gagal hitung | Sumbernya belum siap, atau atribusinya belum lengkap |
+
+Batas 10 orang bukan angka arbitrer: tiap orang adalah panggilan sumber tersendiri, dan sebagian sumber memanggil service lain lewat HTTP **berurutan**. Konfigurasi yang tak lolos `ValidateKPIAutoConfig` dibalas **400 berisi pesan yang dapat dibaca HR**, bukan 500 — yang salah adalah isian formnya.
 
 ## Dua bentuk yang jadi tugas sumber, bukan reduksi baru
 
@@ -308,7 +349,10 @@ Empat contoh nyata, semuanya bertipe sama: salah yang tidak menimbulkan error.
 - [ ] Metrik yang gagal dihitung terbukti tetap kosong, bukan bernilai 0
 - [ ] Bila menarik dari service lain: rute sumber punya test yang **melewati Fiber** untuk tanpa kunci, kunci salah, dan env kosong
 - [ ] Env kunci layanan terpasang di **dua** blok compose (service sumber dan employee-service)
+- [ ] Sumber bermetrik didaftarkan lewat **`DaftarkanSumberBermetrik`** dan metriknya benar-benar muncul di `GET /kpi/sumber-katalog`
+- [ ] Sebarannya **dipratinjau** (`POST /kpi/auto-values/pratinjau`) untuk beberapa orang pada periode lampau — bukan semua 100, bukan semua 0
 - [ ] Sudah dijalankan **sekali lewat gateway** sungguhan, bukan hanya lokal
+- [ ] Merge-nya terbukti sampai `main`: `git merge-base --is-ancestor <merge-commit> origin/main`, atau berkasnya benar-benar ada di `origin/main`. Tanda **MERGED** di GitHub tidak cukup — PR yang `base`-nya menunjuk branch fitur lain kehilangan seluruh isinya bila branch dasarnya di-merge lebih dulu (terjadi nyata pada PR #1058, lihat [[HRIS - Otomasi Skor KPI]])
 - [ ] Metriknya dibuka di layar **Otomasi KPI** (`/hris/kpi/otomasi`) dan berstatus `otomatis` atau `semi` — bukan `manual`
 
 Butir terakhir adalah cara termurah membuktikan metrikmu benar-benar hidup untuk **semua** orang di posisi itu, bukan cuma untuk satu karyawan yang kebetulan kamu uji. Statusnya `semi` bukan kegagalan — itu berarti angkanya nyata tetapi cakupan datanya parsial, dan layar itu menyebutkan berapa persen. Yang harus membuat berhenti adalah `manual`: berarti hitungannya gagal, dan sebabnya sudah tertulis di kolom keterangan.

@@ -4,6 +4,7 @@
 
 - **Status**: ⚠️ **Metrik otomatis PERTAMA menyala di produksi 6 Agustus 2026**, lima hari sesudah mesinnya deploy. Tiga metrik Tech Development kini punya konfigurasi `auto` dan benar-benar menghasilkan angka (rincian dan buktinya di bab **Metrik otomatis yang sudah menyala** di bawah). Catatan lama "belum ada satu pun metrik yang terisi otomatis" **sudah tidak berlaku**. Mesinnya sendiri jalan sejak PR #843 (kontrak sumber nilai), #857 (mesin reduksi + arah target + registry), dan #866 (sumber `uptime_sistem`), deploy 1 Agustus 2026. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.
 	- ✅ **Penilai kini bisa melihatnya.** Frontend produksi di-deploy ulang **6 Agustus 19:02 WIB** (container `frontend-hris-dashboard`), sesudah PR erp-frontend #831 dan #834 merged, jadi modal Score KPI di produksi sudah memuat pengambilan `auto-values`. Catatan lama "penilai belum melihatnya, otomasi hidup di API saja" sudah tidak berlaku. Perlu diketahui: nilainya muncul sebagai **usulan yang harus ditekan** lewat tombol "Pakai usulan" (#831 sengaja tidak mengisi kolom otomatis), jadi supervisor yang tidak menekannya tetap melihat kolom kosong — itu perilaku yang dirancang, bukan kegagalan pengambilan data.
+	- ⚠️ **Batch besar berikutnya merged tetapi BELUM di-deploy** (bip-erp #1049/#1051/#1053, erp-frontend #831/#832, seluruhnya 6 Agustus 2026): katalog sumber, pratinjau konfigurasi sebelum simpan, jejak perubahan, target berbeda per karyawan, dan metrik `jumlah_video`. HR karenanya **belum** benar-benar dapat mengisi konfigurasi sendiri di produksi. Rincian, gap yang tersisa, dan satu PR yang **tidak sampai ke `main`** ada di bab **HR mengisi konfigurasinya sendiri** di bawah.
 	- ✅ **Layar yang menjawab "metrik mana yang macet" sudah ada di produksi.** Modal Score KPI menjawab satu orang satu periode; untuk melihat seluruh metrik satu departemen sekaligus beserta sebab yang gagal, ada halaman **Otomasi KPI** (bip-erp PR [#1066](https://github.com/bip-itteam-internal/bip-erp/pull/1066) + erp-frontend PR [#843](https://github.com/bip-itteam-internal/erp-frontend/pull/843), keduanya merged 6 Agustus 2026; `Employee-Service`, `API-Gateway`, dan `frontend-hris-dashboard` prod di-recreate 7 Agustus 2026 pagi). Rinciannya di bab **Layar diagnostik** di bawah.
 - **Ruang lingkup**: `kpi_template` / `kpi_score` di [[Microservices - Employee Service]]. **Bukan** engine insentif marketing di [[Microservices - Insentive Service]], walau bab 6 mengusulkan menyambungkan keduanya.
 
@@ -107,6 +108,59 @@ Tiga status pertama memakai nama yang sama persis dengan `KPISources` di `shared
 - **Frontend tidak memegang default departemen.** Backend yang memilih departemen pertama yang berhak dilihat pemanggil, dan badan 403 ikut membawa daftar departemen yang berhak, supaya pengguna bisa pindah tab alih-alih terdampar.
 
 Kontrak lengkapnya di [[API - Employee Service]]; cara menambah metrik otomatis baru dan memverifikasinya lewat layar ini di [[RUN - Menambah Metrik KPI Otomatis]].
+
+## HR mengisi konfigurasinya sendiri
+
+> **Status**: ⚠️ **merged, BELUM di-deploy** per 2026-08-11. bip-erp PR [#1049](https://github.com/bip-itteam-internal/bip-erp/pull/1049) · [#1051](https://github.com/bip-itteam-internal/bip-erp/pull/1051) · [#1053](https://github.com/bip-itteam-internal/bip-erp/pull/1053) dan erp-frontend PR [#831](https://github.com/bip-itteam-internal/erp-frontend/pull/831) · [#832](https://github.com/bip-itteam-internal/erp-frontend/pull/832), seluruhnya merged 6 Agustus 2026. **Belum satu pun terbukti jalan lewat gateway produksi**, jadi seluruh bab ini menggambarkan kode yang ada di `main`, bukan perilaku yang sudah disaksikan.
+
+Sampai batch ini, menyalakan satu metrik otomatis menuntut seseorang membedah `kpi_template` langsung di Mongo dengan `arrayFilters` — prosedur yang tertulis di [[RUN - Menambah Metrik KPI Otomatis]] dan memang dipakai untuk tiga metrik pertama. Batch ini memindahkan pekerjaan itu ke layar, sehingga HR tak lagi menunggu dev untuk tiap metrik.
+
+**Tiga kemampuan baru di backend:**
+
+| Apa | Rute / kontrak | Kenapa ada |
+|---|---|---|
+| **Katalog pilihan** | `GET /kpi/sumber-katalog?department=` | Daftar sumber, sub-metrik, formula, arah, dan scope selama ini hanya hidup di kode Go. Frontend yang menuliskan daftarnya sendiri membuat tiap sumber baru menuntut perubahan di dua tempat. Formula/arah/scope dibaca **lewat refleksi** atas struct di `shared-library`, bukan disalin — literal berarti pilihan baru tak pernah muncul dan gejalanya cuma dropdown yang kurang |
+| **Pratinjau sebelum simpan** | `POST /kpi/auto-values/pratinjau`, maks **10** `employee_ids` | Salah konfigurasi **tidak menimbulkan galat**, hanya angka salah yang tampak wajar. Sebaran beberapa orang pada periode lampau menunjukkannya langsung: semua 100 berarti target terlalu rendah, semua 0 berarti terlalu tinggi atau arahnya terbalik |
+| **Jejak perubahan** | koleksi `kpi_template_audits` | Konfigurasi kini disunting orang yang bukan penulisnya, dan blok `auto` yang berubah diam-diam mengubah nilai semua orang di posisi itu |
+
+**Target berbeda per karyawan** (`TargetPerKaryawan`, berkunci `employee_id`) adalah perubahan yang paling menentukan hasilnya. `TargetPeriode` diganti `TargetBerlaku(cfg, periode, employeeID)` dengan urutan **per karyawan → per periode → umum**. Alasannya ada di datanya sendiri: profit nominal antar toko ICC Juli 2026 timpang **570×** — dari Rp342.585.503 sampai minus Rp3.471.743. Satu garis target meloloskan pemegang toko besar dan menggagalkan sisanya tanpa ada kaitannya dengan kinerja. Frontend #832 menyediakan tabel pengisian massalnya.
+
+**`kinerja_toko` bertambah `jumlah_video`**, menjadi tujuh metrik (`revenue`, `ads_cost`, `gross_profit`, `jumlah_video`, `roi`, `roi_bersih`, `retur_persen`). Berbeda dari metrik rasio di sebelahnya, **nol video BUKAN galat**: seorang ICC memang dapat tidak menerbitkan video sebulan penuh, dan itu justru keadaan yang hendak diukur — menggalatkannya menyembunyikan kinerja terburuk sebagai "gagal hitung".
+
+### Yang harus diketahui sebelum angkanya dipercaya
+
+Lima hal ini tidak terlihat dari layar mana pun, dan tiap satunya cukup untuk membuat skor terbaca sebagai kinerja buruk padahal bukan.
+
+1. 🔴 **`shopee_shop_id` KOSONG di seluruh 12 baris `icc_account_mappings`** (diperiksa langsung ke produksi 2026-08-06; 12 baris aktif). `tokoMilikKaryawan` mengambil `tiktok_shop_id` dan `shopee_shop_id` dan melewati yang kosong, jadi hari ini profit dan revenue KPI **hanya terhitung dari toko TikTok**. Revenue Juli 2026 per channel: TIKTOK **Rp7.741.562.100** (20 toko) · SHOPEE **Rp1.951.681.920** (8 toko) · LAZADA Rp7.193.788 (2 toko) — jadi yang terhitung sekitar 80% omzet dan sisanya luput tanpa satu pun pesan. **Ini pekerjaan data tim marketing, bukan pekerjaan kode.** Pemetaan TikTok pun belum penuh: 21 toko terotorisasi, **11 dipetakan**.
+2. 🔴 **Tiga toko berprofit NEGATIF sepanjang Juli penuh**: Kyura Beauty Skincare −3.471.743, Glowbooster Glowfast −718.501, Glowbooster.Store −604.194. Dengan arah `naik`, pemegangnya bernilai **0 berapa pun targetnya** — termasuk target per-karyawan. Angka negatif bukan kegagalan hitung, jadi tak ada yang jatuh ke `manual`; skor 0-nya akan terlihat sah. Keputusan pemilik metrik dibutuhkan sebelum penilaian Agustus, bukan sesudah.
+3. ⚠️ **SPV departemen belum dapat menemukan halaman konfigurasinya.** Backend mengizinkan — `RequireKPIDepartmentRBAC` meloloskan penyunting template satu departemen, dan itu sebabnya `GET /kpi/sumber-katalog` menerima `?department=`. Tetapi menu **KPI Templates** (`/hris/kpi/templates`) terdaftar di kategori sidebar **`hris`** dengan `perm: "kpi.view"`, dan kategori yang bukan modul si pembaca hanya menampilkan item bertanda `public` — yang tidak dipasang di sini. Praktis **hanya pemilik `system_roles.hris` yang dapat mengisi konfigurasi**. **Gap ini belum diperbaiki (TBD)**: entah menandai menunya `public`, memindahkannya ke kategori `kpi`, atau memang menerima bahwa pengisian tetap milik HR.
+4. ⚠️ **Jejak `kpi_template_audits` ditulis tetapi tak terbaca.** Belum ada endpoint maupun layar untuk membacanya — satu-satunya jalan adalah akses Mongo langsung. Belum pula ada index `{template_id, diubah_at:-1}`, sehingga penelusuran per template memindai seluruh koleksi. Riwayat yang hanya bisa dibuka lewat Mongo tidak menjawab pertanyaan yang membuatnya dibangun ("siapa yang mengubah target ini").
+5. ⚠️ **Seluruh batch ini belum di-deploy.** Merged bukan bukti jalan; ingatan tim ini sudah mencatat fitur yang merged, deployed, dan tetap mustahil dipakai selama tiga hari karena satu lapisan pengikatan request tak ikut diperbarui. Sebelum diklaim selesai, tiap rute baru wajib dijalankan **sekali lewat gateway** sungguhan.
+
+### KPI ICC versi Juli 2026
+
+Sumbernya `REKOMENDASI KPI ICC UPDATE JULI 2026.xlsx` (dokumen HR, bukan kode). **Berlaku mulai penilaian Agustus 2026**; KPI Juli sudah ditutup dan snapshot `kpi_score`-nya beku.
+
+| Posisi | Bobot dan metrik |
+|---|---|
+| ICC | 0,30 kuantitas video · 0,30 ROI · 0,40 Revenue |
+| Leader ICC | 0,15 kuantitas video team · 0,15 ROI team · 0,50 Revenue team · 0,20 KPI Team (Average 70; **<70 = 0**) |
+| SPV Marketing | 0,60 Revenue · 0,10 inventory turnover · 0,10 retur (maks 7%) · 0,20 Performance Monitoring (**<70 = 0**) |
+
+- **Ambang GMV per video (10.000 / 150.000) DIHAPUS** dari versi ini. Metrik yang tercatat di bab Matriks di atas beserta pembuktian ambangnya karena itu **tidak lagi dipakai** untuk ICC mulai Agustus; yang tersisa dari sisi video hanya cacahannya. Itu pula sebabnya `/kpi/kinerja-toko` membawa `jumlah_video` telanjang tanpa GMV tiap video — membawanya hanya menambah muatan tanpa dipakai siapa pun.
+- **Aturan "<70 = 0" dinyatakan lewat `NilaiMinimum`**, field pointer baru di `KPIAutoConfig`. Pointer, bukan nilai biasa, supaya "tidak memakai minimum" terbedakan dari "minimum nol" — dan minimum nol adalah aturan yang sah. Tanpa field ini aturan tebing itu mustahil dinyatakan lewat konfigurasi: realisasi 65 atas target 70 bernilai 92,86.
+- 🔴 **`inventory turnover` pada SPV Marketing tidak punya sumber** — tidak ada modul demand planning di ERP mana pun. Metrik itu **tetap manual**, dan bobot 0,10-nya tak dapat diotomatiskan oleh batch ini maupun batch berikutnya.
+- ⚠️ **Metrik ber-scope "team" pada Leader ICC belum punya cakupan yang benar.** Kedua Leader ICC punya **NOL bawahan** di `work_data.supervisor_id` (`icc_leaders`: Kyura → BIP-0024-01-23 Ridho, Beauty Hacks → BIP-0013-03-22 Satrio), sedangkan **23 dari 39 ICC** justru menunjuk BeautyHacks Supervisor. Dengan `scope: team`, keempat metrik team Leader menghasilkan populasi nol dan jatuh ke `manual`. Upaya menjawabnya lewat cakupan `tim_icc` **tidak sampai ke `main`** — lihat bab di bawah.
+
+### Cakupan `tim_icc`: merged ke branch yang salah, tidak ada di `main`
+
+> **Status**: 🔴 **TIDAK ADA di `main`** per 2026-08-11, meskipun PR-nya bertanda MERGED.
+
+bip-erp PR [#1058](https://github.com/bip-itteam-internal/bip-erp/pull/1058) ("cakupan tim ICC untuk metrik KPI Leader") menambahkan `GET /kpi/anggota-tim-icc`, scope baru `KPIAutoScopes.TimICC`, dan sumber pembacanya. GitHub mencatatnya **merged 6 Agustus 2026 11:30:34 UTC** — tetapi `baseRef`-nya bukan `main`, melainkan branch `feat/kpi-katalog-pratinjau-audit` milik PR #1053. Branch itu **sudah lebih dulu di-merge ke `main` 39 detik sebelumnya** (11:29:55 UTC). Akibatnya isi #1058 mendarat di branch yang sudah tak dibaca siapa pun: merge commit-nya bukan leluhur `origin/main`, dan berkas `services/marketing-analytics/kpi_tim_icc.go` serta `services/employee/kpi_sumber_tim_icc.go` **tidak ada di `main`**. `KPIAutoScopes` di `main` masih berisi `department`, `team`, `individu` saja.
+
+**Jadi masalah yang hendak dijawabnya masih terbuka**: kedua Leader ICC tetap tak punya bawahan di `supervisor_id`, dan metrik team mereka tetap tak dapat dihitung. Pekerjaan kodenya sudah ada dan teruji di branch `feat/kpi-cakupan-tim-icc`; yang dibutuhkan hanya PR baru yang menargetkan `main`.
+
+**Pelajaran yang layak diingat**: PR bertumpuk (`base` menunjuk branch fitur lain, bukan `main`) kehilangan seluruh isinya bila branch dasarnya di-merge lebih dulu. Tanda MERGED di GitHub **tidak berarti kodenya ada di `main`** — yang membuktikannya hanya `git merge-base --is-ancestor <merge-commit> origin/main`, atau lebih sederhana, mencari berkasnya di `origin/main`.
 
 ## Progres bulan berjalan di MyBharata
 
@@ -402,7 +456,9 @@ Field `attribution_note` pada `mart_profit_attribution` di production menyatakan
 ## Belum Diimplementasikan / Catatan
 
 - **308 dari 311 metrik masih diisi manusia.** Tiga yang otomatis sejak 2026-08-06 ada di bab **Metrik otomatis yang sudah menyala**. Sisanya menunggu konfigurasi `auto` pada `kpi_template`, yang diisi lewat `POST /kpi/templates` tanpa perlu deploy.
-- ⚠️ **Frontend produksi belum menampilkan usulan sistem.** FE prod terakhir di-deploy 2026-08-06 16:38, sebelum PR erp-frontend #831 merged. Jadi supervisor yang membuka modal Score KPI belum melihat angka otomatis walau angkanya sudah ada di API. Deploy FE prod adalah langkah yang membuat otomasi ini terasa.
+- ⚠️ **Sudah basi**: catatan lama "frontend produksi belum menampilkan usulan sistem". FE prod di-deploy ulang **6 Agustus 19:02 WIB** sesudah #831 merged, jadi modal Score KPI produksi sudah memuat `auto-values` (lihat bab Deskripsi). Yang **belum** di produksi adalah form konfigurasi otomasi #832 beserta backend pendukungnya — bab **HR mengisi konfigurasinya sendiri**.
+- 🔴 **`shopee_shop_id` kosong di seluruh 12 baris `icc_account_mappings`**, sehingga metrik bersumber `kinerja_toko` hanya terhitung dari toko TikTok (± 80% omzet). Pekerjaan data tim marketing; tanpa catatan ini angka KPI ICC akan terbaca sebagai kinerja buruk. Rinciannya beserta angka per channel di bab **Yang harus diketahui sebelum angkanya dipercaya**.
+- 🔴 **bip-erp PR #1058 (`tim_icc`) bertanda MERGED tetapi isinya tidak ada di `main`** — ter-merge ke branch PR #1053 yang sudah lebih dulu masuk `main` 39 detik sebelumnya. Metrik team Leader ICC karena itu masih tak dapat dihitung. Detail di bab **Cakupan `tim_icc`**.
 - ⚠️ **Di DEV, `MONITORING_SERVICE_KEY` dan `MARKETING_ANALYTICS_SERVICE_KEY` kosong** (diperiksa 2026-08-06; di prod keduanya terisi 32 karakter). Gerbang kunci layanan fail-closed, jadi sumber `uptime_sistem` dan `kinerja_toko` **mustahil menghasilkan angka di dev** dan selalu gagal dengan alasan "SERVICE_KEY belum diatur". Itu menjelaskan kenapa uji end-to-end otomasi KPI di dev selalu buntu tanpa sebab yang kelihatan.
 - **Uptime bulan Juni 2026 dan sebelumnya tidak dapat dihitung.** Diverifikasi di produksi 1 Agustus 2026: Juni membalas `null` dengan 0 dari 30 hari, Juli 99,81% dengan 23 dari 31 hari (membenarkan heartbeat terawal 9 Juli). Agustus adalah periode penuh pertama.
 - **Selama bulan berjalan, metrik uptime akan dilaporkan `semi`, bukan `otomatis`.** Cakupannya memang belum penuh, dan uptime satu hari bukan uptime sebulan. Ia menjadi `otomatis` setelah bulannya tutup, yaitu saat penilaian dilakukan.

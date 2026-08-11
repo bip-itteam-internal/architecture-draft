@@ -3,7 +3,7 @@
 *Penjelasan otomasi skor KPI dalam bentuk diagram. Ada **dua versi**: gambaran besar untuk pembaca non-teknis, dan alur rinci untuk dev. Keduanya tersimpan di `Additional documents/Excalidraw/`; halaman ini catatan penunjuknya, sekaligus supaya diagramnya terjangkau pencarian vault (folder `Additional documents/` tidak diindeks).*
 
 - **Bentuk**: dua diagram Excalidraw
-- **Status**: ✅ Selaras dengan keadaan produksi per **2 Agustus 2026**
+- **Status**: ⚠️ Gambarnya masih selaras, **teks penyertanya diperbarui 11 Agustus 2026**. Rangkaian dan prinsipnya tidak berubah; yang berubah keadaan nyatanya — lihat catatan di bawah tabel.
 
 | Versi | Untuk siapa | Menjawab apa |
 |---|---|---|
@@ -26,7 +26,11 @@
 4. Sistem menghitung skor tiap orang, dibandingkan dengan **matrik KPI per posisi**.
 5. Skor KPI terisi sendiri; atasan tinggal memeriksa, bukan menebak.
 
-Mesin langkah 4 sudah jalan di produksi sejak 1 Agustus 2026. Yang belum: **0 dari 70 matrik** diisi pengaturannya, jadi hari ini belum ada satu posisi pun yang benar-benar otomatis.
+Mesin langkah 4 sudah jalan di produksi sejak 1 Agustus 2026.
+
+⚠️ **Kalimat lama "0 dari 70 matrik diisi pengaturannya" sudah TIDAK berlaku.** Sejak **6 Agustus 2026** tiga metrik Tech Development benar-benar terisi otomatis di produksi, dan penilai sudah melihat usulannya di modal Score KPI. Yang masih benar: sisanya, **308 dari 311 metrik**, belum diisi pengaturannya.
+
+Alat yang membuat pengisian itu jadi pekerjaan HR alih-alih pekerjaan dev — katalog sumber, pratinjau sebaran sebelum simpan, dan target berbeda per karyawan — **sudah merged tetapi belum di-deploy**. Angka mutakhir beserta gap yang tersisa dipelihara di [[HRIS - Otomasi Skor KPI]], bukan di halaman ini.
 
 ## Tiga syarat yang sering terlupa
 
