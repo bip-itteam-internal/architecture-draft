@@ -63,6 +63,28 @@ Koleksi `trainer_evaluation`. **Peserta menilai trainer**, empat aspek tetap (pe
 
 Penjaga lain: hanya **peserta** yang boleh menilai, hanya pelatihan **`Completed`**, satu peserta satu penilaian lewat **index unik** (pemeriksaan handler saja lolos pada pengiriman berbarengan), dan rata-rata dihitung dari nilai **mentah** bukan dari rata-rata yang sudah dibulatkan.
 
+## Layar karyawan (`/me/trainings`) — ✅ merged 2026-08-11 (PR [#1150](https://github.com/bip-itteam-internal/bip-erp/pull/1150))
+
+`MeTraining` kini membawa `trainer_id`, `trainer_name`, `sudah_dinilai`, dan `boleh_menilai`.
+
+Sebelum ini layar penilaian tak bisa dibuat benar: tanpa penanda sudah-dinilai, satu-satunya cara mengetahuinya adalah **mengirim penilaian lalu ditolak 409**, sehingga tombol muncul di setiap pelatihan selesai termasuk yang sudah dinilai.
+
+- **`boleh_menilai` dihitung SERVER**, mengikuti alasan yang sama dengan `can_attend`: aturannya sudah hidup di `BolehMenilaiPelatihan`, dan menyalinnya ke klien melahirkan salinan ketiga setelah Go dan TypeScript — di aplikasi, salinan yang menyimpang baru bisa diperbaiki lewat rilis baru ke store.
+- **Kedua penanda TANPA `omitempty`.** Dengan `omitempty`, nilai `false` hilang dari respons dan klien tak bisa membedakan "tidak boleh" dari "server lama yang belum punya field ini".
+- **Dua kueri pengaya gagal-TERBUKA**: galat baca dicatat lalu dilewati, tak menggagalkan layar dan tak menutup tombol. Index unik tetap penjaga sebenarnya.
+
+## ⚠️ Bug: pencarian supervisor memakai KEY, bukan NAMA — 🔜 perbaikan di PR [#1153](https://github.com/bip-itteam-internal/bip-erp/pull/1153) (belum merge)
+
+Kelas bug yang sudah berulang di repo ini: **dua satuan berbeda untuk hal yang terdengar sama**.
+
+`department_key` adalah **key** (`master_department.key`, mis. `it`), sedangkan `work_data.department` menyimpan **nama** (`Tech Development`). `supervisorDepartemen` mengirim key ke `/list?type=supervisor&department=`, padahal di sana `SupervisorLookupOrder` mencocokkan `d.Name`. Hasilnya nol supervisor, lalu pengajuan dibalas **409 "departemen belum punya supervisor"** — galat yang menuduh data master padahal yang salah satuan nilainya.
+
+Diperiksa pada data dev: **6 dari 10 departemen punya key ≠ name** (`hris`/Human Resource, `ga`/General Affair, `it`/Tech Development, `secretary`/Kesekretariatan, `beauty_hacks`/Beauty Hacks, `manufacture`/Manufaktur). Untuk keenamnya pengajuan pelatihan **mustahil dibuat**. Empat sisanya (Finance, Kyura, Quality, Procurement) jalan hanya karena kebetulan key-nya sama dengan namanya — itulah yang membuatnya tampak "kadang jalan".
+
+Sekalian di PR yang sama: **`department_key` jadi OPSIONAL**, kosong berarti "departemen saya" dari header `BIP-Department`. Tanpa itu MyBharata tak bisa mengajukan sama sekali — aplikasi tak punya endpoint master departemen dan profilnya hanya menyimpan nama, jadi memaksanya mengirim key membuat tiap klien menyalin pemetaan nama↔key, persis duplikasi yang melahirkan bug ini.
+
+⚠️ **Key yang SALAH sengaja tidak jatuh ke pencocokan nama.** Menebaknya akan menyembunyikan klien yang mengirim satuan keliru.
+
 ## Belum Diimplementasikan / Catatan
 
 - **Seluruh fitur LMS belum ada.** Course, materi PDF & video, bank soal, pre/post test, skoring otomatis, kurikulum per jabatan, tenggat, Talent Pool — semuanya Fase 1 ke atas. Desainnya lengkap, lihat [[HRIS - Training Program]]. **Penilaian trainer sudah ada** (lihat di atas).
@@ -73,7 +95,8 @@ Penjaga lain: hanya **peserta** yang boleh menilai, hanya pelatihan **`Completed
 - ⚠️ **Urutan registrasi rute itu kritis dan dikunci uji.** `/training/requests` dan `/training/:id/evaluation` didaftarkan **sebelum** `registerTrainingEventRoutes`; menaruhnya sesudah `/training/:id` membuat permintaannya ter-match sebagai event ber-id "requests" lalu dibalas 400 *"id is not a valid ObjectID"* — galat yang menuduh permintaan yang benar dan paling sulit dicurigai karena pesannya terdengar masuk akal.
 - `ensureTrainingIndexes` dan kedua index baru dijaga `mongodb.DB == nil`: paniknya terjadi saat **registrasi rute**, jadi tanpa itu service gagal naik sama sekali.
 - Bawaan dari kode lama, belum diperbaiki: `PUT` bersifat full-replace sehingga frontend wajib mengirim objek lengkap, pendaftaran peserta belum memeriksa karyawan benar-benar ada di `work_data`, dan daftar belum berpaginasi.
-- **Belum ada frontend** untuk pengajuan maupun evaluasi, dan keduanya **belum diverifikasi lewat gateway hidup**.
+- ✅ ~~Belum ada frontend untuk pengajuan maupun evaluasi~~ — **sudah ada di web** (erp-frontend [#967](https://github.com/bip-itteam-internal/erp-frontend/pull/967) & [#968](https://github.com/bip-itteam-internal/erp-frontend/pull/968), merged): `/hris/training/requests`, `/hris/pelatihan-saya`, dan agregat penilaian di halaman Pelatihan. Detail di [[APP - Web ERP]].
+- ⚠️ **Seluruh fitur pengajuan & evaluasi BELUM pernah diverifikasi lewat gateway hidup.** `learning-service` di dev masih memakai image lama sejak #1148 merge: `/training/requests` di sana masih tertelan `/training/:id` dan membalas 400, `/training/:id/evaluation` masih 404. Perlu `docker compose build learning-service && docker compose up -d --no-deps learning-service` di VM dev. Itulah sebab bug departemen di bawah tak terlihat berminggu-minggu. Lihat [[RUN - Deploy Microservices bip-erp]].
 - **Rute lama `/api/employee/training/*` masih hidup di produksi.** `employee-service` sengaja tidak di-rebuild saat cut-over agar tidak ikut mendorong perubahan orang lain ke produksi. Tidak ada pemanggil yang tersisa. Koleksi Training lama juga masih ada di `employee_db` sebagai jalan pulang.
 
 ## Dependensi & Integrasi

@@ -80,14 +80,22 @@ Verifikasinya menemukan yang test tak bisa: `vonis.laba_kotor` **cocok sampai ru
 | GET | `/jobs/status` | `penjadwal_hidup`, `dinonaktifkan`, alasan, interval, ambang mati 72 jam, `sync_state` tiap job |
 | GET | `/health` | `ok` / `degraded` (503) bila index unik gagal dibuat |
 
+## Pengumpul KPI
+
+| Method | Path | Fungsi | Gerbang |
+|---|---|---|---|
+| GET | `/kpi/kinerja-toko` | Agregat **mentah** kinerja toko satu karyawan satu periode, bahan penilaian KPI marketing. Query wajib `periode=YYYY-MM`·`employee_id`·`key`. Balasan `periode`·`employee_id`·`toko_diminta`·`toko_berdata`·`revenue`·`ads_cost`·`retur`·`gross_profit`·`jumlah_video`. **Rasio sengaja tidak dihitung di sini** — ROI kotor vs bersih-setelah-retur adalah keputusan bisnis yang masih dapat berubah, dan menaruhnya di sisi ini memaksa deploy tiap kali definisinya diubah; yang memilih rumus adalah konfigurasi metrik di [[Microservices - Employee Service]]. Sumbernya `mart_profit_attribution` level `shop`, koleksi yang sama dengan `/profit/shops`, jadi angka KPI dan angka dashboard tak akan pernah berbeda. **Rute ini sendiri yang mencari toko milik karyawan** lewat `icc_account_mappings` di `integration_db` (service ini satu-satunya yang sudah punya koneksi baca-saja ke sana); satu orang boleh memegang beberapa toko **lintas channel**, dan seluruhnya digabung jadi satu angka. Karyawan yang belum dipetakan dijawab **400, bukan 200 bernilai nol** — nol terbaca sebagai orang yang tak menghasilkan apa pun sebulan penuh, tuduhan yang jauh berbeda dari "tokonya belum ditugaskan". `toko_berdata < toko_diminta` berarti ada toko tanpa satu pun baris pada periode itu, dan cakupan itu ikut dilaporkan ke penilai. Batas atas periode **eksklusif** (`$lt`) supaya hari terakhir bulan tak terhitung dua kali. `kpi_kinerja_toko.go` | Kunci layanan sendiri `?key=` (`MARKETING_ANALYTICS_SERVICE_KEY`), **bukan** `BIP-Gateway-ID` — gateway memasang header itu untuk tiap permintaan yang lolos JWT, sehingga rute yang bersandar padanya terbuka bagi semua karyawan yang login ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Kunci kosong **menutup** rute |
+
+- ⚠️ **`jumlah_video` ditambahkan** (PR [#1049](https://github.com/bip-itteam-internal/bip-erp/pull/1049), merged 6 Agustus 2026, **belum di-deploy**): cacahan video terbit (`tt_shop_video_performances.published_at`) milik seluruh toko yang dipegang, dipakai metrik `kuantitas video` pada KPI ICC. Dicacah dengan `CountDocuments`, bukan ditarik dokumennya — yang dibutuhkan hanya cacahnya, dan koleksi itu belum punya index selain `_id`.
+- ⚠️ **Kegagalan mencacah video tidak menggagalkan jawaban, dan nol-nya tak terbedakan dari nol sungguhan kecuali lewat log.** Disengaja: revenue dan ROI berbobot 0,70 sedangkan video 0,30, jadi membuang metrik yang sudah sah demi satu yang gagal lebih merugikan. Konsekuensinya harus disadari penilai — `jumlah_video: 0` bisa berarti "memang tak menerbitkan video" atau "cacahannya gagal", dan hanya log service yang membedakannya. Berbeda dari metrik lain, di sini nol **tidak** jatuh ke `manual`.
+
 ## Belum terdokumentasi (ada di kode, bukan di dok ini)
 
-Terhitung 2026-08-07, tiga route produksi terdaftar tetapi belum punya baris di tabel mana pun di atas. Ketiganya mendarat di `main` **sesudah** audit 2026-08-02 dan **bukan** bagian dari pekerjaan halaman depan, jadi didaftar apa adanya di sini alih-alih dikarang semantiknya:
+Terhitung 2026-08-11, dua route produksi terdaftar tetapi belum punya baris di tabel mana pun di atas. Keduanya mendarat di `main` **sesudah** audit 2026-08-02 dan **bukan** bagian dari pekerjaan halaman depan, jadi didaftar apa adanya di sini alih-alih dikarang semantiknya:
 
 | Method | Path | Berkas |
 |---|---|---|
 | GET | `/toko` | `toko.go` |
-| GET | `/kpi/kinerja-toko` | `kpi_kinerja_toko.go` |
 | GET | `/profit/items` | `handler_mart.go` |
 
 Menyebutkan keberadaannya lebih berguna daripada menghilangkannya: dok yang diam soal route yang ada membuat pembacanya mengira daftar ini lengkap. `/sync-docs` berikutnya yang menyentuh service ini semestinya melengkapinya.

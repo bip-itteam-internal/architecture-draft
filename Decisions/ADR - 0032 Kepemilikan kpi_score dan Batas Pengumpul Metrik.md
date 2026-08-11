@@ -1,6 +1,27 @@
-**Status**: ⚠️ Diputuskan 2026-07-31; fondasinya sudah ditulis di branch `feat/kpi-auto-value` (**belum merge, belum deploy**), sisanya belum. Tidak ada satu pun metrik KPI yang terisi otomatis di produksi hari ini. Analisis yang mendasarinya ada di [[HRIS - Otomasi Skor KPI]].
+**Status**: ⚠️ Diputuskan 2026-07-31; keputusan pokoknya **tetap berlaku**, tetapi catatan status lamanya sudah basi. Fondasinya **sudah merge dan sudah deploy** ke produksi 1 Agustus 2026 (PR #843/#857/#866), dan **tiga metrik Tech Development benar-benar terisi otomatis di produksi sejak 6 Agustus 2026** — kalimat lama "branch `feat/kpi-auto-value` belum merge, belum deploy" dan "tidak ada satu pun metrik KPI yang terisi otomatis" **sudah tidak berlaku**. Sejak itu otomasi berkembang jauh melampaui Fase 1 yang dibayangkan ADR ini; ringkasannya di bab **Perkembangan sesudah keputusan** di bawah. Analisis yang mendasarinya ada di [[HRIS - Otomasi Skor KPI]].
 
 > **Penyempitan yang disepakati saat implementasi Fase 1**: butir 4 di bawah menyebut pintu masuk berupa **endpoint tulis**. Fase 1 justru **menghitung di sisi baca** (`GET /kpi/auto-values`, plus stempel saat submit `POST /kpi`), dan itu disengaja. Alasannya ada di kode yang sudah berjalan: `ApplyKPIValues` menolak submit yang tak memuat SELURUH label, dan `POST /kpi` menimpa dokumen skor dengan `ReplaceOne`, sehingga nilai yang dititipkan terpisah pasti tersapu pada submit berikutnya. Endpoint tulis tetap berlaku untuk Fase 2, saat collector eksternal benar-benar ada. Keputusan pokoknya (kepemilikan data, satu pintu bergerbang, DRAFT) tidak berubah.
+
+## Perkembangan sesudah keputusan
+
+Ditambahkan 2026-08-11, grounded ke `origin/main` bip-erp. Bab ini **tidak mengubah keputusannya**; ia mencatat bahwa dua premis angka di dalamnya sudah lewat.
+
+**Pemicu ekstraksi collector di butir 6 SUDAH TERLAMPAUI, dan pemisahannya tetap tidak dikerjakan.** Butir 6 menetapkan tiga konektor keluar sebagai salah satu pemicunya. Konektor keluar employee-service yang benar-benar terdaftar di `main` kini **empat**, seluruhnya lewat `os.Getenv` ke modul lain, bukan lewat `InternalURL`:
+
+| Sumber | Berkas | Menarik dari |
+|---|---|---|
+| `uptime_sistem` (metrik `uptime`, `downtime`) | `kpi_sumber_uptime.go` | `MONITORING_MODULE_URL` — [[Microservices - Monitoring Service]] |
+| `kaizen_ide_diajukan`, `kaizen_ide_diterapkan` | `kpi_sumber_kaizen.go` | `FORM_BUILDER_MODULE_URL` — [[Microservices - Form Builder Service]] |
+| `kinerja_toko` (7 metrik) | `kpi_sumber_kinerja_toko.go` | `MARKETING_ANALYTICS_MODULE_URL` — [[Microservices - Marketing Analytics Service]] |
+| `kinerja_tiket` (3 metrik) | `kpi_sumber_tiket.go` | `TASK_MANAGEMENT_MODULE_URL` — [[Microservices - Task Management Service]] |
+
+Ditambah `skor_tim` yang membaca `kpi_score` employee-service sendiri (bukan konektor keluar), dan `akurasi_aset_ga` (`kpi_sumber_aset.go`) yang menarik dari **dua** modul sekaligus (inventory dan integration) — jadi begitu ia masuk, hitungannya menjadi enam.
+
+**Yang belum diputuskan: apakah angka tiga masih pemicu yang bermakna.** Dua pemicu lainnya belum terpenuhi — tak ada penjadwalan di luar siklus HR (perhitungan tetap on-read, tak ada cron KPI), dan employee-service belum menyimpan kredensial non-HR (yang dipegangnya hanya kunci layanan per-service, bukan token iklan atau kredensial Accurate). Ongkos yang dikhawatirkan ADR ini ternyata tidak muncul: tiap konektor adalah satu berkas `kpi_sumber_*.go` yang tak menyentuh berkas milik orang lain, dan registry `DaftarkanSumber` memang dirancang supaya begitu. **TBD**: apakah pemicu konektor dicabut dan diganti pemicu yang benar-benar mengukur beban (mis. lama respons `GET /kpi/auto-values`, atau jumlah panggilan HTTP serial per permintaan), atau pemisahan memang dijalankan sekarang.
+
+**Butir 3 dan 5 sudah dijalankan; butir 4 masih berbeda dari kenyataan.** Endpoint tulis bergerbang di butir 4 tetap tidak ada — perhitungan tetap di sisi baca, sesuai penyempitan yang dicatat di blockquote atas. `auto_value` terpisah dari `value` sudah berjalan (butir 3), dan supervisor tetap memverifikasi sebelum menyimpan (butir 5). **Jejak alasan saat supervisor menimpa angka sistem masih belum ada**; penimpaan hanya terdeteksi dari `value != auto_value`.
+
+**Konfigurasi otomatis kini punya jejak perubahannya sendiri** (`kpi_template_audits`, PR [#1053](https://github.com/bip-itteam-internal/bip-erp/pull/1053)) — koleksi terpisah di `employee_db`, jadi kepemilikan datanya tak berubah. Rincian dan batasnya di [[HRIS - Otomasi Skor KPI]].
 
 ## Context
 
@@ -50,7 +71,7 @@ Fakta yang membatasi jawabannya:
 
 **Yang belum dikerjakan:**
 
-- Seluruh Fase 1 sampai Fase 4 di [[HRIS - Otomasi Skor KPI]] masih rencana.
+- ⚠️ **Sudah basi**: kalimat lama "seluruh Fase 1 sampai Fase 4 masih rencana". Fase 1 butir 2 **selesai dan deploy**; enam sumber terdaftar, tiga metrik menyala di produksi. Yang masih rencana: penyambungan insentive-service ke `kpi_score` (Fase 1 butir 1), auto-fill ICC (butir 3), auto-fill kedisiplinan (butir 4), dan seluruh Fase 2 sampai 4. Status per fase yang mutakhir dipelihara di [[HRIS - Otomasi Skor KPI]], bukan di sini.
 - **Pemetaan karyawan ke toko atau advertiser belum memadai.** Metrik marketing bersifat per toko, per kampanye, atau per video, sedangkan KPI dinilai per orang. Satu-satunya pemetaan yang ada, `employee_performance_mappings` di insentive-service, berisi **3 dokumen** di produksi. Tanpa membereskan ini, metrik iklan tidak dapat dibebankan ke orang yang tepat walaupun angkanya sudah tersedia.
 - **Label metrik belum layak dijadikan kunci otomasi.** Label adalah identitas unik metrik di kode, tetapi produksi memuat label seperti `Performa 1/2/3`, `Administrasi 1/2/3/4`, dan `Revenue 240M` yang maknanya hanya ada di kolom deskripsi. Ada pula satu template uji (`Beauty Hacks / Buzzer / "Buzzer"` berisi metrik `contoh` bobot 1.0) dan satu metrik duplikat (`Warehouse Leader`, over-dispensing tercatat dua kali). Pembersihan ini prasyarat, bukan pekerjaan kosmetik.
 - **Insentive-service belum menyetor hasilnya ke `kpi_score`**, sehingga duplikasi pengetikan untuk tim marketing masih berlangsung.
