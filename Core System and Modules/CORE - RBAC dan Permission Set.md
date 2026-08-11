@@ -131,6 +131,22 @@ Dua sakelar terakhir menuntut penegaknya tinggal di shared-library (dipakai empl
 
 Dua temuan yang **tidak** dikerjakan dan menunggu keputusan: (1) ketiga paket procurement membundel `bayar.save`, sehingga pemisahan per-risiko di katalog — yang alasannya ditulis sendiri di kodenya: *membuat tagihan hanya mengakui utang, membayar memindahkan uang* — tak terpakai di tingkat paket; (2) 17 menu procurement tak satu pun bertanda izin, jadi kategori yang terbuka menampilkan seluruh pohonnya.
 
+**Audit RBAC Quality (2026-08-11) — departemen terkunci dari MODULNYA SENDIRI, kelas yang sama dengan Procurement.**
+
+Seluruh modul Quality di employee-service — batch release, CAPA, komplain QC, incoming/RM check (`services/employee/quality_*.go`) — digerbang `RequireQualityStaff`/`RequireQualitySupervisor` yang membaca `system_roles.quality`. **Tak satu pun karyawan Quality memegang peran itu**: penurunan peran hanya memberi `manufacture: qc` (tab WMS `batch_record`/`rekon_mo`), sementara `quality` tak pernah ada, dan **tak ada paket `quality`** di `master_permission_set` — jadi peran adalah SATU-SATUNYA jalur. Dibuktikan lewat gateway: QA Leader ber-`manufacture:qc` pun dibalas **403** di `/quality/batch-releases`, Quality Supervisor tanpa peran apa pun. Sesudah perbaikan: **200** untuk Quality Supervisor, QA Leader, dan QC Production.
+
+Diperbaiki di tabel penurunan peran (`peran_dari_jabatan.go`), BUKAN paket — modul ini memang tak berkatalog. `manufacture: qc` dipertahankan (tab `rekon_mo` yang tak dibuka peran quality); `quality` ditambahkan; jabatan yang dulu absen dari tabel (**Quality Supervisor**, **QC Leader**) dimasukkan supaya tak jatuh ke "menu terbuka lalu halaman menolak".
+
+Tingkat SENGAJA least-privilege: **`quality: supervisor` hanya untuk jabatan Supervisor**, sisanya `staff`. Peran supervisor cuma menambah wewenang **DELETE** (batch release/CAPA/komplain/incoming) di atas staff — penghapusan catatan di lingkungan CPOB/GMP layak dikunci ketat. QA/QC Leader tetap `staff`: tetap bisa MEMBUAT & memfinalisasi batch release (rute itu `RequireQualityStaff`), hanya tak bisa menghapus. **CAPA approve tak terpengaruh** — gerbangnya `RequireCAPAApprover` = produksi (`manufacture` admin/ppic/spv) ATAU warehouse, bukan quality. Menaikkan Leader ke supervisor = keputusan pemilik produk QA.
+
+> ⚠️ Uji lama `TestJabatanAmbiguTidakDipetakan` yang mengunci "Quality Supervisor harus kosong" DIPERBARUI, bukan dihapus. Maksud aslinya — jangan `manufacture: supervisor` yang membuka SELURUH WMS jauh melebihi pengawasan mutu — tetap ditegakkan uji baru `TestQualitySupervisorBukanManufactureSupervisor`. Ia kini `manufacture: qc` (tab QC saja), bukan supervisor.
+
+**Audit RBAC Tech Development (2026-08-11) — ditinjau, TIDAK diubah (keputusan pemilik produk).**
+
+Kebalikan Quality: tak ada yang terkunci, justru berpotensi terlalu terbuka — dan itu **diterima sadar**. Jabatan dev (`Frontend Developer`, `Backend Developer`, dst.) membawa paket `hris_admin` + `recruitment_penyetuju` di tingkat POSISI, sehingga dev baru non-admin otomatis mendapat HR admin. Diminta **dibiarkan** (tim ini membangun & mengoperasikan ERP, akses luas disengaja). Departemennya punya atasan (`is_supervisor: true` pada dua Tech Development Supervisor), jadi bug "tak punya atasan" ala Procurement tak ada. Jabatan `IT Infrastructure` tanpa paket & tanpa pemegang — dorman, tak berbahaya.
+
+Dengan ini **sepuluh departemen tuntas** diaudit: HR · Finance · Manufaktur · Quality · Beauty Hacks · Kyura · General Affair · Kesekretariatan · Procurement · Tech Development.
+
 🔴 **Direktur = akses penuh seluruh sistem (2026-08-11). Corporate Secretary TIDAK.** Keputusan pemilik produk, dengan **hak tulis diterima eksplisit**. Ini titik di mana kesetaraan Direktur–Corporate Secretary **berhenti**: keduanya tetap setara dalam MEMUTUS (lihat paragraf berikutnya), tapi tidak dalam mengakses.
 
 Dikerjakan di tiga lapis, sebab satu lapis saja menghasilkan menu yang terbuka lalu halaman yang menolak:
