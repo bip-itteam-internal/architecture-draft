@@ -220,6 +220,20 @@ Koleksi `icc_affiliate_accounts` — **terpisah dari `icc_account_mappings`**: a
 - Anggota tim: assign/unassign member (`/marketing/teams/:id/members`)
 - **Shop ACL**: assign/unassign toko ke tim (`/marketing/teams/:id/shops`) — kontrol akses toko per tim marketing
 
+Koleksi `marketing_teams` + `team_shops`. **Dipakai [[Microservices - Marketing Analytics Service]]** sebagai sumber saringan divisi **dan satu-satunya sumber Shopee** untuk kolom penanggung jawab toko — jadi mencabutnya tanpa pengganti mengosongkan keduanya tanpa satu pun error. Isi produksi 2026-08-11 tipis: **3 tim** (`aris`, `BH`, `GB-KY` — tak satu pun cocok nama departemen), **1 anggota**, **5 toko**. Penyatuannya ke `department_shops` diputuskan di [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]].
+
+### Kepemilikan toko per departemen (`department_shops`)
+
+> Grounded ke `internal/domain/entity/department_shop.go` + `usecase/department_shop_usecase.go`. **Terbangun tetapi belum tersambung**: 0 dokumen di produksi, belum ada UI, belum ada pembaca.
+
+- `GET /department-shops` — daftar pemetaan · `RequireIntegrationStaff`
+- `GET /department-shops/kesehatan` — **laporan ketidakcocokan**: toko terotorisasi yang belum dipetakan (yatim) + pemetaan tanpa otorisasi (sisa) · `RequireIntegrationStaff`
+- `POST /department-shops` (upsert) · `DELETE /department-shops` — **`RequireIntegrationAdmin`**
+
+**Bukan pengganti `/marketing/teams`, melainkan jawaban pertanyaan yang berbeda.** Team Shop adalah **kontrol akses** — satu toko boleh dilihat banyak tim. `department_shops` adalah **kepemilikan**, dan karenanya tunggal: satu toko yang dimiliki dua departemen membuat omzetnya terhitung dua kali dan menaikkan skor dua supervisor sekaligus. Ketunggalan ditegakkan index unik `(channel, shop_id)`.
+
+`Department` disimpan sebagai **nama** departemen milik employee-service — kopling longgar yang di sistem ini **terbukti bisa membusuk**: `icc_account_mappings.team` pernah menulis "Tech Development" untuk 12 mapping karyawan yang `work_data`-nya Kyura/Beauty Hacks (diperbaiki 2026-08-07). Karena itu endpoint `/kesehatan` **bagian wajib fitur, bukan tambahan**. `ShopName` hanya untuk tampilan dan **tidak pernah** dipakai mencocokkan: nama toko di produksi ada yang berspasi di ujung dan ada yang beda hanya huruf besar-kecil.
+
 ### Fulfillment (WMS Bridge — internal)
 
 > Endpoint internal untuk WMS Tinggarjaya. Dilindungi oleh gateway key global (`ValidateGateway`) — tidak ada middleware tambahan. Grounded: `usecase/warehouse_bridge_usecase.go`, `interface/http/warehouse_bridge_handler.go`.
