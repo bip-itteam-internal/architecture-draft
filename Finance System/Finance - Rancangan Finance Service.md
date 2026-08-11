@@ -66,7 +66,9 @@ Kontrak `SumberCuplikan` menyatakannya harfiah: *"Sumber tidak menghitung nilai 
 
 Endpoint AR (`/orders/piutang/summary`, `/accounting/receivables`) tidak punya dimensi karyawan, sehingga AR Leader dan ketiga AR Staf menerima **angka yang sama**. Ini **bukan cacat**: seluruh toko dikelola bersama oleh tim AR Sales, jadi tidak ada pembagian per orang yang bisa diukur. Pemetaan karyawan→toko seperti `icc_account_mappings` di [[Sales - ICC Account Manager Mapping]] **tidak diperlukan di sini**.
 
-Konsekuensi yang diterima sadar: metrik AR menilai **kinerja tim**, bukan membedakan individu. Pembeda antar-orang harus datang dari metrik lain di templatnya.
+Konsekuensi yang diterima sadar: metrik AR menilai **kinerja tim**, bukan membedakan individu. Pembeda antar-orang harus datang dari metrik lain di templatnya. Bila kelak perlu dibedakan per orang, `TargetBerlaku` sudah mendukung `target_per_karyawan` — cukup lewat target, tanpa menyentuh metriknya.
+
+Kesiapan teknis rumpun AR beserta endpoint dan celahnya ada di bab **Rumpun AR** di bawah.
 
 **Di luar lingkup, beserta alasannya**
 
@@ -338,6 +340,45 @@ sequenceDiagram
 **Nilai otomatis berstatus DRAFT, bukan final** (ADR-0032 butir 5). Supervisor tetap memverifikasi sebelum periode ditutup.
 
 > ⚠️ **Metrik yang datanya belum ada wajib mengembalikan GALAT, bukan nol.** Nol di sini berarti seseorang dinilai nol karena datanya belum masuk. Prinsip ini sudah tertulis di [[HRIS - Alur KPI Otomatis]] dan dikunci di sumber `kinerja_toko` yang ada.
+
+## Rumpun AR — jalur tercepat menuju metrik pertama yang menyala
+
+AR tidak menginput apa pun ke service ini; metriknya lewat fasad KPI (opsi B). Tetapi ia **satu-satunya rumpun yang tidak menunggu satu pun keputusan Finance**, sehingga layak dikerjakan lebih dulu bila tujuannya membuktikan rantai otomasi bekerja.
+
+### Pemetaan metrik ke endpoint
+
+| Metrik | Bobot | Endpoint | Siap? |
+|---|---:|---|---|
+| AR Leader — piutang aging >60 hari <5% | 0,30 | `GET /transactions/orders/piutang/tren` | ✅ **siap** |
+| AR Staf Piutang — penagihan >60 hari <5% | 0,20 | sama | ✅ **siap** |
+| AR Leader — pengawasan AR aging ≤14 hari | 0,30 | — | ⚠️ `Lebih14` belum dibawa |
+| AR Staf Piutang — penagihan >14 hari <5% | 0,20 | — | ⚠️ idem |
+| AR Leader — Monitoring Team | 0,20 | `skor_tim` (employee-service) | 🔴 `supervisor_id` kosong |
+| AR Staf — Pencatatan Piutang / Retur | 0,90 | — | 🔴 vonisnya patut dikoreksi, lihat bawah |
+
+Metrik >60 hari tinggal `lebih60 ÷ total_terbuka × 100`.
+
+### Kenapa `/tren`, bukan `/summary`
+
+`GET /orders/piutang/summary` menghitung umur relatif terhadap **hari ini** (`piutangCutoffs(now)`), jadi tak dapat menilai bulan yang sudah lewat. `GET /orders/piutang/tren?bulan=N` mengembalikan posisi per **akhir bulan** hingga 12 bulan ke belakang — itulah bentuk yang dibutuhkan KPI periodik.
+
+**Bulan berjalan sengaja tidak ikut** di tren; posisinya belum final. Konsekuensinya wajar: KPI baru dapat dinilai setelah bulannya berakhir.
+
+### Dua hal yang wajib diketahui sebelum menyambungnya
+
+⚠️ **`Lebih14` belum ada di posisi historis.** `PiutangPosisiRow` hanya membawa `TotalTerbuka` dan `Lebih60`, padahal cutoff 14 hari **sudah dihitung** di `piutangCutoffs`. Menambahkannya pekerjaan kecil di pipeline yang sudah ada, murni IT — dan ia membuka 0,50 bobot lagi.
+
+⚠️ **Deret historisnya rekonstruksi, bukan snapshot.** Handler-nya menuliskannya sendiri: *"order yang batal atau retur dikeluarkan per tanggal kejadiannya, bukan snapshot yang tersimpan bulan itu."* Artinya skor Agustus yang dihitung September bisa berbeda bila dihitung ulang Oktober. `auto_value` yang tersimpan saat submit ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] butir 3) sudah membekukannya — **jangan pernah menghitung ulang skor periode yang sudah tertutup**.
+
+### 🔴 Dua vonis matriks yang patut dikoreksi — bobot gabungan 0,90
+
+`Pencatatan Piutang` (AR Staf 0,40) dan `Pencatatan Retur` (AR Retur 0,50) divonis 🟢 *"bisa otomatis dari Accurate live proxy"* di [[HRIS - Matriks KPI per Departemen]]. Tetapi targetnya berbunyi *"input data selesai **maks tanggal 3 bulan berikutnya**"* — yang diukur **ketepatan waktu input manusia**, bukan angka piutang. Saldo di Accurate tidak menyimpan kapan seseorang mengetiknya.
+
+Kelas kekeliruan yang sama dengan metrik temuan pajak: sumber datanya ada, tetapi bukan sumber untuk hal yang diukur. Wajib diperiksa ke pemilik metrik sebelum dijanjikan otomatis.
+
+### Penghalang di luar data
+
+Keduanya sudah tercatat di audit KPI dan **bukan pekerjaan dev**: template duplikat `AR STAFF PIUTANG` (empat template berbeda sama-sama berposisi `AR Staff`; menyalakan otomasi sebelum dibereskan membuat hasilnya menempel di rubrik yang salah), dan `supervisor_id` kosong untuk seluruh 19 karyawan Finance.
 
 ## Cara Master Data Terisi
 
