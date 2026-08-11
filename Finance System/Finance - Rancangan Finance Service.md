@@ -40,7 +40,9 @@ Bukti bahwa datanya **ada tetapi di luar sistem**: tiga rekap bulanan yang disus
 
 `GET /internal/kpi/metrics` melayani **seluruh metrik departemen Finance**, bukan hanya metrik dari master milik service ini. Termasuk AR (piutang, retur) dan AP, yang datanya tetap milik [[Microservices - Integration Service]] — finance-service hanya **meneruskan**, tidak menghitung ulang.
 
-Alasannya: satu konektor keluar dari employee-service, bukan dua. Pemicu ekstraksi `kpi-collector` di [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] sudah terlampaui di angka lima, jadi menambah dua sekaligus memperburuknya tanpa imbalan.
+Alasannya: satu konektor keluar dari employee-service, bukan dua.
+
+> ⚠️ **Alasan itu melemah sejak 2026-08-11.** [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] kini mencatat bahwa ongkos yang dikhawatirkannya **tidak muncul** — tiap konektor hanya satu berkas `kpi_sumber_*.go` yang tak menyentuh berkas milik siapa pun — dan bahwa **apakah angka tiga masih pemicu yang bermakna sudah jadi TBD di ADR itu sendiri**. Bila pemicunya dicabut, opsi A (AR punya konektor sendiri langsung ke integration-service) jadi lebih bersih secara arsitektur, karena finance-service tak lagi menjadi perantara bagi data yang tidak dimilikinya maupun dihitungnya. Keputusan opsi B **ditinjau ulang** saat pemicu itu diputuskan.
 
 **Tiga metrik sengaja DI LUAR fasad ini** — sumbernya bukan ranah Finance dan sudah punya jalurnya sendiri:
 
@@ -410,7 +412,7 @@ Semua bentuk di bawah **sudah pernah terjadi** di repo ini; masing-masing wajib 
 ## Kendala
 
 - **Menyentuh `shared-library`** (konstanta env, katalog izin, kategori inbox) memicu **redeploy seluruh service** sekali — `deploy.yml` memperlakukan perubahan shared sebagai perubahan semua service.
-- **Pemicu ADR-0032 untuk mengekstrak `kpi-collector` sudah terlampaui.** ADR itu menetapkan ekstraksi saat konektor keluar employee-service mencapai **tiga**; hari ini sudah **lima** (`kinerja_toko`, `kinerja_tiket`, `uptime_sistem`, `kaizen` ×2, `akurasi_aset`). Rencana ini menambah yang keenam. Penyimpangan disengaja dan perlu keputusan terpisah.
+- **Pemicu ADR-0032 untuk mengekstrak `kpi-collector` sudah terlampaui.** ADR menetapkan ekstraksi saat konektor keluar employee-service mencapai **tiga**; per pembaruan ADR 2026-08-11 sudah **empat** yang terdaftar di `main` (`uptime_sistem`, `kaizen`, `kinerja_toko`, `kinerja_tiket`), menjadi **enam** begitu `akurasi_aset_ga` masuk karena ia menarik dari dua modul. Rencana ini menambah satu lagi. Penyimpangan disengaja; ADR itu sendiri kini mempertanyakan apakah pemicunya masih bermakna.
 - **Grain RAPB belum diketahui** — lihat TBD. Menahan jalur entri OPEX, tidak menahan Tax maupun Cost Control.
 - **Konfigurasi matriks KPI bukan pekerjaan service ini.** Membangun modul tidak menyalakan KPI; yang menyalakan adalah pengisian `kpi_template` menurut [[RUN - Menambah Metrik KPI Otomatis]]. Tanpa pemilik langkah itu, hasilnya berulang seperti master anggaran hari ini: modulnya jadi, datanya kosong.
 
