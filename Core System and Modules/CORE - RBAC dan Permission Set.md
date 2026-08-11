@@ -135,6 +135,12 @@ Dua sakelar terakhir menuntut penegaknya tinggal di shared-library (dipakai empl
 
 Koreksi itu perlu karena penurunan ke `finance_view` **melenyapkan menu Ruang Direktur sepenuhnya** — item sidebarnya digerbang `perm: "finance.profit.view"`, dan hanya `finance_admin` yang membawanya. Laporan awal menyebut akibatnya "tab Keuangan kosong"; itu keliru, sebab yang diperiksa cuma gerbang tab dan gerbang panel, bukan gerbang MENU. Satu `grep -rn "finance.profit.view"` akan menangkapnya sebelum apa pun diubah.
 
+**Menu Ruang Direktur juga terbuka untuk supervisor & admin IT (2026-08-10).** `finance.profit.view` menggerbangi **satu** menu saja, jadi fallback perannya sebenarnya menjawab *"boleh membuka layar itu"*, bukan *"boleh melihat angka laba"* — dan selama ia `financeAdminSaja`, tim yang merawat ERP tak bisa membuka layar yang mereka rawat. Kini `financeAdminSaja || itSupervisorPlus` di `utils/menu-permission.ts`. **Staf IT sengaja di luar**: yang diminta supervisor, sementara `isItMember` (dipakai fallback finance lain) memasukkan staf juga.
+
+Yang dilonggarkan **menu, bukan data**. Angka labanya dijaga dua lapis yang tak tersentuh: panel Ringkasan Keuangan memeriksa `can(permissions, "finance.profit.view", false)` — klaim saja, tanpa fallback peran — dan `useCanViewProfit` memakai whitelist `employee_id`. Konsisten dengan [[ADR - 0031 Prefix internal Bukan Batas Keamanan]]: menu bukan gerbang.
+
+⚠️ **Jalur klaim mendahului fallback peran** (`bolehMenu`: `klaimMemuatModul` dulu, baru `FALLBACK`). Akibatnya supervisor IT yang kebetulan memegang paket finance **tanpa** izin laba tetap tak melihat menunya. Bukan regresi — aturan lama — tapi kini ada tesnya, sebab perilaku ini paling mungkin ditemukan lewat kebingungan.
+
 > ⚠️ **Aturan kerja yang lahir dari situ: sebelum mencabut sebuah izin dari jabatan, grep string izinnya ke SELURUH repo frontend.** Satu izin bisa menggerbangi tiga hal sekaligus — item menu, tab halaman, dan isi panel — dan memeriksa satu di antaranya menghasilkan laporan yang salah dengan percaya diri.
 
 `profit.view` sengaja TIDAK ditambahkan ke `finance_view`: paket itu juga dipegang Junior Accountant, Cost Control, dan Tax Staff, sehingga angka laba akan ikut terbuka ke tiga jabatan itu. Yang turun tetap turun — `ar.export`, `payout.view`, dan `kastoko.view` lepas dari Direktur.
