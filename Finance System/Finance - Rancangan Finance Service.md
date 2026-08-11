@@ -2,11 +2,11 @@
 
 ## Deskripsi
 
-*Rancangan service baru yang menampung **master data yang hari ini tidak punya rumah di ERP mana pun** — kewajiban pajak, pelaporan SPT, temuan kepatuhan, register penghematan, dan forecast kas. Tujuannya bukan menambah dashboard, melainkan **memasok angka yang membuat KPI divisi FAT bisa terisi sendiri**. Master anggaran OPEX yang sudah ada di [[Microservices - Integration Service]] **tidak dimigrasi**; service ini membacanya lewat HTTP.*
+*Rancangan service baru yang menampung **master data yang hari ini tidak punya rumah di ERP mana pun** — kewajiban pajak, pelaporan SPT, temuan kepatuhan, rekomendasi efisiensi, dan forecast kas. Tujuannya bukan menambah dashboard, melainkan **memasok angka yang membuat KPI divisi FAT bisa terisi sendiri**. Master anggaran OPEX yang sudah ada di [[Microservices - Integration Service]] **tidak dimigrasi**; service ini membacanya lewat HTTP.*
 
 - **Stack**: Go + Fiber + MongoDB (pola `calendar-service`: flat `package main`)
 - **Path di repo**: `bip-erp/services/finance/` — **TBD, belum dibuat**
-- **Status**: 🟡 Konsep — menunggu persetujuan rencana & file Excel RAPB
+- **Status**: 🟡 Konsep — RAPB sudah dibaca dan grain-nya terjawab; kini menunggu **sepuluh keputusan Finance** (lihat bab tersendiri di bawah)
 - **Konsep induk**: [[Finance - Big Pictures]] · **Konsumen tampilan**: [[Finance - Dashboard per Posisi (FAT)]]
 
 ## Latar Belakang
@@ -75,6 +75,26 @@ Konsekuensi yang diterima sadar: metrik AR menilai **kinerja tim**, bukan membed
 - **Modul Kaizen / ide inovasi** — sudah ada sejak 6 Agustus 2026 di [[Microservices - Form Builder Service]], dan sumber KPI-nya (`kaizen_ide_diajukan`, `kaizen_ide_diterapkan`) sudah terdaftar di employee-service. Tinggal dikonfigurasi, bukan dibangun.
 - **Log 1-on-1** — menahan ~10 baris metrik Finance, tetapi lintas-departemen dan lebih dekat ke ranah HRIS.
 - **Rekonsiliasi pajak per nomor faktur** — mustahil hari ini: penjualan digunggung dan `taxNumber` kosong pada 22 dari 22 sampel probe Accurate.
+
+### Apa yang Finance sendiri minta — kolom `SISTEM ERP`
+
+Tiap baris di workbook KPI FAT punya kolom **`SISTEM ERP`** berisi fitur yang diharapkan pemilik metriknya. Kolom itu **tidak ada di `kpi_template`**, jadi selama ini pernyataan Finance tentang ekspektasi fiturnya hanya hidup di Excel dan tak terbaca siapa pun di luar berkas itu.
+
+| Sheet | Metrik | Fitur yang diminta |
+|---|---|---|
+| Tax Officer | **7 dari 9** | `FITUR UP DOKUMEN` — SPT Masa: `(UPPROV SPV)` |
+| Tax Officer | ide inovasi · 1-on-1 | `FITUR IDE KAIZEN` · `FITUR KALENDER` |
+| Cost Control | varians OPEX | `DONE (DIMENU AR)` |
+| Cost Control | 3 metrik | `PENAMBAHAN FITUR LAPORAN ANGGARAN VS REALISASI` (satu: `BREAKDOWN MINGGUAN`) |
+| Cost Control | kas iklan | `DONE (MENU BEBAN IKLAN)` |
+| SPV FAT | 3 metrik | `PENAMBAHAN FITUR LAPORAN ANGGARAN VS REALISASI` |
+| SPV FAT | KPI tim | `DONE` |
+
+Dua hal yang dikonfirmasinya, dan satu yang dibantahnya:
+
+- ✅ **Master OPEX dan Cost Control memang yang diminta** — *"laporan anggaran vs realisasi"* persis modul itu.
+- ✅ **Kaizen dan Kalender di luar lingkup**, sesuai keputusan yang sudah diambil.
+- ⚠️ **Untuk Tax, Finance meminta unggah dokumen, bukan input berstruktur.** Rancangan ini **sengaja menyimpang**: dokumen yang diunggah hanya membuat KPI dapat **diaudit**, sedangkan tanggal berstruktur membuatnya dapat **dihitung mesin** — dan tujuan yang ditetapkan adalah KPI otomatis. Penyimpangan ini mengubah instrumen penilaian, jadi **wajib disetujui SPV FAT** (keputusan Finance #5), bukan diputuskan IT.
 
 ## Peta Aktor & Service
 
@@ -333,7 +353,7 @@ Bagian ini menjawab pertanyaan yang menentukan berhasil-tidaknya seluruh rancang
 
 | Master | Sumber awal (seed) | Jalur rutin | Pemicu pengisian |
 |---|---|---|---|
-| Anggaran OPEX | Backfill Feb–Jul 2026 dari rekap yang sudah ada | RAPB tahunan sekali + revisi | Kartu varians menampilkan cacah akun belum dianggarkan |
+| Anggaran OPEX | **RAPB 2026 Rev 2** — Juli s.d. Desember, ~222 baris | RAPB tahunan sekali + revisi | Kartu varians menampilkan cacah akun belum dianggarkan |
 | Kewajiban pajak | Master jenis kewajiban, 5–6 baris, sekali | Baris per masa **dibangkitkan sistem** | Notifikasi H-7/H-3 berpintu langsung ke barisnya |
 | Register penghematan | 3 rekomendasi Juli yang sudah tertulis di rekap cost driver | 3 rekomendasi per bulan | KPI-nya sendiri sudah mewajibkan 3 per bulan |
 | Klasifikasi deductible | Sekali, ~55 akun beban dari katalog Accurate | Hanya saat ada akun baru | Antrean akun baru tanpa klasifikasi |
@@ -341,14 +361,30 @@ Bagian ini menjawab pertanyaan yang menentukan berhasil-tidaknya seluruh rancang
 
 ### Anggaran OPEX — impor, bukan pengetikan
 
-Angkanya **sudah ada**: RAPB Juli Rp 6.684.636.073 tersebar di ~55 akun. Yang menghalangi bukan kemauan, melainkan bentuk:
+Angkanya **sudah ada dan sudah diperiksa**. Sumbernya `RAPB 2026 Rev 2_Juli s.d Des`, sheet `RAPB Juli - Des 2026`:
 
-- **Unggahan harus menerima NAMA akun**, bukan hanya kode. Rekapnya memakai nama, dan nama-nama itu **persis nama akun Accurate** — resolusinya mekanis lewat `GET /accounting/anggaran/katalog` yang sudah ada. Nama ganda atau tak dikenal masuk ke laporan `baris_ditolak` yang mekanismenya sudah jalan.
-- **Template unduh terisi katalog akun & departemen**, supaya format wajibnya tidak perlu ditebak dari kode parser.
-- **Salin dari periode sebelumnya** dan **isi setahun sekaligus** (12 kolom bulan). Tanpa ini, satu tahun berarti ribuan baris diketik ulang.
-- **Backfill Feb–Jul 2026** dari enam rekap yang sudah ada. Begitu masuk, kartu varians, bagan varians per pos, tren OPEX enam periode, dan Ringkasan Divisi **hidup seketika tanpa satu baris frontend baru**.
+| | |
+|---|---|
+| Baris akun (bagian operasional, kolom C) | 46 |
+| Punya keenam bulan penuh | 35 |
+| Punya minimal satu nilai | 37 |
+| Namanya cocok bagan akun Accurate | **37 dari 46** |
+| Perkiraan baris anggaran | 37 × 6 ≈ **222** |
+| Cakupan periode | **Juli–Desember 2026** |
 
-> ⚠️ Backfill hanya bisa lengkap untuk baris berbudget > 0. **17 baris berbudget 0 tidak dapat dipastikan** tanpa Excel sumbernya: ia bisa berarti anggota kelompok anggaran, atau memang tidak dianggarkan. Perbedaannya menentukan angka varians totalnya — lihat TBD #1.
+Yang menghalangi bukan kemauan maupun kelengkapan, melainkan bentuk:
+
+- **Unggahan harus menerima NAMA akun.** RAPB **tidak memuat kode akun sama sekali** — hanya nama, dan nama-nama itu nama akun Accurate. Resolusinya mekanis lewat `GET /accounting/anggaran/katalog` yang sudah ada; nama ganda atau tak dikenal masuk ke laporan `baris_ditolak` yang mekanismenya sudah jalan.
+- **Parser harus membaca layout bulan-per-kolom.** RAPB berbentuk **lebar** (enam kolom bulan), parser sekarang menuntut bentuk **panjang** (satu baris per akun × bulan). Ini membuktikan fitur "isi setahun sekaligus" bukan kenyamanan — **itu bentuk asli sumbernya**. Menuntut Finance merombaknya jadi 222 baris tiap revisi hanya memindahkan pekerjaan.
+- **Baris induk WAJIB dibuang.** Kolom B adalah induk dan nilainya sudah memuat anaknya; ikut terunggah berarti total anggaran berlipat. Di file tak ada penanda induk selain posisi kolom B versus C. Aturannya sudah ada presedennya di entity (`JumlahRealisasiDaun` membuang `isParent`), tetapi jalur unggah anggaran belum menerapkannya.
+- **Template unduh terisi katalog akun**, supaya format wajibnya tidak perlu ditebak dari kode parser.
+- **Tidak ada dimensi departemen** di RAPB — sheet `BREAKDOWN` ternyata soal target brand & HPP produk, bukan pecahan OPEX per departemen. Semua baris masuk sebagai `departemen=""` (seluruh perusahaan). Model mendukungnya eksplisit, dan KPI Cost Control memang diukur se-perusahaan; KPI General Affair yang butuh per-departemen tetap tak terlayani.
+
+> ⚠️ **Feb–Juni tidak ada di berkas ini** (namanya "Rev 2_Juli s.d Des"). Yang bisa langsung hidup: **Juli–Desember, termasuk Agustus** — bulan berjalan. Backfill tren enam bulan ke belakang, yang dipakai bagan Penurunan OPEX, menuntut revisi RAPB sebelumnya.
+
+> ⚠️ Pembanding "cocok bagan akun Accurate" di atas adalah rekap realisasi Juli, **bukan katalog Accurate penuh**. Tiga baris berisi yang tak cocok (`Beban Iuran & Sumbangan`, `Beban Entertainment Adum`, `Beban Bank`) mungkin tetap ada di Accurate dengan realisasi nol pada Juli. Validasi sebenarnya terjadi saat unggah.
+
+> 🔴 **Halaman masternya sendiri sedang rusak.** `GET /accounting/anggaran` membalas 200 dengan `"anggaran": null` untuk periode kosong; penjaga bentuk di FE menolaknya, sehingga layar menampilkan "Gagal memuat master anggaran" untuk **setiap** pengunjung. Diperbaiki di PR terbuka `fix/anggaran-daftar-array-kosong` (bip-erp + erp-frontend), **belum merge**. Selama itu, mengunggah RAPB tak akan terlihat hasilnya.
 
 ### Kewajiban pajak — dibangkitkan, bukan dibuat
 
@@ -356,9 +392,13 @@ Tax Officer **tidak membuat baris**. Master jenis kewajiban diisi sekali (PPh 21
 
 **Notifikasi H-7/H-3 sekaligus menjadi pintu masuk pengisian** — tiap pengingat membawa `deep_link` ke baris yang harus dilengkapi. Pengingat yang hanya memberi tahu tanpa membuka pintunya akan diabaikan.
 
-### Register penghematan — memindahkan, bukan menambah
+### Rekomendasi efisiensi — menempel pada laporan varians, bukan register tersendiri
 
-KPI Cost Control **sudah mewajibkan minimal 3 rekomendasi efisiensi per bulan**, dan rekomendasi itu memang sudah ditulis — tiga di antaranya ada di rekap cost driver Juli. Jadi ini bukan pekerjaan baru, hanya pindah tempat: dari narasi PDF ke baris yang bisa dilacak status realisasinya.
+Rancangan awal mengusulkan modul "register penghematan". **Itu dicabut**: workbook KPI FAT tak menyebut penghematan sama sekali. Yang diminta Cost Control adalah *"laporan realisasi anggaran **dengan rekomendasi efisiensi**"* — rekomendasinya menempel pada laporan varians yang sudah dibangun, bukan modul berdiri sendiri.
+
+Konsekuensi baiknya dua: tak ada tandingan bagi `ProcurementSaving` di employee-service, dan pekerjaannya menyusut jadi satu tab pada layar yang memang sudah ada.
+
+KPI Cost Control **sudah mewajibkan minimal 3 rekomendasi efisiensi per bulan**, dan rekomendasi itu memang sudah ditulis — tiga di antaranya ada di rekap cost driver Juli. Jadi ini bukan pekerjaan baru, hanya pindah tempat: dari narasi PDF ke baris yang dapat dilacak.
 
 ### Forecast kas — satu-satunya yang meminta pekerjaan baru
 
@@ -385,6 +425,49 @@ Rekomendasi: mulai dari **(a)**. Metrik yang terisi bulanan lebih berguna daripa
 3. **Register penghematan** → pindahkan 3 rekomendasi Juli
 4. **Klasifikasi deductible** → sekali jalan
 5. **Forecast kas** → terakhir, setelah bentuknya disepakati
+
+## Rancangan Frontend
+
+### Jalur entri ditentukan volume × frekuensi, bukan selera
+
+Unggah Excel bukan aturan menyeluruh — ia salah satu dari dua jalur yang **sudah hidup berdampingan** di `/finance/anggaran` (unggah untuk borongan, form satu baris untuk koreksi).
+
+| Master | Volume sekali isi | Frekuensi | Jalur utama |
+|---|---|---|---|
+| Anggaran OPEX | ~222 baris | setahun sekali + revisi | **Unggah Excel** — satu-satunya yang datanya memang lahir sebagai spreadsheet |
+| Breakdown mingguan forecast | 4–5 minggu × pos | tiap bulan | **Grid sunting inline**, diseed dari RAPB bulanan |
+| Rekomendasi efisiensi | 3 baris | tiap bulan | **Form** |
+| Register SPT | ~5 baris | tiap bulan | **Form**, atas baris yang dibangkitkan sistem |
+| Register temuan | 0–beberapa | insidental | **Form** |
+| Klasifikasi deductible | ~55 akun | sekali, lalu insidental | **Sunting massal inline** dari katalog Accurate |
+
+Memaksakan unggah Excel untuk tiga rekomendasi per bulan justru menambah langkah. Unggah hanya menang saat datanya sudah berbentuk tabel dan berjumlah ratusan.
+
+### Menu & rute
+
+Mengikuti pola entri datar per sub-modul di `financeMenus` (`components/layout/sidebar-menus.tsx`):
+
+```
+FAT — Finance, Accounting & Tax
+├── Anggaran OPEX     /finance/anggaran        ← sudah ada, diperluas
+├── Cost Control      /finance/cost-control    ← BARU
+└── Pajak             /finance/pajak           ← BARU
+```
+
+Dua entri baru saja; isi tiap modul dipecah jadi **tab di dalam halaman** memakai `CustomTabs`, bukan cabang menu — sidebar utama sudah memuat 131 menu.
+
+| Halaman | Tab |
+|---|---|
+| `/finance/cost-control` | Anggaran vs Realisasi · Forecast Mingguan · Rekomendasi Efisiensi |
+| `/finance/pajak` | SPT Masa · Temuan · Klasifikasi Akun |
+
+### Bentuk halaman
+
+Wajib pola **satu kartu**: `Banner bare` di dalam prop `toolbar` milik `MainTable`, seluruh keadaan di `useTableState`. Jangan merakit tabel, filter, atau paginasi sendiri. Prosedur dan gerbang verifikasinya ada di skill `migrasi-tabel-hris`. Aksi tulis berfield sedikit lewat `ActionForm` yang sudah ada.
+
+⚠️ **`/finance/anggaran` hari ini melanggar pola itu** — ia merakit baris filter, tabel, dan tombol paginasinya sendiri, tidak memakai `MainTable`. Memperluasnya tanpa migrasi memperdalam ketimpangan.
+
+Tiga jebakan yang sudah terbukti menggigit di pola ini: `FilterTable` hanya mengenal `select` dan `date` (ambang numerik jadi preset atau kontrol di slot `actions`); format tanggal/uang jangan di lapisan fetch; uji tab Radix pakai `fireEvent.mouseDown`, bukan `click`.
 
 ## Konsumen Data
 
@@ -416,16 +499,63 @@ Semua bentuk di bawah **sudah pernah terjadi** di repo ini; masing-masing wajib 
 - **Grain RAPB belum diketahui** — lihat TBD. Menahan jalur entri OPEX, tidak menahan Tax maupun Cost Control.
 - **Konfigurasi matriks KPI bukan pekerjaan service ini.** Membangun modul tidak menyalakan KPI; yang menyalakan adalah pengisian `kpi_template` menurut [[RUN - Menambah Metrik KPI Otomatis]]. Tanpa pemilik langkah itu, hasilnya berulang seperti master anggaran hari ini: modulnya jadi, datanya kosong.
 
-## Belum Diputuskan (TBD)
+## Sudah Terjawab
 
-1. **Grain RAPB — per akun atau per kelompok akun?** Bukti aritmetika dari rekap Juli menunjukkan satu baris budget menutupi beberapa akun (budget Rp 41 juta "Lain-lain Marketing" dibandingkan terhadap gabungan 10 akun senilai Rp 72,7 juta). Bila benar per kelompok, dibutuhkan master `kelompok_anggaran` — dan masternya milik Finance, bukan turunan Accurate. **Menunggu file Excel RAPB.** Keputusan ini layak jadi ADR karena menentukan bentuk model data.
-2. **Siapa yang boleh melihat kalender kewajiban pajak?** Agenda perusahaan atau pekerjaan Tax Officer saja. Usulan: Finance + Tax + setingkat Direktur, bukan seluruh karyawan.
-3. **Batas lingkup register penghematan** terhadap `ProcurementSaving` yang sudah ada di employee-service (`/procurement/savings`). Usulan: *procurement = penghematan harga beli/vendor; finance = penghematan biaya operasional berjalan*. Tanpa batas tertulis, dua angka "total penghematan" akan beredar.
-4. **Urutan setor dan lapor per jenis pajak** — mesin status di atas mengasumsikan pola PPh 21/23.
-5. **Perlukah alur persetujuan** untuk penghematan berstatus `Terealisasi` dan untuk revisi anggaran? Belum ada di [[REF - Alur Persetujuan]].
-6. **Granularitas forecast kas — bulanan atau mingguan?** Rekap yang ada bulanan; metrik KPI menuntut mingguan. Menuntut mingguan berarti pekerjaan baru bagi peran berisi satu orang, dengan risiko tidak pernah diisi. Usulan: terima bulanan dan sesuaikan definisi metriknya.
-7. **Kapan `kpi-collector` diekstrak.** Opsi B menahan penambahan di satu konektor, tetapi pemicu ADR-0032 tetap terlampaui. Keputusan terpisah, tidak memblokir rancangan ini.
-8. **i18n**: `features/finance/` di erp-frontend hari ini **nol** berkas memakai `useTranslation`, sementara [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]] mewajibkan teks user-facing baru lewat `react-i18next`. Halaman baru akan jadi pulau i18n di modul yang tidak — perlu diputuskan menyeragamkan atau menerima ketimpangan itu.
+Dicatat supaya tidak ditanyakan lagi, dan supaya tak ada yang mulai merancang sesuatu yang ternyata tak dibutuhkan.
+
+| Pertanyaan | Jawaban | Bukti |
+|---|---|---|
+| **Grain RAPB — per akun atau per kelompok?** | **Per akun**, untuk bagian operasional | RAPB Rev 2 kolom C = akun, kolom I–N = Juli–Desember. Baris induk (kolom B) = jumlah anaknya, tepat sampai rupiah: `Beban Non Operasional` Juli 115.660.720 = jumlah 7 anak; `Beban Pajak` 6.824.783 = 6.417.983 + 406.800 |
+| **Perlu master `kelompok_anggaran`?** | **Tidak.** `KunciAnggaran` yang ada sudah cukup | konsekuensi langsung dari baris di atas |
+| **Batas register penghematan vs `ProcurementSaving`?** | **Gugur** — register penghematan tak pernah diminta | kata "penghematan"/"saving" nol hit di seluruh workbook KPI FAT. Yang diminta: *"laporan realisasi anggaran dengan rekomendasi efisiensi"* |
+| **Granularitas forecast kas** | Buktinya berbalik ke **mingguan** | `BREAKDOWN MINGGUAN` tertulis eksplisit di dua sheet (Cost Control #4, SPV P1) — meski rekap yang benar-benar dibuat selama ini bulanan. Ketegangan itu jadi keputusan Finance #7 di bawah |
+
+⚠️ **Berlaku hanya untuk bagian operasional.** Bagian beban penjualan RAPB (baris 10–25) grain-nya lebih kasar — `Beban Iklan + Pajak Iklan` adalah **satu** baris anggaran yang menutupi **dua** akun Accurate. Itu jadi keputusan Finance #3.
+
+## Keputusan yang Ditunggu dari Tim Finance
+
+Dikelompokkan menurut apa yang berhenti bila tak dijawab. **Tak satu pun dapat diputuskan IT.**
+
+### Menghentikan Master OPEX (bobot KPI 0,70)
+
+| # | Keputusan | Pemilik | Bila tak dijawab |
+|---|---|---|---|
+| 1 | **Akun mana saja yang masuk "OPEX"** untuk metrik varians. Tiga dokumen memberi tiga total Juli: rekap "TOTAL OPEX" Rp 6.684.636.073 · RAPB "Total Anggaran Beban" Rp 1.067.439.526 · RAPB "Total Beban Penjualan" Rp 12.881.653.989 — **tak satu pun cocok** | Cost Control + SPV FAT | Angkanya tetap keluar, rapi, dan salah. Tak ada yang akan curiga |
+| 2 | **Revisi mana yang berlaku untuk Juli.** Juli sudah tutup dengan rekap memakai anggaran lama (Iklan Rp 4,93 M); Rev 2 merevisinya (Iklan + Pajak Iklan Rp 3,58 M) | SPV FAT | Memuat Rev 2 menyatakan ulang bulan yang sudah tutup |
+| 3 | **`Beban Iklan + Pajak Iklan` dipecah atau tetap satu baris** | Cost Control | Baris itu tak dapat diunggah, atau dipaksa ke satu akun dan variansnya menipu |
+| 4 | **Akun bernilai kosong: "dianggarkan nol" atau "belum dianggarkan"?** Enam baris kosong di keenam bulan | Cost Control | Pengunggah menebak, dan tebakannya mengubah total varians |
+
+### Menghentikan modul Tax (bobot 0,45)
+
+| # | Keputusan | Pemilik | Bila tak dijawab |
+|---|---|---|---|
+| 5 | **Setuju input berstruktur menggantikan unggah dokumen sebagai dasar penilaian?** Kolom `SISTEM ERP` di Excel KPI meminta `FITUR UP DOKUMEN` untuk **7 dari 9** metrik Tax | SPV FAT + Tax Officer | Kita membangun yang tak diminta, atau membangun yang diminta tapi KPI-nya tetap manual |
+| 6 | **Pola tenggat per jenis pajak** — jatuh tempo setor, jatuh tempo lapor, dan urutannya, untuk PPh 21/23/25, PPh 4 ayat 2, PPN Masa | Tax Officer | Mesin status dan perhitungan "tepat waktu" tak punya dasar |
+
+### Menghentikan modul Cost Control (bobot 0,25+)
+
+| # | Keputusan | Pemilik | Bila tak dijawab |
+|---|---|---|---|
+| 7 | **Forecast kas mingguan atau bulanan** | Cost Control + SPV FAT | Menuntut pekerjaan mingguan baru pada peran berisi satu orang — kandidat terkuat "fitur jadi, data kosong" |
+| 8 | **Definisi "selisih" dan batas waktu** untuk Pengelolaan Kas Iklan (bobot 0,20) | Cost Control | Metrik tetap 🟡 tak terhitung |
+| 9 | **Rumus "Penurunan OPEX 3–5% dalam 6 bulan".** Rekap memakai rata-rata sederhana 6 persentase MoM termasuk Februari yang pembandingnya tak ada di tabel (−6,65%); penurunan sebenarnya Feb→Jul −50,1% | Cost Control + SPV FAT | ERP menghitung berbeda dari spreadsheet, lalu Finance menyimpulkan ERP-nya salah |
+
+### Klarifikasi — tidak menghentikan
+
+| # | Pertanyaan | Pemilik |
+|---|---|---|
+| 10a | Excel menandai varians OPEX `DONE (DIMENU AR)` — layar mana yang dimaksud? Varians ada di `/finance/anggaran`, bukan AR, dan masternya kosong | Cost Control |
+| 10b | Sumber "Revenue 240M" SPV tercatat data iklan TikTok, padahal deskripsinya soal piutang AR | SPV FAT |
+| 10c | Ada RAPB Feb–Juni (revisi sebelumnya)? Hanya dibutuhkan untuk backfill tren 6 bulan ke belakang | Cost Control |
+| 10d | Anggaran per departemen direncanakan? RAPB tak punya dimensi itu; KPI General Affair membutuhkannya | SPV FAT |
+| 10e | Siapa yang boleh melihat kalender kewajiban pajak — agenda perusahaan atau pekerjaan Tax Officer saja? Usulan: Finance + Tax + setingkat Direktur | SPV FAT |
+| 10f | Perlukah alur persetujuan untuk revisi anggaran? Belum ada di [[REF - Alur Persetujuan]] | SPV FAT |
+
+## Belum Diputuskan (TBD) — ranah IT
+
+1. **Kapan `kpi-collector` diekstrak.** Opsi B menahan penambahan di satu konektor, tetapi pemicu ADR-0032 tetap terlampaui — dan ADR itu sendiri kini mempertanyakan apakah pemicunya masih bermakna. Tidak memblokir rancangan ini.
+2. **i18n**: `features/finance/` di erp-frontend hari ini **nol** berkas memakai `useTranslation`, sementara [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]] mewajibkan teks user-facing baru lewat `react-i18next`. Halaman baru akan jadi pulau i18n di modul yang tidak.
+3. **Migrasi `/finance/anggaran` ke pola tabel HRIS** — layar itu merakit filter, tabel, dan paginasinya sendiri, tidak memakai `MainTable`. Memperluasnya tanpa migrasi memperdalam ketimpangan.
 
 ## Dokumen Terkait
 
