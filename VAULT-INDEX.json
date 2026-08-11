@@ -422,18 +422,20 @@
         "API - Index",
         "CORE - API Master Gateway"
       ],
-      "hash": "b08a85de5bba62fdb3c5f58b27185aacb64e010863cd4c7b58b5270601a6fdd2",
-      "ukuran_kb": 3.5,
-      "ringkasan": "Menjawab: endpoint apa saja di service learning untuk mengelola jenis pelatihan, trainer, event training (dengan transisi status), serta pendaftaran & kehadiran peserta, termasuk kode status saat verifikasi department_key ke employee-service dan fitur LMS lanjutan yang belum ada.",
+      "hash": "237d97bf47fdbd43c10ad43df3657e73558c5f9d4b4269c017f107890fa4baf0",
+      "ukuran_kb": 6.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di modul gateway /api/learning/*, bagaimana bentuk request CRUD master jenis pelatihan dan trainer, event pelatihan, peserta, kehadiran, pengajuan pelatihan, serta layar karyawan /me/trainings. Menjelaskan juga aturan urutan registrasi rute Fiber (rute statik sebelum rute :id), pemetaan kode status verifikasi department_key (404 jadi 400, gangguan server jadi 502), dan beda satuan key departemen versus nama departemen yang pernah membuat pengajuan ditolak 409 karena supervisor tak ketemu. Termasuk aturan privasi agregat penilaian trainer yang baru ditampilkan setelah minimal tiga responden.",
       "kata_kunci": [
         "learning service",
-        "API training",
-        "pelatihan",
+        "API pelatihan",
+        "training endpoint",
         "trainer",
-        "event training",
-        "peserta kehadiran",
-        "department_key verifikasi",
-        "LMS"
+        "peserta pelatihan",
+        "kehadiran",
+        "pengajuan pelatihan",
+        "training request",
+        "department_key",
+        "evaluasi trainer"
       ]
     },
     {
@@ -967,25 +969,26 @@
         "APP - Dynamic Task Tracker",
         "API - Form Builder Service",
         "HRIS - Kaizen (Ide Perbaikan)",
+        "Microservices - Learning Service",
         "HRIS - Attendance System",
         "HRIS - Payroll",
         "Microservices - Employee Service",
         "Microservices - Notification Service"
       ],
-      "hash": "99640b6edf0039e1c572440349fbdc1f2a265481dc8639f8eb173e40b328a93d",
-      "ukuran_kb": 25.4,
-      "ringkasan": "Menjawab: apa saja yang bisa dikerjakan karyawan lewat aplikasi mobile HRIS MyBharata (absen QR + geofencing + biometric, cuti/izin, lembur, slip gaji, KPI, survei, Kaizen), dan bagaimana aplikasinya dibangun (Flutter, Clean Architecture feature-first, BLoC, dio lewat API Gateway, JWT Bearer bukan SSO ticket). Menjawab juga versi mana yang sedang beredar di HP pemakai versus yang masih menggantung di dev, dan bagian mana yang sudah ter-scope multi-perusahaan sedangkan sisanya masih TBD di backend.",
+      "hash": "0f09e15162ff99af2e833c11de8877cd672652119d191049431bca7934c2dac8",
+      "ukuran_kb": 27.7,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitekturnya (Flutter, BLoC, get_it, dio, go_router, Firebase, Clean Architecture feature-first), bagaimana autentikasi bekerja (JWT Bearer lewat gateway, biometric, PIN, 1 akun 1 device), dan fitur apa saja yang tersedia untuk karyawan mulai dari attendance, izin dan cuti, lembur, payroll, KPI, survei, sampai Kaizen. Menjelaskan juga bagaimana dukungan multi-perusahaan bekerja lewat scoping company_id dari JWT plus helper CompanyScope, mana konten yang masih terpaku ke data BIP, serta jejak versi build dan rilis di branch dev dan main. Berguna untuk memahami apakah MyBharata menembak gateway atau backend langsung, dan apa saja gerbang konten per tenant.",
       "kata_kunci": [
         "MyBharata",
-        "aplikasi mobile",
+        "aplikasi mobile HRIS",
         "Flutter",
-        "absensi",
-        "attendance",
-        "cuti",
-        "leave",
-        "lembur",
-        "payroll",
-        "multi-perusahaan"
+        "BLoC",
+        "attendance mobile",
+        "absensi karyawan",
+        "geofencing",
+        "biometric",
+        "multi-perusahaan",
+        "company_id"
       ]
     },
     {
@@ -1068,6 +1071,8 @@
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
+        "Microservices - Learning Service",
+        "HRIS - Training Program",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Attrition",
         "Finance - Dashboard per Posisi (FAT)",
@@ -1114,20 +1119,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "7af2f86d5ce8fe40676ac133b84aadd4872ab85a810c00bbb9144b821d2ec4d9",
-      "ukuran_kb": 197.3,
-      "ringkasan": "Menjawab: apa itu portal web internal One Bharata (erp-frontend), stack apa yang dipakai, dan bagaimana login serta SSO Identity Provider bekerja (mint one-time code, allowlist redirect_url). Menjelaskan juga bagaimana menu dan hak akses digerbang lewat cookie system_roles per modul, bagaimana sub-menu HRIS dikelompokkan dengan menu induk bersarang, dan bagaimana halaman Pengaturan HRGA terpusat menyaring akses per tab, bukan per halaman. Menjadi rujukan untuk pertanyaan multi-perusahaan di sisi frontend: CompanySwitcher, kelola perusahaan, departemen, shift, network WiFi, dan direktori karyawan yang ikut perusahaan terpilih.",
+      "hash": "942175da644ab3fd7d4ebbb2c296146d9c83b7c66be780349addb4f0bb5e7f85",
+      "ukuran_kb": 199.1,
+      "ringkasan": "Menjawab: apa itu portal web internal hris-dashboard (One Bharata), stack frontend-nya (Next.js App Router, React, shadcn/Radix/Tailwind, TanStack Query, react-hook-form + zod, react-i18next), bagaimana login dan refresh token bekerja, serta bagaimana web ini berperan sebagai SSO Identity Provider lewat one-time code. Menjelaskan struktur role dari cookie system_roles (peta module ke role), aturan role gating sidebar, pola pengelompokan menu memakai menu induk bersarang alih-alih field group, dan detail penyaringan akses per tab pada Pengaturan HRGA terpusat termasuk gerbang rute di proxy.ts serta rute lama yang diteruskan. Memuat juga dampak multi-perusahaan pada halaman kelola perusahaan, departemen, shift, network, direktori karyawan, dan artikel.",
       "kata_kunci": [
-        "web ERP",
-        "hris-dashboard",
         "erp-frontend",
+        "hris-dashboard",
         "One Bharata",
-        "SSO",
+        "web ERP",
+        "Next.js",
         "system_roles",
         "role gating",
+        "SSO identity provider",
         "sidebar menu",
-        "Pengaturan HRGA",
-        "multi-perusahaan"
+        "pengaturan HRGA"
       ]
     },
     {
@@ -1981,27 +1986,28 @@
         "API - Learning Service",
         "Microservices - Form Builder Service",
         "HRIS - Recruitment",
+        "APP - Web ERP",
+        "RUN - Deploy Microservices bip-erp",
         "DB - Overview and Notes",
         "Microservices - Notification Service",
         "CORE - API Master Gateway",
-        "APP - Web ERP",
         "API - Index",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id"
       ],
-      "hash": "b5ef605bb39d7ff1bc575958256a35a813e0d457659ca69b66de2d95ce5ce763",
-      "ukuran_kb": 11.9,
-      "ringkasan": "Menjawab: service mana yang melayani modul pelatihan karyawan (Go + Fiber + MongoDB `learning_db`, port 6987, modul gateway `learning`), kenapa Training dipisah dari Employee Service, dan endpoint apa saja yang tersedia (master jenis pelatihan, trainer, event training, peserta & kehadiran, pengajuan, evaluasi). Menjelaskan cara verifikasi departemen lewat panggilan internal ke Employee Service beserta pemetaan galatnya (404 jadi 400, sisanya 502) dan kenapa `EMPLOYEE_MODULE_URL` sengaja tidak masuk map `InternalURL`. Juga menjawab bagaimana rantai approval pengajuan pelatihan SPV lalu HR bekerja (siapa yang dilewati, kenapa penolakan final) dan bagaimana privasi evaluasi trainer dijaga (penilai anonim, agregat minimal tiga responden).",
+      "hash": "d51b0acda417610194861827e1b7d2e88540d47e70271a1db644d98dfaf808c7",
+      "ukuran_kb": 15.4,
+      "ringkasan": "Menjawab: kenapa modul Training dipisah dari Employee Service jadi service learning sendiri, apa stack dan lokasinya (Go + Fiber v2 + MongoDB learning_db, services/learning, port 6987, modul gateway learning), serta fitur apa yang sudah ada di dalamnya. Menjelaskan cara verifikasi departemen lewat panggilan internal ke employee-service beserta alasan EMPLOYEE_MODULE_URL sengaja dibaca os.Getenv dan tidak masuk map InternalURL, escaping kunci departemen, dan pemetaan kode galat 400 versus 502. Menjelaskan pula rancangan pengajuan pelatihan rantai SPV ke HR (kenapa dua tahap, bukan tiga) dan desain privasi evaluasi trainer termasuk ambang tiga responden serta identitas penilai yang tak pernah keluar di respons.",
       "kata_kunci": [
         "learning service",
-        "pelatihan",
-        "training",
-        "LMS",
-        "training request",
-        "pengajuan pelatihan",
-        "evaluasi trainer",
-        "trainer evaluation",
-        "peserta pelatihan",
-        "EMPLOYEE_MODULE_URL"
+        "LMS Fase 0",
+        "training service",
+        "pelatihan karyawan",
+        "Go Fiber",
+        "learning_db",
+        "training_request",
+        "trainer_evaluation",
+        "EMPLOYEE_MODULE_URL",
+        "database-per-service"
       ]
     },
     {
@@ -5880,20 +5886,20 @@
         "HRIS - Big Pictures",
         "HRIS - Analysis"
       ],
-      "hash": "ad208cf37bfee15dc998df8f6b8b6ca540145f17e6e6f1d6c2a2676b1fcf3607",
-      "ukuran_kb": 18.6,
-      "ringkasan": "Menjawab: apa cakupan MVP program pelatihan & pengembangan karyawan (training types, trainers, event training, peserta & kehadiran), bagaimana alur prosesnya dari penyiapan master, penjadwalan, penugasan peserta, sampai riwayat per karyawan. Menjelaskan fitur modul Training ERPGo mana yang diambil, disesuaikan, atau dibuang (mis. Branch diganti Department karena perusahaan single-site, Cost hanya informasional karena pembukuan lewat Accurate) serta bentuk model datanya per collection. Juga menjawab di mana modul ini ditempatkan secara arsitektur (kini Learning Service, UI `/hris/training`) dan apa saja yang ditunda ke fase lanjut seperti sertifikat PDF, notifikasi undangan, dan kelanjutan ke LMS People Development.",
+      "hash": "7129ba3561272bc08e0518eea79642b9e2b7b0de17354ded5af50b54183dad6c",
+      "ukuran_kb": 19.7,
+      "ringkasan": "Menjawab: bagaimana program pelatihan dan pengembangan karyawan dirancang di Bharata, apa saja cakupan MVP-nya (master jenis pelatihan, master trainer, event pelatihan, peserta dan kehadiran), dan mana bagian modul Training ERPGo yang diambil, disesuaikan, atau dibuang beserta alasannya (mis. Branch dibuang karena perusahaan single-site, Cost hanya informasional karena pembukuan lewat Accurate). Menjelaskan usulan model data tiap koleksi (training_type, trainer, training, training_participant) plus kandidat fase lanjut seperti evaluasi, sertifikat PDF, dan request/approval, serta alur proses bisnis, aktor, dan keputusan penempatan arsitekturnya di service learning. Berguna untuk tahu apa yang masuk MVP versus fase lanjut, rencana rollout LMS People Development, dan hal apa saja yang masih TBD.",
       "kata_kunci": [
         "training program",
         "pelatihan karyawan",
-        "training & development",
+        "people development",
+        "LMS",
+        "ERPGo training",
         "training types",
         "trainer",
-        "kehadiran peserta",
-        "ERPGo",
-        "LMS People Development",
-        "HRIS",
-        "MVP pelatihan"
+        "kehadiran pelatihan",
+        "evaluasi pelatihan",
+        "talent pool"
       ]
     },
     {

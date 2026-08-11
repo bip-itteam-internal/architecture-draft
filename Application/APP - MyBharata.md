@@ -3,7 +3,7 @@
 *Aplikasi mobile **MyBharata** (`my_bharata`) adalah aplikasi HRIS resmi PT Bharata Internasional — satu codebase Flutter untuk Android & iOS yang menjadi portal karyawan untuk seluruh siklus HR: attendance → cuti/izin → lembur → payroll → evaluasi. Aplikasi menegakkan aturan "Peraturan Perusahaan 2026–2028" secara otomatis dan mencegah kecurangan absensi melalui biometric + geofencing + validasi QR.*
 
 - **Status**: ✅ Implemented — aplikasi HRIS mobile produksi (Flutter, Android/iOS); rilis dev 1.10.2+104.
-- **Multi-perusahaan** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]): presensi (absen/jadwal/izin) ter-scope **otomatis via JWT** (tak ada perubahan). **Profil Perusahaan** dari `/me` (BIP profil penuh; perusahaan lain nama saja) & **onboarding** (welcome + setup-selesai) dari respons login `new_user`, membuang hardcode "PT Bharata". **Konten dinamis per tenant (F2-C, PR #90)**: helper `CompanyScope` / `companyScopeOf(context)` dari `UserProfileBloc` (key kosong = BIP demi kompatibilitas token lama); blok "Tentang Perusahaan" (Visi/Misi/Company Info/SOP) & "Bharata Community" hanya untuk BIP, sedangkan kartu cuaca kantor dan nama pada strap QR lanyard kini ikut nama perusahaan user. **Menu Pengajuan disembunyikan untuk non-BIP (PR #91)** selama pilot, di dua entry point (`home_menu_grid` + `more_menu`), karena perusahaan lain fokus presensi dulu. **Status rilis**: PR #89/#90/#91 sudah **merged ke `dev`** (versionCode 120), belum naik ke `main`. **Masih TBD (butuh data per-perusahaan di BE):** kontak HR, nama gedung + guestbook, handbook/SOP PDF. Kontak IT sengaja tetap pusat (helpdesk grup, dipakai juga pra-login sebelum perusahaan diketahui).
+- **Multi-perusahaan** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]): presensi (absen/jadwal/izin) ter-scope **otomatis via JWT** (tak ada perubahan). **Profil Perusahaan** dari `/me` (BIP profil penuh; perusahaan lain nama saja) & **onboarding** (welcome + setup-selesai) dari respons login `new_user`, membuang hardcode "PT Bharata". **Konten dinamis per tenant (F2-C, PR #90)**: helper `CompanyScope` / `companyScopeOf(context)` dari `UserProfileBloc` (key kosong = BIP demi kompatibilitas token lama); blok "Tentang Perusahaan" (Visi/Misi/Company Info/SOP) & "Bharata Community" hanya untuk BIP, sedangkan kartu cuaca kantor dan nama pada strap QR lanyard kini ikut nama perusahaan user. **Menu Pengajuan disembunyikan untuk non-BIP (PR #91)** selama pilot, di dua entry point (`home_menu_grid` + `more_menu`), karena perusahaan lain fokus presensi dulu. 🔜 **Gerbang itu DIBUKA di PR [#113](https://github.com/bip-itteam-internal/my-bharata/pull/113)** (belum merge): `attendance-service` kini menyaring per `company_id` di seluruh jalurnya, jadi menahannya lebih lama berarti seluruh karyawan CV Elit dan Sadewa tak bisa mengajukan cuti lewat aplikasi sama sekali padahal servernya sudah siap. ⚠️ Dua gerbang KONTEN (visi-misi + Bharata Community di beranda, profil perusahaan lengkap) **sengaja TIDAK ikut dibuka**: di baliknya `CompanyInfoModel.dummy()` dan `ClubEntity.sample()`, yaitu data BIP yang dipaku di kode. Mencabut kondisinya tidak membuka akses, melainkan menampilkan visi-misi dan alamat PT Bharata Internasional kepada karyawan CV Elit seolah itu perusahaannya sendiri. Yang dibutuhkan di sana konten per-tenant, bukan penghapusan `if`. **Status rilis**: PR #89/#90/#91 sudah **merged ke `dev`** (versionCode 120), belum naik ke `main`. **Masih TBD (butuh data per-perusahaan di BE):** kontak HR, nama gedung + guestbook, handbook/SOP PDF. Kontak IT sengaja tetap pusat (helpdesk grup, dipakai juga pra-login sebelum perusahaan diketahui).
 
 - Pengguna: karyawan, supervisor, HRD, IT admin, dan tamu eksternal (guest book)
 - Versi build saat ini: **1.14.6+139** (`origin/dev`; `pubspec.yaml`) — naik dari 135 lewat PR #107 (slip gaji terbit + unduh PDF), #108 (menu Kaizen), #109 (progres KPI bulan berjalan), dan #110 (kategori notifikasi `employee-moved`). PR #111 (posisi section Survei) masih terbuka di versionCode **140**.
@@ -160,7 +160,21 @@ Sebabnya program Kaizen bukan "satu form lagi" bagi pengisinya: berulang tiap pe
 ## Fitur "Coming Soon" (Belum Tersedia)
 
 Tercantum di menu tetapi masih placeholder (route `/coming-soon` atau stub):
-- Digital ID, My Documents, Policy/Handbook, Insurance, Loan, Meeting Room, Vehicle, Learning Center, Inbox, Chat HRD
+- Digital ID, My Documents, Policy/Handbook, Insurance, Loan, Meeting Room, Vehicle, Inbox, Chat HRD
+
+🔜 **Learning** tak lagi placeholder di PR [#112](https://github.com/bip-itteam-internal/my-bharata/pull/112) (belum merge) — lihat di bawah.
+
+## Pelatihan Saya — 🔜 PR [#112](https://github.com/bip-itteam-internal/my-bharata/pull/112) (belum merge)
+
+Mengisi menu **Learning** yang selama ini `ComingSoon`. Daftar pelatihan yang diikuti (berjalan / riwayat), **tandai hadir mandiri**, dan **penilaian trainer** empat aspek.
+
+Ini menutup lubang lama: `/me/trainings` di [[Microservices - Learning Service]] **tak pernah dipanggil siapa pun** — tidak oleh web, tidak oleh aplikasi. `can_attend` bahkan dirancang khusus untuk aplikasi ini sejak awal, lengkap dengan alasan tertulis kenapa server yang menghitungnya, tapi tak pernah ada tombolnya.
+
+- **Seluruh keputusan dari server**: `can_attend` + `attend_block_reason`, `boleh_menilai` + `sudah_dinilai`. Tak satu pun dihitung ulang di Dart.
+- **Field yang absen gagal-TERTUTUP**: server versi lama tak mengirim penanda penilaian; absen diperlakukan "tidak boleh" supaya tak ada tombol yang pasti dibalas 409.
+- **Pesan galat server diteruskan apa adanya** — sebagian penolakan memberi tahu, bukan sekadar gagal.
+- ⚠️ **Pengajuan pelatihan TIDAK termasuk**: `POST /training/requests` semula menuntut `department_key`, sedangkan aplikasi tak punya endpoint master departemen dan profilnya hanya menyimpan nama. Prasyaratnya ada di bip-erp PR #1153; sesudah itu baru bisa dibangun.
+- ⚠️ **Publish sebelum `learning-service` di dev naik = menu terlihat tapi kosong**, dan tombol Nilai Trainer tak pernah muncul (gagal-tertutup di atas).
 
 ## Roadmap (Belum Diimplementasikan)
 

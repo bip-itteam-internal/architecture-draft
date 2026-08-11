@@ -41,6 +41,14 @@ Verifikasi memanggil `GET {EMPLOYEE_MODULE_URL}/master/departments/{key}` di [[M
 
 `department_key` kosong melewati pemeriksaan sepenuhnya.
 
+> ⚠️ **Aturan di atas berlaku untuk EVENT pelatihan, bukan PENGAJUAN.** Sejak PR [#1153](https://github.com/bip-itteam-internal/bip-erp/pull/1153) `POST /training/requests` memakai resolusi tersendiri (`departemen.go`): kosong berarti "departemen saya" dari header `BIP-Department`, dan key yang dikirim **diterjemahkan jadi NAMA** sebelum dipakai mencari supervisor. Lihat catatan satuan di bawah.
+
+### ⚠️ Satuan `department_key` vs `work_data.department`
+
+`department_key` adalah **key** (`master_department.key`, mis. `it`); `work_data.department` menyimpan **nama** (`Tech Development`). Pencarian supervisor di [[Microservices - Employee Service]] (`/list?type=supervisor&department=`) menyaring **nama**, bukan key.
+
+Mengirim key ke sana menghasilkan nol supervisor lalu **409 "departemen belum punya supervisor"** — galat yang menuduh data master padahal yang salah satuan nilainya. Terjadi nyata di `POST /training/requests` sejak PR #1148; **6 dari 10 departemen** punya key ≠ name sehingga pengajuan mustahil dibuat untuk keenamnya, sementara empat sisanya jalan karena kebetulan key-nya sama dengan namanya. Diperbaiki PR #1153.
+
 ## Peserta & Kehadiran
 
 | Method | Path | Fungsi |
@@ -48,6 +56,39 @@ Verifikasi memanggil `GET {EMPLOYEE_MODULE_URL}/master/departments/{key}` di [[M
 | GET · POST | `/training/:id/participants` | List / enroll peserta. Unique index `{training_id, employee_id}` menutup pendaftaran ganda secara atomik; **tanpa cap kapasitas** (kapasitas = jumlah peserta yang di-assign) |
 | PATCH · DELETE | `/training/:id/participants/:employeeId` | Tandai kehadiran (boolean) / batalkan peserta |
 | GET | `/training/history/:employeeId` | Riwayat pelatihan per karyawan |
+
+## Pengajuan Pelatihan
+
+| Method | Path | Fungsi |
+|---|---|---|
+| POST | `/training/requests` | Buat pengajuan. `department_key` **opsional** (kosong = departemen pemanggil) |
+| GET | `/training/requests?as=self\|reviewer\|reviewed` | Daftar per sudut pandang; ketiganya relasional, bukan berbasis izin |
+| PATCH | `/training/requests/:id/review` | `{approve, note}`. Tahap ditentukan STATUS, bukan dikirim klien |
+| POST | `/training/requests/:id/cancel` | Hanya pembuatnya, hanya selama belum diputuskan |
+
+⚠️ **`/training/requests` didaftarkan SEBELUM rute event.** Ia segmen statik; ditaruh sesudah `/training/:id` membuat seluruh permintaannya ter-match sebagai event ber-id `"requests"` lalu dibalas 400 *"id is not a valid ObjectID"*.
+
+## Layar Karyawan (`/me`)
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/me/trainings` · `/me/trainings/history` | Pelatihan milik pemanggil (berjalan / selesai-batal) |
+| GET | `/me/trainings/:id` | Detail satu pelatihan milik pemanggil |
+| POST | `/me/trainings/:id/attendance` | Tandai hadir mandiri |
+| POST | `/me/trainings/:id/evaluation` | `{ratings, comment}`, empat aspek 1..5 |
+
+Identitas **selalu** dari header yang diisi gateway dari klaim JWT, tak pernah dari path maupun query.
+
+Keputusan dihitung **server**, klien cukup menampilkan: `can_attend` + `attend_block_reason`, dan (PR #1150) `boleh_menilai` + `sudah_dinilai` + `trainer_name`. Kedua penanda penilaian dikirim **tanpa `omitempty`** supaya klien bisa membedakan "tidak boleh" dari "server lama yang belum punya field ini".
+
+## Agregat Penilaian Trainer
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/training/:id/evaluation` | Agregat satu kelas |
+| GET | `/training/trainers/:id/evaluation` | Agregat satu trainer lintas kelasnya |
+
+Di bawah **tiga responden**, `ditampilkan: false` **dan seluruh angkanya nol** — klien yang lupa membaca penanda tak boleh punya angka untuk ditampilkan. Jumlah responden tetap dikirim.
 
 ## Lain-lain
 
@@ -57,7 +98,9 @@ Verifikasi memanggil `GET {EMPLOYEE_MODULE_URL}/master/departments/{key}` di [[M
 
 ## Belum Ada
 
-Seluruh endpoint LMS (course, materi, bank soal, pre/post test, skoring, kurikulum jabatan, Talent Pool, penilaian trainer) **belum ada** — Fase 1 ke atas. Desainnya di [[HRIS - Training Program]].
+Seluruh endpoint LMS (course, materi, bank soal, pre/post test, skoring, kurikulum jabatan, Talent Pool) **belum ada** — Fase 1 ke atas. Desainnya di [[HRIS - Training Program]]. **Penilaian trainer sudah ada** (lihat di atas).
+
+⚠️ Seluruh endpoint pengajuan, evaluasi, dan penanda `/me` di atas **belum pernah diverifikasi lewat gateway hidup**: `learning-service` di dev masih memakai image lama.
 
 ## Dokumen Terkait
 
