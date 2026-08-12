@@ -5414,7 +5414,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — master departemen/posisi sudah di-DB; org chart **sudah ada** (2026-08-01); **jenjang jabatan sudah ada & live di produksi** (2026-08-03) tapi **nol dari 79 jabatan** terisi; **penyetuju pengajuan per departemen** merged 2026-08-12 (PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184) & [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)) tapi **belum diverifikasi lewat gateway dan belum deploy**",
+      "status_teks": "Implemented (ada catatan) — master departemen/posisi sudah di-DB; org chart **sudah ada** (2026-08-01); **jenjang jabatan live di produksi** (2026-08-03), **56 dari 81 jabatan** terisi per 2026-08-12 dan kini **ditampilkan** di daftar karyawan serta bagan organisasi (FE PR [#1000](https://github.com/bip-itteam-internal/erp-frontend/pull/1000), belum deploy); **penyetuju pengajuan per departemen** merged 2026-08-12 (PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184) & [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)), **ter-deploy & terverifikasi di DEV**, prod belum",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
@@ -5429,9 +5429,9 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "5c513d650dd509edf4ca05fe2ae1c9a6ee194b28ddd4e642e40bc826ed583d5c",
-      "ukuran_kb": 29.5,
-      "ringkasan": "Menjawab: bagaimana struktur organisasi perusahaan tersimpan dan siapa yang menyetujui pengajuan siapa. Mencakup master departemen dan jabatan, jenjang jabatan sebagai penanda organisasi yang sengaja bukan sumbu hak akses, atasan langsung per orang untuk cakupan tampilan KPI, penyetuju pengajuan per departemen untuk wewenang menyetujui, bagan organisasi, serta relasi supervisi antar-departemen lewat supervised_by. Menjelaskan pula urutan pencarian atasan yang dipakai attendance-service beserta alasan tiap langkahnya, dan membedakan secara eksplisit dua konsep yang sering tertukar: cakupan tampilan versus cakupan wewenang.",
+      "hash": "9b2fa08d4cc473e435a10d5b2a9ceb9d1eb0cffe54cdbce9d35785d110f5ab99",
+      "ukuran_kb": 32.7,
+      "ringkasan": "Menjawab: bagaimana struktur organisasi perusahaan tersimpan, siapa menyetujui pengajuan siapa, dan siapa boleh melihat KPI siapa. Mencakup master departemen dan jabatan, jenjang jabatan sebagai penanda organisasi yang sengaja bukan sumbu hak akses dan kini ditampilkan di daftar karyawan serta bagan organisasi, atasan langsung per orang untuk cakupan tampilan, penyetuju pengajuan per departemen untuk wewenang menyetujui, bagan organisasi, serta relasi supervisi antar-departemen lewat supervised_by. Menjelaskan pula urutan pencarian atasan yang dipakai attendance-service beserta alasan tiap langkahnya, membedakan secara eksplisit dua konsep yang sering tertukar (cakupan tampilan versus cakupan wewenang), dan mencatat usulan perombakan navigasi yang sudah ditimbang lalu dibatalkan beserta alasannya.",
       "kata_kunci": [
         "struktur organisasi",
         "atasan langsung",
@@ -5439,9 +5439,11 @@
         "penyetuju pengajuan",
         "approver",
         "is_supervisor",
+        "supervisor_id",
         "supervised_by",
         "HRGA",
         "jenjang jabatan",
+        "job level",
         "org chart",
         "bagan organisasi",
         "departemen"
