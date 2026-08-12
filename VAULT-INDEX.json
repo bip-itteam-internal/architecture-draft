@@ -1130,8 +1130,19 @@
       ],
       "hash": "8f8fcafc8153780f4d792f93fb92baddc793d32bbd8ec4f083d4b096fe9c1dac",
       "ukuran_kb": 219.5,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: apa stack dan struktur portal web ERP internal (hris-dashboard / \"One Bharata\"), bagaimana alur login serta perannya sebagai SSO Identity Provider untuk aplikasi lain, dan bagaimana menu sidebar di-gate oleh system_roles per modul. Juga menjelaskan pengelompokan menu HRIS (induk bersarang, bukan header grup), rencana Pengaturan HRGA terpusat beserta aturan penyaringan per tab, dan bagian mana saja dari UI yang mengikuti pemilih perusahaan (multi-tenant).",
+      "kata_kunci": [
+        "erp-frontend",
+        "hris-dashboard",
+        "One Bharata",
+        "web ERP",
+        "Next.js",
+        "SSO",
+        "system_roles",
+        "role gating",
+        "sidebar menu",
+        "multi-perusahaan"
+      ]
     },
     {
       "path": "Application/APP - Website Bharata Internasional.md",
@@ -1694,8 +1705,19 @@
       ],
       "hash": "e73a1eced0610653c7a942e330cd9c0b5bb9c6222e65ba0aca3d209a4a59ff3d",
       "ukuran_kb": 75.7,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: di mana sumber kebenaran data karyawan dan autentikasi bip-erp, endpoint apa saja yang dipakai untuk login (username/employee_id, PIN, biometric), refresh token, dan registrasi onboarding. Menjelaskan pula operasi admin akun oleh IT (reset akun, forget-device, set roles, status aktif), CRUD master department dan system role beserta gerbang RBAC-nya, serta register workspace posisi Legal, R&D Regulatory, Quality, dan Procurement yang menumpang di service ini agar tak menambah modul gateway.",
+      "kata_kunci": [
+        "employee-service",
+        "auth",
+        "login",
+        "PIN",
+        "onboarding",
+        "master department",
+        "system roles",
+        "RBAC",
+        "karyawan",
+        "resign"
+      ]
     },
     {
       "path": "Core System and Modules/Microservices - File Service.md",
@@ -1907,8 +1929,19 @@
       ],
       "hash": "42d54b2b9e07cad278174e5924367b8842d5c412e6d9730de00f298b0651b9b6",
       "ukuran_kb": 237.4,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana order dan laporan iklan marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk ke ERP lewat webhook dan sync terjadwal, lalu dinormalkan jadi model transaction terpadu. Menjelaskan bridging akuntansi ke Accurate (faktur harian, Sales Invoice, Sales Return), pengelolaan kredensial OAuth per marketplace, automasi auto-ship/auto-approve yang sadar hari libur, serta endpoint analitik seperti GMV Max monitoring/overview dan metrik video ICC yang dipakai insentif.",
+      "kata_kunci": [
+        "integration-service",
+        "TikTok Shop",
+        "Shopee",
+        "webhook",
+        "Accurate",
+        "sales invoice",
+        "GMV Max",
+        "marketplace",
+        "auto-sync",
+        "ads report"
+      ]
     },
     {
       "path": "Core System and Modules/Microservices - Inventory Service.md",
@@ -2014,8 +2047,19 @@
       ],
       "hash": "7b835b63592348ae0ab714e8addb1879035c49ac838eeeb61202b0ee58ce4302",
       "ukuran_kb": 61.4,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana WMS manufaktur bekerja, dari master bahan baku dan produk/bundle, snapshot stok, transaksi masuk/keluar, formula (BOM), produksi, sampai PO dan proposal koreksi. Menjelaskan dari mana master dan angka stok berasal (sync Accurate dan data HPP, bukan lagi Google Sheets), bagaimana pergerakan WMS didorong balik ke Accurate sebagai Penyesuaian Persediaan lewat outbox, serta cara kerja saldo awal dan saldo akhir bulanan.",
+      "kata_kunci": [
+        "manufacture-service",
+        "WMS",
+        "gudang",
+        "warehouse",
+        "stok",
+        "master bahan",
+        "formula",
+        "BOM",
+        "saldo awal bulanan",
+        "push Accurate"
+      ]
     },
     {
       "path": "Core System and Modules/Microservices - Marketing Analytics Service.md",
@@ -2200,8 +2244,19 @@
       ],
       "hash": "64a4900302b503752b7432e92eedfa6bd12f08446c0886edfece327b83c4cbd5",
       "ukuran_kb": 35.3,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana master Pemasok dan master Barang & Jasa diinput di ERP lalu disinkronkan ke Accurate, serta bagaimana dokumen Pembelian (Permintaan Barang, Pesanan Pembelian, Penerimaan) dicerminkan balik dari Accurate untuk dipantau. Memuat aturan penomoran/usul kode, perilaku worker antrian sync, import awal, gerbang RBAC role procurement, dan jebakan integrasi Accurate yang sudah terverifikasi (field baca-saja, tipe data respons, perilaku edit parsial).",
+      "kata_kunci": [
+        "procurement-service",
+        "pemasok",
+        "supplier",
+        "vendor",
+        "barang dan jasa",
+        "pembelian",
+        "purchase order",
+        "penerimaan barang",
+        "Accurate",
+        "sync"
+      ]
     },
     {
       "path": "Core System and Modules/Microservices - Recruitment Service.md",
@@ -3016,8 +3071,18 @@
       ],
       "hash": "556058f972e13ef0dc38a0b0c88b3b8a2d78b044f553a5a643e885a4f6b6c83d",
       "ukuran_kb": 5.4,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: kenapa tanggal Retur Penjualan yang di-push ke Accurate pernah diseragamkan ke tanggal disetujui marketplace (accepted) dan kenapa jalur arrival/reverse-tracking dicabut. Menjelaskan juga alasan konstanta cutover dipecah dua, satu untuk jalur faktur dan satu untuk jalur retur, supaya retur yang matang belakangan tidak memblokir atau membalik pembukuan manual finance. Berguna untuk menelusuri asal-usul aturan tanggal dan cutover retur sebelum digantikan sebagian oleh ADR berikutnya.",
+      "kata_kunci": [
+        "retur",
+        "return",
+        "sales return",
+        "ADR 0023",
+        "cutover",
+        "tanggal retur",
+        "accepted",
+        "auto-sync retur",
+        "Accurate"
+      ]
     },
     {
       "path": "Decisions/ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution.md",
@@ -3039,8 +3104,19 @@
       ],
       "hash": "0277a6d51d46f74911e9c4a1f82f7eee8c63f15f994d4071e90de0311ebbd28b",
       "ukuran_kb": 30.7,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: kapan sebuah retur marketplace dibukukan sebagai Retur Penjualan dan kapan justru dilewati karena refund-nya sudah terserap di sisi Income/Bukti Terima Kas, lewat gerbang payout mendekati nol. Menjelaskan pula bagaimana tanggal retur ditentukan berbeda per solution (refund-only pakai tanggal ajukan, barang-balik pakai tanggal barang tiba, TikTok pakai order_update_date) dan kenapa cutover retur mengikuti hari kirim faktur sumbernya. Memuat rangkaian amandemen yang memperketat gerbang agar dobel-booking tidak terjadi dan setiap keputusan skip meninggalkan jejak.",
+      "kata_kunci": [
+        "retur",
+        "return",
+        "payout",
+        "escrow",
+        "refund",
+        "Shopee",
+        "dobel booking",
+        "ADR 0024",
+        "tanggal retur",
+        "receipt"
+      ]
     },
     {
       "path": "Decisions/ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput.md",
@@ -3066,8 +3142,19 @@
       ],
       "hash": "4528b389bee5bd130456ef093282e4db777d5d98c07310a905912823913d7092",
       "ukuran_kb": 30.8,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi dua sub-tab (data dari sumber versus data hasil input gudang), menu mana saja yang terkena, dan kenapa badge status sudah/belum dicatat hanya dipasang di tab yang punya kunci join. Menjelaskan aturan turunannya: agregasi tab Keluar FG per SKU dengan bundle dipecah ke komponen, status resi mana yang dihitung keluar gudang, serta kenapa nama penginput distempel server lewat header gateway dan tidak boleh dikirim client. Mencakup pula gerbang gudang untuk retur barang-balik yang membuat pemisahan itu bermakna.",
+      "kata_kunci": [
+        "WMS",
+        "log gudang",
+        "sumber vs input",
+        "created_by_name",
+        "audit trail",
+        "retur ekspedisi",
+        "resi",
+        "Keluar FG",
+        "Inbound RM",
+        "ADR 0025"
+      ]
     },
     {
       "path": "Decisions/ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri).md",
@@ -5308,8 +5395,18 @@
       ],
       "hash": "47f2fd2b1555668bf16a749c220b468656cf2e449af6061e363a79176d8147a8",
       "ukuran_kb": 134.6,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang hari ini, per departemen dan per posisi, lengkap dengan bobot, label persis seperti tersimpan, dan target yang tersimpan di deskripsi. Menjelaskan cara membaca tabelnya (kenapa typo dan spasi ujung sengaja dipertahankan sebagai kunci identitas metrik), klasifikasi kelayakan otomasi per departemen, cacat data yang sudah diketahui seperti template uji dan metrik duplikat, serta cara menyegarkan dokumen dari koleksi kpi_template.",
+      "kata_kunci": [
+        "KPI",
+        "kpi_template",
+        "matriks KPI",
+        "bobot",
+        "target KPI",
+        "departemen",
+        "metrik",
+        "penilaian karyawan",
+        "otomasi KPI"
+      ]
     },
     {
       "path": "Human Resource Information System/HRIS - Organization Structure.md",
@@ -5414,8 +5511,19 @@
       ],
       "hash": "cb06786d5041233778bbdde0d52f5d1d7c7acd6cea5b1ebe59bcaca3f570c48f",
       "ukuran_kb": 65.2,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: metrik KPI mana yang bisa diisi otomatis dari data yang sudah dimiliki ERP, mana yang modulnya ada tapi datanya kosong, dan mana yang memang tak punya sumber sama sekali, dari 311 metrik yang terpasang di production. Menjelaskan cara kerja mesin nilai otomatis (sumber, formula reduksi, scope tim atau departemen, arah target, batas nilai, dan bedanya cakupan penuh versus parsial), bagaimana penilai melihatnya sebagai usulan di modal Score KPI, serta layar diagnostik Otomasi KPI untuk menelusuri metrik yang macet beserta sebabnya. Memuat pula jebakan urutan penilaian untuk metrik skor tim dan bagaimana HR mengisi konfigurasinya sendiri.",
+      "kata_kunci": [
+        "otomasi KPI",
+        "auto-values",
+        "skor KPI",
+        "kpi_score",
+        "skor tim",
+        "uptime sistem",
+        "scope team",
+        "metrik otomatis",
+        "KPI automation",
+        "supervisor"
+      ]
     },
     {
       "path": "Human Resource Information System/HRIS - Overtime.md",
@@ -6590,8 +6698,19 @@
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
       "ukuran_kb": 6.9,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
+      "kata_kunci": [
+        "faktur",
+        "invoice",
+        "Accurate",
+        "append dobel",
+        "saveWithRetry",
+        "external-edit-detection",
+        "RETURN_LOCKED",
+        "invqtycek",
+        "auto-sync faktur",
+        "pembersihan data"
+      ]
     },
     {
       "path": "Logs/LOG - Clock-in Gagal Karyawan Shift (schedule not found).md",
@@ -9421,17 +9540,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Application/APP - Web ERP.md",
-    "Core System and Modules/Microservices - Employee Service.md",
-    "Core System and Modules/Microservices - Integration Service.md",
-    "Core System and Modules/Microservices - Manufacture Service.md",
-    "Core System and Modules/Microservices - Procurement Service.md",
-    "Decisions/ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah.md",
-    "Decisions/ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution.md",
-    "Decisions/ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput.md",
-    "Human Resource Information System/HRIS - Matriks KPI per Departemen.md",
-    "Human Resource Information System/HRIS - Otomasi Skor KPI.md",
-    "Logs/LOG - 2026-08-11 Pembersihan Faktur Menggelembung Agustus.md"
-  ]
+  "gagal": []
 }
