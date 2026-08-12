@@ -127,6 +127,8 @@ Sampai batch ini, menyalakan satu metrik otomatis menuntut seseorang membedah `k
 
 **`kinerja_toko` bertambah `jumlah_video`**, menjadi tujuh metrik (`revenue`, `ads_cost`, `gross_profit`, `jumlah_video`, `roi`, `roi_bersih`, `retur_persen`). Berbeda dari metrik rasio di sebelahnya, **nol video BUKAN galat**: seorang ICC memang dapat tidak menerbitkan video sebulan penuh, dan itu justru keadaan yang hendak diukur — menggalatkannya menyembunyikan kinerja terburuk sebagai "gagal hitung".
 
+**Penyempurnaan pengisian angka** (branch `feature/workspace-position`, **belum di-push** per 2026-08-12). Field target, ambang, `nilai_minimum`, dan target per-bulan/per-karyawan kini menampilkan **pemisah ribuan langsung saat mengetik** (netral-satuan, sadar-locale id/en, desimal dipertahankan), sementara yang dikirim ke backend tetap `number` mentah — komponen `InputAngka` + helper `formatKetik`/`parseAngka` di `src/features/hris/kpi/lib/angka.ts`. Di samping field target muncul **petunjuk satuan berbasis FORMULA** (`jumlah_nilai`→nominal, `jumlah_unit`→jumlah, `rasio_ambang`→persen, `rata_rata`→nilai) sebagai pill berikon, ditambah baris "Tersimpan ke sistem" yang memperlihatkan angka mentah. Satuan sengaja diturunkan dari formula, bukan nama sumber, agar sumber baru tak menuntut rilis FE — konsekuensi diterima: metrik uptime/downtime (juga `rata_rata`) berlabel "nilai (0–100)", bukan "persen". Tabel target massal tetap integer-only (`bacaAngka`) dan hanya menampilkan grouping saat blur.
+
 ### Yang harus diketahui sebelum angkanya dipercaya
 
 Lima hal ini tidak terlihat dari layar mana pun, dan tiap satunya cukup untuk membuat skor terbaca sebagai kinerja buruk padahal bukan.
