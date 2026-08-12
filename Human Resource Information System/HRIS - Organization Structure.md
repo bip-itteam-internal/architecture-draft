@@ -2,7 +2,7 @@
 
 *Struktur organisasi perusahaan — departemen, posisi/jabatan, jenjang, dan hierarki (atasan/SPV). **Departemen dan posisi** dikelola sebagai master data di MongoDB (`master_department`) dengan CRUD endpoint dan halaman admin di frontend. Data karyawan tetap di `work_data`. **Bagan organisasi sudah ada** (`/hris/org-chart`); **jenjang jabatan sudah ada** (2026-08-03) tapi belum diisi HR.*
 
-- **Status**: ⚠️ Implemented (ada catatan) — master departemen/posisi sudah di-DB; org chart **sudah ada** (2026-08-01); **jenjang jabatan sudah ada & live di produksi** (2026-08-03) tapi **nol dari 79 jabatan** terisi
+- **Status**: ⚠️ Implemented (ada catatan) — master departemen/posisi sudah di-DB; org chart **sudah ada** (2026-08-01); **jenjang jabatan sudah ada & live di produksi** (2026-08-03) tapi **nol dari 79 jabatan** terisi; **penyetuju pengajuan per departemen** merged 2026-08-12 (PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184) & [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)) tapi **belum diverifikasi lewat gateway dan belum deploy**
 
 ## Ruang Lingkup
 
@@ -45,6 +45,40 @@
 	- ⚠️ **Direktur muncul di dalam Kesekretariatan, bukan di puncak**, karena begitulah datanya (`work_data.department` = `Kesekretariatan`). Penentuan akar **tidak** ditebak dari nama jabatan. Menjadikan Direktur puncak organisasi adalah **keputusan data**, sekelas dengan jenjang jabatan; bagan ini justru membuat kejanggalan itu terlihat.
 	- ⚠️ Direktur di dalam Kesekretariatan **tetap begitu walau jenjang sudah ada**: akar bagan ditentukan `work_data.department`, bukan `level_key`. Menjadikan jenjang penentu akar akan membuat bagan bercabang dari lima Supervisor sekaligus dan berbeda dari struktur pelaporan yang sebenarnya.
 
+## Penyetuju pengajuan per departemen (`work_data.is_supervisor`)
+
+- ✅ **Merged 2026-08-12** (BE PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184), FE PR [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)); **belum diverifikasi lewat gateway dan belum deploy**.
+- Layar: **Pengaturan → Organisasi → Penyetuju Pengajuan** (`/pengaturan/organisasi?tab=penyetuju`). Endpoint: `GET /master/departments/approvers` & `PUT /master/departments/:key/approver` ([[API - Employee Service]]).
+
+### Kenapa ada
+
+`work_data.is_supervisor` menentukan ke siapa cuti, izin, koreksi absensi, dan dinas satu departemen mengalir, tetapi sampai 2026-08-12 **tak ada layar mana pun yang menentukannya**. Frontend menurunkannya dari NAMA JABATAN (`position.includes("Supervisor") || position === "Leader"`) setiap kali Data Pekerjaan disimpan.
+
+Akibatnya: **menyunting data siapa pun berjabatan persis `"Leader"` mengalihkan seluruh persetujuan departemennya**, tanpa centang dan tanpa pesan. Terjadi di **Beauty Hacks 2026-08-12**: pengajuan 48 orang berpindah dari Aris Romadhoni (`BIP-0224-01-26`, "BeautyHacks Supervisor") ke Ade Jaenul Farhi (`BIP-0055-02-24`, "Leader") yang `system_roles`-nya kosong. Dua koreksi absensi menggantung sampai keluhan masuk lewat MyBharata, bukan lewat satu pun test.
+
+Ini juga menjelaskan kalimat "data eksplisit selalu menang atas tebakan judul jabatan" di bawah: data eksplisit itu **sendiri** diisi dari tebakan judul jabatan.
+
+### Aturan yang berlaku sekarang
+
+- **Satu departemen satu penyetuju.** Pemanggil memakai `supervisors[0]`, jadi penyetuju kedua tak menambah siapa pun yang bisa menyetujui — ia hanya membuat pilihannya ambigu dan membuat salah satunya melihat antrian review kosong tanpa tahu sebabnya. Penetapan adalah **pertukaran** dalam satu transaksi, bukan penambahan.
+- **`is_supervisor` tak lagi bisa ditulis lewat form data pekerjaan.** Dibuang di **ketiga** pintu tulis `work_data` lewat `fieldPenyetuju` (`services/employee/partial_update.go`), bersama `fieldKontrak`: `buildUpdateSet`, `POST /create/:id/work`, dan `workDataSetTanpaFieldTerkunci` (jalur `PUT /api/hris/employees/multi/:id` yang menerima struct). Pintu ketiga paling berbahaya karena `IsSupervisor` bertag bson **tanpa `omitempty`**, sehingga pemanggil yang tak menyentuhnya tetap menulis `false` lewat zero value Go. Dibuang **senyap, bukan 400**, mengikuti alasan `fieldKontrak`: backend naik lebih dulu daripada frontend.
+- **Penyetuju wajib anggota departemen yang disetujuinya.** Lookup menyaring `{is_supervisor, department}` sekaligus, jadi orang dari departemen lain tak akan pernah ditemukan dan departemennya berakhir tanpa penyetuju secara senyap.
+- ⚠️ **`:key` adalah satu key departemen, BUKAN label grup.** Endpoint ini sengaja **tidak** memakai `ResolveDepartmentFilter`/`ExpandToDepartmentGroup` seperti `/supervisor-assignment` dan `/kpi`: memekarkan `HRGA` akan mematikan penyetuju Human Resource sekaligus, sementara General Affair justru harus tetap kosong agar alirannya ke HR tak putus. Dikunci uji pembaca berkas.
+- **Departemen tanpa penyetuju sendiri bukan kekurangan.** Layar membedakan "mengikuti *induk*" dari "belum ditetapkan", dan yang pertama **tidak** dihitung sebagai perlu perhatian — menyamakannya akan mengundang orang mengangkat supervisor GA dan memutus jalur pengajuan 21 orang.
+- **Perpindahan hanya berlaku untuk pengajuan BARU.** Penyetuju disnapshot saat pengajuan dibuat, jadi yang sedang berjalan tetap di orang lama; itulah yang membuat dua koreksi Hanif Fauzan menggantung saat insiden. Dialog konfirmasi menyebutkannya.
+- **Jejak audit** di koleksi `department_approver_log` (`company_id`, `department_key`, `department_name`, `from_employee_id`, `to_employee_id`, `actor`, `at`), ditulis **di dalam transaksi** yang sama. Insiden 2026-08-12 hanya bisa dilacak karena `metadata.updated_at` kebetulan belum tertimpa.
+
+### Beda dari Atasan Langsung
+
+| | **Atasan Langsung** (`supervisor_id`) | **Penyetuju Pengajuan** (`is_supervisor`) |
+|---|---|---|
+| Mengatur | Cakupan TAMPILAN (siapa melihat KPI siapa) | WEWENANG menyetujui pengajuan |
+| Layar | HRIS → Personalia → Atasan Langsung | Pengaturan → Organisasi → Penyetuju Pengajuan |
+| Cakupan | Per orang, banyak bawahan | Per departemen, satu penyetuju |
+| Label grup | Dimekarkan (HRGA jadi satu tim) | **Tidak** dimekarkan |
+
+Halaman Atasan Langsung berkali-kali disangka juga menetapkan penyetuju, jadi kini ia memuat keterangan **read-only** yang menunjuk ke tab penyetuju. Sengaja hanya memberi tahu, tidak menulis: menyatukan kedua kendali di satu layar akan melebur dua konsep yang tabel di §Cakupan supervisi sengaja pisahkan.
+
 ## Cakupan supervisi antar-departemen (`supervised_by`)
 
 ⚠️ **Baca sebelum mengubah data departemen atau supervisor.** Relasi ini menentukan ke siapa pengajuan cuti mengalir.
@@ -82,6 +116,8 @@ Mencampur keduanya berbahaya dua arah: menyempitkan tampilan bikin staf HR melih
 **Data eksplisit selalu menang atas tebakan judul jabatan**, di kedalaman mana pun. Kalau tidak, seseorang berjudul `GA Supervisor` (jabatan itu ada di seed default GA) tanpa flag `is_supervisor` akan membajak seluruh pengajuan GA dari supervisor HR yang sah.
 
 **Departemen yang punya atasan sendiri selalu menang atas induknya.** Jadi memisahkan kembali cukup mengangkat supervisor di departemen itu; relasinya tak perlu dikosongkan lebih dulu, dan tak perlu ubah kode maupun deploy.
+
+⚠️ **Pemanggil memakai `supervisors[0]` — SATU orang, yang pertama.** Sejak PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184) kedua pipeline (jalur utama dan jalur cadangan) memakai `$sort {employee_id: 1}` eksplisit, dan hasil lebih dari satu dicatat ke log beserta siapa yang menang. Sebelumnya urutannya adalah urutan index yang kebetulan tersedia: produksi hanya punya `{company_id, employee_id}`, sehingga employee_id terkecil menang tanpa pernah diputuskan siapa pun. Hasil akhirnya sama, bedanya kini itu keputusan yang tertulis. Jalur **cadangan** yang paling mungkin mengembalikan beberapa orang, karena ia menebak dari judul jabatan yang tak mengenal siapa yang sah.
 
 ### Konsekuensi yang perlu dijaga
 

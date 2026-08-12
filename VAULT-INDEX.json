@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-11",
-  "jumlah_dokumen": 284,
+  "digenerate": "2026-08-12",
+  "jumlah_dokumen": 285,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -96,20 +96,22 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "0a9e29493259906ba4809eaec8b03da86f88107c7280f1f43c5e3cdb9ea1957e",
-      "ukuran_kb": 31.6,
-      "ringkasan": "Daftar endpoint employee-service beserta gerbang dan bentuk balasannya. Menjawab: rute apa yang tersedia untuk data karyawan, kontrak, resign, mutasi, KPI, dan surat peringatan; siapa yang boleh memanggilnya; serta parameter dan field respons tiap rute, termasuk deret riwayat turnover dan batas kerasnya. Dipakai saat menyambungkan frontend atau service lain ke modul kepegawaian.",
+      "hash": "e716eb2a43990d6fd3eeb04ed5b8e7a2322bdd199414439cde09b6d222d2cceb",
+      "ukuran_kb": 32.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service dan siapa yang boleh memanggilnya, mulai dari login dan onboarding, CRUD personal/work data beserta dokumennya, master data departemen dan system role, jenjang jabatan, penyetuju pengajuan per departemen, KPI, kuota cuti, kontrak, resign, mutasi, sampai surat peringatan. Juga menjawab pertanyaan operasional yang sering muncul: rute mana yang dipakai frontend mana, gerbang RBAC apa yang berlaku di tiap grup rute, dan mana yang sudah live versus sekadar merged. Beberapa entri mencatat jebakan spesifik seperti urutan pendaftaran rute statis versus parametrik dan field yang sengaja dipertahankan saat PUT memakai ReplaceOne.",
       "kata_kunci": [
-        "employee service",
-        "endpoint karyawan",
-        "resign",
-        "turnover",
-        "riwayat turnover",
-        "kontrak",
-        "mutasi",
-        "promosi",
-        "surat peringatan",
-        "KPI karyawan"
+        "employee-service",
+        "endpoint",
+        "API karyawan",
+        "RBAC",
+        "master data departemen",
+        "penyetuju pengajuan",
+        "approver",
+        "jenjang jabatan",
+        "job level",
+        "supervisor-assignment",
+        "org chart",
+        "resign"
       ]
     },
     {
@@ -1126,21 +1128,10 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "e56e05991ece420d4ba64fd01737862b7c9eb500580949f4242f5197ecc93ac0",
-      "ukuran_kb": 217.3,
-      "ringkasan": "Peta modul dan halaman frontend ERP (Next.js) beserta keputusan UI dan jebakan yang sudah terbukti menggigit. Menjawab: halaman apa saja yang ada per modul dan di rute mana, bagaimana sidebar disusun dan disaring per role, per izin, dan per jabatan, kenapa kategori HRIS dan GA digabung setelah penyaringan alih-alih di berkas menu, bagaimana gerbang rute di proxy bekerja dan di mana ia belum lengkap, serta bagaimana Ringkasan Divisi HRGA bertab per posisi disusun. Juga memuat daftar yang belum diimplementasikan beserta alasannya.",
-      "kata_kunci": [
-        "web ERP",
-        "erp-frontend",
-        "sidebar",
-        "menu",
-        "kategori HRGA",
-        "ringkasan divisi",
-        "proxy",
-        "gerbang rute",
-        "tampilan menu",
-        "Next.js"
-      ]
+      "hash": "8f8fcafc8153780f4d792f93fb92baddc793d32bbd8ec4f083d4b096fe9c1dac",
+      "ukuran_kb": 219.5,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Application/APP - Website Bharata Internasional.md",
@@ -1668,11 +1659,11 @@
         "HRIS - Otomasi Skor KPI",
         "Microservices - Insentive Service",
         "Microservices - Marketing Analytics Service",
+        "Microservices - Integration Service",
         "Microservices - Task Management Service",
         "API - Employee Service",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "Microservices - Inventory Service",
-        "Microservices - Integration Service",
         "APP - Web ERP",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "HRIS - Matriks KPI per Departemen",
@@ -1701,21 +1692,10 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "f7960263d42497e08e3404d33bf88b932d1949779a142febec4d09b9daed5f84",
-      "ukuran_kb": 73.7,
-      "ringkasan": "Implementasi employee-service: data karyawan, kontrak, resign dan penonaktifan akun, promosi dan mutasi, KPI, surat peringatan, serta ringkasan turnover. Menjawab: bagaimana headcount dan turnover dihitung dan mengapa angka bulan lampau hanya boleh dipakai sebagai arah, bagaimana penonaktifan akun dijalankan cron, dan gerbang mana yang menjaga tiap kelompok rute. Memuat pula konsekuensi deploy seperti kategori notifikasi baru yang menuntut dua container naik bersama.",
-      "kata_kunci": [
-        "employee service",
-        "turnover",
-        "headcount",
-        "resign",
-        "mutasi",
-        "promosi",
-        "surat peringatan",
-        "kontrak karyawan",
-        "KPI",
-        "cron penonaktifan"
-      ]
+      "hash": "e73a1eced0610653c7a942e330cd9c0b5bb9c6222e65ba0aca3d209a4a59ff3d",
+      "ukuran_kb": 75.7,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Core System and Modules/Microservices - File Service.md",
@@ -1925,21 +1905,10 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "53b944040c678ad0af81aa2b0ab7c14cd3edc1e51a3c6d08099700ea04ff224b",
-      "ukuran_kb": 236.1,
-      "ringkasan": "Menjawab: bagaimana order marketplace (TikTok Shop, Shopee, Lazada, TikTok Ads) masuk ke ERP lewat webhook direct, bagaimana kredensial OAuth per marketplace dikelola, dan bagaimana data itu dinormalkan jadi model transaction terpadu. Juga menjawab: bagaimana bridging ke Accurate Online dilakukan (invoice, Sales Invoice, Sales Return, ringkasan harian per shop), bagaimana laporan iklan GMV Max dan metrik video ICC diagregasi untuk dashboard marketing dan insentif, serta apa saja cron/worker yang berjalan. Termasuk status jalur Desty yang soft-disabled, kondisi Meta Ads yang masih konsep, dan gotcha teknis seperti bypass verifikasi signature Shopee dan perbaikan agregasi ROI/ROAS.",
-      "kata_kunci": [
-        "integration service",
-        "marketplace",
-        "TikTok Shop",
-        "Shopee",
-        "TikTok Ads",
-        "GMV Max",
-        "Accurate",
-        "webhook",
-        "ROAS",
-        "Desty"
-      ]
+      "hash": "42d54b2b9e07cad278174e5924367b8842d5c412e6d9730de00f298b0651b9b6",
+      "ukuran_kb": 237.4,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Core System and Modules/Microservices - Inventory Service.md",
@@ -2043,21 +2012,10 @@
         "DB - Overview and Notes",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
-      "hash": "d465fa9dc69d990b11afdd00e23f755cf616c6b3cd6773efa8abe1bf65256b49",
-      "ukuran_kb": 57.3,
-      "ringkasan": "Menjawab: bagaimana WMS manufaktur bekerja — master bahan baku dan produk, stok per gudang, transaksi in/out, formula/BOM, produksi, material order, PO, proposal koreksi, dan audit log. Juga menjawab: dari mana master dan angka stok berasal setelah sync Google Sheets dihapus (bahan & stok dari Accurate, barang jadi & bundle dari data HPP, formula dari import Excel), bagaimana push pergerakan WMS ke Accurate sebagai Penyesuaian Persediaan harian berjalan lewat outbox, dan bagaimana saldo awal/akhir bulanan dihitung serta dikunci saat bulan berganti. Termasuk gotcha nyata seperti format transDate dd/MM/yyyy yang membuat semua push gagal dan penolakan Accurate karena HPP nol.",
-      "kata_kunci": [
-        "manufacture service",
-        "WMS",
-        "stok",
-        "master bahan",
-        "formula",
-        "Accurate",
-        "penyesuaian persediaan",
-        "saldo awal",
-        "bundle",
-        "HPP"
-      ]
+      "hash": "7b835b63592348ae0ab714e8addb1879035c49ac838eeeb61202b0ee58ce4302",
+      "ukuran_kb": 61.4,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Core System and Modules/Microservices - Marketing Analytics Service.md",
@@ -2235,25 +2193,15 @@
         "API - Procurement Service",
         "Microservices - Employee Service",
         "CORE - RBAC dan Permission Set",
+        "HRIS - Otomasi Skor KPI",
         "ADR - 0001 Akuntansi via Accurate",
         "Microservices - Manufacture Service",
         "Microservices - Integration Service"
       ],
-      "hash": "37a0dfa5b965670c84b2d46e298458680aa740612e31bba928ddc704eca29dae",
-      "ukuran_kb": 32.0,
-      "ringkasan": "Implementasi procurement-service: master Pemasok dan Barang & Jasa yang diinput di ERP lalu disinkronkan ke Accurate, plus cermin baca-saja Pembelian (Pesanan, Penerimaan, Permintaan Barang) yang ditarik dari Accurate. Menjawab: ke arah mana data mengalir untuk tiap entity, koleksi apa saja yang ada di procurement_db beserta jumlah nyatanya di produksi, dan bagaimana worker sinkronisasi bekerja. Sebagian bab menyimpan peringatan bahwa isinya belum diaudit ulang terhadap kode terkini.",
-      "kata_kunci": [
-        "procurement",
-        "pemasok",
-        "vendor",
-        "barang dan jasa",
-        "pembelian",
-        "pesanan pembelian",
-        "penerimaan",
-        "permintaan barang",
-        "Accurate",
-        "sinkronisasi"
-      ]
+      "hash": "64a4900302b503752b7432e92eedfa6bd12f08446c0886edfece327b83c4cbd5",
+      "ukuran_kb": 35.3,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Core System and Modules/Microservices - Recruitment Service.md",
@@ -3057,7 +3005,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (sebagian digantikan)** — keputusan **#1 (tanggal accepted-seragam)** **digantikan** [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] (2026-07-18). Keputusan **#2**: struktur **split** (2 konstanta) tetap, TAPI **basis cutover retur diubah tanggal-retur → hari-kirim** (2026-07-19, ADR-0024).",
+      "status_teks": "**Implemented (sebagian digantikan)** — keputusan **#1 (tanggal accepted-seragam)** **digantikan** [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] (2026-07-18). Keputusan **#2**: struktur **split** (2 konstanta) tetap, TAPI **basis cutover retur diubah tanggal-retur → hari-kirim** (2026-07-19, ADR-0024). **2026-08-12:** jaring terakhir `shipped` (hari-kirim) yang disebut ANOMALI di bawah kini **DIBUANG total** — ganti `order.returned_at` lalu tanggal deteksi (`detected`); lihat [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] amandemen 2026-08-12.",
       "publik": true,
       "tautan": [
         "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
@@ -3066,18 +3014,10 @@
         "Microservices - Integration Service",
         "APP - Web ERP"
       ],
-      "hash": "941f1db418adcb3c3b19f95f795a195624b0f5b72344a6f4b55a31cd42299594",
-      "ukuran_kb": 5.1,
-      "ringkasan": "Menjawab keputusan awal soal tanggal retur (memakai tanggal accepted marketplace secara seragam lintas channel) dan kenapa cutover auto-sync faktur dipisah dari cutover retur (basis tanggal berbeda), termasuk kasus retur 'yatim' yang sempat tak bisa dibukukan.",
-      "kata_kunci": [
-        "tanggal retur accepted",
-        "cutover faktur vs retur",
-        "autoSyncCutoverDateWIB",
-        "retur yatim",
-        "arrival resolver",
-        "resolveReturnTransDate",
-        "WIB"
-      ]
+      "hash": "556058f972e13ef0dc38a0b0c88b3b8a2d78b044f553a5a643e885a4f6b6c83d",
+      "ukuran_kb": 5.4,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Decisions/ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution.md",
@@ -3085,7 +3025,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented & Deployed; perbaikan cacat MENUNGGU DEPLOY** (cacat 2026-08-07: cabang bukti-mutasi-dompet men-skip kasus yang justru TIDAK dobel, paparan 1 order — **fix di PR #1085, belum deploy**; lihat amandemen 2026-08-07 & 2026-08-08). Riwayat: (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel). **Amandemen 2026-08-05 (✅ DEPLOYED 2026-08-05, commit `779b0a06`; verifikasi prod: 38 baris jejak tersemai, dari 1):** janji \"SKIP → baris `SKIPPED`\" di Decision #1 akhirnya benar-benar dipenuhi — sebelumnya baris hanya ditandai bila kebetulan sudah ada, sehingga mayoritas retur payout>0 **tak berjejak sama sekali** di UI; sekaligus menutup lubang dobel-booking lewat konfirmasi gudang yang baru terlihat setelah baris jejak itu ada. **Amandemen 2026-08-06 (✅ DEPLOYED, PR #1038):** cabang Shopee berhenti menebak dari kanal dan **menuntut bukti** mutasi penyerap; backfill + sensus penutup SELESAI hari yang sama (129 dari 131 retur ACCEPTED sudah berbaris; 2 sisanya DEFER benar). Lihat Consequences.",
+      "status_teks": "**Implemented & Deployed; perbaikan cacat MENUNGGU DEPLOY** (cacat 2026-08-07: cabang bukti-mutasi-dompet men-skip kasus yang justru TIDAK dobel, paparan 1 order — **fix di PR #1085, belum deploy**; lihat amandemen 2026-08-07 & 2026-08-08). Riwayat: (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel). **Amandemen 2026-08-05 (✅ DEPLOYED 2026-08-05, commit `779b0a06`; verifikasi prod: 38 baris jejak tersemai, dari 1):** janji \"SKIP → baris `SKIPPED`\" di Decision #1 akhirnya benar-benar dipenuhi — sebelumnya baris hanya ditandai bila kebetulan sudah ada, sehingga mayoritas retur payout>0 **tak berjejak sama sekali** di UI; sekaligus menutup lubang dobel-booking lewat konfirmasi gudang yang baru terlihat setelah baris jejak itu ada. **Amandemen 2026-08-06 (✅ DEPLOYED, PR #1038):** cabang Shopee berhenti menebak dari kanal dan **menuntut bukti** mutasi penyerap; backfill + sensus penutup SELESAI hari yang sama (129 dari 131 retur ACCEPTED sudah berbaris; 2 sisanya DEFER benar). Lihat Consequences. **Amandemen 2026-08-12 (kode, belum deploy):** fallback tanggal **hari-kirim DIBUANG**, ganti ke `order.returned_at` lalu tanggal deteksi (PR bip-erp#1161 + erp-frontend#977).",
       "publik": true,
       "tautan": [
         "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
@@ -3097,27 +3037,10 @@
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur"
       ],
-      "hash": "ecd7490540ac20488cb4bc57e9a10ff03fa7aae084341f7c8ec71d215ccafcf4",
-      "ukuran_kb": 28.2,
-      "ringkasan": "Menjawab: kapan sebuah retur boleh dibukukan sebagai Retur Penjualan di Accurate dan kapan harus di-skip, lewat gerbang payout≈0 (returnPayoutGate: CANCELLED langsung book, income belum settle jadi DEFER, payout>0 pasca-cutover jadi SKIP karena diserap receipt/Auto Sync Income, payout≈0 jadi book) sehingga revenue tidak dibalik dua kali. Juga menjawab: tanggal mana yang dipakai per solution (cancelled_at untuk cancel, order_update_date untuk TikTok, requested_at untuk Shopee refund-only, tanggal fisik barang sampai dari return_tracking RECEIVED untuk barang-balik) dan mengapa update_time Shopee tidak dipercaya karena melar saat settle refund. Serta menjawab: mengapa cutover retur mengikuti hari kirim/faktur, apa hasil cleanup data lama (descope 1565 retur, void 1 dobel), dan apa isi rangkaian amandemen 2026-08-05 sampai 2026-08-08 tentang jejak baris SKIPPED dan gerbang yang menuntut bukti/angka penyerapan.",
-      "kata_kunci": [
-        "ADR 0024",
-        "retur",
-        "return",
-        "gerbang payout",
-        "payout gate",
-        "Retur Penjualan",
-        "Sales Return",
-        "Accurate",
-        "escrow",
-        "refund",
-        "Shopee",
-        "TikTok",
-        "cutover retur",
-        "tanggal retur",
-        "dobel booking",
-        "SKIPPED"
-      ]
+      "hash": "0277a6d51d46f74911e9c4a1f82f7eee8c63f15f994d4071e90de0311ebbd28b",
+      "ukuran_kb": 30.7,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Decisions/ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput.md",
@@ -3133,29 +3056,18 @@
         "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
         "Microservices - Integration Service",
-        "ADR - 0002 Database-per-Service",
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
+        "ADR - 0002 Database-per-Service",
         "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
         "APP - Web ERP",
         "API - Manufacture Service",
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "26ae8166a5a7d6d8c5b82835636f5df0ff5b4f700f28ac811869a1bfd76862ee",
-      "ukuran_kb": 23.5,
-      "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi dua sub-tab (SUMBER vs INPUT WMS), menu apa saja yang terkena, dan apa sumber pembanding tiap menu (feed retur marketplace, resi, Procurement PO, Surat Jalan, laporan produksi). Juga menjawab: kenapa badge \"sudah/belum dicatat\" hanya ada di tab yang punya kunci join, status resi mana yang dihitung keluar gudang (COMPLETED + SHIPPED, TO_SHIP dikecualikan), dan kenapa tab sumber Keluar FG diagregasi per SKU dengan bundle dipecah ke komponen. Serta: kenapa nama penginput (created_by_name) distempel server dari header gateway, bukan dikirim frontend, dan bagaimana gerbang gudang per-order untuk retur bekerja.",
-      "kata_kunci": [
-        "ADR 0025",
-        "WMS",
-        "log sumber",
-        "input WMS",
-        "created_by_name",
-        "retur",
-        "Keluar FG",
-        "Inbound RM",
-        "resi",
-        "gerbang gudang"
-      ]
+      "hash": "4528b389bee5bd130456ef093282e4db777d5d98c07310a905912823913d7092",
+      "ukuran_kb": 30.8,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Decisions/ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri).md",
@@ -5388,25 +5300,16 @@
         "RUN - Menambah Metrik KPI Otomatis",
         "HRIS - Otomasi Skor KPI",
         "Microservices - Employee Service",
+        "Microservices - Procurement Service",
         "Microservices - Monitoring Service",
         "HRIS - Alur KPI Otomatis.excalidraw",
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "7bedc37461a6ff22c94fdbd92c9df3d4edd1096ce407b8eb806764d70e1840ae",
-      "ukuran_kb": 133.9,
-      "ringkasan": "Menjawab pertanyaan detail isi kpi_template produksi per departemen: label metrik, bobot, target, dan status kelayakan otomasinya per posisi, termasuk cacat data yang sudah diketahui seperti template duplikat dan label yang keliru.",
-      "kata_kunci": [
-        "KPI",
-        "kpi_template",
-        "matriks KPI",
-        "bobot metrik",
-        "target",
-        "departemen",
-        "otomasi KPI",
-        "posisi",
-        "scoring"
-      ]
+      "hash": "47f2fd2b1555668bf16a749c220b468656cf2e449af6061e363a79176d8147a8",
+      "ukuran_kb": 134.6,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Human Resource Information System/HRIS - Organization Structure.md",
@@ -5414,7 +5317,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — master departemen/posisi sudah di-DB; org chart **sudah ada** (2026-08-01); **jenjang jabatan sudah ada & live di produksi** (2026-08-03) tapi **nol dari 79 jabatan** terisi",
+      "status_teks": "Implemented (ada catatan) — master departemen/posisi sudah di-DB; org chart **sudah ada** (2026-08-01); **jenjang jabatan sudah ada & live di produksi** (2026-08-03) tapi **nol dari 79 jabatan** terisi; **penyetuju pengajuan per departemen** merged 2026-08-12 (PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184) & [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)) tapi **belum diverifikasi lewat gateway dan belum deploy**",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
@@ -5422,28 +5325,29 @@
         "HRIS - Career & Promotion",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "API - Employee Service",
         "CORE - RBAC dan Permission Set",
         "HRIS - Key Performance Index",
         "HRIS - Interrelationship Matrices",
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "d143153fa9c80a6177fdea4a5b9c8e7a65fdafa1762b3905b0bc91af5a3bd6de",
-      "ukuran_kb": 23.9,
-      "ringkasan": "Menjawab: bagaimana struktur organisasi disimpan dan dikelola — departemen dan posisi sebagai master data di master_department (key, positions, position_items, roles, company_id, supervised_by), CRUD-nya lewat employee service, dan halaman admin Master Data di frontend. Menjelaskan jabatan sebagai entitas ber-key stabil yang memegang permission set, jenjang jabatan lima tingkat (Pelaksana sampai Direktur) dengan rank renggang di master_job_level, dan penegasan bahwa jenjang adalah penanda organisasi, bukan sumbu hak akses. Juga menjawab bagaimana hierarki atasan bekerja: supervisor per divisi, atasan langsung per orang lewat work_data.supervisor_id beserta endpoint supervisor-assignment, dan bagaimana cakupan supervisi antar-departemen dipakai berbagai approval.",
+      "hash": "5c513d650dd509edf4ca05fe2ae1c9a6ee194b28ddd4e642e40bc826ed583d5c",
+      "ukuran_kb": 29.5,
+      "ringkasan": "Menjawab: bagaimana struktur organisasi perusahaan tersimpan dan siapa yang menyetujui pengajuan siapa. Mencakup master departemen dan jabatan, jenjang jabatan sebagai penanda organisasi yang sengaja bukan sumbu hak akses, atasan langsung per orang untuk cakupan tampilan KPI, penyetuju pengajuan per departemen untuk wewenang menyetujui, bagan organisasi, serta relasi supervisi antar-departemen lewat supervised_by. Menjelaskan pula urutan pencarian atasan yang dipakai attendance-service beserta alasan tiap langkahnya, dan membedakan secara eksplisit dua konsep yang sering tertukar: cakupan tampilan versus cakupan wewenang.",
       "kata_kunci": [
         "struktur organisasi",
-        "organization structure",
-        "master_department",
-        "departemen",
-        "posisi",
-        "jabatan",
-        "jenjang jabatan",
-        "job level",
         "atasan langsung",
-        "supervisor_id",
+        "supervisor",
+        "penyetuju pengajuan",
+        "approver",
+        "is_supervisor",
+        "supervised_by",
+        "HRGA",
+        "jenjang jabatan",
         "org chart",
-        "hierarki"
+        "bagan organisasi",
+        "departemen"
       ]
     },
     {
@@ -5464,11 +5368,11 @@
         "Microservices - Integration Service",
         "External - Accurate",
         "HRIS - Organization Structure",
+        "Microservices - Procurement Service",
         "Microservices - Monitoring Service",
         "IT - Helpdesk",
         "HRIS - Attendance System",
         "HRIS - Personalia",
-        "Microservices - Procurement Service",
         "Microservices - Warehouse Service",
         "Manufacture - Stock & Material Management",
         "Microservices - Inventory Service",
@@ -5508,21 +5412,10 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "bde9f2ce2d409f6822c48045a943936b5ff7e206a43c043454b0b05a557937af",
-      "ukuran_kb": 62.7,
-      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di produksi, mana yang sumber datanya sudah ada, mana yang modulnya ada tapi datanya kosong, dan mana yang memang tak punya sumber sama sekali — beserta keadaan mutakhir otomasinya. Merinci tiga metrik Tech Development yang sudah menyala di produksi (`skor_tim` dan `uptime_sistem`, termasuk pergantian `uptime` jadi `downtime` arah turun), layar diagnostik Otomasi KPI (`/hris/kpi/otomasi`) yang menjawab metrik mana yang macet dan kenapa, batch \"HR mengisi konfigurasinya sendiri\" (katalog sumber, pratinjau sebelum simpan, jejak `kpi_template_audits`, target per karyawan) yang merged tapi belum di-deploy, KPI ICC versi Juli 2026, dan gap yang masih terbuka: `shopee_shop_id` kosong di seluruh `icc_account_mappings` sehingga hanya toko TikTok terhitung, toko berprofit negatif yang otomatis bernilai nol, SPV departemen belum menemukan halaman konfigurasinya, audit yang ditulis tapi tak terbaca, dan cakupan `tim_icc` yang PR-nya bertanda merged tetapi tidak ada di `main`.",
-      "kata_kunci": [
-        "otomasi skor KPI",
-        "311 metrik",
-        "auto_value auto_basis",
-        "skor_tim uptime_sistem",
-        "layar otomasi KPI",
-        "katalog sumber pratinjau",
-        "target per karyawan",
-        "KPI ICC",
-        "icc_account_mappings",
-        "tim_icc"
-      ]
+      "hash": "cb06786d5041233778bbdde0d52f5d1d7c7acd6cea5b1ebe59bcaca3f570c48f",
+      "ukuran_kb": 65.2,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Human Resource Information System/HRIS - Overtime.md",
@@ -6683,6 +6576,22 @@
         "kerentanan",
         "point-in-time"
       ]
+    },
+    {
+      "path": "Logs/LOG - 2026-08-11 Pembersihan Faktur Menggelembung Agustus.md",
+      "judul": "LOG - 2026-08-11 Pembersihan Faktur Menggelembung Agustus",
+      "area": "Logs",
+      "jenis": "log",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "Microservices - Integration Service"
+      ],
+      "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
+      "ukuran_kb": 6.9,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Logs/LOG - Clock-in Gagal Karyawan Shift (schedule not found).md",
@@ -9512,5 +9421,17 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "Application/APP - Web ERP.md",
+    "Core System and Modules/Microservices - Employee Service.md",
+    "Core System and Modules/Microservices - Integration Service.md",
+    "Core System and Modules/Microservices - Manufacture Service.md",
+    "Core System and Modules/Microservices - Procurement Service.md",
+    "Decisions/ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah.md",
+    "Decisions/ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution.md",
+    "Decisions/ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput.md",
+    "Human Resource Information System/HRIS - Matriks KPI per Departemen.md",
+    "Human Resource Information System/HRIS - Otomasi Skor KPI.md",
+    "Logs/LOG - 2026-08-11 Pembersihan Faktur Menggelembung Agustus.md"
+  ]
 }
