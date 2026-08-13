@@ -39,6 +39,12 @@ Bentuk artefak (judul persis, `/wrap` mencarinya):
 - <kode/komponen/master data/resolver yang sudah menyelesaikan sebagian masalah ini>
   — dipakai ulang / dibangun tandingannya karena <alasan>
 
+## Alur Pengguna
+<WAJIB bila menyentuh UI/menu/navigasi; tulis "tidak menyentuh UI" bila memang tidak.
+ Langkah ORANG, bukan aliran data. Tiap langkah sebutkan langkah berikutnya ADA DI MODUL
+ MANA, dan tandai TITIK PUTUS: langkah berikutnya di modul lain tanpa tautan, aksi ditolak
+ dengan cara membetulkan di layar lain, atau keadaan menunggu tanpa pemberitahuan.>
+
 ## Ruang Lingkup
 - [ ] <repo> `<path/eksak>` — <apa yang berubah>
 - [ ] <repo> `<path/eksak>` — <apa yang berubah>
@@ -60,6 +66,10 @@ Bentuk artefak (judul persis, `/wrap` mencarinya):
 ## Di Luar Lingkup
 - <hal yang sengaja tidak dikerjakan> — <satu baris alasan, wajib>
 ```
+
+Isi `## Alur Pengguna` jangan dikosongkan untuk rencana ber-UI. Alur wajib ini tidak pernah
+menanyakannya di tahap mana pun sebelum bagian itu ada, sehingga fitur bisa benar secara
+kode dan tetap membingungkan orang yang memakainya. Aturannya di §1b plan-checklist.
 
 Isi `## Cara Verifikasi` jangan dikosongkan. Test hijau bukan bukti fitur bisa dipakai:
 fitur pernah merged, deployed, dan tetap mustahil dipakai selama 3 hari karena lapisan

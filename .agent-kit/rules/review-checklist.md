@@ -139,11 +139,40 @@ Berlaku untuk keluaran LLM (scraping, sentiment, Veo), webhook marketplace, dan 
 - Upload: file-service dibatasi **4 MB** dan prefix per access key. Cek batas ditegakkan
   di sisi pemanggil, jangan mengandalkan pesan galat service.
 
+### F. Alur pengguna terputus
+
+Kelas cacat yang selama ini tak dicari sama sekali, dan yang paling sering dikeluhkan
+pengguna. Semuanya lolos setiap gerbang teknis: kodenya benar, test hijau, tak ada galat.
+Yang rusak adalah **orangnya tidak bisa menyelesaikan pekerjaannya**.
+
+Berlaku untuk tiap diff yang menyentuh UI, menu, atau navigasi.
+
+- **Langkah berikutnya hidup di modul lain tanpa tautan.** Layar menampilkan masalah, tetapi
+  tempat membetulkannya ada di layar lain dan tak ada apa pun yang mengantar ke sana.
+  Contoh nyata: kolom Pemegang bernilai "belum ditugaskan" di Marketing Analytics →
+  Affiliate; jawabannya di ICC Management → tab Akun Affiliate, tanpa tautan.
+- **Aksi ditolak sementara cara membetulkannya ada di modul lain.** Pesannya benar dan
+  jelas, tetapi jalan keluarnya menuntut pengguna pergi ke tempat lain lalu mencari jalan
+  kembali sendiri. Contoh: assign toko ditolak karena karyawan belum punya atasan langsung
+  di HRIS. Minimal beri tautan langsung ke layar tujuan.
+- **Pilihan yang hilang tanpa penjelasan.** Item yang tak muncul di dropdown karena sudah
+  dipakai orang lain terlihat sebagai "tidak ada", bukan "sudah dipegang X". Pengguna
+  menebak atau mencari di tabel lain.
+- **Keadaan yang menunggu orang lain tanpa pemberitahuan.** Pengguna harus membuka halaman
+  berulang kali untuk tahu hasilnya. Loop yang tak pernah tertutup.
+- **Urutan wajib yang hanya dijelaskan lewat teks.** Bila layar butuh paragraf panduan
+  untuk menerangkan urutan kerjanya (mis. rotasi = nonaktifkan dulu, baru buat baru), itu
+  gejala alurnya belum mengantar sendiri. Tanyakan apakah alurnya yang perlu diperbaiki,
+  bukan panduannya yang perlu diperpanjang.
+
+Bila rencana punya bagian `## Alur Pengguna`, bandingkan diff dengannya: titik putus yang
+sudah ditandai di rencana tetapi tak ditutup di diff adalah temuan, bukan catatan.
+
 ---
 
 ## Pass 2 — INFORMASIONAL
 
-### F. Nama field & tag bson/json
+### G. Nama field & tag bson/json
 
 - **Tag `bson` tidak cocok dengan nama field di koleksi.** Gejalanya senyap: field terbaca
   sebagai nilai nol, bukan error. Cocokkan dengan dokumen nyata atau Data Dictionary di vault.
@@ -152,7 +181,7 @@ Berlaku untuk keluaran LLM (scraping, sentiment, Veo), webhook marketplace, dan 
 - **Pemeriksa request yang cuma mengecek string** meloloskan field `time.Time`/`int` sebagai
   nilai nol. Cek eksplisit per tipe.
 
-### G. Kontrak API & kompatibilitas mundur
+### H. Kontrak API & kompatibilitas mundur
 
 - Field dihapus/berganti tipe di respons, atau parameter wajib baru di endpoint lama.
 - Status code atau method berubah tanpa alias path lama.
@@ -161,7 +190,7 @@ Berlaku untuk keluaran LLM (scraping, sentiment, Veo), webhook marketplace, dan 
   aman bila field baru belum ada).
 - Dok `API - <Service>.md` di vault tidak ikut diperbarui saat rute berubah.
 
-### H. Frontend (erp-frontend / mybharata)
+### I. Frontend (erp-frontend / mybharata)
 
 - **Teks user-facing baru di-hardcode.** Wajib lewat `t("domain.key")`, key ditaruh di
   **dua** berkas `src/i18n/locales/id.ts` **dan** `en.ts`. Istilah teknis lazim English
@@ -179,11 +208,14 @@ Berlaku untuk keluaran LLM (scraping, sentiment, Veo), webhook marketplace, dan 
 - **Halaman daftar tidak memakai struktur tabel HRIS**: satu kartu, `Banner bare` di dalam
   prop `toolbar` milik `MainTable`, seluruh keadaan di `useTableState`. Jangan merakit
   tabel/filter/paginasi sendiri.
-- **Loading pakai spinner**, bukan `ShimmerBox`.
+- **Loading pakai spinner** alih-alih kerangka. ⚠️ Komponennya BEDA per repo:
+  `Skeleton` (`@/components/ui/skeleton`) di **erp-frontend**, `ShimmerBox` di
+  **mybharata** (Flutter). `ShimmerBox` TIDAK ADA di erp-frontend; menyuruhnya di sana
+  berarti menyuruh membuat komponen baru, bukan memakai ulang yang sudah dipakai 155 berkas.
 - **Komponen tiruan look-alike** alih-alih reuse komponen shared via adapter.
 - Error validasi form tidak lewat `showFormErrorsToast`.
 
-### I. Celah test
+### J. Celah test
 
 - Jalur galat/guard baru tanpa test negatif sama sekali.
 - **Test fungsi murni tidak menangkap cacat glue handler.** Tambahkan minimal satu
@@ -196,7 +228,7 @@ Berlaku untuk keluaran LLM (scraping, sentiment, Veo), webhook marketplace, dan 
 - Uji i18n memakai `t` tiruan sehingga buta terhadap key yang hilang; uji terpisah dengan
   instance i18next asli + kontrol negatif bahwa `en` bukan hasil fallback ke `id`.
 
-### J. Deploy & konfigurasi
+### K. Deploy & konfigurasi
 
 - **Menambah env tanpa mencatat bahwa container harus `--force-recreate`.** Env dibaca saat
   container DIBUAT, `restart` saja tidak cukup.
@@ -209,7 +241,7 @@ Berlaku untuk keluaran LLM (scraping, sentiment, Veo), webhook marketplace, dan 
 - **Seed master data** berhenti bila koleksi tak kosong, jadi data baru tak masuk ke
   environment yang sudah terisi. Sediakan migrasi terpisah.
 
-### K. Kode mati & konsistensi
+### L. Kode mati & konsistensi
 
 - Variabel/fungsi/import yang tak terpakai setelah perubahan.
 - Komentar yang bertentangan dengan kode setelah diubah.
@@ -228,8 +260,8 @@ KRITIS                              INFORMASIONAL
 ├─ Hak akses & visibilitas          ├─ Kontrak API & kompatibilitas mundur
 ├─ Kelengkapan enum & nilai baru    ├─ Frontend (i18n, filter, format, komponen)
 ├─ Konkurensi & keutuhan data       ├─ Celah test
-└─ Batas kepercayaan input          ├─ Deploy & konfigurasi
-                                     └─ Kode mati & konsistensi
+├─ Batas kepercayaan input          ├─ Deploy & konfigurasi
+└─ Alur pengguna terputus           └─ Kode mati & konsistensi
 ```
 
 ---
@@ -260,10 +292,14 @@ PERBAIKI LANGSUNG.
 - **Plaintext credentials di dok IT vault** (`IT - Server, VMs and Databases`,
   `IT - Monitoring System`) **DISENGAJA** sebagai referensi akses internal tim IT. Jangan
   diflag sebagai isu keamanan, jangan usulkan rotasi atau scrub.
-- **Merah/hijau di tab Actions erp-frontend bukan sinyal.** `.github/workflows/ci.yml`
-  kehilangan blok trigger sejak 2026-07-29 (`on:` kosong); tiap run merah adalah **startup
-  failure**, bukan test gagal. Jangan menyimpulkan apa pun dari situ, dan jangan menyuruh
-  "perbaiki CI yang gagal". Verifikasi wajib lokal.
+- ~~Merah/hijau di tab Actions erp-frontend bukan sinyal.~~ **SUDAH TIDAK BERLAKU sejak
+  2026-08-12.** `ci.yml` kini punya `on: pull_request: branches: [main]` lagi, jadi
+  gerbangnya **hidup dan merahnya sinyal sungguhan**. Aturan lama justru berbahaya sekarang:
+  ia menyuruh mengabaikan gerbang yang bekerja. Diverifikasi 2026-08-13, dan pada hari yang
+  sama PR erp-frontend #1030 di-merge saat `verify` masih `pending` tanpa ada yang menahan.
+  **Yang berlaku sekarang**: baca statusnya, tetapi periksa dulu commit mana yang diuji
+  versus waktu merge, dan verifikasi lokal tetap wajib karena `pnpm test` tak pernah hijau
+  penuh di `main`.
 - **`pnpm test` erp-frontend tidak pernah hijau penuh di `main`.** Bandingkan kegagalan
   dengan baseline `origin/main` sebelum menyalahkan perubahan sendiri.
 - Redundansi yang tidak berbahaya dan justru menolong keterbacaan.

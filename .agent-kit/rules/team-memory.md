@@ -1,7 +1,7 @@
 # Ingatan Tim — Shared Memory (bip-erp)
 
 > Indeks memori **BERSAMA** antar-agent/dev, di-load tiap sesi via `@rules/team-memory.md` di `CLAUDE.md`.
-> **Sumber** = kit (`architecture-draft/.agent-kit/rules/`) → disalin ke `.claude/rules/` saat `init` (dikelola kit; **jangan edit** file di `.claude/`, edit sumbernya lalu re-run init).
+> **Sumber** = kit (`architecture-draft/.agent-kit/rules/`), dibaca **langsung dari vault** lewat path itu — `init` hanya menyalin `commands`, `hooks`, dan `skills`, TIDAK `rules` (`.claude/rules/` memang tidak ada). Karena itu semua berkas di `rules/` berlaku cukup dengan `git pull architecture-draft`, tanpa re-run `init`.
 > Beda dari **auto-memory** `~/.claude/.../memory/` yang **privat per-mesin**. Fakta durable & layak-bagi → taruh di sini atau promosikan ke vault.
 
 ## Konvensi build & tooling
@@ -19,7 +19,7 @@
 - **Deploy BE sebelum FE** untuk perubahan kontrak (FE fallback aman bila field baru belum ada).
 
 ## Konvensi FE / UI (erp-frontend · mybharata)
-- Loading konten/field pakai **ShimmerBox**, bukan `CircularProgressIndicator`/spinner.
+- Loading konten/field pakai **kerangka, bukan spinner**. ⚠️ Komponennya BEDA per repo: **`Skeleton`** (`@/components/ui/skeleton`, dipakai 155 berkas) di **erp-frontend**; **`ShimmerBox`** di **mybharata** (Flutter). `ShimmerBox` TIDAK ADA di erp-frontend — menyebutnya di sana berarti menyuruh membuat komponen baru, bukan reuse.
 - Saat menyamakan UI → **reuse komponen shared** (pakai adapter), jangan bikin tiruan look-alike.
 - **i18n dua bahasa** (id+en via react-i18next), default Indonesia; istilah teknis lazim English biarkan English. Detail: **ADR 0010** di vault.
 - **Halaman daftar pakai struktur tabel HRIS**: satu kartu, `Banner bare` di dalam prop `toolbar` milik `MainTable`, seluruh keadaan di `useTableState`. Jangan merakit tabel/filter/paginasi sendiri. Prosedur lengkap + gerbang verifikasi ada di skill **`/migrasi-tabel-hris`** (kit ≥ 1.6.0; jalankan ulang `init` bila belum muncul). Acuan kode: `hris/resign/page.tsx` (ada aksi tulis) dan `finance/piutang/tiktok/page.tsx` (read-only, filter banyak).
@@ -32,8 +32,12 @@
 - ⚠️ **`i18n/locales/{id,en}.ts` berkas paling sering disunting paralel.** Sebelum merge: `git merge origin/main` lokal lalu `pnpm tsc` **dan** `pnpm build`. Auto-merge git bisa menelan kurung tutup sehingga berkasnya bukan JavaScript sah — galat **parse**, bukan tipe, dan SELURUH halaman gagal build. Terjadi 2026-08-09: dua PR menyunting titik yang sama berselang enam menit, `main` mati 48 menit (dipulihkan erp-frontend #909).
 - **Uji Radix Tabs pakai `fireEvent.mouseDown`, bukan `click`** — dengan `click` tabnya tak berpindah dan testnya lolos-diam.
 
-### ⚠️ Gerbang CI erp-frontend MATI sejak 2026-07-29
-`.github/workflows/ci.yml` ("CI — Verify PR") kehilangan blok trigger-nya di commit `d8c8ab54` ("delete ci"), `on:` jadi kosong. Tiap run yang terlihat merah di tab Actions adalah **startup failure** (`jobs: []`, tanpa log), **bukan test yang gagal** — tak ada tsc/lint/build/test yang pernah jalan untuk PR mana pun. Jangan membaca merah/hijau di situ sebagai sinyal; **verifikasi wajib lokal**, dan bandingkan kegagalan `pnpm test` penuh dengan baseline `origin/main` sebelum menyalahkan perubahan sendiri. Kerusakan `main` 48 menit di atas persis yang gerbang ini ditulis untuk mencegah.
+### ✅ Gerbang CI erp-frontend SUDAH PULIH (2026-08-12)
+`.github/workflows/ci.yml` ("CI — Verify PR") kini punya `on: pull_request: branches: [main]` lagi — diverifikasi langsung 2026-08-13. **Merah di tab Actions KINI sinyal sungguhan**, jangan diabaikan.
+
+> Riwayat: trigger-nya sempat hilang di commit `d8c8ab54` ("delete ci") sehingga `on:` kosong, dan tiap run tercatat **startup failure** (`jobs: []`, tanpa log) — bukan test gagal. `main` sempat tak bisa di-build melewati lima merge tanpa ada yang tahu.
+
+⚠️ **Yang belum tertutup: hijaunya CI tidak menahan merge.** PR erp-frontend **#1030 di-merge 2026-08-13 saat `verify` masih `pending`**, tanpa ada yang menahannya. Jadi *merged* bukan berarti tergerbang. Sebelum menyimpulkan sesuatu aman: periksa commit mana yang diuji versus waktu merge. **Verifikasi lokal tetap wajib**, dan bandingkan kegagalan `pnpm test` penuh dengan baseline `origin/main` sebelum menyalahkan perubahan sendiri — suite itu tak pernah hijau penuh di `main`.
 
 ## Kalender terpusat (WAJIB untuk fitur bertanggal)
 - **Fitur yang punya tanggal/jadwal/tenggat yang perlu dilihat orang WAJIB mendaftarkan feed ke `calendar-service`, DILARANG bikin halaman kalender sendiri.** Tiap kalender tambahan membawa salinan aturan visibilitasnya sendiri, dan salinan itu yang menyimpang diam-diam sampai ada yang melihat agenda yang tak boleh dilihatnya. Contoh yang harus diarahkan ke sini: rencana `GET /bookings/calendar` di [[GA - Asset Loan & Room Booking]].
@@ -72,6 +76,7 @@
 - **Skill `deploy-bip-erp`** (kit ≥ 1.10.0) untuk tiap deploy dan tiap kali menyelidiki "kenapa fitur ini tidak bereaksi padahal sudah merged". Ia menentukan daftar container yang harus naik (kopling lewat biner tak terlihat dari API), urutannya, dan gerbang verifikasi yang **menolak `docker ps` dan `/health` sebagai bukti**. Prosedurnya sendiri tetap satu-satunya di [[RUN - Deploy Microservices bip-erp]]; skill ini sengaja tidak menyalinnya supaya tak lahir sumber kebenaran kedua.
 - **Skill `audit-keamanan`** (kit ≥ 1.9.0) untuk audit keamanan / threat model / OWASP. Gerbang keyakinan 8/10 dan verifikasi lewat penelusuran kode; **dilarang menyerang sistem hidup**. Pengecualian kerasnya mendahului segalanya — creds vault IT disengaja, jangan diflag. Audit yang berisik akan diabaikan, jadi laporannya wajib menyebut berapa kandidat yang dibuang.
 - **`/plan` menulis artefak ke `.task-plans/<tanggal>-<slug>.md`** dan **`/wrap` mengauditnya** lewat `.agent-kit/rules/wrap-completion-gate.md` (kit ≥ 1.8.0). Gerbangnya MEMBLOKIR penutupan bila ada item rencana yang belum dikerjakan, dan menuntut konfirmasi **per item** untuk yang tak bisa dibuktikan diff (keadaan Mongo, env container, panggilan lewat gateway). Alasannya persis kasus form-builder: 183 test hijau, fitur merged dan deployed, tetap mustahil dipakai 3 hari karena `formRequest` tak punya field-nya. **Test hijau bukan bukti fitur bisa dipakai** — isi bagian `## Cara Verifikasi` di artefak rencana, jangan dikosongkan.
+- **Alur pengguna kini ditanyakan di tiga tahap** (kit ≥ 1.12.0). Sebelum ini alur wajib `/start-task`→`/wrap` **tak pernah sekali pun** menanyakan apakah ORANGNYA bisa menyelesaikan pekerjaannya — semua gerbang bertanya apakah kodenya benar. Hasilnya benar secara kode dan membingungkan di layar. Sekarang: `/plan` §1b menuntut bagian **`## Alur Pengguna`** di artefak (langkah orang, bukan aliran data, dengan titik putusnya ditandai); `/review` §F mencari alur terputus sebagai temuan KRITIS; `/wrap` §5d menuntut satu perjalanan utuh sebagai orang, dan `curl` ke endpoint tidak menggantikannya. Tiga bentuk putus yang sudah terbukti: **langkah berikutnya di modul lain tanpa tautan** (kolom "belum ditugaskan" di Affiliate, betulnya di ICC Management), **aksi ditolak dengan cara membetulkan di layar lain** (assign butuh atasan di HRIS), dan **keadaan menunggu tanpa pemberitahuan**. Layar yang butuh paragraf panduan adalah gejala alurnya belum mengantar sendiri, bukan solusi.
 - **Checklist `/review` ada di `.agent-kit/rules/review-checklist.md`** (kit ≥ 1.7.0), dibaca **on-demand** saat `/review` jalan — sengaja TIDAK di-import ke `CLAUDE.md` karena akan membakar konteks tiap sesi. Isinya kelas bug yang sudah terbukti menggigit di sini, jadi **gotcha baru yang berulang taruh di situ**, bukan cuma di file ini. Yang paling menolong justru **gerbang verifikasi anti false-positive**-nya: klaim "field/handler ini tidak ada" wajib dibuktikan Grep dulu, karena diff saja tidak cukup dan review yang sering meleset akan diabaikan orang.
 - **`superpowers` WAJIB dipakai seluruh tim** (kit ≥ 1.11.0). `init` kini menulis
   `enabledPlugins: { "superpowers@claude-plugins-official": true }` ke `.claude/settings.json`

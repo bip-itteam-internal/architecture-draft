@@ -46,6 +46,50 @@ Bagian ini masuk ke artefak rencana sebagai `## Apa yang Sudah Ada`.
 
 ---
 
+## 1b. Alur pengguna
+
+Bagian 1 dan 2 menanyakan apakah **kodenya** benar. Bagian ini menanyakan apakah
+**orangnya bisa menyelesaikan pekerjaannya**. Tanpa bagian ini seluruh alur wajib
+(`/start-task` sampai `/wrap`) tidak pernah menanyakannya satu kali pun, dan hasilnya
+benar secara kode tetapi membingungkan di layar.
+
+**Wajib untuk tiap rencana yang menyentuh UI, menu, atau navigasi.** Lewati hanya untuk
+perubahan yang murni internal (refactor, indeks, job cron tanpa layar).
+
+Tulis alurnya sebagai LANGKAH ORANG, bukan aliran data. Untuk tiap langkah jawab: setelah
+aksi ini, apa langkah berikutnya, dan **di modul mana ia tinggal**.
+
+```
+Alur: <siapa> ingin <menyelesaikan apa>
+  1. mulai dari <layar>
+  2. <aksi>  ->  berikutnya: <langkah>  @ <modul/layar>
+  3. ...
+  n. selesai ketika <apa yang dilihat orang itu>
+```
+
+Tiga bentuk putus yang sudah terbukti ada di sini, cari ketiganya:
+
+| Bentuk | Gejalanya bagi pengguna |
+|---|---|
+| **Langkah berikutnya di modul lain, tanpa tautan** | Ia tahu harus ke mana hanya bila sudah pernah diberi tahu. Contoh: kolom "belum ditugaskan" di Marketing Analytics → Affiliate; cara membetulkannya di ICC Management, tanpa satu pun tautan |
+| **Aksi ditolak, cara membetulkannya di layar lain** | Ia berhenti di tengah, pergi, lalu harus mencari jalan kembali. Contoh: assign toko ditolak karena karyawan belum punya atasan di HRIS |
+| **Keadaan menunggu orang lain tanpa pemberitahuan** | Ia membuka halaman berulang kali untuk tahu hasilnya. Loop yang tak pernah tertutup |
+
+**Layar yang butuh paragraf penjelas adalah gejala, bukan solusi.** Blok panduan enam butir
+di ICC Management ada persis karena urutan kerjanya tak terbaca dari bentuk layarnya.
+Bila rencana menambah teks panduan, tanyakan lebih dulu apakah alurnya yang perlu
+diperbaiki.
+
+Perbaikan yang muncul dari pemetaan ini hampir selalu KECIL: tautan dari tempat masalah
+terlihat ke tempat ia dibetulkan, aksi yang tersedia di layar tempat orang menyadarinya,
+notifikasi yang menutup loop. Mahalnya bukan di perbaikan, melainkan di tidak pernah
+memetakannya.
+
+Bagian ini masuk ke artefak rencana sebagai `## Alur Pengguna`, dan `/wrap` mengauditnya
+lewat §5d gerbang kelengkapan.
+
+---
+
 ## 2. Mode kegagalan
 
 Untuk **tiap jalur kode baru** di rencana, tulis satu cara realistis fitur itu gagal di

@@ -141,6 +141,34 @@ sebagai item, dan tandai **KEADAAN-LUAR**:
   saat container DIBUAT.
 - **Perubahan kontrak** → deploy BE sebelum FE.
 
+### 5d. Alur pengguna wajib ditempuh utuh, bukan endpoint-nya saja
+
+Berlaku bila rencana menyentuh UI, menu, atau navigasi.
+
+`5a` membuktikan **endpoint**-nya hidup. Itu tidak membuktikan **orangnya** bisa
+menyelesaikan pekerjaannya. Keduanya berbeda, dan yang kedua yang dikeluhkan pengguna.
+
+Bila artefak rencana punya bagian `## Alur Pengguna` (§1b plan-checklist), audit tiap
+langkahnya sebagai item tersendiri. Tandai **BELUM** bila ada titik putus yang ditandai di
+rencana tetapi tak ditutup di diff.
+
+Bila rencana **tidak** punya bagian itu padahal menyentuh UI, katakan begitu secara
+eksplisit dan tandai seluruh alurnya **TAK TERVERIFIKASI**. Jangan diam-diam melewatinya:
+tak ada bagian rencana berarti tak ada yang pernah memikirkan perjalanannya, bukan berarti
+perjalanannya baik.
+
+Bukti yang diterima: **satu perjalanan utuh sebagai orang**, dari niat sampai selesai,
+melewati semua modul yang terlibat. `curl` ke endpoint tidak menggantikannya, dan begitu
+pula "sudah saya cek" tanpa keterangan langkahnya.
+
+Tiga pertanyaan yang wajib terjawab untuk tiap alur:
+
+1. Setelah tiap aksi, apakah langkah berikutnya terjangkau dari layar itu — atau pengguna
+   harus sudah tahu sendiri ke mana?
+2. Bila sebuah aksi ditolak, apakah cara membetulkannya terjangkau dari pesan itu?
+3. Bila hasilnya menunggu orang lain, apakah pengguna diberi tahu — atau harus membuka
+   halaman berulang kali?
+
 ---
 
 ## 6. Keluaran
@@ -213,8 +241,13 @@ lingkupnya dikecilkan.
 - **Jangan lolos diam-diam.** Bila gerbangnya tak bisa jalan (tak ada rencana, berkas tak
   terbaca, ekstraksi gagal), katakan begitu secara eksplisit. Gagal-diam adalah bentuk
   kegagalan yang gerbang ini justru dibuat untuk mencegah.
-- **Jangan menyimpulkan apa pun dari status CI erp-frontend.** Gerbangnya mati sejak
-  2026-07-29; merah di Actions adalah startup failure, bukan test gagal.
+- **Status CI erp-frontend KINI sinyal sungguhan** (sejak 2026-08-12; `ci.yml` punya
+  `on: pull_request` lagi). Aturan lama "abaikan saja" sudah dicabut — ia justru menyuruh
+  mengabaikan gerbang yang bekerja. Yang tetap berlaku: periksa commit mana yang diuji versus
+  waktu merge, dan verifikasi lokal wajib karena `pnpm test` tak pernah hijau penuh di `main`.
+- **Jangan menandai SELESAI hanya karena CI hijau atau karena PR sudah merged.** PR
+  erp-frontend #1030 di-merge 2026-08-13 saat `verify` masih `pending`; merged bukan berarti
+  tergerbang, dan tergerbang bukan berarti pernah dilihat orang di layar (lihat 5d).
 - **Jangan menjadikan "test hijau" sebagai bukti fitur bisa dipakai.** form-builder punya
   183 test hijau saat bug binding-nya hidup.
 - Jangan commit atau push di dalam gerbang ini. Itu langkah `/wrap` sesudahnya.
