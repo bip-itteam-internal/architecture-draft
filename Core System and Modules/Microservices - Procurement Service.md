@@ -3,8 +3,8 @@
 *Microservice **procurement-service** — master Pemasok, master Barang & Jasa, Tagihan Pemasok, dan cermin baca-saja Pembelian (Pesanan/Penerimaan/Permintaan Barang) dari Accurate Online. Master data diinput di BIP-ERP lalu disinkronkan otomatis ke Accurate; Pembelian arahnya kebalikannya — dicatat finance langsung di Accurate lalu ditarik otomatis ke ERP untuk dipantau.*
 
 - **Stack**: Go + Fiber v2 + MongoDB (driver resmi) + shared-library; di belakang [[CORE - API Master Gateway]] (`/api/procurement/*`), seluruh route internal dilindungi `BIP-Gateway-ID` + role guard `system_roles["procurement"]`.
-- **Path di repo**: `bip-erp/services/procurement/` · flat package `main` · `models.go` (entity + peta prefix→kategori pemasok) · `accurate_client.go` (transport) · `accurate_vendor.go` (payload + method vendor) · `accurate_item.go` (payload + method barang) · `nomor.go` (usul nomor pemasok) · `sync.go` (worker antrian, kedua entity) · `pemasok.go` (handler CRUD pemasok) · `barang.go` (handler CRUD barang, termasuk usul kode) · `import.go` / `import_barang.go` (import awal) · `pesanan.go` / `penerimaan.go` / `permintaan.go` (entity cermin Pembelian, termasuk field penandaan "barang tidak sesuai" milik ERP di `penerimaan.go`) · `pembelian_handler.go` (handler daftar + baris turunan penerimaan + handler tandai/batal-tandai tidak sesuai) · `sync_pembelian.go` (worker impor terjadwal).
-- **Port**: `6983` (default). **Database**: `procurement_db` (MongoDB per-service, host port `32794`). **Env kunci**: `MONGO_URI`, `MONGO_DB`, `INTERNAL_GATEWAY_KEY`, `ACCURATE_ACCOUNT_URL`, `ACCURATE_SECRET_KEY`, `ACCURATE_BEARER_TOKEN`.
+- **Path di repo**: `bip-erp/services/procurement/` · flat package `main` · `models.go` (entity + peta prefix→kategori pemasok) · `accurate_client.go` (transport) · `accurate_vendor.go` (payload + method vendor) · `accurate_item.go` (payload + method barang) · `nomor.go` (usul nomor pemasok) · `sync.go` (worker antrian, kedua entity) · `pemasok.go` (handler CRUD pemasok) · `barang.go` (handler CRUD barang, termasuk usul kode) · `import.go` / `import_barang.go` (import awal) · `pesanan.go` / `penerimaan.go` / `permintaan.go` (entity cermin Pembelian, termasuk field penandaan "barang tidak sesuai" milik ERP di `penerimaan.go`) · `pembelian_handler.go` (handler daftar + baris turunan penerimaan + handler tandai/batal-tandai tidak sesuai) · `sync_pembelian.go` (worker impor terjadwal) · `kpi_pembayaran.go` (🟡 PR belum merge — endpoint tren pembayaran untuk KPI Account Payable, lihat bab tersendiri di bawah).
+- **Port**: `6983` (default). **Database**: `procurement_db` (MongoDB per-service, host port `32794`). **Env kunci**: `MONGO_URI`, `MONGO_DB`, `INTERNAL_GATEWAY_KEY`, `ACCURATE_ACCOUNT_URL`, `ACCURATE_SECRET_KEY`, `ACCURATE_BEARER_TOKEN`, `PROCUREMENT_SERVICE_KEY` (🟡 PR belum merge — gerbang `/faktur/pembayaran-tren`).
 - **Status**: ⚠️ Implemented (ada catatan) — **sudah deploy dan terisi di produksi**. Sensus langsung `procurement_db` produksi **4 Agustus 2026**: `pemasok` 139, `barang` 955, `pesanan_pembelian` 1.038, `penerimaan` 1.841, `faktur_pembelian` 2.055, `permintaan_barang` 235, `katalog` 653, `pengaturan` 1, `pembayaran` 0, `purchase_order` 0. Frontend Master Pemasok, Barang & Jasa, dan ketiga tab Pembelian ada di `erp-frontend` (`src/features/procurement/`) — lihat [[APP - Web ERP]].
 
   > **Koreksi 2026-08-04.** Baris status sebelumnya menyatakan service ini **belum di-deploy** dan import awal **belum dijalankan**. Keduanya sudah tidak benar sejak entah kapan, dan tidak ada yang memperbaruinya. Nama koleksi pun sudah bergeser (`pesanan` → `pesanan_pembelian`, `permintaan` → `permintaan_barang`) dan lahir koleksi yang belum tercatat di dokumen ini (`faktur_pembelian`, `pembayaran`, `katalog`, `pengaturan`). Bab-bab di bawah **belum diaudit ulang** terhadap kode terkini; perlakukan sebagai berpotensi tertinggal sampai `/sync-docs` menyeluruh dijalankan untuk service ini.
@@ -133,6 +133,21 @@ Pemisahan ini mencegah import ulang menghapus isian user di ERP. Akun Utang dan
 Akun Uang Muka kini termasuk **milik Accurate** (ikut diperbarui saat import),
 karena keduanya benar-benar dikirim dan Accurate menjadi sumbernya.
 
+### KPI Account Payable — Tren Pembayaran (`kpi_pembayaran.go`)
+
+> **Status**: 🟡 **PR [#1178](https://github.com/bip-itteam-internal/bip-erp/pull/1178) belum merge, belum deploy.** Test lulus lokal (`go test ./...` procurement, employee, shared-library — semuanya hijau); **belum pernah dicoba lewat gateway produksi sungguhan**.
+
+Dibangun untuk metrik KPI Finance "100% pembayaran sesuai rencana kas" (lihat [[HRIS - Otomasi Skor KPI]], sumber `kinerja_ap`), yang sebelumnya divonis tak terukur karena `procurement_db.pembayaran` **selalu 0 dokumen** — arah sinkronisasi faktur searah ERP→Accurate (`purchase-invoice/save.do`, `purchase-payment/save.do`), tidak ada jalur baca balik.
+
+**Temuan yang mendasarinya**: probe live ke Accurate (`purchase-invoice/list.do` dengan `fields=`) membuktikan field **`lastPaymentDate` ada di level faktur**, bisa ditarik massal, dan **belum pernah dipakai kode mana pun** di service ini. Diukur dari 800 faktur sampel produksi (12 Agustus 2026): 705 Lunas dengan `lastPaymentDate` terisi (94,1%), 44 Lunas tapi kosong (5,9% — **seluruhnya** lunas lewat alokasi uang muka, prefix `PI.` bukan `PID`, bukan pembayaran tunai/transfer baru), 51 belum lunas.
+
+- **`GET /faktur/pembayaran-tren?bulan=YYYY-MM&key=...`** — persentase faktur *jatuh tempo* bulan tsb yang dibayar pada/sebelum `dueDate`. Menarik `purchase-invoice/list.do` paginated (`fields=number,statusName,primeOwing,dueDate,lastPaymentDate`), diagregasi lokal lewat `hitungTrenPembayaran` (fungsi murni). Faktur yang lunas via alokasi DP (tanpa `lastPaymentDate` individual) **dikecualikan dari penyebut** — bukan dihukum, bukan diluluskan. Faktur yang masih menunggak saat dinilai **tetap masuk penyebut** sebagai gagal.
+- **Digerbangi kunci layanan sendiri** (`gerbangKunciLayananKPI`, env `PROCUREMENT_SERVICE_KEY`), dua lapis bersama grup `internal` yang sudah ada — **bukan** reuse `/tagihan/aging` yang digerbangi RBAC `gate()` (mensyaratkan `employee_id` dari header, tak tersedia untuk panggilan mesin). Pola sama dengan `services/monitoring/kpi_uptime.go`.
+- **Cache in-memory 1 jam** — endpoint menarik ~21 halaman berurutan dari Accurate (rate limiter 6 rps); freshness bukan prioritas untuk metrik yang dinilai bulanan.
+- Sepanjang bulan berjalan, metrik ini akan selalu gagal hitung (posisi faktur bulan berjalan belum final) — perilaku disengaja, konsisten dengan pola `kinerja_ar` di [[Microservices - Employee Service]].
+
+**Sengaja tidak disentuh di PR ini**: dua metrik lain di template `KPI Finance Staff Account Payable` (Perhitungan HPP — selalu 100% tak berperiode; Laporan credit term — mengukur laporan bukan data) tetap divonis "perlu definisi ulang", bukan soal ketersediaan sumber.
+
 ## Belum Diimplementasikan / Catatan
 
 - **Belum di-deploy.** Backend terverifikasi berjalan di lingkungan lokal (Docker), belum pernah dijalankan di server.
@@ -205,9 +220,10 @@ Ditambah koleksi `impor_kemajuan` (index `modul` unique, `impor_kemajuan_modul_u
 
 ## Dependensi & Integrasi
 
-- **Accurate Online** — [[ADR - 0001 Akuntansi via Accurate]]. Endpoint yang dipakai: `vendor/save.do`, `vendor/list.do`, `vendor/detail.do`, `payment-term/list.do`, dan untuk Pembelian: `purchase-order/list.do`, `receive-item/list.do` + `receive-item/detail.do` (jendela 6 bulan), `purchase-requisition/list.do`. Klien Accurate **disalin** ke service ini (bukan diimpor dari integration) mengikuti pola [[Microservices - Manufacture Service]] yang juga berbicara langsung ke Accurate; endpoint vendor sama sekali tidak dipakai integration sehingga tidak ada logika terduplikasi.
+- **Accurate Online** — [[ADR - 0001 Akuntansi via Accurate]]. Endpoint yang dipakai: `vendor/save.do`, `vendor/list.do`, `vendor/detail.do`, `payment-term/list.do`, dan untuk Pembelian: `purchase-order/list.do`, `receive-item/list.do` + `receive-item/detail.do` (jendela 6 bulan), `purchase-requisition/list.do`; 🟡 `purchase-invoice/list.do` (KPI Account Payable, PR belum merge — lihat bab tersendiri di atas). Klien Accurate **disalin** ke service ini (bukan diimpor dari integration) mengikuti pola [[Microservices - Manufacture Service]] yang juga berbicara langsung ke Accurate; endpoint vendor sama sekali tidak dipakai integration sehingga tidak ada logika terduplikasi.
 - **Kredensial Accurate dibagi** dengan [[Microservices - Integration Service]] — satu database Accurate yang sama.
 - **Gateway**: [[CORE - API Master Gateway]] (`PROCUREMENT_MODULE_URL`).
+- 🟡 **[[Microservices - Employee Service]]** — konsumen `/faktur/pembayaran-tren` (sumber KPI `kinerja_ap`), PR belum merge.
 
 ## Dokumen Terkait
 
@@ -215,3 +231,5 @@ Ditambah koleksi `impor_kemajuan` (index `modul` unique, `impor_kemajuan_modul_u
 - [[ADR - 0001 Akuntansi via Accurate]]
 - [[Microservices - Integration Service]]
 - [[Microservices - Manufacture Service]]
+- [[Microservices - Employee Service]] — konsumen KPI Account Payable
+- [[HRIS - Otomasi Skor KPI]] — analisis metrik & definisi "tepat waktu" yang mendasari endpoint ini
