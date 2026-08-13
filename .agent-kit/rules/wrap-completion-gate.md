@@ -241,12 +241,12 @@ lingkupnya dikecilkan.
 - **Jangan lolos diam-diam.** Bila gerbangnya tak bisa jalan (tak ada rencana, berkas tak
   terbaca, ekstraksi gagal), katakan begitu secara eksplisit. Gagal-diam adalah bentuk
   kegagalan yang gerbang ini justru dibuat untuk mencegah.
-- **Status CI erp-frontend KINI sinyal sungguhan** (sejak 2026-08-12; `ci.yml` punya
-  `on: pull_request` lagi). Aturan lama "abaikan saja" sudah dicabut — ia justru menyuruh
-  mengabaikan gerbang yang bekerja. Yang tetap berlaku: periksa commit mana yang diuji versus
-  waktu merge, dan verifikasi lokal wajib karena `pnpm test` tak pernah hijau penuh di `main`.
-- **Jangan menandai SELESAI hanya karena CI hijau atau karena PR sudah merged.** PR
-  erp-frontend #1030 di-merge 2026-08-13 saat `verify` masih `pending`; merged bukan berarti
+- **Jangan menyimpulkan apa pun dari status CI, ke arah mana pun.** Bukan bukti selesai,
+  bukan pula bukti rusak. Verifikasi yang dihitung gerbang ini adalah yang dijalankan
+  lokal: `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test` (dibanding baseline `origin/main`,
+  sebab suite itu tak pernah hijau penuh di sana), dan `pnpm build`.
+- **Jangan menandai SELESAI hanya karena PR sudah merged.** PR erp-frontend #1030 di-merge
+  2026-08-13 sebelum gerbangnya selesai, tanpa ada yang menahan. Merged bukan berarti
   tergerbang, dan tergerbang bukan berarti pernah dilihat orang di layar (lihat 5d).
 - **Jangan menjadikan "test hijau" sebagai bukti fitur bisa dipakai.** form-builder punya
   183 test hijau saat bug binding-nya hidup.
