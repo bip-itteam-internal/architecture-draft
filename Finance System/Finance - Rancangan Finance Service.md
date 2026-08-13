@@ -479,6 +479,43 @@ Rekomendasi: mulai dari **(a)**. Metrik yang terisi bulanan lebih berguna daripa
 4. **Klasifikasi deductible** → sekali jalan
 5. **Forecast kas** → terakhir, setelah bentuknya disepakati
 
+## Dari Unggah sampai Skor
+
+Bab "Cara Master Data Terisi" dan bab jembatan KPI berdiri terpisah di dokumen ini, dan itu memancing kesimpulan bahwa keduanya menyatu — bahwa mengunggah berkas membuat KPI terisi sendiri. **Tidak.** Rangkaian penuhnya begini:
+
+```mermaid
+flowchart TB
+    U["Cost Control unggah RAPB<br/>di menu Anggaran OPEX"] --> B[("baris anggaran tersimpan")]
+    B --> C["cron menarik realisasi Accurate<br/>SUDAH JALAN"]
+    C --> V["varians terhitung"]
+    V --> D["tampil di dashboard<br/>Cost Control dan SPV"]
+
+    V --> S["sumber KPI membaca varians<br/>BELUM DIBANGUN"]
+    S --> K["HR mengonfigurasi metrik<br/>di kpi_template"]
+    K --> A["auto_value berstatus DRAFT"]
+    A --> Q["SPV verifikasi lalu submit"]
+    Q --> Z["skor KPI terisi"]
+```
+
+Bagian **unggah sampai dashboard** memang otomatis. Bagian **dashboard sampai skor** masih pekerjaan: satu berkas `kpi_sumber_*.go` di employee-service, plus konfigurasi metrik yang dikerjakan HR. Padanannya untuk rumpun AR sudah dibuat (`kinerja_ar`); padanan untuk varians OPEX **belum ada**, sehingga angkanya akan tampil di layar tetapi tidak mengalir ke KPI.
+
+Dan sumber itu baru bisa dibangun setelah **keputusan Finance #1** dijawab — tanpanya ia tak tahu angka mana yang harus dilaporkan.
+
+### Berkas mana yang MASUK, berkas mana yang KELUAR
+
+Cost Control menghasilkan enam berkas tiap bulan. **Hanya sebagian yang menjadi masukan**; sisanya justru keluaran yang isinya dapat dihitung sendiri oleh ERP. Mengunggah semuanya berarti menyalin data yang sudah dipunya sistem, dan melahirkan sumber kebenaran kedua yang pasti menyimpang.
+
+| Berkas | Sifat | Keterangan |
+|---|---|---|
+| `RAPB <tahun> Rev N` | 🟢 **MASUK** | Satu-satunya unggahan berkala yang sesungguhnya |
+| `<bulan>_Realisasi OPEX` | 🔵 keluar | Realisasi dari Accurate + anggaran dari RAPB + varians hitung |
+| `<bulan>_Realisasi Admin & Non Ops` | 🔵 keluar | Idem; hanya **aturan baseline YoY** yang perlu diinput, dan itu konfigurasi sekali |
+| `<bulan>_Cashflow` | 🔵 keluar | Proyeksinya bertuliskan *"Based RAPB"* — turunan, bukan master mandiri |
+| `<bulan>_3 Cost Driver` | 🔵 keluar + 🟢 masuk | Tren dihitung sistem; **3 rekomendasi** masuk lewat form, bukan unggah berkas |
+| `Iklan <brand> per <tanggal>` | 🟢 **MASUK** + 🔵 keluar | Anggaran iklan per advertiser diinput; realisasinya dari sistem |
+
+**Input manusia yang sesungguhnya hanya empat**: RAPB (setahun sekali + revisi), anggaran iklan per periode, tiga rekomendasi efisiensi per bulan, dan aturan baseline YoY. Selebihnya keluaran.
+
 ## Rancangan Frontend
 
 > ⚠️ **Bab ini hanya berlaku untuk OPEX, Cost Control, dan Pajak.** Rumpun **AR tidak menuntut frontend sama sekali** — seluruh UI otomasi KPI sudah terbangun dan dropdown sumbernya mengisi diri dari katalog backend. Jangan membaca tiga halaman di bawah seolah AR termasuk di dalamnya; alasannya di bab **Rumpun AR**.
@@ -579,6 +616,10 @@ Dikelompokkan menurut apa yang berhenti bila tak dijawab. **Tak satu pun dapat d
 | 2 | **Revisi mana yang berlaku untuk Juli.** Juli sudah tutup dengan rekap memakai anggaran lama (Iklan Rp 4,93 M); Rev 2 merevisinya (Iklan + Pajak Iklan Rp 3,58 M) | SPV FAT | Memuat Rev 2 menyatakan ulang bulan yang sudah tutup |
 | 3 | **`Beban Iklan + Pajak Iklan` dipecah atau tetap satu baris** | Cost Control | Baris itu tak dapat diunggah, atau dipaksa ke satu akun dan variansnya menipu |
 | 4 | **Akun bernilai kosong: "dianggarkan nol" atau "belum dianggarkan"?** Enam baris kosong di keenam bulan | Cost Control | Pengunggah menebak, dan tebakannya mengubah total varians |
+
+> 💡 **Ada jawaban bawaan untuk #1.** Ekspor Laba/Rugi Multi Periode Accurate memperlihatkan bahwa **Accurate sendiri sudah punya kelompok bernama `Beban Operasional`**, dan sudah menghitungnya: Juli 2026 = Rp 5.114.573.928, terdiri atas `Beban Penjualan & Pemasaran` Rp 4.394.611.816 dan `Beban Administrasi & Umum` Rp 719.962.112.
+>
+> Memakai kelompok itu lebih aman daripada mengarang irisan sendiri, dan struktur induk–anaknya sudah ditangani kode (`JumlahRealisasiDaun` melewati akun `isParent` supaya tak menghitung ganda). Ini juga menjelaskan mengapa "TOTAL OPEX" di rekap Juli tak cocok dengan apa pun — Finance memakai subset pilihan tangan, selisihnya kira-kira sebesar Admin E-Commerce + Potongan Afiliasi + Ongkir E-Commerce yang tidak ikut. **Tetap keputusan Finance**, tetapi kini ada usulan konkret untuk disetujui atau ditolak, bukan pertanyaan terbuka.
 
 ### Menghentikan modul Tax (bobot 0,45)
 
