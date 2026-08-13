@@ -1128,9 +1128,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "1c0170a121a7b7926938d5df4a50f1e01fb67deaaba4c430352e45bfa3b35d02",
+      "hash": "c1ed5756c7dc1f390388f4fb27c6b3536ce63a6259de529edee0aa6187e1c4fb",
       "ukuran_kb": 229.1,
-      "ringkasan": "Menjawab: apa isi portal web ERP internal Bharata (`erp-frontend` / \"One Bharata\"), stack dan pola UI apa yang dipakai, serta menu apa saja yang muncul per modul (HRIS, Finance, IT, GA, Manufacture, Warehouse, Quality, Procurement, Integration, Sekretariat, Marketing Analytics) berikut rute halamannya. Menjawab juga bagaimana login, refresh token, dan peran SSO Identity Provider bekerja, bagaimana `system_roles` dan paket hak menentukan kategori sidebar yang tampil, rute mana yang digerbang `proxy.ts`, dan bagaimana Tampilan Menu per jabatan menyembunyikan menu berdasarkan URL. Memuat riwayat keputusan bentuk menu beserta alasannya, termasuk jebakan yang sudah terbukti menggigit seperti rute yang dipindah membatalkan penyembunyian tersimpan, layar kembar antar-modul, dan menu yang tampil tapi halamannya menolak.",
+      "ringkasan": "Menjawab: apa isi portal web ERP internal Bharata (`erp-frontend` / \"One Bharata\"), stack dan pola UI apa yang dipakai, serta menu apa saja yang muncul per modul (HRIS, Finance, IT, GA, Manufacture, Warehouse, Quality, Procurement, Integration, Sekretariat, Marketing Analytics) berikut rute halamannya. Menjawab juga bagaimana login, refresh token, dan peran SSO Identity Provider bekerja, bagaimana `system_roles` dan paket hak menentukan kategori sidebar yang tampil, rute mana yang digerbang `proxy.ts`, dan bagaimana Tampilan Menu per jabatan menyembunyikan menu berdasarkan URL. Memuat riwayat keputusan bentuk menu beserta alasannya, termasuk yang sudah dicoba lalu dibatalkan, dan jebakan yang terbukti menggigit seperti rute yang dipindah membatalkan penyembunyian tersimpan, layar kembar antar-modul, label menu yang bertabrakan antar-kategori, dan menu yang tampil tapi halamannya menolak.",
       "kata_kunci": [
         "erp-frontend",
         "One Bharata",
