@@ -292,14 +292,28 @@ PERBAIKI LANGSUNG.
 - **Plaintext credentials di dok IT vault** (`IT - Server, VMs and Databases`,
   `IT - Monitoring System`) **DISENGAJA** sebagai referensi akses internal tim IT. Jangan
   diflag sebagai isu keamanan, jangan usulkan rotasi atau scrub.
-- ~~Merah/hijau di tab Actions erp-frontend bukan sinyal.~~ **SUDAH TIDAK BERLAKU sejak
-  2026-08-12.** `ci.yml` kini punya `on: pull_request: branches: [main]` lagi, jadi
-  gerbangnya **hidup dan merahnya sinyal sungguhan**. Aturan lama justru berbahaya sekarang:
-  ia menyuruh mengabaikan gerbang yang bekerja. Diverifikasi 2026-08-13, dan pada hari yang
-  sama PR erp-frontend #1030 di-merge saat `verify` masih `pending` tanpa ada yang menahan.
-  **Yang berlaku sekarang**: baca statusnya, tetapi periksa dulu commit mana yang diuji
-  versus waktu merge, dan verifikasi lokal tetap wajib karena `pnpm test` tak pernah hijau
-  penuh di `main`.
+- **Merah di Actions erp-frontend: BACA DURASINYA DULU, baru simpulkan.** Aturan lama
+  "abaikan saja" (era `on:` kosong) sudah dicabut — `ci.yml` punya `on: pull_request` lagi
+  sejak 2026-08-12. Tetapi merah masih punya DUA sebab yang sama sekali berbeda, dan
+  durasinya yang membedakan:
+
+  | Durasi | Artinya |
+  |---|---|
+  | 10–20 menit | run sungguhan; hijau/merahnya **sinyal kode** |
+  | 1–3 menit | run sungguhan yang gagal cepat; **sinyal kode** |
+  | **3–6 detik** | **job tak pernah mulai** (`steps: []`), BUKAN sinyal kode |
+
+  Yang 3–6 detik terverifikasi 2026-08-13 sebagai **tagihan GitHub Actions**:
+  *"The job was not started because recent account payments have failed or your spending
+  limit needs to be increased."* Pesannya TIDAK tampil di ringkasan `gh pr checks` maupun
+  `gh run view`; ia hanya muncul lewat
+  `gh api repos/<org>/<repo>/check-runs/<id>/annotations`. Cabang yang sama bisa hijau
+  11 menit lalu merah 4 detik sejam kemudian.
+
+  **Jangan menyuruh orang "perbaiki test yang gagal" untuk run 3–6 detik**, dan jangan pula
+  menyimpulkan kodenya aman. Yang benar: laporkan bahwa gerbangnya tak berjalan, dan
+  verifikasi lokal. `pnpm test` tak pernah hijau penuh di `main`, jadi bandingkan ke
+  baseline `origin/main`.
 - **`pnpm test` erp-frontend tidak pernah hijau penuh di `main`.** Bandingkan kegagalan
   dengan baseline `origin/main` sebelum menyalahkan perubahan sendiri.
 - Redundansi yang tidak berbahaya dan justru menolong keterbacaan.

@@ -37,7 +37,16 @@
 
 > Riwayat: trigger-nya sempat hilang di commit `d8c8ab54` ("delete ci") sehingga `on:` kosong, dan tiap run tercatat **startup failure** (`jobs: []`, tanpa log) — bukan test gagal. `main` sempat tak bisa di-build melewati lima merge tanpa ada yang tahu.
 
-⚠️ **Yang belum tertutup: hijaunya CI tidak menahan merge.** PR erp-frontend **#1030 di-merge 2026-08-13 saat `verify` masih `pending`**, tanpa ada yang menahannya. Jadi *merged* bukan berarti tergerbang. Sebelum menyimpulkan sesuatu aman: periksa commit mana yang diuji versus waktu merge. **Verifikasi lokal tetap wajib**, dan bandingkan kegagalan `pnpm test` penuh dengan baseline `origin/main` sebelum menyalahkan perubahan sendiri — suite itu tak pernah hijau penuh di `main`.
+⚠️ **BACA DURASI RUN sebelum menyimpulkan apa pun dari merah.** Ada dua sebab merah yang sama sekali berbeda:
+
+| Durasi | Artinya |
+|---|---|
+| 10–20 menit, atau 1–3 menit | run sungguhan → **sinyal kode** |
+| **3–6 detik** (`steps: []`) | **job tak pernah mulai** → BUKAN sinyal kode |
+
+Yang 3–6 detik terverifikasi 2026-08-13: **tagihan GitHub Actions org**. Pesannya *"The job was not started because recent account payments have failed or your spending limit needs to be increased"* dan ia **tidak tampil** di `gh pr checks` maupun `gh run view` — hanya lewat `gh api repos/<org>/<repo>/check-runs/<id>/annotations`. Cabang yang sama bisa hijau 11 menit lalu merah 4 detik sejam kemudian, dan `gh run rerun` tidak menolongnya.
+
+⚠️ **Hijaunya CI tidak menahan merge.** PR erp-frontend **#1030 di-merge 2026-08-13 saat `verify` masih `pending`**, tanpa ada yang menahannya. Jadi *merged* bukan berarti tergerbang. **Verifikasi lokal tetap wajib**, dan bandingkan kegagalan `pnpm test` penuh dengan baseline `origin/main` sebelum menyalahkan perubahan sendiri — suite itu tak pernah hijau penuh di `main`.
 
 ## Kalender terpusat (WAJIB untuk fitur bertanggal)
 - **Fitur yang punya tanggal/jadwal/tenggat yang perlu dilihat orang WAJIB mendaftarkan feed ke `calendar-service`, DILARANG bikin halaman kalender sendiri.** Tiap kalender tambahan membawa salinan aturan visibilitasnya sendiri, dan salinan itu yang menyimpang diam-diam sampai ada yang melihat agenda yang tak boleh dilihatnya. Contoh yang harus diarahkan ke sini: rencana `GET /bookings/calendar` di [[GA - Asset Loan & Room Booking]].
