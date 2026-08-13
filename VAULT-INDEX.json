@@ -1420,8 +1420,8 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "d161e8ef847844df6b1dc3c3ab01609a3e2806e2c83229cadc5986868bab6760",
-      "ukuran_kb": 95.2,
+      "hash": "4d83bb1f9480d1727dc380265be4965d0f51c6649041a38d4be10a66c2b3fff6",
+      "ukuran_kb": 95.4,
       "ringkasan": "Menjawab: bagaimana hak akses bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi, cakupan), modul mana saja yang sudah berkatalog permission, dan apa beda permission_sets, menu_hidden, serta modul menu terbatas yang mudah tertukar. Juga menjawab kenapa memberi paket ke sebuah posisi kadang tak mengubah apa pun, apa itu fase satu vs fase dua beserta sakelar env tiap modul, dan hasil audit RBAC per departemen. Memuat katalog acuan 15 modul terdaftar per 2026-08-13, termasuk modul secretary yang melebur legal dan rnd dengan tangga izin yang dipecah per area.",
       "kata_kunci": [
         "RBAC",
@@ -7191,7 +7191,7 @@
       "area": "Quality & Regulatory",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Kedua register + unggah PDF **live di kode**, dan sejak **2026-08-13 modulnya bukan `rnd` lagi melainkan `secretary`** (Kesekretariatan) bersama Legal — lihat blok di bawah. Rute `/rnd/*` **tidak berubah**. Verifikasi lewat gateway **belum dijalankan**. Simulasi HPP & CAPA belum; Papan Pengembangan berupa **tabel bertahap** (belum kanban drag-drop).",
+      "status_teks": "Implemented (ada catatan). Kedua register + unggah PDF **live di kode**, dan sejak **2026-08-13 modulnya bukan `rnd` lagi melainkan `secretary`** (Kesekretariatan) bersama Legal — lihat blok di bawah. Rute `/rnd/*` **tidak berubah**. **Backend terverifikasi live di dev 2026-08-13** lewat gateway (`/api/employee/rnd/registrations` dan `/rnd/products` membalas 200 untuk pemegang peran, 403 untuk yang tidak); **frontend belum di-deploy**. Detail deploy dan peringatan \"merged bukan live\" ada di [[QA - Register Perizinan & Sertifikasi]]. Simulasi HPP & CAPA belum; Papan Pengembangan berupa **tabel bertahap** (belum kanban drag-drop).",
       "publik": true,
       "tautan": [
         "QA - Register Perizinan & Sertifikasi",
@@ -7202,8 +7202,8 @@
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "APP - Web ERP"
       ],
-      "hash": "f2cb7552044f3376e47c2fc72515de99eac359fffb70fe7cc95ab70fee3a380f",
-      "ukuran_kb": 8.6,
+      "hash": "7cdcb40cf9b2ea7b358c25540462d8135d51425078fa97891ffd82acba04e386",
+      "ukuran_kb": 8.9,
       "ringkasan": "Menjawab: bagaimana proses registrasi izin edar produk (NIE/BPOM, Halal, SNI) dipantau di ERP sampai terbit beserta alert bila melewati target, dan bagaimana pipeline produk baru dilacak dari tahap ide, formulasi, trial, registrasi, hingga siap launching. Juga menjawab endpoint dan field model kedua register, siapa yang berhak, dan bagaimana unggah PDF hasil uji dilakukan. Sejak 2026-08-13 modulnya bukan rnd lagi melainkan salah satu area di dalam secretary (Kesekretariatan) bersama Legal, dan inilah lapisan izin pertama bagi kesepuluh rutenya; rute halaman /rnd/* tidak berubah.",
       "kata_kunci": [
         "R&D Regulatory",
@@ -7224,7 +7224,7 @@
       "area": "Quality & Regulatory",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Ketiga register (Perizinan, Kontrak & SLA, Dispute & Advis) + **unggah PDF** **live di kode**, dan sejak **2026-08-13 modulnya bukan `legal` lagi melainkan `secretary`** (Kesekretariatan) bersama R&D — lihat blok di bawah. Rute `/legal/*` **tidak berubah**. Verifikasi lewat gateway **belum dijalankan**: dev auto-deploy hanya terjadi saat merge, dan pengukuran 2026-08-13 menemukan dev tak punya satu pun akun berposisi `Legal` untuk mengujinya. Pemisahan ke service `legal` tersendiri **belum** (dan kini kecil kemungkinannya).",
+      "status_teks": "Implemented (ada catatan). Ketiga register (Perizinan, Kontrak & SLA, Dispute & Advis) + **unggah PDF** **live di kode**, dan sejak **2026-08-13 modulnya bukan `legal` lagi melainkan `secretary`** (Kesekretariatan) bersama R&D — lihat blok di bawah. Rute `/legal/*` **tidak berubah**. **Backend terverifikasi live di dev 2026-08-13** lewat gateway: katalog `secretary` muncul dengan 6 izin, kelima rute baca membalas 200 untuk pemegang peran, 403 untuk yang tidak, dan satu izin benar-benar dibuat lalu dihapus lewat `/api/employee/legal/licenses`. **Frontend-nya belum di-deploy** ke dev, jadi ketiga pemeriksaan sidebar masih menunggu. Pemisahan ke service `legal` tersendiri **belum** (dan kini kecil kemungkinannya).",
       "publik": true,
       "tautan": [
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
@@ -7237,8 +7237,8 @@
         "Microservices - Employee Service",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
       ],
-      "hash": "f0bf9bdc15fa30e0830183af9f18d4025d84e8228c6815fa962f4167f14c1381",
-      "ukuran_kb": 15.8,
+      "hash": "1c841a955e1b7e591ea406cd50d5cfcca0c0a0728bf77597dfc57ce159f5dcb5",
+      "ukuran_kb": 16.5,
       "ringkasan": "Menjawab: di mana izin edar BPOM, sertifikat Halal, izin usaha, kontrak/SLA, dan perkara dispute perusahaan dicatat, field apa saja yang disimpan, serta bagaimana alert H-90 (izin) dan H-60 (kontrak) dihitung. Menjelaskan endpoint CRUD /legal/licenses, /legal/contracts, dan /legal/disputes yang di-host employee-service beserta gerbang izinnya, katalog paket, cara unggah PDF, dan halaman frontend /legal/*. Juga menjawab kenapa modul ini nol pemakai di produksi dan bagaimana itu diselesaikan 2026-08-13 dengan meleburnya ke modul secretary (Kesekretariatan), tempat orang legal sesungguhnya duduk.",
       "kata_kunci": [
         "perizinan",
