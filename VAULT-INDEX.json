@@ -1420,20 +1420,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "4d83bb1f9480d1727dc380265be4965d0f51c6649041a38d4be10a66c2b3fff6",
-      "ukuran_kb": 95.4,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi, cakupan), modul mana saja yang sudah berkatalog permission, dan apa beda permission_sets, menu_hidden, serta modul menu terbatas yang mudah tertukar. Juga menjawab kenapa memberi paket ke sebuah posisi kadang tak mengubah apa pun, apa itu fase satu vs fase dua beserta sakelar env tiap modul, dan hasil audit RBAC per departemen. Memuat katalog acuan 15 modul terdaftar per 2026-08-13, termasuk modul secretary yang melebur legal dan rnd dengan tangga izin yang dipecah per area.",
+      "hash": "574467075df8e2395ad8230be2371b77b9102f417de1a968f58f276ab7d55c02",
+      "ukuran_kb": 96.9,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan data), bagaimana paket hak (permission set) menempel di posisi/jabatan dan diresolusi jadi klaim JWT saat login, serta di mana penegakannya berjalan (gateway, service, frontend). Juga menjawab modul mana yang katalog/paketnya sudah terdaftar dan sudah ditegakkan per-aksi, mana yang masih bertumpu pada system_roles tier, plus riwayat Fase Dua (tier fallback) yang sempat dinyalakan lalu dicabut. Menyebutkan path kode terkait di shared-library, employee-service, dan erp-frontend untuk menyusun/menegakkan hak.",
       "kata_kunci": [
         "RBAC",
         "permission set",
-        "ADR 0030",
-        "katalog izin",
-        "fase dua",
-        "tier fallback",
+        "paket hak",
+        "hak akses",
         "reach",
-        "hak per posisi",
-        "menu_hidden",
-        "secretary"
+        "cakupan data",
+        "system_roles",
+        "tier fallback",
+        "JWT permissions",
+        "katalog modul"
       ]
     },
     {
