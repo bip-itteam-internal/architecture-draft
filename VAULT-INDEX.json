@@ -5283,20 +5283,22 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "7e1ece230a9409a8bbd723e340f27af8fe7a395231c59f1a68f6902deeaec97c",
-      "ukuran_kb": 13.4,
-      "ringkasan": "Menjawab: bagaimana skor KPI karyawan dinilai dan siapa yang berhak melihatnya, beda antara engine KPI→insentif marketing (sudah production) dan appraisal per-karyawan lintas departemen (template per posisi + scoring per periode). Menjelaskan aturan pencocokan posisi template dengan jabatan pada periode yang dinilai (via employee_movement), RBAC per departemen, cakupan tim untuk Leader (scope=team via bawahan langsung), serta penggabungan tampilan lintas departemen (mis. HRGA) dari master data.",
+      "hash": "b231cdf56b0811bd839a3666d5d16b523496f450f9fc5772d2a5e90250245b50",
+      "ukuran_kb": 14.0,
+      "ringkasan": "Menjawab: bagaimana penilaian kinerja KPI di ERP Bharata bekerja, apa bedanya engine KPI→insentif marketing (sudah production di Insentive Service) dengan appraisal KPI bulanan per-karyawan lintas departemen (di Employee Service `/kpi/*`). Menjelaskan template KPI per posisi, aturan bahwa posisi template harus cocok dengan jabatan karyawan pada periode yang dinilai (dijawab dari employee_movement, bukan posisi hari ini), RBAC per departemen, cakupan tim untuk Leader (scope=team berdasarkan bawahan langsung), serta penggabungan tampilan lintas departemen (mis. HRGA) dari master data. Juga menjelaskan mana yang masih konsep/TBD: penegakan siklus bulanan wajib dan workflow review supervisor→HR.",
       "kata_kunci": [
         "KPI",
         "Key Performance Index",
         "appraisal",
         "penilaian kinerja",
-        "skor",
-        "template posisi",
-        "scope team",
+        "performance review",
+        "insentif",
+        "incentive",
+        "scoring",
+        "template KPI",
         "RBAC departemen",
-        "insentif marketing",
-        "HRGA"
+        "scope=team",
+        "employee_movement"
       ]
     },
     {
