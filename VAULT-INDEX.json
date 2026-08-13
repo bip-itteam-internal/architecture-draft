@@ -1100,8 +1100,9 @@
         "API - Integration Service",
         "Microservices - Insentive Service",
         "Microservices - Integration Service",
-        "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
+        "IT - Monitoring System",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "CORE - IT Orchestrator",
         "APP - MyBharata",
         "QA - Register Perizinan & Sertifikasi",
@@ -1128,29 +1129,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "03eb5b8601bf9f68001810caed4b374bfb4e994a13b3edda1db12933512b7eb6",
-      "ukuran_kb": 232.4,
-      "ringkasan": "Menjawab: apa isi portal web ERP internal Bharata (`erp-frontend` / \"One Bharata\"), stack dan pola UI apa yang dipakai, serta menu apa saja yang muncul per modul (HRIS, Finance, IT, GA, Manufacture, Warehouse, Quality, Procurement, Integration, Sekretariat, Marketing Analytics) berikut rute halamannya. Menjawab juga bagaimana login, refresh token, dan peran SSO Identity Provider bekerja, bagaimana `system_roles` dan paket hak menentukan kategori sidebar yang tampil, rute mana yang digerbang `proxy.ts`, bagaimana Tampilan Menu per jabatan menyembunyikan menu berdasarkan URL, dan bagaimana rute yang pindah tetap menjaga setelan itu lewat peta url lama. Memuat riwayat keputusan bentuk menu beserta alasannya, termasuk yang sudah dicoba lalu dibatalkan, dan jebakan yang terbukti menggigit seperti kotak cari yang mati karena tabel merender data mentah, layar kembar antar-modul, label menu yang bertabrakan antar-kategori, dan menu yang tampil tapi halamannya menolak.",
+      "hash": "038df4f53ef74286cb788f9e39550a9224cde8396c287caff818924e99d7b8e6",
+      "ukuran_kb": 236.8,
+      "ringkasan": "Menjawab: modul, menu, dan halaman apa saja yang ada di portal web ERP `erp-frontend` (\"One Bharata\") per role — HRIS, Finance/FAT, IT, GA, Procurement, Warehouse, Manufacture, Task Management, Marketing Analytics — dan stack apa yang dipakai membangunnya. Juga menjawab siapa melihat menu mana, bagaimana gerbang rute di `proxy.ts` menyaring per modul, dan bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain. Memuat riwayat keputusan UI beserta jebakan yang sudah terbukti menggigit: label menu yang bertabrakan, penyembunyian menu yang batal senyap saat rute berpindah, dan angka yang menyesatkan ketika sumber datanya tak terjangkau.",
       "kata_kunci": [
         "erp-frontend",
-        "One Bharata",
-        "web ERP",
+        "web erp",
+        "one bharata",
+        "hris-dashboard",
         "sidebar",
         "menu",
-        "Konfigurasi Sistem",
-        "Hak Akses",
-        "Kelola Perusahaan",
-        "Tampilan Menu",
-        "menu_hidden",
-        "rute lama",
-        "redirect",
-        "proxy",
-        "route gating",
-        "system_roles",
-        "SSO",
         "Next.js",
-        "i18n",
-        "multi-perusahaan"
+        "proxy rute",
+        "SSO identity provider",
+        "ringkasan divisi"
       ]
     },
     {
@@ -6190,6 +6182,7 @@
       "status_teks": "Overview — peta domain IT; tiap area berstatus sendiri di dok masing-masing.",
       "publik": false,
       "tautan": [
+        "APP - Web ERP",
         "IT - Helpdesk",
         "IT - Employee System",
         "IT - Server, VMs and Databases",
@@ -6204,18 +6197,20 @@
         "DB - Overview and Notes",
         "BASE - Enterance Point"
       ],
-      "hash": "9079821125e5f9d2ff7c0e06a21e316ed19ee6d78a350f2e096ba9f6bfaedf28",
-      "ukuran_kb": 1.7,
-      "ringkasan": "Menjawab: apa saja area/domain yang dikelola tim IT (helpdesk, manajemen akun & akses, infrastruktur server/network, deployment CI/CD, monitoring, backup, keamanan) dan dokumen mana yang menjelaskan tiap area secara detail, sebagai peta navigasi awal domain IT.",
+      "hash": "ed2a648dffa898c27348383877a554bf2dbdca56e88a2035e5e412a2d1320417",
+      "ukuran_kb": 2.1,
+      "ringkasan": "Menjawab: area apa saja yang jadi tanggung jawab departemen IT dan dokumen mana yang membahas masing-masing — ringkasan divisi di web ERP, helpdesk/ticketing, manajemen akun & akses, server/VM/database, jaringan, deployment CI-CD, monitoring, backup & DR, tools pengembangan, dan keamanan. Berguna sebagai titik masuk saat belum tahu dok IT mana yang relevan. Juga menunjuk komponen inti lintas-domain yang sengaja didokumentasikan di Core System: API Master Gateway, SSO Flow, dan database per service.",
       "kata_kunci": [
-        "IT big pictures",
+        "IT",
         "peta domain IT",
+        "departemen IT",
         "helpdesk",
         "infrastruktur",
-        "deployment",
         "monitoring",
+        "CI/CD",
+        "backup",
         "keamanan IT",
-        "overview IT"
+        "ringkasan divisi IT"
       ]
     },
     {
