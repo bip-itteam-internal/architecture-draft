@@ -41,16 +41,28 @@ done
 
 ss_cmd="bash \\\"$claude/hooks/session-start.sh\\\""
 pc_cmd="bash \\\"$claude/hooks/pre-commit-reminder.sh\\\""
+
+# Plugin WAJIB tim, di-enable lewat settings SCOPE PROJECT supaya berlaku bagi siapa pun
+# yang clone + trust workspace ini — tak perlu tiap orang ingat menyalakannya.
+# Sengaja hanya yang WAJIB; rekomendasi lain tetap opsional lewat /skills.
+plugins_json='"superpowers@claude-plugins-official": true'
+
 if [ "$no_precommit" -eq 1 ]; then
   cat > "$claude/settings.json" <<JSON
-{ "hooks": { "SessionStart": [ { "hooks": [ { "type": "command", "command": "$ss_cmd" } ] } ] } }
+{
+  "enabledPlugins": { $plugins_json },
+  "hooks": { "SessionStart": [ { "hooks": [ { "type": "command", "command": "$ss_cmd" } ] } ] }
+}
 JSON
 else
   cat > "$claude/settings.json" <<JSON
-{ "hooks": {
-  "SessionStart": [ { "hooks": [ { "type": "command", "command": "$ss_cmd" } ] } ],
-  "PreToolUse": [ { "matcher": "Bash", "hooks": [ { "type": "command", "command": "$pc_cmd" } ] } ]
-} }
+{
+  "enabledPlugins": { $plugins_json },
+  "hooks": {
+    "SessionStart": [ { "hooks": [ { "type": "command", "command": "$ss_cmd" } ] } ],
+    "PreToolUse": [ { "matcher": "Bash", "hooks": [ { "type": "command", "command": "$pc_cmd" } ] } ]
+  }
+}
 JSON
 fi
 

@@ -73,8 +73,27 @@
 - **Skill `audit-keamanan`** (kit ≥ 1.9.0) untuk audit keamanan / threat model / OWASP. Gerbang keyakinan 8/10 dan verifikasi lewat penelusuran kode; **dilarang menyerang sistem hidup**. Pengecualian kerasnya mendahului segalanya — creds vault IT disengaja, jangan diflag. Audit yang berisik akan diabaikan, jadi laporannya wajib menyebut berapa kandidat yang dibuang.
 - **`/plan` menulis artefak ke `.task-plans/<tanggal>-<slug>.md`** dan **`/wrap` mengauditnya** lewat `.agent-kit/rules/wrap-completion-gate.md` (kit ≥ 1.8.0). Gerbangnya MEMBLOKIR penutupan bila ada item rencana yang belum dikerjakan, dan menuntut konfirmasi **per item** untuk yang tak bisa dibuktikan diff (keadaan Mongo, env container, panggilan lewat gateway). Alasannya persis kasus form-builder: 183 test hijau, fitur merged dan deployed, tetap mustahil dipakai 3 hari karena `formRequest` tak punya field-nya. **Test hijau bukan bukti fitur bisa dipakai** — isi bagian `## Cara Verifikasi` di artefak rencana, jangan dikosongkan.
 - **Checklist `/review` ada di `.agent-kit/rules/review-checklist.md`** (kit ≥ 1.7.0), dibaca **on-demand** saat `/review` jalan — sengaja TIDAK di-import ke `CLAUDE.md` karena akan membakar konteks tiap sesi. Isinya kelas bug yang sudah terbukti menggigit di sini, jadi **gotcha baru yang berulang taruh di situ**, bukan cuma di file ini. Yang paling menolong justru **gerbang verifikasi anti false-positive**-nya: klaim "field/handler ini tidak ada" wajib dibuktikan Grep dulu, karena diff saja tidak cukup dan review yang sering meleset akan diabaikan orang.
-- **Skill umum** (superpowers: brainstorming/TDD/systematic-debugging/writing-plans, dataviz, frontend-design, code-review, deep-research, dll.): **plugin per-mesin**, tak ikut repo. Marketplace resmi Anthropic (`claude-plugins-official`) **sudah pre-registered**. Install: `/plugin` (tab Discover) atau CLI `claude plugin install <nama>@claude-plugins-official` (mis. `superpowers`). Kelola: `/plugin list`, `claude plugin enable|disable|uninstall <nama>@<marketplace>`. (Cek nama marketplace asli plugin di `/plugin` → tab Marketplaces.)
-- **Standarkan set plugin tim**: `enabledPlugins` di `.claude/settings.json` (project scope) auto-enable saat clone + trust. Tapi `.claude/settings.json` ERP **di-generate `init`** (bisa ketimpa) → standarisasi resmi tim idealnya lewat agent-kit (init menulis `enabledPlugins`) — **belum dilakukan (TBD)**.
+- **`superpowers` WAJIB dipakai seluruh tim** (kit ≥ 1.11.0). `init` kini menulis
+  `enabledPlugins: { "superpowers@claude-plugins-official": true }` ke `.claude/settings.json`
+  scope project, jadi ia menyala bagi siapa pun yang clone + trust workspace ini — tak perlu
+  tiap orang ingat menyalakannya. Yang dipakai sehari-hari: `brainstorming` sebelum kerja
+  kreatif, `systematic-debugging` sebelum menebak sebab bug, `test-driven-development`,
+  `verification-before-completion` sebelum mengklaim selesai.
+- ⚠️ **`enabledPlugins` MENYALAKAN, belum tentu MEMASANG.** Bila plugin-nya belum pernah
+  ter-install di mesin itu, menyalakannya tidak menghadirkan skill apa pun — dan gagalnya
+  **senyap**: tak ada galat, skill-nya cuma tak muncul. Kalau `/brainstorming` dsb. tak ada
+  setelah `init`, jalankan **`/skills`** (ia yang benar-benar meng-install), lalu **restart
+  sesi**. Jangan simpulkan kit-nya rusak.
+- **Skill umum SISANYA** (dataviz, frontend-design, code-review, deep-research): tetap
+  **opsional per-mesin**, tak ikut repo. Marketplace resmi Anthropic (`claude-plugins-official`)
+  **sudah pre-registered**. Install: `/skills` (disarankan), `/plugin` tab Discover, atau CLI
+  `claude plugin install <nama>@claude-plugins-official`. Kelola: `/plugin list`,
+  `claude plugin enable|disable|uninstall <nama>@<marketplace>`.
+- **Kenapa plugin TIDAK di-vendor ke `.agent-kit/skills/`**: skill kit memuat pengetahuan yang
+  hanya berlaku di sini (daftar container deploy, gotcha yang sudah menggigit tim ini),
+  sedangkan superpowers praktik umum yang dirawat upstream. Menyalinnya = fork yang berhenti
+  menerima perbaikan lalu menyimpang diam-diam — kelas masalah "sumber kebenaran kedua" yang
+  berulang kali dicatat di berkas ini.
 - **Bikin skill custom tim** (shareable): taruh `SKILL.md` di `.agent-kit/skills/<nama>/` → `init` menyalin ke `.claude/skills/`; bump versi kit → tim `git pull` + re-init.
 - **Update file ingatan-tim ini**: edit `.agent-kit/rules/team-memory.md` di vault → tim cukup `git pull architecture-draft` (di-import langsung sejak kit v1.3.0; **tanpa** re-init).
 

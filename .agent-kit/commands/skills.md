@@ -8,7 +8,7 @@ lalu tawarkan install yang belum ada. **User cukup konfirmasi — kamu yang menj
 ## Daftar rekomendasi tim
 | Skill/plugin | Kegunaan | Install (marketplace resmi) |
 |---|---|---|
-| **superpowers** | brainstorming · TDD · systematic-debugging · writing-plans · verification | `claude plugin install superpowers@claude-plugins-official` |
+| **superpowers** ⭐ **WAJIB** | brainstorming · TDD · systematic-debugging · writing-plans · verification | `claude plugin install superpowers@claude-plugins-official` |
 | **code-review** | review diff (bug) + `/simplify` (cleanup kualitas) | `claude plugin install code-review@claude-plugins-official` |
 | **dataviz** | chart/visualisasi data konsisten | `claude plugin install dataviz@claude-plugins-official` |
 | **frontend-design** | arah desain UI (erp-frontend, mybharata) | `claude plugin install frontend-design@claude-plugins-official` |
@@ -30,5 +30,13 @@ lalu tawarkan install yang belum ada. **User cukup konfirmasi — kamu yang menj
 ## Catatan
 - Ini **skill umum** (plugin per-mesin), BEDA dari command tim ERP (`/start-task`…`/wrap`, `/ask`)
   yang datang dari agent-kit via `init`.
-- **JANGAN install tanpa konfirmasi user** (perubahan konfigurasi mesin).
+- **`superpowers` WAJIB tim** (kit ≥ 1.11.0). `init` sudah menyalakannya lewat `enabledPlugins`
+  di `.claude/settings.json` scope project, **tetapi menyalakan ≠ memasang**: bila plugin-nya
+  belum pernah ter-install di mesin ini, skill-nya tetap tak muncul dan gagalnya **senyap**.
+  Karena itu superpowers **tetap wajib dicek di langkah 1** — kalau ⬜, tawarkan install lebih
+  dulu sebelum yang lain, dan tekankan restart sesi setelahnya.
+- **JANGAN install tanpa konfirmasi user** (perubahan konfigurasi mesin). Berlaku juga untuk
+  yang WAJIB: yang otomatis cuma penyalaannya, pemasangannya tetap keputusan pemilik mesin.
 - Sesuaikan daftar rekomendasi dengan mengedit `architecture-draft/.agent-kit/commands/skills.md`.
+  Untuk mengubah yang **wajib**, sunting `enabledPlugins` di `init.ps1` **dan** `init.sh`
+  (dua-duanya, kalau tidak Windows dan Linux akan menyimpang), lalu bump `VERSION`.

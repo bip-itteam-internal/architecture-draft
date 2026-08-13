@@ -54,8 +54,15 @@ $hooks = @{ SessionStart = @(@{ hooks = @(@{ type='command'; command=$ssCmd }) }
 if (-not $NoPreCommitHook) {
   $hooks['PreToolUse'] = @(@{ matcher='Bash'; hooks=@(@{ type='command'; command=$pcCmd }) })
 }
+# Plugin WAJIB tim, di-enable lewat settings SCOPE PROJECT supaya berlaku bagi siapa pun yang
+# clone + trust workspace ini — tak perlu tiap orang ingat menyalakannya sendiri.
+# Sengaja hanya yang WAJIB; rekomendasi lain tetap opsional lewat /skills.
+$enabledPlugins = @{ 'superpowers@claude-plugins-official' = $true }
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-[System.IO.File]::WriteAllText((Join-Path $claude 'settings.json'), (@{ hooks = $hooks } | ConvertTo-Json -Depth 8), $utf8NoBom)
+[System.IO.File]::WriteAllText(
+  (Join-Path $claude 'settings.json'),
+  (@{ enabledPlugins = $enabledPlugins; hooks = $hooks } | ConvertTo-Json -Depth 8),
+  $utf8NoBom)
 
 # 6. generate erp/CLAUDE.md dari template
 $kitVer = (Get-Content (Join-Path $kitRoot 'VERSION') -Raw).Trim()
