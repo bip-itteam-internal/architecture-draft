@@ -3147,19 +3147,19 @@
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "4528b389bee5bd130456ef093282e4db777d5d98c07310a905912823913d7092",
-      "ukuran_kb": 30.8,
-      "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi dua sub-tab (data dari sumber versus data hasil input gudang), menu mana saja yang terkena, dan kenapa badge status sudah/belum dicatat hanya dipasang di tab yang punya kunci join. Menjelaskan aturan turunannya: agregasi tab Keluar FG per SKU dengan bundle dipecah ke komponen, status resi mana yang dihitung keluar gudang, serta kenapa nama penginput distempel server lewat header gateway dan tidak boleh dikirim client. Mencakup pula gerbang gudang untuk retur barang-balik yang membuat pemisahan itu bermakna.",
+      "hash": "3266cd358f98a92f33244a13187cdfb28113d284784ced58f99877ab35544dc0",
+      "ukuran_kb": 32.0,
+      "ringkasan": "Menjawab: mengapa log tiap menu WMS dipecah jadi sub-tab SUMBER vs INPUT WMS, menu mana saja yang kena (Return Dari Ekspedisi, Keluar FG, Inbound RM Harian, Input Gudang FG, Kirim FG), dan kenapa badge \"sudah/belum dicatat\" hanya ada di tab yang punya kunci join. Menjelaskan juga resi mana yang dihitung keluar gudang (hanya COMPLETED + SHIPPED, alasan TO_SHIP dikecualikan), kenapa tab sumber Keluar FG diagregasi per SKU dengan bundle dipecah ke komponen, serta bagaimana nama penginput distempel server dari header BIP-Username ke field created_by_name alih-alih dikirim client. Memuat pula gerbang gudang untuk retur barang-balik, termasuk perubahannya jadi per-order dan status SEBAGIAN.",
       "kata_kunci": [
         "WMS",
-        "log gudang",
-        "sumber vs input",
+        "log sumber",
+        "input WMS",
         "created_by_name",
+        "stempel penginput",
         "audit trail",
-        "retur ekspedisi",
+        "gerbang gudang",
+        "retur",
         "resi",
-        "Keluar FG",
-        "Inbound RM",
         "ADR 0025"
       ]
     },
