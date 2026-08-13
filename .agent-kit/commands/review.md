@@ -84,5 +84,4 @@ diff kecil hasilnya sama saja.
 ## Yang tidak dilakukan di sini
 
 - Jangan commit, push, atau buka PR. Itu tugas `/wrap`.
-- Jangan menyimpulkan apa pun dari status CI erp-frontend (gerbangnya mati sejak
-  2026-07-29; merah di Actions = startup failure). Verifikasi wajib lokal.
+- Jangan menyimpulkan apa pun dari status CI, ke arah mana pun. Verifikasi wajib lokal.

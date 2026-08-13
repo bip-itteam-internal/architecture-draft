@@ -32,21 +32,14 @@
 - ⚠️ **`i18n/locales/{id,en}.ts` berkas paling sering disunting paralel.** Sebelum merge: `git merge origin/main` lokal lalu `pnpm tsc` **dan** `pnpm build`. Auto-merge git bisa menelan kurung tutup sehingga berkasnya bukan JavaScript sah — galat **parse**, bukan tipe, dan SELURUH halaman gagal build. Terjadi 2026-08-09: dua PR menyunting titik yang sama berselang enam menit, `main` mati 48 menit (dipulihkan erp-frontend #909).
 - **Uji Radix Tabs pakai `fireEvent.mouseDown`, bukan `click`** — dengan `click` tabnya tak berpindah dan testnya lolos-diam.
 
-### ✅ Gerbang CI erp-frontend SUDAH PULIH (2026-08-12)
-`.github/workflows/ci.yml` ("CI — Verify PR") kini punya `on: pull_request: branches: [main]` lagi — diverifikasi langsung 2026-08-13. **Merah di tab Actions KINI sinyal sungguhan**, jangan diabaikan.
+### Verifikasi erp-frontend: LOKAL, jangan lewat CI
+**Status CI erp-frontend sengaja TIDAK diatur di sini, dan jangan ditambahkan lagi.** Aturannya sempat ditulis dan ditulis ulang beberapa kali, dan tiap versinya usang dalam hitungan hari karena yang dikodekan bukan sifat repo ini melainkan keadaan yang berubah-ubah. Aturan yang berulang kali meleset akan diabaikan seluruhnya, termasuk bagiannya yang benar.
 
-> Riwayat: trigger-nya sempat hilang di commit `d8c8ab54` ("delete ci") sehingga `on:` kosong, dan tiap run tercatat **startup failure** (`jobs: []`, tanpa log) — bukan test gagal. `main` sempat tak bisa di-build melewati lima merge tanpa ada yang tahu.
+Yang berlaku dan stabil:
 
-⚠️ **BACA DURASI RUN sebelum menyimpulkan apa pun dari merah.** Ada dua sebab merah yang sama sekali berbeda:
-
-| Durasi | Artinya |
-|---|---|
-| 10–20 menit, atau 1–3 menit | run sungguhan → **sinyal kode** |
-| **3–6 detik** (`steps: []`) | **job tak pernah mulai** → BUKAN sinyal kode |
-
-Yang 3–6 detik terverifikasi 2026-08-13: **tagihan GitHub Actions org**. Pesannya *"The job was not started because recent account payments have failed or your spending limit needs to be increased"* dan ia **tidak tampil** di `gh pr checks` maupun `gh run view` — hanya lewat `gh api repos/<org>/<repo>/check-runs/<id>/annotations`. Cabang yang sama bisa hijau 11 menit lalu merah 4 detik sejam kemudian, dan `gh run rerun` tidak menolongnya.
-
-⚠️ **Hijaunya CI tidak menahan merge.** PR erp-frontend **#1030 di-merge 2026-08-13 saat `verify` masih `pending`**, tanpa ada yang menahannya. Jadi *merged* bukan berarti tergerbang. **Verifikasi lokal tetap wajib**, dan bandingkan kegagalan `pnpm test` penuh dengan baseline `origin/main` sebelum menyalahkan perubahan sendiri — suite itu tak pernah hijau penuh di `main`.
+- **Verifikasi WAJIB lokal**: `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test`, dan `pnpm build` sebelum merge.
+- **`pnpm test` tak pernah hijau penuh di `main`** — bandingkan kegagalan dengan baseline `origin/main` sebelum menyalahkan perubahan sendiri.
+- **Merged bukan berarti tergerbang.** PR #1030 di-merge 2026-08-13 saat gerbangnya belum selesai, tanpa ada yang menahan. Jangan menyimpulkan sebuah perubahan sudah teruji hanya karena sudah masuk `main`.
 
 ## Kalender terpusat (WAJIB untuk fitur bertanggal)
 - **Fitur yang punya tanggal/jadwal/tenggat yang perlu dilihat orang WAJIB mendaftarkan feed ke `calendar-service`, DILARANG bikin halaman kalender sendiri.** Tiap kalender tambahan membawa salinan aturan visibilitasnya sendiri, dan salinan itu yang menyimpang diam-diam sampai ada yang melihat agenda yang tak boleh dilihatnya. Contoh yang harus diarahkan ke sini: rencana `GET /bookings/calendar` di [[GA - Asset Loan & Room Booking]].
