@@ -5292,22 +5292,22 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "b231cdf56b0811bd839a3666d5d16b523496f450f9fc5772d2a5e90250245b50",
-      "ukuran_kb": 14.0,
-      "ringkasan": "Menjawab: bagaimana penilaian kinerja KPI di ERP Bharata bekerja, apa bedanya engine KPI→insentif marketing (sudah production di Insentive Service) dengan appraisal KPI bulanan per-karyawan lintas departemen (di Employee Service `/kpi/*`). Menjelaskan template KPI per posisi, aturan bahwa posisi template harus cocok dengan jabatan karyawan pada periode yang dinilai (dijawab dari employee_movement, bukan posisi hari ini), RBAC per departemen, cakupan tim untuk Leader (scope=team berdasarkan bawahan langsung), serta penggabungan tampilan lintas departemen (mis. HRGA) dari master data. Juga menjelaskan mana yang masih konsep/TBD: penegakan siklus bulanan wajib dan workflow review supervisor→HR.",
+      "hash": "47280dbd8dad127c2e4a2cc6db9cc3c394f0d65fc4f4a60f7f58e39a477d7788",
+      "ukuran_kb": 14.4,
+      "ringkasan": "Menjawab: bagaimana penilaian KPI dihitung untuk tim marketing (skor→insentif) versus appraisal per-karyawan lintas departemen, bagaimana template KPI per posisi & scoring bulanan bekerja, dan aturan pencocokan posisi template dengan jabatan karyawan pada periode yang dinilai. Juga menjelaskan RBAC per departemen, cakupan tim untuk Leader (scope=team), penggabungan tampilan lintas departemen (mis. HRGA), serta bagian mana yang sudah live dan mana yang masih konsep (siklus bulanan wajib + workflow review supervisor→HR).",
       "kata_kunci": [
         "KPI",
         "Key Performance Index",
         "appraisal",
         "penilaian kinerja",
-        "performance review",
         "insentif",
         "incentive",
         "scoring",
-        "template KPI",
+        "template posisi",
         "RBAC departemen",
-        "scope=team",
-        "employee_movement"
+        "supervisor",
+        "employee-service",
+        "marketing"
       ]
     },
     {
