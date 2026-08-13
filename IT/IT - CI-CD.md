@@ -1,4 +1,4 @@
-**Status**: ⚠️ **Implemented (ada catatan)** — pipeline dev jalan lewat GitHub Actions, mobile lewat Codemagic. Catatan besar: **jalur deploy produksi ada di luar repo dan belum terverifikasi mekanismenya**, dan CI erp-frontend mati sejak 2026-07-29.
+**Status**: ⚠️ **Implemented (ada catatan)** — pipeline dev jalan lewat GitHub Actions, mobile lewat Codemagic. Catatan besar: **jalur deploy produksi ada di luar repo dan belum terverifikasi mekanismenya**, dan **seluruh workflow `erp-frontend` dimatikan 2026-08-14** sehingga deploy web produksi kini **manual** ([[RUN - Deploy Frontend ERP ke Produksi]]).
 
 ## Deskripsi
 
@@ -6,7 +6,7 @@
 
 ## Infrastruktur CI/CD
 
-- **Self-hosted runner**: kini di **VPS Biznet Gio** `116.206.196.31` (VM internal lama `10.10.10.8`/`cicd` sudah **decommissioned**) — menjalankan workflow GitHub Actions (`runs-on: self-hosted` di `deploy.yml`), lalu SSH ke VM target
+- **Self-hosted runner**: ⚠️ **lokasinya tidak diketahui.** Beberapa workflow memakai `runs-on: self-hosted` (`deploy.yml` bip-erp, `local-deploy.yml` task-management, `deploy-prod.yml` erp-frontend), tetapi **runner-nya tidak ada di VPS Biznet Gio** `116.206.196.31` — diperiksa menyeluruh 2026-08-14: nol proses `Runner.Listener`, nol unit systemd `actions.runner.*`, nol direktori `actions-runner`, nol container ber-nama runner/delegate. Enumerasi resmi lewat API GitHub **tidak bisa dilakukan** dengan hak yang ada (403 di level org, 404 di level repo), jadi *"tidak ada runner sama sekali"* **belum terbukti** — yang terbukti hanya *"tidak di Biznet"*. VM internal lama `10.10.10.8`/`cicd` sudah **decommissioned**. Gejala bila memang tak ada executor: run **menggantung di antrean** alih-alih gagal (run `deploy-prod.yml` 2026-07-05 mengantre 24 jam sebelum dibatalkan).
 - **Deployment VM (dev)**: `10.10.10.121` (user `erp`) — host container/app (dev). ⚠️ Prod LIVE kini di **VPS Biznet `116.206.196.31`** (konfirmasi user 18 Juli 2026; `10.10.10.120` pensiun)
 - 🔴 **PENTING — merge ke `main` MENDARAT DI PRODUKSI** (terverifikasi 2026-08-13). `finance-service` yang baru lahir hari itu **sudah menjawab di prod** lewat gateway (`GET /api/finance` → 200) padahal **dev masih 404** berjam-jam sesudahnya. Repo bip-erp hanya punya **dua** workflow — `deploy.yml` (judulnya "Deploy to **Dev**", `VM_IP: 10.10.10.121`) dan `pr-notification.yml`; **tidak ada** `deploy-prod.yml`. Jadi prod menerima deploy dari `main` lewat jalur **di luar GitHub Actions**; kandidat terkuat delegate **Harness** di VPS, tetapi pemicunya **belum terverifikasi** — jangan tulis mekanismenya sebagai fakta sebelum ada yang membuktikannya.
   **Konsekuensi praktis**: gerbang **sebelum** merge adalah satu-satunya gerbang. Perubahan yang bisa mematikan boot (mis. entri baru di `InternalURL` gateway tanpa `*_MODULE_URL` di compose → `ValidateInternalURL` memanik → restart-loop) akan menjatuhkan **seluruh ERP produksi**, bukan dev. Dan "uji di dev dulu" tidak berarti apa-apa bila dev tertinggal; per 2026-08-13 dev menjalankan biner gateway **8 jam lebih tua** dari `main` sampai di-deploy ulang manual.
@@ -23,10 +23,11 @@
 - **Rollback**: `emergency-rollback` (manual) → `git reset --hard HEAD~1` + rebuild semua
 - App dir: `/home/erp/apps/bip-erp`. Detail: `CICD_WORKFLOW_DOCUMENTATION.md` di repo. Lihat [[CORE - API Master Gateway]]
 
-### erp-frontend (web "hris-dashboard") — GitHub Actions + PM2
-- **Trigger**: push ke `main` + `workflow_dispatch` (rollback)
-- **Alur**: SSH ke VM → `git reset --hard origin/main` → **PM2** jalankan `ecosystem.config.cjs` (app `web-erp`, otomatis `pnpm install && build && prod`) → verify `pm2 info`
-- App dir: `/home/erp/apps/frontend-hris-dashboard`. Lihat [[APP - Web ERP]]
+### erp-frontend (web "hris-dashboard") — ⚠️ MANUAL, tanpa otomasi
+- **Semua workflow dimatikan 2026-08-14** (`CI — Verify PR` dan `Deploy PROD ERP Frontend`, keduanya `disabled_manually`). Tak ada trigger otomatis apa pun ke dev maupun prod.
+- **Deploy prod = manual lewat SSH**, prosedur + gerbang verifikasinya di [[RUN - Deploy Frontend ERP ke Produksi]].
+- **Bukan PM2 lagi**, dan bukan lagi user `erp`: produksi jalan sebagai **container Docker** `frontend-hris-dashboard` (image `erp-frontend-frontend-hris`, port `9696`) di app dir **`/home/bharata/apps/erp-frontend`**. Diverifikasi langsung 2026-08-14 — `pm2 list` di VPS hanya memegang `uptime-kuma`, dan direktori lama `/home/*/apps/frontend-hris-dashboard` sudah tidak ada.
+- **`.github/workflows/deploy-prod.yml` masih tersimpan di repo dengan isi yang salah** (`VM_IP` menunjuk `10.10.10.120` yang sudah pensiun, dan `runs-on: self-hosted`). Berkasnya terbaca seolah jalur ini hidup; ia tidak. Lihat [[APP - Web ERP]]
 
 ### mybharata-app (mobile Flutter) — Codemagic
 - **Trigger branch**: `development` → build staging (APK/IPA) → **Firebase App Distribution**; `release/*` atau `main` → build prod (AAB/IPA) → **Google Play Store & App Store Connect**

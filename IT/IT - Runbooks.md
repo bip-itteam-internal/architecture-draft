@@ -19,17 +19,17 @@ Pola dari [[HOMEPAGE]] + [[ADR - 0002 Database-per-Service]]:
 
 ## Runbook 2 — Deploy / rilis (grounded dari [[IT - CI-CD]])
 
-**Infra**: self-hosted runner VM `10.10.10.8` (user `cicd`) menjalankan GitHub Actions → SSH ke VM target (**dev `10.10.10.121`**, **prod `10.10.10.120`**, user `erp`). Auth SSH password via GitHub Secret `VM_PASSWORD` (`sshpass`).
+**Infra**: ⚠️ dua nilai di bawah ini sudah usang di jalur prod — VM runner `10.10.10.8` **decommissioned** dan prod `10.10.10.120` **pensiun** (prod kini VPS Biznet `116.206.196.31`, user `bharata`). Yang masih berlaku: self-hosted runner (lokasi **tidak diketahui**, bukan di Biznet) menjalankan GitHub Actions → SSH ke VM target **dev `10.10.10.121`** (user `erp`), auth SSH password via GitHub Secret `VM_PASSWORD` (`sshpass`). Rinciannya di [[IT - CI-CD]].
 
 - **bip-erp (backend)** — trigger **push ke `main`** (+ `workflow_dispatch`). Alur: `detect` (git pull + deteksi service berubah) → `notify-start` → `deploy-*` (build → down → up per service, **paralel**) → `deployment-summary` (cleanup image, simpan 10 terakhir). **Selective**: hanya service berubah; bila file **shared** berubah (`shared-library/`, `.env*`, `docker-compose.yml`) → **semua 11 service** redeploy. App dir VM: `/home/erp/apps/bip-erp`.
-- **erp-frontend (web)** — push `main` → SSH → `git reset --hard origin/main` → **PM2** `ecosystem.config.cjs` (app `web-erp`: `pnpm install && build && prod`) → verify `pm2 info`. App dir: `/home/erp/apps/frontend-hris-dashboard`. Lihat [[APP - Web ERP]].
+- **erp-frontend (web)** — ⚠️ **tidak ada otomasi lagi.** Seluruh workflow-nya dimatikan 2026-08-14; deploy prod **manual lewat SSH** ke VPS Biznet, jalan sebagai container Docker (bukan PM2, bukan user `erp`). Prosedur + gerbang verifikasi: [[RUN - Deploy Frontend ERP ke Produksi]]. Lihat juga [[APP - Web ERP]].
 - **mybharata-app (mobile)** — **Codemagic**: branch `development` → APK/IPA → Firebase App Distribution; `release/*`/`main` → AAB/IPA → Play Store/App Store. Lihat [[APP - MyBharata]].
 - **Notifikasi**: WhatsApp grup "BIP Notification Center" (`scripts/notify.sh`) untuk backend/web; Slack `#hris-mobile-alerts` untuk mobile.
 
 ## Runbook 2b — Rollback
 
 - **bip-erp**: `workflow_dispatch` → job `emergency-rollback` = `git reset --hard HEAD~1` + rebuild semua service.
-- **erp-frontend**: `workflow_dispatch` (rollback) via GitHub Actions.
+- **erp-frontend**: **manual** — `git reset --hard <commit-sebelumnya>` di app dir lalu rebuild container. Jalur `workflow_dispatch` sudah tidak ada sejak workflow-nya dimatikan. Langkahnya di [[RUN - Deploy Frontend ERP ke Produksi]] §Rollback.
 - (Catatan: belum ada health-check/automated test **sebelum** deploy — lihat roadmap di [[IT - CI-CD]].)
 
 ## Runbook 3 — Backup & restore (grounded dari [[IT - Backup & DR]])

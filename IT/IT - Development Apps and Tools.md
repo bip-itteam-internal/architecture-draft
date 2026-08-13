@@ -10,7 +10,7 @@
 - Development workspace ada di "BIP ERP"
 
 [OneBharata](https://hoppscotch.io/) - Production
-- Di-host secara internal pada VM ERP-Production: http://10.10.10.120:9696/
+- Produksi kini di **VPS Biznet**, diakses lewat URL publik: https://erp.bharatainternasional.com (alamat lama `http://10.10.10.120:9696/` sudah pensiun). Port `9696` tetap dipakai container-nya di host, tapi tidak diekspos langsung ke pengguna.
 - Credentials mengikuti akun yang Anda buat untuk perusahaan saat on-boarding di myBharata, jika Anda lupa Anda bisa menghubungi IT Support
 
 [OneBharata](https://hoppscotch.io/) - Development
