@@ -5283,22 +5283,23 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "b231cdf56b0811bd839a3666d5d16b523496f450f9fc5772d2a5e90250245b50",
-      "ukuran_kb": 14.0,
-      "ringkasan": "Menjawab: bagaimana penilaian kinerja KPI di ERP Bharata bekerja, apa bedanya engine KPI→insentif marketing (sudah production di Insentive Service) dengan appraisal KPI bulanan per-karyawan lintas departemen (di Employee Service `/kpi/*`). Menjelaskan template KPI per posisi, aturan bahwa posisi template harus cocok dengan jabatan karyawan pada periode yang dinilai (dijawab dari employee_movement, bukan posisi hari ini), RBAC per departemen, cakupan tim untuk Leader (scope=team berdasarkan bawahan langsung), serta penggabungan tampilan lintas departemen (mis. HRGA) dari master data. Juga menjelaskan mana yang masih konsep/TBD: penegakan siklus bulanan wajib dan workflow review supervisor→HR.",
+      "hash": "0d4bd43246d01741c8e00d6813db8058539142b39633acf13a3e2344847cf9f7",
+      "ukuran_kb": 14.1,
+      "ringkasan": "Menjawab: bagaimana KPI karyawan dinilai dan disimpan per periode, mengapa posisi template harus cocok dengan jabatan karyawan pada akhir periode yang dinilai (termasuk kasus mutasi), serta bagaimana engine skor KPI marketing dikonversi jadi insentif. Menjelaskan juga cara kerja RBAC KPI per departemen, cakupan tim untuk Leader (scope=team berbasis bawahan langsung), dan penggabungan tampilan lintas departemen (mis. HRGA) yang bersumber dari master data. Membedakan mana yang sudah jalan (engine insentif marketing + appraisal per-karyawan di employee-service) versus mana yang masih konsep (siklus bulanan wajib & workflow review supervisor→HR).",
       "kata_kunci": [
         "KPI",
         "Key Performance Index",
         "appraisal",
         "penilaian kinerja",
-        "performance review",
         "insentif",
         "incentive",
         "scoring",
-        "template KPI",
+        "template posisi",
         "RBAC departemen",
-        "scope=team",
-        "employee_movement"
+        "scope team",
+        "supervisor",
+        "mutasi karyawan",
+        "HRGA"
       ]
     },
     {
