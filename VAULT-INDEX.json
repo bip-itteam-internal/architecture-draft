@@ -980,22 +980,20 @@
         "Microservices - Employee Service",
         "Microservices - Notification Service"
       ],
-      "hash": "34d2f8023315c2fa83f456b569424eabbc4e6e9d0c5fbd0e511d4abc7f356946",
-      "ukuran_kb": 32.0,
-      "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile MyBharata dan di mana letak menunya, bagaimana karyawan absen, mengajukan cuti/izin/lembur, melihat slip gaji, mengisi survei dan ide Kaizen, serta menandai kehadiran pelatihan dan menilai trainer. Menjawab juga bagaimana aplikasi di-scope per perusahaan (multi-tenant lewat JWT), bagaimana notifikasi diarahkan ke halaman lewat kategori bukan field route, versi build dan versi rilis mana yang sedang beredar, dan fitur mana yang masih placeholder Coming Soon. Memuat struktur menu beranda dan sebab sebuah menu bisa merged, ter-build, tapi tak pernah terjangkau pemakai.",
+      "hash": "4cdccf56ff8271de468159551160225ba6ef9a47d297031f4bb38d15e89aac6e",
+      "ukuran_kb": 35.0,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, fitur HRIS apa saja yang bisa dipakai karyawan dari HP (absensi QR + geofencing + biometric, cuti/izin, lembur, slip gaji, KPI, survei, pelatihan, Kaizen), dan bagaimana arsitektur Flutter-nya disusun (Clean Architecture feature-first, BLoC, get_it, dio, go_router). Menjelaskan juga cara autentikasi aplikasi (JWT Bearer lewat API Master Gateway, bukan SSO ticket; PIN, biometric, kebijakan 1 akun = 1 device) serta bagaimana konten dan menu di-scope per perusahaan pada skema multi-tenant. Berguna untuk menelusuri versi build/rilis mana yang sedang beredar di HP pemakai versus yang baru ada di branch dev, dan menu mana yang masih digerbang untuk non-BIP.",
       "kata_kunci": [
-        "mybharata",
+        "MyBharata",
+        "my-bharata",
         "aplikasi mobile",
+        "mobile app",
         "Flutter",
         "HRIS mobile",
-        "absensi attendance",
-        "slip gaji payslip",
-        "Kaizen",
-        "pelatihan training learning",
-        "menu beranda Quick Access",
-        "multi-tenant perusahaan",
-        "notifikasi push",
-        "versionCode rilis"
+        "absensi",
+        "attendance",
+        "BLoC",
+        "multi-perusahaan"
       ]
     },
     {
@@ -1082,6 +1080,7 @@
         "HRIS - Personalia",
         "Microservices - Learning Service",
         "HRIS - Training Program",
+        "APP - MyBharata",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Attrition",
         "Finance - Dashboard per Posisi (FAT)",
@@ -1104,7 +1103,6 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "CORE - IT Orchestrator",
-        "APP - MyBharata",
         "QA - Register Perizinan & Sertifikasi",
         "Microservices - Form Builder Service",
         "IT - Form Builder",
@@ -1129,20 +1127,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "038df4f53ef74286cb788f9e39550a9224cde8396c287caff818924e99d7b8e6",
-      "ukuran_kb": 236.8,
-      "ringkasan": "Menjawab: modul, menu, dan halaman apa saja yang ada di portal web ERP `erp-frontend` (\"One Bharata\") per role — HRIS, Finance/FAT, IT, GA, Procurement, Warehouse, Manufacture, Task Management, Marketing Analytics — dan stack apa yang dipakai membangunnya. Juga menjawab siapa melihat menu mana, bagaimana gerbang rute di `proxy.ts` menyaring per modul, dan bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain. Memuat riwayat keputusan UI beserta jebakan yang sudah terbukti menggigit: label menu yang bertabrakan, penyembunyian menu yang batal senyap saat rute berpindah, dan angka yang menyesatkan ketika sumber datanya tak terjangkau.",
+      "hash": "3f4bc98a0ac98db32ab2d1de870e1c6384fe5f31f30903d3199d08a4ebd27f4a",
+      "ukuran_kb": 239.7,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS internal Bharata (hris-dashboard / \"One Bharata\"), stack apa yang dipakai (Next.js App Router, React, shadcn/Radix/Tailwind, TanStack Query, react-i18next), dan modul apa saja yang tersedia di dalamnya. Menjelaskan cara login dan refresh token, peran web ini sebagai SSO Identity Provider bagi aplikasi lain, serta bagaimana role gating sidebar bekerja dari cookie system_roles (key = kode modul) beserta pengelompokan menu induk bersarang. Juga menjawab di mana setelan HRGA terpusat berada, kenapa penyaringannya per tab bukan per halaman, dan bagaimana fitur multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/network) dirancang di frontend.",
       "kata_kunci": [
+        "Web ERP",
         "erp-frontend",
-        "web erp",
-        "one bharata",
         "hris-dashboard",
-        "sidebar",
-        "menu",
+        "One Bharata",
         "Next.js",
-        "proxy rute",
-        "SSO identity provider",
-        "ringkasan divisi"
+        "frontend",
+        "SSO",
+        "system_roles",
+        "sidebar",
+        "role gating"
       ]
     },
     {
@@ -2003,6 +2001,7 @@
         "API - Learning Service",
         "Microservices - Form Builder Service",
         "HRIS - Recruitment",
+        "APP - MyBharata",
         "APP - Web ERP",
         "RUN - Deploy Microservices bip-erp",
         "DB - Overview and Notes",
@@ -2011,20 +2010,20 @@
         "API - Index",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id"
       ],
-      "hash": "d51b0acda417610194861827e1b7d2e88540d47e70271a1db644d98dfaf808c7",
-      "ukuran_kb": 15.4,
-      "ringkasan": "Menjawab: kenapa modul Training dipisah dari Employee Service jadi service learning sendiri, apa stack dan lokasinya (Go + Fiber v2 + MongoDB learning_db, services/learning, port 6987, modul gateway learning), serta fitur apa yang sudah ada di dalamnya. Menjelaskan cara verifikasi departemen lewat panggilan internal ke employee-service beserta alasan EMPLOYEE_MODULE_URL sengaja dibaca os.Getenv dan tidak masuk map InternalURL, escaping kunci departemen, dan pemetaan kode galat 400 versus 502. Menjelaskan pula rancangan pengajuan pelatihan rantai SPV ke HR (kenapa dua tahap, bukan tiga) dan desain privasi evaluasi trainer termasuk ambang tiga responden serta identitas penilai yang tak pernah keluar di respons.",
+      "hash": "f82a4c0d4bd98f318fb9d9982c2f37c734a1e3a0779a93be6bd3fdf3978ffae6",
+      "ukuran_kb": 17.1,
+      "ringkasan": "Menjawab: di mana modul pelatihan karyawan sekarang tinggal setelah dipindah dari Employee Service, kenapa ia dijadikan service sendiri sebagai fondasi LMS People Development, dan endpoint apa saja yang tersedia (master jenis pelatihan, master trainer, event pelatihan, peserta & kehadiran, pengajuan pelatihan, evaluasi trainer). Menjelaskan alur approval pengajuan pelatihan dua tahap SPV lalu HR, kenapa tahap Direktur tidak dipakai, bagaimana supervisor dipaku ke slot saat pengajuan dibuat, dan aturan penolakan yang final. Juga menjawab bagaimana verifikasi departemen dilakukan lewat panggilan internal ke Employee Service, kenapa EMPLOYEE_MODULE_URL sengaja tidak masuk map InternalURL, dan bentuk evaluasi pasca-pelatihan yang dipakai peserta menilai trainer.",
       "kata_kunci": [
         "learning service",
-        "LMS Fase 0",
-        "training service",
-        "pelatihan karyawan",
-        "Go Fiber",
-        "learning_db",
-        "training_request",
-        "trainer_evaluation",
-        "EMPLOYEE_MODULE_URL",
-        "database-per-service"
+        "pelatihan",
+        "training",
+        "LMS",
+        "people development",
+        "trainer",
+        "pengajuan pelatihan",
+        "training request",
+        "evaluasi trainer",
+        "approval SPV HR"
       ]
     },
     {

@@ -199,9 +199,22 @@ Ini menutup lubang lama: `/me/trainings` di [[Microservices - Learning Service]]
 - **Seluruh keputusan dari server**: `can_attend` + `attend_block_reason`, `boleh_menilai` + `sudah_dinilai`. Tak satu pun dihitung ulang di Dart.
 - **Field yang absen gagal-TERTUTUP**: server versi lama tak mengirim penanda penilaian; absen diperlakukan "tidak boleh" supaya tak ada tombol yang pasti dibalas 409.
 - **Pesan galat server diteruskan apa adanya** — sebagian penolakan memberi tahu, bukan sekadar gagal.
-- ⚠️ **Pengajuan pelatihan TIDAK termasuk**: `POST /training/requests` semula menuntut `department_key`, sedangkan aplikasi tak punya endpoint master departemen dan profilnya hanya menyimpan nama. Prasyaratnya ada di bip-erp PR #1153; sesudah itu baru bisa dibangun.
+- ✅ ~~Pengajuan pelatihan TIDAK termasuk~~ — prasyaratnya (bip-erp PR [#1153](https://github.com/bip-itteam-internal/bip-erp/pull/1153), `department_key` jadi opsional) **merged 2026-08-11**, dan layarnya menyusul di PR [#115](https://github.com/bip-itteam-internal/my-bharata/pull/115). Lihat bagian tersendiri di bawah.
 - ⚠️ **Publish sebelum `learning-service` di dev naik = menu terlihat tapi kosong**, dan tombol Nilai Trainer tak pernah muncul (gagal-tertutup di atas).
 - ⚠️ **Rute `/pelatihan-saya` tak pernah didaftarkan di PR #112.** Halamannya ada di `misc_pages.dart`, `GoRoute`-nya tidak, jadi menekan menunya akan mendarat di layar galat go_router, bukan di halamannya. **Halaman terdaftar di `AppPages.getPage` bukan berarti rutenya ada** — keduanya berkas terpisah dan tak ada yang memaksa keduanya sinkron. Diperbaiki di PR #114 beserta test regresinya.
+
+## Pengajuan Pelatihan & Tugas Onboarding — 🔜 PR [#115](https://github.com/bip-itteam-internal/my-bharata/pull/115) (belum merge)
+
+Dua layar **self-service yang PINDAH dari web**: menunya dicabut dari Portal Saya > Manajemen HR di erp-frontend [#1022](https://github.com/bip-itteam-internal/erp-frontend/pull/1022). Keduanya urusan karyawan atas pekerjaannya sendiri, dan sebagian besar karyawan tak duduk di depan komputer. Detail sisi web di [[APP - Web ERP]].
+
+- **`/pengajuan-pelatihan`** menumpang `features/training/` yang sudah ada: daftar pengajuan sendiri (`as=self`) berikut kedua tahap peninjauan dan catatan penolakannya, formulir topik/alasan/perkiraan biaya, dan pembatalan untuk yang masih menunggu keputusan.
+- **`/tugas-onboarding`** jadi modul baru `features/onboarding_tasks/`. ⚠️ Namanya sengaja **BUKAN** `onboarding`: berkas itu sudah dipakai onboarding APLIKASI (registrasi, PIN, biometrik) dan tak berhubungan sama sekali dengan checklist karyawan baru.
+- ⚠️ **Formulir memakai TOPIK BEBAS, tanpa katalog jenis pelatihan.** Bukan penyederhanaan sementara: `GET /training/types` digerbang `PermTrainingView`, yaitu izin **mengelola** pelatihan, sehingga karyawan biasa dibalas 403. Server memang menerima katalog **atau** topik bebas.
+- ⚠️ **Body pengajuan tak mengirim `department_key` maupun `employee_id`.** Keduanya kosong berarti "departemen saya" dan "untuk saya sendiri", diselesaikan server dari header identitas. Mengirim key dari aplikasi menuntutnya menyalin pemetaan nama↔key departemen, dan salinan itu persis yang melahirkan bug 409 di 6 dari 10 departemen. Dikunci test regresi.
+- ⚠️ **Catatan tugas onboarding SELALU ikut dikirim**, walau tak diubah: server menyetel `tasks.$.note` apa adanya, jadi menyimpan status tanpa menyertakan catatan yang sedang tampil akan menghapusnya tanpa satu pun pesan. Dikunci test regresi.
+- **Antrean peninjau TIDAK ikut pindah.** Aplikasi hanya memakai `as=self`; menyetujui dan menolak tetap di web, sebab penyetujunya bekerja dari sana dan penolakan di tahap mana pun bersifat final.
+- ⚠️ **Menunya sudah dicabut di web SEBELUM rilis ini naik ke store.** Sampai build-nya sampai ke orang, kedua layar itu hanya terjangkau lewat tautan langsung ke rute web yang dibiarkan dormant. Tugas onboarding yang paling terasa: modulnya tak mengirim notifikasi apa pun, sehingga PIC tak punya pemberitahuan lain.
+- ⚠️ **Deep link notifikasinya belum benar-benar hidup.** `rutePengajuanUntukMobile` di learning-service kini berisi rute aplikasi (bip-erp [#1198](https://github.com/bip-itteam-internal/bip-erp/pull/1198)) dan nilainya dikunci test di kedua repo, TAPI `/inbox/send` hanya menyimpan dokumen inbox tanpa push FCM, dan daftar notifikasi di aplikasi belum menavigasi ke mana pun. Membuat inbox bisa diketuk berarti fitur baru untuk SELURUH kategori notifikasi (10 titik pengirim, sebagian masih mengisi `app_route` dengan rute web) — keputusan produk tersendiri.
 
 ## Roadmap (Belum Diimplementasikan)
 

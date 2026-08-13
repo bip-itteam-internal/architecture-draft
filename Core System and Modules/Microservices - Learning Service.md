@@ -50,6 +50,8 @@ Sampai sebelum ini **semua penjadwalan berangkat dari HR**; karyawan dan atasan 
 - **Tahap ditentukan STATUS, bukan dikirim klien**; kalau klien memilih tahap, siapa pun yang tahu bentuk permintaannya bisa mengaku menindak tahap HR. Dan tak seorang pun memutus pengajuannya sendiri.
 - **Membuat pengajuan tak digerbang izin modul**: meminta pelatihan bukan hak mengelola pelatihan. Yang menggerbang identitas.
 - **Notifikasi memakai kategori `request-*` yang SUDAH ADA**, bukan kategori baru — jadi **tanpa deploy dua container** dan tanpa perubahan MyBharata. `request-waiting-review` sengaja dihindari walau terdaftar: MyBharata memetakan `request-review`, bukan nama itu, sehingga ia jatuh ke `system`.
+- ⚠️ **`app_route` notifikasinya sempat berisi rute WEB** (`/hris/training/requests`) sejak fitur ini lahir. Field itu dibaca MyBharata untuk menentukan layar yang dibuka, dan aplikasi tak punya satu pun rute berawalan `/hris/`, jadi deep link-nya tak pernah bisa mendarat. Diperbaiki jadi `/pengajuan-pelatihan` di PR [#1198](https://github.com/bip-itteam-internal/bip-erp/pull/1198) bersama pindahnya sisi pengajuan ke aplikasi. **Nilainya harus sama persis dengan `RouteNames.trainingRequests`** di my-bharata; tak ada apa pun yang memaksa keduanya sejalan, jadi masing-masing repo mengunci nilainya lewat test, dan yang di sini menolak awalan `/hris/` secara eksplisit alih-alih sekadar mencocokkan satu nilai. Berkas `request_notify.go` sebelumnya tak punya satu pun test.
+- ⚠️ **Deep link itu belum benar-benar hidup.** `/inbox/send` di notification-service HANYA menyimpan dokumen inbox, tanpa push FCM, dan daftar notifikasi di MyBharata belum menavigasi ke mana pun. Perbaikan di atas menjadikan datanya benar, bukan menjadikan tautannya berfungsi. Detail: [[APP - MyBharata]].
 
 ## Evaluasi pasca-pelatihan — ✅ merged 2026-08-10 (PR [#1149](https://github.com/bip-itteam-internal/bip-erp/pull/1149))
 
@@ -73,7 +75,7 @@ Sebelum ini layar penilaian tak bisa dibuat benar: tanpa penanda sudah-dinilai, 
 - **Kedua penanda TANPA `omitempty`.** Dengan `omitempty`, nilai `false` hilang dari respons dan klien tak bisa membedakan "tidak boleh" dari "server lama yang belum punya field ini".
 - **Dua kueri pengaya gagal-TERBUKA**: galat baca dicatat lalu dilewati, tak menggagalkan layar dan tak menutup tombol. Index unik tetap penjaga sebenarnya.
 
-## ⚠️ Bug: pencarian supervisor memakai KEY, bukan NAMA — 🔜 perbaikan di PR [#1153](https://github.com/bip-itteam-internal/bip-erp/pull/1153) (belum merge)
+## ✅ Bug: pencarian supervisor memakai KEY, bukan NAMA — diperbaiki PR [#1153](https://github.com/bip-itteam-internal/bip-erp/pull/1153), **merged 2026-08-11**
 
 Kelas bug yang sudah berulang di repo ini: **dua satuan berbeda untuk hal yang terdengar sama**.
 
@@ -96,6 +98,7 @@ Sekalian di PR yang sama: **`department_key` jadi OPSIONAL**, kosong berarti "de
 - `ensureTrainingIndexes` dan kedua index baru dijaga `mongodb.DB == nil`: paniknya terjadi saat **registrasi rute**, jadi tanpa itu service gagal naik sama sekali.
 - Bawaan dari kode lama, belum diperbaiki: `PUT` bersifat full-replace sehingga frontend wajib mengirim objek lengkap, pendaftaran peserta belum memeriksa karyawan benar-benar ada di `work_data`, dan daftar belum berpaginasi.
 - ✅ ~~Belum ada frontend untuk pengajuan maupun evaluasi~~ — **sudah ada di web** (erp-frontend [#967](https://github.com/bip-itteam-internal/erp-frontend/pull/967) & [#968](https://github.com/bip-itteam-internal/erp-frontend/pull/968), merged): `/hris/training/requests`, `/hris/pelatihan-saya`, dan agregat penilaian di halaman Pelatihan. Detail di [[APP - Web ERP]].
+- ⚠️ **Sisi MENGAJUKAN pindah ke MyBharata 2026-08-13** (erp-frontend [#1022](https://github.com/bip-itteam-internal/erp-frontend/pull/1022) + my-bharata [#115](https://github.com/bip-itteam-internal/my-bharata/pull/115)). Yang tinggal di web adalah **antrean persetujuan** (`as=reviewer`/`reviewed`), menunya berganti nama jadi "Persetujuan Pelatihan" dan mulai digerbang. `/hris/pelatihan-saya` masih hidup sebagai rute dormant tanpa menu. Konsekuensi bagi service ini: **klien pengajuan kini dua**, dan aplikasi tak bisa dipaksa update — perubahan bentuk `POST /training/requests` maupun `GET /training/requests?as=self` wajib aman bagi versi app yang sudah beredar.
 - ⚠️ **Seluruh fitur pengajuan & evaluasi BELUM pernah diverifikasi lewat gateway hidup.** `learning-service` di dev masih memakai image lama sejak #1148 merge: `/training/requests` di sana masih tertelan `/training/:id` dan membalas 400, `/training/:id/evaluation` masih 404. Perlu `docker compose build learning-service && docker compose up -d --no-deps learning-service` di VM dev. Itulah sebab bug departemen di bawah tak terlihat berminggu-minggu. Lihat [[RUN - Deploy Microservices bip-erp]].
 - **Rute lama `/api/employee/training/*` masih hidup di produksi.** `employee-service` sengaja tidak di-rebuild saat cut-over agar tidak ikut mendorong perubahan orang lain ke produksi. Tidak ada pemanggil yang tersisa. Koleksi Training lama juga masih ada di `employee_db` sebagai jalan pulang.
 
