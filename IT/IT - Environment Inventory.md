@@ -8,9 +8,9 @@
 
 | Env | Host (grounded) | Catatan |
 |---|---|---|
-| **Production** | **VPS Biznet `116.206.196.31`** (sejak ≤18 Juli 2026; `10.10.10.120` pensiun — konfirmasi user) | URL publik: `erp.bharatainternasional.com`, `tamu.bharatainternasional.com`, `tasks.bharatainternasional.com`. ⚠️ Workflow "Deploy to Prod" masih menarget `.120` — belum dipindah ke VPS |
+| **Production** | **VPS Biznet `116.206.196.31`** (sejak ≤18 Juli 2026; `10.10.10.120` pensiun — konfirmasi user) | URL publik: `erp.bharatainternasional.com`, `tamu.bharatainternasional.com`, `tasks.bharatainternasional.com`; API `api.bharatainternasional.com`. 🔴 **Menerima deploy dari `main`** (terverifikasi 2026-08-13) lewat jalur **di luar GitHub Actions** — repo bip-erp tak punya `deploy-prod.yml`. Detail & konsekuensinya: [[IT - CI-CD]] |
 | **Staging** | `erp-dev.bharatainternasional.com` | host internal = TBD |
-| **Development** | `10.10.10.121` | port mirror production |
+| **Development** | `10.10.10.121` (API `api-dev.bharatainternasional.com`, gateway port 6969) | port mirror production. ⚠️ **Bisa tertinggal dari `main`** — 2026-08-13 dev menjalankan biner gateway 8 jam lebih tua dari prod sampai di-deploy ulang manual. Jangan anggap dev otomatis lebih baru |
 | **Wiki dok** | `architecture.bharatainternasional.com` | export vault (lihat [[README]]) |
 
 ## Port backend (internal, di belakang gateway) — grounded dari `.env.example`

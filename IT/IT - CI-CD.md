@@ -1,3 +1,5 @@
+**Status**: ⚠️ **Implemented (ada catatan)** — pipeline dev jalan lewat GitHub Actions, mobile lewat Codemagic. Catatan besar: **jalur deploy produksi ada di luar repo dan belum terverifikasi mekanismenya**, dan CI erp-frontend mati sejak 2026-07-29.
+
 ## Deskripsi
 
 *Ringkasan pipeline CI/CD ERP Bharata. Backend & web di-deploy otomatis lewat **GitHub Actions** dengan **self-hosted runner** (di VPS Biznet Gio); aplikasi **mobile** di-build & didistribusikan lewat **Codemagic**. Infrastruktur VM-nya tercatat di [[IT - Server, VMs and Databases]].*
@@ -5,7 +7,9 @@
 ## Infrastruktur CI/CD
 
 - **Self-hosted runner**: kini di **VPS Biznet Gio** `116.206.196.31` (VM internal lama `10.10.10.8`/`cicd` sudah **decommissioned**) — menjalankan workflow GitHub Actions (`runs-on: self-hosted` di `deploy.yml`), lalu SSH ke VM target
-- **Deployment VM (dev)**: `10.10.10.121` (user `erp`) — host container/app (dev). ⚠️ Prod LIVE kini di **VPS Biznet `116.206.196.31`** (konfirmasi user 18 Juli 2026; `10.10.10.120` pensiun) — workflow deploy-prod masih menarget `.120` dan perlu dipindah
+- **Deployment VM (dev)**: `10.10.10.121` (user `erp`) — host container/app (dev). ⚠️ Prod LIVE kini di **VPS Biznet `116.206.196.31`** (konfirmasi user 18 Juli 2026; `10.10.10.120` pensiun)
+- 🔴 **PENTING — merge ke `main` MENDARAT DI PRODUKSI** (terverifikasi 2026-08-13). `finance-service` yang baru lahir hari itu **sudah menjawab di prod** lewat gateway (`GET /api/finance` → 200) padahal **dev masih 404** berjam-jam sesudahnya. Repo bip-erp hanya punya **dua** workflow — `deploy.yml` (judulnya "Deploy to **Dev**", `VM_IP: 10.10.10.121`) dan `pr-notification.yml`; **tidak ada** `deploy-prod.yml`. Jadi prod menerima deploy dari `main` lewat jalur **di luar GitHub Actions**; kandidat terkuat delegate **Harness** di VPS, tetapi pemicunya **belum terverifikasi** — jangan tulis mekanismenya sebagai fakta sebelum ada yang membuktikannya.
+  **Konsekuensi praktis**: gerbang **sebelum** merge adalah satu-satunya gerbang. Perubahan yang bisa mematikan boot (mis. entri baru di `InternalURL` gateway tanpa `*_MODULE_URL` di compose → `ValidateInternalURL` memanik → restart-loop) akan menjatuhkan **seluruh ERP produksi**, bukan dev. Dan "uji di dev dulu" tidak berarti apa-apa bila dev tertinggal; per 2026-08-13 dev menjalankan biner gateway **8 jam lebih tua** dari `main` sampai di-deploy ulang manual.
 - Auth deploy: **SSH password** via GitHub Secret `VM_PASSWORD` (`sshpass`); StrictHostKeyChecking dimatikan untuk automation
 - **VPS Biznet Gio (migrasi, ⚠️)**: `116.206.196.31` (user `bharata`, Ubuntu 22.04) — target migrasi prod baru. CI via **Harness** (`bip-erp-vm-delegate` container jalan di VPS; build di VM). Per 2026-07-09 masih **dobel deployment** dengan `.120` (integration-service + worker jalan di dua tempat, belum cutover). Storage: additional disk 100G di-mount `/backup`.
 - Detail VM & kredensial: [[IT - Server, VMs and Databases]]

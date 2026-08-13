@@ -1,12 +1,12 @@
-**Status**: 🟡 **Konsep / Rancangan** — belum ada satu baris kode pun. Dokumen requirements untuk `finance-service` baru: modul input Tax, Cost Control, dan jembatan Master OPEX ke KPI otomatis.
+**Status**: ⚠️ **Implemented (ada catatan)** — **Fase 0 (kerangka `finance-service`) LIVE di dev & prod** sejak 2026-08-13, dan **daftar akun OPEX sudah ditegakkan kode** di integration-service. Modul Tax dan Cost Control masih 🟡 konsep: keduanya menunggu keputusan #3 & #5–#9.
 
 ## Deskripsi
 
 *Rancangan service baru yang menampung **master data yang hari ini tidak punya rumah di ERP mana pun** — kewajiban pajak, pelaporan SPT, temuan kepatuhan, rekomendasi efisiensi, dan forecast kas. Tujuannya bukan menambah dashboard, melainkan **memasok angka yang membuat KPI divisi FAT bisa terisi sendiri**. Master anggaran OPEX yang sudah ada di [[Microservices - Integration Service]] **tidak dimigrasi**; service ini membacanya lewat HTTP.*
 
 - **Stack**: Go + Fiber + MongoDB (pola `calendar-service`: flat `package main`)
-- **Path di repo**: `bip-erp/services/finance/` — **TBD, belum dibuat**
-- **Status**: 🟡 Konsep — RAPB sudah dibaca dan grain-nya terjawab; kini menunggu **sepuluh keputusan Finance** (lihat bab tersendiri di bawah)
+- **Path di repo**: `bip-erp/services/finance/` — ✅ **ada** (Fase 0: `main.go`, `routes.go`, `db.go`, Dockerfile, blok compose + `finance-mongo-db`, `FINANCE_MODULE_URL` di peta gateway). Terverifikasi lewat gateway: `GET /api/finance` membalas identitas service di **prod dan dev**
+- **Status**: ⚠️ Kerangka live, modul menyusul — keputusan Finance **#1, #2, #4 sudah dijawab** (2026-08-13) dan #1 sudah ditegakkan kode; sisanya masih menunggu (lihat bab tersendiri di bawah)
 - **Konsep induk**: [[Finance - Big Pictures]] · **Konsumen tampilan**: [[Finance - Dashboard per Posisi (FAT)]]
 
 ## Latar Belakang
@@ -604,22 +604,126 @@ Dicatat supaya tidak ditanyakan lagi, dan supaya tak ada yang mulai merancang se
 
 ⚠️ **Berlaku hanya untuk bagian operasional.** Bagian beban penjualan RAPB (baris 10–25) grain-nya lebih kasar — `Beban Iklan + Pajak Iklan` adalah **satu** baris anggaran yang menutupi **dua** akun Accurate. Itu jadi keputusan Finance #3.
 
+## Daftar Akun OPEX — ✅ Implemented (2026-08-13)
+
+Keputusan #1 tidak berhenti sebagai catatan; ia **ditegakkan kode** di
+[[Microservices - Integration Service]], bukan di service ini — varians dihitung di sana, dan
+menaruh daftarnya di `finance-service` berarti panggilan lintas service pada tiap perhitungan.
+
+**Daftarnya di kode Go (`internal/usecase/opex_daftar.go`), bukan koleksi Mongo.** Alasan yang
+menentukan: daftar di kode identik di semua lingkungan **secara konstruksi**, sedangkan daftar di
+Mongo adalah state per-lingkungan yang bisa menyimpang antara dev dan prod tanpa ada yang tahu —
+untuk angka yang dibandingkan orang antar-lingkungan itu kelas kegagalan yang tak boleh diundang.
+Ditambah seed master data di repo ini punya mode gagal senyap yang sudah tercatat (berhenti karena
+koleksi tak kosong). Pindah ke Mongo baru masuk akal bila ada UI pemeliharaan dengan jejak audit;
+saat itu daftar ini menjadi seed-nya.
+
+Kelemahannya — Finance tak bisa melihat isinya tanpa repo — ditutup dengan
+`GET /accounting/anggaran/katalog` yang mengembalikan daftar penuh beserta
+`diminta`/`ter_resolve`/`tak_ada`/`ambigu`/`lengkap`.
+
+**Yang ditegakkan:**
+
+- **Unggah Excel dan form koreksi satu baris** sama-sama menolak akun beban yang sah di Accurate
+  tetapi bukan komponen OPEX. Menyaring hanya di jalur unggah membuat form koreksi jadi pintu
+  belakang yang meloloskan persis baris yang ditolak Excel.
+- **Alasan penolakannya dibedakan** dari "akun tidak dikenal". Akunnya memang ada di Accurate; ia
+  hanya bukan OPEX. Kalimat yang sama akan mengirim pengunggah memeriksa bagan akun — tempat yang
+  salah.
+- **Gagal-tertutup**: bila tak satu pun dari 58 komponen ter-resolve, permintaan dijawab **502**
+  dengan sebab sesungguhnya. Mengartikan kekosongan sebagai "tanpa penyaringan" akan membuat satu
+  kegagalan di pemanggil mematikan seluruh penyaringan diam-diam.
+- **Pencocokan memakai normalizer yang SAMA dengan parser** (`normalisasiNamaAkun`). Normalizer
+  kedua yang lebih longgar akan membuat filter OPEX dan resolusi nama parser berbeda pendapat
+  tentang akun yang sama. Konsekuensinya `&` **tidak** disamakan dengan `dan`; nama yang tak cocok
+  muncul di `tak_ada` supaya bisa diperbaiki, bukan hilang.
+- **Nama kembar tidak ditebak** — dilaporkan di `ambigu` beserta seluruh kandidat kodenya.
+
+**Mode kegagalan yang ditutup sadar:** nama akun yang diganti di Accurate membuat komponennya
+berhenti terhitung sejak saat itu juga. Karena itu `tak_ada` dilaporkan di katalog, pada unggahan
+yang **sukses** sekalipun, dan ditulis ke log **tiap run** worker — tanpa itu satu-satunya jejaknya
+adalah varians yang perlahan menyimpang.
+
+**Diperkirakan `ter_resolve` ≈ 52, bukan 58.** Enam nama ini tak ada di ekspor Laba/Rugi:
+`Beban Software & Server Marketing` (Accurate hanya punya `Beban Software` dan `Beban Server`
+polos, padahal sheet Finance mencatat realisasi Rp 58.032.606), `Beban K3`,
+`Beban PPh Badan Pasal 31E`, `Beban PPN KMS Gedung`, `Beban Denda Pajak`, `Beban Pajak KOL`.
+Itu perilaku yang benar dan justru bukti mekanismenya bekerja; yang perlu dibereskan ada di sisi
+Accurate/Finance.
+
+**Populasi realisasi ikut diperbaiki.** Lihat [[IT - Background Jobs & Schedulers]] — refresh
+sekarang menarik seluruh akun OPEX, bukan hanya yang beranggaran, sehingga Rp 150.186.975 belanja
+Juli yang selama ini tak pernah muncul di layar varians kini terlihat sebagai
+`anggaran_belum_diisi`.
+
+**Masih menunggu Finance** (tidak memblokir penegakan di atas): perlakuan tiga akun pajak yang
+berasal dari jurnal penyesuaian (`Beban PPh Final UMKM`, `Beban PPh Badan Pasal 31E`,
+`Beban PPh 23`) di dalam perhitungan varians. Keanggotaannya di daftar sudah pasti; yang belum
+adalah apakah ketiganya ikut dihitung. Argumen untuk mengeluarkannya: nilainya turunan dari omzet
+dan laba, jadi KPI Cost Control akan memburuk justru ketika perusahaan menjual lebih banyak.
+
 ## Keputusan yang Ditunggu dari Tim Finance
 
 Dikelompokkan menurut apa yang berhenti bila tak dijawab. **Tak satu pun dapat diputuskan IT.**
 
-### Menghentikan Master OPEX (bobot KPI 0,70)
+### Master OPEX (bobot KPI 0,70) — #1, #2, #4 SUDAH DIJAWAB 2026-08-13
 
-| # | Keputusan | Pemilik | Bila tak dijawab |
+| # | Keputusan | Pemilik | Status |
 |---|---|---|---|
-| 1 | **Akun mana saja yang masuk "OPEX"** untuk metrik varians. Tiga dokumen memberi tiga total Juli: rekap "TOTAL OPEX" Rp 6.684.636.073 · RAPB "Total Anggaran Beban" Rp 1.067.439.526 · RAPB "Total Beban Penjualan" Rp 12.881.653.989 — **tak satu pun cocok** | Cost Control + SPV FAT | Angkanya tetap keluar, rapi, dan salah. Tak ada yang akan curiga |
-| 2 | **Revisi mana yang berlaku untuk Juli.** Juli sudah tutup dengan rekap memakai anggaran lama (Iklan Rp 4,93 M); Rev 2 merevisinya (Iklan + Pajak Iklan Rp 3,58 M) | SPV FAT | Memuat Rev 2 menyatakan ulang bulan yang sudah tutup |
-| 3 | **`Beban Iklan + Pajak Iklan` dipecah atau tetap satu baris** | Cost Control | Baris itu tak dapat diunggah, atau dipaksa ke satu akun dan variansnya menipu |
-| 4 | **Akun bernilai kosong: "dianggarkan nol" atau "belum dianggarkan"?** Enam baris kosong di keenam bulan | Cost Control | Pengunggah menebak, dan tebakannya mengubah total varians |
+| 1 | **Akun mana saja yang masuk "OPEX"** untuk metrik varians | Cost Control + SPV FAT | ✅ **Dijawab**: 58 komponen, lihat di bawah |
+| 2 | **Revisi mana yang berlaku untuk Juli** | SPV FAT | ✅ **Dijawab**: pakai **RAPB Rev 2** |
+| 3 | **`Beban Iklan + Pajak Iklan` dipecah atau tetap satu baris** | Cost Control | 🟡 Terjawab sebagian: di Rev 2 keduanya **sudah dilebur** jadi satu baris `Beban Iklan + Pajak Iklan`. Yang belum: apakah peleburan itu memang final |
+| 4 | **Akun bernilai kosong: "dianggarkan nol" atau "belum dianggarkan"?** | Cost Control | ✅ **Terjawab dari berkas**: 16 komponen tanpa padanan di RAPB **semuanya berbudget nol** → mereka akun **realisasi-saja**, jadi jawabannya "belum dianggarkan" |
 
-> 💡 **Ada jawaban bawaan untuk #1.** Ekspor Laba/Rugi Multi Periode Accurate memperlihatkan bahwa **Accurate sendiri sudah punya kelompok bernama `Beban Operasional`**, dan sudah menghitungnya: Juli 2026 = Rp 5.114.573.928, terdiri atas `Beban Penjualan & Pemasaran` Rp 4.394.611.816 dan `Beban Administrasi & Umum` Rp 719.962.112.
+**Jawaban #1 — sumbernya sebuah berkas, bukan tafsiran.** `Juli_Monitoring Anggaran.xlsx` sheet
+`1 & 2 Realisasi Opex & Non Ops` menandai batasnya sendiri: **58 baris** di antara penanda
+`KOMPONEN OPEX` (baris 20) dan `TOTAL OPEX ( Target Varians ≤ ± 5% )` (baris 84). Jumlah Budget
+Juli ke-58 baris itu **Rp 6.684.636.073 — nol selisih** dengan angka TOTAL OPEX milik sheet itu
+sendiri. Angka yang dokumen ini dulu sebut "tak cocok dengan apa pun" ternyata cocok sempurna;
+yang kurang adalah berkasnya, bukan kecocokannya.
+
+Diringkas ke struktur RAPB — **masuk**: 3 akun dari blok Penjualan (Packing Gd Sidareja, Iklan,
+Lain-lain Marketing), kedua baris Biaya Gaji, seluruh Beban Operasional **kecuali** Iuran &
+Sumbangan dan Entertainment Adum, seluruh 7 akun penyusutan, akun Beban Pajak, plus PPh Badan
+Pasal 31E. **Keluar walau berkategori OPS**: Penjualan, Retur, Potongan Penjualan, HPP,
+**Admin E-Commerce, Potongan Afiliasi E-Commerce, Ongkir E-Commerce**, Biaya Angkut Penjualan,
+PPN Keluaran, Biaya Varian Produksi. **Pindah ke metrik Admin & Non Ops** (target ≥2% YOY):
+Iuran & Sumbangan, Beban Bank, Entertainment Adum.
+
+Daftar ini kini **ditegakkan kode** — lihat bab *Daftar Akun OPEX (Implemented)* di bawah.
+
+**Jawaban #2 — dan temuan yang menyertainya.** Kolom Budget di sheet monitoring ternyata berasal
+dari sheet tertanam `Copy of RAPB 2026` (RAPB **awal**, Januari–Desember, kolom O = Juli):
+41 dari 41 nilainya cocok rupiah-per-rupiah ke sana, dan **tak satu pun** cocok ke Rev 2. Finance
+memutuskan ERP memakai **Rev 2**, sehingga TOTAL OPEX Juli menjadi **Rp 5.118.934.685** —
+selisih **−Rp 1.565.701.388 (−23,4%)** dari yang tampil di sheet monitoring mereka. Selisih itu
+bukan bug; ia konsekuensi keputusan, dan Cost Control perlu tahu supaya ERP tidak dituduh salah.
+
+Lima nama berganti di Rev 2 dan butuh peta: `Beban Gaji Karyawan Adum`→`Total Gaji UMUM`,
+`Beban Gaji Sales & Marketing`→`Total Gaji MARKETING`, `Beban Packing Gd Sidareja`→`Beban Packing`,
+`Beban Iklan`→`Beban Iklan + Pajak Iklan`, `Beban Lain-lain Marketing`→`Beban Lain-Lain Penjualan`.
+⚠️ Yang terakhir **paling lemah** — nilainya naik dari Rp 41 jt ke Rp 90 jt dan namanya bergeser
+dari "Marketing" ke "Penjualan"; perlu dikonfirmasi. Jangan mengambil `Total Seluruh Gaji`, itu
+induk yang menjumlahkan kedua baris gaji.
+
+> ⚠️ **KOREKSI atas dokumen ini sendiri (2026-08-13).** Versi sebelumnya mengusulkan memakai
+> kelompok `Beban Operasional` milik Accurate (Juli Rp 5.114.573.928) sebagai jawaban bawaan #1,
+> dan menjelaskan selisihnya sebagai "kira-kira sebesar Admin E-Commerce + Potongan Afiliasi +
+> Ongkir E-Commerce". **Dua-duanya salah.**
 >
-> Memakai kelompok itu lebih aman daripada mengarang irisan sendiri, dan struktur induk–anaknya sudah ditangani kode (`JumlahRealisasiDaun` melewati akun `isParent` supaya tak menghitung ganda). Ini juga menjelaskan mengapa "TOTAL OPEX" di rekap Juli tak cocok dengan apa pun — Finance memakai subset pilihan tangan, selisihnya kira-kira sebesar Admin E-Commerce + Potongan Afiliasi + Ongkir E-Commerce yang tidak ikut. **Tetap keputusan Finance**, tetapi kini ada usulan konkret untuk disetujui atau ditolak, bukan pertanyaan terbuka.
+> Pertama, **dasar perbandingannya keliru**: Rp 6.684.636.073 itu **anggaran**, sedangkan
+> Rp 5.114.573.928 **realisasi** dari ekspor Laba/Rugi. Perbandingan realisasi yang sah adalah
+> OPEX realisasi Juli **Rp 3.394.909.594** vs Accurate Rp 5.114.573.928.
+>
+> Kedua, **kelompok Accurate tidak bisa dipakai sebagai jalan pintas**. Di ekspor Laba/Rugi,
+> `Beban Penyusutan` (Rp 89.242.330) dan `Beban Pajak Perusahaan` (Rp 52.574.788) berada di bawah
+> **Beban NON Operasional**, sementara daftar Finance justru **memasukkan** keduanya (8 akun
+> penyusutan + 5 akun pajak). Memakai kelompok Accurate akan membuang ketiga belas akun itu
+> sekaligus menarik masuk biaya e-commerce yang sengaja dikeluarkan Finance — salah di dua arah.
+> Keputusan Finance memakai daftar eksplisit adalah yang benar.
+>
+> Arah dugaan soal e-commerce kebetulan tepat, tapi dari bukti lain: ketiga akun itu memang
+> ditaruh **di luar** penanda `KOMPONEN OPEX` di sheet-nya.
 
 ### Menghentikan modul Tax (bobot 0,45)
 
@@ -643,7 +747,7 @@ Dikelompokkan menurut apa yang berhenti bila tak dijawab. **Tak satu pun dapat d
 | 10a | Excel menandai varians OPEX `DONE (DIMENU AR)` — layar mana yang dimaksud? Varians ada di `/finance/anggaran`, bukan AR, dan masternya kosong | Cost Control |
 | 10b | Sumber "Revenue 240M" SPV tercatat data iklan TikTok, padahal deskripsinya soal piutang AR | SPV FAT |
 | 10c | Ada RAPB Feb–Juni (revisi sebelumnya)? Hanya dibutuhkan untuk backfill tren 6 bulan ke belakang | Cost Control |
-| 10d | Anggaran per departemen direncanakan? RAPB tak punya dimensi itu; KPI General Affair membutuhkannya | SPV FAT |
+| 10d | Anggaran per departemen direncanakan? ⚠️ **Sebagian terjawab**: sheet `Ketentuan` di `Juli_Monitoring Anggaran.xlsx` memetakan **115 akun → Cash/Accrual · Ops/Non Ops · PJ Divisi** (HRD, GA, Finance, Warehouse, Manufacture, Procurement, Quality, IT, Sekre, BH & KY). Jadi dimensi departemennya **ada**, hanya di sheet lain — bukan di RAPB. Yang belum: apakah `PJ Divisi` sama artinya dengan pemilik anggaran | SPV FAT |
 | 10e | Siapa yang boleh melihat kalender kewajiban pajak — agenda perusahaan atau pekerjaan Tax Officer saja? Usulan: Finance + Tax + setingkat Direktur | SPV FAT |
 | 10f | Perlukah alur persetujuan untuk revisi anggaran? Belum ada di [[REF - Alur Persetujuan]] | SPV FAT |
 
