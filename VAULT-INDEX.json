@@ -323,6 +323,7 @@
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
         "ADR - 0009 Affiliate via Search Seller Affiliate Orders API",
         "IT - Background Jobs & Schedulers",
+        "Microservices - Employee Service",
         "ADR - 0015 Push Pergerakan WMS ke Accurate",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "Microservices - Insentive Service",
@@ -333,9 +334,9 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "c2865c39e270ccf5cb53823c1d1a04d46dc3e7c84fb514940d2b47c62011d1da",
-      "ukuran_kb": 41.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di integration-service untuk menarik order marketplace (TikTok Shop/Business, Shopee) dan membukukannya ke Accurate, termasuk path gateway `/api/integration/*` dan webhook publik `/ext/webhook/:service`. Menjelaskan cara mengambil daftar dan detail order, export xlsx, ringkasan dashboard, perbandingan periode, aging piutang per bucket umur, feed retur lintas-channel untuk gudang, packet tracking beserta backfill checkpoint, serta feed resi untuk WMS. Juga jadi rujukan saat memilih endpoint retur yang benar (kenapa `/transactions/returns` dipakai, bukan `status=RETURNED`, bukan `/shopee/returns/list`, bukan `/accurate/daily-returns`) dan area lain seperti profit, insentif profit-based, ICC account mapping, kas toko/wallet, ulasan marketplace, serta worker/jobs.",
+      "hash": "d15d07af02e7e0061b71656b4866fba4173140451bd1ed34ada4ebf949537ec4",
+      "ukuran_kb": 41.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di integration-service untuk menarik order marketplace (TikTok Shop/Business, Shopee) dan membukukannya ke Accurate, termasuk path gateway /api/integration/* dan webhook publik /ext/webhook/:service. Menjelaskan cara mengambil daftar dan detail order, export xlsx, ringkasan dashboard, perbandingan periode, aging piutang per bucket umur, feed retur lintas-channel untuk gudang, packet tracking beserta backfill checkpoint, serta feed resi untuk WMS. Juga jadi rujukan saat memilih endpoint retur yang benar, termasuk kenapa kecepatan penanganan retur untuk KPI memakai rute terpisah /accurate/daily-returns/kpi/penanganan alih-alih /stats yang mengukur umur terhadap hari ini.",
       "kata_kunci": [
         "integration-service",
         "marketplace",
@@ -347,11 +348,9 @@
         "retur",
         "return",
         "piutang",
-        "accounts receivable",
         "tracking resi",
-        "AWB",
         "endpoint API",
-        "ICC mapping",
+        "kpi penanganan retur",
         "kas toko"
       ]
     },
@@ -1703,9 +1702,9 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "1cf9510b36b6049be4dfd57d6235ae7da5120b117e8d365b64246493cab10de1",
-      "ukuran_kb": 76.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang di-host employee-service, koleksi MongoDB apa yang dimilikinya, dan modul mana yang menumpang di sini alih-alih punya service sendiri (Legal, R&D, Quality, Procurement register). Juga menjawab bagaimana seed master data dan migrasi berjalan saat service start, serta gerbang RBAC mana yang menjaga tiap kelompok rute. Sejak 2026-08-13 rute Legal dan R&D digerbang izin modul secretary lewat gateSecretary, dengan gerbang tier lama tinggal sebagai fallback kill-switch.",
+      "hash": "1bbe2ee1a586ecc5b22876ce934e8fb6c609cecd8fc4eaac1359fa2efc52ab80",
+      "ukuran_kb": 77.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang di-host employee-service, koleksi MongoDB apa yang dimilikinya, dan modul mana yang menumpang di sini alih-alih punya service sendiri (register Legal, R&D, Quality, Procurement). Juga menjawab bagaimana seed master data dan migrasi berjalan saat service start, gerbang RBAC mana yang menjaga tiap kelompok rute, dan bagaimana nilai otomatis KPI dirakit dari sumber lintas-service. Sejak 2026-08-13 rute Legal dan R&D digerbang izin modul secretary lewat gateSecretary, dengan gerbang tier lama tinggal sebagai fallback kill-switch.",
       "kata_kunci": [
         "employee-service",
         "endpoint",
@@ -1716,6 +1715,7 @@
         "legal",
         "rnd",
         "gateSecretary",
+        "otomasi KPI",
         "work_data"
       ]
     },
@@ -1910,6 +1910,7 @@
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "ADR - 0017 Tanggal Retur TikTok via order_update_date",
         "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
+        "Microservices - Employee Service",
         "Sales - ICC Account Manager Mapping",
         "Sales - ICC Affiliate Mapping",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
@@ -1927,9 +1928,9 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "42d54b2b9e07cad278174e5924367b8842d5c412e6d9730de00f298b0651b9b6",
-      "ukuran_kb": 237.4,
-      "ringkasan": "Menjawab: bagaimana order dan laporan iklan marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk ke ERP lewat webhook dan sync terjadwal, lalu dinormalkan jadi model transaction terpadu. Menjelaskan bridging akuntansi ke Accurate (faktur harian, Sales Invoice, Sales Return), pengelolaan kredensial OAuth per marketplace, automasi auto-ship/auto-approve yang sadar hari libur, serta endpoint analitik seperti GMV Max monitoring/overview dan metrik video ICC yang dipakai insentif.",
+      "hash": "36d2b0d361c5369f168d0fb178d10dc436edee44654abbe09653e428ea0fbc5e",
+      "ukuran_kb": 238.9,
+      "ringkasan": "Menjawab: bagaimana order dan laporan iklan marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk ke ERP lewat webhook dan sync terjadwal, lalu dinormalkan jadi model transaction terpadu. Menjelaskan bridging akuntansi ke Accurate (faktur harian, Sales Invoice, Sales Return), pengelolaan kredensial OAuth per marketplace, automasi auto-ship/auto-approve yang sadar hari libur, serta endpoint analitik seperti GMV Max monitoring dan metrik video ICC. Juga menjawab bagaimana kecepatan penanganan retur dihitung untuk KPI, termasuk kenapa jeda diukur dari tanggal retur dan kenapa bulan berjalan ditolak.",
       "kata_kunci": [
         "integration-service",
         "TikTok Shop",
@@ -1940,6 +1941,8 @@
         "GMV Max",
         "marketplace",
         "auto-sync",
+        "retur",
+        "penanganan retur",
         "ads report"
       ]
     },
@@ -5512,20 +5515,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "cb06786d5041233778bbdde0d52f5d1d7c7acd6cea5b1ebe59bcaca3f570c48f",
-      "ukuran_kb": 65.2,
-      "ringkasan": "Menjawab: metrik KPI mana yang bisa diisi otomatis dari data yang sudah dimiliki ERP, mana yang modulnya ada tapi datanya kosong, dan mana yang memang tak punya sumber sama sekali, dari 311 metrik yang terpasang di production. Menjelaskan cara kerja mesin nilai otomatis (sumber, formula reduksi, scope tim atau departemen, arah target, batas nilai, dan bedanya cakupan penuh versus parsial), bagaimana penilai melihatnya sebagai usulan di modal Score KPI, serta layar diagnostik Otomasi KPI untuk menelusuri metrik yang macet beserta sebabnya. Memuat pula jebakan urutan penilaian untuk metrik skor tim dan bagaimana HR mengisi konfigurasinya sendiri.",
+      "hash": "f4decfe6a74001e4f93068e016cb835c267471ab856af599c370ab7139e72bce",
+      "ukuran_kb": 66.9,
+      "ringkasan": "Menjawab: metrik KPI mana yang bisa diisi otomatis dari data yang sudah dimiliki ERP, mana yang modulnya ada tapi datanya kosong, dan mana yang memang tak punya sumber sama sekali. Menjelaskan cara kerja mesin nilai otomatis (sumber, formula reduksi, scope tim atau departemen, arah target, batas nilai, cakupan penuh versus parsial), bagaimana penilai melihatnya sebagai usulan di modal Score KPI, serta layar diagnostik untuk menelusuri metrik yang macet. Memuat pelajaran memilih jam mulai metrik: rancangan yang salah titik awal menghasilkan angka yang selalu sempurna dan karena itu tidak mengukur pekerjaan siapa pun.",
       "kata_kunci": [
         "otomasi KPI",
         "auto-values",
         "skor KPI",
         "kpi_score",
         "skor tim",
-        "uptime sistem",
-        "scope team",
         "metrik otomatis",
         "KPI automation",
-        "supervisor"
+        "jam mulai metrik",
+        "retur",
+        "cakupan parsial"
       ]
     },
     {
