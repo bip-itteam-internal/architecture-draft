@@ -1128,28 +1128,29 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "c1ed5756c7dc1f390388f4fb27c6b3536ce63a6259de529edee0aa6187e1c4fb",
-      "ukuran_kb": 229.1,
-      "ringkasan": "Menjawab: apa isi portal web ERP internal Bharata (`erp-frontend` / \"One Bharata\"), stack dan pola UI apa yang dipakai, serta menu apa saja yang muncul per modul (HRIS, Finance, IT, GA, Manufacture, Warehouse, Quality, Procurement, Integration, Sekretariat, Marketing Analytics) berikut rute halamannya. Menjawab juga bagaimana login, refresh token, dan peran SSO Identity Provider bekerja, bagaimana `system_roles` dan paket hak menentukan kategori sidebar yang tampil, rute mana yang digerbang `proxy.ts`, dan bagaimana Tampilan Menu per jabatan menyembunyikan menu berdasarkan URL. Memuat riwayat keputusan bentuk menu beserta alasannya, termasuk yang sudah dicoba lalu dibatalkan, dan jebakan yang terbukti menggigit seperti rute yang dipindah membatalkan penyembunyian tersimpan, layar kembar antar-modul, label menu yang bertabrakan antar-kategori, dan menu yang tampil tapi halamannya menolak.",
+      "hash": "03eb5b8601bf9f68001810caed4b374bfb4e994a13b3edda1db12933512b7eb6",
+      "ukuran_kb": 232.4,
+      "ringkasan": "Menjawab: apa isi portal web ERP internal Bharata (`erp-frontend` / \"One Bharata\"), stack dan pola UI apa yang dipakai, serta menu apa saja yang muncul per modul (HRIS, Finance, IT, GA, Manufacture, Warehouse, Quality, Procurement, Integration, Sekretariat, Marketing Analytics) berikut rute halamannya. Menjawab juga bagaimana login, refresh token, dan peran SSO Identity Provider bekerja, bagaimana `system_roles` dan paket hak menentukan kategori sidebar yang tampil, rute mana yang digerbang `proxy.ts`, bagaimana Tampilan Menu per jabatan menyembunyikan menu berdasarkan URL, dan bagaimana rute yang pindah tetap menjaga setelan itu lewat peta url lama. Memuat riwayat keputusan bentuk menu beserta alasannya, termasuk yang sudah dicoba lalu dibatalkan, dan jebakan yang terbukti menggigit seperti kotak cari yang mati karena tabel merender data mentah, layar kembar antar-modul, label menu yang bertabrakan antar-kategori, dan menu yang tampil tapi halamannya menolak.",
       "kata_kunci": [
         "erp-frontend",
         "One Bharata",
-        "hris-dashboard",
         "web ERP",
         "sidebar",
         "menu",
         "Konfigurasi Sistem",
         "Hak Akses",
+        "Kelola Perusahaan",
         "Tampilan Menu",
         "menu_hidden",
+        "rute lama",
+        "redirect",
         "proxy",
         "route gating",
         "system_roles",
         "SSO",
         "Next.js",
         "i18n",
-        "multi-perusahaan",
-        "CompanySwitcher"
+        "multi-perusahaan"
       ]
     },
     {
@@ -1429,20 +1430,24 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "574467075df8e2395ad8230be2371b77b9102f417de1a968f58f276ab7d55c02",
-      "ukuran_kb": 96.9,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan data), bagaimana paket hak (permission set) menempel di posisi/jabatan dan diresolusi jadi klaim JWT saat login, serta di mana penegakannya berjalan (gateway, service, frontend). Juga menjawab modul mana yang katalog/paketnya sudah terdaftar dan sudah ditegakkan per-aksi, mana yang masih bertumpu pada system_roles tier, plus riwayat Fase Dua (tier fallback) yang sempat dinyalakan lalu dicabut. Menyebutkan path kode terkait di shared-library, employee-service, dan erp-frontend untuk menyusun/menegakkan hak.",
+      "hash": "3d67d5f6c0d4cb2624e3f8beb6e7c303e322d20f8529b15281abb42cf2ed812d",
+      "ukuran_kb": 97.6,
+      "ringkasan": "Menjawab: bagaimana hak akses bekerja di seluruh bip-erp lewat tiga sumbu (modul, tingkat aksi, cakupan data) dan paket hak bernama yang menempel pada posisi/jabatan, modul mana yang sudah menegakkannya per-aksi, dan bagaimana izin efektif dihitung saat login lalu dibawa di klaim JWT sampai ke gateway, service, dan frontend. Menjawab juga endpoint apa saja yang mengelola katalog, paket, pemasangan ke posisi, dan pengecualian per-akun, serta bedanya `permission_sets` dari `menu_hidden` dan dari modul `menu` (menu terbatas) yang ketiganya menyentuh sidebar dan mudah tertukar. Memuat aturan kapan daftar modul harus diambil dari katalog backend dan kapan justru tidak boleh.",
       "kata_kunci": [
         "RBAC",
         "permission set",
         "paket hak",
-        "hak akses",
         "reach",
         "cakupan data",
+        "katalog permission",
+        "permission-modules",
+        "hak per posisi",
         "system_roles",
         "tier fallback",
         "JWT permissions",
-        "katalog modul"
+        "menu terbatas",
+        "menu_hidden",
+        "Siapa Boleh Apa"
       ]
     },
     {
