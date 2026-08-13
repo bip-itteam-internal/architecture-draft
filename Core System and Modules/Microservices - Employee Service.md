@@ -36,14 +36,14 @@
 
 **Legal — Register Perizinan, Kontrak & Dispute (⚠️ live di kode, runtime pending)**
 - Workspace posisi Staf Legal, di-host di service ini (`services/employee/legal_{perizinan,kontrak,dispute}.go`, `RegisterLegalRoutes`). Di-host di sini — bukan service `legal` baru — agar tak menambah modul/URL gateway (menghindari panic `ValidateInternalURL`).
-- CRUD `/legal/licenses`, `/legal/contracts`, `/legal/disputes` (GET/POST/PUT gate `RequireLegalStaff`; DELETE gate `RequireLegalSupervisor`), masing-masing dengan filter query. Dipanggil FE lewat `/api/employee/legal/*`.
-- Model `LegalLicense`/`LegalContract`/`LegalDispute` (`shared-library/models/employee/models.go`), collection `legal_license`/`legal_contract`/`legal_dispute`. Department `legal` di-seed di `DefaultDepartments`; role key `legal` (staff/supervisor) — lihat [[CORE - RBAC dan Permission Set]].
+- CRUD `/legal/licenses`, `/legal/contracts`, `/legal/disputes`, masing-masing dengan filter query. Dipanggil FE lewat `/api/employee/legal/*`. Sejak 2026-08-13 digerbang `gateSecretary(secretary.legal.view|work|manage)`; `RequireLegalStaff`/`RequireLegalSupervisor` tinggal sebagai fallback kill-switch di tiap rute.
+- Model `LegalLicense`/`LegalContract`/`LegalDispute` (`shared-library/models/employee/models.go`), collection `legal_license`/`legal_contract`/`legal_dispute`. Department `legal` **dicabut dari `DefaultDepartments`** (tak pernah lahir di dev maupun prod); haknya kini dari modul `secretary` plus peran yang diturunkan dari jabatan `Legal` di Kesekretariatan — lihat [[CORE - RBAC dan Permission Set]].
 - Unggah PDF memakai endpoint generik `POST /upload` (`minio.UploadSingleHandler`) yang sudah ada. Frontend `/legal/{perizinan,kontrak,dispute}` + alert H-90/H-60. Detail: [[QA - Register Perizinan & Sertifikasi]].
 
 **R&D Regulatory — Registrasi izin & pipeline produk (⚠️ live di kode, runtime pending)**
 - Workspace posisi R&D Regulatory, di-host di service ini (`services/employee/{rnd_regulatory.go,rnd_product.go}`, `RegisterRnDRoutes`). Pola sama dengan Legal.
-- CRUD `/rnd/registrations` (Register NIE/BPOM/Halal) & `/rnd/products` (Papan Pengembangan Produk) — GET/POST/PUT gate `RequireRnDStaff`, DELETE gate `RequireRnDSupervisor`. FE lewat `/api/employee/rnd/*`.
-- Model `RnDRegistration`/`RnDProduct`, collection `rnd_registration`/`rnd_product`. Department `rnd` (`R&D Regulatory`) di-seed di `DefaultDepartments`; role key `rnd`. Detail: [[QA - R&D Regulatory (Registrasi & Pipeline Produk)]].
+- CRUD `/rnd/registrations` (Register NIE/BPOM/Halal) & `/rnd/products` (Papan Pengembangan Produk). FE lewat `/api/employee/rnd/*`. Sejak 2026-08-13 digerbang `gateSecretary(secretary.rnd.view|work|manage)` — lapisan izin PERTAMA untuk kesepuluh rute ini; `RequireRnDStaff`/`RequireRnDSupervisor` tinggal sebagai fallback.
+- Model `RnDRegistration`/`RnDProduct`, collection `rnd_registration`/`rnd_product`. Department `rnd` **dicabut dari `DefaultDepartments`**, sama seperti `legal`; haknya dari modul `secretary` plus peran dari jabatan `QA RND`. Detail: [[QA - R&D Regulatory (Registrasi & Pipeline Produk)]].
 
 **Quality — CAPA, Incoming Inspection, Antrean Release Batch (⚠️ live di kode, runtime pending)**
 - Workspace divisi Quality, di-host di service ini (`services/employee/{quality_capa.go,quality_incoming.go,quality_batch.go}`, `RegisterQualityRoutes`). Pola sama dengan Legal/R&D.

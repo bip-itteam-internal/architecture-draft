@@ -48,7 +48,7 @@ Sakelar `ROLE_FROM_POSITION=off` mengembalikan perilaku lama tanpa deploy kode.
 | Beauty Hacks, Kyura | Video Editor, Videographer | tak punya padanan peran insentif |
 | Kyura | `?` | jabatan kosong di data (3 akun) |
 | General Affair | GA Supervisor | jabatan yang **ditinggalkan** setelah penggabungan HRGA; memetakannya berarti menghidupkannya kembali |
-| General Affair | Admin, Legal Staff | nama jabatannya tak menyatakan kewenangan GA; `Legal Staff` lebih dekat ke modul `legal` yang belum ada di `main` |
+| General Affair | Admin, Legal Staff | nama jabatannya tak menyatakan kewenangan GA. ⚠️ Catatan "`legal` belum ada di `main`" sudah BASI dua kali: modul `legal` mendarat 2026-08-09 lalu dilebur ke `secretary` pada 2026-08-13. `Legal Staff` di GA tetap **tidak** dipetakan, sebab jabatan legal yang benar-benar dipakai ada di Kesekretariatan (lihat baris tambahan di bawah); memetakan keduanya akan melahirkan dua pintu ke register yang sama |
 | General Affair | Office Boy | dasbornya datang dari preset per-JABATAN (`features/hris/dashboard/lib/position-view.ts`), bukan dari peran — jadi ia memang tak perlu `system_roles` |
 | General Affair | Bootcamp Content Creator | tak ada satu pun pemegangnya di data |
 | Kesekretariatan | Personal Assistant | dua pemegangnya berada di dua ujung ekstrem (7 peran vs nol); menurunkan salah satunya berarti memilih tanpa dasar |
@@ -56,6 +56,32 @@ Sakelar `ROLE_FROM_POSITION=off` mengembalikan perilaku lama tanpa deploy kode.
 | Kesekretariatan | Company Branding, Graphic Design, Video Editor | pekerjaan kreatif tanpa padanan modul ERP mana pun |
 
 `integration` juga tidak diturunkan untuk atasan brand walau satu SPV Beauty Hacks hari ini memegangnya: peran itu membuka kategori Integration dengan 26 menu, jauh melebihi apa pun yang bisa disimpulkan dari nama jabatan "supervisor brand".
+
+### Tambahan 2026-08-13: dua jabatan Kesekretariatan, dan kenapa PERAN masih perlu di sini
+
+| Departemen | Jabatan | Peran diturunkan |
+|---|---|---|
+| Kesekretariatan | `Legal` | `legal: staff` |
+| Kesekretariatan | `QA RND` | `rnd: staff` |
+
+Keduanya ditambahkan bersama peleburan modul `legal` + `rnd` jadi `secretary`
+([[QA - Register Perizinan & Sertifikasi]]). Ini **tampak** melanggar batas ADR ini, yang
+menyatakan dirinya jembatan untuk modul yang BELUM berkatalog — sementara `secretary` justru
+baru saja berkatalog. Alasannya bukan izin melainkan JALAN MASUK:
+
+`erp-frontend/src/proxy.ts` hanya membaca cookie `system_roles` dan tak pernah melihat klaim
+`permissions`, dan sidebar memilih kategori dari kunci `system_roles`. Jadi paket menentukan
+IZIN, tapi peran yang menentukan MENU dan lolosnya rute. Memberi paket tanpa peran
+menghasilkan orang yang izinnya benar tapi tak punya jalan ke sana. Ini persis kesimpulan
+audit RBAC Procurement 2026-08-11 ("keduanya perlu"), bukan pengecualian baru.
+
+Nilainya `staff`, bukan `supervisor`: keduanya jabatan pelaksana, dan pembeda satu-satunya di
+kedua area adalah hak MENGHAPUS permanen. Beda dari `secretary: staff` di bawah, di sini
+gerbangnya (`RequireLegalStaff`/`RequireRnDStaff`) memang meloloskan `staff`, jadi menunya
+terbuka DAN halamannya menerima.
+
+⚠️ Pemetaan `QA RND` → `rnd` **belum dikonfirmasi pemilik produk**; ia dipilih dari nama
+jabatan, dan tak bisa diperiksa ke data karena dev tak punya pemegangnya.
 
 ### `secretary: staff` sengaja tak pernah diturunkan
 

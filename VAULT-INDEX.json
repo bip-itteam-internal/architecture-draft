@@ -1128,20 +1128,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "a6eebf4d7d257dc0859725985fc7cb3cc595dcb5ff2c24a7672b7194acb54d6f",
-      "ukuran_kb": 221.1,
-      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (hris-dashboard / \"One Bharata\"), stack dan repo mana yang dipakai (Next.js App Router + React di `erp-frontend`), serta modul apa saja yang tersedia di dalamnya (HR, attendance, finance/insentif, integrasi marketplace, IT, GA). Menjawab juga bagaimana alur login `employee_id` + password, refresh token, dan peran web ini sebagai SSO Identity Provider untuk aplikasi lain seperti Task Manager. Selain itu menjelaskan cara menu sidebar digerbang oleh `system_roles` per modul dan per role, bagaimana menu dikelompokkan lewat induk bersarang, di mana setelan HRGA terpusat berada beserta penyaringan akses per tab, dan bagaimana dukungan multi-perusahaan (company switcher, departemen/shift/network per perusahaan) bekerja.",
+      "hash": "de796fddcdfcf6284bd001c2d1dda104f20323493f0482cfc87bb6830a6ba896",
+      "ukuran_kb": 223.1,
+      "ringkasan": "Menjawab: apa saja modul dan halaman yang ada di portal web ERP Bharata (One Bharata), bagaimana login serta SSO Identity Provider-nya bekerja, dan bagaimana sidebar disaring dari cookie system_roles plus klaim permissions. Juga menjawab pertanyaan per-modul yang sering muncul di frontend: kenapa sebuah menu tak tampil, bagaimana multi-perusahaan mempengaruhi halaman presensi dan master data, dan keputusan UI apa yang sudah diambil beserta alasannya. Sejak 2026-08-13 memuat kategori sidebar SEKRETARIAT yang menggabungkan menu Legal dan R&D, berikut alias kategori, penandaan izin per-area, dan jebakan urutan kunci menus yang mempengaruhi layar Tampilan Menu.",
       "kata_kunci": [
-        "erp-frontend",
-        "hris-dashboard",
-        "One Bharata",
         "web ERP",
-        "frontend Next.js",
-        "SSO identity provider",
-        "login autentikasi",
-        "system_roles role gating",
-        "sidebar menu",
-        "multi-perusahaan multi-company"
+        "One Bharata",
+        "erp-frontend",
+        "sidebar",
+        "system_roles",
+        "SSO",
+        "role gating",
+        "multi-perusahaan",
+        "Tampilan Menu",
+        "SEKRETARIAT"
       ]
     },
     {
@@ -1384,7 +1384,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, **legal**, serta **formbuilder**. **finance** punya katalog + 5 paket (`finance_view`, `finance_pelaksana`, `finance_admin`, `finance_ar`, `finance_ap`) dan menunya sudah bertanda izin, tetapi **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
+      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, **ga**, **formbuilder**, serta **secretary** (Kesekretariatan, peleburan `legal` + `rnd` sejak 2026-08-13 — `legal` sebagai modul tersendiri sudah dipensiunkan). **finance** punya katalog + 5 paket (`finance_view`, `finance_pelaksana`, `finance_admin`, `finance_ar`, `finance_ap`) dan menunya sudah bertanda izin, tetapi **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -1421,20 +1421,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "f542ec39bc80d0a1c8c3c872576e9ed7e8c87d799ea036ee9757a75bc9e5bb5e",
-      "ukuran_kb": 89.5,
-      "ringkasan": "Katalog izin lengkap per modul, paket bawaan yang dipilih HR, dan status penegakan di tiap service. Menjawab: izin apa yang ada untuk sebuah modul, paket mana yang memberikannya, bagaimana fallback tier bekerja selama migrasi dan bagaimana fase dua dicabut, serta jebakan mana yang sudah terbukti menggigit — termasuk izin tanpa entri fallback yang justru diloloskan frontend dan argumen fallback can() yang diabaikan saat token memuat izin modul yang sama. Dipakai sebelum menambah izin atau paket baru.",
+      "hash": "d161e8ef847844df6b1dc3c3ab01609a3e2806e2c83229cadc5986868bab6760",
+      "ukuran_kb": 95.2,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi, cakupan), modul mana saja yang sudah berkatalog permission, dan apa beda permission_sets, menu_hidden, serta modul menu terbatas yang mudah tertukar. Juga menjawab kenapa memberi paket ke sebuah posisi kadang tak mengubah apa pun, apa itu fase satu vs fase dua beserta sakelar env tiap modul, dan hasil audit RBAC per departemen. Memuat katalog acuan 15 modul terdaftar per 2026-08-13, termasuk modul secretary yang melebur legal dan rnd dengan tangga izin yang dipecah per area.",
       "kata_kunci": [
         "RBAC",
         "permission set",
-        "izin",
-        "paket hak",
-        "hak per posisi",
-        "fallback tier",
+        "ADR 0030",
+        "katalog izin",
         "fase dua",
-        "katalog modul",
+        "tier fallback",
         "reach",
-        "kill-switch"
+        "hak per posisi",
+        "menu_hidden",
+        "secretary"
       ]
     },
     {
@@ -1703,20 +1703,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "e73a1eced0610653c7a942e330cd9c0b5bb9c6222e65ba0aca3d209a4a59ff3d",
-      "ukuran_kb": 75.7,
-      "ringkasan": "Menjawab: di mana sumber kebenaran data karyawan dan autentikasi bip-erp, endpoint apa saja yang dipakai untuk login (username/employee_id, PIN, biometric), refresh token, dan registrasi onboarding. Menjelaskan pula operasi admin akun oleh IT (reset akun, forget-device, set roles, status aktif), CRUD master department dan system role beserta gerbang RBAC-nya, serta register workspace posisi Legal, R&D Regulatory, Quality, dan Procurement yang menumpang di service ini agar tak menambah modul gateway.",
+      "hash": "1cf9510b36b6049be4dfd57d6235ae7da5120b117e8d365b64246493cab10de1",
+      "ukuran_kb": 76.0,
+      "ringkasan": "Menjawab: endpoint apa saja yang di-host employee-service, koleksi MongoDB apa yang dimilikinya, dan modul mana yang menumpang di sini alih-alih punya service sendiri (Legal, R&D, Quality, Procurement register). Juga menjawab bagaimana seed master data dan migrasi berjalan saat service start, serta gerbang RBAC mana yang menjaga tiap kelompok rute. Sejak 2026-08-13 rute Legal dan R&D digerbang izin modul secretary lewat gateSecretary, dengan gerbang tier lama tinggal sebagai fallback kill-switch.",
       "kata_kunci": [
         "employee-service",
-        "auth",
-        "login",
-        "PIN",
-        "onboarding",
-        "master department",
-        "system roles",
+        "endpoint",
+        "MongoDB",
+        "seed master data",
+        "migrasi",
         "RBAC",
-        "karyawan",
-        "resign"
+        "legal",
+        "rnd",
+        "gateSecretary",
+        "work_data"
       ]
     },
     {
@@ -3773,6 +3773,7 @@
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "QA - Register Perizinan & Sertifikasi",
         "CORE - RBAC dan Permission Set",
         "Microservices - Employee Service",
         "Microservices - Manufacture Service",
@@ -3780,20 +3781,20 @@
         "HRIS - Organization Structure",
         "APP - Web ERP"
       ],
-      "hash": "6485260ad5f9cf1cb9f9a84db7222cfeb6d6864fdb619007764a6e7ffb98168d",
-      "ukuran_kb": 10.9,
-      "ringkasan": "Menjawab: kenapa `system_roles` yang kosong diisi otomatis dari pasangan departemen dan jabatan saat token diterbitkan, serta empat aturan yang membatasinya (tak pernah menimpa, dinilai per modul, hanya untuk peran akses bukan perhitungan, jabatan ambigu tak ditebak). Juga menjawab jabatan mana yang sengaja tidak dipetakan beserta alasannya, kenapa `secretary: staff` tak pernah diturunkan, dan bagaimana sakelar `ROLE_FROM_POSITION=off` mengembalikan perilaku lama tanpa deploy kode.",
+      "hash": "62b6b6019e96e5e4778ceeb1df0705c5539fbd81364970abef356454f51c8575",
+      "ukuran_kb": 12.6,
+      "ringkasan": "Menjawab: kenapa system_roles yang kosong diisi otomatis dari pasangan departemen dan jabatan saat token diterbitkan, bukan lewat permission-set seperti ADR 0030. Menjelaskan pengukuran data dev yang mendasarinya, jabatan mana yang sengaja TIDAK dipetakan beserta alasan tiap barisnya, dan kenapa mekanisme ini menyatakan diri jembatan sementara. Sejak 2026-08-13 memuat jabatan Legal dan QA RND di Kesekretariatan, yang perannya diturunkan bukan demi izin melainkan demi jalan masuk: proxy.ts dan sidebar hanya membaca system_roles, tak pernah klaim permissions.",
       "kata_kunci": [
-        "ADR 0043",
-        "system_roles",
         "peran dari jabatan",
-        "role from position",
+        "system_roles",
+        "ADR 0043",
+        "peran_dari_jabatan.go",
         "ROLE_FROM_POSITION",
-        "RBAC",
         "jabatan",
-        "penerbitan token",
-        "manufacture",
-        "insentive"
+        "penurunan peran",
+        "Kesekretariatan",
+        "proxy",
+        "token"
       ]
     },
     {
@@ -7187,7 +7188,7 @@
       "area": "Quality & Regulatory",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Kedua register + unggah PDF **live di kode** (Go build + FE typecheck/eslint lolos), **belum diverifikasi runtime**. Simulasi HPP & CAPA belum; Papan Pengembangan berupa **tabel bertahap** (belum kanban drag-drop).",
+      "status_teks": "Implemented (ada catatan). Kedua register + unggah PDF **live di kode**, dan sejak **2026-08-13 modulnya bukan `rnd` lagi melainkan `secretary`** (Kesekretariatan) bersama Legal — lihat blok di bawah. Rute `/rnd/*` **tidak berubah**. Verifikasi lewat gateway **belum dijalankan**. Simulasi HPP & CAPA belum; Papan Pengembangan berupa **tabel bertahap** (belum kanban drag-drop).",
       "publik": true,
       "tautan": [
         "QA - Register Perizinan & Sertifikasi",
@@ -7195,11 +7196,12 @@
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "CORE - API Master Gateway",
         "Microservices - Employee Service",
+        "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "APP - Web ERP"
       ],
-      "hash": "04c0aca11582e228be6cd8ac51d2acdf1cb682cb0dfa0ed9103a26686b529a94",
-      "ukuran_kb": 5.2,
-      "ringkasan": "Menjawab: bagaimana proses registrasi izin edar produk (NIE/BPOM, Halal, SNI) dipantau di ERP sampai terbit beserta alert bila melewati target, dan bagaimana pipeline produk baru dilacak dari tahap ide, formulasi, trial, registrasi, hingga siap launching. Juga menjawab: endpoint dan field model kedua register, siapa yang berhak (rnd:staff dan rnd:supervisor), dan bagaimana unggah PDF hasil uji dilakukan. Berguna untuk memahami batas antara registrasi produk milik R&D dan izin perusahaan milik Legal, serta apa yang belum ada (simulasi HPP produk baru, kanban drag-drop, perhitungan lead time otomatis).",
+      "hash": "f2cb7552044f3376e47c2fc72515de99eac359fffb70fe7cc95ab70fee3a380f",
+      "ukuran_kb": 8.6,
+      "ringkasan": "Menjawab: bagaimana proses registrasi izin edar produk (NIE/BPOM, Halal, SNI) dipantau di ERP sampai terbit beserta alert bila melewati target, dan bagaimana pipeline produk baru dilacak dari tahap ide, formulasi, trial, registrasi, hingga siap launching. Juga menjawab endpoint dan field model kedua register, siapa yang berhak, dan bagaimana unggah PDF hasil uji dilakukan. Sejak 2026-08-13 modulnya bukan rnd lagi melainkan salah satu area di dalam secretary (Kesekretariatan) bersama Legal, dan inilah lapisan izin pertama bagi kesepuluh rutenya; rute halaman /rnd/* tidak berubah.",
       "kata_kunci": [
         "R&D Regulatory",
         "NIE",
@@ -7210,7 +7212,7 @@
         "pipeline produk",
         "product development",
         "rnd",
-        "formulasi trial"
+        "secretary"
       ]
     },
     {
@@ -7219,20 +7221,22 @@
       "area": "Quality & Regulatory",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Ketiga register (Perizinan, Kontrak & SLA, Dispute & Advis) + **unggah PDF** **live di kode** (Go build + FE typecheck/eslint lolos), **belum diverifikasi runtime** di stack dev (butuh redeploy container + akun ber-role `legal`). Pemisahan ke service `legal` tersendiri **belum**.",
+      "status_teks": "Implemented (ada catatan). Ketiga register (Perizinan, Kontrak & SLA, Dispute & Advis) + **unggah PDF** **live di kode**, dan sejak **2026-08-13 modulnya bukan `legal` lagi melainkan `secretary`** (Kesekretariatan) bersama R&D — lihat blok di bawah. Rute `/legal/*` **tidak berubah**. Verifikasi lewat gateway **belum dijalankan**: dev auto-deploy hanya terjadi saat merge, dan pengukuran 2026-08-13 menemukan dev tak punya satu pun akun berposisi `Legal` untuk mengujinya. Pemisahan ke service `legal` tersendiri **belum** (dan kini kecil kemungkinannya).",
       "publik": true,
       "tautan": [
-        "APP - Web ERP",
+        "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "CORE - RBAC dan Permission Set",
+        "APP - Web ERP",
         "CORE - API Master Gateway",
         "Microservices - Recruitment Service",
+        "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "HRIS - Organization Structure",
         "Microservices - Employee Service",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
       ],
-      "hash": "f3670b523cdb37ec791b423348024727ec83d96857b36d9afa2b29e4f22d493c",
-      "ukuran_kb": 11.7,
-      "ringkasan": "Menjawab: di mana izin edar BPOM, sertifikat Halal, izin usaha, kontrak/SLA, dan perkara dispute perusahaan dicatat, field apa saja yang disimpan, serta bagaimana alert H-90 (izin) dan H-60 (kontrak) dihitung. Menjelaskan endpoint CRUD /legal/licenses, /legal/contracts, dan /legal/disputes yang di-host di employee-service beserta gate RequireLegalStaff/RequireLegalSupervisor, katalog izin legal.view/work/manage, cara unggah PDF lewat endpoint upload generik, dan halaman frontend /legal/*. Juga menjawab mengapa modul ini praktis tak bisa dipakai di produksi: departemen legal tak ada di master data prod dan seed berhenti bila koleksi sudah terisi, sehingga role legal tak bisa diberikan ke siapa pun.",
+      "hash": "f0bf9bdc15fa30e0830183af9f18d4025d84e8228c6815fa962f4167f14c1381",
+      "ukuran_kb": 15.8,
+      "ringkasan": "Menjawab: di mana izin edar BPOM, sertifikat Halal, izin usaha, kontrak/SLA, dan perkara dispute perusahaan dicatat, field apa saja yang disimpan, serta bagaimana alert H-90 (izin) dan H-60 (kontrak) dihitung. Menjelaskan endpoint CRUD /legal/licenses, /legal/contracts, dan /legal/disputes yang di-host employee-service beserta gerbang izinnya, katalog paket, cara unggah PDF, dan halaman frontend /legal/*. Juga menjawab kenapa modul ini nol pemakai di produksi dan bagaimana itu diselesaikan 2026-08-13 dengan meleburnya ke modul secretary (Kesekretariatan), tempat orang legal sesungguhnya duduk.",
       "kata_kunci": [
         "perizinan",
         "license",
@@ -7243,7 +7247,7 @@
         "kontrak SLA",
         "dispute",
         "alert H-90",
-        "workspace posisi"
+        "secretary"
       ]
     },
     {

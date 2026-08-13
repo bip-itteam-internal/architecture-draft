@@ -4,16 +4,46 @@
 
 - **Stack**: Go (Fiber, di-host di employee-service) + MongoDB (`legal_license`) + JWT/`system_roles` sebagai pembawa peran; frontend Next.js (App Router, TanStack Query).
 - **Path di repo**:
-  - Backend: `bip-erp/services/employee/{legal_perizinan.go,legal_kontrak.go,legal_dispute.go}` (routes+handler CRUD) · model `LegalLicense`/`LegalContract`/`LegalDispute` di `bip-erp/shared-library/models/employee/models.go` · collection `legal_license`/`legal_contract`/`legal_dispute` · RBAC `RequireLegalStaff`/`RequireLegalSupervisor` di `bip-erp/shared-library/common/roles.go` · seed department `legal` di `.../master_data.go` (`DefaultDepartments`). Unggah PDF memakai endpoint generik `POST /upload` yang sudah ada (`minio.UploadSingleHandler`).
-  - Frontend: `erp-frontend/src/app/(main)/legal/{perizinan,kontrak,dispute}/page.tsx` · `erp-frontend/src/features/legal/{perizinan,kontrak,dispute}/*` (types, hooks fetch/upsert/delete, form modal) · helper unggah `features/legal/shared/upload.ts` · helper daftar `features/legal/shared/daftar.ts` (pencarian + param penyaring) · tiga entri menu `legal` di `src/components/layout/sidebar-menus.tsx` (**bukan** `sidebar.tsx`) · gating rute di `src/proxy.ts`.
-- **Status**: ⚠️ Implemented (ada catatan). Ketiga register (Perizinan, Kontrak & SLA, Dispute & Advis) + **unggah PDF** **live di kode** (Go build + FE typecheck/eslint lolos), **belum diverifikasi runtime** di stack dev (butuh redeploy container + akun ber-role `legal`). Pemisahan ke service `legal` tersendiri **belum**.
+  - Backend: `bip-erp/services/employee/{legal_perizinan.go,legal_kontrak.go,legal_dispute.go}` (routes+handler CRUD) · gerbang izin `services/employee/secretary_gate.go` (`gateSecretary`) · katalog `shared-library/common/catalog_secretary.go` · model `LegalLicense`/`LegalContract`/`LegalDispute` di `bip-erp/shared-library/models/employee/models.go` · collection `legal_license`/`legal_contract`/`legal_dispute` · gerbang tier lama `RequireLegalStaff`/`RequireLegalSupervisor` di `bip-erp/shared-library/common/roles.go` (kini dipakai sebagai fallback kill-switch). Unggah PDF memakai endpoint generik `POST /upload` yang sudah ada (`minio.UploadSingleHandler`).
+  - Frontend: `erp-frontend/src/app/(main)/legal/{perizinan,kontrak,dispute}/page.tsx` · `erp-frontend/src/features/legal/{perizinan,kontrak,dispute}/*` (types, hooks fetch/upsert/delete, form modal) · helper unggah `features/legal/shared/upload.ts` · helper daftar `features/legal/shared/daftar.ts` (pencarian + param penyaring) · tiga entri menu di blok **`secretary`** pada `src/components/layout/sidebar-menus.tsx` (**bukan** `sidebar.tsx`) · alias kategori `src/components/layout/modul-aktif.ts` · gating rute di `src/proxy.ts`.
+- **Status**: ⚠️ Implemented (ada catatan). Ketiga register (Perizinan, Kontrak & SLA, Dispute & Advis) + **unggah PDF** **live di kode**, dan sejak **2026-08-13 modulnya bukan `legal` lagi melainkan `secretary`** (Kesekretariatan) bersama R&D — lihat blok di bawah. Rute `/legal/*` **tidak berubah**. Verifikasi lewat gateway **belum dijalankan**: dev auto-deploy hanya terjadi saat merge, dan pengukuran 2026-08-13 menemukan dev tak punya satu pun akun berposisi `Legal` untuk mengujinya. Pemisahan ke service `legal` tersendiri **belum** (dan kini kecil kemungkinannya).
+
+> [!info] Modul `legal` DILEBUR ke `secretary` (2026-08-13)
+> Register ini tak lagi berdiri sebagai modul sendiri. Ia kini satu dari dua **area** di
+> dalam modul **`secretary`** (Kesekretariatan), bersama [[QA - R&D Regulatory (Registrasi & Pipeline Produk)]].
+>
+> | | Sebelum | Sesudah |
+> |---|---|---|
+> | Kunci modul | `legal` | `secretary` |
+> | Izin | `legal.view/work/manage` | `secretary.legal.view/work/manage` |
+> | Paket | `legal_lihat`/`legal_pelaksana`/`legal_admin` | `secretary_legal_lihat`/`_pelaksana`/`_admin` |
+> | Gerbang | `gateLegal` | `gateSecretary` |
+> | Kill-switch | `LEGAL_PERMISSION_ENFORCEMENT` | `SECRETARY_PERMISSION_ENFORCEMENT` (nama lama tetap dibaca sebagai alias) |
+> | Kategori sidebar | `LEGAL` | `SEKRETARIAT` |
+> | Rute halaman | `/legal/*` | **`/legal/*`, tidak berubah** |
+>
+> **Rutenya sengaja tidak ikut pindah.** `menu_hidden` menyimpan URL dan mencocokkannya
+> persis, jadi memindahkannya ke `/sekre/*` akan membatalkan setelan Tampilan Menu tiap
+> jabatan secara senyap.
+>
+> **Peran `system_roles.legal` tetap hidup** sebagai tier fallback dan sebagai sumbu yang
+> menentukan menu serta lolosnya `proxy.ts` — lihat catatan tiga lapis di
+> [[CORE - RBAC dan Permission Set]]. Yang berubah pemiliknya, bukan jalurnya.
+>
+> Alasan penggabungan ada di sensus produksi di bagian **Belum Diimplementasikan** di bawah,
+> dan keputusannya adalah pilihan kedua yang ditawarkan sensus itu.
 
 ## Persona / Pengguna
 
 | Persona | Peran & Divisi | Akses/RBAC | Device |
 |---|---|---|---|
-| Staf Legal | posisi `Staf Legal` / department `legal` | role `legal:staff` — buat/edit/lihat izin | Web ERP |
-| Legal Supervisor | department `legal` | role `legal:supervisor` — termasuk hapus izin | Web ERP |
+| Staf Legal | jabatan **`Legal`** di department **`secretary`** (Kesekretariatan) | peran `legal:staff` diturunkan dari jabatan (`peran_dari_jabatan.go`), atau paket **Sekretariat: Legal Pelaksana** — buat/edit/lihat izin | Web ERP |
+| Legal Supervisor | department `secretary` | peran `legal:supervisor` atau paket **Sekretariat: Legal Admin** — termasuk hapus izin | Web ERP |
+| Supervisor / admin IT | Tech Development | super-akses ke seluruh 25 rute, bertahan juga di fase dua | Web ERP |
+
+⚠️ Baris pertama BERUBAH 2026-08-13. Sebelumnya persona ini digantungkan pada department
+`legal` yang **tak pernah ada di produksi**; kini ia jabatan di dalam Kesekretariatan, yang
+memang tempat orangnya duduk.
 
 - **Tujuan**: satu layar yang menjawab "izin apa yang segera habis" tanpa menyusuri folder/berkas fisik.
 - **Pain point**: pemantauan masa berlaku izin hari ini manual (spreadsheet), sehingga perpanjangan sering baru disadari mepet tenggat.
@@ -41,7 +71,7 @@
 **Unggah PDF** — reuse endpoint generik `POST /api/employee/upload` (field multipart `file`, `minio.UploadSingleHandler`) yang sudah ada; FE (`features/legal/shared/upload.ts`) unggah lebih dulu, simpan `full_url`→`file_object` di payload. Tiap halaman menautkan `file_object` (buka PDF di tab baru).
 
 - **Frontend**: tiga halaman list (Perizinan/Kontrak/Dispute) + modal create/edit (react-hook-form + zod) + hapus (ActionDialog) + unggah PDF. Tiga menu muncul di sidebar untuk pemegang role `legal`; rute `/legal/*` digating di `proxy.ts`. Sejak branch `refactor/legal-struktur-halaman-hris` (⚠️ **belum merge**) ketiganya memakai **struktur halaman HRIS** berikut pencarian, penyaring, paginasi, export, dan i18n dua bahasa — rinciannya beserta alasan tiap keputusan di [[APP - Web ERP]] bagian **Legal**.
-- **RBAC & seed**: role key `legal` pada tier `system_roles` (`legal:staff|supervisor`), department `legal` di-seed di `DefaultDepartments`. Sejak [#1117](https://github.com/bip-itteam-internal/bip-erp/pull/1117) (branch `feat/legal-permission-set`, **merged 2026-08-09**) modul ini **berkatalog penuh**: tiga izin `legal.view` / `legal.work` / `legal.manage` menggerbang kelima belas rute lewat `gateLegal`, dengan fallback tier di tiap rute dan kill-switch `LEGAL_PERMISSION_ENFORCEMENT=off`. Tiga paket bawaan: **Lihat** (baru, tak punya padanan tier lama), **Pelaksana** (setara `legal:staff`), **Admin** (setara `legal:supervisor`). Rincian keputusan: [[CORE - RBAC dan Permission Set]].
+- **RBAC & seed**: sejak [#1117](https://github.com/bip-itteam-internal/bip-erp/pull/1117) (**merged 2026-08-09**) modul ini berkatalog penuh dengan tiga izin `legal.*` lewat `gateLegal`. Sejak **2026-08-13** katalognya dilebur ke modul `secretary`: ketiga izin jadi `secretary.legal.view|work|manage`, gerbangnya `gateSecretary`, dan paket bawaannya **Sekretariat: Legal Lihat / Pelaksana / Admin** (reach `all`). Isi Pelaksana & Admin persis mencerminkan `legal:staff` dan `legal:supervisor` hari ini, dikunci `TestPaketBawaanSecretaryCerminTierHariIni`; paket **Lihat** tetap kemampuan BARU yang tak punya padanan tier. Department `legal` **dicabut dari `DefaultDepartments`** (ia tak pernah lahir di lingkungan mana pun). Migrasi `migrasiPaketLegalKeSecretary` menulis ulang assignment paket lama, dan shim baca di `common.IzinSecretaryEfektifDari` menjaga yang lolos dari migrasi itu. Rincian keputusan: [[CORE - RBAC dan Permission Set]].
 
 ## Belum Diimplementasikan / Catatan
 
@@ -64,22 +94,44 @@
 >
 > Dan orangnya sebenarnya ada: **satu** karyawan berjabatan legal di produksi, `BIP-0184-08-25`, departemen **Kesekretariatan**, jabatan `Legal` — persis posisi yang jadi alasan register ini dibangun. Ia duduk di `secretary`, bukan di departemen `legal` yang di-seed, dan tak punya akses ke modulnya sendiri.
 >
-> **Yang perlu diputuskan orang, bukan kode**: buat departemen `legal` di Master Data prod lalu assign rolenya, ATAU akui Legal memang tinggal di Kesekretariatan dan sesuaikan `deptKeyToNames`. Selama belum, seluruh mesin izin di atas tak akan terasa oleh siapa pun.
+> **Yang perlu diputuskan orang, bukan kode**: buat departemen `legal` di Master Data prod lalu assign rolenya, ATAU akui Legal memang tinggal di Kesekretariatan dan sesuaikan `deptKeyToNames`.
+>
+> ✅ **DIPUTUSKAN 2026-08-13: pilihan KEDUA.** Modul `legal` dilebur ke `secretary`, dan
+> jabatan `Legal` di Kesekretariatan kini menurunkan peran `legal: staff` lewat
+> `peran_dari_jabatan.go`. `deptKeyToNames` tidak disentuh (entri `legal` dibiarkan sebagai
+> pemetaan inert untuk akses KPI); yang berubah adalah modul mana yang memiliki register ini.
+
+> [!note] Pengukuran ulang 2026-08-13: dev ternyata sama kosongnya dengan prod
+> Diukur langsung ke `employee_db` dev sebelum perubahan dikerjakan:
+>
+> | | |
+> |---|---|
+> | departemen di `master_department` dev | **10** — `legal` dan `rnd` **tidak ada**, sama seperti prod |
+> | akun ber-`system_roles.legal` atau `.rnd` | **0** |
+> | assignment paket `legal_*` (akun maupun posisi) | **0** |
+> | pemegang jabatan `Legal` / `QA RND` di Kesekretariatan (dev) | **0** |
+>
+> Dua akibatnya. Pertama, mencabut kedua departemen dari `DefaultDepartments` **nol dampak
+> di mana pun** — seed-nya memang tak pernah jalan lagi sejak koleksinya terisi. Kedua,
+> **dev tak punya akun untuk menguji fitur ini**: verifikasi lewat gateway menuntut akun uji
+> berposisi `Legal` dibuat lebih dulu. Pengukuran yang sama di PROD belum dijalankan.
 
 - **Unggah PDF pakai bucket `uploads/` generik**: berkas disimpan lewat `POST /upload` (prefix `uploads/`, bukan `legal/...` khusus) dan `file_object` menyimpan `full_url` publik langsung — belum ada preview presigned/akses berbasis-peran. Cukup untuk sekarang; perlu ditinjau bila dokumen legal harus dibatasi.
 - **Hosting sementara di employee-service** (TBD): dipilih agar tidak menambah modul gateway/URL baru (menghindari panic `ValidateInternalURL`) dan bisa langsung boot. Bila beban Legal tumbuh, ekstrak ke service `legal` tersendiri (env `LEGAL_MODULE_URL` + entri `InternalURL` di [[CORE - API Master Gateway]] + service data-owning meniru [[Microservices - Recruitment Service]]).
 - **Verifikasi runtime**: build Go & typecheck FE lolos; smoke-test end-to-end (login akun `legal`, CRUD terhadap employee-service berjalan) **belum dijalankan** — perlu redeploy `docker-compose.dev.yml`. Yang khususnya tak bisa ditutup test: apakah nilai enum penyaring (`Aktif`, `BPOM`, `Draft`, dst) benar-benar cocok dengan yang tersimpan di Mongo. Bila meleset, gejalanya tabel kosong **tanpa satu pun pesan galat**.
 - ⚠️ **Tombol Hapus tampil untuk `legal:staff` yang tak berhak.** DELETE digerbangi `RequireLegalSupervisor` di backend, sementara frontend merender `ActionDialog` tanpa memeriksa peran — staf menekan Hapus, mengkonfirmasi dialognya, lalu dapat toast gagal. Ada sejak register ini lahir; **belum diperbaiki**.
 - **Penyaring backend sempat dirakit tanpa pemanggil.** `license_type`, `status`, `contract_type`, `review_status`, dan `dispute_type` diterima handler sejak awal dan tak pernah dikirim frontend sampai `refactor/legal-struktur-halaman-hris`. Sekelas dengan `formRequest` yang tak punya field `recurrence` di form-builder: dirakit benar, tak dibaca siapa pun, nol test merah. **Pencarian teks masih tak ada di backend** dan dikerjakan di klien; sah selama register ini masih puluhan baris, perlu ditinjau ulang bila tumbuh.
-- **Domain**: perizinan (BPOM/Halal/izin edar) masuk cakupan Quality & Regulatory; sebagian isi (izin usaha, kontrak) beririsan dengan fungsi Legal/GA. Posisi `Staf Legal` dulunya terdaftar di department `ga`/`secretary`; kini punya department key `legal` sendiri. ⚠️ **Tiga representasi legal kini hidup berdampingan di master data** dan belum diputuskan mana yang benar: department `legal` (`Legal Supervisor`, `Staf Legal`), posisi `Legal Staff` di department `ga`, dan posisi `Legal` di `secretary` — ketiganya di `DefaultDepartments`. Lihat [[HRIS - Organization Structure]].
+- **Domain**: perizinan (BPOM/Halal/izin edar) masuk cakupan Quality & Regulatory; sebagian isi (izin usaha, kontrak) beririsan dengan fungsi Legal/GA. ✅ **Tiga representasi legal di master data kini tinggal dua** (2026-08-13): department `legal` dicabut dari `DefaultDepartments`, menyisakan posisi `Legal` di `secretary` (yang dipakai, dan yang haknya diturunkan) serta posisi `Legal Staff` di `ga` (yang tak dipetakan ke modul apa pun — lihat [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]). Menyatukan dua sisa itu adalah keputusan master data, bukan kode. Lihat [[HRIS - Organization Structure]].
 
 ## Dependensi & Integrasi
 
 - [[Microservices - Employee Service]] — host endpoint `/legal/*`, koneksi Mongo, seed department.
 - [[CORE - API Master Gateway]] — meneruskan `/api/employee/legal/*` + header `BIP-*` (termasuk `BIP-System-Roles` yang dipakai `RequireLegal*`).
-- [[CORE - RBAC dan Permission Set]] — role key `legal` pada tier `system_roles`.
-- [[APP - Web ERP]] — modul frontend `legal` (sidebar, gating, halaman Perizinan/Kontrak/Dispute, struktur halaman HRIS).
-- [[HRIS - Organization Structure]] — department `legal` beserta dua posisi legal lain yang masih hidup di `ga` dan `secretary`.
+- [[CORE - RBAC dan Permission Set]] — modul `secretary`, izin `secretary.legal.*`, dan tier lama `system_roles.legal` yang tetap dipakai sebagai fallback.
+- [[QA - R&D Regulatory (Registrasi & Pipeline Produk)]] — area kedua di modul yang sama; keduanya satu kategori sidebar tapi haknya tetap terpisah.
+- [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]] — jabatan `Legal` di Kesekretariatan menurunkan peran `legal: staff`, yang menentukan menu dan lolosnya `proxy.ts`.
+- [[APP - Web ERP]] — kategori sidebar SEKRETARIAT (gating, halaman Perizinan/Kontrak/Dispute, struktur halaman HRIS).
+- [[HRIS - Organization Structure]] — posisi `Legal` di `secretary` dan `Legal Staff` di `ga` yang masih berdampingan.
 - [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]] — namespace `legal.*` di kedua locale.
 
 ## Dokumen Terkait
