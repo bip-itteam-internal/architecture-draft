@@ -5283,9 +5283,9 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "0d4bd43246d01741c8e00d6813db8058539142b39633acf13a3e2344847cf9f7",
-      "ukuran_kb": 14.1,
-      "ringkasan": "Menjawab: bagaimana KPI karyawan dinilai dan disimpan per periode, mengapa posisi template harus cocok dengan jabatan karyawan pada akhir periode yang dinilai (termasuk kasus mutasi), serta bagaimana engine skor KPI marketing dikonversi jadi insentif. Menjelaskan juga cara kerja RBAC KPI per departemen, cakupan tim untuk Leader (scope=team berbasis bawahan langsung), dan penggabungan tampilan lintas departemen (mis. HRGA) yang bersumber dari master data. Membedakan mana yang sudah jalan (engine insentif marketing + appraisal per-karyawan di employee-service) versus mana yang masih konsep (siklus bulanan wajib & workflow review supervisor→HR).",
+      "hash": "47280dbd8dad127c2e4a2cc6db9cc3c394f0d65fc4f4a60f7f58e39a477d7788",
+      "ukuran_kb": 14.4,
+      "ringkasan": "Menjawab: bagaimana penilaian KPI dihitung untuk tim marketing (skor→insentif) versus appraisal per-karyawan lintas departemen, bagaimana template KPI per posisi & scoring bulanan bekerja, dan aturan pencocokan posisi template dengan jabatan karyawan pada periode yang dinilai. Juga menjelaskan RBAC per departemen, cakupan tim untuk Leader (scope=team), penggabungan tampilan lintas departemen (mis. HRGA), serta bagian mana yang sudah live dan mana yang masih konsep (siklus bulanan wajib + workflow review supervisor→HR).",
       "kata_kunci": [
         "KPI",
         "Key Performance Index",
@@ -5296,10 +5296,9 @@
         "scoring",
         "template posisi",
         "RBAC departemen",
-        "scope team",
         "supervisor",
-        "mutasi karyawan",
-        "HRGA"
+        "employee-service",
+        "marketing"
       ]
     },
     {
