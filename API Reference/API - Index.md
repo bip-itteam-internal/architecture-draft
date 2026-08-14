@@ -26,6 +26,7 @@
 | File | `/api/file/*` | [[API - File Service]] | [[Microservices - File Service]] |
 | Insentive | `/api/insentive/*` | [[API - Insentive Service]] | [[Microservices - Insentive Service]] |
 | Integration | `/api/integration/*` | [[API - Integration Service]] | [[Microservices - Integration Service]] |
+| Finance | `/api/finance/*` | [[API - Finance Service]] | [[Finance - Rancangan Finance Service]] |
 | Inventory | `/api/inventory/*` | [[API - Inventory Service]] | [[Microservices - Inventory Service]] |
 | TikTok Shop | `/api/tiktok-shop/*` | [[API - TikTok Shop Service]] | [[Microservices - TikTok Shop Service]] |
 | Task Management | `/api/task-management/*` | [[API - Task Management Service]] | [[Microservices - Task Management Service]] |
