@@ -2,7 +2,7 @@
 
 *Penanganan kedisiplinan karyawan & **Surat Peringatan (SP1/SP2/SP3)** — penerbitan oleh HR, masa berlaku 6 bulan, riwayat per karyawan, dan usulan otomatis SP1 dari akumulasi keterlambatan.*
 
-- **Status**: ⚠️ Implemented (ada catatan) — irisan 1 **selesai di kode dan terverifikasi lokal** (BE `feat/employee-surat-peringatan`, FE `feat/hris-surat-peringatan`), tapi **belum di-push/PR, belum merged, belum deploy**. Dampak payroll, skorsing, dan PHK **sengaja di luar irisan ini**; pemicu SP2/SP3 **belum terdefinisi di peraturan** (lihat *Belum Diputuskan*).
+- **Status**: ⚠️ Implemented (ada catatan) — irisan 1 **merged dan hidup di PROD** (diverifikasi 2026-08-14: banner usulan di `/hris/surat-peringatan` menampilkan angka yang cocok persis dengan `attendance_entries` prod). Penyaring **keterlambatan tanpa potongan jam** menyusul dan **belum merged** (BE `feat/attendance-telat-berpotongan`, FE `feat/hris-laporan-telat-toleransi`). Dampak payroll, skorsing, dan PHK **sengaja di luar irisan ini**; pemicu SP2/SP3 **belum terdefinisi di peraturan** (lihat *Belum Diputuskan*).
 
 ## Sumber Aturan
 
@@ -11,9 +11,53 @@ Aturannya **tidak ada di vault ini**. Sumber kebenarannya **Peraturan Perusahaan
 | Pasal | Isi yang dipakai |
 |---|---|
 | 19 & 20 | **Terlambat 3x per bulan memicu SP1.** Terlambat 5x per bulan tanpa keterangan dan mangkir 6 hari berturut-turut dikualifikasikan **mengundurkan diri** (jalur [[HRIS - Personalia]], bukan jalur SP) |
+| 19, Grace Period | Peraturan menulis toleransi keterlambatan sebagai **"(Jika ada)"** — angkanya sengaja tidak ditetapkan di sana, jadi ia setelan sistem. Lihat *Apa yang dihitung sebagai telat* di bawah |
 | 55 | **SP2**: potong **25% gaji pokok**, aktif **6 bulan sejak tanggal terbit**, menghambat kenaikan upah dan promosi |
 | 56 | **SP3**: perusahaan berhak PHK sepihak, dengan opsi masa perbaikan 1 bulan diawasi Atasan dan HRD |
 | 53 ayat 2-3 | **Skorsing**: maksimal 3 bulan, akses dicabut otomatis, upah tetap dibayar |
+
+## Apa yang dihitung sebagai telat
+
+> ⚠️ **Belum merged** (BE `feat/attendance-telat-berpotongan`, FE `feat/hris-laporan-telat-toleransi`).
+
+**Keterlambatan yang tidak menghasilkan potongan jam tidak dihitung**, tidak untuk SP dan
+tidak untuk pewarnaan laporan. Kriterianya `status = Terlambat` **dan** `late_hour > 0`.
+
+Alasannya ada di dua ambang presensi yang dijelaskan di [[HRIS - Attendance System]]: di
+antara `ontime_grace_minutes` dan `late_hour_threshold_minutes` ada band yang berstatus
+Terlambat tetapi `late_hour` nol, yaitu pelanggaran yang tak berakibat apa pun pada upah.
+Mendasari surat sanksi pada band itu berarti menghukum sesuatu yang sistem sendiri putuskan
+tak layak dipotong.
+
+Skalanya diukur ke data prod sebelum diputuskan, bukan dikira-kira (2026-08-14):
+
+| | Prod |
+|---|---|
+| Entri `Terlambat` sepanjang waktu | 1.043 |
+| Di antaranya tanpa potongan jam | **321 (31%)** |
+| Entri tanpa field `late_hour` sama sekali | **0** |
+| Periode 2026-08 | 50 telat, 32 berpotongan, 18 tidak |
+
+Angka nol di baris ketiga itu yang menentukan boleh-tidaknya penyaring `$gt: 0` dipakai:
+Mongo tak menganggap field yang absen lebih besar dari nol, jadi seandainya ada entri
+warisan tanpa field itu, mereka akan tersaring keluar **diam-diam**. Sama-sama nol di dev.
+
+Dampaknya pada periode 2026-08 di prod: usulan turun dari 3 karyawan jadi 2 di perusahaan
+BIP, dan 1 karyawan di ELT juga keluar. Yang keluar semuanya tepat di ambang 3x dengan
+mayoritas keterlambatan di dalam toleransi; yang 5x dan 6x tak bergeser sedikit pun karena
+seluruh keterlambatan mereka memang berpotongan jam.
+
+**Kriterianya satu fungsi, `kriteriaTelatDihitung` di `late_recap.go`, dan dipakai berdua**
+oleh rekap SP dan `GET /history?late=true` yang angkanya dilihat karyawan di
+[[APP - MyBharata]]. Dua rakitan terpisah pasti bercabang, dan yang kena SP akan
+membandingkan kedua angka itu. Alasan yang sama membuat batas periode diekstrak sebelumnya.
+
+Konsekuensi yang **diterima sadar**: dengan bawaan 11 menit, orang yang terlambat sepuluh
+menit setiap hari tak akan pernah memicu SP1 maupun berwarna di laporan; angka telat di
+MyBharata ikut turun tanpa pemberitahuan otomatis (pengumuman itu tugas HR, bukan fitur);
+dan HR kehilangan cara melihat siapa yang "nyaris telat" tiap hari dari layar laporan.
+Ambangnya sengaja **tidak** dibuat terpisah dari perhitungan potongan jam payroll, supaya
+tak lahir setelan kedua yang harus dirawat dan dijelaskan sendiri ke HR.
 
 ## Sudah Diimplementasikan
 
@@ -23,7 +67,7 @@ Aturannya **tidak ada di vault ini**. Sumber kebenarannya **Peraturan Perusahaan
 - **Pencabutan** dengan alasan wajib, bersifat final.
 - **Lampiran salinan surat bertanda tangan** (PDF/gambar/Word, cap 4 MB milik [[Microservices - File Service]]).
 - **Notifikasi ke karyawan** saat SP terbit dan saat dicabut, lewat [[Microservices - Notification Service]].
-- **Halaman `/hris/surat-peringatan`** di [[APP - Web ERP]], dwibahasa id/en.
+- **Halaman `/hris/surat-peringatan`** di [[APP - Web ERP]], dwibahasa id/en. Tiap baris usulan menautkan ke `/hris/report?search=<employee_id>` supaya perintah "periksa dulu data kehadirannya" punya alamat; sebelumnya HR harus tahu sendiri tempatnya dan mencari orangnya manual. Tautannya membawa **employee_id, bukan nama**: nama di usulan dibaca dari `personal_data` sedangkan nama di laporan dari salinannya di `work_schedule`, dan begitu kedua salinan menyimpang tautan berbasis nama mendarat di tabel kosong yang terbaca seperti "orang ini tak punya catatan kehadiran". Kotak cari laporan karena itu kini mencocokkan employee_id juga. *(belum merged, `feat/hris-laporan-telat-toleransi`)*
 
 Implementasi: [[Microservices - Employee Service]] · endpoint: [[API - Employee Service]] & [[API - Attendance Service]].
 

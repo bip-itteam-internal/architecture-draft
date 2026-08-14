@@ -10,7 +10,7 @@
 |---|---|---|---|
 | POST | `/tap` | Clock-in/out (fingerprint/mobile/website; `?method=`) | open (serial/MAC/token) |
 | GET | `/entries` | List entri (paginated, filter dept/status/periode) | HRIS |
-| GET | `/history` | Riwayat absensi sendiri (bulanan) | header |
+| GET | `/history` | Riwayat absensi sendiri (bulanan). `?late=true&month=YYYY-MM` membalas **satu angka** (jumlah telat periode 26→25), dipakai [[APP - MyBharata]].<br>⚠️ **Belum merged** (`feat/attendance-telat-berpotongan`): angka itu kini hanya menghitung telat yang **berpotongan jam**, memakai `kriteriaTelatDihitung` yang sama dengan `/internal/late-recap` supaya angka yang dilihat karyawan tak bercabang dari angka yang dipakai HR menerbitkan SP | header |
 | GET | `/report` | Laporan periode 26→25 (`?yyyy-mm`); tiap entry juga membawa `leave_subtype` (bedakan Izin urusan kantor vs pribadi di FE) | HRIS |
 | PATCH | `/:id/update` | Update entri (+dokumen/status/comment) | HRIS |
 | GET | `/payroll-supplement` | Agregasi jam → payout_pct (`?employee_id`); dibayar/dipotong per status dari master treatment | open |
@@ -80,7 +80,7 @@ Ringkasan/detail **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar) dari sat
 | POST/GET | `/fingerprint/export` | Upsert/list ekspor fingerprint | open (serial) |
 | GET/POST/DELETE | `/networks` · `/internal/wifi/add` · `/delete` | WiFi kantor (validasi on-site) | open / ITStaff |
 | GET | `/internal/summary` | Ringkasan 24 jam (utk HRIS orchestrator) | HRIS |
-| GET | `/internal/late-recap` | ⚠️ **belum merge & belum deploy** (branch `feat/employee-surat-peringatan`). Jumlah telat **per karyawan** satu periode, untuk usulan SP1 di [[HRIS - Disciplinary (Surat Peringatan)]]. `?period=YYYY-MM` (wajib, 400 bila tak terurai) · `?min=` (bawaan 1). Periodenya **26 bulan lalu sampai 25 bulan ini**, dihitung `rentangPeriodeTelat` yang sama dengan `/history?late=true` supaya tak lahir dua angka "telat bulan ini". Balasan `{period, from, to, min, data[]{employee_id, late_count}}`, `data` selalu slice non-nil. Menghormati `?company=` bagi admin pusat | HRIS |
+| GET | `/internal/late-recap` | ✅ merged & hidup di prod (diverifikasi 2026-08-14). Jumlah telat **per karyawan** satu periode, untuk usulan SP1 di [[HRIS - Disciplinary (Surat Peringatan)]]. `?period=YYYY-MM` (wajib, 400 bila tak terurai) · `?min=` (bawaan 1). Periodenya **26 bulan lalu sampai 25 bulan ini**, dihitung `rentangPeriodeTelat` yang sama dengan `/history?late=true` supaya tak lahir dua angka "telat bulan ini". Balasan `{period, from, to, min, data[]{employee_id, late_count}}`, `data` selalu slice non-nil. Menghormati `?company=` bagi admin pusat.<br>⚠️ **Belum merged** (`feat/attendance-telat-berpotongan`): yang dihitung hanya `status = Terlambat` **DAN** `late_hour > 0`, jadi keterlambatan di dalam toleransi tak lagi masuk. Penyaring yang sama berlaku di `/history?late=true` | HRIS |
 
 **`/internal/` bukan berarti privat** pada tabel di atas: gateway tetap meneruskannya dari internet, jadi tiap rute memeriksa identitas pemanggilnya sendiri. `/internal/late-recap` memaparkan siapa saja yang sering terlambat di seluruh perusahaan, karena itu digerbang `RequireHRISStaff`.
 

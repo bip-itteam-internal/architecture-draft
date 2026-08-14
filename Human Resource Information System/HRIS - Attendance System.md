@@ -46,6 +46,39 @@ Ini adalah fitur yang terikat dan dimiliki oleh HRIS untuk attendance
 Fitur tambahan
  - Kita mungkin ingin mempertimbangkan penggunaan lingkungan kerja hybrid/remote, sehingga karyawan perlu melakukan clock-in/out dengan aplikasi mobile di luar jaringan perusahaan
 
+## Ambang Keterlambatan
+
+Presensi mengenal **dua** ambang, bukan satu, dan keduanya bisa disetel per perusahaan
+(`company_attendance_setting`, dibaca `resolveAttendanceRule` di
+`services/attendance/attendance_setting.go`). Aturan yang berlaku saat entri dibuat ikut
+disalin ke entri itu sendiri (`AttendanceEntries.Rule`), jadi mengubah setelan tidak
+menulis ulang masa lalu.
+
+| Setelan | Bawaan | Artinya |
+|---|---|---|
+| `ontime_grace_minutes` | 1 menit | Di bawah ini status tetap **Tepat Waktu** |
+| `late_hour_threshold_minutes` | 11 menit | Di bawah ini status **Terlambat** tapi `late_hour` = 0 |
+
+Perhitungannya di `calcLateStatus` (`correction.go`): `late_hour` dihitung dari selisih
+terhadap **ambang**, bukan terhadap jam masuk, lalu dibulatkan ke atas per jam.
+
+```
+jam masuk →   jadwal        +1 mnt                  +11 mnt
+              │  (grace)                            │  (threshold)
+  status:     │ Tepat Waktu  │      Terlambat       │      Terlambat
+  late_hour:  │      0       │          0           │        ≥ 1
+```
+
+Akibatnya ada **band di antara kedua ambang** yang tercatat sebagai pelanggaran tetapi tak
+berakibat apa pun pada upah. Ini bukan kasus pinggiran: di produksi per 2026-08-14, **321
+dari 1.043** entri Terlambat (31%) ada di band itu. Karena itu band tersebut **tidak
+dihitung** sebagai keterlambatan untuk Surat Peringatan dan **tidak diwarnai** di laporan —
+lihat [[HRIS - Disciplinary (Surat Peringatan)]].
+
+Validasi setelan menolak `late_hour_threshold_minutes` yang lebih kecil dari
+`ontime_grace_minutes`; keduanya boleh **0** dengan sengaja, jadi nilai nol tidak
+diperlakukan sebagai "belum diisi".
+
 ## Kebutuhan
 
 - [x] Master data karyawan (referensi lookup)
@@ -55,6 +88,7 @@ Fitur tambahan
 
 - [[HRIS - Attendance Correction]] — Alur koreksi untuk clock-in/out yang terlewat
 - [[HRIS - Tukar Jadwal Kerja]] — Alur pertukaran shift/hari libur
+- [[HRIS - Disciplinary (Surat Peringatan)]] — Konsumen angka keterlambatan; memakai ambang di atas untuk memutuskan mana yang dihitung
 
 ## Dependensi
 
