@@ -1,6 +1,6 @@
 ---
 name: deploy-bip-erp
-description: Gunakan saat men-deploy service bip-erp ke dev atau prod, saat memverifikasi apakah sebuah merge sudah benar-benar mendarat, atau saat gejala aneh muncul setelah deploy (502, notifikasi tak tiba, menu hilang, fitur tak bereaksi). Menentukan container mana saja yang harus naik, urutannya, dan gerbang verifikasi yang membuktikan fiturnya jalan.
+description: Gunakan saat men-deploy service bip-erp ke dev atau prod, saat memverifikasi apakah sebuah merge sudah benar-benar mendarat, atau saat gejala aneh muncul setelah deploy (502, notifikasi tak tiba, menu hilang, fitur tak bereaksi). Menentukan container mana saja yang harus naik, urutannya, dan gerbang verifikasi yang membuktikan fiturnya jalan. Di PROD agent hanya menyiapkan perintah; manusia yang menjalankan (§0).
 ---
 
 # Deploy bip-erp
@@ -16,11 +16,51 @@ membuktikan deploy-nya berhasil**.
 
 ---
 
+## 0. PROD: agent menyiapkan, manusia menjalankan
+
+**Keputusan tim 2026-08-14. Baca ini sebelum apa pun.**
+
+Di prod, agent **dilarang menjalankan perintah yang mengubah keadaan**. Yang boleh
+dikerjakannya berhenti di menyiapkan.
+
+| Di PROD | Agent | Manusia |
+|---|---|---|
+| Menyusun daftar container, urutan, dan perintahnya | ✅ | |
+| Membaca keadaan: `docker ps`, `logs`, `inspect`, `/health`, GET lewat gateway, query Mongo baca | ✅ | |
+| `docker compose build` · `up -d` · `restart` · `pull` · `down` | ⛔ | ✅ |
+| Menyunting `.env`, compose, atau berkas apa pun di server | ⛔ | ✅ |
+| `git pull` / checkout di server | ⛔ | ✅ |
+| Menulis ke DB, memicu job, menyalakan feature flag | ⛔ | ✅ |
+
+**DEV tidak kena aturan ini.** Agent boleh men-deploy dev sendiri. Bukan karena dev tak
+penting, tapi karena dev memang tempat mencoba: pipeline sudah menyentuhnya otomatis tiap
+merge, dan salahnya bisa diulang. Prod tak punya keduanya.
+
+**Bentuk keluaran yang benar untuk prod** adalah blok perintah siap-tempel, berurutan, satu
+tujuan per blok, ditutup gerbang verifikasi §4 yang akan dijalankan orangnya. Bukan narasi,
+bukan ringkasan langkah. Kalau agent tak sanggup menuliskannya sebagai perintah yang bisa
+langsung ditempel, ia belum benar-benar paham deploy-nya dan belum layak menyuruh orang
+menjalankannya.
+
+**Izin sambil lalu tidak cukup.** Bila user memerintahkan eksekusi prod secara eksplisit,
+sebutkan dulu bahwa itu menyimpang dari aturan ini, sebutkan apa yang akan berubah, lalu
+minta ia menegaskan sekali lagi. Yang dilarang adalah **agent memutuskan sendiri** bahwa
+keadaannya cukup aman.
+
+Kenapa dipisah begini: prod tak punya undo, dan deploy prod tak punya gerbang otomatis apa
+pun. Satu-satunya gerbang yang tersisa adalah orang yang menekan enter, dan itu justru
+gerbang yang paling gampang hilang tanpa ada yang sadar. Aturan ini sekaligus menutup
+ambiguitas lama pada "jangan menyentuh prod tanpa diminta eksplisit" di §6, yang selama ini
+menyerahkan tafsir "diminta eksplisit" kepada agent di tengah percakapan.
+
+---
+
 ## 1. Tentukan lingkungannya dulu
 
 | | DEV | PROD |
 |---|---|---|
 | Cara deploy | Pipeline jalan sendiri setelah merge ke `main` | **Selalu manual.** Merge ke `main` tidak menyentuh prod sama sekali |
+| Siapa mengeksekusi | Agent boleh | **Orang.** Agent berhenti di menyiapkan perintah (§0) |
 | Boleh dipercaya? | **Tidak.** Lihat §5 | Kamu yang menjalankan, jadi kamu tahu |
 
 **Jangan pernah mengatakan "sudah ter-deploy" hanya karena PR-nya merged.** Untuk prod itu
@@ -134,7 +174,8 @@ Jebakan lain yang sudah terbukti:
 
 - **Jangan menyalin isi runbook ke sini atau ke tempat lain.** Vault adalah sumber
   kebenarannya; salinan kedua akan menyimpang tanpa ada yang sadar.
-- **Jangan menyentuh prod tanpa diminta eksplisit.** Host, user, app dir, dan kunci SSH prod
+- **Jangan mengeksekusi apa pun yang mengubah keadaan prod** (§0). Agent berhenti di
+  menyiapkan perintah; orang yang menjalankannya. Host, user, app dir, dan kunci SSH prod
   ada di dok IT vault, dan tiap orang memakai kuncinya sendiri.
 - **Jangan menyalakan feature flag yang dorman** hanya karena kamu men-deploy service-nya.
   Beberapa flag memicu aksi nyata dan tak bisa dibatalkan ke pihak luar. Runbook §3b
