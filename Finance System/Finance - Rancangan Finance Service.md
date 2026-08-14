@@ -644,23 +644,90 @@ berhenti terhitung sejak saat itu juga. Karena itu `tak_ada` dilaporkan di katal
 yang **sukses** sekalipun, dan ditulis ke log **tiap run** worker — tanpa itu satu-satunya jejaknya
 adalah varians yang perlahan menyimpang.
 
-**Diperkirakan `ter_resolve` ≈ 52, bukan 58.** Enam nama ini tak ada di ekspor Laba/Rugi:
-`Beban Software & Server Marketing` (Accurate hanya punya `Beban Software` dan `Beban Server`
-polos, padahal sheet Finance mencatat realisasi Rp 58.032.606), `Beban K3`,
-`Beban PPh Badan Pasal 31E`, `Beban PPN KMS Gedung`, `Beban Denda Pajak`, `Beban Pajak KOL`.
-Itu perilaku yang benar dan justru bukti mekanismenya bekerja; yang perlu dibereskan ada di sisi
-Accurate/Finance.
+**`ter_resolve` = 56 dari 58** — terverifikasi di **produksi** 2026-08-14 lewat
+`GET /accounting/anggaran/katalog`. `ambigu` kosong. Hanya dua nama yang tak ditemukan:
+
+| Komponen | Keadaan |
+|---|---|
+| `Beban Software & Server Marketing` | Accurate hanya punya `Beban Software` dan `Beban Server` polos. Sheet Finance mencatat realisasi **Rp 58.032.606** yang **tak akan pernah terbaca ERP** sampai akunnya dibuat di Accurate. Finance mengonfirmasi ini akun operasional marketing, jadi ia harus diadakan — bukan dihapus dari daftar |
+| `Beban PPN KMS Gedung` | Realisasi nol, tak beranggaran di Rev 2. Dampaknya kecil, kelasnya sama |
+
+> ⚠️ **GOTCHA — ekspor Laba/Rugi BUKAN bagan akun.** Dokumen ini sempat menulis perkiraan
+> "≈ 52, enam nama hilang" berdasarkan `laba_atau_rugi_multi_periode_*.xlsx`. **Salah**: berkas itu
+> laporan laba rugi, dan ia **hanya memuat akun yang punya nilai di periode yang ditampilkan**.
+> `Beban K3` (realisasi Rp 0 di Juli) tidak muncul di sana, lalu disimpulkan tidak ada di Accurate —
+> padahal ia ada, bernomor **6229**, dan tim Finance yang mengoreksinya. Tiga akun lain yang ikut
+> dituduh hilang (`PPh Badan 31E`, `Denda Pajak`, `Pajak KOL`) juga ada; ketiganya kebetulan
+> berealisasi nol. **Untuk memeriksa keberadaan akun, pakai katalog/bagan akun, jangan laporan
+> berperiode** — ketiadaan di laporan bukan ketiadaan di bagan akun.
+
+**Celah yang tersisa: `opex_tak_lengkap` belum punya tampilan.** Backend melaporkannya di respons
+unggah dan di katalog, tetapi **tidak satu pun komponen frontend merendernya** (nol kecocokan di
+`erp-frontend/src/`). Jadi kedua akun di atas tidak terlihat di layar mana pun; penggantinya
+sementara adalah menghitung isi dropdown **Akun beban** (harus 56) atau memanggil katalognya
+langsung. Jaminan "komponen tak ter-resolve tidak lenyap diam-diam" karenanya baru berlaku di API,
+belum di layar.
 
 **Populasi realisasi ikut diperbaiki.** Lihat [[IT - Background Jobs & Schedulers]] — refresh
 sekarang menarik seluruh akun OPEX, bukan hanya yang beranggaran, sehingga Rp 150.186.975 belanja
 Juli yang selama ini tak pernah muncul di layar varians kini terlihat sebagai
 `anggaran_belum_diisi`.
 
+## Master OPEX Terisi — ✅ Terverifikasi di Produksi (2026-08-14)
+
+Rangkaiannya tuntas: daftar ditegakkan → anggaran Rev 2 diunggah → realisasi ditarik → varians
+tampil. Angka Juli 2026 di `/finance/anggaran` produksi:
+
+| | |
+|---|---|
+| Anggaran (38 baris) | Rp 5.028.934.685 |
+| Realisasi | Rp 3.208.108.105 |
+| Varians OPEX | Rp 1.820.826.580 · terpakai **63,8%** |
+| Pos lewat anggaran | **4 pos** |
+| Cakupan | 38 dihitung + **18 belum dianggarkan** = 56 |
+
+**Keempat pemetaan nama Rev 2 terbukti benar** terhadap bagan akun produksi, bukan sekadar dugaan:
+`6107 Beban Iklan` Rp 3.579.122.639 (dari `Beban Iklan + Pajak Iklan`), `6116 Beban Packing Gd
+Sidareja` Rp 388.138.000 (dari `Beban Packing`), `6201 Beban Gaji Karyawan Adum` Rp 311.371.400
+(dari `Total Gaji UMUM`), `6101 Beban Gaji Sales & Marketing` Rp 307.414.950 (dari
+`Total Gaji MARKETING`).
+
+**Baris "belum dianggarkan" itu bukti perbaikan populasi refresh bekerja.** Ia hanya bisa muncul
+bila realisasi ditarik untuk akun yang TIDAK punya anggaran — di kode lama akun begitu tak pernah
+ditarik sama sekali, sehingga penanda "BUKAN potret utuh" tak pernah menyala.
+
+**Silang dengan sheet Finance**: realisasi OPEX Juli menurut `Juli_Monitoring Anggaran` =
+Rp 3.394.909.594, ERP = Rp 3.208.108.105. Selisih **Rp 186.801.489** kira-kira sebesar realisasi
+akun yang belum beranggaran. Kedua angka **tidak bertentangan** — populasinya berbeda, dan ERP
+menyatakan bedanya terang-terangan lewat cacah "18 belum dianggarkan" alih-alih menyembunyikannya.
+
+**Jebakan yang sudah menggigit sekali**: berkas unggahan versi pertama memuat 7 sel bernilai
+pecahan (mis. `4902341483.55`) dan **ketujuhnya ditolak** — `parseNominalAnggaran` sengaja menolak
+bentuk berambigu alih-alih menebak, karena `"10.000"` yang terbaca `10,0` membuat anggaran 1000×
+lebih kecil tanpa satu pun sinyal. Penolakannya **per sel bulan**, bukan per baris, jadi kerusakannya
+terbatas. Pembangkit berkas wajib membulatkan ke rupiah.
+
 **Masih menunggu Finance** (tidak memblokir penegakan di atas): perlakuan tiga akun pajak yang
 berasal dari jurnal penyesuaian (`Beban PPh Final UMKM`, `Beban PPh Badan Pasal 31E`,
-`Beban PPh 23`) di dalam perhitungan varians. Keanggotaannya di daftar sudah pasti; yang belum
-adalah apakah ketiganya ikut dihitung. Argumen untuk mengeluarkannya: nilainya turunan dari omzet
-dan laba, jadi KPI Cost Control akan memburuk justru ketika perusahaan menjual lebih banyak.
+`Beban PPh 23`) di dalam perhitungan varians. **Dijawab 2026-08-14: ketiganya MASUK varians OPEX.**
+Konsekuensinya belum tuntas — Rev 2 tak memberi mereka angka bulanan, jadi ketiganya tampil
+`anggaran_belum_diisi`; bila memang ingin ikut terhitung, Finance perlu memberi anggarannya.
+Keanggotaannya di daftar sudah pasti. Keberatan yang **sudah disampaikan dan ditolak** Finance:
+nilainya turunan dari omzet dan laba, jadi KPI Cost Control memburuk justru ketika perusahaan
+menjual lebih banyak. Finance tetap memilih memasukkannya — dicatat di sini supaya keputusannya
+tidak dibongkar ulang tanpa alasan baru.
+
+Dua pertanyaan lain **juga dijawab 2026-08-14**: `Beban FO & Optimasi Toko` dan
+`Beban Packing Pihak Ketiga` **komponen operasional marketing** (keduanya belanja nyata Rp 82 jt +
+Rp 37 jt di Juli yang **tidak dianggarkan** di Rev 2 — kini terlihat sebagai `anggaran_belum_diisi`,
+dan itu temuan cost control tersendiri, bukan cacat data), dan `Beban Software & Server Marketing`
+**akun operasional marketing** — sehingga akunnya perlu **diadakan di Accurate**, bukan dikeluarkan
+dari daftar.
+
+**Yang tersisa menunggu Finance tinggal satu**: apakah `Beban Lain-lain Marketing` sama dengan
+`Beban Lain-Lain Penjualan` di Rev 2. Nilainya naik dari Rp 41 jt ke Rp 90 jt dan namanya bergeser
+dari "Marketing" ke "Penjualan", jadi pemetaannya **sengaja tidak ditebak** dan barisnya dibiarkan
+kosong. Menambahkannya cukup lewat form **Tambah baris**, tanpa unggah ulang.
 
 ## Keputusan yang Ditunggu dari Tim Finance
 
