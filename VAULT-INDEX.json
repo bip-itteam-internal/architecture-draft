@@ -4198,20 +4198,20 @@
         "External - Accurate",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "de6e15a971e6e908ed22d5969778b7ea5e442a0a671a5424801c6b9616b0fade",
-      "ukuran_kb": 59.9,
-      "ringkasan": "Menjawab: kenapa finance-service dibuat, modul apa saja yang masuk lingkupnya (Tax, Cost Control, jembatan KPI, jalur entri OPEX) dan apa yang sengaja tidak dimigrasi dari integration-service. Menjelaskan bagaimana metrik KPI departemen FAT bisa terisi otomatis lewat GET /internal/kpi/metrics, pembagian tiga lapis rumus (agregasi mentah di service pemilik data, rumus metrik di employee-service, rumus skor di shared-library), serta kenapa metrik AR bersifat tim bukan per individu. Juga memuat RBAC, alur & mesin status tiap modul, cara master data terisi, rancangan frontend, mode kegagalan, dan daftar keputusan Finance yang masih ditunggu.",
+      "hash": "e3ca082cc6fd18802f9c6e078fb772905a9a7ee1fbf51fb839a8841c8283c26d",
+      "ukuran_kb": 61.1,
+      "ringkasan": "Menjawab: apa lingkup finance-service (modul Tax, Cost Control, jembatan KPI), kenapa metrik KPI departemen Finance tidak terisi otomatis, dan master data mana — kewajiban pajak, register SPT, penghematan, forecast kas, anggaran OPEX — yang harus ada agar metriknya menyala. Menjelaskan juga pembagian tiga lapis rumus (agregasi di service pemilik data, rumus metrik di employee-service, rumus skor di shared-library), kenapa master anggaran OPEX tetap tinggal di integration-service, dan kenapa metrik AR bersifat tim bukan per individu. Berisi RBAC, peta aktor, alur tiap modul, cara master data terisi, rancangan frontend, mode kegagalan, serta daftar keputusan yang masih ditunggu dari tim Finance.",
       "kata_kunci": [
         "finance-service",
-        "FAT",
-        "KPI Finance",
-        "anggaran OPEX",
-        "varians OPEX",
-        "forecast kas",
-        "cashflow",
+        "OPEX",
+        "anggaran",
+        "budget",
         "pajak",
-        "tax SPT",
-        "piutang (AR)"
+        "tax",
+        "cost control",
+        "forecast cashflow",
+        "KPI FAT",
+        "piutang AR"
       ]
     },
     {
@@ -7636,19 +7636,19 @@
         "RUN - Deploy Task Management Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "30c9ff0b2e029d8388dbc61124f36b5527dd9d5a06cad4cdd006d9d6fee38f2e",
-      "ukuran_kb": 12.1,
-      "ringkasan": "Menjawab: bagaimana cara men-deploy ulang satu microservice bip-erp ke produksi tanpa menyentuh dependensinya, kenapa flag --no-deps wajib di jam rawan, dan kapan justru tidak boleh dipakai. Menjelaskan urutan aman antar-service yang saling bergantung, aturan bahwa perubahan shared-library menuntut service pembacanya ikut di-rebuild (kasus kategori inbox dan klaim JWT yang gagal senyap), cara memeriksa umur image container untuk membuktikan biner memuat logika yang dicari, perbedaan compose dev vs produksi, verifikasi pasca-deploy, serta troubleshooting gejala ke akar masalah.",
+      "hash": "5fbeb98f8a9225e8a9593bed20ee7ff7e76cdb45a76e8b31267813acd0baa537",
+      "ukuran_kb": 13.9,
+      "ringkasan": "Menjawab: bagaimana men-deploy ulang satu microservice bip-erp ke produksi tanpa menyentuh dependensinya, kenapa `--no-deps` wajib saat jam rawan (dan kapan justru tidak boleh dipakai), serta urutan aman bila dua service saling memanggil. Menjelaskan cara membuktikan deploy benar-benar mendarat — tarik kode dulu karena `--build` membangun dari disk, lalu periksa umur image — dan kenapa perubahan `shared-library` menuntut semua service pembacanya ikut di-rebuild, termasuk kasus kategori inbox notifikasi yang gagal senyap. Ditutup dengan verifikasi pasca-deploy, service yang hanya ada di compose produksi, fitur dorman di balik feature flag, dan troubleshooting gejala → akar → fix.",
       "kata_kunci": [
         "deploy",
-        "runbook",
         "docker compose",
         "--no-deps",
+        "rebuild image",
+        "produksi",
+        "prod",
         "microservice",
         "shared-library",
-        "rebuild container",
         "notification-service",
-        "produksi",
         "troubleshooting"
       ]
     },

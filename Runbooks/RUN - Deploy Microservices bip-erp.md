@@ -17,10 +17,44 @@ Men-deploy ulang **satu** microservice bip-erp ke produksi (rebuild image + recr
 ## 1. Perintah deploy per-service
 
 ```bash
+cd <folder stack>
+git fetch origin main && git reset --hard origin/main   # ← WAJIB, lihat §1a
 docker compose up -d --build <service> --no-deps
+docker image inspect bip-erp-<service> --format '{{.Created}}'   # ← gerbang, lihat §1b
 ```
 
 `--build` rebuild image dari source; `-d` detached; **`--no-deps` = kunci utama** (lihat §2).
+
+### 1a. Tarik kode dulu — `--build` membangun dari DISK, bukan dari `main`
+
+Runbook ini semula langsung ke perintah compose, karena sesi yang melahirkannya kebetulan punya
+checkout yang sudah mutakhir. Asumsi itu tak pernah terlihat sampai ia menggigit.
+
+**2026-08-14, produksi**: PR sudah merge ke `main`, `docker compose up -d --build
+integration-service --no-deps` dijalankan, dan **semuanya melaporkan berhasil** — build sukses,
+container naik, healthcheck hijau. Tetapi checkout di VM masih commit lama, jadi tak satu pun
+berkas berubah, build kena cache penuh, dan **image yang dihasilkan identik dengan yang lama**.
+Perilaku service tidak berubah sedikit pun. Tidak ada satu pun pesan galat di mana pun.
+
+### 1b. "Build sukses" BUKAN bukti — periksa umur image
+
+Dua kegagalan senyap yang berlawanan arah, keduanya terjadi dalam dua hari ke tim yang sama:
+
+| Yang basi | Gejalanya |
+|---|---|
+| **Container** (checkout benar) | Fitur tampak "sudah di prod" padahal biner lama yang melayani — `integration-service` tertinggal 10 jam setelah dua PR merge, 2026-08-14 |
+| **Checkout** (container baru dibangun) | `build` dan `up -d` sama-sama sukses, image identik, timestamp tak bergerak |
+
+Gerbangnya satu baris, dan ia yang membedakan keduanya:
+
+```bash
+docker image inspect bip-erp-<service> --format '{{.Created}}'
+```
+
+Harus **lebih baru dari waktu merge commit yang kamu harapkan hidup**. `docker ps`, `/health`,
+`docker compose build` yang sukses, dan "checkout-nya sudah benar" — **tak satu pun dari itu
+membuktikan biner mana yang sedang melayani permintaan**. Bukti terakhirnya tetap satu panggilan
+lewat gateway yang menunjukkan perilaku barunya.
 
 ## 2. Kenapa `--no-deps` WAJIB di jam rawan
 

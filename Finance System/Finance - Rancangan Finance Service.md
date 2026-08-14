@@ -630,7 +630,7 @@ Kelemahannya — Finance tak bisa melihat isinya tanpa repo — ditutup dengan
 - **Alasan penolakannya dibedakan** dari "akun tidak dikenal". Akunnya memang ada di Accurate; ia
   hanya bukan OPEX. Kalimat yang sama akan mengirim pengunggah memeriksa bagan akun — tempat yang
   salah.
-- **Gagal-tertutup**: bila tak satu pun dari 58 komponen ter-resolve, permintaan dijawab **502**
+- **Gagal-tertutup**: bila tak satu pun dari 57 komponen ter-resolve, permintaan dijawab **502**
   dengan sebab sesungguhnya. Mengartikan kekosongan sebagai "tanpa penyaringan" akan membuat satu
   kegagalan di pemanggil mematikan seluruh penyaringan diam-diam.
 - **Pencocokan memakai normalizer yang SAMA dengan parser** (`normalisasiNamaAkun`). Normalizer
@@ -644,13 +644,25 @@ berhenti terhitung sejak saat itu juga. Karena itu `tak_ada` dilaporkan di katal
 yang **sukses** sekalipun, dan ditulis ke log **tiap run** worker — tanpa itu satu-satunya jejaknya
 adalah varians yang perlahan menyimpang.
 
-**`ter_resolve` = 56 dari 58** — terverifikasi di **produksi** 2026-08-14 lewat
-`GET /accounting/anggaran/katalog`. `ambigu` kosong. Hanya dua nama yang tak ditemukan:
+**`ter_resolve` = 56 dari 57** — terverifikasi di **produksi** 2026-08-14 lewat
+`GET /accounting/anggaran/katalog`. `ambigu` kosong. Tersisa satu nama yang tak ditemukan:
+`Beban PPN KMS Gedung` — realisasi nol, tak beranggaran di Rev 2, dampaknya nihil.
 
-| Komponen | Keadaan |
-|---|---|
-| `Beban Software & Server Marketing` | Accurate hanya punya `Beban Software` dan `Beban Server` polos. Sheet Finance mencatat realisasi **Rp 58.032.606** yang **tak akan pernah terbaca ERP** sampai akunnya dibuat di Accurate. Finance mengonfirmasi ini akun operasional marketing, jadi ia harus diadakan — bukan dihapus dari daftar |
-| `Beban PPN KMS Gedung` | Realisasi nol, tak beranggaran di Rev 2. Dampaknya kecil, kelasnya sama |
+> ⚠️ **KOREKSI — `Beban Software & Server Marketing` BUKAN AKUN, dan uangnya tak pernah hilang.**
+> Dokumen ini sempat menulis bahwa realisasi **Rp 58.032.606** miliknya *"tak akan pernah terbaca
+> ERP sampai akunnya dibuat di Accurate"*. **Salah.** Baris itu pemecahan sisi Finance: sheet
+> monitoring memisah porsi marketing dari porsi Adum untuk keperluan internal, sedangkan Accurate
+> hanya punya `Beban Software` dan `Beban Server` gabungan — dan **keduanya sudah ada di daftar
+> ini**. Angkanya membuktikan (Juli 2026): Accurate `62.577.227 + 14.687.935 = 77.265.162`
+> vs sheet Finance `13.368.764 + 5.134.625 + 58.032.606 = 76.535.995`. Porsi marketing itu **sudah
+> termasuk** di kedua akun Accurate.
+>
+> Karena itu ia **dikeluarkan dari daftar** (58 → **57**, commit `8edea1d4`). Bukan kosmetik:
+> selama ia di daftar ia permanen jadi `tak_ada`, dan bila suatu hari ada yang membuat akun bernama
+> itu di Accurate lalu memasukkannya kembali, nilainya **terhitung dua kali**. Ketiadaannya ditulis
+> sebagai komentar di posisinya dalam `opex_daftar.go` — bukan sekadar dihapus — supaya orang yang
+> membandingkan dengan sheet (58 baris) tidak menyangka kelewat. Dikonfirmasi tim Finance
+> 2026-08-14.
 
 > ⚠️ **GOTCHA — ekspor Laba/Rugi BUKAN bagan akun.** Dokumen ini sempat menulis perkiraan
 > "≈ 52, enam nama hilang" berdasarkan `laba_atau_rugi_multi_periode_*.xlsx`. **Salah**: berkas itu
@@ -680,17 +692,32 @@ tampil. Angka Juli 2026 di `/finance/anggaran` produksi:
 
 | | |
 |---|---|
-| Anggaran (38 baris) | Rp 5.028.934.685 |
-| Realisasi | Rp 3.208.108.105 |
-| Varians OPEX | Rp 1.820.826.580 · terpakai **63,8%** |
+| Anggaran (39 baris) | Rp 5.118.934.685 |
+| Realisasi | Rp 3.208.784.105 |
+| Varians OPEX | Rp 1.910.150.580 · terpakai **62,7%** |
 | Pos lewat anggaran | **4 pos** |
-| Cakupan | 38 dihitung + **18 belum dianggarkan** = 56 |
+| Cakupan | 39 dihitung + **17 belum dianggarkan** = 56 |
 
-**Keempat pemetaan nama Rev 2 terbukti benar** terhadap bagan akun produksi, bukan sekadar dugaan:
+Unggahannya `229 baris masuk · 0 ditolak` — satu baris anggaran = satu kombinasi akun × bulan,
+jadi 39 akun × 6 bulan = 234 potensial dikurangi 5 sel yang memang kosong (dilewati, **tidak**
+disimpan sebagai nol).
+
+**Kelima pemetaan nama Rev 2 terbukti benar** terhadap bagan akun produksi, bukan sekadar dugaan:
 `6107 Beban Iklan` Rp 3.579.122.639 (dari `Beban Iklan + Pajak Iklan`), `6116 Beban Packing Gd
 Sidareja` Rp 388.138.000 (dari `Beban Packing`), `6201 Beban Gaji Karyawan Adum` Rp 311.371.400
 (dari `Total Gaji UMUM`), `6101 Beban Gaji Sales & Marketing` Rp 307.414.950 (dari
-`Total Gaji MARKETING`).
+`Total Gaji MARKETING`), dan **`Beban Lain-lain Marketing` Rp 90.000.000** (dari
+`Beban Lain-Lain Penjualan`).
+
+Yang kelima sempat **sengaja ditahan** karena nilainya naik dari Rp 41 jt (RAPB awal) ke Rp 90 jt
+dan namanya bergeser dari "Marketing" ke "Penjualan". Dikonfirmasi Finance 2026-08-14, didukung
+tiga bukti: posisinya identik (tepat setelah baris iklan di blok Beban Penjualan), RAPB awal
+memakai **ejaan akun Accurate persis** di slot itu, dan Accurate **tidak punya** akun bernama
+`Beban Lain-Lain Penjualan` — jadi Rev 2 mengganti nama **baris anggaran**, bukan akunnya.
+
+Penambahannya menghasilkan silang yang rapi: varians naik **tepat Rp 89.324.000** dan realisasi
+naik **tepat Rp 676.000** — angka kedua persis realisasi Juli akun itu di Accurate, yang baru ikut
+terhitung setelah barisnya menjadi *terdefinisi*; dan 90.000.000 − 676.000 = 89.324.000.
 
 **Baris "belum dianggarkan" itu bukti perbaikan populasi refresh bekerja.** Ia hanya bisa muncul
 bila realisasi ditarik untuk akun yang TIDAK punya anggaran — di kode lama akun begitu tak pernah
@@ -724,10 +751,11 @@ dan itu temuan cost control tersendiri, bukan cacat data), dan `Beban Software &
 **akun operasional marketing** — sehingga akunnya perlu **diadakan di Accurate**, bukan dikeluarkan
 dari daftar.
 
-**Yang tersisa menunggu Finance tinggal satu**: apakah `Beban Lain-lain Marketing` sama dengan
-`Beban Lain-Lain Penjualan` di Rev 2. Nilainya naik dari Rp 41 jt ke Rp 90 jt dan namanya bergeser
-dari "Marketing" ke "Penjualan", jadi pemetaannya **sengaja tidak ditebak** dan barisnya dibiarkan
-kosong. Menambahkannya cukup lewat form **Tambah baris**, tanpa unggah ulang.
+**Seluruh pertanyaan Finance untuk Master OPEX sudah terjawab per 2026-08-14.** Yang tersisa bukan
+lagi keputusan melainkan pekerjaan: `Beban PPN KMS Gedung` belum ada di bagan akun Accurate
+(dampak nihil — realisasi nol, tak beranggaran), dan **metrik KPI-nya sendiri belum diperiksa**
+apakah sudah terisi otomatis di halaman KPI Cost Control. Yang terakhir itu tujuan seluruh
+rangkaian ini; master datanya kini ada, jadi tak ada lagi yang menghalanginya.
 
 ## Keputusan yang Ditunggu dari Tim Finance
 
@@ -737,7 +765,7 @@ Dikelompokkan menurut apa yang berhenti bila tak dijawab. **Tak satu pun dapat d
 
 | # | Keputusan | Pemilik | Status |
 |---|---|---|---|
-| 1 | **Akun mana saja yang masuk "OPEX"** untuk metrik varians | Cost Control + SPV FAT | ✅ **Dijawab**: 58 komponen, lihat di bawah |
+| 1 | **Akun mana saja yang masuk "OPEX"** untuk metrik varians | Cost Control + SPV FAT | ✅ **Dijawab**: 58 baris sheet → **57 komponen** (satu bukan akun), lihat di bawah |
 | 2 | **Revisi mana yang berlaku untuk Juli** | SPV FAT | ✅ **Dijawab**: pakai **RAPB Rev 2** |
 | 3 | **`Beban Iklan + Pajak Iklan` dipecah atau tetap satu baris** | Cost Control | 🟡 Terjawab sebagian: di Rev 2 keduanya **sudah dilebur** jadi satu baris `Beban Iklan + Pajak Iklan`. Yang belum: apakah peleburan itu memang final |
 | 4 | **Akun bernilai kosong: "dianggarkan nol" atau "belum dianggarkan"?** | Cost Control | ✅ **Terjawab dari berkas**: 16 komponen tanpa padanan di RAPB **semuanya berbudget nol** → mereka akun **realisasi-saja**, jadi jawabannya "belum dianggarkan" |
