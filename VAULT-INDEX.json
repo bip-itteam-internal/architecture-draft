@@ -1136,8 +1136,8 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "879bba2e4ad6516ddc9c48c56d45e5ec9da7d5d360b857273b6f75828a356c99",
-      "ukuran_kb": 257.5,
+      "hash": "53e9d7d44ff6d81249aa0a1eca3d203d43b410939496cf113b5032207fbaa02c",
+      "ukuran_kb": 257.6,
       "ringkasan": "Menjawab: apa itu portal web \"One Bharata\" (hris-dashboard), stack teknologinya, dan bagaimana login, refresh token, serta SSO Identity Provider bekerja. Menjelaskan cara role gating menentukan menu yang tampil (key `system_roles` per module), struktur pengelompokan menu bersarang, halaman Pengaturan HRGA terpusat yang menyaring akses per tab bukan per halaman, dan bagaimana dukungan multi-perusahaan (company switcher, departemen, shift, network) diterapkan di frontend. Juga menjawab bagaimana Ringkasan Divisi HRGA (`/hris`) disusun: sembilan tab per posisi, kosakata lima kartu, baris aksi \"Yang menunggu Anda\" di blok teratas, cara 403 dibedakan dari antrean kosong, dan KPI SPV mana yang sudah punya sumber data beserta kartu skor KPI berambang 70.",
       "kata_kunci": [
         "erp-frontend",
