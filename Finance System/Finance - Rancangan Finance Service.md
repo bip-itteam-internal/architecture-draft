@@ -647,11 +647,22 @@ bisa: `GET /kpi/templates` bergerbang RBAC departemen KPI sehingga staf Cost Con
 sebagai kalimat di dalam `Basis`. Maka layar hanya menyatakan **cacahnya** lalu menautkan ke
 halaman KPI. Aturan itu dikunci test yang menolak teks apa pun berisi klaim angka target.
 
-**Alur pengguna ditutup dua tempat**, keduanya ditemukan dengan memetakan perjalanannya:
-tautan dari kartu varians ke layar rekomendasi (sebelumnya tak ada satu pun jalan dari tempat
-masalah terlihat ke tempat ia ditindaklanjuti), dan cacah bulan berjalan di layar pencatatan.
-Tautannya dipasang di **kartu**, bukan di baris, karena pos yang melebihi anggaran hanya disajikan
-sebagai cacah agregat — belum ada daftar barisnya untuk ditempeli.
+**Alur pengguna ditutup tiga tempat**: tautan dari kartu varians ke layar rekomendasi (sebelumnya
+tak ada satu pun jalan dari tempat masalah terlihat ke tempat ia ditindaklanjuti), cacah bulan
+berjalan di layar pencatatan, dan **entri sidebar `Finance → Cost Control`**. Tautannya dipasang di
+**kartu**, bukan di baris, karena pos yang melebihi anggaran hanya disajikan sebagai cacah agregat —
+belum ada daftar barisnya untuk ditempeli.
+
+> ⚠️ **Yang ketiga terlewat sampai pemakainya bertanya "apa ada menunya?".** Pemetaan alurnya
+> berangkat dari kartu varians — *"orang melihat pos lewat anggaran, lalu menindaklanjuti"* — dan
+> tak pernah menanyakan bagaimana ia sampai ke sana **saat tak sedang bereaksi terhadap masalah**.
+> Akibatnya tautan satu-satunya bersyarat `baris_melebihi > 0`, sehingga di bulan yang semua posnya
+> aman layarnya tak terjangkau dari mana pun — padahal justru bulan begitulah rekomendasi efisiensi
+> paling mungkin ditulis dengan tenang. **Pintu yang hanya terbuka saat ada masalah bukan pintu,
+> itu alarm.** Tak satu pun test bisa menangkapnya: halamannya jalan sempurna, rutenya terverifikasi
+> lewat gateway, seluruh suite hijau. Penjaganya kini `sidebar-menus.test.ts`, yang menanyakan arah
+> **berlawanan** dengan penjaga rute yang sudah ada — bukan "apakah menu ini menunjuk halaman yang
+> ada", melainkan "apakah halaman ini punya menu".
 
 **Konsekuensi deploy**: env baru **`FINANCE_MODULE_URL` pada `employee-service`**, sehingga
 `finance-service` **dan** `employee-service` wajib naik bersama, dan env dibaca saat container

@@ -4247,20 +4247,25 @@
         "External - Accurate",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "4a9a1bb085e67b02f4709479efa8b600c1271d2f8654e9531c042fb5ff2e1a90",
-      "ukuran_kb": 64.7,
-      "ringkasan": "Menjawab: kenapa finance-service dibangun, modul apa saja yang masuk dan sengaja di luar lingkupnya, dan bagaimana ia memasok angka supaya metrik KPI divisi FAT bisa terisi otomatis. Menjelaskan pembagian tiga lapis rumus (agregasi mentah di service pemilik data, rumus metrik di employee-service, rumus skor di shared-library), kenapa `anggaran_opex` tetap tinggal di integration-service, kenapa metrik AR bersifat tim bukan per individu, serta jalur master data terisi dari impor OPEX sampai skor KPI. Memuat pula rancangan RBAC, alur modul Tax dan Cost Control, rancangan frontend, mode kegagalan yang diketahui, dan daftar keputusan yang masih ditunggu dari tim Finance.",
+      "hash": "ca45506e92195c7f8293a37804039223522d3fdf82e23e9aef23fca603abe671",
+      "ukuran_kb": 65.6,
+      "ringkasan": "Menjawab: akun mana saja yang dihitung sebagai OPEX dan dari mana daftarnya berasal, bagaimana anggaran RAPB diunggah ke ERP lalu dibandingkan dengan realisasi Accurate, serta metrik KPI divisi FAT mana yang sudah terisi otomatis dan mana yang belum. Memuat pula rancangan modul Cost Control (rekomendasi efisiensi, forecast kas) dan modul Tax beserta keputusan yang masih menggantung.",
       "kata_kunci": [
-        "finance service",
-        "FAT",
-        "KPI",
-        "cost control",
-        "tax",
-        "pajak",
         "OPEX",
         "anggaran",
+        "budget",
+        "RAPB",
+        "varians",
+        "variance",
+        "Cost Control",
+        "rekomendasi efisiensi",
         "forecast kas",
-        "piutang AR"
+        "cashflow",
+        "KPI FAT",
+        "finance-service",
+        "Accurate",
+        "Tax",
+        "PPh"
       ]
     },
     {
