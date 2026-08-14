@@ -1,4 +1,4 @@
-**Status**: ⚠️ **Implemented (ada catatan)** — **Fase 0 LIVE di dev & prod** sejak 2026-08-13, **daftar akun OPEX ditegakkan kode** dan metrik varians OPEX **sudah terisi otomatis** di KPI, serta **modul Cost Control Fase 1a (rekomendasi efisiensi, bobot 20%) sudah ada**. Tersisa 🟡: forecast kas mingguan (Fase 1b), modul Tax, dan metrik Admin & Non-Ops YoY — lihat bab keputusan.
+**Status**: ⚠️ **Implemented (ada catatan)** — **Fase 0 LIVE di dev & prod** sejak 2026-08-13, **daftar akun OPEX ditegakkan kode** dan metrik varians OPEX **sudah terisi otomatis** di KPI, serta **modul Cost Control Fase 1a (rekomendasi efisiensi, bobot 20%) sudah ada**. serta **modul Cost Control Fase 1b (akurasi forecast kas mingguan, bobot 15%) sudah ada**. Tersisa 🟡: modul Tax dan metrik Admin & Non-Ops YoY — lihat bab keputusan.
 
 ## Deskripsi
 
@@ -453,7 +453,23 @@ Konsekuensi baiknya dua: tak ada tandingan bagi `ProcurementSaving` di employee-
 
 KPI Cost Control **sudah mewajibkan minimal 3 rekomendasi efisiensi per bulan**, dan rekomendasi itu memang sudah ditulis — tiga di antaranya ada di rekap cost driver Juli. Jadi ini bukan pekerjaan baru, hanya pindah tempat: dari narasi PDF ke baris yang dapat dilacak.
 
-### Forecast kas — satu-satunya yang meminta pekerjaan baru
+### Forecast kas — ⛔ analisis di bawah TERBANTAH, lihat bab Fase 1b
+
+> ⛔ **Seluruh pertimbangan di bawah gugur.** Ia berdiri di atas dugaan bahwa forecast kas
+> adalah **pekerjaan baru** yang harus diketik orang tiap minggu. Sheet KPI `COST CONTROL`
+> baris 14 kolom `SISTEM ERP` ternyata menuliskan yang diminta secara harfiah:
+> **"PENAMBAHAN FITUR LAPORAN ANGGARAN VS REALISASI (BREAKDOWN MINGGUAN)"**, dengan
+> `DOKUMEN PENDUKUNG` = *"Laporan RAB mingguan"*. Dan rekap `Juli_Cashflow.pdf` memberi
+> kolom proyeksinya judul **"( Based RAPB)"** — proyeksinya **diturunkan dari anggaran**,
+> bukan dinilai orang.
+>
+> Jadi tak ada pekerjaan mingguan baru sama sekali, dan tak ada pilihan (a) vs (b) yang
+> perlu diambil: kedua sisi rasionya sudah hidup di produksi. Yang dibangun akhirnya
+> pemecahan mingguan atas laporan yang sudah ada — lihat **Modul Cost Control Fase 1b**.
+>
+> Pelajarannya bukan soal forecast kas. Analisis ini disusun **tanpa membuka sheet-nya
+> sampai habis**; kolom `SISTEM ERP` memuat jawabannya sejak awal, dan tiga paragraf
+> pertimbangan di bawah ini dikarang untuk pertanyaan yang sudah terjawab tertulis.
 
 Rekap yang ada **bulanan dan hanya 6 akun**; metriknya menuntut **mingguan**. Ini satu-satunya master yang meminta sesuatu yang belum pernah dikerjakan, pada peran berisi satu orang. Dua jalan:
 
@@ -534,7 +550,7 @@ Unggah Excel bukan aturan menyeluruh — ia salah satu dari dua jalur yang **sud
 | Master | Volume sekali isi | Frekuensi | Jalur utama |
 |---|---|---|---|
 | Anggaran OPEX | ~222 baris | setahun sekali + revisi | **Unggah Excel** — satu-satunya yang datanya memang lahir sebagai spreadsheet |
-| Breakdown mingguan forecast | 4–5 minggu × pos | tiap bulan | **Grid sunting inline**, diseed dari RAPB bulanan |
+| ~~Breakdown mingguan forecast~~ | — | — | ⛔ **TIDAK ADA jalur entri.** Proyeksinya diturunkan dari RAPB yang sudah diunggah dan realisasinya ditarik Accurate; tak ada satu sel pun yang diketik orang. Lihat Fase 1b |
 | Rekomendasi efisiensi | 3 baris | tiap bulan | **Form** |
 | Register SPT | ~5 baris | tiap bulan | **Form**, atas baris yang dibangkitkan sistem |
 | Register temuan | 0–beberapa | insidental | **Form** |
@@ -667,6 +683,82 @@ belum ada daftar barisnya untuk ditempeli.
 **Konsekuensi deploy**: env baru **`FINANCE_MODULE_URL` pada `employee-service`**, sehingga
 `finance-service` **dan** `employee-service` wajib naik bersama, dan env dibaca saat container
 DIBUAT — `restart` tidak cukup.
+
+## Modul Cost Control Fase 1b — ✅ Implemented (2026-08-14)
+
+Metrik KPI Cost Control #4 **"Forecast cashflow mingguan dengan akurasi ≥ 95%"** (bobot **15%**)
+kini terisi otomatis. Rute dan kontraknya ada di [[API - Integration Service]]; yang dicatat di
+sini keputusan rancangannya.
+
+**Ia bukan modul forecast, dan finance-service tidak disentuh sama sekali.** Sheet KPI
+`COST CONTROL` baris 14 kolom `SISTEM ERP` menuliskan yang diminta secara harfiah:
+*"PENAMBAHAN FITUR LAPORAN ANGGARAN VS REALISASI (BREAKDOWN MINGGUAN)"*. Jadi yang dibangun
+adalah pemecahan mingguan atas laporan yang **sudah** hidup di
+[[Microservices - Integration Service]] — bukan master baru. Koleksi `cost_forecast_kas` yang
+sempat dipesan sejak Fase 0 **tidak jadi dipakai**.
+
+**Proyeksinya diturunkan dari RAPB, tidak diketik siapa pun.** Kolom proyeksi di
+`Juli_Cashflow.pdf` berjudul *"( Based RAPB)"*. Anggaran bulanan dipecah **menurut jumlah HARI**
+tiap minggu, bukan dibagi rata per minggu: potongan 29–31 Agustus yang cuma tiga hari akan
+menerima seperlima anggaran sebulan, lalu realisasi tiga harinya dibandingkan jatah tujuh hari
+dan akurasi minggu terakhir selalu tampak anjlok tanpa ada yang salah pada belanjanya. Sisa
+pembulatan ditimpakan ke minggu terakhir supaya jumlahnya kembali **tepat** ke anggaran bulanan.
+
+**Minggu = potongan 7 hari dari tanggal 1, bukan minggu kalender Senin–Minggu.** Minggu kalender
+melintasi batas bulan (29 Juli–4 Agustus adalah satu minggu), sedangkan anggaran dan realisasi
+keduanya dikunci per periode bulanan; minggu yang kakinya di dua bulan tak punya anggaran
+pembanding tanpa lebih dulu memutuskan bulan mana yang memilikinya — keputusan yang tak tertulis
+di mana pun.
+
+**Enam akun kas-keluar, bukan 57 akun OPEX.** Daftarnya diambil dari `Juli_Cashflow.pdf` dan
+**terverifikasi ke rupiah** terhadap total milik berkas itu sendiri: proyeksi
+Rp 5.082.414.466 dan realisasi Rp 2.430.100.871, rasio **47,81%** — sama dengan kolom
+`Prosentase` di berkas itu dan dengan skor **47,0** di sel AK14 sheet KPI. Memakai seluruh 57 akun
+akan membuat metrik ini dan metrik #1 (varians OPEX, 20%) mengukur hal yang persis sama, dan 35%
+bobot bergerak sebagai satu angka.
+
+**Rumus akurasinya SIMETRIS terhadap 100%**, bukan rasio telanjang realisasi÷proyeksi:
+
+```
+akurasi = 100 − |100 − realisasi/proyeksi × 100|,  dilantai di 0
+```
+
+Di bawah proyeksi hasilnya **sama persis** dengan rasio telanjang — itulah yang membuatnya
+mereproduksi keempat skor historis Finance (April 84, Mei 61,05, Juni 63,38, Juli 47) alih-alih
+menggantinya dengan angka baru yang tak dikenali siapa pun. Bedanya muncul di atas proyeksi, dan
+di situlah rasio telanjang rusak: `Beban Registrasi, Administrasi, & Perizinan` Juli mencatat
+**642,81%**, yang dibaca rasio telanjang sebagai jauh melampaui ambang ≥95%. Meleset 6,4 kali
+lipat, dinilai lulus dengan gemilang. Kolom KPI-nya sendiri berbunyi *"Analisis Deviasi Forecast
+vs Aktual"* — meleset ke atas sama meleset-nya dengan meleset ke bawah. Dilantai 0 karena simetris
+murni memberi −442,81% pada baris itu, dan nilai negatif tak berarti pada skala 0..100.
+
+**Akurasi dihitung dari TOTAL, bukan rata-rata akurasi mingguan.** Rata-rata memberi bobot sama
+pada minggu 3 hari dan minggu 7 hari, sehingga satu minggu pendek menggeser nilai sebulan; rekap
+Finance sendiri menutup bulannya dari total.
+
+**Pencocokan nama akun WAJIB ternormalisasi.** Nama yang tersimpan di `anggaran_opex` berasal dari
+**katalog Accurate**, sedangkan daftar enam akun disalin dari berkas Finance — keduanya tak
+dijamin sama ejaannya, dan itu sebabnya `SaringKatalogOpex` sudah memakai `normalisasiNamaAkun`
+sejak awal. Versi pertama membandingkan string mentah; satu perbedaan huruf besar atau spasi ganda
+akan **menjatuhkan akun itu dari laporan tanpa satu pun galat** — proyeksinya hilang, penyebut
+akurasi mengecil, angkanya tetap tampak wajar. Ditemukan di `/review`, dikunci test lima varian ejaan.
+
+**Tiga nol yang artinya berbeda** dijaga terpisah sampai ke layar: anggaran belum diunggah
+(`akurasi_terdefinisi: false`, **bukan** 0%), minggu yang realisasinya gagal ditarik
+(`baris_belum_tersinkron`, tidak dihitung sebagai belanja nol), dan belanja yang memang nol.
+
+**Layar tidak menyatakan ambang 95%** dan tidak mewarnai baris lulus/gagal — ambangnya milik
+`kpi_template` ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]) dan dapat diubah
+HR per posisi maupun per periode. Aturan yang sama dipegang layar Fase 1a, dan dikunci test.
+
+**Konsekuensi deploy**: **tidak ada env baru** — `INTEGRATION_MODULE_URL` sudah ada di compose dan
+sudah terisi di container Employee-Service produksi (diverifikasi 2026-08-14), jadi **tanpa**
+`--force-recreate`. Yang baru hanya koleksi `realisasi_opex_mingguan` beserta indeks uniknya.
+Urutan naik: **integration-service → employee-service → frontend**.
+
+> ⚠️ **Angka Juli di ERP TIDAK akan sama dengan 47,81%,** dan itu benar. PDF memakai RAPB asli;
+> yang diunggah ke ERP adalah **Rev 2** (−23,4%) atas permintaan Finance. Yang direproduksi test
+> adalah rumus dan subsetnya, memakai angka PDF sebagai fixture — bukan angka produksinya.
 
 ## Daftar Akun OPEX — ✅ Implemented (2026-08-13)
 
@@ -895,7 +987,7 @@ induk yang menjumlahkan kedua baris gaji.
 
 | # | Keputusan | Pemilik | Bila tak dijawab |
 |---|---|---|---|
-| 7 | **Forecast kas mingguan atau bulanan** | Cost Control + SPV FAT | Menuntut pekerjaan mingguan baru pada peran berisi satu orang — kandidat terkuat "fitur jadi, data kosong" |
+| 7 | ~~**Forecast kas mingguan atau bulanan**~~ | — | ⛔ **GUGUR, tak pernah perlu ditanyakan.** Sheet KPI `COST CONTROL` baris 14 kolom `SISTEM ERP` sudah menuliskan yang diminta: "LAPORAN ANGGARAN VS REALISASI (BREAKDOWN MINGGUAN)". Mingguan, dan tanpa pekerjaan baru bagi siapa pun — proyeksinya dari RAPB. Kekhawatiran "fitur jadi, data kosong" ikut gugur bersamanya |
 | 8 | **Definisi "selisih" dan batas waktu** untuk Pengelolaan Kas Iklan (bobot 0,20) | Cost Control | Metrik tetap 🟡 tak terhitung |
 | 9 | **Rumus "Penurunan OPEX 3–5% dalam 6 bulan".** Rekap memakai rata-rata sederhana 6 persentase MoM termasuk Februari yang pembandingnya tak ada di tabel (−6,65%); penurunan sebenarnya Feb→Jul −50,1% | Cost Control + SPV FAT | ERP menghitung berbeda dari spreadsheet, lalu Finance menyimpulkan ERP-nya salah |
 
