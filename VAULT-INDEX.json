@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-14",
-  "jumlah_dokumen": 286,
+  "jumlah_dokumen": 287,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -152,6 +152,40 @@
       ]
     },
     {
+      "path": "API Reference/API - Finance Service.md",
+      "judul": "API - Finance Service",
+      "area": "API Reference",
+      "jenis": "api",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [
+        "Finance - Rancangan Finance Service",
+        "API - Index",
+        "Microservices - Employee Service",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "Microservices - Integration Service",
+        "CORE - API Master Gateway",
+        "RUN - Menambah Metrik KPI Otomatis"
+      ],
+      "hash": "2cf32a15824a6239fc1df820f0f5ba7875f7242f8dd1e6fd8f8c7d54cae56f32",
+      "ukuran_kb": 6.2,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan finance-service di balik gateway `/api/finance/*`, bagaimana mencatat/melihat/menghapus rekomendasi efisiensi Cost Control, dan bagaimana agregatnya dipakai sebagai sumber metrik KPI `kinerja_cost_control`. Menjelaskan pula kenapa rute didaftarkan tanpa mengulang nama modul (gateway memotong prefix `/api/finance`), bagaimana penjaga rute `/internal/` membedakan pemanggil orang lewat gateway dari pemanggil service pemegang kunci, dan kenapa periode dihitung memakai zona Asia/Jakarta. Juga menyebut apa yang sengaja belum/tidak ada di service ini: modul Tax, forecast kas mingguan, dan master anggaran OPEX.",
+      "kata_kunci": [
+        "finance service",
+        "API finance",
+        "cost control",
+        "rekomendasi efisiensi",
+        "KPI",
+        "endpoint",
+        "internal route",
+        "prefix gateway",
+        "Asia/Jakarta",
+        "periode YYYY-MM"
+      ]
+    },
+    {
       "path": "API Reference/API - Form Builder Service.md",
       "judul": "API - Form Builder Service",
       "area": "API Reference",
@@ -245,6 +279,8 @@
         "Microservices - Insentive Service",
         "API - Integration Service",
         "Microservices - Integration Service",
+        "API - Finance Service",
+        "Finance - Rancangan Finance Service",
         "API - Inventory Service",
         "Microservices - Inventory Service",
         "API - TikTok Shop Service",
@@ -268,18 +304,20 @@
         "DB - Overview and Notes",
         "HOMEPAGE"
       ],
-      "hash": "2de9739f0d94b5bce556ab857adbe9077743197193ecc100a1a38aaa3d213e6a",
+      "hash": "f0653aa07940411f51a015c1ef02e6a44866ba2ec7cae97cfea747525c7e75a7",
       "ukuran_kb": 3.5,
-      "ringkasan": "Menjawab: service apa saja yang ada di ekosistem bip-erp beserta prefix gateway dan dokumen API masing-masing, dan bagaimana cara routing request lewat API Master Gateway bekerja secara umum (JWT, header BIP-*, open routes, rute public/ext).",
+      "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, prefix gateway masing-masing (`/api/<module>/*`), dan di dokumen mana daftar endpoint serta dok arsitekturnya berada. Menjelaskan pula cara routing dasar: semua request lewat API Master Gateway, JWT divalidasi di gateway lalu identitas diteruskan sebagai header `BIP-*`, plus jalur khusus open route dengan service key dan rute public/ext tanpa JWT. Titik awal saat mencari endpoint tapi belum tahu service mana pemiliknya.",
       "kata_kunci": [
         "API index",
         "daftar service",
-        "gateway routing",
+        "endpoint",
+        "gateway",
+        "routing",
+        "prefix module",
         "JWT",
-        "BIP header",
-        "open route",
-        "public route",
-        "prefix modul"
+        "header BIP",
+        "service key",
+        "microservices"
       ]
     },
     {
@@ -1703,6 +1741,7 @@
         "API - Employee Service",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "Microservices - Inventory Service",
+        "API - Finance Service",
         "APP - Web ERP",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "HRIS - Matriks KPI per Departemen",
@@ -1731,21 +1770,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "1bbe2ee1a586ecc5b22876ce934e8fb6c609cecd8fc4eaac1359fa2efc52ab80",
-      "ukuran_kb": 77.6,
-      "ringkasan": "Menjawab: endpoint apa saja yang di-host employee-service, koleksi MongoDB apa yang dimilikinya, dan modul mana yang menumpang di sini alih-alih punya service sendiri (register Legal, R&D, Quality, Procurement). Juga menjawab bagaimana seed master data dan migrasi berjalan saat service start, gerbang RBAC mana yang menjaga tiap kelompok rute, dan bagaimana nilai otomatis KPI dirakit dari sumber lintas-service. Sejak 2026-08-13 rute Legal dan R&D digerbang izin modul secretary lewat gateSecretary, dengan gerbang tier lama tinggal sebagai fallback kill-switch.",
+      "hash": "95466c8c7fbbe1de9047e192e1b9a0cc2481263b651dfa85859c5bc38621a4aa",
+      "ukuran_kb": 79.0,
+      "ringkasan": "Menjawab: bagaimana login, PIN, biometric, refresh token, dan onboarding karyawan bekerja, sebab service ini adalah source of truth autentikasi seluruh ekosistem bip-erp. Menjawab pula operasi admin akun oleh IT (set aktif/nonaktif, forget-device, hard reset, kelola `system_roles`), CRUD master data department dan system role, serta di mana workspace divisi Legal, R&D Regulatory, Quality, dan Procurement non-Accurate di-host beserta gerbang izinnya. Berguna juga untuk menelusuri data KPI, contract, BPJS, vacation quota, dan catatan multi-tenant, akun pihak luar (vendor/mitra), serta jalur resign.",
       "kata_kunci": [
-        "employee-service",
-        "endpoint",
-        "MongoDB",
-        "seed master data",
-        "migrasi",
-        "RBAC",
-        "legal",
-        "rnd",
-        "gateSecretary",
-        "otomasi KPI",
-        "work_data"
+        "employee service",
+        "karyawan",
+        "login",
+        "auth",
+        "SSO",
+        "onboarding",
+        "system roles",
+        "master data",
+        "department",
+        "resign"
       ]
     },
     {
@@ -4178,7 +4216,7 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — **Fase 0 (kerangka `finance-service`) LIVE di dev & prod** sejak 2026-08-13, dan **daftar akun OPEX sudah ditegakkan kode** di integration-service. Modul Tax dan Cost Control masih 🟡 konsep: keduanya menunggu keputusan #3 & #5–#9.",
+      "status_teks": "**Implemented (ada catatan)** — **Fase 0 LIVE di dev & prod** sejak 2026-08-13, **daftar akun OPEX ditegakkan kode** dan metrik varians OPEX **sudah terisi otomatis** di KPI, serta **modul Cost Control Fase 1a (rekomendasi efisiensi, bobot 20%) sudah ada**. Tersisa 🟡: forecast kas mingguan (Fase 1b), modul Tax, dan metrik Admin & Non-Ops YoY — lihat bab keputusan.",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
@@ -4199,6 +4237,7 @@
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "Microservices - Employee Service",
         "RUN - Menambah Metrik KPI Otomatis",
+        "API - Finance Service",
         "IT - Background Jobs & Schedulers",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "Microservices - Notification Service",
@@ -4208,19 +4247,19 @@
         "External - Accurate",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "e3ca082cc6fd18802f9c6e078fb772905a9a7ee1fbf51fb839a8841c8283c26d",
-      "ukuran_kb": 61.1,
-      "ringkasan": "Menjawab: apa lingkup finance-service (modul Tax, Cost Control, jembatan KPI), kenapa metrik KPI departemen Finance tidak terisi otomatis, dan master data mana — kewajiban pajak, register SPT, penghematan, forecast kas, anggaran OPEX — yang harus ada agar metriknya menyala. Menjelaskan juga pembagian tiga lapis rumus (agregasi di service pemilik data, rumus metrik di employee-service, rumus skor di shared-library), kenapa master anggaran OPEX tetap tinggal di integration-service, dan kenapa metrik AR bersifat tim bukan per individu. Berisi RBAC, peta aktor, alur tiap modul, cara master data terisi, rancangan frontend, mode kegagalan, serta daftar keputusan yang masih ditunggu dari tim Finance.",
+      "hash": "4a9a1bb085e67b02f4709479efa8b600c1271d2f8654e9531c042fb5ff2e1a90",
+      "ukuran_kb": 64.7,
+      "ringkasan": "Menjawab: kenapa finance-service dibangun, modul apa saja yang masuk dan sengaja di luar lingkupnya, dan bagaimana ia memasok angka supaya metrik KPI divisi FAT bisa terisi otomatis. Menjelaskan pembagian tiga lapis rumus (agregasi mentah di service pemilik data, rumus metrik di employee-service, rumus skor di shared-library), kenapa `anggaran_opex` tetap tinggal di integration-service, kenapa metrik AR bersifat tim bukan per individu, serta jalur master data terisi dari impor OPEX sampai skor KPI. Memuat pula rancangan RBAC, alur modul Tax dan Cost Control, rancangan frontend, mode kegagalan yang diketahui, dan daftar keputusan yang masih ditunggu dari tim Finance.",
       "kata_kunci": [
-        "finance-service",
+        "finance service",
+        "FAT",
+        "KPI",
+        "cost control",
+        "tax",
+        "pajak",
         "OPEX",
         "anggaran",
-        "budget",
-        "pajak",
-        "tax",
-        "cost control",
-        "forecast cashflow",
-        "KPI FAT",
+        "forecast kas",
         "piutang AR"
       ]
     },

@@ -1,4 +1,4 @@
-**Status**: ⚠️ **Implemented (ada catatan)** — **Fase 0 (kerangka `finance-service`) LIVE di dev & prod** sejak 2026-08-13, dan **daftar akun OPEX sudah ditegakkan kode** di integration-service. Modul Tax dan Cost Control masih 🟡 konsep: keduanya menunggu keputusan #3 & #5–#9.
+**Status**: ⚠️ **Implemented (ada catatan)** — **Fase 0 LIVE di dev & prod** sejak 2026-08-13, **daftar akun OPEX ditegakkan kode** dan metrik varians OPEX **sudah terisi otomatis** di KPI, serta **modul Cost Control Fase 1a (rekomendasi efisiensi, bobot 20%) sudah ada**. Tersisa 🟡: forecast kas mingguan (Fase 1b), modul Tax, dan metrik Admin & Non-Ops YoY — lihat bab keputusan.
 
 ## Deskripsi
 
@@ -497,9 +497,16 @@ flowchart TB
     Q --> Z["skor KPI terisi"]
 ```
 
-Bagian **unggah sampai dashboard** memang otomatis. Bagian **dashboard sampai skor** masih pekerjaan: satu berkas `kpi_sumber_*.go` di employee-service, plus konfigurasi metrik yang dikerjakan HR. Padanannya untuk rumpun AR sudah dibuat (`kinerja_ar`); padanan untuk varians OPEX **belum ada**, sehingga angkanya akan tampil di layar tetapi tidak mengalir ke KPI.
+Bagian **unggah sampai dashboard** memang otomatis. Bagian **dashboard sampai skor** dulu masih
+pekerjaan; **kini rampung**: sumber `varians_anggaran` (`kpi_sumber_varians_anggaran.go`) ada di
+`main` sejak 13 Agustus 2026 dan metriknya dikonfigurasi HR pada template Cost Control 14 Agustus
+2026 — pratinjaunya mengeluarkan angka sungguhan. Rantainya utuh dari unggah RAPB sampai skor KPI.
 
-Dan sumber itu baru bisa dibangun setelah **keputusan Finance #1** dijawab — tanpanya ia tak tahu angka mana yang harus dilaporkan.
+Konfigurasi yang BENAR untuk metrik "varians ≤ ±5%": metrik `varians_absolut_persen`, arah
+**turun**, target **5**, dan **`nilai_minimum` DIKOSONGKAN**. Ambang minimum diperiksa terhadap
+REALISASI (`NilaiDenganArah`, `kpi_reduksi.go:181`), sedangkan realisasi metrik ini adalah varians
+dalam persen dengan arah makin-kecil-makin-baik — mengisinya 70 membuat varians 2%, hasil hampir
+sempurna, bernilai **nol**.
 
 ### Berkas mana yang MASUK, berkas mana yang KELUAR
 
@@ -603,6 +610,52 @@ Dicatat supaya tidak ditanyakan lagi, dan supaya tak ada yang mulai merancang se
 | **Granularitas forecast kas** | Buktinya berbalik ke **mingguan** | `BREAKDOWN MINGGUAN` tertulis eksplisit di dua sheet (Cost Control #4, SPV P1) — meski rekap yang benar-benar dibuat selama ini bulanan. Ketegangan itu jadi keputusan Finance #7 di bawah |
 
 ⚠️ **Berlaku hanya untuk bagian operasional.** Bagian beban penjualan RAPB (baris 10–25) grain-nya lebih kasar — `Beban Iklan + Pajak Iklan` adalah **satu** baris anggaran yang menutupi **dua** akun Accurate. Itu jadi keputusan Finance #3.
+
+## Modul Cost Control Fase 1a — ✅ Implemented (2026-08-14)
+
+Metrik KPI Cost Control **"minimal 3 rekomendasi efisiensi cost driver setiap bulan"** (bobot
+**20%**) kini terisi otomatis. Rute, kontrak, dan penjaganya ada di [[API - Finance Service]];
+yang dicatat di sini adalah keputusan rancangannya.
+
+**Yang dinilai adalah CACAH rekomendasi, bukan besaran penurunan OPEX-nya.** Pembacaan ini
+mengoreksi kesimpulan sebelumnya: di sheet `COST CONTROL`, kolom **AREA KINERJA** berbunyi
+*"Penurunan OPEX 3–5% dalam 6 bulan"* — itu tujuan yang melatarbelakangi — sedangkan kolom **KPI**
+dan **TARGET** berbunyi *"minimal 3 rekomendasi efisiensi cost driver setiap bulan"*. Karena yang
+diskor kolom kedua, metrik ini **tidak** terhalang pertanyaan rumus penurunan OPEX yang masih
+menggantung.
+
+**`TaksiranHemat` sengaja opsional.** Menuntutnya akan menghalangi pencatatan rekomendasi yang
+dampaknya belum terukur — padahal itu justru yang paling sering di awal. Kosong berarti **belum
+ditaksir**, bukan nol; layar menampilkannya begitu, dan form tidak mengirim 0. Menampilkan "Rp 0"
+membuat rekomendasi yang dampaknya belum diukur terbaca sebagai tak berdampak.
+
+**Sumber KPI dinamai menurut POSISI** (`kinerja_cost_control`), kebalikan `varians_anggaran` yang
+dinamai menurut datanya. Alasannya berbeda dan keduanya disengaja: varians dikonsumsi empat posisi
+sekaligus sehingga menamainya menurut satu posisi menyesatkan, sedangkan divisi FAT punya banyak
+posisi dengan metrik masing-masing sehingga sumber per-metrik akan melahirkan selusin sumber
+berisi satu angka. Didaftarkan **bermetrik sejak metrik pertamanya** supaya Fase 1b cukup menambah
+satu entri.
+
+**Layar TIDAK menampilkan target.** Versi pertamanya menampilkan "n dari 3" dengan angka 3
+di-hardcode di frontend. Target sebenarnya dimiliki `kpi_template` di employee-service
+([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]) dan dapat diubah per posisi, per
+periode, bahkan per karyawan — begitu HR mengubahnya jadi 4, kartu tetap berbunyi "n dari 3" dengan
+meyakinkan. Memindahkan angkanya ke respons finance-service **juga ditolak**: itu menaruh nilai
+milik service lain di sini dan cuma memindahkan duplikatnya. Membacanya dari sumber aslinya belum
+bisa: `GET /kpi/templates` bergerbang RBAC departemen KPI sehingga staf Cost Control ditolak, dan
+`MetrikPratinjau` pada `GET /me/kpi-score` tidak membawa field target — angkanya hanya muncul
+sebagai kalimat di dalam `Basis`. Maka layar hanya menyatakan **cacahnya** lalu menautkan ke
+halaman KPI. Aturan itu dikunci test yang menolak teks apa pun berisi klaim angka target.
+
+**Alur pengguna ditutup dua tempat**, keduanya ditemukan dengan memetakan perjalanannya:
+tautan dari kartu varians ke layar rekomendasi (sebelumnya tak ada satu pun jalan dari tempat
+masalah terlihat ke tempat ia ditindaklanjuti), dan cacah bulan berjalan di layar pencatatan.
+Tautannya dipasang di **kartu**, bukan di baris, karena pos yang melebihi anggaran hanya disajikan
+sebagai cacah agregat — belum ada daftar barisnya untuk ditempeli.
+
+**Konsekuensi deploy**: env baru **`FINANCE_MODULE_URL` pada `employee-service`**, sehingga
+`finance-service` **dan** `employee-service` wajib naik bersama, dan env dibaca saat container
+DIBUAT — `restart` tidak cukup.
 
 ## Daftar Akun OPEX — ✅ Implemented (2026-08-13)
 
