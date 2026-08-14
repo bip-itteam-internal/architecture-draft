@@ -743,9 +743,19 @@ sejak awal. Versi pertama membandingkan string mentah; satu perbedaan huruf besa
 akan **menjatuhkan akun itu dari laporan tanpa satu pun galat** — proyeksinya hilang, penyebut
 akurasi mengecil, angkanya tetap tampak wajar. Ditemukan di `/review`, dikunci test lima varian ejaan.
 
-**Tiga nol yang artinya berbeda** dijaga terpisah sampai ke layar: anggaran belum diunggah
-(`akurasi_terdefinisi: false`, **bukan** 0%), minggu yang realisasinya gagal ditarik
-(`baris_belum_tersinkron`, tidak dihitung sebagai belanja nol), dan belanja yang memang nol.
+**Empat nol yang artinya berbeda** dijaga terpisah sampai ke layar: anggaran belum diunggah
+(`akurasi_terdefinisi: false`, **bukan** 0%), **tak satu pun sel terukur** (juga tak terdefinisi —
+lihat di bawah), sebagian sel gagal ditarik (`baris_belum_tersinkron`, menurunkan cakupan tanpa
+membatalkan angkanya), dan belanja yang memang nol.
+
+> ⚠️ **Yang kedua ketahuan di produksi, bukan di test.** Deploy pertama membalas Agustus dengan
+> `akurasi_terdefinisi: true` dan `akurasi_persen: 0`, padahal **30 dari 30 sel belum ditarik** —
+> task penariknya baru jalan 03:15. Metrik akan melaporkan **skor nol** untuk bulan yang datanya
+> sama sekali belum diukur, persis aturan yang modul ini ada untuk menegakkannya. Penjaga yang
+> sudah ada cuma separuh jalan: `baris_belum_tersinkron` menurunkan cakupan sehingga metriknya
+> berstatus `semi`, tetapi **nilai 0-nya tetap mengalir** ke penilaian. Keadaan ini berulang
+> **tiap awal bulan**, bukan sekali saat rilis. Yang menemukannya adalah kebiasaan memperlakukan
+> angka nol sebagai pertanyaan alih-alih kabar baik — respons itu lolos setiap gerbang lain.
 
 **Layar tidak menyatakan ambang 95%** dan tidak mewarnai baris lulus/gagal — ambangnya milik
 `kpi_template` ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]) dan dapat diubah

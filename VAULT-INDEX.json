@@ -1178,8 +1178,8 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "8fb001574fb977b5195c093d65c753f52ef3894a94f5de0aa27c0df50ff6433d",
-      "ukuran_kb": 260.4,
+      "hash": "0ae30299abdf6ff8fd57305c2c0928f8e60e8c11936ec99fb15766295f677b13",
+      "ukuran_kb": 261.4,
       "ringkasan": "Menjawab: apa itu portal web \"One Bharata\" (hris-dashboard), stack teknologinya, dan bagaimana login, refresh token, serta SSO Identity Provider bekerja. Menjelaskan cara role gating menentukan menu yang tampil (key `system_roles` per module), struktur pengelompokan menu bersarang, halaman Pengaturan HRGA terpusat yang menyaring akses per tab bukan per halaman, dan bagaimana dukungan multi-perusahaan (company switcher, departemen, shift, network) diterapkan di frontend. Juga menjawab bagaimana Ringkasan Divisi HRGA (`/hris`) disusun: sembilan tab per posisi, kosakata lima kartu, baris aksi \"Yang menunggu Anda\" di blok teratas, cara 403 dibedakan dari antrean kosong, kartu skor KPI berambang 70, dan di tab mana funnel rekrutmen tinggal.",
       "kata_kunci": [
         "erp-frontend",
@@ -1776,8 +1776,8 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "097a6c22512aedb389dc99f43e9c6bd420a310f0861d2ef6dd35fe26871e16a9",
-      "ukuran_kb": 80.6,
+      "hash": "66359653646cafc71fd6482c4084323c3df1fe185215c469d542595ae4bfb5af",
+      "ukuran_kb": 81.3,
       "ringkasan": "Menjawab: bagaimana data karyawan, work_data, dan KPI dikelola di employee-service, sumber KPI otomatis apa saja yang sudah terdaftar dan dari service mana masing-masing menarik angkanya, serta bagaimana menambah metrik baru tanpa menyentuh aturan penilaian. Menjelaskan pula kepemilikan kpi_score dan batas yang dipegang pengumpul metrik.",
       "kata_kunci": [
         "employee-service",
@@ -2003,8 +2003,8 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "a6706d24420a25a9ef103ab06df5c793f7935c609eb3ea65737ccf7a7046eda8",
-      "ukuran_kb": 244.7,
+      "hash": "1d13237a8fc44a1aeaa47b7dc798e127d4c561a20c05b03e3adb10c3c19eeae5",
+      "ukuran_kb": 251.0,
       "ringkasan": "Menjawab: apa tanggung jawab integration-service sebagai jembatan marketplace ke Accurate, fitur apa saja yang sudah ada (webhook direct, TikTok Business/Ads, GMV Max, Shopee, transactions terpadu, profit, ICC mapping, WMS bridge, review analytics), dan mana yang masih konsep. Menjelaskan cara kerja tiap sub-modul beserta gotcha nyata yang pernah menggigit — bypass verifikasi signature webhook Shopee, rate limit cron master data TikTok, dan salah field path pada filter advertiser. Berguna saat mau menambah integrasi baru, menelusuri sumber angka iklan/ROI, atau memahami status jalur Desty yang sudah soft-disabled.",
       "kata_kunci": [
         "integration service",
@@ -3219,8 +3219,8 @@
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "5f9278f6c200f0653b9b16b6ae920f8e70696c4ee97e90180ad4e368a530cda3",
-      "ukuran_kb": 33.2,
+      "hash": "e8a9852e4819843965c978b69ad5ee437e8625c79d772dc1d52d1aca6c1d006b",
+      "ukuran_kb": 34.7,
       "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi dua sub-tab (SUMBER vs INPUT WMS), menu apa saja yang terkena, dan dari feed mana tiap tab sumber diambil (retur marketplace, resi, Procurement PO, Surat Jalan, Laporan Hasil Produksi). Menjelaskan alasan badge \"sudah/belum dicatat\" hanya dipasang pada tab yang punya kunci join, kenapa tab sumber Keluar FG diagregasi per SKU dengan bundle dipecah ke komponen, dan kenapa hanya resi berstatus COMPLETED plus SHIPPED yang dianggap keluar gudang sementara TO_SHIP dikecualikan. Juga menjawab bagaimana jejak penginput dijamin: `created_by_name` distempel server dari header `BIP-Username`, selalu menimpa nilai dari body, di koleksi transaksi, resi, PO, dan proposal, berikut amandemen gerbang gudang per-order dan status SEBAGIAN.",
       "kata_kunci": [
         "ADR 0025",
@@ -4256,8 +4256,8 @@
         "External - Accurate",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "a8ccd9a444b8f21e8b91a547fc9f7e1bb1236930143847cf4c7369e2f73e2c4b",
-      "ukuran_kb": 73.1,
+      "hash": "24c32f60c5c660b427bf700b5b9a6054d4b4e8aeabdf524d10450fcae9a45c77",
+      "ukuran_kb": 73.9,
       "ringkasan": "Menjawab: akun mana saja yang dihitung sebagai OPEX dan dari mana daftarnya berasal, bagaimana anggaran RAPB diunggah lalu dibandingkan dengan realisasi Accurate, dan metrik KPI divisi FAT mana yang sudah terisi otomatis beserta rumusnya. Memuat modul Cost Control (rekomendasi efisiensi, akurasi forecast kas mingguan), rancangan modul Tax, dan keputusan Finance yang masih menggantung.",
       "kata_kunci": [
         "OPEX",
@@ -5387,6 +5387,7 @@
         "APP - Web ERP",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "HRIS - Organization Structure",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "HRIS - Otomasi Skor KPI",
         "HRIS - Work Review",
         "HRIS - Career & Promotion",
@@ -5394,8 +5395,8 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "47280dbd8dad127c2e4a2cc6db9cc3c394f0d65fc4f4a60f7f58e39a477d7788",
-      "ukuran_kb": 14.4,
+      "hash": "a70bea192b2acc84f6704ae3550161fa6ff5060f6b7b0a4f4f87935c12ce216d",
+      "ukuran_kb": 16.7,
       "ringkasan": "Menjawab: bagaimana penilaian KPI dihitung untuk tim marketing (skor→insentif) versus appraisal per-karyawan lintas departemen, bagaimana template KPI per posisi & scoring bulanan bekerja, dan aturan pencocokan posisi template dengan jabatan karyawan pada periode yang dinilai. Juga menjelaskan RBAC per departemen, cakupan tim untuk Leader (scope=team), penggabungan tampilan lintas departemen (mis. HRGA), serta bagian mana yang sudah live dan mana yang masih konsep (siklus bulanan wajib + workflow review supervisor→HR).",
       "kata_kunci": [
         "KPI",
