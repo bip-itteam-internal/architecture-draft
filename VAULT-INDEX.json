@@ -106,24 +106,25 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "f0fc88309c05ab990b42e83d072643624a4366704f9cf9a3489fc90d11bfb479",
-      "ukuran_kb": 32.9,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di employee-service (HRIS inti) di balik gateway `/api/employee/*` — mulai login/PIN/biometrik, onboarding akun, CRUD personal & work data, dokumen, jadwal, sampai kelola akun IT. Menjelaskan juga cara menetapkan penyetuju pengajuan departemen (satu-satunya jalur menulis `work_data.is_supervisor`), CRUD master departemen & system role beserta RBAC-nya, pengaturan menu tersembunyi/jenjang jabatan per posisi, dan penerbitan akun eksternal (vendor/mitra) berprefiks `EXT-` dengan permission-set.",
+      "hash": "bed282be2e26c9cb5f1a7aa204582504d22df904715cc8e4a3e2f5f89c55e283",
+      "ukuran_kb": 33.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service (HRIS inti) dan bagaimana memakainya — login/auth/onboarding, CRUD personal & work data, jadwal, dokumen, master data departemen & system role, jenjang jabatan, penyembunyian menu, serta penetapan penyetuju pengajuan. Menjelaskan juga siapa yang boleh mengakses tiap grup (RBAC seperti RequireHRISStaff, RequireITSupervisor, RequireKPIDepartmentRBAC), cara akun pihak luar (vendor/mitra) diterbitkan dan dikelola dengan prefix EXT-, serta jalur menonaktifkan akun karyawan (resign) dan endpoint ulang tahun karyawan aktif.",
       "kata_kunci": [
         "employee-service",
         "HRIS",
         "endpoint",
-        "API",
         "login",
+        "auth",
         "onboarding",
+        "work_data",
         "master data departemen",
         "system role",
-        "penyetuju pengajuan",
-        "approver",
-        "akun eksternal vendor",
+        "external account",
+        "vendor",
         "RBAC",
-        "work_data",
-        "is_supervisor"
+        "penyetuju pengajuan",
+        "is_supervisor",
+        "birthdays"
       ]
     },
     {
@@ -5380,6 +5381,7 @@
         "Sales - Incentive",
         "DB - Overview and Notes",
         "APP - Web ERP",
+        "HRIS - Key Performance Index",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "HRIS - Organization Structure",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
@@ -5390,25 +5392,24 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "93d14a74b331f89b82a26bafe88430308113cd43d9cb518215eafa33fd9cfaba",
-      "ukuran_kb": 17.7,
-      "ringkasan": "Menjawab: bagaimana KPI di ERP bekerja dan bagian mana yang sudah jalan versus masih konsep — engine skor→insentif untuk 9 role marketing (di insentive-service) versus appraisal per-karyawan lintas departemen (di employee-service `/kpi/*`). Menjelaskan template KPI per posisi beserta bobot metrik, scoring per periode `YYYY-MM` dengan snapshot template, aturan posisi template harus cocok dengan jabatan karyawan pada periode yang dinilai (dibaca dari employee_movement), RBAC per departemen, cakupan tim untuk Leader (`scope=team` berbasis bawahan langsung), dan penggabungan tampilan lintas departemen satu tim (mis. HRGA) dari master data.",
+      "hash": "bec7e7727bfc8a50d7a4c9e0d1fe6c498342427f1229f7e9f174721c72463148",
+      "ukuran_kb": 18.3,
+      "ringkasan": "Menjawab: bagaimana penilaian kinerja berbasis skor KPI bekerja di ERP Bharata, mana yang sudah jalan dan mana yang masih konsep — engine skor→insentif untuk 9 role marketing (sudah production di insentive-service) versus appraisal per-karyawan lintas departemen di employee-service (template per posisi, scoring per periode YYYY-MM). Menjelaskan aturan kunci seperti template harus cocok dengan posisi karyawan pada periode yang dinilai (bukan posisi hari ini), penghitungan employee_count sebagai assignment aktual, RBAC per departemen, cakupan tim untuk Leader (scope=team), dan tampilan gabungan lintas departemen (mis. HRGA) yang bersumber dari master data supervised_by.",
       "kata_kunci": [
         "KPI",
         "Key Performance Index",
         "appraisal",
         "penilaian kinerja",
-        "skor",
         "insentif",
         "incentive",
         "marketing",
         "template KPI",
         "scoring",
-        "employee-service",
+        "kpi_score",
         "RBAC departemen",
-        "scope team leader",
-        "HRGA",
-        "employee_movement"
+        "scope team",
+        "employee_count",
+        "HRGA"
       ]
     },
     {
