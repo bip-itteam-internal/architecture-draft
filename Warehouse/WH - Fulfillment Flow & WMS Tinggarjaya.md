@@ -453,6 +453,7 @@ bukan body request).
 - [[External - Accurate]] — bridging akuntansi hilir (settlement → Accurate, tidak berubah)
 - [[Microservices - Manufacture Service]] — **tidak tersentuh** oleh WMS; `manufacture_resi` tetap untuk fungsi inbound return-nya sendiri
 - [[WH - Warehouse Sadewa]] — gudang kedua yang berbagi antrian fulfillment & `PackingBoard` ini, dengan lapisan approval cetak resi Sadewa→Tinggar
+- [[WH - Kelola Pesanan (Order Management)]] — rencana penyatuan alur ini ke satu layar omnichannel (frontend; 🟡 konsep)
 - [[WH - Management System]] — dok konsep warehouse sebelumnya
 - [[WH - Outbound (Sending)]] — logging outbound
 - [[WH - Inbound (Receiving)]] — logging inbound / retur
