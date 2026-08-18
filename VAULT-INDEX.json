@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-14",
-  "jumlah_dokumen": 287,
+  "digenerate": "2026-08-18",
+  "jumlah_dokumen": 288,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -106,22 +106,25 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "e716eb2a43990d6fd3eeb04ed5b8e7a2322bdd199414439cde09b6d222d2cceb",
-      "ukuran_kb": 32.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service dan siapa yang boleh memanggilnya, mulai dari login dan onboarding, CRUD personal/work data beserta dokumennya, master data departemen dan system role, jenjang jabatan, penyetuju pengajuan per departemen, KPI, kuota cuti, kontrak, resign, mutasi, sampai surat peringatan. Juga menjawab pertanyaan operasional yang sering muncul: rute mana yang dipakai frontend mana, gerbang RBAC apa yang berlaku di tiap grup rute, dan mana yang sudah live versus sekadar merged. Beberapa entri mencatat jebakan spesifik seperti urutan pendaftaran rute statis versus parametrik dan field yang sengaja dipertahankan saat PUT memakai ReplaceOne.",
+      "hash": "bed282be2e26c9cb5f1a7aa204582504d22df904715cc8e4a3e2f5f89c55e283",
+      "ukuran_kb": 33.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service (HRIS inti) dan bagaimana memakainya — login/auth/onboarding, CRUD personal & work data, jadwal, dokumen, master data departemen & system role, jenjang jabatan, penyembunyian menu, serta penetapan penyetuju pengajuan. Menjelaskan juga siapa yang boleh mengakses tiap grup (RBAC seperti RequireHRISStaff, RequireITSupervisor, RequireKPIDepartmentRBAC), cara akun pihak luar (vendor/mitra) diterbitkan dan dikelola dengan prefix EXT-, serta jalur menonaktifkan akun karyawan (resign) dan endpoint ulang tahun karyawan aktif.",
       "kata_kunci": [
         "employee-service",
+        "HRIS",
         "endpoint",
-        "API karyawan",
-        "RBAC",
+        "login",
+        "auth",
+        "onboarding",
+        "work_data",
         "master data departemen",
+        "system role",
+        "external account",
+        "vendor",
+        "RBAC",
         "penyetuju pengajuan",
-        "approver",
-        "jenjang jabatan",
-        "job level",
-        "supervisor-assignment",
-        "org chart",
-        "resign"
+        "is_supervisor",
+        "birthdays"
       ]
     },
     {
@@ -305,7 +308,7 @@
         "HOMEPAGE"
       ],
       "hash": "f0653aa07940411f51a015c1ef02e6a44866ba2ec7cae97cfea747525c7e75a7",
-      "ukuran_kb": 3.5,
+      "ukuran_kb": 3.6,
       "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, prefix gateway masing-masing (`/api/<module>/*`), dan di dokumen mana daftar endpoint serta dok arsitekturnya berada. Menjelaskan pula cara routing dasar: semua request lewat API Master Gateway, JWT divalidasi di gateway lalu identitas diteruskan sebagai header `BIP-*`, plus jalur khusus open route dengan service key dan rute public/ext tanpa JWT. Titik awal saat mencari endpoint tapi belum tahu service mana pemiliknya.",
       "kata_kunci": [
         "API index",
@@ -2003,22 +2006,21 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "1d13237a8fc44a1aeaa47b7dc798e127d4c561a20c05b03e3adb10c3c19eeae5",
-      "ukuran_kb": 251.0,
-      "ringkasan": "Menjawab: apa tanggung jawab integration-service sebagai jembatan marketplace ke Accurate, fitur apa saja yang sudah ada (webhook direct, TikTok Business/Ads, GMV Max, Shopee, transactions terpadu, profit, ICC mapping, WMS bridge, review analytics), dan mana yang masih konsep. Menjelaskan cara kerja tiap sub-modul beserta gotcha nyata yang pernah menggigit — bypass verifikasi signature webhook Shopee, rate limit cron master data TikTok, dan salah field path pada filter advertiser. Berguna saat mau menambah integrasi baru, menelusuri sumber angka iklan/ROI, atau memahami status jalur Desty yang sudah soft-disabled.",
+      "hash": "32a8b9bba6014145895cf99e64a3e9f2642c8f419551400cc7924dcada5607af",
+      "ukuran_kb": 252.2,
+      "ringkasan": "Menjawab: bagaimana ERP tersambung ke marketplace (TikTok Shop, TikTok Ads/Business, Shopee, Lazada) lewat webhook direct, bagaimana order dan laporan iklan dinormalkan jadi model transaction terpadu, lalu di-bridge ke Accurate (Sales Invoice/Return, ringkasan harian). Juga menjelaskan automasi auto-ship/auto-approve sadar-holiday, kredensial OAuth per marketplace, cron sync master data, metrik GMV Max (monitoring/overview/ICC video) untuk insentif marketing, verifikasi signature webhook Shopee (HMAC, saat ini di-bypass), serta status Desty yang soft-disabled dan konsep Meta Ads yang belum ada kode.",
       "kata_kunci": [
         "integration service",
-        "microservice",
         "marketplace",
-        "TikTok Business",
-        "GMV Max",
+        "TikTok Shop",
         "Shopee",
+        "webhook",
         "Accurate",
-        "Desty",
+        "GMV Max",
+        "OAuth kredensial",
+        "auto-ship",
         "Meta Ads",
-        "ICC",
-        "cron worker",
-        "webhook"
+        "sync order"
       ]
     },
     {
@@ -2953,7 +2955,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "076b1a4fb212adebd3801ec7b3443d492438a6a76da2345516b17d06f0ada9bb",
-      "ukuran_kb": 4.8,
+      "ukuran_kb": 4.9,
       "ringkasan": "Menjawab sumber tanggal yang dipakai untuk membukukan retur TikTok ke Accurate: kenapa update_time menyesatkan (ikut mundur karena settle refund) dan kenapa order_update_date dipilih sebagai gantinya, serta perbaikan zona waktu WIB untuk penomoran dokumen retur (RTR).",
       "kata_kunci": [
         "tanggal retur",
@@ -3219,28 +3221,22 @@
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "e8a9852e4819843965c978b69ad5ee437e8625c79d772dc1d52d1aca6c1d006b",
-      "ukuran_kb": 34.7,
-      "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi dua sub-tab (SUMBER vs INPUT WMS), menu apa saja yang terkena, dan dari feed mana tiap tab sumber diambil (retur marketplace, resi, Procurement PO, Surat Jalan, Laporan Hasil Produksi). Menjelaskan alasan badge \"sudah/belum dicatat\" hanya dipasang pada tab yang punya kunci join, kenapa tab sumber Keluar FG diagregasi per SKU dengan bundle dipecah ke komponen, dan kenapa hanya resi berstatus COMPLETED plus SHIPPED yang dianggap keluar gudang sementara TO_SHIP dikecualikan. Juga menjawab bagaimana jejak penginput dijamin: `created_by_name` distempel server dari header `BIP-Username`, selalu menimpa nilai dari body, di koleksi transaksi, resi, PO, dan proposal, berikut amandemen gerbang gudang per-order dan status SEBAGIAN.",
+      "hash": "52a031bae73ca4ea642ddbd3feeea34825e4ea201337e649b5907a27906034c8",
+      "ukuran_kb": 40.3,
+      "ringkasan": "Menjawab: mengapa tiap menu WMS dipecah dua sub-tab (SUMBER vs INPUT WMS) dan bagaimana Finance bisa melihat apa yang seharusnya masuk/keluar vs apa yang sudah dicatat gudang. Menjelaskan kapan badge status sudah/belum-dicatat boleh muncul (hanya bila ada kunci join), aturan resi mana yang terhitung keluar gudang (COMPLETED+SHIPPED, kecuali TO_SHIP), agregasi Keluar FG per SKU dengan pemecahan bundle, serta mengapa nama penginput (created_by_name) distempel server dari header BIP-Username bukan dikirim client. Termasuk gerbang gudang backend per-order dan status SEBAGIAN.",
       "kata_kunci": [
-        "ADR 0025",
         "WMS",
         "log sumber",
         "input WMS",
         "created_by_name",
         "stempel penginput",
         "audit trail",
-        "BIP-Username",
-        "retur ekspedisi",
-        "return marketplace",
         "Keluar FG",
         "Inbound RM",
-        "Surat Jalan",
-        "resi AWB",
         "gerbang gudang",
-        "manufacture service",
-        "status resi",
-        "bundle SKU"
+        "retur",
+        "resi",
+        "BIP-Username"
       ]
     },
     {
@@ -3524,7 +3520,7 @@
         "API - Integration Service"
       ],
       "hash": "067712344405f4a51dfe830b6ab8f19ce78e74873264a026a47a3ab3cc8e1d1c",
-      "ukuran_kb": 4.9,
+      "ukuran_kb": 5.0,
       "ringkasan": "Menjawab: dari mana angka biaya operasional pada rumus insentif diambil, yaitu beban karyawan dari payroll dan beban non-gaji dari saldo akun per proyek di Accurate yang berkode employee id. Juga menjawab kenapa filternya wajib memakai nomor proyek dan bukan nama proyek, kenapa akun induk 6000 tak boleh dipakai mentah-mentah, akun mana saja yang dikecualikan beserta alasannya, dan konsekuensi apa yang harus diterima selama datanya belum terisi.",
       "kata_kunci": [
         "biaya operasional",
@@ -3674,7 +3670,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "2972fd4057b1295e0144c6ca7f2cd700e749ee52165d96cbd05abdb0dc7caa6e",
-      "ukuran_kb": 13.7,
+      "ukuran_kb": 13.8,
       "ringkasan": "Menjawab: bagaimana aset GA di modul Aset ERP direkonsiliasi dengan Aktiva Tetap di Accurate — tiga tab (Kelola Aset, Data Accurate berikut editor pemetaan kategori-ERP → golongan-Accurate, dan Cocokkan), serta mengapa join otomatis mustahil sehingga pencocokan berupa ceklis manual berbantuan yang menanam `accurate_asset_no` sebagai kunci bersama secara bertahap. Juga menjawab bagaimana skor KPI staff GA dihitung per item alih-alih agregat, mengapa aset yang belum punya padanan di Accurate dihitung 100% (input Accurate adalah hak eksklusif Finance, bukan salah GA), dan mengapa angka Cakupan wajib tampil berdampingan dengan Akurasi agar tak menyesatkan. Menjelaskan pula penempatan tiap potongan data agar batas service tetap dihormati dan penyaluran nilai KPI wajib lewat satu pintu bergerbang di employee-service.",
       "kata_kunci": [
         "aset GA",
@@ -4045,7 +4041,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "ee317d4d8664cf3c5227bcf8d3d018f9648ff0b9fdc9228e35cc31d4144a5c89",
-      "ukuran_kb": 15.9,
+      "ukuran_kb": 16.3,
       "ringkasan": "Menjawab endpoint dan alur kerja Finance Bridging versi Golang (penulisan ulang dari sistem Java): bagaimana membuat dan mengirim ringkasan transaksi Sales/Income/Return ke Accurate, halaman FE terkait per channel, status ringkasan, serta setting toko dan mapping produk.",
       "kata_kunci": [
         "Finance Bridging Golang",
@@ -4072,7 +4068,7 @@
         "Finance - Incentive"
       ],
       "hash": "8a3dba53269a5104fd1106064d8ed8159f96a7207b2c5a97ffc4a66f7a399504",
-      "ukuran_kb": 19.5,
+      "ukuran_kb": 19.6,
       "ringkasan": "Menjawab fitur dan struktur sistem Finance lama (Java/PostgreSQL/ReactJS) sebagai jembatan antara Accurate dan marketplace: master data, upload Excel per platform (TikTok/Shopee/Lazada/Tokopedia/KiriminAja), sinkronisasi ke Accurate, dan lokasi repositori kodenya.",
       "kata_kunci": [
         "Finance Bridging lama",
@@ -4165,7 +4161,7 @@
         "HRIS - Compensation & Benefits"
       ],
       "hash": "4438b6b78b580047c15c7524e71a6058e257938add761fd4e2c2144d996f5e42",
-      "ukuran_kb": 19.5,
+      "ukuran_kb": 19.8,
       "ringkasan": "Menjawab: skema insentif tim marketing yang berlaku menurut SK 010 dan 011/2026 (profit-based lintas jabatan), tabel tarif per persentase pencapaian target, aturan gerbang retur 7%, dasar perhitungan uang cair, dan aturan hangus untuk order yang belum cair sampai tanggal 25. Juga memuat isi SK lama berbasis KPI-multiplier per jabatan (SPV Marketing, Advertiser, ICC, Host Live, Affiliator, CS, CRM) sebagai riwayat, plus daftar hal yang masih menahan pemakaiannya.",
       "kata_kunci": [
         "insentif marketing",
@@ -5385,6 +5381,7 @@
         "Sales - Incentive",
         "DB - Overview and Notes",
         "APP - Web ERP",
+        "HRIS - Key Performance Index",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "HRIS - Organization Structure",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
@@ -5395,9 +5392,9 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "a70bea192b2acc84f6704ae3550161fa6ff5060f6b7b0a4f4f87935c12ce216d",
-      "ukuran_kb": 16.7,
-      "ringkasan": "Menjawab: bagaimana penilaian KPI dihitung untuk tim marketing (skor→insentif) versus appraisal per-karyawan lintas departemen, bagaimana template KPI per posisi & scoring bulanan bekerja, dan aturan pencocokan posisi template dengan jabatan karyawan pada periode yang dinilai. Juga menjelaskan RBAC per departemen, cakupan tim untuk Leader (scope=team), penggabungan tampilan lintas departemen (mis. HRGA), serta bagian mana yang sudah live dan mana yang masih konsep (siklus bulanan wajib + workflow review supervisor→HR).",
+      "hash": "bec7e7727bfc8a50d7a4c9e0d1fe6c498342427f1229f7e9f174721c72463148",
+      "ukuran_kb": 18.3,
+      "ringkasan": "Menjawab: bagaimana penilaian kinerja berbasis skor KPI bekerja di ERP Bharata, mana yang sudah jalan dan mana yang masih konsep — engine skor→insentif untuk 9 role marketing (sudah production di insentive-service) versus appraisal per-karyawan lintas departemen di employee-service (template per posisi, scoring per periode YYYY-MM). Menjelaskan aturan kunci seperti template harus cocok dengan posisi karyawan pada periode yang dinilai (bukan posisi hari ini), penghitungan employee_count sebagai assignment aktual, RBAC per departemen, cakupan tim untuk Leader (scope=team), dan tampilan gabungan lintas departemen (mis. HRGA) yang bersumber dari master data supervised_by.",
       "kata_kunci": [
         "KPI",
         "Key Performance Index",
@@ -5405,12 +5402,14 @@
         "penilaian kinerja",
         "insentif",
         "incentive",
+        "marketing",
+        "template KPI",
         "scoring",
-        "template posisi",
+        "kpi_score",
         "RBAC departemen",
-        "supervisor",
-        "employee-service",
-        "marketing"
+        "scope team",
+        "employee_count",
+        "HRGA"
       ]
     },
     {
@@ -6917,7 +6916,7 @@
         "QA - CPOB (GMP)"
       ],
       "hash": "dd084ecd166a8c13255bc2dec23c8afb425d4b54827a33168fe80668e2b84898",
-      "ukuran_kb": 15.7,
+      "ukuran_kb": 15.6,
       "ringkasan": "Menjawab: bagaimana dokumen batch produksi (batch release dossier 7 lembar) yang dulu manual dikerjakan di WMS, siapa mengisi bagian mana (admin RM, admin produksi, QC/RnD, PPIC/SPV), dan bagaimana alur DRAFT ke DIAJUKAN ke LULUS atau DITOLAK dijaga di server. Menjelaskan mode pengecekan QC (field milik QC dikunci di form admin dan hanya bisa diisi di layar review), paraf by jabatan lewat roster, serta paraf digital berjenjang per baris yang mengunci approval sampai semua slot terparaf. Berguna untuk memahami isi tiap lembar, penimbangan dan rekonsiliasi, cetak PDF, serta rantai nomor batch dari MO ke Laporan Produksi.",
       "kata_kunci": [
         "dokumen produksi batch",
@@ -7294,7 +7293,7 @@
         "QA - Register Perizinan & Sertifikasi"
       ],
       "hash": "23e3bd168ac5a48c16f9775bbc34e5fedf3ebe1e157b20409e69fdedb7075c5e",
-      "ukuran_kb": 9.1,
+      "ukuran_kb": 9.0,
       "ringkasan": "Menjawab: register mutu apa saja yang sudah ada di ERP divisi Quality — CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing, dan pengecekan raw material — berikut endpoint `/api/employee/quality/*`, collection MongoDB, dan model datanya. Juga menjawab siapa yang boleh mengakses apa (`quality:staff`, `quality:supervisor`, approver produksi & warehouse, staf marketing), bagaimana alur approval CAPA berjalan (Draft → Diajukan → persetujuan Produksi + Warehouse → finalisasi QA), dan aturan alert keterlambatan tiap register (tenggat H-7, Menunggu >3 hari, antrean >24 jam). Menjelaskan pula apa yang belum tersedia: Dashboard Mutu, IPC/Pre-Check/CPPB, dan checklist GMP/kalibrasi/storage.",
       "kata_kunci": [
         "quality",
@@ -7419,7 +7418,7 @@
         "Microservices - Manufacture Service"
       ],
       "hash": "facb437be722b849d4b5b753ebf84a71c3ac771e0b858bf8de443bbb69f3d61d",
-      "ukuran_kb": 8.9,
+      "ukuran_kb": 8.8,
       "ringkasan": "Menjawab: alur persetujuan apa saja yang ada di seluruh ERP Bharata dan siapa yang berwenang memutuskan masing-masing, mulai dari cuti/izin/sakit, perjalanan dinas, koreksi presensi, tukar jadwal, pesanan pembelian dan permintaan barang, payroll run, rekrutmen, dokumen HRD, task management, sampai insentif. Juga menjelaskan tiga cara gerbang approval ditulis (middleware di routes.go, pemeriksaan di dalam handler, dan slot reviewer pada dokumen) sehingga menyapu daftar rute saja menghasilkan kesimpulan salah, siapa yang termasuk wewenang setingkat Direktur lewat common.SetaraDirektur, dan pola cacat berulang berupa orang yang berwenang memutus tapi tak punya layar untuk melihat antreannya.",
       "kata_kunci": [
         "persetujuan",
@@ -7807,7 +7806,7 @@
         "APP - Web ERP"
       ],
       "hash": "0115ceffe21b522769faac6e9286fe16c1737ff46d15d0f58ff2e9333c9cd7f0",
-      "ukuran_kb": 14.0,
+      "ukuran_kb": 14.2,
       "ringkasan": "Menjawab: bagaimana menerbitkan akun ERP untuk vendor, mitra, atau kontraktor tanpa menjadikannya karyawan, lalu memberinya akses ke modul tertentu. Menjelaskan cara memilih antara dua sumbu hak akses yang paling sering tertukar (Paket Hak vs Role Modul), cara memperpanjang dan menutup akses beserta batasnya, serta gejala umum saat vendor sudah dibuat tapi tetap tak bisa masuk.",
       "kata_kunci": [
         "akun eksternal",
@@ -8976,28 +8975,27 @@
         "RUN - Panduan WMS Fulfillment Gudang Tinggarjaya",
         "Microservices - Manufacture Service",
         "WH - Warehouse Sadewa",
+        "WH - Kelola Pesanan (Order Management)",
         "WH - Management System",
         "WH - Outbound (Sending)",
         "WH - Inbound (Receiving)",
         "Sales - Marketplace Integration",
         "DB - Overview and Notes"
       ],
-      "hash": "4e2baed0fe701ec2314f952cae43b4edeab995af997895fc5c4cc1815373713d",
-      "ukuran_kb": 23.7,
-      "ringkasan": "Menjawab: bagaimana alur fulfillment gudang Tinggarjaya berjalan end-to-end dari order marketplace masuk (TikTok/Shopee via webhook & reconciler) sampai serah kurir dan settlement Accurate, serta kapan sebuah order muncul di WMS (hanya status TO_SHIP). Menjelaskan state machine fulfillment_orders (jalur cepat NEW→APPROVED→RTS→LABEL→HANDED_OVER dan jalur scan opsional), gerbang rekon wajib sebelum RTS, kode packer, menu \"Perlu Diproses\" pengganti arrange Desty, serta hak akses system_roles[\"warehouse\"]. Berguna untuk memahami arsitektur services/warehouse, event/reconciler, peran KiriminAja, dan gap analysis blueprint vs implementasi.",
+      "hash": "1d98727e430de527de63c6e51e5e1407808ee368f6ddb9bafc4b9d0909bfd188",
+      "ukuran_kb": 23.9,
+      "ringkasan": "Menjawab: bagaimana alur fulfillment gudang Tinggarjaya bergerak end-to-end dari order marketplace masuk (webhook TikTok/Shopee) sampai serah kurir dan settlement di Accurate, kapan sebuah order berpindah dari TO_PROCESS ke TO_SHIP sehingga baru tampil di WMS, dan apa tahap-tahap state machine `fulfillment_orders` (jalur cepat NEW→APPROVED→RTS_OK→LABEL_PRINTED→HANDED_OVER vs jalur scan pick/pack). Juga menjelaskan peran menu \"Perlu Diproses\"/arrange pengganti Desty, event hook `NotifyWarehouse` dan reconciler sweep sebagai jaring lepas-webhook, gerbang rekon `exported_at` sebelum RTS, kode packer T1/T2, peran KiriminAja, hak akses `system_roles[\"warehouse\"]`, dan gap analysis blueprint WMS vs sistem yang sudah berjalan.",
       "kata_kunci": [
         "fulfillment",
-        "WMS",
-        "Tinggarjaya",
-        "TO_SHIP",
-        "reconciler",
-        "state machine",
-        "cetak resi",
-        "RTS",
+        "WMS Tinggarjaya",
+        "gudang",
+        "warehouse service",
         "arrange",
-        "packer_code",
-        "rekon",
-        "KiriminAja"
+        "RTS resi",
+        "state machine fulfillment_orders",
+        "reconciler",
+        "packer code T1 T2",
+        "gerbang rekon"
       ]
     },
     {
@@ -9055,6 +9053,40 @@
         "attendance clock-in",
         "geofencing",
         "company_wifi"
+      ]
+    },
+    {
+      "path": "Warehouse/WH - Kelola Pesanan (Order Management).md",
+      "judul": "WH - Kelola Pesanan (Order Management)",
+      "area": "Warehouse",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "Konsep / Direncanakan — pratinjau **FE-only \"Kelola Pesanan (Beta)\"** sudah ada di kode (data **dummy**, aksi **mati**); gate RBAC badge count sudah live (lihat [[CORE - RBAC dan Permission Set]]); **penyambungan ke data/endpoint nyata + cutover dari menu lama BELUM dikerjakan**.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Warehouse Service",
+        "Microservices - Integration Service",
+        "CORE - RBAC dan Permission Set",
+        "WH - Fulfillment Flow & WMS Tinggarjaya",
+        "External - Desty",
+        "WH - Warehouse Sadewa",
+        "API - Warehouse Service",
+        "APP - Web ERP"
+      ],
+      "hash": "c4637f8509f5c1a5a4144b1a335e575e34704efa5110b9829b98aa991eb3b130",
+      "ukuran_kb": 8.5,
+      "ringkasan": "Menjawab: apa rencana penyatuan menu-menu gudang yang kini terpecah per-tahap (Perlu Diproses, Antrian Pesanan, Pengambilan, Pengemasan, Riwayat Cetak Resi, Serah Terima) menjadi satu layar omnichannel \"Kelola Pesanan\" ala Desty tanpa mengubah backend, dan apa beda pratinjau Beta FE-only (data dummy, aksi mati) dengan menu produksi yang sudah wired ke endpoint nyata. Juga menjelaskan pemetaan tiap tab/sub-tab \"Siap Dikirim\" ke endpoint warehouse/integration, rencana mutasi bertahap fase 0-5 sampai cutover, gerbang dan nuansa yang wajib dipertahankan saat \"cuma ganti UI\" (gerbang rekon `exported_at`, kode packer T1/T2, guard TikTok `package_id` kosong, batch cap 100), persona pengguna dan RBAC-nya, serta hal yang belum diputuskan (tab Belum Dibayar, cakupan Sadewa, nasib menu lama).",
+      "kata_kunci": [
+        "Kelola Pesanan",
+        "Order Management",
+        "Kelola Pesanan Beta",
+        "omnichannel",
+        "Desty",
+        "erp-frontend warehouse",
+        "atur pengiriman arrange",
+        "cetak resi",
+        "tab pesanan",
+        "cutover menu lama"
       ]
     },
     {
@@ -9222,7 +9254,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.5,
+      "ukuran_kb": 11.2,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
