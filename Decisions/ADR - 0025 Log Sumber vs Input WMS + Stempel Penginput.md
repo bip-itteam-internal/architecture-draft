@@ -109,6 +109,8 @@ Jalur **proposal** ditambahkan belakangan (21 Juli 2026): transaksi yang lahir d
 - **Export laporan fleksibel** (`buildBarisExport`): modal pilih **kolom** (24 kolom termasuk resi-balik/kurir/status-logistik + Reuse/Rework/Reject + dicatat-oleh) + **filter** (rentang tanggal, channel, status catat) + **toggle granularitas per-retur / per-SKU** → **xlsx** (`exceljs`+`file-saver` dynamic import, pola `ResiMasterView`). Murni client-side dari feed yang sudah dimuat (batas truncation >2000 diberitahukan).
 - **Auto-isi "Nama Pengecek (PIC)"** dari **`full_name` JWT** (cookie `token`, fallback `username`), diisi **hanya bila kosong** — DEFAULT kenyamanan, **BUKAN** pengganti stempel audit `created_by_name` (#6) yang tetap server-side & otoritatif. Ini pembedaan penting: PIC = field bisnis bisa disunting, stempel = jejak audit tak bisa dipalsukan.
 
+> **Amandemen — kolom "Daftar Nama Barang" di export (✅ 2026-08-20).** Granularitas **per-retur** (default modal export) hanya membawa `daftar_sku` (kode SKU digabung koma) — operator harus buka master SKU terpisah untuk tahu nama barangnya; granularitas per-SKU sudah punya `item_name` tapi itu bukan default. Kolom baru `daftar_nama_barang` (mirror `daftar_sku`, gabung `items[].name`) ditambahkan ke `EXPORT_COLUMNS` & masuk **default terpilih** `expCols` — file hasil download kini langsung membawa nama produk tanpa operator perlu memilihnya manual. Grounded: `nilaiKolom`/`EXPORT_COLUMNS` (`retur-export.ts`), tes `retur-export.test.ts`; `expCols` (`GudangBarangJadiView.tsx`).
+
 ## Consequences
 
 **Yang membaik**
