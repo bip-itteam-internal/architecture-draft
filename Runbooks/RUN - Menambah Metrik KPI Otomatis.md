@@ -14,7 +14,7 @@ Sumber yang sudah ada dan bisa dipakai sebagai contoh:
 | `skor_tim` | Koleksi `kpi_score` di employee-service sendiri | Sumber yang membaca data lokal, disempitkan ke tim atau departemen |
 | `uptime_sistem` | monitoring-service lewat HTTP | Sumber yang menarik dari service lain, dan cakupannya bersifat WAKTU sehingga `CakupanPersen` ditimpa |
 | `kaizen` | form-builder lewat HTTP | Sumber yang mencacah kiriman per periode |
-| `kinerja_toko` | marketing-analytics lewat HTTP | **Satu sumber melayani banyak metrik** lewat `KPIAutoConfig.Metrik` — kini **tujuh**: `revenue`, `ads_cost`, `gross_profit`, `jumlah_video`, `roi`, `roi_bersih`, `retur_persen`; tiap entri katalog menghasilkan SATU angka |
+| `kinerja_toko` | marketing-analytics lewat HTTP | **Satu sumber melayani banyak metrik** lewat `KPIAutoConfig.Metrik` — kini **delapan**: `revenue`, `ads_cost`, `gross_profit`, `jumlah_video`, `roas`, `roas_bersih`, `retur_persen`, `profit_bersih`; tiap entri katalog menghasilkan SATU angka. (`roas`/`roas_bersih` dulu bernama `roi`/`roi_bersih` — alias lama tetap jalan. `profit_bersih` = net_settle − hpp − iklan − retur − opex, boleh negatif. Detail: [[HRIS - Otomasi Skor KPI]]) |
 | `kinerja_tiket` 🟡 | task-management lewat HTTP | Pola yang sama, tetapi tiap entri katalog menghasilkan **Cuplikan utuh** karena bentuk cakupan tiap metriknya berbeda (belum merge, branch `feat/kpi-sumber-tiket`) |
 
 **Kalau sumbermu menyediakan lebih dari satu angka, jangan bikin sumber baru per metrik.** Pakai `KPIAutoConfig.Metrik` sebagai pemilihnya, seperti `kinerja_toko` dan `kinerja_tiket`. Dengan begitu mengganti metrik sebuah baris KPI cukup mengubah konfigurasi, tanpa sumber baru dan tanpa deploy.
@@ -291,7 +291,7 @@ Urutan menangnya dari yang paling khusus:
 
 Yang tak terdaftar jatuh ke lapis berikutnya, **bukan nol**. Pemeriksaannya memakai bentuk dua-nilai (`t, ada :=`), bukan membandingkan hasil dengan nol, sebab **target 0 sah** untuk arah `turun` dan memperlakukannya sebagai "tak diisi" akan diam-diam mengembalikan target umum yang bukan maksudmu.
 
-**Pakai `target_per_karyawan` untuk metrik NOMINAL, bukan untuk rasio.** Alasannya bukan kelenturan melainkan ketimpangan yang terukur: profit antar toko ICC Juli 2026 berentang **570×**, dari Rp342.585.503 sampai minus Rp3.471.743. Satu garis target di situ meloloskan pemegang toko besar dan menggagalkan sisanya tanpa ada kaitannya dengan kinerja. Metrik rasio (ROI, persentase retur) sudah ternormalisasi, jadi target seragam justru yang benar di sana.
+**Pakai `target_per_karyawan` untuk metrik NOMINAL, bukan untuk rasio.** Alasannya bukan kelenturan melainkan ketimpangan yang terukur: profit antar toko ICC Juli 2026 berentang **570×**, dari Rp342.585.503 sampai minus Rp3.471.743. Satu garis target di situ meloloskan pemegang toko besar dan menggagalkan sisanya tanpa ada kaitannya dengan kinerja. Metrik rasio (ROAS, persentase retur) sudah ternormalisasi, jadi target seragam justru yang benar di sana.
 
 ⚠️ **Target per karyawan menggeser bebannya, bukan menghapusnya.** Sekali dipakai, target tiap orang jadi keputusan yang harus dipertanggungjawabkan tiap periode dan tak lagi terbaca dari satu angka di template. Isi lewat tabel massal di form konfigurasi (erp-frontend PR [#832](https://github.com/bip-itteam-internal/erp-frontend/pull/832)), dan **pratinjau dulu sebarannya** sebelum menyimpan.
 

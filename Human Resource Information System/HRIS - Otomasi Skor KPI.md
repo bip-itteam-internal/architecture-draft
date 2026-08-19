@@ -127,6 +127,8 @@ Sampai batch ini, menyalakan satu metrik otomatis menuntut seseorang membedah `k
 
 **`kinerja_toko` bertambah `jumlah_video`**, menjadi tujuh metrik (`revenue`, `ads_cost`, `gross_profit`, `jumlah_video`, `roi`, `roi_bersih`, `retur_persen`). Berbeda dari metrik rasio di sebelahnya, **nol video BUKAN galat**: seorang ICC memang dapat tidak menerbitkan video sebulan penuh, dan itu justru keadaan yang hendak diukur — menggalatkannya menyembunyikan kinerja terburuk sebagai "gagal hitung".
 
+> Daftar metrik di atas **sudah bergeser** sejak Agustus 2026: `roi`/`roi_bersih` dinamai ulang `roas`/`roas_bersih`, dan metrik kedelapan `profit_bersih` ditambahkan. Rinciannya di bab **Perubahan Agustus 2026: ROAS, profit bersih, dan opex per ICC** di bawah.
+
 **Penyempurnaan pengisian angka** (branch `feature/workspace-position`, **belum di-push** per 2026-08-12). Field target, ambang, `nilai_minimum`, dan target per-bulan/per-karyawan kini menampilkan **pemisah ribuan langsung saat mengetik** (netral-satuan, sadar-locale id/en, desimal dipertahankan), sementara yang dikirim ke backend tetap `number` mentah — komponen `InputAngka` + helper `formatKetik`/`parseAngka` di `src/features/hris/kpi/lib/angka.ts`. Di samping field target muncul **petunjuk satuan berbasis FORMULA** (`jumlah_nilai`→nominal, `jumlah_unit`→jumlah, `rasio_ambang`→persen, `rata_rata`→nilai) sebagai pill berikon, ditambah baris "Tersimpan ke sistem" yang memperlihatkan angka mentah. Satuan sengaja diturunkan dari formula, bukan nama sumber, agar sumber baru tak menuntut rilis FE — konsekuensi diterima: metrik uptime/downtime (juga `rata_rata`) berlabel "nilai (0–100)", bukan "persen". Tabel target massal tetap integer-only (`bacaAngka`) dan hanya menampilkan grouping saat blur.
 
 ### Yang harus diketahui sebelum angkanya dipercaya
@@ -163,6 +165,34 @@ bip-erp PR [#1058](https://github.com/bip-itteam-internal/bip-erp/pull/1058) ("c
 **Jadi masalah yang hendak dijawabnya masih terbuka**: kedua Leader ICC tetap tak punya bawahan di `supervisor_id`, dan metrik team mereka tetap tak dapat dihitung. Pekerjaan kodenya sudah ada dan teruji di branch `feat/kpi-cakupan-tim-icc`; yang dibutuhkan hanya PR baru yang menargetkan `main`.
 
 **Pelajaran yang layak diingat**: PR bertumpuk (`base` menunjuk branch fitur lain, bukan `main`) kehilangan seluruh isinya bila branch dasarnya di-merge lebih dulu. Tanda MERGED di GitHub **tidak berarti kodenya ada di `main`** — yang membuktikannya hanya `git merge-base --is-ancestor <merge-commit> origin/main`, atau lebih sederhana, mencari berkasnya di `origin/main`.
+
+### Perubahan Agustus 2026: ROAS, profit bersih, dan opex per ICC
+
+> **Status**: ⚠️ **selesai & terverifikasi di dev, BELUM di prod** per 2026-08-19. Branch `feature/workspace-position` (bip-erp, sudah di-push), commit `619eeafd` (ROAS), `a51c5216` (kerangka profit bersih), `68adb0d2` (opex pakai `bersih`). Berlaku di prod setelah `marketing-analytics-service` + `employee-service` di-deploy, lalu migrasi template prod `roi`→`roas`.
+
+Tiga perubahan lahir dari masukan manajemen atas metrik marketing ICC/SPV.
+
+**1. `roi` → `roas`** (dan `roi_bersih` → `roas_bersih`). Rumus `revenue / ads_cost` di katalog `kinerja_toko` sejak awal memang **ROAS** (Return on Ad Spend, pembilang revenue KOTOR), bukan ROI — ROI membagi untung bersih terhadap biaya. Target 4,5 pun hanya masuk akal sebagai ROAS (revenue 4,5× belanja iklan), bukan ROI (450% untung). Nama lama tetap diterima lewat `aliasMetrikUsang` di `services/employee/kpi_sumber_kinerja_toko.go` supaya template yang belum dimigrasi tak gagal hitung saat biner baru naik lebih dulu dari config-nya; picker hanya menampilkan nama baru. **Menggantikan** daftar metrik `roi`/`roi_bersih` di bab "HR mengisi konfigurasinya sendiri" di atas. Diverifikasi di dev: metrik Kualitas Iklan ICC Kyura tetap menghasilkan angka identik (ROAS 3,97 atas target 4,5 → 88,3), murni ganti nama. Ruang lingkup "ROAS tingkat toko" (revenue toko ÷ belanja iklan) disepakati cukup — bukan ROAS per-kampanye dari laporan platform ads.
+
+**2. Metrik baru `profit_bersih`** = `net_settlement − hpp − ads_cost − retur − opex`, per rumus atasan. Berbeda dari `gross_profit` yang bertumpu pada revenue: basisnya **net_settlement** (uang yang benar-benar diterima setelah potongan marketplace), lalu dikurangi seluruh biaya termasuk opex. **Boleh negatif** — ICC yang belanja iklannya melampaui hasil bersihnya memang rugi, dan menjepitnya ke nol menyembunyikan keadaan yang justru hendak diukur. `net_settlement` dan `hpp` ditambahkan ke `$group` agregasi `mart_profit_attribution` (sudah ada per baris); `opex` dari sumber di poin 3. Diverifikasi end-to-end di dev untuk BIP-0028-05-23 (Juli 2026): `4.918.124 − 1.577.794 − 3.117.799 − 0 − 0 = ` **222.531** — opex `bersih`-nya Juli = 0 (lihat poin 3), jadi hasilnya kebetulan sama dengan gross_profit bulan itu.
+
+**3. Opex per ICC dari Accurate — `integration_db.incentive_opex_accurate`** (salinan lokal yang disinkron integration-service dari akun induk **`6000` "Beban Operasional"** Accurate, per proyek). Berkunci `proyek_no` (= `employee_id`; satu proyek Accurate = satu ICC) + `periode`. Field: `induk` (total 6000 mentah), `dikecualikan` (Σ 14 akun yang SUDAH terhitung di tempat lain), `bersih` = `induk − dikecualikan`, dan `rincian[]` (daftar akun yang **dikecualikan** itu, bukan yang dibebankan).
+
+Rumus memakai field **`bersih`**, BUKAN `induk` mentah maupun `Σrincian`/`dikecualikan`. Ini menentukan benar-salahnya angka, dan integration-service sudah memutuskannya untuk rumus profit insentif yang bentuknya SAMA:
+- `induk` **salah** — 88,5% opex Juli 2026 (Rp4,47 M dari Rp5,05 M) sudah dikurangkan di tempat lain; mengambilnya mentah menghitung dobel.
+- `Σrincian`/`dikecualikan` **salah** — justru akun-akun yang sudah terhitung di tempat lain: fee e-commerce yang sudah terpotong di **net_settlement** (Admin E-Commerce 6112, Afiliasi 6113, Ongkir 6114, dst.), **iklan** (6107/6108), dan **gaji** (payroll). Mengurangkannya = dobel.
+- `bersih` = opex yang **BELUM** terhitung di tempat lain — satu-satunya yang sah dikurangkan dari rumus yang net_settle/hpp/iklan/retur-nya sudah dihitung terpisah. Definisi milik integration-service (`AkunDikecualikan` di `incentive_opex_accurate.go`), dipakai ulang alih-alih melahirkan versi kedua. Hanya baris status `ada` yang dipakai.
+
+[[Microservices - Marketing Analytics Service]] yang membacanya (satu-satunya dengan koneksi baca ke `integration_db`) lalu menempelkannya ke `/kpi/kinerja-toko` lewat `services/marketing-analytics/kpi_opex_icc.go`; opex gagal-baca tak menggagalkan metrik toko lain. (Iterasi awal keliru memakai `Σrincian`; dikoreksi ke `bersih`, commit `68adb0d2`.)
+
+> **Koreksi bab-bab di bawah**: baris "Varians budget vs realisasi OPEX — Budget/anggaran tidak tersimpan di ERP mana pun" (Semi-otomatis) **sudah tidak akurat**. `integration_db` memuat `anggaran_opex` (229 dok), `realisasi_opex` (112), `realisasi_opex_mingguan` (60) — level akun+bulan+departemen — dan `incentive_opex_accurate` (17) yang **per-ICC**.
+
+**Yang masih menahannya (bukan kode):**
+- **Cakupan opex tipis & `bersih` Juli = 0**: `incentive_opex_accurate` baru terisi **17 ICC, periode 2026-07** — terikat sinkron fitur incentive, bukan feed bulanan umum. Dan di data itu `bersih` = 0 untuk **semuanya** (seluruh opex mereka jatuh ke akun yang sudah terpotong di net_settlement/iklan), jadi profit bersih untuk sekarang praktis **= gross**. ICC/periode yang belum tersinkron juga mengembalikan 0 secara SAH. Butuh dipastikan Accurate mengisi semua ICC tiap bulan, dan bila `bersih` tetap 0 terus, perlu konfirmasi finance apakah pengecualiannya memang benar.
+- **Target `profit_bersih` belum disepakati**: net profit jauh lebih kecil dari gross (88rb vs gross 222rb untuk contoh di atas), jadi target lama (mis. 50 jt untuk gross) tak cocok. Keputusan pemilik metrik.
+- **Ganti atau tambah**: apakah metrik "Profit" ICC yang ada beralih ke `profit_bersih`, atau net profit jadi metrik terpisah di samping gross — TBD.
+
+Konteks sumber: [[Microservices - Marketing Analytics Service]] (agregasi mart + join opex), [[Microservices - Employee Service]] (katalog metrik), [[External - Accurate]] (opex).
 
 ## Progres bulan berjalan di MyBharata
 
