@@ -30,7 +30,19 @@ Aturan turunannya:
 
 7. **Departemen dan jabatan tujuan wajib ada di master data perusahaan TUJUAN.** `master_department.key` unik per perusahaan, bukan global; verifikasi dev terakhir menunjukkan ELT masih nol departemen, jadi tanpa penjaga ini mutasi pertama ke sana mendaratkan karyawan di departemen yang tidak ada.
 
-	**Perpindahan nyata pertama justru berjalan ke arah SEBALIKNYA** (ELT → BIP, 14 karyawan CV Elit), dan prasyarat aturan ini disiapkan lebih dulu 2026-08-19: departemen **`printing` "Printing"** dibuat di BIP berisi 13 jabatan salinan dari `pct` "Percetakan" milik ELT (PR [#1276](https://github.com/bip-itteam-internal/bip-erp/pull/1276); live DEV, **prod belum**). Rinciannya di [[HRIS - Organization Structure]].
+	**Perpindahan nyata pertama justru berjalan ke arah SEBALIKNYA** (ELT → BIP, 14 karyawan CV Elit), dan ✅ **sudah DIJALANKAN di produksi 2026-08-19**. Prasyarat aturan ini disiapkan lebih dulu: departemen **`printing` "Printing"** dibuat di BIP pukul 11:32 berisi 13 jabatan salinan dari `pct` "Percetakan" milik ELT (PR [#1276](https://github.com/bip-itteam-internal/bip-erp/pull/1276)), baru pukul 11:40 orangnya dipindahkan. Rinciannya di [[HRIS - Organization Structure]].
+
+	Yang benar-benar berpindah: 14 `work_data`, 14 `work_schedule`, 14 `employee_contract`, 14 catatan `employee_movement` berstatus `applied`, 242 entri presensi, 1 koreksi presensi, dan 2 definisi `company_work_schedule`. **Modulnya sendiri TIDAK dipakai** — catatannya ditulis langsung sebagai dokumen, sebab modul ini belum pernah dijalankan lewat gateway hidup dan percobaan perdananya tak layak berupa 14 orang sungguhan di produksi.
+
+	**Urutan yang terbukti, dan alasan tiap langkahnya** (kerangka skripnya: `.task-plans/jalankan-migrasi-elt.ps1`):
+
+	1. **`mongodump` kedua database** sebelum satu byte pun berubah. Pemindahan riwayat presensi tak punya jalan pulang tanpa ini.
+	2. **Gandakan WiFi kantor tenant asal sebagai milik tenant tujuan**, SEBELUM orangnya pindah. Verifikasi clock-in WFO mencocokkan `company_id` perusahaan karyawan itu sendiri lalu membalas **403 `Unauthorized network`**; memindahkan kepemilikan berbarengan dengan orangnya meninggalkan jeda yang menolak SETIAP tap absen, dengan pesan yang tak menyebut perpindahan sama sekali. Menggandakan lebih dulu membuat keduanya berlaku selama migrasi.
+	3. **Pindahkan orangnya**, lalu 4. **pindahkan riwayat dan kepemilikan jadwal**, baru 5. **buang WiFi lama** — dan langkah 5 wajib menolak berjalan bila salinan barunya belum terbukti ada.
+
+	**Yang sengaja TIDAK perlu disentuh**, dan sempat dikira perlu: jadwal kerja. Resolusi harian mencari `company_work_schedule` **by `schedule_id` tanpa filter perusahaan** (`schedule_id` unik global), jadi `ELT-REGULAR` tetap terbaca sesudah orangnya jadi BIP. Yang berpindah cuma kepemilikan dan daftar pilihannya.
+
+	**`position_key` adalah titik paling rapuh.** Nama jabatan boleh ditulis ulang mengikuti gaya perusahaan tujuan (ALL CAPS → Title Case) karena `common.KanonPosisi` melumatkan kapitalisasi sehingga key-nya tetap sama; mengganti KATA-nya menerbitkan key baru dan memutus paket hak yang menempel. Satu karyawan hampir mendarat di jabatan yang salah karena `position_key`-nya basi — nama jabatannya disunting HR tanpa key-nya ikut diperbarui, dan kedua jabatan sama-sama ada di master sehingga tak ada galat yang akan muncul. **Migrasi berikutnya wajib memeriksa `KanonPosisi(position) == position_key` untuk tiap orang, dan berhenti bila ada yang tak cocok.**
 
 	Dua hal yang ditemukan saat menyiapkannya dan berlaku untuk perpindahan antar-tenant berikutnya, bukan cuma yang ini:
 
