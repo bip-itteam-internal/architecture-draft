@@ -2,7 +2,7 @@
 
 *Endpoint service `learning` (modul gateway **`/api/learning/*`**, port internal 6987). Isinya modul pelatihan karyawan yang dipindah utuh dari [[Microservices - Employee Service]] pada LMS Fase 0. Implementasi & catatan: [[Microservices - Learning Service]] · konsep: [[HRIS - Training Program]].*
 
-- **Status**: ✅ Grounded ke kode, live di dev + produksi 2026-08-06
+- **Status**: ✅ Grounded ke kode, live di dev + produksi 2026-08-06; pengajuan, evaluasi, dan `/me` **terverifikasi lewat gateway hidup 2026-08-19**
 - **RBAC**: tulis = `RequireHRISStaff`; GET terbuka di belakang gateway
 - **Catatan pemindahan**: path internalnya **tidak berubah** dari versi lama, hanya prefix modulnya. `/api/employee/training/...` menjadi `/api/learning/training/...`
 
@@ -100,7 +100,20 @@ Di bawah **tiga responden**, `ditampilkan: false` **dan seluruh angkanya nol** �
 
 Seluruh endpoint LMS (course, materi, bank soal, pre/post test, skoring, kurikulum jabatan, Talent Pool) **belum ada** — Fase 1 ke atas. Desainnya di [[HRIS - Training Program]]. **Penilaian trainer sudah ada** (lihat di atas).
 
-⚠️ Seluruh endpoint pengajuan, evaluasi, dan penanda `/me` di atas **belum pernah diverifikasi lewat gateway hidup**: `learning-service` di dev masih memakai image lama.
+✅ ~~Seluruh endpoint pengajuan, evaluasi, dan penanda `/me` belum pernah diverifikasi lewat gateway hidup~~ — **terverifikasi 2026-08-19** lewat gateway dev, sesudah image `learning-service` dibuild ulang di dev dan produksi:
+
+| Panggilan lewat gateway dev | Balasan |
+|---|---|
+| `GET /api/learning/training` | 200 |
+| `GET /api/learning/training/types` | 200 (1 dokumen) |
+| `GET /api/learning/training/requests?as=self` | 200 |
+| `GET /api/learning/training/requests?as=reviewer` | 200 |
+| `GET /api/learning/me/trainings` | 200 |
+| `GET /api/learning/training/requests-karangan` (**kontrol negatif**) | **400** `id is not a valid ObjectID` |
+
+Kontrol negatif itu bagian dari buktinya, bukan pelengkap: ia berprefiks **sama** dengan rute nyata sehingga hasil yang beda membuktikan routing-nya benar-benar membedakan. Tanpa itu, deretan 200 di atas tak bisa dipisahkan dari gateway yang meloloskan apa saja. Sebelum rebuild, `/training/requests` tertelan `/training/:id` dan membalas 400.
+
+⚠️ **Terpasang bukan berarti terpakai.** Di produksi 2026-08-19 koleksi `training_request` dan `trainer_evaluation` sama-sama **0 dokumen** walau endpointnya live sejak 2026-08-11 — sebabnya alur karyawan yang terputus, lihat [[Microservices - Learning Service]].
 
 ## Dokumen Terkait
 
