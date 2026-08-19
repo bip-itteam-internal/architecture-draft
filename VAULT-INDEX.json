@@ -4192,21 +4192,20 @@
         "GA - Procurement System",
         "Finance - Big Pictures"
       ],
-      "hash": "396a4ab7e75d0797b1b5788d8ca12eea5f0954884e066a1e2629a27f48d47729",
-      "ukuran_kb": 23.9,
-      "ringkasan": "Menjawab: bagaimana modul kas kecil dan pengajuan budget per divisi dirancang dan sejauh mana sudah ada di kode, termasuk plafon per divisi, sembilan aturan bisnis (R-01 s/d R-09), matriks approval berjenjang, dan alur status kas kecil/pengajuan/top-up. Menjelaskan endpoint /kas dan /budget di procurement-service, model izin permission-set tanpa fallback tier, alasan menumpang procurement-service, serta lubang data dan tabrakan arsitektur (mis. buku besar sendiri vs ADR-0001 Accurate) yang masih menghalangi bagian berikutnya. Berguna untuk tahu apa yang sudah merge/deploy dan apa yang perlu diputuskan sebelum lanjut.",
+      "hash": "869181259438b1d1a671e7c3c0e701592d48b5fa3a497cf41eca05b987790ce4",
+      "ukuran_kb": 24.1,
+      "ringkasan": "Menjawab: bagaimana kas kecil per divisi dibatasi plafon, kapan sebuah pengeluaran masuk jalur kas kecil langsung (< Rp 500.000) versus jalur Pengajuan yang butuh approval berjenjang, dan siapa approver di tiap tingkat nominal (Kepala Divisi, Finance, Direksi). Merinci sembilan aturan bisnis (R-01 sampai R-09) termasuk blokir overbudget, larangan beli aset lewat kas kecil, deteksi pemecahan transaksi, top-up khusus Purchasing/Gudang TJ, alur status, endpoint procurement-service (/kas dan /budget), koleksi Mongo, serta model izin tanpa fallback tier. Juga mendokumentasikan lubang data hasil sensus produksi, tabrakan dengan arsitektur (buku besar sendiri vs Accurate, relasional di atas MongoDB, register aset), dan hal yang masih TBD sebelum deploy.",
       "kata_kunci": [
         "kas kecil",
         "petty cash",
         "pengajuan budget",
-        "plafon divisi",
+        "plafon",
+        "budget request",
         "approval berjenjang",
-        "procurement service",
-        "permission set",
         "top-up",
-        "kaskecil",
-        "aturan bisnis R-01",
-        "Finance"
+        "procurement",
+        "pengajuan aset",
+        "R-01 R-09"
       ]
     },
     {
