@@ -3893,13 +3893,14 @@
         "Microservices - File Service",
         "APP - Web ERP"
       ],
-      "hash": "5619c3b08fcbb1947003866c53c1532c78d7cfcdba66c1d2741e8699356f3cc0",
-      "ukuran_kb": 16.4,
-      "ringkasan": "Menjawab: apa yang terjadi pada data seorang karyawan ketika ia pindah badan usaha di dalam Bharata Group, dan kenapa `employee_id`-nya tidak pernah diterbitkan ulang sehingga prefix perusahaan pada ID berhenti menandakan tenant dan tinggal jadi jejak asal-mula. Menjelaskan koleksi `employee_movement` yang menyatukan promosi, mutasi, dan mutasi antar-perusahaan dengan status disimpan plus cron harian idempoten, aturan bahwa departemen dan jabatan tujuan wajib sudah ada di master data perusahaan TUJUAN, serta apa yang ikut pindah (masa kerja, kuota cuti, BPJS) dan apa yang tidak (kontrak baru, riwayat presensi lama). Memuat konsekuensi yang diterima sadar, termasuk perusahaan tujuan yang belum punya hak menolak dan approval yang sengaja ditunda.",
+      "hash": "aa6a44c7e65ed35e6ceaf0007afd5fcd6663aafabe8a25ecf0222453cf25bd6d",
+      "ukuran_kb": 17.4,
+      "ringkasan": "Menjawab: apa yang terjadi pada data seorang karyawan ketika ia pindah badan usaha di dalam Bharata Group, dan kenapa `employee_id`-nya tidak pernah diterbitkan ulang sehingga prefix perusahaan pada ID berhenti menandakan tenant dan tinggal jadi jejak asal-mula. Menjelaskan koleksi `employee_movement` yang menyatukan promosi, mutasi, dan mutasi antar-perusahaan dengan status disimpan plus cron harian idempoten, aturan bahwa departemen dan jabatan tujuan wajib sudah ada di master data perusahaan TUJUAN, serta apa yang ikut pindah (masa kerja, kuota cuti, BPJS) dan apa yang tidak (kontrak baru, riwayat presensi lama). Memuat juga perpindahan nyata pertama ELT ke BIP beserta pengecualian resminya: riwayat presensi CV Elit ikut dipindahkan karena badan usaha asalnya diserap seluruhnya, dan itu ditegaskan sebagai pengecualian, bukan pembatalan aturan bawaannya.",
       "kata_kunci": [
         "mutasi",
         "mutasi antar-perusahaan",
         "perpindahan tenant",
+        "pindah badan usaha",
         "promosi",
         "employee_movement",
         "employee_id",
@@ -3908,8 +3909,10 @@
         "transfer karyawan",
         "ELT",
         "CV Elit",
-        "prasyarat post-test",
-        "snapshot jabatan"
+        "Printing",
+        "riwayat presensi",
+        "snapshot jabatan",
+        "prasyarat post-test"
       ]
     },
     {
