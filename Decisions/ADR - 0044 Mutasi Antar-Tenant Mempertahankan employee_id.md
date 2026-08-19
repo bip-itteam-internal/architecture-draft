@@ -30,6 +30,13 @@ Aturan turunannya:
 
 7. **Departemen dan jabatan tujuan wajib ada di master data perusahaan TUJUAN.** `master_department.key` unik per perusahaan, bukan global; verifikasi dev terakhir menunjukkan ELT masih nol departemen, jadi tanpa penjaga ini mutasi pertama ke sana mendaratkan karyawan di departemen yang tidak ada.
 
+	**Perpindahan nyata pertama justru berjalan ke arah SEBALIKNYA** (ELT → BIP, 14 karyawan CV Elit), dan prasyarat aturan ini disiapkan lebih dulu 2026-08-19: departemen **`printing` "Printing"** dibuat di BIP berisi 13 jabatan salinan dari `pct` "Percetakan" milik ELT (PR [#1276](https://github.com/bip-itteam-internal/bip-erp/pull/1276); live DEV, **prod belum**). Rinciannya di [[HRIS - Organization Structure]].
+
+	Dua hal yang ditemukan saat menyiapkannya dan berlaku untuk perpindahan antar-tenant berikutnya, bukan cuma yang ini:
+
+	- **Menulis ulang nama jabatan aman, mengganti namanya tidak.** Nama boleh diselaraskan dengan gaya perusahaan tujuan (ALL CAPS → Title Case) karena `common.KanonPosisi` melumatkan kapitalisasi sehingga `position_key`-nya tetap sama; tetapi mengubah KATA-nya (mis. "SPV Operasional" → "Printing Supervisor") menerbitkan key baru dan memutus kecocokan `work_data.position_key` karyawan yang ikut pindah, beserta paket hak yang menempel padanya.
+	- **Aturan ini menjamin departemennya ADA, bukan bahwa alurnya HIDUP.** Departemen tujuan yang sah tetap bisa lahir tanpa penyetuju pengajuan, dan kekosongan itu tak memunculkan galat apa pun — yang terlihat cuma cuti dan koreksi absensi yang mentok. Perlu diperiksa terpisah, terutama bila judul jabatan atasannya tak cocok pola tebakan `Supervisor|^Leader$` sehingga tak ada lapisan cadangan yang menutupinya.
+
 8. **`work_data` ditulis lewat `$set` yang disusun sendiri**, bukan lewat `executeEmployeeUpdateTransaction` (bisa mengosongkan `company_id`, lihat [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] §Masih terbuka) maupun rute update parsial (sumber korupsi tipe BSON). Daftar field yang ditulis eksplisit dan pendek, dan `employment_type`/`contract_ending` **tak pernah** ikut — keduanya milik modul kontrak.
 
 9. **Perpindahan didaftarkan sebagai feed kalender**, `kind` `movement` pada endpoint yang sudah ada, dengan lingkup **personal saja**: orang melihat perpindahannya sendiri, bukan supervisor, bukan HR ([[Microservices - Calendar Service]]).
