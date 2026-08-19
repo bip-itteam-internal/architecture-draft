@@ -18,6 +18,7 @@ Doc: [[Microservices - Employee Service]]
 - company_work_schedule
 - system_authentication
 - kpi_score (beserta KPI templates)
+- kpi_template_assignment (🟡 bip-erp PR [#1298](https://github.com/bip-itteam-internal/bip-erp/pull/1298), belum merge) — penetapan template KPI per karyawan: `employee_id`·`template_id`·`company_id`·**`berlaku_mulai`** (`YYYY-MM`)·`metadata`. Ada karena satu jabatan tidak selalu satu template (AR Staff Finance memegang tiga) sedangkan `work_data` tak menyimpan pembedanya. **Berperiode**: mengganti template = MENAMBAH baris, bukan menimpa, supaya penilaian bulan lampau tetap memakai penetapan yang berlaku saat itu. Koleksi tersendiri (bukan field `work_data`) mengikuti alasan `employee_resign`. Index unik `{employee_id, berlaku_mulai}`; disemai sekali saat boot dari riwayat `kpi_score`
 - company_holiday
 - master_department (departments + positions + roles per dept; seed otomatis) — kini **`company_id` per-perusahaan** (PR #652, migrasi backfill BIP; supervisi/RBAC tetap global — [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]])
 - master_system_role (feature-based role systems: insentive, integration; seed otomatis)
