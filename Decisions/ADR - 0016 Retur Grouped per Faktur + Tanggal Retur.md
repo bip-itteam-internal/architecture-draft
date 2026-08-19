@@ -1,4 +1,4 @@
-**Status**: ✅ **Implemented** (kode + deploy 2026-07-17)
+**Status**: ✅ **Implemented** (kode + deploy 2026-07-17). **Amandemen 2026-08-20 (✅ deployed, PR #1299):** kunci grup ditambah segmen **JENIS** → `<faktur>|<YYYYMMDD>|<JENIS>` — satu dokumen = satu jenis retur (Decision #1 diperluas; Decision #4 mode-campuran **tak lagi terjadi** untuk dokumen baru). Lihat amandemen di bawah.
 
 # ADR - 0016 Retur: Grouped per (Faktur Sumber + Tanggal Retur)
 
@@ -45,6 +45,12 @@ Kunci `<faktur>|<tanggal>` menggabungkan dua nilai yang **bisa bergerak setelah 
 ⚠️ **Jebakan saat membetulkan data: re-book bisa MENGHIDUPKAN baris `SKIPPED`.** Membukukan ulang satu baris "penyintas" dari sepasang dokumen kembar akan ikut menarik member yang baris pasangannya sengaja `SKIPPED` — bila member pasangan itu **bukan himpunan bagian** dari member penyintas, hasilnya dokumen Accurate baru untuk retur yang sengaja tak dibukukan. Terjadi pada `RTR/2026/07/22/003` & `RTR/2026/07/23/055-BH`; ketahuan karena cacah SENT jadi 1.294, bukan 1.292 — **selalu cacah ulang sesudah remediasi, jangan percaya laporan alatnya saja.**
 
 - **Pembersihan dokumen kembar ✅ SELESAI 2026-08-06**: Agustus **8 pasang** (−Rp1.500.000); Juli **9 pasang** se-bulan + **4 pasang** lintas-bulan (−Rp1.033.500). Dihapus lewat `cmd/returndescope --return` (memakai `sales-return/delete.do`).
+
+### Amandemen 2026-08-20 — segmen JENIS di kunci grup: satu dokumen = satu jenis (✅ deployed, PR #1299)
+
+**Permintaan finance**: keterangan dokumen tak boleh "campur" — pengelompokan juga per **jenis retur**. Kunci grup menjadi `<faktur>|<YYYYMMDD>|<JENIS>` dengan JENIS = segmen stabil dari `classifyReturnKind` (`RETUR_REFUND` barang+dana / `REFUND_DANA` dana-saja / `RETUR_COD` batal tanpa dana; `returnKindKeySegment` — segmen ≠ label tampilan, karena label RETUR COD bisa "RETUR <metode gabungan>" yang berubah ikut komposisi). Konsekuensi: retur beda jenis pada faktur+tanggal sama → **dokumen terpisah & homogen** → keterangan (`returnDescriptionLabel` agregat) otomatis bersih, mode header tegas (`RETURNED`/`NOT_RETURNED`; `PARTIALLY_RETURNED` kini **murni dari retur parsial**, bukan campuran mode lintas member — Decision #4 tak lagi terjadi utk dokumen baru). Satu faktur+tanggal kini bisa 2–3 dokumen RTR.
+
+**Kompat-mundur TANPA migrasi** (pola pelajaran §"tiga cara kunci jadi basi"): `return_kind` **dipersist** di baris saat dibuat (seperti `trans_date`); `pindahKeGrupGudang` memakai jenis tersimpan → baris LAMA tanpa jenis tetap berformat lama & gabung-gudang tak lintas format/jenis. Reuse `trans_date` (butir #2) **diperluas ke KUNCI PENUH**: member yang sudah punya baris memakai `dedupe_key` tersimpan, dengan dua pengecualian — baris jejak `SKIPPED` (kunci per-`return_sn`; mengadopsinya = menghidupkan keputusan yang sengaja dilewati, lubang amandemen ADR-0024 2026-08-05) dan baris ber-faktur beda/kosong (penanda gagal-fetch `RecordReturnFetchFailure`). Cabang "kunci bergeser" pada guard SENT yang mati oleh reuse dihapus. **Dokumen lama campur (~84, Jul–Ags) SENGAJA dibiarkan** (keputusan user; pecah-ulang = hapus+book-ulang → sentuh stok + nomor RTR); label agregatnya tetap benar & kolom laporan per-order (PR #1260) menampilkan jenis per baris. Grounded: `returnGroupKey`/`returnKindKeySegment`/`SyncOrderReturn`/`pindahKeGrupGudang` (`accurate_rts_usecase.go`), `entity.AccurateDailyReturn.ReturnKind`, tes `accurate_return_groupkey_test.go` + `accurate_return_group_gudang_test.go`.
 
 ## Dokumen Terkait
 - [[Microservices - Integration Service]] — Auto-Sync Retur (model grup)
