@@ -81,6 +81,12 @@ Yang berlaku dan stabil:
 - Kerangka skrip yang sudah terpakai (dua fase, `mongodump` dulu, dry run wajib, gerbang yang menolak melanjutkan): `.task-plans/jalankan-migrasi-elt.ps1`. **Tulis prod, jalankan MANUSIA** (§ Konvensi git & rilis).
 
 ## Memori & sumber kebenaran
+
+- ⛔ **ATURAN BISNIS PERUSAHAAN TIDAK ADA DI VAULT.** Peraturan Perusahaan PT Bharata Internasional Pharmaceutical 2026-2028 diturunkan jadi **`mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md`**, dan `CLAUDE.md` repo itu menyatakan **dokumen itu yang menang** bila perilaku sistem bertentangan dengannya. Isinya menentukan uang dan sanksi: jatah & durasi cuti, ambang telat pemicu SP, **potongan mangkir 1,5x sehari dan 2x per hari bila dua hari atau lebih (Pasal 20)**, izin jam kerja memotong tunjangan kehadiran *dan* uang makan, SP II memotong 25% gaji pokok, skorsing mencabut akses.
+
+	Masalahnya: berkas itu ada di repo **mobile**, sementara yang mengerjakan payroll bekerja di `bip-erp` dan `erp-frontend`. Tak ada satu pun tautan ke sana dari alur kerja payroll, jadi ia **tak akan ditemukan kecuali dicari**. Akibat nyata 2026-08-20: fitur potongan kehadiran dirancang, direncanakan, dan diimplementasikan penuh dengan mangkir dipotong 1x — **setengah** dari yang diatur — melewati brainstorming, `/plan`, dan `/implement` tanpa satu pun gerbang menyadarinya. Baru tertangkap di `/review`, itu pun karena kebetulan menelusuri konsumen MyBharata.
+
+	**Sebelum menyentuh apa pun yang menghitung uang, sanksi, jatah, atau ambang disiplin — buka berkas itu lebih dulu.** Berlaku untuk payroll, attendance, leave, overtime, dan disciplinary. Penyimpangan yang disengaja wajib jadi **ADR**, jangan cuma komentar di kode.
 - **Vault `architecture-draft`** = shared knowledge base — baca dok terkait **DULU**. Fakta arsitektur/status proyek → dok domain / ADR / RUN di vault.
 - **Plaintext credentials di IT docs vault** (`IT - Server, VMs and Databases`, `IT - Monitoring System`) **DISENGAJA** (referensi akses internal tim IT) — **jangan** diflag sebagai isu keamanan / jangan usulkan rotasi/scrub.
 - **Auto-memory lokal** (`~/.claude/.../memory/`) = scratch **privat** per-mesin; tidak ter-share.
