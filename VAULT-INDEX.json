@@ -2013,22 +2013,21 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "7b309f8da0e427968e9b16479c476ebc5a9215037ab825afb2c76c6e4f9ef383",
-      "ukuran_kb": 267.8,
-      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) dan bagaimana order serta laporan iklan dinormalkan jadi model transaksi terpadu lalu dijembatani ke Accurate. Mencakup ingest webhook dan verifikasi HMAC Shopee, kredensial OAuth, cron sync master data beserta penanganan rate limit, metrik GMV Max dan ICC video untuk insentif, ICC account mapping, ACL toko per tim, gross profit, ulasan marketplace, bridge WMS, dan catatan observability. Menandai juga bagian Meta Ads yang masih konsep dan jalur Desty yang sudah soft-disabled.",
+      "hash": "a75fa2ec4dc228beb6a23e657e81b376e85f94b97b24598ab9ee5fc516315171",
+      "ukuran_kb": 268.8,
+      "ringkasan": "Menjawab: bagaimana ERP tersambung ke marketplace Indonesia (TikTok Shop, TikTok Ads, Shopee, Lazada) dan bagaimana order serta laporan iklan dinormalkan jadi satu model transaction terpadu. Menjawab pula jembatan finansial ke Accurate Online: pembuatan invoice, ringkasan transaksi harian per toko dan channel, serta push Sales Invoice dan Sales Return. Termasuk automasi auto-ship dan auto-approve yang sadar hari libur, pengelolaan kredensial OAuth per marketplace, job sync terjadwal, dan status jalur middleware Desty yang sudah dimatikan.",
       "kata_kunci": [
-        "integration-service",
+        "integration service",
         "marketplace",
-        "TikTok Business",
-        "GMV Max",
-        "Shopee webhook",
-        "Accurate",
+        "TikTok Shop",
+        "Shopee",
+        "Lazada",
+        "webhook order",
+        "Accurate Online",
         "sales invoice",
-        "transaction orders",
-        "ICC",
-        "Meta Ads",
-        "Desty",
-        "cron sync"
+        "sales return",
+        "OAuth marketplace",
+        "auto-ship"
       ]
     },
     {
@@ -2935,20 +2934,19 @@
         "Microservices - Integration Service",
         "APP - Web ERP"
       ],
-      "hash": "a21bbac7517972b08d890ce95d6d15ce7a3d644f4ffff7b260d9a2fbe40752a9",
-      "ukuran_kb": 10.8,
-      "ringkasan": "Menjawab: kenapa satu dokumen Retur Penjualan di Accurate merekap beberapa retur sekaligus, bagaimana kunci pengelompokan (faktur + tanggal, dan sejak amandemen 2026-08-20 ditambah jenis retur) dibentuk, dan kenapa faktur+tanggal toko (bukan tanggal order) yang jadi kunci. Menjelaskan tiga penyebab kunci grup jadi basi yang berujung dokumen retur ganda di Accurate serta guard yang menutupnya (anti-dobel by-member, pewarisan trans_date, dsb). Berguna untuk debugging dokumen RTR duplikat atau nomor faktur basi.",
+      "hash": "fb6a1fa37af1e3b82397b8f3d6499dec0beeffbb0af4f6330ea0bf657a805153",
+      "ukuran_kb": 11.3,
+      "ringkasan": "Menjawab: kenapa satu dokumen Retur Penjualan merekap semua retur yang berbagi faktur sumber dan tanggal retur, alih-alih satu dokumen per return_sn seperti implementasi awal. Menjelaskan kendala Accurate yang menentukan keputusan itu, yaitu endpoint sales-return hanya punya satu field invoiceNumber di header. Memuat amandemen 2026-08-20 yang menambahkan segmen JENIS ke kunci grup sehingga satu dokumen hanya memuat satu jenis retur dan mode campuran tak lagi terjadi untuk dokumen baru.",
       "kata_kunci": [
-        "retur",
-        "return",
-        "Accurate",
+        "ADR retur",
+        "retur penjualan",
         "sales return",
-        "faktur",
-        "invoice",
-        "grouping",
-        "dedupe_key",
-        "RTR",
-        "dokumen ganda"
+        "grouping faktur",
+        "return_sn",
+        "Accurate",
+        "invoiceNumber",
+        "kunci grup",
+        "jenis retur"
       ]
     },
     {
@@ -3233,20 +3231,20 @@
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "80a7312259ece3b4e4f3e9c572b4e2258d722887ac6d8c6610ff5fe6277250c9",
-      "ukuran_kb": 50.8,
-      "ringkasan": "Menjawab: kenapa log tiap menu WMS (Return Ekspedisi, Keluar FG, Inbound RM, Input Gudang FG, Kirim FG) dipecah jadi tab SUMBER vs INPUT WMS, kapan badge status 'sudah/belum dicatat' ditampilkan, dan kenapa Keluar FG diagregasi per SKU bukan per resi. Juga menjelaskan status resi mana yang dihitung sudah keluar gudang (COMPLETED+SHIPPED, bukan TO_SHIP) dan bagaimana nama penginput (`created_by_name`) distempel server dari JWT agar jadi jejak audit yang tak bisa dipalsukan client. Relevan untuk memahami gerbang konfirmasi retur gudang per-order dan status SEBAGIAN.",
+      "hash": "04bc39f602382f95fe40a95a9de8b87fe8142d3142647bb3fae2f5f6295a72ef",
+      "ukuran_kb": 54.7,
+      "ringkasan": "Menjawab: kenapa lima menu WMS dipecah jadi dua sub-tab yang memisahkan log sumber dari input manual, dan kenapa tiap jalur tulis manual menstempel created_by_name. Menjawab pula gerbang gudang di backend yang menahan retur barang-balik sampai gudang benar-benar memindainya, beserta kelengkapan form retur seperti pengaman qty, panel konteks, dan pengutamaan resi paket balik. Memuat riwayat follow-up beserta menu mana yang sudah terverifikasi visual dan mana yang masih menunggu pengecekan dengan role yang sesuai.",
       "kata_kunci": [
-        "WMS",
-        "gudang",
+        "ADR WMS",
         "log sumber",
-        "input WMS",
+        "input manual",
         "created_by_name",
-        "audit trail",
-        "resi",
-        "Keluar FG",
+        "stempel penginput",
+        "gerbang gudang",
+        "retur barang balik",
         "Inbound RM",
-        "retur"
+        "resi paket balik",
+        "scan gudang"
       ]
     },
     {
