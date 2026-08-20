@@ -1,4 +1,4 @@
-> **Status**: 🟡 Konsep / Direncanakan (20 Agustus 2026), rancangan disetujui, belum ada kode. Ini **potongan A** dari empat potongan yang disepakati (lihat §Ruang Lingkup); B dan C belum dirancang.
+> **Status**: 🟡 Kode selesai di branch, BELUM merge dan BELUM deploy (20 Agustus 2026). Ini **potongan A** dari empat potongan yang disepakati (lihat §Ruang Lingkup); B dan C belum dirancang. Implementasi ada di branch `feat/attendance-jejak-pengajuan` (bip-erp), sudah lewat review per-task dan satu review menyeluruh; gerbang dev di §9 **belum dijalankan**, jadi belum ada satu pun bukti fitur ini bekerja lewat gateway.
 
 ## Context
 
@@ -84,7 +84,7 @@ Ini keputusan inti ADR ini. Alternatif "helper eksplisit di tiap `return`" menir
 
 **Satu titik yang kelewat berarti cabang itu tak terlihat tanpa gejala apa pun**, dan siapa pun yang menambah cabang penolakan baru bulan depan tak akan tahu harus menambahkan panggilannya. Middleware memberi kelengkapan **secara konstruksi**, bukan lewat ingatan orang.
 
-Middleware boleh membaca form multipart yang sama dengan handler: Fiber meneruskan `c.MultipartForm()` ke fasthttp yang **menyimpan hasil parse-nya**, sehingga panggilan kedua mengembalikan objek yang sama tanpa mengurai ulang. Diverifikasi ke `fasthttp v1.69` `http.go:1014-1017`, bukan diasumsikan.
+Middleware boleh membaca form multipart yang sama dengan handler: Fiber meneruskan `c.MultipartForm()` ke fasthttp yang **menyimpan hasil parse-nya**, sehingga panggilan kedua mengembalikan objek yang sama tanpa mengurai ulang. Diverifikasi ke `fasthttp v1.68.0` `http.go:1014-1017` (versi yang dipatok `go.mod`), bukan diasumsikan.
 
 **3. Alasan penolakan disimpan sebagai KODE STABIL, bukan disaring dari teks pesan.**
 
@@ -129,6 +129,12 @@ Daftar-izin, bukan daftar-larangan: field baru yang ditambahkan ke formulir nant
 
 `mime` dan `ekstensi` disimpan berdua karena `ValidateImageFile` memutuskan dari header Content-Type sedangkan nama objek MinIO dibentuk dari ekstensi; ketidakcocokan keduanya jadi terbaca langsung.
 
+**Amandemen (implementasi, 20 Agustus 2026): panjang dibatasi, dan `destination` disebut eksplisit.** Enumerasi di atas tidak menyebut batas panjang, dan itu lubang nyata: karyawan yang sudah login bisa mengirim satu field berisi megabyte teks lalu menulis dokumen sebesar itu ke koleksi yang hidup setahun, sementara handler menolaknya dalam milidetik. Batas yang dipasang: nilai payload **256 karakter**, `attempt_id` **64 karakter**, `reject_msg` **300 byte** dengan pemotongan aman-UTF-8. Dipotong, bukan ditolak, karena jejak yang terpangkas tetap lebih berguna daripada jejak yang hilang.
+
+Perlu disebut jujur bahwa `destination` (pintu perjalanan dinas) adalah **teks bebas ketikan karyawan**, sama kelasnya dengan `reason` yang justru dibuang. Ia tetap disimpan karena tanpanya penolakan di pintu itu tak bisa dibedakan satu sama lain, tapi kalau kelak terbukti memuat keterangan pribadi, ia yang pertama harus dibuang dari daftar-izin.
+
+**Amandemen: `attachment.present` selalu ada.** Bentuk awal menghasilkan `nil` untuk pintu JSON dan `{present:false}` untuk pintu multipart tanpa berkas, yaitu tiga keadaan untuk dua makna. Kueri `attachment.present = false` karena itu tidak akan pernah menemukan pintu JSON. Kini keempat pintu selalu menghasilkan objek, sehingga `present` bisa disaring apa adanya.
+
 **6. Retensi 1 tahun lewat TTL index**, dihapus Mongo sendiri tanpa cron. Satu tahun menutup siklus sengketa payroll bulanan sekaligus review tahunan, dua momen ketika orang benar-benar membuka lagi riwayat pengajuannya. Untuk percobaan yang berhasil isinya sebagian besar sudah ada di `leave_request`; yang benar-benar data baru adalah percobaan yang **gagal**, dan itu yang dibatasi umurnya.
 
 **7. Identitas distempel server, `attempt_id` dari klien hanya untuk korelasi.**
@@ -151,7 +157,11 @@ Test fungsi murni **tidak dihitung sebagai bukti** di sini: form-builder pernah 
 
 Yang wajib ada: handler membalas 400 **tanpa titipan** tetap melahirkan satu record ber-`UNCLASSIFIED` (menguji jaringnya, bukan penajamnya); satu test per pintu yang menembak rute sungguhan (menangkap middleware yang lepas atau tertukar urutannya); 200 ber-titipan `duplicate` wajib tercatat `duplicate`; 200 tanpa titipan wajib `unknown`; kontrol negatif privasi yang **menyerialkan seluruh record** lalu menuntut teks alasan karyawan tak muncul di mana pun (bukan memeriksa kunci yang sudah dikenal, karena yang dicegah justru kunci yang ditambahkan orang lain nanti); insert yang sengaja digagalkan tidak mengubah respons; DB nil tidak memanik.
 
-**Gerbang terakhir bukan test**: satu perjalanan sungguhan lewat gateway di dev, mengajukan Sakit dengan foto di atas 4 MB, dan membuktikan record-nya berbunyi `FILE_UPLOAD_FAILED` berstatus 413. Fitur ini membuktikan dirinya pada kasus yang melahirkannya.
+**Amandemen (implementasi): "satu test per pintu yang menembak rute sungguhan" hanya tercapai untuk DUA dari empat pintu.** Koreksi presensi dan perjalanan dinas mendaftarkan rutenya lewat fungsi tersendiri (`registerCorrectionRoutes`, `registerBusinessTripRoutes`) sehingga bisa didaftarkan ke app kosong lalu diperiksa lewat `app.Stack()`. Dua pintu lain (`/request/create`, `/schedule-exchange/create`) didaftarkan langsung di dalam `func main()` yang panjangnya ribuan baris dan bercampur inisialisasi Mongo serta env, jadi tak bisa diuji tanpa menjalankan `main()` penuh. Keduanya dibiarkan tanpa test kehadiran, dan itu **dicatat sebagai lubang, bukan diselesaikan dengan test palsu**: kalau seseorang menyelesaikan konflik merge di `main.go` dan `attemptTrace(...)` lenyap dari salah satu rute itu, seluruh test tetap hijau dan jejaknya berhenti diam-diam. Menutupnya menuntut memindahkan pendaftaran rute keluar dari `main()`, perubahan tersendiri yang tak layak diselundupkan ke sini.
+
+**Gerbang terakhir bukan test**: satu perjalanan sungguhan lewat gateway di dev, mengajukan Sakit dengan foto di atas 4 MB, dan membuktikan record-nya berbunyi `FILE_UPLOAD_FAILED`. Fitur ini membuktikan dirinya pada kasus yang melahirkannya.
+
+⚠️ **Peringatan untuk yang menjalankan gerbang itu**: bila `InternalRequestMultipart` gagal di tingkat transport ia mengembalikan status **0**, dan `c.Status(0)` diserialkan fasthttp sebagai **200**. Jadi gerbang ini bisa sah menghasilkan record berbunyi status 200 / `unknown` / `FILE_UPLOAD_FAILED` alih-alih 413. Itu jejak yang BENAR, bukan jejak yang gagal, dan justru contoh kenapa `outcome` dipisah dari status di #4. Jangan salah baca sebagai bug.
 
 ## Consequences
 
@@ -164,7 +174,11 @@ Yang wajib ada: handler membalas 400 **tanpa titipan** tetap melahirkan satu rec
 
 **Yang harus diterima**
 
-- **Tiga kelas kegagalan tetap tak tertangkap** dan ini harus disebut daripada ditemukan belakangan: permintaan yang ditolak gateway sebelum sampai ke attendance (JWT kedaluwarsa, RBAC); body melebihi `BodyLimit` 50 MB yang ditolak fasthttp sebelum rantai handler jalan; dan semua yang tidak pernah meninggalkan HP. Yang terakhir memang potongan C. Ketiganya bukan alasan menunda A, tapi ketiadaan record **tidak boleh dibaca sebagai "tidak pernah terjadi"**.
+- **Empat kelas kegagalan tetap tak tertangkap** dan ini harus disebut daripada ditemukan belakangan: permintaan yang ditolak gateway sebelum sampai ke attendance (JWT kedaluwarsa, RBAC); body melebihi `BodyLimit` 50 MB yang ditolak fasthttp sebelum rantai handler jalan; semua yang tidak pernah meninggalkan HP (memang potongan C); dan **handler yang PANIK, yang menghasilkan nol record**. Yang terakhir ditemukan saat review implementasi dan diterima sadar: `c.Next()` sengaja berada di LUAR blok `recover` milik middleware, karena menelan panik handler jauh lebih berbahaya daripada kehilangan satu jejak. Akibatnya satu-satunya mode gagal yang tak punya respons HTTP sama sekali juga tak punya jejak. Keempatnya bukan alasan menunda A, tapi ketiadaan record **tidak boleh dibaca sebagai "tidak pernah terjadi"**.
+
+- **Jaminannya "satu record per permintaan yang DILIHAT attendance", bukan per ketukan orang.** `routes.Reroute` di gateway memakai `http.Client` yang bisa memutar ulang POST saat koneksi keep-alive mati, jadi satu ketukan sah bisa menghasilkan dua record. Untuk fitur ini itu justru informasi, tapi siapa pun yang menghitung dari koleksi ini perlu tahu.
+
+- **Katalog pintu koreksi presensi berisi 16 kode, bukan 14** seperti rancangan awal. Review menemukan satu kode salah pasang (cabang jendela clock-out dititipi kode bernama guestbook) dan dua kode yang menutupi dua sebab berbeda sekaligus. Pemecahannya menambah dua kode. Ini bukti kecil bahwa penamaan kode wajib dicocokkan ke cabangnya satu per satu, bukan ditebak dari bentuknya.
 - **Data lama tidak ada dan tidak bisa diisi surut.** Jejak baru dimulai saat middleware naik.
 - **Field formulir baru tidak otomatis tercatat**, konsekuensi langsung dari daftar-izin di #5. Menambah field ke pengajuan berarti memutuskan sekali apakah ia layak masuk jejak.
 - **TTL index yang sudah ada tidak bisa diubah masa simpannya lewat `CreateIndex`**, harus di-drop dulu. Masuk [[RUN - Deploy Microservices bip-erp]], bukan disembunyikan di kode.
