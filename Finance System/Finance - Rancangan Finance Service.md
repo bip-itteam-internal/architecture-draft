@@ -829,18 +829,35 @@ BUKAN warna di mockup yang arahnya terbalik untuk konsep yang sama. **Ditemukan 
 `/review`, bukan test yang sudah ada duluan**: total sempat menjumlah kontribusi kategori
 yang GAGAL dimuat sebagai 0 (bukan penanda "tak lengkap") — pola yang sama dengan
 `ada_baris_tak_terdefinisi` di `KartuVariansOpex`, ditutup dengan penanda serupa. 7 label
-kategori juga sempat dirender tanpa `t()` (pelanggaran ADR-0010) di kartu/modal/chart
+kategori juga sempat dirender tanpa `t()` (pelanggaran ADR-0010) di kartu/drawer/chart
 komposisi — dipindah ke kunci i18n `finance.opexManual.kategoriLabel.<key>`.
 
 Chart komposisi 7 kategori memakai pola **batang**, BUKAN donat — aturan tim 2026-08-13 di
 `donat-komposisi.tsx` (`erp-frontend`) eksplisit menolak donat untuk perbandingan "mana
 lebih besar" dengan porsi mirip-mirip, persis kasus ini.
 
+**Revisi UI 2026-08-20 (sesudah dicoba di layar sungguhan):** drill-down "Lihat Detail"
+pindah dari `Dialog` (kotak tengah) ke `Sheet` (drawer sisi kanan) — pola yang sama dipakai
+panel "Hitung otomatis" di form KPI (`template-form.tsx`), bukan komponen baru. Breakdown
+"Per item"/"Per PIC" **dihapus dari drawer** — drawer kategori manual sekarang cuma form
+tambah + tabel rincian; backend (`Ringkasan()`) **tetap** menghitung & mengembalikan
+`per_item`/`per_pic`, cuma tak ada lagi konsumen FE yang merendernya. Judul panel
+"Breakdown Beban Software" **dihapus** — sudah tidak akurat sejak halaman mencakup 7
+kategori, bukan cuma Software. Kartu **"Varians OPEX Marketing"** (Varians/Anggaran
+Terpakai/Pos Lewat Anggaran) menggantikan kartu "Selisih" tunggal — dihitung client-side
+dari 7 kategori grid (bukan panggil `/anggaran/varians`), label & pola SAMA dengan
+`KartuVariansOpex` di tab "Master Anggaran" sebelahnya, supaya "varians OPEX" berarti hal
+yang sama di kedua tab.
+
 ### Registry catatan beban manual (dasar untuk 5 dari 7 kategori)
 
-Breakdown per-item & per-PIC — awalnya khusus kategori **"Beban Software"**, rute & kontrak
-di [[API - Integration Service]]. Latar belakangnya sama polanya dengan Fase 1a/1b:
-sesuatu yang diminta Finance tapi tak bisa dijawab master anggaran yang sudah ada.
+Backend menghitung breakdown per-item & per-PIC — awalnya khusus kategori **"Beban
+Software"**, rute & kontrak di [[API - Integration Service]]. Latar belakangnya sama
+polanya dengan Fase 1a/1b: sesuatu yang diminta Finance tapi tak bisa dijawab master
+anggaran yang sudah ada. ⚠️ Sejak revisi 2026-08-20 di atas, breakdown ini **tidak lagi
+ditampilkan** di drawer FE — kartu grid tetap menampilkan total manual (`total_manual`),
+dan rincian per-item/PIC-nya masih tersedia lewat API bagi siapa pun yang membutuhkannya
+langsung, cuma bukan lagi bagian layar.
 
 **Kenapa perlu registry baru sama sekali: Accurate cuma punya SATU akun gabungan.**
 Dikonfirmasi 2026-08-14 (lihat komentar `DaftarKomponenOpex` di `opex_daftar.go`) —
