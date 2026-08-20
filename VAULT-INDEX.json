@@ -7824,6 +7824,7 @@
         "APP - Web ERP",
         "CORE - RBAC dan Permission Set",
         "External - Desty",
+        "ADR - 0046 Percobaan Pengajuan Dijejaki Middleware, Bukan Panggilan per Cabang",
         "Microservices - Warehouse Service",
         "Microservices - Integration Service",
         "Microservices - Form Builder Service",
@@ -7832,20 +7833,20 @@
         "RUN - Deploy Task Management Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "5fbeb98f8a9225e8a9593bed20ee7ff7e76cdb45a76e8b31267813acd0baa537",
-      "ukuran_kb": 13.9,
-      "ringkasan": "Menjawab: bagaimana men-deploy ulang satu microservice bip-erp ke produksi tanpa menyentuh dependensinya, kenapa `--no-deps` wajib saat jam rawan (dan kapan justru tidak boleh dipakai), serta urutan aman bila dua service saling memanggil. Menjelaskan cara membuktikan deploy benar-benar mendarat — tarik kode dulu karena `--build` membangun dari disk, lalu periksa umur image — dan kenapa perubahan `shared-library` menuntut semua service pembacanya ikut di-rebuild, termasuk kasus kategori inbox notifikasi yang gagal senyap. Ditutup dengan verifikasi pasca-deploy, service yang hanya ada di compose produksi, fitur dorman di balik feature flag, dan troubleshooting gejala → akar → fix.",
+      "hash": "82a0471c11985363ef95ed929fd6f0d0e14fa0ca67733785d90936b78fe4fecd",
+      "ukuran_kb": 15.3,
+      "ringkasan": "Menjawab: bagaimana cara deploy ulang satu microservice bip-erp ke produksi dengan aman di jam rawan tanpa ikut merestart dependensinya (database/mongo/redis), kenapa flag --no-deps wajib dipakai, dan urutan deploy yang benar saat dua service saling memanggil. Juga menjawab kenapa perubahan di shared-library mengharuskan lebih dari satu container ikut di-deploy ulang (kategori inbox notifikasi, klaim JWT), serta cara membuktikan deploy benar-benar mendarat lewat umur image docker (bukan sekadar docker ps atau /health yang bisa menyesatkan), lengkap dengan tabel troubleshooting gejala ke akar masalah.",
       "kata_kunci": [
         "deploy",
-        "docker compose",
+        "microservice bip-erp",
+        "docker compose up --build",
         "--no-deps",
-        "rebuild image",
-        "produksi",
-        "prod",
-        "microservice",
         "shared-library",
-        "notification-service",
-        "troubleshooting"
+        "rebuild container",
+        "verifikasi pasca-deploy",
+        "image basi/stale",
+        "urutan deploy antar-service",
+        "produksi/prod"
       ]
     },
     {
