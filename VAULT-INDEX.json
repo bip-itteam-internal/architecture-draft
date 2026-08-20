@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-20",
-  "jumlah_dokumen": 290,
+  "jumlah_dokumen": 291,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -3231,9 +3231,9 @@
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "6c96af8425373367f9aff8704756b1d1249c94add7edf5535f33c40d4917d0c3",
-      "ukuran_kb": 57.1,
-      "ringkasan": "Menjawab: kenapa log tiap menu WMS (Return Ekspedisi, Keluar FG, Inbound RM, Input Gudang FG, Kirim FG) dipecah jadi tab SUMBER vs INPUT WMS, menu mana yang punya badge status sudah/belum dicatat dan kenapa yang lain sengaja tidak, serta bagaimana data Keluar FG diagregasi per SKU dan status resi mana (COMPLETED/SHIPPED) yang dihitung sebagai barang keluar gudang. Juga menjawab bagaimana nama penginput (`created_by_name`) distempel dari server berdasarkan header gateway alih-alih dikirim client, supaya jejak audit tidak bisa dipalsukan, termasuk perluasannya ke gerbang gudang per-order untuk retur barang-balik.",
+      "hash": "9f340115a0f95a220c4a5a963a07e410efd531d690438864939a183f8a3da808",
+      "ukuran_kb": 59.9,
+      "ringkasan": "Menjawab: bagaimana log lima menu WMS (Return Ekspedisi, Keluar FG, Inbound RM, Input Gudang FG, Kirim FG) dipecah jadi tab SUMBER vs INPUT WMS supaya Finance bisa membandingkan apa yang seharusnya masuk/keluar dengan apa yang sudah dicatat gudang, kapan badge status \"sudah/belum dicatat\" ditampilkan (hanya bila ada kunci join), kenapa tab sumber Keluar FG diagregasi per SKU bukan per resi, dan kenapa hanya resi berstatus COMPLETED+SHIPPED yang dihitung keluar gudang. Juga menjawab bagaimana nama penginput (`created_by_name`) distempel server dari header `BIP-Username`, bukan dikirim client, sebagai jejak akuntabilitas yang tak bisa dipalsukan.",
       "kata_kunci": [
         "WMS",
         "log sumber",
@@ -3241,13 +3241,10 @@
         "stempel penginput",
         "created_by_name",
         "audit trail",
-        "gerbang gudang",
-        "retur",
-        "resi",
         "Keluar FG",
         "Inbound RM",
-        "Return Dari Ekspedisi",
-        "status resi COMPLETED SHIPPED"
+        "resi",
+        "gudang gerbang"
       ]
     },
     {
@@ -4007,6 +4004,39 @@
         "attendance-service",
         "retry pengajuan",
         "lampiran gagal terkirim"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0047 Jejak Pengajuan Dibaca Modul IT, Digerbang Departemen Bukan Peran.md",
+      "judul": "ADR - 0047 Jejak Pengajuan Dibaca Modul IT, Digerbang Departemen Bukan Peran",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "Konsep / Direncanakan (20 Agustus 2026), rancangan disetujui, belum ada kode. Ini **potongan B** dari empat potongan di [[ADR - 0046 Percobaan Pengajuan Dijejaki Middleware, Bukan Panggilan per Cabang]]; A sudah merged tapi **belum terbukti jalan di dev**, C belum dirancang.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0046 Percobaan Pengajuan Dijejaki Middleware, Bukan Panggilan per Cabang",
+        "Microservices - Attendance Service",
+        "APP - Web ERP",
+        "CORE - RBAC dan Permission Set",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
+      ],
+      "hash": "de910701c13dd48ab563d508035fc7fc18b13023c2809d400fa3e42fd47b297a",
+      "ukuran_kb": 9.3,
+      "ringkasan": "Menjawab: kenapa halaman baca jejak percobaan pengajuan (`submission_attempt`) ditaruh di modul IT tapi digerbang departemen Tech Development (`employee.DeptIT`), bukan peran `system_roles.it` seperti gerbang IT lain, dan siapa saja empat pemegang peran IT yang jadi kehilangan akses akibat keputusan itu. Juga menjawab bentuk dua endpoint yang disediakan (daftar berpaginasi dan ringkasan agregat terpisah), kenapa rentang tanggal bawaan 7 hari harus diumumkan lewat `range.default_applied`, dan kenapa kode alasan penolakan ditampilkan mentah tanpa terjemahan i18n.",
+      "kata_kunci": [
+        "jejak pengajuan",
+        "submission_attempt",
+        "modul IT",
+        "DeptIT",
+        "Tech Development",
+        "system_roles.it",
+        "RBAC departemen",
+        "reject_code",
+        "middleware gerbang",
+        "data kesehatan"
       ]
     },
     {
