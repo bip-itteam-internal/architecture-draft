@@ -1,4 +1,4 @@
-**Status**: ⚠️ **Implemented (ada catatan)** — **Fase 0 LIVE di dev & prod** sejak 2026-08-13, **daftar akun OPEX ditegakkan kode** dan metrik varians OPEX **sudah terisi otomatis** di KPI, serta **modul Cost Control Fase 1a (rekomendasi efisiensi, bobot 20%) sudah ada**, **Fase 1b (akurasi forecast kas mingguan, bobot 15%) sudah ada**, **metrik Admin & Non-Ops YoY (bobot 10%) sudah ada**, dan **registry Beban Software manual ("Opex Marketing" — breakdown per-item & per-PIC, pelengkap akun Accurate yang tak dipecah per vendor) sudah ada**. ⚠️ **Ketiga yang disebut terakhir mendarat di [[Microservices - Integration Service]], BUKAN di service ini** — beda dari Fase 1a yang memang di sini; lihat catatan gap di §Ruang Lingkup. Tersisa 🟡: modul Tax — lihat bab keputusan.
+**Status**: ⚠️ **Implemented (ada catatan)** — **Fase 0 LIVE di dev & prod** sejak 2026-08-13, **daftar akun OPEX ditegakkan kode** dan metrik varians OPEX **sudah terisi otomatis** di KPI, serta **modul Cost Control Fase 1a (rekomendasi efisiensi, bobot 20%) sudah ada**, **Fase 1b (akurasi forecast kas mingguan, bobot 15%) sudah ada**, **metrik Admin & Non-Ops YoY (bobot 10%) sudah ada**, dan **grid "Opex Marketing" (7 kategori — breakdown manual, otomatis `incentive_profit`, dan alokasi headcount — sejak 2026-08-20, awalnya registry Beban Software manual 2026-08-19) sudah ada**. ⚠️ **Ketiga yang disebut terakhir mendarat di [[Microservices - Integration Service]], BUKAN di service ini** — beda dari Fase 1a yang memang di sini; lihat catatan gap di §Ruang Lingkup. Tersisa 🟡: modul Tax — lihat bab keputusan.
 
 ## Deskripsi
 
@@ -772,12 +772,75 @@ Urutan naik: **integration-service → employee-service → frontend**.
 > yang diunggah ke ERP adalah **Rev 2** (−23,4%) atas permintaan Finance. Yang direproduksi test
 > adalah rumus dan subsetnya, memakai angka PDF sebagai fixture — bukan angka produksinya.
 
-## Registry Beban Software Manual ("Opex Marketing") — ✅ Implemented (2026-08-19)
+## Grid Opex Marketing (7 Kategori) — ✅ Implemented (2026-08-20, awalnya registry Beban Software manual 2026-08-19)
 
-Breakdown per-item & per-PIC untuk kategori **"Beban Software"** — tab baru di halaman
-Anggaran Opex (`erp-frontend`), rute & kontrak di [[API - Integration Service]]. Latar
-belakangnya sama polanya dengan Fase 1a/1b: sesuatu yang diminta Finance tapi tak bisa
-dijawab master anggaran yang sudah ada.
+Tab "Opex Marketing" di halaman Anggaran Opex (`erp-frontend`) direstrukturisasi dari satu
+kartu (Beban Software) jadi **grid 7 kategori** + total ringkasan + drill-down "Lihat
+Detail" per kartu, mengikuti mockup visual yang disetujui user — TAPI mockup itu cuma
+referensi tampilan, bukan spek data: tiap kategori punya sumber Aktual yang benar-benar
+berbeda, dikonfirmasi satu-satu via tanya-jawab sebelum diimplementasi.
+
+**Tiga pola sumber Aktual, bukan cuma "manual vs otomatis":**
+
+1. **Manual** (Software, Server, Pelatihan Karyawan, Perjalanan Dinas Adum, Laptop/PC) —
+   `catatan_beban_manual` (paragraf di bawah), diperluas dari 1 kategori terkunci jadi 5.
+   Laptop/PC beda dari 4 lainnya: ia bukan salah satu dari 57 komponen OPEX resmi sama
+   sekali (bukan cuma "tak dipecah per vendor" seperti Software dkk), jadi kartunya
+   **tanpa Budget/status pill** — tak ada baris Master Anggaran yang sah untuk akun yang
+   tak terdaftar.
+2. **Otomatis dari `incentive_profit`** (Beban Iklan Marketing) — baca-saja, reuse `Total.
+   IklanTiktok + Total.IklanShopee` dari `GET /profit/incentive/summary` yang sudah live
+   dipakai Incentive Dashboard. Tidak pernah menerima entri manual: menambahkannya ke
+   `catatan_beban_manual` akan membuat data yang tak pernah ditampilkan FE.
+3. **Alokasi headcount** (Beban Internet) — baca-saja. Akun `Beban Internet & Telepon
+   Adum` SELALU tercatat di bawah departemen Adum di Accurate (dikonfirmasi user, bukan
+   asumsi) — tak pernah ter-tag ke Marketing. Aktual-nya = saldo akun se-perusahaan ×
+   (karyawan aktif Marketing ÷ karyawan aktif seluruh perusahaan), headcount dari
+   `GET /api/employee/list` (endpoint yang sama dipakai dropdown PIC). **Keterbatasan yang
+   diterima sadar**: headcount yang dipakai adalah headcount SAAT DIPANGGIL, bukan
+   snapshot historis bulan yang sedang dilihat — tidak ada sumber headcount per-bulan di
+   codebase ini.
+
+**Budget adalah sumbu TERPISAH dari Aktual, dan itu yang membuat pola 1–3 di atas aman.**
+Budget tiap kartu (6 dari 7 — semua kecuali Laptop/PC) berasal dari **Master Anggaran yang
+sudah ada** (`anggaran_opex`), difilter akun × departemen Marketing (Beauty Hacks + Kyura,
+dijumlah client-side dari `GET /accounting/anggaran?akun_no=`). Ini murni input manusia
+(form/Excel), sama sekali tidak bergantung pada bagaimana Accurate mencatat departemen
+untuk akun Aktual-nya — sehingga aman dipasang bahkan untuk Internet & Iklan yang sisi
+Aktual-nya "riskan". Sempat dipertimbangkan memakai `realisasi_opex` (salinan Accurate
+dept-scoped yang sudah dipakai `/anggaran/varians`) sebagai Aktual untuk SEMUA kategori —
+**ditolak**, karena itu mengasumsikan Accurate benar-benar men-tag posting ke Beauty
+Hacks/Kyura secara akurat, dan itu persis masalah yang sudah terbukti SALAH untuk Internet
+(semua masuk Adum). Bukannya menebak mana yang bisa dipercaya per akun, pola manual yang
+sudah terbukti benar (Finance yang menulis) dipertahankan untuk 5 kategori, dan alokasi
+eksplisit dipakai untuk Internet.
+
+**Endpoint baru `GET /accounting/akun-saldo?nama_akun=&tahun=&bulan=`** — saldo satu akun
+Accurate generik, baca-saja, nama akun BEBAS (tidak terikat daftar terkunci registry
+manual). Dasar alokasi Internet di atas. Logika pencocokan nama (`SaldoAkunAccurate`)
+diekstrak dari `angkaKontrolAccurate` (dipakai bersama, bukan ditulis ulang) — lihat
+[[API - Integration Service]].
+
+**Total Aktual/Budget/Selisih** dijumlah dari 7 sumber di atas di FRONTEND (React Query
+men-dedupe query yang identik dengan yang sudah ditarik tiap kartu, jadi tidak ada
+panggilan jaringan ganda). Arah warna Selisih mengikuti konvensi `KartuVariansOpex` yang
+sudah jalan di tab "Master Anggaran" sebelahnya (negatif = di bawah anggaran = hijau) —
+BUKAN warna di mockup yang arahnya terbalik untuk konsep yang sama. **Ditemukan lewat
+`/review`, bukan test yang sudah ada duluan**: total sempat menjumlah kontribusi kategori
+yang GAGAL dimuat sebagai 0 (bukan penanda "tak lengkap") — pola yang sama dengan
+`ada_baris_tak_terdefinisi` di `KartuVariansOpex`, ditutup dengan penanda serupa. 7 label
+kategori juga sempat dirender tanpa `t()` (pelanggaran ADR-0010) di kartu/modal/chart
+komposisi — dipindah ke kunci i18n `finance.opexManual.kategoriLabel.<key>`.
+
+Chart komposisi 7 kategori memakai pola **batang**, BUKAN donat — aturan tim 2026-08-13 di
+`donat-komposisi.tsx` (`erp-frontend`) eksplisit menolak donat untuk perbandingan "mana
+lebih besar" dengan porsi mirip-mirip, persis kasus ini.
+
+### Registry catatan beban manual (dasar untuk 5 dari 7 kategori)
+
+Breakdown per-item & per-PIC — awalnya khusus kategori **"Beban Software"**, rute & kontrak
+di [[API - Integration Service]]. Latar belakangnya sama polanya dengan Fase 1a/1b:
+sesuatu yang diminta Finance tapi tak bisa dijawab master anggaran yang sudah ada.
 
 **Kenapa perlu registry baru sama sekali: Accurate cuma punya SATU akun gabungan.**
 Dikonfirmasi 2026-08-14 (lihat komentar `DaftarKomponenOpex` di `opex_daftar.go`) —
@@ -794,11 +857,14 @@ stabil di manapun di codebase ini). Selisih antara total manual dan angka kontro
 ditampilkan apa adanya, tidak dipaksa sama — pola yang sama dengan Akurasi+Cakupan pada
 [[ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI]].
 
-**Kategori dikunci, nama item sengaja bebas.** `KategoriOpexManualValid` cuma berisi
-"Beban Software" untuk fase ini — pelajaran yang sama dengan "kategori ERP bebas-ketik
-jadi bucket sampah" di ADR-0037. `nama_item` (Capcut, Creative Studio AI, dst) sebaliknya
-sengaja bebas-ketik: daftar vendor software memang terus bertambah tergantung pengajuan
-tim marketing, dan menguncinya ke daftar tetap berarti deploy tiap kali ada tool baru.
+**Kategori dikunci, nama item sengaja bebas.** `KategoriOpexManualValid` berisi 5 nilai
+tetap sejak 2026-08-20 (Software, Server, Pelatihan Karyawan, Perjalanan Dinas Adum,
+Laptop/PC) — pelajaran yang sama dengan "kategori ERP bebas-ketik jadi bucket sampah" di
+ADR-0037. Beban Internet & Beban Iklan Marketing SENGAJA TIDAK ada di daftar ini (lihat
+§Grid Opex Marketing di atas — keduanya otomatis). `nama_item` (Capcut, Creative Studio
+AI, dst) sebaliknya sengaja bebas-ketik: daftar vendor/item memang terus bertambah
+tergantung pengajuan tim marketing, dan menguncinya ke daftar tetap berarti deploy tiap
+kali ada tool baru.
 
 **PIC dipilih dari karyawan Beauty Hacks/Kyura, tidak diketik bebas.** "Staff marketing"
 di organisasi ini secara struktural berarti kedua departemen itu — tidak ada departemen
@@ -821,6 +887,12 @@ menebak salah satu kandidat kini menolak menebak dan melapor ambigu.
 **Konsekuensi deploy**: tidak ada env baru. Koleksi baru `catatan_beban_manual` beserta
 indeks (kategori+tahun+bulan, bukan unik — banyak baris per periode memang sah) terbentuk
 otomatis. Urutan naik: **integration-service → frontend**.
+
+**Konsekuensi deploy — perluasan grid 2026-08-20**: tidak ada env baru, tidak ada koleksi
+baru (Internet & Iklan Marketing baca-saja, tak menulis apa pun). 4 kategori manual baru
+otomatis diterima koleksi `catatan_beban_manual` yang sudah ada (kategori cuma string).
+Urutan naik SAMA: **integration-service → frontend** (endpoint `/accounting/akun-saldo`
+baru + kategori baru wajib live sebelum FE-nya memanggil).
 
 ## Daftar Akun OPEX — ✅ Implemented (2026-08-13)
 
