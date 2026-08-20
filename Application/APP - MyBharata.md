@@ -163,6 +163,23 @@ Sebabnya program Kaizen bukan "satu form lagi" bagi pengisinya: berulang tiap pe
 >
 > Terpisah dari itu: kategori Kaizen juga belum terdaftar di **`shared-library` sisi backend**, sehingga notifikasinya ditolak `400` dan tak pernah terkirim sejak awal. Dua lapis berbeda, keduanya harus dibereskan.
 
+> [!danger] `GET /inbox` tanpa `?page` WAJIB tetap array telanjang — ini kontrak, bukan detail
+> `notification_remote_data_source.dart` membaca badan respons **mentah** lalu menguji
+> `data is List`. Begitu balasan bawaan endpoint itu dibungkus jadi objek, uji itu gagal dan
+> cabang `else`-nya mengembalikan **list kosong, bukan galat**: kotak masuk jadi kosong di
+> seluruh aplikasi tanpa satu pun pesan, dan tak ada yang menandainya sebagai kegagalan.
+>
+> Dua hal membuatnya permanen, bukan sekadar sampai rilis berikutnya. **APK yang sudah
+> terpasang tak bisa dipaksa update**, jadi memperbaiki sisi mobile lalu rilis ke store
+> tidak menyelamatkan versi yang beredar. Dan jebakan keduanya lebih halus: `json.Marshal`
+> atas nil-slice di Go menghasilkan `null`, dan **`null is List` juga false** — jadi inbox
+> yang memang kosong pun akan salah dibaca kalau penjaga "kembalikan `[]`" di backend
+> hilang.
+>
+> Karena itu paginasi web dibuat **opt-in** lewat `?page` (2026-08-20), dan bentuk bawaannya
+> dikunci test berikut kontrol negatifnya di
+> [[Microservices - Notification Service]]. Diverifikasi langsung di dev **dan** prod.
+
 ### Fitur pendukung lain
 - **QR Code**: tampilkan QR pribadi + akses scanner inventory
 - **Guest Book**: tamu eksternal mengisi buku tamu (scan QR, input manual, kategori)
