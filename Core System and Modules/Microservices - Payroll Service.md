@@ -12,6 +12,7 @@
 - `GET/PUT /config/company` — identitas perusahaan (nama, kota, penanda tangan HRD) untuk kop slip
 - `GET/PUT /config/bpjs` — rate & cap 5 program: Kesehatan, JHT, JP, JKK, JKM
 - `GET/PUT /config/tax` — PPh21 metode **TER** + nominal PTKP per status + tabel TER
+- `GET/PUT /config/attendance-deduction` — tarif potongan kehadiran (6 angka; ⚠️ belum merged, lihat §Potongan Kehadiran)
 - GET = role HR; PUT = HR admin. Dokumen **singleton**, di-seed default saat boot (idempoten).
 
 ### Master Badan Usaha (multi-company — identitas/kop slip)
@@ -24,6 +25,7 @@
 ### Master Komponen Gaji
 - CRUD `/salary-components` — komponen `type` (earning/deduction), `input_type` (manual/computed), `taxable`, `bpjs_base`, `sort_order`, `is_active`
 - **Di-seed 15 komponen** default **persis slip nyata** (9 pendapatan + 6 pengurangan). Yang `computed` (Lembur, BPJS, PPh21, **potongan** Tunjangan Kehadiran) dihitung engine; **earning Tunjangan Kehadiran = manual** (base per karyawan). GET = HR; tulis = HR admin.
+	- ⚠️ **Jadi 18 komponen** (9 + 9) di [#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318): baris potongan "Tunjangan Kehadiran" dipecah jadi empat (Telat/Izin/Mangkir/Uang Makan). **Seed tak berlaku untuk dev & prod** yang koleksinya sudah terisi — backfill per-nama yang mengurusnya, lihat §Potongan Kehadiran.
 
 ### Gaji per Karyawan
 - `GET /employee-salary` (list) · `GET/PUT /employee-salary/:employeeId` (upsert; path = sumber kebenaran)
@@ -35,11 +37,28 @@
 
 ## Endpoint / Fitur (Sudah Diimplementasikan — Fase 2: Payroll Run)
 
-- **Kalkulasi** (`buildPayslip`): Gaji Pokok = `basic_salary` (bukan komponen → hindari double-count; komponen manual bernama "Gaji Pokok" di-skip sbg guard) + komponen manual + Tunjangan Kehadiran penuh + lembur − BPJS (dari `upah_bpjs` + config) − potongan Tunjangan Kehadiran (`base × (1 − payout)`) − **PPh21 (TER)**. Hanya komponen `manual` diambil dari `component_values`; yang `computed` dihitung engine.
+- **Kalkulasi** (`buildPayslip`): Gaji Pokok = `basic_salary` (bukan komponen → hindari double-count; komponen manual bernama "Gaji Pokok" di-skip sbg guard) + komponen manual + Tunjangan Kehadiran penuh + lembur − BPJS (dari `upah_bpjs` + config) − potongan kehadiran − **PPh21 (TER)**. Hanya komponen `manual` diambil dari `component_values`; yang `computed` dihitung engine.
+	- ⚠️ **Potongan kehadiran diganti total** ([#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318), belum merged). Satu baris `base × (1 − payout_pct)` menjadi **empat baris eksplisit bertarif tetap** — rinciannya di §Potongan Kehadiran di bawah. `attendanceShortfall` dan `PayoutFraction` **dihapus**; `payout_pct` tetap disimpan dan ditampilkan tapi tak lagi menentukan satu rupiah pun, dikunci test yang membandingkan dua slip berpayout berbeda.
 - **PPh21 (Fase 2b)** — metode **TER bulanan (PMK 168/2023)**: `PPh21 = tarif_efektif(kategori PTKP, bruto) × bruto`. Kategori dari `ptkp_status` (**A**: TK/0,TK/1,K/0 · **B**: TK/2,TK/3,K/1,K/2 · **C**: K/3; tak dikenal → A). Tabel TER A/B/C di config (`tax.ter_brackets`), di-seed default + backfill idempoten. Bruto = total pendapatan engine.
 - **Batch run**: `POST /payroll-runs` (metadata `title`, `pay_period_start/end`, `pay_date`, `notes` — **penggajian BULANAN**, tak ada mingguan; `period` label diturunkan dari `pay_period_start` bila kosong; hitung semua karyawan, simpan snapshot per orang; supplement gagal per-orang ditandai, tak gagalkan run) · `GET /payroll-runs` · `GET /payroll-runs/:id` (+ lines) · `POST /:id/recalculate` (draft) · `POST /:id/approve` (approver) · `POST /:id/publish` (approver; approved → published) · `GET /:id/lines/:employeeId`. Status **draft → approved → published**.
 - **Slip self-service** (tanpa gate HR — identitas dari header gateway): `GET /payroll-runs/my` (+ `/my/:id`) — karyawan lihat slip **sendiri**, HANYA dari run **published**; field internal HR (`notes`, `created_by`/`approved_by`/`published_by`) di-**redact**. Rute `/my` didaftarkan **sebelum** `/:id` agar tak ketangkap sebagai param.
 - **Service-to-service**: panggil [[Microservices - Attendance Service]] `GET /payroll-supplement` (`payout_pct` **persentase 0–100** → prorata Tunjangan Kehadiran + lembur) via `InternalRequest`.
+
+### Potongan Kehadiran (⚠️ belum merged — [#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318), butuh [#1317](https://github.com/bip-itteam-internal/bip-erp/pull/1317) naik lebih dulu)
+
+Menggantikan prorata `payout_pct`. Alasannya bukan ketepatan melainkan **keterbacaan**: HRD
+menghitung tangan di Excel, dan satu baris gabungan mustahil dicocokkan baris per baris.
+
+- **Empat baris slip**: `Potongan Telat` · `Potongan Izin` · `Potongan Mangkir` · `Potongan Uang Makan`. Nama lama "Tunjangan Kehadiran" berhenti dipakai di sisi potongan — ia muncul dua kali di slip yang sama, dan karyawan yang bertanya "kenapa tunjangan saya dipotong" sedang menanyakan hal yang wajar.
+- **Tarif** dari `payroll_config.attendance_deduction` (6 angka, `GET/PUT /config/attendance-deduction`, gerbang sama dengan BPJS & pajak): `hour_divisor` 173 · `day_divisor` 26 · `meal_deduction` 10.000 · `meal_threshold_hours` 4 · `alpha_multiplier_one_day` 1,5 · `alpha_multiplier_multi_day` 2,0.
+- **Mangkir mengikuti Peraturan Perusahaan Pasal 20**: 1,5x tarif harian bila sehari, **2x per hari** bila dua hari atau lebih. Penafsiran yang dipilih: begitu mencapai dua hari, SELURUH harinya berpengali 2x (3 hari = 6x, bukan 1,5+2+2). Karena itu mangkir dipisah dari izin, baik di `days` (penanda `alpha`) maupun di baris slip — digabung, "1 hari × tarif" tak akan sama dengan rupiah yang tertulis.
+- **Batas pada JUMLAH telat+izin+mangkir ≤ Tunjangan Kehadiran** (bukan `min()` per baris, yang akan membiarkan gabungannya berkali-kali lipat). Uang makan dibatasi Tunjangan Makan sendiri. Saat batas aktif ketiganya diperkecil proporsional, dan sisa pembulatan ditaruh di baris bernilai mentah terbesar supaya baris bernilai nol tak memunculkan potongan hantu. **Dengan pengali 2x, batas jauh lebih sering aktif: 13 hari mangkir sudah menghabiskan seluruh tunjangan.**
+- **Angka dasar disnapshot ke `Payslip.attendance_basis`** (`jam_telat`, `hari_izin_ekuivalen`, `hari_mangkir`, `hari_makan_hangus`) — sealasan dengan `CompanySnapshot`: slip yang sudah terbit tak boleh berubah karena kebijakan diubah sesudahnya. Disimpan sebagai **angka**, bukan kalimat jadi, supaya layar bisa menerjemahkannya (ADR 0010); PDF yang memformatnya ke Bahasa Indonesia karena ia dokumen cetak tanpa konteks bahasa.
+- ⛔ **Pembagi/pengali nol = kelas bug paling mahal di fitur ini.** `base/0` pada float bukan panic melainkan `+Inf`, lalu batas per tunjangan memangkasnya jadi **tepat sebesar tunjangannya** — karyawan yang telat semenit kehilangan seluruh Tunjangan Kehadiran, slip terbit tanpa galat, dan angkanya terlihat wajar karena bulat. Tiga lapis penjaga: validasi `PUT` menolak, backfill boot mengisi, fungsi hitung memulangkan **0** bila keduanya bocor. Sumber keempat yang tak terduga: `scheduled_hours` **0** dari `work_time` rusak — datang dari data produksi, bukan salah ketik HR, dan dijaga terpisah.
+- ⚠️ **Backfill config bekerja PER FIELD, bukan per blok.** Memeriksa satu field saja akan melewatkan config yang SUDAH pernah di-backfill sebelum field lain ada (persis yang terjadi pada pengali mangkir: pembaginya terisi, jadi pemeriksaan menyatakan "tak perlu" sementara pengalinya 0 dan mangkir tak dipotong sama sekali). Karena itu **nol pada pengali mangkir DITOLAK validasi** meski nol pada potongan uang makan sah — nol yang mustahil datang dari HR adalah satu-satunya penanda "belum ditulis" yang bisa dipercaya.
+- **Komponen master di-backfill per-nama** (`ensureAttendanceDeductionComponents`), karena `seedSalaryComponents` berhenti begitu koleksi tak kosong dan dev/prod sudah berisi 15 dokumen sejak lama.
+- **`days` absen dari respons supplement → baris ditandai `error`**, bukan diam-diam berpotongan nol. Itu berarti payroll naik lebih dulu dari attendance; slipnya akan terbit terlalu murah hati dan tak seorang pun tahu.
+- 🔜 **Belum diverifikasi lewat gateway maupun sebagai orang di layar.** Golden test bagian potongannya memakai rincian harian **rekayasa** dan menunggu lembar Excel HRD; yang tetap terbukti dari slip sungguhan hanya gaji pokok, GROSS, dan kedua baris BPJS.
 
 ### Beban pemberi kerja (konsumsi antar-service — modul insentif)
 
@@ -86,7 +105,7 @@ Grounded ke **Formulir 2a PU BPJS Ketenagakerjaan** milik BHARATA INTERNASIONAL 
 
 ## Model Data (`payroll_db`)
 
-- `salary_component` · `employee_salary` · `payroll_config` (singleton) · **`company`** (master badan usaha penggaji; identitas/kop slip, `is_default`) · `payroll_run` (+ **`type`** = `monthly`(default, run lama tanpa field)|`thr`; metadata `title`/`period`/`pay_period_start`/`pay_period_end`/`pay_date` + lifecycle `draft→approved→published` + `approved_by/at`, `published_by/at`) · `payroll_run_line` (snapshot payslip per karyawan + **`CompanySnapshot`** kop badan usaha + THR: **`thr_months_of_service`/`thr_proportion`** + `error` bila supplement/masa kerja gagal)
+- `salary_component` · `employee_salary` · `payroll_config` (singleton; + **`attendance_deduction`** ⚠️ belum merged) · **`company`** (master badan usaha penggaji; identitas/kop slip, `is_default`) · `payroll_run` (+ **`type`** = `monthly`(default, run lama tanpa field)|`thr`; metadata `title`/`period`/`pay_period_start`/`pay_period_end`/`pay_date` + lifecycle `draft→approved→published` + `approved_by/at`, `published_by/at`) · `payroll_run_line` (snapshot payslip per karyawan; `Payslip` + **`attendance_basis`** ⚠️ belum merged + **`CompanySnapshot`** kop badan usaha + THR: **`thr_months_of_service`/`thr_proportion`** + `error` bila supplement/masa kerja gagal)
 
 ## Belum Diimplementasikan / Catatan
 
