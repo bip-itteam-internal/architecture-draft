@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-20",
-  "jumlah_dokumen": 291,
+  "jumlah_dokumen": 292,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -4050,6 +4050,37 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem.md",
+      "judul": "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "**Diputuskan 2026-08-20, kode selesai, BELUM merge dan BELUM deploy.** Branch `feat/kpi-skor-otomatis` (bip-erp) dan `feat/kpi-bulan-berjalan` (erp-frontend).",
+      "publik": true,
+      "tautan": [
+        "Microservices - Employee Service",
+        "HRIS - Otomasi Skor KPI",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "HRIS - Key Performance Index"
+      ],
+      "hash": "fe4efa790d40bfe98fc2195487f1446931fcf7cffa1d164149d2963f6bdb57d6",
+      "ukuran_kb": 6.1,
+      "ringkasan": "Menjawab: kenapa posisi yang seluruh metrik KPI-nya bersumber otomatis kini dibekukan jadi `kpi_score` oleh sistem pada tanggal 10 bulan berikutnya, tanpa menunggu supervisor menekan Simpan, dan kenapa keputusan itu ditulis sebagai ADR alih-alih sekadar fitur. Menjelaskan keadaan sebelumnya bahwa otomasi KPI hanya menghitung usulan yang tak pernah disimpan, siapa satu-satunya penulis `kpi_score` sebelum ini, serta siapa yang kini bertanggung jawab atas sebuah skor. Menyebut pula ruang lingkupnya yang terbatas pada `kpi_score` dan `kpi_template`, tanpa menyentuh jalur manusia `POST /kpi`.",
+      "kata_kunci": [
+        "ADR 0048",
+        "KPI otomatis",
+        "skor beku",
+        "kpi_score",
+        "kpi_template",
+        "tanggal 10",
+        "bulan berjalan",
+        "otomasi penuh",
+        "supervisor",
+        "employee service"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -5672,10 +5703,11 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Metrik otomatis PERTAMA menyala di produksi 6 Agustus 2026**, lima hari sesudah mesinnya deploy. Tiga metrik Tech Development kini punya konfigurasi `auto` dan benar-benar menghasilkan angka (rincian dan buktinya di bab **Metrik otomatis yang sudah menyala** di bawah). Catatan lama \"belum ada satu pun metrik yang terisi otomatis\" **sudah tidak berlaku**. Mesinnya sendiri jalan sejak PR #843 (kontrak sumber nilai), #857 (mesin reduksi + arah target + registry), dan #866 (sumber `uptime_sistem`), deploy 1 Agustus 2026. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.",
+      "status_teks": "**24 metrik ber-`auto` di produksi per 2026-08-20**, tersebar di 11 template. Angka \"tiga metrik Tech Development\" di bawah adalah keadaan **6 Agustus 2026** dan sudah lama terlampaui; bab **Metrik otomatis yang sudah menyala** belum disegarkan mengikutinya. Sensus 2026-08-20 langsung ke `employee_db` prod: 24 dari 362 metrik di 83 template, menyentuh **38 dari 183 karyawan aktif**, dan **30 di antaranya berada di posisi yang otomasinya PENUH** (bobot 1,00) yaitu ICC Beauty Hacks 19 orang dan ICC Kyura 11 orang. Ketiga puluh orang itu kini dibekukan sistem, lihat [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]]. Catatan lama \"belum ada satu pun metrik yang terisi otomatis\" **sudah tidak berlaku**. Mesinnya sendiri jalan sejak PR #843 (kontrak sumber nilai), #857 (mesin reduksi + arah target + registry), dan #866 (sumber `uptime_sistem`), deploy 1 Agustus 2026. **Inventaris sumber datanya ✅ grounded** ke kode `origin/main` bip-erp commit `23c6bdc8` dan sensus dokumen 15 database production per **2026-07-31**.",
       "publik": true,
       "tautan": [
         "HRIS - Key Performance Index",
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "Microservices - Employee Service",
         "Microservices - Insentive Service",
         "API - Employee Service",
@@ -5728,21 +5760,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "6f999e7cd279731e981d9b436491a39efca080112b865f15c7856838c919771b",
-      "ukuran_kb": 76.5,
-      "ringkasan": "Menjawab: metrik KPI mana yang layak diisi otomatis dari data yang sudah dimiliki ERP, mana yang modulnya ada tapi datanya kosong, dan mana yang tak punya sumber sama sekali (klasifikasi 311 metrik). Menjelaskan metrik otomatis pertama yang sudah menyala di produksi, cara kerja `GET /kpi/auto-values` (cakupan penuh=otomatis, parsial=semi), layar diagnostik Otomasi KPI, serta bagaimana HR mengisi konfigurasi `auto` sendiri dan gap yang masih tersisa.",
+      "hash": "596c9bcb7ccd04a6a333f4354d8d66e52398a5ea6db55c0db74d6f07df76c18b",
+      "ukuran_kb": 76.8,
+      "ringkasan": "Menjawab: dari seluruh metrik KPI yang benar-benar terpasang di produksi, mana yang sumber datanya sudah ada sehingga bisa diisi otomatis, mana yang modulnya ada tapi belum dipakai, dan mana yang memang tak punya sumber sama sekali. Memuat hasil sensus langsung ke `employee_db` produksi berikut jumlah metrik ber-`auto`, sebarannya per template, dan berapa karyawan yang tersentuh, termasuk posisi yang otomasinya penuh berbobot 1,00. Melengkapi mekanisme scoring di HRIS - Key Performance Index, dan menandai catatan lama mana yang sudah tidak berlaku.",
       "kata_kunci": [
         "otomasi KPI",
-        "auto-values",
-        "skor KPI otomatis",
+        "skor otomatis",
+        "auto metrik",
+        "sensus metrik",
         "kpi_template",
-        "sumber data",
-        "cakupan",
-        "semi",
-        "diagnostik",
-        "skor_tim",
-        "uptime_sistem",
-        "HRIS"
+        "KPI",
+        "ICC Beauty Hacks",
+        "ICC Kyura",
+        "kelayakan otomasi",
+        "employee_db"
       ]
     },
     {
