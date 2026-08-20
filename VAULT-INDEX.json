@@ -3224,27 +3224,30 @@
         "Microservices - Integration Service",
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "IT - Background Jobs & Schedulers",
-        "ADR - 0002 Database-per-Service",
         "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
+        "ADR - 0002 Database-per-Service",
         "APP - Web ERP",
         "API - Manufacture Service",
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "04bc39f602382f95fe40a95a9de8b87fe8142d3142647bb3fae2f5f6295a72ef",
-      "ukuran_kb": 54.7,
-      "ringkasan": "Menjawab: kenapa lima menu WMS dipecah jadi dua sub-tab yang memisahkan log sumber dari input manual, dan kenapa tiap jalur tulis manual menstempel created_by_name. Menjawab pula gerbang gudang di backend yang menahan retur barang-balik sampai gudang benar-benar memindainya, beserta kelengkapan form retur seperti pengaman qty, panel konteks, dan pengutamaan resi paket balik. Memuat riwayat follow-up beserta menu mana yang sudah terverifikasi visual dan mana yang masih menunggu pengecekan dengan role yang sesuai.",
+      "hash": "6c96af8425373367f9aff8704756b1d1249c94add7edf5535f33c40d4917d0c3",
+      "ukuran_kb": 57.1,
+      "ringkasan": "Menjawab: kenapa log tiap menu WMS (Return Ekspedisi, Keluar FG, Inbound RM, Input Gudang FG, Kirim FG) dipecah jadi tab SUMBER vs INPUT WMS, menu mana yang punya badge status sudah/belum dicatat dan kenapa yang lain sengaja tidak, serta bagaimana data Keluar FG diagregasi per SKU dan status resi mana (COMPLETED/SHIPPED) yang dihitung sebagai barang keluar gudang. Juga menjawab bagaimana nama penginput (`created_by_name`) distempel dari server berdasarkan header gateway alih-alih dikirim client, supaya jejak audit tidak bisa dipalsukan, termasuk perluasannya ke gerbang gudang per-order untuk retur barang-balik.",
       "kata_kunci": [
-        "ADR WMS",
+        "WMS",
         "log sumber",
-        "input manual",
-        "created_by_name",
+        "input WMS",
         "stempel penginput",
+        "created_by_name",
+        "audit trail",
         "gerbang gudang",
-        "retur barang balik",
+        "retur",
+        "resi",
+        "Keluar FG",
         "Inbound RM",
-        "resi paket balik",
-        "scan gudang"
+        "Return Dari Ekspedisi",
+        "status resi COMPLETED SHIPPED"
       ]
     },
     {
@@ -3977,7 +3980,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "Konsep / Direncanakan (20 Agustus 2026), rancangan disetujui, belum ada kode. Ini **potongan A** dari empat potongan yang disepakati (lihat §Ruang Lingkup); B dan C belum dirancang.",
+      "status_teks": "Kode selesai di branch, BELUM merge dan BELUM deploy (20 Agustus 2026). Ini **potongan A** dari empat potongan yang disepakati (lihat §Ruang Lingkup); B dan C belum dirancang. Implementasi ada di branch `feat/attendance-jejak-pengajuan` (bip-erp), sudah lewat review per-task dan satu review menyeluruh; gerbang dev di §9 **belum dijalankan**, jadi belum ada satu pun bukti fitur ini bekerja lewat gateway.",
       "publik": true,
       "tautan": [
         "APP - MyBharata",
@@ -3988,20 +3991,22 @@
         "Microservices - Attendance Service",
         "ADR - 0002 Database-per-Service"
       ],
-      "hash": "a02f57fce3e64cbdb8055d042b90db5058faf4cd6e9b04b7f5810fd1cca60c61",
-      "ukuran_kb": 15.5,
-      "ringkasan": "Menjawab: kenapa pengajuan yang DITOLAK (Sakit/Izin/Cuti/Dinas, koreksi absen, tukar jadwal) tidak meninggalkan jejak apa pun di attendance-service, dan bagaimana rancangan koleksi `submission_attempt` di `attendance_db` merekam tiap percobaan berikut identitas, lampiran, status HTTP, dan alasan penolakannya. Menjelaskan kenapa pencatatan dipasang sebagai middleware tingkat rute alih-alih helper di tiap cabang `return`, dan kenapa alasan penolakan disimpan sebagai kode stabil (`SICK_NO_ATTACHMENT`, `VACATION_QUOTA_EXCEEDED`, dst.) lewat `c.Locals` alih-alih dicocokkan dari teks pesan. Juga memuat pembagian ruang lingkup A-D (jejak di server, permukaan baca untuk HR/atasan, telemetri dari aplikasi, retensi & privasi), katalog kode penolakan pintu `leave`, serta bukti kenapa dugaan \"foto lebih dari 4 MB\" gugur pada insiden 20 Agustus 2026.",
+      "hash": "b6c95fcf6596e6ea2e4239d7957c1064ff27074ea0e921b5b025c2df0f35600a",
+      "ukuran_kb": 19.6,
+      "ringkasan": "Menjawab: kenapa pengajuan Sakit/Izin/Cuti/Dinas atau koreksi absen yang ditolak (400) tidak meninggalkan jejak sama sekali di server sehingga alasan penolakannya tak bisa ditelusuri, dipicu insiden prod 20 Agustus 2026 (15 dari 18 percobaan pengajuan ditolak tanpa jejak). Menjelaskan rancangan koleksi `submission_attempt` yang mencatat tiap percobaan (berhasil maupun ditolak) lewat middleware tingkat rute alih-alih panggilan helper di tiap cabang handler, memakai kode alasan penolakan yang stabil (bukan cocokkan teks pesan), dan pembagian empat potongan implementasi (server, permukaan baca HR, telemetri app, retensi/privasi).",
       "kata_kunci": [
         "submission_attempt",
-        "jejak percobaan pengajuan",
+        "jejak pengajuan",
+        "middleware",
         "audit trail pengajuan",
-        "kode penolakan",
+        "pengajuan ditolak",
+        "cuti",
+        "leave request",
+        "koreksi absen",
         "reject_code",
-        "middleware Fiber",
         "attendance-service",
-        "leave request gagal",
-        "400 tanpa alasan",
-        "observability"
+        "retry pengajuan",
+        "lampiran gagal terkirim"
       ]
     },
     {
