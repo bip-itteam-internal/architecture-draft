@@ -140,6 +140,28 @@ Beberapa fitur landing **DORMANT** — kode ada di produksi tapi tidak jalan sam
 
 - **`AUTO_ARRANGE_ENABLED`** (integration-service, default **off**) — worker `auto-arrange` (pengganti auto-ship Desty) hanya didaftarkan bila `=true`. **JANGAN set `true` sampai cutover Desty→WMS** (WMS gudang mulai dipakai & arrange manual Desty dihentikan). Mengaktifkan = aksi kirim NYATA & irreversible ke marketplace. Lihat [[External - Desty]] & [[IT - Background Jobs & Schedulers]]. Verifikasi status di log boot: `auto-arrange scheduler DORMANT` (off) vs `... ENABLED` (on).
 
+## 3c. TTL index: masa simpannya TIDAK bisa diubah lewat deploy
+
+`attendance-service` membuat TTL index saat boot untuk koleksi `submission_attempt` (jejak percobaan pengajuan, [[ADR - 0046 Percobaan Pengajuan Dijejaki Middleware, Bukan Panggilan per Cabang]]), lewat `ensureSubmissionAttemptIndexes` dengan `SetExpireAfterSeconds(365 * 24 * 60 * 60)`.
+
+**Mengubah angka itu di kode lalu men-deploy TIDAK mengubah apa pun.** `CreateOne` atas index yang sudah ada dengan spesifikasi berbeda bukan operasi yang menimpa: Mongo menolaknya, dan penjaganya di sini hanya `log.Printf` yang tidak memblokir start. Jadi gejalanya **senyap**: deploy sukses, container sehat, retensinya tetap yang lama, dan tak ada yang tahu sampai ada yang menghitung umur dokumen tertua.
+
+Mengubah retensi menuntut langkah manual yang **bukan bagian dari deploy**:
+
+```bash
+# di container mongo koleksi yang bersangkutan
+db.submission_attempt.dropIndex("at_1")
+# lalu restart service-nya supaya ensure...Indexes() membuat ulang dengan nilai baru
+```
+
+Verifikasinya satu baris, dan jangan percaya deploy tanpa menjalankannya:
+
+```bash
+db.submission_attempt.getIndexes()   # cari expireAfterSeconds pada index `at_1`
+```
+
+Pola yang sama berlaku untuk TTL index mana pun yang lahir dari `ensure*Indexes()` di service lain. Aturan umumnya: **index yang sudah ada tidak pernah berubah karena deploy**, hanya index yang belum ada yang dibuat.
+
 ## 4. Verifikasi pasca-deploy
 
 ```bash
