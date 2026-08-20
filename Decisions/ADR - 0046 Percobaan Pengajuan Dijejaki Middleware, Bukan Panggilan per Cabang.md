@@ -1,4 +1,4 @@
-> **Status**: 🟡 Konsep / Direncanakan (20 Agustus 2026) — rancangan disetujui, belum ada kode. Ini **potongan A** dari empat potongan yang disepakati (lihat §Ruang Lingkup); B dan C belum dirancang.
+> **Status**: 🟡 Konsep / Direncanakan (20 Agustus 2026), rancangan disetujui, belum ada kode. Ini **potongan A** dari empat potongan yang disepakati (lihat §Ruang Lingkup); B dan C belum dirancang.
 
 ## Context
 
