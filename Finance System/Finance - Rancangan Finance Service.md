@@ -849,6 +849,40 @@ dari 7 kategori grid (bukan panggil `/anggaran/varians`), label & pola SAMA deng
 `KartuVariansOpex` di tab "Master Anggaran" sebelahnya, supaya "varians OPEX" berarti hal
 yang sama di kedua tab.
 
+**Revisi lanjutan 2026-08-20 (form vertikal + Daftar Pemegang Laptop/PC):**
+
+- **Form "Tambah catatan" jadi vertikal**, bukan grid 2/4 kolom — drawer sisi kanan
+  sempit (`sm:max-w-lg`) membuat grid horizontal melipat label dan mengecilkan field.
+  Berlaku ke SEMUA kategori manual sekaligus karena satu komponen `FormTambahBeban`
+  dipakai ulang oleh kelimanya.
+- **Kartu Laptop/PC kini punya "Daftar Pemegang (Beauty Hacks/Kyura)"** — daftar
+  Laptop/PC yang dipegang staff Marketing, ditarik dari **`services/inventory`**
+  (field `held_by`), BUKAN `aset_tetap` (salinan Accurate tanpa data pemegang, sempat
+  keliru disebut sebagai solusi di draf awal) dan BUKAN entri manual. Reuse penuh —
+  hook `useFetchInventory` (sama dipakai [[GA - Inventory Management]]), fungsi
+  `computeDepreciation` (estimasi penyusutan garis lurus, label sama persis: "Nilai
+  Buku (estimasi)" dst) — bukan rumus/komponen tandingan.
+  - **Tabel padat + pencarian, bukan kartu per-pemegang.** Draf pertama pakai kartu
+    (~150px tinggi per orang) dan ditolak user: tak masuk akal begitu daftarnya
+    puluhan baris. Direvisi jadi tabel, kelas yang SAMA dengan tabel "Rincian
+    tercatat" di drawer yang sama (satu bahasa visual, bukan dua).
+  - **"Sedang dipegang" = `held_by.employee_id` terisi**, pola yang SAMA dengan
+    `saringAset` (GA Inventory). `hold_period.is_active` SENGAJA diabaikan — backend
+    `ListInventory` (`controller.go:337`) mengembalikannya `true` untuk SEMUA baris
+    tanpa syarat, jadi bukan penanda yang bisa dipercaya. Ditemukan lewat pembacaan
+    kode langsung, bukan asumsi dari nama field.
+  - **Batasan yang diterima sadar**: `item_category` di `services/inventory` bebas-
+    ketik (form create-nya input bebas, bukan dropdown dari `data-type/electronics`
+    yang ternyata tak dipakai) — tak ada field terstruktur yang membedakan Laptop
+    dari Desktop dari aset elektronik lain. Pencocokan "ini Laptop/PC atau bukan"
+    pakai kata kunci pada nama/kategori (`laptop`, `desktop`, `pc`, `komputer`, dst)
+    — best-effort, bisa salah (nama aset yang tak memuat kata kunci ini terlewat).
+  - **Form manual TETAP ADA** — daftar pemegang melengkapi, bukan menggantikan;
+    Finance masih mengetik nominal beban penyusutan sendiri. Draf sempat
+    mempertimbangkan filter berdasar posisi HRIS "ICC" (sesuai kata user), diputuskan
+    memakai departemen (Beauty Hacks/Kyura) supaya KONSISTEN dengan 6 kategori lain
+    di grid yang semuanya berbasis departemen, bukan posisi.
+
 ### Registry catatan beban manual (dasar untuk 5 dari 7 kategori)
 
 Backend menghitung breakdown per-item & per-PIC — awalnya khusus kategori **"Beban
