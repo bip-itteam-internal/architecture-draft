@@ -4320,20 +4320,23 @@
         "External - Accurate",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "dfbaff3c6383668075adf37a38fa5494be751b1789f28396e3c9afbde72d5aa3",
-      "ukuran_kb": 84.0,
-      "ringkasan": "Menjawab: apa saja modul yang direncanakan untuk finance-service (Tax, Cost Control, jembatan KPI), metrik KPI departemen Finance mana yang terhenti karena tak ada master data ERP, dan kenapa sebagian fitur (Fase 1b forecast kas mingguan, Opex Marketing, Admin & Non-Ops YoY) justru dibangun di integration-service, bukan finance-service. Juga menjelaskan tiga lapis rumus (agregasi mentah, rumus metrik, rumus skor) beserta siapa pemilik tiap lapis, dan status keputusan finance yang sudah/belum dijawab. Berguna sebagai rujukan saat menelusuri kenapa endpoint OPEX/anggaran ada di integration-service padahal dokumennya bernama finance-service.",
+      "hash": "fa1230a7fcb28befe75b19c0d9336677d99cbe7c26c5f520a1a28f6738625da6",
+      "ukuran_kb": 85.2,
+      "ringkasan": "Menjawab: kenapa hampir seluruh KPI divisi Finance (FAT) tidak terisi otomatis, dan bagaimana finance-service dirancang menutup celah itu lewat modul Tax (kewajiban pajak, SPT, temuan kepatuhan), Cost Control (rekomendasi efisiensi, forecast kas), serta jembatan `GET /internal/kpi/metrics` yang juga meneruskan metrik AR/AP milik integration-service. Menjelaskan pembagian tugas dengan [[Microservices - Integration Service]] (master anggaran OPEX dan turunannya tidak dimigrasi, dibaca via HTTP), tiga lapis rumus (agregasi mentah vs rumus metrik vs rumus skor) dan di service mana masing-masing boleh ditulis, RBAC/alur approval per modul, serta keputusan yang masih ditunggu dari tim Finance untuk melanjutkan/menghentikan modul Tax dan Cost Control.",
       "kata_kunci": [
         "finance-service",
+        "KPI FAT",
+        "OPEX",
+        "varians OPEX",
         "Cost Control",
         "Tax",
-        "OPEX",
-        "KPI",
-        "anggaran",
-        "varians OPEX",
+        "SPT",
+        "pajak",
+        "forecast kas",
+        "cashflow",
         "piutang",
         "AR",
-        "forecast kas"
+        "integration-service"
       ]
     },
     {
