@@ -1,4 +1,4 @@
-**Status**: ⚠️ **Implemented (ada catatan)** — **Fase 0 LIVE di dev & prod** sejak 2026-08-13, **daftar akun OPEX ditegakkan kode** dan metrik varians OPEX **sudah terisi otomatis** di KPI, serta **modul Cost Control Fase 1a (rekomendasi efisiensi, bobot 20%) sudah ada**. serta **modul Cost Control Fase 1b (akurasi forecast kas mingguan, bobot 15%) sudah ada**. Tersisa 🟡: modul Tax dan metrik Admin & Non-Ops YoY — lihat bab keputusan.
+**Status**: ⚠️ **Implemented (ada catatan)** — **Fase 0 LIVE di dev & prod** sejak 2026-08-13, **daftar akun OPEX ditegakkan kode** dan metrik varians OPEX **sudah terisi otomatis** di KPI, serta **modul Cost Control Fase 1a (rekomendasi efisiensi, bobot 20%) sudah ada**, **Fase 1b (akurasi forecast kas mingguan, bobot 15%) sudah ada**, **metrik Admin & Non-Ops YoY (bobot 10%) sudah ada**, dan **registry Beban Software manual ("Opex Marketing" — breakdown per-item & per-PIC, pelengkap akun Accurate yang tak dipecah per vendor) sudah ada**. ⚠️ **Ketiga yang disebut terakhir mendarat di [[Microservices - Integration Service]], BUKAN di service ini** — beda dari Fase 1a yang memang di sini; lihat catatan gap di §Ruang Lingkup. Tersisa 🟡: modul Tax — lihat bab keputusan.
 
 ## Deskripsi
 
@@ -32,9 +32,11 @@ Bukti bahwa datanya **ada tetapi di luar sistem**: tiga rekap bulanan yang disus
 | Modul | Isi | Membuka |
 |---|---|---|
 | **Tax** | Master jenis kewajiban · kewajiban per masa · register pelaporan SPT · register temuan kepatuhan · klasifikasi akun deductible | bobot 0,40 |
-| **Cost Control** | Register penghematan · forecast kas mingguan | bobot 0,25 |
+| **Cost Control** | Register penghematan (✅ Fase 1a, di service ini) · ~~forecast kas mingguan~~ (✅ ada, tapi bukan di sini — lihat catatan) | bobot 0,25 |
 | **Jembatan KPI** | `GET /internal/kpi/metrics` + satu sumber baru `kinerja_finance` di employee-service | mengaktifkan semuanya |
 | **Jalur entri OPEX** | Template unduh, salin periode, resolusi nama akun — **di integration-service** | bobot 0,85 |
+
+> ⚠️ **Gap rencana vs implementasi (ditemukan 2026-08-19).** Baris "forecast kas mingguan" di atas menyiratkan fitur itu dibangun di finance-service — pada praktiknya **tidak**. Fase 1b (breakdown mingguan), metrik Admin & Non-Ops YoY, dan registry Beban Software manual ("Opex Marketing") semuanya dibangun di [[Microservices - Integration Service]], bergabung dengan grup `/accounting` yang sudah ada di sana (`anggaran`, `anggaran/mingguan`, `admin-nonops`, `opex-manual` — lihat [[API - Integration Service]]). Alasannya konsisten dengan baris "Jalur entri OPEX" di atas: sumber datanya (Accurate, master anggaran OPEX) sudah hidup di integration-service, dan menaruh fitur turunannya di finance-service berarti satu panggilan HTTP lintas-service ekstra untuk setiap pembacaan — biaya yang sama yang sudah diakui dok ini sendiri di §Lingkup jembatan KPI ("satu konektor keluar, bukan dua"). Pola ini terbukti berulang tiga kali berturut-turut, jadi kemungkinan besar akan terus begitu untuk fitur Cost Control turunan Accurate berikutnya — pertimbangkan itu sebagai default, bukan pengecualian, saat merencanakan fitur baru di area ini.
 
 ### Lingkup jembatan KPI — keputusan: fasad seluruh departemen Finance
 
@@ -769,6 +771,56 @@ Urutan naik: **integration-service → employee-service → frontend**.
 > ⚠️ **Angka Juli di ERP TIDAK akan sama dengan 47,81%,** dan itu benar. PDF memakai RAPB asli;
 > yang diunggah ke ERP adalah **Rev 2** (−23,4%) atas permintaan Finance. Yang direproduksi test
 > adalah rumus dan subsetnya, memakai angka PDF sebagai fixture — bukan angka produksinya.
+
+## Registry Beban Software Manual ("Opex Marketing") — ✅ Implemented (2026-08-19)
+
+Breakdown per-item & per-PIC untuk kategori **"Beban Software"** — tab baru di halaman
+Anggaran Opex (`erp-frontend`), rute & kontrak di [[API - Integration Service]]. Latar
+belakangnya sama polanya dengan Fase 1a/1b: sesuatu yang diminta Finance tapi tak bisa
+dijawab master anggaran yang sudah ada.
+
+**Kenapa perlu registry baru sama sekali: Accurate cuma punya SATU akun gabungan.**
+Dikonfirmasi 2026-08-14 (lihat komentar `DaftarKomponenOpex` di `opex_daftar.go`) —
+`Beban Software` tidak dipecah per vendor di Accurate, dan itu keterbatasan struktural
+permanen, bukan celah sementara. Percobaan sebelumnya memisah "Beban Software & Server
+Marketing" dari porsi Adum sudah ditolak dengan alasan yang sama. Jadi breakdown
+Capcut/Creative Studio AI/dst **tidak mungkin** ditarik otomatis dari Accurate — harus
+dicatat manual.
+
+**Pelengkap, bukan pengganti pembukuan.** Total Accurate untuk kategori yang sama tetap
+dibaca terpisah sebagai "angka kontrol" (`GetProfitLossAccounts`, dicocokkan **by name**
+ternormalisasi — bukan hardcode nomor akun, karena nomor akun bukan kontrak yang dijamin
+stabil di manapun di codebase ini). Selisih antara total manual dan angka kontrol
+ditampilkan apa adanya, tidak dipaksa sama — pola yang sama dengan Akurasi+Cakupan pada
+[[ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI]].
+
+**Kategori dikunci, nama item sengaja bebas.** `KategoriOpexManualValid` cuma berisi
+"Beban Software" untuk fase ini — pelajaran yang sama dengan "kategori ERP bebas-ketik
+jadi bucket sampah" di ADR-0037. `nama_item` (Capcut, Creative Studio AI, dst) sebaliknya
+sengaja bebas-ketik: daftar vendor software memang terus bertambah tergantung pengajuan
+tim marketing, dan menguncinya ke daftar tetap berarti deploy tiap kali ada tool baru.
+
+**PIC dipilih dari karyawan Beauty Hacks/Kyura, tidak diketik bebas.** "Staff marketing"
+di organisasi ini secara struktural berarti kedua departemen itu — tidak ada departemen
+bernama "Marketing" (lihat [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]).
+Nama yang diketik manual tidak bisa diatribusikan balik ke `employee_id`, jadi breakdown
+per-PIC-nya tidak bisa dipercaya tanpa ini.
+
+**Kenapa di integration-service, bukan finance-service — lihat catatan gap di
+§Ruang Lingkup.** Dipertimbangkan dan ditolak secara eksplisit sebelum implementasi;
+alasannya sama dengan Fase 1b dan Admin & Non-Ops YoY yang mendahuluinya.
+
+**Dua celah yang ditemukan lewat `/review`, bukan lewat test yang sudah ada duluan:**
+status galat infrastruktur (Mongo turun) sempat dibalas 400 alih-alih 500 karena `Simpan`
+tidak membedakan galat validasi dari galat repo — pola yang sudah benar di `Hapus` pada
+berkas yang sama tidak ikut diterapkan ke `Simpan`; dan nama akun Accurate sempat
+diasumsikan unik padahal terbukti tidak (`opex_daftar_test.go` mengunci bahwa "Beban
+Iklan" sungguhan resolve ke 2 kode akun berbeda di data produksi) — angka kontrol yang
+menebak salah satu kandidat kini menolak menebak dan melapor ambigu.
+
+**Konsekuensi deploy**: tidak ada env baru. Koleksi baru `catatan_beban_manual` beserta
+indeks (kategori+tahun+bulan, bukan unik — banyak baris per periode memang sah) terbentuk
+otomatis. Urutan naik: **integration-service → frontend**.
 
 ## Daftar Akun OPEX — ✅ Implemented (2026-08-13)
 
