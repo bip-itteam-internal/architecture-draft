@@ -16,14 +16,17 @@
 ## Kelola Form (RBAC per departemen)
 | Method | Path | Fungsi |
 |---|---|---|
-| POST | `/forms` | Buat form (lahir `draft`; `owner_department` wajib dan harus dalam cakupan pemanggil. Ejaannya **dikanonikkan** ke daftar departemen aktif) |
-| GET | `/forms` | Daftar form departemen yang boleh dikelola pemanggil (`?status=`, `?form_type=`, `?search=`, `?page=`, `?limit=` maks 100). Tiap item membawa `form_type`, `response_count` (jumlah jawaban) dan `respondent_count` (jumlah ORANG) |
+| POST | `/forms` | Buat form (lahir `draft`; owner wajib dalam cakupan pemanggil, ejaannya **dikanonikkan** ke daftar departemen aktif). `owner_departments[]` opsional untuk kepemilikan bersama (lihat catatan 🔜 di bawah) |
+| GET | `/forms` | Daftar form yang **salah satu owner-nya** dalam cakupan pemanggil (`?status=`, `?form_type=`, `?search=`, `?page=`, `?limit=` maks 100). Tiap item membawa `form_type`, `response_count` (jumlah jawaban) dan `respondent_count` (jumlah ORANG) |
 | GET | `/forms/:id` | Detail + `response_count` |
 | PATCH | `/forms/:id` | Sunting. `409` bila susunan field diubah padahal sudah ada jawaban (**berlaku juga untuk form berulang**, lihat catatan di bawah). `409` juga bila `recurrence` **dinyalakan** pada form yang sudah punya jawaban; mematikannya tetap boleh. `owner_department` tak bisa dipindah |
 | PATCH | `/forms/:id/status` | `draft`→`published`→`closed`. `409` bila mencoba mundur dari `published` ke `draft`. Saat terbit: **memotret sasaran penilaian** (`422` bila gagal, kosong, atau >300 orang) lalu mengirim notifikasi inbox ke seluruh sasaran |
 | DELETE | `/forms/:id` | Hapus lunak (`deleted_at` + status `closed`) |
 
 > **Cakupannya departemen, bukan modul.** Diambil dari `common.SupervisedDepartments` (departemen sendiri + yang dibawahi lewat `master_department.supervised_by`) lalu diiris daftar departemen aktif. SPV HRGA karena itu melihat form Human Resource **dan** General Affair, tapi tidak Tech Development. Daftar aktifnya konfigurasi `FORM_BUILDER_DEPARTMENTS`; bila kosong dipakai bawaan `Human Resource, General Affair, Tech Development`.
+
+> [!note] 🔜 Kepemilikan bersama (`owner_departments[]`) — branch `feat/formbuilder-owner-jamak`, terverifikasi lokal, **belum merge/deploy**
+> Sebuah form bisa dimiliki beberapa departemen supervisi sekaligus. `POST /forms` menerima `owner_departments[]` (SEMUA wajib dalam cakupan pembuat; satu yang bukan → `403`). `owner_department` = elemen pertama, dikirim juga untuk klien lama. **Lihat** = cakupan pembaca mengandung salah satu owner; **tulis** (sunting/hapus/terbit) = pembaca mengelola salah satu owner. `GET /forms` menyaring `owner_departments $in cakupan` dengan fallback `$or` ke `owner_department` untuk dokumen lama. Tipe form harus boleh dibuat **SEMUA** owner (irisan, [[ADR - 0041 Izin Tipe Form Menempel di Departemen]]). Konsekuensi sadar: analisa form yang dibagikan terbaca staf tiap departemen pemilik. Detail: [[Microservices - Form Builder Service]].
 
 ## Aturan Tipe Form per Departemen (khusus IT)
 
@@ -136,7 +139,7 @@ Transisi sah: belum ditinjau → `accepted`/`rejected`; `accepted` → `implemen
 
 **Bobot** (`weight`) — angka **relatif**, bukan persentase yang wajib berjumlah 100: bobot 3 berarti tiga kali lebih berat dari 1. Hanya berarti pada tipe `scale`, dan hanya dipakai menghitung `overall` di analisa form penilaian. Kosong berarti **1**, sehingga form lama tak berubah artinya. Nol **sah** (pertanyaan pelengkap yang tak ikut menghitung); negatif ditolak `400`, sebab akan membalik arah penilaian tanpa satu pun tanda di layar. Angka persen tetap bisa diisi apa adanya (40/20/10/30) karena jumlahnya memang 100.
 
-**Pemilik** (`owner_department`): nama departemen `master_department` (mis. `"General Affair"`), BUKAN key `system_roles`. Form lama yang masih menyimpan `owner_module` dipindah otomatis saat service boot (`it`→`Tech Development`, `ga`→`General Affair`).
+**Pemilik** (`owner_department`, dan `owner_departments[]` 🔜 branch, belum deploy): nama departemen `master_department` (mis. `"General Affair"`), BUKAN key `system_roles`. Form lama yang masih menyimpan `owner_module` dipindah otomatis saat service boot (`it`→`Tech Development`, `ga`→`General Affair`). `owner_departments[]` memuat SELURUH departemen pemilik saat form dibagikan, dengan `owner_department` sebagai elemen pertama; dokumen lama tanpa `owner_departments` diperlakukan sebagai `[owner_department]` (backfill saat boot).
 
 **Sasaran** (`audience.type`): `all` · `departments` (+`departments[]`) · `employees` (+`employee_ids[]`). `estimated_size` diisi manual sebagai penyebut tingkat pengisian; bila 0, `response_rate` tidak dikirim. Perhatikan `audience.departments` menjawab **siapa yang mengisi**, sedangkan `owner_department` menjawab **siapa yang memiliki** — keduanya tak harus sama.
 

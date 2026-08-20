@@ -139,6 +139,25 @@ Hasilnya "HRGA" tak pernah jadi nilai tersimpan di mana pun: ia gabungan dua dep
 
 ⚠️ **Gerbang ini lebih lebar daripada yang dibaca sepintas.** `managedDepartments` memakai `common.SupervisedDepartments` yang **selalu menyertakan departemen sendiri**, bukan versi `Strict`. Jadi yang lolos bukan "atasan di departemen aktif", melainkan **siapa pun yang bekerja di sana dan punya peran apa pun di modul apa pun** — staf dengan `ticket:staff` sekalipun. Shared-library menandai perbedaan itu sendiri: docstring `SupervisedDepartmentsStrict` menyebut versi non-strict "membuat SETIAP karyawan tampak sebagai supervisor departemennya sendiri" dan mensyaratkan jalur tulis memakai yang strict. Apakah itu memang dikehendaki **belum pernah diputuskan tertulis**; komentar gerbangnya berbunyi "berada di departemen yang diaktifkan", yang mengesankan disengaja.
 
+## Kepemilikan bersama: `owner_departments` jamak
+
+> **Status**: 🔜 **Branch `feat/formbuilder-owner-jamak`, terverifikasi LOKAL** (BE `go build`/`vet`/`test` hijau; FE `pnpm tsc`/`eslint`/`vitest` hijau), **BELUM merge, BELUM deploy.** Alur end-to-end lewat gateway (buat form dua-owner → pembaca departemen lain melihatnya) **belum diuji** — itu gerbang yang tersisa sebelum bisa diklaim jalan. Jangan baca status ini sebagai "live".
+
+Sebuah form kini bisa dimiliki BEBERAPA departemen supervisi sekaligus, bukan cuma satu. Pemicunya nyata: di prod, dua form General Affair yang sedang `published` hanya bisa dikelola satu orang (SPV HRD, satu-satunya `is_supervisor` Human Resource yang cakupannya mencakup General Affair), karena kepemilikan tunggal `owner_department` menautkan form ke satu departemen saja.
+
+- **`Form.OwnerDepartments []string`** — field BARU, bukan mengganti tipe `OwnerDepartment`. `OwnerDepartment` tetap = owner PRIMER (elemen pertama), sehingga seluruh pembaca lama (analisa, tampilan, kaizen) tak tersentuh. Dokumen lama tanpa field ini diperlakukan `[OwnerDepartment]` lewat `effectiveOwners`; backfill saat boot mengisinya (`owner_departments = [owner_department]`, update-pipeline), tapi gerbang dan filter sudah benar sebelum backfill jalan.
+- **Lihat** = cakupan pembaca mengandung SALAH SATU owner. `GET /forms` menyaring `owner_departments $in cakupan` dengan cabang `$or` fallback ke `owner_department` untuk dokumen belum ter-backfill — tanpa cabang itu form owner tunggal lama lenyap dari daftar pemiliknya, senyap. Pola sama dengan `periodQuery`/`subjectQuery`.
+- **Tulis** (sunting, terbit, hapus) = pembaca mengelola SALAH SATU owner (`canManageAnyDepartment`, gerbang tunggal `loadManagedForm` + dua rute Kaizen). Keputusan sadar **"kelola salah satu, bukan semua"**: menyebar beban supaya form GA tak bergantung satu orang. Risiko yang diterima: staf salah satu departemen bisa menghapus form bersama — tapi HANYA form yang sengaja dibagikan, karena membuat form bersama menuntut pembuatnya mengelola SEMUA owner (`canonicalDepartments` menolak seluruhnya bila satu owner di luar cakupan; `403`).
+- **Tipe form diperiksa PER owner**: form HR+GA hanya sah bertipe yang boleh dibuat KEDUANYA (irisan aturan [[ADR - 0041 Izin Tipe Form Menempel di Departemen]]). FE menawarkan irisan (`allowedFormTypesForAll`); BE menolak di owner pertama yang melarang.
+- **Owner terkunci saat pembuatan**, sama seperti `owner_department` tunggal: `updateForm` tak memindahnya (`updated := *form` mempertahankan `OwnerDepartments`).
+
+**Konsekuensi privasi, diterima sadar.** Analisa menampilkan nama, departemen, jabatan, dan seluruh jawaban tiap pengisi. Untuk form yang dibagikan HR+GA, staf HR kini bisa membaca jawaban form GA. Ini **MELEBARKAN kembali** penyempitan yang sengaja dibangun PR #869 (yang mempersempit lingkaran pembaca analisa ke departemen pemilik). Berlaku HANYA untuk form yang eksplisit dibagikan, dan disepakati sadar bersama pemilik keputusan.
+
+**Perbaikan alur ikut** (di [[APP - Web ERP]]): menu Form Builder ditambahkan ke kategori sidebar `ga`. Staf GA yang cuma pegang role `ga` (tanpa `hris`) sebelumnya **lolos** `requireFormManager` (General Affair ada di daftar aktif) tapi tak pernah melihat menunya — sidebar menampilkan menu per key `system_roles`, dan menu GA tinggal di kategori `hris`. Sensus prod 2026-08-20: 1 orang (GA Staff) persis di keadaan ini. Duplikat bagi pemegang HRGA (punya kategori `hris` DAN `ga`) dibuang di `gabungBlokHrga`.
+
+> [!warning] Penyimpangan sadar dari ADR 0030 & ADR 0041
+> [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] (baris 26) menyatakan yang TIDAK ikut pindah ke sumbu izin adalah cakupan departemen Form Builder. Perubahan ini **tidak** memindahnya ke `reach` (env `FORM_BUILDER_DEPARTMENTS` + `managedDepartments` tetap), melainkan menambah **kejamakan** pada owner — sumbu yang belum dijelaskan ADR 0041. Keduanya perlu ditinjau bersamaan saat sumbu izin `reach` untuk Form Builder kelak dibangun. Sumbu izin `formbuilder` (fase satu, di bawah) tak berubah.
+
 ## Izin: katalog `formbuilder` (fase satu)
 
 > **Status**: ⚠️ **Merged & LIVE di dev DAN prod, 2026-08-10** (PR [#1138](https://github.com/bip-itteam-internal/bip-erp/pull/1138), merge commit `0c5d5231`).
