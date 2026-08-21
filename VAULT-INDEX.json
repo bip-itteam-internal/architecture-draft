@@ -377,9 +377,9 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "6f213d66e1d2f1cfb110da1b65d8e9d1d58adb90dca479c433523d4043ab2708",
-      "ukuran_kb": 57.2,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di integration-service untuk sinkronisasi order/transaksi TikTok Shop, TikTok Business, dan Shopee ke Accurate, termasuk webhook, tracking resi, retur lintas-channel, dan dashboard akuntansi FAT. Juga menjelaskan endpoint aging piutang, profit per produk, ICC account mapping, dan kas toko/wallet marketplace. Cocok dirujuk saat menelusuri rute API gateway `/api/integration/*` atau webhook publik `/ext/webhook/:service`.",
+      "hash": "566788dede6fe404b95517238a2e6902d01f668e7ee56a8e462ba4432de69930",
+      "ukuran_kb": 57.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di integration-service untuk sinkronisasi order/transaksi TikTok Shop, TikTok Business, dan Shopee ke Accurate, termasuk webhook, tracking resi, retur lintas-channel, dan dashboard akuntansi FAT. Juga menjelaskan endpoint aging piutang, profit per produk, ICC account mapping, kas toko/wallet marketplace, serta keterangan vonis pada daftar fake order. Cocok dirujuk saat menelusuri rute API gateway `/api/integration/*` atau webhook publik `/ext/webhook/:service`.",
       "kata_kunci": [
         "integration-service",
         "endpoint API",
@@ -1201,8 +1201,8 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "19aa22d655001c43224ec6a2912dfce7d25b6f34346268486c99e57eddb32d48",
-      "ukuran_kb": 284.3,
+      "hash": "ef098e0c43560ce633736dc897226b18f3e8b58b34787cd3aefe3e24772f50a0",
+      "ukuran_kb": 284.7,
       "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di frontend Next.js erp-frontend, dan bagaimana masing-masing dirakit — struktur menu Pengaturan HRGA beserta aturan bahwa key tab adalah bagian URL, halaman payroll, pola tabel HRIS, dan dukungan dua bahasa lewat react-i18next. Menjawab juga bagaimana Ringkasan Divisi HRGA (/hris) bertab per posisi disusun: matriks KPI tiap posisi beserta bobot, status otomasi, dan kelayakannya yang ditarik hidup dari GET /kpi/auto-overview, peta otomasi divisi yang memuat posisi Admin yang tak punya tab, kartu angka efisiensi biaya GA, serta kenapa periodenya dijangkarkan ke bulan lalu dan kenapa bobot lembar KPI tidak boleh disalin ke kode. Menjelaskan pula cara kerja Inbox Notifikasi, kapan izin notifikasi desktop diminta, dan memuat koreksi atas catatan lama yang sudah basi soal dropdown user, konfigurasi Firebase, dan blok KPI belum bersumber yang kini dihapus.",
       "kata_kunci": [
         "erp-frontend",
@@ -2014,9 +2014,9 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "a75fa2ec4dc228beb6a23e657e81b376e85f94b97b24598ab9ee5fc516315171",
-      "ukuran_kb": 268.8,
-      "ringkasan": "Menjawab: bagaimana ERP tersambung ke marketplace Indonesia (TikTok Shop, TikTok Ads, Shopee, Lazada) dan bagaimana order serta laporan iklan dinormalkan jadi satu model transaction terpadu. Menjawab pula jembatan finansial ke Accurate Online: pembuatan invoice, ringkasan transaksi harian per toko dan channel, serta push Sales Invoice dan Sales Return. Termasuk automasi auto-ship dan auto-approve yang sadar hari libur, pengelolaan kredensial OAuth per marketplace, job sync terjadwal, dan status jalur middleware Desty yang sudah dimatikan.",
+      "hash": "97921b95db1c20aae9c84112ca2dfbfce5a60b3f7750a3368704ac4e33cbaff0",
+      "ukuran_kb": 272.4,
+      "ringkasan": "Menjawab: bagaimana ERP tersambung ke marketplace Indonesia (TikTok Shop, TikTok Ads, Shopee, Lazada) dan bagaimana order serta laporan iklan dinormalkan jadi satu model transaction terpadu. Menjawab pula jembatan finansial ke Accurate Online: pembuatan invoice, ringkasan transaksi harian per toko dan channel, push Sales Invoice dan Sales Return, penjagaan jalur retur terhadap fake order, serta kenapa faktur yang sudah dibayar diperlakukan sebagai antrean finance alih-alih alarm. Termasuk automasi auto-ship dan auto-approve yang sadar hari libur, pengelolaan kredensial OAuth per marketplace, job sync terjadwal, dan status jalur middleware Desty yang sudah dimatikan.",
       "kata_kunci": [
         "integration service",
         "marketplace",
@@ -5631,15 +5631,15 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "496dbc1d780f7678b51789552d56ab9d0a2a90fb3af1c882acba91eb3d001ae2",
-      "ukuran_kb": 137.9,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai di production per departemen dan posisi, beserta label persis, bobot, target/deskripsi, dan klasifikasi kelayakan otomasinya. Berfungsi sebagai salinan setia isi kpi_template (70 template, 311 metrik) untuk dev yang akan mengotomatiskan metrik, termasuk daftar cacat data yang diketahui dan cara memperbaruinya dari koleksi kpi_template di employee_db. Memuat pula peringatan bahwa sebagian sumber di tabel ini sempat dipetakan dari LABEL alih-alih deskripsi sehingga vonis kelayakannya menyesatkan (Net Income 20% dikoreksi ke varians anggaran departemen GA, Return On Operation Asset ditandai perlu diperiksa ulang), dan catatan bahwa bobot di tabel ini pernah disalin ke frontend lalu menyimpang tanpa terdeteksi.",
+      "hash": "81d4e8b1601bc0f3aad10725f044c688497d8f6d422be60d982b4e469edab9c8",
+      "ukuran_kb": 139.4,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai di production per departemen dan posisi, beserta label persis, bobot, target/deskripsi, dan klasifikasi kelayakan otomasinya. Berfungsi sebagai salinan setia isi kpi_template (70 template, 311 metrik) untuk dev yang akan mengotomatiskan metrik, termasuk daftar cacat data yang diketahui dan cara memperbaruinya dari koleksi kpi_template di employee_db. Memuat pula tiga peringatan yang diperoleh saat menyambungkan metriknya ke dashboard: sebagian sumber sempat dipetakan dari LABEL alih-alih deskripsi, bobot tabel ini pernah disalin ke frontend lalu menyimpang tanpa terdeteksi, dan metrik berkata SELURUH menuntut reduksi rasio_ambang bukan rata_rata.",
       "kata_kunci": [
         "matriks KPI",
         "kpi_template",
         "bobot metrik",
         "kelayakan otomasi",
-        "label metrik",
+        "reduksi rasio_ambang",
         "KPI Supervisor HRGA",
         "cacat data KPI",
         "otomasi skor KPI",
