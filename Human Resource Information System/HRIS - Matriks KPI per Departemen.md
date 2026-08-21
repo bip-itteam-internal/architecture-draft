@@ -402,8 +402,8 @@ Template `KPI Supervisor HRGA`, 10 metrik.
 | Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
 | 0.15 | `Revenue 240 Miliar` | Menjamin ketersediaan tenaga kerja dengan rata-rata time recruitment <30 hari untuk posisi kritikal | Modul Recruitment ADA tapi koleksi candidate KOSONG (job_requisition 2, job_posting 1). | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu rekrutmen sudah ada, hanya data pelamarnya belum diisi. |
-| 0.05 | `Net Income 20%` | Efisiensi biaya operasional GA min. 5% dari bulanan | Accurate live proxy: /accounting/profit-loss, /balance-sheet, /profit/cash-flow, /fixed-assets. | Bisa otomatis sekarang. Laporan laba rugi dan arus kas diambil langsung dari Accurate. |
-| 0.05 | `Return On Operation Asset` | Monitoring aset 100% terdata secara realtime | accurate_daily_returns (3.351) + shopee_returns (271) + GET /daily-returns/stats. | Bisa otomatis sekarang. Data retur sudah ditarik rutin dari marketplace dan Accurate. |
+| 0.05 | `Net Income 20%` | Efisiensi biaya operasional GA min. 5% dari bulanan | ⚠️ **DIKOREKSI 2026-08-21.** Sumber lama tertulis `/accounting/profit-loss` + `/balance-sheet` + `/profit/cash-flow` — laba rugi PERUSAHAAN, yang tak menjawab efisiensi satu departemen. Yang menjawab: `GET /accounting/anggaran/varians?tahun&bulan&departemen`, memakai `ringkas.total_realisasi` departemen GA. | Bisa otomatis sekarang, **dengan syarat**: realisasi periode itu sudah disinkron (`belum_pernah_sinkron` false) dan departemen GA ada di katalog Accurate. Sudah terpasang di dashboard, lihat catatan di bawah tabel. |
+| 0.05 | `Return On Operation Asset` | Monitoring aset 100% terdata secara realtime | ⚠️ **PERLU DIPERIKSA ULANG 2026-08-21.** Sumber tertulis `accurate_daily_returns` + `shopee_returns` = data RETUR, sementara deskripsinya monitoring ASET. Aset ada di `inventory_db.inventory` (134 item) + rekonsiliasi Accurate ([[ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI]]), bukan di retur. | **Vonis lama `bisa otomatis sekarang` tidak dapat ditindaklanjuti apa adanya** — sumber yang disebut menjawab metrik yang berbeda. Tetapkan dulu dengan pemilik metrik apakah yang dinilai kelengkapan data aset (maka sumbernya `inventory`) atau benar-benar retur (maka deskripsinya yang salah). |
 | 0.2 | `Performance Monitoring 100% Terimplementasi di Q4` | Memastikan seluruh tim/karyawan di setiap departemen memiliki skor KPI Min. 70 | Sumber skor_tim + reduksi rata_rata, scope department. Sudah didukung mesin; tinggal isi konfigurasi. | Bisa otomatis sekarang. Sistem tinggal merata-ratakan skor anggota departemen, dan mesinnya sudah siap. |
 | 0.1 | `Turn Over Rate Target 5% per Tahun` | Peningkatan Kualitas Rekruitment | Modul Recruitment ADA tapi koleksi candidate KOSONG (job_requisition 2, job_posting 1). | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu rekrutmen sudah ada, hanya data pelamarnya belum diisi. |
 | 0.1 | `Implementasi Training` | Memenuhi kebutuhan pelatihan untuk talent dan seluruh karyawan 100% terpenuhi tiap bulan dan terjadi peningkatan performa. | Modul Training ADA di kode tapi koleksi training & training_participant KOSONG di prod. Skor & survei kepuasan training juga belum ada fieldnya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu pelatihan sudah ada, hanya belum ada yang mengisinya. Nilai dan survei kepuasan pelatihan memang belum ada tempatnya. |
@@ -411,6 +411,39 @@ Template `KPI Supervisor HRGA`, 10 metrik.
 | 0.05 | `Employee Productivity sebesar 120 Juta per Employee ( DIv. Marketing )` | Memberikan Training, Coaching, atau Tools untuk meningkatkan Produktivitas. | Modul Training ADA di kode tapi koleksi training & training_participant KOSONG di prod. Skor & survei kepuasan training juga belum ada fieldnya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu pelatihan sudah ada, hanya belum ada yang mengisinya. Nilai dan survei kepuasan pelatihan memang belum ada tempatnya. |
 | 0.05 | `Succession Planing Terimplementasi` | Menyusun Kaderisasi & Talent Pool - 100% Calon Successor memiliki Development Plan dan Siap apabila diperlukan | TIDAK ADA modul succession/talent pool. | Belum bisa otomatis. Belum ada pencatatan calon penerus jabatan. |
 | 0.05 | `Employee Satisfaction` | Tingkat kepuasan pelayanan Team General Service minimal 90% memberikan penilaian 5 dari all karyawan | GET /task-management/report/csat. Pembacaan ulang prod 2026-08-06: **17 tiket ter-rating** seumur hidup, 13 di antaranya Juli. Masih tipis, dan seluruh rating Juli bernilai 5/5 sehingga belum membedakan siapa pun. | Belum layak dipakai. Yang menilai baru 17 orang seumur hidup dan semuanya memberi nilai penuh, jadi angkanya belum bisa membedakan pelayanan yang baik dari yang biasa saja. |
+
+> [!warning] Dua sumber di tabel ini sempat dipetakan dari LABEL, bukan dari deskripsi
+> Ditemukan 2026-08-21 saat menyambungkan metriknya ke dashboard. `Net Income 20%`
+> dipetakan ke laporan laba rugi dan `Return On Operation Asset` ke data retur — keduanya
+> mengikuti bunyi labelnya, padahal deskripsi keduanya bicara soal hal lain (biaya GA dan
+> pendataan aset).
+>
+> **Ini kelas kekeliruan yang khas template ini**, bukan kelalaian sekali: bab "Cacat yang
+> sudah diketahui" di atas sudah mencatat bahwa sejumlah label berisi target korporat
+> alih-alih nama metrik. Selama labelnya yang dibaca, pemetaan sumbernya akan terus
+> meleset ke arah yang sama. **Untuk template ini, baca kolom Target/keterangan lebih dulu,
+> baru cari sumbernya.**
+>
+> Vonis `bisa otomatis sekarang` yang bersandar pada sumber keliru **lebih merugikan
+> daripada vonis "belum bisa"**: ia mengundang dev menyambungkan angka yang menjawab
+> pertanyaan lain, dan angka itu tetap terlihat wajar di layar.
+
+**Terpasang di dashboard** (erp-frontend [#1128](https://github.com/bip-itteam-internal/erp-frontend/pull/1128) + [#1130](https://github.com/bip-itteam-internal/erp-frontend/pull/1130), merged 2026-08-21): seluruh sepuluh metrik di atas kini tampil sebagai **matriks KPI** di tab HRD Supervisor halaman Ringkasan Divisi HRGA, lengkap dengan bobot, status otomasi, dan kelayakannya. Bobot dan status ditarik hidup dari `GET /kpi/auto-overview`, tidak disalin. Satu metrik — `Net Income 20%` — sudah menampilkan **angkanya**, bukan hanya vonis kelayakannya. Rincian di [[APP - Web ERP]].
+
+> [!caution] Bobot lembar KPI ini pernah disalin ke frontend dan menyimpang
+> `erp-frontend/src/features/hris/dashboard/lib/kpi-spv.ts` (sudah **dihapus**) menyalin
+> tabel ini dengan `Return On Operation Asset` berbobot **25** (asli 0,05) dan
+> `Performance Monitoring Team HRGA` berbobot **0** (asli 0,20). Keduanya saling menutupi
+> sehingga totalnya tetap 100 dan test-nya tetap hijau — test itu menguji konsistensi
+> internal, bukan kecocokan dengan tabel ini.
+>
+> Akibatnya bukan kosmetik: daftar "KPI belum bersumber" diurutkan menurut bobot justru
+> untuk memutuskan pekerjaan berikutnya, sehingga ia menunjuk arah terbalik selama
+> berbulan-bulan. `Performance Monitoring Team HRGA` — metrik **terberat bersama** dan
+> menurut tabel ini **bisa otomatis sekarang** — diabaikan karena dikira berbobot nol.
+>
+> **Jangan menyalin bobot dari tabel ini ke kode.** Ia sudah tersedia hidup di
+> `GET /kpi/auto-overview`.
 
 ### Personalia
 
