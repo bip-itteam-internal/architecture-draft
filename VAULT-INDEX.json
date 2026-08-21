@@ -5517,20 +5517,20 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "bbf60d5265cdb765d3892515270ff5b1a5e1cff94e25c498a319d2a654ae6315",
-      "ukuran_kb": 25.8,
-      "ringkasan": "Menjawab: bedanya engine KPI→insentif tim marketing (sudah production di insentive-service, 9 role marketing) dengan appraisal KPI per-karyawan lintas departemen (sudah sebagian di employee-service, `/kpi/*`). Menjelaskan cara kerja template KPI per posisi, scoring per periode `YYYY-MM` dengan snapshot, aturan bahwa posisi template harus cocok dengan jabatan karyawan pada periode yang dinilai (dari employee_movement), RBAC per departemen, cakupan tim untuk Leader (scope=team by supervisor_id), tampilan gabungan departemen satu tim (HRGA), serta bagian appraisal bulanan menyeluruh yang masih konsep.",
+      "hash": "eb26a66cfed683cf1dbdd07c408b6b4ced3f7b72994c98732e93a27f79b2bda7",
+      "ukuran_kb": 26.8,
+      "ringkasan": "Menjawab: bagaimana penilaian kinerja berbasis skor KPI bekerja di ERP Bharata, apa beda engine KPI-ke-insentif tim marketing (sudah production) dari appraisal KPI per-karyawan lintas departemen (template per posisi + scoring di employee-service), dan bagaimana skor dihitung, di-snapshot, serta divalidasi terhadap posisi karyawan pada periode yang dinilai. Menjelaskan juga aturan RBAC per departemen, cakupan tim untuk Leader (scope=team berdasarkan bawahan langsung), penggabungan tampilan lintas departemen (mis. HRGA dari master_department.supervised_by), dan arti kolom jumlah karyawan (employee_count) pada tabel template.",
       "kata_kunci": [
         "KPI",
         "Key Performance Index",
         "appraisal",
         "penilaian kinerja",
-        "insentif marketing",
-        "template per posisi",
+        "insentif",
+        "incentive",
+        "template posisi",
         "scoring",
-        "employee-service",
         "RBAC departemen",
-        "scope team leader"
+        "employee_count"
       ]
     },
     {
