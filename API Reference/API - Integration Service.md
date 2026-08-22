@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, transaksi, items, ulasan marketplace, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈337 rute** (dihitung dari registrasi `main.go`; +5 `/reviews/*` 2026-07-19; +17 `/accounting/*` dashboard FAT 2026-08-01; +1 `/accurate/order-trace` 2026-08-20). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
+*Endpoint **integration-service** (marketplace ⇄ Accurate: TikTok Shop/Business, Shopee, transaksi, items, ulasan marketplace, ICC account mapping, marketing teams, worker/jobs). Gateway: `/api/integration/*`; webhook publik via `/ext/webhook/:service`. **≈341 rute** (dihitung dari registrasi `main.go`; +5 `/reviews/*` 2026-07-19; +17 `/accounting/*` dashboard FAT 2026-08-01; +1 `/accurate/order-trace` 2026-08-20; +4 `/shops/*` status sinkron toko 2026-08-22 🟡 branch). Grounded ke `services/integration/internal/interface/http/*` + `main.go`.*
 
 - **Implementasi**: [[Microservices - Integration Service]] · **Status**: ✅
 - **Indeks**: [[API - Index]] · Semua butuh gateway key kecuali webhook publik (`/ext/webhook/*`). ⚠️ `/health` **juga** butuh gateway key (route terdaftar setelah middleware `ValidateGateway`; gateway memanggilnya dengan key — bukan endpoint terbuka).
@@ -257,6 +257,16 @@
 | GET | `/reviews/sync-status` | State sync per toko (`last_synced_at`, `last_error`, `backfill_truncated` cap-500 Shopee) |
 
 > Worker `sync-reviews` harian 06:45 WIB. TikTok TIDAK punya API teks ulasan (hanya distribusi bintang kumulatif) — detail keterbatasan & desain: [[Microservices - Integration Service]] §Ulasan Marketplace.
+
+## Status Sinkron Toko (shop state)
+🟡 *branch `feat/oauth-shop-status-history`, belum merge/deploy.* Status LOKAL per toko (`shop_sync_states`): toko `DISABLED` dilewati SEMUA worker sync (toko banned marketplace berhenti membakar kuota & success rate). Desain: [[ADR - 0052 Status Sinkron per Toko]].
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/shops/status?channel=shopee\|tiktok` | Satu baris per toko yang dikenal: status lokal (default `ACTIVE` bila tanpa dokumen state) + `reason` + Shopee `marketplace_status` (NORMAL/BANNED/FROZEN — beku saat connect); dokumen state "hantu" (tokonya hilang dari daftar) tetap tampil. Staff. **Sengaja tanpa rescache** (ADR-0011: badge basi pasca-toggle = bohong) |
+| GET | `/shops/:channel/:shopId/history` | Riwayat transisi status toko (paginated `page`/`limit`, terbaru dulu). Staff |
+| POST | `/shops/:channel/:shopId/disable` | Nonaktifkan toko — body `{reason, shop_name?}`, **reason WAJIB**; transisi atomik + idempoten (`changed:false` bila sudah DISABLED); actor dari header identitas tercatat di riwayat. Admin |
+| POST | `/shops/:channel/:shopId/enable` | Aktifkan kembali (reason opsional). Admin |
 
 ## Marketing Teams (admin) · Worker/Jobs
 | Method | Path | Fungsi |
