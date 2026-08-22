@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-21",
+  "digenerate": "2026-08-22",
   "jumlah_dokumen": 292,
   "dokumen": [
     {
@@ -666,20 +666,23 @@
         "Microservices - Marketing Analytics Service",
         "APP - Dynamic Task Tracker"
       ],
-      "hash": "607270548da38165cde28464c89e3e04fb0ac453518011527e98624abfd75eed",
-      "ukuran_kb": 12.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di task-management-service lewat gateway /api/task-management/*, mulai dari space, task, attachment, laporan, audit, sampai WebSocket, dan siapa yang boleh approve, assign, serta melihat Laporan Tim. Menjawab juga bentuk payload types[].fields untuk pertanyaan per tipe permintaan, batas rute laporan yang hanya menerima rentang tanggal tanpa penyaring space, dan kontrak rute panggilan mesin /kpi/ticket beserta alasan ia dipisah dari rute laporan. Memuat dua jebakan yang sudah terbukti di produksi: status selesai tidak selalu bernama Done, dan tiket ditolak tidak boleh masuk penyebut penilaian.",
+      "hash": "c08054e371b179d0a4a42992ff18ca6013c2ca0f2f3ada64ae20b33b11b4bacd",
+      "ukuran_kb": 14.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan task-management (space, task, komentar, checklist, lampiran, laporan, CSAT, audit, WebSocket), field apa yang wajib dikirim saat membuat tiket, dan siapa yang boleh memanggil tiap rute. Memuat aturan validasi POST /tasks berikut perilaku server mengisi requestor_name dari header BIP-Fullname dan phone dari personal_data bila klien mengirimnya kosong, bentuk balasan 400 dengan errors per-kolom, aturan tipe permintaan per space (types[].fields), visibility space public/restricted, serta rute KPI bergerbang kunci layanan.",
       "kata_kunci": [
         "task management",
-        "ticketing",
+        "tiket",
+        "ticket",
         "helpdesk",
         "endpoint",
-        "API",
+        "POST /tasks",
+        "requestor_name",
+        "phone",
+        "validation failed",
         "space",
-        "tiket",
+        "tipe permintaan",
         "CSAT",
-        "SLA",
-        "kpi/ticket"
+        "SLA"
       ]
     },
     {
@@ -1041,6 +1044,7 @@
         "Microservices - Task Management Service",
         "APP - Web ERP",
         "APP - Dynamic Task Tracker",
+        "API - Task Management Service",
         "API - Form Builder Service",
         "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Notification Service",
@@ -1050,23 +1054,22 @@
         "HRIS - Payroll",
         "Microservices - Employee Service"
       ],
-      "hash": "0e4caf439adcc9a8c5530d1d3479a226f18da301ee6f7a24d1b53d1471732c4d",
-      "ukuran_kb": 37.1,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata dan fitur HRIS apa saja yang bisa dikerjakan karyawan dari HP (attendance, cuti/izin, lembur, payroll, KPI, survei, notifikasi, guest book). Menjawab juga bagaimana arsitektur dan tech stack-nya (Flutter, BLoC, Clean Architecture feature-first, get_it, dio plus fpdart) serta bagaimana autentikasinya bekerja (JWT dengan silent refresh, biometric, PIN, kebijakan satu akun satu device). Menjelaskan bahwa aplikasi memanggil backend lewat API Master Gateway dengan prefix `api/<module>`, bagaimana konten dan menu disaring per perusahaan lewat `CompanyScope`, kenapa navigasi notifikasi digerakkan kategori dan bukan field route dari backend, serta kenapa `GET /inbox` tanpa `?page` wajib tetap array telanjang agar kotak masuk tidak kosong senyap di APK yang sudah beredar.",
+      "hash": "03026a9375ab1fba385b43d6e93659f539c5659f077712788f5c7b335fc753e9",
+      "ukuran_kb": 38.8,
+      "ringkasan": "Menjawab: fitur apa saja yang hidup di aplikasi mobile karyawan MyBharata dan bagaimana tiap fitur bekerja dari sisi pengguna, mencakup presensi, izin dan cuti, lembur, payroll, KPI, task management, survei form builder, kaizen, dan pelatihan. Menjawab juga bagaimana aplikasi terhubung ke backend (JWT Bearer lewat gateway, bukan alur SSO ticket) serta gotcha implementasi yang sudah terbukti menggigit, termasuk kolom identitas pemohon pada form Buat Tugas dan cara membaca galat validasi dari server.",
       "kata_kunci": [
-        "MyBharata",
-        "my-bharata",
-        "aplikasi mobile",
-        "mobile app",
-        "Flutter",
-        "HRIS mobile",
+        "mybharata",
+        "mobile",
+        "flutter",
+        "aplikasi karyawan",
+        "presensi",
         "absensi",
-        "attendance",
-        "multi-tenant",
-        "CompanyScope",
-        "notifikasi",
-        "inbox kontrak array",
-        "biometric"
+        "cuti",
+        "lembur",
+        "buat tugas",
+        "tiket",
+        "kaizen",
+        "payroll"
       ]
     },
     {
@@ -2412,8 +2415,8 @@
         "APP - MyBharata",
         "Microservices - Form Builder Service",
         "CORE - API Master Gateway",
-        "Microservices - Employee Service",
         "API - Task Management Service",
+        "Microservices - Employee Service",
         "APP - Web ERP",
         "HRIS - Otomasi Skor KPI",
         "HRIS - Matriks KPI per Departemen",
@@ -2422,20 +2425,22 @@
         "APP - Dynamic Task Tracker",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "5c28ee401d482c19335023780f87c02efccfa531f94837d32a0aee9f10066f65",
-      "ukuran_kb": 31.9,
-      "ringkasan": "Menjawab: bagaimana tiket helpdesk IT dibuat, ditriase, dan dijalankan lewat board Kanban (Request, Todo, On Going, Testing, Done, plus jalur Ditolak), siapa yang berwenang menyetujui atau menolak, dan bagaimana cakupan divisi supervisor dihitung dari header BIP-Supervised-Departments. Juga menjawab cara kerja Space per divisi berikut visibility public/restricted dan admin space (hak yang menempel pada objek, tersimpan di dokumen space sehingga berlaku seketika tanpa login ulang), tipe permintaan beserta pertanyaan per tipe, SLA dua dimensi dengan scheduler eskalasi, CSAT, automation auto-assign/auto-close, WebSocket realtime, dan reporting. Menjelaskan pula kenapa WebSocket masuk lewat ingress langsung dan bukan gateway.",
+      "hash": "16fc9bb3e8d8fae4483aafab468842c6095c1a2f741f803cb29b4390a9aa1d40",
+      "ukuran_kb": 32.4,
+      "ringkasan": "Menjawab: bagaimana backend ticketing dan board Kanban internal ERP bekerja, mulai dari space per divisi, triase dan approval permintaan, penugasan, siklus hold dan reopen, hingga penilaian kepuasan pemohon. Menjawab juga bagaimana engine SLA dua dimensi menghitung response dan resolution beserta eskalasinya, bagaimana automation auto-assign dan auto-close berjalan, siapa yang berwenang lewat admin per space, dan bagaimana identitas pemohon dilengkapi server saat tiket dibuat.",
       "kata_kunci": [
-        "task management",
-        "support ticket",
-        "helpdesk IT",
-        "Kanban",
+        "task management service",
+        "ticketing",
+        "helpdesk",
+        "kanban",
         "space",
-        "admin space",
-        "SLA",
         "approval",
+        "triase",
+        "SLA",
+        "auto-assign",
+        "auto-close",
         "CSAT",
-        "WebSocket"
+        "admin space"
       ]
     },
     {

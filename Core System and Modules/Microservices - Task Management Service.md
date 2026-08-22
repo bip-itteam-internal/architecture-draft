@@ -93,7 +93,7 @@ Space bisa disetel terbuka untuk semua karyawan (`public`, bawaan) atau dibatasi
 - Gerbang ini mengatur **siapa boleh mengajukan**, bukan visibilitas tiket yang sudah dibuat.
 
 ### Tasks
-- `POST /tasks` — create task (status awal `Request`, set `response_due_at = now + 24h`).
+- `POST /tasks` — create task (status awal `Request`, set `response_due_at = now + 24h`). ⚠️ **Identitas pemohon yang tak dikirim klien diisi server SEBELUM validasi** (`requestor_identity.go`): `requestor_name` dari header `BIP-Fullname`, `phone` dari `personal_data.phone_number` lewat koneksi ERP read-only. Kiriman klien tak pernah ditimpa (`pilihNilai`). **Urutannya mengikat** — memindahkan pengisian ke belakang blok validasi mengembalikan penolakan `400` yang tak punya jalan keluar di layar pemohon. Detail & latar: [[API - Task Management Service]].
 - `GET /tasks/:id` — detail task (populated).
 - `GET /tasks/filter` — list dengan RBAC + filter (`space_id`, `status`, `assigned_to_me`, `created_by_me`, `pending_my_approval`, dll), search, dan pagination.
 - `GET /tasks/counts` — jumlah tiket **aktif** per-scope (`created`/`assigned`/`team`) untuk badge tab. Scope divisi mengecualikan status `Request`/`Ditolak`; `team` hanya dihitung untuk supervisor/admin (0 selain itu).

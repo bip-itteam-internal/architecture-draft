@@ -71,7 +71,7 @@ sama sekali.
 ## Tasks
 | Method | Path | Fungsi |
 |---|---|---|
-| POST | `/tasks` | Buat task (set `response_due_at`+24h, notif supervisor). `type_id` **opsional** (klien lama tak mengirimnya) tapi bila diisi **wajib milik space** yang dipilih, kalau tidak `400`. Space `restricted` yang tak boleh diakses → `403` |
+| POST | `/tasks` | Buat task (set `response_due_at`+24h, notif supervisor). Wajib: `requestor_name` (≥2), `requestor_division`, `phone` (≥10), `keluhan`, `description`, `space_id` — tapi **`requestor_name` & `phone` diisi server bila klien tak mengirimnya** (lihat di bawah). `type_id` **opsional** (klien lama tak mengirimnya) tapi bila diisi **wajib milik space** yang dipilih, kalau tidak `400`. Space `restricted` yang tak boleh diakses → `403` |
 | GET | `/tasks/filter` · `/tasks/:id` | Filter (flag `assigned_to_me`/`created_by_me`/`pending_my_approval`/`filter_by_admin_division`) / detail (populated + `sla`) |
 | GET | `/tasks/stats` · `/tasks/admin-stats` | Statistik status FLAT (rentang tanggal) |
 | GET | `/tasks/counts` | Jumlah tiket **AKTIF** per scope (`created`/`assigned`/`team`) untuk badge tab |
@@ -83,6 +83,34 @@ sama sekali.
 | PUT/POST | `/tasks/:id/assign` · `/approve` · `/reject` | Assign/approve (body `start_date/due_date/priority_id/assign_to`)/reject. Boleh supervisor divisi space, admin, ATAU **admin space**. Supervisor divisi LAIN kini `403` — sebelumnya lolos karena ketiga rute ini tak pernah mengecek space sama sekali |
 | GET | `/tasks/:id/history` | Riwayat perubahan (array) |
 | DELETE | `/tasks/:id` | Hapus task (supervisor) |
+
+### Identitas pemohon pada `POST /tasks` ✅
+
+> Status: **merged 2026-08-22** (branch `feat/task-management-identitas-pemohon` + [[APP - MyBharata]] `feat/task-create-identitas-pemohon`). ⚠️ **Belum diuji lewat gateway** dan belum di-deploy ke dev maupun prod.
+
+`requestor_name` dan `phone` tetap **wajib**, tetapi server mengisinya lebih dulu bila klien
+mengirimnya kosong, **sebelum** validasi berjalan:
+
+- `requestor_name` ← header `BIP-Fullname` (klaim JWT, selalu dipasang gateway lewat `routes.Reroute`).
+- `phone` ← `personal_data.phone_number` milik pemanggil, lewat koneksi read-only ke `employee_db`.
+
+**Nilai kiriman klien tak pernah ditimpa.** Server hanya mengisi kekosongan, karena web
+memungkinkan seseorang melaporkan atas nama orang lain; menimpanya akan mengubah data yang
+sengaja diisi tanpa satu pun pesan. Jejak pembuat sebenarnya tetap di `created_by`, yang
+memang selalu dari header.
+
+**Kenapa ini ada.** Kedua field itu tak punya kolom sama sekali di form MyBharata; nilainya
+dirakit dari profil yang belum tentu termuat. Ketika kosong, pemohon ditolak `400` **tanpa
+ada apa pun di layar yang bisa ia perbaiki**. Terekam di prod 2026-08-21 lewat `/log/fiber`
+di dalam container: empat `POST /tasks` dibalas `400` berturut-turut lalu `201` delapan menit
+kemudian. Pengisian di server inilah yang menutup MyBharata versi lama yang sudah beredar,
+karena aplikasi mobile tak bisa dipaksa update.
+
+⚠️ **Balasan `400` memuat `errors` per-kolom** (`{"success":false,"error":"Validation
+failed","errors":{"phone":"phone min 10 chars"}}`), dan selama ini **tak satu pun klien
+membacanya**. Bentuk ini hanya dipakai `POST /tasks`, jadi klien yang mau menampilkannya
+harus membacanya sendiri di datasource-nya; jangan berharap lapisan HTTP bersama yang
+melakukannya.
 
 > **`/tasks/pending-csat` sengaja terpisah dari `/tasks/counts`.** Tiga hitungan di `counts` menyaring tiket AKTIF (`status $nin [Done, Ditolak]`), sedangkan tiket yang menunggu penilaian justru sudah selesai — jadi ia tak pernah masuk hitungan mana pun sebelum rute ini ada. Aturan "menunggu penilaian" diturunkan dari `canSubmitCSAT`, bukan ditulis ulang: kalau keduanya berbeda, klien akan menawarkan tiket yang justru ditolak server saat rating dikirim.
 
