@@ -6,7 +6,7 @@
 - **Path di repo**: `bip-erp/services/marketing-analytics/`
 - **Port**: env `PORT`, alias `SERVICE_PORT`, fallback `6985` (`main.go`)
 - **Prefix gateway**: `marketing-analytics` (`api-gateway/main.go`, env `MARKETING_ANALYTICS_MODULE_URL`)
-- **Status**: ⚠️ Implemented dengan catatan (audit kode 2026-08-07). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **28 route** di berkas produksi. Catatan: `/matrix/sku-shop` masih stub, `mart_live_sessions` & `mart_buyer_cohort` kosong, lock job hanya in-process. **Halaman depan (`/beranda`) dan ambang keputusan (`/ambang`) menunggu merge** PR [#1080](https://github.com/bip-itteam-internal/bip-erp/pull/1080) dan **belum pernah dijalankan lewat gateway**.
+- **Status**: ⚠️ Implemented dengan catatan (audit kode 2026-08-22). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **38 route** di berkas produksi. `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `/matrix/sku-shop` masih stub, `mart_buyer_cohort` masih kosong, lock job hanya in-process. **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD tetapi koleksinya masih 0 dokumen** — belum pernah dipakai host sungguhan, jadi belum terbukti bisa dipakai.
 
 ## Prinsip Arsitektur
 
@@ -94,7 +94,27 @@ Penjaganya `TestRentangBawaanPakaiHariWIBBukanUTCPolos` — pemindai AST berdaft
 |---|---|
 | `/videos` | Performa video (`VideoRow`, tiga tab VSA / GMV Max / organik via `spend_vsa`, `spend_gmv_max`, `sumber`). Kini juga membawa `gross_profit` (dijumlah pass kedua dari `mart_profit_attribution` level video — kegagalannya tak menggagalkan halaman, hanya null) dan identitas produk `product_title` / `product_image_url` / `product_item_group_id`. **Menolak `granularitas` (400)** — snapshot kumulatif tanpa dimensi hari |
 | `/videos/orders` | **Drill video → daftar order AFFILIATE** dari `affiliate_orders` (`content_id = video_id` AND `content_type = "VIDEO"`). Field `cakupan` **selalu terisi**: daftar ini hanya order affiliate — order organik video tidak tercatat menautkan video di sumber mana pun, jadi jangan dibandingkan dengan kolom orders baris video |
-| `/lives` | Sesi live dari `mart_live_sessions` (koleksi masih kosong) |
+| `/lives` | Sesi live dari `mart_live_sessions` (**4.836 sesi** per 2026-08-22; dulu kosong) |
+
+### Pencatatan sesi live oleh host (`/live-shifts`)
+
+Lima route, seluruhnya digerbang `common.RequireLiveShiftUser` (`live_shift_handler.go`). Fitur ini ada karena **atribusi live per orang mustahil dari API TikTok** — dibuktikan lewat panggilan nyata, bukan asumsi: `room_id` di Get Order Detail terbukti US-only (probe `code=0` untuk toko region ID mengembalikan field itu tidak ada), Product Stats API menuntut scope Creator yang tak tersedia di portal, dan `auto_combine_order_id` terkirim kosong pada seluruh 326.153 order. Jalur `affiliate_orders.content_id` = `session_id` **terbukti cocok** (407 dari 432, kontrol negatif VIDEO 0 dari 432) tetapi hanya mencakup **11,8% GMV** karena host penyumbang terbesar siaran atas nama toko, bukan sebagai afiliator.
+
+| Endpoint | Isi |
+|---|---|
+| `POST /live-shifts` | Mulai sesi. Host yang login otomatis jadi host — `employee_id` dari header gateway, bukan dari body (field body bernama sama hanya jadi jalan memalsukannya) |
+| `PATCH /live-shifts/:id/jeda` | Jeda / Lanjutkan. Menutup jeda terakhir bila sedang dijeda, menambah jeda baru bila tidak |
+| `PATCH /live-shifts/:id/selesai` | Akhiri; menutup jeda yang masih menggantung |
+| `GET /live-shifts/berjalan` | Sesi berjalan, untuk menentukan keadaan tombol |
+| `GET /live-shifts` | Riwayat + porsi GMV per host. `?milik_saya=true` menyaring lewat header (tak bisa dipalsukan); `?host=<id>` hanya untuk marketing leader — host biasa yang mencoba mengintip orang lain dibalas **403**, bukan diam-diam dipaksa ke dirinya sendiri |
+
+**Pembagian GMV dua tahap, jangan digabung.** Antar-shift lebih dulu: satu sesi TikTok bisa beririsan dengan beberapa shift (pergantian jadwal pada akun yang sama), jadi GMV-nya dibagi **proporsional menurut lama irisan**. Tanpa itu terukur Rp 1 juta menjadi Rp 2 juta saat dua shift beririsan, dan irisan setipis satu detik menyeret GMV penuh. Baru sesudahnya porsi tiap shift dibagi **rata** ke host di dalamnya. Invarian yang dikunci test: jumlah GMV seluruh shift tidak boleh melebihi GMV sesi sumber.
+
+**`ada_data: false` dibedakan dari GMV nol.** Sync TikTok bisa telat berjam-jam; menyajikan Rp 0 sebagai fakta menuduh host atas sesuatu yang belum tentu terjadi. Pembaca wajib menampilkan "belum ada data", bukan angka nol.
+
+**Rentang baca sesi dilebarkan simetris 12 jam** di kedua ujung, sementara rentang shift memakai tanggal asli. Sesi live melewati tengah malam adalah 5,2% dari seluruh sesi (213 dari 4.130 terukur), dan durasi sesi bersih terpanjang tepat 12 jam — jadi pelebaran sebesar itu menangkap semuanya tanpa menyeret sesi yang sudah pasti tak beririsan. Melebarkan satu ujung saja memindahkan bug, bukan memperbaikinya.
+
+**Tanggal diurai zona WIB**, bukan UTC (`time.ParseInLocation` + `zonaWIB`). `time.Parse` polos membuat rentang "10 Agustus" sebenarnya terbaca 10 Agt 07:00 s.d. 11 Agt 06:59 WIB, sehingga shift dini hari — jam live yang nyata dipakai — muncul pada tanggal yang salah.
 
 ### Retur & analitik lain
 
@@ -159,7 +179,9 @@ Index unik dibuat saat boot (`index.go`). `CreateOne` **tidak mengganti** index 
 | `mart_video_performance` | `channel + video_id` | **Snapshot kumulatif, sengaja tanpa dimensi hari** (lihat bawah) + identitas produk |
 | `mart_ad_creative_link` | `advertiser_id + ad_id + tiktok_item_id` | Jembatan ad ke post organik |
 | `sync_state` | `channel + job` | Cursor, `last_run_at`, `last_ok_at`, `last_error` per job + kunci `penjadwal` |
-| `mart_live_sessions` · `mart_buyer_cohort` | — | **Masih kosong** di production |
+| `mart_live_sessions` | `channel + session_id` | Sesi live hasil sync TikTok. **4.836 baris** per 2026-08-22. `username` di sini adalah **akun toko**, bukan orang — satu akun dipakai bergantian banyak host, dan itulah alasan `live_shifts` ada |
+| `live_shifts` | `akun_live` (unik **parsial**: hanya saat `selesai` null) | Catatan sesi live yang ditulis **host lewat tombol**, sengaja terpisah dari `mart_live_sessions` yang ditulis mesin. Index parsialnya menegakkan "satu akun hanya boleh punya satu sesi berjalan" di Mongo, bukan di kode yang bisa dilewati balapan cek-lalu-tulis. **Masih 0 dokumen** di production |
+| `mart_buyer_cohort` | — | **Masih kosong** di production |
 | `mart_price_floor` | `sku + effective_from` | Harga minimal per SKU |
 | `mart_ambang` | `nama + effective_from` | Ambang keputusan (`roas_min`, `cpa_maks`). **Append-only**: mengubah ambang berarti menambah baris bertanggal baru, bukan menimpa. Menimpa membuat vonis periode lampau ikut berubah surut tanpa jejak, dan yang membandingkan dengan tangkapan layar minggu lalu tak punya cara tahu mengapa angkanya berbeda. Koleksi BARU, tak ada index lama yang perlu di-`dropIndex` saat deploy. Field `nama` konstan (`global`) hari ini, disediakan sejak awal karena menambah dimensi ke kunci unik SESUDAH koleksi berisi menuntut migrasi manual |
 
@@ -280,7 +302,10 @@ Dicatat di sini justru karena rumusnya terlihat benar: tanpa catatan ini, orang 
 - ⚠️ **`/kpi/kinerja-toko` kini membawa `jumlah_video`** (PR [#1049](https://github.com/bip-itteam-internal/bip-erp/pull/1049) merged 6 Agustus 2026, **belum di-deploy**), dicacah dari `tt_shop_video_performances` di `integration_db` lewat pembaca baca-saja yang sudah ada. **Kegagalan mencacah tidak menggagalkan jawaban** — nilainya jatuh ke 0 dan hanya tercatat di log, sehingga tak terbedakan dari nol sungguhan oleh pemanggilnya. Konsekuensi itu diterima sadar (video berbobot 0,30 dari 1,00) tetapi wajib diketahui siapa pun yang membaca angkanya.
 - **JEBAKAN LINGKUNGAN, bukan cacat kode: `TestMuatHariProfitMerakitLewatRakitInputProfit`** (`spend_per_sku_test.go`) memindai TEKS SUMBER `spend_per_sku.go` untuk menemukan akhir sebuah fungsi. Ia **gagal pada salinan kerja yang ber-CRLF**, dan lulus pada yang LF. Blob repo sendiri **murni LF** (terverifikasi byte: `spend_per_sku.go` 10.245 byte, CR=0), jadi **test ini TIDAK merah di `main` dan tidak merah di CI**. Yang membuatnya merah di sebagian mesin adalah `core.autocrlf=true` di **system gitconfig** Windows, yang mengubah berkas jadi CRLF saat checkout. Obatnya di sisi mesin: `git config core.autocrlf false` lalu checkout ulang worktree-nya. Catatan ini ada karena kegagalannya sangat meyakinkan sebagai "bug kode" padahal bukan.
 - **`GET /matrix/sku-shop` masih stub** (envelope kosong yang sah; komentar "SISA STUB").
-- **`mart_live_sessions` dan `mart_buyer_cohort` kosong** di production; `/lives` dan `/cohort` membalas kosong.
+- **`mart_buyer_cohort` kosong** di production; `/cohort` membalas kosong. (`mart_live_sessions` sudah terisi 4.836 sesi sejak 2026-08-22.)
+- **`live_shifts` masih 0 dokumen.** Rute, gerbang, dan halamannya sudah live di PROD, tetapi belum ada host yang menekan tombolnya — jadi fitur ini **belum terbukti bisa dipakai**, hanya terbukti ter-deploy. Verifikasi lewat gateway (tekan Mulai, pastikan dokumen lahir, Jeda/Akhiri, GMV muncul setelah sync) belum dijalankan.
+- **`laba_kotor` pada `/live-shifts` selalu 0** dan `laba_tersedia` selalu false — penelusuran order per sesi ke `tt_shop_transaction_by_orders` + `product_costs` belum dikerjakan. Konsumen sengaja tidak merender kolom laba supaya Rp 0 tak terbaca sebagai "tidak untung". **TBD.**
+- **`luar_shift` belum bermakna.** Frontend mengirim `true` untuk semua sesi karena resolusi jadwal HR (`GET /schedule` milik attendance) belum disambung; penyambungannya ditunda agar urutan menang berlapis (roster per tanggal > rotasi 21 hari > jadwal dasar) tidak disalin ke service ini dan melahirkan sumber kebenaran kedua. **TBD.**
 - **Lock job & penjadwal hanya in-process** — belum aman di-scale horizontal.
 - **Interval penjadwal belum bisa diubah lewat env** (hanya jam, jendela, dan flag aktif).
 - **Job laba Lazada sengaja mati** di `channelProfitBawaan`.
