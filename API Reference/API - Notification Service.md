@@ -30,7 +30,7 @@
 
 > Cron harian 03:00 WIB hapus inbox >2 bulan ([[IT - Background Jobs & Schedulers]]).
 
-> ⚠️ **`/inbox/send` mengipas sendiri ke dua kanal sejak 2026-08-22.** Service pengirim yang sudah memanggilnya **tidak boleh** memanggil `/fcm/send-*` lagi — penerimanya akan mendapat notifikasi ponsel dua kali. `/fcm/send-*` tetap dipakai untuk pengiriman yang memang bukan notifikasi inbox (pengingat presensi dari cron). Alasan & urutan deploy: [[ADR - 0049 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus]].
+> ⚠️ **`/inbox/send` mengipas sendiri ke dua kanal sejak 2026-08-22.** Service pengirim yang sudah memanggilnya **tidak boleh** memanggil `/fcm/send-*` lagi — penerimanya akan mendapat notifikasi ponsel dua kali. `/fcm/send-*` tetap dipakai untuk pengiriman yang memang bukan notifikasi inbox (pengingat presensi dari cron). Alasan & urutan deploy: [[ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus]].
 
 > [!warning] `GET /inbox` TANPA `?page` wajib tetap array telanjang
 > MyBharata membaca badan respons mentah lalu menguji `data is List`. Begitu balasan
