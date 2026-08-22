@@ -1,4 +1,8 @@
-**Status**: ⚠️ Diputuskan, PR **masih TERBUKA** (2026-08-22). Pencabutannya di [erp-frontend #1163](https://github.com/bip-itteam-internal/erp-frontend/pull/1163) dan [bip-erp #1371](https://github.com/bip-itteam-internal/bip-erp/pull/1371), keduanya belum merge dan belum di-deploy. Purge data prod belum dijalankan. **Sampai ketiganya selesai, `menu_hidden` masih hidup dan masih dipakai orang.**
+**Status**: ⚠️ Implemented dan **LIVE di PROD** (2026-08-22), dengan satu sisa: **data belum di-purge**. [erp-frontend #1163](https://github.com/bip-itteam-internal/erp-frontend/pull/1163) (`7f10a099`) dan [bip-erp #1371](https://github.com/bip-itteam-internal/bip-erp/pull/1371) (`e8d94c48`) sudah merge DAN sudah naik ke prod. [erp-frontend #1171](https://github.com/bip-itteam-internal/erp-frontend/pull/1171) (`b66525f5`, pembersihan kode mati) sudah merge tapi **belum ikut naik**; isinya kode mati dan komentar, jadi tak berdampak.
+
+> Diverifikasi di prod 2026-08-22 15:52 WIB, bukan disimpulkan dari status PR. FE: `position-menu-manager.tsx` tak ada lagi di checkout `~/apps/erp-frontend`, container naik dengan image baru. BE: probe biner `docker exec Employee-Service grep -ac 'menu-hidden' /service` = **0**, dengan kontrol positif `permission-sets` = 6 dan `positions` = 6 serta kontrol negatif string karangan = 0; image dibangun 14:11 WIB, sesudah merge.
+>
+> ⚠️ **`menu_hidden` masih TERSIMPAN di 10 posisi** karena purge belum dijalankan. Tak ada lagi yang membacanya (field-nya sudah lenyap dari model), jadi ia inert. Konsekuensi yang menguntungkan: keadaannya masih bisa dipulihkan seandainya pencabutan ini perlu dibatalkan. Skripnya `.task-plans/purge-menu-hidden.ps1`, dijalankan manusia.
 
 ## Context
 
@@ -62,7 +66,9 @@ Dari 159 itu, **115 adalah menu di modul orang itu sendiri** (HR melihat menu HR
 - **Tak ada lagi cara menyembunyikan menu per jabatan.** Untuk 151 menu yang belum punya tag `perm:`, visibilitasnya kini sepenuhnya ditentukan `system_roles` dan tier fallback. Jabatan yang dulu disaring halus lewat `menu_hidden` akan melihat lebih banyak menu daripada sebelumnya.
 - **Pekerjaan sebenarnya belum selesai.** Agar permission set benar-benar bisa menggantikannya, cakupan tag `perm:` harus naik dari 45 ke mendekati 196, dan paket harus dipasang ke jauh lebih dari 10 posisi. Itu proyek tersendiri sebesar [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] dan sengaja tidak ditumpangkan ke sini.
 
-⚠️ **Fitur ini masih dipakai orang saat pencabutannya dikerjakan.** `Beauty Hacks / Leader` disetel pada **2026-08-22 04:59** oleh `BIP-0205-08-25`, beberapa jam setelah pengukuran awal dan di tengah pengerjaan PR-nya. Angka terdampak bergeser 9 ke 10 selagi task berjalan, dan yang menangkapnya adalah gerbang di skrip purge, bukan orang. Konsekuensinya: **pencabutan wajib diumumkan lebih dulu**, bukan sekadar di-deploy. Ada yang akan kehilangan alat tanpa pemberitahuan.
+⚠️ **Fitur ini masih dipakai orang saat pencabutannya dikerjakan, dan mereka TIDAK sempat diberi tahu.** `Beauty Hacks / Leader` disetel pada **2026-08-22 04:59** oleh `BIP-0205-08-25`, beberapa jam setelah pengukuran awal dan di tengah pengerjaan PR-nya. Angka terdampak bergeser 9 ke 10 selagi task berjalan, dan yang menangkapnya adalah gerbang di skrip purge, bukan orang.
+
+Rencananya menuntut pengumuman lebih dulu; kenyataannya deploy mendahului. Jadi ini **bukan lagi tindakan pencegahan melainkan utang**: sepuluh jabatan kehilangan alat yang baru saja dipakai salah satunya, tanpa pemberitahuan, dan mereka akan melihat sidebar yang lebih ramai tanpa tahu sebabnya. Yang masih bisa dikerjakan tinggal memberi tahu setelahnya, dan menyiapkan jawaban ketika ada yang bertanya kenapa menunya bertambah. Dicatat di sini supaya urutannya tidak terulang, bukan supaya disesali.
 
 **Urutan yang mengikat:** FE dulu, lalu BE, lalu purge data. Terbalik membuat FE lama memanggil endpoint yang sudah tiada. Purge boleh ditunda tanpa risiko karena field yang tak dibaca siapa pun bersifat inert; skripnya `.task-plans/purge-menu-hidden.ps1`, tiga fase dengan `mongodump` wajib, dan **dijalankan manusia** sesuai konvensi rilis.
 

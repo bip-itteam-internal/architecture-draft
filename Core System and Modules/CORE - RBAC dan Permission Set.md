@@ -38,9 +38,9 @@
 - **Backfill paket per-akun DICABUT** (`migratePermissionSetAssignment`, dicabut 2026-07-30). Syaratnya "akun punya role ticket & `permission_sets` kosong", dan "kosong" tak bisa dibedakan dari "sengaja dikosongkan" — akibatnya setiap restart service mengembalikan paket per-akun yang baru dirapikan ke posisi. Paket yang sudah ada tidak dihapus; yang berubah, pengosongan kini bertahan dan karyawan baru mendapat hak dari posisi.
 - **UI kelola set & assign per akun** — `erp-frontend/src/features/hris/master-data/components/{permission-set-form-modal,permission-set-assign}.tsx`.
 
-**Tampilan menu per posisi (`menu_hidden`) — ⛔ DICABUT (2026-08-22, PR masih TERBUKA):**
+**Tampilan menu per posisi (`menu_hidden`) — ⛔ DICABUT, sudah LIVE di prod (2026-08-22):**
 
-> ⚠️ **Belum merge dan belum di-deploy saat baris ini ditulis.** Pencabutannya ada di [erp-frontend #1163](https://github.com/bip-itteam-internal/erp-frontend/pull/1163) dan [bip-erp #1371](https://github.com/bip-itteam-internal/bip-erp/pull/1371), keduanya **OPEN**. Sampai keduanya merge DAN naik ke prod, `menu_hidden` masih hidup dan masih dipakai orang. Jangan membaca blok ini sebagai "sudah tidak ada".
+> Terverifikasi di prod 2026-08-22 15:52 WIB: FE ([#1163](https://github.com/bip-itteam-internal/erp-frontend/pull/1163)) dan BE ([#1371](https://github.com/bip-itteam-internal/bip-erp/pull/1371)) sudah merge dan sudah naik. Probe biner employee-service untuk string `menu-hidden` = 0, dengan kontrol positif dan negatif. **Sisa satu: data `menu_hidden` masih tersimpan di 10 posisi** karena purge belum dijalankan; tak ada lagi yang membacanya, jadi inert. Rincian: [[ADR - 0051 Pencabutan Tampilan Menu per Posisi]].
 
 `master_department.position_items[].menu_hidden` menyimpan url menu yang disembunyikan dari sidebar bagi pemegang sebuah jabatan, disetel lewat layar **Tampilan Menu** di Pengaturan HRGA dan IT. Aturannya:
 

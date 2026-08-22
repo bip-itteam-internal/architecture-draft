@@ -1504,8 +1504,8 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "3129c432228d26c6a2f266b4de7303d7f5b684727f988e50d6aa7299e688f980",
-      "ukuran_kb": 96.8,
+      "hash": "e530a46b18983f78204dc56e9d1a8277acdbf284fa8603e7a48d41ddfa680e85",
+      "ukuran_kb": 96.9,
       "ringkasan": "Menjawab: bagaimana hak akses di bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi, cakupan data), bagaimana paket hak bernama menempel pada posisi atau jabatan alih alih pada orang, dan di lapisan mana penegakannya terjadi (gateway, service, frontend). Memuat katalog modul yang benar-benar terdaftar, status penegakan per modul, serta pembedaan permission set dari mekanisme lain yang menyentuh sidebar termasuk menu terbatas dan menu_hidden yang kini dicabut.",
       "kata_kunci": [
         "RBAC",
@@ -4202,7 +4202,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Diputuskan, PR **masih TERBUKA** (2026-08-22). Pencabutannya di [erp-frontend #1163](https://github.com/bip-itteam-internal/erp-frontend/pull/1163) dan [bip-erp #1371](https://github.com/bip-itteam-internal/bip-erp/pull/1371), keduanya belum merge dan belum di-deploy. Purge data prod belum dijalankan. **Sampai ketiganya selesai, `menu_hidden` masih hidup dan masih dipakai orang.**",
+      "status_teks": "Implemented dan **LIVE di PROD** (2026-08-22), dengan satu sisa: **data belum di-purge**. [erp-frontend #1163](https://github.com/bip-itteam-internal/erp-frontend/pull/1163) (`7f10a099`) dan [bip-erp #1371](https://github.com/bip-itteam-internal/bip-erp/pull/1371) (`e8d94c48`) sudah merge DAN sudah naik ke prod. [erp-frontend #1171](https://github.com/bip-itteam-internal/erp-frontend/pull/1171) (`b66525f5`, pembersihan kode mati) sudah merge tapi **belum ikut naik**; isinya kode mati dan komentar, jadi tak berdampak.",
       "publik": true,
       "tautan": [
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
@@ -4213,8 +4213,8 @@
         "Microservices - Employee Service",
         "APP - Web ERP"
       ],
-      "hash": "89d7383ea5cbd310b7286dea027a869b6cb60cf444d640fe0d3f1f96d3a8379c",
-      "ukuran_kb": 8.5,
+      "hash": "dc7dfb2baf7041ff28ea84495fd9c2363b7d0d64627c08ebc7e583c09079ba20",
+      "ukuran_kb": 9.7,
       "ringkasan": "Menjawab: kenapa fitur Tampilan Menu per posisi (menu_hidden) dicabut seluruhnya, dan kenapa aturan tampil = (boleh menurut izin) DAN (tidak ada di menu_hidden) membuat permission set yang sudah dipasang tak pernah terlihat. Memuat angka pemakaian nyata di produksi (10 posisi memakainya sebagai whitelist terbalik), dampak nyata pencabutannya yang jauh lebih kecil daripada jumlah entrinya, dan apa yang sengaja tidak disediakan sebagai pengganti.",
       "kata_kunci": [
         "menu_hidden",
