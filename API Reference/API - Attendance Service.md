@@ -17,6 +17,9 @@
 | GET | `/payroll-status-treatment` | Perlakuan dibayar/dipotong per status (untuk payout) | `payroll.view` |
 | PUT | `/payroll-status-treatment` | Set flag `paid` satu status (`{status, paid}`) | `payroll.manage` |
 | GET | `/today` · `/schedule` · `/sync/company-work-schedules` · `/data-type/:dt` | Jadwal harian/bulanan/sync/enum | open |
+| GET | `/company-group-rotation` | Pola shift bergilir milik perusahaan aktif (`EffectiveCompanyID`) | open |
+| POST | `/company-group-rotation` | Buat pola rotasi. `group_id` **unik GLOBAL** (409 bila dipakai); `starting_date` **wajib** (400 bila kosong) karena ia yang menentukan langkah mana yang berlaku — sebelumnya tak divalidasi dan tersimpan sebagai tahun 0001 lalu menghasilkan fase acak ([#1357](https://github.com/bip-itteam-internal/bip-erp/pull/1357)) | HRIS/IT supervisor |
+| DELETE | `/company-group-rotation/:group_id` | Hapus pola rotasi (difilter `company_id` pemilik) | HRIS/IT supervisor |
 | GET/PATCH | `/mood` | Mood check-in harian | header |
 
 ## Holiday

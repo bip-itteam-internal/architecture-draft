@@ -53,21 +53,20 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "3a919f635366d83c46fb6a5180d982df708a2223370ca24c8f8af2e9909cd871",
-      "ukuran_kb": 10.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang dipunyai attendance-service dan siapa yang boleh memanggilnya. Mencakup clock-in/out multi-metode lewat /tap, daftar entri dan laporan periode 26 sampai 25, seluruh pola pengajuan (cuti/izin, koreksi absensi, tukar jadwal, perjalanan dinas) beserta rantai persetujuan SPV lalu HR, guestbook satpam, hari libur, aturan presensi per perusahaan, dan pembebasan verifikasi WiFi. Juga menjawab bentuk kontrak /payroll-supplement yang jadi masukan potongan kehadiran di payroll, termasuk blok days per hari yang menyusul.",
+      "hash": "92ca174f08a4b8c43a6f71d3f9c0e78c6feae3319dad74ec3192aa9f0d88894e",
+      "ukuran_kb": 11.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang dipunya attendance-service lewat gateway /api/attendance/*, method dan path persisnya, siapa yang boleh memanggilnya, dan apa yang berubah pada tiap rute. Mencakup clock-in/out multi-metode, entri dan laporan kehadiran, jadwal serta CRUD rotasi shift bergilir, hari libur, cuti/izin/dinas, tukar shift, koreksi presensi, roster per tanggal, guestbook, WiFi, dan suplemen payroll. Dipakai saat perlu tahu kontrak HTTP-nya tanpa membuka kode Go.",
       "kata_kunci": [
-        "API attendance",
-        "endpoint absensi",
-        "tap clock-in clock-out",
-        "payroll-supplement",
-        "days rincian harian",
-        "leave request",
-        "koreksi absensi",
-        "tukar shift",
-        "guestbook",
-        "holiday",
-        "RequireHRISStaff"
+        "attendance",
+        "presensi",
+        "endpoint",
+        "API",
+        "clock-in",
+        "absensi",
+        "rotasi shift",
+        "group rotation",
+        "roster",
+        "gateway"
       ]
     },
     {
@@ -1160,6 +1159,7 @@
         "APP - MyBharata",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Attrition",
+        "Microservices - Attendance Service",
         "Finance - Dashboard per Posisi (FAT)",
         "HRIS - Matriks KPI per Departemen",
         "Microservices - Employee Service",
@@ -1170,7 +1170,6 @@
         "CORE - HRIS Orchestrator",
         "HRIS - Pengembangan Organisasi (Community of Interest)",
         "Microservices - Payroll Service",
-        "Microservices - Attendance Service",
         "Microservices - Task Management Service",
         "ADR - 0038 Hak Per-Objek Admin Space Task Management",
         "API - Integration Service",
@@ -1204,20 +1203,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "ef098e0c43560ce633736dc897226b18f3e8b58b34787cd3aefe3e24772f50a0",
-      "ukuran_kb": 284.7,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di frontend Next.js erp-frontend, dan bagaimana masing-masing dirakit — struktur menu Pengaturan HRGA beserta aturan bahwa key tab adalah bagian URL, halaman payroll, pola tabel HRIS, dan dukungan dua bahasa lewat react-i18next. Menjawab juga bagaimana Ringkasan Divisi HRGA (/hris) bertab per posisi disusun: matriks KPI tiap posisi beserta bobot, status otomasi, dan kelayakannya yang ditarik hidup dari GET /kpi/auto-overview, peta otomasi divisi yang memuat posisi Admin yang tak punya tab, kartu angka efisiensi biaya GA, serta kenapa periodenya dijangkarkan ke bulan lalu dan kenapa bobot lembar KPI tidak boleh disalin ke kode. Menjelaskan pula cara kerja Inbox Notifikasi, kapan izin notifikasi desktop diminta, dan memuat koreksi atas catatan lama yang sudah basi soal dropdown user, konfigurasi Firebase, dan blok KPI belum bersumber yang kini dihapus.",
+      "hash": "d3d8db462181023b35bfb6eaa81586f1e1d86dee42ad16b7be7147e15426edd3",
+      "ukuran_kb": 287.3,
+      "ringkasan": "Menjawab: bagaimana portal web internal hris-dashboard (One Bharata) disusun, stack dan pola UI apa yang dipakai, bagaimana login bekerja berikut perannya sebagai SSO Identity Provider, dan bagaimana tiap halaman HRIS/Finance/IT/GA dibangun. Juga menjawab kenapa sebuah layar berbentuk seperti sekarang: keputusan desain, halaman mana yang sudah pindah ke pola satu-kartu, dan jebakan yang sudah terbukti menggigit di filter, i18n, tabel, serta multi-perusahaan.",
       "kata_kunci": [
         "erp-frontend",
-        "Web ERP",
-        "Ringkasan Divisi HRGA",
-        "matriks KPI per posisi",
-        "peta otomasi divisi",
-        "efisiensi biaya GA",
-        "auto-overview",
-        "tab per posisi",
-        "i18n dua bahasa",
-        "Inbox Notifikasi"
+        "web ERP",
+        "One Bharata",
+        "hris-dashboard",
+        "Next.js",
+        "SSO",
+        "frontend",
+        "halaman HRIS",
+        "i18n",
+        "multi-perusahaan"
       ]
     },
     {
@@ -1675,20 +1674,20 @@
         "CORE - HRIS Orchestrator",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "e58e382aa90fe81af3d78b4aa0ddba4ddb9a6c3df96066671f559669f482cf99",
-      "ukuran_kb": 26.1,
-      "ringkasan": "Menjawab: bagaimana attendance-service diimplementasikan, koleksi apa yang dimilikinya, dan bagaimana kehadiran diubah jadi angka yang dipakai payroll. Mencakup agregasi payroll-supplement periode 26 sampai 25, master Perlakuan Kehadiran yang menentukan status mana dibayar dan mana dipotong beserta override per subtipe, cron prealokasi entri, verifikasi WiFi dan geofencing, serta seluruh pola pengajuan yang berbagi rantai persetujuan. Juga menjawab pembagian tugas dengan payroll: service ini melaporkan fakta harian, payroll yang memutuskan tarif dan ambang.",
+      "hash": "0fd903ef6e57404d041600d16f222febdef8292ad56cb191a9c64c321de56b5f",
+      "ukuran_kb": 28.9,
+      "ringkasan": "Menjawab: bagaimana attendance-service bekerja di dalam, mulai dari resolusi jadwal static versus pattern (rotasi shift bergilir per grup), roster harian yang menimpanya, cron pra-generate entri presensi dua jam sebelum shift, sampai verifikasi WiFi dan fingerprint saat clock-in. Juga menjawab alur cuti, tukar jadwal, koreksi presensi, dan perjalanan dinas, plus apa yang belum diimplementasikan dan gotcha yang sudah terbukti menggigit, termasuk fase rotasi yang dibandingkan sebagai hari kalender WIB dan status multi-tenant yang masih parsial.",
       "kata_kunci": [
-        "attendance-service",
-        "payroll-supplement",
-        "payout_pct",
-        "computePayoutBreakdown",
-        "perlakuan kehadiran",
-        "payroll_status_treatment",
-        "days rincian harian",
-        "alpha mangkir",
-        "geofencing WiFi",
-        "cron absensi"
+        "attendance service",
+        "presensi",
+        "rotasi shift",
+        "group rotation",
+        "roster",
+        "cron pra-generate",
+        "jadwal kerja",
+        "clock-in",
+        "WiFi WFO",
+        "multi-tenant"
       ]
     },
     {
