@@ -101,5 +101,21 @@ Ringkasan/detail **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar) dari sat
 
 **`/internal/` bukan berarti privat** pada tabel di atas: gateway tetap meneruskannya dari internet, jadi tiap rute memeriksa identitas pemanggilnya sendiri. `/internal/late-recap` memaparkan siapa saja yang sering terlambat di seluruh perusahaan, karena itu digerbang `RequireHRISStaff`.
 
+## KPI (panggilan mesin)
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| GET | `/kpi/attendance` | Rekap kedisiplinan **per karyawan** satu periode, untuk sumber `kedisiplinan_absensi` di [[Microservices - Employee Service]] | `?key=` = `ATTENDANCE_SERVICE_KEY` |
+
+Parameter **semuanya wajib**: `periode` (`YYYY-MM`), `company_id`, `employee_id` (dipisah koma, maksimum **200** per permintaan), `key`. Yang kurang dibalas 400; `employee_id` melebihi batas juga 400 dan bukan dipotong diam-diam, supaya tak ada angka yang terlihat lengkap untuk sebagian orang saja.
+
+Balasan `{"data": {periode, dari, sampai, data: [...]}}`. `dari`/`sampai` dikirim eksplisit karena batasnya **siklus payroll 26→25**, bukan bulan kalender, dan tebakan paling wajar justru yang salah. Tiap baris membawa `employee_id`, `hari_kerja`, `tepat_waktu`, `terlambat`, `tanpa_keterangan`, `pending`.
+
+- **`hari_kerja` = hari yang MENUNTUT kehadiran**, memakai definisi yang sama persis dengan kartu Kehadiran (`statusTakDihitung`). Cuti, izin, sakit, dinas, dan seluruh hari libur tidak masuk: semuanya sah menurut Peraturan Perusahaan Pasal 15-18, dan menghitungnya sebagai kegagalan membuat angka turun justru ketika orang menempuh prosedur yang benar.
+- **`pending` dipisah, tidak masuk `hari_kerja`.** Ia berarti belum diputuskan, bukan belum hadir. Dikirim terpisah justru karena itu: bagi metrik ketuntasan administrasi, sisa `Pending` adalah pekerjaan yang belum selesai. Satu angka jadi gangguan bagi satu metrik dan pokok bagi metrik lain.
+- **`employee_id` yang tak punya entri tetap dikirim sebagai baris nol**, bukan dihilangkan.
+- Status yang **belum dikenal** masuk `hari_kerja`, sengaja: mengabaikannya membuat kategori baru menghilang dari penyebut tanpa seorang pun sadar sehingga persentasenya naik sendiri.
+
+⚠️ Auth-nya **kunci layanan di query, bukan RBAC modul**, sebab pemanggilnya mesin tanpa JWT. Kunci kosong menutup rute (401), bukan membukanya. Nilainya wajib sama dengan yang dipasang di blok employee-service.
+
 ## Dokumen Terkait
 - [[Microservices - Attendance Service]] · [[HRIS - Leave Request]] · [[HRIS - Tukar Jadwal Kerja]] · [[HRIS - Attendance Correction]] · [[HRIS - Perjalanan Dinas]] · [[HRIS - Payroll]] · [[HRIS - Disciplinary (Surat Peringatan)]] · [[API - Index]]

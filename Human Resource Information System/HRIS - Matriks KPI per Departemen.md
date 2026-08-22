@@ -75,17 +75,34 @@ Kolom ini **bukan pengganti langkah 1** di [[RUN - Menambah Metrik KPI Otomatis]
 > [[RUN - Menambah Metrik KPI Otomatis]]). Membaca "Bisa otomatis sekarang" sebagai yang
 > pertama padahal yang kedua berarti menunggu sesuatu yang tak akan pernah datang.
 >
-> **Sumber yang benar-benar terdaftar di mesin** (`services/employee/kpi_sumber*.go`, per
-> 2026-08-22):
+> **Sumber yang benar-benar terdaftar di mesin** (`services/employee/kpi_sumber*.go`,
+> **18 sumber** per 2026-08-22, diverifikasi lewat `GET /kpi/sumber-katalog` di produksi):
 >
 > `skor_tim` · `varians_anggaran` · `akurasi_aset_ga` · `kinerja_tiket` · `uptime_sistem` ·
 > `kinerja_ar` · `kinerja_ap` · `kinerja_sales_admin` · `kinerja_cost_control` ·
 > `kinerja_toko` · `kinerja_po_marketing` · `admin_non_ops` · `forecast_kas` ·
-> `kaizen_ide_diajukan` · `kaizen_ide_diterapkan`
+> `kaizen_ide_diajukan` · `kaizen_ide_diterapkan` · **`kedisiplinan_absensi`** ·
+> **`turnover_karyawan`** · **`kontrak_karyawan`**
 >
-> ⚠️ **Tidak ada sumber `attendance`, `employee`, `recruitment`, maupun `stok`.** Metrik
-> yang kolom sumbernya menyebut `GET /attendance/report`, `work_data.contract_ending`, atau
-> koleksi `manufacture_*` karenanya **belum bisa dinyalakan** betapapun lengkap datanya.
+> Tiga yang tebal ditambahkan [#1379](https://github.com/bip-itteam-internal/bip-erp/pull/1379)
+> (merged, dan sudah naik di prod maupun dev 2026-08-22). Sub-metriknya:
+>
+> | Sumber | Sub-metrik | Melayani |
+> |---|---|---|
+> | `kedisiplinan_absensi` | `ketepatan_waktu` · `kelengkapan_catatan` | Personalia `Administrasi 1` & `Kedisiplinan`, Organizational Development `SOP` |
+> | `turnover_karyawan` | `turnover_persen` | KPI Supervisor HRGA `Turn Over Rate Target 5% per Tahun` |
+> | `kontrak_karyawan` | `perpanjangan_tepat_waktu` · `sisa_hari_kontrak` | Personalia `Administrasi 3` |
+>
+> ⚠️ **Masih tidak ada sumber `recruitment` maupun `stok`.** Metrik yang kolom sumbernya
+> menyebut koleksi `manufacture_*` atau data rekrutmen tetap **belum bisa dinyalakan**
+> betapapun lengkap datanya.
+>
+> ⚠️ **Punya konektor ≠ skornya otomatis penuh.** `seluruhMetrikOtomatis()` menuntut SEMUA
+> metrik dalam satu template ber-`auto` sebelum skornya dibekukan sistem
+> ([[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]]). `Personalia Team` punya lima
+> metrik dan baru tiga yang terlayani, jadi penilaiannya tetap manual dan angka otomatis
+> hanya mengisi awal modal. Tidak ada satu pun template HRGA yang dapat mencapai otomasi
+> penuh selama `Succession Planing` belum punya modul.
 >
 > Baris yang sudah diperiksa terhadap daftar ini ditandai di tempatnya. Departemen selain
 > HRGA **belum** ditelusuri satu per satu, jadi anggap kolom Rekomendasi di sana masih
@@ -420,7 +437,7 @@ Template `Organizational Development`, 6 metrik.
 | 0.2 | `Culture 2` | Persentase terlaksananya program culture yang sesuai jadwal | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
 | 0.2 | `Culture 3` | Prosentase Keaktifan Peserta Training >= 100% dari jumlah Peserta | Modul Training ADA di kode tapi koleksi training & training_participant KOSONG di prod. Skor & survei kepuasan training juga belum ada fieldnya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu pelatihan sudah ada, hanya belum ada yang mengisinya. Nilai dan survei kepuasan pelatihan memang belum ada tempatnya. |
 | 0.2 | `KPI` | Skor Penilaian Training All Karyawan > 70 | Modul Training ADA di kode tapi koleksi training & training_participant KOSONG di prod. Skor & survei kepuasan training juga belum ada fieldnya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu pelatihan sudah ada, hanya belum ada yang mengisinya. Nilai dan survei kepuasan pelatihan memang belum ada tempatnya. |
-| 0.1 | `SOP` | Tingkat Kedisipilnan Karyawan ( Attandance & Intergritas ) | GET /attendance/report?date=YYYY-MM (status Hadir/Terlambat/Alpha + late_hour). 24.163 entri, periode 26 ke 26 sesuai payroll. | Bisa otomatis sekarang. Data absensi lengkap dan periodenya sudah mengikuti siklus gajian. ⛔ **KONEKTOR BELUM ADA (diperiksa 2026-08-22)** — mesin KPI tak punya sumber untuk ini, jadi belum bisa dinyalakan HR sendiri; butuh dev menulis sumber baru lebih dulu. |
+| 0.1 | `SOP` | Tingkat Kedisipilnan Karyawan ( Attandance & Intergritas ) | `kedisiplinan_absensi` / `ketepatan_waktu`, menarik `GET /kpi/attendance` dari attendance-service. | ✅ **KONEKTOR SIAP** (2026-08-22, [#1379](https://github.com/bip-itteam-internal/bip-erp/pull/1379), live di prod). Tinggal diisi HR di `/hris/kpi/otomasi`: sumber `kedisiplinan_absensi`, metrik `ketepatan_waktu`, cakupan **`perusahaan`** (bunyinya "seluruh karyawan", bukan tim OD), reduksi `rasio_ambang`. |
 | 0.1 | `Kaizen` | Jumlah Inovasi All Divisi ( 7 / Bulan ) | TIDAK ADA modul Kaizen/ide inovasi di sistem (pencarian nol hasil di services + shared-library). Perlu fitur baru. | Belum bisa otomatis. Sistem belum punya tempat mencatat ide perbaikan, jadi harus dibuatkan dulu. |
 
 ### HRD Supervisor
@@ -433,12 +450,32 @@ Template `KPI Supervisor HRGA`, 10 metrik.
 | 0.05 | `Net Income 20%` | Efisiensi biaya operasional GA min. 5% dari bulanan | ⚠️ **DIKOREKSI 2026-08-21.** Sumber lama tertulis `/accounting/profit-loss` + `/balance-sheet` + `/profit/cash-flow` — laba rugi PERUSAHAAN, yang tak menjawab efisiensi satu departemen. Yang menjawab: `GET /accounting/anggaran/varians?tahun&bulan&departemen`, memakai `ringkas.total_realisasi` departemen GA. | Bisa otomatis sekarang, **dengan syarat**: realisasi periode itu sudah disinkron (`belum_pernah_sinkron` false) dan departemen GA ada di katalog Accurate. Sudah terpasang di dashboard, lihat catatan di bawah tabel. |
 | 0.05 | `Return On Operation Asset` | Monitoring aset 100% terdata secara realtime | ⚠️ **PERLU DIPERIKSA ULANG 2026-08-21.** Sumber tertulis `accurate_daily_returns` + `shopee_returns` = data RETUR, sementara deskripsinya monitoring ASET. Aset ada di `inventory_db.inventory` (134 item) + rekonsiliasi Accurate ([[ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI]]), bukan di retur. | **Vonis lama `bisa otomatis sekarang` tidak dapat ditindaklanjuti apa adanya** — sumber yang disebut menjawab metrik yang berbeda. Tetapkan dulu dengan pemilik metrik apakah yang dinilai kelengkapan data aset (maka sumbernya `inventory`) atau benar-benar retur (maka deskripsinya yang salah). |
 | 0.2 | `Performance Monitoring 100% Terimplementasi di Q4` | Memastikan seluruh tim/karyawan di setiap departemen memiliki skor KPI Min. 70 | ⚠️ **DIKOREKSI 2026-08-21.** Sumber `skor_tim` benar, tetapi reduksinya **`rasio_ambang`** (ambang 70, target 100), BUKAN `rata_rata` seperti tertulis sebelumnya. Kata kuncinya **"SELURUH"**: rata-rata 78 lolos target walau sepuluh orang berskor 40. `rasio_ambang` menjawab "berapa persen anggota melewati 70" dan sudah ada di mesin (`kpi_reduksi.go`). | Bisa otomatis sekarang, **dengan reduksi `rasio_ambang`**. Memakai `rata_rata` di sini menerbitkan angka yang menjawab pertanyaan lain, dan angka itu akan terlihat wajar. |
-| 0.1 | `Turn Over Rate Target 5% per Tahun` | Peningkatan Kualitas Rekruitment | Modul Recruitment ADA tapi koleksi candidate KOSONG (job_requisition 2, job_posting 1). | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu rekrutmen sudah ada, hanya data pelamarnya belum diisi. |
+| 0.1 | `Turn Over Rate Target 5% per Tahun` | Peningkatan Kualitas Rekruitment | `turnover_karyawan` / `turnover_persen`, memakai ulang `riwayatTurnover` yang menggambar kartu Turnover di halaman Resign. | ⚠️ **KONEKTOR SIAP, tetapi SATUANNYA harus diputuskan dulu** (2026-08-22, [#1379](https://github.com/bip-itteam-internal/bip-erp/pull/1379)). Cakupan wajib **`perusahaan`** (ditolak kode bila lain), arah **`turun`**. Dua hal yang menuntut keputusan pemilik metrik sebelum dinyalakan, lihat catatan di bawah tabel. |
 | 0.1 | `Implementasi Training` | Memenuhi kebutuhan pelatihan untuk talent dan seluruh karyawan 100% terpenuhi tiap bulan dan terjadi peningkatan performa. | Modul Training ADA di kode tapi koleksi training & training_participant KOSONG di prod. Skor & survei kepuasan training juga belum ada fieldnya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu pelatihan sudah ada, hanya belum ada yang mengisinya. Nilai dan survei kepuasan pelatihan memang belum ada tempatnya. |
 | 0.2 | `Performance Monitoring Team HRGA` | Rata-rata KPI Team HRGA min. 70 | Sumber skor_tim + reduksi rata_rata, scope department. Sudah didukung mesin; tinggal isi konfigurasi. | Bisa otomatis sekarang. Sistem tinggal merata-ratakan skor anggota departemen, dan mesinnya sudah siap. |
 | 0.05 | `Employee Productivity sebesar 120 Juta per Employee ( DIv. Marketing )` | Memberikan Training, Coaching, atau Tools untuk meningkatkan Produktivitas. | Modul Training ADA di kode tapi koleksi training & training_participant KOSONG di prod. Skor & survei kepuasan training juga belum ada fieldnya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu pelatihan sudah ada, hanya belum ada yang mengisinya. Nilai dan survei kepuasan pelatihan memang belum ada tempatnya. |
 | 0.05 | `Succession Planing Terimplementasi` | Menyusun Kaderisasi & Talent Pool - 100% Calon Successor memiliki Development Plan dan Siap apabila diperlukan | TIDAK ADA modul succession/talent pool. | Belum bisa otomatis. Belum ada pencatatan calon penerus jabatan. |
 | 0.05 | `Employee Satisfaction` | Tingkat kepuasan pelayanan Team General Service minimal 90% memberikan penilaian 5 dari all karyawan | GET /task-management/report/csat. Pembacaan ulang prod 2026-08-06: **17 tiket ter-rating** seumur hidup, 13 di antaranya Juli. Masih tipis, dan seluruh rating Juli bernilai 5/5 sehingga belum membedakan siapa pun. | Belum layak dipakai. Yang menilai baru 17 orang seumur hidup dan semuanya memberi nilai penuh, jadi angkanya belum bisa membedakan pelayanan yang baik dari yang biasa saja. |
+
+> [!warning] `Turn Over Rate`: dua hal yang harus diputuskan sebelum dinyalakan
+> **1. Satuannya bulanan, targetnya tertulis per tahun.** Konektor `turnover_karyawan`
+> mengembalikan turnover **satu periode KPI**, yaitu satu bulan, karena itulah yang
+> dihitung `riwayatTurnover`. Label metriknya berbunyi "Target 5% per Tahun". Memasang
+> target `5` apa adanya berarti ambangnya kira-kira **dua belas kali lebih longgar**
+> daripada yang dimaksud, dan angkanya akan lolos tiap bulan tanpa ada yang curiga. 5% per
+> tahun setara ±0,42% per bulan. Kode sendiri tidak menjawab ini: konstanta
+> `TargetTurnoverBulananPersen = 5.0` di `services/employee/turnover.go` dipakai mewarnai
+> kartu di halaman Resign, dan tidak ada catatan apakah angka itu turunan sadar dari target
+> tahunan atau salinan yang satuannya ikut terbawa. **Putuskan eksplisit** sebelum mengisi
+> `Target`.
+>
+> **2. Label dan deskripsinya menunjuk dua hal.** Labelnya ukuran (`Turn Over Rate`),
+> deskripsinya tujuan ("Peningkatan Kualitas Rekruitment"). Keduanya koheren bila yang
+> dimaksud adalah **mengukur kualitas rekrutmen lewat turnover**, dan pemetaan ke
+> `turnover_karyawan` berdiri di atas bacaan itu. Bacaan lain, yaitu menilai mutu pelamar
+> langsung, menuntut data kandidat yang koleksinya masih kosong. Catatan lama di baris ini
+> memilih bacaan kedua; yang sekarang memilih yang pertama, dan itu **perubahan tafsir**,
+> bukan sekadar pembaruan status.
 
 > [!warning] "Rata-rata min 70" dan "SELURUH anggota min 70" adalah dua metrik berbeda
 > Mesin punya empat reduksi (`kpi_reduksi.go`): `rata_rata`, `jumlah_unit`, `jumlah_nilai`,
@@ -497,11 +534,11 @@ Template `Personalia Team`, 5 metrik.
 
 | Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
-| 0.25 | `Administrasi 1` | Terselesaikannya administrasi payroll dan absensi karyawan sesuai dengan ketentuan perusahaan secara akurat | GET /attendance/report?date=YYYY-MM (status Hadir/Terlambat/Alpha + late_hour). 24.163 entri, periode 26 ke 26 sesuai payroll. | Bisa otomatis sekarang. Data absensi lengkap dan periodenya sudah mengikuti siklus gajian. ⛔ **KONEKTOR BELUM ADA (diperiksa 2026-08-22)** — mesin KPI tak punya sumber untuk ini, jadi belum bisa dinyalakan HR sendiri; butuh dev menulis sumber baru lebih dulu. |
+| 0.25 | `Administrasi 1` | Terselesaikannya administrasi payroll dan absensi karyawan sesuai dengan ketentuan perusahaan secara akurat | `kedisiplinan_absensi` / `kelengkapan_catatan`, menarik `GET /kpi/attendance` dari attendance-service. | ✅ **KONEKTOR SIAP** (2026-08-22, [#1379](https://github.com/bip-itteam-internal/bip-erp/pull/1379), live di prod). Sub-metrik `kelengkapan_catatan`, BUKAN `ketepatan_waktu`: yang dinilai ketuntasan pencatatan personalia (sisa hari `Pending`), bukan perilaku karyawannya. Cakupan **`perusahaan`**, reduksi `rasio_ambang`. |
 | 0.2 | `Administrasi 2` | Terselesaikannya administrasi BPJS rekening dan surat-surat karyawan sesuai dengan ketentuan perusahaan | payroll_db baru 1 payroll_run; GET /employee/bpjs tersedia. | Bisa sebagian. Data BPJS sudah ada, tapi payroll baru berjalan sekali sehingga belum cukup jadi dasar penilaian. |
-| 0.2 | `Administrasi 3` | Terselesaikannya administrasi kontrak karyawan baru dan perpanjang kontrak dengan tepat | work_data.contract_ending + join_date di employee_db. | Bisa otomatis sekarang. Tanggal masuk dan tanggal berakhir kontrak sudah tersimpan. ⛔ **KONEKTOR BELUM ADA (diperiksa 2026-08-22)** — mesin KPI tak punya sumber untuk ini, jadi belum bisa dinyalakan HR sendiri; butuh dev menulis sumber baru lebih dulu. |
+| 0.2 | `Administrasi 3` | Terselesaikannya administrasi kontrak karyawan baru dan perpanjang kontrak dengan tepat | `kontrak_karyawan`, membaca koleksi `employee_contract` (BUKAN salinan `work_data.contract_ending`, yang tak punya jejak perpanjangan). | ⚠️ **KONEKTOR SIAP, tetapi menjawab SEBAGIAN** (2026-08-22, [#1379](https://github.com/bip-itteam-internal/bip-erp/pull/1379)). Yang terukur cuma **perpanjangan**; kontrak karyawan BARU tak punya tenggat tercatat sehingga "dengan tepat" di sisi itu tak dapat dinilai tanpa mengarang tenggatnya. Pilihan sub-metrik: `perpanjangan_tepat_waktu` (proses, tetapi kosong pada bulan tanpa kontrak jatuh tempo) atau `sisa_hari_kontrak` (keadaan tunggakan, selalu bersampel). Keduanya `rasio_ambang` ambang 0, cakupan **`perusahaan`**. Menyalakannya = keputusan pemilik metrik menerima cakupan sebagian. |
 | 0.25 | `Administrasi 4` | Pengkinian Data Karyawan terupdate secara akurat di drive utama | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
-| 0.1 | `Kedisiplinan` | Kehadiran dan Ketepatan Waktu | GET /attendance/report?date=YYYY-MM (status Hadir/Terlambat/Alpha + late_hour). 24.163 entri, periode 26 ke 26 sesuai payroll. | Bisa otomatis sekarang. Data absensi lengkap dan periodenya sudah mengikuti siklus gajian. ⛔ **KONEKTOR BELUM ADA (diperiksa 2026-08-22)** — mesin KPI tak punya sumber untuk ini, jadi belum bisa dinyalakan HR sendiri; butuh dev menulis sumber baru lebih dulu. |
+| 0.1 | `Kedisiplinan` | Kehadiran dan Ketepatan Waktu | `kedisiplinan_absensi` / `ketepatan_waktu`, menarik `GET /kpi/attendance` dari attendance-service. | ✅ **KONEKTOR SIAP** (2026-08-22, [#1379](https://github.com/bip-itteam-internal/bip-erp/pull/1379), live di prod). Menjawab pertanyaan yang sama dengan `SOP` milik OD dan sengaja membaca sumber yang sama persis, supaya dua metrik yang menanyakan hal yang sama tak dijawab dua angka berbeda. Cakupan: **`individu`** bila yang dinilai kedisiplinan si staf sendiri, **`perusahaan`** bila yang dinilai hasil kerjanya menjaga disiplin orang lain — putuskan eksplisit, keduanya sah menurut bunyinya. |
 
 ### Recruitment & Onboarding
 
