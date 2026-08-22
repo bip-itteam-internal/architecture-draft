@@ -32,6 +32,20 @@ Satu endpoint melihat **semua** pengajuan lintas koleksi — `services/attendanc
 
 ⚠️ **Tahap HRD tak selalu duduk di slot `hr_status`** ([#1127](https://github.com/bip-itteam-internal/bip-erp/pull/1127)). Dua alur memakai SATU tahap dan menaruh peninjau HR di slot `spv_status`: **Koreksi milik staf HR** (di situ HR penyetuju final) dan **Tukar milik atasan** departemen mana pun atau orang HR. Keduanya tetap keputusan HRD dan karena itu ikut `hris.pengajuan.approve`, dikenali dari data slotnya (`slotHRLevelDepartemen`), bukan dari nama fieldnya. Cabang atasan biasa tak tersentuh. Yang **tidak** digerbang izin dan memang tak boleh: mode `?as=reviewer|reviewed` (relasional, siapa yang ditunjuk di `spv_status`/`hr_status`), `?as=self`, `/requests/mine`, dan penunjukan personal di slot HR.
 
+## Pengganti pada pengajuan (2026-08-22)
+
+Saat menyetujui, **atasan boleh menunjuk rekan yang mengambil alih pekerjaan pemohon**. Berlaku untuk **Izin/Cuti/Sakit** dan **Dinas** — dua jenis yang benar-benar membuat orangnya absen. Koreksi dan Tukar tidak: keduanya tak meninggalkan pekerjaan yang perlu digantikan.
+
+- **Opsional.** Field `replacement` bertipe pointer + `omitempty`, jadi `nil` = tak ada pengganti dan itu keadaan yang sah sekaligus mayoritas. Pengajuan lama terbaca apa adanya → **tanpa migrasi data**.
+- **Hanya tahap SPV.** Handler membaca `replacement_employee_id` cuma saat `updateField == "spv_status"`; tahap HRD mengabaikannya sekalipun ikut terkirim. Siapa yang menggantikan adalah keputusan atasan langsung yang tahu pekerjaannya, dan membuka slot yang sama di dua tahap berarti dua orang bisa saling menimpa tanpa jejak siapa yang terakhir memutuskan.
+- **Kandidat = rekan aktif, sedepartemen, dan seposisi.** Ditentukan **di server** (`saringKandidat`), dipakai dua arah: endpoint daftar yang mengisi layar dan validasi saat penunjukan disimpan. Bila layar memakai aturan sendiri, ia akan menawarkan orang yang justru ditolak server saat tombol Setujui ditekan.
+- **Posisi dibandingkan lewat `common.KanonPosisi`, bukan pencocokan sebagian.** Endpoint daftar karyawan menyaring posisi dengan regex, sehingga permintaan "Host Live" ikut membawa pulang "Senior Host Live".
+- **Nama/departemen/posisi DISALIN ke dokumen**, bukan sekadar dirujuk lewat `employee_id`, supaya riwayat tetap terbaca setelah orangnya keluar dari perusahaan.
+- **Pemberitahuan dikirim setelah HRD menyetujui**, bukan saat penunjukan — kalau HRD menolak, tak ada yang terlanjur diberi tahu untuk menggantikan cuti yang batal. Kategori inbox tersendiri **`request-replacement`** (lihat [[Microservices - Notification Service]]).
+- **Memberi tahu, bukan meminta izin.** Yang ditunjuk tidak diminta menyetujui apa pun, sejalan dengan keputusan yang sama pada undangan kalender.
+- ⚠️ **Belum berlaku untuk karyawan bershift.** Digerbang `attendance.IsShiftBasedSchedule`; server membalas daftar kosong berikut `reason`, dan layar menampilkan alasan itu, bukan daftar kosong tanpa sebab. Menunjuk pengganti bagi karyawan bershift menuntut jadwal penggantinya ikut ditulis berikut libur pengganti, dan itu menyentuh kehadiran lalu lewat kehadiran menyentuh gaji.
+- **Yang belum ada:** rekomendasi berbasis jadwal untuk karyawan bershift, pengurutan kandidat menurut siapa yang paling jarang ditunjuk, dan **pencabutan penunjukan saat pengajuan dibatalkan setelah disetujui** (perilakunya belum diputuskan).
+
 ## Komponen Bersama (di kode)
 
 Semua di [[Microservices - Attendance Service]]:

@@ -75,6 +75,14 @@
 - `PATCH /request/security-verify` — verifikasi oleh security.
 - Detail jenis cuti/izin, reviewer, kuota & alur: [[HRIS - Leave Request]]
 
+**Pengganti pada pengajuan** (2026-08-22) — `replacement.go`
+- `GET /replacement-candidates?type=leave|business-trip&id=<hex>` — rekan aktif **sedepartemen & seposisi** yang boleh ditunjuk mengambil alih pekerjaan pemohon. Hanya peninjau pengajuan itu yang boleh membacanya (filter sama dengan endpoint review); selain itu 403. Balas `{ data[], reason }`, `reason` selalu ada.
+- `PATCH /request/review` dan `PATCH /business-trip/review` menerima `replacement_employee_id` **hanya pada cabang SPV** (digerbang `updateField == "spv_status"`); tahap HRD mengabaikannya. Keduanya memanggil resolver yang SAMA (`resolveReplacement`), bukan salinannya.
+- Notifikasi `pushReplacementAssigned` dikirim saat **HRD menyetujui**, kategori inbox baru **`request-replacement`**.
+- ⚠️ Gerbang sementara: **karyawan bershift belum dilayani** (`attendance.IsShiftBasedSchedule`) — server membalas daftar kosong berikut alasannya.
+- ⚠️ `ambilKandidat` memanggil employee-service dengan **`*fiber.Ctx`, bukan `nil`**. Cabang `/list?type=employee` membaca perusahaan dari **header** (`EffectiveCompanyID`), sementara `nil` membuat `routes.InternalRequest` tak meneruskan header apa pun — kandidatnya lalu diam-diam berasal dari perusahaan default. Query `company_id` hanya dibaca cabang `type=supervisor`, jadi meniru bentuk URL `getSupervisorData` tanpa memeriksa cabangnya menghasilkan kegagalan senyap.
+- Aturan lengkap + lingkup yang sengaja belum dibuat: [[HRIS - Employee Request & Approval]]
+
 **Tukar Jadwal Kerja (workflow)** — collection `schedule_exchange_request`
 - `POST /schedule-exchange/create`, `PATCH /schedule-exchange/consent`, `GET /schedule-exchange/view`, `PATCH /schedule-exchange/review`, `PATCH /schedule-exchange/cancel` — Tukar Shift (swap antar-rekan, 3 langkah: consent rekan → atasan → HRD) atau Tukar Hari (geser hari). Setelah disetujui menyesuaikan attendance (`applyApprovedShiftExchange`/`applyScheduleExchangeSwap`); cron seeding & kalender sadar-swap. Detail lengkap: [[HRIS - Tukar Jadwal Kerja]].
 

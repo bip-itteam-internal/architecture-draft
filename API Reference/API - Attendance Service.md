@@ -62,6 +62,20 @@ Menolak: tanggal lampau, penulisan lintas perusahaan, departemen di luar cakupan
 
 > Opsi enum via `/data-type/:dt`: `business-trip-type`, `business-trip-transport`, `business-trip-accommodation`. Anggaran = estimasi (tanpa Finance). Detail: [[HRIS - Perjalanan Dinas]].
 
+## Pengganti pada pengajuan (2026-08-22)
+Satu endpoint melayani **cuti dan perjalanan dinas**, dibedakan query `type` — dua endpoint terpisah berarti dua tempat yang harus sejalan. Grounded ke `services/attendance/replacement.go`.
+
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| GET | `/replacement-candidates` | Rekan yang boleh ditunjuk menggantikan pemohon. `?type=leave\|business-trip` + `?id=<hex>` (wajib keduanya; selain itu **400**). Balas `{ data[], reason }` — `data[]` = `EmployeeSlice` (`employee_id`, `full_name`, `department`, `position`) | header; hanya **peninjau pengajuan itu** (filter sama dengan endpoint review) → selain itu **403** |
+
+- **`reason` SELALU dikirim**, termasuk saat daftar terisi (nilainya string kosong). Tiga sebab daftar kosong menuntut tindakan berbeda dan ketiganya terlihat sama bila klien cuma menampilkan daftar kosong: pemohon berjadwal shift, daftar karyawan tak dapat dimuat, atau memang tak ada rekan seposisi.
+- **503** bila database belum siap (penjaga `mongodb.GetCollection == nil`; tanpa itu paniknya keluar sebagai 502 tanpa petunjuk).
+- `PATCH /request/review` dan `PATCH /business-trip/review` menerima field opsional **`replacement_employee_id`**, dibaca **hanya pada cabang SPV**. Nilai yang tak lolos validasi dibalas **400** dengan alasannya; tidak dikirim = perilaku persis seperti sebelum fitur ini ada. Dokumen pengajuan bertambah field `replacement` (`omitempty`) berisi salinan `employee_id`/`full_name`/`department`/`position` + `assigned_by`/`assigned_at`.
+- ⚠️ Kandidat diambil dari [[Microservices - Employee Service]] `/list?type=employee`, yang membaca perusahaan dari **header** (`EffectiveCompanyID`) — **bukan** query `company_id` seperti cabang `type=supervisor`. Karena itu `routes.InternalRequest` dipanggil dengan `*fiber.Ctx`, bukan `nil`; dengan `nil` header tak diteruskan dan kandidatnya diam-diam berasal dari perusahaan default.
+
+Aturan lengkap + yang sengaja belum dibuat: [[HRIS - Employee Request & Approval]].
+
 ## HR requests terpadu (lintas jenis)
 Ringkasan/detail **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar) dari satu endpoint — FE reuse satu kartu + stepper. Grounded ke `hr_admin.go` (`handleMyRequests`/`handleHRRequestsList`/`handleHRRequestDetail`).
 

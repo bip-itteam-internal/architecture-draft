@@ -90,6 +90,12 @@
 	- ⚠️ **Kelemahan yang diketahui dan diterima**: gerbang menu memakai `anySupervisor` (dari `system_roles`) atau `punyaBawahan` (dari `work_data.supervisor_id`), sedangkan backend memilih penyetuju dari **`work_data.is_supervisor`**. Ketiganya sumbu berbeda. Seseorang ber-`is_supervisor: true` tanpa role supervisor di modul mana pun DAN tanpa bawahan langsung terdaftar akan menerima notifikasinya lalu tak menemukan menunya. Tak bisa ditutup dari frontend: `/me` tak membawa `is_supervisor`, dan menebaknya dari nama jabatan adalah penyebab insiden prod 2026-08-12 (lihat [[HRIS - Organization Structure]]). Follow-up bila keluhan muncul: ekspos `is_supervisor` di `/me` atau klaim JWT.
 	- **Perubahan bentuk sidebar yang disengaja, dikunci uji**: grup Manajemen HR kini **hilang seluruhnya** dari sidebar staf biasa (semua isinya tergerbang), dan **diratakan** `ratakanIndukTipis` untuk Cost Control yang tinggal dua pintasan.
 
+- **Pengganti pada pengajuan** (2026-08-22, `features/hris/requests`). Dialog persetujuan memuat pemilih **"Pengganti (opsional)"** untuk **Izin/Cuti/Sakit dan Dinas**; Koreksi dan Tukar tidak, sebab keduanya tak meninggalkan pekerjaan yang perlu digantikan. Pemilih hanya muncul saat **Menyetujui** — menolak sambil menunjuk pengganti tak punya arti dan server pun mengabaikannya.
+	- **Daftar kandidat datang dari server** (`/replacement-candidates`), tidak dirakit di layar. Merakit filternya sendiri berarti aturan yang sama hidup di server, web, dan mobile sekaligus, dan salinan seperti itu pasti menyimpang — layar akan menawarkan orang yang justru ditolak server saat tombol ditekan.
+	- **Daftar kosong SELALU disertai sebab dari server**, dan gagal-memuat ditangani sebagai cabang tersendiri. Saat query gagal `data` undefined sehingga `reason` ikut kosong, dan tanpa cabang itu pesannya jatuh ke "tidak ada rekan yang bisa ditunjuk" — jawaban yang masuk akal untuk keadaan yang salah.
+	- **Pengganti yang sudah ditunjuk ditampilkan di layar detail** (`ReplacementSection`), berikut keterangan yang membedakan "diberi tahu setelah HRD menyetujui" dari "sudah diberi tahu". Tanpa itu penunjukannya tersimpan tanpa pernah terlihat oleh siapa pun kecuali penggantinya sendiri, dan itu pun baru setelah HRD memutuskan.
+	- Aturan lengkap: [[HRIS - Employee Request & Approval]] · kontrak: [[API - Attendance Service]]
+
 ## Modul / Fitur (Sudah Diimplementasikan)
 
 **ERP (publik)**
