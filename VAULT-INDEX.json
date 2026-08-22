@@ -5635,20 +5635,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "81d4e8b1601bc0f3aad10725f044c688497d8f6d422be60d982b4e469edab9c8",
-      "ukuran_kb": 139.4,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai di production per departemen dan posisi, beserta label persis, bobot, target/deskripsi, dan klasifikasi kelayakan otomasinya. Berfungsi sebagai salinan setia isi kpi_template (70 template, 311 metrik) untuk dev yang akan mengotomatiskan metrik, termasuk daftar cacat data yang diketahui dan cara memperbaruinya dari koleksi kpi_template di employee_db. Memuat pula tiga peringatan yang diperoleh saat menyambungkan metriknya ke dashboard: sebagian sumber sempat dipetakan dari LABEL alih-alih deskripsi, bobot tabel ini pernah disalin ke frontend lalu menyimpang tanpa terdeteksi, dan metrik berkata SELURUH menuntut reduksi rasio_ambang bukan rata_rata.",
+      "hash": "3368d840bc3a7d56c35fe1979519c78481221f096e3beafc7fedd4ecf4eda4df",
+      "ukuran_kb": 141.8,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai di production per departemen dan posisi, beserta label persis, bobot, target/deskripsi, dan klasifikasi kelayakan otomasinya. Berfungsi sebagai salinan setia isi kpi_template (70 template, 311 metrik) untuk dev yang akan mengotomatiskan metrik, termasuk daftar cacat data yang diketahui dan cara memperbaruinya dari koleksi kpi_template di employee_db. Memuat pula empat peringatan yang diperoleh saat menyambungkan metriknya ke dashboard: kolom sumber menjawab ketersediaan DATA bukan keberadaan konektor di mesin KPI (lengkap dengan daftar sumber yang benar-benar terdaftar), sebagian sumber sempat dipetakan dari LABEL alih-alih deskripsi, bobot tabel ini pernah disalin ke frontend lalu menyimpang tanpa terdeteksi, dan metrik berkata SELURUH menuntut reduksi rasio_ambang bukan rata_rata.",
       "kata_kunci": [
         "matriks KPI",
         "kpi_template",
         "bobot metrik",
         "kelayakan otomasi",
+        "konektor sumber KPI",
         "reduksi rasio_ambang",
         "KPI Supervisor HRGA",
         "cacat data KPI",
         "otomasi skor KPI",
-        "per departemen",
-        "per posisi"
+        "per departemen"
       ]
     },
     {

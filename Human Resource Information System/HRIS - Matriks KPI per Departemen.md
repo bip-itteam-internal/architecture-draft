@@ -62,6 +62,34 @@ Angka di sini akan bergeser begitu template disunting. Untuk menyegarkan, baca u
 **51 dari 311 metrik** berbunyi "perlu diperiksa dulu" alih-alih ditebak. Penunjuk yang keliru lebih merugikan daripada kolom kosong, karena dev akan mengikutinya.
 
 Kolom ini **bukan pengganti langkah 1** di [[RUN - Menambah Metrik KPI Otomatis]]. Volume yang tertulis adalah jumlah dokumen di koleksinya, bukan jumlah yang relevan untuk satu orang pada satu periode. Contoh nyata bedanya: laporan SLA tiket punya endpoint dan rumus, tetapi **0 dari 293 tiket** memenuhi syarat hitung karena tenggatnya tidak pernah diisi.
+
+> [!important] "Datanya ada" BUKAN "mesin KPI bisa menariknya" — dan tabel ini menjawab yang pertama
+> Ditemukan 2026-08-22 saat menyiapkan konfigurasi metrik HRGA. Kolom **Sumber di sistem
+> erp** menyebut endpoint atau koleksi tempat datanya hidup. Itu menjawab **ketersediaan
+> data**. Yang TIDAK dijawabnya: apakah mesin otomasi KPI punya **konektor** untuk sumber
+> itu.
+>
+> Keduanya berbeda, dan bedanya menentukan siapa yang mengerjakan. Metrik dengan konektor
+> tinggal **diisi konfigurasinya** oleh HR di `/hris/kpi/otomasi`. Metrik tanpa konektor
+> menuntut **dev menulis sumber baru** lebih dulu (prosedurnya di
+> [[RUN - Menambah Metrik KPI Otomatis]]). Membaca "Bisa otomatis sekarang" sebagai yang
+> pertama padahal yang kedua berarti menunggu sesuatu yang tak akan pernah datang.
+>
+> **Sumber yang benar-benar terdaftar di mesin** (`services/employee/kpi_sumber*.go`, per
+> 2026-08-22):
+>
+> `skor_tim` · `varians_anggaran` · `akurasi_aset_ga` · `kinerja_tiket` · `uptime_sistem` ·
+> `kinerja_ar` · `kinerja_ap` · `kinerja_sales_admin` · `kinerja_cost_control` ·
+> `kinerja_toko` · `kinerja_po_marketing` · `admin_non_ops` · `forecast_kas` ·
+> `kaizen_ide_diajukan` · `kaizen_ide_diterapkan`
+>
+> ⚠️ **Tidak ada sumber `attendance`, `employee`, `recruitment`, maupun `stok`.** Metrik
+> yang kolom sumbernya menyebut `GET /attendance/report`, `work_data.contract_ending`, atau
+> koleksi `manufacture_*` karenanya **belum bisa dinyalakan** betapapun lengkap datanya.
+>
+> Baris yang sudah diperiksa terhadap daftar ini ditandai di tempatnya. Departemen selain
+> HRGA **belum** ditelusuri satu per satu, jadi anggap kolom Rekomendasi di sana masih
+> mencampur kedua hal ini sampai ada yang memeriksanya.
 ## Beauty Hacks
 
 11 template, 30 metrik. Klasifikasi otomasi: **14 / 2 / 0 / 14**.
@@ -392,7 +420,7 @@ Template `Organizational Development`, 6 metrik.
 | 0.2 | `Culture 2` | Persentase terlaksananya program culture yang sesuai jadwal | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
 | 0.2 | `Culture 3` | Prosentase Keaktifan Peserta Training >= 100% dari jumlah Peserta | Modul Training ADA di kode tapi koleksi training & training_participant KOSONG di prod. Skor & survei kepuasan training juga belum ada fieldnya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu pelatihan sudah ada, hanya belum ada yang mengisinya. Nilai dan survei kepuasan pelatihan memang belum ada tempatnya. |
 | 0.2 | `KPI` | Skor Penilaian Training All Karyawan > 70 | Modul Training ADA di kode tapi koleksi training & training_participant KOSONG di prod. Skor & survei kepuasan training juga belum ada fieldnya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu pelatihan sudah ada, hanya belum ada yang mengisinya. Nilai dan survei kepuasan pelatihan memang belum ada tempatnya. |
-| 0.1 | `SOP` | Tingkat Kedisipilnan Karyawan ( Attandance & Intergritas ) | GET /attendance/report?date=YYYY-MM (status Hadir/Terlambat/Alpha + late_hour). 24.163 entri, periode 26 ke 26 sesuai payroll. | Bisa otomatis sekarang. Data absensi lengkap dan periodenya sudah mengikuti siklus gajian. |
+| 0.1 | `SOP` | Tingkat Kedisipilnan Karyawan ( Attandance & Intergritas ) | GET /attendance/report?date=YYYY-MM (status Hadir/Terlambat/Alpha + late_hour). 24.163 entri, periode 26 ke 26 sesuai payroll. | Bisa otomatis sekarang. Data absensi lengkap dan periodenya sudah mengikuti siklus gajian. ⛔ **KONEKTOR BELUM ADA (diperiksa 2026-08-22)** — mesin KPI tak punya sumber untuk ini, jadi belum bisa dinyalakan HR sendiri; butuh dev menulis sumber baru lebih dulu. |
 | 0.1 | `Kaizen` | Jumlah Inovasi All Divisi ( 7 / Bulan ) | TIDAK ADA modul Kaizen/ide inovasi di sistem (pencarian nol hasil di services + shared-library). Perlu fitur baru. | Belum bisa otomatis. Sistem belum punya tempat mencatat ide perbaikan, jadi harus dibuatkan dulu. |
 
 ### HRD Supervisor
@@ -469,11 +497,11 @@ Template `Personalia Team`, 5 metrik.
 
 | Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
-| 0.25 | `Administrasi 1` | Terselesaikannya administrasi payroll dan absensi karyawan sesuai dengan ketentuan perusahaan secara akurat | GET /attendance/report?date=YYYY-MM (status Hadir/Terlambat/Alpha + late_hour). 24.163 entri, periode 26 ke 26 sesuai payroll. | Bisa otomatis sekarang. Data absensi lengkap dan periodenya sudah mengikuti siklus gajian. |
+| 0.25 | `Administrasi 1` | Terselesaikannya administrasi payroll dan absensi karyawan sesuai dengan ketentuan perusahaan secara akurat | GET /attendance/report?date=YYYY-MM (status Hadir/Terlambat/Alpha + late_hour). 24.163 entri, periode 26 ke 26 sesuai payroll. | Bisa otomatis sekarang. Data absensi lengkap dan periodenya sudah mengikuti siklus gajian. ⛔ **KONEKTOR BELUM ADA (diperiksa 2026-08-22)** — mesin KPI tak punya sumber untuk ini, jadi belum bisa dinyalakan HR sendiri; butuh dev menulis sumber baru lebih dulu. |
 | 0.2 | `Administrasi 2` | Terselesaikannya administrasi BPJS rekening dan surat-surat karyawan sesuai dengan ketentuan perusahaan | payroll_db baru 1 payroll_run; GET /employee/bpjs tersedia. | Bisa sebagian. Data BPJS sudah ada, tapi payroll baru berjalan sekali sehingga belum cukup jadi dasar penilaian. |
-| 0.2 | `Administrasi 3` | Terselesaikannya administrasi kontrak karyawan baru dan perpanjang kontrak dengan tepat | work_data.contract_ending + join_date di employee_db. | Bisa otomatis sekarang. Tanggal masuk dan tanggal berakhir kontrak sudah tersimpan. |
+| 0.2 | `Administrasi 3` | Terselesaikannya administrasi kontrak karyawan baru dan perpanjang kontrak dengan tepat | work_data.contract_ending + join_date di employee_db. | Bisa otomatis sekarang. Tanggal masuk dan tanggal berakhir kontrak sudah tersimpan. ⛔ **KONEKTOR BELUM ADA (diperiksa 2026-08-22)** — mesin KPI tak punya sumber untuk ini, jadi belum bisa dinyalakan HR sendiri; butuh dev menulis sumber baru lebih dulu. |
 | 0.25 | `Administrasi 4` | Pengkinian Data Karyawan terupdate secara akurat di drive utama | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
-| 0.1 | `Kedisiplinan` | Kehadiran dan Ketepatan Waktu | GET /attendance/report?date=YYYY-MM (status Hadir/Terlambat/Alpha + late_hour). 24.163 entri, periode 26 ke 26 sesuai payroll. | Bisa otomatis sekarang. Data absensi lengkap dan periodenya sudah mengikuti siklus gajian. |
+| 0.1 | `Kedisiplinan` | Kehadiran dan Ketepatan Waktu | GET /attendance/report?date=YYYY-MM (status Hadir/Terlambat/Alpha + late_hour). 24.163 entri, periode 26 ke 26 sesuai payroll. | Bisa otomatis sekarang. Data absensi lengkap dan periodenya sudah mengikuti siklus gajian. ⛔ **KONEKTOR BELUM ADA (diperiksa 2026-08-22)** — mesin KPI tak punya sumber untuk ini, jadi belum bisa dinyalakan HR sendiri; butuh dev menulis sumber baru lebih dulu. |
 
 ### Recruitment & Onboarding
 
