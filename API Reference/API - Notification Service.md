@@ -18,7 +18,7 @@
 ## Open routes (service key `?key=`)
 | Method | Path | Fungsi |
 |---|---|---|
-| POST | `/inbox/send` | Simpan notifikasi ke inbox (category tervalidasi) |
+| POST | `/inbox/send` | Simpan notifikasi ke inbox (category tervalidasi) **lalu push ke browser DAN ponsel**. `400` category tak dikenal · `503` database belum terhubung |
 | POST | `/wa/send-personal` · `/wa/send-group` | Kirim WhatsApp personal/grup |
 | POST | `/fcm/send-personal` · `/fcm/send-department` · `/fcm/send-broadcast` | Kirim/broadcast FCM (`?platform=mobile|web_browser`) |
 
@@ -29,6 +29,8 @@
 | GET | `/debug/fcm` | Test FCM (debug) |
 
 > Cron harian 03:00 WIB hapus inbox >2 bulan ([[IT - Background Jobs & Schedulers]]).
+
+> ⚠️ **`/inbox/send` mengipas sendiri ke dua kanal sejak 2026-08-22.** Service pengirim yang sudah memanggilnya **tidak boleh** memanggil `/fcm/send-*` lagi — penerimanya akan mendapat notifikasi ponsel dua kali. `/fcm/send-*` tetap dipakai untuk pengiriman yang memang bukan notifikasi inbox (pengingat presensi dari cron). Alasan & urutan deploy: [[ADR - 0049 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus]].
 
 > [!warning] `GET /inbox` TANPA `?page` wajib tetap array telanjang
 > MyBharata membaca badan respons mentah lalu menguji `data is List`. Begitu balasan
