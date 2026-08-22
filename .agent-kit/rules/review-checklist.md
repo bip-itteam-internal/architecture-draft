@@ -224,6 +224,21 @@ sudah ditandai di rencana tetapi tak ditutup di diff adalah temuan, bukan catata
 - Cek auth/authz yang ada di kode tapi tak pernah diuji untuk kasus "ditolak".
 - **Uji Radix Tabs memakai `click`.** Harus `fireEvent.mouseDown`, kalau tidak tabnya tak
   berpindah dan testnya lolos-diam.
+- ⛔ **Radix Select ber-`position="item-aligned"` MEMBUNUH worker vitest di jsdom.** Bukan
+  test yang gagal, melainkan proses yang mati: `SyntaxError: Invalid regular expression:
+  /file:\/\/\/(\w:)?/: Stack overflow` dari `vite-node/source-map`, diikuti
+  `Error: Worker exited unexpectedly`, dan satu berkas test menghabiskan ~7 menit sebelum
+  tumbang. Sebabnya varian itu mengukur dan menggulir isinya sendiri, dan jsdom tak punya
+  layout sehingga jalurnya berulang tanpa henti. **Kedua idiom yang sudah terbukti jalan
+  untuk Select biasa tetap gagal di sini**: `fireEvent.pointerDown(trigger, {button: 0,
+  ctrlKey: false, pointerType: "mouse"})` (`form-editor.test.tsx`) maupun
+  `fireEvent.keyDown(..., {key: "ArrowDown"})` lalu `findByRole("option")`
+  (`create-task-form.test.tsx`). Select `position` bawaan (popper) TIDAK kena.
+  **Yang harus dilakukan**: jangan menggerakkan Select-nya. Angkat logikanya ke fungsi
+  murni dan uji di situ, kunci anti-polanya lewat keadaan `disabled`/kelas, lalu **tulis
+  batasnya terang-terangan di berkas test** — sama seperti catatan jsdom-tak-punya-layout.
+  Test yang berpura-pura membuktikan interaksi yang tak pernah terjadi lebih buruk
+  daripada gap yang diakui. Terjadi 2026-08-22 di form rotasi shift (erp-frontend #1144).
 - Test bergantung jam sistem, timezone, atau urutan eksekusi.
 - Uji i18n memakai `t` tiruan sehingga buta terhadap key yang hilang; uji terpisah dengan
   instance i18next asli + kontrol negatif bahwa `en` bukan hasil fallback ke `id`.
