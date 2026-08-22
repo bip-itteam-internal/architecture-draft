@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-22",
-  "jumlah_dokumen": 294,
+  "jumlah_dokumen": 295,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -376,20 +376,22 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "566788dede6fe404b95517238a2e6902d01f668e7ee56a8e462ba4432de69930",
-      "ukuran_kb": 57.6,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di integration-service untuk sinkronisasi order/transaksi TikTok Shop, TikTok Business, dan Shopee ke Accurate, termasuk webhook, tracking resi, retur lintas-channel, dan dashboard akuntansi FAT. Juga menjelaskan endpoint aging piutang, profit per produk, ICC account mapping, kas toko/wallet marketplace, serta keterangan vonis pada daftar fake order. Cocok dirujuk saat menelusuri rute API gateway `/api/integration/*` atau webhook publik `/ext/webhook/:service`.",
+      "hash": "0b36e4d88b7a7cd4ff5ffbf6ab6f48d60d7bdd7a8b026e7222968afba1656c15",
+      "ukuran_kb": 58.4,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service untuk marketplace (TikTok Shop, TikTok Business, Shopee, Lazada), transaksi order terpadu, webhook, ICC account mapping, marketing teams, worker/job, dan bridging akuntansi ke Accurate. Menjawab juga aturan aksesnya: seluruh rute menuntut gateway key kecuali webhook publik /ext/webhook/*, dan /health pun ikut menuntutnya sehingga bukan endpoint terbuka.",
       "kata_kunci": [
-        "integration-service",
-        "endpoint API",
+        "integration service",
+        "endpoint",
+        "API",
+        "marketplace",
         "TikTok Shop",
-        "TikTok Business",
         "Shopee",
+        "Lazada",
         "Accurate",
         "webhook",
-        "retur",
-        "piutang",
-        "tracking resi"
+        "gateway key",
+        "order",
+        "ICC mapping"
       ]
     },
     {
@@ -1206,20 +1208,22 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "d3d8db462181023b35bfb6eaa81586f1e1d86dee42ad16b7be7147e15426edd3",
-      "ukuran_kb": 287.3,
-      "ringkasan": "Menjawab: bagaimana portal web internal hris-dashboard (One Bharata) disusun, stack dan pola UI apa yang dipakai, bagaimana login bekerja berikut perannya sebagai SSO Identity Provider, dan bagaimana tiap halaman HRIS/Finance/IT/GA dibangun. Juga menjawab kenapa sebuah layar berbentuk seperti sekarang: keputusan desain, halaman mana yang sudah pindah ke pola satu-kartu, dan jebakan yang sudah terbukti menggigit di filter, i18n, tabel, serta multi-perusahaan.",
+      "hash": "6534678e6f8f1bb23ea634de001c6abf25328ba894bd66e5e16497bd23809fa8",
+      "ukuran_kb": 287.9,
+      "ringkasan": "Menjawab: apa saja yang ada di portal web ERP internal (hris-dashboard, One Bharata), stack apa yang dipakainya, dan bagaimana ia sekaligus berperan sebagai SSO Identity Provider bagi aplikasi lain seperti Task Manager. Memuat rincian dukungan multi-perusahaan, bentuk sidebar dan menunya, i18n dua bahasa, serta halaman per modul HR, presensi, finance, integrasi marketplace, IT, dan GA.",
       "kata_kunci": [
-        "erp-frontend",
         "web ERP",
-        "One Bharata",
         "hris-dashboard",
+        "One Bharata",
         "Next.js",
-        "SSO",
         "frontend",
-        "halaman HRIS",
+        "sidebar",
+        "menu",
+        "SSO",
+        "multi-perusahaan",
         "i18n",
-        "multi-perusahaan"
+        "erp-frontend",
+        "portal internal"
       ]
     },
     {
@@ -1466,15 +1470,16 @@
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
-        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
-        "APP - Web ERP",
+        "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "REF - Alur Persetujuan",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "Finance - Kas Kecil dan Pengajuan Budget",
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "Microservices - Procurement Service",
+        "APP - Web ERP",
         "LOG - 2026-07-30 Audit Otorisasi Employee Service",
         "ADR - 0038 Hak Per-Objek Admin Space Task Management",
         "Microservices - Form Builder Service",
@@ -1499,9 +1504,9 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "888df54d51845428f73dc3c2e21d57e7e8c3fddff30a11686cef79fe4cdbddc4",
-      "ukuran_kb": 98.5,
-      "ringkasan": "Menjawab: bagaimana hak akses di bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi, cakupan data), bagaimana paket hak bernama menempel pada posisi atau jabatan alih-alih pada orang, dan di lapisan mana penegakannya terjadi (gateway, service, frontend). Memuat juga status per modul: mana yang sudah benar-benar memeriksa izin per aksi, mana yang baru punya katalog tanpa endpoint yang memeriksanya, dan kenapa fase tier fallback sempat dinyalakan lalu dicabut di hari yang sama.",
+      "hash": "3129c432228d26c6a2f266b4de7303d7f5b684727f988e50d6aa7299e688f980",
+      "ukuran_kb": 96.8,
+      "ringkasan": "Menjawab: bagaimana hak akses di bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi, cakupan data), bagaimana paket hak bernama menempel pada posisi atau jabatan alih alih pada orang, dan di lapisan mana penegakannya terjadi (gateway, service, frontend). Memuat katalog modul yang benar-benar terdaftar, status penegakan per modul, serta pembedaan permission set dari mekanisme lain yang menyentuh sidebar termasuk menu terbatas dan menu_hidden yang kini dicabut.",
       "kata_kunci": [
         "RBAC",
         "permission set",
@@ -1510,10 +1515,12 @@
         "system_roles",
         "posisi",
         "jabatan",
-        "gateway",
+        "katalog izin",
         "tier fallback",
         "menu terbatas",
-        "authorization"
+        "menu_hidden",
+        "authorization",
+        "sidebar"
       ]
     },
     {
@@ -2022,21 +2029,23 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "97921b95db1c20aae9c84112ca2dfbfce5a60b3f7750a3368704ac4e33cbaff0",
-      "ukuran_kb": 272.4,
-      "ringkasan": "Menjawab: bagaimana ERP tersambung ke marketplace Indonesia (TikTok Shop, TikTok Ads, Shopee, Lazada) dan bagaimana order serta laporan iklan dinormalkan jadi satu model transaction terpadu. Menjawab pula jembatan finansial ke Accurate Online: pembuatan invoice, ringkasan transaksi harian per toko dan channel, push Sales Invoice dan Sales Return, penjagaan jalur retur terhadap fake order, serta kenapa faktur yang sudah dibayar diperlakukan sebagai antrean finance alih-alih alarm. Termasuk automasi auto-ship dan auto-approve yang sadar hari libur, pengelolaan kredensial OAuth per marketplace, job sync terjadwal, dan status jalur middleware Desty yang sudah dimatikan.",
+      "hash": "e8459ef65c78f8e28ec2766c3b9ee6eaa7e2e6e3c4bf1a745e98063573c75eb2",
+      "ukuran_kb": 275.3,
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace Indonesia (TikTok Shop, TikTok Business, Shopee, Lazada), bagaimana order masuk lewat webhook direct lalu dinormalkan jadi model transaksi terpadu, dan bagaimana bridging finansialnya ke Accurate Online bekerja. Menjawab juga soal automasi auto-ship dan auto-approve yang sadar hari libur, pengelolaan kredensial OAuth per marketplace, job sync terjadwal, serta status jalur Desty yang sudah soft-disabled.",
       "kata_kunci": [
         "integration service",
         "marketplace",
         "TikTok Shop",
         "Shopee",
         "Lazada",
-        "webhook order",
-        "Accurate Online",
-        "sales invoice",
-        "sales return",
-        "OAuth marketplace",
-        "auto-ship"
+        "Accurate",
+        "bridging akuntansi",
+        "webhook",
+        "OAuth",
+        "auto-ship",
+        "sync job",
+        "Desty",
+        "transaksi"
       ]
     },
     {
@@ -2958,21 +2967,23 @@
         "ADR - 0017 Tanggal Retur TikTok via order_update_date",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur",
         "Microservices - Integration Service",
+        "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
         "APP - Web ERP"
       ],
-      "hash": "fb6a1fa37af1e3b82397b8f3d6499dec0beeffbb0af4f6330ea0bf657a805153",
-      "ukuran_kb": 11.3,
-      "ringkasan": "Menjawab: kenapa satu dokumen Retur Penjualan merekap semua retur yang berbagi faktur sumber dan tanggal retur, alih-alih satu dokumen per return_sn seperti implementasi awal. Menjelaskan kendala Accurate yang menentukan keputusan itu, yaitu endpoint sales-return hanya punya satu field invoiceNumber di header. Memuat amandemen 2026-08-20 yang menambahkan segmen JENIS ke kunci grup sehingga satu dokumen hanya memuat satu jenis retur dan mode campuran tak lagi terjadi untuk dokumen baru.",
+      "hash": "eb92db479267331e3cfdd126cb8ad591b4d899c225a57cd1cce248580de2c217",
+      "ukuran_kb": 15.3,
+      "ringkasan": "Menjawab: kenapa satu dokumen Retur Penjualan merekap seluruh retur yang berbagi faktur sumber dan tanggal retur, dan kenapa merekap retur lintas faktur mustahil (Accurate hanya punya satu field invoiceNumber di header, tanpa rujukan faktur per baris). Memuat amandemen 2026-08-20 yang menambahkan segmen JENIS ke kunci grup sehingga satu dokumen kini berisi satu jenis retur saja.",
       "kata_kunci": [
-        "ADR retur",
-        "retur penjualan",
+        "retur",
         "sales return",
-        "grouping faktur",
-        "return_sn",
         "Accurate",
+        "faktur",
+        "grouping",
         "invoiceNumber",
-        "kunci grup",
-        "jenis retur"
+        "refund",
+        "retur penjualan",
+        "ADR 0016",
+        "tanggal retur"
       ]
     },
     {
@@ -3772,26 +3783,28 @@
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - RBAC dan Permission Set",
+        "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
         "Microservices - Employee Service",
         "Microservices - Integration Service",
         "Microservices - Task Management Service",
         "APP - Web ERP",
         "API - Integration Service"
       ],
-      "hash": "c4687a2c1613ad9e96494aa6a05b4de3fd9e7e1cfbff23fe6b1a6bc8f3a2cd83",
-      "ukuran_kb": 12.4,
-      "ringkasan": "Menjawab: bagaimana cara membatasi satu menu tertentu (mis. Laporan Keuangan /finance/accounting) untuk akun pilihan tanpa memadamkan halaman bagi semua orang saat deploy, dan mengapa polanya dipilih default terbuka lalu mengunci begitu ada yang di-assign. Menjelaskan modul izin menu.<kunci>, paket menu_<kunci>, penanda kunci $menulock.<kunci> di klaim JWT, urutan tiga langkah HasMenuAccess, dan mengapa prefiksnya sengaja bukan menu.. Juga merekam celah akun tanpa permission-set yang membuat pemegang fallback lama tetap lolos, kaitannya dengan effectiveTicketPermissions di task-management, dan berkas mana yang menyimpan aturannya di backend maupun frontend.",
+      "hash": "6ced910d4ef9f1f9c31721e6eab1871932e2dcc9e8401ab570dd98d31b7a61a1",
+      "ukuran_kb": 12.7,
+      "ringkasan": "Menjawab: kenapa modul menu (menu terbatas) berperilaku terbuka sampai paketnya dipasang ke seseorang, bukan deny-by-default, dan bagaimana penanda kunci $menulock dipakai agar konsumen bisa membedakan restriksi yang belum aktif dari restriksi yang aktif tapi tak mencakup dirinya. Menjawab juga kenapa fitur ini sudah merge tetapi belum boleh dinyalakan, yaitu celah akun tanpa paket yang terbukti tidak kosong.",
       "kata_kunci": [
         "menu terbatas",
         "restricted menu",
         "menulock",
         "permission set",
         "RBAC",
-        "finance accounting",
         "laporan keuangan",
+        "finance accounting",
         "fallback",
         "JWT claims",
-        "ADR 0039"
+        "ADR 0039",
+        "default terbuka"
       ]
     },
     {
@@ -3901,6 +3914,7 @@
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
         "QA - Register Perizinan & Sertifikasi",
         "CORE - RBAC dan Permission Set",
         "Microservices - Employee Service",
@@ -3909,20 +3923,24 @@
         "HRIS - Organization Structure",
         "APP - Web ERP"
       ],
-      "hash": "62b6b6019e96e5e4778ceeb1df0705c5539fbd81364970abef356454f51c8575",
-      "ukuran_kb": 12.6,
-      "ringkasan": "Menjawab: kenapa system_roles yang kosong diisi otomatis dari pasangan departemen dan jabatan saat token diterbitkan, bukan lewat permission-set seperti ADR 0030. Menjelaskan pengukuran data dev yang mendasarinya, jabatan mana yang sengaja TIDAK dipetakan beserta alasan tiap barisnya, dan kenapa mekanisme ini menyatakan diri jembatan sementara. Sejak 2026-08-13 memuat jabatan Legal dan QA RND di Kesekretariatan, yang perannya diturunkan bukan demi izin melainkan demi jalan masuk: proxy.ts dan sidebar hanya membaca system_roles, tak pernah klaim permissions.",
+      "hash": "8b029be2d8f8159b54e1c18a5c95ceb36d1d2410937ceb3b4c755e4587fc4838",
+      "ukuran_kb": 12.8,
+      "ringkasan": "Menjawab: kenapa system_roles yang kosong diisi dari pasangan departemen dan jabatan saat token diterbitkan, jabatan mana yang sengaja TIDAK dipetakan beserta alasannya, dan kenapa ini jembatan sementara yang harus dibongkar setelah modulnya berkatalog. Menjawab juga pembedaan penting bahwa paket menentukan izin sedangkan peran menentukan jalan masuk (kategori sidebar dan lolosnya rute di proxy.ts).",
       "kata_kunci": [
-        "peran dari jabatan",
         "system_roles",
-        "ADR 0043",
-        "peran_dari_jabatan.go",
-        "ROLE_FROM_POSITION",
+        "peran sistem",
         "jabatan",
-        "penurunan peran",
-        "Kesekretariatan",
-        "proxy",
-        "token"
+        "posisi",
+        "RBAC",
+        "token",
+        "login",
+        "manufacture",
+        "insentive",
+        "ga",
+        "secretary",
+        "ADR 0043",
+        "KanonPosisi",
+        "proxy"
       ]
     },
     {
@@ -4176,6 +4194,41 @@
         "urutan deploy",
         "dua kanal",
         "dobel-kirim"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0051 Pencabutan Tampilan Menu per Posisi.md",
+      "judul": "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "Diputuskan, PR **masih TERBUKA** (2026-08-22). Pencabutannya di [erp-frontend #1163](https://github.com/bip-itteam-internal/erp-frontend/pull/1163) dan [bip-erp #1371](https://github.com/bip-itteam-internal/bip-erp/pull/1371), keduanya belum merge dan belum di-deploy. Purge data prod belum dijalankan. **Sampai ketiganya selesai, `menu_hidden` masih hidup dan masih dipakai orang.**",
+      "publik": true,
+      "tautan": [
+        "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
+        "CORE - RBAC dan Permission Set",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "Microservices - Employee Service",
+        "APP - Web ERP"
+      ],
+      "hash": "89d7383ea5cbd310b7286dea027a869b6cb60cf444d640fe0d3f1f96d3a8379c",
+      "ukuran_kb": 8.5,
+      "ringkasan": "Menjawab: kenapa fitur Tampilan Menu per posisi (menu_hidden) dicabut seluruhnya, dan kenapa aturan tampil = (boleh menurut izin) DAN (tidak ada di menu_hidden) membuat permission set yang sudah dipasang tak pernah terlihat. Memuat angka pemakaian nyata di produksi (10 posisi memakainya sebagai whitelist terbalik), dampak nyata pencabutannya yang jauh lebih kecil daripada jumlah entrinya, dan apa yang sengaja tidak disediakan sebagai pengganti.",
+      "kata_kunci": [
+        "menu_hidden",
+        "Tampilan Menu",
+        "sidebar",
+        "permission set",
+        "RBAC",
+        "pencabutan",
+        "posisi",
+        "jabatan",
+        "ADR 0051",
+        "whitelist terbalik",
+        "system_roles",
+        "menu"
       ]
     },
     {

@@ -38,39 +38,35 @@
 - **Backfill paket per-akun DICABUT** (`migratePermissionSetAssignment`, dicabut 2026-07-30). Syaratnya "akun punya role ticket & `permission_sets` kosong", dan "kosong" tak bisa dibedakan dari "sengaja dikosongkan" — akibatnya setiap restart service mengembalikan paket per-akun yang baru dirapikan ke posisi. Paket yang sudah ada tidak dihapus; yang berubah, pengosongan kini bertahan dan karyawan baru mendapat hak dari posisi.
 - **UI kelola set & assign per akun** — `erp-frontend/src/features/hris/master-data/components/{permission-set-form-modal,permission-set-assign}.tsx`.
 
-**Tampilan menu per posisi — BUKAN bagian dari RBAC (2026-07-31, ✅ MERGED ke `main` kedua repo):**
+**Tampilan menu per posisi (`menu_hidden`) — ⛔ DICABUT (2026-08-22, PR masih TERBUKA):**
 
-> Terverifikasi di `origin/main` 2026-08-22. **FE**: `position-menu-manager.tsx` mendarat lewat `e525e031` (2026-07-31), berikut `features/hris/master-data/lib/menu-lingkup.ts`, `hooks/use-position-menu-hidden.ts`, dan `components/layout/sidebar-menu-shape.ts`; kedua layarnya hidup dan memakai komponen yang **sama** dengan prop berbeda, `lingkup="hrga"` di `app/(main)/pengaturan/organisasi/page.tsx:50` dan `lingkup="semua"` di `app/(main)/it/settings/page.tsx:29`. **BE**: penyimpanannya `PUT /master/departments/:key/positions/:positionKey/menu-hidden` bergerbang `common.RequireHRISOrITSupervisor` (`services/employee/position_assign.go:221`), pembacaan setelan sendiri `GET /me/menu-hidden` (`position_assign.go:370`), field `MenuHidden` di `shared-library/models/employee/master_data.go:105`. Dok ini sempat menulis "belum merge" karena ditulis berbarengan dengan branch-nya; nama branch sengaja dibuang dari baris di atas supaya tak terbaca lagi sebagai penanda status.
+> ⚠️ **Belum merge dan belum di-deploy saat baris ini ditulis.** Pencabutannya ada di [erp-frontend #1163](https://github.com/bip-itteam-internal/erp-frontend/pull/1163) dan [bip-erp #1371](https://github.com/bip-itteam-internal/bip-erp/pull/1371), keduanya **OPEN**. Sampai keduanya merge DAN naik ke prod, `menu_hidden` masih hidup dan masih dipakai orang. Jangan membaca blok ini sebagai "sudah tidak ada".
 
-`master_department.position_items[].menu_hidden` menyimpan url menu yang **disembunyikan** dari sidebar bagi pemegang sebuah jabatan, disetel di dua layar: **HRGA → Pengaturan → Organisasi & Jabatan → Tampilan Menu** (lingkup HRGA) dan **IT → Konfigurasi Sistem → Pengaturan** (seluruh departemen). Ditaruh di dokumen ini karena menempel pada objek yang sama dengan `permission_sets` dan gampang tertukar dengannya. **Keduanya berbeda jenis dan jangan disatukan:**
+`master_department.position_items[].menu_hidden` menyimpan url menu yang disembunyikan dari sidebar bagi pemegang sebuah jabatan, disetel lewat layar **Tampilan Menu** di Pengaturan HRGA dan IT. Aturannya:
 
-| | `permission_sets` | `menu_hidden` |
-|---|---|---|
-| Jenis | hak akses | tampilan |
-| Arah | memberi | **hanya mengurangi** |
-| Ditegakkan | gerbang backend | tidak ditegakkan sama sekali |
-| Gerbang tulis | `RequireITSupervisor` | `RequireHRISOrITSupervisor` |
-| Berlaku | setelah login ulang | setelah muat ulang halaman |
+	tampil = (boleh menurut role/izin) DAN (tidak ada di menu_hidden)
 
-Aturan yang mengikat: `tampil = (boleh menurut role/izin) DAN (tidak ada di menu_hidden)`. Karena itu ia dijalankan **setelah** seluruh penyaringan izin dan tak pernah bisa memperluas akses; salah setel paling buruk menyembunyikan menu. Rutenya tetap terbuka lewat URL — menyembunyikan menu **bukan keamanan**, konsisten dengan [[ADR - 0031 Prefix internal Bukan Batas Keamanan]]. Gerbang tulisnya sengaja lebih longgar daripada pemasangan paket justru karena ia tak bisa menaikkan hak siapa pun.
+Dijalankan **setelah** seluruh penyaringan izin, jadi ia hanya bisa mengurangi. Justru itu yang membunuhnya: paket hak yang sudah dipasang ke sebuah jabatan **tidak pernah terlihat** selama url menunya masih terdaftar di `menu_hidden`, dan di produksi 10 posisi memakainya sebagai whitelist terbalik (1.426 entri dari 196 menu, sampai 87% per posisi). Alasan lengkap, angka, dan konsekuensinya: [[ADR - 0051 Pencabutan Tampilan Menu per Posisi]].
 
-⚠️ **Karena yang disimpan url, memindahkan sebuah menu ke rute baru membatalkan setelannya secara SENYAP** — pencocokannya persis, jadi entri lama jadi basi dan menunya muncul kembali tanpa satu pun galat. Penawarnya `terjemahkanTersembunyi` (`components/layout/sidebar-menu-shape.ts`), yang **mengganti** url lama dengan penerusnya saat dibaca dan **wajib dipakai di kedua sisi**: sidebar yang membaca setelan dan layar Tampilan Menu yang menyuntingnya. Dipakai di satu sisi saja menghasilkan kegagalan yang lebih halus daripada bug aslinya — kedua layar tak sepakat, dan mencentang menu agar tampil tak mengubah apa pun karena penyimpanannya juga mencocokkan url persis sehingga url lamanya tetap tinggal. Detail pemetaan & alasan menu yang pecah tidak dipetakan penuh: [[APP - Web ERP]].
+Yang menggantikannya: **`permission_sets` saja**, dibantu `system_roles` untuk kategori sidebar dan gerbang rute di `proxy.ts`. Tak ada penggantinya untuk "menyembunyikan menu yang boleh dilihat", dan itu disengaja.
 
-Disimpan sebagai daftar yang **disembunyikan**, bukan yang ditampilkan, supaya menu baru otomatis muncul untuk semua posisi alih-alih hilang diam-diam sampai ada yang mendaftarkannya ke 79 jabatan.
+Sesudah pencabutan selesai, blok ini dan seluruh tabel pembeda di bawah **ikut dihapus** dari dok ini; yang tersisa cukup ADR 0051 sebagai catatan sejarah.
 
 **Menu terbatas — modul `menu` (2026-08-06, ✅ MERGED ke `main`; ⚠️ tetap jangan dinyalakan, lihat §Belum Diimplementasikan):**
 
 > Terverifikasi di `origin/main` 2026-08-09: `shared-library/common/catalog_menu.go` ada, didaftarkan di `services/employee/permission_catalogs.go:41` (dulu `main.go:128`, lihat catatan pindah berkas di §Deskripsi), dan gerbangnya hidup di `services/integration/main.go:1169` (`accountingRoute.Get("/balance-sheet", httpDelivery.RequireMenuLaporanKeuangan(), …)`) beserta `menu_gate_test.go`. Dok ini sempat menyebutnya "belum merge"; yang masih benar adalah **belum berfungsi penuh**, dan itu dua hal berbeda. Sudah-merge justru menaikkan taruhannya: kodenya kini hidup di produksi, jadi yang menahan fitur ini tinggal keputusan untuk tidak memasang paketnya ke siapa pun.
 
-Whitelist **per akun** untuk satu menu, dipakai pertama kali oleh halaman Laporan Keuangan (`/finance/accounting`) yang memuat posisi keuangan seluruh perusahaan. Keputusan & konsekuensinya di [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]]; yang perlu diketahui di sini adalah **bentuknya berbeda dari izin modul biasa**, dan ia menu-ketiga yang menyentuh sidebar sehingga mudah tertukar dengan dua saudaranya:
+Whitelist **per akun** untuk satu menu, dipakai pertama kali oleh halaman Laporan Keuangan (`/finance/accounting`) yang memuat posisi keuangan seluruh perusahaan. Keputusan & konsekuensinya di [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]]; yang perlu diketahui di sini adalah **bentuknya berbeda dari izin modul biasa**, dan ia mudah tertukar dengan `permission_sets` biasa:
 
-| | `permission_sets` | `menu_hidden` | modul `menu` (menu terbatas) |
-|---|---|---|---|
-| Jenis | hak akses | tampilan | hak akses |
-| Menempel pada | posisi (+akun) | posisi | **akun** (+posisi) |
-| Arah | memberi | hanya mengurangi | memberi ke yang ditunjuk, **menutup yang lain** |
-| Bawaan | deny-by-default | tampil | **terbuka sampai ada yang di-assign** |
-| Ditegakkan | gerbang backend | tidak sama sekali | gerbang backend (parsial, lihat ADR) |
+| | `permission_sets` | modul `menu` (menu terbatas) |
+|---|---|---|
+| Jenis | hak akses | hak akses |
+| Menempel pada | posisi (+akun) | **akun** (+posisi) |
+| Arah | memberi | memberi ke yang ditunjuk, **menutup yang lain** |
+| Bawaan | deny-by-default | **terbuka sampai ada yang di-assign** |
+| Ditegakkan | gerbang backend | gerbang backend (parsial, lihat ADR) |
+
+> Tabel ini dulu berkolom tiga; kolom `menu_hidden` dicabut bersama fiturnya ([[ADR - 0051 Pencabutan Tampilan Menu per Posisi]]). Sejak itu **hanya ada dua mekanisme** yang menyentuh sidebar, bukan tiga.
 
 Yang membedakannya dari izin modul biasa: **default terbuka**. Selama paketnya belum dipasang ke siapa pun, menu berperilaku persis seperti sebelum fitur ada; begitu ada ≥1 assignment, hanya pemegang paket yang boleh. Fakta "sudah ada yang di-assign" bersifat global, jadi employee-service menghitungnya saat token terbit lalu menempelkan penanda `$menulock.<kunci>` ke klaim **setiap orang** — tanpa penanda itu konsumen tak bisa membedakan "belum aktif" dari "aktif tapi saya tak di-assign". Penandanya sengaja **di luar namespace `menu.`** agar tak terhitung sebagai izin modul, sama alasannya dengan penanda reach.
 

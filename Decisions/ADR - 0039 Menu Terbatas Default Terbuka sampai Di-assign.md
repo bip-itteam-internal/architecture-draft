@@ -65,7 +65,9 @@ Pendorongnya bukan fitur menu terbatas melainkan perbaikan lain: pencocokan depa
 
 Sifat turunan yang disengaja: panggilan service-to-service (worker/cron) tak membawa header izin sama sekali, sehingga selalu jatuh ke `fallback` dan tetap berjalan setelah restriksi menyala.
 
-**Hubungannya dengan `menu_hidden`.** Vault sudah punya mekanisme lain yang menyentuh menu — `position_items[].menu_hidden`, penyembunyian **tampilan** per jabatan yang secara eksplisit bukan keamanan ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Keduanya berdampingan dan gampang tertukar; pembedaannya ditabelkan di [[CORE - RBAC dan Permission Set]]. Ringkasnya: `menu_hidden` mengurangi tampilan per jabatan tanpa gerbang, menu terbatas membatasi akses per akun dengan gerbang.
+**Hubungannya dengan `menu_hidden` — sudah tidak berlaku sejak 2026-08-22.** Saat ADR ini ditulis ada mekanisme lain yang menyentuh menu, `position_items[].menu_hidden`, penyembunyian **tampilan** per jabatan yang secara eksplisit bukan keamanan ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Keduanya berdampingan dan gampang tertukar, sehingga pembedaannya sempat ditabelkan tiga kolom di [[CORE - RBAC dan Permission Set]].
+
+`menu_hidden` **kini DICABUT** ([[ADR - 0051 Pencabutan Tampilan Menu per Posisi]]), jadi menu terbatas tinggal berdampingan dengan `permission_sets` biasa saja. Yang tetap perlu diingat dari perbandingan lama: menu terbatas membatasi akses **per akun dengan gerbang**, dan itu tetap membedakannya dari izin modul biasa.
 
 **Yang belum diputuskan (TBD):**
 
