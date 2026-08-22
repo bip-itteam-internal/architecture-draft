@@ -5519,20 +5519,20 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "02d1fa1c66190aa1db58ec8ce7f844ded4910abf8757b39f70917458b84cab0d",
-      "ukuran_kb": 27.7,
-      "ringkasan": "Menjawab: bagaimana skor KPI dinilai dan apa bedanya engine KPI-insentif tim marketing (sudah live di Insentive Service, 9 role) dengan appraisal per-karyawan lintas departemen (template per posisi + scoring bulanan di Employee Service). Menjelaskan aturan penilaian: template di-snapshot ke kpi_score, posisi template wajib cocok dengan jabatan karyawan pada periode yang dinilai (dijawab dari employee_movement), kolom jumlah 'Karyawan' per template, RBAC per departemen, serta cakupan tim untuk Leader (scope=team berbasis bawahan langsung, bukan role). Juga menjawab bagaimana departemen satu tim (mis. HRGA) ditampilkan menyatu lewat master_department.supervised_by.",
+      "hash": "e6b437244c2e2d1d8cf0ac7845a30376cd2b7f4ea6ec7d34aacad6a50112ea1e",
+      "ukuran_kb": 28.7,
+      "ringkasan": "Menjawab: bagaimana penilaian kinerja berbasis skor KPI bekerja, apa beda engine KPI→insentif tim marketing (sudah production di Insentive Service) dengan appraisal per-karyawan lintas departemen (template per posisi + scoring di Employee Service). Menjelaskan juga aturan pencocokan posisi template dengan jabatan karyawan pada periode yang dinilai, kolom jumlah karyawan (assignment aktual) per template, RBAC per departemen, cakupan tim untuk Leader (scope=team), dan penggabungan tampilan lintas departemen (mis. HRGA).",
       "kata_kunci": [
         "KPI",
         "Key Performance Index",
-        "appraisal",
         "penilaian kinerja",
+        "appraisal",
         "insentif",
         "incentive",
-        "kpi_score",
         "template posisi",
-        "scope=team",
-        "RBAC departemen"
+        "scoring",
+        "RBAC departemen",
+        "supervisor"
       ]
     },
     {
