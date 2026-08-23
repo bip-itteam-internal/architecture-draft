@@ -511,7 +511,29 @@ Template `KPI Supervisor HRGA`, 10 metrik.
 > daripada vonis "belum bisa"**: ia mengundang dev menyambungkan angka yang menjawab
 > pertanyaan lain, dan angka itu tetap terlihat wajar di layar.
 
-**Terpasang di dashboard** (erp-frontend [#1128](https://github.com/bip-itteam-internal/erp-frontend/pull/1128) + [#1130](https://github.com/bip-itteam-internal/erp-frontend/pull/1130), merged 2026-08-21): seluruh sepuluh metrik di atas kini tampil sebagai **matriks KPI** di tab HRD Supervisor halaman Ringkasan Divisi HRGA, lengkap dengan bobot, status otomasi, dan kelayakannya. Bobot dan status ditarik hidup dari `GET /kpi/auto-overview`, tidak disalin. Satu metrik — `Net Income 20%` — sudah menampilkan **angkanya**, bukan hanya vonis kelayakannya. Rincian di [[APP - Web ERP]].
+**Terpasang di dashboard** (erp-frontend [#1128](https://github.com/bip-itteam-internal/erp-frontend/pull/1128) + [#1130](https://github.com/bip-itteam-internal/erp-frontend/pull/1130), merged 2026-08-21): seluruh sepuluh metrik di atas kini tampil sebagai **matriks KPI** di tab HRD Supervisor halaman Ringkasan Divisi HRGA, lengkap dengan bobot, status otomasi, dan kelayakannya. Bobot dan status ditarik hidup dari `GET /kpi/auto-overview`, tidak disalin. Rincian di [[APP - Web ERP]].
+
+**Empat dari sepuluh metrik sudah menampilkan ANGKANYA**, bukan hanya vonis kelayakannya (dua terakhir menyusul di erp-frontend [#1180](https://github.com/bip-itteam-internal/erp-frontend/pull/1180), **belum merge**):
+
+| Metrik | Bobot | Angka yang tampil | Reduksi |
+|---|---:|---|---|
+| `Net Income 20%` | 0,05 | penurunan realisasi biaya GA terhadap bulan sebelumnya | — |
+| `Turn Over Rate Target 5% per Tahun` | 0,10 | turnover bulan berjalan terhadap targetnya | — |
+| `Performance Monitoring 100% Terimplementasi di Q4` | 0,20 | **berapa orang** di bawah ambang 70 | `rasio_ambang` |
+| `Performance Monitoring Team HRGA` | 0,20 | **rata-rata** skor grup HRGA | `rata_rata` |
+
+> [!warning] Kedua metrik Performance Monitoring menunjuk kartu yang SAMA dan tak boleh dijawab angka yang sama
+> Keduanya berbobot 0,20 dan keduanya diarahkan ke kartu Skor KPI karyawan, jadi jalan
+> termudah adalah memasangkan keduanya ke satu penyedia angka. Itu keliru, dan kelirunya
+> tak akan terlihat: dua baris, dua angka, keduanya masuk akal.
+>
+> Yang membedakan cuma kalimat metriknya, dan callout **"Rata-rata min 70 dan SELURUH
+> anggota min 70 adalah dua metrik berbeda"** di atas sudah mengatur jawabannya. Rata-rata
+> 78 lolos target 70 walau sepuluh orang berskor 40.
+>
+> Sebelum perbaikan ini, `Performance Monitoring Team HRGA` tak punya angka sama sekali
+> sementara penunjuknya menyuruh pembaca melihat kartu yang hanya memuat angka **lintas
+> departemen**. Diukur di dev 2026-08-21: HRGA 20 orang, lintas departemen 169 orang.
 
 > [!caution] Bobot lembar KPI ini pernah disalin ke frontend dan menyimpang
 > `erp-frontend/src/features/hris/dashboard/lib/kpi-spv.ts` (sudah **dihapus**) menyalin
