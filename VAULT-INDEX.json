@@ -379,9 +379,9 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "29da82735ba655efc0b30db91a2857b0e39ade6c68c6691e9b0819acb0b821b6",
-      "ukuran_kb": 59.6,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki integration-service (order, retur, tracking, wallet, reviews, Accurate, profit, status sinkron toko) beserta parameter, caveat, dan konsumennya. Termasuk rute baru /shops/* untuk menonaktifkan toko banned dari sync dan membaca riwayat statusnya, serta mana endpoint yang di-cache rescache dan mana yang sengaja tidak.",
+      "hash": "632cc88e6c18ff8ef6b436c08198952df7dfeb9bf65340886bebb197cf38a445",
+      "ukuran_kb": 59.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki integration-service (order, retur, tracking, wallet, reviews, Accurate, profit, status sinkron toko) beserta parameter, caveat, dan konsumennya. Termasuk rute /shops/* (live 2026-08-24) untuk menonaktifkan toko banned dari sync dan membaca riwayat statusnya, serta mana endpoint yang di-cache rescache dan mana yang sengaja tidak.",
       "kata_kunci": [
         "endpoint integration",
         "api marketplace",
@@ -1214,9 +1214,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "86f9038c4a48385799463d0cd699a8b709223c4b66b21456698080853f1d7a70",
+      "hash": "6d84a3d931b024b2ed0d15f2903eb5ed90d32e101e76d1fbedb5a92f361bca69",
       "ukuran_kb": 298.3,
-      "ringkasan": "Menjawab: halaman dan modul apa saja yang ada di web ERP One Bharata, siapa yang boleh mengaksesnya (role/permission), dan bagaimana perilaku tiap layar — termasuk panel Shop Sync Status di Integration OAuth, halaman Auto-Sync faktur/retur/penerimaan Accurate beserta badge status scan gudangnya, payroll, presensi, dan KPI. Juga menjawab cara kerja SSO, sidebar, dan i18n dua bahasa.",
+      "ringkasan": "Menjawab: halaman dan modul apa saja yang ada di web ERP One Bharata, siapa yang boleh mengaksesnya (role/permission), dan bagaimana perilaku tiap layar — termasuk panel Shop Sync Status di Integration OAuth (live 2026-08-24), halaman Auto-Sync faktur/retur/penerimaan Accurate beserta badge status scan gudangnya, payroll, presensi, dan KPI. Juga menjawab cara kerja SSO, sidebar, dan i18n dua bahasa.",
       "kata_kunci": [
         "web erp",
         "one bharata",
@@ -1225,9 +1225,9 @@
         "sidebar",
         "role",
         "oauth",
+        "shop sync status",
         "auto-sync retur",
         "scan gudang",
-        "menunggu scan",
         "integration"
       ]
     },
@@ -1594,9 +1594,9 @@
         "Microservices - File Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "43bdd613a93b2dcf5e870ed320f0104ba46b08b7a77459d947c1f35cd881accf",
+      "hash": "01b6ed66bdad4d8560870c13e5fe87afd027e1f5499ef87594e2b26486956479",
       "ukuran_kb": 15.2,
-      "ringkasan": "Menjawab: koleksi Mongo apa saja yang dimiliki tiap service dan field apa saja di dalamnya (grounded dari struct Go), termasuk koleksi baru shop_sync_states dan shop_status_histories untuk status toko nonaktif. Berguna saat perlu tahu nama field bson, tipe, index, atau di database mana sebuah data disimpan.",
+      "ringkasan": "Menjawab: koleksi Mongo apa saja yang dimiliki tiap service dan field apa saja di dalamnya (grounded dari struct Go), termasuk shop_sync_states dan shop_status_histories (live 2026-08-24) untuk status toko nonaktif. Berguna saat perlu tahu nama field bson, tipe, index, atau di database mana sebuah data disimpan.",
       "kata_kunci": [
         "data dictionary",
         "kamus data",
@@ -2031,9 +2031,9 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "a043c16fee8b989b03e5b289b8fe034565e2a51802f76107350edbce2fbacb83",
-      "ukuran_kb": 280.2,
-      "ringkasan": "Menjawab: bagaimana integration-service bekerja end-to-end — webhook marketplace, sync order/retur/escrow/wallet, bridging Accurate (faktur/retur/penerimaan harian, sweep rekonsiliasi termasuk pass seed retur tanpa-faktur), worker cron, observability Shopee (success rate, circuit breaker, rate limit), dan status sinkron per toko yang membuat worker melewati toko banned. Juga mencatat gap yang belum diimplementasikan beserta insiden yang melatarbelakanginya.",
+      "hash": "7db73c54ee134dd18ab734f1a9d3cb40d129dba3882a4dee0e99ac8bf12c10ea",
+      "ukuran_kb": 280.3,
+      "ringkasan": "Menjawab: bagaimana integration-service bekerja end-to-end — webhook marketplace, sync order/retur/escrow/wallet, bridging Accurate (faktur/retur/penerimaan harian, sweep rekonsiliasi termasuk pass seed retur tanpa-faktur), worker cron, observability Shopee (success rate, circuit breaker, rate limit), dan status sinkron per toko (live 2026-08-24) yang membuat worker melewati toko banned. Juga mencatat gap yang belum diimplementasikan beserta insiden yang melatarbelakanginya.",
       "kata_kunci": [
         "integration service",
         "marketplace",
@@ -2045,7 +2045,7 @@
         "cron",
         "retur",
         "sweep",
-        "tanpa faktur",
+        "toko nonaktif",
         "success rate"
       ]
     },
@@ -4232,8 +4232,8 @@
       "judul": "ADR - 0052 Status Sinkron per Toko",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "Implemented di branch `feat/oauth-shop-status-history` (bip-erp + erp-frontend, 2026-08-22) — **belum merge/deploy**. Test hijau (BE 11 handler + 4 filter + 1 task; FE 6 panel, total suite oauth 46 lulus).",
+      "status_emoji": "✅",
+      "status_teks": "Implemented & **LIVE di PROD** — merge 2026-08-23 (bip-erp #1387 `1f67ca36`, erp-frontend #1179 `5ddd6529`), deploy terverifikasi 2026-08-24 14:44 WIB lewat probe biner (`docker exec Integration-Service grep -ac 'shop_sync_states' /service` = 1; sehari sebelumnya container masih pra-merge padahal checkout VM sudah di-pull — bukti bahwa \"sudah deploy\" wajib diverifikasi dari container, bukan dari git). **Pemakaian perdana 2026-08-24**: disable toko TikTok **Rainbow Care** (`7494821116849456662`) yang di-deactivate marketplace (error 36009006) — kegagalan-parsialnya membuat job `sync-tt-shop-orders` gagal tiap run dan banner \"Sync bermasalah\" nempel permanen di laman scan WMS; nol order di ERP, jadi disable murni menghentikan panggilan pasti-gagal.",
       "publik": true,
       "tautan": [
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace",
@@ -4244,18 +4244,18 @@
         "ADR - 0011 Integration Read Cache + Singleflight (Fase 1 Perf)",
         "Sales - Marketplace Integration"
       ],
-      "hash": "d0d0086d52a69383d8a20ea8f8b75edc1f336dbeb10759043eaaafc1f87c5e00",
-      "ukuran_kb": 4.2,
-      "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah (bukan field di dokumen toko), dan aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal). Juga mencatat batas scope: apa yang sengaja tak difilter dan rencana Tahap 2 auto-disable.",
+      "hash": "b6f92f00339ad4a5759e36e13771676e938adb5678b60b0ba4c544a38afacb2c",
+      "ukuran_kb": 4.8,
+      "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, dan aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care yang di-deactivate TikTok. Juga mencatat batas scope dan rencana Tahap 2 auto-disable.",
       "kata_kunci": [
         "adr",
         "shop sync state",
         "toko banned",
         "disable toko",
+        "rainbow care",
         "skip worker",
         "kuota api",
         "success rate",
-        "fail-open",
         "ListSyncableShops"
       ]
     },

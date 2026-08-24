@@ -1,4 +1,4 @@
-**Status**: 🟡 Implemented di branch `feat/oauth-shop-status-history` (bip-erp + erp-frontend, 2026-08-22) — **belum merge/deploy**. Test hijau (BE 11 handler + 4 filter + 1 task; FE 6 panel, total suite oauth 46 lulus).
+**Status**: ✅ Implemented & **LIVE di PROD** — merge 2026-08-23 (bip-erp #1387 `1f67ca36`, erp-frontend #1179 `5ddd6529`), deploy terverifikasi 2026-08-24 14:44 WIB lewat probe biner (`docker exec Integration-Service grep -ac 'shop_sync_states' /service` = 1; sehari sebelumnya container masih pra-merge padahal checkout VM sudah di-pull — bukti bahwa "sudah deploy" wajib diverifikasi dari container, bukan dari git). **Pemakaian perdana 2026-08-24**: disable toko TikTok **Rainbow Care** (`7494821116849456662`) yang di-deactivate marketplace (error 36009006) — kegagalan-parsialnya membuat job `sync-tt-shop-orders` gagal tiap run dan banner "Sync bermasalah" nempel permanen di laman scan WMS; nol order di ERP, jadi disable murni menghentikan panggilan pasti-gagal.
 
 ## Context
 
