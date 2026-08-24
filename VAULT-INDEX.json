@@ -536,20 +536,21 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "b70f9c1ace117ea4080fafda7371172bfe30fd890da8218abab77b9bd21c184f",
-      "ukuran_kb": 10.6,
-      "ringkasan": "Menjawab: rute apa yang tersedia di `/api/marketing-analytics/*`, parameter dan konvensi responsnya, serta apa arti nilai yang dikembalikan. Mencakup halaman depan `/beranda` dengan lima nilai vonis (`tanpa_data`, `belum_matang`, `rugi`, `waspada`, `sehat`) dan ambang keputusan `/ambang`, drill laba per toko/produk/kampanye/iklan/order, video & live, retur, affiliate, cohort, audience, price floor, trigger job & status penjadwal, serta `/kpi/kinerja-toko` yang jadi bahan mentah penilaian KPI marketing. Juga menyebut `null` berarti tak terhitung bukan nol, `cpa_maks` tersimpan tapi tak dibaca, `/matrix/sku-shop` masih stub, dan tiga route yang ada di kode tapi belum terdokumentasi.",
+      "hash": "48c99046fc6b36b6593acf6215e8743d8e6b1013e412d194fb8fd2f51d137521",
+      "ukuran_kb": 11.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki Marketing Analytics Service dan bagaimana kontrak request/responsnya (parameter, kode error 400/403/409, konvensi amplop, hari WIB). Menjelaskan cara membaca vonis laba di `/beranda` (lima nilai: tanpa_data, belum_matang, rugi, waspada, sehat) dan arti ambang keputusan (roas_min, cpa_maks), serta cara drill laba/video/retur/affiliate, mengelola price floor, memicu job sync, dan mengambil KPI kinerja toko per karyawan.",
       "kata_kunci": [
         "marketing analytics",
         "endpoint",
-        "beranda vonis",
-        "ambang roas",
-        "profit shops products",
-        "video performance",
-        "returns breakdown",
+        "API",
+        "beranda",
+        "vonis laba",
+        "ambang keputusan",
+        "roas",
+        "cpa",
+        "profit attribution",
         "price floor",
-        "kpi kinerja toko",
-        "job trigger"
+        "kpi kinerja toko"
       ]
     },
     {
@@ -793,7 +794,7 @@
         "README"
       ],
       "hash": "52eb6306aef513055af71556b6d2cdf0f8cf634f9cb922ca007b472e4ecac5d1",
-      "ukuran_kb": 3.3,
+      "ukuran_kb": 3.4,
       "ringkasan": "Menjawab: endpoint Lazada Open API mana yang benar-benar dipanggil ERP, fungsi Go mana yang memakainya, untuk apa, dan seberapa tinggi confidence tiap endpoint (verified-live, verified-by-usage, atau TBD). Juga menjawab bentuk respons sumber retur Lazada yang dipakai produksi dan TBD apa yang masih terbuka soal enum request_type, reverse_status, serta ketersediaan tracking_number.",
       "kata_kunci": [
         "Lazada",
@@ -875,7 +876,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 1.9,
+      "ukuran_kb": 2.0,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -927,7 +928,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1802,20 +1803,22 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "d422dda30a44d5354eb9f9c7e7156fe5f0b622d8f7680ceb787ede240996a73d",
-      "ukuran_kb": 97.2,
-      "ringkasan": "Menjawab: data karyawan apa saja yang dimiliki employee-service dan bagaimana modul-modulnya bekerja, termasuk work_data, kontrak, resign dan mutasi, Surat Peringatan, KPI, serta permission set. Menjelaskan registry sumber data KPI secara rinci: sumber apa saja yang terdaftar, dari service mana masing-masing menarik data, cakupan apa yang tersedia, dan keputusan penyebut tiap metrik.",
+      "hash": "dc2d1f51d8474ef278bfe3989cbf370c86a7ef265e34b3fbc69d20424397f9c9",
+      "ukuran_kb": 97.8,
+      "ringkasan": "Menjawab: service mana yang menjadi sumber kebenaran autentikasi/SSO dan master data karyawan, serta endpoint apa yang menangani login (username, PIN, biometric), onboarding, admin akun (reset, forget-device, roles), dan master department/system role. Menjelaskan pula workspace yang di-host di sini (Legal, R&D Regulatory, Quality, Procurement non-Accurate) beserta gerbang RBAC-nya, plus fitur KPI, contract, BPJS, vacation quota, dan status multi-tenant serta resign.",
       "kata_kunci": [
         "employee service",
-        "karyawan",
-        "work_data",
-        "KPI",
-        "kpi_score",
-        "kontrak",
+        "autentikasi",
+        "SSO",
+        "login",
+        "onboarding",
+        "master data",
+        "system roles",
+        "department",
+        "RBAC",
+        "multi-tenant",
         "resign",
-        "surat peringatan",
-        "sumber KPI",
-        "permission set"
+        "KPI"
       ]
     },
     {
@@ -2162,7 +2165,7 @@
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
       "hash": "7daedec4afd30a470bd4f174af4f96e531dc1444f23379e77d5221a0a276bf94",
-      "ukuran_kb": 63.0,
+      "ukuran_kb": 63.1,
       "ringkasan": "Menjawab: bagaimana WMS manufaktur bekerja, dari master bahan dan produk, stok per gudang, transaksi in/out, formula/BOM, produksi, PO, sampai proposal koreksi dan audit log. Menjelaskan dari mana masing-masing master ditarik (bahan dan angka stok dari Accurate, barang jadi dari data HPP, formula dari Excel), cara kerja push pergerakan WMS ke Accurate lewat outbox beserta kill switch dan akar kegagalan format transDate, serta mekanisme saldo awal dan saldo akhir bulanan yang idempoten. Berguna saat menelusuri kenapa angka stok atau pembukuan penyesuaian tidak cocok.",
       "kata_kunci": [
         "manufacture-service",
@@ -2195,6 +2198,7 @@
         "API - Marketing Analytics Service",
         "IT - Background Jobs & Schedulers",
         "APP - Web ERP",
+        "HRIS - Otomasi Skor KPI",
         "Sales - ICC Affiliate Mapping",
         "Microservices - Insentive Service",
         "Sales - Marketplace Integration",
@@ -2207,25 +2211,24 @@
         "ADR - 0011 Integration Read Cache + Singleflight (Fase 1 Perf)",
         "Sales - GMV Creative",
         "Sales - Marketing Dashboard (Analisis Rekap)",
-        "Sales - Marketing Analytics (Audit Ketersediaan Data)",
-        "HRIS - Otomasi Skor KPI"
+        "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "58a0cc57dea731f924904d6530da3a2702780b62537a059c4982bed9b74c1689",
-      "ukuran_kb": 45.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan service agregasi laba marketing (profit per toko/produk/kampanye/iklan/video/live, beranda, ambang keputusan, harga floor), bagaimana host live mencatat sesinya sendiri lewat /live-shifts dan bagaimana GMV sesi dibagi ke tiap host, serta koleksi mart_* mana yang sudah terisi dan mana yang masih kosong di production. Juga menjelaskan mengapa integration_db dijaga baca-saja tiga lapis dan mengapa /health turun jadi degraded saat index unik gagal dibuat.",
+      "hash": "93ccde556408ed70d681c52ae40b6703677eff81eca71fbb940d957414fb33f5",
+      "ukuran_kb": 46.2,
+      "ringkasan": "Menjawab: bagaimana arsitektur service agregasi laba dan performa marketing bekerja — kenapa integration_db dibaca baca-saja dan dijaga tiga lapis, kenapa /health turun degraded bila index unik gagal, dan bagaimana koleksi mart_* di-prekomputasi oleh penjadwal 48 jam. Menjelaskan detail perancangan vonis laba lima keadaan (termasuk kenapa belum_matang butuh empat iterasi dan ambang materialitas), konvensi hari WIB, channel TikTok/Shopee, alokasi bundel/SKU, dan kejujuran data revenue.",
       "kata_kunci": [
         "marketing analytics",
-        "gross profit",
-        "laba",
-        "mart_profit_attribution",
-        "live shift",
-        "host live",
-        "sesi live",
-        "GMV",
-        "ambang",
-        "ROAS",
-        "price floor",
-        "beranda"
+        "microservice",
+        "mart",
+        "integration_db baca-saja",
+        "vonis laba",
+        "belum matang",
+        "ambang materialitas",
+        "penjadwal sync",
+        "hari WIB",
+        "tiktok",
+        "shopee",
+        "revenue"
       ]
     },
     {
@@ -5707,20 +5710,22 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "eb26a66cfed683cf1dbdd07c408b6b4ced3f7b72994c98732e93a27f79b2bda7",
-      "ukuran_kb": 26.8,
-      "ringkasan": "Menjawab: bagaimana penilaian kinerja berbasis skor KPI bekerja di ERP Bharata, apa beda engine KPI-ke-insentif tim marketing (sudah production) dari appraisal KPI per-karyawan lintas departemen (template per posisi + scoring di employee-service), dan bagaimana skor dihitung, di-snapshot, serta divalidasi terhadap posisi karyawan pada periode yang dinilai. Menjelaskan juga aturan RBAC per departemen, cakupan tim untuk Leader (scope=team berdasarkan bawahan langsung), penggabungan tampilan lintas departemen (mis. HRGA dari master_department.supervised_by), dan arti kolom jumlah karyawan (employee_count) pada tabel template.",
+      "hash": "e6b437244c2e2d1d8cf0ac7845a30376cd2b7f4ea6ec7d34aacad6a50112ea1e",
+      "ukuran_kb": 28.7,
+      "ringkasan": "Menjawab: bagaimana penilaian kinerja berbasis skor KPI bekerja dan perbedaan antara engine KPI→insentif marketing (sudah production, 9 role) dengan appraisal per-karyawan lintas departemen (template per posisi + scoring di Employee Service). Menjelaskan aturan kunci penilaian: posisi template harus cocok dengan jabatan karyawan pada periode dinilai (via employee_movement), RBAC per departemen, cakupan tim untuk Leader (scope=team by supervisor_id), employee_count sebagai assignment aktual, dan tampilan gabungan lintas departemen (HRGA).",
       "kata_kunci": [
         "KPI",
-        "Key Performance Index",
+        "key performance index",
         "appraisal",
         "penilaian kinerja",
-        "insentif",
-        "incentive",
-        "template posisi",
+        "skor",
+        "template KPI",
+        "insentif marketing",
         "scoring",
         "RBAC departemen",
-        "employee_count"
+        "scope team",
+        "employee_movement",
+        "HRGA"
       ]
     },
     {
@@ -5950,18 +5955,21 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "ffa21f436b5edcc7b8704d8b6fe7274d5b46611f41f2e3fef0adb92d2f7619ee",
-      "ukuran_kb": 77.5,
-      "ringkasan": "Menjawab: metrik KPI mana yang sudah benar-benar terisi otomatis di produksi, berapa orang yang tersentuh, dan apa yang masih menghalangi sisanya. Memuat sensus langsung ke database produksi, status tiap batch perubahan, serta catatan kasus yang sudah menggigit seperti PR yang bertanda merged tetapi isinya tak sampai ke main. Melengkapi mekanisme scoring yang dijelaskan dokumen KPI utama.",
+      "hash": "08c64bbea52c514626815f8e81e62464e2029d7ceb1a9932ff5356303f2f14f7",
+      "ukuran_kb": 80.1,
+      "ringkasan": "Menjawab: metrik KPI mana yang bisa diisi otomatis dari data ERP yang sudah ada, mana yang modulnya ada tapi kosong, dan mana yang tak punya sumber sama sekali (klasifikasi 311/362 metrik). Menjelaskan bagaimana mesin otomasi bekerja (blok auto pada kpi_template, sumber nilai, formula reduksi, arah target, cakupan tim/department/perusahaan), status metrik yang sudah menyala, cara HR mengisi konfigurasinya sendiri, layar diagnostik Otomasi KPI, dan syarat urutan penilaian agar skor_tim benar-benar terpakai.",
       "kata_kunci": [
         "otomasi KPI",
-        "skor KPI",
-        "auto_value",
-        "kelayakan otomasi",
-        "sensus produksi",
-        "metrik otomatis",
+        "skor KPI otomatis",
+        "auto-values",
+        "metrik",
         "kpi_template",
-        "HRIS"
+        "sumber data",
+        "cakupan",
+        "skor tim",
+        "otomasi penuh dibekukan",
+        "layar diagnostik",
+        "konektor metrik"
       ]
     },
     {
@@ -7146,7 +7154,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
-      "ukuran_kb": 6.8,
+      "ukuran_kb": 6.9,
       "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
       "kata_kunci": [
         "faktur",
@@ -7236,7 +7244,7 @@
         "QA - CPOB (GMP)"
       ],
       "hash": "dd084ecd166a8c13255bc2dec23c8afb425d4b54827a33168fe80668e2b84898",
-      "ukuran_kb": 15.7,
+      "ukuran_kb": 15.6,
       "ringkasan": "Menjawab: bagaimana dokumen batch produksi (batch release dossier 7 lembar) yang dulu manual dikerjakan di WMS, siapa mengisi bagian mana (admin RM, admin produksi, QC/RnD, PPIC/SPV), dan bagaimana alur DRAFT ke DIAJUKAN ke LULUS atau DITOLAK dijaga di server. Menjelaskan mode pengecekan QC (field milik QC dikunci di form admin dan hanya bisa diisi di layar review), paraf by jabatan lewat roster, serta paraf digital berjenjang per baris yang mengunci approval sampai semua slot terparaf. Berguna untuk memahami isi tiap lembar, penimbangan dan rekonsiliasi, cetak PDF, serta rantai nomor batch dari MO ke Laporan Produksi.",
       "kata_kunci": [
         "dokumen produksi batch",
@@ -7613,7 +7621,7 @@
         "QA - Register Perizinan & Sertifikasi"
       ],
       "hash": "23e3bd168ac5a48c16f9775bbc34e5fedf3ebe1e157b20409e69fdedb7075c5e",
-      "ukuran_kb": 9.1,
+      "ukuran_kb": 9.0,
       "ringkasan": "Menjawab: register mutu apa saja yang sudah ada di ERP divisi Quality — CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing, dan pengecekan raw material — berikut endpoint `/api/employee/quality/*`, collection MongoDB, dan model datanya. Juga menjawab siapa yang boleh mengakses apa (`quality:staff`, `quality:supervisor`, approver produksi & warehouse, staf marketing), bagaimana alur approval CAPA berjalan (Draft → Diajukan → persetujuan Produksi + Warehouse → finalisasi QA), dan aturan alert keterlambatan tiap register (tenggat H-7, Menunggu >3 hari, antrean >24 jam). Menjelaskan pula apa yang belum tersedia: Dashboard Mutu, IPC/Pre-Check/CPPB, dan checklist GMP/kalibrasi/storage.",
       "kata_kunci": [
         "quality",
@@ -7738,7 +7746,7 @@
         "Microservices - Manufacture Service"
       ],
       "hash": "facb437be722b849d4b5b753ebf84a71c3ac771e0b858bf8de443bbb69f3d61d",
-      "ukuran_kb": 8.9,
+      "ukuran_kb": 8.8,
       "ringkasan": "Menjawab: alur persetujuan apa saja yang ada di seluruh ERP Bharata dan siapa yang berwenang memutuskan masing-masing, mulai dari cuti/izin/sakit, perjalanan dinas, koreksi presensi, tukar jadwal, pesanan pembelian dan permintaan barang, payroll run, rekrutmen, dokumen HRD, task management, sampai insentif. Juga menjelaskan tiga cara gerbang approval ditulis (middleware di routes.go, pemeriksaan di dalam handler, dan slot reviewer pada dokumen) sehingga menyapu daftar rute saja menghasilkan kesimpulan salah, siapa yang termasuk wewenang setingkat Direktur lewat common.SetaraDirektur, dan pola cacat berulang berupa orang yang berwenang memutus tapi tak punya layar untuk melihat antreannya.",
       "kata_kunci": [
         "persetujuan",
@@ -9574,7 +9582,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.5,
+      "ukuran_kb": 11.2,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
