@@ -1214,9 +1214,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "6d84a3d931b024b2ed0d15f2903eb5ed90d32e101e76d1fbedb5a92f361bca69",
+      "hash": "2cb6bf15aa3e9300b9e92220f7cd98cd8f49f1e5947dae7daba17e2ca8b1a790",
       "ukuran_kb": 298.3,
-      "ringkasan": "Menjawab: halaman dan modul apa saja yang ada di web ERP One Bharata, siapa yang boleh mengaksesnya (role/permission), dan bagaimana perilaku tiap layar — termasuk panel Shop Sync Status di Integration OAuth (live 2026-08-24), halaman Auto-Sync faktur/retur/penerimaan Accurate beserta badge status scan gudangnya, payroll, presensi, dan KPI. Juga menjawab cara kerja SSO, sidebar, dan i18n dua bahasa.",
+      "ringkasan": "Menjawab: halaman dan modul apa saja yang ada di web ERP One Bharata, siapa yang boleh mengaksesnya (role/permission), dan bagaimana perilaku tiap layar — termasuk panel Shop Sync Status di Integration OAuth, halaman Auto-Sync faktur/retur/penerimaan Accurate beserta badge status scan gudangnya (live 2026-08-24), payroll, presensi, dan KPI. Juga menjawab cara kerja SSO, sidebar, dan i18n dua bahasa.",
       "kata_kunci": [
         "web erp",
         "one bharata",
@@ -2031,9 +2031,9 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "7db73c54ee134dd18ab734f1a9d3cb40d129dba3882a4dee0e99ac8bf12c10ea",
-      "ukuran_kb": 280.3,
-      "ringkasan": "Menjawab: bagaimana integration-service bekerja end-to-end — webhook marketplace, sync order/retur/escrow/wallet, bridging Accurate (faktur/retur/penerimaan harian, sweep rekonsiliasi termasuk pass seed retur tanpa-faktur), worker cron, observability Shopee (success rate, circuit breaker, rate limit), dan status sinkron per toko (live 2026-08-24) yang membuat worker melewati toko banned. Juga mencatat gap yang belum diimplementasikan beserta insiden yang melatarbelakanginya.",
+      "hash": "fd50ecc03d46ea56f8ad199ae4d2c32b83e5c506b6e1cacebaa302e745ef5164",
+      "ukuran_kb": 280.5,
+      "ringkasan": "Menjawab: bagaimana integration-service bekerja end-to-end — webhook marketplace, sync order/retur/escrow/wallet, bridging Accurate (faktur/retur/penerimaan harian, sweep rekonsiliasi termasuk pass seed retur tanpa-faktur yang live 2026-08-24), worker cron, observability Shopee (success rate, circuit breaker, rate limit), dan status sinkron per toko yang membuat worker melewati toko banned. Juga mencatat gap yang belum diimplementasikan beserta insiden yang melatarbelakanginya.",
       "kata_kunci": [
         "integration service",
         "marketplace",
@@ -2045,6 +2045,7 @@
         "cron",
         "retur",
         "sweep",
+        "tanpa faktur",
         "toko nonaktif",
         "success rate"
       ]
