@@ -1801,24 +1801,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "20bdce36c48b6c216c8ab61e475caa5672a09f19b6cf8a9871bf4f9b050b8b77",
+      "hash": "0edb78cf6acb9c6330c15658a12854e5e358b6070ce7917b41d771a199a575df",
       "ukuran_kb": 93.6,
-      "ringkasan": "Menjawab: bagaimana autentikasi/login, onboarding, dan master data karyawan ditangani, serta endpoint apa saja yang tersedia (~85 route) termasuk auth (login/PIN/biometric/refresh), account admin IT, master department/system role, KPI, contract, dan BPJS. Menjelaskan bahwa service ini sumber kebenaran SSO dan meng-host workspace posisi Legal, R&D Regulatory, Quality (CAPA/incoming/batch release), dan Procurement non-Accurate. Berguna untuk memahami di mana `is_active` ditulis, gerbang RBAC (RequireITStaff/RequireHRISOrITSupervisor dll), dan status multi-tenant serta resign.",
+      "ringkasan": "Menjawab: bagaimana login/registrasi/SSO karyawan bekerja (username, employee_id, PIN, biometric), endpoint apa saja yang mengelola akun (reset, forget-device, roles), serta di mana master data department & system role dikelola. Juga menjelaskan bahwa service ini menampung workspace Legal, R&D Regulatory, Quality, dan Procurement non-Accurate, dan bagaimana masing-masing digerbang RBAC.",
       "kata_kunci": [
         "employee service",
-        "autentikasi",
         "login",
-        "onboarding",
         "SSO",
-        "master data",
-        "department",
+        "autentikasi",
+        "onboarding",
         "system roles",
-        "KPI",
-        "account admin",
-        "legal",
-        "quality CAPA",
-        "RBAC",
-        "resign"
+        "master data department",
+        "PIN",
+        "biometric",
+        "reset akun"
       ]
     },
     {
@@ -5882,20 +5878,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "3c88ec629c52d101ca395adfe6547b72a327188b1a46a1243955a69529e655e9",
-      "ukuran_kb": 79.1,
-      "ringkasan": "Menjawab: metrik KPI mana yang bisa diisi otomatis dari data ERP yang sudah ada (vs modul ada tapi data kosong, vs tanpa sumber sama sekali), bagaimana mesin reduksi/arah target/scope bekerja, dan kenapa nilai muncul sebagai usulan yang harus ditekan supervisor. Menjelaskan juga syarat urutan penilaian agar otomasi bulan berjalan benar-benar terpakai (anggota tim dinilai dulu sebelum Leader/Supervisor karena snapshot kpi_score beku), perbedaan cakupan penuh (otomatis) vs parsial (semi), serta layar diagnostik Otomasi KPI untuk melihat metrik mana yang macet dan sebabnya. Melengkapi HRIS - Key Performance Index yang menjelaskan mekanisme scoring-nya.",
+      "hash": "44e7ee61424e4ae71c2bbbc0d27d2b3b162990ec7b0ea8e5e3f89b92c97ce4f4",
+      "ukuran_kb": 79.4,
+      "ringkasan": "Menjawab: metrik KPI mana yang bisa diisi otomatis dari data ERP yang sudah ada, mana yang modulnya ada tapi belum berdata, dan mana yang tanpa sumber sama sekali. Menjelaskan cara kerja mesin otomasi (sumber nilai, formula reduksi, arah target, scope tim/departemen), status `auto`/`semi`/`manual`, syarat urutan penilaian agar `skor_tim` terpakai, serta layar diagnostik Otomasi KPI.",
       "kata_kunci": [
         "KPI",
         "otomasi skor",
         "auto-values",
         "kpi_template",
         "kpi_score",
-        "Employee Service",
-        "supervisor scoring",
         "skor tim",
-        "uptime",
-        "ICC"
+        "uptime sistem",
+        "ICC",
+        "metrik otomatis",
+        "diagnostik KPI"
       ]
     },
     {
