@@ -62,6 +62,20 @@ Menolak: tanggal lampau, penulisan lintas perusahaan, departemen di luar cakupan
 
 > Opsi enum via `/data-type/:dt`: `business-trip-type`, `business-trip-transport`, `business-trip-accommodation`. Anggaran = estimasi (tanpa Finance). Detail: [[HRIS - Perjalanan Dinas]].
 
+## Pengganti pada pengajuan (2026-08-22)
+Satu endpoint melayani **cuti dan perjalanan dinas**, dibedakan query `type` — dua endpoint terpisah berarti dua tempat yang harus sejalan. Grounded ke `services/attendance/replacement.go`.
+
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| GET | `/replacement-candidates` | Rekan yang boleh ditunjuk menggantikan pemohon. `?type=leave\|business-trip` + `?id=<hex>` (wajib keduanya; selain itu **400**). Balas `{ data[], reason }` — `data[]` = `EmployeeSlice` (`employee_id`, `full_name`, `department`, `position`) | header; hanya **peninjau pengajuan itu** (filter sama dengan endpoint review) → selain itu **403** |
+
+- **`reason` SELALU dikirim**, termasuk saat daftar terisi (nilainya string kosong). Tiga sebab daftar kosong menuntut tindakan berbeda dan ketiganya terlihat sama bila klien cuma menampilkan daftar kosong: pemohon berjadwal shift, daftar karyawan tak dapat dimuat, atau memang tak ada rekan seposisi.
+- **503** bila database belum siap (penjaga `mongodb.GetCollection == nil`; tanpa itu paniknya keluar sebagai 502 tanpa petunjuk).
+- `PATCH /request/review` dan `PATCH /business-trip/review` menerima field opsional **`replacement_employee_id`**, dibaca **hanya pada cabang SPV**. Nilai yang tak lolos validasi dibalas **400** dengan alasannya; tidak dikirim = perilaku persis seperti sebelum fitur ini ada. Dokumen pengajuan bertambah field `replacement` (`omitempty`) berisi salinan `employee_id`/`full_name`/`department`/`position` + `assigned_by`/`assigned_at`.
+- ⚠️ Kandidat diambil dari [[Microservices - Employee Service]] `/list?type=employee`, yang membaca perusahaan dari **header** (`EffectiveCompanyID`) — **bukan** query `company_id` seperti cabang `type=supervisor`. Karena itu `routes.InternalRequest` dipanggil dengan `*fiber.Ctx`, bukan `nil`; dengan `nil` header tak diteruskan dan kandidatnya diam-diam berasal dari perusahaan default.
+
+Aturan lengkap + yang sengaja belum dibuat: [[HRIS - Employee Request & Approval]].
+
 ## HR requests terpadu (lintas jenis)
 Ringkasan/detail **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar) dari satu endpoint — FE reuse satu kartu + stepper. Grounded ke `hr_admin.go` (`handleMyRequests`/`handleHRRequestsList`/`handleHRRequestDetail`).
 
@@ -86,6 +100,22 @@ Ringkasan/detail **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar) dari sat
 | GET | `/internal/late-recap` | ✅ merged & hidup di prod (diverifikasi 2026-08-14). Jumlah telat **per karyawan** satu periode, untuk usulan SP1 di [[HRIS - Disciplinary (Surat Peringatan)]]. `?period=YYYY-MM` (wajib, 400 bila tak terurai) · `?min=` (bawaan 1). Periodenya **26 bulan lalu sampai 25 bulan ini**, dihitung `rentangPeriodeTelat` yang sama dengan `/history?late=true` supaya tak lahir dua angka "telat bulan ini". Balasan `{period, from, to, min, data[]{employee_id, late_count}}`, `data` selalu slice non-nil. Menghormati `?company=` bagi admin pusat.<br>⚠️ **Belum merged** (`feat/attendance-telat-berpotongan`): yang dihitung hanya `status = Terlambat` **DAN** `late_hour > 0`, jadi keterlambatan di dalam toleransi tak lagi masuk. Penyaring yang sama berlaku di `/history?late=true` | HRIS |
 
 **`/internal/` bukan berarti privat** pada tabel di atas: gateway tetap meneruskannya dari internet, jadi tiap rute memeriksa identitas pemanggilnya sendiri. `/internal/late-recap` memaparkan siapa saja yang sering terlambat di seluruh perusahaan, karena itu digerbang `RequireHRISStaff`.
+
+## KPI (panggilan mesin)
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| GET | `/kpi/attendance` | Rekap kedisiplinan **per karyawan** satu periode, untuk sumber `kedisiplinan_absensi` di [[Microservices - Employee Service]] | `?key=` = `ATTENDANCE_SERVICE_KEY` |
+
+Parameter **semuanya wajib**: `periode` (`YYYY-MM`), `company_id`, `employee_id` (dipisah koma, maksimum **200** per permintaan), `key`. Yang kurang dibalas 400; `employee_id` melebihi batas juga 400 dan bukan dipotong diam-diam, supaya tak ada angka yang terlihat lengkap untuk sebagian orang saja.
+
+Balasan `{"data": {periode, dari, sampai, data: [...]}}`. `dari`/`sampai` dikirim eksplisit karena batasnya **siklus payroll 26→25**, bukan bulan kalender, dan tebakan paling wajar justru yang salah. Tiap baris membawa `employee_id`, `hari_kerja`, `tepat_waktu`, `terlambat`, `tanpa_keterangan`, `pending`.
+
+- **`hari_kerja` = hari yang MENUNTUT kehadiran**, memakai definisi yang sama persis dengan kartu Kehadiran (`statusTakDihitung`). Cuti, izin, sakit, dinas, dan seluruh hari libur tidak masuk: semuanya sah menurut Peraturan Perusahaan Pasal 15-18, dan menghitungnya sebagai kegagalan membuat angka turun justru ketika orang menempuh prosedur yang benar.
+- **`pending` dipisah, tidak masuk `hari_kerja`.** Ia berarti belum diputuskan, bukan belum hadir. Dikirim terpisah justru karena itu: bagi metrik ketuntasan administrasi, sisa `Pending` adalah pekerjaan yang belum selesai. Satu angka jadi gangguan bagi satu metrik dan pokok bagi metrik lain.
+- **`employee_id` yang tak punya entri tetap dikirim sebagai baris nol**, bukan dihilangkan.
+- Status yang **belum dikenal** masuk `hari_kerja`, sengaja: mengabaikannya membuat kategori baru menghilang dari penyebut tanpa seorang pun sadar sehingga persentasenya naik sendiri.
+
+⚠️ Auth-nya **kunci layanan di query, bukan RBAC modul**, sebab pemanggilnya mesin tanpa JWT. Kunci kosong menutup rute (401), bukan membukanya. Nilainya wajib sama dengan yang dipasang di blok employee-service.
 
 ## Dokumen Terkait
 - [[Microservices - Attendance Service]] · [[HRIS - Leave Request]] · [[HRIS - Tukar Jadwal Kerja]] · [[HRIS - Attendance Correction]] · [[HRIS - Perjalanan Dinas]] · [[HRIS - Payroll]] · [[HRIS - Disciplinary (Surat Peringatan)]] · [[API - Index]]

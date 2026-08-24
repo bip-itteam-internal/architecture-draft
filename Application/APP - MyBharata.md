@@ -64,6 +64,7 @@
 - **Vacation Quota**: lihat sisa kuota cuti
 - **Check Permission / Verify Leaves**: verifikasi/approval pengajuan (untuk HR/atasan)
 - **Review Submission** (peninjau): inbox **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar) dalam satu daftar via `/hr/requests` (`?as=reviewer` antrian / `reviewed` sudah); detail fetch-on-tap via `/hr/requests/detail`. "Aktivitas Saya" & kartu beranda "menunggu persetujuan" juga pakai endpoint terpadu (`/requests/mine`, `/hr/requests`). Kontrak: [[API - Attendance Service]]
+- **Pengganti** (2026-08-22): sheet Setujui memuat kolom "Pengganti (opsional)" untuk **Izin/Cuti/Sakit dan Dinas**, dan hanya di **tahap atasan** — digerbang `ReviewerActionPolicy.isSpvStage`, bukan `canReview`, sebab HRD lolos `canReview` tetapi server menolak penunjukan darinya. Daftar kandidat datang dari `/replacement-candidates`; saat kosong yang ditampilkan adalah `reason` dari server, bukan kalimat sendiri. Pengganti yang sudah ditunjuk tampil di layar detail berikut keterangan kapan ia diberi tahu. Tukar Jadwal & Koreksi tidak memakai kolom ini. Aturannya: [[HRIS - Employee Request & Approval]]
 
 ### Lembur (Overtime)
 - Pengajuan lembur (form tanggal, alasan, upload file) dengan alur **approval SPKL** oleh supervisor

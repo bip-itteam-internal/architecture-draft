@@ -33,7 +33,7 @@ Empat aturan yang mengikat:
 
 **3. Jabatan yang ambigu TIDAK ditebak.** Menebak berarti melebarkan hak diam-diam: arah kesalahan yang tak punya gejala sama sekali.
 
-**4. Bentuk kanonik yang dipakai adalah `common.KanonPosisi`** — sama dengan `positionSetKeys` dan `/me/menu-hidden`. Membuatnya lebih longgar berarti satu jabatan bisa cocok di satu tempat dan tidak di tempat lain, yaitu kelas bug yang justru sedang diperbaiki. Batas itu dikunci uji.
+**4. Bentuk kanonik yang dipakai adalah `common.KanonPosisi`** — sama dengan `positionSetKeys`. Membuatnya lebih longgar berarti satu jabatan bisa cocok di satu tempat dan tidak di tempat lain, yaitu kelas bug yang justru sedang diperbaiki. Batas itu dikunci uji. (Semula `/me/menu-hidden` juga ikut disebut sebagai permukaan ketiga; rutenya dicabut 2026-08-22 lewat [[ADR - 0051 Pencabutan Tampilan Menu per Posisi]], tetapi tuntutan kanon bersama tidak ikut hilang.)
 
 Sakelar `ROLE_FROM_POSITION=off` mengembalikan perilaku lama tanpa deploy kode.
 

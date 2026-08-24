@@ -58,7 +58,7 @@ Yang tidak lolos **dilewati utuh** dan dicoba lagi esok hari, tidak dibekukan se
 
 **Yang sengaja tidak dilakukan:**
 
-- **Cakupan otomasi se-perusahaan.** KPI SPV HRD berbunyi "seluruh karyawan", sementara `KPIAutoScopes` hanya mengenal `department`, `team`, `individu`, `tim_icc`. Metrik itu tetap diisi manusia.
+- ~~**Cakupan otomasi se-perusahaan.** KPI SPV HRD berbunyi "seluruh karyawan", sementara `KPIAutoScopes` hanya mengenal `department`, `team`, `individu`, `tim_icc`. Metrik itu tetap diisi manusia.~~ **SUDAH TIDAK BERLAKU sejak 2026-08-22** ([#1379](https://github.com/bip-itteam-internal/bip-erp/pull/1379)): cakupan **`perusahaan`** kini ada dan lolos validator, ditambahkan justru karena dua metrik HRGA yang sasarannya seluruh orang akan salah cakupan bila dipaksakan ke `department`. Sengaja bukan nilai bawaan: cakupan ini menjadikan satu orang tanggung jawab atas perilaku ratusan orang, jadi harus dipilih sadar. Yang **tetap** berlaku dari butir ini: adanya cakupan itu tidak dengan sendirinya membuat metriknya otomatis, karena `Target` dan reduksinya tetap diisi manusia.
 - **Kewajiban mengisi alasan saat menimpa.** `value != auto_value` sudah cukup jadi jejak.
 
 **Risiko yang dijaga kode, bukan oleh kebiasaan:**

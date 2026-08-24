@@ -14,8 +14,13 @@ Ditambahkan 2026-08-11, grounded ke `origin/main` bip-erp. Bab ini **tidak mengu
 | `kaizen_ide_diajukan`, `kaizen_ide_diterapkan` | `kpi_sumber_kaizen.go` | `FORM_BUILDER_MODULE_URL` — [[Microservices - Form Builder Service]] |
 | `kinerja_toko` (7 metrik) | `kpi_sumber_kinerja_toko.go` | `MARKETING_ANALYTICS_MODULE_URL` — [[Microservices - Marketing Analytics Service]] |
 | `kinerja_tiket` (3 metrik) | `kpi_sumber_tiket.go` | `TASK_MANAGEMENT_MODULE_URL` — [[Microservices - Task Management Service]] |
+| `kedisiplinan_absensi` (2 metrik) | `kpi_sumber_kedisiplinan.go` | `ATTENDANCE_MODULE_URL` + `ATTENDANCE_SERVICE_KEY` — [[Microservices - Attendance Service]] |
 
 Ditambah `skor_tim` yang membaca `kpi_score` employee-service sendiri (bukan konektor keluar), dan `akurasi_aset_ga` (`kpi_sumber_aset.go`) yang menarik dari **dua** modul sekaligus (inventory dan integration) — jadi begitu ia masuk, hitungannya menjadi enam.
+
+**Per 22 Agustus 2026 hitungannya bertambah lagi**, dan justru ke arah yang membuat pertanyaan di bawah makin tajam. PR [#1379](https://github.com/bip-itteam-internal/bip-erp/pull/1379) menambah tiga sumber sekaligus: `kedisiplinan_absensi` (konektor keluar, sudah masuk tabel), plus `turnover_karyawan` (`kpi_sumber_turnover.go`) dan `kontrak_karyawan` (`kpi_sumber_kontrak.go`) yang **membaca `employee_db` sendiri** sehingga bukan konektor keluar. Total sumber terdaftar kini **18**, diverifikasi lewat `GET /kpi/sumber-katalog` di produksi.
+
+Yang menarik dari ketiganya: dua di antaranya tidak menambah beban lintas-service sama sekali, dan yang satu memakai ulang pipeline HTTP yang polanya sudah ada. Ongkos yang dikhawatirkan ADR ini tetap tidak muncul.
 
 **Yang belum diputuskan: apakah angka tiga masih pemicu yang bermakna.** Dua pemicu lainnya belum terpenuhi — tak ada penjadwalan di luar siklus HR (perhitungan tetap on-read, tak ada cron KPI), dan employee-service belum menyimpan kredensial non-HR (yang dipegangnya hanya kunci layanan per-service, bukan token iklan atau kredensial Accurate). Ongkos yang dikhawatirkan ADR ini ternyata tidak muncul: tiap konektor adalah satu berkas `kpi_sumber_*.go` yang tak menyentuh berkas milik orang lain, dan registry `DaftarkanSumber` memang dirancang supaya begitu. **TBD**: apakah pemicu konektor dicabut dan diganti pemicu yang benar-benar mengukur beban (mis. lama respons `GET /kpi/auto-values`, atau jumlah panggilan HTTP serial per permintaan), atau pemisahan memang dijalankan sekarang.
 
