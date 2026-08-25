@@ -357,6 +357,8 @@ Empat contoh nyata, semuanya bertipe sama: salah yang tidak menimbulkan error.
 - [ ] Sudah dijalankan **sekali lewat gateway** sungguhan, bukan hanya lokal
 - [ ] Merge-nya terbukti sampai `main`: `git merge-base --is-ancestor <merge-commit> origin/main`, atau berkasnya benar-benar ada di `origin/main`. Tanda **MERGED** di GitHub tidak cukup — PR yang `base`-nya menunjuk branch fitur lain kehilangan seluruh isinya bila branch dasarnya di-merge lebih dulu (terjadi nyata pada PR #1058, lihat [[HRIS - Otomasi Skor KPI]])
 - [ ] Metriknya dibuka di layar **Otomasi KPI** (`/hris/kpi/otomasi`) dan berstatus `otomatis` atau `semi` — bukan `manual`
+- [ ] **Label dan keterangannya diisi di kamus, di DUA locale** ([[REF - Penamaan Metrik & Sumber KPI]]). Sumber tanpa entri tidak hilang — ia jatuh ke perapian token (`kinerja_po_marketing` → "Kinerja po marketing") **tanpa keterangan sama sekali**, dan pengisi tak punya cara tahu sumbermu menghitung apa. Per 2026-08-25 separuh katalog (10 dari 20 sumber) berada dalam keadaan itu; jangan menambah yang kesebelas
+- [ ] Labelnya **dilihat di layar**, bukan di editor: pemilih Sumber data selebar `w-60`, dan label di atas ±28 karakter terpotong di sana
 
 Butir terakhir adalah cara termurah membuktikan metrikmu benar-benar hidup untuk **semua** orang di posisi itu, bukan cuma untuk satu karyawan yang kebetulan kamu uji. Statusnya `semi` bukan kegagalan — itu berarti angkanya nyata tetapi cakupan datanya parsial, dan layar itu menyebutkan berapa persen. Yang harus membuat berhenti adalah `manual`: berarti hitungannya gagal, dan sebabnya sudah tertulis di kolom keterangan.
 
@@ -372,3 +374,4 @@ Butir kedua dari terakhir bukan formalitas. Perbandingan itulah yang menemukan b
 - [[Microservices - Employee Service]] (pemilik `kpi_template` dan `kpi_score`)
 - [[Microservices - Integration Service]] · [[Microservices - Marketing Analytics Service]] (calon sumber data marketing)
 - [[HRIS - Organization Structure]] (cakupan departemen dan atasan langsung)
+- [[REF - Penamaan Metrik & Sumber KPI]] (aturan label & keterangan; bagian dari checklist di atas)

@@ -33,6 +33,11 @@ Dua departemen di `work_data` **tidak muncul di sini karena belum punya template
 
 ## Cacat yang sudah diketahui
 
+> Aturan penamaan yang seharusnya berlaku (label menyebut yang diukur bukan targetnya,
+> nomor tanpa makna dilarang, keterangan wajib) ada di
+> [[REF - Penamaan Metrik & Sumber KPI]]. Baris-baris di bawah adalah contoh
+> pelanggarannya yang benar-benar terpasang di produksi hari ini.
+
 Beberapa baris di bawah memang cacat di datanya, dan sengaja disalin apa adanya supaya terlihat:
 
 - **Template uji ikut produksi.** `Beauty Hacks / Buzzer / Buzzer` berisi satu metrik berlabel `contoh` berbobot 1.0, sehingga posisi Buzzer punya dua template.
