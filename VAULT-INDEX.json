@@ -2214,22 +2214,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "85c67d1f62153d02b6d71b87cde6fff1e8fe227991d78d560a790c0154929602",
-      "ukuran_kb": 47.0,
-      "ringkasan": "Menjawab: bagaimana laba dan performa marketing diagregasi per toko, produk, kampanye, iklan, video, dan live, dan bagaimana hasil pre-agregasi disimpan di koleksi mart_* agar dashboard tidak menghitung ulang tiap request. Menjelaskan aturan vonis laba pada halaman /beranda (lima keadaan termasuk belum_matang dan ambang materialitas), konvensi tanggal WIB-sebagai-UTC, prinsip baca-saja integration_db (tiga lapis penjaga), dan kejujuran data revenue TikTok vs Shopee. Berguna untuk pertanyaan soal ambang ROAS/CPA, pencatatan sesi live host, dan penjadwal sync 48 jam.",
+      "hash": "06ee43071491b8cb4e249a6c09a1c6083d3d2a8228cf8d1f7f030f526b338172",
+      "ukuran_kb": 47.1,
+      "ringkasan": "Menjawab: bagaimana laba dan performa marketing per toko/produk/kampanye/iklan/video/live diagregasi, kenapa dashboard tidak menghitung ulang tiap request (koleksi pre-agregasi mart_*), dan bagaimana vonis laba di /beranda ditentukan lewat lima keadaan (tanpa_data, belum_matang, rugi, waspada, sehat) beserta ambang materialitasnya. Menerangkan juga aturan baca-saja integration_db yang dijaga tiga lapis, konvensi tanggal 'hari WIB sebagai tengah malam UTC', channel TikTok/Shopee/Lazada, penjadwal internal 48 jam, serta apa yang masih stub/kosong.",
       "kata_kunci": [
         "marketing analytics",
-        "profit",
-        "laba",
+        "laba marketing",
+        "profit attribution",
         "mart",
         "ROAS",
         "CPA",
-        "ambang",
-        "beranda",
+        "beranda dashboard",
+        "TikTok Shopee Lazada",
         "live session",
-        "dashboard marketing",
-        "pre-agregasi",
-        "belum matang"
+        "price floor"
       ]
     },
     {
@@ -4100,7 +4098,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Diputuskan 2026-08-20, kode selesai, BELUM merge dan BELUM deploy.** Branch `feat/kpi-skor-otomatis` (bip-erp) dan `feat/kpi-bulan-berjalan` (erp-frontend).",
+      "status_teks": "**Diputuskan 2026-08-20, kode selesai.** Branch `feat/kpi-skor-otomatis` (bip-erp) dan `feat/kpi-bulan-berjalan` (erp-frontend).",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
@@ -4109,18 +4107,20 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "HRIS - Key Performance Index"
       ],
-      "hash": "f286b81595297dd3d6f62870ca6b15de6b271f54b761c98e1e54398d8167cbac",
-      "ukuran_kb": 6.7,
-      "ringkasan": "Menjawab: kapan skor KPI seseorang dibekukan sistem tanpa menunggu supervisor menilai, dan syarat apa yang harus dipenuhi sebuah template agar itu terjadi. Menjelaskan mengapa posisi yang otomasinya hanya sebagian sengaja tidak difinalisasi, bagaimana cron-nya dijadwalkan relatif terhadap mutasi, dan cakupan mana yang tersedia untuk metrik yang sasarannya seluruh karyawan.",
+      "hash": "66f83fa520368bbd2f2b4e432d2f57b675c1be1b23b6b55754eefda1addffd44",
+      "ukuran_kb": 7.8,
+      "ringkasan": "Menjawab: kenapa dan bagaimana skor KPI posisi yang seluruh metriknya otomatis dibekukan sistem tanpa menunggu supervisor menekan Simpan, siapa yang terdampak (30 orang ICC otomasi penuh), dan pada tanggal berapa finalisasi terjadi (default tanggal 1, Finance tanggal 5). Menjelaskan empat gerbang finalisasi, bagaimana bulan berjalan dihitung hidup sampai beku, cara supervisor tetap menimpa, dan konsekuensi terhadap pembacaan kpi_score. Menerangkan juga risiko yang dijaga kode: jabatan per-periode, idempotensi $setOnInsert, dan resolusi company_id per orang.",
       "kata_kunci": [
-        "ADR",
-        "KPI otomatis",
-        "finalisasi",
-        "beku",
-        "skor KPI",
-        "cron",
-        "cakupan",
-        "scope perusahaan"
+        "KPI",
+        "skor KPI otomatis",
+        "kpi_score",
+        "finalisasi KPI",
+        "tanggal beku",
+        "cron KPI",
+        "ADR 0048",
+        "otomasi penuh",
+        "ICC",
+        "employee service"
       ]
     },
     {
@@ -5956,20 +5956,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "b3d04414e41ae7f0aadef4806919ff59bc601d71100c4ade6b00c0b7b47768f3",
-      "ukuran_kb": 80.2,
-      "ringkasan": "Menjawab: metrik KPI mana yang skornya bisa diisi otomatis dari data ERP yang sudah ada, mana yang modulnya ada tapi datanya kosong, dan mana yang tidak punya sumber sama sekali (klasifikasi 311/362 metrik). Menjelaskan cara kerja otomasi (sumber nilai, formula reduksi, scope, arah target, cakupan penuh vs parsial menghasilkan status otomatis/semi/manual), metrik mana yang sudah menyala di produksi, dan kenapa 30 orang di posisi otomasi penuh dibekukan sistem. Juga menjawab: bagaimana HR mengisi konfigurasi otomasi sendiri, layar diagnostik Otomasi KPI untuk melihat metrik yang macet, dan urutan penilaian yang wajib (anggota tim dulu baru Leader/Supervisor).",
+      "hash": "2f7cdcf033df3b8f6ea7cdfbab2115212ba5f1caba225f4b93be674d400caa9e",
+      "ukuran_kb": 80.3,
+      "ringkasan": "Menjawab: dari seluruh metrik KPI yang terpasang di produksi, mana yang sudah bisa diisi otomatis dari data ERP, mana yang modulnya ada tapi datanya kosong, dan mana yang tidak punya sumber sama sekali. Menjelaskan metrik auto yang sudah menyala, cara kerja auto_value/auto_basis (otomatis vs semi vs manual), jebakan urutan penilaian skor_tim, layar diagnostik Otomasi KPI, dan bagaimana HR mengisi konfigurasinya sendiri. Berguna untuk menilai kelayakan dan status otomasi scoring per departemen serta gap sumber datanya.",
       "kata_kunci": [
-        "KPI",
-        "otomasi skor KPI",
-        "auto-values",
+        "otomasi KPI",
+        "auto value",
         "kpi_template",
-        "kpi_score",
-        "Employee Service",
-        "ICC",
         "skor tim",
-        "Otomasi KPI",
-        "matriks KPI departemen"
+        "metrik otomatis",
+        "sumber data KPI",
+        "KPI ICC",
+        "uptime_sistem",
+        "HRGA",
+        "kandidat otomasi"
       ]
     },
     {
@@ -6545,6 +6545,7 @@
       "status_teks": "Implemented — 47 job terjadwal + 1 dispatcher webhook (+1 job background PERTAMA manufacture 2026-08-20, sweep konfirmasi retur macet, **DORMANT** — lihat tabel) (+1 penjadwal internal marketing-analytics 2026-08-01, **LIVE** — service itu sebelumnya tanpa scheduler sama sekali; per audit kode 2026-08-01: +19 job integration yang sebelumnya belum tercatat — rumpun Accurate (stock/aset/opex refresh, sweep faktur/retur/receipt, receipt-sync, sample-shipping-expense, anomali retur), rekonsiliasi (statement TikTok, income Lazada, status order, retur TikTok), resi (enrich cancel/reverse, safety-net WMS), wallet-sync, seed-mapping, guardian stale-toship; +4 job integration ditambahkan 2026-07-11: affiliate Shopee AMS performance/conversion & WMS resi bridge `sync-resi-wms`/`sync-shopee-tracking`; +1 guardian order Shopee `sync-shopee-orders` 2026-07-14, **belum deploy**; +1 guardian retur Shopee `sync-shopee-returns` 2026-07-15 & +1 guardian retur TikTok `recover-tiktok-returns` 2026-07-16 — memicu booking Retur Penjualan yang selama ini tak pernah menyala, **belum deploy**; +1 sync ulasan marketplace `sync-reviews` 2026-07-19 harian 06:45, **LIVE**; +3 job Packet Tracking `sync-tracking`/`detect-stuck`/`sync-return-tracking` 2026-07-17..18 — checkpoint pengiriman forward+retur & deteksi mandek, **LIVE**). *3 job reminder attendance (koreksi/leave/tukar jadwal) + auto-ignore koreksi & tukar jadwal + pre-alokasi sadar-swap dari **PR #165** — belum rilis ke prod.*",
       "publik": false,
       "tautan": [
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "External - Desty",
         "Microservices - Integration Service",
@@ -6561,19 +6562,20 @@
         "Microservices - Task Management Service",
         "Sales - Marketplace Integration"
       ],
-      "hash": "498ea6761d785e659502fd2f5a0d1f5590a3cf1e0df311b861307338a76223bf",
-      "ukuran_kb": 28.5,
-      "ringkasan": "Menjawab: cron/scheduler/worker apa saja yang berjalan diam-diam di tiap service bip-erp, kapan jadwalnya, untuk apa, dan mekanisme lock-nya (Mongo cron_locks, Redis, in-process). Berguna saat debugging proses latar belakang yang tak terlihat dari API, perencanaan kapasitas, atau memastikan job baru (mis. guardian Shopee, sweep konfirmasi retur manufacture) sudah atau belum live di prod. Mencakup juga job dead-code yang sudah dicabut agar tak disangka masih berjalan.",
+      "hash": "cfccbacee4b24c48f569f1da0e54de6724e4aacdd2bd56d06917fe0f2d1567f7",
+      "ukuran_kb": 29.0,
+      "ringkasan": "Menjawab: proses latar belakang apa saja yang berjalan diam-diam di bip-erp (cron, scheduler, worker), kapan tiap job jalan, di service mana, untuk apa, dan lock apa yang dipakainya. Berguna saat debugging, perencanaan kapasitas, atau mengubah service agar tak ada 'sistem tersembunyi' yang terlewat. Memuat inventaris grounded per service (employee, attendance, insentive, manufacture, marketing-analytics, integration, notification, task-management) beserta jadwal WIB, sintaks cron, status deploy, dan mekanisme lock (Redis/Mongo/in-process).",
       "kata_kunci": [
-        "cron",
-        "scheduler",
         "background job",
+        "scheduler",
+        "cron",
         "worker",
+        "job terjadwal",
         "lock",
-        "Redis",
-        "cron_locks",
-        "guardian",
-        "webhook dispatcher"
+        "webhook consumer",
+        "sync integration",
+        "Asia/Jakarta WIB",
+        "robfig cron"
       ]
     },
     {
