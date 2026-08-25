@@ -507,7 +507,7 @@ Batas service dan kepemilikan datanya diputuskan di [[ADR - 0032 Kepemilikan kpi
 13. Field skor dan survei kepuasan pada modul Training (4 metrik).
 14. Checklist operasional berjadwal untuk patroli, 5R, GMP, dan preventive maintenance. Satu modul menutup General Affair, Quality, dan Warehouse sekaligus (kurang lebih 20 metrik). Lihat [[GA - Checklist Management]].
 
-**Yang sebaiknya tetap manual**: kurang lebih 36 metrik memang subjektif. Untuk kelompok ini yang perlu diperbaiki adalah rubrik penilaian, bukan otomasi; fitur lampiran bukti `/kpi/evidence` sudah tepat sasaran.
+**Yang sebaiknya tetap manual**: kurang lebih 36 metrik memang subjektif. Untuk kelompok ini yang perlu diperbaiki adalah rubrik penilaian, bukan otomasi; fitur lampiran bukti `/kpi/evidence` sudah tepat sasaran. 🟡 **Sejak PR bip-erp [#1406](https://github.com/bip-itteam-internal/bip-erp/pull/1406) + erp-frontend [#1195](https://github.com/bip-itteam-internal/erp-frontend/pull/1195) (belum merge), karyawan mengunggah laporannya sendiri dari laman KPI Saya** — untuk metrik bertipe "upload laporan" (Junior/Senior Accountant: laporan keuangan, rekonsiliasi, pajak) alurnya jadi: karyawan unggah → atasan tinjau di modal Score (kini dengan tanggal unggah) → atasan nilai 1–100 × bobot. **Menilai = menyetujui**; tak ada status approve per-file. Yang penting untuk otomasi ke depan: `uploaded_at` vs tenggat deskripsi ("max tgl 4/7 bulan berikutnya") adalah data yang bisa diotomasi persis seperti `penjualan_tuntas_cutoff_persen` — alur unggah ini **pabrik datanya**, otomasi "laporan tepat waktu" menyusul setelah datanya terkumpul beberapa bulan.
 
 ## Catatan Akurasi
 
