@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-24",
+  "digenerate": "2026-08-25",
   "jumlah_dokumen": 296,
   "dokumen": [
     {
@@ -379,8 +379,8 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "632cc88e6c18ff8ef6b436c08198952df7dfeb9bf65340886bebb197cf38a445",
-      "ukuran_kb": 59.5,
+      "hash": "879e2ad21b3bdc2229674eca2fd051189d766ea4a55c86f3979b894869d09592",
+      "ukuran_kb": 61.0,
       "ringkasan": "Menjawab: endpoint apa saja yang dimiliki integration-service (order, retur, tracking, wallet, reviews, Accurate, profit, status sinkron toko) beserta parameter, caveat, dan konsumennya. Termasuk rute /shops/* (live 2026-08-24) untuk menonaktifkan toko banned dari sync dan membaca riwayat statusnya, serta mana endpoint yang di-cache rescache dan mana yang sengaja tidak.",
       "kata_kunci": [
         "endpoint integration",
@@ -794,7 +794,7 @@
         "README"
       ],
       "hash": "52eb6306aef513055af71556b6d2cdf0f8cf634f9cb922ca007b472e4ecac5d1",
-      "ukuran_kb": 3.4,
+      "ukuran_kb": 3.3,
       "ringkasan": "Menjawab: endpoint Lazada Open API mana yang benar-benar dipanggil ERP, fungsi Go mana yang memakainya, untuk apa, dan seberapa tinggi confidence tiap endpoint (verified-live, verified-by-usage, atau TBD). Juga menjawab bentuk respons sumber retur Lazada yang dipakai produksi dan TBD apa yang masih terbuka soal enum request_type, reverse_status, serta ketersediaan tracking_number.",
       "kata_kunci": [
         "Lazada",
@@ -876,7 +876,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 2.0,
+      "ukuran_kb": 1.9,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -928,7 +928,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 3.0,
+      "ukuran_kb": 2.9,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1215,9 +1215,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "2cb6bf15aa3e9300b9e92220f7cd98cd8f49f1e5947dae7daba17e2ca8b1a790",
-      "ukuran_kb": 298.3,
-      "ringkasan": "Menjawab: halaman dan modul apa saja yang ada di web ERP One Bharata, siapa yang boleh mengaksesnya (role/permission), dan bagaimana perilaku tiap layar — termasuk panel Shop Sync Status di Integration OAuth, halaman Auto-Sync faktur/retur/penerimaan Accurate beserta badge status scan gudangnya (live 2026-08-24), payroll, presensi, dan KPI. Juga menjawab cara kerja SSO, sidebar, dan i18n dua bahasa.",
+      "hash": "b977142ff8692bdb891303b31bc7591581130f26eda5efaa78921c714550304c",
+      "ukuran_kb": 300.5,
+      "ringkasan": "Menjawab: halaman dan modul apa saja yang ada di web ERP One Bharata, siapa yang boleh mengaksesnya (role/permission), dan bagaimana perilaku tiap layar — termasuk panel Shop Sync Status di Integration OAuth, halaman Auto-Sync Accurate beserta badge scan gudangnya, laman Gudang Barang Jadi / Return Dari Ekspedisi (banner sync-health yang diringkas), payroll, presensi, dan KPI. Juga menjawab cara kerja SSO, sidebar, dan i18n dua bahasa.",
       "kata_kunci": [
         "web erp",
         "one bharata",
@@ -1227,7 +1227,8 @@
         "role",
         "oauth",
         "shop sync status",
-        "auto-sync retur",
+        "return dari ekspedisi",
+        "sync bermasalah",
         "scan gudang",
         "integration"
       ]
@@ -2034,9 +2035,9 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "fd50ecc03d46ea56f8ad199ae4d2c32b83e5c506b6e1cacebaa302e745ef5164",
-      "ukuran_kb": 280.5,
-      "ringkasan": "Menjawab: bagaimana integration-service bekerja end-to-end — webhook marketplace, sync order/retur/escrow/wallet, bridging Accurate (faktur/retur/penerimaan harian, sweep rekonsiliasi termasuk pass seed retur tanpa-faktur yang live 2026-08-24), worker cron, observability Shopee (success rate, circuit breaker, rate limit), dan status sinkron per toko yang membuat worker melewati toko banned. Juga mencatat gap yang belum diimplementasikan beserta insiden yang melatarbelakanginya.",
+      "hash": "2e921537b3b18a4aab5d4029ec38b40f44fe58ec8a2865ec6b7669b45ecee92a",
+      "ukuran_kb": 281.4,
+      "ringkasan": "Menjawab: bagaimana integration-service bekerja end-to-end — webhook marketplace, sync order/retur/escrow/wallet, bridging Accurate (faktur/retur/penerimaan harian, sweep rekonsiliasi termasuk pass seed retur tanpa-faktur), worker cron, observability Shopee (success rate, circuit breaker, rate limit), dan status sinkron per toko yang membuat worker melewati toko banned. Juga mencatat gap yang belum diimplementasikan beserta insiden yang melatarbelakanginya.",
       "kata_kunci": [
         "integration service",
         "marketplace",
@@ -2157,6 +2158,7 @@
         "IT - Background Jobs & Schedulers",
         "ADR - 0002 Database-per-Service",
         "APP - Web ERP",
+        "ADR - 0052 Status Sinkron per Toko",
         "Manufacture - Issue Code Audit 2026-06",
         "Microservices - Employee Service",
         "GA - Procurement System",
@@ -2164,23 +2166,20 @@
         "DB - Overview and Notes",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
-      "hash": "7daedec4afd30a470bd4f174af4f96e531dc1444f23379e77d5221a0a276bf94",
-      "ukuran_kb": 63.1,
-      "ringkasan": "Menjawab: bagaimana WMS manufaktur bekerja, dari master bahan dan produk, stok per gudang, transaksi in/out, formula/BOM, produksi, PO, sampai proposal koreksi dan audit log. Menjelaskan dari mana masing-masing master ditarik (bahan dan angka stok dari Accurate, barang jadi dari data HPP, formula dari Excel), cara kerja push pergerakan WMS ke Accurate lewat outbox beserta kill switch dan akar kegagalan format transDate, serta mekanisme saldo awal dan saldo akhir bulanan yang idempoten. Berguna saat menelusuri kenapa angka stok atau pembukuan penyesuaian tidak cocok.",
+      "hash": "a08229fcb206f17ad0fe22d78a01bcb36b7244c24a9dae5ae90b380c9bbe1fe8",
+      "ukuran_kb": 64.2,
+      "ringkasan": "Menjawab: bagaimana manufacture-service (WMS) bekerja — feed retur marketplace untuk tab Return Dari Ekspedisi, konfirmasi scan gudang ke integration, status kesehatan sync marketplace (endpoint sync-health dan banner peringatan di laman scan, termasuk kenapa pesannya diringkas dan kenapa error 36009006 TikTok bukan bukti toko banned), master resi, stok, dan matriks akses modul WMS.",
       "kata_kunci": [
-        "manufacture-service",
-        "WMS",
-        "gudang",
-        "master bahan",
-        "master produk",
-        "stok",
-        "formula",
-        "BOM",
-        "push Accurate",
-        "penyesuaian persediaan",
-        "saldo awal",
-        "HPP",
-        "bundle"
+        "manufacture service",
+        "wms",
+        "gudang barang jadi",
+        "return dari ekspedisi",
+        "sync-health",
+        "sync bermasalah",
+        "36009006",
+        "scan retur",
+        "resi",
+        "akses wms"
       ]
     },
     {
@@ -4244,19 +4243,22 @@
         "Microservices - Integration Service",
         "API - Integration Service",
         "APP - Web ERP",
+        "Microservices - Manufacture Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0011 Integration Read Cache + Singleflight (Fase 1 Perf)",
         "Sales - Marketplace Integration"
       ],
-      "hash": "b6f92f00339ad4a5759e36e13771676e938adb5678b60b0ba4c544a38afacb2c",
-      "ukuran_kb": 4.8,
-      "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, dan aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care yang di-deactivate TikTok. Juga mencatat batas scope dan rencana Tahap 2 auto-disable.",
+      "hash": "228664b366049c43befc8da8c477c726731f564f259bc21ff9d19c93a1136152",
+      "ukuran_kb": 5.8,
+      "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal), dan kenapa auto-disable Tahap 2 wajib memakai ambang kegagalan beruntun (bukti: error 36009006 TikTok flapping antar run). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care.",
       "kata_kunci": [
         "adr",
         "shop sync state",
         "toko banned",
         "disable toko",
         "rainbow care",
+        "36009006",
+        "flapping",
         "skip worker",
         "kuota api",
         "success rate",
@@ -7154,7 +7156,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
-      "ukuran_kb": 6.9,
+      "ukuran_kb": 6.8,
       "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
       "kata_kunci": [
         "faktur",
@@ -7244,7 +7246,7 @@
         "QA - CPOB (GMP)"
       ],
       "hash": "dd084ecd166a8c13255bc2dec23c8afb425d4b54827a33168fe80668e2b84898",
-      "ukuran_kb": 15.6,
+      "ukuran_kb": 15.7,
       "ringkasan": "Menjawab: bagaimana dokumen batch produksi (batch release dossier 7 lembar) yang dulu manual dikerjakan di WMS, siapa mengisi bagian mana (admin RM, admin produksi, QC/RnD, PPIC/SPV), dan bagaimana alur DRAFT ke DIAJUKAN ke LULUS atau DITOLAK dijaga di server. Menjelaskan mode pengecekan QC (field milik QC dikunci di form admin dan hanya bisa diisi di layar review), paraf by jabatan lewat roster, serta paraf digital berjenjang per baris yang mengunci approval sampai semua slot terparaf. Berguna untuk memahami isi tiap lembar, penimbangan dan rekonsiliasi, cetak PDF, serta rantai nomor batch dari MO ke Laporan Produksi.",
       "kata_kunci": [
         "dokumen produksi batch",
@@ -7621,7 +7623,7 @@
         "QA - Register Perizinan & Sertifikasi"
       ],
       "hash": "23e3bd168ac5a48c16f9775bbc34e5fedf3ebe1e157b20409e69fdedb7075c5e",
-      "ukuran_kb": 9.0,
+      "ukuran_kb": 9.1,
       "ringkasan": "Menjawab: register mutu apa saja yang sudah ada di ERP divisi Quality — CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing, dan pengecekan raw material — berikut endpoint `/api/employee/quality/*`, collection MongoDB, dan model datanya. Juga menjawab siapa yang boleh mengakses apa (`quality:staff`, `quality:supervisor`, approver produksi & warehouse, staf marketing), bagaimana alur approval CAPA berjalan (Draft → Diajukan → persetujuan Produksi + Warehouse → finalisasi QA), dan aturan alert keterlambatan tiap register (tenggat H-7, Menunggu >3 hari, antrean >24 jam). Menjelaskan pula apa yang belum tersedia: Dashboard Mutu, IPC/Pre-Check/CPPB, dan checklist GMP/kalibrasi/storage.",
       "kata_kunci": [
         "quality",
@@ -7746,7 +7748,7 @@
         "Microservices - Manufacture Service"
       ],
       "hash": "facb437be722b849d4b5b753ebf84a71c3ac771e0b858bf8de443bbb69f3d61d",
-      "ukuran_kb": 8.8,
+      "ukuran_kb": 8.9,
       "ringkasan": "Menjawab: alur persetujuan apa saja yang ada di seluruh ERP Bharata dan siapa yang berwenang memutuskan masing-masing, mulai dari cuti/izin/sakit, perjalanan dinas, koreksi presensi, tukar jadwal, pesanan pembelian dan permintaan barang, payroll run, rekrutmen, dokumen HRD, task management, sampai insentif. Juga menjelaskan tiga cara gerbang approval ditulis (middleware di routes.go, pemeriksaan di dalam handler, dan slot reviewer pada dokumen) sehingga menyapu daftar rute saja menghasilkan kesimpulan salah, siapa yang termasuk wewenang setingkat Direktur lewat common.SetaraDirektur, dan pola cacat berulang berupa orang yang berwenang memutus tapi tak punya layar untuk melihat antreannya.",
       "kata_kunci": [
         "persetujuan",
@@ -9582,7 +9584,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.2,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
