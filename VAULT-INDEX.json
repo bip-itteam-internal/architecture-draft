@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-25",
-  "jumlah_dokumen": 297,
+  "jumlah_dokumen": 298,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -5861,6 +5861,7 @@
         "RUN - Menambah Metrik KPI Otomatis",
         "HRIS - Otomasi Skor KPI",
         "Microservices - Employee Service",
+        "REF - Penamaan Metrik & Sumber KPI",
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "Microservices - Procurement Service",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
@@ -5870,20 +5871,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "f67edb01ee447d3fa949a5032b6ce534c027aa05739740f7ba8df15cc81aa7f1",
-      "ukuran_kb": 146.7,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang dipakai menilai tiap posisi di tiap departemen, berapa bobotnya, dan apa targetnya, disalin apa adanya dari koleksi kpi_template di employee_db production, termasuk typo dan label cacat karena label adalah kunci identitas metrik di kode. Menjawab pula metrik mana yang bisa diotomatiskan sekarang, mana yang butuh kesepakatan definisi lebih dulu, mana yang modulnya ada tapi datanya kosong, dan mana yang memang belum punya sumber di sistem, lengkap dengan koleksi/endpoint sumbernya serta rekomendasi non-teknis untuk pemilik metrik. Menjelaskan bedanya \"datanya ada\" dengan \"mesin KPI punya konektornya\", dan mendaftar sumber otomasi yang benar-benar terdaftar di mesin KPI beserta sub-metriknya.",
+      "hash": "463e37ed7f61ed2804d36f9497765b163b4d338af19be6312b22e84024c23d96",
+      "ukuran_kb": 147.0,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar terpasang di produksi per departemen, berapa bobot dan targetnya, dan mana yang sudah bisa diotomatiskan beserta alasannya. Label disalin apa adanya termasuk yang cacat, sebab label adalah kunci identitas metrik di kode, dan tiap baris menyebut sumber datanya di sistem serta rekomendasi tindak lanjutnya.",
       "kata_kunci": [
-        "KPI",
+        "matriks KPI",
         "kpi_template",
-        "matriks KPI per departemen",
         "bobot KPI",
         "target KPI",
         "otomasi KPI",
-        "sumber KPI / sumber-katalog",
+        "sumber KPI",
         "penilaian kinerja",
-        "performance appraisal",
-        "employee_db"
+        "per departemen",
+        "employee_db",
+        "label metrik"
       ]
     },
     {
@@ -7887,6 +7888,38 @@
       ]
     },
     {
+      "path": "Reference/REF - Penamaan Metrik & Sumber KPI.md",
+      "judul": "REF - Penamaan Metrik & Sumber KPI",
+      "area": "Reference",
+      "jenis": "reference",
+      "status_emoji": "⚠️",
+      "status_teks": "Aturan berlaku sejak 2026-08-25; **keadaan yang ada belum memenuhinya** (lihat \"Keadaan terukur\"). Diturunkan dari label yang benar-benar terpasang, bukan dari selera.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Employee Service",
+        "HRIS - Matriks KPI per Departemen",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "RUN - Menambah Metrik KPI Otomatis",
+        "HRIS - Otomasi Skor KPI",
+        "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman"
+      ],
+      "hash": "fac16e7623a166015d6daeb8071f436e6cbe8fa6035ed645f54841f8ffeb1b2b",
+      "ukuran_kb": 6.2,
+      "ringkasan": "Menjawab: bagaimana menamai sumber dan metrik katalog KPI serta metrik template agar ringkas dan terbaca, kenapa keterangan wajib ada dan apa yang harus dijawabnya, serta mana yang aman diganti namanya dan mana yang tidak. Memuat keadaan terukur label yang benar-benar terpasang hari ini, termasuk berapa yang tampil tanpa keterangan dan berapa yang terpotong di layar.",
+      "kata_kunci": [
+        "penamaan metrik",
+        "label KPI",
+        "nama metrik",
+        "deskripsi metrik",
+        "keterangan sumber",
+        "katalog sumber KPI",
+        "konvensi penamaan",
+        "naming convention",
+        "label terpotong",
+        "kpi_template"
+      ]
+    },
+    {
       "path": "ROADMAP.md",
       "judul": "ROADMAP",
       "area": "root",
@@ -8136,6 +8169,7 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "REF - Penamaan Metrik & Sumber KPI",
         "HRIS - Alur KPI Otomatis Rinci.excalidraw",
         "HRIS - Key Performance Index",
         "Microservices - Employee Service",
@@ -8143,19 +8177,20 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "36d91321522a1845d7b25e34edaecea439a609cff03571757af02d02b0b7b907",
-      "ukuran_kb": 33.8,
-      "ringkasan": "Menjawab: langkah konkret apa yang harus dilakukan dev untuk menambahkan satu metrik KPI yang terisi otomatis, mulai dari memastikan datanya benar-benar ada di produksi sampai mendaftarkan sumber dan mengisi konfigurasinya. Memuat contoh sumber yang sudah ada untuk ditiru sesuai bentuk datanya, jebakan yang sudah terbukti menggigit, dan catatan lingkungan mana yang kunci layanannya belum terisi sehingga metrik tak bisa diuji di sana.",
+      "hash": "4108e0501945aaeb9407b81ce9c57d9e8c66c50e69e6d4af7ded4e32b5ea23a0",
+      "ukuran_kb": 34.4,
+      "ringkasan": "Menjawab: bagaimana menambahkan sumber data baru untuk metrik KPI otomatis, dari memastikan datanya memang layak sampai membuktikan metriknya hidup di layar Otomasi KPI. Memuat katalog reduksi, cara mengisi arah target, target berlapis tiga, cara menarik data dari service lain, dan checklist sebelum PR termasuk kewajiban mengisi label dan keterangan di dua locale.",
       "kata_kunci": [
-        "runbook",
         "menambah metrik KPI",
         "sumber KPI",
         "DaftarkanSumber",
-        "konektor",
+        "konektor KPI",
         "reduksi",
         "cakupan",
-        "kpi_template",
-        "cara menambah"
+        "otomasi KPI",
+        "checklist PR",
+        "arah target",
+        "pratinjau"
       ]
     },
     {
