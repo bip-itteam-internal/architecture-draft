@@ -1216,9 +1216,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "325b1c8bf3229225f1245117f35c7f88a7d843ccf1d559358a14a06a1e12ff33",
-      "ukuran_kb": 307.0,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP internal (One Bharata), bagaimana autentikasi, role, dan perannya sebagai SSO Identity Provider bekerja, serta bagaimana sidebar digerbang per modul. Memuat rincian tiap halaman per divisi berikut alasan di balik bentuknya, termasuk Ringkasan Divisi IT, Form Builder beserta halaman analisa jawaban dan tab Ringkasan Eksekutifnya, dan dukungan multi-perusahaan.",
+      "hash": "126b153343f8b62f768d2f8d75fafcc892fc0b3f9fc5dde033831df19fdebfbe",
+      "ukuran_kb": 312.7,
+      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP internal (One Bharata), bagaimana autentikasi, role, dan perannya sebagai SSO Identity Provider bekerja, serta bagaimana sidebar digerbang per modul. Memuat rincian tiap halaman per divisi berikut alasan di balik bentuknya, termasuk Ringkasan Divisi IT, Form Builder beserta halaman analisa jawaban dan tab Ringkasan Eksekutifnya, dan dukungan multi-perusahaan. Menjawab juga bagaimana orang menemukan posisinya di aplikasi sesudah nama kategori dibuang dari sidebar: lewat palet cari menu Ctrl+K dan jejak halaman (breadcrumb) di header, keduanya diturunkan dari indeks menu yang sudah tersaring izin, bukan dari daftar menu mentah.",
       "kata_kunci": [
         "web erp",
         "hris-dashboard",
@@ -1232,7 +1232,12 @@
         "form builder",
         "analisa jawaban",
         "ringkasan eksekutif",
-        "multi-perusahaan"
+        "multi-perusahaan",
+        "breadcrumb",
+        "jejak halaman",
+        "cari menu",
+        "command palette",
+        "header"
       ]
     },
     {
