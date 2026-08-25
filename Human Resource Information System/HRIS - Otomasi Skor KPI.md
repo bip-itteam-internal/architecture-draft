@@ -203,13 +203,15 @@ Konteks sumber: [[Microservices - Marketing Analytics Service]] (agregasi mart +
 
 ## Progres bulan berjalan di MyBharata
 
-> **Status**: 🟡 belum merge — bip-erp PR [#1071](https://github.com/bip-itteam-internal/bip-erp/pull/1071) (endpoint) + my-bharata PR [#109](https://github.com/bip-itteam-internal/my-bharata/pull/109) (layar, ke branch `dev`).
+> **Status**: ⚠️ **endpoint live di `main`, layar ada di `dev` tetapi BELUM rilis** per 2026-08-25. Endpoint `pratinjauKPISaya` ada di `origin/main` bip-erp dan sudah dua iterasi lebih maju daripada versi awalnya (commit `45bdfd8b` menambah `template_id` dan pemilihan template beraturan bersama; `cakupan` dan `rincian` per metrik ikut dikirim). Layarnya mendarat di `dev` my-bharata (commit `42fe0528`). ⛔ **Yang terpasang di HP orang belum memuatnya**: rilis `origin/main` my-bharata masih `1.14.5+135`, sementara `dev` sudah `1.14.14+149`. Catatan lama "belum merge" sudah tidak berlaku.
 
 Metrik otomatis hidup di produksi sejak 6 Agustus, tetapi **orang yang dinilai tak pernah melihatnya**. `GET /me/kpi-score` membaca dokumen `kpi_score` tersimpan dan membalas 404 bila belum ada, sedangkan layar KPI MyBharata mematok batas tombol maju di **bulan kemarin** — jadi bulan berjalan tak punya isi sekaligus tak bisa dibuka. Yang bisa melihat angka otomatis hanya penilai, lewat modal Score KPI dan halaman Otomasi KPI.
 
 `?preview=true` pada periode yang belum dinilai kini membalas 200 dengan progres berjalan: metrik yang sudah punya angka beserta basisnya, ditambah **cacahan** metrik yang masih menunggu atasan.
 
-**Tidak ada skor total di respons maupun di layar, dan itu keputusan utamanya.** Metrik otomatis baru menutupi sebagian bobot template — untuk IT Support baru satu metrik berbobot 0,4 dari empat. Total apa pun yang dihitung dari sebagian itu menyesatkan: menganggap sisanya nol memberi 40, menormalisasi ke yang ada memberi 100, dan keduanya terlihat meyakinkan padahal keduanya salah. Angka besar di layar selalu terbaca sebagai kesimpulan, bukan perkiraan.
+**Tidak ada skor total di RESPONS, dan itu keputusan utamanya.** Metrik otomatis baru menutupi sebagian bobot template — untuk IT Support baru satu metrik berbobot 0,4 dari empat. Total apa pun yang dihitung dari sebagian itu menyesatkan: menganggap sisanya nol memberi 40, menormalisasi ke yang ada memberi 100, dan keduanya terlihat meyakinkan padahal keduanya salah. Angka besar di layar selalu terbaca sebagai kesimpulan, bukan perkiraan.
+
+> ⚠️ **Koreksi 2026-08-25 atas kalimat di atas.** Versi lama berbunyi "tidak ada skor total di respons **maupun di layar**". Bagian "maupun di layar" **tidak pernah benar untuk web** dan **sudah tidak benar untuk mobile**. Rinciannya di bab berikut. Yang tetap berlaku: **responsnya sendiri memang tak membawa total** — kedua klien menghitungnya sendiri.
 
 Keputusan lain yang perlu diketahui sebelum menirunya:
 
@@ -218,6 +220,24 @@ Keputusan lain yang perlu diketahui sebelum menirunya:
 - **`dinilai: false` adalah inti kontraknya.** Tanpa penanda itu aplikasi akan menampilkan angka berjalan dengan gaya yang sama seperti skor final.
 - **Basis ditampilkan apa adanya** (`uptime 99.93%; 7 dari 31 hari berdata`) supaya angkanya bisa ditelusuri tanpa bertanya. Metrik bersumber `semi` diberi keterangan bahwa datanya belum lengkap — pada bulan berjalan itu keadaan normal, dan tanpa keterangan akan terbaca sebagai cacat.
 - **Perhitungannya memanggil `terapkanOtomatis`**, bukan menyalin rumusnya: karyawan dan penilai harus melihat angka yang sama.
+
+### Bulan berjalan jadi default, dan skor totalnya ikut tampil
+
+> **Status**: 🟡 branch `feat/kpi-bulan-berjalan` (my-bharata, dari `dev`), **belum PR** per 2026-08-25. Rencana: `.task-plans/2026-08-25-kpi-mobile-bulan-berjalan.md`.
+
+Irisan pertama menyediakan datanya tetapi tak mengubah pintunya: layar tetap **membuka bulan kemarin**, sehingga progres berjalan ada, bisa dibuka, dan tetap tak terlihat kecuali orangnya menekan panah kanan. Irisan ini memindahkan default ke **bulan berjalan**.
+
+**Skor totalnya kini ditampilkan, dan itu membalik keputusan di bab atas.** Yang membalikkannya bukan argumen baru melainkan keadaan yang sudah berjalan: web `/hris/kpi` **sudah** menampilkan total dari otomasi di produksi (`kpi-scorecard.tsx`, lencana "dari Otomasi"), dihitung sebagai `Σ(bobot × nilai) / Σbobot` **atas metrik yang punya angka saja**. Menahannya di mobile berarti karyawan dan penilainya melihat angka berbeda untuk orang dan bulan yang sama — persis yang hendak dicegah prinsip "karyawan dan penilai harus melihat angka yang sama" di daftar atas.
+
+Kekhawatiran lamanya tetap sah dan dijawab **di layar**, bukan dengan menyembunyikan angkanya:
+
+- **Judulnya "Skor Sementara", tak pernah "Skor Akhir"**, dan kartunya berbeda dari kartu skor final.
+- **Cakupan bobot disebut angka demi angka** ("Dihitung dari 40% bobot yang sudah terisi otomatis"). Bisa dibaca langsung sebagai persen karena `ValidateKPIMetrics` menjamin bobot satu template berjumlah tepat 1,0; nilainya tetap di-clamp karena template yang disunting langsung di Mongo tak melewati validasi itu, dan jalur itulah yang dipakai menyalakan metrik otomatis pertama.
+- **Rumusnya ditiru persis dari web**, bukan disusun ulang. Konsekuensi yang diterima sadar: rumusnya kini hidup di dua tempat (TypeScript dan Dart) dan bisa menyimpang. Memindahkannya ke backend supaya kedua klien berbagi satu sumber adalah pekerjaan yang belum dikerjakan.
+
+**Konsekuensi yang paling menentukan justru bukan soal angka.** Sensus 2026-08-20 mencatat metrik ber-`auto` baru menyentuh **38 dari 183 karyawan aktif**, jadi sesudah perubahan ini mayoritas orang mendarat di layar tanpa angka — padahal sebelumnya mereka langsung melihat skor final bulan lalu. Karena itu **kedua keadaan kosong diberi tombol "Lihat penilaian bulan lalu"**: kartu kosong progres (200 dengan `metrik` kosong) dan cabang **404** (posisi tanpa template KPI). Cabang 404 mudah terlewat dan justru yang paling berbahaya: ia juga menyambut **semua orang** bila employee-service yang terpasang belum mengenal `?preview=true`, dengan pesan "KPI tidak ditemukan" yang menunjuk ke sebab yang salah.
+
+⛔ **Gerbang rilis: pastikan employee-service PROD sudah mengenal `?preview=true` sebelum versi mobile ini naik.** Bila belum, seluruh pemakai membuka KPI dan melihat keadaan kosong. Urutannya BE dulu, baru FE.
 
 ## Kondisi Saat Ini
 

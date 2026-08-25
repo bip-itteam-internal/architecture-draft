@@ -1052,6 +1052,7 @@
         "HRIS - Employee Request & Approval",
         "Microservices - Attendance Service",
         "Microservices - Payroll Service",
+        "HRIS - Otomasi Skor KPI",
         "Microservices - Task Management Service",
         "APP - Web ERP",
         "APP - Dynamic Task Tracker",
@@ -1065,9 +1066,9 @@
         "HRIS - Payroll",
         "Microservices - Employee Service"
       ],
-      "hash": "e65167b71d4b5d0fb8fb0ea7747712a4ae3a4f55ad1e008ae08ff176e369282a",
-      "ukuran_kb": 39.4,
-      "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile karyawan MyBharata dan bagaimana tiap layar terhubung ke backend — presensi, jadwal, pengajuan (izin/cuti/sakit/dinas/koreksi/tukar) berikut inbox peninjau dan penunjukan pengganti, slip gaji, KPI, Kaizen, notifikasi, hingga pelatihan dan tugas onboarding. Menyebut versi build yang beredar, endpoint yang dipakai tiap layar, dan batasan yang sudah diketahui. Dipakai saat menambah layar baru atau menelusuri kenapa sebuah fitur tak muncul di ponsel.",
+      "hash": "014294f50b9b9465eada4820e347bdbd897f38785190360a930c4aaeeec0cd55",
+      "ukuran_kb": 40.3,
+      "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile karyawan MyBharata dan bagaimana tiap layar terhubung ke backend, mulai presensi, jadwal, pengajuan (izin/cuti/sakit/dinas/koreksi/tukar) berikut inbox peninjau dan penunjukan pengganti, slip gaji, KPI, Kaizen, notifikasi, hingga pelatihan dan tugas onboarding. Menyebut versi build yang beredar, endpoint yang dipakai tiap layar, dan batasan yang sudah diketahui. Untuk KPI ia menjelaskan bahwa penilaiannya bulanan (bukan kuartalan) dan satu layar melayani dua keadaan: skor final beku untuk periode yang sudah dinilai, dan progres otomatis untuk bulan berjalan.",
       "kata_kunci": [
         "MyBharata",
         "mobile",
@@ -1076,11 +1077,9 @@
         "presensi",
         "pengajuan",
         "submission",
-        "review submission",
         "pengganti",
-        "notifikasi",
         "slip gaji",
-        "KPI"
+        "KPI bulan berjalan"
       ]
     },
     {
@@ -5959,9 +5958,9 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "2f7cdcf033df3b8f6ea7cdfbab2115212ba5f1caba225f4b93be674d400caa9e",
-      "ukuran_kb": 80.3,
-      "ringkasan": "Menjawab: dari seluruh metrik KPI yang terpasang di produksi, mana yang sudah bisa diisi otomatis dari data ERP, mana yang modulnya ada tapi datanya kosong, dan mana yang tidak punya sumber sama sekali. Menjelaskan metrik auto yang sudah menyala, cara kerja auto_value/auto_basis (otomatis vs semi vs manual), jebakan urutan penilaian skor_tim, layar diagnostik Otomasi KPI, dan bagaimana HR mengisi konfigurasinya sendiri. Berguna untuk menilai kelayakan dan status otomasi scoring per departemen serta gap sumber datanya.",
+      "hash": "7251c5dfe16cd507b705f3d94cfb0ff423c6b97edc71c890a9ddc0c8e88c2943",
+      "ukuran_kb": 83.8,
+      "ringkasan": "Menjawab: dari seluruh metrik KPI yang terpasang di produksi, mana yang sudah bisa diisi otomatis dari data ERP, mana yang modulnya ada tapi datanya kosong, dan mana yang tidak punya sumber sama sekali. Menjelaskan metrik auto yang sudah menyala, cara kerja auto_value/auto_basis (otomatis vs semi vs manual), jebakan urutan penilaian skor_tim, layar diagnostik Otomasi KPI, dan bagaimana HR mengisi konfigurasinya sendiri. Menjawab pula apa yang dilihat karyawan sendiri di MyBharata untuk bulan berjalan lewat preview=true, kenapa skor sementaranya dihitung dari bobot yang terisi saja, dan gerbang deploy yang harus dilewati sebelum layar itu dirilis.",
       "kata_kunci": [
         "otomasi KPI",
         "auto value",
@@ -5971,8 +5970,8 @@
         "sumber data KPI",
         "KPI ICC",
         "uptime_sistem",
-        "HRGA",
-        "kandidat otomasi"
+        "progres bulan berjalan",
+        "skor sementara"
       ]
     },
     {
