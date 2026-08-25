@@ -8173,20 +8173,20 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "4108e0501945aaeb9407b81ce9c57d9e8c66c50e69e6d4af7ded4e32b5ea23a0",
-      "ukuran_kb": 34.4,
-      "ringkasan": "Menjawab: bagaimana menambahkan sumber data baru untuk metrik KPI otomatis, dari memastikan datanya memang layak sampai membuktikan metriknya hidup di layar Otomasi KPI. Memuat katalog reduksi, cara mengisi arah target, target berlapis tiga, cara menarik data dari service lain, dan checklist sebelum PR termasuk kewajiban mengisi label dan keterangan di dua locale.",
+      "hash": "221007b58169c35dda6ab1a01293400f3b1d763f7af43926407e83122c25beb4",
+      "ukuran_kb": 34.9,
+      "ringkasan": "Menjawab: langkah apa saja yang harus dikerjakan dev untuk membuat satu metrik KPI terisi otomatis, mulai dari memastikan datanya memang cukup, mendaftarkan sumber, sampai mengisi konfigurasi target dan arahnya. Menjawab juga pertanyaan yang paling sering muncul soal desainnya: kenapa angka dihitung ulang tiap kali dibaca alih-alih diakumulasi harian, kenapa sumber tidak boleh mengenal target, dan kesalahan apa saja yang sudah pernah terjadi di sini karena salah arah target atau salah nama field.",
       "kata_kunci": [
-        "menambah metrik KPI",
+        "KPI otomatis",
+        "tambah metrik",
         "sumber KPI",
-        "DaftarkanSumber",
-        "konektor KPI",
+        "DaftarkanSumberBermetrik",
         "reduksi",
-        "cakupan",
-        "otomasi KPI",
-        "checklist PR",
+        "rasio_ambang",
         "arah target",
-        "pratinjau"
+        "cakupan",
+        "runbook",
+        "auto_basis"
       ]
     },
     {
