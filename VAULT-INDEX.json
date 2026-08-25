@@ -4288,21 +4288,22 @@
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "606a6e1367e77cdad39348bbef1cdca8dd0b067173724e65490de7dd4979cf3f",
-      "ukuran_kb": 6.4,
-      "ringkasan": "Menjawab: kenapa menyusun struktur template KPI dan menetapkan cara menilainya kini dikerjakan di satu layar, padahal sebelumnya sengaja dipisah ke halaman template dan tab Atur Target. Menjelaskan tiga alasan pembalikannya (alur dua halaman yang terputus, layar kedua yang menuntut memilih karyawan lebih dulu, dan bobot yang punya dua sumber kebenaran), bug penyimpanan metrik manual yang ikut terbongkar, serta konsekuensi yang diterima termasuk urutan deploy yang mengikat.",
+      "hash": "d4df38a47de22380b5ed6f1438c4a93d104633019a96e68db3419b760d85c739",
+      "ukuran_kb": 7.0,
+      "ringkasan": "Menjawab: kenapa membuat template KPI dan menetapkan targetnya disatukan ke satu layar `/hris/kpi/templates` setelah sebelumnya sengaja dipisah, dan kenapa tab Atur Target tetap ada tetapi menyempit ke penyetelan target karyawan tertentu. Menjelaskan bug yang memperkuat keputusannya, yaitu blok `auto` yang selalu dikirim untuk setiap metrik sehingga metrik manual menggagalkan penyimpanan seluruh template dengan 400, serta kenapa rumus dan cakupan dijawab backend lewat `GET /kpi/sumber-katalog` alih-alih disalin ke frontend. Mencatat pula satu keputusan yang dibatalkan saat merge sehingga bobot masih dapat diubah dari dua layar.",
       "kata_kunci": [
-        "KPI",
-        "template KPI",
+        "kpi",
+        "template kpi",
         "atur target",
-        "bobot",
-        "porsi",
-        "otomasi skor",
+        "kpi_template",
         "sumber katalog",
+        "otomasi kpi",
+        "bobot",
+        "weight",
         "scope",
+        "cakupan",
         "formula",
-        "metrik manual",
-        "ADR"
+        "rumus"
       ]
     },
     {
