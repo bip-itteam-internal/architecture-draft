@@ -2,7 +2,7 @@
 
 *Aturan penamaan untuk dua hal yang muncul berdampingan di layar KPI: **sumber/metrik katalog** (dibuat dev, tampil di dropdown "Sumber data") dan **metrik template** (dibuat HR, tampil sebagai baris penilaian). Keduanya sering ditulis panjang, tanpa keterangan, atau bernama tak deskriptif, dan akibatnya jatuh ke orang yang mengisi KPI, bukan ke yang menamainya.*
 
-- **Status**: ⚠️ Aturan berlaku sejak 2026-08-25; **keadaan yang ada belum memenuhinya** (lihat "Keadaan terukur"). Diturunkan dari label yang benar-benar terpasang, bukan dari selera.
+- **Status**: ✅ Berlaku sejak 2026-08-25, dan **seluruh sumber produksi sudah memenuhinya** (lihat "Keadaan terukur"). Dijaga test, bukan oleh dokumen ini. Aturannya diturunkan dari label yang benar-benar terpasang, bukan dari selera.
 - **Ruang lingkup**: kamus label di `erp-frontend/src/features/hris/kpi/lib/label-otomatis.ts` + `src/i18n/locales/{id,en}.ts`, dan field `label`/`description` pada `kpi_template` ([[Microservices - Employee Service]]).
 
 ## Dua hal yang dinamai, dan siapa pemiliknya
@@ -44,21 +44,28 @@ Aturannya sama untuk keduanya. Yang berbeda hanya siapa yang menanggung akibatny
 
 **4. Untuk metrik template, `description` adalah tempat TARGET yang sebenarnya.** `kpi_template` tak punya field target yang dapat dibaca mesin untuk metrik manual, jadi angkanya hidup di sana. Satu deskripsi memuat lebih dari satu angka membuat metriknya mustahil diotomatiskan tanpa bertanya ke pemiliknya lebih dulu (lihat [[HRIS - Matriks KPI per Departemen]]).
 
-## Keadaan terukur (2026-08-25)
+## Keadaan terukur
 
-Diukur langsung ke kamus label dan katalog produksi, bukan diperkirakan:
+Diukur langsung ke kamus label dan katalog produksi, bukan diperkirakan.
 
-| Yang diukur | Angka |
-|---|---|
-| Sumber terdaftar di backend | **20** |
-| Sumber yang punya entri label + keterangan | **10** |
-| Sumber yang tampil sebagai token dirapikan, tanpa keterangan | **10** |
-| Label melewati ±28 karakter (terpotong di `w-60`) | **4** |
-| Keterangan yang dipakai lebih dari satu label | **1** (Kaizen, 2 label) |
+| Yang diukur | Saat aturan ditulis | Sesudah dibereskan |
+|---|---:|---:|
+| Sumber terdaftar di backend | 20 | 20 |
+| Punya entri label **dan** keterangan | **10** | **20** |
+| Tampil sebagai token dirapikan, tanpa keterangan | **10** | **0** |
+| Label melewati ±28 karakter (terpotong di `w-60`) | **4** | **0** |
+| Keterangan dipakai lebih dari satu label | **1** (Kaizen) | **0** |
 
-Separuh isi dropdown karena itu belum memenuhi aturan ini. Itu bukan alasan menurunkan aturannya; itu daftar pekerjaan.
+Keempat label yang dulu terpotong, beserta penggantinya. Detail yang hilang dari label **pindah ke keterangan**, tidak dibuang:
 
-Empat label yang terpotong hari ini: `Penjualan tercatat sebelum cutoff (persen)` (42), `Retur tuntas sebelum cutoff (persen)` (36), `Kinerja affiliate (per tim channel)` (35), `Pembayaran tepat waktu (persen)` (31).
+| Sebelum | Panjang | Sesudah |
+|---|---:|---|
+| `Penjualan tercatat sebelum cutoff (persen)` | 42 | `Penjualan tepat waktu` |
+| `Retur tuntas sebelum cutoff (persen)` | 36 | `Retur tuntas tepat waktu` |
+| `Kinerja affiliate (per tim channel)` | 35 | `Affiliate per tim` |
+| `Pembayaran tepat waktu (persen)` | 31 | `Pembayaran tepat waktu` |
+
+⚠️ **Angka di kolom kanan tidak dijaga oleh dokumen ini, melainkan oleh test.** `label-otomatis.aturan.test.ts` di erp-frontend memeriksa tiap sumber produksi punya label dan keterangan di dua locale, panjangnya tak melewati batas, keterangannya tak dipakai bersama, dan tak sekadar mengulang labelnya. Dokumen yang menyimpan angka tanpa penjaga akan usang dalam hitungan minggu; yang menjaganya di sini adalah suite, dan tabel ini hanya menerangkan kenapa penjaga itu ada.
 
 ## Mengganti label yang sudah dipakai
 
@@ -71,6 +78,7 @@ Empat label yang terpotong hari ini: `Penjualan tercatat sebelum cutoff (persen)
 1. **Di layar, bukan di editor.** Buka pemilih Sumber data dan pastikan tak ada label yang terpotong dan tak ada opsi tanpa baris kedua.
 2. **Dua bahasa.** Label dan keterangan wajib ada di `id.ts` DAN `en.ts` ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]). Istilah teknis lazim English dibiarkan English di kedua locale.
 3. **Sumber baru wajib punya entri kamus**, jangan diserahkan ke perapian token. Masuk checklist [[RUN - Menambah Metrik KPI Otomatis]].
+4. **Jalankan `label-otomatis.aturan.test.ts`.** Ia menjaga aturannya, bukan daftar isinya: sumber baru yang tak berlabel akan memerahkannya begitu ditambahkan ke daftar sumber produksi di berkas test itu. Daftar itu sengaja ditulis tangan, sebab daftar yang ikut berubah sendiri tak akan pernah gagal.
 
 ## Dokumen Terkait
 
