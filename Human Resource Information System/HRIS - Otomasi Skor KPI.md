@@ -121,6 +121,50 @@ Sampai batch ini, menyalakan satu metrik otomatis menuntut seseorang membedah `k
 | Apa | Rute / kontrak | Kenapa ada |
 |---|---|---|
 | **Katalog pilihan** | `GET /kpi/sumber-katalog?department=` | Daftar sumber, sub-metrik, formula, arah, dan scope selama ini hanya hidup di kode Go. Frontend yang menuliskan daftarnya sendiri membuat tiap sumber baru menuntut perubahan di dua tempat. Formula/arah/scope dibaca **lewat refleksi** atas struct di `shared-library`, bukan disalin — literal berarti pilihan baru tak pernah muncul dan gejalanya cuma dropdown yang kurang |
+
+> [!important] Katalog kini menjawab cakupan dan rumus PER SUMBER
+> ⚠️ Branch `feat/kpi-katalog-scope-sumber`, **belum merge, belum deploy** (2026-08-25).
+>
+> Sampai perubahan ini, katalog mengirim `scope` dan `formula` sebagai **daftar global**
+> saja. Frontend karena itu tak punya dasar mengisi keduanya, lalu mengirim blok `auto`
+> ber-`scope` kosong yang ditolak `ValidateKPIAutoConfig` dengan 400. Tiap entri sumber kini
+> membawa empat field baru:
+>
+> | Field | Arti |
+> |---|---|
+> | `scope_didukung` | cakupan yang benar-benar dibaca sumber ini. **Kosong = cakupan tak berpengaruh**, form boleh menyembunyikan pemilihnya |
+> | `scope_baku` | selalu terisi nilai yang lolos validator, termasuk bagi sumber yang mengabaikan cakupan |
+> | `formula_baku` | rumus kanonik sumber yang tak bersub-metrik (mis. `skor_tim`) |
+> | `formula_metrik` | rumus kanonik per sub-metrik; satu sumber bisa berbeda per metrik |
+>
+> **Hanya 5 dari 18 sumber yang benar-benar membaca `KPIAutoConfig.Scope`**: `skor_tim`,
+> `kinerja_toko`, `kedisiplinan_absensi`, `kontrak_karyawan`, dan `turnover_karyawan`. Dua
+> yang terakhir **menolak** cakupan selain `perusahaan` di dalam kodenya sendiri, jadi
+> katalog menyatakannya lebih dulu supaya salah pilih ketahuan saat memilih, bukan saat
+> skornya gagal dihitung berminggu kemudian. Bagi 13 sisanya cakupan adalah isian wajib
+> yang diabaikan — validator masih menuntutnya, dan itu sengaja **tidak** diputuskan di
+> [[ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman]].
+>
+> **Nilai rumusnya grounded ke pemakaian nyata**, dari sensus `kpi_template` produksi
+> 2026-08-25 atas **34 metrik ber-`auto`** (naik dari 24 pada sensus 2026-08-20). Pasangan
+> yang terbukti dipakai:
+>
+> | Sumber · metrik | Formula | Cakupan yang dipakai |
+> |---|---|---|
+> | `skor_tim` (tanpa sub-metrik) | `rata_rata` (6×) | department, team |
+> | `kinerja_toko` · `gross_profit`, `profit_bersih` | `jumlah_nilai` | department, individu, team |
+> | `kinerja_toko` · `roas`, `retur_persen` | `rata_rata` | department, individu, team |
+> | `kinerja_ar` · empat metrik `*_persen` | `rata_rata` | department |
+> | `kinerja_sales_admin` · `penjualan_tuntas_cutoff_persen` | `rata_rata` | department |
+> | `kinerja_affiliate_tim` · `affiliate_aktif`, `conversion` | `jumlah_nilai` | individu |
+> | `forecast_kas` · `akurasi_forecast_kas` | `jumlah_nilai` | individu |
+> | `uptime_sistem` · `downtime` | `rata_rata` | department |
+> | `varians_anggaran` · `varians_persen` | `rata_rata` | department |
+>
+> Sumber yang **belum punya bukti pemakaian sengaja dibiarkan kosong**, dan frontend
+> meminta pengisi memilih. Menebak rumus lebih berbahaya daripada mengakui belum tahu:
+> rumus yang salah tidak menimbulkan galat, hanya angka salah yang tampak wajar. Formula
+> di luar `KPIReduksi` jadi **panic saat boot**, bukan koreksi senyap.
 | **Pratinjau sebelum simpan** | `POST /kpi/auto-values/pratinjau`, maks **10** `employee_ids` | Salah konfigurasi **tidak menimbulkan galat**, hanya angka salah yang tampak wajar. Sebaran beberapa orang pada periode lampau menunjukkannya langsung: semua 100 berarti target terlalu rendah, semua 0 berarti terlalu tinggi atau arahnya terbalik |
 | **Jejak perubahan** | koleksi `kpi_template_audits` | Konfigurasi kini disunting orang yang bukan penulisnya, dan blok `auto` yang berubah diam-diam mengubah nilai semua orang di posisi itu |
 
