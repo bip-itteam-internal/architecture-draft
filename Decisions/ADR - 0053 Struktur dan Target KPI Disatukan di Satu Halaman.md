@@ -34,7 +34,9 @@ Sebuah cacat yang ditemukan saat mengerjakan ini memperkuat keputusannya. `Auto`
 
 **2. Editornya inline, bukan modal.** Target per karyawan membuka dialognya sendiri, dan dialog di atas dialog adalah bentuk yang sudah dihindari di tempat lain. Karena alasan yang sama, dialog "Kelola Template" yang dulu dibuka dari Atur Target diganti tautan halaman.
 
-**3. Porsi bobot hanya disunting di editor.** Tab Atur Target tetap menampilkannya supaya penyetel target tahu bobotnya, tetapi tidak lagi bisa mengubahnya. Satu angka, satu tempat.
+**3. ⚠️ Porsi bobot hanya disunting di editor — DIBATALKAN saat merge (2026-08-25).** Niat semula: Atur Target menampilkan porsi tetapi tak mengubahnya, supaya satu angka punya satu tempat. Saat branch ini digabung dengan `origin/main`, ternyata pekerjaan paralel yang **sudah berjalan di produksi** tetap menyunting bobot di layar itu, dan membatalkannya sepihak dinilai lebih berisiko daripada menunda.
+
+**Keadaan sebenarnya: bobot MASIH dapat diubah dari dua layar**, dan yang belakangan disimpan menang tanpa ada yang diberi tahu. Ini bukan perbaikan yang tertunda melainkan keputusan yang belum tuntas, dan ditulis terang-terangan di test (`atur-target-inline.test.tsx`) supaya tak disangka sudah selesai. Menuntaskannya menuntut kesepakatan dengan pemilik pekerjaan paralel itu lebih dulu.
 
 **4. Tab Atur Target tetap ada**, menyempit ke perannya yang sebenarnya: menyetel target **karyawan tertentu**. Konteks "orang ini" memang milik halaman itu, dan menghapusnya akan memutus alur supervisor yang menyesuaikan target satu orang.
 
@@ -49,7 +51,7 @@ Sebuah cacat yang ditemukan saat mengerjakan ini memperkuat keputusannya. `Auto`
 **Yang membaik**
 
 - Membuat template lengkap selesai tanpa berpindah halaman.
-- Bobot berhenti punya dua sumber kebenaran.
+- ⚠️ ~~Bobot berhenti punya dua sumber kebenaran.~~ **Tidak tercapai**, lihat Decision butir 3.
 - Penyimpanan template yang punya metrik manual berhenti gagal 400. Ini perbaikan bug, bukan sekadar penataan ulang.
 - Cakupan tak lagi bisa tertinggal kosong: katalog selalu menjawab nilai yang lolos validator, termasuk untuk sumber yang mengabaikan cakupan.
 
