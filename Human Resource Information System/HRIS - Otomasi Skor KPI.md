@@ -110,6 +110,12 @@ Tiga status pertama memakai nama yang sama persis dengan `KPISources` di `shared
 
 Kontrak lengkapnya di [[API - Employee Service]]; cara menambah metrik otomatis baru dan memverifikasinya lewat layar ini di [[RUN - Menambah Metrik KPI Otomatis]].
 
+### Skor total per orang: kolom Otomasi dan kartu skor total harus satu rumus
+
+`GET /kpi/auto-scores` menghitung **satu skor per karyawan** untuk kolom Otomasi di daftar Scoring dan badge skor di dropdown `/portal/kpi`; kartu skor total per-orang (tab Ringkasan → Per Karyawan) menghitung ulang dari `GET /kpi/auto-values` di frontend. Keduanya WAJIB memakai rumus yang sama: **rata-rata berbobot** `Σ(bobot × usulan) / Σ(bobot)` atas metrik yang berhasil dihitung — identik dengan skor final `ApplyKPIValues`, yang Σbobot-nya selalu 1,0 (dijaga `ValidateKPIMetrics`).
+
+Sempat menyimpang 2026-08-25: `hitungSkorOtomatis` (`services/employee/kpi_auto_scores.go`) menjumlah `Σ(bobot × usulan)` **tanpa** membaginya dengan Σbobot. Selama data belum lengkap (Σbobot metrik terhitung < 1) jumlah itu keluar LEBIH RENDAH dari rata-rata, sehingga badge menampilkan angka berbeda dari kartu skor total untuk **orang yang sama** — dilaporkan 12 (jumlah) vs 15 (rata-rata) untuk SPV Kyura yang cakupannya 3 dari 4 metrik. Diperbaiki dengan menormalisasi `auto_score` di backend; cakupannya tetap terbaca lewat `terhitung`/`total_otomatis`, jadi normalisasi tidak menyembunyikan bahwa skornya berdiri di atas sebagian metrik. Pada cakupan penuh (Σbobot = 1) rata-rata sama dengan jumlah, jadi posisi ber-otomasi penuh tak berubah angkanya. Ini persis kelas "layar yang menghitung dengan rumusnya sendiri akan berbohong" di atas — kali ini dua layar berbeda rumus, bukan satu layar yang menyalin.
+
 ## HR mengisi konfigurasinya sendiri
 
 > **Status**: ⚠️ **merged, BELUM di-deploy** per 2026-08-11. bip-erp PR [#1049](https://github.com/bip-itteam-internal/bip-erp/pull/1049) · [#1051](https://github.com/bip-itteam-internal/bip-erp/pull/1051) · [#1053](https://github.com/bip-itteam-internal/bip-erp/pull/1053) dan erp-frontend PR [#831](https://github.com/bip-itteam-internal/erp-frontend/pull/831) · [#832](https://github.com/bip-itteam-internal/erp-frontend/pull/832), seluruhnya merged 6 Agustus 2026. **Belum satu pun terbukti jalan lewat gateway produksi**, jadi seluruh bab ini menggambarkan kode yang ada di `main`, bukan perilaku yang sudah disaksikan.
