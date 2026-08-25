@@ -80,6 +80,24 @@ Yang berlaku dan stabil:
 - **Repo mybharata di-rename** `hris_bharata` → **`my-bharata`** (`github.com/bip-itteam-internal/my-bharata`). Remote `origin` lokal lama masih menunjuk nama lama tapi push/`gh` jalan via redirect; rapikan: `git remote set-url origin https://github.com/bip-itteam-internal/my-bharata.git`.
 - **RBAC `system_roles`**: key = **kode MODUL** (`it`,`hris`,`finance`,`ga`,…), **BUKAN** nama departemen (pemetaan modul→nama dept di `shared-library/common/roles.go` `deptKeyToNames`; `space.division` simpan nama dept). `system_roles` = hak akses **modul/menu**, **bukan hierarki org** — **atasan/supervisor departemen ada di `work_data`** (`is_supervisor:true` + `department`), bukan di `system_roles`.
 
+### ⛔ "HRGA" adalah LABEL SUPERVISI, bukan nama departemen siapa pun
+
+Tak seorang pun ber-`work_data.department` = `HRGA`. Isinya selalu **`Human Resource`** atau **`General Affair`**; `HRGA` adalah `master_department.supervision_label` yang lahir dari `supervised_by`. Master data yang menentukan, bukan kode, jadi pengelompokannya bisa **batal** kapan saja dan saat itu terjadi kedua nama asli muncul kembali terpisah.
+
+Backend sudah menangani ini dan konsisten. Diukur di prod 2026-08-25: `GET /kpi` dengan filter `Human Resource`, `General Affair`, maupun `HRGA` membalas **blok yang sama persis** berlabel `HRGA` berisi 20 orang. Begitu juga `KPIAutoConfig.Scope: "department"` yang mekar ke seluruh grup lewat master data (`kpi_auto.go`, `idAnggotaCakupan`).
+
+Yang berulang kali salah adalah **frontend**, dan kegagalannya SENYAP di kedua arah. Keduanya terjadi pada hari yang sama:
+
+1. **Pemilih tak digrupkan** → `Human Resource` dan `General Affair` tampil sebagai dua pilihan untuk satu kelompok, dan **kedua pilihan menampilkan 20 orang yang identik**. Tak ada galat, tak ada angka salah, cuma jumlah pilihannya yang keliru sehingga pembacanya mengira ada dua tim (erp-frontend [#1210](https://github.com/bip-itteam-internal/erp-frontend/pull/1210)).
+2. **Pemilih digrupkan tapi konsumennya mencocokkan `work_data.department` PERSIS** → nol anggota, dan layar berbunyi **"Tidak ada anggota"** untuk grup yang berisi 20 orang (erp-frontend [#1212](https://github.com/bip-itteam-internal/erp-frontend/pull/1212)).
+
+Aturan yang berlaku:
+
+- **Label grup sah dipakai sebagai FILTER** ke backend, dan backend menerjemahkannya. Daftar bergrupnya dari `GET /data-type/department?grouped=true`. ⚠️ Nilainya dibandingkan dengan string **`"true"` persis**, jadi `grouped=1` diabaikan diam-diam dan mengembalikan daftar mentah.
+- **Label grup TIDAK PERNAH cocok** dengan `work_data.department` seorang pun. Kode yang menyaring per orang wajib membandingkan dengan **label BLOK yang dikembalikan backend**, bukan menyimpulkan "hasilnya kosong berarti tak ada anggota". Menjatuhkannya ke "kalau kosong tampilkan semua" juga salah: departemen yang memang kosong lalu terisi orang lain, dan itu jauh lebih sulit disadari daripada daftar kosong.
+- ⛔ **Layar yang MENULIS nama departemen tak boleh memakai daftar bergrup.** `kpi_template.department` menyimpan nama ASLI (`Human Resource` / `General Affair`); template yang tersimpan sebagai `HRGA` tak akan cocok dengan `work_data` siapa pun, dan gagalnya senyap: templatenya jadi, lalu tak pernah terpakai menilai siapa-siapa. Karena itu `template-editor.tsx` sengaja TIDAK digrupkan sementara `kpi-page-content.tsx` digrupkan.
+- Dari 24 pemanggil `useDataTypes({ endpoint: "department" })` di erp-frontend, per 2026-08-25 baru **5** yang memakai `grouped`. Sisanya belum diperiksa satu per satu, dan untuk sebagian halaman departemen mentah memang yang benar. **Putuskan per halaman**, jangan sapu massal.
+
 ## Memindahkan karyawan antar-perusahaan (tenant)
 > Diverifikasi ke kode + prod 2026-08-19 saat menyiapkan perpindahan CV Elit (`ELT`) ke BIP. **Dugaan awal terbalik di dua dari tiga hal di bawah**, jadi jangan menebak arahnya. [[ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id]] mengatur `employee_id` dan `work_data`, tapi **tak menyebut satu pun infrastruktur presensi berikut** — migrasi yang "benar" menurut ADR tetap bisa membuat orangnya tak bisa absen keesokan harinya.
 
