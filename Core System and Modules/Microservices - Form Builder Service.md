@@ -230,6 +230,10 @@ Skor gabungan di atas menjawab "siapa yang perlu ditindaklanjuti". Bagian ini me
 
 **Pertanyaan berbobot nol dikembalikan terpisah** sebagai `unweighted`, bukan disembunyikan: ia jadi pembanding di luar indeks, sehingga indeks yang naik sementara pertanyaan keseluruhan turun menunjukkan bobot antar aspeknya yang salah, bukan layanannya yang membaik.
 
+**Blok yang sama juga menempel di respons `GET /forms/:id/analytics`**, memasok tab Ringkasan Eksekutif di [[APP - Web ERP]]. Dipasang di handler setelah `applyTrueTotal`, sejajar blok penilaian, dan `indeksAnalisa` sendiri yang memutuskan kapan ia absen: pada form bersasaran penilaian (yang dijawab `subjects` per orang) dan pada form tanpa pertanyaan berskala. Keputusan "kapan absen" itu yang paling penting di sini — angka yang muncul di tempat salah tak pernah terlihat salah, sebab bentuknya selalu wajar.
+
+Konsekuensi yang perlu diketahui pembaca kode: `FieldAnalytics` **tidak** membawa `weight`, jadi blok inilah satu-satunya jalan bobot sampai ke klien. Menambahkan `weight` ke `FieldAnalytics` akan melahirkan dua jalan untuk satu nilai, dan yang satu pasti menyimpang.
+
 ## Penilaian karyawan lain: sumbu `subject`, terpisah dari `audience`
 
 Kasus nyata yang jadi acuan: **seluruh karyawan menilai tiap Office Boy, satu per satu**. Di produksi itu 185 karyawan × 4 Office Boy = **740 penilaian**, dan tiap orang mengisi 4 kali dalam satu duduk.

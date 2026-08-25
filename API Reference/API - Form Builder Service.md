@@ -183,6 +183,14 @@ Jendela periode **selalu berakhir di ujung bulan atau minggu**, bukan sekian har
 
 **Respons analytics**: `total_responses`, `unique_respondents`, `audience_size`, `sample_size`, `truncated`, `response_rate` (opsional), `daily[{date,count}]`, `fields[{key,label,type,answered,skipped,options[{option,count}],average,min,max,sample_text[]}]`. Saat `truncated=true`, `response_rate` sengaja tidak dikirim karena tak bisa dihitung jujur dari sebagian data.
 
+**Blok `index` pada respons analytics** (opsional) — ringkasan satu angka atas seluruh pertanyaan berskala: `{index, scored_questions, respondents, aspects[], unweighted[]}`, dengan tiap aspek membawa `{key, label, answered, skipped, average, scale_min, scale_max, weight}`. Bentuknya **sama persis** dengan balasan `/me/service-index`, sebab keduanya memanggil perhitungan yang sama; angka di ringkasan divisi dan di halaman analisa karena itu tak bisa berbeda.
+
+> ⚠️ **Inilah satu-satunya tempat `weight` sampai ke klien.** `fields[]` tidak membawanya sama sekali, jadi tanpa blok ini mustahil menampilkan pertanyaan mana yang menggerakkan angkanya.
+>
+> **Absen pada dua keadaan, dan keputusan kapan absen itu yang penting** — angka yang muncul di tempat salah tak pernah terlihat salah, sebab bentuknya selalu wajar. Pertama, form **bersasaran penilaian**: merata-ratakan seluruh penilai lintas orang yang dinilai melebur nilai dua orang berbeda jadi satu, dan `subjects[]` sudah menjawabnya per orang. Kedua, form **tanpa pertanyaan berskala**: tak ada yang bisa diringkas. Belum adanya JAWABAN bukan salah satunya — aspeknya tetap dilaporkan supaya pembaca tahu apa yang akan diukur, dan yang absen cukup `index` sendiri.
+>
+> Susunan pertanyaan yang dipakai mengikuti `?period=` yang diminta, sama dengan `fields[]`.
+
 **Respons analytics form penilaian** (absen pada form biasa): `evaluation{subject_count, evaluators_started, evaluators_completed, pairs_done}`, `subjects[{employee_id,name,department,position,responses,scores[{key,label,answered,average}],overall,overall_fields,total_questions}]`, `subjects_truncated`. `scores` hanya untuk pertanyaan `number`/`scale`, dan `average` **absen** (bukan 0) bila belum ada yang menilai. `response_rate` di sini = `evaluators_completed / audience_size` — yang dihitung penilai yang menyelesaikan SELURUH daftarnya, bukan yang sekadar mengirim satu penilaian.
 
 ## Dokumen Terkait
