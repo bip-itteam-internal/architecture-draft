@@ -116,6 +116,26 @@ kategori baru:
 
 - **Read-check-write tanpa unique index.** `FindOne` lalu `InsertOne` tanpa indeks unik =
   duplikat saat permintaan paralel. Tangani duplicate-key error dan retry.
+- ⛔ **Indeks unik atas field ber-`omitempty` WAJIB parsial.** Field bertanda `omitempty`
+  tidak disimpan sama sekali ketika bernilai kosong, dan MongoDB memperlakukan seluruh
+  dokumen yang kehilangan field itu sebagai **satu nilai null yang sama**. Indeks unik
+  polos karena itu tidak membatasi segelintir dokumen yang mengisi field itu — ia
+  membatasi **semua dokumen yang tidak mengisinya**, sehingga dokumen kedua yang wajar
+  ditolak dan fitur yang tak ada hubungannya ikut lumpuh. Arah kerusakannya terbalik dari
+  yang diniatkan: makin jarang field itu dipakai, makin luas yang rusak.
+
+  Contoh nyata: `(company_id, owner_department, metric_key)` di form-builder. `metric_key`
+  hanya diisi segelintir form, jadi indeks unik polos akan membuat **dua form biasa** di
+  satu departemen saling menolak dan penerbitan form mati untuk semua orang. Yang benar
+  `partialFilterExpression` (`{metric_key: {$exists: true}, status: "published"}`).
+
+  Dua hal yang menyertainya: `mongodb.CreateIndex` di `shared-library` **tidak** menerima
+  filter parsial (hanya flag unik), jadi kasus ini harus lewat
+  `GetCollection(...).Indexes().CreateOne(...)` langsung dengan penjaga `mongodb.DB == nil`;
+  dan pembuatan indeksnya sebaiknya **tidak fatal** saat boot — service yang menolak hidup
+  gara-gara satu indeks memadamkan seluruh modul demi aturan yang cuma mengatur sebagian
+  kecil dokumen. Verifikasinya bukan "indeksnya terbentuk", melainkan **dokumen yang TIDAK
+  punya field itu masih bisa disisipkan berdampingan**.
 - **Transisi status tidak atomik.** Pakai `UpdateOne` dengan filter menyertakan status LAMA,
   bukan baca-lalu-tulis. Tanpa itu, dua permintaan bisa melewati atau menggandakan transisi.
   (kelas bug pengajuan ganda, PR #494)
