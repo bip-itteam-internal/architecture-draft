@@ -5956,22 +5956,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "a09b83574a1b1b5c8c33b27c9dfd35744071cda90c416d321cfe89e628d7f300",
-      "ukuran_kb": 79.9,
-      "ringkasan": "Menjawab: metrik KPI mana yang bisa diisi otomatis dari data ERP yang sudah ada, mana yang modulnya ada tapi datanya kosong, dan mana yang tak punya sumber sama sekali, dari sensus 311/362 metrik di production. Menjelaskan mesin otomasi (sumber nilai, formula reduksi, arah target, cakupan team/department/perusahaan), bagaimana nilai muncul sebagai usulan yang harus ditekan supervisor, layar diagnostik Otomasi KPI, dan mengapa skor otomatis penuh (bobot 1,00) dibekukan sistem. Berguna untuk pertanyaan urutan penilaian skor_tim, cakupan, dan status deploy per PR.",
+      "hash": "b3d04414e41ae7f0aadef4806919ff59bc601d71100c4ade6b00c0b7b47768f3",
+      "ukuran_kb": 80.2,
+      "ringkasan": "Menjawab: metrik KPI mana yang skornya bisa diisi otomatis dari data ERP yang sudah ada, mana yang modulnya ada tapi datanya kosong, dan mana yang tidak punya sumber sama sekali (klasifikasi 311/362 metrik). Menjelaskan cara kerja otomasi (sumber nilai, formula reduksi, scope, arah target, cakupan penuh vs parsial menghasilkan status otomatis/semi/manual), metrik mana yang sudah menyala di produksi, dan kenapa 30 orang di posisi otomasi penuh dibekukan sistem. Juga menjawab: bagaimana HR mengisi konfigurasi otomasi sendiri, layar diagnostik Otomasi KPI untuk melihat metrik yang macet, dan urutan penilaian yang wajib (anggota tim dulu baru Leader/Supervisor).",
       "kata_kunci": [
         "KPI",
-        "otomasi skor",
+        "otomasi skor KPI",
         "auto-values",
         "kpi_template",
         "kpi_score",
+        "Employee Service",
         "ICC",
-        "skor_tim",
-        "uptime_sistem",
-        "supervisor",
-        "cakupan",
-        "otomasi KPI",
-        "auto"
+        "skor tim",
+        "Otomasi KPI",
+        "matriks KPI departemen"
       ]
     },
     {
