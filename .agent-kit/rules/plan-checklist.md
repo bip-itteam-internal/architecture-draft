@@ -28,6 +28,14 @@ Sebelum menulis satu langkah pun, cari kode/alur yang **sudah** menyelesaikan se
 masalah ini. Untuk tiap yang ditemukan, putuskan eksplisit: rencana ini **memakainya
 ulang** atau **membangun tandingannya**. Kalau membangun tandingan, sebutkan kenapa.
 
+⛔ **Sebutkan pencarian yang BENAR-BENAR dijalankan, bukan kesimpulannya.** Tulis pola yang
+dipakai dan berapa kandidat ditemukan (`Grep "useOpsiSumber|opsiSumber" src/features/hris/kpi`
+→ 2 berkas). Tanpa itu bagian ini tak bisa dibuktikan meleset, dan bagian yang boleh diisi
+"tidak ada" tanpa bukti **akan** diisi "tidak ada": logika pilihan sumber KPI sudah
+terduplikasi di dua berkas persis karena tak ada yang mencari lebih dulu. Aturannya sama
+dengan `audit-keamanan` yang menuntut menyebut berapa kandidat dibuang — pencarian yang tak
+disebutkan tidak dianggap terjadi.
+
 Yang wajib dicek di sini:
 
 - **Komponen shared frontend.** Reuse yang asli lewat adapter, jangan bikin tiruan
@@ -41,6 +49,14 @@ Yang wajib dicek di sini:
   dilarang bikin halaman kalender sendiri.
 - **Dok arsitektur di vault.** Apakah sudah ada dok/ADR yang mengatur ini? Rencana yang
   menyimpang wajib menyebut dok mana dan apakah penyimpangannya disengaja.
+
+⚠️ **Menemukan yang sudah ada BUKAN izin menggeneralisasi.** Kalau yang ketemu hampir cocok,
+pilihannya memakainya lewat adapter atau membiarkannya. Yang dilarang: menambah prop, tipe,
+atau generic ke komponen/fungsi yang sudah dipakai banyak tempat demi satu pemanggil baru.
+Rencana yang tetap ingin melakukannya wajib menyebut **berapa pemanggil lain yang ikut
+terdampak** dan kenapa itu sepadan. Abstraksi baru diangkat pada pemakai **ketiga**, bukan
+kedua; dua yang mirip sering kebetulan, dan menyatukannya lebih awal mengunci bentuk yang
+belum tentu benar. Latar lengkapnya di `team-memory.md` § Prinsip kode.
 
 Bagian ini masuk ke artefak rencana sebagai `## Apa yang Sudah Ada`.
 

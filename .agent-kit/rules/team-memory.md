@@ -4,6 +4,12 @@
 > **Sumber** = kit (`architecture-draft/.agent-kit/rules/`), dibaca **langsung dari vault** lewat path itu — `init` hanya menyalin `commands`, `hooks`, dan `skills`, TIDAK `rules` (`.claude/rules/` memang tidak ada). Karena itu semua berkas di `rules/` berlaku cukup dengan `git pull architecture-draft`, tanpa re-run `init`.
 > Beda dari **auto-memory** `~/.claude/.../memory/` yang **privat per-mesin**. Fakta durable & layak-bagi → taruh di sini atau promosikan ke vault.
 
+## Prinsip kode: SATU FAKTA SATU TEMPAT (bukan "bikin yang reusable")
+- **Ukurannya satu pertanyaan: kalau fakta ini berubah, berapa berkas harus disunting?** Lebih dari satu = bug yang sedang menunggu. Yang dimaksud *fakta*: ambang, rumus, daftar-izin, urutan menang, label, nama rute. Hampir semua kerusakan mahal di berkas ini berbentuk satu fakta yang hidup di dua tempat lalu menyimpang diam-diam (ambang KPI 75 vs 80, `weight` ditulis dua layar, kategori inbox tersalin ke biner tiap service), dan tak satu pun tercegah oleh "tulis kode yang reusable".
+- ⛔ **JANGAN generalisasi demi pemakai yang belum ada.** Menebak pemakaian berikutnya tak bisa diandalkan: pemakai kedua `department` datang sebagai **label grup** `HRGA` yang tak dimiliki `work_data` siapa pun, dan setiap konsumen yang sudah "disiapkan" tetap patah. Tunggu pemakai **ketiga** sebelum mengangkat abstraksi; dua yang mirip sering kebetulan. Dilarang menambah prop/tipe ke komponen shared demi satu pemanggil — ongkosnya jatuh ke puluhan halaman, manfaatnya ke satu (lihat `FilterTable` di § Jebakan tabel/filter).
+- **Reuse yang SALAH lebih mahal daripada duplikasi.** Memakai ulang menuntut membaca kontrak komponennya, bukan cuma daftar props-nya; `ScrollArea` ber-`max-h-*` memotong isinya rapi tanpa batang gulir sehingga terbaca seperti fitur yang bekerja.
+- Gerbang rincinya dibaca **on-demand**, sengaja tidak di sini supaya tak membakar konteks tiap sesi: **mencari sebelum membangun** di `plan-checklist.md` §1, **duplikasi fakta** di `review-checklist.md` §G (Pass 1, kritis), **abstraksi kelewat dini** di §N (Pass 2).
+
 ## Konvensi build & tooling
 - **JS/TS pakai `pnpm`** (bukan npm/yarn) — berlaku semua repo JS (erp-frontend, mybharata, website-bharata, dll).
 

@@ -188,11 +188,36 @@ Berlaku untuk tiap diff yang menyentuh UI, menu, atau navigasi.
 Bila rencana punya bagian `## Alur Pengguna`, bandingkan diff dengannya: titik putus yang
 sudah ditandai di rencana tetapi tak ditutup di diff adalah temuan, bukan catatan.
 
+### G. Satu fakta hidup di dua tempat
+
+Pertanyaannya bukan "apakah kodenya mirip" melainkan **"kalau fakta ini berubah, berapa
+berkas harus disunting?"**. Lebih dari satu = temuan. Yang dimaksud *fakta*: ambang, rumus,
+daftar-izin, urutan menang, label, nama rute. Kelas ini kritis karena gagalnya **senyap dan
+tertunda**: kedua salinan benar saat ditulis, lalu satu diperbaiki dan satunya tidak.
+
+- **Ambang/konstanta ditulis ulang** alih-alih diimpor. Kartu "Tercapai" memakai `75`
+  sementara donut tepat di bawahnya memakai `AMBANG_BAIK` = 80, jadi orang berskor 77
+  tercapai di satu kartu dan "perlu dijaga" di kartu sebelahnya. Tak ada galat, tak ada
+  test merah, dan angkanya sama-sama masuk akal.
+- **Satu field ditulis dari dua layar** lewat endpoint yang sama. `weight` disunting di
+  editor template DAN di tab Atur Target; yang belakangan menyimpan menang tanpa ada yang
+  tahu. Bila memang disengaja, wajib jadi catatan eksplisit di dok, bukan dibiarkan diam.
+- **Daftar/aturan disalin lintas lapisan**: daftar-izin kategori inbox, daftar sumber, peta
+  formula, urutan menang resolver. Salinan berhenti menerima perbaikan lalu menyimpang.
+  ⚠️ Salinan lewat **biner** (`shared-library` di service yang tak ikut naik) **tidak
+  terlihat sama sekali di diff**; lihat §L.
+- **Format/normalisasi diulang** di lapisan fetch dan di render. Yang di fetch menang diam
+  diam dan mengunci kolomnya dari bahasa aktif.
+
+⚠️ **Menyatukan dua penulis satu field mengubah perilaku yang terlihat user** → masuk
+TANYAKAN DULU, bukan perbaiki langsung. Yang boleh langsung: mengganti ambang yang ditulis
+ulang dengan impor konstanta yang sudah ada.
+
 ---
 
 ## Pass 2 — INFORMASIONAL
 
-### G. Nama field & tag bson/json
+### H. Nama field & tag bson/json
 
 - **Tag `bson` tidak cocok dengan nama field di koleksi.** Gejalanya senyap: field terbaca
   sebagai nilai nol, bukan error. Cocokkan dengan dokumen nyata atau Data Dictionary di vault.
@@ -201,7 +226,7 @@ sudah ditandai di rencana tetapi tak ditutup di diff adalah temuan, bukan catata
 - **Pemeriksa request yang cuma mengecek string** meloloskan field `time.Time`/`int` sebagai
   nilai nol. Cek eksplisit per tipe.
 
-### H. Kontrak API & kompatibilitas mundur
+### I. Kontrak API & kompatibilitas mundur
 
 - Field dihapus/berganti tipe di respons, atau parameter wajib baru di endpoint lama.
 - Status code atau method berubah tanpa alias path lama.
@@ -210,7 +235,7 @@ sudah ditandai di rencana tetapi tak ditutup di diff adalah temuan, bukan catata
   aman bila field baru belum ada).
 - Dok `API - <Service>.md` di vault tidak ikut diperbarui saat rute berubah.
 
-### I. Frontend (erp-frontend / mybharata)
+### J. Frontend (erp-frontend / mybharata)
 
 - **Teks user-facing baru di-hardcode.** Wajib lewat `t("domain.key")`, key ditaruh di
   **dua** berkas `src/i18n/locales/id.ts` **dan** `en.ts`. Istilah teknis lazim English
@@ -235,7 +260,7 @@ sudah ditandai di rencana tetapi tak ditutup di diff adalah temuan, bukan catata
 - **Komponen tiruan look-alike** alih-alih reuse komponen shared via adapter.
 - Error validasi form tidak lewat `showFormErrorsToast`.
 
-### J. Celah test
+### K. Celah test
 
 - Jalur galat/guard baru tanpa test negatif sama sekali.
 - **Test fungsi murni tidak menangkap cacat glue handler.** Tambahkan minimal satu
@@ -263,7 +288,7 @@ sudah ditandai di rencana tetapi tak ditutup di diff adalah temuan, bukan catata
 - Uji i18n memakai `t` tiruan sehingga buta terhadap key yang hilang; uji terpisah dengan
   instance i18next asli + kontrol negatif bahwa `en` bukan hasil fallback ke `id`.
 
-### K. Deploy & konfigurasi
+### L. Deploy & konfigurasi
 
 - **Menambah env tanpa mencatat bahwa container harus `--force-recreate`.** Env dibaca saat
   container DIBUAT, `restart` saja tidak cukup.
@@ -276,7 +301,7 @@ sudah ditandai di rencana tetapi tak ditutup di diff adalah temuan, bukan catata
 - **Seed master data** berhenti bila koleksi tak kosong, jadi data baru tak masuk ke
   environment yang sudah terisi. Sediakan migrasi terpisah.
 
-### L. Kode mati & konsistensi
+### M. Kode mati & konsistensi
 
 - Variabel/fungsi/import yang tak terpakai setelah perubahan.
 - Komentar yang bertentangan dengan kode setelah diubah.
@@ -284,6 +309,29 @@ sudah ditandai di rencana tetapi tak ditutup di diff adalah temuan, bukan catata
 - Perubahan yang menyimpang dari dok di `architecture-draft/` (endpoint, kontrak,
   ownership data) tanpa dok-nya ikut diperbarui. Bila menyimpang dari ADR, sebutkan
   ADR-nya dan katakan apakah ini penyimpangan sadar atau kelalaian.
+
+### N. Abstraksi yang kelewat dini
+
+Arah kesalahan yang **berlawanan** dengan §G, dan sengaja dipisah darinya. Jangan
+memperlakukan keduanya sama: review yang menuntut abstraksi untuk tiap kemiripan akan
+diabaikan seluruhnya, beserta bagiannya yang benar. Kalau ragu antara §G dan §N, tanyakan
+apakah yang berulang itu sebuah **fakta** (§G) atau cuma **bentuk** (§N).
+
+- **Menambah prop, tipe, atau generic ke komponen/fungsi yang dipakai banyak tempat demi
+  SATU pemanggil baru.** Sebutkan berapa pemanggil lain ikut terdampak. `FilterTable`
+  dirender puluhan halaman; menambah tipe filter ke sana demi satu modul memindahkan
+  risikonya ke semuanya sementara manfaatnya tinggal di satu (§J).
+- **Mengangkat abstraksi pada pemakai KEDUA.** Tunggu yang ketiga; dua yang mirip sering
+  kebetulan, dan bentuk yang dikunci terlalu awal biasanya salah. Yang benar-benar terjadi:
+  pemakai kedua `department` datang sebagai label grup `HRGA` yang tak dimiliki `work_data`
+  siapa pun, jadi "persiapan" apa pun tetap patah.
+- **Generalisasi untuk pemakai yang belum ada sama sekali.** Parameter, flag, atau lapisan
+  yang tak punya pemanggil hari ini. Kode yang dirakit tapi tak dibaca siapa pun tak
+  menghasilkan satu pun test merah saat ia salah.
+- **Ekstraksi tanpa test sendiri, atau jalur lama tak dihapus.** Fungsi murni yang diangkat
+  tapi hanya teruji lewat komponennya cuma berpindah tempat, belum jadi sumber kebenaran.
+  Dan jalur lama yang dibiarkan hidup **adalah** duplikasi fakta yang baru saja dibuat, jadi
+  temuannya naik ke §G.
 
 ---
 
@@ -296,7 +344,8 @@ KRITIS                              INFORMASIONAL
 ├─ Kelengkapan enum & nilai baru    ├─ Frontend (i18n, filter, format, komponen)
 ├─ Konkurensi & keutuhan data       ├─ Celah test
 ├─ Batas kepercayaan input          ├─ Deploy & konfigurasi
-└─ Alur pengguna terputus           └─ Kode mati & konsistensi
+├─ Alur pengguna terputus           ├─ Kode mati & konsistensi
+└─ Satu fakta dua tempat (§G)       └─ Abstraksi kelewat dini (§N)
 ```
 
 ---
@@ -309,10 +358,13 @@ PERBAIKI LANGSUNG                    TANYAKAN DULU
 ├─ N+1 yang jelas                    ├─ Konkurensi / atomisitas
 ├─ Komentar basi                     ├─ Keputusan desain
 ├─ Angka ajaib -> konstanta bernama  ├─ Fix > 20 baris
-├─ Key i18n hilang di salah satu     ├─ Kelengkapan enum
-│  locale                            ├─ Menghapus fungsionalitas
-├─ Format tanggal pindah ke render   └─ Apa pun yang mengubah perilaku
-└─ Ketidakcocokan versi/path            yang terlihat user
+├─ Ambang ditulis ulang -> impor     ├─ Kelengkapan enum
+│  konstanta yang sudah ada          ├─ Menghapus fungsionalitas
+├─ Key i18n hilang di salah satu     ├─ Menyatukan dua penulis satu
+│  locale                            │  field (mis. `weight`)
+├─ Format tanggal pindah ke render   ├─ Mengangkat abstraksi baru
+└─ Ketidakcocokan versi/path         └─ Apa pun yang mengubah perilaku
+                                        yang terlihat user
 ```
 
 Patokan: bila fix-nya mekanis dan senior engineer akan menerapkannya tanpa diskusi,
