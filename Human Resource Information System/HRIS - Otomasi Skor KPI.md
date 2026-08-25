@@ -128,13 +128,13 @@ Sampai batch ini, menyalakan satu metrik otomatis menuntut seseorang membedah `k
 |---|---|---|
 | **Katalog pilihan** | `GET /kpi/sumber-katalog?department=` | Daftar sumber, sub-metrik, formula, arah, dan scope selama ini hanya hidup di kode Go. Frontend yang menuliskan daftarnya sendiri membuat tiap sumber baru menuntut perubahan di dua tempat. Formula/arah/scope dibaca **lewat refleksi** atas struct di `shared-library`, bukan disalin — literal berarti pilihan baru tak pernah muncul dan gejalanya cuma dropdown yang kurang |
 
-> [!important] Katalog kini menjawab cakupan dan rumus PER SUMBER
-> ⚠️ Branch `feat/kpi-katalog-scope-sumber`, **belum merge, belum deploy** (2026-08-25).
+> [!important] Katalog kini menjawab cakupan, rumus, dan pengelompokan PER SUMBER
+> ✅ **Live di produksi** 2026-08-25 (PR [#1423](https://github.com/bip-itteam-internal/bip-erp/pull/1423) + [#1425](https://github.com/bip-itteam-internal/bip-erp/pull/1425)), diverifikasi dari **bentuk respons** container prod — bukan dari status 200, yang tak membedakan apa pun di kelas ini.
 >
 > Sampai perubahan ini, katalog mengirim `scope` dan `formula` sebagai **daftar global**
 > saja. Frontend karena itu tak punya dasar mengisi keduanya, lalu mengirim blok `auto`
 > ber-`scope` kosong yang ditolak `ValidateKPIAutoConfig` dengan 400. Tiap entri sumber kini
-> membawa empat field baru:
+> membawa lima field baru:
 >
 > | Field | Arti |
 > |---|---|
@@ -142,6 +142,16 @@ Sampai batch ini, menyalakan satu metrik otomatis menuntut seseorang membedah `k
 > | `scope_baku` | selalu terisi nilai yang lolos validator, termasuk bagi sumber yang mengabaikan cakupan |
 > | `formula_baku` | rumus kanonik sumber yang tak bersub-metrik (mis. `skor_tim`) |
 > | `formula_metrik` | rumus kanonik per sub-metrik; satu sumber bisa berbeda per metrik |
+> | `grup` | pengelompokan tampilan: `marketing`·`finance`·`sdm`·`it`·`ga`·`umum` |
+>
+> ⛔ **`grup` adalah ASAL DATA, bukan departemen pemakainya.** `kedisiplinan_absensi`
+> bergrup `sdm` karena datanya dari absensi, walau ia dipakai KPI hampir semua departemen;
+> mengelompokkannya menurut pemakai akan menaruh satu sumber di banyak grup sekaligus dan
+> memaksa katalog tahu siapa memakai apa — pengetahuan yang tak dimilikinya dan akan
+> menyimpang begitu ada template baru. `umum` menampung yang memang lintas departemen.
+> Sebaran nyata di prod: finance 7, marketing 4, umum 3, sdm 3, it 2, ga 1 dari 20 sumber.
+> Pendaftarnya **memanik saat boot** bila grupnya tak dikenal, sebab kegagalan yang
+> sebenarnya di sini berbentuk dropdown yang diam-diam kehilangan satu pilihan.
 >
 > **Hanya 5 dari 18 sumber yang benar-benar membaca `KPIAutoConfig.Scope`**: `skor_tim`,
 > `kinerja_toko`, `kedisiplinan_absensi`, `kontrak_karyawan`, dan `turnover_karyawan`. Dua

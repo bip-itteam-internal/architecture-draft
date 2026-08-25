@@ -2,7 +2,7 @@
 
 *Membuat template KPI dan menetapkan targetnya dikerjakan di **satu layar**, bukan dua. Pemisahannya sebelumnya adalah keputusan sadar yang ditulis sebagai komentar di kode, jadi pembalikannya ditulis sebagai ADR supaya tidak dibalik lagi diam-diam.*
 
-- **Status**: ⚠️ **Diputuskan 2026-08-25, kode selesai tetapi BELUM merge dan BELUM deploy.** Branch `feat/kpi-katalog-scope-sumber` (bip-erp) dan `feat/kpi-template-satu-halaman` (erp-frontend).
+- **Status**: ⚠️ **Diputuskan 2026-08-25, seluruhnya merged; backend live di produksi, frontend baru sebagian.** Backend [#1423](https://github.com/bip-itteam-internal/bip-erp/pull/1423) + [#1425](https://github.com/bip-itteam-internal/bip-erp/pull/1425) **terverifikasi live** (bentuk respons `/kpi/sumber-katalog` di prod memuat `scope_didukung`·`scope_baku`·`formula_baku`·`formula_metrik`·`grup`, 2026-08-25). Frontend [#1214](https://github.com/bip-itteam-internal/erp-frontend/pull/1214) **live** (editor gabungan + perbaikan 400); [#1217](https://github.com/bip-itteam-internal/erp-frontend/pull/1217) (pengelompokan sumber), [#1218](https://github.com/bip-itteam-internal/erp-frontend/pull/1218) (label lengkap), dan [#1220](https://github.com/bip-itteam-internal/erp-frontend/pull/1220) (kartu ringkasan + pencarian lintas departemen) **merged tetapi BELUM di-deploy** — prod FE berhenti di merge #1216 (dibuktikan: string `"Search source or metric"` ada di bundel prod, `"Marketing & Stores"` tidak).
 - **Ruang lingkup**: `kpi_template` di [[Microservices - Employee Service]], halaman `/hris/kpi/templates` dan tab Atur Target di `/hris/kpi` pada [[APP - Web ERP]]. Tidak menyentuh `kpi_score` maupun aturan penilaian.
 
 ## Context
