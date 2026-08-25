@@ -12,6 +12,7 @@
 |---|---|---|---|---|
 | employee | harian 04:00 (`0 4 * * *`) | sync company work schedule | — | `services/employee/cron.go:29` |
 | employee | tgl 1 / bulan 08:45 (`45 8 1 * *`) | broadcast reminder KPI (FCM + inbox) | — | `services/employee/cron.go:34` |
+| employee | harian 02:00 (`0 2 * * *`) | **finalisasi skor KPI otomatis-penuh** ([[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]]): bekukan `kpi_score` posisi yang SELURUH metriknya ber-`auto` & menghasilkan angka; jabatan per-periode. **Tanggal beku per-department** (2026-08-25): default **tgl 1**, **Finance tgl 5** (`bolehBekuDept`, relatif periode). Idempoten (`$setOnInsert`), dijalankan harian sebulan penuh supaya container mati tak melewatkan sebulan; setelah `cronTerapkanMutasi` 00:15 | — | `services/employee/cron.go:52` (`kpi_finalisasi.go`) |
 | employee | 1 Jan 00:05 (`5 0 1 1 *`) | reset kuota cuti tahunan (used→0) | — | `services/employee/cron.go:37` |
 | attendance | tiap 30 mnt (`*/30 * * * *`) | pre-alokasi entry absensi ~2j sebelum shift; pending→alpha saat shift mulai; perhitungkan **cuti & tukar jadwal** disetujui (swap kedua sisi via `WorkTimeFor`) | — | `services/attendance/cron.go:28` |
 | attendance | tiap jam (`0 * * * *`) | auto-ignore **leave + koreksi presensi + tukar jadwal** basi (>24j) + FCM — termasuk tahap consent rekan | — | `services/attendance/cron.go:38` |
