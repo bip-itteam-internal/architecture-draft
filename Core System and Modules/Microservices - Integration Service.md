@@ -247,6 +247,16 @@ Koleksi `icc_affiliate_accounts` — **terpisah dari `icc_account_mappings`**: a
 
 `NormalisasiUsername` (fungsi murni, `usecase/icc_affiliate_account_usecase.go`) membuang `@`, merapatkan spasi tepi, menyamakan ke huruf kecil, lalu memvalidasi `^[a-z0-9._]{2,24}$`. Placeholder (`-`, `@`) dan handle berspasi **ditolak, bukan ditebak** — keduanya butuh keputusan manusia.
 
+### Tim channel affiliate (`affiliate_channel_team`) 🟡 branch `feature/workspace-position`
+
+Menandai staf **Affiliate Acquisition** masuk tim channel **tiktok** atau **shopee** — dasar KPI affiliate per-tim (realisasi = total channel, lihat [[HRIS - Otomasi Skor KPI]]). BEDA dari `icc_affiliate_accounts`: bukan kepemilikan akun, melainkan penempatan channel staf.
+
+- `GET /affiliate/channel-team` — daftar mapping aktif; filter `channel`, `is_active`
+- `POST /affiliate/channel-team` — tetapkan/ganti channel staf (`employee_id`·`employee_name`·`channel`); pindah channel **menonaktifkan** baris lama lalu buat baru (riwayat tersimpan); idempotent bila channel sama
+- `PATCH /affiliate/channel-team/:id/deactivate` — nonaktifkan
+
+Semua gate `RequireMarketingLeader`. Koleksi `affiliate_channel_team`; partial unique `(employee_id, is_active=true)` — satu channel aktif per karyawan. `channel` divalidasi ke `tiktok`/`shopee` (usecase). Dikelola dari **menu Affiliate** (dialog "Tim Channel") di [[APP - Web ERP]].
+
 ### Marketing Team & Shop ACL (admin only)
 - `/marketing/teams` — CRUD tim marketing (gated `RequireIntegrationAdmin` = supervisor/admin module integration)
 - Anggota tim: assign/unassign member (`/marketing/teams/:id/members`)
