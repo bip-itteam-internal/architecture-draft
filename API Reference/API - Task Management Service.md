@@ -136,9 +136,16 @@ melakukannya.
 
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/kpi/ticket` 🟡 | **belum merge** (branch `feat/kpi-sumber-tiket`). Agregat tiket satu orang satu periode untuk penilaian KPI. Query wajib `employee_id`·`periode=YYYY-MM`·`key`. Balasan `{ditugaskan, selesai, sla_terukur, selisih_jam[], csat_rating[]}` |
+| GET | `/kpi/ticket` ✅ | Agregat tiket **satu orang** satu periode untuk penilaian KPI. Query wajib `employee_id`·`periode=YYYY-MM`·`key`. Balasan `{ditugaskan, selesai, sla_terukur, selisih_jam[], csat_rating[]}`. Live di prod sejak 6 Agustus 2026 ([#1055](https://github.com/bip-itteam-internal/bip-erp/pull/1055)); penanda "belum merge" di versi lama dok ini sudah usang |
+| GET | `/kpi/space-group` ⚠️ | Agregat tiket **satu kelompok space** satu periode, untuk metrik KPI Leader. Query wajib `division`·`group`·`periode=YYYY-MM`·`key`. Balasan sama dengan `/kpi/ticket` ditambah `{division, group, spaces}`. Merged [#1427](https://github.com/bip-itteam-internal/bip-erp/pull/1427)+[#1428](https://github.com/bip-itteam-internal/bip-erp/pull/1428) 2026-08-25, **belum terverifikasi lewat gateway** |
 
 > **Kenapa tidak memakai `/report/*` yang angkanya bertetangga.** Rute laporan digerbang izin PEMANGGIL dan cakupannya mengikuti siapa yang memanggil; ia menjawab *"apa yang boleh dilihat orang ini"*. Yang dibutuhkan employee-service pertanyaan lain, *"berapa angka si A pada Juli"*, tanpa membawa identitas pemakai sama sekali. Memaksakan satu rute untuk dua pertanyaan berarti salah satunya harus melonggarkan gerbangnya.
+
+> ⛔ **`/kpi/space-group` TIDAK dapat diturunkan dari `/kpi/ticket`.** Menjumlahkan angka per anggota membuang tiket yang **belum ditugaskan kepada siapa pun** dan tiket yang dipegang **akun non-aktif**, padahal keduanya justru yang paling perlu terlihat oleh Leader. Diukur di produksi Juli 2026 untuk space pengembangan: **14 tiket tanpa assignee** dan **24 tiket dipegang akun non-aktif**. Dengan cakupan `team`, penyebutnya menyusut dan angka Leader **membaik persis ketika timnya menelantarkan tiket** — tanpa galat dan tanpa gejala. Karena itu ruang lingkupnya daftar **space**, bukan daftar orang.
+>
+> Ruang lingkup itu diturunkan dari DATA: `space.division` menyebut departemen pemiliknya dan **`space.kpi_group`** (`support` / `development` / kosong) memisahkan pekerjaan dukungan dari pengembangan di dalam satu divisi. Space baru cukup ditandai lewat layar, tanpa deploy dan tanpa daftar id di kode. Kosakatanya **tetap**, supaya katalog metrik KPI bisa statis dan salah ketik ketahuan saat memilih.
+>
+> **Divisi yang belum satu pun space-nya bergrup dijawab `409`, bukan `200` berisi nol.** Nol tiket terbaca sebagai "timnya tidak mengerjakan apa pun" dan nilainya tampak sah, sehingga kesalahan pengisian berubah jadi skor buruk seseorang tanpa satu pun gejala. Pesannya menyebut berapa space yang belum diisi **dan di layar mana mengisinya** (Manajemen Tugas › Kelola Space › Ubah › Kelompok KPI), karena yang membacanya berdiri di layar KPI sedangkan sebabnya ada di modul lain. Konsumennya, sumber `kinerja_tiket_divisi` di [[Microservices - Employee Service]], meneruskan badan galat itu apa adanya ke `auto_basis`.
 
 Gerbangnya **kunci layanan sendiri** (`TASK_MANAGEMENT_SERVICE_KEY` lewat query `key`), bukan `INTERNAL_GATEWAY_KEY` yang dipasang gateway untuk setiap permintaan ber-JWT ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). **Kunci yang belum dikonfigurasi MENUTUP rute**, supaya env yang lupa dipasang tidak berubah jadi pintu terbuka. Polanya menyalin `/kpi/uptime` [[Microservices - Monitoring Service]] dan `/kpi/kinerja-toko` [[Microservices - Marketing Analytics Service]].
 
@@ -151,6 +158,8 @@ Aturan isi muatannya, semuanya supaya sumber tidak diam-diam menilai:
 - ⚠️ **Selesai BUKAN berarti `status == "Done"`.** Stage terakhir dinamai per-space, dan `isTerminalStatus` mengenali `Done`, `Selesai`, serta `Archive`. Tiga space Tech Development memakai `Archive`; menghitung `Done` saja membuang 18 tiket ber-assignee di produksi, 5 di antaranya membawa rating CSAT alias 29% dari seluruh rating yang pernah masuk.
 - Tiket **`Ditolak` tidak masuk penyebut** sama sekali: permintaan yang batal dikerjakan, bukan pekerjaan yang gagal diselesaikan.
 - Tiket **arsip TETAP dihitung**, beda dari `reportBaseFilter`. Tiket yang selesai lalu diarsipkan auto-close tetap pekerjaan orang itu.
+
+Seluruh aturan di atas berlaku **sama persis** untuk kedua rute, dan itu dijaga kode: `ringkasTiketKPI` (per orang) dan `ringkasTiketGrup` (per kelompok) memanggil satu fungsi `ringkasTiket(tugas, ikut)` yang membedakan keduanya **hanya** lewat predikat siapa yang ikut dihitung. Menyalin badan fungsinya akan melahirkan dua definisi "selesai" yang pasti menyimpang, dan penyimpangannya tak pernah muncul sebagai galat — hanya sebagai dua angka yang berbeda untuk pertanyaan yang sama.
 
 ## WebSocket
 | Path | Fungsi |
