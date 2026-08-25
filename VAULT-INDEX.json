@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-25",
-  "jumlah_dokumen": 296,
+  "jumlah_dokumen": 297,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -90,6 +90,7 @@
         "APP - Web ERP",
         "HRIS - Otomasi Skor KPI",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman",
         "HRIS - Attrition",
         "Microservices - File Service",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
@@ -100,24 +101,21 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "d0ed596e4a6786cf928d2a7400310971e2454685b6d5059634f9b088ceea47d5",
-      "ukuran_kb": 38.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service lewat gateway /api/employee/*, dan siapa yang boleh memanggilnya. Mencakup login/PIN/biometrik dan onboarding, CRUD personal_data dan work_data beserta dokumennya, pengelolaan akun (aktif/nonaktif, forget-device, reset, roles), master departemen dan system role (termasuk menu_hidden, job level, dan penetapan penyetuju pengajuan), akun pihak luar vendor/mitra ber-prefix EXT-, serta KPI, cuti, laporan, resign, promosi/mutasi, dan surat peringatan. Menjelaskan juga gerbang RBAC tiap grup rute (RequireHRISStaff, RequireITStaff, RequireHRISOrITSupervisor, RequireITSupervisor) dan jebakan urutan pendaftaran rute statis vs rute ber-parameter.",
+      "hash": "18b2c0b887ff7688c290905e9e12e44d4ea45c8e6e7339ad727b7eb5adf6fdde",
+      "ukuran_kb": 39.8,
+      "ringkasan": "Menjawab: endpoint apa saja di employee-service sebagai inti HRIS, mulai dari auth dan onboarding, CRUD data personal dan work_data, dokumen karyawan, sampai KPI, jadwal, dan master data. Menyebut pula gerbang RBAC tiap kelompok rute dan bentuk data penting seperti katalog sumber KPI beserta cakupan dan rumusnya.",
       "kata_kunci": [
-        "employee-service",
-        "API employee",
-        "endpoint karyawan",
-        "auth login",
-        "onboarding",
+        "employee service",
+        "endpoint",
+        "HRIS",
+        "auth",
+        "login",
         "work_data",
         "personal_data",
-        "master department",
-        "system roles",
-        "RBAC",
-        "external account",
-        "akun vendor",
-        "penyetuju pengajuan",
-        "approver"
+        "KPI",
+        "sumber katalog",
+        "master data",
+        "RBAC"
       ]
     },
     {
@@ -204,9 +202,9 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "d109cb90b5320005d295af6d1e36c012e90d10efedca4e3763d26c186b3b49fd",
-      "ukuran_kb": 30.8,
-      "ringkasan": "Menjawab: endpoint apa saja untuk membuat, menerbitkan, dan menganalisa form dinamis, siapa yang boleh mengelolanya (RBAC per departemen plus kunci modul IT untuk aturan tipe form), dan bagaimana karyawan mengisinya lewat rute /me. Memuat juga permukaan Kaizen, indeks layanan departemen lewat /me/service-index, serta bentuk data penting seperti tipe field, bobot, sasaran penilaian, penanda metrik, saklar anonim, form berulang, dan gerbang presensi.",
+      "hash": "85cab14fc32f21a884876392e9052c158c7b71ab0c29e518308895127410e924",
+      "ukuran_kb": 32.1,
+      "ringkasan": "Menjawab: endpoint apa saja untuk membuat, menerbitkan, dan menganalisa form dinamis, siapa yang boleh mengelolanya (RBAC per departemen plus kunci modul IT untuk aturan tipe form), dan bagaimana karyawan mengisinya lewat rute /me. Memuat juga permukaan Kaizen, indeks layanan departemen, serta bentuk data penting seperti tipe field, bobot, sasaran penilaian, penanda metrik, saklar anonim, form berulang, gerbang presensi, dan blok index pada respons analitik.",
       "kata_kunci": [
         "form builder",
         "endpoint",
@@ -214,14 +212,15 @@
         "survei",
         "survey",
         "kaizen",
+        "analisa jawaban",
+        "analytics",
         "indeks layanan",
         "service index",
         "metric_key",
         "anonim",
         "bobot",
         "weight",
-        "form berulang",
-        "gerbang presensi"
+        "form berulang"
       ]
     },
     {
@@ -1157,6 +1156,7 @@
         "HRIS - Organization Structure",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "CORE - RBAC dan Permission Set",
+        "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
         "HRIS - Key Performance Index",
         "Microservices - Manufacture Service",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
@@ -1218,9 +1218,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "b28e88ab75b62630ca79a6c69eba7dd12f4dd0ceeff775bd5d84d214d7dfec5b",
-      "ukuran_kb": 300.2,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP internal (One Bharata), bagaimana autentikasi, role, dan perannya sebagai SSO Identity Provider bekerja, serta bagaimana sidebar digerbang per modul. Memuat rincian halaman per divisi termasuk Ringkasan Divisi IT beserta kartu indeks layanannya, dukungan multi-perusahaan, dan alasan di balik bentuk tiap layar.",
+      "hash": "325b1c8bf3229225f1245117f35c7f88a7d843ccf1d559358a14a06a1e12ff33",
+      "ukuran_kb": 307.0,
+      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP internal (One Bharata), bagaimana autentikasi, role, dan perannya sebagai SSO Identity Provider bekerja, serta bagaimana sidebar digerbang per modul. Memuat rincian tiap halaman per divisi berikut alasan di balik bentuknya, termasuk Ringkasan Divisi IT, Form Builder beserta halaman analisa jawaban dan tab Ringkasan Eksekutifnya, dan dukungan multi-perusahaan.",
       "kata_kunci": [
         "web erp",
         "hris-dashboard",
@@ -1231,6 +1231,9 @@
         "role gating",
         "sso",
         "ringkasan divisi",
+        "form builder",
+        "analisa jawaban",
+        "ringkasan eksekutif",
         "multi-perusahaan"
       ]
     },
@@ -1894,15 +1897,16 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "529292b7fd8845d5ff9d3e233e499eb16030bc38f4500939f23040c56c816015",
-      "ukuran_kb": 92.1,
-      "ringkasan": "Menjawab: bagaimana form-builder-service diimplementasikan, mulai dari kepemilikan form per departemen, izin tipe form, skor gabungan pada form penilaian, indeks layanan departemen, form berulang berperiode, program Kaizen, lampiran berkas, sampai gerbang presensi. Menjelaskan pula keputusan desain di balik tiap aturan berikut kegagalan senyap yang ditutupnya.",
+      "hash": "a11b2a418b348b952ddf1094aa1c5efea9c88e38184625b85f5c82dca21cc4d6",
+      "ukuran_kb": 92.9,
+      "ringkasan": "Menjawab: bagaimana form-builder-service diimplementasikan, mulai dari kepemilikan form per departemen, izin tipe form, skor gabungan pada form penilaian, indeks layanan departemen dan blok index di analisa, form berulang berperiode, program Kaizen, lampiran berkas, sampai gerbang presensi. Menjelaskan pula keputusan desain di balik tiap aturan berikut kegagalan senyap yang ditutupnya.",
       "kata_kunci": [
         "form builder service",
         "form dinamis",
         "skor gabungan",
         "indeks layanan",
         "metric_key",
+        "blok index",
         "kaizen",
         "form berulang",
         "periode",
@@ -4267,6 +4271,41 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman.md",
+      "judul": "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "**Diputuskan 2026-08-25, kode selesai tetapi BELUM merge dan BELUM deploy.** Branch `feat/kpi-katalog-scope-sumber` (bip-erp) dan `feat/kpi-template-satu-halaman` (erp-frontend).",
+      "publik": true,
+      "tautan": [
+        "Microservices - Employee Service",
+        "APP - Web ERP",
+        "HRIS - Key Performance Index",
+        "HRIS - Otomasi Skor KPI",
+        "API - Employee Service",
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "RUN - Menambah Metrik KPI Otomatis"
+      ],
+      "hash": "606a6e1367e77cdad39348bbef1cdca8dd0b067173724e65490de7dd4979cf3f",
+      "ukuran_kb": 6.4,
+      "ringkasan": "Menjawab: kenapa menyusun struktur template KPI dan menetapkan cara menilainya kini dikerjakan di satu layar, padahal sebelumnya sengaja dipisah ke halaman template dan tab Atur Target. Menjelaskan tiga alasan pembalikannya (alur dua halaman yang terputus, layar kedua yang menuntut memilih karyawan lebih dulu, dan bobot yang punya dua sumber kebenaran), bug penyimpanan metrik manual yang ikut terbongkar, serta konsekuensi yang diterima termasuk urutan deploy yang mengikat.",
+      "kata_kunci": [
+        "KPI",
+        "template KPI",
+        "atur target",
+        "bobot",
+        "porsi",
+        "otomasi skor",
+        "sumber katalog",
+        "scope",
+        "formula",
+        "metrik manual",
+        "ADR"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -5706,6 +5745,7 @@
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "HRIS - Organization Structure",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman",
         "HRIS - Otomasi Skor KPI",
         "HRIS - Work Review",
         "HRIS - Career & Promotion",
@@ -5713,22 +5753,19 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "e6b437244c2e2d1d8cf0ac7845a30376cd2b7f4ea6ec7d34aacad6a50112ea1e",
-      "ukuran_kb": 28.7,
-      "ringkasan": "Menjawab: bagaimana penilaian kinerja berbasis skor KPI bekerja dan perbedaan antara engine KPI→insentif marketing (sudah production, 9 role) dengan appraisal per-karyawan lintas departemen (template per posisi + scoring di Employee Service). Menjelaskan aturan kunci penilaian: posisi template harus cocok dengan jabatan karyawan pada periode dinilai (via employee_movement), RBAC per departemen, cakupan tim untuk Leader (scope=team by supervisor_id), employee_count sebagai assignment aktual, dan tampilan gabungan lintas departemen (HRGA).",
+      "hash": "6cc29b51259b61b3f3853932e28e5fbbeb7ea396bde09488de225fdcd178ab7d",
+      "ukuran_kb": 31.4,
+      "ringkasan": "Menjawab: bagaimana penilaian kinerja berbasis skor KPI bekerja, dan yang paling penting, memisahkan dua hal yang sering tertukar — engine skor ke insentif tim marketing yang sudah jalan di produksi, versus appraisal bulanan per karyawan lintas departemen yang baru sebagian ada. Menjelaskan template per posisi, mekanisme scoring, dan bagian mana yang masih konsep.",
       "kata_kunci": [
         "KPI",
-        "key performance index",
         "appraisal",
         "penilaian kinerja",
         "skor",
         "template KPI",
-        "insentif marketing",
-        "scoring",
-        "RBAC departemen",
-        "scope team",
-        "employee_movement",
-        "HRGA"
+        "insentif",
+        "marketing",
+        "employee service",
+        "scoring"
       ]
     },
     {
@@ -5911,6 +5948,7 @@
         "Microservices - Insentive Service",
         "API - Employee Service",
         "RUN - Menambah Metrik KPI Otomatis",
+        "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman",
         "Microservices - Marketing Analytics Service",
         "Microservices - Integration Service",
         "External - Accurate",
@@ -5958,20 +5996,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "7251c5dfe16cd507b705f3d94cfb0ff423c6b97edc71c890a9ddc0c8e88c2943",
-      "ukuran_kb": 83.8,
-      "ringkasan": "Menjawab: dari seluruh metrik KPI yang terpasang di produksi, mana yang sudah bisa diisi otomatis dari data ERP, mana yang modulnya ada tapi datanya kosong, dan mana yang tidak punya sumber sama sekali. Menjelaskan metrik auto yang sudah menyala, cara kerja auto_value/auto_basis (otomatis vs semi vs manual), jebakan urutan penilaian skor_tim, layar diagnostik Otomasi KPI, dan bagaimana HR mengisi konfigurasinya sendiri. Menjawab pula apa yang dilihat karyawan sendiri di MyBharata untuk bulan berjalan lewat preview=true, kenapa skor sementaranya dihitung dari bobot yang terisi saja, dan gerbang deploy yang harus dilewati sebelum layar itu dirilis.",
+      "hash": "357bff273b6637e04527783e580679fb7567ae96bd9ddd8681aacbc0039b1209",
+      "ukuran_kb": 86.6,
+      "ringkasan": "Menjawab: metrik KPI mana yang skornya bisa diisi otomatis dari data yang sudah dimiliki ERP, mana yang modulnya ada tetapi belum dipakai, dan mana yang memang tak punya sumber. Memuat sensus metrik ber-auto di produksi berikut berapa karyawan yang terdampak, katalog sumber nilai beserta cakupan dan arah targetnya, serta konsekuensi posisi yang otomasinya penuh.",
       "kata_kunci": [
-        "otomasi KPI",
-        "auto value",
-        "kpi_template",
-        "skor tim",
-        "metrik otomatis",
-        "sumber data KPI",
-        "KPI ICC",
-        "uptime_sistem",
-        "progres bulan berjalan",
-        "skor sementara"
+        "KPI otomatis",
+        "otomasi skor",
+        "sumber nilai",
+        "katalog sumber",
+        "metrik",
+        "auto",
+        "target",
+        "cakupan",
+        "scope",
+        "sensus produksi"
       ]
     },
     {
