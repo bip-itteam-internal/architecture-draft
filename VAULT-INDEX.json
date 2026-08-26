@@ -1554,23 +1554,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "e530a46b18983f78204dc56e9d1a8277acdbf284fa8603e7a48d41ddfa680e85",
-      "ukuran_kb": 96.9,
-      "ringkasan": "Menjawab: bagaimana hak akses di bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi, cakupan data), bagaimana paket hak bernama menempel pada posisi atau jabatan alih alih pada orang, dan di lapisan mana penegakannya terjadi (gateway, service, frontend). Memuat katalog modul yang benar-benar terdaftar, status penegakan per modul, serta pembedaan permission set dari mekanisme lain yang menyentuh sidebar termasuk menu terbatas dan menu_hidden yang kini dicabut.",
+      "hash": "268135f29997f6c592c37e2b44980ffc69afbeda93015619c56e41b7e9b30c5a",
+      "ukuran_kb": 98.4,
+      "ringkasan": "Menjawab: bagaimana hak akses ditentukan di ERP Bharata, apa beda permission set dari system_roles dan dari menu terbatas, bagaimana reach (cakupan data) dihitung, dan izin apa saja yang tersedia per modul. Memuat katalog izin, paket bawaan, tangga tier per modul, serta dua kunci menu terbatas (finance.laporan dan finance.insentif) beserta fallback masing-masing dan beda perlakuan super-aksesnya.",
       "kata_kunci": [
         "RBAC",
         "permission set",
         "hak akses",
-        "paket hak",
+        "izin",
+        "reach",
+        "cakupan data",
         "system_roles",
-        "posisi",
-        "jabatan",
-        "katalog izin",
-        "tier fallback",
         "menu terbatas",
-        "menu_hidden",
-        "authorization",
-        "sidebar"
+        "katalog izin",
+        "paket hak"
       ]
     },
     {
@@ -3817,10 +3814,11 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — **sudah merge, tetapi belum berfungsi sebagaimana dimaksud.** Kode selesai di branch `feat/oneForAll` (2026-08-06), seluruh uji hijau, dan sejak itu **sudah mendarat di `main` kedua repo** (terverifikasi 2026-08-10: `services/employee/menu_terbatas.go`, `shared-library/common/catalog_menu.go`, gerbang di `services/integration/main.go`; sisi FE `utils/menu-terbatas.ts` + `components/menu-terbatas-guard.tsx`). Merge menaikkan taruhannya, bukan menurunkannya: yang menahan fitur ini kini tinggal keputusan untuk tidak memasang paketnya ke siapa pun. Aman dipasang (tak ada yang kehilangan akses), tetapi **mengaktifkannya belum benar-benar membatasi**: celah \"akun tanpa paket\" yang semula diduga kosong kini **terbukti tidak kosong** (bukti 2026-08-06 di §Consequences), sehingga akun finance/IT tanpa permission-set tetap bisa membuka halaman walau restriksi menyala. Prasyarat agar berfungsi: perbaiki fallback task-management lebih dulu. Penegakan backend juga sengaja parsial.",
+      "status_teks": "Implemented (ada catatan) — **sudah merge, tetapi belum berfungsi sebagaimana dimaksud.** Kode selesai di branch `feat/oneForAll` (2026-08-06), seluruh uji hijau, dan sejak itu **sudah mendarat di `main` kedua repo** (terverifikasi 2026-08-10: `services/employee/menu_terbatas.go`, `shared-library/common/catalog_menu.go`, gerbang di `services/integration/main.go`; sisi FE `utils/menu-terbatas.ts` + `components/menu-terbatas-guard.tsx`). Merge menaikkan taruhannya, bukan menurunkannya: yang menahan fitur ini kini tinggal keputusan untuk tidak memasang paketnya ke siapa pun. Aman dipasang (tak ada yang kehilangan akses), tetapi **mengaktifkannya belum benar-benar membatasi**: celah \"akun tanpa paket\" yang semula diduga kosong kini **terbukti tidak kosong** (bukti 2026-08-06 di §Consequences), sehingga akun finance/IT tanpa permission-set tetap bisa membuka halaman walau restriksi menyala. Prasyarat agar berfungsi: perbaiki fallback task-management lebih dulu (**langkah pertama SUDAH selesai 2026-08-09; per 2026-08-26 penyisiran ulang menemukan tak ada lagi konsumen yang menilai dari \"klaim ada\", jadi langkah kedua kini tak punya penghalang selain keputusan mengerjakannya**). Penegakan backend juga sengaja parsial. **Kunci kedua `menu.finance.insentif` ditambahkan 2026-08-26** (Dashboard & Master Data Insentif, sekalian pindah ke Portal Saya) dan mewarisi peringatan yang sama: jangan dinyalakan sampai langkah kedua tuntas.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0047 Jejak Pengajuan Dibaca Modul IT, Digerbang Departemen Bukan Peran",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - RBAC dan Permission Set",
         "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
@@ -3830,21 +3828,20 @@
         "APP - Web ERP",
         "API - Integration Service"
       ],
-      "hash": "6ced910d4ef9f1f9c31721e6eab1871932e2dcc9e8401ab570dd98d31b7a61a1",
-      "ukuran_kb": 12.7,
-      "ringkasan": "Menjawab: kenapa modul menu (menu terbatas) berperilaku terbuka sampai paketnya dipasang ke seseorang, bukan deny-by-default, dan bagaimana penanda kunci $menulock dipakai agar konsumen bisa membedakan restriksi yang belum aktif dari restriksi yang aktif tapi tak mencakup dirinya. Menjawab juga kenapa fitur ini sudah merge tetapi belum boleh dinyalakan, yaitu celah akun tanpa paket yang terbukti tidak kosong.",
+      "hash": "03a81d4905a78d70933218d65794c5f02a0f1d0ee45e8e011981b49d174d2892",
+      "ukuran_kb": 17.7,
+      "ringkasan": "Menjawab: kenapa menu terbatas dirancang default terbuka lalu mengunci begitu ada akun yang di-assign, bagaimana penanda kunci $menulock diterbitkan employee-service saat token terbit, dan kenapa fitur ini belum boleh dinyalakan. Menjelaskan celah akun tanpa permission set yang membuat restriksi membuka tanpa menutup, prasyarat menutupnya, kenapa fallback gerbang backend dipatok true demi panggilan service-ke-service, dan kenapa super-akses sidebar perlu dikecualikan per kunci.",
       "kata_kunci": [
         "menu terbatas",
-        "restricted menu",
         "menulock",
-        "permission set",
-        "RBAC",
-        "laporan keuangan",
-        "finance accounting",
+        "whitelist menu",
+        "default terbuka",
+        "penanda kunci",
+        "menu.finance.laporan",
+        "menu.finance.insentif",
         "fallback",
-        "JWT claims",
-        "ADR 0039",
-        "default terbuka"
+        "super-akses",
+        "restricted menu"
       ]
     },
     {
@@ -4574,6 +4571,7 @@
         "Microservices - Payroll Service",
         "External - Accurate",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
+        "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "doc.pdf",
         "Microservices - Integration Service",
         "Sales - ICC Account Manager Mapping",
@@ -4583,20 +4581,20 @@
         "Finance - Bridging App",
         "HRIS - Compensation & Benefits"
       ],
-      "hash": "4438b6b78b580047c15c7524e71a6058e257938add761fd4e2c2144d996f5e42",
-      "ukuran_kb": 19.8,
-      "ringkasan": "Menjawab: skema insentif tim marketing yang berlaku menurut SK 010 dan 011/2026 (profit-based lintas jabatan), tabel tarif per persentase pencapaian target, aturan gerbang retur 7%, dasar perhitungan uang cair, dan aturan hangus untuk order yang belum cair sampai tanggal 25. Juga memuat isi SK lama berbasis KPI-multiplier per jabatan (SPV Marketing, Advertiser, ICC, Host Live, Affiliator, CS, CRM) sebagai riwayat, plus daftar hal yang masih menahan pemakaiannya.",
+      "hash": "5c12e6a53af72b2636d2b1620b869d9c7950fe47b9751df8469643cec3c049ba",
+      "ukuran_kb": 21.7,
+      "ringkasan": "Menjawab: bagaimana insentif tim marketing dihitung dengan skema profit-based SK 010 & 011/2026, berapa tarif untuk tiap tingkat pencapaian target, dari mana tiap komponen biaya diambil, dan siapa yang boleh membuka dashboard beserta master datanya. Memuat aturan turunan yang mengikat (gerbang retur 7%, target diketik hanya di lingkup Supervisor, dasar uang cair, cutoff tanggal 25) serta riwayat skema KPI-multiplier lama yang sudah dicabut dan tak boleh dipakai sebagai acuan.",
       "kata_kunci": [
-        "insentif marketing",
+        "insentif",
         "incentive",
+        "profit-based",
         "SK 010",
-        "SK 011",
-        "profit",
-        "target",
-        "retur",
-        "uang cair",
+        "target profit",
         "ICC",
-        "advertiser"
+        "advertiser",
+        "uang cair",
+        "retur",
+        "tarif insentif"
       ]
     },
     {
@@ -5725,6 +5723,7 @@
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
+        "HRIS - Organization Structure",
         "HRIS - Attendance System",
         "HRIS - Payroll",
         "HRIS - Leave Request",
@@ -5737,18 +5736,18 @@
         "HRIS - Analysis",
         "HRIS - Big Pictures"
       ],
-      "hash": "50e256532938e9569f0ddacc7fe2e4fe751ddcb8effb8527e3ab97329dba60c3",
-      "ukuran_kb": 1.8,
-      "ringkasan": "Menjawab: subsistem HRIS mana yang saling bergantung, siapa mengambil data dari siapa, dan siapa memberi data ke siapa (mis. Leave ke Attendance, Attendance ke Payroll, Recruitment ke Onboarding) dalam bentuk matriks keterkaitan lintas-modul.",
+      "hash": "44a0ca92b68f10d5b1e4f57dbb62cd3978298cf39da243f85c84d14f40f5e435",
+      "ukuran_kb": 2.3,
+      "ringkasan": "Menjawab: subsistem HRIS mana mengambil data dari mana dan memberi data ke mana, sehingga ketergantungan antar-subsistem terlihat sebelum satu subsistem diubah. Memuat matriks untuk Attendance, Leave, Tukar Jadwal, Attendance Correction, Payroll, KPI, Recruitment, Personalia, Attrition, dan Analysis, dengan catatan tegas bahwa peta ini diturunkan dari dokumen lain dan bukan diukur dari kode.",
       "kata_kunci": [
         "matriks keterkaitan",
         "interrelationship",
-        "dependency antar-modul",
-        "HRIS",
+        "dependensi HRIS",
+        "subsistem HRIS",
+        "aliran data",
         "attendance",
         "payroll",
-        "employee service",
-        "alur data"
+        "leave"
       ]
     },
     {
@@ -5985,22 +5984,28 @@
         "RUN - Deploy Microservices bip-erp",
         "HRIS - Interrelationship Matrices",
         "Microservices - Attendance Service",
+        "Microservices - Insentive Service",
+        "Microservices - Task Management Service",
+        "Microservices - Recruitment Service",
+        "Microservices - Calendar Service",
+        "Microservices - Learning Service",
+        "Microservices - HRD Document Service",
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "3fa68d383f2054915a9bfa84b87ebf1c2e89aa6c7c314e3b1910d74a8f08cbc6",
-      "ukuran_kb": 43.1,
-      "ringkasan": "Menjawab: bagaimana struktur organisasi Bharata disusun — departemen dan jabatan sebagai master data di `master_department` (`positions[]` vs `position_items[]`, `position_key`, `permission_sets`), lima tingkat jenjang jabatan (Pelaksana sampai Direktur) beserta koleksi `master_job_level` dan aturan rank renggang. Menjelaskan siapa penyetuju pengajuan tiap departemen (`work_data.is_supervisor`), bedanya dari atasan langsung, serta bagaimana cakupan supervisi antar-departemen (`supervised_by` dan label kelompok seperti HRGA) memengaruhi urutan pencarian atasan. Memuat juga alasan jenjang jabatan sengaja BUKAN sumbu hak akses, konsekuensi rename jabatan terhadap paket hak, dan bukti verifikasi produksi org chart / jenjang / penyetuju.",
+      "hash": "b34f26298270241acd2a3f4587da53cc77132d9fa834a5a0aa238f872e4dcaca",
+      "ukuran_kb": 47.8,
+      "ringkasan": "Menjawab: bagaimana departemen, jabatan, jenjang jabatan, dan hierarki atasan dikelola sebagai master data, siapa penyetuju pengajuan sebuah departemen dan bagaimana urutan pencarian atasannya, serta apa beda Atasan Langsung dari Penyetuju Pengajuan. Memuat aturan supervised_by dan label grup HRGA, bagan organisasi, peta konsumen struktur organisasi yang diukur langsung ke origin/main, dan bukti verifikasi produksi 2026-08-26.",
       "kata_kunci": [
         "struktur organisasi",
-        "organization structure",
-        "departemen",
-        "jabatan / position",
-        "jenjang jabatan / job level",
+        "master_department",
+        "jabatan",
+        "jenjang jabatan",
+        "job level",
+        "atasan langsung",
+        "supervisor_id",
         "penyetuju pengajuan",
-        "atasan langsung / supervisor",
         "supervised_by",
-        "HRGA",
         "org chart"
       ]
     },

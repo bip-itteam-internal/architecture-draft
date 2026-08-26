@@ -32,6 +32,35 @@ Insentif  = tarif(%) × Profit
 
 **Biaya operasional** dirakit dari dua sumber yang dipisah tegas: beban karyawan dari [[Microservices - Payroll Service]] (bruto + iuran BPJS pemberi kerja — **bukan** gaji bersih yang diterima) dan beban non-gaji dari proyek [[External - Accurate]] per karyawan. Alasan lengkap + daftar akun yang dikecualikan: [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]].
 
+### Siapa yang boleh melihat (per 2026-08-26)
+
+Menunya pindah dari kategori **Finance** ke sidebar **Portal Saya** pada 2026-08-26
+(erp-frontend [#1246](https://github.com/bip-itteam-internal/erp-frontend/pull/1246),
+bip-erp [#1449](https://github.com/bip-itteam-internal/bip-erp/pull/1449)). Rutenya tetap
+`/finance/incentive/*`.
+
+| Layar | Siapa |
+|---|---|
+| **Dashboard Insentif** | menu terbatas `menu.finance.insentif` — hanya akun yang di-assign paket "Menu: Insentif Profit". Sebelum ada yang di-assign: finance, atasan marketing, IT |
+| **Master Data Insentif** | sama dengan Dashboard |
+| **Insentif Saya** | siapa pun berperan `insentive` — **sengaja di luar whitelist**, karena halamannya hanya memuat baris milik pemegang token |
+| **Panduan Insentif** | finance, atasan marketing, atau siapa pun berperan `insentive` |
+| **Rincian beban karyawan** di dalam Dashboard | **hanya `finance`**, terpisah dari dan di atas whitelist |
+
+Alasan dashboard dibatasi: tiap baris membawa `biaya_gaji`, beban perusahaan atas SATU
+orang, yang dengan aturan gaji-orang-itu-sendiri praktis adalah gaji orang tersebut.
+Sebelum perubahan ini `GET /profit-dashboard` dan `GET /profit/incentive/summary` tak punya
+gerbang sama sekali, sehingga menyembunyikan menunya tak menutup apa pun; keduanya kini
+digerbang `common.RequireMenu`. Menulis target tetap terpisah dan lebih ketat
+(`RequireMasterProfitWriter`: finance + IT saja) — di-assign ke menu tidak memberi hak
+mengubah angka yang menentukan pembayaran.
+
+⚠️ **Belum benar-benar membatasi.** Mekanismenya mewarisi peringatan
+[[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]]: selama penjaga klaim-kosong
+di `gabungPenandaMenu` masih terpasang, memasang paket akan MEMBUKA layar bagi yang
+ditunjuk tanpa MENUTUPNYA bagi akun yang tak punya permission-set sama sekali — dan atasan
+marketing termasuk populasi yang paling mungkin berada di celah itu.
+
 ### Yang masih menahan (per 2026-08-02)
 
 - **Atribusi ICC belum lengkap** — baru 10 dari 28 toko punya mapping; 63% profit Juli tak berpemilik. Sumber pengisinya berkas LIST TOKO dari client.

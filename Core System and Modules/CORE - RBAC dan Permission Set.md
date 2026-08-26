@@ -70,7 +70,18 @@ Whitelist **per akun** untuk satu menu, dipakai pertama kali oleh halaman Lapora
 
 Yang membedakannya dari izin modul biasa: **default terbuka**. Selama paketnya belum dipasang ke siapa pun, menu berperilaku persis seperti sebelum fitur ada; begitu ada ≥1 assignment, hanya pemegang paket yang boleh. Fakta "sudah ada yang di-assign" bersifat global, jadi employee-service menghitungnya saat token terbit lalu menempelkan penanda `$menulock.<kunci>` ke klaim **setiap orang** — tanpa penanda itu konsumen tak bisa membedakan "belum aktif" dari "aktif tapi saya tak di-assign". Penandanya sengaja **di luar namespace `menu.`** agar tak terhitung sebagai izin modul, sama alasannya dengan penanda reach.
 
-Batas pemakaian: satu izin + satu paket per menu. Kalau dipakai berlebihan, katalog `menu` akan tumbuh jadi daftar halaman — persis yang ditolak ADR 0030 lewat "satu permission per keputusan akses, bukan per endpoint". Kunci yang ada baru `menu.finance.laporan`.
+Batas pemakaian: satu izin + satu paket per menu. Kalau dipakai berlebihan, katalog `menu` akan tumbuh jadi daftar halaman — persis yang ditolak ADR 0030 lewat "satu permission per keputusan akses, bukan per endpoint".
+
+Kunci yang ada (per 2026-08-26, **dua**):
+
+| Kunci | Paket | Menggerbangi | Fallback (perilaku sebelum dibatasi) |
+|---|---|---|---|
+| `menu.finance.laporan` | `menu_finance_laporan` | `/finance/accounting` (Laba Rugi, Neraca, Neraca Saldo) | role `finance` atau anggota IT |
+| `menu.finance.insentif` | `menu_finance_insentif` | Dashboard Insentif + Master Data Insentif (`/finance/incentive/{dashboard,settings}`, menunya di **Portal Saya**) | role `finance`, atasan marketing (`insentive`: supervisor/adv_leader/adv_marketplace/adv_meta), atau anggota IT |
+
+⚠️ **Keduanya mewarisi peringatan "jangan dinyalakan"** di [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]]: selama penjaga klaim-kosong di `gabungPenandaMenu` masih terpasang, memasang paket akan MEMBUKA menu bagi yang ditunjuk tanpa MENUTUPNYA bagi akun yang tak punya permission-set sama sekali.
+
+⛔ **Beda perlakuan super-akses antar-kunci, dan ini bukan kelalaian.** `menu.finance.insentif` terdaftar di `TANPA_BYPASS_SEMUA_MENU` (`erp-frontend/src/utils/menu-permission.ts`), `menu.finance.laporan` **tidak**. Tanpa pendaftaran itu, `bolehItemSidebar` meloloskan IT supervisor dan jabatan Direktur sebelum menilai `perm`, sehingga whitelist-nya dilewati di lapisan menu sementara gerbang halaman tetap menolak — menu tampil lalu halamannya berkata "Akses Ditolak". Menyamakan keduanya berarti mempersempit akses orang yang hari ini melihat Laporan Keuangan, jadi itu keputusan tersendiri, bukan perapian.
 
 **Pencocokan posisi (hasil pembenahan 2026-07-29):** `common.KanonPosisi` + `common.PosisiCocok` (`shared-library/common/position.go`) menyatukan aturan pencocokan nama posisi (huruf kecil, non-alfanumerik jadi underscore, exact match atas bentuk kanonik), dipakai `checkPosition` dan `isCostControl`.
 
@@ -223,7 +234,7 @@ Yang dilonggarkan **menu, bukan data**. Angka labanya dijaga dua lapis yang tak 
 | `ticket` | 15 permission granular (sudah live, tidak diubah) | | | | | own/div/all |
 | `finance` | (live, TIDAK memakai tangga — lihat catatan di bawah) | | | | | all |
 | `kaskecil` | (live & ditegakkan; 8 izin, `approve` DIPECAH EMPAT — lihat catatan di bawah) | | | | | own/div/all |
-| `menu` | (di luar tangga sepenuhnya: satu izin per MENU, bukan per aksi — `menu.finance.laporan`) | | | | | all |
+| `menu` | (di luar tangga sepenuhnya: satu izin per MENU, bukan per aksi — `menu.finance.laporan`, `menu.finance.insentif`) | | | | | all |
 
 > **Modul `kaskecil` — satu-satunya yang TANPA fallback tier, dan itu disengaja** (`shared-library/common/catalog_kaskecil.go`, ditegakkan `services/procurement/main.go` + `kas_gate_test.go`). Delapan izin: `view`, `transaksi.save`, `pengajuan.save`, empat izin persetujuan terpisah (`approve.atasan`/`approve.aset`/`approve.finance`/`approve.direksi`), dan `master.save`. Dua hal yang membedakannya dari seluruh modul lain di tabel ini, keduanya layak dibaca sebelum menggarap modul berikutnya:
 >
