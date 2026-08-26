@@ -38,7 +38,7 @@ ICC Employee → {
 }
 ```
 
-> Kardinalitas: **1 karyawan → N toko, N akun ads**. Setiap toko dan setiap advertiser tetap hanya dimiliki satu karyawan aktif (many-to-one dari sisi toko/advertiser). Shop dan advertiser bersifat opsional — karyawan dapat di-assign hanya shop saja, hanya advertiser saja, atau keduanya.
+> Kardinalitas: **1 karyawan → N toko, N akun ads**. Setiap toko tetap hanya dimiliki satu karyawan aktif (many-to-one dari sisi toko). **Advertiser BERBEDA (sejak 2026-08-26)**: satu akun iklan TikTok Ads lazim dipakai bareng lebih dari satu karyawan — contoh nyata di lapangan, divisi Kyura memakai advertiser yang sama untuk beberapa orang — jadi **satu advertiser boleh dimiliki lebih dari satu karyawan aktif sekaligus**. Yang tetap dijaga unik hanya PASANGANNYA (karyawan + advertiser): karyawan yang sama tak boleh dobel-assign ke advertiser yang sama, tapi karyawan lain bebas memegang advertiser itu juga. Shop dan advertiser bersifat opsional — karyawan dapat di-assign hanya shop saja, hanya advertiser saja, atau keduanya.
 
 ---
 
@@ -87,7 +87,7 @@ ICC Employee → {
 - Minimal salah satu (`tiktok_shop_id` atau `tiktok_advertiser_id`) wajib diisi
 - **1 karyawan boleh handle >1 toko dan >1 ads** — tidak ada unique index pada `employee_id`
 - Satu shop hanya boleh di-assign ke satu karyawan aktif — unique index `(tiktok_shop_id != "", is_active=true)`
-- Satu advertiser hanya boleh di-assign ke satu karyawan aktif — unique index `(tiktok_advertiser_id != "", is_active=true)`
+- **Satu advertiser BOLEH dipegang lebih dari satu karyawan aktif (sejak 2026-08-26)** — unique index `(tiktok_advertiser_id, employee_id, is_active=true)`, bukan unique global seperti shop. Yang dicegah cuma karyawan yang SAMA dobel-assign ke advertiser yang sama (`409 ErrIccAdvertiserAlreadyAssigned`); karyawan LAIN bebas memegang advertiser itu juga. Pola ini sama dengan `unique(employee_id, username)` di `icc_affiliate_accounts` — lihat [[Sales - ICC Affiliate Mapping]].
 - Partial filter index menyertakan `$gt: ""` agar baris tanpa shop/advertiser (string kosong) tidak dikenai unique constraint
 
 ---
@@ -243,7 +243,9 @@ Buat mapping baru. Dilindungi `RequireMarketingLeader`.
 
 **Error 400:** jika keduanya kosong, atau shop/advertiser tidak ditemukan di data master.
 
-**Error 409:** jika shop atau advertiser sudah di-assign ke karyawan lain yang aktif.
+**Error 409:** jika shop sudah di-assign ke karyawan lain yang aktif, ATAU advertiser sudah
+di-assign ke KARYAWAN YANG SAMA (advertiser boleh dipegang banyak karyawan sekaligus, lihat
+kardinalitas di atas — yang ditolak cuma dobel-assign untuk satu karyawan yang sama).
 
 ---
 
@@ -251,7 +253,7 @@ Buat mapping baru. Dilindungi `RequireMarketingLeader`.
 
 Update mapping. Dilindungi `RequireMarketingLeader` + `tolakLintasDepartemen` (dicek dua sisi bila `team` berubah: team lama **dan** team tujuan — lihat [[#Otorisasi (RBAC)]]).
 
-> **Sejak ⚠️ edit toko & pemegang (branch `feat/icc-mapping-edit` + `feat/icc-mapping-edit-ui`, belum di-merge)**: PATCH bukan cuma deaktivasi/ganti catatan lagi — bisa mengganti toko/advertiser per channel, pemegang (`employee_id`), dan tim (`team`) pada mapping yang **sudah ada**, tanpa perlu deaktivasi lalu assign ulang dari nol.
+> **Sejak fitur edit toko & pemegang (✅ ter-merge ke `main`)**: PATCH bukan cuma deaktivasi/ganti catatan lagi — bisa mengganti toko/advertiser per channel, pemegang (`employee_id`), dan tim (`team`) pada mapping yang **sudah ada**, tanpa perlu deaktivasi lalu assign ulang dari nol.
 
 **Request body (semua opsional — pointer semantics: field tak disebut = tak disentuh):**
 ```json
@@ -272,7 +274,10 @@ Update mapping. Dilindungi `RequireMarketingLeader` + `tolakLintasDepartemen` (d
 - **Ganti `*_shop_id`/`*_advertiser_id`** → diverifikasi ulang ke sumber otoritatif masing-masing channel (sama seperti Create); `*_name` diisi ulang otomatis dari hasil lookup itu (FE tidak mengirim nama, hanya ID). ID kosong (`""`) = lepas channel itu dari mapping, namanya ikut dikosongkan.
 - **Ganti `employee_id` dan/atau `team`** → guard leader-first dicek ulang ke **team tujuan** (`leaderRepo.GetActiveByTeam`), bukan team lama. Team tujuan tanpa leader aktif di `icc_leaders` → `400` (`ErrIccTeamLeaderMissing`), sama seperti Create.
 - **Ganti `notes`/`is_active` saja** → tidak memicu re-cek shop/advertiser/leader sama sekali.
-- Toko/advertiser yang sudah dipegang mapping lain yang aktif → `409` (empat error `*AlreadyAssigned`, satu per channel).
+- Toko/Shopee/Lazada yang sudah dipegang mapping lain yang aktif → `409` (`*AlreadyAssigned`
+  per channel). **Advertiser terkecuali**: 409 hanya bila KARYAWAN YANG SAMA sudah punya
+  baris aktif untuk advertiser itu juga — pindah ke advertiser yang dipegang karyawan LAIN
+  diperbolehkan (sharing disengaja, lihat kardinalitas di atas).
 
 **FE mengirim diff, bukan payload penuh**: dialog assign yang sama dipakai untuk mode edit, tapi hanya field yang benar-benar berubah dari nilai asal mapping yang disertakan di body — menghindari re-trigger validasi leader-gate saat yang diedit cuma toko/catatan.
 
@@ -292,7 +297,12 @@ Daftar TikTok Shop yang **belum di-assign aktif** ke karyawan manapun (untuk dro
 
 ### `GET /icc/mappings/available-advertisers`
 
-Daftar TikTok Ads advertiser yang belum di-assign aktif. Pool advertiser bersifat global. Pipeline: `$unwind → $group by advertiser_id` untuk deduplikasi.
+Daftar **SEMUA** TikTok Ads advertiser — **bukan** "yang belum di-assign" lagi (sejak
+2026-08-26). Beda dari `available-shops`, endpoint ini sengaja **tidak** menyaring
+advertiser yang sudah punya mapping aktif, karena advertiser boleh dipegang lebih dari satu
+karyawan (lihat kardinalitas di atas); menyaringnya akan membuat advertiser hilang dari
+dropdown begitu satu orang memegangnya — persis bug yang diperbaiki. Pool advertiser
+bersifat global. Pipeline: `$unwind → $group by advertiser_id` untuk deduplikasi.
 
 ---
 
@@ -309,7 +319,8 @@ Daftar TikTok Ads advertiser yang belum di-assign aktif. Pool advertiser bersifa
 | **6** | Tampilan ICC Management dipisah per team (kartu per team, satu leader per kartu) | ⛔ Superseded oleh Fase 8 |
 | **7** | Akun affiliate (username TikTok) ikut dikelola di ICC Management — desain & fasenya di [[Sales - ICC Affiliate Mapping]] | ✅ Selesai |
 | **8** | Kartu per LEADER (bukan per team) diturunkan dari `work_data.supervisor_id`; kartu "Langsung di bawah SPV" + "Belum ditugaskan"; hapus Set Leader manual (lihat [[#Tampilan ICC Management — kartu per leader (menggantikan kartu per team)]]) | ✅ Selesai — sudah ter-merge ke `main` |
-| **9** | Edit mapping yang sudah ada: ganti toko/advertiser per channel, pemegang, dan tim tanpa deaktivasi+assign ulang (lihat `PATCH /icc/mappings/:id` di atas) | ⚠️ Backend (`feat/icc-mapping-edit`) + Frontend (`feat/icc-mapping-edit-ui`) sudah **di-push**, **belum di-merge** ke `main` |
+| **9** | Edit mapping yang sudah ada: ganti toko/advertiser per channel, pemegang, dan tim tanpa deaktivasi+assign ulang (lihat `PATCH /icc/mappings/:id` di atas) | ✅ Selesai — Backend (`feat/icc-mapping-edit`) + Frontend (`feat/icc-mapping-edit-ui`) sudah ter-merge ke `main` |
+| **10** | Advertiser TikTok Ads boleh dipegang >1 karyawan aktif: index diganti dari unique global jadi unique per-pasangan `(tiktok_advertiser_id, employee_id)`, `available-advertisers` tak lagi menyaring yang sudah assigned. Toko/Shopee/Lazada TETAP 1:1 (tidak diubah) | ✅ Selesai (2026-08-26), branch `feat/icc-advertiser-shared` |
 
 ---
 
@@ -433,6 +444,7 @@ Tombol **+ Assign** ada di kartu leader (team terkunci = departemen kartu, karya
 | **Team field pada data lama** | Mapping yang dibuat sebelum Phase 3 tidak memiliki field `team` — query filter `?team=X` tidak akan menemukan data lama. Migrasi data lama perlu dijalankan manual atau via script |
 | **Risiko: rotasi** | Jika mapping sering berubah, laporan historis perlu snapshot — perlu `effective_from`/`effective_to` di fase berikutnya |
 | **Belum terintegrasi insentif** | Insentive Service belum konsumsi endpoint ini; integrasi dilakukan saat jabatan ICC → AM resmi berubah |
+| 🟡 **TBD: atribusi insentif advertiser bersama** | Sejak Fase 10, satu advertiser boleh dipegang >1 karyawan aktif. Saat Fase 4 (Laporan Akuntabilitas AM) dibangun, GMV Ads dari advertiser yang dipegang bersama itu dihitung ke siapa — dibagi rata, salah satu ditandai pemilik utama, atau penuh ke semua? **Harus diputuskan sebelum Fase 4**, tapi tidak menghalangi Fase 10 karena Fase 4 belum dibangun. Sejajar dengan TBD "Atribusi order akun bersama" di [[Sales - ICC Affiliate Mapping]]. |
 | ⛔ **`icc_leaders` beku, guard BE independen dari FE** | FE berhenti membaca/menulis `icc_leaders` sejak kartu-per-leader (Fase 8), tapi `POST`/`PATCH /icc/mappings` masih menggerbanginya. Team tanpa baris aktif di `icc_leaders` akan gagal 400 walau kartunya tampil normal di FE. Lihat [[#⛔ Gap nyata: dua model bisa saling bertentangan]] — **belum diverifikasi** isi `icc_leaders` untuk `kyura`/`beautyhacks` di produksi saat ini |
 | **Rename posisi ICC → Account Specialist** | 18 Agt 2026, 33/40 karyawan. Modul ini sudah dipindah ke `position_key`; modul LAIN (RBAC menu, Finance Opex, HRIS KPI) belum tentu ikut — periksa sebelum menyentuhnya |
 
