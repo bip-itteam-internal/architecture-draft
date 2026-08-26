@@ -6,6 +6,10 @@
 - **Path:** `services/attendance`
 - **Status**: ✅ Implemented penuh (kecuali clock-in via website) · ⚠️ **multi-perusahaan (tenant) parsial** — lihat catatan di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]
 
+> ⛔ **Aturan jadwal, ambang telat, dan sanksinya TIDAK ADA DI VAULT INI.** Semuanya diturunkan dari Peraturan Perusahaan 2026-2028 ke **`mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md`** (repo mobile), dan dokumen itu **yang menang** bila perilaku sistem bertentangan dengannya. Yang lahir di service ini dan diatur di sana: tabel jam kerja per shift (Pasal 13 & 48, termasuk Sabtu dan Shift 3 yang melewati tengah malam), **terlambat 3x sebulan memicu SP 1** dan **5x tanpa keterangan dikualifikasikan mengundurkan diri** (Pasal 19), serta **mangkir 6 hari berturut-turut** (Pasal 20).
+>
+> Penting justru karena service ini sengaja **hanya melaporkan fakta** (`late_hours`, `leave_hours`, `unpaid_full_day`, `alpha`) sementara kebijakan rupiahnya diputuskan [[Microservices - Payroll Service]]. Pembagian itu benar, tetapi membuat orang yang menggarap di sini mengira aturan bisnisnya bukan urusannya — padahal **penanda yang salah di sini menghasilkan rupiah yang salah di sana**, dan gerbang mana pun tak akan menangkapnya. Baca berkas itu sebelum mengubah apa pun yang menentukan status kehadiran.
+
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
 **Health & Registry**

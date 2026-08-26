@@ -1708,6 +1708,7 @@
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "Microservices - Payroll Service",
         "Microservices - Employee Service",
         "HRIS - Disciplinary (Surat Peringatan)",
         "APP - MyBharata",
@@ -1716,7 +1717,6 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "Microservices - Task Management Service",
         "HRIS - Leave Request",
-        "Microservices - Payroll Service",
         "CORE - RBAC dan Permission Set",
         "HRIS - Payroll",
         "HRIS - Employee Request & Approval",
@@ -1736,21 +1736,20 @@
         "CORE - HRIS Orchestrator",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "a12dfd63dff6d79f09de986ef892755932a8302d4b07f18f04d6fc8a45341b60",
-      "ukuran_kb": 34.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan attendance service untuk clock-in/out, resolusi dan rotasi jadwal kerja, leave request, perjalanan dinas, guestbook, hari libur, serta laporan absensi dan payroll. Menjelaskan cara rekap telat per karyawan (/internal/late-recap) dipakai menyusun usulan SP, cara /kpi/attendance dipakai employee-service menghitung skor KPI kedisiplinan, dan kenapa rute itu digerbang service key alih-alih RBAC atau gateway key. Juga menjawab bagaimana /payroll-supplement mengagregasi jam kerja jadi payout_pct plus rincian per hari, dan kenapa service ini hanya melaporkan fakta sementara kebijakan tarif tinggal di payroll service.",
+      "hash": "1c63174a6153c63d90d9f710de87279acdd78958a11deb99ab72ff27768b824a",
+      "ukuran_kb": 35.6,
+      "ringkasan": "Menjawab: bagaimana karyawan clock-in/out (mobile, fingerprint, website) berikut validasi WiFi kantor, GPS, dan gerbang form wajib; bagaimana jadwal kerja diresolusi antara jadwal static, rotasi shift bergilir (`pattern`), roster harian per tanggal, dan tukar jadwal; serta bagaimana alur pengajuan cuti/izin, koreksi presensi, perjalanan dinas, dan buku tamu berjalan lengkap dengan rantai approval, gerbang izin, dan cron pra-alokasi entry. Menjawab juga data kehadiran apa yang dipasok ke penggajian lewat `GET /payroll-supplement` (termasuk rincian per hari `late_hours`, `leave_hours`, `unpaid_full_day`, `alpha`), rekap telat per karyawan untuk usulan SP 1, dan rekap KPI kedisiplinan, plus catatan multi-perusahaan (tenant) yang masih parsial. Penting: aturan bisnis di baliknya (tabel jam kerja per shift, ambang telat 3x sebulan pemicu SP 1, mangkir berturut-turut Pasal 20) TIDAK ada di vault melainkan di `mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md`, turunan Peraturan Perusahaan 2026-2028, dan berkas itu yang menang bila perilaku sistem bertentangan dengannya.",
       "kata_kunci": [
-        "attendance",
         "absensi",
+        "attendance",
         "clock-in",
-        "clock-out",
-        "jadwal kerja",
-        "shift rotation",
+        "jadwal shift",
+        "roster",
+        "cuti",
         "leave request",
-        "guestbook",
-        "payroll-supplement",
-        "late recap",
-        "KPI kedisiplinan"
+        "koreksi presensi",
+        "perjalanan dinas",
+        "payroll-supplement"
       ]
     },
     {
@@ -2379,22 +2378,20 @@
         "Microservices - Insentive Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "e12517577c41847d68241613c31146c7d67693938363459b6c9814a8e91b25c6",
-      "ukuran_kb": 29.5,
-      "ringkasan": "Menjawab: bagaimana penggajian diimplementasikan di services/payroll, mulai dari config perusahaan, BPJS, dan pajak PPh21 metode TER, master komponen gaji, penetapan gaji per karyawan, sampai payroll run dengan lifecycle draft, approved, published, THR, dan slip PDF. Menjelaskan konsep badan usaha penggaji (kop slip) yang berbeda dari tenant, kenapa company_id menumpang di employee_salary, dan bagaimana potongan kehadiran dipecah jadi empat baris slip bertarif config. Juga menjawab kondisi nyata di produksi: nol slip pernah terbit, jumlah komponen gaji yang menyimpang dari seed, dan masalah pengisian upah_bpjs yang diisi nominal iuran alih-alih dasar upah.",
+      "hash": "49005482dcf4544593f16713368375a37ddde86c10c562d1d86d7f7540db0eea",
+      "ukuran_kb": 30.7,
+      "ringkasan": "Menjawab: bagaimana gaji dihitung dari setup komponen gaji, config BPJS, PPh21 metode TER, dan penetapan gaji per karyawan sampai payroll run (draft, approved, published), termasuk slip self-service, slip PDF, run THR, dan beban pemberi kerja (`/employer-cost`) yang ditarik modul insentif. Menjawab juga bagaimana potongan kehadiran dipecah jadi empat baris (telat, izin, mangkir, uang makan) berikut tarif dan pengalinya, dua aturan pembulatan BPJS yang sengaja berbeda antara sisi karyawan dan perusahaan, peran master badan usaha penggaji untuk kop slip, jebakan `upah_bpjs` sebagai dasar upah dan bukan nominal iuran, serta kondisi pemakaian nyata di produksi. Penting: sumber aturan bisnisnya (pengali mangkir Pasal 20 yaitu 1,5x sehari dan 2x per hari bila dua hari atau lebih, izin jam kerja memotong Tunjangan Kehadiran dan uang makan, SP II memotong 25% gaji pokok) TIDAK ada di vault melainkan di `mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md`, turunan Peraturan Perusahaan 2026-2028, dan dokumen itu yang menang bila perilaku sistem bertentangan dengannya.",
       "kata_kunci": [
         "payroll",
         "penggajian",
         "slip gaji",
         "payslip",
         "BPJS",
-        "PPh21",
-        "TER",
-        "PTKP",
-        "payroll run",
+        "PPh21 TER",
         "THR",
-        "upah_bpjs",
-        "komponen gaji"
+        "potongan kehadiran",
+        "payroll run",
+        "employer-cost"
       ]
     },
     {
