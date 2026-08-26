@@ -383,9 +383,9 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "09d5f5138e4b6377a9a13047982f8628cebd86038d617ee9475e84800600e3b7",
-      "ukuran_kb": 62.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang menghubungkan marketplace (TikTok Shop/Business, Shopee) ke Accurate — order terpadu, ringkasan/komparasi/ekspor order, aging piutang, feed retur lintas-channel, packet tracking, reviews, ICC account mapping, dan status sinkron toko. Menjelaskan parameter tiap endpoint, alur webhook publik (/ext/webhook/*), serta kenapa /transactions/returns dipakai (seleksi berdasar keberadaan sub-dok return, bukan status=RETURNED) dibanding endpoint retur Shopee-only atau Accurate daily-returns.",
+      "hash": "b00a84f996c30fe41b5d10794c7efcecfecb6d25a79fa3ee1c78643fa24f9026",
+      "ukuran_kb": 62.2,
+      "ringkasan": "Menjawab: endpoint apa saja yang menghubungkan marketplace (TikTok Shop/Business, Shopee) ke Accurate, yaitu order terpadu, ringkasan/komparasi/ekspor order, aging piutang, feed retur lintas-channel, packet tracking, reviews, ICC account mapping, dan status sinkron toko. Menjelaskan parameter tiap endpoint, alur webhook publik (/ext/webhook/*), dan tiga tuas koreksi manual atas satu order (invoice-exclusion, invoice-date-override, fake-order-override) yang sering tertukar maksudnya. Sejak 2026-08-26 menandai fake order penghuni terakhir faktur tidak lagi ditolak melainkan mem-void fakturnya.",
       "kata_kunci": [
         "integration service",
         "endpoint",
@@ -397,8 +397,8 @@
         "webhook",
         "piutang",
         "retur",
-        "packet tracking",
-        "reviews",
+        "fake order",
+        "invoice override",
         "ICC mapping"
       ]
     },
@@ -1221,9 +1221,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "7feb64a1fa76c2d97a61dd2495391406b9c6afd6b4737b6019a543f511a36a9b",
-      "ukuran_kb": 316.9,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS terpadu (hris-dashboard \"One Bharata\"), stack teknologinya (Next.js 16 + React 19 + shadcn/Radix + i18next), dan bagaimana autentikasi/SSO Identity Provider serta role gating sidebar bekerja lewat cookie system_roles. Menjelaskan pula struktur multi-perusahaan (tenant), pengelompokan menu induk-bersarang, dan halaman Pengaturan HRGA terpusat (enam sub-menu, penyaringan per-tab memakai cermin gerbang backend di akses.ts).",
+      "hash": "deb78f9c73f8ebcd994d995a23f05b7550362e0f6c77c574f59b78bd3ba22b67",
+      "ukuran_kb": 317.1,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS terpadu (hris-dashboard, One Bharata), stack teknologinya (Next.js 16 + React 19 + shadcn/Radix + i18next), dan bagaimana autentikasi/SSO Identity Provider serta role gating sidebar bekerja lewat cookie system_roles. Menjelaskan pula struktur multi-perusahaan (tenant), pengelompokan menu induk-bersarang, dan halaman Pengaturan HRGA terpusat (enam sub-menu, penyaringan per-tab memakai cermin gerbang backend di akses.ts).",
       "kata_kunci": [
         "web ERP",
         "hris-dashboard",
@@ -2042,9 +2042,9 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "235ba603a51677a5c7343ed64ac43ba0cce064150b8855600a59c33016557445",
-      "ukuran_kb": 284.9,
-      "ringkasan": "Menjawab: apa fungsi integration-service sebagai penghubung marketplace (TikTok Shop/Business, Shopee, Lazada) ke Accurate dan bridge akuntansi, fitur apa yang sudah ada (webhook direct, kredensial OAuth, holidays, TikTok Ads/GMV Max, transaksi terpadu, ICC mapping), serta mana yang masih konsep (Meta Ads belum ada client). Menjelaskan stack (Go + Fiber + MongoDB + Redis), status auto-ship sadar-holiday, GMV Max monitoring/overview & ICC video metrics, dan ketahanan Shopee (create-on-missing, index jalur panas, status sinkron per toko).",
+      "hash": "b2f7333cb002634351120f0e1ef76a09450e5ac7c2adb310fe7f6a6fd05a88eb",
+      "ukuran_kb": 286.4,
+      "ringkasan": "Menjawab: apa fungsi integration-service sebagai penghubung marketplace (TikTok Shop/Business, Shopee, Lazada) ke Accurate dan bridge akuntansi, fitur apa yang sudah ada (webhook direct, kredensial OAuth, holidays, TikTok Ads/GMV Max, transaksi terpadu, ICC mapping), serta mana yang masih konsep (Meta Ads belum ada client). Menjelaskan stack (Go + Fiber + MongoDB + Redis), status auto-ship sadar-holiday, dan ketahanan Shopee. Memuat keputusan 2026-08-26: faktur yang isinya habis karena vonis fake order kini di-VOID alih-alih aksinya ditolak, dan faktur terkunci retur dikurangi lewat update qty by-line-id.",
       "kata_kunci": [
         "integration service",
         "microservice",
@@ -2056,8 +2056,9 @@
         "webhook",
         "OAuth",
         "ICC",
-        "Meta Ads",
-        "auto-ship"
+        "fake order",
+        "void faktur",
+        "retur"
       ]
     },
     {
