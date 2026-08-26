@@ -1,14 +1,15 @@
 ## Deskripsi
 
-*Penjelasan otomasi skor KPI dalam bentuk diagram. Ada **dua versi**: gambaran besar untuk pembaca non-teknis, dan alur rinci untuk dev. Keduanya tersimpan di `Additional documents/Excalidraw/`; halaman ini catatan penunjuknya, sekaligus supaya diagramnya terjangkau pencarian vault (folder `Additional documents/` tidak diindeks).*
+*Penjelasan otomasi skor KPI dalam bentuk diagram. Ada **tiga**: gambaran besar untuk pembaca non-teknis, alur rinci untuk dev, dan satu khusus divisi marketing yang menggambarkan alurnya beserta keadaan terukurnya. Ketiganya tersimpan di `Additional documents/Excalidraw/`; halaman ini catatan penunjuknya, sekaligus supaya diagramnya terjangkau pencarian vault (folder `Additional documents/` tidak diindeks).*
 
-- **Bentuk**: dua diagram Excalidraw
-- **Status**: ⚠️ Gambarnya masih selaras, **teks penyertanya diperbarui 11 Agustus 2026**. Rangkaian dan prinsipnya tidak berubah; yang berubah keadaan nyatanya — lihat catatan di bawah tabel.
+- **Bentuk**: tiga diagram Excalidraw
+- **Status**: ⚠️ Gambarnya masih selaras. Teks penyerta **dua diagram lintas-departemen** diperbarui 11 Agustus 2026; diagram **marketing** diukur ulang ke produksi **26 Agustus 2026**. Rangkaian dan prinsipnya tidak berubah; yang berubah keadaan nyatanya — lihat catatan di bawah tabel.
 
 | Versi | Untuk siapa | Menjawab apa |
 |---|---|---|
 | [[HRIS - Alur KPI Otomatis.excalidraw]] | SPV, Leader, HR, direksi | Kenapa skornya belum terisi sendiri padahal matriknya sudah lengkap |
 | [[HRIS - Alur KPI Otomatis Rinci.excalidraw]] | Dev departemen | Sembilan langkah yang benar-benar dijalankan employee-service, beserta katalog rumus, arah target, dan jalur kegagalan |
+| [[HRIS - Alur KPI Otomatis Marketing.excalidraw]] | SPV & Leader Beauty Hacks/Kyura, dev marketing | Lima tahap yang benar-benar jalan untuk marketing, dan **di tahap mana** yang belum jalan itu tersendat |
 
 ### Versi gambaran besar
 
@@ -17,6 +18,20 @@
 ### Versi rinci
 
 ![[HRIS - Alur KPI Otomatis Rinci.excalidraw]]
+
+### Versi marketing (Beauty Hacks · Kyura)
+
+![[HRIS - Alur KPI Otomatis Marketing.excalidraw]]
+
+Dua diagram di atas menjelaskan mesinnya secara umum. Yang ini menjawab pertanyaan yang berbeda: **untuk marketing, tahap mana yang sudah jalan dan tahap mana yang menahan** — karena penyebab sebuah metrik kosong hampir tidak pernah ada di tahap tempat kekosongan itu terlihat.
+
+Perlu diketahui sebelum membacanya:
+
+- **"Marketing" bukan nama departemen di sistem ini.** Yang ada `Beauty Hacks` dan `Kyura`; identitas tim tunggalnya diputuskan di [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]. Kode pun menuliskan daftarnya eksplisit (`departemenMarketingTarget` di `services/employee/kpi_target_marketing.go`).
+- **Seluruh angkanya diukur langsung ke produksi 26 Agustus 2026**, bukan disalin dari dokumen lain: cakupan dari `GET /kpi/auto-scores`, katalog dari `GET /kpi/sumber-katalog`, dan alasan kegagalan dari `auto_basis` di `GET /kpi/auto-values`. Angka di [[HRIS - Matriks KPI per Departemen]] masih potret 1 Agustus 2026 dan sudah bergeser jauh sejak itu.
+- **Alur target berjenjang** (Finance → SPV → Direktur, lewat `/kpi/target-marketing`) sengaja digambar terpisah dengan garis putus-putus: rutenya ada di biner produksi dan halaman `/finance/target-marketing` sudah ter-build, tetapi koleksi `kpi_target_marketing` masih kosong dan antrean persetujuan Direktur belum ter-deploy. Ia belum jadi bagian alur yang berjalan.
+
+Dua hal yang paling sering disalahpahami dan karena itu diberi kotak sendiri di diagram: **skor otomatis bukan skor final** (ia hanya usulan atas metrik yang berhasil dihitung, dan yang menyimpan tetap penilai), dan **kegagalan sebuah metrik biasanya berpangkal di tahap 2** — orang yang belum terpetakan ke toko atau ke struktur tim insentif akan mendapat kolom kosong di tahap 5, jauh dari sebabnya.
 
 ## Rangkaiannya, dalam lima langkah
 
