@@ -1,6 +1,6 @@
 # ADR - 0033 Beban Operasional Insentif dari Proyek Accurate
 
-**Status**: ✅ **Accepted** — 2026-08-02. Terkait: [[ADR - 0001 Akuntansi via Accurate]], [[ADR - 0002 Database-per-Service]].
+**Status**: ⚠️ **Accepted** — 2026-08-02, **diamandemen 2026-08-26**: hierarki beban berjenjang (SPV pakai proyek divisi saja) sudah diputuskan tetapi **belum diimplementasikan** — kode masih mencocokkan `employee_id` untuk semua level, sehingga proyek SPV tak ditemukan. Lihat §Consequences. Terkait: [[ADR - 0001 Akuntansi via Accurate]], [[ADR - 0002 Database-per-Service]], [[Microservices - Insentive Service]].
 
 ## Context
 
@@ -56,6 +56,18 @@ Daftar beserta alasan tiap akun ada di `integration/internal/usecase/incentive_o
 
 - **Datanya belum ada.** Per 2026-08-02 baru **6 dari 62** proyek karyawan yang punya beban sepanjang 2026; uangnya masih dibukukan di proyek merek (BIP-BH Rp29,98 M, BIP-KY+GB Rp12,73 M, 001 Umum Rp3,74 M). Dashboard akan tampak sebagian besar kosong — itu keadaan data, bukan bug, dan Panel Kelengkapan di [[APP - Web ERP]] memang dibuat untuk menunjukkannya.
 - **Beban proyek merek belum dibebankan ke siapa pun.** Kalau nanti diputuskan ikut, perlu aturan pembagian — `AlokasiProRata` (metode sisa-terbesar, hasil bagi dijamin kembali sama persis dengan totalnya) sudah tersedia di service insentif.
+
+  **Amandemen 2026-08-26 — aturannya sudah diputuskan, kodenya belum.** Pemilik produk menetapkan hierarki bebannya berjenjang:
+
+  | Level | Kode proyek Accurate | Cakupan |
+  |---|---|---|
+  | Supervisor | **nama divisi** (`BIP - BH`, `BIP - KY + GB`) | sudah **meliputi** beban Leader beserta timnya |
+  | Leader | `employee_id` | beban dirinya + anggota timnya |
+  | Account Specialist | `employee_id` | beban dirinya sendiri |
+
+  Konsekuensinya SPV memakai proyek divisi **SAJA** — menjumlahkannya dengan proyek anggota berarti **hitung ganda**. Terukur prod 2026-08-26: `BIP - BH` induk Rp1.102.150.289 vs jumlah 40 proyek anggota Rp55.960.681, **20× lebih besar**; proyek divisi memang memuat beban yang tidak ada di proyek per orang.
+
+  ⛔ **Kode belum mengikuti.** `ambilOpexAccurate` mencocokkan `employee_id` ke kode proyek untuk semua level, sehingga Aris Romadhoni (SPV Beauty Hacks) berstatus `proyek_tak_dikenal`. Maftuhissaiin (SPV Kyura) lolos dengan nilai **0** karena kebetulan ada proyek ber-kode `employee_id`-nya — **gagal diam-diam**, dan itu lebih berbahaya daripada yang gagal terang-terangan. Belum diverifikasi: berapa `bersih` proyek divisi setelah 14 akun kecualian dibuang — Rp1,1 M itu saldo **induk**, dan pada proyek per-orang 98% terbuang (Rp56 jt induk → Rp1,17 jt bersih).
 - **Tiga akun dikecualikan secara konservatif** (6202, 6204, 6205). Bila ternyata bukan bagian payroll, biaya tercatat terlalu kecil → profit dan insentif terbayar lebih besar dari seharusnya. Menunggu konfirmasi finance.
 - Menambah ketergantungan runtime insentif → integration → Accurate. Kegagalannya ditangani sebagai peringatan baris, bukan kegagalan dashboard.
 

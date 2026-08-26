@@ -267,6 +267,40 @@ Rumus memakai field **`bersih`**, BUKAN `induk` mentah maupun `Σrincian`/`dikec
 
 Konteks sumber: [[Microservices - Marketing Analytics Service]] (agregasi mart + join opex), [[Microservices - Employee Service]] (katalog metrik), [[External - Accurate]] (opex).
 
+## Perubahan 25–26 Agustus 2026: profit KPI dibaca dari insentif
+
+> **Status**: ✅ sumber & template live di prod 2026-08-26. Yang belum: gerbang peringatan (lihat batasan di akhir bab).
+
+**Pertanyaan yang menutup TBD di bab sebelumnya** ("ganti atau tambah", "target `profit_bersih` belum disepakati") terjawab dengan cara yang berbeda dari dugaan: KPI **berhenti menghitung profit sendiri**.
+
+Sebelumnya KPI dan insentif menghitung profit dengan rumus **dan periode** berbeda, dan tak satu pun berbunyi salah:
+
+| | insentif (SK Direktur 010/011) | `kinerja_toko` (lama) |
+|---|---|---|
+| rumus | `net_settlement − hpp − iklan − opex` | `net_settlement − hpp − ads − retur − opex` |
+| sumbu periode | `shipped_at` | `order_date` |
+| cutoff | tgl 25 bulan berikutnya | tak ada |
+| order belum cair | **HANGUS** | tetap dihitung |
+
+Terukur prod Juli 2026: populasi ordernya beda 11% (81.652 vs 73.543).
+
+**Retur sengaja TIDAK dikurangkan** di rumus SK, dan itu benar — `net_settlement` order yang diretur sudah nol atau negatif, jadi mengurangkannya lagi menghitungnya dua kali.
+
+**Sumber baru `insentif_profit`** (`services/employee/kpi_sumber_insentif_profit.go`) membaca `GET /profit-dashboard` di [[Microservices - Insentive Service]]. Satu metrik: `profit` (realisasi apa adanya). Scope `individu`→`icc`, `team`/`tim_icc`→`leader`, `department`→`supervisor`. Delapan template marketing sudah memakainya per 2026-08-26 (2 SPV, 2 Leader, 2 Account Specialist, 2 Marketplace Advertiser).
+
+⛔ **Metrik `pencapaian_target` sempat ada lalu dibuang.** Ia mengambil TARGET dari insentif, padahal KPI sudah punya targetnya sendiri di template (240 jt SPV, 50 jt AS, 3,4 M Leader). Dua target untuk satu penilaian, diketik dua orang di dua layar, tanpa apa pun yang menyamakannya. Pembagian yang benar: **realisasi dari insentif, target dari template KPI**. Dikunci test karena godaan menambahkannya kembali besar — ia *tampak* berguna, dan salahnya baru terlihat saat kedua angka menyimpang.
+
+**Mode monitoring parsial** (`kumpulkanOtomatisParsial`). Syarat "seluruh metrik terisi" membuat layar bulan berjalan **kosong total** begitu satu sumber belum siap: orangnya dilewati sepenuhnya, termasuk metrik lain yang angkanya sudah benar. Terukur prod 2026-08-26 — `GET /kpi?department=Kyura&sertakan_otomasi=1` mengembalikan 29 anggota, **nol** yang punya metrics, padahal 14 dari 31 ICC ROAS-nya sudah terisi dan mencakup 96,4% revenue.
+
+`GET /kpi?sertakan_otomasi=1&parsial=1` kini mengikutkan orang yang baru sebagian metriknya terukur, ditandai `parsial: true` + `metrik_terukur`. Penyebutnya wajib ikut: skor parsial tanpa "2 dari 4 metrik terukur" terbaca sebagai kinerja buruk, padahal datanya yang belum ada.
+
+⚠️ **`layakDifinalisasi` TIDAK ikut dilonggarkan** — cron finalisasi tetap menuntut lengkap. Membekukan skor setengah jadi mencatat angka yang lebih kecil dari kenyataan sebagai sejarah permanen, dan sejarah yang salah jauh lebih sulit dibetulkan daripada layar yang kosong. Fungsinya **dipisah**, bukan gerbangnya dilebarkan. Sejalan dengan [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]].
+
+**Yang masih menahan (bukan kode):**
+- ⛔ **Gerbang peringatan pukul-rata**. Sumber `insentif_profit` membuang baris bila `peringatan[]` tak kosong. Benar untuk komponen **hilang** (gaji, opex, target), keliru untuk **kelengkapan pinggiran**: "HPP mencakup 99,8%" dan "N retur belum terbukukan" tak menggeser angka profit. Maftuhissaiin tak dinilai meski realisasi Rp486 jt sudah benar.
+- ⛔ **Proyek Accurate SPV** — kode SPV bernama divisi, bukan `employee_id`. Rincian di [[Microservices - Insentive Service]] dan [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]].
+- ⚠️ **ROAS kosong untuk 17 dari 31 ICC**, tetapi hanya **3,6% revenue** — 13 di antaranya toko kecil (Rp178 rb–27 jt) yang belum terhubung ke akun advertiser di TikTok Business (`tt_business_stores`), 3 sisanya Lazada yang memang tak punya sumber iklan. Ini keadaan data di hulu, bukan bug: `ads_cost` lahir dari laporan GMV Max per `store_id`, dan toko yang tak terhubung tak punya baris laporan. Kolom `tiktok_advertiser_id` di ICC Management **tidak** dibaca perhitungan ini.
+
 ## Progres bulan berjalan di MyBharata
 
 > **Status**: ⚠️ **endpoint live di `main`, layar ada di `dev` tetapi BELUM rilis** per 2026-08-25. Endpoint `pratinjauKPISaya` ada di `origin/main` bip-erp dan sudah dua iterasi lebih maju daripada versi awalnya (commit `45bdfd8b` menambah `template_id` dan pemilihan template beraturan bersama; `cakupan` dan `rincian` per metrik ikut dikirim). Layarnya mendarat di `dev` my-bharata (commit `42fe0528`). ⛔ **Yang terpasang di HP orang belum memuatnya**: rilis `origin/main` my-bharata masih `1.14.5+135`, sementara `dev` sudah `1.14.14+149`. Catatan lama "belum merge" sudah tidak berlaku.

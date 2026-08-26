@@ -27,7 +27,8 @@ Insentif = tarif(%) × Profit
 - Tiap baris membawa **`peringatan[]`** dan `layak_dibayar` — baris yang datanya belum lengkap **menolak** dinyatakan siap dibayar, bukan diam-diam dihitung nol.
 
 ### Master data profit
-- `GET/POST /profit/org` · `PATCH /profit/org/:id/tutup` — struktur tim (ICC ↔ Leader ↔ Supervisor).
+- `GET/POST /profit/org` · `PATCH /profit/org/:id/tutup` — struktur tim, kini **hanya penambal**. Sejak 2026-08-26 Leader dan Supervisor diturunkan dari **hierarki HRIS** (`work_data.supervisor_id`), bukan dari koleksi ini — lihat §Hierarki di bawah.
+- ⚠️ Seluruh rute **tulis** `/profit/*` dijaga `RequireMasterProfitWriter` (finance staff/supervisor/admin, atau it supervisor/admin). Direktur lolos lewat peran turunannya, tanpa peran `direktur` tersendiri. Peran `insentive` sengaja **tidak** ikut: boleh menyetujui hasil, tidak boleh menulis targetnya sendiri.
 - `GET/POST /profit/targets` — target per entitas per periode. Ubah target setelah periode berjalan **wajib beralasan** (≥10 karakter); setelah disetujui, ditolak.
 - `GET/POST /profit/opex` · `POST /profit/opex/distribusi` — biaya operasional; kini **cadangan** karena gaji ditarik dari payroll dan non-gaji dari Accurate.
 - `GET/POST/DELETE /profit/internal-affiliates[/:username]` — daftar putih akun affiliate milik sendiri.
@@ -39,12 +40,63 @@ Insentif = tarif(%) × Profit
 - `GET /accurate/summary|income|invoices` · `GET /integration/shopee/item-performance`
 - ⚠️ `POST /calculate` dan `POST /calculate/auto` **menolak seluruh role** dengan pesan yang menyebut SK pencabutnya. Rutenya sengaja dibiarkan supaya pemanggil lama mendapat penjelasan, bukan 404 yang membingungkan.
 
+## Hierarki: Leader & Supervisor dari HRIS
+
+> **Status**: ✅ live di prod sejak 2026-08-26 (PR #1431, #1432).
+
+Sebelumnya level Leader dibangun dari koleksi `icc_leaders` dan level Supervisor dari
+`incentive_org`. Keduanya gagal, dengan cara yang berbeda:
+
+- `icc_leaders` punya indeks **UNIQUE pada `team`**, sehingga departemen ber-DUA leader —
+  keadaan Beauty Hacks sejak SK-nya keluar — **ditolak database**. Ade Jaenul Farhi memimpin
+  11 orang dan 3 toko di prod, dan tak akan pernah bisa masuk koleksi itu selama Satrio ada
+  di tim yang sama.
+- `incentive_org` level supervisor **tak pernah terisi** (0 baris) dan tak punya satu pun
+  layar yang bisa mengisinya, sehingga level itu selalu kosong.
+
+Keduanya kini diturunkan dari `work_data.supervisor_id` lewat `hierarki_hris.go`, memakai
+aturan yang **sama persis** dengan [[APP - Web ERP]] (`hierarki-leader.ts`) supaya tak lahir
+perbedaan halus antar-layar:
+
+| Level | Aturan |
+|---|---|
+| Leader | orang yang punya bawahan langsung ber-`position_key: icc`, **dan bukan Supervisor** |
+| Supervisor | atasan langsung seorang Leader |
+| Anggota langsung SPV | siapa pun yang atasannya SPV tanpa perantara Leader — termasuk Affiliate, Host Live, Buzzer |
+
+Empat hal yang menentukan benar-salahnya, dan semuanya sudah menggigit sekali:
+
+- **"Punya bawahan ICC", bukan "berjabatan Leader"** — bila SPV memegang langsung satu
+  Account Specialist, aturan berbasis jabatan membuat staf itu hilang dari penilaian.
+- **Supervisor ditolak jadi Leader** (keputusan pemilik produk 2026-08-25: *"Maftuhissaiin
+  hanya sebagai SPV, bukan leader"*). Tanpa ini ia muncul di dua level sekaligus dan di level
+  Leader dibandingkan dengan target Leader padahal cuma memegang satu orang.
+- **Batas divisi wajib** — tanpa syarat "supervisor harus sudah memimpin Leader ber-anggota
+  ICC", SELURUH supervisor perusahaan ikut tertarik masuk. Terukur prod: Supervisor HRD
+  muncul membawa 27 anggota berisi security, office boy, dan legal.
+- **Cocokkan `position_key`, bukan label** — jabatan "ICC" di-rename jadi "Account Specialist"
+  18 Agustus 2026; mencocokkan label kehilangan seluruh anggota.
+
+Struktur lama tetap jadi **fallback**: hierarki gagal ditarik menurunkan dashboard ke perilaku
+lama, bukan mengosongkannya.
+
+Tiap baris juga membawa `divisi_id`/`divisi_nama` dan `leader_id`/`leader_nama` untuk
+pengelompokan di layar. **Divisi diwakili SUPERVISORNYA**, bukan nama departemen HRIS
+(keputusan 2026-08-25: *"departement = spv"*) — yang menentukan sebuah baris masuk kelompok
+mana adalah siapa yang mempertanggungjawabkannya. Orang yang tak terjangkau hierarki
+dibiarkan berkolom **kosong, bukan ditebak**.
+
+Hasil terhadap 183 karyawan aktif (prod 2026-08-26): 3 Leader (Ade 11, Satrio 10, Ridho 11),
+2 Supervisor (Aris → Satrio+Ade; Maftuhissaiin → Ridho + Annisa sebagai anggota langsung).
+
 ## Belum Diimplementasikan / Catatan
 
 - **Cron harian dihapus** (`cron_worker.go`, −1.571 baris) bersama skema KPI-multiplier. Tidak ada lagi job terjadwal di service ini — lihat [[IT - Background Jobs & Schedulers]].
 - **Pengecualian omzet affiliate eksternal belum terpasang di perhitungan.** Daftar putihnya sudah bisa diisi lewat Master Data, tetapi belum ada kode yang memakainya → pencapaian di layar masih lebih tinggi dari seharusnya. Terukur Juli 2026: 71,6% nilai affiliate berasal dari kreator eksternal.
 - **Belum ada alur approval/freeze** untuk skema profit (yang lama punya, yang baru belum).
-- **Atribusi ICC belum lengkap**: per 2026-08-01 hanya 10 dari 28 toko punya mapping ICC → 63% profit Juli tak berpemilik. Sumbernya `icc_account_mappings` di integration ([[Microservices - Integration Service]]).
+- **Atribusi ICC belum lengkap**: per 2026-08-01 hanya 10 dari 28 toko punya mapping ICC → 63% profit Juli tak berpemilik. Sumbernya `icc_account_mappings` di integration ([[Microservices - Integration Service]]). Membaik per 2026-08-26: 31 mapping aktif, 21 baris muncul di level ICC.
+- ⛔ **Proyek Accurate SPV belum tersambung.** Kode mencocokkan `employee_id` ke kode proyek, padahal proyek supervisor bernama **divisi** (`BIP - BH`, `BIP - KY + GB`). Akibatnya Aris Romadhoni berstatus `proyek_tak_dikenal`, sementara Maftuhissaiin lolos dengan nilai **0** — gagal diam-diam, dan itu lebih berbahaya daripada yang gagal terang-terangan. Aturan yang sudah diputuskan (2026-08-26) belum diimplementasikan: SPV memakai proyek divisi **saja** karena proyek itu sudah meliputi beban Leader beserta timnya; menjumlahkannya dengan proyek anggota berarti hitung ganda. Terukur prod: `BIP - BH` induk Rp1.102.150.289 vs jumlah 40 proyek anggota Rp55.960.681 (20× lebih besar). Lihat [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]] yang sudah memprediksi kebutuhan aturan ini.
+- ⚠️ **Peringatan menggagalkan penilaian KPI secara pukul-rata.** Sumber `insentif_profit` di [[Microservices - Employee Service]] membuang seluruh baris bila `peringatan[]` tak kosong. Benar untuk komponen yang **hilang** (gaji, opex, target), tetapi keliru untuk peringatan **kelengkapan pinggiran**: "HPP mencakup 99,8%" dan "N retur belum terbukukan" tak menggeser angka profit — retur bahkan tak masuk rumusnya sama sekali. Maftuhissaiin karena itu tak dinilai meski realisasinya Rp486 jt sudah benar.
 - Menunggu dari luar: Lampiran SK (target sesungguhnya), mapping tim Beautyhacks, dan finance melengkapi HPP.
 - Pertanyaan finance yang masih terbuka: PPN di dalam profit; target sebelum/sesudah opex; jadwal bayar SK (tgl 1/5) vs cutoff pencairan (tgl 25).
 
