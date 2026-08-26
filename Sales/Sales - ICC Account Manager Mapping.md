@@ -1,11 +1,13 @@
 ## Deskripsi
 
-*Rancangan mapping antara **karyawan ICC (Internal Content Creator)** dengan akun TikTok yang mereka kelola: TikTok Shop (toko) dan TikTok Ads (advertiser). Dokumen ini adalah **rancangan implementasi masa depan** — posisi karyawan saat ini tetap ICC; perubahan jabatan ke Account Manager (AM) akan dilakukan terpisah di kemudian hari.*
+*Mapping antara **karyawan pemegang akun** (posisi HRIS: **ICC**, sebagian sudah di-rename **Account Specialist** — lihat catatan posisi di bawah) dengan akun TikTok yang mereka kelola: TikTok Shop (toko) dan TikTok Ads (advertiser), plus Shopee/Lazada. Perubahan jabatan ke Account Manager (AM) yang disebut versi awal dokumen ini belum terjadi; yang sudah terjadi (18 Agt 2026) adalah rename label posisi "ICC" → "Account Specialist" di HRIS untuk 33 dari 40 karyawan — lihat catatan `position_key` di bawah.*
 
 - **Stack:** Go + Fiber v2 + MongoDB (backend) · Next.js (frontend)
-- **Path target:** `bip-erp/services/integration/` (koleksi & endpoint baru)
-- **Status**: ⚠️ Implemented (ada catatan) — Phase 1–3 selesai; Phase 4 belum
-- **Dokumen terkait:** [[Sales - ICC Affiliate Mapping]] · [[Microservices - Integration Service]] · [[Microservices - Insentive Service]] · [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]
+- **Path:** `bip-erp/services/integration/` (backend) · `erp-frontend/src/features/integration/icc/` (frontend, halaman `/icc/management`)
+- **Status**: ⚠️ Implemented (ada catatan) — Phase 1–3 selesai; Phase 4 belum; lihat gap model leader di [[#Relasi Leader & Akumulasi Insentif]]
+- **Dokumen terkait:** [[Sales - ICC Affiliate Mapping]] · [[Microservices - Integration Service]] · [[Microservices - Insentive Service]] · [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] · [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]
+
+> ⚠️ **Pencocokan posisi "ICC" sudah pindah ke `position_key`, bukan lagi label `position`.** Rename posisi 18 Agt 2026 ("ICC" → "Account Specialist") sempat mematahkan seluruh pencocokan string `position === "icc"` di beberapa modul (ICC Management, RBAC menu, Finance Opex, HRIS KPI). Di modul ini sudah diperbaiki: kode HRIS-hierarchy (`hierarki-leader.ts`) mencocokkan `position_key` bila terisi, fallback ke label `position` untuk data transisi. **Kalau menyentuh modul LAIN yang masih cocok ke label posisi, periksa dulu — itu gap terpisah yang belum tentu ikut diperbaiki.**
 
 ---
 
@@ -247,15 +249,32 @@ Buat mapping baru. Dilindungi `RequireMarketingLeader`.
 
 ### `PATCH /icc/mappings/:id`
 
-Update mapping (deaktivasi atau ganti catatan). Dilindungi `RequireMarketingLeader`.
+Update mapping. Dilindungi `RequireMarketingLeader` + `tolakLintasDepartemen` (dicek dua sisi bila `team` berubah: team lama **dan** team tujuan — lihat [[#Otorisasi (RBAC)]]).
 
-**Request body (semua opsional):**
+> **Sejak ⚠️ edit toko & pemegang (branch `feat/icc-mapping-edit` + `feat/icc-mapping-edit-ui`, belum di-merge)**: PATCH bukan cuma deaktivasi/ganti catatan lagi — bisa mengganti toko/advertiser per channel, pemegang (`employee_id`), dan tim (`team`) pada mapping yang **sudah ada**, tanpa perlu deaktivasi lalu assign ulang dari nol.
+
+**Request body (semua opsional — pointer semantics: field tak disebut = tak disentuh):**
 ```json
 {
-  "is_active": false,
-  "notes": "Rotasi per 2026-09-01"
+  "is_active":            false,
+  "notes":                 "Rotasi per 2026-09-01",
+  "team":                  "beautyhacks",
+  "employee_id":           "BIP-0200",
+  "employee_name":         "Karyawan Pengganti",
+  "tiktok_shop_id":        "7123456789012345678",
+  "tiktok_advertiser_id":  "7234567890123456",
+  "shopee_shop_id":        "SP1",
+  "lazada_shop_id":        "LZ1"
 }
 ```
+
+**Aturan re-validasi (per field yang berubah, bukan seluruh payload):**
+- **Ganti `*_shop_id`/`*_advertiser_id`** → diverifikasi ulang ke sumber otoritatif masing-masing channel (sama seperti Create); `*_name` diisi ulang otomatis dari hasil lookup itu (FE tidak mengirim nama, hanya ID). ID kosong (`""`) = lepas channel itu dari mapping, namanya ikut dikosongkan.
+- **Ganti `employee_id` dan/atau `team`** → guard leader-first dicek ulang ke **team tujuan** (`leaderRepo.GetActiveByTeam`), bukan team lama. Team tujuan tanpa leader aktif di `icc_leaders` → `400` (`ErrIccTeamLeaderMissing`), sama seperti Create.
+- **Ganti `notes`/`is_active` saja** → tidak memicu re-cek shop/advertiser/leader sama sekali.
+- Toko/advertiser yang sudah dipegang mapping lain yang aktif → `409` (empat error `*AlreadyAssigned`, satu per channel).
+
+**FE mengirim diff, bukan payload penuh**: dialog assign yang sama dipakai untuk mode edit, tapi hanya field yang benar-benar berubah dari nilai asal mapping yang disertakan di body — menghindari re-trigger validasi leader-gate saat yang diedit cuma toko/catatan.
 
 ---
 
@@ -286,9 +305,11 @@ Daftar TikTok Ads advertiser yang belum di-assign aktif. Pool advertiser bersifa
 | **2** | Frontend: sidebar "MARKETING ICC", halaman ICC Management (CRUD assign), ICC Dashboard (performa toko + iklan per staff) | ✅ Selesai (2026-07-09) |
 | **3** | Field `team` (auto-fill dari department), isolasi data per tim, shop/advertiser opsional, halaman Team Performance untuk SPV/Leader, route `/icc/mappings/me` untuk staff ICC | ✅ Selesai (2026-07-09) |
 | **4** | Integrasi Insentive Service: hitung KPI AM dari mapping ini | 🟡 Belum |
-| **5** | Relasi leader saat assign (lihat [[#Relasi Leader & Akumulasi Insentif]]) | ✅ Selesai (2026-08-01; sudah ter-merge ke `main`) |
-| **6** | Tampilan ICC Management dipisah per team (lihat [[#Tampilan ICC Management per Team]]) | ✅ Selesai (2026-08-06; sudah ter-merge ke `main`) |
-| **7** | Akun affiliate (username TikTok) ikut dikelola di ICC Management — desain & fasenya di [[Sales - ICC Affiliate Mapping]] | 🟡 Rencana (2026-08-06) |
+| **5** | Relasi leader saat assign, model `icc_leaders` (lihat [[#Relasi Leader & Akumulasi Insentif]]) | ⚠️ Backend masih jadi guard aktif; FE-nya sudah digantikan Fase 8 |
+| **6** | Tampilan ICC Management dipisah per team (kartu per team, satu leader per kartu) | ⛔ Superseded oleh Fase 8 |
+| **7** | Akun affiliate (username TikTok) ikut dikelola di ICC Management — desain & fasenya di [[Sales - ICC Affiliate Mapping]] | ✅ Selesai |
+| **8** | Kartu per LEADER (bukan per team) diturunkan dari `work_data.supervisor_id`; kartu "Langsung di bawah SPV" + "Belum ditugaskan"; hapus Set Leader manual (lihat [[#Tampilan ICC Management — kartu per leader (menggantikan kartu per team)]]) | ✅ Selesai — sudah ter-merge ke `main` |
+| **9** | Edit mapping yang sudah ada: ganti toko/advertiser per channel, pemegang, dan tim tanpa deaktivasi+assign ulang (lihat `PATCH /icc/mappings/:id` di atas) | ⚠️ Backend (`feat/icc-mapping-edit`) + Frontend (`feat/icc-mapping-edit-ui`) sudah **di-push**, **belum di-merge** ke `main` |
 
 ---
 
@@ -296,107 +317,111 @@ Daftar TikTok Ads advertiser yang belum di-assign aktif. Pool advertiser bersifa
 
 *Permintaan dirut (tiket, 2026-08-01): sebelum SPV/leader meng-assign karyawan ICC ke toko, harus jelas karyawan itu di bawah leader siapa — dipakai untuk akumulasi perhitungan insentif leader.*
 
-- **Status**: ⚠️ Implemented (2026-08-01) — backend (Integration Service) + FE sudah ter-merge ke `main`. Konsumsi oleh Insentive Service (Phase 4) belum, jadi akumulasi insentif leader belum berjalan.
+- **Status**: ⚠️ Implemented, tapi **backend dan frontend kini memakai DUA MODEL LEADER BERBEDA** yang tidak saling sinkron — lihat ⛔ di bawah. Konsumsi oleh Insentive Service (Phase 4) masih belum, jadi akumulasi insentif leader belum berjalan sama sekali.
 
-**Desain final (leader-first, menyederhanakan draf sebelumnya):**
+### Model asal (2026-08-01, backend — MASIH JADI GUARD AKTIF)
 
-- **Satu record leader per team** di koleksi **`icc_leaders`** (Integration Service): `team → employee_id + employee_name`, unique partial index `(team, is_active=true)`; pergantian leader = nonaktifkan baris lama + buat baru (riwayat tersimpan). Endpoint `GET/POST /icc/leaders`, `PATCH /icc/leaders/:id/deactivate` (guard `RequireMarketingLeader`).
-- **Tanpa daftar anggota manual**: keanggotaan team diturunkan dari `icc_account_mappings.team` — anggota team X = semua mapping aktif ber-`team` X. (Berbeda dari draf awal yang mau memakai `IncentiveOrg.Anggota` — dipilih Integration-lokal mengikuti pelajaran `mappingDariRingkasan` di `services/insentive/func.go`: panggilan antar-service tanpa identitas user kena 403 di route ber-RBAC; Integration adalah pemilik data "siapa mengelola apa".)
-- **Guard leader-first di BE**: `POST /icc/mappings` ditolak bila team karyawan belum punya leader aktif. Cek memakai `employee_team` dari body (department karyawan yang di-assign; dikirim FE) dengan fallback header `BIP-Department` — supaya assign lintas department oleh IT tetap tervalidasi ke team karyawan, bukan team pemanggil.
-- **FE (ICC Management)**: `LeaderBar` menampilkan leader team + tombol Set Leader (kandidat = karyawan posisi `leader`; team diturunkan dari department kandidat, bukan dipilih manual). Form assign menampilkan warning + submit disabled selama team belum punya leader; dropdown karyawan diperluas posisi `icc` **+ `leader`** (leader boleh pegang toko; form menandai *self-leader*). Leader **tanpa** toko cukup terdaftar di `icc_leaders` — tidak butuh baris mapping, validasi "minimal satu akun" tak berubah.
-- **1 leader per department** (kyura / beautyhacks); leader = posisi "leader" (istilah insentif: `adv_leader`). Nilai `team` konsisten karena satu sumber: department HRIS (= cookie `department` FE = header `BIP-Department`).
-- **Data lama**: mapping existing tak butuh migrasi (leader tidak disimpan di mapping); SPV cukup Set Leader sekali per team setelah live.
-- **Phase 4 (belum)**: Insentive membaca leader dari Integration (pola ringkasan internal seperti `mappingDariRingkasan`) untuk rollup ICC → Leader; `IncentiveOrg` dashboard profit belum disentuh — sampai disatukan, keduanya paralel (leader di dashboard profit tetap diisi manual).
+- **Satu record leader per team** di koleksi **`icc_leaders`** (Integration Service): `team → employee_id + employee_name`, **unique partial index `(team, is_active=true)`** — satu team hanya boleh punya SATU baris aktif; pergantian leader = nonaktifkan baris lama + buat baru. Endpoint `GET/POST /icc/leaders`, `PATCH /icc/leaders/:id/deactivate` (guard `RequireMarketingLeader`) **masih ada di kode** (`icc_leader_handler.go`, terdaftar di `services/integration/main.go`).
+- **Guard leader-first di BE tidak berubah**: `POST` **dan** `PATCH /icc/mappings/:id` (bila `employee_id`/`team` ikut berubah) ditolak `400` (`ErrIccTeamLeaderMissing`) bila team tujuan belum punya baris aktif di `icc_leaders` (`icc_mapping_usecase.go`, `leaderRepo.GetActiveByTeam`).
 
-### Flowchart Assign (leader-first)
+### Model pengganti (2026-08, frontend — yang dilihat & dipakai user sekarang)
+
+- **`icc_leaders` tidak lagi dibaca FE sama sekali.** Fitur "kartu-per-leader-icc" (merged ke `main`) **menghapus** `LeaderBar`, tombol **Set Leader**, `set-leader-dialog.tsx`, `use-set-leader.ts`, dan `use-fetch-leaders.ts`. Tidak ada satu pun jalur UI lagi untuk mengisi atau mengganti baris `icc_leaders` — koleksi itu **beku** sejak migrasi ini, isinya sisa dari sebelum rewrite.
+- **Leader kini diturunkan dari HRIS**, bukan dipilih manual: `hierarki-leader.ts` (`susunTimLeader`) mengelompokkan karyawan ber-`position`/`position_key` **ICC** menurut atasan langsungnya (`work_data.supervisor_id`) — leader = siapa pun yang punya bawahan langsung berposisi ICC, bukan orang yang menyandang label jabatan "leader". Aturan ini sengaja mengikuti kenyataan organisasi, bukan label jabatan, supaya SPV yang kebetulan langsung membawahi satu staf ICC tetap dapat kartu.
+- **Departemen tetap unit pengelompokan tertinggi** di layar (`kartu-leader.ts`, `blokDepartemen`); di dalamnya bisa ada **lebih dari satu kartu leader** — kasus nyata: Beauty Hacks kini punya dua leader paralel (Ade Jaenul Farhi, Satrio), masing-masing dapat kartunya sendiri. Dua kartu tambahan yang tak berbasis leader: **"Langsung di bawah SPV"** (`tanpa-leader` — karyawan ICC tanpa atasan berposisi leader di atasnya) dan **"Belum ditugaskan"** (akun affiliate tanpa pemegang).
+- **Gerbang assign di FE** (`leader-gate.ts`, `nilaiLeaderGate`) memblokir submit bila karyawan yang dipilih **tidak punya `supervisor_id`** sama sekali di HRIS (`kodePesan: "tanpaAtasan"`). Ini **BUKAN pengganti** guard backend — komentar di file itu eksplisit: gate ini menggantikan UX lama, backend tetap penjaga sebenarnya.
+
+### ⛔ Gap nyata: dua model bisa saling bertentangan
+
+**Backend dan frontend memvalidasi hal yang berbeda, dan tak ada yang menjaga keduanya tetap sinkron:**
+
+- FE menilai "team boleh di-assign" dari HRIS (karyawan itu punya atasan); BE menilai dari **baris aktif di `icc_leaders`** untuk team itu — dua sumber yang independen sejak FE berhenti membaca/menulis `icc_leaders`.
+- **`icc_leaders` unique index per-team secara struktural tidak bisa merepresentasikan Beauty Hacks** yang kini punya dua leader (Ade + Satrio) — hanya satu baris yang boleh aktif. Guard BE tidak peduli baris itu milik leader yang MANA (cuma cek "ada baris aktif untuk team ini"), jadi assign untuk anggota Ade maupun Satrio tetap lolos selama team-nya punya *satu* baris aktif apa pun — tapi begitu baris itu dinonaktifkan/basi (mis. data lama sebelum rewrite dan tak ada yang tahu harus menjaganya), **seluruh assign untuk team itu gagal 400 di backend, padahal FE terlihat sudah mengizinkan** (kartu leader tampil, karyawan punya atasan lengkap).
+- **Tak terverifikasi**: apakah baris `icc_leaders` untuk `kyura` dan `beautyhacks` saat ini masih aktif di produksi. Sebelum menyalahkan kode manapun bila assign tiba-tiba 400 di produksi untuk team yang kartunya tampil normal di FE, **cek dulu isi `icc_leaders` untuk team itu** — kelas gejala yang sama dengan "biner basi": layar terlihat benar, backend menolak untuk alasan yang FE tidak tampilkan.
+- **Belum diputuskan**: apakah `icc_leaders`/guard-nya akan dihapus menyusul (menyamakan BE dengan model HRIS), atau backend akan ditulis ulang membaca hierarki HRIS langsung. TBD — tandai sebagai keputusan terbuka, bukan diasumsikan salah satunya.
+
+### Fase 4 (Insentive Service) — tetap belum
+
+- Insentive membaca leader dari Integration untuk rollup ICC → Leader; `IncentiveOrg` dashboard profit belum disentuh — sampai disatukan, keduanya paralel (leader di dashboard profit tetap diisi manual). Konsumsi ini **belum ditulis untuk model manapun** (baik `icc_leaders` lama maupun hierarki HRIS baru) — masih 🟡.
+
+### Flowchart Assign — model SAAT INI (FE hierarki HRIS, BE tetap `icc_leaders`)
 
 ```mermaid
 flowchart TD
-    A["SPV/Leader buka ICC Management"] --> B["LeaderBar: GET /icc/leaders (team)"]
-    B --> C{"Team sudah punya\nleader aktif?"}
-    C -- "belum" --> D["Set Leader: pilih karyawan posisi leader\n(team = department kandidat)\nPOST /icc/leaders\n(ganti leader → baris lama nonaktif)"]
-    D --> E
-    C -- "sudah" --> E["Form assign: pilih karyawan\n(posisi icc + leader)"]
-    E --> F{"Karyawan = leader\nteam itu sendiri?"}
-    F -- "ya" --> G["Form menandai self-leader\n(toko dihitung pribadi + tim)"]
-    F -- "bukan" --> H["Form tampilkan leader team"]
-    G --> I["Pilih toko / ads / Shopee + notes"]
-    H --> I
-    I --> J["POST /icc/mappings + employee_team"]
-    J --> K{"Guard BE:\nteam karyawan punya leader aktif?\n+ validasi akun tersedia"}
-    K -- "tidak" --> L["400: daftarkan leader dulu\n(FE juga sudah memblokir submit)"]
-    K -- "lolos" --> M["Simpan icc_account_mappings"]
-    M --> N["Akumulasi insentif leader (Phase 4, belum):\nanggota team = mapping aktif se-team\nlevel ICC = toko sendiri\nlevel Leader = toko seluruh team\n(termasuk toko leader sendiri)"]
+    A["SPV/Leader/IT buka ICC Management"] --> B["FE: susunTimLeader(karyawan, departemen)\nkelompokkan dari work_data.supervisor_id"]
+    B --> C["Kartu per leader + kartu tanpa-leader\n+ kartu belum-ditugaskan"]
+    C --> D["Klik Assign/Ubah pada kartu\n(team terkunci = departemen kartu)"]
+    D --> E{"nilaiLeaderGate:\nkaryawan terpilih punya supervisor_id?"}
+    E -- "tidak" --> F["Blokir submit FE: tanpaAtasan"]
+    E -- "ya" --> G["Pilih toko / ads / Shopee / Lazada + notes\nPOST atau PATCH /icc/mappings"]
+    G --> H{"Guard BE (independen dari FE):\nicc_leaders punya baris AKTIF\nuntuk team tujuan?"}
+    H -- "tidak" --> I["400 ErrIccTeamLeaderMissing\n⛔ bisa terjadi walau FE sudah lolos —\nicc_leaders beku, tak ada UI isi ulang"]
+    H -- "lolos" --> J["Simpan/ubah icc_account_mappings"]
+    J --> K["Akumulasi insentif leader (Phase 4, belum ditulis untuk model manapun)"]
 ```
 
-## Tampilan ICC Management per Team
+> Flowchart versi lama (Set Leader manual, `icc_leaders` diisi dari FE) dihapus dari dokumen ini karena jalur itu **tidak ada lagi di UI** — lihat [[#⛔ Gap nyata: dua model bisa saling bertentangan]] untuk kenapa backend-nya tetap dijelaskan terpisah.
 
-*Permintaan (2026-08-05): tampilan ICC Management harus terpisah antara department **Kyura** dan **Beauty Hacks**, tidak lagi satu tabel campuran.*
+## Tampilan ICC Management — kartu per leader (menggantikan kartu per team)
 
-- **Status**: ✅ Implemented (2026-08-06) — sudah ter-merge ke `main`. File: `components/team-card.tsx` (kartu per team), `lib/kelompokkan-mapping.ts` (`kelompokkanMappingPerTeam`, 7 unit test), `app/(main)/icc/management/page.tsx`; `leader-bar.tsx` dihapus karena isinya melebur ke header kartu.
+*Permintaan (2026-08-05): tampilan ICC Management harus terpisah antara department **Kyura** dan **Beauty Hacks**, tidak lagi satu tabel campuran. Diselesaikan dulu (2026-08-06) sebagai kartu per TEAM; direvisi lagi (Fase A, sesi ini) jadi kartu per LEADER di dalam tiap departemen begitu hierarki HRIS-nya lengkap dan Beauty Hacks ternyata punya dua leader paralel.*
 
-### Masalah pada tampilan sebelumnya
+- **Status**: ✅ Implemented — sudah ter-merge ke `main` ("kartu-per-leader-icc"). File: `components/team-card.tsx` (rewrite total — kini kartu per leader, dulu kartu per team), `components/leader-card-khusus.tsx` (baru — kartu "Langsung di bawah SPV" + "Belum ditugaskan"), `lib/hierarki-leader.ts` (`susunTimLeader`), `lib/kartu-leader.ts` (`blokDepartemen`, menggantikan `kelompokkanMappingPerTeam`), `lib/leader-gate.ts` (`nilaiLeaderGate`), `app/(main)/icc/management/page.tsx`. **Dihapus**: `set-leader-dialog.tsx`, `use-set-leader.ts`, `use-fetch-leaders.ts` — lihat [[#Relasi Leader & Akumulasi Insentif]] untuk konsekuensinya ke backend.
 
-Halaman `/icc/management` merender **satu tabel datar** berisi seluruh mapping. Untuk pemakai IT (yang menerima semua team) baris Kyura dan Beauty Hacks tercampur **tanpa penanda team sama pun** — tidak ada kolom team di tabel. `LeaderBar` sudah dipisah per team sejak Fase 5, tetapi tabelnya belum, sehingga status per team ("team ini belum punya leader → assign terblokir") tidak nyambung dengan baris datanya.
+### Kenapa direvisi lagi
 
-### Bentuk yang dipilih: satu kartu per team
+Kartu-per-team (Fase 6) menaruh SATU leader per kartu team, sesuai model `icc_leaders` (unique per team) saat itu. Begitu hierarki `work_data.supervisor_id` terisi penuh (sensus 2026-08-06), ketahuan Beauty Hacks punya **dua** orang yang masing-masing punya bawahan ICC langsung (Ade, Satrio) — sesuatu yang model lama secara struktural tak bisa tampilkan (satu leader per team). Kartu-per-team juga mewajibkan "Set Leader" manual sebelum assign bisa jalan, padahal HRIS sudah tahu siapa atasan siapa — jadi ganda-input.
+
+### Bentuk saat ini: kartu per leader di dalam tiap departemen
 
 ```text
-ICC Management
+ICC Management (departemen = Kyura, Beauty Hacks, ...)
 
-┌─ KYURA ─────────────────────────────────────────────────────┐
-│ 👤 Leader: Rido (BIP-0021)     [Ganti Leader] [+ Assign] [▾] │
-│ 5 karyawan · 8 akun                                          │
-├──────────────────────────────────────────────────────────────┤
-│ Karyawan │ TikTok Shop │ Advertiser │ Shopee │ Status │ Aksi │
-│ Rido     │ kyura.id    │ —          │ —      │ Aktif  │  ⏻   │
-│ Sari     │ kyuracare   │ Kyura Ads  │ —      │ Aktif  │  ⏻   │
-└──────────────────────────────────────────────────────────────┘
+┌─ Kyura — Ridho (BIP-00xx) ──────────────────────── [+ Assign] [▾] ─┐
+│ 11 anggota · N toko                                                │
+├──────────────────────────────────────────────────────────────────┤
+│ Karyawan │ TikTok Shop │ Advertiser │ Shopee │ Lazada │ Aksi      │
+│ ...      │ ...         │ ...        │ ...    │ ...    │ ✎  ⏻     │
+└────────────────────────────────────────────────────────────────────┘
 
-┌─ BEAUTY HACKS ──────────────────────────────────────────────┐
-│ ⚠ Belum ada leader — assign terblokir  [Set Leader] [▾]      │
-│ 3 karyawan · 4 akun                                          │
-├──────────────────────────────────────────────────────────────┤
-│ ... tabel yang sama                                          │
-└──────────────────────────────────────────────────────────────┘
+┌─ Beauty Hacks — Ade Jaenul Farhi ────────────────  [+ Assign] [▾] ─┐
+│ 12 anggota                                                          │
+└──────────────────────────────────────────────────────────────────┘
 
-┌─ TANPA TEAM (data lama) ────────────────────────────── [▾] ──┐
-│ Mapping sebelum Fase 3 — nonaktifkan lalu assign ulang       │
-└──────────────────────────────────────────────────────────────┘
+┌─ Beauty Hacks — Satrio ──────────────────────────  [+ Assign] [▾] ─┐
+│ 11 anggota                                                          │
+└──────────────────────────────────────────────────────────────────┘
+
+┌─ ⚠ Langsung di bawah SPV (Beauty Hacks) ─────────────────── [▾] ──┐
+│ Karyawan ICC tanpa atasan berposisi leader di atasnya —            │
+│ TANPA tombol Assign (lihat leader-card-khusus.tsx)                 │
+└──────────────────────────────────────────────────────────────────┘
+
+┌─ ⚠ Belum ditugaskan ──────────────────────────────────────── [▾] ─┐
+│ Akun affiliate tanpa pemegang                                      │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
-**Kartu, bukan tab.** Alasannya: status "belum ada leader" harus terlihat **serentak** untuk semua team karena assign terblokir per team — tab menyembunyikan team yang tidak aktif. Selain itu SPV/leader otomatis hanya menerima satu kartu (data mereka sudah difilter `?team=department`), sehingga tidak perlu cabang kode khusus; tab tunggal justru mubazir. Menaruh leader dan anggotanya dalam satu kotak juga membuat relasi leader ↔ anggota terbaca langsung — inti aturan leader-first.
+Ikon **✎ (Ubah)** di tiap baris membuka dialog assign yang sama dalam mode edit — lihat kemampuan edit mapping di bagian `PATCH /icc/mappings/:id` di atas.
 
-### Aturan pengelompokan
+### Aturan pengelompokan (`hierarki-leader.ts` + `kartu-leader.ts`)
 
-- **Daftar kartu** = `daftarTeamMarketing` yang sudah dipakai `LeaderBar` (distinct department karyawan berposisi ICC + team leader terdaftar). Team **tanpa mapping** tetap muncul supaya leadernya bisa didaftarkan lebih dulu; team **tanpa leader** tetap muncul supaya terlihat sedang terblokir.
-- **Pencocokan `team` case-insensitive + trim**, mengikuti pola `cariLeaderTim` — nilai `team` pada mapping berasal dari header `BIP-Department` yang casing-nya bisa berbeda antar-sumber.
-- **Kartu "Tanpa team"** hanya dirender bila ada mapping ber-`team` kosong (data pra-Fase 3, lihat risiko di bawah). Tanpa tombol Set Leader; berisi anjuran nonaktifkan lalu assign ulang agar `team`-nya terisi. Tujuannya supaya tak ada data yang lenyap dari layar hanya karena tak punya induk.
-- **Urutan**: alfabet, kartu "Tanpa team" selalu terakhir.
-- **Kartu collapsible**, default terbuka. Isi kartu tetap tabel yang sekarang — satu baris per karyawan dengan seluruh tokonya ditumpuk (`kelompokkanMappingPerKaryawan`, sudah ada).
+- **Departemen** tetap unit teratas (sesuai Fase 6): distinct department karyawan berposisi ICC.
+- **Di dalam satu departemen**, `susunTimLeader` mengelompokkan karyawan ICC menurut **atasan langsungnya** (`supervisor_id`) — leader = siapa pun dengan ≥1 bawahan langsung berposisi ICC, BUKAN orang berlabel jabatan "leader". Bisa nol, satu, atau **lebih dari satu** kartu leader per departemen.
+- **Kartu "Langsung di bawah SPV"** (`tanpa-leader`, `leader-card-khusus.tsx`) — karyawan ICC di departemen itu yang atasannya BUKAN sesama pemegang bawahan ICC (mis. langsung di bawah SPV departemen). Sengaja **tanpa tombol Assign** — ini daftar kerja hasil struktur organisasi, bukan tim yang bisa ditambah anggotanya dari kartu ini; tapi mengedit mapping yang **sudah ada** di kartu ini tetap diperbolehkan lewat ikon Ubah.
+- **Kartu "Belum ditugaskan"** — akun affiliate (dari [[Sales - ICC Affiliate Mapping]]) yang belum punya pemegang sama sekali. Juga tanpa tombol Assign.
+- **Pencocokan posisi ICC** pakai `position_key` bila terisi, fallback ke label `position` — lihat catatan rename di bagian atas dokumen.
+- **Urutan**: nama leader, abjad, deterministik.
+- **Kartu collapsible**, default terbuka. Isi kartu = tabel per-karyawan dengan seluruh tokonya ditumpuk (`kelompokkanMappingPerKaryawan`, tak berubah dari Fase 6).
 
-### Tombol Assign pindah ke kartu
+### Tombol Assign tetap terkunci per konteks
 
-Tombol **+ Assign** dipindah dari header halaman ke **tiap kartu**, dengan **team terkunci** — pola yang sama dengan `lockedTeam` pada dialog Set Leader (Fase 5). Ini menghilangkan kemungkinan IT salah memilih karyawan lintas team karena target team jadi eksplisit sejak awal. Pada kartu yang belum punya leader, tombol Assign **disabled** dengan penjelasan singkat; backend tetap penjaga sebenarnya lewat guard leader-first.
-
-### Penempatan satu baris mapping
-
-```mermaid
-flowchart TD
-    A["Mapping dari GET /icc/mappings"] --> B{"Punya field team?"}
-    B -- "tidak" --> C["Kartu TANPA TEAM\n(data pra-Fase 3)"]
-    B -- "ya" --> D{"Cocok dengan salah satu\nteam marketing?\n(case-insensitive + trim)"}
-    D -- "ya" --> E["Kartu team tsb"]
-    D -- "tidak" --> F["Kartu baru untuk team itu\n(muncul dari data, tanpa hardcode)"]
-    E --> G["Dikelompokkan per karyawan\n(toko ditumpuk satu baris)"]
-    F --> G
-```
+Tombol **+ Assign** ada di kartu leader (team terkunci = departemen kartu, karyawan yang boleh dipilih dibatasi ke bawahan leader itu bila relevan). Guard-nya kini `nilaiLeaderGate` (FE) — lihat independensinya dari guard backend di [[#⛔ Gap nyata: dua model bisa saling bertentangan]].
 
 ### Dampak teknis
 
-- **Tanpa perubahan backend** — semua data sudah tersedia: `GET /icc/mappings` (IT: semua team; SPV: team sendiri), `GET /icc/leaders`, dan daftar karyawan untuk derivasi team.
-- Helper murni baru `kelompokkanMappingPerTeam(mappings, teams)` (mengembalikan team → leader → kelompok karyawan) supaya aturan di atas bisa diuji unit, memakai ulang `kelompokkanMappingPerKaryawan` yang sudah ada.
-- `LeaderBar` versi IT melebur ke dalam header kartu; versi SPV tetap satu kartu dengan isi yang sama.
+- **Tanpa perubahan backend** untuk rewrite kartu ini sendiri — semua data sudah tersedia lewat `GET /employee/list?with_supervisor=true` + `GET /icc/mappings`. (Perubahan backend baru datang belakangan dari fitur *edit mapping*, lihat PATCH di atas — bukan bagian dari rewrite kartu ini.)
+- `GET /icc/leaders` tidak lagi dipanggil dari FE sama sekali (lihat gap di atas).
 
 ## Dependensi & Risiko
 
@@ -408,6 +433,8 @@ flowchart TD
 | **Team field pada data lama** | Mapping yang dibuat sebelum Phase 3 tidak memiliki field `team` — query filter `?team=X` tidak akan menemukan data lama. Migrasi data lama perlu dijalankan manual atau via script |
 | **Risiko: rotasi** | Jika mapping sering berubah, laporan historis perlu snapshot — perlu `effective_from`/`effective_to` di fase berikutnya |
 | **Belum terintegrasi insentif** | Insentive Service belum konsumsi endpoint ini; integrasi dilakukan saat jabatan ICC → AM resmi berubah |
+| ⛔ **`icc_leaders` beku, guard BE independen dari FE** | FE berhenti membaca/menulis `icc_leaders` sejak kartu-per-leader (Fase 8), tapi `POST`/`PATCH /icc/mappings` masih menggerbanginya. Team tanpa baris aktif di `icc_leaders` akan gagal 400 walau kartunya tampil normal di FE. Lihat [[#⛔ Gap nyata: dua model bisa saling bertentangan]] — **belum diverifikasi** isi `icc_leaders` untuk `kyura`/`beautyhacks` di produksi saat ini |
+| **Rename posisi ICC → Account Specialist** | 18 Agt 2026, 33/40 karyawan. Modul ini sudah dipindah ke `position_key`; modul LAIN (RBAC menu, Finance Opex, HRIS KPI) belum tentu ikut — periksa sebelum menyentuhnya |
 
 ---
 
