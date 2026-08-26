@@ -3,8 +3,8 @@
 *Payroll Service mengelola **penggajian**: setup komponen gaji, konfigurasi BPJS & pajak, penetapan gaji per karyawan, dan **payroll run** (kalkulasi → approve → terbitkan slip). Ini sisi **implementasi** dari konsep [[HRIS - Payroll]] & [[HRIS - Compensation & Benefits]]. **Fase 1 (Setup & Config)** + **Fase 2 (Engine Run + lifecycle publish + slip self-service)** + **Fase 2b (PPh21 TER)** sudah di kode; slip PDF = fase berikut. Scope tegas: **sampai siapkan data + terbitkan slip, TANPA pembayaran/transfer**.*
 
 - **Stack**: Go + Fiber v2 + MongoDB (`payroll_db`) — selaras pola service bip-erp lain
-- **Path**: `services/payroll` (Fase 1 merged #262; Fase 2 PR #265; Fase 2b PPh21 TER PR #270; Payroll Run extend/publish/self-service PR #272; FE Payroll Run PR #171)
-- **Status**: ⚠️ **Implemented (Fase 1 Setup + Fase 2 Run+publish+self-service + Fase 2b PPh21 TER + Fase 4 THR)**. Di belakang [[CORE - API Master Gateway]] (`InternalURL["payroll"]`), auth **SSO** ([[CORE - SSO Flow]]), role `system_roles["hris"]`. Port `6980`, mongo `payroll-mongo-db` (host `32792`). · 🔴 **Multi-perusahaan: belum ter-scope** — `company_id` di service ini = badan usaha **penggaji** (kop slip), BUKAN tenant; `listEmployeeSalaries`/run generation/THR meng-enumerasi SEMUA karyawan (`bson.M{}`) → campur lintas-perusahaan. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
+- **Path**: `services/payroll` (Fase 1 merged #262; Fase 2 PR #265; Fase 2b PPh21 TER PR #270; Payroll Run extend/publish/self-service PR #272; FE Payroll Run PR #171; potongan kehadiran eksplisit [#1317](https://github.com/bip-itteam-internal/bip-erp/pull/1317) + [#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318) + erp-frontend [#1109](https://github.com/bip-itteam-internal/erp-frontend/pull/1109), merged 2026-08-20)
+- **Status**: ⚠️ **Implemented (Fase 1 Setup + Fase 2 Run+publish+self-service + Fase 2b PPh21 TER + Fase 4 THR + Fase 5 PDF slip)** dan **live di produksi** (image BE dibangun 2026-08-25 21:30, FE 21:34). Di belakang [[CORE - API Master Gateway]] (`InternalURL["payroll"]`), auth **SSO** ([[CORE - SSO Flow]]), role `system_roles["hris"]`. Port `6980`, mongo `payroll-mongo-db` (host `32792`). · ⛔ **Belum pernah dipakai menggaji seorang pun**: 2 `payroll_run` di prod, **keduanya `draft`**, tak satu pun pernah `approved` apalagi `published`, jadi nol slip pernah sampai ke karyawan (diukur 2026-08-26). Lihat §Kondisi Pemakaian di Produksi. · 🔴 **Multi-perusahaan: belum ter-scope** — `company_id` di service ini = badan usaha **penggaji** (kop slip), BUKAN tenant; `listEmployeeSalaries`/run generation/THR meng-enumerasi SEMUA karyawan (`bson.M{}`) → campur lintas-perusahaan. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 
 ## Endpoint / Fitur (Sudah Diimplementasikan — Fase 1)
 
@@ -12,7 +12,7 @@
 - `GET/PUT /config/company` — identitas perusahaan (nama, kota, penanda tangan HRD) untuk kop slip
 - `GET/PUT /config/bpjs` — rate & cap 5 program: Kesehatan, JHT, JP, JKK, JKM
 - `GET/PUT /config/tax` — PPh21 metode **TER** + nominal PTKP per status + tabel TER
-- `GET/PUT /config/attendance-deduction` — tarif potongan kehadiran (6 angka; ⚠️ belum merged, lihat §Potongan Kehadiran)
+- `GET/PUT /config/attendance-deduction` — tarif potongan kehadiran (6 angka; lihat §Potongan Kehadiran)
 - GET = role HR; PUT = HR admin. Dokumen **singleton**, di-seed default saat boot (idempoten).
 
 ### Master Badan Usaha (multi-company — identitas/kop slip)
@@ -26,6 +26,7 @@
 - CRUD `/salary-components` — komponen `type` (earning/deduction), `input_type` (manual/computed), `taxable`, `bpjs_base`, `sort_order`, `is_active`
 - **Di-seed 15 komponen** default **persis slip nyata** (9 pendapatan + 6 pengurangan). Yang `computed` (Lembur, BPJS, PPh21, **potongan** Tunjangan Kehadiran) dihitung engine; **earning Tunjangan Kehadiran = manual** (base per karyawan). GET = HR; tulis = HR admin.
 	- ⚠️ **Jadi 18 komponen** (9 + 9) di [#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318): baris potongan "Tunjangan Kehadiran" dipecah jadi empat (Telat/Izin/Mangkir/Uang Makan). **Seed tak berlaku untuk dev & prod** yang koleksinya sudah terisi — backfill per-nama yang mengurusnya, lihat §Potongan Kehadiran.
+	- ⚠️ **Prod nyatanya berisi 19, bukan 18** (diukur 2026-08-26): backfill per-nama **menambah** empat baris baru tapi **tidak menonaktifkan** baris `deduction/computed` lama bernama "Tunjangan Kehadiran", sehingga ia masih `is_active` berdampingan dengan penggantinya. Engine tak lagi mengisinya (`attendanceShortfall` dan `PayoutFraction` sudah dihapus), jadi dampaknya bukan salah hitung melainkan **daftar yang membingungkan saat HR membacanya**: satu nama muncul sebagai earning DAN sebagai deduction yatim. Menonaktifkannya perlu keputusan sadar, karena run lama menyimpan nama itu di snapshot slipnya.
 
 ### Gaji per Karyawan
 - `GET /employee-salary` (list) · `GET/PUT /employee-salary/:employeeId` (upsert; path = sumber kebenaran)
@@ -34,17 +35,19 @@
 - ⚠️ **`upah_bpjs` = DASAR upah, bukan nominal potongan.** Engine memakainya sebagai pengali (`computeBpjsEmployee`), jadi mengisinya dengan nominal iuran membuat potongan mengecil sebesar rate itu sendiri (isi 4% dari dasar, potongan jadi 4% dari 4%, alias 25 kali lebih kecil). **Tidak ada validasi yang menahannya**: schema FE hanya `min(0)` dan `validateEmployeeSalary` hanya menolak negatif, jadi angka yang keliru lolos diam-diam sampai slip terbit.
 	- **Terjadi di production** (diperiksa 2026-08-05): 10 record `employee_salary` terisi, `upah_bpjs` hanya pernah bernilai **107.200** atau **128.800** dan sama sekali tidak mengikuti gaji pokok (yang bervariasi 1.444.250 sampai 3.000.000). Dibaca sebagai iuran keduanya konsisten: `107.200 = 4% × 2.680.000` dan `128.800 = 4% × 3.220.000` (4% = total rate karyawan Kesehatan 1% + JHT 2% + JP 1%). **Dasar upah yang dimaksud belum dikonfirmasi HR**, jadi koreksi datanya TBD. `effective_date` juga banyak terisi `2027-08-25` (satu record `2026-08-25`, menguatkan dugaan salah ketik tahun).
 	- FE sudah diberi penjaga (estimasi nominal + banner peringatan), lihat [[APP - Web ERP]]. Penjaga itu **tak berlaku surut**: record yang sudah terlanjur salah tetap perlu koreksi manual.
+	- ⛔ **Diukur ulang 2026-08-26: keadaannya memburuk pada skala, bukan membaik.** Dari **90** record, **nol** punya `upah_bpjs` yang masuk akal sebagai dasar upah (`>= basic_salary/2`). Rinciannya: **41 kosong/0** (BPJS-nya akan terhitung nol) dan **49 di bawah separuh gaji pokok** (pola "diisi nominal iuran" yang sama). Nilai terbanyak persis yang dulu ditemukan: 107.200 (x39), 128.800 (x6), lalu 248.600 (x2) dan 109.300 (x2). `effective_date` menguatkan dugaan salah ketik tahun: **46 record bertahun 2027**, hanya 3 di 2026, sisanya kosong. Konsekuensinya keras: bila run pertama diterbitkan hari ini, **baris BPJS setiap karyawan salah**, entah nol atau sekitar 25 kali terlalu kecil. Penjaga FE terbukti belum menghentikannya.
+	- ⚠️ **Angkanya bergerak selagi diukur**: jumlah record naik dari 86 ke 90 dalam hitungan menit di sesi yang sama, jadi HR sedang aktif mengisi. Ukur ulang sebelum menyimpulkan apa pun dari jumlah yang tertulis di sini.
 
 ## Endpoint / Fitur (Sudah Diimplementasikan — Fase 2: Payroll Run)
 
 - **Kalkulasi** (`buildPayslip`): Gaji Pokok = `basic_salary` (bukan komponen → hindari double-count; komponen manual bernama "Gaji Pokok" di-skip sbg guard) + komponen manual + Tunjangan Kehadiran penuh + lembur − BPJS (dari `upah_bpjs` + config) − potongan kehadiran − **PPh21 (TER)**. Hanya komponen `manual` diambil dari `component_values`; yang `computed` dihitung engine.
-	- ⚠️ **Potongan kehadiran diganti total** ([#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318), belum merged). Satu baris `base × (1 − payout_pct)` menjadi **empat baris eksplisit bertarif tetap** — rinciannya di §Potongan Kehadiran di bawah. `attendanceShortfall` dan `PayoutFraction` **dihapus**; `payout_pct` tetap disimpan dan ditampilkan tapi tak lagi menentukan satu rupiah pun, dikunci test yang membandingkan dua slip berpayout berbeda.
+	- ⚠️ **Potongan kehadiran diganti total** ([#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318), merged 2026-08-20). Satu baris `base × (1 − payout_pct)` menjadi **empat baris eksplisit bertarif tetap** — rinciannya di §Potongan Kehadiran di bawah. `attendanceShortfall` dan `PayoutFraction` **dihapus**; `payout_pct` tetap disimpan dan ditampilkan tapi tak lagi menentukan satu rupiah pun, dikunci test yang membandingkan dua slip berpayout berbeda.
 - **PPh21 (Fase 2b)** — metode **TER bulanan (PMK 168/2023)**: `PPh21 = tarif_efektif(kategori PTKP, bruto) × bruto`. Kategori dari `ptkp_status` (**A**: TK/0,TK/1,K/0 · **B**: TK/2,TK/3,K/1,K/2 · **C**: K/3; tak dikenal → A). Tabel TER A/B/C di config (`tax.ter_brackets`), di-seed default + backfill idempoten. Bruto = total pendapatan engine.
 - **Batch run**: `POST /payroll-runs` (metadata `title`, `pay_period_start/end`, `pay_date`, `notes` — **penggajian BULANAN**, tak ada mingguan; `period` label diturunkan dari `pay_period_start` bila kosong; hitung semua karyawan, simpan snapshot per orang; supplement gagal per-orang ditandai, tak gagalkan run) · `GET /payroll-runs` · `GET /payroll-runs/:id` (+ lines) · `POST /:id/recalculate` (draft) · `POST /:id/approve` (approver) · `POST /:id/publish` (approver; approved → published) · `GET /:id/lines/:employeeId`. Status **draft → approved → published**.
 - **Slip self-service** (tanpa gate HR — identitas dari header gateway): `GET /payroll-runs/my` (+ `/my/:id`) — karyawan lihat slip **sendiri**, HANYA dari run **published**; field internal HR (`notes`, `created_by`/`approved_by`/`published_by`) di-**redact**. Rute `/my` didaftarkan **sebelum** `/:id` agar tak ketangkap sebagai param.
 - **Service-to-service**: panggil [[Microservices - Attendance Service]] `GET /payroll-supplement` (`payout_pct` **persentase 0–100** → prorata Tunjangan Kehadiran + lembur) via `InternalRequest`.
 
-### Potongan Kehadiran (⚠️ belum merged — [#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318), butuh [#1317](https://github.com/bip-itteam-internal/bip-erp/pull/1317) naik lebih dulu)
+### Potongan Kehadiran (✅ merged 2026-08-20 — [#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318) bersama [#1317](https://github.com/bip-itteam-internal/bip-erp/pull/1317); FE erp-frontend [#1109](https://github.com/bip-itteam-internal/erp-frontend/pull/1109))
 
 Menggantikan prorata `payout_pct`. Alasannya bukan ketepatan melainkan **keterbacaan**: HRD
 menghitung tangan di Excel, dan satu baris gabungan mustahil dicocokkan baris per baris.
@@ -59,6 +62,8 @@ menghitung tangan di Excel, dan satu baris gabungan mustahil dicocokkan baris pe
 - **Komponen master di-backfill per-nama** (`ensureAttendanceDeductionComponents`), karena `seedSalaryComponents` berhenti begitu koleksi tak kosong dan dev/prod sudah berisi 15 dokumen sejak lama.
 - **`days` absen dari respons supplement → baris ditandai `error`**, bukan diam-diam berpotongan nol. Itu berarti payroll naik lebih dulu dari attendance; slipnya akan terbit terlalu murah hati dan tak seorang pun tahu.
 - 🔜 **Belum diverifikasi lewat gateway maupun sebagai orang di layar.** Golden test bagian potongannya memakai rincian harian **rekayasa** dan menunggu lembar Excel HRD; yang tetap terbukti dari slip sungguhan hanya gaji pokok, GROSS, dan kedua baris BPJS.
+- ⛔ **Sudah ter-deploy ke prod tapi belum pernah menghasilkan satu rupiah pun** (diukur 2026-08-26). Binernya terbukti memuat kode ini (grep `/service` atas "Potongan Mangkir", "alpha_multiplier_multi_day", dengan kontrol negatif nol), dan tab FE-nya ada di bundel. Tetapi kedua `payroll_run` di prod dibuat **sebelum** fitur ini merge, sehingga **0 dari 43** `payroll_run_line` punya `payslip.attendance_basis`. Empat baris itu baru akan muncul setelah ada run baru atau `recalculate`. **Jangan baca "sudah live" sebagai "sudah terbukti"**: di sini keduanya berjarak enam hari dan nol slip.
+- ⚠️ **Config prod menyimpang dari Pasal 20 pada pengali mangkir sehari.** `alpha_multiplier_one_day` di prod bernilai **2**, sedangkan default kode **1,5** (`models_config.go`, komentarnya menyebut pasal itu). Backfill mustahil menuliskannya karena backfill mengisi dengan nilai bawaan, jadi ini suntingan sengaja lewat `PUT /config/attendance-deduction`. Yang membuatnya layak dicatat: angka ini menentukan rupiah, ia **tak terlihat di kode mana pun**, dan satu-satunya cara mengetahuinya adalah membaca config di produksi. Konfirmasikan ke HRD sebelum run pertama diterbitkan.
 
 ### Beban pemberi kerja (konsumsi antar-service — modul insentif)
 
@@ -105,7 +110,28 @@ Grounded ke **Formulir 2a PU BPJS Ketenagakerjaan** milik BHARATA INTERNASIONAL 
 
 ## Model Data (`payroll_db`)
 
-- `salary_component` · `employee_salary` · `payroll_config` (singleton; + **`attendance_deduction`** ⚠️ belum merged) · **`company`** (master badan usaha penggaji; identitas/kop slip, `is_default`) · `payroll_run` (+ **`type`** = `monthly`(default, run lama tanpa field)|`thr`; metadata `title`/`period`/`pay_period_start`/`pay_period_end`/`pay_date` + lifecycle `draft→approved→published` + `approved_by/at`, `published_by/at`) · `payroll_run_line` (snapshot payslip per karyawan; `Payslip` + **`attendance_basis`** ⚠️ belum merged + **`CompanySnapshot`** kop badan usaha + THR: **`thr_months_of_service`/`thr_proportion`** + `error` bila supplement/masa kerja gagal)
+- `salary_component` · `employee_salary` · `payroll_config` (singleton; + **`attendance_deduction`**) · **`company`** (master badan usaha penggaji; identitas/kop slip, `is_default`) · `payroll_run` (+ **`type`** = `monthly`(default, run lama tanpa field)|`thr`; metadata `title`/`period`/`pay_period_start`/`pay_period_end`/`pay_date` + lifecycle `draft→approved→published` + `approved_by/at`, `published_by/at`) · `payroll_run_line` (snapshot payslip per karyawan; `Payslip` + **`attendance_basis`** + **`CompanySnapshot`** kop badan usaha + THR: **`thr_months_of_service`/`thr_proportion`** + `error` bila supplement/masa kerja gagal)
+
+### Kondisi Pemakaian di Produksi (diukur 2026-08-26)
+
+Dokumen ini sebelumnya hanya menceritakan apa yang sudah **di-merge**, dan itu berulang kali
+terbaca sebagai "payroll sudah siap". Ia tidak. Angka di bawah yang menentukan kesiapan,
+bukan git log.
+
+| Koleksi | Isi prod | Bacaan |
+|---|---|---|
+| `payroll_run` | **2, keduanya `draft`** (dibuat 2026-07-30 & 2026-08-05) | ⛔ nol run pernah `approved`/`published`, jadi **nol slip pernah dilihat karyawan**. Fase 2, 4, dan 5 belum pernah dipakai orang sungguhan |
+| `payroll_run_line` | 43 baris, 0 ber-`error`, **0 ber-`attendance_basis`** | kedua run mendahului potongan eksplisit |
+| `employee_salary` | **90** (dari **207** karyawan aktif, ~43%) | cakupan belum separuh; jumlahnya naik selagi diukur |
+| `employee_salary.company_id` | terisi di 60 dari 86 saat diukur | sisanya jatuh ke badan usaha default |
+| `payroll_company` | **41** | cocok dengan skala HRD (1 PT + 40 CV) |
+| `salary_component` | **19** (bukan 18) | baris lama "Tunjangan Kehadiran" (deduction) masih aktif, lihat §Master Komponen Gaji |
+
+**Urutan yang menahan run pertama**, dari yang paling mahal bila terlewat: `upah_bpjs`
+(nol dari 90 record benar, lihat §Gaji per Karyawan) → pengali mangkir yang menyimpang dari
+Pasal 20 → sign-off tabel TER → cakupan gaji yang belum separuh. Tiga yang pertama membuat
+angka di slip **salah**, bukan sekadar kosong, dan slip yang sudah `published` men-snapshot
+kesalahannya.
 
 ## Belum Diimplementasikan / Catatan
 
@@ -113,10 +139,10 @@ Grounded ke **Formulir 2a PU BPJS Ketenagakerjaan** milik BHARATA INTERNASIONAL 
 - **Formula lembur** default `jam × (gaji_pokok/173)` (DJTK 1.5×/2× = TBD konfirmasi HRD).
 - **Insentif** = komponen manual di slip. Integrasi dengan [[Finance - Incentive]] sejauh ini **satu arah**: modul insentif **menarik** beban karyawan dari sini (`/employer-cost`) untuk dipakai sebagai biaya operasional. Arah sebaliknya — nominal insentif masuk otomatis ke slip — **belum**, dan menunggu keputusan apakah insentif dibayar lewat slip atau transfer terpisah (kalau terpisah, payroll tak perlu disentuh sama sekali). Bila lewat slip, `Taxable` & `BpjsBase` komponennya perlu ditetapkan finance/HRD.
 - **THR** ✅ **sudah di kode (Fase 4)** — lihat §Fase 4 di atas. **Sisa Fase 4**: Rekonsiliasi PPh21 Desember (progresif Ps.17) — true-up tahunan yang mengoreksi impresisi TER THR.
-- ~~**Slip gaji** (PDF/cetak) = Fase 3~~ → **PDF slip SUDAH ADA** (lihat Fase 5 di bawah). **Dashboard + export Accurate** = Fase 5 ([[ADR - 0001 Akuntansi via Accurate]]).
+- ~~**Slip gaji** (PDF/cetak) = Fase 3~~ → **PDF slip SUDAH ADA = Fase 5** (lihat §Fase 5 di atas). **Dashboard + export Accurate** = **Fase 6** ([[ADR - 0001 Akuntansi via Accurate]]). Penomorannya sempat bertabrakan di dokumen ini: dua hal berbeda sama-sama disebut "Fase 5".
 > **Modul `payroll` ditegakkan di DUA service sejak 2026-08-09** ([#1126](https://github.com/bip-itteam-internal/bip-erp/pull/1126)). Master **Perlakuan Kehadiran** (`/payroll-status-treatment`) tinggal di [[Microservices - Attendance Service]] tapi kini digerbang `payroll.view`/`payroll.manage`, menggantikan gerbang departemen `isHRDept`. Karena itu aturan keputusan izinnya naik ke `common.IzinPayrollEfektifDari` dan service INI **mendelegasikan** ke sana (`rbac.go`) alih-alih menyimpan salinan kedua yang bisa menyimpang. Konsekuensi deploy: perubahan izin payroll menuntut **payroll-service dan attendance-service naik bersama**.
 
-- **FE** ([[APP - Web ERP]], grup menu **Payroll**, **sudah di `main`**): **Pengaturan Gaji** (config: Komponen, BPJS, Pajak/PTKP, Perlakuan Kehadiran, Perusahaan) · **Gaji Karyawan** (Daftar Gaji register + edit) · **Payroll Run** (buat → detail KPI+tabel karyawan → approve → publish → modal slip) · **Slip Gaji Saya** (self-service). **FE THR** (menyusul BE #406): tombol "Buat Run THR" + badge **Jenis** (Bulanan/THR) di daftar, detail run THR (kolom masa kerja/proporsi), slip THR self-service (label + payout disembunyikan). Butuh service ter-deploy di gateway untuk E2E.
+- **FE** ([[APP - Web ERP]], grup menu **Payroll**, **sudah di `main`**): **Pengaturan Gaji** (config: Komponen, BPJS, Pajak/PTKP, Perlakuan Kehadiran, Perusahaan) · **Gaji Karyawan** (Daftar Gaji register + edit) · **Payroll Run** (buat → detail KPI+tabel karyawan → approve → publish → modal slip) · **Slip Gaji Saya** (self-service). **FE THR** (menyusul BE #406): tombol "Buat Run THR" + badge **Jenis** (Bulanan/THR) di daftar, detail run THR (kolom masa kerja/proporsi), slip THR self-service (label + payout disembunyikan). ✅ **Sudah ter-deploy ke prod** (image 2026-08-25 21:34): rute `/hris/payroll`, `/hris/payroll/my-payslips`, dan `/pengaturan/payroll` ter-build, dan string "Potongan Kehadiran", "Perlakuan Kehadiran", "Badan Usaha", "Slip Gaji Saya" ada di bundel dengan kontrol negatif nol. E2E sebagai orang tetap belum dijalankan, karena belum ada run yang `published` untuk dilihat.
 - **Slip self-service** kini via [[APP - Web ERP]]; integrasi [[APP - MyBharata]] (Flutter) untuk karyawan menyusul.
 - **Multi-company (identitas/kop slip) SUDAH ada** — master badan usaha `/companies` (lihat §Fase 1) memungkinkan menggaji atas nama entitas berbeda (CV Pure Glow Lux, PT Bharata Internasional). **Yang masih single/nasional**: config BPJS/PPh21/PTKP/TER (`payroll_config` singleton) — per-entitas config pajak/BPJS **belum** (ditunda; realita: rate nasional sama antar-entitas).
 - Validasi referensial (`component_id` / eksistensi `employee_id`) dilakukan di FE; assign gaji memakai role `isHR`.

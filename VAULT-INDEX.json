@@ -1221,22 +1221,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "deb78f9c73f8ebcd994d995a23f05b7550362e0f6c77c574f59b78bd3ba22b67",
-      "ukuran_kb": 317.1,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS terpadu (hris-dashboard, One Bharata), stack teknologinya (Next.js 16 + React 19 + shadcn/Radix + i18next), dan bagaimana autentikasi/SSO Identity Provider serta role gating sidebar bekerja lewat cookie system_roles. Menjelaskan pula struktur multi-perusahaan (tenant), pengelompokan menu induk-bersarang, dan halaman Pengaturan HRGA terpusat (enam sub-menu, penyaringan per-tab memakai cermin gerbang backend di akses.ts).",
+      "hash": "972507f427f15554d8d47a619d88a5e2f4b3dc8d36e3e13695e761e92e27d8dc",
+      "ukuran_kb": 317.2,
+      "ringkasan": "Menjawab: apa itu portal web internal \"One Bharata\" (erp-frontend), stack apa yang dipakai, dan bagaimana login serta SSO Identity Provider bekerja untuk aplikasi lain seperti Task Manager. Menjelaskan cara role gating sidebar dibaca dari cookie system_roles per modul, bagaimana menu dikelompokkan lewat menu induk bersarang (bukan field group), dan bagaimana Pengaturan HRGA terpusat menyaring akses per tab, bukan per halaman. Juga menjawab bagian mana dari web ini yang sudah ikut multi-perusahaan (company switcher, kelola departemen, shift, network WiFi, direktori karyawan, broadcast artikel).",
       "kata_kunci": [
         "web ERP",
-        "hris-dashboard",
+        "erp-frontend",
         "One Bharata",
-        "frontend",
-        "Next.js",
+        "hris-dashboard",
         "SSO",
         "system_roles",
         "role gating",
-        "sidebar",
-        "multi-tenant",
-        "pengaturan HRGA",
-        "i18n"
+        "sidebar menu",
+        "Pengaturan HRGA",
+        "multi-perusahaan"
       ]
     },
     {
@@ -1697,20 +1695,21 @@
         "CORE - HRIS Orchestrator",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "c762bcd9f1f008dc1ce8be0fd6c5f9a1739e4e84499052cfa14f3cf0c21b0697",
+      "hash": "a12dfd63dff6d79f09de986ef892755932a8302d4b07f18f04d6fc8a45341b60",
       "ukuran_kb": 34.5,
-      "ringkasan": "Menjawab: bagaimana attendance-service mencatat kehadiran, aturan apa yang menentukan status sebuah entri, dan rute mana yang dikonsumsi service lain. Mencakup verifikasi WiFi dan fingerprint, jadwal dan roster, pengajuan cuti/izin/dinas, rekap keterlambatan untuk usulan SP, serta rekap kedisiplinan untuk sumber KPI. Menjelaskan pula status mana yang dianggap hari kerja dan mana yang tidak, beserta akibatnya pada angka yang tampil.",
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan attendance service untuk clock-in/out, resolusi dan rotasi jadwal kerja, leave request, perjalanan dinas, guestbook, hari libur, serta laporan absensi dan payroll. Menjelaskan cara rekap telat per karyawan (/internal/late-recap) dipakai menyusun usulan SP, cara /kpi/attendance dipakai employee-service menghitung skor KPI kedisiplinan, dan kenapa rute itu digerbang service key alih-alih RBAC atau gateway key. Juga menjawab bagaimana /payroll-supplement mengagregasi jam kerja jadi payout_pct plus rincian per hari, dan kenapa service ini hanya melaporkan fakta sementara kebijakan tarif tinggal di payroll service.",
       "kata_kunci": [
-        "attendance service",
+        "attendance",
         "absensi",
-        "presensi",
-        "kehadiran",
-        "jadwal",
-        "roster",
-        "WiFi",
-        "fingerprint",
-        "kedisiplinan",
-        "hari kerja"
+        "clock-in",
+        "clock-out",
+        "jadwal kerja",
+        "shift rotation",
+        "leave request",
+        "guestbook",
+        "payroll-supplement",
+        "late recap",
+        "KPI kedisiplinan"
       ]
     },
     {
@@ -2322,7 +2321,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (Fase 1 Setup + Fase 2 Run+publish+self-service + Fase 2b PPh21 TER + Fase 4 THR)**. Di belakang [[CORE - API Master Gateway]] (`InternalURL[\"payroll\"]`), auth **SSO** ([[CORE - SSO Flow]]), role `system_roles[\"hris\"]`. Port `6980`, mongo `payroll-mongo-db` (host `32792`). · 🔴 **Multi-perusahaan: belum ter-scope** — `company_id` di service ini = badan usaha **penggaji** (kop slip), BUKAN tenant; `listEmployeeSalaries`/run generation/THR meng-enumerasi SEMUA karyawan (`bson.M{}`) → campur lintas-perusahaan. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].",
+      "status_teks": "**Implemented (Fase 1 Setup + Fase 2 Run+publish+self-service + Fase 2b PPh21 TER + Fase 4 THR + Fase 5 PDF slip)** dan **live di produksi** (image BE dibangun 2026-08-25 21:30, FE 21:34). Di belakang [[CORE - API Master Gateway]] (`InternalURL[\"payroll\"]`), auth **SSO** ([[CORE - SSO Flow]]), role `system_roles[\"hris\"]`. Port `6980`, mongo `payroll-mongo-db` (host `32792`). · ⛔ **Belum pernah dipakai menggaji seorang pun**: 2 `payroll_run` di prod, **keduanya `draft`**, tak satu pun pernah `approved` apalagi `published`, jadi nol slip pernah sampai ke karyawan (diukur 2026-08-26). Lihat §Kondisi Pemakaian di Produksi. · 🔴 **Multi-perusahaan: belum ter-scope** — `company_id` di service ini = badan usaha **penggaji** (kop slip), BUKAN tenant; `listEmployeeSalaries`/run generation/THR meng-enumerasi SEMUA karyawan (`bson.M{}`) → campur lintas-perusahaan. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].",
       "publik": true,
       "tautan": [
         "HRIS - Payroll",
@@ -2342,21 +2341,22 @@
         "Microservices - Insentive Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "2dc5b76714cedc5b04abe1fd2770bb7d372d8853ac9ca1cb75abe9a139d3bedd",
-      "ukuran_kb": 24.3,
-      "ringkasan": "Menjawab: bagaimana penggajian dihitung dan diterbitkan, dari setup komponen gaji, config BPJS dan PPh21 metode TER, penetapan gaji per karyawan, payroll run dengan lifecycle draft-approved-published, THR, sampai slip PDF. Menjawab pula bagaimana potongan kehadiran dihitung jadi empat baris eksplisit (telat per jam, izin per hari, mangkir dengan pengali Pasal 20, uang makan per hari), tarifnya disimpan di mana, dan batas per tunjangan bekerja bagaimana. Termasuk jebakan yang sudah terjadi di produksi seperti upah_bpjs yang diisi nominal iuran serta pembagi nol yang menghapus seluruh tunjangan tanpa satu pun galat.",
+      "hash": "e12517577c41847d68241613c31146c7d67693938363459b6c9814a8e91b25c6",
+      "ukuran_kb": 29.5,
+      "ringkasan": "Menjawab: bagaimana penggajian diimplementasikan di services/payroll, mulai dari config perusahaan, BPJS, dan pajak PPh21 metode TER, master komponen gaji, penetapan gaji per karyawan, sampai payroll run dengan lifecycle draft, approved, published, THR, dan slip PDF. Menjelaskan konsep badan usaha penggaji (kop slip) yang berbeda dari tenant, kenapa company_id menumpang di employee_salary, dan bagaimana potongan kehadiran dipecah jadi empat baris slip bertarif config. Juga menjawab kondisi nyata di produksi: nol slip pernah terbit, jumlah komponen gaji yang menyimpang dari seed, dan masalah pengisian upah_bpjs yang diisi nominal iuran alih-alih dasar upah.",
       "kata_kunci": [
-        "payroll-service",
+        "payroll",
+        "penggajian",
         "slip gaji",
         "payslip",
         "BPJS",
-        "PPh21 TER",
-        "THR",
+        "PPh21",
+        "TER",
+        "PTKP",
         "payroll run",
-        "potongan kehadiran",
-        "potongan mangkir",
-        "employer-cost",
-        "attendance_deduction"
+        "THR",
+        "upah_bpjs",
+        "komponen gaji"
       ]
     },
     {
@@ -4280,7 +4280,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Diputuskan 2026-08-25, seluruhnya merged; backend live di produksi, frontend baru sebagian.** Backend [#1423](https://github.com/bip-itteam-internal/bip-erp/pull/1423) + [#1425](https://github.com/bip-itteam-internal/bip-erp/pull/1425) **terverifikasi live** (bentuk respons `/kpi/sumber-katalog` di prod memuat `scope_didukung`·`scope_baku`·`formula_baku`·`formula_metrik`·`grup`, 2026-08-25). Frontend [#1214](https://github.com/bip-itteam-internal/erp-frontend/pull/1214) **live** (editor gabungan + perbaikan 400); [#1217](https://github.com/bip-itteam-internal/erp-frontend/pull/1217) (pengelompokan sumber), [#1218](https://github.com/bip-itteam-internal/erp-frontend/pull/1218) (label lengkap), dan [#1220](https://github.com/bip-itteam-internal/erp-frontend/pull/1220) (kartu ringkasan + pencarian lintas departemen) **merged tetapi BELUM di-deploy** — prod FE berhenti di merge #1216 (dibuktikan: string `\"Search source or metric\"` ada di bundel prod, `\"Marketing & Stores\"` tidak).",
+      "status_teks": "**Diputuskan 2026-08-25, seluruhnya merged; backend live di produksi, frontend baru sebagian.** Backend [#1423](https://github.com/bip-itteam-internal/bip-erp/pull/1423) + [#1425](https://github.com/bip-itteam-internal/bip-erp/pull/1425) **terverifikasi live** (bentuk respons `/kpi/sumber-katalog` di prod memuat `scope_didukung`·`scope_baku`·`formula_baku`·`formula_metrik`·`grup`, 2026-08-25). Frontend [#1214](https://github.com/bip-itteam-internal/erp-frontend/pull/1214) **live** (editor gabungan + perbaikan 400); [#1217](https://github.com/bip-itteam-internal/erp-frontend/pull/1217) (pengelompokan sumber), [#1218](https://github.com/bip-itteam-internal/erp-frontend/pull/1218) (label lengkap), [#1220](https://github.com/bip-itteam-internal/erp-frontend/pull/1220) (kartu ringkasan + pencarian lintas departemen), dan [#1230](https://github.com/bip-itteam-internal/erp-frontend/pull/1230) (daftar template ikut struktur tabel HRIS) **merged tetapi BELUM di-deploy** — prod FE berhenti di merge #1216 (dibuktikan: string `\"Search source or metric\"` ada di bundel prod, `\"Marketing & Stores\"` tidak).",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
@@ -4292,19 +4292,20 @@
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "18b4d935dc9a3f6d102c6c9402ce9c6b5d9e3989845f5f820da4b6a9a0ee913e",
-      "ukuran_kb": 7.8,
-      "ringkasan": "Keputusan menyatukan pembuatan struktur template KPI (metrik dan porsi bobot) dengan penetapan targetnya (sumber data, rumus, cakupan, arah, target) ke dalam satu layar, membalikkan pemisahan yang sebelumnya disengaja. Menjawab: kenapa halaman Templates dan tab Atur Target digabung, apa konsekuensi yang diterima, dan bagian mana dari keputusan itu yang dibatalkan saat merge. Mencatat juga bug 400 yang ikut diperbaiki: metrik manual murni mengirim blok auto cacat sehingga penyimpanan seluruh template ditolak.",
+      "hash": "7c9bdbc7b84e11504adabe9b415270763bfd9bcaeeb779a426f8ce3e15044ee3",
+      "ukuran_kb": 7.9,
+      "ringkasan": "Menjawab: kenapa penyuntingan struktur template KPI (metrik dan porsi bobot) dan penetapan cara menilainya (sumber, rumus, cakupan, arah, target) digabung ke satu layar di /hris/kpi/templates, serta peran apa yang tersisa untuk tab Atur Target di /hris/kpi. Menjelaskan juga sebab penyimpanan template bermetrik manual dulu ditolak 400 (blok auto selalu dikirim padahal field Auto berupa pointer dan divalidasi ValidateKPIAutoConfig), dan kenapa daftar rumus serta cakupan dijawab backend lewat GET /kpi/sumber-katalog alih-alih disalin ke frontend. Mencatat pula kenapa rencana menjadikan bobot punya satu sumber kebenaran dibatalkan saat merge sehingga bobot masih bisa diubah dari dua layar, beserta konsekuensi urutan deploy employee-service sebelum frontend.",
       "kata_kunci": [
-        "ADR",
         "KPI",
         "template KPI",
+        "kpi_template",
         "atur target",
-        "bobot",
+        "bobot metrik",
         "weight",
-        "otomasi",
-        "400",
-        "keputusan arsitektur"
+        "kpi/sumber-katalog",
+        "KPIAutoConfig",
+        "metrik manual",
+        "ADR 0053"
       ]
     },
     {
@@ -5755,22 +5756,20 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "71c85fa0aaafb4a692890899aa147b66ea281dbea0e20916faa4b79764510e22",
-      "ukuran_kb": 35.6,
-      "ringkasan": "Konsep dan implementasi modul KPI di HRIS: template per jabatan, penilaian per karyawan, matriks per departemen, serta layar-layar yang dipakai HR dan supervisor. Menjawab: bagaimana template KPI dibuat dan ditetapkan ke karyawan, di mana target dan porsi bobot disunting, bagaimana skor dibaca per departemen maupun per orang, ambang mana yang dipakai mewarnai band skor (kurang dari 60 / 60 sampai 79 / 80 ke atas, de-facto dan bukan ambang resmi), dan perubahan UX apa saja yang sudah live versus yang masih menunggu deploy. Memuat catatan bahwa porsi bobot masih bisa ditulis dari dua layar sekaligus, dan bahwa bagan tren Kesimpulan kini memakai gradien ambang yang sama dengan kartu Skor KPI di dashboard.",
+      "hash": "f6d8e8113d7d8516736cf9c8f23b53210c9509ef709b42c88885fd42e11a91e8",
+      "ukuran_kb": 38.0,
+      "ringkasan": "Menjawab: bagaimana kinerja dinilai lewat skor KPI di ERP Bharata, mulai dari engine skor menjadi insentif untuk sembilan role marketing di insentive-service sampai appraisal per-karyawan lintas departemen lewat endpoint /kpi/* di employee-service. Menjelaskan template KPI per posisi berikut cara employee_count dihitung (assignment aktual dari kpi_score, bukan kelayakan posisi), snapshot template ke kpi_score saat scoring, dan aturan bahwa posisi template wajib cocok dengan jabatan karyawan pada periode yang dinilai, bukan jabatan hari ini. Juga menjawab siapa yang boleh melihat KPI siapa: RBAC per departemen, cakupan scope=team untuk Leader yang digerbang keberadaan bawahan langsung, dan kenapa Human Resource dengan General Affair tampil menyatu sebagai HRGA dari master data.",
       "kata_kunci": [
         "KPI",
-        "key performance index",
-        "template KPI",
+        "Key Performance Index",
         "penilaian kinerja",
-        "bobot",
-        "weight",
-        "atur target",
-        "matriks KPI",
-        "ambang KPI",
-        "band skor",
-        "grafik tren KPI",
-        "scorecard"
+        "appraisal",
+        "template KPI",
+        "kpi_score",
+        "insentif",
+        "incentive",
+        "HRGA",
+        "scope=team"
       ]
     },
     {
@@ -6090,7 +6089,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Fase 1 (Setup) + Fase 2 (Payroll Run + publish + slip self-service) + Fase 2b (PPh21 TER) + Fase 4 (THR) sudah di kode** ([[Microservices - Payroll Service]]) — komponen gaji, config BPJS/pajak, assign gaji per karyawan, + **payroll run** (kalkulasi gross → BPJS → potongan kehadiran → **PPh21 TER** → net; lifecycle **draft → approved → published**; karyawan lihat **slip sendiri** via self-service). Penggajian **bulanan** (tak ada mingguan). *Supplement* attendance dipakai untuk prorata Tunjangan Kehadiran (⚠️ **diganti potongan eksplisit 4 baris**, lihat §Potongan Kehadiran Eksplisit — belum merged). Scope: **sampai terbitkan slip, tanpa pembayaran**. **Slip PDF/cetak = fase berikut.**",
+      "status_teks": "**Fase 1 (Setup) + Fase 2 (Payroll Run + publish + slip self-service) + Fase 2b (PPh21 TER) + Fase 4 (THR) + Fase 5 (PDF slip) sudah di kode dan live di produksi** ([[Microservices - Payroll Service]]) — komponen gaji, config BPJS/pajak, assign gaji per karyawan, + **payroll run** (kalkulasi gross → BPJS → potongan kehadiran → **PPh21 TER** → net; lifecycle **draft → approved → published**; karyawan lihat **slip sendiri** via self-service, kini juga sebagai **PDF**). Penggajian **bulanan** (tak ada mingguan). Prorata Tunjangan Kehadiran lewat *supplement* attendance sudah **diganti potongan eksplisit 4 baris** (merged 2026-08-20, lihat §Potongan Kehadiran Eksplisit). Scope: **sampai terbitkan slip, tanpa pembayaran**. · ⛔ **Belum pernah dipakai menggaji seorang pun**: kedua `payroll_run` di prod masih `draft` dan nol slip pernah terbit (2026-08-26). Yang menahan bukan kode, melainkan data gaji dan dua keputusan HRD — rinciannya di §Kondisi Pemakaian di Produksi pada [[Microservices - Payroll Service]].",
       "publik": true,
       "tautan": [
         "Microservices - Payroll Service",
@@ -6103,21 +6102,21 @@
         "HRIS - Compensation & Benefits",
         "Finance - Big Pictures"
       ],
-      "hash": "d00cfe21d3b616028e5bf39f83389ff61878e3b3452daaddbfb7c65c05a704ab",
-      "ukuran_kb": 7.5,
-      "ringkasan": "Menjawab: konsep penggajian HRIS Bharata, bagian mana yang sudah ada di kode dan bagian mana yang belum. Menjawab bagaimana kehadiran memengaruhi gaji lewat payroll-supplement periode 26 sampai 25, status mana yang dibayar atau dipotong, serta tarif keempat baris potongan kehadiran beserta dasar aturannya. Penting: menyebut bahwa sumber kebenaran aturan potongan ada di repo mybharata, bukan di vault ini, dan mencatat penyimpangan sadar ambang uang makan yang belum ber-ADR.",
+      "hash": "56db04e08005d1b39adcabd348b33065ac8276daddd39928f5f16d9d6a3a2e4a",
+      "ukuran_kb": 8.9,
+      "ringkasan": "Menjawab: bagaimana konsep payroll HRIS dipetakan ke implementasi, apa saja yang sudah ada (setup komponen gaji, config BPJS dan pajak, payroll run, PPh21 TER, THR, slip PDF self-service) dan apa yang belum (rekonsiliasi PPh21 tahunan, dashboard, handoff ke Accounting). Menjelaskan cara kehadiran masuk ke gaji lewat payroll-supplement periode 26 ke 25, perlakuan dibayar versus dipotong per status dan per subtipe yang configurable, serta rincian empat baris potongan kehadiran eksplisit (telat, izin, mangkir, uang makan) beserta tarif dan dasarnya. Juga menjawab di mana sumber kebenaran aturan potongan berada (BUSINESS_LOGIC_IMPLEMENTATION.md di repo mybharata, bukan di vault) dan penyimpangan mana yang masih perlu diangkat jadi ADR.",
       "kata_kunci": [
         "payroll",
-        "penggajian",
         "gaji",
         "potongan kehadiran",
-        "potongan mangkir",
-        "Peraturan Perusahaan",
-        "Pasal 20",
-        "tunjangan kehadiran",
+        "mangkir",
         "uang makan",
-        "payroll supplement",
-        "BPJS PPh21 THR"
+        "tunjangan kehadiran",
+        "payout_pct",
+        "PPh21 TER",
+        "THR",
+        "slip gaji",
+        "Peraturan Perusahaan Pasal 20"
       ]
     },
     {
