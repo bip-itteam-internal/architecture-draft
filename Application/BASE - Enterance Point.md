@@ -27,6 +27,33 @@ Daftar portal ditampilkan di sisi kiri layar: judul module (HRIS, IT, dll) hanya
 - Dashboard: ringkasan kehadiran pribadi (clock in/out, overtime/telat/cuti), ringkasan karyawan, jadwal/shift
 - Lookup employee master data + informasi role sebagai dasar portal
 
+**Sedang dikerjakan — dashboard portal mengikuti posisi**
+
+⚠️ Branch `feat/dashboard-portal-per-posisi` di `erp-frontend`, **belum merge**. Konsep di
+dokumen ini menggambarkan dashboard sebagai **satu susunan untuk semua orang**; perubahan
+ini menjadikannya **pemilih**, dan itu penyimpangan sadar dari konsep di atas.
+
+Sebabnya: aplikasi sudah punya lima dashboard departemen yang masing-masing menyaring
+isinya per posisi (HRGA, FAT, IT, Ruang Direktur, Marketing & Ads), sementara halaman yang
+pertama dibuka semua orang tiap hari justru satu-satunya yang tak tahu siapa yang
+membukanya.
+
+- **Posisi dari cookie sesi menentukan isinya.** Posisi yang tak terpetakan tetap mendapat
+	dashboard portal yang sekarang — arah gagalnya sengaja begitu, sebab nama posisi diketik
+	manusia di master data dan menebak untuk yang tak cocok akan menaruh orang di dashboard
+	yang bukan miliknya.
+- **Direktur dan supervisor IT bisa berganti lewat dropdown**, pilihannya tersimpan per
+	perangkat. Bukan izin RBAC baru; memakai `aksesSemuaMenu()` yang sudah ada.
+- ⛔ **Halaman ini adalah tujuan pantulan setiap rute yang ditolak `proxy.ts`**, jadi tiap
+	isi modul yang disematkan wajib lolos gerbang yang mencerminkan gerbang rute aslinya,
+	dan gerbang yang gagal jatuh ke beranda — bukan ke layar tolakan kedua.
+- ⚠️ Konsekuensi yang diterima sadar: karyawan berposisi terpetakan selain Direktur/SPV IT
+	kehilangan kartu Kehadiran pribadi dan Pengumuman, sebab keduanya hanya ada di halaman
+	ini dan mereka tak mendapat dropdown.
+
+Rincian lengkap beserta nama berkasnya ada di [[APP - Web ERP]] (bagian **ERP (publik)** →
+Dashboard).
+
 **Belum diimplementasikan**
 - [ ] Status **Surat Peringatan (SP)** di landing belum ada. Modul SP-nya sendiri sudah dibangun ([[HRIS - Disciplinary (Surat Peringatan)]], ⚠️ belum merge), termasuk masa berlaku 6 bulan yang disebut di atas; yang belum ada adalah endpoint ringkasan "jumlah SP aktif" dan kartunya di landing
 - [ ] **Flag maintenance** per fitur (menandai sistem sementara tidak tersedia, alih-alih menyembunyikannya)
