@@ -8,6 +8,8 @@
 
 Hampir semua subsistem bertumpu pada **master data karyawan** ([[Microservices - Employee Service]]) sebagai referensi, dan banyak yang berujung ke **Attendance** & **Payroll**.
 
+⚠️ **Matriks di bawah HRIS-saja, dan diturunkan dari dokumen lain, bukan diukur dari kode.** Untuk pertanyaan "siapa yang benar-benar memakai struktur organisasi", peta yang diukur langsung ke `origin/main` ada di [[HRIS - Organization Structure]] §Peta konsumen. Peta itu memuat konsumen besar yang **tidak** muncul di tabel ini karena bukan subsistem HRIS (procurement, task-management, form-builder, calendar, manufacture), sekaligus menyebut service yang tak memakainya sama sekali.
+
 ## Matriks Keterkaitan
 
 | Subsistem | Mengambil data dari | Memberi data ke |

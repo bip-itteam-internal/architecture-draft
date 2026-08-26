@@ -220,9 +220,45 @@ Tiga catatan "prod belum" di dokumen ini sudah tidak berlaku. Yang membuktikanny
 
 - Sumber data master: `master_department` dan `master_system_role` di [[Microservices - Employee Service]] (seed otomatis saat kosong)
 - Sumber data karyawan: `work_data` (departemen/posisi/supervisor) & `system_authentication` (role/supervisor) di [[Microservices - Employee Service]]
-- Dipakai oleh hampir semua subsistem HRIS untuk routing approval & RBAC (lihat [[HRIS - Interrelationship Matrices]])
+- **Siapa yang memakainya: §Peta konsumen di bawah.** Kalimat lama "dipakai hampir semua subsistem HRIS" sudah dicabut, karena keliru di **dua arah sekaligus**: konsumen terbesar ketiga adalah **procurement**, yang bukan HRIS, sementara lima service justru tak memakainya sama sekali. [[HRIS - Interrelationship Matrices]] juga bukan jawabannya; ia memetakan aliran data antar-subsistem HRIS, bukan konsumen struktur organisasi, dan statusnya masih 🟡 Draft.
 - Perubahan struktur ditangani via [[HRIS - Career & Promotion]] (mutasi/promosi)
 - Frontend admin: `/hris/master-data` — tabs Departments + System Roles dengan full CRUD
+
+### Peta konsumen
+
+> Diukur langsung ke `origin/main`: bip-erp `84faee96` dan erp-frontend `17cb901f`, keduanya 2026-08-26.
+
+Ada **dua cara** memakainya, dan membedakannya penting karena skalanya jauh berbeda.
+
+**Cara pertama, lewat header gateway.** `shared-library/routes/gateway_request.go` menyuntikkan `BIP-Department`, `BIP-Position`, `BIP-Supervised-Departments`, dan `BIP-System-Roles` ke **setiap** permintaan yang diteruskan. Jadi service tak perlu query `master_department` untuk tahu departemen pemanggilnya, dan pemakaian semacam ini tak terlihat sebagai dependensi di mana pun.
+
+**Cara kedua, membaca datanya.** 16 dari 21 service:
+
+| Service | Yang dirujuk | Untuk |
+|---|---|---|
+| [[Microservices - Attendance Service]] | `Header.Department` 24 · `Header.Position` 17 · `SupervisedDepartments` 6 | **konsumen terbesar**: routing approval, picker jadwal, laporan |
+| [[Microservices - Employee Service]] | `is_supervisor` 36 · `supervisor_id` 32 · `position_key` 21 · `supervised_by` 16 | pemilik datanya |
+| procurement | `Header.Department` 8 · `is_supervisor` 5 · `SupervisedDepartments` 4+2 | approval pengadaan & budget |
+| [[Microservices - Form Builder Service]] | `SupervisedDepartments` 8 · `Header.Department` 7 · `supervised_by` 2 | kepemilikan form per dept, penyetuju laporan |
+| [[Microservices - Insentive Service]] | `position_key` 6 · `supervisor_id` 2 · `is_supervisor` 1 | menyusun hierarki tim marketing (`hierarki_hris.go`) |
+| [[Microservices - Task Management Service]] | `is_supervisor` 4 · `supervised_by` 2 | peran supervisor/staff di space tiket |
+| [[Microservices - Recruitment Service]] | `SupervisedDepartments` 4 · `is_supervisor` 1 | requisition & MPP per departemen |
+| manufacture | `Header.Position` 6 | gerbang per jabatan |
+| [[Microservices - Calendar Service]] | Department · Position · **SupervisedDepartments** | penyaringan feed agenda |
+| [[Microservices - Learning Service]] · notification · payroll · [[Microservices - HRD Document Service]] · integration | Department dan/atau Position (1 sampai 2) | gerbang & pelabelan |
+| inventory · marketing-analytics | `SupervisedDepartments` 1 · `supervisor_id` 1 | cakupan data |
+
+**Lima service TIDAK memakainya sama sekali**: `file`, `finance`, `monitoring`, `tiktok-shop-service`, `warehouse`. Dua terakhir (`monitoring/identity.go`, `warehouse/fulfillment_ops.go`) hanya menyentuh `BIP-System-Roles` untuk gerbang RBAC, tak pernah departemen maupun jabatan. **Baris ini yang paling berguna dari seluruh tabel**: tanpanya orang menganggap semua modul bergantung pada departemen, lalu berhati-hati pada hal yang tak perlu.
+
+⛔ **Jangan mengukur peta ini dari worktree lokal.** Diukur 2026-08-26 dari checkout yang tertinggal **62 commit**, jawabannya menyebut `insentive` sebagai contoh service yang tak memakai struktur organisasi. Yang benar sebaliknya: `services/insentive/hierarki_hris.go` adalah **satu berkas utuh** yang menyusun hierarki insentif dari `position_key` dan `supervisor_id` HRIS. Kesalahannya tak berbunyi apa pun, karena hasil grep yang KURANG terbaca persis seperti "memang tak ada". Ukur ke ref-nya: `git grep <pola> origin/main -- services/`.
+
+### Sisi frontend
+
+**Yang mengelola** (menulis): `/hris/master-data` (departemen, jabatan, jenjang, system role) dan tab **Hak per Posisi** + **Penyetuju Pengajuan** di `/pengaturan/organisasi`, keduanya `RequireHRISOrITSupervisor`; **Atasan Langsung** di `/hris/employee/atasan-langsung`, `RequireHRISOrITStaff`. Gerbangnya sengaja berbeda, lihat §Menemukan layar yang benar.
+
+**Yang membaca**: `/hris/org-chart`, plus **23 pemanggil** `useDataTypes({ endpoint: "department" })` yang tersebar jauh melampaui HRIS (termasuk `/it/employee` dan dua layar **procurement**: `TabUnitKas`, `PersetujuanBudget`). Delapan berkas lagi memakai `endpoint: "position"`.
+
+⚠️ Dari 23 pemanggil itu **hanya 4 yang memakai `grouped`**. Sisanya menerima departemen mentah, dan untuk sebagian layar itu memang yang benar: `template-editor.tsx` sengaja mentah karena **menulis** nama departemen asli ke `kpi_template.department`, dan label grup `HRGA` tak akan pernah cocok dengan `work_data.department` seorang pun (§Cakupan supervisi antar-departemen). Templat yang tersimpan sebagai `HRGA` jadi tanpa galat, lalu tak pernah terpakai menilai siapa-siapa. Putuskan per halaman, jangan sapu massal.
 
 ## Belum Diputuskan (TBD)
 
