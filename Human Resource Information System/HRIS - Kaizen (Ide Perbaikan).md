@@ -6,7 +6,8 @@
 
 - **Status**: ⚠️ **SELURUH tahap LIVE di dev DAN prod** sejak 2026-08-06, teruji end-to-end di dev. Backend, Web ERP, dan MyBharata semuanya sudah merge; lampiran berkas ikut menyusul dan terbukti bekerja. Yang tersisa bukan pekerjaan kode: **HR menetapkan sasaran/kuota/komite/tanggal mulai**, dan **MyBharata belum dirilis ke store**. Ringkasan per tahap di tabel di bawah.
 - ✅ **Pengingat kuota TERBUKTI SAMPAI** setelah PR [#1044](https://github.com/bip-itteam-internal/bip-erp/pull/1044). Sebelumnya kategori `kaizen-reminder` dan `kaizen-decided` tak terdaftar di `shared-library` sehingga notification-service menolaknya `400` dan notifnya hilang tanpa jejak — persis kegagalan yang sudah diperingatkan di rencana tahap 5 di bawah, dan yang sudah pernah terjadi saat `form-published` lahir. Prosedur deploy yang mencegahnya terulang: [[RUN - Deploy Microservices bip-erp]] §3a.
-- **Belum ada satu pun form kaizen dibuat di prod**, jadi seluruh perilaku barunya masih **inert** di sana: cron pengingat tak punya apa pun untuk dikirim, dan menu Komite Kaizen menampilkan "tidak ada program untuk Anda tinjau" — jawaban yang memang benar. Program baru bisa dinyalakan setelah HR menetapkan sasaran, kuota, komite, dan tanggal mulai (lihat TBD).
+- **Belum ada program kaizen SUNGGUHAN di prod**, jadi seluruh perilaku barunya masih **inert** di sana: cron pengingat tak punya apa pun untuk dikirim, dan menu Komite Kaizen menampilkan "tidak ada program untuk Anda tinjau" — jawaban yang memang benar. Program baru bisa dinyalakan setelah HR menetapkan sasaran, kuota, komite, dan tanggal mulai (lihat TBD).
+- ⚠️ **Koreksi 2026-08-26**: pernyataan lama "belum ada satu pun form kaizen dibuat di prod" **sudah tidak akurat**. Diukur langsung ke `form_builder_db.forms` prod: **12 form total, 2 bertipe `kaizen`**. Keduanya jelas form uji milik Tech Development dan ber-status `closed` — `iiiii` (10 Agu 2026) dan `Kaizen` (23 Agu 2026), masing-masing cuma satu field `long_text`, dan yang pertama bahkan punya `quota_by_department` berisi departemen bernama `"2"`. Kesimpulan operasionalnya tak berubah (tak ada program aktif), tapi angkanya bukan nol lagi, dan verifikasi apa pun yang mematok "nol form kaizen" akan hijau untuk keadaan yang salah.
 - ✅ **Alur inti TERUJI end-to-end di dev 2026-08-06** lewat gateway, dengan Mongo dan employee-service hidup. Lihat bagian tersendiri di bawah.
 - ✅ **Prod lengkap sejak 2026-08-06**: #1016, #1018, dan [#1019](https://github.com/bip-itteam-internal/bip-erp/pull/1019) semuanya sudah naik (`23e8914a`). Diverifikasi probe biner dengan kontrol positif dan negatif, ditambah probe perilaku jalur galat. **Belum ada satu pun form kaizen dibuat di prod** — programnya baru bisa dinyalakan setelah HR menetapkan sasaran, kuota, dan komitenya.
 - **Rumah kode yang dipilih**: [[Microservices - Form Builder Service]], sebagai **tipe form tersendiri** (`form_type: "kaizen"`; kelima saat ditambahkan, sebelum `request` dihapus). Bukan service baru, bukan space di [[Microservices - Task Management Service]].
@@ -132,7 +133,7 @@ Butir 11 rencana bertahap di [[HRIS - Otomasi Skor KPI]] dulu menyebut kandidat 
 | Pertanyaan | Keputusan |
 |---|---|
 | Sejauh apa siklus ide dilacak | Sampai **Diterapkan** |
-| Siapa peninjau | **Komite Kaizen terpusat** |
+| Siapa peninjau | **Komite Kaizen terpusat** (bawaan) — sejak [[ADR - 0054 Peninjau Ide Kaizen Bisa Atasan Departemen, Bukan Hanya Komite Terpusat]] bisa juga **atasan departemen pengaju**, dipilih per program lewat `settings.kaizen.reviewer_mode` |
 | Kuota dihitung dari | Ide yang **diajukan** |
 | Ruang lingkup pengaturan kuota | **Global + override per departemen** |
 | Konsekuensi tidak memenuhi | Pengingat berjenjang + papan kepatuhan, dan masuk skor KPI. **Bukan** blokir presensi |
@@ -142,6 +143,17 @@ Butir 11 rencana bertahap di [[HRIS - Otomasi Skor KPI]] dulu menyebut kandidat 
 | Jumlah form Kaizen | **Satu form aktif per `company_id`** |
 | Lampiran | Sekalian bangun **upload file** di Form Builder (berlaku semua tipe form) |
 | Gerbang presensi | Tersedia, default mati, tidak dilarang |
+
+### Mode peninjau: komite atau atasan departemen
+
+Sejak [[ADR - 0054 Peninjau Ide Kaizen Bisa Atasan Departemen, Bukan Hanya Komite Terpusat]], "siapa peninjau" dipilih per program lewat `settings.kaizen.reviewer_mode`. Bawaannya `committee`, jadi seluruh uraian di bawah tetap berlaku apa adanya untuk program yang tak menyentuh saklar ini.
+
+Pemicunya form manual HR **"BERITA ACARA INOVASI"** yang memakai kolom "Catatan Evaluasi **Atasan**". Yang perlu diingat saat membaca sisa dokumen ini:
+
+- **"Atasan" di sini berarti supervisor DEPARTEMEN, bukan atasan langsung per orang.** `work_data.supervisor_id` kosong pada **129 dari 207** karyawan prod (2026-08-26), jadi menggerbangnya di sana akan membangun antrean yatim untuk 62% orang — dan senyap, karena kepatuhan dihitung dari ide yang diajukan.
+- Wewenangnya datang dari izin **`formbuilder.kaizen.review`** yang dipasang HR ke JABATAN, bukan dari `is_supervisor` (yang diturunkan frontend dari nama jabatan dan karena itu rapuh).
+- Pada mode ini `committee_employee_ids` **wajib kosong**, dan **tak seorang pun boleh memutuskan idenya sendiri**.
+- ⚠️ **Programnya tidak berfungsi sampai paket haknya dipasang**, dan tak ada gerbang yang mencegah penerbitan tanpa peninjau. Penggantinya: papan kepatuhan melaporkan `menganggur`, yaitu ide yang belum diputuskan siapa pun lebih dari 14 hari.
 
 ### Kenapa bukan space di Task Management
 
@@ -282,6 +294,7 @@ Konsekuensi yang harus diingat: **karena kartunya hilang dari beranda, gerbang p
 - [[HRIS - Otomasi Skor KPI]] — asal-usul kebutuhan (16 metrik tanpa sumber data)
 - [[HRIS - Matriks KPI per Departemen]] — redaksi metrik Kaizen per posisi
 - [[HRIS - Key Performance Index]] — `kpi_score` berperiode `YYYY-MM`
+- [[ADR - 0054 Peninjau Ide Kaizen Bisa Atasan Departemen, Bukan Hanya Komite Terpusat]] — mode peninjau atasan, dan kenapa "atasan langsung per orang" gugur
 - [[Microservices - Form Builder Service]] · [[API - Form Builder Service]]
 - [[Microservices - Task Management Service]] — kandidat yang gugur, berikut alasannya
 - [[APP - Web ERP]] · [[APP - MyBharata]]
