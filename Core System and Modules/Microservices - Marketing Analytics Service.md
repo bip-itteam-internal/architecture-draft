@@ -6,7 +6,7 @@
 - **Path di repo**: `bip-erp/services/marketing-analytics/`
 - **Port**: env `PORT`, alias `SERVICE_PORT`, fallback `6985` (`main.go`)
 - **Prefix gateway**: `marketing-analytics` (`api-gateway/main.go`, env `MARKETING_ANALYTICS_MODULE_URL`)
-- **Status**: ⚠️ Implemented dengan catatan (audit kode 2026-08-22). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **38 route** di berkas produksi. `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `/matrix/sku-shop` masih stub, `mart_buyer_cohort` masih kosong, lock job hanya in-process. **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD tetapi koleksinya masih 0 dokumen** — belum pernah dipakai host sungguhan, jadi belum terbukti bisa dipakai.
+- **Status**: ⚠️ Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **40 route** di berkas produksi (enumerasi lengkap terhadap `origin/main`, termasuk `/health`). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `/matrix/sku-shop` masih stub, `mart_buyer_cohort` masih kosong, lock job hanya in-process. **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD tetapi koleksinya masih 0 dokumen** — belum pernah dipakai host sungguhan, jadi belum terbukti bisa dipakai.
 
 ## Prinsip Arsitektur
 
@@ -24,7 +24,9 @@ Penjaga yang sama sudah dibuktikan menutup `insentive_db` (sumber ICC) — arahn
 
 ## Endpoint (Sudah Diimplementasikan)
 
-28 route di berkas produksi (audit kode 2026-08-07, `routes.go` + `handler_mart.go` + `price_floor_handler.go` + `jobs.go` + `penjadwal_status.go` + `beranda.go` + `ambang_handler.go`). Daftar lengkap per-route: [[API - Marketing Analytics Service]] — termasuk tiga route (`/toko`, `/kpi/kinerja-toko`, `/profit/items`) yang ada di kode tetapi belum terdokumentasi. Seluruhnya `GET` kecuali disebut lain.
+**40 route** di berkas produksi (audit kode 2026-08-26, enumerasi seluruh pendaftaran `app.Get|Post|Patch|Put|Delete` di `services/marketing-analytics/*.go` non-test terhadap `origin/main`; tak ada `Group`/`Mount`, tak ada yang dikomentari). Berkas pendaftarnya: `routes.go` · `handler_mart.go` · `main.go` · `toko.go` · `divisi.go` · `price_floor_handler.go` · `ambang_handler.go` · `pagu_handler.go` · `kurva_alokasi_handler.go` · `live_shift_handler.go` · `jobs.go` · `penjadwal_status.go`. Daftar lengkap per-route: [[API - Marketing Analytics Service]], yang per audit ini **memuat keempat-puluhnya** (sebelumnya 12 route tak punya baris di mana pun). Seluruhnya `GET` kecuali disebut lain.
+
+> ⚠️ **Angka route di dok ini pernah bertentangan dengan dirinya sendiri**: baris Status sempat menyebut 38 (audit 2026-08-22) sementara paragraf ini masih menyebut 28 (audit 2026-08-07), karena Status diperbarui tanpa menyentuh badan dokumen. Keduanya juga meleset dari kode. Bila memperbarui salah satunya, perbarui **dua-duanya** — dan hitung ulang dari kode, jangan menambahkan selisih ke angka lama.
 
 ### Halaman depan & ambang keputusan (✅ live di PROD)
 
@@ -321,7 +323,7 @@ Dicatat di sini justru karena rumusnya terlihat benar: tanpa catatan ini, orang 
 - **Sumber data (baca-saja)**: `integration_db` milik [[Microservices - Integration Service]] — `transaction_orders`, `product_sku_mappings`, `product_costs`, `tt_business_*`, `tt_shop_video_performances`, `shopee_gms_*`, `affiliate_orders`, `icc_account_mappings`, `icc_affiliate_accounts`, `team_shops`, `marketing_teams`; plus `insentive_db` milik [[Microservices - Insentive Service]] (`employee_performance_mappings`, env `INSENTIVE_MONGO_URI`). Lihat juga [[Sales - Marketplace Integration]].
 - **API pihak ketiga**: TikTok Ads API `/open_api/v1.3/ad/get/` (`client_tiktok_ads_http.go`) hanya untuk tautan ad→video; metrik iklan dibaca dari Mongo, bukan API langsung. Kredensial gagal didekripsi dilewati **tapi dihitung dan dilaporkan**.
 - **Gerbang**: [[CORE - API Master Gateway]] · **Konsumen**: dashboard marketing di [[APP - Web ERP]]
-- **Konsep & rancangan**: [[Sales - Marketing Dashboard (Master Roadmap)]] · [[Sales - Marketing Dashboard (Index)]] · [[Sales - Profit Engine (Design)]] · [[Sales - HPP Master (Plan)]] · [[ADR - 0008 Profit Engine Join via item_group_id]]
+- **Konsep & rancangan — ⚠️ arsip Juni–Juli 2026, peta service-nya usang**: [[Sales - Marketing Dashboard (Master Roadmap)]] · [[Sales - Marketing Dashboard (Index)]] · [[Sales - Profit Engine (Design)]] · [[Sales - HPP Master (Plan)]] · [[ADR - 0008 Profit Engine Join via item_group_id]]. Ketiga dok "Marketing Dashboard" itu menulis rencananya dibangun **di dalam `integration`**, dan menyebut progres 45–50%; kenyataannya lapisan marketing & ads jadi service tersendiri (dokumen ini) sementara profit engine + HPP yang mendarat di `integration`. Audit datanya masih sahih, pembagian service-nya jangan dipakai.
 - **Koleksi**: [[DB - Overview and Notes]] · **Endpoint per-route**: [[API - Marketing Analytics Service]]
 
 ## Dokumen Terkait
