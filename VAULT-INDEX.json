@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-26",
-  "jumlah_dokumen": 300,
+  "jumlah_dokumen": 301,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1554,8 +1554,8 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "268135f29997f6c592c37e2b44980ffc69afbeda93015619c56e41b7e9b30c5a",
-      "ukuran_kb": 98.4,
+      "hash": "c16a40ae24d97ff24cb06e08b503cbe79d1713d49db7cdcf3048cdd5b42a58b3",
+      "ukuran_kb": 98.6,
       "ringkasan": "Menjawab: bagaimana hak akses ditentukan di ERP Bharata, apa beda permission set dari system_roles dan dari menu terbatas, bagaimana reach (cakupan data) dihitung, dan izin apa saja yang tersedia per modul. Memuat katalog izin, paket bawaan, tangga tier per modul, serta dua kunci menu terbatas (finance.laporan dan finance.insentif) beserta fallback masing-masing dan beda perlakuan super-aksesnya.",
       "kata_kunci": [
         "RBAC",
@@ -3814,7 +3814,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — **sudah merge, tetapi belum berfungsi sebagaimana dimaksud.** Kode selesai di branch `feat/oneForAll` (2026-08-06), seluruh uji hijau, dan sejak itu **sudah mendarat di `main` kedua repo** (terverifikasi 2026-08-10: `services/employee/menu_terbatas.go`, `shared-library/common/catalog_menu.go`, gerbang di `services/integration/main.go`; sisi FE `utils/menu-terbatas.ts` + `components/menu-terbatas-guard.tsx`). Merge menaikkan taruhannya, bukan menurunkannya: yang menahan fitur ini kini tinggal keputusan untuk tidak memasang paketnya ke siapa pun. Aman dipasang (tak ada yang kehilangan akses), tetapi **mengaktifkannya belum benar-benar membatasi**: celah \"akun tanpa paket\" yang semula diduga kosong kini **terbukti tidak kosong** (bukti 2026-08-06 di §Consequences), sehingga akun finance/IT tanpa permission-set tetap bisa membuka halaman walau restriksi menyala. Prasyarat agar berfungsi: perbaiki fallback task-management lebih dulu (**langkah pertama SUDAH selesai 2026-08-09; per 2026-08-26 penyisiran ulang menemukan tak ada lagi konsumen yang menilai dari \"klaim ada\", jadi langkah kedua kini tak punya penghalang selain keputusan mengerjakannya**). Penegakan backend juga sengaja parsial. **Kunci kedua `menu.finance.insentif` ditambahkan 2026-08-26** (Dashboard & Master Data Insentif, sekalian pindah ke Portal Saya) dan mewarisi peringatan yang sama: jangan dinyalakan sampai langkah kedua tuntas.",
+      "status_teks": "Implemented (ada catatan) — **celah utamanya SUDAH DITUTUP 2026-08-26 (langkah kedua, `ee9509c5`); yang tersisa tinggal verifikasi di lingkungan nyata.** Riwayat di bawah sengaja dipertahankan karena arah keputusannya mudah dibalik lagi tanpa sadar. Catatan lama: Kode selesai di branch `feat/oneForAll` (2026-08-06), seluruh uji hijau, dan sejak itu **sudah mendarat di `main` kedua repo** (terverifikasi 2026-08-10: `services/employee/menu_terbatas.go`, `shared-library/common/catalog_menu.go`, gerbang di `services/integration/main.go`; sisi FE `utils/menu-terbatas.ts` + `components/menu-terbatas-guard.tsx`). Merge menaikkan taruhannya, bukan menurunkannya: yang menahan fitur ini kini tinggal keputusan untuk tidak memasang paketnya ke siapa pun. Aman dipasang (tak ada yang kehilangan akses), tetapi **mengaktifkannya belum benar-benar membatasi**: celah \"akun tanpa paket\" yang semula diduga kosong kini **terbukti tidak kosong** (bukti 2026-08-06 di §Consequences), sehingga akun finance/IT tanpa permission-set tetap bisa membuka halaman walau restriksi menyala. Prasyarat agar berfungsi: perbaiki fallback task-management lebih dulu (**langkah pertama selesai 2026-08-09, langkah kedua selesai 2026-08-26**). Penegakan backend juga sengaja parsial. **Kunci kedua `menu.finance.insentif` ditambahkan 2026-08-26** (Dashboard & Master Data Insentif, sekalian pindah ke Portal Saya).",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -3828,9 +3828,9 @@
         "APP - Web ERP",
         "API - Integration Service"
       ],
-      "hash": "03a81d4905a78d70933218d65794c5f02a0f1d0ee45e8e011981b49d174d2892",
-      "ukuran_kb": 17.7,
-      "ringkasan": "Menjawab: kenapa menu terbatas dirancang default terbuka lalu mengunci begitu ada akun yang di-assign, bagaimana penanda kunci $menulock diterbitkan employee-service saat token terbit, dan kenapa fitur ini belum boleh dinyalakan. Menjelaskan celah akun tanpa permission set yang membuat restriksi membuka tanpa menutup, prasyarat menutupnya, kenapa fallback gerbang backend dipatok true demi panggilan service-ke-service, dan kenapa super-akses sidebar perlu dikecualikan per kunci.",
+      "hash": "eea55a2a424aea94c57bdf994bae3a142b17b3cfa014565ce7f636b92db971c1",
+      "ukuran_kb": 18.1,
+      "ringkasan": "Menjawab: kenapa menu terbatas dirancang default terbuka lalu mengunci begitu ada akun yang di-assign, bagaimana penanda kunci $menulock diterbitkan employee-service saat token terbit, dan bagaimana celah akun-tanpa-permission-set akhirnya ditutup. Menjelaskan kenapa fallback gerbang backend dipatok true demi panggilan service-ke-service, kenapa super-akses sidebar perlu dikecualikan per kunci, dan apa yang masih harus diverifikasi di lingkungan nyata.",
       "kata_kunci": [
         "menu terbatas",
         "menulock",
@@ -3841,7 +3841,7 @@
         "menu.finance.insentif",
         "fallback",
         "super-akses",
-        "restricted menu"
+        "klaim kosong"
       ]
     },
     {
@@ -4581,9 +4581,9 @@
         "Finance - Bridging App",
         "HRIS - Compensation & Benefits"
       ],
-      "hash": "5c12e6a53af72b2636d2b1620b869d9c7950fe47b9751df8469643cec3c049ba",
-      "ukuran_kb": 21.7,
-      "ringkasan": "Menjawab: bagaimana insentif tim marketing dihitung dengan skema profit-based SK 010 & 011/2026, berapa tarif untuk tiap tingkat pencapaian target, dari mana tiap komponen biaya diambil, dan siapa yang boleh membuka dashboard beserta master datanya. Memuat aturan turunan yang mengikat (gerbang retur 7%, target diketik hanya di lingkup Supervisor, dasar uang cair, cutoff tanggal 25) serta riwayat skema KPI-multiplier lama yang sudah dicabut dan tak boleh dipakai sebagai acuan.",
+      "hash": "dbcc00857d46e3f8cd5b8a2342715c3ddf41c7fcb63ec0f893a9880120c66df4",
+      "ukuran_kb": 22.2,
+      "ringkasan": "Menjawab: bagaimana insentif tim marketing dihitung dengan skema profit-based SK 010 & 011/2026, berapa tarif untuk tiap tingkat pencapaian target, dari mana tiap komponen biaya diambil, dan siapa yang boleh membuka dashboard beserta master datanya serta bagaimana cara menugaskan aksesnya. Memuat aturan turunan yang mengikat (gerbang retur 7%, target diketik hanya di lingkup Supervisor, dasar uang cair, cutoff tanggal 25) serta riwayat skema KPI-multiplier lama yang sudah dicabut dan tak boleh dipakai sebagai acuan.",
       "kata_kunci": [
         "insentif",
         "incentive",
@@ -7462,6 +7462,35 @@
       ]
     },
     {
+      "path": "Manufacture/Manufacture - Material Order (SPK).md",
+      "judul": "Manufacture - Material Order (SPK)",
+      "area": "Manufacture",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan) — dipakai harian dan menyuapi dossier batch, tapi tanpa edit, tanpa status/approval, dan penomorannya dibuat acak di browser. Lihat **Catatan & Belum Diimplementasikan**.",
+      "publik": true,
+      "tautan": [
+        "Manufacture - Dokumen Produksi Batch",
+        "Microservices - Manufacture Service",
+        "CORE - RBAC dan Permission Set",
+        "Manufacture - Stock & Material Management",
+        "APP - Web ERP",
+        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
+        "CORE - API Master Gateway",
+        "API - Manufacture Service",
+        "Sales - Marketing Dashboard (Analisis Rekap)",
+        "GA - Procurement System",
+        "Manufacture - Issue Material Miss Count",
+        "External - Accurate",
+        "Manufacture - Order Production Workflow (Flow Source)",
+        "Manufacture - Issue Code Audit 2026-06"
+      ],
+      "hash": "465590d512d99f9e3dff92193e309599e6d6fffa28a20502a47e759f7c75e86c",
+      "ukuran_kb": 10.5,
+      "ringkasan": null,
+      "kata_kunci": []
+    },
+    {
       "path": "Manufacture/Manufacture - Order Production Workflow (Flow Source).md",
       "judul": "Manufacture - Order Production Workflow (Flow Source)",
       "area": "Manufacture",
@@ -10240,5 +10269,7 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "Manufacture/Manufacture - Material Order (SPK).md"
+  ]
 }

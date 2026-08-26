@@ -55,11 +55,18 @@ digerbang `common.RequireMenu`. Menulis target tetap terpisah dan lebih ketat
 (`RequireMasterProfitWriter`: finance + IT saja) — di-assign ke menu tidak memberi hak
 mengubah angka yang menentukan pembayaran.
 
-⚠️ **Belum benar-benar membatasi.** Mekanismenya mewarisi peringatan
-[[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]]: selama penjaga klaim-kosong
-di `gabungPenandaMenu` masih terpasang, memasang paket akan MEMBUKA layar bagi yang
-ditunjuk tanpa MENUTUPNYA bagi akun yang tak punya permission-set sama sekali — dan atasan
-marketing termasuk populasi yang paling mungkin berada di celah itu.
+Cara memakainya: **Pengaturan → Hak Akses**, pasang paket "Menu: Insentif Profit" ke akun
+terpilih. Sebelum penugasan pertama tak ada yang berubah bagi siapa pun; sesudahnya hanya
+pemegang paket yang bisa membuka. Perubahan berlaku setelah orang yang bersangkutan
+**login ulang**, karena izin dan penanda kunci hanya ikut saat token diterbitkan.
+
+⚠️ **Yang masih harus dibuktikan di lingkungan nyata.** Celah "akun tanpa permission-set"
+yang dulu membuat mekanisme ini membuka-tanpa-menutup sudah ditutup 2026-08-26
+([[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]], `ee9509c5`), dan itu penting
+justru di sini: atasan marketing termasuk populasi yang paling mungkin memegang
+`system_roles` tanpa satu pun paket. Uji membuktikan penandanya terbit; ia tak bisa
+membuktikan bahwa penugasan pertama benar-benar menutup layar bagi mereka. Verifikasi itu
+menunggu deploy.
 
 ### Yang masih menahan (per 2026-08-02)
 

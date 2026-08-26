@@ -52,7 +52,7 @@ Yang menggantikannya: **`permission_sets` saja**, dibantu `system_roles` untuk k
 
 Sesudah pencabutan selesai, blok ini dan seluruh tabel pembeda di bawah **ikut dihapus** dari dok ini; yang tersisa cukup ADR 0051 sebagai catatan sejarah.
 
-**Menu terbatas — modul `menu` (2026-08-06, ✅ MERGED ke `main`; ⚠️ tetap jangan dinyalakan, lihat §Belum Diimplementasikan):**
+**Menu terbatas — modul `menu` (2026-08-06, ✅ MERGED ke `main`; celah akun-tanpa-paket ✅ ditutup 2026-08-26, sisa verifikasi di lingkungan nyata):**
 
 > Terverifikasi di `origin/main` 2026-08-09: `shared-library/common/catalog_menu.go` ada, didaftarkan di `services/employee/permission_catalogs.go:41` (dulu `main.go:128`, lihat catatan pindah berkas di §Deskripsi), dan gerbangnya hidup di `services/integration/main.go:1169` (`accountingRoute.Get("/balance-sheet", httpDelivery.RequireMenuLaporanKeuangan(), …)`) beserta `menu_gate_test.go`. Dok ini sempat menyebutnya "belum merge"; yang masih benar adalah **belum berfungsi penuh**, dan itu dua hal berbeda. Sudah-merge justru menaikkan taruhannya: kodenya kini hidup di produksi, jadi yang menahan fitur ini tinggal keputusan untuk tidak memasang paketnya ke siapa pun.
 
@@ -79,7 +79,7 @@ Kunci yang ada (per 2026-08-26, **dua**):
 | `menu.finance.laporan` | `menu_finance_laporan` | `/finance/accounting` (Laba Rugi, Neraca, Neraca Saldo) | role `finance` atau anggota IT |
 | `menu.finance.insentif` | `menu_finance_insentif` | Dashboard Insentif + Master Data Insentif (`/finance/incentive/{dashboard,settings}`, menunya di **Portal Saya**) | role `finance`, atasan marketing (`insentive`: supervisor/adv_leader/adv_marketplace/adv_meta), atau anggota IT |
 
-⚠️ **Keduanya mewarisi peringatan "jangan dinyalakan"** di [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]]: selama penjaga klaim-kosong di `gabungPenandaMenu` masih terpasang, memasang paket akan MEMBUKA menu bagi yang ditunjuk tanpa MENUTUPNYA bagi akun yang tak punya permission-set sama sekali.
+✅ **Celah akun-tanpa-paket DITUTUP 2026-08-26** (`ee9509c5`): penjaga klaim-kosong di `gabungPenandaMenu` dicabut, jadi penanda kunci kini ikut ke klaim setiap orang dan restriksi benar-benar MENUTUP, bukan cuma membuka. Sebelum itu, memasang paket membuka menu bagi yang ditunjuk tanpa menutupnya bagi akun tanpa permission-set — lihat [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]] untuk bukti dan prasyaratnya. Yang tersisa: verifikasi di lingkungan nyata bahwa penugasan pertama benar-benar menutup bagi yang lain.
 
 ⛔ **Beda perlakuan super-akses antar-kunci, dan ini bukan kelalaian.** `menu.finance.insentif` terdaftar di `TANPA_BYPASS_SEMUA_MENU` (`erp-frontend/src/utils/menu-permission.ts`), `menu.finance.laporan` **tidak**. Tanpa pendaftaran itu, `bolehItemSidebar` meloloskan IT supervisor dan jabatan Direktur sebelum menilai `perm`, sehingga whitelist-nya dilewati di lapisan menu sementara gerbang halaman tetap menolak — menu tampil lalu halamannya berkata "Akses Ditolak". Menyamakan keduanya berarti mempersempit akses orang yang hari ini melihat Laporan Keuangan, jadi itu keputusan tersendiri, bukan perapian.
 
