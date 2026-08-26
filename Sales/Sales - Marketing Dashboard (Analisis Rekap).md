@@ -1,21 +1,28 @@
 # Marketing & Ads Dashboard — Rekap Analisis (Index)
 
-- **Status**: 🟡 Konsep — rekap/analisis teknis dashboard marketing.
+- **Status**: 🟡 **Arsip analisis (30 Juni 2026) — temuan datanya masih sahih, peta service-nya tidak.** Keadaan sekarang: [[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]]. Latar: [[Sales - Marketing Dashboard (Index)]].
+
+> ⛔ **"~45-50%" di §1 adalah potret 30 Juni 2026.** Lapisan marketing & ads sudah live di PROD sejak Agustus 2026 sebagai service tersendiri `marketing-analytics` (40 route), sementara profit engine + HPP mendarat di `integration` sebagai `/integration/gross-profit`. Jangan mengutip persentase ini sebagai status proyek.
+>
+> Temuan **data** di bawah (koleksi mana berisi apa, mana yang real vs kosong) tervalidasi ke produksi saat itu dan tak digantikan dokumen mana pun — itulah nilai berkas ini. Untuk cakupan per-metrik yang **terbaru**, pakai [[Sales - Marketing Analytics (Audit Ketersediaan Data)]] (audit 2026-08-09) yang memakai label ADA/RAKIT/TIPIS/TIDAK ADA.
 
 > Rekap lengkap analisis untuk membangun dashboard `10_DASH_MARKETING_ADS.html`.
 > Semua temuan tervalidasi **data produksi nyata** (mongosh read-only, integration_db) / **dok resmi TikTok**.
 > Dokumen ini = index. Detail per topik di file terkait (link bawah).
 
 ## Dokumen terkait
-- Roadmap master + engine + join + affiliate: `2026-06-30-marketing-dashboard-MASTER.md`
-- Profit engine + HPP: `2026-06-30-profit-engine-design.md`
-- Affiliate auto-sync: `2026-06-30-affiliate-seller-sync-design.md`
-- Plan HPP master: `../plans/2026-06-30-hpp-master-plan.md`
-- Dok TikTok affiliate: `../Affiliate integration.md`, `../TikTok Shop Affiliate(Creator Collaboration)Developer onboarding & termination Rules.md`
+
+Tautan di bawah semula berupa path berkas dari repo asalnya (`2026-06-30-*.md` di `docs/superpowers/`) yang tak menunjuk apa pun dari dalam vault; sudah diganti wikilink ke salinan vault-nya:
+
+- Roadmap master + engine + join + affiliate: [[Sales - Marketing Dashboard (Master Roadmap)]]
+- Profit engine + HPP: [[Sales - Profit Engine (Design)]]
+- Affiliate auto-sync: [[Sales - Affiliate Seller Sync (Design)]] · [[Sales - Affiliate Seller Sync (Plan)]]
+- Plan HPP master: [[Sales - HPP Master (Plan)]]
+- Dok TikTok affiliate: [[Sales - Affiliate Integration (TikTok Docs)]] · [[Sales - TikTok Affiliate Rules (Docs)]]
 
 ---
 
-## 1. Progress vs mockup: ~45-50%
+## 1. Progress vs mockup: ~45-50% *(per 30 Juni 2026)*
 
 Banyak komponen SUDAH ADA tapi **tersebar** — reuse, jangan dobel-bangun:
 - Settlement/income/return UI → `integration-accurate` (Shopee+TikTok, real)

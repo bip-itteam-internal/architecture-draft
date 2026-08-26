@@ -215,6 +215,54 @@ ulang dengan impor konstanta yang sudah ada.
 
 ---
 
+### G2. Kolom yang tampak komponen tapi bukan (hitung ganda)
+
+Pertanyaannya: **"kalau kolom ini dijumlahkan ke total di sebelahnya, apakah ada rupiah yang
+terhitung dua kali?"** Kelas ini kritis karena gagalnya bukan error melainkan **angka yang
+salah dan masuk akal**; tak ada test yang menangkapnya, dan keluhannya datang sebagai "laba
+lebih kecil dari yang saya hitung sendiri" berhari-hari kemudian.
+
+Pemicunya selalu sama: kolom yang **namanya terdengar seperti kerugian atau komponen biaya**,
+padahal ia cuma memotret ulang sesuatu yang **sudah** terpotong di jalur utama. Yang membuatnya
+berbahaya, aturan pemakaiannya hampir selalu hanya hidup sebagai komentar di berkas Go-nya,
+sehingga siapa pun yang merancang layar dari dokumentasi tak punya cara mengetahuinya.
+
+- **Kolom yang sudah terpotong di hulu, dipotong lagi di hilir.** `iklan_sia_sia` di
+  `/returns/detail` adalah porsi `ads_cost` pada order retur — dan `ads_cost` tak pernah
+  dialokasikan ulang saat retur, jadi angka itu **sudah** dikurangkan dari laba. Menjumlahkannya
+  lagi menghitung belanja yang sama dua kali.
+- **Dua kolom yang salah satunya himpunan bagian.** `orders_dikirim` adalah irisan dari
+  `orders` di blok `pembatalan`, bukan kolom sejajar. Menjumlahkan keduanya menghitung order
+  yang sama dua kali.
+- **Kolom yang sama sekali bukan komponen laba.** `pembatalan` tak boleh mengurangi `revenue`
+  atau `gross_profit`: yang batal sebelum kirim tak pernah masuk revenue, yang kembali sudah
+  masuk `retur`.
+- **Dua metrik dijumlah jadi satu "total" karangan.** `iklan_sia_sia` + beban packing jadi
+  "total kerugian retur" menghasilkan angka dobel — yang satu belanja yang sudah terbayar,
+  yang satu uang fisik tambahan.
+- **Level agregasi berbeda dijumlah silang.** `/profit/products` (kode master, bundel dipecah),
+  `/profit/items` (judul listing), `/profit/skus` (SKU master) menjawab pertanyaan berbeda atas
+  koleksi yang sama. Hasil penjumlahannya tak berarti apa-apa tetapi tampak wajar.
+
+**Yang dicari saat review:**
+
+1. Kolom baru yang namanya memuat *rugi*, *sia-sia*, *terbuang*, *beban*, *batal* — telusuri
+   apakah nilainya sudah tercermin di kolom lain pada baris yang sama.
+2. Penamaan yang mengundang salah pakai. `iklan_sia_sia` sengaja **tidak** bernama
+   `kerugian_iklan`; me-rename-nya di lapisan mana pun (BE, FE, ekspor Excel) menghidupkan
+   kembali seluruh kelas ini. Nama di sini bukan kosmetik, ia satu-satunya pengaman.
+3. Aturan pemakaian yang **cuma ada di komentar kode**. Bila sebuah kolom butuh kalimat
+   "jangan dijumlahkan ke X", kalimat itu wajib naik ke dok vault — komentar Go tak terbaca
+   oleh yang merancang layar. Ini temuan, bukan catatan gaya.
+4. Test penjaganya. Pola yang benar sudah ada: `TestPembatalanTidakMengubahAngkaLaba` mengunci
+   bahwa blok tambahan **tidak** menggeser angka laba.
+
+⚠️ **Mengubah nama kolom atau menghapus salah satunya mengubah perilaku yang terlihat user**
+→ masuk TANYAKAN DULU. Yang boleh langsung: menambah test penjaga, dan menaikkan aturan
+pemakaian dari komentar ke dok.
+
+---
+
 ## Pass 2 — INFORMASIONAL
 
 ### H. Nama field & tag bson/json

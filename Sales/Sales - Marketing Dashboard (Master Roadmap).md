@@ -1,6 +1,10 @@
 # Marketing & Ads Command Center — MASTER Roadmap
 
-- **Status**: 🟡 Konsep — roadmap master dashboard Marketing & Ads Command Center.
+- **Status**: 🟡 **Arsip desain (30 Juni 2026) — sudah dieksekusi, peta service-nya usang.** Roadmap ini dijalankan, tetapi hasilnya jadi service tersendiri `marketing-analytics` (+ profit engine di `integration`), bukan seperti yang tertulis di sini. Keadaan sekarang: [[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]]. Latar: [[Sales - Marketing Dashboard (Index)]].
+
+> ⛔ **Angka "Progress ≈ 45–50%" di bawah adalah potret 30 Juni 2026, bukan status hari ini.** Per Agustus 2026 lapisan marketing & ads sudah live di PROD sebagai 40 route di service `marketing-analytics`. Jangan mengutip persentase ini sebagai status proyek — cek dok service-nya.
+>
+> Yang **tetap berlaku**: audit lima sisi di bawah, strategi join, dan prinsip "reuse existing dulu". Yang **sudah lewat**: pembagian scope per-service dan daftar "gap inti".
 
 > Acuan tetap untuk membangun dashboard `10_DASH_MARKETING_ADS.html`.
 > Berbasis audit terverifikasi 5 sisi: koleksi `integration_db`, client API existing, API resmi TikTok Shop, FE marketing, FE accurate/incentive.
@@ -8,7 +12,7 @@
 
 ## Ringkasan eksekutif
 
-Mayoritas data sudah mengalir & sebagian UI sudah ada (tersebar di module accurate + incentive). Kerja utama = **merangkai existing + tambah HPP/laba + wire endpoint yang sudah ada**, bukan ingest ulang. Progress ≈ **45–50%**.
+Mayoritas data sudah mengalir & sebagian UI sudah ada (tersebar di module accurate + incentive). Kerja utama = **merangkai existing + tambah HPP/laba + wire endpoint yang sudah ada**, bukan ingest ulang. Progress ≈ **45–50%** *(per 30 Juni 2026 — lihat catatan usang di atas)*.
 
 ---
 
