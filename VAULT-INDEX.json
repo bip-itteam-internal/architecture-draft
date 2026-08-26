@@ -2378,20 +2378,20 @@
         "Microservices - Insentive Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "49005482dcf4544593f16713368375a37ddde86c10c562d1d86d7f7540db0eea",
-      "ukuran_kb": 30.7,
-      "ringkasan": "Menjawab: bagaimana gaji dihitung dari setup komponen gaji, config BPJS, PPh21 metode TER, dan penetapan gaji per karyawan sampai payroll run (draft, approved, published), termasuk slip self-service, slip PDF, run THR, dan beban pemberi kerja (`/employer-cost`) yang ditarik modul insentif. Menjawab juga bagaimana potongan kehadiran dipecah jadi empat baris (telat, izin, mangkir, uang makan) berikut tarif dan pengalinya, dua aturan pembulatan BPJS yang sengaja berbeda antara sisi karyawan dan perusahaan, peran master badan usaha penggaji untuk kop slip, jebakan `upah_bpjs` sebagai dasar upah dan bukan nominal iuran, serta kondisi pemakaian nyata di produksi. Penting: sumber aturan bisnisnya (pengali mangkir Pasal 20 yaitu 1,5x sehari dan 2x per hari bila dua hari atau lebih, izin jam kerja memotong Tunjangan Kehadiran dan uang makan, SP II memotong 25% gaji pokok) TIDAK ada di vault melainkan di `mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md`, turunan Peraturan Perusahaan 2026-2028, dan dokumen itu yang menang bila perilaku sistem bertentangan dengannya.",
+      "hash": "be04b7b77c084c1ef213d074fbeefe0ff534a7caedd59f2a2f4e535da7f3b9ac",
+      "ukuran_kb": 32.4,
+      "ringkasan": "Menjawab: bagaimana payroll dihitung dari setup komponen gaji, master badan usaha penggaji, BPJS, PPh21 TER, THR, dan empat baris potongan kehadiran sampai slip PDF self-service, serta di mana sumber aturan bisnisnya berada (bukan di vault ini, melainkan `mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md` yang dinyatakan menang bila perilaku sistem bertentangan dengannya). Menjawab juga kondisi nyata di produksi per verifikasi 2026-08-26: `alpha_multiplier_one_day` di prod bernilai 2 padahal Pasal 20 dan default kode 1,5 (disetel Gilang Permatasari, Human Resource/Personalia, pada 2026-08-21), sehingga 8 baris mangkir tepat 1 hari kelebihan potong Rp 141.266, sementara baris mangkir 2 hari atau lebih sudah benar. Serta: 120 `payroll_run_line` kini semuanya ber-`attendance_basis` (naik dari 43 baris dengan nol basis) tetapi kedua `payroll_run` masih `draft` sehingga nol slip pernah sampai ke karyawan, dan `upah_bpjs` wajar nol dari 120 record (71 kosong, 49 di bawah separuh gaji pokok).",
       "kata_kunci": [
         "payroll",
         "penggajian",
         "slip gaji",
         "payslip",
-        "BPJS",
-        "PPh21 TER",
-        "THR",
-        "potongan kehadiran",
         "payroll run",
-        "employer-cost"
+        "potongan kehadiran",
+        "mangkir",
+        "upah_bpjs",
+        "PPh21 TER",
+        "THR"
       ]
     },
     {

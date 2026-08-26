@@ -39,8 +39,8 @@
 - ⚠️ **`upah_bpjs` = DASAR upah, bukan nominal potongan.** Engine memakainya sebagai pengali (`computeBpjsEmployee`), jadi mengisinya dengan nominal iuran membuat potongan mengecil sebesar rate itu sendiri (isi 4% dari dasar, potongan jadi 4% dari 4%, alias 25 kali lebih kecil). **Tidak ada validasi yang menahannya**: schema FE hanya `min(0)` dan `validateEmployeeSalary` hanya menolak negatif, jadi angka yang keliru lolos diam-diam sampai slip terbit.
 	- **Terjadi di production** (diperiksa 2026-08-05): 10 record `employee_salary` terisi, `upah_bpjs` hanya pernah bernilai **107.200** atau **128.800** dan sama sekali tidak mengikuti gaji pokok (yang bervariasi 1.444.250 sampai 3.000.000). Dibaca sebagai iuran keduanya konsisten: `107.200 = 4% × 2.680.000` dan `128.800 = 4% × 3.220.000` (4% = total rate karyawan Kesehatan 1% + JHT 2% + JP 1%). **Dasar upah yang dimaksud belum dikonfirmasi HR**, jadi koreksi datanya TBD. `effective_date` juga banyak terisi `2027-08-25` (satu record `2026-08-25`, menguatkan dugaan salah ketik tahun).
 	- FE sudah diberi penjaga (estimasi nominal + banner peringatan), lihat [[APP - Web ERP]]. Penjaga itu **tak berlaku surut**: record yang sudah terlanjur salah tetap perlu koreksi manual.
-	- ⛔ **Diukur ulang 2026-08-26: keadaannya memburuk pada skala, bukan membaik.** Dari **90** record, **nol** punya `upah_bpjs` yang masuk akal sebagai dasar upah (`>= basic_salary/2`). Rinciannya: **41 kosong/0** (BPJS-nya akan terhitung nol) dan **49 di bawah separuh gaji pokok** (pola "diisi nominal iuran" yang sama). Nilai terbanyak persis yang dulu ditemukan: 107.200 (x39), 128.800 (x6), lalu 248.600 (x2) dan 109.300 (x2). `effective_date` menguatkan dugaan salah ketik tahun: **46 record bertahun 2027**, hanya 3 di 2026, sisanya kosong. Konsekuensinya keras: bila run pertama diterbitkan hari ini, **baris BPJS setiap karyawan salah**, entah nol atau sekitar 25 kali terlalu kecil. Penjaga FE terbukti belum menghentikannya.
-	- ⚠️ **Angkanya bergerak selagi diukur**: jumlah record naik dari 86 ke 90 dalam hitungan menit di sesi yang sama, jadi HR sedang aktif mengisi. Ukur ulang sebelum menyimpulkan apa pun dari jumlah yang tertulis di sini.
+	- ⛔ **Diukur ulang 2026-08-26 pada 120 record: keadaannya memburuk pada skala, bukan membaik.** **Nol dari 120** punya `upah_bpjs` yang masuk akal sebagai dasar upah (`>= basic_salary/2`). Rinciannya: **71 kosong/0** (naik dari 41 — seluruh 30 record baru sejak pengukuran sebelumnya masuk ke kelompok ini) dan **49 di bawah separuh gaji pokok**, jumlah yang **tidak berubah**, jadi tak satu pun record lama diperbaiki. Nilai terbanyak persis yang dulu ditemukan: 107.200 (×39), 128.800 (×6), lalu 109.300 (×2) dan 248.600 (×2) — pola "diisi nominal iuran, bukan dasar upah". `effective_date` menguatkan dugaan salah ketik tahun: **46 record bertahun 2027**, hanya 3 di 2026, 71 kosong. Konsekuensinya keras: bila run pertama diterbitkan hari ini, **baris BPJS setiap karyawan salah**, entah nol atau sekitar 25 kali terlalu kecil. Penjaga FE terbukti belum menghentikannya, dan **tak berlaku surut**.
+	- ⚠️ **Angkanya bergerak antar-pengukuran**: 86 → 90 dalam hitungan menit pada satu sesi, lalu 120 beberapa hari kemudian. HR sedang aktif mengisi. Ukur ulang sebelum menyimpulkan apa pun dari jumlah yang tertulis di sini; yang **tidak** bergerak adalah rasionya — nol yang wajar, tiga kali diukur.
 
 ## Endpoint / Fitur (Sudah Diimplementasikan — Fase 2: Payroll Run)
 
@@ -66,8 +66,20 @@ menghitung tangan di Excel, dan satu baris gabungan mustahil dicocokkan baris pe
 - **Komponen master di-backfill per-nama** (`ensureAttendanceDeductionComponents`), karena `seedSalaryComponents` berhenti begitu koleksi tak kosong dan dev/prod sudah berisi 15 dokumen sejak lama.
 - **`days` absen dari respons supplement → baris ditandai `error`**, bukan diam-diam berpotongan nol. Itu berarti payroll naik lebih dulu dari attendance; slipnya akan terbit terlalu murah hati dan tak seorang pun tahu.
 - 🔜 **Belum diverifikasi lewat gateway maupun sebagai orang di layar.** Golden test bagian potongannya memakai rincian harian **rekayasa** dan menunggu lembar Excel HRD; yang tetap terbukti dari slip sungguhan hanya gaji pokok, GROSS, dan kedua baris BPJS.
-- ⛔ **Sudah ter-deploy ke prod tapi belum pernah menghasilkan satu rupiah pun** (diukur 2026-08-26). Binernya terbukti memuat kode ini (grep `/service` atas "Potongan Mangkir", "alpha_multiplier_multi_day", dengan kontrol negatif nol), dan tab FE-nya ada di bundel. Tetapi kedua `payroll_run` di prod dibuat **sebelum** fitur ini merge, sehingga **0 dari 43** `payroll_run_line` punya `payslip.attendance_basis`. Empat baris itu baru akan muncul setelah ada run baru atau `recalculate`. **Jangan baca "sudah live" sebagai "sudah terbukti"**: di sini keduanya berjarak enam hari dan nol slip.
-- ⚠️ **Config prod menyimpang dari Pasal 20 pada pengali mangkir sehari.** `alpha_multiplier_one_day` di prod bernilai **2**, sedangkan default kode **1,5** (`models_config.go`, komentarnya menyebut pasal itu). Backfill mustahil menuliskannya karena backfill mengisi dengan nilai bawaan, jadi ini suntingan sengaja lewat `PUT /config/attendance-deduction`. Yang membuatnya layak dicatat: angka ini menentukan rupiah, ia **tak terlihat di kode mana pun**, dan satu-satunya cara mengetahuinya adalah membaca config di produksi. Konfirmasikan ke HRD sebelum run pertama diterbitkan.
+- ⚠️ **Keempat baris potongan KINI sudah terhitung di prod** (diukur langsung ke `Payroll-MongoDB` **2026-08-26**, menggantikan catatan lama "belum menghasilkan satu rupiah pun"). Angka terkini: **2 `payroll_run`, keduanya masih `draft`** (periode `2026-06` dan `2026-07`, dibuat Seno Dwi Prakoso / HRD Supervisor), **120 `payroll_run_line`**, dan **120 dari 120** punya `payslip.attendance_basis` — naik dari 43 baris dengan nol basis. Berarti `recalculate` sudah dijalankan sesudah fitur merge. `employee_salary` juga naik jadi **120** (dari 86). **Yang masih nol tetap nol: tak satu run pun `approved` apalagi `published`**, jadi belum ada rupiah yang sampai ke karyawan. Itu satu-satunya hal yang menahan penyimpangan di bawah agar belum jadi salah bayar.
+- ⛔ **Config prod menyimpang dari Pasal 20 pada pengali mangkir sehari, dan sudah terhitung ke 8 slip draft.** Terverifikasi ke produksi 2026-08-26:
+
+	| | `alpha_multiplier_one_day` | `alpha_multiplier_multi_day` |
+	|---|---|---|
+	| Default kode (`models_config.go`) | **1,5** | 2,0 |
+	| Peraturan Perusahaan Pasal 20 | **1,5** | 2 per hari |
+	| **Prod** | **2** ⛔ | 2,0 ✅ |
+
+	Disetel **Gilang Permatasari (Human Resource / Personalia) pada 2026-08-21 09:54 WIB** lewat `PUT /config/attendance-deduction` (`updated_by` + `updated_at` di `payroll_config`). Backfill mustahil menuliskannya karena backfill mengisi dengan nilai bawaan, jadi ini suntingan sengaja.
+
+	**Dampak terukur pada dua run draft**: 22 baris ber-`hari_mangkir > 0`. Dari situ **8 baris ber-mangkir tepat 1 hari** total dipotong **Rp 565.065**, sedangkan pada 1,5x seharusnya **Rp 423.799** — **kelebihan potong Rp 141.266** atas 8 orang. 14 baris sisanya (mangkir 2 sampai 13 hari) **tidak terpengaruh**: pengali ≥2 hari memang 2x per hari di kedua versi, jadi angkanya sudah benar. Batas proporsional tak aktif pada kedelapan baris itu (mangkir 1 hari = 2/26 tunjangan, jauh di bawah plafon), sehingga selisihnya lurus 25%.
+
+	Yang membuatnya mudah terlewat: angka ini **menentukan rupiah, tak terlihat di kode mana pun**, dan satu-satunya cara mengetahuinya adalah membaca config di produksi. **Konfirmasikan ke HRD sebelum run pertama di-`approve`** — sesudah `published`, slip men-snapshot angkanya dan koreksi menuntut pembatalan run, bukan sekadar mengubah config.
 
 ### Beban pemberi kerja (konsumsi antar-service — modul insentif)
 
@@ -125,14 +137,14 @@ bukan git log.
 | Koleksi | Isi prod | Bacaan |
 |---|---|---|
 | `payroll_run` | **2, keduanya `draft`** (dibuat 2026-07-30 & 2026-08-05) | ⛔ nol run pernah `approved`/`published`, jadi **nol slip pernah dilihat karyawan**. Fase 2, 4, dan 5 belum pernah dipakai orang sungguhan |
-| `payroll_run_line` | 43 baris, 0 ber-`error`, **0 ber-`attendance_basis`** | kedua run mendahului potongan eksplisit |
-| `employee_salary` | **90** (dari **207** karyawan aktif, ~43%) | cakupan belum separuh; jumlahnya naik selagi diukur |
-| `employee_salary.company_id` | terisi di 60 dari 86 saat diukur | sisanya jatuh ke badan usaha default |
+| `payroll_run_line` | **120 baris, 120 ber-`attendance_basis`** (naik dari 43 baris / 0 basis) | `recalculate` sudah dijalankan sesudah fitur merge; keempat baris potongan kini terhitung. **22 baris ber-mangkir**, 8 di antaranya tepat 1 hari — lihat penyimpangan pengali di §Potongan Kehadiran |
+| `employee_salary` | **120** (dari **207** karyawan aktif, ~58%) | naik dari 90; cakupan masih di bawah tiga perempat. Angkanya memang bergerak antar-pengukuran karena HR mengisinya bertahap |
+| `employee_salary.company_id` | terisi di **93 dari 120** (2026-08-26; sebelumnya 60 dari 86) | 27 sisanya jatuh ke badan usaha default |
 | `payroll_company` | **41** | cocok dengan skala HRD (1 PT + 40 CV) |
 | `salary_component` | **19** (bukan 18) | baris lama "Tunjangan Kehadiran" (deduction) masih aktif, lihat §Master Komponen Gaji |
 
 **Urutan yang menahan run pertama**, dari yang paling mahal bila terlewat: `upah_bpjs`
-(nol dari 90 record benar, lihat §Gaji per Karyawan) → pengali mangkir yang menyimpang dari
+(nol dari 120 record benar, lihat §Gaji per Karyawan) → pengali mangkir yang menyimpang dari
 Pasal 20 → sign-off tabel TER → cakupan gaji yang belum separuh. Tiga yang pertama membuat
 angka di slip **salah**, bukan sekadar kosong, dan slip yang sudah `published` men-snapshot
 kesalahannya.
