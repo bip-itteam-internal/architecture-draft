@@ -2,7 +2,7 @@
 
 *Struktur organisasi perusahaan — departemen, posisi/jabatan, jenjang, dan hierarki (atasan/SPV). **Departemen dan posisi** dikelola sebagai master data di MongoDB (`master_department`) dengan CRUD endpoint dan halaman admin di frontend. Data karyawan tetap di `work_data`. **Bagan organisasi sudah ada** (`/hris/org-chart`); **jenjang jabatan sudah ada** (2026-08-03) tapi belum diisi HR.*
 
-- **Status**: ⚠️ Implemented (ada catatan) — master departemen/posisi sudah di-DB; org chart **sudah ada** (2026-08-01); **jenjang jabatan live di produksi** (2026-08-03), **56 dari 81 jabatan** terisi per 2026-08-12 dan kini **ditampilkan** di daftar karyawan serta bagan organisasi (FE PR [#1000](https://github.com/bip-itteam-internal/erp-frontend/pull/1000), belum deploy); **penyetuju pengajuan per departemen** merged 2026-08-12 (PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184) & [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)), **ter-deploy & terverifikasi di DEV**, prod belum
+- **Status**: ⚠️ Implemented (ada catatan): master departemen/posisi sudah di-DB; **org chart live di produksi** (2026-08-01) berikut peleburan simpul se-kelompok supervisi (`HRGA`); **jenjang jabatan live di produksi** (2026-08-03), **56 dari 81 jabatan** terisi per 2026-08-12 dan **ditampilkan** di daftar karyawan serta bagan organisasi (FE PR [#1000](https://github.com/bip-itteam-internal/erp-frontend/pull/1000)); **penyetuju pengajuan per departemen live di produksi** (PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184) & [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)); resolusi atasan **disatukan jadi satu rantai** (PR [#1201](https://github.com/bip-itteam-internal/bip-erp/pull/1201)). Ketiganya **diverifikasi langsung di PRODUKSI 2026-08-26**, lihat §Bukti verifikasi produksi
 
 ## Ruang Lingkup
 
@@ -47,7 +47,7 @@
 	- **Tidak rekursif**, hanya satu tingkat ke bawah. Selama hierarki masih Supervisor → Leader → Staff, rekursi tak menambah apa pun.
 - **Org chart** — ✅ dibangun 2026-08-01, **merged** (FE PR [#673](https://github.com/bip-itteam-internal/erp-frontend/pull/673); BE `services/employee/org_chart.go`). `GET /org-chart` mengirim seluruh karyawan **aktif** satu perusahaan beserta daftar departemennya dalam satu panggilan; halaman `/hris/org-chart` (menu **HRIS → Personalia → Bagan Organisasi**) menggambarnya.
 	- **Kerangkanya DEPARTEMEN, bukan rantai atasan.** Sebagian besar karyawan belum punya `supervisor_id`, jadi bagan yang murni mengikuti rantai hanya akan menampilkan beberapa cabang berisi dan menyembunyikan sisanya. Dengan departemen sebagai kerangka, bagan utuh sejak hari pertama dan makin dalam seiring data diisi.
-	- **Departemen se-kelompok supervisi dilebur jadi SATU simpul** (mis. Human Resource + General Affair → `HRGA`) — ✅ **merged 2026-08-02** (BE [#890](https://github.com/bip-itteam-internal/bip-erp/pull/890), FE [#710](https://github.com/bip-itteam-internal/erp-frontend/pull/710)); **prod belum deploy**, dan BE wajib naik lebih dulu karena FE tanpa `groups` kembali menggambar per departemen. Sejalan dengan KPI dan menu Atasan Langsung yang lebih dulu tak bisa memilih keduanya terpisah. Departemen asal tetap disebut sebagai keterangan di samping label, karena "HRGA" sendirian tak memberi tahu isinya apa. **Yang berubah cuma tampilan**: `work_data.department` orang GA tetap `General Affair`, sesuai alasan di §Cakupan supervisi antar-departemen.
+	- **Departemen se-kelompok supervisi dilebur jadi SATU simpul** (mis. Human Resource + General Affair → `HRGA`) — ✅ **merged 2026-08-02** (BE [#890](https://github.com/bip-itteam-internal/bip-erp/pull/890), FE [#710](https://github.com/bip-itteam-internal/erp-frontend/pull/710)) dan ✅ **live di PRODUKSI**, diverifikasi 2026-08-26 (§Bukti verifikasi produksi). Catatan lama "prod belum deploy" sudah tidak berlaku. Urutan deploy-nya tetap **BE dulu**, karena FE yang menerima respons tanpa `groups` kembali menggambar per departemen. Sejalan dengan KPI dan menu Atasan Langsung yang lebih dulu tak bisa memilih keduanya terpisah. Departemen asal tetap disebut sebagai keterangan di samping label, karena "HRGA" sendirian tak memberi tahu isinya apa. **Yang berubah cuma tampilan**: `work_data.department` orang GA tetap `General Affair`, sesuai alasan di §Cakupan supervisi antar-departemen.
 		- Konsekuensi yang dituju: karena anggota kelompok masuk ember yang sama, **rantai atasan ikut tersambung lintas departemen**. Sebelumnya atasan hanya dicari di dalam satu departemen, jadi orang GA yang atasannya supervisor HR tetap menempel ke akar GA walau relasinya sudah diisi.
 		- Aturan kelompok datang **jadi dari backend** (`groups` di respons `/org-chart`, dari `DepartmentGroups`), bukan dihitung ulang di frontend. Frontend tak pernah menyentuh `supervised_by`; ia hanya menerima label beserta anggotanya. Menyalin aturannya ke TypeScript berarti dua sumber kebenaran yang bisa menyimpang diam-diam, hal yang sudah ditandai sebagai langkah mundur di `features/hris/kpi/constants.ts`.
 		- `groups` kosong (organisasi tanpa relasi supervisi, atau backend yang belum di-deploy) menghasilkan bagan persis seperti sebelumnya; itu dikunci uji, jadi FE aman naik lebih dulu meski urutan deploy tetap BE dulu.
@@ -59,7 +59,7 @@
 
 ## Penyetuju pengajuan per departemen (`work_data.is_supervisor`)
 
-- ✅ **Merged 2026-08-12** (BE PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184), FE PR [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)); **belum diverifikasi lewat gateway dan belum deploy**.
+- ✅ **Merged 2026-08-12** (BE PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184), FE PR [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)) dan ✅ **live di PRODUKSI**, diverifikasi 2026-08-26 (§Bukti verifikasi produksi). Catatan lama "belum diverifikasi lewat gateway dan belum deploy" sudah tidak berlaku.
 - Layar: **Pengaturan → Organisasi → Penyetuju Pengajuan** (`/pengaturan/organisasi?tab=penyetuju`). Endpoint: `GET /master/departments/approvers` & `PUT /master/departments/:key/approver` ([[API - Employee Service]]).
 
 ### Kenapa ada
@@ -132,14 +132,41 @@ Mencampur keduanya berbahaya dua arah: menyempitkan tampilan bikin staf HR melih
 
 ### Urutan pencarian atasan
 
-`/list?type=supervisor&department=X` menelusuri berurutan sampai ketemu:
+Rantainya menelusuri berurutan sampai ketemu:
 
 1. `is_supervisor` di departemen X sendiri
-2. `is_supervisor` di departemen induk X
+2. `is_supervisor` di departemen induk X (`master_department.supervised_by`)
 3. Judul jabatan cocok `Supervisor|^Leader$` di X
 4. Judul jabatan cocok di induk X
 
 **Data eksplisit selalu menang atas tebakan judul jabatan**, di kedalaman mana pun. Kalau tidak, seseorang berjudul `GA Supervisor` (jabatan itu ada di seed default GA) tanpa flag `is_supervisor` akan membajak seluruh pengajuan GA dari supervisor HR yang sah.
+
+#### Satu rantai, dipakai bersama semua pemanggil (PR [#1201](https://github.com/bip-itteam-internal/bip-erp/pull/1201))
+
+⚠️ **`atasanDepartemen` (`services/employee/supervisor_lookup.go`) adalah SATU-SATUNYA resolusi "siapa atasan departemen ini".** Jangan menyalin sebagiannya ke pemanggil baru, dan jangan menghitung ulang dari `is_supervisor` di service lain.
+
+Alasannya sudah terbukti: sampai 2026-08-13 langkah pertama berdiri sendiri di pemanggil sementara langkah 2 sampai 4 tinggal di `supervisorFallbackSteps`. Pemanggil baru (lookup penyetuju **laporan** milik form-builder) menyalin langkah pertama saja lalu mengira sudah menjawab pertanyaan yang sama. Untuk setiap departemen yang kosongnya **disengaja** supaya mengalir ke induk, terutama **General Affair (15 orang)**, salinan itu membalas string kosong. Akibatnya keputusan dan antrean laporan dibalas **403 untuk SEMUA orang, termasuk penyetuju yang sah**, dan notifikasinya diam. Tak satu pun pesan menyebut sebabnya. Kini langkah pertama ikut disusun `langkahAtasan`, jadi rantainya mustahil disalin setengah.
+
+Dua pemanggilnya sekarang:
+
+| Pemanggil | Rute | Untuk |
+|---|---|---|
+| attendance-service | `GET /list?type=supervisor&department=X` | penyetuju cuti, izin, koreksi absensi, perjalanan dinas |
+| form-builder | `GET /internal/department-approver?department=&company_id=` | penyetuju **laporan** ([[Microservices - Form Builder Service]]) |
+
+Keduanya memakai orang **PERTAMA** (`supervisors[0]` dan `kandidat[0]`), dan pipeline sudah menyortir `employee_id` menaik. **Jangan menyaring atau menyortir ulang di pemanggil**: begitu dua pemanggil memilih orang berbeda dari daftar yang sama, cuti seseorang mengalir ke A sementara laporannya menunggu B.
+
+⚠️ **`penyetujuSekarang` (`department_approver.go`) sengaja TIDAK ikut memakai rantai penuh.** Ia menjawab pertanyaan yang berbeda, yaitu "siapa yang tercatat **eksplisit** sebagai penyetuju departemen ini", untuk layar admin dan jejak audit pertukarannya. Rantai penuh justru salah di sana: ia akan melaporkan supervisor HR sebagai "penyetuju General Affair" lalu mematikannya saat pertukaran, memutus jalur pengajuan yang sedang berjalan.
+
+#### Satu percobaan yang menggalat menghentikan SELURUH rantai
+
+Galat pada satu lapisan dikembalikan apa adanya, **bukan** di-log lalu dilanjutkan ke lapisan berikutnya. **Jangan mengubahnya jadi "log lalu lanjut", sebab percobaan yang gagal bukan bukti percobaan itu kosong.**
+
+Kerusakannya konkret dan senyap: departemen yang **punya** `is_supervisor` sendiri mengalami galat sesaat di lapisan 1 (cursor timeout, blip failover), lalu lapisan 3 (tebakan judul di departemen yang sama) berhasil dan mengembalikan orang yang `is_supervisor`-nya justru `false`. Pengajuannya dibalas 200, dan `spv_review.employee_id` dipaku ke orang itu **selamanya** di dokumen pengajuan. Itu bentuk persis insiden pembajakan penyetuju 2026-08-12.
+
+Yang **tidak** berubah: hasil **kosong tanpa galat** tetap jatuh ke lapisan berikutnya. Itu jawaban yang sah dan pasti ("departemen ini tak punya siapa-siapa yang cocok"), berbeda dari galat yang berarti "tak tahu".
+
+Konsekuensi bagi pemanggil: lookup penyetuju laporan **gagal-tertutup** (500, bukan `200 {"employee_id":""}`), sementara attendance-service memetakan setiap balasan non-200 ke slice kosong sehingga tak ada layar yang berubah.
 
 **Departemen yang punya atasan sendiri selalu menang atas induknya.** Jadi memisahkan kembali cukup mengangkat supervisor di departemen itu; relasinya tak perlu dikosongkan lebih dulu, dan tak perlu ubah kode maupun deploy.
 
@@ -166,6 +193,28 @@ Mencampur keduanya berbahaya dua arah: menyempitkan tampilan bikin staf HR melih
 	- Form memuat peringatan bahwa mengosongkan relasi tanpa mengangkat supervisor lebih dulu membuat anggotanya kehilangan penyetuju **tanpa pesan error**.
 
 Tampilan KPI menyatukan keduanya sebagai satu entri tanpa menyentuh data — lihat [[HRIS - Key Performance Index]].
+
+## Bukti verifikasi produksi (2026-08-26)
+
+Tiga catatan "prod belum" di dokumen ini sudah tidak berlaku. Yang membuktikannya bukan `docker ps` maupun `git log` di server, melainkan **artefak yang benar-benar berjalan**: repo di server bisa sudah benar sementara containernya belum di-rebuild.
+
+**Backend** (`Employee-Service`, image dibangun 2026-08-26 11:11 WIB). Grep biner `/service`:
+
+| String | Hit | Membuktikan |
+|---|---|---|
+| `department_approver_log` | 1 | jejak audit pertukaran penyetuju (PR #1184) |
+| `/departments/:key/approver` | 2 | rute penetapan penyetuju |
+| `/internal/department-approver` | 1 | lookup penyetuju laporan (PR #1201) |
+| `atasanDepartemen` · `penyetujuUntukLookup` | 3 · 1 | rantai atasan yang disatukan |
+| `DepartmentGroups` · `SupervisorLookupOrder` | 1 · 1 | peleburan simpul `HRGA` di org chart (PR #890) |
+| `master_job_level` | 5 | jenjang jabatan |
+| *(kontrol negatif, string karangan)* | **0** | grep-nya memang membedakan |
+
+**Frontend** (`frontend-hris-dashboard`, image dibangun 2026-08-26 14:47 WIB). Rute `(main)/pengaturan/organisasi`, `(main)/hris/org-chart`, dan `(main)/hris/employee/atasan-langsung` ketiganya ada di `/app/.next/server/app`; string locale `"Assign one approver per department"`, `"Decide who approves a department"`, dan `"Position Levels"` ada di bundel JS (masing-masing 2 berkas), kontrol negatif **0**.
+
+⚠️ **Umur IMAGE yang dibaca, bukan umur container.** Container bisa muda karena restart biasa; hanya image baru yang membuktikan rebuild. Resep lengkapnya di [[RUN - Deploy Microservices bip-erp]].
+
+⚠️ Probe ini membuktikan **kodenya terpasang**, bukan bahwa alurnya sudah dijalani orang. Untuk penyetuju pengajuan, bukti pemakaian yang sesungguhnya adalah isi `department_approver_log`. Belum dihitung.
 
 ## Keterkaitan
 
