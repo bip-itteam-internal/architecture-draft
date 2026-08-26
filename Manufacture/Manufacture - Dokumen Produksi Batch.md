@@ -48,7 +48,7 @@ Mengikuti urutan & format dokumen manual:
 
 ### Rekonsiliasi Pemakaian vs MO (support ticket 2026-07) — ✅ menu terpisah "Rekonsiliasi MO"
 - Kebutuhan tiket ("agar **jumlah MO sesuai pemakaian**") **bukan** bagian dokumen batch asli & Laporan Produksi tak menampung data per-bahan → dibuat **menu tersendiri** `RekonMoView` (`/manufacture/rekonsiliasi-mo`, tab `rekon_mo`), **memakai koleksi `manufacture_batch_record` yang sama** (Ditimbang tetap satu sumber — tak diduplikasi), **tidak** ikut cetak 7-lembar dossier.
-- Per bahan menampilkan **MO** (dari [[Manufacture - Order Production Workflow (Flow Source)|Material Order]] `qty_needed_total`, by `no_batch`) · **Ditimbang** (dari dossier, Restu) · **Sisa** (diisi **Mame**) · **Pemakaian** (= Ditimbang − Sisa) · **Selisih vs MO** (kuning bila ≠). Plus **Hasil PCS** (`rekon_produk_jadi`).
+- Per bahan menampilkan **MO** (dari [[Manufacture - Material Order (SPK)|Material Order]] `qty_needed_total`, by `no_batch`) · **Ditimbang** (dari dossier, Restu) · **Sisa** (diisi **Mame**) · **Pemakaian** (= Ditimbang − Sisa) · **Selisih vs MO** (kuning bila ≠). Plus **Hasil PCS** (`rekon_produk_jadi`).
 - **SPV QC** memeriksa: ceklis "Kelengkapan hasil produksi" + "Hasil timbangan dari produksi" + catatan → tandai **DICEK**. Output **Perusahaan** = cetak softfile ("Laporan Catatan Pengolahan dan Pengemasan Batch"); **BPOM** tetap fisik/di luar sistem.
 - Endpoint: `PUT .../batch-record/:id/rekon-mo` (isi Sisa+qty_mo; `requireBatchCreate` = admin produksi/RM) · `POST .../batch-record/:id/rekon-mo/approve` (`requireBatchApprove` = QC/RnD). Field: `rekon_mo_status` ("" | "DICEK"), `rekon_mo_ceklis`, `rekon_mo_catatan`, `rekon_mo_diperiksa_oleh_*`, `rekon_mo_diperiksa_at`. `qty_mo`/`sisa`/`pemakaian` di `penimbangan` (sebelumnya dormant) kini dipakai di sini.
 - Gate: `admin_gudang_rm` masuk `bolehBuatBatchRecord` + `requireBatchCreate`; matriks tab `rekon_mo` = {admin_produksi, admin_gudang_rm, qc, rnd} (FE `akses.ts` + BE `rbac.go`).
@@ -66,11 +66,11 @@ Mengikuti urutan & format dokumen manual:
 - Filter status berbentuk **tab** (Semua/Draft/Diajukan/Lulus/Ditolak + hitungan) + **filter bulan-tahun** (default bulan berjalan) + pencarian. Kolom: No. Dossier · Produk · No. Batch · Tgl · **Mengajukan** · **Menyetujui** · Status. Untuk akun QC-only: default tab **Diajukan** & baris DRAFT disembunyikan.
 
 ### Rantai No. Batch: MO → Dokumen Produksi → Laporan Produksi
-- **No. Batch dossier** = **dropdown** dari No. Batch [[Manufacture - Order Production Workflow (Flow Source)|Material Order]] (`no_batch_reference`) yang **belum dipakai** dossier mana pun (+ no_batch dossier yang sedang dibuka). Jadi tiap MO hanya bisa dijadikan satu dokumen produksi. **Pilih No. Batch → auto-isi** kode/nama produk, formula (bila `product_sku` cocok), & tabel **penimbangan** dari bahan MO (`teoritis = qty_needed_total`).
+- **No. Batch dossier** = **dropdown** dari No. Batch [[Manufacture - Material Order (SPK)|Material Order]] (`no_batch_reference`) yang **belum dipakai** dossier mana pun (+ no_batch dossier yang sedang dibuka). Jadi tiap MO hanya bisa dijadikan satu dokumen produksi. **Pilih No. Batch → auto-isi** kode/nama produk, formula (bila `product_sku` cocok), & tabel **penimbangan** dari bahan MO (`teoritis = qty_needed_total`).
 - **No. Batch Laporan Produksi** = **dropdown** dari dokumen produksi ber-status **LULUS** yang **belum dibuat laporannya** (+ no_batch laporan yang sedang diedit). **Pilih → auto-isi** produk (kode/nama), qty produk jadi (`rekon_produk_jadi.nyata`), & tanggal (`tgl_selesai_olah`). Filter client-side (diff daftar MO/dossier/production-log).
 
 ### Tautan silang ke Laporan Produksi
-- Dicocokkan berdasarkan **`no_batch`** yang sama: dari dossier, **No. Batch** menjadi link ke [[Manufacture - Order Production Workflow (Flow Source)|Laporan Produksi]] (`/manufacture/production?batch=<no_batch>`), dan sebaliknya baris Laporan Produksi menampilkan link **"Dokumen Batch"**. Menu tujuan otomatis ter-prefilter. (Klien mem-fetch set `no_batch` menu lawan; link muncul hanya bila ada padanan. Link ke Laporan Produksi disembunyikan untuk QC-only yang tak punya akses menu itu.)
+- Dicocokkan berdasarkan **`no_batch`** yang sama: dari dossier, **No. Batch** menjadi link ke [[Microservices - Manufacture Service|Laporan Produksi]] (`/manufacture/production?batch=<no_batch>`), dan sebaliknya baris Laporan Produksi menampilkan link **"Dokumen Batch"**. Menu tujuan otomatis ter-prefilter. (Klien mem-fetch set `no_batch` menu lawan; link muncul hanya bila ada padanan. Link ke Laporan Produksi disembunyikan untuk QC-only yang tak punya akses menu itu.)
 
 ## Model Data & Endpoint
 
@@ -101,5 +101,7 @@ Mengikuti urutan & format dokumen manual:
 
 - [[QA - Batch Record & Traceability]] — konsep QA/RA batch record & ketertelusuran (dokumen ini adalah implementasi digitalnya).
 - [[QA - CPOB (GMP)]] — konteks kepatuhan CPOB (form kesiapan ruang, rekonsiliasi, release for sale).
-- [[Manufacture - Order Production Workflow (Flow Source)]] — alur produksi & Laporan Produksi (tertaut via `no_batch`).
+- [[Manufacture - Material Order (SPK)]] — hulu rantai: MO menerbitkan No. Batch + `qty_needed_total` yang dipakai dossier ini.
+- [[Microservices - Manufacture Service]] — Laporan Produksi (`production-log`), tertaut via `no_batch`.
+- [[Manufacture - Order Production Workflow (Flow Source)]] — flowchart Work Order & BOM di sisi Accurate (hulu konseptual, bukan alur menu WMS).
 - [[Manufacture - Stock & Material Management]] — pencatatan stok bahan & produk jadi (di luar lingkup dossier ini).

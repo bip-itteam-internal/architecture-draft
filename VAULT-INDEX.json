@@ -2201,12 +2201,14 @@
         "Microservices - Employee Service",
         "GA - Procurement System",
         "ADR - 0001 Akuntansi via Accurate",
+        "Manufacture - Material Order (SPK)",
+        "Manufacture - Dokumen Produksi Batch",
         "DB - Overview and Notes",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
-      "hash": "a08229fcb206f17ad0fe22d78a01bcb36b7244c24a9dae5ae90b380c9bbe1fe8",
-      "ukuran_kb": 64.3,
-      "ringkasan": "Menjawab: apa fungsi manufacture-service sebagai WMS manufaktur (master bahan/produk, stok, transaksi in/out, formula/BOM, produksi, saldo awal bulanan), dari mana sumber master (bahan & stok dari Accurate read-only, barang jadi dari HPP, formula dari Excel), dan bagaimana push pergerakan WMS ke Accurate bekerja. Menjelaskan stack/port/database, jebakan sync (align kode Accurate, satuan KG vs gram, format transDate dd/MM/yyyy), serta perilaku saldo awal/akhir bulanan yang idempoten.",
+      "hash": "f4ec06220ca2ab2705dd30019f9611cd4f3b2f73fbf7d4584ba927d7f161c35a",
+      "ukuran_kb": 64.5,
+      "ringkasan": "Menjawab: apa fungsi manufacture-service sebagai WMS manufaktur (master bahan/produk, stok, transaksi in/out, formula/BOM, produksi, material order, PO, saldo awal bulanan), dari mana sumber master (bahan & stok dari Accurate read-only, barang jadi dari HPP, formula dari Excel), dan bagaimana push pergerakan WMS ke Accurate bekerja. Menjelaskan stack/port/database, gerbang RBAC per-tab, jebakan sync (align kode Accurate, satuan KG vs gram, format transDate dd/MM/yyyy), serta perilaku saldo awal/akhir bulanan yang idempoten. Juga jadi rujukan Laporan Produksi (production-log) yang ditaut menu lain lewat no_batch.",
       "kata_kunci": [
         "manufacture service",
         "WMS",
@@ -2219,7 +2221,10 @@
         "push pergerakan",
         "saldo awal bulanan",
         "HPP",
-        "sync"
+        "sync",
+        "laporan produksi",
+        "production-log",
+        "RBAC WMS"
       ]
     },
     {
@@ -7352,7 +7357,7 @@
       "status_teks": "Implemented",
       "publik": true,
       "tautan": [
-        "Manufacture - Order Production Workflow (Flow Source)",
+        "Manufacture - Material Order (SPK)",
         "Microservices - Manufacture Service",
         "API - Manufacture Service",
         "Manufacture - Stock & Material Management",
@@ -7361,11 +7366,12 @@
         "CORE - API Master Gateway",
         "APP - Web ERP",
         "QA - Batch Record & Traceability",
-        "QA - CPOB (GMP)"
+        "QA - CPOB (GMP)",
+        "Manufacture - Order Production Workflow (Flow Source)"
       ],
-      "hash": "dd084ecd166a8c13255bc2dec23c8afb425d4b54827a33168fe80668e2b84898",
-      "ukuran_kb": 15.7,
-      "ringkasan": "Menjawab: bagaimana dokumen batch produksi (batch release dossier 7 lembar) yang dulu manual dikerjakan di WMS, siapa mengisi bagian mana (admin RM, admin produksi, QC/RnD, PPIC/SPV), dan bagaimana alur DRAFT ke DIAJUKAN ke LULUS atau DITOLAK dijaga di server. Menjelaskan mode pengecekan QC (field milik QC dikunci di form admin dan hanya bisa diisi di layar review), paraf by jabatan lewat roster, serta paraf digital berjenjang per baris yang mengunci approval sampai semua slot terparaf. Berguna untuk memahami isi tiap lembar, penimbangan dan rekonsiliasi, cetak PDF, serta rantai nomor batch dari MO ke Laporan Produksi.",
+      "hash": "d4f997013835e282e40df9a28906dee69a25d17259da5be164efa1298af7ae7f",
+      "ukuran_kb": 15.9,
+      "ringkasan": "Menjawab: bagaimana dokumen batch produksi (batch release dossier 7 lembar) yang dulu manual dikerjakan di WMS, siapa mengisi bagian mana (admin RM, admin produksi, QC/RnD, PPIC/SPV), dan bagaimana alur DRAFT ke DIAJUKAN ke LULUS atau DITOLAK dijaga di server. Menjelaskan mode pengecekan QC (field milik QC dikunci di form admin dan hanya bisa diisi di layar review), paraf by jabatan lewat roster, serta paraf digital berjenjang per baris yang mengunci approval sampai semua slot terparaf. Berguna untuk memahami isi tiap lembar, penimbangan dan rekonsiliasi, cetak PDF, serta rantai nomor batch dari Material Order ke dossier lalu ke Laporan Produksi, termasuk menu terpisah Rekonsiliasi MO.",
       "kata_kunci": [
         "dokumen produksi batch",
         "batch record",
@@ -7376,6 +7382,8 @@
         "approval produksi",
         "penimbangan",
         "rekonsiliasi MO",
+        "no batch",
+        "material order",
         "manufacture"
       ]
     },
@@ -7385,16 +7393,17 @@
       "area": "Manufacture",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Issue / Sebagian diperbaiki — **B9 ✅ masuk kode (2026-07-29)**; sisanya (B1–B8, F1–F6) plan disetujui, **belum** masuk kode.",
+      "status_teks": "Issue / Sebagian diperbaiki — **B9 ✅ (2026-07-29)**, **F1 & F3 ✅ (terverifikasi 2026-08-26)**; B1–B8 & F6 masih terbuka. **F2, F4, F5 belum diperiksa ulang** sejak audit asli — statusnya di tabel bawah adalah status 2026-06, bukan pembacaan hari ini.",
       "publik": true,
       "tautan": [
         "Microservices - Manufacture Service",
+        "Manufacture - Material Order (SPK)",
         "API - Manufacture Service",
         "Manufacture - Stock & Material Management"
       ],
-      "hash": "b5023b03f0127d810dd0958fd894cf2b4136eabed4dce113dac53df06aaff9fd",
-      "ukuran_kb": 6.0,
-      "ringkasan": "Menjawab: masalah korektnes, keamanan, dan integritas data apa yang ditemukan saat audit kode manufacture-service (temuan backend B1 hingga B9, frontend F1 hingga F6), di file:line mana letaknya, dan apa rencana perbaikan tiap temuan. Juga menjawab status masing-masing (baru B9, gerbang RBAC per-tab, yang sudah masuk kode) dan urutan perbaikan yang disarankan, termasuk mengapa B1 authz proposal tetap terpisah dan belum selesai.",
+      "hash": "567e5a7345c3d9d0d35b1872ffa39b82798e59dbc18a9cae39e2afb420f4deb0",
+      "ukuran_kb": 7.1,
+      "ringkasan": "Menjawab: masalah korektnes, keamanan, dan integritas data apa yang ditemukan saat audit kode manufacture-service (temuan backend B1 hingga B9, frontend F1 hingga F6), di file:line mana letaknya, dan apa rencana perbaikan tiap temuan. Juga menjawab status masing-masing per pemeriksaan terakhir: B9 (gerbang RBAC per-tab), F1 (mapper snake ke camel), dan F3 (proposal dipersist ke backend) sudah selesai, sementara B1 authz proposal dan F6 status FG masih terbuka. Menyebut eksplisit baris mana yang belum diperiksa ulang sehingga statusnya masih pembacaan 2026-06.",
       "kata_kunci": [
         "audit kode",
         "manufacture",
@@ -7406,7 +7415,9 @@
         "severity",
         "mapper snake case",
         "stok minus",
-        "rencana fix"
+        "rencana fix",
+        "F1",
+        "B9"
       ]
     },
     {
@@ -7487,8 +7498,23 @@
       ],
       "hash": "465590d512d99f9e3dff92193e309599e6d6fffa28a20502a47e759f7c75e86c",
       "ukuran_kb": 10.5,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: apa itu Material Order (MO) di WMS, yaitu lembar SPK formula yang menurunkan kebutuhan tiap bahan dari BOM berdasarkan produk jadi dan target qty, siapa yang boleh membuatnya, dan bagaimana MO menjadi hulu rantai No. Batch menuju dokumen produksi batch dan Laporan Produksi. Menjelaskan bentuk data (target_qty, ingredients dengan qty_needed_total, no_batch_reference), ketiga endpoint GET/POST/DELETE beserta gerbang tab orders_po, dan mengapa MO tidak menyentuh stok. Memuat gap yang sudah terbukti: tak ada endpoint update, tak ada status/approval, nomor MO dan No. Batch dibuat acak di browser sehingga No. Batch kembar menyatu diam-diam di dropdown dossier, qty dihitung frontend tanpa dihitung ulang server, varian Formula 2 hanya jejak teks di keterangan, dan read-only Procurement belum bergerbang di backend.",
+      "kata_kunci": [
+        "material order",
+        "MO",
+        "SPK",
+        "SPK formula",
+        "orders_po",
+        "no_batch_reference",
+        "qty_needed_total",
+        "BOM",
+        "formula",
+        "target qty",
+        "kebutuhan bahan",
+        "PPIC",
+        "WMS",
+        "manufacture"
+      ]
     },
     {
       "path": "Manufacture/Manufacture - Order Production Workflow (Flow Source).md",
@@ -7496,24 +7522,29 @@
       "area": "Manufacture",
       "jenis": "domain",
       "status_emoji": "🟡",
-      "status_teks": "Konsep / Source — sumber flowchart (Mermaid) alur order produksi.",
+      "status_teks": "Konsep / Source — sumber flowchart (Mermaid) alur order produksi **di sisi [[External - Accurate]]** (target qty → Work Order → baca BOM → simulasi → rilis).",
       "publik": true,
       "tautan": [
-        "Manufacture - Stock & Material Management",
         "External - Accurate",
+        "Manufacture - Material Order (SPK)",
+        "Manufacture - Dokumen Produksi Batch",
+        "Manufacture - Stock & Material Management",
         "Microservices - Manufacture Service"
       ],
-      "hash": "126686eb2c45cd61090353a32107045c70b44ed83bfee5f84ee5b7c939a62ec8",
-      "ukuran_kb": 1.4,
-      "ringkasan": "Menjawab: bagaimana alur order produksi digambarkan secara visual, mulai dari input target qty barang jadi, pembuatan Work Order, pembacaan BOM, simulasi kebutuhan bahan, hingga rilis produksi final, dalam bentuk sumber diagram Mermaid.",
+      "hash": "eeef3e31a47dc8ac407d70531b2c84159360c0d2b025db9678c7596cf8710914",
+      "ukuran_kb": 1.9,
+      "ringkasan": "Menjawab: bagaimana alur order produksi di sisi Accurate digambarkan secara visual, mulai dari input target qty barang jadi, pembuatan Work Order, pembacaan BOM aktif, kalkulasi dan simulasi kebutuhan bahan, sampai rilis produksi final, dalam bentuk sumber diagram Mermaid. Menegaskan bahwa dokumen ini BUKAN dokumentasi menu Material Order (MO) di WMS, yang punya koleksi dan endpoint sendiri, karena dok ini sempat jadi sasaran wikilink beralias Material Order.",
       "kata_kunci": [
         "flowchart",
         "order production workflow",
         "BOM",
         "work order",
+        "WO",
+        "Accurate",
         "diagram alur",
         "Mermaid",
-        "rilis produksi"
+        "rilis produksi",
+        "simulasi kebutuhan"
       ]
     },
     {
@@ -7532,6 +7563,8 @@
         "APP - Web ERP",
         "Microservices - Inventory Service",
         "GA - Inventory Management",
+        "Manufacture - Material Order (SPK)",
+        "Manufacture - Dokumen Produksi Batch",
         "GA - Procurement System",
         "APP - MyBharata",
         "Manufacture - Stok Pengecekan Fisik (Flow Source)",
@@ -7546,17 +7579,20 @@
         "Manufacture - Issue ED Material after Stock Opname",
         "Manufacture - Order Production Workflow (Flow Source)"
       ],
-      "hash": "2d1710f0f498bfc7950f85655a687d0a801dd3bf3dfec7e42fcf9de4ebfe4fd5",
-      "ukuran_kb": 10.1,
-      "ringkasan": "Menjawab pertanyaan tentang rancangan sistem manajemen stok & material manufaktur: fitur inti (master material, stok per gudang, BOM/resep, perencanaan kebutuhan, stock opname), pemetaan model data konseptual ke koleksi nyata di manufacture-service, dan tahap rollout mana yang sudah maupun belum berjalan.",
+      "hash": "61ecb734ec680883daa7e2c7aa94e36221f4cbfdebf59caded952a8f6cfdc4d2",
+      "ukuran_kb": 10.3,
+      "ringkasan": "Menjawab pertanyaan tentang rancangan sistem manajemen stok & material manufaktur: fitur inti (master material, stok per gudang, BOM/resep termasuk varian Formula 1/2, perencanaan kebutuhan, stock opname), pemetaan model data konseptual ke koleksi nyata di manufacture-service, dan tahap rollout mana yang sudah maupun belum berjalan. Berguna untuk melihat bagian mana dari perencanaan kebutuhan yang sudah terealisasi (lewat Material Order) dan mana yang masih TBD (perhitungan kekurangan otomatis ke pengadaan, opname digital penuh, multi-gudang sejati).",
       "kata_kunci": [
         "manufacture-service",
         "stok",
         "material",
         "BOM",
         "resep",
+        "formula 1",
+        "formula 2",
         "stock opname",
         "perencanaan kebutuhan",
+        "kekurangan",
         "gudang",
         "WMS",
         "rollout"
@@ -10269,7 +10305,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Manufacture/Manufacture - Material Order (SPK).md"
-  ]
+  "gagal": []
 }

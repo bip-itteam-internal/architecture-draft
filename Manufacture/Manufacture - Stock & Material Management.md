@@ -19,7 +19,7 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 
 - **Master Material** — kode terstandar (migrasi + cleanup dari spreadsheet: kode pembantu → kode penyesuaian), nama, kategori, jenis, satuan, dan **status pergerakan** (fast / medium / slow moving, bad stock, tidak aktif, belum launching)
 - **Stok per gudang/lokasi** — termasuk **gudang karantina** untuk barang rusak/kadaluarsa (ED)
-- **BOM / Resep** (hybrid) — komponen bahan baku/kemas per barang jadi/WIP. **Dua varian resep** (Formula 1 / Formula 2): sebagian produk punya resep alternatif dengan bahan sama tapi qty beda (dari import Excel grup kolom `FURMULA 2`). Menu operasional (**RM Keluar Ke Produksi**, **Material Order**, **Batch Record**) menampilkan pilihan Formula 1/2 **hanya bila produk punya F2** — kalau tidak, langsung Formula 1. Rencana Produksi (kapasitas) tetap default Formula 1.
+- **BOM / Resep** (hybrid) — komponen bahan baku/kemas per barang jadi/WIP. **Dua varian resep** (Formula 1 / Formula 2): sebagian produk punya resep alternatif dengan bahan sama tapi qty beda (dari import Excel grup kolom `FURMULA 2`). Menu operasional (**RM Keluar Ke Produksi**, **[[Manufacture - Material Order (SPK)|Material Order]]**, **[[Manufacture - Dokumen Produksi Batch|Batch Record]]**) menampilkan pilihan Formula 1/2 **hanya bila produk punya F2** — kalau tidak, langsung Formula 1. Rencana Produksi (kapasitas) tetap default Formula 1.
 - **Perencanaan kebutuhan** — rencana produksi/target → kebutuhan dihitung otomatis via BOM, **bisa di-override/tambah manual** (hybrid)
 - **Perhitungan kekurangan** — kebutuhan vs stok → daftar kekurangan → diteruskan ke [[GA - Procurement System]] untuk pengadaan
 - **Stock opname & penyesuaian** — integrasi flow yang sudah ada: hitung fisik → selisih sistem vs fisik → barang rusak/ED ke karantina (input + foto via [[APP - MyBharata]]) → berita acara → adjustment. Flowchart: [[Manufacture - Stok Pengecekan Fisik (Flow Source)]]
@@ -68,6 +68,7 @@ Bahan Baku · Bahan Kemas · Barang Setengah Jadi (WIP) · Barang Jadi — dihub
 ## Dependensi / Dokumen Terkait
 
 - [[Microservices - Manufacture Service]] (implementasi) · [[API - Manufacture Service]] (endpoint)
+- [[Manufacture - Material Order (SPK)]] — penurunan kebutuhan bahan dari BOM yang sudah berjalan (SPK + No. Batch); bagian "perencanaan kebutuhan" di atas yang sudah terealisasi
 - [[Manufacture - Issue Material Miss Count]] · [[Manufacture - Issue ED Material after Stock Opname]] — issue produksi yang dijawab sistem ini
 - **Flow source (Mermaid)**: [[Manufacture - Order Production Workflow (Flow Source)]] · [[Manufacture - Stok Pengecekan Fisik (Flow Source)]]
 - [[WH - Management System]] · [[WH - Inbound (Receiving)]] · [[WH - Outbound (Sending)]]

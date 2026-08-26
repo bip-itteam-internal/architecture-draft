@@ -2,7 +2,7 @@
 
 *Hasil audit kode service [[Microservices - Manufacture Service]] (backend Go + frontend Next.js) per 2026-06-26. Mendaftar temuan korektnes, keamanan, dan integritas data beserta lokasi `file:line` dan rencana perbaikan. Point-in-time record — status per temuan diperbarui saat fix masuk.*
 
-- **Status**: ⚠️ Issue / Sebagian diperbaiki — **B9 ✅ masuk kode (2026-07-29)**; sisanya (B1–B8, F1–F6) plan disetujui, **belum** masuk kode.
+- **Status**: ⚠️ Issue / Sebagian diperbaiki — **B9 ✅ (2026-07-29)**, **F1 & F3 ✅ (terverifikasi 2026-08-26)**; B1–B8 & F6 masih terbuka. **F2, F4, F5 belum diperiksa ulang** sejak audit asli — statusnya di tabel bawah adalah status 2026-06, bukan pembacaan hari ini.
 - **Cakupan**: `bip-erp/services/manufacture/*` + `erp-frontend/src/features/manufacture/*`.
 
 ## Temuan Backend (Go)
@@ -23,19 +23,22 @@
 
 | # | Lokasi | Severity | Masalah | Rencana fix | Status |
 |---|---|---|---|---|---|
-| F1 | `manufacture-app.tsx` (materialOrders/marketingPOs/procurementPOs/proposals/productionLogs) | 🔴 Critical | Set `as any` dari Go (snake_case) tanpa mapper → komponen baca camelCase → `undefined` → crash cetak/`toLocaleString()` + tabel kosong. Pola sama bug formula. | Tambah mapper `mapMaterialOrder/mapMarketingPO/mapProcurementPO/mapProductionLog/mapProposal` (snake→camel). | 🟡 Belum |
+| F1 | `manufacture-app.tsx` (materialOrders/marketingPOs/procurementPOs/proposals/productionLogs) | 🔴 Critical | Set `as any` dari Go (snake_case) tanpa mapper → komponen baca camelCase → `undefined` → crash cetak/`toLocaleString()` + tabel kosong. Pola sama bug formula. | Tambah mapper `mapMaterialOrder/mapMarketingPO/mapProcurementPO/mapProductionLog/mapProposal` (snake→camel). | ✅ Done (verif. 2026-08-26) |
 | F2 | `manufacture-app.tsx` `mapTransaksiToLegacy` | 🟠 Major | Map hanya 6 field; `date/customerOrSupplier/picQc/driver` kosong → ledger & Dashboard tak akurat. | Perluas mapper transaksi sesuai field Go. | 🟡 Belum |
-| F3 | `ApprovalsAccountsView.tsx` + `handleCreateProposal` | 🔴 Critical | Approve/Reject/Create proposal hanya state lokal — tidak POST ke Go → hilang saat refresh; koreksi stok tak persisten. | Panggil endpoint Go yang sudah ada (`POST /proposal`, `/proposal/:id/approve`, `/reject`) + refetch. | 🟡 Belum |
+| F3 | `ApprovalsAccountsView.tsx` + `handleCreateProposal` | 🔴 Critical | Approve/Reject/Create proposal hanya state lokal — tidak POST ke Go → hilang saat refresh; koreksi stok tak persisten. | Panggil endpoint Go yang sudah ada (`POST /proposal`, `/proposal/:id/approve`, `/reject`) + refetch. | ✅ Done (verif. 2026-08-26) |
 | F4 | view stok (GudangBahanBaku/BarangJadi/Production) | 🟠 Major | `onUpdateStock` lokal setelah POST+refetch → **double-count** stok sesaat. | Hapus mutasi lokal pasca-POST; andalkan refetch server. | 🟡 Belum |
 | F5 | `manufacture-app.tsx` `loadData` | 🟠 Major | master/stok/transaksi tanpa `.catch` per-request → satu gagal → layar kosong total; tak ada loading/error state. | `.catch` per-request / `Promise.allSettled` + state loading/error. | 🟡 Belum |
-| F6 | `manufacture-app.tsx:189` | 🟡 Minor | Ternary status FG `... ? "ACTIVE" : "ACTIVE"` → produk DISCONTINUED tetap ACTIVE. | Perbaiki cabang false → `"DISCONTINUED"`. | 🟡 Belum |
+| F6 | `manufacture-app.tsx:509` (dulu `:189`) | 🟡 Minor | Ternary status FG `... ? "ACTIVE" : "ACTIVE"` → produk DISCONTINUED tetap ACTIVE. | Perbaiki cabang false → `"DISCONTINUED"`. | 🟡 Belum (masih ada 2026-08-26) |
 
 ## Catatan
 
 - Formula mapper (`mapFormulaToLegacy`) **sudah** diperbaiki (commit FE 2026-06-26); F1 adalah pola yang sama untuk 5 entitas sisanya.
 - Endpoint approve/reject/create proposal **sudah ada** di backend; F3 murni soal FE memanggilnya.
 - **B9 selesai 2026-07-29** (`rbac.go` + wiring `main.go` + `rbac_test.go`): seluruh rute WMS kini bergerbang RBAC per-tab. Menutup kelas kerentanan "endpoint terbuka", tapi **B1 tetap terpisah & belum**: rute proposal kini tergerbang ke tab `orders_po`, namun `ApproveProposal` masih membaca `role` dari **body** untuk alur PPIC→SPV — perbaiki sesuai rencana B1 (ambil dari `BIP-System-Roles`).
-- Urutan perbaikan disarankan: ~~B1 (security)~~ → **B9 ✅** → B1 (authz proposal) → F1 (crash) → B2/B3 (race) → B4 → F3 → sisanya.
+- **F1 selesai** (verifikasi 2026-08-26): kelima mapper ada di `manufacture-app.tsx` — `mapMaterialOrderToLegacy:115`, `mapMarketingPOToLegacy:155`, `mapProcurementPOToLegacy:207`, `mapProductionLogToLegacy:240`, `mapProposalToLegacy:272`. Bentuk data MO yang dipetakan: [[Manufacture - Material Order (SPK)]].
+- **F3 selesai** (verifikasi 2026-08-26): `POST /api/manufacture/proposal` (`manufacture-app.tsx:948`), `/proposal/:id/approve` (`ApprovalsAccountsView.tsx:59`), `/proposal/:id/reject` (`:146`). **B1 tetap terbuka** — FE kini benar memanggil backend, tapi `ApproveProposal` di Go masih membaca `role` dari body.
+- ⚠️ **Yang diperiksa ulang pada 2026-08-26 hanya F1, F3, dan F6.** Baris lain (B1–B8, F2, F4, F5) tidak dibuka; statusnya masih pembacaan 2026-06 dan bisa saja sudah usang. Jangan simpulkan "belum" dari tabel ini tanpa cek kode.
+- Urutan perbaikan disarankan: ~~B1 (security)~~ → **B9 ✅** → B1 (authz proposal) → ~~F1 (crash)~~ **✅** → B2/B3 (race) → B4 → ~~F3~~ **✅** → sisanya.
 
 ## Dokumen Terkait
 

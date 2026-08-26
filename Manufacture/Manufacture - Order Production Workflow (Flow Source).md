@@ -1,6 +1,7 @@
 # Order Production Workflow (Flow Source)
 
-- **Status**: 🟡 Konsep / Source — sumber flowchart (Mermaid) alur order produksi.
+- **Status**: 🟡 Konsep / Source — sumber flowchart (Mermaid) alur order produksi **di sisi [[External - Accurate]]** (target qty → Work Order → baca BOM → simulasi → rilis).
+- ⚠️ **Bukan** dokumentasi menu **Material Order (MO)** di WMS — itu entitas lain dengan koleksi & endpoint sendiri, lihat [[Manufacture - Material Order (SPK)]]. Dok ini sempat dijadikan sasaran wikilink beralias "Material Order" dari [[Manufacture - Dokumen Produksi Batch]]; sudah dialihkan 2026-08-26.
 
 File Mermaid
 ```
@@ -59,6 +60,7 @@ flowchart TD
 
 ## Dokumen Terkait
 
+- [[Manufacture - Material Order (SPK)]] (padanan alur ini di dalam WMS: SPK formula + No. Batch)
 - [[Manufacture - Stock & Material Management]] (dok induk: BOM/formula & perencanaan kebutuhan)
 - [[External - Accurate]] (Work Order & BOM aktif dibaca dari sini)
 - [[Microservices - Manufacture Service]] (implementasi `manufacture_formula`)

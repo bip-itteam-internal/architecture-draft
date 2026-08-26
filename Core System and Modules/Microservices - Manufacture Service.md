@@ -115,6 +115,7 @@ Daftar rute lengkap di [[API - Manufacture Service]]. Ringkas:
 ## Dokumen Terkait
 
 - [[Manufacture - Stock & Material Management]] (konsep/desain) · [[API - Manufacture Service]] (endpoint)
+- [[Manufacture - Material Order (SPK)]] (SPK formula — `manufacture_material_order`, hulu No. Batch) · [[Manufacture - Dokumen Produksi Batch]] (dossier batch release)
 - [[DB - Overview and Notes]] · [[APP - Web ERP]]
 - [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] (pemisahan log sumber/input + stempel penginput)
 - [[ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace]] (kenapa `resi_sync_state` terpisah dari dokumen order — relevan karena Master Resi service ini yang mengonsumsi hasilnya)
