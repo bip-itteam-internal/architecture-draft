@@ -2,7 +2,7 @@
 
 *Membuat template KPI dan menetapkan targetnya dikerjakan di **satu layar**, bukan dua. Pemisahannya sebelumnya adalah keputusan sadar yang ditulis sebagai komentar di kode, jadi pembalikannya ditulis sebagai ADR supaya tidak dibalik lagi diam-diam.*
 
-- **Status**: ⚠️ **Diputuskan 2026-08-25, seluruhnya merged; backend live di produksi, frontend baru sebagian.** Backend [#1423](https://github.com/bip-itteam-internal/bip-erp/pull/1423) + [#1425](https://github.com/bip-itteam-internal/bip-erp/pull/1425) **terverifikasi live** (bentuk respons `/kpi/sumber-katalog` di prod memuat `scope_didukung`·`scope_baku`·`formula_baku`·`formula_metrik`·`grup`, 2026-08-25). Frontend [#1214](https://github.com/bip-itteam-internal/erp-frontend/pull/1214) **live** (editor gabungan + perbaikan 400); [#1217](https://github.com/bip-itteam-internal/erp-frontend/pull/1217) (pengelompokan sumber), [#1218](https://github.com/bip-itteam-internal/erp-frontend/pull/1218) (label lengkap), [#1220](https://github.com/bip-itteam-internal/erp-frontend/pull/1220) (kartu ringkasan + pencarian lintas departemen), dan [#1230](https://github.com/bip-itteam-internal/erp-frontend/pull/1230) (daftar template ikut struktur tabel HRIS) **merged tetapi BELUM di-deploy** — prod FE berhenti di merge #1216 (dibuktikan: string `"Search source or metric"` ada di bundel prod, `"Marketing & Stores"` tidak).
+- **Status**: ⚠️ **Diputuskan 2026-08-25, seluruhnya merged; backend live di produksi, frontend baru sebagian.** Backend [#1423](https://github.com/bip-itteam-internal/bip-erp/pull/1423) + [#1425](https://github.com/bip-itteam-internal/bip-erp/pull/1425) **terverifikasi live** (bentuk respons `/kpi/sumber-katalog` di prod memuat `scope_didukung`·`scope_baku`·`formula_baku`·`formula_metrik`·`grup`, 2026-08-25). Frontend [#1214](https://github.com/bip-itteam-internal/erp-frontend/pull/1214) **live** (editor gabungan + perbaikan 400); [#1217](https://github.com/bip-itteam-internal/erp-frontend/pull/1217) (pengelompokan sumber), [#1218](https://github.com/bip-itteam-internal/erp-frontend/pull/1218) (label lengkap), [#1220](https://github.com/bip-itteam-internal/erp-frontend/pull/1220) (kartu ringkasan + pencarian lintas departemen), [#1230](https://github.com/bip-itteam-internal/erp-frontend/pull/1230) (daftar template ikut struktur tabel HRIS), dan [#1237](https://github.com/bip-itteam-internal/erp-frontend/pull/1237) (pemilih sumber jadi dialog · Kelola template jadi Sheet digerbang peran · bobot satu penulis, menuntaskan keputusan 3) **merged tetapi BELUM di-deploy** — prod FE berhenti di merge #1216 (dibuktikan: string `"Search source or metric"` ada di bundel prod, `"Marketing & Stores"` tidak).
 - **Ruang lingkup**: `kpi_template` di [[Microservices - Employee Service]], halaman `/hris/kpi/templates` dan tab Atur Target di `/hris/kpi` pada [[APP - Web ERP]]. Tidak menyentuh `kpi_score` maupun aturan penilaian.
 
 ## Context
@@ -34,9 +34,16 @@ Sebuah cacat yang ditemukan saat mengerjakan ini memperkuat keputusannya. `Auto`
 
 **2. Editornya inline, bukan modal.** Target per karyawan membuka dialognya sendiri, dan dialog di atas dialog adalah bentuk yang sudah dihindari di tempat lain. Karena alasan yang sama, dialog "Kelola Template" yang dulu dibuka dari Atur Target diganti tautan halaman.
 
-**3. ⚠️ Porsi bobot hanya disunting di editor — DIBATALKAN saat merge (2026-08-25).** Niat semula: Atur Target menampilkan porsi tetapi tak mengubahnya, supaya satu angka punya satu tempat. Saat branch ini digabung dengan `origin/main`, ternyata pekerjaan paralel yang **sudah berjalan di produksi** tetap menyunting bobot di layar itu, dan membatalkannya sepihak dinilai lebih berisiko daripada menunda.
+**3. Porsi bobot hanya disunting di satu tempat — sempat DIBATALKAN, TUNTAS 2026-08-26.** Niat semula: Atur Target menampilkan porsi tetapi tak mengubahnya, supaya satu angka punya satu tempat. Saat branch ini digabung dengan `origin/main`, ternyata pekerjaan paralel yang **sudah berjalan di produksi** tetap menyunting bobot di layar itu, dan membatalkannya sepihak dinilai lebih berisiko daripada menunda.
 
-**Keadaan sebenarnya: bobot MASIH dapat diubah dari dua layar**, dan yang belakangan disimpan menang tanpa ada yang diberi tahu. Ini bukan perbaikan yang tertunda melainkan keputusan yang belum tuntas, dan ditulis terang-terangan di test (`atur-target-inline.test.tsx`) supaya tak disangka sudah selesai. Menuntaskannya menuntut kesepakatan dengan pemilik pekerjaan paralel itu lebih dulu.
+Pembatalan itu menyisakan `weight` ditulis dari dua layar lewat endpoint yang sama, dan yang belakangan menyimpan menang tanpa ada yang diberi tahu. Yang menuntaskannya bukan perbaikan teknis melainkan **kesepakatan yang waktu itu belum ada**: struktur (metrik dan porsi) milik HR, target dan sumber data milik atasan yang menilai. Setelah itu disepakati, isian Bobot dan saklar Aktif dicabut dari Atur Target ([#1237](https://github.com/bip-itteam-internal/erp-frontend/pull/1237), merged 2026-08-26).
+
+Dua rincian yang mudah terlewat saat mengubah ini lagi:
+
+- **Saklar `Aktif` ikut dicabut**, bukan dibiarkan. Ia menulis `weight = 0` — fakta yang SAMA dengan bobot. Mengunci satu tanpa yang lain menyisakan dua penulis lewat pintu yang lebih sempit.
+- **Nilainya tetap ditampilkan** di Atur Target. Menyembunyikannya salah: porsi menentukan seberapa besar metrik itu menyumbang skor, dan itu justru yang perlu diketahui orang yang sedang menyetel targetnya.
+
+⚠️ Ditemukan saat mengerjakannya, dan berlaku untuk tiap layar yang meneruskan `weight` tanpa menyuntingnya: `onSimpan` di Atur Target dulu merakit ulang `weight` dari persen bulat (`Math.round(weight * 100) / 100`), sehingga **menyimpan TARGET diam-diam mengubah PORSI** — 0,3333 tersimpan jadi 0,33. Tak ada galat, tak ada test merah. Layar yang hanya menampilkan sebuah angka wajib meneruskannya apa adanya, bukan merakitnya ulang dari bentuk tampilannya.
 
 **4. Tab Atur Target tetap ada**, menyempit ke perannya yang sebenarnya: menyetel target **karyawan tertentu**. Konteks "orang ini" memang milik halaman itu, dan menghapusnya akan memutus alur supervisor yang menyesuaikan target satu orang.
 
@@ -51,7 +58,7 @@ Sebuah cacat yang ditemukan saat mengerjakan ini memperkuat keputusannya. `Auto`
 **Yang membaik**
 
 - Membuat template lengkap selesai tanpa berpindah halaman.
-- ⚠️ ~~Bobot berhenti punya dua sumber kebenaran.~~ **Tidak tercapai**, lihat Decision butir 3.
+- Bobot berhenti punya dua sumber kebenaran. **Tercapai 2026-08-26**, setelah sempat dibatalkan; lihat Decision butir 3.
 - Penyimpanan template yang punya metrik manual berhenti gagal 400. Ini perbaikan bug, bukan sekadar penataan ulang.
 - Cakupan tak lagi bisa tertinggal kosong: katalog selalu menjawab nilai yang lolos validator, termasuk untuk sumber yang mengabaikan cakupan.
 
