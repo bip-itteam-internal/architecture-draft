@@ -32,6 +32,12 @@ _Inventory Service adalah microservice untuk manajemen **aset/inventaris General
   - `GET /item/repair/:repair_id` — detail satu record perbaikan
   - `PATCH /item/repair/:repair_id` — edit satu record perbaikan (`UpdateRepairHistory`)
   - **Bukti nota (✅ 2026-08-22)**: `CreateRepairHistory`/`UpdateRepairHistory` menerima & menyimpan `documents` (`[]common.MinIOFile`, **opsional, boleh >1**) — lampiran nota perbaikan. Di-upload lewat presigned `document:"repair"` lalu **diverifikasi ada di MinIO** (`ValidateDocumentsExists`, anti `NoSuchKey`; samakan pola `CreateInventory`). FE menampilkannya di kartu riwayat (`InfoDocument`)
+- **Penyusutan per pemegang:** `GET /penyusutan?employee_ids=a,b,c` (2026-08-26) — mengembalikan penyusutan **bulanan** tiap orang beserta cacah asetnya. Dipanggil [[Microservices - Insentive Service]] saat merakit biaya operasional; dihitung DI SINI karena datanya milik service ini ([[ADR - 0002 Database-per-Service]]).
+
+  Rumusnya sama dengan estimasi di frontend — harga ÷ masa manfaat ÷ 12 — tetapi **penjaganya berbeda dan itu disengaja**: yang dihitung hanya aset yang masih dipegang (`held_by.hold_period.is_active`), dan **aset yang umur bukunya sudah habis TETAP dibebankan** selama masih dipakai. Di akuntansi Accurate aset seperti itu bernilai nol; di sini yang diukur biaya pemakaian, bukan nilai buku. Angkanya karena itu **tidak akan sama** dengan penyusutan pembukuan, dan itu bukan bug.
+
+  Aset yang belum diisi harga atau masa manfaatnya dikembalikan sebagai `tanpa_data` — dicacah, bukan dilewati diam-diam, supaya beban yang belum terhitung tetap terlihat di layar insentif. Prod 2026-08-26: 70 dari 71 aset marketing lengkap, dan 33 dari 33 aset Account Specialist.
+
 - **Summary / reporting:** `GET /summary` — agregasi `$facet` per category/status/department + new-arrivals 30 hari terakhir + **agregasi biaya** (`total_purchase_cost` dari `purchase_price`, `total_repair_cost` dari `repair_history`)
 
 ## Belum Diimplementasikan / Catatan
