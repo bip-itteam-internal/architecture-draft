@@ -2,7 +2,7 @@
 
 *Modul kas kecil per divisi beserta jalur pengajuan budget, menggantikan aturan yang kini berjalan lewat kesepakatan lisan dan chat. **Lintas divisi**, bukan fitur satu departemen: Finance yang menetapkan plafon dan aturannya, tiap divisi yang memakainya. Dokumen ini menggabungkan blueprint dari Finance dengan hasil pemeriksaan langsung ke data produksi, supaya lubang datanya terlihat sebelum ada yang mulai menulis kode.*
 
-- **Status**: ⚠️ **Jalur pengeluaran kas kecil lengkap dan sudah merge** (delapan PR, 5 Agustus 2026), **belum deploy**. Pengajuan, approval berjenjang, top-up, tutup buku, laporan, dan jurnal belum ada. Empat lubang data dan tiga tabrakan arsitektur masih menghalangi bagian berikutnya.
+- **Status**: ⚠️ **Digantikan sebagian, 26 Agustus 2026.** Jalur **pengajuan budget** diganti oleh [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]]; **kas kecil dipensiunkan bertahap** oleh ADR yang sama. Jalur pengeluaran kas kecil lengkap dan sudah merge (delapan PR, 5 Agustus 2026), **belum deploy** — dan kini tidak akan dilanjutkan. Dokumen ini dipertahankan sebagai catatan aturan bisnis dan lubang data yang ditemukan; aturan yang masih berlaku bagi modul penggantinya adalah ambang nominal, bukan plafon per divisi.
 - **Sumber requirement**: Blueprint Modul Kas Kecil & Pengajuan Budget v1.0 (draft), disusun dari percakapan WhatsApp dengan Finance.
 - **Sumber angka sistem**: sensus langsung `employee_db` dan `procurement_db` produksi, **4 Agustus 2026**.
 - **Terkait**: [[GA - Form Pengadaan dan Pengajuan Dana]] mencatat dua form kertas GA yang menjadi bagian dari alur ini.

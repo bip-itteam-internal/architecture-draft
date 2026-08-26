@@ -60,6 +60,10 @@ Rantai ini berada di **satu service yang sama**, jadi ia membuktikan penyebabnya
 | **Jembatan yang ada** | Pengajuan disetujui menambah `TambahanTopUp` pada `PlafonKas` unit+periode yang sama (`pengajuan_budget_approval.go:125`) |
 | **Akibat** | Yang bisa dijawab hanya *"plafon unit ini bulan ini bertambah sekian"*. **"Transaksi mana merealisasikan pengajuan mana" tak bisa dijawab sama sekali** — padahal itu pertanyaan audit yang wajar. |
 
+✅ **Keputusan sudah diambil, 26 Agustus 2026** — [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]]. Rantai ini **tidak disambung**, melainkan **dihapus dari kedua ujungnya**: `PengajuanBudget` diganti `PengajuanPembelian` yang berjalan sampai barang diterima, dan kas kecil dipensiunkan sehingga `TransaksiKas` berhenti menjadi hilirnya. Pertanyaan TBD *"apakah satu transaksi kas boleh merealisasikan banyak pengajuan"* dengan sendirinya gugur.
+
+⚠️ **Yang lahir sebagai gantinya, dan belum diputuskan**: modul pengganti menerbitkan **PO dan penerimaan sendiri**, sementara jalur `permintaan_erp` → `pesanan_erp` → `penerimaan_erp` di §4 tetap hidup. Dua jalur pengadaan berdampingan di satu service yang sama. Ini konsekuensi yang dicatat sadar di ADR-nya, bukan temuan baru.
+
 ### 4. PR → PO → Penerimaan (setengah jalan, dan inilah yang paling menyesatkan)
 
 | | |
@@ -74,7 +78,11 @@ Rantai ini berada di **satu service yang sama**, jadi ia membuktikan penyebabnya
 
 ### 5. Penerimaan barang → stok (putus)
 
-`BuatPenerimaanHandler` (`penerimaan_erp_handler.go:24-97`) hanya `InsertOne`. Tak ada panggilan ke warehouse/inventory/manufacture; `Gudang` sekadar string bebas. **Barang yang diterima di ERP tidak menambah stok mana pun.**
+`BuatPenerimaanHandler` (`penerimaan_erp_handler.go:24-97`) hanya `InsertOne`. Tak ada panggilan ke warehouse/inventory/manufacture; `Gudang` sekadar string bebas. **Barang yang diterima di ERP tidak menambah stok mana pun.** Diverifikasi ulang 26 Agustus 2026 — masih berlaku.
+
+🟡 **Akan tertutup sebagian** oleh [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]]: penerimaan yang lahir **dari pengajuan pembelian** akan menambah stok (raw material lewat `POST /transaksi` manufacture) atau melahirkan item aset (barang umum di inventory). Penerimaan yang dibuat lewat jalur `penerimaan_erp` biasa **tetap tidak menambah stok** — jadi §5 tidak gugur, hanya menyempit.
+
+Temuan tambahan dari pembacaan yang sama: `services/inventory` **tidak punya stok berjumlah sama sekali** (nol referensi qty/stok). Barang GA dilacak sebagai **aset per unit** — master item, kategori, repair, handover. "Menambah stok gudang GA" karena itu berarti melahirkan item aset, bukan menaikkan angka.
 
 ### 6. Rekrutmen: hire → karyawan → onboarding (rantai ada sampai offer, putus di hire)
 
@@ -129,7 +137,8 @@ Belum diputuskan. Diurutkan menurut **rasio nyeri terhadap ongkos**, bukan menur
 
 - **Apakah arahnya menyambung rantai satu per satu, atau membangun mesin alur bersama.** Belum diputuskan (2026-08-26).
 - **Apakah hire → karyawan dianggap cacat atau desain.** Vault saat ini menyatakannya selesai; mengubahnya butuh keputusan eksplisit.
-- **Apakah satu transaksi kas boleh merealisasikan banyak pengajuan budget.** Menentukan bentuk relasinya (satu-ke-banyak atau banyak-ke-banyak).
+- ~~**Apakah satu transaksi kas boleh merealisasikan banyak pengajuan budget.**~~ **Gugur** 26 Agustus 2026 — kas kecil dipensiunkan, lihat §3.
+- **Apakah dua jalur pengadaan dilebur.** Pengajuan Pembelian menerbitkan PO/penerimaan sendiri sementara jalur PR→PO→RI tetap hidup. Belum diputuskan (2026-08-26).
 - **Nasib `MaterialOrder` yang tak punya status sama sekali.** Ditambahi status, atau dilebur ke entitas permintaan.
 
 ## Cara mengaudit ulang peta ini
