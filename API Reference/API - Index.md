@@ -2,7 +2,7 @@
 
 *Indeks **API Reference** bip-erp — daftar endpoint lengkap per service, grounded ke kode. Satu file per service di folder ini. Untuk konsep/arsitektur tiap service lihat dok `Microservices - *` / `CORE - *` terkait.*
 
-- **Status**: ✅ Grounded ke kode (2026-06-24)
+- **Status**: ✅ Grounded ke kode (disegarkan 2026-08-26: Payroll ditambahkan, tiga service tanpa berkas `API -` didaftar eksplisit)
 - **Sumber kebenaran**: kode service; bila berubah, sinkronkan via `/sync-docs`.
 
 ## Cara routing (penting)
@@ -37,8 +37,23 @@
 | Form Builder ⚠️ | `/api/form-builder/*` | [[API - Form Builder Service]] | [[Microservices - Form Builder Service]] |
 | Marketing Analytics | `/api/marketing-analytics/*` | [[API - Marketing Analytics Service]] | [[Microservices - Marketing Analytics Service]] |
 | Learning | `/api/learning/*` | [[API - Learning Service]] | [[Microservices - Learning Service]] |
+| Payroll | `/api/payroll/*` | [[API - Payroll Service]] | [[Microservices - Payroll Service]] |
 
 > ⚠️ Form Builder sudah merged ke `main` (2026-08-01, PR #849) tapi **belum live di dev** — gateway dev masih membalas `400 unknown service`.
+
+> **Finance sengaja memetakan ke dok domain, bukan `Microservices -`.** Arsitektur finance-service hidup di [[Finance - Rancangan Finance Service]] (folder Finance System), tidak di Core System and Modules seperti service lain. Itu keputusan yang berlaku, bukan berkas yang hilang — jangan membuat `Microservices - Finance Service` sebagai "pelengkap", karena yang lahir adalah sumber kebenaran kedua yang pasti menyimpang.
+
+### Service tanpa berkas `API -` (per audit 2026-08-26)
+
+Empat service terdaftar di gateway tetapi belum punya daftar endpoint di folder ini. **Payroll sudah ditutup** pada audit itu; tiga sisanya belum, dan didaftar di sini supaya ketiadaannya terlihat alih-alih terbaca sebagai "service-nya memang tak punya endpoint".
+
+| Service | Dok arsitektur | Keadaan |
+|---|---|---|
+| Calendar | [[Microservices - Calendar Service]] | Rute per-endpoint tercatat di dok arsitekturnya, belum dipisah jadi berkas `API -` |
+| HRD Document | [[Microservices - HRD Document Service]] | idem |
+| Monitoring | [[Microservices - Monitoring Service]] | idem |
+
+⚠️ **Tabel di atas dihitung dari `bip-erp/services/*` terhadap `origin/main`, bukan dari ingatan.** Cara mengauditnya ulang: bandingkan daftar folder service dengan daftar berkas `API - *.md` di sini. Cacah tangan sudah terbukti meleset berulang kali di [[API - Marketing Analytics Service]].
 
 ## Dokumen Terkait
 

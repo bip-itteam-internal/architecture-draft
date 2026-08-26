@@ -1,6 +1,6 @@
 # Finance System – Penghapusan Data Duplikat di Finance Lama (Java)
 
-⚠️ **Implemented (ada catatan)** — prosedur manual/ad hoc, dipakai selama sistem [[Finance - Bridging App]] (Java/PostgreSQL) masih berjalan berdampingan dengan [[Finance - Bridging App New Golang]].
+> **Status**: ⚠️ **Implemented (ada catatan)** — prosedur manual/ad hoc, dipakai selama sistem [[Finance - Bridging App]] (Java/PostgreSQL) masih berjalan berdampingan dengan [[Finance - Bridging App New Golang]]. Belum ada tooling otomatis; eksekusinya tetap manusia.
 
 ## Deskripsi
 
@@ -8,7 +8,6 @@
 
 - Stack: Python (pandas) di Google Colab untuk generate query → dieksekusi manual via database management tool (mis. DBeaver/pgAdmin) ke PostgreSQL Finance lama.
 - Terkait: [[Finance - Bridging App]] (sistem Java yang datanya dibersihkan)
-- Status: Manual, belum ada tooling otomatis untuk cleanup ini.
 
 ## Kapan Dipakai
 

@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-26",
-  "jumlah_dokumen": 298,
+  "jumlah_dokumen": 299,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -257,7 +257,7 @@
       "area": "API Reference",
       "jenis": "api",
       "status_emoji": "✅",
-      "status_teks": "Grounded ke kode (2026-06-24)",
+      "status_teks": "Grounded ke kode (disegarkan 2026-08-26: Payroll ditambahkan, tiga service tanpa berkas `API -` didaftar eksplisit)",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
@@ -301,23 +301,28 @@
         "Microservices - Marketing Analytics Service",
         "API - Learning Service",
         "Microservices - Learning Service",
+        "API - Payroll Service",
+        "Microservices - Payroll Service",
+        "Microservices - Calendar Service",
+        "Microservices - HRD Document Service",
+        "Microservices - Monitoring Service",
         "DB - Overview and Notes",
         "HOMEPAGE"
       ],
-      "hash": "f0653aa07940411f51a015c1ef02e6a44866ba2ec7cae97cfea747525c7e75a7",
-      "ukuran_kb": 3.6,
-      "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, prefix gateway masing-masing (`/api/<module>/*`), dan di dokumen mana daftar endpoint serta dok arsitekturnya berada. Menjelaskan pula cara routing dasar: semua request lewat API Master Gateway, JWT divalidasi di gateway lalu identitas diteruskan sebagai header `BIP-*`, plus jalur khusus open route dengan service key dan rute public/ext tanpa JWT. Titik awal saat mencari endpoint tapi belum tahu service mana pemiliknya.",
+      "hash": "46076fee08c411a57810c8a4e01edb7184c5664266b29260af71c673a484c983",
+      "ukuran_kb": 5.1,
+      "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, lewat prefix gateway mana masing-masing diakses (`/api/<module>/*`), berkas `API -` mana yang memuat daftar endpoint-nya, dan dok arsitektur mana yang berpasangan dengannya — termasuk Payroll yang kini masuk tabel. Menjelaskan pula cara routing lewat API gateway: validasi JWT lalu identitas diteruskan sebagai header `BIP-*`, open route yang cukup membawa service key, jalur `/ext/*` dan `/public/*` tanpa JWT, serta `GET /health` tiap service. Mencatat kenapa Finance sengaja memetakan ke dok domain (bukan `Microservices -`), service mana yang belum punya berkas `API -` sendiri (Calendar, HRD Document, Monitoring), dan cara mengaudit ulang daftar itu dari folder `services/*`.",
       "kata_kunci": [
         "API index",
-        "daftar service",
-        "endpoint",
-        "gateway",
+        "daftar endpoint",
+        "prefix gateway",
         "routing",
-        "prefix module",
-        "JWT",
-        "header BIP",
         "service key",
-        "microservices"
+        "header BIP",
+        "API reference",
+        "microservices bip-erp",
+        "payroll",
+        "open route"
       ]
     },
     {
@@ -590,6 +595,41 @@
         "service key",
         "push notification",
         "paginasi"
+      ]
+    },
+    {
+      "path": "API Reference/API - Payroll Service.md",
+      "judul": "API - Payroll Service",
+      "area": "API Reference",
+      "jenis": "api",
+      "status_emoji": "✅",
+      "status_teks": "Grounded ke kode (2026-08-26). Dok ini **baru dibuat** pada sync tersebut — sebelumnya payroll satu-satunya service besar tanpa berkas `API -`, padahal ia menghitung uang.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Payroll Service",
+        "API - Index",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "Microservices - Calendar Service",
+        "CORE - API Master Gateway",
+        "CORE - RBAC dan Permission Set",
+        "Microservices - Attendance Service",
+        "Microservices - Employee Service",
+        "Microservices - Insentive Service"
+      ],
+      "hash": "5f923935a71be80647a1e774d8f5d6f0e836152d988924aed481dff39dca4c29",
+      "ukuran_kb": 8.2,
+      "ringkasan": "Menjawab: endpoint apa saja yang dipunyai payroll-service dan izin apa yang dibutuhkan tiap rute — konfigurasi singleton (identitas perusahaan, BPJS, PPh21/TER, potongan kehadiran), master data (companies, salary components), gaji per karyawan, payroll run & THR beserta recalculate/approve/publish, slip self-service, plus `/health` dan `/me`. Menjelaskan model gerbang permission-set payroll (`payroll.view` · `manage` · `work` · `approve` · `salary.write`) berikut predikat role sebagai fallback dan kill-switch, kenapa `payroll.salary.write` sengaja berdiri sendiri, kenapa `/employer-cost` sengaja tanpa `gate()`, dan kenapa rute `/payroll-runs/my*` wajib didaftarkan sebelum `:id`. Memuat juga catatan keadaan produksi run dan slip, serta rujukan ke sumber aturan bisnis yang menang bila menyangkut angka.",
+      "kata_kunci": [
+        "payroll",
+        "gaji",
+        "slip gaji",
+        "payslip",
+        "THR",
+        "PPh21 TER",
+        "BPJS",
+        "payroll run",
+        "permission set",
+        "employer cost"
       ]
     },
     {
@@ -1191,10 +1231,12 @@
         "API - Integration Service",
         "Microservices - Insentive Service",
         "Microservices - Integration Service",
+        "Microservices - Procurement Service",
+        "API - Finance Service",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "IT - Monitoring System",
         "Microservices - Form Builder Service",
         "IT - Form Builder",
-        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "CORE - IT Orchestrator",
         "QA - Register Perizinan & Sertifikasi",
@@ -1208,7 +1250,6 @@
         "Microservices - Marketing Analytics Service",
         "API - Marketing Analytics Service",
         "API - Manufacture Service",
-        "Microservices - Procurement Service",
         "API - Procurement Service",
         "CORE - API Master Gateway",
         "RUN - Deploy Microservices bip-erp",
@@ -1221,20 +1262,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "972507f427f15554d8d47a619d88a5e2f4b3dc8d36e3e13695e761e92e27d8dc",
-      "ukuran_kb": 317.2,
-      "ringkasan": "Menjawab: apa itu portal web internal \"One Bharata\" (erp-frontend), stack apa yang dipakai, dan bagaimana login serta SSO Identity Provider bekerja untuk aplikasi lain seperti Task Manager. Menjelaskan cara role gating sidebar dibaca dari cookie system_roles per modul, bagaimana menu dikelompokkan lewat menu induk bersarang (bukan field group), dan bagaimana Pengaturan HRGA terpusat menyaring akses per tab, bukan per halaman. Juga menjawab bagian mana dari web ini yang sudah ikut multi-perusahaan (company switcher, kelola departemen, shift, network WiFi, direktori karyawan, broadcast artikel).",
+      "hash": "c7dc0716a2941fc716d93a338ab7ed04d0b141b68b689b58e7348430e0894727",
+      "ukuran_kb": 320.5,
+      "ringkasan": "Menjawab: halaman dan fitur apa saja yang ada di portal web ERP internal \"One Bharata\" (`erp-frontend`) per modul — HRIS, Finance (termasuk Jurnal `/finance/gl`, Hutang/AP `/finance/ap`, Cost Control, dan Target Marketing), IT, GA, Insentif, dan blok Integrasi Accurate — beserta rute tiap halaman dan service backend yang dipanggilnya. Menjelaskan cara login (`employee_id` + password, refresh token, interceptor 401) dan peran web ini sebagai SSO Identity Provider, bagaimana sidebar serta hak akses diturunkan dari cookie `system_roles`, pengelompokan menu bersarang termasuk Pengaturan HRGA terpusat dengan penyaringan per tab, dukungan multi-perusahaan, dan i18n dua bahasa. Berguna untuk menjawab \"halaman ini ada di mana, siapa yang boleh melihatnya, dan datanya dari service apa\".",
       "kata_kunci": [
-        "web ERP",
         "erp-frontend",
-        "One Bharata",
         "hris-dashboard",
-        "SSO",
-        "system_roles",
-        "role gating",
+        "One Bharata",
+        "portal web ERP",
         "sidebar menu",
-        "Pengaturan HRGA",
-        "multi-perusahaan"
+        "system_roles",
+        "SSO identity provider",
+        "halaman finance",
+        "multi-perusahaan",
+        "Next.js"
       ]
     },
     {
@@ -4467,25 +4508,28 @@
       "judul": "Finance - Delete Data Finance lama",
       "area": "Finance System",
       "jenis": "domain",
-      "status_emoji": null,
-      "status_teks": "Manual, belum ada tooling otomatis untuk cleanup ini.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — prosedur manual/ad hoc, dipakai selama sistem [[Finance - Bridging App]] (Java/PostgreSQL) masih berjalan berdampingan dengan [[Finance - Bridging App New Golang]]. Belum ada tooling otomatis; eksekusinya tetap manusia.",
       "publik": true,
       "tautan": [
         "Finance - Bridging App",
         "Finance - Bridging App New Golang",
         "Finance - Big Pictures"
       ],
-      "hash": "c4d745c5d1d6481993cdb4c7ad8241b0a449d6e0876b2c415ab632952855e3f9",
+      "hash": "75d431974c032580663d427eef5968e2aa9e84b4a28724c3d00b66fd46292e0f",
       "ukuran_kb": 5.1,
-      "ringkasan": "Menjawab prosedur manual menghapus data income duplikat di database Finance lama saat file report marketplace ter-upload dobel, termasuk script Python untuk generate query DELETE dan langkah verifikasi sebelum eksekusi.",
+      "ringkasan": "Menjawab: bagaimana menghapus data income yang salah atau duplikat di database Finance lama (Java/PostgreSQL) ketika file report marketplace seperti TikTok ter-upload lebih dari sekali. Menyebut tabel dan kolom acuannya (`income.reference_order_id` dan `income_tiktok.related_order_id`), prompt serta script Python (pandas) di Google Colab untuk men-generate `delete_income.sql` dari kolom Order ID di Excel, cara mengunduhnya, dan langkah eksekusi ke database. Memuat pula gerbang pengamannya: sanity check jumlah order ID, verifikasi SELECT sebelum DELETE, jalankan dalam satu transaksi, dan batas berlakunya (tidak untuk sistem Golang yang baru).",
       "kata_kunci": [
         "hapus data duplikat",
         "delete income",
-        "Finance lama PostgreSQL",
-        "order ID duplikat",
+        "order ID",
+        "report TikTok dobel",
+        "finance lama",
+        "PostgreSQL",
         "Google Colab",
-        "query DELETE SQL",
-        "cleanup data upload"
+        "pandas",
+        "bridging app",
+        "income_tiktok"
       ]
     },
     {
