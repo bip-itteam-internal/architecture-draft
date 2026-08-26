@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-26",
-  "jumlah_dokumen": 301,
+  "jumlah_dokumen": 302,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -7921,6 +7921,7 @@
       "publik": true,
       "tautan": [
         "APP - Web ERP",
+        "REF - Rantai Pengajuan Lintas Modul",
         "CORE - RBAC dan Permission Set",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
@@ -7930,20 +7931,20 @@
         "Microservices - Procurement Service",
         "Microservices - Manufacture Service"
       ],
-      "hash": "facb437be722b849d4b5b753ebf84a71c3ac771e0b858bf8de443bbb69f3d61d",
-      "ukuran_kb": 8.9,
-      "ringkasan": "Menjawab: alur persetujuan apa saja yang ada di seluruh ERP Bharata dan siapa yang berwenang memutuskan masing-masing, mulai dari cuti/izin/sakit, perjalanan dinas, koreksi presensi, tukar jadwal, pesanan pembelian dan permintaan barang, payroll run, rekrutmen, dokumen HRD, task management, sampai insentif. Juga menjelaskan tiga cara gerbang approval ditulis (middleware di routes.go, pemeriksaan di dalam handler, dan slot reviewer pada dokumen) sehingga menyapu daftar rute saja menghasilkan kesimpulan salah, siapa yang termasuk wewenang setingkat Direktur lewat common.SetaraDirektur, dan pola cacat berulang berupa orang yang berwenang memutus tapi tak punya layar untuk melihat antreannya.",
+      "hash": "a4ff3291166e33d9d178a425d64eb1d235e7808ceb7ed75f8b0ebe854f8f8e14",
+      "ukuran_kb": 9.2,
+      "ringkasan": "Menjawab: alur persetujuan apa saja yang ada di seluruh ERP Bharata dan siapa yang berwenang memutuskan tiap alur, tanpa harus membaca 11 service satu per satu. Menjelaskan tiga cara gerbang persetujuan ditulis (middleware rute, cek di dalam handler, slot reviewer pada dokumen), inventaris per alur untuk cuti, dinas, koreksi presensi, PO/permintaan barang, payroll run, rekrutmen, insentif, dan lainnya, serta wewenang setingkat Direktur lewat common.SetaraDirektur. Juga menjawab kenapa wewenang memutus tanpa layar untuk melihat antrean adalah cacat yang berulang di sini.",
       "kata_kunci": [
         "persetujuan",
         "approval",
+        "penyetuju",
         "approver",
-        "cuti",
-        "pesanan pembelian",
-        "purchase order",
-        "SetaraDirektur",
+        "RBAC izin peran",
         "Direktur",
-        "RBAC",
-        "gerbang akses"
+        "SetaraDirektur",
+        "gerbang otorisasi",
+        "spv_status",
+        "reviewer"
       ]
     },
     {
@@ -8057,6 +8058,42 @@
         "i18n label",
         "naming convention",
         "auto.sumber"
+      ]
+    },
+    {
+      "path": "Reference/REF - Rantai Pengajuan Lintas Modul.md",
+      "judul": "REF - Rantai Pengajuan Lintas Modul",
+      "area": "Reference",
+      "jenis": "reference",
+      "status_emoji": "⚠️",
+      "status_teks": "**Peta masalah, belum ada keputusan.** Seluruh temuan terverifikasi di kode; **arah perbaikannya sengaja belum diputuskan** (lihat §Belum Diputuskan). Dokumen ini ada supaya keputusannya diambil dari peta utuh, bukan dari satu rantai yang kebetulan sedang disentuh.",
+      "publik": true,
+      "tautan": [
+        "REF - Alur Persetujuan",
+        "Manufacture - Material Order (SPK)",
+        "HRIS - Recruitment",
+        "HRIS - Employee Request & Approval",
+        "ADR - 0007 Reimbursement Perjalanan Dinas",
+        "APP - Web ERP",
+        "Microservices - Procurement Service",
+        "Microservices - Manufacture Service",
+        "Microservices - Learning Service",
+        "Microservices - Recruitment Service"
+      ],
+      "hash": "589868b869babe9cd03afc91c8a37e2e5ee8e110886e0d3548325bfc510e5fd3",
+      "ukuran_kb": 13.5,
+      "ringkasan": "Menjawab: rantai bisnis mana saja yang seharusnya satu pengajuan berjalan sampai selesai tetapi di kode terpecah jadi beberapa pengajuan terpisah sehingga datanya diketik ulang, di titik mana tiap rantai putus, dan field referensi apa yang dicari lalu tidak ditemukan. Menginventarisasi delapan rantai (PPIC ke pengadaan, pengajuan pelatihan ke pelatihan, pengajuan budget ke kas kecil, PR ke PO ke penerimaan, penerimaan barang ke stok, rekrutmen hire ke karyawan dan onboarding, cuti dan koreksi ke payroll, perjalanan dinas ke pencairan) berikut mana yang cacat dan mana yang sengaja diputus. Menjelaskan pula penyebab strukturalnya (tidak ada komponen approval berjenjang bersama, hanya empat mesin terpisah yang tak saling pakai), usulan urutan pengerjaan bila kelak dikerjakan, daftar TBD, dan cara mengaudit ulang petanya.",
+      "kata_kunci": [
+        "rantai pengajuan",
+        "lintas modul",
+        "cross-module chain",
+        "pengajuan terpecah",
+        "data diketik ulang",
+        "field referensi hilang",
+        "approval berjenjang",
+        "PR PO penerimaan",
+        "PPIC pengadaan",
+        "traceability"
       ]
     },
     {

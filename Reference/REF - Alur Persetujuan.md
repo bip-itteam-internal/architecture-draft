@@ -102,6 +102,7 @@ Ketiganya kini menunjuk **`common.SetaraDirektur`** (`shared-library/common/jaba
 
 ## Dokumen Terkait
 
+- [[REF - Rantai Pengajuan Lintas Modul]] — **sumbu berbeda, dipakai bersama.** Dokumen ini menjawab *siapa yang berwenang memutuskan*; yang itu menjawab *rantai bisnis mana yang terpecah jadi beberapa pengajuan terpisah, dan di titik mana ia putus*. Inventaris di sini disusun per-mekanisme-gerbang, di sana per-alur-bisnis.
 - [[CORE - RBAC dan Permission Set]] · [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]
 - [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]] · [[ADR - 0031 Prefix internal Bukan Batas Keamanan]]
 - [[APP - Web ERP]] (Ruang Direktur) · [[Microservices - Payroll Service]] · [[Microservices - Recruitment Service]] · [[Microservices - Procurement Service]] · [[Microservices - Manufacture Service]]
