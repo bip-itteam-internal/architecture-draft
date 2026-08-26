@@ -106,6 +106,21 @@ Aturan yang berlaku:
 - ⛔ **Layar yang MENULIS nama departemen tak boleh memakai daftar bergrup.** `kpi_template.department` menyimpan nama ASLI (`Human Resource` / `General Affair`); template yang tersimpan sebagai `HRGA` tak akan cocok dengan `work_data` siapa pun, dan gagalnya senyap: templatenya jadi, lalu tak pernah terpakai menilai siapa-siapa. Karena itu `template-editor.tsx` sengaja TIDAK digrupkan sementara `kpi-page-content.tsx` digrupkan.
 - Dari 24 pemanggil `useDataTypes({ endpoint: "department" })` di erp-frontend, per 2026-08-25 baru **5** yang memakai `grouped`. Sisanya belum diperiksa satu per satu, dan untuk sebagian halaman departemen mentah memang yang benar. **Putuskan per halaman**, jangan sapu massal.
 
+⛔ **Di BACKEND, kelas ini punya bentuk yang lebih senyap lagi: 200 berisi NOL baris.** Dua fungsi bernama mirip TIDAK boleh dipakai bergantian, dan yang keliru tak pernah melempar galat:
+
+| Fungsi | Menerima | Untuk |
+|---|---|---|
+| `ResolveDepartmentFilter` | **label grup** ATAU nama departemen | menerjemahkan nilai yang datang **dari layar** |
+| `SupervisedDepartments` / `ExpandToDepartmentGroup` | **nama departemen** saja | memekarkan satu nama ke grupnya |
+
+`SupervisedDepartments(master, "HRGA")` mencari master department yang **NAMANYA** "HRGA" — label itu tinggal di `supervision_label`, bukan di `name` — lalu mengembalikan `"HRGA"` **apa adanya** (`department_scope.go`). Filter yang memakainya tak cocok dengan `work_data` siapa pun, jadi endpoint membalas **200 tanpa satu pun baris**, dan layar berbunyi "belum ada datanya" alih-alih "filternya tak menemukan siapa-siapa".
+
+Terjadi **dua kali dalam satu hari** (2026-08-26): `/kpi/auto-scores` membuat kolom "Terhitung otomatis" berbunyi **0/20** untuk grup berisi 20 orang (bip-erp [#1444](https://github.com/bip-itteam-internal/bip-erp/pull/1444)), lalu `/kpi/template-assignment` membuat penetapan template satu grup tampil kosong ([#1454](https://github.com/bip-itteam-internal/bip-erp/pull/1454)). **Perbaikan pertama tak ikut menyentuh yang kedua** — bukti langsung bahwa aturannya tak boleh punya dua salinan.
+
+**Yang benar untuk nilai dari layar** adalah komposisi keduanya, persis seperti `GET /kpi`: `ExpandToDepartmentGroup(ResolveDepartmentFilter(master, q))`. Di employee-service ia kini tinggal di satu tempat, `cakupanDepartemenKPI`, dengan penjaga pemindai sumber berdaftar-izin per berkas — pemanggil baru `employee.SupervisedDepartments` atas nilai query membuat testnya merah. **Pemanggilan yang memakai `work_data.department` milik seseorang tetap AMAN** dan sengaja diizinkan: label grup tak pernah tersimpan di sana.
+
+⚠️ **Unit test biasa tak menangkap kelas ini**, dan itu sebabnya penjaganya memindai sumber: jalur yang salah tetap mengembalikan slice yang **sah**, cuma berisi nama yang tak dimiliki siapa pun.
+
 ## Memindahkan karyawan antar-perusahaan (tenant)
 > Diverifikasi ke kode + prod 2026-08-19 saat menyiapkan perpindahan CV Elit (`ELT`) ke BIP. **Dugaan awal terbalik di dua dari tiga hal di bawah**, jadi jangan menebak arahnya. [[ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id]] mengatur `employee_id` dan `work_data`, tapi **tak menyebut satu pun infrastruktur presensi berikut** — migrasi yang "benar" menurut ADR tetap bisa membuat orangnya tak bisa absen keesokan harinya.
 
