@@ -6004,22 +6004,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "0424fb508c373d0063f4b75e9ff504efc2824f8530d05b4ef24c48f800cf8cd6",
-      "ukuran_kb": 90.8,
-      "ringkasan": "Menjawab: sejauh mana skor KPI bisa diisi otomatis dari data ERP alih-alih diketik supervisor — dari 311/362 metrik terpasang, mana yang sumber datanya sudah ada, mana yang modulnya ada tapi kosong, dan mana yang tanpa sumber. Menjelaskan metrik ber-auto yang sudah menyala di produksi, cara kerja cakupan penuh (otomatis) vs parsial (semi), urutan penilaian yang dituntut skor_tim, layar diagnostik Otomasi KPI, serta bagaimana HR mengisi konfigurasi sendiri.",
+      "hash": "23d38eb0da2e0963d0f6caa8b19e7d0a74da691775393b91cfc3efe5d96a2e49",
+      "ukuran_kb": 91.1,
+      "ringkasan": "Menjawab: metrik KPI mana yang bisa diisi otomatis dari data yang sudah ada di ERP dan mana yang tetap manual, sumber data apa yang dipakai tiap metrik (skor_tim, uptime_sistem/downtime, kinerja_toko, kinerja_ar, kinerja_tiket, kinerja_ap, kinerja_affiliate_tim, opex Accurate), serta bagaimana blok `auto` pada `kpi_template` dikonfigurasi HR lewat katalog sumber, pratinjau, formula, arah target, scope, dan target berbeda per karyawan. Menjawab juga kenapa sebuah metrik berstatus otomatis/semi/manual/belum/tanpa_karyawan di layar Otomasi KPI, bagaimana skor sementara bulan berjalan dihitung di web dan MyBharata (jumlah berbobot, metrik belum terhitung dianggap 0), dan jebakan yang membuat angka salah tampak wajar: target yang selalu penuh, shopee_shop_id kosong sehingga omzet Shopee luput, profit toko negatif, dan urutan penilaian yang menentukan skor_tim terpakai atau tidak. Memuat pula klasifikasi 311 metrik production per departemen (otomatis penuh, semi-otomatis, terblokir data karena koleksinya nol dokumen, tanpa sumber sama sekali), peta metrik ke sumber data, temuan data master pada label metrik, dan rencana bertahap otomasinya.",
       "kata_kunci": [
         "otomasi KPI",
-        "skor KPI",
-        "auto value",
-        "kpi_template",
-        "metrik otomatis",
-        "semi-otomatis",
+        "KPI automation",
+        "auto-values",
+        "kpi_template auto",
+        "sumber KPI otomatis",
         "skor_tim",
-        "ICC",
-        "layar diagnostik",
-        "cakupan",
-        "supervisor",
-        "HRIS"
+        "uptime_sistem downtime",
+        "kinerja_toko ROAS",
+        "target per karyawan",
+        "auto-fill skor kinerja"
       ]
     },
     {
