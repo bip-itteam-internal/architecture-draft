@@ -544,20 +544,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "fe6947c20fff930e7d097cf8946c11e707035230291ee88219f00dde9d14a724",
-      "ukuran_kb": 24.2,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service lewat gateway `/api/marketing-analytics/*`, parameter dan konvensi responsnya (amplop `rows`/`unavailable_channels`, `kolom_tidak_berlaku`, paginasi `limit`/`offset`, batas tanggal hari WIB), serta endpoint mana yang digerbang role marketing leader. Menerangkan cara membaca vonis laba `/beranda` (lima nilai: tanpa_data, belum_matang, rugi, waspada, sehat), pengelolaan ambang keputusan (`roas_min`, `cpa_maks`) dan pagu belanja iklan yang append-only, plus kurva alokasi belanja per kanal. Juga menjawab kenapa `/profit/products`, `/profit/items`, dan `/profit/skus` tidak boleh dijumlahkan silang dan mana yang dipanggil menu Profit per Produk vs Profit per SKU.",
+      "hash": "f68c45be3a96ef2d4421630596907a6583834e256a7ece5e334a822aa0915e95",
+      "ukuran_kb": 25.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service lewat prefix gateway `/api/marketing-analytics`, beserta parameter, konvensi amplop respons (`unavailable_channels`, `kolom_tidak_berlaku`, paginasi drill), dan kode galat tiap endpoint laba, video, live, `live-shifts`, retur, affiliate, price floor, job, serta pengumpul KPI yang digerbang kunci layanan. Juga menjawab bagaimana vonis laba `/beranda` dinilai terhadap ambang (lima keadaan, termasuk `belum_matang` yang tidak boleh berlencana merah), siapa yang boleh menulis pagu belanja iklan lewat `POST /pagu` sementara `GET`-nya terbuka, dan apa yang dikembalikan `/kurva-alokasi` untuk blok simulasi alokasi belanja iklan. Penting untuk perancang layar: kolom mana yang tampak seperti kerugian tetapi tidak boleh dijumlahkan ke laba, yaitu `iklan_sia_sia` di `/returns/detail`, blok `pembatalan` di `/profit/shops` (`orders_dikirim` adalah himpunan bagian dari `orders`), dan `kepemilikan` di `/affiliate` yang sumbunya berbeda dari `collaboration_type`.",
       "kata_kunci": [
         "marketing analytics",
         "endpoint",
-        "API reference",
         "laba",
-        "profit",
+        "profit attribution",
         "ROAS",
         "ambang keputusan",
         "pagu belanja iklan",
-        "beranda marketing",
-        "price floor"
+        "kurva alokasi",
+        "iklan_sia_sia",
+        "pembatalan"
       ]
     },
     {
@@ -2196,7 +2196,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **40 route** di berkas produksi (enumerasi lengkap terhadap `origin/main`, termasuk `/health`). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `/matrix/sku-shop` masih stub, `mart_buyer_cohort` masih kosong, lock job hanya in-process. **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD tetapi koleksinya masih 0 dokumen** — belum pernah dipakai host sungguhan, jadi belum terbukti bisa dipakai.",
+      "status_teks": "Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **40 route** di berkas produksi (enumerasi lengkap terhadap `origin/main`, termasuk `/health`). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD tetapi koleksinya masih 0 dokumen** — belum pernah dipakai host sungguhan, jadi belum terbukti bisa dipakai.",
       "publik": true,
       "tautan": [
         "Sales - Marketing Dashboard (Master Roadmap)",
@@ -2220,20 +2220,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "0d8f35e6b94540ab8a3c224fef3f4b62f12612961c0f3f91b7d9ac9290f9bf04",
-      "ukuran_kb": 48.2,
-      "ringkasan": "Menjawab: bagaimana service `marketing-analytics` (Go + Fiber, database `marketing_analytics_db`, koleksi `mart_*`) dirancang, di mana kodenya, port dan prefix gateway-nya, serta kenapa ia membaca `integration_db` secara baca-saja dengan tiga lapis penjaga (tipe reader tanpa metode tulis, uji AST, read preference secondaryPreferred). Menerangkan penjadwal internal 48 jam, job sync, isi tiap koleksi `mart_*`, sumber data per channel (TikTok, Shopee, Lazada), alokasi bundel dan mapping SKU, serta kenapa `/health` turun jadi degraded bila index unik gagal dibuat. Juga menjawab bagaimana vonis laba halaman depan diturunkan (level shop saja, aturan `belum_matang` dan ambang materialitas 0,05 beserta empat iterasi yang melahirkannya) dan catatan kejujuran data seperti perbedaan `revenue` TikTok vs Shopee dan pembatalan kolom Kebocoran.",
+      "hash": "5016de5b4a4a7faa4ed83a6c82da51911f9852fb0a348eafcf764174d178e04c",
+      "ukuran_kb": 60.7,
+      "ringkasan": "Menjawab: bagaimana service agregasi laba marketing ini bekerja, mulai dari koleksi `mart_*` yang dihasilkannya, alasan `integration_db` dijaga baca-saja tiga lapis (tipe reader, uji AST, `secondaryPreferred`), penjadwal internal 48 jam dan job sync, konvensi hari WIB versus stempel waktu UTC, sampai prorata SKU bundel per nilai HPP dan perbedaan arti `revenue` TikTok versus Shopee. Juga menjawab bagaimana vonis lima keadaan `/beranda` diturunkan (termasuk `belum_matang`, ambang materialitas 0,05, dan mengapa vonis hanya dijumlahkan dari level shop), bagaimana pagu belanja iklan disimpan append-only per channel, toko, dan bulan, serta bagaimana kurva alokasi dipasang (bentuk linear, log, akar dengan urutan menang saat seri; gerbang minimal 12 titik lalu R kuadrat 0,5; kalimat batas kausalitas yang dikirim backend, bukan ditulis di UI). Bagian Aturan Pemakaian Angka menjawab larangan hitung ganda: `iklan_sia_sia` adalah porsi `ads_cost` yang sudah terpotong sehingga bukan kerugian tambahan dan tidak boleh di-rename `kerugian_iklan`, `pembatalan` bukan komponen laba dengan `orders_dikirim` sebagai himpunan bagian dari `orders`, dan `kepemilikan` affiliate adalah sumbu terpisah dari `collaboration_type` yang nilai saringan tak dikenalnya ditolak 400.",
       "kata_kunci": [
-        "marketing analytics service",
-        "microservice",
+        "marketing analytics",
+        "laba",
         "mart_profit_attribution",
-        "integration_db baca-saja",
-        "job sync",
-        "penjadwal",
-        "hari WIB",
-        "vonis laba",
-        "belum matang",
-        "Go Fiber MongoDB"
+        "hitung ganda",
+        "iklan_sia_sia",
+        "pembatalan",
+        "kepemilikan affiliate",
+        "pagu belanja iklan",
+        "kurva alokasi",
+        "job sync"
       ]
     },
     {

@@ -42,7 +42,7 @@ Verifikasinya menemukan yang test tak bisa: `vonis.laba_kotor` **cocok sampai ru
 | Method | Path | Catatan |
 |---|---|---|
 | GET | `/summary` | Ringkasan lintas sumber |
-| GET | `/profit/shops` | `granularitas=bulanan\|harian` (bawaan bulanan) · `bulan=YYYY-MM` · `sort_by`/`sort_dir` |
+| GET | `/profit/shops` | `granularitas=bulanan\|harian` (bawaan bulanan) · `bulan=YYYY-MM` · `sort_by`/`sort_dir`. ⛔ Membawa blok **`pembatalan`** (`orders`/`nilai` + `orders_dikirim`/`nilai_dikirim`). **Bukan komponen laba** — tak boleh mengurangi `revenue`/`gross_profit` (batal-sebelum-kirim tak pernah masuk revenue; yang kembali sudah masuk `retur`). `orders_dikirim` **himpunan bagian** dari `orders`, bukan kolom sejajar: menjumlahkannya menghitung order yang sama dua kali. Aturan lengkap: [[Microservices - Marketing Analytics Service]] §Aturan Pemakaian Angka |
 | GET | `/profit/products` | + `lingkup=lintas_toko\|per_toko` (bawaan lintas_toko; baris gabungan membawa `jumlah_toko`, `shop_id` kosong). Berkunci **kode master** (`PJG-004`) dan **memecah bundel ke komponen** |
 | GET | `/profit/items` | Laba per **ID produk marketplace** (`LevelItem`) — satuannya **judul listing**, sepadan laporan "Penjualan Per Produk". Inilah yang dipanggil menu **Profit per Produk**. **Tanpa `hiasAmplop`**: `items[].id` terisi 100% di ketiga channel (verifikasi prod Juli 2026), jadi tak ada batas platform yang perlu dinyatakan |
 | GET | `/profit/skus` | Laba per **SKU master** (`items[].sku` apa adanya, `LevelSKU`) — satuannya "SKU Master", sepadan laporan "Penjualan Per Varian". Inilah yang dipanggil menu **Profit per SKU**. Tanpa `hiasAmplop` (alasan sama) |
@@ -85,11 +85,11 @@ Ringkasannya memakai `RingkasShiftBanyak`, bukan meringkas satu per satu: fungsi
 | Method | Path | Catatan |
 |---|---|---|
 | GET | `/returns/breakdown` | Agregat per channel+initiator+alasan mentah+kurir; `refund_value` ≠ `order_value` |
-| GET | `/returns/detail` | Drill → daftar order (order_id, toko, ICC, items, alasan mentah). `reason=` kosong bermakna "tanpa alasan tercatat"; `initiator=BUYER\|SYSTEM\|SELLER` |
-| GET | `/affiliate` | + `collaboration_type=internal\|eksternal\|tanpa_kolaborasi`; `sort_by`: orders/gmv/actual_commission/est_commission/returns |
+| GET | `/returns/detail` | Drill → daftar order (order_id, toko, ICC, items, alasan mentah). `reason=` kosong bermakna "tanpa alasan tercatat"; `initiator=BUYER\|SYSTEM\|SELLER`. ⛔ Membawa **`iklan_sia_sia`** — porsi `ads_cost` pada order retur. **BUKAN kerugian tambahan**: jangan dijumlahkan ke laba (sudah terpotong seluruhnya), jangan digabung dengan beban packing, jangan di-rename `kerugian_iklan`. Pointer: `nil` = tak dihitung, `0` = dihitung dan nol. Aturan lengkap: [[Microservices - Marketing Analytics Service]] §Aturan Pemakaian Angka |
+| GET | `/affiliate` | + `collaboration_type=internal\|eksternal\|tanpa_kolaborasi`; `sort_by`: orders/gmv/actual_commission/est_commission/returns. Juga `kepemilikan=internal\|belum_terdaftar\|ada_pemegang\|belum_ditugaskan` — **sumbu berbeda dari `collaboration_type`**, jangan ditukar; nilai tak dikenal → **400**, tidak melebar jadi "semua" |
 | GET | `/cohort` | Kohort pembeli |
 | GET | `/audience` | `sort_by`: orders/returns/return_rate_pct/return_value/revenue |
-| GET | `/matrix/sku-shop` | 🔴 **Stub** — envelope kosong |
+| GET | `/matrix/sku-shop` | ✅ Matriks **produk × toko** (`matrix_sku_shop.go`; catatan "stub" di dok ini sudah usang — terimplementasi sejak 2026-08-02). `metrik=` salah satu dari tujuh kolom aditif (`gross_profit` bawaan · `revenue` · `net_settlement` · `hpp` · `ads_cost` · `fee_marketplace` · `retur`); tak dikenal → **400 + `metrik_valid`**. `bulan=YYYY-MM` (bawaan bulan berjalan WIB) **XOR** `dari`/`sampai` — keduanya sekaligus → **400**. `limit` bawaan 100 maks 500, berlaku **setelah** pemeringkatan; pemotongan selalu dilaporkan (`terpotong` + `total_produk`). ⚠️ **Sel absen ≠ nol**: pasangan produk×toko tanpa baris mart tak punya kunci sama sekali (peluang listing), sedangkan nol nyata hadir sebagai `0`. Jangan meratakan keduanya di FE |
 
 ## Daftar acuan untuk saringan FE
 
