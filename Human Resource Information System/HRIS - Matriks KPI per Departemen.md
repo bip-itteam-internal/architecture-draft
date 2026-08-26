@@ -33,6 +33,11 @@ Dua departemen di `work_data` **tidak muncul di sini karena belum punya template
 
 ## Cacat yang sudah diketahui
 
+> Aturan penamaan yang seharusnya berlaku (label menyebut yang diukur bukan targetnya,
+> nomor tanpa makna dilarang, keterangan wajib) ada di
+> [[REF - Penamaan Metrik & Sumber KPI]]. Baris-baris di bawah adalah contoh
+> pelanggarannya yang benar-benar terpasang di produksi hari ini.
+
 Beberapa baris di bawah memang cacat di datanya, dan sengaja disalin apa adanya supaya terlihat:
 
 - **Template uji ikut produksi.** `Beauty Hacks / Buzzer / Buzzer` berisi satu metrik berlabel `contoh` berbobot 1.0, sehingga posisi Buzzer punya dua template.
@@ -75,17 +80,30 @@ Kolom ini **bukan pengganti langkah 1** di [[RUN - Menambah Metrik KPI Otomatis]
 > [[RUN - Menambah Metrik KPI Otomatis]]). Membaca "Bisa otomatis sekarang" sebagai yang
 > pertama padahal yang kedua berarti menunggu sesuatu yang tak akan pernah datang.
 >
-> **Sumber yang benar-benar terdaftar di mesin** (`services/employee/kpi_sumber*.go`,
-> **18 sumber** per 2026-08-22, diverifikasi lewat `GET /kpi/sumber-katalog` di produksi):
+> **Sumber yang benar-benar terdaftar di mesin** (`services/employee/kpi_sumber*.go`).
+> ⚠️ **Angka KODE dan angka PRODUKSI berbeda, dan bedanya menentukan apa yang bisa dipilih HR
+> hari ini**: **21 di `origin/main`**, **20 di produksi** per 2026-08-25.
 >
 > `skor_tim` · `varians_anggaran` · `akurasi_aset_ga` · `kinerja_tiket` · `uptime_sistem` ·
 > `kinerja_ar` · `kinerja_ap` · `kinerja_sales_admin` · `kinerja_cost_control` ·
 > `kinerja_toko` · `kinerja_po_marketing` · `admin_non_ops` · `forecast_kas` ·
-> `kaizen_ide_diajukan` · `kaizen_ide_diterapkan` · **`kedisiplinan_absensi`** ·
-> **`turnover_karyawan`** · **`kontrak_karyawan`**
+> `kaizen_ide_diajukan` · `kaizen_ide_diterapkan` · `kedisiplinan_absensi` ·
+> `turnover_karyawan` · `kontrak_karyawan` · `kinerja_affiliate` · `kinerja_affiliate_tim` ·
+> ⏳ **`kinerja_tiket_divisi`**
 >
-> Tiga yang tebal ditambahkan [#1379](https://github.com/bip-itteam-internal/bip-erp/pull/1379)
-> (merged, dan sudah naik di prod maupun dev 2026-08-22). Sub-metriknya:
+> `kedisiplinan_absensi`, `turnover_karyawan`, dan `kontrak_karyawan` ditambahkan
+> [#1379](https://github.com/bip-itteam-internal/bip-erp/pull/1379) (naik di prod dan dev
+> 2026-08-22). `kinerja_affiliate` dan `kinerja_affiliate_tim` sudah ada di biner prod
+> (diverifikasi `grep -ac` pada `/service`, dengan kontrol negatif string karangan → 0).
+>
+> ⏳ **`kinerja_tiket_divisi` ADA di `main` tetapi BELUM di produksi** (merged
+> [#1427](https://github.com/bip-itteam-internal/bip-erp/pull/1427) +
+> [#1428](https://github.com/bip-itteam-internal/bip-erp/pull/1428) 2026-08-25; prod tidak
+> auto-deploy). Ia melayani metrik KPI **tingkat tim** dan menuntut `space.kpi_group` diisi
+> lebih dulu — rinciannya di [[API - Task Management Service]] dan
+> [[Microservices - Employee Service]].
+>
+> Sub-metrik tiga sumber HRGA:
 >
 > | Sumber | Sub-metrik | Melayani |
 > |---|---|---|
@@ -970,15 +988,24 @@ Template `KPI Quality Supervisor`, 5 metrik.
 >
 > **`kpi_score` tidak tersentuh** (tetap 0 dokumen ber-`auto_value`): snapshot penilaian yang sudah ada beku, jadi angka otomatis baru terpakai pada penilaian **Agustus** di awal September. Kebetulan angkanya sama persis dengan yang sudah diisi manual, jadi tak ada selisih yang perlu dijelaskan ke siapa pun.
 >
-> **Tujuh metrik punya sumber terdaftar, tetapi hanya lima menyentuh orang.** Posisi `IT Infrastructure` **tidak punya karyawan sama sekali (0 orang)**, sehingga `System` 0,1 dan `Server` 0,1 menempel di template yang tak dipegang siapa pun. Yang nyata:
+> ⚠️ **Sensus ulang 2026-08-25: yang menentukan lingkup BUKAN 30 metrik, melainkan siapa yang benar-benar dinilai.** Dari 11 baris `work_data` departemen ini, hanya **6 akun aktif** memegang **3 posisi**. Empat template lain **tak dipegang siapa pun**, sehingga mengotomatiskannya tidak mengubah skor seorang pun.
 >
-> | Posisi | Orang | Metrik siap | Sumber | Bobot |
-> |---|---:|---|---|---:|
-> | `IT Support` | 2 | `Network ` | `uptime_sistem` | 0,4 |
-> | `Tech Development Leader ` | 1 | `Revenue 240M` · `Performance Monitoring Team` | `uptime_sistem` · `skor_tim` | 0,6 |
-> | `Tech Development Supervisor` | 1 | `Revenue 240M` · `Performance Monitoring Team` | `uptime_sistem` · `skor_tim` | 0,5 |
+> | Posisi | Akun aktif | Template | Metrik ber-`auto` |
+> |---|---:|---|---|
+> | `Tech Development Leader` | 1 | `Leader` (dibuat ulang 30 Juli 2026, label sudah menyebut E-TICKET) | 1 dari 5 |
+> | `Fullstack Developer` | 4 | `Fullstack` | 0 dari 4 |
+> | `IT Support` | 1 | `IT Support` | 1 dari 4 |
+> | `Tech Development Supervisor` · `IT Infrastructure` · `Backend Developer` · `Frontend Developer` | **0** | 4 template | 1 dari 17 |
 >
-> **Tujuh developer tidak tersentuh sama sekali.** 2 Backend, 1 Frontend, dan 4 Fullstack — mayoritas departemen — tidak punya satu pun metrik dengan sumber data di sistem. Metrik mereka (`Delivery`, `Quality`, `Support`, `Improvement`, `System Development`, `Kaizen`) semuanya belum terpetakan.
+> Catatan lama "tujuh developer tidak tersentuh (2 Backend, 1 Frontend, 4 Fullstack)" **sudah tidak berlaku**: kedua Backend dan satu-satunya Frontend kini non-aktif, begitu pula Supervisor. Angka mentah `work_data` tak boleh dibaca sebagai jumlah orang tanpa menyaring `system_authentication.is_active` lebih dulu — kekeliruan yang sama pernah tercatat di [[HRIS - Otomasi Skor KPI]].
+>
+> **Otomasi 2026-08-25 menyasar tiga template berpenghuni itu saja** (keputusan pemilik produk). Empat metrik dinyalakan lewat konfigurasi tanpa kode (`kinerja_tiket` untuk ketuntasan, SLA, dan CSAT), sementara tiga metrik Leader menuntut sumber baru `kinerja_tiket_divisi` karena menilai tiket **tim**, bukan tiket Leader sendiri. Rencana, target yang disepakati, dan gerbang verifikasinya ada di `.task-plans/2026-08-25-kpi-tech-development-otomatis.md` di repo kerja.
+>
+> ⛔ **Dua metrik SENGAJA tetap manual, jadi departemen ini tidak akan mencapai otomasi penuh** dan [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]] belum membekukan siapa pun di sini:
+> - **`Pengendalian anggaran IT`** (Leader, 0,1) — master anggaran produksi hanya memuat departemen MARKETING, dan sumber `varians_anggaran` memanggil `/accounting/anggaran/varians` **tanpa parameter departemen** sehingga mengukur seluruh perusahaan. Memakainya apa adanya akan menilai Leader IT atas varians anggaran Marketing: angka yang tampak wajar dan menjawab pertanyaan lain.
+> - **`Monitoring Kegiatan Sinkronisasi/Review`** (Fullstack, 0,2) — tak ada log pertemuan di sistem mana pun. Diarahkan ke modul kewajiban [[Microservices - Calendar Service]], yang di produksi masih 0 template, 0 periode, dan 0 pemenuhan.
+>
+> ⚠️ **Metrik Kaizen (IT Support 0,15 · Fullstack 0,1) mustahil otomatis di produksi hari ini**: `FORM_BUILDER_MODULE_URL` **kosong** di container employee-service prod, dibuktikan lewat pratinjau sungguhan yang membalas `gagal mengambil data: FORM_BUILDER_MODULE_URL belum diatur`. Ini menyentuh **semua departemen** yang memakai Kaizen, bukan hanya Tech Development. Memasangnya menuntut `--force-recreate`, sebab env dibaca saat container DIBUAT.
 >
 > ⚠️ **Koreksi 2026-08-06: dua "penghambat" yang tertulis di sini sebelumnya sebagian besar tidak nyata.** Versi lama menyatakan SLA resolusi tak punya satu pun sampel dan CSAT baru 8 tiket. Pembacaan ulang langsung ke `task_management_db` prod hari ini: dari **307 tiket**, **271 punya `due_date`** dan **214 terukur SLA resolusinya** (56 di antaranya Juli), sedangkan CSAT **17** (13 di Juli). Sebab angka lama nol: sensusnya memakai nama field **`completedAt`** padahal BSON yang sebenarnya **`completed_at`**; diverifikasi, `completedAt` ada di **0 dokumen** dan `completed_at` di 220. Ini persis pola yang sudah diperingatkan di ingatan tim, bahwa angka nol yang mencurigakan diperlakukan sebagai pertanyaan, bukan sebagai temuan.
 >

@@ -110,6 +110,12 @@ Tiga status pertama memakai nama yang sama persis dengan `KPISources` di `shared
 
 Kontrak lengkapnya di [[API - Employee Service]]; cara menambah metrik otomatis baru dan memverifikasinya lewat layar ini di [[RUN - Menambah Metrik KPI Otomatis]].
 
+### Skor total per orang: kolom Otomasi dan kartu skor total harus satu rumus
+
+`GET /kpi/auto-scores` menghitung **satu skor per karyawan** untuk kolom Otomasi di daftar Scoring dan badge skor di dropdown `/portal/kpi`; kartu skor total per-orang (tab Ringkasan → Per Karyawan) menghitung ulang dari `GET /kpi/auto-values` di frontend. Keduanya WAJIB memakai rumus yang sama: **rata-rata berbobot** `Σ(bobot × usulan) / Σ(bobot)` atas metrik yang berhasil dihitung — identik dengan skor final `ApplyKPIValues`, yang Σbobot-nya selalu 1,0 (dijaga `ValidateKPIMetrics`).
+
+Sempat menyimpang 2026-08-25: `hitungSkorOtomatis` (`services/employee/kpi_auto_scores.go`) menjumlah `Σ(bobot × usulan)` **tanpa** membaginya dengan Σbobot. Selama data belum lengkap (Σbobot metrik terhitung < 1) jumlah itu keluar LEBIH RENDAH dari rata-rata, sehingga badge menampilkan angka berbeda dari kartu skor total untuk **orang yang sama** — dilaporkan 12 (jumlah) vs 15 (rata-rata) untuk SPV Kyura yang cakupannya 3 dari 4 metrik. Diperbaiki dengan menormalisasi `auto_score` di backend; cakupannya tetap terbaca lewat `terhitung`/`total_otomatis`, jadi normalisasi tidak menyembunyikan bahwa skornya berdiri di atas sebagian metrik. Pada cakupan penuh (Σbobot = 1) rata-rata sama dengan jumlah, jadi posisi ber-otomasi penuh tak berubah angkanya. Ini persis kelas "layar yang menghitung dengan rumusnya sendiri akan berbohong" di atas — kali ini dua layar berbeda rumus, bukan satu layar yang menyalin.
+
 ## HR mengisi konfigurasinya sendiri
 
 > **Status**: ⚠️ **merged, BELUM di-deploy** per 2026-08-11. bip-erp PR [#1049](https://github.com/bip-itteam-internal/bip-erp/pull/1049) · [#1051](https://github.com/bip-itteam-internal/bip-erp/pull/1051) · [#1053](https://github.com/bip-itteam-internal/bip-erp/pull/1053) dan erp-frontend PR [#831](https://github.com/bip-itteam-internal/erp-frontend/pull/831) · [#832](https://github.com/bip-itteam-internal/erp-frontend/pull/832), seluruhnya merged 6 Agustus 2026. **Belum satu pun terbukti jalan lewat gateway produksi**, jadi seluruh bab ini menggambarkan kode yang ada di `main`, bukan perilaku yang sudah disaksikan.
@@ -121,6 +127,60 @@ Sampai batch ini, menyalakan satu metrik otomatis menuntut seseorang membedah `k
 | Apa | Rute / kontrak | Kenapa ada |
 |---|---|---|
 | **Katalog pilihan** | `GET /kpi/sumber-katalog?department=` | Daftar sumber, sub-metrik, formula, arah, dan scope selama ini hanya hidup di kode Go. Frontend yang menuliskan daftarnya sendiri membuat tiap sumber baru menuntut perubahan di dua tempat. Formula/arah/scope dibaca **lewat refleksi** atas struct di `shared-library`, bukan disalin — literal berarti pilihan baru tak pernah muncul dan gejalanya cuma dropdown yang kurang |
+
+> [!important] Katalog kini menjawab cakupan, rumus, dan pengelompokan PER SUMBER
+> ✅ **Live di produksi** 2026-08-25 (PR [#1423](https://github.com/bip-itteam-internal/bip-erp/pull/1423) + [#1425](https://github.com/bip-itteam-internal/bip-erp/pull/1425)), diverifikasi dari **bentuk respons** container prod — bukan dari status 200, yang tak membedakan apa pun di kelas ini.
+>
+> Sampai perubahan ini, katalog mengirim `scope` dan `formula` sebagai **daftar global**
+> saja. Frontend karena itu tak punya dasar mengisi keduanya, lalu mengirim blok `auto`
+> ber-`scope` kosong yang ditolak `ValidateKPIAutoConfig` dengan 400. Tiap entri sumber kini
+> membawa lima field baru:
+>
+> | Field | Arti |
+> |---|---|
+> | `scope_didukung` | cakupan yang benar-benar dibaca sumber ini. **Kosong = cakupan tak berpengaruh**, form boleh menyembunyikan pemilihnya |
+> | `scope_baku` | selalu terisi nilai yang lolos validator, termasuk bagi sumber yang mengabaikan cakupan |
+> | `formula_baku` | rumus kanonik sumber yang tak bersub-metrik (mis. `skor_tim`) |
+> | `formula_metrik` | rumus kanonik per sub-metrik; satu sumber bisa berbeda per metrik |
+> | `grup` | pengelompokan tampilan: `marketing`·`finance`·`sdm`·`it`·`ga`·`umum` |
+>
+> ⛔ **`grup` adalah ASAL DATA, bukan departemen pemakainya.** `kedisiplinan_absensi`
+> bergrup `sdm` karena datanya dari absensi, walau ia dipakai KPI hampir semua departemen;
+> mengelompokkannya menurut pemakai akan menaruh satu sumber di banyak grup sekaligus dan
+> memaksa katalog tahu siapa memakai apa — pengetahuan yang tak dimilikinya dan akan
+> menyimpang begitu ada template baru. `umum` menampung yang memang lintas departemen.
+> Sebaran nyata di prod: finance 7, marketing 4, umum 3, sdm 3, it 2, ga 1 dari 20 sumber.
+> Pendaftarnya **memanik saat boot** bila grupnya tak dikenal, sebab kegagalan yang
+> sebenarnya di sini berbentuk dropdown yang diam-diam kehilangan satu pilihan.
+>
+> **Hanya 5 dari 18 sumber yang benar-benar membaca `KPIAutoConfig.Scope`**: `skor_tim`,
+> `kinerja_toko`, `kedisiplinan_absensi`, `kontrak_karyawan`, dan `turnover_karyawan`. Dua
+> yang terakhir **menolak** cakupan selain `perusahaan` di dalam kodenya sendiri, jadi
+> katalog menyatakannya lebih dulu supaya salah pilih ketahuan saat memilih, bukan saat
+> skornya gagal dihitung berminggu kemudian. Bagi 13 sisanya cakupan adalah isian wajib
+> yang diabaikan — validator masih menuntutnya, dan itu sengaja **tidak** diputuskan di
+> [[ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman]].
+>
+> **Nilai rumusnya grounded ke pemakaian nyata**, dari sensus `kpi_template` produksi
+> 2026-08-25 atas **34 metrik ber-`auto`** (naik dari 24 pada sensus 2026-08-20). Pasangan
+> yang terbukti dipakai:
+>
+> | Sumber · metrik | Formula | Cakupan yang dipakai |
+> |---|---|---|
+> | `skor_tim` (tanpa sub-metrik) | `rata_rata` (6×) | department, team |
+> | `kinerja_toko` · `gross_profit`, `profit_bersih` | `jumlah_nilai` | department, individu, team |
+> | `kinerja_toko` · `roas`, `retur_persen` | `rata_rata` | department, individu, team |
+> | `kinerja_ar` · empat metrik `*_persen` | `rata_rata` | department |
+> | `kinerja_sales_admin` · `penjualan_tuntas_cutoff_persen` | `rata_rata` | department |
+> | `kinerja_affiliate_tim` · `affiliate_aktif`, `conversion` | `jumlah_nilai` | individu |
+> | `forecast_kas` · `akurasi_forecast_kas` | `jumlah_nilai` | individu |
+> | `uptime_sistem` · `downtime` | `rata_rata` | department |
+> | `varians_anggaran` · `varians_persen` | `rata_rata` | department |
+>
+> Sumber yang **belum punya bukti pemakaian sengaja dibiarkan kosong**, dan frontend
+> meminta pengisi memilih. Menebak rumus lebih berbahaya daripada mengakui belum tahu:
+> rumus yang salah tidak menimbulkan galat, hanya angka salah yang tampak wajar. Formula
+> di luar `KPIReduksi` jadi **panic saat boot**, bukan koreksi senyap.
 | **Pratinjau sebelum simpan** | `POST /kpi/auto-values/pratinjau`, maks **10** `employee_ids` | Salah konfigurasi **tidak menimbulkan galat**, hanya angka salah yang tampak wajar. Sebaran beberapa orang pada periode lampau menunjukkannya langsung: semua 100 berarti target terlalu rendah, semua 0 berarti terlalu tinggi atau arahnya terbalik |
 | **Jejak perubahan** | koleksi `kpi_template_audits` | Konfigurasi kini disunting orang yang bukan penulisnya, dan blok `auto` yang berubah diam-diam mengubah nilai semua orang di posisi itu |
 
@@ -189,7 +249,7 @@ Rumus memakai field **`bersih`**, BUKAN `induk` mentah maupun `Σrincian`/`dikec
 **Sumber `kinerja_affiliate_tim` — KPI Affiliate Acquisition PER-TIM-CHANNEL** (🟡 branch `feature/workspace-position`, **belum merge/prod**, terverifikasi DEV 2026-08-25). Keputusan pemilik metrik: KPI staf Affiliate dinilai **per-tim-channel (TikTok/Shopee)**, bukan per-akun/per-individu — realisasi = **TOTAL channel** pada periode, jadi semua staf di channel yang sama berbagi angka yang sama. Alur: endpoint `GET /kpi/kinerja-affiliate-tim` di [[Microservices - Marketing Analytics Service]] (`kpi_affiliate_tim.go`) menentukan channel staf dari koleksi **`affiliate_channel_team`** (integration_db) lalu menghitung total; sumber `kpi_sumber_affiliate_tim.go` di employee-service memilih metrik & merakit target.
 - **Mapping staf→channel** dikelola dari **menu Affiliate** (dialog "Tim Channel"): CRUD `affiliate_channel_team` di [[Microservices - Integration Service]] (`/affiliate/channel-team`, gate `RequireMarketingLeader`, unik satu channel aktif per karyawan). 7 staf ter-seed: Nur Istiqomah & Ahmad Rifki Kurniawan → **Shopee**; Maulana/Fajar/Gumilang/Annisa/Ida → **TikTok**.
 - **`Conversion`** = total order channel **AFFILIATOR EKSTERNAL saja** — akun **internal** (`icc_affiliate_accounts`, milik perusahaan/dijalankan ICC) **dikecualikan** (`creator_username`/`affiliate_username` `$nin` daftar internal), karena di luar kendali staf Affiliate Acquisition. **TikTok** distinct `order_id` di `affiliate_orders`; **Shopee** Σ`orders` di `shopee_affiliate_performance`. Target per-channel: TikTok **31.000**, Shopee **11.000** (lewat `target_per_karyawan` tiap staf sesuai channel-nya). Terverifikasi DEV Jul-2026 (data penuh 212.543 order, 9.223 kreator): TikTok **25.014** eksternal (dari 31.966 total − 6.952 internal), Shopee **8.533** (≈11k; tak ada akun internal Shopee).
-- **`affiliate_aktif` (Jumlah Affiliate Aktif)** = affiliator external yang **upload ≥1 video/konten** pada bulan itu. **Shopee**: distinct `affiliate_username` di `shopee_affiliate_content_performance` (punya `post_time`). **TikTok**: ⚠️ TAK ADA data upload independen — **diproksi** distinct `creator_username` ber-order (video tanpa order tak terlihat, undercount). Target per-channel: TikTok **7.500**, Shopee **4.500**. DEV Jul: Shopee 101, TikTok 13 (parsial) — jauh di bawah target karena data upload tipis/proksi; angka naik setelah data konten lengkap ditarik.
+- **`affiliate_aktif` (Jumlah Affiliate Aktif)** = affiliator external yang **dapat ≥1 order** pada bulan itu (revisi **2026-08-25**; sebelumnya "upload ≥1 video/konten"). **TikTok**: distinct `creator_username` ber-order di `affiliate_orders`. **Shopee**: distinct `affiliate_username` dengan `orders>0` di `shopee_affiliate_performance` (sumber & saringan tanggal SAMA dengan Conversion). Definisi order-based menghapus ketergantungan data upload konten yang dulu bikin undercount. Target per-channel: TikTok **7.500**, Shopee **4.500**. DEV Jul (verified lewat endpoint): Shopee **1.693** (dari 101 definisi lama), TikTok **2.323** — masih di bawah target.
 - **`kinerja_affiliate` (per-holder)** lama tetap ada (untuk atribusi ICC pemegang akun via `icc_affiliate_accounts`), tetapi template Affiliate kini memakai `kinerja_affiliate_tim`.
 
 > **Koreksi bab-bab di bawah**: baris "Varians budget vs realisasi OPEX — Budget/anggaran tidak tersimpan di ERP mana pun" (Semi-otomatis) **sudah tidak akurat**. `integration_db` memuat `anggaran_opex` (229 dok), `realisasi_opex` (112), `realisasi_opex_mingguan` (60) — level akun+bulan+departemen — dan `incentive_opex_accurate` (17) yang **per-ICC**.
@@ -203,13 +263,15 @@ Konteks sumber: [[Microservices - Marketing Analytics Service]] (agregasi mart +
 
 ## Progres bulan berjalan di MyBharata
 
-> **Status**: 🟡 belum merge — bip-erp PR [#1071](https://github.com/bip-itteam-internal/bip-erp/pull/1071) (endpoint) + my-bharata PR [#109](https://github.com/bip-itteam-internal/my-bharata/pull/109) (layar, ke branch `dev`).
+> **Status**: ⚠️ **endpoint live di `main`, layar ada di `dev` tetapi BELUM rilis** per 2026-08-25. Endpoint `pratinjauKPISaya` ada di `origin/main` bip-erp dan sudah dua iterasi lebih maju daripada versi awalnya (commit `45bdfd8b` menambah `template_id` dan pemilihan template beraturan bersama; `cakupan` dan `rincian` per metrik ikut dikirim). Layarnya mendarat di `dev` my-bharata (commit `42fe0528`). ⛔ **Yang terpasang di HP orang belum memuatnya**: rilis `origin/main` my-bharata masih `1.14.5+135`, sementara `dev` sudah `1.14.14+149`. Catatan lama "belum merge" sudah tidak berlaku.
 
 Metrik otomatis hidup di produksi sejak 6 Agustus, tetapi **orang yang dinilai tak pernah melihatnya**. `GET /me/kpi-score` membaca dokumen `kpi_score` tersimpan dan membalas 404 bila belum ada, sedangkan layar KPI MyBharata mematok batas tombol maju di **bulan kemarin** — jadi bulan berjalan tak punya isi sekaligus tak bisa dibuka. Yang bisa melihat angka otomatis hanya penilai, lewat modal Score KPI dan halaman Otomasi KPI.
 
 `?preview=true` pada periode yang belum dinilai kini membalas 200 dengan progres berjalan: metrik yang sudah punya angka beserta basisnya, ditambah **cacahan** metrik yang masih menunggu atasan.
 
-**Tidak ada skor total di respons maupun di layar, dan itu keputusan utamanya.** Metrik otomatis baru menutupi sebagian bobot template — untuk IT Support baru satu metrik berbobot 0,4 dari empat. Total apa pun yang dihitung dari sebagian itu menyesatkan: menganggap sisanya nol memberi 40, menormalisasi ke yang ada memberi 100, dan keduanya terlihat meyakinkan padahal keduanya salah. Angka besar di layar selalu terbaca sebagai kesimpulan, bukan perkiraan.
+**Tidak ada skor total di RESPONS, dan itu keputusan utamanya.** Metrik otomatis baru menutupi sebagian bobot template — untuk IT Support baru satu metrik berbobot 0,4 dari empat. Total apa pun yang dihitung dari sebagian itu menyesatkan: menganggap sisanya nol memberi 40, menormalisasi ke yang ada memberi 100, dan keduanya terlihat meyakinkan padahal keduanya salah. Angka besar di layar selalu terbaca sebagai kesimpulan, bukan perkiraan.
+
+> ⚠️ **Koreksi 2026-08-25 atas kalimat di atas.** Versi lama berbunyi "tidak ada skor total di respons **maupun di layar**". Bagian "maupun di layar" **tidak pernah benar untuk web** dan **sudah tidak benar untuk mobile**. Rinciannya di bab berikut. Yang tetap berlaku: **responsnya sendiri memang tak membawa total** — kedua klien menghitungnya sendiri.
 
 Keputusan lain yang perlu diketahui sebelum menirunya:
 
@@ -218,6 +280,24 @@ Keputusan lain yang perlu diketahui sebelum menirunya:
 - **`dinilai: false` adalah inti kontraknya.** Tanpa penanda itu aplikasi akan menampilkan angka berjalan dengan gaya yang sama seperti skor final.
 - **Basis ditampilkan apa adanya** (`uptime 99.93%; 7 dari 31 hari berdata`) supaya angkanya bisa ditelusuri tanpa bertanya. Metrik bersumber `semi` diberi keterangan bahwa datanya belum lengkap — pada bulan berjalan itu keadaan normal, dan tanpa keterangan akan terbaca sebagai cacat.
 - **Perhitungannya memanggil `terapkanOtomatis`**, bukan menyalin rumusnya: karyawan dan penilai harus melihat angka yang sama.
+
+### Bulan berjalan jadi default, dan skor totalnya ikut tampil
+
+> **Status**: 🟡 branch `feat/kpi-bulan-berjalan` (my-bharata, dari `dev`), **belum PR** per 2026-08-25. Rencana: `.task-plans/2026-08-25-kpi-mobile-bulan-berjalan.md`.
+
+Irisan pertama menyediakan datanya tetapi tak mengubah pintunya: layar tetap **membuka bulan kemarin**, sehingga progres berjalan ada, bisa dibuka, dan tetap tak terlihat kecuali orangnya menekan panah kanan. Irisan ini memindahkan default ke **bulan berjalan**.
+
+**Skor totalnya kini ditampilkan, dan itu membalik keputusan di bab atas.** Yang membalikkannya bukan argumen baru melainkan keadaan yang sudah berjalan: web `/hris/kpi` **sudah** menampilkan total dari otomasi di produksi (`kpi-scorecard.tsx`, lencana "dari Otomasi"), dihitung sebagai `Σ(bobot × nilai) / Σbobot` **atas metrik yang punya angka saja**. Menahannya di mobile berarti karyawan dan penilainya melihat angka berbeda untuk orang dan bulan yang sama — persis yang hendak dicegah prinsip "karyawan dan penilai harus melihat angka yang sama" di daftar atas.
+
+Kekhawatiran lamanya tetap sah dan dijawab **di layar**, bukan dengan menyembunyikan angkanya:
+
+- **Judulnya "Skor Sementara", tak pernah "Skor Akhir"**, dan kartunya berbeda dari kartu skor final.
+- **Cakupan bobot disebut angka demi angka** ("Dihitung dari 40% bobot yang sudah terisi otomatis"). Bisa dibaca langsung sebagai persen karena `ValidateKPIMetrics` menjamin bobot satu template berjumlah tepat 1,0; nilainya tetap di-clamp karena template yang disunting langsung di Mongo tak melewati validasi itu, dan jalur itulah yang dipakai menyalakan metrik otomatis pertama.
+- **Rumusnya ditiru persis dari web**, bukan disusun ulang. Konsekuensi yang diterima sadar: rumusnya kini hidup di dua tempat (TypeScript dan Dart) dan bisa menyimpang. Memindahkannya ke backend supaya kedua klien berbagi satu sumber adalah pekerjaan yang belum dikerjakan.
+
+**Konsekuensi yang paling menentukan justru bukan soal angka.** Sensus 2026-08-20 mencatat metrik ber-`auto` baru menyentuh **38 dari 183 karyawan aktif**, jadi sesudah perubahan ini mayoritas orang mendarat di layar tanpa angka — padahal sebelumnya mereka langsung melihat skor final bulan lalu. Karena itu **kedua keadaan kosong diberi tombol "Lihat penilaian bulan lalu"**: kartu kosong progres (200 dengan `metrik` kosong) dan cabang **404** (posisi tanpa template KPI). Cabang 404 mudah terlewat dan justru yang paling berbahaya: ia juga menyambut **semua orang** bila employee-service yang terpasang belum mengenal `?preview=true`, dengan pesan "KPI tidak ditemukan" yang menunjuk ke sebab yang salah.
+
+⛔ **Gerbang rilis: pastikan employee-service PROD sudah mengenal `?preview=true` sebelum versi mobile ini naik.** Bila belum, seluruh pemakai membuka KPI dan melihat keadaan kosong. Urutannya BE dulu, baru FE.
 
 ## Kondisi Saat Ini
 

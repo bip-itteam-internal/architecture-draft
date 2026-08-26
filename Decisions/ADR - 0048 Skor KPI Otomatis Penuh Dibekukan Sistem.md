@@ -1,8 +1,9 @@
 ## Deskripsi
 
-*Posisi yang seluruh metrik KPI-nya bersumber otomatis dibekukan jadi `kpi_score` oleh sistem pada tanggal 10 bulan berikutnya, tanpa menunggu supervisor menekan Simpan. Bulan berjalan ikut dihitung dan ditampilkan hidup sampai tanggal itu. Mengubah siapa yang bertanggung jawab atas sebuah skor, karena itu ditulis sebagai ADR.*
+*Posisi yang seluruh metrik KPI-nya bersumber otomatis dibekukan jadi `kpi_score` oleh sistem pada tanggal 1 bulan berikutnya (Finance tanggal 5), tanpa menunggu supervisor menekan Simpan. Bulan berjalan ikut dihitung dan ditampilkan hidup sampai tanggal itu. Mengubah siapa yang bertanggung jawab atas sebuah skor, karena itu ditulis sebagai ADR.*
 
-- **Status**: ⚠️ **Diputuskan 2026-08-20, kode selesai, BELUM merge dan BELUM deploy.** Branch `feat/kpi-skor-otomatis` (bip-erp) dan `feat/kpi-bulan-berjalan` (erp-frontend).
+- **Status**: ⚠️ **Diputuskan 2026-08-20, kode selesai.** Branch `feat/kpi-skor-otomatis` (bip-erp) dan `feat/kpi-bulan-berjalan` (erp-frontend).
+- **Amandemen 2026-08-25**: tanggal beku diubah dari seragam **10** menjadi **1** untuk semua department, **kecuali Finance (tanggal 5)**. Lihat Decision butir 1 dan bagian tanggal di bawah. Kode di `feature/workspace-position` (`kpi_finalisasi.go`).
 - **Ruang lingkup**: `kpi_score` dan `kpi_template` di [[Microservices - Employee Service]]. Tidak menyentuh `POST /kpi` (jalur manusia).
 
 ## Context
@@ -26,7 +27,7 @@ Akibatnya tiga puluh orang tercatat "belum dinilai" selamanya walau skornya suda
 
 ## Decision
 
-**1. Sistem membekukan skor untuk posisi yang bobot otomasinya PENUH.** Cron harian 02:00 WIB, aktif sejak tanggal `TanggalBekuKPI = 10` bulan M+1, memfinalisasi periode M. Gerbangnya empat, dan seluruhnya harus lolos:
+**1. Sistem membekukan skor untuk posisi yang bobot otomasinya PENUH.** Cron harian 02:00 WIB memfinalisasi periode M pada bulan M+1. **Tanggal bekunya per-department** (`tanggalBekuKPIUntuk`): default **tanggal 1**, kecuali **Finance tanggal 5**. Gerbang tanggalnya (`bolehBekuDept`) relatif ke PERIODE, bukan tanggal kalender, jadi pemicu manual bulan lampau tetap benar. Gerbangnya empat (di luar tanggal), dan seluruhnya harus lolos:
 
 - karyawan belum punya `kpi_score` periode itu;
 - templatenya tidak ambigu (satu posisi bisa punya beberapa template);
@@ -39,7 +40,7 @@ Yang tidak lolos **dilewati utuh** dan dicoba lagi esok hari, tidak dibekukan se
 
 **3. Supervisor tetap boleh menimpa** lewat `POST /kpi` biasa. Jejaknya sudah ada tanpa field baru: `dinilai_oleh` berisi `OTOMASI` untuk yang dibekukan sistem, dan [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] sudah menstempel `auto_value` ke snapshot sehingga "penilai menimpa angka mesin" terjawab dari `value != auto_value`.
 
-**Tanggal 10 dipilih dari data, bukan selera.** Pengisian manual memang lambat: periode Juni masih **bertambah 5 dokumen pada 19 Agustus**, tujuh minggu sesudah bulannya berakhir. Membekukan tanggal 1 mengunci bulan itu saat hampir tak seorang pun sempat mengisi.
+**Tanggal beku diubah 2026-08-25: seragam 10 → tanggal 1, Finance tanggal 5.** Kekhawatiran lama yang memilih tanggal 10 — pengisian **manual** yang lambat (periode Juni masih bertambah 5 dokumen pada 19 Agustus, tujuh minggu sesudah bulannya berakhir) — ternyata tak relevan bagi yang dibekukan otomatis: hanya posisi otomasi **PENUH** yang beku sendiri, dan justru posisi itu **tak menunggu tangan siapa pun**. Maka semua department dikunci **tanggal 1** begitu bulannya lewat. **Finance dikecualikan ke tanggal 5** karena proses tutup buku akuntansinya baru rampung belakangan, sehingga skor yang bergantung datanya belum lengkap pada tanggal 1. Posisi bermetrik manual tetap butuh manusia menekan Simpan kapan saja — tanggal beku ini tak menyentuhnya. Menambah pengecualian department lain cukup satu baris di `tanggalBekuKPIKhusus`.
 
 ## Consequences
 

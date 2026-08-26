@@ -37,7 +37,22 @@ Tiga hal yang perlu diketahui pemilik produk:
 
 - **Hanya pertanyaan berskala yang ikut.** Pilihan ganda seperti "Sangat Baik / Baik / Cukup" belum bisa dihitung karena opsinya menyimpan teks tanpa nilai. Gantinya bukan kompromi: tipe skala punya keterangan ujung, sehingga penilai tetap melihat kata sambil angkanya tersimpan. Layar selalu menyebut skor dihitung dari berapa pertanyaan, jadi form yang terlanjur memakai pilihan ganda ketahuan dari angkanya sendiri.
 - **Satu orang satu suara.** Penilai yang menjawab semua pertanyaan dan yang menjawab sebagian sama beratnya. Yang berbobot adalah pertanyaannya, bukan orangnya.
-- **Belum masuk KPI, dan itu disengaja.** Angkanya berhenti di layar analisa supaya rumusnya masih bisa dikoreksi tanpa merusak riwayat penilaian siapa pun.
+- **Belum masuk KPI, dan itu disengaja.** Angkanya berhenti di layar analisa supaya rumusnya masih bisa dikoreksi tanpa merusak riwayat penilaian siapa pun. ⚠️ **Sebagian dilonggarkan 2026-08-25** — lihat §Indeks layanan departemen di bawah: angka DEPARTEMEN kini boleh keluar dari layar analisa. Yang tetap berlaku adalah larangan aslinya, yaitu angka per ORANG tak masuk KPI.
+
+## Indeks layanan departemen
+
+> **Status**: ⚠️ **Merged ke `main` 2026-08-25** (BE [#1417](https://github.com/bip-itteam-internal/bip-erp/pull/1417) + [#1418](https://github.com/bip-itteam-internal/bip-erp/pull/1418), FE [erp-frontend #1205](https://github.com/bip-itteam-internal/erp-frontend/pull/1205) + [#1206](https://github.com/bip-itteam-internal/erp-frontend/pull/1206)). **Belum di-deploy, belum diuji lewat gateway, dan belum ada satu pun form bertanda** — jadi masih inert.
+
+Sebuah form survei bulanan bisa ditandai sebagai **sumber indeks layanan** departemen pemiliknya. Hasilnya diringkas jadi satu angka 0–100 per bulan dan tampil di halaman ringkasan divisi itu, lengkap dengan cakupan pengisian dan aspek yang nilainya paling rendah. Kasus pertamanya: seluruh karyawan menilai layanan Tech Development, hasilnya di `/it`.
+
+Empat hal yang perlu diketahui pemilik produk:
+
+- **Ini penyimpangan sadar dari "angka berhenti di layar analisa".** Yang keluar adalah angka **departemen sebagai unit**, bukan angka per orang, jadi ia tak menyentuh catatan penilaian siapa pun dan tak bisa dipakai menilai individu. Disetujui pemilik produk 2026-08-25 setelah konsekuensinya disampaikan.
+- **Tidak menggantikan CSAT per tiket.** CSAT mengukur layanan yang benar-benar dialami tepat setelah kejadian; indeks ini menangkap yang **tak pernah jadi tiket** — gangguan yang tak dilaporkan, permintaan yang menggantung, perubahan yang tak dikabarkan. Keduanya sengaja berdampingan di layar, sebab menggabungkannya jadi satu angka menyembunyikan justru selisih yang paling menarik dibaca.
+- **Hanya pertanyaan berskala yang ikut**, sesuai bobot masing-masing, memakai perhitungan yang sama persis dengan skor gabungan penilaian. Pertanyaan berbobot **nol** sengaja berdiri di luar indeks sebagai pembanding: bila indeks naik sementara pertanyaan keseluruhan turun, yang salah adalah bobot antar aspeknya, bukan layanannya.
+- **Form survei kini bisa anonim.** Sebelumnya kerahasiaan hanya ada pada form penilaian bersasaran, sehingga survei yang menilai sebuah departemen tak punya cara menyembunyikan pengisinya — padahal yang dinilai adalah departemen yang mengurus akun dan akses mereka. Identitas tetap tersimpan di database (satu orang tetap tak bisa mengisi dua kali, jejaknya tetap bisa ditelusuri); yang hilang hanya kemampuan pemilik form membacanya. **Kerahasiaan tak bisa dicabut setelah ada yang mengisi.**
+
+Detail kontrak: [[API - Form Builder Service]].
 
 ## Menuju hak per jabatan
 

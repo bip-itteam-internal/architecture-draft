@@ -5,7 +5,7 @@ Departemen IT menyediakan dukungan/teknis untuk seluruh perusahaan, sekaligus me
 
 ## Ruang Lingkup Domain IT
 
-- **Ringkasan divisi** — halaman `/it` di [[APP - Web ERP]]: satu layar yang meringkas kesehatan infrastruktur, helpdesk, dan skor KPI tim. Ia **pintu, bukan tujuan** — tiap angka menautkan ke modul yang memiliki daftar dan aksinya, sehingga tak ada dua tempat yang bisa berbeda pendapat. Sejajar `/finance` dan `/hris`, tapi sengaja tanpa sumbu posisi; alasannya di dok itu. ⚠️ Belum merge per 2026-08-13.
+- **Ringkasan divisi** — halaman `/it` di [[APP - Web ERP]]: satu layar yang meringkas kesehatan infrastruktur, helpdesk, skor KPI tim, dan **indeks layanan** (bagaimana karyawan di luar tim menilai layanan divisi ini tiap bulan; lihat [[IT - Form Builder]]). Ia **pintu, bukan tujuan** — tiap angka menautkan ke modul yang memiliki daftar dan aksinya, sehingga tak ada dua tempat yang bisa berbeda pendapat. Sejajar `/finance` dan `/hris`, tapi sengaja tanpa sumbu posisi; alasannya di dok itu. ✅ Merged; kartu indeks layanan menyusul 2026-08-25 dan **belum di-deploy**.
 - **Layanan & dukungan** — [[IT - Helpdesk]] (ticketing): tim IT menangani tiket dari semua divisi
 - **Manajemen akun & akses** — [[IT - Employee System]]: aktif/nonaktif akun, reset akun, set role, reset perangkat tertaut
 - **Infrastruktur** — [[IT - Server, VMs and Databases]] (server/VM/DB) & [[IT - Network Management]] (LAN/WiFi/perangkat)

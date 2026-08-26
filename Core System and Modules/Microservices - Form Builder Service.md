@@ -212,6 +212,28 @@ Nilai di luar rentang **diklem**: validasi menolaknya saat menulis, tapi dokumen
 
 > **Belum masuk KPI, dan itu disengaja.** Angkanya berhenti di layar analisa. Menyambungkannya ke `kpi_score` menuntut definisi yang stabil selamanya, sebab angka periode lalu harus tetap berarti saat rumusnya berubah. Melihatnya dulu di analisa memberi kesempatan mengoreksi rumus tanpa merusak riwayat siapa pun. Bila kelak dilanjutkan, polanya sudah ada di `kpi_sumber_kaizen.go`, dan [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] menetapkan employee-service tetap pemilik tunggal `kpi_score`.
 
+## Indeks layanan departemen: `metric_key` + `GET /me/service-index`
+
+> **Status**: ⚠️ **Merged ke `main` 2026-08-25** (PR [#1417](https://github.com/bip-itteam-internal/bip-erp/pull/1417) + [#1418](https://github.com/bip-itteam-internal/bip-erp/pull/1418)). **Belum di-deploy, belum diuji lewat gateway.** Konsep produknya di [[IT - Form Builder]].
+
+Skor gabungan di atas menjawab "siapa yang perlu ditindaklanjuti". Bagian ini menjawab pertanyaan yang berbeda: **bagaimana orang di luar sebuah departemen menilai layanannya**, sebagai satu angka per bulan yang dibaca di halaman ringkasan divisi.
+
+**Perhitungannya memanggil `overallOf` apa adanya, bukan rumus baru.** Keduanya meringkas jawaban berskala berbobot jadi satu angka, dan dua definisi yang sama-sama masuk akal akan menyimpang begitu salah satunya disentuh — tanpa satu pun layar yang menunjukkan bahwa angka di ringkasan dan angka di halaman analisa sudah berbeda artinya. Ada uji yang membandingkan keduanya langsung untuk masukan yang sama.
+
+**`metric_key` menandai form, bukan id yang ditanam di frontend.** Id Mongo di klien tak bisa diaudit, tak ikut berpindah saat form dibuat ulang, dan tak punya tempat yang menjelaskan kenapa angkanya berasal dari form itu. Validasinya menutup tiga kegagalan senyap sekaligus: nilai tak dikenal, tipe selain `survey`, dan form yang tidak berulang bulanan — yang terakhir paling berbahaya karena jawabannya tersimpan tanpa `period_key` sehingga kartunya kosong selamanya sementara jawaban terus berdatangan.
+
+**Keunikan ditegakkan indeks unik PARSIAL**, bukan sekadar pemeriksaan hitungan saat terbit. Dua permintaan bersamaan sama-sama melihat hitungan nol dan keduanya lolos; yang kalah kini ditolak Mongo dan diterjemahkan jadi `409` yang sama. ⚠️ Filternya wajib parsial: `metric_key` bertanda `omitempty`, jadi indeks unik biasa akan memperlakukan seluruh form tanpa penanda sebagai satu nilai null yang sama dan dua form biasa di satu departemen akan saling menolak. Pembuatan indeksnya **tidak fatal** bila gagal, sebab service yang menolak boot demi satu indeks memadamkan seluruh Form Builder.
+
+**Rutenya di grup `/me`, bukan `/forms`.** Alasannya sama persis dengan rute komite Kaizen: yang membacanya staf divisi di ringkasannya sendiri, yang belum tentu mengelola form apa pun. Gerbangnya pindah ke dalam handler dan bersumbu departemen (`common.SupervisedDepartments`, yang selalu memuat departemen pemanggil sendiri). Rute BACA, jadi terkunci `EffectiveCompanyID` — memakai `CompanyID` membuat admin pusat melihat angka perusahaannya sendiri di bawah label perusahaan yang sedang dibuka.
+
+**Kerahasiaan meluas ke form tanpa sasaran.** `settings.anonymous` melengkapi `subject.anonymous` yang lebih dulu ada, dan keduanya sengaja **tidak** dijumlahkan sebagai OR — form bersasaran hanya membaca miliknya sendiri. Penentu tunggalnya `anonimAktif` di `anonim.go`, menggantikan syarat yang sebelumnya ditulis ulang di daftar jawaban dan export. Mencabutnya setelah ada jawaban dibalas `409`, dan pada `PATCH` field yang absen berarti jangan diubah.
+
+**Pertanyaan berbobot nol dikembalikan terpisah** sebagai `unweighted`, bukan disembunyikan: ia jadi pembanding di luar indeks, sehingga indeks yang naik sementara pertanyaan keseluruhan turun menunjukkan bobot antar aspeknya yang salah, bukan layanannya yang membaik.
+
+**Blok yang sama juga menempel di respons `GET /forms/:id/analytics`**, memasok tab Ringkasan Eksekutif di [[APP - Web ERP]]. Dipasang di handler setelah `applyTrueTotal`, sejajar blok penilaian, dan `indeksAnalisa` sendiri yang memutuskan kapan ia absen: pada form bersasaran penilaian (yang dijawab `subjects` per orang) dan pada form tanpa pertanyaan berskala. Keputusan "kapan absen" itu yang paling penting di sini — angka yang muncul di tempat salah tak pernah terlihat salah, sebab bentuknya selalu wajar.
+
+Konsekuensi yang perlu diketahui pembaca kode: `FieldAnalytics` **tidak** membawa `weight`, jadi blok inilah satu-satunya jalan bobot sampai ke klien. Menambahkan `weight` ke `FieldAnalytics` akan melahirkan dua jalan untuk satu nilai, dan yang satu pasti menyimpang.
+
 ## Penilaian karyawan lain: sumbu `subject`, terpisah dari `audience`
 
 Kasus nyata yang jadi acuan: **seluruh karyawan menilai tiap Office Boy, satu per satu**. Di produksi itu 185 karyawan × 4 Office Boy = **740 penilaian**, dan tiap orang mengisi 4 kali dalam satu duduk.

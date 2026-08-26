@@ -17,6 +17,7 @@ Sumber yang sudah ada dan bisa dipakai sebagai contoh:
 | `kaizen` | form-builder lewat HTTP | Sumber yang mencacah kiriman per periode |
 | `kinerja_toko` | marketing-analytics lewat HTTP | **Satu sumber melayani banyak metrik** lewat `KPIAutoConfig.Metrik` — kini **delapan**: `revenue`, `ads_cost`, `gross_profit`, `jumlah_video`, `roas`, `roas_bersih`, `retur_persen`, `profit_bersih`; tiap entri katalog menghasilkan SATU angka. (`roas`/`roas_bersih` dulu bernama `roi`/`roi_bersih` — alias lama tetap jalan. `profit_bersih` = net_settle − hpp − iklan − retur − opex, boleh negatif. Detail: [[HRIS - Otomasi Skor KPI]]) |
 | `kinerja_tiket` ✅ | task-management lewat HTTP | Pola yang sama, tetapi tiap entri katalog menghasilkan **Cuplikan utuh** karena bentuk cakupan tiap metriknya berbeda. (Penanda "belum merge" di sini sudah usang: PR [#1055](https://github.com/bip-itteam-internal/bip-erp/pull/1055) merged dan hidup di prod sejak 6 Agustus 2026.) |
+| `kinerja_tiket_divisi` ⏳ | task-management lewat HTTP | Satu-satunya contoh sumber yang **cakupannya BUKAN orang**. Ia menilai tiket satu kelompok space, dan ruang lingkupnya ditentukan data di service seberang (`space.division` + `space.kpi_group`), bukan `KPIAutoConfig.Scope`. Juga contoh sumber yang **memakai ulang katalog penghitung sumber lain** alih-alih menyalinnya, dan yang **meneruskan badan galat** service seberang apa adanya ke `auto_basis`. Merged 2026-08-25, belum di prod |
 | `kedisiplinan_absensi` ✅ | attendance lewat HTTP | Sumber yang cakupannya bisa **ratusan orang**, sehingga daftar `employee_id` dipecah 100 per panggilan. Contoh pemakaian cakupan **`perusahaan`**, dan contoh sumber yang memakai ulang definisi penyebut milik service seberang alih-alih menulis tandingannya |
 | `turnover_karyawan` · `kontrak_karyawan` ✅ | `employee_db` sendiri | Sumber **lokal** yang tak memanggil HTTP sama sekali. `turnover_karyawan` juga contoh sumber yang **MENOLAK cakupan** yang tak sah baginya, alih-alih menerimanya lalu menghasilkan angka yang menjawab pertanyaan lain |
 
@@ -357,6 +358,8 @@ Empat contoh nyata, semuanya bertipe sama: salah yang tidak menimbulkan error.
 - [ ] Sudah dijalankan **sekali lewat gateway** sungguhan, bukan hanya lokal
 - [ ] Merge-nya terbukti sampai `main`: `git merge-base --is-ancestor <merge-commit> origin/main`, atau berkasnya benar-benar ada di `origin/main`. Tanda **MERGED** di GitHub tidak cukup — PR yang `base`-nya menunjuk branch fitur lain kehilangan seluruh isinya bila branch dasarnya di-merge lebih dulu (terjadi nyata pada PR #1058, lihat [[HRIS - Otomasi Skor KPI]])
 - [ ] Metriknya dibuka di layar **Otomasi KPI** (`/hris/kpi/otomasi`) dan berstatus `otomatis` atau `semi` — bukan `manual`
+- [ ] **Label dan keterangannya diisi di kamus, di DUA locale** ([[REF - Penamaan Metrik & Sumber KPI]]). Sumber tanpa entri tidak hilang — ia jatuh ke perapian token (`kinerja_po_marketing` → "Kinerja po marketing") **tanpa keterangan sama sekali**, dan pengisi tak punya cara tahu sumbermu menghitung apa. Per 2026-08-25 separuh katalog (10 dari 20 sumber) berada dalam keadaan itu; jangan menambah yang kesebelas
+- [ ] Labelnya **dilihat di layar**, bukan di editor: pemilih Sumber data selebar `w-60`, dan label di atas ±28 karakter terpotong di sana
 
 Butir terakhir adalah cara termurah membuktikan metrikmu benar-benar hidup untuk **semua** orang di posisi itu, bukan cuma untuk satu karyawan yang kebetulan kamu uji. Statusnya `semi` bukan kegagalan — itu berarti angkanya nyata tetapi cakupan datanya parsial, dan layar itu menyebutkan berapa persen. Yang harus membuat berhenti adalah `manual`: berarti hitungannya gagal, dan sebabnya sudah tertulis di kolom keterangan.
 
@@ -372,3 +375,4 @@ Butir kedua dari terakhir bukan formalitas. Perbandingan itulah yang menemukan b
 - [[Microservices - Employee Service]] (pemilik `kpi_template` dan `kpi_score`)
 - [[Microservices - Integration Service]] · [[Microservices - Marketing Analytics Service]] (calon sumber data marketing)
 - [[HRIS - Organization Structure]] (cakupan departemen dan atasan langsung)
+- [[REF - Penamaan Metrik & Sumber KPI]] (aturan label & keterangan; bagian dari checklist di atas)

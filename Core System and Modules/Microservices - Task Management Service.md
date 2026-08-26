@@ -35,6 +35,7 @@ Supervisor yang membawahi **lebih dari satu departemen** melihat dan menindak ti
 - **Tipe permintaan per-space ✅** `Space.Types []SpaceType` (`{id,name,description,color}`), diterima `createSpace`/`updateSpace` lewat field `types`. Lihat **### Tipe permintaan**.
 - **Visibility ✅** `Space.Visibility` (`public` bawaan / `restricted`) + `AllowedDivisions` + `AllowedEmployees`. Lihat **### Kontrol akses space**.
 - **Admin space ✅** `Space.Admins []string` (employee_id) — orang yang ditunjuk memegang space itu. Lihat **### Admin space**.
+- **Kelompok KPI ⚠️** `Space.KPIGroup` (`support` / `development` / kosong), diterima `createSpace` dan `updateSpace`. Memisahkan pekerjaan dukungan dari pengembangan **di dalam satu divisi**, karena metrik KPI Leader menilai keduanya terpisah sedangkan `Division` keduanya sama. Kosakatanya **tetap, bukan teks bebas**: katalog metrik KPI dengan begitu bisa statis, dan salah ketik ditolak 400 saat menyimpan alih-alih berujung metrik yang diam-diam tak menemukan space. Kosong berarti belum dikelompokkan dan **sah**, jadi 15 space produksi tidak butuh migrasi. Dibaca `GET /kpi/space-group`; lihat [[API - Task Management Service]]. Merged 2026-08-25 ([#1427](https://github.com/bip-itteam-internal/bip-erp/pull/1427)+[#1428](https://github.com/bip-itteam-internal/bip-erp/pull/1428)), **belum di prod**.
 - `GET /spaces/my-roles` ✅ — `{admin_space_ids:[...]}` untuk pemanggil; dipakai klien memutuskan menu/tab. Didaftarkan **sebelum** `/spaces/:id`.
 
 ### Admin space ✅
