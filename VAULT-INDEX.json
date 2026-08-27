@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-27",
-  "jumlah_dokumen": 306,
+  "jumlah_dokumen": 308,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -262,6 +262,7 @@
       "tautan": [
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
+        "Microservices - Vault MCP Service",
         "API - API Gateway",
         "API - HRIS Orchestrator",
         "CORE - HRIS Orchestrator",
@@ -309,20 +310,19 @@
         "DB - Overview and Notes",
         "HOMEPAGE"
       ],
-      "hash": "46076fee08c411a57810c8a4e01edb7184c5664266b29260af71c673a484c983",
-      "ukuran_kb": 5.1,
-      "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, lewat prefix gateway mana masing-masing diakses (`/api/<module>/*`), berkas `API -` mana yang memuat daftar endpoint-nya, dan dok arsitektur mana yang berpasangan dengannya — termasuk Payroll yang kini masuk tabel. Menjelaskan pula cara routing lewat API gateway: validasi JWT lalu identitas diteruskan sebagai header `BIP-*`, open route yang cukup membawa service key, jalur `/ext/*` dan `/public/*` tanpa JWT, serta `GET /health` tiap service. Mencatat kenapa Finance sengaja memetakan ke dok domain (bukan `Microservices -`), service mana yang belum punya berkas `API -` sendiri (Calendar, HRD Document, Monitoring), dan cara mengaudit ulang daftar itu dari folder `services/*`.",
+      "hash": "9830516544f9806e53f8fb696602358212a180f51ff684169fca79d48849a8bd",
+      "ukuran_kb": 5.7,
+      "ringkasan": "Menjawab: service apa saja yang ada di bip-erp, prefix gateway masing-masing, dan di berkas mana daftar endpointnya tercatat. Menerangkan juga cara routing yang berlaku untuk semuanya: request masuk lewat API Master Gateway sebagai /api/<module>/<path> dengan prefix dibuang sebelum diteruskan, identitas dikirim lewat header BIP-*, plus jalur open route ber-service key dan jalur public/ext tanpa JWT. Mencatat satu pengecualian yang disengaja, yaitu Vault MCP Service yang tidak lewat gateway sama sekali.",
       "kata_kunci": [
-        "API index",
-        "daftar endpoint",
-        "prefix gateway",
-        "routing",
-        "service key",
-        "header BIP",
         "API reference",
-        "microservices bip-erp",
-        "payroll",
-        "open route"
+        "daftar service",
+        "endpoint",
+        "gateway prefix",
+        "routing",
+        "BIP-Employee-ID",
+        "service key",
+        "open route",
+        "health"
       ]
     },
     {
@@ -1586,22 +1586,23 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "APP - MyBharata",
         "GA - Guestbook System (Complete)",
+        "Microservices - Vault MCP Service",
         "Microservices - Task Management Service",
         "BASE - Enterance Point"
       ],
-      "hash": "cedcedf8292bbc5ea7ebbe65a3d6832b7828f4d20811d2bdb5fbd6ccc164b392",
-      "ukuran_kb": 13.0,
-      "ringkasan": "Menjawab: bagaimana mekanisme Single Sign-On bip-erp bekerja (one-time-code handoff, bukan IdP eksternal), alur lengkap login dari Web ERP ke aplikasi konsumen seperti Task Manager, dan panduan langkah demi langkah menambahkan aplikasi konsumen SSO baru. Juga menjelaskan sumber & struktur role/otorisasi (system_roles) termasuk aturan khusus akun pihak luar (vendor/mitra).",
+      "hash": "571cf6791abc6408f5e7741ffba5ed5daf00aaef8098b7f9a8169dc4b4c2ba68",
+      "ukuran_kb": 14.3,
+      "ringkasan": "Menjawab: bagaimana karyawan login sekali di Web ERP lalu masuk ke aplikasi internal lain tanpa login ulang, lewat one-time-code handoff yang ditukar jadi ERP JWT di gateway, bukan lewat Identity Provider eksternal. Merangkai alurnya end-to-end beserta peran tiap komponen: Web ERP sebagai IdP, gateway sebagai penerbit token dan pemilik endpoint ticket/redeem, employee-service sebagai sumber kredensial, dan Task Manager sebagai konsumennya.",
       "kata_kunci": [
         "SSO",
         "single sign-on",
         "one-time code",
+        "ticket",
+        "redeem",
         "JWT",
-        "redirect login",
-        "Task Manager",
-        "system_roles",
-        "RBAC",
-        "akun eksternal"
+        "login redirect",
+        "identity provider",
+        "handoff"
       ]
     },
     {
@@ -2538,6 +2539,38 @@
       "ukuran_kb": 1.7,
       "ringkasan": "Stub kosong untuk Microservices - TikTok Shop Service. Belum ada isi.",
       "kata_kunci": []
+    },
+    {
+      "path": "Core System and Modules/Microservices - Vault MCP Service.md",
+      "judul": "Microservices - Vault MCP Service",
+      "area": "Core System and Modules",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "**Irisan 1 merged ke `main`, BELUM di-deploy ke mana pun** (PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) + [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489), 2026-08-27). Kode baca-saja lengkap dan terkunci 93 test, termasuk alur OAuth penuh lewat HTTP sungguhan dan klien MCP sungguhan. Tetapi ia **belum pernah dijalankan di mana pun**: `docker build` belum pernah berhasil dicoba, dan DNS, proxy host, serta sertifikat belum berdiri. Irisan 2 (tulis) dan 3 belum ada kode.",
+      "publik": true,
+      "tautan": [
+        "CORE - API Master Gateway",
+        "CORE - SSO Flow",
+        "APP - Web ERP",
+        "RUN - Menyambungkan Claude ke Vault MCP",
+        "ADR - 0003 SSO-only Gateway",
+        "IT - Server, VMs and Databases"
+      ],
+      "hash": "11a34cf37aa350cce593e1508cad3a8780514bb64781359bd936a100103341f1",
+      "ukuran_kb": 17.5,
+      "ringkasan": "Menjawab: bagaimana Claude bisa membaca dan menulis vault arsitektur tanpa menyentuh Obsidian atau git, kenapa server ini menerbitkan token OAuth sendiri alih-alih meneruskan ERP JWT, dan kenapa ia sengaja berdiri di luar API Gateway. Memuat lima keputusan yang mengikat: audience binding, author commit adalah managernya sendiri, daftar-izin employee_id eksplisit, dan larangan menulis VAULT-INDEX.json. Alur autentikasinya menumpang penuh SSO ERP tanpa perubahan di gateway maupun frontend.",
+      "kata_kunci": [
+        "MCP",
+        "vault-mcp",
+        "Claude connector",
+        "OAuth",
+        "SSO",
+        "Streamable HTTP",
+        "dokumentasi arsitektur",
+        "mcp_sessions",
+        "audience binding",
+        "confused deputy"
+      ]
     },
     {
       "path": "Core System and Modules/Microservices - Warehouse Service.md",
@@ -5974,20 +6007,20 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "e97085405454c0fc93a02fe87316d87968e183c9bbbe7b892f179fd8bac72a12",
-      "ukuran_kb": 40.8,
-      "ringkasan": "Menjawab: bagaimana penilaian kinerja berbasis skor KPI bekerja di ERP, dan mana yang sudah jalan versus masih konsep — engine skor ke insentif untuk 9 role marketing di insentive-service, appraisal per-karyawan lintas departemen di employee-service (/kpi/*), sedangkan siklus bulanan wajib dan workflow review supervisor ke HR masih rencana. Menjelaskan template KPI per posisi beserta cara menghitung employee_count (assignment aktual, bukan kelayakan posisi), scoring per karyawan+periode dengan snapshot template, dan aturan bahwa posisi template harus cocok dengan jabatan karyawan pada akhir periode yang dinilai (dijawab dari employee_movement lewat field posisi_periode). Berguna juga untuk memahami RBAC KPI per departemen, cakupan tim untuk Leader (scope=team berdasarkan bawahan langsung, bukan role), dan kenapa Human Resource + General Affair tampil menyatu sebagai HRGA dari master data.",
+      "hash": "0e6d8014254bca641292f8340a0fcbb8a7f386590d730f5b74ff8b720863f006",
+      "ukuran_kb": 42.6,
+      "ringkasan": "Menjawab: bagaimana skor KPI dihitung dan ditampilkan per karyawan, tim, departemen, dan divisi; bagaimana departemen yang satu tim digabung jadi satu kelompok berlabel pendek (HRGA); dan bagaimana target disetel per metrik dari sumber otomasi. Memuat juga jebakan yang sudah menggigit di layar ini: ambang yang hidup di dua tempat, donut yang tak sepakat dengan kartu di sebelahnya, dan filter departemen bergrup yang menjatuhkan anggota tanpa satu pun galat.",
       "kata_kunci": [
         "KPI",
-        "Key Performance Index",
-        "appraisal",
-        "penilaian kinerja",
-        "kpi_template",
-        "kpi_score",
-        "insentif",
-        "incentive",
+        "key performance index",
+        "skor",
+        "otomasi KPI",
+        "auto-scores",
+        "template KPI",
         "HRGA",
-        "supervisor"
+        "Atur Target",
+        "scorecard",
+        "blueprint"
       ]
     },
     {
@@ -6140,20 +6173,20 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "b34f26298270241acd2a3f4587da53cc77132d9fa834a5a0aa238f872e4dcaca",
-      "ukuran_kb": 47.8,
-      "ringkasan": "Menjawab: bagaimana departemen, jabatan, jenjang jabatan, dan hierarki atasan dikelola sebagai master data, siapa penyetuju pengajuan sebuah departemen dan bagaimana urutan pencarian atasannya, serta apa beda Atasan Langsung dari Penyetuju Pengajuan. Memuat aturan supervised_by dan label grup HRGA, bagan organisasi, peta konsumen struktur organisasi yang diukur langsung ke origin/main, dan bukti verifikasi produksi 2026-08-26.",
+      "hash": "90dae65bcc9fe2985db762a0628214dd171cbaa86086b7c168e607443f175af8",
+      "ukuran_kb": 51.6,
+      "ringkasan": "Menjawab: bagaimana departemen, posisi, jenjang jabatan, dan hierarki atasan disimpan sebagai master data; siapa atasan sebuah departemen dan lewat urutan pencarian apa; serta bagaimana departemen yang satu tim (HRGA) dikelompokkan untuk tampilan tanpa mengubah satu pun nilai work_data. Memuat kontrak tiga penerjemah filter departemen yang bernama mirip, yang salah pakainya membalas 200 tanpa satu pun baris alih-alih melempar galat.",
       "kata_kunci": [
         "struktur organisasi",
         "master_department",
-        "jabatan",
-        "jenjang jabatan",
-        "job level",
-        "atasan langsung",
-        "supervisor_id",
-        "penyetuju pengajuan",
         "supervised_by",
-        "org chart"
+        "supervision_label",
+        "HRGA",
+        "atasan langsung",
+        "supervisor",
+        "org chart",
+        "jenjang jabatan",
+        "penyetuju departemen"
       ]
     },
     {
@@ -8517,6 +8550,34 @@
         "service key",
         "cakupan",
         "sumber metrik"
+      ]
+    },
+    {
+      "path": "Runbooks/RUN - Menyambungkan Claude ke Vault MCP.md",
+      "judul": "RUN - Menyambungkan Claude ke Vault MCP",
+      "area": "Runbooks",
+      "jenis": "runbook",
+      "status_emoji": "🟡",
+      "status_teks": "Draft — prosedurnya belum pernah dijalankan sampai tuntas karena servicenya belum di-deploy. Naikkan ke ✅ Implemented setelah manager pertama benar-benar tersambung.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Vault MCP Service",
+        "CORE - SSO Flow",
+        "RUN - Deploy Microservices bip-erp"
+      ],
+      "hash": "9900c0559b2f94003233cc178577975811fe4a75938d985cf9077ef8b5366402",
+      "ukuran_kb": 3.8,
+      "ringkasan": "Menjawab: langkah apa yang dijalankan seorang manager untuk menyambungkan Claude Desktop atau claude.ai ke vault arsitektur, dan apa yang dikerjakan IT untuk memberi atau mencabut akses itu. Menyebut prasyaratnya (employee_id sudah terdaftar di VAULT_MCP_ALLOWED_EMPLOYEES), cara memverifikasi jawabannya benar-benar bersumber vault, dan kenapa mengubah daftar aksesnya menuntut container dibuat ulang, bukan sekadar restart.",
+      "kata_kunci": [
+        "Claude connector",
+        "custom connector",
+        "MCP",
+        "vault",
+        "onboarding manager",
+        "VAULT_MCP_ALLOWED_EMPLOYEES",
+        "OAuth Client ID",
+        "akses vault",
+        "runbook"
       ]
     },
     {
