@@ -1258,20 +1258,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "e50357c692d683ddf49baf9f7098adcd773e0ce74c61f7eb35de659868acc8ac",
-      "ukuran_kb": 333.6,
-      "ringkasan": "Menjawab: apa itu portal web internal \"One Bharata\" (hris-dashboard), stack apa yang dipakai, dan bagaimana login serta refresh token bekerja lewat gateway. Juga menjelaskan bagaimana peran (system_roles per module) menentukan menu yang tampil, bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain, dan bagaimana sidebar dikelompokkan (menu induk bersarang, bukan field group). Berisi pula cara kerja pemilih perusahaan (multi-tenant) dan halaman Pengaturan HRGA terpusat beserta aturan penyaringan akses per tab.",
+      "hash": "3b48473a9fc815532c00899fbb310836b7418d1fdc6e9fcbd921c894e3b4c005",
+      "ukuran_kb": 336.5,
+      "ringkasan": "Menjawab: apa itu portal web internal \"One Bharata\" (erp-frontend), stack yang dipakainya, dan bagaimana login serta SSO Identity Provider bekerja termasuk allowlist redirect. Menjelaskan cara role gating sidebar diturunkan dari cookie system_roles per module, bagaimana menu HRIS dikelompokkan lewat menu induk bersarang (bukan field group), dan di mana setelan HRGA terpusat beserta penyaringan akses per tab. Juga menjawab bagian mana dari web ini yang sudah mengikuti multi-perusahaan (company switcher, kelola perusahaan/departemen/shift/network, direktori karyawan, broadcast artikel lintas-perusahaan).",
       "kata_kunci": [
         "erp-frontend",
-        "hris-dashboard",
-        "One Bharata",
         "web ERP",
+        "One Bharata",
+        "hris-dashboard",
         "SSO",
         "system_roles",
         "role gating",
         "sidebar menu",
         "Pengaturan HRGA",
-        "CompanySwitcher"
+        "multi-perusahaan"
       ]
     },
     {
@@ -2385,20 +2385,20 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "c95c3d2cffa249a67bfef09e0d4f43e692aa21631f9b35a5b72473e5eb4b5f82",
-      "ukuran_kb": 37.3,
-      "ringkasan": "Menjawab: bagaimana payroll-service menyimpan dan menghitung penggajian — endpoint config global (perusahaan, BPJS, pajak PPh21 TER, potongan kehadiran), master badan usaha penggaji untuk kop slip, master komponen gaji, dan penetapan gaji per karyawan. Juga menjelaskan cara kerja payroll run (kalkulasi, approve, publish), perhitungan potongan kehadiran, THR, dan slip PDF, termasuk dua dasar upah BPJS yang terpisah dan aturan pembulatannya. Berisi peringatan bahwa sumber aturan bisnis (jatah, ambang, besaran potongan) berada di BUSINESS_LOGIC_IMPLEMENTATION.md pada repo mobile, bukan di vault.",
+      "hash": "c6efdb2dfcefa02e66b1928f8f0e9ab4176dc0f1092669e8ce3a61d37a807632",
+      "ukuran_kb": 40.3,
+      "ringkasan": "Menjawab: bagaimana penggajian dikerjakan di bip-erp — setup komponen gaji, konfigurasi BPJS dan PPh21 metode TER, penetapan gaji per karyawan, sampai payroll run (kalkulasi, approve, terbitkan slip), THR, dan PDF slip. Menjelaskan endpoint dan gerbang role-nya, model data payroll_db, cara badan usaha penggaji (company_id di employee_salary) menentukan kop slip lewat CompanySnapshot, serta bagaimana potongan kehadiran dipecah jadi komponen terpisah dan mengapa seed tidak berlaku untuk dev/prod yang koleksinya sudah terisi. Juga menyebut di mana sumber aturan bisnisnya berada (BUSINESS_LOGIC_IMPLEMENTATION.md di repo mobile) dan batas scope layanan ini: menyiapkan data dan menerbitkan slip, tanpa pembayaran atau transfer.",
       "kata_kunci": [
-        "payroll service",
+        "payroll",
         "penggajian",
         "slip gaji",
-        "payslip",
-        "BPJS",
-        "PPh21 TER",
         "payroll run",
-        "potongan kehadiran",
+        "BPJS",
+        "PPh21",
+        "TER",
+        "PTKP",
         "THR",
-        "employee_salary"
+        "potongan kehadiran"
       ]
     },
     {
