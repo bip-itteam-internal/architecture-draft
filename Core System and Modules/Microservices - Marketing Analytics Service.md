@@ -6,7 +6,7 @@
 - **Path di repo**: `bip-erp/services/marketing-analytics/`
 - **Port**: env `PORT`, alias `SERVICE_PORT`, fallback `6985` (`main.go`)
 - **Prefix gateway**: `marketing-analytics` (`api-gateway/main.go`, env `MARKETING_ANALYTICS_MODULE_URL`)
-- **Status**: ⚠️ Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **40 route** di berkas produksi (enumerasi lengkap terhadap `origin/main`, termasuk `/health`). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD tetapi koleksinya masih 0 dokumen** — belum pernah dipakai host sungguhan, jadi belum terbukti bisa dipakai.
+- **Status**: ⚠️ Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **41 route** di berkas produksi (enumerasi lengkap terhadap `origin/main`, termasuk `/health`). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD tetapi koleksinya masih 0 dokumen** — belum pernah dipakai host sungguhan, jadi belum terbukti bisa dipakai.
 
 ## Prinsip Arsitektur
 
@@ -24,7 +24,7 @@ Penjaga yang sama sudah dibuktikan menutup `insentive_db` (sumber ICC) — arahn
 
 ## Endpoint (Sudah Diimplementasikan)
 
-**40 route** di berkas produksi (audit kode 2026-08-26, enumerasi seluruh pendaftaran `app.Get|Post|Patch|Put|Delete` di `services/marketing-analytics/*.go` non-test terhadap `origin/main`; tak ada `Group`/`Mount`, tak ada yang dikomentari). Berkas pendaftarnya: `routes.go` · `handler_mart.go` · `main.go` · `toko.go` · `divisi.go` · `price_floor_handler.go` · `ambang_handler.go` · `pagu_handler.go` · `kurva_alokasi_handler.go` · `live_shift_handler.go` · `jobs.go` · `penjadwal_status.go`. Daftar lengkap per-route: [[API - Marketing Analytics Service]], yang per audit ini **memuat keempat-puluhnya** (sebelumnya 12 route tak punya baris di mana pun). Seluruhnya `GET` kecuali disebut lain.
+**41 route** di berkas produksi (audit kode 2026-08-27, enumerasi seluruh pendaftaran `app.Get|Post|Patch|Put|Delete` di `services/marketing-analytics/*.go` non-test terhadap `origin/main`; tak ada `Group`/`Mount`, tak ada yang dikomentari). Berkas pendaftarnya: `routes.go` · `handler_mart.go` · `main.go` · `toko.go` · `divisi.go` · `price_floor_handler.go` · `ambang_handler.go` · `pagu_handler.go` · `kurva_alokasi_handler.go` · `live_shift_handler.go` · `jobs.go` · `penjadwal_status.go`. Daftar lengkap per-route: [[API - Marketing Analytics Service]], yang per audit ini **memuat keempat-puluhnya** (sebelumnya 12 route tak punya baris di mana pun). Seluruhnya `GET` kecuali disebut lain.
 
 > ⚠️ **Angka route di dok ini pernah bertentangan dengan dirinya sendiri**: baris Status sempat menyebut 38 (audit 2026-08-22) sementara paragraf ini masih menyebut 28 (audit 2026-08-07), karena Status diperbarui tanpa menyentuh badan dokumen. Keduanya juga meleset dari kode. Bila memperbarui salah satunya, perbarui **dua-duanya** — dan hitung ulang dari kode, jangan menambahkan selisih ke angka lama.
 
@@ -119,6 +119,42 @@ Penjaganya `TestRentangBawaanPakaiHariWIBBukanUTCPolos` — pemindai AST berdaft
 | `/videos` | Performa video (`VideoRow`, tiga tab VSA / GMV Max / organik via `spend_vsa`, `spend_gmv_max`, `sumber`). Kini juga membawa `gross_profit` (dijumlah pass kedua dari `mart_profit_attribution` level video — kegagalannya tak menggagalkan halaman, hanya null) dan identitas produk `product_title` / `product_image_url` / `product_item_group_id`. **Menolak `granularitas` (400)** — snapshot kumulatif tanpa dimensi hari |
 | `/videos/orders` | **Drill video → daftar order AFFILIATE** dari `affiliate_orders` (`content_id = video_id` AND `content_type = "VIDEO"`). Field `cakupan` **selalu terisi**: daftar ini hanya order affiliate — order organik video tidak tercatat menautkan video di sumber mana pun, jadi jangan dibandingkan dengan kolom orders baris video |
 | `/lives` | Sesi live dari `mart_live_sessions` (**4.836 sesi** per 2026-08-22; dulu kosong) |
+
+### KPI Host Live (`/kpi/kinerja-live`)
+
+Rute ke-41, masuk 2026-08-27 (PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486)). Menjawab satu pertanyaan: **berapa capaian siaran live satu departemen pada satu periode?** Bahan skor KPI Host Live di [[Microservices - Employee Service]] (sumber `kinerja_live`). Rincian parameter & balasan: [[API - Marketing Analytics Service]].
+
+**Penilaian PER-DEPARTEMEN, bukan per-orang** — dan itu bukan penyederhanaan sementara melainkan batas data. Tiga hal menutup jalan ke per-orang, seluruhnya terukur produksi 2026-08-27:
+
+1. Satu sesi TikTok bisa **16 jam** dalam satu `session_id` (07:50–23:50 WIB), berisi 2–3 shift host bergantian. API memberi agregat per sesi **tanpa dimensi waktu di dalamnya**, jadi angkanya tak bisa dipecah dari sisi mana pun.
+2. Satu host memakai beberapa akun, dan akunnya berganti antar bulan (`live_glowbooster4` → `live_glowbooster7`; `beautyhacks.id3` berhenti Juli).
+3. Satu siaran tercatat di beberapa akun sekaligus (dua etalase).
+
+⚠️ **Scope `individu` sudah didaftarkan di sisi employee-service tetapi sumbernya BELUM menghormatinya** — ia selalu menghitung per-departemen, sehingga memilih "Individu" atau "Departemen" di template menghasilkan angka identik sementara layar KPI menampilkan badge "Individu". Terlihat di produksi 2026-08-27 pada template *Host Live Kyura*. Perbaikannya menunggu `/live-shifts` benar-benar terisi.
+
+**Empat metrik**, bobot & target diputuskan pemilik metrik 2026-08-27 (diisi HR di template, bukan di kode):
+
+| Metrik | Rumus | Bobot · target contoh |
+|---|---|---|
+| `conversion` | Σ `sku_orders` (cacahan) | — |
+| `conversion_rate` | Σ `sku_orders` ÷ Σ `product_clicks` × 100 | 70 · 2% |
+| `avg_viewing_duration` | Σ(`avg_watch_sec` × `views`) ÷ Σ `views`, satuan **detik** | 20 · 60 detik |
+| `add_to_cart_rate` | Σ `add_to_cart` ÷ Σ `product_clicks` × 100 | 10 · 5% |
+
+⛔ **`conversion` memakai `sku_orders` (pesanan DIBAYAR), bukan `items_sold`.** TikTok mengirim tiga angka penjualan yang mudah tertukar dan salah pilih tidak menghasilkan galat, hanya angka yang meleset: `sku_orders` (pesanan dibayar) · `created_sku_orders` (termasuk COD/PayLater belum lunas) · `items_sold` (**unit**; satu pesanan berisi tiga unit dihitung tiga). Diverifikasi dua arah: dok resmi menyatakan `click_order_rate` = *paid sku orders / product clicks* (uji sesi nyata 89/1664 = 5,35% persis sama dengan yang dikirim API), dan totalnya cocok catatan manual HR — Juli Kyura **6.947 vs sheet 6.933 (+0,2%)**, sementara `items_sold` meleset 2,3%. Field `mart_live_sessions.orders` **sudah** berisi `sku_orders`; nama telanjang `Orders` itu yang sempat menyesatkan.
+
+⛔ **`24h_live_gmv` bukan `gmv` dan tak boleh dijumlahkan dengannya.** Dok resmi: *"within 24 hours of viewing, **including returns and refunds**"* — bisa **lebih besar** dari `gmv` dan bisa terisi saat `gmv` nol. Sekelas dengan `iklan_sia_sia` — lihat §Aturan Pemakaian Angka di dokumen ini.
+
+**Rasio dihitung dari Σpembilang ÷ Σpenyebut seluruh sesi, bukan rata-rata rasio per sesi**; durasi tonton ditimbang `views`. Merata-ratakan memberi bobot sama kepada sesi 10 penonton dan sesi 5.000 penonton. Konsekuensinya reduksi berbeda per metrik di sisi employee-service: cacahan `jumlah_nilai`, rasio `rata_rata`.
+
+`add_to_cart` **tidak ada di `shop_lives/performance`** — sumbernya endpoint terpisah `/analytics/202512/shop/{live_id}/products_performance`, satu panggilan per sesi saat sync, dan **hanya untuk sesi host** (148 panggilan/bulan, bukan ribuan). Fieldnya pointer: nil = belum pernah diambil, bukan nol orang memasukkan ke keranjang. ⚠️ **Per 2026-08-27 nol dari 2.365 sesi Agustus punya field ini** — kode pengambilnya baru merge dan sync belum berjalan sejak itu, sehingga `add_to_cart_rate` melaporkan 0% untuk keadaan yang sebenarnya belum terukur.
+
+**Yang TIDAK bisa diambil dari API TikTok**, diuji langsung ke produksi 2026-08-27 (12 endpoint live):
+
+- **Biaya iklan per sesi** — tak ada di satu pun endpoint live. `tt_business_gmv_max_performance_reports` bergranularitas harian (`stat_time_day`), endpoint per-menit nol field biaya, dan iklan bertipe LIVE cuma **2 dari 1.335 ad group** dengan nol baris di `mart_profit_attribution`. Konsekuensinya **laba bersih per sesi live tak dapat dihitung tanpa asumsi**; komponen HPP dan fee marketplace sudah akurat (uji: 23,9% vs 25,8% dan 12,0% vs 12,1% terhadap agregat toko), iklan yang tidak.
+- Seluruh keluarga `live_rooms/*` (**7 endpoint**: core_stats/PCU, GMV trend, view trends, traffic, interactive trends, product stats, user portraits) ditolak `36009004`/`36009005` — menuntut otorisasi level akun creator, bukan shop-level seperti kredensial kita. Pola sama dengan livestream Shopee.
+- `Get Bestselling LIVE Sessions` ditolak `105005` (app tak diizinkan).
+- **Shopee live nihil API** dan itu permanen — host Shopee tetap dicatat manual.
 
 ### Pencatatan sesi live oleh host (`/live-shifts`)
 
@@ -245,7 +281,17 @@ Nol koleksi iklan/video/live di `integration_db` (hanya finance). Order Lazada m
 
 ## Aturan Pemakaian Angka (larangan hitung ganda)
 
-Tiga kolom di service ini **tampak seperti komponen kerugian tetapi bukan**, dan menjumlahkannya ke laba menghasilkan angka dobel yang terbaca sah. Sampai 2026-08-26 seluruh aturan di bawah hanya hidup sebagai komentar di berkas Go-nya, jadi siapa pun yang merancang layar dari dokumentasi saja tak punya cara mengetahuinya. Kegagalannya tidak pernah muncul sebagai error, hanya sebagai angka yang salah dan masuk akal.
+Beberapa kolom di service ini **tampak seperti komponen kerugian tetapi bukan**, dan sebagian lain **bernama nyaris sama tetapi berbeda arti**, dan menjumlahkannya ke laba menghasilkan angka dobel yang terbaca sah. Sampai 2026-08-26 seluruh aturan di bawah hanya hidup sebagai komentar di berkas Go-nya, jadi siapa pun yang merancang layar dari dokumentasi saja tak punya cara mengetahuinya. Kegagalannya tidak pernah muncul sebagai error, hanya sebagai angka yang salah dan masuk akal.
+
+### `24h_live_gmv` — GMV 24 jam setelah menonton (`live_client_tiktok_shop.go`)
+
+Dikirim TikTok pada tiap sesi `shop_lives/performance`, **belum disimpan ke mart per 2026-08-27**.
+
+⛔ **JANGAN menjumlahkannya dengan `gmv`.** Dok resmi TikTok: *"the total amount paid for orders within 24 hours of viewing this LIVE, **including returns and refunds**"*. Dua bedanya dari `gmv`, dan keduanya membuat penjumlahan salah: jendela waktunya **setelah** siaran (bukan di dalamnya), dan retur **tidak** dipotong. Terukur di produksi: pada 21 dari 331 sesi angkanya berbeda, bisa **lebih besar** dari `gmv` (07-04: gmv 386.223 vs 24h 482.663) dan bisa terisi saat `gmv` nol. Untuk KPI host yang diukur adalah penjualan **selama** siaran, jadi yang dipakai `gmv`.
+
+### Tiga angka penjualan live yang mudah tertukar
+
+`sku_orders` (pesanan **dibayar**) · `created_sku_orders` (termasuk COD/PayLater **belum lunas**) · `items_sold` (**unit**; satu pesanan berisi tiga unit dihitung tiga). Ketiganya dikirim bersamaan pada tiap sesi dan salah pilih **tidak menghasilkan galat apa pun** — hanya angka yang meleset dan tetap masuk akal. Juli Kyura: 6.947 · 7.142 · 7.093, sementara catatan manual HR 6.933. KPI konversi memakai `sku_orders`; `mart_live_sessions.orders` sudah berisi field itu meski namanya telanjang.
 
 ### `iklan_sia_sia` — porsi belanja iklan pada order retur (`iklan_sia_sia.go`)
 
