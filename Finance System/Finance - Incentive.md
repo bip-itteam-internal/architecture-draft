@@ -68,6 +68,30 @@ justru di sini: atasan marketing termasuk populasi yang paling mungkin memegang
 membuktikan bahwa penugasan pertama benar-benar menutup layar bagi mereka. Verifikasi itu
 menunggu deploy.
 
+### Cara membaca layarnya (per 2026-08-26)
+
+Tiga hal di layar dulu memberi kesan "datanya tidak masuk" padahal datanya benar. Ketiganya
+sudah dibereskan, dan sebabnya berbeda-beda — penting dibedakan supaya keluhan berikutnya
+tidak salah didiagnosis:
+
+| Yang terlihat | Sebab sebenarnya | Penyelesaian |
+|---|---|---|
+| Mapping ICC baru ditambah, dashboard belum berubah | Cache respons `/profit*` (rescache, TTL **10 menit**) tak pernah dibuang saat mapping berubah | Mutasi mapping/leader ICC kini membuang cache itu — bip-erp [#1448](https://github.com/bip-itteam-internal/bip-erp/pull/1448), merged |
+| ICC Management menyebut **15 toko**, dashboard menyebut **9** | Bukan cache. Ringkasan profit hanya memuat toko yang **punya order**; 6 toko lain sudah dipetakan tapi belum pernah berjualan | Toko tanpa order tetap dikirim sebagai baris nol, layar menulis "9 dari 15 toko" — bip-erp [#1455](https://github.com/bip-itteam-internal/bip-erp/pull/1455) + erp-frontend [#1248](https://github.com/bip-itteam-internal/erp-frontend/pull/1248), merged |
+| Dibuka di bulan Agustus, yang tampil Juli | Disengaja: bawaannya bulan **lalu**, dengan alasan bulan berjalan belum punya angka berarti | Bawaan kini **bulan berjalan** + penanda "Belum final" / "Final" — erp-frontend [#1256](https://github.com/bip-itteam-internal/erp-frontend/pull/1256), ⏳ **belum merge** |
+
+**Periode belum final ≠ angka salah.** Satu periode `YYYY-MM` baru tertutup pada akhir hari
+ke-**25 bulan berikutnya** (aturan SK: retur dan uang cair masih boleh masuk sampai tanggal
+itu; `PeriodeInsentif` di [[Microservices - Integration Service]]). Sebelum tanggal itu
+angkanya sah dibaca tetapi **belum boleh dipakai membayar** — itulah yang ditandai penanda
+"Belum final" beserta tanggal tutupnya. Sebelumnya layar menyelesaikan masalah yang sama
+dengan cara lain: menyembunyikan bulan berjalan sama sekali. Cara itu membuat keadaan hari
+ini tak bisa dilihat siapa pun, dan tanggal yang tampil terbaca seperti salah.
+
+**Toko nol order tetap miliknya.** Baris bernilai nol yang ditambahkan bukan angka baru —
+ia menyumbang Rp0 ke omzet, HPP, iklan, dan retur, jadi profit dan pencapaian tidak bergeser
+sedikit pun. Yang berubah hanya: toko itu tidak lagi hilang dari daftar.
+
 ### Yang masih menahan (per 2026-08-02)
 
 - **Atribusi ICC belum lengkap** — baru 10 dari 28 toko punya mapping; 63% profit Juli tak berpemilik. Sumber pengisinya berkas LIST TOKO dari client.

@@ -25,6 +25,7 @@ Insentif = tarif(%) × Profit
 ### Dashboard profit (inti)
 - `GET /profit-dashboard?periode=YYYY-MM&level=icc|leader|supervisor` — satu tabel untuk tiga lingkup; menarik komponen profit dari integration, beban karyawan dari payroll, dan beban non-gaji dari Accurate. `&refresh=1` memaksa penarikan ulang beban non-gaji.
 - Tiap baris membawa **`peringatan[]`** dan `layak_dibayar` — baris yang datanya belum lengkap **menolak** dinyatakan siap dibayar, bukan diam-diam dihitung nol.
+- **Toko terpetakan yang belum berjualan tetap disebut** (2026-08-26, PR #1455 bip-erp + #1248 erp-frontend, merged). Ringkasan profit hanya memuat toko yang punya order, sehingga toko yang sudah dipetakan ke seorang ICC tetapi nol order **lenyap tanpa jejak**: ICC Management menyebut 15 toko untuk tim Satrio, dashboard menyebut 9. Integration kini mengirim baris bernilai nol bertanda `tanpa_penjualan`, service ini mencacahnya jadi `toko_tanpa_penjualan`, dan layar menulis "9 dari 15 toko". Terukur prod 2026-08-26: 15 = 9 berjualan + 6 belum pernah ada order. Angkanya tidak bergeser — toko tanpa order menyumbang Rp0 ke omzet, HPP, iklan, dan retur.
 
 ### Master data profit
 - `GET/POST /profit/org` · `PATCH /profit/org/:id/tutup` — struktur tim, kini **hanya penambal**. Sejak 2026-08-26 Leader dan Supervisor diturunkan dari **hierarki HRIS** (`work_data.supervisor_id`), bukan dari koleksi ini — lihat §Hierarki di bawah.

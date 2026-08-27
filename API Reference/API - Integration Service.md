@@ -185,7 +185,7 @@
 
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/profit/incentive/summary?month=YYYY-MM&cutoff_day=25&shop_id=a,b` | Komponen profit per toko (uang cair, HPP, iklan, retur) + pemilik ICC tiap toko |
+| GET | `/profit/incentive/summary?month=YYYY-MM&cutoff_day=25&shop_id=a,b` | Komponen profit per toko (uang cair, HPP, iklan, retur) + pemilik ICC tiap toko. Toko yang **terpetakan ke seorang ICC tetapi nol order** di periode itu ikut dikirim sebagai baris bernilai nol bertanda `tanpa_penjualan` (2026-08-26, PR #1455 — merged, belum diverifikasi di prod). Sebelumnya toko begitu lenyap dari jawaban, sehingga dashboard menyebut **9 toko** untuk tim yang di [[Sales - ICC Account Manager Mapping]] tercatat memegang **15** — selisih 6 toko yang belum pernah berjualan, tanpa satu pun keterangan. Saringan `shop_id` tetap dihormati (toko di luar saringan tidak ditambahkan) dan urutannya di-sort supaya jawaban ber-cache bisa dibandingkan |
 | GET | `/profit/incentive/panduan` | Kerangka rumus + penjelasan tiap baris untuk ditampilkan di UI (dihasilkan dari struct yang sama dengan yang menghitung) |
 | GET | `/profit/incentive/opex?month=YYYY-MM&projects=a,b,c[&refresh=1]` | Beban operasional **non-gaji** per proyek Accurate (akun `6000` − 14 akun yang sudah terhitung di tempat lain); membawa rincian akun yang dipotong + alasannya. `refresh=1` melewati salinan lokal 12 jam |
 
@@ -208,6 +208,8 @@
 ### Leader team ICC
 
 > Satu leader aktif per team. `POST /icc/mappings` **ditolak** bila team karyawan belum punya leader (leader-first). Lihat [[Sales - ICC Account Manager Mapping]].
+
+> **Mutasi mapping & leader ICC membuang cache `/profit*`** (2026-08-26, PR #1448 — merged). `POST/PATCH/DELETE /icc/mappings` dan `POST/PATCH /icc/leaders` memanggil `InvalidatePrefix(ctx, "/profit")` sesudah berhasil. Tanpa itu mapping yang baru ditambahkan tidak terlihat di dashboard insentif sampai TTL rescache **10 menit** habis — dan bagi pemakainya itu terbaca sebagai "datanya tidak masuk", bukan sebagai cache. 🔑 `keyPrefix` rescache memuat **modtime binary** (`rescache:b<mtime>:`) sehingga berubah tiap deploy: jangan pernah di-hardcode, termasuk di test.
 
 | Method | Path | Fungsi |
 |---|---|---|

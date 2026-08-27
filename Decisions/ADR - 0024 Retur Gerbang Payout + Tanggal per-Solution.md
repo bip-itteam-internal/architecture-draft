@@ -1,4 +1,4 @@
-**Status**: ⚠️ **Implemented & Deployed; perbaikan cacat MENUNGGU DEPLOY** (cacat 2026-08-07: cabang bukti-mutasi-dompet men-skip kasus yang justru TIDAK dobel, paparan 1 order — **fix di PR #1085, belum deploy**; lihat amandemen 2026-08-07 & 2026-08-08). Riwayat: (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel). **Amandemen 2026-08-05 (✅ DEPLOYED 2026-08-05, commit `779b0a06`; verifikasi prod: 38 baris jejak tersemai, dari 1):** janji "SKIP → baris `SKIPPED`" di Decision #1 akhirnya benar-benar dipenuhi — sebelumnya baris hanya ditandai bila kebetulan sudah ada, sehingga mayoritas retur payout>0 **tak berjejak sama sekali** di UI; sekaligus menutup lubang dobel-booking lewat konfirmasi gudang yang baru terlihat setelah baris jejak itu ada. **Amandemen 2026-08-06 (✅ DEPLOYED, PR #1038):** cabang Shopee berhenti menebak dari kanal dan **menuntut bukti** mutasi penyerap; backfill + sensus penutup SELESAI hari yang sama (129 dari 131 retur ACCEPTED sudah berbaris; 2 sisanya DEFER benar). Lihat Consequences. **Amandemen 2026-08-12 (kode, belum deploy):** fallback tanggal **hari-kirim DIBUANG**, ganti ke `order.returned_at` lalu tanggal deteksi (PR bip-erp#1161 + erp-frontend#977).
+**Status**: ⚠️ **Implemented & Deployed; perbaikan cacat MENUNGGU DEPLOY** (cacat 2026-08-07: cabang bukti-mutasi-dompet men-skip kasus yang justru TIDAK dobel, paparan 1 order — **fix di PR #1085, belum deploy**; lihat amandemen 2026-08-07 & 2026-08-08). Riwayat: (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel). **Amandemen 2026-08-05 (✅ DEPLOYED 2026-08-05, commit `779b0a06`; verifikasi prod: 38 baris jejak tersemai, dari 1):** janji "SKIP → baris `SKIPPED`" di Decision #1 akhirnya benar-benar dipenuhi — sebelumnya baris hanya ditandai bila kebetulan sudah ada, sehingga mayoritas retur payout>0 **tak berjejak sama sekali** di UI; sekaligus menutup lubang dobel-booking lewat konfirmasi gudang yang baru terlihat setelah baris jejak itu ada. **Amandemen 2026-08-06 (✅ DEPLOYED, PR #1038):** cabang Shopee berhenti menebak dari kanal dan **menuntut bukti** mutasi penyerap; backfill + sensus penutup SELESAI hari yang sama (129 dari 131 retur ACCEPTED sudah berbaris; 2 sisanya DEFER benar). Lihat Consequences. **Amandemen 2026-08-12 (kode, belum deploy):** fallback tanggal **hari-kirim DIBUANG**, ganti ke `order.returned_at` lalu tanggal deteksi (PR bip-erp#1161 + erp-frontend#977). **Amandemen 2026-08-26 (✅ DEPLOYED, PR #1451):** kompensasi paket hilang ([[ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order]]) kini ikut menyerap — jalur cancel tak lagi membukukan retur untuk pesanan batal yang fakturnya sudah dilunasi kompensasi.
 
 # ADR - 0024 Retur: Gerbang Payout≈0 (Income vs Retur) + Tanggal per-Solution
 
@@ -146,8 +146,28 @@ Jaring TERAKHIR `resolveReturnTransDate` dulu **hari-kirim** (`shipped`, `date_w
 
 Grounded: `resolveReturnTransDate`/`resolveReturnTransDateOrNow` (`accurate_rts_usecase.go`), tes `accurate_return_date_test.go` (`TestResolveReturnTransDate_ReturnedAtLaluDetected`).
 
+### Amandemen 2026-08-26 — kompensasi paket hilang juga penyerap (✅ deployed, PR #1451)
+
+Sejak [[ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order]], **penyesuaian statement TikTok** (97% ganti rugi PAKET HILANG) dibukukan sebagai penambah payout pesanan → receipt melunasi fakturnya. Begitu itu terjadi, membukukan Retur Penjualan di atasnya = **pembalikan dobel**: pendapatan terbalik dua kali, piutang ter-kredit minus.
+
+Jalur cancel gerbang ini justru yang paling terpapar: ia mengembalikan `book` **tanpa bertanya apa pun**, sementara **254 dari 263** pesanan penerima kompensasi berstatus `CANCELLED` (terukur prod 2026-08-26). Artinya membayar fakturnya *membuka* lubang dobel yang sebelumnya tertutup hanya karena uangnya tak pernah dibukukan.
+
+**Keputusan**: `diserapPenyesuaianStatement` diperiksa **paling dulu**, sebelum cabang cancel. Prinsipnya sama dengan cabang Shopee di amandemen 2026-08-08 — pertanyaannya bukan *"ada penyerap?"* melainkan **ANGKA**: `payoutOf(income) + Σpenyesuaian > 0.5` berarti uangnya masih di kita, jadi penjualannya **TIDAK batal** → `SKIP` (baris `SKIPPED`, Auto Sync Income yang urus).
+
+Batasnya sengaja sempit, dan tiga-tiganya mengikat:
+- hanya kanal **TikTok** (penyesuaian statement tak ada di kanal lain);
+- hanya **hari-kirim ≥ `autoSyncCutoverDateWIB`** — receipt tak membukukan order pra-cutover, jadi di sana **tak ada** yang menyerap dan retur TETAP harus dibukukan (syarat yang sama sudah berlaku untuk cabang payout>0);
+- **lookup MALAS** — `SumByOrder` hanya dipanggil setelah dua syarat di atas terpenuhi, karena ia query DB per-order di jalur terpanas.
+
+Repo belum tersuntik (`cmd` one-off, tes lama) → dianggap tak ada kompensasi → **BOOK**, arah yang sama dengan `shopeeRefundAdjustment`: salah-book terlihat sebagai dokumen yang bisa dihapus, salah-skip hilang tanpa jejak.
+
+⚠️ **Keterbatasan yang disadari**: **19 dari 263** pesanan berkompensasi ternyata barangnya TETAP kembali ke gudang. Untuk mereka skip berarti stok tak bertambah padahal barangnya nyata ada. Gerbang tak bisa tahu — scan gudang terjadi jauh setelah keputusan ini diambil, jadi hasilnya sengaja berupa baris `SKIPPED` yang **terlihat** di UI (bukan diam) supaya kelas 7% itu dapat mata finance. Berlaku **maju**; 208 baris `PENDING` yang sudah terlanjur ada tidak tersentuh.
+
+Grounded: `returnPayoutGate`/`diserapPenyesuaianStatement`/`tiktokStatementAdjustment` (`accurate_rts_usecase.go`), `tiktokStatementAdjustmentRepo.SumByOrder` (`tiktok_statement_adjustment_repo.go`), tes `accurate_receipt_penyesuaian_test.go` (`TestGerbangRetur*`).
+
 ## Dokumen Terkait
 - [[Microservices - Integration Service]] — Auto-Sync Retur (gerbang payout, tanggal per-solution) & Auto Sync Income (receipt)
+- [[ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order]] — kompensasi paket hilang yang kini ikut menyerap (amandemen 2026-08-26)
 - [[ADR - 0040 Retur Paket Utuh via Baris Induk Faktur]] — pembentukan baris & harga retur paket (tak mengubah gerbang ini)
 - [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] — gerbang gudang; jalur konfirmasinya sempat bisa menghidupkan baris `SKIPPED` jadi pembukuan dobel (amandemen 2026-08-05)
 - [[ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah]] — keputusan #1 digantikan; #2 tetap
