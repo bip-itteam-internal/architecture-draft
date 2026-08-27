@@ -57,7 +57,7 @@ ditemukan lagi sebagai kejutan.
 
 - **Config** (singleton, seed default): perusahaan (kop slip), **BPJS** (rate/cap 5 program), **pajak PPh21 metode TER** + PTKP per status.
 - **Master komponen gaji** (`/salary-components`): di-seed **15 komponen persis slip** (9 pendapatan + 6 pengurangan); tandai `manual` vs `computed`.
-- **Gaji per karyawan** (`/employee-salary/:employeeId`): `basic_salary`, **`upah_bpjs`** (dasar BPJS terpisah), `ptkp_status`, komponen manual. Referensi `employee_id` (NPWP/BPJS/rekening di-join FE).
+- **Gaji per karyawan** (`/employee-salary/:employeeId`): `basic_salary`, **`upah_bpjs_kesehatan`** + **`upah_bpjs_ketenagakerjaan`** (DUA dasar BPJS terpisah, karena upah yang dilaporkan ke kedua lembaga memang bisa berbeda), `ptkp_status`, komponen manual. Referensi `employee_id` (NPWP/BPJS/rekening di-join FE).
 
 ## Fitur
 
@@ -101,10 +101,16 @@ Setup gaji + **engine payroll run** (kalkulasi gross → BPJS → potongan kehad
 
 ⛔ **Yang menahan payroll hari ini bukan lagi kode.** Seluruh fase di atas sudah ter-deploy
 ke produksi, tetapi nol slip pernah terbit dan data gajinya belum layak dipakai membayar:
-dari 90 record `employee_salary`, **tak satu pun** punya `upah_bpjs` yang masuk akal sebagai
-dasar upah, sehingga baris BPJS setiap karyawan akan salah bila run diterbitkan sekarang.
+dari 120 record `employee_salary`, **tak satu pun** punya dasar upah BPJS yang masuk akal,
+sehingga baris BPJS setiap karyawan akan salah bila run diterbitkan sekarang.
 Daftar penghambat berurutan ada di §Kondisi Pemakaian di Produksi pada
 [[Microservices - Payroll Service]].
+
+⚠️ **Sesudah pemisahan dasar upah BPJS** (branch `feat/payroll-upah-bpjs-terpisah`, belum
+merge), seluruh record berdasar upah **kosong** dan menunggu HR mengisi ulang **dua** angka
+per orang. Itu keadaan yang diinginkan, bukan regresi: nilai lama tak disalin justru karena
+tak satu pun di antaranya benar. Bedanya, kekosongan itu kini **ditandai** di layar dan di
+baris payroll run, jadi ia terlihat sebelum tombol Approve ditekan.
 
 ## Dokumen Terkait
 
