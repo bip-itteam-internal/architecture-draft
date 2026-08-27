@@ -260,7 +260,11 @@ Metrik yang sumbernya sudah berupa persentase (uptime, konversi) memakai `rata_r
 
 **Persentase yang menempel di ujung skala tidak bisa diukur dengan rasio.** Uptime produksi bergerak di 99,8–99,9%, dan `realisasi/target` dibatasi 100, jadi metriknya bernilai 100 setiap bulan berapa pun targetnya dinaikkan — target 99,5 pun masih memberi 100, dan target 99,9 memberi 99,9. Metrik berbobot besar yang selalu penuh tidak membedakan bulan baik dari bulan buruk.
 
-Penawarnya bukan menaikkan target, melainkan **membalik besarannya**: ukur yang tersisa (downtime, cacat, keterlambatan) dengan `arah: turun`, dan jadikan targetnya **anggaran** — berapa banyak yang masih dapat diterima. Downtime bergerak dari 0,07% sampai berkali lipat, sehingga dengan anggaran 0,5% (SLA 99,5%) bulan normal tetap 100 sementara downtime 1% jatuh ke 50 dan 2% ke 25. Sumber `uptime_sistem` karena itu menyediakan dua metrik: `uptime` dan `downtime`. Aturan umumnya: **kalau realisasi wajar selalu melampaui target, metriknya salah bentuk, bukan salah angka.**
+Penawarnya bukan menaikkan target, melainkan **membalik besarannya**: ukur yang tersisa (downtime, cacat, keterlambatan) dengan `arah: turun`. Sumber `uptime_sistem` karena itu menyediakan dua metrik: `uptime` dan `downtime`. Aturan umumnya: **kalau realisasi wajar selalu melampaui target, metriknya salah bentuk, bukan salah angka.**
+
+> ⛔ **Model skor `turun` berubah 2026-08-27 — target kini TITIK GAGAL, bukan anggaran.** Sampai 2026-08-27 arah `turun` memakai model **plafon**: skor datar 100 selama realisasi di bawah target, baru menurun saat melampauinya (`target/realisasi × 100`). Model itu diganti **ramp pada rentang `[0, target]`**, simetris dengan `naik`: `(target − realisasi)/target × 100`, dibatasi 0. **Target `turun` sekarang adalah level yang bernilai NOL** — makin kecil realisasi makin tinggi skornya, jadi metrik turun ikut membedakan bulan alih-alih datar 100.
+>
+> Contoh nyata dampaknya: downtime dengan target 0,5%. **Model lama** — 0,19% → 100, 1% → 50, 2% → 25. **Model baru** — 0,19% → `(0,5−0,19)/0,5 = 62`, 1% dan 2% → 0 (sudah mencapai/melampaui titik gagal). ⚠️ **43 metrik turun yang lama disetel sebagai anggaran/plafon karena itu WAJIB di-re-kalibrasi**: targetnya harus diubah menjadi angka yang layak bernilai nol (level-gagal), bukan batas yang masih dapat diterima. `hit_miss` mengikuti model yang sama: lulus (100) selama realisasi **< titik gagal**, mencapai titik gagal = gagal (0).
 
 **`ambang` dan `target` adalah dua hal berbeda.** `ambang` dipakai mencacah, `target` dipakai membandingkan. Metrik ICC membutuhkan keduanya sekaligus: ambang GMV 10.000 per video, target 70% video yang melewatinya.
 
@@ -271,11 +275,11 @@ Penawarnya bukan menaikkan target, melainkan **membalik besarannya**: ukur yang 
 | `naik` (bawaan) | makin besar makin baik | omzet, konversi, jumlah video |
 | `turun` | makin kecil makin baik | waste, retur, CPA, selisih, temuan audit |
 
-**Salah arah tidak menghasilkan error, hanya angka yang salah dan tampak wajar.** `Waste maksimal 1,5%` dengan realisasi 0,8% akan bernilai **53 dari 100** bila arahnya lupa diisi, padahal seharusnya penuh. Tidak ada yang akan curiga pada angka 53.
+**Salah arah tidak menghasilkan error, hanya angka yang salah dan tampak wajar.** Metrik `turun` dengan titik gagal 1,5% dan realisasi 0,8% menempuh `(1,5−0,8)/1,5 = 47` dari 100; bila arahnya lupa diisi ia dibaca `naik` dan bernilai `0,8/1,5 = 53` — dua angka yang sama-sama wajar, jadi tidak ada yang akan curiga. (Angka yang benar bergantung pada titik gagal yang disetel: pada model ramp, **target `turun` = level bernilai nol**, bukan plafon.)
 
 Dari 311 metrik produksi, **43 berarah turun** dan menumpuk di Finance, Manufaktur, Quality, dan General Affair. Kalau departemenmu salah satunya, anggap `arah: "turun"` sebagai bawaan sampai terbukti sebaliknya.
 
-Untuk arah `turun`, **`target: 0` sah dan bermakna**: "zero accident", "zero major finding", "selisih 0%". Realisasi 0 bernilai penuh; sekali melanggar langsung jatuh ke 0, karena tidak ada yang namanya sedikit zero accident.
+Untuk arah `turun`, **`target: 0` sah dan bermakna**: "zero accident", "zero major finding", "selisih 0%". Realisasi 0 bernilai penuh; sekali melanggar langsung jatuh ke 0 (ramp menyatu ke situ), karena tidak ada yang namanya sedikit zero accident.
 
 ### Target berlapis tiga: per karyawan, per periode, umum
 
