@@ -2,7 +2,8 @@
 
 *MCP server yang membuka vault `architecture-draft` untuk Claude, supaya management bisa membaca sistem yang sudah terdokumentasi dan menuangkan kebutuhan baru langsung dari Claude Desktop / claude.ai tanpa menyentuh Obsidian, git, maupun editor. Identitasnya menumpang SSO ERP yang sudah ada, dan setiap tulisan mendarat di vault sebagai commit git ber-author manager yang bersangkutan.*
 
-- **Status**: ⚠️ **Irisan 1 ditulis, BELUM di-deploy ke mana pun** (PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488), 2026-08-27). Kode baca-saja lengkap dan terkunci 74 test termasuk alur OAuth penuh lewat HTTP sungguhan dan klien MCP sungguhan. Tetapi ia **belum pernah dijalankan**: `docker build` belum pernah berhasil dicoba, dan DNS, proxy host, serta sertifikat belum berdiri. Irisan 2 (tulis) dan 3 belum ada kode.
+- **Status**: ⚠️ **Irisan 1 merged ke `main`, BELUM di-deploy ke mana pun** (PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) + [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489), 2026-08-27). Kode baca-saja lengkap dan terkunci 93 test, termasuk alur OAuth penuh lewat HTTP sungguhan dan klien MCP sungguhan. Tetapi ia **belum pernah dijalankan di mana pun**: `docker build` belum pernah berhasil dicoba, dan DNS, proxy host, serta sertifikat belum berdiri. Irisan 2 (tulis) dan 3 belum ada kode.
+- ⛔ **#1488 di-merge sebelum `/review` sempat jalan, dan reviewnya menemukan tiga celah keamanan** yang semuanya lolos 74 test hijau: `redirect_uri` tak dicocokkan dengan daftar terdaftar, nol pembatasan laju, dan rotasi refresh token baca-lalu-tulis. Ditutup di #1489. Jangan men-deploy commit yang lebih tua dari itu.
 - **Stack**: Go + [MCP Go SDK resmi](https://github.com/modelcontextprotocol/go-sdk) (Tier 1, dirawat bersama Google) + MongoDB (koleksi `mcp_sessions`). Transport **Streamable HTTP**.
 - **Path di repo** (rencana): `bip-erp/services/vault-mcp/`, mengikuti pola `services/.template`.
 - **Rute**: ⛔ **TIDAK lewat [[CORE - API Master Gateway]].** Dipaparkan langsung sebagai `https://mcp.bharatainternasional.com` lewat Nginx Proxy Manager (`bip-erp/infra/npm/`). Claude menyambung dari infrastruktur cloud Anthropic, bukan dari laptop pemakai, sehingga server wajib terjangkau internet publik.
@@ -87,6 +88,28 @@ sequenceDiagram
 
 ⚠️ **Manager tetap harus mengetik password sekali saat menyambungkan connector**, walau sedang login di Web ERP, karena halaman login ERP memaksa logout saat di-mount ([[CORE - SSO Flow]] § Catatan & Keterbatasan). Terjadi sekali per beberapa bulan; sengaja tidak ditambal di lingkup ini.
 
+## Endpoint (Sudah Diimplementasikan)
+
+⚠️ **Tidak ada satu pun yang lewat `/api/<module>/*`.** Service ini dipaparkan langsung, jadi path di bawah adalah path publik apa adanya.
+
+| Endpoint | Auth | Fungsi |
+|---|---|---|
+| `GET /.well-known/oauth-protected-resource` | publik | Metadata RFC 9728. Juga dilayani di `.../oauth-protected-resource/mcp` karena klien berbeda menebak berbeda |
+| `GET /.well-known/oauth-authorization-server` | publik | Metadata RFC 8414. Hanya mengumumkan `S256` |
+| `GET /oauth/authorize` | publik, ber-batas laju | Memeriksa client, `redirect_uri` terdaftar, dan PKCE; lalu melempar ke halaman login ERP |
+| `GET /oauth/erp-callback` | publik, ber-batas laju | Menukar SSO code jadi identitas, memeriksa daftar-izin, menerbitkan authorization code |
+| `POST /oauth/token` | client_secret, ber-batas laju | `authorization_code` dan `refresh_token` |
+| `POST /mcp` | Bearer, ber-batas laju | Endpoint MCP Streamable HTTP |
+| `GET /health` | publik | Hanya `{"status":"ok"}`; sengaja tidak menyebut keadaan internal apa pun |
+
+## Pengamanan (dari temuan review #1489)
+
+Ketiganya lolos test hijau di #1488, jadi ketiadaannya tidak terlihat dari mana pun.
+
+- **`redirect_uri` dicocokkan PERSIS** terhadap `VAULT_MCP_REDIRECT_URIS`. Memeriksa bentuknya saja (https, absolut, tanpa fragment) menerima host mana pun, sehingga siapa pun yang tahu `client_id` bisa membuat server ini mengirim authorization code ke tujuan pilihannya. Bukan berawalan: `…/auth_callback.evil.example` berawalan sama dengan nilai yang sah.
+- **Pembatasan laju per alamat klien** di seluruh endpoint OAuth dan MCP, plus batas keras antrean permintaan authorize. `X-Forwarded-For` dipercaya, dan itu aman **karena** compose memakai `expose` bukan `ports`; bila suatu saat container ini dipaparkan dengan `ports`, asumsi itu batal.
+- **Rotasi refresh token atomik**, dengan sidik lama ikut di filter. Sesi menyimpan sidik yang baru dipensiunkan supaya pemakaian ulang bisa **dikenali**, bukan sekadar gagal "tidak dikenal". Pemakaian ulang mencabut **seluruh** sesi: menolak permintaannya saja membiarkan pencuri dan korban bergantian memperpanjang sesi tanpa ada yang menyadarinya.
+
 ## Permukaan tool
 
 | Tool | Fungsi |
@@ -167,11 +190,24 @@ Gerbang per irisan:
 
 - Plugin `obsidian-local-rest-api` yang terpasang di vault **tidak dipakai**. Plugin itu hidup di dalam aplikasi Obsidian di laptop dev; menyambungkannya membuat MCP di internet bergantung pada laptop yang menyala.
 - Tidak ada UI. Satu-satunya antarmuka adalah Claude.
-- Tidak ada `move_note` / rename di lingkup awal: memindahkan dokumen menuntut pembaruan seluruh `[[wikilink]]` yang menunjuk padanya, dan itu masalah tersendiri.
+- Tidak ada `move_note` / rename di lingkup awal: memindahkan dokumen menuntut pembaruan seluruh tautan wiki yang menunjuk padanya, dan itu masalah tersendiri.
 - Tidak menyentuh RBAC ERP maupun `system_roles`.
+
+## Dependensi & Integrasi
+
+| Bergantung pada | Untuk apa | Bila mati |
+|---|---|---|
+| [[CORE - API Master Gateway]] | `POST /auth/sso/redeem` saat menukar identitas | Penyambungan connector baru gagal; sesi yang sudah ada tetap jalan |
+| [[APP - Web ERP]] | Halaman login tempat manager memasukkan kredensial | Sama: hanya penyambungan baru yang terhalang |
+| Repo `architecture-draft` (git) | Sumber isi vault, di-`pull` berkala | Tool **gagal** menyebut umur data setelah melewati ambang, bukan menjawab dengan dokumen lama |
+| MongoDB `vault-mcp-mongo-db` | Koleksi `mcp_sessions` | Service menolak naik; penjaga `mongodb.DB == nil` menurunkan kelasnya jadi pesan yang bisa dibaca |
+| Nginx Proxy Manager (`bip-erp/infra/npm`) | Ingress + TLS | Tak terjangkau dari internet |
+
+**Tidak** bergantung pada: RBAC ERP, `system_roles`, notification-service, calendar-service.
 
 ## Dokumen Terkait
 
+- [[RUN - Menyambungkan Claude ke Vault MCP]], cara memakai dan memberi akses
 - [[CORE - SSO Flow]], alur `ticket`/`redeem` yang ditumpangi
 - [[CORE - API Master Gateway]], sengaja **tidak** dilewati, alasannya di § Keputusan 2
 - [[ADR - 0003 SSO-only Gateway]], dasar keputusan satu identitas karyawan untuk semua aplikasi
