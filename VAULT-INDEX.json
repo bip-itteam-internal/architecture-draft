@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-27",
-  "jumlah_dokumen": 304,
+  "jumlah_dokumen": 305,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -340,20 +340,18 @@
         "Finance - Incentive",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "f808efa07814c926fb78341671014a25254a3b7cc34c820dd8c8e625f428b9ae",
-      "ukuran_kb": 3.7,
-      "ringkasan": "Menjawab: rute mana yang melayani skema insentif profit-based (dashboard per level ICC/Leader/Supervisor, struktur tim, target per periode, opex, daftar putih affiliate internal) dan rute warisan mana yang masih terdaftar tapi menolak dipanggil. Juga menjawab dari mana angka profit, beban non-gaji, dan beban karyawan ditarik, serta endpoint untuk results, approve/unapprove, override, export Excel, dan konfigurasi PPN.",
+      "hash": "5a8050e1758be22a62e57280354952b76b91465f40c485bb92d7018fc6586d4f",
+      "ukuran_kb": 4.0,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki insentive-service untuk skema insentif profit-based seluruh jabatan (rute /profit*, dashboard profit, master data), rute warisan skema KPI-multiplier mana yang masih terdaftar tapi menolak, dan gateway/key yang dibutuhkan.",
       "kata_kunci": [
+        "insentive",
         "insentif",
-        "incentive",
+        "api insentive",
         "profit-based",
-        "ICC",
-        "leader",
-        "supervisor",
-        "target profit",
-        "opex",
-        "master KPI",
-        "approve"
+        "profit dashboard",
+        "kpi multiplier",
+        "gateway",
+        "endpoint"
       ]
     },
     {
@@ -379,28 +377,29 @@
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "HRIS - Otomasi Skor KPI",
         "Microservices - Insentive Service",
-        "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "Sales - ICC Account Manager Mapping",
+        "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "Sales - ICC Affiliate Mapping",
         "ADR - 0052 Status Sinkron per Toko",
         "External - Desty",
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "bc201ee5de729cf7bfc5bb3b9cd0949ab1f1406b7336f21f403c8b2673a9537b",
-      "ukuran_kb": 63.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang menghubungkan marketplace (TikTok Shop/Business, Shopee) ke Accurate, yaitu order terpadu, ringkasan/komparasi/ekspor order, aging piutang, feed retur lintas-channel, packet tracking, reviews, ICC account mapping, dan status sinkron toko. Menjelaskan parameter tiap endpoint, alur webhook publik lewat /ext/webhook/*, dan tiga tuas koreksi manual atas satu order (invoice-exclusion, invoice-date-override, fake-order-override) yang sering tertukar maksudnya. Menjawab juga kenapa dua endpoint piutang berbeda bentuk: /piutang/summary membalas tiga bucket yang saling lepas sedangkan /piutang/tren membalas himpunan bersarang di mana lebih14 memuat lebih60, sehingga keduanya tak boleh dijumlahkan.",
+      "hash": "24f7f762d21e495df406105178f595371a6134ca7edcddbd9dd9d243e0145a9e",
+      "ukuran_kb": 64.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki integration-service (order, retur, tracking, wallet, reviews, Accurate, accounting FAT, profit, status sinkron toko) beserta parameter, caveat, dan konsumennya. Termasuk rute /shops/* (live 2026-08-24) untuk menonaktifkan toko banned dari sync dan membaca riwayat statusnya, serta mana endpoint yang di-cache rescache dan mana yang sengaja tidak.",
       "kata_kunci": [
-        "integration service",
-        "endpoint",
-        "marketplace",
-        "TikTok Shop",
-        "Shopee",
-        "Accurate",
-        "aging piutang",
-        "receivables",
-        "bucket bersarang",
-        "retur"
+        "endpoint integration",
+        "api marketplace",
+        "shops status",
+        "disable toko",
+        "shop state",
+        "webhook",
+        "wallet",
+        "reviews",
+        "accounting",
+        "rescache",
+        "gateway"
       ]
     },
     {
@@ -836,7 +835,7 @@
         "README"
       ],
       "hash": "52eb6306aef513055af71556b6d2cdf0f8cf634f9cb922ca007b472e4ecac5d1",
-      "ukuran_kb": 3.4,
+      "ukuran_kb": 3.3,
       "ringkasan": "Menjawab: endpoint Lazada Open API mana yang benar-benar dipanggil ERP, fungsi Go mana yang memakainya, untuk apa, dan seberapa tinggi confidence tiap endpoint (verified-live, verified-by-usage, atau TBD). Juga menjawab bentuk respons sumber retur Lazada yang dipakai produksi dan TBD apa yang masih terbuka soal enum request_type, reverse_status, serta ketersediaan tracking_number.",
       "kata_kunci": [
         "Lazada",
@@ -918,7 +917,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 2.0,
+      "ukuran_kb": 1.9,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -970,7 +969,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 3.0,
+      "ukuran_kb": 2.9,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1258,20 +1257,23 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "04ea560309abf8db3068d33d104d629089396f496162db86640c1af083df9628",
-      "ukuran_kb": 324.9,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang sudah ada di portal web ERP (erp-frontend), siapa yang boleh melihat tiap menu, dan bagaimana tiap layar digerbang. Memuat rincian per modul HRIS, Finance, IT, GA, Integration, Task Management, beserta keputusan UI yang sudah diambil dan alasannya. Termasuk beranda Portal Saya yang isinya mengikuti posisi pembaca dan pemilih dashboard untuk Direktur serta supervisor IT.",
+      "hash": "227fdcf39f497d8bf83c8bc59be41ee3df4cdf104bdc8cacc0281f0dbe7292fe",
+      "ukuran_kb": 325.5,
+      "ringkasan": "Menjawab: halaman dan modul apa saja yang ada di web ERP One Bharata, siapa yang boleh mengaksesnya (role/permission), dan bagaimana perilaku tiap layar — termasuk panel Shop Sync Status di Integration OAuth, halaman Auto-Sync Accurate beserta badge scan gudangnya, laman Gudang Barang Jadi / Return Dari Ekspedisi (banner sync-health yang diringkas), dashboard insentif profit, payroll, presensi, dan KPI. Juga menjawab cara kerja SSO, sidebar, dan i18n dua bahasa.",
       "kata_kunci": [
-        "erp-frontend",
-        "portal web ERP",
-        "sidebar menu",
-        "system_roles",
-        "dashboard per posisi",
-        "Portal Saya",
-        "Ringkasan Divisi HRGA",
-        "proxy.ts",
-        "gerbang rute",
-        "Next.js"
+        "web erp",
+        "one bharata",
+        "frontend",
+        "halaman",
+        "sidebar",
+        "role",
+        "oauth",
+        "shop sync status",
+        "return dari ekspedisi",
+        "sync bermasalah",
+        "scan gudang",
+        "insentif",
+        "integration"
       ]
     },
     {
@@ -1634,9 +1636,9 @@
         "Microservices - File Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "01b6ed66bdad4d8560870c13e5fe87afd027e1f5499ef87594e2b26486956479",
-      "ukuran_kb": 15.2,
-      "ringkasan": "Menjawab: koleksi Mongo apa saja yang dimiliki tiap service dan field apa saja di dalamnya (grounded dari struct Go), termasuk shop_sync_states dan shop_status_histories (live 2026-08-24) untuk status toko nonaktif. Berguna saat perlu tahu nama field bson, tipe, index, atau di database mana sebuah data disimpan.",
+      "hash": "457772de46f30b48274753d519ccf03657138f45914933cf4259184d4d1e6b31",
+      "ukuran_kb": 15.4,
+      "ringkasan": "Menjawab: koleksi Mongo apa saja yang dimiliki tiap service dan field apa saja di dalamnya (grounded dari struct Go), termasuk shop_sync_states (status toko nonaktif + counter kegagalan auth beruntun Tahap 2) dan shop_status_histories. Berguna saat perlu tahu nama field bson, tipe, index, atau di database mana sebuah data disimpan.",
       "kata_kunci": [
         "data dictionary",
         "kamus data",
@@ -1645,6 +1647,7 @@
         "bson",
         "schema",
         "shop_sync_states",
+        "consecutive_auth_failures",
         "database per service"
       ]
     },
@@ -2007,22 +2010,20 @@
         "Sales - Incentive",
         "HRIS - Key Performance Index"
       ],
-      "hash": "cad357403953727c6850ebd0b1cdc0e7234717765a378d26c2609b4af87906ea",
-      "ukuran_kb": 12.7,
-      "ringkasan": "Menjawab: bagaimana insentif tim marketing dihitung dengan skema profit-based (insentif = tarif × profit), bagaimana tarif bertingkat mengikuti % pencapaian target, dan bagaimana gerbang retur 7% bekerja. Menjelaskan juga dari mana komponen biaya operasional diambil (gaji dari payroll, beban marketing dari Accurate lewat integration, penyusutan aset dari inventory), endpoint dashboard profit dan master data target/opex beserta gerbang RBAC-nya, serta bagaimana level Leader dan Supervisor diturunkan dari hierarki HRIS (work_data.supervisor_id) menggantikan icc_leaders dan incentive_org.",
+      "hash": "0e5fab599d668e7de26560b4cc7d0ff87a43e24775bcfae2ec936f5dcd87fa94",
+      "ukuran_kb": 13.3,
+      "ringkasan": "Menjawab: bagaimana engine insentif profit-based bekerja untuk seluruh jabatan (ICC → Leader → Supervisor) sejak SK 010/011 2026, dari mana komponen profit, beban karyawan, biaya operasional (tiga bagian per 2026-08-26), dan hierarki leader/supervisor diambil, serta rute warisan skema lama mana yang masih terdaftar.",
       "kata_kunci": [
-        "insentif",
-        "incentive",
         "insentive service",
+        "insentif",
         "profit-based",
-        "profit dashboard",
-        "tarif insentif",
-        "target pencapaian",
-        "gerbang retur",
-        "ICC",
-        "leader supervisor",
+        "icc",
+        "leader",
+        "supervisor",
         "biaya operasional",
-        "opex"
+        "payroll",
+        "hierarki hris",
+        "skema lama dicabut"
       ]
     },
     {
@@ -2056,6 +2057,7 @@
         "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
+        "ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order",
         "ADR - 0017 Tanggal Retur TikTok via order_update_date",
         "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
         "Microservices - Employee Service",
@@ -2079,20 +2081,23 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "244b86265be7b5de4930871ba8a591447c1218381cc140be75fb17e54c02fa37",
-      "ukuran_kb": 288.3,
-      "ringkasan": "Menjawab: bagaimana order dan laporan iklan marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk ke ERP lewat webhook direct dan cron sync, bagaimana kredensial OAuth per marketplace dikelola, dan bagaimana data itu dinormalkan jadi model transaction terpadu lalu di-push sebagai Sales Invoice/Sales Return ke Accurate Online. Menjawab juga rincian endpoint per modul (webhook logs & retry, holidays untuk auto-ship/auto-approve, GMV Max monitoring & overview, ICC video metrics, affiliate, fulfillment WMS bridge, gross profit per product, review analytics) beserta rumus metrik iklan seperti ROAS/ROI dan aturan GMV winner. Berguna saat menelusuri kenapa angka iklan atau sinkronisasi toko tampak salah: memuat catatan bug yang pernah terjadi (filter advertiser_id, rata-rata ROI, rate limit TikTok, bypass verifikasi signature Shopee) serta status jalur Desty yang dicabut.",
+      "hash": "d02be5a39631da33b627d4de0bf67f3a0ce7980e5a676cc66c4b5545228313af",
+      "ukuran_kb": 293.0,
+      "ringkasan": "Menjawab: bagaimana integration-service bekerja end-to-end — webhook marketplace, sync order/retur/escrow/wallet, bridging Accurate (faktur/retur/penerimaan harian, sweep rekonsiliasi termasuk pass seed retur tanpa-faktur), worker cron, observability Shopee (success rate, circuit breaker, rate limit), status sinkron per toko yang membuat worker melewati toko banned, dan auto-disable Tahap 2 berbasis kegagalan auth beruntun. Juga mencatat gap yang belum diimplementasikan beserta insiden yang melatarbelakanginya.",
       "kata_kunci": [
         "integration service",
         "marketplace",
-        "TikTok Shop",
-        "TikTok Business Ads",
-        "Shopee",
-        "Lazada",
-        "webhook",
-        "Accurate Online",
-        "Sales Invoice",
-        "GMV Max"
+        "shopee",
+        "tiktok",
+        "lazada",
+        "accurate",
+        "worker",
+        "cron",
+        "retur",
+        "sweep",
+        "toko nonaktif",
+        "auto-disable",
+        "success rate"
       ]
     },
     {
@@ -3263,9 +3268,10 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented & Deployed; perbaikan cacat MENUNGGU DEPLOY** (cacat 2026-08-07: cabang bukti-mutasi-dompet men-skip kasus yang justru TIDAK dobel, paparan 1 order — **fix di PR #1085, belum deploy**; lihat amandemen 2026-08-07 & 2026-08-08). Riwayat: (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel). **Amandemen 2026-08-05 (✅ DEPLOYED 2026-08-05, commit `779b0a06`; verifikasi prod: 38 baris jejak tersemai, dari 1):** janji \"SKIP → baris `SKIPPED`\" di Decision #1 akhirnya benar-benar dipenuhi — sebelumnya baris hanya ditandai bila kebetulan sudah ada, sehingga mayoritas retur payout>0 **tak berjejak sama sekali** di UI; sekaligus menutup lubang dobel-booking lewat konfirmasi gudang yang baru terlihat setelah baris jejak itu ada. **Amandemen 2026-08-06 (✅ DEPLOYED, PR #1038):** cabang Shopee berhenti menebak dari kanal dan **menuntut bukti** mutasi penyerap; backfill + sensus penutup SELESAI hari yang sama (129 dari 131 retur ACCEPTED sudah berbaris; 2 sisanya DEFER benar). Lihat Consequences. **Amandemen 2026-08-12 (kode, belum deploy):** fallback tanggal **hari-kirim DIBUANG**, ganti ke `order.returned_at` lalu tanggal deteksi (PR bip-erp#1161 + erp-frontend#977).",
+      "status_teks": "**Implemented & Deployed; perbaikan cacat MENUNGGU DEPLOY** (cacat 2026-08-07: cabang bukti-mutasi-dompet men-skip kasus yang justru TIDAK dobel, paparan 1 order — **fix di PR #1085, belum deploy**; lihat amandemen 2026-08-07 & 2026-08-08). Riwayat: (2026-07-18/19: gerbang payout + tanggal per-solution + pemicu settlement + **cutover retur ikut faktur/hari-kirim** + gate cutover-fix; deploy 2026-07-19; cleanup data existing **SELESAI** — descope 1565 retur < 1 Jul, void 1 dobel). **Amandemen 2026-08-05 (✅ DEPLOYED 2026-08-05, commit `779b0a06`; verifikasi prod: 38 baris jejak tersemai, dari 1):** janji \"SKIP → baris `SKIPPED`\" di Decision #1 akhirnya benar-benar dipenuhi — sebelumnya baris hanya ditandai bila kebetulan sudah ada, sehingga mayoritas retur payout>0 **tak berjejak sama sekali** di UI; sekaligus menutup lubang dobel-booking lewat konfirmasi gudang yang baru terlihat setelah baris jejak itu ada. **Amandemen 2026-08-06 (✅ DEPLOYED, PR #1038):** cabang Shopee berhenti menebak dari kanal dan **menuntut bukti** mutasi penyerap; backfill + sensus penutup SELESAI hari yang sama (129 dari 131 retur ACCEPTED sudah berbaris; 2 sisanya DEFER benar). Lihat Consequences. **Amandemen 2026-08-12 (kode, belum deploy):** fallback tanggal **hari-kirim DIBUANG**, ganti ke `order.returned_at` lalu tanggal deteksi (PR bip-erp#1161 + erp-frontend#977). **Amandemen 2026-08-26 (✅ DEPLOYED, PR #1451):** kompensasi paket hilang ([[ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order]]) kini ikut menyerap — jalur cancel tak lagi membukukan retur untuk pesanan batal yang fakturnya sudah dilunasi kompensasi.",
       "publik": true,
       "tautan": [
+        "ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order",
         "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
         "ADR - 0012 Retur Refund-only Push-all",
@@ -3275,20 +3281,19 @@
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur"
       ],
-      "hash": "0277a6d51d46f74911e9c4a1f82f7eee8c63f15f994d4071e90de0311ebbd28b",
-      "ukuran_kb": 30.7,
-      "ringkasan": "Menjawab: kapan sebuah retur marketplace dibukukan sebagai Retur Penjualan dan kapan justru dilewati karena refund-nya sudah terserap di sisi Income/Bukti Terima Kas, lewat gerbang payout mendekati nol. Menjelaskan pula bagaimana tanggal retur ditentukan berbeda per solution (refund-only pakai tanggal ajukan, barang-balik pakai tanggal barang tiba, TikTok pakai order_update_date) dan kenapa cutover retur mengikuti hari kirim faktur sumbernya. Memuat rangkaian amandemen yang memperketat gerbang agar dobel-booking tidak terjadi dan setiap keputusan skip meninggalkan jejak.",
+      "hash": "83e6de27cccfccde21052a22e64eb392bcd63be65b079b76112db4a2d0bacae1",
+      "ukuran_kb": 33.7,
+      "ringkasan": "Menjawab: kenapa retur hanya dibukukan bila payout≈0 (retur vs income agar tak dobel), bagaimana tanggal retur ditentukan per solution, apa saja amandemennya (keputusan SKIP wajib berjejak, gerbang menuntut bukti penyerapan, cutover retur ikut hari kirim), dan cacat mana yang masih menunggu deploy.",
       "kata_kunci": [
+        "adr",
         "retur",
-        "return",
-        "payout",
-        "escrow",
-        "refund",
-        "Shopee",
-        "dobel booking",
-        "ADR 0024",
+        "gerbang payout",
+        "income vs retur",
         "tanggal retur",
-        "receipt"
+        "solution",
+        "skipped",
+        "cutover retur",
+        "dobel"
       ]
     },
     {
@@ -4295,22 +4300,22 @@
         "ADR - 0011 Integration Read Cache + Singleflight (Fase 1 Perf)",
         "Sales - Marketplace Integration"
       ],
-      "hash": "228664b366049c43befc8da8c477c726731f564f259bc21ff9d19c93a1136152",
-      "ukuran_kb": 5.8,
-      "ringkasan": "Menjawab: kenapa dan bagaimana status sinkron per-toko diputuskan — toko banned/di-deactivate marketplace membakar kuota dan menyeret success rate partner app, jadi status ACTIVE/DISABLED disimpan di koleksi terpisah shop_sync_states (bukan field di dokumen toko yang bisa hilang saat re-sync). Menjelaskan bahwa semua jalur sync melewati toko DISABLED lewat satu pintu (ListSyncableShops), sifat fail-open, toggle manual admin-only ber-alasan wajib + riwayat, serta kenapa ambang \"gagal beruntun\" wajib (kode error transien/flapping bukan bukti banned).",
+      "hash": "1af925998c51daaf89f4b362162b5f8c117e3db82e37169cbfe7b2e6ed084c92",
+      "ukuran_kb": 6.5,
+      "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal), dan bagaimana auto-disable Tahap 2 bekerja (counter kegagalan auth beruntun, ambang 5, reset saat sukses, satu Telegram tanpa damper terpisah — bukti flapping 36009006). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care.",
       "kata_kunci": [
-        "status sinkron toko",
+        "adr",
         "shop sync state",
-        "ADR",
         "toko banned",
-        "DISABLED",
-        "kuota API",
+        "disable toko",
+        "auto-disable",
+        "rainbow care",
+        "36009006",
+        "flapping",
+        "skip worker",
+        "kuota api",
         "success rate",
-        "ListSyncableShops",
-        "Shopee",
-        "TikTok",
-        "Rainbow Care",
-        "fail-open"
+        "ListSyncableShops"
       ]
     },
     {
@@ -4415,6 +4420,37 @@
         "QC",
         "penerimaan barang",
         "ADR 0055"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order.md",
+      "judul": "ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "✅",
+      "status_teks": "**Implemented & Deployed** — PR #1451 merged & live 26 Agustus 2026 (deploy 20:36 WIB). Diverifikasi ke dokumen Accurate nyata pada dua penerimaan yang finance laporkan selisih.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
+        "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
+        "Microservices - Integration Service",
+        "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur",
+        "ADR - 0001 Akuntansi via Accurate",
+        "APP - Web ERP"
+      ],
+      "hash": "3405a3dc1516fe9eff90d36e5a1a47c8a876d2dbaf6bc9537105816d5897ee6d",
+      "ukuran_kb": 10.1,
+      "ringkasan": "Menjawab: bagaimana penyesuaian statement TikTok (tt_statement_adjustments, mayoritas ganti rugi paket hilang / LOGISTICS_REIMBURSEMENT yang bukan penggantian ongkir) dibukukan ke Accurate — dilipat ke payout pesanan yang disebutnya lalu diurus mesin receipt, bukan sebagai baris pendapatan tersendiri — dan bagaimana pesanan yang tak ditemukan ditangani. Live 26 Agustus 2026 (PR #1451).",
+      "kata_kunci": [
+        "adr",
+        "tiktok",
+        "statement adjustment",
+        "penyesuaian statement",
+        "payout",
+        "receipt",
+        "logistics reimbursement",
+        "paket hilang",
+        "accurate"
       ]
     },
     {
@@ -4617,8 +4653,8 @@
         "External - Accurate",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
-        "doc.pdf",
         "Microservices - Integration Service",
+        "doc.pdf",
         "Sales - ICC Account Manager Mapping",
         "APP - Dynamic Task Tracker",
         "Sales - GMV Creative",
@@ -4626,20 +4662,20 @@
         "Finance - Bridging App",
         "HRIS - Compensation & Benefits"
       ],
-      "hash": "dbcc00857d46e3f8cd5b8a2342715c3ddf41c7fcb63ec0f893a9880120c66df4",
-      "ukuran_kb": 22.2,
-      "ringkasan": "Menjawab: bagaimana insentif tim marketing dihitung dengan skema profit-based SK 010 & 011/2026, berapa tarif untuk tiap tingkat pencapaian target, dari mana tiap komponen biaya diambil, dan siapa yang boleh membuka dashboard beserta master datanya serta bagaimana cara menugaskan aksesnya. Memuat aturan turunan yang mengikat (gerbang retur 7%, target diketik hanya di lingkup Supervisor, dasar uang cair, cutoff tanggal 25) serta riwayat skema KPI-multiplier lama yang sudah dicabut dan tak boleh dipakai sebagai acuan.",
+      "hash": "45ecda130a8a574dd2a3819d3a2f7b93c81334ed2bf46b0cd2c29b89c5e0a34e",
+      "ukuran_kb": 24.4,
+      "ringkasan": "Menjawab: bagaimana skema insentif marketing yang berlaku (profit-based seluruh jabatan per SK 010 & 011/2026) dihitung dan siapa yang boleh melihat layarnya, apa yang masih menahan pemakaiannya (master data), serta riwayat SK lama KPI-multiplier per jabatan (SPV, ADV/Leader ICC, Meta, marketplace, CRM) yang sudah dicabut dan tak boleh dipakai sebagai acuan.",
       "kata_kunci": [
         "insentif",
         "incentive",
         "profit-based",
-        "SK 010",
-        "target profit",
-        "ICC",
-        "advertiser",
-        "uang cair",
-        "retur",
-        "tarif insentif"
+        "sk 010",
+        "sk 011",
+        "spv marketing",
+        "icc",
+        "adv",
+        "kpi multiplier dicabut",
+        "master data"
       ]
     },
     {
@@ -5156,7 +5192,7 @@
         "GA - Form Pengadaan dan Pengajuan Dana"
       ],
       "hash": "5a506ef2f6690f2d0fd48bd5da4134bc63d99b6af98efef405cd97c1c4ee6447",
-      "ukuran_kb": 7.6,
+      "ukuran_kb": 7.7,
       "ringkasan": "Menjawab: apa saja 11 SOP Procurement resmi PT Bharata (perencanaan kebutuhan, PR, seleksi vendor, RFQ, penerbitan PO, monitoring pengiriman, penerimaan+QC, verifikasi invoice, pembayaran, evaluasi vendor, cost saving, pelaporan) dan sejauh mana masing-masing sudah didukung ERP. Memetakan tahap SOP mana yang sudah ada di kode (Permintaan/Pesanan/Penerimaan), mana yang sebagian, dan mana yang belum dibangun (RFQ 3-vendor, matriks approval nominal >Rp50jt, AVL & dokumen legalitas vendor, scorecard/OTD vendor, pelaporan formal). Berguna untuk mengecek kepatuhan SOP sebelum merancang fitur procurement/manufacture baru.",
       "kata_kunci": [
         "procurement",
@@ -7355,7 +7391,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
-      "ukuran_kb": 6.9,
+      "ukuran_kb": 6.8,
       "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
       "kata_kunci": [
         "faktur",
@@ -7882,7 +7918,7 @@
         "QA - Register Perizinan & Sertifikasi"
       ],
       "hash": "23e3bd168ac5a48c16f9775bbc34e5fedf3ebe1e157b20409e69fdedb7075c5e",
-      "ukuran_kb": 9.0,
+      "ukuran_kb": 9.1,
       "ringkasan": "Menjawab: register mutu apa saja yang sudah ada di ERP divisi Quality — CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing, dan pengecekan raw material — berikut endpoint `/api/employee/quality/*`, collection MongoDB, dan model datanya. Juga menjawab siapa yang boleh mengakses apa (`quality:staff`, `quality:supervisor`, approver produksi & warehouse, staf marketing), bagaimana alur approval CAPA berjalan (Draft → Diajukan → persetujuan Produksi + Warehouse → finalisasi QA), dan aturan alert keterlambatan tiap register (tenggat H-7, Menunggu >3 hari, antrean >24 jam). Menjelaskan pula apa yang belum tersedia: Dashboard Mutu, IPC/Pre-Check/CPPB, dan checklist GMP/kalibrasi/storage.",
       "kata_kunci": [
         "quality",
@@ -9948,7 +9984,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.2,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
