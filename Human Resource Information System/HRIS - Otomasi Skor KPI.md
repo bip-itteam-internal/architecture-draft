@@ -269,7 +269,7 @@ Konteks sumber: [[Microservices - Marketing Analytics Service]] (agregasi mart +
 
 ## Perubahan 25–26 Agustus 2026: profit KPI dibaca dari insentif
 
-> **Status**: ✅ sumber & template live di prod 2026-08-26. Yang belum: gerbang peringatan (lihat batasan di akhir bab).
+> **Status**: ✅ sumber, template, dan gerbang peringatan seluruhnya live di prod 2026-08-26.
 
 **Pertanyaan yang menutup TBD di bab sebelumnya** ("ganti atau tambah", "target `profit_bersih` belum disepakati") terjawab dengan cara yang berbeda dari dugaan: KPI **berhenti menghitung profit sendiri**.
 
@@ -297,7 +297,31 @@ Terukur prod Juli 2026: populasi ordernya beda 11% (81.652 vs 73.543).
 ⚠️ **`layakDifinalisasi` TIDAK ikut dilonggarkan** — cron finalisasi tetap menuntut lengkap. Membekukan skor setengah jadi mencatat angka yang lebih kecil dari kenyataan sebagai sejarah permanen, dan sejarah yang salah jauh lebih sulit dibetulkan daripada layar yang kosong. Fungsinya **dipisah**, bukan gerbangnya dilebarkan. Sejalan dengan [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]].
 
 **Yang masih menahan (bukan kode):**
-- ⛔ **Gerbang peringatan pukul-rata**. Sumber `insentif_profit` membuang baris bila `peringatan[]` tak kosong. Benar untuk komponen **hilang** (gaji, opex, target), keliru untuk **kelengkapan pinggiran**: "HPP mencakup 99,8%" dan "N retur belum terbukukan" tak menggeser angka profit. Maftuhissaiin tak dinilai meski realisasi Rp486 jt sudah benar.
+- ✅ ~~Gerbang peringatan pukul-rata.~~ **DIPERBAIKI 2026-08-26.** Dulu sumber `insentif_profit` membuang baris begitu ada peringatan apa pun, sehingga Maftuhissaiin tak dinilai berbulan-bulan padahal realisasinya Rp486 juta sudah benar. Yang menahannya cuma dua hal yang tak menyentuh angka: "HPP mencakup 99,8%" (meleset 0,2%) dan "95 retur belum terbukukan" (retur memang tidak dikurangkan di rumus SK).
+
+  Sekarang hanya peringatan yang **benar-benar mengubah angka** yang menahan penilaian: gaji belum ada, opex belum ada, target belum diisi. Penjaganya sengaja **dibalik** — yang boleh lewat yang didaftar, dan peringatan baru yang belum dipertimbangkan **tetap menahan** sampai ada yang memutuskan sifatnya. Pencocokannya lewat potongan kalimat, yang memang rapuh; dengan arah ini rapuhnya jatuh ke sisi aman.
+
+### Skor tak lagi dibulatkan (2026-08-26)
+
+Layar KPI membulatkan skor ke bilangan bulat, dan itu sempat menyesatkan. Skor Maftuhissaiin:
+
+    0,60 × 51,0 (Profit)   = 30,6
+    0,20 × 100  (Retur)    = 20,0
+    0,20 ×   0  (KPI Team) =  0,0
+                             ----
+                             50,6   ditampilkan sebagai "51"
+
+Angka 51 itu **kebetulan sama persis** dengan skor metrik Profit, sehingga terbaca seolah skor total = profit saja dan dua metrik lain tak ikut dihitung. Pertanyaan "kenapa totalnya sama dengan profit?" lahir langsung dari pembulatan itu.
+
+Pada bobot pecahan (0,6 / 0,2 / 0,2) hasilnya nyaris tak pernah bulat, jadi pembulatan justru menyembunyikan selisih yang menjelaskan susunannya. Perbaikannya di [[APP - Web ERP]] — satu helper dipakai bersama di empat layar supaya tak ada yang tertinggal dengan aturan lama.
+
+### Kenapa "KPI Team" bisa bernilai 0
+
+Sumber `skor_tim` merata-ratakan skor anggota tim, lalu membandingkannya dengan target. Yang kerap membingungkan: **rata-rata dihitung dari anggota yang SUDAH punya skor**, bukan dari seluruh anggota.
+
+Contoh Kyura Agustus 2026: 28 anggota, baru 12 yang punya skor, rata-ratanya 52,70 terhadap target 70 → skor 0. Enam belas sisanya memegang posisi yang metriknya **manual seluruhnya** (Host Live, Bootcamp Content Creator, Buzzer, Customer Support, Live Support, Meta Advertiser) — mereka menunggu penilaian atasan, bukan menunggu data.
+
+Basis di layar menyebutkan penyebutnya apa adanya ("dari 12 pengukuran, populasi 28"), jadi angkanya dapat ditelusuri. Begitu atasan menilai sisanya, rata-rata tim ikut naik **sendiri** lewat fallback bulan berjalan yang sudah ada di `kpi_auto.go` — tanpa perubahan kode.
 - ⛔ **Proyek Accurate SPV** — kode SPV bernama divisi, bukan `employee_id`. Rincian di [[Microservices - Insentive Service]] dan [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]].
 - ⚠️ **ROAS kosong untuk 17 dari 31 ICC**, tetapi hanya **3,6% revenue** — 13 di antaranya toko kecil (Rp178 rb–27 jt) yang belum terhubung ke akun advertiser di TikTok Business (`tt_business_stores`), 3 sisanya Lazada yang memang tak punya sumber iklan. Ini keadaan data di hulu, bukan bug: `ads_cost` lahir dari laporan GMV Max per `store_id`, dan toko yang tak terhubung tak punya baris laporan. Kolom `tiktok_advertiser_id` di ICC Management **tidak** dibaca perhitungan ini.
 

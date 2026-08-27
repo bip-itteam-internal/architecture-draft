@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-26",
-  "jumlah_dokumen": 304,
+  "digenerate": "2026-08-27",
+  "jumlah_dokumen": 303,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -377,6 +377,7 @@
         "Microservices - Employee Service",
         "ADR - 0015 Push Pergerakan WMS ke Accurate",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
+        "HRIS - Otomasi Skor KPI",
         "Microservices - Insentive Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "Sales - ICC Account Manager Mapping",
@@ -386,9 +387,9 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "b00a84f996c30fe41b5d10794c7efcecfecb6d25a79fa3ee1c78643fa24f9026",
-      "ukuran_kb": 62.2,
-      "ringkasan": "Menjawab: endpoint apa saja yang menghubungkan marketplace (TikTok Shop/Business, Shopee) ke Accurate, yaitu order terpadu, ringkasan/komparasi/ekspor order, aging piutang, feed retur lintas-channel, packet tracking, reviews, ICC account mapping, dan status sinkron toko. Menjelaskan parameter tiap endpoint, alur webhook publik (/ext/webhook/*), dan tiga tuas koreksi manual atas satu order (invoice-exclusion, invoice-date-override, fake-order-override) yang sering tertukar maksudnya. Sejak 2026-08-26 menandai fake order penghuni terakhir faktur tidak lagi ditolak melainkan mem-void fakturnya.",
+      "hash": "bc201ee5de729cf7bfc5bb3b9cd0949ab1f1406b7336f21f403c8b2673a9537b",
+      "ukuran_kb": 63.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang menghubungkan marketplace (TikTok Shop/Business, Shopee) ke Accurate, yaitu order terpadu, ringkasan/komparasi/ekspor order, aging piutang, feed retur lintas-channel, packet tracking, reviews, ICC account mapping, dan status sinkron toko. Menjelaskan parameter tiap endpoint, alur webhook publik lewat /ext/webhook/*, dan tiga tuas koreksi manual atas satu order (invoice-exclusion, invoice-date-override, fake-order-override) yang sering tertukar maksudnya. Menjawab juga kenapa dua endpoint piutang berbeda bentuk: /piutang/summary membalas tiga bucket yang saling lepas sedangkan /piutang/tren membalas himpunan bersarang di mana lebih14 memuat lebih60, sehingga keduanya tak boleh dijumlahkan.",
       "kata_kunci": [
         "integration service",
         "endpoint",
@@ -396,13 +397,10 @@
         "TikTok Shop",
         "Shopee",
         "Accurate",
-        "order",
-        "webhook",
-        "piutang",
-        "retur",
-        "fake order",
-        "invoice override",
-        "ICC mapping"
+        "aging piutang",
+        "receivables",
+        "bucket bersarang",
+        "retur"
       ]
     },
     {
@@ -1731,20 +1729,20 @@
         "CORE - HRIS Orchestrator",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "1c63174a6153c63d90d9f710de87279acdd78958a11deb99ab72ff27768b824a",
-      "ukuran_kb": 35.6,
-      "ringkasan": "Menjawab: bagaimana karyawan clock-in/out (mobile, fingerprint, website) berikut validasi WiFi kantor, GPS, dan gerbang form wajib; bagaimana jadwal kerja diresolusi antara jadwal static, rotasi shift bergilir (`pattern`), roster harian per tanggal, dan tukar jadwal; serta bagaimana alur pengajuan cuti/izin, koreksi presensi, perjalanan dinas, dan buku tamu berjalan lengkap dengan rantai approval, gerbang izin, dan cron pra-alokasi entry. Menjawab juga data kehadiran apa yang dipasok ke penggajian lewat `GET /payroll-supplement` (termasuk rincian per hari `late_hours`, `leave_hours`, `unpaid_full_day`, `alpha`), rekap telat per karyawan untuk usulan SP 1, dan rekap KPI kedisiplinan, plus catatan multi-perusahaan (tenant) yang masih parsial. Penting: aturan bisnis di baliknya (tabel jam kerja per shift, ambang telat 3x sebulan pemicu SP 1, mangkir berturut-turut Pasal 20) TIDAK ada di vault melainkan di `mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md`, turunan Peraturan Perusahaan 2026-2028, dan berkas itu yang menang bila perilaku sistem bertentangan dengannya.",
+      "hash": "cbda77c29d02779879418f7f6357f9cbb5e3ca6df57e36d12c63e9b9301d2804",
+      "ukuran_kb": 37.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki attendance-service (clock-in/out multi-metode lewat mobile/fingerprint/website, resolusi dan rotasi jadwal kerja, leave request, perjalanan dinas, guestbook tamu, hari libur, serta laporan payroll dan rekap telat/KPI kedisiplinan). Menjawab juga apa yang dikerjakan cron tiap 30 menit: pra-generate entri presensi, kapan status Pending berubah jadi Tanpa Keterangan, kenapa penandaan itu menunggu ontime_grace_minutes habis dan dipicu jendela alih-alih kesetaraan menit, serta siapa yang berhak menerima pengingat \"Kamu belum absen hari ini!\" dan notifikasi pujian clock-in. Memuat catatan gap yang masih hidup: multi-perusahaan (company_id) baru parsial, picker jadwal BIP masih hardcode per nama departemen, clock-in website masih 501, dan aturan jam kerja serta sanksinya sengaja tinggal di BUSINESS_LOGIC_IMPLEMENTATION.md repo mobile, bukan di vault ini.",
       "kata_kunci": [
-        "absensi",
-        "attendance",
+        "attendance service",
+        "presensi",
         "clock-in",
-        "jadwal shift",
-        "roster",
-        "cuti",
-        "leave request",
-        "koreksi presensi",
-        "perjalanan dinas",
-        "payroll-supplement"
+        "clock-out",
+        "cron presensi",
+        "Tanpa Keterangan",
+        "alpha",
+        "toleransi tepat waktu",
+        "ontime_grace_minutes",
+        "multi-tenant company_id"
       ]
     },
     {
@@ -1997,35 +1995,34 @@
       "tautan": [
         "Microservices - Integration Service",
         "Microservices - Payroll Service",
+        "Microservices - Inventory Service",
         "APP - Web ERP",
         "IT - Background Jobs & Schedulers",
-        "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
-        "Microservices - Employee Service",
         "DB - Overview and Notes",
         "External - Accurate",
         "CORE - API Master Gateway",
         "Finance - Incentive",
+        "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "API - Insentive Service",
         "Sales - Incentive",
         "HRIS - Key Performance Index"
       ],
-      "hash": "111dfb16c69bb762bd3a48b9d8f61a14fd3623c1e1754f93ce963584c60f376f",
-      "ukuran_kb": 10.7,
-      "ringkasan": "Menjawab: bagaimana insentif tim marketing dihitung dengan skema profit-based (Profit = uang cair − HPP − beban iklan − biaya operasional, insentif = tarif bertingkat × profit), bagaimana tarif per tier pencapaian dan gerbang retur 7% bekerja, serta siapa yang boleh menulis target dan master data profit. Juga menjelaskan bagaimana level Leader dan Supervisor kini diturunkan dari hierarki HRIS (work_data.supervisor_id) menggantikan icc_leaders dan incentive_org, endpoint dashboard profit, dan mana bagian skema lama yang sudah dicabut.",
+      "hash": "cad357403953727c6850ebd0b1cdc0e7234717765a378d26c2609b4af87906ea",
+      "ukuran_kb": 12.7,
+      "ringkasan": "Menjawab: bagaimana insentif tim marketing dihitung dengan skema profit-based (insentif = tarif × profit), bagaimana tarif bertingkat mengikuti % pencapaian target, dan bagaimana gerbang retur 7% bekerja. Menjelaskan juga dari mana komponen biaya operasional diambil (gaji dari payroll, beban marketing dari Accurate lewat integration, penyusutan aset dari inventory), endpoint dashboard profit dan master data target/opex beserta gerbang RBAC-nya, serta bagaimana level Leader dan Supervisor diturunkan dari hierarki HRIS (work_data.supervisor_id) menggantikan icc_leaders dan incentive_org.",
       "kata_kunci": [
         "insentif",
         "incentive",
+        "insentive service",
         "profit-based",
         "profit dashboard",
-        "tarif bertingkat",
-        "target insentif",
-        "retur",
+        "tarif insentif",
+        "target pencapaian",
+        "gerbang retur",
         "ICC",
-        "leader",
-        "supervisor",
-        "hierarki HRIS",
-        "opex",
-        "insentive service"
+        "leader supervisor",
+        "biaya operasional",
+        "opex"
       ]
     },
     {
@@ -2109,6 +2106,8 @@
       "tautan": [
         "CORE - RBAC dan Permission Set",
         "ADR - 0049 Padanan Aset per-item berbasis nama menggantikan kategori-golongan",
+        "Microservices - Insentive Service",
+        "ADR - 0002 Database-per-Service",
         "ADR - 0001 Akuntansi via Accurate",
         "Microservices - Integration Service",
         "Microservices - File Service",
@@ -2118,27 +2117,24 @@
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "External - Accurate"
       ],
-      "hash": "fd98890dc30e285419d4977862255d3c7ee10a6246b6d7703e29e1c7539e13c6",
-      "ukuran_kb": 10.2,
-      "ringkasan": "Menjawab: bagaimana aset/inventaris GA dibuat dan dilacak di inventory-service (Go + Fiber + MongoDB + MinIO), termasuk pola ID aset (INV-BIP-DDMMYY-NAMA-n dengan tanggal WIB), endpoint item/kategori/summary, serta upload dokumen via MinIO presigned URL dan verifikasi anti-NoSuchKey. Menjelaskan juga alur serah-terima pemegang (held_by) dengan persetujuan SPV, riwayat perbaikan berikut bukti nota, penyusutan/nilai buku sebagai estimasi, dan rekonsiliasi aset ke Accurate (accurate_asset_no, category-mapping). Menerangkan gotcha middleware grup Fiber per-prefix pada approve-handover dan status implementasi tiap fitur.",
+      "hash": "5c44dd744b1b4b1765c334ab0c8447a72a54bd63e3a98890dae577b5f862650a",
+      "ukuran_kb": 11.3,
+      "ringkasan": "Menjawab: bagaimana aset/inventaris General Affairs dicatat dan dilacak — pola ID item (INV-BIP-DDMMYY-NAMA-n), spesifikasi, pemegang (held_by), lokasi, masa manfaat, dokumen pembelian/kedatangan/serah-terima/nota perbaikan lewat MinIO presigned URL, serta riwayat perbaikan. Menjelaskan alur serah-terima dan persetujuan SPV beserta jebakan middleware prefix Fiber yang membuat SPV non-GA tertolak 403, pemetaan kategori ke golongan aset Accurate dan penggantinya, dan endpoint penyusutan per pemegang yang dipakai insentif (harga ÷ masa manfaat ÷ 12, aset habis umur tetap dibebankan sehingga sengaja berbeda dari pembukuan Accurate).",
       "kata_kunci": [
-        "inventory service",
-        "aset GA",
+        "inventory",
+        "inventaris",
+        "aset",
         "asset tracking",
-        "held_by",
+        "General Affairs",
+        "GA",
         "serah-terima",
         "handover",
-        "approve-handover",
-        "SPV",
         "repair history",
-        "bukti nota",
-        "presigned URL",
-        "MinIO",
-        "accurate_asset_no",
-        "category-mapping",
-        "INV-BIP",
+        "perbaikan",
         "penyusutan",
-        "nilai buku"
+        "depresiasi",
+        "MinIO",
+        "rekonsiliasi Accurate"
       ]
     },
     {
@@ -4461,20 +4457,6 @@
       ]
     },
     {
-      "path": "Excalidraw/Drawing 2026-08-26 18.25.35.excalidraw.md",
-      "judul": "Drawing 2026-08-26 18.25.35.excalidraw",
-      "area": "Excalidraw",
-      "jenis": null,
-      "status_emoji": null,
-      "status_teks": null,
-      "publik": false,
-      "tautan": [],
-      "hash": "8d0f58cc8747b93b64e519c42aeca08e19b1bfd83b4a3ca31a3f7cc8016b4e4f",
-      "ukuran_kb": 0.6,
-      "ringkasan": null,
-      "kata_kunci": []
-    },
-    {
       "path": "Finance System/Finance - Big Pictures.md",
       "judul": "Finance - Big Pictures",
       "area": "Finance System",
@@ -5318,19 +5300,21 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Gambarnya masih selaras, **teks penyertanya diperbarui 11 Agustus 2026**. Rangkaian dan prinsipnya tidak berubah; yang berubah keadaan nyatanya — lihat catatan di bawah tabel.",
+      "status_teks": "Gambarnya masih selaras. Teks penyerta **dua diagram lintas-departemen** diperbarui 11 Agustus 2026; diagram **marketing** diukur ulang ke produksi **26 Agustus 2026**. Rangkaian dan prinsipnya tidak berubah; yang berubah keadaan nyatanya. Lihat catatan di bawah tabel.",
       "publik": true,
       "tautan": [
         "HRIS - Alur KPI Otomatis.excalidraw",
         "HRIS - Alur KPI Otomatis Rinci.excalidraw",
-        "HRIS - Otomasi Skor KPI",
+        "HRIS - Alur KPI Otomatis Marketing.excalidraw",
+        "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "HRIS - Matriks KPI per Departemen",
+        "HRIS - Otomasi Skor KPI",
         "RUN - Menambah Metrik KPI Otomatis",
         "HRIS - Key Performance Index"
       ],
-      "hash": "aa53401403cb242eb52677daf1068826edf0cf5e1f94950cdecd20bf4c5fa43f",
-      "ukuran_kb": 6.9,
-      "ringkasan": "Menjawab: kenapa skor KPI belum terisi sendiri padahal matriknya sudah lengkap, dan langkah apa saja yang dijalankan sistem dari pekerjaan harian sampai skor muncul untuk diperiksa atasan. Menjelaskan tiga syarat non-kode yang selama ini jadi penghambat sebenarnya (aplikasinya benar-benar diisi, sistem tahu data itu milik siapa, metriknya mungkin diukur), beda metrik dari data sistem versus metrik tim yang bahannya skor orang lain, serta mekanisme cakupan/populasi yang membuat skor atasan tidak bisa dikatrol dari beberapa anggota saja. Sekaligus penunjuk ke dua diagram Excalidraw (versi gambaran besar untuk non-teknis dan versi rinci untuk dev) yang tersimpan di folder tak terindeks.",
+      "hash": "390b754ab2c9d9efe8f9c8ec2d1f9ce1b774d97868e7a2189ae355df90da7a4b",
+      "ukuran_kb": 9.1,
+      "ringkasan": "Menjawab: kenapa skor KPI belum terisi sendiri padahal matriknya sudah lengkap, dan langkah apa saja yang dijalankan sistem dari pekerjaan harian sampai skor muncul untuk diperiksa atasan. Menjelaskan tiga syarat non-kode yang selama ini jadi penghambat sebenarnya (aplikasinya benar-benar diisi, sistem tahu data itu milik siapa, metriknya mungkin diukur), beda metrik dari data sistem versus metrik tim yang bahannya skor orang lain, serta mekanisme cakupan/populasi yang membuat skor atasan tidak bisa dikatrol dari beberapa anggota saja. Sekaligus penunjuk ke tiga versi diagram Excalidraw (gambaran besar untuk non-teknis, versi rinci untuk dev, dan versi marketing untuk Beauty Hacks dan Kyura) yang tersimpan di folder tak terindeks.",
       "kata_kunci": [
         "KPI",
         "otomasi skor KPI",
@@ -5421,31 +5405,24 @@
       "publik": true,
       "tautan": [
         "HRIS - Disciplinary (Surat Peringatan)",
+        "Microservices - Attendance Service",
         "HRIS - Attendance Correction",
-        "HRIS - Tukar Jadwal Kerja",
-        "Microservices - Attendance Service"
+        "HRIS - Tukar Jadwal Kerja"
       ],
-      "hash": "3c6c0bb20b8b9c44ca29ea70d455b5844754472c8fabe6962bf02f252e5ac525",
-      "ukuran_kb": 5.6,
-      "ringkasan": "Menjawab: bagaimana konsep presensi Bharata dirancang, metode apa saja yang dipakai karyawan untuk clock-in/out (mesin fingerprint Solution X105 dan mobile app dengan face recognition, geolocation, dan geofencing WiFi), serta bagian mana yang masih manual karena cron penarikan log mesin belum berhasil. Menjelaskan fitur presensi milik HRIS: memantau real-time, mengubah status entri, menambah komentar dan dokumen, dan mengekspor laporan. Sumber utama untuk pertanyaan soal ambang keterlambatan: `ontime_grace_minutes` (bawaan 1 menit) versus `late_hour_threshold_minutes` (bawaan 11 menit), cara `late_hour` dihitung dari selisih terhadap ambang lalu dibulatkan per jam, dan adanya band Terlambat tanpa potongan jam yang tidak dihitung untuk Surat Peringatan.",
+      "hash": "f210ed7e965eea1c4d104e59293715ab1febf278b8221c159ed1119cb2946820",
+      "ukuran_kb": 7.1,
+      "ringkasan": "Menjawab: bagaimana konsep presensi Bharata dirancang dan kenapa bentuknya begitu, yaitu mesin fingerprint Solution X105 sebagai fallback dan aplikasi mobile sebagai gerbang utama, dengan tiga lapis verifikasi (face recognition, geolocation, dan koneksi WiFi kantor). Menjawab dua ambang mana yang menentukan status kehadiran, ontime_grace_minutes untuk batas Tepat Waktu dan late_hour_threshold_minutes untuk kapan late_hour mulai dihitung, termasuk kenapa ada band di antara keduanya yang tercatat pelanggaran tetapi tak berakibat pada upah. Menjawab juga kapan sistem boleh menyebut seseorang \"belum absen\", dan kenapa ambang itu wajib sama dengan yang dipakai menghitung status supaya karyawan tepat waktu tidak menerima tuduhan belum absen.",
       "kata_kunci": [
         "attendance",
         "presensi",
-        "absensi",
-        "fingerprint Solution X105",
-        "pyzk",
-        "geofencing",
-        "geolocation",
-        "face recognition",
-        "clock-in clock-out",
         "ambang keterlambatan",
-        "grace period",
-        "late_hour",
         "ontime_grace_minutes",
         "late_hour_threshold_minutes",
-        "company_attendance_setting",
-        "toleransi telat",
-        "laporan absensi"
+        "Tepat Waktu",
+        "Terlambat",
+        "belum absen",
+        "fingerprint",
+        "toleransi"
       ]
     },
     {
@@ -6012,9 +5989,9 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "a7fb62b2c03208f2dd7d9a21964c05b12992ef981b65a4fbfd31fc863bc6c301",
-      "ukuran_kb": 149.7,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang di produksi hari ini, berapa bobotnya, dan apa targetnya, dikelompokkan per departemen dan per posisi. Menjawab juga metrik mana yang bisa diotomatiskan dan mana yang tidak, termasuk perbedaan penting antara datanya ada dan mesin KPI punya konektor untuk menariknya, beserta daftar sumber yang benar-benar terdaftar di kode dan mana yang sudah naik ke produksi.",
+      "hash": "0db06cfcca9f805e818d85a68998e861e5e3eb7f43972a9847d3eba6ac943ff9",
+      "ukuran_kb": 150.6,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang di produksi hari ini, berapa bobotnya, dan apa targetnya, dikelompokkan per departemen dan per posisi. Menjawab juga metrik mana yang bisa diotomatiskan dan mana yang tidak, termasuk perbedaan penting antara datanya ada dan mesin KPI punya konektor untuk menariknya, beserta daftar sumber yang benar-benar terdaftar di kode dan mana yang sudah naik ke produksi. Memuat pula peringatan atas metrik yang label dan deskripsinya pernah menyebut dua hal berbeda, seperti metrik AR Supervisor Finance yang sempat tercatat sebagai Revenue 240M padahal mengukur piutang lewat 60 hari.",
       "kata_kunci": [
         "KPI",
         "kpi_template",
@@ -6024,9 +6001,8 @@
         "otomasi KPI",
         "metrik per departemen",
         "sumber KPI",
-        "konektor",
-        "Tech Development",
-        "HRGA"
+        "piutang",
+        "Supervisor Finance"
       ]
     },
     {
@@ -6095,6 +6071,7 @@
         "Microservices - Marketing Analytics Service",
         "Microservices - Integration Service",
         "External - Accurate",
+        "APP - Web ERP",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "IT - Background Jobs & Schedulers",
         "HRIS - Organization Structure",
@@ -6125,7 +6102,6 @@
         "HRIS - Work Review",
         "Microservices - Calendar Service",
         "Sales - Marketing Dashboard (Master Roadmap)",
-        "APP - Web ERP",
         "API - Task Management Service",
         "Microservices - Attendance Service",
         "IT - Monitoring System",
@@ -6140,23 +6116,22 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "de1e4740e521c4d81150ecee6379cfacb5d85fa6eb1aa234de2153cc79119214",
-      "ukuran_kb": 95.3,
-      "ringkasan": "Menjawab: metrik KPI mana yang bisa diisi otomatis dari data yang sudah dimiliki ERP dan mana yang tidak punya sumber sama sekali, hasil klasifikasi 311 metrik menjadi siap otomatis, semi, modul-ada-data-kosong, dan tanpa sumber. Menjelaskan cara kerja mesinnya (sumber nilai, formula reduksi, cakupan tim/departemen/perusahaan, arah target, batas 100), bedanya status otomatis vs semi vs manual, dan bagaimana penilai memakai usulan lewat GET /kpi/auto-values serta halaman diagnostik Otomasi KPI. Juga menjawab jebakan urutan penilaian pada metrik skor_tim karena snapshot kpi_score beku.",
+      "hash": "869e67635b3ec2b55789b00defa2b3b3ace904b65ff547dac1ed47ec54677e33",
+      "ukuran_kb": 97.4,
+      "ringkasan": "Menjawab: metrik KPI mana yang skornya bisa diisi otomatis dari data ERP, dari sumber apa, dan mana yang modulnya ada tapi datanya kosong atau tidak punya sumber sama sekali (klasifikasi 311 metrik lengkap dengan rekap per departemen dan matriks per posisi). Menjelaskan cara kerja blok `auto` di kpi_template, endpoint GET /kpi/auto-values, arti auto_basis otomatis/semi/manual dan cakupan data parsial, layar diagnostik Otomasi KPI, serta cara HR mengisi konfigurasinya sendiri. Memuat juga jebakan operasional: urutan penilaian yang dituntut sumber skor_tim, snapshot kpi_score yang beku, dan kenapa KPI Team bisa bernilai 0.",
       "kata_kunci": [
         "KPI",
-        "otomasi KPI",
         "skor KPI",
+        "otomasi KPI",
         "auto-values",
         "kpi_template",
         "kpi_score",
-        "skor tim",
-        "cakupan",
-        "uptime sistem",
-        "ICC",
+        "skor_tim",
+        "uptime_sistem",
+        "penilaian karyawan",
+        "performance appraisal",
         "HRIS",
-        "penilaian",
-        "supervisor"
+        "target metrik"
       ]
     },
     {
@@ -8109,9 +8084,9 @@
         "HRIS - Otomasi Skor KPI",
         "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman"
       ],
-      "hash": "765ee68b455d9d0d0a7b72604d755b7ea933ea2fbadaba148b965f947a388fee",
-      "ukuran_kb": 7.2,
-      "ringkasan": "Menjawab: bagaimana aturan menamai sumber/metrik katalog (dibuat dev, tampil di dropdown Sumber data) dan metrik template (dibuat HR, tampil sebagai baris penilaian), termasuk kenapa label harus menyebut yang diukur bukan targetnya, batas panjang agar tak terpotong di kontrol w-60, dan syarat keterangan wajib yang menyebut menu asal angka. Menjelaskan mana yang aman diganti namanya (label metrik template dan LABEL sumber) dan mana yang berbahaya (token sumber/metrik katalog seperti kinerja_toko yang tersimpan di auto.sumber). Juga menjawab: di mana kamus label disimpan, bagaimana test label-otomatis.aturan.test.ts menjaga aturan ini, dan cara memeriksa label di layar serta di dua locale.",
+      "hash": "dfb29f4c6c07f08bab9edae8599fb05d2587d2ab3c085611656ce69b68ace445",
+      "ukuran_kb": 8.5,
+      "ringkasan": "Menjawab: bagaimana aturan menamai sumber/metrik katalog (dibuat dev, tampil di dropdown Sumber data) dan metrik template (dibuat HR, tampil sebagai baris penilaian), termasuk kenapa label harus menyebut yang diukur bukan targetnya, batas panjang agar tak terpotong di kontrol w-60, dan syarat keterangan wajib yang menyebut menu asal angka. Menjelaskan mana yang aman diganti namanya (label metrik template dan LABEL sumber) dan mana yang berbahaya (token sumber/metrik katalog seperti kinerja_toko yang tersimpan di auto.sumber). Menjawab juga di mana saja sebuah METRIK baru harus didaftarkan supaya tidak tampil tanpa keterangan atau bersatuan salah, dan kenapa penjaga otomatisnya menutupi sumber tetapi tidak menutupi metrik yang terlewat.",
       "kata_kunci": [
         "penamaan metrik",
         "label KPI",
@@ -8121,7 +8096,7 @@
         "katalog sumber",
         "keterangan metrik",
         "i18n label",
-        "naming convention",
+        "satuan target",
         "auto.sumber"
       ]
     },
@@ -8423,9 +8398,9 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "221007b58169c35dda6ab1a01293400f3b1d763f7af43926407e83122c25beb4",
-      "ukuran_kb": 34.9,
-      "ringkasan": "Menjawab: langkah apa saja yang harus dikerjakan dev untuk membuat satu metrik KPI terisi otomatis, mulai dari memastikan datanya memang cukup, mendaftarkan sumber, sampai mengisi konfigurasi target dan arahnya. Menjawab juga pertanyaan yang paling sering muncul soal desainnya: kenapa angka dihitung ulang tiap kali dibaca alih-alih diakumulasi harian, kenapa sumber tidak boleh mengenal target, dan kesalahan apa saja yang sudah pernah terjadi di sini karena salah arah target atau salah nama field.",
+      "hash": "6507a5e2809a1ffba08ad8cf337bda8eda8932299e708a4e50011a10128102f8",
+      "ukuran_kb": 35.4,
+      "ringkasan": "Menjawab: langkah apa saja yang harus dikerjakan dev untuk membuat satu metrik KPI terisi otomatis, mulai dari memastikan datanya memang cukup, mendaftarkan sumber, sampai mengisi konfigurasi target dan arahnya. Menjawab juga pertanyaan yang paling sering muncul soal desainnya: kenapa angka dihitung ulang tiap kali dibaca alih-alih diakumulasi harian, kenapa sumber tidak boleh mengenal target, dan kesalahan apa saja yang sudah pernah terjadi di sini karena salah arah target atau salah nama field. Memuat checklist sebelum PR, termasuk kewajiban mendaftarkan tiap metrik dari sumber bermetrik secara terpisah karena sumber yang sudah berlabel lengkap tidak menolong metriknya.",
       "kata_kunci": [
         "KPI otomatis",
         "tambah metrik",
@@ -10414,7 +10389,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Excalidraw/Drawing 2026-08-26 18.25.35.excalidraw.md"
-  ]
+  "gagal": []
 }

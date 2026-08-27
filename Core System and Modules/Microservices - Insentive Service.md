@@ -31,6 +31,29 @@ Insentif = tarif(%) × Profit
 - ⚠️ Seluruh rute **tulis** `/profit/*` dijaga `RequireMasterProfitWriter` (finance staff/supervisor/admin, atau it supervisor/admin). Direktur lolos lewat peran turunannya, tanpa peran `direktur` tersendiri. Peran `insentive` sengaja **tidak** ikut: boleh menyetujui hasil, tidak boleh menulis targetnya sendiri.
 - `GET/POST /profit/targets` — target per entitas per periode. Ubah target setelah periode berjalan **wajib beralasan** (≥10 karakter); setelah disetujui, ditolak.
 - `GET/POST /profit/opex` · `POST /profit/opex/distribusi` — biaya operasional; kini **cadangan** karena gaji ditarik dari payroll dan non-gaji dari Accurate.
+
+### Biaya operasional terdiri dari tiga bagian (2026-08-26)
+
+Rumus profit memakai **Biaya Operasional** sebagai pengurang terakhir. Isinya:
+
+| Bagian | Dari mana | Contoh angka (Maftuhissaiin, Agustus 2026) |
+|---|---|---|
+| Gaji | payroll | Rp 6.623.500 |
+| Beban marketing | Accurate, lewat [[Microservices - Integration Service]] | Rp 2.773.289 |
+| Penyusutan aset | [[Microservices - Inventory Service]] | Rp 551.847 (2 aset) |
+| **Total** | | **Rp 9.948.636** |
+
+**Beban marketing menggantikan cara lama.** Sebelumnya sistem mengambil SELURUH akun beban `6000` di Accurate lalu membuang 14 akun yang sudah dihitung di tempat lain. Cara itu berbahaya: akun baru yang muncul di Accurate otomatis ikut terhitung tanpa ada yang tahu. Sekarang sistem **memilih 5 akun** yang memang beban per-orang — Software, Pelatihan, Perjalanan Dinas, Sewa, dan Server.
+
+Cara baru juga sudah **membagi beban proyek divisi** ke tiap orang. Proyek `BIP - BH` dan `BIP - KY + GB` dulu tak pernah terbaca karena kodenya bukan employee id; kini isinya dibagi rata ke anggota divisinya.
+
+⚠️ **Akibatnya biaya operasional turun 60–94%** (Ade dari Rp4,55 juta jadi Rp280 ribu). Turun bukan karena beban hilang, tetapi karena cara lama ikut menghitung akun yang bukan beban per-orang. Karena biaya adalah pengurang, **profit dan insentif tiap orang naik** — finance perlu tahu ini.
+
+**Penyusutan aset dihitung per orang.** Rumusnya harga beli ÷ masa manfaat ÷ 12, dijumlahkan untuk semua aset yang dipegang orang itu.
+
+Aturannya: **selama aset masih dipakai, penyusutannya tetap dibebankan** — walau umur bukunya sudah habis. Ini keputusan sadar dan berbeda dari akuntansi: di Accurate, aset yang habis umurnya bernilai nol dan tak disusutkan lagi. Yang diukur di sini biaya pemakaian, bukan nilai buku. Kalau suatu saat dibandingkan dengan Accurate, selisihnya akan muncul dan sebabnya ini.
+
+Aset yang belum diisi harga atau masa manfaatnya **tidak dilewati diam-diam** — jumlahnya dilaporkan sebagai peringatan baris, supaya beban yang belum terhitung tetap terlihat. Prod 2026-08-26: 70 dari 71 aset marketing sudah lengkap.
 - `GET/POST/DELETE /profit/internal-affiliates[/:username]` — daftar putih akun affiliate milik sendiri.
 
 ### Warisan skema lama (masih terdaftar)
@@ -95,8 +118,8 @@ Hasil terhadap 183 karyawan aktif (prod 2026-08-26): 3 Leader (Ade 11, Satrio 10
 - **Pengecualian omzet affiliate eksternal belum terpasang di perhitungan.** Daftar putihnya sudah bisa diisi lewat Master Data, tetapi belum ada kode yang memakainya → pencapaian di layar masih lebih tinggi dari seharusnya. Terukur Juli 2026: 71,6% nilai affiliate berasal dari kreator eksternal.
 - **Belum ada alur approval/freeze** untuk skema profit (yang lama punya, yang baru belum).
 - **Atribusi ICC belum lengkap**: per 2026-08-01 hanya 10 dari 28 toko punya mapping ICC → 63% profit Juli tak berpemilik. Sumbernya `icc_account_mappings` di integration ([[Microservices - Integration Service]]). Membaik per 2026-08-26: 31 mapping aktif, 21 baris muncul di level ICC.
-- ⛔ **Proyek Accurate SPV belum tersambung.** Kode mencocokkan `employee_id` ke kode proyek, padahal proyek supervisor bernama **divisi** (`BIP - BH`, `BIP - KY + GB`). Akibatnya Aris Romadhoni berstatus `proyek_tak_dikenal`, sementara Maftuhissaiin lolos dengan nilai **0** — gagal diam-diam, dan itu lebih berbahaya daripada yang gagal terang-terangan. Aturan yang sudah diputuskan (2026-08-26) belum diimplementasikan: SPV memakai proyek divisi **saja** karena proyek itu sudah meliputi beban Leader beserta timnya; menjumlahkannya dengan proyek anggota berarti hitung ganda. Terukur prod: `BIP - BH` induk Rp1.102.150.289 vs jumlah 40 proyek anggota Rp55.960.681 (20× lebih besar). Lihat [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]] yang sudah memprediksi kebutuhan aturan ini.
-- ⚠️ **Peringatan menggagalkan penilaian KPI secara pukul-rata.** Sumber `insentif_profit` di [[Microservices - Employee Service]] membuang seluruh baris bila `peringatan[]` tak kosong. Benar untuk komponen yang **hilang** (gaji, opex, target), tetapi keliru untuk peringatan **kelengkapan pinggiran**: "HPP mencakup 99,8%" dan "N retur belum terbukukan" tak menggeser angka profit — retur bahkan tak masuk rumusnya sama sekali. Maftuhissaiin karena itu tak dinilai meski realisasinya Rp486 jt sudah benar.
+- ✅ ~~Proyek Accurate SPV belum tersambung.~~ **SELESAI 2026-08-26**, tetapi bukan lewat jalur yang direncanakan. Sempat dibuat pemetaan manual divisi→kode proyek (koleksi + endpoint + layar), lalu **dicabut** karena ternyata sudah diselesaikan lebih dulu di [[Microservices - Integration Service]]: beban proyek divisi kini dibagi ke tiap orang secara otomatis, jadi tak ada yang perlu dipetakan tangan. Dua orang mengerjakan masalah yang sama tanpa saling tahu; yang dipertahankan yang lebih lengkap.
+- ✅ ~~Peringatan menggagalkan penilaian KPI secara pukul-rata.~~ **DIPERBAIKI 2026-08-26.** Sekarang hanya peringatan yang **benar-benar mengubah angka** yang menahan penilaian — gaji belum ada, opex belum ada, target belum diisi. Peringatan soal kelengkapan pembukuan dibiarkan lewat: "HPP mencakup 99,8%" meleset 0,2%, dan "N retur belum terbukukan" sama sekali tak menyentuh rumus profit (retur memang tidak dikurangkan). Maftuhissaiin sempat tak dinilai berbulan-bulan padahal realisasinya Rp486 juta sudah benar. Penjaganya sengaja dibalik — yang **boleh lewat** yang didaftar, peringatan baru yang belum dipertimbangkan tetap menahan penilaian sampai ada yang memutuskan sifatnya.
 - Menunggu dari luar: Lampiran SK (target sesungguhnya), mapping tim Beautyhacks, dan finance melengkapi HPP.
 - Pertanyaan finance yang masih terbuka: PPN di dalam profit; target sebelum/sesudah opex; jadwal bayar SK (tgl 1/5) vs cutoff pencairan (tgl 25).
 

@@ -67,6 +67,12 @@ Keempat label yang dulu terpotong, beserta penggantinya. Detail yang hilang dari
 
 ⚠️ **Angka di kolom kanan tidak dijaga oleh dokumen ini, melainkan oleh test.** `label-otomatis.aturan.test.ts` di erp-frontend memeriksa tiap sumber produksi punya label dan keterangan di dua locale, panjangnya tak melewati batas, keterangannya tak dipakai bersama, dan tak sekadar mengulang labelnya. Dokumen yang menyimpan angka tanpa penjaga akan usang dalam hitungan minggu; yang menjaganya di sini adalah suite, dan tabel ini hanya menerangkan kenapa penjaga itu ada.
 
+⛔ **Penjaga itu menutupi SUMBER, tidak METRIK, dan keduanya daftar yang berbeda.** `SUMBER_PRODUKSI` memuat 20 dari 20 sumber produksi, sehingga sumber baru yang tak berlabel pasti memerahkan suite. `METRIK_DIKENAL` berdiri sendiri dan per 2026-08-26 memuat **14 dari 37** entri kamus metrik. Konsekuensinya tajam: metrik yang tak punya entri kamus **dan** tak didaftarkan di situ tidak terlihat oleh siapa pun, sementara tabel di atas tetap sah berbunyi "20 dari 20".
+
+Itu bukan kemungkinan teoretis. `piutang_lewat_14_persen` dan `piutang_lewat_60_persen` sudah terdaftar di backend dan yang kedua sudah dipakai template produksi `AR STAFF PIUTANG`, tetapi keduanya tak punya entri kamus sama sekali sampai 2026-08-26 dan tampil sebagai token dirapikan tanpa keterangan. Sumbernya, `kinerja_ar`, berlabel lengkap sepanjang waktu itu.
+
+⚠️ **Kelalaian yang sama punya bentuk kedua yang lebih senyap**: `SATUAN_PER_METRIK` di `konfigurasi-otomatis-rules.ts`. Metrik yang absen di sana jatuh ke penurunan formula, dan `rata_rata` menghasilkan `nilai` yang dirender bersuffix **`x`** (satuan ROAS). Target 5 **persen** karena itu tampil sebagai "5 x": angkanya benar, satuannya menyesatkan, dan tak satu pun test menangkapnya. **Metrik baru wajib didaftarkan di TIGA tempat**, bukan satu: kamus label, daftar penjaga `METRIK_DIKENAL`, dan `SATUAN_PER_METRIK`.
+
 ## Mengganti label yang sudah dipakai
 
 **Metrik template aman diganti namanya** sejak tiap metrik punya `key` yang stabil: `IsiKunciMetrik` mempertahankan kunci yang sudah ada, jadi konfigurasi otomatis tidak lepas saat label dibetulkan. Sebelum ada `key`, backend memasangkan konfigurasi lewat label, dan memperbaiki typo berarti menghapus konfigurasinya tanpa pesan.
