@@ -1258,20 +1258,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "892bee164bf82a2578e25281a04569916144e0fd5753bef2baab4960e2d04bde",
-      "ukuran_kb": 333.4,
-      "ringkasan": "Menjawab: modul dan menu apa saja yang ada di portal web ERP internal Bharata (hris-dashboard / One Bharata), bagaimana login serta role gating bekerja lewat cookie system_roles, dan bagaimana web ini berperan sebagai SSO Identity Provider bagi aplikasi lain seperti Task Manager. Menjelaskan juga stack frontend yang dipakai (Next.js App Router, shadcn/ui, TanStack Query, react-i18next), cara pemilih perusahaan multi-tenant memengaruhi presensi, karyawan, dan artikel, serta bagaimana menu Pengaturan HRGA terpusat disusun beserta aturan penyaringan akses per tab. Cocok untuk pertanyaan soal struktur sidebar, siapa yang boleh melihat menu apa, dan bagaimana handoff SSO inbound maupun outbound bekerja.",
+      "hash": "e50357c692d683ddf49baf9f7098adcd773e0ce74c61f7eb35de659868acc8ac",
+      "ukuran_kb": 333.6,
+      "ringkasan": "Menjawab: apa itu portal web internal \"One Bharata\" (hris-dashboard), stack apa yang dipakai, dan bagaimana login serta refresh token bekerja lewat gateway. Juga menjelaskan bagaimana peran (system_roles per module) menentukan menu yang tampil, bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain, dan bagaimana sidebar dikelompokkan (menu induk bersarang, bukan field group). Berisi pula cara kerja pemilih perusahaan (multi-tenant) dan halaman Pengaturan HRGA terpusat beserta aturan penyaringan akses per tab.",
       "kata_kunci": [
         "erp-frontend",
         "hris-dashboard",
         "One Bharata",
+        "web ERP",
         "SSO",
         "system_roles",
         "role gating",
         "sidebar menu",
-        "Next.js",
-        "multi-perusahaan",
-        "Pengaturan HRGA"
+        "Pengaturan HRGA",
+        "CompanySwitcher"
       ]
     },
     {
@@ -2384,20 +2384,20 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "cd763a4456fddc54a8b3aa0298f565460cf19f063be3cd80cdeacfdd3bb1d816",
+      "hash": "c95c3d2cffa249a67bfef09e0d4f43e692aa21631f9b35a5b72473e5eb4b5f82",
       "ukuran_kb": 37.3,
-      "ringkasan": "Menjawab: bagaimana payroll service menyusun master komponen gaji, config BPJS dan PPh21 metode TER, penetapan gaji per karyawan, sampai lifecycle payroll run dari draft ke approve lalu publish slip. Menjelaskan master badan usaha penggaji untuk kop slip (satu PT induk tapi banyak CV), dua dasar upah BPJS yang terpisah antara Kesehatan dan Ketenagakerjaan, cara potongan kehadiran dipecah jadi baris slip eksplisit, serta aturan pembulatan BPJS yang sengaja berbeda antara sisi karyawan dan sisi perusahaan. Juga menunjuk ke mana letak sumber aturan bisnisnya yang tidak ada di vault ini, yaitu BUSINESS_LOGIC_IMPLEMENTATION.md di repo mobile.",
+      "ringkasan": "Menjawab: bagaimana payroll-service menyimpan dan menghitung penggajian — endpoint config global (perusahaan, BPJS, pajak PPh21 TER, potongan kehadiran), master badan usaha penggaji untuk kop slip, master komponen gaji, dan penetapan gaji per karyawan. Juga menjelaskan cara kerja payroll run (kalkulasi, approve, publish), perhitungan potongan kehadiran, THR, dan slip PDF, termasuk dua dasar upah BPJS yang terpisah dan aturan pembulatannya. Berisi peringatan bahwa sumber aturan bisnis (jatah, ambang, besaran potongan) berada di BUSINESS_LOGIC_IMPLEMENTATION.md pada repo mobile, bukan di vault.",
       "kata_kunci": [
-        "payroll",
+        "payroll service",
         "penggajian",
         "slip gaji",
-        "payroll run",
+        "payslip",
         "BPJS",
         "PPh21 TER",
-        "THR",
+        "payroll run",
         "potongan kehadiran",
-        "employee-salary",
-        "payroll_db"
+        "THR",
+        "employee_salary"
       ]
     },
     {
@@ -6320,20 +6320,20 @@
         "HRIS - Compensation & Benefits",
         "Finance - Big Pictures"
       ],
-      "hash": "e245eb9496be32abcb500ba2974a3c4d33348facf12a9de7b54f9eb3b269c5cc",
-      "ukuran_kb": 9.5,
-      "ringkasan": "Menjawab: bagaimana konsep penggajian Bharata dirangkai, mulai dari agregasi kehadiran periode 26 bulan lalu sampai 25 bulan ini lewat payroll-supplement, perlakuan bayar per status dan per subtipe yang bisa dikonfigurasi HR, sampai empat baris potongan kehadiran eksplisit beserta tarif dan dasarnya (telat, izin, mangkir, uang makan). Menjelaskan kenapa payout_pct berhenti menentukan rupiah, di mana sumber kebenaran aturan potongan sebenarnya berada, dan bahwa pengali mangkir di produksi berbeda dari default kode sehingga perlu konfirmasi HRD. Juga merangkum bagian yang masih tertunda seperti rekonsiliasi PPh21 tahunan Desember, dashboard, dan handoff ke Accounting.",
+      "hash": "aac10023a813b29f6d9e10197e64223ca14220e17e74b4eda92af44ccda1923e",
+      "ukuran_kb": 9.6,
+      "ringkasan": "Menjawab: konsep penggajian di HRIS — apa saja yang memengaruhi gaji seorang karyawan, bagaimana data kehadiran mengalir ke payroll lewat payroll-supplement (payout_pct, perlakuan per status dan per subtipe cuti), dan siapa yang boleh menyuntingnya. Juga merinci empat baris potongan kehadiran eksplisit (telat, izin, mangkir, uang makan) beserta tarif dan dasar perhitungannya, termasuk pengali mangkir menurut Pasal 20 Peraturan Perusahaan dan penyimpangan config produksi terhadapnya. Menyebut pula fitur payroll yang masih tertunda seperti rekonsiliasi PPh21 tahunan, dashboard, dan handoff ke Accounting.",
       "kata_kunci": [
         "payroll",
         "penggajian",
+        "gaji",
         "potongan kehadiran",
-        "payout_pct",
+        "attendance deduction",
         "payroll-supplement",
-        "tunjangan kehadiran",
-        "uang makan",
+        "payout_pct",
         "mangkir",
-        "PPh21",
-        "THR"
+        "uang makan",
+        "PPh21"
       ]
     },
     {

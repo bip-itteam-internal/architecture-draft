@@ -106,8 +106,9 @@ sehingga baris BPJS setiap karyawan akan salah bila run diterbitkan sekarang.
 Daftar penghambat berurutan ada di §Kondisi Pemakaian di Produksi pada
 [[Microservices - Payroll Service]].
 
-⚠️ **Sesudah pemisahan dasar upah BPJS** (branch `feat/payroll-upah-bpjs-terpisah`, belum
-merge), seluruh record berdasar upah **kosong** dan menunggu HR mengisi ulang **dua** angka
+⚠️ **Sesudah pemisahan dasar upah BPJS** ([#1478](https://github.com/bip-itteam-internal/bip-erp/pull/1478)
++ erp-frontend [#1265](https://github.com/bip-itteam-internal/erp-frontend/pull/1265), **belum
+merge**), seluruh record berdasar upah **kosong** dan menunggu HR mengisi ulang **dua** angka
 per orang. Itu keadaan yang diinginkan, bukan regresi: nilai lama tak disalin justru karena
 tak satu pun di antaranya benar. Bedanya, kekosongan itu kini **ditandai** di layar dan di
 baris payroll run, jadi ia terlihat sebelum tombol Approve ditekan.
