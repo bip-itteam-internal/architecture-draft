@@ -122,6 +122,23 @@ Kontrak lengkapnya di [[API - Employee Service]]; cara menambah metrik otomatis 
 
 Konsekuensi yang diterima sadar: skor berjalan **mulai rendah lalu memanjat** sepanjang bulan seiring metrik terisi (mis. Profit yang baru terhitung setelah tutup buku). Itu bukan cacat — angka besar yang muncul harus mencerminkan yang sudah benar-benar dikerjakan, bukan ekstrapolasi dari satu metrik. Cakupan tetap terbaca lewat `terhitung`/`total_otomatis`. Bandingkan dengan MyBharata yang memilih **tidak menampilkan total sama sekali** pada bulan berjalan (bab "Progres bulan berjalan"); layar penilai web memilih menampilkannya dengan aturan 0-fill ini.
 
+## Hit/miss (biner) & pemisahan Kelola Template vs Atur Target (2026-08-27)
+
+> **Status**: ⚠️ **di branch `feature/workspace-position`, belum di `main`.** bip-erp `48dc1b81`, erp-frontend `f99ae94b`. Terverifikasi di DEV; PROD belum.
+
+Dua perubahan yang mengubah bentuk konfigurasi otomasi, bukan sekadar menambah metrik.
+
+**1. Penilaian hit/miss (biner).** Selain gradien `NilaiDenganArah` (jarak realisasi ke target diskalakan 0..100), tiap metrik kini bisa disetel **hit/miss**: `NilaiBiner(realisasi, target, arah)` mengembalikan **100 begitu target terlewati, 0 bila tidak** — inklusif di titik target (arah `naik` lulus saat `realisasi ≥ target`, `turun` saat `≤`). Untuk metrik yang memang biner ("tercapai atau tidak"), di mana 92,86 dari "65 atas target 70" menyesatkan. Field `KPIAutoConfig.HitMiss` (`bson:hit_miss,omitempty`); `hitungDariCuplikan` bercabang ke `NilaiBiner` bila `HitMiss`, selain itu tetap gradien + `nilai_minimum`. **Opt-in, default off — metrik lama tak berubah.** `<` vs `≤` (dan `>` vs `≥`) TIDAK dibedakan: skor rasio, jadi bedanya tak terpakai — sengaja tetap dua arah + satu toggle, bukan empat operator.
+
+**2. Pemilihan sumber data (titik aktivasi otomasi) hanya di Atur Target, bukan Kelola Template.** Sebelumnya konfig otomasi penuh (sumber, formula, scope, target, arah) hidup di **Kelola Template**. Kini:
+
+- **Kelola Template** = STRUKTUR + BAKU saja: label, bobot, deskripsi, **`default_arah`**, **`default_hit_miss`** (field baru di `KPIMetric`, terpisah dari `Auto`). TANPA pemilih sumber/formula/scope/target.
+- **Atur Target** = aktivasi: pilih sumber → `Auto` terisi; `arah`/`hit_miss`-nya **diawali** dari `default_*` template, dan boleh ditimpa. Konfig yang SUDAH aktif menang atas baku.
+- ⛔ **Anti-wipe**: `POST /kpi/templates` melakukan `ReplaceOne`, jadi Kelola Template **meneruskan blok `Auto` yang sudah ada APA ADANYA** (tak menyusun ulang). Kalau tidak, menyimpan struktur dari Kelola Template akan **menghapus aktivasi yang disetel di Atur Target tanpa satu pun galat** — kelas kegagalan senyap yang sama dengan `ReplaceOne` di [[RUN - Menambah Metrik KPI Otomatis]] §"Cara menerapkannya menentukan risikonya".
+- Migrasi: template lama tanpa `default_*` → toggle di layar mengambil dari `Auto.Arah`/`Auto.HitMiss` yang sudah ada (bukan reset), lewat fallback di `dariTemplate`.
+
+Ini **membalik** keputusan lama "konfig otomasi dipindah ke Kelola Template" (§"HR mengisi konfigurasinya sendiri" di bawah, dan Langkah 3 di runbook). `default_*` **tak menilai apa pun** — yang menilai tetap `Auto`; keduanya cuma nilai awal saat aktivasi.
+
 ## HR mengisi konfigurasinya sendiri
 
 > **Status**: ⚠️ **merged, BELUM di-deploy** per 2026-08-11. bip-erp PR [#1049](https://github.com/bip-itteam-internal/bip-erp/pull/1049) · [#1051](https://github.com/bip-itteam-internal/bip-erp/pull/1051) · [#1053](https://github.com/bip-itteam-internal/bip-erp/pull/1053) dan erp-frontend PR [#831](https://github.com/bip-itteam-internal/erp-frontend/pull/831) · [#832](https://github.com/bip-itteam-internal/erp-frontend/pull/832), seluruhnya merged 6 Agustus 2026. **Belum satu pun terbukti jalan lewat gateway produksi**, jadi seluruh bab ini menggambarkan kode yang ada di `main`, bukan perilaku yang sudah disaksikan.

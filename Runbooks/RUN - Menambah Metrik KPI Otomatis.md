@@ -192,6 +192,8 @@ Terakhir, env barunya dipasang di **dua** blok `docker-compose.yml`: service sum
 
 Lewat `POST /kpi/templates` yang sudah ada. Tidak perlu deploy untuk mengubahnya.
 
+⚠️ **Berubah di branch `feature/workspace-position` (2026-08-27, belum di `main`):** pemilihan **sumber** (titik aktivasi otomasi) pindah dari **Kelola Template** ke **Atur Target**. Kelola Template kini hanya struktur + baku (`default_arah`, `default_hit_miss` — field baru di `KPIMetric`); sumber/formula/scope/target disetel di Atur Target, yang mengawali arah/hit-miss dari baku itu. Ada juga mode penilaian **hit/miss (biner)** (`KPIAutoConfig.HitMiss`). Detail + peringatan anti-wipe `ReplaceOne` di [[HRIS - Otomasi Skor KPI]] §"Hit/miss (biner) & pemisahan Kelola Template vs Atur Target". Bedah Mongo di bawah tetap sah untuk menyalakan metrik pada template yang sudah ada.
+
 ⚠️ **Sesudah batch 6 Agustus 2026 di-deploy, langkah ini tidak lagi harus dikerjakan dev.** Form konfigurasi otomasi (erp-frontend PR [#832](https://github.com/bip-itteam-internal/erp-frontend/pull/832)) mengisi dropdown-nya dari `GET /kpi/sumber-katalog`, jadi sumber yang kamu daftarkan di Langkah 2 **langsung muncul di layar HR tanpa perubahan frontend apa pun**. Tugasmu berhenti setelah sumbernya terdaftar dan terbukti menghasilkan angka; yang menyalakan metriknya adalah pemilik metrik. Bedah Mongo di bawah tetap dipakai untuk template yang sudah ada, atau selama batch itu belum di-deploy. **Catatan gap**: menu **KPI Templates** hari ini hanya terlihat oleh pemilik `system_roles.hris`, jadi SPV departemen belum benar-benar dapat mengisinya sendiri walau backend mengizinkan — lihat [[HRIS - Otomasi Skor KPI]].
 
 ### Contoh yang benar-benar terpasang di produksi
