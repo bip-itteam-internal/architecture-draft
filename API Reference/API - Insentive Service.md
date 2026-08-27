@@ -8,7 +8,7 @@
 ## Profit-based (skema berlaku)
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/profit-dashboard` | Dashboard insentif per periode & level (`periode=YYYY-MM`, `level=icc\|leader\|supervisor`, `refresh=1` tarik ulang beban non-gaji) |
+| GET | `/profit-dashboard` | Dashboard insentif per periode & level (`periode=YYYY-MM`, `level=icc\|leader\|supervisor`, `refresh=1` tarik ulang beban non-gaji). Tiap baris membawa `toko_tanpa_penjualan` — berapa dari `shop_ids` yang terpetakan ke orang itu tetapi nol order di periode berjalan, dipakai layar untuk menulis "9 dari 15 toko" alih-alih menyembunyikan yang belum berjualan (2026-08-26, PR #1455) |
 | GET/POST | `/profit/org` | Struktur tim (ICC ↔ Leader ↔ Supervisor) |
 | PATCH | `/profit/org/:id/tutup` | Tutup masa berlaku satu baris struktur |
 | GET/POST | `/profit/targets` | Target profit per entitas/periode (ubah saat berjalan wajib beralasan ≥10 karakter) |
