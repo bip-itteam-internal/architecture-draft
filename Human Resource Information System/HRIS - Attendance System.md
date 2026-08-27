@@ -79,6 +79,29 @@ Validasi setelan menolak `late_hour_threshold_minutes` yang lebih kecil dari
 `ontime_grace_minutes`; keduanya boleh **0** dengan sengaja, jadi nilai nol tidak
 diperlakukan sebagai "belum diisi".
 
+### Toleransi juga mengikat cron, bukan cuma perhitungan status
+
+⛔ **`ontime_grace_minutes` menentukan kapan seseorang boleh disebut "belum absen", bukan
+hanya bagaimana statusnya dihitung.** Keduanya wajib memakai ambang yang sama; kalau tidak,
+ada jendela di mana sistem mencatat orangnya **Tepat Waktu** sambil mengirimkan notifikasi
+yang menuduhnya belum absen.
+
+Itu benar-benar terjadi. Sampai 2026-08-27 cron menandai `Tanpa Keterangan` dan mengirim
+push + inbox **"Kamu belum absen hari ini!"** tepat di jam mulai shift, detik ke-0, sementara
+toleransinya baru habis semenit kemudian. Terukur di produksi: dari **31** orang berstatus
+`Tepat Waktu` yang tap pada menit yang sama dengan jam mulai, **31** menerima tuduhan itu —
+nol yang lolos. Keluhannya datang sebagai "selalu ada notifikasi absen padahal saya tepat
+waktu", dan tak satu pun test menangkapnya karena statusnya memang benar; yang salah cuma
+notifikasinya.
+
+Konsekuensi yang perlu diketahui saat membaca layar: pengingat itu kini tiba pada tik cron
+**berikutnya** sesudah toleransi habis (jadi bisa sampai 30 menit setelah jam mulai), bukan
+di detik ke-0. Ajakannya memang "ajukan koreksi", jadi ia tak perlu tiba lebih awal; ajakan
+untuk tap sudah dikerjakan pengingat T-30 menit yang terpisah.
+
+Implementasinya di `pantasDitandaiAlpha` (`services/attendance/alpha_toleransi.go`), satu
+tempat yang dipakai jalur jadwal perusahaan maupun roster. Detail cron: [[Microservices - Attendance Service]].
+
 ## Kebutuhan
 
 - [x] Master data karyawan (referensi lookup)
