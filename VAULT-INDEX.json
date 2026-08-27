@@ -84,6 +84,8 @@
         "API - Index",
         "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "RUN - Onboarding Akun Eksternal (Vendor & Mitra)",
         "API - Learning Service",
         "HRIS - Key Performance Index",
@@ -101,20 +103,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "d151af8df63c8c72238acd8830fc139352d22272b4b597a5fbbf0c5edd8f8a3a",
-      "ukuran_kb": 43.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di employee-service lewat gateway `/api/employee/*` dan siapa yang boleh memanggilnya — login/refresh/PIN, onboarding, CRUD personal_data & work_data, dokumen pribadi/kerja, jadwal kerja, perangkat & sesi browser, sampai ulang tahun karyawan. Menjelaskan master data departemen, posisi, system role, jenjang jabatan, `menu_hidden`, serta cara menetapkan dan membaca penyetuju pengajuan per departemen (termasuk `/internal/department-approver` yang dipakai form-builder). Memuat juga gerbang RBAC tiap grup rute (`RequireHRISStaff`, `RequireITSupervisor`, `RequireHRISOrITSupervisor`) dan penerbitan akun pihak luar (vendor/mitra) berprefiks `EXT-`.",
+      "hash": "8564dc55e745c9833b92a09ff48113cf64a00a8ef6caab2d53b41fd21e759690",
+      "ukuran_kb": 44.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik gateway `/api/employee/*`, mulai dari login (password/PIN/biometrik), CRUD personal_data dan work_data, dokumen pribadi/kerja, jadwal, pengelolaan akun dan perangkat, sampai KPI, resign, promosi-mutasi, dan surat peringatan. Juga menjawab siapa yang boleh memanggil tiap rute (RequireHRISStaff, RequireITStaff, RequireHRISOrITSupervisor, RequireKPIDepartmentRBAC) dan aturan halus master data: `?grouped=true` pada `/data-type/department`, `PUT /master/departments` yang mempertahankan `supervised_by`/`supervision_label`, `menu-hidden` sebagai setelan tampilan bukan hak akses, serta `/master/departments/:key/approver` sebagai satu-satunya jalur yang menulis `work_data.is_supervisor`. Memuat pula kontrak rute lintas-service `/internal/department-approver` dan `/internal/permission-holders` beserta gerbang identitasnya.",
       "kata_kunci": [
         "employee-service",
-        "endpoint",
-        "API karyawan",
-        "master data departemen",
-        "system role",
-        "RBAC",
-        "penyetuju pengajuan",
-        "approver",
-        "jenjang jabatan / job level",
-        "akun eksternal vendor"
+        "endpoint karyawan",
+        "auth login PIN biometrics",
+        "work_data personal_data",
+        "master department",
+        "system roles RBAC",
+        "department approver",
+        "permission-holders",
+        "menu_hidden job level",
+        "API reference HRIS"
       ]
     },
     {
@@ -638,27 +640,25 @@
       "tautan": [
         "Microservices - Procurement Service",
         "API - Index",
+        "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
+        "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
         "ADR - 0001 Akuntansi via Accurate",
         "CORE - API Master Gateway"
       ],
-      "hash": "2658adde0a3e04b748db77d0f2a76bc7830c5b577dd947030b35af8b30e95239",
-      "ukuran_kb": 23.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di procurement-service lewat gateway /api/procurement, bagaimana bentuk request dan response untuk membuat serta menyunting master Pemasok dan master Barang & Jasa, dan aturan penomoran vendor_no per kategori maupun kode BRG- yang global. Menjelaskan juga cara mengambil katalog acuan dari Accurate (syarat pembayaran, akun utang, kategori barang, satuan, pajak), arti tiap nilai sync_status saat data didorong ke Accurate, serta role apa yang diterima gerbang (staff, spv, admin; import khusus admin). Memuat pula ringkasan cermin baca-saja Pembelian (Pesanan Pembelian, Penerimaan Barang, Permintaan Barang) beserta alur create dan persetujuannya di sisi ERP.",
+      "hash": "b02f5928cdc1388320cd0a5407a68f658222509950178e837801a87f64e1e54a",
+      "ukuran_kb": 29.4,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia untuk master Pemasok dan master Barang & Jasa di procurement-service (`/api/procurement/*`), termasuk bentuk request body, bentuk response, dan kode galat tiap rute (400 validasi, 404, 409 nomor/kode ganda, 502 bila Accurate tak terhubung). Menjawab juga bagaimana penomoran diusulkan (`/pemasok/usul-nomor` per kategori vs `/barang/usul-kode` global), katalog mana yang ditarik dari Accurate (syarat pembayaran, akun utang, kategori barang, satuan, pajak), arti `sync_status` PENDING/SYNCED/FAILED pada worker sync, serta field yang baca-saja seperti `merek` dan `tipe_persediaan`. Selain itu memuat cermin baca-saja modul Pembelian (Pesanan, Penerimaan, Permintaan Barang) dan rantai delapan tahap Pengajuan Pembelian.",
       "kata_kunci": [
-        "procurement",
-        "pengadaan",
-        "pemasok",
-        "supplier",
-        "vendor",
-        "barang dan jasa",
-        "master item",
-        "Accurate",
+        "procurement-service",
+        "pemasok vendor",
+        "master barang jasa",
+        "Accurate sync",
         "sync_status",
-        "pesanan pembelian",
-        "purchase order",
+        "purchase order pesanan pembelian",
         "penerimaan barang",
         "permintaan barang",
-        "katalog akun utang"
+        "pengajuan pembelian",
+        "katalog satuan pajak"
       ]
     },
     {
@@ -2332,6 +2332,8 @@
         "APP - MyBharata",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "HRIS - Employee Request & Approval",
+        "Microservices - Procurement Service",
+        "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
         "Microservices - Recruitment Service",
         "APP - Web ERP",
         "ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri)",
@@ -2340,21 +2342,20 @@
         "DB - Overview and Notes",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "9a3c2119a0437b04d478b1dcbcececfd58a1e48dcd71f61d9b1dc249315ed669",
-      "ukuran_kb": 13.8,
-      "ringkasan": "Menjawab: bagaimana notifikasi dikirim di ERP dan lewat kanal apa saja — inbox in-app, FCM mobile dan web push, WhatsApp, email lewat Resend, splash promotion, dan article feed. Menjelaskan daftar-izin kategori inbox (`InboxCategories`), kenapa kategori yang salah atau tak terdaftar gagal secara senyap, dan konsekuensi deploy dua container yang menyertainya. Dipakai saat menambah jenis notifikasi baru atau menelusuri notifikasi yang tak pernah tiba.",
+      "hash": "453f85249371008da5401e2d4cf304000ecb305035f853a393273d87d03434ae",
+      "ukuran_kb": 14.9,
+      "ringkasan": "Menjawab: bagaimana notifikasi dikirim di seluruh ekosistem lewat satu hub multi-channel, yaitu inbox in-app, FCM push ponsel dan browser, WhatsApp, email via Resend, splash promotion, dan article. Menjawab pertanyaan operasional yang sering muncul: mengapa `GET /inbox` tanpa `?page` wajib tetap array telanjang (MyBharata yang beredar akan menampilkan inbox kosong bila dibungkus objek), bagaimana mark-read menyaring pemilik, indeks Mongo apa yang dibuat saat startup, dan rute mana yang butuh service key. Juga menerangkan pemusatan fan-out push di `POST /inbox/send` sehingga tiap service pengirim tak perlu memanggil `/fcm/send-*` lagi, konsekuensi urutan deploy yang mengikat, peran `InboxCategories` sebagai satu-satunya daftar-izin yang tersisa, dan bagaimana `ExtraResource.WebRoute` diturunkan dari `AppRoute` untuk tautan klik push.",
       "kata_kunci": [
-        "notification service",
-        "notifikasi",
-        "inbox",
-        "FCM",
-        "push notification",
-        "kategori inbox",
-        "InboxCategories",
-        "WhatsApp",
-        "email",
-        "Resend",
-        "web push"
+        "notification-service",
+        "inbox notifikasi",
+        "FCM push",
+        "web push browser",
+        "WhatsApp email Resend",
+        "splash article",
+        "InboxCategories kategori inbox",
+        "paginasi inbox",
+        "fan-out inbox/send",
+        "WEB_APP_URL"
       ]
     },
     {
@@ -4217,7 +4218,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Diputuskan 2026-08-22, kode selesai, BELUM merge dan BELUM deploy.** Branch `feat/push-dua-kanal` (bip-erp).",
+      "status_teks": "**Implemented (ada catatan)** — sudah **merge ke `main`**, diverifikasi 27 Agustus 2026: `PushWebCategories` dan `IsPushWebCategory` tak lagi ada di `shared-library/models/notification/models.go`, dan `IsInboxCategoryValid` berdiri sendiri sebagai satu-satunya daftar-izin. **Keadaan deploy tidak diverifikasi** pada pemeriksaan itu; urutan deploy yang mengikat di bawah tetap berlaku.",
       "publik": true,
       "tautan": [
         "Microservices - Notification Service",
@@ -4229,21 +4230,20 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "APP - Web ERP"
       ],
-      "hash": "874a409c2dfa268baacce127deb61028c43f3cf872a9a6774e0491590e034e91",
-      "ukuran_kb": 8.4,
-      "ringkasan": "Menjawab: kenapa daftar-izin PushWebCategories dicabut sehingga setiap dokumen inbox mendorong push ke browser dan ponsel sekaligus, angka volume produksi apa yang mendasarinya, dan kenapa daftar itu tidak boleh dihidupkan kembali tanpa membaca ADR ini. Menjelaskan juga kenapa Surat Peringatan selama ini tak pernah membuat ponsel berdering, kenapa urutan deploy jadi mengikat untuk mencegah dobel-kirim, dan bug apa saja yang ikut terbongkar (notifikasi per-departemen yang tak pernah terkirim, pengingat KPI yang berpotensi dobel, dan panic database yang menyamar jadi 502).",
+      "hash": "f852623884e498be231f5bff58dc448fd0874666159ecc95e2110d44fa9a8c73",
+      "ukuran_kb": 8.7,
+      "ringkasan": "Menjawab: mengapa setiap dokumen inbox kini mendorong push ke browser dan ponsel sekaligus tanpa penyaringan kategori, dan mengapa `PushWebCategories` beserta `IsPushWebCategory` dicabut dari shared-library sementara `IsInboxCategoryValid` tetap ada untuk menolak kategori salah-ketik. Menjawab juga mengapa fan-out dipusatkan di `POST /inbox/send` alih-alih dibiarkan di tiap service pengirim, mengapa `/fcm/send-*` tetap hidup untuk pengingat presensi yang tidak menulis inbox, dan mengapa urutan deploy task-management, attendance, dan employee harus mendahului notification-service supaya tidak terjadi dobel-kirim. Berisi angka pengukuran volume notifikasi prod yang menjadi dasar keputusan, plus tiga bug yang ikut terbongkar: perulangan inbox per-departemen yang tak pernah jalan karena spasi pada nama departemen, broadcast ganda `cronReminderKPI`, dan panic `GetCollection` saat DB nil.",
       "kata_kunci": [
+        "ADR 0050",
         "push notification",
-        "notifikasi",
-        "daftar-izin",
+        "web push browser",
         "PushWebCategories",
+        "inbox/send fan-out",
         "FCM",
-        "browser",
-        "ponsel",
-        "Surat Peringatan",
         "urutan deploy",
-        "dua kanal",
-        "dobel-kirim"
+        "surat peringatan notifikasi",
+        "kategori inbox",
+        "notification-service"
       ]
     },
     {
@@ -4390,11 +4390,12 @@
       "judul": "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** — desain disetujui 26 Agustus 2026, belum ada kode. Spesifikasi lengkap: `bip-erp/docs/superpowers/specs/2026-08-26-pengajuan-pembelian-empat-tipe-design.md`",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — kode backend dan frontend sudah di `main` kedua repo (diverifikasi 27 Agustus 2026: 22 berkas `services/procurement/pengajuan_pembelian*` dan modul `erp-frontend/src/features/procurement/pembelian`). **Keadaan deploy tidak diverifikasi** pada pemeriksaan itu. Catatan yang masih terbuka ada di bagian bawah dokumen ini. Spesifikasi lengkap: `bip-erp/docs/superpowers/specs/2026-08-26-pengajuan-pembelian-empat-tipe-design.md`",
       "publik": true,
       "tautan": [
         "REF - Rantai Pengajuan Lintas Modul",
+        "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
         "Finance - Kas Kecil dan Pengajuan Budget",
         "REF - Alur Persetujuan",
         "Microservices - Procurement Service",
@@ -4403,22 +4404,20 @@
         "CORE - RBAC dan Permission Set",
         "ADR - 0001 Akuntansi via Accurate"
       ],
-      "hash": "d16d606c6f6907949b9af3785f1c8d3b8f1fd8cca41973f918bd9c29050395be",
-      "ukuran_kb": 8.4,
-      "ringkasan": "Menjawab: kenapa modul Pengajuan Budget diganti menjadi Pengajuan Pembelian bertipe empat (barang umum, raw material, software, iklan), rantai persetujuan mana yang berlaku untuk tiap tipe (dari SPV divisi/manufactur sampai procurement, AP, QC, dan penerimaan barang), dan kapan direktur ikut menyetujui menurut ambang nominal. Menjelaskan juga bagaimana status dan posisi tahap disimpan (`TahapSaatIni` + `JenjangWajib`), perlakuan QC tidak lolos, aturan penerimaan bertahap dengan satu RI per pengajuan, permission RBAC per tipe, serta rencana pensiun bertahap kas kecil. Berguna untuk mengetahui konsekuensi yang diterima sadar, termasuk lahirnya dua jalur pengadaan berdampingan dan kebutuhan endpoint baru di services/inventory.",
+      "hash": "6fd8bf6b904f3e54862776556afde5354dd508dbdb7cfc03622c043a347ac922",
+      "ukuran_kb": 9.5,
+      "ringkasan": "Menjawab: mengapa modul Pengajuan Budget diganti total oleh Pengajuan Pembelian bertipe empat (umum, raw material, software, iklan), siapa yang mengajukan (staf, bukan SPV), dan bagaimana rantai persetujuannya berjalan sampai barang diterima termasuk sisipan tahap direktur di atas ambang nominal. Menjawab juga keputusan desainnya: status tetap kasar dengan posisi disimpan di `TahapSaatIni`, QC tidak lolos mengembalikan ke Procurement tanpa membuat PO baru, penerimaan bertahap tetapi RI terbit sekali, ekor stok memakai jalur `services/manufacture` untuk raw material dan item aset `services/inventory` untuk barang umum, RBAC lewat permission per tipe, dan pemensiunan kas kecil secara bertahap. Bagian Consequences merinci rantai mana yang tertutup, empat titik alur pengguna yang patah, serta jalur PR-PO-RI lama yang kini menjadi jalur kedua dan belum diputuskan nasibnya.",
       "kata_kunci": [
+        "ADR 0055",
         "pengajuan pembelian",
         "pengajuan budget",
         "purchase request",
-        "procurement",
-        "raw material",
-        "kas kecil",
-        "petty cash",
-        "approval berjenjang",
-        "RBAC permission",
-        "QC",
-        "penerimaan barang",
-        "ADR 0055"
+        "approval chain rantai persetujuan",
+        "raw material QC",
+        "kas kecil petty cash",
+        "permission budget",
+        "penerimaan barang stok",
+        "procurement"
       ]
     },
     {
@@ -4471,20 +4470,20 @@
         "Microservices - Employee Service",
         "Microservices - Notification Service"
       ],
-      "hash": "22ab6b1a3c165e3b8e0a238ba345d8349aeb05a016aefb5fe400c0e4439e9c72",
-      "ukuran_kb": 7.5,
-      "ringkasan": "Menjawab: siapa yang boleh menindak tiap tahap Pengajuan Pembelian, dan kenapa penunjukan penyetuju dari layar master hanya MENYEMPITKAN himpunan yang sudah dibuka RBAC, tidak pernah memberi hak baru. Menjelaskan tiga aturan jatuh-balik supaya dokumen tidak mandek (tahap tanpa penunjukan jatuh ke semua pemegang izin, spv_divisi tetap lewat resolver atasan, supervisor IT tetap lolos), endpoint pembacaan pemegang izin di employee-service, serta kewajiban gerbang dan antrean memakai satu fungsi yang sama. Berguna untuk memahami kenapa keputusan ini menyimpangi ADR 0055 bagian 7 dan konsekuensi adanya dua tempat yang menentukan wewenang.",
+      "hash": "a9e6f7460e228c5a99621b1f1e6db30e1cd6142c1b031d40f4890aa6bf67d652",
+      "ukuran_kb": 9.8,
+      "ringkasan": "Menjawab: bagaimana penyetuju tiap tahap Pengajuan Pembelian ditetapkan dari layar master, dan mengapa penunjukan itu hanya menyempitkan himpunan yang sudah dibuka RBAC sehingga secara struktural tak bisa memberi hak baru (pemberian izin tetap milik IT lewat permission set). Menjawab juga tiga aturan jatuh-balik supaya tak ada dokumen mandek (tahap tanpa penunjukan jatuh ke seluruh pemegang izin, `spv_divisi` tetap dari resolver atasan, supervisor IT lolos lewat `superAksesIT`), mengapa gerbang dan antrean wajib memakai satu fungsi yang sama, dan mengapa endpoint baru `GET /internal/permission-holders` dibutuhkan agar pemilih hanya menawarkan orang yang memang berizin. Menerangkan pula arah kegagalan yang sengaja berbeda: penyimpanan penunjukan gagal-tertutup, sedangkan pembacaan penyempitan saat menindak atau membuka antrean gagal-terbuka.",
       "kata_kunci": [
+        "ADR 0057",
+        "penyetuju per tahap",
+        "approver assignment",
         "pengajuan pembelian",
-        "purchase request",
-        "penyetuju",
-        "approval",
-        "RBAC",
-        "permission set",
-        "procurement",
         "permission-holders",
-        "tahap approval",
-        "ADR 0057"
+        "RBAC izin",
+        "notifikasi tahap",
+        "antrean perlu aksi saya",
+        "fail-open fail-closed",
+        "budget.master.save"
       ]
     },
     {

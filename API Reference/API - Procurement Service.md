@@ -368,8 +368,43 @@ Entitas **milik ERP** (koleksi `penerimaan_erp`), melengkapi rantai PR→PO→RI
 
 > **No Terima ≠ No Form.** No Form (`number`) di-generate sistem & unik; No Terima (`no_terima`) nomor surat jalan pemasok yang **diketik manual** gudang/QC, wajib tapi tak dijamin unik. Gudang **wajib** per baris.
 
+## Pengajuan Pembelian — rantai delapan tahap (✅ Diimplementasikan)
+
+Modul [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]], koleksi `pengajuan_pembelian`. Prefix `/pengajuan-pembelian`, **bukan** `/pembelian`: prefiks yang terakhir sudah dipakai cermin Accurate di atas, dan rute `:nomor` di sini akan menelannya.
+
+⛔ **Rute literal didaftarkan sebelum saudara ber-`:nomor`.** Fiber mencocokkan sesuai urutan pendaftaran, dan rute yang tertelan membalas 200 berisi bentuk yang masuk akal, bukan 404.
+
+Gerbangnya berlapis: gerbang rute menyaring "punya urusan dengan modul ini", sedangkan yang memutuskan apakah izin pemanggil COCOK dengan TAHAP yang sedang berjalan adalah handler — gerbang rute tak dapat melihat dokumennya.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/pengajuan-pembelian` | Daftar dalam cakupan pemanggil. Query: `tipe`, `status`, `batas` (bawaan 100, maksimum 500). |
+| GET | `/pengajuan-pembelian/saya` | Pengajuan milik pemanggil. Rute terpisah, bukan penyaring atas daftar umum: staf pengaju tak punya cakupan apa pun sehingga daftar umum kosong baginya. |
+| GET | `/pengajuan-pembelian/perlu-aksi` | Antrean yang menunggu tindakan pemanggil. Tahap mana saja yang masuk ditentukan izin **dan** penunjukan per tahap ([[ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap]]); frontend tidak merakit daftarnya sendiri. |
+| GET | `/pengajuan-pembelian/penyetuju` | Penunjukan seluruh tahap yang dapat ditetapkan, termasuk yang masih kosong (agar layar dapat membedakan "belum ditetapkan" dari "tahap tak ada"). Izin `budget.master.save`. |
+| GET | `/pengajuan-pembelian/penyetuju/kandidat?tahap=` | Pemegang izin tahap itu, diproksi ke `GET /internal/permission-holders` milik employee-service. **Layar tak pernah menyebut nama izin**: peta tahap→izin tinggal di service ini. `400` tahap tak dikenal, `502` employee-service tak terjangkau. Izin `budget.master.save`. |
+| PUT | `/pengajuan-pembelian/penyetuju/:tahap` | Menetapkan penyetuju satu tahap. Body `{"employee_ids": [...]}`; daftar kosong = kembalikan ke seluruh pemegang izin. `400` bila tahap tak dikenal, bila tahap `spv_divisi` (penyetujunya mengikuti departemen pengaju, diatur di HRIS), atau bila ada id yang **tidak memegang izin tahap itu**. `502` bila izin tak dapat diperiksa (gagal-tertutup). Izin `budget.master.save`. |
+| POST | `/pengajuan-pembelian` | Buat pengajuan. Selalu lahir **DRAFT**; `jenjang_wajib` belum dibekukan. `nominal` dihitung server dari Σ subtotal item dan **ditolak 400 bila dikirim klien**. Digerbang per TIPE (`budget.pengajuan.{umum,rawmaterial,software,iklan}`) di dalam handler, sebab tipe dibaca dari body. |
+| GET | `/pengajuan-pembelian/:nomor` | Detail. Pengaju selalu boleh melihat miliknya; selebihnya mengikuti cakupan departemen. |
+| PATCH | `/pengajuan-pembelian/:nomor` | Sunting DRAFT/REVISI oleh pengajunya. Menerima `keperluan`, `kategori_kode`, `tautan`, `items`. **TIPE tidak dapat diubah**, bahkan saat draft. Nilai kosong berarti "jangan sentuh", sehingga `tautan` yang sudah terisi tidak dapat dikosongkan lewat rute ini. |
+| POST | `/pengajuan-pembelian/:nomor/ajukan` | Membekukan `jenjang_wajib` dan ambang Direktur, lalu menjalankan dokumen. REVISI ikut boleh diajukan, dan jenjangnya **dihitung ulang**. |
+| POST | `/pengajuan-pembelian/:nomor/batal` | Pembatalan oleh pengaju. Ditolak `409` bila `nomor_po` sudah terisi. |
+| POST | `/pengajuan-pembelian/:nomor/setujui` · `/tolak` · `/revisi` | Gerbang persetujuan. Alasan **wajib** pada tolak dan revisi. `DITOLAK` hanya untuk penolakan saat belum ada uang keluar. |
+| POST | `/pengajuan-pembelian/:nomor/beli` | Tahap Procurement (`budget.approve.procurement`). Mencatat `nomor_po`; putaran kedua tidak menerbitkan PO baru. |
+| POST | `/pengajuan-pembelian/:nomor/bayar` | Tahap AP (`budget.ap.bayar`). Mencatat `id_pembayaran`. |
+| POST | `/pengajuan-pembelian/:nomor/qc` | Pemeriksaan mutu raw material (`budget.qc.periksa`). TIDAK LOLOS mengembalikan dokumen ke Procurement dengan status tetap `BERJALAN`, bukan `DITOLAK`. |
+| POST | `/pengajuan-pembelian/:nomor/terima` | Penerimaan gudang (`budget.terima.ga` / `budget.terima.rm`). Bertahap; `stok_ditulis: false` datang lewat jalur SUKSES dan wajib diperiksa pemanggil. |
+| POST | `/pengajuan-pembelian/:nomor/stok/coba-lagi` | Mengulang HANYA penulisan stok yang gagal. Body kosong: angkanya diambil server dari catatan penerimaan terakhir. |
+| PATCH | `/pengajuan-pembelian/:nomor/alokasi` | Alokasi akuntansi oleh Finance (`budget.approve.finance`). **Belum punya konsumen frontend.** |
+
+> **Jejak langkah membawa pelakunya.** Tiap baris `riwayat` menyimpan `oleh` (employee_id) plus `nama` dan `posisi` yang **dibekukan saat tindakan terjadi**, diambil dari header `BIP-Fullname`/`BIP-Position` sehingga tak menuntut satu pun panggilan lintas service. Sengaja tidak diterjemahkan dari `oleh` saat dibaca: jabatan berubah, dan jejak yang menerjemahkannya belakangan akan menyatakan bahwa yang menyetujui setahun lalu adalah jabatannya yang sekarang. Keduanya `omitempty` — baris yang dibuat sebelum field ini ada tidak memilikinya, dan pembacanya **wajib jatuh ke `oleh`**, bukan menampilkan kosong.
+
+> **Pengabaran.** Tiap perpindahan tahap mengirim inbox `pembelian-perlu-aksi` ke penindak berikutnya, dan `pembelian-diperbarui` ke pengaju saat ditolak, diminta revisi, atau selesai. Best-effort: kegagalannya di-log dan tidak membatalkan transisi. Tahap yang **belum ditetapkan penyetujunya** sengaja tidak dikabari (dicatat di log), sebab menebak nama departemen tiap tahap di kode menghasilkan filter yang tak cocok dengan siapa pun: nol notifikasi tanpa satu pun tanda.
+
 ## Belum Diimplementasikan / Catatan
 
+- **Rute kas kecil, pengajuan budget lama, dan katalog Accurate belum didaftar di dokumen ini** (TBD). Yang sudah didaftar hanya master pemasok/barang, cermin Pembelian, rantai PR→PO→RI, dan Pengajuan Pembelian.
+- **Lampiran pengajuan pembelian tidak punya endpoint unggah.** Field `lampiran` ada di model dan sengaja dinolkan saat pembuatan, tetapi tak ada rute yang mengisinya.
 - Tidak ada endpoint **hapus pemasok** maupun **hapus barang** — penghapusan master dilakukan finance/procurement di Accurate.
 - Tidak ada endpoint **pemicu sync manual**; worker berjalan otomatis tiap 30 detik atas baris `PENDING`/`FAILED` (pemasok maupun barang).
 - **Toggle boolean pada `PUT /barang/:id`** (`pakai_ppn`, `kelola_nomor_seri`, `pakai_kadaluarsa`) hanya bisa **diaktifkan**, tidak bisa dinonaktifkan oleh payload yang tidak mengirim field itu — batasan `bool` biasa (tidak bisa membedakan "false" dari "tidak dikirim"). Tidak terasa di FE ERP karena form selalu mengirim seluruh field toggle.
