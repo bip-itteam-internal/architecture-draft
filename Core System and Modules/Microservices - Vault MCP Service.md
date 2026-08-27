@@ -2,7 +2,7 @@
 
 *MCP server yang membuka vault `architecture-draft` untuk Claude, supaya management bisa membaca sistem yang sudah terdokumentasi dan menuangkan kebutuhan baru langsung dari Claude Desktop / claude.ai tanpa menyentuh Obsidian, git, maupun editor. Identitasnya menumpang SSO ERP yang sudah ada, dan setiap tulisan mendarat di vault sebagai commit git ber-author manager yang bersangkutan.*
 
-- **Status**: 📝 **Direncanakan, belum ada kode** (desain disetujui 2026-08-27). Tidak ada satu pun bagian dokumen ini yang sudah berjalan.
+- **Status**: ⚠️ **Irisan 1 ditulis, BELUM di-deploy ke mana pun** (PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488), 2026-08-27). Kode baca-saja lengkap dan terkunci 74 test termasuk alur OAuth penuh lewat HTTP sungguhan dan klien MCP sungguhan. Tetapi ia **belum pernah dijalankan**: `docker build` belum pernah berhasil dicoba, dan DNS, proxy host, serta sertifikat belum berdiri. Irisan 2 (tulis) dan 3 belum ada kode.
 - **Stack**: Go + [MCP Go SDK resmi](https://github.com/modelcontextprotocol/go-sdk) (Tier 1, dirawat bersama Google) + MongoDB (koleksi `mcp_sessions`). Transport **Streamable HTTP**.
 - **Path di repo** (rencana): `bip-erp/services/vault-mcp/`, mengikuti pola `services/.template`.
 - **Rute**: ⛔ **TIDAK lewat [[CORE - API Master Gateway]].** Dipaparkan langsung sebagai `https://mcp.bharatainternasional.com` lewat Nginx Proxy Manager (`bip-erp/infra/npm/`). Claude menyambung dari infrastruktur cloud Anthropic, bukan dari laptop pemakai, sehingga server wajib terjangkau internet publik.
@@ -44,7 +44,7 @@ Konsekuensi yang harus ditutup: dokumen baru tulisan manager tidak akan punya en
 
 ### 5. Daftar-izin `employee_id` eksplisit, bukan diturunkan dari `system_roles`
 
-Diperiksa di `/oauth/authorize`, sehingga yang tidak berhak ditolak dengan pesan jelas pada saat login, bukan gagal diam-diam saat memanggil tool. Alasan tidak memakai RBAC yang sudah ada: di sini salah izin berarti orang yang tidak dimaksud bisa menyunting dokumentasi arsitektur, dan daftar nama yang bisa dibaca mata jauh lebih mudah diaudit daripada aturan role berlapis. Jumlah managernya sedikit, jadi ongkos memeliharanya kecil.
+Diperiksa di `/oauth/erp-callback`, sehingga yang tidak berhak ditolak dengan pesan jelas pada saat login, bukan gagal diam-diam saat memanggil tool. (Desain awal menaruhnya di `/oauth/authorize`; saat implementasi ternyata di titik itu identitas pemakainya belum diketahui, karena `employee_id` baru ada setelah redeem. Maksudnya tetap sama: menolak selagi orangnya masih di browser.) Diperiksa **ulang** saat refresh token dan tiap panggilan MCP, karena access token hidup satu jam dan refresh 30 hari, sehingga tanpa itu pencabutan akses baru terasa sejam sampai sebulan kemudian. Alasan tidak memakai RBAC yang sudah ada: di sini salah izin berarti orang yang tidak dimaksud bisa menyunting dokumentasi arsitektur, dan daftar nama yang bisa dibaca mata jauh lebih mudah diaudit daripada aturan role berlapis. Jumlah managernya sedikit, jadi ongkos memeliharanya kecil.
 
 ## Alur autentikasi
 
@@ -134,6 +134,8 @@ Tiap irisan berakhir pada sesuatu yang bisa dibuktikan hidup, bukan pada kode ya
 **Irisan 1, sambungan dan identitas, baca saja.** DNS, proxy host di NPM, sertifikat, container jalan, seluruh alur OAuth berfungsi, plus `search_notes` / `read_note` / `list_notes`. Bagian tersulit dan paling banyak hal di luar kode ada di sini, dan risikonya ke vault nol karena belum ada tulis sama sekali.
 
 **Irisan 2, tulis.** `write_note`, `patch_note`, alur git, atribusi author.
+
+⛔ **Prasyarat irisan 2 yang ditemukan saat menulis irisan 1: ERP JWT TIDAK punya klaim email.** Klaim yang benar-benar diterbitkan gateway hanya `employee_id`, `full_name`, `username`, `system_roles`, `department`, `position`, `company_id` (`shared-library/auth/jwt.go` `SignJWT`). Author commit menuntut alamat email, dan **mengarangnya dari username akan masuk permanen ke riwayat git tanpa bisa dibedakan dari alamat yang benar**. Irisan 2 wajib mengambilnya dari employee-service lebih dulu, atau memutuskan secara sadar memakai bentuk `noreply` yang jelas-jelas bukan alamat orang.
 
 **Irisan 3, sisanya.** `delete_note`, ditambah satu **MCP prompt** (`curahkan-kebutuhan`) yang memandu manager menuangkan keinginannya jadi struktur konsisten: masalah yang dirasakan, siapa yang terdampak, keadaan sekarang, yang diharapkan. Ini justru inti permintaan aslinya, tapi baru masuk akal setelah tulis terbukti jalan.
 
