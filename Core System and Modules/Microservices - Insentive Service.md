@@ -24,6 +24,9 @@ Insentif = tarif(%) × Profit
 
 ### Dashboard profit (inti)
 - `GET /profit-dashboard?periode=YYYY-MM&level=icc|leader|supervisor` — satu tabel untuk tiga lingkup; menarik komponen profit dari integration, beban karyawan dari payroll, dan beban non-gaji dari Accurate. `&refresh=1` memaksa penarikan ulang beban non-gaji.
+- **Jawabannya membawa ATURAN, bukan cuma angka** (2026-08-27, PR #1463): `tarif_tiers` (tangga tarif SK siap tampil), `batas_retur_persen`, `batas_pencapaian_bebas_retur` — sekali per respons. Dikirim backend supaya layar bisa menjelaskan asal Capai/Tarif/Insentif **tanpa menyalin tabel tarifnya**; tabel itu pernah salah satu poin persen di produksi dan tesnya ikut mengunci angka salah. 🔑 `BarisTarif` bentuk terpisah dari `ProfitIncentiveTier` karena batas atas tier teratas bernilai `math.Inf(1)` dan **`json.Marshal` menolak Inf** — mengirim tabel mentah menjatuhkan SELURUH respons, bukan mengosongkan satu field.
+- **`&mode=bergeser`** (2026-08-27, PR #1503 — belum merge) — jendela KPI, lihat §Dua jendela periode di bawah. **Mode ikut kunci cache**, dan pre-warm menghangatkan KEDUA mode.
+- **Cache dashboard 15 menit + pre-warm** — agregasi ini berat (~20 dtk hangat, ~2 mnt dingin) dan sumber KPI `insentif_profit` memanggilnya PER KARYAWAN. Tanpa cache, permintaan KPI habis waktu di gateway dan seluruh otomasi KPI hilang (insiden 2026-08-26). Hanya respons SUKSES yang disimpan, jadi kegagalan tak terkunci.
 - Tiap baris membawa **`peringatan[]`** dan `layak_dibayar` — baris yang datanya belum lengkap **menolak** dinyatakan siap dibayar, bukan diam-diam dihitung nol.
 - **Toko terpetakan yang belum berjualan tetap disebut** (2026-08-26, PR #1455 bip-erp + #1248 erp-frontend, merged). Ringkasan profit hanya memuat toko yang punya order, sehingga toko yang sudah dipetakan ke seorang ICC tetapi nol order **lenyap tanpa jejak**: ICC Management menyebut 15 toko untuk tim Satrio, dashboard menyebut 9. Integration kini mengirim baris bernilai nol bertanda `tanpa_penjualan`, service ini mencacahnya jadi `toko_tanpa_penjualan`, dan layar menulis "9 dari 15 toko". Terukur prod 2026-08-26: 15 = 9 berjualan + 6 belum pernah ada order. Angkanya tidak bergeser — toko tanpa order menyumbang Rp0 ke omzet, HPP, iklan, dan retur.
 
@@ -55,7 +58,6 @@ Cara baru juga sudah **membagi beban proyek divisi** ke tiap orang. Proyek `BIP 
 Aturannya: **selama aset masih dipakai, penyusutannya tetap dibebankan** — walau umur bukunya sudah habis. Ini keputusan sadar dan berbeda dari akuntansi: di Accurate, aset yang habis umurnya bernilai nol dan tak disusutkan lagi. Yang diukur di sini biaya pemakaian, bukan nilai buku. Kalau suatu saat dibandingkan dengan Accurate, selisihnya akan muncul dan sebabnya ini.
 
 Aset yang belum diisi harga atau masa manfaatnya **tidak dilewati diam-diam** — jumlahnya dilaporkan sebagai peringatan baris, supaya beban yang belum terhitung tetap terlihat. Prod 2026-08-26: 70 dari 71 aset marketing sudah lengkap.
-- `GET/POST/DELETE /profit/internal-affiliates[/:username]` — daftar putih akun affiliate milik sendiri.
 
 ### Warisan skema lama (masih terdaftar)
 - `GET /health` · `GET /stats` · `GET/PUT /configs/ppn`
@@ -63,6 +65,51 @@ Aset yang belum diisi harga atau masa manfaatnya **tidak dilewati diam-diam** �
 - `/results*` (list, export Excel, approve/unapprove, override, delete)
 - `GET /accurate/summary|income|invoices` · `GET /integration/shopee/item-performance`
 - ⚠️ `POST /calculate` dan `POST /calculate/auto` **menolak seluruh role** dengan pesan yang menyebut SK pencabutnya. Rutenya sengaja dibiarkan supaya pemanggil lama mendapat penjelasan, bukan 404 yang membingungkan.
+
+## Dua jendela periode: insentif menghanguskan, KPI menggeser
+
+> **Status**: 🟡 kode siap, PR #1503 belum merge.
+
+Sebuah order masuk periode bulan M bila **dikirim** di bulan M **dan** uangnya
+**cair** paling lambat tanggal 25 bulan M+1. Dua sumbu berbeda, dan keduanya sering
+tertukar — angka 25 itu tanggal 25 **bulan berikutnya**, bukan tanggal 25 di bulan
+periodenya, sehingga order tanggal 26–31 tetap milik bulannya sendiri (terukur Juli
+2026: dari 14.886 order yang dikirim 26–31 Juli, **14.270 = 95,9% tetap terhitung di
+Juli**).
+
+Order yang uangnya cair setelah cutoff **hangus** — jatuh dari periodenya sendiri
+maupun periode berikutnya, karena periode berikutnya hanya menerima order yang
+dikirim di bulan itu.
+
+| | Jendela | Order telat cair |
+|---|---|---|
+| **Insentif** (bawaan) | kirim ∈ bulan M, cair ≤ 25 M+1 | **hangus** |
+| **KPI** (`mode=bergeser`) | idem, **+** kirim < M, cair ∈ (25 M, 25 M+1] | **masuk periode berikutnya** |
+
+Perbedaan ini **disengaja** (keputusan pemilik produk 2026-08-27): insentif membayar
+periode yang sudah tertutup di tanggal 25, sementara KPI menilai kerja — dan kerja
+yang hasilnya baru cair terlambat tetap kerja orang itu. Konsekuensinya dua angka
+profit yang sah berbeda untuk orang yang sama; kartu KPI **menyebutnya** lewat label
+"Profit (rumus SK, jendela KPI)" beserta catatannya, bukan membiarkannya ditemukan
+sendiri.
+
+Terukur prod 2026-08-27:
+
+| Periode | Insentif | KPI | Susulan |
+|---|---|---|---|
+| Juli | 79.983 order · Rp5.586.390.864 | 80.952 · Rp5.594.807.329 | +969 · Rp8.416.465 (**+0,151%**) |
+| Agustus | 37.130 · Rp2.804.542.537 | 37.243 · Rp2.807.153.330 | +113 · Rp2.610.793 (**+0,093%**) |
+
+Identitas `utama + susulan = gabungan` terverifikasi di kedua bulan — tak ada order
+yang terhitung dua kali. Yang menjaganya dua syarat, dan keduanya gagal **senyap**
+bila hilang: batas **bawah** jendela susulan (tanpa itu order lampau ikut berkali-kali
+tiap bulan) dan syarat `shipped_at < from` pada cabang susulan (tanpa itu order bulan
+ini terhitung dua kali). Retur **ikut** bergeser — kalau tidak, penyebut rasio retur
+bertambah sementara pembilangnya tidak, dan rasio itulah yang dipakai gerbang 7%.
+
+⚠️ Yang **tidak** ditolong mode bergeser: order yang uangnya tak pernah cair sama
+sekali (Juli 1.568, Juni 5.046 — masih `paid_at` kosong berbulan-bulan kemudian,
+kemungkinan batal). Tak ada tanggal cair untuk digeser ke mana pun.
 
 ## Hierarki: Leader & Supervisor dari HRIS
 
@@ -116,7 +163,7 @@ Hasil terhadap 183 karyawan aktif (prod 2026-08-26): 3 Leader (Ade 11, Satrio 10
 ## Belum Diimplementasikan / Catatan
 
 - **Cron harian dihapus** (`cron_worker.go`, −1.571 baris) bersama skema KPI-multiplier. Tidak ada lagi job terjadwal di service ini — lihat [[IT - Background Jobs & Schedulers]].
-- **Pengecualian omzet affiliate eksternal belum terpasang di perhitungan.** Daftar putihnya sudah bisa diisi lewat Master Data, tetapi belum ada kode yang memakainya → pencapaian di layar masih lebih tinggi dari seharusnya. Terukur Juli 2026: 71,6% nilai affiliate berasal dari kreator eksternal.
+- 🗑️ ~~Pengecualian omzet affiliate eksternal.~~ **DIBUANG SELURUHNYA 2026-08-27** (PR #1474 + erp-frontend #1261). Mekanismenya ada dan aktif di kode, tetapi digerbang daftar putih `internal_affiliate_accounts` yang **kosong di produksi** (0 dokumen) sepanjang umurnya — penyaringan tak pernah menyala sekali pun, dan barisnya di layar selalu Rp0. Premisnya juga dibantah pemilik produk dan terukur salah: komisi affiliate Rp155,6 juta = 2,5% omzet dan **sudah terpotong di uang cair**, jadi mengeluarkannya lagi menghitung potongan yang sama dua kali. Tak ada di SK 010/011 yang menuntutnya. Sekaligus menutup master data KEDUA: ICC Management sudah memegang 34 akun affiliate (`icc_affiliate_accounts`), sementara yang dibaca insentif justru koleksi kosong. ⚠️ JANGAN keliru dengan `usernameInternalAffiliate` di [[Microservices - Marketing Analytics Service]] — itu membaca `icc_affiliate_accounts` untuk KPI Affiliate Acquisition, fitur berbeda yang hidup.
 - **Belum ada alur approval/freeze** untuk skema profit (yang lama punya, yang baru belum).
 - **Atribusi ICC belum lengkap**: per 2026-08-01 hanya 10 dari 28 toko punya mapping ICC → 63% profit Juli tak berpemilik. Sumbernya `icc_account_mappings` di integration ([[Microservices - Integration Service]]). Membaik per 2026-08-26: 31 mapping aktif, 21 baris muncul di level ICC.
 - ✅ ~~Proyek Accurate SPV belum tersambung.~~ **SELESAI 2026-08-26**, tetapi bukan lewat jalur yang direncanakan. Sempat dibuat pemetaan manual divisi→kode proyek (koleksi + endpoint + layar), lalu **dicabut** karena ternyata sudah diselesaikan lebih dulu di [[Microservices - Integration Service]]: beban proyek divisi kini dibagi ke tiap orang secara otomatis, jadi tak ada yang perlu dipetakan tangan. Dua orang mengerjakan masalah yang sama tanpa saling tahu; yang dipertahankan yang lebih lengkap.
@@ -126,7 +173,7 @@ Hasil terhadap 183 karyawan aktif (prod 2026-08-26): 3 Leader (Ade 11, Satrio 10
 
 ## Dependencies & Integrasi
 
-- **MongoDB** (`insentive_db`) — koleksi profit: `incentive_org`, `incentive_profit_targets`, `incentive_opex`, `internal_affiliate_accounts`; warisan: `master_kpis`, `employee_performance_mappings`, `audit_logs`, `incentive_results`. Lihat [[DB - Overview and Notes]].
+- **MongoDB** (`insentive_db`) — koleksi profit: `incentive_org`, `incentive_profit_targets`, `incentive_opex`; warisan: `master_kpis`, `employee_performance_mappings`, `audit_logs`, `incentive_results`. Lihat [[DB - Overview and Notes]].
 - **[[Microservices - Integration Service]]** — `GET /profit/incentive/summary` (komponen profit per toko + pemilik ICC) dan `GET /profit/incentive/opex` (beban non-gaji per proyek Accurate). Env `INTEGRATION_MODULE_URL`.
 - **[[Microservices - Payroll Service]]** — `GET /employer-cost` (beban perusahaan per karyawan: bruto + iuran BPJS pemberi kerja). Env **`PAYROLL_MODULE_URL`** (ditambahkan ke blok `insentive-service` di `docker-compose.yml`).
 - **[[External - Accurate]]** — sumber pembukuan beban operasional, dibaca lewat integration (bukan langsung).
