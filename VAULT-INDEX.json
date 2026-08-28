@@ -45,6 +45,7 @@
         "API - Index",
         "APP - MyBharata",
         "Microservices - Payroll Service",
+        "Microservices - Form Builder Service",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Perjalanan Dinas",
         "Microservices - Employee Service",
@@ -55,20 +56,24 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "5d2ae59655e1779a66a4ee281223d3a15d5413ba6eb7e11b9423a3ae5061b22c",
-      "ukuran_kb": 15.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki attendance-service, siapa yang boleh memanggilnya, dan parameter apa yang wajib. Mencakup tap/clock-in, riwayat dan laporan periode 26 ke 25, koreksi absensi, pengajuan cuti/izin/dinas/tukar shift, jadwal dan roster, WiFi kantor, guestbook, serta rute panggilan mesin GET /kpi/attendance yang digerbang kunci layanan. Menjelaskan pula mengapa prefiks /internal/ bukan berarti rutenya privat.",
+      "hash": "8c7dcd912a20c5fabb8efb70eba67cd04dc0a3690132c052ce6afd7c9998f29b",
+      "ukuran_kb": 16.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan attendance-service dan siapa yang boleh memanggil masing-masing. Mencakup clock-in/out, laporan periode 26 ke 25, hari libur, pengajuan cuti dan izin, tukar jadwal kerja, koreksi presensi, perjalanan dinas, buku tamu, roster harian, serta kelola definisi shift dan rotasi. Juga menjawab: kenapa hapus shift bawaan membalas 404, dan apa beda gerbangRoster dari common.CanManageDepartment.",
       "kata_kunci": [
-        "attendance",
-        "absensi",
-        "endpoint",
-        "API",
+        "attendance service",
+        "endpoint presensi",
         "clock-in",
-        "presensi",
-        "kpi/attendance",
-        "kunci layanan",
-        "service key",
-        "periode payroll"
+        "clock-out",
+        "roster",
+        "company-work-schedule",
+        "company-group-rotation",
+        "kelola shift",
+        "rotasi shift",
+        "gerbangRoster",
+        "RBAC presensi",
+        "cuti",
+        "koreksi presensi",
+        "tukar shift"
       ]
     },
     {
@@ -1260,20 +1265,22 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "8a45af0311b7b094307014d58fc81351eeeabf6926166c4a99bd25a6fedad07f",
-      "ukuran_kb": 340.8,
-      "ringkasan": "Menjawab: apa itu portal web internal One Bharata (repo erp-frontend), stack apa yang dipakai, bagaimana alur login serta refresh token bekerja, dan bagaimana web ini sekaligus berperan sebagai SSO Identity Provider bagi aplikasi lain seperti Task Manager. Juga menjawab bagaimana sidebar dan menu digerbang oleh cookie system_roles, bagaimana setelan HRGA dikumpulkan di satu induk Pengaturan dengan penyaringan per tab, serta layar apa saja yang sudah multi-perusahaan (company switcher, kelola perusahaan, departemen, shift, network).",
+      "hash": "18dff33d755785f01f10cf39785bf97e1f5259ab18b770f93288324414ea1b94",
+      "ukuran_kb": 342.2,
+      "ringkasan": "Menjawab: halaman apa saja yang ada di frontend ERP web, siapa yang bisa membukanya, dan kenapa tiap layar berbentuk seperti sekarang. Mencakup HRIS, Finance, Procurement, Task Management, Marketing Analytics, Portal Saya, serta struktur sidebar dan gerbang rute di proxy. Juga menjawab: siapa yang melihat tombol tambah dan hapus di halaman Jadwal, dan kenapa uji gerbang peran wajib memakai predikat aslinya lewat importActual, bukan tiruan.",
       "kata_kunci": [
         "erp-frontend",
-        "hris-dashboard",
-        "One Bharata",
         "web ERP",
-        "Next.js",
-        "SSO",
-        "system_roles",
-        "sidebar menu",
-        "role gating",
-        "pengaturan HRGA"
+        "sidebar",
+        "menu",
+        "halaman HRIS",
+        "proxy rute",
+        "hris/schedule",
+        "jadwal",
+        "roster",
+        "gerbang peran frontend",
+        "tabel HRIS",
+        "Portal Saya"
       ]
     },
     {
@@ -1554,20 +1561,22 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "c16a40ae24d97ff24cb06e08b503cbe79d1713d49db7cdcf3048cdd5b42a58b3",
-      "ukuran_kb": 98.6,
-      "ringkasan": "Menjawab: bagaimana hak akses ditentukan di ERP Bharata, apa beda permission set dari system_roles dan dari menu terbatas, bagaimana reach (cakupan data) dihitung, dan izin apa saja yang tersedia per modul. Memuat katalog izin, paket bawaan, tangga tier per modul, serta dua kunci menu terbatas (finance.laporan dan finance.insentif) beserta fallback masing-masing dan beda perlakuan super-aksesnya.",
+      "hash": "727636c654918cd1779fe7c09819dc0c5a6dd019fdaee37d6e07221752a513e5",
+      "ukuran_kb": 100.1,
+      "ringkasan": "Menjawab: bagaimana hak akses ditentukan di ERP, dan kapan sistem memakai permission set versus tier system_roles lama. Menjelaskan katalog izin per modul, paket hak yang menempel di posisi, sakelar tier fallback per modul beserta bahayanya bila dinyalakan, dan kenapa sebagian gerbang tulis sengaja tidak dipetakan ke izin. Juga menjawab: kenapa memetakan gerbang lintas-modul RequireHRISOrIT ke hris.work justru MENCABUT akses staf IT.",
       "kata_kunci": [
         "RBAC",
         "permission set",
-        "hak akses",
-        "izin",
-        "reach",
-        "cakupan data",
         "system_roles",
-        "menu terbatas",
+        "tier fallback",
         "katalog izin",
-        "paket hak"
+        "hris.view",
+        "hris.work",
+        "hak per posisi",
+        "RequireHRISStaffOrITSupervisor",
+        "gateHris",
+        "ADR 0030",
+        "menu terbatas"
       ]
     },
     {
@@ -1733,20 +1742,24 @@
         "CORE - HRIS Orchestrator",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "4f586198dc542366053a18acdb15f276c0e354a4628698e13b86cdeaa8f11fc7",
-      "ukuran_kb": 38.0,
-      "ringkasan": "Menjawab: bagaimana absensi karyawan diproses end-to-end, dari clock-in/out multi-metode (mobile, fingerprint, website), resolusi dan rotasi jadwal kerja, leave request, perjalanan dinas, guestbook tamu, hari libur, sampai laporan bulanan dan payroll supplement. Juga menjawab endpoint mana yang dikonsumsi service lain beserta gerbangnya (rekap telat untuk usulan SP1, /kpi/attendance sebagai sumber skor KPI kedisiplinan) dan status mana yang tidak dihitung sebagai gagal hadir. Menunjuk ke mana aturan jam kerja, ambang telat, dan sanksinya sebenarnya didefinisikan.",
+      "hash": "12b4efcf981ccd1a2188b5cd58435469c2a46794d3398d6591911c22e92137f6",
+      "ukuran_kb": 42.6,
+      "ringkasan": "Menjawab: bagaimana attendance-service menentukan jadwal seseorang pada suatu tanggal dan bagaimana entri presensi disemai serta divalidasi. Mencakup urutan menang event perusahaan, roster, hari libur, jadwal dasar; rotasi shift bergilir dan cara fase dihitung; cron penyemaian; verifikasi WiFi dan fingerprint; serta isolasi multi-tenant. Juga menjawab: kenapa jadwal buatan HR bertahan melewati restart lewat managed_by, kenapa code_managed BUKAN berarti dilarang menambah, dan kenapa otorisasi roster berlapis dua.",
       "kata_kunci": [
-        "absensi",
-        "attendance",
-        "clock-in",
-        "clock-out",
-        "jadwal kerja",
-        "shift",
-        "leave request",
-        "hari libur",
-        "guestbook",
-        "laporan absensi"
+        "attendance service",
+        "resolusi jadwal",
+        "roster",
+        "rotasi shift",
+        "pattern",
+        "managed_by",
+        "code_managed",
+        "seed jadwal",
+        "cron presensi",
+        "company_work_schedule",
+        "gerbangRoster",
+        "multi-tenant presensi",
+        "WiFi kantor",
+        "fingerprint"
       ]
     },
     {
@@ -3758,6 +3771,7 @@
         "Microservices - Employee Service",
         "APP - Web ERP",
         "APP - MyBharata",
+        "CORE - RBAC dan Permission Set",
         "API - Attendance Service",
         "API - Employee Service",
         "HRIS - Attendance System",
@@ -3767,20 +3781,21 @@
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "fbfbc97f21b89ad93036b820146af01904988d716c31ecdea9d4fa0c48643cda",
-      "ukuran_kb": 10.6,
-      "ringkasan": "Menjawab: kenapa jadwal boleh ditentukan per orang per tanggal untuk posisi yang tak berpola seperti Host Live, dan apa saja aturan turunannya (roster menumpuk di atas jadwal dasar bukan menggantikannya, tanggal kosong berperilaku seperti sebelum fitur ada, urutan menang event perusahaan lalu roster lalu libur lalu jadwal dasar, tanggal lampau read-only, Tukar Shift ditutup). Menjawab juga konsekuensi yang sudah terasa saat dipakai: saklar `roster_enabled` mengalir satu arah dari database employee, allowlist proyeksi bisa menelan field baru, dan menu Roster akhirnya dibubarkan jadi tab di halaman Jadwal.",
+      "hash": "a7572123eb23d4247397edea44961108883b7b28f92b8d732ae3030cb9b5b9d4",
+      "ukuran_kb": 12.6,
+      "ringkasan": "Menjawab: kenapa roster harian per tanggal dibuat untuk Host Live yang jam siarnya mengikuti campaign dan bukan rotasi, serta aturan mana yang menang saat roster bertabrakan dengan hari libur dan event perusahaan. Menjelaskan saklar roster_enabled per karyawan, batas 500 sel per permintaan, dan tanggal lampau yang read-only. Juga menjawab: siapa yang boleh mengisi roster sejak ambangnya turun ke staf HRIS, dan konsekuensi bahwa staf HR kini bisa membaca catatan leader seluruh departemen.",
       "kata_kunci": [
         "roster",
-        "jadwal harian",
+        "roster_enabled",
         "Host Live",
         "Kyura",
-        "roster_enabled",
-        "schedule_type",
-        "shift",
-        "attendance",
-        "tukar shift",
-        "resolver jadwal"
+        "jadwal bebas per tanggal",
+        "ADR 0036",
+        "hari libur",
+        "event perusahaan",
+        "urutan menang jadwal",
+        "cakupan supervisi",
+        "catatan leader"
       ]
     },
     {
