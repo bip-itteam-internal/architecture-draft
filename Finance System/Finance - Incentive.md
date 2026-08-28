@@ -92,10 +92,36 @@ ini tak bisa dilihat siapa pun, dan tanggal yang tampil terbaca seperti salah.
 ia menyumbang Rp0 ke omzet, HPP, iklan, dan retur, jadi profit dan pencapaian tidak bergeser
 sedikit pun. Yang berubah hanya: toko itu tidak lagi hilang dari daftar.
 
+### Aturan periode: hangus, bukan bergeser (per 2026-08-27)
+
+Sebuah order masuk periode bulan M bila **dikirim** di bulan M **dan** uangnya **cair**
+paling lambat tanggal **25 bulan M+1**. Dua sumbu berbeda, dan keduanya sering
+tertukar — angka 25 itu tanggal 25 **bulan berikutnya**, bukan tanggal 25 di bulan
+periodenya. Order tanggal 26–31 tetap milik bulannya sendiri: terukur Juli 2026, dari
+14.886 order yang dikirim 26–31 Juli, **14.270 (95,9%) tetap terhitung di Juli**.
+
+Order yang uangnya cair setelah cutoff **hangus** — jatuh dari periodenya sendiri
+maupun periode berikutnya. Dikonfirmasi pemilik produk 2026-08-27 sebagai aturan yang
+benar untuk **uang**: jadwal bayarnya memang sudah lewat. Besarannya kecil — Juli 2,0%
+(104 order cair terlambat + 1.568 tak pernah cair, dari 81.655).
+
+⚠️ Banner dashboard sempat menjanjikan sebaliknya ("bergeser ke periode berikutnya")
+selama berbulan-bulan, bertentangan dengan Panduan di modul yang sama. Diperbaiki di
+erp-frontend [#1286](https://github.com/bip-itteam-internal/erp-frontend/pull/1286)
+(belum merge) dengan menyatukan kalimatnya ke satu konstanta yang dibaca kedua layar.
+
+**KPI memakai aturan berbeda, dan itu disengaja.** Untuk penilaian, menghanguskan order
+berarti menghukum orang atas kecepatan pencairan marketplace — hal yang bukan urusannya.
+Sejak PR [#1503](https://github.com/bip-itteam-internal/bip-erp/pull/1503) (belum merge)
+metrik KPI memakai jendela **bergeser**: order yang telat cair masuk periode berikutnya.
+Selisihnya terukur +0,151% (Juli) dan +0,093% (Agustus) — kecil, tetapi berarti **dua
+angka profit yang sah berbeda** untuk orang yang sama, dan kartu KPI menyebutkannya.
+Detail: §Dua jendela periode di [[Microservices - Insentive Service]].
+
 ### Yang masih menahan (per 2026-08-02)
 
 - **Atribusi ICC belum lengkap** — baru 10 dari 28 toko punya mapping; 63% profit Juli tak berpemilik. Sumber pengisinya berkas LIST TOKO dari client.
-- **Pengecualian omzet affiliate eksternal belum terpasang** di perhitungan (daftar putihnya sudah bisa diisi, tapi belum dipakai kode) → pencapaian di layar masih lebih tinggi dari seharusnya. Terukur Juli 2026: 71,6% nilai affiliate dari kreator eksternal.
+- 🗑️ ~~Pengecualian omzet affiliate eksternal.~~ **DIBUANG 2026-08-27** — bukan ditunda, melainkan dinyatakan tidak berlaku. Daftar putihnya kosong di produksi sepanjang umurnya sehingga penyaringan tak pernah menyala; premisnya keliru (komisi affiliate 2,5% omzet dan **sudah terpotong di uang cair**, jadi mengeluarkannya lagi menghitung potongan yang sama dua kali); dan tak ada di SK yang menuntutnya. Order affiliate kini dihitung **penuh**, termasuk dari kreator luar.
 - **Beban non-gaji baru terisi di 6 dari 62 proyek karyawan** di Accurate; sisanya masih dibukukan di proyek merek.
 - **Belum ada alur approval/freeze** untuk skema profit.
 - Menunggu dari luar: Lampiran SK (target sesungguhnya), dan finance melengkapi HPP.
@@ -310,7 +336,7 @@ Sistem insentif dibangun **gabung ke ERP**, basis **MongoDB**, dengan **RBAC per
 | Uang cair, HPP, beban iklan, retur | [[Microservices - Integration Service]] `GET /profit/incentive/summary` (per toko, basis hari kirim + cutoff 25) |
 | Beban karyawan | [[Microservices - Payroll Service]] `GET /employer-cost` |
 | Beban operasional non-gaji | [[External - Accurate]] per proyek, lewat integration `GET /profit/incentive/opex` |
-| Struktur tim, target, daftar putih affiliate | `insentive_db` (master data di [[Microservices - Insentive Service]]) |
+| Struktur tim, target | `insentive_db` (master data di [[Microservices - Insentive Service]]) |
 | Pemilik toko (ICC) | `icc_account_mappings` di integration — lihat [[Sales - ICC Account Manager Mapping]] |
 
 **Sumber skema LAMA yang tak lagi dipakai**: skor KPI dari [[APP - Dynamic Task Tracker]] dan jumlah konversi dari [[Sales - GMV Creative]] — keduanya tak masuk rumus profit-based. KPI tetap dipakai untuk evaluasi & kenaikan gaji, bukan penentu nominal insentif.
