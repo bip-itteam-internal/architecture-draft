@@ -157,9 +157,9 @@ Yang membuatnya bergejala: `DepartmentFilterOptions` sengaja MENGGANTI anggota g
 - **`/analisa-kebutuhan` (kit ≥ 1.14.0) berdiri SEBELUM `/start-task`, dan sifatnya opsional.**
   Seluruh flow wajib berangkat dari task teknis yang sudah jelas, jadi penerjemahan kebutuhan
   manajemen jadi keputusan arsitektur selama ini terjadi di kepala orang, tidak tercatat, dan
-  tidak tergerbang. Itu persis cara potongan mangkir dirancang 1x padahal Pasal 20 mengatur
-  1,5x: lolos brainstorming, `/plan`, dan `/implement`, tertangkap di `/review` cuma karena
-  kebetulan. Command ini memperlakukan kalimat pembuka user sebagai **solusi yang diusulkan**,
+  tidak tergerbang. Itu jalur yang meloloskan kegagalan potongan mangkir sampai `/review`
+  (angka dan kronologinya di § Memori & sumber kebenaran; jangan disalin ke sini).
+  Command ini memperlakukan kalimat pembuka user sebagai **solusi yang diusulkan**,
   bukan kebutuhan, lalu menulis ADR + dok domain + `Workspace/ANALISA - *.md`. Ia **boleh
   menyimpulkan "tidak perlu dibangun"**, dan itu bagian dari gunanya. Task teknis biasa tetap
   langsung `/start-task`; memaksa semua task lewat sini cuma menambah gesekan.
