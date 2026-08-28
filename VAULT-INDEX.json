@@ -1265,9 +1265,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "d935321e9e6acc3de742b95bbd023de4109244c007de8087e39d69ccecdfb330",
-      "ukuran_kb": 344.8,
-      "ringkasan": "Menjawab: halaman apa saja yang ada di frontend ERP web, siapa yang bisa membukanya, dan kenapa tiap layar berbentuk seperti sekarang. Mencakup HRIS, Finance, Procurement, Task Management, Marketing Analytics, Portal Saya, serta struktur sidebar dan gerbang rute di proxy. Juga menjawab: siapa yang melihat tombol tambah dan hapus di halaman Jadwal, kenapa uji gerbang peran wajib memakai predikat aslinya lewat importActual bukan tiruan, dan di mana terlihat siapa yang terakhir mengubah penetapan gaji seorang karyawan.",
+      "hash": "05157535297400f536fa1a3bf57c8b84875176272454d4dae781177703fd404f",
+      "ukuran_kb": 347.2,
+      "ringkasan": "Menjawab: halaman apa saja yang ada di frontend ERP web, siapa yang bisa membukanya, dan kenapa tiap layar berbentuk seperti sekarang. Mencakup HRIS, Finance, Procurement, Task Management, Marketing Analytics, Portal Saya, serta struktur sidebar dan gerbang rute di proxy. Juga menjawab: tab apa saja di tiap sub-menu Pengaturan dan dari tabel mana semuanya diturunkan, kenapa tautan ber-?tab= sempat selalu mendarat di tab pertama di keenam sub-menu, siapa yang melihat tombol tambah dan hapus di halaman Jadwal, kenapa uji gerbang peran wajib memakai predikat aslinya lewat importActual bukan tiruan, dan di mana terlihat siapa yang terakhir mengubah penetapan gaji seorang karyawan.",
       "kata_kunci": [
         "erp-frontend",
         "web ERP",
@@ -1275,14 +1275,14 @@
         "menu",
         "halaman HRIS",
         "proxy rute",
+        "Pengaturan",
+        "tab query",
+        "SUB_MENU_PENGATURAN",
         "hris/schedule",
-        "jadwal",
         "roster",
         "gerbang peran frontend",
-        "tabel HRIS",
         "Portal Saya",
         "jejak perubahan",
-        "diubah oleh",
         "Gaji Karyawan"
       ]
     },
@@ -1357,8 +1357,8 @@
       "status_teks": null,
       "publik": true,
       "tautan": [],
-      "hash": "8313f6315601f4b4f8afaf68b65f203d3f8b1f36fb36a249c86b1f2b9d9797f9",
-      "ukuran_kb": 12.6,
+      "hash": "083aeac288e764b97e893827f724d6ad337cead09954114f1844409bfb978c60",
+      "ukuran_kb": 13.0,
       "ringkasan": "Menjawab: aturan main menulis dokumentasi di vault arsitektur ERP Bharata — struktur folder per domain, konvensi penamaan berprefiks, kewajiban grounded-in-code, wikilink 0-broken, bentuk penulisan status marker, dan template per jenis dokumen. Juga menjawab repo kode mana dipetakan ke dokumen mana, serta alur sync dan aturan git yang harus diikuti tiap update.",
       "kata_kunci": [
         "rulebook",
@@ -6175,7 +6175,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan): master departemen/posisi sudah di-DB; **org chart live di produksi** (2026-08-01) berikut peleburan simpul se-kelompok supervisi (`HRGA`); **jenjang jabatan live di produksi** (2026-08-03), **56 dari 81 jabatan** terisi per 2026-08-12 dan **ditampilkan** di daftar karyawan serta bagan organisasi (FE PR [#1000](https://github.com/bip-itteam-internal/erp-frontend/pull/1000)); **penyetuju pengajuan per departemen live di produksi** (PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184) & [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)); resolusi atasan **disatukan jadi satu rantai** (PR [#1201](https://github.com/bip-itteam-internal/bip-erp/pull/1201)). Ketiganya **diverifikasi langsung di PRODUKSI 2026-08-26**, lihat §Bukti verifikasi produksi",
+      "status_teks": "Implemented (ada catatan): master departemen/posisi sudah di-DB; **org chart live di produksi** (2026-08-01) berikut peleburan simpul se-kelompok supervisi (`HRGA`); **jenjang jabatan live di produksi** (2026-08-03), **56 dari 81 jabatan** terisi per 2026-08-12 dan **ditampilkan** di daftar karyawan serta bagan organisasi (FE PR [#1000](https://github.com/bip-itteam-internal/erp-frontend/pull/1000)); **penyetuju pengajuan per departemen live di produksi** (PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184) & [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)); resolusi atasan **disatukan jadi satu rantai** (PR [#1201](https://github.com/bip-itteam-internal/bip-erp/pull/1201)). Ketiganya **diverifikasi langsung di PRODUKSI 2026-08-26**, lihat §Bukti verifikasi produksi. ⚠️ **Belum merge, belum deploy**: mode bagan kanvas pada `/hris/org-chart` dan tab baca-saja **Peta Struktur** ada di branch `feat/visual-struktur-organisasi` (erp-frontend, 2026-08-28) — FE saja, nol perubahan kontrak backend",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
@@ -6199,9 +6199,9 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "90dae65bcc9fe2985db762a0628214dd171cbaa86086b7c168e607443f175af8",
-      "ukuran_kb": 51.6,
-      "ringkasan": "Menjawab: bagaimana departemen, posisi, jenjang jabatan, dan hierarki atasan disimpan sebagai master data; siapa atasan sebuah departemen dan lewat urutan pencarian apa; serta bagaimana departemen yang satu tim (HRGA) dikelompokkan untuk tampilan tanpa mengubah satu pun nilai work_data. Memuat kontrak tiga penerjemah filter departemen yang bernama mirip, yang salah pakainya membalas 200 tanpa satu pun baris alih-alih melempar galat.",
+      "hash": "9ad1d0d12e1e745f53bb16cc8baf37c8397e45ab9d155610e96a01b0950101ee",
+      "ukuran_kb": 56.3,
+      "ringkasan": "Menjawab: bagaimana departemen, posisi, jenjang jabatan, dan hierarki atasan disimpan sebagai master data; siapa atasan sebuah departemen dan lewat urutan pencarian apa; serta bagaimana departemen yang satu tim (HRGA) dikelompokkan untuk tampilan tanpa mengubah satu pun nilai work_data. Menjawab juga bedanya tiga field bernama mirip yang menentukan aliran pengajuan — supervised_by, is_supervisor, dan supervisor_id — beserta layar mana yang mengatur masing-masing, dan bagaimana bagan organisasi digambar dalam dua mode (kanvas geser-zoom dan daftar bertingkat) tanpa menduakan penyusun pohonnya. Memuat kontrak tiga penerjemah filter departemen yang bernama mirip, yang salah pakainya membalas 200 tanpa satu pun baris alih-alih melempar galat.",
       "kata_kunci": [
         "struktur organisasi",
         "master_department",
@@ -6211,6 +6211,8 @@
         "atasan langsung",
         "supervisor",
         "org chart",
+        "bagan organisasi",
+        "peta struktur",
         "jenjang jabatan",
         "penyetuju departemen"
       ]
