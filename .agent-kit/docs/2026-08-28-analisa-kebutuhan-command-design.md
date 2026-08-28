@@ -106,7 +106,7 @@ empat; yang dijalankan ditentukan area yang tersentuh, minimum dua (vault + back
 | vault | `architecture-draft` | dok terkait, **status marker** tiap dok, ADR yang mengikat keputusan ini |
 | backend | `bip-erp` | service/handler tersentuh, koleksi + field, aturan pemakaian kolom |
 | frontend | `erp-frontend` | halaman/menu tersentuh, komponen shared yang sudah ada |
-| mobile | `mybharata` | konsumen yang ikut patah, aturan bisnis di `BUSINESS_LOGIC_IMPLEMENTATION.md` |
+| mobile | `mybharata-app` | konsumen yang ikut patah, aturan bisnis di `BUSINESS_LOGIC_IMPLEMENTATION.md` |
 
 Tiap subagent wajib mengembalikan `file:line` untuk **setiap** klaim, dan satu bagian bernama
 **"yang sudah ada"**, yaitu kode atau master data yang sudah menyelesaikan sebagian masalah ini.
