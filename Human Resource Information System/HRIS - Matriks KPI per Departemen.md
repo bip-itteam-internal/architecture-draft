@@ -111,14 +111,17 @@ Kolom ini **bukan pengganti langkah 1** di [[RUN - Menambah Metrik KPI Otomatis]
 > melayani metrik KPI **tingkat tim** dan menuntut `space.kpi_group` diisi lebih dulu —
 > rinciannya di [[API - Task Management Service]] dan [[Microservices - Employee Service]].
 >
-> ⛔ **Kode yang hidup BUKAN berarti metriknya bisa dihitung.** Diukur 2026-08-28 lewat
-> panggilan service-to-service yang sama persis dengan yang dipakai employee-service,
-> `GET /kpi/space-group` untuk divisi Tech Development membalas **409** berbunyi *"belum ada
-> space divisi Tech Development yang dikelompokkan sebagai support (9 space divisi ini belum
-> diisi kelompok KPI-nya); isi lewat Manajemen Tugas > Kelola Space > Ubah > Kelompok KPI"*.
-> Kelima belas `space` produksi memang masih ber-`kpi_group` kosong. Yang tersisa jadi
-> pekerjaan **mengisi data lewat layar**, bukan pekerjaan kode, dan isian "Kelompok KPI"-nya
-> sudah ada di bundel frontend produksi (diverifikasi dengan kontrol negatif).
+> ⛔ **Kode yang hidup BUKAN berarti metriknya bisa dihitung, dan hari itu terbukti dua kali.**
+> Pagi 2026-08-28 `GET /kpi/space-group` untuk divisi Tech Development masih membalas **409**
+> berbunyi *"belum ada space divisi Tech Development yang dikelompokkan sebagai support (9 space
+> divisi ini belum diisi kelompok KPI-nya); isi lewat Manajemen Tugas > Kelola Space > Ubah >
+> Kelompok KPI"* — kodenya sudah hidup, data pendukungnya belum ada. Sore harinya kesembilan
+> space diisi (**2 support**: Infrastructure dan IT Support; **7 development**: MyBharata/HRIS,
+> System Finance, System Marketing, System Manufacture dan Warehouse, Official Website Bharata,
+> procurement, Quality) dan rute yang sama menjawab angka: support Agustus 11 tiket masuk, 10
+> selesai, 10 terukur SLA, 6 rating; development 16 masuk, 7 selesai, 7 terukur, 1 rating.
+> **Pesan 409 itu sendiri yang menuntun ke layarnya**, dan itulah gunanya digalatkan alih-alih
+> dijawab 200 berisi nol.
 >
 > Sub-metrik tiga sumber HRGA:
 >
@@ -1008,26 +1011,39 @@ Template `KPI Quality Supervisor`, 5 metrik.
 > `IT Support` (1 orang). Tabel per-metrik di bawah masih memuat ketujuhnya sebagai salinan
 > data; bacalah empat yang arsip sebagai riwayat, bukan pekerjaan.
 >
-> Dari 13 metrik itu, **sumber datanya sudah tersedia untuk 9** dan belum untuk 4:
+> **Sore 2026-08-28 tujuh metrik dinyalakan sekaligus**, jadi metrik ber-`auto` departemen ini
+> naik **3 → 10** dan seluruh perusahaan **58 → 65**. `kpi_score` ber-`auto_value` tidak
+> bergerak (tetap 2), sehingga penilaian yang sudah tersimpan tak tersentuh. Keadaan 13 metrik
+> itu sekarang, diverifikasi lewat `GET /kpi/auto-values` untuk orang sungguhan periode
+> 2026-08:
 >
-> | Keadaan | Metrik | Yang menghalangi |
+> | Keadaan | Metrik | Angka pertama yang keluar |
 > |---|---|---|
-> | ✅ sudah menyala | IT Support `Network` (0,4) · Leader `KPI Team` (0,4) | — |
-> | 🟡 sumber hidup, konfigurasi belum diisi | IT Support `Problem Solving` (0,3) & `Customer Satisfaction` (0,15) · Fullstack `System Development` (0,5) & `Customer Satifaction` (0,2) | menulis blok `auto` ke `kpi_template` produksi |
-> | 🟠 sumber hidup, DATANYA belum ada | Leader `Revenue 240M` (0,2) · `Integration System Development di Q4` (0,2) · `Customer Satifaction` (0,1) | `space.kpi_group` 9 space Tech Development masih kosong → `409` |
-> | 🔴 belum bisa | IT Support `Kaizen` (0,15) · Fullstack `Kaizen` (0,1) | tak ada program Kaizen hidup di prod |
-> | 🔴 belum bisa | Fullstack `Monitoring Kegiatan Sinkronisasi/Review` (0,2) | modul kewajiban [[Microservices - Calendar Service]]: 0 template, 0 periode, 0 pemenuhan |
+> | ✅ `otomatis` | IT Support `Problem Solving` (0,3) | 8 dari 10 tepat waktu (80%) atas target 60 → **100** |
+> | ✅ `otomatis` | Fullstack `System Development` (0,5) | ketuntasan 80% atas target 85 → **94** |
+> | ✅ `otomatis` | Leader `Revenue 240M` (0,2) | tiket support tuntas 90,9% atas target 95 → **96** |
+> | ✅ `otomatis` | Leader `Integration System Development di Q4` (0,2) | 1 dari 7 tepat waktu (14,3%) atas target bertahap 30 → **48** |
+> | ⚠️ `semi` | IT Support `Network` (0,4) | uptime 99,96%, cakupan 90,3% → 100 |
+> | ⚠️ `semi` | IT Support `Customer Satisfaction` (0,15) | rata-rata 5,00 dari 6 rating atas 10 tiket selesai (cakupan 60%) → 100 |
+> | ⚠️ `semi` | Fullstack `Customer Satifaction` (0,2) | 1 rating atas 4 tiket selesai (cakupan 25%) → 100 |
+> | ⚠️ `semi` | Leader `Customer Satifaction` (0,1) | 1 rating atas 7 tiket selesai (cakupan 14,3%) → 100 |
+> | ⏳ `manual` sementara | Leader `KPI Team` (0,4) | `skor_tim` membaca `kpi_score` periode yang SAMA, dan Agustus belum dinilai siapa pun |
+> | 🔴 `manual` | IT Support `Kaizen` (0,15) · Fullstack `Kaizen` (0,1) | tak ada program Kaizen hidup di prod |
+> | 🔴 `manual` | Fullstack `Monitoring Kegiatan Sinkronisasi/Review` (0,2) | modul kewajiban [[Microservices - Calendar Service]]: 0 template, 0 periode, 0 pemenuhan |
 > | ⛔ sengaja manual | Leader `Pengendalian anggaran IT` (0,1) | master anggaran hanya Marketing |
 >
-> **Datanya sendiri terbukti hidup**, bukan sekadar endpoint yang ada: `GET /kpi/ticket`
-> menjawab 10 tiket ditugaskan / 10 selesai / 10 SLA terukur / 6 rating untuk IT Support
-> Agustus, dan 28 ditugaskan / 18 selesai / 17 SLA terukur untuk satu Fullstack pada Juli.
-> `GET /kpi/uptime` Agustus 99,96% dengan cakupan 90,3%.
+> ⚠️ **Empat dari delapan metrik yang menyala berstatus `semi` karena RATING, bukan karena
+> kode.** Cakupan CSAT 14% sampai 60% berarti angkanya berdiri di atas satu atau enam penilai;
+> nilainya 100 semua karena setiap rating yang pernah masuk bernilai 5. Yang menaikkannya bukan
+> pekerjaan dev melainkan kebiasaan meminta pemohon menilai tiketnya.
 >
-> ⏳ **Irisan 1 belum dijalankan**: jumlah metrik ber-`auto` departemen ini masih **3**
-> (termasuk satu di template Supervisor yang sudah arsip), sama seperti 25 Agustus. Skripnya
-> menulis ke DB produksi, jadi manusia yang menjalankan. `kpi_score` periode 2026-08 masih
-> **0 dokumen** (Juli 6), jadi menyalakannya sekarang masih sempat terpakai untuk Agustus.
+> ⏳ **Metrik terbesar Leader (0,4) belum menghasilkan angka**, dan itu perilaku yang dirancang:
+> anggota tim harus dinilai lebih dulu, baru Leader. Urutan itu tidak bisa dibalik tanpa
+> kehilangan angka otomatisnya untuk bulan tersebut — sebabnya di [[HRIS - Otomasi Skor KPI]].
+>
+> ✅ **Tidak ada template yang jadi otomatis PENUH**, jadi [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]]
+> tetap tidak membekukan siapa pun di sini: Leader 4 dari 5, IT Support 3 dari 4, Fullstack 2
+> dari 4.
 
 > **Departemen pertama yang dikerjakan.** Kodenya **sudah merge (PR #866) dan deploy ke produksi 1 Agustus 2026**, terverifikasi terhadap data sungguhan. Lihat [[Microservices - Monitoring Service]].
 >
@@ -1090,9 +1106,9 @@ Template `Fullstack`, 4 metrik.
 
 | Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
-| 0.5 | `System Development` | Penyelesaian Project Development Software & Uprgade Fitur Penunjang Operational | ✅ Sumber `kinerja_tiket` metrik `selesai_persen` (2026-08-28: satu Fullstack pada Juli 28 tiket ditugaskan, 18 selesai). Konfigurasi `auto` **belum diisi**. | Bisa otomatis sekarang, tinggal dinyalakan. Sepakati dulu targetnya: realisasi historis 40% sampai 100%, jadi target 100 seperti bunyi deskripsinya tak pernah tercapai dan tak membedakan bulan baik dari bulan buruk. |
+| 0.5 | `System Development` | Penyelesaian Project Development Software & Uprgade Fitur Penunjang Operational | ✅ **MENYALA 2026-08-28**: `kinerja_tiket` metrik `selesai_persen`, reduksi `rata_rata`, target **85**, arah naik. Angka pertama (Agustus, `BIP-0205-08-25`): ketuntasan 80% → nilai **94**, status `otomatis`. | Sudah otomatis. Target 85, bukan 100 seperti bunyi deskripsinya: realisasi historis 40% sampai 100%, dan target yang tak pernah tercapai tidak membedakan bulan baik dari bulan buruk. |
 | 0.2 | `Implementasi` | Monitoring Implementasi Sinkronisasi/Review dengan Requester | ❌ Tidak ada log pertemuan di sistem mana pun. Diarahkan ke modul kewajiban [[Microservices - Calendar Service]], yang di produksi 2026-08-28 masih **0 template, 0 periode, 0 pemenuhan**. Catatan lama "stok & penjualan tersedia" adalah salah tempel dari departemen lain. | Belum bisa otomatis. Sesi review dengan pemohon belum tercatat di mana pun, jadi harus ada tempat mencatatnya dulu. |
-| 0.2 | `Customer Satifaction` | Survey Penilaian Software yang sudah diimplementasikan | ✅ Sumber `kinerja_tiket` metrik `csat`. Skalanya **1..5** (`csat.rating` divalidasi 1..5), bukan 1-10 seperti bunyi deskripsi. Konfigurasi `auto` **belum diisi**. | Bisa otomatis sekarang, tapi sepakati dulu bahwa nilai penuh berarti 5, bukan 10. Ratingnya juga masih tipis dan cenderung penuh, jadi belum tajam membedakan orang. |
+| 0.2 | `Customer Satifaction` | Survey Penilaian Software yang sudah diimplementasikan | ✅ **MENYALA 2026-08-28**: `kinerja_tiket` metrik `csat`, `rata_rata`, target **5** (skalanya 1..5, bukan 1-10 seperti bunyi deskripsi). Angka pertama (Agustus): 1 rating atas 4 tiket selesai, cakupan 25% → nilai 100, status **`semi`**. | Sudah otomatis, tapi angkanya belum tajam: yang menilai baru satu orang dan semua rating yang pernah masuk bernilai penuh. Menaikkan kualitas metrik ini soal meminta pemohon menilai tiketnya, bukan soal kode. |
 | 0.1 | `Kaizen` | Ide Improvement | ⚠️ Modul Kaizen SUDAH ADA ([[HRIS - Kaizen (Ide Perbaikan)]]) dan sumber `kaizen_ide_diajukan` sudah di biner prod; `FORM_BUILDER_MODULE_URL` terisi sejak 2026-08-28. Yang kurang: **tak ada program Kaizen hidup** (`has_program:false`, kedua form kaizen prod sudah dihapus). Catatan lama "TIDAK ADA modul Kaizen" sudah tidak berlaku. | Belum bisa dinyalakan. Menunya sudah ada dan sistemnya siap menghitung; yang belum ada adalah program Kaizen yang berjalan untuk dihitung. |
 
 ### IT Infrastructure
@@ -1116,8 +1132,8 @@ Template `IT Support`, 4 metrik.
 | Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
 | 0.4 | `Network` | Optimalisasi Uptime Server & Sistem | ✅ **Satu-satunya metrik departemen ini yang benar-benar ber-`auto`.** Sumber `uptime_sistem` (`GET /kpi/uptime?periode=YYYY-MM`), 2026-08-28: Agustus 99,96% atas 28 dari 31 hari. ⚠️ Konfigurasinya **berubah lagi 2026-08-26** oleh `BIP-0205-08-25` (jejaknya di `kpi_template_audits`): `metrik: downtime` dibuang dan arahnya dibalik ke `naik` dengan `target_per_karyawan` 90, sehingga bentuknya kembali seperti sebelum 7 Agustus. | Bisa otomatis dan memang sudah jalan, **tetapi bentuknya perlu ditinjau ulang**: uptime terhadap target 90 memberi nilai penuh setiap bulan, dan metrik berbobot 0,4 yang selalu 100 tidak mengukur apa pun. Itu persis alasan metriknya dulu dipindah ke `downtime`. |
-| 0.15 | `Customer Satisfaction` | Kepuasan Pelayanan IT Support | ✅ Sumber `kinerja_tiket` metrik `csat`, skala **1..5**. Diukur 2026-08-28: 6 rating pada Agustus, seluruhnya 5. Konfigurasi `auto` **belum diisi**. | Bisa otomatis sekarang, tapi angkanya belum tajam: yang menilai masih sedikit dan semuanya memberi nilai penuh. Nilai penuh berarti 5, bukan 10 seperti bunyi deskripsi. |
-| 0.3 | `Problem Solving` | Penyelesaian E - Ticket sesuai dengan SLA ( Service Level Agreement ) | ✅ Sumber `kinerja_tiket` metrik `ontime` + reduksi `rasio_ambang` (ambang 0). Diukur 2026-08-28: Agustus 10 tiket ditugaskan, 10 selesai, **10 terukur SLA**. Konfigurasi `auto` **belum diisi**. | Bisa otomatis sekarang. Yang perlu diputuskan targetnya: ketepatan waktu bergerak 0% → 7% → 25% → 75% dalam empat bulan, jadi target tetap 80 akan menilai perbaikan nyata sebagai kegagalan. Pakai target bertahap per periode. |
+| 0.15 | `Customer Satisfaction` | Kepuasan Pelayanan IT Support | ✅ **MENYALA 2026-08-28**: `kinerja_tiket` metrik `csat`, `rata_rata`, target **5** (skala 1..5). Angka pertama (Agustus): rata-rata 5,00 dari 6 rating atas 10 tiket selesai, cakupan 60% → nilai 100, status **`semi`**. | Sudah otomatis. Angkanya penuh karena setiap rating yang pernah masuk bernilai 5; yang membuatnya membedakan orang adalah lebih banyak pemohon yang menilai, bukan perubahan rumus. |
+| 0.3 | `Problem Solving` | Penyelesaian E - Ticket sesuai dengan SLA ( Service Level Agreement ) | ✅ **MENYALA 2026-08-28**: `kinerja_tiket` metrik `ontime`, reduksi `rasio_ambang` ambang 0, target **80** dengan `target_per_periode` 60 untuk Agustus dan September. Angka pertama (Agustus): 8 dari 10 tepat waktu (80%) → nilai **100**, status `otomatis`. | Sudah otomatis. Targetnya sengaja bertahap: ketepatan waktu bergerak 0% → 7% → 25% → 80% dalam lima bulan, dan target tetap 80 sejak awal akan menilai perbaikan nyata sebagai kegagalan. |
 | 0.15 | `Kaizen` | Improvement | ⚠️ Sama dengan Kaizen di template Fullstack: modulnya ada, sumbernya di biner prod, `FORM_BUILDER_MODULE_URL` sudah terisi 2026-08-28, tetapi **tak ada program Kaizen hidup** (`has_program:false`). Catatan lama "TIDAK ADA modul Kaizen" sudah tidak berlaku. | Belum bisa dinyalakan sampai ada program Kaizen yang berjalan. |
 
 ### Tech Development Leader
@@ -1126,11 +1142,11 @@ Template `Leader`, 5 metrik.
 
 | Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
-| 0.2 | `Revenue 240M` | **Label produksi kini**: "Menjamin operasional IT tanpa gangguan ( E TICKET INFRA & IT SUPPORT )" | 🟠 Sumber `kinerja_tiket_divisi` metrik `support_selesai_persen`, **live di prod 2026-08-28**. Belum menghasilkan angka: `GET /kpi/space-group` membalas **409** karena 9 space Tech Development belum diisi `kpi_group`. | Tinggal satu langkah pengisian data, bukan pekerjaan kode: tandai tiap space sebagai Dukungan atau Pengembangan lewat Manajemen Tugas > Kelola Space > Ubah > Kelompok KPI, lalu nyalakan metriknya. |
+| 0.2 | `Revenue 240M` | **Label produksi kini**: "Menjamin operasional IT tanpa gangguan ( E TICKET INFRA & IT SUPPORT )" | ✅ **MENYALA 2026-08-28**: `kinerja_tiket_divisi` metrik `support_selesai_persen`, `rata_rata`, target **95**, arah naik. Angka pertama (Agustus): 10 dari 11 tiket support tuntas (90,9%) → nilai **96**, status `otomatis`, cakupan 100%. | Sudah otomatis. Target 95 diambil dari realisasi Juni 100%, Juli 100%, Agustus 90,9%: tiket dukungan hampir selalu ditutup, jadi target yang lebih rendah tak akan pernah bergerak. |
 | 0.1 | `Net income 20%` | Pengendalian anggaran IT | ⛔ **Sengaja tetap manual.** Master anggaran produksi hanya memuat departemen Marketing, dan sumber `varians_anggaran` memanggil `/accounting/anggaran/varians` **tanpa parameter departemen** sehingga mengukur seluruh perusahaan. Memakainya apa adanya menilai Leader IT atas varians anggaran Marketing: angka yang tampak wajar dan menjawab pertanyaan lain. | Belum bisa otomatis, dan itu keputusan sadar. Konsekuensinya template Leader tidak akan pernah otomatis penuh, jadi [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]] tidak membekukan siapa pun di sini. |
-| 0.2 | `Integration System Development di Q4` | **Label produksi kini**: "On-time project delivery rate (%) – proyek IT/development selesai sesuai timeline ( E TICKET SOFTWARE DEV )" | 🟠 Sumber `kinerja_tiket_divisi` metrik `development_ontime`, **live di prod 2026-08-28**, terhalang `kpi_group` yang sama. | Sama dengan baris pertama: isi kelompok KPI space-nya dulu, lalu nyalakan. |
-| 0.1 | `Customer Satifaction` | Average Tingkat Kepuasan User Terhadap Pelayanan Team IT ( Fullstack & Support ) | 🟠 Sumber `kinerja_tiket_divisi` metrik `development_csat`, **live di prod 2026-08-28**, terhalang `kpi_group` yang sama. Skala 1..5. | Sama dengan dua baris di atas. Perhatikan nilai penuh berarti 5, bukan 10. |
-| 0.4 | `Performance Monitoring Team` | KPI Team | Sumber skor_tim + reduksi rata_rata, scope department. Sudah didukung mesin; tinggal isi konfigurasi. | Bisa otomatis sekarang. Sistem tinggal merata-ratakan skor anggota departemen, dan mesinnya sudah siap. |
+| 0.2 | `Integration System Development di Q4` | **Label produksi kini**: "On-time project delivery rate (%) – proyek IT/development selesai sesuai timeline ( E TICKET SOFTWARE DEV )" | ✅ **MENYALA 2026-08-28**: `kinerja_tiket_divisi` metrik `development_ontime`, `rasio_ambang` ambang 0, target **60** dengan `target_per_periode` 30 untuk Agustus dan September. Angka pertama (Agustus): 1 dari 7 tepat waktu (14,3%) → nilai **48**, status `otomatis`. | Sudah otomatis, dan angkanya rendah karena kenyataannya memang rendah: ketepatan waktu tim pengembangan 15,2% (Juni), 28,3% (Juli), 14,3% (Agustus). Target dibuat bertahap supaya perbaikan nyata terbaca, bukan supaya angkanya bagus. |
+| 0.1 | `Customer Satifaction` | Average Tingkat Kepuasan User Terhadap Pelayanan Team IT ( Fullstack & Support ) | ✅ **MENYALA 2026-08-28**: `kinerja_tiket_divisi` metrik `development_csat`, `rata_rata`, target **5** (skala 1..5). Angka pertama (Agustus): 1 rating atas 7 tiket selesai, cakupan 14,3% → nilai 100, status **`semi`**. ⚠️ Labelnya berbunyi "Fullstack & Support" tetapi sumbernya hanya punya `support_csat` **atau** `development_csat`; yang terpasang kelompok development saja, jadi rating IT Support tidak ikut terhitung. | Sudah otomatis dengan satu ketidakcocokan yang disengaja: labelnya menjanjikan dua kelompok sekaligus, dan menyatukannya butuh sub-metrik baru di kode, bukan konfigurasi. Putuskan mana yang benar sebelum angkanya dipakai menilai. |
+| 0.4 | `Performance Monitoring Team` | KPI Team | ✅ Ber-`auto` sejak 2026-08-06: `skor_tim`, `rata_rata`, scope **`team`**, target 70. ⏳ Untuk periode 2026-08 masih dilaporkan `manual` karena `skor_tim` membaca `kpi_score` periode yang SAMA dan belum seorang pun dinilai untuk Agustus. | Sudah otomatis, tetapi angkanya baru muncul setelah anggota tim dinilai lebih dulu. Menilai Leader duluan membekukan snapshot tanpa angka otomatis, dan itu tidak bisa dibatalkan tanpa menimpa penilaian. |
 
 ### Tech Development Supervisor
 
