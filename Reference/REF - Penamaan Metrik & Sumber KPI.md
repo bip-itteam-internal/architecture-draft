@@ -83,6 +83,10 @@ Itu bukan kemungkinan teoretis. `piutang_lewat_14_persen` dan `piutang_lewat_60_
 
 ⚠️ **Yang TIDAK aman adalah mengganti token sumber/metrik katalog** (`kinerja_toko`, `retur_persen`). Token itu tersimpan di `auto.sumber`/`auto.metrik` tiap template, dan menggantinya membuat metrik yang sudah dikonfigurasi gagal hitung dengan pesan "sumber tidak terdaftar". Yang boleh diganti adalah LABELNYA, bukan tokennya.
 
+⚠️ **Satu nama metrik boleh hidup di DUA sumber, dan sejak 2026-08-27 memang begitu.** `retur_persen` ada di `kinerja_toko` (dari mart marketing-analytics) **dan** di `insentif_profit` (dari dokumen retur terbukukan). Nama yang sama disengaja: satuan "persen", formula `rata_rata`, dan target 7 di template berkunci **nama metrik**, sehingga memindahkan sumbernya cukup mengganti satu field tanpa menyentuh yang lain ([bip-erp#1462](https://github.com/bip-itteam-internal/bip-erp/pull/1462)).
+
+Konsekuensinya di layar: kedua opsi akan tampil dengan label yang **sama persis** kalau labelnya hanya berkunci nama metrik. Karena itu ada `METRIK_PER_SUMBER` berkunci `${sumber}|${metrik}` yang menang lebih dulu, dan `infoMetrik(token, sumber?)` menerima sumber sebagai argumen opsional ([erp-frontend#1257](https://github.com/bip-itteam-internal/erp-frontend/pull/1257)). Pemanggil yang tak tahu sumbernya tetap mendapat label lama — tak ada yang mendadak kosong. **Saat menambah metrik yang namanya sudah dipakai sumber lain, entri per-pasangan itu wajib ikut**, kalau tidak pengisi template tak punya cara membedakan mana yang benar selain menebak.
+
 ## Cara memeriksa
 
 1. **Di layar, bukan di editor.** Buka pemilih Sumber data dan pastikan tak ada label yang terpotong dan tak ada opsi tanpa baris kedua.
