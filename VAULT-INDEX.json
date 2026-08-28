@@ -1265,9 +1265,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "18dff33d755785f01f10cf39785bf97e1f5259ab18b770f93288324414ea1b94",
-      "ukuran_kb": 342.2,
-      "ringkasan": "Menjawab: halaman apa saja yang ada di frontend ERP web, siapa yang bisa membukanya, dan kenapa tiap layar berbentuk seperti sekarang. Mencakup HRIS, Finance, Procurement, Task Management, Marketing Analytics, Portal Saya, serta struktur sidebar dan gerbang rute di proxy. Juga menjawab: siapa yang melihat tombol tambah dan hapus di halaman Jadwal, dan kenapa uji gerbang peran wajib memakai predikat aslinya lewat importActual, bukan tiruan.",
+      "hash": "d935321e9e6acc3de742b95bbd023de4109244c007de8087e39d69ccecdfb330",
+      "ukuran_kb": 344.8,
+      "ringkasan": "Menjawab: halaman apa saja yang ada di frontend ERP web, siapa yang bisa membukanya, dan kenapa tiap layar berbentuk seperti sekarang. Mencakup HRIS, Finance, Procurement, Task Management, Marketing Analytics, Portal Saya, serta struktur sidebar dan gerbang rute di proxy. Juga menjawab: siapa yang melihat tombol tambah dan hapus di halaman Jadwal, kenapa uji gerbang peran wajib memakai predikat aslinya lewat importActual bukan tiruan, dan di mana terlihat siapa yang terakhir mengubah penetapan gaji seorang karyawan.",
       "kata_kunci": [
         "erp-frontend",
         "web ERP",
@@ -1280,7 +1280,10 @@
         "roster",
         "gerbang peran frontend",
         "tabel HRIS",
-        "Portal Saya"
+        "Portal Saya",
+        "jejak perubahan",
+        "diubah oleh",
+        "Gaji Karyawan"
       ]
     },
     {
@@ -2404,9 +2407,9 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "f31d2ab93131eec133dc3112b711726f678c87b55ab7207b98918ab4551c14b3",
-      "ukuran_kb": 50.8,
-      "ringkasan": "Menjawab: bagaimana gaji karyawan disiapkan dan diterbitkan di bip-erp, mulai dari setup komponen gaji, konfigurasi BPJS dan PPh21 metode TER, penetapan gaji per karyawan, sampai payroll run (kalkulasi, approve, publish slip) beserta THR dan slip PDF. Juga menjawab: endpoint apa saja yang tersedia, bagaimana potongan kehadiran (telat, izin, mangkir, uang makan) dihitung, bagaimana satu karyawan bisa digaji atas nama badan usaha berbeda untuk kop slip, serta di mana sumber aturan bisnisnya berada (BUSINESS_LOGIC_IMPLEMENTATION.md di repo mobile, bukan di vault). Memuat pula model data payroll_db, kondisi pemakaian nyata di produksi, dan batas scope (tidak mencakup pembayaran/transfer serta belum ter-scope multi-tenant).",
+      "hash": "453d87127ad6ed9730f5341230c2feed0aaa5bbc810f2f7fbf5f27144239466f",
+      "ukuran_kb": 52.2,
+      "ringkasan": "Menjawab: bagaimana gaji karyawan disiapkan dan diterbitkan di bip-erp, mulai dari setup komponen gaji, konfigurasi BPJS dan PPh21 metode TER, penetapan gaji per karyawan, sampai payroll run (kalkulasi, approve, publish slip) beserta THR dan slip PDF. Juga menjawab: endpoint apa saja yang tersedia, bagaimana potongan kehadiran (telat, izin, mangkir, uang makan) dihitung, bagaimana satu karyawan bisa digaji atas nama badan usaha berbeda untuk kop slip, di mana sumber aturan bisnisnya berada (BUSINESS_LOGIC_IMPLEMENTATION.md di repo mobile, bukan di vault), serta siapa yang terakhir mengubah penetapan gaji dan kenapa riwayat perubahan sebelumnya tidak tersimpan di mana pun. Memuat pula model data payroll_db, kondisi pemakaian nyata di produksi, dan batas scope (tidak mencakup pembayaran/transfer serta belum ter-scope multi-tenant).",
       "kata_kunci": [
         "payroll",
         "penggajian",
@@ -2417,7 +2420,10 @@
         "PPh21 TER",
         "PTKP",
         "potongan kehadiran",
-        "THR"
+        "THR",
+        "updated_by",
+        "jejak perubahan",
+        "audit trail"
       ]
     },
     {
