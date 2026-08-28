@@ -35,6 +35,57 @@ Klaim "0 kode" pada dua baris di atas diverifikasi dengan `git grep` berbatas ka
 - **Menyimpan rancangan kapabilitas prediktif**, karena belum ada dok domain yang memilikinya.
 - **Di luar lingkup**: cara kerja rinci tiap kapabilitas generatif. Itu tetap milik dokumennya masing-masing, dan menyalinnya ke sini akan melahirkan sumber kebenaran kedua yang menyimpang diam-diam.
 
+## Alur Sistem
+
+Alur di bawah adalah yang **sudah berjalan hari ini**, kecuali satu kotak yang ditandai belum ada. Kapabilitas prediktif pertama menyisip di situ, bukan menggantikan apa pun.
+
+```mermaid
+flowchart TD
+    MP["Marketplace<br/>TikTok, Shopee, Lazada"]
+    INT["integration-service"]
+    IDB[("integration_db<br/>transaction_orders 490.287<br/>tt_shop_video_performances 107.769")]
+    MA["marketing-analytics<br/>penjadwal internal<br/>tiap 48 jam, 03.00 WIB<br/>jendela resync 14 hari"]
+    MDB[("marketing_analytics_db<br/>mart_profit_attribution 839.147<br/>mart_video_performance 126.166")]
+    ALERT["Lapisan peringatan dini<br/>BELUM ADA, diusulkan ADR 0058"]
+    GW["API Gateway<br/>prefix modul dipotong"]
+    FE["erp-frontend"]
+    ICC["ICC pemegang toko"]
+
+    MP --> INT
+    INT --> IDB
+    IDB -.->|baca-saja, tiga lapis penjaga| MA
+    MP -.->|panggilan API langsung| MA
+    MA --> MDB
+    MDB --> ALERT
+    ALERT --> GW
+    MDB --> GW
+    GW --> FE
+    FE --> ICC
+```
+
+### Enam job yang membangun mart
+
+| Job | Menghasilkan | Baris di produksi 2026-08-28 |
+|---|---|---|
+| `sync-profit-attribution` | `mart_profit_attribution` | 839.147 |
+| `sync-video-performance` | `mart_video_performance` | 126.166 |
+| `sync-ad-creative-link` | `mart_ad_creative_link` | 7.823 |
+| `sync-live-sessions` | `mart_live_sessions` | 5.321 |
+| `sync-ad-group` | `mart_ad_group` | 1.335 |
+| `sync-shop-performance` | `tt_shop_performance_daily` | 1.198 |
+
+Sumbernya campuran: sebagian membaca `integration_db`, sebagian memanggil API TikTok langsung. Seluruhnya dapat dipicu manual lewat `POST /jobs/:name/trigger` di samping jadwal otomatis.
+
+### Empat sifat alur ini yang menentukan rancangan di atasnya
+
+**Penjadwalnya di dalam service, bukan cron server.** Sebelum ada penjadwal, sync hanya berjalan bila seseorang ingat memicunya, sehingga halaman menampilkan angka dari terakhir kali ada yang ingat lalu makin usang tanpa satu pun tanda. Konsekuensi yang masih hidup: **kunci per-job hanya berlaku dalam satu proses, jadi replika service ini wajib tetap 1.** Menaikkannya membuat tiap replika punya penjadwalnya sendiri dan semuanya menembak TikTok bersamaan.
+
+**Pembacaan `integration_db` dijaga tiga lapis**, dan itu bukan kehati-hatian berlebih. Menulis ke database milik service lain **berhasil secara teknis**, sehingga pelanggarannya tidak akan pernah tampak sebagai test merah biasa; kerusakannya baru terlihat sebagai data korup di repo yang berbeda. Lapisnya: tipe yang tidak mengekspos satu pun metode penulisan, test yang memindai AST seluruh package, dan read preference `secondaryPreferred`.
+
+**Batas hari memakai WIB, bukan UTC,** dan bedanya tujuh jam penuh. Ini pernah nyata dan mahal: terukur di produksi 2026-08-07, sejak 10 Juni sebanyak Rp 2,48 miliar omzet (20.328 order-item) tercatat di hari yang salah, dan 5,54% omzet Juli meleset per sel hari-toko. Penyebabnya satu nama fungsi yang dipakai untuk dua makna berbeda. Karena itu definisi "video-hari" pada fitur baru wajib dipatok eksplisit, bukan diwariskan diam-diam.
+
+**Gateway memotong prefix modul** sebelum meneruskan, sehingga rute akar modul didaftarkan di `/`, bukan di `/marketing-analytics`. Unit test tetap hijau bila keliru, karena ia memanggil path lokal langsung ke Fiber.
+
 ## Kapabilitas Prediktif Pertama: Peringatan Dini Belanja Iklan Video
 
 ### Masalah yang dipecahkan
@@ -74,10 +125,26 @@ Kolom di bawah pernah, atau berpotensi, dijumlahkan secara keliru sehingga mengh
 | `revenue` tingkat video | Bukan hasil atribusi sendiri | Berasal dari laporan marketplace, karena nol dari 433.641 pesanan menyimpan penanda campaign, ad, maupun video. **Pendapatan nol tidak sama dengan pemborosan terbukti**; bisa berarti penjualannya tercatat di tempat lain, atau datanya memang tidak ada (lihat di bawah). |
 | `retur` | Komponen sejajar | `ads_cost` tidak pernah dialokasikan ulang saat retur terjadi, jadi ia sudah menanggung retur sejak awal. |
 | `gross_profit` | Hasil | Sudah bersih dari HPP, fee marketplace, dan seluruh `ads_cost`. |
+| `spend_vsa` dan `spend_gmv_max` | Dua basis atribusi berbeda | **Jangan dijumlahkan begitu saja dalam satu kolom.** Yang pertama aktual per iklan, yang kedua estimasi prorata per campaign. Lihat di bawah. |
 
 Konsekuensi langsungnya untuk kapabilitas ini: angka Rp 1,15 miliar adalah **ukuran ruang keputusan**, bukan kerugian yang sudah pasti, dan wajib dikonfirmasi ke pemilik jalur atribusi sebelum dipakai memindahkan anggaran.
 
 ⛔ **Sebagian pendapatan nol itu memang tidak ada datanya, dan pipeline-nya mencatat sendiri.** Pada 2026-08-28 job `sync-video-performance` menuliskan catatan: *"14487 video ber-spend tanpa baris organik (metrik nol = tak ada data)"*. Artinya metrik nol pada baris-baris itu berarti **ketiadaan data**, bukan penjualan nol, dan keduanya tidak dapat dibedakan dari kolomnya saja. Setiap perhitungan yang memperlakukan nol sebagai "iklan gagal menjual" akan melebihkan angkanya sebesar porsi ini. Memisahkan keduanya adalah prasyarat, bukan penyempurnaan.
+
+### Belanja per video punya tiga sumber, dan kekuatan buktinya berbeda
+
+`video_source.go` menetapkan empat nilai untuk kolom `sumber`, dan komentarnya menyatakan terus terang bahwa basis atribusinya berbeda sehingga angkanya tidak boleh dijumlahkan begitu saja dalam satu kolom:
+
+| Nilai `sumber` | Basis | Sifat |
+|---|---|---|
+| `organik` | tidak ada spend | - |
+| `vsa` | per `ad_id` | **aktual** |
+| `gmv_max` | per campaign, diprorata ke video | **estimasi** |
+| `campuran` | punya keduanya | 1.103 video, 23,1% dari VSA |
+
+⛔ **Ini mengikat langsung rancangan peringatan.** Menandai sebuah video sebagai boros ketika belanjanya berasal dari `gmv_max` berarti menuduh video tertentu atas angka yang sebenarnya taksiran di tingkat campaign. Bukti pada `vsa` jauh lebih kuat daripada pada `gmv_max`, dan peringatan yang memperlakukan keduanya sama akan salah sasaran pada sebagian kasus.
+
+Kegagalannya berbentuk yang paling sulit disadari: orang menutup iklan yang sebenarnya bekerja, lalu tidak pernah tahu karena yang hilang adalah penjualan yang tak jadi terjadi. Karena itu `sumber` wajib ikut ditampilkan di daftar peringatan, dan urutan prioritasnya tidak boleh mencampur kedua basis itu tanpa membedakannya.
 
 ### Apa yang tidak dijanjikan
 
@@ -122,6 +189,7 @@ Kepemilikan toko dibaca dari pemetaan ICC yang sudah ada, bukan ditebak dari nam
 - **Bentuk penyimpanan dan kontrak API**: peringatan dihitung saat dibaca atau disimpan sebagai koleksi tersendiri, dan endpoint apa yang menyajikannya. Belum diputuskan sama sekali.
 - **Batas hari WIB**: definisi operasional "video-hari" belum dipatok. Mart ini memakai konvensi hari WIB, dan mencampuradukkan tanggal dengan instant adalah kelas kesalahan yang sudah pernah menggigit di modul yang sama.
 - **Aturan berhenti memberi peringatan**: video yang sama akan memenuhi syarat lagi pada siklus berikutnya. Belum ada status sudah-ditindak, belum ada batas berapa kali sebuah video diperingatkan.
+- **Perlakuan terhadap `gmv_max`**: apakah video yang belanjanya hanya berasal dari prorata campaign ikut diperingatkan, diperingatkan dengan penanda keyakinan lebih rendah, atau dikeluarkan sama sekali dari daftar. Belum diputuskan, dan pilihannya mengubah siapa yang muncul di layar.
 - **Seluruh sisi frontend**: halaman mana yang menampungnya, komponen apa yang dipakai, dan kunci i18n `id` serta `en` yang diwajibkan [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]] untuk tiap teks baru yang tampil ke pengguna.
 - **Runtime bila model terlatih ternyata diperlukan**: [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] §2 menetapkan tempatnya, yaitu service pemilik data, dan itu memadai untuk aturan statistik di Go. Untuk model terlatih belum terjawab, karena marketing-analytics adalah Go dan tidak ada service Python di bip-erp.
 - **Isi `accurate_daily_returns`** (7.779 baris) belum dibuka, dan dapat mengubah putusan pada kandidat retur.

@@ -86,6 +86,7 @@ Empat hal yang wajib diputuskan di dalam task ini, dan tidak satu pun sudah terj
 - **Batas hari WIB.** Definisi operasional "video-hari" harus dipatok eksplisit. Mart ini memakai konvensi hari WIB, dan mencampuradukkan tanggal dengan instant sudah pernah menggigit di modul yang sama.
 - **Aturan berhenti memberi peringatan.** Video yang sama akan memenuhi syarat lagi pada siklus berikutnya. Perlu status sudah-ditindak, atau batas berapa kali sebuah video diperingatkan, kalau tidak daftarnya berubah jadi kebisingan yang diabaikan orang.
 - **Tampilan untuk sumber basi.** Bila job sync-nya gagal (lihat T4b), layar wajib mengatakannya, bukan menampilkan daftar yang terlihat normal.
+- **Perlakuan terhadap belanja `gmv_max`.** Belanja per video punya tiga sumber dengan kekuatan bukti berbeda: `vsa` aktual per iklan, `gmv_max` estimasi prorata per campaign. Menandai video boros atas dasar angka prorata berarti menuduh video tertentu atas taksiran tingkat campaign, dan salahnya berbentuk paling sulit disadari, yaitu iklan yang sebenarnya bekerja ikut ditutup.
 
 Dependensi: **T1, T2, T4 lulus**. T4b sebaiknya sudah beres, kalau tidak hasilnya tidak dapat dipercaya.
 

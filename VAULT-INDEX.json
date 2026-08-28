@@ -1512,20 +1512,20 @@
         "Sales - Marketing Analytics (Audit Ketersediaan Data)",
         "ADR - 0008 Profit Engine Join via item_group_id"
       ],
-      "hash": "40e7535ac4a00f50554fc60f857aafecddd641f015def8d8140dcb1a3f092481",
-      "ukuran_kb": 13.6,
-      "ringkasan": "Menjawab: kapabilitas AI apa saja yang dimiliki ERP Bharata, mana yang benar-benar berjalan di produksi dan mana yang masih konsep tanpa satu baris kode, serta apa beda kapabilitas generatif (video iklan, sentimen, OCR) dari kapabilitas prediktif yang menuntut label historis. Menjawab pula seberapa cepat peringatan belanja iklan dapat dijanjikan, karena mart-nya disegarkan tiap 48 jam oleh konstanta penjadwal yang tidak dapat diubah lewat env, dan apa yang harus terjadi ketika job sync sumbernya sedang basi. Memuat aturan pemakaian kolom laba yang mudah salah dijumlahkan, termasuk kenapa iklan_sia_sia adalah himpunan bagian dari ads_cost dan kenapa metrik video bernilai nol bisa berarti datanya tidak ada alih-alih penjualannya nol.",
+      "hash": "a605caefbb6ea36070e038625b382b9a4cad02c933e7a377470edcacae01daed",
+      "ukuran_kb": 18.4,
+      "ringkasan": "Menjawab: kapabilitas AI apa saja yang dimiliki ERP Bharata, mana yang berjalan di produksi dan mana yang masih konsep tanpa kode, serta bagaimana alur sistemnya dari marketplace lewat integration-service dan enam job sync marketing-analytics sampai ke layar ICC pemegang toko (lengkap dengan diagram). Menjawab pula seberapa cepat peringatan belanja iklan dapat dijanjikan, karena mart-nya disegarkan tiap 48 jam oleh konstanta penjadwal yang tidak dapat diubah lewat env, kenapa replika service wajib tetap satu, dan kenapa batas hari harus WIB bukan UTC. Memuat aturan pemakaian kolom laba yang mudah salah dijumlahkan, termasuk kenapa iklan_sia_sia adalah himpunan bagian dari ads_cost, kenapa metrik video bernilai nol bisa berarti datanya tidak ada, dan kenapa belanja vsa yang aktual tidak boleh disamakan dengan gmv_max yang prorata.",
       "kata_kunci": [
         "AI",
         "artificial intelligence",
         "machine learning",
         "ML",
-        "kapabilitas AI",
+        "alur sistem",
         "peringatan dini iklan",
         "belanja iklan",
-        "prediktif",
-        "generatif",
-        "kesegaran data"
+        "job sync",
+        "kesegaran data",
+        "spend vsa gmv max"
       ]
     },
     {
@@ -10106,9 +10106,9 @@
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
         "CORE - Kapabilitas AI dan Machine Learning"
       ],
-      "hash": "0879cbc296444fabccd3bb7d07b0aff6d9e173833a1a64a8ddf807d725156670",
-      "ukuran_kb": 9.1,
-      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mewujudkan kapabilitas AI prediktif pertama, mana yang berstatus gerbang dan wajib lulus lebih dulu, mana yang berupa prasyarat pipeline (memulihkan job sync yang gagal berhari-hari dan memutuskan kesegaran versus interval 48 jam), dan bagaimana dependensi antar-task-nya. Menjawab juga empat hal yang wajib diputuskan saat membangun lapisan peringatan (bentuk penyimpanan dan kontrak API, batas hari WIB, aturan berhenti memberi peringatan, tampilan untuk sumber basi), kewajiban i18n dua bahasa di sisi frontend, serta kandidat kedua berupa ramalan permintaan per SKU beserta alasan kenapa tidak dikerjakan paralel.",
+      "hash": "557e86f2bc1420ab435cc9d006be5b4ec84a43159b6415f9aa0377f2934075fb",
+      "ukuran_kb": 9.5,
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mewujudkan kapabilitas AI prediktif pertama, mana yang berstatus gerbang dan wajib lulus lebih dulu, mana yang berupa prasyarat pipeline (memulihkan job sync yang gagal berhari-hari dan memutuskan kesegaran versus interval 48 jam), dan bagaimana dependensi antar-task-nya. Menjawab juga lima hal yang wajib diputuskan saat membangun lapisan peringatan, yaitu bentuk penyimpanan dan kontrak API, batas hari WIB, aturan berhenti memberi peringatan, tampilan untuk sumber basi, dan perlakuan terhadap belanja gmv_max yang hanya estimasi. Menyebut pula kewajiban i18n dua bahasa di sisi frontend dan kandidat kedua berupa ramalan permintaan per SKU.",
       "kata_kunci": [
         "daftar task",
         "AI",
