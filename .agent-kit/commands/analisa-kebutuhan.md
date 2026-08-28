@@ -153,10 +153,14 @@ per berkas. Sengaja tidak di dalam ADR: ADR adalah keputusan, bukan papan kerja.
 
 ## 6. Regenerasi indeks. WAJIB.
 
-Jalankan `/index-vault`. Retrieval vault berjalan lewat `VAULT-INDEX.json`, bukan RAG, jadi dok
-yang belum terindeks **tidak terlihat sama sekali**, baik oleh `/ask` dan `/start-task` maupun
-oleh manajemen lewat MCP. Ini sengaja berbeda dari `/ask` yang hanya menyarankan `/sync-docs`:
-di sini dok barunya tidak berguna sampai terindeks.
+Retrieval vault berjalan lewat `VAULT-INDEX.json`, bukan RAG, jadi dok yang belum terindeks
+**tidak terlihat sama sekali**, baik oleh `/ask` dan `/start-task` maupun oleh manajemen lewat
+MCP. Ini sengaja berbeda dari `/ask` yang hanya menyarankan `/sync-docs`: di sini dok barunya
+tidak berguna sampai terindeks.
+
+⚠️ **Jalankan `/index-vault` SEKALI, pada urutannya di langkah 7** (sesudah merge, sebelum
+push), bukan di sini. Merge bisa membawa dok orang lain, jadi indeks yang dibuat sebelum merge
+sudah basi lagi begitu merge selesai.
 
 ## 7. Commit, merge, push
 
