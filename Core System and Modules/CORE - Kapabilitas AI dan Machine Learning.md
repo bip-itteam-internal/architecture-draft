@@ -43,6 +43,18 @@ Belanja iklan setara 61% laba kotor, sementara siklus koreksinya bulanan karena 
 
 Yang dibutuhkan bukan ramalan yang lebih tepat, melainkan **jarak yang lebih pendek antara uang keluar dan orang yang berwenang menghentikannya**.
 
+### Batas kesegaran, dan ini mengikat janji fiturnya
+
+⛔ **Mart ini disegarkan tiap 48 jam, bukan harian.** `intervalPenjadwalBawaan = 48 * time.Hour` adalah konstanta di `penjadwal.go` dan **tidak dapat diubah lewat env**; env hanya mengatur aktif atau tidak, jam WIB, dan lebar jendela resync. Terkonfirmasi di produksi 2026-08-28, cursor penjadwalnya berbunyi "run berikutnya 2026-08-29 03:00 WIB, tiap 48h0m0s, jendela 14 hari".
+
+Konsekuensinya wajib dinyatakan terus terang ke siapa pun yang membaca fitur ini: peringatan tidak dapat datang dalam hitungan jam, dan tidak dapat harian. Yang dapat dijanjikan adalah **dari bulanan menjadi paling cepat dua harian**, ditambah jeda pelaporan marketplace itu sendiri. Mempercepatnya berarti mengubah interval penjadwal, dan itu keputusan tersendiri dengan ongkos kuota API yang belum dinilai.
+
+### Sumber yang basi harus terlihat, bukan terlewat diam-diam
+
+Pada 2026-08-28, dua job sync sedang gagal berhari-hari: `sync-shop-performance` terakhir sukses **2026-08-20** dan `sync-live-sessions` **2026-08-19**, keduanya karena sebagian toko dinonaktifkan dan sebagian kredensialnya kedaluwarsa (11 dan 13 toko).
+
+Fitur peringatan yang dibangun di atas pipeline seperti itu akan mewarisi kebutaannya tanpa satu pun tanda: daftar peringatannya tetap terisi, tampak wajar, dan diam-diam tidak mencakup toko yang datanya tidak masuk. Karena itu keadaan sumber basi wajib punya tampilannya sendiri di layar peringatan, bukan disembunyikan di balik daftar yang terlihat normal.
+
 ### Bentuk keluarannya
 
 Daftar berurutan berisi video yang belanjanya berjalan tanpa penjualan, ditujukan ke penanggung jawab tokonya, dengan tautan langsung ke tempat tindakannya diambil. **Bukan** pemotongan anggaran otomatis, sesuai ADR 0058 §5.
@@ -59,11 +71,13 @@ Kolom di bawah pernah, atau berpotensi, dijumlahkan secara keliru sehingga mengh
 |---|---|---|
 | `ads_cost` | Komponen sejajar | **Sudah** dikurangkan seluruhnya dari `gross_profit`. Jangan dikurangkan lagi. |
 | `iklan_sia_sia` | **Himpunan bagian** dari `ads_cost` | Porsi belanja yang sudah terbayar dan ternyata sia-sia, **bukan** uang baru yang hilang. Jangan dijumlahkan ke laba, jangan dijumlahkan dengan beban packing (itu uang fisik tambahan, ini bukan), dan **jangan di-rename** menjadi kerugian iklan. Namanya adalah pengamannya. |
-| `revenue` tingkat video | Bukan hasil atribusi sendiri | Berasal dari laporan marketplace, karena nol dari 433.641 pesanan menyimpan penanda campaign, ad, maupun video. **Pendapatan nol tidak sama dengan pemborosan terbukti**; bisa berarti penjualannya tercatat di tempat lain. |
+| `revenue` tingkat video | Bukan hasil atribusi sendiri | Berasal dari laporan marketplace, karena nol dari 433.641 pesanan menyimpan penanda campaign, ad, maupun video. **Pendapatan nol tidak sama dengan pemborosan terbukti**; bisa berarti penjualannya tercatat di tempat lain, atau datanya memang tidak ada (lihat di bawah). |
 | `retur` | Komponen sejajar | `ads_cost` tidak pernah dialokasikan ulang saat retur terjadi, jadi ia sudah menanggung retur sejak awal. |
 | `gross_profit` | Hasil | Sudah bersih dari HPP, fee marketplace, dan seluruh `ads_cost`. |
 
 Konsekuensi langsungnya untuk kapabilitas ini: angka Rp 1,15 miliar adalah **ukuran ruang keputusan**, bukan kerugian yang sudah pasti, dan wajib dikonfirmasi ke pemilik jalur atribusi sebelum dipakai memindahkan anggaran.
+
+⛔ **Sebagian pendapatan nol itu memang tidak ada datanya, dan pipeline-nya mencatat sendiri.** Pada 2026-08-28 job `sync-video-performance` menuliskan catatan: *"14487 video ber-spend tanpa baris organik (metrik nol = tak ada data)"*. Artinya metrik nol pada baris-baris itu berarti **ketiadaan data**, bukan penjualan nol, dan keduanya tidak dapat dibedakan dari kolomnya saja. Setiap perhitungan yang memperlakukan nol sebagai "iklan gagal menjual" akan melebihkan angkanya sebesar porsi ini. Memisahkan keduanya adalah prasyarat, bukan penyempurnaan.
 
 ### Apa yang tidak dijanjikan
 
@@ -80,7 +94,9 @@ Tidak ada ramalan lintas musim. Riwayat pesanan yang efektif hanya Januari sampa
 - **Pain point**: salah alokasi baru terlihat setelah bulannya lewat, dan uangnya tidak dapat ditarik kembali.
 - **Aksi utama**: membuka daftar peringatan, memeriksa videonya, lalu menurunkan atau menghentikan anggarannya sendiri.
 
-Kepemilikan toko dibaca dari pemetaan ICC yang sudah ada, bukan ditebak dari nama toko. Dua kenyataan yang membentuknya: **satu toko dapat dipegang lebih dari satu orang** (terukur di produksi 2026-07-31), dan **cakupannya tidak pernah penuh** (terukur 1 sampai 12 Agustus 2026, 37 dari 38 toko punya penanggung jawab). Keadaan belum termapping karena itu wajib punya tampilannya sendiri yang tidak dapat disalahbaca, bukan didiamkan.
+Kepemilikan toko dibaca dari pemetaan ICC yang sudah ada, bukan ditebak dari nama toko. Dua kenyataan yang membentuknya: **satu toko dapat dipegang lebih dari satu orang** (terukur di produksi 2026-07-31), dan **cakupannya tidak pernah penuh**. Keadaan belum termapping karena itu wajib punya tampilannya sendiri yang tidak dapat disalahbaca, bukan didiamkan.
+
+⚠️ Angka cakupannya bergerak, jadi jangan disalin dari komentar kode. Komentar di `penanggung_jawab.go` menyebut 37 dari 38 toko (terukur 1 sampai 12 Agustus 2026), sedangkan catatan job di produksi pada 2026-08-28 menyebut **55 toko dari dua sumber** (`icc_account_mappings` dan `team_shops`). Toko di luar itu berbunyi "belum ditetapkan" sampai mapping-nya dilengkapi lewat ICC Management atau Teams.
 
 ## Konsumen Data
 
@@ -94,13 +110,20 @@ Kepemilikan toko dibaca dari pemetaan ICC yang sudah ada, bukan ditebak dari nam
 - **Katalog kecil.** 86 master SKU, 34 di antaranya punya riwayat memadai. Menguntungkan untuk model statistik per SKU, sekaligus menutup pintu bagi pendekatan yang menuntut data besar.
 - **Atribusi tingkat video bukan milik kita.** Bergantung laporan marketplace, sehingga perubahan cara marketplace melaporkannya berpindah langsung ke keluaran model tanpa perantara.
 - **Menumpang service yang sudah ada berarti ikut memikul jadwal deploy-nya**, dan cakupan test harus menjaga dua hal sekaligus.
+- **Kesegaran terkunci di 48 jam** oleh konstanta penjadwal, sehingga janji fiturnya terbatas pada dua harian, bukan harian apalagi per jam.
+- **Sebagian job sync sedang gagal berhari-hari**, dan kegagalannya tidak berbunyi di layar mana pun. Fitur baru di atasnya mewarisi kebutaan itu bila tidak sengaja ditampilkan.
 
 ## Belum Diputuskan (TBD)
 
 - **Kunci RBAC** yang menggerbangi daftar peringatan. Belum diverifikasi ke kode.
 - **Jalur pemberitahuan**: lewat inbox atau cukup tampil di layar. Bila lewat inbox, kategori barunya menuntut marketing-analytics dan notification-service naik bersama, dan kategori yang salah gagal senyap.
-- **Frekuensi**: harian diasumsikan, per jam belum dinilai.
+- **Frekuensi**: mengikuti penjadwal 48 jam. Apakah interval itu dipercepat demi fitur ini belum diputuskan, dan ongkos kuota API-nya belum dinilai.
 - **Ambang belanja hari pertama** yang memicu peringatan. Wajib dipasang dari sebaran nyata, tidak boleh ditulis tangan.
+- **Bentuk penyimpanan dan kontrak API**: peringatan dihitung saat dibaca atau disimpan sebagai koleksi tersendiri, dan endpoint apa yang menyajikannya. Belum diputuskan sama sekali.
+- **Batas hari WIB**: definisi operasional "video-hari" belum dipatok. Mart ini memakai konvensi hari WIB, dan mencampuradukkan tanggal dengan instant adalah kelas kesalahan yang sudah pernah menggigit di modul yang sama.
+- **Aturan berhenti memberi peringatan**: video yang sama akan memenuhi syarat lagi pada siklus berikutnya. Belum ada status sudah-ditindak, belum ada batas berapa kali sebuah video diperingatkan.
+- **Seluruh sisi frontend**: halaman mana yang menampungnya, komponen apa yang dipakai, dan kunci i18n `id` serta `en` yang diwajibkan [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]] untuk tiap teks baru yang tampil ke pengguna.
+- **Runtime bila model terlatih ternyata diperlukan**: [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] §2 menetapkan tempatnya, yaitu service pemilik data, dan itu memadai untuk aturan statistik di Go. Untuk model terlatih belum terjawab, karena marketing-analytics adalah Go dan tidak ada service Python di bip-erp.
 - **Isi `accurate_daily_returns`** (7.779 baris) belum dibuka, dan dapat mengubah putusan pada kandidat retur.
 - **Penurunan tajam Maret 2026** belum dipastikan kenyataan bisnis atau lubang sinkronisasi. Bila lubang data, setiap model akan tersandung di titik yang sama.
 

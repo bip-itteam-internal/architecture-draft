@@ -60,6 +60,19 @@ Yang gugur, gugur karena kekurangan contoh untuk dipelajari, bukan karena kekura
 
 `transaction_orders` memuat tanggal sejak 2023, dan itu menyesatkan. Sebarannya: 2023 satu baris, 2024 tiga baris, 2025 sebanyak 2.352, dan **2026 sebanyak 487.932**. Riwayat efektifnya Januari sampai Agustus 2026, dan baru padat sejak Mei. Konsekuensinya keras: **tidak ada satu pun siklus tahunan yang pernah terlihat data ini**, sehingga model apa pun yang dijanjikan mengantisipasi Ramadan, Lebaran, atau Harbolnas sedang menebak.
 
+### Pipeline yang menyuplainya menyegarkan diri tiap 48 jam, dan sebagian jobnya sedang gagal
+
+Dua kenyataan yang membatasi apa yang boleh dijanjikan, keduanya terkonfirmasi di produksi 2026-08-28:
+
+1. **Interval penjadwal 48 jam dan terkunci di kode**, bukan konfigurasi. Karena itu peringatan apa pun yang dibangun di atasnya tidak dapat datang harian, apalagi per jam. Yang dapat dijanjikan adalah dari bulanan menjadi paling cepat dua harian.
+2. **Job `sync-shop-performance` terakhir sukses 2026-08-20 dan `sync-live-sessions` 2026-08-19**, karena sebagian toko dinonaktifkan dan sebagian kredensialnya kedaluwarsa. Kegagalannya tidak berbunyi di layar mana pun.
+
+Keduanya tidak membatalkan keputusan ini, tetapi mengikat janji yang boleh dibuat atas namanya, dan itulah alasan keduanya dicatat di sini alih-alih ditemukan belakangan oleh orang yang mengimplementasikan.
+
+### Nol pada metrik video bisa berarti tidak ada datanya
+
+Job `sync-video-performance` mencatat sendiri pada 2026-08-28: *"14487 video ber-spend tanpa baris organik (metrik nol = tak ada data)"*. Jadi nol pada kolom itu memuat dua makna yang tidak dapat dibedakan dari kolomnya saja, yaitu tidak ada penjualan dan tidak ada datanya. Angka Rp 1,15 miliar di atas karena itu adalah batas atas, dan memisahkan kedua makna itu menjadi prasyarat, bukan penyempurnaan.
+
 ### Modul ini sudah pernah memindahkan uang atas dasar angka karangan
 
 `services/marketing-analytics/kurva_alokasi.go` mencatat bahwa layar simulasi alokasi belanja pernah memakai kurva dengan parameter yang ditulis tangan agar grafiknya berbentuk bagus, lengkap dengan keterangan bahwa kurvanya dipasang dari 12 bulan realisasi, padahal tidak satu pun parameternya ada di data mana pun. Tombol optimalkan otomatis di sebelahnya memindahkan anggaran puluhan juta rupiah. Pola yang sama terjadi pada ambang 18% yang dibantah sebaran nyata 4,5% sampai 38,8%, dan ambang ROAS 3,2 yang beredar sebagai bawaan kode.
@@ -125,6 +138,8 @@ Ditolak agar tidak diusulkan berulang tanpa data baru: **prediksi retur** (412 l
 - **Pemberitahuan menuntut dua container naik bersama.** Bila peringatan dini dikirim lewat inbox, kategori inbox barunya hidup di daftar-izin `shared-library`, dan service yang tidak ikut di-rebuild memegang salinan lama. Gagalnya senyap: fiturnya tampak berjalan penuh, notifikasinya tidak pernah tiba. Marketing-analytics dan notification-service karena itu selalu dinaikkan bersama, lalu satu notifikasi sungguhan dipicu sebagai bukti.
 - **Menumpang service yang ada berarti ikut memikul jadwal deploy-nya.** Perubahan pada marketing-analytics kini berpotensi menyentuh dua hal sekaligus, sehingga cakupan test harus menjaga keduanya.
 - **Tidak ada perubahan kontrak API sampai rancangannya matang**, jadi belum ada urutan deploy backend sebelum frontend yang perlu diikuti pada tahap ini.
+- **Janji kecepatannya terbatas pada dua harian**, mengikuti interval penjadwal yang terkunci di kode. Menjanjikan harian atau per jam atas nama keputusan ini adalah salah, dan mempercepatnya adalah keputusan tersendiri dengan ongkos kuota API yang belum dinilai.
+- **Keputusan §2 menetapkan TEMPAT model, bukan runtime-nya.** Untuk aturan statistik, service pemilik data yang berbahasa Go sudah memadai. Bila gerbang T4 nanti menyimpulkan model terlatih memang diperlukan, runtime-nya belum terjawab karena tidak ada service Python di bip-erp, dan itu akan menuntut keputusan tambahan. Dicatat terbuka di sini alih-alih dijawab sekarang, karena menjawabnya sebelum tahu modelnya perlu atau tidak berarti menebak.
 - **Keputusan ini berdiri di atas pengukuran satu titik waktu.** Dua lubang diketahui dan sengaja dicatat: isi `accurate_daily_returns` sebanyak 7.779 baris belum dibuka dan dapat mengubah putusan pada kandidat retur, dan penurunan tajam Maret 2026 belum dipastikan kenyataan bisnis atau lubang sinkronisasi. Keduanya masuk daftar kerja sebagai gerbang, bukan sebagai catatan kaki.
 
 ## Dokumen Terkait
