@@ -722,9 +722,9 @@
         "Microservices - Marketing Analytics Service",
         "APP - Dynamic Task Tracker"
       ],
-      "hash": "520158b388d037c597893f4ea2cb572aa3de827a8fa504e134be59380151fb38",
-      "ukuran_kb": 17.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan task-management-service lewat gateway /api/task-management, siapa yang boleh memanggil tiap rute, dan bagaimana space restricted serta admin space membatasi apa yang terlihat. Juga menjawab pertanyaan KPI: perbedaan /kpi/ticket (agregat satu orang) dan /kpi/space-group (agregat satu kelompok space untuk menilai Leader), kenapa keduanya tidak memakai rute /report/*, dan kenapa divisi tanpa space bergrup dijawab 409 alih-alih 200 berisi nol.",
+      "hash": "d89b7830f89df08a2517a30ece86aa40e8f6223f287e2bb69de4f59f84974637",
+      "ukuran_kb": 17.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan task-management-service lewat gateway /api/task-management, siapa yang boleh memanggil tiap rute, dan bagaimana space restricted serta admin space membatasi apa yang terlihat. Juga menjawab pertanyaan KPI: perbedaan /kpi/ticket (agregat satu orang) dan /kpi/space-group (agregat satu kelompok space untuk menilai Leader), kenapa keduanya tidak memakai rute /report/*, dan kenapa divisi tanpa space bergrup dijawab 409 alih-alih 200 berisi nol. Mencatat pula sejak kapan /kpi/space-group hidup di produksi dan bentuk jawaban apa yang dipakai membuktikannya.",
       "kata_kunci": [
         "task management",
         "ticketing",
@@ -1902,9 +1902,9 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "9d8544f4d425e52255614202d00b489205d6c63d56be204dcfbb814ca57f8d6a",
-      "ukuran_kb": 105.7,
-      "ringkasan": "Menjawab: service mana yang menjadi master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding, beserta endpoint login (username/employee_id, PIN, biometric), refresh token, registrasi, dan rute internal auth yang dipakai service lain. Juga menjawab operasi admin akun oleh IT (set aktif/nonaktif, forget device, hard reset, kelola system_roles), CRUD master department dan system role berikut gerbang RBAC-nya. Selain itu menjelaskan workspace Legal, R&D Regulatory, Quality, dan Procurement non-Accurate yang ikut di-host di service ini dan alasannya.",
+      "hash": "47dddae3a957b9456dcdcaa344fb01b15c635d0b43a9dbc18597b82758b9efaa",
+      "ukuran_kb": 106.0,
+      "ringkasan": "Menjawab: service mana yang menjadi master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding, beserta endpoint login (username/employee_id, PIN, biometric), refresh token, registrasi, dan rute internal auth yang dipakai service lain. Juga menjawab operasi admin akun oleh IT (set aktif/nonaktif, forget device, hard reset, kelola system_roles), CRUD master department dan system role berikut gerbang RBAC-nya, serta daftar sumber KPI yang dihosting service ini beserta status deploy tiap sumbernya. Selain itu menjelaskan workspace Legal, R&D Regulatory, Quality, dan Procurement non-Accurate yang ikut di-host di service ini dan alasannya.",
       "kata_kunci": [
         "employee service",
         "master data karyawan",
@@ -1914,6 +1914,7 @@
         "system_roles",
         "master department",
         "reset akun",
+        "sumber KPI",
         "legal",
         "quality"
       ]
@@ -6044,12 +6045,12 @@
       "publik": true,
       "tautan": [
         "RUN - Deploy Microservices bip-erp",
+        "HRIS - Matriks KPI per Departemen",
+        "HRIS - Otomasi Skor KPI",
         "Microservices - Form Builder Service",
         "Microservices - Task Management Service",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
-        "HRIS - Otomasi Skor KPI",
-        "HRIS - Matriks KPI per Departemen",
         "HRIS - Key Performance Index",
         "ADR - 0054 Peninjau Ide Kaizen Bisa Atasan Departemen, Bukan Hanya Komite Terpusat",
         "APP - MyBharata",
@@ -6066,9 +6067,9 @@
         "API - Form Builder Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "88203d50c2f0fd668303291f8bc1672945fbf04faa0bd03707d5be8d2d139d17",
-      "ukuran_kb": 30.1,
-      "ringkasan": "Menjawab: bagaimana program pengumpulan ide perbaikan bulanan berjalan, siapa yang wajib mengirim ide, bagaimana kuota ditetapkan HR (global dengan override per departemen, dan kenapa kuota adalah lantai bukan langit-langit), serta bagaimana komite memutuskan ide diterima, ditolak, atau diterapkan. Menjelaskan kenapa Kaizen dibangun sebagai tipe form (form_type kaizen) di Form Builder Service alih-alih service atau space sendiri, bagaimana potret peserta per periode dipakai sebagai penyebut papan kepatuhan, dan kenapa angka kepatuhan sengaja dipisah dari skor KPI ide yang diterapkan. Memuat juga penyimpangan rancangan yang disengaja (prefix rute /kaizen, implemented_at wajib, kunci CompanyID, batas aksi massal) berikut hasil uji end-to-end dan catatan notifikasi pengingat kuota.",
+      "hash": "7673a0d3933eb646e22ada7e9cf9c367b84e51a2c19b017239ab622947532a15",
+      "ukuran_kb": 30.7,
+      "ringkasan": "Menjawab: bagaimana program pengumpulan ide perbaikan bulanan berjalan, siapa yang wajib mengirim ide, bagaimana kuota ditetapkan HR (global dengan override per departemen, dan kenapa kuota adalah lantai bukan langit-langit), serta bagaimana komite memutuskan ide diterima, ditolak, atau diterapkan. Menjelaskan kenapa Kaizen dibangun sebagai tipe form (form_type kaizen) di Form Builder Service alih-alih service atau space sendiri, bagaimana potret peserta per periode dipakai sebagai penyebut papan kepatuhan, dan kenapa angka kepatuhan sengaja dipisah dari skor KPI ide yang diterapkan. Menjawab juga keadaan program di produksi hari ini, termasuk kenapa metrik KPI Kaizen gagal hitung selama tak ada form kaizen yang belum terhapus.",
       "kata_kunci": [
         "kaizen",
         "ide perbaikan",
@@ -6078,6 +6079,7 @@
         "komite kaizen",
         "form builder",
         "papan kepatuhan",
+        "has_program",
         "periode bulanan",
         "KPI"
       ]
@@ -6212,7 +6214,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Salinan setia data production per **2026-08-01**. Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini.",
+      "status_teks": "Salinan setia data production per **2026-08-01**, dengan bab **Tech Development** disegarkan langsung dari `employee_db` prod **2026-08-28** (status arsip template, konfigurasi `auto` yang benar-benar terpasang, dan ketersediaan tiap sumbernya). Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini.",
       "publik": true,
       "tautan": [
         "RUN - Menambah Metrik KPI Otomatis",
@@ -6224,15 +6226,16 @@
         "Microservices - Procurement Service",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "APP - Web ERP",
-        "Microservices - Monitoring Service",
         "Microservices - Calendar Service",
+        "Microservices - Monitoring Service",
+        "HRIS - Kaizen (Ide Perbaikan)",
         "HRIS - Alur KPI Otomatis.excalidraw",
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "0db06cfcca9f805e818d85a68998e861e5e3eb7f43972a9847d3eba6ac943ff9",
-      "ukuran_kb": 150.6,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang di produksi hari ini, berapa bobotnya, dan apa targetnya, dikelompokkan per departemen dan per posisi. Menjawab juga metrik mana yang bisa diotomatiskan dan mana yang tidak, termasuk perbedaan penting antara datanya ada dan mesin KPI punya konektor untuk menariknya, beserta daftar sumber yang benar-benar terdaftar di kode dan mana yang sudah naik ke produksi. Memuat pula peringatan atas metrik yang label dan deskripsinya pernah menyebut dua hal berbeda, seperti metrik AR Supervisor Finance yang sempat tercatat sebagai Revenue 240M padahal mengukur piutang lewat 60 hari.",
+      "hash": "b4bc0a340ce79ca9d8aaf3c58b503413af745d0ce7cd00b4cf08a971c36d554c",
+      "ukuran_kb": 155.8,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang di produksi hari ini, berapa bobotnya, dan apa targetnya, dikelompokkan per departemen dan per posisi. Menjawab juga metrik mana yang bisa diotomatiskan dan mana yang tidak, termasuk perbedaan penting antara datanya ada, mesin KPI punya konektornya, dan data pendukungnya sudah diisi orang, beserta daftar sumber yang terdaftar di kode dan mana yang sudah naik ke produksi. Untuk Tech Development memuat sensus terbaru per metrik: mana yang sudah menyala, mana yang tinggal diisi konfigurasinya, mana yang terhalang kelompok KPI space yang belum diisi, dan mana yang memang belum punya sumber.",
       "kata_kunci": [
         "KPI",
         "kpi_template",
@@ -6242,8 +6245,9 @@
         "otomasi KPI",
         "metrik per departemen",
         "sumber KPI",
-        "piutang",
-        "Supervisor Finance"
+        "kpi_group",
+        "Tech Development",
+        "piutang"
       ]
     },
     {
@@ -6306,6 +6310,7 @@
         "HRIS - Key Performance Index",
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "HRIS - Matriks KPI per Departemen",
+        "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Employee Service",
         "Microservices - Insentive Service",
         "API - Employee Service",
@@ -6340,7 +6345,6 @@
         "HRIS - Career & Promotion",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "Microservices - Task Management Service",
-        "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Form Builder Service",
         "HRIS - Work Review",
         "Microservices - Calendar Service",
@@ -6359,19 +6363,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "8fa599e55d3b89356fa6621d041d2eede728391ee46208ac5c68540483c69733",
-      "ukuran_kb": 100.0,
-      "ringkasan": "Menjawab: metrik KPI mana yang sudah bisa diisi otomatis dari data yang dimiliki ERP, mana yang modulnya ada tapi datanya masih kosong, dan mana yang tidak punya sumber sama sekali, lengkap dengan klasifikasi metrik dan rekap per departemen. Juga menjawab bagaimana nilai otomatis dihitung lalu ditampilkan ke penilai sebagai usulan yang harus ditekan, apa beda status otomatis, semi, dan manual beserta perhitungan cakupannya, serta layar diagnostik mana yang menjelaskan sebab sebuah metrik tidak menghasilkan angka. Menjelaskan pula konsekuensi urutan penilaian untuk metrik yang membaca skor tim pada periode yang sama.",
+      "hash": "af43753cffe78f21036916421e7e02dcd36af49b918eff1e9e5e335a184735ab",
+      "ukuran_kb": 102.0,
+      "ringkasan": "Menjawab: metrik KPI mana yang sudah bisa diisi otomatis dari data yang dimiliki ERP, mana yang modulnya ada tapi datanya masih kosong, dan mana yang tidak punya sumber sama sekali, lengkap dengan klasifikasi metrik dan rekap per departemen. Juga menjawab bagaimana nilai otomatis dihitung lalu ditampilkan ke penilai sebagai usulan yang harus ditekan, apa beda status otomatis, semi, dan manual beserta perhitungan cakupannya, serta layar diagnostik mana yang menjelaskan sebab sebuah metrik tidak menghasilkan angka. Mencatat pula konfigurasi metrik yang sedang benar-benar terpasang di produksi berikut riwayat perubahannya di kpi_template_audits, dan konsekuensi urutan penilaian untuk metrik yang membaca skor tim pada periode yang sama.",
       "kata_kunci": [
         "KPI",
         "otomasi KPI",
         "skor KPI",
         "auto-values",
         "kpi_template",
-        "metrik KPI",
+        "kpi_template_audits",
         "cakupan",
         "semi otomatis",
         "sumber data KPI",
+        "uptime",
         "penilaian"
       ]
     },
@@ -8639,9 +8644,9 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "e4dd9645401570e1802b506c5a7b5da2350eacede7f1c1af02defec0dc9c6a34",
-      "ukuran_kb": 36.1,
-      "ringkasan": "Menjawab: langkah konkret yang harus dijalankan dev departemen untuk menambah satu metrik KPI yang terisi otomatis, mulai dari memastikan metriknya layak, mendaftarkan sumber (lokal maupun lewat HTTP ke service lain), mengisi konfigurasi metrik, memilih reduksi, arah target, dan target berlapis, sampai checklist sebelum PR. Juga menjawab kenapa tidak ada tabel penampung KPI dan angkanya dihitung ulang saat layar dibuka, kapan snapshot penilaian dibekukan, sumber mana yang bisa dipakai sebagai contoh, dan kunci layanan mana yang masih kosong di dev sehingga pengujian di sana sia-sia.",
+      "hash": "ba964ac3a7043ac46596e2eba93e423f65e668d1a46f2e54ab4fa2bd023fa2d4",
+      "ukuran_kb": 36.2,
+      "ringkasan": "Menjawab: langkah konkret yang harus dijalankan dev departemen untuk menambah satu metrik KPI yang terisi otomatis, mulai dari memastikan metriknya layak, mendaftarkan sumber (lokal maupun lewat HTTP ke service lain), mengisi konfigurasi metrik, memilih reduksi, arah target, dan target berlapis, sampai checklist sebelum PR. Juga menjawab kenapa tidak ada tabel penampung KPI dan angkanya dihitung ulang saat layar dibuka, kapan snapshot penilaian dibekukan, sumber mana yang bisa dipakai sebagai contoh termasuk sumber yang cakupannya kelompok space alih-alih orang, dan kunci layanan mana yang masih kosong di dev sehingga pengujian di sana sia-sia.",
       "kata_kunci": [
         "KPI otomatis",
         "metrik KPI",
