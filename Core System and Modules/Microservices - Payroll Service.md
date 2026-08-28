@@ -4,7 +4,7 @@
 
 - **Stack**: Go + Fiber v2 + MongoDB (`payroll_db`) — selaras pola service bip-erp lain
 - **Path**: `services/payroll` (Fase 1 merged #262; Fase 2 PR #265; Fase 2b PPh21 TER PR #270; Payroll Run extend/publish/self-service PR #272; FE Payroll Run PR #171; potongan kehadiran eksplisit [#1317](https://github.com/bip-itteam-internal/bip-erp/pull/1317) + [#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318) + erp-frontend [#1109](https://github.com/bip-itteam-internal/erp-frontend/pull/1109), merged 2026-08-20; **dua dasar upah BPJS** [#1478](https://github.com/bip-itteam-internal/bip-erp/pull/1478) + isi massal [#1482](https://github.com/bip-itteam-internal/bip-erp/pull/1482) + ringkasan daftar run [#1485](https://github.com/bip-itteam-internal/bip-erp/pull/1485), merged 2026-08-27; **periode kehadiran** [#1500](https://github.com/bip-itteam-internal/bip-erp/pull/1500) + **lingkup run** [#1502](https://github.com/bip-itteam-internal/bip-erp/pull/1502), merged 2026-08-28)
-- **Status**: ⚠️ **Implemented (Fase 1 Setup + Fase 2 Run+publish+self-service + Fase 2b PPh21 TER + Fase 4 THR + Fase 5 PDF slip)** dan **live di produksi** (image BE dibangun 2026-08-25 21:30, FE 21:34). Di belakang [[CORE - API Master Gateway]] (`InternalURL["payroll"]`), auth **SSO** ([[CORE - SSO Flow]]), role `system_roles["hris"]`. Port `6980`, mongo `payroll-mongo-db` (host `32792`). · ⛔ **Belum pernah dipakai menggaji seorang pun**: 2 `payroll_run` di prod, **keduanya `draft`**, tak satu pun pernah `approved` apalagi `published`, jadi nol slip pernah sampai ke karyawan (diukur 2026-08-26). Lihat §Kondisi Pemakaian di Produksi. · 🔴 **Multi-perusahaan: belum ter-scope** — `company_id` di service ini = badan usaha **penggaji** (kop slip), BUKAN tenant; `listEmployeeSalaries`/run generation/THR meng-enumerasi SEMUA karyawan (`bson.M{}`) → campur lintas-perusahaan. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
+- **Status**: ⚠️ **Implemented (Fase 1 Setup + Fase 2 Run+publish+self-service + Fase 2b PPh21 TER + Fase 4 THR + Fase 5 PDF slip)** dan **live di produksi** (image BE dibangun **2026-08-28 09:45 WIB**, FE 09:43 — memuat #1500 periode kehadiran & #1502 lingkup run; diverifikasi lewat penanda string di biner dan bundel, berikut kontrol negatif). Di belakang [[CORE - API Master Gateway]] (`InternalURL["payroll"]`), auth **SSO** ([[CORE - SSO Flow]]), role `system_roles["hris"]`. Port `6980`, mongo `payroll-mongo-db` (host `32792`). · ⛔ **Belum pernah dipakai menggaji seorang pun**: 2 `payroll_run` di prod, **keduanya `draft`**, tak satu pun pernah `approved` apalagi `published`, jadi nol slip pernah sampai ke karyawan (diukur 2026-08-26). Lihat §Kondisi Pemakaian di Produksi. · 🔴 **Multi-perusahaan: belum ter-scope** — `company_id` di service ini = badan usaha **penggaji** (kop slip), BUKAN tenant; `listEmployeeSalaries`/run generation/THR meng-enumerasi SEMUA karyawan (`bson.M{}`) → campur lintas-perusahaan. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 
 > ⛔ **Sumber aturan bisnisnya TIDAK ADA DI VAULT INI.** Jatah, ambang, dan besaran potongan diturunkan dari Peraturan Perusahaan 2026-2028 ke **`mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md`** — berkas di repo **mobile**, dan `CLAUDE.md` repo itu menyatakan **dokumen itu yang menang** bila perilaku sistem bertentangan dengannya. Yang relevan bagi service ini: mangkir 1,5x sehari dan 2x per hari bila ≥2 hari (Pasal 20), izin jam kerja memotong Tunjangan Kehadiran **dan** uang makan, sakit tanpa surat dokter diperlakukan sebagai izin, dan SP II memotong 25% gaji pokok selama 6 bulan (belum ada di kode).
 >
@@ -204,23 +204,42 @@ bukan git log.
 | `payroll_company` | **41** | cocok dengan skala HRD (1 PT + 40 CV) |
 | `salary_component` | **19** (bukan 18) | baris lama "Tunjangan Kehadiran" (deduction) masih aktif, lihat §Master Komponen Gaji |
 
-**Urutan yang menahan run pertama**, dari yang paling mahal bila terlewat: **dua dasar upah
-BPJS** (lihat §Gaji per Karyawan) → **hitung ulang kedua run sesudah [#1500](https://github.com/bip-itteam-internal/bip-erp/pull/1500) ter-deploy** →
-pengali mangkir yang menyimpang dari Pasal 20 → sign-off tabel TER → cakupan gaji yang belum
-separuh. Empat yang pertama membuat angka di slip **salah**, bukan sekadar kosong, dan slip
-yang sudah `published` men-snapshot kesalahannya.
+**Urutan yang menahan run pertama** per 2026-08-28, sesudah dua penghambat teratas gugur
+(dasar upah kini terisi 136/158 dan kedua run sudah dihitung ulang dengan perbaikan periode):
+**pengali mangkir yang menyimpang dari Pasal 20** → sign-off tabel TER → 22 orang yang dasar
+upahnya masih kosong → keputusan HRD soal JKM yang dimatikan padahal diikuti 80 orang. Yang
+pertama membuat angka di slip **salah**, bukan sekadar kosong, dan slip yang sudah `published`
+men-snapshot kesalahannya.
 
 Bedanya sesudah pemisahan: dasar upah yang kosong **ditandai** di baris payroll run
 (`warn_codes: bpjs_base_missing`) dan di kolom register, jadi penghambat pertama itu kini
 terlihat sebelum tombol Approve ditekan, bukan sesudah slip terbit.
 
-#### Pengukuran ulang 2026-08-27/28 (sesudah pemisahan dasar upah)
+#### Pengukuran ulang 2026-08-28 03:10Z (sesudah #1500 & #1502 live di prod)
 
-- **Field `upah_bpjs` lama sudah hilang** dari prod — backfill boot `ensureUpahBpjsTerpisah()` terbukti jalan.
-- **90 dari 120** record sudah punya dasar upah baru terisi; HR mengisinya lewat impor massal Excel di hari yang sama.
-- ⛔ **Nol baris BPJS di seluruh slip**, dan **240 dari 240** `payroll_run_line` ditandai `bpjs_base_missing`. Sebabnya bukan kalkulasi yang rusak melainkan **snapshot yang basi**: barisnya dihitung 08:58Z sementara dasar upahnya baru disunting 11:00Z. Yang dibutuhkan cuma `recalculate`, bukan perbaikan kode.
-- ⚠️ **Kedua run draft prod dihitung dengan kehadiran BULAN BERJALAN, bukan periodenya** (§Periode Kehadiran). Sesudah [#1500](https://github.com/bip-itteam-internal/bip-erp/pull/1500) ter-deploy, **keduanya wajib di-`recalculate`**; sebelum itu jangan, karena menghitung ulang sekarang justru menimpanya lagi dengan bulan berjalan.
+Prod bergerak cepat pada hari ini; angka di bawah menggantikan pengukuran 2026-08-26/27 yang
+sempat ditulis di sini. **Ukur ulang sebelum menyimpulkan apa pun.**
+
+- **Field `upah_bpjs` lama sudah hilang** — backfill boot `ensureUpahBpjsTerpisah()` terbukti jalan.
+- **`employee_salary` naik jadi 158** (dari 120), **136** di antaranya punya dasar upah terisi. HR mengisinya lewat impor massal Excel.
+- ✅ **Baris BPJS kini benar-benar terbit**: 134 dari 158 baris run Juli dan 126 dari 150 baris run Agustus memuat baris potongan BPJS. Sebelumnya **nol menyeluruh** dengan 240/240 baris ditandai `bpjs_base_missing` — dan sebabnya memang bukan kalkulasi yang rusak melainkan **snapshot basi**, persis seperti didugakan: `recalculate` yang membereskannya, bukan perubahan kode. Sisa tandanya kini 16 (Juli) dan 23 (Agustus), yaitu 22 orang yang dasar upahnya memang belum diisi.
+- ✅ **Kedua run sudah dihitung ulang DENGAN perbaikan periode.** Image prod dibangun 02:45Z; baris run Agustus ditulis 02:49Z dan run Juli 03:06Z. Buktinya bukan cuma stempel waktu: dasar kehadiran kedua run kini **berbeda pola** (52 vs 38 pola unik, dengan distribusi yang jelas tak sama), sedangkan sebelum #1500 keduanya **identik byte-per-byte**.
+- **Kedelapan magang (`BIP-MG-`) punya penetapan gaji**, jadi run berlingkup `magang` akan menghasilkan **8 baris** dan `karyawan` **150** — angka yang bisa dicek sekali klik untuk membuktikan penyaringnya di prod. Per 2026-08-28 belum ada run berlingkup yang dibuat; kedua run yang ada tak punya `scope` sehingga berarti `semua`.
 - **JKM `enabled: false` di config sementara 80 dari 120 karyawan terdaftar mengikutinya** — sekelas dengan JP yang baru dinyalakan 2026-08-27 atas keputusan sadar. Iurannya nol tanpa satu pun tanda di layar sampai [erp-frontend #1285](https://github.com/bip-itteam-internal/erp-frontend/pull/1285) mencoretnya di kolom Program BPJS. **Butuh keputusan HRD**, bukan perbaikan kode.
+
+#### Terverifikasi lewat gateway (DEV, 2026-08-28)
+
+Gerbang §5a runbook deploy, dijalankan sungguhan lewat `/api/payroll/...`:
+
+| Yang diuji | Hasil |
+|---|---|
+| Biner memuat kode baru | `run_period_unknown`/`lingkup_run`/`periode_kehadiran` masing-masing ada; kontrol negatif string karangan = 0 |
+| `scope` tak dikenal | **400** `scope harus salah satu dari: semua, karyawan, magang` |
+| Penyaringan lingkup | karyawan + magang = semua (invarian terpenuhi) |
+| **Periode kehadiran** | `pay_period_end` Agustus → `hari_mangkir 24`; Juni → `hari_mangkir 27`. Periode berbeda menghasilkan dasar berbeda — sebelum #1500 keduanya identik |
+| `pay_period_end` kosong | baris ditandai `run_period_unknown` |
+
+⚠️ **Yang BELUM terbukti end-to-end: penyaring `magang` memilih seseorang.** DEV sama sekali tak punya magang (174 PKWT, 4 Evaluasi, 1 PKWTT), jadi `magang=0` di sana benar tapi kosong sebagai bukti. Yang menahannya sementara ini unit test berbasis keempat nilai prod. Pembuktian termurah: buat satu run `magang` di prod dan pastikan barisnya **8**.
 
 ⚠️ **`POST /payroll-runs` memanik bila Mongo tak tersedia** (`mongodb.GetCollection` → `panic: Database not connected`), fasthttp memutus koneksi, dan gateway membalas **502 tanpa petunjuk**. Terlihat saat menulis test [#1502](https://github.com/bip-itteam-internal/bip-erp/pull/1502). Penjaganya `mongodb.DB == nil` seperti yang sudah dipakai [[Microservices - Calendar Service]]; **belum dikerjakan**.
 

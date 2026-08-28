@@ -2369,7 +2369,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (Fase 1 Setup + Fase 2 Run+publish+self-service + Fase 2b PPh21 TER + Fase 4 THR + Fase 5 PDF slip)** dan **live di produksi** (image BE dibangun 2026-08-25 21:30, FE 21:34). Di belakang [[CORE - API Master Gateway]] (`InternalURL[\"payroll\"]`), auth **SSO** ([[CORE - SSO Flow]]), role `system_roles[\"hris\"]`. Port `6980`, mongo `payroll-mongo-db` (host `32792`). · ⛔ **Belum pernah dipakai menggaji seorang pun**: 2 `payroll_run` di prod, **keduanya `draft`**, tak satu pun pernah `approved` apalagi `published`, jadi nol slip pernah sampai ke karyawan (diukur 2026-08-26). Lihat §Kondisi Pemakaian di Produksi. · 🔴 **Multi-perusahaan: belum ter-scope** — `company_id` di service ini = badan usaha **penggaji** (kop slip), BUKAN tenant; `listEmployeeSalaries`/run generation/THR meng-enumerasi SEMUA karyawan (`bson.M{}`) → campur lintas-perusahaan. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].",
+      "status_teks": "**Implemented (Fase 1 Setup + Fase 2 Run+publish+self-service + Fase 2b PPh21 TER + Fase 4 THR + Fase 5 PDF slip)** dan **live di produksi** (image BE dibangun **2026-08-28 09:45 WIB**, FE 09:43 — memuat #1500 periode kehadiran & #1502 lingkup run; diverifikasi lewat penanda string di biner dan bundel, berikut kontrol negatif). Di belakang [[CORE - API Master Gateway]] (`InternalURL[\"payroll\"]`), auth **SSO** ([[CORE - SSO Flow]]), role `system_roles[\"hris\"]`. Port `6980`, mongo `payroll-mongo-db` (host `32792`). · ⛔ **Belum pernah dipakai menggaji seorang pun**: 2 `payroll_run` di prod, **keduanya `draft`**, tak satu pun pernah `approved` apalagi `published`, jadi nol slip pernah sampai ke karyawan (diukur 2026-08-26). Lihat §Kondisi Pemakaian di Produksi. · 🔴 **Multi-perusahaan: belum ter-scope** — `company_id` di service ini = badan usaha **penggaji** (kop slip), BUKAN tenant; `listEmployeeSalaries`/run generation/THR meng-enumerasi SEMUA karyawan (`bson.M{}`) → campur lintas-perusahaan. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].",
       "publik": true,
       "tautan": [
         "HRIS - Payroll",
@@ -2391,20 +2391,20 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "7a5f0313bfd1bdd85996c172c0adfa60bcdcd23a7dece2a5b4683d688c24d0ca",
-      "ukuran_kb": 48.9,
-      "ringkasan": "Menjawab: bagaimana penggajian dijalankan dari setup komponen gaji, config BPJS dan PPh21 metode TER, penetapan gaji per karyawan, sampai payroll run (kalkulasi, approve, publish slip), THR, dan slip PDF. Juga menjawab bagaimana potongan kehadiran dihitung dan komponen mana yang dipecah, kenapa ada puluhan badan usaha penggaji yang hanya mengubah identitas kop slip, serta model data payroll_db dan sejauh mana fitur ini benar-benar dipakai di produksi. Menunjuk ke berkas turunan Peraturan Perusahaan sebagai sumber aturan jatah, ambang, dan besaran potongan.",
+      "hash": "f31d2ab93131eec133dc3112b711726f678c87b55ab7207b98918ab4551c14b3",
+      "ukuran_kb": 50.8,
+      "ringkasan": "Menjawab: bagaimana gaji karyawan disiapkan dan diterbitkan di bip-erp, mulai dari setup komponen gaji, konfigurasi BPJS dan PPh21 metode TER, penetapan gaji per karyawan, sampai payroll run (kalkulasi, approve, publish slip) beserta THR dan slip PDF. Juga menjawab: endpoint apa saja yang tersedia, bagaimana potongan kehadiran (telat, izin, mangkir, uang makan) dihitung, bagaimana satu karyawan bisa digaji atas nama badan usaha berbeda untuk kop slip, serta di mana sumber aturan bisnisnya berada (BUSINESS_LOGIC_IMPLEMENTATION.md di repo mobile, bukan di vault). Memuat pula model data payroll_db, kondisi pemakaian nyata di produksi, dan batas scope (tidak mencakup pembayaran/transfer serta belum ter-scope multi-tenant).",
       "kata_kunci": [
         "payroll",
         "penggajian",
-        "gaji",
         "slip gaji",
+        "payslip",
         "payroll run",
-        "THR",
         "BPJS",
-        "PPh21",
-        "TER",
-        "potongan kehadiran"
+        "PPh21 TER",
+        "PTKP",
+        "potongan kehadiran",
+        "THR"
       ]
     },
     {
