@@ -30,7 +30,7 @@ mengingatkan bila versi kit terpasang ≠ versi terbaru.
 - `commands/` — 6 slash command flow + `/ask` (recall read-only, sebut sumber) + `/skills` (cek/install skill plugin rekomendasi tim) + `/index-vault` (bangun VAULT-INDEX.json) + `/analisa-kebutuhan` (kebutuhan manajemen mentah → ADR + dok domain + daftar task; berhenti sebelum kode).
 - `hooks/` — session-start (info flow + cek versi/staleness) & pre-commit-reminder.
 - `skills/` — skill tim (disalin `init` → `.claude/skills/`). Kini: `migrasi-tabel-hris`, `audit-keamanan`, `deploy-bip-erp`.
-- `rules/` — `team-memory.md` (ingatan tim bersama; **di-import langsung** oleh CLAUDE.md dari vault via `@../architecture-draft/.agent-kit/rules/team-memory.md` — update cukup `git pull`, tak perlu re-init) plus tiga berkas prosedur yang **tidak** di-import dan dibaca on-demand supaya tak membakar konteks tiap sesi: `plan-checklist.md` (`/plan`), `review-checklist.md` (`/review`), dan `wrap-completion-gate.md` (`/wrap`).
+- `rules/` — `team-memory.md` (ingatan tim bersama; **di-import langsung** oleh CLAUDE.md dari vault via `@../architecture-draft/.agent-kit/rules/team-memory.md` — update cukup `git pull`, tak perlu re-init) plus berkas prosedur yang **tidak** di-import dan dibaca on-demand supaya tak membakar konteks tiap sesi: `plan-checklist.md` (`/plan`), `review-checklist.md` (`/review`), `wrap-completion-gate.md` (`/wrap`), dan `vault-retrieval.md` (pencarian vault, dipakai `/ask`, `/start-task`, `/analisa-kebutuhan`).
 - `templates/` — `workspace-CLAUDE.md` (jadi `erp/CLAUDE.md`).
 - `init.ps1` / `init.sh` — pemasang.
 - `VERSION` — versi kit.

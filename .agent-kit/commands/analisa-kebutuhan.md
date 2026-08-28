@@ -18,8 +18,9 @@ menangkapnya.
 
 ## 0. Kenali area
 
-Baca `architecture-draft/VAULT-INDEX.json` saja (satu berkas, murah) untuk mengenali area yang
-tersentuh. Belum membaca dokumen apa pun di tahap ini.
+Saring `architecture-draft/VAULT-INDEX.json` untuk mengenali area yang tersentuh. **Jangan
+dibaca utuh** — indeksnya ratusan dokumen dan pembacaan penuh akan terpotong diam-diam;
+cocokkan `area` + `kata_kunci` saja. Belum membaca dokumen apa pun di tahap ini.
 
 ## 1. Wawancara
 
@@ -64,8 +65,8 @@ Tiap subagent wajib mengembalikan `file:line` untuk **setiap** klaim, dan satu b
    buka `mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md` **LEBIH DULU**, sebelum
    opsi apa pun disusun. Perhatikan nama foldernya `mybharata-app`, bukan `mybharata`. Dokumen
    itu menang atas perilaku sistem. Ia tinggal di repo mobile sehingga tidak akan ditemukan
-   kecuali dicari. Potongan mangkir pernah dirancang 1x padahal Pasal 20 mengatur 1,5x sehari
-   dan 2x bila dua hari atau lebih, dan itu lolos `/plan` maupun `/implement`.
+   kecuali dicari. Potongan mangkir pernah dirancang **setengah** dari yang diatur Pasal 20,
+   dan itu lolos `/plan` maupun `/implement`. Angkanya baca di dokumen itu, jangan dari sini.
 2. ⛔ **Klaim negatif.** "X belum ada" **tidak boleh** berdiri di atas `Grep` saja. Satu byte NUL
    membuat berkas hilang total dari ripgrep tanpa satu pun tanda. Konfirmasi dengan `git grep`,
    yang tidak melewati berkas biner. Ini gerbang terpenting di sini, karena seluruh keputusan
@@ -73,7 +74,9 @@ Tiap subagent wajib mengembalikan `file:line` untuk **setiap** klaim, dan satu b
 3. ⛔ **Data nyata.** Sebelum merancang apa pun yang membaca data yang sudah ada, **ukur isinya
    di prod**. Sudah berkali-kali terjadi: nol slip payroll terbit padahal kodenya live, nol
    dokumen `web_browser` padahal push notification live. Angka nol yang mencurigakan adalah
-   pertanyaan, bukan kabar baik. **Baca prod boleh, tulis TIDAK.**
+   pertanyaan, bukan kabar baik. **Baca prod boleh, tulis TIDAK.** Bila akses prod tidak
+   tersedia, catat sebagai **asumsi eksplisit** dan tandai sebagai risiko di ADR; jangan
+   menebak isinya.
 4. ⛔ **Kolom.** Untuk tiap kolom angka yang masuk rancangan, jawab eksplisit: komponen sejajar,
    atau himpunan bagian dari kolom lain? `iklan_sia_sia` adalah porsi `ads_cost` yang **sudah**
    terpotong dari laba; `orders_dikirim` himpunan bagian dari `orders`. Menjumlahkannya
@@ -113,6 +116,8 @@ dijawab modul yang ada, atau keputusannya sudah dikunci ADR sebelumnya, atau dat
 terisi sehingga fiturnya mustahil, maka **jangan tulis ADR**. Sajikan temuan itu sebagai hasil,
 dan selesai. Analis yang selalu menghasilkan ADR adalah analis yang selalu bilang ya.
 
+**Bila kesimpulannya ini, langkah 5 sampai 8 di bawah TIDAK dijalankan.**
+
 ## 5. Tulis artefak (hanya setelah disetujui)
 
 Tiga berkas, semuanya di `architecture-draft`.
@@ -122,7 +127,7 @@ hafalan**, orang lain bisa menambah lebih dulu dan seluruh wikilink memakai judu
 mengikuti `Decisions/ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap.md`:
 
 ```
-## Untuk Manajemen
+## Untuk Manajemen        (bagian BARU, belum ada di ADR 0057)
 ## Deskripsi            (miring, satu paragraf)
 - Status / Path di repo / Tanggal
 ## Context
@@ -153,10 +158,13 @@ yang belum terindeks **tidak terlihat sama sekali**, baik oleh `/ask` dan `/star
 oleh manajemen lewat MCP. Ini sengaja berbeda dari `/ask` yang hanya menyarankan `/sync-docs`:
 di sini dok barunya tidak berguna sampai terindeks.
 
-## 7. Commit dan push
+## 7. Commit, merge, push
 
 Vault push **langsung ke `main`, tanpa PR**. Stage **per nama berkas**, jangan `git add -A`.
-Pakai `git -C <vault> -c core.fsmonitor=false`.
+Pakai `git -C <vault> -c core.fsmonitor=false`. Urutan: commit di `main` → merge
+`origin/main` → regenerasi indeks (langkah 6) → push. Bila `VAULT-INDEX.json` konflik saat
+merge, **jangan digabung baris per baris**: ambil salah satu sisi, selesaikan konflik
+dokumennya dulu, lalu regenerasi indeks **sekali di akhir**.
 
 ## 8. Serahkan
 

@@ -23,7 +23,7 @@ try {
   # sudah pernah rot diam-diam saat index-vault.md dan skills.md ditambahkan (2026-08-28).
   $srcCmd = (Get-ChildItem (Join-Path $kitRoot 'commands') -Filter *.md).Count
   $cmdCount = (Get-ChildItem (Join-Path $claude 'commands') -Filter *.md).Count
-  Check ($cmdCount -eq $srcCmd) "semua command kit tersalin ($srcCmd berkas)"
+  Check ($cmdCount -eq $srcCmd) "semua command kit tersalin ($cmdCount/$srcCmd berkas)"
   Check (Test-Path (Join-Path $claude 'hooks/session-start.ps1')) 'hooks tersalin'
   Check (Test-Path (Join-Path $claude 'settings.json')) 'settings.json ada'
   $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8
@@ -38,6 +38,23 @@ try {
   $kv = (Get-Content (Join-Path $claude '.kit-version') -Raw).Trim()
   $ver = (Get-Content (Join-Path $kitRoot 'VERSION') -Raw).Trim()
   Check ($kv -eq $ver) '.kit-version sama dgn VERSION'
+
+  # session-start.ps1 harus mengeluarkan JSON sah di stdout (dipanggil sungguhan, bukan dibaca
+  # sebagai teks). $PWD diset ke $tmp dulu supaya hook menemukan 'architecture-draft' di
+  # bawahnya untuk cabang cek-staleness-nya. Catatan: ini HANYA menguji varian .ps1 — invariant
+  # session-start.sh (ctx tidak mengandung tanda kutip ganda) masih dijaga cuma oleh komentar
+  # di berkas itu sendiri, tidak oleh test ini.
+  $hookJson = $null
+  try {
+    Push-Location $tmp
+    try {
+      $hookOut = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $claude 'hooks/session-start.ps1') 2>$null
+    } finally {
+      Pop-Location
+    }
+    $hookJson = ($hookOut -join '') | ConvertFrom-Json
+  } catch {}
+  Check ($null -ne $hookJson -and $null -ne $hookJson.hookSpecificOutput.additionalContext) 'session-start.ps1 mengeluarkan JSON sah'
 
   # v1.0.1: re-init harus prune file lama yg sudah tak ada di kit, tapi tetap salin yg nyata
   $stale = Join-Path $claude 'commands/__stale-test__.md'

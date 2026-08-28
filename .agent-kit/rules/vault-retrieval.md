@@ -7,7 +7,7 @@
 ## 1. Pilih dokumen dari dua arah
 
 a. `architecture-draft/CLAUDE.md` §7 memetakan **repo kode → dokumen**. Dipakai bila titik
-   berangkatnya kode.
+   berangkatnya kode, dan untuk `/start-task` selalu.
 b. `architecture-draft/VAULT-INDEX.json` memetakan **pertanyaan → dokumen**. Cocokkan teks ke
    `ringkasan` dan `kata_kunci`, ambil **3 sampai 5** kandidat.
 
@@ -27,7 +27,7 @@ Perhatikan `status_emoji` + `status_teks` di entri indeks dan marker di dokumenn
 | Marker | Arti |
 |---|---|
 | ✅ Implemented | ada di kode |
-| ⚠️ | ada catatan penting |
+| ⚠️ Implemented (ada catatan) | ada di kode, tapi ada gap/bug/parsial |
 | 🟡 Konsep | rencana, belum ada kodenya |
 | 🔴 Stub | kerangka saja |
 | 🔜 Direncanakan | belum dikerjakan |
