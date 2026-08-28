@@ -18,8 +18,11 @@ try {
 
   $claude = Join-Path $tmp '.claude'
   Check (Test-Path (Join-Path $claude 'commands/start-task.md')) 'commands tersalin'
+  # Jumlah command diturunkan dari kit, JANGAN dipatok angka: assertion angka-mati
+  # sudah pernah rot diam-diam saat index-vault.md dan skills.md ditambahkan (2026-08-28).
+  $srcCmd = (Get-ChildItem (Join-Path $kitRoot 'commands') -Filter *.md).Count
   $cmdCount = (Get-ChildItem (Join-Path $claude 'commands') -Filter *.md).Count
-  Check ($cmdCount -eq 7) 'jumlah command = 7 (6 flow + /ask)'
+  Check ($cmdCount -eq $srcCmd) "semua command kit tersalin ($srcCmd berkas)"
   Check (Test-Path (Join-Path $claude 'hooks/session-start.ps1')) 'hooks tersalin'
   Check (Test-Path (Join-Path $claude 'settings.json')) 'settings.json ada'
   $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8
