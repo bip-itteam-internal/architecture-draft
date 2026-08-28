@@ -18,6 +18,7 @@ try {
 
   $claude = Join-Path $tmp '.claude'
   Check (Test-Path (Join-Path $claude 'commands/start-task.md')) 'commands tersalin'
+  Check (Test-Path (Join-Path $claude 'commands/analisa-kebutuhan.md')) 'command /analisa-kebutuhan tersalin'
   # Jumlah command diturunkan dari kit, JANGAN dipatok angka: assertion angka-mati
   # sudah pernah rot diam-diam saat index-vault.md dan skills.md ditambahkan (2026-08-28).
   $srcCmd = (Get-ChildItem (Join-Path $kitRoot 'commands') -Filter *.md).Count

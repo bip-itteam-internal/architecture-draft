@@ -5,6 +5,7 @@ kit_ver_file="$vault/.agent-kit/VERSION"
 inst_file="$PWD/.claude/.kit-version"
 
 ctx="Flow wajib: /start-task -> /plan -> /implement -> /review -> /sync-docs -> /wrap"
+ctx="$ctx | Opsional sebelum flow: /analisa-kebutuhan <kebutuhan manajemen> (mentah -> ADR + dok + daftar task)"
 
 if [ -f "$kit_ver_file" ]; then
   kit_ver="$(tr -d '[:space:]' < "$kit_ver_file")"
