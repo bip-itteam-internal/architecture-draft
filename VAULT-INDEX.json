@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-28",
-  "jumlah_dokumen": 308,
+  "jumlah_dokumen": 311,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1486,6 +1486,45 @@
         "WiFi allowlist",
         "RequireITStaff",
         "502"
+      ]
+    },
+    {
+      "path": "Core System and Modules/CORE - Kapabilitas AI dan Machine Learning.md",
+      "judul": "CORE - Kapabilitas AI dan Machine Learning",
+      "area": "Core System and Modules",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "**Sebagian Implemented** — dua kapabilitas generatif hidup di produksi, satu WIP, dua masih konsep tanpa kode. Kapabilitas prediktif belum berkode sama sekali.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
+        "Microservices - Marketing Analytics Service",
+        "APP - Ideamills",
+        "Sales - Veo (Gemini) Implementation",
+        "Sales - Veo (Gemini) Automation Layer",
+        "APP - Tiktok Insight Analyzer",
+        "Sales - TikTok Sentiment Pipeline",
+        "CORE - OCR Document Service",
+        "Microservices - Vault MCP Service",
+        "API - Marketing Analytics Service",
+        "Sales - Profit Engine (Design)",
+        "Sales - Marketing Analytics (Audit Ketersediaan Data)",
+        "ADR - 0008 Profit Engine Join via item_group_id"
+      ],
+      "hash": "65cf0690600a0ce7e43c08bced0a0d686f5abb5cec0698ae645250eda30923fc",
+      "ukuran_kb": 9.6,
+      "ringkasan": "Menjawab: kapabilitas AI apa saja yang dimiliki ERP Bharata, mana yang benar-benar berjalan di produksi dan mana yang masih konsep tanpa satu baris kode, serta apa beda kapabilitas generatif (video iklan, sentimen, OCR) dari kapabilitas prediktif yang menuntut label historis. Memuat rancangan peringatan dini belanja iklan video sebagai kapabilitas prediktif pertama, lengkap dengan persona penggunanya dan urutan kerja yang mengharuskan aturan sederhana diuji sebelum model dibangun. Menjawab juga aturan pemakaian kolom laba yang mudah salah dijumlahkan, termasuk kenapa iklan_sia_sia adalah himpunan bagian dari ads_cost dan bukan kerugian tambahan.",
+      "kata_kunci": [
+        "AI",
+        "artificial intelligence",
+        "machine learning",
+        "ML",
+        "kapabilitas AI",
+        "peringatan dini iklan",
+        "belanja iklan",
+        "prediktif",
+        "generatif",
+        "iklan sia-sia"
       ]
     },
     {
@@ -4543,6 +4582,43 @@
         "antrean perlu aksi saya",
         "fail-open fail-closed",
         "budget.master.save"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi.md",
+      "judul": "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-08-28, kode belum ada. Berdiri di atas pengukuran langsung database produksi pada 2026-08-28.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0028 Code Index bip-erp",
+        "APP - Ideamills",
+        "Sales - Veo (Gemini) Implementation",
+        "Sales - Veo (Gemini) Automation Layer",
+        "APP - Tiktok Insight Analyzer",
+        "Sales - TikTok Sentiment Pipeline",
+        "CORE - OCR Document Service",
+        "CORE - Kapabilitas AI dan Machine Learning",
+        "Microservices - Marketing Analytics Service",
+        "API - Marketing Analytics Service",
+        "Sales - Marketing Analytics (Audit Ketersediaan Data)"
+      ],
+      "hash": "5195217c9c72c37a451a559423ab9e2dbf271c49d7e3da7be10abab180f5e838",
+      "ukuran_kb": 12.0,
+      "ringkasan": "Menjawab: kenapa kelayakan pekerjaan AI di bip-erp ditentukan oleh kelayakan datanya dan bukan oleh ketersediaan teknologinya, tiga syarat apa yang menjadi gerbang sebelum sebuah model boleh dibangun, dan kenapa model menumpang service pemilik data alih-alih berdiri sebagai service AI terpisah. Menjawab pula kandidat mana yang ditolak beserta angka labelnya (retur, resign, penilaian pelamar, pembatalan pesanan) dan kenapa keluaran model hanya mengurutkan perhatian sementara keputusan memotong anggaran tetap di orang. Menyebut konsekuensi deploy bila peringatannya dikirim lewat inbox, yaitu dua container yang wajib naik bersama.",
+      "kata_kunci": [
+        "ADR 0058",
+        "AI",
+        "machine learning",
+        "ML",
+        "gerbang kelayakan data",
+        "label historis",
+        "belanja iklan",
+        "marketing analytics",
+        "kategori inbox",
+        "prediktif"
       ]
     },
     {
@@ -10015,6 +10091,34 @@
         "retur",
         "Tinggarjaya",
         "WMS"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Kapabilitas AI dan Machine Learning.md",
+      "judul": "ANALISA - Kapabilitas AI dan Machine Learning",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
+        "CORE - Kapabilitas AI dan Machine Learning"
+      ],
+      "hash": "a4db340345cdbbcf280efb450c2c8cb1b96c27bc41fbdafe7ca2b302088aa7fd",
+      "ukuran_kb": 5.1,
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mewujudkan kapabilitas AI prediktif pertama, mana yang berstatus gerbang dan wajib lulus lebih dulu sebelum pelaksanaan dimulai, dan bagaimana dependensi antar-task-nya. Menjawab juga kandidat kedua berupa ramalan permintaan per SKU untuk perencanaan produksi beserta alasan kenapa ia sengaja tidak dikerjakan paralel dengan kapabilitas pertama.",
+      "kata_kunci": [
+        "daftar task",
+        "AI",
+        "machine learning",
+        "peringatan dini iklan",
+        "gerbang",
+        "analisa kebutuhan",
+        "ramalan permintaan",
+        "SKU",
+        "roadmap AI",
+        "ML"
       ]
     },
     {
