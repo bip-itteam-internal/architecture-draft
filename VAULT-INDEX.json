@@ -1265,25 +1265,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "05157535297400f536fa1a3bf57c8b84875176272454d4dae781177703fd404f",
-      "ukuran_kb": 347.2,
-      "ringkasan": "Menjawab: halaman apa saja yang ada di frontend ERP web, siapa yang bisa membukanya, dan kenapa tiap layar berbentuk seperti sekarang. Mencakup HRIS, Finance, Procurement, Task Management, Marketing Analytics, Portal Saya, serta struktur sidebar dan gerbang rute di proxy. Juga menjawab: tab apa saja di tiap sub-menu Pengaturan dan dari tabel mana semuanya diturunkan, kenapa tautan ber-?tab= sempat selalu mendarat di tab pertama di keenam sub-menu, siapa yang melihat tombol tambah dan hapus di halaman Jadwal, kenapa uji gerbang peran wajib memakai predikat aslinya lewat importActual bukan tiruan, dan di mana terlihat siapa yang terakhir mengubah penetapan gaji seorang karyawan.",
+      "hash": "7f6a575a7cd6d3b42f09a44c22cfc0e82f91a663b89400ea363a55851f0c67a8",
+      "ukuran_kb": 350.1,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (erp-frontend / hris-dashboard \"One Bharata\"), stack serta repo mana yang dipakai, dan bagaimana login, refresh token, sampai alur SSO Identity Provider (inbound redirect_url, outbound ticket) bekerja. Menjelaskan juga bagaimana hak akses dibaca dari cookie system_roles (daftar module dan role, gating sidebar per menu), bagaimana menu dikelompokkan lewat menu induk bersarang alih-alih field group, dan bagaimana halaman Pengaturan HRGA terpusat disusun dari satu tabel section dengan penyaringan per tab. Berguna untuk mencari dukungan multi-perusahaan (company switcher, karyawan, departemen, shift, WiFi, artikel lintas-tenant), daftar modul/fitur yang sudah ada, serta catatan gap dan dependensi frontend.",
       "kata_kunci": [
         "erp-frontend",
+        "hris-dashboard",
+        "One Bharata",
         "web ERP",
-        "sidebar",
-        "menu",
-        "halaman HRIS",
-        "proxy rute",
-        "Pengaturan",
-        "tab query",
-        "SUB_MENU_PENGATURAN",
-        "hris/schedule",
-        "roster",
-        "gerbang peran frontend",
-        "Portal Saya",
-        "jejak perubahan",
-        "Gaji Karyawan"
+        "frontend",
+        "SSO",
+        "system_roles",
+        "role gating",
+        "sidebar menu",
+        "multi-perusahaan"
       ]
     },
     {
