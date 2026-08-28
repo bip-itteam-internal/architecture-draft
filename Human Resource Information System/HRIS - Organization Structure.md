@@ -130,6 +130,35 @@ Relasinya disimpan sebagai **master data**, bukan di kode: `master_department.su
 
 Mencampur keduanya berbahaya dua arah: menyempitkan tampilan bikin staf HR melihat HR dan GA terpisah padahal timnya satu; melebarkan wewenang bikin staf HR ikut mendapat akses tiket GA yang bukan haknya.
 
+### Kontrak penerjemah filter departemen
+
+⚠️ **Tiga fungsi bernama mirip di `shared-library/models/employee/department_scope.go` menjawab pertanyaan BERBEDA, dan memakai yang keliru tak pernah melempar galat.** Ia mengembalikan slice yang sah berisi nama yang tak dimiliki siapa pun, sehingga endpoint membalas **200 tanpa satu pun baris** dan layar berbunyi "belum ada datanya" alih-alih "filternya tak menemukan siapa-siapa".
+
+| Fungsi | Menerima | Menjawab |
+|---|---|---|
+| `ResolveDepartmentFilter` | nilai dari LAYAR: nama, label grup, CSV, atau campurannya | "nilai yang dipilih orang ini maksudnya departemen apa saja" |
+| `ExpandToDepartmentGroup` | nama departemen saja | "menyebut satu anggota berarti menyebut siapa saja" |
+| `SupervisedDepartments` | nama departemen saja | "apa cakupan supervisi ORANG ini" |
+
+**Nilai yang datang dari layar wajib memakai komposisi `ExpandToDepartmentGroup(ResolveDepartmentFilter(master, q))`**, persis seperti `GET /kpi`. Di employee-service komposisi itu tinggal di satu tempat, `cakupanDepartemenKPI` (`services/employee/kpi_departemen_query.go`), dengan penjaga pemindai sumber berdaftar-izin: pemanggil baru yang menembak `SupervisedDepartments` atas nilai query membuat testnya merah. Pemanggilan yang memakai `work_data.department` milik seseorang tetap aman dan sengaja diizinkan, sebab label grup tak pernah tersimpan di sana.
+
+`ResolveDepartmentFilter` menerima **empat** bentuk, dan bentuk keempat yang paling lama tak terlihat:
+
+1. nama departemen biasa → satu nama, apa adanya
+2. label grup (`HRGA`) → seluruh anggotanya
+3. beberapa nama dipisah koma → nama-nama itu
+4. **campuran nama dan label dalam satu CSV** → tiap potongan diterjemahkan sendiri-sendiri
+
+⛔ **Bentuk keempat sempat patah, dan kerusakannya menyebar lebih luas dari yang terlihat.** Selama perbandingan labelnya dilakukan terhadap **seluruh** nilai, label hanya dikenali bila berdiri sendiri; label yang sama di antara nama lain diteruskan mentah. Yang membuatnya bergejala: `DepartmentFilterOptions` sengaja **mengganti** anggota grup dengan satu entri berlabel, jadi dropdown bergrup yang seluruh opsinya digabung koma mengirim satu label untuk **setiap** grup. Tab "Per Karyawan" halaman KPI melakukan persis itu, dan yang hilang bukan satu departemen melainkan seluruh departemen yang punya grup. Pemekarannya kini dikerjakan **per potongan**, dengan dedup case-insensitive supaya label yang datang bersama anggotanya tak menggandakan isi `$in`.
+
+Dua hal yang menyertainya:
+
+- **`ResolveDepartmentFilter` sengaja TIDAK memekarkan anggota→grup.** Menyebut `Human Resource` tetap menghasilkan satu nama; itu tugas `ExpandToDepartmentGroup`. Pemisahannya dipakai: `filterDepartemenTemplateKPI` memanggilnya **sendirian** justru supaya filter satu departemen tak diam-diam membawa template departemen saudaranya, sebab frontend memanggil endpoint itu per departemen lalu menggabungkan sendiri.
+- ⚠️ **Koma adalah pemisah, jadi `name` maupun `supervision_label` tak boleh mengandung koma.** Hari ini tak ada yang begitu (label tanpa `supervision_label` berbentuk `A + B`), dan bila suatu saat ada, potongannya pecah salah dan departemen itu hilang tanpa pesan.
+- **RBAC menilai string query MENTAH**, lewat `ParseDepartmentList` yang cuma memecah koma tanpa pemekaran grup. Jadi memekarkan label di lapisan filter tidak melebarkan hak akses siapa pun: `hasDepartmentAccess` mencocokkan `deptKeyToNames`, dan `HRGA` tak pernah cocok dengan key mana pun.
+
+Riwayat kelas ini: [#1444](https://github.com/bip-itteam-internal/bip-erp/pull/1444) (`/kpi/auto-scores`, kolom "Terhitung otomatis" berbunyi 0/20), [#1454](https://github.com/bip-itteam-internal/bip-erp/pull/1454) (`/kpi/template-assignment` tampil kosong), lalu bentuk CSV di atas. Perbaikan pertama tak ikut menyentuh yang kedua — bukti langsung bahwa aturannya tak boleh punya dua salinan.
+
 ### Urutan pencarian atasan
 
 Rantainya menelusuri berurutan sampai ketemu:
