@@ -13,8 +13,8 @@ b. `architecture-draft/VAULT-INDEX.json` memetakan **pertanyaan → dokumen**. C
 
 Sumbunya berbeda dan keduanya berguna; gabungkan hasilnya.
 
-Bila indeks tidak ada, rusak, atau `versi_skema` tak dikenal, pakai (a) saja, **beri tahu user**
-bahwa indeks tidak tersedia, dan sarankan `/index-vault`.
+Bila indeks tidak ada, rusak, atau `versi_skema` tak dikenal, pakai (a) saja + grep vault/kode,
+**beri tahu user** bahwa indeks tidak tersedia, dan sarankan `/index-vault`.
 
 ## 2. Baca dokumen terpilih SECARA UTUH
 
@@ -40,6 +40,7 @@ Itu normal, bukan gap.
 
 Indeks selalu mengembalikan dokumen terdekat, bahkan ketika jawabannya belum pernah ditulis.
 Setelah membaca, tanya diri sendiri apakah pertanyaannya benar-benar terjawab atau dokumen itu
-cuma sebidang topik. Bila cuma sebidang, katakan begitu dan sebut apa yang belum ada. Diuji
-2026-07-20: "berapa lama masa percobaan karyawan" dan "kenapa gaji telat cair" mengembalikan
-dokumen recruitment dan payroll yang relevan topiknya tapi tidak memuat jawabannya.
+cuma sebidang topik. Bila cuma sebidang, katakan begitu dan sebut apa yang belum ada — jangan
+menyajikan yang terdekat seolah itu jawabannya. Diuji 2026-07-20: "berapa lama masa percobaan
+karyawan" dan "kenapa gaji telat cair" mengembalikan dokumen recruitment dan payroll yang
+relevan topiknya tapi tidak memuat jawabannya.
