@@ -28,8 +28,20 @@ Nomor dalam kurung = prasyarat. Tiap item cukup jelas untuk langsung dilempar ke
 
 ### Gelombang 1 — fondasi data
 
-**T1. Normalisasi `work_data.join_date` jadi tipe `date`.** Skrip dua fase (dry run wajib, `mongodump` dulu, gerbang yang menolak melanjutkan bila jumlahnya di luar dugaan), mengikuti kerangka `.task-plans/jalankan-migrasi-elt.ps1`. Menulis DB produksi, jadi **disiapkan agent, dijalankan manusia**. Kunci hasilnya dengan test yang membaca `$type`, bukan sekadar mencocokkan nilai.
+**T1. Koersi tipe tanggal di employee-service + normalisasi data lama.** ✅ **SELESAI di branch `feat/employee-koersi-tanggal`, belum merge.** Rencana rincinya: `.task-plans/2026-08-29-employee-koersi-tanggal.md`.
 *Prasyarat: tidak ada. Bisa dikerjakan paralel dengan T2.*
+
+⚠️ **Lingkupnya berubah dari yang ditulis semula** ("skrip `.ps1` dua fase, dijalankan manusia"). Penelusuran kode menemukan tipe string **masih terus diproduksi**: 31 dokumen berpindah dari `date` ke `string` dalam 23 hari, karena `orchestrator/hris/partial_update.go` meneruskan `map[string]any` dari JSON dan employee-service men-`$set` mentah. Normalisasi sekali jalan akan tergerus dalam hitungan minggu.
+
+Yang dikerjakan:
+- Koersi ke `time.Time` di employee-service, gerbang terakhir sebelum Mongo, menutup **empat** pintu berbasis map. Pintu kelima (`workDataSetTanpaFieldTerkunci`) sudah aman karena berbasis struct.
+- Migrasi **boot-time** di repo (`migrateKoersiTipeTanggal`), bukan skrip terpisah, mengikuti 13 preseden di service ini. Idempoten lewat filter `$type: "string"`.
+- Lingkup diperluas ke `contract_ending` (51 dokumen) dan `personal_data.date_of_birth` (13), yang rusak oleh sebab yang sama.
+- Daftar field tanggal diturunkan dari struct lewat **refleksi**, bukan ditulis tangan.
+
+Keputusannya tercatat di [[ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak]] §10.
+
+⛔ **Verifikasi lewat gateway belum dijalankan** (menuntut deploy dev lebih dulu). Test lokal hijau bukan bukti fiturnya jalan.
 
 **T2. Koleksi `vacation_ledger` + model + indeks.** Satu dokumen per kejadian (`terbit`, `pakai`, `hangus`, `koreksi`) dengan `employee_id`, `company_id`, `periode`, `hari`, `pada`, `kedaluwarsa`, `ref`, `alasan`, `metadata`. Indeks unik atas (`employee_id`, `periode`, `jenis="terbit"`) yang menjadi penjaga idempotensi cron. ⚠️ Indeks unik atas field ber-`omitempty` wajib memakai `partialFilterExpression`.
 *Prasyarat: tidak ada.*

@@ -1902,20 +1902,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "224f2323055686f082b7d6b52459d2063420526f26d9f65d5d435208927fe912",
-      "ukuran_kb": 107.2,
-      "ringkasan": "Menjawab: di mana login, registrasi, PIN, biometric, dan reset akun ditangani, serta bagaimana master data karyawan, departemen, dan system roles dikelola. Menjelaskan juga workspace posisi yang menumpang di service ini (Legal, R&D Regulatory, Quality, Procurement non-Accurate), endpoint admin akun untuk IT staff, serta kaitannya dengan multi-perusahaan (tenant), akun pihak luar, KPI, kontrak, BPJS, dan kuota cuti. Dipakai saat menelusuri sumber kebenaran autentikasi dan data karyawan yang dikonsumsi service lain.",
+      "hash": "bf65564490e63444db105bad98c3f390628b61cfd334f8e6fd4605f06dd33d77",
+      "ukuran_kb": 108.6,
+      "ringkasan": "Menjawab: bagaimana login dan onboarding karyawan bekerja (username/employee_id, PIN, biometric, refresh token, temporary password), endpoint apa saja yang disediakan Employee Service sebagai sumber kebenaran autentikasi bip-erp, serta bagaimana admin IT mereset akun, mencabut device, dan mengatur system_roles. Juga menjelaskan master data department dan system role (seed, CRUD, gerbang RBAC-nya) plus workspace register yang menumpang di service ini: Legal (perizinan, kontrak, dispute), R&D Regulatory, Quality (CAPA, incoming, batch release), dan Procurement non-Accurate. Menjelaskan pula catatan multi-perusahaan (tenant), akun pihak luar/vendor, dan jalur resign atau nonaktif karyawan.",
       "kata_kunci": [
         "employee service",
-        "karyawan",
         "autentikasi",
         "authentication",
-        "SSO",
-        "login",
-        "master data",
-        "system roles",
-        "onboarding",
-        "multi-tenant"
+        "login PIN biometric",
+        "onboarding registrasi karyawan",
+        "master data department",
+        "system roles RBAC",
+        "reset akun forget device",
+        "legal perizinan kontrak dispute",
+        "multi-tenant company_id"
       ]
     },
     {
@@ -4745,20 +4745,20 @@
         "HRIS - Personalia",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id"
       ],
-      "hash": "a836bd84ce189c59eae1efc46332ee3bce3d776547aed8ae3076681e96dae85a",
-      "ukuran_kb": 17.1,
-      "ringkasan": "Menjawab: kenapa jatah cuti tahunan akan terbit otomatis di ulang tahun kontrak tiap karyawan, dari mana tanggal patokannya diambil, dan kenapa angka 5 hari yang ada sekarang bukan pelanggaran Pasal 15 melainkan sisa setelah Cuti Bersama dipotong HR di luar sistem. Menjelaskan ledger vacation_ledger sebagai sumber kebenaran saldo dengan work_data.vacation turun jadi salinan ringkas, cron harian idempoten pengganti cronResetAnnualLeave, pemotongan berbasis hari kerja, serta jebakan data seperti join_date bertipe campur date/string. Memuat pula ringkasan Untuk Manajemen berisi dampak ke 15 karyawan berkuota kosong dan 23 yang belum genap setahun.",
+      "hash": "7b9bee3a9c09c297951ed6e7c83b5c3928f5b3a24700e1eaf9bbcf789aabf74e",
+      "ukuran_kb": 18.6,
+      "ringkasan": "Menjawab: kenapa jatah cuti tahunan diputuskan terbit otomatis di ulang tahun kontrak tiap karyawan (bukan diketik HR per orang dan bukan serentak 1 Januari), apa patokan tanggalnya (start_date kontrak paling awal yang sudah lepas masa evaluasi), dan bagaimana saldo dicatat sebagai ledger kejadian vacation_ledger dengan work_data.vacation turun jadi salinan ringkas. Menjelaskan asal-usul angka kuota 5 hari (12 hari Pasal 15 dikurangi 7 hari kerja Cuti Bersama) yang selama ini hanya hidup di kepala HR, plus temuan pengukuran data produksi 2026-08-29: 15 orang sudah lebih dari setahun tetapi berkuota 0 sehingga tidak bisa mengajukan cuti sama sekali, dan 23 orang sudah berkuota padahal belum genap setahun. Juga mencatat jebakan join_date bertipe BSON campur (date dan string) yang membuat filter Mongo melewatkan separuh karyawan tanpa galat, serta apa saja yang sengaja tidak dijanjikan (tidak mencabut jatah terlanjur, tidak backfill mundur, Cuti Bersama tetap tidak dipotong sistem).",
       "kata_kunci": [
-        "ADR 0061",
         "cuti tahunan",
         "annual leave",
-        "kuota",
-        "quota",
-        "akrual",
-        "accrual",
+        "akrual kuota cuti",
+        "vacation quota",
         "vacation_ledger",
-        "Cuti Bersama",
-        "join_date"
+        "ulang tahun kontrak",
+        "join_date tipe campur",
+        "Pasal 15 Peraturan Perusahaan",
+        "cronResetAnnualLeave",
+        "hari kerja vs hari kalender"
       ]
     },
     {
@@ -10292,20 +10292,20 @@
         "ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak",
         "HRIS - Leave Request"
       ],
-      "hash": "a94417a39d1b0ee26251d3f51d0227520957c880936e2871e26fe8c3804380e2",
-      "ukuran_kb": 7.1,
-      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk membuat jatah cuti tahunan terbit otomatis, urutannya, dan apa prasyarat tiap item. Merinci gelombang kerja dari normalisasi join_date dan koleksi vacation_ledger, resolver patokan kontrak, cron akrual harian, ringkasan ke work_data.vacation, pemotongan berbasis hari kerja, layar Kelola Cuti, backfill, sampai verifikasi lewat gateway. Memuat juga TBD yang harus dijawab manusia (kontrak yang tidak nyambung, akun tanpa work_data, kuota ganjil) dan konsekuensi urutan deploy backend sebelum frontend.",
+      "hash": "8008b26e46dfbb3b104acdddb6d4b5ad85d2c9803d8858732308915c345db075",
+      "ukuran_kb": 8.1,
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mewujudkan akrual cuti tahunan otomatis, dalam urutan mana, dan apa prasyarat tiap item. Memuat sepuluh task bergelombang mulai dari koersi tipe tanggal di employee-service dan koleksi vacation_ledger, resolver tanggal patokan, cron akrual harian, ringkasan ke work_data.vacation, pemotongan berbasis hari kerja di attendance-service, koreksi HR jadi entri ledger, layar Kelola Cuti, backfill, sampai verifikasi lewat gateway sebagai satu perjalanan orang. Juga mendaftar lima cacat yang jadi akar masalah, tiga TBD yang harus dijawab manusia (kontrak yang tidak nyambung dengan join_date, akun tanpa work_data, kuota dan used yang janggal), hal-hal yang belum diverifikasi sehingga tidak boleh diklaim, serta konsekuensi deploy (employee dan attendance naik bersama, MyBharata tidak perlu rilis).",
       "kata_kunci": [
-        "analisa",
-        "cuti tahunan",
-        "akrual",
-        "annual leave",
-        "vacation_ledger",
-        "join_date",
+        "akrual cuti tahunan",
+        "annual leave accrual",
         "daftar task",
-        "backfill",
-        "migrasi",
-        "TBD"
+        "vacation_ledger",
+        "cron akrual harian",
+        "decrementVacationQuota",
+        "hari kerja",
+        "backfill kuota cuti",
+        "koersi tipe tanggal join_date",
+        "Kelola Cuti"
       ]
     },
     {

@@ -3,7 +3,8 @@
 *Jatah cuti tahunan terbit otomatis di **ulang tahun kontrak masing-masing karyawan**, bukan diketik HR per orang dan bukan serentak 1 Januari. Patokannya `start_date` kontrak paling awal yang tipenya sudah lepas masa evaluasi. Saldo dicatat sebagai **ledger kejadian** (`vacation_ledger`), dan `work_data.vacation` turun pangkat jadi salinan ringkas demi kompatibilitas MyBharata.*
 
 - **Status**: 🟡 **Diusulkan** — belum ada di kode. Keputusan diambil 2026-08-29 setelah pengukuran data produksi; daftar task ada di `Workspace/ANALISA - Akrual Cuti Tahunan Otomatis`.
-- **Path di repo (yang akan disentuh)**: `bip-erp/services/employee/vacation_accrual.go` (baru) · `vacation_ledger.go` (baru) · `cron.go` (ubah) · `main.go` (endpoint cuti) · `bip-erp/shared-library/models/employee/models.go` · `bip-erp/services/attendance/main.go` (pemotongan hari kerja) · `erp-frontend/src/features/hris/vacation/**` · skrip migrasi `join_date` (dijalankan manusia)
+- **Path di repo (yang akan disentuh)**: `bip-erp/services/employee/vacation_accrual.go` (baru) · `vacation_ledger.go` (baru) · `cron.go` (ubah) · `main.go` (endpoint cuti) · `bip-erp/shared-library/models/employee/models.go` · `bip-erp/services/attendance/main.go` (pemotongan hari kerja) · `erp-frontend/src/features/hris/vacation/**`
+- **Prasyarat §10 sudah dikerjakan** di branch `feat/employee-koersi-tanggal`: `bip-erp/services/employee/tanggal_koersi.go` + `tanggal_migrate.go` (baru), `partial_update.go` · `main.go` · `master_data.go` (ubah). Belum merge.
 - **Tanggal**: 2026-08-29
 
 ## Untuk Manajemen
@@ -148,9 +149,18 @@ Saat rilis, 15 orang yang ulang tahun patokannya sudah lewat menerima satu entri
 
 ### 10. Normalisasi `join_date` adalah prasyarat, bukan pekerjaan sampingan
 
-89 dokumen ber-`join_date` string dinormalisasi menjadi `date` sebelum modul ini menyala, sebagai skrip terpisah dengan dry run. Ia menulis ke database produksi, jadi **dijalankan manusia**, bukan agent.
-
 Meski patokan diambil dari kontrak, `join_date` tetap dipakai sebagai pembanding silang di §2, dan pembanding yang separuhnya tak terbaca bukan pembanding.
+
+⚠️ **Diperbarui 2026-08-29 setelah penelusuran kode.** Keputusan awal di sini menulis "skrip terpisah dengan dry run, dijalankan manusia". Itu diubah karena dua temuan:
+
+1. **Tipe string masih terus diproduksi**, jadi normalisasi sekali jalan akan tergerus. Rantai penyebabnya: frontend mengirim JSON (yang tak punya tipe tanggal) → `orchestrator/hris/partial_update.go` meneruskan `map[string]any` apa adanya → employee-service men-`$set` map itu mentah. Karena itu **sumbernya ditutup lebih dulu** dengan koersi ke `time.Time` di employee-service, gerbang terakhir sebelum Mongo.
+2. **Migrasinya jadi fungsi boot-time di repo**, mengikuti 13 preseden yang sudah ada di service ini, bukan skrip terpisah. Skrip terpisah tak ikut ter-review, tak ter-version, dan tak menyembuhkan diri bila terlewat. Idempotensinya datang dari filter kuerinya sendiri (`$type: "string"`), mekanisme yang sama dengan `migrateWorkDataPositionKey`.
+
+Ini **tidak** menabrak aturan "tulis prod, jalankan manusia": migrasinya berjalan saat container dinaikkan, dan yang menaikkan container tetap orang.
+
+Lingkupnya sekaligus diperluas ke `contract_ending` dan `personal_data.date_of_birth` yang bertipe campur oleh sebab yang sama. Daftar field tanggalnya diturunkan dari struct lewat refleksi, bukan ditulis tangan, supaya tak menyimpang saat model berubah.
+
+Nilai string yang tak terbaca **diteruskan apa adanya lalu dicatat ke log, bukan ditolak 400**: menolak akan mematikan seluruh penyimpanan form data karyawan hanya karena satu format tak terduga.
 
 ## Consequences
 

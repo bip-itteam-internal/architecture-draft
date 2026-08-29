@@ -293,7 +293,15 @@ Pengecualiannya kolom yang **selalu ditulis kode kita sendiri** — mis. `employ
 - `POST /vacation/decrement` — dipanggil oleh attendance
 - ⛔ **`work_data.vacation.quota` BUKAN jatah tahunan**, melainkan **sisa setelah Cuti Bersama dipotong** (12 hari Pasal 15 dikurangi 7 hari kerja Cuti Bersama 2026 = 5). Pemotongan itu dikerjakan HR di luar sistem lalu hasilnya diketik. Jangan menjumlahkannya dengan jatah Cuti Bersama, dan jangan menyimpulkan perusahaan hanya memberi 5 hari.
 - ⚠️ **Tak ada penerbit hak sama sekali.** `POST /vacation/quota` (manual, per orang) satu-satunya penulis `quota`; `cronResetAnnualLeave` hanya menyetel `used=0` bagi yang `quota > 0` sehingga karyawan berkuota 0 dilewati selamanya. Akibatnya 15 karyawan bermasa kerja >12 bulan tak bisa mengajukan cuti (ditolak 400 `VACATION_QUOTA_UNSET` di attendance). Rencana penggantinya: [[ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak]] (koleksi baru `vacation_ledger`, `work_data.vacation` turun jadi salinan ringkas). Detail domain: [[HRIS - Leave Request]] §Kuota Cuti Tahunan.
-- ⛔ **`work_data.join_date` bertipe campur**: 89 `string` dan 91 `date` dari 180 karyawan aktif (diukur 2026-08-29). Filter tanggal biasa melewati separuhnya **tanpa galat**. `employee_contract.start_date` bersih (225 dari 225 `date`), jadi pakai itu bila butuh tanggal yang bisa dibandingkan.
+- ⛔ **Tanggal di koleksi karyawan bertipe CAMPUR, dan sumbernya masih hidup.** Diukur 2026-08-29: `work_data.join_date` 114 `date` / 95 `string`, `contract_ending` 158 / 51, `personal_data.date_of_birth` 196 / 13. MongoDB membandingkan antar-tipe di bracket terpisah, jadi filter rentang (`$gte`/`$lt`) **melewati dokumen bertipe string tanpa satu pun galat**.
+
+	Penyebabnya bukan data lama: 31 dokumen berpindah dari `date` ke `string` antara 2026-08-06 dan 2026-08-29 sementara koleksinya cuma tumbuh 3. Rantainya — frontend mengirim JSON (tak punya tipe tanggal) → `orchestrator/hris/partial_update.go` meneruskan `map[string]any` apa adanya → employee-service men-`$set` map itu mentah lewat `buildUpdateSet` dan dua rute `POST /create/*`. Berkas orchestrator itu sendiri benar; ia dibuat 2026-07-30 untuk memperbaiki bug lain (round-trip struct menimpa `company_id`, `vacation`, `photo` dengan nilai nol), hanya tidak mengurus tipe tanggal.
+
+	Penawar BACA sudah ada dan tetap dipakai: `resolveTanggalFleksibel` (`services/employee/tanggal.go`), yang membaca BSON Date maupun string. Penyaringan tanggal untuk koleksi ini karena itu dikerjakan **di Go, bukan di kueri** — lihat `resign.go` dan `kpi_sumber_turnover.go` yang memakai struct bayangan ber-`JoinDate interface{}`.
+
+	Perbaikan sumbernya ada di branch `feat/employee-koersi-tanggal` (belum merge): koersi ke `time.Time` sebelum `$set` di empat pintu berbasis map, plus migrasi boot-time. Lihat [[ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak]] §10.
+
+	`employee_contract.start_date` bersih (**225 dari 225** `date`), jadi pakai itu bila butuh tanggal yang bisa langsung dibandingkan di kueri.
 
 **Contract / BPJS / Analysis**
 - Endpoint contract, BPJS, dan analysis (`RequireHRISStaff`)
