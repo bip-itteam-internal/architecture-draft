@@ -7,7 +7,7 @@
 - **Status**: ⚠️ Implemented (ada catatan) — kode ada di `main` kedua repo (BE merge PR #1504 `feat/engagement-assign`, FE merge PR #1287), tetapi **audit 2026-08-29 menemukan 3 cacat yang membuat alurnya belum bisa dipakai utuh** (bukti pengerjaan tak bisa diunggah → tiket mustahil ditandai selesai; tab Pekerjaan Saya selalu kosong; keterlihatan tiket tak dibatasi departemen). Rinciannya di **## Cacat yang Diketahui**. **Belum diverifikasi lewat gateway** dev maupun prod.
 - **Implementasi**: [[Microservices - Task Management Service]] (bagian *Modul Engagement Tim*) · kontrak endpoint di [[API - Task Management Service]]
 - **Layar**: [[APP - Web ERP]] — menu **Marketing › Engagement** (`/marketing/engagement`)
-- **Keputusan**: [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]]
+- **Keputusan**: [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] · [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]]
 
 ## Latar Belakang
 
@@ -120,9 +120,9 @@ Dari audit modul 2026-08-29 (task `t_14519b55`). Dicatat di sini supaya dokumen 
 Enam keputusan lingkup ini menunggu SPV; sampai diputuskan, **jangan** menuliskannya sebagai rancangan di dokumen mana pun.
 
 - **Bukti pengerjaan**: tambah rute lampiran engagement, atau longgarkan syarat buktinya jadi opsional? Yang kedua mengubah kontrak metrik `reporting` dan menuntut ADR sendiri. Juga TBD: batas ukuran/jumlah lampiran, dan apakah pemohon boleh melampirkan referensi saat membuat tiket.
-- **Batas keterlihatan tiket** (per-departemen / per-space / global-untuk-supervisor). `EngagementTicket` belum menyimpan `department`, jadi apa pun pilihannya menuntut penambahan field + migrasi. Keputusan ini layak jadi ADR tersendiri begitu diambil.
+- **Batas keterlihatan tiket** — **DIPUTUSKAN 2026-08-29**, lihat [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]]: penyaringan per **departemen requester** lewat field baru `requester_department`, dengan tim Engagement melihat kedua brand. Belum ada di kode.
 - **Apakah `CLOSED`/`CANCELLED` boleh disaring** di tab Tiket Tim, yang dimaksudkan untuk beban berjalan.
-- **Notifikasi "tiket baru" ke seluruh space** — fitur yang belum jadi, atau dead code yang harus dibuang? Kodenya terdaftar sampai FCM tapi tak pernah dikirim.
+- **Notifikasi "tiket baru" ke seluruh space** — **DIPUTUSKAN 2026-08-29** ([[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] §6): `space_id` dicabut sebagai sumber keanggotaan, jadi ini **dead code yang dibuang**, bukan fitur yang belum jadi.
 - **Batas WIP per anggota** — apakah memang direncanakan? `hitungWIP` ada tapi tak dipanggil.
 - **Penyelarasan template KPI produksi** yang masih bernama `Buzzer` dengan sumber `kinerja_engagement`.
 

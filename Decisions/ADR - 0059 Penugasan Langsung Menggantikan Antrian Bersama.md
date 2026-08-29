@@ -34,6 +34,8 @@ Sengaja **string tunggal**, bukan array seperti `Task.AssignTo` pada tiket IT: s
 
 ### 3. Kandidat penugasan disaring DEPARTEMEN, bukan jabatan
 
+> ⚠️ **Butir ini DIUBAH 2026-08-29 oleh [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] §4.** Peringatannya (nama jabatan rapuh terhadap rename) tetap berlaku, tetapi kesimpulannya — memakai departemen **pemanggil** — dibatalkan: ia diam-diam mengandaikan requester dan pengerja sedepartemen, sedangkan permintaan datang dari Account Specialist di **Kyura & Beauty Hacks**. Penggantinya menyaring `position_key` yang daftarnya disimpan sebagai **data**, bukan literal di handler. Teks di bawah dipertahankan sebagai catatan sejarah.
+
 `daftarKandidatPengerja` membaca rekan **sedepartemen pemanggil** dari `employee_db` ERP (read-only, lihat [[Microservices - Employee Service]]), bukan menyaring `position == "Engagement Team"`.
 
 Alasannya langsung: **tim ini baru saja di-rename dari "Buzzer" jadi "Engagement Team"**, dan penyaring berbasis nama jabatan akan mengosongkan daftar penugasan pada rename berikutnya **tanpa satu pun galat** — formulirnya tetap terbuka, dropdown-nya kosong, dan tak ada yang berbunyi salah. Departemen jauh lebih stabil. Sejarah rename ini dicatat di [[Sales - Engagement Team (Modul)]].
@@ -82,7 +84,7 @@ Sisi FE punya sisa yang sama: kolom "Alasan" masih dirender untuk pengerja pada 
 
 **Yang belum diputuskan (TBD):**
 
-- **Apakah notifikasi "tiket baru" ke seluruh space masih diinginkan** sebagai kesadaran situasi, di samping notifikasi personal ke yang ditugaskan. Kalau ya, kode yang menganggur itu adalah **fitur yang belum jadi**, bukan dead code — dan pembersihannya salah. Kalau tidak, ia dan komentar kepala berkasnya harus dibuang bersama.
+- ~~**Apakah notifikasi "tiket baru" ke seluruh space masih diinginkan**~~ — **DIJAWAB 2026-08-29** oleh [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] §6: `space_id` dicabut sebagai sumber keanggotaan (dua mekanisme keanggotaan yang hidup berdampingan pasti menyimpang, dan penyimpangannya muncul sebagai "orang ini tidak dapat notifikasi"). Kode yang menganggur itu **dead code**, dan dibuang bersama komentar kepala berkasnya.
 - **Apakah batas WIP per anggota direncanakan.** `hitungWIP` ada tapi tak dipanggil dari mana pun; ia satu-satunya sisa model lama yang mungkin bukan sampah.
 
 ## Terkait
