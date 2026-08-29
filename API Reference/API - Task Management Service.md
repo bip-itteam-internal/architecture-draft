@@ -2,7 +2,7 @@
 
 *Endpoint **task-management-service** (task & space ala Kanban; kini diposisikan ticketing/helpdesk). Gateway: `/api/task-management/*` (WebSocket via ingress langsung ke service). RBAC `staff`/`supervisor` di-derive dari map `system_roles`. Grounded ke `services/task-management/routes.go` + `main.go` di `origin/main`.*
 
-- **Implementasi**: [[Microservices - Task Management Service]] · **Status**: ⚠️ (di `main`; WS butuh rute ingress; **admin space** merged 2026-08-06 tapi belum diuji lewat gateway)
+- **Implementasi**: [[Microservices - Task Management Service]] · **Status**: ⚠️ (di `main`; WS butuh rute ingress; **admin space** merged 2026-08-06 tapi belum diuji lewat gateway; **modul Engagement Tim** ada di `main` tapi alurnya belum bisa dipakai utuh — lihat bagiannya)
 - **Indeks**: [[API - Index]]
 - > Catatan: attachment (via file-service), reports/stats, history/audit, users/departments, WebSocket, dan SLA — yang dulu dicatat sebagai isi branch `feat/task-management-parity` — **sudah ada di `main`** (diperiksa langsung ke `origin/main` 2026-08-05). Branch itu sendiri tak ada lagi.
 
@@ -161,6 +161,54 @@ Aturan isi muatannya, semuanya supaya sumber tidak diam-diam menilai:
 
 Seluruh aturan di atas berlaku **sama persis** untuk kedua rute, dan itu dijaga kode: `ringkasTiketKPI` (per orang) dan `ringkasTiketGrup` (per kelompok) memanggil satu fungsi `ringkasTiket(tugas, ikut)` yang membedakan keduanya **hanya** lewat predikat siapa yang ikut dihitung. Menyalin badan fungsinya akan melahirkan dua definisi "selesai" yang pasti menyimpang, dan penyimpangannya tak pernah muncul sebagai galat — hanya sebagai dua angka yang berbeda untuk pertanyaan yang sama.
 
+## Engagement Tim ⚠️
+
+> Status: kode di `main` (PR [#1504](https://github.com/bip-itteam-internal/bip-erp/pull/1504) + FE [#1287](https://github.com/bip-itteam-internal/erp-frontend/pull/1287)), **belum diverifikasi lewat gateway**. ⛔ **Alurnya belum bisa dipakai utuh** — tiga cacat yang menghalangi tercatat di [[Sales - Engagement Team (Modul)]]. Konsep & keputusannya: [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]].
+
+Modul boosting media sosial di service yang sama, memakai **koleksi Mongo sendiri** (`engagement_tickets`/`engagement_ticket_items`/`engagement_logs`), bukan `tasks`. Seluruh rutenya digerbang `requireRoles("staff","supervisor","admin")`; otorisasi sebenarnya diputuskan **di dalam handler** menurut hubungan pemanggil dengan tiket (pemohon? pengerja?), bukan di gerbang rute.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| POST | `/engagement/tickets` | Buat tiket. Wajib: `client`, `jenis_pekerjaan` (≥1), `volume` > 0, `items` (≥1), `deadline` (RFC3339), **`assigned_to`**. `prioritas` ∈ `low`·`normal`·`high`·`urgent` (kosong → `normal`; asing → `400`). Nomor tiket `ENG/YYYYMM/NNNN` diterbitkan server. Balasan `201 {data}` |
+| GET | `/engagement/tickets/queue` | Tiket **aktif** tim (`OPEN`+`IN_PROGRESS`+`DONE_BY_TEAM`), urut prioritas lalu deadline. Paginasi `{data, pagination}` |
+| GET | `/engagement/tickets/mine` | Tiket yang ditugaskan ke pemanggil |
+| GET | `/engagement/tickets/requested` | Tiket yang **dibuat** pemanggil (sisi Account Specialist) |
+| GET | `/engagement/kandidat` | Daftar orang yang boleh ditugaskan = rekan **sedepartemen pemanggil** (dari header identitas, bukan query). `{data[], catatan?}`; `catatan` muncul saat daftar kosong |
+| GET | `/engagement/dashboard` | `{per_status, menunggu_verifikasi, lewat_deadline}` |
+| GET | `/engagement/tickets/:id` | Detail + baris target: `{data, items}` |
+| GET | `/engagement/tickets/:id/logs` | Riwayat/audit trail tiket, terlama dulu: `{data, total}` |
+| POST | `/engagement/tickets/:id/start` | Pengerja menandai mulai (**opsional** dalam alur). Hanya `assigned_to`; selain itu `403` |
+| POST | `/engagement/tickets/:id/done` | Pengerja menandai selesai (`OPEN`/`IN_PROGRESS` → `DONE_BY_TEAM`). Body `{catatan}` opsional. ⛔ **Menolak `400` bila `attachments` kosong — dan tak ada rute yang bisa mengisinya** |
+| POST | `/engagement/tickets/:id/close` | Pemohon menutup (`DONE_BY_TEAM` → `CLOSED`). Hanya `requester_id` |
+| POST | `/engagement/tickets/:id/revisi` | Pemohon minta revisi (`DONE_BY_TEAM` → `IN_PROGRESS`), body `{alasan}` **wajib**. `assigned_to` **tidak** berubah |
+| POST | `/engagement/tickets/:id/reassign` | Pemohon/admin menugaskan ulang, body `{assigned_to, alasan}` keduanya wajib. Tiket kembali ke `OPEN`, `started_at`/`escalated_at` dibersihkan, `reassign_count++`. Pengerja **tidak** boleh memindahkan tiketnya sendiri |
+| POST | `/engagement/tickets/:id/cancel` | Pemohon/admin membatalkan (`OPEN`/`IN_PROGRESS` → `CANCELLED`), body `{alasan}` wajib. `DONE_BY_TEAM` **tidak** bisa dibatalkan |
+
+- **Paginasi**: `?page=`·`?limit=` (bawaan 15, **maksimum 100**), bentuk `pagination` sama dengan modul lain. Di `queue` pengurutan dilakukan di Go lalu **baru** dipotong — prioritas bernilai kata, sehingga urutan leksikografis Mongo memberi `high < low < normal < urgent`, terbaca sah padahal terbalik.
+- **Pencarian** `?q=` menyaring `no_tiket`/`client`/`campaign` di `mine`/`requested`. Kata `engagement`/`buzzer` (nama lama tim) **sengaja tidak dipakai sebagai penyaring** — ia menunjuk modul, bukan isi tiket, dan memakainya justru mengosongkan hasil.
+- ⚠️ **`?prioritas=` diabaikan seluruh endpoint daftar**, dan `?status=` diabaikan di `queue`, padahal layar menawarkan keduanya. Memilih saringan tidak mengubah apa pun, tanpa galat.
+- ⚠️ **Tak ada penyaringan departemen/space di `queue`, `dashboard`, `tickets/:id`, maupun `logs`.** Setiap pemakai ERP dapat membaca seluruh tiket lintas departemen berikut `guideline`, `tone_of_voice`, `kata_terlarang`, dan `target_url`.
+- ⚠️ **Urutan pendaftaran rute mengikat**: rute literal (`queue`/`mine`/`requested`) wajib didaftarkan **sebelum** `/tickets/:id`. Bila tertelan, jawabannya bukan `404` melainkan **`200` berisi bentuk yang masuk akal** — kelas cacat yang sudah menggigit di repo ini (bip-erp #1331). Dikunci `TestRuteLiteralTakTertelanParam`.
+
+### `GET /kpi/engagement` ⚠️ (panggilan mesin)
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/kpi/engagement` | Agregat tiket engagement **satu orang** satu periode. Query wajib `employee_id`·`periode=YYYY-MM`·`key`. Balasan `{ditutup, menit_ambil[], tanpa_revisi, rasio_volume[], volume_terukur, berbukti}` |
+
+Gerbangnya **kunci layanan** `TASK_MANAGEMENT_SERVICE_KEY` lewat query `key`, sama seperti `/kpi/ticket` — rute ini menjawab "berapa angka orang ini" tanpa membawa identitas pemakai, jadi header gateway tak boleh jadi buktinya ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Konsumennya sumber `kinerja_engagement` di [[Microservices - Employee Service]].
+
+Aturan muatannya, semuanya supaya sumber tidak diam-diam menilai:
+
+- **Tanpa angka target/bobot/ambang.** Semua milik HR lewat template KPI.
+- **Penyebutnya `ditutup`** = tiket `CLOSED` yang ditugaskan ke orang itu, **periodenya dari `closed_at`**, bukan `created_at`. Tiket `CLOSED` tanpa `closed_at` (data cacat) **dilewati**, tidak jatuh ke `created_at` sebagai cadangan — cadangan itu menaruhnya di bulan yang salah tanpa terlihat sebagai galat.
+- `DONE_BY_TEAM` **tidak** masuk penyebut (menghukum pengerja atas kelambatan pemohon); `CANCELLED` juga tidak.
+- **`menit_ambil` dikirim per tiket**, bukan sudah dirata-rata. ⚠️ Namanya kontrak lama; yang diukur sekarang `assigned_at` → `done_at`, yaitu berapa lama **menyelesaikan**, bukan berapa cepat merespons. Selisih negatif (jam server bergeser) dinolkan, supaya kekeliruan jam tak jadi hadiah.
+- **`volume_terukur` dipisah dari `ditutup`.** Tiket tanpa target volume tak dapat dinilai pencapaiannya, dan mengisi target adalah pekerjaan pemohon — bedanya jadi cakupan, bukan kegagalan pengerjanya.
+- **`rasio_volume` boleh melebihi 1**: kelebihan kerja tidak disembunyikan.
+- **Muatan sempit**: tanpa judul tiket, nama client, maupun nama orang. Permintaan boosting memuat isi pekerjaan dan tautan kampanye; penilaian hanya butuh cacahan. Pola sama dengan `/kpi/ticket`.
+- ⚠️ **Selama cacat "bukti tak bisa diunggah" belum ditutup, seluruh angka rute ini nol untuk semua orang** — tak ada tiket yang pernah mencapai `CLOSED`.
+
 ## WebSocket
 | Path | Fungsi |
 |---|---|
@@ -175,3 +223,4 @@ Seluruh aturan di atas berlaku **sama persis** untuk kedua rute, dan itu dijaga 
 
 ## Dokumen Terkait
 - [[Microservices - Task Management Service]] · [[APP - Dynamic Task Tracker]] · [[API - Index]] · [[ADR - 0038 Hak Per-Objek Admin Space Task Management]]
+- Modul Engagement Tim: [[Sales - Engagement Team (Modul)]] · [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]]
