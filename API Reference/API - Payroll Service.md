@@ -59,16 +59,17 @@ Seluruh config **singleton**, di-seed idempoten saat boot (`seedPayrollConfig`, 
 |---|---|---|---|
 | GET | `/employee-salary` | `view` / `isHR` | Daftar penetapan gaji |
 | GET | `/employee-salary/:employeeId` | `view` / `isHR` | Belum ditetapkan → **404 `gaji karyawan belum ditetapkan`**, bukan 200 bernilai nol |
-| PUT | `/employee-salary/:employeeId` | **`salary.write`** / `isHR` | Izin terpisah — lihat §Model gerbang |
+| PUT | `/employee-salary/:employeeId` | **`salary.write`** / `isHR` | Izin terpisah — lihat §Model gerbang. ⚠️ **Upsert PENUH**: field yang tak dikirim jadi nol |
+| POST | `/employee-salary/bulk-bpjs-base` | **`salary.write`** / `isHR` | Isi massal DUA dasar upah BPJS dari Excel HR. ⛔ **Tanpa `upsert`** — karyawan tanpa penetapan gaji **dilaporkan gagal**, tidak dibuatkan record bergaji nol. `$set` hanya dua dasar upah + `updated_by/at`. Kegagalan **per baris** (`{diperbarui, tanpa_ubah, gagal[]}`), maks 1000 baris. Didaftarkan **sebelum** saudara ber-`:employeeId` |
 | GET | `/employer-cost` | ⚠️ **tanpa `gate()`** | Beban perusahaan per karyawan (bruto + iuran BPJS pemberi kerja), dikonsumsi **modul insentif** sebagai biaya operasional per orang. `?employee_ids=a,b,c&period=YYYY-MM`. Tanpa gerbang izin **secara sengaja**: pemanggilnya service lain yang tak membawa identitas orang. Penjaganya kunci gateway (`ValidateGateway` di `main.go`), dan ia hanya memulangkan satu angka beban per karyawan |
 
 ## Payroll Run & THR
 
 | Method | Path | Gerbang | Catatan |
 |---|---|---|---|
-| POST | `/payroll-runs` | `work` / `isHRSupervisor` | Buat run bulanan |
+| POST | `/payroll-runs` | `work` / `isHRSupervisor` | Buat run bulanan. Body **`scope`** = `semua`(default)\|`karyawan`\|`magang` — nilai tak dikenal dibalas **400**, bukan dijatuhkan ke `semua`: salah ketik yang *melebarkan* lingkup berarti orang yang tak dimaksud ikut terbayar |
 | POST | `/thr-runs` | `work` / `isHRSupervisor` | Buat run THR (Fase 4). Masa kerja ditarik dari employee-service `/internal/export/all` |
-| GET | `/payroll-runs` | `view` / `isHR` | Difilter `?type=thr\|monthly` |
+| GET | `/payroll-runs` | `view` / `isHR` | Difilter `?type=thr\|monthly`. Tiap run membawa `jumlah_karyawan`/`total_gross`/`total_net` — **dihitung saat dibaca** dari `payroll_run_line` (`bson:"-"`), tidak disimpan, supaya mustahil basi terhadap slip di dalamnya |
 | GET | `/payroll-runs/:id` | `view` / `isHR` | |
 | GET | `/payroll-runs/:id/lines/:employeeId` | `view` / `isHR` | Satu baris slip di dalam run |
 | POST | `/payroll-runs/:id/recalculate` | `work` / `isHRSupervisor` | **Dispatch per `type`** — rute lifecycle sengaja type-agnostic dan dipakai ulang oleh THR |

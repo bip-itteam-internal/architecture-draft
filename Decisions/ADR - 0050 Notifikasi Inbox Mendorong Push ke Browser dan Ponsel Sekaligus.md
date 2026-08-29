@@ -2,7 +2,7 @@
 
 *Setiap dokumen inbox yang tersimpan mendorong push ke dua kanal sekaligus, browser dan ponsel, tanpa penyaringan kategori. Mencabut keputusan 2026-08-20 yang membuat daftar-izin push browser lebih pendek dari daftar kategori inbox. Mengubah apa yang sampai ke perangkat orang, karena itu ditulis sebagai ADR.*
 
-- **Status**: ⚠️ **Diputuskan 2026-08-22, kode selesai, BELUM merge dan BELUM deploy.** Branch `feat/push-dua-kanal` (bip-erp).
+- **Status**: ⚠️ **Implemented (ada catatan)** — sudah **merge ke `main`**, diverifikasi 27 Agustus 2026: `PushWebCategories` dan `IsPushWebCategory` tak lagi ada di `shared-library/models/notification/models.go`, dan `IsInboxCategoryValid` berdiri sendiri sebagai satu-satunya daftar-izin. **Keadaan deploy tidak diverifikasi** pada pemeriksaan itu; urutan deploy yang mengikat di bawah tetap berlaku.
 - **Ruang lingkup**: `POST /inbox/send` di [[Microservices - Notification Service]], plus pencabutan panggilan `/fcm/send-*` langsung di [[Microservices - Attendance Service]], [[Microservices - Task Management Service]], dan [[Microservices - Employee Service]]. Tidak menyentuh pengiriman yang memang bukan notifikasi inbox.
 - **Menggantikan**: keputusan `PushWebCategories` 2026-08-20 yang tercatat di [[Microservices - Notification Service]].
 

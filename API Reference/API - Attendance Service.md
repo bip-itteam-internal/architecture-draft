@@ -3,7 +3,7 @@
 *Endpoint **attendance-service** (kehadiran multi-metode, jadwal, leave/shift/correction/perjalanan-dinas, guestbook, payroll-supplement). Gateway: `/api/attendance/*`. Grounded ke `services/attendance/*.go`.*
 
 - **Implementasi**: [[Microservices - Attendance Service]] · **Status**: ✅
-- **Indeks**: [[API - Index]] · RBAC: `RequireHRISStaff`, `RequireSecurity`, `RequireGuestbookRBAC`, `RequireITStaff`; banyak rute open (gated header/token/serial).
+- **Indeks**: [[API - Index]] · RBAC: `RequireHRISStaff`, `RequireSecurity`, `RequireGuestbookRBAC`, `RequireITStaff`, `RequireHRISStaffOrITSupervisor` (kelola jadwal), `gerbangRoster` (roster); banyak rute open (gated header/token/serial).
 
 ## Attendance entries & jadwal
 | Method | Path | Fungsi | Auth |
@@ -17,9 +17,12 @@
 | GET | `/payroll-status-treatment` | Perlakuan dibayar/dipotong per status (untuk payout) | `payroll.view` |
 | PUT | `/payroll-status-treatment` | Set flag `paid` satu status (`{status, paid}`) | `payroll.manage` |
 | GET | `/today` · `/schedule` · `/sync/company-work-schedules` · `/data-type/:dt` | Jadwal harian/bulanan/sync/enum | open |
+| GET | `/company-work-schedule` | Definisi shift milik perusahaan aktif (`EffectiveCompanyID`). Amplopnya membawa **`code_managed`** — lihat [[Microservices - Attendance Service]] soal artinya yang **bukan** "jangan menambah" | open |
+| POST | `/company-work-schedule` | Buat definisi shift. `schedule_id` **unik GLOBAL** (409 bila dipakai); `display_name` **wajib** dan tertutup (`REGULAR`/`MORNING`/`DAY`/`AFTERNOON`/`NIGHT`/`MIDNIGHT`), 400 bila di luar daftar — tanpa nama yang dikenal, kalender merender jam **tanpa keterangan apa pun** dan tak ada galat di mana pun. `company_id` dan `managed_by: "user"` distempel server, **bukan** dari payload | staf HRIS **atau** supervisor IT |
+| DELETE | `/company-work-schedule/:schedule_id` | Hapus definisi shift. Difilter `company_id` pemilik **dan** `managed_by: "user"`, jadi shift **bawaan membalas 404** — menghapusnya tak berpengaruh apa pun karena seed menyemainya ulang tiap boot | staf HRIS **atau** supervisor IT |
 | GET | `/company-group-rotation` | Pola shift bergilir milik perusahaan aktif (`EffectiveCompanyID`) | open |
-| POST | `/company-group-rotation` | Buat pola rotasi. `group_id` **unik GLOBAL** (409 bila dipakai); `starting_date` **wajib** (400 bila kosong) karena ia yang menentukan langkah mana yang berlaku — sebelumnya tak divalidasi dan tersimpan sebagai tahun 0001 lalu menghasilkan fase acak ([#1357](https://github.com/bip-itteam-internal/bip-erp/pull/1357)) | HRIS/IT supervisor |
-| DELETE | `/company-group-rotation/:group_id` | Hapus pola rotasi (difilter `company_id` pemilik) | HRIS/IT supervisor |
+| POST | `/company-group-rotation` | Buat pola rotasi. `group_id` **unik GLOBAL** (409 bila dipakai); `starting_date` **wajib** (400 bila kosong) karena ia yang menentukan langkah mana yang berlaku — sebelumnya tak divalidasi dan tersimpan sebagai tahun 0001 lalu menghasilkan fase acak ([#1357](https://github.com/bip-itteam-internal/bip-erp/pull/1357)) | staf HRIS **atau** supervisor IT |
+| DELETE | `/company-group-rotation/:group_id` | Hapus pola rotasi (difilter `company_id` pemilik **dan** `managed_by: "user"`; rotasi bawaan membalas 404) | staf HRIS **atau** supervisor IT |
 | GET/PATCH | `/mood` | Mood check-in harian | header |
 
 ## Holiday
@@ -47,11 +50,15 @@
 ## Roster jadwal bebas per tanggal
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
-| GET | `/roster` | Sel roster + karyawan ber-roster satu departemen (`?department=` wajib, `?from=`/`?to=` YYYY-MM-DD) | `CanManageDepartment` |
-| PUT | `/roster` | Simpan banyak sel (`{department, cells[]}`; sel = `employee_id`, `date` **RFC3339 penuh**, `off`, `work_time`, `note`). Maks **500 sel** per permintaan; validasi seluruh sel dulu, baru `BulkWrite` | `CanManageDepartment` |
-| DELETE | `/roster` | Kosongkan sel (`{department, cells[{employee_id, date}]}`) → tanggal kembali ke jadwal dasar; entri hari berjalan ikut dipulihkan | `CanManageDepartment` |
+| GET | `/roster` | Sel roster + karyawan ber-roster satu departemen (`?department=` wajib, `?from=`/`?to=` YYYY-MM-DD) | `gerbangRoster` |
+| PUT | `/roster` | Simpan banyak sel (`{department, cells[]}`; sel = `employee_id`, `date` **RFC3339 penuh**, `off`, `work_time`, `note`). Maks **500 sel** per permintaan; validasi seluruh sel dulu, baru `BulkWrite` | `gerbangRoster` |
+| DELETE | `/roster` | Kosongkan sel (`{department, cells[{employee_id, date}]}`) → tanggal kembali ke jadwal dasar; entri hari berjalan ikut dipulihkan | `gerbangRoster` |
 
-Menolak: tanggal lampau, penulisan lintas perusahaan, departemen di luar cakupan supervisi, dan sel hari ini yang karyawannya sudah tap masuk atau sudah berstatus cuti/dinas. `date` bertipe Go `time.Time` sehingga **tanggal telanjang `YYYY-MM-DD` gagal di-parse** — kirim timestamp RFC3339 utuh. Keputusan: [[ADR - 0036 Roster Harian Menimpa Jadwal Dasar]].
+**`gerbangRoster`** (`services/attendance/roster.go`) meloloskan **staf HRIS ke atas** untuk SELURUH departemen, atau siapa pun yang tokennya membawa klaim `supervised_departments` untuk departemen di dalam cakupannya saja. Cakupannya dibaca MENTAH (`SupervisedDepartmentsStrict`, tanpa fallback ke departemen sendiri); dengan fallback, setiap karyawan akan lolos atas rekan sedepartemennya — termasuk host yang menggeser jam shiftnya sendiri sesaat sebelum tap masuk. Modul `it` **tidak** punya akses roster sama sekali, berbeda dari kelola shift/rotasi di atas.
+
+⚠️ Ini **bukan** `common.CanManageDepartment`, yang bentuknya mirip tapi mengunci ambang **supervisor** dan menopang gerbang peninjau Kaizen di [[Microservices - Form Builder Service]]. Roster sengaja punya penjaganya sendiri supaya menurunkan ambang di sini tidak melebarkan Kaizen.
+
+Menolak: tanggal lampau, penulisan lintas perusahaan, departemen di luar cakupan, dan sel hari ini yang karyawannya sudah tap masuk atau sudah berstatus cuti/dinas. `date` bertipe Go `time.Time` sehingga **tanggal telanjang `YYYY-MM-DD` gagal di-parse** — kirim timestamp RFC3339 utuh. Keputusan: [[ADR - 0036 Roster Harian Menimpa Jadwal Dasar]].
 
 ## Business trip (perjalanan dinas)
 | Method | Path | Fungsi | Auth |

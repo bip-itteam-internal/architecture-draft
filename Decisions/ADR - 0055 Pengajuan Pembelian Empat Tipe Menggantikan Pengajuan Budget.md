@@ -2,7 +2,7 @@
 
 *Modul Pengajuan Budget diganti menjadi **Pengajuan Pembelian** bertipe empat (barang umum, raw material, software, iklan), dengan rantai persetujuan yang berlanjut sampai barang diterima. Kas kecil dipensiunkan bertahap.*
 
-- **Status**: 🟡 **Diusulkan** — desain disetujui 26 Agustus 2026, belum ada kode. Spesifikasi lengkap: `bip-erp/docs/superpowers/specs/2026-08-26-pengajuan-pembelian-empat-tipe-design.md`
+- **Status**: ⚠️ **Implemented (ada catatan)** — kode backend dan frontend sudah di `main` kedua repo (diverifikasi 27 Agustus 2026: 22 berkas `services/procurement/pengajuan_pembelian*` dan modul `erp-frontend/src/features/procurement/pembelian`). **Keadaan deploy tidak diverifikasi** pada pemeriksaan itu. Catatan yang masih terbuka ada di bagian bawah dokumen ini. Spesifikasi lengkap: `bip-erp/docs/superpowers/specs/2026-08-26-pengajuan-pembelian-empat-tipe-design.md`
 - **Path di repo**: `bip-erp/services/procurement/pengajuan_budget*.go` (diganti) · `bip-erp/services/inventory` · `bip-erp/services/manufacture`
 - **Tanggal**: 2026-08-26
 
@@ -82,6 +82,15 @@ Tahap pertama mencabut rute dan menu, memindahkan kode yang masih dipakai ke nam
 - Rantai §3 pada [[REF - Rantai Pengajuan Lintas Modul]] **tertutup dari sisi hulu**: satu dokumen berjalan dari pengajuan sampai barang diterima, dan "sekarang di mana" punya satu jawaban.
 - Rantai §5 (penerimaan tidak menambah stok) tertutup **untuk jalur ini saja** — penerimaan yang lahir dari pengajuan akan menambah stok/aset.
 - Mesin `JenjangWajib` + `TahapSaatIni`, yang [[REF - Rantai Pengajuan Lintas Modul]] sebut *"satu-satunya rantai n-tahap sungguhan"* di seluruh repo, dipakai untuk rantai yang jauh lebih panjang — menguji bentuknya sebelum ada yang mempertimbangkan mengangkatnya ke `shared-library`.
+
+### Yang ditemukan setelah dipakai (27 Agustus 2026)
+
+Pembedahan alur menemukan empat titik yang benar secara kode namun membuat orangnya tak dapat menyelesaikan pekerjaannya. Ditutup lewat [[ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap]]:
+
+- **Rantainya tak punya alamat.** Satu-satunya notifikasi di modul ini adalah QC gagal, sehingga delapan tahap bergerak hanya bila orangnya kebetulan membuka menu.
+- **Status `REVISI` tak punya layar sunting.** Yang tersedia bagi pengaju hanya tombol Ajukan, yaitu mengirim ulang dokumen yang sama persis yang baru saja dikembalikan.
+- **Pembuatan selalu melahirkan DRAFT tanpa mengatakannya.** Tombolnya bernama "Simpan", layarnya berpindah, dan pengaju mengira sudah mengajukan.
+- **`tautan` yang diisi pengaju tak pernah dirender**, jadi penyetuju memutuskan tanpa bahan yang sudah dikirimkan kepadanya.
 
 ### Yang memburuk atau tetap terbuka
 

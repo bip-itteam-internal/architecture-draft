@@ -2,7 +2,7 @@
 
 *Struktur organisasi perusahaan — departemen, posisi/jabatan, jenjang, dan hierarki (atasan/SPV). **Departemen dan posisi** dikelola sebagai master data di MongoDB (`master_department`) dengan CRUD endpoint dan halaman admin di frontend. Data karyawan tetap di `work_data`. **Bagan organisasi sudah ada** (`/hris/org-chart`); **jenjang jabatan sudah ada** (2026-08-03) tapi belum diisi HR.*
 
-- **Status**: ⚠️ Implemented (ada catatan): master departemen/posisi sudah di-DB; **org chart live di produksi** (2026-08-01) berikut peleburan simpul se-kelompok supervisi (`HRGA`); **jenjang jabatan live di produksi** (2026-08-03), **56 dari 81 jabatan** terisi per 2026-08-12 dan **ditampilkan** di daftar karyawan serta bagan organisasi (FE PR [#1000](https://github.com/bip-itteam-internal/erp-frontend/pull/1000)); **penyetuju pengajuan per departemen live di produksi** (PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184) & [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)); resolusi atasan **disatukan jadi satu rantai** (PR [#1201](https://github.com/bip-itteam-internal/bip-erp/pull/1201)). Ketiganya **diverifikasi langsung di PRODUKSI 2026-08-26**, lihat §Bukti verifikasi produksi
+- **Status**: ⚠️ Implemented (ada catatan): master departemen/posisi sudah di-DB; **org chart live di produksi** (2026-08-01) berikut peleburan simpul se-kelompok supervisi (`HRGA`); **jenjang jabatan live di produksi** (2026-08-03), **56 dari 81 jabatan** terisi per 2026-08-12 dan **ditampilkan** di daftar karyawan serta bagan organisasi (FE PR [#1000](https://github.com/bip-itteam-internal/erp-frontend/pull/1000)); **penyetuju pengajuan per departemen live di produksi** (PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184) & [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)); resolusi atasan **disatukan jadi satu rantai** (PR [#1201](https://github.com/bip-itteam-internal/bip-erp/pull/1201)). Ketiganya **diverifikasi langsung di PRODUKSI 2026-08-26**, lihat §Bukti verifikasi produksi. ⚠️ **Belum merge, belum deploy**: mode bagan kanvas pada `/hris/org-chart` dan tab baca-saja **Peta Struktur** ada di branch `feat/visual-struktur-organisasi` (erp-frontend, 2026-08-28) — FE saja, nol perubahan kontrak backend
 
 ## Ruang Lingkup
 
@@ -53,7 +53,12 @@
 		- `groups` kosong (organisasi tanpa relasi supervisi, atau backend yang belum di-deploy) menghasilkan bagan persis seperti sebelumnya; itu dikunci uji, jadi FE aman naik lebih dulu meski urutan deploy tetap BE dulu.
 	- Orang tanpa atasan **menempel ke departemennya** dan jumlahnya disebut di kepala halaman, jadi bagan sekaligus menunjukkan pekerjaan pengisian yang belum selesai. Karyawan **tanpa departemen** dikumpulkan ke kelompok berlabel, bukan dibuang — dikunci uji "jumlah seluruh simpul selalu sama dengan jumlah orang".
 	- ⚠️ **Penjaga siklus WAJIB di sini walau tak ada di KPI.** KPI hanya melihat satu tingkat sehingga siklus tak berbahaya; bagan **menelusuri rantai**, jadi satu siklus akan berputar tanpa henti dan membekukan browser. Orang yang atasannya membentuk siklus tetap digambar, menempel ke departemen. Logikanya di `features/hris/org-chart/lib/bangun-pohon.ts`, terpisah dari render supaya bisa diuji tanpa React.
-	- **Tanpa pustaka bagan.** HTML bersarang biasa; `recharts` yang sudah ada tak punya tata letak pohon. Departemen terbuka, isinya terlipat secara bawaan — 204 kartu sekaligus membuat bagan lebih sulit dibaca daripada daftar.
+	- **DUA MODE sejak 2026-08-28** (⚠️ branch `feat/visual-struktur-organisasi`, **belum merge**): toggle **Bagan / Daftar** di kepala halaman. Keduanya membaca pohon yang sama dari `bangunPohon`; yang berbeda cuma cara menggambarnya.
+		- ⛔ **Catatan lama "Tanpa pustaka bagan" DICABUT, dan pencabutannya disengaja.** Alasan lamanya (HTML bersarang cukup; `recharts` tak punya tata letak pohon; dependensi khusus tak sepadan untuk empat tingkat simpul) masih benar untuk mode DAFTAR, dan mode itu karena itu dipertahankan apa adanya. Yang berubah kebutuhannya: satu kanvas berisi 204 orang sekaligus berikut geser, zoom, dan minimap ada di luar jangkauan HTML bersarang. Mode bagan memakai **`@xyflow/react` 12.11.5** (kanvas, geser/zoom, minimap) + **`d3-hierarchy` 3.1.2** (tata letak pohon saja). Diputuskan **tanpa ADR tersendiri**: ini pilihan pustaka, bukan perubahan bentuk arsitektur.
+		- **Mode daftar sengaja TIDAK digantikan.** Ia unggul persis di dua hal yang tak dimiliki kanvas: terbaca di layar sempit, dan bisa dicari dengan Ctrl+F. Ia juga jaring pengaman bila bundel kanvas gagal dimuat, jadi toggle-nya wajib tetap terlihat di kedua mode. Departemen terbuka dan isinya terlipat secara bawaan hanya berlaku di mode ini — 204 kartu sekaligus membuat daftar lebih sulit dibaca.
+		- **`bangunPohon` dipakai ulang UTUH oleh kedua mode**, dan itu yang menjaga peleburan `HRGA` beserta penjaga siklus di atas tak punya salinan kedua. Yang baru hanya `lib/tata-letak.ts`, fungsi murni yang mengubah pohon jadi simpul berkoordinat lewat `d3.hierarchy().tree()`; ia dikunci uji "jumlah simpul orang selalu sama dengan jumlah orang", pasangan dari uji senama di `bangun-pohon.test.ts`.
+		- ⚠️ **Kanvas WAJIB berada di dalam induk bertinggi pasti dengan wadah `flex-1 min-h-0`.** Tanpa itu tingginya nol dan layarnya terbaca sebagai "datanya kosong", bukan sebagai galat — kelas yang sama dengan `max-h-*` pada `ScrollArea`. jsdom tak punya mesin layout sehingga yang bisa dikunci uji hanya anti-polanya lewat assertion kelas.
+		- ⚠️ **Ukuran simpul DIDEKLARASIKAN di datanya (`width`/`height`), bukan diserahkan ke pengukuran React Flow.** Tanpa itu MiniMap menggambar NOL kotak dan tampil sebagai kotak abu kosong yang terbaca seperti kontrol rusak. Minimap juga ditaruh di **kanan-atas**, karena kanan-bawah ditempati tombol aksi mengambang aplikasi di tiap halaman. Kedua cacat ini hanya terlihat dari layar sungguhan; tak ada test yang bisa menangkapnya.
 	- ⚠️ **Direktur muncul di dalam Kesekretariatan, bukan di puncak**, karena begitulah datanya (`work_data.department` = `Kesekretariatan`). Penentuan akar **tidak** ditebak dari nama jabatan. Menjadikan Direktur puncak organisasi adalah **keputusan data**, sekelas dengan jenjang jabatan; bagan ini justru membuat kejanggalan itu terlihat.
 	- ⚠️ Direktur di dalam Kesekretariatan **tetap begitu walau jenjang sudah ada**: akar bagan ditentukan `work_data.department`, bukan `level_key`. Menjadikan jenjang penentu akar akan membuat bagan bercabang dari lima Supervisor sekaligus dan berbeda dari struktur pelaporan yang sebenarnya.
 
@@ -129,6 +134,35 @@ Relasinya disimpan sebagai **master data**, bukan di kode: `master_department.su
 | Sifat | Mengelompokkan ulang baris yang sudah lolos RBAC; **tak pernah menambah baris** | Menambah akses |
 
 Mencampur keduanya berbahaya dua arah: menyempitkan tampilan bikin staf HR melihat HR dan GA terpisah padahal timnya satu; melebarkan wewenang bikin staf HR ikut mendapat akses tiket GA yang bukan haknya.
+
+### Kontrak penerjemah filter departemen
+
+⚠️ **Tiga fungsi bernama mirip di `shared-library/models/employee/department_scope.go` menjawab pertanyaan BERBEDA, dan memakai yang keliru tak pernah melempar galat.** Ia mengembalikan slice yang sah berisi nama yang tak dimiliki siapa pun, sehingga endpoint membalas **200 tanpa satu pun baris** dan layar berbunyi "belum ada datanya" alih-alih "filternya tak menemukan siapa-siapa".
+
+| Fungsi | Menerima | Menjawab |
+|---|---|---|
+| `ResolveDepartmentFilter` | nilai dari LAYAR: nama, label grup, CSV, atau campurannya | "nilai yang dipilih orang ini maksudnya departemen apa saja" |
+| `ExpandToDepartmentGroup` | nama departemen saja | "menyebut satu anggota berarti menyebut siapa saja" |
+| `SupervisedDepartments` | nama departemen saja | "apa cakupan supervisi ORANG ini" |
+
+**Nilai yang datang dari layar wajib memakai komposisi `ExpandToDepartmentGroup(ResolveDepartmentFilter(master, q))`**, persis seperti `GET /kpi`. Di employee-service komposisi itu tinggal di satu tempat, `cakupanDepartemenKPI` (`services/employee/kpi_departemen_query.go`), dengan penjaga pemindai sumber berdaftar-izin: pemanggil baru yang menembak `SupervisedDepartments` atas nilai query membuat testnya merah. Pemanggilan yang memakai `work_data.department` milik seseorang tetap aman dan sengaja diizinkan, sebab label grup tak pernah tersimpan di sana.
+
+`ResolveDepartmentFilter` menerima **empat** bentuk, dan bentuk keempat yang paling lama tak terlihat:
+
+1. nama departemen biasa → satu nama, apa adanya
+2. label grup (`HRGA`) → seluruh anggotanya
+3. beberapa nama dipisah koma → nama-nama itu
+4. **campuran nama dan label dalam satu CSV** → tiap potongan diterjemahkan sendiri-sendiri
+
+⛔ **Bentuk keempat sempat patah, dan kerusakannya menyebar lebih luas dari yang terlihat.** Selama perbandingan labelnya dilakukan terhadap **seluruh** nilai, label hanya dikenali bila berdiri sendiri; label yang sama di antara nama lain diteruskan mentah. Yang membuatnya bergejala: `DepartmentFilterOptions` sengaja **mengganti** anggota grup dengan satu entri berlabel, jadi dropdown bergrup yang seluruh opsinya digabung koma mengirim satu label untuk **setiap** grup. Tab "Per Karyawan" halaman KPI melakukan persis itu, dan yang hilang bukan satu departemen melainkan seluruh departemen yang punya grup. Pemekarannya kini dikerjakan **per potongan**, dengan dedup case-insensitive supaya label yang datang bersama anggotanya tak menggandakan isi `$in`.
+
+Dua hal yang menyertainya:
+
+- **`ResolveDepartmentFilter` sengaja TIDAK memekarkan anggota→grup.** Menyebut `Human Resource` tetap menghasilkan satu nama; itu tugas `ExpandToDepartmentGroup`. Pemisahannya dipakai: `filterDepartemenTemplateKPI` memanggilnya **sendirian** justru supaya filter satu departemen tak diam-diam membawa template departemen saudaranya, sebab frontend memanggil endpoint itu per departemen lalu menggabungkan sendiri.
+- ⚠️ **Koma adalah pemisah, jadi `name` maupun `supervision_label` tak boleh mengandung koma.** Hari ini tak ada yang begitu (label tanpa `supervision_label` berbentuk `A + B`), dan bila suatu saat ada, potongannya pecah salah dan departemen itu hilang tanpa pesan.
+- **RBAC menilai string query MENTAH**, lewat `ParseDepartmentList` yang cuma memecah koma tanpa pemekaran grup. Jadi memekarkan label di lapisan filter tidak melebarkan hak akses siapa pun: `hasDepartmentAccess` mencocokkan `deptKeyToNames`, dan `HRGA` tak pernah cocok dengan key mana pun.
+
+Riwayat kelas ini: [#1444](https://github.com/bip-itteam-internal/bip-erp/pull/1444) (`/kpi/auto-scores`, kolom "Terhitung otomatis" berbunyi 0/20), [#1454](https://github.com/bip-itteam-internal/bip-erp/pull/1454) (`/kpi/template-assignment` tampil kosong), lalu bentuk CSV di atas. Perbaikan pertama tak ikut menyentuh yang kedua — bukti langsung bahwa aturannya tak boleh punya dua salinan.
 
 ### Urutan pencarian atasan
 
@@ -257,6 +291,14 @@ Ada **dua cara** memakainya, dan membedakannya penting karena skalanya jauh berb
 **Yang mengelola** (menulis): `/hris/master-data` (departemen, jabatan, jenjang, system role) dan tab **Hak per Posisi** + **Penyetuju Pengajuan** di `/pengaturan/organisasi`, keduanya `RequireHRISOrITSupervisor`; **Atasan Langsung** di `/hris/employee/atasan-langsung`, `RequireHRISOrITStaff`. Gerbangnya sengaja berbeda, lihat §Menemukan layar yang benar.
 
 **Yang membaca**: `/hris/org-chart`, plus **23 pemanggil** `useDataTypes({ endpoint: "department" })` yang tersebar jauh melampaui HRIS (termasuk `/it/employee` dan dua layar **procurement**: `TabUnitKas`, `PersetujuanBudget`). Delapan berkas lagi memakai `endpoint: "position"`.
+
+**Yang MENJELASKAN**: tab **Peta Struktur** di `/pengaturan/organisasi?tab=peta-struktur` (⚠️ branch `feat/visual-struktur-organisasi`, **belum merge**). Satu-satunya tab baca-saja di halaman itu, dan satu-satunya layar yang menerangkan bedanya `supervised_by`, `is_supervisor`, dan `supervisor_id` — tiga hal bernama mirip yang selama ini hanya bisa dipahami dari dokumen ini dan dari kode, tak pernah dari layar. Salah membacanya sudah pernah memindahkan seluruh antrian persetujuan satu departemen (§Penyetuju pengajuan per departemen).
+
+- **Dua lapisan, dan pembagiannya disengaja.** Lapisan konsep digambar TETAP karena aturannya memang tidak berubah; daftar departemennya ditarik HIDUP dari master data. Menuliskan daftar departemen sebagai gambar tetap akan melahirkan sumber kebenaran kedua yang membusuk diam-diam — hari ini saja `marketing` dan `printing` hidup di produksi tanpa pernah ada di `DefaultDepartments()`.
+- **Nol endpoint baru, nol perubahan backend.** Keempat hook yang dipakai sudah ada (`useFetchDepartments`, `useFetchDepartmentGroups`, `useFetchJobLevels`, `useDepartmentApprovers`), dan status penyetuju beserta nama induknya **dipinjam** dari `master-data/lib/penyetuju.ts`, bukan ditulis ulang.
+- ⛔ **Keadaan keempat: `tak-diketahui`.** `GET /master/departments/approvers` yang belum ter-deploy dan departemen yang benar-benar belum ditetapkan sampai ke frontend sebagai daftar kosong yang **sama persis**. Menyamakan keduanya membuat layar menuduh seluruh departemen lalai, dan "perbaikan" yang wajar atas tuduhan itu — mengangkat supervisor General Affair — justru **memutus jalur pengajuan 21 orang**. Karena itu daftar kosong padahal departemennya ada diperlakukan sebagai "belum terbaca", bukan "belum ditetapkan".
+- **Gerbangnya `RequireHRISOrITSupervisor`**, setinggi tiga tab tetangganya walau tab ini tak menulis apa pun, karena blok penyetujunya membaca endpoint ber-gerbang itu. Menurunkannya ke staf berarti menampilkan blok yang backend-nya membalas 403.
+- ⚠️ **Tautan `?tab=` di lapisan konsepnya menunjuk key section di `sections.ts`** — satu fakta di dua tempat, dijaga uji yang menolak key yang tak ada. Tanpa penjaga itu, rename key membuat tautannya jatuh ke tab pertama tanpa pesan apa pun.
 
 ⚠️ Dari 23 pemanggil itu **hanya 4 yang memakai `grouped`**. Sisanya menerima departemen mentah, dan untuk sebagian layar itu memang yang benar: `template-editor.tsx` sengaja mentah karena **menulis** nama departemen asli ke `kpi_template.department`, dan label grup `HRGA` tak akan pernah cocok dengan `work_data.department` seorang pun (§Cakupan supervisi antar-departemen). Templat yang tersimpan sebagai `HRGA` jadi tanpa galat, lalu tak pernah terpakai menilai siapa-siapa. Putuskan per halaman, jangan sapu massal.
 

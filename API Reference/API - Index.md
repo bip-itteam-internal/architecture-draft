@@ -13,6 +13,8 @@
 - **Public/ext** (webhook, callback, fingerprint): lewat `/ext/*` & `/public/*` di gateway, tanpa JWT.
 - Tiap service juga punya `GET /health` (di belakang gateway key).
 
+> ⛔ **Satu service sengaja TIDAK lewat gateway, dan itu bukan kelalaian.** [[Microservices - Vault MCP Service]] dipaparkan langsung sebagai `mcp.bharatainternasional.com` lewat Nginx Proxy Manager, karena Claude menyambung dari infrastruktur cloud Anthropic dan gateway menuntut ERP JWT di `/api/*` sementara token yang dipegang Claude bukan itu. Gerbangnya OAuth 2.1, bukan `INTERNAL_GATEWAY_KEY`. Endpoint-nya tercatat di dok arsitekturnya, bukan di folder ini, karena ia tak punya prefix gateway untuk didaftarkan. Jangan "membetulkannya" dengan menambahkan baris ke tabel di bawah.
+
 ## Daftar service
 
 | Service | Prefix gateway | File | Implementasi |

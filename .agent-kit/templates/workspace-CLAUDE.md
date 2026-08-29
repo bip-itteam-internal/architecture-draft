@@ -13,6 +13,11 @@ __ACTIVE_PROJECT__
 ## Flow wajib (per task)
 `/start-task` → `/plan` → `/implement` → `/review` → `/sync-docs` → `/wrap`
 
+## Sebelum flow (opsional)
+`/analisa-kebutuhan <kebutuhan mentah dari manajemen>` — menerjemahkan kebutuhan manajemen jadi
+ADR + dok domain + daftar task di vault. Berhenti sebelum kode. Dipakai saat kebutuhannya datang
+mentah dari manajemen; task teknis biasa tetap langsung `/start-task`.
+
 ## Aturan turunan
 - JS/TS: pakai **pnpm**, bukan npm/yarn.
 - Grounded-in-code: jangan mengarang; yang belum ada tandai TBD.

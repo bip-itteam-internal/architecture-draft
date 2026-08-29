@@ -63,9 +63,17 @@ Aturan turunannya:
 - **Aplikasi [[APP - MyBharata]] tidak menyembunyikan tombol Tukar Shift** untuk host ber-roster; penolakannya murni di backend dengan pesan yang jelas.
 - **Shift yang mulai 00:00/01:00 masih berselisih** antara jalur roster dan jalur penyemaian warisan, karena jendela pra-alokasinya jatuh pukul 22:00/23:00 sehingga aturan warisan menyala di jalur penyemaian itu sendiri.
 
+**Perluasan siapa yang boleh mengisi (2026-08-28).** Ambang modul HRIS untuk roster diturunkan dari **supervisor** ke **staf ke atas**, karena mengisi roster adalah pekerjaan harian staf Personalia sementara layarnya menolak mereka sepenuhnya. Tiga konsekuensi diterima sadar:
+
+- **Tidak ada bentuk tengah "staf tapi terbatas departemennya".** Staf HR tak pernah punya klaim `supervised_departments` (klaim itu lahir dari `work_data.is_supervisor`), jadi satu-satunya jalur yang bisa meloloskannya adalah jalur pemilik modul HRIS — dan jalur itu menembus **seluruh** departemen. Membatasinya per departemen menuntut konsep cakupan baru yang belum ada.
+- ⛔ **Staf HR kini bisa MEMBACA catatan leader di seluruh departemen.** `GET /roster` tidak mengembalikan jam saja; ia memuat catatan bebas per tanggal (mis. alasan seseorang diliburkan). Gerbang bacanya sengaja tidak disempitkan: baca yang lebih ketat daripada tulis menghasilkan layar yang menolak menampilkan grid yang justru boleh diisi orang itu, dan bagi pemakainya terbaca sebagai "belum ada datanya". Bila suatu saat ini dinilai terlalu luas, yang dipisahkan adalah **catatan leader dari respons**, bukan ambang gerbangnya.
+- **Tier `hris` tidak bisa membedakan Personalia dari jabatan lain.** Recruitment & Onboarding, Training Officer, dan Culture & Industrial semuanya ber-`hris:staff` ([[CORE - RBAC dan Permission Set]]), jadi ketiganya ikut mendapat hak yang sama. Membatasinya ke Personalia saja menuntut jalur paket/posisi (fase dua RBAC), dan modul `hris` sengaja masih fase satu.
+
+Modul `it` **tidak** ikut turun dan tetap tanpa akses roster sama sekali. Mekanismenya (`gerbangRoster`, satu potret untuk kedua lapis otorisasi) ada di [[Microservices - Attendance Service]].
+
 **Yang belum diputuskan (TBD):**
 
-- Apakah pengisian roster perlu jejak persetujuan, mengingat sekarang satu supervisor cukup untuk mengubah jadwal seluruh timnya.
+- Apakah pengisian roster perlu jejak persetujuan, mengingat sekarang satu supervisor cukup untuk mengubah jadwal seluruh timnya. ⚠️ **Pertanyaan ini MEMBESAR sejak 2026-08-28** (lihat tambahan di Consequences): yang bisa menulis kini bukan cuma supervisor departemen itu, melainkan **setiap staf modul `hris`** atas seluruh departemen. Jumlah orang yang bisa menulis ulang jadwal satu tim tanpa jejak apa pun bertambah, dan jawabannya masih belum ada.
 - Apakah perlakuan payroll untuk hari libur yang di-roster jadi hari kerja sudah benar; ini perlu dikonfirmasi ke pemilik payroll sebelum periode gaji pertama.
 - Apakah departemen selain Kyura akan memakai roster, dan apakah ambang 500 sel masih cukup bila dipakai lebih luas.
 

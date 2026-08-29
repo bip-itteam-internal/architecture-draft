@@ -106,6 +106,16 @@ sequenceDiagram
 | [[APP - Dynamic Task Tracker]] (Task Manager) | ✅ (konsumen) | Gateway-cutover selesai; tanpa login lokal |
 | [[APP - MyBharata]] (MyBharata) | ❌ tak perlu | ⚠️ **Bukan lagi ekosistem terpisah** (diverifikasi ke kode 2026-08-06). `mybharata-app/lib/src/core/api/url.dart:4` menunjuk gateway yang **sama** (`https://api.bharatainternasional.com/`) dan login lewat `/auth/login` yang sama, jadi aplikasi sudah memegang ERP JWT dan bisa memanggil `/api/<modul>/*` langsung **tanpa** handoff SSO. Catatan lama soal `admin.hris-bharata.com` sudah usang |
 | [[GA - Guestbook System (Complete)]] | ❌ | Publik, akses via token kunjungan (bukan SSO) |
+| [[Microservices - Vault MCP Service]] | ✅ (konsumen) | ⚠️ Merged ke `main` 2026-08-27, **belum di-deploy**. Konsumen pertama yang menukar `redeem` dari **server**, bukan dari browser: ia memakai ERP JWT sekali untuk membaca identitas lalu membuangnya, dan menerbitkan token OAuth-nya sendiri. Alasannya dua-duanya mengikat, lihat § Catatan di bawah |
+
+### Konsumen server-to-server: kapan ERP JWT TIDAK boleh diteruskan
+
+Semua konsumen di tabel atas kecuali satu memakai ERP JWT apa adanya sebagai token sesinya. [[Microservices - Vault MCP Service]] sengaja tidak, dan alasannya berlaku umum untuk konsumen serupa berikutnya:
+
+- **Audience.** Konsumen yang memaparkan permukaannya sendiri ke pihak luar wajib memastikan token yang diterimanya memang diterbitkan **untuknya** (RFC 8707). ERP JWT tidak punya audience, jadi menerimanya berarti setiap ERP JWT yang bocor dari aplikasi lain mana pun langsung berlaku di sana.
+- **Umur.** Alur `ticket`/`redeem` tidak menerbitkan refresh token dan JWT-nya ber-TTL 72 jam, jadi konsumen yang meneruskannya memaksa pemakainya login ulang tiap tiga hari.
+
+Polanya: pakai ERP JWT **sekali** di langkah callback untuk membaca identitas, lalu buang, lalu terbitkan token sendiri.
 
 ## Catatan & Keterbatasan
 

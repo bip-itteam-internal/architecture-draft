@@ -2,7 +2,7 @@
 
 *Pengajuan cuti & izin (leave request) adalah alur **"pengajuan ke HR"** inti: karyawan mengajukan ketidakhadiran/izin secara digital, melalui rantai persetujuan **Supervisor → HR**, dan begitu disetujui otomatis menyesuaikan data kehadiran. Ini fondasi yang pola review-nya dipakai juga oleh [[HRIS - Tukar Jadwal Kerja]] dan [[HRIS - Attendance Correction]] — semuanya turunan dari [[HRIS - Employee Request & Approval]].*
 
-- **Status**: ✅ Implemented — pengajuan cuti/izin + approval Supervisor→HR + auto-apply ke attendance ([[APP - MyBharata]] + [[Microservices - Attendance Service]]).
+- **Status**: ✅ Implemented — pengajuan cuti/izin + approval Supervisor→HR + auto-apply ke attendance ([[APP - MyBharata]] + [[Microservices - Attendance Service]]). · ⚠️ **Kuota cuti tahunan TIDAK punya penerbit apa pun**: angkanya diketik HR per orang, dan kuota 0 membuat pengajuan `Cuti tahunan` ditolak 400 — lihat §Kuota Cuti Tahunan dan [[ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak]].
 
 ## Latar Belakang
 
@@ -77,6 +77,50 @@ Rantai **2 tingkat**: **Supervisor departemen → HR**. Supervisor dideteksi via
 - Durasi dibatasi `max_range` per subtipe (mis. Melahirkan/keguguran 90 hari, Izin "Tidak masuk kerja" maks 2 hari, "Pulang cepat" hari yang sama)
 - **Cuti tahunan**: cek & **decrement kuota** lewat [[Microservices - Employee Service]] (`/vacation/decrement`)
 - Dokumen pendukung di-upload via [[Microservices - File Service]] (mis. surat dokter)
+
+## Kuota Cuti Tahunan
+
+Aturan bisnisnya (Pasal 15 Peraturan Perusahaan 2026-2028) **tidak ada di vault ini**. Ia hidup di repo mobile: `mybharata-app/docs/policy/leave_terms.md` dan `mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md`, dan dokumen kedua dinyatakan **menang** atas perilaku sistem. Ringkasnya: 12 hari kerja setelah 12 bulan bekerja dihitung sejak kontrak setelah evaluasi, tambah 2 hari bagi masa kerja ≥5 tahun, hangus akhir tahun berikutnya, dan **Cuti Bersama memotong jatah**.
+
+### Keadaan sekarang (grounded)
+
+Saldo disimpan di `work_data.vacation` (employee service), bukan di database attendance:
+
+```
+Vacation { available bool; quota int; used int; history []time.Time }
+```
+
+- **Tidak ada penerbit hak sama sekali.** Satu-satunya penulis `quota` adalah `POST /vacation/quota`, dipanggil hanya dari modal edit per baris di layar Kelola Cuti ([[APP - Web ERP]]).
+- `cronResetAnnualLeave` (1 Januari 00:05 WIB, [[IT - Background Jobs & Schedulers]]) **bukan** pemberi jatah: filternya `vacation.quota > 0` dan isinya hanya menyetel `used=0, available=true, history=[]`. Karyawan berkuota 0 dilewati selamanya, dan sisa cuti hangus **satu tahun lebih cepat** dari yang diatur.
+- Gerbang di attendance menolak `Cuti tahunan` dengan **400 `Annual leave (vacation) quota has not been set, contact HR`** (kode `VACATION_QUOTA_UNSET`) begitu kuotanya 0.
+- Pemotongan menghitung **hari kalender**, bukan hari kerja, sehingga cuti Jumat sampai Senin memotong 4 hari padahal jatahnya dinyatakan dalam hari kerja.
+- **Cuti Bersama tidak menyentuh saldo.** Pemotongan hanya terjadi untuk `LeaveType = Cuti` dengan subtipe persis `Cuti tahunan`.
+
+### ⛔ `vacation.quota` BUKAN jatah tahunan
+
+Ia menyimpan **sisa setelah Cuti Bersama dipotong**, dan pemotongan itu dikerjakan HR di luar sistem. Pengukuran produksi 2026-08-29: 123 dari 180 karyawan aktif berkuota **5**, tak seorang pun 12 atau 14. Angka itu bukan pelanggaran Pasal 15 melainkan hasil hitungan:
+
+```
+12 hari kerja (jatah Pasal 15)  -  7 hari kerja (Cuti Bersama 2026)  =  5
+```
+
+Delapan tanggal bertipe `Cuti Bersama` tercatat di `company_holiday` untuk BIP tahun 2026 (20 sampai 26 Maret dan 28 Mei); satu di antaranya Minggu, sehingga tujuh hari kerja. **Jangan menyimpulkan perusahaan hanya memberi 5 hari**, dan jangan menjumlahkan `quota` dengan jatah Cuti Bersama karena keduanya bukan komponen sejajar.
+
+### Celah lain yang terukur (2026-08-29)
+
+| Temuan | Angka |
+|---|---|
+| Sudah ≥12 bulan tetapi kuota kosong | 15 orang |
+| Belum 12 bulan tetapi sudah berkuota | 23 orang |
+| Masa kerja ≥5 tahun yang seharusnya dapat tambahan 2 hari | 2 orang, tak seorang pun menerimanya |
+| `work_data.join_date` bertipe `string`, bukan `date` | 89 dari 180 |
+| Karyawan aktif tanpa `work_data` | 2 |
+
+⛔ Baris keempat adalah jebakan: MongoDB tidak membandingkan lintas tipe BSON, jadi filter `{join_date: {$lt: <Date>}}` **melewati separuh karyawan tanpa satu pun galat**. `employee_contract.start_date` sebaliknya 225 dari 225 bertipe `date`.
+
+### Rencana
+
+Penerbitan otomatis di ulang tahun kontrak, cron harian idempoten, dan saldo pindah ke ledger kejadian: [[ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak]]. Belum ada di kode.
 
 ## Endpoint API
 

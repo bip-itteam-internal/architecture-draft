@@ -4,7 +4,10 @@ $vault = Join-Path $PWD 'architecture-draft'
 $kitVerFile = Join-Path $vault '.agent-kit/VERSION'
 $instFile   = Join-Path $PWD '.claude/.kit-version'
 
-$lines = @('Flow wajib: /start-task -> /plan -> /implement -> /review -> /sync-docs -> /wrap')
+$lines = @(
+  'Flow wajib: /start-task -> /plan -> /implement -> /review -> /sync-docs -> /wrap',
+  'Opsional sebelum flow: /analisa-kebutuhan <kebutuhan manajemen> (mentah -> ADR + dok + daftar task)'
+)
 
 if (Test-Path $kitVerFile) {
   $kitVer = (Get-Content $kitVerFile -Raw).Trim()
