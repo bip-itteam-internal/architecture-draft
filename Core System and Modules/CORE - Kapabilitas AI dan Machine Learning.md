@@ -2,7 +2,7 @@
 
 *Peta seluruh kapabilitas AI di ERP Bharata dalam satu tempat, beserta gerbang yang menentukan kapan pekerjaan AI baru boleh dimulai, dan rancangan kapabilitas prediktif pertama. Dibuat karena AI sudah berjalan di empat tempat yang tidak saling menaut, sehingga tidak ada yang dapat menjawab apa yang kita punya dan mana yang benar-benar hidup.*
 
-- **Status**: ⚠️ **Sebagian Implemented** — dua kapabilitas generatif hidup di produksi, satu WIP, dua masih konsep tanpa kode. Kapabilitas prediktif belum berkode sama sekali.
+- **Status**: ⚠️ **Sebagian Implemented** — dua kapabilitas generatif hidup di produksi, satu WIP, tiga masih konsep tanpa kode. Kapabilitas prediktif belum berkode sama sekali.
 - **Keputusan yang mengikat**: [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]
 - **Implementasi prediktif (rencana)**: [[Microservices - Marketing Analytics Service]]
 
@@ -22,9 +22,12 @@ Dua sifat yang sangat berbeda hidup berdampingan di sini, dan membedakannya pent
 | Otomasi tren ke video siap kirim | Generatif | LangGraph, human-in-the-loop | ⚠️ WIP | [[Sales - Veo (Gemini) Automation Layer]] |
 | Analisis sentimen komentar TikTok | Generatif | Claude | ✅ jalan tiap awal pekan | [[APP - Tiktok Insight Analyzer]] · [[Sales - TikTok Sentiment Pipeline]] |
 | OCR dan document intelligence | Generatif | rencana OCR + RAG lokal | 🟡 konsep, **0 kode** | [[CORE - OCR Document Service]] |
+| Asisten tanya-jawab angka bisnis | Generatif | rencana Claude + Tool Runner | 🟡 konsep, **0 kode** | [[Microservices - Assistant Service]] |
 | Peringatan dini belanja iklan | **Prediktif** | belum ditentukan | 🟡 konsep, **0 kode** | dokumen ini |
 
 Akses Claude ke vault lewat [[Microservices - Vault MCP Service]] sengaja **tidak** dimasukkan sebagai kapabilitas AI produk. Ia jalur baca dokumentasi untuk manusia, bukan fitur yang dipakai pengguna ERP.
+
+⚠️ [[Microservices - Assistant Service]] adalah kapabilitas pertama yang **membaca data ERP atas nama seorang pemakai**, sehingga ia satu-satunya yang memunculkan pertanyaan hak akses per-orang. Empat kapabilitas sebelumnya tidak menyentuh data ERP sama sekali. Ia generatif, jadi gerbang label historis tidak mengikatnya, tetapi syarat ketiga ADR 0058 tetap mengikat penuh.
 
 Klaim "0 kode" pada dua baris di atas diverifikasi dengan `git grep` berbatas kata memakai kontrol positif dan negatif, bukan dengan pencarian teks biasa. Rincian dan alasannya di [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]].
 
@@ -199,6 +202,7 @@ Kepemilikan toko dibaca dari pemetaan ICC yang sudah ada, bukan ditebak dari nam
 
 - [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]
 - [[Microservices - Marketing Analytics Service]]
+- [[Microservices - Assistant Service]]
 - [[APP - Ideamills]]
 - [[APP - Tiktok Insight Analyzer]]
 - [[CORE - OCR Document Service]]
