@@ -272,7 +272,27 @@
 | POST | `/shops/:channel/:shopId/disable` | Nonaktifkan toko — body `{reason, shop_name?}`, **reason WAJIB**; transisi atomik + idempoten (`changed:false` bila sudah DISABLED); actor dari header identitas tercatat di riwayat. Admin |
 | POST | `/shops/:channel/:shopId/enable` | Aktifkan kembali (reason opsional). Admin |
 
+## Kepemilikan Toko per Departemen (`department-shops`)
+
+> Auth: `RequireIntegrationStaff` (baca) · `RequireIntegrationAdmin` (tulis). **Bukan** ACL "siapa boleh melihat" — itu `/marketing/teams` di bawah. Ini kepemilikan: satu toko = satu departemen, ditegakkan index unik `(channel, shop_id)`. Endpoint sudah ada sejak Fase Migrate 2026-08-11, baru didokumentasikan di sini 2026-08-29 (sebelumnya nol baris). Desain lengkap: [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]. Konsumen utama: saringan `/divisi` di [[Microservices - Marketing Analytics Service]] (sejak fase Contract 2026-08-29).
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/department-shops` | Daftar kepemilikan, seluruhnya atau `?department=<nama>` |
+| GET | `/department-shops/kesehatan` | Laporan lubang pemetaan: `yatim` (toko terotorisasi belum dimiliki siapa pun), `sisa` (pemetaan menunjuk toko yang sudah tak terotorisasi — menyumbang nol omzet, gejalanya cuma "omzet turun" tanpa sebab), `menyimpang` (toko terpetakan tapi departemennya beda dari pemegang aktif di `icc_account_mappings` — drift SENGAJA tak live-sync, jadi wajib dicek permanen, bukan sekali saat migrasi), plus `total_terotorisasi`/`total_terpetakan`. `menyimpang` kosong (fail-soft) bila `icc_account_mappings` gagal dibaca — `yatim`/`sisa` tetap tampil |
+| POST | `/department-shops` | Body `{department, channel, shop_id, shop_name, pindah}`. Toko yang **sudah** dimiliki departemen lain → **409**, kecuali `pindah:true` dikirim eksplisit — memindahkan kepemilikan diam-diam berarti memindahkan omzet + skor dua supervisor sekaligus, sengaja tidak implisit |
+| DELETE | `/department-shops?channel=&shop_id=` | Lepas kepemilikan (query param, **bukan** path — tak ada `:id` publik). Tidak ditemukan → **404** |
+
+⚠️ **Laporan `yatim` belum mencakup Lazada** — sumbernya cuma menyatukan `shopee_shop_infos` + `tt_shop_authorized_shops`. Toko Lazada karena itu tak akan pernah dilaporkan yatim walau belum dipetakan — gap senyap (hari ini Kyura/Beauty Hacks nol toko Lazada, tapi begitu ada, omzetnya hilang dari laporan kesehatan tanpa peringatan).
+
+`shop_name` **tidak pernah dipakai mencocokkan** (cuma tampilan) — nama toko produksi ada yang berspasi di ujung atau beda kapitalisasi saja; identitas sejati selalu `(channel, shop_id)`.
+
+**Belum ada UI pengelolaan mandiri** untuk endpoint ini — ADR-0045 menyebut "kartu team di ICC Management" sebagai tujuan jangka panjang, tapi kartu itu belum dibangun. Toko baru ditambahkan lewat panggilan `POST` manual oleh admin Integration.
+
 ## Marketing Teams (admin) · Worker/Jobs
+
+> **Beda dari `/department-shops` di atas**: ini kontrol akses tim (satu toko boleh dilihat banyak tim) + keanggotaan, bukan kepemilikan. Sumber Shopee untuk kolom penanggung jawab toko (`icc`) di [[Microservices - Marketing Analytics Service]] masih membaca `team_shops`/`marketing_teams` ini — belum ikut pindah ke `department_shops` (beda dari saringan `/divisi` yang sudah pindah sejak fase Contract 2026-08-29). Rencana pencabutan menyeluruh: [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] §Migrasi.
+
 | Method | Path | Fungsi |
 |---|---|---|
 | GET/POST/PATCH/DELETE | `/marketing/teams[/:id]` (+ `/members[/:employeeId]`, `/shops[/:shopAssignmentId]`) | Tim marketing + ACL shop (admin) |
