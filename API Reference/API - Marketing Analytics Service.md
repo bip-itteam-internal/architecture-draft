@@ -2,7 +2,7 @@
 
 *Daftar endpoint **Marketing Analytics Service** — grounded ke kode (enumerasi seluruh pendaftaran rute di `services/marketing-analytics/*.go` non-test terhadap `origin/main`; audit 2026-08-27, **41 route** di berkas produksi termasuk `/health`). Arsitektur & semantik data: [[Microservices - Marketing Analytics Service]].*
 
-- **Status**: ✅ Grounded ke kode (2026-08-27), **keempat-puluh-satu route punya baris di dok ini**. Route ke-41 `/kpi/kinerja-live` masuk lewat PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486) (merged 2026-08-27); **status deploy belum diverifikasi — merged bukan deployed**. Sebelumnya 12 route tak terdokumentasi sama sekali; daftarnya + cara audit ulangnya ada di bagian **Cara mengaudit kelengkapan daftar ini** di kaki dokumen.
+- **Status**: ✅ Grounded ke kode (2026-08-27), **keempat-puluh-satu route punya baris di dok ini**. Route ke-41 `/kpi/kinerja-live` masuk lewat PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486) (merged 2026-08-27); **status deploy belum diverifikasi — merged bukan deployed**. Sebelumnya 12 route tak terdokumentasi sama sekali; daftarnya + cara audit ulangnya ada di bagian **Cara mengaudit kelengkapan daftar ini** di kaki dokumen. ⚠️ **`GET /divisi` pindah sumber ke `department_shops` 2026-08-29** (fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]], PR [#1520](https://github.com/bip-itteam-internal/bip-erp/pull/1520) & [#1522](https://github.com/bip-itteam-internal/bip-erp/pull/1522)) — jumlah route tetap 41, tapi maknanya berubah; lihat baris `/divisi` di bawah. **Merged, belum di-deploy/diverifikasi lewat gateway.**
 - **Prefix gateway**: `/api/marketing-analytics/*` → path internal tanpa prefix. Routing & auth: [[API - Index]].
 
 ## Konvensi respons
@@ -93,11 +93,13 @@ Ringkasannya memakai `RingkasShiftBanyak`, bukan meringkas satu per satu: fungsi
 
 ## Daftar acuan untuk saringan FE
 
-Dua endpoint yang tak memuat angka, hanya memasok isi dropdown. **Ada supaya FE tidak menghardcode daftarnya**: divisi dibuat & dihapus lewat UI `/integration/teams` kapan saja, dan daftar yang dipahat di FE akan menyimpang tanpa satu pun tanda sementara divisi baru tak pernah muncul.
+Dua endpoint yang tak memuat angka, hanya memasok isi dropdown. **Ada supaya FE tidak menghardcode daftarnya.**
+
+⚠️ **`/divisi` berganti sumber 2026-08-29** (fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]): sebelumnya `marketing_teams`/`team_shops`, kini `department_shops`. **Belum ada UI pengelolaan mandiri** — ADR-0045 menyebut "kartu team di ICC Management" sebagai tempat isi yang dituju, tapi kartu itu **belum dibangun**; isinya hari ini murni lewat `POST`/`DELETE /department-shops` (gerbang `RequireIntegrationAdmin`), dikerjakan admin Integration. Menu `/integration/teams` **masih ada di kode** tetapi tak lagi memengaruhi saringan `/divisi` — ia baru menutup fungsi lamanya (dan koleksi `marketing_teams`/`team_shops`) sepenuhnya setelah kolom penanggung jawab toko (`/beranda`, `icc`) ikut pindah, yang **belum dikerjakan** (lihat [[Microservices - Marketing Analytics Service]] §`icc`).
 
 | Method | Path | Catatan |
 |---|---|---|
-| GET | `/divisi` | Daftar divisi (`marketing_teams`). ⚠️ Di modul ini **"divisi" berarti grup toko**, bukan departemen HRIS dan bukan brand — lihat [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] |
+| GET | `/divisi` | Daftar divisi dari `department_shops` (sebelumnya `marketing_teams`). **"Divisi" kini genuinely nama departemen HRIS** (`work_data.department`, mis. "Beauty Hacks", "Kyura"), bukan lagi grup toko bebas — lihat [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]. Nilai saringan lama (UUID `team_id`) **berhenti berlaku**; bookmark/URL tersimpan yang memakainya tak lagi cocok |
 | GET | `/toko` | Daftar toko dari `mart_profit_attribution`, urut nama lalu `shop_id`. Memakai **pembaca saringan yang sama** dengan halaman lain (`bacaFilterMart`: rentang, `channel`, `divisi`), bukan penguraian kedua yang dapat menyimpang; channel tak dikenal → **400 + `channel_valid`** |
 
 Keduanya membalas **200 dengan amplop `unavailable_channels: SEMUA`** saat sumbernya gagal, **bukan** 5xx dan bukan daftar kosong polos: FE menerima keterangan alih-alih dropdown yang diam-diam kosong. Ini kebalikan dari `GET /pagu`, yang justru 5xx saat gagal — bedanya disengaja, karena dropdown kosong masih bisa dipakai orang sementara pagu kosong mengubah arti angka yang dinilai.
