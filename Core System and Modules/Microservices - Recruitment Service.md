@@ -155,6 +155,20 @@
 
 **FE terkait (erp-frontend, semua merged):** badge **Tahap kandidat bisa diubah dari tabel** (reuse `InlineSelectBadge` diekstrak dari Support Ticket); menu **Job Requisitions** di "Portal Saya" (SPV-only) + halaman `/portal/requisitions` (`scope=department`, tombol Buat Pengajuan pindah ke sini, departemen **terkunci** ke pengaju); filter Departemen/Jenis + search + pagination di tabel requisition (+ perbaikan `FilterTable` crash `SelectItem value=""` yang berdampak **semua** halaman ber-filter); **buka detail dengan klik baris** (buang kolom Aksi ikon-mata) di semua tabel Recruitment; **fix data-loss edit lowongan** (`PUT /postings/:id` full-replace → FE round-trip `terms`/`show_*` agar tak terhapus senyap); **fix key i18n mentah** (lookup System Setup + detail requisition).
 
+## Increment: Direktur ajukan requisition lintas-departemen (2026-08-29)
+
+> Pelonggaran **ditargetkan** di atas penguncian PR #478 (departemen = identitas pengaju). `go build`/`vet`/`test` hijau (recruitment + employee). ⚠️ **Belum ter-deploy** (deploy manual — BE recruitment + employee DULU, baru FE). Branch `feature/workspace-position`.
+>
+> **Kebutuhan:** di `/portal/requisitions/create`, jabatan Direktur hanya bisa memilih posisi departemennya sendiri (Sekretariatan) karena form berjalan mode grup se-departemen. Direktur perlu mengajukan kebutuhan karyawan untuk posisi di **seluruh** departemen.
+
+- **Gerbang = NAMA JABATAN, bukan `system_roles`.** Dipakai `common.SetaraDirektur` (Direktur + Corporate Secretary, [[Microservices - Recruitment Service]] sudah memakainya untuk approval hire) — `id.Position` dari header gateway. SPV biasa tetap terkunci ke departemennya (PR #478 utuh).
+- **BE recruitment (`departmentForNewRequisition`):** untuk `SetaraDirektur` departemen diambil dari **body** (posisi lintas-departemen); selain itu tetap dari identitas pengaju. Recruitment-service tak memiliki koleksi `master_department`, jadi nilai body **tak** divalidasi lintas-master di sini — picker FE hanya menawarkan departemen master valid & Direktur peran tepercaya.
+- **BE recruitment (`listRequisitions?scope=department`):** filter kini `$or[{department∈cakupan},{requested_by=pengaju}]`. Tanpa cabang `requested_by`, requisition lintas-departemen yang diajukan Direktur **lenyap dari daftar portalnya** (cakupan portal = departemen sendiri) — alur pengguna terputus. Konstruksi `$or` diekstrak ke helper `requisitionDeptScopeOr` + unit test.
+- **BE employee (`GET /data-type/position?all=true`):** mode baru mengembalikan posisi **seluruh** master department company sebagai `[{position,department}]` (helper `allPositionOptions` + test), untuk memberi makan dropdown Posisi sisi Direktur. Company-scoped (`EffectiveCompanyID`).
+- **FE (erp-frontend):** hook `useAllPositions` (→ `all=true`); `RequisitionForm` prop `allDepartments` **reuse mekanisme mode grup SPV** (field Departemen disembunyikan, `department` requisition mengikuti posisi terpilih yang berlabel departemen); `/portal/requisitions/create` mendeteksi Direktur via `setaraDirektur(position)`. Key i18n `reqDeptScopeAll` (id+en).
+- **Alur pengguna:** Direktur pilih posisi (lintas-departemen, berlabel) → departemen ikut → Simpan → requisition masuk antrean review SPV HRD (tak berubah) → **tampil kembali** di `/portal/requisitions` lewat cabang `requested_by`.
+- **Konsumen:** [[API - Recruitment Service]] (`POST /requisitions`, `GET /requisitions?scope=department`) · [[API - Employee Service]] (`/data-type/position?all=true`). Detail endpoint di sana.
+
 ## Increment: Konversi Kandidat → Karyawan (hire→employee, 2026-07-16)
 
 > BE **PR #490** (bip-erp) + FE **PR #344** (erp-frontend), keduanya **merged** ke `main`. `go build`/`vet`/`test` hijau. ⚠️ **Belum ter-deploy** (deploy manual — BE dulu baru FE).

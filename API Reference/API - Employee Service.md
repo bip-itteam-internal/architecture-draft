@@ -11,7 +11,7 @@
 | POST | `/auth/login` · `/auth/login-pin` · `/auth/login-biometrics` | Login (dipakai gateway) |
 | GET | `/auth/refresh` · POST `/auth/verify-pin` | Refresh / verifikasi PIN |
 | POST | `/onboarding/register` | Aktivasi akun karyawan baru (handoff) |
-| GET | `/qr/:employee_id` · `/data-type/:dt` · `/check-unique/:field/:value` | QR profil, enum, cek unik. `/data-type/department?grouped=true` menggabungkan departemen satu tim jadi **satu opsi** berlabel kelompok (mis. `HRGA`) yang bisa dikirim balik apa adanya sebagai filter; **opt-in** karena sebagian halaman justru perlu departemen satuan |
+| GET | `/qr/:employee_id` · `/data-type/:dt` · `/check-unique/:field/:value` | QR profil, enum, cek unik. `/data-type/department?grouped=true` menggabungkan departemen satu tim jadi **satu opsi** berlabel kelompok (mis. `HRGA`) yang bisa dikirim balik apa adanya sebagai filter; **opt-in** karena sebagian halaman justru perlu departemen satuan. `/data-type/position` menerima `department` (posisi satu departemen) ATAU `grouped=true` (posisi se-grup supervisi, tiap posisi membawa `{position,department}` aslinya) ATAU **`all=true`** (posisi SELURUH departemen company, bentuk `[{position,department}]`, tanpa `department` — untuk dropdown Posisi form Job Requisition sisi Direktur/setara yang mengajukan lintas-departemen) |
 
 ## Personal & Work Data
 | Method | Path | Fungsi |

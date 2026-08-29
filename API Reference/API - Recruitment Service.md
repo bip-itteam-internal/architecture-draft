@@ -14,8 +14,8 @@
 ## Job Requisition
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
-| POST | `/requisitions` | Ajukan permintaan posisi. **`department` diambil dari identitas pengaju, bukan body** (anti-spoof, PR #478) | supervisor |
-| GET | `/requisitions` · `/requisitions/:id` | List (HR semua / pengaju sendiri) / detail. **`?scope=department`** → SPV lihat requisition **se-departemen** (departemen dari identitas gateway; detail juga izinkan SPV se-departemen) — PR #470 | auth |
+| POST | `/requisitions` | Ajukan permintaan posisi. **`department` diambil dari identitas pengaju, bukan body** (anti-spoof, PR #478). **PENGECUALIAN: jabatan setara Direktur** (`common.SetaraDirektur` = Direktur + Corporate Secretary) boleh mengajukan untuk posisi di departemen **mana pun** — departemen diambil dari body (posisi lintas-departemen), gerbangnya NAMA JABATAN bukan `system_roles` supaya SPV biasa tetap terkunci | supervisor |
+| GET | `/requisitions` · `/requisitions/:id` | List (HR semua / pengaju sendiri) / detail. **`?scope=department`** → SPV lihat requisition **se-departemen** (departemen dari identitas gateway; detail juga izinkan SPV se-departemen) — PR #470. Filter kini `$or[{department∈cakupan},{requested_by=pengaju}]`: pengaju SELALU melihat pengajuannya sendiri, termasuk yang dibuat Direktur untuk departemen LAIN (tanpa ini requisition lintas-departemen lenyap dari daftar portalnya) | auth |
 | PUT | `/requisitions/:id` | Edit (saat Submitted/Revision). Departemen **dipertahankan** (edit tak memindahkan requisition) | pengaju |
 | POST | `/requisitions/:id/resubmit` | Kirim ulang setelah revisi | pengaju |
 | POST | `/requisitions/:id/hr-review` | Review kualifikasi. `action=approve` → **langsung `Approved`** (persetujuan final); `action=revision` → `Revision`. Menerima status sumber `Submitted` **maupun** `HR Reviewed` (agar requisition lama yang menggantung bisa diselesaikan) — PR #609 | HR supervisor |
