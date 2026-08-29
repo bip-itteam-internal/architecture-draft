@@ -6,6 +6,31 @@
 
 **Prasyarat:** Tidak ada. Murni frontend, tanpa perubahan kontrak backend, jadi aturan "deploy BE sebelum FE" tidak berlaku.
 
+---
+
+## ⚠️ Pembaruan 2026-08-29 — rencana ini sebagian sudah usang
+
+Diperiksa ulang ke kode. **Jangan jalankan apa adanya**; tiga hal di bawah berubah sejak 2026-08-07.
+
+**1. Klaim "ketiganya tanpa `enabled` sama sekali" TIDAK lagi benar.** Task 2 sudah mendarat sebagian, tapi lewat bentuk yang rencana ini **tolak eksplisit** — predikat disusun dari `systemRoles`, bukan diturunkan dari `combinedMenus`:
+
+| Hook | Keadaan 2026-08-29 |
+|---|---|
+| `useQueueCounts` | ✅ ber-`enabled` (`bolehLihatMenuWarehouseTinggar`) |
+| `useSadewaCetakResiPendingCount` | ✅ ber-`enabled` (`bolehAksesSadewa`) |
+| `useExternalEditDraftsNewCount` | ⛔ masih **tanpa gerbang** |
+| `useAntreanPoMarketing` (hook **keempat**, lahir setelah rencana ini) | ✅ ber-`enabled` (matriks tab `orders_po`) |
+
+Alasan penolakan di bagian Architecture **tetap berlaku**: matriks akses kini punya salinan kedua. `sidebar-badges.ts` (Task 1) belum ada. Task 1 + 3 masih layak dikerjakan — sekarang sebagai *refactor* dari predikat role ke `combinedMenus`, bukan penambahan gerbang dari nol. Dan cakupannya jadi **empat** hook, bukan tiga.
+
+**2. Task 4 melewatkan pola yang sudah mapan di repo.** Usulan "30s → 120s" polos akan membuat badge terasa lebih lambat daripada perlu. Acuan yang benar sudah hidup di `features/erp/notification/inbox/use-unread-count.ts:39-42` (badge lonceng inbox) — empat setelan yang dipilih bersama: `refetchInterval: 60_000` + `refetchIntervalInBackground: false` + **`refetchOnWindowFocus: true`** + `staleTime: selang/2`. Yang ketiga itu intinya: badge tetap terasa hidup karena menyegarkan diri saat orangnya kembali ke tab, bukan karena polling rapat. Ganti Task 4 dengan kuartet ini.
+
+**3. Angka "360 request per jam per tab" kemungkinan terlalu tinggi.** Default `refetchIntervalInBackground` di TanStack Query adalah `false`, jadi tab di latar belakang semestinya sudah berhenti polling dan yang benar-benar menembak hanyalah tab yang sedang dipakai. **Belum diukur** — verifikasi di Network tab sebelum angka ini dipakai sebagai dasar keputusan.
+
+**Yang masih berlaku utuh:** temuan akar masalah (hook di sidebar = hook di setiap halaman), penolakan predikat-dari-`systemRoles`, Task 5 (`defaultOptions` QueryClient, belum dikerjakan), dan seluruh Task 6 — terutama keharusan membuktikan lewat browser, bukan lewat test hijau.
+
+**Sudah naik kelas:** konvensinya kini terdokumentasi di [[APP - Web ERP]] §Konvensi Data-Fetching, jadi gap dokumentasi yang dicatat di bagian Catatan sudah tertutup.
+
 ## Temuan (kenapa ini terjadi)
 
 Semua halaman berada di bawah `src/app/(main)/layout.tsx` yang merender `Container` lalu `AppSidebar`. Konsekuensinya: **hook apa pun yang dipanggil sidebar akan jalan di setiap halaman**, termasuk modul yang tidak sedang dibuka pemakai.

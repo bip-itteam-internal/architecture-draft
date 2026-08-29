@@ -144,6 +144,50 @@
 	- ⚠️ **Konsekuensi yang diterima sadar: staf biasa melihat SATU kartu** (Ajukan Tugas), jadi baginya halaman ini menambah satu klik dibanding menu langsung yang ia punya sebelumnya. Dua mitigasi (mengembalikan "Tugas Saya" ke kumpulan, atau menyembunyikan menunya dari yang cuma berhak satu kartu) disodorkan ke pemilik proses dan **ditolak**. Jumlah per persona: staf 1 · pengelola desk tiket 2 · atasan tanpa izin budget 2 · atasan + `budget.pengajuan.umum` 3 · supervisor IT 4.
 	- ⚠️ **"Tugas Saya" dan "Persetujuan Pelatihan" sengaja TIDAK ikut** dan tetap di sidebar apa adanya, atas permintaan pemilik proses.
 
+## Konvensi Data-Fetching (TanStack Query)
+
+*Aturan lintas-modul yang sebelumnya hanya hidup sebagai komentar di satu berkas TypeScript, sehingga mustahil ditemukan oleh siapa pun yang merancang dari dokumentasi.*
+
+Seluruh halaman berada di bawah `src/app/(main)/layout.tsx` → `components/layout/container.tsx:30` → `AppSidebar`. Konsekuensinya satu kalimat, dan inilah premis seluruh bagian ini: **hook yang dipanggil sidebar berjalan di SETIAP halaman**, termasuk modul yang tak sedang dibuka pemakai. Karena itu badge — fitur terkecil di layar — bisa menjadi sumber beban terbesar frontend tanpa satu pun gejala.
+
+### 1. Hook di sidebar WAJIB ber-`enabled`
+
+Gerbangnya memakai **predikat yang sama persis** dengan visibilitas item menunya, supaya query hanya jalan saat badge-nya benar-benar tampil. Menyusun predikat baru dari `systemRoles` melahirkan salinan kedua matriks akses yang akan menyimpang diam-diam — sekelas dengan larangan menulis ulang resolusi milik modul lain di [[Microservices - Calendar Service]].
+
+Empat badge yang hidup di sidebar per 2026-08-29:
+
+| Hook | Gerbang | Selang | Muatan |
+|---|---|---|---|
+| `useQueueCounts` (`use-warehouse-queue.ts:162`) | ✅ `bolehLihatMenuWarehouseTinggar` | 30 dtk | hitungan ✅ |
+| `useSadewaCetakResiPendingCount` (`use-sadewa-actions.ts:127`) | ✅ `bolehAksesSadewa` | 30 dtk | ⚠️ **daftar penuh** |
+| `useAntreanPoMarketing` (`use-antrean-ppic.ts:26`) | ✅ matriks tab `orders_po` | 30 dtk | `{menunggu}` ✅ |
+| `useExternalEditDraftsNewCount` (`use-external-edit-drafts.ts:63`) | ⛔ **tanpa gerbang** | 30 dtk | `limit=1` + `total` ✅ |
+
+Yang terakhir menembak untuk **setiap karyawan** di **setiap halaman**, tanpa peduli ia memegang modul Accurate atau tidak.
+
+### 2. Badge pemberitahuan dipasangkan `refetchOnWindowFocus`, bukan interval rapat
+
+Acuan yang sudah mapan: `features/erp/notification/inbox/use-unread-count.ts:39-42` (badge lonceng inbox). Empat setelan yang **dipilih bersama**, bukan sendiri-sendiri:
+
+| Setelan | Perannya |
+|---|---|
+| `refetchInterval: 60_000` | angka tak basi berjam-jam |
+| `refetchIntervalInBackground: false` | tab yang ditinggalkan berhenti memanggil |
+| `refetchOnWindowFocus: true` | segar **seketika** saat orangnya kembali — ini yang menebus selang yang lebih panjang |
+| `staleTime: selang/2` | pindah halaman tak memicu fetch ulang |
+
+Kuncinya yang ketiga: badge terasa hidup **bukan** karena polling rapat, melainkan karena ia menyegarkan diri tepat saat ada mata yang melihatnya. Itu yang membuat 60 detik terasa sama responsifnya dengan 30 detik pada separuh beban. Keempat badge sidebar di atas **belum** mengadopsi kuartet ini.
+
+⚠️ **Menggerbangi badge per-HALAMAN adalah jebakan.** `pathname?.startsWith("/warehouse")` memang menihilkan request di halaman lain, tapi sekaligus membatalkan fungsi badge sebagai pemberitahuan: orang baru tahu ada antrian setelah membuka halamannya, padahal badge itu yang seharusnya memberi tahu bahwa perlu dibuka. Pilih kuartet di atas, bukan gerbang halaman.
+
+### 3. Pencacah membalas ANGKA, bukan daftarnya
+
+`/api/notification/inbox?count=unread` membalas satu angka beralas `CountDocuments` + indeks. Menarik daftar penuh tiap menit untuk seluruh karyawan adalah cara memperkenalkan masalah beban alih-alih fitur. `useSadewaCetakResiPendingCount` masih menarik sampai 500 dokumen `sadewa/actions` hanya untuk membaca `.length`-nya — satu-satunya badge yang belum mengikuti pola ini, dan perbaikannya menuntut parameter hitung di sisi backend ([[Microservices - Manufacture Service]]).
+
+### Catatan `QueryClient`
+
+`components/tanstack.tsx:11` masih `new QueryClient()` polos tanpa `defaultOptions`, jadi seluruh aplikasi mewarisi `staleTime: 0` + `refetchOnWindowFocus: true`; query yang tak menyatakan sikapnya sendiri akan refetch tiap pindah halaman dan tiap pemakai kembali ke tab. Rencana penyetelannya ada di `Workspace/Inbox/2026-08-07 Rencana - Kurangi Fetch Global Sidebar erp-frontend.md` (Task 5), **belum dikerjakan**.
+
 ## Modul / Fitur (Sudah Diimplementasikan)
 
 **ERP (publik)**
