@@ -27,6 +27,14 @@ Alasan penolakan di bagian Architecture **tetap berlaku**: matriks akses kini pu
 
 **3. Angka "360 request per jam per tab" kemungkinan terlalu tinggi.** Default `refetchIntervalInBackground` di TanStack Query adalah `false`, jadi tab di latar belakang semestinya sudah berhenti polling dan yang benar-benar menembak hanyalah tab yang sedang dipakai. **Belum diukur** — verifikasi di Network tab sebelum angka ini dipakai sebagai dasar keputusan.
 
+**Pembaruan kedua, sore 2026-08-29 — sebagian rencana ini SUDAH DIKERJAKAN, tapi lewat jalan lain.** Branch `fix/badge-sidebar-per-halaman` memilih **gerbang HALAMAN**, bukan gerbang kepemilikan menu: badge hanya di-fetch saat pemakai berada di modul tempat badge itu dipasang (`components/layout/sidebar-badge-scope.ts`). Keluhan aslinya memang aliran request yang terlihat di Network tab saat mengerjakan modul lain, dan itu dinihilkan gerbang halaman — sementara Task 1/3/4 hanya menguranginya.
+
+Akibatnya untuk rencana ini:
+- **Task 4 GUGUR.** Kuartet refetch dan gerbang halaman itu alternatif, bukan pelengkap: query yang sudah `enabled: false` tak menyegarkan diri saat fokus kembali.
+- **Task 1 + 3 belum gugur tapi turun prioritas.** Gerbang halaman sudah menihilkan beban lintas-modul; sisa manfaat `combinedMenus` tinggal untuk pemakai yang membuka modul yang menunya tak ia miliki. `sidebar-badges.ts` tetap belum ada.
+- **`useExternalEditDraftsNewCount` sudah ber-`enabled`** — celah "tanpa gerbang" di tabel atas sudah tertutup.
+- **Task 5 (`defaultOptions` QueryClient) tetap belum dikerjakan** dan tetap berdiri sendiri.
+
 **Yang masih berlaku utuh:** temuan akar masalah (hook di sidebar = hook di setiap halaman), penolakan predikat-dari-`systemRoles`, Task 5 (`defaultOptions` QueryClient, belum dikerjakan), dan seluruh Task 6 — terutama keharusan membuktikan lewat browser, bukan lewat test hijau.
 
 **Sudah naik kelas:** konvensinya kini terdokumentasi di [[APP - Web ERP]] §Konvensi Data-Fetching, jadi gap dokumentasi yang dicatat di bagian Catatan sudah tertutup.

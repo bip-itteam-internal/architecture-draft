@@ -154,16 +154,16 @@ Seluruh halaman berada di bawah `src/app/(main)/layout.tsx` → `components/layo
 
 Gerbangnya memakai **predikat yang sama persis** dengan visibilitas item menunya, supaya query hanya jalan saat badge-nya benar-benar tampil. Menyusun predikat baru dari `systemRoles` melahirkan salinan kedua matriks akses yang akan menyimpang diam-diam — sekelas dengan larangan menulis ulang resolusi milik modul lain di [[Microservices - Calendar Service]].
 
-Empat badge yang hidup di sidebar per 2026-08-29:
+Gerbangnya **dua lapis**, dan keduanya perlu: **akses** (boleh melihat badge ini?) dan **halaman** (sedang melihatnya?). Empat badge yang hidup di sidebar per 2026-08-29:
 
-| Hook | Gerbang | Selang | Muatan |
+| Hook | Gerbang akses | Gerbang halaman | Muatan |
 |---|---|---|---|
-| `useQueueCounts` (`use-warehouse-queue.ts:162`) | ✅ `bolehLihatMenuWarehouseTinggar` | 30 dtk | hitungan ✅ |
-| `useSadewaCetakResiPendingCount` (`use-sadewa-actions.ts:127`) | ✅ `bolehAksesSadewa` | 30 dtk | ⚠️ **daftar penuh** |
-| `useAntreanPoMarketing` (`use-antrean-ppic.ts:26`) | ✅ matriks tab `orders_po` | 30 dtk | `{menunggu}` ✅ |
-| `useExternalEditDraftsNewCount` (`use-external-edit-drafts.ts:63`) | ⛔ **tanpa gerbang** | 30 dtk | `limit=1` + `total` ✅ |
+| `useQueueCounts` | `bolehLihatMenuWarehouseTinggar` | `/warehouse` | hitungan ✅ |
+| `useSadewaCetakResiPendingCount` | `bolehAksesSadewa` | `/warehouse` | ⚠️ **daftar penuh** |
+| `useAntreanPoMarketing` | matriks tab `orders_po` | `/manufacture` | `{menunggu}` ✅ |
+| `useExternalEditDraftsNewCount` | — | `/integration-accurate` | `limit=1` + `total` ✅ |
 
-Yang terakhir menembak untuk **setiap karyawan** di **setiap halaman**, tanpa peduli ia memegang modul Accurate atau tidak.
+Yang terakhir sempat **tanpa gerbang apa pun** — menembak untuk setiap karyawan di setiap halaman, tak peduli ia memegang modul Accurate atau tidak. Diperbaiki bersama gerbang halaman (branch `fix/badge-sidebar-per-halaman`).
 
 ### 2. Badge pemberitahuan dipasangkan `refetchOnWindowFocus`, bukan interval rapat
 
@@ -178,7 +178,20 @@ Acuan yang sudah mapan: `features/erp/notification/inbox/use-unread-count.ts:39-
 
 Kuncinya yang ketiga: badge terasa hidup **bukan** karena polling rapat, melainkan karena ia menyegarkan diri tepat saat ada mata yang melihatnya. Itu yang membuat 60 detik terasa sama responsifnya dengan 30 detik pada separuh beban. Keempat badge sidebar di atas **belum** mengadopsi kuartet ini.
 
-⚠️ **Menggerbangi badge per-HALAMAN adalah jebakan.** `pathname?.startsWith("/warehouse")` memang menihilkan request di halaman lain, tapi sekaligus membatalkan fungsi badge sebagai pemberitahuan: orang baru tahu ada antrian setelah membuka halamannya, padahal badge itu yang seharusnya memberi tahu bahwa perlu dibuka. Pilih kuartet di atas, bukan gerbang halaman.
+### 2b. Gerbang HALAMAN — yang akhirnya dipilih, dan kenapa
+
+⚠️ **Catatan revisi (2026-08-29).** Bagian ini semula menyebut gerbang per-halaman sebagai "jebakan" dan menyuruh memilih kuartet. **Pemilik keputusan memilih sebaliknya**, dan alasannya sah: keluhan aslinya adalah aliran request yang terlihat di Network tab saat mengerjakan modul lain, dan kuartet hanya menguranginya — tidak menihilkannya. Kuartet dan gerbang halaman adalah **dua penyelesaian alternatif**, bukan saling melengkapi; memakai keduanya sekaligus tak menambah apa pun karena query yang sudah `enabled: false` tak menyegarkan diri saat fokus kembali.
+
+Yang dijalankan: `badgeAktif(pathname)` di `components/layout/sidebar-badge-scope.ts`, dipakai bersama predikat akses. Di modul lain angkanya **tidak hilang** — TanStack menahan nilai terakhir di cache sehingga badge tetap tampil, cuma berhenti diperbarui; begitu pemakai membuka modulnya lagi, gerbangnya terbuka dan angkanya langsung disegarkan.
+
+**Yang ditukar, dan ini disengaja**: badge berhenti memberi tahu selagi pemakai berada di modul lain.
+
+Dua hal yang wajib dijaga saat menambah badge baru:
+
+- **Batas rutenya separator, bukan `startsWith` telanjang.** `"/warehouse"` tak boleh meloloskan `"/warehouse-lain"`; salahnya tak bergejala — cuma fetch yang menyala di modul keliru. `pathname` kosong = **jangan fetch**.
+- **`RUTE_BADGE` menyimpan ulang pengetahuan dari `sidebar-menus.tsx`** (di modul mana menu ber-badge itu tinggal). Ketidakcocokannya tak menghasilkan galat — gerbangnya cuma tak pernah terbuka lalu badge diam selamanya. Diikat `sidebar-badge-scope.test.ts`; jangan tambah baris di `RUTE_BADGE` tanpa menambah pasangannya di test itu.
+
+Kuartet di §2 tetap berlaku untuk badge yang memang harus memberi tahu **lintas-halaman** — hari ini hanya badge lonceng inbox.
 
 ### 3. Pencacah membalas ANGKA, bukan daftarnya
 
