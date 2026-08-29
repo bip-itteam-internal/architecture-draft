@@ -844,7 +844,7 @@
         "README"
       ],
       "hash": "52eb6306aef513055af71556b6d2cdf0f8cf634f9cb922ca007b472e4ecac5d1",
-      "ukuran_kb": 3.3,
+      "ukuran_kb": 3.4,
       "ringkasan": "Menjawab: endpoint Lazada Open API mana yang benar-benar dipanggil ERP, fungsi Go mana yang memakainya, untuk apa, dan seberapa tinggi confidence tiap endpoint (verified-live, verified-by-usage, atau TBD). Juga menjawab bentuk respons sumber retur Lazada yang dipakai produksi dan TBD apa yang masih terbuka soal enum request_type, reverse_status, serta ketersediaan tracking_number.",
       "kata_kunci": [
         "Lazada",
@@ -926,7 +926,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 1.9,
+      "ukuran_kb": 2.0,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -978,7 +978,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -2317,20 +2317,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "1e234dcf74429f711aee3b758911870e40848913b47929b64f9b74c0ffc5ee45",
-      "ukuran_kb": 67.8,
-      "ringkasan": "Menjawab: bagaimana arsitektur Marketing Analytics Service bekerja (stack Go/Fiber, MongoDB, baca-saja dari integration_db dengan tiga lapis penjaga, health check yang turun ke degraded), dan bagaimana logika vonis laba (belum_matang vs rugi) diturunkan lewat empat iterasi percobaan beserta ambang materialitasnya. Juga menjelaskan koleksi mart_* apa saja yang dimiliki service ini, sumber data tiap channel (TikTok, Shopee, Lazada), dan aturan pemakaian angka yang mencegah hitung ganda saat menjumlahkan laba/penjualan lintas level (shop, produk, kampanye).",
+      "hash": "4e1b2fd51ac6d5d1198d8e10e43a5abe3a9b9c5f5ba25dbb10a64c3fddbf1710",
+      "ukuran_kb": 68.1,
+      "ringkasan": "Menjawab: bagaimana Marketing Analytics Service mengagregasi dan menyajikan laba/performa marketing per toko, produk, kampanye, iklan, video, dan sesi live dari data TikTok/Shopee/Lazada, serta endpoint apa saja yang tersedia (beranda, ambang, pagu, kurva alokasi, KPI host live, live shifts, price floor). Menjelaskan logika vonis laba lima keadaan — termasuk kenapa laba minus bisa berstatus 'belum_matang' (bukan rugi) dan riwayat empat iterasi penentuan ambang materialitasnya — beserta aturan anti hitung-ganda untuk kolom rawan salah baca seperti iklan_sia_sia, pembatalan, dan kepemilikan vs collaboration_type. Juga menjawab prinsip arsitektur service ini: kenapa integration_db hanya boleh dibaca (tiga lapis penjaga) dan kenapa /health turun jadi degraded saat index unik gagal dibuat.",
       "kata_kunci": [
-        "marketing analytics service",
-        "arsitektur",
-        "integration_db read-only",
-        "mart_profit_attribution",
+        "marketing analytics",
+        "laba marketing",
+        "profit attribution",
+        "ROAS",
         "vonis laba",
-        "belum_matang",
-        "hitung ganda",
+        "belum matang",
         "TikTok",
         "Shopee",
-        "Lazada"
+        "Lazada",
+        "hitung ganda"
       ]
     },
     {
@@ -3148,7 +3148,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "076b1a4fb212adebd3801ec7b3443d492438a6a76da2345516b17d06f0ada9bb",
-      "ukuran_kb": 4.9,
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab sumber tanggal yang dipakai untuk membukukan retur TikTok ke Accurate: kenapa update_time menyesatkan (ikut mundur karena settle refund) dan kenapa order_update_date dipilih sebagai gantinya, serta perbaikan zona waktu WIB untuk penomoran dokumen retur (RTR).",
       "kata_kunci": [
         "tanggal retur",
@@ -3868,7 +3868,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "cccc3976f9bcff8f662bf0c004529a903e80d452f9295fadd8cc197c3e9942b5",
-      "ukuran_kb": 14.3,
+      "ukuran_kb": 14.2,
       "ringkasan": "Menjawab: bagaimana skor KPI akurasi aset staff GA dihitung dari rekonsiliasi aset ERP terhadap Aktiva Tetap di Accurate, mengapa memakai ceklis per-item (bukan agregat), dan mengapa aset yang belum ada di Accurate dihitung 100% sehingga tidak menghukum GA. Menjelaskan struktur tiga tab modul Aset (Kelola/Data Accurate/Cocokkan), pencocokan manual berbantuan yang membangun accurate_asset_no bertahap, pemisahan Akurasi vs Cakupan, dan penempatan data yang menghormati batas service (inventory-service tidak memanggil siapa pun; feed KPI lewat employee-service). Mencatat status fase dan bahwa jembatan kategori-golongan serta skor golongan sudah di-supersede sebagian oleh ADR-0049.",
       "kata_kunci": [
         "ADR 0037",
@@ -4145,7 +4145,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "Sebagian dieksekusi (2026-08-29). **Expand** dan **Migrate** live di produksi: penyemaian awal 16 pemetaan (2026-08-11) tumbuh lewat entri manual susulan jadi **58 dari 59 toko terpetakan** per 2026-08-27 (satu yatim tersisa: `Series Glowbooster`), drift ICC-vs-`department_shops` (`Menyimpang`) nol. **Contract BARU SEBAGIAN**: saringan `/divisi` di [[Microservices - Marketing Analytics Service]] sudah pindah penuh ke `department_shops` sebagai sumber (bip-erp PR [#1520](https://github.com/bip-itteam-internal/bip-erp/pull/1520) & [#1522](https://github.com/bip-itteam-internal/bip-erp/pull/1522), erp-frontend PR #1305 — merged 2026-08-29, **belum di-deploy/diverifikasi lewat gateway**), keputusan sadar (2026-08-27) yang **sengaja menunda** dua hal ke rencana terpisah: kolom penanggung jawab toko (`icc`/blok \"per tim\" di `/beranda`) **masih membaca `team_shops`+`marketing_teams`**, dan menu `/integration/teams` **belum dicabut**. Rincian status per-langkah: §Migrasi. Menyusul [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] dan [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]; **tidak** menggantikan keduanya.",
+      "status_teks": "Sebagian dieksekusi (2026-08-29). **Expand** dan **Migrate** live di produksi: penyemaian awal 16 pemetaan (2026-08-11) tumbuh lewat entri manual susulan jadi **58 dari 59 toko terpetakan** per 2026-08-27 (satu yatim tersisa: `Series Glowbooster`), drift ICC-vs-`department_shops` (`Menyimpang`) nol. **Contract SUDAH DUA DARI DUA PEMBACA DIKERJAKAN, BELUM DI-DEPLOY/BACKFILL**: saringan `/divisi` di [[Microservices - Marketing Analytics Service]] sudah pindah penuh ke `department_shops` (bip-erp PR [#1520](https://github.com/bip-itteam-internal/bip-erp/pull/1520) & [#1522](https://github.com/bip-itteam-internal/bip-erp/pull/1522), erp-frontend PR #1305 — merged 2026-08-29, **belum di-deploy/diverifikasi lewat gateway**); kolom penanggung jawab toko (`icc`/blok \"Konteks per departemen\" di `/beranda`) **kode-nya sudah dipindah** ke `department_shops` (`sumber_penanggung_jawab.go`, branch `feat/penanggung-jawab-department-shops`, belum merged) — TAPI atribusi ICC dibakar ke `mart_profit_attribution.icc` saat sync, jadi data historis butuh **backfill eksplisit** (`POST /jobs/sync-profit-attribution/trigger?hari=120`) pasca-deploy, bukan otomatis berubah begitu kode di-deploy. Menu `/integration/teams` dan koleksi `team_shops`/`marketing_teams` **masih belum dicabut** (dipertahankan sengaja sebagai dead code sampai kedua pembaca terverifikasi stabil di prod). Rincian status per-langkah: §Migrasi. Menyusul [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] dan [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]; **tidak** menggantikan keduanya.",
       "publik": true,
       "tautan": [
         "Microservices - Marketing Analytics Service",
@@ -4156,20 +4156,20 @@
         "Microservices - Integration Service",
         "Sales - ICC Account Manager Mapping"
       ],
-      "hash": "9048c142cec037f83b437eb3e30290e06512851494be6a9919c88f94382913e5",
-      "ukuran_kb": 21.2,
-      "ringkasan": "Menjawab: kenapa ada tiga mekanisme berbeda yang menjawab pertanyaan \"toko ini milik tim/departemen mana\" (work_data.department, marketing_teams/team_shops, dan IncentiveOrg) beserta masalah yang ditimbulkan tiap mekanisme, dan keputusan mana yang dipilih sebagai identitas tim tunggal (department_shops dengan department_key sebagai kunci stabil, menggantikan pencocokan berbasis nama). Juga merinci status migrasi per 2026-08-29 (toko mana saja yang sudah/belum terpetakan, apa yang sudah pindah ke Contract dan apa yang sengaja ditunda).",
+      "hash": "0879f2d7e8938d57074b72c1a240e9412f6ad28db38cadc10fa9844a1938ab38",
+      "ukuran_kb": 22.1,
+      "ringkasan": "Menjawab: kenapa ada tiga mekanisme berbeda yang menentukan toko marketing milik tim/departemen mana (work_data.department, marketing_teams/team_shops, IncentiveOrg) yang saling tidak sinkron, dan bagaimana keputusan menyatukannya jadi satu sumber department_shops dengan department_key (bukan nama) sebagai kunci identitas stabil. Menjelaskan status migrasi per tahap Expand-Migrate-Contract (dua tahap pertama live di prod, Contract sudah dikode tapi belum di-deploy/backfill), inventaris toko yang dipindahkan dari team_shops dan icc_account_mappings berikut mana yang berbukti data dan mana yang keputusan manual pemilik fitur. Juga menjawab risiko nyata dari kopling berbasis nama (bukan key) yang pernah membuat data SPV Kyura dan Beauty Hacks salah tersaring.",
       "kata_kunci": [
-        "ADR 0045",
         "department_shops",
-        "marketing_teams",
         "team_shops",
+        "marketing_teams",
+        "ICC",
         "department_key",
         "kepemilikan toko",
         "migrasi tim marketing",
-        "ICC account mapping",
-        "identitas tim",
-        "IncentiveOrg"
+        "icc_account_mappings",
+        "IncentiveOrg",
+        "penanggung jawab toko"
       ]
     },
     {
@@ -4398,7 +4398,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "1af925998c51daaf89f4b362162b5f8c117e3db82e37169cbfe7b2e6ed084c92",
-      "ukuran_kb": 6.5,
+      "ukuran_kb": 6.6,
       "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal), dan bagaimana auto-disable Tahap 2 bekerja (counter kegagalan auth beruntun, ambang 5, reset saat sukses, satu Telegram tanpa damper terpisah — bukti flapping 36009006). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care.",
       "kata_kunci": [
         "adr",
@@ -4535,7 +4535,7 @@
         "APP - Web ERP"
       ],
       "hash": "3405a3dc1516fe9eff90d36e5a1a47c8a876d2dbaf6bc9537105816d5897ee6d",
-      "ukuran_kb": 10.1,
+      "ukuran_kb": 10.2,
       "ringkasan": "Menjawab: bagaimana penyesuaian statement TikTok (tt_statement_adjustments, mayoritas ganti rugi paket hilang / LOGISTICS_REIMBURSEMENT yang bukan penggantian ongkir) dibukukan ke Accurate — dilipat ke payout pesanan yang disebutnya lalu diurus mesin receipt, bukan sebagai baris pendapatan tersendiri — dan bagaimana pesanan yang tak ditemukan ditangani. Live 26 Agustus 2026 (PR #1451).",
       "kata_kunci": [
         "adr",
@@ -4843,7 +4843,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "ee317d4d8664cf3c5227bcf8d3d018f9648ff0b9fdc9228e35cc31d4144a5c89",
-      "ukuran_kb": 16.3,
+      "ukuran_kb": 15.9,
       "ringkasan": "Menjawab endpoint dan alur kerja Finance Bridging versi Golang (penulisan ulang dari sistem Java): bagaimana membuat dan mengirim ringkasan transaksi Sales/Income/Return ke Accurate, halaman FE terkait per channel, status ringkasan, serta setting toko dan mapping produk.",
       "kata_kunci": [
         "Finance Bridging Golang",
@@ -4870,7 +4870,7 @@
         "Finance - Incentive"
       ],
       "hash": "8a3dba53269a5104fd1106064d8ed8159f96a7207b2c5a97ffc4a66f7a399504",
-      "ukuran_kb": 19.6,
+      "ukuran_kb": 19.5,
       "ringkasan": "Menjawab fitur dan struktur sistem Finance lama (Java/PostgreSQL/ReactJS) sebagai jembatan antara Accurate dan marketplace: master data, upload Excel per platform (TikTok/Shopee/Lazada/Tokopedia/KiriminAja), sinkronisasi ke Accurate, dan lokasi repositori kodenya.",
       "kata_kunci": [
         "Finance Bridging lama",
@@ -7698,7 +7698,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
-      "ukuran_kb": 6.8,
+      "ukuran_kb": 6.9,
       "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
       "kata_kunci": [
         "faktur",
@@ -8842,7 +8842,7 @@
         "APP - Web ERP"
       ],
       "hash": "0115ceffe21b522769faac6e9286fe16c1737ff46d15d0f58ff2e9333c9cd7f0",
-      "ukuran_kb": 14.2,
+      "ukuran_kb": 14.0,
       "ringkasan": "Menjawab: bagaimana menerbitkan akun ERP untuk vendor, mitra, atau kontraktor tanpa menjadikannya karyawan, lalu memberinya akses ke modul tertentu. Menjelaskan cara memilih antara dua sumbu hak akses yang paling sering tertukar (Paket Hak vs Role Modul), cara memperpanjang dan menutup akses beserta batasnya, serta gejala umum saat vendor sudah dibuat tapi tetap tak bisa masuk.",
       "kata_kunci": [
         "akun eksternal",
@@ -10178,7 +10178,7 @@
         "APP - Web ERP"
       ],
       "hash": "c4637f8509f5c1a5a4144b1a335e575e34704efa5110b9829b98aa991eb3b130",
-      "ukuran_kb": 8.5,
+      "ukuran_kb": 8.4,
       "ringkasan": "Menjawab: apa rencana penyatuan menu-menu gudang yang kini terpecah per-tahap (Perlu Diproses, Antrian Pesanan, Pengambilan, Pengemasan, Riwayat Cetak Resi, Serah Terima) menjadi satu layar omnichannel \"Kelola Pesanan\" ala Desty tanpa mengubah backend, dan apa beda pratinjau Beta FE-only (data dummy, aksi mati) dengan menu produksi yang sudah wired ke endpoint nyata. Juga menjelaskan pemetaan tiap tab/sub-tab \"Siap Dikirim\" ke endpoint warehouse/integration, rencana mutasi bertahap fase 0-5 sampai cutover, gerbang dan nuansa yang wajib dipertahankan saat \"cuma ganti UI\" (gerbang rekon `exported_at`, kode packer T1/T2, guard TikTok `package_id` kosong, batch cap 100), persona pengguna dan RBAC-nya, serta hal yang belum diputuskan (tab Belum Dibayar, cakupan Sadewa, nasib menu lama).",
       "kata_kunci": [
         "Kelola Pesanan",
@@ -10609,7 +10609,7 @@
         "WH - Warehouse Sadewa"
       ],
       "hash": "cef9199ebe4a4fbb87d195fd9ad3562fc485e88f44f4ccdb65b58d8c2e6cca7b",
-      "ukuran_kb": 16.8,
+      "ukuran_kb": 16.6,
       "ringkasan": "Menjawab: mengapa hook badge di sidebar erp-frontend menembak endpoint warehouse/sadewa/accurate tiap 30 detik untuk semua karyawan terlepas role, dan bagaimana rencana menggerbangnya dengan enabled yang diturunkan dari combinedMenus (menu yang benar-benar tampil), bukan disusun ulang dari systemRoles. Menjelaskan pula temuan akar masalah (hook sidebar = hook tiap halaman), masalah QueryClient tanpa defaultOptions, konvensi interval refetch badge, dan mengapa sebagian rencana ini sudah usang per 2026-08-29.",
       "kata_kunci": [
         "sidebar fetch",
