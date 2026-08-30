@@ -60,6 +60,17 @@
 
 Menolak: tanggal lampau, penulisan lintas perusahaan, departemen di luar cakupan, dan sel hari ini yang karyawannya sudah tap masuk atau sudah berstatus cuti/dinas. `date` bertipe Go `time.Time` sehingga **tanggal telanjang `YYYY-MM-DD` gagal di-parse** — kirim timestamp RFC3339 utuh. Keputusan: [[ADR - 0036 Roster Harian Menimpa Jadwal Dasar]].
 
+## Pergantian jadwal terjadwal (berlaku-mulai)
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| POST | `/work-schedule-assignment` | Jadwalkan pergantian jadwal seorang karyawan (`employee_id`, `schedule_type` `static`/`pattern`, `schedule_id` **atau** `group_id`, `berlaku_mulai`). Menerima `YYYY-MM-DD` maupun RFC3339; keduanya dinormalkan ke tengah malam WIB | `RequireHRISStaffOrITSupervisor` |
+| GET | `/work-schedule-assignment/:employee_id` | Dokumen dasar (`base`), seluruh baris (`assignments`, selalu `[]` bukan `null`), dan `active` = yang berlaku hari ini (dihitung backend, bukan frontend) | `RequireHRISStaffOrITSupervisor` |
+| DELETE | `/work-schedule-assignment/:id` | Batalkan penugasan yang **belum** berlaku; yang sudah berlaku dibalas **409** | `RequireHRISStaffOrITSupervisor` |
+
+⛔ **Aturan H+1: `berlaku_mulai` paling cepat BESOK**, hari ini dan tanggal lampau dibalas **400**. Ini menutup jendela penyemaian entri presensi yang gagal senyap secara struktural; alasan lengkapnya di [[Microservices - Attendance Service]].
+
+Koleksi `work_schedule_assignment` (di `attendance_db`), index **unik** `(employee_id, berlaku_mulai)` — tanggal yang sudah terpakai dibalas **409**. Dokumen dasar `work_schedule` tidak pernah disentuh. Kedua jalur tulis mengirim pemberitahuan inbox berkategori `schedule` ke karyawannya ([[Microservices - Notification Service]]).
+
 ## Business trip (perjalanan dinas)
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
