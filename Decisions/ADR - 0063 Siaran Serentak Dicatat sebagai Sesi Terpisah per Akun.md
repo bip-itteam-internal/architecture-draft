@@ -108,7 +108,17 @@ Ini bukan penyempurnaan tampilan melainkan **prasyarat fitur ini bisa dipakai sa
 
 Dialog Mulai boleh memilih beberapa akun sekaligus dan menerbitkan N sesi dalam satu tindakan. Itu kemudahan di tampilan, **bukan** perubahan kontrak.
 
-### 6. Tidak diputuskan di sini
+### 6. Yang berhak melihat sesi orang lain mencakup IT, dan itu disengaja
+
+Penyaringan "siapa melihat siapa" pada `/live-shifts/berjalan` maupun riwayat memakai satu predikat, `common.IsMarketingLeader`. Daftar peran di baliknya **memuat modul `it` pada tingkat staf ke atas**, di samping supervisor/admin kyura, beauty_hacks, integration, dan `insentive: adv_leader`.
+
+Artinya staf IT melihat sesi berjalan dan riwayat seluruh host live, termasuk nama dan `employee_id` tiap orang. **Itu diterima sadar** (2026-08-30), dengan tiga alasan: IT memang yang menyelidiki saat angkanya janggal, akses baca itu sudah mereka miliki sebelum keputusan ini lewat gerbang rutenya sendiri, dan kartu performa tim di halaman ICC memang digerbang "marketing leader **atau** anggota IT" sehingga mempersempitnya justru mematikan kartu itu bagi mereka.
+
+⚠️ Dicatat di sini karena berkas peran itu sendiri memperingatkan agar predikat ini **tidak** dipakai sebagai penanda SPV marketing, dan peringatan itu benar untuk keputusan **wewenang**. Yang dipakai di sini adalah keputusan **visibilitas baca**, dan hanya untuk itu. Wewenang menindak sesi tetap tidak mengikuti predikat ini (lihat §3): leader tak boleh menghentikan sesi orang lain, dan satu-satunya pengecualian ber-peran adalah **supervisor/admin IT** sebagai jalan darurat, bukan staf IT.
+
+Konsekuensi yang harus diingat: **definisi leader di frontend dan backend TIDAK sama.** Padanan frontend tidak memuat `it`. Menyamakan keduanya tanpa memeriksa akan mematikan kartu performa tim ICC bagi anggota IT, karena merekalah yang lolos gerbang halaman itu lewat jalur `isItMember`.
+
+### 7. Tidak diputuskan di sini
 
 - **Pengelompokan sesi menjadi satu "blok siaran" yang tersimpan.** Ditolak untuk sekarang. Union jendela waktu sudah menjawab pertanyaan jam tanpa menyimpan fakta baru yang bisa menyimpang dari kenyataan, misalnya saat host membuka akun ketiga dua puluh menit kemudian.
 - **Perhitungan dan pembayaran insentif.** Tidak disentuh keputusan ini. Peraturan Perusahaan diam soal insentif Host Live, jadi itu keputusan produk tersendiri yang butuh dasar tertulis lebih dulu.

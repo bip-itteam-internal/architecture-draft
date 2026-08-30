@@ -163,6 +163,41 @@ mendadak tercatat gagal tanpa ada yang berubah pada kinerjanya.
 
 ---
 
+## Sisa dari `/review` T1 (2026-08-30), belum dikerjakan
+
+Ketiganya muncul saat review T1, tidak memblokir T1 naik, dan sengaja dipisah supaya
+PR-nya tetap bisa direview. Yang KRITIS dari review itu (riwayat tak tersaring, sesi
+terkunci permanen, galat Jeda/Akhiri yang senyap) sudah ditutup di dalam T1.
+
+### T11. Normalisasi `employee_id` di titik SIMPAN, bukan titik baca
+
+`keShiftHost` menyalin `EmployeeID` mentah; `validasiHost` hanya men-trim untuk
+*menilai*, bukan menormalkan. Akibatnya nilai tersimpan bisa `" BIP-77"`. Predikat
+kepemilikan men-trim sehingga orang itu tetap pemilik di `/berjalan`, tetapi filter
+Mongo memakai kesetaraan eksak sehingga ia **tak terlihat** oleh audit leader
+`?host=<id>`. Arahnya tidak meloloskan siapa pun ke sesi orang lain, tapi ia membuat
+"definisi pemilik" punya dua bentuk.
+
+**Selesai bila**: nilai tersimpan selalu ter-trim, dan ada test yang mengirim
+employee_id ber-spasi lalu membuktikan audit `?host=` menemukannya.
+
+### T12. Tombol Mulai tidak boleh jatuh di bawah lipatan
+
+Tombolnya dirender SESUDAH seluruh daftar sesi. Untuk leader yang melihat sesi seluruh
+tim, daftar itu bisa belasan blok. Sebelumnya kartunya selalu satu, jadi ini baru.
+Kandidat: pindah ke baris aksi di `CardHeader` supaya posisinya tak bergantung panjang
+daftar.
+
+### T13. Bedakan "gagal dimuat" dari "belum ada sesi"
+
+⚠️ **Pra-eksisting, bukan dari T1**, tetapi taruhannya naik. Halaman tak pernah membaca
+`isError`; saat query gagal, panel menampilkan "Belum ada sesi berjalan" **plus tombol
+Mulai**. Host yang sesinya sedang berjalan diberi tahu tidak ada, lalu ditawari memulai
+sesi baru yang berakhir 409. Persis kelas galat yang komentar cabang memuat di komponen
+itu sendiri larang: nol yang belum terbukti tak boleh terbaca sebagai fakta bisnis.
+
+---
+
 ## Di luar lingkup, sengaja
 
 - **Pengelompokan sesi jadi "blok siaran" tersimpan.** Union jendela waktu sudah menjawab

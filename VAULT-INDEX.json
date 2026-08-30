@@ -4852,19 +4852,19 @@
         "APP - Web ERP",
         "APP - MyBharata"
       ],
-      "hash": "42031ce43b5cc4bf140bb8e231e93fae4bc4ea8e4e2f5a1238cb29531b7718d0",
-      "ukuran_kb": 16.3,
-      "ringkasan": "Menjawab: bagaimana host live yang menyiarkan serentak di beberapa akun dicatat, yaitu sebagai beberapa sesi paralel satu per akun, bukan satu sesi bermuatan banyak akun. Menjelaskan tiga aturan turunannya: jam siaran seseorang dihitung sebagai jam dinding (union jendela waktu) bukan penjumlahan durasi per sesi, tumpang tindih antar-akun berbeda milik orang yang sama diperlakukan sah dan hanya ditandai bukan dinolkan porsinya, dan GMV diatribusikan ke departemen host bukan departemen pemilik akun. Memuat pengukuran produksi 2026-08-30 yang mendasarinya, tiga celah hilir (sesi kedua tak punya tampilan, jam tergandakan di dua tempat, tidak ada rambu), serta apa yang sengaja tidak diputuskan di sini.",
+      "hash": "2c81063e8755357364954d84414e51fdcbf31600df9147b9d740a1f86a525b52",
+      "ukuran_kb": 17.8,
+      "ringkasan": "Menjawab: bagaimana host live yang menyiarkan serentak di beberapa akun dicatat (satu sesi per akun, paralel, tanpa perubahan bentuk penyimpanan), mengapa jam siaran seseorang dihitung sebagai jam dinding lewat union jendela waktu alih-alih menjumlahkan durasi tiap sesi, dan mengapa tumpang tindih antar-akun berbeda milik orang yang sama diperlakukan sah lalu hanya ditandai, bukan dinolkan porsi GMV-nya. Menjawab pula ke departemen mana GMV siaran diatribusikan (departemen host, bukan pemilik akun), siapa yang berhak melihat sesi berjalan orang lain, dan apa yang sengaja tidak diputuskan di sini seperti insentif, laba per siaran, serta penilaian kedisiplinan otomatis. Berisi pengukuran produksi 2026-08-30 yang mendasarinya beserta tiga celah hilir yang ditemukan: sesi kedua tanpa tampilan, jam tergandakan, dan tiadanya rambu tumpang tindih.",
       "kata_kunci": [
         "siaran serentak",
         "host live",
         "live shift",
-        "sesi paralel",
+        "multi akun",
+        "akun_live",
         "jam dinding",
         "union jendela waktu",
-        "durasi efektif",
-        "porsi GMV",
-        "tumpang tindih",
+        "GMV",
+        "durasi_efektif_detik",
         "ADR 0063"
       ]
     },
@@ -10487,20 +10487,20 @@
         "ADR - 0006 Swap Jadwal Same-Department",
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem"
       ],
-      "hash": "cf5efa300ec68fcd388921da25b45a74b4a8d7a8a929b9346c353e9cd8051102",
-      "ukuran_kb": 8.3,
-      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dikerjakan untuk mendukung siaran serentak host live, dalam urutan dan dependensi apa, serta kriteria selesai tiap itemnya. Memuat sebelas item T0 sampai T10, mulai dari menampilkan seluruh sesi berjalan di web dan mobile, menghitung jam siaran sebagai union jendela waktu, menandai tumpang tindih lintas akun sebagai sah, menghentikan penggandaan jam di frontend, dedup pengingat per orang, dialog Mulai multi-akun, pemilih toko di mobile, verifikasi lapangan dengan host sungguhan, sampai menyalakan scope individu oleh HR. Menjelaskan juga apa yang sengaja di luar lingkup dan mengapa T1 serta T2 wajib didahulukan.",
+      "hash": "f5396eaa2c563b7a4b3cfbaa2560f5b174cdd05b6d8ee635dc03fb666556f0b4",
+      "ukuran_kb": 10.1,
+      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dikerjakan supaya host live bisa menyiarkan serentak di beberapa akun, dalam urutan dan dependensi apa (T0 sampai T13), dan apa gerbang selesai untuk tiap task. Merinci pembagian kerja web, mobile, dan backend: menampilkan seluruh sesi berjalan milik pemanggil, menghitung jam siaran sebagai union jendela waktu di satu fungsi, menandai tumpang tindih lintas akun sebagai sah, menghentikan penggandaan jam di frontend, dedup pengingat per orang, dialog Mulai multi-akun, pemilih toko di mobile, verifikasi lapangan dengan host sungguhan, sampai menyalakan scope KPI individu berikut penyesuaian target. Juga memuat angka produksi yang mendasarinya dan sisa temuan review yang belum dikerjakan.",
       "kata_kunci": [
-        "analisa kebutuhan",
-        "daftar task",
         "siaran serentak",
         "host live",
         "live shift",
-        "sesi berjalan",
+        "daftar task",
+        "analisa kebutuhan",
+        "sesi paralel",
         "jam dinding",
         "scope individu",
-        "KPI host",
-        "verifikasi lapangan"
+        "KPI host live",
+        "marketing analytics"
       ]
     },
     {
