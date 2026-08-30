@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-30",
-  "jumlah_dokumen": 322,
+  "jumlah_dokumen": 323,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -47,6 +47,7 @@
         "Microservices - Payroll Service",
         "Microservices - Form Builder Service",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
+        "Microservices - Notification Service",
         "HRIS - Perjalanan Dinas",
         "Microservices - Employee Service",
         "HRIS - Employee Request & Approval",
@@ -56,24 +57,20 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "8c7dcd912a20c5fabb8efb70eba67cd04dc0a3690132c052ce6afd7c9998f29b",
-      "ukuran_kb": 16.9,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan attendance-service dan siapa yang boleh memanggil masing-masing. Mencakup clock-in/out, laporan periode 26 ke 25, hari libur, pengajuan cuti dan izin, tukar jadwal kerja, koreksi presensi, perjalanan dinas, buku tamu, roster harian, serta kelola definisi shift dan rotasi. Juga menjawab: kenapa hapus shift bawaan membalas 404, dan apa beda gerbangRoster dari common.CanManageDepartment.",
+      "hash": "17fb328f89e9450194f3504f3a7a021385e91a67b89339e84663f84de19b06f1",
+      "ukuran_kb": 18.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di attendance-service lewat gateway `/api/attendance/*`, siapa yang boleh memanggilnya (staf HRIS, Security, IT, gerbangRoster, atau rute open), dan bagaimana alur clock-in/out, pengajuan cuti/izin, tukar jadwal, koreksi absen, roster, hari libur, serta business trip berjalan. Juga menjawab detail kontrak yang mudah salah: `schedule_id` dan `group_id` unik global, window koreksi 7 hari, batas 500 sel per permintaan roster, tanggal wajib RFC3339 penuh, dan bagaimana agregasi jam kerja diteruskan ke payroll lewat `/payroll-supplement` beserta perlakuan dibayar/dipotong per status. Dipakai saat mencari bentuk request/response presensi, aturan validasi yang menolak permintaan, atau titik integrasi attendance dengan MyBharata dan payroll.",
       "kata_kunci": [
-        "attendance service",
-        "endpoint presensi",
-        "clock-in",
-        "clock-out",
-        "roster",
-        "company-work-schedule",
-        "company-group-rotation",
-        "kelola shift",
-        "rotasi shift",
-        "gerbangRoster",
-        "RBAC presensi",
-        "cuti",
-        "koreksi presensi",
-        "tukar shift"
+        "attendance",
+        "absensi / presensi",
+        "clock-in / clock-out",
+        "cuti / leave request",
+        "jadwal kerja / work schedule",
+        "shift & roster",
+        "tukar jadwal / schedule exchange",
+        "koreksi absen / correction",
+        "payroll supplement",
+        "endpoint attendance-service"
       ]
     },
     {
@@ -2660,31 +2657,21 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Irisan 1 (baca saja) HIDUP di prod; irisan 2 (tulis) dan 3 belum ada kode.** PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) dan [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489) keduanya merged 2026-08-27, kode baca-saja terkunci 93 test. Diukur di prod 2026-08-30: container `Vault-MCP` sehat, `POST /mcp` membalas 401 ber-`WWW-Authenticate` yang benar (`scope=\"vault:read\"`), kedua `.well-known` 200, `/oauth/authorize` menolak client tak dikenal dengan 400, sembilan `employee_id` terdaftar di `VAULT_MCP_ALLOWED_EMPLOYEES`, dan **tiga sesi sudah terbentuk di `mcp_sessions`** sehingga alur OAuth penuh terbukti pernah dilalui orang sungguhan.",
+      "status_teks": "**Irisan 1 (baca saja) HIDUP di prod. Irisan 2 (tulis) kodenya SELESAI dan terkunci test, tetapi BELUM di-deploy dan deploy key-nya belum ada. Irisan 3 belum ada kode.** PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) dan [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489) merged 2026-08-27. Diukur di prod 2026-08-30: container `Vault-MCP` sehat, `POST /mcp` membalas 401 ber-`WWW-Authenticate` yang benar (`scope=\"vault:read\"`), kedua `.well-known` 200, `/oauth/authorize` menolak client tak dikenal dengan 400, sembilan `employee_id` terdaftar di `VAULT_MCP_ALLOWED_EMPLOYEES`, dan **tiga sesi sudah terbentuk di `mcp_sessions`** sehingga alur OAuth penuh terbukti pernah dilalui orang sungguhan.",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
+        "ADR - 0064 Author Commit Tunggal untuk Vault MCP",
         "APP - Web ERP",
         "RUN - Menyambungkan Claude ke Vault MCP",
         "ADR - 0003 SSO-only Gateway",
         "IT - Server, VMs and Databases"
       ],
-      "hash": "34284c275ca14bb927390b398918e1ccfc707c84c473c559750f35d2f9315e6b",
-      "ukuran_kb": 18.5,
-      "ringkasan": "Menjawab: bagaimana vault arsitektur dibuka ke Claude lewat MCP server sendiri, kenapa server menerbitkan token OAuth sendiri alih-alih meneruskan ERP JWT (audience binding dan TTL), dan kenapa ia sengaja tidak lewat API Master Gateway. Menjawab juga bagaimana identitas manager diambil sekali dari SSO ERP lewat ticket/redeem, kenapa daftar-izin employee_id ditulis eksplisit dan diperiksa ulang tiap panggilan, kenapa tulisan mendarat sebagai commit git ber-author managernya, dan kenapa service ini tidak boleh menyentuh VAULT-INDEX.json. Memuat pula pembagian irisan 1 sampai 3 beserta permukaan tool dan cara pencariannya.",
-      "kata_kunci": [
-        "vault MCP",
-        "MCP server",
-        "Claude connector",
-        "OAuth",
-        "PKCE",
-        "SSO ERP",
-        "architecture-draft",
-        "daftar-izin employee_id",
-        "streamable HTTP",
-        "mcp_sessions"
-      ]
+      "hash": "5b32dce84ab430fc4253bcbf69c531320aa5cd16f8929a24261d9376d930ee3e",
+      "ukuran_kb": 20.5,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Core System and Modules/Microservices - Warehouse Service.md",
@@ -4873,6 +4860,24 @@
         "durasi_efektif_detik",
         "ADR 0063"
       ]
+    },
+    {
+      "path": "Decisions/ADR - 0064 Author Commit Tunggal untuk Vault MCP.md",
+      "judul": "ADR - 0064 Author Commit Tunggal untuk Vault MCP",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "✅",
+      "status_teks": "**Accepted**, 2026-08-30. Menyimpangi Keputusan 3 di [[Microservices - Vault MCP Service]], yang berstatus mengikat dan menuntut ADR untuk diubah.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Vault MCP Service",
+        "RUN - Menyambungkan Claude ke Vault MCP",
+        "CORE - SSO Flow"
+      ],
+      "hash": "26b448727ddc5233b461d15c7e831982462f75305c64b706721415fa9fd904ee",
+      "ukuran_kb": 5.4,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "DEVELOPER GUIDE.md",
@@ -11079,5 +11084,8 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "Core System and Modules/Microservices - Vault MCP Service.md",
+    "Decisions/ADR - 0064 Author Commit Tunggal untuk Vault MCP.md"
+  ]
 }
