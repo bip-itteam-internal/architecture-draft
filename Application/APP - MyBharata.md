@@ -187,6 +187,63 @@ Sebabnya program Kaizen bukan "satu form lagi" bagi pengisinya: berulang tiap pe
 > dikunci test berikut kontrol negatifnya di
 > [[Microservices - Notification Service]]. Diverifikasi langsung di dev **dan** prod.
 
+### Sesi Live Host (`/live-shift`) — ⚠️ live di `dev`, siaran serentak selesai di branch
+
+Host live mencatat sendiri siaran TikTok-nya dari HP: Mulai (toko + akun), Jeda/Lanjutkan,
+Akhiri, plus riwayat 7 hari terakhir dengan porsi GMV-nya sendiri. Ini catatan yang ditulis
+**host**, bukan hasil sync TikTok — sync datang terpisah sebagai `RingkasanShift`, dan
+keduanya dijodohkan lewat toko **dan** akun.
+
+Menunya digerbang **host saja** (`isHostLive`), sengaja tanpa leader marketing: tombol
+Mulai/Akhiri di kartu tidak digerbang peran, jadi memberi leader akses menu berarti memberi
+leader jalan memulai sesi atas namanya sendiri. Ini **berbeda dari web**, yang memang
+memberi leader akses lihat-saja.
+
+Backend, kontrak, dan aturan bisnisnya di [[Microservices - Marketing Analytics Service]]
+dan [[API - Marketing Analytics Service]]; keputusannya di
+[[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]].
+
+**Siaran serentak** (T2, branch `feat/live-shift-sesi-jamak`, versionCode 152, belum
+merged): host memegang beberapa akun sekaligus, jadi sesi berjalan adalah **daftar**, bukan
+satu. Halaman penuh merender satu kartu per sesi dengan timer dan peringatan ambangnya
+masing-masing. **Beranda tetap satu kartu** supaya tak berubah jadi daftar panjang, dengan
+penanda "Lihat N sesi lainnya" yang **bisa ditekan** menuju halaman penuh — sebagai teks
+mati, sesi kedua akan tak terjangkau dari beranda sama sekali.
+
+Yang mudah terlewat saat menyentuh layar ini:
+
+- ⛔ **`null` dan `[]` beda arti.** `null` = belum pernah dimuat (tampilkan kerangka), `[]` =
+  sudah dimuat dan memang tidak sedang live. Keduanya dulu menyatu sebagai satu `null`,
+  sehingga galat jaringan dan "memang tidak live" tampil identik. Gerbangnya `sesi == null`,
+  **bukan** `state is Initial || Loading`: sesi berjalan dan riwayat dimuat oleh dua event
+  terpisah, jadi riwayat yang tiba lebih dulu membuat state jadi `Loaded` selagi sesi masih
+  `null`.
+- ⛔ **Urutan sesi diurutkan di klien** karena backend mengirimnya tanpa sort — lihat ADR
+  0063 §5. Paling lama di depan.
+- **`boleh_kelola` didekode tapi tidak menggerbang tombol apa pun** di sini, karena menunya
+  sudah host-saja sehingga nilainya selalu `true` dan gerbang berbasis field itu akan jadi
+  logika mati. Default **`true`** saat field-nya absen: backend sebelum 2026-08-30 tidak
+  mengirimnya, dan `false` akan mencabut tombol host atas sesinya sendiri.
+- **Konfirmasi memakai `CustomBottomSheet`, bukan `AlertDialog`** (konvensi repo: 48 berkas
+  vs 7), dan **menyebut nama akun** yang sedang diakhiri.
+- ⚠️ `CustomBottomSheet.show` menerima `child` yang **sudah dirakit di lokasi panggil**,
+  jadi context di situ masih milik halaman. `Navigator.pop` dengan context itu menutup
+  **halamannya**, bukan sheet-nya — bungkus tombolnya dengan `Builder`. Ini beda dari
+  `showDialog`, yang memberi context route lewat builder-nya sendiri.
+
+⛔ **Belum terverifikasi di perangkat sungguhan**, dan `live_shifts` produksi masih **0
+dokumen** sejak fiturnya ada.
+
+**Belum ada di mobile** (sudah ada di web): pemilih toko — `shop_id` masih **diketik
+tangan**, dan salah ketik menghasilkan 200 kosong lalu sesi tersimpan ke toko yang tak bisa
+dijodohkan sehingga **GMV-nya hilang selamanya**; dan memilih beberapa akun sekaligus dalam
+satu dialog.
+
+⚠️ Klien mana pun yang kelak merakit daftar akun **lintas toko** wajib berkunci
+`shop_id` + akun, bukan nama akun saja: nama akun berulang antar toko (`hexativ` adalah
+akun teratas di tiga toko berbeda). Digabung per nama, sesi tersimpan atas toko yang salah
+dan gagalnya senyap — riwayatnya berbunyi "belum ada data penjualan" selamanya.
+
 ### Fitur pendukung lain
 - **QR Code**: tampilkan QR pribadi + akses scanner inventory
 - **Guest Book**: tamu eksternal mengisi buku tamu (scan QR, input manual, kategori)

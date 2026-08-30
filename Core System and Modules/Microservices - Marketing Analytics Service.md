@@ -177,7 +177,9 @@ Enam route, seluruhnya digerbang `common.RequireLiveShiftUser` (`live_shift_hand
 
 **Tanggal diurai zona WIB**, bukan UTC (`time.ParseInLocation` + `zonaWIB`). `time.Parse` polos membuat rentang "10 Agustus" sebenarnya terbaca 10 Agt 07:00 s.d. 11 Agt 06:59 WIB, sehingga shift dini hari — jam live yang nyata dipakai — muncul pada tanggal yang salah.
 
-#### Siaran serentak di beberapa akun (🟡 diusulkan, [[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]])
+#### Siaran serentak di beberapa akun (⚠️ sebagian terimplementasi, [[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]])
+
+> **Status per 2026-08-30**: yang sudah berjalan hanyalah **menampilkan** N sesi (web tayang prod, mobile selesai di branch). Kedua aturan yang menyentuh **uang** — jam dinding union dan tumpang tindih lintas akun yang sah — **belum dikerjakan sama sekali**, jadi dua konsumen frontend di bawah masih menggandakan jam sampai hari ini.
 
 Host live memegang lebih dari satu akun dan **menyiarkan serentak dari beberapa perangkat**, dengan akun-akun yang bisa milik toko berbeda (dinyatakan pemilik proses 2026-08-30). Ini sebab kedua yang sudah tercatat di §KPI Host Live sebagai penghalang penilaian per-orang, kini dengan bentuk yang lebih tajam daripada "akunnya berganti antar bulan".
 
@@ -193,11 +195,13 @@ Atribusi lintas departemen: GMV masuk ke departemen **host** (`work_data.departm
 
 ⚠️ **Konsumen yang sudah menggandakan jam hari ini**, dua-duanya di frontend: kartu metrik `halaman-live-shift.tsx` dan `ringkas-performa-host-live.ts` (layar tim ICC), keduanya menjumlahkan `durasi_efektif_detik` per baris tanpa dedup jendela waktu. Di bip-erp sendiri **nol** konsumen `porsi_host`/`durasi_efektif_detik` di luar service ini.
 
-⚠️ **Sesi kedua tak punya tampilan** di web (`sesiBerjalan?.[0]`) maupun mobile (`milik.first`), jadi ia tak bisa dijeda atau diakhiri, lalu menggantung melewati ambang 12 jam yang **memaksa porsi host jadi nol**. Peringatan jam ke-11 tak pernah sampai karena kartunya tak pernah dirender. Ini menjadikan perbaikan tampilan N sesi sebagai **prasyarat**, bukan penyempurnaan.
+✅ **Sesi kedua kini punya tampilan.** Sebelumnya web mengambil `sesiBerjalan?.[0]` dan mobile `milik.first`, jadi sesi kedua tak bisa dijeda atau diakhiri, lalu menggantung melewati ambang 12 jam yang **memaksa porsi host jadi nol** — dan peringatan jam ke-11 tak pernah sampai karena kartunya tak pernah dirender. Itulah yang menjadikan tampilan N sesi sebagai **prasyarat**, bukan penyempurnaan. Web tayang di prod 2026-08-30; mobile selesai di branch `feat/live-shift-sesi-jamak` (belum merged).
 
-#### Kepemilikan sesi (🟡 branch, belum merged)
+⛔ **`ShiftBerjalanSemua` memanggil `Find` TANPA `SetSort`**, jadi urutan sesi berjalan **tidak terdefinisi** — beda dari `DaftarShift` (riwayat) yang memakai `SetSort({mulai: -1})`. Selama satu orang cuma bisa punya satu sesi hal itu tak berakibat apa-apa; dengan siaran serentak, klien yang menampilkan **sebagian** daftar (kartu beranda MyBharata menampilkan elemen pertama) bisa berpindah akun antar-refresh, dan kartu di halaman penuh bisa bertukar tempat tepat saat host hendak menekan tombolnya. **Klien wajib mengurutkan sendiri** — konvensinya paling lama di depan, karena dialah yang paling dekat ambang 12 jam. Menambah sort di store juga sah, tapi ingat method ini dipakai autoclose juga (lihat catatan di bawah).
 
-Dikerjakan di `bip-erp` branch `feat/marketing-analytics-sesi-berjalan-pemilik` dan `erp-frontend` branch `feat/live-shift-sesi-berjalan-jamak`. **Belum merged, belum di-deploy.** Rincian per-endpoint: [[API - Marketing Analytics Service]].
+#### Kepemilikan sesi — ✅ tayang di prod 2026-08-30
+
+Merged lewat bip-erp [#1537](https://github.com/bip-itteam-internal/bip-erp/pull/1537) + erp-frontend [#1321](https://github.com/bip-itteam-internal/erp-frontend/pull/1321), **di-deploy 2026-08-30** (BE 20:27, FE 20:30) dan diverifikasi dengan kontrol positif maupun negatif di biner BE dan bundel FE. Rincian per-endpoint: [[API - Marketing Analytics Service]].
 
 Tiga hal yang berubah, ketiganya menutup lubang yang sudah ada sebelumnya:
 
@@ -209,9 +213,9 @@ Tiga hal yang berubah, ketiganya menutup lubang yang sudah ada sebelumnya:
 
 ⛔ **Penyaringan `/berjalan` ada di HANDLER, bukan di `ShiftBerjalanSemua`.** Method itu dipakai juga oleh autoclose, yang wajib melihat SELURUH sesi. Menyaring di store membuat sesi orang lain tak pernah tertutup otomatis, senyap total, dan justru autoclose itulah jaring pengaman yang menopang keputusan "leader tak boleh menghentikan".
 
-#### Memulai beberapa akun sekaligus (🟡 branch, belum merged)
+#### Memulai beberapa akun sekaligus — ✅ tayang di prod 2026-08-30 (web saja)
 
-`erp-frontend` branch `feat/live-shift-mulai-multi-akun`. Dialog Mulai memilih **beberapa akun sekaligus lewat combobox ber-search**, termasuk akun dari **toko yang berbeda**, lalu menerbitkan N sesi dalam satu tindakan.
+erp-frontend [#1325](https://github.com/bip-itteam-internal/erp-frontend/pull/1325). Dialog Mulai memilih **beberapa akun sekaligus lewat combobox ber-search**, termasuk akun dari **toko yang berbeda**, lalu menerbitkan N sesi dalam satu tindakan. **MyBharata belum punya ini** — di sana masih satu akun per dialog, dan `shop_id` bahkan masih diketik tangan.
 
 ⚠️ **Kontrak service TIDAK berubah.** Klien tetap memanggil `POST /live-shifts` sebanyak akun yang dipilih, satu per akun, sesuai [[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]] §5 yang menyebutnya kemudahan tampilan. Yang berubah cuma berapa kali rute yang sama dipanggil.
 

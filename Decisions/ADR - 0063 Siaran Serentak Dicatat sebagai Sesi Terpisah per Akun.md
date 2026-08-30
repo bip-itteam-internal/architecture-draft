@@ -9,7 +9,13 @@
 
 *Satu host yang menyiarkan serentak di beberapa akun dicatat sebagai BEBERAPA sesi paralel, satu per akun, bukan satu sesi yang memuat banyak akun. Bentuk penyimpanan tidak berubah karena sudah mengizinkannya; yang diputuskan di sini adalah tiga aturan turunannya: jam siaran seseorang dihitung sebagai jam dinding (union jendela waktu) bukan penjumlahan per sesi, tumpang tindih antar-akun berbeda milik orang yang sama diperlakukan SAH dan hanya ditandai, dan GMV-nya diatribusikan ke departemen host bukan departemen pemilik akun.*
 
-- **Status**: 🟡 **Diusulkan**, 2026-08-30, kode belum ada. Berdiri di atas pengukuran langsung database produksi pada 2026-08-30 (lihat Context) dan di atas [[Microservices - Marketing Analytics Service]] yang berstatus ⚠️ Implemented dengan catatan, bukan di atas dokumen konsep.
+- **Status**: ⚠️ **Diterima, sebagian terimplementasi** (2026-08-30). Berdiri di atas pengukuran langsung database produksi pada 2026-08-30 (lihat Context) dan di atas [[Microservices - Marketing Analytics Service]] yang berstatus ⚠️ Implemented dengan catatan, bukan di atas dokumen konsep.
+  - ✅ **§1** (satu sesi satu akun) — tak menuntut perubahan kode, penyimpanan sudah mengizinkannya.
+  - ✅ **§5** (klien menampilkan seluruh sesi) — **web tayang di prod** 2026-08-30 (bip-erp #1537 + erp-frontend #1321/#1325); **mobile selesai di branch** `feat/live-shift-sesi-jamak`, belum merged.
+  - ✅ **§6** (lingkup IT) — sudah berlaku, diterima sadar.
+  - 🟡 **§2** (jam dinding union) dan **§3** (tumpang tindih ditandai sah) — **belum dikerjakan**, dan keduanya yang menyentuh uang. Selama §2 belum ada, dua permukaan frontend masih menggandakan jam.
+  - 🟡 **§4** (GMV ke departemen host) — belum diverifikasi ulang setelah §1 berlaku.
+  - ⛔ **Belum ada satu pun host sungguhan yang memakainya.** `live_shifts` prod masih **0 dokumen**; papan kerjanya menjadikan angka itu uji hipotesis, bukan sekadar catatan.
 - **Path di repo**: `bip-erp/services/marketing-analytics/live_shift_penjualan.go` · `bip-erp/services/marketing-analytics/live_shift_pengingat.go` · `erp-frontend/src/features/marketing-analytics/components/live-shift/halaman-live-shift.tsx` · `.../panel-sesi-berjalan.tsx` · `.../dialog-mulai.tsx` · `erp-frontend/src/features/integration/icc/lib/ringkas-performa-host-live.ts` · `mybharata-app/lib/src/features/live_shift/presentation/bloc/live_shift_bloc.dart` · `.../bloc/live_shift_state.dart` · `.../widgets/kartu_sesi_berjalan.dart`. Tidak ada berkas baru, tidak ada service baru, tidak ada perubahan gateway.
 - **Tanggal**: 2026-08-30
 
@@ -107,6 +113,12 @@ Web dan mobile menampilkan N kartu sesi berjalan, masing-masing dengan tombol Je
 Ini bukan penyempurnaan tampilan melainkan **prasyarat fitur ini bisa dipakai sama sekali** oleh kru yang memegang banyak akun. Selama sesi kedua tidak bisa diakhiri, mencatatnya justru merugikan host lewat ambang 12 jam.
 
 Dialog Mulai boleh memilih beberapa akun sekaligus dan menerbitkan N sesi dalam satu tindakan. Itu kemudahan di tampilan, **bukan** perubahan kontrak.
+
+⛔ **Klien wajib mengurutkan sendiri.** `ShiftBerjalanSemua` memanggil `Find` **tanpa `SetSort`** (`live_shift_store.go`), jadi urutan yang dikirim tidak terdefinisi. Selama sesi hanya bisa satu, hal itu tidak berakibat apa-apa; begitu ada beberapa, permukaan mana pun yang menampilkan sebagian saja — kartu beranda mobile menampilkan **elemen pertama** — bisa berpindah akun antar-refresh, dan kartu di halaman penuh bisa bertukar tempat tepat saat host hendak menekan tombolnya. Urutan yang dipakai: **paling lama di depan**, karena dialah yang paling dekat ambang 12 jam, dengan `id` sebagai pemecah seri.
+
+⛔ **Sinyal penutup dialog Mulai tidak boleh "ada sesi berjalan".** Syarat itu benar sewaktu sesi hanya bisa satu, tetapi dengan siaran serentak ia sudah terpenuhi **sebelum** akun berikutnya tersimpan: dialog menutup seketika dan host tidak pernah tahu akun keduanya jadi atau tidak. Yang benar adalah munculnya sesi ber-**id baru**, digabung dengan syarat bahwa pengiriman memang sudah terjadi — dialog yang dibuka selagi permintaan daftar sesi masih berjalan punya himpunan id awal kosong, sehingga sesi lama mana pun akan terhitung "baru".
+
+⛔ **Konfirmasi mengakhiri sesi wajib menyebut akunnya.** Dengan beberapa kartu di layar, dialog konfirmasi menutupi kartu yang barusan ditekan; judul generik membuat host tidak punya cara memastikan ia mengakhiri sesi yang benar, sementara aksinya tidak bisa dibatalkan dan menutup atribusi GMV sesi itu.
 
 ### 6. Yang berhak melihat sesi orang lain mencakup IT, dan itu disengaja
 

@@ -48,7 +48,13 @@ satu pool.
 **Keluaran**: jawaban HRD tercatat, lalu ADR 0006 diperbarui atau di-Superseded.
 **Bukan** pekerjaan kode, dan ADR 0063 tidak bergantung padanya.
 
-## T1. Web menampilkan SELURUH sesi berjalan milik pemanggil
+## ✅ T1. Web menampilkan SELURUH sesi berjalan milik pemanggil — TAYANG DI PROD
+
+**Selesai 2026-08-30**: bip-erp [#1537](https://github.com/bip-itteam-internal/bip-erp/pull/1537)
++ erp-frontend [#1321](https://github.com/bip-itteam-internal/erp-frontend/pull/1321),
+keduanya merged dan di-deploy (BE 20:27, FE 20:30). Diverifikasi dengan kontrol positif
+dan negatif: biner BE memuat `boleh_kelola` dan pesan 403 baru, bundel FE memuat seluruh
+penandanya. Tiga lubang otorisasi pra-eksisting ikut ditutup di PR yang sama.
 
 Ganti pengambilan elemen pertama menjadi daftar; tiap sesi punya kartu, tombol Jeda dan
 Akhiri, penghitung durasi, dan peringatan ambang sendiri.
@@ -60,17 +66,44 @@ Akhiri, penghitung durasi, dan peringatan ambang sendiri.
 **Selesai bila**: dua sesi berjalan atas satu orang tampil sebagai dua kartu, dan Akhiri
 pada kartu kedua benar-benar menutup sesi kedua (bukan yang pertama).
 
-## T2. Mobile menampilkan seluruh sesi berjalan
+## ✅ T2. Mobile menampilkan seluruh sesi berjalan — SELESAI di branch, belum merged
 
-`sesiBerjalan` berubah dari objek tunggal menjadi daftar; `milik.first` dibuang; timer
-per sesi; kartu beranda merender N kartu.
+**Selesai 2026-08-30** di branch mybharata-app `feat/live-shift-sesi-jamak` (6 commit,
+PR ke `dev`). `sesiBerjalan` kini `List<LiveShift>?`, `milik.first` dibuang, halaman penuh
+merender satu kartu per sesi (timer dan peringatan ambang masing-masing), `versionCode`
+naik ke 152. Tidak ada perubahan backend.
 
-⚠️ Mesin anti-balapan `_versiSesiBerjalan` dibangun untuk melindungi **satu slot**. Ia
-menjawab "payload GET mana yang lebih baru", bukan "sesi mana milik siapa". Begitu slotnya
-jamak, mesin itu **dirancang ulang** (versi per koleksi atau per sesi), jangan ditambal.
+⚠️ **Koreksi atas dugaan di papan ini**: `_versiSesiBerjalan` ternyata **tidak perlu
+dirancang ulang**. Ia sejak awal menjaga satu **field**, bukan satu sesi — pertanyaannya
+"payload GET mana yang lebih baru" tetap berlaku utuh ketika field-nya jadi daftar. Yang
+berubah hanya apa yang dikerjakan keempat penulisnya: `MuatSesiBerjalan` menghitung ulang
+seluruh daftar, `MulaiSesi` menambahkan (upsert per id), `ToggleJeda` mengganti yang
+cocok, `AkhiriSesi` membuang yang cocok. Ketiga test balapan yang sudah ada tetap hijau
+tanpa diubah logikanya.
+
+Tiga hal yang tidak ada di rencana awal tapi wajib ikut:
+
+- ⛔ **Sinyal penutup dialog Mulai berubah.** "Ada sesi berjalan" benar sewaktu sesi cuma
+  bisa satu, tapi dengan siaran serentak syarat itu sudah true **sebelum** akun kedua
+  tersimpan — dialog menutup seketika dan host tak pernah tahu akun keduanya jadi atau
+  tidak. Kini menutup hanya bila muncul sesi ber-**id baru** DAN host memang sudah menekan
+  Mulai. Syarat kedua menutup lubangnya sendiri: dialog yang dibuka selagi
+  `MuatSesiBerjalan` masih terbang punya himpunan id awal kosong, sehingga sesi lama mana
+  pun akan terhitung "baru".
+- ⛔ **Urutan sesi diurutkan di klien.** `ShiftBerjalanSemua` memanggil `Find` **tanpa
+  `SetSort`** (`live_shift_store.go`), jadi urutannya tak terdefinisi. Kartu beranda
+  menampilkan elemen pertama, jadi tanpa urutan tetap ia bisa berpindah akun antar-refresh.
+  Diurutkan **paling lama di depan** (dialah yang paling dekat ambang 12 jam), `id` sebagai
+  pemecah seri. Berlaku untuk klien mana pun yang menampilkan sesi berjalan.
+- **`boleh_kelola` didekode tapi TIDAK menggerbang tombol.** Menu mobile digerbang
+  `isHostLive`, jadi nilainya selalu true di sana dan gerbang berbasis field itu akan jadi
+  logika mati yang tak pernah merah ketika ia salah. Default **true** saat field absen,
+  karena backend sebelum 2026-08-30 tak mengirimnya dan `false` akan mencabut tombol host
+  atas sesinya sendiri.
 
 **Selesai bila**: dua sesi tampil, keduanya bisa dijeda dan diakhiri terpisah, dan
-peringatan jam ke-11 muncul untuk masing-masing.
+peringatan jam ke-11 muncul untuk masing-masing. ⛔ **Belum diverifikasi di perangkat
+sungguhan** — itu bagian dari T9.
 
 ## T3. Jam siaran per orang dihitung sebagai union jendela waktu
 
@@ -216,10 +249,9 @@ itu sendiri larang: nol yang belum terbukti tak boleh terbaca sebagai fakta bisn
 Mobile tertinggal di **tiga** hal, bukan satu. Ketiganya sudah tercatat terpisah di atas
 atau di bawah; dikumpulkan di sini supaya tak ada yang lolos saat mobile digarap.
 
-1. **T2 — menampilkan seluruh sesi berjalan.** `sesiBerjalan` masih objek tunggal dan
-   bloc mengambil `milik.first`, jadi sesi kedua tak punya kartu, tak punya timer, dan
-   tak punya peringatan jam ke-11. ⚠️ Mesin anti-balapan `_versiSesiBerjalan` dibangun
-   untuk melindungi SATU slot; begitu slotnya jamak ia dirancang ulang, bukan ditambal.
+1. ✅ **T2 — menampilkan seluruh sesi berjalan. SELESAI** 2026-08-30 di branch
+   `feat/live-shift-sesi-jamak`, belum merged. Rinciannya di §T2 di atas, termasuk koreksi
+   bahwa `_versiSesiBerjalan` **tidak** perlu dirancang ulang.
 2. **T8 — pemilih toko.** `shop_id` masih diketik tangan padahal konstanta endpoint
    daftar toko sudah ada dan nol pemakai. Salah ketik menghasilkan 200 kosong lalu sesi
    tersimpan ke toko yang tak bisa dijodohkan, dan **GMV-nya hilang selamanya**.
@@ -229,8 +261,16 @@ atau di bawah; dikumpulkan di sini supaya tak ada yang lolos saat mobile digarap
    radio/single-select dan satu-satunya multi-select yang ada (`AssigneeSelectSheet`)
    tinggal di `features/task/`, bukan di `core/widgets/`.
 
-⚠️ Urutannya: **T2 lebih dulu**. Memberi mobile kemampuan memulai banyak akun sementara
-sesi keduanya tak bisa diakhiri justru memperbesar kerusakan yang T1 perbaiki di web.
+⚠️ Urutannya: **T2 lebih dulu** — sudah terpenuhi. Memberi mobile kemampuan memulai banyak
+akun sementara sesi keduanya tak bisa diakhiri justru memperbesar kerusakan yang T1
+perbaiki di web. T8 dan T14 kini tidak lagi terhalang.
+
+⚠️ **T14 punya prasyarat yang tak terlihat dari daftar ini**: nama akun **berulang antar
+toko** (`hexativ` teratas di tiga toko berbeda, `lailastore15` juga di tiga), jadi klien
+mana pun yang merakit daftar akun lintas toko wajib berkunci `shop_id` + akun. Digabung
+per nama saja membuat sesi tersimpan atas toko yang salah, dan gagalnya **senyap**:
+sesinya jadi, lalu selamanya berbunyi "belum ada data penjualan" karena penjodohan
+menuntut toko **dan** akun cocok. Web sudah menanganinya di T7.
 
 ---
 

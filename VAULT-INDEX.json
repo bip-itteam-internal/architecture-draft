@@ -1105,26 +1105,29 @@
         "API - Form Builder Service",
         "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Notification Service",
+        "Microservices - Marketing Analytics Service",
+        "API - Marketing Analytics Service",
+        "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
         "Microservices - Learning Service",
         "HRIS - Training Program",
         "HRIS - Attendance System",
         "HRIS - Payroll",
         "Microservices - Employee Service"
       ],
-      "hash": "014294f50b9b9465eada4820e347bdbd897f38785190360a930c4aaeeec0cd55",
-      "ukuran_kb": 40.3,
-      "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile karyawan MyBharata dan bagaimana tiap layar terhubung ke backend, mulai presensi, jadwal, pengajuan (izin/cuti/sakit/dinas/koreksi/tukar) berikut inbox peninjau dan penunjukan pengganti, slip gaji, KPI, Kaizen, notifikasi, hingga pelatihan dan tugas onboarding. Menyebut versi build yang beredar, endpoint yang dipakai tiap layar, dan batasan yang sudah diketahui. Untuk KPI ia menjelaskan bahwa penilaiannya bulanan (bukan kuartalan) dan satu layar melayani dua keadaan: skor final beku untuk periode yang sudah dinilai, dan progres otomatis untuk bulan berjalan.",
+      "hash": "184a1c53dd1e49a4a70a37958e0c794b8a0b516af3af45a6fdf50ed360a2fad5",
+      "ukuran_kb": 43.9,
+      "ringkasan": "Menjawab: apa saja yang bisa dikerjakan karyawan lewat aplikasi mobile HRIS MyBharata (attendance, cuti/izin, lembur, payroll, KPI, survei, Kaizen, sesi live host), bagaimana arsitektur Flutter-nya disusun (Clean Architecture feature-first, BLoC, get_it, dio, go_router), dan bagaimana login JWT, biometric, PIN, serta kebijakan satu akun satu device bekerja. Menjawab juga bagaimana aplikasi terhubung ke backend lewat API Master Gateway dengan prefix api/<module>, bagaimana konten dan menu dibedakan per perusahaan (multi-tenant CompanyScope), serta versi build mana yang ada di branch dev dan mana yang terpasang di HP pemakai.",
       "kata_kunci": [
         "MyBharata",
-        "mobile",
+        "aplikasi mobile",
+        "mobile app",
         "Flutter",
-        "aplikasi karyawan",
-        "presensi",
-        "pengajuan",
-        "submission",
-        "pengganti",
-        "slip gaji",
-        "KPI bulan berjalan"
+        "HRIS mobile",
+        "absensi karyawan",
+        "attendance",
+        "multi-tenant",
+        "JWT",
+        "geofencing"
       ]
     },
     {
@@ -2356,23 +2359,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "9b1d0042ecc15ebb134ac0bcff89e97eb2a7ae3760d88c4608cbde46042bc90f",
-      "ukuran_kb": 76.1,
-      "ringkasan": "Menjawab: bagaimana laba dan performa marketing diagregasi per toko, produk, kampanye, iklan, video, dan sesi live, endpoint apa saja yang tersedia, dan bagaimana penjadwal internal 48 jam mengisi koleksi mart_*. Menjelaskan juga kenapa integration_db dibuka baca-saja berlapis tiga, bagaimana vonis laba di halaman beranda ditentukan (termasuk keadaan belum_matang dan ambang materialitas), serta aturan pemakaian angka yang melarang hitung ganda (iklan_sia_sia, pembatalan, 24h_live_gmv, tiga angka penjualan live). Memuat konvensi hari WIB, price floor, pagu belanja dan kurva alokasi, KPI host live, pencatatan sesi live oleh host, dan catatan kejujuran data seperti revenue TikTok sudah setelah diskon sementara Shopee masih harga list.",
+      "hash": "80e2e7c86fd453603c89b4fd666471ceddf0ef38c3a1165dabb13567f2c03486",
+      "ukuran_kb": 77.5,
+      "ringkasan": "Menjawab: bagaimana laba dan performa marketing per toko, produk, kampanye, iklan, video, dan sesi live dihitung serta disajikan, endpoint mana yang tersedia (beranda, ambang keputusan, pagu belanja dan kurva alokasi, profit attribution, KPI host live, live-shifts, price floor, job sync), dan bagaimana penjadwal internal 48 jam mengisi koleksi mart_* di marketing_analytics_db. Menjelaskan aturan main yang tidak boleh dilanggar saat memakai angkanya: integration_db baca-saja dengan tiga lapis penjaga, kolom yang haram dijumlahkan karena menghitung rupiah yang sama dua kali (iklan_sia_sia, pembatalan, tiga angka penjualan live), serta penurunan vonis laba lima keadaan termasuk belum_matang berikut ambang materialitasnya. Berguna untuk memahami beda channel TikTok, Shopee, dan Lazada, alokasi bundel dan mapping SKU, dan konvensi hari WIB versus UTC.",
       "kata_kunci": [
         "marketing analytics",
-        "mart_profit_attribution",
+        "dashboard marketing",
         "laba kotor",
         "gross profit",
-        "GMV",
         "ROAS",
-        "iklan_sia_sia",
-        "host live",
-        "live shift",
-        "price floor",
-        "pagu belanja",
-        "TikTok Shopee Lazada",
-        "hitung ganda"
+        "GMV",
+        "live session",
+        "TikTok",
+        "Shopee",
+        "price floor"
       ]
     },
     {
@@ -4851,8 +4851,8 @@
       "judul": "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-08-30, kode belum ada. Berdiri di atas pengukuran langsung database produksi pada 2026-08-30 (lihat Context) dan di atas [[Microservices - Marketing Analytics Service]] yang berstatus ⚠️ Implemented dengan catatan, bukan di atas dokumen konsep.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Diterima, sebagian terimplementasi** (2026-08-30). Berdiri di atas pengukuran langsung database produksi pada 2026-08-30 (lihat Context) dan di atas [[Microservices - Marketing Analytics Service]] yang berstatus ⚠️ Implemented dengan catatan, bukan di atas dokumen konsep.",
       "publik": true,
       "tautan": [
         "Microservices - Marketing Analytics Service",
@@ -4866,20 +4866,20 @@
         "APP - Web ERP",
         "APP - MyBharata"
       ],
-      "hash": "2c81063e8755357364954d84414e51fdcbf31600df9147b9d740a1f86a525b52",
-      "ukuran_kb": 17.8,
-      "ringkasan": "Menjawab: bagaimana host live yang menyiarkan serentak di beberapa akun dicatat (satu sesi per akun, paralel, tanpa perubahan bentuk penyimpanan), mengapa jam siaran seseorang dihitung sebagai jam dinding lewat union jendela waktu alih-alih menjumlahkan durasi tiap sesi, dan mengapa tumpang tindih antar-akun berbeda milik orang yang sama diperlakukan sah lalu hanya ditandai, bukan dinolkan porsi GMV-nya. Menjawab pula ke departemen mana GMV siaran diatribusikan (departemen host, bukan pemilik akun), siapa yang berhak melihat sesi berjalan orang lain, dan apa yang sengaja tidak diputuskan di sini seperti insentif, laba per siaran, serta penilaian kedisiplinan otomatis. Berisi pengukuran produksi 2026-08-30 yang mendasarinya beserta tiga celah hilir yang ditemukan: sesi kedua tanpa tampilan, jam tergandakan, dan tiadanya rambu tumpang tindih.",
+      "hash": "65a58a53d807b185a741472a557cb9483da0db28577db68e48606fc16e6ee53d",
+      "ukuran_kb": 20.1,
+      "ringkasan": "Menjawab: bagaimana host live yang menyiarkan serentak di beberapa akun dicatat sistem, yaitu sebagai beberapa sesi paralel satu akun per sesi, bukan satu sesi berisi banyak akun. Menjelaskan tiga aturan turunannya beserta alasannya: jam siaran seseorang dihitung sebagai jam dinding (union jendela waktu) bukan penjumlahan durasi per sesi, tumpang tindih antar-akun berbeda milik orang yang sama diperlakukan sah dan hanya ditandai bukan menolkan porsi GMV, dan GMV diatribusikan ke departemen host bukan departemen pemilik akun. Memuat pengukuran produksi yang mendasarinya (pasangan sesi tumpang tindih, puncak akun serentak, porsi GMV akun brand), siapa yang berhak melihat sesi orang lain, dan apa yang sengaja tidak diputuskan di sini.",
       "kata_kunci": [
         "siaran serentak",
-        "host live",
         "live shift",
+        "host live",
+        "sesi paralel",
         "multi akun",
-        "akun_live",
-        "jam dinding",
-        "union jendela waktu",
-        "GMV",
-        "durasi_efektif_detik",
-        "ADR 0063"
+        "jam siaran",
+        "porsi GMV",
+        "tumpang tindih sesi",
+        "ADR 0063",
+        "KPI host live"
       ]
     },
     {
@@ -10540,21 +10540,20 @@
         "ADR - 0006 Swap Jadwal Same-Department",
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem"
       ],
-      "hash": "132e46602b95d3b524fa654e01527dfce38b580bf7274d2cbaaea3c563e90c97",
-      "ukuran_kb": 12.3,
-      "ringkasan": "Menjawab: apa saja yang harus dikerjakan supaya host live bisa menyiarkan serentak di beberapa akun dan toko sekaligus, dalam bentuk daftar task T0 sampai T13 beserta urutan dan dependensinya. Menjelaskan kenapa jam siaran seseorang wajib dihitung sebagai union jendela waktu alih-alih menjumlahkan durasi_efektif_detik lintas sesi, kenapa tumpang tindih pada akun berbeda milik orang yang sama harus ditandai sah dan porsinya tidak boleh dinolkan, serta di mana frontend saat ini menggandakan jam. Memuat angka pendukung dari produksi (sesi tumpang tindih beda akun, jam irisan, live_shifts masih 0 dokumen) dan menunjuk keputusannya ke ADR 0063 serta cara kerjanya ke dokumen Marketing Analytics Service.",
+      "hash": "47d550e9ba1032f04725111b9391fc44a74c72636fea4c33570ac0105ccc1f5d",
+      "ukuran_kb": 15.2,
+      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dikerjakan supaya siaran serentak host live bisa dipakai, dalam urutan dan dependensi apa, dan apa gerbang selesai tiap itemnya. Merinci task per permukaan: web dan mobile menampilkan seluruh sesi berjalan, backend menghitung jam sebagai union jendela waktu, penanda tumpang tindih lintas akun yang sah, frontend berhenti menggandakan jam, dedup pengingat, dialog Mulai memilih beberapa akun, pemilih toko di mobile, verifikasi lapangan dengan host sungguhan, dan penyalaan scope individu oleh HR. Berguna untuk mengetahui jebakan yang sudah ditemukan (sinyal penutup dialog Mulai, urutan sesi tanpa SetSort, boleh_kelola yang tidak menggerbang tombol) serta apa yang sengaja ditaruh di luar lingkup.",
       "kata_kunci": [
-        "siaran serentak",
-        "host live",
+        "analisa siaran serentak",
+        "papan kerja",
+        "daftar task",
         "live shift",
-        "multi akun",
-        "sesi paralel",
-        "jam siaran",
+        "host live",
+        "sesi berjalan",
+        "jam dinding",
         "union jendela waktu",
-        "tumpang tindih",
-        "GMV live",
-        "ADR 0063",
-        "MyBharata"
+        "pengingat 12 jam",
+        "scope individu"
       ]
     },
     {
