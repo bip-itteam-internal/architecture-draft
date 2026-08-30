@@ -158,7 +158,7 @@ satu**. Begitu ada penulis kedua, bentuk itu wajib diganti.
 **Deploy**: bila menyentuh kategori inbox, naikkan pengirim **dan** `Notification-Service`
 bersama, lalu picu satu notifikasi sungguhan sebagai bukti.
 
-## ✅ T7. Dialog Mulai memilih beberapa akun sekaligus — SELESAI di branch, belum merged
+## ✅ T7. Dialog Mulai memilih beberapa akun sekaligus — TAYANG DI PROD (web)
 
 Dikerjakan 2026-08-30 di `erp-frontend` branch `feat/live-shift-mulai-multi-akun`
 (4 commit). Toko dan akun sama-sama combobox ber-search multi-pilih; satu tekan
@@ -166,8 +166,10 @@ menerbitkan N sesi. Rencana: `.task-plans/2026-08-30-live-shift-mulai-multi-akun
 Cara kerjanya di [[Microservices - Marketing Analytics Service]] §Memulai beberapa akun
 sekaligus.
 
-⚠️ **Belum bisa dilihat siapa pun sampai T1 tayang**: backend T1 sudah merged tapi belum
-di-deploy, dan tanpa itu penyaringan kepemilikan serta `boleh_kelola` belum berlaku.
+✅ **Sudah tayang di prod 2026-08-30** (erp-frontend
+[#1325](https://github.com/bip-itteam-internal/erp-frontend/pull/1325)), bersama T1.
+Catatan lama "belum bisa dilihat siapa pun sampai T1 tayang" sudah tak berlaku: backend T1
+ikut di-deploy hari itu juga.
 
 Satu jebakan yang ditemukan saat mengerjakannya dan belum tercatat di mana pun sebelumnya:
 **nama akun berulang antar toko** (`hexativ` akun teratas di tiga toko), jadi opsi akun

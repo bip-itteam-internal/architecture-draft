@@ -224,12 +224,22 @@ Yang mudah terlewat saat menyentuh layar ini:
   sudah host-saja sehingga nilainya selalu `true` dan gerbang berbasis field itu akan jadi
   logika mati. Default **`true`** saat field-nya absen: backend sebelum 2026-08-30 tidak
   mengirimnya, dan `false` akan mencabut tombol host atas sesinya sendiri.
-- **Konfirmasi memakai `CustomBottomSheet`, bukan `AlertDialog`** (konvensi repo: 48 berkas
-  vs 7), dan **menyebut nama akun** yang sedang diakhiri.
-- ⚠️ `CustomBottomSheet.show` menerima `child` yang **sudah dirakit di lokasi panggil**,
-  jadi context di situ masih milik halaman. `Navigator.pop` dengan context itu menutup
-  **halamannya**, bukan sheet-nya — bungkus tombolnya dengan `Builder`. Ini beda dari
-  `showDialog`, yang memberi context route lewat builder-nya sendiri.
+- **Pembagiannya: `CustomDialog` untuk keputusan ya/tidak, `CustomBottomSheet` untuk
+  formulir.** Konfirmasi Akhiri Sesi dan konfirmasi toko-tanpa-akun memakai `CustomDialog`
+  (yang sudah membawa ikon tipe, tata letak tombol, jaraknya, dan menutup dirinya sendiri
+  sebelum memanggil callback); dialog Mulai memakai `CustomBottomSheet`. Keduanya
+  menggantikan `AlertDialog`/`showModalBottomSheet` mentah yang dipakai sebelumnya.
+  Konfirmasi Akhiri **menyebut nama akun** yang sedang diakhiri.
+- **Jarak memakai `AppDimens`**, bukan angka mentah — nilainya responsif
+  (`flutter_screenutil`), jadi apa pun yang memakainya menuntut `ScreenUtilInit`. Di widget
+  test itu berarti harus dibungkus `ScreenUtilInit` **dan** diberi permukaan seukuran HP;
+  permukaan bawaan `flutter_test` 800×600 jauh lebih lebar daripada HP mana pun, sehingga
+  dialog meluber sampai tombolnya jatuh di luar layar dan tap-nya tak pernah kena.
+- ⛔ **`CustomButton` sebelumnya tak membungkus label-nya dengan `Flexible`**, jadi dua
+  tombol berdampingan di dalam `Expanded` **meluber** begitu tulisannya sedikit lebih
+  panjang atau skala teks naik — terlihat di kartu sesi live (Jeda + Akhiri Sesi) pada
+  lebar HP yang lazim. Tak pernah tertangkap test karena permukaan test bawaan 800 px.
+  Diperbaiki di komponennya; ini menyentuh **seluruh** pemakai `CustomButton`.
 
 ⛔ **Belum terverifikasi di perangkat sungguhan**, dan `live_shifts` produksi masih **0
 dokumen** sejak fiturnya ada.

@@ -1114,20 +1114,20 @@
         "HRIS - Payroll",
         "Microservices - Employee Service"
       ],
-      "hash": "184a1c53dd1e49a4a70a37958e0c794b8a0b516af3af45a6fdf50ed360a2fad5",
-      "ukuran_kb": 43.9,
-      "ringkasan": "Menjawab: apa saja yang bisa dilakukan karyawan lewat aplikasi mobile HRIS MyBharata (absensi dengan biometric/geofencing/QR, pengajuan cuti & izin, lembur, slip gaji, KPI, survei, Kaizen, pelatihan, sesi live host), versi mana yang benar-benar terpasang di HP pemakai versus yang masih tertahan di branch dev, dan bagaimana aplikasi menangani multi-perusahaan (tenant) lewat CompanyScope. Menjelaskan juga arsitektur Clean Architecture feature-first dengan Flutter/BLoC/get_it/dio, alur autentikasi JWT + PIN + biometric dengan kebijakan 1 akun 1 device, serta bahwa aplikasi berkomunikasi lewat API Master Gateway dengan prefix api/<module>. Berguna untuk menjawab mengapa suatu menu tidak muncul bagi karyawan non-BIP dan konten mana yang sengaja masih dikunci untuk BIP saja.",
+      "hash": "6673b326aea42dc6002ed4ea979d2272459072954833f1d43a8e075b10a8dd7c",
+      "ukuran_kb": 44.8,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitekturnya (Flutter, Clean Architecture feature-first, BLoC, get_it, dio), serta bagaimana karyawan memakainya untuk attendance, cuti/izin, lembur, payroll, KPI, survei, dan Kaizen. Menjelaskan juga cara autentikasi (JWT + biometric + PIN, 1 akun = 1 device), bahwa aplikasi mengakses backend lewat API Master Gateway dengan prefix api/<module>, dan bagaimana konten serta menu di-scope per perusahaan (multi-tenant CompanyScope). Berguna untuk mengetahui versi build/rilis mana yang dipakai di lapangan, struktur menu beranda, fitur developer/admin, known issues, dan roadmap.",
       "kata_kunci": [
         "MyBharata",
+        "my_bharata",
         "aplikasi mobile",
         "mobile app",
         "Flutter",
-        "HRIS",
-        "absensi",
+        "HRIS mobile",
         "attendance",
+        "presensi",
         "multi-tenant",
-        "company_id",
-        "BLoC"
+        "geofencing"
       ]
     },
     {
@@ -10525,20 +10525,20 @@
         "ADR - 0006 Swap Jadwal Same-Department",
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem"
       ],
-      "hash": "47d550e9ba1032f04725111b9391fc44a74c72636fea4c33570ac0105ccc1f5d",
+      "hash": "b03532134d513073e852bf3896a7ec79bbfe75432e83fca445e4b24d0b7f47c6",
       "ukuran_kb": 15.2,
-      "ringkasan": "Menjawab: apa saja daftar task turunan dari kebutuhan siaran serentak host live (T0 sampai T13), urutan dan dependensinya, serta kriteria selesai tiap item — mulai dari menampilkan seluruh sesi berjalan di web dan mobile, jam dinding di backend, penanda tumpang tindih yang sah, sampai verifikasi lapangan dan penyalaan scope KPI individu. Memuat angka produksi yang mendasari keputusan (148 pasangan sesi tumpang tindih lintas toko, 935 jam irisan, puncak 4 akun serentak, live_shifts masih 0 dokumen) dan catatan koreksi atas dugaan awal saat implementasi, termasuk sinyal penutup dialog Mulai dan urutan sesi yang tak terdefinisi karena Find tanpa SetSort. Berguna untuk menjawab item mana yang sudah tayang di prod, mana yang selesai di branch tapi belum merged, dan mana yang belum disentuh.",
+      "ringkasan": "Menjawab: apa saja pekerjaan (T0-T13) yang harus dilakukan agar host live bisa siaran serentak dari beberapa akun sekaligus, bagaimana urutan dan dependensi antar-task, serta apa kriteria \"selesai\" tiap task. Menjelaskan juga kenapa jam siaran per orang wajib dihitung sebagai union jendela waktu (bukan penjumlahan durasi_efektif_detik yang menggandakan jam), dan kenapa tumpang tindih antar-akun milik orang yang sama harus ditandai sah alih-alih menolkan porsi GMV seperti tumpang tindih pada akun yang sama. Memuat angka pengukuran prod yang mendasari keputusan (148 pasangan sesi tumpang tindih, 935 jam irisan, puncak 4 akun serentak) dan menunjuk ke ADR 0063 serta dok Marketing Analytics Service sebagai rujukan tetap.",
       "kata_kunci": [
         "siaran serentak",
         "host live",
         "live shift",
-        "papan kerja",
-        "analisa kebutuhan",
-        "daftar task",
-        "jam dinding",
-        "tumpang tindih",
-        "live_shifts",
-        "scope individu"
+        "sesi paralel",
+        "akun live",
+        "GMV",
+        "jam siaran",
+        "durasi efektif",
+        "ADR 0063",
+        "marketing analytics"
       ]
     },
     {
