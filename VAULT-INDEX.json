@@ -2668,9 +2668,9 @@
         "ADR - 0003 SSO-only Gateway",
         "IT - Server, VMs and Databases"
       ],
-      "hash": "33e5dc430e9a2423b8353856fe9386db19d4f20c4cdf848a49178894cd0fac3a",
-      "ukuran_kb": 22.3,
-      "ringkasan": "Menjawab: bagaimana management membaca dan menulis vault arsitektur lewat Claude tanpa menyentuh Obsidian, git, maupun editor, dan kenapa servicenya menerbitkan token OAuth sendiri alih-alih meneruskan ERP JWT (spec MCP mewajibkan audience binding RFC 8707, dan ERP JWT tak punya refresh token). Menjelaskan kenapa ia sengaja tidak lewat API Master Gateway, kenapa daftar-izin memakai employee_id eksplisit bukan system_roles, dan kenapa service ini tidak pernah menulis ke VAULT-INDEX.json sehingga search_notes wajib menggabungkan index dengan pemindaian isi langsung. Memuat alur OAuth lengkap yang menumpang SSO ERP, daftar endpoint publik, tiga pengamanan hasil review #1489, enam tool MCP beserta scope masing-masing, dan alur tulis berbasis git tanpa reset --hard. Keputusan 3 (author commit adalah managernya) DISIMPANGI ADR 0064: nama author tetap per-manager tapi alamat emailnya tunggal, sehingga git blame berhenti membedakan manager dan pengaman yang tersisa tinggal git revert. Memuat pula empat temuan irisan 2 yang tak terlihat dari desain: pull --rebase menolak berjalan saat worktree kotor sehingga satu berkas nyasar bisa memadamkan seluruh jalur baca lewat ambang kebasian, pesan konflik yang semula menyatu dengan origin tak terjangkau, clone --depth 1 yang harus di-unshallow dan yang diabaikan git untuk path lokal, serta Keputusan 4 yang sebelumnya hanya hidup sebagai kalimat sehingga VAULT-INDEX.json bisa ditimpa lewat MCP.",
+      "hash": "48f7a9fa6b3269297590b2b556c5992cc0e2883f99e4bb6bcea6d413f4edcf97",
+      "ukuran_kb": 24.4,
+      "ringkasan": "Menjawab: bagaimana management membaca dan menulis vault arsitektur lewat Claude tanpa menyentuh Obsidian, git, maupun editor, dan kenapa servicenya menerbitkan token OAuth sendiri alih-alih meneruskan ERP JWT (spec MCP mewajibkan audience binding RFC 8707, dan ERP JWT tak punya refresh token). Menjelaskan kenapa ia sengaja tidak lewat API Master Gateway, kenapa daftar-izin memakai employee_id eksplisit bukan system_roles, dan kenapa service ini tidak pernah menulis ke VAULT-INDEX.json sehingga search_notes wajib menggabungkan index dengan pemindaian isi langsung. Memuat alur OAuth lengkap yang menumpang SSO ERP, daftar endpoint publik, tiga pengamanan hasil review #1489, enam tool MCP beserta scope masing-masing, dan alur tulis berbasis git tanpa reset --hard. Keputusan 3 (author commit adalah managernya) DISIMPANGI ADR 0064: nama author tetap per-manager tapi alamat emailnya tunggal, sehingga git blame berhenti membedakan manager dan pengaman yang tersisa tinggal git revert. Menjawab pula apa saja yang TIDAK boleh ditulis lewat MCP dan kenapa: .git/, .obsidian/, .agent-kit/ (30 berkas instruksi yang dimuat ke setiap sesi agent setiap dev), CLAUDE.md akar, VAULT-INDEX apa pun, berkas non-markdown, dan isi yang mengandung byte NUL; membacanya semua tetap boleh. Memuat lima temuan irisan 2 yang tak terlihat dari desain, empat di antaranya sekelas: keadaan yang dibawa volume vault-mcp-clone lintas deploy, yaitu kedangkalan clone, URL remote lama yang tak ikut berubah saat env diubah, dan berkas nyasar yang membuat pull --rebase menolak berjalan sehingga seluruh jalur baca padam lewat ambang kebasian.",
       "kata_kunci": [
         "MCP",
         "vault-mcp",
@@ -2689,7 +2689,9 @@
         "daftar-izin",
         "write_note",
         "patch_note",
-        "vault:write"
+        "vault:write",
+        "agent-kit",
+        "byte NUL"
       ]
     },
     {
