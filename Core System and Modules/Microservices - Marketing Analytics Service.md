@@ -209,6 +209,20 @@ Tiga hal yang berubah, ketiganya menutup lubang yang sudah ada sebelumnya:
 
 ⛔ **Penyaringan `/berjalan` ada di HANDLER, bukan di `ShiftBerjalanSemua`.** Method itu dipakai juga oleh autoclose, yang wajib melihat SELURUH sesi. Menyaring di store membuat sesi orang lain tak pernah tertutup otomatis, senyap total, dan justru autoclose itulah jaring pengaman yang menopang keputusan "leader tak boleh menghentikan".
 
+#### Memulai beberapa akun sekaligus (🟡 branch, belum merged)
+
+`erp-frontend` branch `feat/live-shift-mulai-multi-akun`. Dialog Mulai memilih **beberapa akun sekaligus lewat combobox ber-search**, termasuk akun dari **toko yang berbeda**, lalu menerbitkan N sesi dalam satu tindakan.
+
+⚠️ **Kontrak service TIDAK berubah.** Klien tetap memanggil `POST /live-shifts` sebanyak akun yang dipilih, satu per akun, sesuai [[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]] §5 yang menyebutnya kemudahan tampilan. Yang berubah cuma berapa kali rute yang sama dipanggil.
+
+Tiga aturan klien yang lahir dari bentuk data service ini, dan yang akan menggigit siapa pun yang membangun klien lain (termasuk MyBharata nanti):
+
+- ⛔ **Opsi akun WAJIB berkunci `shop_id` + akun, bukan nama akun saja.** `GET /live-shifts/akun` melayani satu toko per permintaan, jadi daftar lintas toko dirakit di klien, dan **nama akun berulang antar toko**: `hexativ` adalah akun teratas di TIGA toko berbeda, `lailastore15` juga di tiga. Menggabungkan per nama membuat sesi tersimpan atas toko yang salah, dan gagalnya senyap karena penjodohan penjualan menuntut toko **dan** akun cocok — sesinya jadi, lalu selamanya berbunyi "belum ada data penjualan".
+- ⛔ **Toko yang gagal dimuat wajib disebut namanya.** Satu permintaan gagal berarti akun toko itu hilang dari daftar gabungan, dan itu terbaca persis seperti "akunnya memang tidak ada": pemakai memilih lebih sedikit daripada yang ia maksud tanpa pernah tahu.
+- **Kegagalan sebagian tidak membatalkan yang lain.** Satu akun yang dibalas 409 (masih punya sesi berjalan) tidak boleh menggagalkan akun lain yang sudah benar. Pasangan toko+akun juga di-dedup sebelum dikirim, kalau tidak permintaan kedua yang identik dibalas 409 untuk sesi yang baru saja dibuat permintaan pertama.
+
+⚠️ **Layar Sesi Live Host belum terdokumentasi di [[APP - Web ERP]]** (gap dokumentasi, bukan gap fitur). Seluruh keterangan layarnya sementara ini tinggal di sini.
+
 ### Retur & analitik lain
 
 | Endpoint | Isi |

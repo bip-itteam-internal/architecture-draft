@@ -125,7 +125,20 @@ satu**. Begitu ada penulis kedua, bentuk itu wajib diganti.
 **Deploy**: bila menyentuh kategori inbox, naikkan pengirim **dan** `Notification-Service`
 bersama, lalu picu satu notifikasi sungguhan sebagai bukti.
 
-## T7. Dialog Mulai memilih beberapa akun sekaligus
+## ✅ T7. Dialog Mulai memilih beberapa akun sekaligus — SELESAI di branch, belum merged
+
+Dikerjakan 2026-08-30 di `erp-frontend` branch `feat/live-shift-mulai-multi-akun`
+(4 commit). Toko dan akun sama-sama combobox ber-search multi-pilih; satu tekan
+menerbitkan N sesi. Rencana: `.task-plans/2026-08-30-live-shift-mulai-multi-akun.md`.
+Cara kerjanya di [[Microservices - Marketing Analytics Service]] §Memulai beberapa akun
+sekaligus.
+
+⚠️ **Belum bisa dilihat siapa pun sampai T1 tayang**: backend T1 sudah merged tapi belum
+di-deploy, dan tanpa itu penyaringan kepemilikan serta `boleh_kelola` belum berlaku.
+
+Satu jebakan yang ditemukan saat mengerjakannya dan belum tercatat di mana pun sebelumnya:
+**nama akun berulang antar toko** (`hexativ` akun teratas di tiga toko), jadi opsi akun
+wajib berkunci `shop_id` + akun. Ini berlaku untuk klien mana pun, termasuk T14 nanti.
 
 Satu tindakan menerbitkan N sesi. Kemudahan tampilan, **bukan** perubahan kontrak.
 
@@ -195,6 +208,29 @@ daftar.
 Mulai**. Host yang sesinya sedang berjalan diberi tahu tidak ada, lalu ditawari memulai
 sesi baru yang berakhir 409. Persis kelas galat yang komentar cabang memuat di komponen
 itu sendiri larang: nol yang belum terbukti tak boleh terbaca sebagai fakta bisnis.
+
+---
+
+## Utang MyBharata (diminta user 2026-08-30: "nanti di mobile juga diperbaiki")
+
+Mobile tertinggal di **tiga** hal, bukan satu. Ketiganya sudah tercatat terpisah di atas
+atau di bawah; dikumpulkan di sini supaya tak ada yang lolos saat mobile digarap.
+
+1. **T2 — menampilkan seluruh sesi berjalan.** `sesiBerjalan` masih objek tunggal dan
+   bloc mengambil `milik.first`, jadi sesi kedua tak punya kartu, tak punya timer, dan
+   tak punya peringatan jam ke-11. ⚠️ Mesin anti-balapan `_versiSesiBerjalan` dibangun
+   untuk melindungi SATU slot; begitu slotnya jamak ia dirancang ulang, bukan ditambal.
+2. **T8 — pemilih toko.** `shop_id` masih diketik tangan padahal konstanta endpoint
+   daftar toko sudah ada dan nol pemakai. Salah ketik menghasilkan 200 kosong lalu sesi
+   tersimpan ke toko yang tak bisa dijodohkan, dan **GMV-nya hilang selamanya**.
+3. **T14 (baru) — padanan T7: memilih beberapa akun sekaligus.** Web mendapatkannya di
+   T7; mobile masih satu akun per dialog. Perlu memutuskan lebih dulu apakah pola
+   combobox ber-search web bisa ditiru, karena `CustomSelectBottomSheet` di mobile
+   radio/single-select dan satu-satunya multi-select yang ada (`AssigneeSelectSheet`)
+   tinggal di `features/task/`, bukan di `core/widgets/`.
+
+⚠️ Urutannya: **T2 lebih dulu**. Memberi mobile kemampuan memulai banyak akun sementara
+sesi keduanya tak bisa diakhiri justru memperbesar kerusakan yang T1 perbaiki di web.
 
 ---
 
