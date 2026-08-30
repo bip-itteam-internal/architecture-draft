@@ -2657,7 +2657,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Irisan 1 (baca saja) HIDUP di prod. Irisan 2 (tulis) kodenya SELESAI dan terkunci test, tetapi BELUM di-deploy dan deploy key-nya belum ada. Irisan 3 belum ada kode.** PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) dan [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489) merged 2026-08-27. Diukur di prod 2026-08-30: container `Vault-MCP` sehat, `POST /mcp` membalas 401 ber-`WWW-Authenticate` yang benar (`scope=\"vault:read\"`), kedua `.well-known` 200, `/oauth/authorize` menolak client tak dikenal dengan 400, sembilan `employee_id` terdaftar di `VAULT_MCP_ALLOWED_EMPLOYEES`, dan **tiga sesi sudah terbentuk di `mcp_sessions`** sehingga alur OAuth penuh terbukti pernah dilalui orang sungguhan.",
+      "status_teks": "**Irisan 1 (baca saja) HIDUP di prod. Irisan 2 (tulis) MERGED ke `main` 2026-08-30 (PR [#1543](https://github.com/bip-itteam-internal/bip-erp/pull/1543), 155 test) tetapi BELUM di-deploy, dan deploy key berhak tulis belum ada. Irisan 3 belum ada kode.** ⛔ **Merged bukan berarti jalan**: `docker build` belum pernah dicoba, sembilan verifikasi hidup semuanya menunggu deploy key, dan sembilan pemakai di daftar-izin belum diberi tahu bahwa connector mereka harus disambung ulang. PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) dan [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489) merged 2026-08-27. Diukur di prod 2026-08-30: container `Vault-MCP` sehat, `POST /mcp` membalas 401 ber-`WWW-Authenticate` yang benar (`scope=\"vault:read\"`), kedua `.well-known` 200, `/oauth/authorize` menolak client tak dikenal dengan 400, sembilan `employee_id` terdaftar di `VAULT_MCP_ALLOWED_EMPLOYEES`, dan **tiga sesi sudah terbentuk di `mcp_sessions`** sehingga alur OAuth penuh terbukti pernah dilalui orang sungguhan.",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
@@ -2668,8 +2668,8 @@
         "ADR - 0003 SSO-only Gateway",
         "IT - Server, VMs and Databases"
       ],
-      "hash": "48f7a9fa6b3269297590b2b556c5992cc0e2883f99e4bb6bcea6d413f4edcf97",
-      "ukuran_kb": 24.4,
+      "hash": "626d15dbfab643a7b76e32dc96ca006a10ecdadb9839e738070258ffad5b3a7d",
+      "ukuran_kb": 24.7,
       "ringkasan": "Menjawab: bagaimana manajemen bisa membaca dan menulis dokumentasi arsitektur vault langsung dari Claude Desktop atau claude.ai tanpa Obsidian maupun git, dan mengapa service ini menerbitkan token OAuth sendiri alih-alih meneruskan ERP JWT (audience binding, confused deputy, TTL 72 jam tanpa refresh token). Menjelaskan lima keputusan yang mengikat: token sendiri, tidak lewat API Gateway melainkan langsung via Nginx Proxy Manager di mcp.bharatainternasional.com, author commit per-manager, larangan menulis VAULT-INDEX.json, dan daftar-izin employee_id eksplisit yang diperiksa ulang tiap panggilan. Berguna untuk menjawab irisan mana yang sudah hidup di prod (baca) versus yang selesai tapi belum di-deploy (tulis), dan celah keamanan apa yang ditemukan review setelah PR terlanjur di-merge.",
       "kata_kunci": [
         "Vault MCP",
