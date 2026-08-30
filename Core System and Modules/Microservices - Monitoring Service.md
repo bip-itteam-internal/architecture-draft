@@ -64,6 +64,27 @@ Dipisah menurut apakah periodenya sudah tutup:
 
 Query ini memindai heartbeat sebulan penuh (produksi 1,24 juta baris, bertambah sekitar 57 ribu per hari), jadi menghitung ulang periode lampau tiap 20 detik hanya membakar CPU untuk jawaban yang sama persis. Jumlah entri dibatasi 36 (tiga tahun penilaian): tanpa batas, `YYYY-MM` yang sah membentang sampai tahun 9999 dan satu perulangan permintaan bisa membuat container kehabisan memori.
 
+#### Single-flight dan penyajian entri basi (2026-08-30)
+
+⛔ **Cache yang cuma "cek lalu hitung" TIDAK cukup, dan kegagalannya muncul sebagai skor KPI yang salah, bukan sebagai halaman lambat.** Sampai 30 Agustus 2026, tiap pemanggil yang menemukan entri kedaluwarsa menjalankan querynya sendiri. Karena TTL periode berjalan cuma 20 detik sementara querynya makan sekitar 3,5 detik saat cache dingin, permintaan yang datang bersamaan saling memperlambat sampai menembus batas waktu.
+
+Terukur di produksi hari itu: **40 dari 104 permintaan `GET /kpi/uptime` berakhir `504`**, dan 504-nya **selalu datang berpasangan** — satu untuk karyawan yang metriknya memakai uptime, satu lagi untuk rantai `skor_tim` atasannya. Berpasangan itulah petunjuk yang membedakannya dari "monitoring lambat": probe satu per satu selalu membalas 70 sampai 90 ms dan tampak sehat sepenuhnya.
+
+Yang dipasang (bip-erp PR [#1534](https://github.com/bip-itteam-internal/bip-erp/pull/1534)):
+
+| Mekanisme | Perilaku |
+|---|---|
+| **Single-flight** per periode | Penyegaran kedua ikut menunggu hasil yang pertama, tidak menambah beban ke query yang sedang berjalan |
+| **Entri basi tetap disajikan** | Bila penyegaran gagal, hasil lama dipakai alih-alih membalas 504 |
+| **Batas umur basi 24 jam** | Lewat itu, gagal jujur — tanpa batas ini monitoring yang mati berhari-hari akan menyamar jadi angka yang masih berlaku |
+| **Kegagalan tidak menimpa entri lama** | Entri itulah yang menyelamatkan permintaan berikutnya |
+
+Batas waktu query periode juga **dipisah** dari batas dashboard: `batasWaktuQueryPeriode` 9 detik vs `batasWaktuQuery` 5 detik. Angkanya sengaja di **bawah** timeout klien employee-service (10 detik, `kpi_sumber_uptime.go`); rantai timeout yang terbalik membuat pelonggaran di sini tampak tidak bekerja sama sekali.
+
+⚠️ **Yang belum ditangani**: kegagalan tidak di-cache, jadi saat monitoring benar-benar sakit setiap permintaan tetap memicu satu query berat (kini beruntun, bukan paralel). Dan `ctx` pemanggil pertama menentukan nasib seluruh penunggu — bila klien pertama memutus koneksi, querynya batal dan penunggu lain ikut gagal, tertolong penyajian entri basi bila ada.
+
+Dampak hilirnya ada di [[HRIS - Otomasi Skor KPI]] bab **Sumber yang gagal bukan data yang belum ada**.
+
 ## Gerbang dan RBAC
 
 Dua gerbang berbeda, karena pemanggilnya berbeda jenis.

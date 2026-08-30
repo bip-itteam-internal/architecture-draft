@@ -68,6 +68,62 @@ Dari enam yang aktif, **lima sudah punya `supervisor_id` dan semuanya menunjuk L
 
 **Yang benar-benar perlu ditindaklanjuti adalah posisi Supervisor yang kosong.** Template `Tech Development Supervisor` punya konfigurasi `auto` (`skor_tim`, `scope: department`, target 70), tetapi tak seorang pun aktif memegang posisi itu. Di layar Otomasi KPI posisi itu muncul berstatus **`tanpa_karyawan`** — contoh nyata pertama status tersebut, dan alasan status itu dibuat: konfigurasi yang benar tetapi tak menghasilkan apa pun karena tak ada yang dinilai. Selama posisi itu kosong, konfigurasinya tidak berpengaruh pada siapa pun. Konteks hierarki: [[HRIS - Key Performance Index]].
 
+## Sumber yang gagal bukan data yang belum ada
+
+> Ditemukan dan diperbaiki **2026-08-30**. Aturan di bab ini sebelumnya hanya hidup sebagai komentar Go, sehingga siapa pun yang merancang layar dari dokumentasi tak punya cara mengetahuinya.
+
+**Metrik yang gagal ditarik dihitung 0, bukan ditandai gagal.** Karena skor adalah jumlah berbobot Σ(bobot × nilai) tanpa normalisasi, satu metrik yang hilang menurunkan skor sebesar bobotnya — dan hasilnya tampil sebagai angka yang masuk akal.
+
+Kejadian nyata yang memicu perbaikan ini, dilaporkan pemilik produk dari layar:
+
+| | Seharusnya | Yang tampil |
+|---|---|---|
+| Aminudin (IT Support) | 100 | **55** (kehilangan uptime, bobot 0,45) |
+| Kukuh (Tech Dev Leader) | 78,96 | **38,96** (kehilangan `KPI Team`, bobot 0,4) |
+| Rata-rata Tech Development | 50,2 | **36,0** |
+
+**Satu kegagalan menjatuhkan dua orang.** Aminudin satu-satunya anggota Tech Development yang SELURUH metriknya otomatis, jadi ia satu-satunya pengukur metrik `KPI Team` milik Leader-nya (basisnya berbunyi "1 pengukuran dari populasi 5"). Begitu satu metriknya gagal, `kumpulkanOtomatisPenuh` membuangnya dan metrik tim Leader ikut kosong. Rantai semacam ini tak terlihat dari konfigurasi metrik mana pun.
+
+### Tiga sebab kegagalan, tiga tanggapan berbeda
+
+`terapkanOtomatis` menuliskan sebabnya ke `auto_basis` dengan prefiks yang kini berupa konstanta bersama:
+
+| Prefiks | Artinya | Skor ditampilkan? |
+|---|---|---|
+| `gagal mengambil data:` | Service seberang bermasalah (mis. monitoring membalas 504) | **Tidak** |
+| `sumber tidak terdaftar:` | Salah konfigurasi template, tak akan pulih sendiri | **Tidak** |
+| `belum dapat dihitung:` | Datanya memang belum ada (belum ada tiket, belum ada yang menilai) | **Ya**, keadaan wajar |
+
+**Keputusan pemilik produk 2026-08-30: saat sumber gagal, sembunyikan angkanya dan sebut alasannya.** Skor yang salah lebih berbahaya daripada tidak ada skor, karena hanya yang pertama terbaca sebagai penilaian. Prinsip yang sama sudah dipakai `kumpulkanOtomatis` sejak awal ("menampilkannya sebagai skor 0 memfitnah orangnya"); ini memperluasnya, bukan membuat aturan baru.
+
+Rumus skornya **tidak** diubah. Jumlah berbobot tanpa normalisasi tetap berlaku, karena skor ternormalisasi tak bisa dijumlahkan antar-orang untuk rata-rata departemen.
+
+### ⛔ ADA TIGA JALUR PERHITUNGAN SKOR, dan menyentuh satu saja melahirkan dua angka
+
+Ini yang paling mudah terlewat, dan sudah terbukti terlewat: perbaikan pertama hanya menyentuh dua dari tiga, sehingga layar Manajemen HR tetap menampilkan 55 sementara kartu di `/portal/kpi` sudah berbunyi "tidak dapat dihitung".
+
+| Jalur | Dipakai | Endpoint / layar |
+|---|---|---|
+| `hitungSkorOtomatis` | kartu anggota, kolom Otomasi | `GET /kpi/auto-scores` |
+| `kumpulkanOtomatis` → `layakDifinalisasi` | finalisasi cron, rantai `skor_tim` | `POST /kpi/finalisasi`, sumber `skor_tim` |
+| `skorOrang` → `skorMentahDanKelengkapan` | kartu departemen | `GET /kpi/ringkasan-departemen` |
+
+**Tiap perubahan aturan skor wajib menyisir ketiganya.** Frontend sudah memperingatkan kelas ini di `lib/ringkasan-angka.ts` dengan kalimat yang tepat: *yang salah bukan salah satu angkanya, melainkan adanya dua*.
+
+Kebijakan "sumber gagal membatalkan skor" sengaja **tidak** ditaruh di `skorMentahDanKelengkapan` (rumus murni), melainkan di `skorOrang`. Menyatukannya akan membuat skor bulan **lampau** yang sudah final ikut padam hanya karena snapshot `kpi_score`-nya menyimpan jejak kegagalan lama.
+
+Di semua jalur, metrik yang gagal tetapi **sudah dinilai atasan** tidak membatalkan apa pun: skornya tidak berdiri di atas sumber yang gagal itu.
+
+### Di layar
+
+Kartu KPI kini mengenal **tiga** keadaan, bukan dua: berskor, belum dinilai, dan tidak dapat dihitung beserta metrik penyebabnya. Aturannya tinggal di satu tempat (`lib/keadaan-skor.ts`) supaya kartu, donut, dan halaman detail tak mungkin menjawab berbeda. Kolom Otomasi di layar Scoring menyebut jumlah sumber yang gagal alih-alih strip bisu.
+
+PR terkait: bip-erp [#1534](https://github.com/bip-itteam-internal/bip-erp/pull/1534) (akar di monitoring, lihat [[Microservices - Monitoring Service]]), [#1536](https://github.com/bip-itteam-internal/bip-erp/pull/1536), [#1539](https://github.com/bip-itteam-internal/bip-erp/pull/1539), erp-frontend [#1322](https://github.com/bip-itteam-internal/erp-frontend/pull/1322) dan [#1324](https://github.com/bip-itteam-internal/erp-frontend/pull/1324).
+
+⚠️ **Belum diverifikasi di produksi** per 2026-08-30. Gerbangnya: cacah `504` turun dari baseline 40 dari 104, polling `GET /kpi/auto-scores` 14 kali tanpa kegagalan (baseline 2 dari 14), dan Aminudin kembali 100 dengan Kukuh 78,96.
+
+⚠️ **Tabel bobot di bab "Metrik otomatis yang sudah menyala" sudah tidak cocok dengan produksi.** Pengukuran 2026-08-30 lewat `GET /kpi/auto-values` menunjukkan IT Support memakai `Optimalisasi Uptime Server & Sistem` **0,45**, `Kepuasan Pelayanan IT Support` 0,20, dan `Penyelesaian E-Ticket sesuai SLA` 0,35, sementara tabel di atas masih mencatat `Network` 0,4 / `Problem Solving` 0,3 / `Customer Satisfaction` 0,15. Templatenya jelas disunting sesudah tabel itu ditulis; menyegarkannya menuntut sensus ulang seluruh template dan sengaja tidak dikerjakan di sini.
+
 Metrik ketiga, `Network` milik IT Support, tidak bergantung pada penilaian siapa pun: `Monitoring-Service` hidup di produksi dan `MONITORING_SERVICE_KEY` terpasang 32 karakter di employee-service, jadi ia menghasilkan angka dari heartbeat harian sejak hari pertama bulan berjalan — dengan cakupan parsial selama bulannya belum habis, dan itulah sebabnya statusnya `semi`.
 
 Heartbeatnya diperiksa 7 Agustus 2026 lewat endpoint yang sama dengan yang dipakai KPI: **7 dari 7 hari yang sudah berjalan terisi, tanpa satu pun hari bolong** (uptime 99,93%). Angka 23 dari 31 pada Juli juga bukan kerusakan — heartbeat produksi baru dinyalakan 9 Juli, dan 9 sampai 31 tepat 23 hari. Jadi pada 1 September cakupannya akan penuh dan statusnya naik dari `semi` ke `otomatis`.
