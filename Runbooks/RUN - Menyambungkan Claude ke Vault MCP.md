@@ -53,11 +53,21 @@ Akses diberikan **per orang**, bukan per role.
 | Claude menggantung saat menyambung, tanpa galat | `proxy_buffering` masih menyala di proxy host NPM. Klien MCP membuka stream SSE, dan buffering menahannya sehingga terlihat seperti server mati |
 | **"data vault basi"** saat bertanya | `git pull` ke repo vault gagal berturut-turut. Periksa deploy key. Ini disengaja: lebih baik gagal daripada menjawab dari dokumentasi usang |
 | **"refresh token sudah pernah dipakai; sesi dicabut"** | Sesi sengaja dicabut karena token dipakai dua kali. Sambungkan ulang connector dari awal |
+| **"sambungan ini hanya diberi hak baca"** saat Claude mencoba menulis | Connector-nya tersambung sebelum hak tulis ada. Sambungkan ulang dari pengaturan Claude; hak tulis hanya diminta saat penyambungan, bukan menyusul sendiri |
+| Claude bilang perubahan **"belum terdorong"** | Deploy key repo vault tidak terpasang atau tidak berhak tulis. Tulisannya TIDAK hilang: ia tersimpan sebagai commit lokal dan ikut terdorong pada tulisan berikutnya yang berhasil. Periksa `VAULT_MCP_SSH_DIR` dan hak deploy key-nya |
+| **"dokumen ini sedang disunting orang lain"** | Ada dev yang menyunting dokumen yang sama dan perubahannya bentrok. Minta Claude membaca ulang dokumennya lalu mengulang. Server sengaja tidak menggabungkan sendiri, karena penggabungan otomatis pada dokumen acuan arsitektur menghasilkan teks yang terbaca wajar tapi isinya campuran dua maksud |
 
 Mencabut sambungan sepenuhnya: hapus connector di sisi Claude, lalu hapus `employee_id`-nya dari daftar-izin.
+
+## Setelah irisan 2 naik: semua connector harus disambung ulang
+
+Hak tulis diminta **saat penyambungan**, tidak menyusul sendiri. Connector yang sudah tersambung sebelumnya akan tetap bisa membaca, tetapi setiap percobaan menulis ditolak dengan pesan yang menyuruh menyambung ulang.
+
+Beri tahu kesembilan orang di daftar-izin **sebelum** deploy. Menemukannya sendiri sebagai penolakan di tengah pekerjaan terbaca sebagai fitur yang rusak, bukan sebagai langkah yang memang perlu dilakukan sekali.
 
 ## Dokumen Terkait
 
 - [[Microservices - Vault MCP Service]] — desain, keputusan, dan batasannya
+- [[ADR - 0064 Author Commit Tunggal untuk Vault MCP]] — kenapa semua commit memakai satu alamat email
 - [[CORE - SSO Flow]] — alur login ERP yang ditumpangi prosedur ini
 - [[RUN - Deploy Microservices bip-erp]] — prosedur deploy yang berlaku umum

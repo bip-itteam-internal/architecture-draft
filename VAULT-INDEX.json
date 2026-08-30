@@ -2670,8 +2670,27 @@
       ],
       "hash": "33e5dc430e9a2423b8353856fe9386db19d4f20c4cdf848a49178894cd0fac3a",
       "ukuran_kb": 22.3,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana management membaca dan menulis vault arsitektur lewat Claude tanpa menyentuh Obsidian, git, maupun editor, dan kenapa servicenya menerbitkan token OAuth sendiri alih-alih meneruskan ERP JWT (spec MCP mewajibkan audience binding RFC 8707, dan ERP JWT tak punya refresh token). Menjelaskan kenapa ia sengaja tidak lewat API Master Gateway, kenapa daftar-izin memakai employee_id eksplisit bukan system_roles, dan kenapa service ini tidak pernah menulis ke VAULT-INDEX.json sehingga search_notes wajib menggabungkan index dengan pemindaian isi langsung. Memuat alur OAuth lengkap yang menumpang SSO ERP, daftar endpoint publik, tiga pengamanan hasil review #1489, enam tool MCP beserta scope masing-masing, dan alur tulis berbasis git tanpa reset --hard. Keputusan 3 (author commit adalah managernya) DISIMPANGI ADR 0064: nama author tetap per-manager tapi alamat emailnya tunggal, sehingga git blame berhenti membedakan manager dan pengaman yang tersisa tinggal git revert. Memuat pula empat temuan irisan 2 yang tak terlihat dari desain: pull --rebase menolak berjalan saat worktree kotor sehingga satu berkas nyasar bisa memadamkan seluruh jalur baca lewat ambang kebasian, pesan konflik yang semula menyatu dengan origin tak terjangkau, clone --depth 1 yang harus di-unshallow dan yang diabaikan git untuk path lokal, serta Keputusan 4 yang sebelumnya hanya hidup sebagai kalimat sehingga VAULT-INDEX.json bisa ditimpa lewat MCP.",
+      "kata_kunci": [
+        "MCP",
+        "vault-mcp",
+        "vault mcp",
+        "model context protocol",
+        "Claude connector",
+        "OAuth",
+        "PKCE",
+        "SSO",
+        "Streamable HTTP",
+        "dokumentasi arsitektur",
+        "mcp_sessions",
+        "audience binding",
+        "confused deputy",
+        "refresh token",
+        "daftar-izin",
+        "write_note",
+        "patch_note",
+        "vault:write"
+      ]
     },
     {
       "path": "Core System and Modules/Microservices - Warehouse Service.md",
@@ -8946,8 +8965,24 @@
       ],
       "hash": "42050c3f01f95d83103b2788806ae92d7b056fbc6ed48386786051fea8cac86c",
       "ukuran_kb": 5.5,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana seorang manager menyambungkan Claude Desktop atau claude.ai ke vault arsitektur lewat Add custom connector dengan OAuth Client ID dan Secret yang diberikan IT lewat jalur pribadi, dan bagaimana IT memberi atau mencabut akses per orang dengan menambah atau menghapus employee_id di VAULT_MCP_ALLOWED_EMPLOYEES lalu membuat ulang containernya, karena restart tidak cukup untuk env yang dibaca saat container dibuat. Menjelaskan kenapa password tetap diminta walau sedang login di Web ERP, cara memverifikasi sambungan benar-benar bekerja, dan kenapa setiap connector harus disambung ulang setelah irisan 2 naik: hak tulis hanya diminta saat penyambungan dan tidak menyusul sendiri. Memuat tabel gejala kegagalan beserta sebabnya: akun belum masuk daftar-izin, redirect_uri belum terdaftar, proxy_buffering di Nginx Proxy Manager yang menahan stream SSE sehingga terlihat seperti server mati, data vault basi akibat git pull gagal, sesi yang dicabut karena refresh token dipakai ulang, penolakan menulis karena sambungannya hanya berhak baca, perubahan yang belum terdorong karena deploy key tidak berhak tulis, dan bentrok karena dev menyunting dokumen yang sama.",
+      "kata_kunci": [
+        "Claude connector",
+        "custom connector",
+        "MCP",
+        "vault mcp",
+        "vault",
+        "onboarding manager",
+        "VAULT_MCP_ALLOWED_EMPLOYEES",
+        "OAuth Client ID",
+        "akses vault",
+        "memberi akses",
+        "proxy_buffering",
+        "SSE",
+        "runbook",
+        "sambung ulang",
+        "vault:write"
+      ]
     },
     {
       "path": "Runbooks/RUN - Onboarding Akun Eksternal (Vendor & Mitra).md",
@@ -11085,8 +11120,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Core System and Modules/Microservices - Vault MCP Service.md",
-    "Runbooks/RUN - Menyambungkan Claude ke Vault MCP.md"
-  ]
+  "gagal": []
 }

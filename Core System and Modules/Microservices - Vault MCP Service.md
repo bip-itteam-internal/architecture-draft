@@ -2,7 +2,7 @@
 
 *MCP server yang membuka vault `architecture-draft` untuk Claude, supaya management bisa membaca sistem yang sudah terdokumentasi dan menuangkan kebutuhan baru langsung dari Claude Desktop / claude.ai tanpa menyentuh Obsidian, git, maupun editor. Identitasnya menumpang SSO ERP yang sudah ada, dan setiap tulisan mendarat di vault sebagai commit git ber-author manager yang bersangkutan.*
 
-- **Status**: ⚠️ **Irisan 1 (baca saja) HIDUP di prod; irisan 2 (tulis) dan 3 belum ada kode.** PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) dan [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489) keduanya merged 2026-08-27, kode baca-saja terkunci 93 test. Diukur di prod 2026-08-30: container `Vault-MCP` sehat, `POST /mcp` membalas 401 ber-`WWW-Authenticate` yang benar (`scope="vault:read"`), kedua `.well-known` 200, `/oauth/authorize` menolak client tak dikenal dengan 400, sembilan `employee_id` terdaftar di `VAULT_MCP_ALLOWED_EMPLOYEES`, dan **tiga sesi sudah terbentuk di `mcp_sessions`** sehingga alur OAuth penuh terbukti pernah dilalui orang sungguhan.
+- **Status**: ⚠️ **Irisan 1 (baca saja) HIDUP di prod. Irisan 2 (tulis) kodenya SELESAI dan terkunci test, tetapi BELUM di-deploy dan deploy key-nya belum ada. Irisan 3 belum ada kode.** PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) dan [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489) merged 2026-08-27. Diukur di prod 2026-08-30: container `Vault-MCP` sehat, `POST /mcp` membalas 401 ber-`WWW-Authenticate` yang benar (`scope="vault:read"`), kedua `.well-known` 200, `/oauth/authorize` menolak client tak dikenal dengan 400, sembilan `employee_id` terdaftar di `VAULT_MCP_ALLOWED_EMPLOYEES`, dan **tiga sesi sudah terbentuk di `mcp_sessions`** sehingga alur OAuth penuh terbukti pernah dilalui orang sungguhan.
 - ⚠️ **Yang masih belum terbukti dari sesi-sesi itu**: jumlah sesi tidak membedakan penyambungan dari claude.ai dan dari `claude mcp add` di mesin dev, dan tidak menunjukkan apakah ada pertanyaan yang benar-benar dijawab bersumber vault. Gerbang irisan 1 di § Cara Verifikasi karena itu belum bisa dinyatakan lunas.
 - ⛔ **#1488 di-merge sebelum `/review` sempat jalan, dan reviewnya menemukan tiga celah keamanan** yang semuanya lolos 74 test hijau: `redirect_uri` tak dicocokkan dengan daftar terdaftar, nol pembatasan laju, dan rotasi refresh token baca-lalu-tulis. Ditutup di #1489, yang sudah merged. Jangan men-deploy commit yang lebih tua dari itu.
 - **Stack**: Go + [MCP Go SDK resmi](https://github.com/modelcontextprotocol/go-sdk) (Tier 1, dirawat bersama Google) + MongoDB (koleksi `mcp_sessions`). Transport **Streamable HTTP**.
@@ -34,9 +34,11 @@ Gateway menuntut ERP JWT pada `/api/*` dan membuang prefix `/api/<module>` sebel
 
 ### 3. Author commit adalah managernya, bukan bot
 
+⛔ **DISIMPANGI sejak 2026-08-30 oleh [[ADR - 0064 Author Commit Tunggal untuk Vault MCP]].** Yang berlaku sekarang: **nama** author tetap per-manager, tetapi **alamat email seluruh commit sama**, dibaca dari env `VAULT_MCP_AUTHOR_EMAIL`. Sebabnya ERP JWT tidak memuat klaim email dan satu-satunya rute internal yang membawanya juga mengembalikan password hash serta pin. Bagian di bawah dipertahankan karena alasannya masih berlaku dan menjelaskan apa yang hilang.
+
 Setiap tulisan menjadi commit dengan `--author="Nama <email>"` yang diambil dari identitas ERP hasil redeem. Konsekuensinya langsung berguna: `git log` menjawab siapa menulis apa, `git blame` menjawabnya per baris, dan `git revert` membatalkannya tanpa merusak riwayat. Tidak ada mekanisme audit baru yang perlu dibangun atau dipelajari, karena git sudah melakukannya.
 
-Ini juga satu-satunya pengaman yang ada. Keputusan pemilik: manager boleh menulis ke **seluruh** isi vault tanpa gerbang review. Yang menahan kesalahan bukan pencegahan, melainkan keterlacakan dan kemudahan membatalkan.
+Ini juga satu-satunya pengaman yang ada. Keputusan pemilik: manager boleh menulis ke **seluruh** isi vault tanpa gerbang review. Yang menahan kesalahan bukan pencegahan, melainkan keterlacakan dan kemudahan membatalkan. ⚠️ Sesudah ADR 0064, dari pasangan itu yang tersisa tinggal **kemudahan membatalkan**: `git blame` tak lagi membedakan manager lewat identitas yang bisa diverifikasi.
 
 ### 4. Service ini TIDAK PERNAH menulis ke `VAULT-INDEX.json`
 
@@ -113,14 +115,20 @@ Ketiganya lolos test hijau di #1488, jadi ketiadaannya tidak terlihat dari mana 
 
 ## Permukaan tool
 
-| Tool | Fungsi |
-|---|---|
-| `search_notes` | Cari dokumen relevan, balas path + judul + ringkasan |
-| `read_note` | Baca isi satu dokumen beserta backlink-nya |
-| `list_notes` | Daftar dokumen per area/folder, untuk orientasi |
-| `write_note` | Buat dokumen baru atau timpa penuh |
-| `patch_note` | Sunting satu bagian saja (tambah/ganti di bawah heading tertentu) |
-| `delete_note` | Hapus dokumen |
+| Tool | Scope | Status | Fungsi |
+|---|---|---|---|
+| `search_notes` | `vault:read` | ✅ | Cari dokumen relevan, balas path + judul + ringkasan |
+| `read_note` | `vault:read` | ✅ | Baca isi satu dokumen beserta backlink-nya |
+| `list_notes` | `vault:read` | ✅ | Daftar dokumen per area/folder, untuk orientasi |
+| `write_note` | `vault:write` | ⚠️ kode selesai, belum deploy | Buat dokumen baru atau timpa penuh |
+| `patch_note` | `vault:write` | ⚠️ kode selesai, belum deploy | Sunting satu bagian saja (tambah/ganti di bawah heading tertentu) |
+| `delete_note` | `vault:write` | 🔜 irisan 3 | Hapus dokumen |
+
+⚠️ **Dua scope, dan `vault:write` selalu membawa `vault:read`.** Permintaan tanpa scope apa pun diberi baca saja, dan scope asing **ditolak** di `/oauth/authorize` alih-alih disempitkan diam-diam. Sesi yang tersimpan tanpa scope adalah sesi terbitan irisan 1: ia tetap boleh membaca (fail-open, supaya deploy tidak mematikan connector yang sudah hidup) tapi tidak boleh menulis (fail-closed).
+
+⚠️ **Tool tulis hanya didaftarkan bila `VAULT_MCP_AUTHOR_EMAIL` terisi.** Didaftarkan lalu selalu gagal jauh lebih membingungkan: klien MCP membaca daftar tool sekali saat menyambung, dan tool yang ada tapi mustahil dipakai terbaca sebagai service rusak.
+
+**Pelanggaran konvensi vault DILAPORKAN, tidak menolak tulisan.** Prefix nama (§3), wikilink menggantung (§4), dan status marker di luar 15 baris pertama (§5) muncul sebagai catatan di hasil tool, sehingga Claude bisa menawarkan perbaikannya dalam percakapan yang sama. Gerbang yang menolak akan membuat manager buntu di dalam percakapan, tanpa editor yang bisa memperlihatkan aturannya.
 
 `patch_note` sengaja terpisah dari `write_note` dan diperkirakan jadi yang paling sering dipakai: menambah satu paragraf ke satu heading jauh lebih kecil risikonya daripada menimpa dokumen 40 KB dan berharap seluruh isinya tersalin utuh.
 
@@ -157,9 +165,16 @@ Tiap irisan berakhir pada sesuatu yang bisa dibuktikan hidup, bukan pada kode ya
 
 **Irisan 1, sambungan dan identitas, baca saja.** DNS, proxy host di NPM, sertifikat, container jalan, seluruh alur OAuth berfungsi, plus `search_notes` / `read_note` / `list_notes`. Bagian tersulit dan paling banyak hal di luar kode ada di sini, dan risikonya ke vault nol karena belum ada tulis sama sekali.
 
-**Irisan 2, tulis.** `write_note`, `patch_note`, alur git, atribusi author.
+**Irisan 2, tulis.** `write_note`, `patch_note`, alur git, atribusi author. **Kode selesai 2026-08-30**, belum di-deploy.
 
-⛔ **Prasyarat irisan 2 yang ditemukan saat menulis irisan 1: ERP JWT TIDAK punya klaim email.** Klaim yang benar-benar diterbitkan gateway hanya `employee_id`, `full_name`, `username`, `system_roles`, `department`, `position`, `company_id` (`shared-library/auth/jwt.go` `SignJWT`). Author commit menuntut alamat email, dan **mengarangnya dari username akan masuk permanen ke riwayat git tanpa bisa dibedakan dari alamat yang benar**. Irisan 2 wajib mengambilnya dari employee-service lebih dulu, atau memutuskan secara sadar memakai bentuk `noreply` yang jelas-jelas bukan alamat orang.
+⛔ **Prasyarat yang ditemukan saat menulis irisan 1: ERP JWT TIDAK punya klaim email.** Klaim yang benar-benar diterbitkan gateway hanya `employee_id`, `full_name`, `username`, `system_roles`, `department`, `position`, `company_id` (`shared-library/auth/jwt.go` `SignJWT`). **Diselesaikan lewat [[ADR - 0064 Author Commit Tunggal untuk Vault MCP]]**: satu alamat email untuk semua commit, nama author tetap per-manager. Konsekuensinya irisan 2 tidak menyentuh employee-service sama sekali.
+
+Empat hal yang ditemukan saat mengerjakannya, dan tak satu pun terlihat dari desain:
+
+- ⛔ **`pull --rebase` MENOLAK berjalan bila worktree punya perubahan tak ter-stage.** Satu berkas nyasar membuat setiap tulisan berikutnya gagal dengan pesan yang menyalahkan konflik yang tak pernah ada. Bug yang sama sudah hidup di penyegar latar sejak irisan 1, dan di sana akibatnya lebih besar: sinkronisasi gagal berulang sampai melewati ambang kebasian, lalu **setiap tool menolak menjawab**. Satu berkas nyasar memadamkan servicenya. Ditutup dengan `--autostash` di kedua tempat.
+- ⚠️ **"Origin tak terjangkau" dan "dev menyunting dokumen yang sama" semula menyatu jadi satu pesan** yang menuduh konflik. Dibedakan lewat keberhasilan `rebase --abort`, yang hanya berhasil bila memang ada rebase berhenti di tengah.
+- ⚠️ **Clone `--depth 1` peninggalan irisan 1 harus di-unshallow**, karena deploy tidak menghapus volume `vault-mcp-clone`. Ditambah: `git clone --depth` **diabaikan untuk path lokal**, sehingga test yang meng-clone dari path apa adanya akan hijau walau kedangkalannya masih ada.
+- ⚠️ **Keputusan 4 sebelumnya cuma hidup sebagai kalimat di dokumen ini.** `ResolveVaultPath` hanya memblokir `.git/` dan `.obsidian/`, jadi permintaan "perbarui indeksnya" akan berhasil merusak `VAULT-INDEX.json`. Jalur tulis kini menolaknya, dan menolak berkas non-`.md`.
 
 **Irisan 3, sisanya.** `delete_note`, ditambah satu **MCP prompt** (`curahkan-kebutuhan`) yang memandu manager menuangkan keinginannya jadi struktur konsisten: masalah yang dirasakan, siapa yang terdampak, keadaan sekarang, yang diharapkan. Ini justru inti permintaan aslinya, tapi baru masuk akal setelah tulis terbukti jalan.
 
@@ -186,7 +201,10 @@ Status per 2026-08-30, diukur bukan diingat:
 - ✅ Record DNS `mcp.bharatainternasional.com`, resolve ke `116.206.196.31` (sama dengan `api.*`)
 - ✅ Proxy host + sertifikat di Nginx Proxy Manager (`bip-erp/infra/npm/`); HTTPS dilayani openresty dan stream MCP tidak menggantung
 - ✅ Env daftar-izin `VAULT_MCP_ALLOWED_EMPLOYEES` terisi sembilan `employee_id`; sisa env (`JWT_SECRET`, alamat gateway, alamat Web ERP, client ID + secret OAuth) terbukti ada karena service naik dan alur OAuth menghasilkan sesi
-- 🔜 Deploy key repo vault dengan **hak tulis**, plus `user.name` / `user.email` git di container. Belum diperiksa, dan **baru dibutuhkan irisan 2**
+- 🔜 **Deploy key repo vault dengan hak TULIS**, ditaruh di folder `VAULT_MCP_SSH_DIR` sebagai `vault_mcp_deploy_key` beserta `known_hosts`. **Belum ada, dan ini yang memblokir irisan 2.** `user.name`/`user.email` committer sudah disiapkan di Dockerfile sejak irisan 1
+- 🔜 **`VAULT_MCP_REPO_URL` harus bentuk SSH**, bukan https: https tanpa kredensial hanya bisa membaca, dan gagalnya belakangan saat push
+- 🔜 **`VAULT_MCP_AUTHOR_EMAIL`**. Kosong = tool tulis tidak didaftarkan sama sekali dan service tetap naik melayani jalur baca
+- ⚠️ **Tiga sesi yang sudah tersambung harus menyambung ulang** setelah irisan 2 naik, karena scope berubah. Beri tahu pemakainya sebelum deploy, jangan biarkan mereka menemukannya sebagai kegagalan
 - Deploy prod **dijalankan manusia**, sesuai konvensi tim. Agent menyiapkan daftar container, urutan, perintah siap tempel, dan gerbang verifikasinya
 
 ## Di luar lingkup
