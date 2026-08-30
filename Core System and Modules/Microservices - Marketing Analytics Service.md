@@ -195,6 +195,20 @@ Atribusi lintas departemen: GMV masuk ke departemen **host** (`work_data.departm
 
 ⚠️ **Sesi kedua tak punya tampilan** di web (`sesiBerjalan?.[0]`) maupun mobile (`milik.first`), jadi ia tak bisa dijeda atau diakhiri, lalu menggantung melewati ambang 12 jam yang **memaksa porsi host jadi nol**. Peringatan jam ke-11 tak pernah sampai karena kartunya tak pernah dirender. Ini menjadikan perbaikan tampilan N sesi sebagai **prasyarat**, bukan penyempurnaan.
 
+#### Kepemilikan sesi (🟡 branch, belum merged)
+
+Dikerjakan di `bip-erp` branch `feat/marketing-analytics-sesi-berjalan-pemilik` dan `erp-frontend` branch `feat/live-shift-sesi-berjalan-jamak`. **Belum merged, belum di-deploy.** Rincian per-endpoint: [[API - Marketing Analytics Service]].
+
+Tiga hal yang berubah, ketiganya menutup lubang yang sudah ada sebelumnya:
+
+1. **`GET /live-shifts/berjalan` menyaring per pemilik** (host biasa hanya miliknya, leader seluruh tim) dan tiap baris membawa `boleh_kelola`. Sebelumnya ia mengembalikan seluruh sesi lintas host tanpa penyaringan apa pun.
+2. **`GET /live-shifts` (riwayat) memaksa non-leader ke dirinya sendiri.** Sebelumnya, pemanggil yang tak mengirim `milik_saya=true` maupun `host=` tidak disaring sama sekali, sehingga host biasa membaca riwayat seluruh tim lewat API. Web selalu mengirim parameternya; API tak pernah mewajibkannya.
+3. **`PATCH /:id/jeda` dan `/:id/selesai` membalas 403** bila pemanggil bukan host, pembuat sesi, atau supervisor IT. Sebelumnya tak ada pemeriksaan apa pun.
+
+⛔ **Predikat kepemilikannya WAJIB tetap satu.** `pemanggilAdalahHost` dipakai penyaring GET maupun gerbang PATCH, dan `boleh_kelola` dihitung dari predikat yang sama supaya frontend tak perlu menyimpulkannya sendiri. Dua salinan akan menyimpang, dan gejalanya persis yang dicatat [[ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap]] §3: orang melihat tombol lalu ditolak saat menekannya, tanpa pesan yang menyebut sebabnya.
+
+⛔ **Penyaringan `/berjalan` ada di HANDLER, bukan di `ShiftBerjalanSemua`.** Method itu dipakai juga oleh autoclose, yang wajib melihat SELURUH sesi. Menyaring di store membuat sesi orang lain tak pernah tertutup otomatis, senyap total, dan justru autoclose itulah jaring pengaman yang menopang keputusan "leader tak boleh menghentikan".
+
 ### Retur & analitik lain
 
 | Endpoint | Isi |

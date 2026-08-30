@@ -555,20 +555,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "cb337e0e42fe901009a5335edbffc0d55af20b782db684d79e10c257af5fb3b2",
-      "ukuran_kb": 31.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service beserta parameter, konvensi amplop respons (rows, unavailable_channels, kolom_tidak_berlaku), dan aturan paginasi/validasi enum. Menjelaskan juga bagaimana vonis laba halaman beranda ditentukan (tanpa_data, belum_matang, rugi, waspada, sehat), siapa yang boleh menulis ambang ROAS/CPA dan pagu belanja iklan, serta mengapa nilai null berarti tak terhitung dan bukan nol. Berguna untuk menjawab kolom mana yang boleh dijumlahkan ke laba (mis. pembatalan dan orders_dikirim yang bukan komponen laba), endpoint mana untuk laba per toko/produk/item, pencatatan sesi live host, price floor, retur, job penjadwal, health, serta cara mengaudit ulang kelengkapan daftar route terhadap kode.",
+      "hash": "8065fa1ad6de09563875de81d42ba546bb721f1b469e202cec038095e2e557b1",
+      "ukuran_kb": 34.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service lewat gateway, parameter serta bentuk respons tiap route, dan siapa yang digerbang untuk menulis ambang keputusan maupun pagu belanja iklan. Menjelaskan juga arti lima nilai vonis laba di `/beranda` (tanpa_data, belum_matang, rugi, waspada, sehat), kapan nilai `null` berarti tak terhitung dan bukan nol, serta kolom mana yang tidak boleh dijumlahkan (`pembatalan`, `orders_dikirim`). Memuat konvensi amplop respons, aturan batas tanggal hari WIB, paginasi drill, dan cara mengaudit ulang kelengkapan daftar route terhadap kode.",
       "kata_kunci": [
         "marketing analytics",
         "endpoint",
+        "route",
         "API reference",
+        "beranda",
+        "ambang keputusan",
         "ROAS",
-        "CPA",
-        "ambang",
         "pagu iklan",
-        "laba kotor",
-        "gross profit",
-        "live shift"
+        "kurva alokasi",
+        "profit shops"
       ]
     },
     {
@@ -2343,6 +2343,7 @@
         "Microservices - Employee Service",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
+        "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
         "IT - Background Jobs & Schedulers",
         "APP - Web ERP",
         "HRIS - Otomasi Skor KPI",
@@ -2360,20 +2361,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "7e92d4e3d1f96350b7c0500b7bb96634e53ee600953489facd13fb961b8fe587",
-      "ukuran_kb": 72.3,
-      "ringkasan": "Menjawab: bagaimana laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live diagregasi dari integration_db ke koleksi mart_* milik service ini, endpoint apa saja yang tersedia (termasuk /beranda, /pagu, /kurva-alokasi, /kpi/kinerja-live, /live-shifts, price floor, dan job sync), serta bagaimana penjadwal internal 48 jam bekerja. Menjelaskan juga aturan pemakaian angka yang melarang hitung ganda (iklan_sia_sia, pembatalan, tiga angka penjualan live, 24h_live_gmv), lima keadaan vonis laba beserta ambang materialitas belum_matang, dan konvensi hari WIB versus UTC. Memuat prinsip arsitektur wajib: integration_db baca-saja yang dijaga tiga lapis, dan /health turun jadi degraded bila index unik gagal dibuat.",
+      "hash": "9a65023eff4a4d40c2e475ed09416b8deeabdefe2035687a287e0d2f6954e7eb",
+      "ukuran_kb": 74.1,
+      "ringkasan": "Menjawab: bagaimana Marketing Analytics Service dirancang, dari mana datanya berasal (`integration_db` baca-saja, hasil pre-agregasi disimpan ke koleksi `mart_*` sendiri), dan mengapa akses baca-saja itu dijaga tiga lapis termasuk uji AST. Menerangkan penjadwal internal 48 jam, job sync, koleksi di `marketing_analytics_db`, channel yang didukung (TikTok, Shopee, Lazada), alokasi bundel/mapping SKU, serta penurunan aturan vonis laba lima keadaan beserta ambang materialitas settlement belum matang. Memuat pula aturan pemakaian angka untuk mencegah hitung ganda (`iklan_sia_sia`, `pembatalan`, `24h_live_gmv`, tiga angka penjualan live) dan catatan kejujuran data seperti perbedaan revenue TikTok vs Shopee.",
       "kata_kunci": [
-        "marketing analytics",
+        "marketing analytics service",
         "mart_profit_attribution",
-        "laba kotor",
-        "gross profit",
-        "ROAS",
-        "CPA",
+        "integration_db",
+        "job sync",
+        "penjadwal",
+        "hitung ganda",
+        "iklan_sia_sia",
         "live session",
-        "sesi live",
-        "TikTok",
-        "Shopee"
+        "Shopee",
+        "TikTok"
       ]
     },
     {
