@@ -2660,7 +2660,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Irisan 1 merged ke `main`, BELUM di-deploy ke mana pun** (PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) + [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489), 2026-08-27). Kode baca-saja lengkap dan terkunci 93 test, termasuk alur OAuth penuh lewat HTTP sungguhan dan klien MCP sungguhan. Tetapi ia **belum pernah dijalankan di mana pun**: `docker build` belum pernah berhasil dicoba, dan DNS, proxy host, serta sertifikat belum berdiri. Irisan 2 (tulis) dan 3 belum ada kode.",
+      "status_teks": "**Irisan 1 (baca saja) HIDUP di prod; irisan 2 (tulis) dan 3 belum ada kode.** PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) dan [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489) keduanya merged 2026-08-27, kode baca-saja terkunci 93 test. Diukur di prod 2026-08-30: container `Vault-MCP` sehat, `POST /mcp` membalas 401 ber-`WWW-Authenticate` yang benar (`scope=\"vault:read\"`), kedua `.well-known` 200, `/oauth/authorize` menolak client tak dikenal dengan 400, sembilan `employee_id` terdaftar di `VAULT_MCP_ALLOWED_EMPLOYEES`, dan **tiga sesi sudah terbentuk di `mcp_sessions`** sehingga alur OAuth penuh terbukti pernah dilalui orang sungguhan.",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
@@ -2670,20 +2670,25 @@
         "ADR - 0003 SSO-only Gateway",
         "IT - Server, VMs and Databases"
       ],
-      "hash": "11a34cf37aa350cce593e1508cad3a8780514bb64781359bd936a100103341f1",
-      "ukuran_kb": 17.5,
-      "ringkasan": "Menjawab: bagaimana Claude bisa membaca dan menulis vault arsitektur tanpa menyentuh Obsidian atau git, kenapa server ini menerbitkan token OAuth sendiri alih-alih meneruskan ERP JWT, dan kenapa ia sengaja berdiri di luar API Gateway. Memuat lima keputusan yang mengikat: audience binding, author commit adalah managernya sendiri, daftar-izin employee_id eksplisit, dan larangan menulis VAULT-INDEX.json. Alur autentikasinya menumpang penuh SSO ERP tanpa perubahan di gateway maupun frontend.",
+      "hash": "34284c275ca14bb927390b398918e1ccfc707c84c473c559750f35d2f9315e6b",
+      "ukuran_kb": 18.5,
+      "ringkasan": "Menjawab: bagaimana management membaca vault arsitektur lewat Claude tanpa menyentuh Obsidian, git, maupun editor, dan kenapa servicenya menerbitkan token OAuth sendiri alih-alih meneruskan ERP JWT (spec MCP mewajibkan audience binding RFC 8707, dan ERP JWT tak punya refresh token sehingga connector harus disambung ulang tiap tiga hari). Menjelaskan kenapa ia sengaja tidak lewat API Master Gateway, kenapa author commit adalah managernya sendiri sehingga git log, blame, dan revert menjadi satu-satunya mekanisme audit yang perlu ada, kenapa daftar-izin memakai employee_id eksplisit bukan system_roles, dan kenapa service ini tidak pernah menulis ke VAULT-INDEX.json sehingga search_notes wajib menggabungkan index dengan pemindaian isi langsung. Memuat alur OAuth lengkap yang menumpang SSO ERP, daftar endpoint publik, tiga pengamanan hasil review #1489 (redirect_uri dicocokkan persis bukan berawalan, pembatasan laju per alamat klien, rotasi refresh token atomik yang mencabut seluruh sesi bila token dipakai ulang), enam tool MCP, alur tulis berbasis git tanpa reset --hard, serta status irisan 1 yang kini hidup di prod sementara irisan 2 (tulis) dan 3 belum ada kode.",
       "kata_kunci": [
         "MCP",
         "vault-mcp",
+        "vault mcp",
+        "model context protocol",
         "Claude connector",
         "OAuth",
+        "PKCE",
         "SSO",
         "Streamable HTTP",
         "dokumentasi arsitektur",
         "mcp_sessions",
         "audience binding",
-        "confused deputy"
+        "confused deputy",
+        "refresh token",
+        "daftar-izin"
       ]
     },
     {
@@ -8919,26 +8924,30 @@
       "judul": "RUN - Menyambungkan Claude ke Vault MCP",
       "area": "Runbooks",
       "jenis": "runbook",
-      "status_emoji": "🟡",
-      "status_teks": "Draft — prosedurnya belum pernah dijalankan sampai tuntas karena servicenya belum di-deploy. Naikkan ke ✅ Implemented setelah manager pertama benar-benar tersambung.",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan) — servicenya sudah hidup di prod dan **tiga sesi sudah terbentuk**, jadi prosedur ini terbukti bisa dituntaskan. Yang belum bisa dipastikan: apakah salah satu dari tiga itu seorang manager dari claude.ai, atau semuanya dev yang menguji lewat `claude mcp add`. Naikkan ke ✅ setelah ada satu manager yang jelas tersambung dan mendapat jawaban bersumber vault. Diukur 2026-08-30.",
       "publik": true,
       "tautan": [
         "Microservices - Vault MCP Service",
         "CORE - SSO Flow",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "9900c0559b2f94003233cc178577975811fe4a75938d985cf9077ef8b5366402",
-      "ukuran_kb": 3.8,
-      "ringkasan": "Menjawab: langkah apa yang dijalankan seorang manager untuk menyambungkan Claude Desktop atau claude.ai ke vault arsitektur, dan apa yang dikerjakan IT untuk memberi atau mencabut akses itu. Menyebut prasyaratnya (employee_id sudah terdaftar di VAULT_MCP_ALLOWED_EMPLOYEES), cara memverifikasi jawabannya benar-benar bersumber vault, dan kenapa mengubah daftar aksesnya menuntut container dibuat ulang, bukan sekadar restart.",
+      "hash": "14c9be674b8b8562af11671400a7f33509993c73db73586c62f98c0100469017",
+      "ukuran_kb": 4.0,
+      "ringkasan": "Menjawab: bagaimana seorang manager menyambungkan Claude Desktop atau claude.ai ke vault arsitektur (Settings, Connectors, Add custom connector, isi Remote MCP server URL lalu OAuth Client ID dan Secret yang diberikan IT lewat jalur pribadi), dan bagaimana IT memberi atau mencabut akses per orang dengan menambah atau menghapus employee_id di VAULT_MCP_ALLOWED_EMPLOYEES lalu membuat ulang containernya, karena restart tidak cukup untuk env yang dibaca saat container dibuat. Menjelaskan kenapa password tetap diminta walau sedang login di Web ERP, cara memverifikasi sambungan benar-benar bekerja (Claude menyebut nama dokumennya, bukan menjawab dari pengetahuan umum), dan tabel gejala kegagalan beserta sebabnya: akun belum masuk daftar-izin, redirect_uri Claude belum terdaftar, proxy_buffering di Nginx Proxy Manager masih menyala sehingga stream SSE tertahan dan terlihat seperti server mati, jawaban ditolak karena data vault basi akibat git pull gagal, serta sesi yang sengaja dicabut karena refresh token dipakai dua kali.",
       "kata_kunci": [
         "Claude connector",
         "custom connector",
         "MCP",
+        "vault mcp",
         "vault",
         "onboarding manager",
         "VAULT_MCP_ALLOWED_EMPLOYEES",
         "OAuth Client ID",
         "akses vault",
+        "memberi akses",
+        "proxy_buffering",
+        "SSE",
         "runbook"
       ]
     },

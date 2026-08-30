@@ -2,8 +2,9 @@
 
 *MCP server yang membuka vault `architecture-draft` untuk Claude, supaya management bisa membaca sistem yang sudah terdokumentasi dan menuangkan kebutuhan baru langsung dari Claude Desktop / claude.ai tanpa menyentuh Obsidian, git, maupun editor. Identitasnya menumpang SSO ERP yang sudah ada, dan setiap tulisan mendarat di vault sebagai commit git ber-author manager yang bersangkutan.*
 
-- **Status**: ⚠️ **Irisan 1 merged ke `main`, BELUM di-deploy ke mana pun** (PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) + [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489), 2026-08-27). Kode baca-saja lengkap dan terkunci 93 test, termasuk alur OAuth penuh lewat HTTP sungguhan dan klien MCP sungguhan. Tetapi ia **belum pernah dijalankan di mana pun**: `docker build` belum pernah berhasil dicoba, dan DNS, proxy host, serta sertifikat belum berdiri. Irisan 2 (tulis) dan 3 belum ada kode.
-- ⛔ **#1488 di-merge sebelum `/review` sempat jalan, dan reviewnya menemukan tiga celah keamanan** yang semuanya lolos 74 test hijau: `redirect_uri` tak dicocokkan dengan daftar terdaftar, nol pembatasan laju, dan rotasi refresh token baca-lalu-tulis. Ditutup di #1489. Jangan men-deploy commit yang lebih tua dari itu.
+- **Status**: ⚠️ **Irisan 1 (baca saja) HIDUP di prod; irisan 2 (tulis) dan 3 belum ada kode.** PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) dan [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489) keduanya merged 2026-08-27, kode baca-saja terkunci 93 test. Diukur di prod 2026-08-30: container `Vault-MCP` sehat, `POST /mcp` membalas 401 ber-`WWW-Authenticate` yang benar (`scope="vault:read"`), kedua `.well-known` 200, `/oauth/authorize` menolak client tak dikenal dengan 400, sembilan `employee_id` terdaftar di `VAULT_MCP_ALLOWED_EMPLOYEES`, dan **tiga sesi sudah terbentuk di `mcp_sessions`** sehingga alur OAuth penuh terbukti pernah dilalui orang sungguhan.
+- ⚠️ **Yang masih belum terbukti dari sesi-sesi itu**: jumlah sesi tidak membedakan penyambungan dari claude.ai dan dari `claude mcp add` di mesin dev, dan tidak menunjukkan apakah ada pertanyaan yang benar-benar dijawab bersumber vault. Gerbang irisan 1 di § Cara Verifikasi karena itu belum bisa dinyatakan lunas.
+- ⛔ **#1488 di-merge sebelum `/review` sempat jalan, dan reviewnya menemukan tiga celah keamanan** yang semuanya lolos 74 test hijau: `redirect_uri` tak dicocokkan dengan daftar terdaftar, nol pembatasan laju, dan rotasi refresh token baca-lalu-tulis. Ditutup di #1489, yang sudah merged. Jangan men-deploy commit yang lebih tua dari itu.
 - **Stack**: Go + [MCP Go SDK resmi](https://github.com/modelcontextprotocol/go-sdk) (Tier 1, dirawat bersama Google) + MongoDB (koleksi `mcp_sessions`). Transport **Streamable HTTP**.
 - **Path di repo** (rencana): `bip-erp/services/vault-mcp/`, mengikuti pola `services/.template`.
 - **Rute**: ⛔ **TIDAK lewat [[CORE - API Master Gateway]].** Dipaparkan langsung sebagai `https://mcp.bharatainternasional.com` lewat Nginx Proxy Manager (`bip-erp/infra/npm/`). Claude menyambung dari infrastruktur cloud Anthropic, bukan dari laptop pemakai, sehingga server wajib terjangkau internet publik.
@@ -172,7 +173,7 @@ Tiga lapis. Dua yang pertama sengaja **tidak** dianggap cukup.
 
 Gerbang per irisan:
 
-- **Irisan 1**: satu manager sungguhan menyambung dari claude.ai, bertanya tentang sistem, dan dijawab bersumber vault.
+- **Irisan 1**: satu manager sungguhan menyambung dari claude.ai, bertanya tentang sistem, dan dijawab bersumber vault. **Belum dinyatakan lunas per 2026-08-30**: tiga sesi memang sudah terbentuk, tapi sesi hanya membuktikan penyambungannya berhasil, bukan bahwa ada jawaban yang bersumber vault.
 - **Irisan 2**: commit ber-author manager muncul di GitHub dan turun ke worktree dev lewat `git pull` biasa.
 - **Irisan 3**: satu curahan kebutuhan utuh mendarat sebagai dokumen berstruktur.
 
@@ -180,10 +181,12 @@ Gerbang per irisan:
 
 ## Yang perlu disiapkan di luar kode
 
-- Record DNS `mcp.bharatainternasional.com`
-- Proxy host + sertifikat Let's Encrypt di Nginx Proxy Manager (`bip-erp/infra/npm/`)
-- Deploy key repo vault dengan **hak tulis**, plus `user.name` / `user.email` git di container
-- Env: daftar-izin `employee_id`, `JWT_SECRET`, alamat gateway, alamat Web ERP, client ID + secret OAuth
+Status per 2026-08-30, diukur bukan diingat:
+
+- ✅ Record DNS `mcp.bharatainternasional.com`, resolve ke `116.206.196.31` (sama dengan `api.*`)
+- ✅ Proxy host + sertifikat di Nginx Proxy Manager (`bip-erp/infra/npm/`); HTTPS dilayani openresty dan stream MCP tidak menggantung
+- ✅ Env daftar-izin `VAULT_MCP_ALLOWED_EMPLOYEES` terisi sembilan `employee_id`; sisa env (`JWT_SECRET`, alamat gateway, alamat Web ERP, client ID + secret OAuth) terbukti ada karena service naik dan alur OAuth menghasilkan sesi
+- 🔜 Deploy key repo vault dengan **hak tulis**, plus `user.name` / `user.email` git di container. Belum diperiksa, dan **baru dibutuhkan irisan 2**
 - Deploy prod **dijalankan manusia**, sesuai konvensi tim. Agent menyiapkan daftar container, urutan, perintah siap tempel, dan gerbang verifikasinya
 
 ## Di luar lingkup

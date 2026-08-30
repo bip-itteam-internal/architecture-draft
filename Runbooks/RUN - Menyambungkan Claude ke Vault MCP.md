@@ -1,4 +1,4 @@
-> **Status**: 🟡 Draft — prosedurnya belum pernah dijalankan sampai tuntas karena servicenya belum di-deploy. Naikkan ke ✅ Implemented setelah manager pertama benar-benar tersambung.
+> **Status**: ⚠️ Implemented (ada catatan) — servicenya sudah hidup di prod dan **tiga sesi sudah terbentuk**, jadi prosedur ini terbukti bisa dituntaskan. Yang belum bisa dipastikan: apakah salah satu dari tiga itu seorang manager dari claude.ai, atau semuanya dev yang menguji lewat `claude mcp add`. Naikkan ke ✅ setelah ada satu manager yang jelas tersambung dan mendapat jawaban bersumber vault. Diukur 2026-08-30.
 
 ## Tujuan
 
