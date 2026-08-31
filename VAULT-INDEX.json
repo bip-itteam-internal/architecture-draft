@@ -6860,20 +6860,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "702277e1c22c08472d7b00662d1d043e3d8f3ef984b9a85a41b5cfd659e567d8",
-      "ukuran_kb": 124.3,
-      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di produksi, mana yang sumber datanya sudah ada dan terisi, mana yang modulnya ada tapi datanya kosong, dan mana yang tak punya sumber sama sekali, sehingga skor bisa diisi otomatis alih-alih manual. Menjelaskan metrik yang sudah ber-auto di produksi, mesin reduksi/arah target, tiga jalur perhitungan skor, layar diagnostik Otomasi KPI, cara HR mengisi konfigurasinya sendiri, dan sebab kegagalan sumber (Kaizen, HRGA, tingkat tim).",
+      "hash": "103632630120dd99a46d38a4db09a82e3237bc645466264aad3728d6f4157b62",
+      "ukuran_kb": 125.6,
+      "ringkasan": "Menjawab: sumber data apa saja yang bisa mengisi skor KPI otomatis, metrik apa yang dibawa tiap sumber, dan kenapa sebuah metrik gagal terhitung. Memuat rincian sumber kinerja_toko dan insentif_profit (termasuk perbedaan sumbu periode ROAS: tanggal order tanpa cutoff vs hari-kirim dengan cutoff tanggal 25), mode monitoring parsial, gerbang peringatan yang pernah mematikan seluruh metrik marketing, serta aturan finalisasi skor. Juga menerangkan kenapa retur toko TikTok terbaca nol di mart dan dipindah ke sumber insentif.",
       "kata_kunci": [
-        "otomasi KPI",
-        "skor otomatis",
-        "auto config",
-        "sumber data KPI",
-        "kpi_score",
-        "kinerja_tiket",
-        "semi otomatis",
-        "layar diagnostik",
-        "kelayakan otomasi",
-        "311 metrik"
+        "KPI otomatis",
+        "auto scoring",
+        "sumber KPI",
+        "insentif_profit",
+        "kinerja_toko",
+        "ROAS",
+        "retur_persen",
+        "cutoff",
+        "monitoring parsial",
+        "finalisasi skor"
       ]
     },
     {
@@ -8828,20 +8828,19 @@
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman"
       ],
-      "hash": "8bc5e3545e5fec325d54589e9737ab1e5303768b698cfdbc51cc61a48c8c29ac",
-      "ukuran_kb": 17.3,
-      "ringkasan": "Menjawab: bagaimana menamai sumber/metrik katalog (dropdown Sumber data) dan metrik template (baris penilaian), termasuk aturan label (sebut yang diukur bukan target, hindari nomor tanpa makna, batas panjang w-60) dan aturan keterangan wajib. Menjelaskan pula bahwa metrik baru wajib didaftarkan di empat tempat (kamus label, METRIK_DIKENAL, SATUAN_PER_METRIK, FORMULA_PER_METRIK), kenapa kamus metrik datar tak cukup, dan bahwa aturan dijaga oleh test bukan dokumen.",
+      "hash": "3da9604886e2d695e2f5180194cd9b0a9674ea43e2f0b490e5624ca3dc0ff195",
+      "ukuran_kb": 20.2,
+      "ringkasan": "Menjawab: bagaimana menamai sumber dan metrik KPI supaya pengisi template tak salah pilih, di mana label serta keterangannya ditulis, dan apa yang wajib dilakukan saat satu nama metrik dipakai lebih dari satu sumber. Memuat aturan panjang label, kewajiban keterangan menyebut menu asal angkanya, checklist empat tempat pendaftaran metrik baru, dan penegak yang menggantikan kalimat aturan: jaring runtime pembeda label kembar plus penjaga test atas entri khusus-sumber. Juga menerangkan kenapa nama metrik menyiratkan arah penilaian.",
       "kata_kunci": [
         "penamaan metrik",
-        "penamaan sumber KPI",
-        "label",
-        "description keterangan",
-        "kamus label",
-        "SATUAN_PER_METRIK",
-        "FORMULA_PER_METRIK",
-        "katalog sumber",
-        "kpi_template",
-        "konvensi penamaan"
+        "label KPI",
+        "METRIK_PER_SUMBER",
+        "keterangan metrik",
+        "i18n KPI",
+        "label kembar",
+        "arah metrik",
+        "naming convention",
+        "pemilih sumber data"
       ]
     },
     {
@@ -9143,21 +9142,18 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "a295f7d8145daeb4a9ab1d943764776fc28ebfc1be51507ef2e323eee7b49320",
-      "ukuran_kb": 40.0,
-      "ringkasan": "Menjawab: bagaimana langkah dev menambahkan satu metrik KPI yang terisi otomatis, yaitu memastikan metriknya layak, mendaftarkan sumber (lokal atau via HTTP ke service lain, lewat DaftarkanSumberBermetrik), lalu mengisi konfigurasi auto di template (formula reduksi, arah target, target berlapis per karyawan/periode/umum, pratinjau). Juga menjawab bagaimana menentukan arah naik atau turun dari bunyi KPI-nya dan kenapa salah arah tidak menimbulkan galat, model mentalnya (dihitung saat layar dibuka, dibekukan saat disimpan ke kpi_score), jebakan env dev, aturan yang tak boleh dilanggar, dan checklist sebelum PR.",
+      "hash": "5feefb8165d0d09ba01ddd54f2d94624c302b87b158ed8a4b4676ad41fc1aafe",
+      "ukuran_kb": 40.5,
+      "ringkasan": "Menjawab: langkah apa saja yang harus ditempuh developer untuk menambahkan sumber atau metrik KPI otomatis baru, pola sumber mana yang paling dekat untuk dicontoh, dan apa yang wajib diperiksa sebelum membuka PR. Memuat tabel sumber terdaftar beserta ciri khas tiap pola (lokal, lewat HTTP, multi-metrik, cakupan ratusan orang), jebakan yang sudah terbukti menggigit termasuk arah metrik yang salah dan label yang kembar antar-sumber, serta checklist pra-PR.",
       "kata_kunci": [
-        "runbook",
         "menambah metrik KPI",
-        "KPI otomatis",
-        "KPI automation",
-        "sumber KPI",
-        "arah target naik turun",
-        "KPIAutoConfig",
+        "sumber KPI baru",
+        "runbook KPI",
         "DaftarkanSumberBermetrik",
-        "reduksi arah target",
-        "TargetBerlaku",
-        "checklist PR"
+        "arah metrik",
+        "cakupan scope",
+        "checklist PR",
+        "KPI otomatis"
       ]
     },
     {

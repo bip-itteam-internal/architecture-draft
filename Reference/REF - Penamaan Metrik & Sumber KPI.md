@@ -137,6 +137,25 @@ Aturan ini soal penamaan, tetapi ada satu akibat penamaan yang tidak berhenti di
 
 Konsekuensinya di layar: kedua opsi akan tampil dengan label yang **sama persis** kalau labelnya hanya berkunci nama metrik. Karena itu ada `METRIK_PER_SUMBER` berkunci `${sumber}|${metrik}` yang menang lebih dulu, dan `infoMetrik(token, sumber?)` menerima sumber sebagai argumen opsional ([erp-frontend#1257](https://github.com/bip-itteam-internal/erp-frontend/pull/1257)). Pemanggil yang tak tahu sumbernya tetap mendapat label lama — tak ada yang mendadak kosong. **Saat menambah metrik yang namanya sudah dipakai sumber lain, entri per-pasangan itu wajib ikut**, kalau tidak pengisi template tak punya cara membedakan mana yang benar selain menebak.
 
+### ⛔ Aturan di atas dilanggar lagi tiga hari kemudian — dan jalan keluarnya bukan aturan keempat
+
+`roas` dan `roas_bersih` ditambahkan ke `insentif_profit` 2026-08-28 (bip-erp `71aa32a1`) **tanpa** entri `METRIK_PER_SUMBER`, sehingga pemilih menampilkan **empat** entri ROAS yang dua-dua berlabel dan berketerangan sama persis. Yang membuat kejadian ini layak dicatat: aturannya sudah tertulis **dua kali** — di dokumen ini (paragraf di atas) dan di [[RUN - Menambah Metrik KPI Otomatis]] baris tabel `insentif_profit` — dan tetap terlewat, karena yang menambah metrik di backend tak punya alasan membuka dokumen frontend. Ketahuannya dari layar, seperti dua kali sebelumnya.
+
+Bedanya bukan kosmetik: sumbu periodenya berlainan (tanggal order tanpa cutoff vs hari-kirim + cutoff tgl 25), dan prod 2026-08-26 mencatat median ROAS **4,06 vs 3,17** untuk 15 Account Specialist yang sama — cukup untuk menggeser siapa yang lolos target 4,5.
+
+**Karena itu aturannya kini punya penegak, bukan cuma kalimat** (erp-frontend `fix/kpi-label-roas-per-sumber`, 2026-08-31):
+
+| Lapis | Apa yang dilakukan | Batasnya |
+|---|---|---|
+| `bedakanLabelKembar` (`use-opsi-sumber.ts`) | Label yang muncul di lebih dari satu sumber dibubuhi nama sumbernya, saat itu juga | **Menyingkap** bahwa dua pilihan berbeda; TIDAK menjelaskan bedanya |
+| Penjaga `pasanganKhususSumber()` (`label-otomatis.aturan.test.ts`) | Tiap entri khusus-sumber wajib berlabel & berketerangan beda dari entri umumnya, ada di dua locale, `en` bukan salinan `id` | Hanya menjaga entri yang SUDAH ditulis |
+
+Daftar pasangan yang ditulis tangan sengaja **tidak** dipakai sebagai penjaga: daftar semacam itu bolong persis pada pasangan yang belum terpikirkan, dan bolongnya senyap — `METRIK_DIKENAL` di berkas yang sama memuat 14 dari 37 entri (lihat catatan di atas). Jaring runtime tak punya mode kegagalan itu.
+
+⚠️ **Jaring bukan pengganti kamus.** "Konversi (order) · Affiliate per tim" memberi tahu pengisi bahwa ada dua hal berbeda, tetapi keterangannya tetap keterangan yang salah sampai ada yang menulis entri kamusnya.
+
+**Temuan sampingan yang dibuka jaring itu**: `kinerja_affiliate_tim` ternyata sudah lama memakai label DAN keterangan milik `kinerja_affiliate` untuk `conversion` dan `affiliate_aktif` — kalimat "lewat akun **karyawan**" dan "**milik** karyawan" untuk metrik yang menilai satu tim channel, tempat semua staf di channel yang sama bernilai sama. Perbaikan `conversion` di erp-frontend [#1267](https://github.com/bip-itteam-internal/erp-frontend/pull/1267) menambahkan entri untuk `kinerja_live` dan melewatkan sumber tim ini. Kini keduanya punya entri sendiri (`mtkConversionTim`, `mtkAffiliateAktifTim`). **Perbaikan yang menutup satu tabrakan tidak menutup saudaranya** — itu pola yang sama dengan `SupervisedDepartments` yang harus diperbaiki dua kali dalam sehari.
+
 ## Cara memeriksa
 
 1. **Di layar, bukan di editor.** Buka pemilih Sumber data dan pastikan tak ada label yang terpotong dan tak ada opsi tanpa baris kedua.
