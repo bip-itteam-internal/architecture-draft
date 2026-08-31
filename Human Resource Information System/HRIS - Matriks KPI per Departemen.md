@@ -34,12 +34,13 @@ Dua departemen di `work_data` **tidak muncul di sini karena belum punya template
 ## Ralat 2026-08-31 Kaizen dan forecast kas
 
 > **Status ralat**: ✅ diverifikasi ke kode `bip-erp` `main` (`9734bea0`, 2026-08-28) pada 2026-08-31.
-> Yang diralat: **18 sel** berbunyi *"TIDAK ADA modul Kaizen/ide inovasi di sistem (pencarian nol
+> Yang diralat: **14 sel** berbunyi *"TIDAK ADA modul Kaizen/ide inovasi di sistem (pencarian nol
 > hasil di services + shared-library)"* dan **2 sel** berbunyi *"TIDAK ADA modul forecast/demand
 > planning"* pada metrik yang sebenarnya mengukur **forecast KAS** (Cost Control #4 dan Finance
-> Supervisor `Return on Operation`). Dua sel lain yang memakai kalimat yang sama — `Inventory turn
-> over 90 days` di Beauty Hacks dan Kyura — **tidak diralat dan memang tetap benar**: yang mereka
-> ukur adalah *demand planning*, dan modul itu memang tidak ada.
+> Supervisor `Return on Operation`). Empat sel Kaizen sisanya diralat **berbeda** karena bukan
+> hitungan ide (lihat "Batas ralat ini"). Dua sel lain yang memakai kalimat forecast yang sama —
+> `Inventory turn over 90 days` di Beauty Hacks dan Kyura — **tidak diralat dan memang tetap
+> benar**: yang mereka ukur adalah *demand planning*, dan modul itu memang tidak ada.
 
 ### Dua hal yang wajib dipisahkan
 
@@ -94,11 +95,11 @@ deskripsi tidak disentuh** — itu salinan `kpi_template` produksi. Angka pada t
 (kolom Otomatis / Semi / Terblokir / Manual) **tidak berubah**: metrik Kaizen tetap terhitung
 **manual**, sekarang karena keputusan, bukan karena ketiadaan modul.
 
-Empat sel berlabel Kaizen yang **tidak** dilayani sumber ini — `Inovation & Improvement` (Manufaktur
-Supervisor), `Kaizen 1` (CAPA produksi), `Kaizen 2` (kualitas produk 98%), dan `Kaizen dan Growth`
-(review SOP & WI) — ditandai terpisah di tempatnya masing-masing: labelnya menyebut Kaizen, tapi
-yang diukur bukan hitungan ide, sehingga `kaizen_ide_*` tak akan menjawabnya walau keputusan
-berbalik.
+Empat sel berlabel Kaizen **tidak** dilayani sumber ini dan karena itu diralat berbeda:
+`Inovation & Improvement` (Manufaktur Supervisor), `Kaizen 1` (jumlah CAPA produksi), `Kaizen 2`
+(kualitas produk 98% sesuai SOP QC), dan `Kaizen dan Growth` (review SOP & WI). Labelnya menyebut
+Kaizen, tapi yang diukur bukan hitungan ide — jadi `kaizen_ide_*` tak akan menjawabnya walau
+keputusan B dicabut. Masing-masing ditandai di tempatnya dengan sumber yang sebenarnya dituju.
 
 ## Cacat yang sudah diketahui
 
@@ -764,7 +765,7 @@ Template `R&D REGULATORY`, 4 metrik.
 |---:|---|---|---|---|
 | 0.1 | `Zero major finding saat external audit dengan BPOM` | memastikan seluruh aktivitas sesuai regulasi (BPOM, GMP, HACCP, dll) | TIDAK ADA tracker pajak/audit internal/CAPA/izin BPOM. | Belum bisa otomatis. Temuan audit, pelaporan pajak, dan izin BPOM belum dicatat di sistem. |
 | 0.4 | `Net income 20%` | Product Development Support | Accurate live proxy: /accounting/profit-loss, /balance-sheet, /profit/cash-flow, /fixed-assets. | Bisa otomatis sekarang. Laporan laba rugi dan arus kas diambil langsung dari Accurate. |
-| 0.25 | `Inovation & Improvement` | Meningkatkan Inovasi & Efisiensi Produk | ⚠️ **Bukan dilayani sumber Kaizen.** Modul Kaizen ADA (`kaizen_ide_diajukan`/`kaizen_ide_diterapkan`, lihat [[#Ralat 2026-08-31 Kaizen dan forecast kas]]), tetapi ia menghitung **jumlah ide**, sedangkan metrik ini mengukur "inovasi & efisiensi produk" yang tak punya definisi terukur di sistem mana pun. | Perlu didefinisikan ulang dulu. Modul pencatat ide sudah ada, tapi metrik ini tidak menyebut angka yang bisa dihitung dari sana — sepakati dulu dengan pemilik metrik apakah yang dinilai jumlah ide, atau hal lain. |
+| 0.25 | `Inovation & Improvement` | Meningkatkan Inovasi & Efisiensi Produk | ⚠️ **Bukan dilayani sumber Kaizen.** Modul Kaizen ADA ([[HRIS - Kaizen (Ide Perbaikan)]]) tetapi ia menghitung **jumlah ide**, sedangkan metrik ini mengukur "inovasi & efisiensi produk" yang tak punya definisi terukur di sistem mana pun — jadi `kaizen_ide_*` tak akan menjawabnya walau [[ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI]] dicabut. | Perlu didefinisikan ulang dulu. Modul pencatat ide sudah ada, tapi metrik ini tidak menyebut angka yang bisa dihitung dari sana — sepakati dulu dengan pemilik metrik apa sebenarnya yang dinilai. |
 | 0.25 | `New Product Readiness (Permit & Licence from BPOM) di Q1` | Penyelesaian izin BPOM & Halal sebelum deadline launching | TIDAK ADA tracker pajak/audit internal/CAPA/izin BPOM. | Belum bisa otomatis. Temuan audit, pelaporan pajak, dan izin BPOM belum dicatat di sistem. |
 
 ### Video Editor
@@ -923,8 +924,8 @@ Template `LEADER PRODUKSI`, 7 metrik.
 | 0.15 | `Proses Produksi 2` | Menurunkan waste pengolahan dan pengemasan. 1,5% | Production Log & Batch Record ADA di kode tapi KOSONG di prod (0 dokumen). Begitu dipakai, QA release time & waste langsung terhitung. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Catatan produksi dan batch record sudah ada menunya tapi belum dipakai. Begitu mulai diisi, angkanya terhitung sendiri. |
 | 0.15 | `Proses Produksi 3` | Menjaga pemenuhan target kuantiti produk yang diluluskan ≥ 98% | Production Log & Batch Record ADA di kode tapi KOSONG di prod (0 dokumen). Begitu dipakai, QA release time & waste langsung terhitung. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Catatan produksi dan batch record sudah ada menunya tapi belum dipakai. Begitu mulai diisi, angkanya terhitung sendiri. |
 | 0.15 | `Perfomance Monitoring` | Persentase operator produksi mencapai target KPI (Min. 70). | Sumber skor_tim + reduksi rasio_ambang (ambang = skor minimal, target = 100%). Cakupan team butuh work_data.supervisor_id terisi (2026-08-01: 54 dari 204). | Bisa otomatis, syaratnya data siapa atasan siapa sudah diisi. Per 1 Agustus baru 54 dari 204 karyawan yang terisi. |
-| 0.1 | `Kaizen 1` | Mengurangi Jumlah CAPA produksi yang ditemukan. | ⚠️ **Ralat 2026-08-31 — klaim lama "TIDAK ADA modul Kaizen" SALAH.** Modul Kaizen ADA ([[HRIS - Kaizen (Ide Perbaikan)]]) dan dua sumber KPI-nya terdaftar (`kaizen_ide_diajukan`, `kaizen_ide_diterapkan`, `kpi_sumber_kaizen.go:29-30`) memasok dari `GET /internal/kaizen/metrics`. **Namun Kaizen diputuskan TIDAK dipakai untuk otomasi KPI** ([[ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI]]). | **Tetap dinilai manual — karena keputusan, bukan karena sistemnya belum ada.** Menunya sudah ada di sistem, tetapi tidak dipakai untuk penilaian KPI sampai keputusan itu dicabut. |
-| 0.15 | `Kaizen 2` | Menjaga Kualitas Produk Target 98% ( Sesuai SOP QC ) | ⚠️ **Ralat 2026-08-31 — klaim lama "TIDAK ADA modul Kaizen" SALAH.** Modul Kaizen ADA ([[HRIS - Kaizen (Ide Perbaikan)]]) dan dua sumber KPI-nya terdaftar (`kaizen_ide_diajukan`, `kaizen_ide_diterapkan`, `kpi_sumber_kaizen.go:29-30`) memasok dari `GET /internal/kaizen/metrics`. **Namun Kaizen diputuskan TIDAK dipakai untuk otomasi KPI** ([[ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI]]). | **Tetap dinilai manual — karena keputusan, bukan karena sistemnya belum ada.** Menunya sudah ada di sistem, tetapi tidak dipakai untuk penilaian KPI sampai keputusan itu dicabut. |
+| 0.1 | `Kaizen 1` | Mengurangi Jumlah CAPA produksi yang ditemukan. | ⚠️ **Bukan dilayani sumber Kaizen** meski labelnya menyebutnya. Modul Kaizen ADA ([[HRIS - Kaizen (Ide Perbaikan)]]) tetapi menghitung jumlah ide; yang diukur baris ini adalah **jumlah CAPA produksi**, dan tracker CAPA memang TIDAK ADA di sistem. `kaizen_ide_*` tak akan menjawabnya walau [[ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI]] dicabut. | Belum bisa otomatis. Temuan dan tindak lanjut CAPA belum dicatat di sistem — itu yang perlu dibuatkan, bukan modul ide perbaikan. |
+| 0.15 | `Kaizen 2` | Menjaga Kualitas Produk Target 98% ( Sesuai SOP QC ) | ⚠️ **Bukan dilayani sumber Kaizen** meski labelnya menyebutnya. Yang diukur adalah **persentase kualitas produk sesuai SOP QC**, bukan jumlah ide. Sumbernya batch record & production log, yang ADA di kode tapi KOSONG di prod (0 dokumen). | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Catatan produksi dan batch record sudah ada menunya tapi belum dipakai. |
 | 0.15 | `Realisasi Produksi` | Meningkatkan pelaksanaan rencana produksi sesuai dengan realisasi produksi ≥ 98% | Production Log & Batch Record ADA di kode tapi KOSONG di prod (0 dokumen). Begitu dipakai, QA release time & waste langsung terhitung. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Catatan produksi dan batch record sudah ada menunya tapi belum dipakai. Begitu mulai diisi, angkanya terhitung sendiri. |
 
 ### Manufacturing Supervisor
@@ -1032,7 +1033,7 @@ Template `KPI QA Staff`, 4 metrik.
 | 0.4 | `Average QA relelase time sejak batch production selesai` | Melakukan percepatan pre-check batch record dengan target <20 jam batch record setelah dokumen diterima | Production Log & Batch Record ADA di kode tapi KOSONG di prod (0 dokumen). Begitu dipakai, QA release time & waste langsung terhitung. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Catatan produksi dan batch record sudah ada menunya tapi belum dipakai. Begitu mulai diisi, angkanya terhitung sendiri. |
 | 0.15 | `Testing cost per batch turun 15% dengan optimalisasi alat dan metode` | Testing alat ukur bulanan terselesaikan sesuai jadwal | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
 | 0.25 | `Zero major finding saat external audit (BPOM)` | Melakukan audit area QC, porduksi, penyimpanan, serta dokumen setiap 2x dalam sebulan | TIDAK ADA tracker pajak/audit internal/CAPA/izin BPOM. | Belum bisa otomatis. Temuan audit, pelaporan pajak, dan izin BPOM belum dicatat di sistem. |
-| 0.2 | `Kaizen dan Growth` | Melakukan Review Kesesuaian SOP & WI di Area Produksi dengan target 5 produk/bulan | ⚠️ **Ralat 2026-08-31 — klaim lama "TIDAK ADA modul Kaizen" SALAH.** Modul Kaizen ADA ([[HRIS - Kaizen (Ide Perbaikan)]]) dan dua sumber KPI-nya terdaftar (`kaizen_ide_diajukan`, `kaizen_ide_diterapkan`, `kpi_sumber_kaizen.go:29-30`) memasok dari `GET /internal/kaizen/metrics`. **Namun Kaizen diputuskan TIDAK dipakai untuk otomasi KPI** ([[ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI]]). | **Tetap dinilai manual — karena keputusan, bukan karena sistemnya belum ada.** Menunya sudah ada di sistem, tetapi tidak dipakai untuk penilaian KPI sampai keputusan itu dicabut. |
+| 0.2 | `Kaizen dan Growth` | Melakukan Review Kesesuaian SOP & WI di Area Produksi dengan target 5 produk/bulan | ⚠️ **Bukan dilayani sumber Kaizen** meski labelnya menyebutnya. Yang diukur adalah **jumlah review SOP & WI per bulan**, bukan jumlah ide perbaikan. Tak ada tracker review SOP/WI di sistem. | Belum bisa otomatis. Yang perlu dibuatkan adalah tempat mencatat review SOP & WI, bukan modul ide perbaikan (yang sudah ada). |
 
 ### QC Assistant
 
