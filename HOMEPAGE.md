@@ -65,7 +65,7 @@ Service adalah end-point yang berinteraksi dengan database-nya masing-masing (da
 
 **Microservices** → [[Microservices - Employee Service]] · [[Microservices - Attendance Service]] · [[Microservices - Notification Service]] · [[Microservices - File Service]] · [[Microservices - Insentive Service]] · [[Microservices - Integration Service]] · [[Microservices - Inventory Service]] · [[Microservices - Task Management Service]] · [[Microservices - TikTok Shop Service]]
 
-**Aplikasi** → [[BASE - Enterance Point]] · [[APP - Web ERP]] · [[APP - MyBharata]] · [[APP - Dynamic Task Tracker]] · [[APP - Ideamills]] · [[APP - Tiktok Insight Analyzer]] · [[APP (Extension) - Fingerprint Listener (Complete)]] · [[APP - Portal Karir Bharata]] (portal karir publik)
+**Aplikasi** → [[BASE - Enterance Point]] · [[APP - Web ERP]] · [[APP - MyBharata]] · [[APP - Dynamic Task Tracker]] · [[APP - Ideamills]] · [[APP - Tiktok Insight Analyzer]] · [[APP (Extension) - Fingerprint Listener (Complete)]] · [[APP - Portal Karir Bharata]] (portal karir publik) · [[APP - Buku Besar Konsolidasi CV FINCON]] (akuntansi 40 CV, **di luar ERP** — [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]])
 
 **Domain (Big Pictures)** → [[HRIS - Big Pictures]] · [[Sales - Big Pictures]] · [[GA - Big Pictures]] · [[IT - Big Pictures]] · [[WH - Management System]] · [[Finance - Big Pictures]]
 

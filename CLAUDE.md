@@ -109,6 +109,7 @@ Untuk dok konsep murni: `## Latar Belakang`, `## Ruang Lingkup`, `## Belum Diput
 | `scraping` (Python/FastAPI) | `Application/APP - Tiktok Insight Analyzer` (app) & `Sales/Sales - TikTok Sentiment Pipeline` (konsep) |
 | `website-bharata` (Next.js + Go, **repo terpisah**, bukan bip-erp) | `Application/APP - Website Bharata Internasional` |
 | `career-bharata` (Next.js 16, **repo terpisah**; konsumen `/public/recruitment/*`) | `Application/APP - Portal Karir Bharata` |
+| `consolidated-accounting-app` (Next.js 16 + Supabase, **repo PRIBADI di luar org**; tidak menyentuh gateway) | `Application/APP - Buku Besar Konsolidasi CV FINCON` (app) & `Decisions/ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate` (arah) |
 
 **Area non-kode (tanpa repo):**
 - `Quality & Regulatory/*` ← sumber = **SOP/sertifikat QA-RA Bharata** (CPOB/BPOM/CDOB; diisi tim QA — bukan dari kode).

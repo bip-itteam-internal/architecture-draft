@@ -19,6 +19,11 @@ ERP internal (bip-erp) **tidak membangun akuntansi double-entry / general ledger
 - ➖ Fitur ERP yang mengasumsikan akuntansi internal (mis. modul Accounting/Double-Entry penuh) **out-of-scope**.
 - ⚠️ Perubahan integrasi harus menjaga kontrak ke Accurate; jangan menulis balik sembarangan.
 
+## Ditantang keadaan (2026-08-31, belum diputuskan)
+
+⚠️ Sejak 5 Agustus 2026 berjalan sebuah general ledger + konsolidasi untuk 40 CV grup di luar ERP dan di luar Accurate — persis yang dinyatakan out-of-scope di atas. Keputusan ini **belum dicabut maupun diamandemen**; pilihan arahnya dikumpulkan di [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]] (🟡 Proposed), sistemnya di [[APP - Buku Besar Konsolidasi CV FINCON]]. Jangan menyimpulkan ADR ini sudah gugur — sampai ADR 0068 diputuskan, yang berlaku tetap yang tertulis di sini.
+
 ## Dokumen Terkait
 
 - [[Finance - Big Pictures]] · [[External - Accurate]] · [[Finance - Bridging App]]
+- [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]] · [[APP - Buku Besar Konsolidasi CV FINCON]]
