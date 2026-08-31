@@ -4,7 +4,7 @@
 
 > **Prinsip tiga lapis** (keputusan pemilik produk, 2026-08-06): kalender memuat **data diri sendiri**, **pekerjaan sendiri**, dan **agenda perusahaan**. Data pribadi orang lain **tidak boleh** masuk, sekalipun pemanggilnya seorang supervisor. Prinsip ini yang menutup insiden privasi di bawah, dan ia mengikat semua feed baru.
 
-- **Status**: ⚠️ Implemented (ada catatan) — agregasi + agenda mandiri **live di DEV** dan terverifikasi lewat gateway. **Mesin kewajiban (irisan 3) SUDAH ada di `main`** sejak PR [#1074](https://github.com/bip-itteam-internal/bip-erp/pull/1074) (2026-08-07), tetapi baru separuh: template, periode, dan tagihan berjalan sendiri, sementara **jalur pemakainya belum ada sama sekali** (§ Mesin kewajiban). **PROD tertinggal**: baru sampai irisan 1.
+- **Status**: ⚠️ Implemented (ada catatan) — agregasi + agenda mandiri live dan terverifikasi lewat gateway. **Mesin kewajiban (irisan 3) SUDAH ada di `main`** sejak PR [#1074](https://github.com/bip-itteam-internal/bip-erp/pull/1074) (2026-08-07), tetapi baru separuh: template, periode, dan tagihan berjalan sendiri, sementara **jalur pemakainya belum ada sama sekali** (§ Mesin kewajiban). ⛔ **Diukur 2026-08-31: mesin kewajiban HIDUP DI PRODUKSI**, cron-nya berjalan, dan satu panggilan API sudah cukup untuk menagih orang atas kewajiban yang mustahil dipenuhi — lihat § Keadaan terukur.
 - **Stack**: Go + Fiber + MongoDB (`calendar_db`; koleksi `calendar_events`, `obligation_templates`, `obligation_periods`, `obligation_fulfillments`). Env `MONGO_CALENDAR_DB` **wajib**; tanpa itu service tetap hidup tapi seluruh agenda mandiri membalas 500. `EMPLOYEE_MODULE_URL` dipakai potret peserta kewajiban dan sengaja opsional (kosong = potret tertunda, bukan service mati).
 - **Path di repo**: `bip-erp/services/calendar/` · FE: `erp-frontend/src/features/calendar/` + `src/app/(main)/calendar/`
 - **Rute gateway**: `/api/calendar/*` (entri `"calendar"` di map `InternalURL` [[CORE - API Master Gateway]]; masuk `noCacheRoutes`).
@@ -138,6 +138,26 @@ Baca ini sebelum menambah apa pun; sebagian besar tak akan tertebak dari bentuk 
 
 **Uji yang sudah ada**: `obligation_template_test.go`, `obligation_audience_test.go`, `obligation_window_test.go`, `obligation_cron_test.go`. Seluruhnya menguji fungsi murni dan validasi. **Belum ada satu pun test yang melewati Fiber** untuk rute template, jadi kelas cacat glue handler yang sudah menggigit service lain belum tergerbang di sini.
 
+### Keadaan terukur (2026-08-31, DEV dan PROD)
+
+Diukur langsung, bukan disimpulkan dari `git log`. Catatan lama "PROD tertinggal, baru sampai irisan 1" **sudah tidak berlaku**.
+
+| | DEV `10.10.10.121` | PROD `116.206.196.31` |
+|---|---|---|
+| Container | `Calendar-Service` healthy | `Calendar-Service` healthy |
+| Umur image `bip-erp-calendar-service` | 2026-08-31 10:12 WIB | 2026-08-31 10:17 WIB |
+| `grep -ac obligation_templates /service` | 1 | 1 |
+| `grep -ac 'cron kewajiban aktif' /service` | 1 | 1 |
+| `GET /health` (kontrol positif) | 200 | 200 |
+| `GET /obligations/zzz-karangan` (kontrol negatif) | **404** | **404** |
+| `GET /obligations/templates` | **200** `{"items":[]}` | **200** |
+
+Kontrol negatif ber-prefiks sama itu yang membedakan "rutenya ada" dari "apa pun dijawab 200"; tanpanya tabel ini tak membuktikan apa-apa. Isi `calendar_db` produksi: `obligation_templates` **0**, `obligation_periods` **0**, `obligation_fulfillments` **0**, `calendar_events` **1**.
+
+⛔ **Karena itu angka nol di produksi BUKAN kabar baik, melainkan satu-satunya hal yang menahan kerusakan.** Mesinnya hidup dan cron-nya berjalan tiap jam; yang belum terjadi hanyalah seseorang membuat template pertama. Rutenya terjangkau dari internet lewat gateway (`CALENDAR_MODULE_URL` terpasang, `/api/calendar/*` di-proxy), dan gerbangnya `RequireHRISSupervisor` — jadi **satu `POST` dari akun HR supervisor sudah cukup**. Sesudah itu cron menerbitkan tagihan bagi seluruh sasaran, tak seorang pun punya cara memenuhinya, dan pada `closes_at + grace_days` semuanya ditandai `missed` secara permanen (statusnya ditulis, bukan dihitung ulang saat dibaca).
+
+Yang perlu diputuskan pemilik produk, dan sengaja tidak diputuskan di sini: apakah `POST /obligations/templates` sebaiknya ditahan sampai jalur pemakainya ada, dan kalau ya, ditahan dengan cara apa. Menonaktifkan cron **tidak** cukup — template yang telanjur dibuat akan mulai menagih begitu cron dinyalakan lagi.
+
 ### Jalan menuju metrik KPI "Monitoring Kegiatan Sinkronisasi/Review"
 
 Modul ini adalah rumah yang sudah ditetapkan untuk metrik Fullstack `Implementasi` (bobot 0,2, deskripsi "Monitoring Implementasi Sinkronisasi/Review dengan Requester") di [[HRIS - Matriks KPI per Departemen]], dan untuk 9 metrik log 1-on-1 di [[HRIS - Otomasi Skor KPI]] butir 12 yang sejalan dengan [[HRIS - Work Review]]. Yang masih memisahkan keduanya, berurut:
@@ -169,7 +189,7 @@ Pelajarannya: **"boleh diakses" bukan "layak muncul di kalender"**. Kalender ada
 
 - **Jadwal club/komunitas — TERBLOKIR.** Datanya masih konstanta di frontend ([[Microservices - Employee Service]] tidak menyimpannya), jadi belum ada yang bisa dijadikan feed. Butuh keputusan pemilik data lebih dulu: HR mengelolanya lewat UI (perlu master data + halaman pengelolaan baru) atau IT yang menanamnya (read-only, di-seed).
 - **Irisan 3, sesi wajib — SEBAGIAN sudah ada, rinciannya di § Mesin kewajiban.** Template, periode, potret peserta, dan penerbitan tagihan berjalan sejak PR [#1074](https://github.com/bip-itteam-internal/bip-erp/pull/1074) (2026-08-07); polanya menyalin `FormPeriod` di [[Microservices - Form Builder Service]] yang sudah terbukti di produksi. Yang **belum** ada: rute pemakai, papan kepatuhan, feed `obligation`, rute internal KPI, dan frontend. Yang tetap berlaku sebagai rancangan: yang wajib memilih sendiri lawan sesinya dari kandidat yang lolos aturan `counterpart` per-template, ditegakkan **di server** bukan sekadar dipakai menyaring dropdown; dan menjadwalkan **tidak** langsung memenuhi kewajiban, pertemuannya tetap harus ditandai selesai supaya angka kepatuhan mengukur kenyataan, bukan niat.
-- **Belum diverifikasi: apakah biner kewajiban sudah naik ke DEV maupun PROD.** Kodenya ada di `main`, tetapi kehadirannya di container yang berjalan belum diukur — TBD. Sensus produksi 2026-08-28 mencatat **0 template, 0 periode, 0 pemenuhan**, dan angka nol itu belum dapat dibedakan antara "belum ada yang membuat template" dan "binernya memang belum di sana".
+- ✅ **Sudah diverifikasi 2026-08-31, lihat § Keadaan terukur.** Biner kewajiban ada di DEV **dan** PROD; angka nol di produksi berarti "belum ada yang membuat template", bukan "binernya belum di sana".
 - **TIDAK ADA persetujuan lawan** (keputusan pemilik produk 2026-08-07, membatalkan rancangan sebelumnya). Sesi wajib dihitung sebagai KPI, jadi agenda yang menunggu tombol setuju berarti **kepatuhan seseorang ditentukan oleh kecepatan orang lain merespons**: yang sudah menjadwalkan tepat waktu bisa tercatat lalai hanya karena lawannya tak membuka aplikasi. Lawan **diberi tahu, bukan dimintai izin**. Konsekuensi yang diterima: kalender tak tahu apakah lawan bisa hadir, bentroknya baru ketahuan saat harinya tiba, dan diselesaikan lewat percakapan biasa. Akibatnya `POST /events/:id/respond` **tidak dibuat**, status `proposed` dihapus dari `obligation_fulfillments`, dan `EventParticipant.Status` tetap `pending` untuk semua peserta tanpa ada yang membacanya (field-nya dipertahankan hanya karena dokumen lama memuatnya).
 - **Belum ada**: booking ruang meeting, pengingat lewat [[Microservices - Notification Service]], kalender di [[APP - MyBharata]], seret untuk menggeser agenda.
 
