@@ -6973,24 +6973,22 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "d253d4901f6ad3be6f9d1eb698705e94b046fd14475e31e3b2079d7b27597cc4",
-      "ukuran_kb": 127.5,
-      "ringkasan": "Menjawab: metrik KPI mana yang sumber datanya sudah ada di ERP sehingga bisa diisi otomatis, mana yang modulnya ada tapi datanya kosong, dan mana yang memang tak punya sumber sama sekali. Memuat daftar metrik `auto` yang benar-benar menyala di produksi beserta sumber, formula reduksi, scope, dan targetnya, plus penjelasan kenapa sebuah sumber bisa gagal (dan bedanya gagal vs data belum ada), tiga jalur perhitungan skor yang tak boleh disentuh sebagian, serta layar diagnostik Otomasi KPI untuk melihat metrik yang macet satu departemen sekaligus. Juga menjelaskan bagaimana HR mengisi konfigurasi otomatis sendiri, kasus KPI ICC, arah target yang salah baca, kenapa skor tim bisa nol, dan bahwa skor yang sudah beku tidak ikut terperbaiki.",
+      "hash": "4a3afd5050fe28281b3f20169b4a2d79d6357cdcb97c64b803874132db190cfd",
+      "ukuran_kb": 128.4,
+      "ringkasan": "Menjawab: metrik KPI mana yang bisa diisi otomatis dari data yang sudah dimiliki ERP, sumber data apa saja yang terdaftar (kinerja_tiket, kinerja_tiket_divisi, skor_tim, uptime_sistem, kedisiplinan_absensi, dan lainnya), serta bagaimana blok konfigurasi auto pada kpi_template disusun lewat sumber, formula, scope, dan target termasuk target per karyawan dan target bertahap. Menjelaskan juga kenapa sebuah metrik gagal hitung atau berstatus semi alih-alih bernilai nol, di layar mana diagnostiknya dilihat (modal Score KPI dan halaman Otomasi KPI), bagaimana usulan nilai otomatis muncul ke penilai, dan bagaimana skor total per orang dihitung. Melengkapi HRIS - Key Performance Index dengan klasifikasi seluruh metrik per departemen, peta metrik ke sumber data, serta metrik yang modulnya ada tapi datanya kosong atau memang tak punya sumber sama sekali.",
       "kata_kunci": [
-        "KPI",
-        "otomasi KPI",
-        "skor otomatis",
-        "auto value",
+        "otomasi skor KPI",
+        "KPI otomatis",
+        "auto-values",
         "kpi_template",
         "kpi_score",
-        "employee service",
-        "sumber KPI",
-        "metrik",
-        "scope",
-        "target",
-        "reduksi",
-        "skor tim",
-        "kinerja tiket"
+        "sumber data KPI",
+        "kinerja_tiket",
+        "skor_tim",
+        "formula rasio_ambang",
+        "target per karyawan",
+        "KPI automation",
+        "halaman Otomasi KPI"
       ]
     },
     {
@@ -8945,23 +8943,21 @@
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman"
       ],
-      "hash": "ffac900a02f0705cb4fbda4ff66c78db3d82b23f6681517911822ac594cd315e",
-      "ukuran_kb": 22.8,
-      "ringkasan": "Menjawab: bagaimana aturan menamai sumber/metrik katalog (dibuat dev, tampil di dropdown Sumber data) dan metrik template (dibuat HR, tampil sebagai baris penilaian), termasuk larangan menaruh angka target di label, larangan nomor tanpa makna, batas panjang agar tak terpotong di kontrol `w-60`, dan kewajiban keterangan yang menyebut apa yang dihitung sekaligus dari menu mana angkanya bisa dilihat. Menjelaskan bahwa metrik baru wajib didaftarkan di empat tempat (kamus label, `METRIK_DIKENAL`, `SATUAN_PER_METRIK`, `FORMULA_PER_METRIK`), kenapa penjaganya berupa test bukan dokumen, dan kenapa kamus metrik yang datar tak cukup ketika satu nama metrik dipakai beberapa sumber dengan arti berbeda. Juga menjawab bagaimana cara mengganti label yang sudah dipakai dan cara memeriksanya.",
+      "hash": "c4dcb0dce0181b68ca9248f3fd1aadb0aa0a5a876b4e66a5d1fbf1b688f2b6b0",
+      "ukuran_kb": 23.0,
+      "ringkasan": "Menjawab: bagaimana menamai sumber dan metrik katalog KPI yang dibuat dev (tampil di dropdown Sumber data) serta metrik template yang dibuat HR (tampil sebagai baris penilaian), termasuk siapa yang menanggung akibat bila namanya buruk. Memuat aturan label (menyebut yang diukur bukan targetnya, tidak bernomor tanpa makna, tidak melewati batas lebar kontrol sehingga terpotong) dan aturan keterangan (wajib, menyebut menu asal angkanya, tidak dipakai dua label, dan menjadi tempat target untuk metrik manual). Menjawab juga di empat tempat mana metrik baru wajib didaftarkan (kamus label, METRIK_DIKENAL, SATUAN_PER_METRIK, FORMULA_PER_METRIK), kenapa nama metrik menyiratkan arah, dan cara memeriksa kepatuhannya lewat test bukan lewat dokumen.",
       "kata_kunci": [
         "penamaan metrik",
+        "naming convention KPI",
         "label KPI",
-        "naming convention",
-        "sumber KPI",
-        "katalog metrik",
         "kamus label",
-        "keterangan",
-        "description",
+        "label-otomatis",
+        "keterangan metrik",
+        "description kpi_template",
         "SATUAN_PER_METRIK",
         "FORMULA_PER_METRIK",
-        "kpi_template",
-        "i18n",
-        "erp-frontend"
+        "katalog sumber KPI",
+        "metric naming"
       ]
     },
     {

@@ -103,9 +103,9 @@ Checklist **empat tempat**, apa adanya:
 
 ⚠️ Metrik ini **tidak** butuh `METRIK_PER_SUMBER`: namanya tidak dipakai sumber lain mana pun (per 2026-08-31). Bila kelak dipakai, entri per-pasangan wajib ikut.
 
-### 🟡 `piutang_lewat_90_persen` — metrik ketiga rumpun AR (branch `feat/kpi-piutang-lewat-90`)
+### ✅ `piutang_lewat_90_persen` — metrik ketiga rumpun AR
 
-Metrik baru pada sumber **`kinerja_ar`** yang sudah ada, untuk `Pengawasan 100% AR aging ≤ 90 hari.` (template `AR Staff 2026`, bobot **0,50**). **Belum merge/prod.** Dicatat di sini karena ia menempuh checklist empat-tempat dengan hasil yang sama dengan `rasio_beban_non_ops_persen`, dan karena penjaganya menyingkap pelanggaran pada dua metrik yang SUDAH lama hidup.
+Metrik baru pada sumber **`kinerja_ar`** yang sudah ada, untuk `Pengawasan 100% AR aging ≤ 90 hari.` (template `AR Staff 2026`, bobot **0,50**). **Live di dev & prod 31 Agustus 2026** (bip-erp [#1579](https://github.com/bip-itteam-internal/bip-erp/pull/1579), erp-frontend [#1351](https://github.com/bip-itteam-internal/erp-frontend/pull/1351)); konfigurasi templatenya belum dinyalakan HR. Dicatat di sini karena ia menempuh checklist empat-tempat dengan hasil yang sama dengan `rasio_beban_non_ops_persen`, dan karena penjaganya menyingkap pelanggaran pada dua metrik yang SUDAH lama hidup.
 
 | Locale | Label | Keterangan |
 |---|---|---|
@@ -122,7 +122,7 @@ Kunci i18n: `hris.kpi.mtkPiutangLewat90` / `…Ket`.
 | `FORMULA_PER_METRIK` | ⬜ tidak diisi | sama alasannya dengan seluruh sumber grup Finance yang tak memanggil `DaftarkanFormulaSumber` |
 | `METRIK_PER_SUMBER` | ⬜ tidak perlu | nama metriknya tak dipakai sumber lain mana pun (per 2026-08-31) |
 
-⛔ **Keterangannya menyebut ARAH, dan itu bukan kelebihan melainkan keharusan di sini.** Metrik ini berbobot 0,50 dengan realisasi wajar di bawah satu persen, jadi arah `naik` yang keliru memberi **skor penuh setiap bulan** tanpa satu pun galat, sementara kalimat penjelas di layar ikut membenarkannya. Layar Atur Target membuka dengan toggle "Makin besar makin baik", sehingga keterangan adalah satu-satunya tempat pengisi membaca arah yang benar pada saat ia memilih. Penjaganya `label-otomatis.aturan.test.ts` menuntut frasa arahnya ada di **kedua** locale.
+⛔ **Keterangannya menyebut ARAH, dan itu bukan kelebihan melainkan keharusan di sini.** Metrik ini berbobot 0,50, jadi arah `naik` yang keliru memberi **skor penuh** tanpa satu pun galat, sementara kalimat penjelas di layar ikut membenarkannya. Terukur di prod: realisasi Juli 2026 **11,76%** bernilai 8,5 pada arah `turun` target 1, dan akan bernilai **100** bila arahnya terbalik. Layar Atur Target membuka dengan toggle "Makin besar makin baik", sehingga keterangan adalah satu-satunya tempat pengisi membaca arah yang benar pada saat ia memilih. Penjaganya `label-otomatis.aturan.test.ts` menuntut frasa arahnya ada di **kedua** locale.
 
 ⚠️ **Penjaga satuan yang ditulis bersamanya memerahkan DUA metrik yang sudah lama dipakai template produksi**: keterangan `piutang_lewat_14_persen` dan `piutang_lewat_60_persen` sama sekali tak menyebut satuan maupun arah. Keduanya ikut dibetulkan, satu frasa masing-masing. Polanya sama dengan temuan `kinerja_affiliate_tim` di bawah: **penjaga yang ditulis untuk entri baru hampir selalu menemukan entri lama yang melanggar aturan yang sama**, dan itu justru gunanya.
 
