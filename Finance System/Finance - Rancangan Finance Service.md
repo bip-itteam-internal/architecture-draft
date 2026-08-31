@@ -1173,6 +1173,12 @@ induk yang menjumlahkan kedua baris gaji.
 | 5 | **Setuju input berstruktur menggantikan unggah dokumen sebagai dasar penilaian?** Kolom `SISTEM ERP` di Excel KPI meminta `FITUR UP DOKUMEN` untuk **7 dari 9** metrik Tax | SPV FAT + Tax Officer | Kita membangun yang tak diminta, atau membangun yang diminta tapi KPI-nya tetap manual |
 | 6 | **Pola tenggat per jenis pajak** — jatuh tempo setor, jatuh tempo lapor, dan urutannya, untuk PPh 21/23/25, PPh 4 ayat 2, PPN Masa | Tax Officer | Mesin status dan perhitungan "tepat waktu" tak punya dasar |
 
+> **Ditinjau ulang 2026-08-31** ([[ANALISA - KPI Tax Officer]]), dan kedua keputusan di atas **masih berdiri**. Tiga hal yang berubah sejak bab ini ditulis:
+>
+> - ⛔ **Kerangkanya sudah mendarat tanpa isi, dan tak ada yang berbunyi.** `services/finance/db.go:16-19` mendeklarasikan `pajak_kewajiban`, `pajak_spt`, `pajak_temuan`, dan `pajak_klasifikasi_akun`; `git grep` atas keempatnya di seluruh `services/` hanya mengembalikan baris deklarasinya sendiri, nol pemanggil (kontrol positif: `rekomendasiCollection` muncul 5× di `rekomendasi.go`). Konstanta paket di Go tidak memicu galat "declared but not used", jadi keadaan ini bisa bertahan tanpa satu pun tanda.
+> - ✅ **Mesin untuk dua register terbesar sudah ada di service lain.** Kewajiban per masa cocok dengan **modul obligation `calendar-service`** (template + periode + fulfillment + grace days + status `missed` yang ditulis cron, bukan dihitung saat dibaca), dan alur unggah-plus-persetujuan sudah utuh di **modul Laporan `form-builder`** (keputusan per butir, unggah ulang butir yang ditolak, antrean penyetuju, validasi terhadap snapshot periode). Keduanya membuat lingkup modul Tax jauh lebih kecil daripada yang tergambar di bab rancangan.
+> - ⛔ **Celah yang belum tercatat di mana pun: tidak ada aritmetika HARI KERJA di seluruh repo.** Dikonfirmasi `git grep`; satu-satunya `HariKerja` yang ada adalah penyebut kehadiran di attendance, dan seluruh SLA yang ada berbasis jam kalender. Metrik "temuan ditindaklanjuti ≤ **10 hari kerja**" menuntut helper baru di atas koleksi `holidays` yang sudah ada.
+
 ### Menghentikan modul Cost Control (bobot 0,25+)
 
 | # | Keputusan | Pemilik | Bila tak dijawab |

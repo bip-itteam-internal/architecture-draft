@@ -507,6 +507,14 @@ Template `KPI Senior Accounting Bharata`, 8 metrik.
 
 Template `KPI Tax Officer`, 8 metrik.
 
+> ⚠️ **Tiga vonis di tabel bawah sudah dikoreksi 2026-08-31** lewat pengukuran langsung ke produksi ([[ANALISA - KPI Tax Officer]]). Tabelnya sengaja dibiarkan apa adanya sebagai salinan setia audit 2026-08-01; koreksinya di sini.
+>
+> 1. ⛔ **"Budget TIDAK tersimpan di ERP mana pun" (baris 0,15) KEDALUWARSA.** Master `anggaran_opex` kini terisi 233 baris (2026-07 s/d 2026-12, 40 akun), dan metriknya **sudah bisa dinyalakan tanpa satu baris kode** lewat sumber `varians_anggaran`/`varians_persen`. Pratinjau produksi Tax Staff periode 2026-07: realisasi varians **39,06%**, nilai **12,8**, status `semi` dengan cakupan **28,06%** ("39 dari 139 pos terhitung"). Cakupannya rendah karena anggaran baru terisi untuk 3 departemen; menaikkannya pekerjaan pengisian master data, bukan dev.
+> 2. ⛔ **Dua baris bervonis "Bisa otomatis sekarang" KELIRU, bobot gabungan 0,30.** `Kepatuhan pajak … 1` (rekonsiliasi bulanan) dan `… 3` (temuan ditindaklanjuti ≤ 10 hari kerja) menyebut `/accounting/profit-loss` dan `/balance-sheet` sebagai sumber. Laba rugi Accurate tidak menyimpan temuan maupun tanggal tindak lanjutnya. Ini kelas yang sudah dinamai [[Finance - Rancangan Finance Service]]: **sumber datanya ada, tetapi bukan sumber untuk hal yang diukur** — sama dengan kekeliruan `Pencatatan Piutang`/`Pencatatan Retur` di rumpun AR.
+> 3. ⚠️ **Baris 0,15 mengukur dua hal berbeda.** Labelnya `Varians antara budget vs realisasi OPEX ≤ ±5%` (bisa otomatis), deskripsinya bicara **deductible vs non-deductible** (mustahil: tak ada satu pun penanda deductible di data mana pun, diperiksa pada lima koleksi produksi). Harus diselesaikan pemilik metrik sebelum otomasi, sebab yang mengikat adalah hal yang benar-benar dihitung sumbernya.
+>
+> ⚠️ Tiga metrik berlabel `Kepatuhan pajak 100% setiap bulan 1/2/3` melanggar [[REF - Penamaan Metrik & Sumber KPI]] (label bernomor tanpa makna). Sebabnya: yang masuk kolom `label` adalah **area kinerja**, KPI-nya turun ke `description` — terbalik dari template lain.
+
 | Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
 | 0.15 | `Varians antara budget vs realisasi OPEX ≤ ±5%` | Memastikan perlakuan PPh dan PPN tepat (deductible vs non deductible) - Potensi untuk menekan biaya non-deuctible 10% | Budget TIDAK tersimpan di ERP mana pun. Realisasi ada di Accurate; perlu master anggaran lebih dulu. | Belum bisa otomatis. Pengeluarannya sudah tercatat, tapi anggarannya belum pernah dimasukkan ke sistem, jadi tidak ada yang bisa dibandingkan. |

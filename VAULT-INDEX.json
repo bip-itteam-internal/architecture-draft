@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-31",
-  "jumlah_dokumen": 332,
+  "jumlah_dokumen": 333,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -5513,6 +5513,7 @@
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "IT - Background Jobs & Schedulers",
+        "ANALISA - KPI Tax Officer",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "Microservices - Notification Service",
         "Microservices - File Service",
@@ -5521,25 +5522,20 @@
         "External - Accurate",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "610e7426d0a9dc5cb0a8d589e4289f6d6e4d1dac13f6fdfb6d7880b2017ae621",
-      "ukuran_kb": 89.0,
-      "ringkasan": "Menjawab: kenapa finance-service dibuat, master data apa yang ditampungnya (kewajiban pajak, pelaporan SPT, temuan kepatuhan, rekomendasi efisiensi, forecast kas), dan bagaimana ia memasok angka agar metrik KPI divisi FAT bisa terisi otomatis. Menjelaskan pembagian tiga lapis rumus (agregasi mentah di service pemilik data, rumus metrik di employee-service, rumus skor di shared-library), keputusan fasad `GET /internal/kpi/metrics` untuk seluruh metrik Finance termasuk AR/AP, serta gap penting bahwa forecast kas mingguan, metrik Admin & Non-Ops YoY, dan grid Opex Marketing justru dibangun di integration-service. Juga memuat RBAC, alur modul Tax dan Cost Control, cara master OPEX terisi (impor, bukan pengetikan), rancangan frontend, mode kegagalan, dan daftar keputusan yang masih ditunggu dari tim Finance.",
+      "hash": "453a17607c6ce0cc9045dbd68e664a25342aff01e92771f39efde8144fc793d1",
+      "ukuran_kb": 90.5,
+      "ringkasan": "Menjawab: apa isi finance-service (modul Tax, Cost Control, jembatan KPI, jalur entri OPEX), kenapa ia dibuat, dan bagaimana metrik KPI divisi FAT bisa terisi otomatis lewat GET /internal/kpi/metrics. Menjelaskan pembagian tiga lapis rumus (agregasi mentah di service pemilik data, rumus metrik di employee-service, rumus skor di shared-library), kenapa master anggaran OPEX tetap tinggal di integration-service, dan mana fitur Cost Control yang ternyata mendarat di integration-service alih-alih di sini. Juga memuat daftar keputusan yang masih ditunggu dari tim Finance beserta bobot KPI yang tertahan olehnya.",
       "kata_kunci": [
         "finance service",
-        "FAT",
         "OPEX",
         "anggaran",
         "budget",
+        "varians OPEX",
         "cost control",
-        "tax",
-        "SPT",
-        "pajak",
         "forecast kas",
         "cashflow",
-        "KPI Finance",
-        "piutang",
-        "AR",
-        "EBITDA"
+        "pajak",
+        "tax officer"
       ]
     },
     {
@@ -6830,6 +6826,8 @@
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "Microservices - Procurement Service",
         "Microservices - Integration Service",
+        "ANALISA - KPI Tax Officer",
+        "Finance - Rancangan Finance Service",
         "Microservices - Form Builder Service",
         "ADR - 0066 Modul Kelola Program Culture",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
@@ -6840,20 +6838,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "28e904f3ae6ab0f87e911c39b9978c9abd6916c78515641e97800ec9daabcd1b",
-      "ukuran_kb": 183.1,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar terpasang di production per departemen dan posisi, beserta label persis, bobot, target/keterangan, dan klasifikasi kelayakan otomasinya. Merupakan salinan setia kpi_template produksi (bukan usulan) dan mencatat ralat 2026-08-31 soal modul Kaizen dan forecast kas yang sebelumnya salah dinyatakan tidak ada.",
+      "hash": "aad9253ff6f9ae9d4141dc55940d9d5a436f0c235406a300d17fb4e635a69557",
+      "ukuran_kb": 185.1,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai tiap posisi di production, berapa bobotnya, apa targetnya, dan mana yang sudah otomatis, semi, terblokir data, atau masih manual. Berisi salinan setia isi koleksi kpi_template per departemen (Beauty Hacks, Finance, GA, HR, Kesekretariatan, Kyura, Manufaktur, Procurement, Quality, Tech Development) beserta label apa adanya termasuk typo, karena label itu kunci identitas metrik di kode. Juga menjelaskan cara membaca klasifikasi otomasi, cacat template yang sudah diketahui, dan ralat 2026-08-31 soal modul Kaizen dan forecast kas.",
       "kata_kunci": [
-        "matriks KPI",
+        "KPI",
         "kpi_template",
-        "metrik per departemen",
-        "bobot target",
+        "matriks KPI",
+        "bobot metrik",
+        "target KPI",
         "otomasi KPI",
-        "kaizen",
+        "departemen",
+        "Kaizen",
         "forecast kas",
-        "label metrik",
-        "production",
-        "klasifikasi otomasi"
+        "penilaian karyawan"
       ]
     },
     {
@@ -10813,6 +10811,40 @@
         "SKU",
         "sync gagal",
         "i18n"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - KPI Tax Officer.md",
+      "judul": "ANALISA - KPI Tax Officer",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "Finance - Rancangan Finance Service",
+        "HRIS - Matriks KPI per Departemen",
+        "REF - Penamaan Metrik & Sumber KPI",
+        "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
+        "Microservices - Calendar Service",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "HRIS - Otomasi Skor KPI",
+        "RUN - Menambah Metrik KPI Otomatis"
+      ],
+      "hash": "be81914a5fae6c6d81ff3a35d3044797cbdaa56787979933db52901decd468b2",
+      "ukuran_kb": 15.9,
+      "ringkasan": "Menjawab: apa yang sebenarnya dibutuhkan posisi Tax dari matriks KPI yang datang dari manajemen, kenapa modul Tax belum dibangun meski rancangannya sudah ada, dan dua keputusan pemilik metrik (input berstruktur vs unggah dokumen, serta pola tenggat per jenis pajak) yang menahannya. Berisi keadaan terukur di produksi per 2026-08-31 (isi koleksi anggaran_opex, realisasi_opex, accurate_ppn_masukan, dan ketiadaan penanda deductible), tiga koreksi terhadap vonis lama, masalah pada penamaan metrik templatenya sendiri, serta komponen yang bisa dipakai ulang dari calendar-service, form-builder, dan task-management. Papan kerja hasil /analisa-kebutuhan, bukan dokumen arsitektur.",
+      "kata_kunci": [
+        "KPI Tax",
+        "Tax Officer",
+        "pajak",
+        "SPT Masa",
+        "deductible",
+        "kepatuhan pajak",
+        "rekonsiliasi",
+        "varians anggaran",
+        "analisa kebutuhan",
+        "modul Tax"
       ]
     },
     {
