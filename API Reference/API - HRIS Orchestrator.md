@@ -18,7 +18,7 @@
 ## Attendances
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/attendances/summary` | Ringkasan kehadiran |
+| GET | `/attendances/summary` | Ringkasan kehadiran. `?periode=YYYY-MM` memilih bulan kartu dan **wajib diteruskan** ke `/internal/summary` attendance-service: `routes.InternalRequest` merakit permintaan baru dari URL string, jadi query pemanggil tidak ikut sendiri, dan lupa meneruskannya membalas **200 berisi bulan berjalan** tanpa satu pun galat. Detail periode: [[API - Attendance Service]] |
 | PATCH | `/attendances/:id/update` | Update entri (JSON/multipart + dokumen) |
 | GET/POST/DELETE | `/attendances/holiday` · `/holiday/:id` · `/holiday/delete/all` | Hari libur |
 
