@@ -511,36 +511,52 @@ Ada di grup `/me` (cukup karyawan terautentikasi), BUKAN `/kaizen` maupun `/form
 
 Bukan komite dibalas `is_committee:false`, **bukan `403`**, supaya menunya menjelaskan keadaannya sendiri. "Tak ada program" dan "bukan tugas saya" sengaja tak dibedakan, sama seperti `has_program`: bagi pemakai ujungnya sama, dan membedakannya membocorkan keberadaan program ke orang di luar komite. Gerbangnya memakai predikat `isKaizenCommittee` yang sama persis dengan `loadCommitteeForm`, supaya menu tak pernah muncul untuk orang yang tombolnya justru menolak bekerja.
 
-## Template form generik + realisasi program Culture
+## Modul Kelola Program Culture (jabatan Culture & Industrial)
 
-> **Status**: ⚠️ **Branch `feature/workspace-position`** (bip-erp + erp-frontend), terverifikasi lokal/DEV, **belum merge ke `main`, belum di prod.** Keputusan lengkap + trade-off: [[ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)]].
+> **Status**: ⚠️ **Branch `feature/workspace-position`** (bip-erp + erp-frontend), terverifikasi lokal/DEV, **belum merge ke `main`, belum di prod.** Menggantikan pendekatan seed-form lama (catatan di bawah); keputusan: [[ADR - 0066 Modul Kelola Program Culture]].
 
-Koleksi baru **`form_templates`** (`Collections.Templates`) menyimpan **cetakan** form yang bisa dipakai berulang. Template **tidak menerima jawaban**; ia dipakai untuk melahirkan `Form` lewat `POST /form-templates/:id/instantiate`, yang menyalin `fields` + `form_type` + `default_recurrence` ke sebuah `Form` **draft** ber-`template_id`. Kelima rute CRUD + instantiate ada di [[API - Form Builder Service]].
+KPI jabatan **Culture & Industrial** tak lagi diturunkan dari satu form-builder yang diisi officer sendiri. Modul ini memisahkan angka menurut **siapa yang benar-benar tahu**: officer mencatat program, PESERTA menilai, dan skor implementasi DIHITUNG — tak ada langkah manual yang bisa lupa atau menjadi self-grade.
+
+Dua koleksi baru:
+- **`culture_programs`** (`Collections.CulturePrograms`) — satu program yang dicatat officer: `nama`, `pilar` (Core Value), `jenis`, `target`, `tanggal`, `jam_mulai`/`jam_selesai`, `period_key` (diturunkan dari tanggal), `created_by` (officer pemilik — kunci atribusi KPI).
+- **`culture_feedback`** (`Collections.CultureFeedback`) — satu penilaian PESERTA atas satu program: `rating` 1–5, `masukan` (opsional). Index unik `(program_id, respondent_id)` menegakkan satu penilaian per peserta; jumlah responden itulah "hadir".
+
+Rute `/culture/*` ada di grup **`requireEmployee`** (cukup karyawan terautentikasi): officer mengelola programnya sendiri, peserta menilai lewat **link per-program** (`?program=<id>` — peserta tak memilih program). Daftar lengkap di [[API - Form Builder Service]].
+
+### Skor komposit — blueprint 30/30/40, SEPENUHNYA otomatis
+`hitungSkorProgram` (SATU tempat, `culture_metrics.go`) memadukan tiga komponen per program:
+- **Partisipasi (30%)** = responden ÷ target diundang × 100.
+- **Antusiasme (30%)** = rata-rata rating ÷ 5 × 100.
+- **Implementasi (40%)** = efektivitas = Partisipasi × Antusiasme ÷ 100 — **dihitung, bukan diisi**. Tak ada langkah atasan; jangkauan × kualitas jadi satu, jadi tak ada input manual yang bisa lupa.
+
+`Skor program = Σ komponen berbobot`; **KPI officer = rata-rata skor seluruh programnya** pada periode itu. Bobot 30/30/40 hidup HANYA di backend — tak disalin ke frontend maupun sumber KPI.
+
+### Jenis program → target diundang OTOMATIS
+`jenis` menentukan cara **target** (penyebut partisipasi) di-resolve saat simpan — di-**snapshot** supaya penyebut tak bergeser saat data karyawan berubah kemudian — memakai daftar karyawan aktif dari [[Microservices - Employee Service]] (`GET /list?type=employee`, via `EMPLOYEE_MODULE_URL`):
+- `internal` — seluruh karyawan aktif.
+- `department` — jumlah staf `target_departemen` terpilih.
+- `employees` — jumlah `target_karyawan` yang dipilih (dedup).
+
+`GET /culture/employees` memasok daftar karyawan aktif ke pemilih target FE (daftar departemen diturunkan distinct di FE). `EMPLOYEE_MODULE_URL` dibaca `os.Getenv` langsung, **DI LUAR map `InternalURL`** — pola sama dengan file-service: `ValidateInternalURL` panic pada entri kosong, jadi dependensi opsional tak boleh masuk map. (Jenis **Club** & **Publik**: TBD fase berikut; publik direncanakan dengan proteksi **token per-program**, plus field nama+asal tanpa login.)
+
+### Distribusi per pilar — hanya 3 Core Value atomik
+`cultureSummaryHandler` (`GET /culture/summary`) memecah pilar campur jadi Core Value **ATOMIK** (`pecahPilar`): satu program berpilar "Happiness & Grow" dihitung sebagai Happiness +1 DAN Grow +1, bukan kategori campur tersendiri. Distribusi hanya mengenal **Happiness, Kaizen, Grow** (urut tetap). Ringkasan juga membawa `hadir` (responden) per program untuk kolom Daftar Program.
+
+### Setoran metrik culture ke KPI
+`GET /internal/culture/metrics?period=YYYY-MM` membalas `{data{<employee_id>:{komposit[], jumlah}}, period_key, has_program}` — daftar skor komposit tiap program per officer. Meniru bentuk `/internal/kaizen/metrics` dan **menggerbang dirinya sendiri** ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). `has_program:false` bila belum ada program aktif — membedakan "belum ada program" dari "gagal ambil data", dan hanya yang kedua yang layak dilaporkan sebagai metrik gagal hitung.
+
+Yang **menulis** `kpi_score` tetap [[Microservices - Employee Service]] ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]); service ini hanya melaporkan angkanya. Sisi employee-service adalah sumber `program_culture` (`kpi_sumber_culture.go`, `MetrikCulture{Komposit, Jumlah}`), reduksi `rata_rata`, ditarik lewat `FORM_BUILDER_MODULE_URL` — pola identik `kaizen`.
+
+> [!note] Menggantikan pendekatan seed-form lama
+> Versi sebelumnya menurunkan KPI culture dari SATU form-builder hasil `seed_culture.go` (template slug `program-culture-rencana-realisasi`, radio `terlaksana_sesuai_jadwal`, metrik `{direncanakan, sesuai_jadwal}`). Ditinggalkan karena mengukur **self-report officer**, bukan dampak ke peserta; `seed_culture.go` dihapus. Keputusan: [[ADR - 0066 Modul Kelola Program Culture]] (menggantikan [[ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)]]). Koleksi generik `form_templates` (di bawah) TETAP ada sebagai kapabilitas — kini tanpa konsumen culture.
+
+## Template form generik (kapabilitas reusable)
+
+Koleksi **`form_templates`** (`Collections.Templates`) menyimpan **cetakan** form yang bisa dipakai berulang. Template **tidak menerima jawaban**; ia dipakai untuk melahirkan `Form` lewat `POST /form-templates/:id/instantiate`, yang menyalin `fields` + `form_type` + `default_recurrence` ke sebuah `Form` **draft** ber-`template_id`. Kelima rute CRUD + instantiate ada di [[API - Form Builder Service]].
 
 **Field disalin, bukan dirujuk.** Menyunting template setelah sebuah form terbit tak boleh mengubah arti jawaban yang sudah masuk — pola yang sama dengan alasan susunan pertanyaan terkunci `409` begitu ada jawaban. `Form` bertambah satu field, **`template_id`**, semata untuk menjejak asal-usulnya.
 
-**Kenapa membangun template generik untuk SATU pemakai.** Pemakainya hari ini cuma jabatan **Culture & Industrial**. Ini menyimpang sadar dari prinsip tim "jangan generalisasi untuk pemakai yang belum ada / angkat abstraksi pada pemakai ketiga". Dipilih pemilik produk setelah diberi opsi ringan (seed satu form saja): jalur seed menaruh pekerjaan berulang "satu form realisasi = satu rilis kode" ke dev selamanya, sedangkan template memindahkannya ke layar. Trade-off diterima terbuka; alasan penuhnya di ADR 0065.
-
-### Seed idempoten "Program Culture"
-
-`seed_culture.go` (dipanggil `main.go` saat boot) menyisipkan:
-
-- **Template** "Formulir Rencana & Realisasi Program Culture", slug **`program-culture-rencana-realisasi`**, `form_type: survey`.
-- **Satu `Form` aktif** (published, recurring **monthly**) untuk departemen Human Resource / posisi Culture & Industrial, ber-`template_id` menunjuk template di atas.
-
-**Idempotensinya lewat SLUG spesifik**, bukan "koleksi tak kosong": koleksi yang sudah berisi template lain tetap menerima seed ini tepat sekali, dan boot berikutnya tak menggandakannya. Field-nya datar meniru lima seksi xlsx sumbernya (metadata; rancangan/target; before/after; root-cause/CAPA sebagai teks datar; anggaran `number`; lampiran `file`). Field penggerak KPI adalah radio **`terlaksana_sesuai_jadwal`** beropsi `"Ya"`/`"Tidak"`.
-
-**`form_type: survey`, bukan `report`.** Tipe `report` (rencana terpisah) memikul kewajiban field file + workflow approval; realisasi culture dilaporkan mandiri lalu dibaca sebagai angka KPI, jadi keduanya tak diinginkan. `survey` menghindari kedua beban itu.
-
-### Setoran metrik culture ke KPI
-
-`GET /internal/culture/metrics?period=YYYY-MM` membalas `{data{<employee_id>:{direncanakan, sesuai_jadwal}}, period_key, has_program}`, meniru bentuk `/internal/kaizen/metrics` dan **menggerbang dirinya sendiri** ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]).
-
-**Membaca ISI `answers`, BUKAN `decision.status` seperti Kaizen.** Agregasi form ber-`template_id` = template culture per `period_key`: `direncanakan` = jumlah respons periode itu, `sesuai_jadwal` = respons yang jawaban `terlaksana_sesuai_jadwal`-nya `"Ya"`. `has_program:false` bila template/form culture belum ada — sama seperti Kaizen, ia membedakan "belum ada program" dari "gagal ambil data", dan hanya yang kedua yang layak dilaporkan sebagai metrik gagal hitung.
-
-**Identifikasi lewat `template_id`, bukan `metric_key`.** `metric_key` membawa mesin validasi ber-guard berat (indeks layanan departemen: nilai wajib dikenal, indeks unik parsial per departemen). Culture tak butuh keunikan-per-departemen itu, jadi menumpang `metric_key` berarti dua fitur berbagi satu jalur validasi yang akan menyimpang begitu salah satunya disentuh. `template_id` sudah ada sebagai penjejak instantiate.
-
-Yang **menulis** `kpi_score` tetap [[Microservices - Employee Service]] ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]); service ini hanya melaporkan angkanya. Sisi employee-service adalah sumber `program_culture` (`kpi_sumber_culture.go`), yang menarik lewat `FORM_BUILDER_MODULE_URL` — pola identik `kaizen`.
+> Template ini semula dibangun untuk realisasi program Culture (satu pemakai). Culture kini punya modul sendiri (di atas), jadi kapabilitas template tetap ada namun **belum punya konsumen aktif** — dicatat terbuka sesuai prinsip grounded, bukan disembunyikan.
 
 ## Lampiran berkas (tipe field `file`)
 

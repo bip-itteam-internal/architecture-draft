@@ -2,7 +2,7 @@
 
 *Membangun **template form generik** (koleksi `form_templates` + CRUD + UI + instantiate) di [[Microservices - Form Builder Service]] untuk SATU pemakai nyata: jabatan **Culture & Industrial** yang harus melapor rencana & realisasi program culture tiap bulan. Form realisasi itu lalu menjadi sumber KPI baru `program_culture` yang mengukur "persentase terlaksananya program culture yang sesuai jadwal". Tiga keputusan dicatat di sini: (1) mengangkat abstraksi "template" untuk satu pemakai, menyimpang sadar dari prinsip tim; (2) menandai form culture lewat `template_id`, bukan `metric_key`; (3) `form_type: survey`, bukan `report`.*
 
-- **Status**: ⚠️ **Diterima** oleh pemilik produk 2026-08-30. Kode di branch **`feature/workspace-position`** (bip-erp + erp-frontend), **terverifikasi lokal/DEV, belum merge ke `main`, belum di prod**. Bukan status "live".
+- **Status**: 🔴 **Superseded oleh [[ADR - 0066 Modul Kelola Program Culture]]** (2026-08-31). Diterima 2026-08-30 lalu diganti **sebelum merge**: Culture pindah ke **modul sendiri** (`culture_programs` + feedback peserta), bukan mengisi form, jadi keputusan (2) `template_id`-sebagai-penanda dan (3) `form_type: survey` **tak lagi berlaku**, dan `seed_culture.go` dihapus. Keputusan (1) — koleksi generik `form_templates` — **tetap ada di kode** sebagai kapabilitas, kini **tanpa konsumen**. Konteks & alasan pivot: ADR 0066.
 - **Path di repo**: `bip-erp/services/form-builder/models_template.go` · `template_handlers.go` · `seed_culture.go` · `culture_metrics.go` · `bip-erp/services/employee/kpi_sumber_culture.go` · `erp-frontend/src/app/(main)/form-builder/templates/` · `src/features/hris/kpi/lib/label-otomatis.ts`
 - **Tanggal**: 2026-08-30
 

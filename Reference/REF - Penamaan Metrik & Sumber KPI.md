@@ -105,12 +105,12 @@ Checklist **empat tempat**, apa adanya:
 
 ### 🟡 `program_culture` — sumber baru (branch `feature/workspace-position`)
 
-Sumber KPI baru dari [[Microservices - Form Builder Service]] (`GET /internal/culture/metrics`), memasok metrik `culture` KPI Culture & Industrial. **Belum merge/prod.** Label ramah + keterangan ditaruh di kamus `label-otomatis.ts` dan dua locale `src/i18n/locales/{id,en}.ts`.
+Sumber KPI baru dari [[Microservices - Form Builder Service]] (`GET /internal/culture/metrics`), memasok metrik `culture` KPI Culture & Industrial. **Belum merge/prod.** Nilainya **skor komposit** program culture (blueprint 30/30/40), bukan % sesuai jadwal — lihat [[ADR - 0066 Modul Kelola Program Culture]]. Label ramah + keterangan ditaruh di kamus `label-otomatis.ts` dan dua locale `src/i18n/locales/{id,en}.ts`.
 
 | Locale | Label sumber | Keterangan |
 |---|---|---|
-| `id.ts` | `Program culture` | "Persentase program culture yang terlaksana sesuai jadwal, dari form realisasi program culture. Menu Form Builder." |
-| `en.ts` | `Culture program` | "Percentage of culture programs carried out on schedule, from the culture realization form. Form Builder menu." |
+| `id.ts` | `Program Culture: skor komposit` | "Skor komposit program culture (partisipasi, antusiasme, implementasi) dari penilaian peserta, dirata-rata per periode. Untuk jabatan Culture & Industrial." |
+| `en.ts` | `Culture Program: composite score` | "Composite culture-program score (participation, enthusiasm, implementation) from participant ratings, averaged per period. For the Culture & Industrial role." |
 
 Kunci i18n: **`srcProgramCulture` / `srcProgramCultureKet`** (dengan awalan `src` karena ini penamaan **SUMBER**, bukan metrik template — bedakan dari `mtk*` untuk metrik). Sumber ini **tanpa sub-metrik**, jadi tak butuh entri `METRIK_PER_SUMBER`; nama metrik yang dilayaninya (`culture`) unik dan tak dipakai sumber lain (per 2026-08-30). `SATUAN_PER_METRIK`/`FORMULA_PER_METRIK`: formula bakunya `rata_rata` (nilai 0–100), jadi mengikuti aturan yang sama dengan sumber Finance — formula boleh dilewatkan bila pengisi diminta memilih; satuan tetap wajib bila targetnya bukan skala 0–100.
 

@@ -61,7 +61,29 @@ Template = **cetakan** form yang bisa dipakai berulang; ia **TIDAK menerima jawa
 
 **Struct `FormTemplate`** (`models_template.go`): `name`, `description`, `form_type`, `fields[]`, `default_recurrence`, `default_audience`, `target_department`, `target_position`, `slug`, `status` (`active`/`archived`), `created_by`, timestamps. **Field disalin (bukan dirujuk)** ke `Form` saat instantiate, jadi menyunting template tak mengubah arti jawaban form yang sudah terbit.
 
-> **Seed idempoten saat boot** (`seed_culture.go`, dipanggil `main.go`): template **"Formulir Rencana & Realisasi Program Culture"** (slug `program-culture-rencana-realisasi`, `form_type: survey`) + satu `Form` aktif (published, recurring monthly) untuk departemen Human Resource / posisi Culture & Industrial. Idempotensinya lewat **SLUG spesifik**, bukan "koleksi tak kosong" — sehingga koleksi yang sudah berisi template lain tetap menerima seed ini sekali. Field-nya datar meniru lima seksi xlsx (metadata; rancangan/target; before/after; root-cause/CAPA flat text; anggaran `number`; lampiran `file`); field penggerak KPI = radio **`terlaksana_sesuai_jadwal`** (opsi `"Ya"`/`"Tidak"`).
+> Template ini semula dibangun untuk realisasi program Culture, di-seed saat boot. **Seed itu (`seed_culture.go`) sudah dihapus**: Culture kini punya modul sendiri (bawah). Kapabilitas template tetap ada, tanpa konsumen aktif.
+
+## Kelola Program Culture (jabatan Culture & Industrial)
+
+> ⚠️ **Branch `feature/workspace-position`**, terverifikasi lokal/DEV, **belum merge ke `main`, belum di prod.** Menggantikan pendekatan seed-form. Keputusan: [[ADR - 0066 Modul Kelola Program Culture]]. Konteks: [[Microservices - Form Builder Service]].
+
+Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi): officer mengelola programnya sendiri, peserta menilai lewat **link per-program**. Koleksi `culture_programs` + `culture_feedback`.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/culture/employees` | Daftar karyawan aktif untuk pemilih target (ditarik dari employee-service via `EMPLOYEE_MODULE_URL`) |
+| GET | `/culture/programs` | Daftar program milik pemanggil; pengelola form boleh `?scope=all` (seluruh perusahaan). `?period=YYYY-MM`. Tiap baris membawa `hadir` (responden) |
+| POST | `/culture/programs` | Buat program (`nama`, `pilar`, `jenis`, `target_departemen`/`target_karyawan` sesuai jenis, `tanggal`, `jam_mulai`/`jam_selesai`). `target` **di-resolve otomatis** dari jenis, bukan diketik |
+| PUT | `/culture/programs/:id` | Sunting program milik sendiri |
+| DELETE | `/culture/programs/:id` | Hapus program milik sendiri (feedback yatim ikut dibuang) |
+| GET | `/culture/feedback/programs` | Program aktif untuk dinilai (`?period=`) |
+| GET | `/culture/feedback/program/:id` | Info satu program untuk halaman penilaian (dibuka lewat link `?program=<id>`) |
+| POST | `/culture/feedback` | Kirim penilaian peserta (`program_id`, `rating` 1–5, `masukan?`). Satu per `(program, responden)` — upsert |
+| GET | `/culture/summary` | Ringkasan dashboard (`?period=`, `?scope=all`): rata-rata partisipasi/antusiasme/komposit, distribusi per pilar **atomik** (`pecahPilar`), daftar program terhitung |
+
+**`jenis` → `target` (penyebut partisipasi), di-snapshot saat simpan**: `internal` = seluruh karyawan aktif · `department` = jumlah staf `target_departemen` · `employees` = jumlah `target_karyawan` (dedup). Jenis `club`/`public` menyusul (TBD).
+
+**Skor komposit blueprint 30/30/40, otomatis** (`hitungSkorProgram`, satu tempat): Partisipasi 30% + Antusiasme 30% + Implementasi 40%, dengan **Implementasi = Partisipasi × Antusiasme ÷ 100** (dihitung, bukan diisi). KPI officer = rata-rata skor programnya. Detail konsep: [[Microservices - Form Builder Service]].
 
 ## Analisa & Export (RBAC per departemen)
 | Method | Path | Fungsi |
@@ -151,11 +173,11 @@ Transisi sah: belum ditinjau → `accepted`/`rejected`; `accepted` → `implemen
 |---|---|---|
 | GET | `/internal/compliance` | Form wajib yang belum diisi: `{blocking:[{id,title}], warning:[...]}`. Dipakai [[Microservices - Attendance Service]] saat clock-in |
 | GET | `/internal/kaizen/metrics` | Hitungan ide per orang pada satu periode: `{data{<employee_id>:{submitted,accepted,implemented}}, period_key, has_program}`. `?period=YYYY-MM` (default periode berjalan). Ditarik [[Microservices - Employee Service]] untuk skor KPI |
-| GET | `/internal/culture/metrics` | ⚠️ branch `feature/workspace-position`. Realisasi program culture per orang pada satu periode: `{data{<employee_id>:{direncanakan,sesuai_jadwal}}, period_key, has_program}`. `?period=YYYY-MM`. Ditarik [[Microservices - Employee Service]] untuk sumber KPI `program_culture` |
+| GET | `/internal/culture/metrics` | ⚠️ branch `feature/workspace-position`. Skor komposit program culture per officer pada satu periode: `{data{<employee_id>:{komposit[],jumlah}}, period_key, has_program}`. `?period=YYYY-MM`. Ditarik [[Microservices - Employee Service]] untuk sumber KPI `program_culture` (reduksi `rata_rata`) |
 
 > **Tiga angka, bukan satu.** Kepatuhan dihitung dari ide yang **diajukan** (karyawan memegang kendali penuh atas kepatuhannya sendiri), skor KPI dari ide yang **diterapkan** — begitulah redaksi metriknya di [[HRIS - Matriks KPI per Departemen]]. `has_program:false` membedakan "perusahaan ini belum menjalankan programnya" dari "gagal mengambil data"; hanya yang kedua layak dilaporkan sebagai metrik gagal hitung.
 
-> **`/internal/culture/metrics` membaca ISI `answers`, bukan `decision.status` seperti Kaizen.** Agregasi form ber-`template_id` = template culture per `period_key`: `direncanakan` = jumlah respons periode itu, `sesuai_jadwal` = respons yang jawaban `terlaksana_sesuai_jadwal`-nya `"Ya"`. `has_program:false` bila template/form culture belum ada. Sama seperti Kaizen, rute ini **menggerbang dirinya sendiri** ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]) dan hanya **melapor** — yang menulis `kpi_score` tetap employee-service ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]).
+> **`/internal/culture/metrics` mengagregasi `culture_programs` + `culture_feedback` per periode**, bukan jawaban form. Per program: skor komposit `hitungSkorProgram` (Partisipasi 30% + Antusiasme 30% + Implementasi 40%, implementasi = part×ant÷100). `komposit[]` = daftar skor tiap program officer, `jumlah` = banyaknya program; employee-service me-`rata_rata`-kannya jadi KPI. `has_program:false` bila belum ada program aktif. Sama seperti Kaizen, rute ini **menggerbang dirinya sendiri** ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]) dan hanya **melapor** — yang menulis `kpi_score` tetap employee-service ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]).
 
 > **Identitas terkunci ke header.** Query `?employee_id=&department=&company_id=` HANYA dihormati bila request tak membawa `BIP-Employee-ID` sama sekali (ciri panggilan service-to-service). Request pemakai lewat gateway selalu terkunci ke dirinya sendiri — tanpa aturan ini rute ini jadi jalan mengintip form tertunda orang lain lintas perusahaan. Lihat [[ADR - 0031 Prefix internal Bukan Batas Keamanan]].
 
@@ -173,7 +195,7 @@ Transisi sah: belum ditinjau → `accepted`/`rejected`; `accepted` → `implemen
 
 **Sasaran** (`audience.type`): `all` · `departments` (+`departments[]`) · `employees` (+`employee_ids[]`). `estimated_size` diisi manual sebagai penyebut tingkat pengisian; bila 0, `response_rate` tidak dikirim. Perhatikan `audience.departments` menjawab **siapa yang mengisi**, sedangkan `owner_department` menjawab **siapa yang memiliki** — keduanya tak harus sama.
 
-**Asal template** (`template_id`) — ⚠️ branch `feature/workspace-position`. Menjejak `Form` yang dibuat lewat `POST /form-templates/:id/instantiate` ke template asalnya. **Inilah penanda yang dipakai `/internal/culture/metrics`** untuk mengenali form culture — sengaja BUKAN `metric_key`, supaya tak menumpang mesin validasi ber-guard berat milik indeks layanan ([[ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)]]). Kosong pada form yang dibuat langsung tanpa template.
+**Asal template** (`template_id`) — ⚠️ branch `feature/workspace-position`. Menjejak `Form` yang dibuat lewat `POST /form-templates/:id/instantiate` ke template asalnya. Kosong pada form yang dibuat langsung tanpa template. (Dulu dipakai `/internal/culture/metrics` menandai form culture; sejak Culture punya modul sendiri, penanda itu tak lagi dipakai — lihat [[ADR - 0066 Modul Kelola Program Culture]].)
 
 **Penanda metrik** (`metric_key`) — menandai sebuah form sebagai SUMBER angka ringkasan yang dibaca di luar layar analisa. Satu nilai dikenal: `service_index` (indeks layanan departemen, tampil di ringkasan divisi pemiliknya). Kosong = form biasa, dan itulah keadaan seluruh form lama. Tiga syarat, ketiganya menutup kegagalan **senyap**: nilai wajib dikenal (penanda salah tulis tak akan pernah ditemukan pembacanya), wajib `form_type: survey`, dan wajib `recurrence` ber-`unit: monthly` — jawaban form tak berulang tersimpan tanpa `period_key` sehingga permintaan indeks untuk bulan mana pun tak mencocokkan apa pun dan kartunya kosong selamanya padahal jawaban terus masuk. Pada `PATCH`, **absen berarti jangan diubah**; kirim `""` eksplisit untuk mencabut.
 
