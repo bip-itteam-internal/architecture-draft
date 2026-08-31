@@ -79,7 +79,7 @@ Itu bukan kemungkinan teoretis. `piutang_lewat_14_persen` dan `piutang_lewat_60_
 
 ### 🟡 `rasio_beban_non_ops_persen` — contoh kerja aturan ini (2026-08-31)
 
-Metrik baru pada sumber **`admin_non_ops`** untuk KPI F3 SPV Finance (erp-frontend PR [#1332](https://github.com/bip-itteam-internal/erp-frontend/pull/1332), branch `feat/kpi-rasio-non-ops`, **belum merge**; backend bip-erp PR [#1548](https://github.com/bip-itteam-internal/bip-erp/pull/1548)). Dicatat di sini karena ia melewati checklist empat-tempat dengan hasil yang berbeda per tempat.
+Metrik baru pada sumber **`admin_non_ops`** untuk KPI F3 SPV Finance (erp-frontend PR [#1332](https://github.com/bip-itteam-internal/erp-frontend/pull/1332), branch `feat/kpi-rasio-non-ops`, **sudah merge** ke `origin/main` 31 Agustus 2026, merge commit `de1f24ea`; backend bip-erp PR [#1548](https://github.com/bip-itteam-internal/bip-erp/pull/1548), merge commit `fea804a7`, juga sudah di `origin/main`). Dicatat di sini karena ia melewati checklist empat-tempat dengan hasil yang berbeda per tempat.
 
 | Locale | Label | Keterangan |
 |---|---|---|
@@ -102,6 +102,19 @@ Checklist **empat tempat**, apa adanya:
 ⛔ **Bedanya tajam dengan `SATUAN_PER_METRIK`, dan itu yang membuat satuan wajib sementara formula tidak**: satuan yang absen **tidak** meminta apa pun kepada pengisi — ia diam-diam merender suffix yang salah. Formula yang absen berhenti dan bertanya. Aturannya karena itu: **satuan selalu wajib; formula wajib hanya bila sumbernya mendaftarkan formula ke katalog atau kamu ingin ada nilai awal.**
 
 ⚠️ Metrik ini **tidak** butuh `METRIK_PER_SUMBER`: namanya tidak dipakai sumber lain mana pun (per 2026-08-31). Bila kelak dipakai, entri per-pasangan wajib ikut.
+
+## ⛔ Nama metrik menyiratkan ARAH, dan salah membacanya tak menimbulkan galat
+
+Aturan ini soal penamaan, tetapi ada satu akibat penamaan yang tidak berhenti di layar: **nama metrik menentukan `arah` mana yang benar bagi siapa pun yang mengonfigurasinya.**
+
+| Nama metrik mengembalikan | `arah` yang benar | Contoh terdaftar |
+|---|---|---|
+| akurasi, persentase-tercapai, cakupan, ketepatan waktu, uptime | `naik` | `akurasi_forecast_kas`, `uptime` |
+| pelanggaran, keterlambatan, selisih, sisa, rasio-beban, retur | `turun` | `piutang_lewat_60_persen`, `varians_absolut_persen`, `rasio_beban_non_ops_persen`, `downtime`, `retur_persen` |
+
+⚠️ **Terjadi di produksi 2026-08-31.** `akurasi_forecast_kas` dikonfigurasi `arah: turun`, sehingga akurasi **38,03%** terhadap target 95 dinilai **100/100** — arah `naik` yang benar memberi 40. Tak ada galat, dan kalimat penjelas di layar ikut membenarkannya. Yang membuatnya mudah terjadi: metrik lain di template yang sama (`piutang_lewat_60_persen`) berarah `turun` dan **itu benar**, jadi penyeragaman tampak masuk akal.
+
+**Konsekuensinya untuk penamaan**: metrik yang namanya tak menyatakan besaran yang diukur (`kinerja_x`, `performa_2`) memaksa pengisi menebak arahnya. **Nama yang menyebut besarannya — `akurasi_…`, `…_persen`, `…_lewat_…`, `keterlambatan_…` — adalah petunjuk arah yang gratis.** Aturan lengkap beserta cara mengujinya di [[RUN - Menambah Metrik KPI Otomatis]] §"Arah mengikuti BUNYI KPI-nya"; kejadiannya di [[HRIS - Otomasi Skor KPI]] §"Kesalahan arah F4".
 
 ## Mengganti label yang sudah dipakai
 

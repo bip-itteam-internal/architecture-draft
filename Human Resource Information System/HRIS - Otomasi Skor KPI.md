@@ -424,19 +424,73 @@ Basis di layar menyebutkan penyebutnya apa adanya ("dari 12 pengukuran, populasi
 
 Lima metrik F1–F5, Σbobot = 1,00 (terkonfirmasi dari layar Atur Target produksi). Ringkas — rincian per baris di [[HRIS - Matriks KPI per Departemen]] §Finance Supervisor.
 
+> ⚠️ **Koreksi 2026-08-31 sore atas versi pagi dokumen ini.** Baris F2 dan F3 sebelumnya berbunyi *"menunggu merge"*. Ketiga PR **sudah merge ke `origin/main` pada 31 Agustus 2026** dan itu diverifikasi dengan `git merge-base --is-ancestor <merge-commit> origin/main`, bukan dari tanda MERGED di GitHub: bip-erp [#1546](https://github.com/bip-itteam-internal/bip-erp/pull/1546) = `d5d50ff3`, [#1547](https://github.com/bip-itteam-internal/bip-erp/pull/1547) = `ce04464d`, [#1548](https://github.com/bip-itteam-internal/bip-erp/pull/1548) = `fea804a7`, dan erp-frontend [#1332](https://github.com/bip-itteam-internal/erp-frontend/pull/1332) = `de1f24ea`. Yang tersisa untuk F2 dan F3 **bukan lagi kode**, melainkan data dan env.
+
 | | Metrik | Bobot | Keadaan | Menunggu SIAPA |
 |---|---|---:|---|---|
-| F1 | Monitoring AR & Collection | 0,25 | ✅ **sumber siap, konfigurasi belum diisi** (`kinerja_ar`/`piutang_lewat_60_persen`, sudah di prod) | **HR** — cukup isi blok `auto` lewat layar Atur Target, tanpa deploy |
-| F2 | Kontrol OPEX / varians anggaran | 0,25 | 🟡 **menunggu merge** PR [bip-erp#1546](https://github.com/bip-itteam-internal/bip-erp/pull/1546) (sudah disetujui) | **dev/rilis**, lalu HR. ⚠️ + prasyarat DATA: irisan `anggaran_opex.departemen` × `work_data.department` (TBD) |
-| F3 | Kontrol Beban Non-Operasional | 0,20 | 🟡 **menunggu merge** PR [bip-erp#1548](https://github.com/bip-itteam-internal/bip-erp/pull/1548) + [erp-frontend#1332](https://github.com/bip-itteam-internal/erp-frontend/pull/1332) | **reviewer + dev/rilis**, lalu HR |
-| F4 | Cashflow Forecasting | 0,10 | ✅ **sumber siap, konfigurasi belum diisi** (`forecast_kas`/`akurasi_forecast_kas`, di prod sejak 14 Agu 2026). ⛔ Bagian label `Return on Operation = 2,75` **tak punya sumber** dan berbeda hal dari deskripsinya | **HR** untuk bagian forecast; **pemilik metrik** untuk memutuskan nasib `Return on Operation` (TBD) |
-| F5 | Performance Monitoring Team | 0,20 | ⚠️ **konfigurasi SUDAH menyala** (`skor_tim`, scope `department`) tapi belum berangka: *"belum ada satu pun pengukuran pada periode ini"* | **BUKAN HR, dan bukan template ini.** Menunggu **staf Finance** punya template yang 100% ber-`auto` (lihat gerbang biner di atas), atau **atasan langsung anggota Finance** menilai mereka lebih dulu |
+| F1 | Monitoring AR & Collection | 0,25 | ✅ **menyala dan berangka**: `kinerja_ar`/`piutang_lewat_60_persen`, target 5, **arah `turun`** (benar — bunyi KPI-nya "< 5%"), realisasi 0,76 → 100 | — |
+| F2 | Kontrol OPEX / varians anggaran | 0,25 | ⚠️ **terkonek tapi bergalat**: *"total anggaran periode ini nol"*. Kode #1546 sudah di `main`; yang kurang **master anggaran OPEX departemen Finance** — sejak #1546 permintaannya membawa `&departemen=<departemen karyawan>` dan departemen kosong digalatkan, jadi anggaran departemen lain **tidak menolong** | **staf Finance / Cost Control** mengunggah lewat menu **"Anggaran OPEX"** (`/finance/anggaran`, izin `finance.accounting.view`) — bukan "Master Anggaran" seperti bunyi pesan galatnya. ⚠️ Prasyarat: `anggaran_opex.departemen` dicocokkan dengan `work_data.department` sebagai **string persis** |
+| F3 | Kontrol Beban Non-Operasional | 0,20 | ⚠️ **terkonek tapi bergalat**: *"INTEGRATION_SERVICE_KEY belum diatur"*. Kode #1548 + #1332 sudah di `main` dan `docker-compose.yml` `origin/main` sudah memuat **kedua** blok (employee-service & integration-service) merujuk satu variabel yang sama | **DevOps** memasang nilainya di `.env` server produksi lalu `--force-recreate` kedua container. Kunci kosong **menutup** rutenya (401), disengaja |
+| F4 | Cashflow Forecasting | 0,10 | ⛔ **menyala, berangka, dan ANGKANYA SALAH** — arah terbalik. Lihat §"Kesalahan arah F4" di bawah | **DBA/ops** memperbaiki `auto.arah` → `naik`; **penilai** menilai ulang bila sudah ada skor beku |
+| F5 | Performance Monitoring Team | 0,20 | ⚠️ **konfigurasi SUDAH menyala** (`skor_tim`, scope `department`) tapi belum berangka: *"belum ada satu pun pengukuran pada periode ini"*. **TBD** apakah ia benar-benar tak tampil di layar Atur Target atau hanya tak berangka di kartu Skor Sementara | **BUKAN HR, dan bukan template ini.** Menunggu **staf Finance** punya template yang 100% ber-`auto` (lihat gerbang biner di atas), atau **atasan langsung anggota Finance** menilai mereka lebih dulu |
 
 ⛔ **F5 bukan cacat.** Nol anggota terukur digalatkan, tidak dinilai 0 — 0 tak terbedakan dari "timnya memang berskor 0" dan akan menekan skor supervisor tanpa dasar. Sistem bekerja sebagaimana dirancang.
 
+⛔ **Galat F2 dan F3 juga bukan cacat, dan jangan "diperbaiki" jadi 0.** Keduanya berarah `turun`, dan pada arah turun **0 adalah nilai SEMPURNA** — menelan galat jadi 0 memberi 100 palsu, kelas kesalahan yang sama persis dengan F4. Komentarnya ditulis eksplisit di kode (`kpi_sumber_varians_anggaran.go:59-69`, `kpi_sumber_admin_nonops.go:98-108`).
+
 ⚠️ **Urutan penilaian mengikat, dan untuk bulan lampau tidak ada jaring pengaman**: fallback bulan berjalan **tidak jalan** di luar bulan berjalan, sehingga skor tim hanya dari skor final anggota. Snapshot `kpi_score` **dibekukan begitu `POST /kpi` tersimpan**, jadi menilai SPV terlalu cepat menghasilkan angka yang tak bisa diperbaiki tanpa menilai ulang periode itu. **anggota → Leader → Supervisor.**
 
-**Langit-langit skor hari ini = 35/100** (F1 0,25 + F4 0,10, dikali 100), karena skor total **tidak dinormalisasi** (`kpi_auto_scores.go:130-146`). Naik ke 55 begitu F5 berangka, dan ke 100 setelah kedua PR merge dan seluruhnya dinyalakan.
+**Langit-langit skor hari ini = 55/100** (F1 0,25 + F4 0,10 + F5 0,20, dikali 100), karena skor total **tidak dinormalisasi** (`kpi_auto_scores.go:130-146`) — dengan catatan F5 baru menyumbang setelah berangka, sehingga yang benar-benar terhitung hari ini masih **35**. Naik ke 100 setelah anggaran Finance diunggah (F2) dan env terpasang (F3).
+
+### ⛔ Kesalahan arah F4: skor 100 untuk akurasi 38% (2026-08-31)
+
+**Status**: ⛔ **belum diperbaiki di produksi** per 2026-08-31. Konfigurasi produksi menyimpang dari yang tertulis di [[HRIS - Matriks KPI per Departemen]] baris 414, yang sejak awal menetapkan `arah: naik`.
+
+Bukti lapangan: layar Skor Sementara **Endri Tri Pranoto** (Finance Supervisor), periode berjalan. Metrik Cashflow Forecasting bernilai **100/100** padahal akurasinya **38,03%** terhadap target **95%** — proyeksi Rp3.732.330.750 vs realisasi Rp1.419.563.870, meleset lebih dari 2,6 kali lipat.
+
+**Rantai sebabnya, dengan nomor baris** (diverifikasi ke bip-erp `origin/main` `bed49ad9`):
+
+| Mata rantai | Bukti |
+|---|---|
+| Metriknya mengembalikan **akurasi** (makin tinggi makin baik) | `services/employee/kpi_sumber_forecast_kas.go:48` field `AkurasiPersen`; `:96` `return a.AkurasiPersen, nil` |
+| Bunyi KPI-nya menuntut arah naik | komentar kepala berkas: *"Forecast cashflow mingguan dengan akurasi ≥ 95%"* |
+| Yang terpasang justru `arah: turun` | layar Atur Target produksi |
+| Arah turun memberi 100 begitu realisasi ≤ target | `shared-library/models/employee/kpi_reduksi.go:243-244` — `if realisasi <= target { return 100 }` |
+| Layar ikut membenarkan angkanya | `services/employee/kpi_team.go:161-162` `kesimpulanOtomatis` memilih frasa *"makin kecil makin baik"* dan verdikt *"berada dalam batas"* |
+
+| | arah terpasang (SALAH) | arah seharusnya (BENAR) |
+|---|---|---|
+| Rumus | `realisasi ≤ target → 100` | `38,03 / 95 × 100` |
+| Nilai metrik | **100** dari 100 | **40** dari 100 |
+| Kontribusi ke skor SPV (bobot 0,10) | 10,0 poin | 4,0 poin |
+
+**Skor SPV yang tampil kelebihan 6 poin** semata dari kesalahan ini.
+
+#### ⚠️ Yang paling mudah salah dibaca: arah `turun` pada F1 justru BENAR
+
+F1 pada template yang sama juga berarah `turun` dan juga bernilai 100 — dan di sana **tak ada yang perlu diperbaiki**. Bunyi KPI-nya *"piutang aging > 60 hari sampai **< 5%** dari total AR"*, realisasinya 0,76, dan 0,76 < 5 memang layak 100. Kelima metrik diperiksa satu per satu terhadap bunyi KPI-nya masing-masing pada 2026-08-31: **hanya F4 yang salah**; F1, F2, F3, dan F5 sah dan sengaja **tidak** diseragamkan.
+
+> **Aturannya: arah mengikuti BUNYI KPI-nya, bukan mengikuti metrik tetangga.** Metrik yang mengembalikan akurasi/persentase-tercapai butuh `naik`; metrik yang mengembalikan pelanggaran/keterlambatan/selisih butuh `turun`. Ditulis lengkap beserta tabel keputusannya di [[RUN - Menambah Metrik KPI Otomatis]] §"Arah mengikuti BUNYI KPI-nya", dan itu tempat yang harus dibuka **sebelum** mengonfigurasi metrik baru — bukan dokumen ini, yang mencatat kejadiannya.
+
+Ini contoh sempurna dari peringatan yang sudah lama ada di runbook itu: **salah arah tidak menimbulkan galat, ia hanya menghasilkan angka salah yang tampak wajar.** Tidak ada yang akan curiga pada nilai 100, dan kalimat penjelas di layar justru ikut menguatkannya.
+
+#### ⛔ Skor yang sudah beku TIDAK ikut terperbaiki
+
+`shared-library/models/employee/models.go:351-377,646-651`: dokumen `kpi_score` membawa **snapshot template**, dan `AutoValue`/`AutoBasis` ikut disalin ke dalamnya. Begitu `POST /kpi` tersimpan, snapshot itu beku — **memperbaiki `kpi_template` tidak menyentuh dokumen `kpi_score` yang sudah ada.**
+
+Konsekuensinya, dan apa yang harus dilakukan manusia:
+
+1. **Perbaiki konfigurasinya lebih dulu** (`auto.arah` F4 → `naik`), lalu verifikasi.
+2. **Cari apakah ada `kpi_score` tersimpan yang memakai arah salah** — **TBD**, hanya bisa dijawab dari basis data produksi. Petunjuk yang mempersempit: bukti layar berasal dari **Skor Sementara** periode berjalan, yang dihitung ulang tiap layar dibuka dan **belum tersimpan**; bila belum ada `POST /kpi` untuk periode ini, tak ada yang beku dan perbaikan konfigurasi sudah cukup.
+3. **JANGAN menyunting `kpi_score` langsung di Mongo.** Dokumen itu catatan penilaian yang sudah disetujui; menyuntingnya di luar jalur API menghilangkan jejak siapa menilai apa.
+4. **Penilaian ulang periode itu lewat `POST /kpi`** oleh penilai yang berwenang — jalur yang sama dengan penilaian pertama. Usulan sistem dihitung ulang dengan arah yang benar.
+5. **Beri tahu yang dinilai bahwa skornya berubah dan kenapa.** Skor yang turun 6 poin tanpa penjelasan terbaca sebagai hukuman sewenang-wenang, padahal yang terjadi koreksi angka yang sejak awal salah.
+
+⚠️ **Ada tenggat keras: 5 September 2026.** Cron finalisasi membekukan KPI Finance mulai **tanggal 5**, bukan tanggal 1 seperti departemen lain (`services/employee/kpi_finalisasi.go:120-122`, `tanggalBekuKPIKhusus{"Finance": 5}`). Perbaikan yang selesai sebelum tanggal itu cukup berupa konfigurasi; sesudahnya menuntut penilaian ulang.
+
+**TBD**: siapa dan kapan menyetel arah F4 jadi `turun`. Skrip penyalaan yang disiapkan sebelumnya menuliskan `naik`, jadi penyimpangan ini lahir di luar jalur skrip — kemungkinan besar dari pengisian manual lewat layar Atur Target. Cara memverifikasi: koleksi `kpi_template_audits` bila mencatatnya; kalau tidak, `updated_at` dokumen `kpi_template` dibanding jam kerja HR.
+
+Skrip diagnosa (baca-saja), perbaikan (dry-run bawaan, `$set` sempit pada `auto.arah` saja, dengan rollback), dan verifikasi tersedia di bip-erp `scripts/kpi-spv-finance-perbaikan/` branch `bip-erp/t_9ee46a63-…` commit `555a0226`, beserta laporan lengkap dan 15 pemeriksaan uji yang lulus di atas Mongo palsu. **Tak satu pun sudah dijalankan terhadap produksi.**
 
 ## Progres bulan berjalan di MyBharata
 

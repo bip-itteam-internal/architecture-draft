@@ -276,6 +276,25 @@ Penawarnya bukan menaikkan target, melainkan **membalik besarannya**: ukur yang 
 
 Dari 311 metrik produksi, **43 berarah turun** dan menumpuk di Finance, Manufaktur, Quality, dan General Affair. Kalau departemenmu salah satunya, anggap `arah: "turun"` sebagai bawaan sampai terbukti sebaliknya.
 
+#### ⛔ Arah mengikuti BUNYI KPI-nya, bukan metrik tetangga
+
+Peringatan di atas terwujud di produksi **31 Agustus 2026** pada F4 SPV Finance, dan bentuknya persis seperti yang diperingatkan: **tanpa galat, tanpa gejala, angkanya sempurna.**
+
+Metrik `forecast_kas`/`akurasi_forecast_kas` dikonfigurasi `arah: turun` dengan target 95. Metriknya mengembalikan **akurasi** — `AkurasiPersen`, makin tinggi makin baik (`kpi_sumber_forecast_kas.go:48,96`) — dan bunyi KPI-nya *"akurasi ≥ 95%"*. Pada arah `turun`, `NilaiDenganArah` mengembalikan **100 begitu `realisasi <= target`** (`kpi_reduksi.go:243-244`), sehingga akurasi **38,03%** dibaca `38,03 ≤ 95` → **100 dari 100**. Arah `naik` yang benar memberi `38,03/95 × 100` = **40**. Kalimat di layar pun ikut menyesuaikan diri (`kesimpulanOtomatis`, `kpi_team.go:161-162`: *"makin kecil makin baik"*, *"berada dalam batas"*), jadi tak ada satu pun petunjuk bahwa ada yang salah.
+
+⚠️ **Yang membuat kasus ini layak dihafal: metrik TETANGGANYA berarah `turun` dan itu BENAR.** F1 pada template yang sama (`kinerja_ar`/`piutang_lewat_60_persen`) berarah `turun` target 5 dan juga bernilai 100 — realisasi 0,76 memang di bawah 5, dan bunyi KPI-nya *"piutang aging > 60 hari sampai **< 5%**"*. Menyeragamkan arah "karena departemen Finance kebanyakan turun" justru yang melahirkan kesalahan ini. Aturannya satu kalimat:
+
+> **Baca bunyi KPI-nya, lalu tanya: angka yang dikembalikan metrik ini, kalau NAIK, kabar baik atau buruk?**
+
+| Yang dikembalikan metrik | Arah | Contoh nyata |
+|---|---|---|
+| akurasi, persentase-tercapai, cakupan, ketepatan waktu | `naik` | `akurasi_forecast_kas` (≥95%), `uptime` |
+| pelanggaran, keterlambatan, selisih, sisa, rasio-beban | `turun` | `piutang_lewat_60_persen` (<5%), `varians_absolut_persen` (±5%), `rasio_beban_non_ops_persen` (≤2%), `downtime` |
+
+⛔ **Ada tanda baca yang menentukan, dan gratis dibaca**: `≥`/`minimal`/`akurasi` menuntut `naik`; `≤`/`<`/`maksimal`/`zero` menuntut `turun`. Bila label dan deskripsi metriknya menyebut dua hal berbeda (terjadi pada F4: label `Return on Operation = 2,75`, deskripsi *"akurasi ≥ 95%"*), **yang mengikat adalah hal yang benar-benar dihitung sumbernya** — bukan labelnya.
+
+⚠️ **Konsekuensi yang tak bisa ditebus dengan memperbaiki konfigurasi**: begitu `POST /kpi` tersimpan, snapshot template ikut beku di dokumen `kpi_score`. Memperbaiki `kpi_template` **tidak menyentuh skor yang sudah tersimpan** — perlu penilaian ulang periode itu lewat jalur API yang sama. Rincian kejadian dan tindakannya di [[HRIS - Otomasi Skor KPI]] §"Kesalahan arah F4".
+
 Untuk arah `turun`, **`target: 0` sah dan bermakna**: "zero accident", "zero major finding", "selisih 0%". Realisasi 0 bernilai penuh; sekali melanggar langsung jatuh ke 0, karena tidak ada yang namanya sedikit zero accident.
 
 ### Target berlapis tiga: per karyawan, per periode, umum
@@ -336,7 +355,7 @@ Jangan menunggu reduksi baru untuk keduanya, karena tidak akan datang.
 
 ## Kesalahan yang sudah pernah terjadi di sini
 
-Empat contoh nyata, semuanya bertipe sama: salah yang tidak menimbulkan error.
+Lima contoh nyata, semuanya bertipe sama: salah yang tidak menimbulkan error.
 
 | Kejadian | Akibat |
 |---|---|
@@ -344,12 +363,14 @@ Empat contoh nyata, semuanya bertipe sama: salah yang tidak menimbulkan error.
 | Kolom `team` di `icc_account_mappings` menulis `Tech Development` untuk sepuluh orang Kyura | Atribusi ke departemen yang salah bila dijoin lewat kolom itu, bukan lewat `work_data` |
 | Metrik `...10.000/video` diisi 0 untuk semua ICC tiap bulan | Semua ICC kehilangan poin yang sebenarnya mereka dapat |
 | Template Kyura Supervisor menilai `Produk Beautyhacks` | Supervisor Kyura dinilai dari rating toko departemen lain |
+| **F4 SPV Finance disetel `arah: turun` untuk metrik yang mengembalikan akurasi** (2026-08-31) | Akurasi **38,03%** terhadap target 95 dinilai **100/100**; skor SPV kelebihan **6 poin** (bobot 0,10). Tak ada galat, dan kalimat penjelas di layar ikut membenarkan angkanya |
 
 ## Checklist sebelum PR
 
 - [ ] Jumlah dokumen sumber di produksi dicek, bukan cuma keberadaan koleksinya
 - [ ] Atribusi ke orang terbukti, termasuk berapa persen yang belum terpetakan
 - [ ] `arah` diisi sadar, terutama bila deskripsinya memuat "turun", "maksimal", "≤", atau "zero"
+- [ ] ⛔ **`arah` diuji terhadap BUNYI KPI-nya, bukan terhadap arah metrik tetangga di template yang sama.** Tanya: "kalau angka yang dikembalikan sumber ini NAIK, itu kabar baik atau buruk?" Metrik ber-akurasi/persentase-tercapai butuh `naik` meski seluruh metrik lain di template itu `turun` — lihat §"Arah mengikuti BUNYI KPI-nya"
 - [ ] `ambang` dan `target` dibedakan bila memakai `rasio_ambang`
 - [ ] Sumber diuji dengan data palsu, tanpa Mongo
 - [ ] Hasil hitung dibandingkan dengan skor manual periode terakhir, dan selisihnya dijelaskan
