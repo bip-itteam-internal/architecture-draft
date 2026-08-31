@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-31",
-  "jumlah_dokumen": 330,
+  "jumlah_dokumen": 332,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1039,6 +1039,49 @@
       ]
     },
     {
+      "path": "Application/APP - Buku Besar Konsolidasi CV FINCON.md",
+      "judul": "APP - Buku Besar Konsolidasi CV FINCON",
+      "area": "Application",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — aplikasi berjalan penuh (jurnal → buku besar → laporan → konsolidasi), **tetapi hidup sepenuhnya di luar ERP**: repo pribadi di luar org `bip-itteam-internal`, database Supabase sendiri, login sendiri (7 akun hardcoded), dan **membangun ulang general ledger yang menurut [[ADR - 0001 Akuntansi via Accurate]] adalah ranah Accurate**. Didokumentasikan di sini supaya keberadaannya berhenti tak terlihat; keputusan arah ada di [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]] (🟡 masih Proposed).",
+      "publik": true,
+      "tautan": [
+        "ADR - 0001 Akuntansi via Accurate",
+        "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
+        "CORE - API Master Gateway",
+        "CORE - SSO Flow",
+        "Finance - Delete Data Finance lama",
+        "Microservices - Payroll Service",
+        "API - Integration Service",
+        "Finance - Rancangan Finance Service",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "HRIS - Matriks KPI per Departemen",
+        "Finance - Dashboard per Posisi (FAT)",
+        "IT - Server, VMs and Databases",
+        "Microservices - Integration Service",
+        "External - Accurate",
+        "Finance - Bridging App New Golang",
+        "Finance - Big Pictures"
+      ],
+      "hash": "a0cf1c46edeb94e6548690715aaf5e79ac36247b2f6eac4d8e29082fe91ad1ce",
+      "ukuran_kb": 20.4,
+      "ringkasan": "Menjawab: aplikasi akuntansi apa yang dipakai membukukan 40 CV grup Bharata di luar ERP, modul apa saja yang ada (jurnal kas/piutang/utang/umum/penyesuaian, saldo awal, buku besar, laba rugi, neraca, arus kas metode langsung, perubahan ekuitas, aset tetap, kertas kerja konsolidasi + jurnal eliminasi intercompany), dan siapa yang boleh mengaksesnya. Menjelaskan juga arsitekturnya yang langsung ke Supabase tanpa backend dan tanpa API Gateway, webhook Google Sheets untuk jurnal kas, serta pembagian akun admin1 sampai admin6 per kelompok CV. Berguna untuk memahami mengapa laba per CV punya sumber angka kedua di luar Accurate.",
+      "kata_kunci": [
+        "CV FINCON",
+        "buku besar",
+        "general ledger",
+        "konsolidasi",
+        "consolidation",
+        "jurnal eliminasi",
+        "intercompany",
+        "40 CV",
+        "Supabase",
+        "consolidated-accounting-app"
+      ]
+    },
+    {
       "path": "Application/APP - Dynamic Task Tracker.md",
       "judul": "APP - Dynamic Task Tracker",
       "area": "Application",
@@ -1376,20 +1419,20 @@
       "status_teks": null,
       "publik": true,
       "tautan": [],
-      "hash": "083aeac288e764b97e893827f724d6ad337cead09954114f1844409bfb978c60",
-      "ukuran_kb": 13.0,
-      "ringkasan": "Menjawab: aturan main menulis dokumentasi di vault arsitektur ERP Bharata — struktur folder per domain, konvensi penamaan berprefiks, kewajiban grounded-in-code, wikilink 0-broken, bentuk penulisan status marker, dan template per jenis dokumen. Juga menjawab repo kode mana dipetakan ke dokumen mana, serta alur sync dan aturan git yang harus diikuti tiap update.",
+      "hash": "c8592950889d46e6572448677acfcda50bb9fc03d0ef8818fda54e40bfd27073",
+      "ukuran_kb": 13.2,
+      "ringkasan": "Menjawab: bagaimana aturan menulis dokumentasi di vault architecture-draft, folder mana yang dipakai untuk domain apa, prefix nama berkas apa yang benar (CORE, Microservices, HRIS, ADR, API, RUN, REF, LOG, QA, MTG, ANALISA), dan bagaimana status marker ditulis supaya terbaca indeks. Menjelaskan juga prinsip grounded-in-code, kewajiban wikilink 0 broken, template struktur dokumen, pemetaan repo kode ke dokumen, cara kerja VAULT-INDEX.json, alur sync, dan aturan git vault (stage per nama berkas, jangan git add -A). Ini rulebook yang wajib dibaca sebelum membuat atau memindahkan dokumen vault.",
       "kata_kunci": [
         "rulebook",
-        "CLAUDE.md",
-        "konvensi penamaan",
-        "grounded-in-code",
-        "wikilink",
+        "konvensi dokumentasi",
+        "naming convention",
+        "prefix berkas",
         "status marker",
-        "template",
-        "vault",
-        "dokumentasi",
-        "prefix"
+        "wikilink",
+        "template dokumen",
+        "grounded-in-code",
+        "VAULT-INDEX",
+        "aturan git vault"
       ]
     },
     {
@@ -2764,19 +2807,24 @@
         "Finance - Big Pictures",
         "External - Accurate",
         "Finance - Bridging App",
-        "Microservices - Integration Service"
+        "Microservices - Integration Service",
+        "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
+        "APP - Buku Besar Konsolidasi CV FINCON"
       ],
-      "hash": "cd7bf8f15878f3a709e67cad6cdb42c494b993e436ee2a3c93da8cdef23fd7f7",
-      "ukuran_kb": 1.5,
-      "ringkasan": "Menjawab: kenapa bip-erp tidak membangun sistem akuntansi/general ledger sendiri dan memilih Accurate sebagai sumber kebenaran pembukuan, serta apa konsekuensinya terhadap fitur yang mengasumsikan akuntansi internal. Rujuk dokumen ini saat menimbang apakah suatu fitur finance sebaiknya dibangun di ERP atau didelegasikan ke Accurate.",
+      "hash": "f78d06d69f0e783381a650ba2e8ec9e4979d6c1089ac06a31fd9600dafd1402b",
+      "ukuran_kb": 2.2,
+      "ringkasan": "Menjawab: mengapa ERP internal tidak membangun akuntansi double-entry atau general ledger sendiri, dan sampai di mana batas tanggung jawab bip-erp terhadap pembukuan. Menetapkan bahwa COA, jurnal, buku besar, neraca, dan laba rugi adalah domain Accurate sementara bip-erp hanya menjembatani data orders dan purchase lewat Bridging App / Integration Service. Memuat juga catatan bahwa keputusan ini sedang ditantang keadaan sejak Agustus 2026 tetapi belum dicabut maupun diamandemen.",
       "kata_kunci": [
-        "ADR",
+        "ADR 0001",
         "Accurate",
         "akuntansi",
+        "accounting",
+        "double-entry",
         "general ledger",
-        "bridging finance",
-        "keputusan arsitektur",
-        "double-entry"
+        "chart of accounts",
+        "COA",
+        "bridging",
+        "out-of-scope"
       ]
     },
     {
@@ -5119,6 +5167,42 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate.md",
+      "judul": "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Proposed** — keberadaan sistemnya **fakta**, arahnya **belum diputuskan**. Keputusan ada di SPV FAT + IT, bukan di dokumen ini.",
+      "publik": true,
+      "tautan": [
+        "APP - Buku Besar Konsolidasi CV FINCON",
+        "ADR - 0001 Akuntansi via Accurate",
+        "Finance - Big Pictures",
+        "Microservices - Integration Service",
+        "Microservices - Payroll Service",
+        "HRIS - Matriks KPI per Departemen",
+        "External - Accurate",
+        "Finance - Rancangan Finance Service",
+        "Finance - Dashboard per Posisi (FAT)",
+        "API - Integration Service"
+      ],
+      "hash": "fa79eaa300c195d632739d384f2086453987ba70a244f61fea1f328a3250c1b3",
+      "ukuran_kb": 6.0,
+      "ringkasan": "Menjawab: apa yang harus dilakukan terhadap buku besar konsolidasi 40 CV yang berjalan di luar ERP dan di luar Accurate, dan apa saja pilihan arahnya (A kukuhkan ADR 0001 lalu bangun konsolidasi di atas data Accurate, B amandemen supaya aplikasi berhenti membukukan sendiri dan hanya jadi lapisan konsolidasi, C akui sebagai sistem terpisah tetapi dipagari SSO, RBAC, RLS, test, dan rekonsiliasi). Menjelaskan alasan mengapa ini bukan sekadar alat bantu pribadi: entitas CV-nya sama dengan Payroll Service dan Accurate, laba rugi jadi punya dua sumber tanpa rekonsiliasi, celah kertas kerja konsolidasi memang nyata, dan ada metrik KPI Accounting CV berbobot 0,30 yang menunggu keluarannya. Statusnya masih Proposed, keputusan ada di SPV FAT dan IT.",
+      "kata_kunci": [
+        "ADR 0068",
+        "konsolidasi",
+        "consolidation",
+        "40 CV",
+        "Accurate",
+        "rekonsiliasi",
+        "buku besar kedua",
+        "tata kelola",
+        "shadow IT",
+        "KPI Accounting CV"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -5167,22 +5251,29 @@
       "publik": true,
       "tautan": [
         "External - Accurate",
+        "APP - Buku Besar Konsolidasi CV FINCON",
+        "Microservices - Payroll Service",
+        "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
+        "ADR - 0001 Akuntansi via Accurate",
         "Finance - Bridging App",
         "Finance - Incentive",
         "Finance - Dashboard per Posisi (FAT)",
         "Vendor - CRM"
       ],
-      "hash": "a123fd3be64d42ac1ceed178982f488acfeb2892dd91b86cfd6ee7fcd7d6f8da",
-      "ukuran_kb": 1.0,
-      "ringkasan": "Menjawab bagaimana peta domain Finance System secara garis besar, kenapa sistem finance lama yang tersinkron ke Accurate tidak ditautkan langsung ke arsitektur baru, dan apa rencana ke depan untuk sistem finance yang dibangun ulang dari awal.",
+      "hash": "df7fa9027e59173000c7c0d2642a983fb831780ea25a2498c83ffa5239333f0b",
+      "ukuran_kb": 2.0,
+      "ringkasan": "Menjawab: seperti apa peta besar domain Finance di Bharata, mengapa sistem finance lama dianggap sudah terenkapsulasi dan direncanakan dibangun ulang dari awal, serta bagaimana data dari Vendor CRM dibersihkan dan disinkronkan ke Accurate. Memuat juga penunjuk ke sistem akuntansi kedua di luar peta ini (buku besar konsolidasi 40 CV) beserta konsekuensinya bahwa laba per CV kini punya dua sumber yang tak direkonsiliasi. Titik masuk untuk menemukan dokumen Finance lain seperti Bridging App, Incentive, dan Dashboard per Posisi FAT.",
       "kata_kunci": [
         "finance",
+        "keuangan",
+        "big picture",
+        "overview",
         "Accurate",
-        "bridging app",
+        "bridging",
+        "CRM",
         "insentif",
-        "dashboard keuangan",
-        "overview domain",
-        "akuntansi"
+        "dashboard FAT",
+        "konsolidasi CV"
       ]
     },
     {
@@ -5933,6 +6024,8 @@
         "APP - Tiktok Insight Analyzer",
         "APP (Extension) - Fingerprint Listener (Complete)",
         "APP - Portal Karir Bharata",
+        "APP - Buku Besar Konsolidasi CV FINCON",
+        "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
         "HRIS - Big Pictures",
         "Sales - Big Pictures",
         "GA - Big Pictures",
@@ -5952,19 +6045,20 @@
         "IT - SOP Dokumentasi Vault",
         "RUN - Onboarding Developer Baru"
       ],
-      "hash": "a7f85f84b2c8c034892c59c9e818c23b01f0505267942ad1227b26c0f3a66278",
-      "ukuran_kb": 7.2,
-      "ringkasan": "Menjawab pertanyaan orientasi umum tentang arsitektur ERP Bharata (bip-erp) -- apa itu API Gateway, Orchestrator, dan Service, bagaimana struktur routes (/public, /api, /auth, /ext, dll), struktur repository bip-erp, serta menjadi peta/index ke seluruh dokumen vault (aplikasi, microservices, domain, ADR, API reference).",
+      "hash": "07204376003ca2881b28eb43cdd3e1059808babe744567c32a46a75cfd57ecdd",
+      "ukuran_kb": 7.3,
+      "ringkasan": "Menjawab: seperti apa bentuk sistem ERP Bharata secara keseluruhan, apa peran API Gateway (JWT, SSO, propagasi routes), apa itu Orchestrator, dan apa beda open route service dengan restricted service. Menjelaskan struktur prefix routes gateway (/public, /health, /api, /auth, /ext, /onboarding, /debug, /dev), tiga tipe request, struktur repo bip-erp, serta langkah membuat service baru dari go mod init sampai menambah service-module-url dan env. Sekaligus jadi peta indeks ke seluruh dokumen vault (core, microservices, aplikasi, domain, ADR, runbook) dan cara memakai authentication ERP lewat SSO untuk aplikasi eksternal.",
       "kata_kunci": [
         "homepage",
         "peta dokumentasi",
+        "index",
+        "arsitektur ERP",
         "API Gateway",
         "orchestrator",
-        "arsitektur ERP",
-        "struktur routes",
-        "bip-erp",
-        "index vault",
-        "SSO"
+        "microservices",
+        "SSO",
+        "routes",
+        "service baru"
       ]
     },
     {
