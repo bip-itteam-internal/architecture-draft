@@ -511,6 +511,37 @@ Ada di grup `/me` (cukup karyawan terautentikasi), BUKAN `/kaizen` maupun `/form
 
 Bukan komite dibalas `is_committee:false`, **bukan `403`**, supaya menunya menjelaskan keadaannya sendiri. "Tak ada program" dan "bukan tugas saya" sengaja tak dibedakan, sama seperti `has_program`: bagi pemakai ujungnya sama, dan membedakannya membocorkan keberadaan program ke orang di luar komite. Gerbangnya memakai predikat `isKaizenCommittee` yang sama persis dengan `loadCommitteeForm`, supaya menu tak pernah muncul untuk orang yang tombolnya justru menolak bekerja.
 
+## Template form generik + realisasi program Culture
+
+> **Status**: ⚠️ **Branch `feature/workspace-position`** (bip-erp + erp-frontend), terverifikasi lokal/DEV, **belum merge ke `main`, belum di prod.** Keputusan lengkap + trade-off: [[ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)]].
+
+Koleksi baru **`form_templates`** (`Collections.Templates`) menyimpan **cetakan** form yang bisa dipakai berulang. Template **tidak menerima jawaban**; ia dipakai untuk melahirkan `Form` lewat `POST /form-templates/:id/instantiate`, yang menyalin `fields` + `form_type` + `default_recurrence` ke sebuah `Form` **draft** ber-`template_id`. Kelima rute CRUD + instantiate ada di [[API - Form Builder Service]].
+
+**Field disalin, bukan dirujuk.** Menyunting template setelah sebuah form terbit tak boleh mengubah arti jawaban yang sudah masuk — pola yang sama dengan alasan susunan pertanyaan terkunci `409` begitu ada jawaban. `Form` bertambah satu field, **`template_id`**, semata untuk menjejak asal-usulnya.
+
+**Kenapa membangun template generik untuk SATU pemakai.** Pemakainya hari ini cuma jabatan **Culture & Industrial**. Ini menyimpang sadar dari prinsip tim "jangan generalisasi untuk pemakai yang belum ada / angkat abstraksi pada pemakai ketiga". Dipilih pemilik produk setelah diberi opsi ringan (seed satu form saja): jalur seed menaruh pekerjaan berulang "satu form realisasi = satu rilis kode" ke dev selamanya, sedangkan template memindahkannya ke layar. Trade-off diterima terbuka; alasan penuhnya di ADR 0065.
+
+### Seed idempoten "Program Culture"
+
+`seed_culture.go` (dipanggil `main.go` saat boot) menyisipkan:
+
+- **Template** "Formulir Rencana & Realisasi Program Culture", slug **`program-culture-rencana-realisasi`**, `form_type: survey`.
+- **Satu `Form` aktif** (published, recurring **monthly**) untuk departemen Human Resource / posisi Culture & Industrial, ber-`template_id` menunjuk template di atas.
+
+**Idempotensinya lewat SLUG spesifik**, bukan "koleksi tak kosong": koleksi yang sudah berisi template lain tetap menerima seed ini tepat sekali, dan boot berikutnya tak menggandakannya. Field-nya datar meniru lima seksi xlsx sumbernya (metadata; rancangan/target; before/after; root-cause/CAPA sebagai teks datar; anggaran `number`; lampiran `file`). Field penggerak KPI adalah radio **`terlaksana_sesuai_jadwal`** beropsi `"Ya"`/`"Tidak"`.
+
+**`form_type: survey`, bukan `report`.** Tipe `report` (rencana terpisah) memikul kewajiban field file + workflow approval; realisasi culture dilaporkan mandiri lalu dibaca sebagai angka KPI, jadi keduanya tak diinginkan. `survey` menghindari kedua beban itu.
+
+### Setoran metrik culture ke KPI
+
+`GET /internal/culture/metrics?period=YYYY-MM` membalas `{data{<employee_id>:{direncanakan, sesuai_jadwal}}, period_key, has_program}`, meniru bentuk `/internal/kaizen/metrics` dan **menggerbang dirinya sendiri** ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]).
+
+**Membaca ISI `answers`, BUKAN `decision.status` seperti Kaizen.** Agregasi form ber-`template_id` = template culture per `period_key`: `direncanakan` = jumlah respons periode itu, `sesuai_jadwal` = respons yang jawaban `terlaksana_sesuai_jadwal`-nya `"Ya"`. `has_program:false` bila template/form culture belum ada — sama seperti Kaizen, ia membedakan "belum ada program" dari "gagal ambil data", dan hanya yang kedua yang layak dilaporkan sebagai metrik gagal hitung.
+
+**Identifikasi lewat `template_id`, bukan `metric_key`.** `metric_key` membawa mesin validasi ber-guard berat (indeks layanan departemen: nilai wajib dikenal, indeks unik parsial per departemen). Culture tak butuh keunikan-per-departemen itu, jadi menumpang `metric_key` berarti dua fitur berbagi satu jalur validasi yang akan menyimpang begitu salah satunya disentuh. `template_id` sudah ada sebagai penjejak instantiate.
+
+Yang **menulis** `kpi_score` tetap [[Microservices - Employee Service]] ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]); service ini hanya melaporkan angkanya. Sisi employee-service adalah sumber `program_culture` (`kpi_sumber_culture.go`), yang menarik lewat `FORM_BUILDER_MODULE_URL` — pola identik `kaizen`.
+
 ## Lampiran berkas (tipe field `file`)
 
 > PR [#1023](https://github.com/bip-itteam-internal/bip-erp/pull/1023) + [#1057](https://github.com/bip-itteam-internal/bip-erp/pull/1057), ✅ **live dev + prod 2026-08-06 dan TERUJI end-to-end di dev**. Berlaku **semua tipe form**, bukan cuma Kaizen.
@@ -636,7 +667,7 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 
 ## Dependensi & Integrasi
 
-- **MongoDB** `form_builder_db` — koleksi `forms`, `form_responses`, `form_periods`, `kaizen_reminder_logs`. Index dibuat idempoten saat boot; `(form_id, period_key)` di `form_periods` **unik**, dan keunikan itulah yang membuat pembuatan periode oleh cron aman tanpa lock. Index unik `(form_id, period_key, employee_id, tag)` pada catatan pengingat memainkan peran yang sama untuk pengingat kuota. Lihat [[DB - Overview and Notes]].
+- **MongoDB** `form_builder_db` — koleksi `forms`, `form_responses`, `form_periods`, `kaizen_reminder_logs`, `form_uploads`, dan (⚠️ branch `feature/workspace-position`) `form_templates`. Index dibuat idempoten saat boot; `(form_id, period_key)` di `form_periods` **unik**, dan keunikan itulah yang membuat pembuatan periode oleh cron aman tanpa lock. Index unik `(form_id, period_key, employee_id, tag)` pada catatan pengingat memainkan peran yang sama untuk pengingat kuota. Lihat [[DB - Overview and Notes]].
 - [[IT - Background Jobs & Schedulers]] — cron pembuka periode form berulang, tiap jam, zona `Asia/Jakarta`; cron yang sama memotret peserta Kaizen dan mengirim pengingat kuota H-7/H-2.
 - [[CORE - API Master Gateway]] — satu-satunya pintu masuk; modul `form-builder` di map `InternalURL`.
 - [[Microservices - Attendance Service]] — **konsumen** `GET /internal/compliance` pada jalur clock-in mobile.
@@ -657,5 +688,5 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 - [[IT - Background Jobs & Schedulers]] — cron pembuka periode
 - [[Microservices - Attendance Service]] · [[CORE - API Master Gateway]] · [[DB - Overview and Notes]]
 - [[Microservices - Employee Service]] — penarik metrik Kaizen ke `kpi_score`
-- [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] · [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]
+- [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] · [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] · [[ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)]]
 - [[APP - Web ERP]] · [[APP - MyBharata]] — klien

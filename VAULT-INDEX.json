@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-08-31",
-  "jumlah_dokumen": 324,
+  "jumlah_dokumen": 325,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -203,34 +203,31 @@
         "API - Index",
         "APP - MyBharata",
         "ADR - 0041 Izin Tipe Form Menempel di Departemen",
+        "ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)",
         "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Attendance Service",
         "Microservices - Employee Service",
         "HRIS - Matriks KPI per Departemen",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "IT - Form Builder",
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "85cab14fc32f21a884876392e9052c158c7b71ab0c29e518308895127410e924",
-      "ukuran_kb": 32.1,
-      "ringkasan": "Menjawab: endpoint apa saja untuk membuat, menerbitkan, dan menganalisa form dinamis, siapa yang boleh mengelolanya (RBAC per departemen plus kunci modul IT untuk aturan tipe form), dan bagaimana karyawan mengisinya lewat rute /me. Memuat juga permukaan Kaizen, indeks layanan departemen, serta bentuk data penting seperti tipe field, bobot, sasaran penilaian, penanda metrik, saklar anonim, form berulang, gerbang presensi, dan blok index pada respons analitik.",
+      "hash": "2014c63d9130056bfd6941c3e4a837574f707cd3705f070979d022703376e8d6",
+      "ukuran_kb": 35.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway /api/form-builder/*, siapa yang boleh membuat/mengisi/menganalisa form, dan bagaimana RBAC-nya bekerja (per departemen, bukan modul). Menjelaskan juga rute kelola form, template form reusable, aturan tipe form per departemen yang digerbang IT, indeks layanan departemen, serta rute Kaizen dan rute /me/* untuk pengisian oleh karyawan.",
       "kata_kunci": [
         "form builder",
-        "endpoint",
         "form dinamis",
-        "survei",
-        "survey",
+        "endpoint",
+        "RBAC departemen",
+        "template form",
+        "tipe form",
         "kaizen",
-        "analisa jawaban",
-        "analytics",
+        "form-type-rules",
         "indeks layanan",
-        "service index",
-        "metric_key",
-        "anonim",
-        "bobot",
-        "weight",
-        "form berulang"
+        "gateway"
       ]
     },
     {
@@ -402,7 +399,7 @@
         "External - Accurate"
       ],
       "hash": "bcea7710bcf81634fa36cef525ae12750afd3010b8efc1f5080da917d979f33d",
-      "ukuran_kb": 74.9,
+      "ukuran_kb": 75.2,
       "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service dan bagaimana memanggilnya — daftar rute di bawah gateway `/api/integration/*` plus webhook publik `/ext/webhook/:service`, termasuk rute mana yang butuh gateway key. Merinci parameter dan perilaku endpoint order/transaksi (list, export xlsx, ringkasan & perbandingan periode, dashboard summary, aging piutang, packet tracking beserta DTO ramping dan filter tanggalnya), feed retur lintas-channel `/transactions/returns` dengan `dedupe_key`, `goods_returning`, dan `accurate_booking`. Juga menjawab kenapa memilih feed retur itu alih-alih `/shopee/returns/list` atau `/accurate/daily-returns`, serta di mana letak rute TikTok Shop/Business, Affiliate, Shopee, Accurate, dashboard FAT accounting, profit dan profit insentif, ICC account mapping, WMS bridge, kas toko/wallet, ulasan marketplace, status sinkron toko, kepemilikan toko per departemen, dan worker/jobs.",
       "kata_kunci": [
         "integration service",
@@ -851,7 +848,7 @@
         "README"
       ],
       "hash": "52eb6306aef513055af71556b6d2cdf0f8cf634f9cb922ca007b472e4ecac5d1",
-      "ukuran_kb": 3.3,
+      "ukuran_kb": 3.4,
       "ringkasan": "Menjawab: endpoint Lazada Open API mana yang benar-benar dipanggil ERP, fungsi Go mana yang memakainya, untuk apa, dan seberapa tinggi confidence tiap endpoint (verified-live, verified-by-usage, atau TBD). Juga menjawab bentuk respons sumber retur Lazada yang dipakai produksi dan TBD apa yang masih terbuka soal enum request_type, reverse_status, serta ketersediaan tracking_number.",
       "kata_kunci": [
         "Lazada",
@@ -933,7 +930,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 1.9,
+      "ukuran_kb": 2.0,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -985,7 +982,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1278,7 +1275,7 @@
         "GA - Inventory Management"
       ],
       "hash": "82081b5881f388d980438c1b83ae9c4157c000d85ef9ba2d46e2cfcb47e0d99e",
-      "ukuran_kb": 357.9,
+      "ukuran_kb": 358.8,
       "ringkasan": "Menjawab: apa itu portal web internal `hris-dashboard` (\"One Bharata\") — stack front-end yang dipakai, bagaimana alur login `employee_id` + password, proactive refresh token dan interceptor 401 bekerja, serta bagaimana web ini berperan sebagai SSO Identity Provider (mint one-time code, allowlist redirect, handoff inbound/outbound). Menjelaskan cara role gating bekerja lewat cookie `system_roles` (peta module → role) untuk sidebar dan halaman, cara menu dikelompokkan dengan menu induk bersarang alih-alih field `group`, serta susunan Pengaturan HRGA terpusat (enam sub-menu, tab diturunkan dari satu tabel `SUB_MENU_PENGATURAN`, penyaringan per tab bukan per halaman). Juga menjawab dukungan multi-perusahaan (company switcher, departemen, shift/rotasi, mesin fingerprint, network WiFi) dan konvensi data-fetching TanStack Query untuk hook sidebar, badge pemberitahuan, gerbang halaman, serta endpoint pencacah.",
       "kata_kunci": [
         "web ERP",
@@ -1930,6 +1927,7 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "DB - Overview and Notes",
         "Microservices - Form Builder Service",
+        "ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)",
         "HRIS - Organization Structure",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "HRIS - Career & Promotion",
@@ -1954,22 +1952,22 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "2e8105e7c588574962294c2f3b5257256d1e8b38cf1d024f06418a5ee4bcbaa1",
-      "ukuran_kb": 116.9,
-      "ringkasan": "Menjawab: bagaimana autentikasi dan onboarding karyawan bekerja sebagai sumber kebenaran SSO, apa saja endpoint master data karyawan, kontrak, BPJS, dan kuota cuti. Juga menjawab: sumber KPI otomatis apa saja yang terdaftar di employee-service, dari service mana masing-masing menarik datanya, metrik apa yang tersedia, dan kenapa sebagian sumber sengaja buta-departemen sementara sebagian lain menyempitkan ke departemen karyawan yang dinilai.",
+      "hash": "820c6beb55727cc9846ea052d9124a406ee13e056efb97ecee4d35331f912aca",
+      "ukuran_kb": 117.8,
+      "ringkasan": "Menjawab: bagaimana autentikasi/login (username/employee_id, PIN, biometric), onboarding/registrasi, dan reset akun bekerja sebagai sumber SSO; bagaimana master data departemen & system_roles dikelola; serta workspace posisi apa saja (Legal, R&D Regulatory, Quality, Procurement non-Accurate) yang di-host di service ini beserta gerbang RBAC-nya. Juga menjelaskan peran service ini sebagai master data karyawan, pemilik KPI/contract/BPJS/cuti, dan feed lintas-service, termasuk dukungan multi-tenant dan resign/nonaktif akun.",
       "kata_kunci": [
         "employee service",
-        "SSO",
         "login",
+        "autentikasi",
+        "SSO",
         "onboarding",
-        "master data karyawan",
-        "KPI otomatis",
-        "sumber KPI",
-        "kpi_score",
+        "system_roles",
+        "master department",
+        "account admin",
+        "KPI",
         "multi-tenant",
-        "akun pihak luar",
         "resign",
-        "kontrak kerja"
+        "legal R&D quality procurement"
       ]
     },
     {
@@ -2036,28 +2034,27 @@
         "RUN - Deploy Microservices bip-erp",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "Microservices - Employee Service",
+        "ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)",
         "Microservices - File Service",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "DB - Overview and Notes",
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "a11b2a418b348b952ddf1094aa1c5efea9c88e38184625b85f5c82dca21cc4d6",
-      "ukuran_kb": 92.9,
-      "ringkasan": "Menjawab: bagaimana form-builder-service diimplementasikan, mulai dari kepemilikan form per departemen, izin tipe form, skor gabungan pada form penilaian, indeks layanan departemen dan blok index di analisa, form berulang berperiode, program Kaizen, lampiran berkas, sampai gerbang presensi. Menjelaskan pula keputusan desain di balik tiap aturan berikut kegagalan senyap yang ditutupnya.",
+      "hash": "84cbee39ba601aa932f74bac806cb1f76cd4e782e2be922ebb33de8924186815",
+      "ukuran_kb": 97.1,
+      "ringkasan": "Menjawab: bagaimana sebuah departemen membuat form dinamis tanpa coding, menerbitkannya ke sasaran, membaca rekap, dan mengekspornya, serta bagaimana form dipakai untuk menilai karyawan lain dan menjaga kepatuhan presensi (menahan clock-in mobile bila ada form wajib belum diisi). Menjelaskan kepemilikan form per departemen, izin tipe form, form berulang periodik, tipe form (survey/evaluation/checklist/kaizen), skor gabungan, template generik, lampiran berkas, dan notifikasi inbox. Grounded ke implementasi Go/Fiber/Mongo di services/form-builder.",
       "kata_kunci": [
-        "form builder service",
+        "form builder",
         "form dinamis",
-        "skor gabungan",
-        "indeks layanan",
-        "metric_key",
-        "blok index",
-        "kaizen",
+        "kepatuhan presensi",
+        "penilaian karyawan",
         "form berulang",
-        "periode",
-        "anonim",
-        "gerbang presensi",
-        "RBAC departemen"
+        "kaizen",
+        "tipe form",
+        "template form",
+        "kepemilikan departemen",
+        "notifikasi inbox"
       ]
     },
     {
@@ -2191,7 +2188,7 @@
         "Vendor - CRM"
       ],
       "hash": "a3ca03f12daeb13ddb6e9a38954d524fe4de9a6d335605e8601d414cb0bb2c64",
-      "ukuran_kb": 296.1,
+      "ukuran_kb": 296.6,
       "ringkasan": "Menjawab: apa peran Integration Service sebagai penghubung marketplace Indonesia (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) sekaligus bridge akuntansi ke Accurate Online — stack, path repo, dan fitur apa saja per modul. Menjelaskan cara webhook direct tiap platform di-ingest dan diautentikasi (HMAC Shopee per `app_type`, processor async, TikTok direct), bagaimana laporan iklan dan GMV Max diagregasi untuk monitoring, overview per produk, dan metrik video ICC (termasuk cara menghitung ROAS/ROI, penanganan bucket atribusi `item_id=-1`, dan penanganan rate limit pada cron master data), serta bagaimana order dinormalkan jadi model transaction terpadu untuk push Sales Invoice dan Sales Return. Juga menjawab pertanyaan seputar batas cakupan service (mis. rencana client Meta Ads, jalur middleware Desty), ICC account mapping dan tim affiliate, WMS bridge, master catalog, background worker cron, beban operasional insentif per proyek Accurate, gross profit per product, review analytics, observability Shopee, index Mongo jalur panas, alarm toko tanpa config Accurate, dan status sinkron per toko.",
       "kata_kunci": [
         "integration service",
@@ -4462,7 +4459,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "1af925998c51daaf89f4b362162b5f8c117e3db82e37169cbfe7b2e6ed084c92",
-      "ukuran_kb": 6.5,
+      "ukuran_kb": 6.6,
       "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal), dan bagaimana auto-disable Tahap 2 bekerja (counter kegagalan auth beruntun, ambang 5, reset saat sukses, satu Telegram tanpa damper terpisah — bukti flapping 36009006). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care.",
       "kata_kunci": [
         "adr",
@@ -4599,7 +4596,7 @@
         "APP - Web ERP"
       ],
       "hash": "3405a3dc1516fe9eff90d36e5a1a47c8a876d2dbaf6bc9537105816d5897ee6d",
-      "ukuran_kb": 10.1,
+      "ukuran_kb": 10.2,
       "ringkasan": "Menjawab: bagaimana penyesuaian statement TikTok (tt_statement_adjustments, mayoritas ganti rugi paket hilang / LOGISTICS_REIMBURSEMENT yang bukan penggantian ongkir) dibukukan ke Accurate — dilipat ke payout pesanan yang disebutnya lalu diurus mesin receipt, bukan sebagai baris pendapatan tersendiri — dan bagaimana pesanan yang tak ditemukan ditangani. Live 26 Agustus 2026 (PR #1451).",
       "kata_kunci": [
         "adr",
@@ -4947,6 +4944,41 @@
         "email_address",
         "ERP JWT",
         "personal_data"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0065 Template Form Generik untuk Realisasi Program (Culture).md",
+      "judul": "ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "**Diterima** oleh pemilik produk 2026-08-30. Kode di branch **`feature/workspace-position`** (bip-erp + erp-frontend), **terverifikasi lokal/DEV, belum merge ke `main`, belum di prod**. Bukan status \"live\".",
+      "publik": true,
+      "tautan": [
+        "Microservices - Form Builder Service",
+        "HRIS - Matriks KPI per Departemen",
+        "API - Form Builder Service",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman",
+        "HRIS - Otomasi Skor KPI",
+        "REF - Penamaan Metrik & Sumber KPI",
+        "Microservices - Employee Service"
+      ],
+      "hash": "3c202e1897fdd9868c6e50bdd1350e7f7f22fe98750fbc883b3883e1adc35afb",
+      "ukuran_kb": 7.7,
+      "ringkasan": "Menjawab: mengapa dibangun template form generik (koleksi form_templates + CRUD + instantiate) meski hanya untuk satu pemakai jabatan Culture & Industrial, dan bagaimana form realisasi program culture menjadi sumber KPI baru program_culture. Mencatat tiga keputusan: menyimpang sadar dari prinsip 'jangan generalisasi', mengidentifikasi form culture lewat template_id (bukan metric_key), dan memakai form_type survey (bukan report) untuk menghindari beban field file + workflow approval.",
+      "kata_kunci": [
+        "ADR 0065",
+        "template form",
+        "form_templates",
+        "culture",
+        "program_culture",
+        "KPI",
+        "instantiate",
+        "template_id",
+        "metric_key",
+        "form_type survey"
       ]
     },
     {
@@ -5685,7 +5717,7 @@
         "GA - Form Pengadaan dan Pengajuan Dana"
       ],
       "hash": "5a506ef2f6690f2d0fd48bd5da4134bc63d99b6af98efef405cd97c1c4ee6447",
-      "ukuran_kb": 7.7,
+      "ukuran_kb": 7.6,
       "ringkasan": "Menjawab: apa saja 11 SOP Procurement resmi PT Bharata (perencanaan kebutuhan, PR, seleksi vendor, RFQ, penerbitan PO, monitoring pengiriman, penerimaan+QC, verifikasi invoice, pembayaran, evaluasi vendor, cost saving, pelaporan) dan sejauh mana masing-masing sudah didukung ERP. Memetakan tahap SOP mana yang sudah ada di kode (Permintaan/Pesanan/Penerimaan), mana yang sebagian, dan mana yang belum dibangun (RFQ 3-vendor, matriks approval nominal >Rp50jt, AVL & dokumen legalitas vendor, scorecard/OTD vendor, pelaporan formal). Berguna untuk mengecek kepatuhan SOP sebelum merancang fitur procurement/manufacture baru.",
       "kata_kunci": [
         "procurement",
@@ -6556,6 +6588,8 @@
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "Microservices - Procurement Service",
         "Microservices - Integration Service",
+        "Microservices - Form Builder Service",
+        "ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "APP - Web ERP",
         "Microservices - Calendar Service",
@@ -6564,21 +6598,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "625f88b1b007f30a7b099be13d4fd316df4e2a75c6c0bf6983ff88520f228505",
-      "ukuran_kb": 179.5,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar terpasang di kpi_template produksi per departemen dan posisi, berikut bobot, target, dan label persisnya termasuk typo. Untuk tiap baris juga menjawab: sumber data mana di ERP yang bisa memasoknya, apakah bisa dinyalakan tanpa deploy, dan apa yang menghalanginya. Memuat rincian lengkap kelima metrik Finance Supervisor beserta catatan cakupan kosmetik dan urutan penilaian yang mengikat.",
+      "hash": "cd9897ef53ed5d6b0a2df778e9be37416977e3695294cf031ee532b0cb56b174",
+      "ukuran_kb": 180.3,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar terpasang di production per departemen dan posisi, berapa bobot dan targetnya (tersimpan di description karena kpi_template tak punya field target machine-readable), dan mana yang bisa/belum bisa diotomatiskan. Berguna sebagai salinan setia data produksi untuk dev yang mengotomatiskan metriknya, dengan catatan ralat 2026-08-31 soal Kaizen (modul ADA tapi diputuskan tidak dipakai) dan forecast kas. Label ditulis persis apa adanya termasuk typo karena label adalah kunci identitas metrik di kode.",
       "kata_kunci": [
+        "KPI",
         "matriks KPI",
         "kpi_template",
-        "bobot metrik",
-        "target KPI",
-        "per departemen",
-        "Finance Supervisor",
-        "otomasi metrik",
-        "Cost Control",
-        "AR Staff",
-        "skor tim",
-        "scope department"
+        "metrik per departemen",
+        "bobot target",
+        "otomasi KPI",
+        "kaizen",
+        "forecast kas",
+        "production",
+        "label metrik"
       ]
     },
     {
@@ -6681,6 +6714,7 @@
         "HRIS - Work Review",
         "Microservices - Calendar Service",
         "Sales - Marketing Dashboard (Master Roadmap)",
+        "ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)",
         "API - Task Management Service",
         "Microservices - Attendance Service",
         "IT - Monitoring System",
@@ -6695,21 +6729,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "7938f49c6cf4b7412523e08f011fa43e7a20f7a27d0f08d90728064c1d73ae1b",
-      "ukuran_kb": 115.9,
-      "ringkasan": "Menjawab: metrik KPI mana yang skornya sudah terisi otomatis di produksi, dari sumber apa, dan berapa cakupannya. Juga menjawab: kenapa sumber bisa gagal hitung tanpa berarti datanya kosong, kenapa KPI Team bisa bernilai nol, kenapa fallback bulan berjalan menuntut otomasi PENUH sehingga otomasi separuh menyumbang nol, dan siapa yang harus mengisi apa sebelum sebuah template supervisor menghasilkan angka.",
+      "hash": "f376496ab5455ebb5ff1248fc7c80358a702c6fd5179ad845656ad794a3ebf60",
+      "ukuran_kb": 117.2,
+      "ringkasan": "Menjawab: dari 311 metrik KPI di produksi mana yang sumber datanya sudah ada, mana yang modulnya ada tapi datanya kosong, dan mana yang tak punya sumber sama sekali — analisis kelayakan mengisi skor KPI otomatis alih-alih diketik supervisor. Menjelaskan mesin otomasi (kontrak sumber nilai, reduksi, arah target, registry), metrik yang sudah menyala, layar diagnostik Otomasi KPI, cara HR mengisi konfigurasi sendiri, tiga jalur perhitungan skor, dan mengapa sumber yang gagal berbeda dari data yang belum ada.",
       "kata_kunci": [
-        "otomasi skor KPI",
-        "auto values",
-        "skor tim",
-        "fallback bulan berjalan",
-        "kpi_score",
-        "snapshot beku",
-        "cakupan semi",
-        "target per karyawan",
-        "supervisor",
-        "Finance",
-        "normalisasi skor"
+        "otomasi KPI",
+        "skor KPI otomatis",
+        "auto-values",
+        "kpi_template",
+        "sumber data",
+        "konektor KPI",
+        "kinerja_tiket",
+        "layar diagnostik",
+        "HR konfigurasi",
+        "kaizen"
       ]
     },
     {
@@ -7897,7 +7930,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
-      "ukuran_kb": 6.8,
+      "ukuran_kb": 6.9,
       "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
       "kata_kunci": [
         "faktur",
@@ -8424,7 +8457,7 @@
         "QA - Register Perizinan & Sertifikasi"
       ],
       "hash": "23e3bd168ac5a48c16f9775bbc34e5fedf3ebe1e157b20409e69fdedb7075c5e",
-      "ukuran_kb": 9.1,
+      "ukuran_kb": 9.0,
       "ringkasan": "Menjawab: register mutu apa saja yang sudah ada di ERP divisi Quality — CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing, dan pengecekan raw material — berikut endpoint `/api/employee/quality/*`, collection MongoDB, dan model datanya. Juga menjawab siapa yang boleh mengakses apa (`quality:staff`, `quality:supervisor`, approver produksi & warehouse, staf marketing), bagaimana alur approval CAPA berjalan (Draft → Diajukan → persetujuan Produksi + Warehouse → finalisasi QA), dan aturan alert keterlambatan tiap register (tenggat H-7, Menunggu >3 hari, antrean >24 jam). Menjelaskan pula apa yang belum tersedia: Dashboard Mutu, IPC/Pre-Check/CPPB, dan checklist GMP/kalibrasi/storage.",
       "kata_kunci": [
         "quality",
@@ -8657,25 +8690,26 @@
       "tautan": [
         "Microservices - Employee Service",
         "HRIS - Matriks KPI per Departemen",
+        "Microservices - Form Builder Service",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "RUN - Menambah Metrik KPI Otomatis",
         "HRIS - Otomasi Skor KPI",
         "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman"
       ],
-      "hash": "423e70a1017d25bb0f20714c9bf93e0208547bdbf8211308f0c246608acb163c",
-      "ukuran_kb": 14.2,
-      "ringkasan": "Menjawab: bagaimana menamai sumber dan metrik katalog KPI serta metrik template supaya tidak menyesatkan pengisi, dan aturan apa yang ditegakkan test alih-alih dokumen. Juga menjawab: di berapa tempat sebuah metrik baru harus didaftarkan di frontend, apa akibatnya bila satuan atau formula terlewat, dan kapan entri per-pasangan sumber-metrik menjadi wajib.",
+      "hash": "905cd65a0f8045db4c6a1d1340d80ed3bcb0b0ea490eb98e27e04bdd09dc0601",
+      "ukuran_kb": 15.5,
+      "ringkasan": "Menjawab: bagaimana aturan menamai sumber/metrik katalog KPI (dibuat dev, tampil di dropdown Sumber data) dan metrik template (dibuat HR, tampil sebagai baris penilaian), termasuk aturan label (sebut yang diukur bukan target, jangan bernomor tanpa makna, ringkas agar tak terpotong di w-60) dan aturan keterangan wajib. Menjelaskan pula bahwa aturan dijaga test (bukan dokumen), empat tempat wajib mendaftarkan metrik baru (kamus label, METRIK_DIKENAL, SATUAN_PER_METRIK, FORMULA_PER_METRIK), dan jebakan kamus metrik datar untuk nama ambigu seperti conversion.",
       "kata_kunci": [
         "penamaan metrik",
         "label KPI",
-        "kamus label",
-        "METRIK_DIKENAL",
+        "sumber KPI",
+        "katalog",
+        "label-otomatis",
+        "kpi_template description",
+        "target metrik",
         "SATUAN_PER_METRIK",
-        "FORMULA_PER_METRIK",
-        "i18n dua bahasa",
-        "sumber katalog",
-        "kpi_template",
-        "naming convention"
+        "METRIK_DIKENAL",
+        "konvensi"
       ]
     },
     {
@@ -10678,7 +10712,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.5,
+      "ukuran_kb": 11.2,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",

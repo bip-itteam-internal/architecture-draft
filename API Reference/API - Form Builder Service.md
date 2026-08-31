@@ -44,6 +44,25 @@ Membuat form atau mengganti tipenya pada form `draft` dibalas **`403`** bila tip
 
 Jalur tulis dikunci `common.CompanyID`, bukan `EffectiveCompanyID`: `?company=` milik admin pusat adalah lingkup baca.
 
+## Kelola Template Form (cetakan reusable)
+
+> ⚠️ **Branch `feature/workspace-position`**, terverifikasi lokal/DEV, **belum merge ke `main`, belum di prod.** Keputusan: [[ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)]].
+
+Template = **cetakan** form yang bisa dipakai berulang; ia **TIDAK menerima jawaban**. Koleksi Mongo baru `form_templates` (`Collections.Templates`). Grup digerbang `requireFormManager`; jalur tulis juga `requireFormWriter`.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/form-templates` | Daftar template (`?status=active\|archived`, `?form_type=`, `?search=`) |
+| GET | `/form-templates/:id` | Detail satu template |
+| POST | `/form-templates` | Buat template |
+| PUT | `/form-templates/:id` | Sunting template |
+| DELETE | `/form-templates/:id` | **Hard delete** — form yang sudah di-instantiate dari template ini **tetap ada** |
+| POST | `/form-templates/:id/instantiate` | Buat `Form` **draft** dari template (salin `fields` + `form_type` + `default_recurrence`, set `template_id`), balas form. Form lahir `draft` lalu diterbitkan lewat jalur `PATCH /forms/:id/status` biasa — **tak melewati gerbang penerbitan tersendiri** |
+
+**Struct `FormTemplate`** (`models_template.go`): `name`, `description`, `form_type`, `fields[]`, `default_recurrence`, `default_audience`, `target_department`, `target_position`, `slug`, `status` (`active`/`archived`), `created_by`, timestamps. **Field disalin (bukan dirujuk)** ke `Form` saat instantiate, jadi menyunting template tak mengubah arti jawaban form yang sudah terbit.
+
+> **Seed idempoten saat boot** (`seed_culture.go`, dipanggil `main.go`): template **"Formulir Rencana & Realisasi Program Culture"** (slug `program-culture-rencana-realisasi`, `form_type: survey`) + satu `Form` aktif (published, recurring monthly) untuk departemen Human Resource / posisi Culture & Industrial. Idempotensinya lewat **SLUG spesifik**, bukan "koleksi tak kosong" — sehingga koleksi yang sudah berisi template lain tetap menerima seed ini sekali. Field-nya datar meniru lima seksi xlsx (metadata; rancangan/target; before/after; root-cause/CAPA flat text; anggaran `number`; lampiran `file`); field penggerak KPI = radio **`terlaksana_sesuai_jadwal`** (opsi `"Ya"`/`"Tidak"`).
+
 ## Analisa & Export (RBAC per departemen)
 | Method | Path | Fungsi |
 |---|---|---|
@@ -132,8 +151,11 @@ Transisi sah: belum ditinjau → `accepted`/`rejected`; `accepted` → `implemen
 |---|---|---|
 | GET | `/internal/compliance` | Form wajib yang belum diisi: `{blocking:[{id,title}], warning:[...]}`. Dipakai [[Microservices - Attendance Service]] saat clock-in |
 | GET | `/internal/kaizen/metrics` | Hitungan ide per orang pada satu periode: `{data{<employee_id>:{submitted,accepted,implemented}}, period_key, has_program}`. `?period=YYYY-MM` (default periode berjalan). Ditarik [[Microservices - Employee Service]] untuk skor KPI |
+| GET | `/internal/culture/metrics` | ⚠️ branch `feature/workspace-position`. Realisasi program culture per orang pada satu periode: `{data{<employee_id>:{direncanakan,sesuai_jadwal}}, period_key, has_program}`. `?period=YYYY-MM`. Ditarik [[Microservices - Employee Service]] untuk sumber KPI `program_culture` |
 
 > **Tiga angka, bukan satu.** Kepatuhan dihitung dari ide yang **diajukan** (karyawan memegang kendali penuh atas kepatuhannya sendiri), skor KPI dari ide yang **diterapkan** — begitulah redaksi metriknya di [[HRIS - Matriks KPI per Departemen]]. `has_program:false` membedakan "perusahaan ini belum menjalankan programnya" dari "gagal mengambil data"; hanya yang kedua layak dilaporkan sebagai metrik gagal hitung.
+
+> **`/internal/culture/metrics` membaca ISI `answers`, bukan `decision.status` seperti Kaizen.** Agregasi form ber-`template_id` = template culture per `period_key`: `direncanakan` = jumlah respons periode itu, `sesuai_jadwal` = respons yang jawaban `terlaksana_sesuai_jadwal`-nya `"Ya"`. `has_program:false` bila template/form culture belum ada. Sama seperti Kaizen, rute ini **menggerbang dirinya sendiri** ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]) dan hanya **melapor** — yang menulis `kpi_score` tetap employee-service ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]).
 
 > **Identitas terkunci ke header.** Query `?employee_id=&department=&company_id=` HANYA dihormati bila request tak membawa `BIP-Employee-ID` sama sekali (ciri panggilan service-to-service). Request pemakai lewat gateway selalu terkunci ke dirinya sendiri — tanpa aturan ini rute ini jadi jalan mengintip form tertunda orang lain lintas perusahaan. Lihat [[ADR - 0031 Prefix internal Bukan Batas Keamanan]].
 
@@ -150,6 +172,8 @@ Transisi sah: belum ditinjau → `accepted`/`rejected`; `accepted` → `implemen
 **Pemilik** (`owner_department`, dan `owner_departments[]` 🔜 branch, belum deploy): nama departemen `master_department` (mis. `"General Affair"`), BUKAN key `system_roles`. Form lama yang masih menyimpan `owner_module` dipindah otomatis saat service boot (`it`→`Tech Development`, `ga`→`General Affair`). `owner_departments[]` memuat SELURUH departemen pemilik saat form dibagikan, dengan `owner_department` sebagai elemen pertama; dokumen lama tanpa `owner_departments` diperlakukan sebagai `[owner_department]` (backfill saat boot).
 
 **Sasaran** (`audience.type`): `all` · `departments` (+`departments[]`) · `employees` (+`employee_ids[]`). `estimated_size` diisi manual sebagai penyebut tingkat pengisian; bila 0, `response_rate` tidak dikirim. Perhatikan `audience.departments` menjawab **siapa yang mengisi**, sedangkan `owner_department` menjawab **siapa yang memiliki** — keduanya tak harus sama.
+
+**Asal template** (`template_id`) — ⚠️ branch `feature/workspace-position`. Menjejak `Form` yang dibuat lewat `POST /form-templates/:id/instantiate` ke template asalnya. **Inilah penanda yang dipakai `/internal/culture/metrics`** untuk mengenali form culture — sengaja BUKAN `metric_key`, supaya tak menumpang mesin validasi ber-guard berat milik indeks layanan ([[ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)]]). Kosong pada form yang dibuat langsung tanpa template.
 
 **Penanda metrik** (`metric_key`) — menandai sebuah form sebagai SUMBER angka ringkasan yang dibaca di luar layar analisa. Satu nilai dikenal: `service_index` (indeks layanan departemen, tampil di ringkasan divisi pemiliknya). Kosong = form biasa, dan itulah keadaan seluruh form lama. Tiga syarat, ketiganya menutup kegagalan **senyap**: nilai wajib dikenal (penanda salah tulis tak akan pernah ditemukan pembacanya), wajib `form_type: survey`, dan wajib `recurrence` ber-`unit: monthly` — jawaban form tak berulang tersimpan tanpa `period_key` sehingga permintaan indeks untuk bulan mana pun tak mencocokkan apa pun dan kartunya kosong selamanya padahal jawaban terus masuk. Pada `PATCH`, **absen berarti jangan diubah**; kirim `""` eksplisit untuk mencabut.
 

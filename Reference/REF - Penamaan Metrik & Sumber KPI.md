@@ -103,6 +103,17 @@ Checklist **empat tempat**, apa adanya:
 
 ⚠️ Metrik ini **tidak** butuh `METRIK_PER_SUMBER`: namanya tidak dipakai sumber lain mana pun (per 2026-08-31). Bila kelak dipakai, entri per-pasangan wajib ikut.
 
+### 🟡 `program_culture` — sumber baru (branch `feature/workspace-position`)
+
+Sumber KPI baru dari [[Microservices - Form Builder Service]] (`GET /internal/culture/metrics`), memasok metrik `culture` KPI Culture & Industrial. **Belum merge/prod.** Label ramah + keterangan ditaruh di kamus `label-otomatis.ts` dan dua locale `src/i18n/locales/{id,en}.ts`.
+
+| Locale | Label sumber | Keterangan |
+|---|---|---|
+| `id.ts` | `Program culture` | "Persentase program culture yang terlaksana sesuai jadwal, dari form realisasi program culture. Menu Form Builder." |
+| `en.ts` | `Culture program` | "Percentage of culture programs carried out on schedule, from the culture realization form. Form Builder menu." |
+
+Kunci i18n: **`srcProgramCulture` / `srcProgramCultureKet`** (dengan awalan `src` karena ini penamaan **SUMBER**, bukan metrik template — bedakan dari `mtk*` untuk metrik). Sumber ini **tanpa sub-metrik**, jadi tak butuh entri `METRIK_PER_SUMBER`; nama metrik yang dilayaninya (`culture`) unik dan tak dipakai sumber lain (per 2026-08-30). `SATUAN_PER_METRIK`/`FORMULA_PER_METRIK`: formula bakunya `rata_rata` (nilai 0–100), jadi mengikuti aturan yang sama dengan sumber Finance — formula boleh dilewatkan bila pengisi diminta memilih; satuan tetap wajib bila targetnya bukan skala 0–100.
+
 ## Mengganti label yang sudah dipakai
 
 **Metrik template aman diganti namanya** sejak tiap metrik punya `key` yang stabil: `IsiKunciMetrik` mempertahankan kunci yang sudah ada, jadi konfigurasi otomatis tidak lepas saat label dibetulkan. Sebelum ada `key`, backend memasangkan konfigurasi lewat label, dan memperbaiki typo berarti menghapus konfigurasinya tanpa pesan.
