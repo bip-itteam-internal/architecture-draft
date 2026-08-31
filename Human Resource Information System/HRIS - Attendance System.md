@@ -34,7 +34,10 @@ Attendance dapat dilakukan dengan 2 metode per Februari 2026, baik dari validasi
 
 Ini adalah fitur yang terikat dan dimiliki oleh HRIS untuk attendance
 - Melihat attendance secara real-time
-- Menyaring tampilan per **periode berjalan** (Minggu / Bulan / Tahun ini; default **Minggu ini**) dan per departemen. Preset periode dihitung di frontend jadi rentang `period_start`/`period_end` yang dikirim ke `GET /entries` (lihat [[API - Attendance Service]]); tanpa navigasi mundur/maju.
+- Menyaring tampilan per **bulan kalender** dan per departemen. Keduanya duduk di **dalam panel Filter** yang sama; sejak 2026-08-31 tak ada lagi kontrol periode terpisah di baris alat, dan preset relatif (Minggu / Bulan / Tahun ini) **dibuang seluruhnya** — tak satu pun dari ketiganya bisa menunjuk bulan tertentu, yang justru pertanyaan paling sering diajukan ke layar ini.
+	- Pilihannya **Januari s/d bulan berjalan tahun ini**, berlabel bertahun ("Agustus 2026") mengikuti bahasa aktif. Bulan yang belum terjadi sengaja tak ditawarkan: ia cuma bisa menghasilkan tabel kosong yang terbaca sebagai "tak ada yang absen". Konsekuensi yang diterima sadar: **tiap Januari daftarnya menyusut jadi satu pilihan**, dan menjangkau tahun sebelumnya menuntut kontrol kedua yang belum diputuskan.
+	- Bulan berjalan disemai sebagai nilai awal, dan tombol Bersihkan menyemainya ulang — jadi tabel **tak pernah** jadi permintaan tanpa batas tanggal atas seluruh riwayat. Frontend menerjemahkan bulan jadi rentang `period_start`/`period_end` yang dikirim ke `GET /entries` (lihat [[API - Attendance Service]]).
+	- ⚠️ **Kartu ringkasan di atas tabel TIDAK mengikuti filter ini.** Angkanya dihitung server untuk bulan berjalan dibanding jendela sepanjang sama bulan sebelumnya (`kehadiran_ringkas.go`), tanpa parameter apa pun dari frontend. Karena itu judul kartu utama **menyebut bulannya sendiri** ("Kehadiran Agustus 2026"), bukan "periode ini": memilih Maret menampilkan tabel Maret dengan kartu Agustus, dan judul yang mengaku "periode ini" akan jadi kalimat yang dibantah layarnya sendiri. Tiga kartu lain belum berlabel periode.
 - Mengubah status entri attendance
 - Menambahkan komentar tambahan pada entri attendance
 - Menambahkan dokumen tambahan pada entri attendance
