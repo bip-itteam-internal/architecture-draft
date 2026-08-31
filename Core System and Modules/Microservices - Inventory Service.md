@@ -42,6 +42,8 @@ _Inventory Service adalah microservice untuk manajemen **aset/inventaris General
 
 - **Summary / reporting:** `GET /summary` — agregasi `$facet` per category/status/department + new-arrivals 30 hari terakhir + **agregasi biaya** (`total_purchase_cost` dari `purchase_price`, `total_repair_cost` dari `repair_history`). Stage `$match {deleted_at:{$exists:false}}` sebelum `$facet` mengecualikan aset soft-deleted dari semua cabang (branch `feat/aset-soft-delete`); `total_repair_cost` **tetap** menghitung perbaikan aset terhapus (uang historis yang sudah keluar)
 
+- **Opname perlengkapan:** `GET/POST /perlengkapan-opname` (2026-08-31, [[ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate]]) — koleksi `ga_opname`, gate `PermGaWork`. Staff GA menyimpan **hitung fisik** barang kategori Perlengkapan; qty Accurate live dari [[Microservices - Integration Service]] (`/accurate/stocks/list?category=Perlengkapan`), **selisih & akurasi dihitung di FE** (pola FASS, seperti rekonsiliasi aset tetap — service ini tetap tak memanggil siapa pun). POST upsert per `item_no` dengan `qty_accurate_snapshot` **dipatok** dari qty yang dilihat operator (selisih tak bergeser oleh sync); `selisih` disimpan BE. ⚠️ Belum ada **unique index** `item_no` (ditunda sampai keputusan periode) & **feed KPI = Fase 2**.
+
 ## Belum Diimplementasikan / Catatan
 
 - Tidak ada stub — CRUD lengkap, workflow repair, dan reporting sudah komplet.

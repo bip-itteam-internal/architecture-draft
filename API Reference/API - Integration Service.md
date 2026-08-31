@@ -122,7 +122,7 @@
 | POST | `/accurate/receipts/:channel/:id/retry` | Retry sinkron Bukti Terima Kas (baris `FAILED`); mem-bypass cap `ReceiptMaxAutoAttempts` yang mengikat jalur otomatis |
 | GET | `/accurate/stocks?sku=` | Stok live per SKU listing (pecah komponen bundle via `product_sku_mappings`, get-stock.do) |
 | POST | `/accurate/wms-adjustment` | **Internal (manufacture)**: pergerakan stok WMS → dokumen Penyesuaian Persediaan (create/edit protokol resmi; qty float dalam satuan Accurate). Lihat [[ADR - 0015 Push Pergerakan WMS ke Accurate]] |
-| GET | `/accurate/stocks/list` | Semua stok dari salinan lokal `accurate_stocks` (search `q`, paginated; `only_products` default true = hanya item ter-mapping produk jualan) ✅ |
+| GET | `/accurate/stocks/list` | Semua stok dari salinan lokal `accurate_stocks` (search `q`, filter `category`, paginated; `only_products` default true = hanya item ter-mapping produk jualan — pakai `only_products=false` untuk Perlengkapan yang bukan barang jualan). Filter `category=Perlengkapan` dipakai opname GA ([[ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate]]) ✅ |
 | GET | `/accurate/stocks/listing` | Stok per SKU listing dari salinan lokal: komponen bundle (+flag `mapped`) + stok efektif; sku numeric-id legacy tersaring ✅ |
 | POST | `/webhooks/services/accurate` | Webhook Accurate (ITEM_QUANTITY/STOCK_MUTATION) → update `accurate_stocks` (PUBLIK via `/ext/webhook/accurate`) ✅ (pendaftaran di portal Accurate masih pending) |
 

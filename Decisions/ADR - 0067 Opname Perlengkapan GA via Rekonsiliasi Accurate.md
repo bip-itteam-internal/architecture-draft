@@ -1,4 +1,4 @@
-# ADR - 0065 Opname Perlengkapan GA via Rekonsiliasi Accurate
+# ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate
 
 ## Untuk Manajemen
 
@@ -11,9 +11,11 @@
 
 *Rekonsiliasi Aset GA ↔ Accurate ([[ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI]], [[ADR - 0049 Padanan Aset per-item berbasis nama menggantikan kategori-golongan]]) DIPERLUAS ke barang **kategori Perlengkapan**. Bedanya dari aset tetap: perlengkapan dicocokkan per-**KUANTITAS** (hitung fisik GA vs qty Accurate), bukan per-unit. Muncul di tab **Data Accurate** yang sama lewat pemilih tipe, bukan tab/modul baru.*
 
-- **Status**: 🟡 **Accepted — belum diimplementasikan** (2026-08-31). Hasil `/analisa-kebutuhan`; rincian analisa di `Workspace/ANALISA - Opname Perlengkapan GA.md` (capture privat, tak terbit ke wiki).
-- **Path di repo (rencana)**: BE `bip-erp/services/integration` (sync tangkap kategori + endpoint stok terfilter), `bip-erp/services/inventory` (store opname); FE `erp-frontend` modul Aset GA (tab Data Accurate — pemilih tipe + input opname).
+- **Status**: ✅ **Implemented — live di PROD** (2026-08-31), terverifikasi end-to-end lewat gateway (263 item Perlengkapan tampil, opname bisa disimpan). Hasil `/analisa-kebutuhan`; rincian analisa di `Workspace/ANALISA - Opname Perlengkapan GA.md` (capture privat, tak terbit ke wiki).
+- **Path di repo**: BE `bip-erp/services/integration` (`clients/accurate_client.go` `ListItemStock`+`ListItemCategories`, `worker/tasks/accurate_stock_refresh.go`, `accurate_stocks.category`, filter di `accurate_daily_invoice_handler.go`), `bip-erp/services/inventory` (`opname_perlengkapan.go` GET/POST `/perlengkapan-opname`, koleksi `ga_opname`); FE `erp-frontend/src/features/inventory` (`accurate-data-tab.tsx` pemilih tipe, `perlengkapan-opname-tab.tsx`, `hooks/use-perlengkapan-opname.ts` `akurasiOpname`).
 - **Tanggal**: 2026-08-31
+
+> **Catatan nomor**: semula 0065; di-renumber ke **0067** karena 0065 bertabrakan dengan dua ADR paralel hari yang sama ([[ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)]] yang lebih dulu, + satu ADR payout). Komentar `ADR-0067` di kode (bip-erp + erp-frontend) mengikuti nomor ini.
 
 ## Context
 
@@ -32,7 +34,7 @@ Keadaan terukur (grounded):
 1. **Perluas rekonsiliasi Accurate yang ada ke kategori Perlengkapan — bukan tab/modul baru.** Perlengkapan masuk ke tab **Data Accurate**, dibedakan lewat **pemilih tipe `Aset Tetap` / `Perlengkapan`** yang **menukar isi tabel + kolomnya** (aset tetap: golongan/nilai buku; perlengkapan: qty per gudang + hitung fisik + selisih). ⛔ TIDAK menumpuk perlengkapan sebagai baris di tabel aset tetap — kolomnya beda, dan mencampurnya adalah "reuse yang salah" (kolom setengah kosong).
 2. **Padanan perlengkapan berbasis KUANTITAS, bukan per-unit.** Yang dibandingkan: **hitung fisik yang di-input GA** saat opname **vs qty Accurate**. Bukan pencocokan 1:1 `accurate_asset_no` seperti aset tetap.
 3. **Accurate = sumber kebenaran** (konsisten dengan aset tetap: input Accurate wewenang Finance). `ga_stok` boleh ditampilkan sebagai kolom pembanding, **bukan** acuan skor.
-4. **Skor akurasi opname → KPI staff GA** (paralel Fase 2 aset tetap). Formula (toleransi variance) diputuskan di `/plan`.
+4. **Skor akurasi opname → KPI staff GA** (paralel Fase 2 aset tetap). **Formula terimplementasi** di FE `akurasiOpname` (fungsi murni, per-item): `accurate=0 & fisik=0 → 100`; `accurate=0 & fisik>0 → 0`; selain itu `max(0, round((1 − |fisik−accurate| / accurate) × 100))` — deviasi relatif, tak pernah negatif. **Feed KPI-nya sendiri = Fase 2** (skor dihitung & disimpan, belum mengalir ke `kpi_score`).
 5. **Sync integration menangkap kategori item Accurate** (mis. field `category` di `AccurateStock`) supaya "Perlengkapan" bisa disaring bersih. Endpoint stok menerima filter kategori.
 6. **Butuh store baru untuk record hitung fisik opname** (item · qty_fisik · snapshot qty_accurate · tanggal · oleh siapa · selisih). Aset tetap menyimpan kunci padanan di item; opname menyimpan record hitungan — beda mekanik.
 
@@ -41,7 +43,10 @@ Keadaan terukur (grounded):
 - **Positif**: reuse layar + pola yang sudah dikenal staff GA; data sudah tersinkron; satu tempat GA↔Accurate, bukan dua yang menyimpang.
 - **Ongkos baru**: (a) sync tangkap kategori + re-sync (rebuild integration-service); (b) store opname baru + endpoint di inventory-service; (c) FE pemilih tipe + form input opname + kolom selisih.
 - **Risiko yang diredam**: dua sumber perlengkapan yang menyimpang — dijaga dengan menetapkan Accurate sebagai kebenaran & `ga_stok` sekadar pembanding.
-- **Ditunda ke `/plan`**: formula skor + toleransi variance; periode opname (bulanan?); apakah opname ikut meng-update `ga_stok` atau murni pengukuran; apakah "kategori Perlengkapan" Accurate cukup bersih atau perlu pengecualian tambahan (filter nama staff GA di Accurate menyiratkan mungkin belum).
+- ⚠️ **Temuan implementasi — `item/list-stock.do` TIDAK mengirim `itemCategory`.** Dugaan awal "tangkap kategori sekalian di sync stok" gugur: terverifikasi prod 2026-08-31 (sync sukses, `accurate_stocks.category` tetap kosong). Kategori diambil **terpisah** lewat `item/list.do?fields=no,itemCategory` (`ListItemCategories`), dibangun jadi peta `item_no → kategori`, lalu di-merge ke tiap baris stok sebelum upsert. Kegagalan ambil kategori **non-fatal** (qty stok tetap tersinkron). `fields` di Accurate MEMBATASI field, jadi diminta eksplisit.
+- **Keputusan yang SUDAH tetap saat implementasi**: (a) `qty_accurate_snapshot` **dipatok** dari qty yang dilihat operator saat menghitung (dikirim FE), agar selisih tak bergeser oleh sync berikutnya; selisih & record disimpan di BE (`ga_opname`, upsert per `item_no`). (b) `ga_stok` **tidak** ditampilkan maupun diperbarui — opname murni pengukuran (koleksi `ga_stok` kosong di prod; perlengkapan belum pernah didata di ERP). (c) `only_products=false` wajib saat menarik perlengkapan (bukan barang jualan). (d) Kategori "Perlengkapan" Accurate **cukup bersih** — 263 item terfilter benar via `accurate_stocks.category`.
+- **Masih TERBUKA (task berikutnya)**: **periode opname** (kini upsert per `item_no`, opname ulang menimpa — belum ada riwayat per-bulan) dan konsekuensinya ke **unique index `ga_opname`** (kunci `{item_no}` vs `{item_no, periode}` bergantung keputusan ini — sengaja belum ditambah); **penanda progres** "X/263 diopname"; **apakah opname mengisi `ga_stok`** agar ERP punya angka perlengkapannya sendiri; **feed KPI (Fase 2)**.
+- **Pelajaran deploy**: image di-panggang saat build. Recreate container tanpa `--build` menjalankan binary lama meski source & merge sudah benar (terjadi 2026-08-31: run summary tanpa field `categories=` menandai binary basi). Verifikasi rebuild lewat jejak di log, bukan `docker ps`.
 
 ## Dokumen Terkait
 

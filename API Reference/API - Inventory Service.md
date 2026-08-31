@@ -35,6 +35,16 @@
 | GET | `/item/repair/:item_id/all` · `/item/repair/:repair_id` | List/detail perbaikan | GeneralAffair |
 | PATCH | `/item/repair/:repair_id` | Edit record perbaikan | GeneralAffair |
 
+## Opname perlengkapan (ADR-0067)
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| GET | `/perlengkapan-opname` | List record opname (satu per `item_no`, opname terakhir) | GeneralAffair (`PermGaWork`) |
+| POST | `/perlengkapan-opname` | Simpan hitung fisik satu barang (upsert per `item_no`) | GeneralAffair (`PermGaWork`) |
+
+- Koleksi `ga_opname`. Staff GA meng-input **hitung fisik**; qty Accurate live diambil FE dari [[API - Integration Service]] (`/accurate/stocks/list?category=Perlengkapan`). Selisih & akurasi dihitung **di FE** (pola FASS), BE cuma MENYIMPAN.
+- POST body `{item_no, nama?, qty_fisik, qty_accurate_snapshot, periode?}`; `item_no`+`qty_fisik` wajib (`qty_fisik ≥ 0`). `qty_accurate_snapshot` = qty Accurate yang **dilihat operator** saat menghitung — dipatok agar selisih tak bergeser oleh sync. `selisih = qty_fisik − qty_accurate_snapshot` dihitung & disimpan BE; `oleh` dari header `EmployeeID`.
+- ⚠️ Upsert per `item_no` **tanpa unique index** (dua save konkuren item sama bisa duplikat; risiko rendah — alat single-user). Kunci unik ditunda sampai keputusan **periode** (`{item_no}` vs `{item_no, periode}`).
+
 ## Kontrak request & validasi (grounded)
 
 Detail berikut grounded ke `services/inventory` (`controller.go`, `validation.go`).

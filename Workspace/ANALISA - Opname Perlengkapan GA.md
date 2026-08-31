@@ -1,6 +1,6 @@
 # ANALISA - Opname Perlengkapan GA
 
-Analisa kebutuhan (pra-`/plan`). Keputusan arsitekturalnya di [[ADR - 0065 Opname Perlengkapan GA via Rekonsiliasi Accurate]]; konsep domainnya di [[GA - Inventory Management]].
+Analisa kebutuhan (pra-`/plan`). Keputusan arsitekturalnya di [[ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate]]; konsep domainnya di [[GA - Inventory Management]].
 
 **Dibuat**: 2026-08-31 · **Status**: keputusan terkunci, beberapa parameter ditunda ke `/plan` (§4).
 
@@ -32,7 +32,7 @@ Selisih solusi↔kebutuhan yang penting:
 3. **Padanan berbasis kuantitas.** Skor aset tetap = harga/tanggal; skor opname = **kecocokan qty fisik vs Accurate** (variance).
 4. **FE**: pemilih tipe `Aset Tetap`/`Perlengkapan` di tab Data Accurate (menukar tabel+kolom) + form input opname + kolom selisih.
 
-## 3. Keputusan terkunci (→ ADR 0065)
+## 3. Keputusan terkunci (→ ADR 0067)
 
 - **Bentuk**: alat opname AKTIF — GA input hitung fisik.
 - **Acuan/kebenaran**: **fisik vs qty Accurate** (Accurate = buku Finance). `ga_stok` = kolom pembanding, bukan kebenaran.
@@ -50,4 +50,4 @@ Selisih solusi↔kebutuhan yang penting:
 
 ## Dokumen Terkait
 
-- [[ADR - 0065 Opname Perlengkapan GA via Rekonsiliasi Accurate]] · [[GA - Inventory Management]] · [[Microservices - Integration Service]] · [[Microservices - Inventory Service]] · [[External - Accurate]]
+- [[ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate]] · [[GA - Inventory Management]] · [[Microservices - Integration Service]] · [[Microservices - Inventory Service]] · [[External - Accurate]]
