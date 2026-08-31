@@ -77,6 +77,32 @@ Itu bukan kemungkinan teoretis. `piutang_lewat_14_persen` dan `piutang_lewat_60_
 
 ⛔ **`conversion` membuktikan kamus metrik yang DATAR tidak cukup.** Nama itu kini dipakai **tiga** sumber dengan arti berbeda — order affiliate milik karyawan (`kinerja_affiliate`), total order channel tim (`kinerja_affiliate_tim`), dan pesanan dibayar dari siaran live (`kinerja_live`) — sehingga pengisi template Host Live membaca keterangan affiliate, kalimat yang salah total untuk metrik yang sedang ia pilih. Jalan keluarnya `METRIK_PER_SUMBER` berkunci `"<sumber>|<metrik>"` yang menang atas entri umum (erp-frontend [#1267](https://github.com/bip-itteam-internal/erp-frontend/pull/1267)). **Metrik bernama umum wajib memakai entri khusus-sumber sejak awal**, jangan menunggu tabrakannya terjadi.
 
+### 🟡 `rasio_beban_non_ops_persen` — contoh kerja aturan ini (2026-08-31)
+
+Metrik baru pada sumber **`admin_non_ops`** untuk KPI F3 SPV Finance (erp-frontend PR [#1332](https://github.com/bip-itteam-internal/erp-frontend/pull/1332), branch `feat/kpi-rasio-non-ops`, **belum merge**; backend bip-erp PR [#1548](https://github.com/bip-itteam-internal/bip-erp/pull/1548)). Dicatat di sini karena ia melewati checklist empat-tempat dengan hasil yang berbeda per tempat.
+
+| Locale | Label | Keterangan |
+|---|---|---|
+| `id.ts` | `Rasio beban non-ops` (20 karakter) | "Beban admin & non-operasional (Iuran & Sumbangan, Bank, Entertainment Adum) dibagi pendapatan periode itu, dalam persen. Target maksimal 2%." |
+| `en.ts` | `Non-ops expense ratio` | "Admin & non-operational expenses (Dues, Bank Fees, Entertainment) divided by that period's revenue, in percent. Target maximum 2%." |
+
+Kunci i18n: `hris.kpi.mtkRasioNonOps` / `…Ket`.
+
+Checklist **empat tempat**, apa adanya:
+
+| Tempat | Status | Catatan |
+|---|---|---|
+| Kamus label (`label-otomatis.ts` `METRIK`) | ✅ | |
+| `METRIK_DIKENAL` (`label-otomatis.aturan.test.ts`) | ✅ | metrik masuk penjaga dua-locale |
+| `SATUAN_PER_METRIK` (`konfigurasi-otomatis-rules.ts`) | ✅ `persen` | **wajib**; tanpanya target `2` **persen** dirender "2 x" (satuan ROAS) |
+| `FORMULA_PER_METRIK` | ⬜ tidak diisi | **bukan kelalaian** — lihat di bawah |
+
+⚠️ **Kenapa `FORMULA_PER_METRIK` sengaja dilewati di sini**, dan kapan itu sah. `formulaKatalog` (`auto-block-rules.ts:92-103`) mengambil rumus dari **katalog backend** lebih dulu (`formula_metrik` → `formula_baku`), dan hanya jatuh ke `FORMULA_PER_METRIK` sebagai **jaring terakhir** untuk jendela antar-deploy. Diverifikasi 2026-08-31: **tak satu pun sumber grup Finance** (`kinerja_ar`, `varians_anggaran`, `forecast_kas`, `kinerja_cost_control`, `admin_non_ops`) memanggil `DaftarkanFormulaSumber`, jadi ketiganya sama-sama mengembalikan `undefined`. Akibatnya pengisi **diminta memilih rumus sendiri**, dan itu memang perilaku yang dikehendaki (komentar `formulaKatalog`: rumus yang salah tak menghasilkan galat, hanya angka salah yang tampak wajar — lebih baik meminta pengisi memilih daripada memilihkan).
+
+⛔ **Bedanya tajam dengan `SATUAN_PER_METRIK`, dan itu yang membuat satuan wajib sementara formula tidak**: satuan yang absen **tidak** meminta apa pun kepada pengisi — ia diam-diam merender suffix yang salah. Formula yang absen berhenti dan bertanya. Aturannya karena itu: **satuan selalu wajib; formula wajib hanya bila sumbernya mendaftarkan formula ke katalog atau kamu ingin ada nilai awal.**
+
+⚠️ Metrik ini **tidak** butuh `METRIK_PER_SUMBER`: namanya tidak dipakai sumber lain mana pun (per 2026-08-31). Bila kelak dipakai, entri per-pasangan wajib ikut.
+
 ## Mengganti label yang sudah dipakai
 
 **Metrik template aman diganti namanya** sejak tiap metrik punya `key` yang stabil: `IsiKunciMetrik` mempertahankan kunci yang sudah ada, jadi konfigurasi otomatis tidak lepas saat label dibetulkan. Sebelum ada `key`, backend memasangkan konfigurasi lewat label, dan memperbaiki typo berarti menghapus konfigurasinya tanpa pesan.

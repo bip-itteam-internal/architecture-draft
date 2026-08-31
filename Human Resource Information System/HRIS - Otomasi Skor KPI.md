@@ -414,8 +414,29 @@ Sumber `skor_tim` merata-ratakan skor anggota tim, lalu membandingkannya dengan 
 Contoh Kyura Agustus 2026: 28 anggota, baru 12 yang punya skor, rata-ratanya 52,70 terhadap target 70 → skor 0. Enam belas sisanya memegang posisi yang metriknya **manual seluruhnya** (Host Live, Bootcamp Content Creator, Buzzer, Customer Support, Live Support, Meta Advertiser) — mereka menunggu penilaian atasan, bukan menunggu data.
 
 Basis di layar menyebutkan penyebutnya apa adanya ("dari 12 pengukuran, populasi 28"), jadi angkanya dapat ditelusuri. Begitu atasan menilai sisanya, rata-rata tim ikut naik **sendiri** lewat fallback bulan berjalan yang sudah ada di `kpi_auto.go` — tanpa perubahan kode.
+
+⛔ **Fallback itu bergerbang OTOMASI PENUH, bukan sekadar "punya metrik auto"** — ditelusuri 2026-08-31 saat menyelidiki F5 SPV Finance. Jalurnya: `kpi_auto.go:287-291` → `kumpulkanOtomatisPenuh` → `kumpulkanOtomatis(izinkanParsial=false)` (`kpi_finalisasi.go:337`) → `if !seluruhMetrikOtomatis(tpl) { continue }` (`kpi_finalisasi.go:451`), dan `seluruhMetrikOtomatis` (`:205`) mengembalikan `false` begitu **satu** metrik template punya `Auto == nil`. Konsekuensinya berlawanan dengan intuisi: **menyalakan tiga dari empat metrik seorang staf menyumbang NOL ke skor tim atasannya — sama persis dengan menyalakan nol.** Orangnya dilewati **sebelum satu pun sumber dipanggil**, jadi metriknya bukan "gagal hitung", ia tak pernah dicoba. Yang bernilai karena itu bukan "sebanyak mungkin metrik dinyalakan", melainkan **paling sedikit satu posisi yang templatenya 100% ber-`auto`**.
+
 - ⛔ **Proyek Accurate SPV** — kode SPV bernama divisi, bukan `employee_id`. Rincian di [[Microservices - Insentive Service]] dan [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]].
 - ⚠️ **ROAS kosong untuk 17 dari 31 ICC**, tetapi hanya **3,6% revenue** — 13 di antaranya toko kecil (Rp178 rb–27 jt) yang belum terhubung ke akun advertiser di TikTok Business (`tt_business_stores`), 3 sisanya Lazada yang memang tak punya sumber iklan. Ini keadaan data di hulu, bukan bug: `ads_cost` lahir dari laporan GMV Max per `store_id`, dan toko yang tak terhubung tak punya baris laporan. Kolom `tiktok_advertiser_id` di ICC Management **tidak** dibaca perhitungan ini.
+
+### Status template `KPI Supervisor Finance` (2026-08-31)
+
+Lima metrik F1–F5, Σbobot = 1,00 (terkonfirmasi dari layar Atur Target produksi). Ringkas — rincian per baris di [[HRIS - Matriks KPI per Departemen]] §Finance Supervisor.
+
+| | Metrik | Bobot | Keadaan | Menunggu SIAPA |
+|---|---|---:|---|---|
+| F1 | Monitoring AR & Collection | 0,25 | ✅ **sumber siap, konfigurasi belum diisi** (`kinerja_ar`/`piutang_lewat_60_persen`, sudah di prod) | **HR** — cukup isi blok `auto` lewat layar Atur Target, tanpa deploy |
+| F2 | Kontrol OPEX / varians anggaran | 0,25 | 🟡 **menunggu merge** PR [bip-erp#1546](https://github.com/bip-itteam-internal/bip-erp/pull/1546) (sudah disetujui) | **dev/rilis**, lalu HR. ⚠️ + prasyarat DATA: irisan `anggaran_opex.departemen` × `work_data.department` (TBD) |
+| F3 | Kontrol Beban Non-Operasional | 0,20 | 🟡 **menunggu merge** PR [bip-erp#1548](https://github.com/bip-itteam-internal/bip-erp/pull/1548) + [erp-frontend#1332](https://github.com/bip-itteam-internal/erp-frontend/pull/1332) | **reviewer + dev/rilis**, lalu HR |
+| F4 | Cashflow Forecasting | 0,10 | ✅ **sumber siap, konfigurasi belum diisi** (`forecast_kas`/`akurasi_forecast_kas`, di prod sejak 14 Agu 2026). ⛔ Bagian label `Return on Operation = 2,75` **tak punya sumber** dan berbeda hal dari deskripsinya | **HR** untuk bagian forecast; **pemilik metrik** untuk memutuskan nasib `Return on Operation` (TBD) |
+| F5 | Performance Monitoring Team | 0,20 | ⚠️ **konfigurasi SUDAH menyala** (`skor_tim`, scope `department`) tapi belum berangka: *"belum ada satu pun pengukuran pada periode ini"* | **BUKAN HR, dan bukan template ini.** Menunggu **staf Finance** punya template yang 100% ber-`auto` (lihat gerbang biner di atas), atau **atasan langsung anggota Finance** menilai mereka lebih dulu |
+
+⛔ **F5 bukan cacat.** Nol anggota terukur digalatkan, tidak dinilai 0 — 0 tak terbedakan dari "timnya memang berskor 0" dan akan menekan skor supervisor tanpa dasar. Sistem bekerja sebagaimana dirancang.
+
+⚠️ **Urutan penilaian mengikat, dan untuk bulan lampau tidak ada jaring pengaman**: fallback bulan berjalan **tidak jalan** di luar bulan berjalan, sehingga skor tim hanya dari skor final anggota. Snapshot `kpi_score` **dibekukan begitu `POST /kpi` tersimpan**, jadi menilai SPV terlalu cepat menghasilkan angka yang tak bisa diperbaiki tanpa menilai ulang periode itu. **anggota → Leader → Supervisor.**
+
+**Langit-langit skor hari ini = 35/100** (F1 0,25 + F4 0,10, dikali 100), karena skor total **tidak dinormalisasi** (`kpi_auto_scores.go:130-146`). Naik ke 55 begitu F5 berangka, dan ke 100 setelah kedua PR merge dan seluruhnya dinyalakan.
 
 ## Progres bulan berjalan di MyBharata
 
