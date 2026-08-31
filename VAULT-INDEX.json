@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-08-30",
+  "digenerate": "2026-08-31",
   "jumlah_dokumen": 323,
   "dokumen": [
     {
@@ -1848,36 +1848,41 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — agregasi + agenda mandiri **live di DEV** dan terverifikasi lewat gateway. Terakhir: PATCH sebagian ([#1067](https://github.com/bip-itteam-internal/bip-erp/pull/1067), 2026-08-07). **PROD tertinggal**: baru sampai irisan 1. Irisan 3 (sesi wajib) belum ada kode.",
+      "status_teks": "Implemented (ada catatan) — agregasi + agenda mandiri **live di DEV** dan terverifikasi lewat gateway. **Mesin kewajiban (irisan 3) SUDAH ada di `main`** sejak PR [#1074](https://github.com/bip-itteam-internal/bip-erp/pull/1074) (2026-08-07), tetapi baru separuh: template, periode, dan tagihan berjalan sendiri, sementara **jalur pemakainya belum ada sama sekali** (§ Mesin kewajiban). **PROD tertinggal**: baru sampai irisan 1.",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
         "Microservices - Employee Service",
         "GA - Asset Loan & Room Booking",
         "Microservices - Inventory Service",
+        "Microservices - Form Builder Service",
         "Microservices - Attendance Service",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "Microservices - Task Management Service",
-        "Microservices - Form Builder Service",
+        "APP - Web ERP",
+        "HRIS - Matriks KPI per Departemen",
+        "HRIS - Otomasi Skor KPI",
+        "HRIS - Work Review",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "RUN - Menambah Metrik KPI Otomatis",
         "Microservices - Notification Service",
         "APP - MyBharata",
-        "CORE - RBAC dan Permission Set",
-        "APP - Web ERP"
+        "CORE - RBAC dan Permission Set"
       ],
-      "hash": "08273f46308669fff268ab2d1e4aa15cbf28639cb96f59de7c86725db7844ee2",
-      "ukuran_kb": 17.3,
-      "ringkasan": "Menjawab: bagaimana cara mendaftarkan feed agenda dari modul lain ke kalender terpusat (`GET /internal/calendar-feed` + satu baris di `providerRegistry` + env `<SERVICE>_MODULE_URL`), bentuk item apa yang wajib dikirim (`id` berprefiks sumber, `kind`, `all_day`, `scope`, `deep_link`, `status`), dan siapa yang boleh melihat tiap item. Juga menjawab mengapa fitur bertanggal dilarang membangun halaman kalender sendiri, apa isi prinsip tiga lapis visibilitas (data diri sendiri, pekerjaan sendiri, agenda perusahaan), dan mengapa penyaringan hak akses dikerjakan di service sumber, bukan di kalender. Memuat pula endpoint agenda mandiri (`event`), termasuk PATCH sebagian, pembatalan lunak, balasan 404 alih-alih 403, dan gotcha seperti larangan memasukkan URL provider ke `ValidateInternalURL`.",
+      "hash": "ac87f63f19fc885d3282c0add584bbcaa034e0724d297704d3bca35575734046",
+      "ukuran_kb": 28.2,
+      "ringkasan": "Menjawab: bagaimana cara mendaftarkan agenda/tanggal sebuah modul ke kalender terpusat lewat endpoint `GET /internal/calendar-feed` dan `providerRegistry`, bentuk item feed apa yang wajib dikirim (id berprefiks sumber, kind, all_day, scope, deep_link, status), dan siapa yang boleh melihat sebuah agenda menurut prinsip tiga lapis (data diri sendiri, pekerjaan sendiri, agenda perusahaan). Juga menjawab endpoint apa saja yang tersedia untuk agenda mandiri (`POST/GET/PATCH /api/calendar/events`, cancel lunak) dan template kewajiban beserta gerbang aksesnya. Memuat larangan membangun halaman kalender sendiri, gotcha `ValidateInternalURL`, penanganan feed gagal sebagai `degraded`, dan insiden privasi yang melahirkan aturan-aturan itu.",
       "kata_kunci": [
         "kalender",
-        "calendar",
-        "calendar feed",
+        "calendar service",
+        "calendar-feed",
         "agenda",
         "event",
         "deep_link",
-        "visibilitas",
-        "jadwal",
-        "provider registry",
-        "all_day"
+        "providerRegistry",
+        "kewajiban",
+        "obligation template",
+        "visibilitas"
       ]
     },
     {
@@ -6510,21 +6515,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "1ed8630ef4fd95746b82b974295f6beb63f5c26a4302e3918b686aef4d4cc3ad",
-      "ukuran_kb": 158.2,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai orang di produksi hari ini, berapa bobotnya, apa targetnya, dan mana yang sudah terisi otomatis, dikelompokkan per departemen dan per posisi. Menjawab juga perbedaan antara datanya ada, mesin KPI punya konektornya, dan data pendukungnya sudah diisi orang, beserta daftar sumber yang terdaftar di kode dan mana yang sudah naik ke produksi. Untuk Tech Development memuat sensus per metrik berikut angka pertama yang keluar, target yang dipakai, alasan sebuah metrik berstatus semi alih-alih otomatis, dan metrik mana yang sengaja dibiarkan manual.",
+      "hash": "1aad272d925035e381fdcd8cf86ae1a93f86010a4bcbc717243ec5a78709f422",
+      "ukuran_kb": 158.8,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar terpasang di production untuk tiap departemen dan posisi, berapa bobot serta targetnya, dan dari koleksi/endpoint mana datanya bisa diambil. Menjawab juga metrik mana yang sudah bisa diotomatiskan sekarang, mana yang perlu kesepakatan definisi dulu, dan mana yang belum punya sumber data sama sekali (klasifikasi per departemen plus rekap 70 template / 311 metrik). Memuat cacat data yang sudah diketahui (template uji ikut produksi, metrik duplikat, label memakai target korporat), cara membaca label yang ditulis apa adanya karena label adalah kunci identitas metrik di kode, cara menyegarkan dokumen dari `kpi_template`, dan peringatan bahwa \"datanya ada\" belum berarti mesin KPI punya konektornya.",
       "kata_kunci": [
         "KPI",
         "kpi_template",
         "matriks KPI",
+        "metrik per departemen",
         "bobot",
         "target",
         "otomasi KPI",
-        "metrik per departemen",
-        "sumber KPI",
-        "kpi_group",
-        "Tech Development",
-        "semi otomatis"
+        "sumber data",
+        "penilaian karyawan",
+        "employee_db"
       ]
     },
     {
@@ -6641,23 +6645,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "9049d41a26c7a7f92db819b10ef2da9ac39227b1bce7b2e3e3e4404646cae826",
-      "ukuran_kb": 111.2,
-      "ringkasan": "Menjawab: metrik KPI mana yang skornya bisa diisi otomatis dari data yang sudah dimiliki ERP, sumber data apa saja yang terdaftar (skor_tim, uptime_sistem, kinerja_tiket, kinerja_tiket_divisi, kedisiplinan_absensi, turnover, kontrak, dan lainnya), serta metrik mana yang modulnya ada tapi datanya kosong atau memang tak punya sumber sama sekali. Menjelaskan cara HR mengisi konfigurasi auto sendiri (scope, formula reduksi, arah target, target per karyawan dan target bertahap), bagaimana nilai muncul ke penilai sebagai usulan yang harus ditekan, dan layar diagnostik Otomasi KPI untuk melihat metrik mana yang macet beserta sebabnya. Membedakan tegas antara sumber yang gagal dihitung dan data yang memang belum ada, dan mencatat bahwa ada tiga jalur perhitungan skor yang harus dijaga tetap satu rumus.",
+      "hash": "73dec4ebcf1b91558f6aa824438c9f5ef86f0ba022df2b222763eb5e5a569e7a",
+      "ukuran_kb": 112.3,
+      "ringkasan": "Menjawab: bagaimana skor KPI bisa terisi otomatis dari data yang sudah dimiliki ERP alih-alih diketik supervisor — sumber nilai apa saja yang terdaftar di mesin (`skor_tim`, `kinerja_tiket`, `uptime_sistem`, `kinerja_tiket_divisi`, `kaizen_*`, dan seterusnya), bagaimana blok `auto` sebuah metrik disusun (sumber, formula seperti `rata_rata`/`rasio_ambang`, scope, target, target per karyawan, target bertahap), dan metrik mana yang sudah dinyalakan di produksi. Menjawab juga kenapa sebuah metrik gagal hitung dan bedanya \"sumber gagal\" versus \"data belum ada\", di mana melihat diagnosisnya (halaman Otomasi KPI, `GET /kpi/auto-values`), serta bagaimana HR mengisi konfigurasinya sendiri di `/hris/kpi/otomasi`. Memuat klasifikasi 311 metrik, peringatan tiga jalur perhitungan skor yang harus tetap satu rumus, dan catatan bahwa nilai otomatis muncul sebagai usulan yang harus ditekan penilai.",
       "kata_kunci": [
         "otomasi KPI",
         "skor KPI otomatis",
         "auto-values",
-        "kpi_template",
         "kpi_score",
-        "KPIAutoConfig",
-        "skor_tim",
+        "kpi_template",
+        "sumber nilai",
         "kinerja_tiket",
-        "uptime_sistem",
-        "metrik KPI",
-        "scoring",
-        "ICC",
-        "Tech Development"
+        "skor_tim",
+        "rasio_ambang",
+        "ICC"
       ]
     },
     {

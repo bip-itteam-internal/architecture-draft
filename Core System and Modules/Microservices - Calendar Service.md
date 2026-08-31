@@ -4,8 +4,8 @@
 
 > **Prinsip tiga lapis** (keputusan pemilik produk, 2026-08-06): kalender memuat **data diri sendiri**, **pekerjaan sendiri**, dan **agenda perusahaan**. Data pribadi orang lain **tidak boleh** masuk, sekalipun pemanggilnya seorang supervisor. Prinsip ini yang menutup insiden privasi di bawah, dan ia mengikat semua feed baru.
 
-- **Status**: ⚠️ Implemented (ada catatan) — agregasi + agenda mandiri **live di DEV** dan terverifikasi lewat gateway. Terakhir: PATCH sebagian ([#1067](https://github.com/bip-itteam-internal/bip-erp/pull/1067), 2026-08-07). **PROD tertinggal**: baru sampai irisan 1. Irisan 3 (sesi wajib) belum ada kode.
-- **Stack**: Go + Fiber + MongoDB (`calendar_db`, koleksi `calendar_events`). Env `MONGO_CALENDAR_DB` **wajib**; tanpa itu service tetap hidup tapi seluruh agenda mandiri membalas 500.
+- **Status**: ⚠️ Implemented (ada catatan) — agregasi + agenda mandiri **live di DEV** dan terverifikasi lewat gateway. **Mesin kewajiban (irisan 3) SUDAH ada di `main`** sejak PR [#1074](https://github.com/bip-itteam-internal/bip-erp/pull/1074) (2026-08-07), tetapi baru separuh: template, periode, dan tagihan berjalan sendiri, sementara **jalur pemakainya belum ada sama sekali** (§ Mesin kewajiban). **PROD tertinggal**: baru sampai irisan 1.
+- **Stack**: Go + Fiber + MongoDB (`calendar_db`; koleksi `calendar_events`, `obligation_templates`, `obligation_periods`, `obligation_fulfillments`). Env `MONGO_CALENDAR_DB` **wajib**; tanpa itu service tetap hidup tapi seluruh agenda mandiri membalas 500. `EMPLOYEE_MODULE_URL` dipakai potret peserta kewajiban dan sengaja opsional (kosong = potret tertunda, bukan service mati).
 - **Path di repo**: `bip-erp/services/calendar/` · FE: `erp-frontend/src/features/calendar/` + `src/app/(main)/calendar/`
 - **Rute gateway**: `/api/calendar/*` (entri `"calendar"` di map `InternalURL` [[CORE - API Master Gateway]]; masuk `noCacheRoutes`).
 
@@ -62,6 +62,13 @@ Saat merencanakan fitur yang menyentuh tanggal, jawab dulu:
 - `PATCH /api/calendar/events/:id` → perubahan **sebagian**; field yang tidak disebut dipertahankan. Hanya pembuat.
 - `POST /api/calendar/events/:id/cancel` → pembatalan **lunak**. Agenda yang batal tetap terlihat sampai waktunya lewat, karena agenda yang lenyap tanpa jejak membuat peserta mengira mereka salah ingat.
 
+**Template kewajiban** (`/api/calendar/obligations/templates`, seluruhnya digerbang `common.RequireHRISSupervisor`):
+- `GET /` (opsional `?active=true|false`) · `POST /` · `GET /:id` · `PUT /:id` · `DELETE /:id`.
+- Gerbangnya **lebih sempit** daripada gerbang pengelola di [[Microservices - Form Builder Service]], dan itu disengaja: satu template melahirkan kewajiban ber-KPI bagi orang di seluruh perusahaan, jadi membiarkan tiap pengelola departemen membuatnya berarti membiarkan IT menagihi Finance.
+- **PUT, bukan PATCH**, dan nama rutenya dibuat jujur sejak awal supaya tak mengulang bug `PATCH /events/:id` yang diam-diam menimpa penuh. Di sini menimpa penuh memang benar: bentuknya dikelola satu formulir yang selalu mengirim seluruh field.
+- `DELETE` menghapus **lunak** (`deleted_at` + `active:false`). Laporan kepatuhan bulan lampau menyebut nama templatenya; yang dihapus hilang dari daftar, bukan dari sejarah.
+- `company_id` dan `created_by` **diturunkan dari identitas pemanggil**, dan penyaring `company_id` ada di dalam query, bukan diperiksa sesudah dokumennya terbaca.
+
 **Feed yang sudah terdaftar:**
 
 | Service | `kind` | Catatan |
@@ -86,6 +93,64 @@ Perbandingan tak peka huruf besar-kecil, dan **string kosong tidak pernah diangg
 
 Query Mongo menyempitkan seadanya, lalu **tiap dokumen tetap dilewatkan `canViewEvent`**. Query adalah pengecil beban, bukan gerbang: menaruh aturan visibilitas di dua tempat berarti keduanya bisa menyimpang diam-diam.
 
+## Mesin kewajiban (irisan 3) — mesinnya jalan, jalur pemakainya belum
+
+> ⚠️ **Dokumen ini sempat menyatakan "irisan 3 belum ada kode" selama tiga minggu sesudah kodenya merged** (PR [#1074](https://github.com/bip-itteam-internal/bip-erp/pull/1074), 7 Agustus 2026). Klaim itu salah, dan salahnya mahal: ia mengundang orang berikutnya membangun ulang template kewajiban yang sudah berjalan. Yang benar adalah **pondasinya ada, jalur pemakainya belum**, dan dua bagian itu harus dibaca terpisah.
+
+### Yang sudah berjalan
+
+| Bagian | Berkas | Isi |
+|---|---|---|
+| Template kewajiban | `models_obligation.go` · `obligation_handlers.go` | Pengulangan `monthly`/`weekly`, `quota`, `grace_days`, `active`, hapus lunak |
+| Aturan sasaran (`audience`) | `obligation_audience.go` | `all` · `department` · `position` · `employment_type` · `manual` |
+| Aturan lawan sesi (`counterpart`) | `models_obligation.go` | `supervisor` · `department` · `position` · `any`, atau `required:false` untuk kewajiban mandiri |
+| Penanggalan periode | `obligation_window.go` | `2026-08` bulanan, `2026-W32` mingguan (ISO), plus `missedAt` |
+| Cron tiap jam (Asia/Jakarta) | `obligation_cron.go` | Buka periode → potret peserta → terbitkan tagihan → tutup periode → tandai `missed` |
+| Simpan periode & tagihan | `obligation_period_store.go` · `db.go` | Idempoten lewat **index unik**, bukan lewat pemeriksaan "sudah ada?" |
+
+Status tagihan: `pending` → `scheduled` → `fulfilled`, atau `missed`. Status `proposed` dari rancangan awal **dihapus** bersama alur terima/tolak.
+
+### Keputusan yang sudah terkunci di kode
+
+Baca ini sebelum menambah apa pun; sebagian besar tak akan tertebak dari bentuk datanya.
+
+- **`audience` adalah ATURAN, bukan daftar orang**, dan dievaluasi ulang tiap periode dibuka. Daftar id membusuk: ia menagih orang yang sudah resign selamanya sekaligus tak pernah menagih karyawan baru.
+- **`quota`, `template_name`, dan `grace_days` DIBEKUKAN per periode**, `quota` bahkan per orang. HR boleh mengganti nama kewajiban atau memperpanjang toleransi kapan saja, dan tanpa pembekuan ini perubahan hari ini diam-diam mengubah arti laporan bulan lalu.
+- **`missed` DITULIS cron, bukan dihitung saat dibaca.** "Belum" dan "telat" dua hal berbeda, dan yang kedua tak boleh bisa berubah lagi hanya karena laporannya dibuka di hari yang berbeda.
+- **Penutupan periode dan penandaan `missed` sengaja dipisah.** Periode tutup di ujung bulan; tagihannya baru terlewat sesudah masa tenggang, yang dihitung dari `closes_at` **bukan** dari tanggal agendanya. Yang ditoleransi adalah keterlambatan mencatat, bukan keterlambatan bertemu.
+- **Potret peserta yang gagal tidak menutup periode**, hanya menandai `participants_partial`. Orang tetap bisa menjadwalkan; yang ditahan cuma angka persentase, karena persentase dari penyebut yang salah lebih menyesatkan daripada tak ada angka sama sekali.
+- ⛔ **Sasaran `department` mencocokkan `work_data.department` apa adanya** (`cocokSalahSatu`, tak peka huruf besar-kecil, spasi pinggir diabaikan). **Label grup supervisi seperti `HRGA` tak akan cocok dengan siapa pun**, dan hasilnya periode berisi nol peserta tanpa satu pun galat — kelas kegagalan yang sudah menggigit berulang kali di tempat lain. Untuk grup, sebut kedua nama departemen aslinya atau pakai mode `position`. Awas pula spasi di ujung nama posisi yang memang tersimpan begitu di produksi.
+- **Nilai kosong tidak pernah cocok dengan kosong.** Karyawan yang departemennya belum diisi tak boleh diam-diam masuk sasaran "departemen tertentu"; karyawan tanpa `employee_id` dibuang karena tak bisa dihitung kepatuhannya maupun dikirimi pengingat.
+- **Mode `audience` yang tak dikenal mengembalikan false, bukan true.** Sasaran yang tak terbaca berarti tak ada yang ditagih, jauh lebih baik daripada menagih seluruh perusahaan karena satu salah ketik.
+- **Kuota nol ditolak di muka** (minimal 1, maksimal 31): kewajiban yang tak pernah bisa dipenuhi maupun dilanggar membuat papan kepatuhan menampilkan orang yang selamanya hijau tanpa melakukan apa pun. Peserta di atas 1000 juga ditolak, **tidak dipotong diam-diam**.
+- **`open_day` bulanan dibatasi 1..28** karena Februari, dan jendelanya **selalu** berakhir di ujung bulan atau minggu. Durasi bebas bisa melewati batas bulan sehingga dua periode hidup bersamaan, dan begitu itu terjadi "periode mana yang aktif" tak punya jawaban yang benar.
+- **Cron dinyalakan SESUDAH kunci internal siap** (`main.go`), karena potret pesertanya memanggil employee-service dengan kunci itu. Perusahaan dikirim eksplisit lewat header: `InternalRequest` tanpa `Ctx` membuat employee-service jatuh ke `DefaultCompanyID` dan mengembalikan daftar tenant yang **salah**, yang artinya menagih orang dari tenant lain.
+- **`cron.Recover` bukan kehati-hatian berlebihan.** Panik di handler HTTP cuma memutus satu koneksi karena fasthttp menangkapnya, tapi panik di goroutine cron menjatuhkan **seluruh proses**: agregasi kalender ikut mati hanya karena satu template bermasalah.
+- **`obligation_window.go` menyalin `services/form-builder/period.go` dengan sengaja.** Keduanya `package main` di service berbeda sehingga tak bisa saling impor; tempat yang benar untuk menyatukannya kelak adalah `shared-library`.
+
+### Yang BELUM ada, dan inilah yang membuat modul ini belum bisa dipakai siapa pun
+
+1. ⛔ **Tak ada satu pun rute untuk karyawan yang wajib.** Rute yang terdaftar di `routes.go` hanya CRUD template. Tak ada "kewajiban saya", tak ada cara menautkan agenda ke tagihan, tak ada cara menandai sesi selesai. `event_ids`, `counterpart_id`, `completed_count`, `completed_at`, dan `completed_by` ada di model tapi **tak pernah ditulis dari mana pun**. Akibatnya konkret: **bila HR membuat template hari ini, cron menerbitkan tagihan lalu menandai SEMUA orang `missed`** begitu masa tenggangnya habis, karena tak ada jalan untuk memenuhinya. Ini bukan fitur yang kurang, ini modul yang akan menghukum semua orang bila dinyalakan apa adanya.
+2. **Papan kepatuhan belum ada.** Index-nya sudah disiapkan (`db.go`, "Papan kepatuhan per periode" dan "Kewajiban saya, diurutkan menurut tenggat"), handler-nya belum ditulis.
+3. **Tagihan tak muncul di kalender.** `GET /` hanya menggabungkan provider luar; belum ada `kind: obligation` untuk data milik service ini sendiri. Satu-satunya jejak `obligation` di [[APP - Web ERP]] adalah test gaya untuk `kind` tak dikenal, bukan fitur.
+4. **Belum ada rute internal ber-kunci-layanan untuk KPI** (§ berikutnya).
+5. **Belum ada frontend sama sekali** — tak ada halaman kelola template untuk HR maupun kartu kewajiban untuk karyawan.
+
+**Uji yang sudah ada**: `obligation_template_test.go`, `obligation_audience_test.go`, `obligation_window_test.go`, `obligation_cron_test.go`. Seluruhnya menguji fungsi murni dan validasi. **Belum ada satu pun test yang melewati Fiber** untuk rute template, jadi kelas cacat glue handler yang sudah menggigit service lain belum tergerbang di sini.
+
+### Jalan menuju metrik KPI "Monitoring Kegiatan Sinkronisasi/Review"
+
+Modul ini adalah rumah yang sudah ditetapkan untuk metrik Fullstack `Implementasi` (bobot 0,2, deskripsi "Monitoring Implementasi Sinkronisasi/Review dengan Requester") di [[HRIS - Matriks KPI per Departemen]], dan untuk 9 metrik log 1-on-1 di [[HRIS - Otomasi Skor KPI]] butir 12 yang sejalan dengan [[HRIS - Work Review]]. Yang masih memisahkan keduanya, berurut:
+
+1. **Rute pemakai di service ini** (celah 1 di atas), termasuk penegakan aturan `counterpart` **di server**, bukan sekadar menyaring dropdown.
+2. **Rute internal di sini yang menggerbangi dirinya dengan kunci layanan SENDIRI**, bukan bersandar `INTERNAL_GATEWAY_KEY`: gateway memasang header itu untuk setiap permintaan yang lolos JWT, sehingga rute yang bersandar padanya terbuka bagi seluruh karyawan yang sudah login ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Kunci yang belum dikonfigurasi harus **menutup** rute, bukan membukanya.
+3. **Sumber KPI baru di [[Microservices - Employee Service]]**. Per 2026-08-31, tak satu pun dari 56 berkas `kpi_sumber_*.go` membaca kewajiban kalender, dan `CALENDAR_MODULE_URL` hanya dipakai gateway. URL-nya **dibaca langsung dari env**, jangan dimasukkan ke map yang divalidasi `ValidateInternalURL` — penjaga itu memanggil panic saat kosong, sehingga satu env yang belum dipasang mematikan seluruh employee-service demi satu metrik KPI. Prosedurnya di [[RUN - Menambah Metrik KPI Otomatis]].
+
+⚠️ **Dua hal yang harus diputuskan orang, bukan kode:**
+
+- **Siapa yang menandai sesi selesai.** Bila yang dinilai menandai sendiri, sebagian kemudi KPI berada di tangan yang dinilai. Tapi meminta konfirmasi lawan bertabrakan langsung dengan keputusan 7 Agustus 2026 bahwa undangan **memberi tahu, bukan meminta izin** — keputusan yang justru dibuat supaya kepatuhan seseorang tidak ditentukan kecepatan orang lain merespons.
+- **Mode `counterpart` untuk metrik itu.** "Requester" adalah pemohon tiket yang bisa berada di departemen mana pun, jadi yang muat hanya `any`. Tetapi `any` membuat kepatuhan mudah dikadali, karena orang tinggal memilih rekan yang pasti bersedia.
+
 ## Belum Diimplementasikan / Catatan
 
 ### Insiden privasi 2026-08-06 (baca sebelum menambah feed)
@@ -103,7 +168,8 @@ Pelajarannya: **"boleh diakses" bukan "layak muncul di kalender"**. Kalender ada
 ### Belum ada
 
 - **Jadwal club/komunitas — TERBLOKIR.** Datanya masih konstanta di frontend ([[Microservices - Employee Service]] tidak menyimpannya), jadi belum ada yang bisa dijadikan feed. Butuh keputusan pemilik data lebih dulu: HR mengelolanya lewat UI (perlu master data + halaman pengelolaan baru) atau IT yang menanamnya (read-only, di-seed).
-- **Irisan 3, sesi wajib (belum ada kode)**: mesin kewajiban berulang (one-on-one bulanan, pelatihan wajib) beserta papan kepatuhan. Polanya menyalin `FormPeriod` di [[Microservices - Form Builder Service]] yang sudah terbukti di produksi. Yang wajib memilih sendiri lawan sesinya dari kandidat yang lolos aturan `counterpart` per-template, aturan itu ditegakkan **di server** bukan sekadar dipakai menyaring dropdown. Menjadwalkan **tidak** langsung memenuhi kewajiban; pertemuannya tetap harus ditandai selesai, supaya angka kepatuhan mengukur kenyataan, bukan niat.
+- **Irisan 3, sesi wajib — SEBAGIAN sudah ada, rinciannya di § Mesin kewajiban.** Template, periode, potret peserta, dan penerbitan tagihan berjalan sejak PR [#1074](https://github.com/bip-itteam-internal/bip-erp/pull/1074) (2026-08-07); polanya menyalin `FormPeriod` di [[Microservices - Form Builder Service]] yang sudah terbukti di produksi. Yang **belum** ada: rute pemakai, papan kepatuhan, feed `obligation`, rute internal KPI, dan frontend. Yang tetap berlaku sebagai rancangan: yang wajib memilih sendiri lawan sesinya dari kandidat yang lolos aturan `counterpart` per-template, ditegakkan **di server** bukan sekadar dipakai menyaring dropdown; dan menjadwalkan **tidak** langsung memenuhi kewajiban, pertemuannya tetap harus ditandai selesai supaya angka kepatuhan mengukur kenyataan, bukan niat.
+- **Belum diverifikasi: apakah biner kewajiban sudah naik ke DEV maupun PROD.** Kodenya ada di `main`, tetapi kehadirannya di container yang berjalan belum diukur — TBD. Sensus produksi 2026-08-28 mencatat **0 template, 0 periode, 0 pemenuhan**, dan angka nol itu belum dapat dibedakan antara "belum ada yang membuat template" dan "binernya memang belum di sana".
 - **TIDAK ADA persetujuan lawan** (keputusan pemilik produk 2026-08-07, membatalkan rancangan sebelumnya). Sesi wajib dihitung sebagai KPI, jadi agenda yang menunggu tombol setuju berarti **kepatuhan seseorang ditentukan oleh kecepatan orang lain merespons**: yang sudah menjadwalkan tepat waktu bisa tercatat lalai hanya karena lawannya tak membuka aplikasi. Lawan **diberi tahu, bukan dimintai izin**. Konsekuensi yang diterima: kalender tak tahu apakah lawan bisa hadir, bentroknya baru ketahuan saat harinya tiba, dan diselesaikan lewat percakapan biasa. Akibatnya `POST /events/:id/respond` **tidak dibuat**, status `proposed` dihapus dari `obligation_fulfillments`, dan `EventParticipant.Status` tetap `pending` untuk semua peserta tanpa ada yang membacanya (field-nya dipertahankan hanya karena dokumen lama memuatnya).
 - **Belum ada**: booking ruang meeting, pengingat lewat [[Microservices - Notification Service]], kalender di [[APP - MyBharata]], seret untuk menggeser agenda.
 
