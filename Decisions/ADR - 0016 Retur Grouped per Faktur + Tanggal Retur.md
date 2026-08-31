@@ -1,4 +1,4 @@
-**Status**: ✅ **Implemented** (kode + deploy 2026-07-17). **Amandemen 2026-08-20 (✅ deployed, PR #1299):** kunci grup ditambah segmen **JENIS** → `<faktur>|<YYYYMMDD>|<JENIS>` — satu dokumen = satu jenis retur (Decision #1 diperluas; Decision #4 mode-campuran **tak lagi terjadi** untuk dokumen baru). Lihat amandemen di bawah.
+**Status**: ✅ **Implemented** (kode + deploy 2026-07-17). **Amandemen 2026-08-20 (✅ deployed, PR #1299):** kunci grup ditambah segmen **JENIS** → `<faktur>|<YYYYMMDD>|<JENIS>` — satu dokumen = satu jenis retur (Decision #1 diperluas; Decision #4 mode-campuran **tak lagi terjadi** untuk dokumen baru). **Amandemen 2026-08-20 (PR #1300 ✅ deployed · PR #1517 belum merge):** Decision #3 & #6 ternyata hanya menjaga jalur sinkron — hapus-idempoten & guard anti-dobel kini berlaku juga di jalur **Retry**; insiden dobel Rp288.000 terukur. Lihat amandemen di bawah.
 
 # ADR - 0016 Retur: Grouped per (Faktur Sumber + Tanggal Retur)
 
@@ -72,8 +72,27 @@ Kunci `<faktur>|<tanggal>` menggabungkan dua nilai yang **bisa bergerak setelah 
 
 Grounded: `kunciTunggu`/`kunciMenungguScan`/`belumPunyaHariGudang`/`pisahkanKeHariSendiri` (`accurate_rts_usecase.go`), `AccurateDailyReturnFilter.MenungguScan`, `cmd/returntunggu`, tes `accurate_return_tunggu_test.go` + `accurate_daily_return_tunggu_filter_test.go`.
 
+### Amandemen 2026-08-20 — Decision #3 & #6 ternyata hanya menjaga satu pintu (PR #1300 ✅ deployed · PR #1517 belum merge)
+
+Dua celah, ditemukan dari satu insiden nyata dan saling bersambung.
+
+**(a) Decision #3 hanya kebal terhadap hapus yang DILAKUKAN SENDIRI.** Pembersihan `accurate_return_id` setelah hapus sukses melindungi jalur kode ini. Dokumen yang dihapus dari **luar** — `cmd/returndescope` — meninggalkan id-nya utuh, sehingga tiap rebuild mencoba menghapus dokumen yang tak ada, Accurate menolak, dan grup **macet permanen**: persis jebakan yang Decision #3 sudah ramalkan, dimasuki lewat pintu yang tak ia pertimbangkan. Terukur: `RTR/2026/07/13/002-BH`, `RTR/2026/07/14/005-BH`, `RTR/2026/07/13/006-BH` macet sejak descope 19 Juli.
+
+Perbaikan: `clients.ErrSalesReturnGone` memisahkan *"dokumennya memang sudah tiada"* (tujuan tercapai → lanjut, id dibersihkan) dari penolakan lain (periode terkunci, izin, jaringan) yang **tetap fatal** — di situ dokumennya masih ada dan lanjut membukukan berarti dokumen ganda. Akarnya ikut ditutup: `returndescope` kini menol-kan id setelah menghapus.
+
+**(b) Decision #6 hanya dipasang di `SyncOrderReturn`, TIDAK di `RetryDailyReturn`.** Terbukti mahal pada hari yang sama: begitu (a) membuka kemacetan, Retry atas ketiga baris itu membukukan dokumen **kedua** untuk retur yang sudah dibukukan grup lain — over-reversal **Rp288.000**, dibereskan manual hari itu juga. Ironisnya kemacetan (a) selama ini berfungsi sebagai jaring pengaman yang tak disengaja.
+
+Paparannya bukan tiga baris: **36 baris non-SENT** yang `return_sn`-nya sudah dibukukan grup lain, **15 di antaranya PENDING** — dan `SweepDailyReturns` memanggil `RetryDailyReturn` untuk setiap baris PENDING/FAILED secara berkala, jadi dobel dapat terjadi **tanpa ada yang menekan tombol**.
+
+Perbaikan: guard by-member yang sama dipasang di `RetryDailyReturn`, membandingkan `return_sn` (bukan `order_id` — satu pesanan boleh punya beberapa retur sah), hanya SENT yang memblokir, dan **fail-closed** bila lookup gagal. Sengaja beda dari Sync yang fail-open: sinkron berjalan terus-menerus sehingga menahan diri di sana menyumbat pipa, sedangkan Retry sekali-jalan dan menunggu satu sapuan itu murah — sementara dokumen ganda hanya bisa dibatalkan lewat hapus manual di Accurate.
+
+**Sisa terbuka**: akar *kenapa* kunci grup bergeser sampai melahirkan baris kembar belum ditutup. Amandemen ini mencegah akibatnya, bukan sebabnya; 36 baris itu buktinya sebab tersebut masih hidup.
+
+Grounded: `clients.ErrSalesReturnGone`/`salesReturnGone` (`accurate_client.go`), `RetryDailyReturn`/`grupLainYangSudahMembukukan`/`returnSNsOfRow` (`accurate_rts_usecase.go`), `cmd/returndescope`, tes `accurate_return_dok_tiada_test.go` + `accurate_return_retry_anti_dobel_test.go` + `accurate_client_delete_salesreturn_test.go`.
+
 ## Dokumen Terkait
 - [[Microservices - Integration Service]] — Auto-Sync Retur (model grup)
+- [[ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift]]
 - [[ADR - 0017 Tanggal Retur TikTok via order_update_date]]
 - [[ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur]]
 - [[ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah]]
