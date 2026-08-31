@@ -9,7 +9,7 @@
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
 | POST | `/tap` | Clock-in/out (fingerprint/mobile/website; `?method=`) | open (serial/MAC/token) |
-| GET | `/entries` | List entri (paginated, filter dept/status/periode) | HRIS |
+| GET | `/entries` | List entri (paginated). Filter: `?department=` (diterjemahkan via employee `/list?type=employee`), `?status=` (nilai mentah `/data-type/attendance-status`), `?search=`, dan rentang tanggal `?period_start=`/`?period_end=` (**DD-MM-YYYY**, inklusif, atas field `realtime`; format salah dibalas **400**). FE `/hris/attendance` mengirim rentang dari preset **Minggu/Bulan/Tahun ini** (default Minggu ini) — lihat [[HRIS - Attendance System]] | HRIS |
 | GET | `/history` | Riwayat absensi sendiri (bulanan). `?late=true&month=YYYY-MM` membalas **satu angka** (jumlah telat periode 26→25), dipakai [[APP - MyBharata]].<br>⚠️ **Belum merged** (`feat/attendance-telat-berpotongan`): angka itu kini hanya menghitung telat yang **berpotongan jam**, memakai `kriteriaTelatDihitung` yang sama dengan `/internal/late-recap` supaya angka yang dilihat karyawan tak bercabang dari angka yang dipakai HR menerbitkan SP | header |
 | GET | `/report` | Laporan periode 26→25 (`?yyyy-mm`); tiap entry juga membawa `leave_subtype` (bedakan Izin urusan kantor vs pribadi di FE) | HRIS |
 | PATCH | `/:id/update` | Update entri (+dokumen/status/comment) | HRIS |

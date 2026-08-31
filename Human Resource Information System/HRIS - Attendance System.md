@@ -34,6 +34,7 @@ Attendance dapat dilakukan dengan 2 metode per Februari 2026, baik dari validasi
 
 Ini adalah fitur yang terikat dan dimiliki oleh HRIS untuk attendance
 - Melihat attendance secara real-time
+- Menyaring tampilan per **periode berjalan** (Minggu / Bulan / Tahun ini; default **Minggu ini**) dan per departemen. Preset periode dihitung di frontend jadi rentang `period_start`/`period_end` yang dikirim ke `GET /entries` (lihat [[API - Attendance Service]]); tanpa navigasi mundur/maju.
 - Mengubah status entri attendance
 - Menambahkan komentar tambahan pada entri attendance
 - Menambahkan dokumen tambahan pada entri attendance
