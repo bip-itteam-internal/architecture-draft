@@ -351,14 +351,17 @@ AR tidak menginput apa pun ke service ini; metriknya lewat fasad KPI (opsi B). T
 
 | Metrik | Bobot | Endpoint | Siap? |
 |---|---:|---|---|
-| AR Leader — piutang aging >60 hari <5% | 0,30 | `GET /transactions/orders/piutang/tren` | ✅ **siap** |
-| AR Staf Piutang — penagihan >60 hari <5% | 0,20 | sama | ✅ **siap** |
-| AR Leader — pengawasan AR aging ≤14 hari | 0,30 | — | ⚠️ `Lebih14` belum dibawa |
-| AR Staf Piutang — penagihan >14 hari <5% | 0,20 | — | ⚠️ idem |
+| AR Leader — piutang aging >60 hari <5% | 0,30 | `GET /transactions/orders/piutang/tren` | ✅ **terpasang** (`piutang_lewat_60_persen`) |
+| AR Staf Piutang — penagihan >60 hari <5% | 0,20 | sama | ✅ **terpasang** |
+| AR Leader — pengawasan AR aging ≤14 hari | 0,30 | sama | ✅ **terpasang** (`piutang_lewat_14_persen`) |
+| AR Staf Piutang — penagihan >14 hari <5% | 0,20 | sama | ✅ **terpasang** |
+| AR Staf — pengawasan AR aging ≤90 hari | 0,50 | sama | ✅ **sumbernya siap**, konfigurasinya belum dinyalakan HR |
 | AR Leader — Monitoring Team | 0,20 | `skor_tim` (employee-service) | 🔴 `supervisor_id` kosong |
 | AR Staf — Pencatatan Piutang / Retur | 0,90 | — | 🔴 vonisnya patut dikoreksi, lihat bawah |
 
-Metrik >60 hari tinggal `lebih60 ÷ total_terbuka × 100`.
+Tiap metrik ambang tinggal `lebih<N> ÷ total_terbuka × 100`, dan ketiganya berarah **turun**: yang diukur porsi yang MELEWATI ambang, bukan yang masih di bawahnya.
+
+> ⚠️ **Catatan lama "`Lebih14` belum dibawa" sudah TIDAK berlaku.** Posisi historis kini membawa `Lebih14`, `Lebih60`, dan `Lebih90` sekaligus. Ketiganya **bersarang** (`lebih14` ⊇ `lebih60` ⊇ `lebih90`) dan tidak boleh dijumlahkan; rinciannya di [[API - Integration Service]].
 
 ### Kenapa `/tren`, bukan `/summary`
 
@@ -368,7 +371,9 @@ Metrik >60 hari tinggal `lebih60 ÷ total_terbuka × 100`.
 
 ### Dua hal yang wajib diketahui sebelum menyambungnya
 
-⚠️ **`Lebih14` belum ada di posisi historis.** `PiutangPosisiRow` hanya membawa `TotalTerbuka` dan `Lebih60`, padahal cutoff 14 hari **sudah dihitung** di `piutangCutoffs`. Menambahkannya pekerjaan kecil di pipeline yang sudah ada, murni IT — dan ia membuka 0,50 bobot lagi.
+✅ **Ketiga ambang kini ada di posisi historis.** `PiutangPosisiRow` membawa `TotalTerbuka`, `Lebih14`, `Lebih60`, dan `Lebih90`; ketiga cutoff dihitung dari **T**, bukan dari waktu kini. Ambang 14 hari menyusul lebih dulu, ambang 90 hari menyusul saat metrik AR Staff berbobot 0,50 dibuat.
+
+⛔ **Menambah ambang di sisi historis menuntut urutan deploy yang mengikat: integration-service DULU, baru employee-service.** Bila terbalik, field barunya tak ada di jawaban `/piutang/tren`, Go men-decode-nya jadi **nol**, dan nol pada metrik berarah `turun` adalah nilai **SEMPURNA** — seseorang memperoleh skor penuh justru karena datanya belum ada, tanpa satu pun galat. Penjaganya di kode: `barisTrenPiutang.Lebih90` bertipe **pointer**, sehingga "belum dikirim" terbedakan dari "nol rupiah" dan jatuh ke galat bersebab. Ambang berikutnya wajib mengikuti pola yang sama. ⚠️ Rute tren juga ber-cache Redis 10 menit, jadi bentuk lama masih dapat tersaji sesaat sesudah deploy yang benar.
 
 ⚠️ **Deret historisnya rekonstruksi, bukan snapshot.** Handler-nya menuliskannya sendiri: *"order yang batal atau retur dikeluarkan per tanggal kejadiannya, bukan snapshot yang tersimpan bulan itu."* Artinya skor Agustus yang dihitung September bisa berbeda bila dihitung ulang Oktober. `auto_value` yang tersimpan saat submit ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] butir 3) sudah membekukannya — **jangan pernah menghitung ulang skor periode yang sudah tertutup**.
 

@@ -103,6 +103,29 @@ Checklist **empat tempat**, apa adanya:
 
 ⚠️ Metrik ini **tidak** butuh `METRIK_PER_SUMBER`: namanya tidak dipakai sumber lain mana pun (per 2026-08-31). Bila kelak dipakai, entri per-pasangan wajib ikut.
 
+### 🟡 `piutang_lewat_90_persen` — metrik ketiga rumpun AR (branch `feat/kpi-piutang-lewat-90`)
+
+Metrik baru pada sumber **`kinerja_ar`** yang sudah ada, untuk `Pengawasan 100% AR aging ≤ 90 hari.` (template `AR Staff 2026`, bobot **0,50**). **Belum merge/prod.** Dicatat di sini karena ia menempuh checklist empat-tempat dengan hasil yang sama dengan `rasio_beban_non_ops_persen`, dan karena penjaganya menyingkap pelanggaran pada dua metrik yang SUDAH lama hidup.
+
+| Locale | Label | Keterangan |
+|---|---|---|
+| `id.ts` | `Piutang lewat 90 hari` (21 karakter) | "Porsi nominal piutang macet yang belum tertagih lebih dari 90 hari terhadap total piutang terbuka, dalam persen. Bagian tertua dari piutang lewat 60 hari, jadi keduanya tidak boleh dijumlahkan. Makin kecil makin baik: pilih arah Turun, dan isi target sebagai anggaran yang masih dapat diterima (anjuran 1). Menu Finance (Accounts Receivable)." |
+| `en.ts` | `Receivables past 90 days` | "Share of bad-debt receivables uncollected for more than 90 days… Lower is better: pick the Down direction…" |
+
+Kunci i18n: `hris.kpi.mtkPiutangLewat90` / `…Ket`.
+
+| Tempat | Status | Catatan |
+|---|---|---|
+| Kamus label (`label-otomatis.ts` `METRIK`) | ✅ | |
+| `METRIK_DIKENAL` | ✅ | |
+| `SATUAN_PER_METRIK` | ✅ `persen` | **wajib**; tanpanya target `1` **persen** dirender "1 x" |
+| `FORMULA_PER_METRIK` | ⬜ tidak diisi | sama alasannya dengan seluruh sumber grup Finance yang tak memanggil `DaftarkanFormulaSumber` |
+| `METRIK_PER_SUMBER` | ⬜ tidak perlu | nama metriknya tak dipakai sumber lain mana pun (per 2026-08-31) |
+
+⛔ **Keterangannya menyebut ARAH, dan itu bukan kelebihan melainkan keharusan di sini.** Metrik ini berbobot 0,50 dengan realisasi wajar di bawah satu persen, jadi arah `naik` yang keliru memberi **skor penuh setiap bulan** tanpa satu pun galat, sementara kalimat penjelas di layar ikut membenarkannya. Layar Atur Target membuka dengan toggle "Makin besar makin baik", sehingga keterangan adalah satu-satunya tempat pengisi membaca arah yang benar pada saat ia memilih. Penjaganya `label-otomatis.aturan.test.ts` menuntut frasa arahnya ada di **kedua** locale.
+
+⚠️ **Penjaga satuan yang ditulis bersamanya memerahkan DUA metrik yang sudah lama dipakai template produksi**: keterangan `piutang_lewat_14_persen` dan `piutang_lewat_60_persen` sama sekali tak menyebut satuan maupun arah. Keduanya ikut dibetulkan, satu frasa masing-masing. Polanya sama dengan temuan `kinerja_affiliate_tim` di bawah: **penjaga yang ditulis untuk entri baru hampir selalu menemukan entri lama yang melanggar aturan yang sama**, dan itu justru gunanya.
+
 ### 🟡 `program_culture` — sumber baru (branch `feature/workspace-position`)
 
 Sumber KPI baru dari [[Microservices - Form Builder Service]] (`GET /internal/culture/metrics`), memasok metrik `culture` KPI Culture & Industrial. **Belum merge/prod.** Nilainya **skor komposit** program culture (blueprint 30/30/40), bukan % sesuai jadwal — lihat [[ADR - 0066 Modul Kelola Program Culture]]. Label ramah + keterangan ditaruh di kamus `label-otomatis.ts` dan dua locale `src/i18n/locales/{id,en}.ts`.
