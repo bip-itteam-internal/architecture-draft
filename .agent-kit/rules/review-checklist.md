@@ -126,6 +126,19 @@ kategori baru:
   pada update tak boleh berubah. Ujilah tanpa Mongo: **ekstrak penyusun dokumen update ke
   fungsi murni**, lalu pastikan **`$set` ∩ `$setOnInsert` = ∅**. Terjadi 2026-09-01 di
   opname perlengkapan (`periode` ada di keduanya; fix `opnameUpsert` + test overlap).
+- ⛔ **Koleksi bersama dengan diskriminator: konsumen BARU yang lupa menyaring mencemari
+  UANG/KPI, senyap.** Bila satu koleksi memuat dua jenis baris yang dibedakan sebuah field
+  (mis. `inventory` berisi FASS **dan** perlengkapan via `sifat`, ADR-0069; atau soft-delete
+  via `deleted_at`), aturan "jenis X dikecualikan dari konsumen Y" hidup di **setiap**
+  konsumen — dan yang paling mahal adalah `GetPenyusutan → opex` (uang) & KPI yang menarik
+  `/items`. Kelas ini kritis karena gagalnya tak terlihat di diff konsumen yang **tak
+  disentuh**: menambah baris jenis baru diam-diam menyusup ke setiap query lama yang tak
+  menyaringnya. **Yang dicek**: tiap query ke koleksi itu menyaring diskriminatornya
+  (default ke jenis lama, mis. `sifat != perlengkapan`, agar baris lama tanpa field tetap
+  ikut); dan ada **test regresi** yang membuktikan baris jenis baru **tak menggeser** angka
+  jenis lama (jumlah, biaya, skor). Denormalisasi diskriminator ke baris (bila immutable)
+  menghindari `$lookup` di tiap penyaring. Terbukti dua kali di `inventory`: filter
+  `deleted_at` yang harus diulang di "jalur penyusutan KEDUA", lalu `sifat` di ADR-0069.
 - ⛔ **Indeks unik atas field ber-`omitempty` WAJIB parsial.** Field bertanda `omitempty`
   tidak disimpan sama sekali ketika bernilai kosong, dan MongoDB memperlakukan seluruh
   dokumen yang kehilangan field itu sebagai **satu nilai null yang sama**. Indeks unik
