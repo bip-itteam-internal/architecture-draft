@@ -2,6 +2,8 @@
 
 *Versi digital guestbook perusahaan yang dulunya manual. Aplikasi web publik untuk pengunjung mengisi buku tamu via QR code; datanya disimpan di [[Microservices - Attendance Service]]. Sistem ini dimiliki penuh oleh GA Security. Lihat [repository GitHub](https://github.com/bip-itteam-internal/guestbook-system).*
 
+> ⚠️ **Repo ini hanya menangani kategori `personal` dan `group`.** Kategori ketiga, **`internal`** (security mencatat karyawan yang datang terlambat, `visit_purpose` "Verifikasi Karyawan Terlambat"), ditulis dari **[[APP - MyBharata]]** lewat scan QR karyawan, bukan dari aplikasi Astro ini — tipenya memang tak mengenal nilai itu. Catatan `internal` punya konsekuensi di luar buku tamu: ia mengunci pengajuan koreksi presensi karyawan bersangkutan pada hari itu ([[HRIS - Attendance Correction]] §Aturan Validasi & Anti-Fraud).
+
 - **Stack**: Astro 5 (SSR, `output: 'server'`) + Svelte 5 (island form) + Tailwind v4; adapter `@astrojs/node` (standalone)
 - **Path**: `guestbook-system` (repo terpisah), branch `master`
 - **Deploy**: `tamu.bharatainternasional.com` — mobile-first, publik (tanpa login; akses di-gate oleh token per-kunjungan di URL)

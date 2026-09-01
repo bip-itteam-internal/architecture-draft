@@ -2,7 +2,7 @@
 
 *Fitur ini ditambahkan sebagai pelengkap Attendance System. Koreksi Absen memungkinkan karyawan mengajukan koreksi clock-in/out untuk hari di mana mereka lupa clock-in, clock-out, atau keduanya. Waktu clock otomatis diisi dari jadwal kerja karyawan saat disetujui — tidak perlu input waktu manual.*
 
-- **Status**: ⚠️ Implemented — alur koreksi (pengajuan → approval berjenjang → auto-fix attendance) sudah jalan; penyempurnaan anti-fraud & sebagian FE menyusul.
+- **Status**: ⚠️ Implemented — alur koreksi (pengajuan → approval berjenjang → auto-fix attendance) sudah jalan. Guard anti-fraud guestbook **tak pernah menyala sampai 2026-09-01** dan kini sudah diperbaiki (§Riwayat), **live di DEV, PROD belum**. Pengiriman `employee_id` dari MyBharata menunggu rilis store (my-bharata #133); sampai itu seluruh kecocokan melewati jalur nama.
 
 ## Latar Belakang
 
@@ -137,11 +137,38 @@ Saat pengajuan (`POST /correction`), urutan pemeriksaan:
    - `checkout` — clock-out kosong (clock-in harus sudah ada).
    - `both` — clock-in & clock-out keduanya kosong.
 3. **Jendela waktu clock-out** (`clockOutCorrectionBlocked`, untuk `checkout`/`both`) — koreksi clock-out **baru bisa diajukan setelah window tap clock-out tutup**, yaitu **jam pulang `WorkTime.End` + `clockOutWindowHours` (6 jam)**. Sebelum itu ditolak (422 `"koreksi clock-out baru bisa diajukan setelah batas waktu clock-out berakhir (HH:MM)"`). Alasannya: selama window tap masih terbuka, karyawan cukup **tap clock-out biasa** — koreksi hanya untuk saat window tap sudah `expired`. Bila `WorkTime.End` kosong → tak dibatasi. Konstanta `clockOutWindowHours` **dipakai bersama** dengan pembatas tap clock-out di Attendance Service agar tak drift.
-4. **Anti-fraud guestbook** — untuk `checkin`/`both`, **ditolak** bila ada catatan keterlambatan terverifikasi security di buku tamu (`guestbook` `category="internal"`, `employee_id` & tanggal sama). Mencegah karyawan yang terbukti telat mengubah status jadi Tepat Waktu.
+4. **Anti-fraud guestbook** — untuk `checkin`/`both`, **ditolak 409** bila security sudah mencatat keterlambatan karyawan itu di buku tamu (`guestbook_entries` `category="internal"`, `visit_purpose` "Verifikasi Karyawan Terlambat") pada hari kalender WIB yang sama dengan tanggal absennya. Mencegah karyawan yang terbukti telat mengubah statusnya jadi Tepat Waktu.
 
-**Penyimpanan bukti:** record guestbook `internal` kini menyimpan `employee_id` (dari scan QR di [[APP - MyBharata]]) → dipakai mencocokkan guard. *(Forward-looking: aktif untuk record yang sudah punya `employee_id`.)*
+### Bagaimana catatan security dicocokkan ke karyawan
+
+Aturannya hidup di **satu tempat**, `services/attendance/guestbook_match.go`, dan dipakai bersama oleh gerbang koreksi maupun post-process guestbook. Sebelumnya aturan itu punya dua salinan yang sudah menyimpang (lihat §Riwayat di bawah).
+
+Dua jalur, ditanyakan **berurutan dan terpisah**:
+
+| Urutan | Cocokkan lewat | Berlaku untuk |
+|---|---|---|
+| 1 | `employee_id` | catatan yang menyimpannya (baru, dari scan QR) |
+| 2 | `full_name` + `company_id` | catatan yang `employee_id`-nya kosong (seluruh catatan lama) |
+
+Jalur kedua hanya ditempuh bila yang pertama tak menemukan apa pun. Keduanya sengaja **tidak** digabung jadi satu `$or`: jawaban gabungan tak bisa memberi tahu kecocokannya datang dari mana, dan justru itu yang menentukan bunyi pesan penolakannya.
+
+⚠️ **Cabang nama dibatasi ke dokumen ber-`employee_id` kosong.** Tanpa batasan itu, catatan milik karyawan lain yang kebetulan bernama sama tapi sudah punya `employee_id` presisi akan ikut memblokir selamanya, bukan cuma sampai catatan lama kedaluwarsa.
+
+⛔ **Nama kembar = fail-closed.** Catatan lama tak bisa dipastikan milik siapa, jadi ia memblokir **semua** karyawan bernama itu. Keadaannya nyata: di produksi ada satu nama dipakai dua `employee_id` dari 188 karyawan beraktivitas. Karena orang yang terblokir karenanya tak punya cara membetulkannya sendiri, pesan penolakan jalur nama **mengantar ke HR**; pesan jalur presisi tidak, supaya orang yang catatannya memang miliknya tak dikirim menempuh langkah yang tak dibutuhkannya.
+
+Nama dan tenant diambil dari **entri absennya** (`full_name` + `company_id`), bukan dari header JWT — pasangan itu pula yang dipakai post-process guestbook dan terbukti cocok 22 dari 22 catatan Agustus 2026.
+
+**Penyimpanan bukti:** [[APP - MyBharata]] mengirim `employee_id` dari hasil scan QR saat security mencatat karyawan terlambat. Endpoint `POST /guestbook` sudah menerimanya sejak lama; **pengirimannya baru menyusul** (my-bharata PR #133). Sampai versi itu beredar, tak ada catatan baru yang menyimpan `employee_id` dan seluruh kecocokan melewati jalur nama.
 
 > Pengaman berlapis: **guard guestbook (otomatis)** + **review SPV/HR (manusia)**.
+
+### Riwayat: guard ini tak pernah menyala sampai 2026-09-01
+
+Versi pertama mencocokkan `employee_id` **saja**, dan pulang lebih awal bila nilainya kosong. Dokumen ini sempat menyatakan record internal "kini menyimpan `employee_id` (dari scan QR)"; **itu tak pernah benar**. Diukur di produksi 2026-09-01: **0 dari 318** dokumen guestbook punya field itu, dan skema dokumennya memang tak memuatnya (`full_name`, `phone_number`, `visit_from`, `visit_purpose`, `category`, `visiting_office`, `standby_security`, `metadata`).
+
+Akibatnya gerbangnya tak pernah menolak satu pun pengajuan sejak fiturnya lahir: sepanjang Agustus 2026 tercatat **77 Disetujui, 10 Diabaikan, 0 Ditolak**. Gagalnya senyap sempurna, karena nol dokumen tak terbedakan dari "security memang tidak mencatat apa pun".
+
+Yang membuatnya bertahan lama justru dokumen ini: klaim "sudah menyimpan `employee_id`" membuat siapa pun yang memeriksa dari sisi dokumentasi menyimpulkan rantainya utuh. Diperbaiki di bip-erp [#1605](https://github.com/bip-itteam-internal/bip-erp/pull/1605) dan [#1608](https://github.com/bip-itteam-internal/bip-erp/pull/1608).
 
 ## Pasca-Persetujuan: Dampak pada Attendance (`applyCorrectionToEntry`)
 
@@ -155,6 +182,14 @@ Ketika koreksi sepenuhnya disetujui, sistem otomatis mengubah entri kehadiran ya
 - **Keduanya**: terapkan keduanya.
 - Menambahkan komentar **`"Koreksi disetujui oleh <approver>"`** — **di-append** (tidak menimpa comment lama, mis. bukti keterlambatan guestbook). `approver` = penyetuju **final** yang memicu penerapan (HR untuk karyawan biasa; SPV HR / diri sendiri untuk internal HR).
 - Memperbarui metadata dengan ID approver
+
+### Sisi sebaliknya: security menandai entri absen (`postProcessLateEmployeeFromGuestbook`)
+
+Saat catatan `internal` masuk, service menuliskan `"Keterlambatan terverifikasi oleh <security> pada <jam> WIB"` ke entri absen hari itu, sebagai jejak yang bisa dibaca tanpa membuka buku tamu. Tiga aturan yang mengikatnya, ketiganya lahir dari cacat yang gagal tanpa satu pun galat:
+
+- **Dibatasi hari kalender WIB** entri absennya. Tanpa batas tanggal, pencarian "entri terbaru milik orang ini" mendarat di hari berikutnya begitu cron sudah menyemai entrinya.
+- **Comment di-append, bukan ditimpa.** Field `comment` dipakai bersama dengan jejak koreksi di atas; `$set` polos membuat penulis yang datang belakangan menghapus catatan yang lain.
+- **Hanya ditulis bila cocok TEPAT satu entri.** Lebih dari satu berarti catatan itu tak bisa dipastikan milik siapa, dan menandai salah satunya menuduh orang yang mungkin tidak melakukannya — tuduhan yang lalu ikut mengunci koreksinya lewat guard di atas. Arah kegagalannya sengaja "tidak menulis", bukan "menulis ke tebakan terbaik".
 
 ## Logika Filter Review (`buildCorrectionReviewFilter`)
 
@@ -212,7 +247,8 @@ src/features/hris/attendance-correction/
 - Halaman Pengajuan Saya memiliki dua tampilan: **tabel** dan **kalender** (kalender interaktif dengan status kehadiran berwarna)
 - Tampilan kalender menampilkan kartu detail (clock-in, clock-out, jadwal) saat tanggal dipilih
 - Modal pengajuan koreksi otomatis mendeteksi clock-in/out yang kosong dan memilih tipe koreksi
-- Karyawan mengajukan koreksi untuk hari yang **clock-in/out kosong** atau **clock-in terisi tapi Late** (sengketa telat). Kalender pemilih-tanggal di-feed oleh `GET /api/attendance/history?missing=clockin|clockout|any` (mengembalikan hanya tanggal kandidat; entri telat yang sudah terverifikasi guestbook tak dimunculkan)
+- Karyawan mengajukan koreksi untuk hari yang **clock-in/out kosong** atau **clock-in terisi tapi Late** (sengketa telat). Kalender pemilih-tanggal di-feed oleh `GET /api/attendance/history?missing=clockin|clockout|any` (mengembalikan hanya tanggal kandidat)
+- ⚠️ **Entri telat yang sudah terverifikasi security TETAP dimunculkan** sebagai kandidat, dan penolakannya terjadi saat submit (409) lengkap dengan alasannya. Ini keputusan sadar, bukan kelalaian: membuang tanggalnya dari pemilih membuatnya **lenyap tanpa satu pun penjelasan**, dan orang yang keterlambatannya tercatat security justru yang paling perlu tahu sebabnya. Aksi yang ditolak dengan alasan terbaca di layar yang sama jauh lebih baik daripada pilihan yang hilang diam-diam. Sebelum guard-nya benar-benar menyala, penyaringan itu tak pernah membuang apa pun, jadi menghapusnya tidak mengubah apa yang dilihat orang hari ini
 - Tidak ada input waktu manual — modal menjelaskan bahwa waktu akan otomatis diisi dari jadwal shift saat disetujui
 - Halaman Review memiliki tab: **Menunggu Review** (pending) dan **Sudah Direview** (termasuk yang dibatalkan)
 - Reviewer melihat jadwal kerja pemohon (kolom "Jam Kerja") untuk konteks

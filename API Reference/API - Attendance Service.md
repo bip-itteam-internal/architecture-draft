@@ -43,8 +43,8 @@
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
 | POST/GET/PATCH | `/schedule-exchange/create` · `/consent` · `/partners` · `/view` · `/review` · `/cancel` | **Tukar Jadwal Kerja** (collection `schedule_exchange_request`). **create**: hanya karyawan shift → non-shift **403**; `type:"shift"`+`partner_employee_id` = swap antar-rekan (simpan `exchange_work_time`+`partner_work_time`), `type:"day"` = geser hari. `exchange_date` **H+3**. **consent**: rekan setuju/tolak swap (langkah 1; tolak→Canceled). **partners** `?date=`: kandidat rekan swap (role sama, terjadwal). **view** `?as=reviewer/reviewed/partner` (`partner` = inbox consent rekan, 2026-06-29), `?filter=ongoing/past`, `?id=`, `?search=`. **review**: atasan→HRD, diblokir sampai consent. **cancel**: hanya saat Waiting | header |
-| POST/GET | `/correction` · `/correction/mine` · `/correction` | Koreksi absen (window 7 hari; clock-in: kosong/Late, kecuali telat terverifikasi guestbook; list `?filter=ongoing/past` via status review, `?status=`) | header |
-| GET | `/correction/candidates` | Entri kandidat koreksi 7 hari terakhir (hari ini s/d H-7, lintas-bulan, tanpa month); `?type=clockin/clockout/any` — untuk pemilih tanggal FE | header |
+| POST/GET | `/correction` · `/correction/mine` · `/correction` | Koreksi absen (window 7 hari; clock-in: kosong/Late. **409** bila telat sudah terverifikasi security di guestbook hari itu — dicocokkan lewat `employee_id`, jatuh ke `full_name`+`company_id` untuk catatan lama; list `?filter=ongoing/past` via status review, `?status=`) | header |
+| GET | `/correction/candidates` | Entri kandidat koreksi 7 hari terakhir (hari ini s/d H-7, lintas-bulan, tanpa month); `?type=clockin/clockout/any` — untuk pemilih tanggal FE. **Tidak** disaring guestbook: entri telat terverifikasi tetap muncul, penolakannya saat submit | header |
 | PATCH | `/correction/:id/cancel` · `/correction/:id/review` | Batal / review koreksi | header |
 
 ## Roster jadwal bebas per tanggal
@@ -111,7 +111,7 @@ Ringkasan/detail **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar) dari sat
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
 | GET/POST | `/guestbook/token` · `/guestbook/token-validate` | Token tamu 15 menit | open |
-| GET/POST/PATCH | `/guestbook` | List/buat/edit entri tamu (POST `internal`/telat simpan `employee_id`) | GuestbookRBAC / Security |
+| GET/POST/PATCH | `/guestbook` | List/buat/edit entri tamu. POST menerima `employee_id` untuk kategori `internal` (karyawan telat), tapi **pengirimnya baru menyusul** — per 2026-09-01 nol dari 318 dokumen prod mengisinya, jadi guard koreksi bersandar `full_name`+`company_id`. PATCH menolak `category` selain `personal`/`group` | GuestbookRBAC / Security |
 | POST/GET | `/fingerprint/export` | Upsert/list ekspor fingerprint | open (serial) |
 | GET/POST/DELETE | `/networks` · `/internal/wifi/add` · `/delete` | WiFi kantor (validasi on-site) | open / ITStaff |
 | GET | `/internal/summary` | Ringkasan untuk HRIS orchestrator. Membawa DUA blok dengan jendela berbeda: `summary.total_clock_in`/`total_clock_out` = **24 jam bergulir** (tak terpengaruh parameter apa pun), dan `kehadiran` = **satu bulan kalender** yang dipilih `?periode=YYYY-MM`. Periode kosong / tak terurai / masa depan → **bulan berjalan** (bukan 400). Pembanding `kehadiran` berbeda aturan untuk bulan berjalan vs bulan selesai — lihat [[HRIS - Attendance System]] | HRIS |
