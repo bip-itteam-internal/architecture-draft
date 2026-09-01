@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-01",
-  "jumlah_dokumen": 341,
+  "jumlah_dokumen": 342,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -9296,6 +9296,36 @@
         "open-db.do",
         "integration service",
         "refresh token"
+      ]
+    },
+    {
+      "path": "Runbooks/RUN - Backfill Atribusi Order Shopee.md",
+      "judul": "RUN - Backfill Atribusi Order Shopee",
+      "area": "Runbooks",
+      "jenis": "runbook",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (tool sudah live di prod sejak deploy 2026-09-01; **eksekusi write belum dijalankan** — dry run wajib lebih dulu). Grounded ke [[Microservices - Integration Service]] (§*Atribusi order Shopee: afiliasi vs organik*).",
+      "publik": true,
+      "tautan": [
+        "Microservices - Integration Service",
+        "RUN - Deploy Microservices bip-erp",
+        "API - Integration Service",
+        "APP - Web ERP"
+      ],
+      "hash": "c9bb3e6b9a29bd861f457adb9e79f23cf86124db446bf0c2f7026444e6578679",
+      "ukuran_kb": 5.4,
+      "ringkasan": "Menjawab: bagaimana cara mengisi ulang (backfill) label atribusi afiliasi vs organik untuk order Shopee historis yang tak tersentuh worker harian, apa perintah dry-run dan eksekusi `cmd/attributionbackfill`, angka baseline yang harus dicocokkan sebelum menulis, serta cara memverifikasi hasilnya dan menelusuri penyebab bila hasilnya nol atau seluruhnya \"unknown\". Juga menjawab: kenapa backfill ini aman dan tidak memicu pencatatan apa pun ke Accurate.",
+      "kata_kunci": [
+        "backfill",
+        "atribusi order",
+        "shopee attribution",
+        "afiliasi",
+        "affiliate",
+        "organik",
+        "organic",
+        "attributionbackfill",
+        "Order Management",
+        "shopee_attribution_states"
       ]
     },
     {
