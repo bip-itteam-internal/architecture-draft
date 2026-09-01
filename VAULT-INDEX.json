@@ -7143,22 +7143,25 @@
         "HRIS - Payroll",
         "Microservices - Payroll Service",
         "APP - Web ERP",
+        "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "APP - MyBharata",
         "Microservices - Employee Service",
         "Microservices - Attendance Service"
       ],
-      "hash": "40a52bcef44366837d8523309f945b46006efe8e5c8407ce95e7094a698188f9",
-      "ukuran_kb": 4.6,
-      "ringkasan": "Menjawab: siapa saja aktor dalam alur Payroll Run bulanan dan THR (HR Supervisor pembuat run, Approver Direktur/HR Admin, karyawan self-service), bagaimana urutan lifecycle draft ke approved ke published, dan bagaimana alur khusus perhitungan THR (proporsi masa kerja) beserta skenario kegagalannya.",
+      "hash": "49bd0fda3588275a199d2a46283892a206fb9e82c0e04a43747a550ca7cae153",
+      "ukuran_kb": 6.6,
+      "ringkasan": "Menjawab: siapa yang menjalankan alur payroll run dan apa yang boleh dilakukan masing-masing, dari HR Supervisor yang membuat atau mengimpor run, Approver yang menyetujui dan menerbitkan, sampai karyawan yang melihat slipnya sendiri. Memuat diagram alur draft ke approved ke published berikut cabang impor yang tidak bisa dihitung ulang, serta skenario gagal tiap tahap termasuk penolakan rekonsiliasi dan employee_id yang tak ada di master. Berguna untuk mengetahui gerbang RBAC mana yang dipakai tiap aksi payroll.",
       "kata_kunci": [
+        "payroll persona",
+        "alur payroll",
+        "HR Supervisor",
+        "approver",
         "payroll run",
-        "persona payroll",
+        "slip self-service",
         "THR",
-        "approve publish",
-        "self-service slip gaji",
-        "HR supervisor",
-        "approver direktur",
-        "lifecycle payroll"
+        "impor payroll run",
+        "RBAC payroll",
+        "skenario gagal"
       ]
     },
     {
