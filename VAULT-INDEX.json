@@ -447,20 +447,20 @@
         "GA - Asset Loan & Room Booking",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI"
       ],
-      "hash": "90003f1ea0c6aeb7f0010ca038ec86b4d669ff70c71157c5a2a43a209f3d269d",
-      "ukuran_kb": 8.9,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di inventory-service (aset/inventaris GA) lewat gateway /api/inventory/*, dan bagaimana kontrak request-nya. Menjelaskan cara membuat/mengubah item beserta pemegang (held_by opsional), aturan otorisasi khusus approve-handover oleh SPV penaung, riwayat perbaikan, pemetaan kategori-ERP ke golongan Accurate (ADR-0037), serta opname perlengkapan per-periode (ADR-0067) termasuk validasi field, penomoran ID INV-BIP, upload dokumen MinIO, dan bahwa list/pencarian/paginasi dilakukan client-side.",
+      "hash": "b46ffe124722b567ebb0db2cc4ee472629ffdfebf084b4cfae4296d84e917f71",
+      "ukuran_kb": 9.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di inventory-service (aset/inventaris GA) lewat gateway `/api/inventory/*`, apa kontrak request/validasi tiap rute (buat item, partial update, approve-handover SPV, repair history, opname perlengkapan, unit perlengkapan per-unit), dan siapa yang berhak (RBAC GeneralAffair vs SPV penaung). Juga menjelaskan pola ID aset `INV-BIP-DDMMYY-NAMA-n`, pemetaan kategori-ERP ke golongan-Accurate, serta bahwa `GET /items` tanpa pagination/search (filter & paginasi di client). Berguna untuk tahu format body, auth, dan aturan periode/unique-index opname sebelum memanggil endpoint.",
       "kata_kunci": [
-        "inventory service",
-        "aset GA",
+        "inventory-service",
+        "API inventaris GA",
+        "aset",
         "endpoint",
-        "API",
-        "held_by pemegang",
-        "approve-handover SPV",
-        "category-mapping Accurate",
+        "approve-handover",
         "opname perlengkapan",
-        "repair history",
-        "presigned URL MinIO"
+        "opname stock take",
+        "category-mapping",
+        "presigned URL MinIO",
+        "RBAC GeneralAffair"
       ]
     },
     {
@@ -2280,6 +2280,7 @@
       "tautan": [
         "CORE - RBAC dan Permission Set",
         "Microservices - Employee Service",
+        "ADR - 0069 Perlengkapan Per-Unit Opsional di inventory dengan Guard Anti-Kontaminasi",
         "ADR - 0049 Padanan Aset per-item berbasis nama menggantikan kategori-golongan",
         "Microservices - Insentive Service",
         "ADR - 0002 Database-per-Service",
@@ -2293,20 +2294,20 @@
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "External - Accurate"
       ],
-      "hash": "7d7bcfe6644f64e290a3d477ebc8b664642fb4ac8a8fc15a78a813d3f7d77e7a",
-      "ukuran_kb": 15.4,
-      "ringkasan": "Menjawab: apa itu inventory-service, teknologi yang dipakai (Go + Fiber + MongoDB + MinIO), dan fitur apa saja yang sudah diimplementasikan untuk melacak aset General Affairs. Menjelaskan alur create item dengan generate ID INV-BIP, pemegang opsional, serah-terima yang butuh persetujuan SPV (termasuk koreksi soal middleware grup Fiber per-prefix), soft delete aset, repair history dengan bukti nota, pemetaan kategori-golongan Accurate, serta endpoint penyusutan per pemegang untuk service insentif.",
+      "hash": "a60fca12fc8ea19453b98e50d902588860b66b0bb9596bcad9d683d71a8ae26c",
+      "ukuran_kb": 16.6,
+      "ringkasan": "Menjawab: apa itu inventory-service sebagai microservice (stack Go + Fiber + MongoDB + MinIO, path `services/inventory`), fitur apa yang sudah diimplementasikan (item + spesifikasi, pemegang/heldBy, dokumen, repair history, penomoran ID, soft-delete aset, serah-terima + approve SPV, penyusutan per pemegang), dan bagaimana perilakunya di tingkat kode. Menjelaskan gotcha penting seperti middleware grup Fiber berlaku per-prefix (`approve-handover` ikut gerbang grup `/item`), endpoint `GET /items` yang menyembunyikan aset soft-deleted & FASS-only, serta lantai izin `ga.view`/`ga.work`. Berguna untuk memahami implementasi backend, integrasi (insentive/employee/Accurate), dan alasan desain di baliknya.",
       "kata_kunci": [
-        "inventory service",
+        "inventory-service",
         "microservice",
-        "asset tracking GA",
+        "asset tracking",
         "Go Fiber MongoDB MinIO",
-        "serah-terima aset",
-        "soft delete",
-        "penyusutan",
+        "soft delete aset",
+        "serah-terima aset handover",
+        "penyusutan depresiasi",
         "repair history",
-        "ID INV-BIP",
-        "held_by"
+        "penomoran ID INV-BIP",
+        "ga.view ga.work"
       ]
     },
     {
@@ -5848,6 +5849,7 @@
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "ADR - 0049 Padanan Aset per-item berbasis nama menggantikan kategori-golongan",
         "ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate",
+        "ADR - 0069 Perlengkapan Per-Unit Opsional di inventory dengan Guard Anti-Kontaminasi",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "APP - Web ERP",
         "GA - Procurement System",
@@ -5857,19 +5859,19 @@
         "CORE - OCR Document Service",
         "Form Permintaan Barang GA.pdf"
       ],
-      "hash": "1ecd4823554c93a9b9dd6a12703813bd34199538b1b3e0e46d24499abe5f3398",
-      "ukuran_kb": 11.9,
-      "ringkasan": "Menjawab: apa cakupan dan visi sistem inventory General Affairs, serta fitur apa saja yang sudah/belum jalan di modul Aset dari sudut pandang domain/pengguna. Menjelaskan penomoran tag aset, kategori/nama barang bebas-ketik, alur serah-terima dengan persetujuan SPV, lokasi & estimasi penyusutan garis lurus (bukan angka pembukuan resmi), soft delete beralasan wajib, rekonsiliasi aset & perlengkapan ke Accurate untuk KPI, riwayat perbaikan berbukti nota, serta arah jangka panjang GA sebagai pengelola inventory perusahaan.",
+      "hash": "ccad8790d7f440944b1bcd64768d3eb5d859d218274a20ef99d33e6fd61a6de3",
+      "ukuran_kb": 12.5,
+      "ringkasan": "Menjawab: apa cakupan dan tujuan modul Inventory Management milik General Affairs, fitur apa yang sudah dilihat pengguna (daftar aset, kartu ringkasan, kolom Karyawan Pemegang, detail bertab, export Excel), dan bagaimana alur serah-terima aset, lokasi & estimasi penyusutan, riwayat perbaikan berbukti nota, serta soft-delete aset dari sisi produk. Menjelaskan rekonsiliasi aset & opname perlengkapan GA terhadap Accurate untuk KPI, pendaftaran perlengkapan durable per-unit, arah jangka panjang GA sebagai pengelola inventory perusahaan, dan migrasi tampilan ke struktur halaman HRIS. Berguna untuk memahami konteks bisnis/produk, keputusan (ADR terkait), dan status fitur GA.",
       "kata_kunci": [
-        "inventory management GA",
-        "aset perusahaan",
-        "General Affairs",
-        "serah-terima aset",
-        "penyusutan estimasi",
-        "soft delete aset",
+        "GA inventory management",
+        "General Affairs aset",
+        "manajemen inventaris",
         "rekonsiliasi Accurate",
         "opname perlengkapan",
-        "penomoran aset tag",
+        "penyusutan estimasi",
+        "serah-terima aset SPV",
+        "soft delete aset",
+        "perlengkapan per-unit",
         "KPI akurasi aset"
       ]
     },

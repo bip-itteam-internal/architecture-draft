@@ -45,6 +45,15 @@
 - POST body `{item_no, nama?, qty_fisik, qty_accurate_snapshot}`; `item_no`+`qty_fisik` wajib (`qty_fisik ≥ 0`). `qty_accurate_snapshot` = qty Accurate yang **dilihat operator** saat menghitung — dipatok agar selisih tak bergeser oleh sync. `selisih = qty_fisik − qty_accurate_snapshot` dihitung & disimpan BE; `oleh` dari header `EmployeeID`. **`periode` di-set SERVER = bulan berjalan WIB** (`Asia/Jakarta`, `periodeDari`), input client diabaikan → tak bisa menulis ke bulan lampau/depan.
 - **Unique index `uniq_item_periode` = `(item_no, periode)`** (dibuat saat boot, non-fatal, penjaga `DB==nil`): satu record per barang per bulan; opname ulang bulan sama menimpa, bulan baru = record baru. Menuntaskan risiko dup upsert. Record lama pra-periode di-backfill dari `at` (WIB).
 
+## Perlengkapan per-unit (ADR-0069)
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| GET | `/perlengkapan-units/count` | `{data:{<item_no>: jumlah_unit}}` — prefill Hitung Fisik opname | GeneralAffair (`PermGaWork`) |
+| GET | `/perlengkapan-units[?item_no=]` | Daftar unit perlengkapan (editor padanan) | GeneralAffair (`PermGaWork`) |
+
+- Unit perlengkapan = `InventoryItem` ber-`sifat=perlengkapan` + **`accurate_item_no`** (padanan ke item Accurate, `item_no`; **TERPISAH** dari `accurate_asset_no` aset tetap). Dibuat lewat **`POST /item`** (`{sifat:"perlengkapan", accurate_item_no, item_name, item_category:"Perlengkapan", held_by?, location?}`), dipadankan/lepas lewat **`PATCH /item/:id`** (`accurate_item_no`; kosong = lepas).
+- ⛔ **`sifat` menandai unit perlengkapan agar TAK muncul di endpoint aset tetap** (`GET /items`, `/summary`, `/penyusutan`, ketersediaan permintaan) — default FASS-only. Many-to-one: Accurate qty>1 → N unit per `item_no`.
+
 ## Kontrak request & validasi (grounded)
 
 Detail berikut grounded ke `services/inventory` (`controller.go`, `validation.go`).
