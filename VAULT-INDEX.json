@@ -58,20 +58,25 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "45eeee5400399d066059b314509fa22b1ef9eebce2d0ce0b28cf9bfae1852e35",
-      "ukuran_kb": 19.8,
-      "ringkasan": "Menjawab: rute apa saja yang tersedia di attendance-service lewat gateway /api/attendance/*, siapa yang boleh memanggilnya (staf HRIS, Security, gerbangRoster, atau rute open), dan parameter apa yang dipakai tiap endpoint. Mencakup clock-in/out (/tap), daftar dan laporan entri absen beserta format tanggal DD-MM-YYYY, hari libur, pengajuan cuti/izin/perjalanan dinas, tukar jadwal kerja, koreksi absen, roster bebas per tanggal, definisi shift dan rotasi milik perusahaan, guestbook, WiFi, serta rute internal dan KPI. Juga menjawab aturan validasi yang mudah salah: schedule_id dan group_id unik global, display_name shift yang tertutup, dan payroll-supplement sebagai masukan potongan kehadiran payroll.",
+      "hash": "7dbdd060c5855ff54fae42325986c493ce661986dd57bf27a74f0aefac36839d",
+      "ukuran_kb": 20.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di attendance-service lewat gateway `/api/attendance/*`, siapa yang boleh memanggilnya (RBAC HRIS, Security, guestbook, gerbangRoster), dan parameter apa yang dipakai tiap rute. Mencakup tap clock-in/out, daftar entri beserta filter tanggal DD-MM-YYYY, laporan periode 26→25, payroll-supplement dan perlakuan status dibayar/dipotong, hari libur, pengajuan cuti/izin/dinas beserta review dan pembatalan, tukar jadwal kerja, koreksi absen, roster per tanggal, definisi shift perusahaan, dan pola rotasi grup. Juga menjelaskan aturan validasi yang mudah terlewat: keunikan global `schedule_id`/`group_id`, `display_name` shift yang tertutup, `starting_date` rotasi yang wajib, batas 500 sel roster, dan idempotensi pengajuan cuti.",
       "kata_kunci": [
         "attendance service",
         "absensi",
-        "kehadiran",
+        "presensi",
         "clock-in",
         "clock-out",
-        "roster",
-        "shift exchange",
-        "tukar jadwal",
+        "endpoint attendance",
+        "cuti",
+        "leave request",
         "koreksi absen",
-        "leave request"
+        "roster",
+        "shift",
+        "tukar jadwal",
+        "schedule exchange",
+        "payroll supplement",
+        "guestbook"
       ]
     },
     {
@@ -5912,23 +5917,24 @@
         "Microservices - Attendance Service",
         "APP - MyBharata",
         "HRIS - Attendance Correction",
+        "HRIS - Attendance System",
         "CORE - API Master Gateway",
         "APP - Web ERP"
       ],
-      "hash": "1427f1522c56a0f5f4a345430b5dc768d1ab513f8d48d41c5e1118fa9cad8742",
-      "ukuran_kb": 3.8,
-      "ringkasan": "Menjawab: bagaimana buku tamu digital perusahaan bekerja, dari security menampilkan QR code, pengunjung scan ke /visit/<token>, validasi token, pengisian form tamu, sampai halaman success atau invalid. Menjelaskan stack dan deployment aplikasinya (Astro 5 SSR + Svelte 5 + Tailwind v4 di tamu.bharatainternasional.com, repo terpisah guestbook-system), endpoint backend yang dipakai lewat gateway ke attendance-service, rotasi token harian pukul 04:00, dan bahwa notifikasi host dipicu backend bukan frontend. Juga menjawab batas ruang lingkupnya: hanya kategori personal dan group, sementara kategori internal untuk karyawan terlambat ditulis dari MyBharata dan berdampak mengunci koreksi presensi hari itu; halaman admin dan daftar kunjungan ada di Web ERP, bukan di aplikasi tamu ini.",
+      "hash": "c85ecce1852497751f65de676002865039c037249fe43bfb2d253debb2ab8658",
+      "ukuran_kb": 4.5,
+      "ringkasan": "Menjawab: bagaimana alur pengunjung mengisi buku tamu lewat scan QR (validasi token per-kunjungan, halaman /visit/<token>, form, /success, /invalid), endpoint mana yang dipakai (POST /public/guestbook dan validate=token lewat API Gateway ke Attendance Service), serta siapa yang mengirim notifikasi ke host. Menjelaskan juga pembagian kategori tamu: personal dan group ditangani aplikasi Astro ini, sedangkan kategori internal (karyawan terlambat) ditulis dari MyBharata dan berdampak ke pengunciannya pengajuan koreksi presensi serta angka kartu Terlambat. Memuat batasan yang sudah diketahui: tidak ada halaman admin di aplikasi tamu, QR di-generate di tempat lain, README usang, dan risiko duplikat baris yang memengaruhi angka yang dibaca HR.",
       "kata_kunci": [
         "guestbook",
         "buku tamu",
-        "tamu",
-        "visitor",
+        "GA Security",
         "QR code",
         "token kunjungan",
-        "security",
-        "General Affairs",
+        "visitor",
+        "tamu",
         "karyawan terlambat",
-        "Astro"
+        "Astro",
+        "attendance service"
       ]
     },
     {
@@ -6374,29 +6380,23 @@
         "HRIS - Attendance Correction",
         "HRIS - Tukar Jadwal Kerja"
       ],
-      "hash": "1faf3f1ded82e5850d471e446e5a01bf1148f7f1d6a50ddc44db5249c763d8ef",
-      "ukuran_kb": 10.1,
-      "ringkasan": "Menjawab: bagaimana sistem presensi Bharata bekerja (metode fingerprint Solution X105 dan aplikasi mobile dengan face recognition, geolocation, geofencing WiFi), fitur apa yang dimiliki HR (lihat real-time, ubah status, ekspor laporan), dan bagaimana dua ambang keterlambatan (`ontime_grace_minutes` dan `late_hour_threshold_minutes`) menentukan status Tepat Waktu/Terlambat serta perhitungan `late_hour`. Juga menjawab cara menyaring layar Kehadiran: pemilih bulan kalender di dalam panel Filter (Januari s/d bulan berjalan, terbaru di puncak) yang menggantikan preset Minggu/Bulan/Tahun ini, dan bagaimana kartu ringkasan kini mengikuti bulan yang dipilih lewat `?periode=` — termasuk dua aturan pembandingnya (bulan berjalan pakai jendela sepanjang sama, bulan selesai pakai bulan penuh) dan peringatan agar tidak memakai `rentangPeriodeTelat` yang batasnya siklus payroll 26-25. Menjelaskan pula mengapa ada band keterlambatan yang tak berdampak upah/SP dan bagaimana toleransi mengikat cron notifikasi 'belum absen'.",
+      "hash": "ba98039371b19ac83248588f79715a308ae8fd65646adc7804a49143955eed0d",
+      "ukuran_kb": 13.6,
+      "ringkasan": "Menjawab: bagaimana presensi karyawan direkam (mesin fingerprint Solution X105, aplikasi mobile dengan face recognition, geolocation dan geofencing WiFi), serta bagaimana HR melihat dan menyaringnya di layar Kelola Kehadiran per bulan kalender dan per departemen. Menjelaskan perilaku kartu ringkasan di atas tabel: aturan pembanding bulan berjalan versus bulan selesai, penanganan periode kosong atau masa depan, dan mengapa kartu kalender tak boleh memakai rentang siklus payroll 26→25. Juga merinci rencana kartu Terlambat yang bersumber dari buku tamu (kejadian unik, bukan baris) beserta rumus persentase kehadiran berbasis keterlambatan, dan menegaskan kartu itu bukan daftar kandidat SP karena usulan SP dihitung terpisah dari status entri atas siklus payroll.",
       "kata_kunci": [
         "attendance",
-        "presensi",
         "kehadiran",
+        "presensi",
+        "absensi",
         "fingerprint",
         "Solution X105",
         "geofencing",
-        "keterlambatan",
+        "terlambat",
         "late",
-        "ontime grace",
-        "late_hour_threshold",
-        "cron alpha",
-        "toleransi",
-        "clock-in",
-        "filter bulan",
-        "pemilih periode",
-        "kartu ringkasan",
-        "pembanding",
-        "bulan berjalan",
-        "bulan selesai"
+        "kelola kehadiran",
+        "HRIS",
+        "toleransi keterlambatan",
+        "SP"
       ]
     },
     {

@@ -2,12 +2,18 @@
 
 *Versi digital guestbook perusahaan yang dulunya manual. Aplikasi web publik untuk pengunjung mengisi buku tamu via QR code; datanya disimpan di [[Microservices - Attendance Service]]. Sistem ini dimiliki penuh oleh GA Security. Lihat [repository GitHub](https://github.com/bip-itteam-internal/guestbook-system).*
 
-> ⚠️ **Repo ini hanya menangani kategori `personal` dan `group`.** Kategori ketiga, **`internal`** (security mencatat karyawan yang datang terlambat, `visit_purpose` "Verifikasi Karyawan Terlambat"), ditulis dari **[[APP - MyBharata]]** lewat scan QR karyawan, bukan dari aplikasi Astro ini — tipenya memang tak mengenal nilai itu. Catatan `internal` punya konsekuensi di luar buku tamu: ia mengunci pengajuan koreksi presensi karyawan bersangkutan pada hari itu ([[HRIS - Attendance Correction]] §Aturan Validasi & Anti-Fraud).
-
 - **Stack**: Astro 5 (SSR, `output: 'server'`) + Svelte 5 (island form) + Tailwind v4; adapter `@astrojs/node` (standalone)
 - **Path**: `guestbook-system` (repo terpisah), branch `master`
 - **Deploy**: `tamu.bharatainternasional.com` — mobile-first, publik (tanpa login; akses di-gate oleh token per-kunjungan di URL)
 - **Status**: ✅ Implemented (funnel pengisian tamu; bukan sistem admin lengkap)
+
+> ⚠️ **Repo ini hanya menangani kategori `personal` dan `group`.** Kategori ketiga, **`internal`** (security mencatat karyawan yang datang terlambat, `visit_purpose` "Verifikasi Karyawan Terlambat"), ditulis dari **[[APP - MyBharata]]** lewat scan QR karyawan, bukan dari aplikasi Astro ini — tipenya memang tak mengenal nilai itu.
+>
+> ⛔ **Catatan `internal` bukan sekadar buku tamu; ia menggerakkan dua hal di luar layar ini.**
+> 1. Mengunci pengajuan koreksi presensi karyawan bersangkutan pada hari itu ([[HRIS - Attendance Correction]] §Aturan Validasi & Anti-Fraud).
+> 2. 🔜 Menjadi **sumber angka kartu Terlambat** di Kelola Kehadiran ([[HRIS - Attendance System]]), menggantikan cacah status. Belum live; menunggu bip-erp [#1614](https://github.com/bip-itteam-internal/bip-erp/pull/1614).
+>
+> Konsekuensi praktisnya: **kesalahan input di sini langsung memengaruhi angka yang dibaca HR.** Satu kedatangan yang tercatat dua kali menaikkan hitungannya, dan itu bukan hipotesis — Agustus 2026 punya 22 baris untuk 21 kejadian, satu nama tersimpan dua kali pada 15 Agustus dengan jam identik. Hitungannya memakai kejadian unik (nama + tanggal) supaya duplikat tak menggandakan angka, tetapi duplikatnya tetap layak dibereskan di sini.
 
 ## Alur & Halaman (Sudah Diimplementasikan)
 
