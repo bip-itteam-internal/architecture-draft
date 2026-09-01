@@ -6,7 +6,7 @@
 - **Path frontend:** `frontend/src/features/marketing-insight/affiliate/`
 - **Path backend (target):** `bip-erp/services/integration/` · `bip-erp/services/employee/` (TBD)
 - **Status**: ✅ Implemented (2026-08-07) — daftar akun internal kini hidup di DB (`icc_affiliate_accounts`), dikelola SPV lewat **ICC Management** dan tampil sebagai kolom **Pemegang** di **Marketing Analytics → Affiliate**. Konstanta hardcoded sudah dihapus. Lihat [[#Keputusan Desain 2026-08-06 — Dikelola lewat ICC Management]] dan [[#Rencana Implementasi (Revisi 2026-08-06)]].
-- **Belum**: data produksi belum diimpor (alat siap, lihat Fase C), Kyura belum ada berkasnya, serta antrean kandidat akun internal & pengisian `last_seen_at` belum dibuat.
+- **Belum**: data produksi belum diimpor (alat siap, lihat Fase C), Kyura belum ada berkasnya, serta antrean kandidat akun internal & pengisian `last_seen_at` belum dibuat (**nol penulis** di kode, diverifikasi 2026-09-01). Juga belum ada: cara membedakan akun yang **kena ban** dari yang hidup (bagian tersendiri di bawah, dalam Dependensi & Risiko).
 
 ---
 
@@ -258,7 +258,9 @@ Pencocokan order dilakukan terhadap **gabungan `username` + `alias`**.
 
 ### `last_seen_at` — deteksi handle basi
 
-Diisi dari data order affiliate: kapan terakhir username itu muncul. Username yang berubah tanpa dilaporkan akan terlihat sendiri (tiba-tiba nol order berminggu-minggu), alih-alih menunggu ada yang komplain angkanya turun.
+Rancangannya: diisi dari data order affiliate, yaitu kapan terakhir username itu muncul. Username yang berubah tanpa dilaporkan akan terlihat sendiri (tiba-tiba nol order berminggu-minggu), alih-alih menunggu ada yang komplain angkanya turun.
+
+> 🟡 **Field-nya ada, pengisinya belum pernah dibuat.** Diverifikasi 2026-09-01 dengan `git grep` (bukan hanya ripgrep, yang melewati berkas ber-NUL): di seluruh `bip-erp`, `last_seen_at` cuma muncul sebagai deklarasi entity (`services/integration/internal/domain/entity/icc_affiliate_account.go:44`), ditambah satu baris tipe di `erp-frontend` (`src/features/integration/icc/types.ts:50`). **Nol penulis, nol pembaca, nol tampilan.** Artinya satu-satunya detektor otomatis "akun tiba-tiba sunyi" yang pernah dirancang belum berfungsi sama sekali, dan sampai hari ini akun yang sunyi baru ketahuan kalau ada orang yang mengeluh. Fakta ini sudah tercatat di ringkasan atas dan di Fase E; ditegaskan ulang di sini karena bagian ini, bila dikutip sendirian, terbaca seperti perilaku yang sudah berjalan.
 
 ### Dampak ke tampilan ICC Management
 
@@ -356,6 +358,18 @@ Ditetapkan setelah verifikasi berkas versi 2026-08-06 (`z-file-hasil/DATA NAMA A
 | **Akun bersama — tidak diharapkan, tetap ditoleransi** | Kebijakan per 2026-08-06: satu akun dipegang satu orang; berkas sumber sudah dirapikan (`auraliaa__` dan `gumince` tidak lagi dobel). Model data **tetap** permisif (unik per pasangan karyawan–username, bukan unik global) karena kasusnya masih muncul di data (`efcare`) dan constraint global akan membuat impor gagal diam-diam. Yang benar: **peringatkan** saat satu akun hendak diberikan ke orang kedua, jangan tolak tanpa penjelasan |
 | **Risiko: akun tidak aktif** | Kreator yang resign tidak otomatis off dari daftar ICC |
 | **Dependency runtime** | Fase 2 menambah HTTP call ke Employee Service; pastikan timeout + fallback (jika Employee Service down, fallback ke cache lama) |
+
+### 🔴 Akun yang kena ban tidak bisa dibedakan dari yang hidup
+
+Gap yang berdiri sendiri, bukan turunan dari `last_seen_at` di atas: **tidak ada konsep apa pun untuk status ban di tingkat AKUN**, di koleksi mana pun.
+
+`IccAffiliateAccount` hanya punya `is_active bool`, dan flag itu **sudah dipakai untuk arti lain**. Aturan di bagian *Rename = edit di tempat + alias* menetapkan akun yang berpindah pemegang dinonaktifkan barisnya lalu dibuat baris baru, supaya riwayat insentif tetap menempel ke orang lama. Jadi `is_active: false` hari ini berarti "baris registri ini pensiun", bukan "akunnya mati di TikTok". Menumpanginya untuk arti ban akan melebur dua fakta yang tindakannya berbeda ke dalam satu boolean, persis kelas kesalahan yang `employee_id` opsional dibuat untuk menghindarinya di dokumen ini. Di layar ICC Management pun yang tampil cuma chip "Aktif" / "Nonaktif" tanpa alasan (`affiliate-accounts-tab.tsx`).
+
+**Kontras yang penting: di tingkat TOKO masalah ini sudah selesai.** [[ADR - 0052 Status Sinkron per Toko]] memberi `shop_sync_states` status `ACTIVE`/`DISABLED` dengan `reason` wajib, `disabled_at`, aktor, riwayat append-only, dan counter auto-disable, plus panel "Shop Sync Status" di [[APP - Web ERP]]. Tidak ada padanannya untuk akun, dan kedua level ini gampang tertukar dalam percakapan.
+
+⛔ **Bila kelak dibangun, satu pelajaran ADR-0052 wajib ikut: kegagalan tunggal BUKAN bukti ban.** Terukur prod 2026-08-24, dua run berjarak satu menit melaporkan TikTok error 36009006 untuk himpunan toko yang **berbeda**, termasuk toko yang jelas masih berjualan. Untuk akun sinyalnya lebih lemah lagi: TikTok tidak mengirim pemberitahuan ban, jadi satu-satunya sinyal adalah **sunyi**, dan sunyi juga berarti libur, ganti handle, atau pindah toko. Ban, ganti handle, dan pensiun wajib jadi nilai yang berbeda, bukan satu boolean.
+
+Konsumen yang sudah terdampak hari ini ada di [[Microservices - Marketing Analytics Service]]: pemilih akun live menawarkan akun mati, dan justru di puncak daftar. **Belum ada keputusan apa pun soal ini, belum ada ADR**, dan kebutuhannya belum diterjemahkan dari keluhan pemakai.
 
 ### Catatan Data Saat Ini
 

@@ -227,6 +227,22 @@ Tiga aturan klien yang lahir dari bentuk data service ini, dan yang akan menggig
 
 ⚠️ **Layar Sesi Live Host belum terdokumentasi di [[APP - Web ERP]]** (gap dokumentasi, bukan gap fitur). Seluruh keterangan layarnya sementara ini tinggal di sini.
 
+#### 🔴 Pemilih akun tak tahu akun mana yang sudah mati, dan menaruhnya di puncak
+
+Gap fitur, bukan gap dokumentasi. Pemakai melaporkan (2026-09-01) banyak akun TikTok kena ban dan mereka tak bisa membedakan mana yang masih hidup. Sistem memang belum bisa, dan di layar ini bentuknya bukan sekadar diam melainkan **menyesatkan aktif**.
+
+`bacaAkunLiveMart` (`live_shift_akun.go`) mengagregasi `mart_live_sessions` per `username` dengan `$match` **hanya atas `shop_id`**: tanpa jendela waktu, tanpa status. Kliennya juga tak menambahkan apa-apa (`gabung-akun-lintas-toko.ts` mengirim `params: { shop_id }` saja). Akibatnya berlapis:
+
+- Akun yang sudah diban berbulan-bulan tetap terbalas selamanya, karena sekali sebuah username punya sesi di toko itu ia tak pernah keluar lagi dari agregat.
+- Peringkatnya memakai **GMV kumulatif seumur hidup**, jadi akun brand yang lama produktif lalu mati kemarin justru duduk di **puncak** daftar, mengalahkan akun pengganti yang baru dan masih sepi.
+- Ambang `utama` (≥ 60% porsi GMV) dihitung dari total kumulatif yang sama, sehingga akun mati bisa ikut **distempel `utama`**, yaitu satu-satunya petunjuk yang layar itu berikan tentang akun mana yang benar.
+
+⚠️ **Fenomenanya sudah terukur dan tercatat, tapi cuma sebagai komentar Go.** `kpi_live.go` menuliskan pergantian akun antar bulan (`live_glowbooster4` → `live_glowbooster7`, `beautyhacks.id3` berhenti Juli) sebagai **sebab kedua** dari tiga yang menutup jalan ke KPI live per-orang. Suksesi bernomor semacam itu adalah tanda tangan khas ban-lalu-ganti. Jadi service ini sudah **melihat** akun mati sejak lama; yang tak pernah ada adalah tempat menyimpan faktanya sehingga bisa ditanya siapa pun.
+
+**Taruhannya naik justru sekarang.** [[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]] membuka penilaian **KPI Host Live per orang**. Begitu itu menyala, akun yang diban di tengah periode membuat host terbaca sunyi, dan sunyi akan terbaca sebagai tidak bekerja. Yang kena orangnya, bukan angkanya.
+
+Padanan di tingkat **toko** sudah ada dan bisa dijadikan cetakan ([[ADR - 0052 Status Sinkron per Toko]]: koleksi terpisah, `reason` wajib, riwayat append-only, auto-disable berambang beruntun). ⛔ Yang wajib ikut terbawa dari sana: **kegagalan tunggal bukan bukti ban**. Untuk akun sinyalnya bahkan lebih lemah, karena TikTok tak memberi tahu apa-apa dan satu-satunya sinyal adalah **sunyi**, yang juga berarti libur, ganti handle, atau pindah toko. Konteks sisi akun affiliate ada di [[Sales - ICC Affiliate Mapping]]. **Belum ada keputusan, belum ada ADR.**
+
 ### Retur & analitik lain
 
 | Endpoint | Isi |
