@@ -128,11 +128,16 @@ yang berbeda dari uang yang masuk rekening lebih buruk daripada tidak ada slip.
 menggantikannya hanya **rekonsiliasi** — jumlah baris wajib sama dengan kolom TOTAL TERIMA,
 dan yang tak cocok ditolak berikut selisihnya dalam rupiah.
 
-⛔ **Satu gerbang DATA masih terbuka**: kolom **TOTAL TK** di sheet HRD diduga subtotal
-JHT + JP, dan bila benar maka TOTAL TERIMA di sheet memotong dua kali. Data contoh yang
-dibagikan HRD sudah di-dummy-kan sehingga mustahil dibedakan dari sana. **Impor produksi
-tidak boleh dijalankan sebelum ini terjawab.** Rincian lengkap, termasuk lima kolom ambigu
-lainnya: [[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]].
+✅ **Gerbang data sudah TERJAWAB** (2026-09-01, sheet produksi, empat baris diuji dan cocok
+sampai rupiah): **TOTAL TK adalah subtotal JHT + JP** dan tak boleh dipetakan sebagai
+potongan, sementara **Tunjangan PPh 21 justru IKUT** ditambahkan ke TOTAL TERIMA. Yang kedua
+membalik dugaan awal yang ditarik dari contoh ber-angka dummy. Kolom **KETERANGAN** ternyata
+berisi badan usaha penggaji, dan **ABSENSI** dipetakan ke komponen `Potongan Absensi` yang
+sengaja lahir non-aktif supaya tak pernah ikut run engine.
+
+⛔ Yang masih menahan impor produksi kini tinggal **deploy dan verifikasi lewat gateway**,
+bukan lagi pertanyaan data. Rincian lengkap berikut bukti aritmetikanya:
+[[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]].
 
 ## Dokumen Terkait
 

@@ -179,11 +179,15 @@ Grounded ke **Formulir 2a PU BPJS Ketenagakerjaan** milik BHARATA INTERNASIONAL 
 - **Gateway tak perlu diubah**: `Reroute` di shared-library sudah mengenali `application/pdf` dan men-streaming-nya tanpa buffering, dan cache Redis hanya menyimpan `application/json` sehingga PDF tak ter-cache basi.
 - Nama berkas membuang karakter yang merusak `Content-Disposition` (termasuk CR/LF), karena judul run adalah masukan bebas dari HR.
 
-## Impor Payroll Run dari Spreadsheet HRD (🔜 branch `feat/payroll-impor-run`, belum merged)
+## Impor Payroll Run dari Spreadsheet HRD (⚠️ merged, BELUM deploy)
 
 > Keputusan lengkap, alasan, dan **gerbang datanya**:
 > [[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]].
 > Rute: [[API - Payroll Service]] §Impor Payroll Run.
+>
+> Irisan pertama merged ([#1604](https://github.com/bip-itteam-internal/bip-erp/pull/1604));
+> lanjutan kop slip + komponen absensi masih OPEN
+> ([#1611](https://github.com/bip-itteam-internal/bip-erp/pull/1611)).
 
 **Jenis run KETIGA**, `PayrollRun.type = "import"`. Ada karena payroll belum pernah dipakai
 menggaji seorang pun sementara HRD sudah membayar berbulan-bulan lewat spreadsheet, dan
@@ -211,8 +215,27 @@ tidak ada slip.
   menjatuhkan yang kosong ke `semua`, dan itu bacaan yang benar untuk run lama tapi bohong di
   sini: sheet bisa memuat 8 orang, bisa 200.
 - **Karyawan tanpa `employee_salary` tetap diimpor** (backfill justru mencakup orang yang
-  struktur gajinya belum pernah dimasukkan). Kop slipnya jatuh ke badan usaha **default** dan
-  barisnya ditandai `warn_codes: import_company_default`.
+  struktur gajinya belum pernah dimasukkan).
+- **Kop slip: nama dari sheet → `employee_salary.company_id` → default.** Kolom KETERANGAN
+  sheet HRD berisi badan usaha penggaji, dan itu informasi yang **tidak dimiliki sistem**:
+  `employee_salary` cuma menyimpan keadaan hari ini, sementara yang di-backfill slip belasan
+  bulan lalu. Nama yang disebut tapi tak ada di master **ditolak**, tidak jatuh ke default.
+  `CV` dan `PT` tidak disamakan (entitas beda, NPWP beda), dan nama **kembar** di master
+  ditolak sebagai ambigu karena iterasi map Go tak berurutan sehingga "ambil yang pertama"
+  memilih entitas berbeda tiap proses restart.
+- `warn_codes: import_company_default` menyala hanya bila sheet **tidak** menyebut badan
+  usahanya **dan** orangnya belum punya penetapan gaji. Baris berkop-dari-sheet tak ditandai:
+  kop dari sheet justru yang paling pasti, dan penanda yang kebanyakan salah berhenti dibaca
+  orang termasuk yang benar.
+- ⛔ **Komponen `Potongan Absensi` lahir `is_active: false`, dan itu PENJAGA bukan status.**
+  Kolom ABSENSI sheet satu angka gabungan sementara engine memecahnya jadi empat baris
+  berpengali berbeda. Bila komponen ini aktif, ia muncul di layar Penetapan Gaji dan bisa
+  dilekatkan ke struktur gaji; sejak saat itu tiap run engine memotong absensi manual
+  **ditambah** empat baris kehadiran otomatis, sehingga potongan yang sama diambil **dua
+  kali** tanpa satu pun galat. Non-aktif tetap diterima impor karena `namaKomponenMaster`
+  sengaja membaca seluruh master. Di-backfill idempoten oleh `ensureImporOnlyComponents()`
+  saat boot. ⚠️ Penjaga ini menuntut `employee-salary-form` di FE menyaring `is_active`, dan
+  sebelumnya tidak.
 - **Nama baris slip wajib dari master `salary_component`**, termasuk yang non-aktif. Nama
   bebas ditolak 400: ia melahirkan baris hantu yang tercetak di slip tapi tak ada di layar
   Pengaturan, sehingga tak seorang pun bisa mengubah atau menjelaskannya.
@@ -225,10 +248,15 @@ tidak ada slip.
   `buildPayslip` dari `employee_salary` yang berlaku sekarang. Untuk backfill riwayat itu
   memang yang benar — biaya insentif bulan lalu tak boleh berubah karena riwayat dimasukkan
   hari ini.
-- ⛔ **BELUM diverifikasi lewat gateway sama sekali**, dan **satu gerbang DATA masih terbuka**
-  (kolom TOTAL TK di sheet HRD diduga subtotal JHT+JP; rinciannya di ADR 0070). Impor
-  produksi tidak boleh dijalankan sebelum itu terjawab, karena slip yang sudah `published`
-  men-snapshot kesalahannya.
+- ✅ **Gerbang data sudah TERJAWAB** (2026-09-01, sheet produksi, empat baris cocok sampai
+  rupiah): TOTAL TK **subtotal** JHT+JP, Tunjangan PPh 21 **ikut** ditambahkan ke TOTAL
+  TERIMA. Yang kedua **membalik** dugaan awal yang ditarik dari contoh ber-angka dummy;
+  bukti aritmetika dan pelajarannya di ADR 0070 §Gerbang Data.
+- ⛔ **BELUM di-deploy dan NOL verifikasi lewat gateway.** Impor produksi tetap belum boleh
+  dijalankan: slip yang sudah `published` men-snapshot kesalahannya, dan tak satu pun jalur
+  di atas pernah benar-benar dipanggil lewat `/api/payroll/...`. Test hijau bukan buktinya.
+  ⚠️ Setelah deploy, **buktikan `Potongan Absensi` benar-benar ada dengan `is_active: false`
+  lewat query master komponen**, jangan simpulkan dari log boot.
 
 ## Model Data (`payroll_db`)
 

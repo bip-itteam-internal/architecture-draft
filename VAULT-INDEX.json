@@ -58,32 +58,20 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "c24512b23bfff16b523a8de8c8c201ac93e607d7f029c1c528bd9cc064e25a0c",
-      "ukuran_kb": 19.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di attendance-service lewat gateway `/api/attendance/*`, bagaimana cara clock-in/out multi-metode, mengajukan cuti/izin/dinas, menukar jadwal, mengoreksi absen, dan mengelola roster/shift/rotasi. Juga menjelaskan otorisasi tiap rute (RBAC HRIS, security, roster, atau open gated header/token/serial), format filter tanggal `period_start`/`period_end` (DD-MM-YYYY, inklusif, rentangnya bebas dan tidak dibatasi ke periode berjalan; format salah dibalas 400), parameter `?periode=YYYY-MM` pada `/internal/summary` yang memilih bulan kartu kehadiran, aturan idempoten pengajuan, serta rute payroll-supplement/treatment yang memasok data potongan kehadiran ke payroll.",
+      "hash": "45eeee5400399d066059b314509fa22b1ef9eebce2d0ce0b28cf9bfae1852e35",
+      "ukuran_kb": 19.8,
+      "ringkasan": "Menjawab: rute apa saja yang tersedia di attendance-service lewat gateway /api/attendance/*, siapa yang boleh memanggilnya (staf HRIS, Security, gerbangRoster, atau rute open), dan parameter apa yang dipakai tiap endpoint. Mencakup clock-in/out (/tap), daftar dan laporan entri absen beserta format tanggal DD-MM-YYYY, hari libur, pengajuan cuti/izin/perjalanan dinas, tukar jadwal kerja, koreksi absen, roster bebas per tanggal, definisi shift dan rotasi milik perusahaan, guestbook, WiFi, serta rute internal dan KPI. Juga menjawab aturan validasi yang mudah salah: schedule_id dan group_id unik global, display_name shift yang tertutup, dan payroll-supplement sebagai masukan potongan kehadiran payroll.",
       "kata_kunci": [
-        "attendance",
+        "attendance service",
+        "absensi",
         "kehadiran",
-        "endpoint",
         "clock-in",
         "clock-out",
-        "tap",
-        "cuti",
-        "leave request",
         "roster",
         "shift exchange",
         "tukar jadwal",
-        "correction",
         "koreksi absen",
-        "payroll-supplement",
-        "holiday",
-        "RBAC",
-        "period_start",
-        "period_end",
-        "periode",
-        "internal summary",
-        "kartu kehadiran",
-        "filter tanggal"
+        "leave request"
       ]
     },
     {
@@ -411,23 +399,20 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "661a403308437d666b44fd7f807bdb028e415f7cfac2dfa3137aa99d84348fa2",
-      "ukuran_kb": 78.8,
-      "ringkasan": "Menjawab apa saja endpoint integration-service untuk order/transaksi, retur, dan tracking paket marketplace (TikTok Shop/Business, Shopee), bagaimana webhook marketplace masuk dan diverifikasi, serta bagaimana aging piutang, laporan ringkasan, dan bridging ke Accurate (invoice, sales return, ICC account mapping, dashboard FAT) dihitung. Juga menjelaskan endpoint kas toko/wallet, ulasan marketplace, status sinkron toko, dan kepemilikan toko per departemen.",
+      "hash": "70899838fa5dca1cf569f1df10fcc597125d9003df60581eee27c09b79d77477",
+      "ukuran_kb": 80.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service untuk menyambungkan marketplace (TikTok Shop, TikTok Business, Affiliate, Shopee) dengan Accurate, dan bagaimana memanggilnya lewat gateway /api/integration/* atau webhook publik /ext/webhook/:service. Merinci rute order dan transaksi (list, detail, summary, export xlsx, perbandingan periode, dashboard, aging piutang, feed retur lintas-channel, packet tracking beserta filter dan bentuk response-nya), plus items, credentials, profit dan insentif, ICC account mapping, fulfillment WMS bridge, kas toko, ulasan marketplace, status sinkron toko, kepemilikan toko per departemen, marketing teams, dan worker/jobs. Juga menjawab kapan harus memakai /transactions/returns dan kenapa endpoint retur Shopee-only atau daily-returns Accurate salah dipakai untuk kebutuhan lintas-channel.",
       "kata_kunci": [
-        "integration-service",
+        "integration service",
         "marketplace",
         "TikTok Shop",
         "Shopee",
-        "webhook",
         "Accurate",
-        "packet tracking",
+        "webhook",
+        "order",
         "retur",
-        "return",
-        "piutang",
-        "aging receivable",
-        "ICC account mapping",
-        "gateway API"
+        "packet tracking",
+        "piutang"
       ]
     },
     {
@@ -642,20 +627,22 @@
         "Microservices - Attendance Service",
         "Microservices - Insentive Service"
       ],
-      "hash": "8e7efbcc3af0ffbd37566903d90065ce883a1d21b148f59179f2dd50b9a74138",
-      "ukuran_kb": 11.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang dipunyai payroll-service, siapa yang boleh memanggil masing-masing (permission-set payroll.view/manage/work/approve/salary.write plus predikat tier isHR/isHRSupervisor/isHRAdmin/isApprover), dan apa jebakan tiap rute. Memuat config BPJS/pajak/potongan kehadiran, master komponen gaji dan badan usaha, gaji per karyawan termasuk impor massal dasar upah BPJS, payroll run dan THR, impor payroll run dari spreadsheet, serta slip self-service beserta PDF-nya. Menjelaskan juga kenapa /employer-cost sengaja tanpa gate dan kenapa rute /my wajib didaftarkan sebelum saudara ber-param.",
+      "hash": "5c9e6b52794df8f1d4c2092f0400c76ea9c984d7fabc4da0cb6049e1d4801270",
+      "ukuran_kb": 12.4,
+      "ringkasan": "Menjawab: rute apa saja yang dipunyai payroll-service, gerbang izin mana yang menjaga tiap rute, dan bentuk request/response-nya. Memuat rincian impor payroll run dari spreadsheet (all-or-nothing, rekonsiliasi TOTAL TERIMA, field company_name untuk kop slip), slip self-service karyawan, unduh PDF, serta employer-cost yang sengaja tanpa gerbang izin karena pemanggilnya service lain.",
       "kata_kunci": [
-        "payroll endpoint",
-        "API payroll",
-        "permission set payroll",
-        "payroll.work",
-        "payroll.approve",
-        "employer-cost",
+        "payroll",
+        "endpoint",
+        "API",
         "payroll run",
-        "impor payroll run",
-        "slip self-service",
-        "recalculate"
+        "slip gaji",
+        "payslip",
+        "impor",
+        "import",
+        "employee salary",
+        "employer cost",
+        "THR",
+        "RBAC"
       ]
     },
     {
@@ -1367,20 +1354,21 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "8227512d5c957e0e8a9572b0864659b55a309b87cbcb11ab507023c0445cb571",
-      "ukuran_kb": 368.3,
-      "ringkasan": "Menjawab: layar apa saja yang ada di web ERP per modul, bagaimana bentuknya, dan keputusan UI apa yang sudah diambil beserta alasannya. Dipakai untuk mengetahui apakah sebuah layar sudah ada sebelum membuat yang baru, dan untuk menemukan jebakan yang sudah terbukti menggigit di frontend (struktur tabel HRIS, i18n dua bahasa, pola impor Excel, penanda peringatan di layar persetujuan). Memuat rincian per fitur termasuk payroll, KPI, procurement, marketing analytics, dan inventory.",
+      "hash": "319b955e0dc71f493fffd486138e58c4cad3cae0cc1e73de52da1f316c32d1f6",
+      "ukuran_kb": 368.5,
+      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di aplikasi web ERP, bagaimana tiap layar dirakit, dan konvensi UI mana yang mengikat (struktur tabel HRIS, i18n dua bahasa, skeleton). Memuat detail layar payroll termasuk pemetaan kolom impor spreadsheet dan kolom mana yang sengaja tidak ditebak.",
       "kata_kunci": [
         "web ERP",
         "frontend",
         "erp-frontend",
-        "layar",
+        "Next.js",
         "halaman",
-        "UI",
         "menu",
+        "UI",
+        "i18n",
         "tabel HRIS",
-        "impor Excel",
-        "i18n"
+        "payroll",
+        "impor Excel"
       ]
     },
     {
@@ -2600,20 +2588,23 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "053e1de8d13e40296472a6383f65d614fbda80c23f90736734eb8f642f64557d",
-      "ukuran_kb": 56.8,
-      "ringkasan": "Menjawab: bagaimana gaji dihitung dari gross sampai net, fase apa saja yang sudah ada di kode (setup, payroll run, PPh21 TER, THR, PDF slip, impor run), dan seberapa jauh fitur itu benar-benar dipakai di produksi. Memuat rumus potongan kehadiran empat baris, dua aturan pembulatan BPJS yang sengaja berbeda, dua dasar upah BPJS, periode kehadiran yang diturunkan dari pay_period_end, lingkup run, serta model data payroll_db berikut kode peringatan barisnya. Bagian Kondisi Pemakaian di Produksi mengukur apa yang masih menahan run pertama terbit.",
+      "hash": "5a0166ce78405d6d584f6fd78b20f3e58336033ad25d16ab14f42cc56973c105",
+      "ukuran_kb": 59.0,
+      "ringkasan": "Menjawab: bagaimana payroll-service menghitung gaji, THR, BPJS, dan PPh21; bagaimana lifecycle payroll run berjalan dari draft sampai published; serta bagaimana impor riwayat gaji dari spreadsheet bekerja tanpa menghitung ulang apa pun. Menyebut penjaga-penjaga yang menahan uang salah, termasuk penolakan recalculate atas run impor dan komponen Potongan Absensi yang lahir non-aktif supaya tak pernah ikut run engine.",
       "kata_kunci": [
-        "payroll service",
+        "payroll",
         "penggajian",
         "payroll run",
-        "PPh21 TER",
-        "BPJS",
-        "potongan kehadiran",
         "THR",
+        "BPJS",
+        "PPh21",
+        "TER",
         "slip gaji",
-        "impor payroll run",
-        "employer-cost"
+        "payslip",
+        "impor",
+        "rekonsiliasi",
+        "komponen gaji",
+        "badan usaha"
       ]
     },
     {
@@ -5278,34 +5269,36 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": null,
-      "status_teks": "**Accepted** (2026-09-01). ⛔ Kode selesai di branch `feat/payroll-impor-run` (bip-erp + erp-frontend) tetapi **BELUM merged, BELUM deploy, dan BELUM diverifikasi lewat gateway sama sekali**. Satu **gerbang DATA** masih terbuka sebelum impor produksi boleh dijalankan (§Gerbang Data yang Masih Terbuka).",
+      "status_teks": "**Accepted** (2026-09-01). Irisan pertama **MERGED** (bip-erp [#1604](https://github.com/bip-itteam-internal/bip-erp/pull/1604), erp-frontend [#1371](https://github.com/bip-itteam-internal/erp-frontend/pull/1371)); lanjutannya **OPEN** (bip-erp [#1611](https://github.com/bip-itteam-internal/bip-erp/pull/1611), erp-frontend [#1375](https://github.com/bip-itteam-internal/erp-frontend/pull/1375)). ✅ **Gerbang data sudah TERJAWAB** dari sheet produksi (§Gerbang Data: Terjawab). ⛔ Tetapi **BELUM deploy dan NOL verifikasi lewat gateway**, jadi impor produksi tetap belum boleh dijalankan.",
       "publik": true,
       "tautan": [
         "Microservices - Payroll Service",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "HRIS - Payroll",
         "Microservices - Insentive Service",
         "API - Payroll Service",
-        "HRIS - Payroll",
         "HRIS - Payroll Persona",
         "APP - Web ERP",
         "Microservices - Employee Service",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "ADR - 0002 Database-per-Service"
       ],
-      "hash": "e5811fe3f57697e31857f10933b1c363613b9f3944954998c0c9e4433cce3983",
-      "ukuran_kb": 9.4,
-      "ringkasan": "Menjawab: kenapa riwayat gaji yang sudah dibayar lewat spreadsheet HRD dimasukkan ke sistem dengan cara DISALIN dan bukan dihitung ulang engine, dan apa konsekuensinya. Menjelaskan bahwa baris impor mem-bypass seluruh penjaga uang (config BPJS, tabel TER, tarif potongan kehadiran, dua dasar upah) dan bahwa penggantinya satu-satunya adalah rekonsiliasi jumlah baris terhadap kolom TOTAL TERIMA. Memuat juga gerbang data yang masih terbuka: kolom TOTAL TK di sheet HRD diduga subtotal JHT plus JP, dan bila benar maka total sheet memotong dua kali.",
+      "hash": "61c29c0caf09183f6357c92ab6c0a57f3e95c8844ddf4e2b263c7d801d3e5acc",
+      "ukuran_kb": 14.0,
+      "ringkasan": "Menjawab: kenapa riwayat gaji yang sudah dibayar lewat spreadsheet dimasukkan sebagai jenis run ketiga yang angkanya disalin dan bukan dihitung ulang, dan penjaga apa yang menggantikan seluruh rumus penggajian yang di-bypass. Memuat aritmetika sheet HRD yang sudah terverifikasi (TOTAL TK adalah subtotal JHT+JP, Tunjangan PPh 21 justru ikut ditambahkan ke TOTAL TERIMA), aturan kop slip dari kolom KETERANGAN, dan alasan komponen Potongan Absensi sengaja lahir non-aktif.",
       "kata_kunci": [
-        "impor payroll run",
-        "backfill gaji",
-        "spreadsheet HRD",
-        "import run",
-        "rekonsiliasi",
-        "TOTAL TK",
-        "TOTAL TERIMA",
+        "impor payroll",
+        "import payroll run",
+        "backfill",
         "riwayat gaji",
-        "payroll type import",
-        "ADR 0070"
+        "spreadsheet",
+        "Excel",
+        "rekonsiliasi",
+        "TOTAL TERIMA",
+        "TOTAL TK",
+        "badan usaha",
+        "Potongan Absensi",
+        "ADR"
       ]
     },
     {
@@ -5883,22 +5876,24 @@
       "tautan": [
         "Microservices - Attendance Service",
         "APP - MyBharata",
+        "HRIS - Attendance Correction",
         "CORE - API Master Gateway",
         "APP - Web ERP"
       ],
-      "hash": "0d28fd6983cdc69fabca8ab444050dae4f4645000795a33e0f6cce222c702bb2",
-      "ukuran_kb": 3.3,
-      "ringkasan": "Menjawab pertanyaan tentang bagaimana pengunjung/tamu mengisi buku tamu digital lewat scan QR code (tamu.bharatainternasional.com), bagaimana alur validasi token per kunjungan, jalur cepat karyawan terlambat lewat MyBharata, serta bagaimana data guestbook terintegrasi ke Attendance Service dan notifikasi host.",
+      "hash": "1427f1522c56a0f5f4a345430b5dc768d1ab513f8d48d41c5e1118fa9cad8742",
+      "ukuran_kb": 3.8,
+      "ringkasan": "Menjawab: bagaimana buku tamu digital perusahaan bekerja, dari security menampilkan QR code, pengunjung scan ke /visit/<token>, validasi token, pengisian form tamu, sampai halaman success atau invalid. Menjelaskan stack dan deployment aplikasinya (Astro 5 SSR + Svelte 5 + Tailwind v4 di tamu.bharatainternasional.com, repo terpisah guestbook-system), endpoint backend yang dipakai lewat gateway ke attendance-service, rotasi token harian pukul 04:00, dan bahwa notifikasi host dipicu backend bukan frontend. Juga menjawab batas ruang lingkupnya: hanya kategori personal dan group, sementara kategori internal untuk karyawan terlambat ditulis dari MyBharata dan berdampak mengunci koreksi presensi hari itu; halaman admin dan daftar kunjungan ada di Web ERP, bukan di aplikasi tamu ini.",
       "kata_kunci": [
         "guestbook",
         "buku tamu",
-        "QR code",
         "tamu",
         "visitor",
+        "QR code",
+        "token kunjungan",
         "security",
-        "tamu.bharatainternasional.com",
+        "General Affairs",
         "karyawan terlambat",
-        "kunjungan"
+        "Astro"
       ]
     },
     {
@@ -6302,7 +6297,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented — alur koreksi (pengajuan → approval berjenjang → auto-fix attendance) sudah jalan; penyempurnaan anti-fraud & sebagian FE menyusul.",
+      "status_teks": "Implemented — alur koreksi (pengajuan → approval berjenjang → auto-fix attendance) sudah jalan. Guard anti-fraud guestbook **tak pernah menyala sampai 2026-09-01** dan kini sudah diperbaiki (§Riwayat), **live di DEV, PROD belum**. Pengiriman `employee_id` dari MyBharata menunggu rilis store (my-bharata #133); sampai itu seluruh kecocokan melewati jalur nama.",
       "publik": true,
       "tautan": [
         "HRIS - Leave Request",
@@ -6313,18 +6308,20 @@
         "Microservices - Attendance Service",
         "HRIS - Big Pictures"
       ],
-      "hash": "8197adf54385e322c00662399adc369624787b44dad9db523422960c88f106e2",
-      "ukuran_kb": 14.9,
-      "ringkasan": "Menjawab pertanyaan tentang bagaimana karyawan mengajukan koreksi lupa clock-in/clock-out, siapa reviewer-nya berdasarkan peran (karyawan biasa/SPV/staff HR/SPV HR), aturan anti-fraud terhadap keterlambatan yang sudah diverifikasi di guestbook, serta daftar endpoint API dan aturan auto-ignore pengajuan basi.",
+      "hash": "29b8842988dd6f19aa312bd04fae258b888b6df3289e6dab3f940542e8cbdabb",
+      "ukuran_kb": 19.8,
+      "ringkasan": "Menjawab: bagaimana karyawan mengajukan koreksi absen saat lupa clock-in, lupa clock-out, atau keduanya, siapa reviewernya, dan bagaimana status akhirnya ditentukan. Merinci model data attendance_correction_request, resolusi status dari review_1 dan review_2, auto-ignore pengajuan yang menunggu lebih dari 24 jam beserta reminder reviewer di T+18 jam, empat kasus penentuan reviewer (karyawan biasa, SPV non-HR, staff HR, SPV HR) termasuk pencegahan self-approval dan routing level departemen, serta endpoint /api/attendance/correction/* dengan parameter as, filter ongoing/past, dan status. Juga menjawab aturan anti-fraud guestbook yang menolak koreksi bila keterlambatan sudah diverifikasi security, cara catatan security dicocokkan ke karyawan, dan dampak persetujuan pada entri kehadiran yang waktunya diisi otomatis dari jadwal kerja.",
       "kata_kunci": [
         "koreksi absen",
         "attendance correction",
         "lupa clock-in",
         "lupa clock-out",
+        "approval",
+        "reviewer",
+        "auto-ignore",
         "anti-fraud",
-        "approval SPV HR",
         "guestbook",
-        "correction request"
+        "telat"
       ]
     },
     {
@@ -7132,8 +7129,8 @@
       "judul": "HRIS - Payroll Persona",
       "area": "Human Resource Information System",
       "jenis": "domain",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — lifecycle run + slip self-service + THR di kode BE; **FE THR** (buat run THR, badge Jenis, detail masa kerja/proporsi, slip THR) di [[APP - Web ERP]]. Impor riwayat gaji sudah merged tapi **belum deploy**.",
       "publik": true,
       "tautan": [
         "HRIS - Payroll",
@@ -7144,20 +7141,21 @@
         "Microservices - Employee Service",
         "Microservices - Attendance Service"
       ],
-      "hash": "d9beac70f1e90337cadbc32d087ffeaa0c4e420c9cdfddd54270aaea35296701",
-      "ukuran_kb": 7.0,
-      "ringkasan": "Menjawab: siapa yang menjalankan alur payroll run dan apa yang boleh dilakukan masing-masing, dari HR Supervisor yang membuat atau mengimpor run, Approver yang menyetujui dan menerbitkan, sampai karyawan yang melihat slipnya sendiri di web maupun mobile. Memuat diagram alur draft ke approved ke published berikut cabang impor yang tidak bisa dihitung ulang, serta skenario gagal tiap tahap. Berguna untuk mengetahui gerbang RBAC mana yang dipakai tiap aksi payroll.",
+      "hash": "baffb3b8bf0b5c1d99216637706850c1c2e20b3a467b33fc31c3c4cccbfe295e",
+      "ukuran_kb": 7.5,
+      "ringkasan": "Menjawab: siapa yang memakai alur payroll run, apa yang boleh dikerjakan tiap peran, dan bagaimana urutan langkahnya dari membuat run sampai karyawan membuka slipnya sendiri. Memuat skenario gagal beserta apa yang dilihat orang saat gagal, termasuk kegagalan impor spreadsheet dan tiga hal yang perlu diketahui HR sebelum unggah pertama.",
       "kata_kunci": [
-        "payroll persona",
-        "alur payroll",
+        "payroll",
+        "persona",
         "HR Supervisor",
-        "approver",
-        "payroll run",
-        "slip self-service",
-        "THR",
-        "impor payroll run",
-        "RBAC payroll",
-        "skenario gagal"
+        "Approver",
+        "Direktur",
+        "karyawan",
+        "alur",
+        "approval",
+        "slip gaji",
+        "impor",
+        "RBAC"
       ]
     },
     {
@@ -7180,20 +7178,21 @@
         "HRIS - Compensation & Benefits",
         "Finance - Big Pictures"
       ],
-      "hash": "72ba4d20a307d37f672651f19e6a258523861082b2f5d3791cbc496767f65f89",
-      "ukuran_kb": 11.1,
-      "ringkasan": "Menjawab: apa cakupan penggajian dari sisi bisnis HRIS, komponen apa saja yang membentuk slip, dan bagaimana kehadiran memengaruhi gaji lewat empat baris potongan bertarif tetap (telat, izin, mangkir, uang makan). Menjelaskan bahwa sumber kebenaran aturan potongan TIDAK ada di vault melainkan di BUSINESS_LOGIC_IMPLEMENTATION.md repo mobile, dan mencatat penyimpangan config produksi pada pengali mangkir. Memuat juga backfill riwayat gaji dari spreadsheet HRD berikut gerbang datanya.",
+      "hash": "91c0ca8e85a0c7fa9996d6ffd7f127fc8aa2c31f9918d1db166b4d446b640b0c",
+      "ukuran_kb": 11.4,
+      "ringkasan": "Menjawab: bagaimana konsep penggajian Bharata bekerja, komponen gaji apa saja yang ada, bagaimana potongan kehadiran dan iuran BPJS diperlakukan, dan bagaimana pajak PPh21 dihitung. Juga menjelaskan kenapa riwayat gaji lama dimasukkan lewat impor spreadsheet alih-alih dihitung ulang engine.",
       "kata_kunci": [
         "payroll",
         "penggajian",
-        "slip gaji",
-        "potongan kehadiran",
-        "mangkir",
-        "tunjangan kehadiran",
+        "gaji",
         "komponen gaji",
-        "backfill gaji",
-        "compensation benefits",
-        "PPh21"
+        "tunjangan",
+        "potongan",
+        "BPJS",
+        "PPh21",
+        "slip gaji",
+        "THR",
+        "impor riwayat"
       ]
     },
     {

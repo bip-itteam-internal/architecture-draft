@@ -11,7 +11,7 @@
 
 *Payroll sudah live sejak Fase 1-5 tetapi **belum pernah dipakai menggaji seorang pun** (dua `payroll_run` di produksi, keduanya `draft`, nol slip terbit). Sementara itu HRD sudah membayar gaji berbulan-bulan lewat spreadsheet. ADR ini memutuskan riwayat itu dimasukkan ke sistem sebagai **jenis run ketiga** yang angkanya DISALIN, bukan dihitung, supaya karyawan punya slip yang bisa dibuka tanpa menunggu mesin penggajian dipercaya.*
 
-- **Status**: **Accepted** (2026-09-01). ⛔ Kode selesai di branch `feat/payroll-impor-run` (bip-erp + erp-frontend) tetapi **BELUM merged, BELUM deploy, dan BELUM diverifikasi lewat gateway sama sekali**. Satu **gerbang DATA** masih terbuka sebelum impor produksi boleh dijalankan (§Gerbang Data yang Masih Terbuka).
+- **Status**: **Accepted** (2026-09-01). Irisan pertama **MERGED** (bip-erp [#1604](https://github.com/bip-itteam-internal/bip-erp/pull/1604), erp-frontend [#1371](https://github.com/bip-itteam-internal/erp-frontend/pull/1371)); lanjutannya **OPEN** (bip-erp [#1611](https://github.com/bip-itteam-internal/bip-erp/pull/1611), erp-frontend [#1375](https://github.com/bip-itteam-internal/erp-frontend/pull/1375)). ✅ **Gerbang data sudah TERJAWAB** dari sheet produksi (§Gerbang Data: Terjawab). ⛔ Tetapi **BELUM deploy dan NOL verifikasi lewat gateway**, jadi impor produksi tetap belum boleh dijalankan.
 - **Path di repo**: BE `bip-erp/services/payroll` (`impor_run.go`, `impor_run_handlers.go`, `RunTypeImport` di `models_payroll_run.go`, penjaga di `run_handlers.go`); FE `erp-frontend/src/features/hris/payroll` (`lib/impor-payroll-run.ts`, `components/impor-payroll-run-modal.tsx`, `hooks/use-impor-payroll-run.ts`).
 - **Tanggal**: 2026-09-01
 
@@ -31,26 +31,65 @@
 5. **ALL-OR-NOTHING**, berbeda sengaja dari `bulk-bpjs-base` yang gagal per baris. Di sana tiap baris menulis field yang independen; di sini seluruh baris membentuk **satu run** yang totalnya harus utuh. `Payroll-MongoDB` jalan **standalone tanpa replica set** sehingga transaksi Mongo tak tersedia, jadi validasi penuh di depan adalah penggantinya.
 6. **Nama baris slip WAJIB berasal dari master `salary_component`**; nama bebas ditolak 400. Nama bebas melahirkan baris hantu: tercetak di slip karyawan tetapi tak ada di Pengaturan > Komponen Gaji, sehingga tak seorang pun bisa mengubah atau menjelaskannya.
 7. **Kolom yang artinya ambigu TIDAK ditebak.** Layar pemetaan membiarkannya "abaikan" dan HR memetakannya sendiri. Bila ia lupa, kolomnya tak ikut dijumlahkan, rekonsiliasi gagal, dan barisnya ditolak — kegagalan yang berisik, dan itu yang dikehendaki.
-8. **Karyawan tanpa `employee_salary` tetap diimpor** (backfill justru mencakup orang yang struktur gajinya belum pernah dimasukkan). Kop slipnya jatuh ke badan usaha **default** dan baris itu **ditandai** `warn_codes: import_company_default`.
+8. **Karyawan tanpa `employee_salary` tetap diimpor** (backfill justru mencakup orang yang struktur gajinya belum pernah dimasukkan). Bila sheet **tidak** menyebut badan usahanya, kop slipnya jatuh ke badan usaha **default** dan baris itu **ditandai** `warn_codes: import_company_default`. Sejak Decision 12, penanda itu **tidak** menyala bila sheet menyebutnya.
 9. **`scope` sengaja dibiarkan KOSONG.** Lingkup run impor ditentukan isi berkas, bukan penyaring tipe kepegawaian; mengisinya `semua` akan berbohong karena sheet bisa memuat sebagian orang saja.
 10. **Gerbang izin `payroll.work` / `isHRSupervisor`** untuk impor **dan** hapus — sama dengan membuat run. Menghapus draft impor adalah kebalikan dari **membuatnya**, bukan dari menerbitkannya ([[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]).
 
-## Gerbang Data yang Masih Terbuka
+Ditambahkan 2026-09-01 setelah sheet produksi diterima (bip-erp [#1611](https://github.com/bip-itteam-internal/bip-erp/pull/1611), erp-frontend [#1375](https://github.com/bip-itteam-internal/erp-frontend/pull/1375)):
 
-⛔ **Impor PRODUKSI tidak boleh dijalankan sebelum bagian ini terjawab.** Slip yang sudah `published` men-snapshot kesalahannya, dan koreksinya menuntut pembatalan run.
+11. **Komponen `Potongan Absensi` lahir NON-AKTIF, dan itu penjaganya bukan penanda status.**
 
-Sheet gaji HRD memuat kolom yang **artinya belum dikonfirmasi**, dan aturan pemakaiannya tidak tertulis di mana pun:
+    Sheet menulis seluruh potongan kehadiran sebagai **satu** kolom ABSENSI, sementara engine memecahnya jadi **empat** baris berpengali berbeda (Pasal 20, lihat [[HRIS - Payroll]]). Rinciannya tidak ada lagi untuk bulan yang sudah dibayar, dan mengarangnya berarti menerbitkan slip yang menyebut sebab yang tak pernah diverifikasi siapa pun.
 
-| Kolom | Yang belum pasti |
+    ⛔ `is_active` menentukan sebuah komponen muncul atau tidak di layar **Penetapan Gaji**. Bila komponen ini aktif, seseorang bisa melekatkannya ke struktur gaji karyawan, dan sejak saat itu **setiap run engine memotong `Potongan Absensi` manual DITAMBAH empat baris kehadiran yang dihitung otomatis**. Potongan yang sama diambil **dua kali** dari gaji orang, tanpa satu pun galat, dengan gejala cuma slip yang sedikit lebih kecil dari seharusnya.
+
+    Non-aktif tetap **diterima impor**, karena `namaKomponenMaster` memang sengaja membaca seluruh master termasuk yang non-aktif. Satu flag memberi **dua sifat sekaligus** — dipakai impor, mustahil masuk engine — tanpa menambah field baru ke master.
+
+    Konsekuensinya: begitu engine mengambil alih penggajian, komponen ini **tidak perlu** dipensiunkan. Ia memang sudah tak bisa dipakai run engine sejak awal, dan namanya tetap ada supaya slip riwayat yang menyebutnya tetap bisa dijelaskan (sealasan dengan `pensiunkanKomponen`).
+
+    ⚠️ Penjaga ini menuntut **`employee-salary-form` menyaring `is_active`**, dan sebelumnya tidak. Tanpa perbaikan itu seluruh keputusan ini tidak menjaga apa pun.
+
+12. **Kop slip diambil dari kolom KETERANGAN sheet, mengalahkan `employee_salary`.**
+
+    Urutan menang: **nama dari sheet → `employee_salary.company_id` → badan usaha default.**
+
+    Alasannya `employee_salary` cuma menyimpan keadaan **hari ini**, sementara yang di-backfill slip belasan bulan lalu, dan orang yang sama bisa digaji atas nama CV berbeda dari bulan ke bulan. Menyimpulkan kop dari penetapan gaji berarti mencetak kop hari ini di atas slip lama.
+
+    Nama yang disebut tapi **tak ada di master DITOLAK**, tidak jatuh ke default: kop slip menentukan badan hukum mana yang tercetak, dan menebaknya menghasilkan slip yang terlihat sah atas nama entitas yang tak pernah membayarnya.
+
+    Dua hal sengaja **tidak** dilumatkan saat mencocokkan nama: **bentuk badan hukum** (`CV Sinar` dan `PT Sinar` dua entitas dengan NPWP berbeda) dan **nama kembar di master** (iterasi map Go tak berurutan, jadi "ambil yang pertama" memilih entitas berbeda tiap proses restart; kembar ditolak sebagai ambigu).
+
+13. **Komponen NON-AKTIF ditawarkan di layar impor, dan hanya di sana.** Server sudah menerimanya sejak awal, tetapi layar impor menyaringnya sehingga kelonggaran itu tak bisa dijangkau siapa pun — padahal backfill slip lama justru sering menyebut nama yang sudah dipensiunkan (`BPJS Ketenagakerjaan` gabungan dipensiunkan sejak dipecah per program, tapi slip Januari memang memakainya). Kini ditawarkan, ditaruh di belakang dan berlabel `(non-aktif)`: yang menahan orang adalah **labelnya**, bukan ketiadaannya.
+
+## Gerbang Data: Terjawab (2026-09-01)
+
+✅ Sheet gaji HRD **produksi** (21 baris, angka asli) diterima 2026-09-01. Aritmetikanya diuji pada **empat baris** dan **cocok sampai rupiah**, sehingga gerbang ini tertutup.
+
+| Kolom | Kesimpulan |
 |---|---|
-| **TOTAL TK** | Diduga **subtotal** JHT + JP. ERP sendiri sudah mendefinisikannya begitu: `kolomRinci.totalTk` (`erp-frontend/src/features/hris/payroll/payslip.ts`) menjumlah JHT+JP+JKK+JKM dan dirender berdampingan dengan JHT dan JP **tanpa pernah ditambahkan ke total mana pun**. Bila sheet memakai arti yang sama, TOTAL TERIMA yang memotong TOTAL TK **di samping** JHT dan JP memotong **dua kali** |
-| **Tunjangan PPh 21** | Terbukti **DIKELUARKAN** dari TOTAL TERIMA: dua baris dengan nilai tunjangan berbeda (5.107.872 dan 142.889) punya TOTAL TERIMA yang sama persis |
-| **JABATAN** | Muncul **dua kali** di satu header: nama jabatan dan tunjangan |
-| **PPh 21** | Muncul **dua kali**: tunjangan dan potongan |
-| **ABSENSI** | Satu kolom, sementara master memecah potongan kehadiran jadi **empat** baris |
+| **TOTAL TK** | ✅ **SUBTOTAL JHT + JP.** Jangan pernah dipetakan sebagai potongan. WIRAWAN 204.400+102.000=306.400 · ZULHAKIM 55.400+27.700=83.100 · ENDRI 124.400+62.200=186.600 · RIDHO 55.400+27.700=83.100. BPJS **Kesehatan tidak ikut** (RIDHO: Kes 81.600, TOTAL TK tetap 83.100). Artinya sama persis dengan `kolomRinci.totalTk` milik ERP, jadi dugaan sebelumnya benar |
+| **Tunjangan PPh 21** | ⚠️ **IKUT ditambahkan ke TOTAL TERIMA.** Ini **MEMBALIK** catatan versi pertama ADR ini yang menyatakan ia "terbukti DIKELUARKAN" |
+| **ABSENSI** | Potongan sungguhan, satu angka gabungan. Dipetakan ke komponen baru `Potongan Absensi` (lihat Decision 11) |
+| **KASBON** | Potongan sungguhan |
+| **KETERANGAN** | ✅ Berisi **badan usaha penggaji** (10 dari 21 baris terisi), bukan catatan bebas. Lihat Decision 12 |
+| **JABATAN** | Muncul **dua kali** di satu header: nama jabatan dan tunjangan. Tetap tak ditebak |
+| **PPh 21** | Muncul **dua kali**: tunjangan dan potongan. Tetap tak ditebak |
 | **NIK** | Berisi `employee_id` (`BIP-9999-99-99`), **bukan** nomor KTP |
 
-⚠️ **Data contoh dari HRD sudah di-dummy-kan** (semua tunjangan 10.000.000, semua potongan 200.000), sehingga TOTAL TK vs JHT+JP **mustahil dibedakan dari sana**. Satu baris data asli sudah cukup menjawabnya.
+Bukti aritmetika untuk baris pertama:
+
+```
+WIRAWAN WIDI ATMOKO
+  (18.064.250 + 9.038.550 + 3.025.700 + 200.000 + 5.109.500)   ← T. PPh 21 IKUT
+− (5.109.500 + 102.000 + 204.400 + 102.000)                    ← TOTAL TK TIDAK
+= 29.920.100                                                    ← persis TOTAL TERIMA
+```
+
+ENDRI (ABSENSI 82.637), ZULHAKIM (KASBON 1.000.000), dan FUAD (keduanya) juga rekonsiliasi tepat.
+
+⛔ **Pelajaran yang wajib dibawa ke impor berikutnya: DATA DUMMY BISA MEMALSUKAN BUKTI.** Contoh pertama dari HRD menyamakan seluruh nominal (semua tunjangan 10.000.000, semua potongan 200.000), sehingga dua baris dengan Tunjangan PPh 21 berbeda kebetulan bertotal sama. Itu terbaca sebagai bukti kuat bahwa kolomnya dikeluarkan, dan ditulis ke ADR ini sebagai "terbukti". Yang sebenarnya terbaca adalah **artefak penyamaran data**. Kesimpulan aritmetika hanya boleh ditarik dari angka yang benar-benar berbeda satu sama lain.
+
+Inilah justru alasan rancangan ini **tidak menebak kolom sama sekali** dan menyerahkannya ke rekonsiliasi: gerbang datanya sempat dijawab keliru, dan kodenya tetap tidak salah karena ia memang tak pernah bersandar pada jawaban itu.
 
 ## Consequences
 
