@@ -12,7 +12,7 @@ Aturan, auth/sign, & gotcha: [[README]].
 
 | Path | Method | Fungsi Go | Dipakai untuk | Confidence |
 |---|---|---|---|---|
-| `/orders/get` | GET | `GetOrders`, `GetOrdersRange` | Tarik order per rentang `created_after`/`created_before` (paging offset+limit) | verified-by-usage |
+| `/orders/get` | GET | `GetOrders`, `GetOrdersRange` | Tarik order per rentang `created_after`/`created_before` **atau `update_after`/`update_before`** (paging offset+limit) — detail & bukti live: [[order.orders-get]] | `created_*` verified-by-usage · `update_*` **verified-live 2026-09-01** |
 | `/order/get` | GET | `GetOrder` | Detail 1 order | verified-by-usage |
 | `/order/items/get` | GET | `GetOrderItems` | Item + `tracking_code` (resi forward) 1 order | verified-by-usage |
 | `/logistic/order/trace` | GET | `GetOrderTrace` | Checkpoint logistik forward | verified-by-usage |
