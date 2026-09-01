@@ -6875,6 +6875,7 @@
         "HRIS - Organization Structure",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman",
+        "REF - Penamaan Metrik & Sumber KPI",
         "HRIS - Otomasi Skor KPI",
         "HRIS - Work Review",
         "HRIS - Career & Promotion",
@@ -6882,22 +6883,20 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "624ad38f3bd09b4a88bce45929c8677c248ef77d7be16e4dba701477eec467cd",
-      "ukuran_kb": 43.2,
-      "ringkasan": "Menjawab: bagaimana KPI dinilai per-karyawan (template per posisi, scoring per periode YYYY-MM, snapshot ke kpi_score, final = Σ bobot×nilai) dan bagaimana beda antara engine KPI→insentif marketing yang sudah production dengan appraisal bulanan menyeluruh yang masih sebagian. Menjelaskan aturan pencocokan posisi template dengan jabatan pada akhir periode yang dinilai (bukan posisi hari ini), RBAC per departemen, cakupan tim untuk Leader (scope=team via supervisor_id), dan penggabungan tampilan lintas departemen (mis. HRGA) dari master data. Juga menjawab cara menghitung employee_count/kolom Karyawan pada template dan kenapa satu karyawan dinilai dengan satu template meski satu posisi bisa punya beberapa template.",
+      "hash": "f9e062925fc53f92b1ca4a19248f1d1980d99e32bf95e251711ffd9a1beb8b39",
+      "ukuran_kb": 46.2,
+      "ringkasan": "Menjawab: bagaimana skor KPI per karyawan disusun dari template per posisi lalu dinilai per periode, siapa yang berhak melihat KPI departemen mana, dan bagaimana halaman KPI di web menampilkannya (tab Kesimpulan, scope Per Karyawan / Per Tim / Per Departemen / Per Divisi, scorecard beserta sheet detail metrik dan blok asal datanya). Juga memisahkan engine skor-ke-insentif tim marketing dari appraisal bulanan lintas departemen, dua hal yang sering tertukar.",
       "kata_kunci": [
         "KPI",
-        "Key Performance Index",
         "appraisal",
         "penilaian kinerja",
-        "template posisi",
+        "template KPI",
+        "kpi_score",
         "scoring",
-        "insentif",
-        "incentive",
+        "scorecard",
         "RBAC departemen",
-        "scope team",
-        "HRGA",
-        "employee_count"
+        "ambang band",
+        "insentif"
       ]
     },
     {
@@ -7095,10 +7094,10 @@
         "Microservices - Employee Service",
         "Microservices - Insentive Service",
         "Microservices - Monitoring Service",
+        "Microservices - Marketing Analytics Service",
         "API - Employee Service",
         "RUN - Menambah Metrik KPI Otomatis",
         "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman",
-        "Microservices - Marketing Analytics Service",
         "Microservices - Integration Service",
         "External - Accurate",
         "REF - Penamaan Metrik & Sumber KPI",
@@ -7148,22 +7147,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "4a3afd5050fe28281b3f20169b4a2d79d6357cdcb97c64b803874132db190cfd",
-      "ukuran_kb": 128.4,
-      "ringkasan": "Menjawab: metrik KPI mana yang bisa diisi otomatis dari data yang sudah dimiliki ERP, sumber data apa saja yang terdaftar (kinerja_tiket, kinerja_tiket_divisi, skor_tim, uptime_sistem, kedisiplinan_absensi, dan lainnya), serta bagaimana blok konfigurasi auto pada kpi_template disusun lewat sumber, formula, scope, dan target termasuk target per karyawan dan target bertahap. Menjelaskan juga kenapa sebuah metrik gagal hitung atau berstatus semi alih-alih bernilai nol, di layar mana diagnostiknya dilihat (modal Score KPI dan halaman Otomasi KPI), bagaimana usulan nilai otomatis muncul ke penilai, dan bagaimana skor total per orang dihitung. Melengkapi HRIS - Key Performance Index dengan klasifikasi seluruh metrik per departemen, peta metrik ke sumber data, serta metrik yang modulnya ada tapi datanya kosong atau memang tak punya sumber sama sekali.",
+      "hash": "aece200a14260e0175d31aad275b59389b4371007c1cade0f048b31dae466f91",
+      "ukuran_kb": 132.2,
+      "ringkasan": "Menjawab: metrik KPI mana yang dapat diisi sistem dan dari sumber data apa, bagaimana sebuah sumber didaftarkan beserta formula, arah, cakupan, dan targetnya, serta apa yang terjadi ketika sumbernya gagal ditarik alih-alih datanya memang belum ada. Juga menerangkan tiga jalur perhitungan skor yang wajib selalu sepakat, layar diagnostik Otomasi KPI, dan arti tiga jenis baris di dalam Rincian yang dikirim tiap sumber (komponen, hasil, dan yang tidak ikut dihitung).",
       "kata_kunci": [
-        "otomasi skor KPI",
-        "KPI otomatis",
+        "otomasi KPI",
+        "auto_value",
+        "sumber KPI",
+        "katalog sumber",
+        "formula",
+        "arah target",
+        "cakupan",
+        "rincian",
         "auto-values",
-        "kpi_template",
-        "kpi_score",
-        "sumber data KPI",
-        "kinerja_tiket",
-        "skor_tim",
-        "formula rasio_ambang",
-        "target per karyawan",
-        "KPI automation",
-        "halaman Otomasi KPI"
+        "gagal sumber"
       ]
     },
     {
@@ -9124,21 +9121,20 @@
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman"
       ],
-      "hash": "c4dcb0dce0181b68ca9248f3fd1aadb0aa0a5a876b4e66a5d1fbf1b688f2b6b0",
-      "ukuran_kb": 23.0,
-      "ringkasan": "Menjawab: bagaimana menamai sumber dan metrik katalog KPI yang dibuat dev (tampil di dropdown Sumber data) serta metrik template yang dibuat HR (tampil sebagai baris penilaian), termasuk siapa yang menanggung akibat bila namanya buruk. Memuat aturan label (menyebut yang diukur bukan targetnya, tidak bernomor tanpa makna, tidak melewati batas lebar kontrol sehingga terpotong) dan aturan keterangan (wajib, menyebut menu asal angkanya, tidak dipakai dua label, dan menjadi tempat target untuk metrik manual). Menjawab juga di empat tempat mana metrik baru wajib didaftarkan (kamus label, METRIK_DIKENAL, SATUAN_PER_METRIK, FORMULA_PER_METRIK), kenapa nama metrik menyiratkan arah, dan cara memeriksa kepatuhannya lewat test bukan lewat dokumen.",
+      "hash": "6c3f5b23da0e7d4c7dc8fa57d1f3d30861482b3a62f2ac0e0820e3c1a2af832d",
+      "ukuran_kb": 25.0,
+      "ringkasan": "Menjawab: bagaimana menamai sumber dan metrik KPI beserta keterangannya supaya pengisi template tahu apa yang sebenarnya dihitung dan dari menu mana angkanya bisa dicek sendiri. Memuat checklist empat tempat yang wajib diisi saat menambah metrik baru, aturan entri khusus-pasangan ketika satu nama metrik hidup di lebih dari satu sumber, dan kenapa nama metrik menentukan arah penilaian yang benar.",
       "kata_kunci": [
         "penamaan metrik",
-        "naming convention KPI",
-        "label KPI",
-        "kamus label",
-        "label-otomatis",
+        "label sumber",
         "keterangan metrik",
-        "description kpi_template",
+        "METRIK_PER_SUMBER",
         "SATUAN_PER_METRIK",
-        "FORMULA_PER_METRIK",
-        "katalog sumber KPI",
-        "metric naming"
+        "arah naik turun",
+        "i18n",
+        "label-otomatis",
+        "katalog KPI",
+        "naming"
       ]
     },
     {

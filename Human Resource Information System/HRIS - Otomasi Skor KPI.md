@@ -148,6 +148,61 @@ Sisanya tidak disentuh (`sumber: uptime_sistem`, `formula: rata_rata`, `scope: d
 
 **Yang sengaja dilewati**: `Revenue 240M` pada Leader dan Supervisor. Deskripsinya di sistem berbunyi "Menjamin operasional IT tanpa gangguan" sementara dokumen KPI menyebut targetnya persentase tiket support yang selesai; dua sumber berbeda untuk satu label, dan itu keputusan pemilik metrik, bukan keputusan teknis.
 
+## ⛔ `Rincian` memuat TIGA jenis baris yang artinya berbeda
+
+> **Status**: ⚠️ Aturannya sudah berlaku di backend sejak lama, tetapi sampai 2026-09-01 ia
+> **hanya hidup sebagai komentar Go**. Sisi frontend baru mengenalinya di branch
+> erp-frontend `feat/kpi-scorecard-asal-data-rincian` (**belum merge, belum diverifikasi di
+> layar**).
+
+`RincianBaris` (`shared-library/models/employee/kpi_reduksi.go`) hanya berisi
+`{label, nilai}`, keduanya string. Bentuk itu menyembunyikan fakta bahwa sumber KPI
+mengirim **tiga hal yang tidak boleh dibaca sama**:
+
+| Jenis | Penanda | Contoh | Boleh dijumlahkan? |
+|---|---|---|---|
+| **Komponen** | tanpa penanda | `Beban iklan`, `HPP`, `Settlement` | ya, ia memang penyusunnya |
+| **Hasil** | label berawalan `= ` | `= Profit (rumus SK, jendela KPI)` | tidak, ia HASIL dari komponen di atasnya |
+| **Pengecualian** | label memuat `(tak ikut dihitung)` | `Retur belum/gagal terbukukan (tak ikut dihitung)` | ⛔ **TIDAK**, ia sengaja di luar hitungan |
+
+**Kenapa aturan ini wajib ada di sini, bukan cuma di kode.** Backend sengaja mengirim baris
+pengecualian, dan alasannya ditulis di `services/employee/kpi_sumber_insentif_profit.go`:
+pembaca yang melihat "30 dari 510 order" harus tahu ada 44 lagi yang tidak masuk hitungan,
+kalau tidak 6% terbaca sebagai angka final. Tetapi siapa pun yang merancang layar dari
+dokumentasi tidak punya cara mengetahuinya, dan layar yang meratakan ketiganya menerbitkan
+**angka salah yang masuk akal**: tanpa galat, tanpa test merah, dan keluhannya datang
+berhari-hari kemudian. Kelas yang sama dengan `iklan_sia_sia` dan `orders_dikirim` di
+[[Microservices - Marketing Analytics Service]].
+
+**Siapa yang benar-benar mengisinya, diukur 2026-09-01 ke `origin/main` bip-erp:**
+
+- **7 dari 27** berkas `services/employee/kpi_sumber_*.go` mengisi `Rincian`: `affiliate`,
+  `affiliate_tim`, `ar`, `insentif_profit`, `kinerja_toko`, `live`, `sales_admin`. Sisanya
+  hanya mengirim satu kalimat `Catatan`. **Konsekuensinya layar rincian akan kaya untuk
+  marketing dan finance, dan nyaris kosong untuk IT dan SDM**; jangan menjanjikan "rincian
+  untuk semua metrik" tanpa mengukur dulu.
+- Baris **hasil** `= ` hanya dihasilkan `kinerja_toko` (`kpi_sumber_kinerja_toko.go`, lima
+  metrik) dan `insentif_profit` (`kpi_sumber_insentif_profit.go`, empat metrik).
+- Baris **pengecualian** hanya ada di **SATU** tempat di seluruh backend:
+  `kpi_sumber_insentif_profit.go` metrik `retur_persen`, dan itu pun bersyarat
+  `ReturGagalBooking > 0`. Kelangkaannya justru yang membuatnya berbahaya: hampir semua
+  layar tampak benar sampai satu metrik ini dibuka.
+- `kinerja_ar` cabang **posisi piutang** (`piutang_lewat_*_persen`) mengembalikan `Cuplikan`
+  **tanpa `Rincian`** sama sekali; yang mengisi rincian di sumber itu hanya cabang retur.
+
+⚠️ **Penandanya adalah TEKS, dan teksnya milik backend.** Frontend membacanya lewat fungsi
+murni `src/features/hris/kpi/lib/rincian-baris.ts` (`klasifikasiRincian`), dengan fallback
+aman ke "komponen" bila penandanya berubah. Mengganti kata penandanya di Go karena itu
+**mengembalikan barisnya jadi komponen tanpa satu pun galat**. Perbaikan durabelnya adalah
+menambah field `jenis` pada `RincianBaris` di backend; itu **belum dikerjakan** dan sengaja
+dicatat di sini sebagai utang, bukan sebagai rencana yang sudah berjalan.
+
+⚠️ **Ini tidak dapat diverifikasi di DEV.** Diukur langsung ke `employee_db` dev 2026-09-01:
+dari **63 template**, hanya **2 metrik** yang punya blok `auto`, keduanya `kinerja_ar` cabang
+piutang, dan keduanya tidak mengisi `Rincian`. Tidak satu pun dari ketujuh sumber pengisi
+`Rincian` dikonfigurasi di dev, jadi layar rincian di sana kosong **bukan karena rusak**.
+Verifikasinya menuntut data produksi (ICC, `insentif_profit` / `kinerja_toko`).
+
 ## Layar diagnostik: Otomasi KPI
 
 > **Status**: ✅ **live di dev dan produksi** — bip-erp PR [#1066](https://github.com/bip-itteam-internal/bip-erp/pull/1066) (endpoint) + erp-frontend PR [#843](https://github.com/bip-itteam-internal/erp-frontend/pull/843) (layar), merged 6 Agustus 2026; prod di-deploy 7 Agustus 2026 pagi (`Employee-Service`, `API-Gateway`, `frontend-hris-dashboard`).
