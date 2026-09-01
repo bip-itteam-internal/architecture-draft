@@ -9401,20 +9401,20 @@
         "CORE - SSO Flow",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "42050c3f01f95d83103b2788806ae92d7b056fbc6ed48386786051fea8cac86c",
-      "ukuran_kb": 5.5,
-      "ringkasan": "Menjawab: langkah demi langkah bagaimana seorang manager menyambungkan Claude Desktop atau claude.ai ke vault arsitektur lewat custom connector (URL, OAuth Client ID, Client Secret dari IT), dan bagaimana cara memverifikasi sambungannya benar-benar menjawab bersumber dokumentasi. Menjelaskan juga cara IT memberi dan mencabut akses per orang lewat VAULT_MCP_ALLOWED_EMPLOYEES di .env prod dengan force-recreate container (restart tidak cukup). Berguna untuk menjawab arti tiap pesan galat yang muncul saat menyambung atau bertanya: akun belum diberi akses, alamat kembali tidak sah, Claude menggantung karena proxy_buffering, data vault basi, refresh token dipakai dua kali, dan penolakan hak tulis pada connector lama.",
+      "hash": "0728f74214172f8e2717271e5a0e7f33688ef12912c446791b0c84c3d94e438d",
+      "ukuran_kb": 6.4,
+      "ringkasan": "Menjawab: bagaimana seorang manager menyambungkan Claude (Desktop atau claude.ai) ke vault arsitektur sebagai custom connector — URL remote MCP, OAuth Client ID dan Client Secret dari IT, login SSO ERP — dan bagaimana memverifikasi sambungannya benar-benar menjawab bersumber dokumen vault, bukan pengetahuan umum. Menjawab juga sisi IT: cara memberi dan mencabut akses per orang lewat daftar-izin `VAULT_MCP_ALLOWED_EMPLOYEES` di `.env` prod, dan kenapa containernya harus dibuat ulang (`--force-recreate`) alih-alih `restart`. Memuat tabel gejala-ke-sebab untuk kegagalan yang sudah terjadi (akun belum diberi akses, alamat kembali tidak sah, sambungan menggantung karena `proxy_buffering`, data vault basi, refresh token dipakai ulang, sambungan cuma hak baca, push gagal karena kredensial PAT, dokumen bentrok disunting orang lain) serta alasan seluruh connector lama harus disambung ulang setelah tool tulis dinyalakan.",
       "kata_kunci": [
-        "Vault MCP",
-        "custom connector",
-        "Claude Desktop",
-        "claude.ai",
-        "runbook",
-        "OAuth Client ID",
+        "vault MCP",
+        "custom connector Claude",
+        "remote MCP server URL",
+        "OAuth client id secret",
         "VAULT_MCP_ALLOWED_EMPLOYEES",
-        "memberi akses",
-        "troubleshooting",
-        "force-recreate"
+        "daftar-izin akses vault",
+        "sambung ulang connector",
+        "vault:read vault:write scope",
+        "redirect_uri",
+        "SSO login ERP"
       ]
     },
     {

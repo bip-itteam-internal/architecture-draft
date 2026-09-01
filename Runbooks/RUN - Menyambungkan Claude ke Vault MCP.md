@@ -51,19 +51,21 @@ Akses diberikan **per orang**, bukan per role.
 | Halaman **"Akun Anda belum diberi akses"** | `employee_id`-nya belum ada di daftar-izin. Hubungi kontak yang tertera di halaman itu |
 | Halaman **"Alamat kembali tidak sah"** | `redirect_uri` milik Claude belum terdaftar di `VAULT_MCP_REDIRECT_URIS`. Ambil nilai persisnya dari log service, jangan ditebak |
 | Claude menggantung saat menyambung, tanpa galat | `proxy_buffering` masih menyala di proxy host NPM. Klien MCP membuka stream SSE, dan buffering menahannya sehingga terlihat seperti server mati |
-| **"data vault basi"** saat bertanya | `git pull` ke repo vault gagal berturut-turut. Periksa deploy key. Ini disengaja: lebih baik gagal daripada menjawab dari dokumentasi usang |
+| **"data vault basi"** saat bertanya | `git pull` ke repo vault gagal berturut-turut. Periksa `VAULT_MCP_REPO_URL` dan jalur keluar ke GitHub. Ini disengaja: lebih baik gagal daripada menjawab dari dokumentasi usang |
 | **"refresh token sudah pernah dipakai; sesi dicabut"** | Sesi sengaja dicabut karena token dipakai dua kali. Sambungkan ulang connector dari awal |
 | **"sambungan ini hanya diberi hak baca"** saat Claude mencoba menulis | Connector-nya tersambung sebelum hak tulis ada. Sambungkan ulang dari pengaturan Claude; hak tulis hanya diminta saat penyambungan, bukan menyusul sendiri |
-| Claude bilang perubahan **"belum terdorong"** | Deploy key repo vault tidak terpasang atau tidak berhak tulis. Tulisannya TIDAK hilang: ia tersimpan sebagai commit lokal dan ikut terdorong pada tulisan berikutnya yang berhasil. Periksa `VAULT_MCP_SSH_DIR` dan hak deploy key-nya |
+| Claude bilang perubahan **"belum terdorong"** | Kredensial push di `VAULT_MCP_REPO_URL` tidak berhak tulis atau sudah kedaluwarsa. ⛔ **Deploy key BUKAN yang harus diperiksa**: fiturnya dimatikan di level organisasi `bip-itteam-internal`, jadi jalur push memakai fine-grained PAT di URL https, dan `VAULT_MCP_SSH_DIR` tidak berperan sama sekali. Tulisannya TIDAK hilang: ia tersimpan sebagai commit lokal dan ikut terdorong pada tulisan berikutnya yang berhasil. ⚠️ Gagalnya **senyap dari sisi baca**, karena repo `architecture-draft` publik sehingga `pull` tetap jalan dengan kredensial mati sekalipun. Cek pemiliknya dan kedaluwarsanya lewat `GET https://api.github.com/user` dengan token itu, lalu baca header `github-authentication-token-expiration`; jangan mengandalkan `git push --dry-run`, yang membalas `Everything up-to-date` tanpa pernah menguji izin tulis |
 | **"dokumen ini sedang disunting orang lain"** | Ada dev yang menyunting dokumen yang sama dan perubahannya bentrok. Minta Claude membaca ulang dokumennya lalu mengulang. Server sengaja tidak menggabungkan sendiri, karena penggabungan otomatis pada dokumen acuan arsitektur menghasilkan teks yang terbaca wajar tapi isinya campuran dua maksud |
 
 Mencabut sambungan sepenuhnya: hapus connector di sisi Claude, lalu hapus `employee_id`-nya dari daftar-izin.
 
-## Setelah irisan 2 naik: semua connector harus disambung ulang
+## Irisan 2 sudah naik: semua connector harus disambung ulang SEKARANG
 
-Hak tulis diminta **saat penyambungan**, tidak menyusul sendiri. Connector yang sudah tersambung sebelumnya akan tetap bisa membaca, tetapi setiap percobaan menulis ditolak dengan pesan yang menyuruh menyambung ulang.
+⚠️ **Berlaku sejak 2026-09-01**, saat tool tulis diaktifkan di prod. Hak tulis diminta **saat penyambungan**, tidak menyusul sendiri. Connector yang sudah tersambung sebelumnya tetap bisa membaca, tetapi setiap percobaan menulis ditolak dengan pesan yang menyuruh menyambung ulang.
 
-Beri tahu kesembilan orang di daftar-izin **sebelum** deploy. Menemukannya sendiri sebagai penolakan di tengah pekerjaan terbaca sebagai fitur yang rusak, bukan sebagai langkah yang memang perlu dilakukan sekali.
+Diukur 2026-09-01 di `mcp_sessions`: tiga sesi ada, satu tanpa field scope sama sekali (terbitan irisan 1, fail-closed untuk tulis) dan dua ber-scope `vault:read`. **Nol sesi ber-scope `vault:write`**, jadi sampai penyambungan ulang dilakukan, tool tulis tidak muncul untuk siapa pun meski servicenya sudah mendaftarkannya.
+
+Beri tahu kesembilan orang di daftar-izin. Menemukannya sendiri sebagai penolakan di tengah pekerjaan terbaca sebagai fitur yang rusak, bukan sebagai langkah yang memang perlu dilakukan sekali.
 
 ## Dokumen Terkait
 
