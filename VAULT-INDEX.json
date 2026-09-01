@@ -1336,8 +1336,8 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "328b2653c4b0661a811bcad5f246283078cdb8fd791097ab1f0b603aa87050f8",
-      "ukuran_kb": 362.8,
+      "hash": "10f17aaf19d11776a3e77c71882087f91acfd89882343d21efe322656568b555",
+      "ukuran_kb": 362.9,
       "ringkasan": "Menjawab: bagaimana portal web ERP internal (hris-dashboard / \"One Bharata\") dibangun dan berperilaku — stack Next.js 16 + React 19, alur login dan perannya sebagai SSO Identity Provider, cara cookie system_roles menggerbang modul dan menu, serta bagaimana sidebar dibentuk (penyaringan izin, perataan induk tipis, penggabungan blok HRGA, garis pemisah kategori). Menjawab juga soal orientasi dan navigasi di dalam aplikasi: kotak cari menu Ctrl+K, jejak halaman (breadcrumb) di header beserta jangkar menunya, dan tombol Kembali otomatis di puncak sidebar untuk sub-halaman. Memuat catatan per-modul yang rinci (KPI, recruitment, payroll, finance, integrasi marketplace, form builder, task management) termasuk keputusan yang sudah ditutup, yang masih terbuka, dan jebakan yang sudah terbukti menggigit.",
       "kata_kunci": [
         "web ERP",
