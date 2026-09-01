@@ -319,11 +319,11 @@
 
 `shop_name` **tidak pernah dipakai mencocokkan** (cuma tampilan) — nama toko produksi ada yang berspasi di ujung atau beda kapitalisasi saja; identitas sejati selalu `(channel, shop_id)`.
 
-**Belum ada UI pengelolaan mandiri** untuk endpoint ini — ADR-0045 menyebut "kartu team di ICC Management" sebagai tujuan jangka panjang, tapi kartu itu belum dibangun. Toko baru ditambahkan lewat panggilan `POST` manual oleh admin Integration.
+**UI pengelolaan**: tab "Kepemilikan Toko" di ICC Management (`erp-frontend`, 2026-09-01) — v1 HANYA menangani laporan `yatim` (assign toko yang belum dipetakan, dengan banner untuk toko yang baru tersambung dalam 72 jam terakhir). `sisa` dan `menyimpang` masih dibaca API tapi belum punya UI — keduanya butuh desain aksi manusia yang beda dari sekadar tombol assign (hapus/arsip untuk `sisa`, keputusan penilaian untuk `menyimpang`), jadi masih lewat panggilan `POST`/`DELETE` manual oleh admin Integration untuk sementara. Gate: tab tampil untuk `RequireIntegrationStaff`, tombol assign hanya untuk `RequireIntegrationAdmin`.
 
 ## Marketing Teams (admin) · Worker/Jobs
 
-> **Beda dari `/department-shops` di atas**: ini kontrol akses tim (satu toko boleh dilihat banyak tim) + keanggotaan, bukan kepemilikan. Sumber Shopee untuk kolom penanggung jawab toko (`icc`) di [[Microservices - Marketing Analytics Service]] masih membaca `team_shops`/`marketing_teams` ini — belum ikut pindah ke `department_shops` (beda dari saringan `/divisi` yang sudah pindah sejak fase Contract 2026-08-29). Rencana pencabutan menyeluruh: [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] §Migrasi.
+> **Beda dari `/department-shops` di atas**: ini kontrol akses tim (satu toko boleh dilihat banyak tim) + keanggotaan, bukan kepemilikan. Kolom penanggung jawab toko (`icc`) di [[Microservices - Marketing Analytics Service]] sudah ikut pindah ke `department_shops` (sama seperti saringan `/divisi`, keduanya sejak 2026-08-29/30) — endpoint `marketing/teams` di bawah ini kini murni ACL, tak lagi jadi sumber `icc`. Rencana pencabutan `team_shops`/`marketing_teams` menyeluruh (ditahan sampai kedua konsumen stabil beberapa hari di prod): [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] §Migrasi.
 
 | Method | Path | Fungsi |
 |---|---|---|
