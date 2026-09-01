@@ -2,7 +2,7 @@
 
 ## Untuk Manajemen
 
-- **Yang berubah di layar**: perlengkapan **durable** (charger, mic, tripod, APAR) kini bisa **didaftarkan per-unit** & **dipadankan ke item Accurate** lewat Pengaturan Aset — seperti aset tetap. Jumlah unit yang terdaftar **mengisi otomatis** kolom Hitung Fisik di tab opname, tetap bisa dikoreksi.
+- **Yang berubah di layar**: perlengkapan **durable** (charger, mic, tripod, APAR) kini **diinput di Kelola Aset seperti aset tetap**, lalu **dipadankan ke item perlengkapan Accurate** (by nama) lewat Pengaturan Aset. Jumlah barang yang terpadan **mengisi otomatis** kolom Hitung Fisik di tab opname, tetap bisa dikoreksi.
 - **Siapa terdampak**: staff GA. Barang massal (pulpen/tisu) TETAP kuantitas/hitung manual — per-unit hanya untuk barang yang layak dilacak satuan.
 - **Tidak dijanjikan**: perlengkapan **tidak** disusutkan (akun 1606, bukan aktiva tetap), **tidak** menggantikan opname manual (keduanya berdampingan; prefill cuma memudahkan), dan pemegang **opsional** (barang fasilitas umum tak berpemegang).
 - **Besaran kerja**: sedang. Reuse model unit + plumbing padanan aset tetap; yang baru: field padanan sendiri, endpoint hitung unit, editor, dan **guard agar perlengkapan tak mencemari angka aset tetap**.
@@ -12,7 +12,7 @@
 *Memperluas [[ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI]] / [[ADR - 0049 Padanan Aset per-item berbasis nama menggantikan kategori-golongan]]: perlengkapan boleh menjadi **unit per-item** di koleksi `inventory` (bukan hanya angka di `ga_stok`), dipadankan ke **item Accurate** (`item_no`, many-to-one). Menembus batas model lama secara SADAR, dijaga guard anti-kontaminasi. Melengkapi [[ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate]] — jumlah unit memprefill Hitung Fisik.*
 
 - **Status**: ✅ **Implemented** (2026-09-01). Landasan opname: ADR-0067; padanan aset: ADR-0037/0049.
-- **Path di repo**: BE `bip-erp/services/inventory` (`InventoryItem.Sifat`+`AccurateItemNo`, guard `ListInventory`/`GetSummary`/`GetPenyusutan`, `perlengkapan_unit.go`), `shared-library/models/inventory/models.go`; FE `erp-frontend/src/features/inventory` (`perlengkapan-pairing.tsx`, `use-perlengkapan-units.ts`, prefill `perlengkapan-opname-tab.tsx`).
+- **Path di repo**: BE `bip-erp/services/inventory` (`InventoryItem.AccurateItemNo`, PATCH `accurate_item_no` di `validation.go`, guard opex di `penyusutan.go`, `perlengkapan_unit.go` count/list), `shared-library/models/inventory/models.go`; FE `erp-frontend/src/features/inventory` (`perlengkapan-pairing.tsx` editor pasang-saja, `use-perlengkapan-units.ts`, prefill `perlengkapan-opname-tab.tsx`).
 - **Tanggal**: 2026-09-01
 
 ## Context
@@ -27,22 +27,23 @@ Keadaan terukur (grounded):
 
 ## Decision
 
-1. **Perlengkapan boleh jadi `InventoryItem` per-unit** ber-`sifat=perlengkapan` + **`accurate_item_no`** (padanan ke item Accurate). Field padanan **TERPISAH** dari `accurate_asset_no` (register aset tetap) — pakai ulang akan mencemari join & skor rekonsiliasi/KPI aset tetap.
-2. **Masuk koleksi `inventory` bersama aset tetap** (reuse penuh model/holder/soft-delete), BUKAN koleksi terpisah — DENGAN **4 guard**:
-   - **`sifat` didenormalisasi ke unit** (aman: sifat immutable) → guard jadi filter field sederhana.
-   - **`ListInventory` (`/items`), `GetSummary`, `GetPenyusutan` default FASS-only** (`sifat != perlengkapan`). KPI `akurasi_aset_ga` menarik `/items` → **otomatis terlindungi**.
-   - **Perlengkapan TAK PERNAH disusutkan** (exclude di `GetPenyusutan`).
-   - **Test regresi = penjaga utama**: unit perlengkapan tak menggeser angka aset tetap.
-3. **Pemegang opsional** (fallback "Tersedia di GA"); barang fasilitas umum (APAR) tak berpemegang.
-4. **Berdampingan dengan opname manual (ADR-0067), bukan mengganti**: jumlah unit **memprefill** Hitung Fisik (hanya bulan berjalan, tetap bisa dikoreksi + Simpan). Barang tanpa unit → manual (hibrida per-barang).
+> **Koreksi arah (2026-09-01)**: iterasi pertama sempat memisahkan perlengkapan (field `sifat`
+> + guard FASS-only di banyak konsumen + editor buat-unit). Pemilik produk mengoreksi: **campur
+> saja seperti aset tetap, cuma jangan masuk opex** — jadi keputusan di bawah yang berlaku.
+
+1. **Perlengkapan diinput sebagai `InventoryItem` lewat Kelola Aset BIASA** (`POST /item`, persis cara input aset tetap — tanpa toggle/jenis), lalu **dipadankan by-NAMA** ke item perlengkapan Accurate → **`accurate_item_no`** (via `PATCH /item/:id`). Field padanan **TERPISAH** dari `accurate_asset_no` (register aset tetap).
+2. **Perlengkapan CAMPUR dengan aset tetap** di koleksi `inventory`, `GET /items`, dan ringkasan — **TIDAK dipisah, TIDAK ada field `sifat`**. Diskriminator "ini perlengkapan" = **keberadaan `accurate_item_no`** (dipadankan ke item perlengkapan Accurate).
+3. **SATU-SATUNYA pengecualian: penyusutan (opex).** `GetPenyusutan` mengecualikan item ber-`accurate_item_no` — perlengkapan akun 1606 bukan aktiva tetap, jadi tak boleh masuk biaya opex insentif pemegang. Dikunci test.
+4. **Padanan = editor PASANG-SAJA** (cerminan `AsetPairingEditor`, sisi Accurate diganti `accurate_stocks`): pilih barang ERP + item perlengkapan Accurate → simpan `accurate_item_no`. Bukan editor buat-unit.
+5. **Prefill opname**: jumlah barang ERP ber-`accurate_item_no`=`<item_no>` (endpoint `/perlengkapan-units/count`) **memprefill** Hitung Fisik (bulan berjalan, tetap bisa dikoreksi + Simpan). Berdampingan dengan opname manual (ADR-0067).
 
 ## Consequences
 
-- **Positif**: alat & pengalaman "seperti aset tetap"; opname durable jadi otomatis; satu koleksi (reuse penuh).
-- **Risiko yang diredam**: kontaminasi angka uang/KPI aset tetap — dijaga guard + test regresi.
-- ⚠️ **Risiko sisa yang tak terhapus tuntas**: **konsumen `/items` BARU di masa depan** yang lupa menyaring `sifat` akan re-mengontaminasi. Gotcha ini dinaikkan ke `review-checklist.md`. Denormalisasi `sifat` ke unit + default FASS-only meminimalkannya, tapi disiplin review tetap perlu.
-- **Ongkos**: field baru, endpoint hitung/list unit, editor padanan, prefill.
-- **Ditunda**: **KPI perlengkapan** (ikut jalur `akurasi_aset_ga`, jangan sumber ketiga); **assign pemegang nyata** unit (v1 held_by kosong); **auto-daftar unit dari penerimaan pembelian**; **barang massal per-unit** (tetap kuantitas).
+- **Positif**: input & pengalaman **persis aset tetap** (satu form, satu daftar); padanan by-nama seragam; prefill opname otomatis; reuse penuh model/holder/soft-delete; **pengecualian minimal (satu guard opex)** → permukaan kontaminasi kecil & terlokalisir.
+- ⚠️ **KPI Fase 2 WAJIB menangani ini**: karena perlengkapan **campur** di `/items` (yang ditarik KPI `akurasi_aset_ga`), dan ia tak punya `accurate_asset_no`, ia akan dinilai **100% (ERP-only)** → menggelembungkan skor aset tetap. Saat Fase 2, `akurasi_aset_ga` **wajib mengecualikan** item ber-`accurate_item_no` (perlengkapan dinilai lewat metrik opname sendiri). **Belum masalah** — KPI belum attach ke template mana pun.
+- **Ongkos**: field `accurate_item_no` + jalur PATCH-nya, endpoint count/list, editor padanan, prefill.
+- **Ditunda**: **KPI perlengkapan** (metrik opname sendiri + exclude dari `akurasi_aset_ga`); **assign pemegang nyata** (perlengkapan pakai jalur serah-terima aset yang sudah ada); **auto-padan dari penerimaan pembelian**; **barang massal per-unit** (pulpen/tisu tetap kuantitas `ga_stok`).
+- **Gotcha ke `review-checklist.md`**: koleksi bersama dengan diskriminator — konsumen yang lupa menyaring bisa mencemari uang/KPI. Di sini yang dijaga cuma opex; KPI Fase 2 yang menyusul adalah PR-nya sendiri.
 
 ## Dokumen Terkait
 
