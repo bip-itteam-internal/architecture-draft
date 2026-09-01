@@ -118,20 +118,19 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "63b1d8fe642150a232eeb555ed83cd5369a3984901dc42b893eeb4b8616b77bd",
-      "ukuran_kb": 44.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service (HRIS inti) untuk login/auth, CRUD data personal & work karyawan, dokumen, jadwal, akun & device, serta master data departemen dan system role. Menjelaskan cara kerja filter departemen bergrup (mis. HRGA), jalur satu-satunya penulisan is_active dan is_supervisor, penetapan penyetuju per departemen, dan endpoint internal lintas-service untuk mencari penyetuju/pemegang izin. Berguna untuk tahu path, method, RBAC, dan jebakan urutan rute Fiber tiap endpoint employee.",
+      "hash": "508f5ab5d446599485ef3a2182aab27a993fb6ab7bba45205f834de5e4d8a2b5",
+      "ukuran_kb": 44.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang dipunyai employee-service dan siapa yang boleh memanggilnya, mulai dari master karyawan, work data, personal data, hak akses dan permission set, sampai self-service /me. Berguna untuk menemukan rute yang menyediakan data karyawan bagi service lain, termasuk export internal yang dipakai payroll dan THR. Mencatat juga endpoint yang sudah tak punya konsumen lagi supaya tak disangka masih dipakai.",
       "kata_kunci": [
-        "employee-service",
-        "HRIS",
-        "endpoint",
-        "RBAC",
-        "master data departemen",
-        "system role",
-        "approver",
-        "is_supervisor",
-        "login",
-        "permission-holders"
+        "employee service endpoint",
+        "API employee",
+        "master karyawan",
+        "work data",
+        "self service",
+        "payroll-approx",
+        "permission set",
+        "export internal",
+        "RBAC karyawan"
       ]
     },
     {
@@ -1192,11 +1191,13 @@
         "API - Attendance Service",
         "HRIS - Employee Request & Approval",
         "HRIS - Leave Request",
-        "Microservices - Attendance Service",
         "Microservices - Payroll Service",
+        "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
+        "APP - Web ERP",
+        "Microservices - Employee Service",
+        "Microservices - Attendance Service",
         "HRIS - Otomasi Skor KPI",
         "Microservices - Task Management Service",
-        "APP - Web ERP",
         "APP - Dynamic Task Tracker",
         "API - Task Management Service",
         "API - Form Builder Service",
@@ -1208,26 +1209,22 @@
         "Microservices - Learning Service",
         "HRIS - Training Program",
         "HRIS - Attendance System",
-        "HRIS - Payroll",
-        "Microservices - Employee Service"
+        "HRIS - Payroll"
       ],
-      "hash": "22f5e26c79aacad9b68e641ff1ad287098c00c9586e7542a5f8ca6d95b22647d",
-      "ukuran_kb": 46.1,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitekturnya (Flutter, Clean Architecture feature-first, BLoC, get_it, dio), serta bagaimana karyawan memakainya untuk attendance, cuti/izin, lembur, payroll, KPI, survei, dan Kaizen. Menjelaskan juga cara autentikasi (JWT + biometric + PIN, 1 akun = 1 device), bahwa aplikasi mengakses backend lewat API Master Gateway dengan prefix api/<module>, dan bagaimana konten serta menu di-scope per perusahaan (multi-tenant CompanyScope). Menerangkan pula inbox peninjau lintas jenis lewat /hr/requests dan /hr/requests/detail, kolom Pengganti yang hanya muncul di tahap atasan, kartu lampiran di detail peninjau Izin/Cuti/Sakit, dan kartu pengingat menyerahkan surat dokter asli ke ruang HRD pada formulir pengajuan Sakit. Berguna untuk mengetahui versi build/rilis mana yang dipakai di lapangan, struktur menu beranda, fitur developer/admin, known issues, dan roadmap.",
+      "hash": "65b53cac38e772d6a3f287b15905cbaf0ba8c258b83770f888bb9eb429764d6b",
+      "ukuran_kb": 50.3,
+      "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile MyBharata, bagaimana bentuk layarnya, dan keputusan rancangan apa yang sudah diambil beserta alasannya. Mencakup presensi dan geofencing, cuti dan izin, lembur, slip gaji berikut gerbang PIN dan unduh PDF, KPI, notifikasi, serta susunan menu beranda. Dipakai untuk mengetahui apakah sebuah layar sudah ada sebelum membuat yang baru, dan untuk menemukan jebakan mobile yang sudah terbukti menggigit.",
       "kata_kunci": [
         "MyBharata",
-        "my_bharata",
         "aplikasi mobile",
-        "mobile app",
         "Flutter",
-        "HRIS mobile",
-        "attendance",
-        "presensi",
-        "multi-tenant",
-        "review submission",
-        "lampiran",
-        "surat dokter",
-        "pengingat"
+        "slip gaji mobile",
+        "PIN",
+        "presensi mobile",
+        "menu beranda",
+        "unduh PDF",
+        "geofencing",
+        "notifikasi"
       ]
     },
     {
@@ -2038,6 +2035,7 @@
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "CORE - SSO Flow",
+        "Microservices - Payroll Service",
         "ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak",
         "HRIS - Leave Request",
         "CORE - HRIS Orchestrator",
@@ -2048,21 +2046,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "e221b19d5579596f4ae649735732ea15e2a08b8e43d019e9954a2fe59ac95996",
-      "ukuran_kb": 117.9,
-      "ringkasan": "Menjawab: bagaimana login/autentikasi/onboarding bekerja sebagai sumber SSO seluruh bip-erp (username/employee_id, PIN, biometric, hashing password), operasi admin akun IT (reset, forget-device, active-status, roles), serta CRUD master data department dan system_roles. Juga menjelaskan workspace posisi yang di-host di service ini (Legal, R&D Regulatory, Quality, Procurement non-Accurate), status multi-tenant, akun pihak luar, dan alur resign/non-aktif karyawan.",
+      "hash": "0abc5ebad9af6c88cab891a15860d5a1745deb728a970769df11c0d8c698ec25",
+      "ukuran_kb": 118.5,
+      "ringkasan": "Menjawab: bagaimana data karyawan disimpan dan dilayani, apa isi work_data dan personal_data, bagaimana hak akses diturunkan dari posisi, dan endpoint mana yang dipakai service lain. Memuat jebakan yang sudah terbukti: HRGA sebagai label grup supervisi yang bukan nama departemen siapa pun, jalur hak-dari-posisi yang mati untuk akun vendor, dan endpoint self-service yang kini tak punya konsumen. Sisi konsep organisasinya ada di dokumen HRIS.",
       "kata_kunci": [
         "employee service",
-        "auth",
-        "login",
-        "SSO",
-        "onboarding",
-        "master data department",
-        "system_roles",
-        "account admin",
-        "multi-tenant",
-        "resign",
-        "KPI"
+        "master karyawan",
+        "work_data",
+        "personal_data",
+        "HRGA",
+        "departemen",
+        "permission set",
+        "hak dari posisi",
+        "employee_id",
+        "export all"
       ]
     },
     {
@@ -2603,9 +2600,9 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "032c688d4021fff79dc9c38dcc48ee3b781e4c26304c9df51d9594721430b36d",
-      "ukuran_kb": 56.3,
-      "ringkasan": "Menjawab: bagaimana gaji dihitung di payroll-service dari gross sampai net, apa saja fase yang sudah ada di kode (setup, payroll run, PPh21 TER, THR, PDF slip, impor run), dan seberapa jauh fitur itu benar-benar dipakai di produksi. Memuat rumus potongan kehadiran empat baris, pembulatan BPJS dua aturan berbeda, dua dasar upah BPJS, periode kehadiran yang diturunkan dari pay_period_end, lingkup run, serta model data payroll_db berikut kode peringatan barisnya. Bagian Kondisi Pemakaian di Produksi mengukur apa yang menahan run pertama terbit.",
+      "hash": "053e1de8d13e40296472a6383f65d614fbda80c23f90736734eb8f642f64557d",
+      "ukuran_kb": 56.8,
+      "ringkasan": "Menjawab: bagaimana gaji dihitung dari gross sampai net, fase apa saja yang sudah ada di kode (setup, payroll run, PPh21 TER, THR, PDF slip, impor run), dan seberapa jauh fitur itu benar-benar dipakai di produksi. Memuat rumus potongan kehadiran empat baris, dua aturan pembulatan BPJS yang sengaja berbeda, dua dasar upah BPJS, periode kehadiran yang diturunkan dari pay_period_end, lingkup run, serta model data payroll_db berikut kode peringatan barisnya. Bagian Kondisi Pemakaian di Produksi mengukur apa yang masih menahan run pertama terbit.",
       "kata_kunci": [
         "payroll service",
         "penggajian",
@@ -2770,7 +2767,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Irisan 1 (baca saja) HIDUP di prod. Irisan 2 (tulis) MERGED ke `main` 2026-08-30 (PR [#1543](https://github.com/bip-itteam-internal/bip-erp/pull/1543), 155 test) tetapi BELUM di-deploy, dan deploy key berhak tulis belum ada. Irisan 3 belum ada kode.** ⛔ **Merged bukan berarti jalan**: `docker build` belum pernah dicoba, sembilan verifikasi hidup semuanya menunggu deploy key, dan sembilan pemakai di daftar-izin belum diberi tahu bahwa connector mereka harus disambung ulang. PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) dan [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489) merged 2026-08-27. Diukur di prod 2026-08-30: container `Vault-MCP` sehat, `POST /mcp` membalas 401 ber-`WWW-Authenticate` yang benar (`scope=\"vault:read\"`), kedua `.well-known` 200, `/oauth/authorize` menolak client tak dikenal dengan 400, sembilan `employee_id` terdaftar di `VAULT_MCP_ALLOWED_EMPLOYEES`, dan **tiga sesi sudah terbentuk di `mcp_sessions`** sehingga alur OAuth penuh terbukti pernah dilalui orang sungguhan.",
+      "status_teks": "**Irisan 1 (baca) dan irisan 2 (tulis) sama-sama HIDUP di prod; irisan 3 belum ada kode.** Irisan 2 merged 2026-08-30 (PR [#1543](https://github.com/bip-itteam-internal/bip-erp/pull/1543), 155 test) dan di-deploy 2026-09-01. Diukur, bukan diingat: image `bip-erp-vault-mcp` dibangun 18:03, container dibuat ulang 18:50 sesudah `VAULT_MCP_AUTHOR_EMAIL` dan kredensial push dipasang di `.env` prod; log boot berbunyi `tool tulis aktif, author commit memakai bharataitteam@gmail.com`, dan `git push --dry-run` dari dalam container membalas `Everything up-to-date`. ⛔ **Aktif bukan berarti lunas**: belum ada satu pun commit hasil tulisan manager sungguhan, dan sembilan pemakai di daftar-izin belum menyambungkan ulang connector-nya, sehingga tool tulis belum benar-benar muncul untuk siapa pun. PR [#1488](https://github.com/bip-itteam-internal/bip-erp/pull/1488) dan [#1489](https://github.com/bip-itteam-internal/bip-erp/pull/1489) merged 2026-08-27. Diukur di prod 2026-08-30: container `Vault-MCP` sehat, `POST /mcp` membalas 401 ber-`WWW-Authenticate` yang benar (`scope=\"vault:read\"`), kedua `.well-known` 200, `/oauth/authorize` menolak client tak dikenal dengan 400, sembilan `employee_id` terdaftar di `VAULT_MCP_ALLOWED_EMPLOYEES`, dan **tiga sesi sudah terbentuk di `mcp_sessions`** sehingga alur OAuth penuh terbukti pernah dilalui orang sungguhan.",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
@@ -2781,20 +2778,19 @@
         "ADR - 0003 SSO-only Gateway",
         "IT - Server, VMs and Databases"
       ],
-      "hash": "626d15dbfab643a7b76e32dc96ca006a10ecdadb9839e738070258ffad5b3a7d",
-      "ukuran_kb": 24.7,
-      "ringkasan": "Menjawab: bagaimana manajemen bisa membaca dan menulis dokumentasi arsitektur vault langsung dari Claude Desktop atau claude.ai tanpa Obsidian maupun git, dan mengapa service ini menerbitkan token OAuth sendiri alih-alih meneruskan ERP JWT (audience binding, confused deputy, TTL 72 jam tanpa refresh token). Menjelaskan lima keputusan yang mengikat: token sendiri, tidak lewat API Gateway melainkan langsung via Nginx Proxy Manager di mcp.bharatainternasional.com, author commit per-manager, larangan menulis VAULT-INDEX.json, dan daftar-izin employee_id eksplisit yang diperiksa ulang tiap panggilan. Berguna untuk menjawab irisan mana yang sudah hidup di prod (baca) versus yang selesai tapi belum di-deploy (tulis), dan celah keamanan apa yang ditemukan review setelah PR terlanjur di-merge.",
+      "hash": "da71e18de4a6b47d15f5fc3cdcc38c57d75ed5acaa4149c06d602b23bbb59af1",
+      "ukuran_kb": 26.5,
+      "ringkasan": "Menjawab: bagaimana vault architecture-draft dibuka untuk Claude lewat MCP server sehingga manajemen bisa membaca dan menulis dokumentasi dari Claude Desktop tanpa menyentuh Obsidian atau git. Menjelaskan identitas yang menumpang SSO ERP, alur OAuth berikut scope baca dan tulis, serta bagaimana tiap tulisan mendarat sebagai commit git ber-author manager yang bersangkutan. Mencatat pula keadaan terukur di produksi dan apa yang masih menahan pemakaian sungguhan.",
       "kata_kunci": [
-        "Vault MCP",
+        "vault MCP",
         "MCP server",
-        "Model Context Protocol",
+        "Claude Desktop",
         "OAuth",
-        "PKCE",
-        "SSO",
-        "Claude connector",
-        "architecture-draft",
-        "daftar-izin",
-        "allowlist"
+        "vault:read",
+        "vault:write",
+        "dokumentasi",
+        "commit author",
+        "connector"
       ]
     },
     {
@@ -7148,9 +7144,9 @@
         "Microservices - Employee Service",
         "Microservices - Attendance Service"
       ],
-      "hash": "49bd0fda3588275a199d2a46283892a206fb9e82c0e04a43747a550ca7cae153",
-      "ukuran_kb": 6.6,
-      "ringkasan": "Menjawab: siapa yang menjalankan alur payroll run dan apa yang boleh dilakukan masing-masing, dari HR Supervisor yang membuat atau mengimpor run, Approver yang menyetujui dan menerbitkan, sampai karyawan yang melihat slipnya sendiri. Memuat diagram alur draft ke approved ke published berikut cabang impor yang tidak bisa dihitung ulang, serta skenario gagal tiap tahap termasuk penolakan rekonsiliasi dan employee_id yang tak ada di master. Berguna untuk mengetahui gerbang RBAC mana yang dipakai tiap aksi payroll.",
+      "hash": "d9beac70f1e90337cadbc32d087ffeaa0c4e420c9cdfddd54270aaea35296701",
+      "ukuran_kb": 7.0,
+      "ringkasan": "Menjawab: siapa yang menjalankan alur payroll run dan apa yang boleh dilakukan masing-masing, dari HR Supervisor yang membuat atau mengimpor run, Approver yang menyetujui dan menerbitkan, sampai karyawan yang melihat slipnya sendiri di web maupun mobile. Memuat diagram alur draft ke approved ke published berikut cabang impor yang tidak bisa dihitung ulang, serta skenario gagal tiap tahap. Berguna untuk mengetahui gerbang RBAC mana yang dipakai tiap aksi payroll.",
       "kata_kunci": [
         "payroll persona",
         "alur payroll",

@@ -355,6 +355,24 @@ pemakaian dari komentar ke dok.
   batasnya terang-terangan di berkas test** — sama seperti catatan jsdom-tak-punya-layout.
   Test yang berpura-pura membuktikan interaksi yang tak pernah terjadi lebih buruk
   daripada gap yang diakui. Terjadi 2026-08-22 di form rotasi shift (erp-frontend #1144).
+- ⛔ **`findsNothing` atas widget yang berada DI BAWAH rute lain selalu hijau, bahkan ketika
+  widget-nya dibangun.** Flutter menandai rute di bawah rute opaque sebagai **offstage**, dan
+  `find.text`/`find.byType` bawaan memakai `skipOffstage: true`. Jadi assertion "isi ini tidak
+  dirender" tak bisa membedakan **tak pernah dibangun** dari **dibangun lalu tertutup** — dua
+  hal yang justru jadi seluruh isi pertanyaannya bila yang dijaga adalah gerbang (PIN,
+  otorisasi, paywall). Wajib `find.text(x, skipOffstage: false)`, dan klaimnya sekaligus
+  menguat: isinya tak pernah dibangun sama sekali, bukan cuma tak terlihat mata.
+
+  Terbukti 2026-09-01 di gerbang PIN slip gaji MyBharata: lima test hijau, penjaganya dilepas
+  seluruhnya, **kelimanya tetap hijau**. Sekelas dengan `findsNothing` vakum di Flutter pada
+  umumnya, tapi sebabnya berbeda dan lebih halus — di sini finder-nya memang menemukan
+  sesuatu, ia cuma menolak melihatnya.
+
+  ⚠️ Kelas kedua dari kejadian yang sama: **test widget yang hanya memeriksa keadaan saat
+  DIPASANG buta terhadap perubahan sesudahnya.** Guard yang membaca sesinya di `initState`
+  lolos seluruh suite sementara pembersihan sesi saat aplikasi ke latar tak berpengaruh pada
+  halaman yang sudah terbuka. Bila yang diuji punya siklus hidup, uji juga apa yang terjadi
+  **sesudah** ia terpasang.
 - Test bergantung jam sistem, timezone, atau urutan eksekusi.
 - Uji i18n memakai `t` tiruan sehingga buta terhadap key yang hilang; uji terpisah dengan
   instance i18next asli + kontrol negatif bahwa `en` bukan hasil fallback ke `id`.

@@ -307,6 +307,10 @@ Pengecualiannya kolom yang **selalu ditulis kode kita sendiri** — mis. `employ
 - Profile, kpi-score, vacation, payroll-approx
 - Photo get/upload
 
+⚠️ **`GET /me/payroll-approx` kini YATIM: nol konsumen kode** (diukur 2026-09-01 dengan grep seluruh workspace). Satu-satunya pemakainya adalah [[APP - MyBharata]], dan bagian "Perkiraan" di sana dibuang bersama perombakan halaman Slip Gaji; [[APP - Web ERP]] tak pernah memakainya. Endpointnya **sengaja tidak dihapus** — itu keputusan tersendiri yang belum diambil — tetapi dicatat di sini supaya pembaca berikutnya tak menyangka ia masih melayani siapa pun.
+
+Yang **tidak** ikut mati: `/payroll-supplement` di [[Microservices - Attendance Service]], karena [[Microservices - Payroll Service]] memanggilnya **langsung** saat menghitung run, bukan lewat proxy `payroll-approx` ini.
+
 **Vacation**
 - `GET /vacation`, `POST /vacation/quota`
 - `POST /vacation/decrement` — dipanggil oleh attendance

@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | **HR Supervisor (Personalia)** | Supervisor/Admin HR | `isHRSupervisor` (`system_roles["hris"]` = supervisor/admin) | Web ERP | Buat/recalc run (bulanan & THR); **impor & hapus run impor** (🔜 belum merged) |
 | **Approver (Direktur / HR Admin)** | Admin HR / Direktur | `isApprover` = `isHRAdmin` (`system_roles["hris"]` = admin) | Web ERP | Approve → Publish run |
-| **Karyawan** | Semua karyawan tetap/kontrak | Terautentikasi (identitas dari header gateway) | Web ERP (MyBharata menyusul) | Lihat slip sendiri (self-service) |
+| **Karyawan** | Semua karyawan tetap/kontrak | Terautentikasi (identitas dari header gateway) | Web ERP **dan MyBharata** | Lihat slip sendiri (self-service) + unduh PDF |
 
 ## Persona detail
 
@@ -32,7 +32,8 @@
 ### Karyawan — self-service slip
 - **Peran & Divisi**: karyawan yang punya baris di sebuah run `published`. ⚠️ Untuk run engine itu berarti ia punya `employee_salary`; untuk **run impor tidak**, karena backfill riwayat justru mencakup orang yang struktur gajinya belum pernah dimasukkan ke sistem (kop slipnya jatuh ke badan usaha default dan barisnya ditandai `import_company_default`).
 - **Akses / RBAC**: cukup terautentikasi; identitas dari header gateway (`BIP-Employee-ID`). Hanya slip **sendiri**, hanya dari run **published**; field internal HR (`notes`, pembuat/penyetuju/penerbit) di-**redact**.
-- **Device**: Web ERP (integrasi [[APP - MyBharata]] menyusul).
+- **Device**: Web ERP **dan** [[APP - MyBharata]]. Catatan lama "integrasi MyBharata menyusul" sudah tidak berlaku: sisi mobile merged ke `dev` (commit `3fbf44d4`) dan memanggil endpoint yang sama. ⚠️ Belum dirilis ke store, jadi belum ada di HP orang.
+	- 🔜 Di mobile, halaman itu sedang dirombak jadi **daftar bulan tanpa nominal + gerbang PIN per slip**, dengan rincian per baris sebagai layar tersendiri (branch `feat/payslip-bulan-pin`, belum merged). Rinciannya di [[APP - MyBharata]] bab Payroll.
 - **Tujuan**: melihat rincian gaji bulanan & slip **THR** sendiri (pendapatan, BPJS, PPh21, net).
 - **Pain point**: dulu slip manual/tak transparan; sulit cek potongan.
 - **Aksi utama**: buka "Slip Gaji Saya" → `GET /payroll-runs/my` (daftar) / `/my/:id` (detail). Slip THR dibedakan dari bulanan via `run.type`.
