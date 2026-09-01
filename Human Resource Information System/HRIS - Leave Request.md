@@ -16,10 +16,37 @@ Ada 4 jenis (`LeaveType`) dengan subtipe & batas durasi (`max_range`, format har
 
 | Jenis | Subtipe (contoh) | Batas |
 |---|---|---|
-| **Sakit** | Ada surat keterangan dokter; Tanpa surat keterangan dokter | bebas (hari) |
+| **Sakit** | Ada surat keterangan dokter (**satu-satunya**) | bebas (hari) |
 | **Izin** | Tidak masuk kerja (maks 2 hari); Meninggalkan pekerjaan sementara — **urusan kantor** / **urusan pribadi** (maks 6 jam); Pulang cepat (hari sama) | hari/jam |
 | **Cuti** | Cuti tahunan (cek kuota); Pernikahan (5h); Pernikahan anak (3h); Melahirkan/keguguran (90h); Istri melahirkan/keguguran (3h); Pemakaman anggota keluarga (5h); Wisuda (1h); Pemakaman saudara kandung (1h); Sunat/baptis (2h); Panggilan instansi pemerintah; Bencana alam | per subtipe |
 | **Dinas** | Menghadiri rapat; Mengunjungi instansi; Seminar/khusus; Pemasaran/marketing program; Pembelian barang/jasa; Kegiatan sosial; Antar jemput | hari |
+
+### ⛔ Sakit WAJIB berlampiran, dan subtipe "Tanpa surat keterangan dokter" sudah DIHAPUS
+
+Sakit kini hanya punya **satu** subtipe. Subtipe `Tanpa surat keterangan dokter` dicabut dari
+katalog (`LeaveSubtypes`, `shared-library/models/attendance/models.go`), dan pengajuan Sakit
+tanpa berkas ditolak **400 `Pengajuan Sakit wajib menyertakan surat keterangan dokter`**
+(`services/attendance/main.go`, penjaga `len(form.File["file"]) == 0`, reject code
+`RejectSickNoAttachment`). Sakit tanpa surat kini diajukan sebagai **Izin**, bukan sebagai
+Sakit bersubtipe.
+
+⚠️ **Yang tetap hidup dan jangan dihapus**: `ResolveAttendanceStatusFromLeaveRequest` masih
+memetakan subtipe lama itu ke **Izin** (dipotong), karena record lama dan in-flight bisa masih
+memakainya dan payout historis harus tetap benar. Dikunci test di
+`payroll_treatment_test.go`. Jadi subtipe itu **tak bisa diajukan lagi** tetapi **masih bisa
+dibaca**; keduanya benar sekaligus, dan menyamakannya akan merusak salah satu sisi.
+
+**Lampirannya selalu gambar.** Satu-satunya jalur unggah di [[APP - MyBharata]] memakai
+`ImagePicker` (kamera/galeri), dipakai jalur karyawan maupun jalur HR, jadi belum pernah ada
+cara mengirim PDF. Layar yang menampilkan lampiran memang berasumsi gambar.
+
+**Dokumen fisiknya tak punya jejak di sistem.** Foto yang diunggah tidak menggantikan surat
+asli, dan tak ada satu pun status atau field yang merekam apakah surat itu sudah diterima HRD.
+Sejak 2026-09-01 formulir pengajuan menampilkan kartu pengingat menyerahkannya ke ruang HRD
+(`SickNoteReminderCard`), tetapi itu **pengingat, bukan penjejak** — kepatuhannya tetap
+diurus di luar sistem. Perlu diketahui: kalimat itu **tidak ada** di ketentuan resmi
+`assets/markdown/submission/id/sakit_terms.md`, jadi kartunya sendiri satu-satunya tempat
+aturan itu muncul.
 
 ### Izin Meninggalkan Pekerjaan: Kantor vs Pribadi (payroll)
 
@@ -76,7 +103,7 @@ Rantai **2 tingkat**: **Supervisor departemen → HR**. Supervisor dideteksi via
 - Jenis & subtipe harus valid (`IsLeaveRequestTypeValid` / `IsLeaveRequestSubtypeValid`)
 - Durasi dibatasi `max_range` per subtipe (mis. Melahirkan/keguguran 90 hari, Izin "Tidak masuk kerja" maks 2 hari, "Pulang cepat" hari yang sama)
 - **Cuti tahunan**: cek & **decrement kuota** lewat [[Microservices - Employee Service]] (`/vacation/decrement`)
-- Dokumen pendukung di-upload via [[Microservices - File Service]] (mis. surat dokter)
+- Dokumen pendukung di-upload via [[Microservices - File Service]]. **Opsional untuk semua jenis KECUALI Sakit**, yang ditolak 400 bila berkasnya kosong (lihat §Sakit WAJIB berlampiran)
 
 ## Kuota Cuti Tahunan
 
@@ -150,7 +177,7 @@ Untuk izin yang meninggalkan kantor (mis. "Meninggalkan pekerjaan sementara"/"Pu
 
 ## Pasca-Persetujuan (Dampak ke Attendance)
 
-`ResolveAttendanceStatusFromLeaveRequest` memetakan pengajuan yang disetujui ke status kehadiran: **Sakit→Sick, Izin→Izin, Cuti→Vacation, Dinas→Dinas**. Catatan: **Sakit tanpa surat dokter** diperlakukan sebagai **Izin**. Penerapan terjadi otomatis saat pra-generate entry attendance oleh cron; kuota cuti di-decrement.
+`ResolveAttendanceStatusFromLeaveRequest` memetakan pengajuan yang disetujui ke status kehadiran: **Sakit→Sick, Izin→Izin, Cuti→Vacation, Dinas→Dinas**. Catatan: **Sakit bersubtipe "Tanpa surat keterangan dokter"** diperlakukan sebagai **Izin** — kini murni jalur backward-compat untuk record lama, sebab subtipe itu tak bisa diajukan lagi (§Sakit WAJIB berlampiran). Penerapan terjadi otomatis saat pra-generate entry attendance oleh cron; kuota cuti di-decrement.
 
 ## Notifikasi
 
