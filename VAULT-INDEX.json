@@ -5104,7 +5104,7 @@
         "REF - Penamaan Metrik & Sumber KPI"
       ],
       "hash": "986c92356a28f6e5d7cecda25991d35ee197cf415fad6f6c08996057876df910",
-      "ukuran_kb": 7.5,
+      "ukuran_kb": 7.4,
       "ringkasan": "Menjawab: mengapa KPI jabatan Culture & Industrial dihitung dari penilaian PESERTA (rating + masukan) alih-alih self-report officer, dan bagaimana modul Kelola Program Culture menggantikan pendekatan form realisasi (ADR 0065). Merinci skor komposit 30/30/40 (partisipasi/antusiasme/implementasi dihitung otomatis), resolusi target diundang otomatis dari jenis program, pemecahan distribusi pilar ke Core Value atomik, koleksi culture_programs/culture_feedback, dan batas kepemilikan kpi_score.",
       "kata_kunci": [
         "ADR 0066",
@@ -5991,7 +5991,7 @@
         "GA - Form Pengadaan dan Pengajuan Dana"
       ],
       "hash": "5a506ef2f6690f2d0fd48bd5da4134bc63d99b6af98efef405cd97c1c4ee6447",
-      "ukuran_kb": 7.7,
+      "ukuran_kb": 7.6,
       "ringkasan": "Menjawab: apa saja 11 SOP Procurement resmi PT Bharata (perencanaan kebutuhan, PR, seleksi vendor, RFQ, penerbitan PO, monitoring pengiriman, penerimaan+QC, verifikasi invoice, pembayaran, evaluasi vendor, cost saving, pelaporan) dan sejauh mana masing-masing sudah didukung ERP. Memetakan tahap SOP mana yang sudah ada di kode (Permintaan/Pesanan/Penerimaan), mana yang sebagian, dan mana yang belum dibangun (RFQ 3-vendor, matriks approval nominal >Rp50jt, AVL & dokumen legalitas vendor, scorecard/OTD vendor, pelaporan formal). Berguna untuk mengecek kepatuhan SOP sebelum merancang fitur procurement/manufacture baru.",
       "kata_kunci": [
         "procurement",
@@ -6754,20 +6754,22 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "0e6d8014254bca641292f8340a0fcbb8a7f386590d730f5b74ff8b720863f006",
-      "ukuran_kb": 42.6,
-      "ringkasan": "Menjawab: bagaimana skor KPI dihitung dan ditampilkan per karyawan, tim, departemen, dan divisi; bagaimana departemen yang satu tim digabung jadi satu kelompok berlabel pendek (HRGA); dan bagaimana target disetel per metrik dari sumber otomasi. Memuat juga jebakan yang sudah menggigit di layar ini: ambang yang hidup di dua tempat, donut yang tak sepakat dengan kartu di sebelahnya, dan filter departemen bergrup yang menjatuhkan anggota tanpa satu pun galat.",
+      "hash": "624ad38f3bd09b4a88bce45929c8677c248ef77d7be16e4dba701477eec467cd",
+      "ukuran_kb": 43.2,
+      "ringkasan": "Menjawab: bagaimana KPI dinilai per-karyawan (template per posisi, scoring per periode YYYY-MM, snapshot ke kpi_score, final = Σ bobot×nilai) dan bagaimana beda antara engine KPI→insentif marketing yang sudah production dengan appraisal bulanan menyeluruh yang masih sebagian. Menjelaskan aturan pencocokan posisi template dengan jabatan pada akhir periode yang dinilai (bukan posisi hari ini), RBAC per departemen, cakupan tim untuk Leader (scope=team via supervisor_id), dan penggabungan tampilan lintas departemen (mis. HRGA) dari master data. Juga menjawab cara menghitung employee_count/kolom Karyawan pada template dan kenapa satu karyawan dinilai dengan satu template meski satu posisi bisa punya beberapa template.",
       "kata_kunci": [
         "KPI",
-        "key performance index",
-        "skor",
-        "otomasi KPI",
-        "auto-scores",
-        "template KPI",
+        "Key Performance Index",
+        "appraisal",
+        "penilaian kinerja",
+        "template posisi",
+        "scoring",
+        "insentif",
+        "incentive",
+        "RBAC departemen",
+        "scope team",
         "HRGA",
-        "Atur Target",
-        "scorecard",
-        "blueprint"
+        "employee_count"
       ]
     },
     {
@@ -8748,7 +8750,7 @@
         "QA - Register Perizinan & Sertifikasi"
       ],
       "hash": "23e3bd168ac5a48c16f9775bbc34e5fedf3ebe1e157b20409e69fdedb7075c5e",
-      "ukuran_kb": 9.1,
+      "ukuran_kb": 9.0,
       "ringkasan": "Menjawab: register mutu apa saja yang sudah ada di ERP divisi Quality — CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing, dan pengecekan raw material — berikut endpoint `/api/employee/quality/*`, collection MongoDB, dan model datanya. Juga menjawab siapa yang boleh mengakses apa (`quality:staff`, `quality:supervisor`, approver produksi & warehouse, staf marketing), bagaimana alur approval CAPA berjalan (Draft → Diajukan → persetujuan Produksi + Warehouse → finalisasi QA), dan aturan alert keterlambatan tiap register (tenggat H-7, Menunggu >3 hari, antrean >24 jam). Menjelaskan pula apa yang belum tersedia: Dashboard Mutu, IPC/Pre-Check/CPPB, dan checklist GMP/kalibrasi/storage.",
       "kata_kunci": [
         "quality",
@@ -11076,7 +11078,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.5,
+      "ukuran_kb": 11.2,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
