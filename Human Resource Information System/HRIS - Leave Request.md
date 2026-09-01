@@ -158,8 +158,9 @@ Push **FCM + inbox** via [[Microservices - Notification Service]] pada event: pe
 
 ## Implementasi Frontend
 
-- **Mobile** ([[APP - MyBharata]] — Submission): pilih jenis & subtipe, isi tanggal/durasi, upload dokumen, lihat status & kuota cuti
-- **Web/HRIS**: HR & supervisor mereview/menyetujui pengajuan dari modul kehadiran ([[APP - Web ERP]])
+- **Mobile** ([[APP - MyBharata]] — Submission): pilih jenis & subtipe, isi tanggal/durasi, upload dokumen, lihat status & kuota cuti. Unggahannya lewat `ImagePicker` (kamera/galeri) di satu-satunya widget yang dipakai jalur karyawan maupun jalur HR, jadi isi `document.file_object` **selalu gambar** — belum pernah ada jalur yang bisa mengirim PDF.
+- **Mereview juga terjadi di mobile, bukan hanya di web.** Atasan langsung dan HRD menyetujui/menolak dari inbox peninjau lintas jenis (`/hr/requests` + `/hr/requests/detail`, `?as=reviewer|reviewed`). Baris ini dulu menyebut review hanya ada di Web/HRIS, dan kekeliruan itu membuat satu celah masuk akal untuk terlewat: layar detail peninjau mobile **tak pernah merender lampiran** sejak widget-nya dibuat, padahal server mengirim `document.file_object` ke peninjau sama utuhnya seperti ke pemohon. Gagalnya senyap — layarnya tampak lengkap, sehingga cuti sakit bisa diputuskan tanpa suratnya pernah dilihat. Diperbaiki 2026-09-01 di `ReviewerSubmissionInfo`.
+- **Web/HRIS**: HR & supervisor mereview/menyetujui pengajuan dari modul kehadiran ([[APP - Web ERP]]); lampiran tampil lewat `useDocumentPreview` di `features/hris/requests/components/detail-sections.tsx`.
 
 ## Kebutuhan
 

@@ -1162,6 +1162,7 @@
         "HRIS - Tukar Jadwal Kerja",
         "API - Attendance Service",
         "HRIS - Employee Request & Approval",
+        "HRIS - Leave Request",
         "Microservices - Attendance Service",
         "Microservices - Payroll Service",
         "HRIS - Otomasi Skor KPI",
@@ -1181,9 +1182,9 @@
         "HRIS - Payroll",
         "Microservices - Employee Service"
       ],
-      "hash": "6673b326aea42dc6002ed4ea979d2272459072954833f1d43a8e075b10a8dd7c",
-      "ukuran_kb": 44.8,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitekturnya (Flutter, Clean Architecture feature-first, BLoC, get_it, dio), serta bagaimana karyawan memakainya untuk attendance, cuti/izin, lembur, payroll, KPI, survei, dan Kaizen. Menjelaskan juga cara autentikasi (JWT + biometric + PIN, 1 akun = 1 device), bahwa aplikasi mengakses backend lewat API Master Gateway dengan prefix api/<module>, dan bagaimana konten serta menu di-scope per perusahaan (multi-tenant CompanyScope). Berguna untuk mengetahui versi build/rilis mana yang dipakai di lapangan, struktur menu beranda, fitur developer/admin, known issues, dan roadmap.",
+      "hash": "e72db33b73977ed79a59e951f6943a1e8595dda8e48b19221a0dc7cc7a549a44",
+      "ukuran_kb": 45.3,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitekturnya (Flutter, Clean Architecture feature-first, BLoC, get_it, dio), serta bagaimana karyawan memakainya untuk attendance, cuti/izin, lembur, payroll, KPI, survei, dan Kaizen. Menjelaskan juga cara autentikasi (JWT + biometric + PIN, 1 akun = 1 device), bahwa aplikasi mengakses backend lewat API Master Gateway dengan prefix api/<module>, dan bagaimana konten serta menu di-scope per perusahaan (multi-tenant CompanyScope). Menerangkan pula inbox peninjau lintas jenis lewat /hr/requests dan /hr/requests/detail, termasuk kolom Pengganti yang hanya muncul di tahap atasan dan kartu lampiran di detail peninjau Izin/Cuti/Sakit yang sempat tak pernah dirender. Berguna untuk mengetahui versi build/rilis mana yang dipakai di lapangan, struktur menu beranda, fitur developer/admin, known issues, dan roadmap.",
       "kata_kunci": [
         "MyBharata",
         "my_bharata",
@@ -1194,7 +1195,10 @@
         "attendance",
         "presensi",
         "multi-tenant",
-        "geofencing"
+        "geofencing",
+        "review submission",
+        "lampiran",
+        "attachment"
       ]
     },
     {
@@ -6832,9 +6836,9 @@
         "HRIS - Attendance System",
         "HRIS - Big Pictures"
       ],
-      "hash": "327751f1a3cff37dcc6666558569f473f72ade2d7029119368faed116a886ab6",
-      "ukuran_kb": 11.6,
-      "ringkasan": "Menjawab: bagaimana karyawan mengajukan sakit, izin, cuti, dan dinas, apa subtipe beserta batas durasinya, siapa reviewernya (Supervisor lalu HR), dan bagaimana status akhir diresolusi termasuk auto-ignore 24 jam serta reminder T+18 jam. Menjelaskan pula pembedaan izin urusan kantor vs pribadi yang menentukan potongan tunjangan kehadiran dan uang makan, model data leave_request, dan dampak pasca-persetujuan ke attendance. Bagian Kuota Cuti Tahunan menerangkan kenapa vacation.quota bukan jatah tahunan dan kenapa kuota 0 membuat pengajuan cuti ditolak 400.",
+      "hash": "3ec8fcbac515e89c4371effe1057f258d7d23c613ad4e3479ebd9501cbd67368",
+      "ukuran_kb": 12.5,
+      "ringkasan": "Menjawab: bagaimana karyawan mengajukan sakit, izin, cuti, dan dinas, apa subtipe beserta batas durasinya, siapa reviewernya (Supervisor lalu HR), dan bagaimana status akhir diresolusi termasuk auto-ignore 24 jam serta reminder T+18 jam. Menjelaskan pula pembedaan izin urusan kantor vs pribadi yang menentukan potongan tunjangan kehadiran dan uang makan, model data leave_request, dan dampak pasca-persetujuan ke attendance. Menerangkan bahwa mereview terjadi di mobile maupun web, bahwa lampiran pendukung selalu berupa gambar karena unggahannya lewat ImagePicker, dan di layar mana lampiran itu ditampilkan. Bagian Kuota Cuti Tahunan menerangkan kenapa vacation.quota bukan jatah tahunan dan kenapa kuota 0 membuat pengajuan cuti ditolak 400.",
       "kata_kunci": [
         "cuti",
         "leave request",
@@ -6845,7 +6849,9 @@
         "kuota cuti",
         "vacation quota",
         "attendance",
-        "auto-ignore"
+        "auto-ignore",
+        "lampiran",
+        "surat dokter"
       ]
     },
     {
