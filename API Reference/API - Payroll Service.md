@@ -2,7 +2,7 @@
 
 *Daftar endpoint **Payroll Service** — grounded ke kode (`services/payroll/routes.go` + `main.go` + `rbac.go`; audit 2026-08-26, **34 route** di berkas produksi termasuk `/health` dan `/me`). Arsitektur, fase, rumus perhitungan, dan keadaan produksinya: [[Microservices - Payroll Service]].*
 
-- **Status**: ✅ Grounded ke kode (2026-08-26). Dok ini **baru dibuat** pada sync tersebut — sebelumnya payroll satu-satunya service besar tanpa berkas `API -`, padahal ia menghitung uang.
+- **Status**: ⚠️ Grounded ke kode (2026-09-01). Dok ini **baru dibuat** pada sync 2026-08-26 — sebelumnya payroll satu-satunya service besar tanpa berkas `API -`, padahal ia menghitung uang. · ⛔ **Dua rute impor di §Impor Payroll Run BELUM ada di produksi**: kodenya masih di branch `feat/payroll-impor-run` yang belum merged dan belum di-deploy. 34 route di atas tetap angka produksi hari ini; dengan kedua rute itu jadi **36**.
 - **Prefix gateway**: `/api/payroll/*` → path internal tanpa prefix (`api-gateway/main.go`, env `PAYROLL_MODULE_URL`). Routing & auth: [[API - Index]].
 
 ⛔ **Sebelum menyentuh apa pun yang mengubah angka di sini**, baca lebih dulu `mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md` — turunan Peraturan Perusahaan yang menentukan jatah, ambang, dan besaran potongan. Berkas itu ada di repo **mobile**, tak tertaut dari alur kerja payroll mana pun, dan tak akan ditemukan kecuali dicari. Ia yang menang bila perilaku sistem bertentangan dengannya.
@@ -72,9 +72,26 @@ Seluruh config **singleton**, di-seed idempoten saat boot (`seedPayrollConfig`, 
 | GET | `/payroll-runs` | `view` / `isHR` | Difilter `?type=thr\|monthly`. Tiap run membawa `jumlah_karyawan`/`total_gross`/`total_net` — **dihitung saat dibaca** dari `payroll_run_line` (`bson:"-"`), tidak disimpan, supaya mustahil basi terhadap slip di dalamnya |
 | GET | `/payroll-runs/:id` | `view` / `isHR` | |
 | GET | `/payroll-runs/:id/lines/:employeeId` | `view` / `isHR` | Satu baris slip di dalam run |
-| POST | `/payroll-runs/:id/recalculate` | `work` / `isHRSupervisor` | **Dispatch per `type`** — rute lifecycle sengaja type-agnostic dan dipakai ulang oleh THR |
+| POST | `/payroll-runs/:id/recalculate` | `work` / `isHRSupervisor` | **Dispatch per `type`** lewat `modeHitungUlangRun`, sebuah `switch` yang **menolak tipe tak dikenal** alih-alih menjatuhkannya ke perhitungan bulanan. Run `import` dibalas **400**. ⛔ Penjaganya berjalan **sebelum** `DeleteMany`: begitu barisnya terhapus, penolakan di langkah berikutnya tak menyelamatkan apa pun |
 | POST | `/payroll-runs/:id/approve` | **`approve`** / `isApprover` | |
 | POST | `/payroll-runs/:id/publish` | **`approve`** / `isApprover` | Publish yang membuat slip terlihat karyawan |
+
+## Impor Payroll Run (🔜 belum di produksi)
+
+Backfill riwayat gaji yang sudah dibayar lewat spreadsheet HRD. Keputusan lengkap berikut
+gerbang datanya: [[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]].
+
+| Method | Path | Gerbang | Catatan |
+|---|---|---|---|
+| POST | `/payroll-runs/import` | `work` / `isHRSupervisor` | Buat run `type=import` **beserta seluruh barisnya dalam satu permintaan**. Gerbangnya sama dengan `POST /payroll-runs`: keduanya menerbitkan payroll untuk banyak orang sekaligus. Didaftarkan **sebelum** saudara ber-`:id` |
+| DELETE | `/payroll-runs/:id` | `work` / `isHRSupervisor` | Hanya `type=import` **DAN** `status=draft`; run engine dan run non-draft dibalas **400**. Gerbangnya `work`, bukan `approve`: menghapus draft adalah kebalikan dari **membuatnya**, dan yang salah unggah harus bisa membatalkannya sendiri |
+
+- ⛔ **ALL-OR-NOTHING.** Satu baris bermasalah → **400** berisi `gagal[]` (`{baris, employee_id, alasan}`) dan **nol dokumen tersimpan**. Berbeda sengaja dari `bulk-bpjs-base` yang gagal per baris: di sana tiap baris menulis field independen, di sini seluruh baris membentuk satu run yang totalnya harus utuh. `Payroll-MongoDB` standalone **tanpa replica set** sehingga transaksi Mongo tak tersedia.
+- **Urutan pemeriksaan disengaja**: validasi murni (bentuk, duplikat `employee_id`, rekonsiliasi) dijalankan **sebelum** penjaga `mongodb.DB == nil`, sehingga permintaan yang bentuknya salah tetap dibalas 400 walau Mongo mati — dan seluruh jalur itu bisa diuji lewat Fiber tanpa database.
+- **Rekonsiliasi**: `pendapatan − potongan` wajib sama dengan `net` (kolom TOTAL TERIMA), toleransi **0,01**. Yang tak cocok ditolak **berikut selisihnya dalam rupiah**.
+- **Nama komponen** wajib ada di master `salary_component` (termasuk yang non-aktif, karena slip lama memakai nama yang sudah dipensiunkan). Nama bebas ditolak 400.
+- **`employee_id` diverifikasi** ke [[Microservices - Employee Service]] `/internal/export/all`. Gagal mengambilnya **MENGGAGALKAN impor** (502), berbeda dari `computeRunLines` yang memperlakukan kegagalan yang sama sebagai kosmetik.
+- **Excel diurai di FRONTEND**, sama seperti `bulk-bpjs-base`: tak ada `excelize`, tak ada multipart, **tak ada dependensi Go baru**.
 
 ## Slip self-service (tanpa izin payroll apa pun)
 

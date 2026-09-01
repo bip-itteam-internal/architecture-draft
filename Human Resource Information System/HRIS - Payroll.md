@@ -113,7 +113,29 @@ per orang. Itu keadaan yang diinginkan, bukan regresi: nilai lama tak disalin ju
 tak satu pun di antaranya benar. Bedanya, kekosongan itu kini **ditandai** di layar dan di
 baris payroll run, jadi ia terlihat sebelum tombol Approve ditekan.
 
+## Backfill Riwayat Gaji dari Spreadsheet HRD (🔜 branch `feat/payroll-impor-run`, belum merged)
+
+Nol slip pernah terbit dari sistem, tetapi HRD **sudah membayar gaji berbulan-bulan lewat
+spreadsheet**. Riwayat itu kini bisa dimasukkan sebagai **jenis run ketiga** (`import`) yang
+angkanya **disalin apa adanya**, lalu melewati Setujui dan Terbitkan seperti run biasa
+sehingga karyawan bisa membuka slipnya sendiri berikut PDF-nya.
+
+Menghitung ulang riwayat lewat engine **bukan pilihan**: config BPJS, tabel TER, dan tarif
+potongan hari ini belum tentu sama dengan yang berlaku saat gaji itu dibayarkan, dan slip
+yang berbeda dari uang yang masuk rekening lebih buruk daripada tidak ada slip.
+
+⛔ **Konsekuensinya diterima sadar**: baris impor mem-bypass seluruh penjaga uang. Yang
+menggantikannya hanya **rekonsiliasi** — jumlah baris wajib sama dengan kolom TOTAL TERIMA,
+dan yang tak cocok ditolak berikut selisihnya dalam rupiah.
+
+⛔ **Satu gerbang DATA masih terbuka**: kolom **TOTAL TK** di sheet HRD diduga subtotal
+JHT + JP, dan bila benar maka TOTAL TERIMA di sheet memotong dua kali. Data contoh yang
+dibagikan HRD sudah di-dummy-kan sehingga mustahil dibedakan dari sana. **Impor produksi
+tidak boleh dijalankan sebelum ini terjawab.** Rincian lengkap, termasuk lima kolom ambigu
+lainnya: [[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]].
+
 ## Dokumen Terkait
 
+- [[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]] (backfill riwayat)
 - [[Microservices - Payroll Service]] (implementasi Fase 1) · [[Microservices - Attendance Service]] (`payroll-supplement`) · [[Microservices - Employee Service]] (`payroll-approx`) · [[CORE - HRIS Orchestrator]]
 - [[HRIS - Overtime]] · [[HRIS - Compensation & Benefits]] · [[Finance - Big Pictures]] · [[ADR - 0001 Akuntansi via Accurate]]

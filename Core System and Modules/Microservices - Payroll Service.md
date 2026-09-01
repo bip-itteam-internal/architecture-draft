@@ -3,7 +3,7 @@
 *Payroll Service mengelola **penggajian**: setup komponen gaji, konfigurasi BPJS & pajak, penetapan gaji per karyawan, dan **payroll run** (kalkulasi → approve → terbitkan slip). Ini sisi **implementasi** dari konsep [[HRIS - Payroll]] & [[HRIS - Compensation & Benefits]]. **Fase 1 (Setup & Config)** + **Fase 2 (Engine Run + lifecycle publish + slip self-service)** + **Fase 2b (PPh21 TER)** sudah di kode; slip PDF = fase berikut. Scope tegas: **sampai siapkan data + terbitkan slip, TANPA pembayaran/transfer**.*
 
 - **Stack**: Go + Fiber v2 + MongoDB (`payroll_db`) — selaras pola service bip-erp lain
-- **Path**: `services/payroll` (Fase 1 merged #262; Fase 2 PR #265; Fase 2b PPh21 TER PR #270; Payroll Run extend/publish/self-service PR #272; FE Payroll Run PR #171; potongan kehadiran eksplisit [#1317](https://github.com/bip-itteam-internal/bip-erp/pull/1317) + [#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318) + erp-frontend [#1109](https://github.com/bip-itteam-internal/erp-frontend/pull/1109), merged 2026-08-20; **dua dasar upah BPJS** [#1478](https://github.com/bip-itteam-internal/bip-erp/pull/1478) + isi massal [#1482](https://github.com/bip-itteam-internal/bip-erp/pull/1482) + ringkasan daftar run [#1485](https://github.com/bip-itteam-internal/bip-erp/pull/1485), merged 2026-08-27; **periode kehadiran** [#1500](https://github.com/bip-itteam-internal/bip-erp/pull/1500) + **lingkup run** [#1502](https://github.com/bip-itteam-internal/bip-erp/pull/1502), merged 2026-08-28)
+- **Path**: `services/payroll` (**impor payroll run** branch `feat/payroll-impor-run`, 🔜 belum merged; Fase 1 merged #262; Fase 2 PR #265; Fase 2b PPh21 TER PR #270; Payroll Run extend/publish/self-service PR #272; FE Payroll Run PR #171; potongan kehadiran eksplisit [#1317](https://github.com/bip-itteam-internal/bip-erp/pull/1317) + [#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318) + erp-frontend [#1109](https://github.com/bip-itteam-internal/erp-frontend/pull/1109), merged 2026-08-20; **dua dasar upah BPJS** [#1478](https://github.com/bip-itteam-internal/bip-erp/pull/1478) + isi massal [#1482](https://github.com/bip-itteam-internal/bip-erp/pull/1482) + ringkasan daftar run [#1485](https://github.com/bip-itteam-internal/bip-erp/pull/1485), merged 2026-08-27; **periode kehadiran** [#1500](https://github.com/bip-itteam-internal/bip-erp/pull/1500) + **lingkup run** [#1502](https://github.com/bip-itteam-internal/bip-erp/pull/1502), merged 2026-08-28)
 - **Status**: ⚠️ **Implemented (Fase 1 Setup + Fase 2 Run+publish+self-service + Fase 2b PPh21 TER + Fase 4 THR + Fase 5 PDF slip)** dan **live di produksi** (image BE dibangun **2026-08-28 09:45 WIB**, FE 09:43 — memuat #1500 periode kehadiran & #1502 lingkup run; diverifikasi lewat penanda string di biner dan bundel, berikut kontrol negatif). Di belakang [[CORE - API Master Gateway]] (`InternalURL["payroll"]`), auth **SSO** ([[CORE - SSO Flow]]), role `system_roles["hris"]`. Port `6980`, mongo `payroll-mongo-db` (host `32792`). · ⛔ **Belum pernah dipakai menggaji seorang pun**: 2 `payroll_run` di prod, **keduanya `draft`**, tak satu pun pernah `approved` apalagi `published`, jadi nol slip pernah sampai ke karyawan (diukur 2026-08-26). Lihat §Kondisi Pemakaian di Produksi. · 🔴 **Multi-perusahaan: belum ter-scope** — `company_id` di service ini = badan usaha **penggaji** (kop slip), BUKAN tenant; `listEmployeeSalaries`/run generation/THR meng-enumerasi SEMUA karyawan (`bson.M{}`) → campur lintas-perusahaan. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 
 > ⛔ **Sumber aturan bisnisnya TIDAK ADA DI VAULT INI.** Jatah, ambang, dan besaran potongan diturunkan dari Peraturan Perusahaan 2026-2028 ke **`mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md`** — berkas di repo **mobile**, dan `CLAUDE.md` repo itu menyatakan **dokumen itu yang menang** bila perilaku sistem bertentangan dengannya. Yang relevan bagi service ini: mangkir 1,5x sehari dan 2x per hari bila ≥2 hari (Pasal 20), izin jam kerja memotong Tunjangan Kehadiran **dan** uang makan, sakit tanpa surat dokter diperlakukan sebagai izin, dan SP II memotong 25% gaji pokok selama 6 bulan (belum ada di kode).
@@ -179,11 +179,62 @@ Grounded ke **Formulir 2a PU BPJS Ketenagakerjaan** milik BHARATA INTERNASIONAL 
 - **Gateway tak perlu diubah**: `Reroute` di shared-library sudah mengenali `application/pdf` dan men-streaming-nya tanpa buffering, dan cache Redis hanya menyimpan `application/json` sehingga PDF tak ter-cache basi.
 - Nama berkas membuang karakter yang merusak `Content-Disposition` (termasuk CR/LF), karena judul run adalah masukan bebas dari HR.
 
+## Impor Payroll Run dari Spreadsheet HRD (🔜 branch `feat/payroll-impor-run`, belum merged)
+
+> Keputusan lengkap, alasan, dan **gerbang datanya**:
+> [[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]].
+> Rute: [[API - Payroll Service]] §Impor Payroll Run.
+
+**Jenis run KETIGA**, `PayrollRun.type = "import"`. Ada karena payroll belum pernah dipakai
+menggaji seorang pun sementara HRD sudah membayar berbulan-bulan lewat spreadsheet, dan
+menghitung ulang riwayat itu lewat engine akan menghasilkan angka yang **berbeda dari yang
+sudah dibayar** (config BPJS, tabel TER, dan tarif potongan hari ini belum tentu sama dengan
+yang berlaku saat itu). Slip yang berbeda dari uang yang masuk rekening lebih buruk daripada
+tidak ada slip.
+
+- ⛔ **Angka DISALIN, tidak dihitung.** Baris impor mem-bypass **seluruh** penjaga uang:
+  config BPJS, tabel TER PPh21, tarif potongan kehadiran, dan kedua dasar upah BPJS. Tak satu
+  pun rumus di `payroll_calc.go` menyentuhnya. Penggantinya satu-satunya **REKONSILIASI**:
+  `pendapatan − potongan` wajib sama dengan kolom TOTAL TERIMA, toleransi 0,01.
+- ⛔ **`recalculate` MENOLAK run impor dengan 400, dan itu penjaga terpenting fitur ini.**
+  Bentuk lamanya `if run.Type == RunTypeThr { thr } else { computeRunLines }` memperlakukan
+  SETIAP tipe yang bukan thr sebagai bulanan, jadi run impor jatuh ke `computeRunLines` yang
+  **menghapus seluruh barisnya** lalu menggantinya dengan angka engine — angka yang sudah
+  dibayar hilang tanpa salinan, tanpa galat, dengan status 200. Tombol "Hitung Ulang" muncul
+  untuk tiap run draft tanpa memandang jenisnya, jadi jaraknya satu klik. Kini `switch` di
+  `modeHitungUlangRun` yang juga **menolak tipe tak dikenal**, dijalankan **sebelum**
+  `DeleteMany`.
+- **Koreksinya: hapus lalu impor ulang** selagi `draft` (`DELETE /payroll-runs/:id`, hanya
+  `type=import` + `status=draft`).
+- **`scope` sengaja KOSONG**: lingkup run impor ditentukan isi berkas, bukan penyaring tipe
+  kepegawaian. Layar melabelinya **"Sesuai berkas"**, bukan "Semua" — `lingkupRun()` di FE
+  menjatuhkan yang kosong ke `semua`, dan itu bacaan yang benar untuk run lama tapi bohong di
+  sini: sheet bisa memuat 8 orang, bisa 200.
+- **Karyawan tanpa `employee_salary` tetap diimpor** (backfill justru mencakup orang yang
+  struktur gajinya belum pernah dimasukkan). Kop slipnya jatuh ke badan usaha **default** dan
+  barisnya ditandai `warn_codes: import_company_default`.
+- **Nama baris slip wajib dari master `salary_component`**, termasuk yang non-aktif. Nama
+  bebas ditolak 400: ia melahirkan baris hantu yang tercetak di slip tapi tak ada di layar
+  Pengaturan, sehingga tak seorang pun bisa mengubah atau menjelaskannya.
+- ⚠️ **Lifecycle, slip self-service, dan PDF dipakai ulang UTUH** — nol perubahan di
+  `run_publish.go` maupun `payslip_pdf.go`. `payslip_pdf.go` menilai `IsThr` saja, jadi run
+  impor tercetak sebagai slip biasa, yang memang benar. `catatanPotonganKehadiran` hanya
+  mengisi map bila nilainya `> 0`, jadi basis kehadiran yang nol pada run impor tidak
+  memunculkan keterangan "0 jam" di PDF.
+- ⚠️ **`GET /employer-cost` TIDAK membaca run impor**: ia menghitung ulang lewat
+  `buildPayslip` dari `employee_salary` yang berlaku sekarang. Untuk backfill riwayat itu
+  memang yang benar — biaya insentif bulan lalu tak boleh berubah karena riwayat dimasukkan
+  hari ini.
+- ⛔ **BELUM diverifikasi lewat gateway sama sekali**, dan **satu gerbang DATA masih terbuka**
+  (kolom TOTAL TK di sheet HRD diduga subtotal JHT+JP; rinciannya di ADR 0070). Impor
+  produksi tidak boleh dijalankan sebelum itu terjawab, karena slip yang sudah `published`
+  men-snapshot kesalahannya.
+
 ## Model Data (`payroll_db`)
 
-- `salary_component` · `employee_salary` · `payroll_config` (singleton; + **`attendance_deduction`**) · **`company`** (master badan usaha penggaji; identitas/kop slip, `is_default`) · `payroll_run` (+ **`type`** = `monthly`(default, run lama tanpa field)|`thr`; + **`scope`** = `semua`(default, run lama tanpa field)|`karyawan`|`magang`; metadata `title`/`period`/`pay_period_start`/`pay_period_end`/`pay_date` + lifecycle `draft→approved→published` + `approved_by/at`, `published_by/at`) · `payroll_run_line` (snapshot payslip per karyawan; `Payslip` + **`attendance_basis`** + **`CompanySnapshot`** kop badan usaha + THR: **`thr_months_of_service`/`thr_proportion`** + `error` bila supplement/masa kerja gagal + **`warn_codes[]`**)
+- `salary_component` · `employee_salary` · `payroll_config` (singleton; + **`attendance_deduction`**) · **`company`** (master badan usaha penggaji; identitas/kop slip, `is_default`) · `payroll_run` (+ **`type`** = `monthly`(default, run lama tanpa field)|`thr`|**`import`** (🔜 belum merged, lihat §Impor Payroll Run); + **`scope`** = `semua`(default, run lama tanpa field)|`karyawan`|`magang`, **kosong pada run impor secara sengaja**; metadata `title`/`period`/`pay_period_start`/`pay_period_end`/`pay_date` + lifecycle `draft→approved→published` + `approved_by/at`, `published_by/at`) · `payroll_run_line` (snapshot payslip per karyawan; `Payslip` + **`attendance_basis`** + **`CompanySnapshot`** kop badan usaha + THR: **`thr_months_of_service`/`thr_proportion`** + `error` bila supplement/masa kerja gagal + **`warn_codes[]`**)
 
-- ⚠️ **`warn_codes[]` = SEBAB baris ditandai, sebagai kode stabil dan bukan kalimat**, supaya layar bisa menerjemahkannya ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]) — sealasan dengan `attendance_basis` yang disimpan sebagai angka. Nilai: `attendance_unavailable`, `attendance_days_missing`, `thr_join_date_missing`, `bpjs_base_missing`, **`run_period_unknown`**. `error` tetap memuat detail teknisnya.
+- ⚠️ **`warn_codes[]` = SEBAB baris ditandai, sebagai kode stabil dan bukan kalimat**, supaya layar bisa menerjemahkannya ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]) — sealasan dengan `attendance_basis` yang disimpan sebagai angka. Nilai: `attendance_unavailable`, `attendance_days_missing`, `thr_join_date_missing`, `bpjs_base_missing`, **`run_period_unknown`**, dan **`import_company_default`** (🔜 belum merged; baris impor milik karyawan tanpa penetapan gaji, sehingga kop slipnya jatuh ke badan usaha default — dari 41 badan usaha, itu berpotensi mencetak nama perusahaan yang bukan penggajinya, dan tak ada apa pun yang berbunyi salah karena slipnya tetap terbit rapi). `error` tetap memuat detail teknisnya.
 	- **Ditambahkan, bukan ditimpa.** Satu baris bisa bermasalah karena attendance DAN dasar upah sekaligus; sebelumnya `line.Error` ditimpa sehingga sebab yang datang belakangan menghapus yang sebelumnya, dan yang terbuang bisa justru yang lebih besar dampaknya.
 	- **Kenapa kode, bukan kalimat**: FE dulu menampilkan satu pesan tetap ("Kehadiran tak tersedia, payout 100%") untuk SEMUA sebab, sehingga baris THR yang gagal karena `join_date` pun menyalahkan kehadiran dan orang membetulkan hal yang keliru. Run **lama** tanpa field ini jatuh ke pesan umum.
 	- **Tidak bocor ke karyawan**: `myPayslip` (self-service) hanya memapar `run`/`company`/`payslip`.
