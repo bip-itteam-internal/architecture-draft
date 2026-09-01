@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-01",
-  "jumlah_dokumen": 336,
+  "jumlah_dokumen": 339,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -5302,6 +5302,41 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan.md",
+      "judul": "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-09-01. Belum ada dokumen maupun ADR turunannya.",
+      "publik": true,
+      "tautan": [
+        "HRIS - Payroll",
+        "Microservices - Payroll Service",
+        "HRIS - Attendance System",
+        "HRIS - Disciplinary (Surat Peringatan)",
+        "HRIS - Compensation & Benefits",
+        "HRIS - Kepatuhan Peraturan Perusahaan",
+        "HRIS - Overtime",
+        "HRIS - Leave Request",
+        "ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak"
+      ],
+      "hash": "e0657bb9a05478f421628896d8a5ced25326e7eb8248752acc6deaeaec89f953",
+      "ukuran_kb": 10.8,
+      "ringkasan": "Menjawab: kenapa kepatuhan sistem terhadap Peraturan Perusahaan 2026-2028 dicatat di SATU peta selisih alih-alih tersebar di banyak dokumen teknis, dan kenapa peta itu bukan sumber kebenaran aturan (sumbernya tetap BUSINESS_LOGIC_IMPLEMENTATION.md di repo mybharata-app). Menjelaskan lima keputusan turunannya: satu dokumen peta, larangan menjadikannya sumber kebenaran kedua, kewajiban mencatat nilai config produksi beserta tanggal ukurnya, kewajiban menerbitkan ADR tersendiri untuk tiap penyimpangan yang diputuskan sadar, dan penandaan eksplisit untuk aturan yang belum diimplementasikan. Berguna saat perlu tahu kenapa usulan awal membangun MCP baca backend digeser jadi audit kepatuhan.",
+      "kata_kunci": [
+        "kepatuhan",
+        "compliance",
+        "Peraturan Perusahaan",
+        "ADR 0071",
+        "peta kepatuhan",
+        "penyimpangan",
+        "BUSINESS_LOGIC_IMPLEMENTATION",
+        "payroll config",
+        "Pasal 20",
+        "audit aturan"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -6779,6 +6814,44 @@
         "has_program",
         "periode bulanan",
         "KPI"
+      ]
+    },
+    {
+      "path": "Human Resource Information System/HRIS - Kepatuhan Peraturan Perusahaan.md",
+      "judul": "HRIS - Kepatuhan Peraturan Perusahaan",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "**Peta terisi untuk potongan kehadiran, keterlambatan, dan sanksi; cuti dan lembur baru sebagian.** Diukur ke kode dan ke produksi 2026-09-01. Bukan hasil pembacaan menyeluruh atas seluruh pasal.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan",
+        "Microservices - Payroll Service",
+        "Microservices - Attendance Service",
+        "Microservices - Employee Service",
+        "Microservices - Vault MCP Service",
+        "HRIS - Disciplinary (Surat Peringatan)",
+        "HRIS - Payroll",
+        "HRIS - Attendance System",
+        "HRIS - Overtime",
+        "HRIS - Leave Request",
+        "HRIS - Compensation & Benefits",
+        "ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak"
+      ],
+      "hash": "9992d460eebfe5c3f5a8b362cf99b41e15c2b367836d51624e77d1396f961b02",
+      "ukuran_kb": 12.3,
+      "ringkasan": "Menjawab: pasal mana dari Peraturan Perusahaan yang benar-benar dijalankan sistem, di mana nilainya tinggal (konstanta Go, config yang disunting HR dari layar, atau master data per karyawan), berapa nilainya di produksi, dan di titik mana sistem menyimpang dari aturan. Memuat peta per area: potongan kehadiran dan mangkir (Pasal 20), ambang keterlambatan dan pengunduran diri (Pasal 19), sanksi SP sampai denda (Pasal 53-56), cuti dan izin (Pasal 15-18), serta lembur (Pasal 25), lengkap dengan dampak rupiah yang sudah terukur. Berguna saat HRD atau manajemen bertanya berapa potongan yang sebenarnya diterapkan sistem, atau saat perlu tahu aturan mana yang belum punya implementasi sama sekali.",
+      "kata_kunci": [
+        "kepatuhan",
+        "compliance",
+        "Peraturan Perusahaan",
+        "potongan kehadiran",
+        "attendance deduction",
+        "mangkir",
+        "alpha_multiplier_one_day",
+        "surat peringatan",
+        "cuti",
+        "lembur"
       ]
     },
     {
@@ -10922,6 +10995,35 @@
         "SKU",
         "sync gagal",
         "i18n"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Kepatuhan Peraturan Perusahaan.md",
+      "judul": "ANALISA - Kepatuhan Peraturan Perusahaan",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan",
+        "HRIS - Kepatuhan Peraturan Perusahaan",
+        "HRIS - Disciplinary (Surat Peringatan)"
+      ],
+      "hash": "52682ff34e3c24c3db274374fd8d26770f8f31007899fedebbdc5a157b740da4",
+      "ukuran_kb": 5.7,
+      "ringkasan": "Papan kerja hasil /analisa-kebutuhan 2026-09-01 yang menjawab: tindak lanjut apa saja yang harus dikerjakan setelah audit kepatuhan, mana yang keputusan orang dan bukan task kode, serta urutan prioritasnya. Memuat sembilan task (T1 sampai T9): konfirmasi HRD soal pengali mangkir sehari (2 versus 1,5) yang memblokir perbaikan config produksi selagi payroll run masih draft, penerbitan ADR untuk dua penyimpangan sadar (ambang 4 jam uang makan dan SP1 yang hanya diusulkan), verifikasi ulang baris cuti dan ambang keterlambatan, klarifikasi perusahaan acuan payroll, sampai aturan lembur Pasal 25. Juga mencatat kenapa usulan MCP baca kode backend dan MCP baca data ERP tidak jadi dikerjakan.",
+      "kata_kunci": [
+        "analisa kebutuhan",
+        "kepatuhan",
+        "Peraturan Perusahaan",
+        "pengali mangkir",
+        "alpha_multiplier_one_day",
+        "payroll run draft",
+        "ADR penyimpangan",
+        "MCP backend",
+        "tindak lanjut",
+        "audit kepatuhan"
       ]
     },
     {
