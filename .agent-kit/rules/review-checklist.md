@@ -116,6 +116,16 @@ kategori baru:
 
 - **Read-check-write tanpa unique index.** `FindOne` lalu `InsertOne` tanpa indeks unik =
   duplikat saat permintaan paralel. Tangani duplicate-key error dan retry.
+- ⛔ **Field KUNCI di `$set` DAN `$setOnInsert` sekaligus → upsert SELALU gagal.** MongoDB
+  menolak field yang sama di dua operator update: *"Updating the path '<f>' would create a
+  conflict at '<f>'"*, jadi **setiap** tulis balas 500 — bukan kasus tepi, melainkan jalur
+  utamanya. Gejalanya menipu: kompilasi hijau, unit test hijau, karena tak satu pun test
+  melewati `UpdateOne` (jalur galat validasi berhenti sebelum menyentuh Mongo). Yang
+  mengekspos hanya **simpan sungguhan lewat gateway** (gerbang `/wrap` 5a). Field kunci
+  taruh **HANYA di `$setOnInsert` (+ filter)**, bukan `$set` — pada insert di-seed sekali,
+  pada update tak boleh berubah. Ujilah tanpa Mongo: **ekstrak penyusun dokumen update ke
+  fungsi murni**, lalu pastikan **`$set` ∩ `$setOnInsert` = ∅**. Terjadi 2026-09-01 di
+  opname perlengkapan (`periode` ada di keduanya; fix `opnameUpsert` + test overlap).
 - ⛔ **Indeks unik atas field ber-`omitempty` WAJIB parsial.** Field bertanda `omitempty`
   tidak disimpan sama sekali ketika bernilai kosong, dan MongoDB memperlakukan seluruh
   dokumen yang kehilangan field itu sebagai **satu nilai null yang sama**. Indeks unik
