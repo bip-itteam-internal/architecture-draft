@@ -349,9 +349,59 @@ Pembuatan periode **idempoten lewat index unik** `(form_id, period_key)`, bukan 
 > [!warning] `period_key` kosong tidak sama dengan field yang hilang
 > Jawaban yang tersimpan sebelum fitur ini tak punya `period_key` sama sekali (`omitempty`), dan di Mongo `{period_key: ""}` **tidak cocok** dengan dokumen yang field-nya hilang. Setiap pencocokan wajib lewat `periodQuery` (yang memakai `$in: ["", null]`), bukan perbandingan langsung. Tanpa itu penjaga duplikat dan `single_response` diam-diam berhenti bekerja pada **seluruh form lama**. Ini pola yang sama persis dengan `subjectQuery`, dan alasannya sama.
 
+### Rentang mati: antara periode tutup dan periode berikutnya buka
+
+> Status: 🟡 **Kode selesai di branch `feat/form-builder-periode-terbuka` (bip-erp), BELUM di-PR, BELUM merge, BELUM deploy** per 2026-09-01. Yang dijelaskan di bawah adalah perilaku setelah branch itu naik; **produksi hari ini masih berperilaku lama**. Sebelum ini rentang tersebut **tak pernah dinamai di mana pun**, dan seluruh kelas bug di bawah hidup di dalamnya.
+
+Jendela sebuah putaran berakhir di **ujung bulan**, sedangkan putaran berikutnya baru buka pada **`open_day`**. Untuk `open_day: 27` itu menyisakan **26 hari sebulan** ketika form berulang tidak punya periode yang sedang menerima jawaban sama sekali. Rentang itulah yang disebut **rentang mati**.
+
+Yang membuatnya berbahaya: `periodKeyFor` menurunkan penanda periode dari **bulan kalender**, jadi penandanya berpindah `2026-08` → `2026-09` tepat tengah malam tanggal 1, sementara `windowFor` baru menyatakan `active` pada tanggal 27. Keduanya sama persis **hanya bila `open_day` bernilai 1**. `windowFor` mengembalikan `active`, tetapi 13 dari 15 pemanggilnya membuangnya dengan `_` sehingga yang tersisa cuma penandanya.
+
+Akibatnya di produksi 2026-09-01, pada tiga form berulang ber-`open_day` 25 dan 27:
+
+- **Form muncul kembali sebagai "belum diisi"** bagi orang yang sudah menuntaskan Agustus, karena jawaban berpenanda `2026-08` berhenti cocok dengan penanda hari itu. Hitungan `subject_done` ikut balik ke nol, jadi layarnya terbaca sebagai putaran baru yang sah.
+- **162 jawaban dari 38 pengisi masuk sebagai putaran September**, 25 hari sebelum putaran itu dibuka. Seluruh 38 orang itu sudah mengisi Agustus.
+- Karena ketiga form ber-`single_response: true` dan periode ikut jadi kunci keunikan, ke-38 orang itu justru **terkunci** dari putaran yang sebenarnya.
+
+Tak ada satu pun galat di mana pun. Nilai baliknya sah menurut tipenya, cuma milik putaran yang salah.
+
+**Aturan yang berlaku sekarang**: pada rentang mati sebuah form berulang **tidak punya periode berjalan**. Konsekuensinya:
+
+| Permukaan | Perilaku di rentang mati |
+|---|---|
+| `GET /me/forms` | form **tidak muncul** sama sekali |
+| `POST /me/forms/:id/responses` | **`409`**, pesannya menyebut tanggal buka |
+| `POST /me/forms/:id/uploads` | **`409`** sama, ditolak sebelum berkas naik ke file-service |
+| `GET /me/kaizen` | `has_program: false` |
+| cron `ensurePeriod` | tidak membuat dokumen periode (sudah begitu sejak awal) |
+| gerbang presensi | tidak menahan siapa pun (sudah begitu sejak awal) |
+
+⛔ **Konsekuensi yang diterima sadar**: orang yang belum mengisi putaran lalu **tidak bisa menyusul** selama rentang mati. Jendela memang berakhir di ujung bulan, tetapi aturan itu selama ini tak pernah ditegakkan, jadi secara pengalaman ini pengetatan.
+
+**Tiga pertanyaan yang dulu tertukar, kini punya nama masing-masing** (`services/form-builder/periode_terbuka.go`, satu-satunya berkas yang boleh memanggil `windowFor`):
+
+| Fungsi | Menjawab |
+|---|---|
+| `periodeTerbuka` | boleh menerima jawaban sekarang? **gerbang** |
+| `batasPeriode` | awal/akhir putaran, dipanggil **sesudah** gerbang lolos |
+| `periodeTampilanBawaan` | putaran mana yang **ditampilkan** bila `?period=` kosong (papan & metrik Kaizen) |
+
+`periodeTerbuka` mengembalikan penanda **kosong** saat rentang mati, dan kosong sudah punya arti lain (`periodQuery` membacanya sebagai "dokumen tanpa `period_key`", yaitu jawaban form biasa dan seluruh jawaban pra-fitur). Karena itu pemanggil **wajib** memeriksa nilai `terbuka`, dan yang menegakkannya **penjaga pemindai sumber** `periode_guard_test.go`: pemanggil `windowFor` baru di luar daftar izin membuat test merah. Bentuk penjaga yang sama dipakai `kpi_departemen_query_guard_test.go` di employee-service.
+
+> [!warning] Bug yang sama sudah berjalan sejak Agustus, dan datanya SENGAJA tidak dihapus
+> Skrip pembersihan yang memakai kriteria "dikirim sebelum putarannya buka" menjaring **1728** jawaban, bukan 162: **1093 dari 1212** jawaban Pelayanan Tim Security dan **473 dari 633** Pelayanan Tim Office Boy juga masuk sebelum tanggal 27.
+>
+> Jawaban-jawaban itu sudah jadi data Agustus, sudah masuk rekap dan indeks layanan, dan sudah dianggap selesai oleh pengisinya. Yang benar-benar perlu dibereskan hanya putaran yang **belum dibuka**, sebab hanya di sana jawaban dini menghalangi orangnya mengisi saat putaran asli buka. Untuk putaran yang sudah lewat tak ada lagi yang bisa dihalangi.
+>
+> **Apakah data Agustus yang 90% terkumpul di luar jendela resminya masih sah dipakai menilai orang adalah pertanyaan pemilik proses, dan belum dijawab.** Bila jawabannya "tidak sah", pekerjaannya bukan menghapus melainkan memutuskan ulang bagaimana indeks layanan Agustus dihitung.
+
 ### Gerbang presensi memakai jendela periode
 
 Form berulang memakai jendela **periode berjalan**, bukan `start_date`/`end_date` statis. Tanggal statis hanya masuk akal untuk form sekali jalan: pada survei bulanan ia akan lewat setelah bulan pertama dan gerbangnya tak pernah menyala lagi, padahal formnya justru terbit ulang tiap bulan. Form biasa jatuh ke perilaku lama persis.
+
+⛔ **`blocks_attendance` sempat menjawab BERBEDA dari gerbang yang sesungguhnya.** `pendingForms` (yang benar-benar menolak clock-in) memakai `gateActiveForForm`, sedangkan **kedua permukaan klien** memakai `gateActiveAt` yang hanya membaca tanggal statis. Untuk form berulang tanggal itu kedaluwarsa setelah putaran pertama, jadi keduanya melaporkan "tidak menahan" selamanya sementara gerbangnya terus menyala tiap putaran: orangnya ditolak absen **tanpa satu pun peringatan di layar**, dan tanpa galat di mana pun.
+
+Ketiga form berulang di prod ber-`end_date` 31 Agustus 2026 dengan `open_day` 25 dan 27, jadi kesalahan ini akan terlihat pada putaran 25-30 September. Diperbaiki di branch `feat/form-builder-periode-terbuka` 2026-09-01 (BELUM merge, BELUM deploy): kedua permukaan kini lewat **`menahanPresensi`** (`compliance.go`), satu fungsi yang bertetangga dengan `gateActiveForForm` supaya jawabannya tak bisa lagi menyimpang. Yang terdampak `GET /me/forms` **dan** `GET /me/kaizen`; permukaan kedua itu justru yang paling merugikan, sebab kartu Kaizen sengaja dikeluarkan dari daftar survei MyBharata sehingga field itulah satu-satunya petunjuk yang tersisa bagi orang yang tertahan.
 
 ### Menyalakan pengulangan setelah ada jawaban DILARANG
 
@@ -652,10 +702,10 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 - **Upload file** belum didukung (menyusul via [[Microservices - File Service]], cap 4 MB).
 - **Logika percabangan** (lompat seksi berdasarkan jawaban) belum ada.
 
-> [!warning] `FormPeriod.Fields` ditulis tapi TIDAK PERNAH dibaca
-> Snapshot pertanyaan per periode dibuat `ensurePeriod` dan didokumentasikan di kodenya sebagai penjaga keabsahan pembanding antar-bulan, dengan janji "pemilik form boleh menyunting pertanyaan kapan saja, dan perubahannya berlaku mulai periode BERIKUTNYA".
+> [!warning] ⛔ CATATAN INI SUDAH BASI, dipertahankan karena isi selebihnya masih berlaku
+> Judul lamanya "`FormPeriod.Fields` ditulis tapi TIDAK PERNAH dibaca" **tidak lagi benar** (diperiksa ulang ke kode 2026-09-01). `effectiveFields` (`period_fields.go`) sudah menjadi penopang beban dan dibaca `listMyForms`, `GET /me/kaizen`, serta seluruh jalur laporan/keputusan (`laporan_handlers.go`, `laporan_decision.go`); koleksi `Collections.Periods` dibaca lewat `findPeriod`, `loadActivePeriods`, dan `loadPeriodsByRef`. Snapshotnya **tidak** lagi menganggur.
 >
-> **Janji itu tidak ditepati siapa pun.** Jalur pengisian menyajikan dan memvalidasi dari `form.Fields`, bukan dari snapshot; pencarian `Collections.Periods` menunjukkan koleksi itu hanya ditulis (`period_store.go`, `cron.go`) dan tak pernah dibaca oleh handler mana pun. Snapshotnya menganggur.
+> Yang **masih berlaku** dari catatan ini adalah paragraf tentang kunci `409` di `updateForm` dan tentang jalur KETIGA (analisa & export), jadi seluruh blok dipertahankan alih-alih dihapus. Snapshot pertanyaan per periode dibuat `ensurePeriod`, dengan janji "pemilik form boleh menyunting pertanyaan kapan saja, dan perubahannya berlaku mulai periode BERIKUTNYA".
 >
 > Yang benar-benar menjaga konsistensi adalah kunci `409` di `updateForm`, dan kunci itu **tidak memedulikan apakah form berulang**: begitu ada satu jawaban masuk, susunan pertanyaan terkunci selamanya. Untuk survei bulanan yang hidup bertahun-tahun, artinya pemiliknya tak akan pernah bisa memperbaiki satu pun pertanyaan.
 >
@@ -666,7 +716,7 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 > Batas yang tersisa: `?period=` kosong berarti rekap **seluruh** periode, dan di sana memang tak ada satu susunan pertanyaan yang benar karena jawabannya bisa berasal dari beberapa susunan berbeda. Yang dipakai adalah susunan terbaru milik form.
 
 - **Kuartalan dan tahunan belum ada** pada form berulang, sengaja: belum ada kasus nyatanya, dan menambahkannya sekarang berarti menebak bentuk yang benar.
-- **Kiriman sebelum `open_day` tetap diterima.** `windowFor` mengembalikan `active=false` sebelum hari buka, tapi `submitResponse` **membuang** nilai itu dan hanya memakai penandanya, sehingga jawaban yang masuk lebih awal tetap tersimpan atas periode berjalan. Gerbang presensi justru menghormati `active` lewat `gateActiveForForm`. Jadi pada rentang itu form belum menahan siapa pun tapi sudah bisa diisi. Belum tentu salah (survei yang dibuka lebih awal tidak merugikan), tapi ketidaksamaan kedua jalur ini **belum pernah diputuskan**, cuma terjadi.
+- ✅ **Kiriman sebelum `open_day` kini DITOLAK `409`.** Butir ini sebelumnya berbunyi "tetap diterima ... belum tentu salah ... belum pernah diputuskan, cuma terjadi". Kesimpulan itu terbantah di produksi 2026-09-01; keputusannya kini diambil dan dibalik. Rinciannya di [[#Rentang mati: antara periode tutup dan periode berikutnya buka]].
 - **Jumlah PENGISI tidak dihitung otomatis.** Untuk `audience` bertipe `all`/`departments`, penyebut tingkat pengisian tetap memakai `audience.estimated_size` yang diisi manual pembuat form. Bila kosong, tingkat pengisian **tidak dilaporkan** (menampilkan 0% lebih menyesatkan daripada tak menampilkan apa pun). Berbeda dari `subject`, yang JUSTRU di-resolve otomatis dari employee-service saat terbit — sumbu yang dinilai butuh nama dan jabatan, sedangkan sumbu pengisi cukup dicocokkan dari header.
 - **Agregasi dibatasi 20.000 jawaban.** Bila terlampaui, total sebenarnya tetap dilaporkan dan hasil ditandai `truncated` + `sample_size`, sedangkan tingkat pengisian disembunyikan. Export menandai lewat header `X-Export-Truncated`.
 - **`attendance_gate.start_date`/`end_date` hanya menerima RFC3339** (mis. `2026-08-01T00:00:00Z`); kiriman `"2026-08-01"` akan ditolak dengan pesan parse JSON yang tidak informatif. Perlu dibereskan saat FE dibangun.

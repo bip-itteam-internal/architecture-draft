@@ -100,12 +100,12 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/me/capability` | `{can_manage, can_write, can_manage_type_rules, departments[], form_types_by_department{}}` — apa yang boleh dilakukan pemanggil di Form Builder. `can_write` lahir bersama katalog izin (PR [#1138](https://github.com/bip-itteam-internal/bip-erp/pull/1138), merged & live di dev **dan prod** 2026-08-10): pemegang paket "Lihat" membuka layarnya (`can_manage`) tapi tak boleh membuat atau menyunting form (`can_write`). Selama fase satu nilainya selalu sama dengan `can_manage` |
-| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `form_type`, `submitted`, `blocks_attendance`, `gate_end_date`). Form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous`. Pada form berulang, `submitted` dihitung terhadap **periode berjalan**, bukan seumur hidup form |
+| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `form_type`, `submitted`, `blocks_attendance`, `gate_end_date`). Form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous`. Pada form berulang, `submitted` dihitung terhadap **periode berjalan**, dan form yang putarannya **belum buka tidak muncul sama sekali** |
 | GET | `/me/forms/:id/subjects` | Daftar orang yang harus DINILAI pemanggil + `progress{done,total,anonymous}`. `409` bila form tak menilai siapa pun |
-| POST | `/me/forms/:id/responses` | Kirim jawaban (+`subject_employee_id` untuk form penilaian). `403` bila bukan sasaran atau menilai orang di luar daftar, `409` bila form tak `published` atau orang itu sudah dinilai. Balas `subject_done`, `subject_total`, `all_completed` |
+| POST | `/me/forms/:id/responses` | Kirim jawaban (+`subject_employee_id` untuk form penilaian). `403` bila bukan sasaran atau menilai orang di luar daftar, `409` bila form tak `published`, orang itu sudah dinilai, **atau putaran form berulang belum dibuka**. Balas `subject_done`, `subject_total`, `all_completed` |
 | GET | `/me/responses` | Riwayat jawaban sendiri |
 | GET | `/me/service-index` | **Indeks layanan sebuah departemen** pada satu bulan. `?department=` dan `?period=YYYY-MM` **keduanya wajib**. Balas `{has_form, form_id, title, department, period_key, index, scored_questions, respondents, audience_size, coverage_pct, aspects[], unweighted[]}` |
-| POST | `/me/forms/:id/uploads` | Unggah satu lampiran (**multipart**, field `file` + `field_key`). `201` membalas `{file_name, size, upload_id}`. Cap 4 MB milik file-service; `413` bila lewat |
+| POST | `/me/forms/:id/uploads` | Unggah satu lampiran (**multipart**, field `file` + `field_key`). `201` membalas `{file_name, size, upload_id}`. Cap 4 MB milik file-service; `413` bila lewat. **`409` bila putaran form berulang belum dibuka**, diperiksa SEBELUM berkasnya naik supaya tak meninggalkan objek yatim |
 | GET | `/me/uploads/:uploadId/preview` | Presigned URL lampiran sendiri. `404` untuk id yang bukan miliknya |
 | GET | `/forms/:id/uploads/:uploadId/preview` | Idem untuk **pengelola form** (grup `/forms`, digerbang `requireFormManager`) |
 
@@ -131,7 +131,7 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/me/kaizen` | Program berjalan untuk pemanggil: `{has_program, form_id, title, description, fields, progress, board_visible}`. `progress` = `{quota, submitted, fulfilled, period_key, opens_at, closes_at}` |
+| GET | `/me/kaizen` | Program berjalan untuk pemanggil: `{has_program, form_id, title, description, fields, progress, board_visible}`. `progress` = `{quota, submitted, fulfilled, period_key, opens_at, closes_at}`. Membalas `has_program: false` bila **putarannya belum buka**, sama seperti keadaan "belum ada program": kuota tak boleh mulai menagih sebelum putarannya dibuka |
 | GET | `/me/kaizen/ideas` | Riwayat ide sendiri **lintas periode**, terbaru dulu. `?period=`, `?page=`, `?limit=` maks **50**. Balas `{data[{id,period_key,submitted_at,answers,decision}], total, page, limit, fields}` |
 | GET | `/me/kaizen/board` | Papan ide publik: `{data[{id,employee_name,department,status,submitted_at,answers}], period_key}`. `?period=` (default periode berjalan), maks **100** kartu |
 | GET | `/me/kaizen/committee` | Program mana yang boleh ditinjau pemanggil: `{is_committee, form_id, title, period_key, can_manage_form}`. Bukan komite dibalas `{is_committee:false}`, **bukan `403`** |
@@ -145,6 +145,8 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 > **Papan menyaring dengan DAFTAR IZIN tipe field**, bukan daftar larangan. Papan dibaca seluruh karyawan, jadi tipe pertanyaan yang ditambahkan nanti (lampiran berkas, yang nilainya cuma id unggahan) tersembunyi secara bawaan sampai seseorang sengaja mengizinkannya. Daftar larangan bekerja sebaliknya: tipe baru bocor lebih dulu, ketahuan setelah tampil di depan sekantor. Ide yang masih ditinjau maupun yang ditolak **tak pernah** muncul; papan juga kosong bila `board_visible:false`.
 
 > ✅ **`/me/kaizen` ikut membawa `blocks_attendance` dan `gate_end_date`** sejak PR [#1039](https://github.com/bip-itteam-internal/bip-erp/pull/1039), memakai perhitungan yang sama persis dengan `/me/forms`. Perlu karena form Kaizen dikeluarkan dari daftar survei di mobile: tanpanya, karyawan yang tertahan saat clock-in tak punya satu pun petunjuk di layar.
+>
+> ⚠️ **"Sama persis" itu sempat tidak benar.** Kedua permukaan memang memakai ekspresi yang sama, tapi ekspresi itu **salah untuk form berulang**: ia membaca `start_date`/`end_date` statis lewat `gateActiveAt`, sedangkan gerbang yang benar-benar menahan clock-in memakai jendela periode lewat `gateActiveForForm`. Untuk form berulang tanggal statisnya kedaluwarsa setelah putaran pertama, jadi keduanya melaporkan `false` selamanya sementara gerbangnya terus menyala tiap putaran. Diperbaiki di branch `feat/form-builder-periode-terbuka` 2026-09-01 (BELUM merge, BELUM deploy): keduanya kini lewat satu fungsi `menahanPresensi`. Latar lengkap di [[Microservices - Form Builder Service]] §Gerbang presensi memakai jendela periode.
 
 ## Kaizen (komite program ide bulanan)
 

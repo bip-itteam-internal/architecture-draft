@@ -221,20 +221,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "910c516fc08acc935db30f4edb7e0c972e9106e6176d3fcd53bad6753631f581",
-      "ukuran_kb": 37.6,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service untuk membuat, menerbitkan, mengisi, menganalisa, dan mengekspor form dinamis, serta siapa yang berhak mengelolanya (RBAC per departemen, bukan modul). Merinci rute penilaian karyawan, aturan tipe form per departemen (khusus IT), template form reusable, program Culture, Kaizen, indeks layanan departemen, endpoint internal kepatuhan presensi, dan gerbang RBAC tiap grup rute.",
+      "hash": "fd176106e63e7b14ece6aaa1c7ff99fed012e288d2916430066afcd4f1c461e7",
+      "ukuran_kb": 38.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service dan aturan aksesnya, mulai dari kelola form per departemen, aturan tipe form, template, pengisian lewat /me/*, sampai analisa, export, dan rute Kaizen. Juga menjawab kapan sebuah permintaan dibalas 403, 409, atau 413, termasuk penolakan baru saat putaran form berulang belum dibuka, dan bagaimana ?period= berbeda artinya antara analisa, penjaga duplikat, dan indeks layanan.",
       "kata_kunci": [
         "form builder",
-        "form dinamis",
         "endpoint",
-        "RBAC per departemen",
-        "tipe form",
+        "form berulang",
+        "recurrence",
+        "period_key",
         "kaizen",
-        "template form",
-        "culture program",
-        "penilaian karyawan",
-        "analisa export"
+        "indeks layanan",
+        "metric_key",
+        "gerbang presensi",
+        "blocks_attendance"
       ]
     },
     {
@@ -2112,20 +2112,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "5462111c564b292d3f18a34f5b24748a5456e5a8e0f10ea6fd90e18cea054278",
-      "ukuran_kb": 99.0,
-      "ringkasan": "Menjawab: bagaimana form builder membuat form tanpa coding (10 tipe pertanyaan, 4 tipe form), bagaimana kepemilikan form ditentukan per departemen (bukan modul), dan bagaimana satu endpoint kepatuhan menahan clock-in mobile bila ada form wajib belum diisi. Menjelaskan pula penilaian karyawan lain lewat sumbu subject, form berulang per periode, program Kaizen, modul Kelola Program Culture, template reusable, lampiran berkas, notifikasi inbox, dan status deploy dev/prod tiap fitur.",
+      "hash": "e743433d7eb3008267a814279a2dece5094f751baa1318ab89f371e2c02c0a1c",
+      "ukuran_kb": 105.0,
+      "ringkasan": "Menjawab: bagaimana form dinamis dibuat, dimiliki per departemen, diisi, dinilai, dan dianalisa di bip-erp, termasuk penilaian karyawan lain lewat sumbu subject, skor gabungan, indeks layanan departemen, dan program Kaizen. Menjelaskan cara kerja form berulang secara rinci: penanda periode bulanan dan mingguan, cron pembuka periode, snapshot pertanyaan per periode, dan rentang mati antara periode tutup dan periode berikutnya buka yang membuat form sempat menagih ulang orang yang sudah mengisi. Juga memuat keputusan yang menjaga presensi tetap hidup serta daftar gap dan gotcha yang sudah terbukti menggigit.",
       "kata_kunci": [
-        "form builder service",
-        "form dinamis",
-        "tipe pertanyaan",
+        "form builder",
         "form berulang",
-        "recurrence",
+        "rentang mati",
+        "open_day",
+        "periode",
         "kaizen",
-        "culture program",
-        "kepemilikan departemen",
         "gerbang presensi",
-        "notifikasi inbox"
+        "attendance gate",
+        "penilaian karyawan",
+        "indeks layanan"
       ]
     },
     {
