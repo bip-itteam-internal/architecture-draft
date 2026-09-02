@@ -179,6 +179,37 @@ Daftar pasangan yang ditulis tangan sengaja **tidak** dipakai sebagai penjaga: d
 
 **Temuan sampingan yang dibuka jaring itu**: `kinerja_affiliate_tim` ternyata sudah lama memakai label DAN keterangan milik `kinerja_affiliate` untuk `conversion` dan `affiliate_aktif` — kalimat "lewat akun **karyawan**" dan "**milik** karyawan" untuk metrik yang menilai satu tim channel, tempat semua staf di channel yang sama bernilai sama. Perbaikan `conversion` di erp-frontend [#1267](https://github.com/bip-itteam-internal/erp-frontend/pull/1267) menambahkan entri untuk `kinerja_live` dan melewatkan sumber tim ini. Kini keduanya punya entri sendiri (`mtkConversionTim`, `mtkAffiliateAktifTim`). **Perbaikan yang menutup satu tabrakan tidak menutup saudaranya** — itu pola yang sama dengan `SupervisedDepartments` yang harus diperbaiki dua kali dalam sehari.
 
+### ⛔ Bentuk KEEMPAT: kamusnya benar, PEMANGGILNYA yang tidak mengirim sumber
+
+> Ditemukan 2026-09-01 di `blueprint/kpi-scorecard.tsx` (erp-frontend branch
+> `feat/kpi-scorecard-asal-data-rincian`, **belum merge**). Sudah diperbaiki di branch itu.
+
+Ketiga bentuk sebelumnya soal **isi kamus**: entri yang belum ditulis, atau entri yang
+dipakai bersama. Bentuk ini berbeda dan lebih senyap, sebab kamusnya sudah benar sejak awal.
+`infoMetrik(token, sumber?)` menerima sumber sebagai argumen **opsional**, dan panel detail
+metrik di scorecard memanggilnya `infoMetrik(m.metrikNama)` tanpa sumber, padahal ia
+memegang `m.sumberNama` di variabel sebelahnya.
+
+Akibatnya entri `METRIK_PER_SUMBER` tak pernah dicari, dan **sembilan** pasangan jatuh ke
+entri umum yang kalimatnya salah untuk metrik yang sedang dibaca:
+
+`insentif_profit|retur_persen` · `insentif_profit|roas` · `insentif_profit|roas_bersih` ·
+`kinerja_live|conversion` · `kinerja_live|conversion_rate` · `kinerja_live|add_to_cart_rate` ·
+`kinerja_live|avg_viewing_duration` · `kinerja_affiliate_tim|conversion` ·
+`kinerja_affiliate_tim|affiliate_aktif`
+
+⚠️ **Kedua penegak yang ditulis 2026-08-31 tidak bisa menangkap ini**, dan itu bukan
+kelalaian melainkan batas rancangannya: `bedakanLabelKembar` bekerja pada **daftar opsi
+pemilih sumber** (layar Atur Target), sedangkan `pasanganKhususSumber()` memeriksa **isi
+kamus**. Tidak ada di antara keduanya yang melihat **titik panggil** di layar lain. Penjaga
+suite karena itu tetap hijau sementara layar menerangkan metrik yang salah, persis seperti
+tiga kali sebelumnya, dan lagi-lagi ketahuan dari layar.
+
+**Aturannya**: tiap pemanggil `infoMetrik` yang **tahu** sumbernya WAJIB mengirimkannya.
+Argumen opsional itu ada untuk pemanggil yang benar-benar tak punya sumbernya, bukan sebagai
+kemudahan. Bila sebuah layar memegang `auto_sumber` dan `auto_metrik` berdampingan, tidak
+ada alasan sah untuk mengirim salah satunya saja.
+
 ## Cara memeriksa
 
 1. **Di layar, bukan di editor.** Buka pemilih Sumber data dan pastikan tak ada label yang terpotong dan tak ada opsi tanpa baris kedua.

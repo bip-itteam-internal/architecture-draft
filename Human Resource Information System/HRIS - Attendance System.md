@@ -42,6 +42,32 @@ Ini adalah fitur yang terikat dan dimiliki oleh HRIS untuk attendance
 		- Periode yang **kosong atau tak terurai** berarti bulan berjalan, dan itu kontrak, bukan kelalaian: backend selalu naik lebih dulu daripada frontend. Periode di **masa depan** juga jatuh ke bulan berjalan alih-alih dibalas 400 — daftar bulan di layar tak menawarkannya, jadi nilai semacam itu hanya datang dari URL rakitan tangan, sementara kartu berisi "-" terbaca sebagai layar yang rusak.
 		- ⛔ **Jangan memakai `rentangPeriodeTelat` (`late_recap.go`) untuk kartu ini.** Ia menerima bentuk masukan yang sama persis (`YYYY-MM`) dan namanya terdengar tepat, tetapi mengembalikan batas **siklus payroll 26→25**; kartu kehadiran konsep **kalender**. Memakainya menghasilkan kartu berlabel "Juni" yang menghitung 26 Mei–25 Juni: tak ada galat, angkanya masuk akal, dan salah.
 		- Tiga kartu lain (Tanpa Keterangan, Terlambat, Hari Kerja) ikut berganti angka mengikuti bulan yang sama, tetapi **belum menyebut periodenya sendiri** di judul.
+
+	### Kartu Terlambat bersumber BUKU TAMU, bukan status entri
+
+	> 🔜 **Belum live.** bip-erp [#1614](https://github.com/bip-itteam-internal/bip-erp/pull/1614) dan erp-frontend [#1380](https://github.com/bip-itteam-internal/erp-frontend/pull/1380) masih OPEN dan belum di-deploy. Sampai keduanya merge, yang berlaku adalah perilaku lama: kartu Terlambat = cacah status `Terlambat`, dan persentase = `Hadir / HariKerja`.
+
+	Keterlambatan yang dihitung kartu ini adalah yang **dilaporkan ke pos security**, bukan yang tercatat dari tap karyawan. Sumbernya `guestbook_entries` (`category: "internal"`, `visit_purpose` "Verifikasi Karyawan Terlambat"), dan yang dicacah **kejadian unik** (`full_name` + tanggal WIB), bukan jumlah baris.
+
+	- **Kejadian, bukan baris.** Buku tamu bisa memuat satu kedatangan dua kali; Agustus 2026 punya 22 baris untuk 21 kejadian. Duplikatnya dibereskan di buku tamu, bukan diakali hitungan.
+	- ⛔ **Angkanya JAUH lebih kecil dari cacah status, dan itu disengaja.** Agustus 2026: **21** menurut buku tamu, **77** menurut status, dan hanya **18** entri yang beririsan. Artinya 59 keterlambatan berhenti jadi angka utama. Supaya tak lenyap tanpa jejak, cacah status tetap dikirim sebagai `terlambat_sistem` dan tampil di keterangan kartu ("tercatat sistem: 77").
+	- **Catatan yang harinya berstatus `Izin`/`Dinas` IKUT terhitung**, justru karena tak ada penyilangan status. Agustus 2026 ada tiga, dua di antaranya tap 08:49 dan 08:53 atas jadwal 08:00.
+	- **Angkanya bisa diklik** ke `/hris/guestbook/late-employees?month=MM-YYYY`. Halaman itu kini membaca bulan dari query string; sebelumnya ia selalu membuka bulan berjalan, jadi tautan tanpa bulan akan mendaratkan orang di bulan yang salah tanpa satu pun galat.
+	- ⛔ **Kartu ini BUKAN daftar kandidat SP.** Usulan SP1 tetap dihitung `late_recap.go` dari `status = Terlambat` **dan** `late_hour > 0`, atas **siklus payroll 26→25**, bukan dari buku tamu. Jadi kartu bisa menyebut 21 sementara mesin SP melihat 77, dan seorang karyawan bisa 3x menurut kalender tapi terpecah 2 dan 1 menurut siklusnya. Menyamakan keduanya mengubah siapa yang kena sanksi, jadi itu keputusan HR, bukan keputusan teknis.
+
+	### Persentase kehadiran memakai keterlambatan, bukan ketidakhadiran
+
+	> 🔜 Belum live, satu paket dengan PR di atas.
+
+	```
+	Persen = (HariKerja − Terlambat) / HariKerja
+	```
+
+	⚠️ **Ini keputusan pemilik proses, BUKAN bug — jangan "diperbaiki".** Konsekuensinya sudah disampaikan sebelum diputuskan dan diterima: persentase Agustus 2026 **NAIK dari 93,0% ke 99,5%**, karena `Tanpa Keterangan` (284) berhenti ikut mengurangi sementara keterlambatan menurut buku tamu (21) jauh lebih kecil. Kartu "Kehadiran 99,5%" karena itu berdiri tepat di sebelah kartu "Tanpa Keterangan 284".
+
+	Rumus lama `Hadir / HariKerja` sama sekali tidak dipengaruhi angka Terlambat, karena Terlambat ikut dihitung hadir. Yang menentukannya cuma `Tanpa Keterangan`.
+
+	`Persen` tetap `null` (bukan 0) ketika tak ada hari kerja, dan `terlambat` **juga nullable**: `null` berarti agregasi buku tamu gagal, bukan nol keterlambatan. Keduanya tampil sebagai strip di kartu.
 - Mengubah status entri attendance
 - Menambahkan komentar tambahan pada entri attendance
 - Menambahkan dokumen tambahan pada entri attendance
@@ -55,6 +81,12 @@ Fitur tambahan
  - Kita mungkin ingin mempertimbangkan penggunaan lingkungan kerja hybrid/remote, sehingga karyawan perlu melakukan clock-in/out dengan aplikasi mobile di luar jaringan perusahaan
 
 ## Ambang Keterlambatan
+
+> ⚠️ **Ambang di bawah ini menentukan STATUS entri dan usulan SP, BUKAN kartu Terlambat.**
+> Sejak kartu itu bersumber buku tamu security (§Kartu ringkasan), ia tak memakai ambang mana
+> pun: security mencatat keterlambatan sekecil satu menit, dan angkanya tidak disaring
+> `ontime_grace_minutes` maupun `late_hour_threshold_minutes`. Yang tetap memakai ambang ini
+> adalah status `attendance_entries` dan rekap SP di `late_recap.go`.
 
 Presensi mengenal **dua** ambang, bukan satu, dan keduanya bisa disetel per perusahaan
 (`company_attendance_setting`, dibaca `resolveAttendanceRule` di
