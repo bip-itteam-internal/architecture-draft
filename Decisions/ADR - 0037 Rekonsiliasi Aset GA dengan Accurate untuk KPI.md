@@ -42,6 +42,8 @@ Skor dihitung **per item yang staff input**, berbobot **kelengkapan + kebenaran*
 
 Karena "belum ada di Accurate = 100%", akurasi bisa terlihat sempurna padahal cuma sedikit aset yang terekonsiliasi. Maka dashboard **selalu menampilkan dua angka**: **Akurasi** (cocok / aset-yang-punya-padanan → ini yang jadi KPI) **dan Cakupan** (% aset yang punya padanan di Accurate → konteks kejujuran, memicu koordinasi ke Finance). Matrix per-golongan = **rollup** dari ceklis Tab C untuk dashboard kesehatan data level GA.
 
+⚠️ **Amandemen 2026-09-02 — matrix per-golongan → "Ringkasan Cakupan per Jenis".** Karena golongan menjadi vestigial sejak [[ADR - 0049 Padanan Aset per-item berbasis nama menggantikan kategori-golongan]] (praktis hanya satu baris `(tak terpetakan)`), matrix per-golongan diganti ringkasan **2 baris per JENIS**: **Aset Tetap** (Total ERP · Berpadanan · Cakupan **%-target**) dan **Perlengkapan** (Total Accurate · Berpadanan per-unit `accurate_item_no` · Cakupan **INFORMASI**, [[ADR - 0069 Perlengkapan Per-Unit Opsional di inventory dengan Guard Anti-Kontaminasi]]). Cakupan perlengkapan ditandai **info** (bukan target): barang bulk/habis-pakai sengaja tak dipadankan per-unit, jadi % kecil bukan berarti buruk. FE-only, 0 BE baru (pakai `usePerlengkapanStocks` + `usePerlengkapanUnitCount`). Grounded: erp-frontend `reconcile-tab.tsx` (`ringkasanPerJenis`/`terpadanPerlengkapan` di `utils/reconcile.ts`), commit b2411a23.
+
 ### 5. Penempatan (hormati batas service)
 
 - **Data Accurate** tetap milik integration-service (`accurate_fixed_assets` + `/accounting/*`).
