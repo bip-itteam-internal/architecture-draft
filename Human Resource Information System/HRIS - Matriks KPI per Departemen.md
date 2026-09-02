@@ -2,7 +2,7 @@
 
 *Isi lengkap `kpi_template` di **production**: seluruh label metrik, bobot, dan targetnya, dikelompokkan per departemen. Dokumen kerja untuk dev departemen yang akan mengotomatiskan metriknya. Cara mengerjakannya ada di [[RUN - Menambah Metrik KPI Otomatis]]; latar belakang dan analisis kelayakannya di [[HRIS - Otomasi Skor KPI]].*
 
-- **Status**: ⚠️ Salinan setia data production per **2026-08-01**, dengan bab **Tech Development** disegarkan langsung dari `employee_db` prod **2026-08-28** (status arsip template, konfigurasi `auto` yang benar-benar terpasang, dan ketersediaan tiap sumbernya). Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini. **Ralat 2026-08-31**: 18 sel yang menyatakan "TIDAK ADA modul Kaizen" dan 1 sel yang menyatakan "TIDAK ADA modul forecast" **salah** dan sudah diperbaiki — rinciannya di bagian [[#Ralat 2026-08-31 Kaizen dan forecast kas]].
+- **Status**: ⚠️ Salinan setia data production per **2026-08-01**, dengan bab **Tech Development** disegarkan langsung dari `employee_db` prod **2026-08-28** (status arsip template, konfigurasi `auto` yang benar-benar terpasang, dan ketersediaan tiap sumbernya). Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini. **Ralat 2026-08-31**: 18 sel yang menyatakan "TIDAK ADA modul Kaizen" dan 1 sel yang menyatakan "TIDAK ADA modul forecast" **salah** dan sudah diperbaiki — rinciannya di bagian [[#Ralat 2026-08-31 Kaizen dan forecast kas]]. **Segar 2026-09-02**: bab **Recruitment & Onboarding** ditulis ulang dari `employee_db` + `recruitment_db` prod (template aktifnya sudah berganti jadi `Recruitment` dan dua metriknya berbeda dari yang tercatat sebelumnya), sel `PPIC / Inventory Turnover Ratio` diralat karena berisi verdict rekrutmen yang salah tempel, dan baris rekrutmen di `KPI Supervisor HRGA` disegarkan angkanya.
 - **Sumber**: koleksi `kpi_template` di `employee_db` ([[Microservices - Employee Service]]).
 
 ## Cara membaca
@@ -20,14 +20,14 @@ Kolom **Klasifikasi otomasi** per departemen memakai empat kategori dari [[HRIS 
 | Beauty Hacks     |       11 |      30 |       14 |      2 |              0 |      14 | kukuh |
 | Finance          |       11 |      61 |       13 |     17 |              0 |      31 | ozi   |
 | General Affair   |        5 |      24 |        1 |      5 |              1 |      17 | irfan |
-| Human Resource   |        5 |      31 |        7 |      5 |             10 |       9 | irfan |
+| Human Resource   |        5 |      31 |        7 |      6 |              9 |       9 | irfan |
 | Kesekretariatan  |        7 |      28 |        0 |      0 |              0 |      28 | ozi   |
 | Kyura            |        9 |      27 |       16 |      1 |              0 |      10 | kukuh |
 | Manufaktur       |        9 |      52 |        3 |     16 |             16 |      17 | izan  |
 | Procurement      |        2 |      10 |        4 |      2 |              0 |       4 | faiz  |
 | Quality          |        4 |      18 |        1 |      2 |              8 |       7 | faiz  |
 | Tech Development |        7 |      30 |       14 |      9 |              0 |       7 | izan  |
-| **Total**        |   **70** | **311** |   **73** | **59** |         **35** | **144** |       |
+| **Total**        |   **70** | **311** |   **73** | **60** |         **34** | **144** |       |
 
 Dua departemen di `work_data` **tidak muncul di sini karena belum punya template sama sekali**: Percetakan (13 karyawan) dan Marketing Offline Distribution (1 karyawan).
 
@@ -115,6 +115,12 @@ Beberapa baris di bawah memang cacat di datanya, dan sengaja disalin apa adanya 
 - **Label memakai target korporat, bukan metrik personal.** `Revenue 240M`, `Net Income 20%`, `Penurunan HPP 5%` muncul sebagai label di posisi Staff Inventory, Tax Staff, dan QA RND. Metrik sebenarnya ada di deskripsinya.
 - **Template menilai produk departemen lain.** `Kyura / Kyura Supervisor` memuat `Customer Satisfactions untuk Produk Beautyhacks 4,5 dari 5`.
 - **Satu deskripsi memuat tiga angka.** `Kyura Supervisor / Revenue 240M` berbobot 0,6: label menyebut 240M, deskripsinya menyebut profit 546 juta dan omzet 4.090.000.000.
+- **Target pindah dari `description` ke `label`.** Template `Recruitment` (22 Agu 2026) mengisi kelima `description`-nya dengan `Target 100%` yang seragam dan memindahkan kalimat metriknya ke `label`. Aturan baca di [[#Cara membaca]] ("target sebenarnya tersimpan di `description`") karena itu **tidak berlaku universal**, dan template generasi baru lain perlu diperiksa apakah mengikuti pola yang sama.
+
+Cacat pada **dokumen ini sendiri**, bukan pada datanya:
+
+- **Verdict salah tempel antar-departemen.** Sel `PPIC / Inventory Turnover Ratio` berisi verdict rekrutmen sampai diralat 2026-09-02. Kegagalannya senyap karena selnya terbaca wajar bila hanya kolom Rekomendasi yang dibaca, dan dev yang mengikutinya akan menyelidiki modul yang salah. **Saat menyegarkan satu bab, cocokkan isi kolom Sumber dengan label metriknya, jangan hanya menyalin baris.**
+- ⚠️ **Belum diperiksa: kalimat `TIDAK ADA tracker pajak/audit internal/CAPA/izin BPOM` muncul 13 kali** di bab yang saling berjauhan (Beauty Hacks, Finance, Kyura, Manufaktur, Quality, PPIC). Sebagiannya jelas cocok, tetapi `PPIC / Factory Utilization` menerima kalimat itu untuk utilisasi mesin yang tak ada hubungannya dengan pajak maupun BPOM. Belum diukur ulang, jadi **jangan dipercaya sebelum diverifikasi**; kemungkinan besar ia kalimat cadangan yang tersebar terlalu luas, sekelas dengan salah tempel di atas.
 
 ## Cara memperbarui dokumen ini
 
@@ -591,7 +597,9 @@ Template `Security Team`, 4 metrik.
 
 ## Human Resource
 
-5 template, 31 metrik. Klasifikasi otomasi: **7 / 5 / 10 / 9**.
+5 template, 31 metrik. Klasifikasi otomasi: **7 / 6 / 9 / 9** (sebelum 2026-09-02 tertulis
+7 / 5 / 10 / 9; satu metrik Recruitment & Onboarding berpindah dari *terblokir data* ke
+*butuh definisi*, penjelasannya di bab posisi itu).
 
 ### Culture & Industrial
 
@@ -614,7 +622,7 @@ Template `KPI Supervisor HRGA`, 10 metrik.
 
 | Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
-| 0.15 | `Revenue 240 Miliar` | Menjamin ketersediaan tenaga kerja dengan rata-rata time recruitment <30 hari untuk posisi kritikal | Modul Recruitment ADA tapi koleksi candidate KOSONG (job_requisition 2, job_posting 1). | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu rekrutmen sudah ada, hanya data pelamarnya belum diisi. |
+| 0.15 | `Revenue 240 Miliar` | Menjamin ketersediaan tenaga kerja dengan rata-rata time recruitment <30 hari untuk posisi kritikal | **Disegarkan 2026-09-02.** Modul Recruitment ada tapi koleksi `candidate` **belum pernah terbentuk**; `job_requisition` kini **6** dan `job_posting` **1** (angka lama di dokumen ini, 2 dan 1, sudah basi). Kabar baiknya "posisi kritikal" sudah punya penandanya di sistem: `manpower_plan.is_kritikal` (3 baris tahun 2026, 1 di antaranya kritikal). Batasnya sama persis dengan metrik `Time to Fulfilment Rate` di [[#Recruitment & Onboarding]]: ujung "terpenuhi" belum tercatat di mana pun. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu rekrutmen sudah ada, hanya data pelamarnya belum diisi. Metrik ini dan `Time to Fulfilment Rate` milik staf mengukur hal yang sama dengan cakupan berbeda, jadi definisinya wajib disepakati **sekali** untuk keduanya. |
 | 0.05 | `Net Income 20%` | Efisiensi biaya operasional GA min. 5% dari bulanan | ⚠️ **DIKOREKSI 2026-08-21.** Sumber lama tertulis `/accounting/profit-loss` + `/balance-sheet` + `/profit/cash-flow` — laba rugi PERUSAHAAN, yang tak menjawab efisiensi satu departemen. Yang menjawab: `GET /accounting/anggaran/varians?tahun&bulan&departemen`, memakai `ringkas.total_realisasi` departemen GA. | Bisa otomatis sekarang, **dengan syarat**: realisasi periode itu sudah disinkron (`belum_pernah_sinkron` false) dan departemen GA ada di katalog Accurate. Sudah terpasang di dashboard, lihat catatan di bawah tabel. |
 | 0.05 | `Return On Operation Asset` | Monitoring aset 100% terdata secara realtime | ⚠️ **PERLU DIPERIKSA ULANG 2026-08-21.** Sumber tertulis `accurate_daily_returns` + `shopee_returns` = data RETUR, sementara deskripsinya monitoring ASET. Aset ada di `inventory_db.inventory` (134 item) + rekonsiliasi Accurate ([[ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI]]), bukan di retur. | **Vonis lama `bisa otomatis sekarang` tidak dapat ditindaklanjuti apa adanya** — sumber yang disebut menjawab metrik yang berbeda. Tetapkan dulu dengan pemilik metrik apakah yang dinilai kelengkapan data aset (maka sumbernya `inventory`) atau benar-benar retur (maka deskripsinya yang salah). |
 | 0.2 | `Performance Monitoring 100% Terimplementasi di Q4` | Memastikan seluruh tim/karyawan di setiap departemen memiliki skor KPI Min. 70 | ⚠️ **DIKOREKSI 2026-08-21.** Sumber `skor_tim` benar, tetapi reduksinya **`rasio_ambang`** (ambang 70, target 100), BUKAN `rata_rata` seperti tertulis sebelumnya. Kata kuncinya **"SELURUH"**: rata-rata 78 lolos target walau sepuluh orang berskor 40. `rasio_ambang` menjawab "berapa persen anggota melewati 70" dan sudah ada di mesin (`kpi_reduksi.go`). | Bisa otomatis sekarang, **dengan reduksi `rasio_ambang`**. Memakai `rata_rata` di sini menerbitkan angka yang menjawab pertanyaan lain, dan angka itu akan terlihat wajar. |
@@ -732,15 +740,58 @@ Template `Personalia Team`, 5 metrik.
 
 ### Recruitment & Onboarding
 
-Template `Recruitment Team`, 5 metrik.
+Template `Recruitment`, 5 metrik. Dipegang **1 orang** (`BIP-0123-11-24`, aktif).
 
-| Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
+> ✅ **Disegarkan langsung dari prod 2026-09-02.** Template yang dipakai menilai kini bernama
+> **`Recruitment`** (`6a891211a8f110c4ae85b6ba`, dibuat 22 Agu 2026). Template
+> `Recruitment Team` yang tercatat di versi lama dokumen ini (`6a0bdc21af417b963150bdda`,
+> Mei 2026) sudah berstatus **`arsip`** sejak 25 Agu 2026. Dua metriknya BERGANTI, bukan
+> sekadar berganti kata: metrik ke-4 dari `Skor Kompetensi New Hire Fase On Boarding >80`
+> jadi ketersediaan dokumen jobdesk, dan metrik ke-5 dari `Kaizen` jadi turnover masa
+> probation (`key` ikut berubah `kaizen` → `turnover`). Verdict lamanya karena itu tidak
+> boleh dibawa: yang lama sudah punya keputusan ([[ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI]]),
+> yang baru belum pernah dinilai sama sekali.
+
+> [!warning] Di template ini `description` BUKAN tempat targetnya, berbeda dari bab lain
+> Bab [[#Cara membaca]] menyatakan target sebenarnya tersimpan di `description`. Untuk
+> template `Recruitment` itu **tidak berlaku**: kelima `description`-nya berbunyi seragam
+> `Target 100%`, dan kalimat yang dulu jadi deskripsi kini pindah ke `label`. Kolom
+> **Label** di bawah karena itu ditulis apa adanya dari `label` (panjang, dan memang begitu
+> tersimpannya), sementara `key` disebut terpisah karena `key`-lah yang stabil lintas
+> generasi template.
+
+**Nol dari 5 metrik punya blok `auto`** (diukur ke `kpi_template` prod 2026-09-02), jadi
+kelimanya masih diketik tangan. Skor terakhir orangnya `2026-07` = 87,5, seluruhnya manual
+dan masih memakai snapshot template yang kini arsip; periode `2026-08` belum dinilai.
+
+| Bobot | Label (`key`) | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
-| 0.25 | `Rekrutmen Seleksi dan penempatan` | Time to Fulfilment Rate ( < 30 Hari ) All Vacant | Modul Recruitment ADA tapi koleksi candidate KOSONG (job_requisition 2, job_posting 1). | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu rekrutmen sudah ada, hanya data pelamarnya belum diisi. |
-| 0.2 | `Rekrutmen Seleksi dan penempatan` | Membuat rencana jadwal dan pelaksanaan onboarding karyawan Masa Percobaan. | Modul Recruitment ADA tapi koleksi candidate KOSONG (job_requisition 2, job_posting 1). | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu rekrutmen sudah ada, hanya data pelamarnya belum diisi. |
-| 0.2 | `Rekrutmen Seleksi dan Penempatan` | Presentase Data Base Buffer Kebutuan MPP | Modul Recruitment ADA tapi koleksi candidate KOSONG (job_requisition 2, job_posting 1). | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu rekrutmen sudah ada, hanya data pelamarnya belum diisi. |
-| 0.25 | `Job Description` | Skor Kompetensi New Hire Fase On Boarding >80 | Modul Recruitment ADA tapi koleksi candidate KOSONG (job_requisition 2, job_posting 1). | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu rekrutmen sudah ada, hanya data pelamarnya belum diisi. |
-| 0.1 | `Kaizen` | Jumlah inisiatif perbaikan yang diterapkan | ⚠️ **Ralat 2026-08-31 — klaim lama "TIDAK ADA modul Kaizen" SALAH.** Modul Kaizen ADA ([[HRIS - Kaizen (Ide Perbaikan)]]) dan dua sumber KPI-nya terdaftar (`kaizen_ide_diajukan`, `kaizen_ide_diterapkan`, `kpi_sumber_kaizen.go:29-30`) memasok dari `GET /internal/kaizen/metrics`. **Namun Kaizen diputuskan TIDAK dipakai untuk otomasi KPI** ([[ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI]]). | **Tetap dinilai manual — karena keputusan, bukan karena sistemnya belum ada.** Menunya sudah ada di sistem, tetapi tidak dipakai untuk penilaian KPI sampai keputusan itu dicabut. |
+| 0.25 | `Time to Fulfilment Rate ( < 30 Hari ) All Vacant` (`rekrutmen-seleksi-dan-penempatan`) | `Target 100%` | **Sisi buka ADA, sisi terpenuhi TIDAK.** `job_requisition` 6 + `job_posting` 1 di prod (2026-09-02) memberi tanggal mulainya. Ujung pengukurannya hilang di dua tempat sekaligus: koleksi `candidate` **belum pernah terbentuk**, dan `ReqStatus` berhenti di `Posted` tanpa status "terpenuhi" (`services/recruitment/models_requisition.go:20-32`). Begitu kandidat diisi, tanggal penutupnya ada di `candidate.status_changed_at` saat status `Hired` (`models_candidate.go:76`, `pipeline.go:7`) yang dipasangkan ke requisition lewat `posting_id`. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu rekrutmen sudah ada, hanya data pelamarnya belum diisi. Satu hal yang tetap perlu disepakati: dihitung sampai kandidat diterima, atau sampai orangnya masuk kerja. |
+| 0.2 | `Membuat rencana jadwal dan pelaksanaan onboarding karyawan Masa Percobaan.` (`rekrutmen-seleksi-dan-penempatan-2`) | `Target 100%` | **Fiturnya lengkap dan sudah ter-deploy, datanya nol.** Checklist onboarding (template baku + instance per karyawan baru, `services/recruitment/models_onboarding.go:50-61`) terbukti ada di biner prod `Recruitment-Service` (`grep -ac onboarding_template` → 3, `onboarding_instance` → 4, kontrol negatif string karangan → 0). Koleksi `onboarding_template`, `onboarding_instance`, `onboarding_review` **belum pernah terbentuk** di `recruitment_db`. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu checklist onboarding sudah ada di sistem dan belum pernah dipakai sekali pun. |
+| 0.2 | `Presentase Data Base Buffer Kebutuan MPP` (`rekrutmen-seleksi-dan-penempatan-3`) | `Target 100%` | **Paling dekat siap dari kelimanya, penyebutnya sudah terisi.** Rumus lembar KPI HRD (`Jumlah Database / Actual MPP * 100`) sudah diimplementasikan persis sebagai `GET /manpower-plans/coverage?tahun=YYYY` (`services/recruitment/mpp_coverage.go:64-67`, rute `routes.go:104`). Penyebutnya `manpower_plan` **3 baris tahun 2026** di prod. Pembilangnya nol karena ia mencacah kandidat berstatus `Buffer` (`mpp_coverage.go:136-162`) dan koleksi `candidate` kosong, jadi endpointnya hari ini selalu menjawab 0%. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Rencana MPP-nya sudah diisi; yang belum ada cuma daftar kandidat cadangannya. |
+| 0.25 | `Ketersediaan Dokumen Jobdesk diseluruh posisi dan memastikan seluruh tim baru memahami jobdesk masing-masing` (`job-description`) | `Target 100%` | **TIDAK ADA tempat menyimpan jobdesk per posisi di sistem mana pun.** `hrd_document_db` berisi 1 dokumen (`hrd_document_type` 4, `hrd_document_version` 6), dan `employee_db` tidak punya koleksi master posisi. Yang paling mendekati hanyalah `job_requisition.kualifikasi.tugas_tanggung_jawab`, teks bebas per permintaan karyawan, bukan per posisi. Paruh kedua metriknya ("seluruh tim baru memahami") tak punya sumber sama sekali. | Belum bisa otomatis. Perlu diputuskan dulu apakah jobdesk per posisi layak disimpan di sistem, dan bagaimana pemahaman tim baru mau dibuktikan. |
+| 0.1 | `Tingkat turnover Masa Probation 0%` (`turnover`) | `Target 100%` | ⚠️ **Bahannya ADA di `employee_db`, tapi sumber `turnover_karyawan` yang sudah terdaftar MENJAWAB PERTANYAAN LAIN.** Sumber itu menghitung resign **sukarela seluruh perusahaan** dan menolak cakupan selain `perusahaan` secara eksplisit (`kpi_sumber_turnover.go:25-34`, `:145-149`), jadi ia bukan turnover masa probation. Bahan mentahnya: `employee_resign` 6, `employee_contract` 403 (`PKWT` 347, `PKWT (Evaluasi)` 46, `Magang` 9, `PKWTT` 1), `work_data.join_date` 209. | Bisa otomatis, tapi sepakati dulu siapa yang dihitung "masa probation". Tipe kontrak saja tidak cukup: dua orang terakhir yang resign justru ber-kontrak `PKWT` biasa (`BIP-0248-08-26` masuk 3 Agu keluar 15 Agu; `BIP-0262-07-26` masuk 31 Jul keluar 19 Agu), bukan `PKWT (Evaluasi)`. Sesudah definisinya jelas, tetap butuh sumber KPI baru; `turnover_karyawan` tidak boleh dipakai apa adanya. |
+
+**Akar masalahnya satu, bukan lima.** Modul recruitment ter-deploy penuh tetapi belum
+dipakai: `recruitment_db` prod hanya berisi master data (`interview_round` 7,
+`email_template` 7, `assessment_type` 4, `job_type` 1, `job_location` 1) ditambah
+`job_requisition` 6, `job_posting` 1, `manpower_plan` 3, `audit_logs` 24. Koleksi
+`candidate`, `interview`, `offer`, `candidate_test_result`, `background_check`, dan seluruh
+`onboarding_*` **belum pernah terbentuk**, artinya nol dokumen sejak awal. Tiga dari lima
+metrik di atas menunggu satu hal yang sama, yaitu data kandidat mulai diisi.
+
+⚠️ **Ketiganya tetap butuh dev sesudah datanya terisi.** Tidak ada satu pun sumber KPI yang
+menyentuh `recruitment_db` (lihat peringatan "Masih tidak ada sumber `recruitment`" di
+[[#Dua kolom terakhir]]), grup sumber `sdm` baru berisi empat nama (`program_culture`,
+`kontrak_karyawan`, `kedisiplinan_absensi`, `turnover_karyawan`, `kpi_sumber.go:82-87`), dan
+recruitment-service belum punya rute `/internal/` untuk dikonsumsi employee-service. Jadi
+"datanya sudah diisi" belum berarti angkanya muncul sendiri di KPI.
+
+**Pergeseran klasifikasi akibat pembaruan ini**, supaya angka bab dan ringkasan bisa
+ditelusuri: metrik 1, 2, 3 tetap *modul ada tapi datanya kosong*; metrik 4 pindah dari
+kelompok itu ke *tidak ada sumber sama sekali*; metrik 5 masuk *sumber ada tapi butuh
+definisi* menggantikan `Kaizen` yang manual karena keputusan. Bersih: terblokir 4 → 3,
+semi 0 → 1, manual tetap 1.
 
 ### Training & Perfomance Officer
 
@@ -1017,7 +1068,7 @@ Template `STAFF PPIC`, 5 metrik.
 | Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
 | 0.2 | `REVENUE 240M: OTIF (On Time In Full) / Fill Rate` | Finished good yang dikirim ke WH FG tepat waktu dan dalam jumlah lengkap sesuai yang planning produksi | tt_business_gmv_max_performance_reports (712.855) + marketing_analytics mart_profit_attribution (405.543, level ad/campaign/video/shop/product). Untuk level departemen perlu pemetaan toko ke departemen lebih dulu. | Bisa otomatis, tapi tentukan dulu toko mana milik departemen mana. Tanpa itu ada toko yang omzetnya tidak terhitung, dan itu sudah pernah terjadi senilai Rp 715 juta dalam sebulan. |
-| 0.2 | `Inventory Turnover Ratio (ITO) / Perputaran Persediaan` | ITO tinggi menandakan perputaran barang cepat dan manajemen stok efisien. ITO rendah bisa berarti overstock atau barang lambat laku. | Modul Recruitment ADA tapi koleksi candidate KOSONG (job_requisition 2, job_posting 1). | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu rekrutmen sudah ada, hanya data pelamarnya belum diisi. |
+| 0.2 | `Inventory Turnover Ratio (ITO) / Perputaran Persediaan` | ITO tinggi menandakan perputaran barang cepat dan manajemen stok efisien. ITO rendah bisa berarti overstock atau barang lambat laku. | ⚠️ **Ralat 2026-09-02: isi sel ini SALAH TEMPEL.** Sampai tanggal itu sel Sumber dan Rekomendasi berbunyi *"Modul Recruitment ADA tapi koleksi candidate KOSONG (job_requisition 2, job_posting 1)"*, verdict milik bab [[#Recruitment & Onboarding]] yang tak ada hubungannya dengan perputaran persediaan. Sumber ITO yang sebenarnya **belum diukur**. Tentukan dengan langkah 1 di [[RUN - Menambah Metrik KPI Otomatis]] (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya); ITO menuntut nilai persediaan **dan** HPP periode, jadi keduanya perlu dipastikan ada sebelum dijanjikan. | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
 | 0.25 | `Stock Accuracy (Akurasi Stok)` | Memastikan integritas data. PPIC sangat bergantung pada data stok; jika data salah, perencanaan produksi dan pembelian akan kacau. Target umum adalah 98-100%. | Belum dipetakan. Tentukan dengan langkah 1 di RUN - Menambah Metrik KPI Otomatis (cek jumlah dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Belum jelas data mana di sistem yang dipakai untuk menilai ini. |
 | 0.2 | `Stockout Rate (Tingkat Kekurangan Stok)` | Menghindari terhentinya lini produksi atau hilangnya penjualan karena barang tidak ada. | Stok & penjualan tersedia, tapi tanpa modul demand planning sebagian metrik ini tidak terdefinisi. | Bisa sebagian. Data stok dan penjualan ada, tapi rumusnya perlu disepakati dulu karena belum ada perencanaan permintaan. |
 | 0.15 | `Factory Utilization (Utilisasi Pabrik)` | Aset pabrik (mesin dan manusia) digunakan secara optimal. Terlalu rendah berarti idle capacity (boros), terlalu tinggi (di atas 90%) bisa berisiko jika ada lonjakan permintaan darurat. | TIDAK ADA tracker pajak/audit internal/CAPA/izin BPOM. | Belum bisa otomatis. Temuan audit, pelaporan pajak, dan izin BPOM belum dicatat di sistem. |
