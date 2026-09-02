@@ -214,7 +214,7 @@ Yang dilonggarkan **menu, bukan data**. Angka labanya dijaga dua lapis yang tak 
 | `approve` | Setujui | keputusan final (approve/reject/publish) |
 | `manage` | Kelola | mengubah aturan, master, dan konfigurasi |
 
-**Modul dan tingkat yang berlaku** (52 permission + 15 ticket = 67; `legal` menambah 3 di luar hitungan awal ADR 0030 karena modulnya sendiri belum ada saat ADR ditulis, `hris` menambah 2 izin berlingkup pengajuan pada 2026-08-09, dan `formbuilder` menambah 3 pada 2026-08-10 dengan alasan yang sama seperti `legal`):
+**Modul dan tingkat yang berlaku** (53 permission + 15 ticket = 68; `legal` menambah 3 di luar hitungan awal ADR 0030 karena modulnya sendiri belum ada saat ADR ditulis, `hris` menambah 2 izin berlingkup pengajuan pada 2026-08-09, `formbuilder` menambah 3 pada 2026-08-10 dengan alasan yang sama seperti `legal`, dan `jadwal` menambah 1 pada 2026-09-02 sebagai modul baru):
 
 | Modul | view | work | approve | manage | Pengecualian | Reach |
 |---|---|---|---|---|---|---|
@@ -239,6 +239,15 @@ Yang dilonggarkan **menu, bukan data**. Angka labanya dijaga dua lapis yang tak 
 | `finance` | (live, TIDAK memakai tangga — lihat catatan di bawah) | | | | | all |
 | `kaskecil` | (live & ditegakkan; 8 izin, `approve` DIPECAH EMPAT — lihat catatan di bawah) | | | | | own/div/all |
 | `menu` | (di luar tangga sepenuhnya: satu izin per MENU, bukan per aksi — `menu.finance.laporan`, `menu.finance.insentif`) | | | | | all |
+| `jadwal` | | | | ✅ | satu izin saja: `jadwal.hostlive.manage` | all |
+
+> **Modul `jadwal` — lahir karena PREFIKS izin menentukan kategori sidebar** (`shared-library/common/catalog_jadwal.go`, ditegakkan `services/attendance` lewat `gerbangRuteKelolaJadwal`). Ia menampung kewenangan menyusun jadwal kerja dan menugaskannya, hari ini baru satu izin untuk Host Live. Keputusannya di [[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]].
+>
+> Yang layak dibaca sebelum membuat modul berikutnya: izin ini **semula dinamai `hris.jadwal-hostlive.manage`**, dan dari sisi backend tak ada yang salah dengannya. Yang salah ada di frontend, dan tak terlihat sama sekali dari kode Go: `kunciModulAktif` (`components/layout/modul-aktif.ts`) menurunkan **kategori sidebar** dari prefiks tiap izin di klaim. Izin ber-prefiks `hris` karena itu akan memunculkan kategori HRIS di sidebar orang marketing — dan beberapa menu HRIS tidak ber-`perm` sama sekali (Schedule, Employee, Announcements), jadi ketiganya ikut tampil lalu kliknya memantul di gerbang rute yang menuntut `roles.hris`.
+>
+> **Prefiks izin karena itu bukan soal penamaan.** Modul yang tak ingin membawa kategori sidebar wajib memakai nama yang TIDAK ada di `menus` frontend — `kpi`, `payroll`, `recruitment`, dan `training` sudah begitu, dan `jadwal` mengikutinya. Efek samping yang menguntungkan: memasang paketnya sendirian ke staf HR **tidak** mematikan fallback tier `hris` mereka, jebakan yang akan ada seandainya izinnya tetap ber-prefiks `hris`. Mekanismenya: `KlaimMemuatIzinModul` menilai fallback **per modul**, jadi klaim yang memuat satu izin `hris` apa pun mematikan sintesis tier `hris` seluruhnya — dan pemegangnya kehilangan `hris.view`/`work`/`manage` tanpa satu pun pesan.
+>
+> Gerbangnya **BERDAMPINGAN dengan gerbang lama**, bukan menggantikannya: `HasPermission(jadwal.hostlive.manage)` **ATAU** `RequireHRISStaffOrITSupervisor`. Staf HR tak kehilangan apa pun, dan itu sebabnya modul ini tak punya kill-switch env sendiri — izinnya hanya MENAMBAH pemegang, tak pernah mencabut siapa pun.
 
 > **Modul `kaskecil` — satu-satunya yang TANPA fallback tier, dan itu disengaja** (`shared-library/common/catalog_kaskecil.go`, ditegakkan `services/procurement/main.go` + `kas_gate_test.go`). Delapan izin: `view`, `transaksi.save`, `pengajuan.save`, empat izin persetujuan terpisah (`approve.atasan`/`approve.aset`/`approve.finance`/`approve.direksi`), dan `master.save`. Dua hal yang membedakannya dari seluruh modul lain di tabel ini, keduanya layak dibaca sebelum menggarap modul berikutnya:
 >

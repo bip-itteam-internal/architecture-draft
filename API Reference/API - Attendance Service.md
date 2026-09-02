@@ -63,13 +63,22 @@ Menolak: tanggal lampau, penulisan lintas perusahaan, departemen di luar cakupan
 ## Pergantian jadwal terjadwal (berlaku-mulai)
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
-| POST | `/work-schedule-assignment` | Jadwalkan pergantian jadwal seorang karyawan (`employee_id`, `schedule_type` `static`/`pattern`, `schedule_id` **atau** `group_id`, `berlaku_mulai`). Menerima `YYYY-MM-DD` maupun RFC3339; keduanya dinormalkan ke tengah malam WIB | `RequireHRISStaffOrITSupervisor` |
-| GET | `/work-schedule-assignment/:employee_id` | Dokumen dasar (`base`), seluruh baris (`assignments`, selalu `[]` bukan `null`), dan `active` = yang berlaku hari ini (dihitung backend, bukan frontend) | `RequireHRISStaffOrITSupervisor` |
-| DELETE | `/work-schedule-assignment/:id` | Batalkan penugasan yang **belum** berlaku; yang sudah berlaku dibalas **409** | `RequireHRISStaffOrITSupervisor` |
+| POST | `/work-schedule-assignment` | Jadwalkan pergantian jadwal seorang karyawan (`employee_id`, `schedule_type` `static`/`pattern`, `schedule_id` **atau** `group_id`, `berlaku_mulai`). Menerima `YYYY-MM-DD` maupun RFC3339; keduanya dinormalkan ke tengah malam WIB | `gerbangRuteKelolaJadwal` |
+| GET | `/work-schedule-assignment/:employee_id` | Dokumen dasar (`base`), seluruh baris (`assignments`, selalu `[]` bukan `null`), dan `active` = yang berlaku hari ini (dihitung backend, bukan frontend) | `gerbangRuteKelolaJadwal` (pemegang izin: departemen saja, tanpa syarat kategori) |
+| DELETE | `/work-schedule-assignment/:id` | Batalkan penugasan yang **belum** berlaku; yang sudah berlaku dibalas **409**. Membaca `work_schedule` karyawannya lebih dulu, sehingga yang tak berwenang mendapat **403** bukan 409 | `gerbangRuteKelolaJadwal` |
 
 ⛔ **Aturan H+1: `berlaku_mulai` paling cepat BESOK**, hari ini dan tanggal lampau dibalas **400**. Ini menutup jendela penyemaian entri presensi yang gagal senyap secara struktural; alasan lengkapnya di [[Microservices - Attendance Service]].
 
 Koleksi `work_schedule_assignment` (di `attendance_db`), index **unik** `(employee_id, berlaku_mulai)` — tanggal yang sudah terpakai dibalas **409**. Dokumen dasar `work_schedule` tidak pernah disentuh. Kedua jalur tulis mengirim pemberitahuan inbox berkategori `schedule` ke karyawannya ([[Microservices - Notification Service]]).
+
+⚠️ **`gerbangRuteKelolaJadwal` = pemegang izin `jadwal.hostlive.manage` ATAU `RequireHRISStaffOrITSupervisor`** (staf HRIS atau supervisor IT). Gerbang lamanya tidak dicabut; yang ditambah hanya pemiliknya. Untuk pemegang izin ada **lapis kedua** yang menilai isi permintaan: kategori shift wajib `hostlive`, departemennya wajib punya jadwal host live, dan penugasan jadwal **statis ditolak seluruhnya**. Gerbang yang sama kini juga berlaku untuk `/company-work-schedule`, `/company-group-rotation` (termasuk `/batch`), dan `/schedule-archive`. Rincian & alasannya: [[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]].
+
+## Jadwal Host Live (layar marketing)
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| GET | `/jadwal-host-live/anggota` | Karyawan yang bisa ditugaskan jadwal host live + jadwal yang **berlaku hari ini** + `position` + `terjadwal` (jumlah pergantian yang belum berlaku). `?department=` opsional mempersempit. Balasan `{data, count, today}`; `data` selalu `[]` bukan `null` | `gerbangRuteKelolaJadwal` |
+
+Satu panggilan untuk seluruh layar, bukan `GET /work-schedule-assignment/:employee_id` per baris. Penyaringnya fungsi yang **sama** dengan gerbang tulisnya, supaya layar tak pernah menawarkan orang yang pasti ditolak 403 saat disimpan. ⚠️ `position` dikirim untuk ditampilkan, **tidak** dipakai menyaring — nama jabatan diketik bebas di master data dan sudah pernah berubah.
 
 ## Business trip (perjalanan dinas)
 | Method | Path | Fungsi | Auth |

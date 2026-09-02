@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-02",
-  "jumlah_dokumen": 340,
+  "jumlah_dokumen": 341,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -49,6 +49,7 @@
         "Microservices - Form Builder Service",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "Microservices - Notification Service",
+        "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
         "HRIS - Perjalanan Dinas",
         "Microservices - Employee Service",
         "HRIS - Employee Request & Approval",
@@ -58,9 +59,9 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "7dbdd060c5855ff54fae42325986c493ce661986dd57bf27a74f0aefac36839d",
-      "ukuran_kb": 20.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di attendance-service lewat gateway `/api/attendance/*`, siapa yang boleh memanggilnya (RBAC HRIS, Security, guestbook, gerbangRoster), dan parameter apa yang dipakai tiap rute. Mencakup tap clock-in/out, daftar entri beserta filter tanggal DD-MM-YYYY, laporan periode 26→25, payroll-supplement dan perlakuan status dibayar/dipotong, hari libur, pengajuan cuti/izin/dinas beserta review dan pembatalan, tukar jadwal kerja, koreksi absen, roster per tanggal, definisi shift perusahaan, dan pola rotasi grup. Juga menjelaskan aturan validasi yang mudah terlewat: keunikan global `schedule_id`/`group_id`, `display_name` shift yang tertutup, `starting_date` rotasi yang wajib, batas 500 sel roster, dan idempotensi pengajuan cuti.",
+      "hash": "3adf79617321ccac65a1bc147820f0f3c5371a6511c0ed23fb3a80e1bc3953a1",
+      "ukuran_kb": 21.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di attendance-service lewat gateway `/api/attendance/*`, siapa yang boleh memanggilnya (RBAC HRIS, Security, guestbook, gerbangRoster, gerbangRuteKelolaJadwal), dan parameter apa yang dipakai tiap rute. Mencakup tap clock-in/out, daftar entri beserta filter tanggal DD-MM-YYYY, laporan periode 26 sampai 25, payroll-supplement dan perlakuan status dibayar/dipotong, hari libur, pengajuan cuti/izin/dinas beserta review dan pembatalan, tukar jadwal kerja, koreksi absen, roster per tanggal, definisi shift perusahaan, pola rotasi grup, penugasan jadwal berlaku-mulai, dan daftar anggota Jadwal Host Live. Juga menjelaskan aturan validasi yang mudah terlewat: keunikan global `schedule_id`/`group_id`, `display_name` shift yang tertutup, `starting_date` rotasi yang wajib, batas 500 sel roster, aturan H+1 penugasan, dan idempotensi pengajuan cuti.",
       "kata_kunci": [
         "attendance service",
         "absensi",
@@ -76,7 +77,10 @@
         "tukar jadwal",
         "schedule exchange",
         "payroll supplement",
-        "guestbook"
+        "guestbook",
+        "jadwal host live",
+        "work schedule assignment",
+        "berlaku mulai"
       ]
     },
     {
@@ -1348,6 +1352,7 @@
         "ADR - 0052 Status Sinkron per Toko",
         "Microservices - Marketing Analytics Service",
         "API - Marketing Analytics Service",
+        "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
         "API - Manufacture Service",
         "API - Procurement Service",
         "CORE - API Master Gateway",
@@ -1361,9 +1366,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "bea6c09ab5a7d5fe2bbab8c9f003dc6cebc9f22ad6b3a1693bf3a03f3c91dbf3",
-      "ukuran_kb": 370.5,
-      "ringkasan": "Menjawab: halaman apa saja yang ada di portal web internal One Bharata, bagaimana tiap modul dirakit di frontend, dan keputusan tampilan apa yang sudah diambil beserta alasannya. Mencakup HRIS, presensi, payroll dan insentif, rekrutmen, finance, procurement, task management, IT, GA, serta Marketing Analytics, termasuk peran web ini sebagai SSO Identity Provider untuk aplikasi lain. Juga memuat catatan multi-perusahaan, i18n dua bahasa, pola tabel HRIS, dan sejumlah jebakan frontend yang sudah terbukti menggigit.",
+      "hash": "9fe24f262084ee8d176104dc68befff60ee0d12606cefd5e8045520f1369e878",
+      "ukuran_kb": 373.3,
+      "ringkasan": "Menjawab: halaman apa saja yang ada di portal web internal One Bharata, bagaimana tiap modul dirakit di frontend, dan keputusan tampilan apa yang sudah diambil beserta alasannya. Mencakup HRIS, presensi, payroll dan insentif, rekrutmen, finance, procurement, task management, IT, GA, Marketing Analytics, dan layar Jadwal Host Live milik marketing, termasuk peran web ini sebagai SSO Identity Provider untuk aplikasi lain. Juga memuat catatan multi-perusahaan, i18n dua bahasa, pola tabel HRIS, cara kategori sidebar lahir dari peran maupun paket hak, dan sejumlah jebakan frontend yang sudah terbukti menggigit.",
       "kata_kunci": [
         "erp-frontend",
         "hris-dashboard",
@@ -1374,7 +1379,10 @@
         "SSO",
         "i18n",
         "halaman",
-        "menu"
+        "menu",
+        "sidebar",
+        "jadwal host live",
+        "kategori modul"
       ]
     },
     {
@@ -1668,6 +1676,7 @@
         "REF - Alur Persetujuan",
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
         "Finance - Kas Kecil dan Pengajuan Budget",
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
@@ -1697,9 +1706,9 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "2415a0c28395d1477cf47f89aad787ce54e65f6ec9d4194aee59d9e54080679f",
-      "ukuran_kb": 101.5,
-      "ringkasan": "Menjawab: bagaimana hak akses di seluruh bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi, cakupan data/reach), bagaimana paket hak bernama menempel pada posisi/jabatan alih-alih pada orang, dan bagaimana izin efektif diresolusi saat login lalu dibawa lewat klaim JWT serta header gateway yang dibersihkan dari kiriman klien. Juga menjawab modul mana saja yang terdaftar di katalog permission, endpoint master apa yang menyuplai layar Hak per Posisi dan Siapa Boleh Apa, kenapa daftar modul untuk membuat paket berbeda dari daftar untuk memfilter tabel, dan bagaimana kill-switch serta fallback tier lama bekerja. Berisi juga persona pemakainya (HR, IT perancang hak, karyawan) dan letak berkas penegaknya di repo.",
+      "hash": "c49ff15f64bd50376cf106df346c375b4a29cadf3032f230f40d2026f49bcceb",
+      "ukuran_kb": 103.6,
+      "ringkasan": "Menjawab: bagaimana hak akses di seluruh bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi, cakupan data/reach), bagaimana paket hak bernama menempel pada posisi/jabatan alih-alih pada orang, dan bagaimana izin efektif diresolusi saat login lalu dibawa lewat klaim JWT serta header gateway yang dibersihkan dari kiriman klien. Juga menjawab modul mana saja yang terdaftar di katalog permission (termasuk `jadwal` yang sengaja tanpa kategori sidebar), endpoint master apa yang menyuplai layar Hak per Posisi dan Siapa Boleh Apa, kenapa PREFIKS sebuah izin ikut menentukan kategori sidebar di frontend sehingga salah prefiks memunculkan menu yang memantul, dan bagaimana kill-switch serta fallback tier lama bekerja termasuk kapan sebuah paket justru mematikan fallback itu. Berisi juga persona pemakainya (HR, IT perancang hak, karyawan) dan letak berkas penegaknya di repo.",
       "kata_kunci": [
         "RBAC",
         "permission set",
@@ -1710,7 +1719,10 @@
         "katalog permission",
         "tier fallback",
         "JWT permissions",
-        "posisi jabatan"
+        "posisi jabatan",
+        "modul jadwal",
+        "prefiks izin",
+        "kategori sidebar"
       ]
     },
     {
@@ -1903,22 +1915,23 @@
         "Microservices - Form Builder Service",
         "IT - Form Builder",
         "HRIS - Tukar Jadwal Kerja",
+        "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
+        "APP - Web ERP",
         "Microservices - Notification Service",
         "HRIS - Attendance Correction",
         "HRIS - Perjalanan Dinas",
         "HRIS - Organization Structure",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus",
-        "APP - Web ERP",
         "DB - Overview and Notes",
         "Microservices - File Service",
         "CORE - API Master Gateway",
         "CORE - HRIS Orchestrator",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "88c4bf6af885840bfa6557cc912a7553d40a7e9d309d008a6c53bda2d260c3a4",
-      "ukuran_kb": 46.8,
-      "ringkasan": "Menjawab: bagaimana clock-in/out multi-metode dan resolusi jadwal kerja (static maupun shift bergilir) bekerja, endpoint apa saja yang dipakai HRIS untuk rekap telat, skor KPI kehadiran, laporan bulanan periode 26-25, dan payroll supplement, serta gerbang akses mana yang dipakai tiap rute internal (service key vs RBAC) dan kenapa. Menjawab juga kenapa aturan jam kerja, ambang telat, dan sanksinya TIDAK ada di vault melainkan di BUSINESS_LOGIC_IMPLEMENTATION.md repo mobile, sementara service ini hanya melaporkan fakta kehadiran dan kebijakan rupiahnya diputuskan payroll. Termasuk status multi-tenant presensi yang masih parsial dan status mana saja yang dihitung sebagai hari kerja.",
+      "hash": "ab13974fd328015e155c2e67ea43f94e1ffd37130deee1bb12f9b28f37125f23",
+      "ukuran_kb": 50.8,
+      "ringkasan": "Menjawab: bagaimana clock-in/out multi-metode dan resolusi jadwal kerja (static maupun shift bergilir) bekerja, endpoint apa saja yang dipakai HRIS untuk rekap telat, skor KPI kehadiran, laporan bulanan periode 26-25, dan payroll supplement, serta gerbang akses mana yang dipakai tiap rute internal (service key vs RBAC) dan kenapa. Menjawab juga siapa saja yang kini boleh mengelola jadwal sejak gerbangnya punya dua pemilik (peran HRIS/IT lama plus pemegang izin `jadwal.hostlive.manage`), kenapa middleware saja tak cukup sehingga tiap handler tulis menilai isi permintaannya sendiri, dan kenapa cache kategori shift harus dilupakan saat pola berubah. Menjawab pula kenapa aturan jam kerja, ambang telat, dan sanksinya TIDAK ada di vault melainkan di BUSINESS_LOGIC_IMPLEMENTATION.md repo mobile, sementara service ini hanya melaporkan fakta kehadiran dan kebijakan rupiahnya diputuskan payroll. Termasuk urutan menang tiga lapis roster/penugasan/dokumen dasar, status multi-tenant presensi yang masih parsial, dan status mana saja yang dihitung sebagai hari kerja.",
       "kata_kunci": [
         "absensi",
         "attendance",
@@ -1931,7 +1944,10 @@
         "late recap",
         "KPI kehadiran",
         "payroll supplement",
-        "leave request"
+        "leave request",
+        "roster",
+        "jadwal host live",
+        "gerbang kelola jadwal"
       ]
     },
     {
@@ -5337,6 +5353,42 @@
         "payroll config",
         "Pasal 20",
         "audit aturan"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan.md",
+      "judul": "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "✅",
+      "status_teks": "Diputuskan 2026-09-02, **terimplementasi, BELUM di-deploy**. bip-erp branch `feat/attendance-jadwal-host-live` (6 commit) + erp-frontend branch `feat/marketing-jadwal-host-live` (2 commit). Verifikasi lewat gateway belum dijalankan.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
+        "CORE - RBAC dan Permission Set",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "Microservices - Attendance Service",
+        "API - Attendance Service",
+        "APP - Web ERP",
+        "HRIS - Attendance System",
+        "Sales - Incentive"
+      ],
+      "hash": "6ee768ec417258e277389a45a7d54c051d786b6b8242419a9a0be0187cb6fc91",
+      "ukuran_kb": 8.2,
+      "ringkasan": "Menjawab: siapa yang boleh menyusun jadwal siaran Host Live dan kenapa kewenangan itu dibuat sebagai IZIN yang ditugaskan lewat layar Hak per Posisi, bukan sebagai daftar peran. Menjelaskan kenapa izinnya harus hidup di modul `jadwal` tersendiri dan bukan di dalam `hris` (prefiks izin ikut menentukan kategori sidebar di frontend, sehingga prefiks yang salah memunculkan menu HRIS yang memantul di gerbangnya sendiri), kenapa gerbang lama tetap berlaku berdampingan sehingga staf HR tidak kehilangan apa pun, dan batas apa saja yang berlaku bagi pemegang izin (kategori shift wajib hostlive, departemen wajib punya jadwal host live, penugasan jadwal statis ditolak). Memuat juga temuan yang baru muncul saat implementasi: cache kategori shift lima menit menolak pola yang baru dibuat dengan pesan yang tidak benar lalu sembuh sendiri, dan kenapa nama jabatan tidak dipakai menyaring siapa pun. Dipakai saat menambah modul izin baru atau saat menanyakan kenapa jadwal host live tak lagi dikerjakan HR.",
+      "kata_kunci": [
+        "jadwal host live",
+        "host live",
+        "izin ditugaskan",
+        "permission set",
+        "modul jadwal",
+        "prefiks izin",
+        "kategori sidebar",
+        "gerbang dua lapis",
+        "marketing",
+        "kelola jadwal",
+        "ADR 0072",
+        "rotasi shift"
       ]
     },
     {
