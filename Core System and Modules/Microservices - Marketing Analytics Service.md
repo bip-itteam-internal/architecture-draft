@@ -116,7 +116,8 @@ Penjaganya `TestRentangBawaanPakaiHariWIBBukanUTCPolos` — pemindai AST berdaft
 
 | Endpoint | Isi |
 |---|---|
-| `/videos` | Performa video (`VideoRow`, tiga tab VSA / GMV Max / organik via `spend_vsa`, `spend_gmv_max`, `sumber`). Kini juga membawa `gross_profit` (dijumlah pass kedua dari `mart_profit_attribution` level video — kegagalannya tak menggagalkan halaman, hanya null) dan identitas produk `product_title` / `product_image_url` / `product_item_group_id`. **Menolak `granularitas` (400)** — snapshot kumulatif tanpa dimensi hari |
+| `/videos` | Performa video (`VideoRow`, tiga tab VSA / GMV Max / organik via `spend_vsa`, `spend_gmv_max`, `sumber`). Kini juga membawa `gross_profit` (dijumlah pass kedua dari `mart_profit_attribution` level video — kegagalannya tak menggagalkan halaman, hanya null), identitas produk `product_title` / `product_image_url` / `product_item_group_id`, dan `published_at`. **Menolak `granularitas` (400)**, dan sejak 2026-09-02 **menolak `dari`/`sampai` (400)** dengan pesan yang menunjuk ke `/videos/periode`. Sebelumnya keduanya DITERIMA lalu diabaikan diam-diam, bentuk yang sama persis dengan `granularitas` tetapi tak pernah ikut ditutup karena belum ada rute yang melayaninya |
+| `/videos/periode` | **Performa video DALAM RENTANG TANGGAL.** Rute terpisah, bukan parameter di `/videos`, karena keduanya membaca koleksi yang berbeda: `mart_profit_attribution` level=video (punya `date`) plus deret harian `tt_shop_video_performance_daily` di `integration_db`. `dari` & `sampai` **WAJIB** (400 bila salah satu tak disebut; rentang bawaan yang terpasang diam-diam membuat pemanggil tak dapat menjawab "ini angka periode apa"). Menolak `granularitas`, `matang`, dan `bulan`, masing-masing dengan alasannya sendiri. Tiap baris membawa `trend` per kolom (arah + delta persen + angka pembanding) dan **`hari_berdata` / `hari_diminta`**. Detail: § Halaman video mode rentang |
 | `/videos/orders` | **Drill video → daftar order AFFILIATE** dari `affiliate_orders` (`content_id = video_id` AND `content_type = "VIDEO"`). Field `cakupan` **selalu terisi**: daftar ini hanya order affiliate — order organik video tidak tercatat menautkan video di sumber mana pun, jadi jangan dibandingkan dengan kolom orders baris video |
 | `/lives` | Sesi live dari `mart_live_sessions` (**4.836 sesi** per 2026-08-22; dulu kosong) |
 
@@ -303,7 +304,7 @@ Index unik dibuat saat boot (`index.go`). `CreateOne` **tidak mengganti** index 
 | Koleksi | Kunci unik | Isi |
 |---|---|---|
 | `mart_profit_attribution` | `channel + level + entity_id + shop_id + date` | Laba per hari per channel. `shop_id` masuk kunci sejak baris product dipisah per toko (dulu satu entitas melebur lintas toko dan biaya salah dinisbatkan). `entity_id` level product = **master SKU**; SKU belum termapping tetap memakai SKU aslinya + tanda `belum_termapping` |
-| `mart_video_performance` | `channel + video_id` | **Snapshot kumulatif, sengaja tanpa dimensi hari** (lihat bawah) + identitas produk |
+| `mart_video_performance` | `channel + video_id` | **Sengaja tanpa dimensi hari** (lihat bawah) + identitas produk + `published_at`. ⚠️ `published_at` adalah atribut IDENTITAS, bukan dimensi hari: ia boleh ada di `$set` tetapi **dilarang masuk kunci upsert**, karena tanggal terbit yang terkoreksi di sumber akan melahirkan baris kedua alih-alih memperbarui yang ada |
 | `mart_ad_creative_link` | `advertiser_id + ad_id + tiktok_item_id` | Jembatan ad ke post organik |
 | `sync_state` | `channel + job` | Cursor, `last_run_at`, `last_ok_at`, `last_error` per job + kunci `penjadwal` |
 | `mart_live_sessions` | `channel + session_id` | Sesi live hasil sync TikTok. **4.836 baris** per 2026-08-22. `username` di sini adalah **akun toko**, bukan orang — satu akun dipakai bergantian banyak host, dan itulah alasan `live_shifts` ada |
@@ -314,7 +315,48 @@ Index unik dibuat saat boot (`index.go`). `CreateOne` **tidak mengganti** index 
 
 ### Kenapa `mart_video_performance` tidak punya dimensi hari
 
-Sumbernya, `tt_shop_video_performances`, terverifikasi berupa **snapshot kumulatif**: satu dokumen per video, angka seumur hidup, ditimpa tiap sync, tanpa `stat_time_day`. Versi sebelumnya menyimpan satu baris per video **per hari**; akibatnya terukur di production: 613.867 baris untuk 88.594 video, dan halaman rentang-tanggal mendapat **7,0× angka sebenarnya tanpa error**. Perbaikannya struktural: dimensi harinya dibuang. `synced_at` menggantikan `date`.
+Sumbernya, `tt_shop_video_performances`, adalah **satu dokumen per video tanpa `stat_time_day`**, ditimpa tiap sync. Versi sebelumnya menyimpan satu baris per video **per hari**; akibatnya terukur di production: 613.867 baris untuk 88.594 video, dan halaman rentang-tanggal mendapat **7,0× angka sebenarnya tanpa error**. Perbaikannya struktural: dimensi harinya dibuang. `synced_at` menggantikan `date`.
+
+⚠️ **KOREKSI 2026-09-02: angkanya BUKAN "seumur hidup".** Dok ini dan komentar di `agregasi_video.go` / `entity.go` sebelumnya menyebutnya begitu, dan probe production membantahnya. Produsennya (`icc_shop_video.go` di [[Microservices - Integration Service]]) memanggil `/analytics/202605/shop_videos/performance` dengan **jendela 35 hari** yang dihardcode, lalu membuang dimensi tanggalnya saat upsert. Jadi yang tersimpan adalah performa dalam jendela ~35 hari terakhir **pada saat sync**, bukan akumulasi seumur hidup.
+
+Bukti (probe `integration_db`, 111.968 dokumen, 42 toko, 2026-09-02):
+
+| Kesegaran sync | Umur terbit | n | rata-rata views | max views |
+|---|---|---|---|---|
+| segar (≤2 hari) | 0–35 hari | 12.258 | 924 | 1.391.795 |
+| segar (≤2 hari) | 90–180 hari | 11.600 | 378 | 259.077 |
+| segar (≤2 hari) | >180 hari | 25.638 | 91 | 245.764 |
+| **basi (>20 hari)** | **>180 hari** | **14.695** | **1,46** | **1.389** |
+
+Baris terakhir yang menentukan: mustahil ada 14.695 video yang **seumur hidupnya** tak pernah melewati 1.389 tayangan. Yang terjadi, video berhenti dikembalikan API begitu tak ada aktivitas dalam jendela, lalu barisnya tertinggal membeku pada nilai terakhir. Pada kesegaran sync yang sama, rata-rata juga turun monoton mengikuti umur terbit (924 → 378 → 91), pola yang mustahil untuk angka akumulatif.
+
+⛔ **Konsekuensi yang belum tertangani: 42% baris adalah sisa sync lama.** Hanya 64.497 dari 111.968 tersentuh pada 2026-09-01; sisanya menggambarkan jendela yang berakhir berminggu-minggu lalu, duduk bercampur dengan yang segar. Satu-satunya pembedanya kolom **"Data per"** (`synced_at`) di layar, yang ternyata memikul beban jauh lebih besar daripada yang disadari saat ia dibuat.
+
+Yang **tetap berlaku** dari aturan lama, dan tak berubah oleh koreksi ini: satu dokumen per video, tanpa dimensi hari, **tidak boleh dijumlahkan lintas tanggal**. Penjaga 7,0× (`snapshot_kumulatif_test.go`) berlaku sepenuhnya; yang berubah hanya nama satuannya, bukan larangannya.
+
+### Halaman video mode rentang (`/videos/periode`)
+
+Menjawab pertanyaan yang `/videos` memang tak bisa: **apa yang diperoleh video ini pada rentang tanggal yang saya pilih?** Sumbernya dua, dan keduanya di database yang berbeda:
+
+| Sisi | Kolom | Sumber |
+|---|---|---|
+| Rupiah | `revenue`, `ads_cost`, `gross_profit`, `hpp` | `mart_profit_attribution` level=video (punya `date`, sejak 2026-05-04) |
+| Organik | `views`, `gmv`, `units_sold`, `sku_orders` | `integration_db.tt_shop_video_performance_daily` (baru, lihat [[Microservices - Integration Service]]) |
+
+⛔ **Kolom yang diurutkan menentukan koleksi mana yang memikul populasi dan limit.** Baris laba video lahir dari laporan GMV Max, jadi video **organik murni tak punya satu pun**. Kalau populasi selalu datang dari sana, tab Organik kosong SELAMANYA dan kosongnya terbaca "tidak ada video", bukan "tab ini tak dilayani sumbernya". Aturannya dapat diterangkan satu kalimat: tabel berisi N teratas menurut kolom yang sedang diurutkan, dan yang tahu peringkat itu hanya koleksi pemilik kolomnya.
+
+**Dua gerbang panah trend, dan keduanya wajib karena tanggal mulai sumbernya berbeda:**
+
+- Kolom **laba** dinihilkan bila periode pembanding menyentuh sisi sebelum `TanggalEfektifModul` (10 Juni 2026). HPP belum terdata di sana, jadi labanya tercatat seolah barang dagangan gratis dan panahnya akan menunjuk turun tajam untuk keadaan yang tak berubah.
+- Kolom **organik** dinihilkan bila periode pembanding jatuh sebelum hari pertama deret harian. Tanpa ini, pada hari-hari pertama sesudah job harian naik **setiap video tampil "naik"**, karena pembandingnya nol bukan karena performanya nol melainkan karena datanya belum pernah dikumpulkan. Ratusan panah naik serentak adalah kabar palsu yang tak satu pun galat menyertainya.
+
+Hal lain yang mengikat:
+
+- **Arah panah diambil dari selisih mentah, bukan dari persen.** Laba kotor video boleh negatif, dan pada basis negatif persentase membalik tanda: rugi yang mengecil dari -100 ke -50 menghasilkan -50% dan terbaca "turun" untuk keadaan yang justru membaik. Persen hanya diterbitkan bila basisnya positif, syarat yang sekaligus menutup pembagian nol.
+- **`views`/`gmv` bertipe nullable.** `null` = belum ada riwayat harian untuk video itu pada rentang tersebut; nol sejati tetap 0. Menyamakannya membuat seluruh video lama tampil nol tayangan dan terbaca sebagai video yang tak pernah ditonton.
+- **`hari_berdata` / `hari_diminta` dikirim SELALU**, termasuk saat cakupannya penuh. Job sync bisa tidak jalan sehari, dan rentang yang kehilangan satu hari menghasilkan angka lebih kecil tanpa satu pun galat. Pola yang sama dengan `toko_berdata < toko_diminta` di `/kpi/kinerja-toko`.
+- **Saringan `terbit_dalam_rentang`** menyempitkan POPULASI ke video yang `published_at`-nya jatuh di dalam rentang, berbeda dari rentang itu sendiri yang menyempitkan ANGKA. Keduanya memakai `dari`/`sampai` yang sama; dua pemilih tanggal terpisah akan menuntut pembacanya mengingat mana yang mana. Nilai selain `"true"`/`"false"` **ditolak 400**, bukan dilunakkan jadi false (jebakan `grouped=1` di daftar departemen).
+- **TikTok saja.** Envelope menyatakannya lewat `unavailable_channels`, dan saringan channel yang tak memuat TikTok menjawab nol baris alih-alih baris TikTok.
 
 ## Channel & Sumber Data
 
@@ -502,7 +544,7 @@ Dicatat di sini justru karena rumusnya terlihat benar: tanpa catatan ini, orang 
 
 ## Dependensi & Integrasi
 
-- **Sumber data (baca-saja)**: `integration_db` milik [[Microservices - Integration Service]] — `transaction_orders`, `product_sku_mappings`, `product_costs`, `tt_business_*`, `tt_shop_video_performances`, `shopee_gms_*`, `affiliate_orders`, `icc_account_mappings`, `icc_affiliate_accounts`, `team_shops`, `marketing_teams`, `department_shops` (sejak fase Contract 2026-08-29, [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] — dipakai KEDUA konsumen sekarang: saringan `/divisi` DAN kolom `icc`/"Konteks per departemen" di bawah; `team_shops`/`marketing_teams` dipertahankan sebagai dead code, belum dicabut); plus `insentive_db` milik [[Microservices - Insentive Service]] (`employee_performance_mappings`, env `INSENTIVE_MONGO_URI`). Lihat juga [[Sales - Marketplace Integration]].
+- **Sumber data (baca-saja)**: `integration_db` milik [[Microservices - Integration Service]] — `transaction_orders`, `product_sku_mappings`, `product_costs`, `tt_business_*`, `tt_shop_video_performances`, `tt_shop_video_performance_daily` (deret harian video, sumber kolom organik `/videos/periode`), `shopee_gms_*`, `affiliate_orders`, `icc_account_mappings`, `icc_affiliate_accounts`, `team_shops`, `marketing_teams`, `department_shops` (sejak fase Contract 2026-08-29, [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] — dipakai KEDUA konsumen sekarang: saringan `/divisi` DAN kolom `icc`/"Konteks per departemen" di bawah; `team_shops`/`marketing_teams` dipertahankan sebagai dead code, belum dicabut); plus `insentive_db` milik [[Microservices - Insentive Service]] (`employee_performance_mappings`, env `INSENTIVE_MONGO_URI`). Lihat juga [[Sales - Marketplace Integration]].
 - **API pihak ketiga**: TikTok Ads API `/open_api/v1.3/ad/get/` (`client_tiktok_ads_http.go`) hanya untuk tautan ad→video; metrik iklan dibaca dari Mongo, bukan API langsung. Kredensial gagal didekripsi dilewati **tapi dihitung dan dilaporkan**.
 - **Gerbang**: [[CORE - API Master Gateway]] · **Konsumen**: dashboard marketing di [[APP - Web ERP]]
 - **Konsep & rancangan — ⚠️ arsip Juni–Juli 2026, peta service-nya usang**: [[Sales - Marketing Dashboard (Master Roadmap)]] · [[Sales - Marketing Dashboard (Index)]] · [[Sales - Profit Engine (Design)]] · [[Sales - HPP Master (Plan)]] · [[ADR - 0008 Profit Engine Join via item_group_id]]. Ketiga dok "Marketing Dashboard" itu menulis rencananya dibangun **di dalam `integration`**, dan menyebut progres 45–50%; kenyataannya lapisan marketing & ads jadi service tersendiri (dokumen ini) sementara profit engine + HPP yang mendarat di `integration`. Audit datanya masih sahih, pembagian service-nya jangan dipakai.

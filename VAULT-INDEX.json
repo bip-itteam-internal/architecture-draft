@@ -566,20 +566,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "dd4316cf327129cb4b2c67bcff99b921a12ba2057ef269f93cc13866a06af887",
-      "ukuran_kb": 35.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service lewat gateway, parameter serta bentuk respons tiap route, dan siapa yang digerbang untuk menulis ambang keputusan maupun pagu belanja iklan. Menjelaskan juga arti lima nilai vonis laba di `/beranda` (tanpa_data, belum_matang, rugi, waspada, sehat), kapan nilai `null` berarti tak terhitung dan bukan nol, serta kolom mana yang tidak boleh dijumlahkan (`pembatalan`, `orders_dikirim`). Memuat konvensi amplop respons, aturan batas tanggal hari WIB, paginasi drill, cara mengaudit ulang kelengkapan daftar route terhadap kode, dan peringatan bahwa `GET /live-shifts/akun` tak menyaring jendela waktu maupun status sehingga akun yang sudah mati atau kena ban tetap terbalas dan bisa duduk di puncak peringkat.",
+      "hash": "c78a57e3100385b3a18e687a55a8eec80036c8de9d3cf1d3c8a1402ad7c2ee32",
+      "ukuran_kb": 36.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service, parameter query apa yang diterima tiap rute, dan bentuk balasannya seperti apa. Memuat daftar lengkap rute laba per level (toko, produk, SKU, item, kampanye, iklan), video termasuk mode rentang tanggal, live dan live-shift, retur, cohort, audiens, ambang, pagu, serta rute KPI yang dipakai penilaian karyawan. Juga menerangkan parameter mana yang sengaja DITOLAK 400 di rute tertentu berikut alasannya, dan cara mengaudit ulang kelengkapan daftar ini terhadap kode.",
       "kata_kunci": [
         "marketing analytics",
         "endpoint",
+        "API",
         "route",
-        "API reference",
-        "beranda",
-        "ambang keputusan",
-        "ROAS",
-        "pagu iklan",
-        "pemilih akun live",
-        "akun kena ban"
+        "laba per level",
+        "profit",
+        "video",
+        "rentang tanggal",
+        "KPI marketing",
+        "query parameter"
       ]
     },
     {
@@ -1361,21 +1361,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "319b955e0dc71f493fffd486138e58c4cad3cae0cc1e73de52da1f316c32d1f6",
-      "ukuran_kb": 368.5,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di aplikasi web ERP, bagaimana tiap layar dirakit, dan konvensi UI mana yang mengikat (struktur tabel HRIS, i18n dua bahasa, skeleton). Memuat detail layar payroll termasuk pemetaan kolom impor spreadsheet dan kolom mana yang sengaja tidak ditebak.",
+      "hash": "bea6c09ab5a7d5fe2bbab8c9f003dc6cebc9f22ad6b3a1693bf3a03f3c91dbf3",
+      "ukuran_kb": 370.5,
+      "ringkasan": "Menjawab: halaman apa saja yang ada di portal web internal One Bharata, bagaimana tiap modul dirakit di frontend, dan keputusan tampilan apa yang sudah diambil beserta alasannya. Mencakup HRIS, presensi, payroll dan insentif, rekrutmen, finance, procurement, task management, IT, GA, serta Marketing Analytics, termasuk peran web ini sebagai SSO Identity Provider untuk aplikasi lain. Juga memuat catatan multi-perusahaan, i18n dua bahasa, pola tabel HRIS, dan sejumlah jebakan frontend yang sudah terbukti menggigit.",
       "kata_kunci": [
+        "erp-frontend",
+        "hris-dashboard",
+        "One Bharata",
         "web ERP",
         "frontend",
-        "erp-frontend",
         "Next.js",
-        "halaman",
-        "menu",
-        "UI",
+        "SSO",
         "i18n",
-        "tabel HRIS",
-        "payroll",
-        "impor Excel"
+        "halaman",
+        "menu"
       ]
     },
     {
@@ -2234,6 +2233,7 @@
         "Finance - Incentive",
         "Sales - GMV Creative",
         "RUN - Onboarding Meta Ads",
+        "Microservices - Marketing Analytics Service",
         "APP - Web ERP",
         "ADR - 0009 Affiliate via Search Seller Affiliate Orders API",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
@@ -2245,7 +2245,6 @@
         "ADR - 0014 Accurate Token DB-backed via OAuth",
         "RUN - Accurate API Access Token (OAuth)",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur",
-        "Microservices - Marketing Analytics Service",
         "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
         "External - Accurate",
         "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
@@ -2278,22 +2277,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "ba83ec92dab02413468c534a65cde818aa7527fc4e84f80e65d80c280b4bd8d9",
-      "ukuran_kb": 309.5,
-      "ringkasan": "Menjawab arsitektur integration-service secara menyeluruh: bagaimana order marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk lewat webhook, bagaimana bridging finansial ke Accurate (invoice, sales return, ringkasan transaksi harian) bekerja, serta status fitur GMV Max monitoring/overview dan ICC video metrics untuk insentif. Juga mencakup rencana integrasi Meta Ads yang belum dibangun dan daftar background worker/cron.",
+      "hash": "ec7a11533d0d7cbe9c9f8192cd28b1191a249ec2439df35bbb26c8afa592793f",
+      "ukuran_kb": 312.9,
+      "ringkasan": "Menjawab: bagaimana order dan laporan iklan dari TikTok Shop, TikTok Business, Shopee, dan Lazada masuk ke ERP, bagaimana keduanya dinormalkan jadi model transaction terpadu, dan bagaimana bridging finansial ke Accurate Online bekerja. Memuat daftar webhook, koleksi integration_db, kredensial OAuth per marketplace, serta seluruh job sync terjadwal berikut jadwal dan koleksi tujuannya. Juga menerangkan otomasi auto-ship dan auto-approve yang sadar hari libur, dan bagian legacy mana yang sudah dimatikan.",
       "kata_kunci": [
-        "integration-service",
+        "integration service",
+        "integration_db",
         "marketplace",
-        "TikTok Business",
+        "TikTok Shop",
         "Shopee",
         "Lazada",
-        "Accurate bridging",
+        "Accurate",
         "webhook",
-        "GMV Max",
-        "ICC video metrics",
-        "Meta Ads",
-        "background worker cron",
-        "insentif"
+        "job sync",
+        "worker"
       ]
     },
     {
@@ -2464,21 +2461,21 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "a46621bb6c52bf9b19430e7bf52fa08c678e589a0b7f8c384f3ad4a2e3379623",
-      "ukuran_kb": 80.1,
-      "ringkasan": "Menjawab: bagaimana laba dan performa marketing per toko, produk, kampanye, iklan, video, dan sesi live dihitung dan disajikan ke dashboard, endpoint apa saja yang tersedia, serta koleksi mart_* mana yang menyimpan hasil pre-agregasi di marketing_analytics_db. Menjelaskan aturan pemakaian angka yang mencegah hitung ganda (iklan_sia_sia, pembatalan, 24h_live_gmv, tiga angka penjualan live yang mudah tertukar), cara vonis laba di /beranda ditetapkan termasuk keadaan belum_matang, mengapa integration_db wajib baca-saja, dan bagaimana pencatatan sesi live oleh host (/live-shifts) beserta siaran serentak di beberapa akun dirancang. Menjawab juga kenapa sistem belum bisa membedakan akun TikTok yang kena ban dari yang masih hidup: pemilih akun mengagregasi mart_live_sessions tanpa jendela waktu dan tanpa status, lalu memeringkatnya menurut GMV kumulatif sehingga akun mati justru muncul di puncak dan bisa ikut distempel utama.",
+      "hash": "fb8848377106f9d9afbf68740982c777615887b9638dafe1b0b458df756e71be",
+      "ukuran_kb": 86.5,
+      "ringkasan": "Menjawab: bagaimana angka laba dan performa marketing dihitung per toko, produk, kampanye, iklan, video, dan live, dari koleksi mana asalnya, dan mana yang boleh maupun tidak boleh dijumlahkan. Memuat prinsip pre-agregasi ke koleksi mart, kunci tiap koleksi, atribusi biaya iklan aktual versus prorata, serta bagian Kejujuran Data yang menerangkan kolom mana yang tampak komponen kerugian padahal bukan. Juga menerangkan halaman video mode rentang tanggal berikut dua gerbang panah trend, dan mengapa mart_video_performance sengaja tanpa dimensi hari.",
       "kata_kunci": [
         "marketing analytics",
+        "mart",
         "laba",
         "profit",
-        "GMV",
-        "ROAS",
-        "TikTok",
-        "live shift",
-        "pemilih akun live",
-        "akun kena ban",
-        "akun mati",
-        "hitung ganda"
+        "atribusi iklan",
+        "ads cost",
+        "GMV Max",
+        "video",
+        "rentang tanggal",
+        "trend",
+        "agregasi"
       ]
     },
     {
