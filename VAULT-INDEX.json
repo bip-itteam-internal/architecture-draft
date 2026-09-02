@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-02",
-  "jumlah_dokumen": 339,
+  "jumlah_dokumen": 340,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -11124,6 +11124,38 @@
         "pemilih tipe",
         "ADR 0067",
         "hitung fisik"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Redesign ACL AllowedShops Berbasis Department Shops.md",
+      "judul": "ANALISA - Redesign ACL AllowedShops Berbasis Department Shops",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "🟡",
+      "status_teks": "Analisa — belum ada kode. Riset dilakukan 2026-09-02 sebagai kelanjutan investigasi Fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]], setelah rencana \"cabut menu Teams sepenuhnya\" dibatalkan karena ditemukan fungsi ACL yang masih aktif.",
+      "publik": false,
+      "tautan": [
+        "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
+        "Microservices - Integration Service",
+        "API - Integration Service"
+      ],
+      "hash": "9d84254ec11bb529c9848a59d49b2642320080326daaf7130c2f693840802bdd",
+      "ukuran_kb": 9.1,
+      "ringkasan": "Menjawab: apakah `team_shops`/`marketing_teams`/`team_members` bisa dipensiunkan sekarang kepemilikan toko sudah pindah ke `department_shops`, dan kenapa belum bisa — mekanisme ACL `AllowedShops` (siapa boleh lihat toko apa) di endpoint `GET /transactions/orders/master/shops` masih bergantung pada tabel lama itu. Menjelaskan bagaimana data tim Beauty Hacks/Kyura sudah nyaris identik dengan `department_shops` (bukti migrasi aman), mengusulkan redesign `AllowedShops` berbasis `work_data.department` + `department_shops`, dan mendokumentasikan bug independen: staf non-marketing (Finance, IT, Kesekretariatan) yang memegang `system_roles.integration` kemungkinan mendapat dropdown/daftar toko kosong karena `IsIntegrationAdmin` selalu false (0 akun admin) dan mereka tak terdaftar di `team_members`. Juga menjadi rujukan urutan migrasi expand-migrate-contract sebelum menu Teams benar-benar bisa dicabut.",
+      "kata_kunci": [
+        "AllowedShops",
+        "ACL",
+        "team_shops",
+        "team_members",
+        "marketing_teams",
+        "department_shops",
+        "hak akses toko",
+        "shop access control",
+        "integration-service",
+        "Teams menu",
+        "RequireIntegrationStaff",
+        "IsIntegrationAdmin",
+        "master/shops"
       ]
     },
     {
