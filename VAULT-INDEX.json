@@ -1366,9 +1366,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "9fe24f262084ee8d176104dc68befff60ee0d12606cefd5e8045520f1369e878",
-      "ukuran_kb": 373.3,
-      "ringkasan": "Menjawab: halaman apa saja yang ada di portal web internal One Bharata, bagaimana tiap modul dirakit di frontend, dan keputusan tampilan apa yang sudah diambil beserta alasannya. Mencakup HRIS, presensi, payroll dan insentif, rekrutmen, finance, procurement, task management, IT, GA, Marketing Analytics, dan layar Jadwal Host Live milik marketing, termasuk peran web ini sebagai SSO Identity Provider untuk aplikasi lain. Juga memuat catatan multi-perusahaan, i18n dua bahasa, pola tabel HRIS, cara kategori sidebar lahir dari peran maupun paket hak, dan sejumlah jebakan frontend yang sudah terbukti menggigit.",
+      "hash": "fcd24cbd89244c8398f086348efd49dc33d3b32d9a999cb803b3389e5d404eec",
+      "ukuran_kb": 381.7,
+      "ringkasan": "Menjawab: halaman apa saja yang ada di portal web internal One Bharata, bagaimana tiap modul dirakit di frontend, dan keputusan tampilan apa yang sudah diambil beserta alasannya. Mencakup HRIS, presensi, payroll dan insentif, rekrutmen, finance, procurement, task management, IT, GA, Marketing Analytics, dan layar Jadwal Host Live milik marketing, termasuk peran web ini sebagai SSO Identity Provider untuk aplikasi lain. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts lewat ChartContainer beserta aturan warna per tema dan daftar bagan yang belum mengikutinya, catatan multi-perusahaan, i18n dua bahasa, pola tabel HRIS, cara kategori sidebar lahir dari peran maupun paket hak, dan sejumlah jebakan frontend yang sudah terbukti menggigit.",
       "kata_kunci": [
         "erp-frontend",
         "hris-dashboard",
@@ -1382,7 +1382,13 @@
         "menu",
         "sidebar",
         "jadwal host live",
-        "kategori modul"
+        "kategori modul",
+        "bagan",
+        "chart",
+        "recharts",
+        "ChartContainer",
+        "warna bagan",
+        "mode gelap"
       ]
     },
     {

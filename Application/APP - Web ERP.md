@@ -211,6 +211,52 @@ Kuartet di §2 tetap berlaku untuk badge yang memang harus memberi tahu **lintas
 
 `components/tanstack.tsx:11` masih `new QueryClient()` polos tanpa `defaultOptions`, jadi seluruh aplikasi mewarisi `staleTime: 0` + `refetchOnWindowFocus: true`; query yang tak menyatakan sikapnya sendiri akan refetch tiap pindah halaman dan tiap pemakai kembali ke tab. Rencana penyetelannya ada di `Workspace/Inbox/2026-08-07 Rencana - Kurangi Fetch Global Sidebar erp-frontend.md` (Task 5), **belum dikerjakan**.
 
+## Konvensi Bagan (Recharts + `ChartContainer`)
+
+- **Status**: ⚠️ Implemented (ada catatan) — 18 dari 28 komponen bagan sudah memakai pola ini per 2026-09-02; sisanya diukur di bawah.
+
+Bagan digambar Recharts, tetapi **selalu dibungkus `ChartContainer`** (`components/ui/chart.tsx`), bukan `ResponsiveContainer` telanjang. `ChartContainer` memasang wadah responsif itu di dalam dirinya **sekaligus** memancarkan `--color-<key>` terpisah untuk tema terang dan gelap lewat `ChartStyle`. Itu satu-satunya yang membuat warna deret bisa mengikuti mode gelap tanpa komponen membaca tema sendiri.
+
+### Aturan yang berlaku untuk tiap bagan
+
+- **`ChartConfig` memakai `theme: {light, dark}`, bukan `color` tunggal.** Satu nilai untuk dua mode berarti yang kontrasnya cukup di terang hampir selalu terlalu redup di gelap, dan itu kegagalan yang tak terlihat sampai ada yang memakai mode gelap. ⚠️ Pengecualian sah: token yang **sudah** punya nilai gelapnya sendiri di `globals.css` (mis. `--fat-seri-*`) memang dipakai lewat `color`, karena membungkusnya lagi dengan `theme` melahirkan sumber kebenaran kedua untuk warna yang sama.
+- **Hex mentah dilarang** di berkas bagan. Ia tak dapat mengikuti mode gelap sama sekali.
+- **`--chart-1..5` ditolak untuk deret JAMAK.** Token itu berganti hue antar tema, dan diuji `scripts/validate_palette.js` milik skill dataviz: `--chart-4` versus `--chart-5` di tema terang hanya berjarak ΔE 7,4 (ambang 15) untuk penglihatan normal, dan `--chart-3` di bawah ambang chroma sehingga terbaca abu-abu. Penggantinya `--fb-seri-1..6` (kategorikal) atau peta di `dashboard/kartu/bagan/warna.ts`.
+- **Warna IDENTITAS dipisah dari warna PENILAIAN.** `WARNA_BAGAN` sengaja tak memuat hijau/merah; `WARNA_AMBANG` dipakai hanya saat ambangnya benar-benar tertulis di layar.
+- **Identitas deret tak boleh bersandar warna saja.** Tiap garis punya baris legenda berlabel; tiap irisan donut punya label, jumlah, dan persen.
+- ⛔ **Swatch legenda adalah SATU FAKTA DI DUA TEMPAT, dan wajib dikunci uji.** Legenda duduk di LUAR `ChartContainer` sementara `--color-<key>` hanya hidup di dalam `[data-chart=...]`, jadi warnanya terpaksa ditulis dua kali: sekali sebagai variabel CSS, sekali sebagai kelas Tailwind. Duplikasinya tak terhindarkan, menyimpangnya bisa dicegah. ⚠️ Penjaga lama `warna.test.ts` hanya memeriksa swatch-nya **ada**, bukan **cocok**, sehingga legenda dan garis bisa berbeda warna untuk deret yang sama tanpa satu pun test merah; pola yang benar membandingkan tokennya langsung (`var(--color-amber-400)` ↔ `bg-amber-400`), lihat `rating-trend-chart.test.tsx`.
+- ⛔ **Id `<defs>` gradien wajib lahir per-instance** lewat `useId()` yang **disaring** (`.replace(/[^a-zA-Z0-9_-]/g, "")`). SVG `<defs>` berbagi satu ruang nama sedokumen, jadi dua bagan ber-id sama membuat yang kedua memakai gradien milik yang pertama; gejalanya bukan galat melainkan warna yang mendarat di ketinggian yang salah. Saringannya menutup React 18 yang menghasilkan `:r0:`, tidak sah di dalam `url(#...)`.
+- ⛔ **Offset gradien dihitung dari deret yang benar-benar digambar, bukan dari domain sumbu**, karena gradien SVG mengukur terhadap kotak pembatas PATH. `<Area>` adalah DUA path (kurva dan bidang sampai dasar sumbu), jadi keduanya butuh offset sendiri.
+- ⛔ **`type="monotone"` saja.** `natural`, `basis`, dan `cardinal` overshoot, menggambar lengkung yang melampaui titik datanya sehingga bagan bisa menonjolkan puncak yang tak pernah diukur.
+- **`connectNulls={false}`.** Periode tanpa data digambar sebagai jeda, bukan nol.
+- **`dot` tanpa isian DAN tanpa garis tepi sekaligus akan lenyap di tema terang**, karena Recharts memakai isian bawaannya yang putih. Bentuk yang aman cuma menyebut jari-jarinya.
+- **Deret kosong tetap menggambar sumbu dan kisi**, dan panel rapi itu terbaca sebagai "datanya nol" padahal artinya "belum ada yang tercatat". Sembunyikan bagannya, ganti satu kalimat. Loading pakai `Skeleton`, bukan spinner.
+- **Format tanggal dan uang di lapisan RENDER pakai `intlLocale(lang)`**, jangan di lapisan fetch dan jangan mematok `"id-ID"` ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]).
+- ⛔ **Sumbu yang memuat satuan CAMPUR tak boleh mengklaim satuan.** Satuannya tinggal di legenda dan tooltip yang memang tahu serinya.
+
+### Yang BELUM mengikuti (diukur 2026-09-02)
+
+Dari 28 komponen bagan di `erp-frontend`, **10 belum** memakai pola ini:
+
+- **Empat bagan sudah memakai `ChartContainer` tetapi masih memakai token `--chart-N`**: `task-management/team-report/trend-section`, `hris/kpi/kpi-saya-tren-chart`, `form-builder/analytics/field-summary-card`, `form-builder/analytics/daily-trend-chart`. ⚠️ Penjaga `warna.test.ts` hanya menyapu direktori `dashboard/kartu/bagan/`, jadi keempatnya tidak tergerbang sama sekali; test hijau di sini bukan bukti konvensinya diikuti.
+- **Tiga bagan tanpa `ChartContainer`**: donut komposisi Marketing Analytics, donut dashboard Recruitment, dan bagan batang penjualan per channel Procurement.
+- **Sistem bagan TANDINGAN di `finance/posisi/components/bagan/`**: lima bagan SVG rakitan tangan (batang, batang horizontal, donat, garis, persen) lengkap dengan palet (`lib/palet.ts`), tooltip (`tip-bagan.tsx`), legenda (`legenda-bagan.tsx`), dan keadaan kosong sendiri. Ini bukan satu bagan nyasar melainkan **sumber kebenaran kedua** untuk warna, tooltip, dan legenda; menyatukannya menuntut keputusan tersendiri karena kelimanya saling terkait.
+- Dua visualisasi Marketing Analytics lain digambar SVG tangan dan memang bukan bagan Recharts: histogram sebaran porsi iklan dan gauge busur ROAS.
+
+### Lima bagan garis yang diseragamkan 2026-09-02
+
+Menyentuh empat modul, dan **dua di antaranya memperbaiki cacat yang sudah hidup**:
+
+| Bagan | Yang berubah |
+|---|---|
+| `finance/incentive/.../dashboard/trend-chart` | ⛔ **Cacat mode terang.** Kisinya diberi putih semi-transparan dan tooltipnya latar gelap, keduanya dipatok mati, jadi keduanya benar hanya di mode gelap: di mode terang kisinya praktis hilang dan tooltipnya kotak gelap yang menempel. Bentuknya kini Area bergradasi, padanan penuh bagan tren KPI |
+| `integration/ads-analytics/ads-line-chart` | ⛔ **Satuan yang dikarang.** Kedua formatter sumbu memberi awalan "Rp" untuk tiap nilai di atas seribu, padahal sumbu kanan memuat GMV (rupiah), impressions (cacah), dan ROAS (rasio) sekaligus. Lima ribu tayangan terbaca "Rp5rb". Satuannya dipindah ke legenda dan tooltip. Tetap `Line`, bukan Area: sembilan gradasi bertumpuk tak terbaca |
+| `integration/transactions/revenue-comparison-chart` | Deret periode sekarang jadi Area bergradasi, pembandingnya tetap garis putus tanpa isian supaya perpotongan keduanya terbaca. Legenda dan tooltip dulu mengeja hal yang sama dengan dua cara |
+| `integration/reviews/rating-trend-chart` | ⛔ **Tetap `ComposedChart` Bar + Line dengan dua sumbu Y.** Batangnya jumlah ulasan, garisnya rata-rata rating; menyatukannya jadi satu deret garis akan menghapus jumlah ulasan dari layar tanpa galat. Dikunci uji |
+| `marketing-analytics/blok-tren` | Hanya bungkusnya. Warnanya sudah token `--fat-seri-*` dan kedua serinya sudah dibedakan garis putus, bukan warna saja |
+
+⚠️ **Teks `blok-tren` sengaja TIDAK ikut di-i18n-kan**, berbeda dari empat lainnya: `halaman-beranda.tsx` merangkai **14 blok** dan tak satu pun memakai `useTranslation`, jadi menerjemahkan satu blok saja membuat halamannya campur bahasa. Lihat § Belum Diimplementasikan.
+
 ## Modul / Fitur (Sudah Diimplementasikan)
 
 **ERP (publik)**
@@ -918,6 +964,7 @@ Digerbang `finance.profit.view` di sidebar — izin paling sempit yang benar-ben
 
 ## Belum Diimplementasikan / Catatan
 
+- ⚠️ **Halaman beranda Marketing Analytics belum i18n SAMA SEKALI** (diukur 2026-09-02). `halaman-beranda.tsx` merangkai **14 blok** (`blok-tren`, `blok-efisiensi`, `deret-kpi`, `sebaran-iklan-chart`, `blok-funnel`, `blok-donat`, `blok-penggerus-peluang`, `blok-penanggung-jawab`, `blok-tindakan`, `blok-keputusan-toko`, `blok-laba-harian`, `blok-simulasi-alokasi`, `blok-kanal-bar`, dan halamannya sendiri) dan **tak satu pun memakai `useTranslation`**; seluruh teksnya Indonesia yang dipatok di sumber. Di modul ini i18n baru menyentuh 11 berkas lain (live-shift, ringkas-live, retur, meta-mapping, dialog affiliate) dengan namespace `marketing.*` yang sudah ada. Konsekuensinya: **menerjemahkan satu blok saja membuat halamannya campur bahasa**, jadi ini harus dikerjakan sebagai satu task tersendiri, bukan disisipkan ke perubahan lain. Ditemukan saat menyeragamkan bagan garis 2026-09-02, dan itu sebabnya `blok-tren` sengaja dilewati sementara empat bagan lain ikut di-i18n-kan. Melanggar [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]].
 - **`/integration/inventories` = STUB** (data `MOCK_INVENTORIES` hardcoded; inventory asli ada di module GA)
 - **`/integration/shipment-setting`** create modal — `// TODO: wire up mutation` (tabel tampil, create belum di-wire)
 - **Accurate transaction detail** — panel "Summary Coming Soon"
