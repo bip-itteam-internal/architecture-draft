@@ -48,7 +48,7 @@ Dikunci `TestEmployeeIDEfektifMenguncKeIdentitasPemanggil` dengan keempat kombin
 ## Belum Ada
 
 - **Modul Tax** — menunggu keputusan pemilik metrik; lihat [[Finance - Rancangan Finance Service]].
-- **Forecast kas mingguan** (Fase 1b, metrik bobot 15%) — koleksi `cost_forecast_kas` sudah dinamai sejak Fase 0, rutenya belum ada.
+- ~~**Forecast kas mingguan** (Fase 1b, metrik bobot 15%) — koleksi `cost_forecast_kas` sudah dinamai sejak Fase 0, rutenya belum ada.~~ **Koreksi 2026-09-02: baris ini sudah usang dan menyesatkan.** Fase 1b memang dibangun (14 Agustus 2026), tetapi **bukan di service ini dan bukan sebagai modul forecast** — ia menjadi pemecahan mingguan atas laporan anggaran vs realisasi yang sudah hidup di [[Microservices - Integration Service]] (`GET /accounting/anggaran/mingguan` dan `/mingguan/kpi`), memasok sumber KPI `forecast_kas` di [[Microservices - Employee Service]]. Koleksi `cost_forecast_kas` **tidak jadi dipakai**, dan finance-service tidak disentuh sama sekali. Membiarkan baris ini di daftar "Belum Ada" membuat pembaca mencari rute yang memang tidak akan pernah ada di sini, lalu menyimpulkan metrik berbobot besar belum tergarap padahal ia satu-satunya metrik Cost Control yang rantainya sudah utuh. Alasan rancangannya di [[Finance - Rancangan Finance Service]], bab "Modul Cost Control Fase 1b". Bobot metriknya sendiri kini **35**, bukan 15 — lihat bab "Sheet KPI revisi September 2026" di berkas yang sama.
 - **Master anggaran OPEX** — sengaja **tidak** dimigrasi ke sini; ia tetap milik [[Microservices - Integration Service]] karena hidupnya dari katalog akun dan realisasi Accurate.
 
 ## Dokumen Terkait

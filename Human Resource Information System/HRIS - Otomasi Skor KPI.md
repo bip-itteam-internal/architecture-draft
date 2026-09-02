@@ -183,6 +183,47 @@ Sampai batch ini, menyalakan satu metrik otomatis menuntut seseorang membedah `k
 > | `uptime_sistem` · `downtime` | `rata_rata` | department |
 > | `varians_anggaran` · `varians_persen` | `rata_rata` | department |
 >
+> ⚠️ **Koreksi 2026-09-02 — sensus di atas berselisih dengan kode untuk `varians_anggaran`, dan
+> untuk baris itu kodelah yang berlaku.** Sensus mencatat pasangan `varians_anggaran` ·
+> `varians_persen` dengan cakupan `department`, tetapi sumber itu mendaftarkan cakupan
+> **`perusahaan`** sebagai satu-satunya yang didukung maupun bakunya
+> (`DaftarkanScopeSumber` di `kpi_sumber_varians_anggaran.go`, dan `cuplikanVarians`
+> memang **tidak** mengirim parameter `departemen` ke `/accounting/anggaran/varians`).
+> Perubahannya masuk lewat `28dde395 fix(kpi): F2 varians_anggaran ukur seluruh perusahaan,
+> bukan departemen`, yang mengoreksi `e5cc5470` — alasannya ada di komentar berkas itu:
+> master anggaran produksi tak punya dimensi departemen yang cocok dengan `work_data`
+> karyawan, sehingga menyempitkan ke departemen membuat filternya selalu jatuh ke nol baris
+> dan metriknya selalu gagal hitung dengan pesan "total anggaran periode ini nol" — benar
+> secara teknis, menyesatkan secara substansi. Konfigurasi template yang masih menyimpan
+> `department` untuk sumber ini karena itu **bukan lagi konfigurasi yang sah**, dan perlu
+> diubah HR menjadi `perusahaan`.
+>
+> ⚠️ **Metrik `varians_persen` juga bukan metrik yang benar untuk target dua arah.** Target
+> baris pertama sheet Cost Control berbunyi "varians ≤ ±5%", dan varians **bertanda**
+> memberi nilai sempurna pada realisasi yang hanya separuh anggaran — penyimpangan 50% yang
+> terbaca sebagai penghematan cemerlang. Bentuk yang benar adalah `varians_absolut_persen`
+> dengan arah `turun`, target `5`, dan `nilai_minimum` **dikosongkan**; alasan lengkapnya di
+> [[Finance - Rancangan Finance Service]]. Selama sensus ini masih memperlihatkan
+> `varians_persen` terpasang, temuan itu berlaku untuk setiap posisi yang memakainya, bukan
+> hanya Cost Control.
+>
+> ⚠️ **Dua sumber ber-metrik Cost Control belum tercatat di tabel mana pun di dokumen ini.**
+> `admin_non_ops` (metrik `penurunan_yoy_persen` dan `rasio_beban_non_ops_persen`,
+> `kpi_sumber_admin_nonops.go`) dan `kinerja_cost_control` (metrik `rekomendasi_efisiensi`,
+> `kpi_sumber_cost_control.go`) keduanya sudah di `main` dan dipanggil produksi, tetapi tak
+> satu pun muncul di sensus 2026-08-25 — jadi belum ada bukti pemakaiannya di `kpi_template`,
+> dan formulanya sengaja dibiarkan kosong sesuai aturan paragraf di bawah. Perlu diperhatikan
+> bahwa nama metrik YoY-nya adalah **`penurunan_yoy_persen`**, bukan `penurunan_persen`;
+> yang kedua adalah nama field JSON pada muatan `/accounting/admin-nonops/kpi`, dan memakainya
+> sebagai nama metrik di template menghasilkan galat "metrik tak dikenal".
+>
+> ⚠️ **Keempat sumber rumpun Finance ini tidak mendaftarkan formula kanonik sama sekali**
+> (`varians_anggaran`, `forecast_kas`, `admin_non_ops`, `kinerja_cost_control` — tak satu pun
+> memanggil `DaftarkanFormulaSumber`). Konsekuensinya pengisi template memilih reduksinya
+> sendiri tanpa dituntun, padahal ketiga sumber pertama memasok **satu pengukuran**
+> (`Populasi: 1`) sehingga `rata_rata` dan `jumlah_nilai` kebetulan menghasilkan angka yang
+> sama hari ini. Kebetulan itu tidak dijamin bertahan, dan salah pilih tidak menerbitkan galat.
+>
 > Sumber yang **belum punya bukti pemakaian sengaja dibiarkan kosong**, dan frontend
 > meminta pengisi memilih. Menebak rumus lebih berbahaya daripada mengakui belum tahu:
 > rumus yang salah tidak menimbulkan galat, hanya angka salah yang tampak wajar. Formula

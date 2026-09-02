@@ -758,6 +758,16 @@ membatalkan angkanya), dan belanja yang memang nol.
 > berstatus `semi`, tetapi **nilai 0-nya tetap mengalir** ke penilaian. Keadaan ini berulang
 > **tiap awal bulan**, bukan sekali saat rilis. Yang menemukannya adalah kebiasaan memperlakukan
 > angka nol sebagai pertanyaan alih-alih kabar baik — respons itu lolos setiap gerbang lain.
+>
+> ✅ **Ditambal `ee6bdf38` (14 Agustus 2026), diverifikasi masih berlaku di `origin/main`
+> 2026-09-02.** `RingkasDariBaris` kini mencacah sel yang benar-benar terukur dan, bila
+> **tak satu pun** terukur sementara barisnya ada, memaksa `AkurasiPersen, AkurasiTerdefinisi
+> = 0, false` — sehingga nol itu tak lagi mengalir ke penilaian, ia berhenti sebagai galat di
+> `katalogMetrikForecastKas` pada sumber KPI. Penjaganya berlaku sampai ke **total bulan**,
+> bukan hanya per minggu, sebab `SusunLaporanMingguan` merakit `lap.Total` lewat fungsi yang
+> **sama** atas seluruh sel — itulah yang menutup jalur yang benar-benar dibaca metriknya
+> (`/anggaran/mingguan/kpi` membalas `lap.Total`, bukan baris mingguannya). Sebagian terukur
+> tetap terdefinisi dan ketidaklengkapannya dinyatakan lewat cakupan, sesuai maksud semula.
 
 **Layar tidak menyatakan ambang 95%** dan tidak mewarnai baris lulus/gagal — ambangnya milik
 `kpi_template` ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]) dan dapat diubah
@@ -1097,6 +1107,344 @@ lagi keputusan melainkan pekerjaan: `Beban PPN KMS Gedung` belum ada di bagan ak
 (dampak nihil — realisasi nol, tak beranggaran), dan **metrik KPI-nya sendiri belum diperiksa**
 apakah sudah terisi otomatis di halaman KPI Cost Control. Yang terakhir itu tujuan seluruh
 rangkaian ini; master datanya kini ada, jadi tak ada lagi yang menghalanginya.
+
+## Sheet KPI revisi September 2026 — tiga metrik menggantikan tujuh
+
+Perusahaan merombak sheet KPI posisi **Staf FAT / Cost Control** (Saputri Nur Atika,
+BIP-0065-07-24, grade STAF, atasan Supervisor FAT) dari tujuh metrik menjadi **tiga**, dengan
+bobot **40 / 25 / 35** yang berjumlah tepat 100. Bab ini mencatat susunan barunya dan menandai
+bagian rancangan lama yang kini tak lagi punya metrik pemakai. Padanan di sisi HR ada di
+[[HRIS - Matriks KPI per Departemen]] dan [[HRIS - Otomasi Skor KPI]].
+
+| # | Bobot | KPI | Target | Kolom `SISTEM ERP` | Sumber KPI yang memasoknya |
+|---:|---:|---|---|---|---|
+| 1 | 40 | Review Cash Outflow Mingguan | Efisiensikan Realisasi OPEX −5% dari budget | *"realisasi opex tanpa iklan dengan input budget"* | `varians_anggaran` · `varians_absolut_persen` |
+| 2 | 25 | Analisis biaya berulang dan rekomendasi perbaikan | Penurunan biaya non-operasional ≥ 2% YoY | *"Komparasi biaya bulan ini tahun ini vs bulan lalu tahun lalu"* | `admin_non_ops` · `penurunan_yoy_persen`, dan/atau `kinerja_cost_control` · `rekomendasi_efisiensi` |
+| 3 | 35 | Analisis Deviasi Forecast vs Aktual | Realisasi anggaran maksimal 95% dari RAPB | *"PENAMBAHAN FITUR LAPORAN ANGGARAN VS REALISASI"* | `forecast_kas` · `akurasi_forecast_kas` |
+
+Skor Juli 2026 yang tercatat di sel sheet: baris 1 = 100, baris 2 = 100, baris 3 = 47.
+
+**Skor 100 pada baris 1 diberikan penilai secara manual, bukan dihitung mesin.** Dokumen ini
+tidak pernah menyatakan bahwa terpakai 62,7% menghasilkan nilai 100, dan memang tidak bisa:
+tak ada template produksi yang pernah menghitung baris itu. Menuliskannya sebagai keluaran
+mesin akan menciptakan riwayat yang tak pernah terjadi.
+
+### Bagian rancangan lama yang kini tak lagi punya metrik pemakai
+
+Tiga metrik lama hilang dari sheet, dan bersamanya hilang pula alasan membangun apa pun untuk
+mereka. Dicatat di sini supaya tidak dibangkitkan ulang tanpa sheet yang memintanya:
+
+- **`Pengelolaan Kas Iklan`** (bobot lama 0,20; kolom `SISTEM ERP` berbunyi
+  `DONE (MENU BEBAN IKLAN)`). Pekerjaan rekonsiliasi kas iklan tetap berguna sebagai fitur,
+  tetapi tak lagi menyumbang bobot KPI posisi ini.
+- **`Minimal 5 ide inovasi baru dari tim`** (Kaizen) dan **`Pertemuan 1-on-1`** (bobot lama
+  0,10 dan 0,05). Keduanya sudah lama dinyatakan di luar lingkup, dan kini tak lagi menahan
+  bobot apa pun — modul Kaizen dan log 1-on-1 tetap tidak perlu dibangun.
+- **Koleksi `cost_forecast_kas`** yang dipesan sejak Fase 0 tetap **tidak dipakai**; Fase 1b
+  memilih memecah laporan yang sudah ada, dan sheet baru tidak mengubah keputusan itu.
+
+Yang **tidak** hilang: seluruh Fase 1a (rekomendasi efisiensi) dan Fase 1b (breakdown
+mingguan) masih memasok baris 2 dan baris 3. Master OPEX tetap menjadi tulang punggung
+baris 1.
+
+### Dua baris dengan target yang sama, dua angka yang tak dapat didamaikan
+
+Baris 1 berbunyi *"Efisiensikan Realisasi OPEX −5% dari budget"* dan baris 3 berbunyi
+*"Realisasi anggaran maksimal 95% dari RAPB"*. Secara aritmatika keduanya kalimat yang sama:
+realisasi ≤ 95% anggaran. Godaan yang harus ditahan adalah menyimpulkan bahwa keduanya satu
+angka dasar yang dibaca dua cara. Bukan — empat perbedaan berikut membuatnya berdiri di atas
+hitungan yang benar-benar terpisah:
+
+| | Baris 1 — varians OPEX | Baris 3 — akurasi forecast |
+|---|---|---|
+| Populasi | 57 komponen OPEX; cakupan Juli 39 dihitung + 17 belum dianggarkan = 56 | 6 akun kas-keluar |
+| Versi anggaran | RAPB **Rev 2**, yang diunggah ke ERP; total Juli Rp 5.118.934.685 | RAPB **asli**, dipakai `Juli_Cashflow.pdf`; proyeksi Rp 5.082.414.466 |
+| Asal angkanya | ERP produksi, layar `/finance/anggaran` | Berkas rekap Finance, dipakai sebagai fixture test |
+| Rumus | Rasio terpakai; hemat = baik. Juli **62,7%** | Simetris terhadap 100%; meleset ke bawah sama buruknya. Juli **47,81%** |
+
+Kemiripan Rp 5,08 M dan Rp 5,12 M adalah **kebetulan**: yang satu total 6 akun kas-keluar
+menurut RAPB asli, yang lain total 39 baris anggaran Rev 2. Total RAPB asli untuk seluruh OPEX
+Juli justru sekitar Rp 6,68 miliar. Karena itu **100 dan 47 tidak dapat diperbandingkan**, dan
+tidak ada satu angka pun yang hari ini berhak disebut "tingkat realisasi Juli" bagi posisi ini.
+
+**Arah kebaikannya pun berlawanan.** Berhemat menaikkan baris 1 dan **menurunkan** baris 3,
+sebab baris 3 memperlakukan meleset ke bawah sama meleset-nya dengan meleset ke atas. Ini
+pilihan yang sah bila disengaja — efisiensi dan akurasi perencanaan memang dua kebaikan yang
+berbeda — tetapi harus **dinyatakan**, bukan ditemukan orang setelah skornya keluar.
+
+**Peringatan populasi bersama kini lebih keras, bukan lebih longgar.** Bab Fase 1b menuliskan
+alasan memakai 6 akun kas-keluar alih-alih 57 komponen OPEX dengan menyebut bobot **lama**:
+varians OPEX 20% ditambah forecast 15% sama dengan 35% yang bergerak sebagai satu angka. Di
+bawah sheet baru angkanya menjadi **40 + 35 = 75** — hitungan atas bobot baru, bukan kutipan
+dari catatan lama. Menyamakan populasi kedua metrik ini akan membuat tiga perempat penilaian
+posisi bergerak sebagai satu angka tunggal.
+
+### "Tanpa iklan" mengganti metriknya, bukan menyaringnya
+
+Kolom `SISTEM ERP` baris 1 meminta *"realisasi opex **tanpa iklan** dengan input budget"*.
+Beban Iklan bukan pos kecil di master ini: `6107 Beban Iklan` tercatat **Rp 3.579.122.639**
+dari total anggaran Juli **Rp 5.118.934.685** — sekitar **70%**. Bila iklan dikeluarkan,
+penyebutnya menyusut menjadi sekitar sepertiga, dan seluruh angka historis yang pernah
+dilaporkan (termasuk terpakai 62,7% Juli) tidak lagi sebanding dengan angka baru.
+
+**Tidak ada satu pun endpoint di grup `/accounting` yang menerima parameter pengecualian
+akun** — diperiksa 2026-09-02 dengan pencarian atas `kecuali_akun`, `exclude_account`,
+`tanpa_iklan`, dan `excludeAccount` di seluruh `services/integration/`, yang berbalas nol
+hasil. Yang ada di `/accounting/anggaran/varians` adalah `akun_no`, dan itu **memilih satu**
+akun, bukan membuang satu; `saringVarians` menyaringnya sebagai kecocokan positif. Jadi
+selama kolom `SISTEM ERP` dibaca harfiah, bagian ini **golongan C**: butuh satu parameter
+query opsional yang membuang akun berdasarkan **nama ternormalisasi** (`normalisasiNamaAkun`,
+bukan perbandingan string mentah), ditambah satu metrik baru pada sumber yang sama.
+
+**Penyaringannya tidak boleh terjadi di sisi sumber KPI.** Menaruh daftar akun yang
+dikecualikan di dalam `kpi_sumber_varians_anggaran.go` berarti angka yang tampil di layar Cost
+Control dan angka yang masuk KPI berbeda, tanpa ada yang menyatakannya. Penyaringan harus
+terjadi di tempat angkanya lahir — di integration-service — dan hasilnya harus bisa dilihat di
+layar. Alasan yang sama sudah dipegang `SaringKatalogOpex`: satu normalizer, satu tempat.
+
+### Konfigurasi template yang benar untuk baris 1
+
+Untuk target berbentuk "varians ≤ ±5%", satu-satunya bentuk yang benar adalah:
+
+```
+metrik        varians_absolut_persen
+arah          turun
+target        5
+nilai_minimum <DIKOSONGKAN>
+```
+
+Dua jebakan berdiri berdampingan di sini, dan keduanya senyap:
+
+- **`varians_persen` (bertanda) alih-alih `varians_absolut_persen`** memberi nilai
+  **sempurna** pada realisasi yang hanya separuh anggaran — penyimpangan 50% terbaca sebagai
+  penghematan cemerlang. Sensus `kpi_template` produksi 2026-08-25 di
+  [[HRIS - Otomasi Skor KPI]] justru mencatat pasangan `varians_anggaran` · `varians_persen`
+  sebagai yang terpasang; selama itu masih benar, temuan ini berlaku untuk **setiap** posisi
+  yang memakainya.
+- **Mengisi `nilai_minimum` pada metrik berarah `turun` membalikkan hasilnya.** Ambang minimum
+  diperiksa terhadap **realisasi**, bukan terhadap nilai 0..100 (`NilaiDenganArah` di
+  `shared-library/models/employee/kpi_reduksi.go`), sedangkan realisasi metrik ini adalah
+  varians dalam persen yang **makin kecil makin baik**. Mengisinya 70 membuat varians 2% —
+  hasil hampir sempurna — bernilai **nol**.
+
+Cakupannya juga perlu diperiksa: sumber ini mengukur OPEX **seluruh perusahaan** dan hanya
+mendaftarkan cakupan `perusahaan`, sehingga konfigurasi template yang masih menyimpan
+`department` tidak lagi sah. Rinciannya di [[HRIS - Otomasi Skor KPI]].
+
+### Baseline YoY baris 2 tidak sama dengan yang diminta sheet
+
+`/accounting/admin-nonops` membandingkan realisasi terhadap **bulan yang SAMA pada tahun
+sebelumnya**, dikalikan **1,25** sebagai kebijakan Finance (dikonfirmasi 2026-08-15: *"Up 25%
+itu artinya dari realisasi tahun lalu ditambah 25%"*). Sheet menuliskan *"bulan ini tahun ini
+vs bulan **LALU** tahun lalu"* — bulan pembanding yang berbeda — dan **tidak menyebut pengali
+1,25 sama sekali**.
+
+Pengali itu **konstanta tertanam saat kompilasi** (`const PengaliBaselineYoY = 1.25` di
+`internal/usecase/admin_nonops_daftar.go`), bukan nilai konfigurasi: tidak dibaca dari env,
+tidak disimpan di Mongo, dan tidak dapat diubah tanpa rilis. Ditulis sebagai konstanta
+bernama justru supaya perubahannya terlihat di diff, sebab mengubahnya mengubah arti seluruh
+angka historis metrik ini. Periode pembandingnya pun sudah pernah salah sekali dan
+dikoreksi — versi pertama mematoknya tetap di Mei 2025, dan `PeriodeBaseline` kini
+mengembalikan `(tahun−1, bulan)`.
+
+Selama keduanya belum disamakan, angka yang keluar sistem **tidak akan** sama dengan angka
+yang dihitung Cost Control di berkasnya sendiri — dan yang salah bukan salah satunya,
+melainkan keduanya menjawab pertanyaan yang berbeda. Menyamakannya murah secara teknis
+(mengganti satu konstanta dan satu fungsi dua baris), tetapi ia **mengubah seluruh angka
+historis metrik ini**, jadi keputusannya milik Finance, bukan IT.
+
+Satu hal lagi yang belum terjawab berkas mana pun: sheet menyebut analisis **biaya berulang**,
+sedangkan yang dihitung sistem adalah tiga akun administratif tertentu (`Beban Iuran &
+Sumbangan`, `Beban Bank`, `Beban Entertainment Adum`). Pencarian atas istilah "biaya berulang"
+di seluruh vault pada 2026-09-02 tidak menemukan satu pun definisi — hanya kalimat sheet itu
+sendiri yang dikutip di [[HRIS - Matriks KPI per Departemen]] dan dua penyebutan tak terkait
+tentang biaya cloud. Itu pertanyaan terbuka untuk Finance, bukan sesuatu yang diputuskan di
+sini.
+
+### OPEX tanpa iklan pada laporan varians — ⚠️ Implemented di branch, belum merge (2026-09-02)
+
+Kolom `SISTEM ERP` sheet KPI `COST CONTROL` baris pertama meminta *"realisasi opex **tanpa
+iklan** dengan input budget"*. Bab ini mencatat apa yang dibangun untuk memenuhinya, dan —
+sama pentingnya — apa yang **tidak** diputuskannya.
+
+**Yang dibangun bersifat ADITIF dan aman dijalankan sebelum keputusan Finance #1 diambil.**
+Tak satu pun angka yang sudah ada berubah: `ringkas` tetap berdiri di atas 57 komponen OPEX
+seperti sebelumnya, dan agregat tanpa-iklan datang sebagai blok **tambahan** di sebelahnya.
+Itu keputusan yang disengaja, bukan kebetulan implementasi. Keputusan #1 justru menjadi lebih
+murah karenanya: Finance dapat melihat kedua angka berdampingan di layar sebelum memutuskan
+mana yang menjadi metrik KPI, alih-alih memutuskan atas angka yang belum pernah dilihat siapa
+pun. Yang **belum** diputuskan dan tetap milik HR bersama Finance adalah metrik mana yang
+dipasang di template — memasang `varians_absolut_persen_tanpa_iklan` mengubah arti seluruh
+riwayat baris ini, dan itu bukan konsekuensi teknis.
+
+Branch: `feat/varians-opex-tanpa-iklan` di [[Microservices - Integration Service]] /
+[[Microservices - Employee Service]] (repo `bip-erp`) dan di [[APP - Web ERP]] (repo
+`erp-frontend`). **Belum di-merge, belum di-deploy.**
+
+**Satu fakta menyederhanakan seluruhnya**: `DaftarKomponenOpex` memuat `"Beban Iklan"` **saja**
+— tidak ada akun kedua bernama iklan di antara 57 komponen itu. Pengecualiannya karena itu
+satu nama, dan seluruh Rp 3.579.122.639 anggaran Juli menempel pada satu baris. Yang masih
+perlu dikonfirmasi Finance adalah akibat sampingannya: baris anggaran Rev 2
+`Beban Iklan + Pajak Iklan` menutupi **dua** akun Accurate (lihat bab pemetaan Rev 2 di atas)
+sedangkan hanya satu yang ada di daftar 57, sehingga sisi anggaran hari ini memuat pajak iklan
+sementara sisi realisasi tidak menariknya. Mengeluarkan iklan kebetulan menghapus ketimpangan
+itu. Realisasi akun pajak iklan tidak dapat diverifikasi dari repo, jadi ini pertanyaan untuk
+Finance, bukan klaim.
+
+#### Keputusan bentuk: respons membawa DUA agregat, bukan satu agregat berparameter
+
+Bentuk yang pertama terpikir adalah parameter query opsional pada `/accounting/anggaran/varians`
+yang membuang akun tertentu. **Bentuk itu ditolak**, dan alasan ketiga di bawah yang menentukan:
+
+Pertama, parameter opsional membuat satu endpoint mengembalikan **dua angka berbeda untuk
+periode yang sama dengan nama yang sama**. Siapa pun yang membandingkan dua tangkapan layar
+bulan yang sama akan menyimpulkan datanya berubah — kelas kegagalan yang sudah dicatat berulang
+di modul ini, dan yang dituduh salah hitung selalu ERP-nya.
+
+Kedua, ia melahirkan dua sumber kebenaran tentang apa yang dimaksud "tanpa iklan": layar
+mengirim satu parameter, sumber KPI di [[Microservices - Employee Service]] mengirim parameter
+lain, dan keduanya dapat menyimpang tanpa satu pun galat. Itu persis alasan
+`rekomendasi_efisiensi` harus dikunci test lintas modul.
+
+Ketiga, ia melanggar aturan **satu muatan** yang menjadi dasar katalog metrik `varians_anggaran`:
+seluruh metrik di sumber itu lahir dari satu muatan `/anggaran/varians`, dan katalognya sengaja
+didaftarkan bersama peta penghitungnya supaya keduanya tak bisa menyimpang. Metrik yang
+memanggil endpoint dengan parameter berbeda mengubah satu peta menjadi dua jalur — alasan yang
+**sama** yang dulu membuat `forecast_kas` mendapat sumbernya sendiri alih-alih menumpang.
+
+Dengan dua agregat dalam satu respons, ketiganya lenyap sekaligus: satu panggilan, satu muatan,
+dua angka yang tidak mungkin berbeda pendapat karena lahir dari perjalanan yang sama — dan layar
+dapat menampilkan keduanya berdampingan, yang memang dituntut aturan bahwa penyaringan harus
+terjadi di tempat angkanya lahir dan hasilnya harus terlihat di layar. Biayanya satu lintasan
+`O(n)` atas sekitar 56 baris. Kelemahan yang diterima: preset kedua kelak menuntut blok ketiga
+di respons.
+
+#### Integration-service
+
+Berkas baru `internal/usecase/iklan_daftar.go` mengikuti pola `kas_keluar_daftar.go`: sebuah
+`DaftarAkunIklan` berisi satu nama, `AkunIklanSet()` yang mengembalikannya sebagai himpunan
+**berkunci nama ternormalisasi**, predikat `AkunIklan(nama)`, dan penyaring
+`BuangAkunIklan(baris)`. Daftarnya di **kode Go, bukan Mongo**, dengan alasan yang sudah
+tertulis di bab "Daftar Akun OPEX": daftar di kode identik di semua lingkungan secara
+konstruksi, sedangkan daftar di Mongo adalah state per-lingkungan yang dapat menyimpang antara
+dev dan prod tanpa ada yang tahu.
+
+Penyaringnya diletakkan di paket `usecase`, bukan di handler, supaya aturan `normalisasiNamaAkun`
+tidak disalin ke sana — salinan aturan pencocokan adalah cara paling mudah melahirkan sumber
+kebenaran kedua. Pencocokan mentah akan membuat satu perbedaan huruf besar **melewatkan** baris
+iklan dari pengecualian, dan agregat "tanpa iklan" diam-diam tetap memuat 70% master anggaran:
+angka yang salah dan tetap tampak wajar.
+
+**Penyaringan dikenakan pada baris HASIL GABUNG, bukan pada `FilterRealisasi`.** Ini jebakan
+yang nyata: `FilterRealisasi` hanya menyentuh sisi realisasi, sedangkan `GabungVarians` adalah
+full outer join yang membaca sisi anggaran utuh per periode. Menyaring di sisi realisasi akan
+membuang realisasi iklan tetapi **meninggalkan anggarannya** — penyebut tetap memuat Rp 3,58
+miliar sementara pembilangnya hilang, dan hasilnya bukan "tanpa iklan" melainkan angka yang
+salah ke arah yang tampak wajar. `BuangAkunIklan` juga tidak menyaring di tempat: baris yang
+sama dipakai dua kali oleh handler, dan menyaring di tempat akan membuat urutan penghitungan
+menentukan hasil keduanya.
+
+Handler `Varians` menambah empat field pada responsnya: `ringkas_tanpa_iklan`,
+`akun_dikecualikan` (daftar **nama**, bukan cacah — pembaca yang melihat dua angka berbeda perlu
+tahu *apa* yang hilang), `baris_dikecualikan`, dan `tanpa_iklan_tersedia`. Yang terakhir
+membedakan "agregat itu memang nol" dari "service ini belum diperbarui", pola yang sama dengan
+`pendapatan_terdefinisi` pada `/admin-nonops`. Penjaga nolnya ikut tanpa ditulis ulang:
+`ringkas_tanpa_iklan` memakai `RingkasVarians` yang sama, sehingga `persen_terpakai` tetap
+`null` saat total anggarannya nol dan `ada_baris_tak_terdefinisi` tetap dihitung untuk subsetnya
+sendiri.
+
+> **`baris_dikecualikan: 0` padahal `akun_dikecualikan` tak kosong adalah SINYAL,** bukan
+> keadaan normal: tak satu pun nama di daftar cocok dengan baris periode ini, biasanya karena
+> akunnya diganti nama di Accurate. Tanpa dibawa keluar, satu-satunya jejaknya adalah dua
+> agregat yang diam-diam sama — dan tak seorang pun akan menyadarinya. Layar menyatakannya
+> dengan kalimat sendiri.
+
+#### Employee-service
+
+Satu metrik baru, `varians_absolut_persen_tanpa_iklan`, ditambahkan ke
+`katalogMetrikVariansAnggaran`. **Satu, bukan tiga**: godaan menambah
+`varians_persen_tanpa_iklan` dan `persen_terpakai_tanpa_iklan` sekalian ditolak dengan alasan
+yang sama yang membuat katalog `forecast_kas` hanya berisi satu entri — menambah turunan yang
+tak pernah diminta siapa pun membuat pengisi template memilih di antara angka yang sebagian tak
+ada peminatnya, dan pilihan yang salah tidak menerbitkan galat, ia cuma menghasilkan skor yang
+keliru.
+
+Pemilihan agregatnya lewat **akhiran nama** (`ringkasUntukMetrik`, konstanta
+`akhiranTanpaIklan`), bukan lewat peta kedua yang memasangkan metrik ke agregatnya. Peta kedua
+harus dijaga tetap sinkron dengan katalognya, dan lupa mendaftarkan di sana membuat metrik
+tanpa-iklan diam-diam membaca agregat penuh — angka yang salah, tanpa galat. Dengan aturan
+penamaan, pendaftarannya **adalah** namanya.
+
+Struktur `data` respons diberi nama `dataVarians` (sebelumnya struct anonim) dan bertambah tiga
+field. **Ketiganya kontrak lintas modul Go**, kelas yang sama dengan `rekomendasi_efisiensi`:
+kedua service berada di modul berbeda sehingga kompilator tidak menghubungkannya, dan salah
+ketik membuat sisi pembaca terisi nol-value tanpa galat kompilasi. Dikunci
+`TestKontrakJSONVariansTanpaIklan` dari sisi pembaca.
+
+Metrik tanpa-iklan yang dijawab integration-service **lama** digalatkan dengan menyebut sebab
+yang sesungguhnya. Dibiarkan lewat, `rasioAnggaran` akan menggalatkannya dengan kalimat "total
+anggaran periode ini nol" yang mengirim pembacanya memeriksa anggaran — tempat yang sama sekali
+tidak rusak. Kelas kesalahan yang sama dengan pesan forecast kas yang dulu menuduh anggaran
+belum diunggah padahal yang belum justru realisasinya.
+
+Cakupannya memakai penyebut yang sudah dikurangi `baris_dikecualikan`: pos yang **sengaja**
+dibuang bukan pos yang gagal dihitung, dan memakai jumlah pos penuh akan melaporkan cakupan
+turun tiap bulan tanpa ada yang salah — cakupan yang selalu merah berhenti dibaca orang.
+
+#### Frontend
+
+Kartu `KartuVariansOpex` dipakai **empat halaman** (ringkasan divisi, SPV, Cost Control, AP),
+sehingga apa pun yang ditampilkannya berlaku serentak di keempatnya — dan itu memang yang
+diinginkan supaya keempatnya tak bisa berbeda pendapat.
+
+Angka tanpa-iklan muncul sebagai **kalimat terpisah di bawah kartu** (`kalimatTanpaIklan` di
+`lib/tampilan.ts`), bukan sebagai kartu keempat dan bukan menggantikan isi kartu "Varians OPEX".
+Alasannya bukan tata letak: kedua angka berdiri di atas penyebut yang berbeda dan tidak dapat
+diperbandingkan, sehingga menaruhnya di tempat dan judul yang sama akan membuat pembacanya
+menyimpulkan datanya berubah.
+
+Parser `bacaVarians` membaca blok itu **opsional**: menuntutnya akan membuat seluruh kartu
+varians gagal muat di empat halaman sekaligus terhadap integration-service versi lama — layar
+mati total demi satu angka tambahan. `null` membuat "belum dikirim" terbedakan dari "hasilnya
+nol", dan pada keadaan itu layar **diam** alih-alih menampilkan Rp 0 untuk angka yang tak pernah
+dihitung siapa pun. Blok yang **ada tetapi rusak bentuknya** tetap melempar, sama seperti
+`ringkas`: diam-diam menjadikannya null akan menyembunyikan backend cacat di balik layar yang
+tampak baik-baik saja.
+
+#### Test
+
+Empat di `usecase` (setiap nama ada di `DaftarKomponenOpex`, tanpa duplikat, cocok tanpa
+memedulikan ejaan, menolak yang bukan daftarnya) ditambah tiga atas penyaringnya (baris yang
+hanya punya anggaran ikut terbuang, masukan tidak diubah, dan **silang aritmatika** bahwa
+selisih kedua total anggaran sama persis dengan anggaran akun yang dibuang). Silang itu yang
+membuktikan pengecualiannya benar-benar terjadi: penyaring yang keliru mencocokkan nol akun juga
+"berhasil" tanpa galat.
+
+Empat di handler HTTP (respons membawa kedua agregat dengan silang yang sama, menyebutkan akun
+yang dibuang, periode tanpa baris iklan tetap menjawab agregat kedua, dan ejaan berbeda tetap
+terbuang). Lima di employee-service (kontrak JSON lintas modul, metrik terdaftar, membaca agregat
+kedua dan bukan yang penuh, gagal terbaca pada service lama sementara metrik penuh tetap jalan,
+serta cakupan yang mengecualikan baris yang dibuang). Sembilan di frontend, di tiga berkas.
+
+> ⚠️ **Tak satu pun test di atas pernah dijalankan.** Mesin tempat perubahan ini ditulis tidak
+> punya toolchain Go maupun Node, sehingga kodenya belum pernah dikompilasi apalagi diuji.
+> Verifikasi pertamanya akan terjadi di CI. Dicatat di sini apa adanya karena "test sudah
+> ditulis" dan "test hijau" adalah dua pernyataan yang berbeda, dan menyamakan keduanya persis
+> jenis klaim yang modul ini ada untuk mencegahnya.
+
+#### Deploy, dan apa yang ini tidak selesaikan
+
+Tidak ada env baru, tidak ada koleksi baru, tidak ada migrasi. Urutan naik: integration-service
+→ employee-service → frontend. Karena field-nya opsional di kedua arah, urutan itu **tidak
+mengikat keras** — frontend baru tetap jalan terhadap backend lama, dan sebaliknya.
+
+Yang **tidak** dapat diselesaikan kode: **keterbandingan historis**. Setiap angka yang pernah
+dilaporkan untuk baris 1 berdiri di atas populasi 57 akun. Begitu template KPI beralih ke metrik
+tanpa-iklan, terpakai 62,7% Juli tidak lagi punya padanan — bukan karena angkanya salah,
+melainkan karena ia menjawab pertanyaan yang lain. Hanya pengumuman yang dapat menutup itu, dan
+itulah harga keputusan #1 pilihan (a): harus dibayar sadar, bukan ditemukan orang tiga bulan
+kemudian ketika skornya sudah keluar.
+
 
 ## Keputusan yang Ditunggu dari Tim Finance
 
