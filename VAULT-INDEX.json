@@ -105,6 +105,7 @@
         "APP - Web ERP",
         "HRIS - Otomasi Skor KPI",
         "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman",
+        "Microservices - Payroll Service",
         "HRIS - Attrition",
         "Microservices - File Service",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
@@ -115,18 +116,19 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "508f5ab5d446599485ef3a2182aab27a993fb6ab7bba45205f834de5e4d8a2b5",
-      "ukuran_kb": 44.9,
-      "ringkasan": "Menjawab: endpoint apa saja yang dipunyai employee-service dan siapa yang boleh memanggilnya, mulai dari master karyawan, work data, personal data, hak akses dan permission set, sampai self-service /me. Berguna untuk menemukan rute yang menyediakan data karyawan bagi service lain, termasuk export internal yang dipakai payroll dan THR. Mencatat juga endpoint yang sudah tak punya konsumen lagi supaya tak disangka masih dipakai.",
+      "hash": "c58d8a493d1a4e224dfe2082ec10d6f79fff2319b6022da3fcbb8cd48731c03a",
+      "ukuran_kb": 46.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang dipunyai employee-service dan siapa yang boleh memanggilnya, mulai dari master karyawan, work data, personal data, hak akses dan permission set, KPI, sampai self-service /me. Menjawab juga filter apa yang diterima `/internal/export/all` (search, department termasuk label grup, position, is_active, has_registered, employment_type, contract_ending), kenapa filter itu opsional supaya payroll yang memanggilnya polos tak berubah, dan kenapa kandidat kosong wajib berarti nol baris. Mencatat pula endpoint yang sudah tak punya konsumen lagi supaya tak disangka masih dipakai.",
       "kata_kunci": [
-        "employee service endpoint",
-        "API employee",
-        "master karyawan",
-        "work data",
-        "self service",
-        "payroll-approx",
-        "permission set",
+        "employee service",
+        "endpoint karyawan",
         "export internal",
+        "export all",
+        "filter export",
+        "is_active",
+        "label grup HRGA",
+        "permission set",
+        "self-service /me",
         "RBAC karyawan"
       ]
     },
@@ -244,24 +246,25 @@
       "tautan": [
         "CORE - HRIS Orchestrator",
         "API - Index",
+        "API - Employee Service",
         "API - Attendance Service",
         "Microservices - Employee Service",
         "Microservices - Attendance Service"
       ],
-      "hash": "4e63c6c533ca2a691b16541332805699b8123be7ddc72f2c73ea730f35c20583",
-      "ukuran_kb": 1.7,
-      "ringkasan": "Menjawab: endpoint apa yang menggabungkan aksi lintas-service HR sekaligus, misalnya membuat/mengubah data karyawan beserta dokumen dan jadwal kerjanya, streaming dokumen karyawan dari MinIO, kelola rekening bank, dan export data karyawan IT/Excel. Juga menjawab endpoint ringkasan attendance dan CRUD hari libur lewat orchestrator ini, termasuk kenapa `?periode=` pada `/attendances/summary` wajib diteruskan eksplisit ke attendance-service — `routes.InternalRequest` merakit permintaan baru sehingga query pemanggil tidak ikut sendiri, dan lupa meneruskannya membalas 200 berisi bulan berjalan tanpa galat.",
+      "hash": "51852e1f9d22764d2bfd7aab64d3df32ca83a2b5e75662a8e7eacd363cde3b91",
+      "ukuran_kb": 2.0,
+      "ringkasan": "Menjawab: endpoint apa yang menggabungkan aksi lintas-service HR sekaligus, misalnya membuat/mengubah data karyawan beserta dokumen dan jadwal kerjanya, streaming dokumen karyawan dari MinIO, kelola rekening bank, karyawan IT, dan export Excel karyawan. Menjawab juga bahwa `/employees/export` meneruskan SELURUH query string apa adanya ke employee-service sehingga filter layar sampai ke sumbernya tanpa perubahan di lapisan ini. Memuat pelajaran sebaliknya pada `/attendances/summary`: `?periode=` wajib diteruskan eksplisit karena `routes.InternalRequest` merakit permintaan baru, dan lupa meneruskannya membalas 200 berisi bulan berjalan tanpa galat.",
       "kata_kunci": [
         "HRIS orchestrator",
         "multi-service",
         "dokumen karyawan",
         "export karyawan",
+        "teruskan query string",
         "rekening bank",
         "hari libur",
         "attendance summary",
         "periode",
-        "InternalRequest",
-        "teruskan query"
+        "InternalRequest"
       ]
     },
     {
@@ -1316,6 +1319,7 @@
         "API - Attendance Service",
         "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
         "Microservices - Calendar Service",
+        "API - Employee Service",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Attrition",
         "Microservices - Attendance Service",
@@ -1366,9 +1370,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "fcd24cbd89244c8398f086348efd49dc33d3b32d9a999cb803b3389e5d404eec",
-      "ukuran_kb": 381.7,
-      "ringkasan": "Menjawab: halaman apa saja yang ada di portal web internal One Bharata, bagaimana tiap modul dirakit di frontend, dan keputusan tampilan apa yang sudah diambil beserta alasannya. Mencakup HRIS, presensi, payroll dan insentif, rekrutmen, finance, procurement, task management, IT, GA, Marketing Analytics, dan layar Jadwal Host Live milik marketing, termasuk peran web ini sebagai SSO Identity Provider untuk aplikasi lain. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts lewat ChartContainer beserta aturan warna per tema dan daftar bagan yang belum mengikutinya, catatan multi-perusahaan, i18n dua bahasa, pola tabel HRIS, cara kategori sidebar lahir dari peran maupun paket hak, dan sejumlah jebakan frontend yang sudah terbukti menggigit.",
+      "hash": "bdaccac349f0527604695d24a55721429de2eaf1206c59b0be56b5b0e60414a4",
+      "ukuran_kb": 383.1,
+      "ringkasan": "Menjawab: halaman apa saja yang ada di portal web internal One Bharata, bagaimana tiap modul dirakit di frontend, dan keputusan tampilan apa yang sudah diambil beserta alasannya. Mencakup HRIS, presensi, payroll dan insentif, rekrutmen, finance, procurement, task management, IT, GA, Marketing Analytics, dan layar Jadwal Host Live milik marketing, termasuk peran web ini sebagai SSO Identity Provider untuk aplikasi lain. Menjawab juga aturan tombol Export di halaman daftar: yang terunduh adalah seluruh hasil saring dari server, bukan sehalaman yang tampak, dan kenapa halaman Karyawan sempat melanggarnya. Memuat pula konvensi data-fetching TanStack Query, konvensi bagan Recharts lewat ChartContainer beserta aturan warna per tema, catatan multi-perusahaan, i18n dua bahasa, pola tabel HRIS, cara kategori sidebar lahir dari peran maupun paket hak, dan sejumlah jebakan frontend yang sudah terbukti menggigit.",
       "kata_kunci": [
         "erp-frontend",
         "hris-dashboard",
@@ -1378,17 +1382,15 @@
         "Next.js",
         "SSO",
         "i18n",
-        "halaman",
-        "menu",
+        "export excel",
+        "hideExport",
+        "tombol export",
         "sidebar",
-        "jadwal host live",
         "kategori modul",
         "bagan",
-        "chart",
         "recharts",
         "ChartContainer",
-        "warna bagan",
-        "mode gelap"
+        "tabel HRIS"
       ]
     },
     {
@@ -2018,6 +2020,8 @@
         "Microservices - Procurement Service",
         "Microservices - Learning Service",
         "ADR - 0002 Database-per-Service",
+        "API - Employee Service",
+        "Microservices - Payroll Service",
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "HRIS - Otomasi Skor KPI",
@@ -2025,7 +2029,6 @@
         "Microservices - Marketing Analytics Service",
         "Microservices - Integration Service",
         "Microservices - Task Management Service",
-        "API - Employee Service",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "Microservices - Inventory Service",
         "HRIS - Matriks KPI per Departemen",
@@ -2051,7 +2054,6 @@
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "CORE - SSO Flow",
-        "Microservices - Payroll Service",
         "ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak",
         "HRIS - Leave Request",
         "CORE - HRIS Orchestrator",
@@ -2062,9 +2064,9 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "0abc5ebad9af6c88cab891a15860d5a1745deb728a970769df11c0d8c698ec25",
-      "ukuran_kb": 118.5,
-      "ringkasan": "Menjawab: bagaimana data karyawan disimpan dan dilayani, apa isi work_data dan personal_data, bagaimana hak akses diturunkan dari posisi, dan endpoint mana yang dipakai service lain. Memuat jebakan yang sudah terbukti: HRGA sebagai label grup supervisi yang bukan nama departemen siapa pun, jalur hak-dari-posisi yang mati untuk akun vendor, dan endpoint self-service yang kini tak punya konsumen. Sisi konsep organisasinya ada di dokumen HRIS.",
+      "hash": "cf9fcf0ba26efcb55a3df55969f71eb086da01493fe420da6d68e9c80c4d0a2f",
+      "ukuran_kb": 120.0,
+      "ringkasan": "Menjawab: bagaimana data karyawan disimpan dan dilayani, apa isi work_data dan personal_data, bagaimana hak akses diturunkan dari posisi, dan endpoint mana yang dipakai service lain. Menjawab juga bahwa direktori karyawan dan export Excel kini berangkat dari satu penyusun kandidat yang sama supaya berkas unduhan berisi baris yang persis sama dengan tabel di layar, kenapa filternya opsional demi payroll, dan kenapa galat Mongo saat menyusun kandidat sekarang jadi 500 alih-alih diam-diam melebarkan hasil. Memuat jebakan yang sudah terbukti: HRGA sebagai label grup supervisi yang bukan nama departemen siapa pun, jalur hak-dari-posisi yang mati untuk akun vendor, endpoint self-service tanpa konsumen, dan endpoint summary yang mematok karyawan aktif sehingga kartu ringkasan tak ikut filter. Sisi konsep organisasinya ada di dokumen HRIS.",
       "kata_kunci": [
         "employee service",
         "master karyawan",
@@ -2074,8 +2076,10 @@
         "departemen",
         "permission set",
         "hak dari posisi",
-        "employee_id",
-        "export all"
+        "export all",
+        "filter direktori",
+        "kandidat karyawan",
+        "isolasi tenant"
       ]
     },
     {

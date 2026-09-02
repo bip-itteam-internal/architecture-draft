@@ -71,6 +71,10 @@
 - `GET /v2/internal/aggregate/employees/summary`, `/it`
 - `GET /internal/aggregate/employee/:id`
 - `GET /internal/export/all`
+- **Saringan direktori & export SATU SUMBER** (`employee_filter.go`, 🟡 **belum merge**, branch `feat/employee-export-filter`). `/v2/internal/aggregate/employees` dan `/internal/export/all` kini berangkat dari `kandidatKaryawan()` yang sama, jadi berkas unduhan berisi baris yang persis sama dengan tabel di layar. Sebelumnya export **tidak menyaring apa pun**: pipeline-nya hanya membatasi `work_data.company_id` dan tak pernah meng-`$lookup` `system_authentication`, sehingga ia bahkan tak punya bahan untuk mengetahui siapa yang aktif. Detail kontrak query: [[API - Employee Service]].
+	- Filter **opsional, default tanpa saring**. Itu yang menjaga [[Microservices - Payroll Service]] — pemanggil `/internal/export/all` tanpa query sama sekali — tidak berubah perilakunya.
+	- ⚠️ **Dua perubahan perilaku yang disengaja.** Galat Mongo saat menyusun kandidat kini **dipropagasi jadi 500**; sebelumnya ditelan lalu saringannya dilewati, sehingga kegagalan baca justru MELEBARKAN hasil — dan galat isolasi tenant membatalkan penyaringan perusahaan sepenuhnya, artinya direktori bisa membalas karyawan lintas-perusahaan. Kedua, `$match` kandidat dipasang **tanpa syarat**: kandidat kosong berarti nol baris, bukan "tanpa saringan".
+	- ⛔ **`/v2/internal/aggregate/employees/summary` TIDAK ikut**: ia mematok `is_active: true` dan mengabaikan seluruh query, jadi tiga kartu ringkasan di layar tak bergerak saat filter berubah. Belum diputuskan apakah itu memang yang diinginkan. **TBD.**
 
 **KPI**
 - `GET /kpi`, `GET /kpi/dashboard`, `POST /kpi`
