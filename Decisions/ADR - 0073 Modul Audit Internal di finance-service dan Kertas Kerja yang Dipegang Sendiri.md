@@ -1,16 +1,16 @@
 ## Untuk Manajemen
 
-- **Yang berubah di layar**: modul baru berisi kertas kerja audit bulanan, satu baris per pengujian, dan register temuan yang menuliskan kondisi, kriteria, akar penyebab, dampak, dan rekomendasi. Angka kedua sisi pembanding sudah berdampingan beserta selisihnya, sehingga auditor **menilai**, bukan menghitung ulang. **Layarnya sendiri belum ada** — fase pertama baru mesinnya.
+- **Yang berubah di layar**: modul baru berisi kertas kerja audit bulanan, satu baris per pengujian, dan register temuan yang menuliskan kondisi, kriteria, akar penyebab, dampak, dan rekomendasi. Angka kedua sisi pembanding sudah berdampingan beserta selisihnya, sehingga auditor **menilai**, bukan menghitung ulang. **Layarnya kini sudah dibuat** (tiga halaman, menu tersendiri bernama AUDIT INTERNAL), tetapi belum bisa dicoba siapa pun sampai service-nya di-deploy.
 - **Siapa terdampak**: auditor internal sebagai pemakai utama. Posisi itu **belum ada**, dan sampai terisi modulnya dipakai review silang antar-divisi. Direktur sebagai penerima laporan sekaligus satu-satunya yang boleh menyetel ukuran sampel. Finance sebagai pihak yang dimintai klarifikasi, bukan sebagai pemakai.
 - **Tidak dijanjikan**: modul ini **tidak menyimpulkan kecurangan**, ia menunjukkan selisih lalu berhenti. Ia **tidak menggantikan** hitung fisik kas dan gudang, konfirmasi saldo ke pelanggan, maupun pengambilan rekening koran dari bank. Ia **tidak mencakup pembukuan 40 CV**. Dari 36 pengujian, baru **enam** yang punya penjalan otomatis; sisanya terbit di kertas kerja sebagai baris yang jelas-jelas belum dikerjakan, bukan hilang dari daftar.
-- **Besaran kerja**: fase pertama selesai dan sudah terdorong ke repo (7 commit, 25+ berkas). Yang tersisa: layar, dua endpoint di modul lain, dan tiga pembuktian ke produksi.
+- **Besaran kerja**: mesin dan layarnya selesai. Yang tersisa: menaikkan service-nya ke lingkungan uji, menugaskan paket izinnya, dua endpoint di modul lain, dan tiga pembuktian ke produksi.
 
 ## Deskripsi
 
 *Audit internal atas pembukuan dibangun sebagai **modul di dalam finance-service**, bukan service tersendiri, dan sebagai **konsumen pembaca yang sudah ada**, bukan klien Accurate keempat. Ia memegang sendiri kertas kerja beserta jejak tinjauannya alih-alih menumpang form-builder. Ketiga sisi keputusan ini berangkat dari alasan yang sama: yang menentukan kelayakan pakai-ulang bukan kemiripan bentuk, melainkan kontrak yang harus dipenuhi.*
 
-- **Status**: ⚠️ **Implemented (ada catatan)** — backend fase 1 selesai, ber-test, dan sudah di-push ke branch `feat/finance-audit-internal` (7 commit). **Belum di-deploy, belum ada layar, dan belum pernah dijalankan lewat gateway.** Lihat "Belum selesai" di bawah.
-- **Path di repo**: `bip-erp/services/finance/audit_*.go` · `bip-erp/shared-library/common/catalog_audit.go` · `bip-erp/services/employee/permission_catalogs.go` · `bip-erp/services/integration/internal/interface/http/riwayat_akun_handler.go` · `bip-erp/docker-compose.yml`
+- **Status**: ⚠️ **Implemented (ada catatan)** — backend fase 1 **merged** ([#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676) + [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)); layar fase 2 selesai & ber-test di branch `feat/finance-audit-internal-fe` (**belum merge**). **Belum di-deploy dan belum pernah dijalankan lewat gateway.** Lihat "Belum selesai" di bawah.
+- **Path di repo**: `bip-erp/services/finance/audit_*.go` · `bip-erp/shared-library/common/catalog_audit.go` · `bip-erp/services/employee/permission_catalogs.go` · `bip-erp/services/integration/internal/interface/http/riwayat_akun_handler.go` · `bip-erp/docker-compose.yml` · `erp-frontend/src/app/(main)/audit/*` · `erp-frontend/src/features/audit/*` · `erp-frontend/src/components/layout/sidebar-menus.tsx` · `erp-frontend/src/utils/menu-permission.ts`
 - **Tanggal**: 2026-09-02 (diamandemen di hari yang sama, lihat §1 dan §8)
 
 ## Context
@@ -132,7 +132,8 @@ Yang tidak boleh terjadi: cakupan ini hilang diam-diam. Modul yang memeriksa buk
 - ⚠️ **Utang kontrak `SetelanSampel.Akun`**: didokumentasikan sebagai NAMA akun tetapi dipakai sebagai NOMOR akun pada jalur buku besar. Gejalanya sudah jinak (berujung `gagal_tarik` berisi sebab yang menyebut obatnya), tetapi **wajib selesai sebelum Direksi menyetel akun untuk pertama kali** — sesudah itu menuntut migrasi setelan.
 - ⚠️ **Tiga gerbang kelayakan belum dijalankan**, seluruhnya bacaan produksi oleh manusia: apakah Accurate mengirim jejak pelaku (menyandera 2 uji), apakah matriks hak akses dapat ditarik (menyandera Modul G), dan apakah dokumen Bayar Uang membawa rekening penerima.
 - ⚠️ **Mesin pencatat reproduksibilitas sampel terpasang tetapi belum tersambung**: belum ada uji bermetode acak yang berjalan di fase ini.
-- 🟡 **Belum ada layar.** Backend didahulukan karena ini perubahan kontrak.
+- ⚠️ **Layar selesai tetapi belum terverifikasi sama sekali.** Ketiga halaman lolos `tsc`, `lint`, `build`, dan 32 test lokal, tetapi **tak satu pun pernah memuat data sungguhan** — sebabnya sama dengan butir pertama: `finance-service` tak ada di dev. Test hijau bukan bukti fitur bisa dipakai.
+- ⚠️ **Paket izin belum dipasang ke satu akun pun.** Sampai `Audit: Auditor Internal` / `Audit: Direksi` / `Audit: Pembaca` ditugaskan lewat layar Hak per Posisi, kategori sidebarnya tidak muncul untuk siapa pun kecuali pemegang super-akses menu (IT supervisor dan jabatan Direktur), yang melihat menunya lalu ditolak backend.
 
 ## Consequences
 
@@ -145,6 +146,8 @@ Yang tidak boleh terjadi: cakupan ini hilang diam-diam. Modul yang memeriksa buk
 - ⚠️ **Env baru menuntut `--force-recreate`**, bukan `restart`: `PROCUREMENT_MODULE_URL`, `EMPLOYEE_MODULE_URL`, dan `INTEGRATION_SERVICE_KEY` di blok `finance-service`.
 - ⚠️ **Urutan deploy**: integration-service lebih dulu (endpoint riwayat akun beserta gerbangnya), baru finance-service.
 - ⚠️ Pemakai utamanya belum ada. Sampai posisi auditor internal terisi, modul dipakai review silang antar-divisi.
+- ⚠️ **Tiga izin tulis yang berbeda menuntut tiga gerbang berbeda DI LAYAR, bukan satu.** Ini konsekuensi langsung §8 (yang menyetel ukuran sampel bukan yang mengerjakan pemeriksaan): dua dari tiga paket bawaan memegang `audit.view` sehingga rutin membuka kertas kerja tanpa satu pun izin tulisnya. Layar pertama yang dirancang dari dokumentasi melewatkannya seluruhnya, karena aturannya hanya hidup sebagai gerbang rute di `audit_handler.go`. Pemetaan lengkapnya kini ada di [[Finance - Audit Internal]].
+- ⚠️ **Kategori sidebar `audit` lahir HANYA dari paket izin.** Tak ada `system_roles.audit` dan `AuditTierDefault` kosong, jadi modul ini satu-satunya yang sepenuhnya bergantung pada penugasan paket. Konsekuensi turunannya: menugaskan paket adalah langkah **deploy**, bukan langkah opsional.
 
 ## Dokumen Terkait
 

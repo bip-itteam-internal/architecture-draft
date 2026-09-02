@@ -4,8 +4,8 @@
 
 *Pengujian bulanan atas pembukuan PT Bharata Internasional Pharmaceutical, dijalankan sebagai modul di dalam finance-service yang menarik kedua sisi pembanding lewat pembaca yang sudah ada lalu menyajikan selisihnya sebagai kertas kerja. Sistem membandingkan; auditor menilai, menelusuri, dan menandatangani. Sumbernya BUKAN selalu Accurate — dari 36 pengujian, sisi bersumber Accurate justru minoritas.*
 
-- **Status**: ⚠️ **Implemented (ada catatan)** — backend fase 1 selesai & ber-test di branch `feat/finance-audit-internal`; **belum di-deploy, belum ada layar, belum pernah dijalankan lewat gateway**
-- **Implementasi**: [[Microservices - Procurement Service]] dan [[Microservices - Integration Service]] sebagai sumber; modulnya sendiri di `bip-erp/services/finance/audit_*.go`
+- **Status**: ⚠️ **Implemented (ada catatan)** — backend fase 1 **merged** (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676) + [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)); layar fase 2 selesai & ber-test di branch `feat/finance-audit-internal-fe` (**belum merge**); **belum di-deploy, belum pernah dijalankan lewat gateway**
+- **Implementasi**: [[Microservices - Procurement Service]] dan [[Microservices - Integration Service]] sebagai sumber; modulnya sendiri di `bip-erp/services/finance/audit_*.go`; layarnya di `erp-frontend/src/app/(main)/audit/*` + `src/features/audit/*`
 - **Keputusan**: [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]]
 
 ## Latar Belakang
@@ -76,8 +76,45 @@ Dari 36 uji, **sepuluh menuntut pemilihan sampel**; 26 sisanya atas populasi pen
 
 Pengisian berlangsung berhari-hari, sehingga kertas kerja **wajib bisa disimpan sebagian**. Ini salah satu alasan form-builder tidak dipakai.
 
-## Persona / Pengguna
+## Tiga Layar, dan Kategori Sidebarnya Sendiri
 
+Rute `/audit` (kertas kerja bulanan), `/audit/temuan` (register temuan), `/audit/setelan` (ukuran sampel). Ketiganya memakai struktur tabel HRIS dan mengambil daftar 36 uji dari `GET /audit/uji` — daftarnya **tidak** disalin ke sisi layar, sebab tiap uji butuh implementasi pembandingnya dan salinan di layar akan menyimpang jadi baris yang tampil tanpa pernah dijalankan siapa pun.
+
+⛔ **Kategori sidebarnya `audit`, berdiri sendiri, bukan menumpang FAT.** Frontend memotong tiap izin di titik pertama untuk menentukan kategori, jadi izin ber-prefiks `finance` akan memunculkan seluruh menu keuangan bagi auditor. Yang lebih menentukan arah sebaliknya: menyatukannya membuat pemegang izin finance ikut membuka kertas kerja yang memeriksa pekerjaannya sendiri, dan pemisahan itu justru inti modul ini.
+
+⚠️ **Kategori ini lahir HANYA dari paket izin, tak pernah dari `system_roles`.** Tidak ada `system_roles.audit`, dan `AuditTierDefault` mengembalikan kosong untuk tier apa pun, jadi tak seorang pun mendapat modul ini karena kebetulan supervisor di modul lain. Yang belum ditugaskan salah satu paket `Audit: *` tidak melihat kategorinya — itu keadaan yang benar, bukan kerusakan.
+
+⚠️ **DENGAN SATU PENGECUALIAN yang berlaku di seluruh aplikasi**: super-akses sidebar (`aksesSemuaMenu` — IT supervisor **atau** jabatan Direktur) meloloskan tiap item **sebelum** `perm` dinilai, kecuali izin yang terdaftar di `TANPA_BYPASS_SEMUA_MENU`. Izin audit sengaja **tidak** didaftarkan di sana, mengikuti modul lain yang tier defaultnya juga kosong (`BudgetTierDefault`, `KasKecilTierDefault`). Konsekuensinya jujur: keduanya melihat menu audit tanpa paket apa pun, lalu backend menolak. Untuk Direktur itu justru yang diinginkan — ia memang pemakai `/audit/setelan`, tinggal dipasangi paket `Audit: Direksi`. Untuk supervisor IT di luar Tech Development itu alur terputus yang diterima sadar, sama seperti modul lain. Bila kelak dinilai tak dapat diterima, obatnya menambahkan keempat izin ke `TANPA_BYPASS_SEMUA_MENU`, bukan mengubah tier default.
+
+⚠️ **Gerbang TOMBOL tidak kena pengecualian itu.** `bolehMenu` — yang dipakai `features/audit/lib/izin.ts` — tak punya bypass super-akses; bypass itu hanya hidup di `bolehItemSidebar`. Jadi pemegang super-akses tanpa paket melihat menunya, membuka halamannya, dan **tidak** melihat satu pun tombol aksi. Itu perilaku yang benar dan disengaja.
+
+### Pemetaan aksi layar → izin: TIGA izin tulis, bukan satu
+
+⛔ Aturan ini sebelumnya hanya hidup sebagai gerbang rute di `audit_handler.go`, dan layar pertama yang dirancang dari dokumentasi memang melewatkannya seluruhnya — ketiga tombolnya tampil untuk semua pemegang `audit.view`.
+
+| Aksi di layar | Endpoint | Izin | Auditor | Direksi | Pembaca |
+|---|---|---|---|---|---|
+| Membaca kertas kerja, temuan, setelan | `GET /audit/*` | `audit.view` | ✅ | ✅ | ✅ |
+| Tarik ulang periode | `POST /periode/:periode/tarik` | `audit.tinjau` | ✅ | — | — |
+| Tandai wajar (+ alasan) | `PATCH /periode/:periode/baris/:kode/tinjau` | `audit.tinjau` | ✅ | — | — |
+| Terbitkan temuan | `POST /periode/:periode/baris/:kode/temuan` | `audit.temuan.terbitkan` | ✅ | — | — |
+| Simpan ukuran sampel | `PUT /setelan-sampel/:kode` | `audit.master.save` | — | ✅ | — |
+
+Tiga hal yang mudah salah dan sudah terbukti salah sekali:
+
+- ⛔ **`audit.tinjau` dan `audit.temuan.terbitkan` BUKAN satu izin.** Menggerbangi tombol "Jadikan temuan" dengan `audit.tinjau` membuka formulir lima unsur bagi orang yang baru ditolak **setelah** semuanya selesai diketik.
+- ⚠️ **Membaca setelan sampel hanya butuh `audit.view`**, jadi auditor memang boleh melihat berapa sampel yang ditetapkan untuknya — ia perlu tahu bebannya. Yang disembunyikan kolom aksinya, bukan halamannya.
+- ⚠️ **Direksi dan Pembaca sama-sama memegang `audit.view`**, sehingga keduanya **rutin** membuka kertas kerja tanpa satu pun izin tulis. Tombol yang pasti dijawab 403 membuat pemakainya menyimpulkan sistemnya rusak, bukan bahwa meninjau memang bukan tugasnya.
+
+Penjaga sebenarnya tetap backend: menyembunyikan menu maupun tombol **bukan keamanan** ([[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]], ditegaskan ulang [[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Yang dikerjakan gerbang layar hanya mencegah **alur terputus**. Di frontend pemetaannya tinggal di satu berkas, `features/audit/lib/izin.ts`.
+
+### Keadaan baris dihitung backend, tidak di layar
+
+Layar membaca `keadaan_efektif` dari respons dan **tidak** menghitung ulang urutan menang antara vonis manusia dan keadaan mesin. Itu satu fakta; dua salinannya pasti menyimpang tanpa satu pun galat, lalu tabel dan kartu ringkasan menampilkan keadaan berbeda untuk baris yang sama. Bila field itu tidak dikirim (backend sebelum bip-erp #1679), layar menandainya **eksplisit** alih-alih menebak dari `hasil.keadaan` — sel kosong maupun tebakan sama-sama terbaca sebagai baris yang belum diperiksa.
+
+⛔ **Baris `menunggu_data` dan `belum_diimplementasi` tidak disembunyikan, dan tidak boleh disembunyikan sebagai perilaku bawaan.** Tiga puluh dari 36 uji berkeadaan belum berimplementasi; daftar yang "dibersihkan" menyisakan segelintir baris hijau dan memberi kesan pemeriksaan jauh lebih lengkap daripada kenyataannya. Urutannya menaikkan **kelompok 1**, bukan yang paling merah: uji berpembanding dari luar perusahaan paling sulit dikalahkan, jadi keadaan pengerjaannya yang paling perlu terlihat lebih dulu.
+
+## Persona / Pengguna
 | Persona | Peran & Divisi | Akses / RBAC | Device |
 |---|---|---|---|
 | Auditor internal | Posisinya **belum ada**; direncanakan | `audit_auditor` (view, tinjau, terbitkan) | Web ERP |
@@ -116,7 +153,7 @@ Aturan berikut selama ini hanya hidup sebagai komentar Go, sehingga siapa pun ya
 
 ## Konsumen Data
 
-- [[APP - Web ERP]] — layar kertas kerja dan register temuan (**belum ada**, fase 2)
+- [[APP - Web ERP]] — layar kertas kerja, register temuan, dan ukuran sampel; kategori sidebar `audit` tersendiri (fase 2 selesai, **belum merge**)
 - Direktur — laporan bulanan; penerimanya orang, bukan sistem
 
 ## Kendala
@@ -124,7 +161,7 @@ Aturan berikut selama ini hanya hidup sebagai komentar Go, sehingga siapa pun ya
 - **Master pemasok tidak menyimpan nomor rekening sama sekali.** Sumbu silang yang dipakai: NPWP, NIK, nama, alamat, telepon, email. Kondisi ideal uji itu wajib menyebut batasnya, kalau tidak laporannya terbaca sebagai "rekening sudah diperiksa dan bersih".
 - **Schema resmi Accurate tidak lengkap**; tiga endpoint yang dipanggil produksi tidak terdaftar di sana. Ketiadaan di schema bukan bukti.
 - **Limiter Accurate 6 permintaan per detik dibagi lintas service**, dan sudah ada tiga klien terpisah.
-- **`finance-service` tidak ada di `docker-compose.dev.yml`**, jadi modul ini belum bisa dicoba lewat gateway di mana pun.
+- **`finance-service` tidak ada di `docker-compose.dev.yml`**, jadi modul ini belum bisa dicoba lewat gateway di mana pun — berlaku untuk backend maupun layarnya, dan inilah satu-satunya sebab seluruh verifikasi ujung-ke-ujung masih tertunda.
 - **Pemakai utamanya belum ada.**
 
 ## Belum Diputuskan (TBD)

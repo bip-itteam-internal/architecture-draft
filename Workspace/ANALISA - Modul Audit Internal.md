@@ -3,7 +3,7 @@
 Papan kerja untuk [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]]. Dok domainnya [[Finance - Audit Internal]].
 
 Disusun 2026-09-02, diperbarui hari yang sama setelah fase 1 selesai.
-**Status: Fase 1 backend SELESAI dan ter-push** (branch `feat/finance-audit-internal`, 7 commit). Belum di-deploy, belum ada layar.
+**Status: Fase 1 backend MERGED** (bip-erp #1676 + #1679). **Fase 2 layar SELESAI dan ter-push**, branch `feat/finance-audit-internal-fe` (2 commit). Belum di-deploy, belum pernah dijalankan lewat gateway, dan paket izinnya belum dipasang ke satu akun pun.
 
 ---
 
@@ -48,16 +48,17 @@ Ketiganya membaca produksi dan **dijalankan manusia, bukan agent**. Hasilnya men
 
 ---
 
-## Fase 2 — Layar (belum mulai)
+## Fase 2 — Layar (SELESAI, belum merge)
 
-- [ ] **Halaman kertas kerja bulanan.** Struktur tabel HRIS: satu kartu, `Banner bare` di dalam `toolbar` milik `MainTable`, keadaan di `useTableState`. Ikuti skill `/migrasi-tabel-hris`.
-  ⛔ Urutan menaikkan **kelompok 1** ke atas, bukan yang paling merah. Baris `menunggu_data` dan `belum_diimplementasi` **tidak disembunyikan**.
-  ⛔ Daftar 36 uji dibaca dari `GET /audit/uji`, jangan disalin ke sisi layar.
-  ⚠️ Jangan menambah `p-6`; tombol kembali memakai `SidebarBackButton`; teks lewat `react-i18next` di **dua** locale.
-- [ ] **Halaman detail satu uji.** Acuan reuse: layar rekonsiliasi tiga lapis di `integration-accurate/rekonsiliasi` sudah punya pola dua kolom selisih dan status berwarna.
-- [ ] **Menu, izin sidebar, dan gerbang rute.**
-  ⛔ **Izin tanpa entri di tabel `FALLBACK` DILOLOSKAN untuk semua orang.** Lupa menulisnya bukan menu yang hilang, melainkan menu audit yang terbuka bagi siapa saja.
-- [ ] **Tutup titik putus alur**: baris yang ditinjau harus punya tautan langsung ke pembuatan temuan, kalau tidak penelusuran keluar sistem tak punya tempat kembali.
+- [x] **Halaman kertas kerja bulanan** (`/audit`). Struktur tabel HRIS. Urutan menaikkan kelompok 1, bukan yang paling merah; baris `menunggu_data` dan `belum_diimplementasi` tidak disembunyikan, dikunci test.
+  Pemilih periode ditaruh di slot `actions`, bukan filter laci: `FilterTable` hanya mengenal `select` dan `date`, sedangkan periode berbentuk `YYYY-MM`.
+- [x] **Panel detail satu uji.** Dua sisi berdampingan, selisih terpisah sebagai turunan, kondisi ideal dari registry, waktu penarikan. Daftar 36 uji dibaca `GET /audit/uji`, tidak disalin.
+- [x] **Register temuan** (`/audit/temuan`) dan **ukuran sampel** (`/audit/setelan`).
+- [x] **Menu, kategori sidebar, dan gerbang izin.** Kategori `audit` berdiri sendiri; keempat izin diberi entri `FALLBACK` bernilai `tolak`, dan penjaganya dibuktikan dengan kontrol negatif — menghapus satu entri membuat izinnya terbuka untuk semua orang dan test menangkapnya.
+- [x] **Tutup titik putus alur**: aksi "jadikan temuan" ada di panel detail, dan panel menautkan ke register begitu barisnya punya `temuan_id`.
+- [x] **i18n dua locale** dengan uji paritas memakai instance i18next asli (`fallbackLng` dimatikan) plus kontrol negatif bahwa `en` bukan hasil fallback ke `id`.
+
+**Temuan `/review` yang sudah ditutup**: backend memakai **tiga** izin tulis berbeda (`audit.tinjau`, `audit.temuan.terbitkan`, `audit.master.save`) dan layar pertama tidak menggerbangi satu pun, sehingga paket `Audit: Direksi` dan `Audit: Pembaca` — yang keduanya memegang `audit.view` dan karenanya rutin membuka kertas kerja — melihat tiga tombol yang selalu 403. Pemetaannya kini di `features/audit/lib/izin.ts` dan tercatat di [[Finance - Audit Internal]].
 
 ---
 
@@ -66,6 +67,7 @@ Ketiganya membaca produksi dan **dijalankan manusia, bukan agent**. Hasilnya men
 - [ ] ⛔ **Tambahkan blok `finance-service` ke `docker-compose.dev.yml`.** Sekarang tidak ada sama sekali, jadi seluruh modul ini **tak dapat dicoba lewat gateway di mana pun**. Ini penghalang terbesar untuk gerbang `/wrap`.
 - [ ] **Satu perjalanan utuh sebagai orang**: buka kertas kerja, buka uji yang berbunyi, tandai wajar dengan alasan, naikkan satu jadi temuan, isi lima unsurnya.
   ⛔ `curl` ke endpoint **tidak menggantikan ini**.
+- [ ] **Pasang paket izin `Audit: *` ke minimal dua akun uji** (satu auditor, satu direksi). Tanpa ini kategori sidebarnya tak muncul untuk siapa pun kecuali pemegang super-akses menu, dan pemisahan tugas antar-paket tak pernah benar-benar teruji di layar.
 - [ ] **Kontrol negatif per uji**: buktikan tiap uji bisa MERAH, bukan cuma hijau. Uji yang selalu lolos karena penarikannya diam-diam gagal tak bisa dibedakan dari uji yang lolos karena bukunya benar.
 - [ ] **Matikan `INTEGRATION_MODULE_URL` di dev**, pastikan barisnya `gagal_tarik` dan bukan nol.
 - [ ] **Urutan deploy**: integration-service lebih dulu, baru finance-service, keduanya `--force-recreate` karena ada env baru.
