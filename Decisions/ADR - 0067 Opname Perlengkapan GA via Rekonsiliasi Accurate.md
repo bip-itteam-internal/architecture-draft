@@ -17,6 +17,8 @@
 
 > **Catatan nomor**: semula 0065; di-renumber ke **0067** karena 0065 bertabrakan dengan dua ADR paralel hari yang sama ([[ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)]] yang lebih dulu, + satu ADR payout). Komentar `ADR-0067` di kode (bip-erp + erp-frontend) mengikuti nomor ini.
 
+> ⚠️ **Amandemen 2026-09-02 — tab FE Perlengkapan: OPNAME → EXPLORER PADANAN.** Staff GA meminta tab **Data Accurate → Perlengkapan** diseragamkan dengan tab Aset Tetap: kini **read-only explorer** berkolom **Nomor · Nama · Kuantitas · Terpasang X/N** (jumlah barang ERP ber-`accurate_item_no` ÷ qty Accurate, [[ADR - 0069 Perlengkapan Per-Unit Opsional di inventory dengan Guard Anti-Kontaminasi]]) — **bukan lagi** form Hitung Fisik/selisih/akurasi/periode. Alasan: **KPI opname perlengkapan tak pernah live** (diukur prod 2026-09-01: **0** attach di `kpi_template`), jadi tak ada skor berjalan yang patah. **Decision #1/#2/#4/#6 di bawah di-supersede untuk sisi FE.** **BE tetap UTUH & DORMANT**: koleksi `ga_opname` + `GET/POST /perlengkapan-opname` (inventory-service) **tidak dihapus** (data prod utuh, unique index utuh); FE hanya **berhenti memanggilnya** — opname bisa dihidupkan lagi tanpa migrasi. Grounded: erp-frontend `perlengkapan-tab.tsx` (ganti `perlengkapan-opname-tab.tsx`), commit `273c769c`+`be666dfc`.
+
 ## Context
 
 Staff GA melakukan **stock opname** perlengkapan (menghitung barang fisik) dan butuh membandingkannya dengan catatan sistem untuk mengukur akurasinya. Kebutuhan ini datang sebagai solusi yang diusulkan — "tarik data perlengkapan Accurate lalu tampilkan di tab Perlengkapan baru" — tetapi analisanya menunjukkan kebutuhan sebenarnya **paralel dengan rekonsiliasi aset tetap yang sudah ada**, bukan fitur berdiri sendiri.
