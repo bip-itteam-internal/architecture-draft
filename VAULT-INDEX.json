@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-03",
-  "jumlah_dokumen": 348,
+  "jumlah_dokumen": 350,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -5529,6 +5529,39 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul.md",
+      "judul": "ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, disetujui 2026-09-03, kode belum ada",
+      "publik": true,
+      "tautan": [
+        "Finance - Audit Internal",
+        "Microservices - File Service",
+        "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri",
+        "APP - Audit Internal",
+        "ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri",
+        "API - File Service",
+        "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
+      ],
+      "hash": "3ff31b6ecac6e5bca7a13423674ca15ea1851deb08a6e404b71f8f7dac29813d",
+      "ukuran_kb": 11.9,
+      "ringkasan": "Menjawab: bagaimana dokumen fisik pembanding audit (rekening koran, SPT, berita acara, bukti terima) masuk ke sistem, di mana angkanya dicatat, dan kenapa pembacaan otomatis oleh AI sengaja ditunda jadi tahap terpisah berprasyarat persetujuan Direksi. Menjelaskan pula kenapa premis 'dua belas uji mandek karena tak ada jalur unggah' keliru: sebelas dari dua belas belum punya penjalan sama sekali, sehingga jalur unggah sendirian membuka nol di antaranya. Memuat pemisahan dua bentuk uji (bukti per item terpilih vs angka dari satu dokumen) dan alasan angka hasil mesin tak boleh jadi dasar tunggal temuan.",
+      "kata_kunci": [
+        "audit internal",
+        "rekening koran",
+        "bank statement",
+        "bukti",
+        "evidence",
+        "lampiran",
+        "upload",
+        "file-service",
+        "MinIO",
+        "OCR"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -5572,8 +5605,8 @@
       "judul": "Finance - Audit Internal",
       "area": "Finance System",
       "jenis": "domain",
-      "status_emoji": null,
-      "status_teks": "âœ… **Implemented** â€” **LIVE DI PRODUKSI per 2026-09-03**. Backend (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676) + [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)) dan layar di Web ERP (erp-frontend [#1429](https://github.com/bip-itteam-internal/erp-frontend/pull/1429)) keduanya sudah di-deploy. Data nyata: `audit_kertas_kerja` 1 periode, `audit_baris` **36 uji**. âš ï¸ Yang belum: paket izin `Audit: *` belum ditugaskan ke satu akun pun, sehingga belum ada yang benar-benar memakainya.",
+      "status_emoji": "✅",
+      "status_teks": "**Implemented** — **LIVE DI PRODUKSI per 2026-09-03**. Backend (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676) + [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)) dan layar di Web ERP (erp-frontend [#1429](https://github.com/bip-itteam-internal/erp-frontend/pull/1429)) keduanya sudah di-deploy. Data nyata: `audit_kertas_kerja` 1 periode, `audit_baris` **36 uji**. âš ï¸ Yang belum: paket izin `Audit: *` belum ditugaskan ke satu akun pun, sehingga belum ada yang benar-benar memakainya.",
       "publik": true,
       "tautan": [
         "Microservices - Procurement Service",
@@ -5584,6 +5617,9 @@
         "ANALISA - Audit Internal Terpisah",
         "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
         "APP - Buku Besar Konsolidasi CV FINCON",
+        "ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul",
+        "Microservices - File Service",
+        "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "APP - Web ERP",
@@ -5595,21 +5631,20 @@
         "Finance - Dashboard per Posisi (FAT)",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "e7cfa88e798f50117617861a45c8a3a990986ed2af4a93b202a9ec9dcae419a6",
-      "ukuran_kb": 20.5,
-      "ringkasan": "Menjawab: apa saja yang diperiksa audit internal atas pembukuan PT Bharata, yaitu 36 uji yang dikelompokkan menurut asal sisi pembandingnya (dari luar perusahaan, dokumen internal non-Accurate, atau aturan), dan kenapa 13 uji neraca-lawan-laporan-pendukung sengaja dikeluarkan. Merinci uji mana yang sudah punya penjalan otomatis, apa yang TIDAK dicakup, aturan sampling (kapan acak, kapan terarah, dan kenapa cash opname butuh waktu acak bukan item acak), alur bulanan H+1 sampai H+8, serta semantik kolom dan semantik keadaan baris yang wajib dibaca sebelum merancang layar. Juga menjawab: pemetaan aksi layar ke tiga izin tulis yang berbeda dan kenapa keadaan baris dihitung backend bukan di layar.",
+      "hash": "123ba14b13f9020ffbb50bf6c0b484c56aa19a4b50f6ce54560f554e29a04bf9",
+      "ukuran_kb": 24.9,
+      "ringkasan": "Menjawab: apa saja 36 uji audit internal, bagaimana ketiga kelompok pembandingnya menentukan kekuatan tiap uji, uji mana yang menuntut sampling dan mana yang justru tidak boleh acak, serta bagaimana keadaan baris kertas kerja dihitung backend. Menjelaskan tiga layar audit beserta pemetaan aksi ke tiga izin tulis yang berbeda, dan dua belas uji yang menunggu dokumen fisik beserta alasan sebelas di antaranya belum punya mesin pembandingnya. Memuat semantik kolom, semantik keadaan baris, dan daftar keputusan yang belum diambil termasuk apakah tiga belas uji konsistensi internal dihidupkan kembali.",
       "kata_kunci": [
         "audit internal",
-        "internal audit",
-        "36 uji",
         "kertas kerja",
-        "sampling",
-        "sampel acak",
+        "working paper",
         "temuan",
+        "finding",
+        "sampling",
+        "rekonsiliasi bank",
         "Accurate",
-        "pembukuan",
-        "finance-service",
-        "kondisi ideal"
+        "kelompok pembanding",
+        "ukuran sampel"
       ]
     },
     {
@@ -11277,6 +11312,38 @@
         "deploy.yml",
         "gateway prefix",
         "audit-bharata",
+        "fase"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Bukti Sisi Lawan Audit Internal.md",
+      "judul": "ANALISA - Bukti Sisi Lawan Audit Internal",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul",
+        "Finance - Audit Internal",
+        "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
+        "APP - Audit Internal",
+        "Microservices - File Service",
+        "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri"
+      ],
+      "hash": "65b80482eafa1a88f12814febbeafb15447b038411d3d63f2570e1e69eebb058",
+      "ukuran_kb": 7.2,
+      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dikerjakan untuk membuka uji audit yang pembandingnya dokumen fisik, dalam urutan apa, dan mana yang berprasyarat persetujuan Direksi. Memecah kerjanya jadi tiga fase: tempat menaruh bukti (prefix MinIO, struktur bukti, rute unggah, panel detail), sebelas penjalan uji yang tersisa, dan pembacaan otomatis yang sengaja ditahan. Tiap task menyebut ketergantungannya dan gerbang verifikasinya.",
+      "kata_kunci": [
+        "audit internal",
+        "papan kerja",
+        "task",
+        "roadmap",
+        "bukti",
+        "upload",
+        "rekonsiliasi bank",
+        "pengurai CSV",
+        "AI",
         "fase"
       ]
     },

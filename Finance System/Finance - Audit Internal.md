@@ -4,7 +4,7 @@
 
 *Pengujian bulanan atas pembukuan PT Bharata Internasional Pharmaceutical, dijalankan sebagai modul di dalam finance-service yang menarik kedua sisi pembanding lewat pembaca yang sudah ada lalu menyajikan selisihnya sebagai kertas kerja. Sistem membandingkan; auditor menilai, menelusuri, dan menandatangani. Sumbernya BUKAN selalu Accurate — dari 36 pengujian, sisi bersumber Accurate justru minoritas.*
 
-- **Status**: âœ… **Implemented** â€” **LIVE DI PRODUKSI per 2026-09-03**. Backend (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676) + [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)) dan layar di Web ERP (erp-frontend [#1429](https://github.com/bip-itteam-internal/erp-frontend/pull/1429)) keduanya sudah di-deploy. Data nyata: `audit_kertas_kerja` 1 periode, `audit_baris` **36 uji**. âš ï¸ Yang belum: paket izin `Audit: *` belum ditugaskan ke satu akun pun, sehingga belum ada yang benar-benar memakainya.
+- **Status**: ✅ **Implemented** — **LIVE DI PRODUKSI per 2026-09-03**. Backend (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676) + [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)) dan layar di Web ERP (erp-frontend [#1429](https://github.com/bip-itteam-internal/erp-frontend/pull/1429)) keduanya sudah di-deploy. Data nyata: `audit_kertas_kerja` 1 periode, `audit_baris` **36 uji**. âš ï¸ Yang belum: paket izin `Audit: *` belum ditugaskan ke satu akun pun, sehingga belum ada yang benar-benar memakainya.
 - **Implementasi**: [[Microservices - Procurement Service]] dan [[Microservices - Integration Service]] sebagai sumber; modulnya sendiri di `bip-erp/services/finance/audit_*.go`; layarnya di `erp-frontend/src/app/(main)/audit/*` + `src/features/audit/*`
 - **Keputusan**: [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]], diamandemen [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]
 - ⛔ **Modul ini AKAN PINDAH** keluar `finance-service` jadi service + database sendiri, dan layarnya keluar `erp-frontend` jadi [[APP - Audit Internal]]. Dok ini tetap memegang domainnya — 36 uji, semantik kolom, dan aturan layar — apa pun rumahnya. Papan kerjanya [[ANALISA - Audit Internal Terpisah]].
@@ -56,6 +56,37 @@ Tiga puluh sisanya **terdaftar dan terbit di kertas kerja** berkeadaan `belum_di
 - **Pembukuan 40 CV.** Terkunci [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]]; sistemnya di [[APP - Buku Besar Konsolidasi CV FINCON]].
 - **Kesimpulan kecurangan.** Modul menunjukkan selisih lalu berhenti.
 - **Sembilan prosedur yang menuntut kehadiran fisik, korespondensi resmi, atau tanda tangan.**
+
+## Dua belas uji menunggu dokumen fisik, dan sebelas di antaranya belum punya mesinnya
+
+🟡 **Diusulkan, belum ada kodenya** — [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]].
+
+Dua belas uji ber-`SumberUnggahan`: rekonsiliasi bank, rekonsiliasi pajak, kalender kepatuhan, kas rekening CV, daftar pihak berelasi, pisah batas penjualan, retur penjualan, penyesuaian persediaan, kapitalisasi versus beban, jurnal manual besar, penjualan PT ke CV, piutang iklan ke CV.
+
+⛔ **Sebelas dari dua belas BELUM PUNYA PENJALAN sama sekali**, jadi mereka membalas `belum_diimplementasi` — bukan `menunggu_data`. Diukur di prod 2026-09-03 pada periode 2026-08: **32 `belum diimplementasi`, 4 `gagal ditarik`, 0 `menunggu data`.** Konsekuensinya menentukan urutan kerja: **membangun jalur unggah sendirian membuka nol dari sebelas uji itu.** Yang terbuka hari pertama hanya `jurnal_manual_besar`, satu-satunya yang penjalannya sudah ada.
+
+### Yang benar-benar hilang bukan jalur unggah, melainkan tempat menjawab
+
+`ujiJurnalManualBesar` sudah menunjukkan bentuk yang dituju: ia memilih sampel terarah, mengisi `HasilUji.Terpilih`, lalu berhenti di `menunggu_data` dengan kalimat *"Menunggu dokumen sumbernya ditunjukkan."* Sistem sudah tahu apa yang ditunggunya dan dari item mana. Yang tak ada adalah tempat menjawabnya: `Tinjauan` hanya `{Oleh, Pada, Alasan}`, tanpa slot lampiran dan tanpa slot angka, dan tak satu pun dari sembilan rute audit menerima berkas.
+
+### ⛔ Dua bentuk yang registry TIDAK membedakannya
+
+| Bentuk | Uji | Yang dikerjakan manusia | Guna pembacaan otomatis |
+|---|---|---|---|
+| **A. Bukti per item terpilih** | jurnal manual besar, penyesuaian persediaan, kapitalisasi vs beban, retur penjualan, pisah batas penjualan, penjualan PT ke CV | melampirkan dokumen **per item** dan menilai apakah ia mendukung entrinya | **hampir nihil** — yang diminta penilaian, bukan ekstraksi |
+| **B. Angka dari satu dokumen** | rekonsiliasi bank, rekonsiliasi pajak, kas rekening CV, piutang iklan ke CV | membaca saldo/mutasi dari satu dokumen | **hanya di sini** |
+
+Empat dari dua belas. Merancang fitur ini di sekitar pembacaan otomatis berarti mengoptimalkan sepertiganya sambil membiarkan dua pertiga sisanya tanpa tempat menaruh bukti.
+
+### Pola unggahnya sudah ada di service yang sama
+
+`services/finance/pajak_arsip.go` sudah mengunggah bukti ke file-service, dan memuat seluruh keputusan yang berulang: batas 4 MB yang mencerminkan `services/file/main.go:252`, **daftar-izin** ekstensi (`.pdf .jpg .jpeg .png`) bukan daftar-tolak, hex acak pada nama objek supaya unggahan kedua tak menimpa yang pertama, dan catatan bahwa kunci salah dijawab `invalid access key` — galat yang tak menyebut sebabnya.
+
+⚠️ **Prefix MinIO-nya wajib `audit/` sendiri, jangan menumpang `pajak/`.** Peta akses file-service berbasis prefix, jadi menumpang berarti siapa pun yang boleh membaca arsip pajak ikut boleh membaca rekening koran. Rinciannya: [[Microservices - File Service]].
+
+### ⛔ Taruhannya: temuan modul ini bisa jadi dasar sanksi miliaran
+
+Peraturan Perusahaan Pasal 54 menetapkan denda **Rp 2 miliar** untuk pelanggaran informasi rahasia dan **Rp 5 miliar** untuk penyalahgunaan wewenang, dan menyatakan sanksi itu *"harus tercatat dalam sistem audit"*. Karena itu **angka hasil pembacaan mesin yang tak pernah dikonfirmasi manusia tidak boleh menjadi dasar tunggal sebuah temuan** — berlaku juga untuk pengurai deterministik, bukan cuma untuk model. Sumbernya `mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md`, dan ia menang atas perilaku sistem ([[ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan]]).
 
 ## Sampling: sepuluh uji, dan separuhnya justru tidak boleh acak
 
@@ -160,7 +191,7 @@ Aturan berikut selama ini hanya hidup sebagai komentar Go, sehingga siapa pun ya
 
 ## Konsumen Data
 
-- [[APP - Web ERP]] â€” layar kertas kerja, register temuan, dan ukuran sampel; kategori sidebar `audit` tersendiri (**live di prod 2026-09-03**). Akan dicabut setelah [[APP - Audit Internal]] berjalan.
+- [[APP - Web ERP]] — layar kertas kerja, register temuan, dan ukuran sampel; kategori sidebar `audit` tersendiri (**live di prod 2026-09-03**). Akan dicabut setelah [[APP - Audit Internal]] berjalan.
 - Direktur — laporan bulanan; penerimanya orang, bukan sistem
 
 ## Kendala
@@ -181,10 +212,14 @@ Aturan berikut selama ini hanya hidup sebagai komentar Go, sehingga siapa pun ya
 - Angka kapasitas produksi normal PSAK 14 untuk uji alokasi biaya konversi — tidak ada di sistem mana pun, penetapannya keputusan Finance.
 - Ambang tiap uji yang pembandingnya aturan (batas nilai persetujuan, kebijakan diskon), sebagiannya menuntut kebijakan tertulis yang belum ada.
 - Kapan cakupan diperluas ke pembukuan 40 CV.
+- Apakah **pembacaan otomatis dokumen** dikerjakan, dan dengan model apa. Mengirim rekening koran ke API di luar perusahaan menuntut **persetujuan tertulis Direksi**; pemilik pekerjaan menyatakan itu dapat diterima dengan persetujuan tersebut (2026-09-03), tapi persetujuannya belum ada. Lihat [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]] §4.
+- Apakah **batas 4 MB file-service** cukup untuk rekening koran pindaian. Belum diukur terhadap berkas sungguhan, dan menaikkannya menyentuh seluruh modul yang memakai file-service, bukan audit saja.
+- **Retensi berkas bukti.** Disimpan selamanya untuk sekarang; kebijakan pemusnahan keputusan Finance.
 
 ## Dokumen Terkait
 
 - [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]]
+- [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]] · [[Microservices - File Service]]
 - [[ADR - 0001 Akuntansi via Accurate]] · [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]]
 - [[API - Integration Service]] · [[Microservices - Integration Service]] · [[External - Accurate]]
 - [[Finance - Big Pictures]] · [[Finance - Rancangan Finance Service]] · [[Finance - Dashboard per Posisi (FAT)]]
