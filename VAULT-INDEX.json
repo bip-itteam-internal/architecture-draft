@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-03",
-  "jumlah_dokumen": 350,
+  "jumlah_dokumen": 351,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -9384,6 +9384,34 @@
         "SKU",
         "KPI",
         "definisi"
+      ]
+    },
+    {
+      "path": "Reference/REF - Layout Dashboard erp-frontend.md",
+      "judul": "REF - Layout Dashboard erp-frontend",
+      "area": "Reference",
+      "jenis": "reference",
+      "status_emoji": "🟡",
+      "status_teks": "Pedoman berlaku, belum ditegakkan test dan belum diadopsi merata. Diturunkan dari enam aturan layout dashboard (materi Skula Talks, dibagikan 2026-09-03) lalu **diterjemahkan ke komponen yang benar-benar ada di repo**, bukan disalin mentah. Seberapa jauh adopsinya, termasuk aturan 2 yang masih nol, ada di bagian \"Keadaan terukur\" yang diukur langsung ke kode pada tanggal yang sama.",
+      "publik": true,
+      "tautan": [
+        "REF - Penamaan Metrik & Sumber KPI",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
+      ],
+      "hash": "6230a7d549ba5d806ac6e0f473fe16ac458471f0eee74b18f0c01971e408b99f",
+      "ukuran_kb": 8.1,
+      "ringkasan": "Menjawab: bagaimana menyusun tata letak halaman dashboard/analytics di erp-frontend, mulai dari menentukan zona halaman, membuat satu insight utama yang dominan (`lg:col-span-2` di dalam `grid lg:grid-cols-3`), mengelompokkan kartu setema lewat jarak, sampai merancang urutan alur pandangan mata (saringan, kartu KPI, bagan inti, detail, catatan aksi). Menjelaskan bahwa `Container` layout `(main)` sudah memasang `p-4 sm:p-6` dan `gap-4 sm:gap-6`, sehingga untuk PADDING menulis padding sendiri di halaman memang menghasilkan padding ganda, sedangkan untuk irama VERTIKAL persoalannya bukan jarak yang berlipat melainkan halaman menyatakan ulang fakta yang sudah dimiliki layout sehingga satu layar bisa memakai empat nilai jarak sekaligus (aturan yang berlaku: `gap-6` antar-seksi, `gap-4` antar-kartu dalam satu grid). Memuat juga hasil pengukuran ke kode per 2026-09-03 (18 komponen bagan `ChartContainer`, 16 pemakai `PageShell`, 126 pemakai `MainTable`), catatan dua sistem desain yang hidup berdampingan di `marketing-insight` beserta dampak `bg-white` pada mode gelap, dan batas ruang lingkupnya terhadap aturan warna/bagan di team-memory serta halaman daftar di skill `/migrasi-tabel-hris`.",
+      "kata_kunci": [
+        "layout dashboard",
+        "dashboard layout",
+        "tata letak halaman",
+        "erp-frontend",
+        "jarak antar-kartu",
+        "spacing gap-4 gap-6",
+        "padding ganda Container",
+        "PageShell",
+        "col-span-2 insight dominan",
+        "marketing-insight"
       ]
     },
     {

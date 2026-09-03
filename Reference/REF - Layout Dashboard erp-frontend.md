@@ -2,7 +2,7 @@
 
 *Aturan tata letak untuk halaman yang isinya ANGKA (dashboard, ringkasan, analytics) di `erp-frontend`. Sengaja terpisah dari aturan bagan yang sudah ada: `.agent-kit/rules/team-memory.md` § Bagan/chart mengatur WARNA, AMBANG, dan komponen bersama, dan tak satu barisnya mengatur KOMPOSISI halaman. Celah itulah yang diisi dokumen ini.*
 
-- **Status**: 📝 Pedoman, belum ditegakkan test. Diturunkan dari enam aturan layout dashboard (materi Skula Talks, dibagikan 2026-09-03) lalu **diterjemahkan ke komponen yang benar-benar ada di repo**, bukan disalin mentah. Bagian "Keadaan terukur" diukur langsung ke kode pada tanggal yang sama.
+- **Status**: 🟡 Pedoman berlaku, belum ditegakkan test dan belum diadopsi merata. Diturunkan dari enam aturan layout dashboard (materi Skula Talks, dibagikan 2026-09-03) lalu **diterjemahkan ke komponen yang benar-benar ada di repo**, bukan disalin mentah. Seberapa jauh adopsinya, termasuk aturan 2 yang masih nol, ada di bagian "Keadaan terukur" yang diukur langsung ke kode pada tanggal yang sama.
 - **Ruang lingkup**: halaman di bawah `erp-frontend/src/app/(main)/` yang isinya kartu angka dan bagan. Halaman DAFTAR tidak diatur di sini, sudah punya prosedurnya sendiri di skill `/migrasi-tabel-hris`.
 - **Bukan aturan bagan**: pilihan warna, ambang, `type="monotone"`, `connectNulls`, id gradien, semuanya tetap di team-memory. Dokumen ini berhenti di batas kartu.
 
