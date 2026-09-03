@@ -4,7 +4,7 @@
 
 *Pengujian bulanan atas pembukuan PT Bharata Internasional Pharmaceutical, dijalankan sebagai modul di dalam finance-service yang menarik kedua sisi pembanding lewat pembaca yang sudah ada lalu menyajikan selisihnya sebagai kertas kerja. Sistem membandingkan; auditor menilai, menelusuri, dan menandatangani. Sumbernya BUKAN selalu Accurate — dari 36 pengujian, sisi bersumber Accurate justru minoritas.*
 
-- **Status**: ⚠️ **Implemented (ada catatan)** — seluruhnya **merged ke `main`**: backend fase 1 (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676)), `keadaan_efektif` ke JSON ([#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)), dan layar fase 2 (erp-frontend [#1429](https://github.com/bip-itteam-internal/erp-frontend/pull/1429), 2026-09-03). ⛔ **Belum di-deploy dan belum pernah dijalankan lewat gateway** — `finance-service` tak ada di `docker-compose.dev.yml`, jadi layar ini belum pernah memuat satu baris data pun
+- **Status**: âœ… **Implemented** â€” **LIVE DI PRODUKSI per 2026-09-03**. Backend (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676) + [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)) dan layar di Web ERP (erp-frontend [#1429](https://github.com/bip-itteam-internal/erp-frontend/pull/1429)) keduanya sudah di-deploy. Data nyata: `audit_kertas_kerja` 1 periode, `audit_baris` **36 uji**. âš ï¸ Yang belum: paket izin `Audit: *` belum ditugaskan ke satu akun pun, sehingga belum ada yang benar-benar memakainya.
 - **Implementasi**: [[Microservices - Procurement Service]] dan [[Microservices - Integration Service]] sebagai sumber; modulnya sendiri di `bip-erp/services/finance/audit_*.go`; layarnya di `erp-frontend/src/app/(main)/audit/*` + `src/features/audit/*`
 - **Keputusan**: [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]], diamandemen [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]
 - ⛔ **Modul ini AKAN PINDAH** keluar `finance-service` jadi service + database sendiri, dan layarnya keluar `erp-frontend` jadi [[APP - Audit Internal]]. Dok ini tetap memegang domainnya — 36 uji, semantik kolom, dan aturan layar — apa pun rumahnya. Papan kerjanya [[ANALISA - Audit Internal Terpisah]].
@@ -160,7 +160,7 @@ Aturan berikut selama ini hanya hidup sebagai komentar Go, sehingga siapa pun ya
 
 ## Konsumen Data
 
-- [[APP - Web ERP]] — layar kertas kerja, register temuan, dan ukuran sampel; kategori sidebar `audit` tersendiri (**merged 2026-09-03**, belum di-deploy)
+- [[APP - Web ERP]] â€” layar kertas kerja, register temuan, dan ukuran sampel; kategori sidebar `audit` tersendiri (**live di prod 2026-09-03**). Akan dicabut setelah [[APP - Audit Internal]] berjalan.
 - Direktur — laporan bulanan; penerimanya orang, bukan sistem
 
 ## Kendala
@@ -168,7 +168,8 @@ Aturan berikut selama ini hanya hidup sebagai komentar Go, sehingga siapa pun ya
 - **Master pemasok tidak menyimpan nomor rekening sama sekali.** Sumbu silang yang dipakai: NPWP, NIK, nama, alamat, telepon, email. Kondisi ideal uji itu wajib menyebut batasnya, kalau tidak laporannya terbaca sebagai "rekening sudah diperiksa dan bersih".
 - **Schema resmi Accurate tidak lengkap**; tiga endpoint yang dipanggil produksi tidak terdaftar di sana. Ketiadaan di schema bukan bukti.
 - **Limiter Accurate 6 permintaan per detik dibagi lintas service**, dan sudah ada tiga klien terpisah.
-- **`finance-service` tidak ada di `docker-compose.dev.yml`**, jadi modul ini belum bisa dicoba lewat gateway di mana pun — berlaku untuk backend maupun layarnya, dan inilah satu-satunya sebab seluruh verifikasi ujung-ke-ujung masih tertunda.
+- ⚠️ **`finance-service` tidak ada di `docker-compose.dev.yml`**, jadi modul ini **tak dapat dicoba di dev sama sekali** — yang ada hanya `FINANCE_MODULE_URL` di blok gateway, dan portnya sempat ditulis mati `9999` alih-alih `${FINANCE_SERVICE_PORT}`, satu-satunya dari 22 module URL yang begitu. Konsekuensinya terbalik dari kebiasaan: yang hidup justru PRODUKSI, sehingga percobaan menulis (tinjau, terbitkan temuan) tidak punya tempat latihan yang aman.
+- ⚠️ **`INTEGRATION_SERVICE_KEY` kosong di dev, terisi di prod.** Buku besar per akun karena itu hanya terjangkau di produksi; di dev uji yang memakainya berkeadaan `gagal_tarik` dengan sebab terbaca — bukan bersih.
 - **Pemakai utamanya belum ada.**
 
 ## Belum Diputuskan (TBD)

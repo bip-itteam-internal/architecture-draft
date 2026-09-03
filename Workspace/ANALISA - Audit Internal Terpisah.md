@@ -4,15 +4,17 @@ Papan kerja untuk [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi 
 Dok aplikasi [[APP - Audit Internal]], dok domain [[Finance - Audit Internal]].
 
 Disusun 2026-09-03.
-**Status: belum ada satu baris kode pun.** Modul audit hari ini masih di dalam `services/finance` dan layarnya masih di `erp-frontend`.
+**Status per 2026-09-03: Fase 3 (aplikasi) SELESAI, Fase 1 (pemisahan service + database) BELUM DIMULAI.** Repo `audit-bharata` ada dengan tiga layar, 32 test hijau, build sukses. Modul audit sendiri masih di dalam `services/finance` dan **live di produksi** dengan 36 baris uji nyata.
 
-⛔ **URUTANNYA MENGIKAT.** Fase 1 sebelum Fase 3. Membalik urutannya menerbitkan penampakan independensi di atas penyimpanan yang belum terpisah, dan itu lebih berbahaya daripada tidak memisahkan sama sekali — orang berhenti bertanya.
+⛔ **URUTAN YANG DIANJURKAN: Fase 1 sebelum Fase 3.** Membalik urutannya menerbitkan penampakan independensi di atas penyimpanan yang belum terpisah, dan itu lebih berbahaya daripada tidak memisahkan sama sekali — orang berhenti bertanya.
+
+⚠️ **NYATANYA DIBALIK.** Fase 3 dikerjakan lebih dulu pada 2026-09-03, keputusan sadar pemilik pekerjaan setelah diberi tahu akibatnya. Dicatat apa adanya, dan aturannya TIDAK dihapus — konsekuensinya justru sedang berlaku sekarang: **situsnya ada, tetapi janji independensi belum**, sebab `finance-service` masih memegang kredensial ke `audit_jejak` dan `audit_temuan`. Siapa pun yang membaca papan ini perlu tahu bahwa "audit sudah punya situs sendiri" hari ini **belum** berarti "buktinya sudah tak bisa diubah pihak yang diperiksa".
 
 ---
 
 ## Fase 0 — Prasyarat, dan ini yang menahan segalanya
 
-- [ ] ⛔ **Tambahkan blok service `finance-service` + `finance-mongo-db` ke `docker-compose.dev.yml`.** Sekarang berkas itu hanya punya `FINANCE_MODULE_URL: "http://finance-service:9999"` sebagai placeholder, **tanpa definisi service-nya**, jadi `/api/finance/*` membalas 502 dan modul audit **belum pernah memuat satu baris data pun**.
+- [ ] ⚠️ **Tambahkan blok service `finance-service` + `finance-mongo-db` ke `docker-compose.dev.yml`.** ⚠️ **TURUN PRIORITAS 2026-09-03**: ternyata modul ini sudah live di PRODUKSI, jadi ini bukan lagi penghalang untuk membangun maupun melihatnya bekerja. Yang tersisa gunanya nyata tapi berbeda — **tempat uji yang aman**: hari ini percobaan menulis (tinjau, terbitkan temuan) tidak punya lingkungan latihan selain prod. Berkas itu hanya punya `FINANCE_MODULE_URL: "http://finance-service:9999"`, satu-satunya dari 22 module URL yang portnya ditulis mati, dan membetulkannya jadi `${FINANCE_SERVICE_PORT}` aman (env-nya ADA di `.env` dev, sudah diukur).
   ⚠️ **Port di placeholder itu ditulis mati `9999`, bukan `${FINANCE_SERVICE_PORT}` (=6989).** Menambahkan service tanpa membetulkan baris itu membuat gateway tetap menembak 9999 sementara service mendengar di 6989 — **tetap 502, dengan container yang hidup dan sehat.**
   ⚠️ Cek dulu `.env` VM dev memuat `FINANCE_SERVICE_PORT`, `MONGO_FINANCE_DB`, `INTEGRATION_SERVICE_KEY`. Runbook mencatat kejadian nyata: port di `.env.example` tidak pernah tersalin ke `.env` dev, dan itu sebabnya gateway tak pernah bisa di-rebuild berbulan-bulan.
   ⚠️ Host port 32799 sudah dicek bebas di dev. Preseden payroll harus pindah 32792→32795 karena tabrakan, jadi jangan asumsikan.
@@ -63,29 +65,29 @@ Disusun 2026-09-03.
 
 ---
 
-## Fase 3 — Aplikasi di subdomain sendiri
+## Fase 3 — Aplikasi di subdomain sendiri (SELESAI 2026-09-03, repo `audit-bharata`)
 
-- [ ] **T3.1 — Putuskan nama dan alamatnya.** Wadahnya untuk seluruh audit internal, jadi namanya wajib membedakan diri dari [[GA - Audit Internal System]]. Dua hal bernama sama tanpa pembeda sudah terbukti membingungkan permanen.
+- [x] **T3.1 — Nama dan alamat**: repo `audit-bharata`, domain `audit.bharatainternasional.com`, port dev 3012. Catatan lama: Wadahnya untuk seluruh audit internal, jadi namanya wajib membedakan diri dari [[GA - Audit Internal System]]. Dua hal bernama sama tanpa pembeda sudah terbukti membingungkan permanen.
 
-- [ ] **T3.2 — Repo baru**, Next.js + shadcn/ui. `npx shadcn@latest init` lalu `add` 15 komponen yang dipakai.
+- [x] **T3.2 — Repo baru** (Next 16 + React 19 + Tailwind 4, nyaris identik dengan erp-frontend sehingga tak ada migrasi framework), Next.js + shadcn/ui. `npx shadcn@latest init` lalu `add` 15 komponen yang dipakai.
   ⚠️ Konvensi repo ini: **pnpm**, branch `main` (Portal Karir memakai `master` dan itu jebakan CI).
   ⚠️ Tambah varian `success` dan `warning` ke `badge` — shadcn stok tak punya, dan `tampilan.ts` menuntutnya.
 
-- [ ] **T3.3 — Keputusan tabel: fork atau bangun ulang.** `MainTable` dipakai 124 halaman lain, `Banner` 106. Halaman audit hanya memakai 13 dari 19 prop. Putuskan sadar, jangan mengalir.
+- [x] **T3.3 — Tabel DIBANGUN ULANG** (~190 baris di atas shadcn `Table`), bukan fork; ikut hilang `exceljs`. Pertimbangannya: `MainTable` dipakai 124 halaman lain, `Banner` 106. Halaman audit hanya memakai 13 dari 19 prop. Putuskan sadar, jangan mengalir.
 
-- [ ] **T3.4 — Pindahkan modul audit** (1.924 baris + 524 test). Import relatifnya sudah tertutup.
-  - [ ] Tulis ulang `bolehAksiAudit` (~8 baris, perilakunya sudah terkunci `izin.test.ts`) alih-alih membawa 1.476 baris `menu-permission`.
-  - [ ] Inline `isSelisihNyata` alih-alih membawa 285 baris `reconciliation-view`.
-  - [ ] Ukir blok `audit.*` + `common` dari locale (281 baris).
+- [x] **T3.4 — Modul audit dipindahkan** (1.924 baris + 524 test). Import relatifnya sudah tertutup.
+  - [x] `bolehAksiAudit` ditulis ulang (~15 baris); kesetaraannya dibuktikan `izin.test.ts` yang pindah tanpa diubah dan tetap hijau. Rencana semula: (~8 baris, perilakunya sudah terkunci `izin.test.ts`) alih-alih membawa 1.476 baris `menu-permission`.
+  - [x] `isSelisihNyata` di-inline ke `lib/selisih.ts` beserta ALASANNYA (ambang Rp 0,5 hanya sah untuk satuan IDR). alih-alih membawa 285 baris `reconciliation-view`.
+  - [x] Locale diukir dari 10.166 baris jadi 166 (`common`, `audit`, `sidebar`).
 
-- [ ] **T3.5 — SSO**: halaman `/auth/callback` dikecualikan dari guard, penjaga anti-loop logout, penanganan 401 setelah 72 jam.
+- [x] **T3.5 — SSO** (`/masuk` + `/auth/callback`, keduanya di luar penjaga; penukaran kode dijaga penanda sekali-jalan sebab Strict Mode memanggil efek dua kali): halaman `/auth/callback` dikecualikan dari guard, penjaga anti-loop logout, penanganan 401 setelah 72 jam.
   ⛔ **ERP JWT dipakai sekali lalu dibuang**, pola `services/vault-mcp/erp.go`. Jangan menyimpannya sebagai token sesi.
-  - [ ] ⛔ **PR CORS ke `api-gateway/main.go` + deploy gateway.** Daftar origin hardcode di Go. Dok [[CORE - SSO Flow]] bilang "tidak butuh perubahan backend" dan itu salah.
+  - [x] ⛔ **PR CORS ke `api-gateway/main.go` + deploy gateway.** Dibuka: bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690), origin `https://audit.bharatainternasional.com` + port dev **3012** (3011 dipakai portal karir). ⚠️ **Masih OPEN** — entri baru tidak aktif sampai gateway di-deploy ulang.
   - [ ] Perbaiki allowlist redirect ERP supaya memeriksa **skema**, bukan hostname saja — `http://` di subdomain lolos hari ini dan token dikirim plaintext.
 
-- [ ] **T3.6 — Pasang `form-errors-modal` di layout.** Tanpa itu validasi lima unsur temuan **gagal tanpa satu pun galat**.
+- [x] **T3.6 — `Toaster` dipasang di layout.** Tanpa itu validasi lima unsur temuan **gagal tanpa satu pun galat**.
 
-- [ ] **T3.7 — Guard build**: gagalkan build bila `.env` tak ada, supaya situs produksi tidak menunjuk alamat dev secara senyap.
+- [x] **T3.7 — Guard build**: gagalkan build bila `.env` tak ada, supaya situs produksi tidak menunjuk alamat dev secara senyap.
 
 - [ ] **T3.8 — Cabut rute `/audit*` dari `erp-frontend`** setelah situsnya hidup dan terverifikasi. Jangan sebelumnya.
 
@@ -97,7 +99,7 @@ Disusun 2026-09-03.
 - [ ] Buat `API - Audit Service` + daftarkan di `API - Index`.
 - [ ] Buat `RUN - Deploy Aplikasi Audit Internal` — preseden Portal Karir menunjukkan jebakan deploy tidak muat di dok `APP -`.
 - [ ] Perbarui `CLAUDE.md` §7 vault: baris repo→dok, tandai "repo terpisah".
-- [ ] ⛔ **Perbaiki tiga klaim usang di [[CORE - SSO Flow]]** SEBELUM ada yang memakainya sebagai panduan: `use-task-manager-sso.ts` tidak ada, "tidak butuh perubahan backend" salah, dan allowlist `localhost` lolos tanpa cek port.
+- [x] ⛔ **Tiga klaim usang di [[CORE - SSO Flow]] SUDAH dibetulkan** (2026-09-03), dan yang kedua terbukti keliru untuk KEDUA kalinya lewat PR #1690. Yang dikoreksi: SEBELUM ada yang memakainya sebagai panduan: `use-task-manager-sso.ts` tidak ada, "tidak butuh perubahan backend" salah, dan allowlist `localhost` lolos tanpa cek port.
 - [ ] Perbarui [[CORE - API Master Gateway]] dan [[CORE - RBAC dan Permission Set]].
 
 ---

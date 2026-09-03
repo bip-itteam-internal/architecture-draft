@@ -5,19 +5,19 @@
 - **Yang berubah di layar**: audit internal pindah dari menu di dalam sistem ERP ke **alamat webnya sendiri**, dengan halaman masuk terpisah. Masuknya tetap memakai akun ERP yang sama — tidak ada kata sandi baru untuk dihafal. Isinya sama seperti yang sudah dirancang: kertas kerja bulanan, register temuan, dan pengaturan ukuran sampel milik Direksi.
 - **Siapa terdampak**: auditor internal sebagai pemakai utama, Direksi sebagai penerima laporan sekaligus satu-satunya yang menyetel ukuran sampel, dan pembaca yang hanya boleh melihat. Divisi yang diperiksa **tidak** mendapat akses ke sini; mereka tetap pihak yang dimintai klarifikasi.
 - **Tidak dijanjikan**: alamat terpisah **tidak** membuat pemeriksaannya lebih akurat, dan **tidak** membuka akses bagi auditor dari luar perusahaan — jalur masuknya menuntut akun karyawan. Pemindahan ini juga **tidak** menambah satu pun pengujian baru; dari 36 pengujian, yang sudah berjalan otomatis tetap enam. Yang benar-benar dijamin hanya satu hal, dan itu memang inti keputusannya: **catatan pemeriksaan disimpan dengan kunci yang tidak dipegang divisi yang diperiksa.**
-- **Besaran kerja**: tiga tahap berurutan. Memindahkan mesinnya beserta penyimpanannya, menutup satu celah akses yang tersisa, lalu membangun situsnya. Layarnya sendiri sudah jadi dan tinggal dipindahkan. Tahap pertama yang paling menentukan dan paling tidak terlihat hasilnya dari layar; mendahulukan situsnya akan menghasilkan tampilan terpisah di atas penyimpanan yang belum terpisah.
+- **Besaran kerja**: tiga tahap. Memindahkan mesinnya beserta penyimpanannya, menutup satu celah akses, dan membangun situsnya. ⚠️ **Situsnya dikerjakan lebih dulu (2026-09-03), berlawanan dengan urutan yang dianjurkan ADR ini sendiri** — keputusan sadar pemilik pekerjaan setelah diberi tahu akibatnya. Yang perlu diketahui manajemen: **situsnya sudah jadi, tetapi janji "catatan pemeriksaan disimpan dengan kunci yang tidak dipegang divisi yang diperiksa" BELUM berlaku** dan baru berlaku setelah tahap pertama dikerjakan. Sampai saat itu, yang berubah baru alamatnya.
 
 ## Deskripsi
 
 *Audit internal dikeluarkan dari `finance-service` menjadi service sendiri dengan database dan kredensial sendiri, lalu layarnya dikeluarkan dari `erp-frontend` menjadi aplikasi di subdomain sendiri yang masuk lewat SSO ERP. Keputusan ini **membalik ADR 0073 §1** dan berdiri di atas dua tuntutan yang saat itu belum dinyatakan: pihak yang diperiksa tidak boleh dapat mengubah bukti pemeriksaan tentang dirinya, dan modul ini akan menjadi wadah bagi seluruh audit internal, bukan audit pembukuan saja.*
 
-- **Status**: 🟡 **Diusulkan** — belum ada satu baris kode pun. Layar fase 2 yang sudah merged di `erp-frontend` ([#1429](https://github.com/bip-itteam-internal/erp-frontend/pull/1429)) berhenti dikembangkan di sana dan menjadi bahan pindahan.
+- **Status**: ⚠️ **Implemented sebagian** — **§2 (aplikasi terpisah) SUDAH DIKERJAKAN**: repo `audit-bharata` ada, tiga layar jalan, 32 test hijau, build sukses; PR CORS bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690) OPEN. **§1 (pemisahan service + database) BELUM dimulai.** §5 (bypass super-akses) belum dikerjakan.
 - **Path di repo**: `bip-erp/services/audit/*` (baru) · `bip-erp/shared-library/common/env.go` · `bip-erp/api-gateway/main.go` · `bip-erp/docker-compose.yml` · `bip-erp/.github/workflows/deploy.yml` · `erp-frontend/src/utils/menu-permission.ts` · repo aplikasi baru (baru)
 - **Tanggal**: 2026-09-03
 
 ## Context
 
-⚠️ **ADR ini berdiri di atas dokumen berstatus ⚠️, bukan 🟡.** [[Finance - Audit Internal]] dan [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]] keduanya menggambarkan kode yang benar-benar ada dan sudah merged. Yang belum pernah terjadi adalah **menjalankannya**: `finance-service` tidak ada di `docker-compose.dev.yml`, sehingga modul ini belum pernah memuat satu baris data pun lewat gateway.
+⚠️ **ADR ini berdiri di atas dokumen berstatus ✅, bukan 🟡.** [[Finance - Audit Internal]] dan [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]] keduanya menggambarkan kode yang **live di produksi per 2026-09-03**, dengan 36 baris uji nyata. ⚠️ Yang belum pernah terjadi bukan penjalanannya melainkan **pemakaiannya**: paket izin `Audit: *` belum ditugaskan ke satu akun pun, jadi belum ada orang yang membukanya.
 
 ADR 0073 memutuskan audit sebagai **modul di dalam `finance-service`, bukan service tersendiri**, dengan tiga alasan operasional: container baru mahal di VM dev yang punya riwayat OOM, service baru berulang kali lolos dari `deploy.yml` dengan kegagalan senyap, dan jebakan urutan rute sudah dijinakkan di service lama. Ketiganya **masih berlaku dan tidak dibantah ADR ini**.
 
@@ -51,7 +51,11 @@ Aplikasi Next.js + shadcn/ui di repo terpisah. Autentikasi memakai jalur yang su
 
 ⛔ **DILARANG punya auth sendiri.** [[ADR - 0003 SSO-only Gateway]] mengikat: aplikasi internal memakai akun karyawan yang sama, bukan tabel pengguna sendiri. Preseden pelanggarnya sudah ada dan ongkosnya tercatat di [[APP - Buku Besar Konsolidasi CV FINCON]].
 
-⚠️ **ERP JWT dipakai SEKALI di callback lalu dibuang.** Token ERP tidak punya `aud` dan tidak diperiksa audience-nya, jadi ia berlaku penuh di seluruh `/api/*` selama 72 jam tanpa refresh. Menyimpannya sebagai token sesi aplikasi audit berarti setiap kebocoran dari aplikasi mana pun bisa dipakai di sini. Polanya sudah ada dan terbukti: `services/vault-mcp/erp.go` membaca identitas dari token lalu membuangnya.
+⚠️ **ERP JWT DIPEGANG aplikasi ini, dan anjuran "pakai sekali lalu buang" TIDAK berlaku di sini.** Versi pertama ADR ini menuliskan anjuran itu mengikuti [[CORE - SSO Flow]] dan pola `services/vault-mcp/erp.go` — dan itu **keliru untuk kasus ini**. Pola tersebut menuntut konsumen punya backend sendiri untuk menerbitkan tokennya; aplikasi audit adalah SPA yang memanggil gateway langsung dari peramban, jadi ia tak punya tempat menerbitkan apa pun. Menganjurkannya di sini berarti menuliskan saran yang tak dapat dijalankan, dan saran semacam itu akan diabaikan seluruhnya beserta bagiannya yang benar.
+
+Yang diterima sebagai konsekuensi, ditulis terbuka di `src/lib/sesi.ts` aplikasinya: token berlaku **penuh di seluruh `/api/*`** karena ERP JWT tak punya `aud` dan tak diperiksa audience-nya, dan **berumur 72 jam tanpa refresh** karena jalur SSO tak menerbitkan refresh token. Disimpan di `sessionStorage`, bukan `localStorage`, supaya umurnya seumur tab.
+
+⛔ **Yang tetap DILARANG**: menyimpan ERP JWT di konsumen yang memapar permukaan sendiri ke luar. Larangan itu berlaku penuh untuk konsumen server-to-server, dan `vault-mcp` tetap contoh yang benar untuk bentuk itu.
 
 ### 3. Situs ini wadah SELURUH audit internal, dan namanya harus menyatakan itu
 
@@ -93,7 +97,7 @@ Pemisahan database dan service dikerjakan **sebelum** situsnya. Membalik urutann
 - ➖ Aplikasi terpisah membawa ongkos yang tercatat di dua preseden: deploy adalah bagian termahal, bukan kodenya, dan aplikasi bisa "selesai" berbulan-bulan sebelum ada yang memakainya.
 - ⚠️ **`AUDIT_MODULE_URL` wajib ada di blok `api-gateway` compose.** `ValidateInternalURL` memanik bila ada nilai kosong, dan panik itu berarti **seluruh ERP padam**, bukan satu modul mati. Dijaga `api-gateway/internal_url_compose_test.go`.
 - ⚠️ **`DaftarkanRuteAudit` harus pindah dari `app.Group("/audit")` ke akar `/`.** Gateway sudah membuang `/api/audit`, jadi grup `/audit` membuat rutenya hanya terjangkau lewat `/api/audit/audit/uji`. Kelas ini menggigit calendar-service 2026-08-06 dan sudah dikunci `services/finance/routes_test.go`.
-- ⚠️ **Konsumen berbasis browser menuntut PR CORS ke `api-gateway/main.go` dan deploy gateway.** [[CORE - SSO Flow]] menyatakan menambah konsumen "tidak butuh perubahan backend" — itu **salah**, dan sudah dikonfirmasi ke kode. Klaim itu wajib diperbaiki di dokumennya sendiri sebelum ada yang memakainya sebagai panduan.
+- ⚠️ **Konsumen berbasis browser menuntut PR CORS ke `api-gateway/main.go` dan deploy gateway.** [[CORE - SSO Flow]] menyatakan menambah konsumen "tidak butuh perubahan backend" — itu **salah**, dan sudah dikonfirmasi ke kode dua kali: Portal Karir (PR #460) dan aplikasi ini (bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690)). Daftarnya dikompilasi ke dalam biner Go, jadi entri baru tidak aktif sampai gateway dibangun ulang.
 - ⚠️ **Migrasi 6 koleksi** `audit_*` dari `finance_db` ke `audit_db`. Indeksnya tidak perlu dimigrasi; `siapkanIndexAudit` membuatnya ulang saat boot.
 - ⚠️ **Urutan deploy**: integration-service, lalu audit-service, lalu gateway (`--force-recreate` karena env baru), baru aplikasinya.
 - ⚠️ `ssoStore` di gateway masih `map` in-memory, jadi gateway **tidak boleh di-scale horizontal** selama jalur SSO dipakai.

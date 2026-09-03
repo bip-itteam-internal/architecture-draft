@@ -5,8 +5,8 @@
 *Aplikasi web berdiri sendiri di subdomainnya sendiri untuk seluruh audit internal perusahaan, masuk lewat SSO ERP tanpa akun terpisah. Isinya kertas kerja bulanan, register temuan, dan pengaturan ukuran sampel. Ia sengaja BUKAN menu di dalam ERP: pihak yang diperiksa tidak boleh memegang kunci penyimpanan bukti pemeriksaan tentang dirinya, dan audit kepatuhan yang menyusul tidak punya rumah yang masuk akal di dalam service keuangan.*
 
 - **Stack**: Next.js (App Router) + TypeScript + shadcn/ui + TanStack Query + react-i18next — sama dengan [[APP - Web ERP]], sengaja, supaya layar yang sudah jadi dapat dipindahkan apa adanya
-- **Path di repo**: repo terpisah **(baru, belum dibuat)**; backend `bip-erp/services/finance` hari ini ([[Finance - Rancangan Finance Service]]), `services/audit` sesudah pemisahan
-- **Status**: 🟡 **Konsep / Direncanakan** — belum ada repo, belum ada satu baris kode. Layarnya sudah ada di `erp-frontend` ([#1429](https://github.com/bip-itteam-internal/erp-frontend/pull/1429), merged) dan berhenti dikembangkan di sana
+- **Path di repo**: `audit-bharata` (**repo terpisah**, dibuat 2026-09-03); backend `bip-erp/services/finance` hari ini ([[Finance - Rancangan Finance Service]]), `services/audit` sesudah pemisahan
+- **Status**: ⚠️ **Implemented (ada catatan)** — repo ada, tiga layar jalan, 32 test hijau, `pnpm build` sukses. ⛔ **Belum pernah dijalankan terhadap API sungguhan**: origin aplikasi ini belum ada di allowlist CORS gateway (bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690), OPEN), dan paket izin `Audit: *` belum ditugaskan ke akun mana pun.
 - **Keputusan**: [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]
 
 ## Latar Belakang
@@ -76,7 +76,7 @@ Tiap konsumen SSO menulis ulang keempatnya — belum ada paket bersama:
 
 - Halaman `/auth/callback`, **dikecualikan dari guard** aplikasi
 - Penjaga anti-loop saat logout (`?logged_out=1`); tanpanya redirect otomatis dan auto-login berputar tanpa henti
-- ⛔ **PR CORS ke `api-gateway/main.go` dan deploy gateway.** Daftar origin di-**hardcode di Go**, bukan env. [[CORE - SSO Flow]] menyatakan menambah konsumen "tidak butuh perubahan backend" dan itu **salah** — Portal Karir membuktikannya, ia butuh PR #460 plus deploy gateway prod.
+- ⛔ **PR CORS ke `api-gateway/main.go` dan deploy gateway.** Daftar origin di-**hardcode di Go**, bukan env. Sudah dibuka: bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690) (origin `https://audit.bharatainternasional.com` + port dev **3012**). [[CORE - SSO Flow]] menyatakan menambah konsumen "tidak butuh perubahan backend" dan itu **salah** untuk konsumen berbasis peramban — Portal Karir membuktikannya lewat PR #460, dan PR #1690 membuktikannya kedua kalinya.
 - Penanganan 401 setelah 72 jam; jalur SSO **tidak** menerbitkan refresh token
 
 ## Persona / Pengguna

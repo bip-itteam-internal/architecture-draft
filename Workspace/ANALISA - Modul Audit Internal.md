@@ -3,7 +3,7 @@
 Papan kerja untuk [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]]. Dok domainnya [[Finance - Audit Internal]].
 
 Disusun 2026-09-02, diperbarui hari yang sama setelah fase 1 selesai.
-**Status: SELURUH KODE MERGED per 2026-09-03** — bip-erp #1676 + #1679, erp-frontend #1429. ⛔ **Belum di-deploy dan nol verifikasi lewat gateway**: `docker-compose.dev.yml` tak punya blok service `finance-service`, jadi layar ini belum pernah memuat satu baris data pun. Paket `Audit: *` juga belum dipasang ke akun mana pun.
+**Status: LIVE DI PRODUKSI per 2026-09-03** — bip-erp #1676 + #1679 dan erp-frontend #1429 seluruhnya sudah di-deploy, dengan 36 baris uji nyata. ⛔ **Yang menahan pemakaian tinggal satu: paket izin `Audit: *` belum ditugaskan ke satu akun pun** (diukur di prod: nol posisi). ⚠️ Dev tetap tak punya blok `finance-service`, jadi tak ada tempat uji yang aman.
 
 ---
 
