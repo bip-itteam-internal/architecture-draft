@@ -6,7 +6,8 @@
 
 - **Status**: ⚠️ **Implemented (ada catatan)** — seluruhnya **merged ke `main`**: backend fase 1 (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676)), `keadaan_efektif` ke JSON ([#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)), dan layar fase 2 (erp-frontend [#1429](https://github.com/bip-itteam-internal/erp-frontend/pull/1429), 2026-09-03). ⛔ **Belum di-deploy dan belum pernah dijalankan lewat gateway** — `finance-service` tak ada di `docker-compose.dev.yml`, jadi layar ini belum pernah memuat satu baris data pun
 - **Implementasi**: [[Microservices - Procurement Service]] dan [[Microservices - Integration Service]] sebagai sumber; modulnya sendiri di `bip-erp/services/finance/audit_*.go`; layarnya di `erp-frontend/src/app/(main)/audit/*` + `src/features/audit/*`
-- **Keputusan**: [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]]
+- **Keputusan**: [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]], diamandemen [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]
+- ⛔ **Modul ini AKAN PINDAH** keluar `finance-service` jadi service + database sendiri, dan layarnya keluar `erp-frontend` jadi [[APP - Audit Internal]]. Dok ini tetap memegang domainnya — 36 uji, semantik kolom, dan aturan layar — apa pun rumahnya. Papan kerjanya [[ANALISA - Audit Internal Terpisah]].
 
 ## Latar Belakang
 
