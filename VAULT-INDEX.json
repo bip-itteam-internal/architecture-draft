@@ -2340,8 +2340,8 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "bf75ef7d956da4100b118b2f0efc6ed79f7c9a7cb202f1f6ec06eeaf5a9c95e3",
-      "ukuran_kb": 315.0,
+      "hash": "eb18b5fd51d3d6572b27533c4be8ae78160925f637ebb6b617f3da032608056d",
+      "ukuran_kb": 319.4,
       "ringkasan": "Menjawab: bagaimana integration-service menghubungkan ERP ke marketplace (TikTok Shop/Business/Ads, Shopee, Lazada) dan menjembatani akuntansi ke Accurate Online — ingest webhook & order-sync, normalisasi model transaksi, push Sales Invoice/Return, automasi auto-ship sadar-holiday, kredensial OAuth per marketplace, serta job/cron terjadwal. Termasuk salinan lokal stok Accurate (`accurate_stocks`), penambalan kategori item, dan task harian nilai persediaan perlengkapan (`accurate-perlengkapan-cost-refresh` → `balance_total_cost`, biaya hanya dari `item/detail.do`).",
       "kata_kunci": [
         "integration service",
@@ -3343,8 +3343,8 @@
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "APP - Web ERP"
       ],
-      "hash": "7029330ffd29395fcd5676acaa45631f7c8c761558cd1945c0ee1f179ac899b4",
-      "ukuran_kb": 19.4,
+      "hash": "35df16388d6d7a105cd39d1744f8f15e2c874fc5f15a99061d4bb465b0aa4865",
+      "ukuran_kb": 20.3,
       "ringkasan": "Menjawab kenapa dan bagaimana dokumen Retur Penjualan dikelompokkan per faktur sumber + tanggal retur (bukan per `return_sn`), apa isi group key dan mekanisme guard anti-dobel, serta bagaimana rebuild grup dan sanity check over-retur bekerja. Juga menjelaskan tiga penyebab kunci grup menjadi basi yang pernah menyebabkan retur terbukukan dua kali di Accurate beserta insiden dan remediasinya.",
       "kata_kunci": [
         "ADR 0016",
@@ -6195,9 +6195,9 @@
         "CORE - OCR Document Service",
         "Form Permintaan Barang GA.pdf"
       ],
-      "hash": "244578103801d3c6feb95ab7c7a37e0798402daf359084d35667e622edbecd7e",
-      "ukuran_kb": 14.7,
-      "ringkasan": "Menjawab: bagaimana General Affairs mencatat dan mengontrol aset/barang perusahaan — penomoran tag aset, serah-terima & persetujuan SPV, lokasi & estimasi penyusutan, riwayat perbaikan + bukti nota, soft-delete beralasan, rekonsiliasi aset & perlengkapan dengan Accurate untuk KPI, explorer padanan perlengkapan (Terpasang X/N + Total Biaya/nilai persediaan), dan perlengkapan durable per-unit. Menjelaskan juga tab Cocokkan (search nama + filter status, mengecualikan perlengkapan) dan apa yang sengaja tak ditampilkan (tanggal beli & nilai buku perlengkapan) beserta alasannya.",
+      "hash": "623b7339d8a10a236d5f095cef79dec55a78155ab91937d8cb4471b4a7947ddc",
+      "ukuran_kb": 14.9,
+      "ringkasan": "Menjawab: bagaimana General Affairs mencatat dan mengontrol aset/barang perusahaan — penomoran tag aset, serah-terima & persetujuan SPV, lokasi & estimasi penyusutan, riwayat perbaikan + bukti nota, soft-delete beralasan, rekonsiliasi aset & perlengkapan dengan Accurate untuk KPI, tab Cocokkan (search nama + filter status di header kolom, mengecualikan perlengkapan), explorer padanan perlengkapan (Terpasang X/N + Total Biaya/nilai persediaan), dan perlengkapan durable per-unit. Menjelaskan juga apa yang sengaja tak ditampilkan (tanggal beli & nilai buku perlengkapan) beserta alasannya.",
       "kata_kunci": [
         "inventory",
         "aset",
@@ -6209,9 +6209,9 @@
         "Accurate",
         "rekonsiliasi",
         "cocokkan",
+        "filter status",
         "opname",
         "Total Biaya",
-        "nilai persediaan",
         "soft delete",
         "padanan"
       ]
