@@ -74,17 +74,49 @@ Seluruh config **singleton**, di-seed idempoten saat boot (`seedPayrollConfig`, 
 | GET | `/payroll-runs/:id/lines/:employeeId` | `view` / `isHR` | Satu baris slip di dalam run |
 | POST | `/payroll-runs/:id/recalculate` | `work` / `isHRSupervisor` | **Dispatch per `type`** lewat `modeHitungUlangRun`, sebuah `switch` yang **menolak tipe tak dikenal** alih-alih menjatuhkannya ke perhitungan bulanan. Run `import` dibalas **400**. ⛔ Penjaganya berjalan **sebelum** `DeleteMany`: begitu barisnya terhapus, penolakan di langkah berikutnya tak menyelamatkan apa pun |
 | POST | `/payroll-runs/:id/approve` | **`approve`** / `isApprover` | |
-| POST | `/payroll-runs/:id/publish` | **`approve`** / `isApprover` | Publish yang membuat slip terlihat karyawan |
+| POST | `/payroll-runs/:id/publish` | **`approve`** / `isApprover` | Publish yang membuat slip terlihat karyawan. ⛔ **Menahan PERIODE GANDA**: bila periode run ini sudah punya run lain ber-`status=published`, dibalas **409** yang menyebut **judul** run bentroknya. Badan opsional `{"confirm_duplicate": true}` meloloskannya. Lihat blok di bawah |
 
-## Impor Payroll Run (⚠️ merged, belum di produksi)
+**Penjaga periode ganda pada `publish`** — ✅ live di produksi 2026-09-03 (bip-erp PR [#1695](https://github.com/bip-itteam-internal/bip-erp/pull/1695)).
+
+`getMyPayslips` memetakan slip karyawan **per `run_id`**, jadi dua run yang sama-sama `published` untuk satu periode benar-benar menghasilkan **dua entri** di daftar slip orang itu. Dan **tidak ada endpoint unpublish**: sekali terbit, ia tak bisa ditarik.
+
+| Keadaan | Balasan |
+|---|---|
+| Tak ada run terbit lain di periode itu | **200**, badan diabaikan — perilaku persis seperti sebelum penjaga ini ada |
+| Ada, tanpa konfirmasi | **409**, `error` memuat kalimat lengkap yang menyebut judul run bentroknya |
+| Ada, dengan `{"confirm_duplicate": true}` | **200** |
+
+- **Memperingatkan, bukan memutuskan.** [[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]] menolak mengunci aturan dedup karena belum ada yang menentukan run mana yang menang; yang ditolaknya **memilih pemenang**, bukan **memberi tahu**. Penjaga ini menahan sekali lalu menyerahkan keputusannya kepada HR.
+- **Hanya di `publish`, TIDAK di `approve`.** Approve tak menerbitkan apa pun, dan menggerbangnya akan mengganggu alur sah di mana dua run periode sama hidup sementara sebelum salah satunya dihapus.
+- ⚠️ **Deny-by-default pada badan rusak.** JSON yang tak bisa diurai berarti "belum dikonfirmasi", kalau tidak penjaga ini bisa dilewati dengan mengirim sampah.
+- ⛔ Filternya mengecualikan run yang sedang diterbitkan (`_id: {$ne: ...}`). Tanpa itu ia menghitung **dirinya sendiri** dan yang rusak bukan kasus tepi melainkan **setiap** penerbitan run.
+- Pencocokan `period` **persis** dan **lintas jenis** (impor melawan bulanan), karena justru itu bentrokan yang benar-benar terjadi di produksi.
+
+## Impor Payroll Run — ✅ live di produksi 2026-09-03
 
 Backfill riwayat gaji yang sudah dibayar lewat spreadsheet HRD. Keputusan lengkap berikut
 gerbang datanya: [[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]].
 
+**Sudah dipakai sungguhan**: satu run impor 174 karyawan periode `2026-07` berstatus `published`
+di produksi. Itu slip pertama yang pernah terbit ke karyawan lewat sistem ini.
+
 | Method | Path | Gerbang | Catatan |
 |---|---|---|---|
 | POST | `/payroll-runs/import` | `work` / `isHRSupervisor` | Buat run `type=import` **beserta seluruh barisnya dalam satu permintaan**. Gerbangnya sama dengan `POST /payroll-runs`: keduanya menerbitkan payroll untuk banyak orang sekaligus. Didaftarkan **sebelum** saudara ber-`:id` |
-| DELETE | `/payroll-runs/:id` | `work` / `isHRSupervisor` | Hanya `type=import` **DAN** `status=draft`; run engine dan run non-draft dibalas **400**. Gerbangnya `work`, bukan `approve`: menghapus draft adalah kebalikan dari **membuatnya**, dan yang salah unggah harus bisa membatalkannya sendiri |
+| DELETE | `/payroll-runs/:id` | `work` / `isHRSupervisor` | Hanya `type=import` **DAN** `status=draft`; run engine dan run non-draft dibalas **400**. Gerbangnya `work`, bukan `approve`: menghapus draft adalah kebalikan dari **membuatnya**, dan yang salah unggah harus bisa membatalkannya sendiri. Layarnya menyusul 2026-09-03 (erp-frontend [#1440](https://github.com/bip-itteam-internal/erp-frontend/pull/1440)); sebelum itu endpoint ini **tak punya satu pun jalan masuk dari UI** |
+
+⛔ **Run ENGINE tak punya jalur hapus sama sekali, dan itu disengaja.** Konsekuensinya nyata:
+membuang run bulanan yang salah menuntut **tulis langsung ke MongoDB produksi**, melewati
+gerbang yang kodenya sendiri pasang. Dijalankan 2026-09-03 untuk dua run draft (180 dan 158
+baris) yang berdampingan dengan run impor yang sudah terbit di periode sama.
+
+⚠️ **Bila terpaksa menghapus lewat DB: `payroll_run_line` DIHAPUS LEBIH DULU, baru
+`payroll_run`.** Urutan terbalik meninggalkan ratusan baris slip tanpa induk — tak terlihat di
+layar mana pun, tak bisa ditemukan lewat aplikasi, permanen. Urutan yang benar menyisakan run
+kosong yang masih bisa dihapus ulang, yaitu kegagalan yang bisa diperbaiki. Ini urutan yang
+sama dengan `deleteImportRun`, dan alasannya tertulis di komentarnya. Skrip beserta gerbangnya
+(menolak status non-draft, mencocokkan jumlah baris ke angka di layar, berhenti bila yang cocok
+bukan tepat satu): `.task-plans/hapus-run-draft-prod.js` di workspace.
 
 - ⛔ **ALL-OR-NOTHING.** Satu baris bermasalah → **400** berisi `gagal[]` (`{baris, employee_id, alasan}`) dan **nol dokumen tersimpan**. Berbeda sengaja dari `bulk-bpjs-base` yang gagal per baris: di sana tiap baris menulis field independen, di sini seluruh baris membentuk satu run yang totalnya harus utuh. `Payroll-MongoDB` standalone **tanpa replica set** sehingga transaksi Mongo tak tersedia.
 - **Urutan pemeriksaan disengaja**: validasi murni (bentuk, duplikat `employee_id`, rekonsiliasi) dijalankan **sebelum** penjaga `mongodb.DB == nil`, sehingga permintaan yang bentuknya salah tetap dibalas 400 walau Mongo mati — dan seluruh jalur itu bisa diuji lewat Fiber tanpa database.

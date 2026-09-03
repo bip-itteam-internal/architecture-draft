@@ -11,7 +11,9 @@
 
 *Payroll sudah live sejak Fase 1-5 tetapi **belum pernah dipakai menggaji seorang pun** (dua `payroll_run` di produksi, keduanya `draft`, nol slip terbit). Sementara itu HRD sudah membayar gaji berbulan-bulan lewat spreadsheet. ADR ini memutuskan riwayat itu dimasukkan ke sistem sebagai **jenis run ketiga** yang angkanya DISALIN, bukan dihitung, supaya karyawan punya slip yang bisa dibuka tanpa menunggu mesin penggajian dipercaya.*
 
-- **Status**: **Accepted** (2026-09-01). Irisan pertama dan kedua **MERGED dan sudah ada di `main` kedua repo** (bip-erp [#1604](https://github.com/bip-itteam-internal/bip-erp/pull/1604) + [#1611](https://github.com/bip-itteam-internal/bip-erp/pull/1611), erp-frontend [#1371](https://github.com/bip-itteam-internal/erp-frontend/pull/1371) + [#1375](https://github.com/bip-itteam-internal/erp-frontend/pull/1375); diverifikasi ke `origin/main` 2026-09-03). Irisan ketiga (Decision 14, karyawan non-aktif) **OPEN**: bip-erp [#1691](https://github.com/bip-itteam-internal/bip-erp/pull/1691), erp-frontend [#1434](https://github.com/bip-itteam-internal/erp-frontend/pull/1434). ✅ **Gerbang data sudah TERJAWAB** dari sheet produksi (§Gerbang Data: Terjawab). ⛔ Tetapi **BELUM deploy dan NOL verifikasi lewat gateway**, jadi impor produksi tetap belum boleh dijalankan.
+- **Status**: ✅ **Accepted dan LIVE DI PRODUKSI** (2026-09-03). Seluruh irisan sudah di `main` **dan** ter-deploy, diverifikasi lewat probe biner di prod berikut kontrol negatifnya. **Sudah dipakai sungguhan**: satu run impor **174 karyawan** periode `2026-07` berstatus `published` — slip pertama yang pernah sampai ke karyawan lewat sistem payroll ini, sesudah bertahun-tahun gaji dibayar lewat spreadsheet.
+  Irisan: bip-erp [#1604](https://github.com/bip-itteam-internal/bip-erp/pull/1604) + [#1611](https://github.com/bip-itteam-internal/bip-erp/pull/1611) + [#1691](https://github.com/bip-itteam-internal/bip-erp/pull/1691) + [#1694](https://github.com/bip-itteam-internal/bip-erp/pull/1694) + [#1695](https://github.com/bip-itteam-internal/bip-erp/pull/1695); erp-frontend [#1371](https://github.com/bip-itteam-internal/erp-frontend/pull/1371) + [#1375](https://github.com/bip-itteam-internal/erp-frontend/pull/1375) + [#1434](https://github.com/bip-itteam-internal/erp-frontend/pull/1434) + [#1436](https://github.com/bip-itteam-internal/erp-frontend/pull/1436) + [#1440](https://github.com/bip-itteam-internal/erp-frontend/pull/1440) + [#1441](https://github.com/bip-itteam-internal/erp-frontend/pull/1441).
+  ⚠️ **Pelajaran proses dari hari itu**: satu merge berstatus MERGED ternyata hanya mengangkut sebagian commit branch-nya, dan yang tertinggal justru perbaikan hasil review — ketahuan karena **isi `origin/main` diperiksa, bukan status PR-nya**. Status MERGED bukan bukti seluruh commit ikut.
 - **Path di repo**: BE `bip-erp/services/payroll` (`impor_run.go`, `impor_run_handlers.go`, `RunTypeImport` di `models_payroll_run.go`, penjaga di `run_handlers.go`); FE `erp-frontend/src/features/hris/payroll` (`lib/impor-payroll-run.ts`, `components/impor-payroll-run-modal.tsx`, `hooks/use-impor-payroll-run.ts`).
 - **Tanggal**: 2026-09-01
 
@@ -105,6 +107,58 @@ masih OPEN**):
     keputusan tentang akses akun yang sudah dinonaktifkan, wilayah
     [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]], dan sengaja tidak diputuskan di
     sini.
+
+15. **Penerbitan run kedua di satu periode DITAHAN, tapi tidak dilarang.** (ditambahkan
+    2026-09-03; bip-erp [#1695](https://github.com/bip-itteam-internal/bip-erp/pull/1695),
+    erp-frontend [#1440](https://github.com/bip-itteam-internal/erp-frontend/pull/1440) +
+    [#1441](https://github.com/bip-itteam-internal/erp-frontend/pull/1441))
+
+    § Consequences di bawah mencatat bahwa satu periode bisa punya run engine DAN run impor
+    sekaligus, lalu menunda dedup karena *"belum ada pemakai kedua yang menentukan aturan 'run
+    mana yang menang'"*. Pemakai kedua itu datang: impor riwayat gaji mundur berbulan-bulan,
+    dan keadaannya sudah berdiri di produksi — run bulanan draft 180 orang berperiode `2026-07`
+    berdampingan dengan run impor 174 orang yang **sudah terbit** di periode yang sama.
+
+    ⛔ **Keputusan ini TIDAK membatalkan penundaan itu, dan bedanya menentukan**: yang ditolak
+    § Consequences adalah **memilih pemenang**, bukan **memberi tahu**. Aturan "run mana yang
+    menang" tetap tidak ditulis di mana pun. Yang ditambahkan cuma jaminan bahwa orang yang
+    menekan Terbitkan **tahu** periode itu sudah punya slip.
+
+    `POST /payroll-runs/:id/publish` membalas **409** menyebut judul run bentroknya, dan
+    meloloskannya bila permintaan menegaskan `confirm_duplicate: true`. Layar menampilkan
+    penolakan itu sebagai dialog konfirmasi, bukan toast merah — itu bukan kegagalan melainkan
+    pertanyaan.
+
+    **Kenapa penjaganya di server, bukan cukup peringatan di layar**: `getMyPayslips` memetakan
+    slip per `run_id`, jadi dua run published benar-benar menghasilkan dua entri di daftar slip
+    karyawan; dan **tidak ada endpoint unpublish**, sehingga kerusakannya permanen dan terlihat
+    orang luar. Peringatan yang hanya hidup di layar bisa dilewati dengan satu panggilan
+    langsung.
+
+    ⚠️ **Hanya di `publish`, tidak di `approve`.** Approve tak menerbitkan apa pun, dan
+    menggerbangnya mengganggu alur sah di mana dua run periode sama hidup sementara sebelum
+    salah satunya dihapus.
+
+    **Konsekuensi yang diterima sadar**: HR tetap bisa menerbitkan dua slip untuk satu bulan bila
+    ia memang bermaksud begitu. Yang hilang cuma kemungkinan melakukannya **tanpa sadar**.
+
+16. **Run ENGINE tetap tak punya jalur hapus, dan ongkosnya sudah terbayar sekali.**
+    (dicatat 2026-09-03)
+
+    Decision 4 membuka penghapusan hanya untuk run impor, dengan alasan yang masih berlaku.
+    Tetapi konsekuensinya nyata dan baru terasa hari ini: membuang dua run bulanan draft yang
+    tak terpakai (180 dan 158 baris) menuntut **tulis langsung ke MongoDB produksi**, melewati
+    gerbang yang kodenya sendiri pasang.
+
+    ⚠️ Yang wajib dibawa bila terulang: **`payroll_run_line` dihapus LEBIH DULU, baru
+    `payroll_run`.** Urutan terbalik meninggalkan ratusan baris slip tanpa induk — tak terlihat
+    di layar mana pun, tak bisa ditemukan lewat aplikasi, permanen. Urutan yang benar menyisakan
+    run kosong yang masih bisa dihapus ulang. Ini urutan yang sama dengan `deleteImportRun`, dan
+    di sanalah alasannya tertulis.
+
+    Belum cukup bukti untuk memutuskan apakah run engine perlu jalur hapus sendiri; sekali
+    kejadian bukan pola. Bila ini terulang, itu sinyal untuk meninjau Decision 4, bukan untuk
+    menormalkan tulis-langsung-ke-DB.
 
 ## Gerbang Data: Terjawab (2026-09-01)
 
