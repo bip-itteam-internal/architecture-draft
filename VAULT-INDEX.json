@@ -5404,7 +5404,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — backend fase 1 **merged** ([#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676)); [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679) yang mengirim `keadaan_efektif` ke JSON **masih OPEN**; layar fase 2 selesai & ber-test di branch `feat/finance-audit-internal-fe` (**belum merge**). **Belum di-deploy dan belum pernah dijalankan lewat gateway.** Lihat \"Belum selesai\" di bawah.",
+      "status_teks": "**Implemented (ada catatan)** — seluruhnya **merged ke `main`** per 2026-09-03: backend fase 1 ([#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676)), `keadaan_efektif` ke JSON ([#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)), layar fase 2 (erp-frontend [#1429](https://github.com/bip-itteam-internal/erp-frontend/pull/1429)). **Belum di-deploy dan belum pernah dijalankan lewat gateway.** Lihat \"Belum selesai\" di bawah.",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
@@ -5422,20 +5422,20 @@
         "Finance - Big Pictures",
         "Finance - Rancangan Finance Service"
       ],
-      "hash": "0239d6800e90fb542ba99a4ab90bf73ba560839167a716eccd0692ae2c2dfe49",
-      "ukuran_kb": 18.9,
-      "ringkasan": "Menjawab: kenapa modul audit internal ditaruh sebagai modul di dalam finance-service alih-alih service tersendiri, kenapa ia jadi konsumen pembaca Accurate yang sudah ada dan bukan klien Accurate keempat, dan kenapa kertas kerja beserta jejak tinjauannya dipegang sendiri alih-alih menumpang form-builder. Juga menjawab kenapa izinnya ber-prefiks `audit` bukan `finance`, kenapa register temuan dipisah dari `quality_capa`, dan kenapa ukuran sampel diperlakukan sebagai master data Direksi yang berlantai dan berjejak. Memuat pula batas cakupan keputusan: berhenti di pembukuan PT, tidak menyimpulkan kecurangan.",
+      "hash": "9fd37e8ed137848f3621f22cb10ff25b7a3e0add16436095fbba7596abd2444f",
+      "ukuran_kb": 19.0,
+      "ringkasan": "Menjawab: kenapa modul audit internal ditaruh di dalam finance-service alih-alih jadi service tersendiri, kenapa ia menumpang pembaca Accurate yang sudah ada dan tidak jadi klien Accurate keempat, dan kenapa kertas kerja beserta jejak tinjauannya dipegang sendiri bukan lewat form-builder. Menjelaskan juga kenapa prefiks izinnya audit dan bukan finance, bagaimana ukuran sampel jadi master data Direksi yang berlantai dan berjejak, serta batas cakupan yang sengaja tidak dijanjikan (tidak menyimpulkan kecurangan, tidak mencakup pembukuan 40 CV). Berguna saat menimbang penempatan modul baru, gerbang RBAC per prefiks, atau saat mempertanyakan kelayakan pakai-ulang form-builder untuk alur berhari-hari.",
       "kata_kunci": [
-        "ADR 0073",
         "audit internal",
         "internal audit",
+        "ADR 0073",
         "finance-service",
-        "Accurate",
         "kertas kerja",
         "working paper",
+        "Accurate",
+        "RBAC audit",
         "form-builder",
-        "register temuan",
-        "RBAC izin audit"
+        "register temuan"
       ]
     },
     {
@@ -5483,7 +5483,7 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — backend fase 1 **merged** (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676)); layar fase 2 selesai & ber-test di branch `feat/finance-audit-internal-fe` (**belum merge**). ⛔ **[#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679) masih OPEN**, dan layar bergantung padanya — lihat Urutan Deploy. **Belum di-deploy, belum pernah dijalankan lewat gateway**",
+      "status_teks": "**Implemented (ada catatan)** — seluruhnya **merged ke `main`**: backend fase 1 (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676)), `keadaan_efektif` ke JSON ([#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)), dan layar fase 2 (erp-frontend [#1429](https://github.com/bip-itteam-internal/erp-frontend/pull/1429), 2026-09-03). ⛔ **Belum di-deploy dan belum pernah dijalankan lewat gateway** — `finance-service` tak ada di `docker-compose.dev.yml`, jadi layar ini belum pernah memuat satu baris data pun",
       "publik": true,
       "tautan": [
         "Microservices - Procurement Service",
@@ -5502,9 +5502,9 @@
         "Finance - Dashboard per Posisi (FAT)",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "e75bd53f67d1bc611fa937913454ae94b0cb372df2791cf1b566302fae85e72f",
-      "ukuran_kb": 19.6,
-      "ringkasan": "Menjawab: apa saja 36 uji audit bulanan atas pembukuan PT, bagaimana ketiga kelompoknya dibedakan menurut asal sisi pembanding, uji mana yang sudah punya penjalan otomatis, dan kenapa tiga belas uji neraca-versus-laporan-pendukung sengaja dikeluarkan. Juga menjawab uji mana yang menuntut sampel acak versus terarah dan kenapa keduanya menjawab pertanyaan berbeda, bagaimana alur bulanan H+1 sampai H+8 berjalan, serta bagaimana tiga layar `/audit`, `/audit/temuan`, dan `/audit/setelan` dipetakan ke tiga izin tulis yang berbeda. Menyebut pula yang tidak dicakup: pembukuan 40 CV, kesimpulan kecurangan, dan prosedur yang menuntut kehadiran fisik.",
+      "hash": "12f741dac92f1b3d39acc72dbac53646292af6ac356a41c61fcb332135f663b0",
+      "ukuran_kb": 19.8,
+      "ringkasan": "Menjawab: apa saja 36 pengujian audit bulanan atas pembukuan PT, bagaimana ketiganya dikelompokkan menurut asal sisi pembanding (data luar perusahaan, dokumen internal non-Accurate, atau aturan), dan kenapa 13 uji neraca versus laporan pendukung sengaja dikeluarkan. Menjelaskan alur bulanan H+1 sampai H+8, aturan sampling (lima uji wajib acak, lima wajib terarah, cash opname butuh waktu yang acak), semantik kolom dan keadaan baris, serta pemetaan aksi layar ke tiga izin tulis yang berbeda. Dipakai saat merancang atau membaca layar /audit, /audit/temuan, dan /audit/setelan, atau saat menanyakan apa yang tidak dicakup modul ini.",
       "kata_kunci": [
         "audit internal",
         "internal audit",
@@ -11241,27 +11241,27 @@
       "area": "Workspace",
       "jenis": "workspace",
       "status_emoji": null,
-      "status_teks": "Fase 1 backend MERGED** (bip-erp #1676). ⛔ **#1679 masih OPEN** — ia yang mengirim `keadaan_efektif` ke JSON, dan tanpanya seluruh kolom keadaan di layar berbunyi \"tak terbaca\". **Fase 2 layar SELESAI dan ter-push**, branch `feat/finance-audit-internal-fe` (2 commit). Belum di-deploy, belum pernah dijalankan lewat gateway, dan paket izinnya belum dipasang ke satu akun pun.",
+      "status_teks": "SELURUH KODE MERGED per 2026-09-03** — bip-erp #1676 + #1679, erp-frontend #1429. ⛔ **Belum di-deploy dan nol verifikasi lewat gateway**: `docker-compose.dev.yml` tak punya blok service `finance-service`, jadi layar ini belum pernah memuat satu baris data pun. Paket `Audit: *` juga belum dipasang ke akun mana pun.",
       "publik": false,
       "tautan": [
         "ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri",
         "Finance - Audit Internal",
         "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate"
       ],
-      "hash": "1681a5be81593594f2ec739ba93c151128c62483ad0e10c7f703bf5c661a459f",
+      "hash": "fdc701b7d44b50d120110eead6e1f812ad6740cd11cf5b388f2537f406ec4c54",
       "ukuran_kb": 7.6,
-      "ringkasan": "Menjawab: apa saja butir kerja modul Audit Internal per fase — gerbang kelayakan berupa probe jejak audit dan matriks hak akses Accurate (fase 0), katalog izin serta registry 36 uji di backend (fase 1), utang hasil review berupa endpoint `/internal/audit/pemasok` dan `/internal/audit/karyawan` plus kontrak `SetelanSampel.Akun` (fase 1b), layar dan gerbang izinnya (fase 2), sampai langkah verifikasi lewat gateway (fase 3). Juga menjawab apa yang sengaja tidak masuk daftar kerja: pembukuan 40 CV, rekonsiliasi rekening koran, transaksi antar-entitas, dan penilaian kewajaran otomatis.",
+      "ringkasan": "Papan kerja modul audit internal yang menjawab: pekerjaan apa saja yang tercatat per fase, mana yang masih tersandera, dan apa yang harus dibuktikan sebelum modul dianggap bisa dipakai. Memuat tiga probe kelayakan ke Accurate yang dijalankan manusia (jejak audit, matriks hak akses, rekening penerima Bayar Uang), utang hasil review berupa endpoint /internal/audit/pemasok dan /internal/audit/karyawan plus perbaikan kontrak SetelanSampel.Akun, dan daftar verifikasi seperti blok finance-service di docker-compose.dev.yml, satu perjalanan utuh sebagai orang, kontrol negatif per uji, dan urutan deploy integration sebelum finance. Menyebut juga cakupan yang sengaja tidak masuk daftar (pembukuan 40 CV, rekonsiliasi rekening koran, transaksi antar-entitas, penilaian kewajaran otomatis).",
       "kata_kunci": [
-        "ANALISA",
         "audit internal",
+        "internal audit",
+        "ANALISA",
         "papan kerja",
-        "daftar task",
-        "fase implementasi",
-        "endpoint internal",
-        "paket izin",
+        "task board",
+        "finance-service",
         "docker-compose",
         "verifikasi gateway",
-        "sampling"
+        "sampling",
+        "izin audit"
       ]
     },
     {

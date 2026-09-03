@@ -3,7 +3,7 @@
 Papan kerja untuk [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]]. Dok domainnya [[Finance - Audit Internal]].
 
 Disusun 2026-09-02, diperbarui hari yang sama setelah fase 1 selesai.
-**Status: Fase 1 backend MERGED** (bip-erp #1676). ⛔ **#1679 masih OPEN** — ia yang mengirim `keadaan_efektif` ke JSON, dan tanpanya seluruh kolom keadaan di layar berbunyi "tak terbaca". **Fase 2 layar SELESAI dan ter-push**, branch `feat/finance-audit-internal-fe` (2 commit). Belum di-deploy, belum pernah dijalankan lewat gateway, dan paket izinnya belum dipasang ke satu akun pun.
+**Status: SELURUH KODE MERGED per 2026-09-03** — bip-erp #1676 + #1679, erp-frontend #1429. ⛔ **Belum di-deploy dan nol verifikasi lewat gateway**: `docker-compose.dev.yml` tak punya blok service `finance-service`, jadi layar ini belum pernah memuat satu baris data pun. Paket `Audit: *` juga belum dipasang ke akun mana pun.
 
 ---
 
@@ -48,7 +48,7 @@ Ketiganya membaca produksi dan **dijalankan manusia, bukan agent**. Hasilnya men
 
 ---
 
-## Fase 2 — Layar (SELESAI, belum merge)
+## Fase 2 — Layar (SELESAI, merged erp-frontend #1429)
 
 - [x] **Halaman kertas kerja bulanan** (`/audit`). Struktur tabel HRIS. Urutan menaikkan kelompok 1, bukan yang paling merah; baris `menunggu_data` dan `belum_diimplementasi` tidak disembunyikan, dikunci test.
   Pemilih periode ditaruh di slot `actions`, bukan filter laci: `FilterTable` hanya mengenal `select` dan `date`, sedangkan periode berbentuk `YYYY-MM`.
