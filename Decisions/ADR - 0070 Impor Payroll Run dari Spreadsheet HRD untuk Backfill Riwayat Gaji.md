@@ -11,7 +11,7 @@
 
 *Payroll sudah live sejak Fase 1-5 tetapi **belum pernah dipakai menggaji seorang pun** (dua `payroll_run` di produksi, keduanya `draft`, nol slip terbit). Sementara itu HRD sudah membayar gaji berbulan-bulan lewat spreadsheet. ADR ini memutuskan riwayat itu dimasukkan ke sistem sebagai **jenis run ketiga** yang angkanya DISALIN, bukan dihitung, supaya karyawan punya slip yang bisa dibuka tanpa menunggu mesin penggajian dipercaya.*
 
-- **Status**: **Accepted** (2026-09-01). Irisan pertama **MERGED** (bip-erp [#1604](https://github.com/bip-itteam-internal/bip-erp/pull/1604), erp-frontend [#1371](https://github.com/bip-itteam-internal/erp-frontend/pull/1371)); lanjutannya **OPEN** (bip-erp [#1611](https://github.com/bip-itteam-internal/bip-erp/pull/1611), erp-frontend [#1375](https://github.com/bip-itteam-internal/erp-frontend/pull/1375)). ✅ **Gerbang data sudah TERJAWAB** dari sheet produksi (§Gerbang Data: Terjawab). ⛔ Tetapi **BELUM deploy dan NOL verifikasi lewat gateway**, jadi impor produksi tetap belum boleh dijalankan.
+- **Status**: **Accepted** (2026-09-01). Irisan pertama dan kedua **MERGED dan sudah ada di `main` kedua repo** (bip-erp [#1604](https://github.com/bip-itteam-internal/bip-erp/pull/1604) + [#1611](https://github.com/bip-itteam-internal/bip-erp/pull/1611), erp-frontend [#1371](https://github.com/bip-itteam-internal/erp-frontend/pull/1371) + [#1375](https://github.com/bip-itteam-internal/erp-frontend/pull/1375); diverifikasi ke `origin/main` 2026-09-03). Irisan ketiga (Decision 14, karyawan non-aktif) **OPEN**: bip-erp [#1691](https://github.com/bip-itteam-internal/bip-erp/pull/1691), erp-frontend [#1434](https://github.com/bip-itteam-internal/erp-frontend/pull/1434). ✅ **Gerbang data sudah TERJAWAB** dari sheet produksi (§Gerbang Data: Terjawab). ⛔ Tetapi **BELUM deploy dan NOL verifikasi lewat gateway**, jadi impor produksi tetap belum boleh dijalankan.
 - **Path di repo**: BE `bip-erp/services/payroll` (`impor_run.go`, `impor_run_handlers.go`, `RunTypeImport` di `models_payroll_run.go`, penjaga di `run_handlers.go`); FE `erp-frontend/src/features/hris/payroll` (`lib/impor-payroll-run.ts`, `components/impor-payroll-run-modal.tsx`, `hooks/use-impor-payroll-run.ts`).
 - **Tanggal**: 2026-09-01
 
@@ -60,6 +60,51 @@ Ditambahkan 2026-09-01 setelah sheet produksi diterima (bip-erp [#1611](https://
     Dua hal sengaja **tidak** dilumatkan saat mencocokkan nama: **bentuk badan hukum** (`CV Sinar` dan `PT Sinar` dua entitas dengan NPWP berbeda) dan **nama kembar di master** (iterasi map Go tak berurutan, jadi "ambil yang pertama" memilih entitas berbeda tiap proses restart; kembar ditolak sebagai ambigu).
 
 13. **Komponen NON-AKTIF ditawarkan di layar impor, dan hanya di sana.** Server sudah menerimanya sejak awal, tetapi layar impor menyaringnya sehingga kelonggaran itu tak bisa dijangkau siapa pun — padahal backfill slip lama justru sering menyebut nama yang sudah dipensiunkan (`BPJS Ketenagakerjaan` gabungan dipensiunkan sejak dipecah per program, tapi slip Januari memang memakainya). Kini ditawarkan, ditaruh di belakang dan berlabel `(non-aktif)`: yang menahan orang adalah **labelnya**, bukan ketiadaannya.
+
+Ditambahkan 2026-09-03 (bip-erp [#1691](https://github.com/bip-itteam-internal/bip-erp/pull/1691),
+erp-frontend [#1434](https://github.com/bip-itteam-internal/erp-frontend/pull/1434); **keduanya
+masih OPEN**):
+
+14. **Karyawan NON-AKTIF ikut dimuat di layar impor, dan hanya di sana.**
+
+    Decision 13 diterapkan ke sumbu **kedua**, dan bentuk masalahnya persis sama: server
+    penerima impor **tidak pernah** menyaring `is_active` — `fetchEmployeeIdentities` membaca
+    `/internal/export/all` yang tak punya saringan itu — sementara layar membandingkan ke
+    `/list?type=employee` yang menyaringnya. Karyawan yang sudah resign karena itu ditolak
+    dengan **"Employee ID tidak dikenal"**, kalimat yang menunjuk ke ID sehingga yang
+    diperiksa orang adalah spreadsheet-nya, dan spreadsheet-nya benar. Ditemukan saat impor
+    produksi menolak 4 dari 174 baris.
+
+    Backfill riwayat gaji adalah fitur yang **dijamin** memuat orang seperti itu: semakin lama
+    periode yang dimasukkan, semakin banyak yang sudah keluar. Sejalan dengan Decision 8 yang
+    sudah memutuskan karyawan tanpa `employee_salary` tetap diimpor.
+
+    Penyelesaiannya mengikuti Decision 13: bendera **opt-in** `include_inactive=true` di
+    `/list?type=employee`, dipakai satu layar, dan barisnya **ditandai** bukan disembunyikan.
+    Yang menahan orang tetap labelnya. Rincian benderanya: [[API - Employee Service]].
+
+    ⛔ **Gerbangnya DUA SUMBU**: `RequireHRISStaffCheck` **atau** izin `payroll.work`. Bukan
+    kelonggaran melainkan koreksi — layar pemakainya dijangkau lewat izin, bukan lewat
+    `system_roles`, dan akun ber-permission-set bisa memegang paket payroll tanpa peran `hris`
+    sama sekali. Satu sumbu saja membuat orang itu dibalas 403 lalu melihat daftar kosong,
+    sehingga **seluruh** barisnya ditolak: lebih buruk daripada bug yang sedang diperbaiki.
+    Karena kegagalan itu tetap mungkin lewat sebab lain, layar impor kini **berbunyi eksplisit
+    bila daftar karyawannya gagal dimuat** alih-alih membiarkan barisnya bicara sendiri.
+
+    ⚠️ **Dua batas yang diterima sadar.** Pertama, bendera ini tak menyentuh `$unwind`, jadi
+    karyawan yang tak punya dokumen `system_authentication` sama sekali tetap terbuang dengan
+    gejala yang identik; apakah kelas itu berpenghuni **belum diukur di produksi**, dan
+    melonggarkannya lebih dulu berarti menambah kelas baris yang belum pernah diuji demi orang
+    yang belum terbukti ada. Kedua, bendera ini tak berlaku untuk akun pihak luar
+    (`barisAkunLuar` menyaring `is_active` sendiri dan barisnya tak membawa field itu),
+    sehingga kedua bendera yang menyala bersamaan menghasilkan daftar yang aturannya tidak
+    seragam.
+
+    **Konsekuensi yang perlu disadari**: slip bisa terbit untuk orang yang akunnya sudah mati,
+    dan ia **tidak bisa membukanya sendiri** lewat MyBharata. Menyelesaikannya menuntut
+    keputusan tentang akses akun yang sudah dinonaktifkan, wilayah
+    [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]], dan sengaja tidak diputuskan di
+    sini.
 
 ## Gerbang Data: Terjawab (2026-09-01)
 
