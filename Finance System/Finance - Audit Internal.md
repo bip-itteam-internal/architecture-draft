@@ -4,7 +4,7 @@
 
 *Pengujian bulanan atas pembukuan PT Bharata Internasional Pharmaceutical, dijalankan sebagai modul di dalam finance-service yang menarik kedua sisi pembanding lewat pembaca yang sudah ada lalu menyajikan selisihnya sebagai kertas kerja. Sistem membandingkan; auditor menilai, menelusuri, dan menandatangani. Sumbernya BUKAN selalu Accurate — dari 36 pengujian, sisi bersumber Accurate justru minoritas.*
 
-- **Status**: ⚠️ **Implemented (ada catatan)** — backend fase 1 **merged** (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676) + [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)); layar fase 2 selesai & ber-test di branch `feat/finance-audit-internal-fe` (**belum merge**); **belum di-deploy, belum pernah dijalankan lewat gateway**
+- **Status**: ⚠️ **Implemented (ada catatan)** — backend fase 1 **merged** (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676)); layar fase 2 selesai & ber-test di branch `feat/finance-audit-internal-fe` (**belum merge**). ⛔ **[#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679) masih OPEN**, dan layar bergantung padanya — lihat Urutan Deploy. **Belum di-deploy, belum pernah dijalankan lewat gateway**
 - **Implementasi**: [[Microservices - Procurement Service]] dan [[Microservices - Integration Service]] sebagai sumber; modulnya sendiri di `bip-erp/services/finance/audit_*.go`; layarnya di `erp-frontend/src/app/(main)/audit/*` + `src/features/audit/*`
 - **Keputusan**: [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]]
 
@@ -114,8 +114,13 @@ Layar membaca `keadaan_efektif` dari respons dan **tidak** menghitung ulang urut
 
 ⛔ **Baris `menunggu_data` dan `belum_diimplementasi` tidak disembunyikan, dan tidak boleh disembunyikan sebagai perilaku bawaan.** Tiga puluh dari 36 uji berkeadaan belum berimplementasi; daftar yang "dibersihkan" menyisakan segelintir baris hijau dan memberi kesan pemeriksaan jauh lebih lengkap daripada kenyataannya. Urutannya menaikkan **kelompok 1**, bukan yang paling merah: uji berpembanding dari luar perusahaan paling sulit dikalahkan, jadi keadaan pengerjaannya yang paling perlu terlihat lebih dulu.
 
-## Persona / Pengguna
-| Persona | Peran & Divisi | Akses / RBAC | Device |
+### Urutan deploy: #1679 lebih dulu, dan ini bukan formalitas
+
+⛔ **Layar membaca `keadaan_efektif` dari respons; `origin/main` belum mengirimnya.** Yang ada di sana baru METODE Go `KeadaanEfektif()`, dipakai internal untuk jejak — field JSON-nya menyusul lewat [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679), yang per 2026-09-03 masih OPEN. Bila FE naik lebih dulu, **seluruh** kolom keadaan berbunyi "tak terbaca" — bukan sebagian, dan bukan salah tebak.
+
+Itu perilaku yang dirancang: layar sengaja menolak menebak dari `hasil.keadaan`, sebab tebakan yang benar 90% waktu adalah tebakan yang salahnya tak pernah ketahuan. Tetapi ia hanya berguna sebagai **penanda sementara**, bukan sebagai keadaan tetap. Urutannya: #1679 merge dan naik → baru FE.
+
+## Persona / Pengguna| Persona | Peran & Divisi | Akses / RBAC | Device |
 |---|---|---|---|
 | Auditor internal | Posisinya **belum ada**; direncanakan | `audit_auditor` (view, tinjau, terbitkan) | Web ERP |
 | Reviewer silang | Staf dari divisi di luar yang diaudit | `audit_auditor` | Web ERP |

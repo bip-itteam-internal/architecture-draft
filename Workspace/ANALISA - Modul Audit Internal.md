@@ -3,7 +3,7 @@
 Papan kerja untuk [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]]. Dok domainnya [[Finance - Audit Internal]].
 
 Disusun 2026-09-02, diperbarui hari yang sama setelah fase 1 selesai.
-**Status: Fase 1 backend MERGED** (bip-erp #1676 + #1679). **Fase 2 layar SELESAI dan ter-push**, branch `feat/finance-audit-internal-fe` (2 commit). Belum di-deploy, belum pernah dijalankan lewat gateway, dan paket izinnya belum dipasang ke satu akun pun.
+**Status: Fase 1 backend MERGED** (bip-erp #1676). ⛔ **#1679 masih OPEN** — ia yang mengirim `keadaan_efektif` ke JSON, dan tanpanya seluruh kolom keadaan di layar berbunyi "tak terbaca". **Fase 2 layar SELESAI dan ter-push**, branch `feat/finance-audit-internal-fe` (2 commit). Belum di-deploy, belum pernah dijalankan lewat gateway, dan paket izinnya belum dipasang ke satu akun pun.
 
 ---
 
