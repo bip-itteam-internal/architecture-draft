@@ -35,9 +35,9 @@ Diverifikasi ke `services/file/main.go` 2026-09-03.
 | `notification/` | `MINIO_NOTIFICATION_KEY` | ✅ | notification-service |
 | `form/` | `MINIO_FORM_KEY` | ✅ `MINIO_FORM_READ_KEY` | [[Microservices - Form Builder Service]] |
 | `kas-kecil/` | `MINIO_PROCUREMENT_KEY` | ❌ | procurement-service |
-| `pengajuan-barang/` | `MINIO_PENGAJUAN_KEY` | ❌ | procurement-service |
-| `pembayaran/` | `MINIO_PEMBAYARAN_KEY` | ❌ | bukti transfer AP |
-| `pajak/` | `MINIO_PAJAK_KEY` | ❌ | arsip pajak finance-service |
+| `pengajuan-barang/` | `MINIO_PENGAJUAN_KEY` | ❌ | procurement-service. ⚠️ Env-nya kosong sampai 2026-09-04 |
+| `pembayaran/` | `MINIO_PEMBAYARAN_KEY` | ❌ | bukti transfer AP. ⚠️ Env-nya kosong sampai 2026-09-04 |
+| `pajak/` | `MINIO_PAJAK_KEY` | ❌ | arsip pajak finance-service. ⚠️ Env-nya KOSONG di prod dan dev sampai 2026-09-04 — fiturnya live tapi tak pernah bisa mengunggah |
 | `audit/` | `MINIO_AUDIT_KEY` | ❌ **disengaja** | [[Finance - Audit Internal]], bukti sisi lawan |
 
 ⛔ **Prefix `audit/` sengaja TIDAK punya kunci baca**, dan itu keputusan keamanan, bukan kelalaian. Kunci baca hari ini sampai ke **browser**: erp-frontend membacanya dari `NEXT_PUBLIC_MINIO_*_READ_KEY` (`src/hooks/use-document.ts`), yang ditanam ke bundel klien saat build. Satu kunci baca memberi akses ke **seluruh prefix**, jadi kunci baca `audit/` berarti tiap rekening koran terbaca siapa pun yang punya bundelnya — bertentangan dengan inti [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]. Dikunci test `TestPrefixAuditTakPunyaKunciBaca`. Lihat [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]].
@@ -71,6 +71,8 @@ Alasannya tertulis di `kpi_evidence.go`: *"Sengaja proxy, bukan menerbitkan pres
 1. Satu env yang belum diisi **mematikan seluruh file-service** — foto karyawan, bukti presensi, lampiran tiket, semuanya — padahal yang belum siap cuma satu modul. Kelas kegagalan yang sama sudah dua kali menggigit lewat `ValidateInternalURL`.
 2. Menambah prefix baru jadi **ranjau deploy**: entri baru wajib sudah ada di `.env` tiap lingkungan sebelum service di-rebuild.
 
+⚠️ **Yang hilang cuma akibat MEMATIKANNYA, bukan ranjaunya.** Env yang lupa diisi tetap membuat modulnya mati — bedanya kini senyap alih-alih meledak, dan senyap ternyata bisa bertahan berbulan-bulan. Lihat bagian di bawah.
+
 Perubahan itu sekaligus menutup lubang yang tak kentara: env kosong dulu memasukkan kunci `""` ke peta, sehingga permintaan **tanpa** `?key=` cocok dengan prefix itu dan mendapat akses. Panic membuatnya tak terjangkau — tapi hanya selama panic-nya masih ada.
 
 ⛔ **Kunci yang BERTABRAKAN juga tidak lagi memanic.** Dua modul memakai nilai kunci yang sama memang kesalahan konfigurasi serius — keduanya bisa saling membaca dan menimpa berkas — tetapi obatnya bukan panic. Peta dirakit saat inisialisasi variabel paket, jadi panic terjadi **sebelum `main()`**: tak satu pun baris log menjelaskan sebabnya, dan yang terlihat cuma container restart-loop.
@@ -78,6 +80,36 @@ Perubahan itu sekaligus menutup lubang yang tak kentara: env kosong dulu memasuk
 Yang berlaku sekarang (`main.go:162-174`): **kedua prefix yang bertabrakan dibuang**, dicatat keras di log, dan prefix lain tetap hidup. Keduanya dibuang, bukan salah satu dipilih — memilih berarti menebak, dan tebakan yang salah memberi satu modul akses **tulis** ke ruang modul lain. Dikunci `TestKunciBertabrakanTidakMematikanPrefixLain` dan `TestKunciBentrokTigaEntriTetapDitolak` (urutan iterasi map Go acak, jadi tabrakan harus ditolak apa pun urutannya).
 
 ⚠️ **Konsekuensi operasional**: nilai tiap kunci di `.env` wajib **berbeda satu sama lain**. Menyalin nilai `MINIO_PAJAK_KEY` ke `MINIO_AUDIT_KEY` tidak membuat keduanya jalan — ia mematikan **keduanya**.
+
+### ⛔ Menambah prefix di kode TIDAK cukup — dan lupanya senyap bertahun-tahun
+
+Ini kelas kegagalan paling mahal di service ini, dan ia sudah terjadi **tiga kali tanpa seorang pun melaporkannya.**
+
+Mendaftarkan prefix di `writeAccessEnv` hanya membuat service ini **tahu** nama env-nya. Nilainya tetap harus diisi di `.env` **tiap lingkungan**, dan tak ada apa pun yang mengingatkan kalau lupa: `bangunAccessMap` melewati env kosong dengan tenang, service tetap sehat, dan modul yang bersangkutan membalas `invalid access key` — galat yang **tidak menyebut prefix maupun nama env**. Dari sisi pemakai fiturnya sekadar "kadang error".
+
+**Diukur di prod 2026-09-04**, saat `MINIO_AUDIT_KEY` hendak dipasang:
+
+| Prefix | Modul | Keadaan yang ditemukan |
+|---|---|---|
+| `pajak/` | arsip pajak (finance-service) | ⛔ **live, tapi tak pernah bisa mengunggah satu berkas pun** |
+| `pengajuan-barang/` | lampiran pengajuan (procurement) | ⛔ mati sejak dibuat |
+| `pembayaran/` | bukti transfer AP | ⛔ mati sejak dibuat |
+
+Ketiganya juga kosong di **dev**. Prefix aktif di prod hari itu bergerak **6 → 7 → 8 → 10** begitu keempat env diisi.
+
+Yang paling mahal `pembayaran/`: ia diberi prefix sendiri justru dengan alasan *"bukti pembayaran wajib tetap terbaca saat audit bertahun-tahun kemudian"* — dan selama ini tak pernah bisa **ditulis** sama sekali.
+
+⚠️ **Yang membongkarnya bukan laporan siapa pun**, melainkan baris log boot yang menyebut tiap env kosong satu per satu. Baris itu ada karena `bangunAccessMap` sengaja dibuat **mencatat, bukan panic** — keputusan yang diambil demi alasan lain, dan ternyata satu-satunya yang membuat kelas ini bisa dilihat.
+
+⛔ **Jebakan verifikasi yang menyertainya**: `docker compose up -d --force-recreate` **tidak cukup** bila binernya lebih tua daripada PR yang menambah prefixnya. Dan gagalnya menyesatkan — log **tidak** akan menampilkan `<ENV> belum diisi`, bukan karena kuncinya terbaca melainkan karena nama env itu tak ada di peta biner lama. **Ketiadaan peringatan bukan bukti keberhasilan.** Yang membuktikan adalah **hitungan prefix yang naik**, plus `strings <biner> | grep -c <NAMA_ENV>` dengan kontrol positif. Terjadi 2026-09-04: kedua image prod ternyata dibangun sebelum PR-nya merged, dan `up -d --build` yang dibutuhkan, bukan `--force-recreate`.
+
+**Daftar periksa tiap menambah prefix:**
+
+1. Entri di `writeAccessEnv` (`services/file/main.go`)
+2. Baris di `.env.example` — ⚠️ `.gitignore` bawaan Next/Node kerap memakai pola `.env*` yang ikut menelan berkas contohnya
+3. Nilai di `.env` **dev** dan **prod**, `openssl rand -hex 24`, dan **berbeda dari seluruh kunci lain** — kembar membuang **kedua** entri
+4. `up -d --build` bila binernya belum memuat prefix itu; `--force-recreate` hanya bila sudah
+5. Buktikan lewat **hitungan prefix di log boot**, bukan lewat ketiadaan peringatan
 
 ### Penjaga irisan prefix
 

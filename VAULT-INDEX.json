@@ -2157,9 +2157,9 @@
         "Microservices - Notification Service",
         "APP - MyBharata"
       ],
-      "hash": "397722a5c653623b499aacc843b4c4fd265907984cbd4606d9247f6c8f10d758",
-      "ukuran_kb": 8.8,
-      "ringkasan": "Menjawab: bagaimana berkas disimpan dan diberi izin di ERP, prefix apa saja yang terdaftar dan mana yang punya kunci baca, serta kenapa berkas berizin dibaca lewat proxy sisi server alih-alih presigned URL. Menjelaskan perakitan peta access key yang melewati env kosong dan membuang kedua entri saat kunci bertabrakan, beserta alasan keduanya bukan panic. Memuat tiga jebakan integrasi yang berulang: nama parameter /preview, header upstream yang dibuang, dan nama berkas pengguna di Content-Disposition.",
+      "hash": "4aeebaf057ebbb23a9e0d7e14423cbfae4d198dd7cc30d1ab9950f85932dd46e",
+      "ukuran_kb": 12.0,
+      "ringkasan": "Menjawab: bagaimana berkas disimpan dan diberi izin di ERP, sepuluh prefix apa saja yang terdaftar dan mana yang punya kunci baca, serta kenapa berkas berizin dibaca lewat proxy sisi server alih-alih presigned URL. Menjelaskan perakitan peta access key yang melewati env kosong dan membuang kedua entri saat kunci bertabrakan, beserta alasan keduanya bukan panic. Memuat pula kelas kegagalan yang sudah tiga kali terjadi tanpa dilaporkan siapa pun: prefix yang terdaftar di kode tetapi env-nya lupa diisi, sehingga modulnya mati senyap berbulan-bulan, lengkap dengan daftar periksa dan cara membuktikannya dari hitungan prefix di log boot.",
       "kata_kunci": [
         "file-service",
         "MinIO",
@@ -2168,9 +2168,9 @@
         "upload",
         "preview",
         "proxy",
-        "presigned URL",
-        "bucket",
-        "lampiran"
+        "env kosong",
+        "invalid access key",
+        "deploy"
       ]
     },
     {
