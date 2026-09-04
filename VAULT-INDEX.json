@@ -5864,20 +5864,20 @@
         "Finance - Bridging App",
         "HRIS - Compensation & Benefits"
       ],
-      "hash": "597e5cdf93b82694c3c868f7df96885e09205b7e732ffbc538db2ee5081d342e",
-      "ukuran_kb": 26.3,
-      "ringkasan": "Menjawab: apa aturan bisnis insentif Adv/SPV marketing menurut SK 010 dan 011/2026 (rumus profit, tabel tarif, gerbang retur 7%, target hanya di Supervisor, dasar uang cair, order hangus setelah tanggal 25 bulan berikutnya) dan bagaimana bunyi skema KPI-multiplier lama per jabatan (SPV, ADV, ICC, Host Live, Affiliator, CS, CRM) yang sudah dicabut. Juga menjawab siapa yang boleh melihat tiap layar insentif (menu terbatas, paket Menu: Insentif Profit), cara membaca dashboard (periode belum final, toko nol order, cache), dan apa yang masih menahan pemakaian.",
+      "hash": "df51222013d8319eb801fbf80adc295b656ff262850537ab67ecd35700c5340f",
+      "ukuran_kb": 28.7,
+      "ringkasan": "Menjawab: bagaimana insentif marketing dihitung di bawah skema profit-based SK 010 & 011/2026 (Profit = Uang Cair dikurangi HPP, Beban Iklan, dan Biaya Operasional), berapa tarif di tiap tingkat pencapaian target, siapa yang mengetik target dan bagaimana ia dibagi turun dari Supervisor ke Leader dan ICC, serta syarat yang menggugurkan seperti gerbang retur 7% dan cutoff pencairan tanggal 25 bulan berikutnya. Juga menjawab: siapa yang boleh membuka Dashboard Insentif, Master Data, Insentif Saya, dan rincian beban karyawan; kenapa angka dashboard bisa berbeda dari ICC Management, dari bulan yang diharapkan, atau dari pembukuan Accurate; dan apa arti penanda periode Belum final vs Final. Memuat pula riwayat skema KPI-multiplier per jabatan lama (SPV Marketing, ADV/Leader ICC, ADV Meta & Marketplace, ICC, Host Live, Affiliator, CS, CRM) yang sudah dicabut dan tidak boleh dipakai sebagai acuan perhitungan.",
       "kata_kunci": [
         "insentif",
         "incentive",
-        "SK 010 011",
         "profit-based",
-        "tarif",
-        "gerbang retur",
-        "SPV marketing ADV ICC",
-        "hak akses insentif",
-        "periode hangus cutoff 25",
-        "uang cair net settlement"
+        "SK 010",
+        "uang cair",
+        "net settlement",
+        "target profit",
+        "gerbang retur 7%",
+        "biaya operasional",
+        "ICC"
       ]
     },
     {
@@ -10435,20 +10435,20 @@
         "Microservices - Marketing Analytics Service",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing"
       ],
-      "hash": "64aa5406570facc203c22374dffc1823cc474035784ad17b8fffa38ff8f3148e",
-      "ukuran_kb": 12.7,
-      "ringkasan": "Menjawab: posisi apa saja di divisi brand Beauty Hacks dan Kyura, metrik dan bobot KPI tiap posisi, serta posisi mana yang datanya sudah cukup untuk dibuatkan dashboard sekarang (ICC, Leader, Marketplace Advertiser, Affiliate, Host Live, Customer Support, Supervisor) dan mana yang tidak direkomendasikan. Menjelaskan sumber data marketing yang tersedia (GMV MAX, affiliate orders, video performance, review marketplace), bagaimana atribusi video ICC sebenarnya bekerja lewat creator_username dan bukan icc_account_mappings, serta peringatan bahwa ROAS per-video tidak dapat diandalkan dan tanggal order afiliasi wajib memakai place_order_date. Berguna untuk memutuskan apa yang perlu dibangun versus apa yang sudah dilayani modul insentif dan Marketing Analytics.",
+      "hash": "896f394e2d5a244c056f63f83d6227f4cbe223c7a489f4dfa976e5b9c56ca089",
+      "ukuran_kb": 13.0,
+      "ringkasan": "Menjawab: metrik, bobot, dan target KPI apa yang dipakai tiap posisi di dua divisi brand Beauty Hacks dan Kyura (ICC, Leader, Marketplace Advertiser, Affiliate, Host Live, Customer Support, Supervisor, Meta Advertiser, Buzzer, Video Editor), posisi mana yang datanya sudah cukup untuk dibuatkan dashboard sekarang, dan visual apa yang disarankan untuk masing-masing. Juga menjawab: dari koleksi mana angka tiap metrik diambil (tt_shop_video_performances, affiliate_orders, mart_profit_attribution, marketplace_reviews, dst), bagaimana atribusi metrik per video ICC sebenarnya bekerja (lewat creator_username, bukan icc_account_mappings), kenapa ROAS per video tidak boleh dipakai sebagai angka penilaian, dan kenapa tanggal order afiliasi wajib memakai place_order_date. Memuat pula keputusan yang masih menggantung di pemilik KPI (definisi affiliator baru bergabung) serta metrik yang salah dipetakan dan harus dibetulkan sebelum kartunya dirancang.",
       "kata_kunci": [
+        "dashboard per posisi",
         "Beauty Hacks",
         "Kyura",
-        "dashboard per posisi",
         "ICC",
-        "internal content creator",
+        "creator_username",
+        "icc_account_mappings",
+        "ROAS per video",
         "affiliate",
         "host live",
-        "marketplace advertiser",
-        "ROAS",
-        "marketing analytics"
+        "KPI marketing"
       ]
     },
     {

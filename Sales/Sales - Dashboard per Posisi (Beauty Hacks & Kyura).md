@@ -37,7 +37,11 @@ Layarnya pun sudah ada, 16 halaman Marketing Analytics lengkap dengan saringan, 
 
 ⛔ **Peringatan yang wajib dibaca sebelum merancang layar apa pun di atasnya**, tertulis di komentar entity-nya: **ROAS per-video TIDAK DAPAT DIANDALKAN**, karena alokasi biayanya bocor ke bucket campaign `-1`. Itu keputusan produk yang diterima sadar, bukan cacat yang belum ketahuan. Menggambar ROAS per video sebagai angka penilaian akan memberi kekeliruan itu tampilan resmi.
 
-**Konsekuensi rancangan yang berubah**: karena metriknya sudah ada dan sudah dipakai modul insentif, langkah berikutnya untuk divisi ini **bukan membangun dashboard melainkan memeriksa dulu apa yang sudah ditampilkan `finance/incentive`** ([[Finance - Incentive]]). Pola "yang mau dibangun ternyata sudah ada di modul lain" sudah berulang tiga kali dalam analisis keluarga dokumen ini, dan divisi ini kandidat berikutnya yang paling mungkin mengulanginya.
+**Konsekuensi rancangan yang berubah**: karena metriknya sudah ada dan sudah dipakai modul insentif, langkah berikutnya untuk divisi ini bukan membangun dashboard.
+
+✅ **Pemeriksaan itu sudah dilakukan 2026-09-04**, dan hasilnya lebih baik daripada dashboard mana pun: endpoint `GET /api/integration/insight/icc-video-metrics` **sudah hidup**, tetapi formulir insentif di frontend masih **mengetik CTR, Watch 25%, ROAS, dan Orders dengan tangan** per video. Nol berkas frontend memanggil endpoint itu. Pekerjaan berikutnya karena itu menyambungkan keduanya, bukan membangun layar baru. Rincian, bukti, dan peringatan ROAS-nya di [[Finance - Incentive]] § Metrik ICC sudah dihitung sistem.
+
+Pola "yang mau dibangun ternyata sudah ada di modul lain" kini sudah berulang **empat kali** dalam analisis keluarga dokumen ini.
 
 ## Posisi yang bisa dirancang sekarang
 
