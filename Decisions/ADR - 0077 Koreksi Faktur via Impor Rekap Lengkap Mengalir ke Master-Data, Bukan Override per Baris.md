@@ -64,6 +64,7 @@ Commit menulis semua flag & master lebih dulu (mapping → riwayat harga → fla
 ## Dokumen Terkait
 
 - [[Microservices - Integration Service]] · [[API - Integration Service]] · [[APP - Web ERP]] · [[DB - Data Dictionary]]
+- [[RUN - Import Koreksi Faktur dari Rekap Lengkap]] — prosedur langkah-per-langkah untuk finance.
 - [[ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur]] — faktur tak pernah dihapus; koreksi isi lewat edit-by-id.
 - [[ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift]] — "cermin untuk melihat, Accurate untuk memutuskan".
 - [[External - Accurate]] — batas edit faktur (terkunci retur, terbayar).
