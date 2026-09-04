@@ -59,7 +59,9 @@ Tiga puluh sisanya **terdaftar dan terbit di kertas kerja** berkeadaan `belum_di
 
 ## Dua belas uji menunggu dokumen fisik, dan sebelas di antaranya belum punya mesinnya
 
-🟡 **Diusulkan, belum ada kodenya** — [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]].
+⚠️ **Tempat menaruh buktinya SUDAH ADA sejak 2026-09-03** (bip-erp [#1699](https://github.com/bip-itteam-internal/bip-erp/pull/1699) + [#1700](https://github.com/bip-itteam-internal/bip-erp/pull/1700), keduanya merged): prefix MinIO `audit/`, koleksi `audit_bukti`, dan empat rute — unggah, daftar, baca berkas lewat proxy berizin, hapus. Keputusannya di [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]].
+
+⛔ **Tetapi belum bisa dipakai siapa pun**, dan itu wajib dinyatakan: layarnya belum ada (T1.5), penjalan uji belum membacanya (T1.4), dan `MINIO_AUDIT_KEY` belum diisi di `.env` lingkungan mana pun sehingga unggahannya masih dibalas `invalid access key`. Jangan menyimpulkan dari "merged" bahwa fiturnya hidup.
 
 Dua belas uji ber-`SumberUnggahan`: rekonsiliasi bank, rekonsiliasi pajak, kalender kepatuhan, kas rekening CV, daftar pihak berelasi, pisah batas penjualan, retur penjualan, penyesuaian persediaan, kapitalisasi versus beban, jurnal manual besar, penjualan PT ke CV, piutang iklan ke CV.
 
@@ -96,7 +98,13 @@ Dari 36 uji, **sepuluh menuntut pemilihan sampel**; 26 sisanya atas populasi pen
 
 **Cash opname butuh waktu yang acak, bukan item yang acak.** Ia menghitung seluruh kas; yang harus tak terduga adalah harinya, dan keacakan itu gampang hilang begitu jadwalnya tersimpan di kalender yang bisa dilihat orang.
 
-**Ukuran sampel adalah master data Direksi**, berlantai 5 untuk metode acak, berbenih tak tertebak, dan berjejak. Yang tersimpan bukan hanya yang terpilih melainkan juga ukuran populasi, metode, dan benihnya — tanpa ketiganya sampel tak bisa direproduksi dan auditor tak punya cara membuktikan ia tidak memilih yang mudah.
+**Ukuran sampel adalah master data Direksi**, berlantai 5 untuk metode acak dan berbenih tak tertebak (`BenihAcak` memakai `crypto/rand`, bukan `time.Now()` yang bisa dihitung ulang oleh yang diperiksa).
+
+⛔ **TETAPI CATATAN PENARIKANNYA TIDAK ADA, dan ini gap yang serius.** Rancangannya menuntut yang tersimpan bukan hanya item terpilih melainkan juga ukuran populasi, metode, dan benihnya — tanpa ketiganya sampel tak bisa direproduksi, dan auditor tak punya cara membuktikan ia tidak memilih yang mudah.
+
+Struktur `PenarikanSampel` memang ada (`audit_sampling.go:59`) dan koleksi `audit_sampel` memang dideklarasikan (`audit_db.go`), **tetapi tak satu pun pernah dipakai**: nol penulis, nol pembaca, dan `PenarikanSampel` tak pernah dibangun sekali pun. Diverifikasi `git grep` 2026-09-03.
+
+Jadi kalimat "yang tersimpan bukan hanya yang terpilih" adalah **niat, bukan kenyataan**. Yang benar-benar tersimpan hari ini cuma `HasilUji.Terpilih` di dalam `hasil` — dan itu **ditulis ulang tiap tarik ulang**, jadi bahkan daftar terpilihnya pun tidak awet. Konsekuensinya langsung: **klaim "sampelnya dapat direproduksi" tidak dapat dibuktikan hari ini.** Lihat TBD.
 
 ## Alur Bulanan
 
@@ -215,6 +223,7 @@ Aturan berikut selama ini hanya hidup sebagai komentar Go, sehingga siapa pun ya
 - Apakah **pembacaan otomatis dokumen** dikerjakan, dan dengan model apa. Mengirim rekening koran ke API di luar perusahaan menuntut **persetujuan tertulis Direksi**; pemilik pekerjaan menyatakan itu dapat diterima dengan persetujuan tersebut (2026-09-03), tapi persetujuannya belum ada. Lihat [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]] §4.
 - Apakah **batas 4 MB file-service** cukup untuk rekening koran pindaian. Belum diukur terhadap berkas sungguhan, dan menaikkannya menyentuh seluruh modul yang memakai file-service, bukan audit saja.
 - **Retensi berkas bukti.** Disimpan selamanya untuk sekarang; kebijakan pemusnahan keputusan Finance.
+- ⛔ **Kapan `audit_sampel` benar-benar ditulis.** `PenarikanSampel` dan koleksinya sudah dideklarasikan tapi nol penulis dan nol pembaca (diukur 2026-09-03), sehingga catatan yang membuktikan sampel tidak dipilih yang mudah **tidak ada**. Ini bukan penyempurnaan melainkan lubang di rantai bukti: tanpa ukuran populasi, metode, dan benih yang tersimpan, penarikan bulan lalu tak bisa direproduksi bulan depan. Task tersendiri.
 
 ## Dokumen Terkait
 

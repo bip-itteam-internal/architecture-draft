@@ -2,7 +2,9 @@
 
 Papan kerja untuk [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]]. Keputusannya di ADR; ini pecahan kerjanya.
 
-**Tanggal analisis**: 2026-09-03 · **Status**: 🟡 belum ada satu pun kode
+**Tanggal analisis**: 2026-09-03 · **Diperbarui**: 2026-09-03
+
+**Status**: ⚠️ Fase 1 sebagian — T1.1, T1.2, T1.3 **selesai dan merged**; T1.4, T1.5, T1.6 belum. ⛔ Fiturnya **belum bisa dipakai siapa pun**: layarnya belum ada dan `MINIO_AUDIT_KEY` belum diisi di `.env` lingkungan mana pun.
 
 ## Yang perlu dipegang sebelum mulai
 
@@ -14,16 +16,16 @@ Papan kerja untuk [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat
 
 ## Fase 1 — Tempat menaruh bukti (yang benar-benar di jalur kritis)
 
-### T1.1 · Prefix MinIO `audit/` di file-service
+### ✅ T1.1 · Prefix MinIO `audit/` di file-service — SELESAI ([#1699](https://github.com/bip-itteam-internal/bip-erp/pull/1699))
 `bip-erp/services/file/main.go` · `docker-compose.yml` · `.env`
 
-Tambah `MINIO_AUDIT_KEY: "audit/"` ke peta tulis dan `MINIO_READ_AUDIT_KEY` ke peta baca, mengikuti pola `MINIO_PAJAK_KEY`.
+Tambah `MINIO_AUDIT_KEY: "audit/"` ke peta tulis. ⛔ **TANPA kunci baca** — koreksi terhadap rancangan awal; alasannya di ADR 0075 §Consequences. Nama `MINIO_READ_AUDIT_KEY` juga terbalik dari konvensi (yang benar `MINIO_<MODUL>_READ_KEY`).
 
 ⚠️ **Env dibaca saat container DIBUAT.** Naikkan dengan `docker compose up -d --force-recreate file-service`, bukan `restart`. Kunci yang belum terpasang dijawab `invalid access key`, galat yang tak menyebut sebabnya.
 
 **Verifikasi**: unggah satu berkas uji lewat gateway dengan kunci baru, lalu `/exist` menemukannya di bawah `audit/`. Dan **kontrol negatif**: kunci `pajak/` **ditolak** untuk objek ber-prefix `audit/` — tanpa uji ini, pemisahan prefixnya tak terbukti.
 
-### T1.2 · Struktur `BuktiBaris` + penyimpanannya
+### ✅ T1.2 · Struktur `BuktiBaris` + penyimpanannya — SELESAI ([#1700](https://github.com/bip-itteam-internal/bip-erp/pull/1700))
 `bip-erp/services/finance/audit_bukti.go` (baru) · `audit_kertas_kerja.go`
 
 Field: item terpilih yang dijawab (kosong untuk Bentuk B), objek MinIO, nama berkas asli, oleh, pada, **angka yang dibaca beserta satuannya**.
@@ -34,7 +36,7 @@ Field: item terpilih yang dijawab (kosong untuk Bentuk B), objek MinIO, nama ber
 
 **Bergantung pada**: —
 
-### T1.3 · Rute unggah + hapus bukti
+### ✅ T1.3 · Rute unggah + hapus bukti — SELESAI (#1700, empat rute)
 `bip-erp/services/finance/audit_handler.go`
 
 `POST /audit/periode/:periode/baris/:kode/bukti` dan `DELETE .../bukti/:id`. Digerbang `audit.tinjau` (bukan `audit.view`): melampirkan bukti adalah menulis.
@@ -93,6 +95,9 @@ Tiap uji satu task tersendiri, dan **inilah yang benar-benar membuka dua belas u
 - **T3.1 · Pengurai deterministik CSV/XLS.** Dikerjakan **lebih dulu dan terpisah**, dan tidak butuh persetujuan apa pun karena tak ada data yang keluar. Bila bank memberi e-statement tabel, model tidak dipakai sama sekali.
 - **T3.2 · Pengurai PDF berteks.** Rapuh terhadap perubahan tata letak bank; kunci bentuk keluarannya dengan test atas berkas contoh sungguhan.
 - **T3.3 · Model penglihatan lewat API luar**, hanya untuk dokumen tanpa teks terbaca mesin. Klien LLM **belum ada di mana pun di bip-erp** — ini infrastruktur baru, bukan menyambung kabel. VPS prod tanpa GPU, jadi tidak ada pilihan self-hosted yang sepadan.
+  - ⛔ **PDF WAJIB dirender jadi gambar per halaman lebih dulu.** Diukur 2026-09-03: relay AI internal MENELAN lampiran PDF, dan lewat `/v1/chat/completions` ia membalas 200 dengan angka KARANGAN alih-alih galat. Gambar (PNG) terbaca benar. Rinciannya di ADR 0075 §4.
+  - ⛔ **Patok id model `cc/claude-*` eksplisit.** Id `Claude` dan `token-router/*` membiarkan router memilih penyedia sendiri, jadi rekening koran bisa mendarat di penyedia yang tak seorang pun pilih.
+  - ⚠️ Endpoint default-nya SSE; `stream:false` wajib eksplisit untuk klien Go.
 - **T3.4 · Gerbang konfirmasi.** ⛔ Keluaran T3.1–T3.3 mengisi field angka sebagai **draf** dan **wajib** dikonfirmasi auditor sebelum dipakai — termasuk keluaran pengurai deterministik. Yang membedakan bukti dari tebakan adalah ada orang yang menyatakan angkanya benar, dan temuan modul ini bisa jadi dasar sanksi Rp 5 miliar.
 
 ---

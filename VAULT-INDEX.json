@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-03",
+  "digenerate": "2026-09-04",
   "jumlah_dokumen": 351,
   "dokumen": [
     {
@@ -2135,6 +2135,9 @@
       "publik": true,
       "tautan": [
         "Microservices - Form Builder Service",
+        "Finance - Audit Internal",
+        "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri",
+        "ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul",
         "CORE - API Master Gateway",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
@@ -2144,20 +2147,20 @@
         "Microservices - Notification Service",
         "APP - MyBharata"
       ],
-      "hash": "fe34ae094bb641cfb82c619f78138806f67eb871c5b8f61dec915e350f1dc6b8",
-      "ukuran_kb": 4.7,
-      "ringkasan": "Menjawab: bagaimana upload, download, preview, copy, move, dan delete berkas dilayani satu storage gateway terpusat di atas MinIO, dan bagaimana otorisasi access-key (?key=) memetakan tiap pemanggil ke satu prefix direktori seperti employee/, attendance/, task/, notification/, dan form/. Juga menjawab batas ukuran unggahan 4 MB, kapan presigned URL tersedia (dan kenapa presigned PUT cuma untuk inventory), serta kenapa menambah prefix baru wajib dikerjakan di dua sisi supaya unggahannya tidak dibalas invalid access key. Memuat catatan bahwa akses lewat JWT/RBAC tanpa access-key masih 501 dan upload menimpa object lama tanpa versioning.",
+      "hash": "397722a5c653623b499aacc843b4c4fd265907984cbd4606d9247f6c8f10d758",
+      "ukuran_kb": 8.8,
+      "ringkasan": "Menjawab: bagaimana berkas disimpan dan diberi izin di ERP, prefix apa saja yang terdaftar dan mana yang punya kunci baca, serta kenapa berkas berizin dibaca lewat proxy sisi server alih-alih presigned URL. Menjelaskan perakitan peta access key yang melewati env kosong dan membuang kedua entri saat kunci bertabrakan, beserta alasan keduanya bukan panic. Memuat tiga jebakan integrasi yang berulang: nama parameter /preview, header upstream yang dibuang, dan nama berkas pengguna di Content-Disposition.",
       "kata_kunci": [
-        "file service",
+        "file-service",
         "MinIO",
-        "upload",
-        "download",
-        "presigned URL",
         "access key",
-        "prefix direktori",
-        "object storage",
-        "lampiran",
-        "attachment"
+        "prefix",
+        "upload",
+        "preview",
+        "proxy",
+        "presigned URL",
+        "bucket",
+        "lampiran"
       ]
     },
     {
@@ -5495,7 +5498,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented sebagian** — **§2 (aplikasi terpisah) SUDAH DIKERJAKAN**: repo `audit-bharata` ada, tiga layar jalan, 32 test hijau, build sukses; PR CORS bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690) OPEN. **§1 (pemisahan service + database) BELUM dimulai.** §5 (bypass super-akses) belum dikerjakan.",
+      "status_teks": "**Implemented sebagian** — **§2 (aplikasi terpisah) SUDAH DIKERJAKAN**: repo [`bip-itteam-internal/audit-bharata`](https://github.com/bip-itteam-internal/audit-bharata) **PRIVATE** dibuat 2026-09-03 dan 15 commit sudah naik — sebelumnya aplikasinya HANYA ada di satu laptop tanpa remote sama sekali, jadi \"repo ada\" sempat berarti sesuatu yang jauh lebih rapuh daripada yang terbaca. Tiga layar jalan, 64 test hijau, build sukses; PR CORS bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690) OPEN. **§1 (pemisahan service + database) BELUM dimulai.** §5 (bypass super-akses) belum dikerjakan.",
       "publik": true,
       "tautan": [
         "Finance - Audit Internal",
@@ -5512,21 +5515,18 @@
         "APP - Portal Karir Bharata",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "ff399ee057666870d7e6b2c5e93fe05f868b907ac25057eda86aff577e989d5f",
-      "ukuran_kb": 14.9,
-      "ringkasan": "Menjawab: kenapa audit internal dikeluarkan dari finance-service jadi service dengan database dan kredensial sendiri, dan kenapa layarnya keluar dari erp-frontend jadi aplikasi di subdomain sendiri. Menjelaskan dua tuntutan yang membalik ADR 0073 §1 (pihak yang diperiksa tak boleh bisa mengubah bukti pemeriksaan tentang dirinya; wadahnya akan menampung seluruh audit internal termasuk kepatuhan GA), pengukuran kopling 1,1% yang membuat pemisahan itu murah, dan penegasan bahwa yang memberi independensi adalah DATABASE-nya bukan prosesnya. Juga menjawab: kenapa aplikasi ini memegang ERP JWT alih-alih membuangnya, kenapa temuan kepatuhan GA tidak menumpang koleksi temuan pembukuan, dan kenapa urutan wajibnya penyimpanan dulu baru situs (yang nyatanya dibalik).",
+      "hash": "982ed5e3d412b7dc91d92dfcb1a59594d01a9a1c156e0a94a780cb2a961d7fe6",
+      "ukuran_kb": 15.2,
+      "ringkasan": "Menjawab: kenapa Audit Internal dipisah dari erp-frontend dan finance-service jadi service serta aplikasi web sendiri, apa yang dijamin pemisahan itu, dan apa yang justru tidak dijanjikannya. Menjelaskan tiga fase pemisahan beserta urutan yang dianjurkan dan penyimpangan sadar yang sudah terjadi. Memuat status nyata tiap fase, termasuk repo aplikasi yang kini berdiri di organisasi setelah sebelumnya hanya ada di satu mesin.",
       "kata_kunci": [
-        "ADR 0074",
         "audit internal",
-        "audit-service",
-        "audit_db",
         "pemisahan service",
-        "independensi",
         "SSO",
+        "independensi",
+        "audit-bharata",
+        "CORS",
         "subdomain",
-        "kredensial terpisah",
-        "menu-permission",
-        "bypass super-akses"
+        "RBAC"
       ]
     },
     {
@@ -5534,8 +5534,8 @@
       "judul": "ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui 2026-09-03, kode belum ada",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented sebagian** — §1-§3 dan §5 **SUDAH DIKERJAKAN** 2026-09-03: prefix MinIO `audit/` (bip-erp [#1699](https://github.com/bip-itteam-internal/bip-erp/pull/1699)), koleksi `audit_bukti` + empat rute ([#1700](https://github.com/bip-itteam-internal/bip-erp/pull/1700)), keduanya merged. **§4 (pembacaan otomatis) belum dimulai** dan tetap berprasyarat persetujuan Direksi. ⛔ **Belum bisa dipakai siapa pun**: layarnya belum ada, dan `MINIO_AUDIT_KEY` belum diisi di `.env` mana pun",
       "publik": true,
       "tautan": [
         "Finance - Audit Internal",
@@ -5546,20 +5546,20 @@
         "API - File Service",
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
       ],
-      "hash": "3ff31b6ecac6e5bca7a13423674ca15ea1851deb08a6e404b71f8f7dac29813d",
-      "ukuran_kb": 11.9,
-      "ringkasan": "Menjawab: bagaimana dokumen fisik pembanding audit (rekening koran, SPT, berita acara, bukti terima) masuk ke sistem, di mana angkanya dicatat, dan kenapa pembacaan otomatis oleh AI sengaja ditunda jadi tahap terpisah berprasyarat persetujuan Direksi. Menjelaskan pula kenapa premis 'dua belas uji mandek karena tak ada jalur unggah' keliru: sebelas dari dua belas belum punya penjalan sama sekali, sehingga jalur unggah sendirian membuka nol di antaranya. Memuat pemisahan dua bentuk uji (bukti per item terpilih vs angka dari satu dokumen) dan alasan angka hasil mesin tak boleh jadi dasar tunggal temuan.",
+      "hash": "c0bc6df97bc4bc918c37a4ae6d2854ce3b72e953383ef770a1bd0d970305db54",
+      "ukuran_kb": 16.0,
+      "ringkasan": "Menjawab: bagaimana dokumen fisik pembanding audit masuk ke sistem, di mana angkanya dicatat, dan kenapa pembacaan otomatis oleh AI ditunda jadi tahap terpisah berprasyarat persetujuan Direksi. Menjelaskan kenapa prefix penyimpanan audit sengaja tidak punya kunci baca, dan kenapa kunci baca yang sampai ke peramban membatalkan janji kerahasiaan catatan pemeriksaan. Memuat hasil pengukuran endpoint AI internal: ia relay ke penyedia luar, routernya bisa memilih penyedia sendiri, dan lampiran PDF ditelan diam-diam sehingga jawabannya berupa angka karangan.",
       "kata_kunci": [
         "audit internal",
-        "rekening koran",
-        "bank statement",
         "bukti",
-        "evidence",
-        "lampiran",
+        "rekening koran",
         "upload",
-        "file-service",
         "MinIO",
-        "OCR"
+        "OCR",
+        "AI",
+        "PDF",
+        "vision",
+        "ekstraksi"
       ]
     },
     {
@@ -5632,20 +5632,20 @@
         "Finance - Dashboard per Posisi (FAT)",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "123ba14b13f9020ffbb50bf6c0b484c56aa19a4b50f6ce54560f554e29a04bf9",
-      "ukuran_kb": 24.9,
-      "ringkasan": "Menjawab: apa saja 36 uji audit internal, bagaimana ketiga kelompok pembandingnya menentukan kekuatan tiap uji, uji mana yang menuntut sampling dan mana yang justru tidak boleh acak, serta bagaimana keadaan baris kertas kerja dihitung backend. Menjelaskan tiga layar audit beserta pemetaan aksi ke tiga izin tulis yang berbeda, dan dua belas uji yang menunggu dokumen fisik beserta alasan sebelas di antaranya belum punya mesin pembandingnya. Memuat semantik kolom, semantik keadaan baris, dan daftar keputusan yang belum diambil termasuk apakah tiga belas uji konsistensi internal dihidupkan kembali.",
+      "hash": "266bc7aad92d7fd218998d5ba3235911652b1faa1df06c922571be558f59bd17",
+      "ukuran_kb": 26.8,
+      "ringkasan": "Menjawab: apa saja 36 uji audit internal, bagaimana ketiga kelompok pembandingnya menentukan kekuatan tiap uji, uji mana yang menuntut sampling dan mana yang tak boleh acak, dan bagaimana keadaan baris kertas kerja dihitung. Menjelaskan tiga layar audit beserta pemetaan aksi ke tiga izin tulis yang berbeda, serta dua belas uji yang menunggu dokumen fisik beserta tempat menaruh buktinya yang kini sudah ada di kode. Mencatat pula lubang yang belum tertutup: catatan penarikan sampel yang membuktikan auditor tidak memilih yang mudah belum pernah benar-benar ditulis.",
       "kata_kunci": [
         "audit internal",
         "kertas kerja",
         "working paper",
         "temuan",
-        "finding",
         "sampling",
         "rekonsiliasi bank",
         "Accurate",
-        "kelompok pembanding",
-        "ukuran sampel"
+        "bukti",
+        "ukuran sampel",
+        "kelompok pembanding"
       ]
     },
     {
@@ -11349,8 +11349,8 @@
       "judul": "ANALISA - Bukti Sisi Lawan Audit Internal",
       "area": "Workspace",
       "jenis": "workspace",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "⚠️",
+      "status_teks": "Fase 1 sebagian — T1.1, T1.2, T1.3 **selesai dan merged**; T1.4, T1.5, T1.6 belum. ⛔ Fiturnya **belum bisa dipakai siapa pun**: layarnya belum ada dan `MINIO_AUDIT_KEY` belum diisi di `.env` lingkungan mana pun.",
       "publik": false,
       "tautan": [
         "ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul",
@@ -11360,9 +11360,9 @@
         "Microservices - File Service",
         "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri"
       ],
-      "hash": "65b80482eafa1a88f12814febbeafb15447b038411d3d63f2570e1e69eebb058",
-      "ukuran_kb": 7.2,
-      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dikerjakan untuk membuka uji audit yang pembandingnya dokumen fisik, dalam urutan apa, dan mana yang berprasyarat persetujuan Direksi. Memecah kerjanya jadi tiga fase: tempat menaruh bukti (prefix MinIO, struktur bukti, rute unggah, panel detail), sebelas penjalan uji yang tersisa, dan pembacaan otomatis yang sengaja ditahan. Tiap task menyebut ketergantungannya dan gerbang verifikasinya.",
+      "hash": "5ccdbfc5488a0c35a082ba5b6357f7f02f6b93a250a32a427fe7cd332b9a7662",
+      "ukuran_kb": 8.3,
+      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dikerjakan untuk membuka uji audit yang pembandingnya dokumen fisik, dalam urutan apa, mana yang sudah selesai, dan mana yang berprasyarat persetujuan Direksi. Memecah kerjanya jadi tiga fase: tempat menaruh bukti, sebelas penjalan uji yang tersisa, dan pembacaan otomatis yang sengaja ditahan. Tiap task menyebut ketergantungannya dan gerbang verifikasinya.",
       "kata_kunci": [
         "audit internal",
         "papan kerja",

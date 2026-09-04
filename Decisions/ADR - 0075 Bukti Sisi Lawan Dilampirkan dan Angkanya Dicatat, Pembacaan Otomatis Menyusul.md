@@ -11,7 +11,7 @@
 
 *Dua belas pengujian audit membandingkan pembukuan dengan dokumen fisik yang tak ada di sistem mana pun. Bukti itu **dilampirkan** ke barisnya dan angkanya **dicatat manusia**, lalu perbandingannya dikerjakan mesin secara deterministik. Pembacaan otomatis (pengurai CSV, lalu model penglihatan untuk pindaian) dipisah sebagai tahap tersendiri yang berprasyarat persetujuan Direksi, dan keluarannya tidak pernah boleh langsung dipakai.*
 
-- **Status**: 🟡 **Diusulkan**, disetujui 2026-09-03, kode belum ada
+- **Status**: ⚠️ **Implemented sebagian** — §1-§3 dan §5 **SUDAH DIKERJAKAN** 2026-09-03: prefix MinIO `audit/` (bip-erp [#1699](https://github.com/bip-itteam-internal/bip-erp/pull/1699)), koleksi `audit_bukti` + empat rute ([#1700](https://github.com/bip-itteam-internal/bip-erp/pull/1700)), keduanya merged. **§4 (pembacaan otomatis) belum dimulai** dan tetap berprasyarat persetujuan Direksi. ⛔ **Belum bisa dipakai siapa pun**: layarnya belum ada, dan `MINIO_AUDIT_KEY` belum diisi di `.env` mana pun
 - **Path di repo**: `bip-erp/services/finance/audit_bukti.go` (baru) · `bip-erp/services/finance/audit_kertas_kerja.go` · `bip-erp/services/finance/audit_handler.go` · `bip-erp/services/file/main.go` · `bip-erp/docker-compose.yml` · `audit-bharata/src/features/audit/components/detail-uji-panel.tsx`
 - **Tanggal**: 2026-09-03
 
@@ -87,6 +87,36 @@ Tidak dikerjakan pada tahap ini. Ketika dikerjakan, urutannya wajib:
 
 ⛔ **Prasyarat yang belum terpenuhi**: mengirim rekening koran ke API di luar perusahaan menuntut **persetujuan tertulis Direksi**. Pemilik pekerjaan menyatakan itu dapat diterima **dengan persetujuan Direksi** (2026-09-03); persetujuannya sendiri belum ada. Sampai ada, tahap ini tidak dimulai.
 
+#### Endpoint AI internal: diukur 2026-09-03, dan hasilnya mengubah bentuk tahap ini
+
+`https://code.bharatainternasional.com/v1` adalah **relay ke Anthropic, bukan model yang berjalan di infrastruktur sendiri.** Buktinya: model yang ditawarkan Claude dan MiniMax-M3 — Claude tak bisa di-self-host — dan id pesan berbentuk `msg_011Ceg…`, format asli Anthropic. Auth ditegakkan (401 tanpa kunci maupun dengan kunci ngawur).
+
+**Artinya rekening koran tetap keluar dari gedung, dan prasyarat persetujuan Direksi di atas berlaku utuh.** Nama domain sendiri tidak mengubahnya.
+
+⛔ **Risiko yang belum pernah tercatat: router boleh memilih penyedia sendiri.** Dari sembilan model, satu bernama `Claude` (`owned_by: combo`) dan satu `token-router/MiniMax-M3`. Memakai id `Claude` berarti **tidak mengendalikan penyedia mana yang melihat rekening koran** — ia bisa mendarat di MiniMax. **Aturannya: selalu patok id `cc/claude-*` eksplisit, jangan pernah `Claude` atau apa pun di bawah `token-router/`.**
+
+⛔ **Relay itu MENELAN lampiran PDF, dan mode gagalnya berbeda per jalur.** Diuji dengan PDF sintetis berisi `SALDO AKHIR 87.654.321,09`:
+
+| Jalur | Hasil |
+|---|---|
+| `/v1/messages` + blok `image` | ✅ `87654321.09` benar |
+| `/v1/chat/completions` + `image_url` PNG | ✅ `87654321.09` benar |
+| `/v1/messages` + blok `document` (PDF) | ⚠️ 200, model menjawab jujur *"tidak dapat membaca dokumen"* |
+| `/v1/chat/completions` + blok `file` (PDF) | ⛔ 200, JSON sah, **`{"saldo_akhir":0}`** — angka karangan |
+
+**Kontrol negatif yang membuktikannya**: pertanyaan yang sama **tanpa lampiran apa pun** menjawab `{"saldo_akhir": 1000000}` — juga karangan. PDF-nya tak menyumbang satu bit pun.
+
+Baris terakhir tabel itu adalah kelas kegagalan yang seluruh ADR ini dibuat untuk mencegah, dan ia terbukti sendiri dalam satu percobaan: status 200, JSON sah, bentuk persis seperti diminta, **angka salah**, tanpa satu pun galat.
+
+**Dua konsekuensi mengikat untuk §4:**
+
+1. **PDF WAJIB dirender jadi gambar per halaman lebih dulu.** Mengirim PDF apa adanya tidak menghasilkan galat, ia menghasilkan angka karangan.
+2. **Verifikasi ekstraksi WAJIB punya kontrol negatif**: kirim pertanyaan yang sama tanpa lampiran. Kalau jawabannya tetap keluar, ekstraksinya tidak terjadi — dan tanpa kontrol ini tak ada cara membedakan bacaan dari karangan.
+
+⚠️ Gotcha integrasi: endpoint ini **default-nya SSE**. Tanpa `"stream": false` eksplisit ia membalas `data: {…}` beruntun, dan klien Go yang mengurai JSON biasa gagal dengan galat yang menunjuk ke bentuk respons, bukan ke sebabnya.
+
+⚠️ Subdomain `code.` dan prefiks `cc/` mengesankan gateway ini diperuntukkan bagi Claude Code, bukan sebagai backend aplikasi. Memakainya di produksi berarti modul audit ikut mati bila gateway itu mati.
+
 ### 5. Berkas sumbernya disimpan selamanya, bukan cuma angkanya
 
 Temuan yang angkanya tak dapat ditelusuri balik ke halaman dokumen asalnya bukan bukti. Berkas tidak dihapus saat baris ditinjau ulang atau periode ditutup.
@@ -99,7 +129,11 @@ Temuan yang angkanya tak dapat ditelusuri balik ke halaman dokumen asalnya bukan
 
 ⚠️ **Batas 4 MB belum diukur terhadap rekening koran pindaian sungguhan.** Ia batas file-service (`services/file/main.go:252`), bukan batas audit, jadi menaikkannya menyentuh seluruh modul yang memakainya. Bila ternyata kekecilan, itu keputusan tersendiri — jangan diam-diam dinaikkan di satu sisi saja.
 
-⚠️ **Env baru `MINIO_AUDIT_KEY` dan `MINIO_READ_AUDIT_KEY` menuntut `docker compose up -d --force-recreate` pada file-service DAN finance-service**, bukan `restart`. Env dibaca saat container dibuat. Kunci yang belum terpasang dijawab `invalid access key` — galat yang tak menyebut sebabnya, dan sudah pernah memakan waktu di jalur arsip pajak.
+⚠️ **Env baru `MINIO_AUDIT_KEY` menuntut `docker compose up -d --force-recreate` pada file-service DAN finance-service**, bukan `restart`. Env dibaca saat container dibuat. Kunci yang belum terpasang dijawab `invalid access key` — galat yang tak menyebut sebabnya, dan sudah pernah memakan waktu di jalur arsip pajak.
+
+⛔ **TIDAK ADA `MINIO_AUDIT_READ_KEY`, dan itu koreksi terhadap rancangan awal ADR ini.** Versi pertama menyebut sepasang kunci. Yang membatalkannya: kunci baca hari ini sampai ke **peramban** lewat `NEXT_PUBLIC_MINIO_*_READ_KEY` (`erp-frontend/src/hooks/use-document.ts`), ditanam ke bundel klien saat build, dan satu kunci baca memberi akses ke **seluruh prefix**. Kunci baca `audit/` karena itu berarti tiap rekening koran terbaca siapa pun yang punya bundelnya — persis kebalikan dari yang dijanjikan [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]. Pembacaan berkas lewat **proxy di sisi server** yang memakai kunci **tulis** dan memeriksa `audit.view` setiap kali. Penolakannya dikunci `TestPrefixAuditTakPunyaKunciBaca`; rinciannya di [[Microservices - File Service]].
+
+⚠️ **Nilai `MINIO_AUDIT_KEY` wajib berbeda dari seluruh kunci lain.** `bangunAccessMap` menolak tabrakan dengan membuang **kedua** entri, jadi menyalin nilai `MINIO_PAJAK_KEY` ke sini tidak membuat keduanya jalan — ia mematikan keduanya.
 
 **Kontrak berubah, jadi BE naik sebelum FE.** Aplikasi `audit-bharata` menampilkan bukti hanya bila field-nya ada; tanpa itu panel detail tetap berfungsi tanpa blok bukti.
 
