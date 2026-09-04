@@ -28,6 +28,14 @@
 - Gateway panic saat startup bila key kosong (fail-fast)
 - **Header identitas dari klaim JWT** (`Reroute` membuang header `BIP-*` kiriman klien lalu meng-inject ulang dari klaim): `BIP-Employee-Id`, `BIP-System-Roles`, dan **`BIP-Company-ID`** (perusahaan/tenant; fallback `"BIP"`) — dikirim ke **semua** module secara seragam, dan diteruskan antar-service via `InternalRequest`. Inilah fondasi multi-perusahaan: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 
+> ⛔ **Konsekuensi yang mengikat SETIAP service di belakang gateway: `ReadBufferSize` wajib ≥ 32 KB** (default fasthttp cuma 4 KB). Injeksi di atas membuat permintaan ke hulu **selalu lebih besar** daripada yang dikirim browser — `Reroute` menyalin seluruh header masuk lalu menambahkan `BIP-Permissions`, `BIP-System-Roles`, dan `BIP-Supervised-Departments` — dan ukurannya **tumbuh mengikuti jumlah permission-set** yang dipegang akun pemanggil ([[CORE - RBAC dan Permission Set]]).
+>
+> Di bawah 32 KB fasthttp menolak di lapisan HTTP **sebelum satu handler pun jalan**, membalas `431 Request Header Fields Too Large`. Karena gateway meneruskan status upstream apa adanya (`c.Status(resp.StatusCode)`), **431 milik service tampil di browser seolah berasal dari gateway** — jadi jangan mulai menyelidiki dari gateway.
+>
+> Dua sifat membuatnya sulit dikenali. **Per-akun**: akun berizin sedikit tetap lancar, sehingga gejalanya terlihat seperti masalah satu orang. **Per-rute**: hanya modul yang belum dinaikkan yang gagal, sehingga sisanya yang normal terbaca sebagai bukti gateway sehat. Pembeda tercepat: kirim satu header probe besar (mis. `X-Probe` 6 KB) ke rute yang dicurigai **dan** ke rute modul lain; kalau yang kedua 200, yang salah modulnya, bukan gateway.
+>
+> Diukur 2026-09-04: dari 25 proses Fiber di repo, 22 sudah 32 KB sejak `e84b93c4` (2026-08-18). Commit itu menyapu `api-gateway` + `services/*` dan **melewatkan `orchestrator/*`**, yang secara folder bukan `services/*` — lihat [[CORE - HRIS Orchestrator]] dan [[CORE - IT Orchestrator]].
+
 **Routing service via `/api/:module/*`**
 - Module: employee, attendance, notification, file, insentive, integration, tiktok-shop, inventory, task-management, recruitment, hris (orchestrator), it (orchestrator), **learning** (✅ live dev + prod 2026-08-06, port 6987 — [[Microservices - Learning Service]]), form-builder (⚠️ merged 2026-08-01, **belum live di dev** — `/health?check=form-builder` masih balas `400 unknown service`)
 - Contoh port internal: employee-service:6970, attendance-service:6971, notification-service:6972, file-service:6973, hris-orchestrator:7000, it-orchestrator:7001

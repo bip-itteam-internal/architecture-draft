@@ -22,7 +22,7 @@ Empat izin permission-set: `payroll.view` · `payroll.manage` · `payroll.work` 
 
 ⚠️ **`payroll.salary.write` sengaja berdiri sendiri**, tidak dilebur ke `payroll.work`: staf HR boleh menyetel gaji tetapi **tidak** boleh membuat run, dan pemisahan itulah alasan izin ini ada. Melebur keduanya diam-diam memberi staf HR kemampuan menerbitkan payroll.
 
-⚠️ **Service ini menaikkan `ReadBufferSize` ke 32 KB** (default fasthttp 4 KB) karena header `BIP-Permissions` dari gateway melebihi 4 KB begitu akun punya banyak permission-set. Gejala bila terlupa di service lain: permintaan gagal di lapisan HTTP sebelum handler mana pun jalan.
+⚠️ **Service ini menaikkan `ReadBufferSize` ke 32 KB** (default fasthttp 4 KB) karena header `BIP-Permissions` dari gateway melebihi 4 KB begitu akun punya banyak permission-set. Gejala bila terlupa di service lain: permintaan gagal di lapisan HTTP sebelum handler mana pun jalan. Aturan ini **tidak khusus payroll** dan sumbernya bukan di sini — ia berlaku untuk setiap service di belakang gateway, dan ditulis lengkap di [[CORE - API Master Gateway]].
 
 ## Konfigurasi (baca = `view`, tulis = `manage`)
 

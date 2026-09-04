@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 (+ client MinIO langsung)
 - **Path:** `orchestrator/hris` (port `7000`)
-- **Status**: ✅ Implemented, aktif dipakai
+- **Status**: ⚠️ Implemented (ada catatan) — aktif dipakai, tapi `ReadBufferSize` masih default 4 KB di `main` sehingga seluruh rute membalas 431 untuk akun berizin banyak (lihat Catatan)
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
@@ -38,6 +38,25 @@ Plus aggregate read: `/v2/multi`, `/v2/multi/summary`, `/:id/multi`.
 
 - Secara fungsional sudah Implemented.
 - Terdapat **dead code**: blok `PATCH /:id/update` versi lama yang masih di-comment pada route attendance.
+
+### ⛔ `ReadBufferSize` masih 4 KB: SELURUH `/api/hris/*` membalas 431 untuk akun berizin banyak
+
+`fiber.New(fiber.Config{BodyLimit: 50 * 1024 * 1024})` di `orchestrator/hris/main.go` tidak menyetel `ReadBufferSize`, jadi berlaku default fasthttp 4 KB. Aturannya dan sebabnya ada di [[CORE - API Master Gateway]]; ringkasnya, gateway menambahkan `BIP-Permissions` dkk ke permintaan sebelum meneruskannya, sehingga yang tiba di sini selalu lebih besar daripada yang dikirim browser.
+
+Diukur di **dev 2026-09-04** lewat gateway, dengan satu header probe 6 KB untuk membuat ukurannya deterministik tanpa bergantung pada izin akun penguji:
+
+| Endpoint | tanpa probe | dengan probe 6 KB |
+|---|---|---|
+| `/api/hris/employees/v2/multi/summary` | 200 | **431** |
+| `/api/it/v2/multi` | 200 | **431** |
+| `/api/employee/master/permission-modules` | 200 | 200 |
+| `/api/notification/inbox` | 200 | 200 |
+
+Dua baris terakhir adalah kontrolnya: header 6 KB yang sama lolos gateway dan diterima service ber-32 KB, jadi yang menolak memang orchestrator-nya.
+
+⚠️ **Reproduksi TIDAK bisa memakai akun dev biasa.** Sensus di [[CORE - RBAC dan Permission Set]] menemukan hanya segelintir posisi dan akun yang berpaket di dev, jadi `BIP-Permissions` di sana masih di bawah 4 KB dan endpointnya membalas 200 baik sebelum maupun sesudah perbaikan. Verifikasi yang bersandar pada itu membuktikan nol.
+
+Perbaikannya (`ReadBufferSize: 32 * 1024` + penjaga perilaku di `konfig_fiber_test.go`) ada di PR [bip-erp#1708](https://github.com/bip-itteam-internal/bip-erp/pull/1708), **belum merge per 2026-09-04** — ukur ulang sebelum memakai kalimat ini.
 
 ## Dependencies & Integrasi
 

@@ -30,6 +30,7 @@
 - **Response payload dibuang:** `getRolesByEmployeeID`, `getAccountStatus`, `activateAccount`, `deactivateAccount`, dan `toggleAccountStatus` membangun objek response lengkap (roles / is_active / action) tetapi hanya mengembalikan `{"message","status"}` generik — data yang diharapkan tidak pernah terkirim ke caller.
 - **Role per-departemen nonaktif:** fungsi `setDepartmentRole`, `removeDepartmentRole`, dan `getRolesByDepartment` sudah ditulis penuh TAPI route-nya (`/roles/get-department`, `/set-department`, `/remove-department`) masih di-comment — sehingga manajemen role per-departemen efektif belum diekspos.
 - **Log startup menyesatkan:** mencetak "routes registered" untuk route yang sebenarnya masih di-comment.
+- ⛔ **`ReadBufferSize` masih 4 KB**, sama dengan [[CORE - HRIS Orchestrator]]: `orchestrator/it/main.go` tidak menyetelnya, jadi SELURUH `/api/it/*` membalas 431 untuk akun berizin banyak. Terukur di dev 2026-09-04 (`/api/it/v2/multi` → 431 dengan header probe 6 KB, sementara rute service ber-32 KB → 200). Aturan dan sebabnya di [[CORE - API Master Gateway]]; perbaikannya di PR [bip-erp#1708](https://github.com/bip-itteam-internal/bip-erp/pull/1708), **belum merge per 2026-09-04**. Yang membuat ini lebih menggigit di sini daripada kelihatannya: `/roles/*`, `/network*`, dan `/v2/multi` belum punya pengganti di service mana pun (lihat peringatan di atas), jadi tak ada jalur cadangan saat rutenya mati.
 
 ### `/roles/set` membalas 502 selama sepuluh hari di dev (2026-07-30 → 2026-08-09)
 
