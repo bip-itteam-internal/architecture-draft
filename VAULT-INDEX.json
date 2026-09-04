@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-04",
-  "jumlah_dokumen": 351,
+  "jumlah_dokumen": 360,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -5563,6 +5563,38 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang.md",
+      "judul": "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Berlaku sebagai rancangan** sejak 2026-09-04. Belum ditegakkan test. Dua divisi yang sudah punya dashboard (FAT dan HRGA) dibangun sebelum ADR ini dan sebagian sudah selaras dengannya; penyelarasan sisanya keputusan tersendiri.",
+      "publik": true,
+      "tautan": [
+        "Finance - Dashboard per Posisi (FAT)",
+        "HRIS - Matriks KPI per Departemen",
+        "REF - Layout Dashboard erp-frontend",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "HRIS - Alur KPI Otomatis",
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem"
+      ],
+      "hash": "6f6442ef91f90d3150d9728027990159c01108526c097a6d41ec281e492c7a5f",
+      "ukuran_kb": 7.1,
+      "ringkasan": "Menjawab: dari mana isi dashboard sebuah posisi boleh diturunkan (tiga sumbu: KPI yang dinilai, pekerjaan yang menunggu, dan ambang yang tertulis), apa yang dilarang jadi isi (demografi dan rekap yang tak menuntut tindakan), serta kapan sebuah posisi justru tidak direkomendasikan dibuatkan dashboard sama sekali. Menjelaskan juga kenapa metrik tanpa sumber wajib dirender sebagai panel jujur bernama hook/endpoint-nya, bukan angka nol, dan kenapa ambang lulus/gagal hanya boleh dipasang bila targetnya benar-benar ada di kpi_template atau master data. Memuat sebaran 311 metrik KPI di 10 divisi beserta porsi otomatis vs manual (87,5% manual) yang jadi dasar seluruh keputusannya.",
+      "kata_kunci": [
+        "dashboard posisi",
+        "ADR 0076",
+        "KPI",
+        "kpi_template",
+        "panel jujur",
+        "ambang",
+        "threshold",
+        "antrean",
+        "metrik manual",
+        "matriks KPI per departemen"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -5746,31 +5778,40 @@
       "judul": "Finance - Dashboard per Posisi (FAT)",
       "area": "Finance System",
       "jenis": "domain",
-      "status_emoji": null,
-      "status_teks": "🟢 **Implementasi (FE)** — dashboard keuangan per posisi (FAT) di `erp-frontend`, sebagian besar elemen masih menunggu penyambungan data backend.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implementasi (FE), sebagian besar elemen masih menunggu penyambungan data backend.** Dashboard keuangan per posisi (FAT) di `erp-frontend`, hidup dan dipakai. Marker sebelumnya `🟢` yang bukan anggota himpunan sah, sehingga dokumen ini tercatat TANPA status di `VAULT-INDEX.json`; diperbaiki 2026-09-04.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "External - Accurate",
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "HRIS - Matriks KPI per Departemen",
+        "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
+        "GA - Dashboard per Posisi",
+        "Manufacture - Dashboard per Posisi",
+        "REF - Penamaan Metrik & Sumber KPI",
+        "IT - Dashboard per Posisi",
+        "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri",
+        "REF - Layout Dashboard erp-frontend",
         "Finance - Big Pictures",
         "Finance - Incentive"
       ],
-      "hash": "bc2b8226d212ea1ec2a7ebe01d5a85a00f6da4debb9835d7fefcdcc0e38c62aa",
-      "ukuran_kb": 4.5,
-      "ringkasan": "Menjawab dashboard apa saja yang tersedia untuk tiap posisi Finance/Accounting/Tax (FAT — SPV, AR Staf/Leader, Junior/Senior Accounting, Cost Control, Tax, AP, CV) di erp-frontend, grafik dan indikator target mana yang sudah tersambung data nyata versus masih menunggu backend, serta bagaimana aturan \"tidak ada angka palsu\" diterapkan lewat panel menunggu penyambungan.",
+      "hash": "af01e49b037387adfad2a992e8a1ea000780157bc1183ecc13af82ffa62e6282",
+      "ukuran_kb": 9.5,
+      "ringkasan": "Menjawab: bagaimana dashboard Finance/Accounting/Tax (FAT) per posisi dibangun di erp-frontend, posisi apa saja yang punya halaman (spv, ar-staf, ar-leader, junior/senior accounting, cost control, tax, ap, cv), grafik dan indikator target mana yang sudah hidup beserta hook sumbernya, dan elemen mana yang masih menunggu endpoint backend. Menjelaskan prinsip datanya: tidak ada angka palsu, indikator pass/fail hanya untuk ambang yang sudah tertulis, dan angka lintas modul yang datang dari Accurate. Memuat pula penilaian isi divisi ini terhadap ADR 0076: 61 metrik di 8 posisi, penghambat log 1-on-1 dan Kaizen, kandidat visual utama per posisi, serta metrik yang salah petak (aset tetap ke manufacture_resi, Monitoring Team gabungan) yang harus diputuskan sebelum digambar.",
       "kata_kunci": [
-        "FAT",
-        "dashboard finance",
-        "posisi",
-        "AR",
-        "AP",
-        "tax",
-        "cost control",
+        "dashboard FAT",
+        "finance",
         "accounting",
-        "indikator target",
+        "tax",
+        "dashboard per posisi",
+        "AR staf",
+        "AR leader",
+        "cost control",
         "aging piutang",
-        "aging utang",
-        "RBAC"
+        "Accurate",
+        "panel menunggu penyambungan",
+        "kartu indikator target"
       ]
     },
     {
@@ -6142,6 +6183,44 @@
         "ladder",
         "GA",
         "task tracker"
+      ]
+    },
+    {
+      "path": "General Affairs/GA - Dashboard per Posisi.md",
+      "judul": "GA - Dashboard per Posisi",
+      "area": "General Affairs",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rancangan**. Tiga posisi GA punya tab di `/hris` (GA Staff, Office Boy, Security); Admin dan kedua posisi Procurement belum punya layar sama sekali.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "HRIS - Matriks KPI per Departemen",
+        "GA - Checklist Management",
+        "GA - Guestbook System (Complete)",
+        "Microservices - Procurement Service",
+        "REF - Layout Dashboard erp-frontend",
+        "HRIS - Dashboard per Posisi",
+        "GA - Inventory Management",
+        "GA - Procurement System",
+        "GA - Building Maintenance"
+      ],
+      "hash": "10d438b177315bf2407a2a5daed107991d2fa5e65980d40ea0b7ef798aa67e32",
+      "ukuran_kb": 11.1,
+      "ringkasan": "Menjawab: apa isi rancangan dashboard tiap posisi General Affair (Admin General Service, GA Staff, Office Boy, Security) dan Procurement (Leader, Staff Inventory), metrik KPI apa yang menilai mereka beserta bobot dan status sumber datanya, serta posisi mana yang justru tidak direkomendasikan dibuatkan dashboard dan apa yang membalikkan keputusan itu. Menjelaskan temuan bahwa satu modul checklist berjadwal yang belum ada mengunci sembilan dari 24 metrik GA di lima posisi, sehingga membangunnya jadi pekerjaan berdaya ungkit tertinggi. Memuat pula jebakan yang harus dihindari: satu nama posisi GA Staff dipakai dua peran berbeda, dan metrik rebate Procurement salah petak ke work_data.contract_ending (kontrak karyawan, bukan vendor).",
+      "kata_kunci": [
+        "General Affair",
+        "GA",
+        "procurement",
+        "dashboard per posisi",
+        "office boy",
+        "security",
+        "GA staff",
+        "checklist management",
+        "SLA pembelian",
+        "lead time PO",
+        "inventory_db",
+        "KPI GA"
       ]
     },
     {
@@ -6886,6 +6965,42 @@
         "perselisihan",
         "surat peringatan",
         "HRIS"
+      ]
+    },
+    {
+      "path": "Human Resource Information System/HRIS - Dashboard per Posisi.md",
+      "judul": "HRIS - Dashboard per Posisi",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "**Sebagian sudah ada**. Kelima tab hidup di `/hris` (Ringkasan Divisi HRGA), tetapi tiga di antaranya nyaris kosong dan sebabnya bukan tata letak melainkan ketiadaan data.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "HRIS - Matriks KPI per Departemen",
+        "GA - Dashboard per Posisi",
+        "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
+        "REF - Layout Dashboard erp-frontend",
+        "HRIS - Training Program",
+        "HRIS - Recruitment",
+        "HRIS - Personalia",
+        "HRIS - Pengembangan Organisasi (Community of Interest)",
+        "HRIS - Key Performance Index"
+      ],
+      "hash": "637fb5cb14db45b2a4a19d34e42550622431afd4010d63e64c34d5388de7495b",
+      "ukuran_kb": 11.7,
+      "ringkasan": "Menjawab: apa isi dashboard untuk lima posisi divisi Human Resource (HRD Supervisor, Personalia, Culture & Industrial, Recruitment & Onboarding, Training & Performance Officer), metrik KPI apa yang menilai tiap posisi beserta bobotnya, dan sumber data mana yang sudah menyuplai angkanya. Menjelaskan juga kenapa sebagian tab tampak kosong (metriknya tak punya angka, bukan soal tata letak), kenapa sebaran skor terhadap ambang 70 dipakai alih-alih rata-rata, dan kenapa kartu cuti hari ini tidak boleh diperlakukan sebagai antrean. Memuat catatan bahwa HRGA adalah label grup supervisi, bukan nama departemen, serta daftar kebutuhan backend yang terurut prioritas.",
+      "kata_kunci": [
+        "dashboard per posisi",
+        "HRIS",
+        "HRGA",
+        "KPI",
+        "HRD Supervisor",
+        "Personalia",
+        "Recruitment",
+        "onboarding",
+        "turnover",
+        "ADR 0076"
       ]
     },
     {
@@ -8168,6 +8283,42 @@
       ]
     },
     {
+      "path": "IT/IT - Dashboard per Posisi.md",
+      "judul": "IT - Dashboard per Posisi",
+      "area": "IT",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rancangan**, belum dibangun. Yang ADA hari ini adalah Ringkasan Divisi IT tanpa tab per posisi (`erp-frontend/src/features/it/ringkasan/`).",
+      "publik": false,
+      "tautan": [
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "HRIS - Matriks KPI per Departemen",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "HRIS - Otomasi Skor KPI",
+        "Microservices - Calendar Service",
+        "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
+        "REF - Layout Dashboard erp-frontend",
+        "IT - Helpdesk",
+        "IT - Monitoring System",
+        "RUN - Menambah Metrik KPI Otomatis"
+      ],
+      "hash": "af4fbefe955a596bfc6417ede2aff8920d3432b1b184c7bd1cd80deceefc8c44",
+      "ukuran_kb": 9.8,
+      "ringkasan": "Menjawab: apa yang seharusnya tampil di dashboard tiap posisi divisi Tech Development (Tech Development Leader, Fullstack Developer, IT Support), metrik KPI dan bobot yang menilai mereka, serta sumber otomatis mana yang sudah menyuplai angka (kinerja_tiket, kinerja_tiket_divisi, skor_tim, uptime_sistem). Menjelaskan kenapa hanya tiga dari tujuh posisi yang dirancang (empat template lain arsip dan tak dipegang akun aktif), kenapa tab per posisi bergantung pada `position_key` yang belum mengalir ke frontend, dan kenapa metrik uptime berbobot 0,4 dengan target 90 praktis tidak mengukur apa pun. Memuat juga jebakan pemetaan: varians anggaran tanpa parameter departemen, label CSAT yang tidak mencakup IT Support, dan Kaizen yang manual karena keputusan.",
+      "kata_kunci": [
+        "dashboard per posisi",
+        "IT",
+        "Tech Development",
+        "KPI",
+        "Fullstack Developer",
+        "IT Support",
+        "CSAT",
+        "uptime",
+        "tiket",
+        "position_key"
+      ]
+    },
+    {
       "path": "IT/IT - Development Apps and Tools.md",
       "judul": "IT - Development Apps and Tools",
       "area": "IT",
@@ -8706,6 +8857,43 @@
       ]
     },
     {
+      "path": "Manufacture/Manufacture - Dashboard per Posisi.md",
+      "judul": "Manufacture - Dashboard per Posisi",
+      "area": "Manufacture",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rancangan**. Tak satu pun posisi di divisi ini punya lembar dashboard.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "HRIS - Matriks KPI per Departemen",
+        "GA - Dashboard per Posisi",
+        "QA - Dashboard per Posisi",
+        "GA - Checklist Management",
+        "REF - Layout Dashboard erp-frontend",
+        "Manufacture - Kesiapan Otomasi KPI (menunggu WMS)",
+        "Manufacture - Dokumen Produksi Batch",
+        "Manufacture - Stock & Material Management",
+        "Manufacture - Stok Pengecekan Fisik (Flow Source)",
+        "WH - Fulfillment Flow & WMS Tinggarjaya"
+      ],
+      "hash": "bc1bdb534631682324dd8059af8297fb660f73df04c2239786008dd7f1fca731",
+      "ukuran_kb": 9.5,
+      "ringkasan": "Menjawab: apa isi dashboard untuk delapan posisi divisi Manufaktur (Warehouse Staff, Warehouse Leader, Admin Warehouse dua lokasi, Admin/Leader/Supervisor/Operator Production, PPIC), metrik KPI dan bobotnya, serta sumber data mana yang siap dipakai (manufacture_resi, fulfillment_orders, manufacture_stok, accurate_daily_returns). Menjelaskan kenapa divisi ini terbelah dua: sisi gudang bisa dibangun sekarang sementara 11 metrik sisi produksi terkunci koleksi Batch Record & Production Log yang kosong di produksi, penghambat yang sama dengan divisi Quality. Memuat peringatan salah petak yang harus diperiksa sebelum dipakai: OTIF PPIC dipetakan ke data iklan TikTok, factory utilization ke tracker BPOM/CAPA, dua metrik over-dispensing Warehouse Leader kembar berbobot 0,15 masing-masing, dan metrik bernama Kaizen di Leader Production yang sebenarnya mengukur CAPA dan kualitas SOP QC.",
+      "kata_kunci": [
+        "dashboard per posisi",
+        "manufaktur",
+        "manufacture",
+        "warehouse",
+        "gudang",
+        "PPIC",
+        "batch record",
+        "stock opname",
+        "FIFO FEFO",
+        "KPI"
+      ]
+    },
+    {
       "path": "Manufacture/Manufacture - Dokumen Produksi Batch.md",
       "judul": "Manufacture - Dokumen Produksi Batch",
       "area": "Manufacture",
@@ -9124,6 +9312,41 @@
       "kata_kunci": []
     },
     {
+      "path": "Quality & Regulatory/QA - Dashboard per Posisi.md",
+      "judul": "QA - Dashboard per Posisi",
+      "area": "Quality & Regulatory",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rancangan**. Tak satu pun posisi di divisi ini punya lembar dashboard.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "HRIS - Matriks KPI per Departemen",
+        "HRIS - Dashboard per Posisi",
+        "GA - Dashboard per Posisi",
+        "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
+        "QA - Register Perizinan & Sertifikasi",
+        "REF - Layout Dashboard erp-frontend",
+        "QA - CPOB (GMP)",
+        "Manufacture - Dashboard per Posisi"
+      ],
+      "hash": "057b8d345f3dfe77c1a990f7f4656f2fdeefde84409d24dcc3439d1e3786e420",
+      "ukuran_kb": 6.7,
+      "ringkasan": "Menjawab: apa isi dashboard yang layak dibuat untuk empat posisi divisi Quality (Quality Supervisor, QA Leader, QC Assistant, QC Production), metrik KPI mana yang sudah punya sumber data dan mana yang terkunci, serta visual apa yang sebaiknya ditampilkan per posisi. Menjelaskan bahwa dua penghambat mengunci 10 dari 18 metrik, yaitu koleksi Batch Record & Production Log yang ada di kode tapi kosong di produksi (kasus \"fitur ada, data nol\", bukan permintaan fitur) dan ketiadaan tracker audit internal/CAPA/izin BPOM. Memuat daftar kebutuhan backend terurut daya ungkit plus peringatan salah petak, misalnya metrik bernama \"Kaizen dan Growth\" milik QA Leader yang sebenarnya mengukur review SOP dan WI, bukan ide Kaizen.",
+      "kata_kunci": [
+        "dashboard per posisi",
+        "Quality",
+        "QA",
+        "QC Assistant",
+        "QC Production",
+        "QA Leader",
+        "Quality Supervisor",
+        "batch record",
+        "CAPA",
+        "BPOM"
+      ]
+    },
+    {
       "path": "Quality & Regulatory/QA - Deviation & CAPA.md",
       "judul": "QA - Deviation & CAPA",
       "area": "Quality & Regulatory",
@@ -9335,6 +9558,47 @@
         "gerbang otorisasi",
         "spv_status",
         "reviewer"
+      ]
+    },
+    {
+      "path": "Reference/REF - Dashboard per Posisi (Indeks Cakupan).md",
+      "judul": "REF - Dashboard per Posisi (Indeks Cakupan)",
+      "area": "Reference",
+      "jenis": "reference",
+      "status_emoji": "🟡",
+      "status_teks": "**Rancangan**. Dokumen turunan; yang menentukan tetap dok divisi masing-masing.",
+      "publik": true,
+      "tautan": [
+        "HRIS - Matriks KPI per Departemen",
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "REF - Layout Dashboard erp-frontend",
+        "IT - Dashboard per Posisi",
+        "Finance - Dashboard per Posisi (FAT)",
+        "HRIS - Dashboard per Posisi",
+        "GA - Dashboard per Posisi",
+        "Manufacture - Dashboard per Posisi",
+        "Sales - Dashboard per Posisi (Beauty Hacks & Kyura)",
+        "Unlisted - Dashboard per Posisi (Kesekretariatan)",
+        "QA - Dashboard per Posisi",
+        "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
+        "REF - Penamaan Metrik & Sumber KPI",
+        "HRIS - Otomasi Skor KPI",
+        "RUN - Menambah Metrik KPI Otomatis"
+      ],
+      "hash": "f6e966ce69c586426b8d0f88b51806441808c44007c0234a65d53745f6de4523",
+      "ukuran_kb": 11.0,
+      "ringkasan": "Menjawab: posisi dan divisi mana saja yang punya rancangan dashboard per posisi, berapa banyak metrik KPI yang benar-benar otomatis di produksi (10 dari 311 baris metrik, 87,5% masih dinilai manual), dan penghambat mana yang muncul lintas divisi sehingga satu pekerjaan membuka banyak metrik sekaligus. Memuat tabel dokumen rancangan per divisi, peringkat penghambat menurut daya ungkit (paling besar justru \"belum dipetakan sama sekali\" yang merupakan keputusan pemilik KPI, bukan pekerjaan kode), serta daftar 12 metrik salah petak yang sumbernya menjawab pertanyaan lain sehingga menghasilkan angka masuk akal tetapi salah. Juga mendaftar posisi yang dinyatakan tidak direkomendasikan dibuatkan dashboard beserta syarat yang membalikkan keputusan itu.",
+      "kata_kunci": [
+        "dashboard per posisi",
+        "indeks cakupan",
+        "coverage",
+        "KPI otomatis",
+        "salah petak",
+        "penghambat",
+        "matriks KPI",
+        "ADR 0076",
+        "Kaizen",
+        "batch record"
       ]
     },
     {
@@ -10150,6 +10414,42 @@
         "customer data",
         "vendor Semarang",
         "tool internal"
+      ]
+    },
+    {
+      "path": "Sales/Sales - Dashboard per Posisi (Beauty Hacks & Kyura).md",
+      "judul": "Sales - Dashboard per Posisi (Beauty Hacks & Kyura)",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rancangan**. Tak satu pun posisi di sini punya lembar per posisi. Yang ada [[Sales - Marketing Dashboard (Index)|Marketing Analytics]], 16 halaman per TOPIK, bukan per orang.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "Sales - Marketing Dashboard (Index)",
+        "HRIS - Matriks KPI per Departemen",
+        "Sales - ICC Account Manager Mapping",
+        "GA - Dashboard per Posisi",
+        "REF - Layout Dashboard erp-frontend",
+        "Sales - ICC Affiliate Mapping",
+        "Sales - Marketing Analytics (Audit Ketersediaan Data)",
+        "Microservices - Marketing Analytics Service",
+        "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing"
+      ],
+      "hash": "e49a31e5ffba0cc538601fda90540d144fc5ba254a74a12b5044117f09435751",
+      "ukuran_kb": 11.0,
+      "ringkasan": "Menjawab: posisi mana di divisi brand Beauty Hacks dan Kyura yang dashboard-nya bisa dirancang sekarang (ICC, Leader, Marketplace Advertiser, Affiliate, Host Live, Customer Support Kyura, Supervisor) dan mana yang tidak direkomendasikan (Meta Advertiser karena Meta Ads tak terintegrasi, Buzzer karena memakai akun personal tanpa API, Video Editor karena tak ada tracker garapan). Menjelaskan bahwa di sini penghambatnya bukan ketiadaan data atau layar (data GMV, affiliate, dan video ratusan ribu baris, plus 16 halaman Marketing Analytics sudah ada) melainkan atribusi ke orang, yang bertumpu pada pengisian icc_account_mappings. Memuat bobot dan target metrik per posisi untuk kedua brand, visual utama yang disarankan, serta jebakan seperti wajib memakai place_order_date untuk order afiliasi, cakupan skor_tim yang menuntut supervisor_id terisi, dan CSAT yang hanya punya 17 tiket ter-rating.",
+      "kata_kunci": [
+        "dashboard per posisi",
+        "Beauty Hacks",
+        "Kyura",
+        "ICC",
+        "affiliate",
+        "host live",
+        "buzzer",
+        "Meta Ads",
+        "marketing analytics",
+        "atribusi employee_id"
       ]
     },
     {
@@ -11035,6 +11335,43 @@
         "purchase order",
         "e-store",
         "Finance Big Pictures"
+      ]
+    },
+    {
+      "path": "Unknown or not listed/Unlisted - Dashboard per Posisi (Kesekretariatan).md",
+      "judul": "Unlisted - Dashboard per Posisi (Kesekretariatan)",
+      "area": "Unknown or not listed",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rancangan**. Tak satu pun posisi di divisi ini punya lembar dashboard.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "HRIS - Matriks KPI per Departemen",
+        "QA - Dashboard per Posisi",
+        "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri",
+        "ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri",
+        "Sales - Dashboard per Posisi (Beauty Hacks & Kyura)",
+        "Microservices - Calendar Service",
+        "Microservices - Task Management Service",
+        "REF - Layout Dashboard erp-frontend",
+        "Finance - Audit Internal",
+        "APP - Audit Internal"
+      ],
+      "hash": "2fbfa185a4124494d29fd5e7a7f25135eafc3f379c219f382fa28f5e182626a5",
+      "ukuran_kb": 8.6,
+      "ringkasan": "Menjawab: posisi mana saja di divisi Kesekretariatan yang layak dibuatkan dashboard dan mana yang tidak, beserta alasannya, dengan hanya 2 dari 28 metrik yang punya sumber data (QA RND dan Internal Audit) sementara lima posisi lain nol. Menjelaskan juga metrik mana yang salah petak sumbernya (Internal Audit ke data absensi, Personal Assistant ke chat CS marketplace, Inovation QA RND ke Kaizen) dan kenapa data TikTok Shop tidak boleh dipakai menambal metrik akun organik Company Branding. Memuat urutan kebutuhan backend yang membuka metrik-metrik itu, mulai dari tracker garapan desain dan video, modul Audit Internal, sampai integrasi akun Instagram dan TikTok organik perusahaan.",
+      "kata_kunci": [
+        "Kesekretariatan",
+        "dashboard per posisi",
+        "KPI",
+        "Corporate Secretary",
+        "Personal Assistant",
+        "Graphic Design",
+        "Video Editor",
+        "Company Branding",
+        "Internal Audit",
+        "QA RND"
       ]
     },
     {
