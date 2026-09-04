@@ -5535,7 +5535,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented sebagian** — §1-§3 dan §5 **SUDAH DIKERJAKAN** 2026-09-03: prefix MinIO `audit/` (bip-erp [#1699](https://github.com/bip-itteam-internal/bip-erp/pull/1699)), koleksi `audit_bukti` + empat rute ([#1700](https://github.com/bip-itteam-internal/bip-erp/pull/1700)), keduanya merged. **§4 (pembacaan otomatis) belum dimulai** dan tetap berprasyarat persetujuan Direksi. ⛔ **Belum bisa dipakai siapa pun**: layarnya belum ada, dan `MINIO_AUDIT_KEY` belum diisi di `.env` mana pun",
+      "status_teks": "**Implemented sebagian** — §1-§3 dan §5 **SUDAH DIKERJAKAN**: prefix MinIO `audit/` (bip-erp [#1699](https://github.com/bip-itteam-internal/bip-erp/pull/1699)), koleksi `audit_bukti` + empat rute ([#1700](https://github.com/bip-itteam-internal/bip-erp/pull/1700)), penjalan uji membaca bukti ([#1711](https://github.com/bip-itteam-internal/bip-erp/pull/1711)), panel buktinya di `audit-bharata`, dan `MINIO_AUDIT_KEY` terisi di dev dan prod. **§4 (pembacaan otomatis) belum dimulai** dan tetap berprasyarat persetujuan Direksi. ⛔ **Belum bisa dipakai siapa pun**, tetapi sebabnya sudah bergeser dari kode ke penyiapan: paket izin `Audit: *` belum ditempel ke satu posisi pun, dan aplikasi `audit-bharata` belum ter-deploy di mana pun (diukur prod 2026-09-04)",
       "publik": true,
       "tautan": [
         "Finance - Audit Internal",
@@ -5546,20 +5546,22 @@
         "API - File Service",
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
       ],
-      "hash": "c0bc6df97bc4bc918c37a4ae6d2854ce3b72e953383ef770a1bd0d970305db54",
-      "ukuran_kb": 16.0,
-      "ringkasan": "Menjawab: bagaimana dokumen fisik pembanding audit masuk ke sistem, di mana angkanya dicatat, dan kenapa pembacaan otomatis oleh AI ditunda jadi tahap terpisah berprasyarat persetujuan Direksi. Menjelaskan kenapa prefix penyimpanan audit sengaja tidak punya kunci baca, dan kenapa kunci baca yang sampai ke peramban membatalkan janji kerahasiaan catatan pemeriksaan. Memuat hasil pengukuran endpoint AI internal: ia relay ke penyedia luar, routernya bisa memilih penyedia sendiri, dan lampiran PDF ditelan diam-diam sehingga jawabannya berupa angka karangan.",
+      "hash": "834f5a2402426c81fde155734442921fe53b7a320bbb0dde2dab2fde0319486b",
+      "ukuran_kb": 16.3,
+      "ringkasan": "Menjawab: bagaimana auditor internal melampirkan dokumen pembanding (rekening koran, SPT masa, berita acara, bukti terima gudang) ke sebuah baris kertas kerja, kenapa angka dari dokumen itu diketik manusia dan bukan dibaca mesin, dan apa prasyarat sebelum pembacaan otomatis boleh dimulai. Menjelaskan keputusan menyimpan bukti di koleksi terpisah `audit_bukti` dengan prefix MinIO `audit/` yang sengaja tanpa kunci baca, serta alasan pembacaan otomatis dipisah jadi tahap tersendiri yang berprasyarat persetujuan tertulis Direksi karena rekening koran akan keluar dari perusahaan.",
       "kata_kunci": [
+        "bukti audit",
         "audit internal",
-        "bukti",
         "rekening koran",
-        "upload",
-        "MinIO",
+        "bank statement",
+        "lampiran",
+        "attachment",
+        "MinIO audit prefix",
+        "audit_bukti",
         "OCR",
-        "AI",
-        "PDF",
-        "vision",
-        "ekstraksi"
+        "pembacaan otomatis",
+        "vision model",
+        "persetujuan Direksi"
       ]
     },
     {
@@ -5664,20 +5666,22 @@
         "Finance - Dashboard per Posisi (FAT)",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "266bc7aad92d7fd218998d5ba3235911652b1faa1df06c922571be558f59bd17",
-      "ukuran_kb": 26.8,
-      "ringkasan": "Menjawab: apa saja 36 uji audit internal, bagaimana ketiga kelompok pembandingnya menentukan kekuatan tiap uji, uji mana yang menuntut sampling dan mana yang tak boleh acak, dan bagaimana keadaan baris kertas kerja dihitung. Menjelaskan tiga layar audit beserta pemetaan aksi ke tiga izin tulis yang berbeda, serta dua belas uji yang menunggu dokumen fisik beserta tempat menaruh buktinya yang kini sudah ada di kode. Mencatat pula lubang yang belum tertutup: catatan penarikan sampel yang membuktikan auditor tidak memilih yang mudah belum pernah benar-benar ditulis.",
+      "hash": "6b97f76b8e7df538b6828718175276ea660f2f07daaf0bdbbe0b720e93028c73",
+      "ukuran_kb": 29.2,
+      "ringkasan": "Menjawab: uji audit apa saja yang dijalankan sistem tiap bulan, mana yang otomatis dan mana yang masih menunggu dokumen fisik dari manusia, dan bagaimana sebuah baris kertas kerja berpindah dari menunggu data ke bersih. Menjelaskan pembedaan keadaan mesin, vonis manusia, dan keadaan efektif; aturan sampling beserta gap catatan penarikannya; serta dua bentuk uji berbasis unggahan yang menuntut aturan cakupan bukti berbeda. Memuat peringatan bahwa klaim bersih pada jurnal manual besar berarti dokumennya ditunjukkan, bukan jurnalnya dinilai wajar.",
       "kata_kunci": [
         "audit internal",
         "kertas kerja",
         "working paper",
-        "temuan",
+        "uji audit",
         "sampling",
+        "jurnal manual besar",
         "rekonsiliasi bank",
-        "Accurate",
-        "bukti",
-        "ukuran sampel",
-        "kelompok pembanding"
+        "menunggu data",
+        "temuan",
+        "finding",
+        "bukti sisi lawan",
+        "keadaan efektif"
       ]
     },
     {
@@ -11686,30 +11690,31 @@
       "area": "Workspace",
       "jenis": "workspace",
       "status_emoji": "⚠️",
-      "status_teks": "Fase 1 sebagian — T1.1, T1.2, T1.3 **selesai dan merged**; T1.4, T1.5, T1.6 belum. ⛔ Fiturnya **belum bisa dipakai siapa pun**: layarnya belum ada dan `MINIO_AUDIT_KEY` belum diisi di `.env` lingkungan mana pun.",
+      "status_teks": "Fase 1 hampir tuntas — T1.1 sampai T1.5 **selesai dan merged**; **T1.6 belum**. ⛔ Fiturnya **belum bisa dipakai siapa pun**, tetapi sebabnya sudah BERGESER dan itu yang penting: bukan lagi kodenya kurang, melainkan **paket izin `Audit: *` belum ditempel ke satu posisi pun** dan **aplikasi `audit-bharata` belum ter-deploy di mana pun**. Diukur prod 2026-09-04; ukur ulang sebelum dipakai.",
       "publik": false,
       "tautan": [
         "ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul",
         "Finance - Audit Internal",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
         "APP - Audit Internal",
         "Microservices - File Service",
         "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri"
       ],
-      "hash": "5ccdbfc5488a0c35a082ba5b6357f7f02f6b93a250a32a427fe7cd332b9a7662",
-      "ukuran_kb": 8.3,
-      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dikerjakan untuk membuka uji audit yang pembandingnya dokumen fisik, dalam urutan apa, mana yang sudah selesai, dan mana yang berprasyarat persetujuan Direksi. Memecah kerjanya jadi tiga fase: tempat menaruh bukti, sebelas penjalan uji yang tersisa, dan pembacaan otomatis yang sengaja ditahan. Tiap task menyebut ketergantungannya dan gerbang verifikasinya.",
+      "hash": "f7c5c009bdd2c12ac6496fa1811067088f7c3f4a95a19ff7aafab3d8c3fb2a32",
+      "ukuran_kb": 11.1,
+      "ringkasan": "Papan kerja yang menjawab: task apa saja yang harus dikerjakan supaya auditor bisa melampirkan dokumen pembanding, urutan dan ketergantungannya, dan apa yang sudah selesai versus belum. Memecah pekerjaan jadi tiga fase: tempat menaruh bukti, penjalan untuk sebelas uji yang belum punya mesinnya, dan pembacaan otomatis yang belum boleh dimulai. Mencatat dua prasyarat di luar kode yang menahan verifikasi akhir, yaitu paket izin audit yang belum ditempel ke posisi mana pun dan aplikasi audit yang belum ter-deploy.",
       "kata_kunci": [
         "audit internal",
+        "bukti sisi lawan",
+        "daftar task",
         "papan kerja",
-        "task",
         "roadmap",
-        "bukti",
-        "upload",
-        "rekonsiliasi bank",
-        "pengurai CSV",
-        "AI",
-        "fase"
+        "unggah bukti",
+        "upload evidence",
+        "paket izin audit",
+        "audit-bharata",
+        "fase implementasi"
       ]
     },
     {
