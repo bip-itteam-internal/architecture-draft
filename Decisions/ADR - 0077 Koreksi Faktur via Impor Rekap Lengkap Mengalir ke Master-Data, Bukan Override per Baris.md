@@ -2,7 +2,7 @@
 
 *Menetapkan bagaimana koreksi faktur yang finance nyatakan lewat file Excel "Rekap Lengkap" diterjemahkan oleh sistem: setiap sel yang berubah dipetakan ke **tuas yang sudah ada** (keluarkan order, pindah hari, vonis fake order, Mapping SKU, riwayat Harga Jual), dan **tidak** ada penyimpanan koreksi per baris faktur. Keputusan ini lahir karena baris faktur auto-sync dihitung ulang dari order + master setiap kirim ulang, sehingga koreksi yang tak dituangkan ke master-data atau flag order pasti tertimpa sweep berikutnya.*
 
-- **Status**: 🟡 **Diputuskan 2026-09-04, implementasi menunggu merge** — bip-erp PR [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712) (endpoint + mesin) dan erp-frontend PR [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453) (modal). Uji prod pasca-deploy (file tanpa diedit ⇒ 0 koreksi) belum dijalankan.
+- **Status**: ⚠️ **Implemented dengan catatan** — bip-erp PR [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712) + erp-frontend PR [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453) **merged 2026-09-04**. Lingkupnya lalu **dipangkas** atas keputusan pemilik fitur (bip-erp PR [#1717](https://github.com/bip-itteam-internal/bip-erp/pull/1717) + erp-frontend PR [#1455](https://github.com/bip-itteam-internal/erp-frontend/pull/1455), belum merge): mengeluarkan order dan vonis fake order dikeluarkan dari berkas ini. Uji prod pasca-deploy (file tanpa diedit ⇒ 0 koreksi) belum dijalankan.
 - **Path di repo**: `bip-erp/services/integration/internal/usecase/accurate_koreksi_import*.go`, `accurate_prefix_rekap.go` · `erp-frontend/src/features/integration/accurate/auto-sync/components/koreksi-import-modal.tsx`
 - **Tanggal**: 2026-09-04
 
@@ -26,8 +26,6 @@ Tiap sel prefix yang berbeda dari **baris faktur sebenarnya** (`KoreksiBaseline`
 
 | Sel berubah | Jenis | Tuas | Menyentuh master |
 |---|---|---|---|
-| Accurate Number kosong (seluruh baris order) | `KELUARKAN` | invoice-exclusion | tidak |
-| Accurate Number = `FO` | `FAKE_ORDER` | fake-order override + kaskade (uang dulu) | tidak |
 | Accurate Number = nomor faktur lain, toko + channel sama | `PINDAH_HARI` | invoice-date-override | tidak |
 | Code berubah | `MAPPING_SKU` | `product_sku_mappings` (listing → master, qty_per_unit = qty faktur / qty order) | **ya** |
 | Unit Price berubah | `HARGA` | riwayat harga efektif sejak hari faktur terawal + `ApplyPriceToInvoices` faktur di file | **ya** |
@@ -35,6 +33,15 @@ Tiap sel prefix yang berbeda dari **baris faktur sebenarnya** (`KoreksiBaseline`
 | Name / Amount berubah | — | diabaikan (Accurate membaca kode; Amount turunan) | tidak |
 
 Yang **ditolak** dengan alasan terang: paket multi-komponen (ubah lewat Mapping SKU), faktur `ADOPTED_MANUAL` / `EXTERNAL_EDIT` / `IMPORTED` / `VOIDED`, pengecilan nilai faktur `INVOICE_PAID`, order pra-cutover, kode yang tak ada di master, qty bukan kelipatan qty order, qty SKU master langsung (qty faktur = qty order — tak ada tuas), dan dua nilai berbeda untuk SKU yang sama dalam satu file.
+
+### 1b. Mengeluarkan order & vonis fake order SENGAJA tidak lewat berkas ini (amandemen 2026-09-04)
+
+Versi pertama memetakan **Accurate Number kosong** → keluarkan order dan **`FO`** → vonis fake order. Keduanya dicabut sebelum fitur dipakai finance, dengan dua alasan:
+
+1. **Duplikat.** `POST /accurate/orders/fake-order-override/bulk` sudah ada sejak 2026-08-22 dan menerima export rekap mentah apa adanya — cukup unggah daftar nomor pesanan, tanpa mengetik apa pun ke sel. Mengeluarkan order punya tuas satuan di dialog koreksi per order.
+2. **Sel kosong adalah keadaan paling mudah terjadi tanpa disengaja.** Kolom Accurate Number bisa kosong **sejak diunduh** bila lookup faktur harian gagal senyap di export (`transaction_export_multiple.go`, `invLookupOK`). Membacanya sebagai perintah membuat satu unduhan cacat sanggup mengeluarkan banyak penjualan sekaligus. Pagar berupa peringatan pada ≥20 order hanya menambal gejalanya, dan pagar itu ikut dibuang.
+
+Sel kosong dan `FO` kini **DITOLAK sambil menunjuk tuas yang benar**, bukan diabaikan diam-diam. Tersisa tiga jenis koreksi: `PINDAH_HARI`, `MAPPING_SKU` (+`QTY_PER_UNIT`), `HARGA`.
 
 ### 2. Kelas master-data butuh persetujuan eksplisit, harga bergerbang role
 
@@ -60,6 +67,7 @@ Commit menulis semua flag & master lebih dulu (mapping → riwayat harga → fla
 - **Tidak ada tuas per baris**: qty SKU master langsung dan hari tanpa faktur tetap lewat dialog koreksi per order; perbaikan `accurate_products.product_code` (Config Accurate) dan koreksi Penerimaan lewat file di luar cakupan.
 - Harga hanya dikirim ulang ke faktur **di dalam file** — faktur lain yang memuat SKU sama tidak disentuh otomatis (sama dengan tuas Harga Jual → Dampak Harga); ini disengaja agar satu unggahan tidak memicu kirim ulang massal, tetapi berarti finance harus mengunggah rentang yang lengkap.
 - Commit per koreksi tanpa transaksi (pola import FO): kegagalan di tengah tidak membatalkan yang sudah benar; nasib tiap baris/dokumen diarsipkan.
+- **Koreksi GUDANG belum tercakup, dan itu kebutuhan yang sebenarnya** (dinyatakan pemilik fitur 2026-09-04). Terukur di kode: gudang selalu dari `accurate_shops.warehouse_name` sehingga satu faktur hanya bisa punya satu gudang, padahal satu toko nyatanya memakai gudang berbeda; tak ada `warehouse_override` di mana pun; dan `hashInvoiceLines` (itemNo|unitPrice|qty) **tidak memuat gudang**, sehingga membetulkan config toko tak pernah memicu perbaikan faktur lama — sweep dan Retry sama-sama menyimpulkan "isi tak berubah". Akibatnya hari ini tak ada satu pun jalan di ERP untuk membetulkan gudang faktur yang sudah terbit. Dirancang terpisah.
 
 ## Dokumen Terkait
 
