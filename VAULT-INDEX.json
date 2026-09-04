@@ -415,8 +415,8 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "572587011f65d5fc8f72b45395c3f9a390994223900ab6b9888e3b3a8157fd43",
-      "ukuran_kb": 85.4,
+      "hash": "1ce0258642cdf84f21630a7288bff66c55b830f3af60459dfa90eca596fd0834",
+      "ukuran_kb": 85.7,
       "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service di gateway `/api/integration/*` — daftar/detail order terpadu lintas marketplace, ringkasan & perbandingan performa, aging piutang, feed retur & packet tracking, OAuth/report TikTok Shop-Business-Ads & Shopee, jembatan Accurate (faktur harian auto-sync termasuk detail, export, retry, tiga tuas koreksi per order, import Excel FO massal, dan impor koreksi Rekap Lengkap `daily-invoices/import-koreksi` + riwayatnya), dashboard FAT, profit/insentif, stok Accurate lokal, ICC account mapping, ulasan marketplace, status sinkron toko, dan kepemilikan toko per departemen. Termasuk tombol Segarkan salinan (aset tetap, realisasi OPEX, PPN masukan, biaya perlengkapan) dan worker/jobs.",
       "kata_kunci": [
         "integration service",
@@ -434,7 +434,7 @@
         "daily-invoices",
         "dry_run",
         "expected_hash",
-        "stok Accurate"
+        "fake-order-override"
       ]
     },
     {
@@ -1419,9 +1419,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "e82dc119b2cac30d376691202bfd28e5d26f5f5a9ec7169b9000fc6a9639d35e",
-      "ukuran_kb": 392.5,
-      "ringkasan": "Menjawab: layar apa saja yang ada di aplikasi web ERP (Next.js) per modul, bagaimana tiap layar berperilaku, dan keputusan UI apa yang sudah diambil beserta alasannya. Dipakai untuk mengetahui apakah sebuah fitur sudah punya layar, di menu mana ia tinggal, komponen shared apa yang dipakainya, dan jebakan apa yang sudah terbukti menggigit di sana — termasuk halaman Auto-Sync Accurate (empat tab, kotak cari yang tahu tempat, dua unduhan tab Faktur: Export Excel vs Download Rekap Lengkap, modal Import Koreksi tiga langkah, dan seksi Import Koreksi di halaman Panduan Accurate). Memuat catatan rinci untuk HRIS, payroll (impor run dari spreadsheet, penjaga periode ganda, hapus run impor draft), recruitment, finance, procurement, marketing analytics, dan portal.",
+      "hash": "5c7d81c5d9e8420acfcf0103325b11ceb811038a0f62d54f3ae48d42c8ad1501",
+      "ukuran_kb": 392.9,
+      "ringkasan": "Menjawab: layar apa saja yang ada di aplikasi web ERP (Next.js) per modul, bagaimana tiap layar berperilaku, dan keputusan UI apa yang sudah diambil beserta alasannya. Dipakai untuk mengetahui apakah sebuah fitur sudah punya layar, di menu mana ia tinggal, komponen shared apa yang dipakainya, dan jebakan apa yang sudah terbukti menggigit di sana — termasuk halaman Auto-Sync Accurate (empat tab, kotak cari yang tahu tempat, dua unduhan tab Faktur, modal Import Koreksi tiga langkah yang sengaja TIDAK bisa mengeluarkan pesanan atau memvonis fake order, dan seksi Import Koreksi di halaman Panduan Accurate). Memuat catatan rinci untuk HRIS, payroll, recruitment, finance, procurement, marketing analytics, dan portal.",
       "kata_kunci": [
         "web ERP",
         "erp-frontend",
@@ -1433,8 +1433,8 @@
         "Import Koreksi",
         "Panduan Accurate",
         "Rekap Lengkap",
+        "Order FO",
         "impor payroll",
-        "periode ganda",
         "i18n",
         "komponen shared"
       ]
@@ -2371,9 +2371,9 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "b5c6b272c0b132b8b91c968262056b9786fa23b739de2c517cb736f6e1e4737f",
-      "ukuran_kb": 327.2,
-      "ringkasan": "Menjawab: bagaimana integration-service menghubungkan ERP ke marketplace (TikTok Shop/Business/Ads, Shopee, Lazada) dan menjembatani akuntansi ke Accurate Online — ingest webhook & order-sync, normalisasi model transaksi, push Sales Invoice/Return, tuas koreksi faktur (exclusion, date override, FO, import Excel FO massal, impor koreksi Rekap Lengkap yang menerjemahkan sel Excel ke Mapping SKU / riwayat Harga Jual / flag order dengan satu kirim ulang per faktur), prefix Rekap Lengkap yang kini = baris faktur, automasi auto-ship sadar-holiday, kredensial OAuth per marketplace, serta job/cron terjadwal. Termasuk salinan lokal stok Accurate (`accurate_stocks`), penambalan kategori item, dan task harian nilai persediaan perlengkapan.",
+      "hash": "68b5b230a7d3b79448283ae6ae2abee247021e774ee53f5aef2f55f398471ff8",
+      "ukuran_kb": 327.5,
+      "ringkasan": "Menjawab: bagaimana integration-service menghubungkan ERP ke marketplace (TikTok Shop/Business/Ads, Shopee, Lazada) dan menjembatani akuntansi ke Accurate Online — ingest webhook & order-sync, normalisasi model transaksi, push Sales Invoice/Return, tuas koreksi faktur (exclusion, date override, FO, import Excel FO massal, impor koreksi Rekap Lengkap untuk pindah hari / mapping SKU / harga jual), prefix Rekap Lengkap yang kini = baris faktur, automasi auto-ship sadar-holiday, kredensial OAuth per marketplace, serta job/cron terjadwal. Termasuk salinan lokal stok Accurate (`accurate_stocks`), penambalan kategori item, dan task harian nilai persediaan perlengkapan.",
       "kata_kunci": [
         "integration service",
         "marketplace",
@@ -2387,9 +2387,9 @@
         "PrefixFakturPerOrder",
         "mapping SKU",
         "harga jual",
+        "pindah hari",
         "accurate_stocks",
-        "cron",
-        "OAuth"
+        "cron"
       ]
     },
     {
@@ -5622,8 +5622,8 @@
       "judul": "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diputuskan 2026-09-04, implementasi menunggu merge** — bip-erp PR [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712) (endpoint + mesin) dan erp-frontend PR [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453) (modal). Uji prod pasca-deploy (file tanpa diedit ⇒ 0 koreksi) belum dijalankan.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented dengan catatan** — bip-erp PR [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712) + erp-frontend PR [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453) **merged 2026-09-04**. Lingkupnya lalu **dipangkas** atas keputusan pemilik fitur (bip-erp PR [#1717](https://github.com/bip-itteam-internal/bip-erp/pull/1717) + erp-frontend PR [#1455](https://github.com/bip-itteam-internal/erp-frontend/pull/1455), belum merge): mengeluarkan order dan vonis fake order dikeluarkan dari berkas ini. Uji prod pasca-deploy (file tanpa diedit ⇒ 0 koreksi) belum dijalankan.",
       "publik": true,
       "tautan": [
         "Finance - Incentive",
@@ -5636,9 +5636,9 @@
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "External - Accurate"
       ],
-      "hash": "48933404911d99cbd15dfa6eeed00d4b16d4e7dfa2e3211ff52415abab1a42e1",
-      "ukuran_kb": 8.4,
-      "ringkasan": "Menjawab: kenapa koreksi faktur yang finance tulis di Excel Rekap Lengkap diterjemahkan ke tuas yang sudah ada (keluarkan order, pindah hari, fake order, Mapping SKU, riwayat Harga Jual) dan bukan disimpan sebagai override per baris faktur; sel mana yang boleh diedit dan apa yang ditolak; kenapa kelas master-data butuh centang eksplisit dan harga bergerbang profit editor; serta kenapa prefix Rekap Lengkap harus sama dengan baris faktur dan tiap faktur hanya dikirim ulang sekali per batch.",
+      "hash": "4eef9231516924f0e71b5bf04c5f4b7a2728e89649c14cb56159735b2c4d4889",
+      "ukuran_kb": 10.3,
+      "ringkasan": "Menjawab: kenapa koreksi faktur yang finance tulis di Excel Rekap Lengkap diterjemahkan ke tuas yang sudah ada (pindah hari, Mapping SKU, riwayat Harga Jual) dan bukan disimpan sebagai override per baris faktur; kenapa mengeluarkan pesanan dan vonis fake order sengaja DICABUT dari berkas ini karena duplikat dan karena sel kosong terlalu mudah terjadi tanpa disengaja; kenapa kelas master-data butuh centang eksplisit dan harga bergerbang profit editor; serta kenapa koreksi gudang belum tercakup padahal itu kebutuhan sebenarnya.",
       "kata_kunci": [
         "ADR",
         "import koreksi",
@@ -5647,12 +5647,12 @@
         "override per baris",
         "mapping SKU",
         "harga jual",
-        "profit editor",
-        "auto-sync",
-        "Accurate",
-        "invoice-exclusion",
-        "date override",
-        "fake order"
+        "pindah hari",
+        "fake order",
+        "gudang",
+        "warehouse",
+        "hashInvoiceLines",
+        "auto-sync"
       ]
     },
     {
@@ -10087,7 +10087,7 @@
       "area": "Runbooks",
       "jenis": "runbook",
       "status_emoji": "🟡",
-      "status_teks": "Draft — mesinnya menunggu merge (bip-erp PR [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712), erp-frontend PR [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453)); prosedur ini belum pernah dijalankan di produksi. Jadikan ✅ setelah uji pasca-deploy di bawah lulus.",
+      "status_teks": "Draft — mesinnya sudah merge (bip-erp PR [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712), erp-frontend PR [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453)), tapi **pemangkasan lingkupnya belum** (bip-erp [#1717](https://github.com/bip-itteam-internal/bip-erp/pull/1717), erp-frontend [#1455](https://github.com/bip-itteam-internal/erp-frontend/pull/1455)). Prosedur ini belum pernah dijalankan di produksi. Jadikan ✅ setelah uji pasca-deploy di bawah lulus.",
       "publik": true,
       "tautan": [
         "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris",
@@ -10097,9 +10097,9 @@
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur",
         "External - Accurate"
       ],
-      "hash": "379f4f9e0e938294cd73fa5c3ec5a9991b11716d1dbafac94d469d0b89f7bbe5",
-      "ukuran_kb": 7.3,
-      "ringkasan": "Menjawab: bagaimana finance memperbaiki isi faktur Auto-Sync secara massal lewat file Excel Download Rekap Lengkap — kolom mana yang boleh disunting dan apa arti tiap suntingan, cara membaca pratinjau, kapan harus mencentang perubahan Master Data (Mapping SKU / Harga Jual), cara memverifikasi hasilnya (unggah ulang file tanpa suntingan harus 0 koreksi), serta apa yang dilakukan saat muncul pesan file berubah sejak preview, peringatan pengeluaran massal, channel tak cocok, batas ukuran, baris ditolak, atau baris gagal. Menjelaskan juga bahwa impor ini tidak punya tombol batal dan bagaimana memundurkannya.",
+      "hash": "e9059122036d65f71dee895a63c3b6ddad43b9f5e0ade136c664e40d6df862a0",
+      "ukuran_kb": 8.3,
+      "ringkasan": "Menjawab: bagaimana finance memperbaiki isi faktur Auto-Sync secara massal lewat file Excel Download Rekap Lengkap — kolom mana yang boleh disunting dan apa arti tiap suntingan, apa yang justru tidak dilakukan lewat berkas ini (mengeluarkan pesanan dan vonis fake order), cara membaca pratinjau, kapan harus mencentang perubahan Master Data, cara memverifikasi hasilnya (unggah ulang tanpa suntingan harus 0 koreksi), serta apa yang dilakukan saat muncul pesan file berubah sejak preview, channel tak cocok, batas ukuran, baris ditolak, atau baris gagal. Menjelaskan juga bahwa impor ini tidak punya tombol batal dan bahwa gudang belum bisa dikoreksi dari layar mana pun.",
       "kata_kunci": [
         "runbook",
         "import koreksi",
@@ -10110,10 +10110,10 @@
         "Accurate",
         "mapping SKU",
         "harga jual",
-        "fake order",
+        "pindah hari",
         "prosedur",
         "troubleshooting",
-        "409 file berubah"
+        "gudang"
       ]
     },
     {
