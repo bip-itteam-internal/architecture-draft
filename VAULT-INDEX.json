@@ -6315,8 +6315,8 @@
         "CORE - OCR Document Service",
         "Form Permintaan Barang GA.pdf"
       ],
-      "hash": "2c883409d6d370b22806da36ff86c3ef8738976fc06c24d8940851274b366824",
-      "ukuran_kb": 16.1,
+      "hash": "e218699c201d51d720aca6ebd9a7b3796ffb46d7ba427c300cdfeb3e1399715e",
+      "ukuran_kb": 16.6,
       "ringkasan": "Menjawab: bagaimana General Affairs mencatat dan mengontrol aset/barang perusahaan — penomoran tag aset, serah-terima & persetujuan SPV, lokasi & estimasi penyusutan, riwayat perbaikan + bukti nota, soft-delete, rekonsiliasi aset & perlengkapan dengan Accurate untuk KPI, tab Cocokkan (search + filter status di header, kecualikan perlengkapan), dan explorer perlengkapan lingkup GUDANG GA (Gudang Utama) dengan Terpasang X/N + Total Biaya yang cocok report Accurate per-gudang. Menjelaskan juga apa yang sengaja tak ditampilkan (tanggal beli, nilai buku, barang gudang lain) beserta alasannya.",
       "kata_kunci": [
         "inventory",
