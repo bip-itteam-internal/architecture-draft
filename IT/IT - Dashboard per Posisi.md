@@ -10,7 +10,11 @@
 
 `/it` merender **Ringkasan Divisi**, bukan lembar per posisi: `KartuInfrastruktur`, `KartuHelpdesk`, `KartuKpiTimIt`, `KartuIndeksLayanan`, lalu petak tautan modul.
 
-Ketiadaan tab posisi **bukan kelalaian**, dan alasannya sudah tertulis di kodenya sendiri (`isi-ringkasan-divisi-it.tsx`): peta posisi IT belum ada di kode dan `position_key` belum mengalir ke frontend, sehingga menyusun daftar posisi di sana berarti mengarangnya. Prasyarat [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] itu belum gugur, dan **dokumen ini tidak menggugurkannya**. Rancangan di bawah baru bisa dibangun setelah `position_key` tersedia di frontend.
+Ketiadaan tab posisi **bukan kelalaian**, dan alasannya tertulis di kodenya sendiri (`isi-ringkasan-divisi-it.tsx`): peta posisi IT belum ada di kode dan `position_key` belum mengalir ke frontend, sehingga menyusun daftar posisi di sana berarti mengarangnya.
+
+⚠️ **Ralat 2026-09-04**: dokumen ini semula menyimpulkan dari kalimat itu bahwa rancangan di bawah "baru bisa dibangun setelah `position_key` tersedia di frontend". **Itu terlalu keras.** Dari dua alasan di kode, yang pertama sudah gugur (peta posisi IT kini ada, diturunkan dari [[HRIS - Matriks KPI per Departemen]]), dan yang kedua bukan gerbang: **17 lembar HRGA dan FAT sudah berjalan hari ini tanpa `position_key`**, dengan mencocokkan nama posisi dari `useAuth().position`. `position-view.ts` menyebutnya eksplisit sebagai satu-satunya cara selama utang [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] belum lunas.
+
+Jadi rancangan di bawah **boleh dibangun sekarang** dengan cara yang sama. Konsekuensi yang diterima sadar: rename nama posisi di master data memutus pencocokannya secara senyap, jadi selama utang itu hidup perubahan nama posisi wajib diperlakukan sebagai perubahan yang menyentuh frontend.
 
 ## Yang menentukan lingkup: penghuni, bukan jumlah template
 
@@ -96,13 +100,14 @@ Divisi ini punya **7 template berisi 30 metrik**, tetapi **4 di antaranya bersta
 
 ## Kebutuhan backend, terurut
 
-1. **`position_key` mengalir ke frontend.** Prasyarat mutlak: tanpa ini tak ada dashboard per posisi yang bisa dibangun di divisi mana pun, bukan cuma IT. Menyentuh [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].
-2. **Putuskan bentuk metrik `Network` IT Support.** Bukan pekerjaan kode melainkan keputusan: uptime terhadap 90 tidak membedakan bulan baik dari bulan buruk. Sampai diputuskan, kartunya tak layak dominan.
-3. **Satukan atau pisahkan CSAT Leader.** Label menjanjikan Fullstack dan Support; yang terpasang development saja. Butuh sub-metrik baru di kode.
-4. **Rute pemakai modul kewajiban Calendar Service.** Mesinnya sudah jalan; yang kurang cara orang menjadwalkan dan menandai selesai, plus dua keputusan yang disebut di bagian Fullstack.
-5. **Master anggaran departemen IT + parameter departemen di `/accounting/anggaran/varians`.** Keduanya diperlukan bersama; salah satu saja tidak cukup.
+1. **Putuskan bentuk metrik `Network` IT Support.** Bukan pekerjaan kode melainkan keputusan: uptime terhadap 90 tidak membedakan bulan baik dari bulan buruk. Sampai diputuskan, kartunya tak layak dominan.
+2. **Satukan atau pisahkan CSAT Leader.** Label menjanjikan Fullstack dan Support; yang terpasang development saja. Butuh sub-metrik baru di kode.
+3. **Rute pemakai modul kewajiban Calendar Service.** Mesinnya sudah jalan; yang kurang cara orang menjadwalkan dan menandai selesai, plus dua keputusan yang disebut di bagian Fullstack.
+4. **Master anggaran departemen IT + parameter departemen di `/accounting/anggaran/varians`.** Keduanya diperlukan bersama; salah satu saja tidak cukup.
 
-⚠️ **Yang TIDAK masuk daftar ini**: menaikkan cakupan CSAT. Ia bukan pekerjaan backend melainkan kebiasaan meminta pemohon menilai tiketnya. Menaruhnya di daftar teknis akan membuatnya menunggu rilis yang tak pernah relevan.
+⚠️ **Yang TIDAK masuk daftar ini**: `position_key` mengalir ke frontend. Ia utang nyata ([[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]) tetapi **bukan penghambat** lembar-lembar di atas, sesuai ralat di § Keadaan sekarang. Menaruhnya di sini akan membuat pekerjaan yang bisa jalan hari ini tampak menunggu.
+
+⚠️ **Juga tidak masuk daftar ini**: menaikkan cakupan CSAT. Ia bukan pekerjaan backend melainkan kebiasaan meminta pemohon menilai tiketnya. Menaruhnya di daftar teknis akan membuatnya menunggu rilis yang tak pernah relevan.
 
 ## Dokumen Terkait
 
