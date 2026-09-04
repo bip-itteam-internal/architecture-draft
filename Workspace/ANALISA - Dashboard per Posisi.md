@@ -25,9 +25,11 @@ Berjalan paralel dengan gelombang 2. Tidak menahan siapa pun, tetapi nomor 1.1 *
       - kelengkapan laporan audit (Internal Audit) menunjuk **data absensi**
       **Selesai bila**: tiap metrik punya sumber yang menjawab pertanyaannya, atau dinyatakan manual secara sadar.
 
-- [ ] **1.2 Verifikasi isi `icc_account_mappings`** · menggerbang 11 posisi Sales · *IT + ICC*
-      Tanpa atribusi `employee_id` ke akun, seluruh rancangan Sales menampilkan angka orang lain **tanpa satu pun galat**.
-      **Selesai bila**: cakupan pemetaan terukur (berapa akun aktif punya `employee_id`), bukan sekadar tabelnya ada.
+- [x] **1.2 Verifikasi isi `icc_account_mappings`** — SELESAI 2026-09-04, **dan ternyata BUKAN gerbang.**
+      Diukur ke `integration_db` prod: 61 dokumen, 55 aktif, **55 dari 55 punya `employee_id`**, 32 orang unik, tim Beauty Hacks dan Kyura. Dari 44 baris ber-`tiktok_shop_id`, tak satu toko pun dibagi dua orang.
+      ⚠️ **Atribusi video ternyata tidak lewat pemetaan ini sama sekali**: `ICCVideoMetric` beratribut `creator_username` lewat `tt_business_campaign_items`, dan metriknya **sudah dihitung backend** serta sudah dikonsumsi `services/insentive`.
+      **Menggantikan item ini**: periksa cakupan `finance/incentive` sebelum merancang layar ICC apa pun. Rinciannya di [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]] § Ralat 2026-09-04.
+      ⛔ ROAS per-video **tidak dapat diandalkan** (alokasi biaya bocor ke bucket campaign `-1`); jangan digambar sebagai angka penilaian.
 
 - [ ] **1.3 Petakan 47 metrik "belum dipetakan"** · 28 posisi, 8 divisi · *pemilik KPI*
       Bucket terbesar di seluruh analisis. Dahulukan divisi yang masuk gelombang 2.

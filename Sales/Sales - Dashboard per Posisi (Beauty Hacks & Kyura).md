@@ -27,9 +27,17 @@ Di HR, GA, dan Manufaktur, penghambatnya **ketiadaan data**. Di sini datanya jus
 
 Layarnya pun sudah ada, 16 halaman Marketing Analytics lengkap dengan saringan, kartu vonis, dan blok keputusan.
 
-⛔ **Yang kurang bukan data dan bukan layar, melainkan ATRIBUSI KE ORANG.** Seluruh sumber di atas beratribut akun, toko, kampanye, atau video, bukan `employee_id`. Jembatannya `icc_account_mappings` ([[Sales - ICC Account Manager Mapping]]), dan sejauh mana ia terisi menentukan apakah dashboard per posisi di divisi ini mungkin sama sekali.
+⚠️ **RALAT 2026-09-04.** Dokumen ini semula menyatakan atribusi ke orang adalah gerbang tunggal divisi ini, dan bahwa jembatannya `icc_account_mappings`. **Keduanya tidak akurat**, dan koreksinya mengubah rekomendasi di bawah. Diukur langsung ke `integration_db` produksi hari itu:
 
-**Konsekuensi rancangan**: divisi ini adalah satu-satunya tempat di mana dashboard per posisi bisa lahir dari **memilah ulang layar yang sudah ada**, bukan dari membangun sumber baru. Itu membuatnya kandidat termurah sekaligus paling menuntut kehati-hatian, karena angka yang salah atribusi tetap terlihat mulus.
+**a. `icc_account_mappings` TERISI dan sehat.** 61 dokumen, 55 aktif, dan **seluruh 55 baris aktif punya `employee_id`** (100%), mencakup **32 orang unik** di tim Beauty Hacks dan Kyura. Dari 44 baris ber-`tiktok_shop_id`, **tak satu toko pun dibagi dua orang** (maksimum satu orang per toko), jadi atribusi lewat toko memang membedakan orang. Yang tipis justru kanal lain: hanya 2 baris punya `tiktok_advertiser_id` dan 8 punya `shopee_shop_id`.
+
+**b. Atribusi VIDEO tidak lewat pemetaan itu sama sekali.** `ICCVideoMetric` (`services/integration/internal/domain/entity/icc_video_metric.go`) beratribut **`creator_username`**, dijoin lewat `tt_business_campaign_items` dan tanggal tayangnya dari snapshot `tt_shop_video_performances`. Jadi metrik per-video ICC punya jalur atribusinya sendiri, dan `icc_account_mappings` bukan prasyaratnya.
+
+**c. Metrik per-video ICC SUDAH dihitung backend**, dan sudah dikonsumsi `services/insentive` lewat `EvaluateICCVideoIncentive` serta `IsICCVideoEligible`.
+
+⛔ **Peringatan yang wajib dibaca sebelum merancang layar apa pun di atasnya**, tertulis di komentar entity-nya: **ROAS per-video TIDAK DAPAT DIANDALKAN**, karena alokasi biayanya bocor ke bucket campaign `-1`. Itu keputusan produk yang diterima sadar, bukan cacat yang belum ketahuan. Menggambar ROAS per video sebagai angka penilaian akan memberi kekeliruan itu tampilan resmi.
+
+**Konsekuensi rancangan yang berubah**: karena metriknya sudah ada dan sudah dipakai modul insentif, langkah berikutnya untuk divisi ini **bukan membangun dashboard melainkan memeriksa dulu apa yang sudah ditampilkan `finance/incentive`** ([[Finance - Incentive]]). Pola "yang mau dibangun ternyata sudah ada di modul lain" sudah berulang tiga kali dalam analisis keluarga dokumen ini, dan divisi ini kandidat berikutnya yang paling mungkin mengulanginya.
 
 ## Posisi yang bisa dirancang sekarang
 
@@ -50,7 +58,7 @@ Sumber ketiganya sama: `tt_shop_video_performances`, yang punya `published_at` d
 - **Visual utama**: cacah video per bulan terhadap target 125, dengan tiga pita standar (belum memenuhi, standar dasar, standar tinggi) ditumpuk. Satu bagan menjawab ketiga metriknya sekaligus, dan ketiganya memang membaca deret yang sama.
 - Daftar video bulan berjalan beserta GMV masing-masing, diurutkan menurun.
 
-⚠️ **Bergantung penuh pada `icc_account_mappings`.** Tanpa pemetaan `employee_id` ke akun TikTok, halaman ini menampilkan video orang lain tanpa satu pun galat.
+⚠️ **Atribusinya lewat `creator_username`, bukan `icc_account_mappings`** (lihat ralat di atas). Jalur itu sudah ada dan sudah dipakai modul insentif, jadi posisi ini tidak terhalang pemetaan. Yang perlu diperiksa lebih dulu justru apakah layarnya sudah ada di `finance/incentive`.
 
 ### Leader
 
@@ -131,7 +139,7 @@ Ia tetap manual sampai maknanya diputuskan ulang, dan **tidak boleh digambar di 
 
 ## Kebutuhan backend, terurut
 
-1. **Isi dan verifikasi `icc_account_mappings`.** Prasyarat mutlak untuk seluruh divisi ini: tanpa atribusi `employee_id` ke akun, tak satu pun rancangan di atas bisa dibangun, dan yang lebih buruk, ia akan menampilkan angka orang lain tanpa galat.
+1. ~~**Isi dan verifikasi `icc_account_mappings`.**~~ **SELESAI 2026-09-04, dan ternyata bukan prasyarat.** Pemetaannya sehat (55 dari 55 baris aktif terisi, 32 orang, satu toko satu orang), dan atribusi video memang tidak lewat situ. Yang menggantikannya sebagai langkah pertama: **periksa cakupan `finance/incentive`** sebelum merancang layar ICC apa pun, karena metriknya sudah dihitung dan sudah dikonsumsi modul insentif.
 2. **Tetapkan definisi "affiliator baru bergabung".** Keputusan pemilik KPI, bukan kode. Mengunci bobot 0,3 sampai 0,4 di dua posisi.
 3. **Perbaiki pemetaan ROI Host Live Beauty Hacks** yang menunjuk tracker pajak/BPOM.
 4. **Bersihkan template `Buzzer` Beauty Hacks** yang berisi metrik `contoh`.

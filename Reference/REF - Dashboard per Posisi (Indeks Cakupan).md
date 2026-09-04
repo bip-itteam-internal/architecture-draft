@@ -141,7 +141,7 @@ Diurutkan menurut porsi bobot yang sudah punya sumber.
 | ICC | Beauty Hacks & Kyura | 3 dari 3, menunggu atribusi | [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]] |
 | Personalia | Human Resource | 3 dari 5 | [[HRIS - Dashboard per Posisi]] |
 
-⚠️ Kesiapan Sales **seluruhnya bergantung `icc_account_mappings`**. Datanya paling tebal di perusahaan tetapi tidak beratribut `employee_id`; tanpa jembatan itu layarnya menampilkan angka orang lain tanpa satu pun galat.
+⚠️ **Ralat 2026-09-04**: baris ini semula menyatakan kesiapan Sales seluruhnya bergantung `icc_account_mappings`. **Tidak benar.** Pemetaan itu diukur ke prod dan sehat (55 dari 55 baris aktif terisi, 32 orang, satu toko satu orang), dan atribusi video ternyata lewat `creator_username`, bukan lewat pemetaan itu. Metrik per-video ICC bahkan **sudah dihitung backend** dan sudah dikonsumsi modul insentif. Yang menggantikannya sebagai langkah pertama Sales: periksa cakupan [[Finance - Incentive]] lebih dulu. Rinciannya di [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]] § Ralat 2026-09-04.
 
 ## Batas dokumen ini
 

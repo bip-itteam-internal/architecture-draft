@@ -9578,24 +9578,25 @@
         "Unlisted - Dashboard per Posisi (Kesekretariatan)",
         "QA - Dashboard per Posisi",
         "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
+        "Finance - Incentive",
         "REF - Penamaan Metrik & Sumber KPI",
         "HRIS - Otomasi Skor KPI",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "94e6a0fee4cdaf29822f570ff7e34b0d1c9e1063ae2738874ef1a96e96e95f4e",
-      "ukuran_kb": 12.3,
-      "ringkasan": "Menjawab: ada berapa divisi, posisi unik, template KPI, dan baris metrik di seluruh perusahaan, posisi mana yang sudah punya lembar dashboard, dan berapa metrik yang benar-benar otomatis versus manual. Menjawab juga penghambat mana yang muncul lintas divisi sehingga satu pekerjaan membuka banyak metrik sekaligus (metrik belum dipetakan, Batch Record kosong, modul checklist, master anggaran, integrasi Meta Ads) dan mana yang sengaja tidak dikerjakan seperti Kaizen. Memuat daftar metrik salah petak, yaitu metrik yang punya sumber tetapi sumbernya menjawab pertanyaan lain, plus daftar posisi yang dinyatakan tidak direkomendasikan dibuatkan dashboard beserta syarat yang membalikkannya.",
+      "hash": "a81fceac0d683a21cc730f1c8d28be52f7610efd99eee3e79dedf746d98306f9",
+      "ukuran_kb": 12.7,
+      "ringkasan": "Menjawab: posisi apa saja yang ada di tiap divisi, berapa metrik KPI yang benar-benar sudah otomatis di produksi versus yang masih dinilai manual, dan dokumen rancangan dashboard mana yang mengurus divisi tertentu. Menjawab juga penghambat mana yang mengunci paling banyak metrik lintas divisi (dan mana yang sebenarnya bukan pekerjaan kode melainkan keputusan pemilik KPI atau pengisian data), metrik mana yang salah petak sehingga sumbernya menjawab pertanyaan lain, serta posisi mana yang sengaja dinyatakan tidak direkomendasikan dibuatkan dashboard beserta syarat yang membalikkannya.",
       "kata_kunci": [
-        "indeks cakupan",
         "dashboard per posisi",
-        "KPI",
-        "salah petak",
-        "coverage",
+        "position dashboard",
+        "indeks cakupan",
+        "cakupan KPI",
+        "KPI otomatis",
+        "salah petak metrik",
         "penghambat",
-        "metrik otomatis",
-        "Kaizen",
-        "template KPI",
-        "posisi"
+        "blocker",
+        "matriks KPI per departemen",
+        "ADR 0076"
       ]
     },
     {
@@ -10425,28 +10426,29 @@
         "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
         "Sales - Marketing Dashboard (Index)",
         "HRIS - Matriks KPI per Departemen",
-        "Sales - ICC Account Manager Mapping",
+        "Finance - Incentive",
         "GA - Dashboard per Posisi",
         "REF - Layout Dashboard erp-frontend",
+        "Sales - ICC Account Manager Mapping",
         "Sales - ICC Affiliate Mapping",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)",
         "Microservices - Marketing Analytics Service",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing"
       ],
-      "hash": "e49a31e5ffba0cc538601fda90540d144fc5ba254a74a12b5044117f09435751",
-      "ukuran_kb": 11.0,
-      "ringkasan": "Menjawab: posisi mana di divisi brand Beauty Hacks dan Kyura yang dashboard-nya bisa dirancang sekarang (ICC, Leader, Marketplace Advertiser, Affiliate, Host Live, Customer Support Kyura, Supervisor) dan mana yang tidak direkomendasikan (Meta Advertiser karena Meta Ads tak terintegrasi, Buzzer karena memakai akun personal tanpa API, Video Editor karena tak ada tracker garapan). Menjelaskan bahwa di sini penghambatnya bukan ketiadaan data atau layar (data GMV, affiliate, dan video ratusan ribu baris, plus 16 halaman Marketing Analytics sudah ada) melainkan atribusi ke orang, yang bertumpu pada pengisian icc_account_mappings. Memuat bobot dan target metrik per posisi untuk kedua brand, visual utama yang disarankan, serta jebakan seperti wajib memakai place_order_date untuk order afiliasi, cakupan skor_tim yang menuntut supervisor_id terisi, dan CSAT yang hanya punya 17 tiket ter-rating.",
+      "hash": "64aa5406570facc203c22374dffc1823cc474035784ad17b8fffa38ff8f3148e",
+      "ukuran_kb": 12.7,
+      "ringkasan": "Menjawab: posisi apa saja di divisi brand Beauty Hacks dan Kyura, metrik dan bobot KPI tiap posisi, serta posisi mana yang datanya sudah cukup untuk dibuatkan dashboard sekarang (ICC, Leader, Marketplace Advertiser, Affiliate, Host Live, Customer Support, Supervisor) dan mana yang tidak direkomendasikan. Menjelaskan sumber data marketing yang tersedia (GMV MAX, affiliate orders, video performance, review marketplace), bagaimana atribusi video ICC sebenarnya bekerja lewat creator_username dan bukan icc_account_mappings, serta peringatan bahwa ROAS per-video tidak dapat diandalkan dan tanggal order afiliasi wajib memakai place_order_date. Berguna untuk memutuskan apa yang perlu dibangun versus apa yang sudah dilayani modul insentif dan Marketing Analytics.",
       "kata_kunci": [
-        "dashboard per posisi",
         "Beauty Hacks",
         "Kyura",
+        "dashboard per posisi",
         "ICC",
+        "internal content creator",
         "affiliate",
         "host live",
-        "buzzer",
-        "Meta Ads",
-        "marketing analytics",
-        "atribusi employee_id"
+        "marketplace advertiser",
+        "ROAS",
+        "marketing analytics"
       ]
     },
     {
@@ -11722,6 +11724,7 @@
       "tautan": [
         "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
         "REF - Dashboard per Posisi (Indeks Cakupan)",
+        "Sales - Dashboard per Posisi (Beauty Hacks & Kyura)",
         "RUN - Menambah Metrik KPI Otomatis",
         "IT - Dashboard per Posisi",
         "Manufacture - Dashboard per Posisi",
@@ -11733,20 +11736,20 @@
         "REF - Layout Dashboard erp-frontend",
         "HRIS - Matriks KPI per Departemen"
       ],
-      "hash": "b8cc44e66de022c7576b17f484e27975b2e468a88c036800169af41d924793f6",
-      "ukuran_kb": 8.2,
-      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dilakukan untuk mewujudkan dashboard per posisi, dalam urutan apa, dan siapa yang mengerjakannya (pemilik KPI, tim produksi, finance, atau developer). Diurutkan sebagai lima gelombang berdasarkan daya ungkit dibagi ongkos: perbaikan metrik salah petak dan pemetaan metrik yang nol kode, pembangunan layar untuk divisi yang datanya sudah ada, pengisian modul yang sudah berdiri tapi kosong (Batch Record, Training, master anggaran), pembangunan modul baru, lalu integrasi baru. Menjawab juga mana yang sengaja tidak dikerjakan (Kaizen dan integrasi akun buzzer) dan kenapa utang position_key dicatat sebagai utang, bukan gerbang.",
+      "hash": "40fc66504bd5b5de21edf67be51a27363c1192e5b09149a251ddca84b5dd90db",
+      "ukuran_kb": 8.8,
+      "ringkasan": "Menjawab: apa urutan pengerjaan keluarga dokumen dashboard per posisi, item mana yang tiket developer dan mana yang permintaan ke tim non-IT, serta apa daya ungkit tiap item. Memuat lima gelombang kerja mulai dari perbaikan metrik salah petak dan pemetaan 47 metrik yang belum bersumber (nol kode), membangun layar untuk data yang sudah ada, pengisian modul yang sudah jadi tapi kosong (Batch Record, Training, master anggaran), pembangunan modul baru, sampai integrasi baru. Menjelaskan juga apa yang sengaja tidak dikerjakan beserta alasannya, terutama Kaizen yang manual karena keputusan.",
       "kata_kunci": [
-        "analisa",
-        "dashboard per posisi",
+        "analisa dashboard per posisi",
         "papan kerja",
-        "backlog",
-        "prioritas",
+        "roadmap",
         "gelombang",
-        "KPI",
+        "prioritas",
         "salah petak",
+        "Kaizen",
         "Batch Record",
-        "position_key"
+        "master anggaran",
+        "backlog KPI"
       ]
     },
     {
