@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-04",
-  "jumlah_dokumen": 360,
+  "jumlah_dokumen": 361,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1549,20 +1549,24 @@
         "APP - MyBharata",
         "DB - Overview and Notes"
       ],
-      "hash": "053384f112e8096bb184f3b95da1f4678b59821cd605a67a74a5510c51139eca",
-      "ukuran_kb": 10.0,
-      "ringkasan": "Menjawab: bagaimana request dari internet masuk ke seluruh ekosistem bip-erp lewat satu pintu — validasi JWT, penerbitan token saat login (password/PIN/biometrik), refresh dan logout, handoff sesi lewat SSO one-time-code, serta routing /api/:module/* dan proxy khusus /auth, /public, /ext ke service internal. Menjawab juga header identitas apa yang di-inject gateway (BIP-Employee-Id, BIP-System-Roles, BIP-Company-ID, BIP-Permissions), kenapa setiap service di belakangnya wajib ReadBufferSize minimal 32 KB agar tidak membalas 431, bagaimana response caching Redis bekerja dan kenapa ia bisa menyajikan hak yang sudah basi, serta kenapa prefix /internal/ bukan batas keamanan. Dipakai saat menelusuri masalah auth, routing modul, rate limit, CORS, atau galat yang tampak berasal dari gateway.",
+      "hash": "88f2fe4563d59c799aab17182fffee35a454477330ceab3b95c4cba57ef90987",
+      "ukuran_kb": 10.9,
+      "ringkasan": "Menjawab: bagaimana request dari internet masuk ke ekosistem bip-erp, siapa yang memvalidasi JWT dan menerbitkannya saat login, serta bagaimana routing `/api/:module/*` diteruskan ke service internal lewat internal gateway key. Juga menjawab pertanyaan operasional yang sering muncul: kenapa sebuah endpoint membalas 431 (header identitas yang di-inject gateway menuntut `ReadBufferSize` minimal 32 KB di setiap service), kenapa `/internal/` tetap bisa diakses dari internet karena routing bersifat catch-all bukan allowlist, dan kenapa perubahan hak akses seseorang tidak langsung terasa karena kunci cache Redis hanya memuat employee dan URL tanpa izin. Memuat pula daftar module beserta port internal, rute non-`/api` (auth, onboarding, public, ext, dev), alur SSO one-time-code, serta batasan SSO store in-memory dan revoke token.",
       "kata_kunci": [
         "api gateway",
         "gateway",
         "JWT",
-        "auth",
-        "login",
+        "authentication",
         "SSO",
-        "routing modul",
+        "routing",
         "reverse proxy",
-        "rate limit",
-        "CORS"
+        "431 Request Header Fields Too Large",
+        "ReadBufferSize",
+        "rate limiting",
+        "CORS",
+        "Redis cache",
+        "internal gateway key",
+        "BIP-Company-ID"
       ]
     },
     {
@@ -1571,7 +1575,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — aktif dipakai, tapi `ReadBufferSize` masih default 4 KB di `main` sehingga seluruh rute membalas 431 untuk akun berizin banyak (lihat Catatan)",
+      "status_teks": "Implemented (ada catatan) — aktif dipakai; perbaikan 431 sudah live di DEV, **PROD masih tertinggal** (lihat Catatan)",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
@@ -1585,20 +1589,23 @@
         "CORE - IT Orchestrator",
         "APP - MyBharata"
       ],
-      "hash": "c179fae73d9c59b9bd907424f89a7182f722b0ccc39a2b7db706538757043c75",
-      "ukuran_kb": 5.4,
-      "ringkasan": "Menjawab: operasi HR apa saja yang dijalankan sebagai satu transaksi lintas service (employee, attendance, notification, MinIO) dan bagaimana rollback-nya bekerja saat salah satu langkah gagal. Menjawab juga endpoint patch parsial personal-data / work-data / dokumen / jadwal kerja beserta alasan body dikirim sebagai map agar field yang tak disertakan tidak tertimpa nilai nol, alur create/update employee multi-step, aggregate read /v2/multi dan summary, ekspor karyawan, CRUD company-holiday, preview dokumen publik tanpa JWT, serta kewajiban meneruskan query string ?company= untuk override multi-perusahaan. Berisi juga sebab seluruh /api/hris/* bisa membalas 431 untuk akun berizin banyak.",
+      "hash": "35332a137ab2e9dc34f2c78afc5cf8500cf2bcd11873af33327d1bec6cb0daa4",
+      "ukuran_kb": 5.8,
+      "ringkasan": "Menjawab: operasi HR mana yang dijalankan lintas service sekaligus (employee, attendance, notification, MinIO) dan bagaimana create/update employee dijalankan sebagai transaksi dengan rollback bila salah satu langkah gagal. Menjelaskan rute `/employees/*`, `/employees/multi*`, `/attendances/*`, dan preview dokumen publik tanpa JWT, termasuk kenapa update `personal-data` dan `work-data` harus dikirim sebagai map agar tidak menimpa `company_id`, `vacation`, dan `photo` dengan nilai nol, serta kenapa query string `?company=` wajib ikut diteruskan untuk multi-perusahaan. Juga menjawab kenapa seluruh `/api/hris/*` bisa membalas 431 untuk akun berizin banyak dan bagaimana perilakunya diukur dengan header probe, bukan dengan akun dev biasa.",
       "kata_kunci": [
         "HRIS orchestrator",
         "orchestrator",
-        "transaksi create employee",
+        "create employee",
+        "transaksi",
+        "rollback",
         "MinIO",
         "upload dokumen",
         "partial update",
-        "company holiday",
-        "multi-perusahaan",
         "431",
-        "ReadBufferSize"
+        "ReadBufferSize",
+        "multi-tenant",
+        "company_id",
+        "company-holiday"
       ]
     },
     {
@@ -1621,15 +1628,17 @@
         "DB - Overview and Notes",
         "IT - Employee System"
       ],
-      "hash": "3d4fc4980cbc6dac0b912339fc616c1806209b085e7cadc1ad7340dac26bed63",
-      "ukuran_kb": 6.8,
-      "ringkasan": "Menjawab: endpoint IT-admin apa saja yang tersedia untuk mengelola akun karyawan — baca dan ganti system_roles, reset password beserta pembersihan PIN/device, aktivasi/deaktivasi akun, allow-list jaringan WiFi yang di-proxy ke attendance service, dan daftar karyawan /v2/multi berfilter departemen. Menjawab juga rute mana yang sudah punya pengganti di Employee Service (dan mana yang belum, sehingga tak punya jalur cadangan), cara melepas device tanpa reset password, serta catatan bug: response payload yang dibuang jadi pesan generik, role per-departemen yang kodenya ada tapi route-nya masih dikomentari, dan sebab /api/it/* membalas 431. Memuat kronologi lengkap 502 pada /roles/set sebagai contoh kegagalan yang berasal dari container tak dibangun ulang, bukan dari kode.",
+      "hash": "d1130e533dffc052dd171484b3b9d05136dad361d384adadb5558a280f8e7846",
+      "ukuran_kb": 7.1,
+      "ringkasan": "Menjawab: operasi IT-admin apa saja yang tersedia lintas service (baca dan ganti `system_roles`, reset password, aktivasi dan deaktivasi akun, allow-list WiFi, agregat daftar karyawan `/v2/multi`) dan bagaimana RBAC-nya diterapkan blanket lewat `ValidateGateway` plus `RequireITStaff`. Berguna untuk tahu rute mana yang sudah punya pengganti di Employee Service dan mana yang belum (`/roles/*`, `/network*`, `/v2/multi`), kenapa response payload beberapa handler dibuang jadi `{message,status}` generik, dan kenapa route role per-departemen belum terekspos meski fungsinya sudah ditulis. Memuat juga studi kasus `/roles/set` membalas 502 selama sepuluh hari karena container tak pernah dibangun ulang, dan cara lepas device tanpa reset password.",
       "kata_kunci": [
         "IT orchestrator",
         "system_roles",
+        "roles",
         "reset password",
         "aktivasi akun",
-        "allow-list WiFi",
+        "deactivate account",
+        "WiFi allow-list",
         "network",
         "RequireITStaff",
         "502",
@@ -8303,20 +8312,22 @@
         "IT - Monitoring System",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "af4fbefe955a596bfc6417ede2aff8920d3432b1b184c7bd1cd80deceefc8c44",
-      "ukuran_kb": 9.8,
-      "ringkasan": "Menjawab: apa yang seharusnya tampil di dashboard tiap posisi divisi Tech Development (Tech Development Leader, Fullstack Developer, IT Support), metrik KPI dan bobot yang menilai mereka, serta sumber otomatis mana yang sudah menyuplai angka (kinerja_tiket, kinerja_tiket_divisi, skor_tim, uptime_sistem). Menjelaskan kenapa hanya tiga dari tujuh posisi yang dirancang (empat template lain arsip dan tak dipegang akun aktif), kenapa tab per posisi bergantung pada `position_key` yang belum mengalir ke frontend, dan kenapa metrik uptime berbobot 0,4 dengan target 90 praktis tidak mengukur apa pun. Memuat juga jebakan pemetaan: varians anggaran tanpa parameter departemen, label CSAT yang tidak mencakup IT Support, dan Kaizen yang manual karena keputusan.",
+      "hash": "086873611d6ad6545e63dcbe912c8b9d48dfd7c25dacc736ac81406fa9dd7eb5",
+      "ukuran_kb": 10.6,
+      "ringkasan": "Menjawab: apa isi dashboard untuk tiap posisi di divisi Tech Development (Tech Development Leader, Fullstack Developer, IT Support), metrik KPI mana yang jadi visual utama, dan kenapa empat posisi lain tidak dirancang karena templatenya arsip tanpa akun aktif. Menjelaskan bobot, sumber, dan cakupan tiap metrik, kenapa cakupan CSAT harus ditulis di sebelah angkanya, serta apa yang menunggu backend (anggaran IT tanpa parameter departemen, modul kewajiban Calendar Service) dan apa yang sengaja tidak ditampilkan (Kaizen, manual karena keputusan). Juga menjawab kenapa pencocokan posisi masih memakai nama dari `useAuth().position` alih-alih `position_key`, dan risiko senyap bila nama posisi di master data di-rename.",
       "kata_kunci": [
         "dashboard per posisi",
-        "IT",
         "Tech Development",
+        "IT",
         "KPI",
         "Fullstack Developer",
         "IT Support",
+        "position_key",
         "CSAT",
+        "SLA tiket",
         "uptime",
-        "tiket",
-        "position_key"
+        "Kaizen",
+        "cakupan metrik"
       ]
     },
     {
@@ -11712,6 +11723,47 @@
         "pengurai CSV",
         "AI",
         "fase"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Dashboard per Posisi.md",
+      "judul": "ANALISA - Dashboard per Posisi",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "REF - Dashboard per Posisi (Indeks Cakupan)",
+        "RUN - Menambah Metrik KPI Otomatis",
+        "IT - Dashboard per Posisi",
+        "REF - Layout Dashboard erp-frontend",
+        "Manufacture - Dashboard per Posisi",
+        "Finance - Dashboard per Posisi (FAT)",
+        "GA - Checklist Management",
+        "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri",
+        "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "HRIS - Matriks KPI per Departemen"
+      ],
+      "hash": "8963740eccd90c45685b927c45e5a2510c70d6b2692611f7d8620ae02f961df1",
+      "ukuran_kb": 7.7,
+      "ringkasan": "Menjawab: apa urutan pengerjaan rancangan dashboard per posisi untuk seluruh divisi, item mana yang tiket developer dan mana yang permintaan ke tim lain (pemilik KPI, produksi, people development, finance, ICC). Papan kerja ini memecah pekerjaan jadi lima gelombang berdasarkan daya ungkit dibagi ongkos: keputusan tanpa kode (perbaiki 12 metrik salah petak, verifikasi `icc_account_mappings`, petakan 47 metrik belum terpetakan), membangun layar yang datanya sudah ada dimulai dari IT, mengisi modul yang sudah ada (Batch Record, Training, master anggaran), membangun modul baru, lalu integrasi baru. Juga menjawab apa yang sengaja tidak dikerjakan (Kaizen dan integrasi akun buzzer) beserta alasannya, dan utang `position_key` yang dicatat sebagai utang, bukan penghambat.",
+      "kata_kunci": [
+        "analisa",
+        "dashboard per posisi",
+        "roadmap",
+        "gelombang",
+        "prioritas",
+        "KPI",
+        "metrik salah petak",
+        "icc_account_mappings",
+        "Batch Record",
+        "training",
+        "master anggaran",
+        "position_key",
+        "Kaizen"
       ]
     },
     {
