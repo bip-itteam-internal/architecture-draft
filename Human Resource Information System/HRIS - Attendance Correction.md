@@ -2,7 +2,7 @@
 
 *Fitur ini ditambahkan sebagai pelengkap Attendance System. Koreksi Absen memungkinkan karyawan mengajukan koreksi clock-in/out untuk hari di mana mereka lupa clock-in, clock-out, atau keduanya. Waktu clock otomatis diisi dari jadwal kerja karyawan saat disetujui — tidak perlu input waktu manual.*
 
-- **Status**: ⚠️ Implemented — alur koreksi (pengajuan → approval berjenjang → auto-fix attendance) sudah jalan. Guard anti-fraud guestbook **tak pernah menyala sampai 2026-09-01** dan kini sudah diperbaiki (§Riwayat), **live di DEV, PROD belum**. Pengiriman `employee_id` dari MyBharata menunggu rilis store (my-bharata #133); sampai itu seluruh kecocokan melewati jalur nama.
+- **Status**: ⚠️ Implemented — alur koreksi (pengajuan → approval berjenjang → auto-fix attendance) sudah jalan. Guard anti-fraud guestbook **tak pernah menyala sampai 2026-09-01** dan kini sudah diperbaiki (§Riwayat), **live di DEV, PROD belum**. Pengiriman `employee_id` dari MyBharata menunggu rilis store (my-bharata #133); sampai itu seluruh kecocokan melewati jalur nama. **Kasus Penggunaan #4 (sengketa telat) tak terjangkau dari layar mana pun sampai 2026-09-04** — backend membukanya sejak 2026-06-25 tapi kedua frontend menolaknya sendiri (§Riwayat); perbaikannya belum dirilis (web menunggu deploy, MyBharata menunggu rilis store). Satu gap tersisa: jendela clock-out masih punya dua salinan yang berbeda (§Gap yang diketahui).
 
 ## Latar Belakang
 
@@ -220,14 +220,17 @@ Semua notifikasi menggunakan sistem push notification (FCM + inbox) melalui noti
 
 ## Implementasi Frontend
 
-### Halaman
+Dua klien memakai alur ini: **erp-frontend** (web, bagian di bawah) dan **MyBharata**
+(mobile, lihat sub-bagian tersendiri). Keduanya memanggil endpoint yang sama.
+
+### Halaman (erp-frontend)
 
 | Route                                   | Halaman      | Deskripsi                                |
 |-----------------------------------------|--------------|------------------------------------------|
 | `/hris/attendance-correction`           | Pengajuan Saya| Karyawan melihat riwayat presensi + koreksi |
 | `/hris/attendance-correction/approvals` | Review       | Reviewer menyetujui/menolak pengajuan     |
 
-### Struktur Modul Fitur
+### Struktur Modul Fitur (erp-frontend)
 
 ```
 src/features/hris/attendance-correction/
@@ -235,24 +238,74 @@ src/features/hris/attendance-correction/
 │   ├── correction-actions.tsx    — Tombol dialog Approve/Reject
 │   └── modal-create.tsx          — Modal pengajuan koreksi baru
 ├── hooks/
-│   └── use-correction.ts        — React Query hooks untuk fetch/create/cancel/review
+│   └── use-correction.ts        — React Query hooks fetch/create/cancel/review + kandidat
+├── lib/
+│   └── correction-eligibility.ts — SATU tempat aturan tipe koreksi (cermin validateCorrectionTypeMatch)
 ├── schemas/
 │   └── correction.ts            — Skema validasi Zod
 └── types/
     └── correction.ts            — Interface dan konstanta TypeScript
 ```
 
-### Perilaku Frontend Penting
+### Perilaku Frontend Penting (erp-frontend)
 
 - Halaman Pengajuan Saya memiliki dua tampilan: **tabel** dan **kalender** (kalender interaktif dengan status kehadiran berwarna)
 - Tampilan kalender menampilkan kartu detail (clock-in, clock-out, jadwal) saat tanggal dipilih
-- Modal pengajuan koreksi otomatis mendeteksi clock-in/out yang kosong dan memilih tipe koreksi
-- Karyawan mengajukan koreksi untuk hari yang **clock-in/out kosong** atau **clock-in terisi tapi Late** (sengketa telat). Kalender pemilih-tanggal di-feed oleh `GET /api/attendance/history?missing=clockin|clockout|any` (mengembalikan hanya tanggal kandidat)
+- **Baris mana yang dapat tombol koreksi ditentukan SERVER**, bukan disimpulkan dari isi baris: halaman memanggil `GET /api/attendance/correction/candidates?type=any` lalu mencocokkan `_id`. Dengan begitu jendela koreksi milik perusahaan dan aturan sengketa telat hanya punya satu penegak
+- Modal memilih tipe koreksi dari kondisi entri (punch yang kosong, atau status **Terlambat** untuk sengketa telat). Aturannya hidup di **satu berkas**, `features/hris/attendance-correction/lib/correction-eligibility.ts`, cermin dari `validateCorrectionTypeMatch` di server. `status` adalah prop **wajib** `ModalCreateCorrection` — dibuat wajib supaya pemanggil berikutnya tak bisa melupakannya diam-diam
+- Panjang jendela koreksi tampil sebagai keterangan di atas tabel; angkanya dibaca dari `GET /api/attendance/company-attendance-setting` (`correction_window_days`), **tidak** ditulis `7` di layar karena nilainya setelan per perusahaan. Tanpa kalimat ini, riwayat bulan lampau menampilkan kolom Aksi kosong seluruhnya dan terbaca sebagai fitur yang rusak
+- Bila daftar kandidat gagal dimuat, tombol koreksi lenyap dari **setiap** baris sementara halamannya tetap terlihat normal. Karena itu ada peringatan + tombol muat ulang; riwayatnya sendiri tetap ditampilkan karena masih benar
 - ⚠️ **Entri telat yang sudah terverifikasi security TETAP dimunculkan** sebagai kandidat, dan penolakannya terjadi saat submit (409) lengkap dengan alasannya. Ini keputusan sadar, bukan kelalaian: membuang tanggalnya dari pemilih membuatnya **lenyap tanpa satu pun penjelasan**, dan orang yang keterlambatannya tercatat security justru yang paling perlu tahu sebabnya. Aksi yang ditolak dengan alasan terbaca di layar yang sama jauh lebih baik daripada pilihan yang hilang diam-diam. Sebelum guard-nya benar-benar menyala, penyaringan itu tak pernah membuang apa pun, jadi menghapusnya tidak mengubah apa yang dilihat orang hari ini
 - Tidak ada input waktu manual — modal menjelaskan bahwa waktu akan otomatis diisi dari jadwal shift saat disetujui
 - Halaman Review memiliki tab: **Menunggu Review** (pending) dan **Sudah Direview** (termasuk yang dibatalkan)
 - Reviewer melihat jadwal kerja pemohon (kolom "Jam Kerja") untuk konteks
 - Semua tabel menggunakan pagination sisi klien dengan opsi ukuran halaman: 3 (default), 5, 10, 50
+
+### MyBharata (mobile)
+
+Pengajuan koreksi masuk lewat **Pengajuan → Human Resource (HR)**, dengan Tipe Pengajuan
+"Koreksi Presensi" lalu sub-pilihan **Clock-in** / **Clock-out**. Tak ada pilihan `both` di
+jalur ini; `HrCorrectionFormSection` menerjemahkan sub-pilihan itu jadi `checkin`/`checkout`.
+
+- Pemilih tanggal ("7 hari terakhir") di-feed `GET /correction/candidates?type=clockin|clockout`,
+  jadi **isinya sudah difilter per tipe oleh server**. Aplikasi karena itu tidak menilai ulang
+  kelayakan entri yang dipilih.
+- Mengganti tipe koreksi **mengosongkan** tanggal yang sudah dipilih. Widget-nya dipasang dengan
+  `GlobalKey` sehingga State-nya bertahan; tanpa pembersihan itu entri yang sah untuk Clock-in
+  ikut terkirim sebagai Clock-out lalu dijawab 422.
+- Rute `RouteNames.createCorrection` / `CreateCorrectionPage` **tidak punya satu pun pemanggil**
+  (diukur `git grep` 2026-09-04). Ia terdaftar tapi tak terjangkau; jangan dijadikan acuan.
+
+### ⛔ Riwayat: Kasus Penggunaan #4 tak terjangkau dari layar mana pun sampai 2026-09-04
+
+Backend membuka sengketa telat pada 2026-06-25 (`690820f2`). **Tidak satu pun frontend ikut**,
+dan masing-masing menyimpan salinan aturan kelayakannya sendiri yang tak mengenal `status`:
+
+| Tempat | Bentuk kegagalannya |
+|---|---|
+| MyBharata `CorrectionEligibility.evaluate` | menolak setiap entri yang clock-in **dan** clock-out-nya terisi, dengan pesan "Presensi pada tanggal ini tidak memenuhi syarat untuk dikoreksi" |
+| erp-frontend `canRequestCorrection` | entri Terlambat tak pernah dapat tombol; sebaliknya entri **di luar jendela** justru dapat tombol karena tebakan itu tak punya batas tanggal sama sekali |
+
+Gejalanya sempurna menyesatkan: tanggalnya **muncul** di pemilih (server menganggapnya kandidat)
+lalu formulir menolaknya sendiri, jadi terbaca seperti data yang cacat, bukan seperti aturan.
+Ditemukan dari laporan pemakai (Bella Rahmadhaniyah, absen 2026-09-02: masuk 10:42 atas jadwal
+08:00). Perilaku salahnya bahkan **dikunci test** MyBharata (`both punches present -> ineligible`),
+jadi suite hijau bukan bukti apa pun di kelas ini.
+
+Diperbaiki dengan **membuang** salinan aturan di aplikasi dan menyerahkan penentuan kandidat ke
+`/correction/candidates`. Yang tersisa di web hanya pemilihan tipe, di satu modul teruji.
+
+### ⚠️ Gap yang diketahui: jendela clock-out punya dua salinan yang sudah berbeda
+
+`modal-create.tsx` `isShiftEnded` menganggap koreksi clock-out boleh sejak `work_time.end`
+terlewat, sedangkan server menuntut `work_time.end + ClockOutWindowHours` — bawaannya **6 jam**,
+bisa disetel per perusahaan, **dan** ada override per departemen/jabatan (`attendance_setting.go`
+`resolveAttendanceRule`). Web karena itu tak bisa tahu ambang yang benar dari sisinya sendiri,
+jadi opsi Clock-out ditawarkan lebih dini daripada yang diterima server dan pengajuannya dijawab
+**422**. Aturannya sendiri sampai kini hanya hidup sebagai konstanta di berkas Go, tak terbaca
+oleh yang merancang layar. Jalan keluarnya menyentuh backend: `/correction/candidates` ikut
+menyaring jendela clock-out, atau mengirim `allowed_types` per kandidat sehingga tak ada
+frontend yang perlu memutuskan apa pun.
 
 ## Kebutuhan
 

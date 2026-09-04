@@ -59,28 +59,20 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "3adf79617321ccac65a1bc147820f0f3c5371a6511c0ed23fb3a80e1bc3953a1",
-      "ukuran_kb": 21.9,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di attendance-service lewat gateway `/api/attendance/*`, siapa yang boleh memanggilnya (RBAC HRIS, Security, guestbook, gerbangRoster, gerbangRuteKelolaJadwal), dan parameter apa yang dipakai tiap rute. Mencakup tap clock-in/out, daftar entri beserta filter tanggal DD-MM-YYYY, laporan periode 26 sampai 25, payroll-supplement dan perlakuan status dibayar/dipotong, hari libur, pengajuan cuti/izin/dinas beserta review dan pembatalan, tukar jadwal kerja, koreksi absen, roster per tanggal, definisi shift perusahaan, pola rotasi grup, penugasan jadwal berlaku-mulai, dan daftar anggota Jadwal Host Live. Juga menjelaskan aturan validasi yang mudah terlewat: keunikan global `schedule_id`/`group_id`, `display_name` shift yang tertutup, `starting_date` rotasi yang wajib, batas 500 sel roster, aturan H+1 penugasan, dan idempotensi pengajuan cuti.",
+      "hash": "c1aa2b4b75f3d32d3b5d22aca442c04d4361b9d7f1326314e166b9d1f2e8d455",
+      "ukuran_kb": 22.2,
+      "ringkasan": "Menjawab: endpoint mana yang dipakai untuk clock-in/out, menarik daftar entri absensi beserta filter tanggal dan departemennya, mengelola definisi shift dan pola rotasi perusahaan, serta mengisi roster jadwal bebas per tanggal. Juga menjawab siapa yang boleh memanggil tiap rute (RBAC seperti RequireHRISStaff, RequireSecurity, gerbangRoster) dan rute mana yang open, plus bentuk request/response untuk leave request, tukar jadwal, koreksi absen, holiday, mood, dan payroll-supplement. Berguna saat menyambungkan frontend atau service lain ke attendance-service lewat gateway /api/attendance/*.",
       "kata_kunci": [
         "attendance service",
         "absensi",
-        "presensi",
+        "endpoint",
+        "API",
         "clock-in",
         "clock-out",
-        "endpoint attendance",
-        "cuti",
-        "leave request",
-        "koreksi absen",
+        "jadwal kerja",
+        "work schedule",
         "roster",
-        "shift",
-        "tukar jadwal",
-        "schedule exchange",
-        "payroll supplement",
-        "guestbook",
-        "jadwal host live",
-        "work schedule assignment",
-        "berlaku mulai"
+        "leave request"
       ]
     },
     {
@@ -1229,6 +1221,7 @@
         "API - Attendance Service",
         "HRIS - Employee Request & Approval",
         "HRIS - Leave Request",
+        "HRIS - Attendance Correction",
         "Microservices - Payroll Service",
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "APP - Web ERP",
@@ -1249,20 +1242,21 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "65b53cac38e772d6a3f287b15905cbaf0ba8c258b83770f888bb9eb429764d6b",
-      "ukuran_kb": 50.3,
-      "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile MyBharata, bagaimana bentuk layarnya, dan keputusan rancangan apa yang sudah diambil beserta alasannya. Mencakup presensi dan geofencing, cuti dan izin, lembur, slip gaji berikut gerbang PIN dan unduh PDF, KPI, notifikasi, serta susunan menu beranda. Dipakai untuk mengetahui apakah sebuah layar sudah ada sebelum membuat yang baru, dan untuk menemukan jebakan mobile yang sudah terbukti menggigit.",
+      "hash": "f632873720f4766e2ddbe9cd4ae0e48c319d3bc24abe65d9cb1122bd98f573ad",
+      "ukuran_kb": 51.3,
+      "ringkasan": "Menjawab: apa saja yang bisa dilakukan karyawan lewat aplikasi mobile MyBharata (absensi, pengajuan cuti/izin, lembur, slip gaji, KPI, survei, pelatihan) dan bagaimana aplikasinya dibangun — Flutter dengan Clean Architecture feature-first, BLoC, get_it, dio, dan go_router. Juga menjawab bagaimana autentikasi bekerja (JWT + biometric + PIN, satu akun satu device), bahwa aplikasi memanggil backend lewat API Master Gateway dengan prefix api/<module>, serta bagaimana konten dan menu di-scope per perusahaan (multi-tenant) beserta batas gerbang konten yang sengaja belum dibuka. Berguna untuk tahu versi build vs versi rilis dan fitur mana yang baru ada di dev.",
       "kata_kunci": [
         "MyBharata",
         "aplikasi mobile",
         "Flutter",
-        "slip gaji mobile",
-        "PIN",
-        "presensi mobile",
-        "menu beranda",
-        "unduh PDF",
+        "HRIS mobile",
+        "BLoC",
+        "clean architecture",
+        "multi-tenant",
+        "JWT",
+        "biometric",
         "geofencing",
-        "notifikasi"
+        "gateway"
       ]
     },
     {
@@ -6701,7 +6695,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented — alur koreksi (pengajuan → approval berjenjang → auto-fix attendance) sudah jalan. Guard anti-fraud guestbook **tak pernah menyala sampai 2026-09-01** dan kini sudah diperbaiki (§Riwayat), **live di DEV, PROD belum**. Pengiriman `employee_id` dari MyBharata menunggu rilis store (my-bharata #133); sampai itu seluruh kecocokan melewati jalur nama.",
+      "status_teks": "Implemented — alur koreksi (pengajuan → approval berjenjang → auto-fix attendance) sudah jalan. Guard anti-fraud guestbook **tak pernah menyala sampai 2026-09-01** dan kini sudah diperbaiki (§Riwayat), **live di DEV, PROD belum**. Pengiriman `employee_id` dari MyBharata menunggu rilis store (my-bharata #133); sampai itu seluruh kecocokan melewati jalur nama. **Kasus Penggunaan #4 (sengketa telat) tak terjangkau dari layar mana pun sampai 2026-09-04** — backend membukanya sejak 2026-06-25 tapi kedua frontend menolaknya sendiri (§Riwayat); perbaikannya belum dirilis (web menunggu deploy, MyBharata menunggu rilis store). Satu gap tersisa: jendela clock-out masih punya dua salinan yang berbeda (§Gap yang diketahui).",
       "publik": true,
       "tautan": [
         "HRIS - Leave Request",
@@ -6712,20 +6706,20 @@
         "Microservices - Attendance Service",
         "HRIS - Big Pictures"
       ],
-      "hash": "29b8842988dd6f19aa312bd04fae258b888b6df3289e6dab3f940542e8cbdabb",
-      "ukuran_kb": 19.8,
-      "ringkasan": "Menjawab: bagaimana karyawan mengajukan koreksi absen saat lupa clock-in, lupa clock-out, atau keduanya, siapa reviewernya, dan bagaimana status akhirnya ditentukan. Merinci model data attendance_correction_request, resolusi status dari review_1 dan review_2, auto-ignore pengajuan yang menunggu lebih dari 24 jam beserta reminder reviewer di T+18 jam, empat kasus penentuan reviewer (karyawan biasa, SPV non-HR, staff HR, SPV HR) termasuk pencegahan self-approval dan routing level departemen, serta endpoint /api/attendance/correction/* dengan parameter as, filter ongoing/past, dan status. Juga menjawab aturan anti-fraud guestbook yang menolak koreksi bila keterlambatan sudah diverifikasi security, cara catatan security dicocokkan ke karyawan, dan dampak persetujuan pada entri kehadiran yang waktunya diisi otomatis dari jadwal kerja.",
+      "hash": "23f1c03b5fb939b0c0267f25e93c4df967405d12e4fdb7b0a527afe809a92449",
+      "ukuran_kb": 24.5,
+      "ringkasan": "Menjawab: bagaimana karyawan mengajukan koreksi absen saat lupa clock-in, clock-out, keduanya, atau menyengketakan status telat, dan dari mana waktu clock diisi saat koreksi disetujui (snapshot jadwal kerja, bukan input manual). Juga menjawab siapa reviewernya untuk empat kombinasi peran pemohon (karyawan biasa, SPV non-HR, staff HR, SPV HR), bagaimana status akhir diturunkan dari review_1 dan review_2, aturan anti-self-approval, auto-ignore pengajuan yang menggantung lebih dari 24 jam beserta reminder di T+18 jam, dan bagaimana guard anti-fraud mencocokkan koreksi dengan catatan security di guestbook. Memuat model data koleksi attendance_correction_request, daftar endpoint /api/attendance/correction/*, serta parameter filter ongoing/past dan as=reviewer/reviewed.",
       "kata_kunci": [
         "koreksi absen",
         "attendance correction",
         "lupa clock-in",
         "lupa clock-out",
-        "approval",
+        "approval berjenjang",
         "reviewer",
-        "auto-ignore",
         "anti-fraud",
         "guestbook",
-        "telat"
+        "telat",
+        "auto-ignore"
       ]
     },
     {
