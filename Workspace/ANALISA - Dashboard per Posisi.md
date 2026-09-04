@@ -39,11 +39,11 @@ Berjalan paralel dengan gelombang 2. Tidak menahan siapa pun, tetapi nomor 1.1 *
 
 ## Gelombang 2 — bangun yang datanya sudah ada
 
-- [ ] **2.1 IT, 3 posisi berpenghuni** ⬅️ **DIKERJAKAN PERTAMA**
-      Tech Development Leader, Fullstack Developer, IT Support. Rancangan: [[IT - Dashboard per Posisi]].
-      Empat template IT lainnya **arsip tanpa akun aktif**, sengaja tidak dibangun.
-      Dipilih pertama bukan karena paling penting melainkan paling murah untuk **membuktikan polanya**: data paling siap (9 metrik otomatis), cakupan terkecil, tanpa gesekan lintas tim.
-      **Selesai bila**: ketiga lembar tampil lewat gateway dengan angka sungguhan, dan bentuknya lolos [[REF - Layout Dashboard erp-frontend]].
+- [x] **2.1 IT** — SELESAI 2026-09-04, **tapi tidak seperti yang direncanakan.** erp-frontend [#1452](https://github.com/bip-itteam-internal/erp-frontend/pull/1452).
+      Tiga lembar per posisi **dibatalkan**: `/portal/kpi` sudah melayani ketiga posisi lewat kaskade persona, dengan komponen yang lebih matang. Rinciannya di [[IT - Dashboard per Posisi]] § Kenapa lembar per posisi dibatalkan.
+      Yang dibangun: blok **Uptime Bulan Penilaian** (endpoint `/uptime?periode=` yang sebelumnya nol konsumen) dan **tautan kartu KPI ke `/portal/kpi`**.
+      ⚠️ **Pelajaran yang mengubah item 2.2 sampai 2.4 di bawah**: sebelum merancang lembar mana pun, periksa dulu apakah `/portal/kpi` sudah menjawabnya untuk posisi itu. Untuk posisi yang **bukan penilai**, kemungkinan besar sudah. Yang layak dibangun adalah yang TIDAK ada di scorecard KPI: angka operasional, antrean pekerjaan, dan ambang yang perlu ditindak.
+      **Tersisa**: verifikasi manual di layar (blok uptime wajib menampilkan pesan bersebab saat monitoring 503 di dev), dan dua item review yang belum diputuskan (pesan khusus untuk 502/504, dan tautan kartu uptime ke `/it/status-infrastruktur`).
 
 - [ ] **2.2 Manufaktur sisi gudang** · Warehouse Staff, Warehouse Leader, Admin Warehouse (2 lokasi)
       17 dari 24 metrik bersumber. Rancangan: [[Manufacture - Dashboard per Posisi]].

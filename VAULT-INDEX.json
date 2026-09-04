@@ -414,24 +414,20 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "c4a8eff0853302c1f451fc55b1c2fd61ac32fb5ba70507581eccc739cf984ee0",
-      "ukuran_kb": 82.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service di gateway `/api/integration/*` — daftar/detail order terpadu lintas marketplace, ringkasan & perbandingan performa, aging piutang, feed retur & packet tracking, OAuth/report TikTok Shop-Business-Ads & Shopee, jembatan Accurate (invoice, dashboard FAT, profit/insentif), stok Accurate lokal, ICC account mapping, ulasan marketplace, status sinkron toko, dan kepemilikan toko per departemen. Termasuk tombol Segarkan salinan (aset tetap, realisasi OPEX, PPN masukan, biaya perlengkapan `perlengkapan-cost/segarkan`) dan worker/jobs.",
+      "hash": "2601de18b7e3b091269de0b2ff93256720b38828f894e051c4d5cff22a54fcd7",
+      "ukuran_kb": 83.7,
+      "ringkasan": "Menjawab: endpoint mana yang dipakai untuk menarik order marketplace terpadu, aging piutang, pelacakan paket (packet tracking), feed retur lintas-channel, dan pembukuan ke Accurate, lengkap dengan parameter query serta bentuk responsnya. Menjelaskan juga mana rute yang wajib memakai gateway key dan mana webhook publik lewat /ext/webhook, termasuk peringatan endpoint mana yang keliru bila dipakai untuk daftar retur semua channel.",
       "kata_kunci": [
-        "integration service",
+        "integration-service",
         "endpoint",
+        "API reference",
         "marketplace",
+        "TikTok Shop",
+        "Shopee",
         "Accurate",
         "order",
         "piutang",
-        "retur",
-        "packet tracking",
-        "TikTok",
-        "Shopee",
-        "segarkan",
-        "perlengkapan",
-        "stok Accurate",
-        "balance_total_cost"
+        "packet tracking"
       ]
     },
     {
@@ -1414,22 +1410,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "c68b4e291ca2fce07b9dc2aeda69cdb6f25e7548192c8f4643dce55a5ad743f6",
-      "ukuran_kb": 389.9,
-      "ringkasan": "Menjawab: layar apa saja yang ada di aplikasi web ERP (Next.js) per modul, bagaimana tiap layar berperilaku, dan keputusan UI apa yang sudah diambil beserta alasannya. Dipakai untuk mengetahui apakah sebuah fitur sudah punya layar, di menu mana ia tinggal, komponen shared apa yang dipakainya, dan jebakan apa yang sudah terbukti menggigit di sana. Memuat catatan rinci untuk HRIS, payroll (impor run dari spreadsheet, penjaga periode ganda, hapus run impor draft), recruitment, finance, procurement, marketing analytics, dan portal.",
+      "hash": "c7bd9cbe654faed4cb27ca9adaf5d38eb9364cdd788879717c031745c4cef5f3",
+      "ukuran_kb": 390.7,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (erp-frontend / One Bharata), stack apa yang dipakai, bagaimana login serta role gating sidebar bekerja lewat cookie system_roles, dan bagaimana web ini berperan sebagai SSO Identity Provider untuk aplikasi lain. Menjawab juga konvensi wajib data-fetching TanStack Query dan konvensi bagan Recharts, pengelompokan menu HRIS termasuk Pengaturan HRGA terpusat, serta dukungan multi-perusahaan (company switcher, departemen, shift, WiFi per perusahaan).",
       "kata_kunci": [
-        "web ERP",
         "erp-frontend",
-        "frontend",
-        "layar",
-        "menu",
+        "One Bharata",
+        "hris-dashboard",
         "Next.js",
-        "impor payroll",
-        "payroll run",
-        "periode ganda",
-        "resign",
+        "sidebar",
+        "system_roles",
+        "SSO",
         "i18n",
-        "komponen shared"
+        "TanStack Query",
+        "Recharts"
       ]
     },
     {
@@ -2360,24 +2354,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "daad0c0520723e0ff50e1481815d9efba1c6f66c22cb9073dc9cc3c77f6c3805",
-      "ukuran_kb": 321.0,
-      "ringkasan": "Menjawab: bagaimana integration-service menghubungkan ERP ke marketplace (TikTok Shop/Business/Ads, Shopee, Lazada) dan menjembatani akuntansi ke Accurate Online — ingest webhook & order-sync, normalisasi model transaksi, push Sales Invoice/Return, automasi auto-ship sadar-holiday, kredensial OAuth per marketplace, serta job/cron terjadwal. Termasuk salinan lokal stok Accurate (`accurate_stocks`), penambalan kategori item, dan task harian nilai persediaan perlengkapan (`accurate-perlengkapan-cost-refresh` → `balance_total_cost`, biaya hanya dari `item/detail.do`).",
+      "hash": "bba286bbdb2d1a2bc6a49e8ce66e6409eb926be2ae165b40fd4c89743a48b80a",
+      "ukuran_kb": 323.4,
+      "ringkasan": "Menjawab: apa peran integration-service sebagai jembatan marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) sekaligus bridge akuntansi ke Accurate Online, dan bagian mana yang sudah berjalan versus yang masih rencana (misalnya Meta Ads yang belum punya kode sama sekali). Menjelaskan cara webhook masuk diverifikasi dan diproses async, cron sync master data beserta penanganan rate limit, metrik GMV Max dan ICC video yang dipakai perhitungan insentif, serta catatan ketahanan, index Mongo jalur panas, dan status sinkron per toko.",
       "kata_kunci": [
-        "integration service",
+        "integration-service",
         "marketplace",
-        "Accurate",
+        "TikTok Shop",
+        "TikTok Business Ads",
+        "Shopee",
+        "Accurate Online",
         "webhook",
-        "order sync",
-        "Sales Invoice",
-        "accurate_stocks",
-        "stok",
-        "perlengkapan",
-        "Total Biaya",
-        "balance_total_cost",
-        "cron",
-        "OAuth",
-        "nilai persediaan"
+        "GMV Max",
+        "ICC",
+        "sync order"
       ]
     },
     {
@@ -2577,6 +2567,7 @@
         "HRIS - Otomasi Skor KPI",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "HRIS - Matriks KPI per Departemen",
         "IT - Monitoring System",
         "APP - Web ERP",
         "Microservices - Employee Service",
@@ -2586,22 +2577,20 @@
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "IT - Server, VMs and Databases"
       ],
-      "hash": "a86a7a65c3c9b47068032d2cb43720bd937bad6b2de8e0d2ec40aa3eed1a651f",
-      "ukuran_kb": 11.0,
-      "ringkasan": "Menjawab: dari mana angka uptime infrastruktur berasal (basis data kuma.db milik Uptime Kuma, dibuka read-only), kenapa service ini hanya berjalan di produksi dan membalas 503 di dev, serta endpoint apa saja yang tersedia untuk dashboard IT, ekspor CSV, dan pengumpul KPI. Menjelaskan cara uptime per periode kalender dihitung: batas periode dihitung di WIB lalu dikonversi ke UTC, rata-rata tertimbang jumlah heartbeat, uptime nullable saat tak ada data, dan pelaporan cakupan hari. Memuat juga perilaku cache dua tingkat, single-flight beserta penyajian entri basi, dan perbedaan gerbang RBAC (monitoring.view / monitoring.export) dengan gerbang kunci layanan untuk rute KPI yang dipanggil mesin.",
+      "hash": "3aa9328b3fb0c4e92c0e527951b756dc8d551ef67d7552bcd3351eb722aa3efb",
+      "ukuran_kb": 12.3,
+      "ringkasan": "Menjawab: dari mana angka uptime di dashboard IT dan metrik KPI otomatis berasal (basis data kuma.db milik Uptime Kuma yang dibuka read-only), dan kenapa endpointnya membalas 503 di server dev. Menjelaskan cara uptime per periode kalender dihitung: batas periode dihitung WIB lalu dikonversi UTC, rata-rata tertimbang jumlah heartbeat, uptime nullable saat tak ada data, dan pelaporan cakupan hari. Menjawab juga perbedaan gerbang akses manusia (izin RBAC monitoring.view / monitoring.export) versus pemanggil mesin (MONITORING_SERVICE_KEY), serta perilaku cache single-flight dan penyajian entri basi.",
       "kata_kunci": [
-        "monitoring",
-        "uptime",
-        "downtime",
+        "monitoring-service",
         "Uptime Kuma",
         "kuma.db",
-        "heartbeat",
-        "incident",
-        "gangguan",
+        "uptime",
         "KPI uptime",
+        "dashboard IT",
+        "heartbeat",
+        "single-flight cache",
         "monitoring.view",
-        "MONITORING_SERVICE_KEY",
-        "cache single-flight"
+        "MONITORING_SERVICE_KEY"
       ]
     },
     {
@@ -8297,8 +8286,8 @@
       "judul": "IT - Dashboard per Posisi",
       "area": "IT",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "**Rancangan**, belum dibangun. Yang ADA hari ini adalah Ringkasan Divisi IT tanpa tab per posisi (`erp-frontend/src/features/it/ringkasan/`).",
+      "status_emoji": "⚠️",
+      "status_teks": "**Sebagian terbangun, dan rancangan lembar per posisinya DIBATALKAN 2026-09-04** (bukan ditunda). Yang mendarat: blok uptime periode kalender dan tautan ke `/portal/kpi` di Ringkasan Divisi IT, erp-frontend [#1452](https://github.com/bip-itteam-internal/erp-frontend/pull/1452). Sebab pembatalannya di bagian tersendiri di bawah, dan itu jawaban yang sah menurut [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]] §4.",
       "publik": false,
       "tautan": [
         "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
@@ -8312,22 +8301,20 @@
         "IT - Monitoring System",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "086873611d6ad6545e63dcbe912c8b9d48dfd7c25dacc736ac81406fa9dd7eb5",
-      "ukuran_kb": 10.6,
-      "ringkasan": "Menjawab: apa isi dashboard untuk tiap posisi di divisi Tech Development (Tech Development Leader, Fullstack Developer, IT Support), metrik KPI mana yang jadi visual utama, dan kenapa empat posisi lain tidak dirancang karena templatenya arsip tanpa akun aktif. Menjelaskan bobot, sumber, dan cakupan tiap metrik, kenapa cakupan CSAT harus ditulis di sebelah angkanya, serta apa yang menunggu backend (anggaran IT tanpa parameter departemen, modul kewajiban Calendar Service) dan apa yang sengaja tidak ditampilkan (Kaizen, manual karena keputusan). Juga menjawab kenapa pencocokan posisi masih memakai nama dari `useAuth().position` alih-alih `position_key`, dan risiko senyap bila nama posisi di master data di-rename.",
+      "hash": "cab19bfd6de4531a75472b99a2257b7ce1d84a31fa836ad834fe123603ddd59b",
+      "ukuran_kb": 13.4,
+      "ringkasan": "Menjawab: apa isi dashboard yang dirancang untuk tiap posisi di divisi Tech Development (Leader, Fullstack Developer, IT Support), metrik KPI apa yang menilai tiap posisi beserta bobot, sumber otomatis, dan targetnya. Menjelaskan juga kenapa rancangan lembar per posisi ditinggalkan setelah ditemukan `/portal/kpi` sudah melayani ketiga posisi lewat kaskade persona, apa yang dibangun sebagai gantinya (blok uptime periode penilaian dan tautan dari kartu KPI tim), serta kenapa empat posisi bertemplate arsip tanpa akun aktif sengaja tidak dirancang. Berguna sebagai cetakan pengecekan sebelum merancang dashboard posisi untuk divisi lain, termasuk konsekuensi utang `position_key` yang belum mengalir ke frontend sehingga pencocokan masih lewat nama posisi.",
       "kata_kunci": [
         "dashboard per posisi",
+        "position dashboard",
         "Tech Development",
-        "IT",
-        "KPI",
-        "Fullstack Developer",
-        "IT Support",
+        "divisi IT",
+        "KPI IT",
+        "portal KPI",
         "position_key",
-        "CSAT",
-        "SLA tiket",
         "uptime",
-        "Kaizen",
-        "cakupan metrik"
+        "IT Support",
+        "Fullstack Developer"
       ]
     },
     {
@@ -9597,20 +9584,20 @@
         "HRIS - Otomasi Skor KPI",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "f6e966ce69c586426b8d0f88b51806441808c44007c0234a65d53745f6de4523",
-      "ukuran_kb": 11.0,
-      "ringkasan": "Menjawab: posisi dan divisi mana saja yang punya rancangan dashboard per posisi, berapa banyak metrik KPI yang benar-benar otomatis di produksi (10 dari 311 baris metrik, 87,5% masih dinilai manual), dan penghambat mana yang muncul lintas divisi sehingga satu pekerjaan membuka banyak metrik sekaligus. Memuat tabel dokumen rancangan per divisi, peringkat penghambat menurut daya ungkit (paling besar justru \"belum dipetakan sama sekali\" yang merupakan keputusan pemilik KPI, bukan pekerjaan kode), serta daftar 12 metrik salah petak yang sumbernya menjawab pertanyaan lain sehingga menghasilkan angka masuk akal tetapi salah. Juga mendaftar posisi yang dinyatakan tidak direkomendasikan dibuatkan dashboard beserta syarat yang membalikkan keputusan itu.",
+      "hash": "94e6a0fee4cdaf29822f570ff7e34b0d1c9e1063ae2738874ef1a96e96e95f4e",
+      "ukuran_kb": 12.3,
+      "ringkasan": "Menjawab: ada berapa divisi, posisi unik, template KPI, dan baris metrik di seluruh perusahaan, posisi mana yang sudah punya lembar dashboard, dan berapa metrik yang benar-benar otomatis versus manual. Menjawab juga penghambat mana yang muncul lintas divisi sehingga satu pekerjaan membuka banyak metrik sekaligus (metrik belum dipetakan, Batch Record kosong, modul checklist, master anggaran, integrasi Meta Ads) dan mana yang sengaja tidak dikerjakan seperti Kaizen. Memuat daftar metrik salah petak, yaitu metrik yang punya sumber tetapi sumbernya menjawab pertanyaan lain, plus daftar posisi yang dinyatakan tidak direkomendasikan dibuatkan dashboard beserta syarat yang membalikkannya.",
       "kata_kunci": [
-        "dashboard per posisi",
         "indeks cakupan",
-        "coverage",
-        "KPI otomatis",
+        "dashboard per posisi",
+        "KPI",
         "salah petak",
+        "coverage",
         "penghambat",
-        "matriks KPI",
-        "ADR 0076",
+        "metrik otomatis",
         "Kaizen",
-        "batch record"
+        "template KPI",
+        "posisi"
       ]
     },
     {
@@ -11738,32 +11725,29 @@
         "REF - Dashboard per Posisi (Indeks Cakupan)",
         "RUN - Menambah Metrik KPI Otomatis",
         "IT - Dashboard per Posisi",
-        "REF - Layout Dashboard erp-frontend",
         "Manufacture - Dashboard per Posisi",
         "Finance - Dashboard per Posisi (FAT)",
         "GA - Checklist Management",
         "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri",
         "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "REF - Layout Dashboard erp-frontend",
         "HRIS - Matriks KPI per Departemen"
       ],
-      "hash": "8963740eccd90c45685b927c45e5a2510c70d6b2692611f7d8620ae02f961df1",
-      "ukuran_kb": 7.7,
-      "ringkasan": "Menjawab: apa urutan pengerjaan rancangan dashboard per posisi untuk seluruh divisi, item mana yang tiket developer dan mana yang permintaan ke tim lain (pemilik KPI, produksi, people development, finance, ICC). Papan kerja ini memecah pekerjaan jadi lima gelombang berdasarkan daya ungkit dibagi ongkos: keputusan tanpa kode (perbaiki 12 metrik salah petak, verifikasi `icc_account_mappings`, petakan 47 metrik belum terpetakan), membangun layar yang datanya sudah ada dimulai dari IT, mengisi modul yang sudah ada (Batch Record, Training, master anggaran), membangun modul baru, lalu integrasi baru. Juga menjawab apa yang sengaja tidak dikerjakan (Kaizen dan integrasi akun buzzer) beserta alasannya, dan utang `position_key` yang dicatat sebagai utang, bukan penghambat.",
+      "hash": "b8cc44e66de022c7576b17f484e27975b2e468a88c036800169af41d924793f6",
+      "ukuran_kb": 8.2,
+      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dilakukan untuk mewujudkan dashboard per posisi, dalam urutan apa, dan siapa yang mengerjakannya (pemilik KPI, tim produksi, finance, atau developer). Diurutkan sebagai lima gelombang berdasarkan daya ungkit dibagi ongkos: perbaikan metrik salah petak dan pemetaan metrik yang nol kode, pembangunan layar untuk divisi yang datanya sudah ada, pengisian modul yang sudah berdiri tapi kosong (Batch Record, Training, master anggaran), pembangunan modul baru, lalu integrasi baru. Menjawab juga mana yang sengaja tidak dikerjakan (Kaizen dan integrasi akun buzzer) dan kenapa utang position_key dicatat sebagai utang, bukan gerbang.",
       "kata_kunci": [
         "analisa",
         "dashboard per posisi",
-        "roadmap",
-        "gelombang",
+        "papan kerja",
+        "backlog",
         "prioritas",
+        "gelombang",
         "KPI",
-        "metrik salah petak",
-        "icc_account_mappings",
+        "salah petak",
         "Batch Record",
-        "training",
-        "master anggaran",
-        "position_key",
-        "Kaizen"
+        "position_key"
       ]
     },
     {

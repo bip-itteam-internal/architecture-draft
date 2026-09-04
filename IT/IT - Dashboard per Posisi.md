@@ -2,7 +2,8 @@
 
 *Rancangan isi dashboard per posisi untuk divisi **Tech Development**. Diturunkan mengikuti [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]]: KPI yang dinilai, pekerjaan yang menunggu, dan ambang yang tak boleh dilewati. Divisi ini dikerjakan lebih dulu karena satu-satunya yang punya metrik benar-benar otomatis dalam jumlah berarti, jadi rancangannya bisa diuji kebenarannya alih-alih diperdebatkan.*
 
-- **Status**: 🟡 **Rancangan**, belum dibangun. Yang ADA hari ini adalah Ringkasan Divisi IT tanpa tab per posisi (`erp-frontend/src/features/it/ringkasan/`).
+- **Status**: ⚠️ **Sebagian terbangun, dan rancangan lembar per posisinya DIBATALKAN 2026-09-04** (bukan ditunda). Yang mendarat: blok uptime periode kalender dan tautan ke `/portal/kpi` di Ringkasan Divisi IT, erp-frontend [#1452](https://github.com/bip-itteam-internal/erp-frontend/pull/1452). Sebab pembatalannya di bagian tersendiri di bawah, dan itu jawaban yang sah menurut [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]] §4.
+- ⚠️ **Dokumen ini TIDAK usang.** Analisis per posisi di bawah tetap berlaku sebagai catatan apa yang menilai tiap orang di divisi ini, dan pelajaran pembatalannya adalah cetakan untuk sembilan divisi sisanya. Sengaja TIDAK diberi marker `⛔`, yang di vault ini berarti "sudah digantikan, jangan dipakai".
 - **Angka KPI diukur 2026-08-28** (sumber: [[HRIS - Matriks KPI per Departemen]]). ⚠️ Konfigurasi template divisi ini berubah beberapa kali dalam Agustus 2026. **Ukur ulang sebelum dipakai mengambil keputusan.**
 - **Path di repo**: `erp-frontend/src/features/it/ringkasan/`
 
@@ -14,7 +15,30 @@ Ketiadaan tab posisi **bukan kelalaian**, dan alasannya tertulis di kodenya send
 
 ⚠️ **Ralat 2026-09-04**: dokumen ini semula menyimpulkan dari kalimat itu bahwa rancangan di bawah "baru bisa dibangun setelah `position_key` tersedia di frontend". **Itu terlalu keras.** Dari dua alasan di kode, yang pertama sudah gugur (peta posisi IT kini ada, diturunkan dari [[HRIS - Matriks KPI per Departemen]]), dan yang kedua bukan gerbang: **17 lembar HRGA dan FAT sudah berjalan hari ini tanpa `position_key`**, dengan mencocokkan nama posisi dari `useAuth().position`. `position-view.ts` menyebutnya eksplisit sebagai satu-satunya cara selama utang [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] belum lunas.
 
-Jadi rancangan di bawah **boleh dibangun sekarang** dengan cara yang sama. Konsekuensi yang diterima sadar: rename nama posisi di master data memutus pencocokannya secara senyap, jadi selama utang itu hidup perubahan nama posisi wajib diperlakukan sebagai perubahan yang menyentuh frontend.
+Jadi secara teknis rancangan di bawah **bisa** dibangun. Yang membatalkannya bukan penghalang teknis, melainkan temuan di bagian berikutnya.
+
+## ⛔ Kenapa lembar per posisi dibatalkan
+
+Ditemukan 2026-09-04 saat lembarnya hendak dibangun: **`/portal/kpi` sudah melayani ketiga posisi berpenghuni divisi ini**, lewat kaskade persona di `erp-frontend/src/app/(main)/portal/kpi/page.tsx`.
+
+| Posisi | Yang sudah didapat hari ini |
+|---|---|
+| Tech Development Leader | punya bawahan, jadi `KpiPageContent teamScope` |
+| Fullstack Developer | bukan penilai, jadi `KpiSayaView` |
+| IT Support | bukan penilai, jadi `KpiSayaView` |
+
+`KpiSayaView` (359 baris) sudah lengkap dengan pemilih periode, tren, band skor, lencana sumber otomatis/semi/manual, cakupan per metrik, unggah bukti, dan dialog rincian, yaitu persis isi yang dirancang untuk dua lembar staf di bawah.
+
+**Yang menentukan: keputusan ini sudah pernah diambil di repo dan alasannya tertulis di kode.** Komentar di `page.tsx` menyatakan kartu skor KPI di dashboard sengaja TIDAK melayani cakupan "diri" karena *"dua layar yang menjawab pertanyaan sama akan menyimpang, dan yang ini sudah lebih matang"*. Membangun tiga lembar KPI di `/it` berarti membalik keputusan itu tanpa menyebutnya.
+
+**Yang dibangun sebagai gantinya**, erp-frontend [#1452](https://github.com/bip-itteam-internal/erp-frontend/pull/1452), keduanya benar-benar belum ada sebelumnya:
+
+1. **Blok "Uptime Bulan Penilaian"** di Ringkasan Divisi IT, memakai `GET /api/monitoring/uptime?periode=` yang sebelumnya nol konsumen. Ia menampilkan uptime periode kalender berikut **cakupan harinya**, dan sengaja duduk tepat di bawah blok Kesehatan Infrastruktur yang memakai jendela berjalan 24 jam supaya bedanya terbaca.
+2. **Tautan dari kartu KPI tim ke `/portal/kpi`**, menutup titik putus alur: kartu menyebut rata-rata tim sementara pertanyaan berikutnya yang wajar dijawab layar di modul lain, tanpa satu pun tautan.
+
+⚠️ **Pelajaran yang berlaku untuk sembilan divisi sisanya**: sebelum merancang lembar per posisi, periksa lebih dulu apakah `/portal/kpi` sudah menjawabnya untuk posisi itu. Untuk posisi yang **bukan penilai**, kemungkinan besar sudah. Yang benar-benar menambah nilai adalah metrik yang **tidak** ada di scorecard KPI, seperti uptime periode di sini.
+
+Konsekuensi utang `position_key` yang tetap berlaku bila suatu saat lembar per posisi dibangun di divisi mana pun: rename nama posisi di master data memutus pencocokannya secara senyap, jadi selama utang itu hidup perubahan nama posisi wajib diperlakukan sebagai perubahan yang menyentuh frontend.
 
 ## Yang menentukan lingkup: penghuni, bukan jumlah template
 
