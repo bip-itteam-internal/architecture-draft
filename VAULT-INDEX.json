@@ -59,28 +59,20 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "3adf79617321ccac65a1bc147820f0f3c5371a6511c0ed23fb3a80e1bc3953a1",
-      "ukuran_kb": 21.9,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di attendance-service lewat gateway `/api/attendance/*`, siapa yang boleh memanggilnya (RBAC HRIS, Security, guestbook, gerbangRoster, gerbangRuteKelolaJadwal), dan parameter apa yang dipakai tiap rute. Mencakup tap clock-in/out, daftar entri beserta filter tanggal DD-MM-YYYY, laporan periode 26 sampai 25, payroll-supplement dan perlakuan status dibayar/dipotong, hari libur, pengajuan cuti/izin/dinas beserta review dan pembatalan, tukar jadwal kerja, koreksi absen, roster per tanggal, definisi shift perusahaan, pola rotasi grup, penugasan jadwal berlaku-mulai, dan daftar anggota Jadwal Host Live. Juga menjelaskan aturan validasi yang mudah terlewat: keunikan global `schedule_id`/`group_id`, `display_name` shift yang tertutup, `starting_date` rotasi yang wajib, batas 500 sel roster, aturan H+1 penugasan, dan idempotensi pengajuan cuti.",
+      "hash": "c1aa2b4b75f3d32d3b5d22aca442c04d4361b9d7f1326314e166b9d1f2e8d455",
+      "ukuran_kb": 22.2,
+      "ringkasan": "Menjawab: endpoint mana yang dipakai untuk clock-in/out, menarik daftar entri absensi beserta filter tanggal dan departemennya, mengelola definisi shift dan pola rotasi perusahaan, serta mengisi roster jadwal bebas per tanggal. Juga menjawab siapa yang boleh memanggil tiap rute (RBAC seperti RequireHRISStaff, RequireSecurity, gerbangRoster) dan rute mana yang open, plus bentuk request/response untuk leave request, tukar jadwal, koreksi absen, holiday, mood, dan payroll-supplement. Berguna saat menyambungkan frontend atau service lain ke attendance-service lewat gateway /api/attendance/*.",
       "kata_kunci": [
         "attendance service",
         "absensi",
-        "presensi",
+        "endpoint",
+        "API",
         "clock-in",
         "clock-out",
-        "endpoint attendance",
-        "cuti",
-        "leave request",
-        "koreksi absen",
+        "jadwal kerja",
+        "work schedule",
         "roster",
-        "shift",
-        "tukar jadwal",
-        "schedule exchange",
-        "payroll supplement",
-        "guestbook",
-        "jadwal host live",
-        "work schedule assignment",
-        "berlaku mulai"
+        "leave request"
       ]
     },
     {
@@ -1236,6 +1228,7 @@
         "API - Attendance Service",
         "HRIS - Employee Request & Approval",
         "HRIS - Leave Request",
+        "HRIS - Attendance Correction",
         "Microservices - Payroll Service",
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "APP - Web ERP",
@@ -1256,20 +1249,21 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "65b53cac38e772d6a3f287b15905cbaf0ba8c258b83770f888bb9eb429764d6b",
-      "ukuran_kb": 50.3,
-      "ringkasan": "Menjawab: fitur apa saja yang ada di aplikasi mobile MyBharata, bagaimana bentuk layarnya, dan keputusan rancangan apa yang sudah diambil beserta alasannya. Mencakup presensi dan geofencing, cuti dan izin, lembur, slip gaji berikut gerbang PIN dan unduh PDF, KPI, notifikasi, serta susunan menu beranda. Dipakai untuk mengetahui apakah sebuah layar sudah ada sebelum membuat yang baru, dan untuk menemukan jebakan mobile yang sudah terbukti menggigit.",
+      "hash": "f632873720f4766e2ddbe9cd4ae0e48c319d3bc24abe65d9cb1122bd98f573ad",
+      "ukuran_kb": 51.3,
+      "ringkasan": "Menjawab: apa saja yang bisa dilakukan karyawan lewat aplikasi mobile MyBharata (absensi, pengajuan cuti/izin, lembur, slip gaji, KPI, survei, pelatihan) dan bagaimana aplikasinya dibangun — Flutter dengan Clean Architecture feature-first, BLoC, get_it, dio, dan go_router. Juga menjawab bagaimana autentikasi bekerja (JWT + biometric + PIN, satu akun satu device), bahwa aplikasi memanggil backend lewat API Master Gateway dengan prefix api/<module>, serta bagaimana konten dan menu di-scope per perusahaan (multi-tenant) beserta batas gerbang konten yang sengaja belum dibuka. Berguna untuk tahu versi build vs versi rilis dan fitur mana yang baru ada di dev.",
       "kata_kunci": [
         "MyBharata",
         "aplikasi mobile",
         "Flutter",
-        "slip gaji mobile",
-        "PIN",
-        "presensi mobile",
-        "menu beranda",
-        "unduh PDF",
+        "HRIS mobile",
+        "BLoC",
+        "clean architecture",
+        "multi-tenant",
+        "JWT",
+        "biometric",
         "geofencing",
-        "notifikasi"
+        "gateway"
       ]
     },
     {
@@ -2561,6 +2555,7 @@
         "HRIS - Otomasi Skor KPI",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "HRIS - Matriks KPI per Departemen",
         "IT - Monitoring System",
         "APP - Web ERP",
         "Microservices - Employee Service",
@@ -2570,22 +2565,20 @@
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "IT - Server, VMs and Databases"
       ],
-      "hash": "a86a7a65c3c9b47068032d2cb43720bd937bad6b2de8e0d2ec40aa3eed1a651f",
-      "ukuran_kb": 11.0,
-      "ringkasan": "Menjawab: dari mana angka uptime infrastruktur berasal (basis data kuma.db milik Uptime Kuma, dibuka read-only), kenapa service ini hanya berjalan di produksi dan membalas 503 di dev, serta endpoint apa saja yang tersedia untuk dashboard IT, ekspor CSV, dan pengumpul KPI. Menjelaskan cara uptime per periode kalender dihitung: batas periode dihitung di WIB lalu dikonversi ke UTC, rata-rata tertimbang jumlah heartbeat, uptime nullable saat tak ada data, dan pelaporan cakupan hari. Memuat juga perilaku cache dua tingkat, single-flight beserta penyajian entri basi, dan perbedaan gerbang RBAC (monitoring.view / monitoring.export) dengan gerbang kunci layanan untuk rute KPI yang dipanggil mesin.",
+      "hash": "3aa9328b3fb0c4e92c0e527951b756dc8d551ef67d7552bcd3351eb722aa3efb",
+      "ukuran_kb": 12.3,
+      "ringkasan": "Menjawab: dari mana angka uptime di dashboard IT dan metrik KPI otomatis berasal (basis data kuma.db milik Uptime Kuma yang dibuka read-only), dan kenapa endpointnya membalas 503 di server dev. Menjelaskan cara uptime per periode kalender dihitung: batas periode dihitung WIB lalu dikonversi UTC, rata-rata tertimbang jumlah heartbeat, uptime nullable saat tak ada data, dan pelaporan cakupan hari. Menjawab juga perbedaan gerbang akses manusia (izin RBAC monitoring.view / monitoring.export) versus pemanggil mesin (MONITORING_SERVICE_KEY), serta perilaku cache single-flight dan penyajian entri basi.",
       "kata_kunci": [
-        "monitoring",
-        "uptime",
-        "downtime",
+        "monitoring-service",
         "Uptime Kuma",
         "kuma.db",
-        "heartbeat",
-        "incident",
-        "gangguan",
+        "uptime",
         "KPI uptime",
+        "dashboard IT",
+        "heartbeat",
+        "single-flight cache",
         "monitoring.view",
-        "MONITORING_SERVICE_KEY",
-        "cache single-flight"
+        "MONITORING_SERVICE_KEY"
       ]
     },
     {
@@ -5482,7 +5475,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented sebagian** — §1-§3 dan §5 **SUDAH DIKERJAKAN** 2026-09-03: prefix MinIO `audit/` (bip-erp [#1699](https://github.com/bip-itteam-internal/bip-erp/pull/1699)), koleksi `audit_bukti` + empat rute ([#1700](https://github.com/bip-itteam-internal/bip-erp/pull/1700)), keduanya merged. **§4 (pembacaan otomatis) belum dimulai** dan tetap berprasyarat persetujuan Direksi. ⛔ **Belum bisa dipakai siapa pun**: layarnya belum ada, dan `MINIO_AUDIT_KEY` belum diisi di `.env` mana pun",
+      "status_teks": "**Implemented sebagian** — §1-§3 dan §5 **SUDAH DIKERJAKAN**: prefix MinIO `audit/` (bip-erp [#1699](https://github.com/bip-itteam-internal/bip-erp/pull/1699)), koleksi `audit_bukti` + empat rute ([#1700](https://github.com/bip-itteam-internal/bip-erp/pull/1700)), penjalan uji membaca bukti ([#1711](https://github.com/bip-itteam-internal/bip-erp/pull/1711)), panel buktinya di `audit-bharata`, dan `MINIO_AUDIT_KEY` terisi di dev dan prod. **§4 (pembacaan otomatis) belum dimulai** dan tetap berprasyarat persetujuan Direksi. ⛔ **Belum bisa dipakai siapa pun**, tetapi sebabnya sudah bergeser dari kode ke penyiapan: paket izin `Audit: *` belum ditempel ke satu posisi pun, dan aplikasi `audit-bharata` belum ter-deploy di mana pun (diukur prod 2026-09-04)",
       "publik": true,
       "tautan": [
         "Finance - Audit Internal",
@@ -5493,20 +5486,22 @@
         "API - File Service",
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
       ],
-      "hash": "c0bc6df97bc4bc918c37a4ae6d2854ce3b72e953383ef770a1bd0d970305db54",
-      "ukuran_kb": 16.2,
-      "ringkasan": "Menjawab: bagaimana dokumen fisik pembanding audit masuk ke sistem, di mana angkanya dicatat, dan kenapa pembacaan otomatis oleh AI ditunda jadi tahap terpisah berprasyarat persetujuan Direksi. Menjelaskan kenapa prefix penyimpanan audit sengaja tidak punya kunci baca, dan kenapa kunci baca yang sampai ke peramban membatalkan janji kerahasiaan catatan pemeriksaan. Memuat hasil pengukuran endpoint AI internal: ia relay ke penyedia luar, routernya bisa memilih penyedia sendiri, dan lampiran PDF ditelan diam-diam sehingga jawabannya berupa angka karangan.",
+      "hash": "834f5a2402426c81fde155734442921fe53b7a320bbb0dde2dab2fde0319486b",
+      "ukuran_kb": 16.4,
+      "ringkasan": "Menjawab: bagaimana auditor internal melampirkan dokumen pembanding (rekening koran, SPT masa, berita acara, bukti terima gudang) ke sebuah baris kertas kerja, kenapa angka dari dokumen itu diketik manusia dan bukan dibaca mesin, dan apa prasyarat sebelum pembacaan otomatis boleh dimulai. Menjelaskan keputusan menyimpan bukti di koleksi terpisah `audit_bukti` dengan prefix MinIO `audit/` yang sengaja tanpa kunci baca, serta alasan pembacaan otomatis dipisah jadi tahap tersendiri yang berprasyarat persetujuan tertulis Direksi karena rekening koran akan keluar dari perusahaan.",
       "kata_kunci": [
+        "bukti audit",
         "audit internal",
-        "bukti",
         "rekening koran",
-        "upload",
-        "MinIO",
+        "bank statement",
+        "lampiran",
+        "attachment",
+        "MinIO audit prefix",
+        "audit_bukti",
         "OCR",
-        "AI",
-        "PDF",
-        "vision",
-        "ekstraksi"
+        "pembacaan otomatis",
+        "vision model",
+        "persetujuan Direksi"
       ]
     },
     {
@@ -5671,20 +5666,22 @@
         "Finance - Dashboard per Posisi (FAT)",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "266bc7aad92d7fd218998d5ba3235911652b1faa1df06c922571be558f59bd17",
-      "ukuran_kb": 27.0,
-      "ringkasan": "Menjawab: apa saja 36 uji audit internal, bagaimana ketiga kelompok pembandingnya menentukan kekuatan tiap uji, uji mana yang menuntut sampling dan mana yang tak boleh acak, dan bagaimana keadaan baris kertas kerja dihitung. Menjelaskan tiga layar audit beserta pemetaan aksi ke tiga izin tulis yang berbeda, serta dua belas uji yang menunggu dokumen fisik beserta tempat menaruh buktinya yang kini sudah ada di kode. Mencatat pula lubang yang belum tertutup: catatan penarikan sampel yang membuktikan auditor tidak memilih yang mudah belum pernah benar-benar ditulis.",
+      "hash": "6b97f76b8e7df538b6828718175276ea660f2f07daaf0bdbbe0b720e93028c73",
+      "ukuran_kb": 29.4,
+      "ringkasan": "Menjawab: uji audit apa saja yang dijalankan sistem tiap bulan, mana yang otomatis dan mana yang masih menunggu dokumen fisik dari manusia, dan bagaimana sebuah baris kertas kerja berpindah dari menunggu data ke bersih. Menjelaskan pembedaan keadaan mesin, vonis manusia, dan keadaan efektif; aturan sampling beserta gap catatan penarikannya; serta dua bentuk uji berbasis unggahan yang menuntut aturan cakupan bukti berbeda. Memuat peringatan bahwa klaim bersih pada jurnal manual besar berarti dokumennya ditunjukkan, bukan jurnalnya dinilai wajar.",
       "kata_kunci": [
         "audit internal",
         "kertas kerja",
         "working paper",
-        "temuan",
+        "uji audit",
         "sampling",
+        "jurnal manual besar",
         "rekonsiliasi bank",
-        "Accurate",
-        "bukti",
-        "ukuran sampel",
-        "kelompok pembanding"
+        "menunggu data",
+        "temuan",
+        "finding",
+        "bukti sisi lawan",
+        "keadaan efektif"
       ]
     },
     {
@@ -5873,20 +5870,20 @@
         "Finance - Bridging App",
         "HRIS - Compensation & Benefits"
       ],
-      "hash": "597e5cdf93b82694c3c868f7df96885e09205b7e732ffbc538db2ee5081d342e",
-      "ukuran_kb": 26.3,
-      "ringkasan": "Menjawab: apa aturan bisnis insentif Adv/SPV marketing menurut SK 010 dan 011/2026 (rumus profit, tabel tarif, gerbang retur 7%, target hanya di Supervisor, dasar uang cair, order hangus setelah tanggal 25 bulan berikutnya) dan bagaimana bunyi skema KPI-multiplier lama per jabatan (SPV, ADV, ICC, Host Live, Affiliator, CS, CRM) yang sudah dicabut. Juga menjawab siapa yang boleh melihat tiap layar insentif (menu terbatas, paket Menu: Insentif Profit), cara membaca dashboard (periode belum final, toko nol order, cache), dan apa yang masih menahan pemakaian.",
+      "hash": "df51222013d8319eb801fbf80adc295b656ff262850537ab67ecd35700c5340f",
+      "ukuran_kb": 28.7,
+      "ringkasan": "Menjawab: bagaimana insentif marketing dihitung di bawah skema profit-based SK 010 & 011/2026 (Profit = Uang Cair dikurangi HPP, Beban Iklan, dan Biaya Operasional), berapa tarif di tiap tingkat pencapaian target, siapa yang mengetik target dan bagaimana ia dibagi turun dari Supervisor ke Leader dan ICC, serta syarat yang menggugurkan seperti gerbang retur 7% dan cutoff pencairan tanggal 25 bulan berikutnya. Juga menjawab: siapa yang boleh membuka Dashboard Insentif, Master Data, Insentif Saya, dan rincian beban karyawan; kenapa angka dashboard bisa berbeda dari ICC Management, dari bulan yang diharapkan, atau dari pembukuan Accurate; dan apa arti penanda periode Belum final vs Final. Memuat pula riwayat skema KPI-multiplier per jabatan lama (SPV Marketing, ADV/Leader ICC, ADV Meta & Marketplace, ICC, Host Live, Affiliator, CS, CRM) yang sudah dicabut dan tidak boleh dipakai sebagai acuan perhitungan.",
       "kata_kunci": [
         "insentif",
         "incentive",
-        "SK 010 011",
         "profit-based",
-        "tarif",
-        "gerbang retur",
-        "SPV marketing ADV ICC",
-        "hak akses insentif",
-        "periode hangus cutoff 25",
-        "uang cair net settlement"
+        "SK 010",
+        "uang cair",
+        "net settlement",
+        "target profit",
+        "gerbang retur 7%",
+        "biaya operasional",
+        "ICC"
       ]
     },
     {
@@ -6324,8 +6321,8 @@
         "CORE - OCR Document Service",
         "Form Permintaan Barang GA.pdf"
       ],
-      "hash": "0bce09cf72fad9786d58100c585b3683f7db7570b4a3defca68026037110f32b",
-      "ukuran_kb": 15.6,
+      "hash": "e218699c201d51d720aca6ebd9a7b3796ffb46d7ba427c300cdfeb3e1399715e",
+      "ukuran_kb": 16.6,
       "ringkasan": "Menjawab: bagaimana General Affairs mencatat dan mengontrol aset/barang perusahaan — penomoran tag aset, serah-terima & persetujuan SPV, lokasi & estimasi penyusutan, riwayat perbaikan + bukti nota, soft-delete, rekonsiliasi aset & perlengkapan dengan Accurate untuk KPI, tab Cocokkan (search + filter status di header, kecualikan perlengkapan), dan explorer perlengkapan lingkup GUDANG GA (Gudang Utama) dengan Terpasang X/N + Total Biaya yang cocok report Accurate per-gudang. Menjelaskan juga apa yang sengaja tak ditampilkan (tanggal beli, nilai buku, barang gudang lain) beserta alasannya.",
       "kata_kunci": [
         "inventory",
@@ -6704,7 +6701,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented — alur koreksi (pengajuan → approval berjenjang → auto-fix attendance) sudah jalan. Guard anti-fraud guestbook **tak pernah menyala sampai 2026-09-01** dan kini sudah diperbaiki (§Riwayat), **live di DEV, PROD belum**. Pengiriman `employee_id` dari MyBharata menunggu rilis store (my-bharata #133); sampai itu seluruh kecocokan melewati jalur nama.",
+      "status_teks": "Implemented — alur koreksi (pengajuan → approval berjenjang → auto-fix attendance) sudah jalan. Guard anti-fraud guestbook **tak pernah menyala sampai 2026-09-01** dan kini sudah diperbaiki (§Riwayat), **live di DEV, PROD belum**. Pengiriman `employee_id` dari MyBharata menunggu rilis store (my-bharata #133); sampai itu seluruh kecocokan melewati jalur nama. **Kasus Penggunaan #4 (sengketa telat) tak terjangkau dari layar mana pun sampai 2026-09-04** — backend membukanya sejak 2026-06-25 tapi kedua frontend menolaknya sendiri (§Riwayat); perbaikannya belum dirilis (web menunggu deploy, MyBharata menunggu rilis store). Satu gap tersisa: jendela clock-out masih punya dua salinan yang berbeda (§Gap yang diketahui).",
       "publik": true,
       "tautan": [
         "HRIS - Leave Request",
@@ -6715,20 +6712,20 @@
         "Microservices - Attendance Service",
         "HRIS - Big Pictures"
       ],
-      "hash": "29b8842988dd6f19aa312bd04fae258b888b6df3289e6dab3f940542e8cbdabb",
-      "ukuran_kb": 20.1,
-      "ringkasan": "Menjawab: bagaimana karyawan mengajukan koreksi absen saat lupa clock-in, lupa clock-out, atau keduanya, siapa reviewernya, dan bagaimana status akhirnya ditentukan. Merinci model data attendance_correction_request, resolusi status dari review_1 dan review_2, auto-ignore pengajuan yang menunggu lebih dari 24 jam beserta reminder reviewer di T+18 jam, empat kasus penentuan reviewer (karyawan biasa, SPV non-HR, staff HR, SPV HR) termasuk pencegahan self-approval dan routing level departemen, serta endpoint /api/attendance/correction/* dengan parameter as, filter ongoing/past, dan status. Juga menjawab aturan anti-fraud guestbook yang menolak koreksi bila keterlambatan sudah diverifikasi security, cara catatan security dicocokkan ke karyawan, dan dampak persetujuan pada entri kehadiran yang waktunya diisi otomatis dari jadwal kerja.",
+      "hash": "23f1c03b5fb939b0c0267f25e93c4df967405d12e4fdb7b0a527afe809a92449",
+      "ukuran_kb": 24.8,
+      "ringkasan": "Menjawab: bagaimana karyawan mengajukan koreksi absen saat lupa clock-in, clock-out, keduanya, atau menyengketakan status telat, dan dari mana waktu clock diisi saat koreksi disetujui (snapshot jadwal kerja, bukan input manual). Juga menjawab siapa reviewernya untuk empat kombinasi peran pemohon (karyawan biasa, SPV non-HR, staff HR, SPV HR), bagaimana status akhir diturunkan dari review_1 dan review_2, aturan anti-self-approval, auto-ignore pengajuan yang menggantung lebih dari 24 jam beserta reminder di T+18 jam, dan bagaimana guard anti-fraud mencocokkan koreksi dengan catatan security di guestbook. Memuat model data koleksi attendance_correction_request, daftar endpoint /api/attendance/correction/*, serta parameter filter ongoing/past dan as=reviewer/reviewed.",
       "kata_kunci": [
         "koreksi absen",
         "attendance correction",
         "lupa clock-in",
         "lupa clock-out",
-        "approval",
+        "approval berjenjang",
         "reviewer",
-        "auto-ignore",
         "anti-fraud",
         "guestbook",
-        "telat"
+        "telat",
+        "auto-ignore"
       ]
     },
     {
@@ -8293,8 +8290,8 @@
       "judul": "IT - Dashboard per Posisi",
       "area": "IT",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "**Rancangan**, belum dibangun. Yang ADA hari ini adalah Ringkasan Divisi IT tanpa tab per posisi (`erp-frontend/src/features/it/ringkasan/`).",
+      "status_emoji": "⚠️",
+      "status_teks": "**Sebagian terbangun, dan rancangan lembar per posisinya DIBATALKAN 2026-09-04** (bukan ditunda). Yang mendarat: blok uptime periode kalender dan tautan ke `/portal/kpi` di Ringkasan Divisi IT, erp-frontend [#1452](https://github.com/bip-itteam-internal/erp-frontend/pull/1452). Sebab pembatalannya di bagian tersendiri di bawah, dan itu jawaban yang sah menurut [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]] §4.",
       "publik": false,
       "tautan": [
         "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
@@ -8308,22 +8305,20 @@
         "IT - Monitoring System",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "086873611d6ad6545e63dcbe912c8b9d48dfd7c25dacc736ac81406fa9dd7eb5",
-      "ukuran_kb": 10.7,
-      "ringkasan": "Menjawab: apa isi dashboard untuk tiap posisi di divisi Tech Development (Tech Development Leader, Fullstack Developer, IT Support), metrik KPI mana yang jadi visual utama, dan kenapa empat posisi lain tidak dirancang karena templatenya arsip tanpa akun aktif. Menjelaskan bobot, sumber, dan cakupan tiap metrik, kenapa cakupan CSAT harus ditulis di sebelah angkanya, serta apa yang menunggu backend (anggaran IT tanpa parameter departemen, modul kewajiban Calendar Service) dan apa yang sengaja tidak ditampilkan (Kaizen, manual karena keputusan). Juga menjawab kenapa pencocokan posisi masih memakai nama dari `useAuth().position` alih-alih `position_key`, dan risiko senyap bila nama posisi di master data di-rename.",
+      "hash": "cab19bfd6de4531a75472b99a2257b7ce1d84a31fa836ad834fe123603ddd59b",
+      "ukuran_kb": 13.6,
+      "ringkasan": "Menjawab: apa isi dashboard yang dirancang untuk tiap posisi di divisi Tech Development (Leader, Fullstack Developer, IT Support), metrik KPI apa yang menilai tiap posisi beserta bobot, sumber otomatis, dan targetnya. Menjelaskan juga kenapa rancangan lembar per posisi ditinggalkan setelah ditemukan `/portal/kpi` sudah melayani ketiga posisi lewat kaskade persona, apa yang dibangun sebagai gantinya (blok uptime periode penilaian dan tautan dari kartu KPI tim), serta kenapa empat posisi bertemplate arsip tanpa akun aktif sengaja tidak dirancang. Berguna sebagai cetakan pengecekan sebelum merancang dashboard posisi untuk divisi lain, termasuk konsekuensi utang `position_key` yang belum mengalir ke frontend sehingga pencocokan masih lewat nama posisi.",
       "kata_kunci": [
         "dashboard per posisi",
+        "position dashboard",
         "Tech Development",
-        "IT",
-        "KPI",
-        "Fullstack Developer",
-        "IT Support",
+        "divisi IT",
+        "KPI IT",
+        "portal KPI",
         "position_key",
-        "CSAT",
-        "SLA tiket",
         "uptime",
-        "Kaizen",
-        "cakupan metrik"
+        "IT Support",
+        "Fullstack Developer"
       ]
     },
     {
@@ -9589,24 +9584,25 @@
         "Unlisted - Dashboard per Posisi (Kesekretariatan)",
         "QA - Dashboard per Posisi",
         "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
+        "Finance - Incentive",
         "REF - Penamaan Metrik & Sumber KPI",
         "HRIS - Otomasi Skor KPI",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "f6e966ce69c586426b8d0f88b51806441808c44007c0234a65d53745f6de4523",
-      "ukuran_kb": 11.1,
-      "ringkasan": "Menjawab: posisi dan divisi mana saja yang punya rancangan dashboard per posisi, berapa banyak metrik KPI yang benar-benar otomatis di produksi (10 dari 311 baris metrik, 87,5% masih dinilai manual), dan penghambat mana yang muncul lintas divisi sehingga satu pekerjaan membuka banyak metrik sekaligus. Memuat tabel dokumen rancangan per divisi, peringkat penghambat menurut daya ungkit (paling besar justru \"belum dipetakan sama sekali\" yang merupakan keputusan pemilik KPI, bukan pekerjaan kode), serta daftar 12 metrik salah petak yang sumbernya menjawab pertanyaan lain sehingga menghasilkan angka masuk akal tetapi salah. Juga mendaftar posisi yang dinyatakan tidak direkomendasikan dibuatkan dashboard beserta syarat yang membalikkan keputusan itu.",
+      "hash": "a81fceac0d683a21cc730f1c8d28be52f7610efd99eee3e79dedf746d98306f9",
+      "ukuran_kb": 12.8,
+      "ringkasan": "Menjawab: posisi apa saja yang ada di tiap divisi, berapa metrik KPI yang benar-benar sudah otomatis di produksi versus yang masih dinilai manual, dan dokumen rancangan dashboard mana yang mengurus divisi tertentu. Menjawab juga penghambat mana yang mengunci paling banyak metrik lintas divisi (dan mana yang sebenarnya bukan pekerjaan kode melainkan keputusan pemilik KPI atau pengisian data), metrik mana yang salah petak sehingga sumbernya menjawab pertanyaan lain, serta posisi mana yang sengaja dinyatakan tidak direkomendasikan dibuatkan dashboard beserta syarat yang membalikkannya.",
       "kata_kunci": [
         "dashboard per posisi",
+        "position dashboard",
         "indeks cakupan",
-        "coverage",
+        "cakupan KPI",
         "KPI otomatis",
-        "salah petak",
+        "salah petak metrik",
         "penghambat",
-        "matriks KPI",
-        "ADR 0076",
-        "Kaizen",
-        "batch record"
+        "blocker",
+        "matriks KPI per departemen",
+        "ADR 0076"
       ]
     },
     {
@@ -10471,28 +10467,29 @@
         "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
         "Sales - Marketing Dashboard (Index)",
         "HRIS - Matriks KPI per Departemen",
-        "Sales - ICC Account Manager Mapping",
+        "Finance - Incentive",
         "GA - Dashboard per Posisi",
         "REF - Layout Dashboard erp-frontend",
+        "Sales - ICC Account Manager Mapping",
         "Sales - ICC Affiliate Mapping",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)",
         "Microservices - Marketing Analytics Service",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing"
       ],
-      "hash": "e49a31e5ffba0cc538601fda90540d144fc5ba254a74a12b5044117f09435751",
-      "ukuran_kb": 11.1,
-      "ringkasan": "Menjawab: posisi mana di divisi brand Beauty Hacks dan Kyura yang dashboard-nya bisa dirancang sekarang (ICC, Leader, Marketplace Advertiser, Affiliate, Host Live, Customer Support Kyura, Supervisor) dan mana yang tidak direkomendasikan (Meta Advertiser karena Meta Ads tak terintegrasi, Buzzer karena memakai akun personal tanpa API, Video Editor karena tak ada tracker garapan). Menjelaskan bahwa di sini penghambatnya bukan ketiadaan data atau layar (data GMV, affiliate, dan video ratusan ribu baris, plus 16 halaman Marketing Analytics sudah ada) melainkan atribusi ke orang, yang bertumpu pada pengisian icc_account_mappings. Memuat bobot dan target metrik per posisi untuk kedua brand, visual utama yang disarankan, serta jebakan seperti wajib memakai place_order_date untuk order afiliasi, cakupan skor_tim yang menuntut supervisor_id terisi, dan CSAT yang hanya punya 17 tiket ter-rating.",
+      "hash": "896f394e2d5a244c056f63f83d6227f4cbe223c7a489f4dfa976e5b9c56ca089",
+      "ukuran_kb": 13.2,
+      "ringkasan": "Menjawab: metrik, bobot, dan target KPI apa yang dipakai tiap posisi di dua divisi brand Beauty Hacks dan Kyura (ICC, Leader, Marketplace Advertiser, Affiliate, Host Live, Customer Support, Supervisor, Meta Advertiser, Buzzer, Video Editor), posisi mana yang datanya sudah cukup untuk dibuatkan dashboard sekarang, dan visual apa yang disarankan untuk masing-masing. Juga menjawab: dari koleksi mana angka tiap metrik diambil (tt_shop_video_performances, affiliate_orders, mart_profit_attribution, marketplace_reviews, dst), bagaimana atribusi metrik per video ICC sebenarnya bekerja (lewat creator_username, bukan icc_account_mappings), kenapa ROAS per video tidak boleh dipakai sebagai angka penilaian, dan kenapa tanggal order afiliasi wajib memakai place_order_date. Memuat pula keputusan yang masih menggantung di pemilik KPI (definisi affiliator baru bergabung) serta metrik yang salah dipetakan dan harus dibetulkan sebelum kartunya dirancang.",
       "kata_kunci": [
         "dashboard per posisi",
         "Beauty Hacks",
         "Kyura",
         "ICC",
+        "creator_username",
+        "icc_account_mappings",
+        "ROAS per video",
         "affiliate",
         "host live",
-        "buzzer",
-        "Meta Ads",
-        "marketing analytics",
-        "atribusi employee_id"
+        "KPI marketing"
       ]
     },
     {
@@ -11730,30 +11727,31 @@
       "area": "Workspace",
       "jenis": "workspace",
       "status_emoji": "⚠️",
-      "status_teks": "Fase 1 sebagian — T1.1, T1.2, T1.3 **selesai dan merged**; T1.4, T1.5, T1.6 belum. ⛔ Fiturnya **belum bisa dipakai siapa pun**: layarnya belum ada dan `MINIO_AUDIT_KEY` belum diisi di `.env` lingkungan mana pun.",
+      "status_teks": "Fase 1 hampir tuntas — T1.1 sampai T1.5 **selesai dan merged**; **T1.6 belum**. ⛔ Fiturnya **belum bisa dipakai siapa pun**, tetapi sebabnya sudah BERGESER dan itu yang penting: bukan lagi kodenya kurang, melainkan **paket izin `Audit: *` belum ditempel ke satu posisi pun** dan **aplikasi `audit-bharata` belum ter-deploy di mana pun**. Diukur prod 2026-09-04; ukur ulang sebelum dipakai.",
       "publik": false,
       "tautan": [
         "ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul",
         "Finance - Audit Internal",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
         "APP - Audit Internal",
         "Microservices - File Service",
         "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri"
       ],
-      "hash": "5ccdbfc5488a0c35a082ba5b6357f7f02f6b93a250a32a427fe7cd332b9a7662",
-      "ukuran_kb": 8.4,
-      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dikerjakan untuk membuka uji audit yang pembandingnya dokumen fisik, dalam urutan apa, mana yang sudah selesai, dan mana yang berprasyarat persetujuan Direksi. Memecah kerjanya jadi tiga fase: tempat menaruh bukti, sebelas penjalan uji yang tersisa, dan pembacaan otomatis yang sengaja ditahan. Tiap task menyebut ketergantungannya dan gerbang verifikasinya.",
+      "hash": "f7c5c009bdd2c12ac6496fa1811067088f7c3f4a95a19ff7aafab3d8c3fb2a32",
+      "ukuran_kb": 11.2,
+      "ringkasan": "Papan kerja yang menjawab: task apa saja yang harus dikerjakan supaya auditor bisa melampirkan dokumen pembanding, urutan dan ketergantungannya, dan apa yang sudah selesai versus belum. Memecah pekerjaan jadi tiga fase: tempat menaruh bukti, penjalan untuk sebelas uji yang belum punya mesinnya, dan pembacaan otomatis yang belum boleh dimulai. Mencatat dua prasyarat di luar kode yang menahan verifikasi akhir, yaitu paket izin audit yang belum ditempel ke posisi mana pun dan aplikasi audit yang belum ter-deploy.",
       "kata_kunci": [
         "audit internal",
+        "bukti sisi lawan",
+        "daftar task",
         "papan kerja",
-        "task",
         "roadmap",
-        "bukti",
-        "upload",
-        "rekonsiliasi bank",
-        "pengurai CSV",
-        "AI",
-        "fase"
+        "unggah bukti",
+        "upload evidence",
+        "paket izin audit",
+        "audit-bharata",
+        "fase implementasi"
       ]
     },
     {
@@ -11767,34 +11765,32 @@
       "tautan": [
         "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
         "REF - Dashboard per Posisi (Indeks Cakupan)",
+        "Sales - Dashboard per Posisi (Beauty Hacks & Kyura)",
         "RUN - Menambah Metrik KPI Otomatis",
         "IT - Dashboard per Posisi",
-        "REF - Layout Dashboard erp-frontend",
         "Manufacture - Dashboard per Posisi",
         "Finance - Dashboard per Posisi (FAT)",
         "GA - Checklist Management",
         "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri",
         "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "REF - Layout Dashboard erp-frontend",
         "HRIS - Matriks KPI per Departemen"
       ],
-      "hash": "8963740eccd90c45685b927c45e5a2510c70d6b2692611f7d8620ae02f961df1",
-      "ukuran_kb": 7.8,
-      "ringkasan": "Menjawab: apa urutan pengerjaan rancangan dashboard per posisi untuk seluruh divisi, item mana yang tiket developer dan mana yang permintaan ke tim lain (pemilik KPI, produksi, people development, finance, ICC). Papan kerja ini memecah pekerjaan jadi lima gelombang berdasarkan daya ungkit dibagi ongkos: keputusan tanpa kode (perbaiki 12 metrik salah petak, verifikasi `icc_account_mappings`, petakan 47 metrik belum terpetakan), membangun layar yang datanya sudah ada dimulai dari IT, mengisi modul yang sudah ada (Batch Record, Training, master anggaran), membangun modul baru, lalu integrasi baru. Juga menjawab apa yang sengaja tidak dikerjakan (Kaizen dan integrasi akun buzzer) beserta alasannya, dan utang `position_key` yang dicatat sebagai utang, bukan penghambat.",
+      "hash": "40fc66504bd5b5de21edf67be51a27363c1192e5b09149a251ddca84b5dd90db",
+      "ukuran_kb": 8.9,
+      "ringkasan": "Menjawab: apa urutan pengerjaan keluarga dokumen dashboard per posisi, item mana yang tiket developer dan mana yang permintaan ke tim non-IT, serta apa daya ungkit tiap item. Memuat lima gelombang kerja mulai dari perbaikan metrik salah petak dan pemetaan 47 metrik yang belum bersumber (nol kode), membangun layar untuk data yang sudah ada, pengisian modul yang sudah jadi tapi kosong (Batch Record, Training, master anggaran), pembangunan modul baru, sampai integrasi baru. Menjelaskan juga apa yang sengaja tidak dikerjakan beserta alasannya, terutama Kaizen yang manual karena keputusan.",
       "kata_kunci": [
-        "analisa",
-        "dashboard per posisi",
+        "analisa dashboard per posisi",
+        "papan kerja",
         "roadmap",
         "gelombang",
         "prioritas",
-        "KPI",
-        "metrik salah petak",
-        "icc_account_mappings",
+        "salah petak",
+        "Kaizen",
         "Batch Record",
-        "training",
         "master anggaran",
-        "position_key",
-        "Kaizen"
+        "backlog KPI"
       ]
     },
     {

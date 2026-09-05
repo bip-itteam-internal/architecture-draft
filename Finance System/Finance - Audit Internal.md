@@ -61,15 +61,25 @@ Tiga puluh sisanya **terdaftar dan terbit di kertas kerja** berkeadaan `belum_di
 
 ⚠️ **Tempat menaruh buktinya SUDAH ADA sejak 2026-09-03** (bip-erp [#1699](https://github.com/bip-itteam-internal/bip-erp/pull/1699) + [#1700](https://github.com/bip-itteam-internal/bip-erp/pull/1700), keduanya merged): prefix MinIO `audit/`, koleksi `audit_bukti`, dan empat rute — unggah, daftar, baca berkas lewat proxy berizin, hapus. Keputusannya di [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]].
 
-⛔ **Tetapi belum bisa dipakai siapa pun**, dan itu wajib dinyatakan: layarnya belum ada (T1.5), penjalan uji belum membacanya (T1.4), dan `MINIO_AUDIT_KEY` belum diisi di `.env` lingkungan mana pun sehingga unggahannya masih dibalas `invalid access key`. Jangan menyimpulkan dari "merged" bahwa fiturnya hidup.
+✅ **Jalurnya kini utuh dari layar sampai kesimpulan** (2026-09-04): `MINIO_AUDIT_KEY` terisi di `.env` dev dan prod, panel buktinya ada di aplikasi `audit-bharata` (T1.5), dan `ujiJurnalManualBesar` sudah membaca bukti (T1.4, bip-erp [#1711](https://github.com/bip-itteam-internal/bip-erp/pull/1711)).
+
+⛔ **Tetapi belum ada satu orang pun yang bisa memakainya, dan itu wajib dinyatakan.** Tiga hal menahannya, tak satu pun soal kode: paket izin `Audit: *` **belum ditempel ke satu posisi pun** (diukur prod 2026-09-04: 0 posisi; hanya satu akun developer memegangnya langsung di `system_authentication`), aplikasi `audit-bharata` **belum ter-deploy di mana pun**, dan **jalurnya belum pernah dijalankan lewat gateway dengan berkas sungguhan** (T1.6). Jangan menyimpulkan dari "merged" bahwa fiturnya hidup — dan jangan menyimpulkan dari "kodenya lengkap" bahwa ada yang bisa membukanya.
 
 Dua belas uji ber-`SumberUnggahan`: rekonsiliasi bank, rekonsiliasi pajak, kalender kepatuhan, kas rekening CV, daftar pihak berelasi, pisah batas penjualan, retur penjualan, penyesuaian persediaan, kapitalisasi versus beban, jurnal manual besar, penjualan PT ke CV, piutang iklan ke CV.
 
 ⛔ **Sebelas dari dua belas BELUM PUNYA PENJALAN sama sekali**, jadi mereka membalas `belum_diimplementasi` — bukan `menunggu_data`. Diukur di prod 2026-09-03 pada periode 2026-08: **32 `belum diimplementasi`, 4 `gagal ditarik`, 0 `menunggu data`.** Konsekuensinya menentukan urutan kerja: **membangun jalur unggah sendirian membuka nol dari sebelas uji itu.** Yang terbuka hari pertama hanya `jurnal_manual_besar`, satu-satunya yang penjalannya sudah ada.
 
-### Yang benar-benar hilang bukan jalur unggah, melainkan tempat menjawab
+### Yang dulu hilang bukan jalur unggah, melainkan tempat menjawab
 
-`ujiJurnalManualBesar` sudah menunjukkan bentuk yang dituju: ia memilih sampel terarah, mengisi `HasilUji.Terpilih`, lalu berhenti di `menunggu_data` dengan kalimat *"Menunggu dokumen sumbernya ditunjukkan."* Sistem sudah tahu apa yang ditunggunya dan dari item mana. Yang tak ada adalah tempat menjawabnya: `Tinjauan` hanya `{Oleh, Pada, Alasan}`, tanpa slot lampiran dan tanpa slot angka, dan tak satu pun dari sembilan rute audit menerima berkas.
+`ujiJurnalManualBesar` sudah menunjukkan bentuk yang dituju sejak awal: ia memilih sampel terarah, mengisi `HasilUji.Terpilih`, lalu berhenti di `menunggu_data`. Sistem sudah tahu apa yang ditunggunya dan dari item mana. Yang tak ada adalah tempat menjawabnya — `Tinjauan` hanya `{Oleh, Pada, Alasan}`, tanpa slot lampiran dan tanpa slot angka, dan tak satu pun rute audit menerima berkas.
+
+✅ **Kini tempat itu ada, dan kesimpulannya ikut bergerak.** Selama masih ada item `Terpilih` yang belum berdokumen, barisnya tetap `menunggu_data` dengan ringkas yang menyebut **berapa** dan rincian yang menyebut **mana**; begitu seluruhnya terjawab, `bersih`.
+
+⚠️ **Klaim `bersih`-nya SEMPIT dan disengaja: "dokumennya sudah ditunjukkan", bukan "jurnalnya wajar".** Mesin tak membaca isi dokumennya. Kondisi ideal uji ini memang hanya menuntut dokumennya dapat ditunjukkan saat diminta, jadi auditor yang menemukan dokumennya ada tapi tak nyambung tetap menuliskannya lewat tinjauan. Membaca `bersih` sebagai "sudah dinilai wajar" adalah salah baca yang paling mungkin terjadi di layar ini.
+
+⛔ **Bukti tingkat baris (`Item` kosong) TIDAK menjawab item mana pun.** Tiap jurnal menuntut dokumen sumbernya sendiri, jadi satu lampiran yang dianggap menjawab semuanya menghasilkan `bersih` yang tak seorang pun periksa. Ongkosnya diterima sadar: auditor yang memegang satu PDF gabungan melampirkannya sekali per item. ⚠️ Aturan ini **hanya berlaku untuk bentuk A** di tabel bawah; uji bentuk B dijawab **satu** dokumen untuk seluruh baris, jadi jangan memakai ulang `KeadaanDariCakupanBukti` di sana. Karena itu tiap uji menyatakan aturannya sendiri lewat `Uji.SimpulkanUlang`, yang bawaannya nil, dan bukan disimpulkan dari `SisiB == unggahan`.
+
+⛔ **Mengunggah bukti menyegarkan barisnya SEKETIKA, dan sengaja TANPA menarik ulang sumbernya.** Ini bukan penghematan melainkan syarat: penarikan ulang **memilih ulang** sampelnya, dan karena metodenya terarah, satu jurnal besar baru menggeser daftar N teratas sehingga bukti yang baru dilampirkan bisa lepas dari sampelnya di detik yang sama. Yang disegarkan hanya kesimpulannya, atas pemilihan yang sudah tersimpan. Penghapusan bukti ikut menyegarkan, dan arah itu justru yang lebih berbahaya: baris yang sudah `bersih` lalu buktinya dicabut akan tetap tampil bersih.
 
 ### ⛔ Dua bentuk yang registry TIDAK membedakannya
 

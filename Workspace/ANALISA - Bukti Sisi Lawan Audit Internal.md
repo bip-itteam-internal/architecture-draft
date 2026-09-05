@@ -4,7 +4,7 @@ Papan kerja untuk [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat
 
 **Tanggal analisis**: 2026-09-03 · **Diperbarui**: 2026-09-03
 
-**Status**: ⚠️ Fase 1 sebagian — T1.1, T1.2, T1.3 **selesai dan merged**; T1.4, T1.5, T1.6 belum. ⛔ Fiturnya **belum bisa dipakai siapa pun**: layarnya belum ada dan `MINIO_AUDIT_KEY` belum diisi di `.env` lingkungan mana pun.
+**Status**: ⚠️ Fase 1 hampir tuntas — T1.1 sampai T1.5 **selesai dan merged**; **T1.6 belum**. ⛔ Fiturnya **belum bisa dipakai siapa pun**, tetapi sebabnya sudah BERGESER dan itu yang penting: bukan lagi kodenya kurang, melainkan **paket izin `Audit: *` belum ditempel ke satu posisi pun** dan **aplikasi `audit-bharata` belum ter-deploy di mana pun**. Diukur prod 2026-09-04; ukur ulang sebelum dipakai.
 
 ## Yang perlu dipegang sebelum mulai
 
@@ -47,19 +47,28 @@ Batas 4 MB dan daftar-izin ekstensi ditolak **lebih dulu di sini**, meniru `paja
 
 **Bergantung pada**: T1.1, T1.2
 
-### T1.4 · `ujiJurnalManualBesar` membaca bukti
-`bip-erp/services/finance/audit_uji_aturan.go`
+### ✅ T1.4 · `ujiJurnalManualBesar` membaca bukti — SELESAI ([#1711](https://github.com/bip-itteam-internal/bip-erp/pull/1711))
 
-Selama masih ada item `Terpilih` yang belum punya bukti → tetap `menunggu_data`, dengan ringkas yang menyebut **berapa** yang belum. Begitu semuanya terjawab → `bersih` atau `berbunyi` menurut kondisi idealnya.
+Selama masih ada item `Terpilih` yang belum berbukti → tetap `menunggu_data`, dengan ringkas yang menyebut **berapa** dan rincian yang menyebut **mana**. Begitu seluruhnya terjawab → `bersih`.
 
 ⛔ **Tidak ada jalur di mana manusia menyatakan sendiri hasilnya bersih.** Manusia menyediakan bahan, mesin menyimpulkan.
 
+Tiga hal yang diputuskan saat mengerjakannya, dan tak satu pun tertulis di rencana ini sebelumnya:
+
+- **`berbunyi` tidak dapat dicapai mesin untuk uji ini.** Ketiadaan dokumen tak bisa dibedakan dari "belum diunggah", jadi "sudah saya minta dan memang tidak ada" hanya bisa dinyatakan manusia lewat tinjauan. Rencana semula menulis "`bersih` atau `berbunyi` menurut kondisi idealnya"; separuh keduanya tak punya jalan.
+- **Barisnya disegarkan SEKETIKA saat bukti diunggah atau dihapus**, di luar rumusan task ini. Tanpanya kesimpulan hanya dihitung saat periode ditarik, dan auditor yang melampirkan dokumen terakhir melihat barisnya tetap "menunggu data" lalu menyimpulkan unggahannya tidak masuk. ⛔ Penyegarannya **tidak** menarik ulang sumbernya, sebab penarikan ulang memilih ulang sampelnya dan bisa melepaskan bukti yang baru dilampirkan.
+- **Aturan cakupan dinyatakan per uji** lewat `Uji.SimpulkanUlang` (bawaannya nil), bukan disimpulkan dari `SisiB == unggahan`. Bentuk A dan bentuk B menuntut aturan berbeda, dan aturan yang salah tidak melempar apa pun.
+
 **Bergantung pada**: T1.2
 
-### T1.5 · Panel detail menampilkan dan menerima bukti
+### ✅ T1.5 · Panel detail menampilkan dan menerima bukti — SELESAI (`audit-bharata`, komponen `bukti-baris.tsx`)
 `audit-bharata/src/features/audit/components/detail-uji-panel.tsx`
 
 Daftar item `Terpilih` dengan keadaan terjawab/belum, unggah per item, isian angka, dan tautan unduh berkasnya.
+
+⛔ **Item disodorkan sebagai PILIHAN dari sampel yang berlaku, bukan diketik.** String itemnya berbentuk `JV-001 | 2026-08-02 | 1250000.00 | Koreksi kas`; mengetiknya ulang hampir pasti meleset satu karakter, dan bukti yang itemnya meleset langsung tampil "tak lagi terpilih" — gagal yang terlihat seperti masalah data, padahal salah ketik.
+
+⚠️ **Bukti yang itemnya lepas DITANDAI, bukan disaring.** Ia tetap bukti pemeriksaan yang sah; membuangnya dari daftar membuatnya lenyap tanpa satu pun galat.
 
 ⚠️ **Digerbang `bolehTinjau`**, sama seperti tombol Tandai wajar. Paket `Audit: Direksi` dan `Audit: Pembaca` memegang `audit.view` dan rutin membuka panel ini, tetapi tak memegang izin tulisnya — kontrol unggah yang pasti dijawab 403 membuat pemakainya menyimpulkan sistemnya rusak.
 
@@ -71,6 +80,13 @@ Daftar item `Terpilih` dengan keadaan terjawab/belum, unggah per item, isian ang
 Bukan `curl` ke endpoint saja: **satu perjalanan utuh sebagai orang** — buka kertas kerja, buka `jurnal_manual_besar`, unggah dokumen sumber untuk tiap item terpilih, isi angkanya, lihat barisnya berpindah dari `menunggu data`.
 
 ⚠️ **Ukur berkas sungguhan terhadap batas 4 MB di sini**, dan catat hasilnya ke TBD [[Finance - Audit Internal]] apa pun jawabannya. Angka nol yang mencurigakan diperlakukan sebagai pertanyaan.
+
+⛔ **DUA PRASYARAT DI LUAR KODE, dan keduanya menahan T1.6 hari ini** (diukur prod 2026-09-04, ukur ulang sebelum dipakai):
+
+1. **Paket izin `Audit: *` belum ditempel ke satu POSISI pun.** Ketiga paket (`audit_auditor`, `audit_direksi`, `audit_pembaca`) ada di `master_permission_set`, tetapi `master_department.position_items.permission_sets` memuatnya **nol** kali. Yang memegangnya cuma satu akun developer, langsung di `system_authentication`. Penugasan per-akun juga hilang saat orangnya mutasi — [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] menaruh paket di `position_items` justru karena itu.
+2. **Aplikasi `audit-bharata` belum ter-deploy di mana pun.** Tak ada container audit di prod; layarnya cuma hidup di mesin pengembang. Dockerfile dan compose-nya sudah ada, subdomainnya sudah diloloskan CORS gateway, tetapi belum pernah dijalankan.
+
+⚠️ **Selama keduanya belum beres, T1.6 tidak bisa dijalankan sebagai orang** — yang tersisa cuma `curl`, dan `curl` memang yang sengaja ditolak task ini sebagai bukti.
 
 **Bergantung pada**: T1.5
 

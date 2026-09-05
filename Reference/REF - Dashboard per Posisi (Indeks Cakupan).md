@@ -24,7 +24,7 @@
 
 | Divisi | Posisi | Metrik | Dok rancangan | Keadaan layar |
 |---|---:|---:|---|---|
-| Tech Development | 7 | 30 | [[IT - Dashboard per Posisi]] | ringkasan divisi, tanpa tab posisi |
+| Tech Development | 7 | 30 | [[IT - Dashboard per Posisi]] | ringkasan divisi, tanpa tab posisi. **Lembar per posisi DIBATALKAN**, lihat catatan di bawah |
 | Finance | 8 | 61 | [[Finance - Dashboard per Posisi (FAT)]] | 9 posisi bertab, hidup |
 | Human Resource | 5 | 31 | [[HRIS - Dashboard per Posisi]] | 5 posisi bertab, hidup |
 | General Affair | 4 | 24 | [[GA - Dashboard per Posisi]] | 3 posisi bertab, hidup |
@@ -113,6 +113,18 @@ Sesuai [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Amban
 
 **Ini jawaban, bukan kegagalan.** Menyatakan sebuah posisi belum layak punya dashboard jauh lebih berguna daripada membangun layar yang seluruhnya panel menunggu, karena layar semacam itu mengajari pemakainya bahwa dashboard memang tidak berisi apa-apa, dan kerusakan itu menular ke layar lain yang sebenarnya berguna.
 
+## ⛔ Sebelum merancang lembar mana pun: periksa `/portal/kpi` dulu
+
+Ditemukan 2026-09-04 saat divisi IT hendak dibangun, dan **berlaku untuk kesepuluh divisi**.
+
+`/portal/kpi` sudah punya kaskade persona yang melayani setiap karyawan: yang punya bawahan mendapat KPI timnya, yang bukan penilai mendapat `KpiSayaView` miliknya sendiri, lengkap dengan pemilih periode, tren, band skor, lencana sumber otomatis/semi/manual, cakupan per metrik, dan unggah bukti.
+
+Akibatnya, **lembar per posisi yang isinya sekadar scorecard KPI adalah duplikat**, dan repo sudah pernah memutuskan untuk menghindarinya: komentar di `portal/kpi/page.tsx` menyatakan kartu skor KPI di dashboard sengaja tidak melayani cakupan "diri" karena *"dua layar yang menjawab pertanyaan sama akan menyimpang, dan yang ini sudah lebih matang"*.
+
+**Yang tetap layak dibangun** adalah yang TIDAK ada di scorecard KPI: angka operasional, antrean pekerjaan, ambang yang perlu ditindak, dan metrik mentah di balik skornya. Divisi IT berakhir dengan dua penambahan kecil semacam itu, bukan tiga lembar ([[IT - Dashboard per Posisi]] § Kenapa lembar per posisi dibatalkan).
+
+⚠️ Tabel di bawah karena itu membaca **kesiapan DATA**, bukan rekomendasi membangun layar. Posisi yang siap datanya tetap bisa berakhir tidak dibuatkan lembar.
+
 ## Posisi yang paling siap dibangun
 
 Diurutkan menurut porsi bobot yang sudah punya sumber.
@@ -129,7 +141,7 @@ Diurutkan menurut porsi bobot yang sudah punya sumber.
 | ICC | Beauty Hacks & Kyura | 3 dari 3, menunggu atribusi | [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]] |
 | Personalia | Human Resource | 3 dari 5 | [[HRIS - Dashboard per Posisi]] |
 
-⚠️ Kesiapan Sales **seluruhnya bergantung `icc_account_mappings`**. Datanya paling tebal di perusahaan tetapi tidak beratribut `employee_id`; tanpa jembatan itu layarnya menampilkan angka orang lain tanpa satu pun galat.
+⚠️ **Ralat 2026-09-04**: baris ini semula menyatakan kesiapan Sales seluruhnya bergantung `icc_account_mappings`. **Tidak benar.** Pemetaan itu diukur ke prod dan sehat (55 dari 55 baris aktif terisi, 32 orang, satu toko satu orang), dan atribusi video ternyata lewat `creator_username`, bukan lewat pemetaan itu. Metrik per-video ICC bahkan **sudah dihitung backend** dan sudah dikonsumsi modul insentif. Yang menggantikannya sebagai langkah pertama Sales: periksa cakupan [[Finance - Incentive]] lebih dulu. Rinciannya di [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]] § Ralat 2026-09-04.
 
 ## Batas dokumen ini
 
