@@ -1,4 +1,4 @@
-> **Status**: 🟡 Draft — mesinnya sudah merge (bip-erp PR [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712), erp-frontend PR [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453)), tapi **pemangkasan lingkupnya belum** (bip-erp [#1717](https://github.com/bip-itteam-internal/bip-erp/pull/1717), erp-frontend [#1455](https://github.com/bip-itteam-internal/erp-frontend/pull/1455)). Prosedur ini belum pernah dijalankan di produksi. Jadikan ✅ setelah uji pasca-deploy di bawah lulus.
+> **Status**: ⚠️ Implemented — **deployed 2026-09-05** (bip-erp [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712) + [#1717](https://github.com/bip-itteam-internal/bip-erp/pull/1717), erp-frontend [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453) + [#1455](https://github.com/bip-itteam-internal/erp-frontend/pull/1455)). Uji "unggah tanpa suntingan ⇒ 0 koreksi" **LULUS di prod 5 Sep** (satu toko TikTok, 4 Sep, 35 baris, 35 tidak berubah). Langkah **Terapkan** belum pernah dijalankan di produksi — jalankan pertama kali pada rentang kecil.
 
 ## Tujuan
 
@@ -48,7 +48,7 @@ Untuk satu-dua pesanan saja, dialog koreksi per pesanan di tab Faktur lebih cepa
 
 - Layar hasil: kartu **Diterapkan** sesuai jumlah yang Anda setujui, **Gagal** = 0, dan daftar **Dokumen Accurate yang disentuh** semuanya `RESENT` (atau `SKIPPED` bila memang sudah sesuai).
 - Buka satu faktur yang dikoreksi di tab Faktur → modal detail → nilainya sudah berubah; bandingkan dengan dokumen yang sama di Accurate.
-- Unduh ulang **Rekap Lengkap** untuk rentang yang sama, lalu unggah kembali **tanpa menyunting apa pun**: pratinjau harus melaporkan **0 koreksi**. Ini uji terbaik bahwa berkas dan faktur sudah sinkron.
+- Unduh ulang **Rekap Lengkap** untuk rentang yang sama, lalu unggah kembali **tanpa menyunting apa pun**: pratinjau harus melaporkan **0 koreksi**. Ini uji terbaik bahwa berkas dan faktur sudah sinkron. Terbukti di prod 2026-09-05: 35 baris dibaca, 35 tidak berubah, nol koreksi.
 - Riwayat: tombol **Riwayat import** di modal (arsip batch: siapa, kapan, berkas apa, hasil tiap baris), dan riwayat koreksi per pesanan di dialog koreksi order.
 
 ## Bila gagal / Rollback
