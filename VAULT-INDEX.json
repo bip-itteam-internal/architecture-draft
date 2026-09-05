@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-04",
-  "jumlah_dokumen": 363,
+  "digenerate": "2026-09-05",
+  "jumlah_dokumen": 364,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -416,7 +416,7 @@
         "External - Accurate"
       ],
       "hash": "1ce0258642cdf84f21630a7288bff66c55b830f3af60459dfa90eca596fd0834",
-      "ukuran_kb": 85.7,
+      "ukuran_kb": 86.1,
       "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service di gateway `/api/integration/*` — daftar/detail order terpadu lintas marketplace, ringkasan & perbandingan performa, aging piutang, feed retur & packet tracking, OAuth/report TikTok Shop-Business-Ads & Shopee, jembatan Accurate (faktur harian auto-sync termasuk detail, export, retry, tiga tuas koreksi per order, import Excel FO massal, dan impor koreksi Rekap Lengkap `daily-invoices/import-koreksi` + riwayatnya), dashboard FAT, profit/insentif, stok Accurate lokal, ICC account mapping, ulasan marketplace, status sinkron toko, dan kepemilikan toko per departemen. Termasuk tombol Segarkan salinan (aset tetap, realisasi OPEX, PPN masukan, biaya perlengkapan) dan worker/jobs.",
       "kata_kunci": [
         "integration service",
@@ -1420,7 +1420,7 @@
         "GA - Inventory Management"
       ],
       "hash": "5c7d81c5d9e8420acfcf0103325b11ceb811038a0f62d54f3ae48d42c8ad1501",
-      "ukuran_kb": 392.9,
+      "ukuran_kb": 393.9,
       "ringkasan": "Menjawab: layar apa saja yang ada di aplikasi web ERP (Next.js) per modul, bagaimana tiap layar berperilaku, dan keputusan UI apa yang sudah diambil beserta alasannya. Dipakai untuk mengetahui apakah sebuah fitur sudah punya layar, di menu mana ia tinggal, komponen shared apa yang dipakainya, dan jebakan apa yang sudah terbukti menggigit di sana — termasuk halaman Auto-Sync Accurate (empat tab, kotak cari yang tahu tempat, dua unduhan tab Faktur, modal Import Koreksi tiga langkah yang sengaja TIDAK bisa mengeluarkan pesanan atau memvonis fake order, dan seksi Import Koreksi di halaman Panduan Accurate). Memuat catatan rinci untuk HRIS, payroll, recruitment, finance, procurement, marketing analytics, dan portal.",
       "kata_kunci": [
         "web ERP",
@@ -1736,6 +1736,7 @@
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya",
         "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
@@ -1772,24 +1773,10 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "c49ff15f64bd50376cf106df346c375b4a29cadf3032f230f40d2026f49bcceb",
-      "ukuran_kb": 103.6,
-      "ringkasan": "Menjawab: bagaimana hak akses di seluruh bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi, cakupan data/reach), bagaimana paket hak bernama menempel pada posisi/jabatan alih-alih pada orang, dan bagaimana izin efektif diresolusi saat login lalu dibawa lewat klaim JWT serta header gateway yang dibersihkan dari kiriman klien. Juga menjawab modul mana saja yang terdaftar di katalog permission (termasuk `jadwal` yang sengaja tanpa kategori sidebar), endpoint master apa yang menyuplai layar Hak per Posisi dan Siapa Boleh Apa, kenapa PREFIKS sebuah izin ikut menentukan kategori sidebar di frontend sehingga salah prefiks memunculkan menu yang memantul, dan bagaimana kill-switch serta fallback tier lama bekerja termasuk kapan sebuah paket justru mematikan fallback itu. Berisi juga persona pemakainya (HR, IT perancang hak, karyawan) dan letak berkas penegaknya di repo.",
-      "kata_kunci": [
-        "RBAC",
-        "permission set",
-        "hak akses",
-        "paket hak",
-        "system_roles",
-        "reach",
-        "katalog permission",
-        "tier fallback",
-        "JWT permissions",
-        "posisi jabatan",
-        "modul jadwal",
-        "prefiks izin",
-        "kategori sidebar"
-      ]
+      "hash": "a061d3fdc416d8ef5c8482272d90bb73468e73eeaf8a4604265261cae9b73c48",
+      "ukuran_kb": 106.6,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Core System and Modules/CORE - SSO Flow.md",
@@ -1861,7 +1848,7 @@
         "CORE - API Master Gateway"
       ],
       "hash": "8ff715aac476514c28d64d774ae1de6e29ca4b80964df2eaa9f995104a4f729b",
-      "ukuran_kb": 16.4,
+      "ukuran_kb": 16.5,
       "ringkasan": "Menjawab: koleksi Mongo apa saja yang dimiliki tiap service dan field apa saja di dalamnya (grounded dari struct Go), termasuk shop_sync_states (status toko nonaktif + counter kegagalan auth beruntun Tahap 2), shop_status_histories, dan arsip impor koreksi Rekap Lengkap `invoice_correction_import_batches` (nasib per baris/master/dokumen, jejak `KOREKSI_IMPORT` di invoice_correction_logs). Berguna saat perlu tahu nama field bson, tipe, index, atau di database mana sebuah data disimpan.",
       "kata_kunci": [
         "data dictionary",
@@ -2372,7 +2359,7 @@
         "Vendor - CRM"
       ],
       "hash": "68b5b230a7d3b79448283ae6ae2abee247021e774ee53f5aef2f55f398471ff8",
-      "ukuran_kb": 327.5,
+      "ukuran_kb": 328.0,
       "ringkasan": "Menjawab: bagaimana integration-service menghubungkan ERP ke marketplace (TikTok Shop/Business/Ads, Shopee, Lazada) dan menjembatani akuntansi ke Accurate Online — ingest webhook & order-sync, normalisasi model transaksi, push Sales Invoice/Return, tuas koreksi faktur (exclusion, date override, FO, import Excel FO massal, impor koreksi Rekap Lengkap untuk pindah hari / mapping SKU / harga jual), prefix Rekap Lengkap yang kini = baris faktur, automasi auto-ship sadar-holiday, kredensial OAuth per marketplace, serta job/cron terjadwal. Termasuk salinan lokal stok Accurate (`accurate_stocks`), penambalan kategori item, dan task harian nilai persediaan perlengkapan.",
       "kata_kunci": [
         "integration service",
@@ -2495,6 +2482,7 @@
         "ADR - 0002 Database-per-Service",
         "APP - Web ERP",
         "ADR - 0052 Status Sinkron per Toko",
+        "ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya",
         "Manufacture - Issue Code Audit 2026-06",
         "Microservices - Employee Service",
         "GA - Procurement System",
@@ -2504,26 +2492,10 @@
         "DB - Overview and Notes",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
-      "hash": "f4ec06220ca2ab2705dd30019f9611cd4f3b2f73fbf7d4584ba927d7f161c35a",
-      "ukuran_kb": 64.5,
-      "ringkasan": "Menjawab: apa fungsi manufacture-service sebagai WMS manufaktur (master bahan/produk, stok, transaksi in/out, formula/BOM, produksi, material order, PO, saldo awal bulanan), dari mana sumber master (bahan & stok dari Accurate read-only, barang jadi dari HPP, formula dari Excel), dan bagaimana push pergerakan WMS ke Accurate bekerja. Menjelaskan stack/port/database, gerbang RBAC per-tab, jebakan sync (align kode Accurate, satuan KG vs gram, format transDate dd/MM/yyyy), serta perilaku saldo awal/akhir bulanan yang idempoten. Juga jadi rujukan Laporan Produksi (production-log) yang ditaut menu lain lewat no_batch.",
-      "kata_kunci": [
-        "manufacture service",
-        "WMS",
-        "master bahan",
-        "master produk",
-        "stok",
-        "formula",
-        "BOM",
-        "Accurate",
-        "push pergerakan",
-        "saldo awal bulanan",
-        "HPP",
-        "sync",
-        "laporan produksi",
-        "production-log",
-        "RBAC WMS"
-      ]
+      "hash": "7ca14994d37495a6e1e5be786c80b80db80acb5f3fb98f0387a14eb730565d71",
+      "ukuran_kb": 65.7,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Core System and Modules/Microservices - Marketing Analytics Service.md",
@@ -3372,25 +3344,14 @@
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur",
         "Microservices - Integration Service",
         "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
+        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "APP - Web ERP"
       ],
-      "hash": "35df16388d6d7a105cd39d1744f8f15e2c874fc5f15a99061d4bb465b0aa4865",
-      "ukuran_kb": 20.3,
-      "ringkasan": "Menjawab kenapa dan bagaimana dokumen Retur Penjualan dikelompokkan per faktur sumber + tanggal retur (bukan per `return_sn`), apa isi group key dan mekanisme guard anti-dobel, serta bagaimana rebuild grup dan sanity check over-retur bekerja. Juga menjelaskan tiga penyebab kunci grup menjadi basi yang pernah menyebabkan retur terbukukan dua kali di Accurate beserta insiden dan remediasinya.",
-      "kata_kunci": [
-        "ADR 0016",
-        "retur",
-        "sales return",
-        "grouping faktur",
-        "Accurate",
-        "dedupe_key",
-        "guard anti-dobel",
-        "return group",
-        "nomor RTR",
-        "over-retur",
-        "duplikat booking"
-      ]
+      "hash": "6c9416d11988cd4d6020f87c74a4c6a35f2080fa4340678c9bcd3270b073dc98",
+      "ukuran_kb": 24.9,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Decisions/ADR - 0017 Tanggal Retur TikTok via order_update_date.md",
@@ -3674,23 +3635,10 @@
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "e7dcabc323e0561945c179860683f9052df70a2528596f0b8267e66980b8e73f",
-      "ukuran_kb": 76.1,
-      "ringkasan": "Menjawab: mengapa tiap menu WMS dipecah jadi dua sub-tab (SUMBER vs INPUT WMS), menu mana yang punya badge status \"sudah/belum dicatat\" dan kenapa sebagian sengaja tanpa badge (tidak ada kunci join). Juga menjelaskan aturan resi mana yang dihitung keluar gudang (COMPLETED + SHIPPED, bukan TO_SHIP), kenapa Keluar FG diagregasi per SKU dan bundle dipecah ke komponen, serta bagaimana nama penginput (created_by_name) distempel oleh server dari header BIP-Username agar tak bisa dipalsukan. Mencakup pula fondasi backend gerbang gudang per-order untuk retur barang-balik.",
-      "kata_kunci": [
-        "WMS",
-        "log sumber vs input",
-        "stempel penginput",
-        "created_by_name",
-        "BIP-Username",
-        "gerbang gudang",
-        "retur",
-        "resi COMPLETED SHIPPED",
-        "Keluar FG per SKU",
-        "audit trail",
-        "Inbound RM",
-        "kunci join"
-      ]
+      "hash": "58703a91252e12e2a69abe242577680fddbe49475a5fb471b1400cd8e7d70869",
+      "ukuran_kb": 83.9,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Decisions/ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri).md",
@@ -3835,9 +3783,10 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Keputusan ini **sudah dijalankan dan terverifikasi live di dev DAN produksi** (2026-07-30): posisi memegang paket hak, izin efektif digabung dari posisi + akun dengan reach tertinggi, layar Hak per Posisi & Siapa Boleh Apa jalan, dan penegakan per-aksi aktif di `ticket` serta `payroll`. Paket per-akun sudah dirapikan (dev 5 jadi 1, prod 4 jadi 0, sehingga hampir semua hak kini berasal dari jabatan). Catatan per 2026-08-11: **14 modul sudah berkatalog** (`ga` menyusul lewat [#1163](https://github.com/bip-itteam-internal/bip-erp/pull/1163)) dan penegakannya jalan di semuanya kecuali `finance`, yang berkatalog tanpa satu pun gerbang endpoint; **7 modul dari daftar asli belum berkatalog** (`hrdoc`, `wms`, `warehouse`, `integration`, `insentive`, `notification`, `admin`); dan pola izin antar-modul belum seragam (lihat Consequences). Yang menahan dampaknya bukan katalog melainkan dua hal lain: fase dua belum menyala di modul mana pun, dan baru 29 dari 171 entri menu yang ditandai izin — rinciannya di [[CORE - RBAC dan Permission Set]].",
+      "status_teks": "Implemented (ada catatan). Keputusan ini **sudah dijalankan dan terverifikasi live di dev DAN produksi** (2026-07-30): posisi memegang paket hak, izin efektif digabung dari posisi + akun dengan reach tertinggi, layar Hak per Posisi & Siapa Boleh Apa jalan, dan penegakan per-aksi aktif di `ticket` serta `payroll`. Paket per-akun sudah dirapikan (dev 5 jadi 1, prod 4 jadi 0, sehingga hampir semua hak kini berasal dari jabatan). Catatan per 2026-08-11: **14 modul sudah berkatalog** (`ga` menyusul lewat [#1163](https://github.com/bip-itteam-internal/bip-erp/pull/1163)) dan penegakannya jalan di semuanya kecuali `finance`, yang berkatalog tanpa satu pun gerbang endpoint; **6 modul dari daftar asli belum berkatalog** (`hrdoc`, `warehouse`, `integration`, `insentive`, `notification`, `admin`) — `wms` keluar dari daftar ini per 2026-09-05, berkatalog dengan nama modul **`manufacture`** (bip-erp PR [#1723](https://github.com/bip-itteam-internal/bip-erp/pull/1723), belum merge; nama & cara penggelarannya diputuskan [[ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya]]); dan pola izin antar-modul belum seragam (lihat Consequences). Yang menahan dampaknya bukan katalog melainkan dua hal lain: fase dua belum menyala di modul mana pun, dan baru 29 dari 171 entri menu yang ditandai izin — rinciannya di [[CORE - RBAC dan Permission Set]].",
       "publik": true,
       "tautan": [
+        "ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya",
         "CORE - RBAC dan Permission Set",
         "Microservices - Form Builder Service",
         "ADR - 0041 Izin Tipe Form Menempel di Departemen",
@@ -3857,21 +3806,10 @@
         "DB - Data Dictionary",
         "ADR - 0003 SSO-only Gateway"
       ],
-      "hash": "7e42e7cd2c0b696fb8e5bec4e0f30715386160238f5d56e2dc82275597530649",
-      "ukuran_kb": 24.3,
-      "ringkasan": "Menjawab: bagaimana model RBAC tiga sumbu dirancang (sumbu modul, tingkat view/work/approve/manage, cakupan reach own/division/all) dan kenapa hak default menempel di POSISI bukan di akun. Menjelaskan juga bagaimana permission-set/paket bernama dan resolusi izin efektif saat login bekerja (union dengan reach tertinggi), fallback tier ke system_roles selama migrasi, serta status katalog dan penegakan per modul termasuk modul mana yang belum berkatalog.",
-      "kata_kunci": [
-        "RBAC",
-        "permission set",
-        "system_roles",
-        "position_key posisi",
-        "reach cakupan",
-        "katalog izin",
-        "tiga sumbu",
-        "fallback tier",
-        "hak akses modul",
-        "resolusi login"
-      ]
+      "hash": "eac2a011c04f03286caaf9043c560ee4450fca5a05dd55719ceded90f0f3e6da",
+      "ukuran_kb": 24.6,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Decisions/ADR - 0031 Prefix internal Bukan Batas Keamanan.md",
@@ -4314,12 +4252,13 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "✅",
-      "status_teks": "Implemented (dev, 2026-08-09). Tabel `services/employee/peran_dari_jabatan.go` mengisi `system_roles` yang kosong dari (departemen, jabatan) di keempat jalur penerbitan token. Menyentuh 13 akun Manufaktur/Quality, 11 akun Beauty Hacks/Kyura, 1 akun General Affair, dan 1 akun Kesekretariatan. Sakelar `ROLE_FROM_POSITION=off`. **Jembatan sementara**, bukan pengganti [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].",
+      "status_teks": "Implemented (dev, 2026-08-09). Tabel `services/employee/peran_dari_jabatan.go` mengisi `system_roles` yang kosong dari (departemen, jabatan) di keempat jalur penerbitan token. Menyentuh 13 akun Manufaktur/Quality, 11 akun Beauty Hacks/Kyura, 1 akun General Affair, dan 1 akun Kesekretariatan. Sakelar `ROLE_FROM_POSITION=off`. **Jembatan sementara**, bukan pengganti [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]. ⚠️ Pembongkaran dimulai 2026-09-05: `manufacture` sudah berkatalog, barisnya masih hidup sampai fase dua (lihat catatan di §Decision).",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
         "QA - Register Perizinan & Sertifikasi",
+        "ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya",
         "CORE - RBAC dan Permission Set",
         "Microservices - Employee Service",
         "Microservices - Manufacture Service",
@@ -4327,25 +4266,10 @@
         "HRIS - Organization Structure",
         "APP - Web ERP"
       ],
-      "hash": "8b029be2d8f8159b54e1c18a5c95ceb36d1d2410937ceb3b4c755e4587fc4838",
-      "ukuran_kb": 12.8,
-      "ringkasan": "Menjawab: kenapa system_roles yang kosong diisi dari pasangan departemen dan jabatan saat token diterbitkan, jabatan mana yang sengaja TIDAK dipetakan beserta alasannya, dan kenapa ini jembatan sementara yang harus dibongkar setelah modulnya berkatalog. Menjawab juga pembedaan penting bahwa paket menentukan izin sedangkan peran menentukan jalan masuk (kategori sidebar dan lolosnya rute di proxy.ts).",
-      "kata_kunci": [
-        "system_roles",
-        "peran sistem",
-        "jabatan",
-        "posisi",
-        "RBAC",
-        "token",
-        "login",
-        "manufacture",
-        "insentive",
-        "ga",
-        "secretary",
-        "ADR 0043",
-        "KanonPosisi",
-        "proxy"
-      ]
+      "hash": "15c76761522a1bc20768732ec1bcb165dcf4729c3896566d51d493aeefcab327",
+      "ukuran_kb": 14.1,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "Decisions/ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id.md",
@@ -5622,8 +5546,8 @@
       "judul": "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "⚠️",
-      "status_teks": "**Implemented dengan catatan** — bip-erp PR [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712) + erp-frontend PR [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453) **merged 2026-09-04**. Lingkupnya lalu **dipangkas** atas keputusan pemilik fitur (bip-erp PR [#1717](https://github.com/bip-itteam-internal/bip-erp/pull/1717) + erp-frontend PR [#1455](https://github.com/bip-itteam-internal/erp-frontend/pull/1455), belum merge): mengeluarkan order dan vonis fake order dikeluarkan dari berkas ini. Uji prod pasca-deploy (file tanpa diedit ⇒ 0 koreksi) belum dijalankan.",
+      "status_emoji": "✅",
+      "status_teks": "**Implemented & terverifikasi di produksi** — bip-erp [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712) + erp-frontend [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453) merged 2026-09-04, lingkup dipangkas lewat bip-erp [#1717](https://github.com/bip-itteam-internal/bip-erp/pull/1717) + erp-frontend [#1455](https://github.com/bip-itteam-internal/erp-frontend/pull/1455) (merged 2026-09-04 09:23 UTC), **deployed 2026-09-05**. Uji prod hari itu: Rekap Lengkap satu toko TikTok satu hari diunduh lalu diunggah balik **tanpa disunting** ⇒ 35 baris dibaca, **35 tidak berubah, 0 koreksi, 0 ditolak** — membuktikan prefix export = baris faktur. Jalur commit belum pernah dijalankan di prod.",
       "publik": true,
       "tautan": [
         "Finance - Incentive",
@@ -5636,9 +5560,9 @@
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "External - Accurate"
       ],
-      "hash": "4eef9231516924f0e71b5bf04c5f4b7a2728e89649c14cb56159735b2c4d4889",
-      "ukuran_kb": 10.3,
-      "ringkasan": "Menjawab: kenapa koreksi faktur yang finance tulis di Excel Rekap Lengkap diterjemahkan ke tuas yang sudah ada (pindah hari, Mapping SKU, riwayat Harga Jual) dan bukan disimpan sebagai override per baris faktur; kenapa mengeluarkan pesanan dan vonis fake order sengaja DICABUT dari berkas ini karena duplikat dan karena sel kosong terlalu mudah terjadi tanpa disengaja; kenapa kelas master-data butuh centang eksplisit dan harga bergerbang profit editor; serta kenapa koreksi gudang belum tercakup padahal itu kebutuhan sebenarnya.",
+      "hash": "05f2a0fd81a8b6c0355ac96c5f122ee4bd6b2a32d35dd8acecaa4fab1f1726d5",
+      "ukuran_kb": 11.5,
+      "ringkasan": "Menjawab: kenapa koreksi faktur yang finance tulis di Excel Rekap Lengkap diterjemahkan ke tuas yang sudah ada (pindah hari, Mapping SKU, riwayat Harga Jual) dan bukan disimpan sebagai override per baris faktur; kenapa mengeluarkan pesanan dan vonis fake order dicabut dari berkas ini; kenapa kelas master-data butuh centang eksplisit dan harga bergerbang profit editor. Memuat hasil probe produksi 5 September yang menutup pertanyaan koreksi gudang: hanya ada dua gudang Accurate, TikTok warehouse_id ternyata satu per toko sehingga bukan gudang pengirim sebenarnya, dan transaction_orders tak punya field gudang — jadi tidak ada sumber otomatis dan koreksinya harus penanda manual per pesanan.",
       "kata_kunci": [
         "ADR",
         "import koreksi",
@@ -5650,10 +5574,32 @@
         "pindah hari",
         "fake order",
         "gudang",
-        "warehouse",
-        "hashInvoiceLines",
-        "auto-sync"
+        "warehouse_id",
+        "Gudang Sadewa",
+        "Gudang Sidareja",
+        "hashInvoiceLines"
       ]
+    },
+    {
+      "path": "Decisions/ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya.md",
+      "judul": "ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diputuskan, menunggu merge** — bip-erp PR [#1723](https://github.com/bip-itteam-internal/bip-erp/pull/1723) + erp-frontend PR [#1463](https://github.com/bip-itteam-internal/erp-frontend/pull/1463), keduanya **belum merge**. Fase dua (`MANUFACTURE_TIER_FALLBACK=off`) belum dijadwalkan dan menuntut sensus lebih dulu.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
+        "CORE - RBAC dan Permission Set",
+        "Microservices - Manufacture Service"
+      ],
+      "hash": "a021cbd8ac3db55aff8fcbdca4f65088d6164b12e7a8e5a90243e947f38c5c64",
+      "ukuran_kb": 7.8,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "DEVELOPER GUIDE.md",
@@ -10086,8 +10032,8 @@
       "judul": "RUN - Import Koreksi Faktur dari Rekap Lengkap",
       "area": "Runbooks",
       "jenis": "runbook",
-      "status_emoji": "🟡",
-      "status_teks": "Draft — mesinnya sudah merge (bip-erp PR [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712), erp-frontend PR [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453)), tapi **pemangkasan lingkupnya belum** (bip-erp [#1717](https://github.com/bip-itteam-internal/bip-erp/pull/1717), erp-frontend [#1455](https://github.com/bip-itteam-internal/erp-frontend/pull/1455)). Prosedur ini belum pernah dijalankan di produksi. Jadikan ✅ setelah uji pasca-deploy di bawah lulus.",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented — **deployed 2026-09-05** (bip-erp [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712) + [#1717](https://github.com/bip-itteam-internal/bip-erp/pull/1717), erp-frontend [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453) + [#1455](https://github.com/bip-itteam-internal/erp-frontend/pull/1455)). Uji \"unggah tanpa suntingan ⇒ 0 koreksi\" **LULUS di prod 5 Sep** (satu toko TikTok, 4 Sep, 35 baris, 35 tidak berubah). Langkah **Terapkan** belum pernah dijalankan di produksi — jalankan pertama kali pada rentang kecil.",
       "publik": true,
       "tautan": [
         "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris",
@@ -10097,9 +10043,9 @@
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur",
         "External - Accurate"
       ],
-      "hash": "e9059122036d65f71dee895a63c3b6ddad43b9f5e0ade136c664e40d6df862a0",
-      "ukuran_kb": 8.3,
-      "ringkasan": "Menjawab: bagaimana finance memperbaiki isi faktur Auto-Sync secara massal lewat file Excel Download Rekap Lengkap — kolom mana yang boleh disunting dan apa arti tiap suntingan, apa yang justru tidak dilakukan lewat berkas ini (mengeluarkan pesanan dan vonis fake order), cara membaca pratinjau, kapan harus mencentang perubahan Master Data, cara memverifikasi hasilnya (unggah ulang tanpa suntingan harus 0 koreksi), serta apa yang dilakukan saat muncul pesan file berubah sejak preview, channel tak cocok, batas ukuran, baris ditolak, atau baris gagal. Menjelaskan juga bahwa impor ini tidak punya tombol batal dan bahwa gudang belum bisa dikoreksi dari layar mana pun.",
+      "hash": "e18e61ed73d63c8bdca73643cdc376a95054f8aeadd0f76ada4c1ea4e4d1640f",
+      "ukuran_kb": 8.4,
+      "ringkasan": "Menjawab: bagaimana finance memperbaiki isi faktur Auto-Sync secara massal lewat file Excel Download Rekap Lengkap — kolom mana yang boleh disunting dan apa arti tiap suntingan, apa yang justru tidak dilakukan lewat berkas ini (mengeluarkan pesanan dan vonis fake order), cara membaca pratinjau, kapan harus mencentang perubahan Master Data, cara memverifikasi hasilnya, serta apa yang dilakukan saat muncul pesan file berubah sejak preview, channel tak cocok, batas ukuran, baris ditolak, atau baris gagal. Menyebut hasil uji produksi 5 September (unggah tanpa suntingan menghasilkan nol koreksi), bahwa impor ini tidak punya tombol batal, dan bahwa gudang belum bisa dikoreksi dari layar mana pun.",
       "kata_kunci": [
         "runbook",
         "import koreksi",
@@ -12666,5 +12612,13 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "Core System and Modules/CORE - RBAC dan Permission Set.md",
+    "Core System and Modules/Microservices - Manufacture Service.md",
+    "Decisions/ADR - 0016 Retur Grouped per Faktur + Tanggal Retur.md",
+    "Decisions/ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput.md",
+    "Decisions/ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi.md",
+    "Decisions/ADR - 0043 Peran Sistem Diturunkan dari Jabatan.md",
+    "Decisions/ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya.md"
+  ]
 }
