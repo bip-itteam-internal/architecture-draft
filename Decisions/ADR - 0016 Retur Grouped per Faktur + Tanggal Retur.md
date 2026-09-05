@@ -90,6 +90,26 @@ Perbaikan: guard by-member yang sama dipasang di `RetryDailyReturn`, membandingk
 
 Grounded: `clients.ErrSalesReturnGone`/`salesReturnGone` (`accurate_client.go`), `RetryDailyReturn`/`grupLainYangSudahMembukukan`/`returnSNsOfRow` (`accurate_rts_usecase.go`), `cmd/returndescope`, tes `accurate_return_dok_tiada_test.go` + `accurate_return_retry_anti_dobel_test.go` + `accurate_client_delete_salesreturn_test.go`.
 
+### Amandemen 2026-09-05 — satu order banyak baris: yang TERKUAT menjawab, bukan yang terbaca terakhir (🟡 PR #1721 belum merge)
+
+Decision #2 sudah menyatakan `order_id`/`return_sn` **top-level hanya penanda member pertama untuk tampilan** — `Members` yang jadi sumber kebenaran. Yang tak pernah ditindaklanjuti: **tiga jalur baca memperlakukan baris ganda tanpa aturan sama sekali**, dan satu tool migrasi justru melahirkan barisnya. Dilaporkan user dari layar Auto-Sync Retur ("satu order kok ada 2 nomor retur + 1 menunggu scan"), order `585062380560746363`.
+
+**Header memang basi by design — yang salah adalah yang mempercayainya.** `AddMember`/`RemoveMember` hanya menyentuh `members[]`, jadi begitu member seed pindah baris, headernya menunjuk order yang sudah tak ada di dalamnya. Sensus prod 2026-09-05: **320 baris ber-header basi (212 SENT)**. Pencarian `buildListQuery` ikut mencocokkan header → tiap satu memunculkan baris **NYASAR** saat order lamanya dicari. Kasus terlapor: `RTR/2026/07/27/127-BH` (benar) berdampingan dengan `RTR/2026/08/14/267-BH` yang **isinya order lain** (`585055111533070166`). Perbaikan: header **dipagari "members kosong"** — tetap dicari untuk baris lama pra-grup (di situ ia satu-satunya penanda), disaring **di query** supaya daftar/ekspor/paginasi ikut benar **dan 320 baris itu tak perlu di-backfill**. Biayanya diukur: 11 baris punya header `return_sn` yang tak dibawa member mana pun, **10 di antaranya headernya memang sudah basi**; hanya 1 (`RTR/2026/07/18/001-BH`) benar-benar kehilangan satu jalur cari, dan ia tetap terjangkau lewat `order_id`/`invoice_number`/`return_number`. Aturan `$expr` "header masih menunjuk member" disiapkan lalu **dibuang** — tak sepadan untuk 1 baris.
+
+**Keranjang `TUNGGU:` bisa jadi HANTU.** Amandemen 2026-08-21 memperkenalkan keranjang; `cmd/returntunggu` kasus B mengeluarkan member tanpa scan dari baris SENT ke keranjang. Itu aman untuk **isi dokumen** ("kondisi gudang menang"), tapi ia tak pernah memeriksa apakah retur member itu **sudah punya dokumen di baris lain**. Kalau sudah, lahirlah keranjang PENDING yang menyatakan "belum jadi dokumen apa pun" tentang retur yang dokumennya sudah ada. Sensus: **35 keranjang** seperti itu. Perbaikan: pagar anti-hantu di tool (baris itu sendiri tak dihitung "baris lain" — kasus B justru berjalan pada baris SENT; gagal baca indeks = BERHENTI, bukan lanjut tanpa pagar).
+
+**Akibat hilir yang paling berbahaya ada di WMS.** `BookingStateByOrderIDs` (feed retur gudang, [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]]) menulis map **tanpa prioritas** — baris terakhir menang. Karena hantu terbaca belakangan, feed menjawab `accurate_booking: pending`, `scanned_gudang: false` untuk retur yang dokumennya sudah ada (dibuktikan dengan memanggil `GET /transactions/returns` langsung di VM). Ordernya lalu tampil di tab **Retur dari Ekspedisi** seolah masih perlu discan — dan `GetByMemberOrderIDAny` adalah `FindOne` **tanpa sort**, jadi konfirmasi yang menyusul bisa mendarat di hantu → di-rekey → dibukukan sendiri → **dokumen Retur Penjualan kedua**. Sensus penutup saat itu: **0 order terbukukan di >1 dokumen SENT** — pintunya masih terbuka, belum dilewati.
+
+Perbaikan, satu aturan di dua tempat:
+- `bookingStateLebihKuat` — BOOKED menang (dokumen nyata > niat), lalu yang punya scan order **ini** menang. Setara = tidak menimpa.
+- `pilihBarisKonfirmasi` — SENT → `last_sent_at` terbaru (sejalan `GetByMember`, supaya dua pintu lookup tak menjawab beda) → `created_at` tertua (baris asal, bukan susulan) → `id`.
+
+Ikut dipasang index multikey `members.order_id`, melunasi utang lama yang dicatat [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]]: dua jalur ini mencari **tanpa** shop/channel sehingga `shop_channel_member_returnsn` tak menjangkaunya.
+
+**Sisa terbuka**: 35 keranjang hantu yang telanjur ada kini **inert** (feed & konfirmasi sama-sama mendarat di baris SENT) tapi masih tampil di tab "Menunggu Scan Gudang" — membersihkannya operasi tulis tersendiri. Dan akar §"tiga cara kunci jadi basi" tetap belum ditutup: amandemen ini lagi-lagi mencegah akibat, bukan sebab.
+
+Grounded: `bookingStateLebihKuat`/`BookingStateByOrderIDs` (`accurate_rts_usecase.go`), `pilihBarisKonfirmasi`/`barisKonfirmasiLebihKuat`/`GetByMemberOrderIDAny`/`buildListQuery`/`EnsureIndexes` (`accurate_daily_return_repo.go`), `saringSudahDibukukan`/`indeksSudahDibukukan` (`cmd/returntunggu`), tes `accurate_return_hantu_sent_menang_test.go` + `accurate_daily_return_pilih_baris_test.go` + `accurate_daily_return_search_header_basi_test.go` + `saring_sudah_dibukukan_test.go`.
+
 ## Dokumen Terkait
 - [[Microservices - Integration Service]] — Auto-Sync Retur (model grup)
 - [[ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift]]
