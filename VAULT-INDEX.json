@@ -1413,9 +1413,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "c5896826ec55435074018b485746adcb2b439fb6baf942bece95c3cfb4b72dcf",
-      "ukuran_kb": 393.0,
-      "ringkasan": "Menjawab: layar apa saja yang ada di aplikasi web ERP (Next.js) per modul, bagaimana tiap layar berperilaku, dan keputusan UI apa yang sudah diambil beserta alasannya. Dipakai untuk mengetahui apakah sebuah fitur sudah punya layar, di menu mana ia tinggal, komponen shared apa yang dipakainya, dan jebakan apa yang sudah terbukti menggigit di sana — termasuk halaman Auto-Sync Accurate (empat tab, kotak cari yang tahu tempat, dua unduhan tab Faktur, modal Import Koreksi tiga langkah yang sengaja TIDAK bisa mengeluarkan pesanan atau memvonis fake order, dan seksi Import Koreksi di halaman Panduan Accurate). Memuat catatan rinci untuk HRIS, payroll, recruitment, finance, procurement, marketing analytics, dan portal.",
+      "hash": "47fea2a0725cc9a36aded4686d42c5e50eadae63acbbc83e9ac9159b288bb604",
+      "ukuran_kb": 393.4,
+      "ringkasan": "Menjawab: layar apa saja yang ada di aplikasi web ERP (Next.js) per modul, bagaimana tiap layar berperilaku, dan keputusan UI apa yang sudah diambil beserta alasannya. Dipakai untuk mengetahui apakah sebuah fitur sudah punya layar, di menu mana ia tinggal, komponen shared apa yang dipakainya, dan jebakan apa yang sudah terbukti menggigit di sana — termasuk halaman Auto-Sync Accurate (empat tab, kotak cari yang tahu tempat, dua unduhan tab Faktur, modal Import Koreksi tiga langkah yang sengaja TIDAK bisa mengeluarkan pesanan atau memvonis fake order, dan tiga tempat teks penjelasnya yang gampang tertinggal saat lingkup berubah). Memuat catatan rinci untuk HRIS, payroll, recruitment, finance, procurement, marketing analytics, dan portal.",
       "kata_kunci": [
         "web ERP",
         "erp-frontend",
@@ -1425,11 +1425,11 @@
         "Next.js",
         "auto-sync",
         "Import Koreksi",
+        "banner",
         "Panduan Accurate",
         "Rekap Lengkap",
         "Order FO",
         "impor payroll",
-        "i18n",
         "komponen shared"
       ]
     },
