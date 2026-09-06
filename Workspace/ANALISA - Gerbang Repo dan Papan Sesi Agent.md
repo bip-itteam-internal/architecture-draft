@@ -8,6 +8,27 @@ Usulan aslinya arsitektur multi-agent otonom bertingkat. Yang diterima cuma dua 
 
 Aturan yang berlaku untuk seluruh daftar ini: **sebuah item baru boleh ditandai selesai bila gerbangnya terbukti pernah MENOLAK sesuatu.** Gerbang yang meloloskan segalanya terlihat persis sama dengan gerbang yang bekerja, dan itu kelas kegagalan yang sudah berulang di tim ini. Tiap item karena itu punya **kontrol negatif** wajib.
 
+## Keadaan 2026-09-06 malam (kit 1.15.0, keputusan pemilik: bangun sesuai dokumen)
+
+Urutan aslinya dibalik oleh keputusan pemilik pada hari yang sama (ADR 0077 § Revisi): seluruh loop dibangun sekaligus sebagai agent-kit 1.15.0, dengan substitusi tercatat. Keadaan per task, diukur saat menutup sesi:
+
+| Task | Keadaan | Bukti |
+|---|---|---|
+| T1 gerbang pre-commit + matcher PowerShell | **selesai** | `hooks/pre-commit-gate.ps1`; kontrol positif langsung di sesi: commit di `main` repo temp DITOLAK, termasuk bentuk `-C $t` (gagal-tertutup); `tests/test-init.ps1` 44 lulus |
+| T2 + T3 pre-push erp-frontend / bip-erp | **selesai, bentuknya berubah** | satu `hooks/githooks/pre-push` di kit, dipasang `init` lewat `core.hooksPath` ke 11 repo sibling (repo kode tidak disentuh); terbukti menyala pada push PR #1739 |
+| T4 init memasang hooksPath | **selesai** | `init.ps1`/`init.sh` §7; assertion di test-init |
+| T5 kit menundukkan diri sendiri (test kit masuk gerbang vault) | **belum** | vault sengaja tanpa hooksPath; `test-init.ps1` masih dijalankan manual. Butuh keputusan: hook `pre-push` khusus vault yang menjalankan `tests/test-init.ps1` + pytest `Tools/` |
+| T6 bump VERSION, sebar, runbook | **selesai** | `VERSION` 1.15.0, README changelog, RUN Onboarding + DEVELOPER GUIDE diperbarui; tim tinggal `git pull` + init + restart |
+| T7 + T8 papan sesi (hook + pembaca) | **selesai** | `session-start`/`sesi-sentuh`/`sesi-selesai` + `papan-sesi.ps1` (tabel + HTML); `/papan-sesi` |
+| T9 pembersihan sesi basi | **selesai** | `papan-sesi.ps1 -Bersihkan7Hari` |
+| T10 rapikan `pr-notification.yml` | **PR terbuka**, merge manusia | bip-erp **#1739**, dikerjakan lewat `/kerjakan` sungguhan: eksekutor → gerbang → judge (lolos, 0 temuan) → PR |
+| T11 nomor ADR 0058 ganda | **belum** | butuh keputusan siapa yang dinomori ulang (keduanya sudah tertaut) |
+| T12 ekstraksi skill | **dibangun, belum dipakai** | `/ekstrak-skill` + `transkrip-ringkas` + agen `loop-ekstrak-skill`; belum ada draft yang dihasilkan dari sesi nyata |
+| T13 baseline test | **selesai** | `baseline/erp-frontend.json` (11.554 test, 37 gagal, `c8993067`) dan `baseline/bip-erp.json` (14.562 test, 14 gagal, `12bd8484`), keduanya 2026-09-06 di worktree `origin/main` bersih |
+| Pembersihan 31 worktree merged | **selesai sebagian, yang benar** | 27 dihapus (14 bip-erp + 13 erp-frontend); 3 `owfe-*` dilewati karena punya perubahan belum di-commit; 1 belum merged dan 3 detached dibiarkan. Terdaftar kini 4 + 7 |
+
+Yang masih perlu **restart sesi** untuk terpakai penuh: agen kustom `loop-*` (dibaca saat sesi mulai). Di sesi pembangunnya, `/kerjakan` memakai jalan darurat `general-purpose` dengan definisi agen disisipkan, dan itu dicatat di log judge.
+
 ## Fase 1 — Gerbang yang bisa menolak
 
 ### T1. Ubah pre-commit dari pengingat jadi gerbang, dan hidupkan di PowerShell

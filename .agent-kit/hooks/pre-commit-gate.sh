@@ -35,7 +35,13 @@ EOF
 # `$v="..."; git -C $v commit`
 case "$dir" in \$*) n="${dir#\$}"; n="${n#\{}"; n="${n%\}}"
   v="$(printf '%s\n' "$cmd" | sed -nE "s/.*\\\$$n[[:space:]]*=[[:space:]]*(\"([^\"]*)\"|$sq([^$sq]*)$sq).*/\2\3/p" | head -n1)"; [ -n "$v" ] && dir="$v";; esac
-[ -n "$dir" ] && [ -d "$dir" ] || dir="$cwd"
+# GAGAL-TERTUTUP: -C ada tetapi path-nya tidak bisa ditentukan (ekspresi/variabel) -> tolak.
+# Versi gagal-terbuka pernah meloloskan commit di main lewat `-C $t` (2026-09-06).
+if [ -n "$dir" ] && [ ! -d "$dir" ]; then
+  echo "DITOLAK gerbang agent-kit: ada 'git commit' tetapi repo-nya tidak bisa ditentukan dari perintah (path '$dir' dari ekspresi/variabel). Tulis path LITERAL di -C. Gerbang ini sengaja gagal-tertutup." >&2
+  exit 2
+fi
+[ -n "$dir" ] || dir="$cwd"
 [ -n "$dir" ] && [ -d "$dir" ] || exit 0
 
 common="$(git -C "$dir" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || exit 0

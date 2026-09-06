@@ -13,7 +13,10 @@ param(
   [string]$Akar = (Join-Path $env:USERPROFILE 'wt'),
   [switch]$TanpaInstall
 )
-$ErrorActionPreference = 'Stop'
+# 'Continue', BUKAN 'Stop': git menulis "Preparing worktree ..." ke stderr saat SUKSES, dan PS 5.1
+# di bawah 'Stop' mengubah baris stderr native jadi galat terminating (skrip mati dengan exit 1
+# padahal worktree-nya jadi). Keberhasilan diperiksa lewat $LASTEXITCODE.
+$ErrorActionPreference = 'Continue'
 . (Join-Path $PSScriptRoot 'gerbang-lib.ps1')
 
 $top = Get-RepoTop $Repo

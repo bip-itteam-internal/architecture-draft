@@ -49,6 +49,12 @@ Skill yang relevan untuk dibaca dulu: <daftar .claude/skills/<x>/SKILL.md yang c
 Percobaan: 1 dari 3
 ```
 
+**Bila `Agent` menjawab "Agent type 'loop-<domain>' not found"**: daftar agen kustom dibaca saat sesi
+mulai, jadi sesi ini lahir sebelum kit 1.15.0 di-init. Jalan yang benar: **restart sesi**. Jalan
+darurat satu kali: dispatch `general-purpose` dengan seluruh isi `.claude/agents/loop-<domain>.md`
+(tanpa frontmatter) sebagai pembuka prompt, lalu catat `agen` di log judge sebagai
+`general-purpose(loop-<domain>)`; jangan jadikan ini kebiasaan, model dan batas tools-nya berbeda.
+
 Pilih skill relevan dari `.claude/skills/`: `migrasi-tabel-hris` untuk halaman daftar erp-frontend,
 `deploy-bip-erp` tidak relevan untuk eksekutor (jangan disertakan), `audit-keamanan` bila brief
 menyebut auth/RBAC/izin. Catat daftar itu; ia masuk log judge sebagai `skills_dibaca`.
@@ -95,7 +101,10 @@ Repo kode, di dalam worktree:
 2. Commit dengan judul conventional dari brief: `<tipe>(<area>): <judul brief>` dengan tipe =
    domain (`fix`, `refactor`, `test`, `docs`), area = modul/folder utama yang disentuh. Badan:
    Tujuan brief (satu paragraf), lalu `Judge: lolos, <n> kriteria, percobaan <k>/3`. **Tanpa**
-   trailer `Co-Authored-By`.
+   trailer `Co-Authored-By`. ⚠️ **Tulis pesannya ke berkas lalu `git commit -F <berkas>`**, jangan
+   `-m` inline: PowerShell 5.1 memecah argumen native pada tanda kutip ganda di dalam pesan, git
+   lalu membaca sisa pesan sebagai pathspec dan commit gagal, sementara push berikutnya tetap
+   jalan dan mendorong branch **tanpa commit**. Terjadi 2026-09-06 pada PR pertama loop ini.
 3. `git -C "<wt>" -c core.fsmonitor=false push -u origin <branch>`. Hook `pre-push` akan
    menjalankan tsc/lint/build atau go build. Bila **ditolak**: JANGAN `--no-verify`. Perlakukan
    sebagai kegagalan judge (kembali ke §4 dengan keluaran hook sebagai temuan).

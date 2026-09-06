@@ -6,11 +6,13 @@
 # Menolak lewat EXIT 2, bukan JSON: exit 2 memblokir tool call apa pun isi stdout-nya, jadi
 # JSON yang salah bentuk tidak bisa membuat gerbang ini gagal-terbuka (kelas kegagalan yang
 # sama dengan matcher `Bash` yang membuat versi lama tak pernah menyala di mesin PowerShell).
-# Selain kasus tolak: exit 0 + pengingat, persis perilaku lama.
 #
-# Yang TIDAK ditangkap, dan disadari: `--no-verify` bukan urusan hook ini (itu hook git);
-# commit lewat GUI/terminal di luar Claude Code; path repo yang datang dari variabel yang
-# di-assign di perintah LAIN (hanya assignment di perintah yang sama yang dibaca).
+# GAGAL-TERTUTUP: bila ada `commit` tetapi repo-nya tidak bisa ditentukan (path dari ekspresi
+# seperti `-C $t` dengan `$t = Join-Path ...`), gerbang MENOLAK dan menyuruh memakai path
+# literal. Terbukti 2026-09-06: versi gagal-terbuka meloloskan commit di `main` persis lewat
+# bentuk perintah yang biasa ditulis agent. Yang masih dikenali: `-C "literal"`, `-C $v` dengan
+# `$v="literal"` di perintah yang sama, `$env:NAMA` di dalam string, dan `cd <path>; git commit`.
+# Selain kasus tolak: exit 0 + pengingat, persis perilaku lama.
 $ErrorActionPreference = 'SilentlyContinue'
 if (-not [Console]::IsInputRedirected) { exit 0 }
 $raw = [Console]::In.ReadToEnd()
@@ -29,41 +31,69 @@ function Get-Tokens([string]$s) {
   }
 }
 
-# `$v="..."; git -C $v commit` — baca assignment di perintah yang sama
+# `$v="..."; git -C $v commit` — baca assignment LITERAL di perintah yang sama
 $vars = @{}
 foreach ($m in [regex]::Matches($cmd, '\$(\w+)\s*=\s*(?:"([^"]*)"|''([^'']*)'')')) {
   $vars[$m.Groups[1].Value] = if ($m.Groups[2].Success) { $m.Groups[2].Value } else { $m.Groups[3].Value }
 }
 
+$TAK = '<<tak-terurai>>'
+function Resolve-Dir([string]$rawDir) {
+  if (-not $rawDir) { return $null }
+  $d = $rawDir
+  # $env:NAMA di dalam string -> nilai env
+  $d = [regex]::Replace($d, '\$env:(\w+)', { param($m) [string][Environment]::GetEnvironmentVariable($m.Groups[1].Value) })
+  if ($d -match '^\$\{?(\w+)\}?$') {
+    $n = $Matches[1]
+    if ($vars.ContainsKey($n)) { $d = $vars[$n] } else { return $TAK }
+  }
+  if ($d -match '\$' -or $d -match '`') { return $TAK }   # masih ada ekspresi
+  if (Test-Path $d) { return (Resolve-Path $d).Path }
+  return $TAK
+}
+
 # Periksa SETIAP segmen (`;`, `&&`, `||`, baris baru): `git add .; git commit` tetap kena.
+# `cd`/Set-Location sebelum segmen commit ikut dicatat sebagai repo kandidat.
 $segments = $cmd -split '(?:;|&&|\|\||\r?\n)'
-$repoDir = $null; $isCommit = $false
+$repoRaw = $null; $adaC = $false; $isCommit = $false; $cdRaw = $null
 foreach ($seg in $segments) {
   $tokens = @(Get-Tokens $seg)
+  if ($tokens.Count -eq 0) { continue }
+  $t0 = $tokens[0]
+  if ($t0 -in @('cd', 'chdir', 'sl', 'Set-Location', 'Push-Location', 'pushd') -and $tokens.Count -gt 1) {
+    $cdRaw = ($tokens[1..($tokens.Count - 1)] | Where-Object { $_ -notlike '-*' } | Select-Object -First 1)
+    continue
+  }
   $gi = -1
   for ($i = 0; $i -lt $tokens.Count; $i++) {
     if ($tokens[$i] -match '(^|[\\/])git(\.exe)?$') { $gi = $i; break }
   }
   if ($gi -lt 0) { continue }
-  $dir = $null; $sub = $null
+  $dir = $null; $sub = $null; $punyaC = $false
   for ($i = $gi + 1; $i -lt $tokens.Count; $i++) {
     $t = $tokens[$i]
     # -ceq (peka huruf): `-eq` PowerShell menyamakan -C dan -c, sehingga `-c core.fsmonitor=false`
     # pernah menimpa path repo dan gerbang ini gagal-terbuka persis di perintah git yang tim pakai
-    if ($t -ceq '-C' -and ($i + 1) -lt $tokens.Count) { $dir = $tokens[$i + 1]; $i++; continue }
+    if ($t -ceq '-C' -and ($i + 1) -lt $tokens.Count) { $dir = $tokens[$i + 1]; $punyaC = $true; $i++; continue }
     if ($t -ceq '-c' -and ($i + 1) -lt $tokens.Count) { $i++; continue }
     if ($t -like '-*') { continue }
     $sub = $t; break   # token non-opsi pertama sesudah git = subperintah
   }
-  if ($sub -eq 'commit') { $isCommit = $true; if ($dir) { $repoDir = $dir }; break }
+  if ($sub -eq 'commit') { $isCommit = $true; $adaC = $punyaC; $repoRaw = $dir; break }
 }
 if (-not $isCommit) { exit 0 }
 
-if ($repoDir -and $repoDir.StartsWith('$')) {
-  $n = $repoDir.TrimStart('$').Trim('{', '}')
-  if ($vars.ContainsKey($n)) { $repoDir = $vars[$n] }
+$repoDir = $null
+if ($adaC) { $repoDir = Resolve-Dir $repoRaw }
+elseif ($cdRaw) { $repoDir = Resolve-Dir $cdRaw }
+if ($repoDir -eq $TAK) {
+  $msg = "DITOLAK gerbang agent-kit: ada 'git commit' tetapi repo-nya tidak bisa ditentukan dari perintah " +
+         "(path datang dari ekspresi/variabel: '$(if ($adaC) { $repoRaw } else { $cdRaw })'). " +
+         "Tulis path LITERAL, mis. git -C `"C:\...\repo`" commit ..., atau `$v=`"C:\...\repo`" di perintah yang sama. Gerbang ini sengaja gagal-tertutup."
+  [Console]::Error.WriteLine($msg)
+  exit 2
 }
-if (-not $repoDir -or -not (Test-Path $repoDir)) { $repoDir = $cwd }
+if (-not $repoDir) { $repoDir = $cwd }
 if (-not $repoDir -or -not (Test-Path $repoDir)) { exit 0 }
 
 # --path-format=absolute supaya worktree tertaut pun terbaca milik repo mana
