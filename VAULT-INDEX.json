@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-06",
-  "jumlah_dokumen": 361,
+  "jumlah_dokumen": 364,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -5595,6 +5595,41 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak.md",
+      "judul": "ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-09-06, kode belum ada. Berdiri di atas pengukuran langsung ke GitHub API, isi repo, dan isi agent-kit pada tanggal yang sama.",
+      "publik": true,
+      "tautan": [
+        "IT - CI-CD",
+        "IT - Papan Aktivitas Developer",
+        "Microservices - Vault MCP Service",
+        "RUN - Onboarding Developer Baru",
+        "IT - Gerbang Repo dan Papan Sesi Agent",
+        "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
+        "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
+        "DEVELOPER GUIDE"
+      ],
+      "hash": "d47fa1657b6e1a51d86b72d8e14d0f23871abceaf839851a6938c97c60d070de",
+      "ukuran_kb": 14.8,
+      "ringkasan": "Menjawab: kenapa agent AI tidak diberi wewenang merge ke main, gerbang otomatis apa saja yang sudah ada di erp-frontend/bip-erp/agent-kit dan mana yang benar-benar berfungsi (bukan sekadar pengingat), serta kenapa usulan arsitektur multi-agent otonom bertingkat (Judges, Supervisor, orkestrasi, dashboard) ditolak untuk sekarang. Memuat pengukuran terukur 2026-09-06 bahwa CI, branch protection, rulesets, dan hook git lokal semuanya kosong atau tidak pernah menyala, dan bahwa main pernah mendarat di produksi lewat jalur di luar GitHub Actions yang belum terverifikasi.",
+      "kata_kunci": [
+        "merge",
+        "otonomi agent",
+        "gerbang",
+        "gate",
+        "pre-commit",
+        "pre-push",
+        "branch protection",
+        "CI/CD",
+        "GitHub Actions",
+        "wewenang merge agent",
+        "ADR 0077"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -8466,6 +8501,40 @@
         "gerbang presensi",
         "RBAC",
         "kaizen"
+      ]
+    },
+    {
+      "path": "IT/IT - Gerbang Repo dan Papan Sesi Agent.md",
+      "judul": "IT - Gerbang Repo dan Papan Sesi Agent",
+      "area": "IT",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Konsep**, 2026-09-06, kode belum ada. Berdiri di atas pengukuran langsung ke GitHub API, isi repo, dan isi agent-kit pada tanggal yang sama.",
+      "publik": false,
+      "tautan": [
+        "ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak",
+        "IT - CI-CD",
+        "DEVELOPER GUIDE",
+        "RUN - Onboarding Developer Baru",
+        "IT - Development Apps and Tools",
+        "IT - Papan Aktivitas Developer",
+        "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
+        "IT - SOP Dokumentasi Vault"
+      ],
+      "hash": "9437bf5cb2ad2d706837d66c32bce163f25a510c2694a981a8a1fcdec507e7c8",
+      "ukuran_kb": 8.3,
+      "ringkasan": "Menjawab: apa itu gerbang repo lokal dan papan sesi agent, apa saja yang masuk cakupannya (hook Claude Code, pre-push git hook per repo, gerbang kit atas dirinya sendiri, papan sesi berbasis berkas) dan apa yang sengaja tidak dikerjakan, bagaimana cara distribusi hook git ke seluruh tim lewat core.hooksPath, serta apa bedanya dengan IT - Papan Aktivitas Developer. Juga mencatat kendala seperti gerbang yang masih bisa dilewati --no-verify dan pnpm test yang tidak pernah hijau penuh di main.",
+      "kata_kunci": [
+        "gerbang lokal",
+        "local gate",
+        "papan sesi",
+        "session board",
+        "pre-commit",
+        "pre-push",
+        "core.hooksPath",
+        "git hook",
+        "Claude Code hook",
+        ".task-plans"
       ]
     },
     {
@@ -11751,6 +11820,37 @@
         "Batch Record",
         "master anggaran",
         "backlog KPI"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Gerbang Repo dan Papan Sesi Agent.md",
+      "judul": "ANALISA - Gerbang Repo dan Papan Sesi Agent",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak",
+        "IT - Gerbang Repo dan Papan Sesi Agent",
+        "RUN - Onboarding Developer Baru",
+        "Microservices - Vault MCP Service",
+        "IT - CI-CD"
+      ],
+      "hash": "f9dd0f3369289199315a090b3bd4f654c02e4b891ac5bb15274504b09e6a2cb2",
+      "ukuran_kb": 7.6,
+      "ringkasan": "Menjawab: daftar task T1 sampai T12 untuk membangun gerbang repo dan papan sesi agent, urutan fase dan dependensi antar-task, serta kontrol negatif wajib untuk membuktikan tiap gerbang benar-benar bisa menolak (bukan cuma terlihat bekerja). Juga menjawab apa yang sengaja tidak dikerjakan (orkestrasi eksternal, Judges LLM terpisah, Supervisor Agent, GitHub Actions berbayar, wewenang merge agent) dan asumsi yang belum terjawab seperti jalur deploy produksi dari main.",
+      "kata_kunci": [
+        "task board",
+        "T1-T12",
+        "gerbang",
+        "papan sesi",
+        "kontrol negatif",
+        "fase implementasi",
+        "analisa kebutuhan",
+        "roadmap",
+        "pre-push",
+        "core.hooksPath"
       ]
     },
     {
