@@ -2,17 +2,38 @@
 
 ## Untuk Manajemen
 
-- **Yang berubah di layar**: tidak ada. Keputusan ini tidak menyentuh satu pun layar ERP dan tidak terlihat oleh karyawan. Yang berubah adalah cara kerja di dalam repo: mulai sekarang ada langkah otomatis yang bisa **menolak** sebuah penyimpanan perubahan bila pemeriksaan dasarnya belum dijalankan, dan ada satu papan yang menunjukkan sesi kerja mana sedang mengerjakan apa.
-- **Siapa terdampak**: developer dan siapa pun yang menjalankan asisten AI di workspace ini. Pengguna ERP tidak terdampak sama sekali, dan produksi tidak tersentuh.
-- **Tidak dijanjikan**: keputusan ini **tidak** membuat asisten AI bekerja sendiri tanpa diawasi, dan justru **menunda** kemampuan itu sampai ada yang bisa menahannya. Ia juga **tidak** menghidupkan kembali pemeriksaan otomatis di GitHub, karena itu menuntut biaya yang tidak dianggarkan dan paket akun yang sekarang tidak mengizinkannya. Yang dipasang adalah pemeriksaan di komputer masing-masing, yang secara sadar **masih bisa dilewati** oleh orang yang memang bermaksud melewatinya. Ia menahan kelalaian, bukan niat. Dan ia **tidak** menjanjikan review kode mulai berjalan; itu masalah orang, bukan masalah alat.
-- **Besaran kerja**: kecil. Sebagian besar bahannya sudah ada dan tinggal diubah dari pengingat menjadi penolak. Tidak ada server baru, tidak ada langganan baru, tidak ada biaya berjalan.
+- **Yang berubah di layar**: tidak ada layar ERP yang berubah, dan karyawan tidak melihat apa pun. Yang berubah adalah cara developer bekerja: ada alur di mana asisten AI mengerjakan satu perbaikan kecil dari sebuah brief sampai menjadi **usulan perubahan (PR)** sendiri, dinilai dua lapis sebelum diusulkan (pemeriksaan mesin, lalu penilai), ada papan yang menunjukkan sesi kerja mana sedang mengerjakan apa, dan ada langkah otomatis yang **menolak** perubahan yang disimpan langsung ke branch utama atau didorong sebelum pemeriksaan dasarnya lolos.
+- **Siapa terdampak**: developer dan siapa pun yang menjalankan asisten AI di workspace ini. Pengguna ERP tidak terdampak, dan produksi tidak tersentuh.
+- **Tidak dijanjikan**: asisten **tidak** menggabungkan perubahannya sendiri ke branch utama; keputusan itu tetap manusia. Pemeriksaan otomatis di GitHub **tidak** dihidupkan (biaya dan paket akun). Tidak ada layanan orkestrasi berbayar. Penilai tidak mengubah pengetahuan tim sendiri; ia mengusulkan, manusia yang menaikkan. Dan skala "setara puluhan tim engineering" **tidak** dijanjikan: sistem rujukannya menghabiskan sekitar $5.463 per hari dan berjalan di atas suite test yang menghasilkan ribuan temuan, sementara di sini yang ada baru ukuran awal test yang memang merah.
+- **Besaran kerja**: satu hari untuk perkakasnya, disebar ke tim lewat pembaruan kit. Ongkos berjalan hanya pemakaian Claude di dalam langganan yang sudah ada.
+
+## Revisi 2026-09-06: dibangun sesuai dokumen, dengan substitusi
+
+Analisis awal (bagian Context dan Decision di bawah, dipertahankan apa adanya sebagai rekaman) merekomendasikan menolak arsitektur yang diusulkan dan hanya membangun gerbang serta papan sesi. Pemilik proses, setelah keberatan itu disampaikan dan ditegaskan ulang pada hari yang sama, **memutuskan membangunnya sesuai dokumen**. Keputusan itu dihormati dan dicatat di sini, bukan disembunyikan di kode.
+
+**Yang tetap berlaku dari keputusan awal**: §1 wewenang merge ditahan (agent berhenti di PR), §2 gerbang lokal, §3 gerbang wajib punya exit code, §4 kit menundukkan dirinya sendiri, §5 papan sesi berupa berkas. Dokumen rujukan sendiri menempatkan Judges menolak *sebelum* commit/deploy, jadi §1 sejalan dengannya.
+
+**Yang dibalik dari §6 dan §7**, dengan substitusi yang diputuskan analis atas izin pemilik:
+
+| Dokumen rujukan | Yang dibangun (agent-kit 1.15.0) | Alasan substitusi |
+|---|---|---|
+| Orkestrasi Trigger.dev | agen kustom Claude Code (`.claude/agents/loop-*`) + papan sesi berkas | layanan berbayar ditolak; masalahnya 4+ sesi di satu mesin |
+| Mix model DeepSeek/Kimi/GLM/Claude/Fable | tingkatan Claude: `sonnet` eksekutor, `opus` judge, `fable` supervisor dan ekstraktor | tidak ada API key vendor lain; fungsi yang sama |
+| Judges sebagai agen | **dua lapis yang keduanya harus lolos**: gerbang deterministik (tsc/lint/build, `go build`, test vs baseline) DAN agen judge read-only | agen tidak berwenang membatalkan mesin; inilah yang mencegah mengakali satu metrik |
+| Triangulated metrics berbasis test pass rate | test dibanding **baseline bertanggal** (`baseline/<repo>.json`) | `pnpm test` main tidak pernah hijau penuh |
+| Supervisor memperbarui skill otomatis | supervisor menulis **draft** + laporan; manusia menaikkan lewat `/supervise --terapkan` | tidak ada metrik kualitas skill; skill salah menyebar ke seluruh tim lewat init |
+| Skill extraction dari ekspor sesi | skrip deterministik meringkas transkrip (menolak bila tak terurai) → agen menulis draft | skema transkrip dinyatakan internal oleh dok resmi |
+| Dashboard | `papan-sesi` tabel + HTML statis | separuh panel rujukan tak punya sumber data di sini |
+| Otonomi sampai deploy | berhenti di PR | §1 |
+
+Rincian bentuk dan keputusan kecilnya ada di `architecture-draft/.agent-kit/docs/2026-09-06-ai-engineering-loop-design.md`; cara kerjanya untuk pembaca umum di [[IT - Gerbang Repo dan Papan Sesi Agent]].
 
 ## Deskripsi
 
 *Usulan mengadopsi arsitektur multi-agent otonom bertingkat (lapisan eksekusi, Judges, Supervisor, orkestrasi, dashboard) ditolak untuk sekarang. Yang diputuskan sebagai gantinya adalah memasang lebih dulu satu hal yang selama ini tidak dimiliki rantai kerja ini sama sekali, yaitu mekanisme yang benar-benar bisa mengatakan tidak. Wewenang merge oleh agent ditahan sampai gerbang itu berdiri, karena `main` pernah terbukti mendarat di produksi lewat jalur yang sampai hari ini belum terverifikasi.*
 
-- **Status**: 🟡 **Diusulkan**, 2026-09-06, kode belum ada. Berdiri di atas pengukuran langsung ke GitHub API, isi repo, dan isi agent-kit pada tanggal yang sama.
-- **Path di repo**: `architecture-draft/.agent-kit/hooks/pre-commit-reminder.ps1` · `architecture-draft/.agent-kit/hooks/session-start.ps1` · `architecture-draft/.agent-kit/init.ps1` · `architecture-draft/.agent-kit/init.sh` · `architecture-draft/.agent-kit/commands/papan-sesi.md` (baru) · `erp-frontend/scripts/githooks/pre-push` (baru) · `bip-erp/scripts/githooks/pre-push` (baru)
+- **Status**: ⚠️ **Implemented (ada catatan)**, agent-kit **1.15.0**, 2026-09-06. Keputusan awal (tolak arsitektur, bangun gerbang saja) **direvisi hari yang sama** oleh pemilik proses menjadi "bangun sesuai dokumen dengan substitusi"; lihat bagian Revisi. Catatan: gerbang lokal bisa dilewati `--no-verify`; wewenang merge tetap ditahan (§1); baseline test baru diukur sekali dan wajib diukur ulang saat `main` bergerak jauh.
+- **Path di repo**: `architecture-draft/.agent-kit/` → `agents/loop-*.md` · `commands/{brief,kerjakan,judge,supervise,ekstrak-skill,papan-sesi}.md` · `hooks/pre-commit-gate.{ps1,sh}` (menggantikan `pre-commit-reminder`) · `hooks/{session-start,sesi-sentuh,sesi-selesai,sesi-lib}.{ps1,sh}` · `hooks/{gerbang,baseline-test,worktree-baru,transkrip-ringkas,papan-sesi}.{ps1,sh}` · `hooks/gerbang-lib.{ps1,py}` · `hooks/worktree-bersih.ps1` · `hooks/githooks/pre-push` · `baseline/<repo>.json` · `init.{ps1,sh}` · `tests/test-init.ps1` · `templates/brief.md`. Repo kode **tidak** disentuh secara git; `core.hooksPath` dipasang `init` per mesin.
 - **Tanggal**: 2026-09-06
 
 ## Context
@@ -112,12 +133,16 @@ Tanpa layanan, tanpa basis data, tanpa dashboard. Alasannya bukan hemat, melaink
 
 ### 6. Yang TIDAK dibangun, beserta alasannya
 
+> **Direvisi 2026-09-06** oleh keputusan pemilik: sebagian butir di bawah **dibangun** dengan substitusi. Tabel di bagian Revisi (atas) yang berlaku; butir di bawah dipertahankan sebagai rekaman alasan awalnya.
+
 - **Orkestrasi eksternal (Trigger.dev atau sejenisnya)**: ditolak. Masalahnya empat sesi di satu mesin, bukan penjadwalan lintas mesin. Menambah layanan berarti menambah yang bisa mati.
 - **Judges sebagai agen LLM terpisah**: ditolak untuk sekarang. Selama gerbang deterministiknya kosong, menambahkan penilai probabilistik menaikkan biaya tanpa menaikkan kepastian. Pertimbangkan ulang setelah §2 berdiri.
 - **Supervisor Agent yang memperbarui skill library sendiri**: ditolak. Ia menuntut kemampuan menilai kualitas skill, dan tidak ada metrik yang tersedia untuk itu di sini. `pnpm test` erp-frontend tidak pernah hijau penuh di `main`, jadi metrik lolos-test tidak bisa dipakai mentah sebagai umpan balik.
 - **Triangulated Metrics berbasis test pass rate**: ditolak dalam bentuk mentah, alasan sama.
 
 ### 7. Skill extraction ditunda, bukan dibuang
+
+> **Direvisi 2026-09-06**: dibangun sebagai `/ekstrak-skill` (skrip deterministik meringkas transkrip, agen `fable` menulis draft ke `skills/_draft/`). Alasan penundaan di bawah tetap benar sebagai peringatan: bahan mentahnya harus dipahami dulu sebelum dipercaya.
 
 Ekstraksi skill dari sesi manual adalah bagian paling matang dari usulan aslinya dan bahan mentahnya sudah menumpuk: `erp/.agents/AGENTS.md` memuat 721 baris dengan 26 entri ber-`originSessionId`, dan `Tools/` sudah menyediakan cetakan pipeline yang terbukti, yaitu daftar-tugas lalu fan-out subagent lalu serap. Ia dikerjakan **sesudah** §2 dan §5, bukan sebagai gantinya.
 

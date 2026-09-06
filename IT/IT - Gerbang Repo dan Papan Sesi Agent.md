@@ -2,9 +2,9 @@
 
 ## Deskripsi
 
-*Dua perkakas kerja developer yang saling melengkapi: **gerbang lokal** yang bisa menolak commit atau push bila pemeriksaan dasarnya belum lolos, dan **papan sesi** yang menunjukkan sesi kerja mana sedang mengerjakan apa saat lebih dari empat sesi berjalan bersamaan. Keduanya hidup di mesin developer, tanpa layanan dan tanpa biaya berjalan. Keputusan yang melahirkannya beserta alasan menolak alternatifnya ada di [[ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak]].*
+*AI Engineering Loop di agent-kit: **gerbang lokal** yang menolak commit di branch utama dan push yang gagal pemeriksaan dasar, **papan sesi** yang menunjukkan sesi kerja mana sedang mengerjakan apa, dan **loop otonom** `/brief` → `/kerjakan` yang mengerjakan satu task kecil lewat agen domain, dinilai dua lapis (mesin dan penilai), lalu berhenti di PR. Semuanya hidup di mesin developer, tanpa layanan dan tanpa biaya berjalan di luar langganan Claude. Keputusan, substitusi dari dokumen rujukan, dan batasnya ada di [[ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak]].*
 
-- **Status**: 🟡 **Konsep**, 2026-09-06, kode belum ada. Berdiri di atas pengukuran langsung ke GitHub API, isi repo, dan isi agent-kit pada tanggal yang sama.
+- **Status**: ⚠️ **Implemented (ada catatan)**, agent-kit **1.15.0**, 2026-09-06. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi satu mesin; (3) baseline test diukur sekali pada tanggal ini dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia.
 
 ## Latar Belakang
 
@@ -30,11 +30,16 @@ Kebutuhan kedua datang dari pemilik proses: lebih dari empat sesi kerja berjalan
 3. **Gerbang kit atas dirinya sendiri.** `tests/test-init.ps1` dan pytest `Tools/` ikut dijalankan.
 4. **Papan sesi.** Tiap sesi menulis satu berkas status ke `.task-plans/` berisi branch, task, tahap flow, dan waktu sentuh terakhir, ditulis hook `SessionStart` yang sudah ada. Satu command membacanya jadi satu tabel.
 
+5. **Loop otonom** (revisi 2026-09-06). `/brief <masalah>` menulis Quick Brief Spec (`templates/brief.md`: tujuan, kriteria lolos yang bisa diverifikasi, batas). `/kerjakan <brief>`: routing deterministik dari kata kunci (LLM hanya bila ambigu) → `worktree-baru` di path pendek (`~/wt/fe-<slug>`, pola yang sudah dipakai tim) → agen `loop-<domain>` (`sonnet`) mengerjakan tanpa commit → `/judge` → bila gagal, eksekutor diulang dengan temuan judge, maksimum 2 pengulangan → bila lolos: commit conventional, push (kena `pre-push`), `gh pr create`. **Berhenti di PR.** Gagal 3× → worktree dibiarkan, path dan temuan dicetak untuk manusia.
+6. **Judges dua lapis.** `/judge` menjalankan `gerbang.ps1` (tsc/lint/build; `go build` per service tersentuh; test dibanding `baseline/<repo>.json`) DAN agen `loop-judge` (`opus`, hanya `Read/Grep/Glob`) yang menilai kepatuhan brief per kriteria, `review-checklist` Pass 1, dan solusi nakal. Lolos hanya bila **keduanya** lolos; agen tidak berwenang membatalkan mesin.
+7. **Supervisi dan ekstraksi skill.** `/supervise` → agen `loop-supervisor` (`fable`) membaca brief/verdict/sesi/skill dan menulis laporan + **draft** ke `skills/_draft/`; `/supervise --terapkan <nama>` dijalankan manusia. `/ekstrak-skill` → `transkrip-ringkas` (skrip, menolak bila skema transkrip tidak terurai) → agen `loop-ekstrak-skill` (`fable`) → draft.
+
 **Yang sengaja TIDAK termasuk**
 
-- Orkestrasi eksternal, agen penilai terpisah, supervisor yang memperbarui skill sendiri, dan dashboard web. Alasan penolakan per butir ada di ADR §6.
-- Menghidupkan kembali GitHub Actions. Di luar mandat, alasan biaya dan paket akun.
+- Layanan orkestrasi eksternal (Trigger.dev), vendor model lain, dashboard web live, agent merge, supervisor auto-apply. Alasan tiap substitusi di ADR bagian Revisi.
+- Menghidupkan kembali GitHub Actions atau branch protection. Di luar mandat, alasan biaya dan paket akun.
 - Memperbaiki review kode. Angka review 2,2% adalah masalah orang, bukan masalah alat.
+- Suite E2E baru. Yang ada hanya **baseline** suite yang sudah ada; bahan bakar sebesar sistem rujukan (E2E tests 288/1.644) belum ada di sini.
 
 ## Cara Kerja
 
