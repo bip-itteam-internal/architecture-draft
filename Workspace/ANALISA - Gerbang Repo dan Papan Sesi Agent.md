@@ -105,6 +105,15 @@ Sebelum dikerjakan, jawab dulu satu hal yang belum terjawab: mekanisme apa yang 
 
 **Dependensi**: Fase 1 dan Fase 2.
 
+### T13. Tegakkan baseline test supaya test bisa masuk gerbang
+
+Dasbor sistem rujukan (2026-09-06) menempatkan **E2E tests 288/1.644** sebagai sumber pekerjaan terbesarnya. Artinya bahan bakar loop semacam itu adalah temuan test otomatis, dan di sini bahan bakar itu belum ada: `pnpm test` erp-frontend tidak pernah hijau penuh di `main`, dan `Makefile` bip-erp tidak memanggil `go test`.
+
+Yang dikerjakan bukan "perbaiki semua test", melainkan yang jauh lebih kecil dan lebih menentukan: **tetapkan baseline yang bisa dibandingkan**, yaitu daftar test yang memang merah di `main` beserta tanggalnya, supaya gerbang bisa berbunyi hanya untuk kemunduran baru. Tanpa baseline, test tidak akan pernah bisa masuk gerbang push, dan tanpa itu tidak ada bahan bakar untuk apa pun yang dibangun sesudahnya.
+
+**Dependensi**: Fase 1 (gerbangnya sudah berdiri dulu, baru diisi).
+**Kontrol negatif**: perkenalkan satu kegagalan baru dan pastikan gerbang membedakannya dari yang sudah merah sejak baseline.
+
 ## Yang TIDAK dikerjakan, supaya tidak diusulkan lagi
 
 - **Orkestrasi eksternal (Trigger.dev dan sejenisnya)** — masalahnya empat sesi di satu mesin, bukan penjadwalan lintas mesin.

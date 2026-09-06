@@ -51,6 +51,20 @@ Dua cacat kecil memperjelas polanya. Pertama, hook `PreToolUse` dipasang dengan 
 
 Ini penting supaya keputusan ini tidak dibaca sebagai tuduhan terhadap agent. Manusia di sini sudah merge tanpa review. Yang dilakukan otonomi agent bukan memperkenalkan kelas risiko baru, melainkan **menaikkan lajunya** pada sistem yang sudah tidak punya rem. Karena itu jawabannya bukan melarang agent, melainkan memasang rem lebih dulu.
 
+### Sistem rujukannya berjalan di atas dua hal yang belum dimiliki di sini
+
+Pemilik proses menyerahkan tangkapan layar dasbor sistem aslinya pada 2026-09-06. Angka di bawah **dibaca dari gambar, bukan diukur sendiri**, jadi diperlakukan sebagai indikasi besaran dan bukan sebagai data. Sebagian labelnya terpotong dan sengaja tidak dikutip. Satu ketidakcocokan kecil sudah terlihat di gambar itu sendiri (337 dibuka lawan 323 merge dalam tujuh hari memberi 95,8%, sementara panel merge rate menulis 99%), dan itu justru menguatkan alasan memperlakukannya sebagai indikasi.
+
+**Ongkosnya.** `SPEND 7D $38.244,32` atas `MRG 7D 323`, yaitu **$118,40 per PR merged** dan sekitar **$5.463 per hari**. Bila lajunya bertahan, itu di kisaran $164.000 per bulan. Berapa pun tagihan GitHub Actions yang ditolak pada keputusan yang sama, ia beberapa orde besaran di bawah angka itu. Menyalin arsitektur ini tanpa menyalin anggarannya menghasilkan sistem yang berhenti di tengah.
+
+**Bahan bakarnya.** Panel `SOURCE - MERGED / FOUND` menempatkan **E2E tests di 288/1.644** sebagai sumber pekerjaan terbesar, jauh di atas sumber lain. Artinya mesin itu tidak menghasilkan pekerjaan dari ketiadaan: ia mengubah **temuan test otomatis** menjadi perbaikan. Di sini `pnpm test` erp-frontend tidak pernah hijau penuh di `main`, `Makefile` bip-erp tidak memanggil `go test`, dan seluruh CI mati. Membangun loop-nya lebih dulu berarti membangun loop tanpa bahan bakar.
+
+**Bentuk keluarannya.** Komposisinya **74% Fix, 12% Test, 6% Docs, dan hanya 3% Feature**. Sistem itu mesin perawatan, bukan pabrik fitur. Perlu disebut supaya harapan "setara puluhan tim engineering" tidak dibaca sebagai fitur baru yang datang sendiri.
+
+**Lapisan Judges-nya.** Merge rate yang ditampilkan 99%. Apa pun yang dikerjakan lapisan validasi di sistem itu, pada tahap PR ia praktis tidak menolak apa pun. Ini tidak membuktikan lapisannya tak berguna, tetapi ia melemahkan alasan menyalin lapisan itu lebih dulu.
+
+Ketiganya menunjuk arah yang sama dengan §2: yang perlu berdiri lebih dulu adalah bahan bakarnya, yaitu pemeriksaan otomatis yang benar-benar berjalan dan menghasilkan temuan.
+
 ### Batas yang mengunci pilihan
 
 Tiga hal mempersempit ruang solusi, dan ketiganya di luar mandat keputusan ini untuk diubah:

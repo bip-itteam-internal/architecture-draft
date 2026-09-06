@@ -5612,21 +5612,20 @@
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
         "DEVELOPER GUIDE"
       ],
-      "hash": "d47fa1657b6e1a51d86b72d8e14d0f23871abceaf839851a6938c97c60d070de",
-      "ukuran_kb": 14.8,
-      "ringkasan": "Menjawab: kenapa agent AI tidak diberi wewenang merge ke main, gerbang otomatis apa saja yang sudah ada di erp-frontend/bip-erp/agent-kit dan mana yang benar-benar berfungsi (bukan sekadar pengingat), serta kenapa usulan arsitektur multi-agent otonom bertingkat (Judges, Supervisor, orkestrasi, dashboard) ditolak untuk sekarang. Memuat pengukuran terukur 2026-09-06 bahwa CI, branch protection, rulesets, dan hook git lokal semuanya kosong atau tidak pernah menyala, dan bahwa main pernah mendarat di produksi lewat jalur di luar GitHub Actions yang belum terverifikasi.",
+      "hash": "723772781443131533aa6c3854ac3619cc5d9c5229b530287765b43a810cb854",
+      "ukuran_kb": 16.9,
+      "ringkasan": "Menjawab: kenapa usulan arsitektur multi-agent otonom bertingkat (lapisan eksekusi, Judges, Supervisor, dashboard) ditolak untuk sekarang, dan apa yang diputuskan sebagai gantinya -- menahan wewenang merge agent sampai ada mekanisme lokal yang benar-benar bisa menolak commit/push. Menjawab juga bukti terukur bahwa gerbang otomatis saat ini kosong (CI erp-frontend dan deploy bip-erp mati, branch protection main tidak aktif, hook git lokal exit 0 tanpa syarat, review PR cuma 2,2%), kenapa merge ke main disetarakan dengan deploy produksi di sini, dan perbandingan ongkos terhadap sistem multi-agent rujukan ($118 per PR merged).",
       "kata_kunci": [
-        "merge",
+        "ADR 0077",
+        "gerbang repo",
         "otonomi agent",
-        "gerbang",
-        "gate",
+        "wewenang merge",
         "pre-commit",
         "pre-push",
         "branch protection",
-        "CI/CD",
-        "GitHub Actions",
-        "wewenang merge agent",
-        "ADR 0077"
+        "CI/CD mati",
+        "hook git",
+        "multi-agent"
       ]
     },
     {
@@ -11837,20 +11836,20 @@
         "Microservices - Vault MCP Service",
         "IT - CI-CD"
       ],
-      "hash": "f9dd0f3369289199315a090b3bd4f654c02e4b891ac5bb15274504b09e6a2cb2",
-      "ukuran_kb": 7.6,
-      "ringkasan": "Menjawab: daftar task T1 sampai T12 untuk membangun gerbang repo dan papan sesi agent, urutan fase dan dependensi antar-task, serta kontrol negatif wajib untuk membuktikan tiap gerbang benar-benar bisa menolak (bukan cuma terlihat bekerja). Juga menjawab apa yang sengaja tidak dikerjakan (orkestrasi eksternal, Judges LLM terpisah, Supervisor Agent, GitHub Actions berbayar, wewenang merge agent) dan asumsi yang belum terjawab seperti jalur deploy produksi dari main.",
+      "hash": "a656ed91b736e03e6d4212857b1265ec1f56c97be5e673f01f394f760169ba7c",
+      "ukuran_kb": 8.6,
+      "ringkasan": "Menjawab: task teknis apa saja (T1 sampai T13) yang harus dikerjakan untuk mewujudkan keputusan di ADR-0077, urutan fase dan dependensi antar-task (gerbang pre-commit/pre-push dulu di Fase 1, baru papan sesi di Fase 2, lalu rapi-rapi di Fase 3), dan kontrol negatif yang wajib dibuktikan sebelum sebuah item boleh ditandai selesai. Menjawab juga apa yang sengaja TIDAK dikerjakan (orkestrasi eksternal, Judges LLM terpisah, Supervisor Agent, GitHub Actions berbayar, wewenang merge agent) beserta alasannya.",
       "kata_kunci": [
-        "task board",
-        "T1-T12",
-        "gerbang",
         "papan sesi",
-        "kontrol negatif",
-        "fase implementasi",
-        "analisa kebutuhan",
-        "roadmap",
+        "session board",
+        "gerbang repo",
+        "pre-commit",
         "pre-push",
-        "core.hooksPath"
+        "task-plans",
+        "kontrol negatif",
+        "ADR 0077",
+        "agent-kit",
+        "T1-T13"
       ]
     },
     {
