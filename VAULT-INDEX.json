@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-05",
+  "digenerate": "2026-09-06",
   "jumlah_dokumen": 361,
   "dokumen": [
     {
@@ -10596,23 +10596,20 @@
         "ADR - 0009 Affiliate via Search Seller Affiliate Orders API",
         "Sales - Incentive"
       ],
-      "hash": "9139548dcad9bb0d3e71d8ecce326c4ccc56d27e1f697891016bca66026021c6",
-      "ukuran_kb": 35.2,
-      "ringkasan": "Menjawab: bagaimana karyawan ICC (kini berlabel Account Specialist) dipetakan ke akun TikTok Shop dan TikTok Ads advertiser yang mereka kelola lewat koleksi icc_account_mappings, termasuk bentuk datanya, aturan wajib/opsional tiap field, dan unique index yang berlaku (satu shop hanya satu karyawan aktif, tetapi satu advertiser boleh dipegang beberapa karyawan). Menjelaskan alur SPV/Leader membuat mapping, dashboard ICC melihat performa sendiri, performa tim, dan rotasi pemegang akun, beserta endpoint /icc/mappings dan aturan RBAC-nya. Juga membahas pengelompokan kartu per leader dan perbedaan model leader antara frontend (hierarki HRIS) dan backend.",
+      "hash": "926e2d13059839e638323548f07e516144b715f0ef8611e382237339d5e3cc48",
+      "ukuran_kb": 41.2,
+      "ringkasan": "Menjawab: bagaimana karyawan ICC (posisi HRIS, sebagian sudah berganti label jadi Account Specialist) dipetakan ke toko TikTok Shop dan akun TikTok Ads (advertiser) yang mereka kelola, termasuk model data `icc_account_mappings`, aturan kepemilikan (satu toko hanya satu karyawan aktif, satu advertiser boleh dipegang beberapa karyawan sekaligus), serta flow assign oleh SPV/leader, dashboard performa ICC, dan endpoint API-nya. Juga menjelaskan relasi leader dan akumulasi insentif (model lama vs model FE saat ini beserta gap-nya), jebakan pencocokan posisi lewat `position_key` vs label `position` setelah rename jabatan, dan pemisahan tab Marketplace Advertiser dari Toko & Iklan di halaman ICC Management.",
       "kata_kunci": [
         "ICC",
-        "Account Specialist",
         "Account Manager",
-        "icc_account_mappings",
+        "Account Specialist",
         "TikTok Shop",
         "TikTok Ads",
         "advertiser",
-        "shop_id",
-        "mapping karyawan",
-        "ICC Management",
+        "icc_account_mappings",
+        "position_key",
         "leader",
-        "team",
-        "position_key"
+        "Marketplace Advertiser"
       ]
     },
     {
