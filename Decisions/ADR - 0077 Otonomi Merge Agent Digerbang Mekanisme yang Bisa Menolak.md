@@ -7,6 +7,14 @@
 - **Tidak dijanjikan**: asisten **tidak** menggabungkan perubahannya sendiri ke branch utama; keputusan itu tetap manusia. Pemeriksaan otomatis di GitHub **tidak** dihidupkan (biaya dan paket akun). Tidak ada layanan orkestrasi berbayar. Penilai tidak mengubah pengetahuan tim sendiri; ia mengusulkan, manusia yang menaikkan. Dan skala "setara puluhan tim engineering" **tidak** dijanjikan: sistem rujukannya menghabiskan sekitar $5.463 per hari dan berjalan di atas suite test yang menghasilkan ribuan temuan, sementara di sini yang ada baru ukuran awal test yang memang merah.
 - **Besaran kerja**: satu hari untuk perkakasnya, disebar ke tim lewat pembaruan kit. Ongkos berjalan hanya pemakaian Claude di dalam langganan yang sudah ada.
 
+## Deskripsi
+
+*Usulan mengadopsi arsitektur multi-agent otonom bertingkat (lapisan eksekusi, Judges, Supervisor, orkestrasi, dashboard) ditolak untuk sekarang. Yang diputuskan sebagai gantinya adalah memasang lebih dulu satu hal yang selama ini tidak dimiliki rantai kerja ini sama sekali, yaitu mekanisme yang benar-benar bisa mengatakan tidak. Wewenang merge oleh agent ditahan sampai gerbang itu berdiri, karena `main` pernah terbukti mendarat di produksi lewat jalur yang sampai hari ini belum terverifikasi.*
+
+- **Status**: ⚠️ **Implemented (ada catatan)**, agent-kit **1.15.0**, 2026-09-06. Keputusan awal (tolak arsitektur, bangun gerbang saja) **direvisi hari yang sama** oleh pemilik proses menjadi "bangun sesuai dokumen dengan substitusi"; lihat bagian Revisi. Catatan: gerbang lokal bisa dilewati `--no-verify`; wewenang merge tetap ditahan (§1); baseline test baru diukur sekali dan wajib diukur ulang saat `main` bergerak jauh.
+- **Path di repo**: `architecture-draft/.agent-kit/` → `agents/loop-*.md` · `commands/{brief,kerjakan,judge,supervise,ekstrak-skill,papan-sesi}.md` · `hooks/pre-commit-gate.{ps1,sh}` (menggantikan `pre-commit-reminder`) · `hooks/{session-start,sesi-sentuh,sesi-selesai,sesi-lib}.{ps1,sh}` · `hooks/{gerbang,baseline-test,worktree-baru,transkrip-ringkas,papan-sesi}.{ps1,sh}` · `hooks/gerbang-lib.{ps1,py}` · `hooks/worktree-bersih.ps1` · `hooks/githooks/pre-push` · `baseline/<repo>.json` · `init.{ps1,sh}` · `tests/test-init.ps1` · `templates/brief.md`. Repo kode **tidak** disentuh secara git; `core.hooksPath` dipasang `init` per mesin.
+- **Tanggal**: 2026-09-06
+
 ## Revisi 2026-09-06: dibangun sesuai dokumen, dengan substitusi
 
 Analisis awal (bagian Context dan Decision di bawah, dipertahankan apa adanya sebagai rekaman) merekomendasikan menolak arsitektur yang diusulkan dan hanya membangun gerbang serta papan sesi. Pemilik proses, setelah keberatan itu disampaikan dan ditegaskan ulang pada hari yang sama, **memutuskan membangunnya sesuai dokumen**. Keputusan itu dihormati dan dicatat di sini, bukan disembunyikan di kode.
@@ -26,15 +34,7 @@ Analisis awal (bagian Context dan Decision di bawah, dipertahankan apa adanya se
 | Dashboard | `papan-sesi` tabel + HTML statis | separuh panel rujukan tak punya sumber data di sini |
 | Otonomi sampai deploy | berhenti di PR | §1 |
 
-Rincian bentuk dan keputusan kecilnya ada di `architecture-draft/.agent-kit/docs/2026-09-06-ai-engineering-loop-design.md`; cara kerjanya untuk pembaca umum di [[IT - Gerbang Repo dan Papan Sesi Agent]].
-
-## Deskripsi
-
-*Usulan mengadopsi arsitektur multi-agent otonom bertingkat (lapisan eksekusi, Judges, Supervisor, orkestrasi, dashboard) ditolak untuk sekarang. Yang diputuskan sebagai gantinya adalah memasang lebih dulu satu hal yang selama ini tidak dimiliki rantai kerja ini sama sekali, yaitu mekanisme yang benar-benar bisa mengatakan tidak. Wewenang merge oleh agent ditahan sampai gerbang itu berdiri, karena `main` pernah terbukti mendarat di produksi lewat jalur yang sampai hari ini belum terverifikasi.*
-
-- **Status**: ⚠️ **Implemented (ada catatan)**, agent-kit **1.15.0**, 2026-09-06. Keputusan awal (tolak arsitektur, bangun gerbang saja) **direvisi hari yang sama** oleh pemilik proses menjadi "bangun sesuai dokumen dengan substitusi"; lihat bagian Revisi. Catatan: gerbang lokal bisa dilewati `--no-verify`; wewenang merge tetap ditahan (§1); baseline test baru diukur sekali dan wajib diukur ulang saat `main` bergerak jauh.
-- **Path di repo**: `architecture-draft/.agent-kit/` → `agents/loop-*.md` · `commands/{brief,kerjakan,judge,supervise,ekstrak-skill,papan-sesi}.md` · `hooks/pre-commit-gate.{ps1,sh}` (menggantikan `pre-commit-reminder`) · `hooks/{session-start,sesi-sentuh,sesi-selesai,sesi-lib}.{ps1,sh}` · `hooks/{gerbang,baseline-test,worktree-baru,transkrip-ringkas,papan-sesi}.{ps1,sh}` · `hooks/gerbang-lib.{ps1,py}` · `hooks/worktree-bersih.ps1` · `hooks/githooks/pre-push` · `baseline/<repo>.json` · `init.{ps1,sh}` · `tests/test-init.ps1` · `templates/brief.md`. Repo kode **tidak** disentuh secara git; `core.hooksPath` dipasang `init` per mesin.
-- **Tanggal**: 2026-09-06
+Rincian bentuk dan keputusan kecilnya ada di `architecture-draft/.agent-kit/docs/2026-09-06-ai-engineering-loop-design.md`; cara kerjanya untuk pembaca umum di [[IT - Gerbang Repo dan Papan Sesi Agent]]. Bukti pertama loop bekerja utuh: bip-erp PR [#1739](https://github.com/bip-itteam-internal/bip-erp/pull/1739), dari brief sampai PR lewat eksekutor, gerbang, dan judge, tanpa satu pun kode ditulis manusia.
 
 ## Context
 
