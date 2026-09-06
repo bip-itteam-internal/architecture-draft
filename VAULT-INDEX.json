@@ -5599,8 +5599,8 @@
       "judul": "ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**, agent-kit **1.15.0**, 2026-09-06. Keputusan awal (tolak arsitektur, bangun gerbang saja) **direvisi hari yang sama** oleh pemilik proses menjadi \"bangun sesuai dokumen dengan substitusi\"; lihat bagian Revisi. Catatan: gerbang lokal bisa dilewati `--no-verify`; wewenang merge tetap ditahan (§1); baseline test baru diukur sekali dan wajib diukur ulang saat `main` bergerak jauh.",
       "publik": true,
       "tautan": [
         "IT - Gerbang Repo dan Papan Sesi Agent",
@@ -5612,20 +5612,20 @@
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
         "DEVELOPER GUIDE"
       ],
-      "hash": "c3f4c957fa5fd5fefefe5746ee7319f0850c1a6c77eb6d963c880d9af173abd5",
-      "ukuran_kb": 20.4,
-      "ringkasan": "Menjawab: kenapa wewenang merge oleh agent AI ditahan sampai ada mekanisme yang benar-benar bisa menolak, apa yang diusulkan (arsitektur multi-agent otonom bertingkat) versus yang akhirnya dibangun (gerbang lokal, papan sesi, loop otonom /brief -> /kerjakan), dan substitusi apa saja yang dipakai menggantikan bagian rujukan (Trigger.dev, mix model vendor lain, dashboard live) beserta alasan tiap substitusinya.",
+      "hash": "c0bbeb63f8eacf69b87d8a77bfcf484a39ae1657f010f0ec49093e23fea2c9cf",
+      "ukuran_kb": 20.6,
+      "ringkasan": "Menjawab: kenapa usulan arsitektur multi-agent otonom bertingkat (AI Engineering Loop System — Judges, Supervisor, orkestrasi, dashboard) ditolak untuk workspace ini, dan apa yang dipasang sebagai gantinya sebelum agent diberi wewenang merge ke branch utama. Menjelaskan revisi keputusan pada hari yang sama yang membalikkan sebagian keputusan awal menjadi \"dibangun sesuai dokumen, dengan substitusi\" (mis. Trigger.dev diganti agen kustom Claude Code + papan sesi berkas, mix model vendor lain diganti tingkatan model Claude), lengkap dengan tabel pengukuran gerbang otomatis (CI, branch protection, hook git) yang ternyata kosong/tidak aktif sebelum keputusan ini diambil.",
       "kata_kunci": [
-        "merge otonomi",
+        "ADR 0077",
+        "otonomi merge agent",
+        "gerbang commit merge",
         "agent-kit",
-        "gerbang commit",
-        "pre-push",
-        "PR",
-        "loop otonom",
-        "brief",
-        "kerjakan",
-        "judge",
-        "papan sesi"
+        "AI Engineering Loop System",
+        "papan sesi",
+        "branch protection",
+        "pre-commit gate",
+        "wrap-completion-gate",
+        "orkestrasi agent Claude Code"
       ]
     },
     {
