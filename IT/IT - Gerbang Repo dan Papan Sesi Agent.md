@@ -84,6 +84,22 @@ Keduanya tidak bisa saling menggantikan, dan itu bukan soal selera: sesi yang ma
 - Apakah papan sesi kelak perlu lintas-mesin. Sekarang dirancang untuk satu mesin, karena jumlah dev yang benar-benar memakai kit belum diukur.
 - Apakah keluaran papan sesi layak disalurkan ke [[IT - Papan Aktivitas Developer]] sebagai sumber kedua, atau justru harus tetap terpisah agar tidak melahirkan dua angka yang menyimpang.
 - Bentuk gerbang untuk repo selain `erp-frontend` dan `bip-erp`.
+
+### Bila kelak papan sesi dijadikan web
+
+Ditinjau 2026-09-06 memakai dasbor sistem rujukan sebagai daftar panel. Diputuskan **tetap berkas dulu**, ditinjau ulang setelah baseline test berdiri. Pemetaan di bawah dicatat supaya keputusannya tidak diulang dari nol:
+
+| Panel | Bisa diisi di sini | Catatan |
+|---|---|---|
+| Jumlah PR dibuka/merge, grafik, cycle median total, hotspot komponen | Ya, **tapi sudah ada** di [[IT - Papan Aktivitas Developer]] | menyalinnya melahirkan dua angka untuk satu pertanyaan |
+| Komposisi fix/test/docs/feature | **Ya** | 90% judul PR erp-frontend dan 87% bip-erp sudah berpola conventional commit (diukur 2026-09-06 atas 60 PR merged terakhir tiap repo) |
+| Merge rate | Ya, tapi tak berguna | akan selalu di sekitar 99% karena 90% PR di-merge penulisnya sendiri |
+| Cycle dipecah investigate/develop/QA | Tidak | tidak ada tahap QA otomatis, jadi pecahannya tidak punya sumber |
+| Sumber temuan (test yang menemukan, lalu diperbaiki) | Belum | menuntut baseline test lebih dulu |
+| Biaya per PR | Tidak | tidak ada pelacakan biaya per task sama sekali, menuntut instrumentasi baru |
+| Klasifikasi risiko dan jenis perubahan | Tidak, dan berisiko | klasifikasi otomatis tampil sebagai angka pasti padahal tebakan |
+
+Yang perlu diingat saat meninjau ulang: **panel yang paling dibutuhkan justru tidak ada di dasbor rujukan itu.** Dasbor itu menghitung PR yang sudah jadi, sedangkan kebutuhan di sini adalah sesi yang sedang berjalan dan belum menghasilkan PR apa pun.
 - Ekstraksi skill dari sesi manual. Bahan mentahnya sudah menumpuk (`erp/.agents/AGENTS.md`, 721 baris, 26 entri ber-`originSessionId`) dan cetakan pipeline-nya sudah terbukti di `Tools/`, tetapi urutannya sesudah gerbang dan papan sesi.
 
 ## Dokumen Terkait

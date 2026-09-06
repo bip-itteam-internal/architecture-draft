@@ -8520,20 +8520,20 @@
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "9437bf5cb2ad2d706837d66c32bce163f25a510c2694a981a8a1fcdec507e7c8",
-      "ukuran_kb": 8.3,
-      "ringkasan": "Menjawab: apa itu gerbang repo lokal dan papan sesi agent, apa saja yang masuk cakupannya (hook Claude Code, pre-push git hook per repo, gerbang kit atas dirinya sendiri, papan sesi berbasis berkas) dan apa yang sengaja tidak dikerjakan, bagaimana cara distribusi hook git ke seluruh tim lewat core.hooksPath, serta apa bedanya dengan IT - Papan Aktivitas Developer. Juga mencatat kendala seperti gerbang yang masih bisa dilewati --no-verify dan pnpm test yang tidak pernah hijau penuh di main.",
+      "hash": "3b04055366cb4f947465b44f367c0d057f0201d7536d94c6f6236fc1e5c1e6da",
+      "ukuran_kb": 9.8,
+      "ringkasan": "Menjawab: kenapa saat ini tidak ada satu pun gerbang CI otomatis yang benar-benar berjalan di erp-frontend dan bip-erp (workflow disabled, main tidak protected, hook selalu exit 0), dan bagaimana rencana gerbang lokal dua lapis (hook Claude Code yang menolak, ditambah pre-push git hook per repo yang menjalankan tsc/lint/build atau go build) serta papan sesi agent berbasis berkas dirancang untuk menggantikannya. Juga menjelaskan cakupan yang sengaja tidak diambil (orkestrasi eksternal, dashboard web, menghidupkan kembali GitHub Actions), kendala gerbang lokal (bisa dilewati --no-verify, hanya berlaku bagi yang sudah memasang core.hooksPath), dan bedanya dengan Papan Aktivitas Developer yang mencatat peristiwa GitHub yang sudah terjadi lewat webhook.",
       "kata_kunci": [
-        "gerbang lokal",
-        "local gate",
-        "papan sesi",
-        "session board",
-        "pre-commit",
-        "pre-push",
+        "gerbang repo",
+        "repo gate",
+        "papan sesi agent",
+        "agent session board",
+        "pre-push hook",
+        "git hook lokal",
         "core.hooksPath",
-        "git hook",
-        "Claude Code hook",
-        ".task-plans"
+        "CI/CD",
+        "branch protection",
+        "ADR 0077"
       ]
     },
     {
