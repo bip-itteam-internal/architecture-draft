@@ -289,6 +289,8 @@ Semua gate `RequireMarketingLeader`. Koleksi `affiliate_channel_team`; partial u
 
 Koleksi `marketing_teams` + `team_shops`. **Dipakai [[Microservices - Marketing Analytics Service]]** sebagai sumber saringan divisi **dan satu-satunya sumber Shopee** untuk kolom penanggung jawab toko — jadi mencabutnya tanpa pengganti mengosongkan keduanya tanpa satu pun error. Isi produksi 2026-08-11 tipis: **3 tim** (`aris`, `BH`, `GB-KY` — tak satu pun cocok nama departemen), **1 anggota**, **5 toko**. Penyatuannya ke `department_shops` diputuskan di [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]].
 
+⚠️ **Fungsi KEDUA, independen dari kepemilikan toko di atas: ACL "siapa boleh lihat toko apa"** (`AllowedShops`, dipanggil `transaction_handler.go` di `GET /transactions/master/shops`, gerbang rute `RequireIntegrationStaff`) — memfilter dropdown toko di puluhan halaman Accurate/payouts/gross-profit/transaksi lewat hook FE `useFetchShops()`. Sampai commit sebelum 2026-09-05 sumbernya `team_members`/`team_shops`; **branch `feat/acl-shops-department-source` (commit `f4d45777`, belum merge)** menggantinya baca `department_shops` + `BIP-Department` header. Detail lengkap (termasuk kenapa gate rute & exemption supervisor/admin TIDAK ikut berubah): [[ANALISA - Redesign ACL AllowedShops Berbasis Department Shops]].
+
 ### Kepemilikan toko per departemen (`department_shops`)
 
 > Grounded ke `internal/domain/entity/department_shop.go` + `usecase/department_shop_usecase.go`. **Terbangun tetapi belum tersambung**: 0 dokumen di produksi, belum ada UI, belum ada pembaca.
