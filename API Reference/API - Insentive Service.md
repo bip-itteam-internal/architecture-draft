@@ -11,7 +11,7 @@
 | GET | `/profit-dashboard` | Dashboard insentif per periode & level (`periode=YYYY-MM`, `level=icc\|leader\|supervisor`, `refresh=1` tarik ulang beban non-gaji). Tiap baris membawa `toko_tanpa_penjualan` — berapa dari `shop_ids` yang terpetakan ke orang itu tetapi nol order di periode berjalan, dipakai layar untuk menulis "9 dari 15 toko" alih-alih menyembunyikan yang belum berjualan (2026-08-26, PR #1455), dan `retur_gagal_booking` — order retur yang belum/gagal masuk pembukuan sehingga tak ikut rasio (2026-08-27, PR #1462). Jawabannya juga membawa, sekali per respons, `tarif_tiers` (tangga tarif SK siap tampil), `batas_retur_persen` (7), dan `batas_pencapaian_bebas_retur` (100) — dikirim backend, TIDAK disalin ke layar, karena tabel tarif pernah salah satu poin persen di produksi (2026-08-27, PR #1463). Parameter `mode=bergeser` mengaktifkan jendela KPI (lihat catatan di bawah) |
 | GET/POST | `/profit/org` | Struktur tim (ICC ↔ Leader ↔ Supervisor) |
 | PATCH | `/profit/org/:id/tutup` | Tutup masa berlaku satu baris struktur |
-| GET/POST | `/profit/targets` | Target profit per entitas/periode (ubah saat berjalan wajib beralasan ≥10 karakter) |
+| GET/POST | `/profit/targets` | Target profit per entitas/periode (ubah saat berjalan wajib beralasan ≥10 karakter). 🟡 [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]]: gerbang tulis jadi per level dan divisi untuk SPV Marketing, belum di kode |
 | GET/POST | `/profit/opex` | Biaya operasional manual — kini **cadangan** (gaji dari payroll, non-gaji dari Accurate) |
 | POST | `/profit/opex/distribusi` | Bagi satu angka divisi ke tiap entitas (pro-rata, metode sisa-terbesar) |
 

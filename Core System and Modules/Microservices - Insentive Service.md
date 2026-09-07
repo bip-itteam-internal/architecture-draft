@@ -17,7 +17,7 @@ Insentif = tarif(%) × Profit
 
 - **Tarif** naik bertingkat mengikuti % pencapaian terhadap target: `<80% → 0` · `80–90% → 2%` · `>90–100% → 3%` · `>100–110% → 4%` · `>110% → 5%`. Ditulis sebagai rantai perbandingan (bukan penelusuran tabel) supaya **celah antar-tier mustahil secara struktur** — versi tabel sebelumnya menyisakan lubang 0,01% yang diam-diam membayar 0.
 - **Gerbang retur 7%**: batas hanya berlaku selama pencapaian **≤100%**; di atas itu retur tidak lagi menggugurkan. Rasio dihitung dari **jumlah order** (keputusan client 2026-07-31); rasio berbasis nilai tetap ditampilkan sebagai pembanding karena keduanya bisa berbeda jauh (Juli 2026: 4,12% vs 3,35%).
-- **Target** hanya diketik di lingkup **Supervisor**, lalu dibagi rata turun ke Leader dan ICC. Baris turunan boleh ditimpa manual.
+- **Target** hanya diketik di lingkup **Supervisor**, lalu dibagi rata turun ke Leader dan ICC. Baris turunan boleh ditimpa manual. 🟡 **Diputuskan berubah 2026-09-07** ([[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]], belum di kode): koleksi ini jadi satu-satunya tempat target profit ditulis, SPV Marketing mengetik target per orang untuk divisinya, dan sumber KPI `insentif_profit` membaca `target` dari baris `/profit-dashboard`.
 - **Satu orang bisa menempati dua level**: leader yang punya toko sendiri dinilai sebagai ICC atas tokonya **dan** sebagai Leader atas total timnya, dengan target masing-masing.
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
@@ -32,7 +32,7 @@ Insentif = tarif(%) × Profit
 
 ### Master data profit
 - `GET/POST /profit/org` · `PATCH /profit/org/:id/tutup` — struktur tim, kini **hanya penambal**. Sejak 2026-08-26 Leader dan Supervisor diturunkan dari **hierarki HRIS** (`work_data.supervisor_id`), bukan dari koleksi ini — lihat §Hierarki di bawah.
-- ⚠️ Seluruh rute **tulis** `/profit/*` dijaga `RequireMasterProfitWriter` (finance staff/supervisor/admin, atau it supervisor/admin). Direktur lolos lewat peran turunannya, tanpa peran `direktur` tersendiri. Peran `insentive` sengaja **tidak** ikut: boleh menyetujui hasil, tidak boleh menulis targetnya sendiri.
+- ⚠️ Seluruh rute **tulis** `/profit/*` dijaga `RequireMasterProfitWriter` (finance staff/supervisor/admin, atau it supervisor/admin). Direktur lolos lewat peran turunannya, tanpa peran `direktur` tersendiri. Peran `insentive` sengaja **tidak** ikut: boleh menyetujui hasil, tidak boleh menulis targetnya sendiri. 🟡 [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] (belum di kode): gerbangnya jadi per level dan per divisi, SPV Marketing boleh menulis level icc dan leader divisinya sendiri, level supervisor tetap finance/IT/Direktur, dan menulis target diri sendiri ditolak server.
 - `GET/POST /profit/targets` — target per entitas per periode. Ubah target setelah periode berjalan **wajib beralasan** (≥10 karakter); setelah disetujui, ditolak.
 - `GET/POST /profit/opex` · `POST /profit/opex/distribusi` — biaya operasional; kini **cadangan** karena gaji ditarik dari payroll dan non-gaji dari Accurate.
 
