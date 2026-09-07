@@ -225,6 +225,8 @@ Kolom ini **bukan pengganti langkah 1** di [[RUN - Menambah Metrik KPI Otomatis]
 
 11 template, 30 metrik. Klasifikasi otomasi: **14 / 2 / 0 / 14**.
 
+> ✅ **Posisi ICC sudah maju melewati snapshot ini.** Per sensus 2026-08-20, ICC Beauty Hacks (19 orang) memegang template dengan otomasi PENUH (bobot 1,00) dan skornya kini **dibekukan otomatis** oleh sistem tiap tanggal 1 — lihat [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]]. Tabel ICC di bawah tetap salinan struktur metrik per 1 Agustus; rumus sumber yang benar-benar berjalan sekarang ada di `kpi_sumber_kinerja_toko.go` ([[Microservices - Employee Service]]).
+
 ### Affiliate
 
 Template `AFFILIATE`, 2 metrik.
@@ -889,6 +891,8 @@ Template `VIDEOGRAPHER & EDITOR COMPANY`, 4 metrik.
 ## Kyura
 
 9 template, 27 metrik. Klasifikasi otomasi: **16 / 1 / 0 / 10**.
+
+> ✅ **Posisi ICC sudah maju melewati snapshot ini.** Per sensus 2026-08-20, ICC Kyura (11 orang) memegang template dengan otomasi PENUH (bobot 1,00) dan skornya kini **dibekukan otomatis** oleh sistem tiap tanggal 1 — lihat [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]]. Tabel ICC di bawah tetap salinan struktur metrik per 1 Agustus; rumus sumber yang benar-benar berjalan sekarang ada di `kpi_sumber_kinerja_toko.go` ([[Microservices - Employee Service]]).
 
 ### Affiliate
 

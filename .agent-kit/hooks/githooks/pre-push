@@ -1,0 +1,81 @@
+#!/bin/sh
+# pre-push — gerbang lokal agent-kit untuk repo KODE. Dipasang lewat `git config core.hooksPath`
+# oleh init (path absolut, berlaku untuk seluruh worktree repo itu). Dijalankan oleh sh bawaan
+# git, termasuk di Windows (Git for Windows), jadi satu skrip untuk semua OS.
+#
+# Menolak push bila pemeriksaan dasar gagal:
+#   - repo Node (package.json + pnpm-lock.yaml): pnpm tsc, pnpm lint, pnpm build
+#       (build dilewati bila AGENTKIT_SKIP_BUILD=1, dan itu DICETAK supaya tidak senyap)
+#   - repo Go multi-modul (services/<x>/go.mod): `go build ./...` per service yang tersentuh
+#       oleh commit yang dipush; semua service bila shared-library tersentuh
+# Test vs baseline SENGAJA tidak di sini (menit-menitan); itu urusan /judge.
+# Melewati dengan sadar: `git push --no-verify` (jejaknya tetap ada di riwayat shell Anda).
+
+remote="$1"
+top="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+cd "$top" || exit 0
+
+zero="0000000000000000000000000000000000000000"
+touched=""
+while read -r lref lsha rref rsha; do
+  [ "$lsha" = "$zero" ] && continue                      # hapus branch remote: tak ada yang diperiksa
+  if [ "$rsha" = "$zero" ]; then
+    base="$(git merge-base "$lsha" origin/main 2>/dev/null || git merge-base "$lsha" origin/master 2>/dev/null || echo "")"
+  else
+    base="$rsha"
+  fi
+  if [ -n "$base" ]; then
+    touched="$touched
+$(git diff --name-only "$base" "$lsha" 2>/dev/null)"
+  else
+    touched="$touched
+$(git show --name-only --format= "$lsha" 2>/dev/null)"
+  fi
+done
+
+gagal=0
+echo "[agent-kit pre-push] repo: $top"
+
+# ---- Node (erp-frontend dkk) ----
+if [ -f package.json ] && [ -f pnpm-lock.yaml ]; then
+  for s in tsc typecheck lint; do
+    if grep -q "\"$s\"[[:space:]]*:" package.json; then
+      echo "[agent-kit pre-push] pnpm $s ..."
+      if ! pnpm "$s"; then echo "[agent-kit pre-push] GAGAL: pnpm $s"; gagal=1; fi
+    fi
+  done
+  if [ "$gagal" -eq 0 ] && grep -q "\"build\"[[:space:]]*:" package.json; then
+    if [ "${AGENTKIT_SKIP_BUILD:-0}" = "1" ]; then
+      echo "[agent-kit pre-push] pnpm build DILEWATI (AGENTKIT_SKIP_BUILD=1). Jalankan sendiri sebelum merge."
+    else
+      echo "[agent-kit pre-push] pnpm build ... (lewati sadar: AGENTKIT_SKIP_BUILD=1)"
+      if ! pnpm build; then echo "[agent-kit pre-push] GAGAL: pnpm build"; gagal=1; fi
+    fi
+  fi
+fi
+
+# ---- Go multi-modul (bip-erp) ----
+if [ -d services ] && ls services/*/go.mod >/dev/null 2>&1; then
+  svcs=""
+  if printf '%s\n' "$touched" | grep -q '^shared-library/'; then
+    svcs="$(ls -d services/*/ | sed 's#services/##; s#/$##')"
+    echo "[agent-kit pre-push] shared-library tersentuh: build SEMUA service"
+  else
+    svcs="$(printf '%s\n' "$touched" | sed -n 's#^services/\([^/]*\)/.*#\1#p' | sort -u)"
+  fi
+  if [ -z "$svcs" ]; then
+    echo "[agent-kit pre-push] tidak ada services/<x> tersentuh: go build dilewati"
+  fi
+  for s in $svcs; do
+    [ -f "services/$s/go.mod" ] || continue
+    echo "[agent-kit pre-push] go build services/$s ..."
+    if ! (cd "services/$s" && go build ./...); then echo "[agent-kit pre-push] GAGAL: go build services/$s"; gagal=1; fi
+  done
+fi
+
+if [ "$gagal" -ne 0 ]; then
+  echo "[agent-kit pre-push] PUSH DITOLAK. Perbaiki dulu, atau lewati sadar dengan --no-verify."
+  exit 1
+fi
+echo "[agent-kit pre-push] lolos"
+exit 0

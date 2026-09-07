@@ -480,7 +480,29 @@ Konsekuensinya — **sejak PR #1109 hanya berlaku penuh untuk Shopee**; untuk Ti
 - **`gross_profit` TIDAK terpengaruh — terverifikasi ulang sesudah #1109.** Ia dihitung dari `net_settlement`, HPP dari `o.Qty`, dan `revenue` tidak muncul dalam rumusnya (`attribution.go:133`). Yang bergeser hanya sebaran `ads_cost` antar-SKU pada jalur prorata (totalnya tetap). Gerbang laba pada vonis halaman depan tetap sehat.
 - **Efek samping menguntungkan**: margin yang dihitung manual (`gross_profit ÷ revenue`) untuk TikTok membaik dari 18% ke 26%, mendekati margin sejati 35% (`gross_profit ÷ net_settlement`) — sebelumnya pembilang memakai settlement sementara penyebut memakai harga banderol.
 
-`fee_marketplace` = `TotalPlatformCommission + TotalServiceFee + TotalAffiliateCommissionFee`, diprorata per item. **Komisi affiliate sudah termasuk.** Yang tak punya kolom sama sekali: **diskon, ongkir, dan adjustment**.
+`fee_marketplace` = `TotalPlatformCommission + TotalServiceFee + TotalAffiliateCommissionFee`, diprorata per item. **Komisi affiliate sudah termasuk.** Yang tak punya kolom sama sekali: **ongkir dan adjustment** — diskon kini punya kolomnya sendiri (lihat bagian berikut).
+
+### `harga_sebelum_diskon` + rincian diskon (PR [#1613](https://github.com/bip-itteam-internal/bip-erp/pull/1613))
+
+Kalimat "tak ada satu kolom pun yang menampilkannya" di atas **sudah tidak berlaku** sejak PR ini: mart menyimpan `harga_sebelum_diskon`, `diskon_penjual`, dan `diskon_platform`, diprorata dari order dengan porsi yang sama seperti `gmv_dashboard`.
+
+Pemicunya keluhan yang sama berulang dalam bentuk baru. Diukur Agustus 2026 atas 5 toko Beautyhacks: ERP `1.397.606.930` vs Desty `1.888.205.400` — **selisih 26%**, dan sekali lagi dibaca sebagai data hilang. Bukan. `revenue`/`sub_total` ERP sudah dipotong diskon penjual **dan** platform, sementara "Penjualan Kotor" Desty hanya memotong diskon penjual.
+
+Rumusnya diverifikasi ke API TikTok, **bukan disimpulkan dari dokumentasi Desty** — keterangan kolom mereka sendiri menyebut TikTok memakai subtotal setelah diskon, dan angkanya membantah itu:
+
+```
+sub_total = original_total_product_price − seller_discount − platform_discount
+```
+
+`platform_discount` **wajib** ikut. Pada satu order contoh (orig 130.000, seller 35.550, platform 14.168, sub 80.282) mengabaikannya salah Rp14.168 — untuk satu order. Diukur atas 200 order Agustus, total `platform_discount` mengekstrapolasi ke **~Rp40 juta**, menutup **95%** dari selisih Rp42,5 juta terhadap Desty; sisanya beda cakupan order.
+
+⚠️ **Rumus itu tidak eksak.** 3 dari 200 order menyisakan selisih yang persis sebesar `payment_platform_discount` order tersebut (diskon metode pembayaran; tidak disimpan). Totalnya 0,05% dari nilai. Jangan memakainya sebagai pemeriksa kesamaan yang keras — pakai toleransi, atau tarik `payment_platform_discount` dari API bila butuh rekonsiliasi rupiah-per-rupiah.
+
+**Penjual dan platform sengaja dipisah** karena penanggungnya berbeda: diskon penjual mengurangi penerimaan toko, diskon platform ditanggung marketplace. Menyatukannya membuat laporan laba menghitung beban yang bukan milik penjual. Ketiganya **tidak dipakai hitungan laba** — hanya untuk menyandingkan dengan laporan luar.
+
+Di lapisan kawat ketiganya `*float64` (nol → `nil`), berbeda dari `gmv_dashboard` yang float polos: baris mart periode sebelum [[Microservices - Integration Service]] menyimpannya (~19 Agt 2026) dan channel non-TikTok bernilai 0 karena **tidak diketahui**, bukan karena penjualannya nol. Nol polos akan tampil "Rp 0" di FE dan terbaca sebagai fakta.
+
+**Tanpa backfill.** Order baru terisi sendiri; baris mart periode lama tetap kosong sampai ETL-nya dijalankan ulang untuk periode itu. Berbeda dari #1109 yang di-backfill, karena di sini yang hilang bukan angka yang salah melainkan kolom yang memang belum pernah ada.
 
 Identitasnya lebih dulu dibuktikan tim di `services/integration/cmd/insentifprobe` terhadap data TikTok Juni 2026: `total_original_price − total_discount = subtotal_after_seller_discount`, lalu `subtotal − (service + shipping + affiliate + commission + adjustment + refund) = total_settlement_amount`.
 

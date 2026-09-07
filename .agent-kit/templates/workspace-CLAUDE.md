@@ -18,6 +18,16 @@ __ACTIVE_PROJECT__
 ADR + dok domain + daftar task di vault. Berhenti sebelum kode. Dipakai saat kebutuhannya datang
 mentah dari manajemen; task teknis biasa tetap langsung `/start-task`.
 
+## Loop otonom (kit ≥ 1.15.0)
+`/brief <masalah>` → `/kerjakan <path brief>` (worktree pendek → agen `loop-<domain>` → `/judge`
+otomatis → perbaikan maks 2× → **PR**). **Merge tetap manusia** (ADR 0077 §1). Pendukung:
+`/papan-sesi` (sesi mana mengerjakan apa), `/dashboard` (HTML statis: SHIPPED, MIX, LOOP, CYCLE,
+SESI dari gh + data lokal), `/ekstrak-skill` (sesi → draft skill), `/supervise` (evaluasi loop →
+draft, tidak auto-apply). Gerbang lokal: pre-commit **menolak** commit di branch
+utama repo kode; pre-push menjalankan tsc/lint/build atau go build. Jangan `--no-verify` tanpa
+alasan tertulis. Papan tim (`dev-activity-board`) menerima peristiwa loop bila mesin ini punya
+`~/.agent-kit/loop-ingest.json` (opt-in, best-effort, tanpa judul brief/teks task).
+
 ## Aturan turunan
 - JS/TS: pakai **pnpm**, bukan npm/yarn.
 - Grounded-in-code: jangan mengarang; yang belum ada tandai TBD.

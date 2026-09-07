@@ -1,0 +1,78 @@
+**Status**: 🟡 Daftar task dari `/analisa-kebutuhan` 2026-09-07. Keputusannya di [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]]; dok ini papan kerja, bukan arsitektur. Coret item begitu PR-nya merge, dan pindahkan keadaannya ke dok domain lewat `/sync-docs`, jangan menumpuk status di sini.
+
+## Kebutuhan yang dijawab
+
+Target profit per orang per bulan untuk tim marketing dipakai membayar insentif dan menilai KPI, tetapi diketik di dua tempat dan terukur menyimpang (9 dari 28 Account Specialist, Agustus 2026). Manajemen memutuskan: satu angka, SPV Marketing menulis target bawahannya, Finance atau Direktur menulis target SPV. Opsi yang dipilih: insentif pemilik tunggal, KPI membacanya, alur target-marketing dipensiunkan.
+
+## Urutan deploy yang mengikat
+
+Gerbang tulis hidup di `shared-library`, jadi **insentive-service dan employee-service naik bersama** (T1 + T2 satu rilis backend), baru erp-frontend (T4 + T5), baru pencabutan (T3 + T6). BE sebelum FE karena payload sumber KPI berubah. Tidak ada env baru. Prod dijalankan manusia (skill `deploy-bip-erp` §0).
+
+## Task
+
+### T1. Gerbang tulis target insentif per level dan divisi
+- **Status 2026-09-07**: ✅ dikodekan di bip-erp branch `feat/insentive-gerbang-target` (tiga commit: ekspor `BolehTulisMasterProfit`, gerbang + test, perbaikan `/review`), test insentive dan shared-library/common hijau, kontrol negatif terbukti (gerbang dilepas → test merah di assertion 403). PR bip-erp [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767) dibuka 2026-09-07; **belum merge, belum deploy dev, verifikasi lewat gateway belum** (delapan item di badan PR). Artefak rencana: `.task-plans/2026-09-07-insentive-gerbang-target.md`.
+- **Repo**: bip-erp, `shared-library/common/gerbang_insentif.go`, `services/insentive/func.go` (`POST /profit/targets`), `services/insentive/business_rules.go`.
+- **Isi**: level `icc` dan `leader` boleh ditulis SPV Marketing untuk divisinya sendiri (peran dari jabatan + departemen, pola `perananTarget`), plus finance/IT/Direktur; level `supervisor` tetap finance/IT/Direktur; permintaan yang `entity_id`-nya pemanggil sendiri ditolak apa pun perannya. `BolehUbahTarget` dan `riwayat[]` tidak disentuh.
+- **Test**: perluas `gerbang_master_profit_test.go` dengan kontrol positif (SPV Beauty Hacks menulis icc Beauty Hacks) dan tiga kontrol negatif (SPV Beauty Hacks menulis icc Kyura, SPV menulis level supervisor, SPV menulis dirinya sendiri). Satu test lewat Fiber untuk jalur 403.
+- **Verifikasi**: lewat gateway dengan token SPV sungguhan di dev; bandingkan bentuk respons, bukan status saja.
+- **Dependensi**: tidak ada.
+
+### T2. KPI membaca target profit dari sumber insentif
+- **Status 2026-09-07**: ✅ dikodekan di bip-erp branch `feat/employee-kpi-target-insentif` (commit 38cd2719 + perbaikan `/review` a4bd57a6), test modul employee dan shared-library hijau dibanding baseline `origin/main` (masing-masing 1 dan 2 merah pra-ada), kontrol negatif fallback-ke-template terbukti merah. **Penyimpangan sadar**: validasi template TIDAK ditolak di T2 (FE memblokir simpan bila `auto.target <= 0`, jadi menolak di backend lebih dulu menjebak HR); mesin mengabaikan target template untuk `insentif_profit`/`profit`, pembersihan + penolakan dipasang bersama T5. Tanpa migrasi 8 template prod. PR bip-erp [#1775](https://github.com/bip-itteam-internal/bip-erp/pull/1775) **merged 2026-09-07 14:42 UTC** (`main` ce30a716); **dev ter-deploy oleh pipeline 21:44 WIB** (image baru, biner memuat `TargetDariSumber` = 2, kontrol positif `TargetBerlaku` = 1, string karangan = 0) dan **terverifikasi 21:55 WIB** dari dalam container (rute tanpa prefix + header `BIP-Gateway-ID`, kontrol negatif 401): katalog `insentif_profit.target_dari_sumber = ["profit"]`; `auto-values` Aan Budiyanto periode tanpa target insentif → `auto_value` null, basis "belum dapat dihitung: target profit belum diisi di Master Target insentif untuk periode 2026-08", `auto_target` null, `auto_gagal_sumber` false (template 2 M diabaikan); periode 2026-06 dengan target uji 44 jt → `auto_target` 44.000.000, skor 67 (29,5 jt / 44 jt), kesimpulan menyebut 44 jt; `/me/kpi-score?preview=true` target 44 jt. Data uji (template, penetapan, 2 target) dihapus sesudahnya. Belum bisa diuji di dev: skor beku ber-`insentif_profit` (dev tak punya snapshot semacam itu). **Prod belum deploy.**
+- **Repo**: bip-erp, `services/employee/kpi_sumber_insentif_profit.go` dan `_test.go`, `shared-library/models/employee/kpi_reduksi.go` (`TargetBerlaku`), `services/employee/kpi_auto.go`, `kpi_finalisasi.go`, `kpi_score_tersimpan.go`, validasi template (`ValidateKPIAutoConfig`).
+- **Isi**: field `target` baris `/profit-dashboard` jadi target metrik `profit`; konsep "target dari sumber" mendahului empat lapis `TargetBerlaku` hanya untuk metrik yang sumbernya menyediakan target; template yang memuat target untuk metrik itu ditolak validasi; target nol atau tak ada berarti metrik tidak dinilai dengan keterangan "target belum diisi", **tanpa bawaan**; snapshot beku menyimpan `auto_target`, dan pembacaan skor beku memakainya.
+- **Test**: tulis ulang `TestKatalog_TakAdaPencapaianTarget` dengan arah sebaliknya dan alasan baru; fungsi murni untuk pemilihan target diuji dengan kontrol negatif (target absen tidak jatuh ke `cfg.Target`); test snapshot membuktikan `auto_target` tersimpan dan dipakai saat dibaca.
+- **Verifikasi**: `GET /kpi/auto-values` untuk satu Account Specialist di dev menampilkan `auto_target` sama persis dengan `target` di `GET /profit-dashboard?level=icc`; finalisasi manual satu periode uji menyimpan target di dokumen skor.
+- **Dependensi**: tidak ada di kode; untuk verifikasi angka nyata butuh T1 supaya SPV bisa mengisi.
+- **Gerbang kolom**: `realisasi` tetap dari insentif dengan `mode=bergeser`; hanya target yang disatukan. Jangan menyentuh rumus profit.
+
+### T3. Cabut alur target-marketing di backend
+- **Repo**: bip-erp, `services/employee/kpi_target_marketing.go`, `kpi_target_marketing_routes.go`, model `shared-library/models/employee/kpi_target_marketing.go`, pendaftaran rute di `main.go`.
+- **Isi**: rute `GET/POST/PUT/PATCH /kpi/target-marketing*` dicabut; koleksi `kpi_target_marketing` (nol dokumen di prod, ukur ulang sebelum menghapus) dihapus; `materialisasiTargetDisetujui` dan `posisiDibreakdown` ikut hilang.
+- **Verifikasi**: `git grep` nol rujukan tersisa; rute lewat gateway membalas 404 (bukan 200 berisi data kosong).
+- **Dependensi**: T2 merge dulu, supaya tidak ada jendela di mana KPI tanpa jalur target sama sekali.
+
+### T4. Layar Master Target insentif jadi tabel per orang, ber-i18n
+- **Status 2026-09-07**: ✅ dikodekan di erp-frontend branch `refactor/insentif-struktur-hris` (refactor + merge `origin/main` + perbaikan `/review`), lingkupnya diperluas atas permintaan pemilik produk: **Dashboard Insentif dan Master Target sekaligus** pindah ke struktur satu kartu HRIS (`MainTable` + `Banner bare` + `useTableState`), kelompok divisi/tim jadi dua kolom berlabel, TOTAL di footer, i18n `finance.insentif.*`. **Penyimpangan sadar** dari isi di bawah: bukan ketik langsung di sel ala `TargetMassalModal`, melainkan pensil per baris yang membuka dialog `EditorTarget` yang sudah ada, supaya alasan wajib dan riwayat perubahan tak berubah; gembok beralasan untuk baris yang tak boleh ditulis (`bolehTulisTargetFE`, cermin gerbang T1). Komentar gerbang `settings/page.tsx` sudah diperbarui. 141 test lingkup insentif hijau, tsc/lint/build lolos, test penuh dibanding baseline `origin/main` tanpa kegagalan baru. **Belum PR; merge hanya setelah #1767 merge dan naik ke dev; perjalanan sebagai SPV di dev belum dijalankan.** Artefak rencana: `.task-plans/2026-09-07-insentif-struktur-hris.md`. Tab Struktur Tim dan Proyek Divisi tetap di luar lingkup.
+- **Repo**: erp-frontend, `src/features/finance/incentive/profit/components/master-target.tsx`, `editor-target.tsx`, `src/app/(main)/finance/incentive/settings/page.tsx`, `src/i18n/locales/{id,en}.ts`.
+- **Isi**: tab Target menampilkan anggota divisi per level (icc, leader) dengan kolom target yang bisa diketik langsung oleh SPV divisinya, mengikuti pola `TargetMassalModal` (kosong berarti belum diisi, format ribuan saat blur); level supervisor tetap hanya bisa diketik finance/IT/Direktur, dan baris diri sendiri tampil terkunci; aturan alasan wajib tak berubah. Seluruh teks lewat `t()` di **dua** locale (ADR 0010); layar ini hari ini nol i18n. Komentar gerbang di `settings/page.tsx:66-73` diperbarui bersama backend.
+- **Test**: perbarui `editor-target.test.tsx`; test i18n dengan instance i18next asli plus kontrol negatif `en` bukan fallback `id`.
+- **Verifikasi**: `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test` dibanding baseline `origin/main`, `pnpm build`; satu perjalanan utuh sebagai SPV Beauty Hacks di dev: buka Master Target, ketik target satu Account Specialist, simpan, lihat angkanya di Dashboard Insentif dan di kartu KPI orang itu.
+- **Dependensi**: T1 sudah di dev.
+
+### T5. Atur Target KPI menampilkan target profit dari insentif, tidak menerimanya
+- **Repo**: erp-frontend, `src/features/hris/kpi/components/blueprint/atur-target-inline.tsx`, `src/features/hris/kpi/lib/auto-block-rules.ts`, `src/features/hris/kpi/components/modals/konfigurasi-otomatis-field.tsx`, `target-massal-modal.tsx`, `riwayat-konfig-view.tsx`, `src/features/hris/kpi/schemas/template.ts`, locale id/en.
+- **Isi**: untuk metrik yang sumbernya menyediakan target, kolom Target jadi tampilan bertanda "dari Insentif" dengan tautan ke Master Target; tombol Isi massal dan baris `employee_id` disembunyikan untuk metrik itu; `alasanBlokTakSah` tidak lagi menuntut target untuk metrik itu; label riwayat konfigurasi ditinjau. Metrik lain tidak berubah.
+- **Test**: `atur-target-inline.test.tsx`, `auto-block-rules.test.ts`, `target-massal-rules.test.ts`, `use-upsert-template.test.tsx` disesuaikan; tambah kontrol negatif bahwa payload `POST /kpi/templates` tidak lagi membawa target untuk metrik profit.
+- **Verifikasi**: sebagai SPV Kyura lewat Portal KPI, buka Atur Target, pastikan target profit tampil sama dengan Master Target dan tidak bisa diketik; `pnpm build` lolos.
+- **Dependensi**: T2 sudah di dev.
+
+### T6. Cabut halaman dan menu target-marketing di frontend
+- **Repo**: erp-frontend, `src/app/(main)/finance/target-marketing/`, `src/app/(main)/marketing/target-marketing/`, `src/features/hris/kpi/components/target-marketing-view.tsx`, `use-target-marketing.ts`, `target-marketing-rules.ts`, `src/features/direktur/components/kpi-target-menunggu-panel.tsx`, `use-kpi-target-menunggu.ts`, `src/components/layout/sidebar-menus.tsx` (dua entri "Target Marketing"), `marketing-kpi-templates.tsx` (penyisipan ketiga), locale `hris.targetMarketing.*`.
+- **Verifikasi**: `git grep` nol rujukan; sidebar Finance dan Marketing tanpa entri Target Marketing; Ruang Direktur tanpa antrean "Target KPI Marketing"; `pnpm build`.
+- **Dependensi**: T3 merge dulu (FE tidak boleh memanggil rute yang sudah tidak ada, dan BE tidak boleh dicabut selagi FE masih memanggilnya di prod; urutannya cabut FE di rilis yang sama atau sesudah BE).
+
+### T7. Sinkron dok setelah merge
+- Ubah catatan 🟡 "belum di kode" menjadi keadaan nyata di: [[REF - Kepemilikan Data]] (baris target profit pindah dari §Duplikasi ke §Peta), [[Finance - Incentive]], [[Microservices - Insentive Service]], [[API - Insentive Service]], [[HRIS - Otomasi Skor KPI]], [[Microservices - Employee Service]], [[HRIS - Alur KPI Otomatis]] dan diagram Excalidraw-nya, [[APP - Web ERP]], [[RUN - Menambah Metrik KPI Otomatis]] (prosedur pengisian target berlapis), [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] (status ke ✅ atau ⚠️ dengan catatan).
+- Jalankan `/sync-docs`, regenerasi indeks, push `main` vault.
+- **Dependensi**: T1 sampai T6 merge dan terverifikasi di prod.
+
+## Catatan dari review T1 (task lanjutan, di luar T1..T7)
+
+- **Indeks unik `{level, entity_id, periode}` di `incentive_profit_targets` belum ada** (pra-eksisting). Upsert-nya `FindOne` lalu `UpdateOne`; dua penulis paralel pada baris baru bisa menggandakan dokumen, dan kini penulisnya bertambah. Tangani duplicate-key saat menambahkannya.
+- **Daftar level ditulis di tiga tempat**: `kanonLevel` (baru), validasi `GET /profit-dashboard` (`func.go` sekitar baris 1365), validasi `POST /profit/org` (`:447`). Alihkan dua yang lama ke `kanonLevel`; mengubah perilaku baca (peka kapital), jadi task sendiri.
+- **Diterima sadar di T1**: Supervisor departemen mana pun bisa menulis baris icc/leader untuk anggotanya; baris yatim tak dibaca dashboard. Penyempit berbasis data (entitas punya baris di level itu) bila kelak dibutuhkan.
+- Komentar gerbang di erp-frontend `settings/page.tsx:66-73` ("finance + IT saja") basi setelah T1; ✅ diperbarui di T4 (branch `refactor/insentif-struktur-hris`).
+- ⚠️ **Teramati saat verifikasi T2 di dev (2026-09-07 21:55 WIB), di luar lingkup T2**: `GET /profit-dashboard?periode=2026-07&level=icc&mode=bergeser` (dipanggil dari dalam `Insentive-Service` dengan header gateway) membalas `data.periode` **2026-08**, tepat setelah permintaan 2026-08; sebelumnya permintaan 2026-08 membalas 2026-07 setelah rangkaian 2026-09, 2026-08, 2026-07. Pola ini menunjuk ke cache respons `/profit*` (rescache 10 menit) yang kuncinya tidak membedakan periode dengan benar, dan KPI membaca baris dari sini per periode. Belum direproduksi terkendali; periksa bersama PR bip-erp #1748 (pembuangan cache saat target/opex ditulis) sebelum menyalahkan sumber KPI.
+
+## Pengukuran yang membuktikan selesai
+
+Setelah T1 sampai T5 live di prod, untuk satu periode penuh: jumlah karyawan marketing yang `auto_target` KPI-nya berbeda dari `target` insentif harus **nol**, dan jumlah yang jatuh ke bawaan template harus **nol**. Angka pembandingnya hari ini: 9 dari 28 Account Specialist berbeda, 2 Leader di bawaan 3,4 miliar, 4 orang nol di insentif tapi 22 juta di KPI (diukur 2026-09-07).
+
+## Di luar lingkup, dengan alasan
+
+- **Realisasi dua angka** (insentif menghanguskan, KPI menggeser): keputusan sadar 2026-08-27, bukan bagian masalah ini.
+- **Hierarki beban SPV** (amandemen ADR 0033 belum di kode): mengubah pencapaian SPV, bukan targetnya; task terpisah.
+- **Koreksi skor Agustus 2026 yang sudah beku**: manual, pola `.task-plans/2026-09-07-koreksi-target-profit-kpi-agustus-kyura.ps1`, dijalankan manusia.
+- **Angka target otoritatif (lampiran SK)**: keputusan manajemen di luar sistem; ADR tidak menetapkan angka.

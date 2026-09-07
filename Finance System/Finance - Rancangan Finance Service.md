@@ -444,7 +444,7 @@ Yang menghalangi bukan kemauan maupun kelengkapan, melainkan bentuk:
 
 > ⚠️ Pembanding "cocok bagan akun Accurate" di atas adalah rekap realisasi Juli, **bukan katalog Accurate penuh**. Tiga baris berisi yang tak cocok (`Beban Iuran & Sumbangan`, `Beban Entertainment Adum`, `Beban Bank`) mungkin tetap ada di Accurate dengan realisasi nol pada Juli. Validasi sebenarnya terjadi saat unggah.
 
-> 🔴 **Halaman masternya sendiri sedang rusak.** `GET /accounting/anggaran` membalas 200 dengan `"anggaran": null` untuk periode kosong; penjaga bentuk di FE menolaknya, sehingga layar menampilkan "Gagal memuat master anggaran" untuk **setiap** pengunjung. Diperbaiki di PR terbuka `fix/anggaran-daftar-array-kosong` (bip-erp + erp-frontend), **belum merge**. Selama itu, mengunggah RAPB tak akan terlihat hasilnya.
+> ✅ **Halaman masternya sudah diperbaiki — bukan lagi rusak.** `GET /accounting/anggaran` sempat membalas 200 dengan `"anggaran": null` untuk periode kosong, membuat penjaga bentuk di FE menolaknya dan layar menampilkan "Gagal memuat master anggaran" untuk **setiap** pengunjung. Diperbaiki dua sisi dan **keduanya sudah merge ke `origin/main`** 2026-08-11: bip-erp `fix(integration): daftar anggaran kosong terkirim [] bukan null` (`6de42d61`) dan erp-frontend `fix(finance): terima null sebagai daftar anggaran kosong` (`935f5f1b`). Mengunggah RAPB sekarang sudah bisa terlihat hasilnya.
 
 ### Kewajiban pajak — dibangkitkan, bukan dibuat
 

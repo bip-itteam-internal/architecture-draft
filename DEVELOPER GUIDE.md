@@ -40,6 +40,8 @@ Flow wajib tiap task: **`/start-task` → `/plan` → `/implement` → `/review`
 - `/start-task` memuat konteks arsitektur + kode relevan **sebelum** menulis kode (arch-first).
 - `/sync-docs` menyinkronkan dok dengan perubahan kode (delegasi ke rulebook vault).
 
+**Loop otonom untuk task kecil** (kit ≥ 1.15.0): `/brief <masalah>` → `/kerjakan <path brief>`. Agent membuat worktree di path pendek, mengerjakan lewat agen domain, dinilai `/judge` (gerbang mesin **dan** penilai, keduanya harus lolos), mengulang maksimum dua kali, lalu membuka **PR**. **Merge tetap manusia.** Pendukung: `/papan-sesi` (sesi mana mengerjakan apa), `/ekstrak-skill` (sesi → draft skill), `/supervise` (evaluasi loop → draft). Gerbang lokal: commit di branch utama repo kode **ditolak**; push menjalankan tsc/lint/build atau go build. Cara kerja dan batasnya: [[IT - Gerbang Repo dan Papan Sesi Agent]]; keputusannya: [[ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak]].
+
 ## 5. Konvensi
 
 - **Kode**: ikuti pola service yang ada (lihat runbook "tambah service baru" di [[IT - Runbooks]]); database-per-service + di belakang SSO/gateway ([[CORE - API Master Gateway]], [[CORE - SSO Flow]]).
@@ -48,20 +50,20 @@ Flow wajib tiap task: **`/start-task` → `/plan` → `/implement` → `/review`
 
 ## 6. Git & rilis
 
-- **Alur branch kode**: `feature → dev (test) → main (production)`. Push ke `main` → **deploy otomatis** (GitHub Actions self-hosted + Codemagic mobile). Detail: [[SCRUM SPECS]] · [[IT - CI-CD]] · [[IT - Runbooks]].
+- **Alur branch kode**: `feature → PR → main`. **Semua repo kode wajib PR**, nama branch utama apa pun (`main` maupun `master`). ⚠️ Kalimat lama "push ke `main` → deploy otomatis" **sudah tidak berlaku**: per 2026-09-06 seluruh workflow GitHub Actions di `bip-erp` dan `erp-frontend` berstatus `disabled_manually`, dan jalur deploy produksi belum terverifikasi mekanismenya; yang berlaku ada di [[IT - CI-CD]]. Deploy: [[RUN - Deploy Microservices bip-erp]] · [[RUN - Deploy Frontend ERP ke Produksi]] · mobile lewat Codemagic. Detail proses: [[SCRUM SPECS]] · [[IT - Runbooks]].
 - **Vault (dok)**: selalu `git pull` sebelum push; **stage per-file** (`git add -- "Folder/Nama.md"`, JANGAN `git add -A`); pesan `docs: ...`; jangan commit `.obsidian/*`. ([[CLAUDE]] §8–§9)
 
 ## 7. Akses arsitektur
 
 - **Utama (sekarang)**: vault lokal sebagai sibling (§2) dibuka di **Obsidian**; tersedia juga **wiki publish** di `architecture.bharatainternasional.com` (lihat [[README]]).
 - **Mulai baca dari**: [[HOMEPAGE]] (peta) → dok domain terkait.
-- **🟡 Opsi masa depan — akses via MCP**: men-expose `architecture-draft` lewat **MCP server** agar AI agent/dev bisa query dok arsitektur tanpa harus clone lokal (atau sebagai pelengkap). **Belum dibangun** — dicatat sebagai arah, perlu desain & keputusan tersendiri.
+- **Akses via MCP** (untuk manajemen dan Claude di luar workspace): **sudah dibangun dan hidup di prod** sebagai [[Microservices - Vault MCP Service]] (baca dan tulis). Cara menyambungkan: [[RUN - Menyambungkan Claude ke Vault MCP]]. Kalimat lama "belum dibangun" di sini usang sejak 2026-08-27.
 
 ## 8. Onboarding hari-1 (checklist)
 
 - [ ] Clone vault + repo yang akan digarap sebagai **sibling** (§2).
 - [ ] Pasang tools (§3): pnpm, Obsidian, Go, Docker.
-- [ ] **Pasang agent-kit**: dari folder `erp/`, jalankan init **sekali** — Windows `powershell -ExecutionPolicy Bypass -File architecture-draft\.agent-kit\init.ps1`; mac/linux `bash architecture-draft/.agent-kit/init.sh`. Tanpa ini, `/start-task … /sync-docs … /wrap` tak muncul di Claude Code. Detail + multi-project: [[RUN - Onboarding Developer Baru]].
+- [ ] **Pasang agent-kit**: dari folder `erp/`, jalankan init **sekali** — Windows `powershell -ExecutionPolicy Bypass -File architecture-draft\.agent-kit\init.ps1`; mac/linux `bash architecture-draft/.agent-kit/init.sh`. Lalu **restart sesi Claude Code** (hook dibaca saat sesi mulai). Tanpa ini, `/start-task … /sync-docs … /wrap` tak muncul di Claude Code, dan gerbang commit/push tidak terpasang. Detail + multi-project: [[RUN - Onboarding Developer Baru]].
 - [ ] Buka vault di Obsidian → baca [[HOMEPAGE]] + [[CLAUDE]] (rulebook).
 - [ ] Pahami alur kerja per task (§4) + konvensi (§5).
 - [ ] Jalankan stack lokal bila perlu (`bip-erp/docker-compose.yml`; port di [[IT - Environment Inventory]]).

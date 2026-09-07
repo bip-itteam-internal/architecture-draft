@@ -50,6 +50,16 @@ Angka-angka ini yang memicu pembuatan sistemnya, dan tetap relevan sebagai catat
 - **10 dari 28 komponen bip-erp hanya disentuh satu orang** dalam 30 hari, termasuk `procurement` (125 commit) dan `marketing-analytics` (93 commit).
 - **Lima repo dipegang satu orang saja**, termasuk `my-bharata` (382 commit) yang merupakan aplikasi presensi seluruh karyawan.
 
+## Loop otonom (ingest dari mesin developer, 2026-09-07)
+
+Kode ada di `main` sejak 2026-09-07 (PR #1 `feat/loop-ingest`, di-merge manusia). Ia menambah `POST /loop/ingest` dan bagian **Loop otonom** di papan: sesi Claude Code yang berjalan (aktif / basi lebih dari 24 jam / selesai), brief 30 hari dengan verdict judge terakhir dan nomor PR. Sumbernya hook agent-kit ≥ 1.17.0 di tiap mesin developer, **opt-in** lewat `~/.agent-kit/loop-ingest.json`.
+
+- **Auth menulis**: HMAC-SHA256 (`X-Loop-Signature-256`) dengan rahasia `LOOP_INGEST_SECRET`; rahasia belum dipasang = 503 mati tertutup. **Membaca tetap lewat tautan** (ADR 0034 §3); yang berubah hanya sisi tulis. Ini jawaban atas TBD ADR 0034 "perlu autentikasi bila data lebih sensitif".
+- **Privasi**: mengikuti §4 (judul commit tidak disimpan), judul brief, teks task, dan judul PR **tidak pernah dikirim maupun disimpan**; yang tampil hanya id hash slug, tahap, status, repo, domain, nomor PR, dan nama orang hasil pemetaan `identity_alias` (email tak terpetakan dipotong di `@`).
+- **Best-effort**: timeout 3 detik, gagal senyap dengan jeda 10 menit setelah 3 kegagalan, lalu satu baris peringatan di konteks sesi. Papan yang sepi bisa berarti ingest belum dinyalakan, bukan tidak ada yang bekerja; dashboard lokal `/dashboard` tetap sumber yang tidak butuh jaringan.
+- **Menghidupkan** (pemegang akun Cloudflare): `pnpm db:remote` → `wrangler secret put LOOP_INGEST_SECRET` (atau `wrangler secret bulk <berkas.json>`, bebas jebakan newline) → **`pnpm run deploy`** → bagikan `url` + `secret` ke tiap dev. Urutan tercatat di README repo. ⚠️ Harus **`pnpm run deploy`**: `pnpm deploy` telanjang adalah perintah bawaan pnpm untuk workspace dan gagal `ERR_PNPM_CANNOT_DEPLOY` (terjadi 2026-09-07, dua langkah sebelumnya sudah sukses). Merge **bukan** deploy: worker hanya berubah lewat perintah itu dari mesin yang login ke akun Cloudflare tim.
+- **Mengukur sudah hidup atau belum** (jangan disimpulkan dari tanggal merge): `GET /loop/ingest` membalas **405** bila kode baru sudah naik dan **404** bila worker masih versi lama; `POST` tanpa tanda tangan membalas **503** bila rahasia belum dipasang dan **401** bila sudah. Dihidupkan 2026-09-07 (versi worker `ff35af77`): sebelum deploy 404, sesudahnya 405 dan 401.
+
 ## Belum Diimplementasikan / Catatan
 
 - **Tanpa autentikasi.** Akses lewat tautan berpotongan URL acak panjang; itu bukan autentikasi, hanya membuat alamatnya tidak gampang ditemukan. Keputusan sadar, lihat ADR.

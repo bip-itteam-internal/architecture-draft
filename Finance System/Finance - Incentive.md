@@ -26,7 +26,7 @@ Insentif  = tarif(%) × Profit
 **Aturan turunan yang mengikat:**
 
 1. **Gerbang retur 7%** — batas berlaku selama pencapaian **≤100%**; di atas itu retur tidak lagi menggugurkan. Rasionya dari **jumlah order** (keputusan client 2026-07-31), bukan nilai rupiah; rasio nilai tetap ditampilkan sebagai pembanding karena bisa berbeda jauh (Juli 2026: 4,12% vs 3,35%).
-2. **Target diketik hanya di lingkup Supervisor**, lalu dibagi rata turun ke Leader dan ICC. Baris turunan boleh ditimpa manual. Ubah target saat periode berjalan wajib beralasan; setelah disetujui, ditolak.
+2. **Target diketik hanya di lingkup Supervisor**, lalu dibagi rata turun ke Leader dan ICC. Baris turunan boleh ditimpa manual. Ubah target saat periode berjalan wajib beralasan; setelah disetujui, ditolak. 🟡 **Diputuskan berubah 2026-09-07** ([[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]]; gerbang tulisnya sudah di branch `feat/insentive-gerbang-target`, belum merge; sisanya belum di kode): target per orang diketik SPV Marketing untuk divisinya, target SPV oleh Finance atau Direktur, dan angka yang sama dibaca KPI.
 3. **Dasarnya UANG CAIR, bukan harga jual** — potongan marketplace dan retur sudah terpotong di dalamnya, jadi tidak dikurangkan lagi. Retur ditampilkan untuk pemantauan dan syarat 7%, bukan sebagai pengurang.
 4. **Order yang belum cair sampai tanggal 25 bulan berikutnya HANGUS** untuk periode itu. Konsekuensinya dashboard akan selalu sedikit lebih tinggi dari pembukuan Accurate — itu aturan keadilan, bukan buku besar.
 
@@ -52,7 +52,7 @@ orang, yang dengan aturan gaji-orang-itu-sendiri praktis adalah gaji orang terse
 Sebelum perubahan ini `GET /profit-dashboard` dan `GET /profit/incentive/summary` tak punya
 gerbang sama sekali, sehingga menyembunyikan menunya tak menutup apa pun; keduanya kini
 digerbang `common.RequireMenu`. Menulis target tetap terpisah dan lebih ketat
-(`RequireMasterProfitWriter`: finance + IT saja) — di-assign ke menu tidak memberi hak
+(`RequireMasterProfitWriter`: finance + IT saja untuk `/profit/org`, `/profit/opex`, `/profit/proyek-divisi`; untuk `/profit/targets` ⚠️ [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] T1 di branch `feat/insentive-gerbang-target`, belum merge: Supervisor divisi boleh level icc dan leader divisinya sendiri, level supervisor tetap finance/IT/Direktur, target diri sendiri ditolak) — di-assign ke menu tidak memberi hak
 mengubah angka yang menentukan pembayaran.
 
 Cara memakainya: **Pengaturan → Hak Akses**, pasang paket "Menu: Insentif Profit" ke akun
@@ -91,6 +91,28 @@ ini tak bisa dilihat siapa pun, dan tanggal yang tampil terbaca seperti salah.
 **Toko nol order tetap miliknya.** Baris bernilai nol yang ditambahkan bukan angka baru —
 ia menyumbang Rp0 ke omzet, HPP, iklan, dan retur, jadi profit dan pencapaian tidak bergeser
 sedikit pun. Yang berubah hanya: toko itu tidak lagi hilang dari daftar.
+
+### Bentuk layar Dashboard dan Master Target (per 2026-09-07, belum merge)
+
+Keduanya dipindah ke struktur satu kartu yang dipakai halaman daftar HRIS (erp-frontend
+branch `refactor/insentif-struktur-hris`, T4 [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]];
+merge menunggu gerbang backend bip-erp [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767)
+naik ke dev). Yang berubah bagi pembaca:
+
+- **Kelompok jadi kolom.** Baris judul "DIVISI · Aris (Supervisor)" / "TIM · Ade (Leader)"
+  hilang, diganti kolom **Divisi** dan **Tim** yang menyebut nama beserta perannya. Dua
+  keadaan yang dulu sama-sama tampil kosong kini dibedakan: *Langsung di bawah <SPV>, tanpa
+  Leader* (sah: Annisa, Affiliate, Host Live, Buzzer memang bertanggung jawab ke SPV) dan
+  *Belum berdivisi* (atasan belum diisi di HRIS, perlu dibetulkan di sana).
+- **Cari, urut, halaman, TOTAL.** Kotak cari menyaring nama, tim, dan divisi; TOTAL di kaki
+  tabel dihitung dari **seluruh hasil saring**, bukan halaman yang tampak; export mengunduh
+  seluruh hasil saring.
+- **Master Target per orang.** Tab Target menampilkan anggota per level; pensil hanya pada
+  baris yang boleh ditulis pemegang token (cermin gerbang T1 di layar, backend tetap
+  penentu), gembok beralasan untuk baris diri sendiri, level supervisor, dan divisi lain.
+  Perubahan tetap lewat dialog beralasan wajib, bukan ketik langsung di sel.
+- Seluruh teks lewat i18n `finance.insentif.*` ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]);
+  tab Struktur Tim dan Proyek Divisi belum dimigrasi.
 
 ### Aturan periode: hangus, bukan bergeser (per 2026-08-27)
 

@@ -1,0 +1,30 @@
+{
+    "repo":  "bip-erp",
+    "jenis":  "go",
+    "tanggal":  "2026-09-06T16:54:06.7139726Z",
+    "commit":  "12bd8484",
+    "path_ukur":  "C:/Users/irfan/wt/be-baseline",
+    "jumlah_test":  14562,
+    "jumlah_gagal":  14,
+    "gagal":  [
+                  "services/employee:employee.(paket gagal)",
+                  "services/employee:employee.TestMetrikTanpaIklanGagalTerbacaPadaServiceLama",
+                  "services/integration:integration/internal/infrastructure/clients.(paket gagal)",
+                  "services/integration:integration/internal/infrastructure/clients.TestListGLAccountHasNextFallbackFullPage",
+                  "services/integration:integration/internal/infrastructure/clients.TestListGLAccountShapes",
+                  "services/integration:integration/internal/interface/http.(paket gagal)",
+                  "services/integration:integration/internal/interface/http.TestCreateTanpaLazadaTetapSepertiSemulaLewatFiber",
+                  "services/integration:integration/internal/usecase.(paket gagal)",
+                  "services/integration:integration/internal/usecase.TestAdopsiReceipt_E2EAritmetikaGeserAlokasi",
+                  "services/integration:integration/internal/usecase.TestSerap_TolakGeserAlokasiTanpaUangBergerak",
+                  "services/integration:integration/internal/usecase.TestSyncOrderReturn_ExistingNonSent_RepushWithStoredMode",
+                  "services/integration:integration/internal/usecase.TestTerjemahkanDiffReceipt_AlokasiTurunSepihakDilaporkan",
+                  "services/integration:integration/internal/usecase.TestTerjemahkanDiffReceipt_GeserAlokasi",
+                  "services/integration:integration/internal/usecase.TestTerjemahkanDiffReceipt_GeserBanyakFakturSeimbang"
+              ],
+    "durasi_detik":  939.5,
+    "catatan":  [
+
+                ],
+    "cara_ukur_ulang":  "baseline-test.ps1 -Path \u003ccheckout origin/main bersih\u003e ; jangan di branch fitur"
+}
