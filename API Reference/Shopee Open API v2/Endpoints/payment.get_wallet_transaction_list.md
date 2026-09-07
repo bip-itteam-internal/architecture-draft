@@ -4,7 +4,7 @@
 - Method: GET
 - Auth: shop
 - Deskripsi: Use this API to get the transaction records of wallet. Only applicable for local shops
-- Sumber: open.shopee.com/documents/v2/payment.get_wallet_transaction_list?type=1 (backend doc/api) — 2026-07-18
+- Sumber: open.shopee.com/documents/v2/payment.get_wallet_transaction_list?type=1 (backend doc/api) — 2026-09-07
 - Confidence: verified-docs
 
 ## Request
