@@ -28,6 +28,16 @@
 - Gateway panic saat startup bila key kosong (fail-fast)
 - **Header identitas dari klaim JWT** (`Reroute` membuang header `BIP-*` kiriman klien lalu meng-inject ulang dari klaim): `BIP-Employee-Id`, `BIP-System-Roles`, dan **`BIP-Company-ID`** (perusahaan/tenant; fallback `"BIP"`) — dikirim ke **semua** module secara seragam, dan diteruskan antar-service via `InternalRequest`. Inilah fondasi multi-perusahaan: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 
+> ⛔ **Konsekuensi yang mengikat SETIAP service di belakang gateway: `ReadBufferSize` wajib ≥ 32 KB** (default fasthttp cuma 4 KB). Injeksi di atas membuat permintaan ke hulu **selalu lebih besar** daripada yang dikirim browser — `Reroute` menyalin seluruh header masuk lalu menambahkan `BIP-Permissions`, `BIP-System-Roles`, dan `BIP-Supervised-Departments` — dan ukurannya **tumbuh mengikuti jumlah permission-set** yang dipegang akun pemanggil ([[CORE - RBAC dan Permission Set]]).
+>
+> Di bawah 32 KB fasthttp menolak di lapisan HTTP **sebelum satu handler pun jalan**, membalas `431 Request Header Fields Too Large`. Karena gateway meneruskan status upstream apa adanya (`c.Status(resp.StatusCode)`), **431 milik service tampil di browser seolah berasal dari gateway** — jadi jangan mulai menyelidiki dari gateway.
+>
+> Dua sifat membuatnya sulit dikenali. **Per-akun**: akun berizin sedikit tetap lancar, sehingga gejalanya terlihat seperti masalah satu orang. **Per-rute**: hanya modul yang belum dinaikkan yang gagal, sehingga sisanya yang normal terbaca sebagai bukti gateway sehat. Pembeda tercepat: kirim satu header probe besar (mis. `X-Probe` 6 KB) ke rute yang dicurigai **dan** ke rute modul lain; kalau yang kedua 200, yang salah modulnya, bukan gateway.
+>
+> Diukur 2026-09-04: dari 25 proses Fiber di repo, 22 sudah 32 KB sejak `e84b93c4` (2026-08-18). Commit itu menyapu `api-gateway` + `services/*` dan **melewatkan `orchestrator/*`**, yang secara folder bukan `services/*`; ketiga sisanya (kedua orchestrator + `services/.template`, yang membuat tiap service baru lahir salah) ditutup `df03a674`. Kini 25 dari 25 di `main` — lihat [[CORE - HRIS Orchestrator]] dan [[CORE - IT Orchestrator]], keduanya **belum naik ke prod**.
+>
+> Pelajaran yang lebih tahan lama daripada angkanya: **sapuan berbasis pola folder melewatkan proses Fiber yang tidak tinggal di `services/`**. Aturan ini berlaku untuk `orchestrator/*` dan untuk apa pun yang menyusul.
+
 **Routing service via `/api/:module/*`**
 - Module: employee, attendance, notification, file, insentive, integration, tiktok-shop, inventory, task-management, recruitment, hris (orchestrator), it (orchestrator), **learning** (✅ live dev + prod 2026-08-06, port 6987 — [[Microservices - Learning Service]]), form-builder (⚠️ merged 2026-08-01, **belum live di dev** — `/health?check=form-builder` masih balas `400 unknown service`)
 - Contoh port internal: employee-service:6970, attendance-service:6971, notification-service:6972, file-service:6973, hris-orchestrator:7000, it-orchestrator:7001
@@ -63,7 +73,7 @@
 
 - **SSO store in-memory** tidak aman untuk deployment multi-instance (sudah ditandai di kode) — kode SSO yang disimpan di satu instance tidak terlihat oleh instance lain.
 - **Revoke token pada refresh/biometrics** masih placeholder kosong — JWT lama tidak benar-benar di-revoke saat refresh atau login biometrics.
-- **Route `/dev/*` & `/debug/get-jwt`** sengaja dibuat insecure (mint admin token tanpa proteksi) dan **harus dihapus di production**.
+- ⛔ **Route `/dev/*` & `/debug/get-jwt`** sengaja dibuat insecure (mint admin token tanpa proteksi) dan **harus dihapus di production**. **Diukur 2026-09-04: `GET https://api.bharatainternasional.com/debug/get-jwt` membalas 200 di PRODUKSI** — jadi kalimat "harus dihapus" di atas belum dikerjakan, dan siapa pun yang tahu path-nya bisa menerbitkan JWT ber-`it: supervisor` + `hris: staff` + `ga` tanpa kredensial apa pun. Satu-satunya penahannya `strictLimiter`, yang membatasi laju, bukan akses. Statusnya bergerak — ukur ulang sebelum memakai kalimat ini.
 
 ## Dependencies & Integrasi
 

@@ -247,6 +247,30 @@ Perhitungannya: (Finale Score x 2 x Jumlah Konversi)
 		- Skema Penilaian KPI Tim ICC mulai Januari 2026 sebagai berikut:
 		- ![[ICC2.png]]
 
+### ⛔ Metrik ICC sudah dihitung sistem, tetapi layarnya masih diketik tangan
+
+*Ditemukan dan diverifikasi 2026-09-04.*
+
+Aturan insentif ICC 2026 di atas dievaluasi atas **CTR ≥ 2%**, **Watch ≥ 30%**, **ROI GMV Max ≥ 3.2**, dan **minimal 15 order**. Keempatnya sudah dihitung backend, dan endpointnya sudah hidup:
+
+| | |
+|---|---|
+| Endpoint | `GET /api/integration/insight/icc-video-metrics` |
+| Terdaftar | `services/integration/main.go:1128`, handler `ListICCVideoMetrics`, ber-cache 10 menit |
+| Entity | `ICCVideoMetric` (`internal/domain/entity/icc_video_metric.go`) |
+| Atribusi | **`creator_username`**, dijoin lewat `tt_business_campaign_items`; tanggal tayang dari snapshot `tt_shop_video_performances` |
+| Konsumen aturan | `services/insentive` (`business_rules.go`, `func.go`, `hierarki_hris.go`, `main.go`) |
+
+**Yang tidak terhubung: frontend.** `erp-frontend/src/features/finance/incentive/components/form/video-metrics-fields.tsx` adalah formulir berisi field **manual** untuk Video ID, Tanggal Tayang, CTR, Watch 25%, ROAS, dan Orders, satu set per video.
+
+Diverifikasi 2026-09-04: **nol berkas frontend memanggil endpoint itu.** Klaim nol ini divalidasi kontrol positif (185 berkas frontend memanggil `/api/integration`, jadi metode pencariannya memang bekerja); pencarian pertama yang lebih sempit mengembalikan nol pada kontrolnya juga dan karena itu dibuang.
+
+**Kenapa ini layak dikerjakan lebih dulu daripada dashboard ICC mana pun.** Perubahannya jauh lebih kecil (menyambung satu endpoint ke formulir yang sudah ada, bukan membangun layar baru), efeknya langsung terasa oleh yang mengisi insentif tiap bulan, dan ia menghapus sumber kesalahan yang tak terlihat: angka yang diketik tangan tak punya cara diperiksa terhadap sumbernya, sementara insentif yang dibayarkan bergantung padanya.
+
+⛔ **Satu keputusan wajib diambil sebelum menyambungkannya: ROAS per-video TIDAK dapat diandalkan.** Komentar di `icc_video_metric.go` menyatakan alokasi biayanya bocor ke bucket campaign `-1`, dan itu dipakai apa adanya sebagai keputusan produk. Mengisi otomatis CTR, Watch25, Orders, dan tanggal tayang aman; **ROAS menuntut keputusan pemilik insentif** apakah tetap diisi tangan, dikosongkan, atau diberi penanda bahwa angkanya perkiraan.
+
+⚠️ Peringatan ROAS itu selama ini **hanya hidup sebagai komentar Go**, tak terbaca oleh siapa pun yang merancang layar dari dokumentasi. Ia dinaikkan ke sini justru karena itu.
+
 ## HOST LIVE
 1. Insentif Host Live berdasarkan pada skor final KPI Tim (Key Performance Indicator).
 2. Skor Final KPI (Key Performance Indicator) dinilai berdasarkan konversi sesuai dengan target yang telah ditentukan oleh Marketing SPV dengan persetujuan dari Tim Finance dan Direktur.

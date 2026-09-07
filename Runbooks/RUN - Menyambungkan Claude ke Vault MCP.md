@@ -1,4 +1,4 @@
-> **Status**: ⚠️ Implemented (ada catatan) — servicenya sudah hidup di prod dan **tiga sesi sudah terbentuk**, jadi prosedur ini terbukti bisa dituntaskan. Yang belum bisa dipastikan: apakah salah satu dari tiga itu seorang manager dari claude.ai, atau semuanya dev yang menguji lewat `claude mcp add`. Naikkan ke ✅ setelah ada satu manager yang jelas tersambung dan mendapat jawaban bersumber vault. Diukur 2026-08-30.
+> **Status**: ⚠️ Implemented (ada catatan). Prosedur ini terbukti bisa dituntaskan, dan sejak 2026-09-05 terbukti bisa menghasilkan sesi ber-hak tulis. Yang belum: **belum ada satu pun tulisan yang benar-benar mendarat di vault lewat jalur ini**, dan sebagian besar orang di daftar-izin belum pernah menyambung. Naikkan ke ✅ setelah ada commit ber-author manager di GitHub dan satu jawaban yang jelas bersumber vault. Diukur 2026-09-06; angkanya di § Keadaan adopsi, ukur ulang sebelum dipakai.
 
 ## Tujuan
 
@@ -29,7 +29,28 @@ Dokumen ini ada karena tanpanya alur pemakainya terputus di langkah pertama: **t
 
 ## Verifikasi
 
-Tanyakan sesuatu yang jawabannya hanya ada di vault, misalnya *"bagaimana SSO bip-erp bekerja?"*. Berhasil bila Claude **menyebut nama dokumennya** (mis. `CORE - SSO Flow`), bukan sekadar menjawab dari pengetahuan umum.
+Dua langkah, dan **keduanya wajib**. Yang pertama membuktikan baca, yang kedua membuktikan tulis, dan sambungan bisa lolos yang pertama sambil gagal yang kedua tanpa satu pun tanda.
+
+**1. Baca.** Tanyakan sesuatu yang jawabannya hanya ada di vault, misalnya *"bagaimana SSO bip-erp bekerja?"*. Berhasil bila Claude **menyebut nama dokumennya** (mis. `CORE - SSO Flow`), bukan sekadar menjawab dari pengetahuan umum.
+
+**2. Tulis.** Minta Claude membuat satu catatan kecil, lalu perhatikan jawabannya:
+
+```
+Tulis catatan baru di vault: Workspace/Inbox/<tanggal> Uji sambungan.md
+Isinya satu paragraf bahwa ini uji sambungan.
+```
+
+⛔ **Daftar tool yang muncul di layar Claude BUKAN bukti hak tulis.** Sambungan ber-hak baca saja tetap menampilkan `Write note` dan `Patch note` di daftar izin, dan penolakannya baru muncul saat tool itu dipanggil. Terjadi 2026-09-01 dan terulang 2026-09-05 pada penyambungan yang sama sekali baru, jadi ini bukan sisa keadaan lama: sambungan baru pun bisa terbit ber-hak baca saja bila Claude memakai metadata yang sudah ia simpan sebelumnya.
+
+Yang membuktikannya cuma tulisan sungguhan. Tiga hasil yang mungkin:
+
+| Yang dijawab Claude | Artinya | Yang dilakukan |
+|---|---|---|
+| Menyebut `commit` **dan** `pushed: true` | Beres, hak tulis terbit dan tulisannya sampai GitHub | Selesai |
+| Menyebut `commit` tapi `pushed: false` | Hak tulis terbit, tapi push ke GitHub gagal | Bukan masalah Anda. Lapor ke IT, lihat baris "belum terdorong" di § Bila gagal |
+| **"sambungan ini hanya diberi hak baca"** | Hak tulis tidak terbit | Hapus connector, tambahkan lagi dari awal, lalu ulangi langkah ini |
+
+`Workspace/Inbox/` sengaja dipakai untuk uji ini: area itu dikecualikan dari status marker, template, dan gerbang wikilink, jadi catatan uji tidak memicu peringatan konvensi dan tidak mencemari dokumen arsitektur.
 
 ## Memberi akses (untuk IT)
 
@@ -59,13 +80,53 @@ Akses diberikan **per orang**, bukan per role.
 
 Mencabut sambungan sepenuhnya: hapus connector di sisi Claude, lalu hapus `employee_id`-nya dari daftar-izin.
 
-## Irisan 2 sudah naik: semua connector harus disambung ulang SEKARANG
+## Irisan 2 sudah naik: connector lama harus disambung ulang
 
-⚠️ **Berlaku sejak 2026-09-01**, saat tool tulis diaktifkan di prod. Hak tulis diminta **saat penyambungan**, tidak menyusul sendiri. Connector yang sudah tersambung sebelumnya tetap bisa membaca, tetapi setiap percobaan menulis ditolak dengan pesan yang menyuruh menyambung ulang.
+⚠️ **Berlaku sejak 2026-09-01**, saat tool tulis diaktifkan di prod. Hak tulis diminta **saat penyambungan**, tidak menyusul sendiri. Connector yang tersambung sebelum tanggal itu tetap bisa membaca, tetapi setiap percobaan menulis ditolak dengan pesan yang menyuruh menyambung ulang.
 
-Diukur 2026-09-01 di `mcp_sessions`: tiga sesi ada, satu tanpa field scope sama sekali (terbitan irisan 1, fail-closed untuk tulis) dan dua ber-scope `vault:read`. **Nol sesi ber-scope `vault:write`**, jadi sampai penyambungan ulang dilakukan, tool tulis tidak muncul untuk siapa pun meski servicenya sudah mendaftarkannya.
+⛔ **Menyambung ulang belum tentu cukup, dan ini yang paling mudah terlewat.** Penyambungan yang sama sekali baru pun bisa terbit ber-hak baca saja, karena Claude memakai metadata OAuth yang sudah ia simpan sebelumnya. Terbukti 2026-09-05: satu sambungan baru terbit `["vault:read"]` **dua belas menit sesudah** sambungan lain di server yang sama berhasil terbit `["vault:read","vault:write"]`. Jadi penjelasan "connector lama" tidak menutup seluruh kasus ini.
 
-Beri tahu kesembilan orang di daftar-izin. Menemukannya sendiri sebagai penolakan di tengah pekerjaan terbaca sebagai fitur yang rusak, bukan sebagai langkah yang memang perlu dilakukan sekali.
+Karena itu § Verifikasi langkah 2 wajib dijalankan tiap kali menyambung, bukan hanya saat curiga.
+
+## Keadaan adopsi
+
+⚠️ **Ini potret bertanggal, bukan fakta.** Ukur ulang sebelum memakainya untuk apa pun.
+
+Diukur **2026-09-06** di `mcp_sessions` prod:
+
+- **4 sesi**, milik **2 orang** dari 9 yang ada di daftar-izin.
+- **1 sesi ber-hak tulis.** Sisanya: satu tanpa field scope sama sekali (terbitan irisan 1) dan dua ber-`vault:read`.
+- **Nol commit pernah mendarat lewat jalur ini.** Seluruh commit vault ber-email `bharataitteam@gmail.com` bernama author `BIP-ITTeam`, yakni akun tim untuk commit manual, dan yang terakhir bertanggal 2026-08-31, sehari sebelum tool tulis aktif.
+- **Nol baris log permintaan** dalam 16 jam sejak container terakhir dibuat. Service ini menganggur.
+
+Sesi seorang pemakai **menumpuk dan tidak dibersihkan**: sesi lama tetap hidup sampai `refresh_kedaluwarsa`-nya (30 hari) walau ia sudah menyambung ulang. Sesi terbitan irisan 1 yang tanpa field scope tetap bisa **membaca seluruh vault** selama masa itu, karena `BolehBaca` sengaja fail-open untuk scope kosong.
+
+### Yang penting: audiensnya 3 orang, bukan 9
+
+Dari 9 `employee_id` di daftar-izin per 2026-09-06, **6 di antaranya Tech Development** dan **3 di Kesekretariatan** (Direktur, Internal Audit, Corporate Secretary).
+
+Service ini ada untuk menghapus perantara dev, jadi bagi dev ia nyaris tak menambah apa-apa: mereka sudah punya vault di Obsidian dan git. **Yang menentukan berhasil atau tidaknya adalah 3 orang Kesekretariatan itu.** Menghitung adopsi dari 9 membuat angkanya terlihat lebih buruk sekaligus salah sasaran, dan upaya onboarding yang disebar rata ke sembilan orang menghabiskan tenaga di enam orang yang tidak akan memakainya.
+
+### Cara mengukur ulang
+
+Dari server prod:
+
+```
+cd ~/apps/bip-erp
+U=$(grep -E "^MONGO_ROOT_USER=" .env | cut -d= -f2)
+P=$(grep -E "^MONGO_ROOT_PASSWORD=" .env | cut -d= -f2)
+docker exec Vault-MCP-MongoDB mongosh --quiet -u "$U" -p "$P" \
+  --authenticationDatabase admin vault_mcp_db --eval '
+  db.mcp_sessions.find().forEach(function(d){
+    print((d.identitas ? d.identitas.employee_id : "?") +
+      " | scope=" + (d.scope === undefined ? "TIDAK ADA FIELD" : JSON.stringify(d.scope)) +
+      " | dibuat=" + d.dibuat)
+  })'
+```
+
+Bandingkan dengan `VAULT_MCP_ALLOWED_EMPLOYEES` di `.env` untuk tahu siapa yang belum menyambung. Nama container-nya **`Vault-MCP`** dan **`Vault-MCP-MongoDB`**, berhuruf besar; filter `docker ps` bersifat case-sensitive dan `--filter name=vault-mcp` akan mengembalikan kosong, yang terbaca seperti servicenya mati.
+
+⛔ **`docker ps` hijau dan boot log berbunyi `tool tulis aktif` tidak membuktikan apa pun soal pemakaian.** Keduanya benar sepanjang 2026-09-01 sampai 2026-09-06 sementara nol tulisan terjadi.
 
 ## Dokumen Terkait
 

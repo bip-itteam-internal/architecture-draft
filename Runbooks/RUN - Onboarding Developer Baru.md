@@ -19,11 +19,15 @@ Hari pertama developer baru, atau saat setup ulang environment dari awal.
    - Windows: `powershell -ExecutionPolicy Bypass -File architecture-draft\.agent-kit\init.ps1`
    - mac/linux: `bash architecture-draft/.agent-kit/init.sh`
 
-   Hasil: `erp/.claude/` (commands + hooks + skills) & `erp/CLAUDE.md` ter-generate. **Tanpa langkah ini tak ada command apa pun** — termasuk `/start-task … /sync-docs … /wrap`. Update standar: `git -C architecture-draft pull` lalu jalankan ulang init (otomatis prune command lama).
+   Hasil: `erp/.claude/` (commands + hooks + skills + agents) & `erp/CLAUDE.md` ter-generate, folder `erp/.task-plans/{sesi,briefs,judge}` dibuat, dan **`core.hooksPath`** tiap repo kode sibling diarahkan ke `erp/.claude/hooks/githooks` (gerbang `pre-push`: tsc/lint/build atau go build). Repo yang sudah punya hooksPath lain (mis. husky) dilewati dan dicetak. **Tanpa langkah ini tak ada command apa pun** — termasuk `/start-task … /sync-docs … /wrap`. Update standar: `git -C architecture-draft pull` lalu jalankan ulang init (otomatis prune command lama).
+
+   Lalu **restart sesi Claude Code**: hook (`SessionStart`, gerbang pre-commit, papan sesi) dibaca saat sesi mulai, jadi sesi yang sudah terbuka tetap memakai konfigurasi lama tanpa satu pun tanda.
 3. Pahami alur request: baca [[HOMEPAGE]] → [[CORE - API Master Gateway]] → [[CORE - SSO Flow]].
 4. Jalankan stack lokal sesuai [[DEVELOPER GUIDE]].
 5. Untuk bikin service baru: ikuti langkah di [[HOMEPAGE]] (bagian "Dari mana saya mulai").
 6. Kerjakan task dengan flow wajib: `/start-task` → `/plan` → `/implement` → `/review` → `/sync-docs` → `/wrap`.
+7. Untuk task **kecil dan jelas** (satu bug, satu test, satu dok): `/brief <masalah>` lalu `/kerjakan <path brief>`; agent mengerjakan sampai **PR**, Anda yang merge. Lihat `/papan-sesi` bila membuka lebih dari satu sesi. Cara kerja dan batasnya di [[IT - Gerbang Repo dan Papan Sesi Agent]].
+8. **Opsional, supaya sesi dan brief Anda tampil di papan tim** ([[IT - Papan Aktivitas Developer]]): minta `url` dan `secret` ingest ke pemegang akun Cloudflare tim, buat `~/.agent-kit/loop-ingest.json` berisi `{ "url": "...", "secret": "..." }`, lalu restart sesi. Tanpa berkas itu tidak ada yang dikirim. Yang dikirim hanya id, tahap, status, repo, domain, nomor PR; judul brief dan teks task tidak pernah keluar dari mesin Anda. Bila 3 kali gagal beruntun, SessionStart menampilkan satu baris peringatan.
 
 ## Multi-project (memegang beberapa repo)
 
@@ -43,8 +47,11 @@ Satu workspace `erp/` menampung **banyak project sekaligus** — vault & `erp/.c
 
 ## Verifikasi
 
-- Di Claude Code ketik `/` → command flow muncul (`/start-task`, `/sync-docs`, dll.); cek `erp/.claude/commands/` berisi 7 file.
+- Di Claude Code ketik `/` → command flow muncul (`/start-task`, `/sync-docs`, `/brief`, `/kerjakan`, dll.); jumlah berkas di `erp/.claude/commands/` sama dengan di `architecture-draft/.agent-kit/commands/` (angka mati "7 file" yang dulu tertulis di sini sudah basi sejak kit 1.4.0).
 - `erp/CLAUDE.md` ter-generate (memuat "Project aktif" & versi kit).
+- `git -C bip-erp config core.hooksPath` menampilkan path `erp/.claude/hooks/githooks`; `git -C bip-erp push --dry-run origin <branch-fitur>` mencetak baris `[agent-kit pre-push]`.
+- **Gerbang commit bekerja**: di repo temp ber-branch `main`, minta Claude menjalankan `git commit`; harus ditolak dengan pesan `DITOLAK gerbang agent-kit`. Kalau lolos, sesi belum di-restart atau init belum dijalankan ulang.
+- Uji kit sendiri hijau: `powershell -ExecutionPolicy Bypass -File architecture-draft\.agent-kit\tests\test-init.ps1` → `Semua lulus`.
 - Login lokal berhasil & bisa hit `/health` salah satu service (lihat [[DEVELOPER GUIDE]]).
 
 ## Bila gagal / Rollback

@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 (+ client MinIO langsung)
 - **Path:** `orchestrator/hris` (port `7000`)
-- **Status**: ✅ Implemented, aktif dipakai
+- **Status**: ⚠️ Implemented (ada catatan) — aktif dipakai; perbaikan 431 sudah live di DEV, **PROD masih tertinggal** (lihat Catatan)
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
@@ -38,6 +38,25 @@ Plus aggregate read: `/v2/multi`, `/v2/multi/summary`, `/:id/multi`.
 
 - Secara fungsional sudah Implemented.
 - Terdapat **dead code**: blok `PATCH /:id/update` versi lama yang masih di-comment pada route attendance.
+
+### 431 karena `ReadBufferSize` 4 KB — diperbaiki, live di DEV, PROD masih tertinggal
+
+`orchestrator/hris/main.go` dulu memanggil `fiber.New(fiber.Config{BodyLimit: 50 * 1024 * 1024})` tanpa `ReadBufferSize`, jadi berlaku default fasthttp 4 KB dan **seluruh** `/api/hris/*` membalas 431 untuk akun berizin banyak. Aturan dan sebabnya di [[CORE - API Master Gateway]]. Kini `konfigFiber()` menyetel `ReadBufferSize: 32 * 1024`, dikunci uji perilaku di `konfig_fiber_test.go` (permintaan berheader 8 KB harus sampai ke handler, plus kontrol negatif atas `fiber.Config{}` kosong).
+
+Diukur di **dev 2026-09-04** lewat gateway, sebelum dan sesudah deploy, memakai satu header probe untuk membuat ukurannya deterministik tanpa bergantung pada izin akun penguji:
+
+| Endpoint | sebelum (probe 6 KB) | sesudah (probe 6 KB) |
+|---|---|---|
+| `/api/hris/employees/v2/multi/summary` | **431** | 200 |
+| `/api/it/v2/multi` | **431** | 200 |
+| `/api/employee/master/permission-modules` (kontrol) | 200 | 200 |
+| `/api/notification/inbox` (kontrol) | 200 | 200 |
+
+Batasnya juga diukur: 31.000 byte → 200, 33.000 byte → koneksi ditutup, jadi tebingnya tepat di 32.768 byte. Layar Direktori Karyawan (`/hris/employee`) ditempuh sebagai orang dan kartu ringkasannya terisi (169 / 168 / 1).
+
+⚠️ **Reproduksi TIDAK bisa memakai akun dev biasa.** Sensus di [[CORE - RBAC dan Permission Set]] menemukan hanya segelintir posisi dan akun yang berpaket di dev, jadi `BIP-Permissions` di sana masih di bawah 4 KB dan endpointnya membalas 200 baik sebelum maupun sesudah perbaikan. Verifikasi yang bersandar pada akun biasa membuktikan nol; pakai header probe eksplisit.
+
+⛔ **PROD masih memakai biner lama.** Diukur 2026-09-04: repo prod di `991ba606` dan kedua image orchestrator dibangun `2026-09-03T13:22`, sebelum perbaikannya. Jadi 431 masih hidup di prod sampai `hris-orchestrator` dan `it-orchestrator` di sana dibangun ulang. PR: [bip-erp#1708](https://github.com/bip-itteam-internal/bip-erp/pull/1708) (merged `df03a674`, 2026-09-04). **Status prod bergerak — ukur ulang sebelum memakai kalimat ini.**
 
 ## Dependencies & Integrasi
 

@@ -9,7 +9,8 @@
 | Method | Path | Fungsi |
 |---|---|---|
 | PATCH | `/employees/personal-data` · `/work-data` · `/personal-documents` · `/work-documents` · `/work-schedule` | Update data/dokumen/jadwal (HRIS) |
-| GET | `/employees/it` · `/employees/export` | Karyawan IT / export Excel |
+| GET | `/employees/it` | Karyawan IT |
+| GET | `/employees/export` | Export Excel karyawan. Meneruskan **seluruh query string** apa adanya ke employee-service `/internal/export/all` (`queryParams` di `employee_export.go`), jadi filter layar sampai ke sumbernya tanpa perubahan di sini. Kontrak filternya: [[API - Employee Service]] |
 | GET | `/employees/v2/multi[/summary]` · `/employees/:employee_id/multi` | Aggregate semua / per-karyawan |
 | POST/PUT | `/employees/multi` · `/employees/multi/:employee_id` | Buat/update employee (multipart + dokumen) |
 | GET | `/employees/:employee_id/documents/*` | Stream dokumen dari MinIO |

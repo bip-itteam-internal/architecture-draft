@@ -6,8 +6,8 @@
 
 - **Stack**: Go + Fiber v2 (service `marketing-analytics`), MongoDB (koleksi `mart_*`)
 - **Path di repo**: `bip-erp/services/marketing-analytics/`
-- **Status**: ⚠️ Implemented (ada catatan) — **13 dari 13 halaman prototipe sudah punya endpoint**, tetapi cakupan per-metrik timpang: lapisan laba Bharata lengkap, lapisan metrik platform (Ads Manager & Seller Center) tipis sampai kosong.
-- **Tanggal audit**: 2026-08-09
+- **Status**: ⚠️ Implemented (ada catatan) — **13 dari 13 halaman prototipe sudah punya endpoint**, tetapi cakupan per-metrik timpang: lapisan laba Bharata lengkap, lapisan metrik platform (Ads Manager & Seller Center) tipis sampai kosong **di TikTok**, dan **utuh di Shopee**.
+- **Tanggal audit**: 2026-08-09; cakupan lapisan iklan disegarkan **2026-09-02** (lihat § Cakupan metrik iklan berbeda tajam per channel)
 - **Sumber prototipe**: `Marketing_Analytics_Lengkap_Bharata.html` (dari Direktur, 13 halaman + 10 penambahan)
 
 ## Cara membaca label
@@ -25,16 +25,49 @@ Empat label, bukan tiga. Label keempat ditambahkan karena "ada" saja menyembunyi
 
 **Terbalik dari dugaan biasa.** Yang membuat prototipe itu berharga justru bagian yang paling lengkap di service: settlement, retur, HPP, laba, fee marketplace, harga floor, repeat rate, wilayah, kurir, penanggung jawab (ICC). Itu persis kolom yang di prototipe ditandai "tidak ada di dashboard platform mana pun". Yang tipis justru bagian yang **disalin dari dashboard platform**.
 
-**Lapisan metrik iklan cakupannya rendah, dan itu tertulis di kodenya sendiri** (`metrik_iklan.go:141-172`):
+**Lapisan metrik iklan cakupannya rendah, dan itu tertulis di kodenya sendiri** (`metrik_iklan.go:141-172`). ⛔ **Angka di bawah HANYA berlaku untuk TIKTOK** — lihat § Cakupan metrik iklan berbeda tajam per channel:
 
-| Kelompok field | Cakupan |
+| Kelompok field (TikTok, `tt_business_integrated_reports`) | Cakupan |
 |---|---|
 | `impressions`, `spend`, `clicks` | **18 sampai 77%** |
 | `conversion`, `conversion_rate`, `cost_per_conversion`, `onsite_shopping_roas` | **0,3 sampai 1%** |
 
-Konsekuensinya bukan "belum dibangun", melainkan "kalau dibangun pun kolomnya kosong". Kolom **CVR, CPA, GMV platform, dan ROAS platform** di halaman Kampanye dan Iklan berdiri di lapisan 0,3 sampai 1% itu. **Funnel di Ringkasan SPV** (Impresi → View 2s → Klik → Order → GMV) berdiri di lapisan 18 sampai 77%, sehingga tiap tahapnya mencacah populasi yang berbeda: corongnya akan terlihat rapi dan menyesatkan.
+Konsekuensinya bukan "belum dibangun", melainkan "kalau dibangun pun kolomnya kosong". Kolom **CVR, CPA, GMV platform, dan ROAS platform** di halaman Kampanye dan Iklan berdiri di lapisan 0,3 sampai 1% itu **untuk baris TikTok**. **Funnel di Ringkasan SPV** (Impresi → View 2s → Klik → Order → GMV) berdiri di lapisan 18 sampai 77%, sehingga tiap tahapnya mencacah populasi yang berbeda: corongnya akan terlihat rapi dan menyesatkan.
 
-**Baris mart profit tidak memuat cacah order maupun qty** (`entity.go:324-357` hanya berisi kolom uang). Satu ketiadaan ini sekaligus mematikan **AOV**, **klik→order**, **CPA**, dan **cancel per toko**. Ia juga menjelaskan kenapa `cpa_maks` di `/ambang` tersimpan tapi tak pernah dibaca siapa pun: tak ada penyebut untuk menghitungnya.
+**Baris mart profit tidak memuat cacah order maupun qty** (`entity.go:324-357` hanya berisi kolom uang). Satu ketiadaan ini sekaligus mematikan **AOV**, **klik→order**, **CPA**, dan **cancel per toko**. Ia juga menjelaskan kenapa `cpa_maks` di `/ambang` tersimpan tapi tak pernah dibaca siapa pun: tak ada penyebut untuk menghitungnya. ⚠️ **Batas klaim ini adalah MART, bukan seluruh sistem**: untuk Shopee cacah konversinya ada dan lengkap di sumbernya (`report.broad_order`), cuma tak ikut disimpan ke mart — lihat bab berikut.
+
+### ⛔ Cakupan metrik iklan berbeda tajam per channel, dan dokumen ini pernah menulisnya seolah satu angka
+
+> Ditambahkan 2026-09-02 setelah pengukuran langsung ke produksi. Sampai tanggal itu seluruh label TIPIS di dokumen ini tidak menyebut channel sama sekali, sehingga terbaca berlaku untuk semuanya. Akibatnya konversi dan CPA Shopee — yang datanya **lengkap** — ikut tervonis "kalau dibangun pun kolomnya kosong", dan itu kebalikan dari kenyataan.
+
+Sumber Shopee bukan `tt_business_integrated_reports` melainkan `shopee_gms_item_performances` + `shopee_gms_campaign_performances` di `integration_db`, dan bentuknya berbeda: kunci dimensi di tingkat atas, seluruh metrik di sub-dokumen `report` (`services/marketing-analytics/entity_shopee.go`).
+
+| Field `report.*` | Baris terisi | Cakupan |
+|---|---|---|
+| `expense` · `broad_gmv` · `broad_order` · `direct_order` · `clicks` · `impression` | **42.849 dari 42.849** | **100%** |
+
+Diukur atas seluruh riwayat koleksi (1 Januari sampai 31 Agustus 2026, 8 toko) dan diperiksa ulang untuk jendela Agustus saja (5.181 dari 5.181 baris). Tak satu pun field di atas pernah kosong.
+
+Yang terbuka karenanya, dan **hanya untuk Shopee**:
+
+| Metrik | Rumus dari sumber | Label |
+|---|---|---|
+| Konversi iklan | Σ `broad_order` (atau `direct_order`) | **ADA** |
+| CPA | Σ `expense` ÷ Σ `broad_order` | **ADA** |
+| ROAS iklan | Σ `broad_gmv` ÷ Σ `expense` | **ADA** |
+| CPC · CTR · CVR | dari `expense`, `clicks`, `impression`, `broad_order` | **ADA** |
+
+Terukur Agustus 2026: belanja Rp213.821.800 · GMV iklan Rp1.175.065.029 · konversi 11.159 · ROAS 5,50 · CPA Rp19.161. Sebagai pembanding, seluruh order Shopee bulan itu 21.907, jadi order beratribut iklan kira-kira **51%** dari semuanya.
+
+Tiga jebakan yang menyertainya, ketiganya gagal tanpa satu pun galat:
+
+1. ⛔ **`broad_order` dan `direct_order` JANGAN dijumlahkan** — `direct` adalah himpunan bagian dari `broad` (Agustus: 10.403 dari 11.159). Kelas yang sama dengan `orders_dikirim` di [[Microservices - Marketing Analytics Service]] § Aturan Pemakaian Angka.
+2. ⛔ **`income.total_advertising_cost` pada order BUKAN belanja Shopee Ads.** Agustus 2026: Rp11,6 juta di seluruh 8 toko, berbanding Rp213,8 juta dari GMS. Kyura Beauty Official Store bahkan **0** padahal belanja iklannya Rp26 juta. Memakainya sebagai belanja iklan, atau sebagai penanda "order ini datang dari iklan", menghasilkan angka yang masuk akal dan salah.
+3. ⚠️ **`broad_gmv` adalah angka dashboard Shopee**, bukan omzet dan bukan uang cair: tidak dipotong diskon penjual, fee marketplace, maupun retur. Jangan disandingkan langsung dengan `revenue` atau `net_settlement` baris mart.
+
+⚠️ **Skala field turunan Shopee (`cpc`, `cpdc`, `broad_roi`, `direct_roi`, `cir`, `cr`) tidak terverifikasi dan sengaja tidak dibaca kode** — `report.cpc` pernah bernilai 1.787.289.342 pada baris ber-`expense` Rp857.899. Hitung sendiri dari `expense`, `clicks`, dan `broad_order`; jangan ambil field jadinya.
+
+⛔ **Baris `level: campaign` channel SHOPEE bukan tempat membaca laba.** Di baris itu `hpp`, `fee_marketplace`, dan `retur` seluruhnya 0 dan `attribution_kolom` menyatakan sendiri "nilai retur 0 di sini berarti TIDAK DIKETAHUI, bukan nol", sehingga `gross_profit`-nya (Agustus: Rp961.243.245) terbaca sangat sehat dan menyesatkan. Laba hanya sah dibaca dari `level: shop` (Agustus: `net_settlement` Rp1.074.357.098, `gross_profit` Rp424.526.171).
 
 ## Peta halaman
 
@@ -97,11 +130,11 @@ Service kita punya lebih dari prototipe: `/profit/products`, `/profit/items`, dr
 | Metrik prototipe | Label | Keterangan |
 |---|---|---|
 | Spend | ADA | |
-| Impresi · Klik · CTR · CPC | TIPIS | Cakupan 18–77%; CTR sudah dalam persen 0–100 |
-| CPM | RAKIT | Turunan spend ÷ impresi, ikut tipis |
+| Impresi · Klik · CTR · CPC | TIPIS (TikTok) · **ADA (Shopee)** | TikTok cakupan 18–77%; Shopee 100%. CTR sudah dalam persen 0–100 |
+| CPM | RAKIT | Turunan spend ÷ impresi; ikut tipis di TikTok, utuh di Shopee |
 | Frequency | TIDAK ADA | Butuh `reach`, tidak ada |
-| Konversi · CVR · CPA | TIPIS | Cakupan **0,3–1%** |
-| GMV platform · ROAS platform | TIPIS | Cakupan **0,3–1%** |
+| Konversi · CVR · CPA | TIPIS (TikTok) · **ADA (Shopee)** | TikTok cakupan **0,3–1%**; Shopee `report.broad_order` **100%** |
+| GMV platform · ROAS platform | TIPIS (TikTok) · **ADA (Shopee)** | TikTok cakupan **0,3–1%**; Shopee `report.broad_gmv` **100%** |
 | GMV settlement | ADA | |
 | Retur % | ADA | |
 | ROAS settlement | RAKIT | |
@@ -234,7 +267,7 @@ Diurut dari yang paling murah dan paling luas dampaknya.
 
 2. **Pisahkan `total_original_price` dan `total_discount` di mart.** Ini menyelesaikan dua hal sekaligus: kata "Revenue" berhenti bermakna ganda, dan diskon sebagai tuas laba terbesar akhirnya punya kolom.
 
-3. **Nasib lapisan metrik iklan.** Perbaiki ingest supaya cakupan naik, atau terima halaman Kampanye dan Iklan tanpa kolom platform dan funnel tanpa tiga tahap teratas. Ini menentukan nasib dua halaman penuh, jadi perlu diputuskan sadar, bukan didiamkan.
+3. **Nasib lapisan metrik iklan TikTok.** Perbaiki ingest supaya cakupan naik, atau terima halaman Kampanye dan Iklan tanpa kolom platform dan funnel tanpa tiga tahap teratas. Ini menentukan nasib dua halaman penuh, jadi perlu diputuskan sadar, bukan didiamkan. ⚠️ **Keputusan ini tidak menyentuh Shopee** — di sana cakupannya sudah 100% dan yang kurang justru pemakainya: konversi dan CPA Shopee belum jadi sumber KPI mana pun, padahal jabatan `Marketplace Advertiser` justru dinilai atas keduanya menurut SK di [[Finance - Incentive]]. Lihat [[HRIS - Otomasi Skor KPI]].
 
 4. **Kategori QC A–E**: tetap ditolak, atau dibuatkan pemetaan resmi dari alasan mentah platform ke lima kategori itu.
 
@@ -242,4 +275,4 @@ Diurut dari yang paling murah dan paling luas dampaknya.
 
 ## Dokumen Terkait
 
-[[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]] · [[APP - Web ERP]] · [[DB - Data Dictionary]] · [[Sales - Marketing Dashboard (Index)]] · [[ADR - 0008 Profit Engine Join via item_group_id]] · [[Microservices - Inventory Service]]
+[[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]] · [[APP - Web ERP]] · [[DB - Data Dictionary]] · [[Sales - Marketing Dashboard (Index)]] · [[ADR - 0008 Profit Engine Join via item_group_id]] · [[Microservices - Inventory Service]] · [[HRIS - Otomasi Skor KPI]] (konsumen KPI dari cakupan di atas) · [[Finance - Incentive]] (SK yang menyebut CPA & konversi sebagai dasar penilaian Advertiser)

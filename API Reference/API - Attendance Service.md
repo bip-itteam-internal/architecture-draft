@@ -43,8 +43,8 @@
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
 | POST/GET/PATCH | `/schedule-exchange/create` · `/consent` · `/partners` · `/view` · `/review` · `/cancel` | **Tukar Jadwal Kerja** (collection `schedule_exchange_request`). **create**: hanya karyawan shift → non-shift **403**; `type:"shift"`+`partner_employee_id` = swap antar-rekan (simpan `exchange_work_time`+`partner_work_time`), `type:"day"` = geser hari. `exchange_date` **H+3**. **consent**: rekan setuju/tolak swap (langkah 1; tolak→Canceled). **partners** `?date=`: kandidat rekan swap (role sama, terjadwal). **view** `?as=reviewer/reviewed/partner` (`partner` = inbox consent rekan, 2026-06-29), `?filter=ongoing/past`, `?id=`, `?search=`. **review**: atasan→HRD, diblokir sampai consent. **cancel**: hanya saat Waiting | header |
-| POST/GET | `/correction` · `/correction/mine` · `/correction` | Koreksi absen (window 7 hari; clock-in: kosong/Late. **409** bila telat sudah terverifikasi security di guestbook hari itu — dicocokkan lewat `employee_id`, jatuh ke `full_name`+`company_id` untuk catatan lama; list `?filter=ongoing/past` via status review, `?status=`) | header |
-| GET | `/correction/candidates` | Entri kandidat koreksi 7 hari terakhir (hari ini s/d H-7, lintas-bulan, tanpa month); `?type=clockin/clockout/any` — untuk pemilih tanggal FE. **Tidak** disaring guestbook: entri telat terverifikasi tetap muncul, penolakannya saat submit | header |
+| POST/GET | `/correction` · `/correction/mine` · `/correction` | Koreksi absen (window `correction_window_days` dari pengaturan perusahaan, **bawaan 7**, sah 1–30; clock-in: kosong/Late. **409** bila telat sudah terverifikasi security di guestbook hari itu — dicocokkan lewat `employee_id`, jatuh ke `full_name`+`company_id` untuk catatan lama; list `?filter=ongoing/past` via status review, `?status=`) | header |
+| GET | `/correction/candidates` | Entri kandidat koreksi dalam window koreksi perusahaan (hari ini s/d H-`correction_window_days`, **bawaan 7**, lintas-bulan, tanpa month); `?type=clockin/clockout/any` — untuk pemilih tanggal FE. **Tidak** disaring guestbook: entri telat terverifikasi tetap muncul, penolakannya saat submit. ⚠️ **Tidak** disaring jendela clock-out juga: entri yang `checkout`-nya belum boleh diajukan tetap jadi kandidat, dan penolakannya baru datang saat submit (**422**) | header |
 | PATCH | `/correction/:id/cancel` · `/correction/:id/review` | Batal / review koreksi | header |
 
 ## Roster jadwal bebas per tanggal
@@ -63,13 +63,22 @@ Menolak: tanggal lampau, penulisan lintas perusahaan, departemen di luar cakupan
 ## Pergantian jadwal terjadwal (berlaku-mulai)
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
-| POST | `/work-schedule-assignment` | Jadwalkan pergantian jadwal seorang karyawan (`employee_id`, `schedule_type` `static`/`pattern`, `schedule_id` **atau** `group_id`, `berlaku_mulai`). Menerima `YYYY-MM-DD` maupun RFC3339; keduanya dinormalkan ke tengah malam WIB | `RequireHRISStaffOrITSupervisor` |
-| GET | `/work-schedule-assignment/:employee_id` | Dokumen dasar (`base`), seluruh baris (`assignments`, selalu `[]` bukan `null`), dan `active` = yang berlaku hari ini (dihitung backend, bukan frontend) | `RequireHRISStaffOrITSupervisor` |
-| DELETE | `/work-schedule-assignment/:id` | Batalkan penugasan yang **belum** berlaku; yang sudah berlaku dibalas **409** | `RequireHRISStaffOrITSupervisor` |
+| POST | `/work-schedule-assignment` | Jadwalkan pergantian jadwal seorang karyawan (`employee_id`, `schedule_type` `static`/`pattern`, `schedule_id` **atau** `group_id`, `berlaku_mulai`). Menerima `YYYY-MM-DD` maupun RFC3339; keduanya dinormalkan ke tengah malam WIB | `gerbangRuteKelolaJadwal` |
+| GET | `/work-schedule-assignment/:employee_id` | Dokumen dasar (`base`), seluruh baris (`assignments`, selalu `[]` bukan `null`), dan `active` = yang berlaku hari ini (dihitung backend, bukan frontend) | `gerbangRuteKelolaJadwal` (pemegang izin: departemen saja, tanpa syarat kategori) |
+| DELETE | `/work-schedule-assignment/:id` | Batalkan penugasan yang **belum** berlaku; yang sudah berlaku dibalas **409**. Membaca `work_schedule` karyawannya lebih dulu, sehingga yang tak berwenang mendapat **403** bukan 409 | `gerbangRuteKelolaJadwal` |
 
 ⛔ **Aturan H+1: `berlaku_mulai` paling cepat BESOK**, hari ini dan tanggal lampau dibalas **400**. Ini menutup jendela penyemaian entri presensi yang gagal senyap secara struktural; alasan lengkapnya di [[Microservices - Attendance Service]].
 
 Koleksi `work_schedule_assignment` (di `attendance_db`), index **unik** `(employee_id, berlaku_mulai)` — tanggal yang sudah terpakai dibalas **409**. Dokumen dasar `work_schedule` tidak pernah disentuh. Kedua jalur tulis mengirim pemberitahuan inbox berkategori `schedule` ke karyawannya ([[Microservices - Notification Service]]).
+
+⚠️ **`gerbangRuteKelolaJadwal` = pemegang izin `jadwal.hostlive.manage` ATAU `RequireHRISStaffOrITSupervisor`** (staf HRIS atau supervisor IT). Gerbang lamanya tidak dicabut; yang ditambah hanya pemiliknya. Untuk pemegang izin ada **lapis kedua** yang menilai isi permintaan: kategori shift wajib `hostlive`, departemennya wajib punya jadwal host live, dan penugasan jadwal **statis ditolak seluruhnya**. Gerbang yang sama kini juga berlaku untuk `/company-work-schedule`, `/company-group-rotation` (termasuk `/batch`), dan `/schedule-archive`. Rincian & alasannya: [[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]].
+
+## Jadwal Host Live (layar marketing)
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| GET | `/jadwal-host-live/anggota` | Karyawan yang bisa ditugaskan jadwal host live + jadwal yang **berlaku hari ini** + `position` + `terjadwal` (jumlah pergantian yang belum berlaku). `?department=` opsional mempersempit. Balasan `{data, count, today}`; `data` selalu `[]` bukan `null` | `gerbangRuteKelolaJadwal` |
+
+Satu panggilan untuk seluruh layar, bukan `GET /work-schedule-assignment/:employee_id` per baris. Penyaringnya fungsi yang **sama** dengan gerbang tulisnya, supaya layar tak pernah menawarkan orang yang pasti ditolak 403 saat disimpan. ⚠️ `position` dikirim untuk ditampilkan, **tidak** dipakai menyaring — nama jabatan diketik bebas di master data dan sudah pernah berubah.
 
 ## Business trip (perjalanan dinas)
 | Method | Path | Fungsi | Auth |

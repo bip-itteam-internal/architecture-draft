@@ -321,6 +321,7 @@ bersifat global. Pipeline: `$unwind → $group by advertiser_id` untuk deduplika
 | **8** | Kartu per LEADER (bukan per team) diturunkan dari `work_data.supervisor_id`; kartu "Langsung di bawah SPV" + "Belum ditugaskan"; hapus Set Leader manual (lihat [[#Tampilan ICC Management — kartu per leader (menggantikan kartu per team)]]) | ✅ Selesai — sudah ter-merge ke `main` |
 | **9** | Edit mapping yang sudah ada: ganti toko/advertiser per channel, pemegang, dan tim tanpa deaktivasi+assign ulang (lihat `PATCH /icc/mappings/:id` di atas) | ✅ Selesai — Backend (`feat/icc-mapping-edit`) + Frontend (`feat/icc-mapping-edit-ui`) sudah ter-merge ke `main` |
 | **10** | Advertiser TikTok Ads boleh dipegang >1 karyawan aktif: index diganti dari unique global jadi unique per-pasangan `(tiktok_advertiser_id, employee_id)`, `available-advertisers` tak lagi menyaring yang sudah assigned. Toko/Shopee/Lazada TETAP 1:1 (tidak diubah) | ✅ Selesai (2026-08-26), branch `feat/icc-advertiser-shared` |
+| **11** | Karyawan berposisi **Marketplace Advertiser** dipisah dari tab "Toko & Iklan" ke tab baru **"Marketplace Adv"** (pindah eksklusif, bukan duplikat) — lihat [[#Tab "Marketplace Adv" — Marketplace Advertiser dipisah dari Toko & Iklan]] | ✅ Selesai (2026-09-06), branch `feat/icc-marketplace-adv-tab` |
 
 ---
 
@@ -406,9 +407,9 @@ ICC Management (departemen = Kyura, Beauty Hacks, ...)
 │ 11 anggota                                                          │
 └──────────────────────────────────────────────────────────────────┘
 
-┌─ ⚠ Langsung di bawah SPV (Beauty Hacks) ─────────────────── [▾] ──┐
-│ Karyawan ICC tanpa atasan berposisi leader di atasnya —            │
-│ TANPA tombol Assign (lihat leader-card-khusus.tsx)                 │
+┌─ ⚠ Langsung di bawah SPV (Beauty Hacks) ────────── [+ Assign] [▾] ─┐
+│ Karyawan APA PUN posisinya yang lapor langsung ke SPV departemen   │
+│ (bukan cuma ICC lagi — lihat "Kenapa direvisi lagi" & Fase 11)     │
 └──────────────────────────────────────────────────────────────────┘
 
 ┌─ ⚠ Belum ditugaskan ──────────────────────────────────────── [▾] ─┐
@@ -416,13 +417,21 @@ ICC Management (departemen = Kyura, Beauty Hacks, ...)
 └──────────────────────────────────────────────────────────────────┘
 ```
 
+> ⚠️ **Koreksi (2026-09-06)**: kartu "Langsung di bawah SPV" tadinya didokumentasikan
+> "sengaja TANPA tombol Assign" — itu sudah tidak akurat sejak kartu ini dibuka untuk
+> SIAPA PUN yang lapor langsung ke SPV (posisi apa pun, bukan cuma ICC), sebelum task
+> Fase 11 ini. Tombolnya ADA (`bisaAssign = kartu.jenis === "tanpa-leader"`,
+> `leader-card-khusus.tsx`) dan memakai `modeLangsungSpv` di dialog assign supaya
+> kandidatnya tidak dibatasi ke posisi ICC. Lihat [[#Tab "Marketplace Adv" —
+> Marketplace Advertiser dipisah dari Toko & Iklan]] untuk kelanjutannya.
+
 Ikon **✎ (Ubah)** di tiap baris membuka dialog assign yang sama dalam mode edit — lihat kemampuan edit mapping di bagian `PATCH /icc/mappings/:id` di atas.
 
 ### Aturan pengelompokan (`hierarki-leader.ts` + `kartu-leader.ts`)
 
 - **Departemen** tetap unit teratas (sesuai Fase 6): distinct department karyawan berposisi ICC.
 - **Di dalam satu departemen**, `susunTimLeader` mengelompokkan karyawan ICC menurut **atasan langsungnya** (`supervisor_id`) — leader = siapa pun dengan ≥1 bawahan langsung berposisi ICC, BUKAN orang berlabel jabatan "leader". Bisa nol, satu, atau **lebih dari satu** kartu leader per departemen.
-- **Kartu "Langsung di bawah SPV"** (`tanpa-leader`, `leader-card-khusus.tsx`) — karyawan ICC di departemen itu yang atasannya BUKAN sesama pemegang bawahan ICC (mis. langsung di bawah SPV departemen). Sengaja **tanpa tombol Assign** — ini daftar kerja hasil struktur organisasi, bukan tim yang bisa ditambah anggotanya dari kartu ini; tapi mengedit mapping yang **sudah ada** di kartu ini tetap diperbolehkan lewat ikon Ubah.
+- **Kartu "Langsung di bawah SPV"** (`tanpa-leader`, `leader-card-khusus.tsx`) — karyawan APA PUN posisinya di departemen itu yang lapor langsung ke SPV (bukan lagi terbatas ICC — lihat Fase 11). **Punya tombol Assign** (`modeLangsungSpv`, kandidat tidak dibatasi posisi ICC); mengedit mapping yang sudah ada tetap lewat ikon Ubah seperti biasa.
 - **Kartu "Belum ditugaskan"** — akun affiliate (dari [[Sales - ICC Affiliate Mapping]]) yang belum punya pemegang sama sekali. Juga tanpa tombol Assign.
 - **Pencocokan posisi ICC** pakai `position_key` bila terisi, fallback ke label `position` — lihat catatan rename di bagian atas dokumen.
 - **Urutan**: nama leader, abjad, deterministik.
@@ -437,6 +446,78 @@ Tombol **+ Assign** ada di kartu leader (team terkunci = departemen kartu, karya
 - **Tanpa perubahan backend** untuk rewrite kartu ini sendiri — semua data sudah tersedia lewat `GET /employee/list?with_supervisor=true` + `GET /icc/mappings`. (Perubahan backend baru datang belakangan dari fitur *edit mapping*, lihat PATCH di atas — bukan bagian dari rewrite kartu ini.)
 - `GET /icc/leaders` tidak lagi dipanggil dari FE sama sekali (lihat gap di atas).
 
+## Tab "Marketplace Adv" — Marketplace Advertiser dipisah dari Toko & Iklan
+
+*Realisasi dari rencana yang sudah dikonfirmasi user 2026-09-02 (dicatat sebagai memori
+tim): posisi **Marketplace Advertiser** akan dipisah jadi kategori/tim tersendiri,
+terpisah dari **Account Specialist** (posisi ICC biasa). Task ini (Fase 11,
+2026-09-06) mengerjakan pemisahan TAMPILANNYA di ICC Management; position_key stabil
+di HRIS master data untuk posisi ini **masih TBD** (lihat tabel Dependensi & Risiko).*
+
+- **Status**: ✅ Implemented — branch `feat/icc-marketplace-adv-tab`. Frontend murni,
+  **backend tidak disentuh sama sekali**.
+
+### Kenapa Marketplace Advertiser sebelumnya tercampur
+
+Marketplace Advertiser **tidak** difilter oleh `useFetchIccEmployees` (yang membatasi ke
+posisi `icc`/`leader`/`supervisor` lewat `position_key`) — mereka masuk daftar karyawan
+ICC Management lewat jalur lain sama sekali: `use-fetch-staf-langsung-spv.ts`
+(`useFetchStafLangsungSpv`), hook yang dibuat khusus untuk kasus nyata **Yudi Kurniawan**
+(Marketplace Advertiser, toko Shopee Beauty Hacks) — mengambil SEMUA karyawan satu
+departemen (posisi apa pun) yang lapor **langsung ke SPV**. Karena tidak berposisi ICC,
+mereka jatuh sebagai residual ke kartu "Langsung di bawah SPV", tercampur satu tabel
+dengan Account Specialist yang juga ada di sana.
+
+### Cara deteksi: label `position`, BUKAN `position_key`
+
+Berbeda dari pencocokan ICC yang sudah pindah ke `position_key` (lihat catatan rename di
+puncak dokumen), Marketplace Advertiser dicocokkan lewat label `position` **apa
+adanya** (`berposisiMarketplaceAdvertiser`, `kartu-leader.ts`, case-insensitive, exact
+match "Marketplace Advertiser"). Alasannya: posisi ini **belum punya `position_key`
+sendiri yang stabil** — mekanisme yang menjaringnya (`useFetchStafLangsungSpv`) sama
+sekali tidak bergantung pada `position_key`, jadi tidak ada satu pun yang perlu
+dicocokkan. Risiko yang mengikuti: label ini bisa berganti di HRIS tanpa pemberitahuan
+(preseden nyata — "ICC" → "Account Specialist", 18 Agt 2026) dan filter ini akan
+diam-diam berhenti mengenali mereka bila itu terjadi. **Dampaknya bukan kehilangan
+data** — mereka kembali tercampur ke tab "Toko & Iklan", sama seperti sebelum
+pemisahan ini ada (fallback aman, bukan gagal-tertutup).
+
+### Bentuk: reuse struktur kartu yang sama, bukan tabel baru
+
+*Keputusan user 2026-09-06: "marketplace adv bukan belum punya struktur, tapi memang
+langsung dibawah spv, jadi pakai aja yang udah ada seperti kartu asli punya icc."*
+
+Tab baru **"Marketplace Adv"** (di antara "Toko & Iklan" dan "Akun Affiliate" di
+`TabsList`, `app/(main)/icc/management/page.tsx`) memakai **komponen yang identik**
+(`TeamCard`, `LeaderCardKhusus`) dengan tab "Toko & Iklan" — bukan komponen atau layar
+baru. Yang berbeda cuma sumber datanya: `KartuLeader` kini punya dua kelompok baris,
+bukan satu:
+
+| Field | Isinya |
+|---|---|
+| `kelompok` | Baris toko/iklan Account Specialist — **TANPA** Marketplace Advertiser lagi |
+| `kelompokMarketplaceAdv` | Baris toko/iklan Marketplace Advertiser — dipisah **eksklusif**, bukan duplikat |
+
+Dipilih di `rakitKartu` (`kartu-leader.ts`) dengan mem-partisi
+`kelompokkanMappingPerKaryawan(mappings)` memakai lookup posisi dari `anggota` yang
+sudah tersedia di fungsi itu. `TeamCard`/`LeaderCardKhusus` memilih field mana yang
+dirender berdasarkan `activeTab` yang diteruskan dari halaman (pola yang sama dengan
+pemisahan tab Toko & Iklan/Akun Affiliate yang sudah ada).
+
+Karena Marketplace Advertiser **selalu** langsung di bawah SPV (tak pernah ditemukan di
+bawah seorang Leader di data nyata), tab "Marketplace Adv" secara praktis hanya pernah
+menampilkan kartu "Langsung di bawah SPV" — kartu jenis "leader" yang
+`kelompokMarketplaceAdv`-nya kosong disembunyikan dari tab ini (prinsip sama dengan
+kartu "Langsung di bawah SPV" yang juga tak dibuat bila tak ada isinya sama sekali).
+
+### Tombol Assign & alur kerja tidak berubah
+
+Tombol Assign pada kartu "Langsung di bawah SPV" (`modeLangsungSpv`, lihat bagian di
+atas) **tidak disentuh** — sudah position-agnostic sejak sebelum task ini, dan tetap
+tampil di kedua tab. Assign toko baru ke Marketplace Advertiser (baru maupun yang sudah
+ada) tetap lewat kartu yang sama seperti sebelumnya; yang berubah murni **tampilan
+pengelompokannya**, bukan alur kerja assign-nya.
+
 ## Dependensi & Risiko
 
 | Item | Detail |
@@ -450,6 +531,8 @@ Tombol **+ Assign** ada di kartu leader (team terkunci = departemen kartu, karya
 | 🟡 **TBD: atribusi insentif advertiser bersama** | Sejak Fase 10, satu advertiser boleh dipegang >1 karyawan aktif. Saat Fase 4 (Laporan Akuntabilitas AM) dibangun, GMV Ads dari advertiser yang dipegang bersama itu dihitung ke siapa — dibagi rata, salah satu ditandai pemilik utama, atau penuh ke semua? **Harus diputuskan sebelum Fase 4**, tapi tidak menghalangi Fase 10 karena Fase 4 belum dibangun. Sejajar dengan TBD "Atribusi order akun bersama" di [[Sales - ICC Affiliate Mapping]]. |
 | ⛔ **`icc_leaders` beku, guard BE independen dari FE** | FE berhenti membaca/menulis `icc_leaders` sejak kartu-per-leader (Fase 8), tapi `POST`/`PATCH /icc/mappings` masih menggerbanginya. Team tanpa baris aktif di `icc_leaders` akan gagal 400 walau kartunya tampil normal di FE. Lihat [[#⛔ Gap nyata: dua model bisa saling bertentangan]] — **belum diverifikasi** isi `icc_leaders` untuk `kyura`/`beautyhacks` di produksi saat ini |
 | **Rename posisi ICC → Account Specialist** | 18 Agt 2026, 33/40 karyawan. Modul ini sudah dipindah ke `position_key`; modul LAIN (RBAC menu, Finance Opex, HRIS KPI) belum tentu ikut — periksa sebelum menyentuhnya |
+| 🟡 **TBD: `position_key` stabil untuk Marketplace Advertiser** | Fase 11 memisah TAMPILAN-nya, tapi posisi ini masih dideteksi dari label `position` bebas (bukan `position_key` seperti ICC) karena belum punya kategori/tim formal sendiri di HRIS master data. Rentan sama seperti ICC pra-rename: label berganti tanpa pemberitahuan = filter berhenti mengenali (fallback aman ke tercampur lagi, bukan hilang). Membutuhkan keputusan HR/product, bukan pekerjaan FE murni |
+| ⚠️ **Marketplace Advertiser yang lapor ke Leader (bukan SPV langsung) tak tertangkap** | `useFetchStafLangsungSpv` hanya menjaring yang lapor LANGSUNG ke SPV — pre-existing sejak hook ini dibuat, tak disentuh Fase 11. Bila kasus ini muncul di data nyata, karyawannya tak akan tampil di ICC Management sama sekali (bukan cuma tak masuk tab Marketplace Adv) |
 
 ---
 
