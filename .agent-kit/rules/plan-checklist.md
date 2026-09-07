@@ -43,6 +43,14 @@ Yang wajib dicek di sini:
   jangan merakit tabel, filter, atau paginasi sendiri.
 - **Master data yang sudah ada.** Cek dulu sebelum menambah field baru; sering yang
   dibutuhkan sudah ada dengan nama lain.
+- **Pemilik fakta.** Sebelum menambah koleksi, field, atau layar tulis untuk sebuah fakta
+  bisnis, buka `Reference/REF - Kepemilikan Data.md`: siapa pemiliknya, siapa boleh
+  menulis, dan lewat jalan mana ia dibaca (HTTP ke pemilik, feed kalender, klaim JWT).
+  Salinan hanya sah bila satu arah, tak pernah ditulis tangan, dan berpenjaga; tambahkan
+  barisnya di dok itu. Fakta yang sudah dimiliki service lain tapi kamu butuh dengan arti
+  berbeda adalah dua fakta, bukan salinan: beri nama berbeda dan catat hubungannya.
+  Target profit pernah diketik di insentif DAN template KPI justru karena bagian ini tak
+  punya tempat untuk mencari (ADR 0079).
 - **Resolver milik modul lain.** Panggil aslinya, jangan menyalin logikanya. Urutan
   menangnya sering berlapis, dan salinan itu pasti menyimpang.
 - **Kalender terpusat.** Fitur bertanggal WAJIB mendaftarkan feed ke `calendar-service`;
