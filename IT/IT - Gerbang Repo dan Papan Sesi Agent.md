@@ -82,7 +82,7 @@ Karyawan pengguna ERP **tidak** menjadi persona di sini. Perkakas ini tidak meny
 
 [[IT - Papan Aktivitas Developer]] mencatat peristiwa GitHub yang **sudah terjadi** (push, PR, review) lewat webhook, di Cloudflare. Papan sesi mencatat pekerjaan yang **sedang berjalan dan belum menghasilkan peristiwa apa pun**.
 
-Sejak 2026-09-07 (kit 1.17.0 + PR `feat/loop-ingest` di papan), kedua sumber itu **bertemu di papan tim tanpa menghitung ulang angka PR**: hook kit mengirim peristiwa sesi/brief/judge/PR ke `POST /loop/ingest` (opt-in per mesin, best-effort, tanpa judul), dan papan menampilkannya di bagian Loop otonom di samping tabel PR yang sudah ada. Dashboard lokal `/dashboard` tetap dipertahankan sebagai cadangan yang tidak butuh jaringan dan satu-satunya tempat judul brief terlihat. Yang tetap benar: sesi yang macet tanpa commit hanya terlihat lewat jalur sesi ini, bukan lewat webhook GitHub.
+Sejak 2026-09-07 (kit 1.17.0 + PR #1 `feat/loop-ingest` di papan, merged hari itu juga), kedua sumber itu **bertemu di papan tim tanpa menghitung ulang angka PR**: hook kit mengirim peristiwa sesi/brief/judge/PR ke `POST /loop/ingest` (opt-in per mesin, best-effort, tanpa judul), dan papan menampilkannya di bagian Loop otonom di samping tabel PR yang sudah ada. Dashboard lokal `/dashboard` tetap dipertahankan sebagai cadangan yang tidak butuh jaringan dan satu-satunya tempat judul brief terlihat. Yang tetap benar: sesi yang macet tanpa commit hanya terlihat lewat jalur sesi ini, bukan lewat webhook GitHub.
 
 ## Belum Diputuskan (TBD)
 
