@@ -11,6 +11,7 @@ Gerbang tulis hidup di `shared-library`, jadi **insentive-service dan employee-s
 ## Task
 
 ### T1. Gerbang tulis target insentif per level dan divisi
+- **Status 2026-09-07**: ✅ dikodekan di bip-erp branch `feat/insentive-gerbang-target` (tiga commit: ekspor `BolehTulisMasterProfit`, gerbang + test, perbaikan `/review`), test insentive dan shared-library/common hijau, kontrol negatif terbukti (gerbang dilepas → test merah di assertion 403). **Belum PR, belum deploy dev, verifikasi lewat gateway belum.** Artefak rencana: `.task-plans/2026-09-07-insentive-gerbang-target.md`.
 - **Repo**: bip-erp, `shared-library/common/gerbang_insentif.go`, `services/insentive/func.go` (`POST /profit/targets`), `services/insentive/business_rules.go`.
 - **Isi**: level `icc` dan `leader` boleh ditulis SPV Marketing untuk divisinya sendiri (peran dari jabatan + departemen, pola `perananTarget`), plus finance/IT/Direktur; level `supervisor` tetap finance/IT/Direktur; permintaan yang `entity_id`-nya pemanggil sendiri ditolak apa pun perannya. `BolehUbahTarget` dan `riwayat[]` tidak disentuh.
 - **Test**: perluas `gerbang_master_profit_test.go` dengan kontrol positif (SPV Beauty Hacks menulis icc Beauty Hacks) dan tiga kontrol negatif (SPV Beauty Hacks menulis icc Kyura, SPV menulis level supervisor, SPV menulis dirinya sendiri). Satu test lewat Fiber untuk jalur 403.
@@ -54,6 +55,13 @@ Gerbang tulis hidup di `shared-library`, jadi **insentive-service dan employee-s
 - Ubah catatan 🟡 "belum di kode" menjadi keadaan nyata di: [[REF - Kepemilikan Data]] (baris target profit pindah dari §Duplikasi ke §Peta), [[Finance - Incentive]], [[Microservices - Insentive Service]], [[API - Insentive Service]], [[HRIS - Otomasi Skor KPI]], [[Microservices - Employee Service]], [[HRIS - Alur KPI Otomatis]] dan diagram Excalidraw-nya, [[APP - Web ERP]], [[RUN - Menambah Metrik KPI Otomatis]] (prosedur pengisian target berlapis), [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] (status ke ✅ atau ⚠️ dengan catatan).
 - Jalankan `/sync-docs`, regenerasi indeks, push `main` vault.
 - **Dependensi**: T1 sampai T6 merge dan terverifikasi di prod.
+
+## Catatan dari review T1 (task lanjutan, di luar T1..T7)
+
+- **Indeks unik `{level, entity_id, periode}` di `incentive_profit_targets` belum ada** (pra-eksisting). Upsert-nya `FindOne` lalu `UpdateOne`; dua penulis paralel pada baris baru bisa menggandakan dokumen, dan kini penulisnya bertambah. Tangani duplicate-key saat menambahkannya.
+- **Daftar level ditulis di tiga tempat**: `kanonLevel` (baru), validasi `GET /profit-dashboard` (`func.go` sekitar baris 1365), validasi `POST /profit/org` (`:447`). Alihkan dua yang lama ke `kanonLevel`; mengubah perilaku baca (peka kapital), jadi task sendiri.
+- **Diterima sadar di T1**: Supervisor departemen mana pun bisa menulis baris icc/leader untuk anggotanya; baris yatim tak dibaca dashboard. Penyempit berbasis data (entitas punya baris di level itu) bila kelak dibutuhkan.
+- Komentar gerbang di erp-frontend `settings/page.tsx:66-73` ("finance + IT saja") basi setelah T1; masuk T4.
 
 ## Pengukuran yang membuktikan selesai
 

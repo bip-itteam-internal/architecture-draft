@@ -26,7 +26,7 @@ Insentif  = tarif(%) × Profit
 **Aturan turunan yang mengikat:**
 
 1. **Gerbang retur 7%** — batas berlaku selama pencapaian **≤100%**; di atas itu retur tidak lagi menggugurkan. Rasionya dari **jumlah order** (keputusan client 2026-07-31), bukan nilai rupiah; rasio nilai tetap ditampilkan sebagai pembanding karena bisa berbeda jauh (Juli 2026: 4,12% vs 3,35%).
-2. **Target diketik hanya di lingkup Supervisor**, lalu dibagi rata turun ke Leader dan ICC. Baris turunan boleh ditimpa manual. Ubah target saat periode berjalan wajib beralasan; setelah disetujui, ditolak. 🟡 **Diputuskan berubah 2026-09-07** ([[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]], belum di kode): target per orang diketik SPV Marketing untuk divisinya, target SPV oleh Finance atau Direktur, dan angka yang sama dibaca KPI.
+2. **Target diketik hanya di lingkup Supervisor**, lalu dibagi rata turun ke Leader dan ICC. Baris turunan boleh ditimpa manual. Ubah target saat periode berjalan wajib beralasan; setelah disetujui, ditolak. 🟡 **Diputuskan berubah 2026-09-07** ([[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]]; gerbang tulisnya sudah di branch `feat/insentive-gerbang-target`, belum merge; sisanya belum di kode): target per orang diketik SPV Marketing untuk divisinya, target SPV oleh Finance atau Direktur, dan angka yang sama dibaca KPI.
 3. **Dasarnya UANG CAIR, bukan harga jual** — potongan marketplace dan retur sudah terpotong di dalamnya, jadi tidak dikurangkan lagi. Retur ditampilkan untuk pemantauan dan syarat 7%, bukan sebagai pengurang.
 4. **Order yang belum cair sampai tanggal 25 bulan berikutnya HANGUS** untuk periode itu. Konsekuensinya dashboard akan selalu sedikit lebih tinggi dari pembukuan Accurate — itu aturan keadilan, bukan buku besar.
 
@@ -52,7 +52,7 @@ orang, yang dengan aturan gaji-orang-itu-sendiri praktis adalah gaji orang terse
 Sebelum perubahan ini `GET /profit-dashboard` dan `GET /profit/incentive/summary` tak punya
 gerbang sama sekali, sehingga menyembunyikan menunya tak menutup apa pun; keduanya kini
 digerbang `common.RequireMenu`. Menulis target tetap terpisah dan lebih ketat
-(`RequireMasterProfitWriter`: finance + IT saja; 🟡 [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] membuka level icc dan leader untuk SPV Marketing divisinya sendiri, belum di kode) — di-assign ke menu tidak memberi hak
+(`RequireMasterProfitWriter`: finance + IT saja untuk `/profit/org`, `/profit/opex`, `/profit/proyek-divisi`; untuk `/profit/targets` ⚠️ [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] T1 di branch `feat/insentive-gerbang-target`, belum merge: Supervisor divisi boleh level icc dan leader divisinya sendiri, level supervisor tetap finance/IT/Direktur, target diri sendiri ditolak) — di-assign ke menu tidak memberi hak
 mengubah angka yang menentukan pembayaran.
 
 Cara memakainya: **Pengaturan → Hak Akses**, pasang paket "Menu: Insentif Profit" ke akun
