@@ -38,7 +38,7 @@ echo "[agent-kit pre-push] repo: $top"
 
 # ---- Node (erp-frontend dkk) ----
 if [ -f package.json ] && [ -f pnpm-lock.yaml ]; then
-  for s in tsc lint; do
+  for s in tsc typecheck lint; do
     if grep -q "\"$s\"[[:space:]]*:" package.json; then
       echo "[agent-kit pre-push] pnpm $s ..."
       if ! pnpm "$s"; then echo "[agent-kit pre-push] GAGAL: pnpm $s"; gagal=1; fi

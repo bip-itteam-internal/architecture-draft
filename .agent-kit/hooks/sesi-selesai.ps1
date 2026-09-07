@@ -12,5 +12,6 @@ $now = Get-WaktuUtc
 Set-SesiField $s 'terakhir' $now
 Set-SesiField $s 'selesai' $now
 Set-SesiField $s 'status' 'selesai'
+Send-SesiLoop $PSScriptRoot 'sesi.selesai' $s
 Write-Sesi $p $s
 exit 0

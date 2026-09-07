@@ -36,7 +36,21 @@ function New-Sesi([string]$id, [string]$ws) {
   return [pscustomobject]@{
     session_id = $id; mulai = $now; terakhir = $now; selesai = $null; status = 'aktif'
     cwd = $ws; tahap = 'mulai'; task = ''; worktree = ''; branch = ''
+    # waktu terakhir sesi ini dikirim ke papan tim (loop-kirim); dipakai sesi-sentuh untuk throttle
+    terkirim = $null
   }
+}
+
+# Kirim peristiwa sesi ke papan tim (best-effort, opt-in per mesin). Judul/teks task TIDAK ikut.
+function Send-SesiLoop([string]$hookDir, [string]$jenis, $sesi) {
+  try {
+    $data = [ordered]@{
+      id = [string]$sesi.session_id; tahap = [string]$sesi.tahap; status = [string]$sesi.status
+      mulai = $sesi.mulai; terakhir = $sesi.terakhir; selesai = $sesi.selesai
+    } | ConvertTo-Json -Compress
+    & (Join-Path $hookDir 'loop-kirim.ps1') -Jenis $jenis -Data $data | Out-Null
+    Set-SesiField $sesi 'terkirim' (Get-WaktuUtc)
+  } catch {}
 }
 
 function Set-SesiField($sesi, [string]$name, $value) {

@@ -45,9 +45,15 @@ if ($in -and $in.session_id) {
     Set-SesiField $s 'status' 'aktif'
     Set-SesiField $s 'selesai' $null
   }
+  Send-SesiLoop $PSScriptRoot 'sesi.mulai' $s
   Write-Sesi $p $s
   # /kerjakan dan /ekstrak-skill membaca id sesi dari baris ini; hook input tidak terlihat model
   $lines += "Sesi ini: $id (papan: .task-plans/sesi/$id.json)"
+  # Kegagalan kirim ke papan tim tidak boleh senyap: sesudah 3 kali beruntun, katakan di sini.
+  $gagalFile = Join-Path $env:USERPROFILE '.agent-kit\loop-ingest.gagal'
+  if (Test-Path $gagalFile) {
+    try { $g = Get-Content $gagalFile -Raw | ConvertFrom-Json; if ($g.beruntun -ge 3) { $lines += "loop-ingest: $($g.beruntun) kegagalan beruntun mengirim ke papan tim (kode $($g.kode)); sesi ini TIDAK tampil di papan. Periksa ~/.agent-kit/loop-ingest.json" } } catch {}
+  }
 }
 
 $ctx = ($lines -join "`n")

@@ -170,6 +170,29 @@ try {
   $errTxt = if (Test-Path $errf) { Get-Content $errf -Raw } else { '' }
   Check ($rc -eq 2 -and $errTxt -match "branch 'main'") "cd <repo>; git commit: ditolak karena main (exit $rc)"
 
+  # ---- loop-kirim: BEST-EFFORT, tidak pernah menahan ----
+  $lk = Join-Path $claude 'hooks/loop-kirim.ps1'
+  # JSON dilewatkan lewat berkas: argumen ber-kutip ke proses baru dilucuti Windows (lihat komentar di skrip)
+  $dataFile = Join-Path $tmp 'loop-data.json'; [IO.File]::WriteAllText($dataFile, '{"id":"s"}')
+  $konfigTidakAda = Join-Path $tmp 'tidak-ada\loop-ingest.json'
+  $sw = [Diagnostics.Stopwatch]::StartNew()
+  $rc = Invoke-Ps $lk @('-Jenis', 'sesi.mulai', '-DataFile', $dataFile, '-Konfig', $konfigTidakAda) $null $errf
+  Check ($rc -eq 0 -and $sw.Elapsed.TotalSeconds -lt 5) "loop-kirim tanpa konfigurasi: no-op, exit 0 ($([int]$sw.Elapsed.TotalMilliseconds) ms)"
+  $konfigMati = Join-Path $tmp 'loop-ingest.json'
+  [IO.File]::WriteAllText($konfigMati, '{"url":"http://127.0.0.1:9/loop/ingest","secret":"x","mesin":"UJI"}')
+  [IO.File]::WriteAllText((Join-Path $tmp 'gh-login.txt'), 'uji')   # cegah panggilan gh sungguhan
+  $sw = [Diagnostics.Stopwatch]::StartNew()
+  $rc = Invoke-Ps $lk @('-Jenis', 'sesi.mulai', '-DataFile', $dataFile, '-Konfig', $konfigMati) $null $errf
+  $gagalFile = Join-Path $tmp 'loop-ingest.gagal'
+  Check ($rc -eq 0 -and $sw.Elapsed.TotalSeconds -lt 8) "loop-kirim ke URL mati: tetap exit 0 dalam $([int]$sw.Elapsed.TotalSeconds) detik"
+  Check (Test-Path $gagalFile) 'loop-kirim mencatat kegagalan ke loop-ingest.gagal (tidak senyap)'
+  $idOut = [IO.Path]::GetTempFileName()
+  $p = Start-Process powershell -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',('"' + $lk + '"'),'-Jenis','brief.dibuat','-BriefSlug','Hapus-PR-Notification','-HanyaId') -RedirectStandardOutput $idOut -Wait -PassThru -NoNewWindow
+  $id1 = (Get-Content $idOut -Raw).Trim()
+  $p = Start-Process powershell -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',('"' + $lk + '"'),'-Jenis','brief.dibuat','-BriefSlug','hapus-pr-notification','-HanyaId') -RedirectStandardOutput $idOut -Wait -PassThru -NoNewWindow
+  $id2 = (Get-Content $idOut -Raw).Trim()
+  Check ($id1 -match '^[0-9a-f]{12}$' -and $id1 -eq $id2) "id brief 12 hex, stabil terhadap huruf besar-kecil ($id1)"
+
   # ---- transkrip-ringkas: JSONL sah -> markdown; sampah -> tolak ----
   $tr = Join-Path $claude 'hooks/transkrip-ringkas.ps1'
   $jl = Join-Path $tmp 'sesi.jsonl'
