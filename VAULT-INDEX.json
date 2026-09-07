@@ -8665,20 +8665,20 @@
         "IT - CI-CD",
         "DEVELOPER GUIDE"
       ],
-      "hash": "81fc1597f6918072e95f993aea82c01af859263cda59d30ec3b08fe507c54f88",
-      "ukuran_kb": 7.7,
-      "ringkasan": "Menjawab: apa itu papan aktivitas developer organisasi GitHub bip-itteam-internal (repo dev-activity-board terpisah dari bip-erp, Cloudflare Workers + D1 + Durable Object, akun Cloudflare tim), metrik apa yang ditampilkan per developer, per repo, dan per service bip-erp, serta aturan hitungnya (hanya branch integrasi, merge commit dan review PR sendiri tidak dihitung, semua waktu WIB, rollup dihitung ulang dari data mentah, judul commit tak pernah disimpan). Juga menjawab cara kerja realtime lewat webhook organisasi dan cron 15 menit, cara menyalakan dan membuktikan ingest loop otonom dari mesin developer (POST /loop/ingest ber-HMAC, opt-in lewat ~/.agent-kit/loop-ingest.json, deploy lewat pnpm deploy bukan merge, kode 405/404/503/401 sebagai penanda sudah hidup atau belum), temuan awal yang memicu pembuatannya (review PR 2,2%, 90% self-merge, dua orang 72,4% commit), dan batasan yang wajib disebut saat memakai angkanya (tanpa autentikasi, volume bukan dampak, jangan jadi dasar tunggal penilaian karyawan).",
+      "hash": "6d9647c7bd689945d31776c8e3ab6355dd808d9f4373370196dbd37517dd29dd",
+      "ukuran_kb": 8.0,
+      "ringkasan": "Menjawab: apa itu papan aktivitas developer (dev-activity-board) untuk organisasi GitHub bip-itteam-internal, angka apa saja yang ditampilkan per developer, per repo, dan per service bip-erp (commit, baris, PR merged, review, lead time, kepemilikan komponen), serta bagaimana angka itu dihitung (hanya branch integrasi, merge commit dan review PR sendiri tidak dihitung, semua waktu WIB, rollup dihitung ulang dari data mentah). Juga menjawab bagaimana ingest loop otonom dari mesin developer bekerja (POST /loop/ingest, HMAC-SHA256 dengan LOOP_INGEST_SECRET, opt-in via ~/.agent-kit/loop-ingest.json), cara menghidupkan dan mengukurnya di Cloudflare Workers lewat wrangler dan pnpm run deploy, serta apa saja batasan yang wajib disebut saat memakai angkanya (volume bukan mutu, waktu commit ditulis ulang oleh rebase/squash, tanpa autentikasi, tanpa panel admin).",
       "kata_kunci": [
         "papan aktivitas developer",
         "dev-activity-board",
-        "leaderboard developer",
-        "Cloudflare Workers",
-        "wrangler",
+        "developer activity leaderboard",
+        "produktivitas developer",
         "webhook GitHub",
+        "Cloudflare Workers D1 Durable Object",
+        "wrangler deploy",
         "loop ingest",
-        "review PR",
-        "self-merge",
-        "statistik commit"
+        "LOOP_INGEST_SECRET",
+        "code review PR merged"
       ]
     },
     {
