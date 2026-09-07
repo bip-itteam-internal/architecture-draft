@@ -90,9 +90,21 @@ Keduanya tidak bisa saling menggantikan, dan itu bukan soal selera: sesi yang ma
 - Apakah keluaran papan sesi layak disalurkan ke [[IT - Papan Aktivitas Developer]] sebagai sumber kedua, atau justru harus tetap terpisah agar tidak melahirkan dua angka yang menyimpang.
 - Bentuk gerbang untuk repo selain `erp-frontend` dan `bip-erp`.
 
-### Bila kelak papan sesi dijadikan web
+### Dashboard (kit 1.16.0, 2026-09-07)
 
-Ditinjau 2026-09-06 memakai dasbor sistem rujukan sebagai daftar panel. Diputuskan **tetap berkas dulu**, ditinjau ulang setelah baseline test berdiri. Pemetaan di bawah dicatat supaya keputusannya tidak diulang dari nol:
+Dibangun sebagai **HTML statis interaktif**, bukan layanan: `dashboard.ps1` (Windows) / `dashboard.py` (mac/linux) mengumpulkan data lalu menanamkannya sebagai JSON ke `dashboard.template.html`, satu-satunya penulis UI; filter rentang 7/14/30 hari dan repo dihitung di halaman dari data 30 hari yang ditanam, jadi tidak butuh server. `--loop <detik>` menulis ulang berkala dan halaman me-refresh diri tiap 60 detik. Bentuk bagan mengikuti skill dataviz (stacked bar horizontal untuk komposisi, bukan donat; line 2 seri untuk tren; ubin untuk angka tunggal; legend selalu ada; tabel kembar per bagan), palet dark divalidasi. PR ditarik `gh` **per irisan mingguan** karena bip-erp menembus batas 500 dalam 30 hari; irisan yang penuh diperingatkan di halaman, bukan disembunyikan.
+
+| Panel | Sumber | Keadaan |
+|---|---|---|
+| SHIPPED (dibuka/merged per hari, merge rate, cycle) · MIX · HOTSPOTS · CYCLE | `gh pr list` bip-erp + erp-frontend | ✅ |
+| LOOP (brief → judge → PR, status merged dicocokkan ke data gh) | `.task-plans/briefs`, `.task-plans/judge` | ✅ data lokal, sejak kit 1.15.0 |
+| SESI | `.task-plans/sesi` | ✅ |
+| BASELINE | `.agent-kit/baseline` | ✅ bertanggal |
+| SPEND (biaya per PR) · RISK / PATCH-ARCHITECTURAL | tidak ada | ditulis di kaki halaman sebagai "tidak ada sumber" |
+
+### Pemetaan kelayakan panel (2026-09-06, sebelum dibangun)
+
+Ditinjau memakai dasbor sistem rujukan sebagai daftar panel. Saat itu diputuskan tetap berkas dulu; sehari kemudian pemilik meminta tampilannya dan dibangun sebagai HTML statis di atas. Pemetaan dipertahankan sebagai rekaman alasan panel mana yang ada dan tidak:
 
 | Panel | Bisa diisi di sini | Catatan |
 |---|---|---|

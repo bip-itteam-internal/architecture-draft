@@ -21,8 +21,9 @@ mentah dari manajemen; task teknis biasa tetap langsung `/start-task`.
 ## Loop otonom (kit ≥ 1.15.0)
 `/brief <masalah>` → `/kerjakan <path brief>` (worktree pendek → agen `loop-<domain>` → `/judge`
 otomatis → perbaikan maks 2× → **PR**). **Merge tetap manusia** (ADR 0077 §1). Pendukung:
-`/papan-sesi` (sesi mana mengerjakan apa), `/ekstrak-skill` (sesi → draft skill), `/supervise`
-(evaluasi loop → draft, tidak auto-apply). Gerbang lokal: pre-commit **menolak** commit di branch
+`/papan-sesi` (sesi mana mengerjakan apa), `/dashboard` (HTML statis: SHIPPED, MIX, LOOP, CYCLE,
+SESI dari gh + data lokal), `/ekstrak-skill` (sesi → draft skill), `/supervise` (evaluasi loop →
+draft, tidak auto-apply). Gerbang lokal: pre-commit **menolak** commit di branch
 utama repo kode; pre-push menjalankan tsc/lint/build atau go build. Jangan `--no-verify` tanpa
 alasan tertulis.
 

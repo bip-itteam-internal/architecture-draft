@@ -31,7 +31,7 @@ Analisis awal (bagian Context dan Decision di bawah, dipertahankan apa adanya se
 | Triangulated metrics berbasis test pass rate | test dibanding **baseline bertanggal** (`baseline/<repo>.json`) | `pnpm test` main tidak pernah hijau penuh |
 | Supervisor memperbarui skill otomatis | supervisor menulis **draft** + laporan; manusia menaikkan lewat `/supervise --terapkan` | tidak ada metrik kualitas skill; skill salah menyebar ke seluruh tim lewat init |
 | Skill extraction dari ekspor sesi | skrip deterministik meringkas transkrip (menolak bila tak terurai) → agen menulis draft | skema transkrip dinyatakan internal oleh dok resmi |
-| Dashboard | `papan-sesi` tabel + HTML statis | separuh panel rujukan tak punya sumber data di sini |
+| Dashboard | `/dashboard` (kit 1.16.0): HTML statis **interaktif** dari JSON tertanam, data `gh` + lokal, filter di halaman, tanpa server; panel tanpa sumber ditulis terang | separuh panel rujukan tak punya sumber data di sini; yang ada dibangun, yang tidak ada tidak diisi nol |
 | Otonomi sampai deploy | berhenti di PR | §1 |
 
 Rincian bentuk dan keputusan kecilnya ada di `architecture-draft/.agent-kit/docs/2026-09-06-ai-engineering-loop-design.md`; cara kerjanya untuk pembaca umum di [[IT - Gerbang Repo dan Papan Sesi Agent]]. Bukti pertama loop bekerja utuh: bip-erp PR [#1739](https://github.com/bip-itteam-internal/bip-erp/pull/1739), dari brief sampai PR lewat eksekutor, gerbang, dan judge, tanpa satu pun kode ditulis manusia.
