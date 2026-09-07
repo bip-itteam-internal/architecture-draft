@@ -5612,20 +5612,24 @@
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
         "DEVELOPER GUIDE"
       ],
-      "hash": "c0bbeb63f8eacf69b87d8a77bfcf484a39ae1657f010f0ec49093e23fea2c9cf",
-      "ukuran_kb": 20.6,
-      "ringkasan": "Menjawab: kenapa usulan arsitektur multi-agent otonom bertingkat (AI Engineering Loop System — Judges, Supervisor, orkestrasi, dashboard) ditolak untuk workspace ini, dan apa yang dipasang sebagai gantinya sebelum agent diberi wewenang merge ke branch utama. Menjelaskan revisi keputusan pada hari yang sama yang membalikkan sebagian keputusan awal menjadi \"dibangun sesuai dokumen, dengan substitusi\" (mis. Trigger.dev diganti agen kustom Claude Code + papan sesi berkas, mix model vendor lain diganti tingkatan model Claude), lengkap dengan tabel pengukuran gerbang otomatis (CI, branch protection, hook git) yang ternyata kosong/tidak aktif sebelum keputusan ini diambil.",
+      "hash": "77e13755aac1afccc7ef2c57d1de2f16643c95ef5ed4f042384285e55ced639d",
+      "ukuran_kb": 20.8,
+      "ringkasan": "Menjawab: kenapa usulan arsitektur AI Engineering Loop penuh (orkestrasi Trigger.dev, mix model vendor lain, dashboard live, agent yang merge sendiri) ditolak, apa yang dibangun sebagai gantinya di agent-kit (gerbang lokal, papan sesi, loop /brief -> /kerjakan dengan judge dua lapis), dan kenapa wewenang merge ke branch utama tetap dipegang manusia bukan agent. Juga menjawab pengukuran kondisi gerbang otomatis (Actions, branch protection) sebelum keputusan ini diambil dan tabel substitusi tiap komponen dokumen rujukan.",
       "kata_kunci": [
         "ADR 0077",
-        "otonomi merge agent",
-        "gerbang commit merge",
+        "otonomi merge",
         "agent-kit",
-        "AI Engineering Loop System",
+        "gerbang lokal",
+        "pre-commit",
+        "pre-push",
+        "loop otonom",
+        "/brief",
+        "/kerjakan",
+        "judge",
         "papan sesi",
-        "branch protection",
-        "pre-commit gate",
-        "wrap-completion-gate",
-        "orkestrasi agent Claude Code"
+        "AI Engineering Loop",
+        "PR",
+        "merge agent"
       ]
     },
     {
@@ -8529,20 +8533,24 @@
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "2d46fae76233c54a1dda4d38840a66c3164620f2fcc7b4af0dac916537014bbd",
-      "ukuran_kb": 11.8,
-      "ringkasan": "Menjawab: bagaimana gerbang lokal (hook pre-commit dan pre-push) menolak commit di branch utama serta push yang gagal pemeriksaan dasar (tsc/lint/build atau go build), bagaimana papan sesi menunjukkan sesi kerja mana sedang mengerjakan apa di satu mesin, dan bagaimana loop otonom /brief -> /kerjakan mengerjakan task kecil lewat agen domain sampai membuka PR tanpa wewenang merge.",
+      "hash": "920a6428ef6234a86f626667e6d9e50e6dc9e981a9d7e429f9fd41cbd736a285",
+      "ukuran_kb": 13.1,
+      "ringkasan": "Menjawab: bagaimana cara kerja gerbang commit/push lokal di agent-kit (hook PreToolUse dan pre-push git per repo yang benar-benar bisa menolak), bagaimana loop otonom /brief -> /kerjakan -> judge -> PR berjalan dari brief sampai pull request tanpa kode ditulis manusia, dan bagaimana papan sesi menampilkan sesi kerja mana sedang mengerjakan apa saat lebih dari empat sesi berjalan bersamaan di satu mesin. Juga menjelaskan kenapa gerbangnya dipasang lokal (bukan GitHub Actions) dan batasannya (bisa dilewati --no-verify, satu mesin saja).",
       "kata_kunci": [
         "gerbang repo",
         "papan sesi",
         "pre-commit",
         "pre-push",
         "loop otonom",
-        "brief",
-        "kerjakan",
-        "judge",
-        "core.hooksPath",
-        "AI engineering loop"
+        "/brief",
+        "/kerjakan",
+        "/judge",
+        "/supervise",
+        "/papan-sesi",
+        "agent-kit",
+        "session board",
+        "AI Engineering Loop",
+        "worktree"
       ]
     },
     {
