@@ -92,12 +92,13 @@ ini tak bisa dilihat siapa pun, dan tanggal yang tampil terbaca seperti salah.
 ia menyumbang Rp0 ke omzet, HPP, iklan, dan retur, jadi profit dan pencapaian tidak bergeser
 sedikit pun. Yang berubah hanya: toko itu tidak lagi hilang dari daftar.
 
-### Bentuk layar Dashboard dan Master Target (per 2026-09-07, belum merge)
+### Bentuk layar Dashboard dan Master Target (live di prod 2026-09-07)
 
 Keduanya dipindah ke struktur satu kartu yang dipakai halaman daftar HRIS (erp-frontend
-branch `refactor/insentif-struktur-hris`, T4 [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]];
-merge menunggu gerbang backend bip-erp [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767)
-naik ke dev). Yang berubah bagi pembaca:
+PR [#1473](https://github.com/bip-itteam-internal/erp-frontend/pull/1473), T4 [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]];
+live di prod 23:16 WIB). ⚠️ Naik **sebelum** gerbang backend bip-erp [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767):
+sampai insentive-service prod memuat T1, pensil di Master Target untuk Supervisor berujung
+403 bertoast, Finance tidak terpengaruh. Yang berubah bagi pembaca:
 
 - **Kelompok jadi kolom.** Baris judul "DIVISI · Aris (Supervisor)" / "TIM · Ade (Leader)"
   hilang, diganti kolom **Divisi** dan **Tim** yang menyebut nama beserta perannya. Dua
