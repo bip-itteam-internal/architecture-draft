@@ -71,7 +71,7 @@ Service adalah end-point yang berinteraksi dengan database-nya masing-masing (da
 
 **Quality & Regulatory** → [[QA - Big Pictures]] (CPOB/GMP · BPOM/izin edar · batch & traceability · deviation/CAPA · ED & recall — farmasi)
 
-**Reference** → [[REF - Glossary]] (glosarium istilah & singkatan Bharata)
+**Reference** → [[REF - Glossary]] (glosarium istilah & singkatan Bharata) · [[REF - PRD ERP]] (peta PRD: delapan bagian PRD enterprise dipetakan ke dok sumber + gap)
 
 **API Reference** → [[API - Index]] (daftar endpoint lengkap per service)
 
