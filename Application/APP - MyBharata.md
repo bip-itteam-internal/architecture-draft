@@ -79,7 +79,7 @@
 	- Bytes diambil lewat `ApiInterface.getBytes` (`BaseResponse` mengasumsikan JSON), disimpan ke **direktori aplikasi** lalu dibuka lewat lembar berbagi (`ShareUtil.shareBytes`). **Sengaja bukan folder Unduhan bersama** — itu menuntut izin storage, dan justru itulah sumber Known Issue unduh Android 13+ pada aplikasi lama.
 	- ⚠️ **Jenis run tak menghalangi apa pun**: `isThr => runType == 'thr'` adalah perbandingan **positif** dan hanya memilih badge, sedangkan `MyPayslip` sama sekali tak punya `payout_pct`. Jadi jenis run baru (mis. `import` untuk backfill riwayat, [[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]]) mengalir ke sini **tanpa perubahan mobile**. Bandingkan dengan [[APP - Web ERP]] yang justru memakai bentuk negatif `!== "thr"` dan karenanya perlu diperbaiki.
 
-#### Daftar bulan + gerbang PIN per slip (🔜 branch `feat/payslip-bulan-pin`, belum merged, belum rilis)
+#### Daftar bulan + gerbang PIN per slip (⚠️ PR [#134](https://github.com/bip-itteam-internal/my-bharata/pull/134) **merged ke `dev` 2026-09-01**, `dev` 1.15.2+157; **belum rilis**: `main` masih 1.14.5+135 per 2026-09-07)
 
 Halaman Slip Gaji dirombak: **daftar bulan TANPA nominal** → tap → **verifikasi PIN** → halaman **rincian** (kop badan usaha, baris pendapatan, baris potongan, bruto, total potongan, gaji bersih, tombol unduh). Rincian per baris itu **fungsionalitas baru**; sebelumnya karyawan hanya melihat gaji bersih di kartu dan mengunduh PDF-nya.
 
@@ -95,6 +95,15 @@ Halaman Slip Gaji dirombak: **daftar bulan TANPA nominal** → tap → **verifik
 - **Kerangka memuat diganti bentuknya**, bukan direname: kerangka lama berbentuk kartu Perkiraan (lingkaran persentase, blok statistik) padahal dipakai ulang apa adanya untuk daftar slip, jadi ia sudah tak menyerupai isi yang ditunggu bahkan sebelum Perkiraan dibuang.
 - 🔜 **Titik putus yang diketahui dan belum ditutup**: karyawan tak tahu kapan slipnya terbit dan harus membuka halaman berulang. Menutupnya butuh notifikasi dari BE saat `publish`, dan itu di luar lingkup perombakan ini.
 - ⛔ **Gerbang rilis**: bila belum ada run `published` di produksi, halaman ini **kosong untuk setiap karyawan** begitu rilis mendarat, karena Perkiraan yang selama ini mengisinya sudah tiada. Diukur lewat `.task-plans/2026-09-01-ukur-payroll-run-published.ps1`. Per pengukuran vault terakhir (2026-08-26) jumlahnya **nol**.
+
+#### Insentif Saya di dalam Slip Gaji (🟡 [[ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji]], diputuskan 2026-09-07, belum di kode)
+
+Layar Insentif Saya pindah dari web ke aplikasi dan **menumpang daftar Slip Gaji**: untuk tiap bulan ada dua kartu berdampingan, **Slip Gaji** dan **Insentif**, keduanya tanpa nominal dan tanpa status; menekan kartu membuka rute rincian di balik `PinGuard` yang sama (`PayrollPages.getPage`), jadi PIN muncul saat kartu ditekan, bukan saat halaman dibuka. `PinSession` tidak berubah.
+
+- **Kartu Insentif hanya untuk anggota skema profit**, dijawab server lewat endpoint keanggotaan tanpa angka (`GET /profit-dashboard/saya/keanggotaan`, [[API - Insentive Service]]); bukan dari daftar role di aplikasi. Terukur prod 2026-09-07: 78 pemegang role `insentive`, hanya 37 punya baris profit; Host Live, affiliate, dan CRM tidak dapat kartu.
+- Rincian membaca `GET /profit-dashboard/saya?periode=` apa adanya: tarif, gugur, peringatan dari server; `biaya_gaji` berlabel beban perusahaan. **Aplikasi tidak menjumlahkan atau membandingkan** insentif dengan gaji bersih; kartu berlabel hitungan yang dibayar terpisah.
+- Daftar bulan jadi gabungan run payroll `published` dan dua belas bulan terakhir bagi anggota; bulan tanpa baris berujung kalimat kosong di rincian.
+- Menu web dicabut **setelah** adopsi versi terukur, bukan sebelum rilis; preseden #1022 memutus alur enam hari. Daftar task: `Workspace/ANALISA - Insentif Saya di MyBharata.md`.
 
 ### KPI & Task Management
 - **KPI**: penilaian **bulanan** (read-only di mobile) dengan grafik tren 12 bulan. Satu layar melayani dua keadaan yang berbeda tegas, dipilih dari bulan yang sedang dilihat: periode yang **sudah dinilai** menampilkan skor final beku dari `kpi_score`, sedangkan **bulan berjalan** menampilkan progres otomatis lewat `GET /me/kpi-score?preview=true`. Batas periodenya Maret 2026 sampai bulan berjalan. Fitur `features/kpi`; rincian, keputusan rancangan, dan gerbang rilisnya di [[HRIS - Otomasi Skor KPI]] bab *Progres bulan berjalan di MyBharata*.
