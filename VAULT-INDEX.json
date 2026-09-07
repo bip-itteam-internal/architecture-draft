@@ -3979,20 +3979,19 @@
         "IT - Development Apps and Tools",
         "IT - Big Pictures"
       ],
-      "hash": "dc210d0b4ba650b618fa221c261185f3ff6bace4498c1d7d1ec3e7dec9c43052",
-      "ukuran_kb": 6.0,
-      "ringkasan": "Menjawab: kenapa papan peringkat aktivitas developer sengaja dibangun di luar arsitektur ERP (repo, stack, dan infrastruktur terpisah), serta stack apa yang dipakai (Cloudflare Workers + D1 + Durable Object, TypeScript, tanpa gateway dan tanpa SSO). Menjelaskan juga alternatif yang ditolak beserta alasannya (service Go di bip-erp, hosting di server ERP, GitHub Actions + Pages, Vercel), aturan privasi yang dipilih (judul commit tidak pernah disimpan, akses lewat tautan acak yang bukan autentikasi), dan kepemilikan akun atas nama tim. Berguna untuk memahami batas penyimpangan arsitektur ini, konsekuensi yang diterima (data di pihak ketiga, tanpa jejak audit pembaca), serta angka audit GitHub 3 bulan yang jadi latar belakang keputusan.",
+      "hash": "365312bd560b0f11e2f272a7ac45e58702320695dc6d8c899c758eab8d058036",
+      "ukuran_kb": 6.5,
+      "ringkasan": "Menjawab kenapa papan aktivitas developer sengaja dibangun di luar arsitektur ERP (bukan Go/MongoDB/gateway/RBAC), stack apa yang dipakai (Cloudflare Workers + D1 + Durable Object), dan bagaimana akses tanpa login diamankan (tautan berpotongan URL acak, bukan otentikasi sungguhan). Juga menjelaskan alternatif yang ditolak (service Go di bip-erp, GitHub Actions+Pages, Vercel) beserta alasannya, dan konsekuensi yang diterima sadar (data aktivitas di infrastruktur pihak ketiga, tanpa jejak audit siapa membuka papan).",
       "kata_kunci": [
-        "papan aktivitas developer",
-        "dev activity board",
-        "leaderboard",
         "ADR 0034",
+        "papan aktivitas developer",
+        "dev-activity-board",
         "Cloudflare Workers",
         "D1",
         "Durable Object",
-        "penyimpangan arsitektur",
-        "tanpa login",
-        "webhook GitHub"
+        "penyimpangan arsitektur ERP",
+        "webhook GitHub",
+        "autentikasi tautan"
       ]
     },
     {
@@ -8533,24 +8532,21 @@
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "920a6428ef6234a86f626667e6d9e50e6dc9e981a9d7e429f9fd41cbd736a285",
-      "ukuran_kb": 13.1,
-      "ringkasan": "Menjawab: bagaimana cara kerja gerbang commit/push lokal di agent-kit (hook PreToolUse dan pre-push git per repo yang benar-benar bisa menolak), bagaimana loop otonom /brief -> /kerjakan -> judge -> PR berjalan dari brief sampai pull request tanpa kode ditulis manusia, dan bagaimana papan sesi menampilkan sesi kerja mana sedang mengerjakan apa saat lebih dari empat sesi berjalan bersamaan di satu mesin. Juga menjelaskan kenapa gerbangnya dipasang lokal (bukan GitHub Actions) dan batasannya (bisa dilewati --no-verify, satu mesin saja).",
+      "hash": "b9fff4d12fec036b106b0a011aaf628656df36c6ea1957bc0938efdec2d1e02d",
+      "ukuran_kb": 13.4,
+      "ringkasan": "Menjawab bagaimana gerbang lokal (hook Claude Code dan pre-push git) mencegah commit langsung ke branch utama serta menolak push yang gagal tsc/lint/build atau go build, bagaimana papan sesi menampilkan sesi kerja Claude Code mana yang sedang mengerjakan apa di satu mesin, dan bagaimana loop otonom `/brief` -> `/kerjakan` bekerja (routing ke agen domain di worktree terpisah, dinilai dua lapis oleh gerbang mesin dan agen judge, lalu berhenti di PR dengan merge tetap manusia). Juga menjelaskan latar belakang kenapa gerbang ini dibutuhkan (nol gerbang otomatis aktif sebelumnya di erp-frontend maupun bip-erp) dan keterbatasannya (bisa dilewati --no-verify, papan sesi cuma satu mesin).",
       "kata_kunci": [
         "gerbang repo",
         "papan sesi",
         "pre-commit",
         "pre-push",
+        "AI Engineering Loop",
         "loop otonom",
         "/brief",
         "/kerjakan",
-        "/judge",
-        "/supervise",
-        "/papan-sesi",
+        "judge",
         "agent-kit",
-        "session board",
-        "AI Engineering Loop",
-        "worktree"
+        "core.hooksPath"
       ]
     },
     {
@@ -8668,20 +8664,19 @@
         "IT - CI-CD",
         "DEVELOPER GUIDE"
       ],
-      "hash": "362e8a60d3f337c8a0b19fc645d8cbcfadb6bf4f24b9ae4ba86e7bf707841655",
-      "ukuran_kb": 5.8,
-      "ringkasan": "Menjawab: apa isi papan peringkat aktivitas developer, bagaimana angkanya dihitung, dan sejauh mana angka itu boleh dipakai. Menjelaskan tabel per developer, per repo, dan kepemilikan komponen per service bip-erp, grafik sebaran jam/hari, periode bergulir, alur realtime lewat webhook GitHub plus cron penambal, serta aturan perhitungan penting seperti hanya branch integrasi yang dicatat, merge commit dan review ke PR sendiri tidak dihitung, dan semua waktu dalam WIB. Memuat juga temuan data soal kesenjangan review kode dan pemusatan kepemilikan, batasan yang wajib disebut saat memakai angkanya, plus daftar hal yang belum ada seperti panel admin dan peringatan otomatis.",
+      "hash": "8d02887331f107b2349677dc6efd20463f47fd32bd9afb4917a33a399d526861",
+      "ukuran_kb": 7.2,
+      "ringkasan": "Menjawab fitur apa saja yang ada di papan aktivitas developer (tabel per developer/repo/service dengan kepemilikan komponen, grafik sebaran jam dan hari, update realtime lewat webhook), aturan perhitungan yang wajib diketahui sebelum membaca angkanya (hanya branch integrasi, merge commit tak dihitung, semua waktu WIB, judul commit tak pernah disimpan), dan temuan awal yang memicu pembuatannya (review PR nyaris tak berjalan, kepemilikan kode terpusat di sedikit orang). Juga menjelaskan perluasan terbaru: loop otonom mengirim status sesi dan brief Claude Code ke papan lewat endpoint ingest ber-HMAC yang opt-in per developer.",
       "kata_kunci": [
         "papan aktivitas developer",
-        "dev activity board",
-        "leaderboard",
-        "metrik commit",
+        "dev-activity-board",
+        "leaderboard commit",
+        "review PR",
         "kepemilikan komponen",
-        "code review",
+        "loop ingest",
         "webhook GitHub",
         "Cloudflare Workers",
-        "lead time",
-        "WIB"
+        "aturan perhitungan"
       ]
     },
     {
@@ -10229,23 +10224,23 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
         "IT - Gerbang Repo dan Papan Sesi Agent",
+        "IT - Papan Aktivitas Developer",
         "IT - Helpdesk",
         "IT - Monitoring System"
       ],
-      "hash": "52bdb216699490d0529737c97a93696c8ac86d8ffff8e4c03cf1fc5c9d0496a1",
-      "ukuran_kb": 5.1,
-      "ringkasan": "Menjawab: langkah-langkah membawa developer baru dari nol sampai bisa berkontribusi ke bip-erp -- clone sibling repo, memasang agent-kit lewat init.ps1/init.sh, cara memverifikasi command flow dan gerbang commit sudah menyala, cara mengelola beberapa project (multi-project) dalam satu workspace, dan langkah pemulihan bila setup gagal.",
+      "hash": "a1257d9ea61655a758665974bfd29df775e73ab945ed9e9c9d6ccfedd702f422",
+      "ukuran_kb": 5.6,
+      "ringkasan": "Menjawab langkah demi langkah membawa developer baru dari nol sampai bisa menjalankan dan berkontribusi ke bip-erp: clone vault dan repo kode sebagai sibling, menjalankan agent-kit init untuk memasang command/hook/gerbang, memahami alur request dan stack lokal, flow task wajib, opsi ikut papan aktivitas tim lewat loop ingest, serta cara mengelola beberapa project sekaligus (pindah project aktif). Juga memuat langkah verifikasi setup dan langkah rollback bila command atau gerbang tidak muncul.",
       "kata_kunci": [
-        "onboarding",
-        "developer baru",
+        "onboarding developer",
         "agent-kit init",
-        "setup environment",
-        "sibling repo",
         "core.hooksPath",
         "multi-project",
-        "verifikasi",
-        "rollback",
-        "install"
+        "project aktif",
+        "flow wajib",
+        "verifikasi setup",
+        "rollback init",
+        "clone sibling"
       ]
     },
     {
