@@ -92,6 +92,28 @@ ini tak bisa dilihat siapa pun, dan tanggal yang tampil terbaca seperti salah.
 ia menyumbang Rp0 ke omzet, HPP, iklan, dan retur, jadi profit dan pencapaian tidak bergeser
 sedikit pun. Yang berubah hanya: toko itu tidak lagi hilang dari daftar.
 
+### Bentuk layar Dashboard dan Master Target (per 2026-09-07, belum merge)
+
+Keduanya dipindah ke struktur satu kartu yang dipakai halaman daftar HRIS (erp-frontend
+branch `refactor/insentif-struktur-hris`, T4 [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]];
+merge menunggu gerbang backend bip-erp [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767)
+naik ke dev). Yang berubah bagi pembaca:
+
+- **Kelompok jadi kolom.** Baris judul "DIVISI · Aris (Supervisor)" / "TIM · Ade (Leader)"
+  hilang, diganti kolom **Divisi** dan **Tim** yang menyebut nama beserta perannya. Dua
+  keadaan yang dulu sama-sama tampil kosong kini dibedakan: *Langsung di bawah <SPV>, tanpa
+  Leader* (sah: Annisa, Affiliate, Host Live, Buzzer memang bertanggung jawab ke SPV) dan
+  *Belum berdivisi* (atasan belum diisi di HRIS, perlu dibetulkan di sana).
+- **Cari, urut, halaman, TOTAL.** Kotak cari menyaring nama, tim, dan divisi; TOTAL di kaki
+  tabel dihitung dari **seluruh hasil saring**, bukan halaman yang tampak; export mengunduh
+  seluruh hasil saring.
+- **Master Target per orang.** Tab Target menampilkan anggota per level; pensil hanya pada
+  baris yang boleh ditulis pemegang token (cermin gerbang T1 di layar, backend tetap
+  penentu), gembok beralasan untuk baris diri sendiri, level supervisor, dan divisi lain.
+  Perubahan tetap lewat dialog beralasan wajib, bukan ketik langsung di sel.
+- Seluruh teks lewat i18n `finance.insentif.*` ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]);
+  tab Struktur Tim dan Proyek Divisi belum dimigrasi.
+
 ### Aturan periode: hangus, bukan bergeser (per 2026-08-27)
 
 Sebuah order masuk periode bulan M bila **dikirim** di bulan M **dan** uangnya **cair**

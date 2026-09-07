@@ -1370,10 +1370,10 @@
         "ADR - 0038 Hak Per-Objek Admin Space Task Management",
         "API - Integration Service",
         "Microservices - Insentive Service",
+        "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
         "Microservices - Integration Service",
         "Microservices - Procurement Service",
         "API - Finance Service",
-        "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "Finance - Audit Internal",
         "ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri",
@@ -1406,20 +1406,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "561940512ec246857d3ce8d05e4cc56f6a03b2fbc55e2e7e50e2b6ba92eb54c9",
-      "ukuran_kb": 393.5,
-      "ringkasan": "Menjawab: apa itu portal web One Bharata (repo erp-frontend), stack apa yang dipakainya, bagaimana login, refresh token, dan SSO ke aplikasi lain bekerja, serta bagaimana cookie system_roles menggerbang modul dan menu di sidebar (termasuk kenapa key legal/rnd tetap ada dan kategori audit tak punya key). Juga menjawab bagaimana menu HRIS dikelompokkan lewat menu induk bersarang, bagaimana halaman Pengaturan HRGA terpusat disusun (sub-menu, tab, penyaringan per tab), konvensi data-fetching TanStack Query untuk hook sidebar dan badge, konvensi bagan Recharts, dan halaman mana saja yang sudah mendukung multi-perusahaan.",
+      "hash": "ed59c0e55cae7a4a66a06775836d2d0e754982cfa00b6d508fdde89fa66d7597",
+      "ukuran_kb": 395.7,
+      "ringkasan": "Menjawab: apa itu portal web `hris-dashboard` (One Bharata, repo erp-frontend), stack apa yang dipakai, bagaimana login, cookie `system_roles`, SSO handoff ke aplikasi lain, dan role gating sidebar bekerja, serta bagaimana menu HRIS dan Pengaturan HRGA terpusat dikelompokkan (sub-menu, tab, penyaringan hak per tab). Juga menjawab konvensi data-fetching TanStack Query (hook sidebar ber-`enabled`, badge refetch, gerbang halaman), konvensi bagan Recharts lewat `ChartContainer`, dukungan multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/WiFi), dan modul mana yang sudah atau belum diimplementasikan.",
       "kata_kunci": [
         "erp-frontend",
         "hris-dashboard",
         "One Bharata",
-        "web ERP",
-        "frontend",
+        "Web ERP",
         "Next.js",
         "SSO",
         "system_roles",
-        "sidebar menu",
-        "Pengaturan HRGA"
+        "Pengaturan HRGA",
+        "TanStack Query",
+        "multi-perusahaan"
       ]
     },
     {
@@ -5670,7 +5670,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui manajemen 2026-09-07 lewat wawancara `/analisa-kebutuhan`. **T1 (gerbang tulis per level dan divisi) sudah dikodekan** di bip-erp branch `feat/insentive-gerbang-target` (test hijau, kontrol negatif terbukti, **belum merge, belum deploy**); T2 sampai T6 belum ada kodenya. Daftar task: `Workspace/ANALISA - Target Profit Satu Pintu.md` (papan kerja, bukan dok terbit).",
+      "status_teks": "**Diusulkan**, disetujui manajemen 2026-09-07 lewat wawancara `/analisa-kebutuhan`. **T1 (gerbang tulis per level dan divisi) sudah dikodekan** di bip-erp PR [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767) (test hijau, kontrol negatif terbukti, **belum merge, belum deploy**); **T4 (Master Target per orang, sekaligus Dashboard Insentif, struktur HRIS + i18n) sudah dikodekan** di erp-frontend branch `refactor/insentif-struktur-hris` (belum PR, merge menunggu #1767 di dev); T2, T3, T5, T6 belum ada kodenya. Daftar task: `Workspace/ANALISA - Target Profit Satu Pintu.md` (papan kerja, bukan dok terbit).",
       "publik": true,
       "tautan": [
         "Finance - Incentive",
@@ -5687,20 +5687,20 @@
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "APP - Web ERP"
       ],
-      "hash": "e357461f2454fbe0b2e28f151485e83a85c285837aac49cd41ca8d300dba7073",
-      "ukuran_kb": 17.1,
-      "ringkasan": "Menjawab: kenapa target profit tim marketing hanya boleh ditulis di koleksi target milik insentive-service dan bukan lagi di template KPI, siapa yang berwenang menulis target tiap level (SPV Marketing untuk Leader/ICC di divisinya, Finance atau Direktur untuk SPV, dan tak seorang pun untuk dirinya sendiri), serta bagaimana sumber KPI `insentif_profit` membaca target itu dari baris `/profit-dashboard`. Juga menjawab kenapa alur target-marketing berjenjang (Finance menetapkan, SPV memecah, Direktur menyetujui) dipensiunkan, apa arti target yang belum diisi (metrik tidak dinilai, bukan bawaan), bagaimana snapshot skor beku menyimpan target, apa dampaknya bagi SPV, Finance, HR, dan Direktur, serta apa yang sengaja tidak diubah (realisasi tetap dua angka sah karena jendela periodenya berbeda).",
+      "hash": "911a01c63d4a08ba123e9257165dadf08d6688ef06e62159f0fe48b538b5bf8d",
+      "ukuran_kb": 17.3,
+      "ringkasan": "Menjawab: di mana target profit tim marketing ditulis (satu pintu di koleksi target insentive-service), siapa yang berwenang menulis target per level dan per divisi (SPV Marketing untuk Leader/Account Specialist/Advertiser divisinya, Finance atau Direktur untuk target SPV, tak seorang pun menulis target dirinya sendiri), dan bagaimana sumber KPI `insentif_profit` membaca target dari insentif alih-alih dari template KPI. Juga menjawab apa arti target yang kosong, bagaimana snapshot skor beku memperlakukan target, mengapa alur target-marketing berjenjang (Finance, SPV, Direktur) dipensiunkan, mengapa realisasi tetap dua angka, dan penyimpangan terukur di produksi yang melatarbelakangi keputusan ini.",
       "kata_kunci": [
+        "target profit",
         "ADR 0079",
-        "target profit satu pintu",
-        "single source of truth target",
-        "incentive_profit_targets",
-        "gerbang tulis target",
+        "satu pintu",
+        "single source of truth",
+        "insentif",
+        "incentive",
+        "KPI",
         "SPV Marketing",
-        "KPI insentif_profit",
-        "kpi_template target",
-        "target-marketing dipensiunkan",
-        "Beauty Hacks Kyura"
+        "gerbang tulis target",
+        "target-marketing"
       ]
     },
     {
@@ -5977,6 +5977,7 @@
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "Microservices - Integration Service",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "doc.pdf",
         "Sales - ICC Account Manager Mapping",
         "APP - Dynamic Task Tracker",
@@ -5985,20 +5986,20 @@
         "Finance - Bridging App",
         "HRIS - Compensation & Benefits"
       ],
-      "hash": "77148712eac0483aea7b6b12efc3390ac03b37665c56aed1c5c12dbf288d916c",
-      "ukuran_kb": 29.4,
-      "ringkasan": "Menjawab: apa aturan bisnis insentif marketing menurut SK 010 dan 011/2026 (rumus profit, tabel tarif per pencapaian, gerbang retur 7% berbasis jumlah order, target diketik di lingkup Supervisor, dasar uang cair bukan harga jual, order yang belum cair sampai tanggal 25 bulan berikutnya hangus), siapa yang boleh melihat tiap layar insentif (Dashboard, Master Data, Insentif Saya, Panduan, rincian beban karyawan) dan bagaimana paket menu \"Insentif Profit\" dipasang lewat Hak Akses. Juga menjawab cara membaca layar dashboard (periode belum final vs final, toko nol order tetap dihitung miliknya, cache mapping ICC), riwayat skema KPI-multiplier lama per jabatan (SPV, ADV, ICC, Host Live, Affiliator, CS, CRM) yang sudah dicabut, serta acuan akuntansi dan sumber datanya.",
+      "hash": "645ed091c4b4c96fa0e9112d85c06db888fd2e4d402c6e68ea0c894d5b21d2b9",
+      "ukuran_kb": 31.0,
+      "ringkasan": "Menjawab: bagaimana insentif profit-based dihitung menurut SK 010 dan 011/2026 (rumus profit dari uang cair dikurangi HPP, iklan, dan biaya operasional; tabel tarif 2 sampai 5 persen berdasarkan pencapaian target; tiga level ICC, Leader, Supervisor), beserta aturan turunannya: gerbang retur 7 persen dari jumlah order, target diketik di lingkup Supervisor lalu dibagi turun, order yang belum cair sampai tanggal 25 hangus, dan sumber biaya operasional dari payroll dan Accurate. Juga menjawab siapa yang boleh melihat tiap layar insentif (Dashboard, Master Data, Insentif Saya, Panduan, rincian beban karyawan) dan cara membaca layarnya (cache 10 menit, toko tanpa order, periode belum final). Memuat riwayat skema SK lama per jabatan (SPV, ADV, ICC, Host Live, Affiliator, CS, CRM) yang sudah dicabut sebagai arsip.",
       "kata_kunci": [
         "insentif",
         "incentive",
-        "SK 010 011 2026",
+        "profit-based",
+        "SK 010/2026",
         "tarif insentif",
+        "ICC",
+        "SPV Marketing",
         "retur 7%",
-        "uang cair net settlement",
-        "Insentif Saya",
-        "menu Insentif Profit",
-        "periode hangus tanggal 25",
-        "skema KPI-multiplier lama"
+        "uang cair",
+        "Insentif Saya"
       ]
     },
     {
@@ -9862,20 +9863,20 @@
         "REF - PRD ERP",
         "REF - Alur Persetujuan"
       ],
-      "hash": "2b8bf9b4a02ff9871ff03b04f2a5da6e61a9d48b2be0a5d8d4342dc92c459f96",
-      "ukuran_kb": 19.7,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis di ERP (identitas dan data kerja karyawan, status aktif, departemen dan label supervisi, hak akses, kontrak, jadwal kerja dan rotasi shift, presensi dan cuti, skor dan target KPI, target dan hierarki insentif, toko per divisi), siapa yang boleh menulisnya, dan lewat jalan mana service lain boleh membacanya (HTTP internal, feed kalender, klaim JWT). Juga menjawab salinan lintas-service mana yang sah beserta arah sinkron dan penjaganya, pengecualian database-per-service yang masih hidup di kode, duplikasi yang belum diputuskan, dan bagaimana mengecek \"data ini sudah ada di mana\" sebelum membangun ulang di service baru.",
+      "hash": "93e66409d8681fbfb88217092d2530926f6b7e1dc66cf063d7e948744b16e371",
+      "ukuran_kb": 20.0,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis di ERP Bharata (identitas dan data kerja karyawan, status aktif, departemen dan label supervisi, hak akses, kontrak, jadwal kerja dan rotasi, presensi dan cuti, skor dan target KPI, target dan realisasi insentif, hierarki tim insentif), siapa yang boleh menulisnya, dan lewat jalan mana service lain boleh membacanya. Juga menjawab salinan mana yang sah beserta arah dan penjaganya (SyncCollection, field yang dibuang dari $set), pengecualian ADR 0002 yang masih hidup di kode (task-management membaca employee_db dan attendance_db langsung), duplikasi yang belum diputuskan, dan langkah yang harus ditempuh sebelum membangun penyimpanan atas fakta yang mungkin sudah dimiliki departemen lain.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "satu fakta satu pemilik",
-        "database per service",
+        "pemilik fakta",
+        "source of truth",
+        "satu fakta satu tempat",
+        "database-per-service",
         "ADR 0002",
         "SyncCollection",
         "salinan sah",
-        "duplikasi data",
-        "source of truth",
-        "pemilik koleksi"
+        "duplikasi data"
       ]
     },
     {
@@ -12448,20 +12449,20 @@
         "APP - Web ERP",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "323e521c99f35d85f8be7090997111f4763ec04f84850492bc5306a213c53eca",
-      "ukuran_kb": 10.5,
-      "ringkasan": "Menjawab: task apa saja (T1 sampai T7) yang menyusun pekerjaan menyatukan target profit insentif dan KPI, di repo dan berkas mana masing-masing dikerjakan, test dan verifikasi apa yang dituntut tiap task, serta urutan deploy yang mengikat (insentive-service dan employee-service naik bersama, lalu erp-frontend, lalu pencabutan target-marketing di backend dan frontend). Juga menjawab pengukuran apa yang membuktikan pekerjaan selesai, catatan tindak lanjut dari review T1, dan apa yang sengaja di luar lingkup.",
+      "hash": "06f3db879ee4cb179612e2f923bbd991a8d543c2f36b51587267720e5756a325",
+      "ukuran_kb": 11.9,
+      "ringkasan": "Menjawab: task apa saja (T1 sampai T7) yang diturunkan dari ADR 0079 untuk menyatukan target profit insentif dan KPI, repo dan berkas mana yang disentuh tiap task, test dan verifikasi apa yang dituntut, serta dependensi antar-task. Juga menjawab urutan deploy yang mengikat (insentive-service dan employee-service naik bersama, lalu erp-frontend, lalu pencabutan alur target-marketing), catatan dari review T1, pengukuran yang membuktikan selesai, dan apa yang sengaja di luar lingkup. Ini papan kerja, bukan dokumen arsitektur.",
       "kata_kunci": [
-        "target profit satu pintu",
+        "target profit",
+        "satu pintu",
         "daftar task",
-        "papan kerja workspace",
-        "analisa kebutuhan",
-        "gerbang tulis target",
-        "master target insentif",
-        "atur target KPI",
-        "target-marketing dicabut",
-        "urutan deploy",
-        "T1 T2 T3 T4 T5 T6 T7"
+        "papan kerja",
+        "ADR 0079",
+        "insentif",
+        "incentive",
+        "KPI",
+        "Master Target",
+        "urutan deploy"
       ]
     },
     {
