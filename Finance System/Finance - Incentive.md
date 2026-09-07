@@ -43,7 +43,7 @@ bip-erp [#1449](https://github.com/bip-itteam-internal/bip-erp/pull/1449)). Rute
 |---|---|
 | **Dashboard Insentif** | menu terbatas `menu.finance.insentif` — hanya akun yang di-assign paket "Menu: Insentif Profit". Sebelum ada yang di-assign: finance, atasan marketing, IT |
 | **Master Data Insentif** | sama dengan Dashboard |
-| **Insentif Saya** | siapa pun berperan `insentive` — **sengaja di luar whitelist**, karena halamannya hanya memuat baris milik pemegang token |
+| **Insentif Saya** | siapa pun berperan `insentive` — **sengaja di luar whitelist**, karena halamannya hanya memuat baris milik pemegang token. 🟡 **Pindah ke MyBharata di dalam Slip Gaji** ([[ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji]], 2026-09-07): kartu per bulan tanpa nominal, PIN saat kartu ditekan; menu web dicabut setelah rilis aplikasi terpasang luas. Terukur prod: dari 78 pemegang role hanya 37 punya baris profit |
 | **Panduan Insentif** | finance, atasan marketing, atau siapa pun berperan `insentive` |
 | **Rincian beban karyawan** di dalam Dashboard | **hanya `finance`**, terpisah dari dan di atas whitelist |
 
@@ -92,12 +92,13 @@ ini tak bisa dilihat siapa pun, dan tanggal yang tampil terbaca seperti salah.
 ia menyumbang Rp0 ke omzet, HPP, iklan, dan retur, jadi profit dan pencapaian tidak bergeser
 sedikit pun. Yang berubah hanya: toko itu tidak lagi hilang dari daftar.
 
-### Bentuk layar Dashboard dan Master Target (per 2026-09-07, belum merge)
+### Bentuk layar Dashboard dan Master Target (live di prod 2026-09-07)
 
 Keduanya dipindah ke struktur satu kartu yang dipakai halaman daftar HRIS (erp-frontend
-branch `refactor/insentif-struktur-hris`, T4 [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]];
-merge menunggu gerbang backend bip-erp [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767)
-naik ke dev). Yang berubah bagi pembaca:
+PR [#1473](https://github.com/bip-itteam-internal/erp-frontend/pull/1473), T4 [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]];
+live di prod 23:16 WIB). ⚠️ Naik **sebelum** gerbang backend bip-erp [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767):
+sampai insentive-service prod memuat T1, pensil di Master Target untuk Supervisor berujung
+403 bertoast, Finance tidak terpengaruh. Yang berubah bagi pembaca:
 
 - **Kelompok jadi kolom.** Baris judul "DIVISI · Aris (Supervisor)" / "TIM · Ade (Leader)"
   hilang, diganti kolom **Divisi** dan **Tim** yang menyebut nama beserta perannya. Dua
