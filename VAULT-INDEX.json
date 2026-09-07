@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-07",
-  "jumlah_dokumen": 371,
+  "jumlah_dokumen": 373,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -346,6 +346,8 @@
       "tautan": [
         "Microservices - Insentive Service",
         "API - Index",
+        "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
+        "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
         "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
         "API - Integration Service",
         "IT - Background Jobs & Schedulers",
@@ -353,20 +355,20 @@
         "Finance - Incentive",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "82233dcf48d4e5693745362b9950f67aa196723ac61fe86b25d5842dc531ece7",
-      "ukuran_kb": 5.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki insentive-service di gateway `/api/insentive/*`, parameter apa yang diterima `GET /profit-dashboard` (periode, level icc/leader/supervisor, refresh, mode=bergeser) dan field apa yang dibawa jawabannya (tarif_tiers, batas_retur_persen, toko_tanpa_penjualan, retur_gagal_booking), serta rute mana untuk struktur tim, target, opex dan distribusinya, results beserta approve/unapprove/override, mappings, audit log, config PPN, dan proxy Accurate. Juga menjawab rute warisan skema KPI-multiplier mana yang masih terdaftar tetapi menolak, kenapa `/profit/internal-affiliates` dihapus, dan apa beda dua angka profit antara jendela insentif bawaan (order cair lewat tanggal 25 hangus) dan `mode=bergeser` yang dipakai adaptor KPI.",
+      "hash": "5dcdd4581738ba2e3dadbcae07868473c5c8870afb2547ccccfcc0dc551cc2d9",
+      "ukuran_kb": 7.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki insentive-service lewat gateway `/api/insentive/*`, rute profit-based mana yang berlaku (`/profit-dashboard`, `/profit-dashboard/saya`, `/profit/org`, `/profit/targets`, `/profit/opex`) beserta parameter dan bentuk balasannya, dan rute warisan skema KPI-multiplier mana yang masih terdaftar tetapi menolak. Juga menjawab apa arti `mode=bergeser` dan kenapa menghasilkan angka profit yang berbeda, dari mana angka profit dan beban diambil (integration-service, payroll), serta siapa yang boleh menulis target profit.",
       "kata_kunci": [
+        "insentive-service",
         "insentif",
-        "insentive service",
         "incentive",
-        "api insentive",
+        "endpoint",
         "profit-dashboard",
-        "endpoint insentif",
+        "profit-dashboard/saya",
         "target profit",
         "opex",
-        "mode bergeser",
-        "results approve override"
+        "master KPI",
+        "mode bergeser"
       ]
     },
     {
@@ -1227,6 +1229,8 @@
         "APP - Web ERP",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
+        "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
+        "API - Insentive Service",
         "HRIS - Otomasi Skor KPI",
         "Microservices - Task Management Service",
         "APP - Dynamic Task Tracker",
@@ -1242,21 +1246,20 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "f632873720f4766e2ddbe9cd4ae0e48c319d3bc24abe65d9cb1122bd98f573ad",
-      "ukuran_kb": 51.3,
-      "ringkasan": "Menjawab: apa saja yang bisa dilakukan karyawan lewat aplikasi mobile MyBharata (absensi, pengajuan cuti/izin, lembur, slip gaji, KPI, survei, pelatihan) dan bagaimana aplikasinya dibangun — Flutter dengan Clean Architecture feature-first, BLoC, get_it, dio, dan go_router. Juga menjawab bagaimana autentikasi bekerja (JWT + biometric + PIN, satu akun satu device), bahwa aplikasi memanggil backend lewat API Master Gateway dengan prefix api/<module>, serta bagaimana konten dan menu di-scope per perusahaan (multi-tenant) beserta batas gerbang konten yang sengaja belum dibuka. Berguna untuk tahu versi build vs versi rilis dan fitur mana yang baru ada di dev.",
+      "hash": "c90393864f42d9502daa7bc910c745508c1c81bbad63a049a7313419f0d5e8c6",
+      "ukuran_kb": 52.8,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitekturnya (Flutter, BLoC, Clean Architecture feature-first, get_it, dio, go_router), cara autentikasinya (JWT, biometric, PIN, satu akun satu device), dan bagaimana ia terhubung ke backend lewat gateway. Juga menjawab fitur apa yang sudah live (attendance, izin/cuti, lembur, slip gaji, KPI, survei, Kaizen, sesi live host, pelatihan), bagaimana konten dan menu dibedakan per perusahaan (multi-tenant), versi mana yang rilis di `main` versus yang baru sampai `dev`, serta fitur mana yang masih coming soon atau roadmap.",
       "kata_kunci": [
         "MyBharata",
-        "aplikasi mobile",
+        "my_bharata",
+        "mobile",
         "Flutter",
         "HRIS mobile",
-        "BLoC",
-        "clean architecture",
-        "multi-tenant",
-        "JWT",
-        "biometric",
-        "geofencing",
-        "gateway"
+        "aplikasi karyawan",
+        "employee app",
+        "attendance",
+        "slip gaji",
+        "multi-tenant"
       ]
     },
     {
@@ -1370,6 +1373,7 @@
         "API - Integration Service",
         "Microservices - Insentive Service",
         "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
+        "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
         "Microservices - Integration Service",
         "Microservices - Procurement Service",
         "API - Finance Service",
@@ -1405,20 +1409,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "1ef6c4095cbf7e7776177ff5fa60f37d314976aa65ccd9b99ed95ed79388cf24",
-      "ukuran_kb": 395.8,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (repo erp-frontend), stack apa yang dipakai, bagaimana login, cookie system_roles, refresh token, dan peran SSO identity provider bekerja, serta bagaimana sidebar dan menu digerbang per modul dan role (termasuk kategori audit yang lahir dari paket izin). Juga menjawab bagaimana multi-perusahaan (company switcher) memengaruhi halaman HRIS, bagaimana halaman Pengaturan HRGA terpusat disusun per sub-menu dan tab, serta konvensi data-fetching TanStack Query dan konvensi bagan Recharts/ChartContainer yang wajib diikuti di frontend.",
+      "hash": "30367678248b38905bde7b76ca0eb2f4d4600f6e03e664a2c312de5b3fa7424c",
+      "ukuran_kb": 396.4,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS One Bharata (`erp-frontend` / `hris-dashboard`), stack-nya (Next.js, shadcn/ui, TanStack Query, react-i18next), cara login dan perannya sebagai SSO Identity Provider, serta bagaimana role dari cookie `system_roles` menggerbang sidebar dan modul (termasuk kategori audit yang lahir dari paket izin). Juga menjawab bagaimana menu HRIS dikelompokkan, di mana Pengaturan HRGA terpusat beserta sub-menu dan tab-nya, konvensi data-fetching TanStack Query dan konvensi bagan Recharts yang wajib diikuti, serta modul mana yang sudah dan belum diimplementasikan.",
       "kata_kunci": [
+        "Web ERP",
         "erp-frontend",
         "hris-dashboard",
         "One Bharata",
-        "web ERP",
-        "SSO identity provider",
+        "Next.js",
+        "SSO",
         "system_roles",
-        "sidebar menu",
-        "TanStack Query",
-        "Recharts ChartContainer",
-        "Pengaturan HRGA"
+        "sidebar",
+        "Pengaturan HRGA",
+        "frontend"
       ]
     },
     {
@@ -5734,6 +5738,44 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji.md",
+      "judul": "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-07 lewat percakapan `/analisa-kebutuhan`; kode belum ada. Daftar task: `Workspace/ANALISA - Insentif Saya di MyBharata.md` (papan kerja, bukan dok terbit).",
+      "publik": true,
+      "tautan": [
+        "API - Insentive Service",
+        "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
+        "APP - MyBharata",
+        "Finance - Incentive",
+        "Microservices - Insentive Service",
+        "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "APP - Web ERP",
+        "Microservices - Payroll Service",
+        "HRIS - Payroll Persona",
+        "IT - CI-CD"
+      ],
+      "hash": "d8487f57b511404388da7fd0721fa8ded20879212506b261924abdf06d0944e7",
+      "ukuran_kb": 15.1,
+      "ringkasan": "Menjawab: kenapa layar Insentif Saya dipindahkan dari web ERP ke MyBharata dan mengapa ditempatkan di dalam daftar Slip Gaji sebagai kartu per bulan tanpa nominal di balik PIN, siapa yang mendapat kartu Insentif (ditentukan server lewat endpoint keanggotaan, bukan daftar role di aplikasi), dan endpoint mana yang dibaca rinciannya. Juga menjawab kenapa insentif tidak dijumlahkan ke slip gaji, kapan menu web dicabut, kenapa tanpa notifikasi, siapa yang terdampak (37 orang marketing), dan apa yang sengaja tidak dilakukan.",
+      "kata_kunci": [
+        "ADR 0081",
+        "insentif saya",
+        "my incentive",
+        "MyBharata",
+        "slip gaji",
+        "payslip",
+        "PIN",
+        "keanggotaan insentif",
+        "profit-dashboard/saya",
+        "pindah ke mobile"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -6005,6 +6047,7 @@
         "Microservices - Payroll Service",
         "External - Accurate",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
+        "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "Microservices - Integration Service",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
@@ -6016,20 +6059,20 @@
         "Finance - Bridging App",
         "HRIS - Compensation & Benefits"
       ],
-      "hash": "c20f72439a75a6f685b6be89d2e5438d56fe7d8281716510010fa241799015f7",
-      "ukuran_kb": 31.1,
-      "ringkasan": "Menjawab: bagaimana insentif profit-based tim marketing (ICC, Leader, Supervisor) dihitung menurut SK 010 dan 011/2026, berapa tarif per tingkat pencapaian target, bagaimana gerbang retur 7%, dasar uang cair, dan aturan order hangus tanggal 25 berlaku, serta dari mana biaya operasional dirakit (payroll dan proyek Accurate). Juga menjawab siapa yang boleh melihat Dashboard Insentif, Master Data, Insentif Saya, dan rincian beban karyawan, kenapa angka di layar bisa tampak \"belum masuk\" (cache, toko tanpa order, periode belum final), serta seperti apa skema KPI-multiplier lama per jabatan (SPV, ADV, ICC, Host Live, Affiliator, CS, CRM) yang sudah dicabut dan hanya disimpan sebagai riwayat.",
+      "hash": "c2281efa6eb57ea007225ca4b838f375bcdd8c402b7c82955e641ee35914503c",
+      "ukuran_kb": 31.4,
+      "ringkasan": "Menjawab: bagaimana rumus insentif profit-based yang berlaku sejak SK 010 dan 011/2026 (Profit = uang cair - HPP - beban iklan - biaya operasional; tarif 2 sampai 5% menurut pencapaian target), bagaimana tiga level ICC/Leader/Supervisor dinilai, aturan gerbang retur 7%, siapa yang mengetik target, dan kenapa order yang belum cair sampai tanggal 25 bulan berikutnya hangus. Juga menjawab siapa yang boleh melihat Dashboard Insentif, Master Target, dan Insentif Saya, cara membaca penanda belum final dan selisih jumlah toko di layar, serta riwayat skema KPI-multiplier lama per jabatan (SPV, ADV, ICC, Host Live, Affiliator, CS, CRM) yang sudah dicabut.",
       "kata_kunci": [
         "insentif",
         "incentive",
         "profit-based",
-        "SK 010 011 2026",
+        "SK 010/011",
         "tarif insentif",
-        "ICC Leader Supervisor",
         "retur 7%",
-        "uang cair net settlement",
-        "Dashboard Insentif",
-        "insentive-service"
+        "target profit",
+        "ICC",
+        "SPV Marketing",
+        "bonus marketing"
       ]
     },
     {
@@ -12210,6 +12253,37 @@
         "baseline test",
         "status task",
         "T1-T13"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Insentif Saya di MyBharata.md",
+      "judul": "ANALISA - Insentif Saya di MyBharata",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "🟡",
+      "status_teks": "Daftar task dari `/analisa-kebutuhan` 2026-09-07. Keputusannya di [[ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji]]; dok ini papan kerja, bukan arsitektur. Coret item begitu PR-nya merge, dan pindahkan keadaannya ke dok domain lewat `/sync-docs`.",
+      "publik": false,
+      "tautan": [
+        "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
+        "APP - MyBharata",
+        "APP - Web ERP",
+        "Finance - Incentive",
+        "API - Insentive Service"
+      ],
+      "hash": "371344c463c8ea57719066dc95733575476f7bdce8cf17eab2a9db3203cd4d73",
+      "ukuran_kb": 6.1,
+      "ringkasan": "Menjawab: task apa saja (M1 sampai M5) yang harus dikerjakan untuk memindahkan Insentif Saya ke MyBharata menurut ADR 0081, di repo dan berkas mana masing-masing, urutan yang mengikat (endpoint keanggotaan di backend, lalu aplikasi, rilis store, cabut menu web, sinkron dok), serta test dan verifikasi apa yang membuktikan tiap task selesai. Juga menjawab ukuran keberhasilan setelah rilis, apa yang sengaja di luar lingkup (notifikasi, Host Live/affiliate/CRM, penyandingan dengan Bonus payroll), dan gap dok yang dibetulkan bersamanya.",
+      "kata_kunci": [
+        "analisa kebutuhan",
+        "insentif saya",
+        "MyBharata",
+        "daftar task",
+        "task list",
+        "papan kerja",
+        "ADR 0081",
+        "keanggotaan insentif",
+        "cabut menu web",
+        "rilis aplikasi"
       ]
     },
     {
