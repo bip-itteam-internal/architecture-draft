@@ -355,9 +355,9 @@
         "Finance - Incentive",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "be5fc44190b379874752f3825d649d28431dbbdf1822696533b1c4f0ef76de89",
-      "ukuran_kb": 8.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki insentive-service lewat gateway `/api/insentive/*`, mana yang berlaku untuk skema profit-based (`/profit-dashboard`, `/profit-dashboard/saya`, `/profit-dashboard/saya/keanggotaan`, `/profit/org`, `/profit/targets`, `/profit/opex`) dan mana rute warisan KPI-multiplier yang kini menolak. Juga menjawab parameter dan bentuk balasan tiap rute (`periode`, `level`, `mode=bergeser`, `refresh`, `tarif_tiers`, `toko_tanpa_penjualan`, `retur_gagal_booking`), arti kode status 400/401/403/502/503, gerbang role untuk menulis target, serta rute results/approve, mappings, audit-logs, stats, config PPN, dan proxy Accurate.",
+      "hash": "e44def24157fdb234865d0547240275e800e35ac655ff341f0cb2bff86dd13c5",
+      "ukuran_kb": 8.4,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki insentive-service lewat gateway `/api/insentive/*`, rute profit-based mana yang berlaku (`/profit-dashboard`, `/profit-dashboard/saya`, `/profit-dashboard/saya/keanggotaan`, `/profit/org`, `/profit/targets`, `/profit/opex`) dan rute warisan KPI-multiplier mana yang kini menolak. Juga menjawab apa isi respons dashboard (`tarif_tiers`, `batas_retur_persen`, `toko_tanpa_penjualan`, `retur_gagal_booking`, `biaya_gaji`), apa arti parameter `mode=bergeser` dan `refresh=1`, kode status 401/502/503 endpoint keanggotaan, serta rute mana yang sudah dihapus (`/profit/internal-affiliates`) atau masih menunggu merge.",
       "kata_kunci": [
         "insentif",
         "incentive",
@@ -365,10 +365,10 @@
         "endpoint",
         "profit-dashboard",
         "profit-based",
-        "tarif tiers",
-        "mode bergeser",
         "keanggotaan",
-        "target profit"
+        "mode bergeser",
+        "tarif tiers",
+        "/api/insentive"
       ]
     },
     {
@@ -2280,20 +2280,20 @@
         "Sales - Incentive",
         "HRIS - Key Performance Index"
       ],
-      "hash": "0c029a7b31fc3447a175fb0d9529d657ae0d182c86c502bdcf165320a399f236",
+      "hash": "5d11b216f21af2ce364775ff940bd55d387759b85a82ea24d10decc9a1b5c2bd",
       "ukuran_kb": 19.5,
-      "ringkasan": "Menjawab: bagaimana insentif marketing dihitung dalam skema profit-based (Profit = uang cair - HPP - beban iklan - biaya operasional, tangga tarif menurut pencapaian target, gerbang retur 7%), bagaimana level ICC/Leader/Supervisor ditentukan dari hierarki HRIS, dan dari mana tiap komponen angka diambil (integration-service, payroll, Accurate, penyusutan aset inventory). Juga menjelaskan cache dashboard dan pre-warm, perbedaan jendela periode insentif vs KPI (`mode=bergeser`), siapa yang boleh menulis master data org/target/opex, rute warisan yang dicabut, dan catatan yang belum terpenuhi.",
+      "ringkasan": "Menjawab: bagaimana insentif profit-based dihitung (Profit = uang cair − HPP − beban iklan − biaya operasional; tarif bertingkat 2–5% menurut pencapaian target; gerbang retur 7% berbasis jumlah order), dari mana angkanya dirakit (komponen profit dari integration-service, gaji dari payroll, beban marketing dari Accurate, penyusutan aset dari inventory), dan bagaimana ICC → Leader → Supervisor diturunkan dari hierarki HRIS. Juga menjawab siapa yang boleh menulis target/org/opex (`RequireMasterProfitWriter`, `gerbangTulisTarget`), kenapa dashboard di-cache 15 menit dan di-pre-warm, apa beda jendela periode insentif (menghanguskan) dan KPI (`mode=bergeser`), skema lama mana yang dicabut, serta apa yang belum layak dipakai membayar.",
       "kata_kunci": [
         "insentif",
         "incentive",
-        "insentive service",
+        "insentive-service",
         "profit-based",
-        "rumus profit",
         "tarif bertingkat",
         "gerbang retur",
-        "ICC leader supervisor",
         "target profit",
-        "biaya operasional opex"
+        "biaya operasional",
+        "ICC leader supervisor",
+        "SK 010 011"
       ]
     },
     {
@@ -5744,7 +5744,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-07 lewat percakapan `/analisa-kebutuhan`. M1 (endpoint keanggotaan) **merged ke `main`** 2026-09-08 (bip-erp PR [#1778](https://github.com/bip-itteam-internal/bip-erp/pull/1778)), belum diverifikasi di dev/prod saat ditulis; M2 sampai M5 belum. Daftar task: `Workspace/ANALISA - Insentif Saya di MyBharata.md` (papan kerja, bukan dok terbit).",
+      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-07 lewat percakapan `/analisa-kebutuhan`. M1 (endpoint keanggotaan) ✅ **live prod** 2026-09-08 (bip-erp PR [#1778](https://github.com/bip-itteam-internal/bip-erp/pull/1778), terverifikasi 7 orang lintas level, lihat [[API - Insentive Service]]); M2 sampai M5 belum. Daftar task: `Workspace/ANALISA - Insentif Saya di MyBharata.md` (papan kerja, bukan dok terbit).",
       "publik": true,
       "tautan": [
         "API - Insentive Service",
@@ -5760,11 +5760,10 @@
         "HRIS - Payroll Persona",
         "IT - CI-CD"
       ],
-      "hash": "006f8d5b39152f17a0c52323b4cdbc502284c608b769fbccfb51c0d6204ce6c9",
+      "hash": "6d9c688418ad79a14a998f275cd11e05142e4b9f893762f33ecbecc9b637469a",
       "ukuran_kb": 16.1,
-      "ringkasan": "Menjawab: mengapa dan bagaimana layar Insentif Saya dipindahkan dari web ERP ke MyBharata sebagai kartu per bulan di dalam halaman Slip Gaji (tanpa nominal sebelum PIN), siapa yang mendapat kartu (ditentukan server lewat endpoint keanggotaan, bukan daftar role di aplikasi), endpoint apa yang dibaca aplikasi, dan mengapa insentif tidak dijumlahkan ke slip gaji. Juga menjelaskan urutan rilis (backend, aplikasi, store, lalu cabut menu web), apa yang sengaja tidak dilakukan (notifikasi, Host Live/affiliate/CRM), serta data produksi pemegang role vs baris insentif yang mendasari keputusan.",
+      "ringkasan": "Menjawab: kenapa layar Insentif Saya dipindahkan dari web ERP ke MyBharata di dalam halaman Slip Gaji, bagaimana bentuknya (kartu Slip Gaji dan kartu Insentif per bulan tanpa nominal, PIN di lapisan rute), dan siapa yang mendapat kartu Insentif (ditentukan server lewat endpoint keanggotaan, bukan daftar role di aplikasi). Juga menjawab kenapa aplikasi tidak menghitung maupun menjumlahkan insentif dengan gaji, kenapa tanpa notifikasi di tahap ini, urutan rilisnya (backend dulu, aplikasi, store, baru menu web dicabut), dan apa yang sengaja tidak dilakukan (Host Live, affiliate, CRM, koreksi insentif dari aplikasi).",
       "kata_kunci": [
-        "ADR 0081",
         "insentif saya",
         "my incentive",
         "MyBharata",
@@ -5772,8 +5771,9 @@
         "payslip",
         "PIN",
         "keanggotaan",
-        "kartu insentif",
-        "cabut menu web"
+        "ADR 0081",
+        "cabut menu web",
+        "mobile"
       ]
     },
     {
@@ -12302,20 +12302,20 @@
         "Finance - Incentive",
         "API - Insentive Service"
       ],
-      "hash": "4e98da07ee0c5c63568c98dc9f6754801e2224059737a0e97e9048f0db2b251d",
-      "ukuran_kb": 6.8,
-      "ringkasan": "Menjawab: task apa saja (M1 sampai M5) yang harus dikerjakan untuk memindahkan Insentif Saya ke MyBharata, di repo dan berkas mana masing-masing, test dan verifikasi apa yang dituntut tiap task, serta urutan dependensinya (endpoint keanggotaan, kartu di Slip Gaji, rilis store, cabut menu web, sinkron dok). Juga menyebut ukuran yang membuktikan selesai (pemakaian rincian insentif dari aplikasi), hal di luar lingkup beserta alasannya, dan gap dokumentasi yang dibetulkan bersamanya.",
+      "hash": "ce5e433bf2aac0195a5ab8bc9baa0465bb26623fb31c18b6495706fcf7b909c1",
+      "ukuran_kb": 6.9,
+      "ringkasan": "Menjawab: task apa saja (M1 sampai M5) yang diperlukan untuk memindahkan Insentif Saya ke MyBharata, di repo dan berkas mana masing-masing dikerjakan (bip-erp `keanggotaan_saya.go`, my-bharata `features/insentif/` dan `payslip_page.dart`, erp-frontend `sidebar-menus.tsx`), serta test dan langkah verifikasi apa yang dituntut tiap task. Juga menjawab urutan dan dependensi antar-task (backend, aplikasi, rilis store, cabut menu web), apa yang sengaja di luar lingkup beserta alasannya, dan ukuran apa yang membuktikan pekerjaannya selesai.",
       "kata_kunci": [
-        "ANALISA",
         "insentif saya",
         "MyBharata",
         "daftar task",
+        "task list",
+        "analisa kebutuhan",
         "slip gaji",
         "keanggotaan",
-        "kartu insentif",
         "rilis aplikasi",
-        "cabut menu web",
-        "analisa kebutuhan"
+        "cabut menu",
+        "papan kerja"
       ]
     },
     {
