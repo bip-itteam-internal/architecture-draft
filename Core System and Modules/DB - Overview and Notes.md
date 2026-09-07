@@ -88,7 +88,7 @@ Doc: [[Microservices - Task Management Service]]
 - notifications
 - audits
 
-> Catatan: task-management juga membaca `employee_db` (ERP) secara **read-only** untuk memperoleh nama/divisi.
+> Catatan: task-management juga membaca `employee_db` (ERP) secara **read-only** untuk memperoleh nama/divisi (`erpdb.go`, env `MONGO_URI_ERP`), dan sejak modul Engagement juga membaca `attendance_db` secara read-only untuk memeriksa siapa sedang cuti penuh (`attendancedb.go`, env `MONGO_URI_ATTENDANCE`; terverifikasi `origin/main` 2026-09-07). Keduanya pengecualian atas [[ADR - 0002 Database-per-Service]] dan dicatat sebagai utang di [[REF - Kepemilikan Data]] §Pengecualian.
 
 ### recruitment — `recruitment-mongo-db`
 Doc: [[Microservices - Recruitment Service]] (⚠️ Fase 1-3)

@@ -52,7 +52,7 @@ Proses bisnis ditulis per domain. Pintu tiap domain adalah dok Big Pictures, dan
 - **Peta sistem dan indeks dokumentasi**: [[HOMEPAGE]]. Struktur repo, gateway, orchestrator, dan daftar service ada di situ.
 - **Aplikasi yang dipakai orang**: [[APP - Web ERP]] · [[APP - MyBharata]] · [[APP - Dynamic Task Tracker]] · [[APP - Audit Internal]] · [[APP - Portal Karir Bharata]] · [[BASE - Enterance Point]].
 - **Service backend**: seluruh dok berprefix `Microservices -` di folder Core System and Modules, satu dok per service. Daftar endpoint per service: [[API - Index]].
-- **Data**: [[DB - Overview and Notes]] (database per service) dan [[DB - Data Dictionary]].
+- **Data**: [[DB - Overview and Notes]] (database per service) dan [[DB - Data Dictionary]]. Siapa pemilik tiap fakta bisnis, siapa boleh menulis, dan salinan mana yang sah: [[REF - Kepemilikan Data]].
 - **Yang belum ada atau masih konsep**: [[ROADMAP]] dan [[HRIS - Roadmap]].
 - Kemampuan AI yang sudah dan belum ada di ERP: [[CORE - Kapabilitas AI dan Machine Learning]].
 
