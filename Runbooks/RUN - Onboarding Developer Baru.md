@@ -27,6 +27,7 @@ Hari pertama developer baru, atau saat setup ulang environment dari awal.
 5. Untuk bikin service baru: ikuti langkah di [[HOMEPAGE]] (bagian "Dari mana saya mulai").
 6. Kerjakan task dengan flow wajib: `/start-task` → `/plan` → `/implement` → `/review` → `/sync-docs` → `/wrap`.
 7. Untuk task **kecil dan jelas** (satu bug, satu test, satu dok): `/brief <masalah>` lalu `/kerjakan <path brief>`; agent mengerjakan sampai **PR**, Anda yang merge. Lihat `/papan-sesi` bila membuka lebih dari satu sesi. Cara kerja dan batasnya di [[IT - Gerbang Repo dan Papan Sesi Agent]].
+8. **Opsional, supaya sesi dan brief Anda tampil di papan tim** ([[IT - Papan Aktivitas Developer]]): minta `url` dan `secret` ingest ke pemegang akun Cloudflare tim, buat `~/.agent-kit/loop-ingest.json` berisi `{ "url": "...", "secret": "..." }`, lalu restart sesi. Tanpa berkas itu tidak ada yang dikirim. Yang dikirim hanya id, tahap, status, repo, domain, nomor PR; judul brief dan teks task tidak pernah keluar dari mesin Anda. Bila 3 kali gagal beruntun, SessionStart menampilkan satu baris peringatan.
 
 ## Multi-project (memegang beberapa repo)
 

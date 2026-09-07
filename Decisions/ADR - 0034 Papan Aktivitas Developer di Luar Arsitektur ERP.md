@@ -48,7 +48,7 @@ Sistem ini melanggar pola yang berlaku di vault ini pada hampir semua sumbu: bah
 
 **Yang belum diputuskan (TBD):**
 
-- Apakah papan ini nantinya perlu autentikasi bila isinya diperluas ke data yang lebih sensitif.
+- ~~Apakah papan ini nantinya perlu autentikasi bila isinya diperluas ke data yang lebih sensitif.~~ **Dijawab 2026-09-07** saat papan diperluas menerima peristiwa AI Engineering Loop dari mesin developer: autentikasi ditambahkan untuk **menulis** (HMAC bersama, rute 503 bila rahasia belum dipasang), **membaca tetap lewat tautan** (§3), dan datanya dijaga tidak lebih sensitif dari yang sudah ada dengan aturan yang sama seperti §4: judul brief, teks task, dan judul PR tidak pernah dikirim. Rinciannya di [[IT - Papan Aktivitas Developer]] § Loop otonom.
 - Siapa penanggung jawab kedua bila pemegang akun bersama berhalangan. Saat ini seluruh organisasi GitHub bergantung pada **satu** akun owner, dan itu risiko yang lebih besar daripada papan ini sendiri.
 - Apakah temuan dari papan ini (kesenjangan review, pemusatan kepemilikan komponen) akan ditindaklanjuti jadi kebijakan, atau berhenti sebagai informasi.
 

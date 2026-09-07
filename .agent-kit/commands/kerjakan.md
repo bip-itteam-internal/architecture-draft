@@ -65,6 +65,12 @@ Jalankan prosedur `/judge` (baca `.claude/commands/judge.md` dan lakukan) atas w
 brief yang sama. Hasilnya `lolos` (gerbang deterministik **dan** agen judge sama-sama lolos) dan
 daftar `temuan`, `gagal_baru`.
 
+Kirim verdict ke papan tim (best-effort; no-op bila mesin ini tidak menyalakan ingest):
+```
+& '.claude/hooks/loop-kirim.ps1' -Jenis judge.verdict -BriefSlug <slug> -Data '{"percobaan":<n>,"lolos":<true|false>,"temuan_kritis":<k>,"durasi_gerbang":<detik>}'
+```
+(in-process dengan `&`, bukan `powershell -File`; alasannya di komentar skrip)
+
 Tulis log `.task-plans/judge/<slug>-<n>.json`:
 
 ```json
@@ -114,7 +120,10 @@ Repo kode, di dalam worktree:
    - Ringkasan judge + gerbang yang dijalankan (nama, durasi, lolos)
    - `Brief: <path>` · `Log: .task-plans/judge/<slug>-<n>.json`
    - Baris penutup: *Dibuat oleh AI Engineering Loop (agent-kit). Merge tetap keputusan manusia (ADR 0077 §1).*
-5. Cetak URL PR. Tambahkan `## Hasil` di brief: percobaan, verdict, URL PR.
+5. Cetak URL PR. Tambahkan `## Hasil` di brief: percobaan, verdict, URL PR. Kirim ke papan tim:
+   ```
+   & '.claude/hooks/loop-kirim.ps1' -Jenis loop.pr -BriefSlug <slug> -Data '{"repo":"<repo>","number":<nomor PR>}'
+   ```
 
 Vault (domain docs): stage **per nama berkas**, commit, `build-vault-index.py --check` (regenerasi
 lewat `/index-vault` bila basi), `git merge origin/main` bila remote maju, push `main`. Tanpa PR.

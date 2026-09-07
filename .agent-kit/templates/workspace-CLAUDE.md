@@ -25,7 +25,8 @@ otomatis → perbaikan maks 2× → **PR**). **Merge tetap manusia** (ADR 0077 �
 SESI dari gh + data lokal), `/ekstrak-skill` (sesi → draft skill), `/supervise` (evaluasi loop →
 draft, tidak auto-apply). Gerbang lokal: pre-commit **menolak** commit di branch
 utama repo kode; pre-push menjalankan tsc/lint/build atau go build. Jangan `--no-verify` tanpa
-alasan tertulis.
+alasan tertulis. Papan tim (`dev-activity-board`) menerima peristiwa loop bila mesin ini punya
+`~/.agent-kit/loop-ingest.json` (opt-in, best-effort, tanpa judul brief/teks task).
 
 ## Aturan turunan
 - JS/TS: pakai **pnpm**, bukan npm/yarn.

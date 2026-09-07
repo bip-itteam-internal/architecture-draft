@@ -45,7 +45,15 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
    lebih dari satu repo atau lebih dari satu modul → **pecah**, jangan menulis brief L.
 
 8. Tulis berkas dari `architecture-draft/.agent-kit/templates/brief.md` (ganti semua `__X__`),
-   slug kebab-case maksimum 30 karakter. Lalu cetak:
+   slug kebab-case maksimum 30 karakter. Kirim ke papan tim (best-effort, no-op bila mesin ini
+   tidak menyalakan ingest; judul TIDAK dikirim, hanya id hash slug, repo, domain):
+   ```
+   & '.claude/hooks/loop-kirim.ps1' -Jenis brief.dibuat -BriefSlug <slug> -Data '{"repo":"<repo>","domain":"<domain>"}'
+   ```
+   (panggil **in-process** dengan `&`, bukan `powershell -File`: proses baru melucuti tanda kutip
+   di dalam JSON-nya diam-diam; mac/linux: `loop-kirim.sh brief.dibuat '{...}'` dengan id dihitung
+   sama)
+   Lalu cetak:
 
 ```
 Brief: .task-plans/briefs/<tanggal>-<slug>.md
