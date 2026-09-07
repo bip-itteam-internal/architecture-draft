@@ -21,7 +21,8 @@ Argumen: `[--basi N]` jam (bawaan 24), `[--bersihkan]` (hapus berkas sesi **sele
    ```
    (mac/linux: `papan-sesi.sh`, tabel saja tanpa HTML.)
 2. Tampilkan keluarannya apa adanya (baris ringkas + tabel) dan path HTML
-   `.task-plans/papan-sesi.html` (menyegarkan diri tiap 60 detik saat dibuka di browser).
+   `.task-plans/dashboard.html` (dibangkitkan `dashboard.ps1` dari cache PR; `/dashboard` untuk
+   menarik data gh terbaru dan panel lengkap).
 3. Untuk tiap sesi **BASI** (aktif tapi tak disentuh > N jam): sebutkan worktree/branch-nya bila
    ada, dan sarankan **satu** dari: lanjutkan di sesi itu, atau tutup sesinya (SessionEnd akan
    menandainya selesai). Jangan menghapus berkas sesi aktif; yang boleh dibersihkan hanya yang
