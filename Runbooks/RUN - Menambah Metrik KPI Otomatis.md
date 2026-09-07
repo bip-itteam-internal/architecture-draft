@@ -91,7 +91,7 @@ Arah+Target (satu pemilik)  -> nilai 0..100
 
 Sumber **tidak mengenal target dan tidak menghitung nilai**. Ia hanya melapor apa yang terukur dan berapa yang seharusnya terukur. Pemisahan itu disengaja: kalau sumber boleh menghitung nilai sendiri, sepuluh departemen akan melahirkan sepuluh semantik penilaian, dan skor KPI dibandingkan lintas departemen ("KPI Team minimal 70") sehingga perbedaan itu merusak perbandingannya secara diam-diam.
 
-🟡 **Satu pengecualian yang dinyatakan** ([[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] T2, branch `feat/employee-kpi-target-insentif`, belum merge): sumber yang memang **memiliki** target sebuah metrik boleh meneruskannya lewat `Cuplikan.TargetSumber`, dan hanya bila ia mendaftar lewat `DaftarkanTargetSumber` (lihat §Target dari sumber di bawah). Ia tetap tidak menghitung nilai; yang berpindah cuma tempat targetnya ditulis.
+⚠️ **Satu pengecualian yang dinyatakan** ([[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] T2, PR [#1775](https://github.com/bip-itteam-internal/bip-erp/pull/1775) merged 2026-09-07, dev terverifikasi, prod belum): sumber yang memang **memiliki** target sebuah metrik boleh meneruskannya lewat `Cuplikan.TargetSumber`, dan hanya bila ia mendaftar lewat `DaftarkanTargetSumber` (lihat §Target dari sumber di bawah). Ia tetap tidak menghitung nilai; yang berpindah cuma tempat targetnya ditulis.
 
 ## Langkah 1: pastikan metriknya memang bisa
 
@@ -326,7 +326,7 @@ Yang tak terdaftar jatuh ke lapis berikutnya, **bukan nol**. Pemeriksaannya mema
 
 ### Target dari sumber: bila targetnya milik modul lain
 
-> 🟡 [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] T2, bip-erp branch `feat/employee-kpi-target-insentif`, **belum merge**.
+> ⚠️ [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] T2, bip-erp PR [#1775](https://github.com/bip-itteam-internal/bip-erp/pull/1775) **merged 2026-09-07, dev terverifikasi, prod belum**.
 
 Ketiga lapis di atas berlaku untuk target yang memang diputuskan di KPI. Ada metrik yang targetnya **sudah dimiliki modul lain** dan dipakai untuk hal lain juga: target profit per orang hidup di Master Target insentif karena menentukan tarif insentif. Menyalinnya ke template membuat dua orang mengetik satu angka di dua layar, dan terukur menyimpang (Agustus 2026: 13 dari 29 orang berbeda, 9 hanya di KPI). Untuk metrik seperti itu:
 
