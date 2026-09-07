@@ -266,6 +266,18 @@ sehingga siapa pun yang merancang layar dari dokumentasi tak punya cara mengetah
 - **Level agregasi berbeda dijumlah silang.** `/profit/products` (kode master, bundel dipecah),
   `/profit/items` (judul listing), `/profit/skus` (SKU master) menjawab pertanyaan berbeda atas
   koleksi yang sama. Hasil penjumlahannya tak berarti apa-apa tetapi tampak wajar.
+- ⛔ **Kunci join KOSONG yang cocok ke baris catch-all lalu DIJUMLAHKAN lintas baris.** Mekanisme
+  beda (bukan penamaan kolom) tapi gagalnya sekelas: angka biaya salah dan masuk akal, nol error.
+  Penjualan ber-`sku==""` di HPP insentif (`integration-service` `HitungHPPInsentif`) jatuh ke satu
+  bucket `komponen[""]` yang memuat SEMUA baris penyelamat (mapping `sku==""`, satu per produk),
+  lalu HPP tiap `master_sku` di dalamnya dijumlahkan seolah komponen bundle — padahal tiap baris
+  itu PRODUK BERBEDA yang mesti dipilih lewat atribut pembedanya (nama), bukan dijumlah. Digabung
+  satu order ber-`quantity` korup (item qty 40.046) → HPP Rp1,45 M atas nilai jual Rp7,9 jt;
+  realisasi orangnya −Rp1,16 M sementara KPI (skor tersimpan) tampak 100. ⚠️ Baris penyelamat
+  `sku==""` itu FITUR (`entity.PenyelamatTanpaSKU`), jadi perbaikannya di jalur HITUNG (cocokkan by
+  nama; tak cocok → `nilaiTanpaHPP`, bukan mengarang), BUKAN menolak baris penyelamat di ingesti.
+  `AggregateSKUSales` yang mem-`$group` hanya `by items.sku` membuang justru atribut pembedanya
+  (`product_name`). (prod 2026-09-07, PR #1769)
 
 **Yang dicari saat review:**
 
@@ -279,6 +291,10 @@ sehingga siapa pun yang merancang layar dari dokumentasi tak punya cara mengetah
    oleh yang merancang layar. Ini temuan, bukan catatan gaya.
 4. Test penjaganya. Pola yang benar sudah ada: `TestPembatalanTidakMengubahAngkaLaba` mengunci
    bahwa blok tambahan **tidak** menggeser angka laba.
+5. Kunci join yang boleh kosong/null (`sku`, `item_id`, diskriminator apa pun): nilai kosong tak
+   boleh mendarat di satu bucket lalu di-`sum` lintas baris. Cocokkan lewat atribut pembeda; tak
+   cocok → dikecualikan / "tanpa biaya", bukan mengarang. Waspadai `$group` yang membuang atribut
+   pembeda itu, dan `quantity`/qty yang tak diwaraskan (satu baris korup mengalikan biayanya).
 
 ⚠️ **Mengubah nama kolom atau menghapus salah satunya mengubah perilaku yang terlihat user**
 → masuk TANYAKAN DULU. Yang boleh langsung: menambah test penjaga, dan menaikkan aturan
