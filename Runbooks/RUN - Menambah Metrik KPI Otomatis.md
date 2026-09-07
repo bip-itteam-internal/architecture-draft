@@ -91,6 +91,8 @@ Arah+Target (satu pemilik)  -> nilai 0..100
 
 Sumber **tidak mengenal target dan tidak menghitung nilai**. Ia hanya melapor apa yang terukur dan berapa yang seharusnya terukur. Pemisahan itu disengaja: kalau sumber boleh menghitung nilai sendiri, sepuluh departemen akan melahirkan sepuluh semantik penilaian, dan skor KPI dibandingkan lintas departemen ("KPI Team minimal 70") sehingga perbedaan itu merusak perbandingannya secara diam-diam.
 
+🟡 **Satu pengecualian yang dinyatakan** ([[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] T2, branch `feat/employee-kpi-target-insentif`, belum merge): sumber yang memang **memiliki** target sebuah metrik boleh meneruskannya lewat `Cuplikan.TargetSumber`, dan hanya bila ia mendaftar lewat `DaftarkanTargetSumber` (lihat §Target dari sumber di bawah). Ia tetap tidak menghitung nilai; yang berpindah cuma tempat targetnya ditulis.
+
 ## Langkah 1: pastikan metriknya memang bisa
 
 Tanyakan tiga hal ini sebelum menulis kode. Ketiganya sudah pernah menjatuhkan pekerjaan di sini.
@@ -321,6 +323,19 @@ Yang tak terdaftar jatuh ke lapis berikutnya, **bukan nol**. Pemeriksaannya mema
 **Pakai `target_per_karyawan` untuk metrik NOMINAL, bukan untuk rasio.** Alasannya bukan kelenturan melainkan ketimpangan yang terukur: profit antar toko ICC Juli 2026 berentang **570×**, dari Rp342.585.503 sampai minus Rp3.471.743. Satu garis target di situ meloloskan pemegang toko besar dan menggagalkan sisanya tanpa ada kaitannya dengan kinerja. Metrik rasio (ROAS, persentase retur) sudah ternormalisasi, jadi target seragam justru yang benar di sana.
 
 ⚠️ **Target per karyawan menggeser bebannya, bukan menghapusnya.** Sekali dipakai, target tiap orang jadi keputusan yang harus dipertanggungjawabkan tiap periode dan tak lagi terbaca dari satu angka di template. Isi lewat tabel massal di form konfigurasi (erp-frontend PR [#832](https://github.com/bip-itteam-internal/erp-frontend/pull/832)), dan **pratinjau dulu sebarannya** sebelum menyimpan.
+
+### Target dari sumber: bila targetnya milik modul lain
+
+> 🟡 [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] T2, bip-erp branch `feat/employee-kpi-target-insentif`, **belum merge**.
+
+Ketiga lapis di atas berlaku untuk target yang memang diputuskan di KPI. Ada metrik yang targetnya **sudah dimiliki modul lain** dan dipakai untuk hal lain juga: target profit per orang hidup di Master Target insentif karena menentukan tarif insentif. Menyalinnya ke template membuat dua orang mengetik satu angka di dua layar, dan terukur menyimpang (Agustus 2026: 13 dari 29 orang berbeda, 9 hanya di KPI). Untuk metrik seperti itu:
+
+1. Di `init()` sumbermu, daftarkan: `DaftarkanTargetSumber(<nama sumber>, "<tempat target ditulis>", "<metrik>", ...)` (`services/employee/kpi_target_sumber.go`). `tempat` dipakai pesan galat supaya penilai tahu ke mana harus mengisi, mis. "Master Target insentif". Pendaftaran ganda atau tanpa metrik memanik saat boot.
+2. Di fungsi sumbermu, isi `c.TargetSumber = &target` **hanya bila** targetnya benar-benar ada dan positif. Nol atau kosong dibiarkan `nil`.
+3. Jangan sentuh template. Untuk metrik terdaftar, `hitungDariCuplikan` memakai `TargetSumber` dan **menolak jatuh ke `TargetBerlaku`**: `nil` berarti "belum dapat dihitung: target <metrik> belum diisi di <tempat> untuk periode <p>", kelas yang sama dengan data yang belum ada, bukan "gagal mengambil data". Sumber yang mengirim `TargetSumber` tanpa mendaftar ditolak dengan galat, bukan diam-diam dipakai.
+4. Target yang dipakai tersimpan di `KPIMetric.AutoTarget` dan ikut ke snapshot beku; `GET /kpi/auto-values`, `GET /kpi/score`, dan `/me/kpi-score` membacanya lewat `targetMetrik`. Katalog (`GET /kpi/sumber-katalog`) mengumumkan `target_dari_sumber[]` supaya form berhenti meminta target untuk metrik itu.
+
+Pendaftar pertama: `insentif_profit` untuk metrik `profit`, dari field `target` baris `/profit-dashboard` (`kpi_sumber_insentif_profit.go`). Metrik lain di sumber yang sama (`retur_persen`, `roas`) tetap bertarget template. Test yang menguncinya: `kpi_target_sumber_test.go` dan `TestSumberProfit_TargetDariInsentif`, dengan kontrol negatif fallback ke template dihidupkan sebentar membuat tiga test merah.
 
 ### Pratinjau sebelum menyimpan
 
