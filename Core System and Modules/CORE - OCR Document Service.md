@@ -93,10 +93,21 @@ membuka seluruh kebutuhan GPU di atas. Selama belum dijawab, jangan menjanjikan 
 | [[GA - Inventory Management]] dokumen kedatangan | pindaian / foto | ya, atau vision |
 | [[GA - Waste Management]] manifest | pindaian / foto | ya, atau vision |
 
-⚠️ Untuk CV: batas unggah **1 MB PDF** (`services/recruitment/public_handlers.go`) berarti CV
-hasil pindai kemungkinan besar **sudah ditolak di unggahan** sebelum sempat sampai ke OCR. Jadi
-"OCR fallback untuk CV scan" menjawab kasus yang mungkin belum benar-benar ada; ukur dulu berapa
-CV di prod yang tidak punya lapisan teks sebelum membangun cadangannya.
+⚠️ Untuk CV ada **DUA jalur unggah dengan penjaga yang sangat berbeda**, dan menyamakannya
+menyesatkan:
+
+| jalur | batas ukuran | pemeriksaan tipe |
+|---|---|---|
+| portal karir publik (`public_handlers.go`) | **1 MB** | ekstensi wajib `.pdf` |
+| unggah oleh HR (`uploadCandidateFile`) | **tidak ada** | **tidak ada** |
+
+Jadi CV hasil pindai memang sulit lewat portal publik, tetapi **bisa masuk tanpa hambatan lewat
+HR**, begitu pula DOCX atau JPG. Artinya kebutuhan "OCR fallback untuk CV scan" **nyata**, bukan
+kasus teoretis seperti yang sempat ditulis di sini berdasarkan batas 1 MB saja. Yang masih perlu
+diukur adalah frekuensinya di prod, bukan apakah mungkin.
+
+Sampai OCR ada, jalur penilaian CV menolak berkas semacam itu dengan alasan yang bisa dibaca
+(lapisan teks terlalu tipis, atau bukan PDF), bukan memberinya skor.
 
 ⚠️ Tahap `CV Screening` **sudah ada** di pipeline recruitment (`pipeline.go`) sebagai keadaan
 menunggu, jadi konsumennya sudah punya tempat mendarat. Yang belum ada cuma pengisinya.
