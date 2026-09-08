@@ -568,20 +568,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "c78a57e3100385b3a18e687a55a8eec80036c8de9d3cf1d3c8a1402ad7c2ee32",
-      "ukuran_kb": 36.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service, parameter query apa yang diterima tiap rute, dan bentuk balasannya seperti apa. Memuat daftar lengkap rute laba per level (toko, produk, SKU, item, kampanye, iklan), video termasuk mode rentang tanggal, live dan live-shift, retur, cohort, audiens, ambang, pagu, serta rute KPI yang dipakai penilaian karyawan. Juga menerangkan parameter mana yang sengaja DITOLAK 400 di rute tertentu berikut alasannya, dan cara mengaudit ulang kelengkapan daftar ini terhadap kode.",
+      "hash": "2f19d1a02b10bba3dcecd156fb8b359567dbeb8ad2c96a4e97f8b2298df71635",
+      "ukuran_kb": 36.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan marketing-analytics service (42 route lewat prefix gateway /api/marketing-analytics) beserta parameter, bentuk respons, dan kode galatnya: halaman depan /beranda dengan vonis laba lima nilai (tanpa_data, belum_matang, rugi, waspada, sehat), ambang keputusan /ambang, pagu belanja iklan /pagu, kurva alokasi, laba per toko/produk/item, video dan live, pencatatan sesi live host /live-shifts, retur, price floor, job/penjadwal, dan pengumpul KPI. Juga menjawab konvensi amplop respons (unavailable_channels, kolom_tidak_berlaku, 400 untuk enum tak dikenal, paginasi drill dengan total -1), siapa yang boleh menulis ambang dan pagu (RequireMarketingLeader), kenapa cpa_maks tersimpan tapi tak dibaca, dan cara mengaudit ulang kelengkapan daftar route terhadap kode.",
       "kata_kunci": [
         "marketing analytics",
-        "endpoint",
-        "API",
-        "route",
-        "laba per level",
-        "profit",
-        "video",
-        "rentang tanggal",
-        "KPI marketing",
-        "query parameter"
+        "endpoint / route API",
+        "beranda",
+        "vonis laba / belum_matang",
+        "ambang roas_min cpa_maks",
+        "pagu belanja iklan",
+        "kurva alokasi",
+        "live-shifts / sesi live host",
+        "profit shops products items",
+        "price floor"
       ]
     },
     {
@@ -2540,20 +2540,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "9eb07f94763a4fe09c6a284345fb4937b1348f79fdf868ebd78a87e8d4e63c41",
-      "ukuran_kb": 89.2,
-      "ringkasan": "Menjawab: bagaimana laba dan performa marketing diagregasi per toko, produk, kampanye, iklan, video, dan live ke koleksi `mart_*` supaya dashboard tak menghitung ulang tiap request, serta endpoint apa saja (41 route) yang tersedia. Juga menjawab aturan yang gampang salah: kenapa `integration_db` wajib baca-saja dan bagaimana penjagaannya, bagaimana vonis laba halaman depan ditentukan (lima keadaan termasuk `belum_matang` dan ambang materialitas), larangan hitung ganda antar-kolom (`iklan_sia_sia`, `pembatalan`, tiga angka penjualan live), penjadwal internal 48 jam, dan batas kejujuran data per channel.",
+      "hash": "531afad4f90da2ad168b3d78f4b52a2446a9ab3f812ce299f452714eb8cd006d",
+      "ukuran_kb": 90.1,
+      "ringkasan": "Menjawab: bagaimana marketing-analytics service dibangun dan kenapa begitu: membaca integration_db secara baca-saja (dijaga tiga lapis termasuk uji AST) lalu menyimpan pre-agregasi ke koleksi mart_* di marketing_analytics_db, penjadwal internal 48 jam dan job sync per channel (TikTok, Shopee, Lazada), alokasi bundel dan mapping SKU, serta /health yang turun ke degraded bila index unik gagal. Juga menjawab kenapa vonis beranda punya lima keadaan dan bagaimana aturan belum_matang dengan ambang materialitas 5% lahir dari empat iterasi, kapan hari WIB dipakai dan kapan UTC, larangan hitung ganda antar angka (24h_live_gmv, tiga angka penjualan live, iklan_sia_sia, pembatalan, kepemilikan vs collaboration_type), kejujuran data revenue TikTok vs Shopee, serta bagaimana pencatatan sesi live host dan siaran serentak dirancang, siapa personanya, dan apa yang belum diimplementasikan.",
       "kata_kunci": [
-        "marketing analytics",
-        "mart_",
-        "laba",
-        "gross profit",
-        "ROAS",
-        "dashboard marketing",
-        "live session",
-        "hitung ganda",
-        "penjadwal",
-        "beranda"
+        "marketing analytics service",
+        "mart_* / mart_profit_attribution",
+        "marketing_analytics_db",
+        "integration_db baca-saja / read-only",
+        "penjadwal 48 jam / job sync",
+        "TikTok Shopee Lazada",
+        "belum_matang / ambang materialitas",
+        "hitung ganda / double counting",
+        "iklan_sia_sia / pembatalan",
+        "live-shifts / sesi live host"
       ]
     },
     {
