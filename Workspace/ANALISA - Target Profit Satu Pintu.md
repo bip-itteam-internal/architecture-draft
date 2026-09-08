@@ -28,6 +28,7 @@ Gerbang tulis hidup di `shared-library`, jadi **insentive-service dan employee-s
 - **Gerbang kolom**: `realisasi` tetap dari insentif dengan `mode=bergeser`; hanya target yang disatukan. Jangan menyentuh rumus profit.
 
 ### T3. Cabut alur target-marketing di backend
+- **Status 2026-09-08**: ✅ di kode sebagai **PR C** (bip-erp [#1788](https://github.com/bip-itteam-internal/bip-erp/pull/1788), draft bertumpuk di atas PR A #1783): 6 berkas + `Collections.KPITargetMarketing` dihapus, `POST /kpi/auto-values/pratinjau` ikut dicabut (pemanggilnya hilang di #1484), penolakan 400 §7 dinyalakan (`bersihkanTargetTransisi = false`, test pengunci + kontrol negatif). Koleksi prod nol dokumen, tak ada yang di-drop. Build 4 service pengimpor `models/employee` lolos. **Merge hanya sesudah PR A dan PR B live prod.**
 - **Repo**: bip-erp, `services/employee/kpi_target_marketing.go`, `kpi_target_marketing_routes.go`, model `shared-library/models/employee/kpi_target_marketing.go`, pendaftaran rute di `main.go`.
 - **Isi**: rute `GET/POST/PUT/PATCH /kpi/target-marketing*` dicabut; koleksi `kpi_target_marketing` (nol dokumen di prod, ukur ulang sebelum menghapus) dihapus; `materialisasiTargetDisetujui` dan `posisiDibreakdown` ikut hilang.
 - **Verifikasi**: `git grep` nol rujukan tersisa; rute lewat gateway membalas 404 (bukan 200 berisi data kosong).
