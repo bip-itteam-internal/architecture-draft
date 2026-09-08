@@ -16,3 +16,7 @@ __pycache__/
 .pytest_cache/
 VAULT-INDEX.tugas*.json
 VAULT-INDEX.hasil*.json
+
+# Artefak lokal agent-kit (/plan, papan sesi) — bukan bagian vault, sengaja
+# nyasar ke sini saat cwd sesi tidak balik ke root workspace erp/.
+.task-plans/
