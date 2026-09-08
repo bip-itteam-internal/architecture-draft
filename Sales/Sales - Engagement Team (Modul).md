@@ -64,7 +64,7 @@ Tim ini **flat, tanpa lead** — tak ada satu orang pun yang bisa dijadikan tuju
 
 ⚠️ **Peran adalah relasi terhadap tiket, bukan jabatan orangnya.** Orang yang sama bisa jadi pemohon di satu tiket dan pengerja di tiket lain; yang menentukan wewenangnya adalah `requester_id`/`assigned_to` pada tiket yang sedang disentuh. Gerbang rute hanya membuka pintu (`staff`/`supervisor`/`admin`); keputusan sebenarnya ada di handler.
 
-⚠️ **Menu tak menyaring siapa pun.** Ketiga persona di atas memakai izin menu yang sama (`IZIN_MARKETING.po`, sama dengan "PO Barang Jadi" dan "Target Marketing"), dan halamannya menampilkan tab berbeda menurut peran orang pada tiap tiket — bukan menurut izin.
+⚠️ **Menu tak menyaring siapa pun.** Ketiga persona di atas memakai izin menu yang sama (`IZIN_MARKETING.po`, sama dengan "PO Barang Jadi"; menu "Target Marketing" yang dulu seizin ini sudah dicabut, [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] §6), dan halamannya menampilkan tab berbeda menurut peran orang pada tiap tiket — bukan menurut izin.
 
 ## Sejarah Rename: Buzzer → Engagement Team
 

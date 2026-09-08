@@ -385,7 +385,7 @@ Kelas kekeliruan yang sama dengan metrik temuan pajak: sumber datanya ada, tetap
 
 ### Nol perubahan frontend — dan itu fakta terpenting bagi yang mengerjakannya
 
-Jalur AR **tidak menuntut satu baris frontend pun**. Seluruh UI otomasi KPI sudah terbangun di `erp-frontend`: halaman `/hris/kpi/otomasi`, `auto-overview-view`, `konfigurasi-otomatis-field`, `use-sumber-katalog`, `use-pratinjau-otomatis`, `target-massal-modal`, dan `score-form` yang menampilkan `auto_value` — seluruhnya beserta test.
+Jalur AR **tidak menuntut satu baris frontend pun**. Seluruh UI otomasi KPI sudah terbangun di `erp-frontend`: halaman `/hris/kpi/otomasi`, `auto-overview-view`, Atur Target per karyawan (`atur-target-inline`), `use-sumber-katalog`, dan `score-form` yang menampilkan `auto_value` — seluruhnya beserta test. (`konfigurasi-otomatis-field`, `use-pratinjau-otomatis`, dan `target-massal-modal` yang dulu disebut di sini sudah dicabut sebagai rantai yatim, erp-frontend PR [#1484](https://github.com/bip-itteam-internal/erp-frontend/pull/1484).)
 
 Dropdown pilihan sumber **mengisi dirinya sendiri** dari `GET /kpi/sumber-katalog`. Jadi begitu `kinerja_finance` didaftarkan lewat `DaftarkanSumberBermetrik`, sumber itu muncul di layar konfigurasi beserta daftar metriknya, tanpa menyentuh frontend. Skornya tampil di halaman yang sudah ada (`/hris/kpi` dan `/finance/kpi` yang terkunci ke departemen Finance).
 
