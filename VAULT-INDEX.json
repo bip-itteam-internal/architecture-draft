@@ -110,20 +110,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "3c9ac3e4f3f2840c92f8f31263b19f741db387c1aa172470c8d9a1927c85a8bd",
-      "ukuran_kb": 51.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service lewat gateway `/api/employee/*` (login PIN/biometrik, onboarding, CRUD personal dan work data, dokumen, jadwal kerja, akun dan perangkat, master departemen/system role/job level, penyetuju departemen, akun vendor, KPI, cuti, resign, promosi-mutasi, surat peringatan) dan RBAC mana yang menjaga tiap rute. Juga menjelaskan perilaku khusus yang sering salah dipakai: `department?grouped=true` untuk label grup, `PUT` master departemen yang mempertahankan `supervised_by`, `menu-hidden` dan `level` posisi sebagai setelan tampilan bukan hak akses, `approver` sebagai satu-satunya penulis `is_supervisor`, serta rute `/internal/` lintas-service (department-approver, permission-holders) beserta bentuk responsnya.",
+      "hash": "94b606401051eb42a86a0d6a0c58b40fb77491e651299d753b5853078ac8e2fd",
+      "ukuran_kb": 51.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki employee-service di balik gateway `/api/employee/*` untuk login/refresh/PIN, onboarding, CRUD personal_data dan work_data, dokumen, jadwal kerja, kelola akun (active-status, forget-device, reset, roles), serta master data departemen, system role, jenjang jabatan, menu-hidden, dan penyetuju pengajuan. Juga menjawab RBAC yang menjaga tiap rute (RequireHRISStaff, RequireITStaff, RequireHRISOrITSupervisor, RequireKPIDepartmentRBAC), parameter khusus seperti `grouped=true` dan `all=true` pada `/data-type`, dan kontrak rute internal lintas-service (`/internal/department-approver`, `/internal/permission-holders`) yang dipakai form-builder dan procurement.",
       "kata_kunci": [
         "employee-service",
+        "API employee",
         "endpoint karyawan",
-        "employee API",
-        "auth login PIN biometrik",
-        "work_data personal_data",
-        "master departemen",
-        "penyetuju departemen",
+        "auth login refresh PIN",
+        "master departments",
+        "system roles",
+        "data-type department grouped",
         "department approver",
-        "system roles RBAC",
-        "menu-hidden"
+        "permission holders",
+        "RBAC HRIS IT"
       ]
     },
     {
@@ -1437,23 +1437,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "e01f4deddf5906c8bfb8a909b7497eaf5f76ccbae25cc03ab94f69837b4a56b0",
-      "ukuran_kb": 403.9,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS `erp-frontend` (One Bharata), stack apa yang dipakai (Next.js App Router, shadcn/ui, TanStack Query, react-i18next), bagaimana login, cookie `system_roles`, SSO ticket, dan role gating sidebar bekerja, serta bagaimana menu HRIS dan Pengaturan HRGA terpusat dikelompokkan dan digerbang per tab. Juga menjawab konvensi data-fetching TanStack Query (hook sidebar ber-`enabled`, badge dengan refetchOnWindowFocus, pencacah membalas angka), konvensi bagan Recharts lewat `ChartContainer`, dukungan multi-perusahaan (CompanySwitcher, kelola perusahaan, shift, WiFi per tenant), dan modul mana yang sudah diimplementasikan atau masih catatan.",
+      "hash": "fd8f6bdf70eacb91229bd1d16cbd6ac07c9d3804fd639ac1c19928915d0d7538",
+      "ukuran_kb": 404.0,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS `hris-dashboard` (One Bharata), stack teknologinya (Next.js App Router, React, shadcn/ui, TanStack Query, react-i18next), bagaimana login, cookie `system_roles`, dan peran SSO Identity Provider bekerja, serta modul mana yang di-gate role apa di sidebar. Juga menjawab konvensi frontend yang mengikat: struktur menu induk bersarang dan halaman Pengaturan HRGA terpusat (sub-menu dan tab per gerbang backend), aturan data-fetching TanStack Query untuk hook sidebar dan badge, konvensi bagan Recharts lewat ChartContainer, dan dukungan multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/WiFi per tenant).",
       "kata_kunci": [
         "erp-frontend",
-        "Web ERP",
+        "web ERP",
         "One Bharata",
         "hris-dashboard",
-        "Next.js",
-        "SSO",
-        "system_roles",
-        "sidebar",
-        "role gating",
+        "Next.js frontend",
+        "SSO identity provider",
+        "system_roles cookie",
+        "sidebar menu role gating",
         "Pengaturan HRGA",
-        "multi-tenant",
-        "TanStack Query",
-        "Recharts"
+        "TanStack Query"
       ]
     },
     {
@@ -2142,23 +2139,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "333f0e8f449c37dba46534c669d2cdde7433137afa855cc4b3fc5e55f34607ad",
-      "ukuran_kb": 121.9,
-      "ringkasan": "Menjawab: apa peran employee-service sebagai master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding (SSO) di bip-erp, dan fitur apa saja yang dimilikinya: auth/registration, account admin IT (active-status, forget-device, reset, roles), master data departemen dan system role beserta seed-nya, KPI, kontrak, BPJS, vacation quota, multi-tenant, akun pihak luar, dan resign. Juga menjawab workspace posisi mana yang di-host di service ini alih-alih service baru (Legal perizinan/kontrak/dispute, R&D Regulatory, Quality CAPA/incoming/batch release, register Procurement non-Accurate), gerbang izin apa yang dipakainya, serta dependensi dan integrasinya dengan service lain.",
+      "hash": "938bfe222a544384755510e662aa4b254ee517c6e4fd41f748a2f9d0af7565b7",
+      "ukuran_kb": 122.2,
+      "ringkasan": "Menjawab: apa tanggung jawab employee-service sebagai master data karyawan dan sumber kebenaran autentikasi/onboarding (login username, PIN, biometric, registrasi, password hashing), fitur admin akun untuk IT (active-status, forget-device, reset, roles), dan master data departemen/system role beserta seed otomatisnya. Juga menjawab kenapa workspace Legal, R&D Regulatory, Quality, dan register Procurement non-Accurate di-host di service ini, koleksi dan model apa yang dipakai masing-masing beserta gerbangnya, serta bagaimana multi-perusahaan, akun pihak luar (vendor/mitra), dan resign/non-aktif karyawan ditangani di service ini.",
       "kata_kunci": [
+        "employee-service",
         "employee service",
         "master data karyawan",
-        "autentikasi / authentication SSO",
+        "autentikasi",
+        "authentication login PIN biometric",
         "onboarding register",
-        "account admin forget-device reset",
-        "master_department master_system_role",
-        "legal perizinan kontrak dispute",
-        "rnd regulatory",
-        "quality CAPA incoming batch release",
-        "procurement kontrak vendor cost saving",
-        "multi-tenant company_id",
-        "akun vendor / mitra",
-        "Go Fiber MongoDB"
+        "account admin IT",
+        "master department system role",
+        "legal rnd quality procurement register",
+        "resign non-aktif karyawan"
       ]
     },
     {
@@ -5768,8 +5762,8 @@
       "judul": "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui manajemen 2026-09-07 lewat wawancara `/analisa-kebutuhan`. **T1 (gerbang tulis per level dan divisi)** di bip-erp PR [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767) (**merged 2026-09-08 06:59 WIB, live di prod 07:03 WIB**; terverifikasi prod baca-saja: SPV Beauty Hacks menulis dirinya → 403 \"tidak boleh menulis target diri sendiri\", menulis level supervisor → 403 \"level supervisor hanya boleh ditulis Finance, IT, atau Direktur\", target yang ada tak berubah; jalur positif SPV menulis icc divisinya belum dicoba di prod karena itu menulis data); **T4 (Master Target per orang, sekaligus Dashboard Insentif, struktur HRIS + i18n) sudah dikodekan** di erp-frontend PR [#1473](https://github.com/bip-itteam-internal/erp-frontend/pull/1473) (**merged dan live di prod 2026-09-07 23:16 WIB**; jendela 403 pensil Supervisor karena dimerge sebelum #1767 tertutup sejak T1 live prod 2026-09-08 07:03 WIB); **T2 (KPI membaca target dari sumber insentif) sudah dikodekan** di bip-erp PR [#1775](https://github.com/bip-itteam-internal/bip-erp/pull/1775) (**merged 2026-09-07 14:42 UTC** ke `main` ce30a716; **live di dev 21:44 WIB dan di prod 22:16 WIB, keduanya terverifikasi 2026-09-07**: di prod `auto_target` Aan Budiyanto Agustus 44 jt (insentif) bukan 88 jt (template), Silvia 165 jt bukan 116,89 jt, Aan September \"belum dapat dihitung: target profit belum diisi di Master Target insentif\", skor beku Annisa Agustus tak berubah; lihat catatan transisi di §3 dan §7); **T5 backend (PR A, bip-erp [#1783](https://github.com/bip-itteam-internal/bip-erp/pull/1783)) dan T5 frontend + T6 (PR B, erp-frontend [#1484](https://github.com/bip-itteam-internal/erp-frontend/pull/1484)) di kode, dan T3 + penolakan §7 (PR C, bip-erp [#1788](https://github.com/bip-itteam-internal/bip-erp/pull/1788), draft bertumpuk di atas PR A), ketiganya belum merge per 2026-09-08** (lihat §3 dan §6 \"Sebagaimana dikodekan\"); urutan merge dan deploy WAJIB A → B → C. Daftar task: `Workspace/ANALISA - Target Profit Satu Pintu.md` (papan kerja, bukan dok terbit).",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — seluruh T1 sampai T6 sudah di `main` per 2026-09-08 malam; T1, T2, T4 live prod, T3/T5/T6 (PR A/B/C) menunggu deploy prod, T7 sinkron dok menyusul. Disetujui manajemen 2026-09-07 lewat wawancara `/analisa-kebutuhan`. **T1 (gerbang tulis per level dan divisi)** di bip-erp PR [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767) (**merged 2026-09-08 06:59 WIB, live di prod 07:03 WIB**; terverifikasi prod baca-saja: SPV Beauty Hacks menulis dirinya → 403 \"tidak boleh menulis target diri sendiri\", menulis level supervisor → 403 \"level supervisor hanya boleh ditulis Finance, IT, atau Direktur\", target yang ada tak berubah; jalur positif SPV menulis icc divisinya belum dicoba di prod karena itu menulis data); **T4 (Master Target per orang, sekaligus Dashboard Insentif, struktur HRIS + i18n) sudah dikodekan** di erp-frontend PR [#1473](https://github.com/bip-itteam-internal/erp-frontend/pull/1473) (**merged dan live di prod 2026-09-07 23:16 WIB**; jendela 403 pensil Supervisor karena dimerge sebelum #1767 tertutup sejak T1 live prod 2026-09-08 07:03 WIB); **T2 (KPI membaca target dari sumber insentif) sudah dikodekan** di bip-erp PR [#1775](https://github.com/bip-itteam-internal/bip-erp/pull/1775) (**merged 2026-09-07 14:42 UTC** ke `main` ce30a716; **live di dev 21:44 WIB dan di prod 22:16 WIB, keduanya terverifikasi 2026-09-07**: di prod `auto_target` Aan Budiyanto Agustus 44 jt (insentif) bukan 88 jt (template), Silvia 165 jt bukan 116,89 jt, Aan September \"belum dapat dihitung: target profit belum diisi di Master Target insentif\", skor beku Annisa Agustus tak berubah; lihat catatan transisi di §3 dan §7); **T5 backend (PR A, bip-erp [#1783](https://github.com/bip-itteam-internal/bip-erp/pull/1783)) dan T5 frontend + T6 (PR B, erp-frontend [#1484](https://github.com/bip-itteam-internal/erp-frontend/pull/1484)) di kode, dan T3 + penolakan §7 (PR C, bip-erp [#1788](https://github.com/bip-itteam-internal/bip-erp/pull/1788)) **merged berurutan 2026-09-08 malam, belum deploy prod saat ditulis** (lihat §3 dan §6 \"Sebagaimana dikodekan\"); karena A dan C kini satu biner employee-service, deploy backend dan frontend-hris harus berdampingan. Daftar task: `Workspace/ANALISA - Target Profit Satu Pintu.md` (papan kerja, bukan dok terbit).",
       "publik": true,
       "tautan": [
         "Finance - Incentive",
@@ -5786,20 +5780,20 @@
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "APP - Web ERP"
       ],
-      "hash": "d19e4c214ae8d009498dfc11d69675ec9e31d75bc4d8cc0240e6843f957bc539",
-      "ukuran_kb": 22.5,
-      "ringkasan": "Menjawab: kenapa target profit tim marketing hanya ditulis satu kali di Master Target insentif (koleksi target insentive-service) dan tidak lagi di template KPI, siapa yang boleh menulis target level mana (SPV Marketing untuk icc/leader di divisinya, Finance/IT/Direktur untuk SPV, tak seorang pun untuk dirinya sendiri), bagaimana sumber KPI `insentif_profit` membaca target itu dan memperlakukan target yang belum diisi sebagai belum bisa dinilai, serta kenapa alur target-marketing berjenjang Finance-SPV-Direktur dipensiunkan. Juga menjelaskan konsekuensinya: skor beku tidak dihitung ulang, realisasi tetap dua angka dengan jendela berbeda, dan urutan merge/deploy PR yang mengikat.",
+      "hash": "596d37aee9a43d1c62777259992cb037b9df9686b6a106dc9d40e65dfa54b155",
+      "ukuran_kb": 22.9,
+      "ringkasan": "Menjawab: kenapa target profit tim marketing hanya ditulis di satu tempat (koleksi target milik insentive-service) dan sumber KPI `insentif_profit` membacanya alih-alih menyimpan target di template KPI, siapa yang berwenang menulis target tiap level (SPV Marketing untuk icc/leader divisinya, Finance/IT/Direktur untuk supervisor, tak seorang pun menulis targetnya sendiri), dan kenapa alur target-marketing berjenjang Finance, SPV, Direktur dipensiunkan. Juga menjawab apa yang terjadi bila target belum diisi (metrik tidak dinilai, bukan jatuh ke bawaan), bagaimana snapshot skor beku menyimpan target yang dipakai, dan mana yang sengaja tidak disatukan (realisasi tetap dua angka karena jendela periode berbeda).",
       "kata_kunci": [
         "target profit",
         "profit target",
-        "insentif",
-        "incentive",
-        "KPI marketing",
-        "Master Target",
-        "SPV Beauty Hacks Kyura",
+        "satu pintu",
+        "insentif KPI",
+        "incentive_profit_targets",
+        "gerbang tulis target",
+        "SPV marketing",
         "target-marketing dipensiunkan",
         "insentif_profit",
-        "satu pintu single source"
+        "ADR 0079"
       ]
     },
     {
@@ -6974,20 +6968,20 @@
         "RUN - Menambah Metrik KPI Otomatis",
         "HRIS - Key Performance Index"
       ],
-      "hash": "8a8f79a6e0bde9b680dfe56c2a4d80bfd476554c3e9a4ecb612eb9a347b8d8f5",
+      "hash": "054f12103749f5eb0ed689b943d4bf2f627c37e5418c9d9e38c527dabe05ba44",
       "ukuran_kb": 9.9,
-      "ringkasan": "Menjawab: bagaimana skor KPI terisi otomatis dari data kerja sehari-hari dalam lima langkah, kenapa skor bisa kosong padahal matriksnya lengkap (aplikasi tidak dipakai penuh, sistem tak tahu data milik siapa, metrik mustahil diukur), dan bagaimana metrik tim `skor_tim` berantai dari skor anggota dengan mekanisme cakupan yang menurunkan skor atasan bila anggotanya belum dinilai. Menunjuk ke tiga diagram Excalidraw (gambaran besar untuk non-teknis, rinci untuk dev, khusus marketing Beauty Hacks/Kyura yang menunjukkan tahap mana yang tersendat) dan menjelaskan pertanyaan yang dijawab tiap diagram.",
+      "ringkasan": "Menjawab: bagaimana skor KPI terisi otomatis dari pekerjaan sehari-hari sampai angka di layar, dalam tiga diagram Excalidraw (gambaran besar untuk SPV/HR/direksi, alur rinci sembilan langkah employee-service untuk dev, dan versi marketing Beauty Hacks/Kyura beserta tahap mana yang tersendat). Juga menjawab kenapa skor otomatis belum terisi padahal matriks sudah lengkap (tiga syarat non-kode: aplikasi dipakai, sistem tahu pemilik data, metrik bisa diukur), kenapa skor tim atasan turun bila anggotanya belum dinilai (mekanisme cakupan/populasi pada `skor_tim`), dan mengapa skor otomatis hanya usulan, bukan skor final.",
       "kata_kunci": [
         "alur KPI otomatis",
         "diagram KPI",
         "excalidraw",
-        "skor otomatis",
-        "auto score",
+        "skor KPI otomatis",
+        "auto KPI flow",
         "skor_tim",
-        "cakupan",
-        "coverage",
-        "KPI marketing Beauty Hacks Kyura",
-        "metrik tim"
+        "cakupan tim coverage",
+        "populasi metrik tim",
+        "marketing Beauty Hacks Kyura",
+        "kenapa skor belum terisi"
       ]
     },
     {
@@ -7614,25 +7608,20 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "c018dd0eafa71180041dfc10f775005c038ec70427755ec6b59e4ea73f986825",
-      "ukuran_kb": 46.4,
-      "ringkasan": "Menjawab: apa beda engine KPI ke insentif tim marketing (insentive-service, 9 role) dengan appraisal per-karyawan lintas departemen (employee-service `/kpi/*`), bagaimana template per posisi, scoring per periode `YYYY-MM`, snapshot template ke `kpi_score`, dan kolom `employee_count` (assignment aktual, bukan kelayakan posisi) bekerja. Juga menjawab aturan posisi template wajib sama dengan posisi karyawan pada periode itu (`posisi_periode` dari `employee_movement`), RBAC per departemen termasuk CSV multi-departemen, cakupan tim untuk Leader (`scope=team`, gerbangnya keberadaan bawahan), tampilan gabungan HRGA dari master data, dan bagian appraisal bulanan mana yang masih konsep (siklus wajib, workflow review supervisor ke HR).",
+      "hash": "6dcad9dd0f7aa93bdfb5a31f1189d966f950f7fe15d859b9cda2bf4367d86cce",
+      "ukuran_kb": 46.5,
+      "ringkasan": "Menjawab: bagaimana penilaian kinerja KPI bekerja di ERP, dengan pemisahan tegas antara engine skor ke insentif marketing (insentive-service, 9 role marketing) dan appraisal per-karyawan lintas departemen (employee-service `/kpi/*`: template per posisi, scoring per periode `YYYY-MM`, snapshot template ke `kpi_score`). Juga menjawab aturan kunci seperti posisi template wajib sama dengan jabatan karyawan pada periode yang dinilai (dari `employee_movement`, field `posisi_periode`), arti kolom `employee_count` pada daftar template, RBAC per departemen dan cakupan tim untuk Leader (`scope=team`), serta kenapa Human Resource dan General Affair tampil menyatu sebagai HRGA.",
       "kata_kunci": [
         "KPI",
-        "Key Performance Index",
-        "appraisal",
+        "key performance index",
         "penilaian kinerja",
-        "kpi_template",
+        "appraisal",
+        "kpi template per posisi",
         "kpi_score",
-        "template per posisi",
-        "scoring",
-        "employee_count",
+        "scoring per periode",
         "posisi_periode",
-        "scope=team",
-        "Leader",
-        "HRGA",
-        "RequireKPIDepartmentRBAC",
-        "insentif marketing"
+        "scope team leader",
+        "HRGA gabungan"
       ]
     },
     {
@@ -7884,20 +7873,20 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "7b37652fb1e94d323761c79c6f5e39ad1c1eaf516d98c0daceaf1dfdc865e9f6",
-      "ukuran_kb": 140.3,
-      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di produksi, mana yang sudah bisa diisi otomatis, mana yang modulnya ada tapi datanya kosong, mana yang tak punya sumber sama sekali, dan metrik otomatis mana yang sudah menyala per posisi beserta sumber, formula, scope, dan targetnya. Juga menjelaskan kenapa sebuah sumber gagal hitung dan bagaimana tiga jalur perhitungan skor bisa melahirkan angka berbeda, tiga jenis baris `Rincian` yang artinya berbeda, layar diagnostik Otomasi KPI, cara HR mengisi konfigurasi sendiri lewat katalog dan pratinjau, perubahan profit KPI yang dibaca dari insentif, kesalahan arah target, dan progres bulan berjalan di MyBharata.",
+      "hash": "5868e34a038c7fa6d6619b450ddc01f2671464020e80e8fac8ca5846917df3eb",
+      "ukuran_kb": 140.4,
+      "ringkasan": "Menjawab: dari 311 metrik KPI yang terpasang di produksi, mana yang sumber datanya sudah ada, mana yang modulnya ada tapi datanya kosong, dan mana yang tak punya sumber sama sekali, beserta metrik mana yang menyala otomatis (posisi, sumber, formula, scope, target). Juga menjawab kenapa sebuah metrik gagal hitung dan bagaimana membedakannya dari data yang belum ada, tiga jalur perhitungan skor yang harus satu rumus, tiga jenis baris `Rincian` yang artinya berbeda, cara kerja layar diagnostik Otomasi KPI, bagaimana HR mengisi konfigurasi sendiri (katalog sumber, pratinjau, target per karyawan), serta perubahan profit KPI yang dibaca dari insentif dan kesalahan arah target yang pernah terjadi.",
       "kata_kunci": [
         "otomasi KPI",
         "KPI automation",
         "auto-values",
         "skor otomatis",
+        "sumber metrik data source",
         "kpi_template auto",
-        "sumber KPI",
-        "kinerja_tiket",
-        "kinerja_toko",
-        "insentif_profit",
-        "klasifikasi 311 metrik"
+        "klasifikasi 311 metrik",
+        "layar diagnostik Otomasi KPI",
+        "sumber-katalog",
+        "kinerja_toko insentif_profit"
       ]
     },
     {
@@ -10691,20 +10680,20 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "68c4ff55e824611bf64d106ba41554540bf49e4fb7285f214affe6ee3d0793ca",
-      "ukuran_kb": 45.4,
-      "ringkasan": "Menjawab: bagaimana dev departemen menambahkan satu metrik KPI otomatis baru langkah demi langkah, yaitu memastikan metriknya memang bisa, mendaftarkan sumber lewat `DaftarkanSumberBermetrik`, mengisi konfigurasi `auto` dengan reduksi, arah target, dan target berlapis (`TargetBerlaku`, target dari sumber), serta kapan harus membuat sumber baru versus menambah `Metrik` pada sumber yang ada. Juga menjelaskan model mental kenapa KPI dihitung ulang bukan diakumulasi harian, cetak biru rute bila datanya di service lain, service key yang kosong di dev, kesalahan yang pernah terjadi, dan checklist sebelum PR.",
+      "hash": "38d13a3c0a42c71a0065bee1df09e9de13bf8cdf6f9541cdd1ecb0fa2c172fd8",
+      "ukuran_kb": 45.3,
+      "ringkasan": "Menjawab: bagaimana dev departemen menambahkan satu metrik KPI yang terisi otomatis, langkah demi langkah (memastikan metriknya bisa diukur, mendaftarkan sumber lewat `DaftarkanSumberBermetrik`, mengisi konfigurasi `auto` di template), dan sumber mana yang bisa dicontoh untuk tiap pola (data lokal, HTTP ke service lain, satu sumber banyak metrik, cakupan bukan orang, cakupan ratusan orang, sumber yang menuntut perubahan di service seberang). Juga menjawab model mental kenapa tidak ada tabel penampung dan skor dihitung ulang bukan diakumulasi harian, katalog reduksi dan arah target yang paling sering salah, target berlapis (per karyawan, per periode, umum, dari sumber), aturan yang tak boleh dilanggar, kesalahan yang pernah terjadi, dan checklist sebelum PR.",
       "kata_kunci": [
         "menambah metrik KPI",
-        "add KPI metric",
+        "runbook KPI otomatis",
         "sumber KPI",
         "KPIAutoConfig",
         "DaftarkanSumberBermetrik",
         "reduksi",
         "arah target",
         "TargetBerlaku",
-        "runbook KPI",
-        "kinerja_toko kinerja_tiket"
+        "service key dev prod",
+        "checklist PR KPI"
       ]
     },
     {
@@ -12730,20 +12719,20 @@
         "APP - Web ERP",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "333bce3b042ab6ca9c24d81ca06189f86bfd18dcf8ca7662b0976078363d3a99",
-      "ukuran_kb": 18.1,
-      "ringkasan": "Menjawab: task apa saja (T1 sampai T7) yang diturunkan dari ADR 0079 untuk menyatukan target profit marketing ke insentif, di repo dan berkas mana tiap task dikerjakan, apa isi, test, dan cara verifikasinya, serta urutan deploy yang mengikat (insentive-service dan employee-service naik bersama, lalu erp-frontend, lalu pencabutan). Juga mencatat PR tiap task beserta bukti verifikasinya di dev dan prod, pengukuran yang membuktikan selesai, catatan lanjutan dari review T1, dan apa yang sengaja di luar lingkup.",
+      "hash": "f620fff5aa513c5ae1d2ed566ad5ed50bd01faaf8c0341556db772c1757fd3bd",
+      "ukuran_kb": 18.3,
+      "ringkasan": "Menjawab: task apa saja (T1 sampai T7) yang menurunkan keputusan ADR 0079 tentang target profit satu pintu, di repo dan berkas mana masing-masing dikerjakan, apa isi, test, verifikasi, dan dependensinya, serta urutan deploy yang mengikat (insentive-service dan employee-service naik bersama, lalu frontend, lalu pencabutan alur target-marketing). Juga menjawab kebutuhan bisnis yang dijawabnya (target diketik di dua tempat dan menyimpang), pengukuran yang membuktikan selesai, catatan lanjutan dari review, dan apa yang sengaja di luar lingkup beserta alasannya.",
       "kata_kunci": [
-        "target profit",
-        "satu pintu",
-        "daftar task",
-        "ANALISA",
-        "ADR 0079",
-        "gerbang tulis target",
-        "insentive-service",
+        "target profit satu pintu",
+        "analisa kebutuhan",
+        "daftar task T1-T7",
+        "papan kerja",
+        "gerbang target insentif",
+        "KPI target dari insentif",
         "target-marketing dicabut",
-        "Master Target",
-        "papan kerja"
+        "master target per orang",
+        "urutan deploy",
+        "ADR 0079"
       ]
     },
     {
