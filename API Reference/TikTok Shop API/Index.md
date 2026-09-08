@@ -18,6 +18,8 @@ Base: `https://open-api.tiktokglobalshop.com`. Auth & sign: lihat `README.md`.
 | return_refund | POST | `/return_refund/202602/returns/search` | **cari retur** (milestone, resi retur, status) — lihat `Endpoints/return_refund.returns_search.md` | `tiktok_return_usecase` |
 | product | GET | `/product/202309/products/{product_id}` | detail produk | `tiktok_client` |
 | finance | GET | `/finance/202309/withdrawals` | riwayat penarikan dana | `tiktok_withdrawal_client` |
+| finance | GET | `/finance/202309/statements` | **daftar statement** (batch pencairan) satu toko dalam rentang — satu-satunya cara MENANYAKAN nomor statement; lihat `Endpoints/finance.get_statements.md` | `tiktok_client.GetStatements` (`cmd/statementdiscover`) |
+| finance | GET | `/finance/202501/statements/{statement_id}/statement_transactions` | isi satu statement (transaksi per pesanan + baris penyesuaian); param wajib `sort_field=order_create_time` | `tiktok_client.GetStatementTransactions` |
 | analytics | GET | `/analytics/202509/shop_products/{id}/performance` | performa 1 produk | `tiktok_business_client` |
 | analytics | POST | `/analytics/202605/shop_products/performance` | performa produk (batch) | `tiktok_business_client` |
 | analytics | POST | `/analytics/202605/shop_videos/performance` | performa video | `tiktok_business_client` |
