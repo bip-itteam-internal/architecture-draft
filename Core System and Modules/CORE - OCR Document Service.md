@@ -15,6 +15,126 @@
 
 ---
 
+## Temuan terukur 2026-09-08
+
+> Bagian ini ditambahkan setelah blueprint di bawahnya, dan **mengoreksi sebagian asumsinya**.
+> Blueprint (bagian 1 sampai 8) ditulis sebelum ada pengukuran ke infrastruktur nyata; ia
+> dipertahankan apa adanya sebagai riwayat pertimbangan. Bila keduanya bertentangan, **bagian
+> ini yang berlaku**, karena angkanya diukur.
+
+### Blueprint ini mencampur DUA kapabilitas, dan itu yang membuatnya tampak mahal
+
+Bagian 1 sampai 8 merancang **RAG document Q&A**: embedding, vector store, retrieval, LLM lokal
+via Ollama. Itu kapabilitas untuk menjawab pertanyaan bebas atas korpus dokumen.
+
+Yang sebenarnya diminta lima dari enam konsumen di atas adalah **ekstraksi terstruktur**: baca
+satu dokumen, keluarkan field yang sudah ditentukan (nomor faktur, supplier, total; atau nama
+pelamar, pendidikan, pengalaman). Itu tidak butuh embedding, tidak butuh vector store, dan tidak
+butuh Ollama. Menggabungkan keduanya jadi satu proyek membuat kebutuhan yang sederhana ikut
+menanggung ongkos yang tidak diperlukannya.
+
+**Pisahkan keduanya.** Ekstraksi terstruktur bisa jalan sekarang; RAG Q&A belum punya konsumen
+yang menyebutkan pertanyaan yang ingin dijawabnya, dan sesuai [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]
+itu belum lolos gerbang.
+
+### Ekstraksi terstruktur sudah bisa jalan hari ini, tanpa infrastruktur baru
+
+Endpoint AI internal yang dipakai [[ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library]]
+**menerima gambar** lewat blok `image_url` standar. Diuji 2026-09-08 atas faktur Bahasa Indonesia:
+nomor faktur, nama supplier, jumlah baris item, dan total terbaca **persis**. Kontrol negatif
+(prompt sama, gambar dibuang) menjawab "tidak melihat gambar", jadi hasilnya benar-benar dari
+membaca, bukan menebak.
+
+Ongkos token terukur (`prompt_tokens`):
+
+| | token | gambar saja |
+|---|---|---|
+| tanpa gambar (overhead tetap) | 2.061 | - |
+| gambar 760x420 | 2.484 | 423 |
+| pindaian A4 200 dpi | 3.624 | **1.563** |
+
+⛔ **Overhead tetap 2.030 token lebih besar daripada gambar A4 itu sendiri**, dan ia 57% dari
+seluruh permintaan (suntikan system prompt Claude Code oleh proxy). Konsekuensinya untuk bagian
+2 blueprint: rencana "OCR dulu supaya hemat token" **tidak terbayar**. Menukar gambar A4 (1.563)
+dengan teksnya (kira-kira 500) cuma memangkas sekitar 29% dari total, dan untuk itu perlu
+instance ber-GPU yang menyala terus. Tuas penghematan yang jauh lebih besar dan **gratis** adalah
+meminta alias endpoint tanpa suntikan system prompt itu.
+
+### Asumsi infrastruktur blueprint tidak selamat
+
+Bagian 5 menulis *"MVP minimal 8GB RAM untuk embedding sederhana; GPU opsional untuk
+DeepSeek-OCR"*. Diukur di prod Biznet 2026-09-08: **tidak ada GPU** (VGA-nya QEMU virtual
+`1234:1111`), 8 core, **15 GB RAM total dengan 8 GB bebas**, dan **52 container** sudah jalan di
+atasnya. VM dev lebih mustahil lagi: 48 container di 7,9 GB dan rutin kena OOM kernel.
+
+Jadi "8 GB RAM" bukan sisa yang tersedia melainkan hampir seluruh sisa mesin, dan "GPU opsional"
+sebenarnya berarti "belum ada sama sekali". Model OCR kelas `Unlimited-OCR` (3B parameter bf16,
+kira-kira 6 GB bobot, CUDA, inferensi CPU-only tidak didukung) tidak muat di mana pun tanpa
+menambah instance ber-GPU sebagai baris biaya baru.
+
+### Kepatuhan data: endpoint internal BUKAN model lokal
+
+`GET /v1/models` per 2026-09-08 mengembalikan `cc/*`, `Claude`, dan `token-router/MiniMax-M3`,
+**seluruhnya proksi pihak ketiga**. Nol model lokal. Artinya apa pun yang dikirim ke sana keluar
+dari perusahaan, **teks maupun gambar**.
+
+⛔ Karena itu OCR lokal **tidak** menyelesaikan syarat "dokumen tidak boleh keluar", selama tahap
+ekstraksinya tetap memanggil endpoint itu. Jalur benar-benar lokal menuntut **dua** model lokal
+(OCR dan LLM ekstraksi), bukan satu. Apakah data ERP boleh diproses penyedia AI pihak ketiga
+adalah **pertanyaan legal dan manajemen yang belum dijawab**, dan jawabannya membatalkan atau
+membuka seluruh kebutuhan GPU di atas. Selama belum dijawab, jangan menjanjikan salah satunya.
+
+### Yang sebenarnya dibutuhkan tiap konsumen, dan hanya satu yang butuh OCR sungguhan
+
+| Konsumen | Bentuk masuk | Butuh OCR? |
+|---|---|---|
+| [[HRIS - Recruitment]] CV screening | PDF dari portal karir, **maks 1 MB** | **Tidak.** PDF digital sudah punya lapisan teks; cukup ekstraktor PDF. OCR hanya cadangan untuk CV hasil pindai |
+| Faktur supplier | pindaian / foto | ya, atau vision |
+| [[GA - Inventory Management]] dokumen kedatangan | pindaian / foto | ya, atau vision |
+| [[GA - Waste Management]] manifest | pindaian / foto | ya, atau vision |
+
+⚠️ Untuk CV: batas unggah **1 MB PDF** (`services/recruitment/public_handlers.go`) berarti CV
+hasil pindai kemungkinan besar **sudah ditolak di unggahan** sebelum sempat sampai ke OCR. Jadi
+"OCR fallback untuk CV scan" menjawab kasus yang mungkin belum benar-benar ada; ukur dulu berapa
+CV di prod yang tidak punya lapisan teks sebelum membangun cadangannya.
+
+⚠️ Tahap `CV Screening` **sudah ada** di pipeline recruitment (`pipeline.go`) sebagai keadaan
+menunggu, jadi konsumennya sudah punya tempat mendarat. Yang belum ada cuma pengisinya.
+
+### Urutan yang disarankan, menggantikan MVP 1 di bagian 6
+
+**MVP 0 (baru, dan ini yang pertama):** satu konsumen, ekstraksi terstruktur lewat
+[[ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library]] yang sudah ada. Tanpa container
+baru, tanpa GPU, tanpa vector store. Tujuannya bukan fitur melainkan **angka akurasi atas dokumen
+asli** untuk dibawa ke keputusan berikutnya.
+
+Baru setelah MVP 0 punya angka, MVP 1 sampai 5 di bagian 6 layak ditimbang ulang, dan sebagian
+besar kemungkinan tidak diperlukan.
+
+**Service terpisah baru wajib bila salah satu terjadi**, bukan sebelumnya:
+- model lokal benar-benar dipakai (Python plus CUDA tidak bisa masuk biner Go); atau
+- prosesnya melewati **batas 30 detik** [[CORE - API Master Gateway]], yang pasti terjadi untuk
+  batch arsip, dan menuntut kontrak asinkron (202 + job id), bukan request-response.
+
+**Jangan bikin penyimpanan berkas sendiri.** [[Microservices - File Service]] dan MinIO sudah
+hidup di prod, dan CV recruitment sudah tersimpan di sana; OCR membaca object yang sudah ada,
+tidak menerima unggahan sendiri. Lihat [[REF - Kepemilikan Data]].
+
+### Catatan bila `Unlimited-OCR` (Baidu) dipilih
+
+MIT, Python, 3B parameter, keluarannya parsing dokumen berstruktur (bukan teks rata, jadi tata
+letak tabel faktur terjaga). ⛔ Pemakaiannya menuntut `trust_remote_code=True`, artinya kode
+Python dari repo HuggingFace **dieksekusi** saat model dimuat. Bila dipakai: kunci
+`revision=<commit hash>`, jangan `main`, dan isolasi containernya dari DB ERP. Dukungan Bahasa
+Indonesianya hanya ditandai "multilingual" tanpa daftar, jadi **belum terbukti** dan wajib diuji
+dengan dokumen asli sebelum jadi dasar keputusan.
+
+⚠️ Seluruh uji vision di atas memakai gambar **sintetis bersih** hasil render, bukan foto miring
+atau pindaian buram. Ia membuktikan jalurnya jalan dan Bahasa Indonesia terbaca; ia **tidak**
+membuktikan ketahanan terhadap dokumen nyata yang jelek. Itu isi MVP 0.
+
+---
+
 1. Ringkasan solusi
     
 
