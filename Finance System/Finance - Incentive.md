@@ -96,9 +96,9 @@ sedikit pun. Yang berubah hanya: toko itu tidak lagi hilang dari daftar.
 
 Keduanya dipindah ke struktur satu kartu yang dipakai halaman daftar HRIS (erp-frontend
 PR [#1473](https://github.com/bip-itteam-internal/erp-frontend/pull/1473), T4 [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]];
-live di prod 23:16 WIB). ⚠️ Naik **sebelum** gerbang backend bip-erp [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767):
-sampai insentive-service prod memuat T1, pensil di Master Target untuk Supervisor berujung
-403 bertoast, Finance tidak terpengaruh. Yang berubah bagi pembaca:
+live di prod 23:16 WIB). Gerbang backend bip-erp [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767) (T1)
+menyusul live prod 2026-09-08 07:03 WIB, jadi pensil Supervisor di Master Target kini
+benar-benar menulis untuk divisinya; jendela 403 di antaranya sudah tertutup. Yang berubah bagi pembaca:
 
 - **Kelompok jadi kolom.** Baris judul "DIVISI · Aris (Supervisor)" / "TIM · Ade (Leader)"
   hilang, diganti kolom **Divisi** dan **Tim** yang menyebut nama beserta perannya. Dua
