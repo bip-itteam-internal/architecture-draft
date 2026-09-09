@@ -5967,22 +5967,22 @@
         "APP - MyBharata",
         "HRIS - Matriks KPI per Departemen"
       ],
-      "hash": "229b4c369fcc94575a54ef8cea028a4e5123a757e9965f2bc13579e7ec76bca4",
-      "ukuran_kb": 13.5,
-      "ringkasan": "Menjawab: mengapa \"hadir\" di Program Culture berubah dari jumlah pengisi feedback menjadi jumlah scan QR kehadiran, bagaimana token QR berputar per-program ditampilkan officer dan dipindai peserta, dan bagaimana rating dipisah dari kehadiran serta didorong lewat pop-up persisten di MyBharata. Menjelaskan pula dampaknya ke rumus KPI Culture & Industrial (partisipasi dari scan, di-clamp 100, walk-in tetap dihitung), master program yang mengisi form pembuatan otomatis, dan mengapa batas kepemilikan kpi_score (ADR 0032) tidak berubah.",
+      "hash": "ddd8211509695cc32e30ccaa08b6a00f19702f7f0cbadf6be3a93d9c89920515",
+      "ukuran_kb": 14.1,
+      "ringkasan": "Menjawab: bagaimana kehadiran Program Culture kini didefinisikan (scan QR fisik, bukan pengisi feedback), bagaimana metrik partisipasi/antusiasme/implementasi KPI Culture & Industrial dihitung setelah perubahan ini, dan bagaimana alur scan token + rating persisten berjalan di MyBharata. Menjelaskan juga peran master program untuk mengisi form pembuatan program otomatis, bagaimana walk-in tak diundang tetap dihitung hadir, serta koleksi/endpoint baru di form-builder dan repo mana saja yang tersentuh.",
       "kata_kunci": [
         "Program Culture",
         "kehadiran",
         "attendance",
         "scan QR",
         "scan token",
-        "master program",
+        "culture_attendance",
         "KPI Culture & Industrial",
-        "rating",
-        "feedback",
+        "partisipasi",
+        "master program",
         "MyBharata",
-        "ADR 0084",
-        "walk-in"
+        "feedback rating",
+        "ADR 0084"
       ]
     },
     {
