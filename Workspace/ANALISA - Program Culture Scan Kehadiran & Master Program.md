@@ -3,7 +3,7 @@ publish: false
 ---
 # ANALISA — Program Culture: Scan Kehadiran, Rating Dipisah, Master Program
 
-Daftar task hasil `/analisa-kebutuhan` (2026-09-09). Keputusan: [[ADR - 0083 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program]]. Papan kerja — berubah tiap item selesai; bukan arsitektur.
+Daftar task hasil `/analisa-kebutuhan` (2026-09-09). Keputusan: [[ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program]]. Papan kerja — berubah tiap item selesai; bukan arsitektur.
 
 **Urutan wajib**: BE (form-builder) sebelum FE/mobile (perubahan kontrak). Prod dijalankan MANUSIA.
 
