@@ -1,4 +1,4 @@
-> **Status**: ✅ Implemented (21 Juli 2026) — **lima** menu WMS dipecah dua sub-tab; stempel `created_by_name` aktif di semua jalur tulis manual (termasuk jalur proposal). Verifikasi visual tuntas untuk **Inbound RM**, **Kirim FG**, & **Master Resi**; Keluar FG / Input Gudang FG / Laporan Hasil Produksi menunggu pengecekan dengan role yang sesuai (`admin gudang FG`, `admin produksi`). **Follow-up 22 Juli 2026:** (a) batasan "PO multi-bahan tak mengisi form penuh" diselesaikan — form Inbound RM jadi multi-baris (klik baris PO memuat seluruh bahan); (b) **backend gerbang gudang** (retur barang-balik ditahan sampai gudang scan; Decision #8) — cakupan ADR ini diperluas dari log-split FE ke fondasi backend yang membuatnya bermakna; **terbukti end-to-end di prod**; (c) **form retur dilengkapi** (pengaman qty/status, panel konteks, scan dari daftar, retur basi terlipat; Decision #9); (d) **resi paket BALIK** diutamakan di form + scan (sumber Shopee `get_return_detail`), plus **search/filter/export laporan + auto-isi PIC** (Decision #10). **Follow-up 30 Juli 2026 (✅ deployed):** gerbang gudang **PER-ORDER** (fix under-book — konfirmasi 1 member membuka gerbang seluruh grup: 189 grup/1.437 order ~Rp142jt) + status **SEBAGIAN** turunan — lihat amandemen Decision #8. Lihat Consequences.
+> **Status**: ✅ Implemented (21 Juli 2026) — **lima** menu WMS dipecah dua sub-tab; stempel `created_by_name` aktif di semua jalur tulis manual (termasuk jalur proposal). Verifikasi visual tuntas untuk **Inbound RM**, **Kirim FG**, & **Master Resi**; Keluar FG / Input Gudang FG / Laporan Hasil Produksi menunggu pengecekan dengan role yang sesuai (`admin gudang FG`, `admin produksi`). **Follow-up 22 Juli 2026:** (a) batasan "PO multi-bahan tak mengisi form penuh" diselesaikan — form Inbound RM jadi multi-baris (klik baris PO memuat seluruh bahan); (b) **backend gerbang gudang** (retur barang-balik ditahan sampai gudang scan; Decision #8) — cakupan ADR ini diperluas dari log-split FE ke fondasi backend yang membuatnya bermakna; **terbukti end-to-end di prod**; (c) **form retur dilengkapi** (pengaman qty/status, panel konteks, scan dari daftar, retur basi terlipat; Decision #9); (d) **resi paket BALIK** diutamakan di form + scan (sumber Shopee `get_return_detail`), plus **search/filter/export laporan + auto-isi PIC** (Decision #10). **Follow-up 30 Juli 2026 (✅ deployed):** gerbang gudang **PER-ORDER** (fix under-book — konfirmasi 1 member membuka gerbang seluruh grup: 189 grup/1.437 order ~Rp142jt) + status **SEBAGIAN** turunan — lihat amandemen Decision #8. **Follow-up 9 September 2026:** konfirmasi scan dinilai **PER-SKU**, bukan per-order (✅ LIVE, PR #1793 — 56 scan di 54 order hilang permanen, diukur ke ledger WMS; remediasi tuntas 56→15, sisanya order yang finance tambal manual), dan deteksi **komponen paket yang tak pernah discan** ditambahkan ke feed gudang (🟡 PR #1804 belum merge — 17 order, dugaan "form bug" diuji & gugur). Lihat Consequences.
 
 ## Context
 
@@ -196,6 +196,72 @@ Jalur **proposal** ditambahkan belakangan (21 Juli 2026): transaksi yang lahir d
 - **Mencari nama toko / SKU tetap terbatas pada yang termuat.** Cadangan pencarian ke server hanya mengenali **nomor order** dan **nomor resi** (`/returns/lookup` mencari persis, bukan teks bebas). Untuk kata kunci lain, jawabannya masih sebatas 2.000 baris yang termuat — layar mengatakan batas itu apa adanya alih-alih menjawab "tidak ada". Pencarian teks bebas lintas seluruh feed butuh parameter pencarian sisi server (repo Mongo + handler integration + handler manufacture): perubahan terpisah, belum dikerjakan.
 - **Retur "basi" belum punya penutupan resmi** (#9). Retur barang-balik yang barangnya tak akan datang menumpuk di "belum dicatat" selamanya — melipatnya di FE hanya kosmetik. Perlu aksi backend "tutup retur basi" (state penutupan) + keputusan finance (siapa boleh menutup, kapan). ANTREAN.
 - **Stok WMS = stok Accurate untuk semua kondisi** (#8; selisih Reject **diselesaikan 22 Juli**). Backend `deltaStokTransaksi` kini menambah **seluruh qty** (Reuse+Rework+Reject) ke stok WMS — SAMA dengan yang Accurate bukukan (`RETURNED`), jadi tak ada lagi selisih otoritatif. Ini **membalik arah** temuan awal 17 Juli ("reject ke scrap"): karena Accurate membukukan ketiganya, mengurangi Reject di WMS justru menciptakan selisih permanen — satu pintu penyesuaian (finance manual, keputusan 21 Juli) lebih mudah dijaga daripada dua sistem menebak. Sisa: FE `onUpdateStock` masih menambah Reuse+Rework saja untuk update optimistik lokal, tapi itu **kosmetik & sekejap** — tertimpa `loadData()` yang mengambil stok server (semua qty). Diselaraskan di iterasi FE berikutnya.
+
+> **Amandemen — konfirmasi scan dinilai PER-SKU, bukan per-order (✅ 2026-09-09 LIVE, PR #1793).** Scan gudang
+**disimpan** per `(order, SKU)`, tapi "sudah discan" **dinilai** per **ORDER** — dan retur multi-SKU/bundel mengirim
+satu konfirmasi per baris scan lewat goroutine *fire-and-forget* (`transaksi.go`, error dibuang). Begitu satu
+panggilan gagal sementara saudaranya berhasil, feed menjawab `scanned_gudang: true` untuk order itu
+(`orderHasWarehouseItem`: true bila **ada satu saja**), lalu `putuskanKonfirmasi` memutuskan "tak ada yang perlu
+dikirim" — **selamanya**. Barangnya fisik ada di gudang, tapi tak pernah masuk dokumen.
+> **Terukur dgn membandingkan LANGSUNG ke ledger WMS** (`manufacture_transaksi`) — bukan disimpulkan dari data ERP
+sendiri: dari **13.423** scan retur, **3.681** memang sengaja tak dikirim (`detail.catatanSaja`), **9.243** cocok,
+**56 scan di 54 order** hilang permanen, 20 masih terjangkau penyapu, 423 kelas lain. PJG-002 = 42 dari 56 —
+**efek volume**, bundel `PJG-002 + PJG-004` yang paling laku. ⚠️ `catatanSaja` (27% populasi) WAJIB dikecualikan;
+menghitungnya sebagai hilang melipatgandakan temuan palsu.
+> **Fix dua sisi**: integration `ReturnBookingState` + feed `/transactions/returns` membawa **`scanned_skus`**
+(saringan SAMA dgn `Scanned`: qty > 0 — SKU berqty nol yang ikut terdaftar akan tampak tercatat lalu **memblokir**
+kiriman ulang yang sah; `order_id` dibandingkan ketat karena satu dokumen menaungi banyak order). Manufacture
+`putuskanKonfirmasi` menerima SKU transaksi dan menilai per-SKU; `ScannedSKUs` **nil** (integration versi lama) jatuh
+ke perilaku lama per-order — membedakan **nil dari kosong** itu wajib, kalau tidak selama jeda deploy SEMUA scan
+dikira belum tercatat lalu dikirim ulang, dan tiap pengiriman me-rebuild dokumen Accurate yang sudah benar.
+⇒ **DEPLOY INTEGRATION DULU, manufacture menyusul.** Urutan pemeriksaan ikut berubah: **pra-cutover dinaikkan ke ATAS**
+cabang per-SKU (grupnya tak pernah ada di Accurate ⇒ mengirim pasti gagal, sementara cabang per-SKU MEMBUKA jalur
+kirim). `transaksi.go` tak lagi membuang error fire-and-forget — alasan lama ("kegagalan terlihat lewat badge feed")
+tak berlaku justru untuk retur multi-SKU, karena SKU saudaranya membuat feed menjawab "sudah discan".
+> ⚠️ **Penyapu pemulih TIDAK menjangkau populasi ini**, dan itu bertentangan dengan dugaan wajar. `buildSweepFilter`
+menyaring `created_at >= now-3hari`; pass kedua berjendela 45 hari **tapi hanya untuk `detail.returnKey` KOSONG**.
+Scan Juli–Agustus yang sudah tertaut tak tersentuh keduanya — diverifikasi sesudah deploy: sisa hilang **tetap 56**.
+Pemulihan wajib dipicu manual lewat `POST /returns/konfirmasi-ulang` (lingkup `resi=` / `dari&sampai` / `catatanSaja=1`;
+tanpa `apply=1` = dry-run). **Remediasi tuntas 9 Sep: 56 → 15**, dan 15 sisa itu persis order yang finance sudah
+tambal manual di Accurate — mengirim ulang untuk mereka BERBAHAYA (rebuild = hapus + buat-ulang dokumen, koreksi
+manual bisa terbuang). Sensus penutup: **order di >1 dok SENT tetap 1** (pasangan 106/107-KY+GB yang memang bukan
+dobel). ⛔ Kirim 39 resi sekaligus kena **batas waktu gateway 30 detik** (502) **TAPI kerjanya tetap berjalan
+sebagian** (56→30) — 502 di endpoint ini BUKAN "tak ada yang terjadi"; ukur ulang keadaan sebelum mengulang. Batch 7
+resi aman; operasinya idempoten.
+
+> **Amandemen — komponen paket yang TAK PERNAH discan: kelas tetangga, deteksinya ditambahkan (🟡 PR #1804 belum
+merge).** Retur **paket** yang komponennya cuma discan sebagian **tetap menerbitkan dokumen** — hanya kurang isinya —
+jadi tak ada yang berbunyi salah: penjualan terbalik kurang, stok komponennya tak pernah bertambah, barangnya diam di
+gudang. Beda dari amandemen di atas: datanya **tak pernah lahir**, bukan hilang di jalan, jadi fix per-SKU tak
+menyentuhnya. Terukur 2026-09-09: **17 order** (TikTok 12 dari 1.720 order paket ber-scan, Shopee 5 dari 162),
+ketahuan **hanya** karena user melaporkan satu dokumen (`RTR/2026/09/04/077-KY+GB`).
+> ⚠️ **Dugaan "form WMS menampilkan 1 baris padahal isinya 2" DIUJI DAN GUGUR**: bundel `PJG-002 + PJG-004` tercatat
+lengkap di **1.671 dari 1.683** order — kalau form-nya buta, ketiganya-ribu akan kurang. Pemetaannya juga lengkap
+(20/20 varian → dua komponen). Dominasi PJG-002 = efek volume, bukan cacat.
+> **Deteksi**: feed retur membawa **`komponen_belum_discan`** per order (`KomponenBelumDiscanByOrder`). Ekspansi paket
+memakai `profitRepo.ListMappingsBySKU` — pemetaan yang SAMA dengan jalur pembukuan, bukan salinan. **Dua keadaan
+SENGAJA bukan temuan**, dan membedakannya yang membuat daftar ini layak dipercaya (daftar berisik akan diabaikan, lalu
+yang benar ikut tenggelam): retur **PARSIAL** (pelanggan memang cuma mengembalikan sebagian — diambil dari objek retur
+marketplace, BUKAN disimpulkan dari selisih) dan **belum ada scan sama sekali** (barangnya memang belum datang; itu
+antrean normal yang sudah punya tampilannya sendiri). ⛔ Order **tanpa objek retur** (`CANCELLED`) diperlakukan **TIDAK
+parsial, bukan dilewati** — paket batal balik UTUH dari ekspedisi, pembeli tak pernah menerimanya. Versi pertama
+melewatinya dan karena itu membuang kelompok TERBESAR (12 dari 17); ditangkap tesnya sendiri, bukan oleh review.
+Gagal baca pemetaan = **diam**, tidak menebak (menganggap "tak ada komponen" ⇒ lapor lengkap padahal tak diperiksa;
+memakai SKU mentah ⇒ lapor kurang padahal belum tentu).
+> **Triase murah tanpa bertanya ke gudang**: `status order` + `return.partial` sudah cukup memisahkan kelalaian scan
+dari retur sebagian yang sah — dari 17, **16** berstatus CANCELLED atau `partial:false` (paket balik utuh ⇒ hampir
+pasti terlewat discan) dan **1** parsial yang sah. Remediasi 9 Sep menambal 13 order/15 baris lewat
+`POST /transaksi` (**bukan** `/transaksi/fg` — yang FG memecah bundel & payload-nya tanpa `detail`, sehingga
+`returnKey`/`noResi` hilang dan konfirmasi tak pernah terkirim), seluruh `detail` disalin dari scan saudaranya di
+paket yang sama. Sisa 3 sengaja: 1 parsial sah + 2 yang discan hari itu. **Sisa terbuka**: tampilan di layar WMS
+(erp-frontend) belum ada, dan dua kelas lain sudah teridentifikasi tapi belum terdeteksi — **qty kurang** (SKU sama,
+jumlah di bawah seharusnya) dan **SKU salah scan** (SKU yang tak ada di order sama sekali); sumbu deteksi ini hanya
+"SKU hilang".
+> Grounded: `komponenBelumDiscan`/`KomponenBelumDiscanByOrder` (`accurate_return_komponen_belum_discan.go`),
+`skuTercatatOrder`/`ReturnBookingState` (`accurate_rts_usecase.go`), `ReturnRow` (`transaction_return_handler.go`),
+`putuskanKonfirmasi`/`keadaanRetur.sudahTercatat` (`retur_konfirmasi_ulang.go`), `buildSweepFilter`
+(`retur_konfirmasi_sweep.go`), tes `accurate_return_komponen_belum_discan_test.go` +
+`accurate_return_scanned_skus_test.go` + `retur_konfirmasi_per_sku_test.go`.
 
 ## Dokumen Terkait
 
