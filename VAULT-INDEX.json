@@ -412,7 +412,7 @@
         "External - Accurate"
       ],
       "hash": "b84bbdb91c1659f41feda79a35ed97fcd2672f2baa375acdb99bfacd7a712502",
-      "ukuran_kb": 91.1,
+      "ukuran_kb": 91.4,
       "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service lewat gateway `/api/integration/*` untuk marketplace (TikTok Shop/Business, Shopee), webhook publik, order terpadu dan ekspornya, aging piutang, feed retur lintas-channel, packet tracking, Accurate, dashboard FAT `/accounting/*`, profit dan profit insentif, ICC account mapping, kas toko/wallet, ulasan marketplace, status sinkron toko, serta kepemilikan toko per departemen. Juga menjelaskan parameter tiap rute (mis. `shopee_attribution`, `updated_since`, `order_ids`, `date_basis`, `with_total`), bentuk responsnya, siapa konsumennya (WMS, Web ERP), dan jebakan seperti `/health` yang tetap butuh gateway key.",
       "kata_kunci": [
         "integration-service",
@@ -835,7 +835,7 @@
         "order.order-items-get"
       ],
       "hash": "40849a92b3a96565fbc789742e61b75e3bbd942b6d18b298c097028cfbd2659e",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab cara menarik daftar order dari Lazada Open API endpoint `/orders/get`, perbedaan filter waktu `created_after`/`created_before` (waktu order dibuat) vs `update_after`/`update_before` (waktu order berubah), dan kenapa window berbasis update penting sebagai jaring pengaman ketika webhook Lazada (LPM) mati. Juga mendokumentasikan jebakan status order-level yang bisa tertinggal dari status tracking sebenarnya.",
       "kata_kunci": [
         "Lazada",
@@ -999,7 +999,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 1.9,
+      "ukuran_kb": 2.0,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1051,7 +1051,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -2403,7 +2403,7 @@
         "Vendor - CRM"
       ],
       "hash": "8d460dd56f166a3c6ff4f18ee0410268c6ebe60f3a34558c5a4f14b7baecf988",
-      "ukuran_kb": 356.7,
+      "ukuran_kb": 357.2,
       "ringkasan": "Menjawab: bagaimana order marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk ke ERP lewat webhook direct, bagaimana kredensial OAuth dan job sync terjadwal dikelola, serta bagaimana transaksi dijembatani ke Accurate Online sebagai Sales Invoice dan Sales Return. Memuat daftar endpoint per modul (webhooks, credentials/holidays, TikTok Business/Ads termasuk GMV Max monitoring/overview dan ICC video metrics, TikTok Shop, affiliate, Shopee, transactions, Accurate, fulfillment WMS bridge, items, workers/cron), aturan verifikasi HMAC webhook Shopee beserta bypass sementaranya, dan cara agregasi ROI/ROAS iklan dihitung. Juga menjelaskan status jalur Desty yang soft-disabled, rencana Meta Ads yang belum berkode, indexing MongoDB jalur panas, alarm toko tanpa config Accurate, serta status sinkron per toko yang melewati toko banned.",
       "kata_kunci": [
         "integration service",
@@ -4671,7 +4671,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "1af925998c51daaf89f4b362162b5f8c117e3db82e37169cbfe7b2e6ed084c92",
-      "ukuran_kb": 6.5,
+      "ukuran_kb": 6.6,
       "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal), dan bagaimana auto-disable Tahap 2 bekerja (counter kegagalan auth beruntun, ambang 5, reset saat sukses, satu Telegram tanpa damper terpisah — bukti flapping 36009006). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care.",
       "kata_kunci": [
         "adr",
@@ -4809,7 +4809,7 @@
         "APP - Web ERP"
       ],
       "hash": "3405a3dc1516fe9eff90d36e5a1a47c8a876d2dbaf6bc9537105816d5897ee6d",
-      "ukuran_kb": 10.1,
+      "ukuran_kb": 10.2,
       "ringkasan": "Menjawab: bagaimana penyesuaian statement TikTok (tt_statement_adjustments, mayoritas ganti rugi paket hilang / LOGISTICS_REIMBURSEMENT yang bukan penggantian ongkir) dibukukan ke Accurate — dilipat ke payout pesanan yang disebutnya lalu diurus mesin receipt, bukan sebagai baris pendapatan tersendiri — dan bagaimana pesanan yang tak ditemukan ditangani. Live 26 Agustus 2026 (PR #1451).",
       "kata_kunci": [
         "adr",
@@ -5237,7 +5237,7 @@
         "REF - Penamaan Metrik & Sumber KPI"
       ],
       "hash": "986c92356a28f6e5d7cecda25991d35ee197cf415fad6f6c08996057876df910",
-      "ukuran_kb": 7.5,
+      "ukuran_kb": 7.4,
       "ringkasan": "Menjawab: mengapa KPI jabatan Culture & Industrial dihitung dari penilaian PESERTA (rating + masukan) alih-alih self-report officer, dan bagaimana modul Kelola Program Culture menggantikan pendekatan form realisasi (ADR 0065). Merinci skor komposit 30/30/40 (partisipasi/antusiasme/implementasi dihitung otomatis), resolusi target diundang otomatis dari jenis program, pemecahan distribusi pilar ke Core Value atomik, koleksi culture_programs/culture_feedback, dan batas kepemilikan kpi_score.",
       "kata_kunci": [
         "ADR 0066",
@@ -5968,7 +5968,7 @@
         "HRIS - Matriks KPI per Departemen"
       ],
       "hash": "229b4c369fcc94575a54ef8cea028a4e5123a757e9965f2bc13579e7ec76bca4",
-      "ukuran_kb": 13.6,
+      "ukuran_kb": 13.5,
       "ringkasan": "Menjawab: mengapa \"hadir\" di Program Culture berubah dari jumlah pengisi feedback menjadi jumlah scan QR kehadiran, bagaimana token QR berputar per-program ditampilkan officer dan dipindai peserta, dan bagaimana rating dipisah dari kehadiran serta didorong lewat pop-up persisten di MyBharata. Menjelaskan pula dampaknya ke rumus KPI Culture & Industrial (partisipasi dari scan, di-clamp 100, walk-in tetap dihitung), master program yang mengisi form pembuatan otomatis, dan mengapa batas kepemilikan kpi_score (ADR 0032) tidak berubah.",
       "kata_kunci": [
         "Program Culture",
@@ -6857,7 +6857,7 @@
         "GA - Form Pengadaan dan Pengajuan Dana"
       ],
       "hash": "5a506ef2f6690f2d0fd48bd5da4134bc63d99b6af98efef405cd97c1c4ee6447",
-      "ukuran_kb": 7.7,
+      "ukuran_kb": 7.6,
       "ringkasan": "Menjawab: apa saja 11 SOP Procurement resmi PT Bharata (perencanaan kebutuhan, PR, seleksi vendor, RFQ, penerbitan PO, monitoring pengiriman, penerimaan+QC, verifikasi invoice, pembayaran, evaluasi vendor, cost saving, pelaporan) dan sejauh mana masing-masing sudah didukung ERP. Memetakan tahap SOP mana yang sudah ada di kode (Permintaan/Pesanan/Penerimaan), mana yang sebagian, dan mana yang belum dibangun (RFQ 3-vendor, matriks approval nominal >Rp50jt, AVL & dokumen legalitas vendor, scorecard/OTD vendor, pelaporan formal). Berguna untuk mengecek kepatuhan SOP sebelum merancang fitur procurement/manufacture baru.",
       "kata_kunci": [
         "procurement",
@@ -9247,7 +9247,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
-      "ukuran_kb": 6.8,
+      "ukuran_kb": 6.9,
       "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
       "kata_kunci": [
         "faktur",
@@ -9495,7 +9495,7 @@
         "WH - Management System"
       ],
       "hash": "8d2a9337ca3437bc81034f920197380aa9f9e669cf3d589e6f5865156a4f32f3",
-      "ukuran_kb": 7.6,
+      "ukuran_kb": 7.5,
       "ringkasan": "Menjawab: metrik KPI posisi Manufaktur (produksi + gudang) mana yang sudah bisa diotomasi sekarang, mana yang menunggu data WMS, dan mana yang tetap manual/subjektif. Menjelaskan kenapa source & endpoint `/kpi/*` sudah ada di kode tapi dorman (koleksi `production_log`/`batch_record`/`cycle_count` kosong karena WMS belum dipakai), dan mematahkan asumsi quick-win: `manufacture_stok`/`saldo_awal` cuma sisi sistem tanpa angka fisik, `manufacture_transaksi` semua INBOUND REUSE, `manufacture_resi` status order marketplace bukan kinerja orang. Juga memuat gerbang verifikasi yang wajib dilewati (adu output nyata WMS ke endpoint, buktikan lewat gateway `GET /kpi/auto-values`) sebelum mengklaim metrik otomatis saat WMS live.",
       "kata_kunci": [
         "KPI manufaktur",
@@ -9879,7 +9879,7 @@
         "QA - Register Perizinan & Sertifikasi"
       ],
       "hash": "23e3bd168ac5a48c16f9775bbc34e5fedf3ebe1e157b20409e69fdedb7075c5e",
-      "ukuran_kb": 9.1,
+      "ukuran_kb": 9.0,
       "ringkasan": "Menjawab: register mutu apa saja yang sudah ada di ERP divisi Quality — CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing, dan pengecekan raw material — berikut endpoint `/api/employee/quality/*`, collection MongoDB, dan model datanya. Juga menjawab siapa yang boleh mengakses apa (`quality:staff`, `quality:supervisor`, approver produksi & warehouse, staf marketing), bagaimana alur approval CAPA berjalan (Draft → Diajukan → persetujuan Produksi + Warehouse → finalisasi QA), dan aturan alert keterlambatan tiap register (tenggat H-7, Menunggu >3 hari, antrean >24 jam). Menjelaskan pula apa yang belum tersedia: Dashboard Mutu, IPC/Pre-Check/CPPB, dan checklist GMP/kalibrasi/storage.",
       "kata_kunci": [
         "quality",
@@ -10149,6 +10149,8 @@
         "Microservices - Calendar Service",
         "Microservices - Task Management Service",
         "Microservices - Learning Service",
+        "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program",
+        "Microservices - Form Builder Service",
         "HRIS - Payroll",
         "Microservices - Payroll Service",
         "HRIS - Kepatuhan Peraturan Perusahaan",
@@ -10159,21 +10161,25 @@
         "REF - PRD ERP",
         "REF - Alur Persetujuan"
       ],
-      "hash": "3324950ef35f808054f0e1cc660b3336cf0d72f518d06b5e07d8c89c06d10d2b",
-      "ukuran_kb": 21.2,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis di ERP Bharata (identitas karyawan, status aktif, departemen dan label supervisi, hak akses, kontrak, jadwal kerja, presensi, skor KPI, target insentif profit, dst), siapa yang boleh menulisnya, dan lewat jalan mana service lain boleh membacanya. Juga menjawab salinan mana yang sah beserta arah dan penjaganya (SyncCollection, daftar field yang dibuang dari `$set`), pengecualian ADR 0002 yang masih hidup di kode (task-management membaca employee_db/attendance_db langsung), dan duplikasi yang belum diputuskan; dibuka sebelum membangun penyimpanan baru atas fakta yang mungkin sudah dimiliki service lain.",
+      "hash": "2cb0359424eac9fabe384c3a40602ab9f4a713771ab6391243999c53c361916e",
+      "ukuran_kb": 21.9,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis ERP (identitas karyawan, status aktif, departemen/label supervisi, hak akses RBAC, kontrak, jadwal kerja, presensi/cuti, skor KPI, target/realisasi insentif profit), siapa yang boleh menulisnya, dan lewat jalan mana service lain boleh membacanya. Juga menjawab: salinan data mana yang sah beserta arah sinkron dan penjaganya, duplikasi mana yang belum diputuskan, dan kenapa sebuah fakta yang sudah dimiliki departemen lain tidak boleh dibangun ulang di service baru. Dipakai sebagai peta 'cari sebelum membangun' saat kebutuhan baru datang, melengkapi gerbang /plan dan /review.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "source of truth",
         "sumber kebenaran",
+        "single source of truth",
         "satu fakta satu tempat",
-        "SyncCollection",
-        "salinan",
-        "duplikasi",
         "database-per-service",
-        "ADR 0002",
-        "pemilik koleksi"
+        "MODULE_URL",
+        "duplikasi data",
+        "salinan sinkron",
+        "SyncCollection",
+        "employee-service",
+        "attendance",
+        "KPI",
+        "insentif profit",
+        "RBAC"
       ]
     },
     {
@@ -12972,7 +12978,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.5,
+      "ukuran_kb": 11.2,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
