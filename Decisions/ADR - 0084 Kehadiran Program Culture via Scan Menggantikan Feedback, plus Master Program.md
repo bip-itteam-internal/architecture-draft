@@ -73,8 +73,8 @@ Endpoint baru ditambахkan sebagai konstanta di `core/api/url.dart`; menu/rute/
 
 ### Yang memburuk atau tetap terbuka
 
-- ⚠️ **Perubahan semantik KPI**: skor `partisipasi` sebuah officer bisa berubah dibanding sebelum ADR ini (dari #penilai → #hadir). Wajib diumumkan ke HR sebelum rilis; periode berjalan bisa bergeser. **BE sebelum FE**; verifikasi skor tak patah.
-- **Modul dasar (ADR 0066) status prod belum dipastikan** — kode ada di `origin/main` bip-erp, tetapi deploy ≠ merge. Ukur status prod sebelum membangun di atasnya; bila belum prod, koordinasikan dengan pemilik `feature/workspace-position`.
+- **Tidak ada skor KPI live yang bergeser & tak ada migrasi historis.** Modul Program Culture **belum dipakai di prod** (dinyatakan pemilik produk 2026-09-09; **T0 wajib mengukur ulang** — status prod adalah keadaan yang bergerak, jangan diasumsikan). Karena belum live, "hadir = pengisi feedback" tak pernah menjadi angka KPI produksi, jadi fitur ini lahir **langsung berbasis scan** — TANPA perlu strategi cutover/fallback maupun backfill data historis. Syarat satu-satunya: **fitur scan mendarat BERSAMA atau SEBELUM modul Program Culture debut di prod**, supaya definisi "hadir" tak sempat salah di prod walau sesaat. Data feedback yang sudah ada di DEV tidak mengikat. **BE sebelum FE** tetap berlaku (perubahan kontrak).
+- **Kode modul dasar (ADR 0066) ada di `origin/main` bip-erp tetapi belum di-deploy prod** (deploy ≠ merge). Koordinasikan dengan pemilik `feature/workspace-position` agar scan + modul dasar naik ke prod sebagai satu paket.
 - **Token TTL menuntut jam HP officer & peserta cukup selaras** dan officer harus menampilkan QR selama acara. Peserta di luar jangkauan app (tak bawa HP) perlu jalur cadangan manual — **di luar lingkup fase ini**, dicatat sebagai TBD.
 - Endpoint `pending` + attendance menambah query per buka-app; ikuti TTL/memoisasi seperti sumber culture (30 dtk) bila perlu.
 

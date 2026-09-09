@@ -5966,20 +5966,22 @@
         "APP - MyBharata",
         "HRIS - Matriks KPI per Departemen"
       ],
-      "hash": "51a10073c5c748922214535f81a93054760d3d547f1269f79af300d10d7c76fb",
-      "ukuran_kb": 13.0,
-      "ringkasan": "Menjawab: mengapa dan bagaimana definisi \"hadir\" pada Program Culture diubah dari jumlah pengisi feedback menjadi jumlah scan kehadiran fisik lewat QR token berputar yang ditampilkan officer di MyBharata, dan bagaimana rating dipisah lalu didorong lewat pop-up persisten sampai peserta menilai. Menjelaskan juga aturan walk-in tetap dihitung hadir, dampaknya ke rumus KPI Culture & Industrial (partisipasi/antusiasme/implementasi), penambahan master program pengisi form otomatis, dan mengapa batas kepemilikan kpi_score tak berubah.",
+      "hash": "229b4c369fcc94575a54ef8cea028a4e5123a757e9965f2bc13579e7ec76bca4",
+      "ukuran_kb": 13.5,
+      "ringkasan": "Menjawab: mengapa \"hadir\" di Program Culture berubah dari jumlah pengisi feedback menjadi jumlah scan QR kehadiran, bagaimana token QR berputar per-program ditampilkan officer dan dipindai peserta, dan bagaimana rating dipisah dari kehadiran serta didorong lewat pop-up persisten di MyBharata. Menjelaskan pula dampaknya ke rumus KPI Culture & Industrial (partisipasi dari scan, di-clamp 100, walk-in tetap dihitung), master program yang mengisi form pembuatan otomatis, dan mengapa batas kepemilikan kpi_score (ADR 0032) tidak berubah.",
       "kata_kunci": [
-        "ADR 0084",
-        "program culture",
-        "kehadiran scan",
-        "QR token",
+        "Program Culture",
+        "kehadiran",
         "attendance",
-        "rating feedback",
+        "scan QR",
+        "scan token",
         "master program",
-        "KPI Culture Industrial",
-        "walk-in",
-        "partisipasi"
+        "KPI Culture & Industrial",
+        "rating",
+        "feedback",
+        "MyBharata",
+        "ADR 0084",
+        "walk-in"
       ]
     },
     {
@@ -12771,20 +12773,21 @@
       "tautan": [
         "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program"
       ],
-      "hash": "eacc6b75fa64a71b34bc85018d29f3ed0b7f946e331a1347d02852f29151a9cd",
-      "ukuran_kb": 4.6,
-      "ringkasan": "Menjawab: task teknis apa saja yang harus dikerjakan untuk mengimplementasikan scan kehadiran Program Culture dan master program, dalam urutan mana (backend form-builder dulu, lalu web ERP dan MyBharata), dan apa dependensi antar task. Menjadi papan kerja per-item (T0-T13) yang menyebut koleksi, endpoint, file acuan reuse, dan gerbang verifikasi end-to-end untuk ADR 0084.",
+      "hash": "2d0bb4ca4b264774c10bb98ea923d1cd7ec8fc9b55674406a6b245c5f876d9c3",
+      "ukuran_kb": 4.9,
+      "ringkasan": "Menjawab: task teknis apa saja yang harus dikerjakan untuk mengubah Program Culture ke kehadiran berbasis scan, dan dalam urutan mana (backend form-builder dulu, lalu web ERP dan mobile). Merinci per fase koleksi/endpoint backend (master_culture_program, culture_attendance, scan-token, feedback/pending), halaman web (master program, form auto-isi, label hadir), fitur MyBharata (tampilkan QR officer, scan+rating peserta, pengingat persisten), serta prasyarat verifikasi bahwa modul culture belum di prod dan langkah deploy end-to-end.",
       "kata_kunci": [
-        "ANALISA",
+        "Program Culture",
         "daftar task",
-        "program culture",
+        "analisa kebutuhan",
         "scan kehadiran",
         "master program",
         "form-builder",
         "culture_attendance",
         "scan-token",
-        "papan kerja",
-        "rating pending"
+        "MyBharata",
+        "deploy",
+        "fase implementasi"
       ]
     },
     {

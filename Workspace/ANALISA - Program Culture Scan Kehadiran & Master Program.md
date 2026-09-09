@@ -9,7 +9,7 @@ Daftar task hasil `/analisa-kebutuhan` (2026-09-09). Keputusan: [[ADR - 0084 Keh
 
 ## Fase 0 — Prasyarat
 
-- [ ] **T0. Ukur basis modul culture (ADR 0066).** Pastikan `culture_programs`/`culture_feedback` sudah ada di DEV/PROD dan branch `feature/workspace-position` sudah/hendak merge ke `main`. Ukur prod (bukan asumsi): apakah ada program & feedback nyata. Koordinasikan dengan pemilik branch itu sebelum menumpuk. Bila belum prod, catat sebagai risiko rilis.
+- [ ] **T0. Konfirmasi modul culture BELUM di prod (ukur, bukan asumsi).** Pemilik produk menyatakan fitur belum dipakai di prod (2026-09-09) → bila benar, **tak ada migrasi/cutover** yang perlu (fitur lahir langsung berbasis scan). Ukur ulang: apakah `culture_programs`/`culture_feedback` sudah ter-deploy & terisi data nyata di prod. Koordinasi dengan pemilik `feature/workspace-position` supaya scan + modul dasar naik ke prod **sebagai satu paket** (jangan biarkan "hadir=feedback" live lebih dulu).
 
 ## Fase 1 — Backend form-builder (`bip-erp/services/form-builder/`)
 
@@ -34,7 +34,7 @@ Daftar task hasil `/analisa-kebutuhan` (2026-09-09). Keputusan: [[ADR - 0084 Keh
 
 ## Fase 4 — Deploy & verifikasi
 
-- [ ] **T13. Deploy BE→FE + verifikasi end-to-end.** Naikkan form-builder (bila ada kategori inbox baru untuk pengingat → notification-service bersama). Verifikasi lewat gateway: scan → `hadir` naik; rating → hilang dari `pending`; `/internal/culture/metrics` benar; skor KPI tak patah. **PROD: agent siapkan perintah, manusia jalankan.** Umumkan perubahan semantik KPI ke HR sebelum rilis.
+- [ ] **T13. Deploy BE→FE + verifikasi end-to-end.** Naikkan form-builder (bila ada kategori inbox baru untuk pengingat → notification-service bersama). Verifikasi lewat gateway: scan → `hadir` naik; rating → hilang dari `pending`; `/internal/culture/metrics` benar; skor KPI terhitung wajar. **PROD: agent siapkan perintah, manusia jalankan.** Karena modul belum di prod (T0), tak ada skor live yang bergeser — tapi pastikan scan + modul dasar Program Culture debut prod **bersama**, jangan sampai "hadir=feedback" sempat live.
 
 ## Catatan lingkup (dari ADR 0083)
 
