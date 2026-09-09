@@ -2,7 +2,7 @@
 
 *Tiket Engagement disaring per **departemen requester**, bukan dibiarkan terbuka bagi seluruh pemakai ERP. Tiket menyimpan field baru `requester_department` yang distempel server saat tiket dibuat; keterlihatannya diputuskan dari **keterkaitan pemanggil dengan tiket** (pembuat / pengerja / anggota kolam pengerja / supervisor departemen / admin), bukan dari satu aturan tunggal. Keputusan ini juga mencabut `space_id` sebagai sumber keanggotaan tim.*
 
-- **Status**: 🟡 Konsep / Direncanakan — **belum ada di kode**. Keputusan diambil 2026-08-29 atas temuan audit T-10 ([[Sales - Engagement Team (Modul)]] cacat no. 4). Implementasinya task `t_9d06c153`; spesifikasi teknis lengkap ada di `Workspace/ANALISA - Model Departemen Engagement`.
+- **Status**: ✅ **Berlaku, kodenya sudah di `main`** — commit `1cdd7fad` "model departemen requester + kolam pengerja lintas departemen" dan `742e0bfd` "perbaiki hasil review PR #1519 (kebocoran keterlihatan, filter mine, peta departemen)" (29 Agustus 2026), diverifikasi ulang ke kode 2026-09-09. **Belum diverifikasi lewat gateway** dev maupun prod. Keputusan diambil 2026-08-29 atas temuan audit T-10 ([[Sales - Engagement Team (Modul)]] cacat no. 4). Spesifikasi teknis lengkap ada di `Workspace/ANALISA - Model Departemen Engagement`. ⚠️ **§6 di bawah (pembersihan `space_id`/notifikasi mati) TERNYATA belum tuntas** — lihat catatan di situ dan di [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]].
 - **Path di repo (yang akan disentuh)**: `bip-erp/services/task-management/engagement_models.go` · `engagement_handlers.go` · `engagement_assign.go` · `engagement_repo.go` · `erp-frontend/src/features/marketing/engagement/**`
 - **Tanggal**: 2026-08-29
 
@@ -73,7 +73,9 @@ Sejak [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]], notifikasi
 
 Dua mekanisme keanggotaan yang hidup berdampingan pasti menyimpang, dan penyimpangannya muncul sebagai "orang ini tidak dapat notifikasi" — kegagalan yang tak berbunyi.
 
-Field `space_id` **tidak dihapus dari dokumen** (data lama menyimpannya) dan tetap diteruskan ke `notifyMany` sebagai konteks tautan saja. Yang dihentikan: menerimanya dari body `POST /engagement/tickets`, dan `anggotaSpaceEngagement` beserta dua tipe notifikasi mati (`engagement_ticket_open`, `engagement_released`) dibuang.
+Field `space_id` **tidak dihapus dari dokumen** (data lama menyimpannya) dan tetap diteruskan ke `notifyMany` sebagai konteks tautan saja. Yang **seharusnya** dihentikan: menerimanya dari body `POST /engagement/tickets` (ini benar terjadi — `buatTiketRequest` masih punya field `SpaceID` tapi tak lagi memengaruhi keanggotaan/notifikasi), dan `anggotaSpaceEngagement` beserta dua tipe notifikasi mati (`engagement_ticket_open`, `engagement_released`) **dibuang**.
+
+⛔ **Koreksi 2026-09-09**: bagian "dibuang" di atas TIDAK terjadi. Diverifikasi lewat Grep atas `bip-erp/services/task-management`: `anggotaSpaceEngagement` (`engagement_notify.go:55`) masih ada di kode dan memang tak dipanggil dari mana pun (dead code terbukti, bukan diasumsikan) — tapi tak dibuang. `NotifEngagementOpen`/`NotifEngagementReleased` (`engagement_notify.go:21,23`) masih terdaftar sampai `fcm.go:66`. Komentar kepala berkas `engagement_notify.go:11-16` juga masih menyatakan "modul ini menyapa SELURUH anggota space" — kalimat yang sudah salah sejak ADR-0059 berlaku. Rinciannya dipindah ke [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] (bagian ini historisnya milik keputusan itu, bukan ADR ini) supaya tak ada dua tempat mencatat fakta yang sama.
 
 ### 7. Tiket lama: dimigrasi, dan yang gagal dimigrasi TIDAK disembunyikan
 
@@ -90,13 +92,14 @@ Yang tak berhasil di-resolve (requester sudah resign, `work_data` terhapus) **ti
 - **Kontrak FE berubah**: `queue` mengembalikan lebih sedikit baris untuk sebagian orang, `/engagement/kandidat` kini memuat orang lintas departemen sehingga kolom departemen jadi perlu, dan `detailTiket`/`logs` bisa membalas `403` untuk id yang sebelumnya `200`.
 - **`403`, bukan `404`, untuk tiket di luar cakupan.** `404` menyembunyikan keberadaan tiket lebih baik, tetapi membuat "tak berhak" tak dapat dibedakan dari "salah id" saat menelusuri keluhan. Yang bocor dari `403` hanyalah fakta bahwa sebuah id ada.
 
-**Yang belum diputuskan (TBD) — butuh jawaban manusia:**
+**TBD di atas — DIJAWAB 2026-09 (kartu `t_9fcdab8c`, komentar "JAWABAN USER ATAS TBD" di `engagementSettingsDefault`, `engagement_settings.go`):**
 
-- ⛔ **Di departemen mana anggota tim Engagement benar-benar duduk di `work_data`?** Master data menempatkan jabatan `Engagement Team` sebagai **posisi di dalam `Kyura` DAN `Beauty Hacks`** (`shared-library/models/employee/master_data.go:345,353`) — **tidak ada departemen bernama "Engagement"** di seluruh repo. Bila kenyataannya memang begitu, "requester dan pengerja beda departemen" tidak sepenuhnya tepat: yang beda adalah **jabatan**, dan sebagian pengerja justru sedepartemen dengan requesternya. Rancangan di atas sengaja benar untuk kedua keadaan (ia menyaring kunci jabatan, bukan departemen), tetapi angka sebenarnya harus dibaca dari produksi sebelum seed default dikunci.
-- **Apakah tim Engagement Kyura boleh dikerjakan orang Beauty Hacks dan sebaliknya**, atau kolamnya dua dan terpisah per brand. Default yang dipilih: **satu kolam lintas brand**, karena itu yang dinyatakan pemilik produk.
+- ✅ **Kunci jabatan pengerja**: `position_key == 'engagement_team'` SAJA, terbukti tiga karyawan di produksi. Kunci lama `buzzer` sengaja TIDAK diikutkan di seed produksi (beda dari usulan jaring-pengaman semula) — kalau kelak masih ada `work_data` yang belum ter-rename, operator menambahkannya lewat Mongo langsung, bukan lewat kode.
+- ✅ **Satu kolam lintas brand** (bukan dua kolam terpisah per brand) — ini yang berlaku di kode (`daftarKandidatPengerja` menyaring `position_key`, bukan `department`). **Nuansa penting**: ini jawaban untuk *siapa BOLEH ditugaskan/dilihat sebagai kandidat* (kolam). Untuk *siapa OTOMATIS dapat giliran* (alokasi round-robin), keputusan terpisah menyempitkannya ke sedepartemen requester secara default — lihat [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]] §2. Dua sumbu ini gampang tertukar; jangan disatukan jadi satu kalimat "kolamnya lintas/tidak lintas departemen" tanpa menyebut yang mana.
 
 ## Terkait
 
+- [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]] — memakai kolam pengerja ADR ini (§4) sebagai sumber kandidat, lalu menyempitkannya ke sedepartemen requester untuk alokasi OTOMATIS
 - [[Sales - Engagement Team (Modul)]] — konsep bisnis modul, daftar cacat termasuk T-10 yang jadi sebab ADR ini
 - [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] — butir 3-nya diubah oleh ADR ini
 - [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]
