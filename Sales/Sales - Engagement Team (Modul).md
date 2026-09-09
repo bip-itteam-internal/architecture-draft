@@ -2,12 +2,12 @@
 
 ## Deskripsi
 
-*Modul **Engagement Tim** adalah alur tiket boosting media sosial: **Account Specialist** membuat permintaan (like/komentar/share/review pada sejumlah URL target), **menunjuk langsung** satu anggota tim Engagement yang mengerjakannya, lalu memverifikasi hasilnya. Tiket hidup di koleksi Mongo sendiri di dalam [[Microservices - Task Management Service]], terpisah dari tiket IT, dengan state machine dan nomor tiketnya sendiri. Angka penutupannya jadi sumber KPI `kinerja_engagement` di [[Microservices - Employee Service]].*
+*Modul **Engagement Tim** adalah alur tiket boosting media sosial: **Account Specialist** membuat permintaan (like/komentar/share/review pada sejumlah URL target), sistem **mengalokasikan otomatis** satu anggota tim Engagement lewat round-robin, lalu Account Specialist memverifikasi hasilnya. Tiket hidup di koleksi Mongo sendiri di dalam [[Microservices - Task Management Service]], terpisah dari tiket IT, dengan state machine dan nomor tiketnya sendiri. Angka penutupannya jadi sumber KPI `kinerja_engagement` di [[Microservices - Employee Service]].*
 
-- **Status**: ⚠️ Implemented (ada catatan) — kode ada di `main` kedua repo (BE merge PR #1504 `feat/engagement-assign`, FE merge PR #1287), tetapi **audit 2026-08-29 menemukan 3 cacat yang membuat alurnya belum bisa dipakai utuh** (bukti pengerjaan tak bisa diunggah → tiket mustahil ditandai selesai; tab Pekerjaan Saya selalu kosong; keterlihatan tiket tak dibatasi departemen). Rinciannya di **## Cacat yang Diketahui**. **Belum diverifikasi lewat gateway** dev maupun prod.
+- **Status**: ⚠️ Implemented (ada catatan) — kode maju banyak sejak audit awal (28-29 Agustus 2026): **3 dari 4 cacat blocker/risiko audit awal sudah diperbaiki** (bukti pengerjaan dilonggarkan jadi opsional, tab Pekerjaan Saya diperbaiki, keterlihatan disaring per departemen via [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]]), penugasan berpindah total dari manual ke **round-robin otomatis** ([[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]], 1 September), dan satu **bug baru ditemukan+diperbaiki 2026-09-09**: nama pengerja salah lookup collection sehingga tampil sebagai `employee_id` mentah di setiap layar (dropdown reassign, kolom Pengerja, pratinjau giliran). Rincian terkini di **## Cacat yang Diketahui**. **Belum diverifikasi lewat gateway** dev maupun prod.
 - **Implementasi**: [[Microservices - Task Management Service]] (bagian *Modul Engagement Tim*) · kontrak endpoint di [[API - Task Management Service]]
 - **Layar**: [[APP - Web ERP]] — menu **Marketing › Engagement** (`/marketing/engagement`)
-- **Keputusan**: [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] · [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]]
+- **Keputusan**: [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] · [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] · [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]]
 
 ## Latar Belakang
 
@@ -19,9 +19,9 @@
 
 ### Siklus hidup satu permintaan
 
-1. **Account Specialist membuat tiket**: client, campaign, platform, jenis pekerjaan, volume, deadline, prioritas, guideline/tone of voice/kata terlarang, plus **satu atau lebih baris target** (URL + jenis + volume target). Ia **wajib menunjuk pengerjanya** di formulir yang sama.
-2. Sistem menerbitkan **nomor tiket** `ENG/YYYYMM/NNNN` (bulan menurut WIB) dan mengirim notifikasi ke orang yang ditunjuk.
-3. **Pengerja** menandai *mulai* (opsional) lalu *sudah dikerjakan* — dengan **bukti pengerjaan wajib** (screenshot atau tautan).
+1. **Account Specialist membuat tiket**: client, campaign, platform, jenis pekerjaan, volume, deadline, prioritas, guideline/tone of voice/kata terlarang, plus **satu atau lebih baris target** (URL + jenis + volume target). Ia **TIDAK LAGI menunjuk pengerjanya** — sejak [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]] (1 September 2026), server mengalokasikan otomatis lewat giliran round-robin (sedepartemen requester secara default). Form menampilkan pratinjau read-only siapa yang AKAN dapat giliran (`GET /engagement/giliran-berikutnya`, sejak 2 September) — **perkiraan**, bisa berbeda dari hasil sungguhan bila giliran bergeser sebelum submit.
+2. Sistem menerbitkan **nomor tiket** `ENG/YYYYMM/NNNN` (bulan menurut WIB) dan mengirim notifikasi ke orang yang teralokasi.
+3. **Pengerja** menandai *mulai* (opsional) lalu *sudah dikerjakan* — **bukti pengerjaan OPSIONAL** sejak keputusan SPV melonggarkan syaratnya (semula wajib dan membuat tiket mustahil ditandai selesai, lihat ## Cacat yang Diketahui).
 4. **Account Specialist memverifikasi**: *tutup* bila sesuai, atau *minta revisi* (wajib alasan) yang mengembalikan tiket ke **pengerja yang sama**.
 5. Bila pengerjanya berhalangan, **pembuat tiket atau admin/supervisor menugaskan ulang** (wajib alasan). Pembatalan juga milik keduanya, wajib alasan.
 
@@ -33,7 +33,7 @@ Status: `OPEN` → `IN_PROGRESS` → `DONE_BY_TEAM` → `CLOSED`, dengan jalur r
 |---|---|---|
 | Stage | dinamis per space, wajib memuat `Request`/`Todo`/`Done` | lima status **tetap** di kode |
 | Triase | supervisor menyetujui/menolak permintaan masuk | **tak ada triase** — tiket lahir sudah tertuju ke orang |
-| Penugasan | supervisor/admin space saat approve (bisa round-robin) | **pemohon** menunjuk saat membuat |
+| Penugasan | supervisor/admin space saat approve (bisa round-robin) | **server** mengalokasikan otomatis lewat round-robin saat dibuat (sejak 1 Sep 2026, [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]]) — pemohon tak lagi memilih |
 | Verifikasi hasil | supervisor meninjau `Testing → Done` | **pemohon** yang menutup atau minta revisi |
 | SLA | dua dimensi (response + resolution), target per prioritas | `deadline` diisi pemohon; prioritas hanya mengurutkan tampilan |
 | Eskalasi | breach SLA → supervisor divisi | tiket menganggur → pengerja + pemohon (tim flat, tak ada lead) |
@@ -73,7 +73,7 @@ Tim ini **flat, tanpa lead** — tak ada satu orang pun yang bisa dijadikan tuju
 - **Pencarian mengenali kedua nama.** `cocokAliasEngagement` (`engagement_alias.go`) mencocokkan kata kunci `engagement` **dan** `buzzer` dengan `Contains`, satu arah, tanpa mengubah data apa pun. Kalau kata kunci pencarian menunjuk modul ini, ia **tidak** dipakai sebagai penyaring isi tiket — sebab ia menunjuk *modul*, bukan isi, sehingga memakainya sebagai kata kunci justru mengosongkan hasil dan pembacanya menyimpulkan datanya hilang.
 - Alias sengaja **tidak** memakai pencocokan awalan/kemiripan: `buzz` dan `engage` ditolak. Alias yang terlalu longgar membuat pencarian apa pun mengembalikan seluruh tiket engagement.
 - **Nama lama masih hidup di luar modul ini**, dan itu bukan bug modul: template KPI produksi `Beauty Hacks / Buzzer` (termasuk satu template uji cacat, lihat [[HRIS - Otomasi Skor KPI]]), baris jabatan `Buzzer` di [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]], dan peta kepemilikan di [[Sales - ICC Account Manager Mapping]]. Pencarian di vault maupun di data yang hanya memakai satu dari dua nama akan **melewatkan separuh kenyataan**.
-- ⚠️ **Penyaring kandidat penugasan TIDAK memakai nama jabatan.** Ini kebalikan dari dugaan yang wajar. `daftarKandidatPengerja` (`engagement_assign.go`) menyaring **`department` == departemen pemanggil**, dan komentar di kodenya menyebut alasannya eksplisit: menyaring `position == "Engagement Team"` akan terikat pada nama jabatan yang **baru saja di-rename**, dan rename berikutnya mengosongkan daftar itu **tanpa satu pun galat**. Konsekuensi yang diterima sadar: daftar kandidat memuat orang yang bukan pengerja engagement (Account Specialist sendiri ikut muncul).
+- ⚠️ **Penyaring kandidat penugasan TIDAK memakai nama jabatan** — dan sejak [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] §4 (29 Agustus 2026) juga **tidak lagi memakai departemen pemanggil**. `daftarKandidatPengerja` (`engagement_assign.go`) kini menyaring `position_key ∈ KunciJabatanPengerja` (data di `engagement_settings`, seed produksi cuma `'engagement_team'`) **lintas departemen** — versi lama dokumen ini pernah menyatakan penyaringannya `department == departemen pemanggil`, itu sudah tidak akurat. Alasan menghindari nama jabatan tetap sama: rename `Buzzer` → `Engagement Team` menerbitkan `position_key` baru dan mengosongkan daftar **tanpa satu pun galat** bila disaring by-nama. Konsekuensi yang diterima sadar sekarang bergeser: bukan lagi "AS ikut muncul di kandidat" (itu sudah tak terjadi karena position_key sudah spesifik), melainkan alokasi OTOMATIS (round-robin, [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]]) yang menyempitkan kandidat ke sedepartemen requester secara default — dua sumbu (kolam vs giliran) yang gampang tertukar, lihat ADR-0060 TBD.
 
 ## Konsumen Data
 
@@ -86,6 +86,8 @@ Tim ini **flat, tanpa lead** — tak ada satu orang pun yang bisa dijadikan tuju
 | `quality` | *Engagement Quality* | 1/0 per tiket, 1 = ditutup tanpa revisi | tiket `CLOSED` periode itu |
 | `reporting` | *Reporting & Account Readiness* | 1/0 per tiket, 1 = punya lampiran bukti | tiket `CLOSED` periode itu |
 
+⛔ **`reporting` TERSTRUKTUR SELALU NOL untuk siapa pun, permanen** (bukan bug, konsekuensi keputusan yang belum ditutup) — lihat ## Cacat yang Diketahui #7. Tak ada satu pun rute yang menulis `attachments` ke `engagement_tickets` sejak syarat buktinya dilonggarkan jadi opsional; kalau tiket tak pernah bisa punya lampiran, `len(t.Attachments) > 0` tak pernah `true`.
+
 - **Penyebut keempatnya sama: tiket `CLOSED` pada periode itu**, dan periodenya dari `closed_at`, bukan `created_at`. `DONE_BY_TEAM` sengaja tak masuk — menghitungnya gagal berarti menghukum pengerja atas kelambatan pemohon. `CANCELLED` juga tidak: permintaan yang batal bukan pekerjaan yang gagal.
 - **Tak ada satu pun angka target/bobot/ambang di sumbernya** — seluruhnya milik HR/SPV lewat template KPI, sejalan [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]. Yang dikirim pengukuran mentah per tiket; yang mencacah lolos/tidak adalah reduksi.
 - ⚠️ **Konsekuensi yang perlu diketahui HR** (tertulis di kode): (a) metrik `speed` mengukur *berapa lama menyelesaikan*, bukan *berapa cepat merespons* — pengerja yang langsung mengerjakan tiket berat tampak sama lambatnya dengan yang menunda; (b) metrik `quality` ikut turun bila pemohon menekan Revisi karena **brief-nya sendiri** berubah, bukan karena hasilnya buruk. Alasan revisi wajib diisi dan tersimpan, sehingga sengketanya bisa ditelusuri.
@@ -93,21 +95,27 @@ Tim ini **flat, tanpa lead** — tak ada satu orang pun yang bisa dijadikan tuju
 
 ## Cacat yang Diketahui
 
-Dari audit modul 2026-08-29 (task `t_14519b55`). Dicatat di sini supaya dokumen ini **tidak** membaca seolah modulnya beres. Setiap butir grounded ke berkas:baris; usulan perbaikannya ada di laporan audit, bukan di sini.
+Dari audit modul 2026-08-29 (task `t_14519b55`), **diverifikasi ulang ke kode 2026-09-09** — banyak yang sudah berubah sejak audit awal, dicatat di sini apa adanya (termasuk yang ternyata TIDAK seperti diklaim commit/ADR-nya).
 
-**Menghalangi pemakaian (blocker):**
+**Sudah diperbaiki sejak audit awal:**
 
-1. ⛔ **Tiket mustahil ditandai selesai.** `selesaiDikerjakanHandler` (`engagement_handlers.go:588`) menolak `400` bila `attachments` kosong, tetapi **tak ada satu pun rute atau kode yang menulis `attachments` ke `engagement_tickets`** — tak ada `POST /engagement/tickets/:id/attachments` maupun `/links`, dan rute lampiran yang ada beroperasi atas koleksi `tasks`. Sisi FE mengonfirmasi: tombol "Sudah Dikerjakan" permanen mati. Akibat berantai: `DONE_BY_TEAM` tak pernah tercapai → `CLOSED` tak pernah tercapai → **keempat metrik KPI selalu nol untuk semua orang**.
-2. ⛔ **Tab "Pekerjaan Saya" selalu kosong.** `pekerjaanSaya` (`engagement_handlers.go:269`) menyaring `claimed_by`, field yang **tidak ada di model** dan tak pernah ditulis; yang benar `assigned_to`. Balasannya `200` berisi daftar kosong — tak ada galat, dan pengerja menyimpulkan tak ada tiket untuknya. Sisa peninggalan model antrian bersama; jejak yang sama ada di index `ix_pemegang` (`engagement_repo.go:66`) dan `hitungWIP` (`:140`, tak dipanggil dari mana pun).
-3. ⛔ **Kolom "Pengerja" menampilkan `employee_id` mentah.** `assigned_name` tak pernah diisi saat membuat tiket (`engagement_handlers.go:149-170`) dan justru di-`$unset` saat menugaskan ulang (`:544`), padahal `requester_name` diisi. Datanya tersedia (kandidat penugasan sudah membawa `full_name`), hanya tidak disimpan.
+1. ✅ **Bukti pengerjaan dilonggarkan jadi opsional.** `selesaiDikerjakanHandler` (`engagement_handlers.go:767`) tidak lagi mewajibkan `attachments` — komentarnya eksplisit menyebut ini keputusan SPV, karena syarat lama membuat tiket mustahil ditandai selesai (tak ada rute yang bisa menulis `attachments`). Konsekuensinya: metrik KPI `reporting` (lihat ## Konsumen Data) kini **terstruktur permanen nol**, bukan cuma nol karena tiket tak bisa `CLOSED` — rute untuk mengisi `attachments` tetap tidak ada.
+2. ✅ **Tab "Pekerjaan Saya" diperbaiki.** `pekerjaanSaya`, index `ix_pemegang`, dan `hitungWIP` kini menyaring/dibangun atas `assigned_to`, bukan `claimed_by`. Dikunci `engagement_regresi_test.go` (T-02).
+3. ✅ **Keterlihatan tiket kini dibatasi departemen requester.** [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] terimplementasi penuh (`engagement_visibility.go`): field `requester_department`, lima aturan OR (pembuat/pengerja/kolam pengerja/supervisor tercakup/admin), gerbang `POST /engagement/tickets` menolak `403` di luar departemen requester yang di-seed.
 
-**Risiko keterlihatan data:**
+**Cacat BARU ditemukan+diperbaiki 2026-09-09** (testing manual, sebelum ada di produksi):
 
-4. ⚠️ **Antrian dan dashboard tidak menyaring departemen sama sekali.** Komentar `antrianEngagement` (`engagement_handlers.go:209-213`) menyatakan "seluruh tiket aktif satu departemen", tetapi querynya hanya menyaring status; `dashboardEngagement` sama. Gerbangnya cuma `requireRoles("staff","supervisor","admin")` — yaitu **setiap pemakai ERP**. Akibatnya siapa pun yang bisa login melihat seluruh tiket lintas departemen berikut `client`, `campaign`, `guideline`, `tone_of_voice`, `kata_terlarang`, dan `target_url` kampanye. `detailTiket`/`riwayatTiket` juga tak memeriksa keterkaitan pemanggil dengan tiket. Bandingkan: `daftarKandidatPengerja` menyaring departemen, dan muatan `/kpi/engagement` sengaja disempitkan justru untuk alasan ini — standarnya sudah ada dan tidak diterapkan di jalur pemakai.
+4. ⛔→✅ **Kolom "Pengerja" (dan seluruh layar yang menampilkan nama kandidat) menampilkan `employee_id` mentah** (`BIP-0099-10-24` alih-alih nama orang) — root cause BARU, bukan yang dicatat audit lama. `daftarKandidatPengerja` (`engagement_assign.go`) melakukan `$lookup` nama dari koleksi `system_authentication`, yang **tidak punya field `full_name` sama sekali** (`shared-library/models/employee/models.go`), sehingga `$ifNull` SELALU jatuh ke `employee_id` — bukan cacat "belum diisi" seperti audit lama duga, melainkan salah collection. Diperbaiki dengan mengarahkan lookup ke `personal_data` (pola yang sama dengan `fetchFullName` di `notify.go`), diekstrak jadi `daftarKandidatPengerjaPipeline` supaya bentuk query-nya teruji tanpa Mongo.
+5. ⛔→✅ **FE form "Buat Request" masih menawarkan dropdown assign manual** padahal backend sudah mengabaikan total `assigned_to` sejak round-robin berlaku ([[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]], 1 September). AS memilih orang X, tiket jatuh ke orang Y hasil round-robin, **tanpa satu pun indikasi di layar**. Diperbaiki: dropdown diganti pratinjau read-only dari `GET /engagement/giliran-berikutnya`.
 
-**Cacat lain yang tercatat:** saringan prioritas diabaikan di ketiga endpoint daftar (saringan status juga diabaikan di tab Tiket Tim) meski FE menawarkannya; nomor tiket ganda dijanjikan di-retry tetapi pemanggilnya tidak me-retry sehingga permintaan bersamaan berujung `500`; tiket bisa lahir tanpa baris target (item disisipkan setelah tiket, tanpa rollback, dan baris ber-URL kosong dilewati diam-diam); dua tipe notifikasi (`engagement_ticket_open`, `engagement_released`) terdaftar lengkap sampai FCM tetapi **tak pernah dikirim**; label riwayat memakai teks tombol ("Mulai Kerjakan") alih-alih teks peristiwa ("Mulai dikerjakan").
+**Masih terbuka:**
 
-⚠️ **Test hijau di modul ini menyesatkan.** `go test ./...` di `services/task-management` lolos (45 subtest engagement), tetapi seluruhnya berhenti sebelum menyentuh Mongo, sehingga kelas cacat "query menunjuk field yang tak pernah ditulis" — yaitu cacat nomor 2 — mustahil tertangkap. Penjaga notifikasinya sendiri bolong: daftar tipe yang diiterasi test memuat satu tipe dua kali dan **melewatkan** satu tipe lain.
+6. ⚠️ **Notifikasi model lama TIDAK dibuang seperti diklaim ADR-0060 §6.** `anggotaSpaceEngagement`, `NotifEngagementOpen`/`NotifEngagementReleased`, dan komentar kepala berkas yang menjanjikan "menyapa SELURUH anggota space" (`engagement_notify.go`) semua masih ada di kode — dead code yang tak dibuang, bukan fitur yang jalan. Rincian di [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] (Consequences).
+7. ⚠️ **KPI `reporting` (Berbukti) terstruktur selalu nol** — lihat butir 1. Bukan bug baru, tapi konsekuensi permanen dari keputusan melonggarkan syarat bukti tanpa menambah cara mengisinya.
+
+**Cacat lain yang BELUM diverifikasi ulang** (dicatat audit 2026-08-29, statusnya sekarang tidak diketahui — jangan dipercaya tanpa Grep ulang): saringan prioritas/status di endpoint daftar; retry nomor tiket ganda; tiket lahir tanpa baris target; label riwayat memakai teks tombol alih-alih teks peristiwa.
+
+⚠️ **Test hijau di modul ini menyesatkan untuk kelas cacat tertentu.** Suite `services/task-management` lolos jauh melebihi 45 subtest lama, tapi kelas "query Mongo menunjuk collection/field yang salah" (butir 4 di atas) tetap tak tertangkap unit test — lingkungan test paket ini memang tanpa Mongo asli (dicatat eksplisit di `engagement_giliran_test.go`). Yang bisa dan sudah dikunci: BENTUK pipeline (`engagement_assign_test.go`), bukan hasil eksekusinya. Penjaga notifikasi juga masih bolong: `semuaTipeNotifEngagement()` memuat satu tipe dua kali dan melewatkan satu tipe lain (lihat butir 6).
 
 ## Kendala
 
@@ -117,12 +125,13 @@ Dari audit modul 2026-08-29 (task `t_14519b55`). Dicatat di sini supaya dokumen 
 
 ## Belum Diputuskan (TBD)
 
-Enam keputusan lingkup ini menunggu SPV; sampai diputuskan, **jangan** menuliskannya sebagai rancangan di dokumen mana pun.
+Sisa keputusan lingkup yang menunggu SPV; sampai diputuskan, **jangan** menuliskannya sebagai rancangan di dokumen mana pun.
 
-- **Bukti pengerjaan**: tambah rute lampiran engagement, atau longgarkan syarat buktinya jadi opsional? Yang kedua mengubah kontrak metrik `reporting` dan menuntut ADR sendiri. Juga TBD: batas ukuran/jumlah lampiran, dan apakah pemohon boleh melampirkan referensi saat membuat tiket.
-- **Batas keterlihatan tiket** — **DIPUTUSKAN 2026-08-29**, lihat [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]]: penyaringan per **departemen requester** lewat field baru `requester_department`, dengan tim Engagement melihat kedua brand. Belum ada di kode.
+- **Bukti pengerjaan**: syaratnya sudah dilonggarkan jadi opsional (## Cacat yang Diketahui #1), tapi rute untuk MENGISI `attachments` tak pernah ditambahkan — jadi metrik KPI `reporting` terstruktur nol permanen. TBD yang sebenarnya sekarang: apakah rute lampiran akan ditambahkan (menghidupkan metrik ini), atau metrik `reporting` dicabut/diganti dari katalog KPI karena tak pernah bisa terisi.
+- ~~Batas keterlihatan tiket~~ — **SELESAI**, lihat [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] (kodenya sudah ada, diverifikasi 2026-09-09).
+- ~~Siapa menunjuk pengerja~~ — **SELESAI**, lihat [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]]: server, bukan AS.
 - **Apakah `CLOSED`/`CANCELLED` boleh disaring** di tab Tiket Tim, yang dimaksudkan untuk beban berjalan.
-- **Notifikasi "tiket baru" ke seluruh space** — **DIPUTUSKAN 2026-08-29** ([[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] §6): `space_id` dicabut sebagai sumber keanggotaan, jadi ini **dead code yang dibuang**, bukan fitur yang belum jadi.
+- ⚠️ **Notifikasi "tiket baru" ke seluruh space** — ADR-0060 §6 mengklaim ini **DIJAWAB 2026-08-29** (dead code dibuang), tapi diverifikasi 2026-09-09 kodenya (`anggotaSpaceEngagement`, dua tipe notifikasi) **masih ada**, cuma tak terpanggil. Bukan TBD desain lagi, tapi utang pembersihan kode yang belum dikerjakan — lihat ## Cacat yang Diketahui #6.
 - **Batas WIP per anggota** — apakah memang direncanakan? `hitungWIP` ada tapi tak dipanggil.
 - **Penyelarasan template KPI produksi** yang masih bernama `Buzzer` dengan sumber `kinerja_engagement`.
 
@@ -130,7 +139,7 @@ Enam keputusan lingkup ini menunggu SPV; sampai diputuskan, **jangan** menuliska
 
 - [[Microservices - Task Management Service]] — implementasi service (bagian *Modul Engagement Tim*)
 - [[API - Task Management Service]] — daftar endpoint `/engagement/*` + `/kpi/engagement`
-- [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]]
+- [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] · [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] · [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]]
 - [[Microservices - Employee Service]] — sumber KPI `kinerja_engagement` · [[HRIS - Otomasi Skor KPI]] · [[HRIS - Matriks KPI per Departemen]]
 - [[APP - Web ERP]] — layar Marketing › Engagement · [[Sales - Big Pictures]] · [[Sales - ICC Account Manager Mapping]]
 - [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]] — jabatan `Buzzer` di peta peran sistem

@@ -2,7 +2,8 @@
 
 *Tiket Engagement DITUGASKAN langsung oleh Account Specialist saat permintaan dibuat — `assigned_to` wajib, tunggal, dan tak pernah kosong. Model lama, yaitu antrian bersama tempat anggota tim mengambil sendiri tiket ("claim"), DITINGGALKAN. Keputusan ini mengubah makna status `OPEN` tanpa mengubah namanya, dan sisa-sisa model lama masih berserak di kode — itulah sebab tiga cacat yang tercatat di [[Sales - Engagement Team (Modul)]].*
 
-- **Status**: ⚠️ **Berlaku, kodenya sudah di `main`** — BE commit `06691bc8` "Account Specialist menugaskan, bukan anggota mengambil" (PR [#1504](https://github.com/bip-itteam-internal/bip-erp/pull/1504)), FE commit `ebb55961` "pemilih pengerja menggantikan tombol Ambil Tiket" (PR [#1287](https://github.com/bip-itteam-internal/erp-frontend/pull/1287)). ⚠️ **Pembersihan sisa model lama BELUM tuntas** — lihat Consequences. **Belum diverifikasi lewat gateway.**
+- **Status**: ⛔ **§1-§3 DIGANTIKAN 2026-09-01** oleh [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]] — AS tidak lagi menunjuk pengerja, server mengalokasikan lewat round-robin. **§4 (penugasan ulang), §5 (revisi ke orang sama), §6 (notifikasi personal) TETAP BERLAKU**, tidak disentuh ADR-0083. Teks di bawah dipertahankan sebagai catatan sejarah keputusan awal — jangan dibaca sebagai perilaku saat ini untuk §1-§3.
+- Riwayat: BE commit `06691bc8` "Account Specialist menugaskan, bukan anggota mengambil" (PR [#1504](https://github.com/bip-itteam-internal/bip-erp/pull/1504)), FE commit `ebb55961` "pemilih pengerja menggantikan tombol Ambil Tiket" (PR [#1287](https://github.com/bip-itteam-internal/erp-frontend/pull/1287)). ⚠️ **Pembersihan sisa model lama BELUM tuntas** — lihat Consequences.
 - **Path di repo**: `bip-erp/services/task-management/engagement_assign.go` · `engagement_handlers.go` · `engagement_state.go` · `erp-frontend/src/features/marketing/engagement/**`
 - **Tanggal**: keputusan diambil saat modul dibangun ulang; didokumentasikan 2026-08-29
 
@@ -76,19 +77,20 @@ Tiket baru menyapa **orang yang ditugaskan**, bukan seluruh anggota space. Eskal
 
 Keputusan ini diambil dan diterapkan, tetapi pembersihannya tidak tuntas, dan itulah sebab langsung tiga cacat yang tercatat di [[Sales - Engagement Team (Modul)]]:
 
-- Query papan kerja masih menyaring **`claimed_by`**, field model lama yang tak pernah ada di `EngagementTicket` dan tak pernah ditulis. Tab "Pekerjaan Saya" karena itu **selalu kosong dengan `200`** — tak ada galat sama sekali. Index `ix_pemegang` dan `hitungWIP` menunjuk field mati yang sama.
-- Dua tipe notifikasi model lama (`engagement_ticket_open`, `engagement_released`) masih terdaftar lengkap sampai pemetaan FCM, tetapi **tak pernah dikirim**; pembaca `anggotaSpaceEngagement` juga tak ada lagi.
+- ✅ **DIPERBAIKI** (tanggal tak tercatat di commit message, terverifikasi ada di `main` per 2026-09-09): `pekerjaanSaya`, index `ix_pemegang`, dan `hitungWIP` kini menyaring/dibangun atas `assigned_to`, bukan `claimed_by` lagi. Dikunci `engagement_regresi_test.go` (T-02) yang memindai sumber ketiganya menolak kemunculan literal `claimed_by`.
+- ⚠️ **Masih benar per 2026-09-09, walau [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] §6 mengklaim ini sudah dibereskan**: dua tipe notifikasi model lama (`NotifEngagementOpen`/`engagement_ticket_open`, `NotifEngagementReleased`/`engagement_released`, `engagement_notify.go:21-23`) masih terdaftar lengkap sampai pemetaan FCM (`fcm.go:66`), tetapi **tak pernah dikirim** dari satu pun handler. `anggotaSpaceEngagement` (`engagement_notify.go:55`) juga **masih ada di kode**, bukan dibuang seperti yang dinyatakan ADR-0060 — ia sekadar tak dipanggil dari mana pun (dead code terbukti lewat Grep, bukan diasumsikan). `semuaTipeNotifEngagement()` (`engagement_notify.go:37-48`) memuat `NotifEngagementClaimed` DUA KALI dan tidak memuat `NotifEngagementOpen` sama sekali — penjaga test yang mengiterasi daftar ini karena itu tak bisa menangkap tipe yang hilang.
 - **Komentar di kode masih menjanjikan model lama**: kepala berkas notifikasi menyatakan "menyapa SELURUH anggota space", ada doc-comment untuk fungsi `notifikasiTiketBaru` yang tidak ada, dan komentar antrian menyebut "antrian bersama". Bahayanya bukan biaya runtime melainkan **kebohongan dokumentasi**: pembaca berikutnya menyimpulkan modul ini menyiarkan tiket baru ke seluruh space, dan asumsi keliru itu melahirkan keputusan keliru.
 
 Sisi FE punya sisa yang sama: kolom "Alasan" masih dirender untuk pengerja pada status `IN_PROGRESS`, padahal tak ada satu pun aksi pengerja yang memakai alasan (sisa aksi "lepas tiket" yang sudah dihapus).
 
 **Yang belum diputuskan (TBD):**
 
-- ~~**Apakah notifikasi "tiket baru" ke seluruh space masih diinginkan**~~ — **DIJAWAB 2026-08-29** oleh [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] §6: `space_id` dicabut sebagai sumber keanggotaan (dua mekanisme keanggotaan yang hidup berdampingan pasti menyimpang, dan penyimpangannya muncul sebagai "orang ini tidak dapat notifikasi"). Kode yang menganggur itu **dead code**, dan dibuang bersama komentar kepala berkasnya.
+- ~~**Apakah notifikasi "tiket baru" ke seluruh space masih diinginkan**~~ — **DIJAWAB 2026-08-29** oleh [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] §6: `space_id` dicabut sebagai sumber keanggotaan. ⚠️ **Tapi pembersihan kode yang ADR-0060 klaim sudah terjadi TERNYATA BELUM** (diverifikasi Grep 2026-09-09) — `anggotaSpaceEngagement`, `NotifEngagementOpen`/`NotifEngagementReleased`, dan komentar kepala berkas yang menjanjikan "seluruh anggota space" semuanya **masih ada di kode**, sekadar tak terpanggil dari jalur manapun. Lihat baris di atas.
 - **Apakah batas WIP per anggota direncanakan.** `hitungWIP` ada tapi tak dipanggil dari mana pun; ia satu-satunya sisa model lama yang mungkin bukan sampah.
 
 ## Terkait
 
+- [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]] — MENGGANTIKAN §1-§3 ADR ini (2026-09-01)
 - [[Sales - Engagement Team (Modul)]] — konsep bisnis modul ini, termasuk daftar cacat yang jadi turunan keputusan ini
 - [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] — keputusan pasangannya, tentang di mana tiketnya disimpan
 - [[Microservices - Task Management Service]] · [[API - Task Management Service]] · [[Microservices - Employee Service]] · [[APP - Web ERP]]
