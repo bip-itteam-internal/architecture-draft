@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-08",
-  "jumlah_dokumen": 378,
+  "digenerate": "2026-09-09",
+  "jumlah_dokumen": 382,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -110,24 +110,22 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "b6faf7cc8003a716322a46715b48f01175770128a0d8b52498c5e47bf37a22bb",
-      "ukuran_kb": 51.2,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik gateway `/api/employee/*` (login username/PIN/biometrik, onboarding, personal dan work data, dokumen, jadwal, system-auth, kelola akun, master departemen dan system role, menu-hidden, jenjang jabatan, penyetuju departemen, permission-holders, KPI, vacation, resign, promosi/mutasi, surat peringatan) dan RBAC mana yang menggerbang tiap rute. Juga menjawab kontrak responsnya: kode status yang dikembalikan, field query yang wajib, perilaku `PUT` yang mempertahankan field supervisi, dan rute `/internal/*` yang dipakai lintas-service (department-approver, permission-holders).",
+      "hash": "edc5dbfd8d9f66082f1caa31b89503459395a2723b80102e919702b81c93f0de",
+      "ukuran_kb": 51.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service lewat gateway `/api/employee/*` (login/PIN/biometrik, onboarding, personal & work data, dokumen, jadwal kerja, akun & perangkat, master data departemen/system role/jenjang jabatan/penyetuju, KPI, resign, promosi-mutasi, surat peringatan) dan RBAC mana yang menjaga tiap rute. Juga menjawab perilaku khusus seperti `/data-type/department?grouped=true`, `menu-hidden`, penetapan approver departemen (satu-satunya penulis `is_supervisor`), serta endpoint `/internal/` yang dipakai lintas-service (department-approver, permission-holders).",
       "kata_kunci": [
         "employee-service",
-        "endpoint employee",
-        "api/employee",
-        "login PIN biometrik",
-        "master department",
-        "system roles",
-        "penyetuju departemen / department approver",
-        "permission-holders",
-        "menu-hidden",
-        "jenjang jabatan / job level",
-        "resign nonaktif",
-        "surat peringatan SP",
-        "promosi mutasi",
-        "RBAC HRIS"
+        "endpoint",
+        "API",
+        "auth login",
+        "master data departemen",
+        "system role",
+        "approver",
+        "penyetuju",
+        "permission holders",
+        "RBAC",
+        "data-type grouped",
+        "HRGA"
       ]
     },
     {
@@ -414,7 +412,7 @@
         "External - Accurate"
       ],
       "hash": "b84bbdb91c1659f41feda79a35ed97fcd2672f2baa375acdb99bfacd7a712502",
-      "ukuran_kb": 91.1,
+      "ukuran_kb": 91.4,
       "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service lewat gateway `/api/integration/*` untuk marketplace (TikTok Shop/Business, Shopee), webhook publik, order terpadu dan ekspornya, aging piutang, feed retur lintas-channel, packet tracking, Accurate, dashboard FAT `/accounting/*`, profit dan profit insentif, ICC account mapping, kas toko/wallet, ulasan marketplace, status sinkron toko, serta kepemilikan toko per departemen. Juga menjelaskan parameter tiap rute (mis. `shopee_attribution`, `updated_since`, `order_ids`, `date_basis`, `with_total`), bentuk responsnya, siapa konsumennya (WMS, Web ERP), dan jebakan seperti `/health` yang tetap butuh gateway key.",
       "kata_kunci": [
         "integration-service",
@@ -837,7 +835,7 @@
         "order.order-items-get"
       ],
       "hash": "40849a92b3a96565fbc789742e61b75e3bbd942b6d18b298c097028cfbd2659e",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab cara menarik daftar order dari Lazada Open API endpoint `/orders/get`, perbedaan filter waktu `created_after`/`created_before` (waktu order dibuat) vs `update_after`/`update_before` (waktu order berubah), dan kenapa window berbasis update penting sebagai jaring pengaman ketika webhook Lazada (LPM) mati. Juga mendokumentasikan jebakan status order-level yang bisa tertinggal dari status tracking sebenarnya.",
       "kata_kunci": [
         "Lazada",
@@ -1001,7 +999,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 1.9,
+      "ukuran_kb": 2.0,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1053,7 +1051,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1273,23 +1271,24 @@
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
         "Microservices - Learning Service",
         "HRIS - Training Program",
+        "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program",
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "c90393864f42d9502daa7bc910c745508c1c81bbad63a049a7313419f0d5e8c6",
-      "ukuran_kb": 52.8,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitekturnya (Flutter, BLoC, Clean Architecture feature-first, get_it, dio, go_router), cara autentikasinya (JWT, biometric, PIN, satu akun satu device), dan bagaimana ia terhubung ke backend lewat gateway. Juga menjawab fitur apa yang sudah live (attendance, izin/cuti, lembur, slip gaji, KPI, survei, Kaizen, sesi live host, pelatihan), bagaimana konten dan menu dibedakan per perusahaan (multi-tenant), versi mana yang rilis di `main` versus yang baru sampai `dev`, serta fitur mana yang masih coming soon atau roadmap.",
+      "hash": "195538b97a4249a0d4fa1d8caf40983b2f53fd34e7febb0eb3e42ed3ca68372a",
+      "ukuran_kb": 53.5,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, fitur HR apa saja yang tersedia (attendance, cuti/izin, lembur, payroll, KPI, survei), bagaimana arsitektur Flutter-nya (Clean Architecture feature-first, bloc, dio, go_router), dan bagaimana autentikasi bekerja (JWT + biometric + PIN, 1 akun = 1 device). Menjelaskan juga bagaimana konten dinamis per-tenant di-scope lewat company_id, versi build/rilis mana yang terpasang di HP pemakai versus dev, dan bahwa aplikasi mengakses backend lewat API Master Gateway (bukan langsung, bukan SSO ticket).",
       "kata_kunci": [
         "MyBharata",
-        "my_bharata",
-        "mobile",
+        "aplikasi mobile",
         "Flutter",
         "HRIS mobile",
-        "aplikasi karyawan",
-        "employee app",
         "attendance",
-        "slip gaji",
-        "multi-tenant"
+        "cuti",
+        "lembur",
+        "payroll",
+        "JWT biometric PIN",
+        "multi-tenant company_id"
       ]
     },
     {
@@ -1441,23 +1440,22 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "e01f4deddf5906c8bfb8a909b7497eaf5f76ccbae25cc03ab94f69837b4a56b0",
-      "ukuran_kb": 403.9,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS `erp-frontend` (One Bharata), stack apa yang dipakai (Next.js App Router, shadcn/ui, TanStack Query, react-i18next), bagaimana login, cookie `system_roles`, SSO ticket, dan role gating sidebar bekerja, serta bagaimana menu HRIS dan Pengaturan HRGA terpusat dikelompokkan dan digerbang per tab. Juga menjawab konvensi data-fetching TanStack Query (hook sidebar ber-`enabled`, badge dengan refetchOnWindowFocus, pencacah membalas angka), konvensi bagan Recharts lewat `ChartContainer`, dukungan multi-perusahaan (CompanySwitcher, kelola perusahaan, shift, WiFi per tenant), dan modul mana yang sudah diimplementasikan atau masih catatan.",
+      "hash": "0f1edf8dffe429fd979252ef275653e76222199756fe12ab03ee694f48bddd17",
+      "ukuran_kb": 404.0,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (`erp-frontend`, Next.js App Router), bagaimana autentikasi, cookie `system_roles`, dan peran SSO identity provider bekerja, serta bagaimana sidebar dan menu digerbang per modul/role (termasuk Pengaturan HRGA terpusat, multi-perusahaan, dan kategori audit yang lahir dari paket izin). Juga menjawab konvensi frontend yang wajib diikuti: data-fetching TanStack Query (hook sidebar ber-`enabled`, badge pakai refetchOnWindowFocus) dan bagan Recharts lewat `ChartContainer`.",
       "kata_kunci": [
         "erp-frontend",
-        "Web ERP",
+        "web ERP",
         "One Bharata",
         "hris-dashboard",
         "Next.js",
         "SSO",
         "system_roles",
-        "sidebar",
+        "sidebar menu",
         "role gating",
-        "Pengaturan HRGA",
-        "multi-tenant",
         "TanStack Query",
-        "Recharts"
+        "Recharts ChartContainer",
+        "multi-tenant"
       ]
     },
     {
@@ -1729,22 +1727,29 @@
         "HRIS - Recruitment",
         "GA - Procurement System",
         "HRIS - Leave Request",
-        "Manufacture - Stock & Material Management"
+        "Manufacture - Stock & Material Management",
+        "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
+        "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library",
+        "CORE - API Master Gateway",
+        "Microservices - File Service",
+        "REF - Kepemilikan Data"
       ],
-      "hash": "9dbf65a35f04547bd9baafd6c660f9427c5e721a1bfcb4ba2d92dc6dd4b553f1",
-      "ukuran_kb": 10.3,
-      "ringkasan": "Menjawab: bagaimana rencana arsitektur layanan OCR + document-intelligence (RAG) lintas-fitur yang akan dipakai berbagai subsistem ERP (Inventory, Waste Management, Recruitment CV screening), termasuk pilihan komponen (OCR cloud/lokal, embedding, vector store FAISS, LLM lokal via Ollama) dan rencana MVP bertahap. Cocok dirujuk saat menimbang siapa saja calon konsumen kapabilitas OCR/RAG di ERP.",
+      "hash": "68b0acedc72aae6a224bf4823aa573a21407459a76543b2df3b5117988be6abd",
+      "ukuran_kb": 17.9,
+      "ringkasan": "Menjawab: apakah OCR/ekstraksi dokumen bisa dibangun sekarang, apa yang benar-benar dibutuhkan tiap konsumen (Inventory, Waste, Recruitment CV screening, faktur supplier), dan mengapa blueprint RAG (embedding, FAISS, Ollama) yang ada di bagian bawah dokumen sebagian besar tidak diperlukan. Bagian 'Temuan terukur 2026-09-08' MENGOREKSI blueprint dengan angka: ekstraksi terstruktur sudah jalan hari ini lewat endpoint AI internal yang menerima gambar (faktur Bahasa Indonesia terbaca persis, kontrol negatif lolos), overhead tetap 2.061 token membuat rencana 'OCR dulu supaya hemat token' tidak terbayar, dan prod Biznet TIDAK punya GPU (8 core, 15 GB RAM, 52 container) sehingga model 3B kelas Unlimited-OCR tak muat. Juga menjawab batasan kepatuhan data: GET /v1/models mengembalikan nol model lokal, jadi semua yang dikirim ke endpoint itu keluar dari perusahaan — OCR lokal tidak menyelesaikan syarat 'dokumen tidak boleh keluar' selama ekstraksinya masih memanggil endpoint itu.",
       "kata_kunci": [
         "OCR",
-        "RAG",
         "document intelligence",
+        "RAG",
+        "ekstraksi terstruktur",
         "embedding",
         "vector store",
         "FAISS",
         "Ollama",
-        "LLM lokal",
+        "DeepSeek-OCR",
+        "GPU",
         "CV screening",
-        "konsep draft"
+        "vision"
       ]
     },
     {
@@ -2146,23 +2151,22 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "333f0e8f449c37dba46534c669d2cdde7433137afa855cc4b3fc5e55f34607ad",
-      "ukuran_kb": 121.9,
-      "ringkasan": "Menjawab: apa peran employee-service sebagai master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding (SSO) di bip-erp, dan fitur apa saja yang dimilikinya: auth/registration, account admin IT (active-status, forget-device, reset, roles), master data departemen dan system role beserta seed-nya, KPI, kontrak, BPJS, vacation quota, multi-tenant, akun pihak luar, dan resign. Juga menjawab workspace posisi mana yang di-host di service ini alih-alih service baru (Legal perizinan/kontrak/dispute, R&D Regulatory, Quality CAPA/incoming/batch release, register Procurement non-Accurate), gerbang izin apa yang dipakainya, serta dependensi dan integrasinya dengan service lain.",
+      "hash": "538f62313756b764063ac05a9af687646381fe5f5cb6b4312c393313bc7186ba",
+      "ukuran_kb": 122.3,
+      "ringkasan": "Menjawab: apa tanggung jawab employee-service sebagai master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding di bip-erp, fitur apa saja yang sudah diimplementasikan (login username/PIN/biometrik, account admin IT seperti forget-device dan reset, master data departemen & system role, KPI, kontrak, BPJS, vacation quota, resign, multi-tenant, akun pihak luar), dan workspace mana yang di-host di service ini (Legal, R&D Regulatory, Quality, Procurement non-Accurate). Juga menjawab bagaimana ia menjadi feed data lintas-service dan apa catatan runtime yang masih tertunda.",
       "kata_kunci": [
-        "employee service",
-        "master data karyawan",
-        "autentikasi / authentication SSO",
-        "onboarding register",
-        "account admin forget-device reset",
-        "master_department master_system_role",
-        "legal perizinan kontrak dispute",
-        "rnd regulatory",
-        "quality CAPA incoming batch release",
-        "procurement kontrak vendor cost saving",
-        "multi-tenant company_id",
-        "akun vendor / mitra",
-        "Go Fiber MongoDB"
+        "employee-service",
+        "Microservices",
+        "Go Fiber MongoDB",
+        "autentikasi",
+        "onboarding",
+        "master data",
+        "account admin",
+        "legal rnd quality procurement",
+        "multi-tenant",
+        "resign",
+        "feed lintas-service",
+        "source of truth"
       ]
     },
     {
@@ -2233,6 +2237,7 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "Microservices - Employee Service",
         "ADR - 0066 Modul Kelola Program Culture",
+        "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program",
         "ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)",
         "Microservices - File Service",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
@@ -2240,20 +2245,21 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "e743433d7eb3008267a814279a2dece5094f751baa1318ab89f371e2c02c0a1c",
-      "ukuran_kb": 105.0,
-      "ringkasan": "Menjawab: bagaimana form dinamis dibuat, dimiliki per departemen, diisi, dinilai, dan dianalisa di bip-erp, termasuk penilaian karyawan lain lewat sumbu subject, skor gabungan, indeks layanan departemen, dan program Kaizen. Menjelaskan cara kerja form berulang secara rinci: penanda periode bulanan dan mingguan, cron pembuka periode, snapshot pertanyaan per periode, dan rentang mati antara periode tutup dan periode berikutnya buka yang membuat form sempat menagih ulang orang yang sudah mengisi. Juga memuat keputusan yang menjaga presensi tetap hidup serta daftar gap dan gotcha yang sudah terbukti menggigit.",
+      "hash": "f5abf9ef1f2474b0dbc8d20219b5715acea294e57c782e52f770b06b412ab7af",
+      "ukuran_kb": 106.2,
+      "ringkasan": "Menjawab: bagaimana sebuah departemen membuat form dinamis tanpa coding, tipe pertanyaan apa saja yang didukung (10 tipe), bagaimana form diterbitkan ke sasaran, siapa yang boleh mengelola form (RBAC per departemen), dan bagaimana jawaban direkap serta diekspor ke CSV. Menjelaskan juga tipe form (survey/evaluation/checklist/kaizen), penilaian karyawan lain lewat sumbu subject, form berulang periode bulanan/mingguan, program culture dengan skor komposit, gerbang presensi mobile berbasis form wajib, dan kewajiban ikut men-deploy notification-service.",
       "kata_kunci": [
-        "form builder",
-        "form berulang",
-        "rentang mati",
-        "open_day",
-        "periode",
+        "Form Builder",
+        "form dinamis",
+        "survey",
+        "evaluation",
+        "checklist",
         "kaizen",
-        "gerbang presensi",
-        "attendance gate",
+        "form berulang",
         "penilaian karyawan",
-        "indeks layanan"
+        "program culture",
+        "gerbang presensi",
+        "form_builder_db"
       ]
     },
     {
@@ -2396,20 +2402,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "8d460dd56f166a3c6ff4f18ee0410268c6ebe60f3a34558c5a4f14b7baecf988",
-      "ukuran_kb": 356.7,
-      "ringkasan": "Menjawab: bagaimana order marketplace (TikTok Shop, Shopee, Lazada) masuk ke ERP lewat webhook direct, bagaimana kredensial OAuth per marketplace dikelola, dan bagaimana order dinormalkan jadi model transaction terpadu lalu dibridging ke Accurate Online sebagai Sales Invoice/Sales Return. Menjelaskan juga endpoint report iklan TikTok Business/Ads (GMV Max monitoring, overview per produk, ICC video metrics) beserta rumus ROAS/ROI dan aturan GMV winner, cron sync master data, worker terjadwal, serta jebakan yang pernah terjadi (rate limit TikTok, salah field filter advertiser_id, bypass verifikasi signature webhook Shopee). Berguna untuk menelusuri toko/gudang, ACL toko per departemen, mapping ICC, dan status ketahanan sinkron per toko.",
+      "hash": "e40407d1fd6442ee0453798b2dc48aab3291555b764738bc9a960bffac21e074",
+      "ukuran_kb": 356.0,
+      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) ke model transaksi terpadu dan bridge akuntansi ke Accurate Online (invoice harian, sales return, push), bagaimana webhook tiap platform diautentikasi dan diproses, serta fitur apa saja per area: GMV Max monitoring/overview, ICC video metrics, affiliate, ICC account mapping, marketing team dan shop ACL, kepemilikan toko per departemen, fulfillment bridge WMS, profit per produk, ulasan marketplace, status sinkron toko, cron/worker, dan observabilitas Shopee. Juga mencatat keputusan teknis dan perbaikan yang tercatat (rate limit TikTok, filter advertiser_id, ROI agregat), catatan tentang Meta Ads, dan jalur legacy Desty yang dinonaktifkan.",
       "kata_kunci": [
         "integration service",
-        "marketplace",
+        "integrasi marketplace",
         "TikTok Shop",
+        "TikTok Business",
         "Shopee",
-        "Lazada",
+        "Accurate",
         "webhook",
-        "Accurate Online",
-        "Sales Invoice",
         "GMV Max",
-        "ICC"
+        "ICC",
+        "auto-sync"
       ]
     },
     {
@@ -4664,7 +4670,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "1af925998c51daaf89f4b362162b5f8c117e3db82e37169cbfe7b2e6ed084c92",
-      "ukuran_kb": 6.5,
+      "ukuran_kb": 6.6,
       "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal), dan bagaimana auto-disable Tahap 2 bekerja (counter kegagalan auth beruntun, ambang 5, reset saat sukses, satu Telegram tanpa damper terpisah — bukti flapping 36009006). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care.",
       "kata_kunci": [
         "adr",
@@ -4802,7 +4808,7 @@
         "APP - Web ERP"
       ],
       "hash": "3405a3dc1516fe9eff90d36e5a1a47c8a876d2dbaf6bc9537105816d5897ee6d",
-      "ukuran_kb": 10.1,
+      "ukuran_kb": 10.2,
       "ringkasan": "Menjawab: bagaimana penyesuaian statement TikTok (tt_statement_adjustments, mayoritas ganti rugi paket hilang / LOGISTICS_REIMBURSEMENT yang bukan penggantian ongkir) dibukukan ke Accurate — dilipat ke payout pesanan yang disebutnya lalu diurus mesin receipt, bukan sebagai baris pendapatan tersendiri — dan bagaimana pesanan yang tak ditemukan ditangani. Live 26 Agustus 2026 (PR #1451).",
       "kata_kunci": [
         "adr",
@@ -4929,11 +4935,12 @@
       "judul": "ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "⚠️",
-      "status_teks": "**Berlaku, kodenya sudah di `main`** — BE commit `06691bc8` \"Account Specialist menugaskan, bukan anggota mengambil\" (PR [#1504](https://github.com/bip-itteam-internal/bip-erp/pull/1504)), FE commit `ebb55961` \"pemilih pengerja menggantikan tombol Ambil Tiket\" (PR [#1287](https://github.com/bip-itteam-internal/erp-frontend/pull/1287)). ⚠️ **Pembersihan sisa model lama BELUM tuntas** — lihat Consequences. **Belum diverifikasi lewat gateway.**",
+      "status_emoji": "⛔",
+      "status_teks": "**§1-§3 DIGANTIKAN 2026-09-01** oleh [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]] — AS tidak lagi menunjuk pengerja, server mengalokasikan lewat round-robin. **§4 (penugasan ulang), §5 (revisi ke orang sama), §6 (notifikasi personal) TETAP BERLAKU**, tidak disentuh ADR-0083. Teks di bawah dipertahankan sebagai catatan sejarah keputusan awal — jangan dibaca sebagai perilaku saat ini untuk §1-§3.",
       "publik": true,
       "tautan": [
         "Sales - Engagement Team (Modul)",
+        "ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS",
         "ADR - 0060 Cakupan Keterlihatan Tiket Engagement",
         "Microservices - Employee Service",
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
@@ -4941,20 +4948,20 @@
         "API - Task Management Service",
         "APP - Web ERP"
       ],
-      "hash": "07a6e0d73185f7d862e6f6b20df03406d564e62b2636160676877154667d975f",
-      "ukuran_kb": 10.2,
-      "ringkasan": "Menjawab: kenapa tiket Engagement ditugaskan langsung oleh Account Specialist dan bukan diambil sendiri dari antrian bersama, serta konsekuensi apa yang menyertainya. Menjelaskan aturan assigned_to wajib dan tunggal, pergeseran makna status OPEN menjadi sudah ditugaskan tapi belum disentuh, jalur penugasan ulang beserta pembersihan started_at/escalated_at, revisi yang kembali ke orang yang sama, dan notifikasi personal alih-alih siaran. Dipakai saat menyusun query papan kerja atau membaca metrik menit_ambil yang maknanya ikut bergeser.",
+      "hash": "72eec5a1da36dc70aedf90987985583fbdad197fd26eb1f12e3770d4512ff88f",
+      "ukuran_kb": 11.5,
+      "ringkasan": "Menjawab: kenapa tiket Engagement dulu ditugaskan langsung oleh Account Specialist alih-alih diambil bebas dari antrian bersama (claim), bagaimana aturan penugasan ulang (reassign) saat pengerja berhalangan, bagaimana revisi tiket kembali ke pengerja yang sama, dan kenapa notifikasi bersifat personal bukan siaran. Juga menandai bagian mana (§1-3, penunjukan manual) yang sudah digantikan ADR-0083 dan bagian mana (reassign, revisi, notifikasi) yang tetap berlaku.",
       "kata_kunci": [
-        "ADR 0059",
         "engagement",
+        "assign",
         "penugasan",
-        "assignment",
-        "assigned_to",
-        "antrian",
-        "claim",
-        "Account Specialist",
+        "antrian bersama",
+        "shared queue",
+        "claim tiket",
         "reassign",
-        "OPEN"
+        "penugasan ulang",
+        "account specialist",
+        "buzzer"
       ]
     },
     {
@@ -4962,12 +4969,13 @@
       "judul": "ADR - 0060 Cakupan Keterlihatan Tiket Engagement",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "Konsep / Direncanakan — **belum ada di kode**. Keputusan diambil 2026-08-29 atas temuan audit T-10 ([[Sales - Engagement Team (Modul)]] cacat no. 4). Implementasinya task `t_9d06c153`; spesifikasi teknis lengkap ada di `Workspace/ANALISA - Model Departemen Engagement`.",
+      "status_emoji": "✅",
+      "status_teks": "**Berlaku, kodenya sudah di `main`** — commit `1cdd7fad` \"model departemen requester + kolam pengerja lintas departemen\" dan `742e0bfd` \"perbaiki hasil review PR #1519 (kebocoran keterlihatan, filter mine, peta departemen)\" (29 Agustus 2026), diverifikasi ulang ke kode 2026-09-09. **Belum diverifikasi lewat gateway** dev maupun prod. Keputusan diambil 2026-08-29 atas temuan audit T-10 ([[Sales - Engagement Team (Modul)]] cacat no. 4). Spesifikasi teknis lengkap ada di `Workspace/ANALISA - Model Departemen Engagement`. ⚠️ **§6 di bawah (pembersihan `space_id`/notifikasi mati) TERNYATA belum tuntas** — lihat catatan di situ dan di [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]].",
       "publik": true,
       "tautan": [
         "Sales - Engagement Team (Modul)",
         "ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama",
+        "ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS",
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "Microservices - Task Management Service",
@@ -4975,20 +4983,20 @@
         "Microservices - Employee Service",
         "APP - Web ERP"
       ],
-      "hash": "e89775a67a955ac7976cb16ab5766c4c9d06f258082d8d71022b33c64063fb80",
-      "ukuran_kb": 11.8,
-      "ringkasan": "Menjawab: siapa boleh melihat tiket Engagement mana, dan kenapa penyaringnya adalah field baru requester_department yang distempel server dari header identitas. Menjelaskan lima aturan keterlihatan yang digabung sebagai OR (pembuat, pengerja, anggota kolam pengerja, supervisor sesuai cakupan, admin), kolam pengerja yang disimpan sebagai data position_key di koleksi engagement_settings, pembatasan siapa boleh membuat tiket, pencabutan space_id sebagai sumber keanggotaan, dan perlakuan tiket lama saat migrasi. Dipakai saat menutup kebocoran materi kampanye antar-brand Kyura dan Beauty Hacks.",
+      "hash": "44c712f6e449889c203390eaa2f22cc71a5f21fe1393c2cbfb435c5e9d6c25e8",
+      "ukuran_kb": 13.5,
+      "ringkasan": "Menjawab: siapa saja yang boleh melihat sebuah tiket Engagement lintas departemen (Kyura vs Beauty Hacks), bagaimana field requester_department dipakai sebagai sumbu penyaring, dan lima aturan keterlihatan (requester, pengerja, kolam pengerja, supervisor, admin) digabung sebagai OR. Juga menjelaskan kenapa kolam kandidat pengerja tetap lintas departemen sementara pembuatan tiket baru dibatasi ke departemen requester tertentu.",
       "kata_kunci": [
-        "ADR 0060",
         "engagement",
-        "keterlihatan",
+        "keterlihatan tiket",
         "visibility",
         "requester_department",
-        "departemen",
-        "position_key",
-        "Kyura",
-        "Beauty Hacks",
-        "engagement_settings"
+        "kolam pengerja",
+        "worker pool",
+        "kyura",
+        "beauty hacks",
+        "rbac",
+        "kebocoran data"
       ]
     },
     {
@@ -5228,7 +5236,7 @@
         "REF - Penamaan Metrik & Sumber KPI"
       ],
       "hash": "986c92356a28f6e5d7cecda25991d35ee197cf415fad6f6c08996057876df910",
-      "ukuran_kb": 7.5,
+      "ukuran_kb": 7.4,
       "ringkasan": "Menjawab: mengapa KPI jabatan Culture & Industrial dihitung dari penilaian PESERTA (rating + masukan) alih-alih self-report officer, dan bagaimana modul Kelola Program Culture menggantikan pendekatan form realisasi (ADR 0065). Merinci skor komposit 30/30/40 (partisipasi/antusiasme/implementasi dihitung otomatis), resolusi target diundang otomatis dari jenis program, pemecahan distribusi pilar ke Core Value atomik, koleksi culture_programs/culture_feedback, dan batas kepemilikan kpi_score.",
       "kata_kunci": [
         "ADR 0066",
@@ -5772,8 +5780,8 @@
       "judul": "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui manajemen 2026-09-07 lewat wawancara `/analisa-kebutuhan`. **T1 (gerbang tulis per level dan divisi)** di bip-erp PR [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767) (**merged 2026-09-08 06:59 WIB, live di prod 07:03 WIB**; terverifikasi prod baca-saja: SPV Beauty Hacks menulis dirinya → 403 \"tidak boleh menulis target diri sendiri\", menulis level supervisor → 403 \"level supervisor hanya boleh ditulis Finance, IT, atau Direktur\", target yang ada tak berubah; jalur positif SPV menulis icc divisinya belum dicoba di prod karena itu menulis data); **T4 (Master Target per orang, sekaligus Dashboard Insentif, struktur HRIS + i18n) sudah dikodekan** di erp-frontend PR [#1473](https://github.com/bip-itteam-internal/erp-frontend/pull/1473) (**merged dan live di prod 2026-09-07 23:16 WIB**; jendela 403 pensil Supervisor karena dimerge sebelum #1767 tertutup sejak T1 live prod 2026-09-08 07:03 WIB); **T2 (KPI membaca target dari sumber insentif) sudah dikodekan** di bip-erp PR [#1775](https://github.com/bip-itteam-internal/bip-erp/pull/1775) (**merged 2026-09-07 14:42 UTC** ke `main` ce30a716; **live di dev 21:44 WIB dan di prod 22:16 WIB, keduanya terverifikasi 2026-09-07**: di prod `auto_target` Aan Budiyanto Agustus 44 jt (insentif) bukan 88 jt (template), Silvia 165 jt bukan 116,89 jt, Aan September \"belum dapat dihitung: target profit belum diisi di Master Target insentif\", skor beku Annisa Agustus tak berubah; lihat catatan transisi di §3 dan §7); **T5 backend (PR A, bip-erp [#1783](https://github.com/bip-itteam-internal/bip-erp/pull/1783)) dan T5 frontend + T6 (PR B, erp-frontend [#1484](https://github.com/bip-itteam-internal/erp-frontend/pull/1484)) di kode, keduanya belum merge per 2026-09-08** (lihat §3 dan §6 \"Sebagaimana dikodekan\"); urutan wajib A → B → C; T3 menyusul sebagai PR C. Daftar task: `Workspace/ANALISA - Target Profit Satu Pintu.md` (papan kerja, bukan dok terbit).",
+      "status_emoji": "✅",
+      "status_teks": "**Implemented** — T1 sampai T6 live prod per 2026-09-08 (T3/T5/T6 pukul 11:29 WIB employee-service dan 11:27 WIB frontend-hris, terverifikasi baca-saja dari dalam container), T7 sinkron dok selesai. Catatan tersisa: jalur positif SPV di layar Atur Target belum ditempuh sebagai orang; 8 template prod masih menyimpan target profit lama sampai disimpan ulang atau skrip pembersihan dijalankan; catatan review T1 (indeks unik `incentive_profit_targets`, `kanonLevel` tiga tempat) masih terbuka. Disetujui manajemen 2026-09-07 lewat wawancara `/analisa-kebutuhan`. **T1 (gerbang tulis per level dan divisi)** di bip-erp PR [#1767](https://github.com/bip-itteam-internal/bip-erp/pull/1767) (**merged 2026-09-08 06:59 WIB, live di prod 07:03 WIB**; terverifikasi prod baca-saja: SPV Beauty Hacks menulis dirinya → 403 \"tidak boleh menulis target diri sendiri\", menulis level supervisor → 403 \"level supervisor hanya boleh ditulis Finance, IT, atau Direktur\", target yang ada tak berubah; jalur positif SPV menulis icc divisinya belum dicoba di prod karena itu menulis data); **T4 (Master Target per orang, sekaligus Dashboard Insentif, struktur HRIS + i18n) sudah dikodekan** di erp-frontend PR [#1473](https://github.com/bip-itteam-internal/erp-frontend/pull/1473) (**merged dan live di prod 2026-09-07 23:16 WIB**; jendela 403 pensil Supervisor karena dimerge sebelum #1767 tertutup sejak T1 live prod 2026-09-08 07:03 WIB); **T2 (KPI membaca target dari sumber insentif) sudah dikodekan** di bip-erp PR [#1775](https://github.com/bip-itteam-internal/bip-erp/pull/1775) (**merged 2026-09-07 14:42 UTC** ke `main` ce30a716; **live di dev 21:44 WIB dan di prod 22:16 WIB, keduanya terverifikasi 2026-09-07**: di prod `auto_target` Aan Budiyanto Agustus 44 jt (insentif) bukan 88 jt (template), Silvia 165 jt bukan 116,89 jt, Aan September \"belum dapat dihitung: target profit belum diisi di Master Target insentif\", skor beku Annisa Agustus tak berubah; lihat catatan transisi di §3 dan §7); **T5 backend (PR A, bip-erp [#1783](https://github.com/bip-itteam-internal/bip-erp/pull/1783)) dan T5 frontend + T6 (PR B, erp-frontend [#1484](https://github.com/bip-itteam-internal/erp-frontend/pull/1484)) di kode, dan T3 + penolakan §7 (PR C, bip-erp [#1788](https://github.com/bip-itteam-internal/bip-erp/pull/1788)) **merged berurutan lalu live prod 2026-09-08** (lihat §3 dan §6 \"Sebagaimana dikodekan\"); karena A dan C dimerge sebelum deploy, keduanya naik dalam satu biner employee-service berdampingan dengan frontend-hris. Daftar task: `Workspace/ANALISA - Target Profit Satu Pintu.md` (papan kerja, bukan dok terbit).",
       "publik": true,
       "tautan": [
         "Finance - Incentive",
@@ -5790,24 +5798,22 @@
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "APP - Web ERP"
       ],
-      "hash": "b743ccbb529a4bf58fd22df0e4437f583a48269105fcf3c8e0455460066380d5",
-      "ukuran_kb": 22.1,
-      "ringkasan": "Menjawab: di mana target profit tim marketing ditulis (satu pintu di koleksi target milik insentive-service), siapa yang berwenang menulis target per level dan divisi (SPV Marketing untuk Leader/Account Specialist/Advertiser divisinya, Finance atau Direktur untuk target SPV, tak seorang pun menulis targetnya sendiri), dan bagaimana KPI membaca target profit dari sumber insentif alih-alih dari template KPI. Juga menjawab kenapa alur target-marketing berjenjang (Finance, SPV, Direktur) dipensiunkan, apa arti target yang tidak ada (belum bisa dinilai, bukan bawaan), bagaimana snapshot skor beku menyimpan target, seberapa jauh angka insentif dan KPI menyimpang di produksi, serta status task T1 sampai T6 beserta PR dan verifikasi prod-nya.",
+      "hash": "99b776b09f03cf404beb4bfecefbbb7dcf98d2675e86bf5975ba4102d34c0757",
+      "ukuran_kb": 23.4,
+      "ringkasan": "Menjawab: kenapa target profit tim marketing hanya ditulis di satu tempat (koleksi target insentive-service) dan KPI membacanya, siapa yang berwenang menulis target tiap level (SPV Marketing untuk icc/leader divisinya, Finance/IT/Direktur untuk SPV, tak seorang pun menulis targetnya sendiri), dan apa artinya bila target belum diisi (metrik tidak dinilai, bukan bawaan). Juga menjawab kenapa alur target-marketing berjenjang Finance-SPV-Direktur dipensiunkan, apa yang tidak dijanjikan (skor beku tak dihitung ulang, realisasi tetap dua angka), serta PR dan status tiap task T1 sampai T7.",
       "kata_kunci": [
-        "target profit",
-        "profit target",
         "ADR 0079",
-        "satu pintu",
+        "target profit",
         "insentif",
         "incentive",
-        "incentive_profit_targets",
+        "KPI",
         "insentif_profit",
         "Master Target",
-        "gerbang tulis",
         "SPV Marketing",
-        "target-marketing dicabut",
-        "auto_target",
-        "KPI"
+        "target-marketing dipensiunkan",
+        "satu pintu",
+        "Beauty Hacks",
+        "Kyura"
       ]
     },
     {
@@ -5907,6 +5913,75 @@
         "json_schema strict",
         "stream false",
         "ADR 0082"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS.md",
+      "judul": "ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "✅",
+      "status_teks": "**Berlaku, kodenya sudah di `main`** (bip-erp) — commit `012561c5` \"alokasi otomatis round-robin tiket, ganti assign manual\" (1 September 2026), disusul `cf766cd7` \"cabut fallback lintas departemen, lewati anggota cuti/sakit\" dan `14c7a955` \"endpoint pratinjau giliran berikutnya\" (2 September). **Belum diverifikasi lewat gateway** dev maupun prod. Dituliskan 2026-09-09, sesudah kodenya berjalan — sama seperti ADR-0058/0059, keputusan ini sempat hanya hidup sebagai komentar kode.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama",
+        "ADR - 0060 Cakupan Keterlihatan Tiket Engagement",
+        "Sales - Engagement Team (Modul)",
+        "Microservices - Task Management Service",
+        "API - Task Management Service"
+      ],
+      "hash": "18379e99f404fb08c3cf5fe8b1b41d82b955136e9acd1ac6d111da4bab8c3f09",
+      "ukuran_kb": 7.1,
+      "ringkasan": "Menjawab: bagaimana tiket Engagement kini dialokasikan otomatis lewat round-robin server-side alih-alih ditunjuk manual oleh Account Specialist, bagaimana giliran berputar per departemen requester, kenapa anggota yang cuti/sakit sehari penuh dilewati dari giliran, dan bagaimana kursor giliran dijaga atomik saat dua tiket dibuat bersamaan. Juga menjelaskan endpoint pratinjau giliran berikutnya dan konsekuensi yang belum diputuskan seperti batas WIP per anggota.",
+      "kata_kunci": [
+        "engagement",
+        "round-robin",
+        "alokasi otomatis",
+        "auto assign",
+        "giliran",
+        "kursor",
+        "assigned_to",
+        "cuti sakit",
+        "wip",
+        "pratinjau giliran"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program.md",
+      "judul": "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-09, kode belum ada. Artefak daftar task: `Workspace/ANALISA - Program Culture Scan Kehadiran & Master Program.md`.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0066 Modul Kelola Program Culture",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman",
+        "ADR - 0002 Database-per-Service",
+        "Microservices - Form Builder Service",
+        "API - Form Builder Service",
+        "Microservices - Attendance Service",
+        "APP - MyBharata",
+        "HRIS - Matriks KPI per Departemen"
+      ],
+      "hash": "229b4c369fcc94575a54ef8cea028a4e5123a757e9965f2bc13579e7ec76bca4",
+      "ukuran_kb": 13.5,
+      "ringkasan": "Menjawab: mengapa \"hadir\" di Program Culture berubah dari jumlah pengisi feedback menjadi jumlah scan QR kehadiran, bagaimana token QR berputar per-program ditampilkan officer dan dipindai peserta, dan bagaimana rating dipisah dari kehadiran serta didorong lewat pop-up persisten di MyBharata. Menjelaskan pula dampaknya ke rumus KPI Culture & Industrial (partisipasi dari scan, di-clamp 100, walk-in tetap dihitung), master program yang mengisi form pembuatan otomatis, dan mengapa batas kepemilikan kpi_score (ADR 0032) tidak berubah.",
+      "kata_kunci": [
+        "Program Culture",
+        "kehadiran",
+        "attendance",
+        "scan QR",
+        "scan token",
+        "master program",
+        "KPI Culture & Industrial",
+        "rating",
+        "feedback",
+        "MyBharata",
+        "ADR 0084",
+        "walk-in"
       ]
     },
     {
@@ -6781,7 +6856,7 @@
         "GA - Form Pengadaan dan Pengajuan Dana"
       ],
       "hash": "5a506ef2f6690f2d0fd48bd5da4134bc63d99b6af98efef405cd97c1c4ee6447",
-      "ukuran_kb": 7.7,
+      "ukuran_kb": 7.6,
       "ringkasan": "Menjawab: apa saja 11 SOP Procurement resmi PT Bharata (perencanaan kebutuhan, PR, seleksi vendor, RFQ, penerbitan PO, monitoring pengiriman, penerimaan+QC, verifikasi invoice, pembayaran, evaluasi vendor, cost saving, pelaporan) dan sejauh mana masing-masing sudah didukung ERP. Memetakan tahap SOP mana yang sudah ada di kode (Permintaan/Pesanan/Penerimaan), mana yang sebagian, dan mana yang belum dibangun (RFQ 3-vendor, matriks approval nominal >Rp50jt, AVL & dokumen legalitas vendor, scorecard/OTD vendor, pelaporan formal). Berguna untuk mengecek kepatuhan SOP sebelum merancang fitur procurement/manufacture baru.",
       "kata_kunci": [
         "procurement",
@@ -6982,24 +7057,21 @@
         "RUN - Menambah Metrik KPI Otomatis",
         "HRIS - Key Performance Index"
       ],
-      "hash": "7b6cd3a94177aab3b28c692e8caa1e8d99605f58dd4cec28c6024ba6f88eea97",
-      "ukuran_kb": 9.6,
-      "ringkasan": "Menjawab: bagaimana alur otomasi skor KPI bekerja dari pekerjaan tim sampai skor terisi dalam lima langkah, diagram Excalidraw mana yang cocok untuk pembaca non-teknis, dev, dan tim marketing (Beauty Hacks/Kyura), dan di tahap mana metrik marketing tersendat (biasanya di tahap pemetaan orang ke toko/tim, bukan di tahap skor terlihat kosong). Juga menjawab tiga syarat non-kode yang sering jadi penghambat (aplikasi dipakai, sistem tahu pemilik data, metrik mungkin diukur), beda metrik kelas A (dari data sistem) dan kelas B (`skor_tim` berbahan skor orang lain), mengapa mekanisme cakupan/populasi mencegah atasan mendapat skor penuh dari sebagian anggota, dan kenapa cakupan tim menuntut supervisor tercatat sedangkan cakupan departemen tidak.",
+      "hash": "5ec160d0995c55f7f0a9a9714bafe88e0a331880b74925422bfa737207e9475d",
+      "ukuran_kb": 9.9,
+      "ringkasan": "Menjawab: bagaimana skor KPI terisi otomatis dari data sistem dalam bentuk tiga diagram Excalidraw (gambaran besar untuk non-teknis, alur rinci sembilan langkah employee-service untuk dev, dan khusus marketing yang menunjukkan tahap mana yang tersendat), serta kenapa skor belum terisi padahal matriks sudah lengkap (tiga syarat non-kode: aplikasi dipakai, pemilik data tercatat, metrik bisa diukur). Juga menjawab bagaimana metrik tim (`skor_tim`) yang bahannya skor anggota bekerja lewat mekanisme cakupan Nilai vs Populasi sehingga atasan tak bisa mendapat nilai penuh dari sebagian anggota.",
       "kata_kunci": [
-        "KPI otomatis",
-        "auto score",
-        "alur KPI",
-        "diagram",
-        "Excalidraw",
+        "alur KPI otomatis",
+        "diagram Excalidraw",
+        "otomasi skor KPI",
         "skor_tim",
         "cakupan",
         "coverage",
-        "populasi",
-        "marketing",
-        "Beauty Hacks",
-        "Kyura",
         "metrik tim",
-        "employee-service"
+        "marketing Beauty Hacks Kyura",
+        "auto-scores",
+        "KPI automation",
+        "skor otomatis bukan skor final"
       ]
     },
     {
@@ -7626,25 +7698,22 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "c018dd0eafa71180041dfc10f775005c038ec70427755ec6b59e4ea73f986825",
-      "ukuran_kb": 46.4,
-      "ringkasan": "Menjawab: apa beda engine KPI ke insentif tim marketing (insentive-service, 9 role) dengan appraisal per-karyawan lintas departemen (employee-service `/kpi/*`), bagaimana template per posisi, scoring per periode `YYYY-MM`, snapshot template ke `kpi_score`, dan kolom `employee_count` (assignment aktual, bukan kelayakan posisi) bekerja. Juga menjawab aturan posisi template wajib sama dengan posisi karyawan pada periode itu (`posisi_periode` dari `employee_movement`), RBAC per departemen termasuk CSV multi-departemen, cakupan tim untuk Leader (`scope=team`, gerbangnya keberadaan bawahan), tampilan gabungan HRGA dari master data, dan bagian appraisal bulanan mana yang masih konsep (siklus wajib, workflow review supervisor ke HR).",
+      "hash": "fe19b176adcbba325d0477f65859a99e53922fcf83e5eab00d30955c50345547",
+      "ukuran_kb": 46.5,
+      "ringkasan": "Menjawab: bagaimana penilaian kinerja KPI bekerja di sistem dan apa beda engine KPI-ke-insentif marketing (insentive-service, 9 role) dengan appraisal per-karyawan lintas departemen (employee-service `/kpi/*`). Juga menjawab bagaimana template per posisi, `employee_count`, scoring per periode dengan snapshot template, aturan posisi template harus sama dengan posisi karyawan pada periode itu (`posisi_periode`), RBAC per departemen, cakupan tim untuk Leader (`scope=team`), dan tampilan gabungan HRGA, serta bagian appraisal bulanan mana yang masih konsep.",
       "kata_kunci": [
         "KPI",
         "Key Performance Index",
         "appraisal",
         "penilaian kinerja",
-        "kpi_template",
+        "kpi template",
         "kpi_score",
-        "template per posisi",
         "scoring",
         "employee_count",
         "posisi_periode",
-        "scope=team",
-        "Leader",
-        "HRGA",
         "RequireKPIDepartmentRBAC",
-        "insentif marketing"
+        "scope team leader",
+        "HRGA"
       ]
     },
     {
@@ -7896,26 +7965,22 @@
         "Sales - Incentive",
         "REF - Glossary"
       ],
-      "hash": "80074ca26fb7bc94487bfd535025f9dfea5138e8c0266f209468ecd8ff25b227",
-      "ukuran_kb": 140.0,
-      "ringkasan": "Menjawab: metrik KPI mana yang sudah terisi otomatis di produksi (berapa dari 311/362 metrik, template dan posisi mana, sumber dan target apa), sumber data mana yang tersedia (`kinerja_tiket`, `uptime_sistem`, `skor_tim`, `kinerja_tiket_divisi`, kedisiplinan, turnover, kontrak), dan klasifikasi metrik siap otomatis, semi-otomatis, modul ada tapi data kosong, atau tak ada sumber. Juga menjawab tiga sebab kegagalan sumber dan tanggapannya, tiga jalur perhitungan skor yang wajib satu rumus, arti tiga jenis baris `Rincian`, layar diagnostik Otomasi KPI, cara HR mengisi konfigurasi `auto` sendiri (katalog sumber, pratinjau, target per karyawan), perubahan profit KPI dibaca dari insentif termasuk target dari sumber (T2 ADR 0079), kesalahan arah metrik, skor beku yang tak ikut terperbaiki, dan progres bulan berjalan di MyBharata.",
+      "hash": "870046801245727b94051a650950bc72c1e5862a7038cc12843cf7c9a553dd33",
+      "ukuran_kb": 140.5,
+      "ringkasan": "Menjawab: dari 311 metrik KPI di produksi mana yang bisa diisi otomatis dari data ERP, metrik mana yang sudah menyala beserta sumber, formula, scope, dan targetnya, dan kenapa sebuah sumber gagal hitung (tiga sebab dengan tanggapan berbeda). Juga menjawab bagaimana HR mengisi konfigurasi `auto` sendiri lewat katalog sumber dan layar diagnostik Otomasi KPI, jebakan seperti tiga jalur perhitungan skor dan tiga jenis baris `Rincian`, klasifikasi metrik per departemen dan sumber data, serta perubahan target dan realisasi profit yang dibaca dari insentif.",
       "kata_kunci": [
         "otomasi KPI",
-        "auto score",
-        "KPI automation",
         "auto-values",
-        "auto_target",
+        "auto-scores",
+        "sumber-katalog",
         "kpi_template auto",
-        "sumber metrik",
+        "metrik otomatis",
         "kinerja_tiket",
         "skor_tim",
         "uptime_sistem",
-        "reduksi",
-        "target_per_karyawan",
-        "Otomasi KPI",
-        "311 metrik",
         "insentif_profit",
-        "Rincian"
+        "Rincian",
+        "KPI automation"
       ]
     },
     {
@@ -9181,7 +9246,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
-      "ukuran_kb": 6.8,
+      "ukuran_kb": 6.9,
       "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
       "kata_kunci": [
         "faktur",
@@ -9429,7 +9494,7 @@
         "WH - Management System"
       ],
       "hash": "8d2a9337ca3437bc81034f920197380aa9f9e669cf3d589e6f5865156a4f32f3",
-      "ukuran_kb": 7.6,
+      "ukuran_kb": 7.5,
       "ringkasan": "Menjawab: metrik KPI posisi Manufaktur (produksi + gudang) mana yang sudah bisa diotomasi sekarang, mana yang menunggu data WMS, dan mana yang tetap manual/subjektif. Menjelaskan kenapa source & endpoint `/kpi/*` sudah ada di kode tapi dorman (koleksi `production_log`/`batch_record`/`cycle_count` kosong karena WMS belum dipakai), dan mematahkan asumsi quick-win: `manufacture_stok`/`saldo_awal` cuma sisi sistem tanpa angka fisik, `manufacture_transaksi` semua INBOUND REUSE, `manufacture_resi` status order marketplace bukan kinerja orang. Juga memuat gerbang verifikasi yang wajib dilewati (adu output nyata WMS ke endpoint, buktikan lewat gateway `GET /kpi/auto-values`) sebelum mengklaim metrik otomatis saat WMS live.",
       "kata_kunci": [
         "KPI manufaktur",
@@ -9813,7 +9878,7 @@
         "QA - Register Perizinan & Sertifikasi"
       ],
       "hash": "23e3bd168ac5a48c16f9775bbc34e5fedf3ebe1e157b20409e69fdedb7075c5e",
-      "ukuran_kb": 9.1,
+      "ukuran_kb": 9.0,
       "ringkasan": "Menjawab: register mutu apa saja yang sudah ada di ERP divisi Quality — CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing, dan pengecekan raw material — berikut endpoint `/api/employee/quality/*`, collection MongoDB, dan model datanya. Juga menjawab siapa yang boleh mengakses apa (`quality:staff`, `quality:supervisor`, approver produksi & warehouse, staf marketing), bagaimana alur approval CAPA berjalan (Draft → Diajukan → persetujuan Produksi + Warehouse → finalisasi QA), dan aturan alert keterlambatan tiap register (tenggat H-7, Menunggu >3 hari, antrean >24 jam). Menjelaskan pula apa yang belum tersedia: Dashboard Mutu, IPC/Pre-Check/CPPB, dan checklist GMP/kalibrasi/storage.",
       "kata_kunci": [
         "quality",
@@ -10093,23 +10158,21 @@
         "REF - PRD ERP",
         "REF - Alur Persetujuan"
       ],
-      "hash": "ca4ef49d24dc333c642f9e6ba33c4a15574a7627b2b3afc256915d7b1abe884d",
-      "ukuran_kb": 21.7,
-      "ringkasan": "Menjawab: siapa pemilik (service dan koleksi) tiap fakta bisnis di ERP seperti data karyawan, status aktif, departemen dan label supervisi, hak akses, kontrak kerja, jadwal kerja dan rotasi, presensi/cuti, skor dan target KPI, target insentif; siapa yang boleh menulisnya dan lewat jalan mana service lain boleh membacanya (HTTP internal, feed kalender, klaim JWT). Juga menjawab salinan mana yang sah beserta arah dan penjaganya (`SyncCollection`, field yang dibuang dari `$set`), pengecualian ADR 0002 yang masih hidup (task-management membaca `employee_db`/`attendance_db` langsung), duplikasi yang belum diputuskan, cara memakai peta ini sebelum membangun penyimpanan atau fitur baru, dan service mana yang belum dipetakan.",
+      "hash": "3324950ef35f808054f0e1cc660b3336cf0d72f518d06b5e07d8c89c06d10d2b",
+      "ukuran_kb": 21.2,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis di ERP Bharata (identitas karyawan, status aktif, departemen dan label supervisi, hak akses, kontrak, jadwal kerja, presensi, skor KPI, target insentif profit, dst), siapa yang boleh menulisnya, dan lewat jalan mana service lain boleh membacanya. Juga menjawab salinan mana yang sah beserta arah dan penjaganya (SyncCollection, daftar field yang dibuang dari `$set`), pengecualian ADR 0002 yang masih hidup di kode (task-management membaca employee_db/attendance_db langsung), dan duplikasi yang belum diputuskan; dibuka sebelum membangun penyimpanan baru atas fakta yang mungkin sudah dimiliki service lain.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "pemilik fakta",
+        "source of truth",
+        "sumber kebenaran",
         "satu fakta satu tempat",
         "SyncCollection",
         "salinan",
         "duplikasi",
         "database-per-service",
         "ADR 0002",
-        "sumber kebenaran",
-        "source of truth",
-        "work_data",
-        "employee_db"
+        "pemilik koleksi"
       ]
     },
     {
@@ -10709,22 +10772,20 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "f58b95260729ae78d1bc58195fbb25126cb1fda03d61ac73f99d5f692d50512f",
+      "hash": "38d13a3c0a42c71a0065bee1df09e9de13bf8cdf6f9541cdd1ecb0fa2c172fd8",
       "ukuran_kb": 45.3,
-      "ringkasan": "Menjawab: bagaimana seorang dev menambahkan satu metrik KPI yang terisi otomatis langkah demi langkah: memastikan metriknya layak, mendaftarkan sumber (`DaftarkanSumberBermetrik`, `KPIAutoConfig.Metrik` untuk sumber bermetrik banyak), mengisi konfigurasi `auto` di template, memilih reduksi dan arah target, target berlapis per karyawan/periode/umum atau dari sumber, dan pratinjau sebelum simpan. Juga menjawab model mentalnya (dihitung ulang dari database service tempat orang bekerja, bukan tabel penampung harian), pola bila datanya ada di service lain (cetak biru rute, service key, cakupan), sumber mana yang bisa dijadikan contoh, kesalahan apa yang sudah pernah terjadi, dan checklist sebelum PR.",
+      "ringkasan": "Menjawab: bagaimana dev departemen menambahkan satu metrik KPI yang terisi otomatis, langkah demi langkah (memastikan metriknya bisa diukur, mendaftarkan sumber lewat `DaftarkanSumberBermetrik`, mengisi konfigurasi `auto` di template), dan sumber mana yang bisa dicontoh untuk tiap pola (data lokal, HTTP ke service lain, satu sumber banyak metrik, cakupan bukan orang, cakupan ratusan orang, sumber yang menuntut perubahan di service seberang). Juga menjawab model mental kenapa tidak ada tabel penampung dan skor dihitung ulang bukan diakumulasi harian, katalog reduksi dan arah target yang paling sering salah, target berlapis (per karyawan, per periode, umum, dari sumber), aturan yang tak boleh dilanggar, kesalahan yang pernah terjadi, dan checklist sebelum PR.",
       "kata_kunci": [
-        "menambah metrik KPI otomatis",
-        "runbook KPI",
-        "registry sumber KPI / KPI source",
+        "menambah metrik KPI",
+        "runbook KPI otomatis",
+        "sumber KPI",
+        "KPIAutoConfig",
         "DaftarkanSumberBermetrik",
-        "KPIAutoConfig Metrik Scope",
+        "reduksi",
+        "arah target",
         "TargetBerlaku",
-        "reduksi rata_rata rasio_ambang",
-        "arah target naik turun",
-        "service key MONITORING_SERVICE_KEY",
-        "cakupan / coverage CakupanPersen",
-        "METRIK_PER_SUMBER",
-        "cetak biru rute sumber"
+        "service key dev prod",
+        "checklist PR KPI"
       ]
     },
     {
@@ -11156,16 +11217,17 @@
       "area": "Sales",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — kode ada di `main` kedua repo (BE merge PR #1504 `feat/engagement-assign`, FE merge PR #1287), tetapi **audit 2026-08-29 menemukan 3 cacat yang membuat alurnya belum bisa dipakai utuh** (bukti pengerjaan tak bisa diunggah → tiket mustahil ditandai selesai; tab Pekerjaan Saya selalu kosong; keterlihatan tiket tak dibatasi departemen). Rinciannya di **## Cacat yang Diketahui**. **Belum diverifikasi lewat gateway** dev maupun prod.",
+      "status_teks": "Implemented (ada catatan) — kode maju banyak sejak audit awal (28-29 Agustus 2026): **3 dari 4 cacat blocker/risiko audit awal sudah diperbaiki** (bukti pengerjaan dilonggarkan jadi opsional, tab Pekerjaan Saya diperbaiki, keterlihatan disaring per departemen via [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]]), penugasan berpindah total dari manual ke **round-robin otomatis** ([[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]], 1 September), dan satu **bug baru ditemukan+diperbaiki 2026-09-09**: nama pengerja salah lookup collection sehingga tampil sebagai `employee_id` mentah di setiap layar (dropdown reassign, kolom Pengerja, pratinjau giliran). Rincian terkini di **## Cacat yang Diketahui**. **Belum diverifikasi lewat gateway** dev maupun prod.",
       "publik": true,
       "tautan": [
         "Microservices - Task Management Service",
         "Microservices - Employee Service",
+        "ADR - 0060 Cakupan Keterlihatan Tiket Engagement",
+        "ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS",
         "API - Task Management Service",
         "APP - Web ERP",
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
         "ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama",
-        "ADR - 0060 Cakupan Keterlihatan Tiket Engagement",
         "HRIS - Matriks KPI per Departemen",
         "IT - Background Jobs & Schedulers",
         "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
@@ -11175,24 +11237,20 @@
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "Sales - Big Pictures"
       ],
-      "hash": "a3453da3e8914e8c1d84c579d46bbc880b9a489c26be118b8907094925c247d1",
-      "ukuran_kb": 17.5,
-      "ringkasan": "Menjawab: bagaimana alur tiket boosting media sosial tim Engagement (dulu Buzzer) bekerja, dari Account Specialist membuat tiket dan menunjuk pengerja langsung, bukti pengerjaan wajib, verifikasi tutup atau minta revisi, tugas ulang dan pembatalan beralasan, sampai eskalasi tiket yang didiamkan (2 jam atau setengah sisa deadline); status apa saja (`OPEN`, `IN_PROGRESS`, `DONE_BY_TEAM`, `CLOSED`, `CANCELLED`) dan apa bedanya dari tiket IT di task-management. Juga menjawab persona dan RBAC-nya (peran adalah relasi terhadap tiket, menu tak menyaring siapa pun), jebakan rename Buzzer ke Engagement Team dan alias pencarian, angka mana yang jadi sumber KPI `kinerja_engagement`, serta cacat yang diketahui yang membuat alurnya belum bisa dipakai utuh.",
+      "hash": "63578abeeae59bf7a3412e5bb819b16279fb9178d59ef81c2549de81e09bd8d3",
+      "ukuran_kb": 20.6,
+      "ringkasan": "Menjawab: apa itu modul Engagement Team, bagaimana siklus hidup satu tiket boosting media sosial dari pembuatan permintaan Account Specialist sampai verifikasi dan penutupan, siapa saja persona penggunanya beserta wewenangnya, dan cacat apa saja yang pernah ditemukan serta status perbaikannya. Juga menjelaskan perbedaan tiket Engagement dari tiket IT di service yang sama dan sejarah rename tim dari Buzzer menjadi Engagement Team.",
       "kata_kunci": [
-        "Engagement Team",
-        "Engagement Tim",
-        "Buzzer",
-        "tiket engagement",
-        "engagement_tickets",
+        "engagement team",
+        "buzzer",
         "boosting",
-        "media sosial",
-        "Account Specialist",
-        "kinerja_engagement",
-        "task-management",
-        "penugasan langsung",
-        "revisi",
-        "eskalasi",
-        "/marketing/engagement"
+        "tiket engagement",
+        "engagement ticket",
+        "account specialist",
+        "task-management service",
+        "kpi engagement",
+        "sosial media",
+        "eskalasi tiket"
       ]
     },
     {
@@ -11605,6 +11663,39 @@
         "marketing insight",
         "HPP master",
         "RAPB"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SLA Chat CS (Shopee & TikTok).md",
+      "judul": "Sales - SLA Chat CS (Shopee & TikTok)",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [
+        "Microservices - Marketing Analytics Service",
+        "HRIS - Otomasi Skor KPI",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan"
+      ],
+      "hash": "d9c358dd9b067ee840a3336c1c842a3abce0a8ff9f292877e2e2a279e5e79c1b",
+      "ukuran_kb": 6.9,
+      "ringkasan": "Menjawab: metrik SLA respons chat toko apa yang benar-benar tersedia dari Shopee dan TikTok untuk KPI Customer Service, dan apa yang TIDAK — seluruhnya dari panggilan API nyata ke prod, bukan dari dokumentasi yang terbukti tak cocok. Shopee (account_health/get_shop_performance, 9/9 toko HTTP 200) hanya mengirim tiga metrik CS: response_rate (11), shop_rating (22), csat_rate (95); metric 21/29/23 TIDAK dikirim untuk toko Indonesia sehingga KPI 'kecepatan balas dalam menit' tidak bisa dibangun dari Shopee, targetnya berbeda antar toko (Kyura >=60, delapan lain >=70), dan angkanya SNAPSHOT 30 hari berjalan sehingga menjumlahkan/merata-ratakan lintas tanggal itu salah. TikTok 401 code 105005 karena scope seller.customer_service — API-nya API pemindahan kanal untuk CRM, bukan pembacaan data, dan approval-nya menuntut antarmuka chat yang sudah berfungsi. Juga menjawab jebakan kredensial SHOPEE_ERP_SYSTEM_PARTNER_ID (salah pasang = 403 invalid_acceess_token yang terbaca seperti token kedaluwarsa), bahwa KPI ini menilai TOKO bukan ORANG (tak ada atribusi per-agen di kedua platform), dan apa yang sudah dibangun di ERP (job sync-cs-sla, mart_cs_sla_daily, GET /kpi/sla-chat-cs, GET /icc/sla-chat, sumber KPI sla_chat_cs, cs_shop_mappings).",
+      "kata_kunci": [
+        "SLA chat",
+        "customer service",
+        "CS",
+        "Shopee",
+        "TikTok",
+        "response_rate",
+        "account_health",
+        "csat_rate",
+        "shop_performance",
+        "sla_chat_cs",
+        "mart_cs_sla_daily",
+        "cs_shop_mappings",
+        "ICC",
+        "KPI"
       ]
     },
     {
@@ -12672,6 +12763,34 @@
       ]
     },
     {
+      "path": "Workspace/ANALISA - Program Culture Scan Kehadiran & Master Program.md",
+      "judul": "ANALISA - Program Culture Scan Kehadiran & Master Program",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program"
+      ],
+      "hash": "2d0bb4ca4b264774c10bb98ea923d1cd7ec8fc9b55674406a6b245c5f876d9c3",
+      "ukuran_kb": 4.9,
+      "ringkasan": "Menjawab: task teknis apa saja yang harus dikerjakan untuk mengubah Program Culture ke kehadiran berbasis scan, dan dalam urutan mana (backend form-builder dulu, lalu web ERP dan mobile). Merinci per fase koleksi/endpoint backend (master_culture_program, culture_attendance, scan-token, feedback/pending), halaman web (master program, form auto-isi, label hadir), fitur MyBharata (tampilkan QR officer, scan+rating peserta, pengingat persisten), serta prasyarat verifikasi bahwa modul culture belum di prod dan langkah deploy end-to-end.",
+      "kata_kunci": [
+        "Program Culture",
+        "daftar task",
+        "analisa kebutuhan",
+        "scan kehadiran",
+        "master program",
+        "form-builder",
+        "culture_attendance",
+        "scan-token",
+        "MyBharata",
+        "deploy",
+        "fase implementasi"
+      ]
+    },
+    {
       "path": "Workspace/ANALISA - Redesign ACL AllowedShops Berbasis Department Shops.md",
       "judul": "ANALISA - Redesign ACL AllowedShops Berbasis Department Shops",
       "area": "Workspace",
@@ -12750,23 +12869,21 @@
         "APP - Web ERP",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "96f4625aaaad77ceab0c13154d877c911191bd8be1c6dea416289acdb3489216",
-      "ukuran_kb": 17.6,
-      "ringkasan": "Menjawab: daftar task T1 sampai T7 untuk menyatukan target profit marketing ke insentif (gerbang tulis per level dan divisi, KPI membaca target dari sumber insentif, pencabutan alur target-marketing di backend dan frontend, layar Master Target per orang ber-i18n, Atur Target KPI menampilkan target tanpa menerimanya, sinkron dok), status dan PR tiap task, serta urutan deploy yang mengikat (insentive-service dan employee-service naik bersama, lalu erp-frontend, lalu pencabutan). Juga menjawab bagaimana tiap task diverifikasi di dev dan prod (kontrol positif/negatif, angka `auto_target` orang sungguhan), pengukuran yang membuktikan selesai, catatan lanjutan dari review, dan apa yang sengaja di luar lingkup.",
+      "hash": "e3057dad3ffdc6660a21b12a7122c4911c7f7c0ab02d4e1f58efee50e45da924",
+      "ukuran_kb": 19.4,
+      "ringkasan": "Menjawab: apa daftar task T1 sampai T7 untuk menyatukan target profit marketing ke insentif sesuai ADR 0079, beserta status, repo, berkas, test, cara verifikasi, dependensi, dan PR tiap task (gerbang tulis per level/divisi, KPI membaca target dari sumber, pencabutan target-marketing di backend dan frontend, Master Target per orang, Atur Target menampilkan target profit, sinkron dok). Juga menjawab urutan deploy yang mengikat (insentive dan employee naik bersama, lalu frontend, lalu pencabutan), catatan review lanjutan, pengukuran yang membuktikan selesai, dan apa yang sengaja di luar lingkup.",
       "kata_kunci": [
-        "target profit",
-        "satu pintu",
         "ANALISA",
-        "daftar task",
+        "target profit satu pintu",
         "papan kerja",
+        "task T1 T7",
         "ADR 0079",
-        "insentif",
-        "Master Target",
-        "gerbang target",
+        "insentive-service",
+        "employee-service",
+        "erp-frontend",
+        "gerbang tulis target",
         "target-marketing",
-        "urutan deploy",
-        "T1 T2 T3",
-        "analisa-kebutuhan"
+        "urutan deploy"
       ]
     },
     {
@@ -12854,7 +12971,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.5,
+      "ukuran_kb": 11.2,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
