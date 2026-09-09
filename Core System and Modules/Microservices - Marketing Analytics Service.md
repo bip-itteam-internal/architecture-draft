@@ -153,9 +153,30 @@ Rute ke-41, masuk 2026-08-27 (PR [#1479](https://github.com/bip-itteam-internal/
 **Yang TIDAK bisa diambil dari API TikTok**, diuji langsung ke produksi 2026-08-27 (12 endpoint live):
 
 - **Biaya iklan per sesi** — tak ada di satu pun endpoint live. `tt_business_gmv_max_performance_reports` bergranularitas harian (`stat_time_day`), endpoint per-menit nol field biaya, dan iklan bertipe LIVE cuma **2 dari 1.335 ad group** dengan nol baris di `mart_profit_attribution`. Konsekuensinya **laba bersih per sesi live tak dapat dihitung tanpa asumsi**; komponen HPP dan fee marketplace sudah akurat (uji: 23,9% vs 25,8% dan 12,0% vs 12,1% terhadap agregat toko), iklan yang tidak.
-- Seluruh keluarga `live_rooms/*` (**7 endpoint**: core_stats/PCU, GMV trend, view trends, traffic, interactive trends, product stats, user portraits) ditolak `36009004`/`36009005` — menuntut otorisasi level akun creator, bukan shop-level seperti kredensial kita. Pola sama dengan livestream Shopee.
+- Seluruh keluarga `live_rooms/*` (**7 endpoint**: core_stats/PCU, GMV trend, view trends, traffic, interactive trends, product stats, user portraits) ditolak `36009004`/`36009005` — menuntut otorisasi level akun creator, bukan shop-level seperti kredensial kita.
 - `Get Bestselling LIVE Sessions` ditolak `105005` (app tak diizinkan).
-- **Shopee live nihil API** dan itu permanen — host Shopee tetap dicatat manual.
+
+⛔ **KOREKSI 2026-09-09 — dok ini sebelumnya menyatakan "Shopee live nihil API dan itu permanen". Itu KELIRU, dan kata "permanen" yang paling merugikan** karena ia menghentikan orang sebelum bertanya.
+
+Diukur ke backend dokumentasi resmi Shopee (`doc/module/?version=2`): **441 API**, di antaranya modul **`Livestream` berisi 29 endpoint** (`get_session_metric`, `get_session_detail`, `get_session_item_metric`, dst.) plus **3 endpoint livestream di BrandPortal** (`principal.get_shop_livestream_performance`, `get_session_livestream_performance`, `get_principal_livestream_performance`). ⚠️ Cache lokal `API Reference/Shopee Open API v2/Index.md` (367 endpoint dari SDK) **tidak memuat modul ini**, jadi pencarian yang berhenti di cache akan mengkonfirmasi klaim yang salah — tembak backend-nya.
+
+Yang **benar** dari catatan lama hanyalah alasannya: **level otorisasinya berbeda**, bukan API-nya tak ada. Probe read-only ke produksi 2026-09-09 (toko Kyura Beauty, kontrol positif `shop.get_shop_info` HTTP 200):
+
+| Endpoint | Balasan |
+|---|---|
+| `livestream.get_session_metric` / `_detail` / `get_item_count` | `error_param` — *"There is no user_id in query."* |
+| idem, `user_id` diisi `shop_id` | HTTP 403 `invalid_acceess_token` |
+| `principal.get_*_livestream_performance` | `error_param` — *"There is no principal_id in query."* |
+
+Yang menentukan adalah **jenis errornya**: bukan `error_auth` ("tidak berhak"), bukan `error_sign` ("tanda tangan salah"). App-nya berhak; yang kurang satu identitas. Penanganannya di [[Microservices - Integration Service]] (app keempat `LIVESTREAM`, otorisasi level akun).
+
+**Yang masih menghalangi sinkronisasi sesi Shopee ke `mart_live_sessions`** (TBD, belum dikerjakan):
+
+- Modul `livestream` **tidak punya `get_session_list`** — `get_session_metric` wajib disodori `session_id`, dan bila host siaran dari aplikasi Shopee Live nomornya tak pernah sampai ke kita. Yang bisa mengenumerasi sesi hanya jalur `principal` (Brand Portal), yang menuntut `principal_id`.
+- ⛔ **Semantik `orders` Shopee BERBEDA dari TikTok dan tidak boleh disamakan begitu saja.** Dok Shopee: *placed orders (**paid and unpaid**) during Livestream, **including cancelled orders***; `gmv` juga termasuk order batal. KPI Host Live memakai `sku_orders` TikTok = **dibayar saja**. Menyuapkan angka Shopee apa adanya ke metrik yang sama membuat host Shopee **sistematis terlihat lebih unggul** — tanpa galat dan tanpa test yang menangkapnya. Kelas yang sama dengan `iklan_sia_sia`; keputusan perlakuannya milik pemilik metrik, bukan keputusan teknis.
+- `conversion_rate` versi `principal` = orders ÷ **views**, sedangkan rumus KPI di dok ini = orders ÷ **product_clicks**. `livestream.get_session_metric` justru punya `co` (orders ÷ clicks) yang cocok persis.
+
+Sampai ketiganya terjawab, **host Shopee tetap dicatat manual** lewat `/live-shifts`.
 
 ### Pencatatan sesi live oleh host (`/live-shifts`)
 
