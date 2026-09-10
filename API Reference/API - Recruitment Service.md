@@ -4,6 +4,7 @@
 
 - **Implementasi**: [[Microservices - Recruitment Service]] · **Status**: ⚠️ BE Fase 1-3 + master ERPGo (A–F) + portal publik (browse/apply/track) + requisition se-departemen — increment 2026-07-16 deployed & terverifikasi live di dev. **Custom Questions dihapus** (#486/#342). **hire→karyawan** (endpoint `link-employee`, PR #490) **merged, belum deploy**. **Link Form Feedback Interview** (`GET /interviews`, panel/location, feedback hardening — PR #536/#381) **merged & dilaporkan ter-deploy dev** (2026-07-18).
 - **Konsumen publik**: [[APP - Portal Karir Bharata]]
+- ⚠️ **Cakupan verifikasi 2026-09-10**: yang diperiksa ulang ke `routes.go` pada pass ini **hanya** blok **Stages** (tahap/tes/background check) dan **Interview Rounds**. Blok lain (Candidate `PUT /advance`, Offer `/candidates/:id/offer*`) **belum** diperiksa dan sudah terlihat menyimpang dari `routes.go` — jangan diperlakukan sebagai grounded sampai di-sync tersendiri.
 - **Indeks**: [[API - Index]] · Role: `isSupervisor` (ajukan), `isHR`/`isHRSupervisor` (kelola/review **+ persetujuan final requisition** sejak 2026-07-22), `isApprover` (HR admin/Secretary — **tidak lagi dipakai di requisition**, masih dipakai untuk hire kandidat).
 
 ## Sistem
@@ -42,8 +43,14 @@
 ## Stages & Offer
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
-| POST | `/candidates/:id/screening` · `/interviews` · `/technical-test` · `/background-check` · `/psychotest` | Catat tiap tahap | HR |
-| GET | `/candidates/:id/stages` | Timeline tahap kandidat | HR |
+| POST | `/candidates/:id/interviews` | Jadwalkan sesi interview (satu-satunya tahap yang **dijadwalkan**) | HR |
+| GET | `/candidates/:id/stages` | Timeline tahap kandidat (kini hanya berisi `interviews`) | HR |
+| PUT/DELETE | `/stages/:kind/:id` | Ubah / hapus record tahap (`:kind` yang dikenal saat ini hanya `interviews`) | HR |
+| POST | `/candidates/:id/test-result` | **Rekam hasil babak bertipe tes** (Psikotest / Technical Test). Body: `round_id` (wajib, harus babak ber-`form_type: "test"`, kalau bukan → `400`), `result` (**Pass/Fail/Pending**, wajib), `score` (opsional), `notes`. **Upsert** per (`candidate_id`, `round_id`). Menggerakkan `progress` ke babak itu + status (Pass→`Pending`, Fail/Pending→`Hold`) | HR |
+| GET | `/candidates/:id/test-results` | Daftar hasil tes kandidat, diperkaya `round_name` | HR |
+| POST/GET | `/candidates/:id/background-check` | Rekam / baca Background Check (`verifications[]`, `reference`, `slik`, `decision`, `hr_note`) | HR |
+
+> ⚠️ **Endpoint per-tahap lama SUDAH TIDAK ADA** (diverifikasi ke `routes.go` 2026-09-10): `POST /candidates/:id/screening`, `/technical-test`, `/psychotest`. Screening jadi keputusan manual tanpa endpoint sendiri; tes dan psikotes menyatu jadi **satu jalur `/test-result` berbasis babak**. Contoh `curl` ke `/psychotest` yang masih beredar di `docs/recruitment-api.curl.md` (repo `erp`) ikut usang.
 | POST | `/candidates/:id/offer` | Terbitkan offer (→ Offering) | HR supervisor |
 | POST | `/candidates/:id/offer/letter` | Unggah surat penawaran PDF (MinIO) + email kandidat | HR supervisor |
 | POST | `/candidates/:id/offer/accept` · `/offer/decline` | Respon offer | HR |
@@ -53,8 +60,12 @@
 ## Interview Rounds & Feedback (Fase F — adopsi ERPGo)
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
-| POST/GET | `/postings/:id/rounds` | Definisi/daftar babak interview per lowongan | HR |
-| PUT/DELETE | `/rounds/:id` | Ubah / hapus babak | HR |
+| POST/GET | `/masters/interview-rounds` | **Katalog babak GLOBAL** (bukan lagi per lowongan). Field: `name`, `sequence_number`, `status` (`active`/`inactive`), `sends_feedback_link`, **`form_type`**. Di-seed 7 babak baku saat startup, idempoten (`$setOnInsert`) sehingga perubahan HR tak ketimpa | HR |
+| PUT/DELETE | `/masters/interview-rounds/:id` | Ubah / hapus babak | HR |
+
+> **`form_type` (5 nilai):** `generic` · `hrd_interview` · `user_interview` · `background_check` · `test`. Kosong dianggap `generic` (fallback babak lama). Nilai di luar itu ditolak `400`. Babak ber-`form_type` `test` atau `background_check` **tidak dijadwalkan** lewat Proses Seleksi, hasilnya direkam lewat endpoint hasil di atas. Babak baku ber-`test`: **Psikotest** (urutan 3) dan **Technical Test** (urutan 5).
+>
+> ⚠️ Rute lama **`/postings/:id/rounds`** dan **`/rounds/:id`** sudah tidak ada. Lowongan kini hanya **memilih** babak dari katalog lewat `round_ids[]`.
 | GET | `/interviews` | **Semua** sesi interview (terbaru dulu), diperkaya nama/posisi kandidat + status feedback `feedback_submitted`/`feedback_total` — sisi HR (menu **Interviews**) — PR #536 | HR |
 | GET | `/interviews/assigned` | Sesi interview yang menugaskan saya sebagai pewawancara (+ nama/posisi kandidat + jawaban saya). Dipakai halaman link `/interview-feedback/:id`; menu "Interview Saya" sendiri sudah dihapus dari navigasi (dormant) | auth |
 | POST | `/interviews/:id/feedback` | Kirim/**ubah** penilaian (rating 1-5 + recommendation). **Upsert** per (interview, pewawancara) → tak dobel. Boleh **pewawancara sesi ATAU HR**. **`interviewer_id`** di body hanya dipakai bila pengirim **HR** (rekap atas nama pewawancara lain) — non-HR **selalu** JWT sendiri (PR #536) | auth |

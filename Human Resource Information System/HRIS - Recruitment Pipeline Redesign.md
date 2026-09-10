@@ -2,9 +2,12 @@
 
 *Desain **penyederhanaan pipeline Recruitment**: mengganti model dua-field `progress` (10 tahap "rekaman HRD") + `status` (keadaan) menjadi **satu field `status` berisi 6 nilai**, membuang tahap Technical Test / Background Check / Psikotes, dan menjadikan **jenis interview** sebagai **Interview Rounds** yang dikelola (katalog global + override per-lowongan). Hasil brainstorming 2026-07-18.*
 
-- **Status**: 🟡 **Direncanakan (Design)** — belum ada kode; ini spec untuk implementasi.
+- **Status**: ⚠️ **Diimplementasikan SEBAGIAN, arahnya berbeda** — dokumen riwayat, bukan spec yang masih berlaku (diperiksa ke kode 2026-09-10).
+	- ✅ **Terlaksana**: koleksi `screening_result` · `technical_test_result` · `psychotest` · `psychotest_result` memang dibuang, dan babak jadi katalog yang dikelola.
+	- ❌ **Tidak jadi**: penyederhanaan ke **satu field status 6 nilai**. Kode tetap memakai **dua field** — `progress` (kini berisi **nama babak** dari katalog, plus `Offering`/`Onboarding`) dan `status` (8 nilai: In Progress · Scheduled · Pending · Hold · Buffer · Hired · Rejected · Withdrawn).
+	- 🔁 **Kembali dengan bentuk lain**: **Background Check** hidup lagi sebagai model tersendiri, dan **tes** (Psikotest/Technical Test) hidup lagi sebagai **babak ber-`form_type: "test"`** dengan hasil di `candidate_test_result`. Babak jadi katalog **global**, bukan "katalog global + override per-lowongan" seperti di spec ini.
 - **Sisi implementasi**: [[Microservices - Recruitment Service]] (BE) + [[APP - Web ERP]] (FE erp-frontend). Endpoint → [[API - Recruitment Service]].
-- **Pasangan konsep**: [[HRIS - Recruitment]] (⚠️ akan di-update saat implementasi — lihat Penyimpangan).
+- **Pasangan konsep**: [[HRIS - Recruitment]] · **Desain turunan yang ikut usang**: [[HRIS - Candidate Assessment]].
 
 ## Latar Belakang & Tujuan
 
