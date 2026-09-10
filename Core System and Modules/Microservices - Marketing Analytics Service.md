@@ -125,13 +125,26 @@ Penjaganya `TestRentangBawaanPakaiHariWIBBukanUTCPolos` — pemindai AST berdaft
 
 Rute ke-41, masuk 2026-08-27 (PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486)). Menjawab satu pertanyaan: **berapa capaian siaran live satu departemen pada satu periode?** Bahan skor KPI Host Live di [[Microservices - Employee Service]] (sumber `kinerja_live`). Rincian parameter & balasan: [[API - Marketing Analytics Service]].
 
-**Penilaian PER-DEPARTEMEN, bukan per-orang** — dan itu bukan penyederhanaan sementara melainkan batas data. Tiga hal menutup jalan ke per-orang, seluruhnya terukur produksi 2026-08-27:
+**Dua jalur, dipilih lewat parameter `employee_id`:**
 
-1. Satu sesi TikTok bisa **16 jam** dalam satu `session_id` (07:50–23:50 WIB), berisi 2–3 shift host bergantian. API memberi agregat per sesi **tanpa dimensi waktu di dalamnya**, jadi angkanya tak bisa dipecah dari sisi mana pun.
+| `employee_id` | Jalur | Sumber angka |
+|---|---|---|
+| kosong | departemen | seluruh sesi `mart_live_sessions` milik toko departemen itu |
+| diisi | individu | `live_shifts` orang itu, dijodohkan ke sesi TikTok lalu diprorata porsi waktu |
+
+Jalur **departemen** tetap tak bisa per-orang, dan itu batas data bukan penyederhanaan. Tiga hal menutupnya, seluruhnya terukur produksi 2026-08-27:
+
+1. Satu sesi TikTok bisa **16 jam** dalam satu `session_id` (07:50–23:50 WIB), berisi 2–3 shift host bergantian. API memberi agregat per sesi **tanpa dimensi waktu di dalamnya**.
 2. Satu host memakai beberapa akun, dan akunnya berganti antar bulan (`live_glowbooster4` → `live_glowbooster7`; `beautyhacks.id3` berhenti Juli).
 3. Satu siaran tercatat di beberapa akun sekaligus (dua etalase).
 
-⚠️ **Scope `individu` sudah didaftarkan di sisi employee-service tetapi sumbernya BELUM menghormatinya** — ia selalu menghitung per-departemen, sehingga memilih "Individu" atau "Departemen" di template menghasilkan angka identik sementara layar KPI menampilkan badge "Individu". Terlihat di produksi 2026-08-27 pada template *Host Live Kyura*. Perbaikannya menunggu `/live-shifts` benar-benar terisi.
+✅ **Jalur individu menjawab ketiganya lewat `live_shifts`** (`kpi_live_individu.go`), dan sejak **2026-09-09** ia mengisi metrik rasio juga, bukan cuma nominal. Bahan rasio (`product_clicks`, `add_to_cart`, `views`, `avg_watch_sec`) diprorata memakai porsi waktu irisan **yang sama** dengan GMV dan orders, lalu rasionya dihitung fungsi yang sama dengan jalur departemen (`RasioKonversi`, `RasioAddToCart`, `AvgViewingDuration`) — tak ada rumus kedua. Aturan pointer-nil juga satu tempat (`bahanTraffic.tambah`). Keputusannya [[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]] §8.
+
+⚠️ **Batas yang tersisa dan permanen**: bila dua host bergantian **di dalam satu sesi**, keduanya menerima rasio yang sama. Sebab nomor 1 di atas tak hilang, ia hanya berhenti menghalangi angka nominal.
+
+⚠️ **Rasio TIDAK dibagi antar host, cacahan dibagi.** `conversion` adalah jatah orang sehingga shift berdua membaginya; rasio bukan jatah, dan membaginya menghukum orang karena bekerja berdua.
+
+**Catatan lama yang sudah tidak berlaku**: sampai 2026-09-08 dok ini menyatakan sumbernya "belum menghormati scope `individu`" sehingga Individu dan Departemen menghasilkan angka identik. Itu benar untuk keadaan waktu itu dan sudah tidak lagi.
 
 **Empat metrik**, bobot & target diputuskan pemilik metrik 2026-08-27 (diisi HR di template, bukan di kode):
 
@@ -158,21 +171,21 @@ Rute ke-41, masuk 2026-08-27 (PR [#1479](https://github.com/bip-itteam-internal/
 
 ⛔ **KOREKSI 2026-09-09 — dok ini sebelumnya menyatakan "Shopee live nihil API dan itu permanen". Itu KELIRU, dan kata "permanen" yang paling merugikan** karena ia menghentikan orang sebelum bertanya.
 
-Diukur ke backend dokumentasi resmi Shopee (`doc/module/?version=2`): **441 API**, di antaranya modul **`Livestream` berisi 29 endpoint** (`get_session_metric`, `get_session_detail`, `get_session_item_metric`, dst.) plus **3 endpoint livestream di BrandPortal** (`principal.get_shop_livestream_performance`, `get_session_livestream_performance`, `get_principal_livestream_performance`). ⚠️ Cache lokal `API Reference/Shopee Open API v2/Index.md` (367 endpoint dari SDK) **tidak memuat modul ini**, jadi pencarian yang berhenti di cache akan mengkonfirmasi klaim yang salah — tembak backend-nya.
+Diukur ke backend dokumentasi resmi Shopee (`doc/module/?version=2`): **441 API**, di antaranya modul **`Livestream` berisi 25 endpoint** (`get_session_metric`, `get_session_detail`, `get_session_item_metric`, dst.) plus **3 endpoint livestream di BrandPortal** (`principal.get_shop_livestream_performance`, `get_session_livestream_performance`, `get_principal_livestream_performance`). ⚠️ Cache lokal `API Reference/Shopee Open API v2/Index.md` (367 endpoint dari SDK) **tidak memuat modul ini**, jadi pencarian yang berhenti di cache akan mengkonfirmasi klaim yang salah — tembak backend-nya. *(Versi pertama koreksi ini menulis 29; salah hitung, dibetulkan 2026-09-10.)*
 
-Yang **benar** dari catatan lama hanyalah alasannya: **level otorisasinya berbeda**, bukan API-nya tak ada. Probe read-only ke produksi 2026-09-09 (toko Kyura Beauty, kontrol positif `shop.get_shop_info` HTTP 200):
+Endpoint `/api/v2/livestream/*` menuntut ekor signature **`user_id`**, bukan `shop_id` — terverifikasi dua arah 2026-09-10 dengan app yang BENAR (partner `2038358`, kredensial toko Beautyhacks.id, kontrol positif `shop.get_shop_info` HTTP 200):
 
-| Endpoint | Balasan |
-|---|---|
-| `livestream.get_session_metric` / `_detail` / `get_item_count` | `error_param` — *"There is no user_id in query."* |
-| idem, `user_id` diisi `shop_id` | HTTP 403 `invalid_acceess_token` |
-| `principal.get_*_livestream_performance` | `error_param` — *"There is no principal_id in query."* |
+| Yang dicoba | Balasan | Artinya |
+|---|---|---|
+| ekor `shop_id` | `error_param` — *"There is no user_id in query."* | ditolak di pintu |
+| **ekor `user_id`** | `error_data` — *"The session(session_id:N) is not belong to you"* | **otentikasi LOLOS**; ditolak di pemeriksaan kepemilikan data, karena `session_id`-nya karangan |
 
-Yang menentukan adalah **jenis errornya**: bukan `error_auth` ("tidak berhak"), bukan `error_sign` ("tanda tangan salah"). App-nya berhak; yang kurang satu identitas. Penanganannya di [[Microservices - Integration Service]] (app keempat `LIVESTREAM`, otorisasi level akun).
+⛔ **Koreksi kedua (2026-09-10): `user_id` TIDAK menuntut alur otorisasi khusus.** Versi pertama koreksi ini menyimpulkan "modul menuntut otorisasi level akun" dari probe yang memakai **partner `2032314` (app ERP_SYSTEM)** — app yang salah, dan `error_param` yang sama akan muncul untuk app apa pun yang bukan app Livestream. Kenyataannya otorisasi **toko biasa** (`/api/v2/shop/auth_partner`) pada app Livestream menerbitkan **`shop_id` DAN `user_id` sekaligus**; `user_id` baru terbit saat kode ditukar, bukan di redirect. Terukur di prod: Beautyhacks Indonesia `shop 1811407105 / user 7894179133`, Beautyhacks.id `shop 898309034 / user 898362461`. Riwayat lengkapnya di [[Microservices - Integration Service]] § app keempat.
 
 **Yang masih menghalangi sinkronisasi sesi Shopee ke `mart_live_sessions`** (TBD, belum dikerjakan):
 
-- Modul `livestream` **tidak punya `get_session_list`** — `get_session_metric` wajib disodori `session_id`, dan bila host siaran dari aplikasi Shopee Live nomornya tak pernah sampai ke kita. Yang bisa mengenumerasi sesi hanya jalur `principal` (Brand Portal), yang menuntut `principal_id`.
+- ⛔ **Tak ada cara mengenumerasi sesi milik sendiri, dan inilah penghalang yang tersisa.** Modul `livestream` (25 endpoint) tidak punya `get_session_list`; `create_session`/`start_session`/`end_session` untuk **menerbitkan** siaran, bukan membaca yang sudah lewat. Jadi endpoint hanya menjawab bila `session_id`-nya sudah diketahui. Yang bisa mengenumerasi hanya jalur `principal` (Brand Portal), yang menuntut `principal_id` — dan kedua kredensial prod memulangkan `principal_id_list` **kosong**.
+- ⚠️ **`shopee_affiliate_content_performance` BUKAN sumber `session_id` itu**, walau ia menyimpan `content_id` ber-`channel: LiveStreaming` yang terlihat menjanjikan (judul siaran sungguhan, mis. `223885342` "monggo sekeca.aken belanja"). Diuji 2026-09-10: `get_session_metric` atas `content_id` itu dibalas *"is not belong to you"* — sesi tersebut milik **afiliator** yang mempromosikan produk toko, bukan siaran toko itu sendiri. Hipotesis yang wajar dan salah; dicatat supaya tak diulang.
 - ⛔ **Semantik `orders` Shopee BERBEDA dari TikTok dan tidak boleh disamakan begitu saja.** Dok Shopee: *placed orders (**paid and unpaid**) during Livestream, **including cancelled orders***; `gmv` juga termasuk order batal. KPI Host Live memakai `sku_orders` TikTok = **dibayar saja**. Menyuapkan angka Shopee apa adanya ke metrik yang sama membuat host Shopee **sistematis terlihat lebih unggul** — tanpa galat dan tanpa test yang menangkapnya. Kelas yang sama dengan `iklan_sia_sia`; keputusan perlakuannya milik pemilik metrik, bukan keputusan teknis.
 - `conversion_rate` versi `principal` = orders ÷ **views**, sedangkan rumus KPI di dok ini = orders ÷ **product_clicks**. `livestream.get_session_metric` justru punya `co` (orders ÷ clicks) yang cocok persis.
 
@@ -215,7 +228,11 @@ Tiga aturan yang diputuskan:
 
 Atribusi lintas departemen: GMV masuk ke departemen **host** (`work_data.department`), bukan departemen pemilik akun, demi menjaga invarian [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] bahwa satu omzet tak boleh menaikkan skor dua departemen. Kepemilikan toko tetap dibaca dari `department_shops`, jangan diturunkan dari nama akun.
 
-⚠️ **Konsumen yang sudah menggandakan jam hari ini**, dua-duanya di frontend: kartu metrik `halaman-live-shift.tsx` dan `ringkas-performa-host-live.ts` (layar tim ICC), keduanya menjumlahkan `durasi_efektif_detik` per baris tanpa dedup jendela waktu. Di bip-erp sendiri **nol** konsumen `porsi_host`/`durasi_efektif_detik` di luar service ini.
+✅ **Sudah berlaku di jalur KPI sejak 2026-09-09**: `JamDindingDetik(shifts, sekarang)` di `live_shift_entity.go` menyatukan jendela `JendelaAktif` tiap shift lewat `gabungkanInterval`, dan `kpi_live_individu.go` memakainya alih-alih menjumlahkan. Mesin peleburannya satu dengan `gabungkanJeda`, dan total `JendelaAktif` dikunci test agar selalu sama dengan `DurasiEfektif` untuk satu shift.
+
+⚠️ **Konsumen yang MASIH menggandakan jam**, dua-duanya di frontend: kartu metrik `halaman-live-shift.tsx` dan `ringkas-performa-host-live.ts` (layar tim ICC), keduanya menjumlahkan `durasi_efektif_detik` per baris tanpa dedup jendela waktu. Di bip-erp sendiri **nol** konsumen `porsi_host`/`durasi_efektif_detik` di luar service ini.
+
+⛔ **Akibatnya dua permukaan kini berselisih, dan itu utang yang dinyatakan, bukan terlewat.** Diukur prod 2026-09-09: Vani Nur Zakiyah tercatat **1,67 jam** di KPI (union) dan **3,32 jam** di panel ICC (penjumlahan); Kusmi 1,02 vs 2,01. Sebelum §2 dikerjakan keduanya konsisten-salah; sesudahnya tidak konsisten. Siapa pun yang menyentuh salah satu permukaan wajib tahu angka mana yang sedang ia baca.
 
 ✅ **Sesi kedua kini punya tampilan.** Sebelumnya web mengambil `sesiBerjalan?.[0]` dan mobile `milik.first`, jadi sesi kedua tak bisa dijeda atau diakhiri, lalu menggantung melewati ambang 12 jam yang **memaksa porsi host jadi nol** — dan peringatan jam ke-11 tak pernah sampai karena kartunya tak pernah dirender. Itulah yang menjadikan tampilan N sesi sebagai **prasyarat**, bukan penyempurnaan. Web tayang di prod 2026-08-30; mobile selesai di branch `feat/live-shift-sesi-jamak` (belum merged).
 
