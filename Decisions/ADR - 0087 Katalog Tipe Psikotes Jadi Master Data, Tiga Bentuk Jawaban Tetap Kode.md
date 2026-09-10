@@ -15,6 +15,8 @@ HRD bisa mengelola sendiri **daftar tipe tes** (CFIT, DISC, Kraepelin, dan tipe 
 3. **Legalitas soal bukan urusan sistem.** CFIT dan DISC adalah instrumen berlisensi. Keputusan boleh atau tidaknya item-itemnya didigitalkan dan disimpan di server perusahaan **harus diambil HRD sebelum bank soal diisi**, bukan sesudah.
 4. **Tarik-lepas (drag and drop) untuk mengurutkan tes tidak dibuat.** Urutan diatur dengan tombol naik dan turun. Alasannya di bagian teknis di bawah.
 
+**Yang belum diputuskan, dan perlu diketahui sekarang:** tes dikerjakan kandidat **sendiri, tanpa pendamping HR**, di mana saja dan kapan saja, dan tautannya **tidak punya tenggat**. Sistem hari ini tidak memeriksa siapa yang mengerjakan maupun di mana. Untuk tes kecepatan seperti Kraepelin risikonya terbatas; untuk CFIT, yang punya jawaban benar, pengerjaan di rumah tanpa pengawasan bisa dibantu orang lain. Boleh atau tidaknya itu keputusan HRD, dan **harus diambil sebelum CFIT dibangun**. Rinciannya di bagian Belum Diputuskan di bawah.
+
 **Perkiraan besaran kerja: besar, dan dipecah empat tahap.** Tahap pertama kecil dan memperbaiki sesuatu yang sedang salah hari ini. Sebagian besar bahan sudah ada di sistem dan dipakai ulang: mesin sesi tes bertoken, kerangka layar kandidat, pembaca berkas Excel, dan pola unggah gambar. Yang benar-benar baru: tiga koleksi data, tiga menu, dan dua mesin penilaian. Perlu rilis backend lebih dulu, lalu web.
 
 ## Deskripsi
@@ -22,7 +24,7 @@ HRD bisa mengelola sendiri **daftar tipe tes** (CFIT, DISC, Kraepelin, dan tipe 
 *Psikotes diperluas dari satu jenis (Kraepelin) menjadi multi-jenis. **Katalog tipe tes, bank soal, dan paket tes menjadi master data yang dikelola HRD**, sementara **bentuk jawaban tetap kode**: tiga mesin penilaian (pilihan ganda berkunci, MOST/LEAST, angka-kolom) yang menjadi kontrak antara katalog dan mesin. Paket tes dijalankan sebagai **satu sesi, satu tautan, sekali duduk berurutan**, sehingga index unik `(candidate_id, round_id)` yang sudah ada tetap sah. Menyimpang dari kalimat di [[HRIS - Psikotes Kraepelin]] yang menjanjikan "jenis tes baru cukup menambah file skoring", dengan alasan yang dicatat di bawah.*
 
 - **Status**: 🟡 **Diusulkan**, rencana disetujui 2026-09-10, kode belum ada. Artefak kerja: `Workspace/ANALISA - Psikotes Multi-Jenis.md`
-- **Path di repo**: `bip-erp/services/recruitment/psikotes_tipe*.go` (baru) · `psikotes_item*.go` (baru) · `psikotes_paket*.go` (baru) · `psikotes_jenis_jawaban.go` (baru, dispatcher) · `psikotes_selesai.go` · `psikotes_public_handlers.go` · `psikotes_hr_handlers.go` · `bip-erp/api-gateway/main.go` · `erp-frontend/src/features/hris/recruitment/psikotes/*` · `erp-frontend/src/features/psikotes/*` · `erp-frontend/src/app/(main)/pengaturan/rekrutmen/page.tsx`
+- **Path di repo**: `bip-erp/services/recruitment/psikotes_tipe*.go` (baru) · `psikotes_item*.go` (baru) · `psikotes_paket*.go` (baru) · `psikotes_jenis_jawaban.go` (baru, dispatcher) · `psikotes_selesai.go` · `psikotes_public_handlers.go` · `psikotes_hr_handlers.go` · `bip-erp/api-gateway/main.go` · `erp-frontend/src/features/hris/recruitment/psikotes/*` · `erp-frontend/src/app/(main)/pengaturan/rekrutmen/page.tsx` · `career-bharata/src/components/psikotes/*` · `career-bharata/src/lib/recruitment-api.ts` (halaman kandidat yang dipakai prod) · `erp-frontend/src/features/psikotes/*` (versi kedua, nasibnya menunggu butir 4 Belum Diputuskan)
 - **Tanggal**: 2026-09-10
 
 ## Context
@@ -125,7 +127,7 @@ Konsekuensinya index unik `(candidate_id, round_id)` yang sudah ada **tetap sah 
 - Sepuluh titik pemanggilan yang sekarang memanggil Kraepelin langsung harus melewati dispatcher. Selama transisi, salah satu jalur yang terlewat akan menilai tes DISC dengan rumus Kraepelin, dan **gagalnya tidak akan berupa galat** melainkan angka yang masuk akal. Setiap titik wajib punya test yang menguncinya.
 - Gateway meng-hardcode kelima path psikotes. Endpoint publik berbentuk baru menuntut menyunting dan menaikkan gateway juga.
 - Bank soal berisi kunci jawaban. Kebocorannya tidak akan terlihat sebagai galat, jadi endpoint pengelola dan endpoint kandidat wajib memakai bentuk respons yang terpisah dan diuji, mengikuti pola yang sudah ada di learning.
-- Selama **dua implementasi mesin tes kandidat** masih hidup berdampingan (erp-frontend dan career-bharata), tiap bentuk jawaban baru dibangun dua kali. Ini belum diputuskan dan biayanya berlipat justru karena ADR ini.
+- Selama **dua implementasi mesin tes kandidat** masih hidup berdampingan (erp-frontend dan career-bharata), tiap bentuk jawaban baru berisiko dibangun dua kali. **Di prod pilihannya sudah terjadi de facto**: `ERP_FRONTEND_URL` di container recruitment prod berisi `https://career.bharatainternasional.com` (dibaca 2026-09-10), jadi kandidat prod mengerjakan di career portal. Keputusan resminya belum ada, dan biayanya berlipat justru karena ADR ini.
 
 **Risiko yang diterima sadar**
 
@@ -141,6 +143,15 @@ Konsekuensinya index unik `(candidate_id, round_id)` yang sudah ada **tetap sah 
 - Koleksi baru tidak menuntut env baru. Bila kelak ditambah env (misalnya batas ukuran gambar soal), container wajib dibuat ulang, bukan sekadar dimulai ulang.
 - Menaikkan recruitment-service saja **tidak cukup** bila ada endpoint publik baru: gateway ikut naik.
 - Bila tahap nol ditambahi pemberitahuan "hasil siap dinilai", itu **kategori inbox baru**, dan service pengirim beserta notification-service wajib naik bersama.
+
+## Belum Diputuskan (TBD)
+
+Ditemukan sesudah ADR ini disetujui, saat menelusuri apa yang sebenarnya dialami kandidat (2026-09-10, diverifikasi ke `origin` dan ke prod). Keempatnya keputusan HRD atau produk, bukan pekerjaan developer, dan butir 1 **memblokir tahap CFIT**.
+
+1. **Pendampingan.** Psikotes yang terbangun dikerjakan kandidat sendiri lewat tautan tanpa login: tidak ada langkah HR memulai tes, identitas hanya dikonfirmasi lewat satu klik, dan BE tidak mencatat IP maupun perangkat. Itu menyimpang dari keputusan HRD yang tercatat di [[HRIS - Recruitment]] ("dilaksanakan & dicatat staf HR langsung"). Untuk Kraepelin risikonya terbatas karena tes kecepatan sulit dibantu orang lain. Untuk **CFIT**, yang berkunci jawaban, pengerjaan jarak jauh tanpa pengawasan membuka jalan bagi orang lain mengerjakan atau membantu, dan aturan butir 3 tidak mencegah orang kedua di perangkat lain. Pilihannya: boleh jarak jauh dengan risiko diterima tertulis, wajib diawasi di kantor, atau campuran per tipe tes. **Bila CFIT boleh jarak jauh, timernya wajib ditegakkan server.** Hari ini batas waktu per kolom hanya ditegakkan browser: server menerima kiriman kolom kapan saja selama sesi berjalan, dan jam satu-satunya di server adalah sapuan ketidakaktifan 6 × detik per kolom.
+2. **Tenggat tautan.** `issued_at` hanya dicatat dan ditampilkan, tak pernah dibandingkan dengan waktu apa pun, sehingga tautan yang belum dibuka berlaku selamanya. Halaman kandidat juga tidak memeriksa status kandidat: yang sudah ditolak atau mengundurkan diri tetap bisa mengerjakan, dan hasilnya tetap tertulis ke Hasil Tes.
+3. **Aturan "halaman tersembunyi = tes berakhir".** Versi career portal mengakhiri sesi **seketika** begitu halaman tersembunyi (pindah tab, peramban diminimalkan, layar ponsel terkunci, telepon masuk) atau ditutup. Disengaja, karena Kraepelin mengukur ketahanan di bawah tekanan waktu tak terputus. Harganya: satu dari dua sesi terputus di prod cocok dengan pola ini (berakhir di kolom 3, sekitar satu menit sesudah mulai), dan kandidat tidak diberi tahu aturan ini selain anjuran di email untuk memakai komputer. Perlu diputuskan apakah dipertahankan apa adanya, diberi jeda toleransi, atau diberitahukan terang di layar petunjuk.
+4. **Mesin kandidat resmi.** Di prod pilihannya sudah terjadi de facto: `ERP_FRONTEND_URL` di container recruitment prod berisi `https://career.bharatainternasional.com`, jadi kandidat mengerjakan di career portal. Versi erp-frontend masih ada dan perilakunya berbeda (tanpa aturan butir 3). Keputusan tertulis mana yang dipertahankan belum ada, dan bentuk jawaban baru harus dibangun di tempat kandidat benar-benar berada.
 
 ## Dokumen Terkait
 

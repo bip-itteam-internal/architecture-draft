@@ -54,6 +54,8 @@
 
 *(Psikotes **dilaksanakan & dicatat staf HR langsung** — tanpa psikolog/asesor internal/vendor.)*
 
+> ⚠️ **Keputusan di atas tidak lagi mencerminkan sistem (2026-09-10).** Psikotes Kraepelin yang terbangun dikerjakan kandidat **sendiri** lewat tautan tanpa login, tanpa pendamping HR dan tanpa jejak tempat pengerjaan. Keputusan penggantinya belum diambil; pertanyaannya tercatat di [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] §Belum Diputuskan.
+
 ## User Persona
 
 > Persona pengguna sistem Recruitment — grounded ke aktor & proses HRD saat ini (manual/spreadsheet + Glints).
@@ -140,6 +142,7 @@
 - **Screening**: **manual** dulu (HR yang memutuskan); AI hanya **asisten skor & rekomendasi** (tanpa auto-reject) bila nanti diaktifkan.
 - **Interview**: multi-tahap **s/d 3×** tergantung posisi (mis. SPV).
 - **Psikotes**: dilaksanakan & dicatat **staf HR langsung** (tanpa psikolog/asesor internal/vendor).
+  > ⚠️ **Gap dengan sistem (2026-09-10):** psikotes yang terbangun dikerjakan kandidat **sendiri** lewat tautan tanpa login, tanpa pendamping HR dan tanpa jejak tempat pengerjaan. Keputusan ini belum dicabut maupun ditegaskan ulang; pertanyaannya tercatat di [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] §Belum Diputuskan.
 - **Urutan tahap (high-level)**: Screening → Interview → Psikotes → Offer.
 - **Tahap detail (rekaman HRD)**: CV Screening → HR/User Interview → **Technical Test (tes skill)** → Final Interview → **Background Check** → **Psikotes** → Offering → Hired → Onboarding. *(Technical Test = tes skill, **terpisah dari Psikotes**; Psikotes = tahap baru setelah Background Check, sebelum Offering.)*
   > ⚠️ **Gap dengan sistem (2026-09-10):** seed babak menaruh **Psikotest di urutan 3** (sebelum User Interview), bukan setelah Background Check. Technical Test dan Psikotest memang tetap dua babak terpisah, sesuai keputusan. Karena urutan babak adalah **data yang bisa disunting HR** di katalog babak, penyelarasannya tidak menuntut perubahan kode — cukup atur ulang `sequence_number`, dan itu belum dilakukan.

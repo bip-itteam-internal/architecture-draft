@@ -5,7 +5,9 @@ Papan kerja hasil `/analisa-kebutuhan` 2026-09-10. Keputusannya di [[ADR - 0087 
 ## Yang menghalangi sebelum kerja dimulai
 
 - [ ] **B1. HRD menjawab legalitas item CFIT dan DISC.** Keduanya instrumen berlisensi. **Bank soal tidak boleh diisi sebelum ini dijawab.** Ini bukan pekerjaan teknis dan tidak menghalangi T0 sampai T2, tetapi **memblokir T3 ke atas**.
-- [ ] **B2. Putuskan mesin kandidat mana yang menang**, erp-frontend atau career-bharata. Selama keduanya hidup, tiap bentuk jawaban dibangun dua kali. Menunda keputusan ini melipatgandakan T3 dan T5.
+- [ ] **B2. Putuskan resmi mesin kandidat mana yang dipertahankan**, erp-frontend atau career-bharata. **De facto di prod sudah career portal**: `ERP_FRONTEND_URL` prod berisi alamat career portal (dibaca 2026-09-10). Selama keduanya hidup, tiap bentuk jawaban berisiko dibangun dua kali; menunda keputusan ini melipatgandakan T3 dan T5.
+- [ ] **B3. HRD memutuskan pendampingan psikotes.** Tes hari ini dikerjakan mandiri tanpa pendamping dan tanpa jejak tempat pengerjaan, menyimpang dari keputusan HRD yang tercatat ("dilaksanakan staf HR langsung"). **Memblokir T3 (CFIT)**: menentukan apakah soal CFIT boleh dibuka lewat tautan publik, dan bila boleh, timernya wajib ditegakkan server. Rincian: [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] §Belum Diputuskan.
+- [ ] **B4. HRD memutuskan tenggat tautan.** Tautan `pending` tidak pernah kedaluwarsa, dan kandidat yang sudah ditolak tetap bisa mengerjakan. Tidak memblokir T0 sampai T2.
 
 ## Yang bisa dikerjakan tanpa kode
 
@@ -37,7 +39,7 @@ Papan kerja hasil `/analisa-kebutuhan` 2026-09-10. Keputusannya di [[ADR - 0087 
 
 ### Tahap 2 — CFIT
 
-- [ ] **T3. Mesin `pilihan_ganda` + bank soal teks.** *(butuh T1, B1, B2)*
+- [ ] **T3. Mesin `pilihan_ganda` + bank soal teks.** *(butuh T1, B1, B2, B3)*
 	Koleksi `psikotes_item`, CRUD bergerbang HR, dan mesin penilaian benar/salah per subtes. Termasuk **dispatcher `jenis_jawaban`** yang menggantikan sepuluh titik yang sekarang memanggil Kraepelin langsung.
 	Pola yang dicontek dari LMS: snapshot soal saat percobaan dimulai, **timer ditegakkan server** dari waktu mulai bukan dipercayakan klien, pencocokan jawaban lewat id soal sehingga pengacakan aman, dan kunci jawaban dibuang saat serialisasi.
 	⛔ Baca lebih dulu pelajaran di LMS bahwa menyembunyikan kunci dengan tag `json:"-"` **mematikan penguraian body** sehingga seluruh kunci tersimpan nol.

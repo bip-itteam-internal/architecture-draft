@@ -89,15 +89,18 @@ Daftar tipe tes **berurutan**, masing-masing bisa dinyalakan atau dimatikan tanp
 - ⛔ **Mengganti spesifikasi index tidak terjadi lewat deploy.** Mongo menolak diam-diam, penjaganya cuma log, dan index lama tetap berlaku sementara build tampak sukses. Karena itu paket sengaja dijalankan sebagai satu sesi.
 - ⚠️ **Sesi yang berakhir `ditinggalkan` atau `kedaluwarsa` tetap menghasilkan skor.** Diukur di prod 2026-09-10: 2 dari 2 hasil tersimpan adalah artefak sesi yang terputus di kolom 1 dan kolom 3, dan HR tidak punya cara melihatnya. Ini dibereskan di tahap nol, sebelum jenis tes apa pun ditambahkan.
 - ⚠️ **Gateway meng-hardcode kelima path psikotes.** Endpoint publik berbentuk baru menuntut menyunting dan menaikkan gateway juga.
-- ⚠️ **Dua implementasi mesin tes kandidat masih hidup berdampingan** (erp-frontend dan career-bharata). Selama belum diputuskan, tiap bentuk jawaban baru dibangun dua kali.
+- ⚠️ **Dua implementasi mesin tes kandidat masih hidup berdampingan** (erp-frontend dan career-bharata). Di prod kandidat memakai **career portal** (`ERP_FRONTEND_URL` prod berisi alamat career portal, dibaca 2026-09-10), jadi bentuk jawaban baru harus mendarat di sana. Selama erp-frontend belum resmi dipensiunkan, tiap bentuk jawaban berisiko dibangun dua kali.
+- ⚠️ **Batas waktu hari ini ditegakkan browser, bukan server.** Cukup untuk Kraepelin selama kandidatnya jujur, tapi tidak cukup untuk tes berkunci jawaban yang dikerjakan jarak jauh. Pola timer yang ditegakkan server dari waktu mulai sudah ada di LMS dan layak dicontek.
 
 ## Belum Diputuskan (TBD)
 
 1. **Legalitas item CFIT dan DISC.** Keduanya instrumen berlisensi. Boleh atau tidaknya didigitalkan dan disimpan di server perusahaan **harus dijawab HRD sebelum bank soal diisi**. Risiko hukum, bukan teknis.
 2. **Bentuk jawaban EPPS.** Diasumsikan muat di `most_least` karena sama-sama pilihan berpasangan, tetapi **belum diperiksa**.
-3. **Mesin kandidat mana yang menang**, erp-frontend atau career-bharata.
-4. **Bentuk perbaikan skor artefak**: menahan penulisan skor untuk sesi tak-tuntas, menandainya, atau keduanya. Diputuskan saat pengerjaan tahap nol.
+3. **Mesin kandidat mana yang dipertahankan resmi.** De facto di prod sudah career portal; keputusan tertulisnya belum ada.
+4. **Bentuk perbaikan skor artefak**: ✅ diputuskan 2026-09-10 saat merencanakan tahap nol, yaitu sesi yang tidak tuntas tetap menulis baris Hasil Tes **tanpa skor**, dan status terputusnya dibaca dari laporan sesi.
 5. **Urutan babak di prod sudah menyimpang** (`sequence_number` berisi 1, 1, 2, 3, 3, 5, 7 — dua pasang bertabrakan, dua angka bolong). Apakah dirapikan sebagai data atau diberi penjaga keunikan, belum diputuskan.
+6. **Pendampingan.** Tes hari ini dikerjakan mandiri tanpa pendamping dan tanpa jejak tempat pengerjaan. Untuk CFIT, yang berkunci jawaban, ini menentukan apakah soalnya boleh dibuka lewat tautan publik sama sekali, dan bila boleh, timernya wajib ditegakkan server. **Wajib dijawab HRD sebelum tahap CFIT.** Rincian: [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] §Belum Diputuskan.
+7. **Tenggat tautan dan status kandidat.** Tautan yang belum dibuka tidak pernah kedaluwarsa, dan kandidat yang sudah ditolak tetap bisa mengerjakan. Rincian di ADR yang sama.
 
 ## Dependensi & Integrasi
 
