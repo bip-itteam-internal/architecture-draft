@@ -92,16 +92,24 @@ Doc: [[Microservices - Task Management Service]]
 
 ### recruitment — `recruitment-mongo-db`
 Doc: [[Microservices - Recruitment Service]] (⚠️ Fase 1-3)
+Daftar di bawah = seluruh `mongodb.GetCollection(...)` di `services/recruitment` (diperiksa 2026-09-10).
 - job_requisition
 - job_posting
 - candidate
-- screening_result
 - interview
-- technical_test_result
-- psychotest
+- interview_round · interview_feedback
+- candidate_test_result *(hasil babak bertipe tes: Psikotest & Technical Test)*
+- psikotes_session *(sesi psikotes online Kraepelin; 3 index, dua di antaranya UNIK: `(candidate_id, round_id)` dan `token`)*
 - background_check
 - offer
+- manpower_plan
+- job_type · candidate_source · interview_type · job_location · assessment_type *(master)*
+- onboarding_template · onboarding_instance · onboarding_review · onboarding_review_response
+- email_template
+- candidate_assessment *(legacy — hanya dibaca `migrate_test_result.go`, tak ditulis lagi)*
 - audit_logs
+
+> ⚠️ `screening_result`, `technical_test_result`, `psychotest`, dan `psychotest_result` **tidak ada** dan tak pernah lagi ditulis service ini; dokumen lama yang menyebutnya sudah dikoreksi di [[Microservices - Recruitment Service]] dan [[HRIS - Recruitment]].
 
 ### payroll — `payroll-mongo-db`
 Doc: [[Microservices - Payroll Service]] (⚠️ Fase 1 — Salary Setup & Config)

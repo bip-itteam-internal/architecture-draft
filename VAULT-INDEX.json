@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-10",
-  "jumlah_dokumen": 382,
+  "jumlah_dokumen": 391,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -566,25 +566,26 @@
         "Microservices - Marketing Analytics Service",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "API - Index",
+        "ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
         "Microservices - Employee Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "2f19d1a02b10bba3dcecd156fb8b359567dbeb8ad2c96a4e97f8b2298df71635",
-      "ukuran_kb": 36.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan marketing-analytics service (42 route lewat prefix gateway /api/marketing-analytics) beserta parameter, bentuk respons, dan kode galatnya: halaman depan /beranda dengan vonis laba lima nilai (tanpa_data, belum_matang, rugi, waspada, sehat), ambang keputusan /ambang, pagu belanja iklan /pagu, kurva alokasi, laba per toko/produk/item, video dan live, pencatatan sesi live host /live-shifts, retur, price floor, job/penjadwal, dan pengumpul KPI. Juga menjawab konvensi amplop respons (unavailable_channels, kolom_tidak_berlaku, 400 untuk enum tak dikenal, paginasi drill dengan total -1), siapa yang boleh menulis ambang dan pagu (RequireMarketingLeader), kenapa cpa_maks tersimpan tapi tak dibaca, dan cara mengaudit ulang kelengkapan daftar route terhadap kode.",
+      "hash": "6166029ba4c949b4324f9f8b494bb2608ecd5c02b1718dabf3280823d7dc327c",
+      "ukuran_kb": 38.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service beserta parameter dan bentuk responsnya, mulai dari halaman depan `/beranda`, ambang keputusan `/ambang`, pagu belanja iklan `/pagu`, `/kurva-alokasi`, laba per toko/produk/item, video dan live, pencatatan sesi live host `/live-shifts`, sampai job, penjadwal, dan `/health`. Juga menjawab: endpoint mana yang digerbang role marketing leader dan mana yang sengaja terbuka, apa arti lima nilai vonis laba (`tanpa_data`, `belum_matang`, `rugi`, `waspada`, `sehat`), kapan nilai `null` berarti tak terhitung alih-alih nol, dan mengapa blok `pembatalan` serta `orders_dikirim` tidak boleh dijumlahkan ke laba. Memuat konvensi amplop respons (`unavailable_channels`, `kolom_tidak_berlaku`, paginasi drill, batas hari WIB) plus prosedur mengaudit ulang kelengkapan daftar route terhadap kode.",
       "kata_kunci": [
         "marketing analytics",
-        "endpoint / route API",
-        "beranda",
-        "vonis laba / belum_matang",
-        "ambang roas_min cpa_maks",
-        "pagu belanja iklan",
-        "kurva alokasi",
-        "live-shifts / sesi live host",
-        "profit shops products items",
-        "price floor"
+        "endpoint",
+        "API reference",
+        "laba",
+        "profit attribution",
+        "ROAS",
+        "ambang keputusan",
+        "pagu iklan",
+        "live shift",
+        "vonis laba"
       ]
     },
     {
@@ -700,24 +701,29 @@
         "APP - Portal Karir Bharata",
         "API - Index",
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
+        "HRIS - Psikotes Kraepelin",
         "HRIS - Recruitment",
         "Microservices - Employee Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "7f3e7158dab449d579c03f2454c4bc332bc9a7fa1a2fa5978fd6fa7a34f2b323",
-      "ukuran_kb": 13.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan recruitment-service beserta role yang boleh memanggilnya, dari pengajuan job requisition, job posting, kandidat dan upload CV, tahapan seleksi (screening, interview, technical test, background check, psikotes), offer, hire, sampai jalur publik portal karir tanpa JWT. Juga menjawab siapa yang mereview dan menyetujui requisition, bagaimana babak interview dan feedback pewawancara direkam serta siapa yang boleh mengisinya, dan bagaimana kandidat Hired ditautkan ke data karyawan HRIS lewat link-employee. Memuat pula aturan pengambilan department requisition dari identitas pengaju berikut pengecualian jabatan berjenjang direktur.",
+      "hash": "0d5d3d97d82d0348b4242bac4b17ee50636be221c1f5ac47f1244650757bbef8",
+      "ukuran_kb": 18.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di recruitment-service, siapa role yang boleh memanggilnya, dan bagaimana bentuk request/response tiap tahap rekrutmen. Berguna untuk mencari path pengajuan requisition (termasuk aturan direktur mengajukan lintas departemen), pembukaan lowongan, CRUD kandidat, upload CV, perekaman hasil tes dan background check, penerbitan psikotes online, offer, hire, sampai rute publik tanpa JWT untuk portal karir. Juga menjelaskan endpoint lama yang sudah dihapus (screening, technical-test, psychotest, director-approve) supaya contoh curl usang tidak dipakai lagi.",
       "kata_kunci": [
-        "recruitment",
+        "recruitment service",
         "rekrutmen",
         "ATS",
+        "endpoint",
+        "API",
         "job requisition",
         "job posting",
         "lowongan",
         "kandidat",
-        "interview feedback",
+        "candidate",
         "offer",
-        "portal karir publik"
+        "psikotes",
+        "interview round",
+        "public recruitment"
       ]
     },
     {
@@ -1297,7 +1303,7 @@
       "area": "Application",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas → cek status; **E2E terverifikasi live 2026-07-16**). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf, dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*).",
+      "status_teks": "**Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas; **E2E terverifikasi live 2026-07-16**). ⛔ **Fitur \"cek status lamaran\" SUDAH DIHAPUS** (BE `a298ba70`, 2026-07-24; portal tak punya rute `/status` — diverifikasi 2026-09-10). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf, dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*).",
       "publik": true,
       "tautan": [
         "Microservices - Recruitment Service",
@@ -1305,24 +1311,25 @@
         "APP - Web ERP",
         "HRIS - Recruitment",
         "APP - Website Bharata Internasional",
+        "HRIS - Psikotes Kraepelin",
         "API - Recruitment Service",
         "Microservices - Notification Service",
         "CORE - SSO Flow"
       ],
-      "hash": "d88b254349cc4ec45f9996133404ef8fe933cc7f7c5bc7ca0e55842cfdf4df44",
-      "ukuran_kb": 9.6,
-      "ringkasan": "Menjawab: bagaimana pelamar publik menelusuri lowongan, mengirim lamaran beserta satu berkas PDF gabungan, dan mengecek status lewat tracking token, serta halaman apa saja yang ada di portal. Juga menjawab kontrak publik recruitment yang dipakai beserta jebakannya (posisi_dilamar wajib, tanggal_lahir RFC3339, casing enum persis), stack dan status repo terpisah career-bharata, dan cara deploy Docker-nya termasuk pemetaan port di server.",
+      "hash": "617666db3f713b26c652d3f7e117f648c04bf42c430dc47c42c32b22074c3e95",
+      "ukuran_kb": 12.3,
+      "ringkasan": "Menjawab: apa itu portal karir publik career.bharatainternasional.com, bagaimana pelamar melihat lowongan, mengirim lamaran dengan satu berkas PDF gabungan, dan mengerjakan psikotes Kraepelin lewat magic link tanpa login. Juga menjelaskan stack dan repo terpisah career-bharata (Next.js 16, branch master, pnpm), endpoint /public/recruitment/* yang dikonsumsi lewat gateway tanpa JWT, cara deploy Docker standalone beserta jebakan port 3005 di prod, kenapa pelamar tidak bisa memeriksa status lamarannya sendiri, dan bedanya dengan halaman karir situs korporat.",
       "kata_kunci": [
         "portal karir",
         "career portal",
+        "career-bharata",
         "lowongan",
         "job posting",
         "lamaran",
-        "apply",
-        "tracking token",
-        "career-bharata",
-        "recruitment",
-        "Next.js"
+        "pelamar",
+        "psikotes",
+        "magic link",
+        "career.bharatainternasional.com"
       ]
     },
     {
@@ -1561,6 +1568,8 @@
         "CORE - IT Orchestrator",
         "Microservices - Learning Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "HRIS - Psikotes Kraepelin",
+        "API - Recruitment Service",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
@@ -1575,24 +1584,24 @@
         "APP - MyBharata",
         "DB - Overview and Notes"
       ],
-      "hash": "88f2fe4563d59c799aab17182fffee35a454477330ceab3b95c4cba57ef90987",
-      "ukuran_kb": 10.9,
-      "ringkasan": "Menjawab: bagaimana request dari internet masuk ke ekosistem bip-erp, siapa yang memvalidasi JWT dan menerbitkannya saat login, serta bagaimana routing `/api/:module/*` diteruskan ke service internal lewat internal gateway key. Juga menjawab pertanyaan operasional yang sering muncul: kenapa sebuah endpoint membalas 431 (header identitas yang di-inject gateway menuntut `ReadBufferSize` minimal 32 KB di setiap service), kenapa `/internal/` tetap bisa diakses dari internet karena routing bersifat catch-all bukan allowlist, dan kenapa perubahan hak akses seseorang tidak langsung terasa karena kunci cache Redis hanya memuat employee dan URL tanpa izin. Memuat pula daftar module beserta port internal, rute non-`/api` (auth, onboarding, public, ext, dev), alur SSO one-time-code, serta batasan SSO store in-memory dan revoke token.",
+      "hash": "f149404e0fc39554a2d9220e86f2fa9e7521045f40d28e6905696e0e7c6e7619",
+      "ukuran_kb": 11.9,
+      "ringkasan": "Menjawab: bagaimana request dari internet masuk ke ekosistem bip-erp, bagaimana JWT diterbitkan dan divalidasi, dan bagaimana gateway merutekan ke service internal lewat pola /api/:module/* beserta rute non-api khusus (auth, onboarding, public feedback/guestbook/recruitment/psikotes, ext webhook, dev/debug). Menjelaskan header identitas yang di-inject dari klaim JWT (BIP-Employee-Id, BIP-System-Roles, BIP-Company-ID), konsekuensi wajibnya ReadBufferSize minimal 32 KB agar tidak muncul 431, SSO one-time-code, serta caching Redis dan module yang dikecualikan. Juga menegaskan bahwa routing bersifat catch-all sehingga prefix /internal/ bukan batas keamanan dan limiter khusus bisa dilewati.",
       "kata_kunci": [
-        "api gateway",
+        "API gateway",
         "gateway",
         "JWT",
-        "authentication",
+        "auth",
         "SSO",
         "routing",
         "reverse proxy",
-        "431 Request Header Fields Too Large",
+        "431 request header",
         "ReadBufferSize",
-        "rate limiting",
-        "CORS",
-        "Redis cache",
         "internal gateway key",
-        "BIP-Company-ID"
+        "Redis cache",
+        "rate limit",
+        "company_id",
+        "multi-tenant"
       ]
     },
     {
@@ -1922,26 +1931,30 @@
         "ADR - 0002 Database-per-Service",
         "REF - Kepemilikan Data",
         "Microservices - Recruitment Service",
+        "HRIS - Recruitment",
         "Microservices - Payroll Service",
         "Microservices - Learning Service",
         "Microservices - Form Builder Service",
         "Microservices - File Service"
       ],
-      "hash": "36f2ed1bee0d0b582e3d2e1fe08e1b4524c9d23feaba4b5e72cae7c0662d4383",
-      "ukuran_kb": 8.7,
-      "ringkasan": "Menjawab: service mana memiliki database dan collection MongoDB apa saja (employee, attendance, notification, insentive, integration, inventory, tiktok-shop, task-management, recruitment, payroll, learning, form-builder), kenapa hanya employee-service yang berjalan sebagai replica set, dan koleksi mana yang membawa company_id untuk multi-tenant. Juga menjawab apa fungsi Redis dan MinIO sebagai infrastruktur data bersama, index apa yang dipasang saat boot, serta pengecualian mana yang membaca database service lain secara read-only (task-management ke employee_db dan attendance_db).",
+      "hash": "7617c01e0e983478eee9fccc3d110e198945f69169efd5079cf7f9b51003b9be",
+      "ukuran_kb": 9.6,
+      "ringkasan": "Menjawab: service mana memiliki database mana, collection apa saja yang ada di tiap database, dan siapa pemilik sebuah data di pola database-per-service. Berguna saat mencari tempat penyimpanan sebuah entitas (work_data, attendance_entries, transaction_orders, candidate, psikotes_session, salary_component, forms, dan lainnya), saat memeriksa koleksi mana yang sudah membawa company_id untuk multi-perusahaan, atau saat menelusuri pengecualian akses lintas database seperti task-management yang membaca employee_db dan attendance_db read-only. Menyebut juga infrastruktur data bersama (Redis, MinIO), replica set employee-service, dan konvensi waktu UTC.",
       "kata_kunci": [
-        "database per service",
+        "database",
         "MongoDB",
+        "database-per-service",
         "collection",
         "koleksi",
-        "replica set",
-        "company_id",
-        "multi-tenant",
+        "employee_db",
+        "attendance_db",
+        "recruitment_db",
         "Redis",
         "MinIO",
-        "kepemilikan data",
-        "data ownership"
+        "company_id",
+        "multi-tenant",
+        "index",
+        "ownership data"
       ]
     },
     {
@@ -2154,7 +2167,7 @@
       ],
       "hash": "b51390140a48a329df55320373d0656545c10a24a67cb96d48affcaf089ea6c9",
       "ukuran_kb": 124.5,
-      "ringkasan": "Menjawab: bagaimana alur login (username/employee_id, PIN, biometric), refresh token, dan onboarding karyawan berjalan, serta endpoint internal apa yang dipakai service lain untuk mengambil identitas dan role. Menjelaskan juga operasi admin akun oleh IT (set aktif/nonaktif, forget-device, hard reset, kelola system_roles), CRUD master data department & system role beserta siapa yang berhak, dan di mana data KPI, contract, BPJS, serta kuota cuti disimpan. Termasuk kenapa workspace Legal, R&D Regulatory, Quality, dan Procurement (register non-Accurate) di-host di service ini alih-alih membuat service baru, lengkap dengan gerbang izinnya.",
+      "ringkasan": "Menjawab: bagaimana login/SSO karyawan bekerja (username, employee_id, PIN, biometric, refresh token), bagaimana onboarding/registrasi dan admin akun oleh IT (aktif/nonaktif, forget-device, reset akun, system_roles) dilakukan, serta di mana master data departemen dan system role dikelola. Juga menjelaskan workspace register non-HR yang di-host di service ini (Legal, R&D Regulatory, Quality CAPA/batch release, Procurement kontrak & saving), cakupan multi-tenant company_id, akun pihak luar/vendor, dan alur resign menonaktifkan akun.",
       "kata_kunci": [
         "employee service",
         "master data karyawan",
@@ -2162,10 +2175,10 @@
         "autentikasi",
         "SSO",
         "onboarding",
+        "reset akun",
         "system_roles",
         "master department",
-        "reset akun",
-        "legal quality rnd procurement"
+        "resign"
       ]
     },
     {
@@ -2379,6 +2392,7 @@
         "Microservices - Employee Service",
         "HRIS - Otomasi Skor KPI",
         "ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate",
+        "External - Accurate Webhook",
         "ADR - 0069 Perlengkapan Per-Unit Opsional di inventory dengan Guard Anti-Kontaminasi",
         "ADR - 0065 Payout yang Sudah Dibukukan Dokumen Lain Ditutup, Bukan Dibuat Ulang",
         "Sales - ICC Account Manager Mapping",
@@ -2401,20 +2415,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "c2290ace889a99dcd85fe51b07514c1c0b987c19fbb42bb780879e9ff6cd6533",
-      "ukuran_kb": 364.3,
-      "ringkasan": "Menjawab: bagaimana order dan laporan iklan dari TikTok Shop, TikTok Business/Ads, Shopee, dan Lazada masuk ke ERP (webhook direct, verifikasi HMAC, retry log webhook) lalu dinormalkan jadi model transaction terpadu. Menjelaskan bridging akuntansi ke Accurate Online (Sales Invoice, Sales Return, ringkasan transaksi harian per toko/channel), pengelolaan kredensial OAuth per marketplace, automasi auto-ship/auto-approve yang sadar hari libur, serta job dan cron sync terjadwal. Juga menjadi rujukan untuk endpoint analitik iklan (GMV Max monitoring/overview, ICC video metrics), kepemilikan toko per departemen, dan status sinkron per toko termasuk toko banned yang dilewati worker.",
+      "hash": "2cefdf233fedd936591ed3dac0f6e7305ff2c776c43836a833567ee750c4bedd",
+      "ukuran_kb": 367.7,
+      "ringkasan": "Menjawab: bagaimana order dan laporan iklan dari marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk ke ERP lewat webhook dan sync terjadwal, lalu dinormalkan jadi model transaction dan di-bridge ke Accurate (Sales Invoice, Sales Return, ringkasan harian). Juga menjelaskan endpoint GMV Max monitoring/overview, ICC video metrics untuk insentif, kredensial OAuth dan holiday untuk auto-ship, mapping akun ICC dan kepemilikan toko, cron worker, gross profit per produk, ulasan marketplace, serta status sinkron per toko dan rencana Meta Ads.",
       "kata_kunci": [
         "integration service",
         "marketplace",
+        "webhook",
         "TikTok Shop",
         "Shopee",
         "Lazada",
-        "webhook",
         "Accurate",
+        "faktur",
         "sales invoice",
-        "GMV Max",
-        "OAuth credentials"
+        "GMV Max"
       ]
     },
     {
@@ -2561,6 +2575,7 @@
         "API - Marketing Analytics Service",
         "Microservices - Employee Service",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
+        "ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
         "APP - Web ERP",
@@ -2581,20 +2596,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "991746608e18bcd3c5302386863af2b03e83db821037e92b0824a902104b2a9b",
-      "ukuran_kb": 95.9,
-      "ringkasan": "Menjawab: dari mana angka laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live di dashboard berasal, dan kenapa dihitung lebih dulu ke koleksi mart_* alih-alih dihitung ulang tiap request. Menjelaskan aturan arsitektur wajibnya (integration_db baca-saja dengan tiga lapis penjaga, /health degraded bila index unik gagal), vonis halaman depan beserta lima keadaannya termasuk belum_matang dan ambang materialitas, serta pagu belanja, price floor, KPI host live, dan pencatatan sesi live. Juga sumber jawaban untuk larangan hitung ganda antar kolom (iklan_sia_sia, pembatalan, tiga angka penjualan live) dan catatan kejujuran data revenue TikTok vs Shopee.",
+      "hash": "c7b4aa34946987e920fc442e98c9c816ab4849fa4d24e533fbe3700e18895c13",
+      "ukuran_kb": 100.1,
+      "ringkasan": "Menjawab: bagaimana laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live dihitung dan dipra-agregasi ke koleksi mart_* dari integration_db yang dibaca-saja, serta endpoint apa yang tersedia (beranda vonis laba, ambang ROAS/CPA, pagu & kurva alokasi, KPI host live, pencatatan sesi live, retur, price floor). Juga menjelaskan aturan pemakaian angka agar tidak hitung ganda (iklan_sia_sia, pembatalan, GMV live 24 jam), vonis belum_matang vs rugi, penjadwal sync 48 jam, sumber data TikTok/Shopee, dan catatan kejujuran data seperti revenue sebelum/sesudah diskon.",
       "kata_kunci": [
         "marketing analytics",
-        "mart",
-        "laba",
-        "gross profit",
-        "ROAS",
         "dashboard marketing",
-        "live session",
-        "pagu iklan",
-        "price floor",
-        "hitung ganda"
+        "laba",
+        "profit",
+        "mart",
+        "ROAS",
+        "live shift",
+        "KPI host live",
+        "hitung ganda",
+        "iklan_sia_sia"
       ]
     },
     {
@@ -2780,8 +2795,10 @@
         "APP - Portal Karir Bharata",
         "API - Recruitment Service",
         "Microservices - File Service",
+        "HRIS - Psikotes Kraepelin",
         "Microservices - Employee Service",
         "Microservices - Notification Service",
+        "HRIS - Recruitment Pipeline Redesign",
         "DB - Overview and Notes",
         "CORE - OCR Document Service",
         "Sales - Veo (Gemini) Implementation",
@@ -2793,20 +2810,24 @@
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "907f870e43ee81d80ab00620a3e091f950e75fc4a6b75d1579d5b6bbd307bcae",
-      "ukuran_kb": 45.5,
-      "ringkasan": "Menjawab: bagaimana recruitment-service dirakit dan dijalankan, dari stack (Go + Fiber v2 + MongoDB recruitment_db, port 6979, di belakang gateway dengan auth SSO), collection apa saja yang dipakai, sampai cakupan tiap tahap pipeline dari job requisition, job posting, kandidat, seleksi, offer, hingga handoff onboarding ke employee-service. Juga menjawab increment apa saja yang tercatat beserta alasannya (apply publik, adopsi struktur ERPGo, konversi kandidat jadi karyawan, onboarding checklist yang dibangun ulang, orkestrasi interview dan link form feedback pewawancara, penghapusan tahap Direktur dan rentang gaji) serta prosedur deploy manual ke dev. Menyebut pula ketergantungannya ke file-service, notification-service, dan Glints, dan catatan scoping multi-perusahaan.",
+      "hash": "ed58a0629f7aace4b1cfe13eebc3f02d453a44a2d737e4937d7fd68e48055c8a",
+      "ukuran_kb": 51.5,
+      "ringkasan": "Menjawab: bagaimana recruitment-service dibangun dan sejauh mana pipeline rekrutmen sudah jalan di kode, dari requisition, posting, kandidat, babak seleksi, sampai offer dan handoff onboarding ke employee-service. Menjelaskan katalog babak global interview_round beserta form_type yang memisahkan babak yang dijadwalkan dari babak yang hanya dicatat hasilnya, mekanisme SP-Wiring yang menggerakkan progress dan status kandidat dari hasil tes, serta catatan bahwa psikotes online melakukan upsert langsung sehingga wiring tidak ikut jalan. Berguna pula untuk tahu stack, port, nama database, cara deploy manual, dan daftar increment beserta koleksi lama yang ternyata tidak ada di kode.",
       "kata_kunci": [
         "recruitment service",
         "rekrutmen",
-        "recruitment_db",
-        "job requisition",
-        "kandidat",
-        "interview",
-        "onboarding checklist",
-        "portal karir",
-        "deploy manual",
-        "Glints"
+        "microservice",
+        "Go Fiber",
+        "interview round",
+        "babak seleksi",
+        "form_type",
+        "SP-Wiring",
+        "test result",
+        "background check",
+        "offer",
+        "onboarding",
+        "psikotes",
+        "deploy manual"
       ]
     },
     {
@@ -5990,6 +6011,118 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI.md",
+      "judul": "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan** — disetujui 2026-09-10, kode belum ada. Rincian di `## Deskripsi`.",
+      "publik": true,
+      "tautan": [
+        "HRIS - Disciplinary (Surat Peringatan)",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "Microservices - Calendar Service",
+        "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program",
+        "HRIS - Industrial Relation",
+        "HRIS - Key Performance Index",
+        "HRIS - Conflict Management",
+        "HRIS - Kepatuhan Peraturan Perusahaan",
+        "Microservices - Employee Service",
+        "APP - MyBharata",
+        "APP - Web ERP"
+      ],
+      "hash": "cbe50357be0f60ff0c955244db65d7ea6a789c7e20f47bc80ee593d394467e49",
+      "ukuran_kb": 11.7,
+      "ringkasan": "Menjawab: kenapa modul Industrial Relation menyimpan catatan pelanggaran kepatuhan ringan (atribut kerja: sepatu, lanyard) di koleksi baru compliance_note yang terpisah dari Surat Peringatan dan kpi_score, dan kenapa catatan itu bukan sanksi, tidak memotong gaji, tidak menerbitkan SP otomatis, serta tidak masuk skor KPI. Menjelaskan siapa yang boleh mencatat (petugas IR/HR yang ditunjuk, lewat MyBharata, ditegakkan di server), siapa yang boleh membaca (visibilitas tiga-arah: petugas HR, karyawan atas dirinya, atasan atas departemennya via SupervisedDepartmentsStrict), dan kenapa jenis pelanggaran dibuat master data bukan enum Go. Juga menjawab kenapa data ini sensitif sehingga tidak didaftarkan ke calendar-service atau feed lintas modul.",
+      "kata_kunci": [
+        "industrial relation",
+        "compliance note",
+        "catatan kepatuhan",
+        "pelanggaran ringan",
+        "atribut kerja",
+        "SP",
+        "surat peringatan",
+        "KPI",
+        "coaching",
+        "master data",
+        "SupervisedDepartmentsStrict"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel.md",
+      "judul": "ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "**Sebagian terimplementasi** (2026-09-10). **§3 (prasyarat `live_shifts.channel`) SUDAH MERGED dan TERVERIFIKASI DI DEV, BELUM DI PROD**: bip-erp [#1827](https://github.com/bip-itteam-internal/bip-erp/pull/1827) (merged 2026-09-10 15:17 WIB, `131ce13c`; field `Channel`, `channelNormal` dua sisi, `channelPerToko`, channel masuk predikat `jodohkanSesiDenganPorsi`, derivasi dari `department_shops` dengan 400 toko tak terpetakan vs 503 master data tak terbaca, resep `dropIndex` di `index.go`; `go build` dan `go test ./services/marketing-analytics` exit 0 di atas `main` terbaru, kontrol negatif dijalankan) dan erp-frontend [#1521](https://github.com/bip-itteam-internal/erp-frontend/pull/1521) (merged 2026-09-10 15:23 WIB, `72194d4a`; dialog Mulai menampilkan pesan server untuk 400/503 lewat daftar-izin, key `sebagianGagalSebab` di dua locale; hook pre-push `tsc`/`lint`/`build` lolos setelah merge `main`, `dialog-mulai.test.tsx` 27/27). ⚠️ Kedua merge dilakukan asisten atas penegasan ulang user, **menyimpang sadar dari [[ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak]] §1**. **Dev, diukur 2026-09-10**: pipeline membangun ulang `marketing-analytics` 38 detik setelah merge dan frontend sekitar 4 menit sesudahnya; biner dev memuat string pesan barunya dan bundle dev memuat `sebagianGagalSebab` di 6 berkas; `POST /api/marketing-analytics/live-shifts` **lewat gateway dev** dengan JWT akun uji membalas **400** berbadan kalimat ICC Management, kontrol `GET /live-shifts/berjalan` 200, dan tak satu pun dokumen tertulis. **Yang TIDAK bisa dibuktikan di dev**: jalur 201 (channel tersimpan) dan penjodohan yang tetap berjalan, karena dev punya **0** baris `department_shops`, 0 `live_shifts`, dan 0 `mart_live_sessions`. Akibatnya sejak deploy ini **setiap** `POST /live-shifts` di dev dibalas 400, dan alur Mulai di layar dev tak bisa ditempuh karena dropdown tokonya kosong. **Prod, diukur 2026-09-10**: BELUM di-deploy (biner prod memuat nol fungsi baru dengan kontrol positif satu; bundle prod nol); deploy prod menunggu manusia, dan buktinya kelak cukup dibaca: dokumen `live_shifts` baru membawa `channel: \"TIKTOK\"`. **§1, §2, §4 sampai §11 masih 🟡 konsep** dan sebagian prasyaratnya di luar kendali kita (otorisasi streamer Shopee). Diukur di prod 2026-09-10: `mart_live_sessions` berisi **6.363 dokumen, seluruhnya `channel: \"TIKTOK\"`**, jadi belum ada satu pun sesi non-TikTok yang perlu digabungkan. Sementara itu `department_shops` **sudah** memuat 9 baris SHOPEE dan 3 baris LAZADA di samping 49 TIKTOK, jadi dimensi channel sudah nyata di master data dan hanya sesi live-nya yang belum ada. Prasyarat yang **bisa** dikerjakan sekarang tanpa menunggu Shopee: field `channel` pada `live_shifts`, yang per 2026-09-10 **tidak dimiliki satu pun dari 29 dokumen** shift September 2026. Keputusan ini lahir dari penelusuran metrik `add_to_cart_rate` Host Live 2026-09-10 (lihat §Context).",
+      "publik": true,
+      "tautan": [
+        "ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak",
+        "Sales - Marketing Analytics (Audit Ketersediaan Data)",
+        "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
+        "Microservices - Marketing Analytics Service",
+        "API - Marketing Analytics Service",
+        "HRIS - Otomasi Skor KPI",
+        "REF - Penamaan Metrik & Sumber KPI",
+        "RUN - Menambah Metrik KPI Otomatis",
+        "HRIS - Matriks KPI per Departemen",
+        "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "REF - Kepemilikan Data"
+      ],
+      "hash": "b69beb20f8de0bc9bb44d74e44e0d6f28a3d21c5ba79f34d09ab29e5c303b69f",
+      "ukuran_kb": 23.5,
+      "ringkasan": "Menjawab: bagaimana metrik rasio KPI Host Live (mis. add to cart rate) dihitung bila host live di lebih dari satu channel (TikTok, Shopee, Lazada), yaitu satu angka gabungan dari jumlah pembilang dibagi jumlah penyebut seluruh channel, bukan rata-rata rasio per channel, dan kenapa penyebutnya klik produk, bukan penonton. Juga menjawab kenapa data live Shopee belum bisa ditarik (API menuntut otorisasi tingkat akun streamer) dan Lazada tak punya data live, kenapa field channel di live_shifts jadi prasyarat, serta apa yang terjadi pada channel yang semantik field-nya belum diperiksa (digalatkan, bukan dilewati). Menjelaskan pula dampaknya ke rincian per channel di panel detail metrik, ambang sampel, target KPI yang harus diturunkan ulang, dan riwayat KPI sebelum-sesudah penggabungan yang tidak sebanding.",
+      "kata_kunci": [
+        "KPI Host Live",
+        "add to cart rate",
+        "metrik lintas channel",
+        "cross-channel",
+        "live_shifts channel",
+        "Shopee live",
+        "TikTok live",
+        "product clicks",
+        "rincian per channel",
+        "mart_live_sessions"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode.md",
+      "judul": "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan** — disetujui 2026-09-10, kode belum ada. Rincian di `## Deskripsi`.",
+      "publik": true,
+      "tautan": [
+        "HRIS - Psikotes Kraepelin",
+        "ADR - 0002 Database-per-Service",
+        "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
+        "ADR - 0041 Izin Tipe Form Menempel di Departemen",
+        "REF - Kepemilikan Data",
+        "HRIS - Recruitment",
+        "HRIS - Bank Soal dan Paket Psikotes",
+        "API - Recruitment Service"
+      ],
+      "hash": "c9d4b40c818d594165dc7b510da2117a6edf142f8e982f95f5f76fa64b7c42f0",
+      "ukuran_kb": 20.6,
+      "ringkasan": "Menjawab: kenapa katalog tipe tes psikotes, bank soal, dan paket tes dijadikan master data yang dikelola HRD sementara bentuk jawaban (pilihan ganda, MOST/LEAST, angka-kolom) tetap kode, dan sampai mana janji \"tanpa coding\" berlaku. Juga menjelaskan kenapa paket dijalankan sebagai satu sesi satu tautan, kenapa Form Builder ditolak sebagai fondasi, apa yang sengaja tidak dijanjikan (konversi IQ, kesimpulan otomatis, legalitas soal CFIT/DISC, drag and drop), temuan prod bahwa skor tersimpan adalah artefak sesi terputus, serta keputusan HRD yang masih terbuka seperti pendampingan pengerjaan dan tenggat tautan.",
+      "kata_kunci": [
+        "psikotes multi-jenis",
+        "tipe tes",
+        "bank soal",
+        "paket tes",
+        "CFIT",
+        "DISC",
+        "Kraepelin",
+        "jenis_jawaban",
+        "master data",
+        "ADR 0087"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -7217,6 +7350,44 @@
       ]
     },
     {
+      "path": "Human Resource Information System/HRIS - Bank Soal dan Paket Psikotes.md",
+      "judul": "HRIS - Bank Soal dan Paket Psikotes",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Direncanakan (Design)** — belum ada kode. Rencana disetujui 2026-09-10. Papan kerja: `Workspace/ANALISA - Psikotes Multi-Jenis.md`",
+      "publik": true,
+      "tautan": [
+        "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode",
+        "HRIS - Psikotes Kraepelin",
+        "Microservices - Recruitment Service",
+        "APP - Web ERP",
+        "API - Recruitment Service",
+        "REF - Kepemilikan Data",
+        "ADR - 0041 Izin Tipe Form Menempel di Departemen",
+        "CORE - API Master Gateway",
+        "Microservices - File Service",
+        "Microservices - Notification Service",
+        "APP - Portal Karir Bharata",
+        "HRIS - Recruitment"
+      ],
+      "hash": "71bb9732cb4d0f89a88eb92305578e32670859694010ef11fb40c224ab5137ce",
+      "ukuran_kb": 11.6,
+      "ringkasan": "Menjawab: bagaimana psikotes multi-jenis bekerja, yaitu model data psikotes_tipe, psikotes_item, psikotes_paket, dan perluasan psikotes_session, serta tiga bentuk jawaban (pilihan_ganda untuk CFIT, most_least untuk DISC, angka_kolom untuk Kraepelin) dan apa yang dihitung masing-masing. Juga menjelaskan alur HRD menyiapkan tipe, soal, dan paket per posisi lalu mengirim satu tautan ke kandidat, komponen yang dipakai ulang vs yang harus dibangun baru, dan jebakan seperti titik dispatcher yang terlewat, tag json:\"-\" pada kunci jawaban, serta index Mongo yang tidak berubah lewat deploy.",
+      "kata_kunci": [
+        "bank soal psikotes",
+        "question bank",
+        "paket psikotes",
+        "psikotes_tipe",
+        "psikotes_item",
+        "psikotes_paket",
+        "CFIT",
+        "DISC",
+        "pilihan ganda",
+        "MOST LEAST"
+      ]
+    },
+    {
       "path": "Human Resource Information System/HRIS - Big Pictures.md",
       "judul": "HRIS - Big Pictures",
       "area": "Human Resource Information System",
@@ -7266,30 +7437,30 @@
       "judul": "HRIS - Candidate Assessment",
       "area": "Human Resource Information System",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "Direncanakan (Design) — belum ada kode. Hasil brainstorming 2026-07-19.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Superseded** — desain ini sempat dibangun, lalu **dibongkar lagi** dan dikonsolidasi ke **hasil tes per-babak** (`candidate_test_result`). Dokumen dipertahankan sebagai riwayat keputusan; **jangan dipakai sebagai rencana kerja**. Diperiksa ke kode 2026-09-10.",
       "publik": true,
       "tautan": [
         "HRIS - Recruitment Pipeline Redesign",
         "Microservices - Recruitment Service",
-        "APP - Web ERP",
         "API - Recruitment Service",
+        "APP - Web ERP",
         "HRIS - Recruitment"
       ],
-      "hash": "a84a53a84ea2984d977d11c6b8e22b62f86afbebe68b5dd5b8ffff2197b29d56",
-      "ukuran_kb": 4.6,
-      "ringkasan": "Menjawab: bagaimana fitur Candidate Assessment (tes teknis/keahlian di tahap Screening) dirancang, mulai dari master katalog tipe assessment di System Setup, entity candidate_assessment berisi skor dan hasil Pass/Fail/Pending, sampai endpoint backend dan halaman menu tersendiri di web beserta reuse CandidatePicker. Juga menjelaskan keputusan desain yang sudah dikunci, misalnya perubahan status kandidat tetap manual oleh HR (tanpa otomatis dari hasil tes) dan picker kandidat dibatasi ke status Screening, plus urutan slicing BE lalu FE dan hal yang di luar scope MVP seperti lampiran hasil tes.",
+      "hash": "3022d291ec9347d1108d5c9293ade6b570418a213beb022495c1413d932c85a5",
+      "ukuran_kb": 6.0,
+      "ringkasan": "Menjawab: kenapa fitur Candidate Assessment (tes teknis dengan skor dan hasil Pass/Fail/Pending plus menu tersendiri) pernah dirancang, apa yang benar-benar terbangun, dan apa penggantinya sekarang. Berguna saat menemukan sisa-sisa desain lama di kode atau UI: master `assessment_type` dan koleksi `candidate_assessment` masih ada, tapi handler CRUD dan menu FE `hris/recruitment/assessments` sudah dibongkar, struct-nya disisakan hanya untuk migrasi ke `candidate_test_result`, dan form Lowongan masih mewajibkan `assessment_type_ids` yang tak lagi menentukan apa pun. Dokumen riwayat keputusan, bukan rencana kerja yang masih berlaku.",
       "kata_kunci": [
         "candidate assessment",
+        "assessment type",
         "tes teknis",
         "technical test",
+        "psikotest",
+        "Pass Fail Pending",
         "recruitment",
         "rekrutmen",
-        "screening",
-        "Pass Fail Pending",
-        "assessment type",
-        "System Setup",
-        "kandidat"
+        "superseded",
+        "candidate_test_result"
       ]
     },
     {
@@ -7547,6 +7718,44 @@
         "versioning dokumen",
         "targets",
         "penyasaran dokumen"
+      ]
+    },
+    {
+      "path": "Human Resource Information System/HRIS - Industrial Relation.md",
+      "judul": "HRIS - Industrial Relation",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "Konsep / Direncanakan (disetujui 2026-09-10, kode belum ada)",
+      "publik": true,
+      "tautan": [
+        "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
+        "Microservices - Employee Service",
+        "APP - Web ERP",
+        "APP - MyBharata",
+        "HRIS - Disciplinary (Surat Peringatan)",
+        "HRIS - Key Performance Index",
+        "Microservices - Calendar Service",
+        "HRIS - Conflict Management",
+        "HRIS - Kepatuhan Peraturan Perusahaan",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program"
+      ],
+      "hash": "44e833273bcde122a3083e0cc984ddd345a996fad2b20e5572f3c7b5590c653d",
+      "ukuran_kb": 5.7,
+      "ringkasan": "Menjawab: apa itu modul Industrial Relation, siapa yang mencatat pelanggaran kepatuhan ringan lewat MyBharata, siapa yang boleh melihat rekapnya (petugas IR/HR, supervisor, karyawan atas dirinya sendiri), dan bagaimana rekap per-departemen ditampilkan. Menjelaskan cara kerja rencananya: koleksi `compliance_note`, katalog jenis pelanggaran sebagai master data, gerbang baca tiga-arah, status hangus diturunkan saat baca, serta komponen mana yang di-reuse di MyBharata dan Web ERP. Juga memuat persona, kendala privasi, dan daftar hal yang belum diputuskan (TBD).",
+      "kata_kunci": [
+        "industrial relation",
+        "HRIS",
+        "compliance note",
+        "kepatuhan",
+        "atribut",
+        "lanyard",
+        "sepatu",
+        "coaching loop",
+        "rekap per departemen",
+        "MyBharata",
+        "petugas IR/HR"
       ]
     },
     {
@@ -8202,6 +8411,44 @@
       ]
     },
     {
+      "path": "Human Resource Information System/HRIS - Psikotes Kraepelin.md",
+      "judul": "HRIS - Psikotes Kraepelin",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — BE + FE ada di `origin/main` (BE: 12 berkas Go di `services/recruitment`; FE kandidat sejak 2026-09-09). **Masih bergerak**: sisi career portal disentuh 2026-09-10. **Status deploy belum diukur** — jangan asumsikan sudah live, ukur dulu ([[RUN - Deploy Microservices bip-erp]]).",
+      "publik": true,
+      "tautan": [
+        "Microservices - Recruitment Service",
+        "API - Recruitment Service",
+        "RUN - Deploy Microservices bip-erp",
+        "HRIS - Recruitment",
+        "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode",
+        "HRIS - Bank Soal dan Paket Psikotes",
+        "Microservices - Calendar Service",
+        "Microservices - Notification Service",
+        "CORE - API Master Gateway",
+        "APP - Web ERP",
+        "APP - Portal Karir Bharata",
+        "HRIS - Candidate Assessment"
+      ],
+      "hash": "c2b3f35466dfd75917d367c564b3bdb15d9f47240a966a0299bf8860447d8eca",
+      "ukuran_kb": 15.5,
+      "ringkasan": "Menjawab: bagaimana HR menerbitkan psikotes Kraepelin online untuk kandidat, bagaimana kandidat mengerjakannya lewat magic link tanpa login, dan bagaimana server menilai kecepatan, ketelitian, keajegan, dan ketahanan. Juga menjelaskan model data psikotes_session beserta index uniknya, konfigurasi kolom/baris/detik, endpoint HR dan publik (terbitkan, terbitkan ulang, laporan, start, submit kolom, finish, abandon), tiga cara sesi berakhir (tuntas, ditinggalkan, kedaluwarsa), serta kenapa hasilnya berhenti di Pending dan tidak menggerakkan status kandidat.",
+      "kata_kunci": [
+        "psikotes",
+        "Kraepelin",
+        "psychological test",
+        "tes online",
+        "magic link",
+        "psikotes_session",
+        "skoring",
+        "keajegan",
+        "abandon",
+        "Hasil Tes"
+      ]
+    },
+    {
       "path": "Human Resource Information System/HRIS - Recruitment Flow.excalidraw.md",
       "judul": "HRIS - Recruitment Flow.excalidraw",
       "area": "Human Resource Information System",
@@ -8257,29 +8504,31 @@
       "judul": "HRIS - Recruitment Pipeline Redesign",
       "area": "Human Resource Information System",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "**Direncanakan (Design)** — belum ada kode; ini spec untuk implementasi.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Diimplementasikan SEBAGIAN, arahnya berbeda** — dokumen riwayat, bukan spec yang masih berlaku (diperiksa ke kode 2026-09-10).",
       "publik": true,
       "tautan": [
         "Microservices - Recruitment Service",
         "APP - Web ERP",
         "API - Recruitment Service",
         "HRIS - Recruitment",
+        "HRIS - Candidate Assessment",
         "APP - Portal Karir Bharata"
       ],
-      "hash": "0890d1d19026aca6a6f54c158175df13ede6a1a8936346b95228395a66ff4ffd",
-      "ukuran_kb": 6.1,
-      "ringkasan": "Menjawab: apa keputusan desain penyederhanaan pipeline recruitment dari model dua-field progress+status menjadi satu field status 6 nilai (New/Screening/Interview/Offer/Hired/Rejected), mengapa Technical Test/Background Check/Psikotes dibuang sebagai tahap, dan bagaimana konsep Interview Rounds (katalog global + override per-lowongan) menggantikan stage interview hardcoded.",
+      "hash": "a9b523a29b30dcdd4636dddd2282a9e7b4d7a0a1c8dbd72aa403d26633b87f0e",
+      "ukuran_kb": 6.9,
+      "ringkasan": "Menjawab: kenapa pipeline kandidat pernah diusulkan disederhanakan jadi satu field status berisi 6 nilai (New, Screening, Interview, Offer, Hired, Rejected), dan bagian mana dari rencana itu yang jadi maupun yang tidak. Berguna untuk memahami kondisi sekarang: koleksi `screening_result`, `technical_test_result`, `psychotest`, dan `psychotest_result` memang dibuang, tetapi kode tetap memakai dua field (`progress` berisi nama babak plus Offering/Onboarding, dan `status` 8 nilai), sementara Background Check dan tes kembali dalam bentuk babak katalog global tanpa override per-lowongan. Memuat pula tabel migrasi status lama ke baru dan rencana slicing PR yang tidak seluruhnya dijalankan, jadi diperlakukan sebagai dokumen riwayat, bukan spec aktif.",
       "kata_kunci": [
-        "pipeline recruitment",
+        "pipeline redesign",
+        "recruitment",
+        "rekrutmen",
         "status kandidat",
+        "progress",
+        "candidate status",
         "interview rounds",
-        "penyederhanaan pipeline",
+        "migrasi status",
         "screening",
-        "technical test",
-        "background check",
-        "psikotes",
-        "migrasi data status"
+        "riwayat keputusan"
       ]
     },
     {
@@ -8298,18 +8547,20 @@
         "HRIS - Recruitment",
         "HRIS - Key Performance Index"
       ],
-      "hash": "65fe4c84e7d3305bdd880baa9006c43ec1240bb09d17c2e59e4489b6455d7823",
-      "ukuran_kb": 11.0,
-      "ringkasan": "Menjawab: fitur apa saja dari modul Recruitment ERPGo (job requisition, job posting, candidate, dashboard, offer & onboarding) yang sudah diadopsi bip-erp, apa yang sengaja tidak diadopsi (custom questions, dll), dan rekomendasi prioritas pengembangan berikutnya (mis. tanggal kedaluwarsa offer, status inline).",
+      "hash": "9054368916fcac98ab0d924267b32b0784fe6c5b6d82cfc81b02ce40fe1ebce7",
+      "ukuran_kb": 11.2,
+      "ringkasan": "Menjawab: fitur modul Recruitment ERPGo (WorkDo) mana yang sudah ada di bip-erp, mana yang baru parsial, mana yang sengaja tidak diadopsi sebagai keputusan sadar, dan mana yang jadi kandidat implementasi berikutnya beserta prioritasnya. Isinya tabel pemetaan per fase (master data, sourcing, seleksi, offer dan onboarding) plus dashboard talent acquisition, ditambah rangkuman kondisi aktual menu FE recruitment. Berguna saat merencanakan penambahan fitur recruitment supaya tidak mengusulkan ulang hal yang sudah diputuskan dibuang seperti Custom Questions, template Onboarding Checklist, dan pelacakan lamaran oleh kandidat.",
       "kata_kunci": [
+        "roadmap recruitment",
         "ERPGo",
-        "recruitment roadmap",
-        "adopsi fitur",
-        "job requisition",
-        "job posting",
-        "offer",
-        "dashboard talent acquisition",
-        "gap fitur rekrutmen"
+        "WorkDo",
+        "gap analysis",
+        "pemetaan fitur",
+        "hiring funnel",
+        "dashboard recruitment",
+        "custom questions",
+        "offer expiration",
+        "prioritas fitur"
       ]
     },
     {
@@ -8318,13 +8569,16 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas + cek status). Menyusul: AI CV screening, psikotes online, WhatsApp kandidat, integrasi job board",
+      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board",
       "publik": true,
       "tautan": [
         "HRIS - Analysis",
         "Microservices - Recruitment Service",
         "APP - Portal Karir Bharata",
+        "HRIS - Psikotes Kraepelin",
         "Microservices - Employee Service",
+        "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode",
+        "HRIS - Bank Soal dan Paket Psikotes",
         "Microservices - File Service",
         "CORE - OCR Document Service",
         "Sales - Veo (Gemini) Implementation",
@@ -8338,20 +8592,20 @@
         "HRIS - Big Pictures",
         "HRIS - Recruitment Roadmap (Adopsi ERPGo)"
       ],
-      "hash": "a315604179a09681491aae804a69cb43f7b5bd774edc3e2f7a03d4fde8d6372f",
-      "ukuran_kb": 26.0,
-      "ringkasan": "Menjawab: bagaimana desain end-to-end proses recruitment dari permintaan posisi (Job Requisition) sampai karyawan aktif, siapa saja aktor yang terlibat (SPV pengaju, SPV HRD, pewawancara, kandidat) dan apa peran masing-masing dalam approval. Juga menjawab format Form Permintaan Karyawan, kenapa tahap Direktur dihapus dari alur persetujuan, dan apakah lowongan mencantumkan rentang gaji ke pelamar.",
+      "hash": "a8aebabf8ba48b5f33290f48f417a5a6553df567b35d8eeddc6c12c7ec68d227",
+      "ukuran_kb": 30.2,
+      "ringkasan": "Menjawab: bagaimana alur rekrutmen end-to-end dari permintaan posisi (job requisition) sampai kandidat jadi karyawan, siapa yang menyetujui requisition, dan bagaimana screening, interview multi-tahap dengan feedback lewat link email, psikotes serta tes keahlian sebagai babak tes, offer, dan hire ke data karyawan dijalankan. Juga memuat aktor dan persona, model data kandidat (progress dan status), masa evaluasi dan Performance Review onboarding, keputusan yang sudah disepakati HRD, pertanyaan yang masih terbuka, dan rencana rollout bertahap.",
       "kata_kunci": [
+        "rekrutmen",
+        "recruitment",
         "job requisition",
         "permintaan karyawan",
-        "approval requisition",
-        "persetujuan",
-        "SPV HRD",
-        "Direktur",
-        "job posting",
-        "lowongan",
-        "gaji",
-        "aktor recruitment"
+        "kandidat",
+        "candidate",
+        "interview",
+        "screening",
+        "onboarding",
+        "ATS"
       ]
     },
     {
@@ -8572,6 +8826,7 @@
         "External - Desty",
         "Microservices - Integration Service",
         "Microservices - Warehouse Service",
+        "API - Integration Service",
         "IT - Backup & DR",
         "IT - Runbooks",
         "IT - Monitoring System",
@@ -8582,22 +8837,24 @@
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
         "Microservices - Task Management Service",
-        "Sales - Marketplace Integration"
+        "Sales - Marketplace Integration",
+        "External - Accurate",
+        "External - Accurate Webhook"
       ],
-      "hash": "50c87621cb9ac908a90ca8821fdb63117231803ccb03e37b6c1dd45db65e8fdc",
-      "ukuran_kb": 30.9,
-      "ringkasan": "Menjawab: proses latar belakang apa saja yang berjalan diam-diam di bip-erp — cron, scheduler, worker, poller — kapan jadwalnya, di service mana, untuk apa, dan lock apa yang dipakainya, lengkap dengan file:line-nya. Berguna saat debugging \"kenapa data ini muncul/berubah sendiri\", perencanaan kapasitas, atau sebelum mengubah service; juga menjawab service mana yang sama sekali tak punya job background, mana yang dormant atau belum deploy, dan perbedaan sintaks cron 6-field integration vs 5-field service lain.",
+      "hash": "89ccd3b0db852a8dfb5a2de568ab18028d8b4eaaa3d1286f27ace25e8f4b5767",
+      "ukuran_kb": 33.8,
+      "ringkasan": "Menjawab: proses latar belakang apa saja yang berjalan diam-diam di bip-erp — cron, scheduler, worker, poller — kapan jadwalnya, di service mana, untuk apa, dan lock apa yang dipakainya, lengkap dengan file:line-nya. Menjawab juga pertanyaan yang paling sering menyesatkan: kenapa mengubah jadwal cron di kode tidak berpengaruh apa pun — koleksi workers.worker_configs MENIMPA jadwal di kode secara senyap, beserta perintah mongosh untuk memperbaikinya dan peringatan boot yang menjadi satu-satunya tandanya. Berguna saat debugging \"kenapa data ini muncul/berubah sendiri\", perencanaan kapasitas, atau sebelum mengubah service; juga menjawab service mana yang sama sekali tak punya job background, mana yang dormant atau belum deploy, dan perbedaan sintaks cron 6-field integration vs 5-field service lain.",
       "kata_kunci": [
         "background job",
         "cron",
         "scheduler",
         "worker",
+        "worker_configs",
+        "jadwal ditimpa",
         "jadwal",
         "sync",
         "lock",
-        "Redis lock",
-        "WIB",
-        "operasional"
+        "WIB"
       ]
     },
     {
@@ -10155,6 +10412,8 @@
         "Microservices - Learning Service",
         "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program",
         "Microservices - Form Builder Service",
+        "HRIS - Industrial Relation",
+        "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
         "HRIS - Payroll",
         "Microservices - Payroll Service",
         "HRIS - Kepatuhan Peraturan Perusahaan",
@@ -10165,25 +10424,22 @@
         "REF - PRD ERP",
         "REF - Alur Persetujuan"
       ],
-      "hash": "2cb0359424eac9fabe384c3a40602ab9f4a713771ab6391243999c53c361916e",
-      "ukuran_kb": 21.9,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis ERP (identitas karyawan, status aktif, departemen/label supervisi, hak akses RBAC, kontrak, jadwal kerja, presensi/cuti, skor KPI, target/realisasi insentif profit), siapa yang boleh menulisnya, dan lewat jalan mana service lain boleh membacanya. Juga menjawab: salinan data mana yang sah beserta arah sinkron dan penjaganya, duplikasi mana yang belum diputuskan, dan kenapa sebuah fakta yang sudah dimiliki departemen lain tidak boleh dibangun ulang di service baru. Dipakai sebagai peta 'cari sebelum membangun' saat kebutuhan baru datang, melengkapi gerbang /plan dan /review.",
+      "hash": "569e4e3202c1f539fc53e15c822e001ddb578e862063d3bf9d8bd27e0524a03d",
+      "ukuran_kb": 22.4,
+      "ringkasan": "Menjawab: siapa pemilik tiap fakta bisnis di ERP Bharata (service dan koleksi mana yang memegangnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Berguna saat kebutuhan baru datang untuk memutuskan apakah suatu data harus dibangun ulang atau sudah dimiliki departemen lain, serta membedakan salinan yang sah (satu arah, tak ditulis tangan, berpenjaga) dari duplikasi yang belum diputuskan. Juga menunjuk fakta mana yang punya dua penulis (mis. target profit insentif vs KPI) dan pengecualian database-per-service yang masih hidup di kode (task-management membaca employee_db dan attendance_db langsung).",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "sumber kebenaran",
+        "pemilik fakta bisnis",
+        "database-per-service",
         "single source of truth",
         "satu fakta satu tempat",
-        "database-per-service",
-        "MODULE_URL",
         "duplikasi data",
         "salinan sinkron",
-        "SyncCollection",
-        "employee-service",
-        "attendance",
-        "KPI",
-        "insentif profit",
-        "RBAC"
+        "MODULE_URL",
+        "work_data",
+        "kpi_score",
+        "RACI"
       ]
     },
     {
@@ -12018,6 +12274,40 @@
       ]
     },
     {
+      "path": "Third-party Software/External - Accurate Webhook.md",
+      "judul": "External - Accurate Webhook",
+      "area": "Third-party Software",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan) — konsumsi webhook stok `ITEM_QUANTITY`/`STOCK_MUTATION` live (lihat [[Microservices - Integration Service]] §Accurate); pembaru masa aktif otomatis ada (`accurate-webhook-renew`); **kiriman untuk database prod 1443290 belum terbukti tiba** (lihat §Belum Terjawab)",
+      "publik": true,
+      "tautan": [
+        "External - Accurate",
+        "Microservices - Integration Service",
+        "IT - Background Jobs & Schedulers",
+        "RUN - Accurate API Access Token (OAuth)",
+        "ADR - 0001 Akuntansi via Accurate",
+        "ADR - 0014 Accurate Token DB-backed via OAuth",
+        "API - Integration Service",
+        "APP - Web ERP"
+      ],
+      "hash": "7deaa555a281d1356ca2f75d270ade7a02988d1946e69fa1942f3af55fed30a5",
+      "ukuran_kb": 12.0,
+      "ringkasan": "Menjawab: tipe event webhook apa saja yang benar-benar ada di Accurate Online (24 tipe resmi, dan kenapa jurnal umum TIDAK punya event sendiri sehingga jurnal manual finance hanya bisa ditarik, bukan ditunggu), bagaimana memperpanjang masa aktif webhook yang cuma 7 hari lewat webhook-renew.do, dan cara memakai webhook-history.do beserta batas rentang 24 jamnya. Menjawab juga jebakan pengukuran yang paling mahal: webhook-history melapor PER-APLIKASI menurut token pemanggil sehingga rowCount:0 bukan bukti tak ada kiriman, ada dua aplikasi Accurate bernama mirip yang mudah tertukar, cara mengetahui aplikasi penerbit sebuah token, dan kenapa nomor dokumen yang sama di dua database bukan bukti dokumen yang sama. Memuat ongkos API terukur dan hipotesis terbuka soal kiriman webhook database prod yang belum terbukti tiba.",
+      "kata_kunci": [
+        "Accurate webhook",
+        "webhook-renew",
+        "webhook-history",
+        "JOURNAL_VOUCHER",
+        "GLACCOUNT",
+        "databaseId",
+        "db-detail",
+        "App Key",
+        "masa aktif 7 hari",
+        "Debug Log"
+      ]
+    },
+    {
       "path": "Third-party Software/External - Accurate.md",
       "judul": "External - Accurate",
       "area": "Third-party Software",
@@ -12029,15 +12319,18 @@
         "ADR - 0001 Akuntansi via Accurate",
         "Microservices - Integration Service",
         "Finance - Bridging App",
+        "External - Accurate Webhook",
+        "RUN - Accurate API Access Token (OAuth)",
+        "IT - Background Jobs & Schedulers",
         "APP - Web ERP",
         "API - Integration Service",
         "Finance - Big Pictures",
         "Microservices - Insentive Service",
         "Sales - Marketplace Integration"
       ],
-      "hash": "c911c6f45d7564707de9de433c1208f7b9dc9b318a6a12d77d8ed76b81fa68a9",
-      "ukuran_kb": 2.7,
-      "ringkasan": "Menjawab pertanyaan tentang bagaimana ERP terhubung ke Accurate Online sebagai sumber kebenaran akuntansi, termasuk cara autentikasi (API Token + HMAC-SHA256), endpoint yang dipakai (sales-invoice, sales-return, detail), protokol edit dokumen, dan siapa saja konsumen integrasinya (Integration Service, Web ERP).",
+      "hash": "3b464590d03db170b0a2742ab7b97d96ddca8108dfe4415f3f9d6ad1d29f6680",
+      "ukuran_kb": 5.5,
+      "ringkasan": "Menjawab pertanyaan tentang bagaimana ERP terhubung ke Accurate Online sebagai sumber kebenaran akuntansi, termasuk cara autentikasi (API Token + HMAC-SHA256), endpoint yang dipakai (sales-invoice, sales-return, detail), protokol edit dokumen, dan siapa saja konsumen integrasinya (Integration Service, Web ERP). Menjawab juga kenapa ACCURATE_DB_ID di env prod SENGAJA dikosongkan (token aat. sudah membawa sesi database; mengisinya mematikan seluruh sinkronisasi) beserta dua penjaga boot yang memperingatkannya, di mana salinan dokumentasi API resmi yang sah berada dan kenapa SwaggerHub dilarang, serta ongkos API terukur (get-bs-account-amount 347 akun dalam satu call, volume jurnal per hari, limiter 6 req/detik yang dibagi seluruh service).",
       "kata_kunci": [
         "Accurate",
         "Accurate Online",
@@ -12046,8 +12339,8 @@
         "sales return",
         "HMAC",
         "API Token",
-        "itemNo",
-        "bridging finance",
+        "ACCURATE_DB_ID",
+        "limiter 6 req/s",
         "general ledger"
       ]
     },
@@ -12556,6 +12849,35 @@
       ]
     },
     {
+      "path": "Workspace/ANALISA - Industrial Relation.md",
+      "judul": "ANALISA - Industrial Relation",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
+        "HRIS - Industrial Relation",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
+      ],
+      "hash": "84eea0d31fa4a9542b971923d6f581125027fb387717e5e43cdd6cb5d5e4985a",
+      "ukuran_kb": 6.3,
+      "ringkasan": "Menjawab: task apa saja yang perlu dikerjakan untuk membangun modul Industrial Relation dan dalam urutan mana (T1 master katalog, T2 koleksi compliance_note + baca tiga-arah, T3 rekap per-departemen, T4 menu Web ERP, T5 fitur MyBharata, T6 verifikasi end-to-end). Memuat command `/start-task` siap-pakai per task, cara verifikasi tiap task lewat gateway, dependensi antar-task, dan urutan deploy BE sebelum FE/Mobile. Juga mencatat opsi yang ditolak (tumpang di employee_warning, jadi sumber KPI, notifikasi H+1, eskalasi otomatis ke SP) beserta alasannya.",
+      "kata_kunci": [
+        "analisa kebutuhan",
+        "industrial relation",
+        "daftar task",
+        "compliance note",
+        "compliance_violation_type",
+        "start-task",
+        "cara verifikasi",
+        "employee-service",
+        "MyBharata",
+        "rekap departemen"
+      ]
+    },
+    {
       "path": "Workspace/ANALISA - Insentif Saya di MyBharata.md",
       "judul": "ANALISA - Insentif Saya di MyBharata",
       "area": "Workspace",
@@ -12799,6 +13121,37 @@
         "MyBharata",
         "deploy",
         "fase implementasi"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Psikotes Multi-Jenis.md",
+      "judul": "ANALISA - Psikotes Multi-Jenis",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode",
+        "HRIS - Bank Soal dan Paket Psikotes",
+        "API - Recruitment Service",
+        "CORE - API Master Gateway",
+        "REF - Kepemilikan Data"
+      ],
+      "hash": "a5f34f74a363d28cbdd6a3ad815b4b4ce3160bb0c7dba60cabe9d282bba9f10f",
+      "ukuran_kb": 7.7,
+      "ringkasan": "Menjawab: apa urutan task untuk membangun psikotes multi-jenis (T0 laporan psikotes dan skor artefak, T1 katalog tipe, T2 paket dan sesi multi-bagian, T3-T4 CFIT dengan soal bergambar, T5 DISC, T6 impor Excel, T7 sinkron dokumentasi) beserta gerbang verifikasi tiap task. Juga mencatat keputusan HRD yang menghalangi (legalitas soal CFIT/DISC, mesin kandidat mana yang dipertahankan, pendampingan, tenggat tautan) dan pekerjaan tanpa kode seperti menyetel config Kraepelin dan merapikan sequence_number babak di prod.",
+      "kata_kunci": [
+        "analisa psikotes",
+        "papan kerja",
+        "task list",
+        "psikotes multi-jenis",
+        "CFIT",
+        "DISC",
+        "Kraepelin",
+        "impor Excel",
+        "blocker HRD",
+        "urutan kerja"
       ]
     },
     {
