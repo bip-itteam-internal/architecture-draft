@@ -10248,6 +10248,8 @@
         "Microservices - Learning Service",
         "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program",
         "Microservices - Form Builder Service",
+        "HRIS - Industrial Relation",
+        "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
         "HRIS - Payroll",
         "Microservices - Payroll Service",
         "HRIS - Kepatuhan Peraturan Perusahaan",
@@ -10258,25 +10260,22 @@
         "REF - PRD ERP",
         "REF - Alur Persetujuan"
       ],
-      "hash": "2cb0359424eac9fabe384c3a40602ab9f4a713771ab6391243999c53c361916e",
-      "ukuran_kb": 21.9,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis ERP (identitas karyawan, status aktif, departemen/label supervisi, hak akses RBAC, kontrak, jadwal kerja, presensi/cuti, skor KPI, target/realisasi insentif profit), siapa yang boleh menulisnya, dan lewat jalan mana service lain boleh membacanya. Juga menjawab: salinan data mana yang sah beserta arah sinkron dan penjaganya, duplikasi mana yang belum diputuskan, dan kenapa sebuah fakta yang sudah dimiliki departemen lain tidak boleh dibangun ulang di service baru. Dipakai sebagai peta 'cari sebelum membangun' saat kebutuhan baru datang, melengkapi gerbang /plan dan /review.",
+      "hash": "569e4e3202c1f539fc53e15c822e001ddb578e862063d3bf9d8bd27e0524a03d",
+      "ukuran_kb": 22.4,
+      "ringkasan": "Menjawab: siapa pemilik tiap fakta bisnis di ERP Bharata (service dan koleksi mana yang memegangnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Berguna saat kebutuhan baru datang untuk memutuskan apakah suatu data harus dibangun ulang atau sudah dimiliki departemen lain, serta membedakan salinan yang sah (satu arah, tak ditulis tangan, berpenjaga) dari duplikasi yang belum diputuskan. Juga menunjuk fakta mana yang punya dua penulis (mis. target profit insentif vs KPI) dan pengecualian database-per-service yang masih hidup di kode (task-management membaca employee_db dan attendance_db langsung).",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "sumber kebenaran",
+        "pemilik fakta bisnis",
+        "database-per-service",
         "single source of truth",
         "satu fakta satu tempat",
-        "database-per-service",
-        "MODULE_URL",
         "duplikasi data",
         "salinan sinkron",
-        "SyncCollection",
-        "employee-service",
-        "attendance",
-        "KPI",
-        "insentif profit",
-        "RBAC"
+        "MODULE_URL",
+        "work_data",
+        "kpi_score",
+        "RACI"
       ]
     },
     {
