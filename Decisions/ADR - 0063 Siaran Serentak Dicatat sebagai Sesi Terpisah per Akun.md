@@ -13,9 +13,12 @@
   - ✅ **§1** (satu sesi satu akun) — tak menuntut perubahan kode, penyimpanan sudah mengizinkannya.
   - ✅ **§5** (klien menampilkan seluruh sesi) — **web tayang di prod** 2026-08-30 (bip-erp #1537 + erp-frontend #1321/#1325); **mobile selesai di branch** `feat/live-shift-sesi-jamak`, belum merged.
   - ✅ **§6** (lingkup IT) — sudah berlaku, diterima sadar.
-  - 🟡 **§2** (jam dinding union) dan **§3** (tumpang tindih ditandai sah) — **belum dikerjakan**, dan keduanya yang menyentuh uang. Selama §2 belum ada, dua permukaan frontend masih menggandakan jam.
+  - ⚠️ **§2** (jam dinding union) — **selesai di jalur KPI** 2026-09-09 (`JamDindingDetik`, `live_shift_entity.go`), **masih utang di panel performa host ICC** (`erp-frontend .../icc/lib/ringkas-performa-host-live.ts`) yang tetap menjumlahkan `durasi_efektif_detik` per baris porsi host. Akibatnya kedua permukaan kini menampilkan angka BERBEDA untuk host multi-akun: diukur 2026-09-09, Vani 1,67 jam di KPI vs 3,32 jam di ICC. Diterima sadar sebagai utang berjangka, bukan terlewat.
+  - 🟡 **§3** (tumpang tindih ditandai sah) — **belum dikerjakan**. Belum menggigit karena deteksi yang ada menuntut `shop_id` DAN `akun_live` sama, sehingga sesi paralel milik satu orang tak pernah tertandai; memperluasnya tanpa §3 justru akan menghanguskan GMV yang sah.
   - 🟡 **§4** (GMV ke departemen host) — belum diverifikasi ulang setelah §1 berlaku.
-  - ⛔ **Belum ada satu pun host sungguhan yang memakainya.** `live_shifts` prod masih **0 dokumen**; papan kerjanya menjadikan angka itu uji hipotesis, bukan sekadar catatan.
+  - ✅ **§8** (rasio per individu, amandemen 2026-09-09) — terimplementasi di `kpi_live_individu.go` + `kpi_sumber_live.go`.
+  - ✅ **Sudah dipakai host sungguhan sejak 2026-09-09.** `live_shifts` prod berisi **24 dokumen**, 21 di antaranya dari hari itu: 9 host, 5 akun, 3 toko, 30 jam 7 menit durasi efektif. Catatan lama "0 dokumen" sudah tidak berlaku. ⚠️ Angka ini bertanggal ukur; ukur ulang sebelum dipakai sebagai dasar keputusan baru.
+- **Path di repo** (§8 dan §2): `bip-erp/services/marketing-analytics/live_shift_entity.go` (`gabungkanInterval`, `JendelaAktif`, `JamDindingDetik`) · `bip-erp/services/marketing-analytics/kpi_live.go` (`bahanTraffic`) · `bip-erp/services/marketing-analytics/kpi_live_individu.go` · `bip-erp/services/employee/kpi_sumber_live.go` (`penjagaIndividu`, `cakupanIndividu`, `minKlikRasioIndividu`)
 - **Path di repo**: `bip-erp/services/marketing-analytics/live_shift_penjualan.go` · `bip-erp/services/marketing-analytics/live_shift_pengingat.go` · `erp-frontend/src/features/marketing-analytics/components/live-shift/halaman-live-shift.tsx` · `.../panel-sesi-berjalan.tsx` · `.../dialog-mulai.tsx` · `erp-frontend/src/features/integration/icc/lib/ringkas-performa-host-live.ts` · `mybharata-app/lib/src/features/live_shift/presentation/bloc/live_shift_bloc.dart` · `.../bloc/live_shift_state.dart` · `.../widgets/kartu_sesi_berjalan.dart`. Tidak ada berkas baru, tidak ada service baru, tidak ada perubahan gateway.
 - **Tanggal**: 2026-08-30
 
@@ -136,6 +139,32 @@ Konsekuensi yang harus diingat: **definisi leader di frontend dan backend TIDAK 
 - **Perhitungan dan pembayaran insentif.** Tidak disentuh keputusan ini. Peraturan Perusahaan diam soal insentif Host Live, jadi itu keputusan produk tersendiri yang butuh dasar tertulis lebih dulu.
 - ⚠️ **TBD, dan perlu dibawa ke HRD, bukan diselesaikan di kode**: [[ADR - 0006 Swap Jadwal Same-Department]] berdiri di atas asumsi tiap shift host live wajib berisi satu Beauty Hacks dan satu Kyura, "bukan satu pool interchangeable", dan ADR itu **menuliskan sendiri** bahwa bila HRD menyatakan satu pool maka ia ditinjau ulang dan mungkin berstatus Superseded. Satu orang yang memegang akun Beauty Hacks dan Kyura serentak adalah bukti kuat ke arah satu pool. Keputusan 0063 ini **tidak** memutuskan hal tersebut dan tidak bergantung padanya, tetapi konsekuensinya harus diperiksa sebelum ADR 0006 dipakai sebagai dasar aturan tukar jadwal apa pun.
 
+### 8. Rasio per individu dihitung dari sesi terjodohkan, tertimbang porsi waktu
+
+> Amandemen 2026-09-09. Ditambahkan setelah §7 supaya penomoran pasal lama tidak bergeser.
+
+Metrik rasio Host Live (`conversion_rate`, `add_to_cart_rate`, `avg_viewing_duration`) pada scope `individu` dihitung dari sesi TikTok yang **terjodohkan dengan shift orang itu**, dengan bahan mentahnya (`product_clicks`, `add_to_cart`, `views`, `avg_watch_sec`) diprorata memakai **porsi waktu irisan yang sama** dengan GMV dan orders.
+
+**Ini membalik keputusan implisit sebelumnya**, yang mengosongkan ketiga rasio itu di jalur individu dengan alasan bahan rasio "belum dipecah per host". Yang membalikkannya: porsi waktu mengalikan **pembilang dan penyebut dengan faktor yang sama**, sehingga yang tersisa adalah rasio sesi yang benar-benar dibawakan orang itu, bukan klaim atas trafik yang dihasilkan bersama. Memperlakukan `product_clicks` berbeda dari `orders`, yang sudah diprorata dengan porsi yang sama sejak awal, tidak punya dasar.
+
+Akibat keadaan lama: ketiga metrik itu berbobot 70 + 10 + 20 di template `Host Live Kyura` dan `Host Live Beautyhacks`, sehingga **100% bobot mustahil terisi** berapa pun sesi yang dicatat host. Diukur di prod 2026-09-09 sebelum perbaikan: `ada_klik:false` dan ketiga rasio nol untuk seluruh host, sementara jalur departemen Kyura mengembalikan 6,87% / 4,85% / 49,9 detik.
+
+⚠️ **Batas yang TIDAK hilang, dan wajib disebut saat menilai orang**: bila dua host bergantian **di dalam satu sesi TikTok**, keduanya menerima rasio yang sama. Rasio tak bisa dipecah lebih halus daripada sesi. Ini yang tersisa dari sebab nomor 1 di Context, dan ia permanen selama API TikTok tak memberi dimensi waktu di dalam sesi.
+
+**Rasio TIDAK dibagi antar host, cacahan dibagi.** `conversion` sebagai cacahan adalah jatah orang, jadi shift berdua membaginya rata. Rasio bukan jatah: dua host yang membawakan sesi yang sama sama-sama menghasilkan rasio sesi itu, dan membaginya akan menghukum orang justru karena bekerja berdua. Penyebutnya pun tak dibagi, jadi keduanya konsisten.
+
+**Tiga penjaga menyertainya, dan ketiganya menerbitkan GALAT bersebab, bukan angka nol:**
+
+1. **Belum ada shift tercatat** pada periode itu. Nol di sini berarti belum mencatat, bukan belum berjualan.
+2. **Shift tercatat tapi belum satu pun terjodohkan** dengan siaran TikTok. Sebabnya sync harian belum menyusul atau `akun_live` salah ketik; keduanya bukan kegagalan kinerja.
+3. **Penyebut terlalu kecil.** Ambang `minKlikRasioIndividu` = 100 klik produk, diturunkan dari pengukuran prod (akun brand ~123 klik per jam siaran, 11.319 klik / 92 jam pada `glowboosterofficial.id` 1-8 September 2026), jadi kira-kira setara satu jam siaran. Dari 12 klik, satu pesanan memberi 8,3% dan dua memberi 16,7% — angka yang berayun liar sambil tampak sah. Hanya berlaku untuk metrik yang penyebutnya klik; `conversion` sebagai cacahan tetap dihitung.
+
+Ketiganya menuruti aturan [[RUN - Menambah Metrik KPI Otomatis]] yang melarang mengarang angka saat datanya belum ada: metrik yang gagal dihitung dibiarkan kosong dengan alasannya di `auto_basis`, dan sumbernya jatuh ke `manual`.
+
+**Cakupan dilaporkan** lewat `CakupanPersen` = shift terjodohkan dibagi total shift, sehingga metrik yang berdiri di atas sebagian shift berstatus `semi`, bukan `otomatis`. Tanpa ini cakupan bawaan selalu 1/1 karena sumbernya membawa satu angka realisasi.
+
+**Berlaku mulai periode September 2026**, atas keputusan pemilik proses 2026-09-09. Hari 1 sampai 8 September tidak punya atribusi per orang dan sengaja **tidak** direkonstruksi: tak ada sumber yang tahu siapa memegang akun mana pada hari-hari itu (jadwal Host Live di attendance hanya menyimpan `schedule_id`, bukan akun), dan mengetiknya mundur dari ingatan lalu memakainya menilai orang tidak bisa diaudit. Karena ketiga metriknya rasio dan bukan cacahan, hilangnya delapan hari itu tidak mengurangi kredit siapa pun; yang dijaga cukup transparansi cakupan.
+
 ## Consequences
 
 **Yang menjadi mungkin.** Penilaian KPI Host Live per orang menjadi mungkin untuk pertama kalinya, karena satu-satunya sumber yang tahu siapa memegang akun mana pada jam berapa adalah catatan host sendiri. Scope `individu` yang sudah terdaftar di template bisa dinyalakan HR tanpa deploy begitu koleksinya terisi.
@@ -150,7 +179,7 @@ Konsekuensi yang harus diingat: **definisi leader di frontend dan backend TIDAK 
 
 **Yang tetap tidak bisa dijawab sistem**: siapa memegang akun apa, bila host tidak menekan tombol. Keputusan ini tidak mengurangi ketergantungan itu sedikit pun, ia justru menaikkan taruhannya, karena angka yang lahir darinya sekarang dipakai menilai orang per orang.
 
-**Risiko adopsi, dan ini yang terbesar.** Koleksinya nol dokumen selama fitur ini live di produksi. Membangun lantai dua di atas gedung yang belum pernah dimasuki orang adalah risiko nyata, dan keputusan ini menerimanya dengan satu syarat: perbaikan tampilan N sesi (§5) dikerjakan **lebih dulu** dan diverifikasi seorang host sungguhan, karena tanpa itu kru yang memegang banyak akun memang tidak punya jalan memakai fitur ini.
+**Risiko adopsi, dan ini yang terbesar — sudah lewat.** Saat keputusan ini diambil koleksinya nol dokumen, dan membangun lantai dua di atas gedung yang belum pernah dimasuki orang adalah risiko nyata; syaratnya perbaikan tampilan N sesi (§5) dikerjakan lebih dulu. ✅ **Syarat itu terpenuhi dan adopsinya terjadi 2026-09-09**: 21 sesi dari 9 host dalam satu hari, termasuk dua host yang benar-benar memegang dua akun serentak (Kusmi dan Vani) — praktik yang jadi alasan §1 dan §2 ada. Justru merekalah yang memunculkan bug jam ganda ke permukaan, dan itu yang memicu §2 dikerjakan.
 
 ## Dokumen Terkait
 
