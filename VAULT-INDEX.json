@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-10",
+  "digenerate": "2026-09-11",
   "jumlah_dokumen": 391,
   "dokumen": [
     {
@@ -2415,20 +2415,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "2cefdf233fedd936591ed3dac0f6e7305ff2c776c43836a833567ee750c4bedd",
-      "ukuran_kb": 367.7,
-      "ringkasan": "Menjawab: bagaimana order dan laporan iklan dari marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk ke ERP lewat webhook dan sync terjadwal, lalu dinormalkan jadi model transaction dan di-bridge ke Accurate (Sales Invoice, Sales Return, ringkasan harian). Juga menjelaskan endpoint GMV Max monitoring/overview, ICC video metrics untuk insentif, kredensial OAuth dan holiday untuk auto-ship, mapping akun ICC dan kepemilikan toko, cron worker, gross profit per produk, ulasan marketplace, serta status sinkron per toko dan rencana Meta Ads.",
+      "hash": "671be8a4afa0ddf6c9afd02fe77551e4b6f5ae1f06452545f0b4976054bc9e56",
+      "ukuran_kb": 369.0,
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) lewat webhook dan job sync, bagaimana order dan laporan iklan dinormalkan jadi model transaction terpadu, dan bagaimana invoice, Sales Invoice, dan Sales Return di-push ke Accurate Online. Juga menjawab endpoint apa saja yang tersedia (GMV Max monitoring/overview, ICC video metrics, affiliate, ulasan, fulfillment WMS, profit per produk, beban opex insentif per proyek), cara kerja auto-ship sadar hari libur, kredensial OAuth, background worker/cron, ketahanan Shopee, status sinkron per toko, dan rencana client Meta Ads.",
       "kata_kunci": [
-        "integration service",
+        "integration-service",
         "marketplace",
         "webhook",
-        "TikTok Shop",
+        "Accurate Online",
+        "Sales Invoice",
         "Shopee",
+        "TikTok Shop",
+        "GMV Max",
         "Lazada",
-        "Accurate",
-        "faktur",
-        "sales invoice",
-        "GMV Max"
+        "cron worker"
       ]
     },
     {
