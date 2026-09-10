@@ -97,6 +97,26 @@
 
 ## Catatan & risiko operasional
 
+- ⛔ **`workers.worker_configs` MENIMPA jadwal cron di kode — senyap, dan seluruh tabel di atas jadi tak bisa dipercaya sendirian.** Database **`workers`** (bukan `integration_db`), koleksi **`worker_configs`**, kunci `_id` = **nama job**. **68 entri per 2026-09-10.** Bila ada entri untuk sebuah job, nilai `schedule` di **database MENANG** atas yang di kode — jadi mengubah jadwal di Go **tidak berpengaruh apa pun** sampai dokumen database ikut diperbarui. Grounded: `services/integration/internal/worker/manager.go` `Register()` (`configStore.Load` → `job.Schedule = cfg.Schedule`); hal yang sama berlaku untuk `MaxAttempts`, `RetryDelay`, dan `Timeout`.
+
+	**Terjadi 2026-09-10**: jadwal penyerapan jurnal kas diubah 04:15 → tiap 3 jam, **deploy sukses**, tapi entri database bertanggal 4 Agustus 2026 tetap memaksa **04:15**. Tak ada galat, tak ada penolakan — jadwal barunya sekadar tak pernah berlaku, dan yang membaca kode menyimpulkan fiturnya sudah berubah.
+
+	⚠️ **Manager menyemai tiap job BARU dengan `enabled=true` ke `worker_configs` saat boot pertama.** Konsekuensinya: nilai di kode adalah **seed sekali-pakai**, bukan konfigurasi hidup. Job yang perlu lahir-mati karena mahal karena itu digerbang **kv**, bukan `worker_configs` (mis. `accurate-serap-jurnal-kas` lewat kv `serap-jurnal-kas`; komentar alasannya ada di `accurate_serap_jurnal_kas.go` & `accurate_snapshot_baseline_seed.go`).
+
+	✅ **Yang menyelamatkan**: `manager.go:157` mencetak peringatan boot bila DB ≠ kode —
+	`WARN worker: schedule from DB overrides code — code change has NO effect until worker_configs updated` (membawa `job`, `db_schedule`, `code_schedule`).
+	**Baca log boot setiap kali mengubah jadwal cron**; ini satu-satunya tanda yang muncul.
+
+	**Cara memperbaiki** (pola untuk job apa pun — `<nama-job>` = `_id` di koleksi):
+	```bash
+	docker exec Integration-MongoDB mongosh "mongodb://erp-mongo:<pass>@localhost:27017/workers?authSource=admin" --quiet --eval 'db.worker_configs.updateOne({_id:"<nama-job>"},{$set:{schedule:"<cron 6 field>",updated_at:new Date()}})'
+	```
+	Lalu `docker restart <service>` — **jadwal dibaca saat boot**, jadi update tanpa restart tak berefek sampai boot berikutnya.
+
+	⚠️ **Pakai kutip TUNGGAL untuk `--eval`.** Dengan kutip ganda, shell mengembangkan `$set` menjadi string kosong dan perintahnya gagal **tanpa sebab yang jelas** — bentuk perintahnya terlihat benar di layar.
+
+	Alternatif tanpa mongosh untuk job yang punya endpointnya: `PUT /jobs/:name/config` (retune schedule/retry/timeout) dan `POST /jobs/:name/{enable,disable}` — lihat [[API - Integration Service]].
+
 - **Penumpukan jam 00:00–02:00**: banyak sync integration (master data, order, report, kredensial) menumpuk di tengah malam WIB — perhatikan saat menilai beban/quota API TikTok/Shopee. Tambahan: `sync-tt-shop-orders` kini 4× sehari (bukan 1× di 01:00) — jam 00:00/08:00/16:00/23:00 WIB.
 - **Notifikasi worker**: semua worker integration kirim Telegram otomatis via hook di manager level — tidak perlu konfigurasi per-task. `WithOnJobError` → `SendError` saat gagal (setelah semua retry habis); `WithOnJobEnd` → `Send` saat sukses. Dikecualikan dari notif sukses: `webhook-consumer` & `sync-resi-wms` (frekuensi tinggi, akan spam). PR #322.
 - **Job tersibuk**: `webhook_consumer` jalan **tiap 5 detik** — paling sering; pastikan lock Redis sehat agar tak dobel.
@@ -110,3 +130,5 @@
 - [[IT - Monitoring System]] · [[IT - Runbooks]] · [[IT - Environment Inventory]] · [[IT - Backup & DR]]
 - [[DB - Overview and Notes]] (`cron_locks`, `webhook_tasks`) · [[Microservices - Integration Service]] · [[Microservices - Insentive Service]] · [[Microservices - Employee Service]] · [[Microservices - Attendance Service]] · [[Microservices - Notification Service]] · [[Microservices - Task Management Service]]
 - [[External - Desty]] · [[Sales - Marketplace Integration]]
+- [[API - Integration Service]] — endpoint `/jobs/*` (status, histori, config, enable/disable/trigger)
+- [[External - Accurate]] · [[External - Accurate Webhook]] — limiter 6 req/s dibagi seluruh service (alasan jadwal job Accurate disebar) & job `accurate-webhook-renew`
