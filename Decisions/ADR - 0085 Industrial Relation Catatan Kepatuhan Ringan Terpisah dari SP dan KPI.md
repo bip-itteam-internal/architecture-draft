@@ -1,3 +1,5 @@
+> **Status**: 🟡 **Diusulkan** — disetujui 2026-09-10, kode belum ada. Rincian di `## Deskripsi`.
+
 ## Untuk Manajemen
 
 Menambah menu **Industrial Relation** di workspace HR untuk membina budaya kepatuhan ringan di kantor — hal-hal seperti sepatu, lanyard, dan atribut kerja. Petugas HR/IR yang ditunjuk mencatat temuan secara diskret lewat aplikasi MyBharata saat berkeliling di jam kerja; keesokannya rekapnya tampil per departemen. **Supervisor** melihat rekap timnya, dan **tiap karyawan** melihat catatan dirinya sendiri sehingga tahu apa yang perlu dibenahi.
