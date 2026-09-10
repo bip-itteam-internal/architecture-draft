@@ -4,6 +4,7 @@
 
 - **Implementasi**: [[Microservices - Recruitment Service]] · **Status**: ⚠️ BE Fase 1-3 + master ERPGo (A–F) + portal publik (browse/apply/track) + requisition se-departemen — increment 2026-07-16 deployed & terverifikasi live di dev. **Custom Questions dihapus** (#486/#342). **hire→karyawan** (endpoint `link-employee`, PR #490) **merged, belum deploy**. **Link Form Feedback Interview** (`GET /interviews`, panel/location, feedback hardening — PR #536/#381) **merged & dilaporkan ter-deploy dev** (2026-07-18).
 - **Konsumen publik**: [[APP - Portal Karir Bharata]]
+- ⚠️ **Cakupan verifikasi 2026-09-10**: yang diperiksa ulang ke `routes.go` pada pass ini **hanya** blok **Stages** (tahap/tes/background check) dan **Interview Rounds**. Blok lain (Candidate `PUT /advance`, Offer `/candidates/:id/offer*`) **belum** diperiksa dan sudah terlihat menyimpang dari `routes.go` — jangan diperlakukan sebagai grounded sampai di-sync tersendiri.
 - **Indeks**: [[API - Index]] · Role: `isSupervisor` (ajukan), `isHR`/`isHRSupervisor` (kelola/review **+ persetujuan final requisition** sejak 2026-07-22), `isApprover` (HR admin/Secretary — **tidak lagi dipakai di requisition**, masih dipakai untuk hire kandidat).
 
 ## Sistem
@@ -42,8 +43,27 @@
 ## Stages & Offer
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
-| POST | `/candidates/:id/screening` · `/interviews` · `/technical-test` · `/background-check` · `/psychotest` | Catat tiap tahap | HR |
-| GET | `/candidates/:id/stages` | Timeline tahap kandidat | HR |
+| POST | `/candidates/:id/interviews` | Jadwalkan sesi interview (satu-satunya tahap yang **dijadwalkan**) | HR |
+| GET | `/candidates/:id/stages` | Timeline tahap kandidat (kini hanya berisi `interviews`) | HR |
+| PUT/DELETE | `/stages/:kind/:id` | Ubah / hapus record tahap (`:kind` yang dikenal saat ini hanya `interviews`) | HR |
+| POST | `/candidates/:id/test-result` | **Rekam hasil babak bertipe tes** (Psikotest / Technical Test). Body: `round_id` (wajib, harus babak ber-`form_type: "test"`, kalau bukan → `400`), `result` (**Pass/Fail/Pending**, wajib), `score` (opsional), `notes`. **Upsert** per (`candidate_id`, `round_id`). Menggerakkan `progress` ke babak itu + status (Pass→`Pending`, Fail/Pending→`Hold`) | HR |
+| GET | `/candidates/:id/test-results` | Daftar hasil tes kandidat, diperkaya `round_name` | HR |
+| POST/GET | `/candidates/:id/background-check` | Rekam / baca Background Check (`verifications[]`, `reference`, `slik`, `decision`, `hr_note`) | HR |
+
+### Psikotes online (sisi HR)
+
+Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
+
+| Method | Path | Fungsi | Role |
+|---|---|---|---|
+| POST | `/candidates/:id/psikotes` | Terbitkan sesi psikotes + kirim magic link ke email kandidat. Kandidat yang **sudah punya sesi → `409`** (sarankan Terbitkan Ulang). Babak `"Psikotest"` belum ada di master → `400` | HR |
+| POST | `/candidates/:id/psikotes/reissue` | Terbitkan ulang. **`alasan` wajib** (kosong → `400`); sesi lama dihapus sehingga token lama mati | HR |
+| GET | `/candidates/:id/psikotes/report` | Laporan individual (metrik 4 kategori + skor keseluruhan + `selesai_karena`). **Tidak memuat soal/kunci jawaban** | HR |
+| GET | `/candidates/psikotes/status` | Status **massal** untuk polling tabel (banyak id sekaligus, satu kueri `$in`) | HR |
+
+> ⚠️ **`/candidates/psikotes/status` WAJIB terdaftar sebelum `GET /candidates/:id`**, kalau tidak ia tertelan sebagai permintaan kandidat ber-id `"psikotes"` dan membalas 200 berisi data yang salah, bukan 404. Di kode ada test yang mengunci urutannya.
+
+> ⚠️ **Endpoint per-tahap lama SUDAH TIDAK ADA** (diverifikasi ke `routes.go` 2026-09-10): `POST /candidates/:id/screening`, `/technical-test`, `/psychotest`. Screening jadi keputusan manual tanpa endpoint sendiri; tes dan psikotes menyatu jadi **satu jalur `/test-result` berbasis babak**. Contoh `curl` ke `/psychotest` yang masih beredar di `docs/recruitment-api.curl.md` (repo `erp`) ikut usang.
 | POST | `/candidates/:id/offer` | Terbitkan offer (→ Offering) | HR supervisor |
 | POST | `/candidates/:id/offer/letter` | Unggah surat penawaran PDF (MinIO) + email kandidat | HR supervisor |
 | POST | `/candidates/:id/offer/accept` · `/offer/decline` | Respon offer | HR |
@@ -53,8 +73,12 @@
 ## Interview Rounds & Feedback (Fase F — adopsi ERPGo)
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
-| POST/GET | `/postings/:id/rounds` | Definisi/daftar babak interview per lowongan | HR |
-| PUT/DELETE | `/rounds/:id` | Ubah / hapus babak | HR |
+| POST/GET | `/masters/interview-rounds` | **Katalog babak GLOBAL** (bukan lagi per lowongan). Field: `name`, `sequence_number`, `status` (`active`/`inactive`), `sends_feedback_link`, **`form_type`**. Di-seed 7 babak baku saat startup, idempoten (`$setOnInsert`) sehingga perubahan HR tak ketimpa | HR |
+| PUT/DELETE | `/masters/interview-rounds/:id` | Ubah / hapus babak | HR |
+
+> **`form_type` (5 nilai):** `generic` · `hrd_interview` · `user_interview` · `background_check` · `test`. Kosong dianggap `generic` (fallback babak lama). Nilai di luar itu ditolak `400`. Babak ber-`form_type` `test` atau `background_check` **tidak dijadwalkan** lewat Proses Seleksi, hasilnya direkam lewat endpoint hasil di atas. Babak baku ber-`test`: **Psikotest** (urutan 3) dan **Technical Test** (urutan 5).
+>
+> ⚠️ Rute lama **`/postings/:id/rounds`** dan **`/rounds/:id`** sudah tidak ada. Lowongan kini hanya **memilih** babak dari katalog lewat `round_ids[]`.
 | GET | `/interviews` | **Semua** sesi interview (terbaru dulu), diperkaya nama/posisi kandidat + status feedback `feedback_submitted`/`feedback_total` — sisi HR (menu **Interviews**) — PR #536 | HR |
 | GET | `/interviews/assigned` | Sesi interview yang menugaskan saya sebagai pewawancara (+ nama/posisi kandidat + jawaban saya). Dipakai halaman link `/interview-feedback/:id`; menu "Interview Saya" sendiri sudah dihapus dari navigasi (dormant) | auth |
 | POST | `/interviews/:id/feedback` | Kirim/**ubah** penilaian (rating 1-5 + recommendation). **Upsert** per (interview, pewawancara) → tak dobel. Boleh **pewawancara sesi ATAU HR**. **`interviewer_id`** di body hanya dipakai bila pengirim **HR** (rekap atas nama pewawancara lain) — non-HR **selalu** JWT sendiri (PR #536) | auth |
@@ -107,8 +131,19 @@
 |---|---|---|
 | GET | `/public/recruitment/postings` | Daftar lowongan Open (featured dulu) — tiap item memuat **`slug`** |
 | GET | `/public/recruitment/postings/:id` | Detail lowongan. **`:id` menerima `slug` ATAU ObjectID** (dicoba ObjectID dulu; gagal parse → lookup by `slug`). Respons + `slug` & **`job_type`** (nama, hasil resolve `job_type_id` → master `job_types`) |
-| POST | `/public/recruitment/apply` | Pelamar mendaftar sendiri (email + `posisi_dilamar` wajib) → respons `tracking_token` + `track_url`. **Dua bentuk body**: (a) JSON, atau (b) **`multipart/form-data`**: field `data` = JSON kandidat + file **`berkas`** = PDF **maks 10 MB** → MinIO `recruitment/cv/<candidate_id>/berkas.pdf` → set `cv_object` (HR buka via `GET /candidates/:id/cv/preview`) |
-| GET | `/public/recruitment/track/:token` | Cek status lamaran via **tracking_token** (bukan `_id`) — curated: progress/status label + stepper |
+| POST | `/public/recruitment/apply` | Pelamar mendaftar sendiri (email + `posisi_dilamar` wajib). Respons **`201`** berisi **hanya** `{"message": "Lamaran terkirim. Konfirmasi telah dikirim ke email Anda."}` — **tanpa** `tracking_token`/`track_url` (fitur tracking dihapus, lihat di bawah). Kandidat lahir `progress: "CV Screening"`, `status: Pending`. **Dua bentuk body**: (a) JSON, atau (b) **`multipart/form-data`**: field `data` = JSON kandidat + file **`berkas`** = PDF **maks 10 MB** → MinIO `recruitment/cv/<candidate_id>/berkas.pdf` → set `cv_object` (HR buka via `GET /candidates/:id/cv/preview`) |
+
+| GET | `/public/recruitment/psikotes/:token` | Kandidat membuka sesi psikotes lewat magic link. **Tidak memuat digit soal** |
+| POST | `/public/recruitment/psikotes/:token/start` | Mulai mengerjakan. **Idempoten**: soal tidak digenerate ulang, lanjut dari kolom tersimpan |
+| POST | `/public/recruitment/psikotes/:token/columns/:index` | Submit satu kolom. Index sama **menimpa**; index lama tidak menarik balik progres; panjang jawaban ditentukan **server** |
+| POST | `/public/recruitment/psikotes/:token/finish` | Selesai + dinilai. Panggilan kedua tidak menghitung ulang |
+| POST | `/public/recruitment/psikotes/:token/abandon` | Dipanggil browser lewat `navigator.sendBeacon`. Balasan **selalu** `{ok:true}` tanpa skor |
+
+> **Psikotes publik dijaga token, bukan sesi login.** Token 32 byte `crypto/rand` base64url, unik di level index. Tidak ada endpoint publik yang mengembalikan soal, kunci jawaban, atau skor — DTO-nya eksplisit dan ada test allowlist kunci JSON yang menggigit bila field internal bocor. Rincian: [[HRIS - Psikotes Kraepelin]].
+
+> ⛔ **`GET /public/recruitment/track/:token` SUDAH TIDAK BERFUNGSI** (diverifikasi 2026-09-10). Fitur lacak lamaran **dihapus** dari recruitment-service di `a298ba70` (2026-07-24, sudah di `origin/main`): `tracking_token`, `track_url`, dan handler `/public/track/:token` **nol hit** di seluruh `services/recruitment/*.go`, dan test template email menguncinya (`"applied: tombol tracking harus sudah dihapus"`).
+>
+> ⚠️ **Tapi rutenya masih terdaftar di gateway** (`api-gateway/main.go:689-700`) dan meneruskan ke `<recruitment>/public/track/<token>` yang sudah tak ada, jadi pemanggil menerima **404 dari Fiber**, bukan 501/410 yang menjelaskan apa pun. Rute yatim ini belum dibersihkan. Sisi portal karir sudah bersih: `career-bharata` **tidak punya** rute `/status` sama sekali, jadi tak ada alur pengguna yang patah — yang tersisa hanya rute gateway yang menganggur.
 
 > **Catatan kontrak `/apply`:** `posisi_dilamar` **wajib** dan **tidak** diisi server dari posting — divalidasi lebih dulu, jadi klien harus mengirimnya walau sudah kirim `posting_id`. `tanggal_lahir` = **RFC3339** (samakan dengan model employee agar mapping saat hire tidak perlu isi ulang — lihat [[HRIS - Recruitment]]). Upload berkas **backward-compatible**: body JSON tanpa file tetap diterima; berkas non-PDF / >10 MB → 400.
 

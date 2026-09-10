@@ -2,9 +2,17 @@
 
 *Desain fitur **Candidate Assessment** — tes teknis/keahlian (mis. Technical Coding Test, Frontend Development Test) yang direkam HR di tahap **Screening**, dinilai **skor + hasil Pass/Fail/Pending**. Melengkapi pipeline recruitment 6-status ([[HRIS - Recruitment Pipeline Redesign]]). Hasil bersifat catatan; perubahan status kandidat tetap manual oleh HR.*
 
-- **Status**: 🟡 Direncanakan (Design) — belum ada kode. Hasil brainstorming 2026-07-19.
+- **Status**: ⚠️ **Superseded** — desain ini sempat dibangun, lalu **dibongkar lagi** dan dikonsolidasi ke **hasil tes per-babak** (`candidate_test_result`). Dokumen dipertahankan sebagai riwayat keputusan; **jangan dipakai sebagai rencana kerja**. Diperiksa ke kode 2026-09-10.
+- **Penggantinya**: babak ber-`form_type: "test"` di katalog babak global (baku: **Psikotest** & **Technical Test**), hasilnya lewat `POST /candidates/:id/test-result`. Lihat [[Microservices - Recruitment Service]] § Babak Seleksi dan [[API - Recruitment Service]].
 - **Sisi implementasi**: [[Microservices - Recruitment Service]] (BE) + [[APP - Web ERP]] (FE). Endpoint → [[API - Recruitment Service]].
 - **Catatan**: menghidupkan kembali konsep "tes teknis" (yang dihapus saat redesign) sebagai entity BARU `candidate_assessment` dengan semantik Pass/Fail/Pending + menu sendiri — bukan resurrect `technical_test_result` lama.
+
+> **Apa yang benar-benar terjadi** (2026-09-10, grounded ke `services/recruitment`):
+>
+> - **Yang jadi**: master `assessment_type` (`/masters/assessment-types`) dan koleksi `candidate_assessment`.
+> - **Yang dibongkar**: seluruh handler CRUD assessment + menu/rute FE `hris/recruitment/assessments`. Struct `CandidateAssessment` disisakan **hanya** supaya `migrate_test_result.go` bisa membaca data lama dan memindahkannya ke `candidate_test_result` (heuristik nama: mengandung "psiko" → babak **Psikotest**, selain itu → **Technical Test**).
+> - **Yang berubah artinya**: keputusan desain no. 2 di bawah ("hasil → status = MANUAL") **sudah tidak berlaku**. Hasil tes kini **menggerakkan** kandidat: Pass → status `Pending`, Fail & Pending → `Hold`, plus `progress` pindah ke babak tes itu.
+> - **Yang tertinggal**: master `assessment_type` masih hidup dan form Lowongan masih mewajibkan minimal satu `assessment_type_ids`, padahal pilihan itu tak lagi menentukan apa pun pada pencatatan hasil.
 
 ## Latar Belakang
 

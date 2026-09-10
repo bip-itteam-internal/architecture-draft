@@ -339,6 +339,7 @@ Dua layar **self-service yang PINDAH dari web**: menunya dicabut dari Portal Say
 
 ## Roadmap (Belum Diimplementasikan)
 
+- **Program Culture (mobile)** — 🟡 diusulkan 2026-09-09, [[ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program]]. Dua permukaan: **officer** HR Culture & Industrial menampilkan **QR kehadiran** berputar per program; **peserta** men-scan QR itu (kehadiran nyata, menggantikan "hadir = pengisi survei") lalu diingatkan memberi **rating** lewat pop-up persisten sampai dinilai (pola `PendingCsatBanner`). Meniru end-to-end fitur **Pelatihan Saya** (attendance + evaluation) + scanner `mobile_scanner`. Backend: [[Microservices - Form Builder Service]] (`culture_attendance`, scan-token, `/culture/feedback/pending`). *(prioritas: High)*
 - **Offline-Mode Attendance** — rekam absensi offline (GPS terenkripsi lokal), auto-sync saat online *(prioritas: High)*
 - Naikkan test coverage 55% → 70% (fokus `attendance`, `payroll`)
 - Migrasi widget `payroll` lama ke dark theme

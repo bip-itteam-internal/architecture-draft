@@ -125,13 +125,26 @@ Penjaganya `TestRentangBawaanPakaiHariWIBBukanUTCPolos` — pemindai AST berdaft
 
 Rute ke-41, masuk 2026-08-27 (PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486)). Menjawab satu pertanyaan: **berapa capaian siaran live satu departemen pada satu periode?** Bahan skor KPI Host Live di [[Microservices - Employee Service]] (sumber `kinerja_live`). Rincian parameter & balasan: [[API - Marketing Analytics Service]].
 
-**Penilaian PER-DEPARTEMEN, bukan per-orang** — dan itu bukan penyederhanaan sementara melainkan batas data. Tiga hal menutup jalan ke per-orang, seluruhnya terukur produksi 2026-08-27:
+**Dua jalur, dipilih lewat parameter `employee_id`:**
 
-1. Satu sesi TikTok bisa **16 jam** dalam satu `session_id` (07:50–23:50 WIB), berisi 2–3 shift host bergantian. API memberi agregat per sesi **tanpa dimensi waktu di dalamnya**, jadi angkanya tak bisa dipecah dari sisi mana pun.
+| `employee_id` | Jalur | Sumber angka |
+|---|---|---|
+| kosong | departemen | seluruh sesi `mart_live_sessions` milik toko departemen itu |
+| diisi | individu | `live_shifts` orang itu, dijodohkan ke sesi TikTok lalu diprorata porsi waktu |
+
+Jalur **departemen** tetap tak bisa per-orang, dan itu batas data bukan penyederhanaan. Tiga hal menutupnya, seluruhnya terukur produksi 2026-08-27:
+
+1. Satu sesi TikTok bisa **16 jam** dalam satu `session_id` (07:50–23:50 WIB), berisi 2–3 shift host bergantian. API memberi agregat per sesi **tanpa dimensi waktu di dalamnya**.
 2. Satu host memakai beberapa akun, dan akunnya berganti antar bulan (`live_glowbooster4` → `live_glowbooster7`; `beautyhacks.id3` berhenti Juli).
 3. Satu siaran tercatat di beberapa akun sekaligus (dua etalase).
 
-⚠️ **Scope `individu` sudah didaftarkan di sisi employee-service tetapi sumbernya BELUM menghormatinya** — ia selalu menghitung per-departemen, sehingga memilih "Individu" atau "Departemen" di template menghasilkan angka identik sementara layar KPI menampilkan badge "Individu". Terlihat di produksi 2026-08-27 pada template *Host Live Kyura*. Perbaikannya menunggu `/live-shifts` benar-benar terisi.
+✅ **Jalur individu menjawab ketiganya lewat `live_shifts`** (`kpi_live_individu.go`), dan sejak **2026-09-09** ia mengisi metrik rasio juga, bukan cuma nominal. Bahan rasio (`product_clicks`, `add_to_cart`, `views`, `avg_watch_sec`) diprorata memakai porsi waktu irisan **yang sama** dengan GMV dan orders, lalu rasionya dihitung fungsi yang sama dengan jalur departemen (`RasioKonversi`, `RasioAddToCart`, `AvgViewingDuration`) — tak ada rumus kedua. Aturan pointer-nil juga satu tempat (`bahanTraffic.tambah`). Keputusannya [[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]] §8.
+
+⚠️ **Batas yang tersisa dan permanen**: bila dua host bergantian **di dalam satu sesi**, keduanya menerima rasio yang sama. Sebab nomor 1 di atas tak hilang, ia hanya berhenti menghalangi angka nominal.
+
+⚠️ **Rasio TIDAK dibagi antar host, cacahan dibagi.** `conversion` adalah jatah orang sehingga shift berdua membaginya; rasio bukan jatah, dan membaginya menghukum orang karena bekerja berdua.
+
+**Catatan lama yang sudah tidak berlaku**: sampai 2026-09-08 dok ini menyatakan sumbernya "belum menghormati scope `individu`" sehingga Individu dan Departemen menghasilkan angka identik. Itu benar untuk keadaan waktu itu dan sudah tidak lagi.
 
 **Empat metrik**, bobot & target diputuskan pemilik metrik 2026-08-27 (diisi HR di template, bukan di kode):
 
@@ -155,7 +168,7 @@ Rute ke-41, masuk 2026-08-27 (PR [#1479](https://github.com/bip-itteam-internal/
 - **Biaya iklan per sesi** — tak ada di satu pun endpoint live. `tt_business_gmv_max_performance_reports` bergranularitas harian (`stat_time_day`), endpoint per-menit nol field biaya, dan iklan bertipe LIVE cuma **2 dari 1.335 ad group** dengan nol baris di `mart_profit_attribution`. Konsekuensinya **laba bersih per sesi live tak dapat dihitung tanpa asumsi**; komponen HPP dan fee marketplace sudah akurat (uji: 23,9% vs 25,8% dan 12,0% vs 12,1% terhadap agregat toko), iklan yang tidak.
 - Seluruh keluarga `live_rooms/*` (**7 endpoint**: core_stats/PCU, GMV trend, view trends, traffic, interactive trends, product stats, user portraits) ditolak `36009004`/`36009005` — menuntut otorisasi level akun creator, bukan shop-level seperti kredensial kita. Pola sama dengan livestream Shopee.
 - `Get Bestselling LIVE Sessions` ditolak `105005` (app tak diizinkan).
-- **Shopee live nihil API** dan itu permanen — host Shopee tetap dicatat manual.
+- **Shopee live tak dapat ditarik, tetapi BUKAN karena API-nya tak ada** — host Shopee tetap dicatat manual. ⚠️ Dok ini sebelumnya menulis "nihil API dan itu permanen"; kodenya menyatakan lain, dan bedanya menentukan apakah ini pekerjaan IT atau keputusan bisnis. `ReasonShopeeLiveUserAuth` (`envelope.go`): modul livestream Shopee **ADA di dok resmi**, seluruh API-nya ber-`api_type: "User"` (user_id ikut ditandatangani), sementara **24 kredensial Shopee kita shop-level dengan `user_id_list` kosong**; panggilan nyata `get_session_detail` membalas `error_param "There is no user_id in query"` (terverifikasi 2026-08-02). Jadi yang tak ada **otorisasinya**, dan itu **bisa berubah bila akun streamer melakukan otorisasi — keputusan bisnis, bukan kode**. Lazada baru yang benar-benar nihil API live (`ReasonLazadaNoLive`). Konsekuensinya untuk KPI ada di [[ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel]].
 
 ### Pencatatan sesi live oleh host (`/live-shifts`)
 
@@ -194,7 +207,22 @@ Tiga aturan yang diputuskan:
 
 Atribusi lintas departemen: GMV masuk ke departemen **host** (`work_data.department`), bukan departemen pemilik akun, demi menjaga invarian [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] bahwa satu omzet tak boleh menaikkan skor dua departemen. Kepemilikan toko tetap dibaca dari `department_shops`, jangan diturunkan dari nama akun.
 
-⚠️ **Konsumen yang sudah menggandakan jam hari ini**, dua-duanya di frontend: kartu metrik `halaman-live-shift.tsx` dan `ringkas-performa-host-live.ts` (layar tim ICC), keduanya menjumlahkan `durasi_efektif_detik` per baris tanpa dedup jendela waktu. Di bip-erp sendiri **nol** konsumen `porsi_host`/`durasi_efektif_detik` di luar service ini.
+#### `channel` pada `live_shifts` (2026-09-10)
+
+`LiveShift.Channel` ada sejak [[ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel]] §3, dan ikut ke **predikat penjodohan** `jodohkanSesiDenganPorsi`. Tanpanya satu shift menjodoh ke sesi dua platform yang kebetulan sama toko, akun, dan jendela waktunya; gagalnya senyap karena GMV, orders, klik produk, dan masuk-keranjang tiap sesi sekadar terjumlah dan angkanya tetap masuk akal. Dipasang **sebelum** sesi non-TikTok pertama masuk, karena sesudahnya ada periode yang angkanya sudah tercampur dan tak bisa dipisah lagi.
+
+- ⛔ **DITURUNKAN dari `department_shops`, tidak diterima dari klien.** `channelPerToko` (`divisi.go`) memetakan `shop_id` → `channel`; `handleShiftMulai` memakainya lewat `sumberTokoMongo.ChannelPerToko`. `permintaanMulai` sengaja tak punya field `channel` — alasan yang sama dengan `dibuat_oleh`, `shift_id`, dan `status_jadwal` yang juga tak diterima dari body.
+- ⛔ **Dua sebab gagal dibedakan: 400 vs 503.** Toko tak terpetakan → **400** dengan pesan yang menyebut **ICC Management**; `department_shops` tak terbaca → **503**. Karena itu jalur ini **tidak** memakai `bacaTokoDepartemenAman` yang sengaja menelan galat demi dropdown `/toko`; `bacaTokoDepartemenBergalat` diekstrak darinya supaya bacaannya tetap satu. Menyamakan keduanya jadi 400 menuduh master data atas gangguan infrastruktur, dan orang yang membacanya pergi membetulkan data yang sudah benar.
+- **Kosong berarti `TIKTOK`** (`channelNormal`), dan normalisasinya dipakai di **kedua sisi** pembandingan. Aturan ini untuk dokumen yang ditulis sebelum field-nya ada, dan **sah hanya selama seluruh mart TikTok**. Terukur prod 2026-09-10: `mart_live_sessions` 6.363 dari 6.363 `TIKTOK`; `live_shifts` **0 dari 29** dokumen punya `channel`; `department_shops` 49 TIKTOK + 9 SHOPEE + 3 LAZADA; **21 dari 21** toko yang dipakai mart sudah terpetakan, jadi jalur 400 belum menyala untuk satu host pun.
+- **SATU `sumberTokoMongo` dibagi `/toko` dan penurunan channel** (`routes.go`). Dua sumber berarti dua cache dengan TTL yang kedaluwarsa pada menit berbeda, sehingga toko bisa tampil di dropdown tetapi ditolak saat host menekan Mulai.
+- ⚠️ **Index unik tetap `{akun_live}` saja, tanpa `channel`** — sengaja, lihat [[API - Marketing Analytics Service]] untuk resep migrasinya bila kelak ada handle yang dipakai serentak di dua platform.
+- **Sisi frontend**: `dialog-mulai.tsx` sebelumnya hanya membaca HTTP status dan membuang `error` di body, sehingga pesan yang menyebut ICC Management tak pernah sampai ke mata host. Diperbaiki bersamaan; 400 dan 503 kini menampilkan pesan server apa adanya lewat daftar-izin status (500 tetap teks generik karena membawa `err.Error()` mentah).
+
+✅ **Sudah berlaku di jalur KPI sejak 2026-09-09**: `JamDindingDetik(shifts, sekarang)` di `live_shift_entity.go` menyatukan jendela `JendelaAktif` tiap shift lewat `gabungkanInterval`, dan `kpi_live_individu.go` memakainya alih-alih menjumlahkan. Mesin peleburannya satu dengan `gabungkanJeda`, dan total `JendelaAktif` dikunci test agar selalu sama dengan `DurasiEfektif` untuk satu shift.
+
+⚠️ **Konsumen yang MASIH menggandakan jam**, dua-duanya di frontend: kartu metrik `halaman-live-shift.tsx` dan `ringkas-performa-host-live.ts` (layar tim ICC), keduanya menjumlahkan `durasi_efektif_detik` per baris tanpa dedup jendela waktu. Di bip-erp sendiri **nol** konsumen `porsi_host`/`durasi_efektif_detik` di luar service ini.
+
+⛔ **Akibatnya dua permukaan kini berselisih, dan itu utang yang dinyatakan, bukan terlewat.** Diukur prod 2026-09-09: Vani Nur Zakiyah tercatat **1,67 jam** di KPI (union) dan **3,32 jam** di panel ICC (penjumlahan); Kusmi 1,02 vs 2,01. Sebelum §2 dikerjakan keduanya konsisten-salah; sesudahnya tidak konsisten. Siapa pun yang menyentuh salah satu permukaan wajib tahu angka mana yang sedang ia baca.
 
 ✅ **Sesi kedua kini punya tampilan.** Sebelumnya web mengambil `sesiBerjalan?.[0]` dan mobile `milik.first`, jadi sesi kedua tak bisa dijeda atau diakhiri, lalu menggantung melewati ambang 12 jam yang **memaksa porsi host jadi nol** — dan peringatan jam ke-11 tak pernah sampai karena kartunya tak pernah dirender. Itulah yang menjadikan tampilan N sesi sebagai **prasyarat**, bukan penyempurnaan. Web tayang di prod 2026-08-30; mobile selesai di branch `feat/live-shift-sesi-jamak` (belum merged).
 
