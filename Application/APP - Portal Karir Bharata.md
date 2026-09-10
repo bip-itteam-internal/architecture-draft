@@ -2,7 +2,7 @@
 
 ## Deskripsi
 
-*Portal karir publik **PT Bharata Internasional Pharmaceutical** — situs tanpa login tempat pelamar melihat lowongan dan mengirim lamaran (satu berkas PDF gabungan). Menggantikan alur **Google Form** lama HRD: lamaran langsung masuk pipeline [[Microservices - Recruitment Service]] sehingga HR tak perlu memindahkan data manual. Target domain: **`career.bharatainternasional.com`**.*
+*Portal karir publik **PT Bharata Internasional Pharmaceutical** — situs tanpa login tempat pelamar melihat lowongan, mengirim lamaran (satu berkas PDF gabungan), dan **mengerjakan psikotes Kraepelin lewat magic link**. Menggantikan alur **Google Form** lama HRD: lamaran langsung masuk pipeline [[Microservices - Recruitment Service]] sehingga HR tak perlu memindahkan data manual. Target domain: **`career.bharatainternasional.com`**.*
 
 - **Repo**: `career-bharata` — **repo Git terpisah** (sibling di bawah `erp/`), **bukan** bagian dari `bip-erp`. Remote: `github.com/bip-itteam-internal/career-bharata`, branch utama **`master`** (bukan `main` — `origin/HEAD` menunjuk ke sana).
 - **Package manager**: **pnpm** (`pnpm@10.25.0`). Bukan npm/yarn.
@@ -31,7 +31,9 @@ Sumber: `career-bharata/src/app/`.
 - **`/lowongan/[slug]` — Detail lowongan**: satu baris **judul + tombol "Lamar Sekarang"** (tombol tidak terkubur di bawah), sub-judul = **jenis pekerjaan** (dari master `job_types`) + jumlah posisi; di bawah tombol: keterangan **"Sebelum tanggal {deadline}"** (bulan disingkat, `timeZone: "UTC"` agar tanggal deadline tak bergeser ke H+1). Isi: deskripsi/persyaratan/benefit (HTML disanitasi) + section **Penempatan** di paling bawah. **Tanpa** badge status, badge skill, atau departemen (keputusan UI: bukan info yang dicari pelamar).
 - **`/lowongan/[slug]/lamar` — Form lamaran** (halaman sendiri, bukan modal): field **native model `candidate`** (nama_lengkap, email, no_hp, jenis_kelamin, tanggal_lahir, alamat, pendidikan, ipk, pengalaman, expected_salary, dll) — **bukan** form-builder `custom_question`; + **upload satu berkas PDF gabungan (maks 10 MB)** → dikirim `multipart/form-data`. Sukses → redirect ke **`/lowongan/[slug]/lamar/sukses`**.
 - **`/lowongan/[slug]/lamar/sukses` — Konfirmasi terkirim**: menyebut posisi yang dilamar, memberi tahu konfirmasi sudah dikirim ke email, satu tombol "Lihat Lowongan Lain", plus peringatan rekrutmen **tidak dipungut biaya**. **Tanpa token, tanpa nomor lamaran** — pelamar tak punya cara memeriksa kemajuan lamarannya sendiri; satu-satunya kontak balik adalah tim rekrutmen menghubunginya.
-- ⛔ **`/status` & `/status/[token]` SUDAH TIDAK ADA.** Rute itu pernah didokumentasikan di sini, tapi `career-bharata/src/app/` sekarang hanya memuat `/`, `/lowongan/[slug]`, `/lowongan/[slug]/lamar`, `/lowongan/[slug]/lamar/sukses`, `/syarat-penggunaan`, `/kebijakan-privasi` (diverifikasi 2026-09-10). BE-nya juga sudah dihapus — lihat [[API - Recruitment Service]] §Publik.
+- **`/psikotes/[token]` — Mengerjakan psikotes Kraepelin** (`components/psikotes/`: `mesin-tes.tsx`, `ledger-kolom.tsx`, `sapaan.tsx`, `tes-sudah-selesai.tsx`; `lib/psikotes/mesin.ts`). Dibuka kandidat **tanpa login**, dijaga token di URL. Mengonsumsi lima endpoint `/public/recruitment/psikotes/*`. Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
+	- ⚠️ **Ada implementasi KEDUA yang sama-sama hidup** di `erp-frontend` (`src/app/psikotes/[token]` + `src/features/psikotes/`), dan magic link di email menunjuk ke sana (env `ERP_FRONTEND_URL`), bukan ke portal ini. Versi portal justru yang paling aktif dikembangkan (disentuh 2026-09-10 vs 2026-09-09). Bisa jadi migrasi yang sedang berjalan, bisa jadi dua salinan yang akan menyimpang — **belum diputuskan**, ukur ulang sebelum dipakai.
+- ⛔ **`/status` & `/status/[token]` SUDAH TIDAK ADA.** Rute itu pernah didokumentasikan di sini, tapi `career-bharata/src/app/` sekarang memuat `/`, `/lowongan/[slug]`, `/lowongan/[slug]/lamar`, `/lowongan/[slug]/lamar/sukses`, `/psikotes/[token]`, `/syarat-penggunaan`, `/kebijakan-privasi` (diverifikasi ke `origin/master` 2026-09-10). BE-nya juga sudah dihapus — lihat [[API - Recruitment Service]] §Publik.
 - **`/syarat-penggunaan` & `/kebijakan-privasi`** — halaman legal (komponen bersama `legal-page.tsx`), ditautkan di footer.
 - **Shared**: `Header` (**sticky**, logo `/logo/logo.png` "Winning Team Bharata") · `SiteFooter` · `SectionShell` (Container) · `components/form/fields.tsx` — field reusable (`TextField`/`TextareaField`/`SelectField`/`DateField`/`FileField`, RHF-compatible, wajib ditandai **asterisk merah**).
 
@@ -45,7 +47,9 @@ Detail: [[API - Recruitment Service]] §Publik.
 | `GET /public/recruitment/postings/:slug` | `/lowongan/[slug]` (`:id` menerima **slug** ATAU ObjectID) |
 | `POST /public/recruitment/apply` (**multipart**: `data` JSON + `berkas` PDF) | `/lowongan/[slug]/lamar` |
 
-Portal ini memakai **tiga endpoint itu saja**. `GET /public/recruitment/track/:token` **tidak lagi dipakai dan tidak lagi ada di BE**; rutenya masih menganggur di gateway (`api-gateway/main.go`) dan membalas 404 bila dipanggil.
+| `GET /public/recruitment/psikotes/:token` + `POST .../start`, `.../columns/:index`, `.../finish`, `.../abandon` | `/psikotes/[token]` |
+
+`GET /public/recruitment/track/:token` **tidak lagi dipakai dan tidak lagi ada di BE**; rutenya masih menganggur di gateway (`api-gateway/main.go`) dan membalas 404 bila dipanggil.
 
 **Gotcha kontrak:** `posisi_dilamar` **wajib** dikirim (server tidak mengisinya dari `posting_id`); `tanggal_lahir` **RFC3339**; nilai enum casing **persis** BE (mis. `jenis_kelamin` "Laki-laki"/"Perempuan"). Lamaran sukses → kandidat menerima **email otomatis** "Lamaran Anda Telah Kami Terima" (✅ terverifikasi live) via [[Microservices - Notification Service]].
 

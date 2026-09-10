@@ -99,6 +99,7 @@ Daftar di bawah = seluruh `mongodb.GetCollection(...)` di `services/recruitment`
 - interview
 - interview_round · interview_feedback
 - candidate_test_result *(hasil babak bertipe tes: Psikotest & Technical Test)*
+- psikotes_session *(sesi psikotes online Kraepelin; 3 index, dua di antaranya UNIK: `(candidate_id, round_id)` dan `token`)*
 - background_check
 - offer
 - manpower_plan

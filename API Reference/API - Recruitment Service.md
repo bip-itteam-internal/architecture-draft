@@ -50,6 +50,19 @@
 | GET | `/candidates/:id/test-results` | Daftar hasil tes kandidat, diperkaya `round_name` | HR |
 | POST/GET | `/candidates/:id/background-check` | Rekam / baca Background Check (`verifications[]`, `reference`, `slik`, `decision`, `hr_note`) | HR |
 
+### Psikotes online (sisi HR)
+
+Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
+
+| Method | Path | Fungsi | Role |
+|---|---|---|---|
+| POST | `/candidates/:id/psikotes` | Terbitkan sesi psikotes + kirim magic link ke email kandidat. Kandidat yang **sudah punya sesi → `409`** (sarankan Terbitkan Ulang). Babak `"Psikotest"` belum ada di master → `400` | HR |
+| POST | `/candidates/:id/psikotes/reissue` | Terbitkan ulang. **`alasan` wajib** (kosong → `400`); sesi lama dihapus sehingga token lama mati | HR |
+| GET | `/candidates/:id/psikotes/report` | Laporan individual (metrik 4 kategori + skor keseluruhan + `selesai_karena`). **Tidak memuat soal/kunci jawaban** | HR |
+| GET | `/candidates/psikotes/status` | Status **massal** untuk polling tabel (banyak id sekaligus, satu kueri `$in`) | HR |
+
+> ⚠️ **`/candidates/psikotes/status` WAJIB terdaftar sebelum `GET /candidates/:id`**, kalau tidak ia tertelan sebagai permintaan kandidat ber-id `"psikotes"` dan membalas 200 berisi data yang salah, bukan 404. Di kode ada test yang mengunci urutannya.
+
 > ⚠️ **Endpoint per-tahap lama SUDAH TIDAK ADA** (diverifikasi ke `routes.go` 2026-09-10): `POST /candidates/:id/screening`, `/technical-test`, `/psychotest`. Screening jadi keputusan manual tanpa endpoint sendiri; tes dan psikotes menyatu jadi **satu jalur `/test-result` berbasis babak**. Contoh `curl` ke `/psychotest` yang masih beredar di `docs/recruitment-api.curl.md` (repo `erp`) ikut usang.
 | POST | `/candidates/:id/offer` | Terbitkan offer (→ Offering) | HR supervisor |
 | POST | `/candidates/:id/offer/letter` | Unggah surat penawaran PDF (MinIO) + email kandidat | HR supervisor |
@@ -119,6 +132,14 @@
 | GET | `/public/recruitment/postings` | Daftar lowongan Open (featured dulu) — tiap item memuat **`slug`** |
 | GET | `/public/recruitment/postings/:id` | Detail lowongan. **`:id` menerima `slug` ATAU ObjectID** (dicoba ObjectID dulu; gagal parse → lookup by `slug`). Respons + `slug` & **`job_type`** (nama, hasil resolve `job_type_id` → master `job_types`) |
 | POST | `/public/recruitment/apply` | Pelamar mendaftar sendiri (email + `posisi_dilamar` wajib). Respons **`201`** berisi **hanya** `{"message": "Lamaran terkirim. Konfirmasi telah dikirim ke email Anda."}` — **tanpa** `tracking_token`/`track_url` (fitur tracking dihapus, lihat di bawah). Kandidat lahir `progress: "CV Screening"`, `status: Pending`. **Dua bentuk body**: (a) JSON, atau (b) **`multipart/form-data`**: field `data` = JSON kandidat + file **`berkas`** = PDF **maks 10 MB** → MinIO `recruitment/cv/<candidate_id>/berkas.pdf` → set `cv_object` (HR buka via `GET /candidates/:id/cv/preview`) |
+
+| GET | `/public/recruitment/psikotes/:token` | Kandidat membuka sesi psikotes lewat magic link. **Tidak memuat digit soal** |
+| POST | `/public/recruitment/psikotes/:token/start` | Mulai mengerjakan. **Idempoten**: soal tidak digenerate ulang, lanjut dari kolom tersimpan |
+| POST | `/public/recruitment/psikotes/:token/columns/:index` | Submit satu kolom. Index sama **menimpa**; index lama tidak menarik balik progres; panjang jawaban ditentukan **server** |
+| POST | `/public/recruitment/psikotes/:token/finish` | Selesai + dinilai. Panggilan kedua tidak menghitung ulang |
+| POST | `/public/recruitment/psikotes/:token/abandon` | Dipanggil browser lewat `navigator.sendBeacon`. Balasan **selalu** `{ok:true}` tanpa skor |
+
+> **Psikotes publik dijaga token, bukan sesi login.** Token 32 byte `crypto/rand` base64url, unik di level index. Tidak ada endpoint publik yang mengembalikan soal, kunci jawaban, atau skor — DTO-nya eksplisit dan ada test allowlist kunci JSON yang menggigit bila field internal bocor. Rincian: [[HRIS - Psikotes Kraepelin]].
 
 > ⛔ **`GET /public/recruitment/track/:token` SUDAH TIDAK BERFUNGSI** (diverifikasi 2026-09-10). Fitur lacak lamaran **dihapus** dari recruitment-service di `a298ba70` (2026-07-24, sudah di `origin/main`): `tracking_token`, `track_url`, dan handler `/public/track/:token` **nol hit** di seluruh `services/recruitment/*.go`, dan test template email menguncinya (`"applied: tombol tracking harus sudah dihapus"`).
 >
