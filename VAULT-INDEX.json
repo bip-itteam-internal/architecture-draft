@@ -704,23 +704,20 @@
         "Microservices - Employee Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "8036c479b345bc789250a27fabaa0396c8c50751e019d625a9b45c34305ef283",
-      "ukuran_kb": 15.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di recruitment-service dan role mana yang boleh memanggilnya, mulai dari pengajuan job requisition, pembukaan lowongan, pengelolaan kandidat, penjadwalan interview, pencatatan hasil tes dan background check, sampai offer dan hire. Menjelaskan juga path gateway `/api/recruitment/*` (auth JWT) versus `/public/recruitment/*` (portal karir publik tanpa JWT), serta aturan RBAC `system_roles[\"hris\"]` (isHR, isHRSupervisor, isSupervisor, isApprover). Berguna untuk menemukan endpoint yang benar saat integrasi FE atau portal karir, termasuk mengetahui rute lama mana yang sudah dihapus (misalnya `/screening`, `/technical-test`, `/psychotest`, `/postings/:id/rounds`, `director-approve`).",
+      "hash": "c56aa824516da406e4e9ffb966ba5d22f2f6f8ac55181ce2478918226000e813",
+      "ukuran_kb": 16.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang dilayani recruitment-service, path persisnya, dan role mana yang boleh memanggil tiap endpoint (supervisor pengaju, isHR, isHRSupervisor, approver). Merinci jalur requisition (ajukan, edit, resubmit, hr-review, reject), job posting, kandidat (advance, reject, withdraw, link-employee, upload CV/foto/cover letter), babak seleksi (interviews, test-result berbasis round_id, background-check), offer sampai hire, katalog interview round global beserta arti form_type, serta rute publik portal karir tanpa JWT. Berguna juga untuk mengetahui endpoint per-tahap lama mana yang sudah tidak ada lagi (screening, technical-test, psychotest) dan blok mana yang belum diverifikasi ulang ke routes.go.",
       "kata_kunci": [
-        "recruitment",
-        "rekrutmen",
-        "API",
-        "endpoint",
+        "recruitment service",
+        "API endpoint",
         "ATS",
         "job requisition",
         "job posting",
         "candidate",
-        "interview rounds",
-        "offer",
-        "background check",
-        "RBAC hris",
-        "portal karir"
+        "interview round",
+        "form_type",
+        "offer dan hire",
+        "RBAC hris"
       ]
     },
     {
@@ -1300,7 +1297,7 @@
       "area": "Application",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas → cek status; **E2E terverifikasi live 2026-07-16**). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf, dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*).",
+      "status_teks": "**Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas; **E2E terverifikasi live 2026-07-16**). ⛔ **Fitur \"cek status lamaran\" SUDAH DIHAPUS** (BE `a298ba70`, 2026-07-24; portal tak punya rute `/status` — diverifikasi 2026-09-10). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf, dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*).",
       "publik": true,
       "tautan": [
         "Microservices - Recruitment Service",
@@ -1312,20 +1309,20 @@
         "Microservices - Notification Service",
         "CORE - SSO Flow"
       ],
-      "hash": "d88b254349cc4ec45f9996133404ef8fe933cc7f7c5bc7ca0e55842cfdf4df44",
-      "ukuran_kb": 9.6,
-      "ringkasan": "Menjawab: bagaimana pelamar publik menelusuri lowongan, mengirim lamaran beserta satu berkas PDF gabungan, dan mengecek status lewat tracking token, serta halaman apa saja yang ada di portal. Juga menjawab kontrak publik recruitment yang dipakai beserta jebakannya (posisi_dilamar wajib, tanggal_lahir RFC3339, casing enum persis), stack dan status repo terpisah career-bharata, dan cara deploy Docker-nya termasuk pemetaan port di server.",
+      "hash": "86a3a6110e08e3ac913d8bd85bf740a75d6c015313006870a58e83ce3d9425a0",
+      "ukuran_kb": 10.4,
+      "ringkasan": "Menjawab: bagaimana pelamar publik melihat lowongan dan mengirim lamaran tanpa login, halaman apa saja yang ada di portal karir (landing dengan daftar lowongan, detail lowongan per slug, form lamar satu PDF gabungan, halaman sukses, syarat penggunaan, kebijakan privasi), dan endpoint /public/recruitment/* mana saja yang dipakai. Menjawab juga stack dan cara deploy portal (repo terpisah career-bharata, pnpm, Next.js standalone + Docker, .env ikut masuk image karena NEXT_PUBLIC_* di-inline saat build, pemetaan port host prod yang sengaja beda dari repo) serta gotcha kontrak saat apply (posisi_dilamar wajib dikirim, tanggal_lahir RFC3339, casing enum harus persis BE).",
       "kata_kunci": [
         "portal karir",
         "career portal",
-        "lowongan",
-        "job posting",
-        "lamaran",
-        "apply",
-        "tracking token",
         "career-bharata",
-        "recruitment",
-        "Next.js"
+        "lowongan",
+        "lamaran",
+        "apply publik",
+        "public recruitment endpoint",
+        "Next.js",
+        "pelamar",
+        "deploy Docker"
       ]
     },
     {
@@ -1564,6 +1561,7 @@
         "CORE - IT Orchestrator",
         "Microservices - Learning Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "API - Recruitment Service",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
@@ -1578,24 +1576,20 @@
         "APP - MyBharata",
         "DB - Overview and Notes"
       ],
-      "hash": "88f2fe4563d59c799aab17182fffee35a454477330ceab3b95c4cba57ef90987",
-      "ukuran_kb": 10.9,
-      "ringkasan": "Menjawab: bagaimana request dari internet masuk ke ekosistem bip-erp, siapa yang memvalidasi JWT dan menerbitkannya saat login, serta bagaimana routing `/api/:module/*` diteruskan ke service internal lewat internal gateway key. Juga menjawab pertanyaan operasional yang sering muncul: kenapa sebuah endpoint membalas 431 (header identitas yang di-inject gateway menuntut `ReadBufferSize` minimal 32 KB di setiap service), kenapa `/internal/` tetap bisa diakses dari internet karena routing bersifat catch-all bukan allowlist, dan kenapa perubahan hak akses seseorang tidak langsung terasa karena kunci cache Redis hanya memuat employee dan URL tanpa izin. Memuat pula daftar module beserta port internal, rute non-`/api` (auth, onboarding, public, ext, dev), alur SSO one-time-code, serta batasan SSO store in-memory dan revoke token.",
+      "hash": "ce4e1d1a58f1b45cdd43808b8a8d9c9d71563ea7aefd5cccd32ab6bfdbfc916d",
+      "ukuran_kb": 11.2,
+      "ringkasan": "Menjawab: bagaimana request dari internet masuk ke seluruh ekosistem bip-erp lewat satu pintu, bagaimana JWT diterbitkan dan divalidasi (login, PIN, biometrik, refresh, logout, tiket SSO sekali pakai), header identitas apa yang di-inject gateway ke service (BIP-Employee-Id, BIP-System-Roles, BIP-Company-ID, BIP-Permissions, BIP-Supervised-Departments), dan module apa saja yang dirutekan lewat /api/:module/* beserta rute non-/api seperti /auth, /public, dan /ext. Menjawab juga tiga jebakan yang sering menyesatkan: kenapa tiap service Fiber di belakang gateway wajib ReadBufferSize minimal 32 KB (gejala 431 yang tampak seperti salah gateway), kenapa prefix /internal/ bukan batas keamanan karena routing bersifat catch-all, dan kenapa cache Redis yang berkunci employee plus URL saja bisa membuat perubahan hak terasa belum berlaku.",
       "kata_kunci": [
         "api gateway",
-        "gateway",
         "JWT",
-        "authentication",
         "SSO",
-        "routing",
+        "routing module",
         "reverse proxy",
         "431 Request Header Fields Too Large",
-        "ReadBufferSize",
-        "rate limiting",
-        "CORS",
+        "INTERNAL_GATEWAY_KEY",
+        "prefix internal",
         "Redis cache",
-        "internal gateway key",
-        "BIP-Company-ID"
+        "CORS rate limit"
       ]
     },
     {
@@ -2816,23 +2810,20 @@
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "b94922a16f17ad5b1d6ccbfb60bf225a1241c916182b99b8163cab5f21927296",
-      "ukuran_kb": 49.9,
-      "ringkasan": "Menjawab: bagaimana recruitment-service dibangun dan sejauh mana pipeline rekrutmen benar-benar ada di kode, dari requisition, posting, kandidat, babak seleksi, offer, sampai handoff onboarding ke employee-service. Menjelaskan mekanisme kunci yang sering ditanyakan: katalog babak global `interview_round` dengan `form_type` (generic, hrd_interview, user_interview, background_check, test) yang memisahkan babak yang dijadwalkan dari yang hanya dicatat hasilnya, upsert hasil tes per (candidate_id, round_id), dan SP-Wiring yang menggerakkan `progress` serta menderivasi status (Pass ke Pending, Fail dan Pending ke Hold). Memuat pula stack dan lokasi kode (`services/recruitment`, Go + Fiber + MongoDB `recruitment_db`, port 6979), daftar model data, riwayat increment per fitur, serta catatan bahwa service ini belum ter-scope multi-perusahaan dan deploy-nya manual.",
+      "hash": "046eaf748ddb6aea8426ebbbfd723c2db4e46eaf827e466206ae289c0119e94d",
+      "ukuran_kb": 50.5,
+      "ringkasan": "Menjawab: bagaimana sisi implementasi recruitment dibangun, mulai dari stack (Go + Fiber + MongoDB recruitment_db, port 6979), cakupan tiap pipeline (requisition satu tahap persetujuan SPV HRD, posting tanpa rentang gaji, kandidat dua jalur input HR dan apply publik), sampai cara kerja babak seleksi. Merinci katalog babak global interview_round yang di-seed idempoten, arti lima nilai form_type yang memisahkan babak dijadwalkan dari babak yang hanya dicatat hasilnya, mekanisme upsert hasil tes per pasangan kandidat dan babak, serta wiring hasil ke progress dan status kandidat. Menjawab juga koleksi apa saja yang benar-benar ada di recruitment_db, koleksi lama mana yang sudah dibuang, jalur handoff hire ke employee-service, dan bahwa deploy service ini dilakukan manual.",
       "kata_kunci": [
-        "recruitment service",
-        "rekrutmen",
-        "microservice",
-        "ATS",
-        "interview round",
+        "recruitment-service",
+        "Go Fiber",
+        "MongoDB recruitment_db",
+        "interview_round",
         "form_type",
-        "candidate_test_result",
-        "psikotest",
-        "technical test",
+        "test result",
         "background check",
         "offer",
         "onboarding handoff",
-        "recruitment_db"
+        "deploy manual"
       ]
     },
     {
@@ -8441,18 +8432,20 @@
         "HRIS - Recruitment",
         "HRIS - Key Performance Index"
       ],
-      "hash": "65fe4c84e7d3305bdd880baa9006c43ec1240bb09d17c2e59e4489b6455d7823",
-      "ukuran_kb": 11.0,
-      "ringkasan": "Menjawab: fitur apa saja dari modul Recruitment ERPGo (job requisition, job posting, candidate, dashboard, offer & onboarding) yang sudah diadopsi bip-erp, apa yang sengaja tidak diadopsi (custom questions, dll), dan rekomendasi prioritas pengembangan berikutnya (mis. tanggal kedaluwarsa offer, status inline).",
+      "hash": "9054368916fcac98ab0d924267b32b0784fe6c5b6d82cfc81b02ce40fe1ebce7",
+      "ukuran_kb": 11.2,
+      "ringkasan": "Menjawab: fitur modul Recruitment ERPGo (WorkDo) mana yang sudah ada di bip-erp, mana yang baru parsial, mana yang sengaja tidak diadopsi sebagai keputusan sadar, dan mana yang jadi kandidat implementasi berikutnya beserta prioritasnya. Isinya tabel pemetaan per fase (master data, sourcing, seleksi, offer dan onboarding) plus dashboard talent acquisition, ditambah rangkuman kondisi aktual menu FE recruitment. Berguna saat merencanakan penambahan fitur recruitment supaya tidak mengusulkan ulang hal yang sudah diputuskan dibuang seperti Custom Questions, template Onboarding Checklist, dan pelacakan lamaran oleh kandidat.",
       "kata_kunci": [
+        "roadmap recruitment",
         "ERPGo",
-        "recruitment roadmap",
-        "adopsi fitur",
-        "job requisition",
-        "job posting",
-        "offer",
-        "dashboard talent acquisition",
-        "gap fitur rekrutmen"
+        "WorkDo",
+        "gap analysis",
+        "pemetaan fitur",
+        "hiring funnel",
+        "dashboard recruitment",
+        "custom questions",
+        "offer expiration",
+        "prioritas fitur"
       ]
     },
     {
@@ -8461,7 +8454,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas + cek status). Menyusul: AI CV screening, psikotes online, WhatsApp kandidat, integrasi job board",
+      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). Menyusul: AI CV screening, psikotes online, WhatsApp kandidat, integrasi job board",
       "publik": true,
       "tautan": [
         "HRIS - Analysis",
@@ -8481,13 +8474,12 @@
         "HRIS - Big Pictures",
         "HRIS - Recruitment Roadmap (Adopsi ERPGo)"
       ],
-      "hash": "5135531419d83d91467495ec7311b5675fac0b855e7ab97c6dd4bf65f06dda5d",
-      "ukuran_kb": 27.8,
-      "ringkasan": "Menjawab: bagaimana proses rekrutmen Bharata berjalan end-to-end dari sisi bisnis, mulai dari Form Permintaan Karyawan (job requisition) dan siapa yang menyetujuinya, sourcing lewat Glints/TapLoker dan kanal lain, screening manual, interview multi-tahap beserta mekanisme email feedback pewawancara, psikotes dan tes keahlian, offer, sampai hire jadi karyawan dan masa evaluasi/Performance Review Onboarding. Menjelaskan aktor dan perannya (pengaju SPV, SPV HRD sebagai penyetuju final sejak 2026-07-22, pewawancara, kandidat) serta keputusan HRD yang sudah disepakati dan pertanyaan yang masih terbuka. Berguna juga untuk melihat gap antara desain dan kode, misalnya psikotes online dan skor per-aspek yang belum ada tempatnya, serta urutan babak Psikotest yang di seed berbeda dari keputusan HRD.",
+      "hash": "51aebaa49a3fc584266926548b1587d4c07d0f52491c2173cf06bdc6d27de282",
+      "ukuran_kb": 28.0,
+      "ringkasan": "Menjawab: bagaimana alur bisnis rekrutmen dirancang end to end, dari permintaan posisi lewat Form Permintaan Karyawan sampai karyawan aktif, dan siapa aktor di tiap langkah (SPV pengaju yang mengisi kualifikasi, SPV HRD sebagai penyetuju final sejak 2026-07-22, pewawancara, HR). Merinci screening manual beserta rencana AI CV screening, interview multi-tahap dengan feedback lewat link email untuk stage User dan Final, psikotes dan technical test sebagai babak bertipe tes, offer, hire ke data karyawan lewat link-employee, serta masa evaluasi dan Performance Review Onboarding. Menjawab juga keputusan HRD yang sudah disepakati dan gap yang tercatat antara desain dengan kode, misalnya urutan babak psikotes, mode tes online, dan tempat penyimpanan skor per aspek atau report PDF.",
       "kata_kunci": [
         "recruitment",
         "rekrutmen",
-        "HRIS",
         "job requisition",
         "form permintaan karyawan",
         "screening CV",
@@ -8495,9 +8487,6 @@
         "psikotes",
         "offer",
         "onboarding",
-        "Glints",
-        "TapLoker",
-        "hiring",
         "masa evaluasi"
       ]
     },

@@ -21,7 +21,7 @@ tags: [hris, recruitment, roadmap]
 
 1. **Job Requisition** — **approval 3-tingkat**: SPV ajukan (`Submitted`) → HR review (`HR Reviewed`/`Revision Requested`) → **Direktur** (`Approved`) → `Posted`; + reject + resubmit. Kualifikasi (usia/gender/pendidikan/pengalaman/tugas/tanggal mulai). Capability flags per-aksi.
 2. **Job Posting** — dibuka dari requisition Approved; `Open/Closed`, **slug** URL publik; field kaya (job_type/location/branch/positions/priority/experience/salary/deadline/featured/show_*/skills/description/requirements/benefits/terms HTML).
-3. **Candidate** — pipeline **`progress` (10 tahap) + `status` (9 keadaan)** + `tracking_token`; field lengkap + salary expected/current, notice, portfolio/linkedin, source; berkas **CV + profile image + cover letter** (MinIO); aksi create/update/**advance**/reject/withdraw/**link-employee**; **apply publik + tracking**. Flags can_issue_offer/upload_letter/respond/hire.
+3. **Candidate** — pipeline **`progress` + `status`** ⛔ *(`tracking_token` sudah dihapus 2026-07-24; `progress` kini nama babak dari katalog, bukan 10 tahap tetap)*; field lengkap + salary expected/current, notice, portfolio/linkedin, source; berkas **CV + profile image + cover letter** (MinIO); aksi create/update/**advance**/reject/withdraw/**link-employee**; **apply publik + tracking**. Flags can_issue_offer/upload_letter/respond/hire.
 4. **Stage records (timeline seleksi, 5 jenis)** — `GET /stages` + PUT/DELETE per record: **Screening** (lanjut/reject) · **Interview** (dari menu Interviews: HR/User/Final, panel, rounds per-lowongan, feedback rating+rekomendasi + link email) · **Technical Test** (skill/score/notes — **manual**) · **Background Check** (clear/issue) · **Psikotes** (jenis/mode/scores/interpretasi + **report PDF**; `online` placeholder).
 5. **Offer & Hire** — issue (HR supervisor) → upload **letter PDF** → accept/decline → **hire** (Direktur/approver). Status `Issued/Accepted/Declined`. → link-employee jadi karyawan.
 6. **"Onboarding" = masa evaluasi** — **Performance Review Onboarding** (multi-penilai 7 rating + 3 uraian → Lulus/Diperpanjang/Tidak Lulus, penilai isi via link). **Bukan** checklist tugas.
@@ -58,7 +58,7 @@ tags: [hris, recruitment, roadmap]
 | Job Postings (kaya: type/location/branch/positions/priority/experience/salary/deadline/featured/show_*/skills/requirements/benefits/terms HTML) | ✅ lengkap (`job_posting` diperkaya) | — |
 | Job Posting → **AI assist** konten (title/requirements/benefits) | ❌ | 🔮 selaras kapabilitas AI internal (sejajar "AI CV screening" di roadmap) |
 | Job Posting → Application Questions | ⛔ ikut Custom Questions dihapus | ⏭️ skip |
-| Candidates (Tracking ID, source, field lengkap, CV/cover/profile MinIO, apply publik) | ✅ (`candidate` + `tracking_token`) | — |
+| Candidates (Tracking ID, source, field lengkap, CV/cover/profile MinIO, apply publik) | ⚠️ `candidate` ✅, **Tracking ID ⛔ dihapus** (2026-07-24) | Kandidat tak punya cara melacak lamarannya sendiri |
 | Candidates → ubah **Status inline** dari daftar | ⚠️ ubah tahap via detail kandidat / `advance` | 🟢 quick-win: ubah status/tahap inline dari list |
 
 ### Fase 3 — Seleksi

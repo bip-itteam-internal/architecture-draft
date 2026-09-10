@@ -1,8 +1,8 @@
-> Status: ⚠️ **Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas → cek status; **E2E terverifikasi live 2026-07-16**). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf, dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*).
+> Status: ⚠️ **Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas; **E2E terverifikasi live 2026-07-16**). ⛔ **Fitur "cek status lamaran" SUDAH DIHAPUS** (BE `a298ba70`, 2026-07-24; portal tak punya rute `/status` — diverifikasi 2026-09-10). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf, dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*).
 
 ## Deskripsi
 
-*Portal karir publik **PT Bharata Internasional Pharmaceutical** — situs tanpa login tempat pelamar melihat lowongan, mengirim lamaran (satu berkas PDF gabungan), dan mengecek status lamarannya. Menggantikan alur **Google Form** lama HRD: lamaran langsung masuk pipeline [[Microservices - Recruitment Service]] sehingga HR tak perlu memindahkan data manual. Target domain: **`career.bharatainternasional.com`**.*
+*Portal karir publik **PT Bharata Internasional Pharmaceutical** — situs tanpa login tempat pelamar melihat lowongan dan mengirim lamaran (satu berkas PDF gabungan). Menggantikan alur **Google Form** lama HRD: lamaran langsung masuk pipeline [[Microservices - Recruitment Service]] sehingga HR tak perlu memindahkan data manual. Target domain: **`career.bharatainternasional.com`**.*
 
 - **Repo**: `career-bharata` — **repo Git terpisah** (sibling di bawah `erp/`), **bukan** bagian dari `bip-erp`. Remote: `github.com/bip-itteam-internal/career-bharata`, branch utama **`master`** (bukan `main` — `origin/HEAD` menunjuk ke sana).
 - **Package manager**: **pnpm** (`pnpm@10.25.0`). Bukan npm/yarn.
@@ -14,8 +14,8 @@
 
 ## Arsitektur
 
-- **Server Components** untuk fetch data (list/detail/track, `cache: "no-store"`); **Client Components** hanya untuk interaksi (form lamar, filter, modal WASPADA, input token).
-- Semua akses BE disentralkan di `src/lib/recruitment-api.ts` (tipe `PostingListItem`/`PostingView`/`ApplyDTO`/`TrackView` + fungsi `listPostings`/`getPosting`/`apply`/`track`, native `fetch`). Detail/track → `null` bila 404 → `notFound()`.
+- **Server Components** untuk fetch data (list/detail, `cache: "no-store"`); **Client Components** hanya untuk interaksi (form lamar, filter, modal WASPADA).
+- Semua akses BE disentralkan di `src/lib/recruitment-api.ts` (tipe `PostingListItem`/`PostingView`/`ApplyDTO` + fungsi `listPostings`/`getPosting`/`apply`, native `fetch`). Detail → `null` bila 404 → `notFound()`. *(`TrackView`/`track` sudah tidak ada — ikut terhapus bersama fitur tracking.)*
 - **Deploy: Docker standalone** (`output: "standalone"` + `Dockerfile` 2-stage + `docker-compose.yml` + `.dockerignore`) — **pola disamakan dengan `erp-frontend`** (2026-07-16): `.env` **ikut masuk image** (bukan `--build-arg`) karena `NEXT_PUBLIC_*` di-inline saat `next build`; compose punya healthcheck/restart/logging. **Guard**: build **digagalkan** bila `.env` tak ada (tanpa itu kode jatuh ke fallback URL **dev** → portal production salah alamat senyap). ✅ image **sudah divalidasi di produksi** (build + jalan, 2026-08-02). **Base API production = `https://api.bharatainternasional.com/public/recruitment`** (gateway di VPS Biznet, terverifikasi 200) — **bukan** `10.10.10.121` internal.
 
 > [!warning] Compose di server SENGAJA berbeda satu baris dari repo
@@ -29,8 +29,9 @@ Sumber: `career-bharata/src/app/`.
 
 - **`/` — Landing**: hero (background `/hero/pixel.jpg` + overlay gradien gelap, teks putih) **disatukan dengan daftar lowongan** (anchor `#lowongan`, komponen `careers/jobs-browser.tsx`: pencarian + filter klien). Muncul **modal "WASPADA"** anti-penipuan rekrutmen saat pertama membuka landing (pola serupa portal karir Pertamina) — implementasi `useSyncExternalStore` agar aman SSR.
 - **`/lowongan/[slug]` — Detail lowongan**: satu baris **judul + tombol "Lamar Sekarang"** (tombol tidak terkubur di bawah), sub-judul = **jenis pekerjaan** (dari master `job_types`) + jumlah posisi; di bawah tombol: keterangan **"Sebelum tanggal {deadline}"** (bulan disingkat, `timeZone: "UTC"` agar tanggal deadline tak bergeser ke H+1). Isi: deskripsi/persyaratan/benefit (HTML disanitasi) + section **Penempatan** di paling bawah. **Tanpa** badge status, badge skill, atau departemen (keputusan UI: bukan info yang dicari pelamar).
-- **`/lowongan/[slug]/lamar` — Form lamaran** (halaman sendiri, bukan modal): field **native model `candidate`** (nama_lengkap, email, no_hp, jenis_kelamin, tanggal_lahir, alamat, pendidikan, ipk, pengalaman, expected_salary, dll) — **bukan** form-builder `custom_question`; + **upload satu berkas PDF gabungan (maks 10 MB)** → dikirim `multipart/form-data`. Sukses → tampil `tracking_token` + tautan ke `/status/[token]`.
-- **`/status` & `/status/[token]` — Cek status lamaran**: input token → tampilan curated (progress/status label + stepper) dari `GET /public/recruitment/track/:token`.
+- **`/lowongan/[slug]/lamar` — Form lamaran** (halaman sendiri, bukan modal): field **native model `candidate`** (nama_lengkap, email, no_hp, jenis_kelamin, tanggal_lahir, alamat, pendidikan, ipk, pengalaman, expected_salary, dll) — **bukan** form-builder `custom_question`; + **upload satu berkas PDF gabungan (maks 10 MB)** → dikirim `multipart/form-data`. Sukses → redirect ke **`/lowongan/[slug]/lamar/sukses`**.
+- **`/lowongan/[slug]/lamar/sukses` — Konfirmasi terkirim**: menyebut posisi yang dilamar, memberi tahu konfirmasi sudah dikirim ke email, satu tombol "Lihat Lowongan Lain", plus peringatan rekrutmen **tidak dipungut biaya**. **Tanpa token, tanpa nomor lamaran** — pelamar tak punya cara memeriksa kemajuan lamarannya sendiri; satu-satunya kontak balik adalah tim rekrutmen menghubunginya.
+- ⛔ **`/status` & `/status/[token]` SUDAH TIDAK ADA.** Rute itu pernah didokumentasikan di sini, tapi `career-bharata/src/app/` sekarang hanya memuat `/`, `/lowongan/[slug]`, `/lowongan/[slug]/lamar`, `/lowongan/[slug]/lamar/sukses`, `/syarat-penggunaan`, `/kebijakan-privasi` (diverifikasi 2026-09-10). BE-nya juga sudah dihapus — lihat [[API - Recruitment Service]] §Publik.
 - **`/syarat-penggunaan` & `/kebijakan-privasi`** — halaman legal (komponen bersama `legal-page.tsx`), ditautkan di footer.
 - **Shared**: `Header` (**sticky**, logo `/logo/logo.png` "Winning Team Bharata") · `SiteFooter` · `SectionShell` (Container) · `components/form/fields.tsx` — field reusable (`TextField`/`TextareaField`/`SelectField`/`DateField`/`FileField`, RHF-compatible, wajib ditandai **asterisk merah**).
 
@@ -43,7 +44,8 @@ Detail: [[API - Recruitment Service]] §Publik.
 | `GET /public/recruitment/postings` | landing (`#lowongan`) |
 | `GET /public/recruitment/postings/:slug` | `/lowongan/[slug]` (`:id` menerima **slug** ATAU ObjectID) |
 | `POST /public/recruitment/apply` (**multipart**: `data` JSON + `berkas` PDF) | `/lowongan/[slug]/lamar` |
-| `GET /public/recruitment/track/:token` | `/status/[token]` |
+
+Portal ini memakai **tiga endpoint itu saja**. `GET /public/recruitment/track/:token` **tidak lagi dipakai dan tidak lagi ada di BE**; rutenya masih menganggur di gateway (`api-gateway/main.go`) dan membalas 404 bila dipanggil.
 
 **Gotcha kontrak:** `posisi_dilamar` **wajib** dikirim (server tidak mengisinya dari `posting_id`); `tanggal_lahir` **RFC3339**; nilai enum casing **persis** BE (mis. `jenis_kelamin` "Laki-laki"/"Perempuan"). Lamaran sukses → kandidat menerima **email otomatis** "Lamaran Anda Telah Kami Terima" (✅ terverifikasi live) via [[Microservices - Notification Service]].
 

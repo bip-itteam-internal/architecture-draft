@@ -51,7 +51,7 @@
 - `/public/guestbook` → attendance-service
 - `/public/recruitment/apply` → recruitment-service (pelamar mendaftar sendiri tanpa JWT)
 - `/public/recruitment/postings` & `/public/recruitment/postings/:id` → recruitment-service (portal karir: daftar & detail lowongan Open, tanpa JWT)
-- `/public/recruitment/track/:token` → recruitment-service (kandidat cek status lamaran via tracking token, tanpa JWT)
+- ⛔ `/public/recruitment/track/:token` → **rute YATIM**: masih terdaftar di gateway (`api-gateway/main.go`) dan meneruskan ke `<recruitment>/public/track/<token>`, tapi handler-nya **sudah dihapus** dari recruitment-service (`a298ba70`, 2026-07-24). Hasilnya **404 Fiber**, bukan pesan yang menjelaskan. Tak ada konsumen tersisa (portal karir sudah tak punya rute `/status`), jadi aman dibuang saat gateway disentuh berikutnya. Diverifikasi 2026-09-10 — lihat [[API - Recruitment Service]] §Publik
 - `/ext/fingerprint/*` → mesin fingerprint eksternal (X105:4370, X609:4371, dipilih dari serial) + attendance-service
 - `/ext/tiktok-shop/callback` & `/ext/tiktok-shop/webhook` → tiktok-shop service
 - `/ext/webhook/:service` → integration-service
