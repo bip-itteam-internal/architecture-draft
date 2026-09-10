@@ -5,6 +5,7 @@
 - **Status**: ⚠️ **Implemented (ada catatan)** — BE + FE ada di `origin/main` (BE: 12 berkas Go di `services/recruitment`; FE kandidat sejak 2026-09-09). **Masih bergerak**: sisi career portal disentuh 2026-09-10. **Status deploy belum diukur** — jangan asumsikan sudah live, ukur dulu ([[RUN - Deploy Microservices bip-erp]]).
 - **Menggantikan asumsi lama** bahwa psikotes "dilaksanakan staf HR di luar aplikasi" dan "psikotes online = fase lanjut". Keduanya sudah tidak berlaku; dokumen yang masih berbunyi begitu sudah dikoreksi ([[HRIS - Recruitment]]).
 - **Diverifikasi ke `origin/main` 2026-09-10** (bukan checkout lokal — lihat catatan di bagian akhir).
+- 🟡 **Perluasan ke multi-jenis sudah diputuskan** (CFIT, DISC, dan tipe lain lewat katalog yang dikelola HRD): [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] + [[HRIS - Bank Soal dan Paket Psikotes]]. Dokumen ini tetap menjadi rincian **jenis Kraepelin**; yang berlaku lintas-jenis pindah ke sana.
 
 ## Alur Pengguna
 
