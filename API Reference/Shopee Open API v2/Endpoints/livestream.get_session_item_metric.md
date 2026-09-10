@@ -4,7 +4,7 @@
 - Method: GET
 - Auth: user
 - Deskripsi: Get real-time indicator data of live stream products, including product clicks, add-to-cart, etc. (For TW, ID, TH, PH, MY, SG, VN)
-- Sumber: open.shopee.com/documents/v2/livestream.get_session_item_metric?type=1 (backend doc/api) — 2026-09-09
+- Sumber: open.shopee.com/documents/v2/livestream.get_session_item_metric?type=1 (backend doc/api) — 2026-09-10
 - Confidence: verified-docs
 
 ## Request

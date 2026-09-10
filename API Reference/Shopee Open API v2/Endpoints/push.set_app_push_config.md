@@ -4,7 +4,7 @@
 - Method: POST
 - Auth: public
 - Deskripsi: you can turn on or turn off your app push config setting through this open api
-- Sumber: open.shopee.com/documents/v2/push.set_app_push_config?type=1 (backend doc/api) — 2026-07-18
+- Sumber: open.shopee.com/documents/v2/push.set_app_push_config?type=1 (backend doc/api) — 2026-09-10
 - Confidence: verified-docs
 
 ## Request

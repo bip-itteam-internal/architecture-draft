@@ -4,7 +4,7 @@
 - Method: GET
 - Auth: public
 - Deskripsi: you can get your app current push config setting through this api
-- Sumber: open.shopee.com/documents/v2/push.get_app_push_config?type=1 (backend doc/api) — 2026-07-18
+- Sumber: open.shopee.com/documents/v2/push.get_app_push_config?type=1 (backend doc/api) — 2026-09-10
 - Confidence: verified-docs
 
 ## Request
