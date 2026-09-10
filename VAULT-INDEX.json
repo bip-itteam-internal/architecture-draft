@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-09",
-  "jumlah_dokumen": 382,
+  "digenerate": "2026-09-10",
+  "jumlah_dokumen": 383,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -2377,6 +2377,7 @@
         "Microservices - Employee Service",
         "HRIS - Otomasi Skor KPI",
         "ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate",
+        "External - Accurate Webhook",
         "ADR - 0069 Perlengkapan Per-Unit Opsional di inventory dengan Guard Anti-Kontaminasi",
         "ADR - 0065 Payout yang Sudah Dibukukan Dokumen Lain Ditutup, Bukan Dibuat Ulang",
         "Sales - ICC Account Manager Mapping",
@@ -2399,9 +2400,9 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "e40407d1fd6442ee0453798b2dc48aab3291555b764738bc9a960bffac21e074",
-      "ukuran_kb": 355.4,
-      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) ke model transaksi terpadu dan bridge akuntansi ke Accurate Online (invoice harian, sales return, push), bagaimana webhook tiap platform diautentikasi dan diproses, serta fitur apa saja per area: GMV Max monitoring/overview, ICC video metrics, affiliate, ICC account mapping, marketing team dan shop ACL, kepemilikan toko per departemen, fulfillment bridge WMS, profit per produk, ulasan marketplace, status sinkron toko, cron/worker, dan observabilitas Shopee. Juga mencatat keputusan teknis dan perbaikan yang tercatat (rate limit TikTok, filter advertiser_id, ROI agregat), catatan tentang Meta Ads, dan jalur legacy Desty yang dinonaktifkan.",
+      "hash": "2136b282e36591709a6df5beee1f8a422cd74f5a292b98473212786ffe6232b7",
+      "ukuran_kb": 357.0,
+      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) ke model transaksi terpadu dan bridge akuntansi ke Accurate Online (invoice harian, sales return, push), bagaimana webhook tiap platform diautentikasi dan diproses, serta fitur apa saja per area: GMV Max monitoring/overview, ICC video metrics, affiliate, ICC account mapping, marketing team dan shop ACL, kepemilikan toko per departemen, fulfillment bridge WMS, profit per produk, ulasan marketplace, status sinkron toko, cron/worker, dan observabilitas Shopee. Juga menjawab status pendaftaran webhook Accurate (terdaftar & ACTIVE, kiriman terbukti hanya untuk database Trial IT — prod belum) dan mencatat keputusan teknis serta perbaikan yang tercatat (rate limit TikTok, filter advertiser_id, ROI agregat), catatan Meta Ads, dan jalur legacy Desty yang dinonaktifkan.",
       "kata_kunci": [
         "integration service",
         "integrasi marketplace",
@@ -8565,6 +8566,7 @@
         "External - Desty",
         "Microservices - Integration Service",
         "Microservices - Warehouse Service",
+        "API - Integration Service",
         "IT - Backup & DR",
         "IT - Runbooks",
         "IT - Monitoring System",
@@ -8575,22 +8577,24 @@
         "Microservices - Attendance Service",
         "Microservices - Notification Service",
         "Microservices - Task Management Service",
-        "Sales - Marketplace Integration"
+        "Sales - Marketplace Integration",
+        "External - Accurate",
+        "External - Accurate Webhook"
       ],
-      "hash": "50c87621cb9ac908a90ca8821fdb63117231803ccb03e37b6c1dd45db65e8fdc",
-      "ukuran_kb": 30.8,
-      "ringkasan": "Menjawab: proses latar belakang apa saja yang berjalan diam-diam di bip-erp — cron, scheduler, worker, poller — kapan jadwalnya, di service mana, untuk apa, dan lock apa yang dipakainya, lengkap dengan file:line-nya. Berguna saat debugging \"kenapa data ini muncul/berubah sendiri\", perencanaan kapasitas, atau sebelum mengubah service; juga menjawab service mana yang sama sekali tak punya job background, mana yang dormant atau belum deploy, dan perbedaan sintaks cron 6-field integration vs 5-field service lain.",
+      "hash": "89ccd3b0db852a8dfb5a2de568ab18028d8b4eaaa3d1286f27ace25e8f4b5767",
+      "ukuran_kb": 33.7,
+      "ringkasan": "Menjawab: proses latar belakang apa saja yang berjalan diam-diam di bip-erp — cron, scheduler, worker, poller — kapan jadwalnya, di service mana, untuk apa, dan lock apa yang dipakainya, lengkap dengan file:line-nya. Menjawab juga pertanyaan yang paling sering menyesatkan: kenapa mengubah jadwal cron di kode tidak berpengaruh apa pun — koleksi workers.worker_configs MENIMPA jadwal di kode secara senyap, beserta perintah mongosh untuk memperbaikinya dan peringatan boot yang menjadi satu-satunya tandanya. Berguna saat debugging \"kenapa data ini muncul/berubah sendiri\", perencanaan kapasitas, atau sebelum mengubah service; juga menjawab service mana yang sama sekali tak punya job background, mana yang dormant atau belum deploy, dan perbedaan sintaks cron 6-field integration vs 5-field service lain.",
       "kata_kunci": [
         "background job",
         "cron",
         "scheduler",
         "worker",
+        "worker_configs",
+        "jadwal ditimpa",
         "jadwal",
         "sync",
         "lock",
-        "Redis lock",
-        "WIB",
-        "operasional"
+        "WIB"
       ]
     },
     {
@@ -12008,6 +12012,40 @@
       ]
     },
     {
+      "path": "Third-party Software/External - Accurate Webhook.md",
+      "judul": "External - Accurate Webhook",
+      "area": "Third-party Software",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan) — konsumsi webhook stok `ITEM_QUANTITY`/`STOCK_MUTATION` live (lihat [[Microservices - Integration Service]] §Accurate); pembaru masa aktif otomatis ada (`accurate-webhook-renew`); **kiriman untuk database prod 1443290 belum terbukti tiba** (lihat §Belum Terjawab)",
+      "publik": true,
+      "tautan": [
+        "External - Accurate",
+        "Microservices - Integration Service",
+        "IT - Background Jobs & Schedulers",
+        "RUN - Accurate API Access Token (OAuth)",
+        "ADR - 0001 Akuntansi via Accurate",
+        "ADR - 0014 Accurate Token DB-backed via OAuth",
+        "API - Integration Service",
+        "APP - Web ERP"
+      ],
+      "hash": "7deaa555a281d1356ca2f75d270ade7a02988d1946e69fa1942f3af55fed30a5",
+      "ukuran_kb": 11.9,
+      "ringkasan": "Menjawab: tipe event webhook apa saja yang benar-benar ada di Accurate Online (24 tipe resmi, dan kenapa jurnal umum TIDAK punya event sendiri sehingga jurnal manual finance hanya bisa ditarik, bukan ditunggu), bagaimana memperpanjang masa aktif webhook yang cuma 7 hari lewat webhook-renew.do, dan cara memakai webhook-history.do beserta batas rentang 24 jamnya. Menjawab juga jebakan pengukuran yang paling mahal: webhook-history melapor PER-APLIKASI menurut token pemanggil sehingga rowCount:0 bukan bukti tak ada kiriman, ada dua aplikasi Accurate bernama mirip yang mudah tertukar, cara mengetahui aplikasi penerbit sebuah token, dan kenapa nomor dokumen yang sama di dua database bukan bukti dokumen yang sama. Memuat ongkos API terukur dan hipotesis terbuka soal kiriman webhook database prod yang belum terbukti tiba.",
+      "kata_kunci": [
+        "Accurate webhook",
+        "webhook-renew",
+        "webhook-history",
+        "JOURNAL_VOUCHER",
+        "GLACCOUNT",
+        "databaseId",
+        "db-detail",
+        "App Key",
+        "masa aktif 7 hari",
+        "Debug Log"
+      ]
+    },
+    {
       "path": "Third-party Software/External - Accurate.md",
       "judul": "External - Accurate",
       "area": "Third-party Software",
@@ -12019,15 +12057,18 @@
         "ADR - 0001 Akuntansi via Accurate",
         "Microservices - Integration Service",
         "Finance - Bridging App",
+        "External - Accurate Webhook",
+        "RUN - Accurate API Access Token (OAuth)",
+        "IT - Background Jobs & Schedulers",
         "APP - Web ERP",
         "API - Integration Service",
         "Finance - Big Pictures",
         "Microservices - Insentive Service",
         "Sales - Marketplace Integration"
       ],
-      "hash": "c911c6f45d7564707de9de433c1208f7b9dc9b318a6a12d77d8ed76b81fa68a9",
-      "ukuran_kb": 2.6,
-      "ringkasan": "Menjawab pertanyaan tentang bagaimana ERP terhubung ke Accurate Online sebagai sumber kebenaran akuntansi, termasuk cara autentikasi (API Token + HMAC-SHA256), endpoint yang dipakai (sales-invoice, sales-return, detail), protokol edit dokumen, dan siapa saja konsumen integrasinya (Integration Service, Web ERP).",
+      "hash": "3b464590d03db170b0a2742ab7b97d96ddca8108dfe4415f3f9d6ad1d29f6680",
+      "ukuran_kb": 5.5,
+      "ringkasan": "Menjawab pertanyaan tentang bagaimana ERP terhubung ke Accurate Online sebagai sumber kebenaran akuntansi, termasuk cara autentikasi (API Token + HMAC-SHA256), endpoint yang dipakai (sales-invoice, sales-return, detail), protokol edit dokumen, dan siapa saja konsumen integrasinya (Integration Service, Web ERP). Menjawab juga kenapa ACCURATE_DB_ID di env prod SENGAJA dikosongkan (token aat. sudah membawa sesi database; mengisinya mematikan seluruh sinkronisasi) beserta dua penjaga boot yang memperingatkannya, di mana salinan dokumentasi API resmi yang sah berada dan kenapa SwaggerHub dilarang, serta ongkos API terukur (get-bs-account-amount 347 akun dalam satu call, volume jurnal per hari, limiter 6 req/detik yang dibagi seluruh service).",
       "kata_kunci": [
         "Accurate",
         "Accurate Online",
@@ -12036,8 +12077,8 @@
         "sales return",
         "HMAC",
         "API Token",
-        "itemNo",
-        "bridging finance",
+        "ACCURATE_DB_ID",
+        "limiter 6 req/s",
         "general ledger"
       ]
     },
