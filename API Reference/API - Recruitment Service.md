@@ -46,7 +46,7 @@
 | POST | `/candidates/:id/interviews` | Jadwalkan sesi interview (satu-satunya tahap yang **dijadwalkan**) | HR |
 | GET | `/candidates/:id/stages` | Timeline tahap kandidat (kini hanya berisi `interviews`) | HR |
 | PUT/DELETE | `/stages/:kind/:id` | Ubah / hapus record tahap (`:kind` yang dikenal saat ini hanya `interviews`) | HR |
-| POST | `/candidates/:id/test-result` | **Rekam hasil babak bertipe tes** (Psikotest / Technical Test). Body: `round_id` (wajib, harus babak ber-`form_type: "test"`, kalau bukan → `400`), `result` (**Pass/Fail/Pending**, wajib), `score` (opsional), `notes`. **Upsert** per (`candidate_id`, `round_id`). Menggerakkan `progress` ke babak itu + status (Pass→`Pending`, Fail/Pending→`Hold`) | HR |
+| POST | `/candidates/:id/test-result` | **Rekam hasil babak bertipe tes** (Psikotest / Technical Test). Body: `round_id` (wajib, harus babak ber-`form_type: "test"`, kalau bukan → `400`), `result` (**Pass/Fail/Pending**, wajib), `score` (opsional), `notes`. **Upsert** per (`candidate_id`, `round_id`). Menggerakkan `progress` ke babak itu + status (Pass→`Pending`, Fail/Pending→`Hold`). Baris babak **Psikotest** juga ditulis **otomatis** saat sesi psikotes ditutup (langsung ke koleksi, bukan lewat endpoint ini, jadi progress/status tidak ikut bergerak): `result: Pending`, dan **(T0, bip-erp #1828)** `score` hanya untuk sesi `tuntas`; sesi terputus menulis baris **tanpa** `score` | HR |
 | GET | `/candidates/:id/test-results` | Daftar hasil tes kandidat, diperkaya `round_name` | HR |
 | POST/GET | `/candidates/:id/background-check` | Rekam / baca Background Check (`verifications[]`, `reference`, `slik`, `decision`, `hr_note`) | HR |
 
@@ -58,10 +58,12 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 |---|---|---|---|
 | POST | `/candidates/:id/psikotes` | Terbitkan sesi psikotes + kirim magic link ke email kandidat. Kandidat yang **sudah punya sesi → `409`** (sarankan Terbitkan Ulang). Babak `"Psikotest"` belum ada di master → `400` | HR |
 | POST | `/candidates/:id/psikotes/reissue` | Terbitkan ulang. **`alasan` wajib** (kosong → `400`); sesi lama dihapus sehingga token lama mati | HR |
-| GET | `/candidates/:id/psikotes/report` | Laporan individual (metrik 4 kategori + skor keseluruhan + `selesai_karena`). **Tidak memuat soal/kunci jawaban** | HR |
-| GET | `/candidates/psikotes/status` | Status **massal** untuk polling tabel (banyak id sekaligus, satu kueri `$in`) | HR |
+| GET | `/candidates/:id/psikotes/report` | Laporan individual (metrik 4 kategori + skor keseluruhan + `selesai_karena`; **(T0, bip-erp #1828)** + `col_index` = jumlah kolom yang sempat dikirim). **Tidak memuat soal/kunci jawaban**. Kandidat tanpa sesi → `404 {"error": ...}` | HR |
+| GET | `/candidates/psikotes/status` | Status **massal** untuk polling tabel (banyak id sekaligus, satu kueri `$in`). Tiap baris: `candidate_id`, `status`, `col_index`, `total_kolom`, `issued_at`, `last_seen_at?`; **(T0)** + `selesai_karena?` (omitempty, hanya sesi `finished`). **Tanpa** skor/kategori, dikunci test allowlist | HR |
 
 > ⚠️ **`/candidates/psikotes/status` WAJIB terdaftar sebelum `GET /candidates/:id`**, kalau tidak ia tertelan sebagai permintaan kandidat ber-id `"psikotes"` dan membalas 200 berisi data yang salah, bukan 404. Di kode ada test yang mengunci urutannya.
+
+> ⚠️ **Cache gateway 3 menit.** `GET /api/recruitment/*` di-cache api-gateway (modul `recruitment` tidak ada di `noCacheModules` maupun `noCacheRoutes`), dan penutupan sesi oleh kandidat atau sweep tidak mengosongkannya. Status massal dan laporan psikotes bisa basi sampai 3 menit; periksa header `X-Cache` saat verifikasi. Mengecualikannya adalah task api-gateway tersendiri (2026-09-10).
 
 > ⚠️ **Endpoint per-tahap lama SUDAH TIDAK ADA** (diverifikasi ke `routes.go` 2026-09-10): `POST /candidates/:id/screening`, `/technical-test`, `/psychotest`. Screening jadi keputusan manual tanpa endpoint sendiri; tes dan psikotes menyatu jadi **satu jalur `/test-result` berbasis babak**. Contoh `curl` ke `/psychotest` yang masih beredar di `docs/recruitment-api.curl.md` (repo `erp`) ikut usang.
 | POST | `/candidates/:id/offer` | Terbitkan offer (→ Offering) | HR supervisor |
@@ -141,9 +143,11 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 
 > **Psikotes publik dijaga token, bukan sesi login.** Token 32 byte `crypto/rand` base64url, unik di level index. Tidak ada endpoint publik yang mengembalikan soal, kunci jawaban, atau skor — DTO-nya eksplisit dan ada test allowlist kunci JSON yang menggigit bila field internal bocor. Rincian: [[HRIS - Psikotes Kraepelin]].
 
+> **Galat publik yang dibaca halaman kandidat** (`psikotes_public_handlers.go`): token tak dikenal → `404 {"error": "sesi tes tidak ditemukan"}`; sesi sudah `finished` → `410 {"error": "sesi tes sudah selesai"}`. Kuncinya **`error`**, bukan `message`. **(T0, career-bharata #9)** Portal karir memetakan 404 ke layar "tautan tidak berlaku" tanpa Coba Lagi dan 410 ke layar "tes sudah selesai"; mengubah status kode ini di BE mengubah layar yang dilihat kandidat.
+
 > ⛔ **`GET /public/recruitment/track/:token` SUDAH TIDAK BERFUNGSI** (diverifikasi 2026-09-10). Fitur lacak lamaran **dihapus** dari recruitment-service di `a298ba70` (2026-07-24, sudah di `origin/main`): `tracking_token`, `track_url`, dan handler `/public/track/:token` **nol hit** di seluruh `services/recruitment/*.go`, dan test template email menguncinya (`"applied: tombol tracking harus sudah dihapus"`).
 >
-> ⚠️ **Tapi rutenya masih terdaftar di gateway** (`api-gateway/main.go:689-700`) dan meneruskan ke `<recruitment>/public/track/<token>` yang sudah tak ada, jadi pemanggil menerima **404 dari Fiber**, bukan 501/410 yang menjelaskan apa pun. Rute yatim ini belum dibersihkan. Sisi portal karir sudah bersih: `career-bharata` **tidak punya** rute `/status` sama sekali, jadi tak ada alur pengguna yang patah — yang tersisa hanya rute gateway yang menganggur.
+> ✅ **Rute yatimnya sudah dibuang dari gateway** di bip-erp #1824 (merged 2026-09-10, `a0260e4d`). Biner API-Gateway **dev** yang naik sesudah merge tak lagi memuat string `recruitment/track` (0; kontrol positif `recruitment/psikotes` = 4, diukur 2026-09-10). **Prod baru ikut bersih sesudah api-gateway prod di-deploy ulang**; sampai itu rute lama masih meneruskan ke handler yang tak ada dan membalas 404 Fiber di sana. Sisi portal karir sudah bersih sejak awal: `career-bharata` **tidak punya** rute `/status` sama sekali.
 
 > **Catatan kontrak `/apply`:** `posisi_dilamar` **wajib** dan **tidak** diisi server dari posting — divalidasi lebih dulu, jadi klien harus mengirimnya walau sudah kirim `posting_id`. `tanggal_lahir` = **RFC3339** (samakan dengan model employee agar mapping saat hire tidak perlu isi ulang — lihat [[HRIS - Recruitment]]). Upload berkas **backward-compatible**: body JSON tanpa file tetap diterima; berkas non-PDF / >10 MB → 400.
 
