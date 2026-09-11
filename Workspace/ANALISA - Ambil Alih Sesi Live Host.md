@@ -53,6 +53,11 @@ berikutnya tervonis `dalam_shift`. Bukan pekerjaan kode.
 
 ## T1. BE: tutup otomatis di jam berakhir shift + 60 menit
 
+**Status 2026-09-11**: dikodekan di branch bip-erp `feat/marketing-analytics-tutup-akhir-shift`
+(4 commit) dan erp-frontend `feat/live-shift-badge-alasan-tutup` (1 commit); rencana
+`.task-plans/2026-09-11-tutup-otomatis-akhir-shift.md`. Belum merged. Sisa: PR, deploy (BE lalu
+FE), verifikasi DEV lewat gateway.
+
 - Sesi berjalan yang melewati jam berakhir shift + 60 menit ditutup dengan `selesai` **tepat
   di batas itu** (bukan jam tik), `ditutup_otomatis: true`, alasan `shift_berakhir`.
 - Aturan clock-out yang ada tetap dan menang bila lebih awal.
