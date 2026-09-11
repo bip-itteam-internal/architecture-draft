@@ -6209,7 +6209,7 @@
         "ADR - 0002 Database-per-Service"
       ],
       "hash": "60d6a4f45b371d573b71dcb3897aca654a52b3702a2b58b30d3fa1526f399537",
-      "ukuran_kb": 18.0,
+      "ukuran_kb": 17.9,
       "ringkasan": "Menjawab: apa keputusan cara menandatangani kontrak PKWT di sistem sendiri dengan tanda tangan elektronik tidak tersertifikasi, tatap muka di kantor didampingi HRD (tanpa PSrE, e-KYC, PIN karyawan, maupun tanda tangan jarak jauh), siapa Pihak Pertama (direktur per perusahaan), dan kenapa e-Meterai dibubuhkan HR di luar sistem. Juga menjelaskan pengingat kontrak habis yang dipisah dari tanda tangan, dasar hukum UU ITE dan PP 71/2019, lubang keamanan akun yang ditemukan (PIN tanpa limiter, akun direktur dipakai bersama Sekretariat, kunci MinIO di bundel browser), arsip di prefix terkunci, salinan untuk karyawan, dan konsekuensinya.",
       "kata_kunci": [
         "tanda tangan kontrak",
@@ -8181,20 +8181,20 @@
         "IT - Background Jobs & Schedulers",
         "HRIS - Big Pictures"
       ],
-      "hash": "f892b8122689517f18d1d1ae838702c9dfb05724cf2db66fbfe964bec5731adf",
-      "ukuran_kb": 34.8,
-      "ringkasan": "Menjawab: bagaimana alur kontrak kerja elektronik dirancang, dari template berbasis data HRIS, sesi tanda tangan tatap muka didampingi HRD, tanda tangan direktur massal, pembubuhan e-Meterai oleh HR, sampai salinan untuk karyawan (email atau \"Kontrak Saya\" di MyBharata), serta persona yang terlibat dan hak aksesnya. Juga menjelaskan pondasi modul kontrak di employee-service (`employee_contract`, nomor otomatis, lampiran PDF, status ongoing/ending/expired), celah yang harus ditutup (nomor tak unik, lampiran bisa diganti, karyawan tak punya akses ke kontraknya), cara kerja pengingat kontrak habis, pemetaan field template ke sumber data, landasan hukum, dan hal yang belum diputuskan seperti kapan calon karyawan menandatangani.",
+      "hash": "1aa089e6f5ab67b44db220f380b289c5885729a53e202ae194b5e82c3d3ecc08",
+      "ukuran_kb": 36.3,
+      "ringkasan": "Menjawab: bagaimana kontrak kerja PKWT/PKWTT dibuat dari template berbasis data HRIS, ditandatangani tatap muka di kantor didampingi HRD, dikonfirmasi direktur dari Ruang Direktur, lalu dibubuhi e-Meterai oleh HR sebelum salinannya dikirim ke karyawan. Juga menjelaskan siapa persona dan hak aksesnya, pondasi riwayat kontrak di employee-service (koleksi employee_contract, lampiran PDF, nomor kontrak, status ongoing/ending/expired) beserta celah yang harus ditutup, pemetaan field template ke sumber data, keamanan akun direktur yang dipakai bersama Sekretariat, dan cara kerja pengingat kontrak habis.",
       "kata_kunci": [
-        "kontrak kerja elektronik",
-        "e-signing",
-        "e-Meterai",
+        "kontrak kerja",
+        "employment contract",
         "PKWT",
         "PKWTT",
-        "employee_contract",
+        "tanda tangan elektronik",
+        "e-signing",
+        "e-Meterai",
         "pengingat kontrak habis",
         "contract expiry reminder",
-        "template kontrak",
-        "Kontrak Saya"
+        "employee_contract"
       ]
     },
     {
@@ -13525,20 +13525,20 @@
         "ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR",
         "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)"
       ],
-      "hash": "bb8d6d287b066c8bcc629cfa3bcfaadfe1db97466e9a76ffcc68df062e0ff5cd",
-      "ukuran_kb": 12.3,
-      "ringkasan": "Menjawab: masalah apa yang sebenarnya ada di balik permintaan tanda tangan dan meterai digital untuk kontrak PKWT (biaya kertas vs kontrak habis tak terpantau), keputusan pemilik proses yang mengikat, dan jebakan yang menggagalkan rancangan naif (SetaraDirektur, kunci MinIO, urutan meterai, `ReplaceOne`, calon karyawan tanpa NIK). Juga memuat urutan task per gelombang (T1 pengingat kontrak habis beserta turunan T13 sampai T16, uji PDF bermeterai S1, nomor kontrak unik, template PKWT, prefix arsip, alur tanda tangan backend, layar), task keamanan akun yang terpisah, hal yang belum diputuskan, dan titik mulai pengerjaan.",
+      "hash": "718584c3d1484fc243576c56aee227b5a81c8f6cd7372f7f7aa8a2bf0ee6cb8b",
+      "ukuran_kb": 13.8,
+      "ringkasan": "Menjawab: task apa saja yang perlu dikerjakan untuk tanda tangan kontrak kerja dan pengingat kontrak habis, dalam urutan gelombang beserta prasyaratnya (uji PDF bermeterai, nomor kontrak unik, data penandatangan, template PKWT, masa evaluasi di offer jadi angka bulan). Juga mencatat keputusan pemilik proses yang mengikat (tanpa PSrE dan e-KYC, tanda tangan di kantor didampingi HRD, e-Meterai dibubuhkan HR, kategori inbox reminder) serta jebakan yang menggagalkan rancangan naif, misalnya SetaraDirektur yang meloloskan Corporate Secretary, PATCH kontrak yang memakai ReplaceOne, dan kontrak hasil migrasi yang mendominasi data kedaluwarsa.",
       "kata_kunci": [
         "analisa kebutuhan",
         "tanda tangan kontrak",
-        "e-signature",
-        "e-Meterai",
+        "contract signing",
         "pengingat kontrak habis",
-        "contract reminder",
-        "PKWT",
-        "task breakdown",
-        "uji PDF bermeterai",
-        "gelombang kerja"
+        "contract expiry reminder",
+        "PKWT (Evaluasi)",
+        "e-Meterai",
+        "nomor kontrak",
+        "masa evaluasi",
+        "daftar task"
       ]
     },
     {
