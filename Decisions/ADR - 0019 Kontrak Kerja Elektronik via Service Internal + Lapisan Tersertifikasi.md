@@ -18,7 +18,7 @@ Bagian Context, Decision, dan Consequences di bawah dipertahankan apa adanya seb
 |---|---|
 | §1 service baru `contract-service` memegang template, approval, arsip, dan audit | `contract-service` belum ada. Record kontrak dan arsip PDF ada di employee-service. Template, approval, dan jejak audit tanda tangan belum ada di mana pun |
 | §3 `new_hire` dipicu orkestrator setelah create-employee commit | kontrak pertama sudah dibentuk **di dalam** transaksi create-employee (`kontrakPertama`, `services/employee/func.go`). Pemicu tanda tangan belum ada |
-| §3 pengingat otomatis TBD karena tak ada cron | employee-service sudah menjalankan `robfig/cron` (`services/employee/cron.go`). Pengingat kontraknya dibangun lewat [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]] §2 (branch `feat/employee-pengingat-kontrak`, belum merge per 2026-09-11) |
+| §3 pengingat otomatis TBD karena tak ada cron | employee-service sudah menjalankan `robfig/cron` (`services/employee/cron.go`). Pengingat kontraknya dibangun lewat [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]] §2 (bip-erp PR #1851, merged 2026-09-11) |
 | §5 arsip di MinIO prefix `contract/` + referensi di `work_document` | arsip di field `employee_contract.file`, object key `employee/<employee_id>/contract/<contract_id>/`. `work_document` tidak dipakai |
 | Context: "hanya view monitoring `GET /contract`" | ada riwayat per karyawan, nomor otomatis, lampiran PDF, dan ringkasan |
 

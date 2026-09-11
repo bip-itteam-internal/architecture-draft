@@ -117,20 +117,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "dcf82ecae90bf54ee9d974fdc62b50734488535c0b505773e24b01cd16a00564",
-      "ukuran_kb": 59.8,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service lewat gateway `/api/employee/*` (login/PIN/biometrik, onboarding, CRUD personal & work data, dokumen, jadwal, akun, master departemen/perusahaan/system role, KPI, cuti, kontrak, resign, promosi/mutasi, surat peringatan) beserta gerbang RBAC tiap rute. Juga menjelaskan perilaku khusus seperti `/data-type/department?grouped=true`, penetapan penyetuju departemen yang jadi satu-satunya jalur menulis `is_supervisor`, jenjang jabatan, menu tersembunyi per posisi, serta endpoint internal lintas-service seperti `/internal/department-approver` dan `/internal/permission-holders`.",
+      "hash": "6083904d0cad0720729dddd3dc9fd5de0c5e45d14acbf0d660e7c15e2dbc3bf3",
+      "ukuran_kb": 59.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service lewat gateway `/api/employee/*` (login dan onboarding, personal/work data, dokumen, jadwal kerja, akun, master departemen dan system role, KPI, cuti, kontrak kerja, resign, promosi/mutasi, surat peringatan) beserta gerbang RBAC tiap rute. Juga menjelaskan perilaku khusus seperti `/data-type/department?grouped=true`, penetapan penyetuju departemen (`/master/departments/:key/approver`), `menu-hidden`, jenjang jabatan, serta endpoint internal lintas-service seperti `/internal/department-approver` dan `/internal/permission-holders`.",
       "kata_kunci": [
         "employee-service",
-        "endpoint karyawan",
-        "login",
+        "API karyawan",
+        "endpoint HRIS",
+        "login PIN",
         "master departemen",
-        "penyetuju pengajuan",
+        "penyetuju departemen",
         "approver",
-        "is_supervisor",
-        "jenjang jabatan",
-        "job level",
-        "RBAC"
+        "kontrak kerja",
+        "RBAC",
+        "system roles"
       ]
     },
     {
@@ -716,19 +716,19 @@
         "HRIS - Recruitment",
         "Microservices - Employee Service"
       ],
-      "hash": "1c26d387a88d9ace3f12672af4c3ab9c521c5543d481088f1158560d33e847af",
-      "ukuran_kb": 35.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan recruitment-service untuk requisition, lowongan, kandidat, babak seleksi, hasil tes, psikotes online beserta katalognya, offer (termasuk menu Offers dan flag can_approve), hire, onboarding checklist, review onboarding, dan portal karir publik, lengkap dengan role yang boleh memanggilnya. Juga menjelaskan efek samping endpoint (mis. terbit psikotes memindah progress, hire tidak mengaktifkan akun), cakupan perusahaan untuk rekrutmen lintas perusahaan, serta jebakan urutan rute dan cache gateway.",
+      "hash": "fd1b3f0c0e3deee00648d53a4d43880cae8f21426aab1495bc50182db9fd2d34",
+      "ukuran_kb": 33.0,
+      "ringkasan": "Menjawab: endpoint apa saja milik recruitment-service (`/api/recruitment/*` dan publik `/public/recruitment/*`) untuk job requisition, job posting, kandidat, tahap seleksi, offer, psikotes, interview rounds & feedback, master form, performance review onboarding, dan onboarding checklist, beserta role yang boleh memanggilnya. Juga menjelaskan siapa boleh mengajukan dan menyetujui requisition (supervisor, SPV HRD, jenjang direktur) serta aturan cakupan perusahaan pada rekrutmen lintas perusahaan (`GET /companies`, `?company=`, 404 untuk data perusahaan lain).",
       "kata_kunci": [
         "recruitment-service",
         "endpoint rekrutmen",
         "job requisition",
-        "offer",
-        "can_approve",
+        "permintaan karyawan",
+        "lowongan",
+        "job posting",
+        "kandidat",
+        "candidate",
         "psikotes",
-        "hire",
-        "onboarding checklist",
-        "portal karir",
         "lintas perusahaan"
       ]
     },
@@ -1463,19 +1463,19 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "b5c032b666b8ca7c5906fb58b813d6cdcc0def2eb7b7de77b05d05b02275eca4",
-      "ukuran_kb": 419.1,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP/HRIS One Bharata, bagaimana autentikasi, SSO, role gating sidebar, dan Pengaturan HRGA bekerja, serta konvensi data-fetching dan bagan yang wajib diikuti. Juga mencatat perubahan per modul (mis. Recruitment: alur kerja HR, rekrutmen lintas perusahaan, onboarding checklist; payroll, KPI, presensi) beserta gap yang belum diimplementasikan.",
+      "hash": "98808487685bc326317de8daaa248cbeaa6f5dd4e4be7b128355ee7ebab40069",
+      "ukuran_kb": 415.1,
+      "ringkasan": "Menjawab: apa itu web ERP `erp-frontend` (One Bharata / hris-dashboard), stack yang dipakai, cara login dan SSO identity provider bekerja, serta bagaimana `system_roles` dan paket izin menentukan kategori sidebar dan menu yang tampil. Juga memuat konvensi data-fetching TanStack Query (hook sidebar ber-`enabled`, badge, gerbang halaman), konvensi bagan Recharts/`ChartContainer`, daftar modul yang sudah ada (multi-perusahaan, Pengaturan HRGA terpusat, recruitment), dan catatan pekerjaan yang belum dikerjakan.",
       "kata_kunci": [
         "erp-frontend",
         "web ERP",
-        "HRIS dashboard",
         "One Bharata",
-        "sidebar role gating",
+        "hris-dashboard",
+        "sidebar",
+        "menu",
         "SSO",
-        "Pengaturan HRGA",
-        "recruitment",
         "TanStack Query",
+        "Recharts",
         "Next.js"
       ]
     },
@@ -2179,20 +2179,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "abd977466ea6502adbdf0bcd31c36d81a1b022915a84375693ba290d44d64b32",
+      "hash": "f70f024320d34d18e758d047c86d1a6623b99c9cf57286e613a84071f4acba83",
       "ukuran_kb": 131.7,
-      "ringkasan": "Menjawab: apa tanggung jawab employee-service sebagai master data karyawan dan sumber kebenaran autentikasi/onboarding (login, PIN, biometrik, registrasi), operasi admin akun oleh IT (aktif/nonaktif, forget device, reset akun), serta master departemen dan system role. Juga menjelaskan workspace yang di-host di service ini (Legal, R&D Regulatory, Quality, Procurement non-Accurate), KPI, kontrak, BPJS, kuota cuti, dukungan multi-perusahaan, akun pihak luar, resign, dan dependensinya dengan service lain.",
+      "ringkasan": "Menjawab: apa peran employee-service sebagai master data karyawan sekaligus sumber autentikasi SSO (login username/PIN/biometrik, registrasi, hash password), dan fitur apa saja yang ditanganinya (admin akun IT seperti reset dan forget-device, master departemen dan system role, KPI, kontrak, BPJS, kuota cuti, resign, multi-perusahaan). Juga menjelaskan modul register yang ikut di-host di service ini (Legal, R&D Regulatory, Quality, Procurement non-Accurate), catatan yang belum diimplementasikan, serta dependensi dan integrasinya dengan service lain.",
       "kata_kunci": [
-        "employee-service",
-        "master data karyawan",
+        "employee service",
+        "microservice karyawan",
         "autentikasi",
-        "authentication",
+        "SSO",
         "onboarding",
         "reset akun",
-        "forget device",
-        "master departemen",
-        "legal",
-        "quality"
+        "master data",
+        "multi-tenant",
+        "legal register",
+        "Quality CAPA"
       ]
     },
     {
@@ -2817,7 +2817,6 @@
         "Microservices - File Service",
         "HRIS - Psikotes Kraepelin",
         "Microservices - Employee Service",
-        "APP - MyBharata",
         "Microservices - Notification Service",
         "HRIS - Bank Soal dan Paket Psikotes",
         "HRIS - Recruitment Pipeline Redesign",
@@ -2833,20 +2832,20 @@
         "CORE - RBAC dan Permission Set",
         "ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen"
       ],
-      "hash": "561158c8ecb48601cb9e5920180980eac5bcfd93fab3c27d1d9ccb6f7677c8a9",
-      "ukuran_kb": 66.9,
-      "ringkasan": "Menjawab: bagaimana recruitment-service mengimplementasikan pipeline rekrutmen, dari requisition, lowongan, kandidat, babak seleksi dan hasil tes, psikotes online, offer, dan hire sampai onboarding checklist dan performance review onboarding, termasuk model data, SP-Wiring progress dan status, notifikasi, serta cara deploy. Juga menjelaskan increment penting seperti konversi kandidat ke karyawan, rekrutmen lintas perusahaan, gerbang can_approve offer, dan koreksi bahwa hire tidak mengaktifkan akun karyawan.",
+      "hash": "98072389174f51df231b7fb445e03710fc22449213eece7ae1a5edc152539bca",
+      "ukuran_kb": 63.6,
+      "ringkasan": "Menjawab: bagaimana recruitment-service mengimplementasikan siklus rekrutmen dari requisition, lowongan, kandidat, babak seleksi (interview, psikotes, technical test, background check), offer, sampai handoff jadi karyawan, termasuk model data `recruitment_db` dan cara hasil tes menggerakkan progress/status kandidat (SP-Wiring). Juga merekam riwayat increment (notifikasi email, apply publik, adopsi ERPGo, onboarding checklist, performance review, interview orchestration) dan rincian rekrutmen lintas perusahaan: turunan `company_id`, backfill, cache master perusahaan, pemindai sumber, serta catatan deploy manual.",
       "kata_kunci": [
         "recruitment-service",
         "rekrutmen",
-        "pipeline kandidat",
-        "SP-Wiring",
-        "psikotes Kraepelin",
+        "recruitment",
+        "ATS",
+        "babak seleksi",
+        "interview round",
+        "hasil tes",
+        "background check",
         "offer",
-        "hire",
-        "onboarding checklist",
-        "notifikasi PIC",
-        "lintas perusahaan"
+        "company_id"
       ]
     },
     {
@@ -3537,17 +3536,17 @@
         "Microservices - Notification Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "187fd6e92197c11cc53d458c81a9233e5eeaa2f3afa72b6e3ceac58335523ac8",
+      "hash": "f40fec0dc318eca9542cf4ad14ba6ab8f9f39f4e687b7caa769a07d68ec0c245",
       "ukuran_kb": 9.0,
-      "ringkasan": "Menjawab: apa usulan awal kontrak kerja elektronik lewat tanda tangan tersertifikasi (PSrE), e-KYC karyawan, e-Meterai Peruri via API, dan service baru `contract-service`, serta kenapa usulan itu digantikan ADR 0089 dan tak pernah diratifikasi. Juga menjelaskan selisih usulan dengan kode per 2026-09-11 (riwayat kontrak ternyata dibangun di employee-service, bukan service baru) dan kendala hukum TTE serta bea meterai yang membentuk usulannya.",
+      "ringkasan": "Menjawab: apa usulan awal kontrak kerja elektronik lewat `contract-service` baru dengan tanda tangan elektronik tersertifikasi (PSrE, e-KYC karyawan) dan e-Meterai Peruri via API penyedia berlisensi, beserta kendala hukum, alur pemicu, arsip, dan konsekuensinya. Juga menjelaskan kenapa usulan ini digantikan ADR 0089 (tanda tangan tidak tersertifikasi tatap muka didampingi HRD) dan membandingkan rancangannya dengan modul kontrak di employee-service (koleksi `employee_contract`, cron, lampiran PDF).",
       "kata_kunci": [
-        "ADR 0019",
         "kontrak kerja elektronik",
         "e-signing",
         "tanda tangan elektronik tersertifikasi",
         "TTE",
         "PSrE",
         "e-Meterai",
+        "Peruri",
         "e-KYC",
         "contract-service",
         "PKWT"
@@ -6185,7 +6184,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui pemilik proses 2026-09-11 lewat `/analisa-kebutuhan` dan **direvisi hari yang sama**: tanda tangan PIN jarak jauh di MyBharata diganti tanda tangan tatap muka didampingi HRD (§4, §6, §7). Kode tanda tangan belum ada. ⚠️ **§2 (pengingat): kode selesai di branch `feat/employee-pengingat-kontrak` 2026-09-11, belum merge dan belum deploy.** Keabsahan hukum menunggu konfirmasi legal.",
+      "status_teks": "**Diusulkan**, disetujui pemilik proses 2026-09-11 lewat `/analisa-kebutuhan` dan **direvisi hari yang sama**: tanda tangan PIN jarak jauh di MyBharata diganti tanda tangan tatap muka didampingi HRD (§4, §6, §7). Kode tanda tangan belum ada. ⚠️ **§2 (pengingat): merged 2026-09-11 (bip-erp PR #1851) dan naik di DEV; PROD ditahan sampai data kontrak prod diukur.** Keabsahan hukum menunggu konfirmasi legal.",
       "publik": true,
       "tautan": [
         "ADR - 0019 Kontrak Kerja Elektronik via Service Internal + Lapisan Tersertifikasi",
@@ -6195,26 +6194,27 @@
         "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
         "Microservices - File Service",
         "HRIS - Personalia",
+        "HRIS - Recruitment",
         "Microservices - Employee Service",
         "Microservices - Notification Service",
         "IT - Background Jobs & Schedulers",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus",
         "ADR - 0002 Database-per-Service"
       ],
-      "hash": "bef2d6c1912999da812b74d95922883b2983d874fb01074c341158a5350ec350",
-      "ukuran_kb": 17.1,
-      "ringkasan": "Menjawab: bagaimana kontrak PKWT direncanakan ditandatangani di sistem sendiri dengan tanda tangan elektronik tidak tersertifikasi secara tatap muka di kantor didampingi HRD, siapa Pihak Pertama (direktur yang ditetapkan per perusahaan), siapa yang membubuhkan e-Meterai (HR, di luar sistem), dan kenapa jalur PSrE/e-KYC dari ADR 0019 ditolak. Juga memuat keputusan memisahkan pengingat kontrak habis dari tanda tangan (kodenya masih di branch, belum merge), dasar hukum UU ITE dan PP 71/2019, lubang keamanan akun yang ditemukan, arsip terkunci, dan salinan kontrak untuk karyawan.",
+      "hash": "60d6a4f45b371d573b71dcb3897aca654a52b3702a2b58b30d3fa1526f399537",
+      "ukuran_kb": 17.9,
+      "ringkasan": "Menjawab: apa keputusan cara menandatangani kontrak PKWT di sistem sendiri dengan tanda tangan elektronik tidak tersertifikasi, tatap muka di kantor didampingi HRD (tanpa PSrE, e-KYC, PIN karyawan, maupun tanda tangan jarak jauh), siapa Pihak Pertama (direktur per perusahaan), dan kenapa e-Meterai dibubuhkan HR di luar sistem. Juga menjelaskan pengingat kontrak habis yang dipisah dari tanda tangan, dasar hukum UU ITE dan PP 71/2019, lubang keamanan akun yang ditemukan (PIN tanpa limiter, akun direktur dipakai bersama Sekretariat, kunci MinIO di bundel browser), arsip di prefix terkunci, salinan untuk karyawan, dan konsekuensinya.",
       "kata_kunci": [
-        "ADR 0089",
         "tanda tangan kontrak",
         "e-signature",
         "tanda tangan elektronik tidak tersertifikasi",
         "e-Meterai",
         "PKWT",
-        "HRD pendamping",
-        "Ruang Direktur",
         "pengingat kontrak habis",
-        "contract reminder"
+        "contract reminder",
+        "HRD",
+        "Ruang Direktur",
+        "ADR 0089"
       ]
     },
     {
@@ -8147,7 +8147,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "🟡",
-      "status_teks": "**Konsep / Direncanakan** untuk tanda tangan dan e-Meterai; belum ada di kode. ⚠️ **Pengingat kontrak habis: kode selesai di branch `feat/employee-pengingat-kontrak` (bip-erp, 2026-09-11), belum merge dan belum deploy** (§Pengingat Kontrak Habis). Pondasinya (riwayat kontrak + lampiran PDF) sudah ✅ live, diverifikasi ke `bip-erp` `origin/main` `915ca2f8` pada 2026-09-11; rinciannya di §Pondasi yang Sudah Ada.",
+      "status_teks": "**Konsep / Direncanakan** untuk tanda tangan dan e-Meterai; belum ada di kode. ⚠️ **Pengingat kontrak habis: merged 2026-09-11 (bip-erp PR #1851) dan naik di DEV; PROD belum**, sengaja ditahan sampai data kontrak prod diukur (§Pengingat Kontrak Habis). Pondasinya (riwayat kontrak + lampiran PDF) sudah ✅ live, diverifikasi ke `bip-erp` `origin/main` `915ca2f8` pada 2026-09-11; rinciannya di §Pondasi yang Sudah Ada.",
       "publik": true,
       "tautan": [
         "ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR",
@@ -8161,6 +8161,7 @@
         "Microservices - Calendar Service",
         "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
         "Microservices - HRD Document Service",
+        "HRIS - Recruitment",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus",
         "Microservices - Payroll Service",
         "HRIS - Organization Structure",
@@ -8169,14 +8170,13 @@
         "CORE - HRIS Orchestrator",
         "CORE - API Master Gateway",
         "HRIS - Personalia",
-        "HRIS - Recruitment",
         "HRIS - Compensation & Benefits",
         "IT - Background Jobs & Schedulers",
         "HRIS - Big Pictures"
       ],
-      "hash": "1a4b2472ac83d357f74afbd0bf167f25fd30939ec60e7a78e401500c94e02679",
-      "ukuran_kb": 30.2,
-      "ringkasan": "Menjawab: bagaimana rancangan digitalisasi kontrak PKWT/PKWTT bekerja (draft dari template berbasis data HRIS, tanda tangan tatap muka didampingi HRD, konfirmasi direktur dari Ruang Direktur, e-Meterai oleh HR, salinan ke karyawan), siapa persona yang terlibat, dan pondasi apa yang sudah ada di modul riwayat kontrak `employee_contract`. Juga memuat celah pondasi (nomor kontrak tak unik, lampiran bisa diganti, karyawan tak bisa membuka kontraknya sendiri), keamanan akun, landasan hukum, pemetaan field template PKWT ke sumber data, rancangan pengingat kontrak habis (kode di branch, belum merge), dan keputusan yang masih TBD.",
+      "hash": "f892b8122689517f18d1d1ae838702c9dfb05724cf2db66fbfe964bec5731adf",
+      "ukuran_kb": 34.6,
+      "ringkasan": "Menjawab: bagaimana alur kontrak kerja elektronik dirancang, dari template berbasis data HRIS, sesi tanda tangan tatap muka didampingi HRD, tanda tangan direktur massal, pembubuhan e-Meterai oleh HR, sampai salinan untuk karyawan (email atau \"Kontrak Saya\" di MyBharata), serta persona yang terlibat dan hak aksesnya. Juga menjelaskan pondasi modul kontrak di employee-service (`employee_contract`, nomor otomatis, lampiran PDF, status ongoing/ending/expired), celah yang harus ditutup (nomor tak unik, lampiran bisa diganti, karyawan tak punya akses ke kontraknya), cara kerja pengingat kontrak habis, pemetaan field template ke sumber data, landasan hukum, dan hal yang belum diputuskan seperti kapan calon karyawan menandatangani.",
       "kata_kunci": [
         "kontrak kerja elektronik",
         "e-signing",
@@ -8184,10 +8184,10 @@
         "PKWT",
         "PKWTT",
         "employee_contract",
-        "template kontrak",
-        "tanda tangan tatap muka",
         "pengingat kontrak habis",
-        "nomor kontrak"
+        "contract expiry reminder",
+        "template kontrak",
+        "Kontrak Saya"
       ]
     },
     {
@@ -8597,7 +8597,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Sebagian diimplementasikan — **pencatatan resign & penonaktifan akun ✅ live di produksi 2026-08-05**; **riwayat kontrak ✅** (koleksi `employee_contract`, halaman `/hris/contract`); **pengingat kontrak habis ⚠️ kode di branch, belum merge** (2026-09-11); sisa off-boarding (exit clearance) masih 🟡 konsep",
+      "status_teks": "Sebagian diimplementasikan — **pencatatan resign & penonaktifan akun ✅ live di produksi 2026-08-05**; **riwayat kontrak ✅** (koleksi `employee_contract`, halaman `/hris/contract`); **pengingat kontrak habis ⚠️ merged 2026-09-11, DEV ya, PROD belum**; sisa off-boarding (exit clearance) masih 🟡 konsep",
       "publik": true,
       "tautan": [
         "HRIS - Analysis",
@@ -8612,20 +8612,20 @@
         "Microservices - Notification Service",
         "HRIS - Big Pictures"
       ],
-      "hash": "58d8e90b0176d610b8f57ac1fcc5bf609d4bc69a262aac981959c9effe984455",
-      "ukuran_kb": 4.8,
-      "ringkasan": "Menjawab: data administratif karyawan apa saja yang dikelola personalia (data personal, kontrak PKWT, BPJS, riwayat masa kerja), bagaimana urutan off-boarding/exit clearance (feedback, pengembalian inventaris, NDA, paklaring), dan bagaimana HR mencatat resign sekaligus menonaktifkan akun karyawan. Juga menjelaskan kebutuhan notifikasi sebelum kontrak habis beserta rancangan pengingatnya (kode di branch, belum merge), serta integrasi dengan employee-service, notification-service, dan inventaris GA.",
+      "hash": "0de33327353c71fd294faa77c6f9503dc7096d0e1882821f587b987d25d0b22c",
+      "ukuran_kb": 4.6,
+      "ringkasan": "Menjawab: apa saja lingkup administrasi kepegawaian (data personal, kontrak PKWT, BPJS, dokumen, riwayat masa kerja) dan bagaimana urutan off-boarding atau exit clearance (feedback, pengembalian inventaris ke GA, NDA, paklaring). Juga menjelaskan cara HR mencatat resign atau non-aktif karyawan yang sekaligus mematikan akun (kategori, tanggal efektif, perbaikan, pembatalan) serta kebutuhan notifikasi sebelum kontrak habis yang dijawab pengingat kontrak.",
       "kata_kunci": [
         "personalia",
         "administrasi kepegawaian",
-        "kontrak PKWT",
-        "BPJS",
+        "personnel administration",
         "off-boarding",
         "exit clearance",
         "resign",
         "non-aktif karyawan",
         "paklaring",
-        "pengingat kontrak"
+        "PKWT",
+        "BPJS"
       ]
     },
     {
@@ -8787,7 +8787,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. 🟡 **Rekrutmen lintas perusahaan: kode lengkap di branch, BELUM merge maupun deploy** (diukur 2026-09-11, lihat bagian \"Rekrutmen Lintas Perusahaan\" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian \"Alur Kerja HR\" di bawah)",
+      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. 🟡 **Rekrutmen lintas perusahaan: kode lengkap di branch, BELUM merge maupun deploy** (diukur 2026-09-11, lihat bagian \"Rekrutmen Lintas Perusahaan\" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]])",
       "publik": true,
       "tautan": [
         "HRIS - Analysis",
@@ -8798,7 +8798,6 @@
         "Microservices - Employee Service",
         "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode",
         "HRIS - Bank Soal dan Paket Psikotes",
-        "APP - MyBharata",
         "Microservices - File Service",
         "CORE - OCR Document Service",
         "Sales - Veo (Gemini) Implementation",
@@ -8817,20 +8816,20 @@
         "HRIS - Big Pictures",
         "HRIS - Recruitment Roadmap (Adopsi ERPGo)"
       ],
-      "hash": "6595f7f2e44d5948be58c9329f363e158b9660396d587a732ae4a1797885c309",
-      "ukuran_kb": 46.4,
-      "ringkasan": "Menjawab: bagaimana alur rekrutmen HRD dirancang dan berjalan dari permintaan karyawan, lowongan, screening, interview, psikotes, dan offer sampai hire dan masa evaluasi, siapa aktor dan persona yang terlibat, serta keputusan HRD yang sudah diambil dan pertanyaan yang masih terbuka. Juga menjelaskan alur kerja HR terbaru (titik putus dibuka, kotak Langkah berikutnya, tugas PIC di MyBharata) dan rekrutmen lintas perusahaan lewat paket izin.",
+      "hash": "dac3166c90e947f2223a9b70eb80867e8a4fc55523d87c06579e8d360eeb4c54",
+      "ukuran_kb": 39.2,
+      "ringkasan": "Menjawab: bagaimana alur rekrutmen end-to-end dirancang, dari Form Permintaan Karyawan, sourcing (Glints/TapLoker), screening manual, interview multi-tahap, psikotes dan technical test, offer, hire jadi karyawan, sampai masa evaluasi dan performance review onboarding. Juga menjelaskan aktor dan role, model data, keputusan yang sudah disepakati HRD dan pertanyaan yang masih terbuka, rollout bertahap, serta persona dan alur pengguna rekrutmen lintas perusahaan.",
       "kata_kunci": [
         "rekrutmen",
         "recruitment",
-        "job requisition",
+        "talent acquisition",
         "permintaan karyawan",
-        "kandidat",
+        "job requisition",
+        "screening",
+        "interview",
         "psikotes",
-        "offer",
-        "hire karyawan",
-        "Langkah berikutnya",
-        "lintas perusahaan"
+        "onboarding",
+        "Glints"
       ]
     },
     {
@@ -9042,7 +9041,7 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented — 47 job terjadwal + 1 dispatcher webhook (+1 pengingat kontrak habis employee 07:00 WIB 2026-09-11, **belum merge**) (+1 job background PERTAMA manufacture 2026-08-20, sweep konfirmasi retur macet, **DORMANT** — lihat tabel) (+1 penjadwal internal marketing-analytics 2026-08-01, **LIVE** — service itu sebelumnya tanpa scheduler sama sekali; per audit kode 2026-08-01: +19 job integration yang sebelumnya belum tercatat — rumpun Accurate (stock/aset/opex refresh, sweep faktur/retur/receipt, receipt-sync, sample-shipping-expense, anomali retur), rekonsiliasi (statement TikTok, income Lazada, status order, retur TikTok), resi (enrich cancel/reverse, safety-net WMS), wallet-sync, seed-mapping, guardian stale-toship; +4 job integration ditambahkan 2026-07-11: affiliate Shopee AMS performance/conversion & WMS resi bridge `sync-resi-wms`/`sync-shopee-tracking`; +1 guardian order Shopee `sync-shopee-orders` 2026-07-14, **belum deploy**; +1 guardian retur Shopee `sync-shopee-returns` 2026-07-15 & +1 guardian retur TikTok `recover-tiktok-returns` 2026-07-16 — memicu booking Retur Penjualan yang selama ini tak pernah menyala, **belum deploy**; +1 sync ulasan marketplace `sync-reviews` 2026-07-19 harian 06:45, **LIVE**; +3 job Packet Tracking `sync-tracking`/`detect-stuck`/`sync-return-tracking` 2026-07-17..18 — checkpoint pengiriman forward+retur & deteksi mandek, **LIVE**). *3 job reminder attendance (koreksi/leave/tukar jadwal) + auto-ignore koreksi & tukar jadwal + pre-alokasi sadar-swap dari **PR #165** — belum rilis ke prod.*",
+      "status_teks": "Implemented — 47 job terjadwal + 1 dispatcher webhook (+1 pengingat kontrak habis employee 07:00 WIB, merged 2026-09-11, DEV ya, **PROD belum**) (+1 job background PERTAMA manufacture 2026-08-20, sweep konfirmasi retur macet, **DORMANT** — lihat tabel) (+1 penjadwal internal marketing-analytics 2026-08-01, **LIVE** — service itu sebelumnya tanpa scheduler sama sekali; per audit kode 2026-08-01: +19 job integration yang sebelumnya belum tercatat — rumpun Accurate (stock/aset/opex refresh, sweep faktur/retur/receipt, receipt-sync, sample-shipping-expense, anomali retur), rekonsiliasi (statement TikTok, income Lazada, status order, retur TikTok), resi (enrich cancel/reverse, safety-net WMS), wallet-sync, seed-mapping, guardian stale-toship; +4 job integration ditambahkan 2026-07-11: affiliate Shopee AMS performance/conversion & WMS resi bridge `sync-resi-wms`/`sync-shopee-tracking`; +1 guardian order Shopee `sync-shopee-orders` 2026-07-14, **belum deploy**; +1 guardian retur Shopee `sync-shopee-returns` 2026-07-15 & +1 guardian retur TikTok `recover-tiktok-returns` 2026-07-16 — memicu booking Retur Penjualan yang selama ini tak pernah menyala, **belum deploy**; +1 sync ulasan marketplace `sync-reviews` 2026-07-19 harian 06:45, **LIVE**; +3 job Packet Tracking `sync-tracking`/`detect-stuck`/`sync-return-tracking` 2026-07-17..18 — checkpoint pengiriman forward+retur & deteksi mandek, **LIVE**). *3 job reminder attendance (koreksi/leave/tukar jadwal) + auto-ignore koreksi & tukar jadwal + pre-alokasi sadar-swap dari **PR #165** — belum rilis ke prod.*",
       "publik": false,
       "tautan": [
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
@@ -9067,20 +9066,20 @@
         "External - Accurate",
         "External - Accurate Webhook"
       ],
-      "hash": "e8323b2cb2c6380079e5f80be4150324551688ac301cb458fe813eadadf45062",
+      "hash": "922fda50fc96b91750d75df8e3f7fda39887f28fb1d194a78b9d7354998a8d5b",
       "ukuran_kb": 34.7,
-      "ringkasan": "Menjawab: cron, scheduler, dan worker latar belakang apa saja yang berjalan di bip-erp, di service mana, jam berapa (WIB), untuk apa, memakai lock apa, dan di file mana didefinisikan. Berguna saat debugging job yang diam-diam jalan atau tidak jalan (mis. finalisasi skor KPI, reset kuota cuti, pre-alokasi absensi, sync order marketplace, penjadwal marketing-analytics, sweep retur manufacture), termasuk job pengingat kontrak habis yang masih di branch belum merge, poller in-process, service tanpa job, dan risiko operasionalnya.",
+      "ringkasan": "Menjawab: cron, scheduler, dan worker latar belakang apa saja yang berjalan di bip-erp, di service mana, jadwalnya jam berapa (WIB), untuk apa, dan memakai lock apa. Berguna saat menelusuri proses tersembunyi seperti finalisasi skor KPI, reset kuota cuti, pengingat kontrak habis, pre-alokasi dan reminder absensi, hitung insentif, sync order dan retur marketplace (TikTok, Shopee), serta sweep konfirmasi retur manufacture. Juga mencatat beda sintaks cron 5-field dan 6-field, dispatcher webhook, poller goroutine, service tanpa job background, dan risiko operasionalnya.",
       "kata_kunci": [
         "background job",
         "cron",
         "scheduler",
+        "penjadwal",
         "worker",
         "robfig/cron",
         "job terjadwal",
-        "Redis lock",
+        "lock Redis",
         "webhook dispatcher",
-        "penjadwal",
-        "WIB"
+        "sync marketplace"
       ]
     },
     {
@@ -13514,20 +13513,20 @@
         "ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR",
         "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)"
       ],
-      "hash": "d7a78c4844296177525d9c816b971026475ff8bb02cec6dc3a07a5b991b195d6",
-      "ukuran_kb": 9.6,
-      "ringkasan": "Menjawab: task apa saja yang diturunkan dari kebutuhan tanda tangan kontrak kerja dan pengingat kontrak habis, bagaimana urutan gelombangnya, dan apa prasyarat tiap task (pengingat T1 yang kodenya di branch belum merge, uji PDF bermeterai S1, nomor kontrak unik, template PKWT, arsip MinIO terkunci, sesi tanda tangan tatap muka, Kontrak Saya di MyBharata, antrean Ruang Direktur). Juga memuat jebakan yang menggagalkan rancangan naif, task keamanan akun terpisah (limiter PIN, jejak reset akun, password awal acak), keputusan yang masih TBD, dan titik mulai pengerjaan.",
+      "hash": "bb8d6d287b066c8bcc629cfa3bcfaadfe1db97466e9a76ffcc68df062e0ff5cd",
+      "ukuran_kb": 12.1,
+      "ringkasan": "Menjawab: masalah apa yang sebenarnya ada di balik permintaan tanda tangan dan meterai digital untuk kontrak PKWT (biaya kertas vs kontrak habis tak terpantau), keputusan pemilik proses yang mengikat, dan jebakan yang menggagalkan rancangan naif (SetaraDirektur, kunci MinIO, urutan meterai, `ReplaceOne`, calon karyawan tanpa NIK). Juga memuat urutan task per gelombang (T1 pengingat kontrak habis beserta turunan T13 sampai T16, uji PDF bermeterai S1, nomor kontrak unik, template PKWT, prefix arsip, alur tanda tangan backend, layar), task keamanan akun yang terpisah, hal yang belum diputuskan, dan titik mulai pengerjaan.",
       "kata_kunci": [
         "analisa kebutuhan",
-        "daftar task",
         "tanda tangan kontrak",
-        "pengingat kontrak habis",
+        "e-signature",
         "e-Meterai",
+        "pengingat kontrak habis",
+        "contract reminder",
         "PKWT",
-        "Kontrak Saya",
-        "MyBharata",
-        "keamanan akun",
-        "roadmap"
+        "task breakdown",
+        "uji PDF bermeterai",
+        "gelombang kerja"
       ]
     },
     {

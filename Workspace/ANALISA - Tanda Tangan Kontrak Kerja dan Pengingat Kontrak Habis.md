@@ -2,7 +2,7 @@
 
 Daftar task hasil `/analisa-kebutuhan` 2026-09-11, direvisi hari yang sama. Keputusan arsitekturalnya di [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]]; cara kerja domainnya di [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]].
 
-**Dibuat**: 2026-09-11 · **Status**: T1 kode selesai dan lolos `/review` di branch `feat/employee-pengingat-kontrak` (bip-erp), menunggu PR, merge, dan verifikasi dev. Rilis tanda tangan (Gelombang 2-3) menunggu N1 (konfirmasi legal) dan S1 (uji PDF bermeterai).
+**Dibuat**: 2026-09-11 · **Status**: T1 merged (bip-erp PR #1851) dan naik di DEV 2026-09-11; verifikasi fungsional DEV lewat jalan cron 07:00 WIB; PROD ditahan sampai data kontrak prod diukur (N3). Rilis tanda tangan (Gelombang 2-3) menunggu N1 (konfirmasi legal) dan S1 (uji PDF bermeterai).
 
 ---
 
@@ -19,14 +19,18 @@ Keputusan pemilik proses yang mengikat:
 - kontrak karyawan baru dikirim lewat email; karyawan aktif membuka salinannya di MyBharata;
 - e-Meterai dibubuhkan HR di luar sistem;
 - Pihak Pertama = direktur, dengan akun bersama Sekretariat diterima apa adanya;
-- pengingat memakai kategori `reminder`, ringkasan harian ke supervisor HR, atasan H-14 kalender, kedaluwarsa mingguan.
+- pengingat memakai kategori `reminder`, ringkasan harian ke supervisor HR, atasan H-14 kalender, kedaluwarsa mingguan;
+- verifikasi DEV pengingat lewat jalan cron 07:00 WIB, dan deploy PROD pengingat ditahan sampai data prod diukur (2026-09-11).
 
 ⛔ **Jebakan yang menggagalkan rancangan naif** (dicek ke `origin/main` 2026-09-11, rinciannya di dok domain):
 - `common.SetaraDirektur` meloloskan Corporate Secretary. Jangan dipakai sebagai gerbang Pihak Pertama.
 - Lampiran kontrak sekarang di prefix `employee/`, yang kunci bacanya ada di bundel browser.
 - Menempel goresan ke PDF yang sudah bermeterai bisa merusak e-Meterai dan sidik jarinya. Urutan ditentukan S1.
-- Status kontrak punya dua aturan batas hari (`klasifikasiKontrak` vs `statusKontrak`), dan tanggal disimpan sebagai tengah malam WIB. Hitung dalam tanggal WIB; T1 menyatukan keduanya (di branch, belum merge).
+- Status kontrak dulu punya dua aturan batas hari (`klasifikasiKontrak` vs `statusKontrak`), dan tanggal disimpan sebagai tengah malam WIB. Disatukan dalam tanggal WIB oleh T1 (PR #1851).
 - `PATCH /contract/:id` memakai `ReplaceOne`: field yang tidak ada di struct ikut terhapus. Status tanda tangan wajib masuk struct, catatan di koleksi sendiri.
+- Data kandidat tidak punya NIK, sedangkan record kontrak, pencocokan NIK, dan salinan email bertumpu pada data karyawan. Usulan: calon karyawan menandatangani sesudah dibuatkan data karyawan (dok domain §Calon karyawan dan karyawan aktif).
+- Akun karyawan baru langsung aktif saat dibuat (`services/employee/func.go:188-190`): calon karyawan yang sudah dibuatkan data ikut terhitung karyawan aktif sebelum menandatangani.
+- Kontrak hasil migrasi yang tak pernah diperbarui mendominasi data: DEV 2026-09-11, 110 dari 172 karyawan aktif kedaluwarsa, semuanya `migrated`.
 
 ---
 
@@ -38,7 +42,7 @@ Nomor dalam kurung = prasyarat. Tiap item cukup jelas untuk langsung dilempar ke
 
 **T1. Pengingat kontrak habis.** Rencana disetujui: `.task-plans/2026-09-11-pengingat-kontrak-habis.md` (branch `feat/employee-pengingat-kontrak`). Cron harian 07:00 WIB di employee-service; ringkasan harian ke supervisor HR (masuk "segera berakhir", H-30, H-7, kedaluwarsa mingguan); atasan H-14 kalender; kategori `reminder`; menyatukan aturan status kontrak dalam tanggal WIB; catatan terkirim per (kontrak, tahap, penerima).
 *Prasyarat: tidak ada.* Deploy: employee-service saja.
-*Status 2026-09-11*: kode selesai dan lolos `/review`. Sisa: `/wrap` (PR), merge, verifikasi dev dengan `PENGINGAT_KONTRAK_SAAT_BOOT=true` (langkahnya di artefak rencana §Cara Verifikasi), lalu deploy prod oleh manusia.
+*Status 2026-09-11*: merged (PR #1851). Pipeline dev melewatkannya, jadi dideploy manual ke DEV 22:01 WIB (gerbang biner lolos; `GET /api/employee/contract` lewat gateway sudah menunjukkan aturan tanggal WIB). Sisa: baca hasil jalan cron 07:00 WIB (log, inbox, `employee_contract_pengingat`), cek dedupe dengan satu recreate ber-env di jam kerja, ukur PROD (N3) dan putuskan soal kontrak kedaluwarsa migrasi, lalu deploy PROD oleh manusia.
 
 **T13. Tautan dari pesan pengingat ke halaman Kontrak.** Pesan T1 tanpa rute, karena halaman `/hris/contract` tidak membaca query string dan belum ada pemetaan rute inbox ke sana. Butuh pemetaan tautan inbox dan halaman yang membuka karyawan dari `?employee=` (sejalan dengan T11).
 *Prasyarat: T1.*
@@ -48,6 +52,9 @@ Nomor dalam kurung = prasyarat. Tiap item cukup jelas untuk langsung dilempar ke
 
 **T15. Filter `ending_month` di `GET /contract` dalam tanggal WIB.** Bulan masih dibaca dari `contract_ending` dalam UTC, jadi kontrak yang tersimpan tengah malam WIB tanggal 1 masuk ke bulan sebelumnya. Perbaikannya mengubah hasil filter yang terlihat HR.
 *Prasyarat: T1 (memakai `tanggalWIB` yang sama).*
+
+**T16. Pesan atasan H-14 untuk kontrak `PKWT (Evaluasi)`.** Karyawan masa evaluasi sudah dinilai lewat Performance Review Onboarding di Recruitment, jadi pesan atasan dari T1 menjadi saluran penilaian kedua. Putuskan: lewati jenis ini, arahkan pesannya ke review itu, atau biarkan.
+*Prasyarat: T1; butuh keputusan pemilik proses.*
 
 ### Prasyarat tanda tangan
 
@@ -59,10 +66,10 @@ Nomor dalam kurung = prasyarat. Tiap item cukup jelas untuk langsung dilempar ke
 **T5. Nomor kontrak unik + format HR.** Konfirmasi format ke HR (`…/HRD/PKWT/…/…`), urut per perusahaan dan periode, index unik pada nomor. Tentukan perlakuan nomor kontrak lama.
 *Prasyarat: tidak ada.*
 
-**T6. Data penandatangan per perusahaan + field tempat lahir.** Nama, jabatan, dan alamat direktur per perusahaan (bukan `SetaraDirektur`), plus tempat lahir di `personal_data` beserta form pengisiannya.
+**T6. Data penandatangan per perusahaan + field tempat lahir.** Nama, jabatan, dan alamat direktur per perusahaan (bukan `SetaraDirektur`), plus tempat lahir di `personal_data` beserta form pengisiannya. Tempat lahir calon karyawan sudah ada di data kandidat (`tempat_lahir`), jadi bisa terisi saat Tambah Karyawan dari kandidat.
 *Prasyarat: tidak ada.*
 
-**T7. Template PKWT + generator PDF draft + lembar bukti.** Isi dari `personal_data`, `work_data`, `employee_contract`, `employee_salary` (Lampiran 1, dengan pemetaan komponen ke kolom); versi template dicatat per kontrak; kotak tanda tangan mengikuti hasil S1. Periksa font untuk karakter di luar ASCII (preseden slip gaji hanya font inti).
+**T7. Template PKWT + generator PDF draft + lembar bukti.** Isi dari `personal_data`, `work_data`, `employee_contract`, `employee_salary` (Lampiran 1, dengan pemetaan komponen ke kolom); versi template dicatat per kontrak; kotak tanda tangan mengikuti hasil S1. Periksa font untuk karakter di luar ASCII (preseden slip gaji hanya font inti). Untuk calon karyawan, gaji di offer hanya satu angka (`gaji_evaluasi`/`gaji_kontrak`): putuskan sumber rincian komponennya (payroll diisi dulu, atau offer diperluas).
 *Prasyarat: T5, T6, S1.*
 
 **T8. Prefix arsip MinIO + kunci lampiran.** Prefix baru tanpa kunci baca di browser (pola `audit/`), dibaca lewat proxy employee-service; lampiran yang sudah dikunci tidak bisa diganti atau dihapus.
@@ -78,6 +85,13 @@ Nomor dalam kurung = prasyarat. Tiap item cukup jelas untuk langsung dilempar ke
 - batal.
 
 Lembar bukti PDF terpisah; salinan email lewat `POST /email/send` untuk karyawan baru.
+
+Tambahan dari telaah 2026-09-11:
+- kontrak pertama (dari create-employee) maupun perpanjangan lahir berstatus menunggu tanda tangan, bukan langsung berlaku;
+- sesuaikan pengingat T1: kontrak lama tetap diingatkan sampai kontrak baru `SELESAI`, atau ada pengingat terpisah untuk tanda tangan yang tertunda;
+- sediakan jalan membatalkan calon karyawan yang batal datang atau menolak menandatangani (akunnya sudah aktif sejak dibuat);
+- penolakan NIK di sesi menautkan ke layar perbaikan data karyawan.
+
 *Prasyarat: T7, T8, S1.*
 
 ### Gelombang 3: layar
@@ -106,7 +120,7 @@ Tanda tangan tidak memakai akun maupun PIN karyawan, jadi task ini tidak menahan
 
 **N2. SOP HR**: akun enterprise di distributor resmi e-Meterai, jenis kontrak yang dimeteraikan, jumlah meterai per kontrak, pencatatan biaya ke finance; SOP sesi tatap muka (pencocokan KTP, penolakan di tempat).
 
-**N3. Ukur data prod**: jalankan `.task-plans/cek-kontrak-esign-prod.ps1` (volume kontrak per bulan, kontrak kedaluwarsa pada karyawan aktif). Hasilnya menentukan beban HRD dan direktur, dan panjang ringkasan pengingat pertama T1 di prod.
+**N3. Ukur data prod**: jalankan `.task-plans/cek-kontrak-esign-prod.ps1` (volume kontrak per bulan, kontrak kedaluwarsa pada karyawan aktif, dan sebaran tahap pengingat: migrasi vs bukan, umur lewat, jendela H-14 tanpa `supervisor_id`, supervisor HR aktif per perusahaan). Hasilnya menentukan beban HRD dan direktur, dan apakah deploy PROD T1 perlu data dirapikan atau aturan diubah dulu. Temuan DEV 2026-09-11 sebagai pembanding: 110 dari 172 karyawan aktif kedaluwarsa, semuanya migrasi.
 
 ---
 
@@ -115,14 +129,17 @@ Tanda tangan tidak memakai akun maupun PIN karyawan, jadi task ini tidak menahan
 Rinciannya di dok domain §Belum Diputuskan. Yang menahan task tertentu:
 - Format nomor kontrak → T5.
 - Letak data penandatangan per perusahaan → T6.
-- Lokasi kerja dan jam kerja di template, pemetaan komponen gaji Lampiran 1 → T7.
+- Lokasi kerja dan jam kerja di template, pemetaan komponen gaji Lampiran 1, rincian gaji calon karyawan dari offer → T7.
 - Hasil S1 (urutan A/B) → T7, T9.
 - Draf lewat email sebelum datang, bentuk penolakan di tempat → T9.
+- Calon karyawan menandatangani sesudah dibuatkan data karyawan (usulan), jalan membatalkan calon yang batal atau menolak, kontrak belum ditandatangani terhadap pengingat → T9.
 - Retensi arsip → T8.
 - Bentuk hasil penilaian kinerja atasan → T14.
+- Pesan atasan untuk `PKWT (Evaluasi)` → T16.
+- Kontrak kedaluwarsa hasil migrasi: rapikan data atau ubah aturan → T1, sesudah N3.
 
 ---
 
 ## 3. Mulai dari mana
 
-T1 menunggu PR, merge, dan verifikasi dev. Paralel dengannya: S1 (minta HR memeteraikan satu PDF contoh), T5, T6, T8, T15, dan K1-K4.
+T1: baca hasil jalan cron 07:00 di DEV, ukur PROD (N3), putuskan soal kontrak kedaluwarsa migrasi, lalu deploy PROD. Paralel dengannya: S1 (minta HR memeteraikan satu PDF contoh), T5, T6, T8, T15, T16, dan K1-K4.
