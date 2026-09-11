@@ -44,7 +44,7 @@ Berlaku untuk `conversion_rate`, `add_to_cart_rate`, dan `avg_viewing_duration`,
 add_to_cart_rate = Σ add_to_cart (semua channel) ÷ Σ product_clicks (semua channel) × 100
 ```
 
-**Bukan** rata-rata dari rasio per channel, dengan alasan yang sama yang melarangnya antar periode. Template KPI memuat satu metrik dengan satu bobot dan satu target, bukan satu metrik per channel.
+**Bukan** rata-rata dari rasio per channel, dengan alasan yang sama yang melarangnya antar periode. Di dalam penjumlahan itu tiap pecahan **berpasangan** sejak branch `fix/marketing-analytics-rasio-live-berpasangan` (2026-09-11, belum merged): pembilang dan penyebut hanya dijumlah dari sesi yang kedua sisinya terukur, jadi `add_to_cart` dan klik penyebutnya sama-sama dari sesi yang klik dan keranjangnya terukur. Aturan Σ pembilang ÷ Σ penyebut tidak berubah; yang berubah himpunan sesi yang boleh menyumbang ke tiap pecahan. Rumus lengkap: [[Microservices - Marketing Analytics Service]] § KPI Host Live. Template KPI memuat satu metrik dengan satu bobot dan satu target, bukan satu metrik per channel.
 
 ### 2. Penyebutnya tetap klik produk, bukan penonton atau impresi
 

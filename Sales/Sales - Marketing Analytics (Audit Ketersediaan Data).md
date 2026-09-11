@@ -180,12 +180,12 @@ Service kita punya lebih dari prototipe: `/profit/products`, `/profit/items`, dr
 | Metrik prototipe | Label | Keterangan |
 |---|---|---|
 | Viewers · Avg watch · Klik produk · Order · GMV | ADA | |
-| Durasi · GMV/jam · Rev/1000 viewers | RAKIT | `start_time`/`end_time` ada |
+| Durasi · GMV/jam · Rev/1000 viewers | RAKIT | `start_time`/`end_time` ada. Durasi dan GMV/jam studio dirakit di `/lives/analisis` (branch 2026-09-11, belum merged): GMV per jam berpasangan dengan jam sesi yang sudah selesai. Rev/1000 viewers belum dirakit |
 | **Peak concurrent** | TIDAK ADA | **Sengaja**: endpoint list `shop_lives` tidak menyediakannya (`entity.go:34`) |
 | Host | ADA | `username` |
 | Studio | TIDAK ADA | Data operasional, bukan data platform |
 | Laba per sesi | TIDAK ADA | Sebab sama dengan video |
-| Heatmap jam × hari | RAKIT | `start_time` + GMV sudah ada |
+| Heatmap jam × hari | RAKIT | `start_time` + GMV sudah ada. Dirakit di `/lives/analisis` (branch 2026-09-11, belum merged): peta hari × jam WIB akun studio, GMV per sel **perkiraan** prorata waktu karena API tak memberi dimensi waktu di dalam sesi |
 
 Bonus di service yang tak ada di prototipe: `items_sold`, `customers`, `new_followers`.
 

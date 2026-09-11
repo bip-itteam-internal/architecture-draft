@@ -562,8 +562,8 @@
       "judul": "API - Marketing Analytics Service",
       "area": "API Reference",
       "jenis": "api",
-      "status_emoji": "✅",
-      "status_teks": "Grounded ke kode (2026-08-30), **keempat-puluh-dua route punya baris di dok ini**. Route ke-42 `GET /live-shifts/akun` (`live_shift_akun.go`) ditambahkan ke dok ini 2026-08-30; ia sudah ada di `origin/main` tetapi terlewat dari audit 2026-08-27, sehingga dok ini dan [[Microservices - Marketing Analytics Service]] sempat sama-sama menulis \"lima route\" untuk keluarga `/live-shifts` yang sebenarnya enam. Route ke-41 `/kpi/kinerja-live` masuk lewat PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486) (merged 2026-08-27); **status deploy belum diverifikasi — merged bukan deployed**. Sebelumnya 12 route tak terdokumentasi sama sekali; daftarnya + cara audit ulangnya ada di bagian **Cara mengaudit kelengkapan daftar ini** di kaki dokumen. ⚠️ **`GET /divisi` pindah sumber ke `department_shops` 2026-08-29** (fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]], PR [#1520](https://github.com/bip-itteam-internal/bip-erp/pull/1520) & [#1522](https://github.com/bip-itteam-internal/bip-erp/pull/1522)) — jumlah route tetap 41, tapi maknanya berubah; lihat baris `/divisi` di bawah. **Merged, belum di-deploy/diverifikasi lewat gateway.**",
+      "status_emoji": "⚠️",
+      "status_teks": "Grounded ke kode (2026-08-30: **keempat-puluh-dua route punya baris di dok ini**). ⚠️ **Enumerasi ulang 2026-09-11**: `origin/main` kini **45 route**, dan `GET /icc/sla-chat` serta `GET /kpi/sla-chat-cs` (`routes.go`) belum punya baris di dok ini (di luar lingkup sync Analisis Live, perlu sync tersendiri). Branch Analisis Live menambah `GET /lives/analisis` dan `GET /live-shifts/performa` (**47** bila merged); keduanya sudah punya baris di bawah. Route ke-42 `GET /live-shifts/akun` (`live_shift_akun.go`) ditambahkan ke dok ini 2026-08-30; ia sudah ada di `origin/main` tetapi terlewat dari audit 2026-08-27, sehingga dok ini dan [[Microservices - Marketing Analytics Service]] sempat sama-sama menulis \"lima route\" untuk keluarga `/live-shifts` yang sebenarnya enam. Route ke-41 `/kpi/kinerja-live` masuk lewat PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486) (merged 2026-08-27); **status deploy belum diverifikasi — merged bukan deployed**. Sebelumnya 12 route tak terdokumentasi sama sekali; daftarnya + cara audit ulangnya ada di bagian **Cara mengaudit kelengkapan daftar ini** di kaki dokumen. ⚠️ **`GET /divisi` pindah sumber ke `department_shops` 2026-08-29** (fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]], PR [#1520](https://github.com/bip-itteam-internal/bip-erp/pull/1520) & [#1522](https://github.com/bip-itteam-internal/bip-erp/pull/1522)) — jumlah route tetap 41, tapi maknanya berubah; lihat baris `/divisi` di bawah. **Merged, belum di-deploy/diverifikasi lewat gateway.**",
       "publik": true,
       "tautan": [
         "Microservices - Marketing Analytics Service",
@@ -575,20 +575,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "ba152d9613bd1f55c01304454dcd8a4fb0576f9d0eaa5092f920d3ff7971f069",
-      "ukuran_kb": 39.6,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki marketing-analytics lewat `/api/marketing-analytics/*`, parameter dan konvensi respons-nya (`unavailable_channels`, `kolom_tidak_berlaku`, paginasi drill, 400 untuk enum tak dikenal), serta endpoint mana yang digerbang `RequireMarketingLeader`. Mencakup beranda vonis laba dan ambang keputusan (ROAS/CPA), pagu belanja iklan dan kurva alokasi, laba per toko/produk/item, video & live, pencatatan sesi live host (`/live-shifts`), retur, price floor, job penjadwal, dan pengumpul KPI. Juga menjelaskan cara mengaudit kelengkapan daftar route terhadap kode.",
+      "hash": "71526f9f8b9e5682b388108b8bc07039ca8bd76cb9989a3314d6765bfb6b7ad5",
+      "ukuran_kb": 44.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda, ambang, pagu, kurva alokasi, laba per toko/produk/kampanye, video, live, live-shifts, retur, price floor, job, pengumpul KPI) beserta parameter, gerbang role, dan kode galatnya. Juga menjelaskan konvensi respons (`unavailable_channels`, `kolom_tidak_berlaku`, paginasi drill, batas hari WIB), lima nilai vonis laba, arti nilai null, larangan menjumlahkan blok `pembatalan`, serta cara mengaudit ulang kelengkapan daftar route terhadap kode.",
       "kata_kunci": [
         "marketing analytics API",
-        "laba toko",
-        "profit",
-        "ROAS",
-        "ambang keputusan",
-        "pagu iklan",
+        "endpoint",
         "beranda",
+        "ambang ROAS",
+        "pagu iklan",
+        "kurva alokasi",
+        "profit per toko",
         "live-shifts",
-        "sesi live host",
-        "price floor"
+        "price floor",
+        "vonis laba"
       ]
     },
     {
@@ -1432,6 +1432,8 @@
         "ADR - 0052 Status Sinkron per Toko",
         "Microservices - Marketing Analytics Service",
         "API - Marketing Analytics Service",
+        "REF - Layout Dashboard erp-frontend",
+        "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
         "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
         "API - Manufacture Service",
         "API - Procurement Service",
@@ -1446,22 +1448,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "0f1edf8dffe429fd979252ef275653e76222199756fe12ab03ee694f48bddd17",
-      "ukuran_kb": 404.0,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (`erp-frontend`, Next.js App Router), bagaimana autentikasi, cookie `system_roles`, dan peran SSO identity provider bekerja, serta bagaimana sidebar dan menu digerbang per modul/role (termasuk Pengaturan HRGA terpusat, multi-perusahaan, dan kategori audit yang lahir dari paket izin). Juga menjawab konvensi frontend yang wajib diikuti: data-fetching TanStack Query (hook sidebar ber-`enabled`, badge pakai refetchOnWindowFocus) dan bagan Recharts lewat `ChartContainer`.",
+      "hash": "b2c009de777dc48f047c955392b32834f957c7af7d81217064c7450fe2eee844",
+      "ukuran_kb": 406.9,
+      "ringkasan": "Menjawab: apa itu portal web ERP `erp-frontend` (One Bharata), stack yang dipakai, cara login dan SSO Identity Provider bekerja, serta bagaimana cookie `system_roles` menggerbang sidebar dan menu per modul. Juga menjelaskan pengelompokan menu HRIS, halaman Pengaturan HRGA terpusat dengan penyaringan per tab, dukungan multi-perusahaan, konvensi data-fetching TanStack Query, dan konvensi bagan Recharts dengan `ChartContainer`.",
       "kata_kunci": [
         "erp-frontend",
         "web ERP",
         "One Bharata",
         "hris-dashboard",
-        "Next.js",
         "SSO",
         "system_roles",
         "sidebar menu",
-        "role gating",
+        "Pengaturan HRGA",
         "TanStack Query",
-        "Recharts ChartContainer",
-        "multi-tenant"
+        "Recharts"
       ]
     },
     {
@@ -2158,20 +2158,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "e1a14450922c085a9911c6f98f4f995899ef3a4ce443eaa9aaf36d2bd3d3be05",
-      "ukuran_kb": 125.8,
-      "ringkasan": "Menjawab: apa peran employee-service sebagai master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding (SSO), fitur apa saja yang dimilikinya (login username/PIN/biometric, admin akun IT seperti reset dan forget-device, master departemen dan system role, workspace Legal, R&D Regulatory, Quality, dan register Procurement non-Accurate), serta bagaimana ia terintegrasi dengan service lain. Juga menjawab catatan multi-tenant, akun pihak luar (vendor/mitra), resign/non-aktif, dan hal yang belum diimplementasikan.",
+      "hash": "caab19286502fd48e36a1cd4fe573d1d464bcb239e39201c67135ea443b10b2c",
+      "ukuran_kb": 127.0,
+      "ringkasan": "Menjawab: bagaimana login (password, PIN, biometric), refresh token, dan onboarding karyawan ditangani, serta endpoint admin akun untuk IT seperti reset akun, forget-device, status aktif, dan pengaturan `system_roles`. Juga memetakan master data departemen dan system role, workspace yang di-host di service ini (Legal, R&D Regulatory, Quality, Procurement non-Accurate), akun pihak luar, resign/non-aktif, KPI, kontrak, BPJS, kuota cuti, dan dependensinya dengan service lain.",
       "kata_kunci": [
         "employee service",
         "master data karyawan",
+        "login",
         "autentikasi",
-        "SSO",
         "onboarding",
         "reset akun",
-        "forget device",
-        "multi-tenant",
-        "legal",
-        "R&D regulatory"
+        "system_roles",
+        "master department",
+        "akun vendor",
+        "resign"
       ]
     },
     {
@@ -2559,20 +2559,21 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **41 route** di berkas produksi (enumerasi lengkap terhadap `origin/main`, termasuk `/health`). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD tetapi koleksinya masih 0 dokumen** — belum pernah dipakai host sungguhan, jadi belum terbukti bisa dipakai.",
+      "status_teks": "Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **45 route** di berkas produksi `origin/main` (enumerasi ulang 2026-09-11, termasuk `/health`; audit 2026-08-26 menghitung 41; branch Analisis Live menambah dua, jadi 47 bila merged). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD dan dipakai host sejak 2026-09-09** (catatan lama \"0 dokumen\" dicoret 2026-09-11, lihat § Belum Diimplementasikan).",
       "publik": true,
       "tautan": [
         "Sales - Marketing Dashboard (Master Roadmap)",
         "Microservices - Integration Service",
         "ADR - 0002 Database-per-Service",
         "API - Marketing Analytics Service",
+        "APP - Web ERP",
         "Microservices - Employee Service",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
         "Microservices - Attendance Service",
-        "APP - Web ERP",
         "ADR - 0052 Status Sinkron per Toko",
         "Sales - ICC Affiliate Mapping",
         "IT - Background Jobs & Schedulers",
@@ -2590,20 +2591,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "3ad14c2d97002062386aac1ffe108c0417171906373418ef8e629b7e4f72af42",
-      "ukuran_kb": 104.4,
-      "ringkasan": "Menjawab: bagaimana marketing-analytics membangun mart laba dan performa (toko, produk, kampanye, iklan, video, live) dari `integration_db` secara baca-saja, apa yang dijalankan penjadwal 48 jam dan job sync-nya, koleksi `mart_*` apa saja yang ada, dan bagaimana data TikTok, Shopee, serta Lazada diambil. Juga menjawab logika vonis beranda (lima keadaan termasuk `belum_matang`), aturan pemakaian angka agar tidak hitung ganda (`iklan_sia_sia`, `pembatalan`, GMV live), alokasi bundel dan mapping SKU, KPI Host Live, pencatatan sesi live oleh host, serta keterbatasan data yang harus jujur ditampilkan.",
+      "hash": "112af0269c34b46d2a2b32c05280864985ca670853278af2f1fbe445747fa43e",
+      "ukuran_kb": 114.9,
+      "ringkasan": "Menjawab: bagaimana Marketing Analytics Service mengagregasi laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live ke koleksi `mart_*`, serta bagaimana ia menjaga `integration_db` tetap baca-saja. Juga menjelaskan logika vonis laba lima keadaan (termasuk `belum_matang` dan pita materialitas), penjadwal sync 48 jam, sumber data per channel (TikTok, Shopee, Lazada), pencatatan sesi live host (`/live-shifts`), KPI Host Live, dan aturan pemakaian angka untuk mencegah hitung ganda.",
       "kata_kunci": [
-        "marketing-analytics",
-        "dashboard marketing",
-        "laba",
-        "profit attribution",
+        "marketing analytics",
         "mart_profit_attribution",
+        "laba marketing",
+        "profit attribution",
         "vonis belum_matang",
-        "hitung ganda",
-        "sesi live host",
+        "live-shifts",
         "KPI Host Live",
-        "job sync"
+        "hitung ganda",
+        "iklan_sia_sia",
+        "integration_db baca-saja"
       ]
     },
     {
@@ -5130,24 +5131,20 @@
         "APP - Web ERP",
         "APP - MyBharata"
       ],
-      "hash": "3fada0541edcd3b27953fbdcfe89f0691a5ed48c5c8b4616611b23411d835fff",
-      "ukuran_kb": 25.6,
-      "ringkasan": "Menjawab: bagaimana host live yang menyiarkan serentak di beberapa akun dicatat, yaitu sebagai beberapa sesi paralel satu-akun-satu-sesi, bukan satu sesi bermacam akun. Menjelaskan tiga aturan turunannya: jam siaran seseorang dihitung sebagai jam dinding (union jendela waktu) bukan penjumlahan durasi per sesi, tumpang tindih antar-akun berbeda milik orang yang sama diperlakukan SAH dan hanya ditandai, dan GMV diatribusikan ke departemen host bukan departemen pemilik akun. Juga memuat pengukuran produksi yang mendasarinya, kewajiban klien web dan mobile menampilkan seluruh sesi berjalan milik pemanggil, rasio per individu dari sesi terjodohkan, dan apa yang sengaja TIDAK diputuskan (insentif, penilaian kedisiplinan otomatis, laba per siaran).",
+      "hash": "8f299536accfe2f767e7f9fa1316424efa1b578b89372f2b7727d367c74485c5",
+      "ukuran_kb": 26.0,
+      "ringkasan": "Menjawab: bagaimana siaran live serentak di beberapa akun dicatat (satu sesi per akun, bukan satu sesi multi-akun), dan kenapa jam siaran host dihitung sebagai jam dinding (union jendela waktu) bukan penjumlahan per sesi. Juga menjawab apakah tumpang tindih sesi antar-akun milik orang yang sama dianggap sah, ke departemen mana GMV diatribusikan, siapa yang boleh melihat sesi orang lain, bagaimana rasio per individu dihitung, dan data pengukuran produksi yang mendasari keputusannya.",
       "kata_kunci": [
-        "ADR 0063",
         "siaran serentak",
-        "live shift",
-        "sesi live paralel",
-        "host live",
+        "multi-akun live",
+        "live_shifts",
+        "sesi paralel",
         "jam dinding",
-        "durasi efektif",
+        "JamDindingDetik",
+        "host live",
         "GMV live",
-        "atribusi departemen",
         "tumpang tindih sesi",
-        "overlap",
-        "akun_live",
-        "KPI host live",
-        "ICC performa host"
+        "ADR 0063"
       ]
     },
     {
@@ -6053,8 +6050,8 @@
         "ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
-        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "Microservices - Marketing Analytics Service",
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "API - Marketing Analytics Service",
         "HRIS - Otomasi Skor KPI",
         "REF - Penamaan Metrik & Sumber KPI",
@@ -6065,19 +6062,19 @@
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "REF - Kepemilikan Data"
       ],
-      "hash": "f2e9b7a3a0ecf1edc85d51e3c7ade441ff81b79985d534aa8886aa4b01b3179e",
-      "ukuran_kb": 24.0,
-      "ringkasan": "Menjawab: bagaimana metrik rasio KPI Host Live (mis. add to cart rate) dihitung bila host live di lebih dari satu channel (TikTok, Shopee, Lazada), yaitu satu angka gabungan dari jumlah pembilang dibagi jumlah penyebut seluruh channel, bukan rata-rata rasio per channel, dan kenapa penyebutnya klik produk, bukan viewers. Juga menjawab kenapa field channel di live_shifts menjadi prasyarat, apa yang terjadi pada channel yang semantik field-nya belum diperiksa (digalatkan, bukan dilewati), serta bagaimana cakupan, ambang sampel, target, dan rincian per channel di panel detail metrik diperlakukan. Menjelaskan pula kenapa data live Shopee belum bisa diambil (butuh otorisasi tingkat akun streamer) dan Lazada tidak punya data live, sehingga riwayat KPI sebelum dan sesudah penggabungan tidak sebanding.",
+      "hash": "a92b88afdd123e86af58430fca496360245f6a5710b64c43911fb6778c08c6e0",
+      "ukuran_kb": 24.5,
+      "ringkasan": "Menjawab: bagaimana metrik rasio KPI Host Live (mis. add to cart rate) dihitung bila ada lebih dari satu channel, yaitu satu angka gabungan dengan menjumlahkan pembilang dan penyebut lintas channel lalu membagi sekali, bukan merata-ratakan rasio. Juga menjawab kenapa penyebutnya klik produk, kenapa `live_shifts` butuh field `channel`, bagaimana channel yang semantiknya belum diperiksa ditangani, bagaimana rincian per channel ditampilkan, kapan target perlu diturunkan ulang, dan kenapa data live Shopee dan Lazada belum bisa diambil.",
       "kata_kunci": [
         "KPI Host Live",
-        "add to cart rate",
-        "metrik lintas channel",
+        "lintas channel",
         "cross-channel",
-        "live_shifts channel",
-        "mart_live_sessions",
-        "Shopee Live",
-        "product_clicks",
-        "RincianBaris jenis",
+        "add to cart rate",
+        "rasio gabungan",
+        "live_shifts.channel",
+        "Shopee live",
+        "RincianBaris",
+        "product clicks",
         "ADR 0086"
       ]
     },
@@ -11715,20 +11712,20 @@
         "Sales - Marketing Dashboard (Index)",
         "ADR - 0008 Profit Engine Join via item_group_id"
       ],
-      "hash": "a087281d8966c1643f2de7644ada57dd68f51a1d936bdd73a6bece7dac06a31e",
-      "ukuran_kb": 18.8,
-      "ringkasan": "Menjawab: dari seluruh metrik prototipe \"Bharata Command Center\" milik Direktur, mana yang datanya sudah tersimpan (ADA), mana yang bahannya ada tapi belum dihitung (RAKIT), mana yang cakupannya rendah (TIPIS), dan mana yang tidak punya sumber sama sekali, beserta endpoint `marketing-analytics` untuk tiap halaman prototipe. Menjelaskan bahwa cakupan lapisan metrik iklan berbeda tajam per channel — TikTok tipis (konversi/ROAS hanya 0,3–1% terisi) sementara Shopee 100% lewat `shopee_gms_item_performances`/`shopee_gms_campaign_performances` — sehingga CPA, CVR, dan ROAS iklan hanya sah dihitung untuk Shopee. Memuat jebakan angka yang gagal tanpa galat: `direct_order` himpunan bagian `broad_order`, `income.total_advertising_cost` bukan belanja Shopee Ads, `broad_gmv` bukan omzet, field turunan seperti `cpc` tak terverifikasi, dan laba tak boleh dibaca dari baris `level: campaign`.",
+      "hash": "a2ab0c1470d4eaaeac534e5df6058aabacec3f7cc173276b030a47195e303ea9",
+      "ukuran_kb": 18.9,
+      "ringkasan": "Menjawab: dari metrik prototipe Bharata Command Center milik Direktur, mana yang datanya sudah ada, perlu dirakit, tipis, atau tidak ada di `marketing-analytics`, per halaman prototipe beserta endpoint yang melayaninya. Juga menjelaskan kenapa cakupan metrik iklan TikTok rendah sementara Shopee (GMS) lengkap, jebakan seperti `broad_order` vs `direct_order` dan `total_advertising_cost` yang bukan belanja iklan, serta kenapa ketiadaan cacah order di mart menghalangi AOV dan CPA.",
       "kata_kunci": [
+        "audit ketersediaan data",
+        "prototipe Direktur",
+        "Bharata Command Center",
         "marketing analytics",
-        "command center",
-        "ketersediaan data",
-        "audit data",
-        "ROAS",
+        "metrik iklan",
+        "cakupan data TikTok",
+        "Shopee GMS",
         "CPA",
-        "broad_order",
-        "shopee ads",
-        "tiktok ads",
-        "mart profit"
+        "ROAS",
+        "data availability"
       ]
     },
     {
