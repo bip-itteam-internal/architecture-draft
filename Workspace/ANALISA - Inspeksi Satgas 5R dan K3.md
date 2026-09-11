@@ -2,7 +2,7 @@
 
 Papan kerja hasil `/analisa-kebutuhan` 2026-09-11. Keputusan di [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]], cara kerja di [[Microservices - Form Builder Service]] bagian "Inspeksi Satgas 5R & K3".
 
-**Status papan (2026-09-11):** T1+T2 **selesai di branch** bip-erp `feat/form-builder-satgas-kepatuhan` (4 commit di atas `main` f1bc2314), **belum PR/merge, belum deploy**, dan verifikasi lewat gateway belum dijalankan. T0 dan T3 sampai T7 belum dimulai. Rencana: `.task-plans/2026-09-11-satgas-kepatuhan-izin-dan-gerbang.md` (akar `erp/`).
+**Status papan (2026-09-11):** T1+T2 **selesai di branch** bip-erp `feat/form-builder-satgas-kepatuhan` (5 commit di atas `main` f1bc2314), **PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849) terbuka, belum merge, belum deploy**, dan verifikasi lewat gateway belum dijalankan. T0 dan T3 sampai T7 belum dimulai. Rencana: `.task-plans/2026-09-11-satgas-kepatuhan-izin-dan-gerbang.md` (akar `erp/`).
 
 **Kebutuhan asal** (dari manajemen): posisi Culture di HRD sebagai "intel perusahaan"; budaya kepatuhan kantor (sepatu, lanyard) dicatat diam-diam lewat MyBharata dan muncul besoknya per departemen; HRD punya rutinitas Satgas 5R & K3 yang sekarang lewat Google Form "Dokumentasi Temuan Inspeksi SATGAS 5R & K3" (foto, maks 10 berkas, 10 MB).
 
@@ -42,8 +42,9 @@ Digabung satu PR atas keputusan user, supaya tak ada izin tanpa penegak yang ter
 - `5fd162d1` penanda `metric_key: inspeksi_satgas`: evaluation, bulanan, sasaran aktif, tepat satu `boolean`, tanpa `single_response`, `metrikJamak`.
 - `0391b083` gerbang (`satgas_gate.go`) di kirim jawaban, unggah, daftar sasaran, `listMyForms`; `metric_key` di payload `/me/forms`; kill-switch `KEPATUHAN_PERMISSION_ENFORCEMENT`; notifikasi terbit dilewati; `GET /me/satgas` (`satgas_me.go`).
 - `2af244aa` perbaikan review: notifikasi "selesai" juga dilewati (`kirimNotifForm`), nama paket satu konstanta, klaim diurai sekali per permintaan, uji round-trip BSON.
+- `4414ea24` nama paket bawaan di seed memakai konstanta yang sama dengan pesan tolakan.
 
-**Yang belum**: PR + merge (manusia), deploy dev, dan **Cara Verifikasi lewat gateway** di artefak rencana (dua akun: berpaket dan tak berpaket; kirim/unggah 403 vs 201; `/me/satgas` allowed false vs ringkasan; temuan lalu cek ulang berpindah status; regresi form penilaian biasa).
+**Yang belum**: merge PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849) (manusia), deploy dev, dan **Cara Verifikasi lewat gateway** di artefak rencana (dua akun: berpaket dan tak berpaket; kirim/unggah 403 vs 201; `/me/satgas` allowed false vs ringkasan; temuan lalu cek ulang berpindah status; regresi form penilaian biasa).
 
 ## T3. BE: nilai terakhir-menang, endpoint internal, sumber KPI
 
