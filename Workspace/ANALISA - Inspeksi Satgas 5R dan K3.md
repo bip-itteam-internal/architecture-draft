@@ -2,6 +2,8 @@
 
 Papan kerja hasil `/analisa-kebutuhan` 2026-09-11. Keputusan di [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]], cara kerja di [[Microservices - Form Builder Service]] bagian "Inspeksi Satgas 5R & K3".
 
+**Status papan (2026-09-11):** T1+T2 **selesai di branch** bip-erp `feat/form-builder-satgas-kepatuhan` (4 commit di atas `main` f1bc2314), **belum PR/merge, belum deploy**, dan verifikasi lewat gateway belum dijalankan. T0 dan T3 sampai T7 belum dimulai. Rencana: `.task-plans/2026-09-11-satgas-kepatuhan-izin-dan-gerbang.md` (akar `erp/`).
+
 **Kebutuhan asal** (dari manajemen): posisi Culture di HRD sebagai "intel perusahaan"; budaya kepatuhan kantor (sepatu, lanyard) dicatat diam-diam lewat MyBharata dan muncul besoknya per departemen; HRD punya rutinitas Satgas 5R & K3 yang sekarang lewat Google Form "Dokumentasi Temuan Inspeksi SATGAS 5R & K3" (foto, maks 10 berkas, 10 MB).
 
 **Hasil wawancara dan grounding:**
@@ -10,12 +12,13 @@ Papan kerja hasil `/analisa-kebutuhan` 2026-09-11. Keputusan di [[ADR - 0090 Ins
 - Satgas 5R & K3 ternyata untuk **KPI perorangan Office Boy dan Security**. Beberapa hari setelah temuan dicek ulang, dan **nilai KPI diambil dari cek ulang**. Sekarang PIC diberi tahu manual lewat WhatsApp.
 - Pemakai: OD & Industrial Relation Officer. Masalah yang mereka nyatakan: repot mengunggah dokumentasi. Solusi yang mereka minta: file upload di Form Builder.
 - Diputuskan user: tetap Form Builder; menu khusus Satgas di MyBharata yang hanya muncul untuk jabatan tertentu (form Satgas tidak muncul di daftar survei); plus halaman rekap di web.
+- Diputuskan user saat `/start-task` T1: nama modul **`kepatuhan`**, satu izin dulu (`kepatuhan.satgas.input`), T1+T2 digabung satu PR, temuan = pertanyaan ya/tidak "Ada temuan?", notifikasi terbit dilewati. Saat `/review`: notifikasi "selesai" juga dilewati.
 - Usulan awal yang **gugur** setelah informasi pemakai masuk: AI penilai foto, peringkat antar departemen, master area.
 - Temuan data (lembar HRD "KPI DEPARTEMEN HRGA"): skor Satgas diketik dengan skala campur; Maret 2026 total KPI Office Girl 131 dari 100 lolos disetujui.
 
-**Urutan**: T0 (keputusan HR) berjalan paralel dan wajib selesai sebelum T3 go-live. T1 → T2 → T3 (backend berantai). T4 dan T6 setelah kontrak T2 turun. T5 setelah T3. Tutup dengan T7. ⛔ **employee-service dan form-builder naik bersama, lalu web, lalu MyBharata.**
+**Urutan**: T0 (keputusan HR) berjalan paralel dan wajib selesai sebelum T3 go-live. T1+T2 (selesai di branch) → T3. T4 dan T6 bisa mulai sekarang (kontrak T2 sudah turun di branch). T5 setelah T3. Tutup dengan T7. ⛔ **employee-service dan form-builder naik bersama, lalu web, lalu MyBharata.**
 
-⚠️ **Koordinasi**: modul izin di T1 diusulkan dipakai juga oleh menu pencatat ADR 0085 (TBD "petugas ditunjuk"). Beri tahu Faiz sebelum T1 dimulai supaya gerbang petugas tidak dibangun dua kali.
+⚠️ **Koordinasi**: modul `kepatuhan` diusulkan dipakai juga oleh menu pencatat ADR 0085 (TBD "petugas ditunjuk"). Kabari Faiz nama modulnya supaya izin catatan kepatuhan masuk ke modul yang sama, bukan gerbang kedua.
 
 ---
 
@@ -27,57 +30,57 @@ Jawaban wajib sebelum go-live, dicatat ke ADR 0090 §TBD:
 - Cek ulang yang jatuh ke bulan berikutnya masuk periode mana.
 - Jumlah field foto per orang, dan apakah foto wajib.
 - Siapa selain petugas yang boleh membuka rekap web (usul: atasan Office Boy dan Security).
-- Jabatan persis yang dipasangi izin Satgas.
+- Jabatan persis yang dipasangi paket `kepatuhan_petugas_satgas`.
 
 **Cara verifikasi**: jawaban tertulis dari HR, ditempel ke ADR 0090.
 
-## T1. BE: modul izin Satgas
+## T1+T2. BE: modul izin `kepatuhan` + penanda + gerbang + `/me/satgas` ✅ selesai di branch
 
-Modul izin tersendiri (bukan `hris`, bukan `formbuilder`) tanpa fallback tier: katalog di `shared-library/common`, registrasi di employee-service (`permission_catalogs.go`, `DefaultPermissionSets`), paket default. Nama modul mengikuti konvensi katalog; pertimbangkan satu modul untuk petugas lapangan OD & IR dengan dua izin (Satgas + catatan kepatuhan ADR 0085).
+Digabung satu PR atas keputusan user, supaya tak ada izin tanpa penegak yang ter-deploy ke dev saat merge. Isi branch `feat/form-builder-satgas-kepatuhan`:
 
-`/start-task buat modul izin baru untuk petugas lapangan OD & IR di shared-library + employee-service (katalog, registrasi, paket default tanpa fallback tier), bukan prefiks hris atau formbuilder`
+- `d94c7c84` modul izin `kepatuhan`: `catalog_kepatuhan.go` (izin `kepatuhan.satgas.input`, paket `kepatuhan_petugas_satgas`, tanpa tier), loop `DefaultPermissionSets`, registrasi employee-service, `init()` uji. Tiga penjaga `permission_catalogs_test.go` dibuktikan merah tanpa registrasi.
+- `5fd162d1` penanda `metric_key: inspeksi_satgas`: evaluation, bulanan, sasaran aktif, tepat satu `boolean`, tanpa `single_response`, `metrikJamak`.
+- `0391b083` gerbang (`satgas_gate.go`) di kirim jawaban, unggah, daftar sasaran, `listMyForms`; `metric_key` di payload `/me/forms`; kill-switch `KEPATUHAN_PERMISSION_ENFORCEMENT`; notifikasi terbit dilewati; `GET /me/satgas` (`satgas_me.go`).
+- `2af244aa` perbaikan review: notifikasi "selesai" juga dilewati (`kirimNotifForm`), nama paket satu konstanta, klaim diurai sekali per permintaan, uji round-trip BSON.
 
-**Cara verifikasi**: modul muncul di `GET /master/permission-modules`; tanpa paket, tak seorang pun memegang izinnya; memasang paket ke jabatan uji **tidak** mencabut `hris.*` maupun `formbuilder.*` akun itu (bandingkan `/me/capability` Form Builder dan menu HRIS sebelum dan sesudah). Kontrol negatif: pasang izin berprefiks `formbuilder` ke akun uji, pastikan fallback-nya memang mati, supaya uji di atas terbukti bisa merah.
-
-## T2. BE form-builder: penanda Satgas, gerbang pengisian, endpoint menu
-
-**Bergantung T1.** Penanda form Satgas (sah hanya `evaluation` + berulang bulanan; ikut dikirim di `GET /me/forms`). Gerbang izin di kirim jawaban (`response_handlers.go`) **dan** unggah (`uploads.go`) untuk form bertanda. Endpoint `/me/...` meniru `/me/kaizen`: form Satgas milik pemanggil berizin + ringkasan kiriman periode ini per orang yang dinilai.
-
-`/start-task tambah penanda form inspeksi Satgas di form-builder (evaluation + bulanan, dikirim di /me/forms), gerbang izin pada kirim jawaban dan unggah untuk form bertanda, dan endpoint /me menu Satgas meniru /me/kaizen`
-
-**Cara verifikasi**: lewat gateway, akun tanpa izin yang masuk audience mengirim jawaban dan mengunggah ke form bertanda → `403`; akun berizin → sukses; form tanpa penanda tidak berubah perilaku. Uji `app.Test(httptest.NewRequest(...))` untuk jalur galat. Payload `/me/forms` membawa penanda (bandingkan BENTUK respons, bukan status).
+**Yang belum**: PR + merge (manusia), deploy dev, dan **Cara Verifikasi lewat gateway** di artefak rencana (dua akun: berpaket dan tak berpaket; kirim/unggah 403 vs 201; `/me/satgas` allowed false vs ringkasan; temuan lalu cek ulang berpindah status; regresi form penilaian biasa).
 
 ## T3. BE: nilai terakhir-menang, endpoint internal, sumber KPI
 
-**Bergantung T2 dan T0 (rumus konversi).** Satu fungsi nilai Satgas (jawaban terakhir per orang per periode, satu rumus konversi) dipakai endpoint internal form-builder, endpoint rekap/menu T2, dan tab analitik "Yang Dinilai" untuk form bertanda. Sumber KPI per orang baru di employee-service. ⛔ Jangan memakai atau menyentuh `service_team_index` / `nilai_layanan_pribadi`.
+**Bergantung T1+T2 dan T0 (rumus konversi).** Pembaca SKOR Satgas: jawaban terakhir per orang per periode, satu rumus konversi, dipakai endpoint internal form-builder dan tab analitik "Yang Dinilai" untuk form bertanda (hari ini tab itu masih `overallOf`, rata-rata). Pakai ulang `ringkasSatgas`/`kirimanLebihBaru` dari `satgas_me.go` untuk memilih jawaban terakhir, jangan menulis urutan-menang kedua. Sumber KPI per orang baru di employee-service. ⛔ Jangan memakai atau menyentuh `service_team_index` / `nilai_layanan_pribadi`.
 
-`/start-task buat fungsi nilai Satgas (jawaban terakhir per orang per periode, satu rumus konversi) untuk endpoint internal form-builder, tab analitik Yang Dinilai, dan sumber KPI per orang baru di employee-service`
+`/start-task buat pembaca skor Satgas (jawaban terakhir per orang per periode, satu rumus konversi) untuk endpoint internal form-builder, tab analitik Yang Dinilai pada form inspeksi_satgas, dan sumber KPI per orang baru di employee-service`
 
 **Cara verifikasi**: temuan skor 2 lalu cek ulang skor 5 untuk orang yang sama → nilai = konversi 5, **bukan** rata-rata; tab analitik menampilkan angka yang sama; orang tanpa jawaban → galat (jatuh manual), bukan 0; form ber-`service_team_index` tetap dirata-rata (uji membuktikan kedua aturan tak tertukar, dengan kontrol negatif). Satu panggilan sungguhan lewat gateway, dan draf KPI Office Boy uji terisi setelah HR memasang sumbernya di "Atur Target".
 
-## T4. Web: field foto Form Builder + sakelar penanda
+## T4. Web: field foto Form Builder + sakelar penanda + label modul
 
-**Bergantung T2 (kontrak penanda).** Tipe `file` di editor (`types/form.ts`, `lib/schema.ts`, `lib/field-types.ts`, `components/question-row.tsx`), tampilan foto di analitik lewat pratinjau pengelola (bukan `upload_id` mentah di `lib/format-answer.ts`), kompresi gambar klien (utilitas `kompresGambar` sudah ada), sakelar penanda Satgas di editor.
+**Bergantung T1+T2 (kontrak penanda).** Tipe `file` di editor (`types/form.ts`, `lib/schema.ts`, `lib/field-types.ts`, `components/question-row.tsx`), tampilan foto di analitik lewat pratinjau pengelola (bukan `upload_id` mentah di `lib/format-answer.ts`), kompresi gambar klien (utilitas `kompresGambar` sudah ada), sakelar penanda Satgas di editor. Cermin validasi di `schema.ts`: tepat satu pertanyaan `boolean` dan larangan `single_response` untuk `inspeksi_satgas`, dan pesan bulanan yang hari ini menyebut "penanda indeks" untuk semua penanda. Label modul `kepatuhan` di `MODUL_BERLABEL` (`src/features/hris/master-data/lib/label-modul.ts`) supaya layar Hak per Posisi tak menampilkan kode mentah.
 
-`/start-task dukung field file di editor Form Builder erp-frontend (tipe, schema, field-types, question-row), tampilan foto di analitik lewat pratinjau pengelola, kompresi gambar, dan sakelar penanda Satgas`
+`/start-task dukung field file di editor Form Builder erp-frontend (tipe, schema, field-types, question-row), tampilan foto di analitik lewat pratinjau pengelola, kompresi gambar, sakelar penanda inspeksi_satgas dengan cermin validasinya, dan label modul kepatuhan`
 
 **Cara verifikasi**: `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test`, `pnpm build` (bandingkan baseline `origin/main`). ⚠️ `fieldTypeEnum` di `schema.ts` adalah literal `z.enum`, jadi compiler tidak menangkap bila lupa diubah. i18n id + en. Buat form dengan field foto, isi dari MyBharata (T6), lihat fotonya di analitik.
 
 ## T5. Web: halaman rekap Satgas
 
-**Bergantung T3.** Menu di kategori HRIS, digerbang izin modul T1, membaca endpoint rekap yang sama dengan menu MyBharata. Isi: nilai per orang per bulan, foto temuan dan perbaikan, orang yang belum dicek ulang.
+**Bergantung T3.** Menu di kategori HRIS, digerbang izin modul `kepatuhan`, membaca data yang sama dengan menu MyBharata. Isi: nilai per orang per bulan, foto temuan dan perbaikan, orang yang belum dicek ulang. Menunya tak boleh bertumpu pada fallback: entri `FALLBACK` di `menu-permission.ts` wajib ada untuk izin `kepatuhan.*` (izin tanpa entri diloloskan `bolehMenu`).
 
-`/start-task buat halaman rekap Satgas di HRIS erp-frontend (menu bergerbang izin modul Satgas, data dari endpoint rekap yang sama dengan menu MyBharata, nilai sama dengan KPI)`
+`/start-task buat halaman rekap Satgas di HRIS erp-frontend (menu bergerbang izin kepatuhan.satgas.input, data dari endpoint yang sama dengan menu MyBharata, nilai sama dengan KPI)`
 
 **Cara verifikasi**: angka per orang **sama persis** dengan draf KPI bulan yang sama; akun tanpa izin tidak melihat menu dan ditolak server. Struktur tabel HRIS (skill `/migrasi-tabel-hris`), tanpa `p-6` sendiri, tombol kembali lewat `SidebarBackButton`, loading pakai `Skeleton`, i18n id + en.
 
-## T6. MyBharata: field foto, menu Satgas, penyaring beranda
+## T6. MyBharata: field foto + `boolean`, menu Satgas, penyaring beranda, cek ulang
 
-**Bergantung T2.** Tipe field `file` (kamera/galeri, `maxWidth` sekitar 1920, cek ukuran di bawah 4 MB, tombol kirim terkunci selama unggah, pola unggah-dulu-kirim-id). Menu Satgas di `home_quick_access.dart` yang bertanya ke server (endpoint T2), bukan `system_roles`. Form bertanda Satgas dikeluarkan dari `SurveySection` (pola `isKaizen`; `pendingOf` tidak disaring).
+**Bergantung T1+T2 (kontrak sudah ada di branch).**
 
-`/start-task tambah tipe field file di form MyBharata (kamera, kompresi, batas 4 MB) + menu Satgas yang bertanya ke server + keluarkan form bertanda Satgas dari SurveySection`
+- Tipe field **`file`** (kamera/galeri, `maxWidth` sekitar 1920, cek ukuran di bawah 4 MB, tombol kirim terkunci selama unggah, pola unggah-dulu-kirim-id) dan **`boolean`** (untuk "Ada temuan?"; hari ini jatuh ke `unknown`).
+- Menu Satgas di `home_quick_access.dart` yang bertanya ke `GET /me/satgas` (tampil bila `allowed`), bukan `system_roles`. Tampilkan status per PIC (`not_rated` / `open_finding` / `resolved`).
+- Form bertanda `inspeksi_satgas` dikeluarkan dari `SurveySection` lewat `metric_key` (pola `isKaizen`; `pendingOf` tidak disaring).
+- ⚠️ **Cek ulang**: `EvaluationFillPage` menutup diri saat semua orang sudah dinilai, dan daftar sasaran menandai orang yang sudah dinilai sebagai `done`. Menu Satgas harus bisa membuka pengisian untuk orang berstatus `open_finding` walau ia sudah pernah dinilai.
 
-**Cara verifikasi**: petugas berizin melihat menu, akun lain tidak, **termasuk saat cache peran kosong**; form Satgas tidak muncul di beranda, tetapi tautan notifikasinya tetap membuka form; foto ponsel ukuran penuh berhasil diunggah (terkompres). `dart analyze` per folder (bukan `flutter analyze` seluruh repo). Rilis menaikkan **version name** dan versionCode (`update_version.dart` dua argumen).
+`/start-task tambah tipe field file dan boolean di form MyBharata, menu Satgas yang bertanya ke GET /me/satgas, penyaring form inspeksi_satgas dari SurveySection, dan pengisian cek ulang untuk PIC yang sudah pernah dinilai`
+
+**Cara verifikasi**: petugas berizin melihat menu, akun lain tidak, **termasuk saat cache peran kosong**; form Satgas tidak muncul di beranda, tetapi tautan notifikasinya tetap membuka form; foto ponsel ukuran penuh berhasil diunggah (terkompres); cek ulang atas PIC yang sudah dinilai bisa dikirim dan statusnya berpindah ke `resolved`. `dart analyze` per folder (bukan `flutter analyze` seluruh repo). Rilis menaikkan **version name** dan versionCode (`update_version.dart` dua argumen).
 
 ## T7. Verifikasi end-to-end + tutup dok
 
@@ -85,7 +88,7 @@ Modul izin tersendiri (bukan `hris`, bukan `formbuilder`) tanpa fallback tier: k
 
 Negatif: akun non-petugas ditolak `403` saat mengirim; MyBharata versi lama tidak buntu (foto belum wajib).
 
-Tutup: perbarui status ADR 0090 dan bagian Satgas di dok Form Builder dari 🟡 ke ✅/⚠️ sesuai kenyataan, perbarui baris `Kebersihan 3` dan `Kerapihan dan kebersihan Pos` di Matriks KPI, lalu `/sync-docs`.
+Tutup: perbarui status ADR 0090 dan bagian Satgas di dok Form Builder ke ✅/⚠️ sesuai kenyataan, perbarui baris `Kebersihan 3` dan `Kerapihan dan kebersihan Pos` di Matriks KPI, lalu `/sync-docs`.
 
 ---
 
@@ -94,8 +97,9 @@ Tutup: perbarui status ADR 0090 dan bagian Satgas di dok Form Builder dari 🟡 
 - Dok Form Builder belum memuat tipe `report` (keputusan per butir, unggah ulang), penanda `kpi_checklist`, dan `service_team_index` (sumber `nilai_layanan_pribadi` / `indeks_layanan_tim`).
 - Matriks KPI masih menulis `Pelayanan Security` "belum dipetakan", padahal kode memakai `nilai_layanan_pribadi` untuk metrik itu (`kpi_sumber_indeks_layanan_tim.go:33-35`). Apakah template sudah memasangnya belum diukur.
 - ADR 0066 / ADR 0084 dan dok Form Builder menyebut modul culture "belum merge", padahal `culture_*.go` dan `kpi_sumber_culture.go` sudah di `origin/main` (2026-09-11).
-- Tipe field `boolean` di backend belum dikenal MyBharata (jatuh ke `unknown`).
 - Pemakaian field `file` di prod (koleksi `form_uploads`) belum diukur.
+- Komentar di `services/form-builder/models_form.go` (blok tipe field) masih berbunyi "upload file belum ada, fase 2", padahal `FieldFile` sudah ada.
+- **Kegagalan test yang sudah ada di `origin/main`** (bukan dari branch ini): `shared-library/models/employee` `TestDefaultPermissionSetsValid` (+ saudaranya di `permission_set_payroll_test.go`) merah karena `init()` uji tak mendaftarkan katalog `manufacture`; `services/employee` `TestMetrikTanpaIklanGagalTerbacaPadaServiceLama` merah.
 
 ## Yang TIDAK jadi dikerjakan, beserta alasannya
 
