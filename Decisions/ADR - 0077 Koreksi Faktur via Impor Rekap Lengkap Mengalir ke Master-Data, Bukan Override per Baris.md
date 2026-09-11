@@ -2,7 +2,7 @@
 
 *Menetapkan bagaimana koreksi faktur yang finance nyatakan lewat file Excel "Rekap Lengkap" diterjemahkan oleh sistem: setiap sel yang berubah dipetakan ke **tuas yang sudah ada** (keluarkan order, pindah hari, vonis fake order, Mapping SKU, riwayat Harga Jual), dan **tidak** ada penyimpanan koreksi per baris faktur. Keputusan ini lahir karena baris faktur auto-sync dihitung ulang dari order + master setiap kirim ulang, sehingga koreksi yang tak dituangkan ke master-data atau flag order pasti tertimpa sweep berikutnya.*
 
-- **Status**: ✅ **Implemented & terverifikasi di produksi** — bip-erp [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712) + erp-frontend [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453) merged 2026-09-04, lingkup dipangkas lewat bip-erp [#1717](https://github.com/bip-itteam-internal/bip-erp/pull/1717) + erp-frontend [#1455](https://github.com/bip-itteam-internal/erp-frontend/pull/1455) (merged 2026-09-04 09:23 UTC), **deployed 2026-09-05**. Uji prod hari itu: Rekap Lengkap satu toko TikTok satu hari diunduh lalu diunggah balik **tanpa disunting** ⇒ 35 baris dibaca, **35 tidak berubah, 0 koreksi, 0 ditolak** — membuktikan prefix export = baris faktur. Jalur commit belum pernah dijalankan di prod.
+- **Status**: ✅ **Implemented & terverifikasi di produksi** — bip-erp [#1712](https://github.com/bip-itteam-internal/bip-erp/pull/1712) + erp-frontend [#1453](https://github.com/bip-itteam-internal/erp-frontend/pull/1453) merged 2026-09-04, lingkup dipangkas lewat bip-erp [#1717](https://github.com/bip-itteam-internal/bip-erp/pull/1717) + erp-frontend [#1455](https://github.com/bip-itteam-internal/erp-frontend/pull/1455) (merged 2026-09-04 09:23 UTC), **deployed 2026-09-05**. Uji prod hari itu: Rekap Lengkap satu toko TikTok satu hari diunduh lalu diunggah balik **tanpa disunting** ⇒ 35 baris dibaca, **35 tidak berubah, 0 koreksi, 0 ditolak** — membuktikan prefix export = baris faktur. Jalur commit belum pernah dijalankan di prod. 🟡 **Amandemen §1c koreksi GUDANG**: branch `feat/koreksi-gudang-import` bip-erp + erp-frontend (2026-09-11), **belum merged/deployed**.
 - **Path di repo**: `bip-erp/services/integration/internal/usecase/accurate_koreksi_import*.go`, `accurate_prefix_rekap.go` · `erp-frontend/src/features/integration/accurate/auto-sync/components/koreksi-import-modal.tsx`
 - **Tanggal**: 2026-09-04
 
@@ -30,6 +30,7 @@ Tiap sel prefix yang berbeda dari **baris faktur sebenarnya** (`KoreksiBaseline`
 | Code berubah | `MAPPING_SKU` | `product_sku_mappings` (listing → master, qty_per_unit = qty faktur / qty order) | **ya** |
 | Unit Price berubah | `HARGA` | riwayat harga efektif sejak hari faktur terawal + `ApplyPriceToInvoices` faktur di file | **ya** |
 | Quantity berubah pada SKU ber-mapping | `QTY_PER_UNIT` | `qty_per_unit` mapping | **ya** |
+| Gudang Accurate berubah (kolom paling kanan) — 🟡 §1c | `GUDANG` | `transaction_orders.warehouse_override` per pesanan + dokumen retur pesanan dipindah | **stok** |
 | Name / Amount berubah | — | diabaikan (Accurate membaca kode; Amount turunan) | tidak |
 
 Yang **ditolak** dengan alasan terang: paket multi-komponen (ubah lewat Mapping SKU), faktur `ADOPTED_MANUAL` / `EXTERNAL_EDIT` / `IMPORTED` / `VOIDED`, pengecilan nilai faktur `INVOICE_PAID`, order pra-cutover, kode yang tak ada di master, qty bukan kelipatan qty order, qty SKU master langsung (qty faktur = qty order — tak ada tuas), dan dua nilai berbeda untuk SKU yang sama dalam satu file.
@@ -43,13 +44,25 @@ Versi pertama memetakan **Accurate Number kosong** → keluarkan order dan **`FO
 
 Sel kosong dan `FO` kini **DITOLAK sambil menunjuk tuas yang benar**, bukan diabaikan diam-diam. Tersisa tiga jenis koreksi: `PINDAH_HARI`, `MAPPING_SKU` (+`QTY_PER_UNIT`), `HARGA`.
 
+### 1c. Koreksi GUDANG per pesanan (amandemen 2026-09-11, 🟡 belum merged)
+
+Pemilik fitur: satu toko **bisa mengirim dari dua gudang dalam satu hari**, dan tak ada data marketplace yang menunjukkan gudang pengirim (probe prod 2026-09-05, lihat Consequences). Keputusannya:
+
+1. **Penanda per pesanan, bukan override baris.** Kolom `Gudang Accurate` (ujung keempat format Rekap Lengkap; sengaja bukan `Warehouse Name` milik TikTok/Lazada) diterjemahkan ke `transaction_orders.warehouse_override`. Selaras dengan §1: file hanya menyatakan, penanda di order yang disimpan, dan perakit faktur & retur membacanya (`GudangEfektif`) sehingga kirim ulang tak mengembalikan gudang.
+2. **Baris faktur dipecah per gudang.** Faktur harian menggabung semua pesanan toko-hari per (kode, harga) dan satu baris Accurate = satu gudang, jadi memindah satu pesanan = memecah baris. Pola `cmd/gudangfix` (ganti gudang seluruh baris) tak cukup untuk koreksi per pesanan.
+3. **Sidik faktur hanya berubah untuk baris ber-penanda** (`GudangKoreksi`): gudang baris biasa tetap di luar `hashInvoiceLines`/`hashInvoiceQty` supaya ribuan faktur lama tak dikirim ulang. Baris pesanan yang **dikembalikan** ke gudang toko tetap bertanda (penanda ditulis eksplisit), kalau tidak pecahan lamanya di faktur terkunci tak pernah digabung balik.
+4. **Faktur terkunci retur ikut** — prod 2026-09-11: 654 dari 1.410 faktur sejak 1 Agu (46%) terkunci. Faktur terkunci menolak hapus baris, jadi pemecahan = UPDATE qty baris lama (≥ qty yang sudah diretur) + SISIP baris gudang tujuan, lalu baca-ulang. Yang mentok dilaporkan, tidak didiamkan.
+5. **Retur mengikuti faktur** (barang keluar & masuk di gudang yang sama). Dokumen retur yang sudah terbit dipindah dengan pola `cmd/gudangfix` (seluruh baris induk verbatim, verifikasi identik). Satu dokumen retur hanya satu gudang: kelompok pesanan yang berbagi retur harus berakhir di gudang yang sama, diproses **semua-atau-tidak**; memecah baris retur belum pernah diuji di Accurate dan karena itu ditolak.
+6. **Kelas `Pindah gudang` wajib dicentang** (`apply_gudang`, vonis `PERLU_PERSETUJUAN`): Rekap Lengkap mengisi kolom gudang di SEMUA baris, sehingga file unduhan lama bisa diam-diam mengembalikan gudang yang sudah dikoreksi — dan koreksi ini memindah stok.
+7. **Faktur Juli ditolak** di kode, dengan pilihan per unggahan *Koreksi gudang mulai tanggal* (`gudang_mulai`, bawaan & paling awal 2026-08-01, `usecase.GudangMulaiTerawal`). Faktur Juli sengaja dibiarkan di gudang lama (keputusan user 2026-09-02); mengirim ulang satu faktur Juli memindah seluruh barisnya.
+
 ### 2. Kelas master-data butuh persetujuan eksplisit, harga bergerbang role
 
 Koreksi `MAPPING_SKU`/`QTY_PER_UNIT` dan `HARGA` berstatus **PERLU_PERSETUJUAN** di preview dan hanya dijalankan bila kelasnya dicentang saat commit (`apply_mapping`, `apply_price`). Kelas harga ditolak di klasifikasi bila aktor bukan profit editor (gerbang yang sama dengan Upload Massal Harga Jual). Harga untuk **kode baru** (Code + Unit Price berubah bersamaan) bergantung pada mappingnya: bila mapping tidak diterapkan, harganya dilewati — faktur tak memuat kode itu dan kirim ulang paksa hanya membuang kuota.
 
 ### 3. Baris yang hilang dari file tidak berarti apa-apa
 
-Finance boleh mengunggah sebagian baris. Mengeluarkan order harus **eksplisit** (mengosongkan Accurate Number). Preview memperingatkan bila ≥ 20 order akan dikeluarkan, karena kolom kosong massal biasanya berasal dari unduhan yang lookup fakturnya gagal senyap, bukan niat finance.
+Finance boleh mengunggah sebagian baris. (Versi pertama mengeluarkan order lewat Accurate Number kosong dengan peringatan ≥ 20 order; keduanya dicabut, lihat §1b.)
 
 ### 4. Prefix Rekap Lengkap = baris faktur
 
@@ -67,7 +80,7 @@ Commit menulis semua flag & master lebih dulu (mapping → riwayat harga → fla
 - **Tidak ada tuas per baris**: qty SKU master langsung dan hari tanpa faktur tetap lewat dialog koreksi per order; perbaikan `accurate_products.product_code` (Config Accurate) dan koreksi Penerimaan lewat file di luar cakupan.
 - Harga hanya dikirim ulang ke faktur **di dalam file** — faktur lain yang memuat SKU sama tidak disentuh otomatis (sama dengan tuas Harga Jual → Dampak Harga); ini disengaja agar satu unggahan tidak memicu kirim ulang massal, tetapi berarti finance harus mengunggah rentang yang lengkap.
 - Commit per koreksi tanpa transaksi (pola import FO): kegagalan di tengah tidak membatalkan yang sudah benar; nasib tiap baris/dokumen diarsipkan.
-- **Koreksi GUDANG belum tercakup, dan itu kebutuhan yang sebenarnya** (dinyatakan pemilik fitur 2026-09-04). Terukur di kode: gudang selalu dari `accurate_shops.warehouse_name` sehingga satu faktur hanya bisa punya satu gudang, padahal satu toko nyatanya memakai gudang berbeda; tak ada `warehouse_override` di mana pun; dan `hashInvoiceLines` (itemNo|unitPrice|qty) **tidak memuat gudang**, sehingga membetulkan config toko tak pernah memicu perbaikan faktur lama — sweep dan Retry sama-sama menyimpulkan "isi tak berubah". Akibatnya hari ini tak ada satu pun jalan di ERP untuk membetulkan gudang faktur yang sudah terbit.
+- **Koreksi GUDANG — dijawab §1c (🟡 belum merged).** Konteks awalnya (dinyatakan pemilik fitur 2026-09-04): Terukur di kode: gudang selalu dari `accurate_shops.warehouse_name` sehingga satu faktur hanya bisa punya satu gudang, padahal satu toko nyatanya memakai gudang berbeda; tak ada `warehouse_override` di mana pun; dan `hashInvoiceLines` (itemNo|unitPrice|qty) **tidak memuat gudang**, sehingga membetulkan config toko tak pernah memicu perbaikan faktur lama — sweep dan Retry sama-sama menyimpulkan "isi tak berubah". Akibatnya hari ini tak ada satu pun jalan di ERP untuk membetulkan gudang faktur yang sudah terbit.
 
   **Probe prod 2026-09-05 (read-only) menutup pertanyaan "dari mana sistem tahu gudang yang benar": TIDAK ADA SUMBER OTOMATIS.**
   - `accurate_shops`: **53 toko, hanya 2 gudang** — *Gudang Sadewa* (23 toko) dan *Gudang Sidareja* (30 toko).
@@ -75,7 +88,10 @@ Commit menulis semua flag & master lebih dulu (mapping → riwayat harga → fla
   - `transaction_orders` **tidak punya field gudang sama pun** (nol field cocok `ware|gudang|scan|fulfil`).
   - Lazada punya `warehouse_code` di cache native; **Shopee tak punya sama sekali**.
 
-  Konsekuensinya untuk rancangan: pemetaan "id gudang marketplace → nama gudang Accurate" **tidak berguna**, karena marketplace tak tahu gudang mana yang mengirim. Kebenarannya hanya dipegang manusia atau WMS, sehingga koreksi gudang harus berupa **penanda manual per pesanan** — dan karena gudangnya cuma dua, validasinya cukup terhadap `distinct(accurate_shops.warehouse_name)`. Dirancang terpisah.
+  Konsekuensinya untuk rancangan: pemetaan "id gudang marketplace → nama gudang Accurate" **tidak berguna**, karena marketplace tak tahu gudang mana yang mengirim. Kebenarannya hanya dipegang manusia atau WMS, sehingga koreksi gudang harus berupa **penanda manual per pesanan** — dan karena gudangnya cuma dua, validasinya cukup terhadap `distinct(accurate_shops.warehouse_name)`. Dirancang di §1c.
+- **Kolom Gudang Accurate = gudang menurut ERP**, bukan dibaca dari Accurate (satu panggilan per faktur akan menembus batas gateway 30 detik saat ekspor). Dokumen yang gudangnya diubah di luar ERP (faktur Juli) tampil berbeda dari Accurate.
+- **Belum terbukti di prod** (§1c): gudang komponen ketika baris induk paket **disisipkan** ke gudang koreksi; dan penyapu malam belum memegang kunci faktur di cabang faktur terkunci (celah lama jalur append, kini juga jalur pindah gudang).
+- **Tampilan belum ikut**: detail/ekspor faktur Auto-Sync belum menampilkan gudang per baris (baris pecahan tampil kembar kode+harga) dan Lacak Order belum menampilkan gudang koreksi — task lanjutan.
 
 ## Dokumen Terkait
 
