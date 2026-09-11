@@ -576,20 +576,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "b15fc12902d9406e2d4d9452b4298c923ad361eb78cfc4037aa611c65833a40b",
-      "ukuran_kb": 44.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda, laba per toko/produk/kampanye, video & live, pencatatan sesi live host `/live-shifts`, retur, price floor, ambang, pagu, kurva alokasi, pengumpul KPI) beserta parameter, gerbang akses, dan konvensi responsnya seperti `unavailable_channels`, `kolom_tidak_berlaku`, dan paginasi drill. Juga menjawab arti lima nilai vonis laba di `/beranda`, kenapa `null` berarti tak terhitung bukan nol, kenapa blok `pembatalan` tak boleh dikurangkan dari laba, dan cara mengaudit kelengkapan daftar route terhadap kode.",
+      "hash": "97915cfa8bf276edf056d104b050b861563b8e5a448675eb6dfe9070d3739164",
+      "ukuran_kb": 45.0,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda, ambang, pagu, kurva alokasi, laba per toko/produk/kampanye, video, live, live-shifts, retur, price floor, job, pengumpul KPI), parameter dan gerbang aksesnya, serta arti field respons seperti unavailable_channels, kolom_tidak_berlaku, dan lima nilai vonis laba. Juga menjelaskan konvensi respons (enum tak dikenal jadi 400, batas hari WIB, paginasi drill, total -1) dan cara mengaudit ulang kelengkapan daftar route terhadap kode.",
       "kata_kunci": [
         "marketing analytics",
         "endpoint",
         "API",
         "beranda",
-        "vonis laba",
         "ambang ROAS",
-        "pagu iklan",
+        "pagu belanja iklan",
+        "laba toko",
+        "profit",
         "live-shifts",
-        "profit per toko",
-        "kurva alokasi"
+        "sesi live"
       ]
     },
     {
@@ -2597,20 +2597,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "6a4834e9f8adba47a21af628e4e298e62dd9e7aef7b25fa8fd4a23fa2d7e095f",
-      "ukuran_kb": 119.3,
-      "ringkasan": "Menjawab: bagaimana marketing-analytics-service menghitung laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live dari integration_db ke koleksi mart_* miliknya, endpoint apa saja yang tersedia (beranda, ambang, pagu, kurva alokasi, live-shifts, KPI host live, analisis live), dan bagaimana vonis laba lima keadaan termasuk belum_matang ditentukan. Juga menjelaskan aturan pemakaian angka supaya tidak hitung ganda (iklan_sia_sia, pembatalan, 24h_live_gmv, tiga angka penjualan live), penjadwal sync 48 jam, pencatatan sesi live oleh host beserta tutup otomatis dan siaran serentak, serta penjaga baca-saja atas database service lain.",
+      "hash": "b2bf49e390b44c68a7ff35faad73a1327542f48ee74e6b67dc5cf5a07d6d7a3b",
+      "ukuran_kb": 121.0,
+      "ringkasan": "Menjawab: bagaimana service agregasi laba dan performa marketing bekerja, mulai dari membaca integration_db secara baca-saja, menyimpan pre-agregasi ke koleksi mart_*, penjadwal internal 48 jam dan job sync, sampai sumber data per channel TikTok, Shopee, dan Lazada serta alokasi bundel dan mapping SKU. Menjelaskan juga logika vonis beranda (termasuk belum_matang dan ambang materialitas), aturan pemakaian angka agar tidak hitung ganda (iklan_sia_sia, pembatalan, 24h_live_gmv, GMV live), serta pencatatan sesi live oleh host (live_shifts, siaran serentak, kepemilikan sesi, tutup otomatis).",
       "kata_kunci": [
-        "marketing analytics",
-        "laba marketing",
-        "profit attribution",
-        "mart_*",
-        "sesi live host",
-        "live-shifts",
-        "beranda vonis laba",
-        "ambang ROAS",
+        "marketing analytics service",
+        "mart",
+        "laba kotor",
+        "gross profit",
+        "ROAS",
         "hitung ganda",
-        "TikTok Shopee"
+        "integration_db",
+        "sesi live host",
+        "live shift",
+        "Shopee TikTok Lazada"
       ]
     },
     {
@@ -6128,7 +6128,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** (2026-09-11). Arahnya disetujui 2026-09-11 lewat `/analisa-kebutuhan`; kode belum ada. §2 direvisi di hari yang sama: ambil alih meminta persetujuan pemegang dengan batas 30 detik, dan diam berarti setuju. Berdiri di atas pengukuran prod 2026-09-11 dan di atas [[Microservices - Marketing Analytics Service]] yang berstatus ⚠️ Implemented dengan catatan, bukan di atas dok konsep. Papan kerja: `Workspace/ANALISA - Ambil Alih Sesi Live Host.md` (tidak diterbitkan).",
+      "status_teks": "**Diusulkan** (2026-09-11). Arahnya disetujui 2026-09-11 lewat `/analisa-kebutuhan`. **§1 sudah dikodekan** di branch bip-erp `feat/marketing-analytics-tutup-akhir-shift` dan erp-frontend `feat/live-shift-badge-alasan-tutup` (2026-09-11), belum merged dan belum di-deploy; §2 belum ada kodenya. §2 direvisi di hari yang sama: ambil alih meminta persetujuan pemegang dengan batas 30 detik, dan diam berarti setuju. Berdiri di atas pengukuran prod 2026-09-11 dan di atas [[Microservices - Marketing Analytics Service]] yang berstatus ⚠️ Implemented dengan catatan, bukan di atas dok konsep. Papan kerja: `Workspace/ANALISA - Ambil Alih Sesi Live Host.md` (tidak diterbitkan).",
       "publik": true,
       "tautan": [
         "Microservices - Marketing Analytics Service",
@@ -6143,20 +6143,20 @@
         "APP - Web ERP",
         "APP - MyBharata"
       ],
-      "hash": "25f26f447be0262991d85b0e7fde4a0dc9920ecb958a4759aa9b7b014e465a34",
-      "ukuran_kb": 22.1,
-      "ringkasan": "Menjawab: bagaimana host live yang ditolak 409 karena sesi sebelumnya ditinggal terbuka bisa mengambil alih akun (persetujuan pemegang berbatas 30 detik, diam berarti setuju), kapan sesi tertutup sendiri (jam berakhir shift + 60 menit), dan kenapa leader tetap tidak boleh menghentikan sesi orang lain. Memuat kronologi insiden 10 ke 11 September 2026, pengukuran prod atas pergantian host, dampaknya ke atribusi GMV dan perlu_koreksi, serta jejak riwayat dan notifikasi yang dicatat.",
+      "hash": "78f1306b475936760d09e9e3b2dd04045f358844bf7c7f1d8aeb0c29f3230bdf",
+      "ukuran_kb": 22.5,
+      "ringkasan": "Menjawab: apa yang terjadi bila host live lupa mengakhiri sesi sehingga akun tertahan (409) dan GMV menempel ke host yang salah, serta keputusan yang diambil: tutup otomatis 60 menit setelah shift pemilik berakhir, dan ambil alih oleh host yang jadwalnya sedang berjalan dengan persetujuan pemegang berbatas 30 detik (diam berarti setuju). Juga menjelaskan siapa yang terdampak, apa yang tidak berubah dari keputusan 2026-08-30 (leader tetap tak boleh menghentikan sesi orang lain), jejak di riwayat, notifikasi, dan data produksi yang mendasarinya.",
       "kata_kunci": [
-        "ambil alih",
+        "ambil alih sesi live",
         "takeover",
-        "sesi live host",
-        "live shift",
         "tutup otomatis",
         "auto-close",
         "akhir shift",
-        "409 akun live",
-        "atribusi GMV",
-        "MyBharata"
+        "host live",
+        "live shift",
+        "409 akun dipakai",
+        "persetujuan 30 detik",
+        "atribusi GMV"
       ]
     },
     {
@@ -12856,19 +12856,20 @@
         "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
         "API - Marketing Analytics Service"
       ],
-      "hash": "698b69a8e87440f8f862117526a3de853852300f91c4eb668a3a36e654139fda",
-      "ukuran_kb": 10.5,
-      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk ambil alih sesi live host dan tutup otomatis akhir shift (T0 sampai T6), bagaimana urutan dan dependensinya, apa kriteria selesai berbasis test tiap task, dan bagaimana urutan deploy BE sebelum web dan MyBharata. Juga menjelaskan kenapa istirahat bolak-balik host tidak dibangun terpisah, perbaikan jadwal host yang wajib dilakukan HR, dan apa yang sengaja di luar lingkup.",
+      "hash": "2ba1002a4d87d26111878d427ef8d324bdf010eae37e53a7c1706096be054977",
+      "ukuran_kb": 10.8,
+      "ringkasan": "Menjawab: pekerjaan apa saja yang diturunkan dari kebutuhan tombol ambil alih sesi live (T0 sampai T6: pembetulan jadwal oleh HR, tutup otomatis +60 menit di backend, ambil alih di backend, tombol di web dan MyBharata, verifikasi lapangan, dok), bagaimana urutan dependensi dan urutan deploy-nya, serta kriteria selesai tiap task. Juga menjelaskan kebutuhan sebenarnya di balik permintaan itu dan apa yang sengaja di luar lingkup.",
       "kata_kunci": [
-        "ambil alih",
-        "takeover",
-        "sesi live host",
-        "tutup otomatis",
-        "daftar task",
         "analisa kebutuhan",
-        "live shift",
-        "jadwal host live",
-        "urutan deploy"
+        "ambil alih sesi live",
+        "daftar task",
+        "tutup otomatis shift",
+        "takeover",
+        "MyBharata",
+        "erp-frontend",
+        "host live",
+        "jadwal host",
+        "papan kerja"
       ]
     },
     {
