@@ -2,13 +2,13 @@
 
 *Administrasi kepegawaian (personalia) — mengelola data administratif karyawan sepanjang masa kerja: data personal, kontrak (PKWT), BPJS, dokumen, riwayat masa kerja, hingga off-boarding/exit clearance. Beririsan dengan subsistem off-boarding di [[HRIS - Analysis]].*
 
-- **Status**: ⚠️ Sebagian diimplementasikan — **pencatatan resign & penonaktifan akun ✅ live di produksi 2026-08-05**; sisa off-boarding (exit clearance) masih 🟡 konsep
+- **Status**: ⚠️ Sebagian diimplementasikan — **pencatatan resign & penonaktifan akun ✅ live di produksi 2026-08-05**; **riwayat kontrak ✅** (koleksi `employee_contract`, halaman `/hris/contract`); sisa off-boarding (exit clearance) masih 🟡 konsep
 
 ## Ruang Lingkup & Data
 
 Dokumen/data yang dikelola (sebagian sudah ada di [[Microservices - Employee Service]]):
 - **Data personal pegawai** (`personal_data`, `personal_document`)
-- **Kontrak / PKWT** (mis. BIP-203-0525) — **notifikasi 1 bulan sebelum masa kontrak habis** → follow up ke SPV. Digitalisasi tanda tangan & e-Meterai kontrak: [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] (🟡 direncanakan)
+- **Kontrak / PKWT** (mis. BIP-203-0525): riwayat kontrak per karyawan, perpanjangan, dan lampiran PDF bertanda tangan sudah ada (rute di [[API - Employee Service]] §Kontrak Kerja). Kebutuhan: **notifikasi 1 bulan sebelum masa kontrak habis** → follow up ke SPV. ⚠️ Notifikasi itu **belum ada di kode** (dicek ke `bip-erp` `origin/main` 2026-09-11); yang ada hanya status `ending` (berakhir dalam 2 bulan) di layar dan tanggal berakhir di kalender pribadi karyawan. Digitalisasi tanda tangan & e-Meterai kontrak: [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] (🟡 direncanakan)
 - **BPJS**
 - **Riwayat masa kerja** (history)
 
@@ -38,7 +38,7 @@ Implementasi: [[Microservices - Employee Service]] · endpoint: [[API - Employee
 ## Integrasi
 
 - [[Microservices - Employee Service]] — endpoint contract, BPJS, personal data (RequireHRISStaff)
-- [[Microservices - Notification Service]] — notifikasi PKWT mendekati habis
+- [[Microservices - Notification Service]]: notifikasi PKWT mendekati habis (🟡 belum ada di kode; lihat [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] §Celah pondasi)
 - [[GA - Inventory Management]] — pengembalian aset saat exit clearance
 - [[HRIS - Analysis]] — subsistem off-boarding
 

@@ -110,7 +110,12 @@ Seluruhnya `gateHris` + `RequireHRISStaff` (baca `PermHrisView`, tulis `PermHris
 | POST | `/contract/:id/file` | Unggah lampiran multipart `file`: **PDF saja, maks 4 MB**, object key `employee/<employee_id>/contract/<contract_id>/<hex>.pdf` lewat [[Microservices - File Service]]. Mengganti lampiran menghapus objek lama **sesudah** `$set` berhasil. ⚠️ Belum ada penguncian: PDF yang sudah ditandatangani tetap bisa diganti. `contract_file.go` |
 | GET | `/contract/:id/file` | Mengalirkan PDF lewat file-service `/preview` dengan kunci **baca**; `Content-Type: application/pdf` + `Content-Disposition` lewat helper yang meng-escape nama berkas. ⚠️ Khusus staf HRIS: karyawan tak punya jalur membuka kontraknya sendiri |
 
-Jangan tertukar: `/legal/contracts` (`legal_kontrak.go`) dan `/procurement/contracts` (`procurement_kontrak.go`) di service yang sama adalah registri kontrak **bisnis** dengan gerbangnya sendiri, bukan kontrak kerja; belum dirinci di dok ini.
+**Jangan tertukar: kontrak BISNIS di service yang sama.** Dua registri non-Accurate berikut bukan kontrak kerja. Keduanya tanpa filter `company_id`, dan `PUT` menimpa dokumen utuh (`ReplaceOne`), jadi field yang tak dikirim ikut kosong. Model dan field-nya dirinci di dok sumbernya, tidak disalin ke sini.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET/POST/PUT/DELETE | `/legal/contracts` · `/legal/contracts/:id` | Register Kontrak & SLA Legal (`legal_kontrak.go`, koleksi `legal_contract`). Filter `contract_type`, `review_status`; daftar dibalas `{data, count}`; `name` + `counterparty` wajib. Gerbang `gateSecretary`: baca `PermSecretaryLegalView`, tulis `PermSecretaryLegalWork` (fallback `RequireLegalStaff`), DELETE `PermSecretaryLegalManage` (fallback `RequireLegalSupervisor`). Detail: [[QA - Register Perizinan & Sertifikasi]] |
+| GET/POST/PUT/DELETE | `/procurement/contracts` · `/procurement/contracts/:id` | Kontrak & perpanjangan vendor non-inventory (`procurement_kontrak.go`, koleksi `procurement_contract`). Filter `contract_type`, `status`; daftar dibalas `{data, count}`; `vendor` + `contract_type` wajib. Baca `RequireProcurementReadOrLegal` (Legal ikut membaca), tulis `RequireProcurementStaff`, DELETE `RequireProcurementSupervisor`. Detail: [[Microservices - Procurement Service]] |
 
 ## Resign / Non-Aktif Karyawan — ✅ live di produksi 2026-08-05
 Seluruhnya `RequireHRISStaff` + isolasi tenant `EffectiveCompanyID`. Keputusan & konsekuensinya: [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]].

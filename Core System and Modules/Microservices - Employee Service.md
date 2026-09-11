@@ -337,6 +337,10 @@ Yang **tidak** ikut mati: `/payroll-supplement` di [[Microservices - Attendance 
 
 **Contract / BPJS / Analysis**
 - Endpoint contract, BPJS, dan analysis (`RequireHRISStaff`)
+- **Kontrak kerja (riwayat PKWT/PKWTT)**: rute `/contract*` (daftar, ringkasan, riwayat, tambah, koreksi, lampiran PDF) dirinci di [[API - Employee Service]] §Kontrak Kerja; rencana e-signing di [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]]. Kode: `contract.go`, `contract_file.go`, `contract_summary.go`, `contract_migrate.go`.
+	- Koleksi `employee_contract` adalah sumber kebenaran; perpanjangan = dokumen baru, status dihitung saat baca. Kontrak pertama dibentuk di dalam transaksi create-employee (`kontrakPertama`, `func.go`) dan `work_data` diturunkan darinya; karyawan lama dibuatkan satu kontrak `migrated: true` oleh migrasi saat boot.
+	- ⛔ **Salinan `work_data.employment_type` + `contract_ending` hanya ditulis modul kontrak** (`segarkanSalinan`). Tiga pintu tulis `work_data` lain membuang keduanya secara senyap lewat `fieldKontrak` (`partial_update.go`): `buildUpdateSet` (`PUT /update/:employee_id/work` & `/personal`), `POST /create/:employee_id/work`, dan `workDataSetTanpaFieldTerkunci` (dipakai `executeEmployeeUpdateTransaction`). Pintu tulis `work_data` baru wajib melewati penjaga yang sama. Dibuang senyap, bukan ditolak 400, supaya form lama tak mati selama jendela rilis BE-sebelum-FE. Kepemilikan: [[REF - Kepemilikan Data]].
+	- ⚠️ Nomor kontrak (`nomorKontrak`) diurut **per karyawan**, jadi bisa sama antar-karyawan; formatnya belum dikonfirmasi HR.
 - `GET /bpjs` — nomor kepesertaan KS & KT per karyawan. Dua mode: **single** (`?employee_id=`, respons datar) dan **list** (paginasi + `search` nama/NIK + filter `department`). Hanya karyawan **aktif** (`system_authentication.is_active`) dan dibatasi perusahaan pemakai. **Hanya baca** — tak ada endpoint tulis; nomor BPJS diubah lewat `PATCH /work-data` milik [[CORE - HRIS Orchestrator]] yang bersifat partial.
 	- Sempat **yatim**: lengkap sejak lama tapi tak punya pemanggil sama sekali. Kini dikonsumsi menu **Kelola BPJS** di [[APP - Web ERP]] (dikoreksi 2026-08-06).
 - Device/browser management + FCM token
@@ -377,7 +381,7 @@ Yang **tidak** ikut mati: `/payroll-supplement` di [[Microservices - Attendance 
 
 ## Dependencies & Integrasi
 
-- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `work_schedule`, `company_work_schedule`, `system_authentication`, `external_account`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`, `master_company`, `master_job_level`, `employee_warning` (⚠️ belum merge), `legal_license`, `legal_contract`, `legal_dispute`, `rnd_registration`, `rnd_product`, `quality_capa`, `quality_incoming`, `quality_batch_release`, `procurement_contract`, `procurement_saving`. Lihat [[DB - Overview and Notes]].
+- **MongoDB** — penyimpanan utama; collections: `personal_data`, `personal_document`, `work_data`, `work_document`, `employee_contract`, `work_schedule`, `company_work_schedule`, `system_authentication`, `external_account`, `kpi_score`, `company_holiday`, `master_department`, `master_system_role`, `master_company`, `master_job_level`, `employee_warning` (⚠️ belum merge), `legal_license`, `legal_contract`, `legal_dispute`, `rnd_registration`, `rnd_product`, `quality_capa`, `quality_incoming`, `quality_batch_release`, `procurement_contract`, `procurement_saving`. Lihat [[DB - Overview and Notes]].
 - **MinIO** — client langsung untuk upload foto & dokumen.
 - [[Microservices - Attendance Service]] — memanggil `POST /vacation/decrement`, mengonsumsi feed `/list` dan cron `/sync/work-schedules`.
 - [[Microservices - Notification Service]] — mengonsumsi feed `/list` (fcm-token, supervisor, dll).
