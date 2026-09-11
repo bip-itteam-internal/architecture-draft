@@ -642,17 +642,39 @@ Objeknya benar-benar mendarat di prefix `form/` — bagian yang paling mungkin d
 
 > Percobaan pertama dibalas `403`, dan itu **benar**: skrip ujinya salah membaca `employee_id` (respons `/api/employee/me` datar, bukan bersarang di `data`), sehingga formnya menyasar daftar kosong dan pemanggil memang bukan sasarannya sendiri.
 
-## Inspeksi Satgas 5R & K3 (direncanakan)
+## Inspeksi Satgas 5R & K3 (penanda `inspeksi_satgas`)
 
-> **Status**: 🟡 **Diusulkan 2026-09-11, kode belum ada.** Keputusan dan alasannya: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]]. Daftar task: `Workspace/ANALISA - Inspeksi Satgas 5R dan K3.md`.
+> **Status**: ⚠️ **T1+T2 terimplementasi di branch `feat/form-builder-satgas-kepatuhan`** (bip-erp, 4 commit di atas `main` f1bc2314), **belum merge, belum deploy, belum diuji lewat gateway**. Skor dan KPI dari cek ulang (T3), editor dan rekap web (T4/T5), dan menu MyBharata (T6) belum dikerjakan. Keputusan dan alasannya: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]]. Daftar task: `Workspace/ANALISA - Inspeksi Satgas 5R dan K3.md`.
 
-Petugas OD & Industrial Relation menilai Office Boy dan Security lewat form `evaluation` (sasaran `positions`, berulang bulanan) dengan foto temuan dan foto perbaikan. Temuan dicek ulang beberapa hari kemudian, dan **nilai KPI bulan itu diambil dari cek ulang**. Yang direncanakan bertambah di service ini:
+Petugas OD & Industrial Relation menilai Office Boy dan Security lewat form `evaluation` (sasaran `positions`, berulang bulanan) dengan foto temuan dan foto perbaikan. Temuan dicek ulang beberapa hari kemudian, dan **nilai KPI bulan itu diambil dari cek ulang**.
 
-- **Penanda form Satgas** (nama final di `/plan`), sah hanya pada `evaluation` berulang bulanan, dan ikut dikirim di `GET /me/forms` supaya MyBharata bisa mengeluarkannya dari daftar survei. Hari ini `settings` terkirim utuh ke klien sedangkan `metric_key` tidak. Penandanya **bukan** `service_team_index`: penanda itu melebur seluruh form bertanda di departemen (lihat koreksi di §Skor gabungan), sehingga skor 5R akan tercampur rating pelayanan di KPI anggota dan atasannya.
-- **Gerbang pengisian berbasis izin.** Kirim jawaban dan unggah foto pada form bertanda ditolak bila pengirim tak memegang izin modul Satgas. Modulnya tersendiri, bukan `formbuilder`, karena satu klaim `formbuilder.*` mematikan fallback tier pemegangnya (`permission_gate.go:89-92`). Hari ini jalur isi hanya memeriksa status terbit dan `audience` (`response_handlers.go:364-369`), jadi menyembunyikan menu di aplikasi tidak menahan apa pun.
-- **Nilai terakhir-menang per orang per periode**, di satu fungsi yang dipakai endpoint KPI internal, endpoint menu/rekap, dan tab analitik "Yang Dinilai" untuk form bertanda. `overallOf` (rata-rata antar jawaban, `skor_gabungan.go:119-142`) tetap berlaku untuk form lain. Tanpa jawaban dalam periode berarti belum dinilai, bukan 0.
-- **Endpoint menu di grup `/me`**, meniru `/me/kaizen`: form Satgas milik pemanggil yang berizin, beserta ringkasan kiriman periode ini per orang yang dinilai. Dipakai menu MyBharata dan halaman rekap web.
-- **Endpoint internal per orang** untuk sumber KPI baru di [[Microservices - Employee Service]]. Seperti rute internal lain, ia menggerbang dirinya sendiri ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]).
+**Penanda `metric_key: inspeksi_satgas`** (`MetricSatgasInspeksi`, `models_form.go`). Sah hanya bila (`validateMetricKey` + `validateSatgas`, `validate.go`):
+
+- tipe `evaluation`, berulang **bulanan**, sasaran penilaian aktif;
+- **tepat satu** pertanyaan `boolean`, yaitu "Ada temuan?" (`kunciTemuan`). Nol atau dua ditolak, bukan ditebak dari urutan pertanyaan;
+- `settings.single_response` **dilarang**: cek ulang adalah kiriman kedua atas orang yang sama pada periode yang sama, dan `single_response` menolaknya `409`.
+
+Penandanya masuk `metrikJamak`, jadi Security dan Office Boy boleh punya form Satgas terpisah di departemen yang sama. Penandanya **bukan** `service_team_index`: penanda itu melebur seluruh form bertanda di departemen (lihat koreksi di §Skor gabungan), sehingga skor 5R akan tercampur rating pelayanan di KPI anggota dan atasannya.
+
+**Gerbang izin** (`satgas_gate.go`). Satu predikat `bolehIsiFormSatgas` dipakai kirim jawaban (`submitResponse`), unggah berkas (`uploadResponseFile`, sebelum berkas naik ke file-service), daftar sasaran (`listFormSubjects`), dan daftar form saya (`listMyForms`). Form bertanda Satgas hanya untuk pemegang `kepatuhan.satgas.input` (modul `kepatuhan`, [[CORE - RBAC dan Permission Set]]). Yang lain mendapat `403` berpesan yang menyebut paket "Kepatuhan: Petugas Satgas 5R & K3" dan perlunya login ulang, dan formnya tak muncul di `/me/forms`. Deny-by-default, tanpa tier fallback. Form tanpa penanda tak tersentuh sama sekali; untuk form lain jalur isi tetap hanya memeriksa `audience`.
+
+- **Kill-switch** `KEPATUHAN_PERMISSION_ENFORCEMENT`, dibaca `bacaSakelarIzin` bersama sakelar `formbuilder`. Hanya `off` yang mematikan, dan saat itu form Satgas kembali ke perilaku form lain: cukup `audience`. Sengaja tak ditulis di compose.
+
+**`metric_key` ikut dikirim di `GET /me/forms`**, supaya MyBharata mengeluarkan form Satgas dari daftar survei (pola `form_type` untuk Kaizen). Kosong = form biasa.
+
+**Notifikasi inbox dilewati untuk form Satgas** (`kirimNotifForm`), baik saat terbit (audience lebar akan menerima kabar inspeksi) maupun saat pengisian "selesai" (`notifySubmitted` mengirim "sudah lengkap" SETIAP kiriman begitu seluruh sasaran pernah dinilai, jadi tiap cek ulang akan mengulanginya).
+
+**`GET /me/satgas`** (`satgas_me.go`) untuk menu Satgas di MyBharata. Izin dinilai **sebelum** database disentuh: tanpa izin dijawab `200 {allowed:false, forms:[]}`. Pemegang izin menerima form Satgas terbit yang putarannya buka dan ia masuk audience, beserta ringkasan per PIC dari kiriman petugas **siapa pun** pada periode berjalan: `not_rated`, `open_finding`, atau `resolved`. Aturan ringkasannya (`ringkasSatgas`, fungsi murni):
+
+- jawaban **terakhir** yang menang (seri waktu dipecah lewat ObjectID), bukan yang pertama dan bukan rata-rata;
+- roster (potret sasaran) yang menentukan siapa tampil; kiriman atas orang di luar roster dan kiriman periode lain diabaikan;
+- jawaban "Ada temuan?" yang tak terbaca dibaca `open_finding`, supaya temuan yang tak pernah dicek tak tertutup sendiri.
+
+Kontrak lengkap di [[API - Form Builder Service]].
+
+⚠️ **Tab analitik "Yang Dinilai" masih merata-ratakan** (`overallOf`) jawaban form Satgas. Aturan terakhir-menang untuk skor dan KPI adalah T3; sampai itu, analitik bukan tempat membaca nilai Satgas.
+
+⚠️ **Kepemilikan form Satgas sebaiknya Human Resource saja.** Pengelola departemen pemilik membaca analitik dan foto seluruh jawaban lewat grup `/forms`. Bila General Affair ikut jadi pemilik, pengelola dari departemen PIC membaca inspeksi atas timnya sendiri.
 
 Rumus konversi skala 1-5 ke 0-100 masih TBD (lihat ADR). `normalisasiSkala` (`skor_gabungan.go:61`) membuat 3 = 50, sedangkan praktik lembar HRD membuat 3 = 60.
 
