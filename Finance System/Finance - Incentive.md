@@ -25,8 +25,8 @@ Insentif  = tarif(%) × Profit
 
 **Aturan turunan yang mengikat:**
 
-1. **Gerbang retur 7%** — batas berlaku selama pencapaian **≤100%**; di atas itu retur tidak lagi menggugurkan. Rasionya dari **jumlah order** (keputusan client 2026-07-31), bukan nilai rupiah; rasio nilai tetap ditampilkan sebagai pembanding karena bisa berbeda jauh (Juli 2026: 4,12% vs 3,35%).
-2. **Target diketik hanya di lingkup Supervisor**, lalu dibagi rata turun ke Leader dan ICC. Baris turunan boleh ditimpa manual. Ubah target saat periode berjalan wajib beralasan; setelah disetujui, ditolak. 🟡 **Diputuskan berubah 2026-09-07** ([[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]]; gerbang tulisnya sudah di branch `feat/insentive-gerbang-target`, belum merge; sisanya belum di kode): target per orang diketik SPV Marketing untuk divisinya, target SPV oleh Finance atau Direktur, dan angka yang sama dibaca KPI.
+1. **Gerbang retur 7%** — batas berlaku selama pencapaian **≤100%**; di atas itu retur tidak lagi menggugurkan. Rasionya dari **jumlah order** (keputusan client 2026-07-31), bukan nilai rupiah; rasio nilai tetap ditampilkan sebagai pembanding karena bisa berbeda jauh (Juli 2026: 4,12% vs 3,35%). Gerbang ini hanya berlaku bila **target sudah diisi**: baris bertarget kosong tak punya pencapaian untuk dibandingkan, dan dulu terlabel *Gugur* seolah karena retur; kini tidak digugurkan, yang tampil peringatan *target belum diisi* (bip-erp [#1620](https://github.com/bip-itteam-internal/bip-erp/pull/1620), merged 2026-09-01).
+2. **Target diketik hanya di lingkup Supervisor**, lalu dibagi rata turun ke Leader dan ICC. Baris turunan boleh ditimpa manual. Ubah target saat periode berjalan wajib beralasan; setelah disetujui, ditolak. ✅ **Berubah 2026-09-07** ([[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]], live prod 2026-09-08): target per orang diketik SPV Marketing untuk divisinya, target SPV oleh Finance atau Direktur, dan angka yang sama dibaca KPI. ⚠️ Pembagian rata turun praktis tak berjalan: `incentive_org` kosong, sehingga baris Leader dan ICC tanpa target manual bertarget **nol** (ADR 0079 §Context). Terukur prod 2026-09-11 (ukur ulang sebelum dipakai): target September baru memuat 2 Supervisor dan 27 ICC, **belum ada Leader**.
 3. **Dasarnya UANG CAIR, bukan harga jual** — potongan marketplace dan retur sudah terpotong di dalamnya, jadi tidak dikurangkan lagi. Retur ditampilkan untuk pemantauan dan syarat 7%, bukan sebagai pengurang.
 4. **Order yang belum cair sampai tanggal 25 bulan berikutnya HANGUS** untuk periode itu. Konsekuensinya dashboard akan selalu sedikit lebih tinggi dari pembukuan Accurate — itu aturan keadilan, bukan buku besar.
 
@@ -52,7 +52,7 @@ orang, yang dengan aturan gaji-orang-itu-sendiri praktis adalah gaji orang terse
 Sebelum perubahan ini `GET /profit-dashboard` dan `GET /profit/incentive/summary` tak punya
 gerbang sama sekali, sehingga menyembunyikan menunya tak menutup apa pun; keduanya kini
 digerbang `common.RequireMenu`. Menulis target tetap terpisah dan lebih ketat
-(`RequireMasterProfitWriter`: finance + IT saja untuk `/profit/org`, `/profit/opex`, `/profit/proyek-divisi`; untuk `/profit/targets` ⚠️ [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] T1 di branch `feat/insentive-gerbang-target`, belum merge: Supervisor divisi boleh level icc dan leader divisinya sendiri, level supervisor tetap finance/IT/Direktur, target diri sendiri ditolak) — di-assign ke menu tidak memberi hak
+(`RequireMasterProfitWriter`: finance + IT saja untuk `/profit/org`, `/profit/opex`, `/profit/proyek-divisi`; untuk `/profit/targets` ⚠️ [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] T1 live prod 2026-09-08: Supervisor divisi boleh level icc dan leader divisinya sendiri, level supervisor tetap finance/IT/Direktur, target diri sendiri ditolak) — di-assign ke menu tidak memberi hak
 mengubah angka yang menentukan pembayaran.
 
 Cara memakainya: **Pengaturan → Hak Akses**, pasang paket "Menu: Insentif Profit" ke akun
@@ -68,9 +68,9 @@ justru di sini: atasan marketing termasuk populasi yang paling mungkin memegang
 membuktikan bahwa penugasan pertama benar-benar menutup layar bagi mereka. Verifikasi itu
 menunggu deploy.
 
-### Cara membaca layarnya (per 2026-08-26)
+### Cara membaca layarnya (per 2026-08-26, ditambah 2026-09-11)
 
-Tiga hal di layar dulu memberi kesan "datanya tidak masuk" padahal datanya benar. Ketiganya
+Empat hal di layar dulu memberi kesan "datanya tidak masuk" padahal datanya benar. Keempatnya
 sudah dibereskan, dan sebabnya berbeda-beda — penting dibedakan supaya keluhan berikutnya
 tidak salah didiagnosis:
 
@@ -78,7 +78,8 @@ tidak salah didiagnosis:
 |---|---|---|
 | Mapping ICC baru ditambah, dashboard belum berubah | Cache respons `/profit*` (rescache, TTL **10 menit**) tak pernah dibuang saat mapping berubah | Mutasi mapping/leader ICC kini membuang cache itu — bip-erp [#1448](https://github.com/bip-itteam-internal/bip-erp/pull/1448), merged |
 | ICC Management menyebut **15 toko**, dashboard menyebut **9** | Bukan cache. Ringkasan profit hanya memuat toko yang **punya order**; 6 toko lain sudah dipetakan tapi belum pernah berjualan | Toko tanpa order tetap dikirim sebagai baris nol, layar menulis "9 dari 15 toko" — bip-erp [#1455](https://github.com/bip-itteam-internal/bip-erp/pull/1455) + erp-frontend [#1248](https://github.com/bip-itteam-internal/erp-frontend/pull/1248), merged |
-| Dibuka di bulan Agustus, yang tampil Juli | Disengaja: bawaannya bulan **lalu**, dengan alasan bulan berjalan belum punya angka berarti | Bawaan kini **bulan berjalan** + penanda "Belum final" / "Final" — erp-frontend [#1256](https://github.com/bip-itteam-internal/erp-frontend/pull/1256), ⏳ **belum merge** |
+| Dibuka di bulan Agustus, yang tampil Juli | Disengaja: bawaannya bulan **lalu**, dengan alasan bulan berjalan belum punya angka berarti | Bawaan kini **bulan berjalan** + penanda "Belum final" / "Final" — erp-frontend [#1256](https://github.com/bip-itteam-internal/erp-frontend/pull/1256), merged 2026-08-27 |
+| Target baru disimpan, layar tetap *Target belum diisi*; menyimpan lagi ditolak "wajib disertai alasan minimal 10 karakter" tanpa kolom untuk mengetiknya | Cache dashboard 15 menit tak dibuang saat target ditulis. Formulir menyimpulkan "belum pernah diisi" dari baris basi itu lalu menyembunyikan kolom Alasan, sementara backend tahu dokumennya sudah ada (409). Terjadi prod 2026-09-07 | Cache periode dibuang tiap penulisan target/opex — bip-erp [#1748](https://github.com/bip-itteam-internal/bip-erp/pull/1748); kolom Alasan selalu terbuka selama periode berjalan — erp-frontend [#1467](https://github.com/bip-itteam-internal/erp-frontend/pull/1467); keduanya live prod 2026-09-11 |
 
 **Periode belum final ≠ angka salah.** Satu periode `YYYY-MM` baru tertutup pada akhir hari
 ke-**25 bulan berikutnya** (aturan SK: retur dan uang cair masih boleh masuk sampai tanggal
@@ -108,10 +109,17 @@ benar-benar menulis untuk divisinya; jendela 403 di antaranya sudah tertutup. Ya
 - **Cari, urut, halaman, TOTAL.** Kotak cari menyaring nama, tim, dan divisi; TOTAL di kaki
   tabel dihitung dari **seluruh hasil saring**, bukan halaman yang tampak; export mengunduh
   seluruh hasil saring.
+- **Kartu ringkasan** di atas tabel (Realisasi, Insentif, Beban = insentif terhadap profit, Siap dibayar)
+  dihitung dari hasil saring yang sama dengan TOTAL (`ringkasAngka(hasil.tersaring)`; komponen erp-frontend
+  [#1387](https://github.com/bip-itteam-internal/erp-frontend/pull/1387) dipakai ulang). Beban tampil "—" bila profit tidak positif, karena persen terhadap
+  profit negatif terbaca sebagai kabar baik.
 - **Master Target per orang.** Tab Target menampilkan anggota per level; pensil hanya pada
   baris yang boleh ditulis pemegang token (cermin gerbang T1 di layar, backend tetap
   penentu), gembok beralasan untuk baris diri sendiri, level supervisor, dan divisi lain.
-  Perubahan tetap lewat dialog beralasan wajib, bukan ketik langsung di sel.
+  Perubahan tetap lewat dialog beralasan wajib, bukan ketik langsung di sel. Selama periode berjalan kolom
+  Alasan **selalu terbuka** dan wajib hanya bila baris itu sudah bertarget (berlabel *opsional* pada pengisian
+  pertama), karena `target > 0` di baris bisa basi dan hanya backend yang pasti tahu dokumennya ada
+  (erp-frontend [#1467](https://github.com/bip-itteam-internal/erp-frontend/pull/1467), live prod 2026-09-11).
 - Seluruh teks lewat i18n `finance.insentif.*` ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]);
   tab Struktur Tim dan Proyek Divisi belum dimigrasi.
 
@@ -131,11 +139,11 @@ benar untuk **uang**: jadwal bayarnya memang sudah lewat. Besarannya kecil — J
 ⚠️ Banner dashboard sempat menjanjikan sebaliknya ("bergeser ke periode berikutnya")
 selama berbulan-bulan, bertentangan dengan Panduan di modul yang sama. Diperbaiki di
 erp-frontend [#1286](https://github.com/bip-itteam-internal/erp-frontend/pull/1286)
-(belum merge) dengan menyatukan kalimatnya ke satu konstanta yang dibaca kedua layar.
+(merged 2026-08-28) dengan menyatukan kalimatnya ke satu konstanta yang dibaca kedua layar.
 
 **KPI memakai aturan berbeda, dan itu disengaja.** Untuk penilaian, menghanguskan order
 berarti menghukum orang atas kecepatan pencairan marketplace — hal yang bukan urusannya.
-Sejak PR [#1503](https://github.com/bip-itteam-internal/bip-erp/pull/1503) (belum merge)
+Sejak PR [#1503](https://github.com/bip-itteam-internal/bip-erp/pull/1503) (merged 2026-08-28)
 metrik KPI memakai jendela **bergeser**: order yang telat cair masuk periode berikutnya.
 Selisihnya terukur +0,151% (Juli) dan +0,093% (Agustus) — kecil, tetapi berarti **dua
 angka profit yang sah berbeda** untuk orang yang sama, dan kartu KPI menyebutkannya.
