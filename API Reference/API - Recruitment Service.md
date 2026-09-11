@@ -78,17 +78,17 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
-| GET | `/psikotes/tipe` (`?active=true`) · `/psikotes/tipe/:id` | Daftar/detail tipe + `total_durasi_detik`, `jumlah_soal` per kode subtes, `kesiapan`, `subtes_kurang`, `dipakai_paket` | lihat |
-| POST/PUT/DELETE | `/psikotes/tipe` · `/psikotes/tipe/:id` | Buat/ubah/hapus tipe; `kode` dibuat server. `jenis_jawaban` di luar tiga nilai → `400`. Tipe bersoal: ganti jenis, buang subtes bersoal, atau ganti `jumlah_jawaban` subtes bersoal → `409`. Hapus tipe bersoal atau dipakai paket → `409` | tulis |
+| GET | `/psikotes/tipe` (`?active=true`) · `/psikotes/tipe/:id` | Daftar/detail tipe + `total_durasi_detik`, `jumlah_soal` per kode subtes, `kesiapan`, `subtes_kurang`, `dipakai_paket`. *(Revisi, branch belum merged)* + `penjelasan_kandidat`, `jumlah_contoh` per kode subtes (soal contoh aktif, terpisah dari `jumlah_soal`); kode kesiapan baru `contoh_kosong` (subtes pilihan ganda tanpa soal contoh aktif), dan `subtes_kurang` ikut memuatnya | lihat |
+| POST/PUT/DELETE | `/psikotes/tipe` · `/psikotes/tipe/:id` | Buat/ubah/hapus tipe; `kode` dibuat server. `jenis_jawaban` di luar tiga nilai → `400`. Tipe bersoal: ganti jenis, buang subtes bersoal, atau ganti `jumlah_jawaban` subtes bersoal → `409`. Hapus tipe bersoal atau dipakai paket → `409`. *(Revisi)* Hitungan "bersoal" di penjaga itu mencakup soal contoh; body PUT tanpa key `penjelasan_kandidat` mempertahankan nilai lama | tulis |
 | GET | `/psikotes/item?tipe_id=` | Daftar soal satu tipe, **termasuk kunci dan dimensi DISC**; karena itu digerbang setara tulis, bukan lihat | tulis |
-| POST/PUT/DELETE | `/psikotes/item` · `/psikotes/item/:id` | Buat/ubah/hapus soal, divalidasi terhadap tipenya (opsi 2 sampai 6, kunci sebanyak `jumlah_jawaban`, DISC tepat 4 kata berdimensi sah, gambar berpola kunci) | tulis |
+| POST/PUT/DELETE | `/psikotes/item` · `/psikotes/item/:id` | Buat/ubah/hapus soal, divalidasi terhadap tipenya (opsi 2 sampai 6, kunci sebanyak `jumlah_jawaban`, DISC tepat 4 kata berdimensi sah, gambar berpola kunci). *(Revisi)* + `contoh` (pilihan ganda saja; DISC bertanda contoh → `400`) dan `penjelasan` (maks 500, hanya soal contoh); body PUT tanpa key `contoh`/`penjelasan` mempertahankan nilai lama | tulis |
 | PUT | `/psikotes/item-urutan` | `{tipe_id, subtes_kode, ids}`: urutan baru satu subtes (tombol naik/turun) | tulis |
-| POST | `/psikotes/impor-item` | `{tipe_id, dry_run, expected_hash, baris[]}`, maks 500 baris, divalidasi per baris. `dry_run` membalas `{baris[], valid, ditolak, hash}`; simpan wajib membawa hash yang sama, beda → `409` | tulis |
+| POST | `/psikotes/impor-item` | `{tipe_id, dry_run, expected_hash, baris[]}`, maks 500 baris, divalidasi per baris. `dry_run` membalas `{baris[], valid, ditolak, hash}`; simpan wajib membawa hash yang sama, beda → `409`. *(Revisi)* Baris membawa `contoh` (bool) dan `penjelasan`, keduanya ikut dalam hash | tulis |
 | POST | `/psikotes/gambar` | Multipart `file`, maks 2 MB (`413`); PNG/JPG/GIF/WEBP ditentukan dari isi berkas (lainnya `415`). Balasan `{gambar: <kunci>}` | tulis |
 | GET | `/psikotes/gambar/:nama` | Pratinjau gambar untuk HR | lihat |
 | GET · POST/PUT/DELETE | `/psikotes/paket` · `/psikotes/paket/:id` | Paket berurutan + `siap`, `total_durasi_detik`, kesiapan per bagian | lihat · tulis |
 
-> `item-urutan` dan `impor-item` sengaja **satu segmen**, bukan `/psikotes/item/urutan`, supaya tak bersaudara dengan `/psikotes/item/:id` dan urutan pendaftaran rute tak menentukan kebenarannya. Semua perubahan tercatat di audit: `psikotes_tipe.*`, `psikotes_paket.*`, `psikotes_item.created|updated|deleted|reordered|imported` (ubah soal membawa penanda "kunci diubah" **tanpa nilai kuncinya**), `psikotes_gambar.uploaded`.
+> `item-urutan` dan `impor-item` sengaja **satu segmen**, bukan `/psikotes/item/urutan`, supaya tak bersaudara dengan `/psikotes/item/:id` dan urutan pendaftaran rute tak menentukan kebenarannya. Semua perubahan tercatat di audit: `psikotes_tipe.*`, `psikotes_paket.*`, `psikotes_item.created|updated|deleted|reordered|imported` (ubah soal membawa penanda "kunci diubah" **tanpa nilai kuncinya**, dan *(revisi)* "dijadikan soal contoh" atau "dijadikan soal asli"), `psikotes_gambar.uploaded`.
 
 ## Interview Rounds & Feedback (Fase F — adopsi ERPGo)
 | Method | Path | Fungsi | Role |
@@ -155,7 +155,7 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 
 | Method | Path (gateway) | Fungsi |
 |---|---|---|
-| GET | `/public/recruitment/psikotes/:token` | Kandidat membuka sesi psikotes lewat magic link. **Tidak memuat digit soal**; sesi paket + `paket` (bagian, `bagian_index`, tanpa soal) |
+| GET | `/public/recruitment/psikotes/:token` | Kandidat membuka sesi psikotes lewat magic link. **Tidak memuat digit soal**; sesi paket + `paket` (bagian, `bagian_index`, tanpa soal). *(Revisi layar kandidat, branch belum merged)* + `lowongan` (judul posting, cadangan `posisi_dilamar`), `telepon_samar`, `email_samar` (disamarkan server; nilai lengkap tak dikirim); `paket` tanpa `nama`; bagian tanpa `nama`/`deskripsi`, dengan `penjelasan` dan key `konfig_kolom` (dulu `kraepelin`); subtes tanpa `nama`, dengan `jumlah_contoh` |
 | POST | `/public/recruitment/psikotes/:token/start` | Mulai mengerjakan. **Idempoten**: soal tidak digenerate ulang, lanjut dari kolom tersimpan |
 | POST | `/public/recruitment/psikotes/:token/columns/:index` | Submit satu kolom. Index sama **menimpa**; index lama tidak menarik balik progres; panjang jawaban ditentukan **server** |
 | POST | `/public/recruitment/psikotes/:token/finish` | Selesai + dinilai. Panggilan kedua tidak menghitung ulang |
@@ -163,13 +163,14 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 | POST | `.../:token/bagian/:b/mulai` | **(Tes berpaket, 2026-09-11, bip-erp #1837 + #1838, belum prod.)** Mulai bagian ke-b sesuai giliran. Bagian Kraepelin membalas config + kolom seperti `/start` lama |
 | POST | `.../:token/bagian/:b/kolom/:index` · `.../bagian/:b/selesai` | Kirim kolom dan tutup bagian Kraepelin di dalam paket |
 | POST | `.../:token/bagian/:b/subtes/:s/mulai` | Mulai subtes; server menulis deadline. Balasan soal **tanpa kunci/dimensi**, `soal_index`, `sisa_detik` (`null` bila tanpa timer) |
-| POST | `.../:token/bagian/:b/subtes/:s/jawab` | `{nomor, pilihan}` (pilihan ganda) atau `{nomor, most, least}` (DISC, keduanya beda). Maju saja; lewat deadline plus 5 detik → `409 waktu_habis` |
+| POST | `.../:token/bagian/:b/subtes/:s/contoh` | *(Revisi, branch belum merged.)* Soal contoh subtes yang gilirannya: `{jumlah_jawaban, contoh: [{pertanyaan, gambar, opsi, kunci, penjelasan}]}`. **Sengaja membawa kunci** (contoh tak dinilai). Tak menulis deadline maupun status, hanya `last_seen_at`. Bukan pilihan ganda → 400; bagian belum mulai → `409 belum_mulai`; bukan subtes yang gilirannya → `409 bukan_giliran` |
+| POST | `.../:token/bagian/:b/subtes/:s/jawab` | `{nomor, pilihan}` (pilihan ganda) atau `{nomor, most, least}` (DISC, keduanya beda). Maju saja (*(revisi, branch)* nomor mana pun dalam rentang boleh dijawab ulang selama subtes berjalan; di luar rentang 400); lewat deadline plus 5 detik → `409 waktu_habis` |
 | POST | `.../:token/bagian/:b/subtes/:s/selesai` | Tutup subtes; subtes terakhir menutup bagian, bagian terakhir menutup sesi |
 | GET | `.../:token/gambar/:nama` | Gambar soal/opsi, **hanya** yang ada di snapshot sesi token itu (lainnya 404) |
 
-> **Psikotes publik dijaga token, bukan sesi login.** Token 32 byte `crypto/rand` base64url, unik di level index. Tidak ada endpoint publik yang mengembalikan kunci jawaban, dimensi DISC, atau skor; soal CFIT/DISC dikirim **tanpa kunci** saat subtesnya dimulai. DTO-nya eksplisit dan ada test allowlist kunci JSON yang menggigit bila field internal bocor. Rincian: [[HRIS - Psikotes Kraepelin]] dan [[HRIS - Bank Soal dan Paket Psikotes]].
+> **Psikotes publik dijaga token, bukan sesi login.** Token 32 byte `crypto/rand` base64url, unik di level index. Tidak ada endpoint publik yang mengembalikan kunci jawaban, dimensi DISC, atau skor; soal CFIT/DISC dikirim **tanpa kunci** saat subtesnya dimulai. *(Revisi, branch belum merged)* Pengecualian sadar: `.../subtes/:s/contoh` membawa kunci dan penjelasan **soal contoh**; soal asli tetap tanpa kunci. DTO-nya eksplisit dan ada test allowlist kunci JSON yang menggigit bila field internal bocor. Rincian: [[HRIS - Psikotes Kraepelin]] dan [[HRIS - Bank Soal dan Paket Psikotes]].
 
-> **Galat mesin tes berpaket** berbentuk `{"error": <kalimat>, "kode": <kode>}` dengan kode `bukan_giliran`, `belum_mulai`, `waktu_habis`, `soal_terlewati`, `subtes_selesai` (409); career portal membaca `kode`. `POST .../columns/:index` dan `.../finish` menolak sesi paket (400). Gateway meneruskan semua rute ini lewat **satu rute umum berpenyaring** dengan limiter per token ([[CORE - API Master Gateway]]).
+> **Galat mesin tes berpaket** berbentuk `{"error": <kalimat>, "kode": <kode>}` dengan kode `bukan_giliran`, `belum_mulai`, `waktu_habis`, `soal_terlewati` (*(revisi, branch)* dibuang), `subtes_selesai` (409); career portal membaca `kode`. `POST .../columns/:index` dan `.../finish` menolak sesi paket (400). Gateway meneruskan semua rute ini lewat **satu rute umum berpenyaring** dengan limiter per token ([[CORE - API Master Gateway]]).
 
 > **Galat publik yang dibaca halaman kandidat** (`psikotes_public_handlers.go`): token tak dikenal → `404 {"error": "sesi tes tidak ditemukan"}`; sesi sudah `finished` → `410 {"error": "sesi tes sudah selesai"}`. Kuncinya **`error`**, bukan `message`. **(T0, career-bharata #9)** Portal karir memetakan 404 ke layar "tautan tidak berlaku" tanpa Coba Lagi dan 410 ke layar "tes sudah selesai"; mengubah status kode ini di BE mengubah layar yang dilihat kandidat.
 
