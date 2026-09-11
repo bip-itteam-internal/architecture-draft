@@ -33,7 +33,7 @@ mengingatkan bila versi kit terpasang ≠ versi terbaru.
 - `baseline/` — `<repo>.json`: test yang memang merah di `origin/main`, bertanggal + ber-commit; dibandingkan `gerbang` supaya hanya kegagalan BARU yang menolak.
 - `templates/brief.md` — Quick Brief Spec untuk `/brief`.
 - `skills/` — skill tim (disalin `init` → `.claude/skills/`). Kini: `migrasi-tabel-hris`, `audit-keamanan`, `deploy-bip-erp`.
-- `rules/` — `team-memory.md` (ingatan tim bersama; **di-import langsung** oleh CLAUDE.md dari vault via `@../architecture-draft/.agent-kit/rules/team-memory.md` — update cukup `git pull`, tak perlu re-init) plus berkas prosedur yang **tidak** di-import dan dibaca on-demand supaya tak membakar konteks tiap sesi: `plan-checklist.md` (`/plan`), `review-checklist.md` (`/review`), `wrap-completion-gate.md` (`/wrap`), dan `vault-retrieval.md` (pencarian vault, dipakai `/ask`, `/start-task`, `/analisa-kebutuhan`).
+- `rules/` — `team-memory.md` (ingatan tim bersama; **di-import langsung** oleh CLAUDE.md dari vault via `@../architecture-draft/.agent-kit/rules/team-memory.md` — update cukup `git pull`, tak perlu re-init) plus berkas prosedur yang **tidak** di-import dan dibaca on-demand supaya tak membakar konteks tiap sesi: `plan-checklist.md` (`/plan`), `review-checklist.md` (`/review`), `wrap-completion-gate.md` (`/wrap`), `vault-retrieval.md` (pencarian vault, dipakai `/ask`, `/start-task`, `/analisa-kebutuhan`), dan `ui-checklist.md` (mutu layar dan urutan reuse komponen; dirujuk team-memory, `plan-checklist.md` §1, dan `review-checklist.md` §J).
 - `templates/` — `workspace-CLAUDE.md` (jadi `erp/CLAUDE.md`).
 - `init.ps1` / `init.sh` — pemasang.
 - `VERSION` — versi kit.
