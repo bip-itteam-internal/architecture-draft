@@ -26,7 +26,7 @@ median 239 menit (maksimum 450). Aturan +60 memotong 0 dari 45 sesi sah (molor t
 
 ```
 T1 (BE: tutup otomatis +60) ────────────────────────────┐
-T2 (BE: ambil alih) ─┬─> T3 (web: tombol + riwayat) ────┼─> T5 (verifikasi lapangan)
+T2 (BE: ambil alih) ─┬─> T3 (web: BATAL, ADR 0091) ─────┼─> T5 (verifikasi lapangan)
                      └─> T4 (MyBharata: tombol + rilis) ┘
 brief celah 1 web ─────> T3      brief celah 1 mobile ──> T4
 T0 (HR: jadwal) paralel, non-kode, wajib selesai sebelum T5
@@ -71,7 +71,9 @@ diakhiri), verifikasi DEV lewat gateway, dan daftar verifikasi pasca-merge di ba
 - Teks pengingat `shift_usai` (jam berakhir + 30 menit) menyebut jam tutup otomatisnya.
 - **Web (erp-frontend)**: badge riwayat membaca alasan selesai ("shift berakhir" / "clock-out");
   sesi lama tanpa alasan tetap memakai teks sekarang. Sekarang badge berbunyi "Ditutup otomatis
-  (clock-out)" untuk setiap penutupan otomatis (`tabel-riwayat-live.tsx:121-125`).
+  (clock-out)" untuk setiap penutupan otomatis (`tabel-riwayat-live.tsx:121-125`). ⛔ Badge web ini
+  ikut hilang saat halaman web Sesi Live Host dihapus 2026-09-11
+  ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]).
 - Tik dan jalur lazy `GET /berjalan` memakai **satu** fungsi keputusan; jangan dua salinan.
 
 **Selesai bila** (test): sesi dalam shift yang lewat +60 tertutup tepat di +60; clock-out lebih
@@ -116,12 +118,17 @@ seketika, Tolak menggugurkan, diam 30 detik menjalankan; peminta yang sudah perg
 sesinya; pemegang yang menekan Akhiri selagi menunggu tidak menghasilkan 500; `selesai` sesi
 lama sama dengan `mulai` sesi baru; leader tetap 403 di `PATCH /:id/selesai`.
 
-**Deploy**: BE sebelum web dan MyBharata. Env baru untuk mencari atasan di employee-service
+**Deploy**: BE sebelum MyBharata (tombol web batal, lihat T3). Env baru untuk mencari atasan di employee-service
 berarti `up -d --force-recreate marketing-analytics-service`, bukan restart.
 
 **Mulai**: `jalankan /start-task Ambil alih sesi Sesi Live Host oleh host terjadwal (ADR 0088 §2)`
 
-## T3. Web: tombol Ambil alih + label riwayat
+## ⛔ T3. Web: tombol Ambil alih + label riwayat (BATAL 2026-09-11)
+
+Halaman web Sesi Live Host dihapus
+([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]), jadi tombol dan
+label riwayat versi web tidak dibangun, dan brief `.task-plans/briefs/2026-09-11-pemegang-akun-409-web.md`
+ikut tak relevan. Rincian di bawah dibiarkan sebagai catatan.
 
 **Prasyarat**: brief `.task-plans/briefs/2026-09-11-pemegang-akun-409-web.md` (menyebut pemegang
 di penolakan) sudah merged, dan T2 sudah ter-deploy.
@@ -167,7 +174,8 @@ Di DEV dengan dua akun host, lalu sekali di prod sesudah deploy:
 3. Riwayat A berbunyi "Diambil alih oleh B"; `selesai` A sama dengan `mulai` B.
 4. Sesudah sync TikTok, GMV terbagi per potongan waktu dan tak satu pun sesi `perlu_koreksi`.
 5. Satu sesi yang dibiarkan lewat jam berakhir + 60 menit tertutup sendiri dengan alasan
-   `shift_berakhir`, dan riwayat web menyebut "shift berakhir", bukan "clock-out".
+   `shift_berakhir`, dan riwayat MyBharata menyebut "shift berakhir" sesudah T4, bukan "clock-out"
+   (riwayat web sudah dihapus).
 
 Lewat gateway, bukan panggilan lokal. Test hijau bukan bukti fiturnya bisa dipakai.
 

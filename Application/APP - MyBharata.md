@@ -215,7 +215,7 @@ Sebabnya program Kaizen bukan "satu form lagi" bagi pengisinya: berulang tiap pe
 > dikunci test berikut kontrol negatifnya di
 > [[Microservices - Notification Service]]. Diverifikasi langsung di dev **dan** prod.
 
-### Sesi Live Host (`/live-shift`) — ⚠️ live di `dev`, siaran serentak selesai di branch
+### Sesi Live Host (`/live-shift`): ⚠️ live di `dev`, satu-satunya klien pencatatan sejak 2026-09-11
 
 Host live mencatat sendiri siaran TikTok-nya dari HP: Mulai (toko + akun), Jeda/Lanjutkan,
 Akhiri, plus riwayat 7 hari terakhir dengan porsi GMV-nya sendiri. Ini catatan yang ditulis
@@ -224,15 +224,21 @@ keduanya dijodohkan lewat toko **dan** akun.
 
 Menunya digerbang **host saja** (`isHostLive`), sengaja tanpa leader marketing: tombol
 Mulai/Akhiri di kartu tidak digerbang peran, jadi memberi leader akses menu berarti memberi
-leader jalan memulai sesi atas namanya sendiri. Ini **berbeda dari web**, yang memang
-memberi leader akses lihat-saja.
+leader jalan memulai sesi atas namanya sendiri. Web dulu memberi leader akses ke halaman
+Sesi Live Host; halaman itu dihapus 2026-09-11
+([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]).
 
 Backend, kontrak, dan aturan bisnisnya di [[Microservices - Marketing Analytics Service]]
 dan [[API - Marketing Analytics Service]]; keputusannya di
 [[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]].
 
-**Siaran serentak** (T2, branch `feat/live-shift-sesi-jamak`, versionCode 152, belum
-merged): host memegang beberapa akun sekaligus, jadi sesi berjalan adalah **daftar**, bukan
+⛔ **Sejak 2026-09-11 menu ini satu-satunya klien pencatatan sesi live**
+([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]): halaman web
+Sesi Live Host dihapus. Menunya ada di `origin/dev` (1.16.0+160), tidak di `origin/main`
+(1.14.5+135), jadi host yang belum memasang build yang memuatnya tak punya jalan lain untuk
+mencatat sesi.
+
+**Siaran serentak** (T2, my-bharata #128, merged ke `dev` 2026-08-31): host memegang beberapa akun sekaligus, jadi sesi berjalan adalah **daftar**, bukan
 satu. Halaman penuh merender satu kartu per sesi dengan timer dan peringatan ambangnya
 masing-masing. **Beranda tetap satu kartu** supaya tak berubah jadi daftar panjang, dengan
 penanda "Lihat N sesi lainnya" yang **bisa ditekan** menuju halaman penuh — sebagai teks
@@ -269,13 +275,17 @@ Yang mudah terlewat saat menyentuh layar ini:
   lebar HP yang lazim. Tak pernah tertangkap test karena permukaan test bawaan 800 px.
   Diperbaiki di komponennya; ini menyentuh **seluruh** pemakai `CustomButton`.
 
-⛔ **Belum terverifikasi di perangkat sungguhan**, dan `live_shifts` produksi masih **0
-dokumen** sejak fiturnya ada.
+⛔ **Belum terverifikasi di perangkat sungguhan.** ~~`live_shifts` produksi masih 0
+dokumen~~: tidak berlaku lagi, terukur 74 sesi per 2026-09-11; dari klien mana tidak terukur
+(tak ada field maupun log yang mencatatnya).
 
-**Belum ada di mobile** (sudah ada di web): pemilih toko — `shop_id` masih **diketik
-tangan**, dan salah ketik menghasilkan 200 kosong lalu sesi tersimpan ke toko yang tak bisa
-dijodohkan sehingga **GMV-nya hilang selamanya**; dan memilih beberapa akun sekaligus dalam
-satu dialog.
+~~Belum ada di mobile: pemilih toko, `shop_id` masih diketik tangan~~: **per 2026-09-11
+`origin/dev` sudah memanggil daftar toko** (`Api.marketingToko`) dan pemilih akun
+(`GET /live-shifts/akun`), belum diverifikasi di perangkat. Salah ketik `shop_id` dulu
+menghasilkan 200 kosong lalu sesi tersimpan ke toko yang tak bisa dijodohkan sehingga
+**GMV-nya hilang selamanya**. Memilih beberapa akun sekaligus dalam satu dialog belum
+diperiksa; padanan web-nya dihapus 2026-09-11
+([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]).
 
 ⚠️ Klien mana pun yang kelak merakit daftar akun **lintas toko** wajib berkunci
 `shop_id` + akun, bukan nama akun saja: nama akun berulang antar toko (`hexativ` adalah
