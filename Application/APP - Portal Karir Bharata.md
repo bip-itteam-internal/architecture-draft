@@ -1,8 +1,8 @@
-> Status: ⚠️ **Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas; **E2E terverifikasi live 2026-07-16**). ⛔ **Fitur "cek status lamaran" SUDAH DIHAPUS** (BE `a298ba70`, 2026-07-24; portal tak punya rute `/status` — diverifikasi 2026-09-10). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf, dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*).
+> Status: ⚠️ **Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas; **E2E terverifikasi live 2026-07-16**). ⛔ **Fitur "cek status lamaran" SUDAH DIHAPUS** (BE `a298ba70`, 2026-07-24; portal tak punya rute `/status` — diverifikasi 2026-09-10). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf (dan per perusahaan grup masih **TBD**, lihat [[HRIS - Recruitment]] §Rekrutmen Lintas Perusahaan), dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*). 🟡 **Nama perusahaan perekrut di daftar & detail lowongan: branch career-bharata `feat/nama-perusahaan-lowongan`, BELUM merge ke `master` maupun prod** (diukur 2026-09-11, branch ahead 1 commit dari `origin/master`).
 
 ## Deskripsi
 
-*Portal karir publik **PT Bharata Internasional Pharmaceutical** — situs tanpa login tempat pelamar melihat lowongan, mengirim lamaran (satu berkas PDF gabungan), dan **mengerjakan psikotes lewat magic link** (Kraepelin, dan sejak 2026-09-11 tes berpaket CFIT, DISC, Kraepelin; merged lewat #10, belum prod). Menggantikan alur **Google Form** lama HRD: lamaran langsung masuk pipeline [[Microservices - Recruitment Service]] sehingga HR tak perlu memindahkan data manual. Target domain: **`career.bharatainternasional.com`**.*
+*Portal karir publik **grup Bharata**, situs tanpa login tempat pelamar melihat lowongan, mengirim lamaran (satu berkas PDF gabungan), dan **mengerjakan psikotes lewat magic link** (Kraepelin, dan sejak 2026-09-11 tes berpaket CFIT, DISC, Kraepelin; merged lewat #10, belum prod). **Satu portal melayani lowongan SELURUH perusahaan grup** (bukan cuma PT Bharata Internasional Pharmaceutical/BIP): sejak rekrutmen lintas perusahaan (🟡 branch, belum merge, lihat [[HRIS - Recruitment]] §Rekrutmen Lintas Perusahaan), lowongan bisa dibuka atas nama perusahaan grup mana pun, dan nama perusahaan perekrutnya (`company_name`) tampil di daftar maupun detail lowongan supaya pelamar tahu ia melamar ke perusahaan yang mana. Menggantikan alur **Google Form** lama HRD: lamaran langsung masuk pipeline [[Microservices - Recruitment Service]] sehingga HR tak perlu memindahkan data manual. Target domain: **`career.bharatainternasional.com`**.*
 
 - **Repo**: `career-bharata` — **repo Git terpisah** (sibling di bawah `erp/`), **bukan** bagian dari `bip-erp`. Remote: `github.com/bip-itteam-internal/career-bharata`, branch utama **`master`** (bukan `main` — `origin/HEAD` menunjuk ke sana).
 - **Package manager**: **pnpm** (`pnpm@10.25.0`). Bukan npm/yarn.
@@ -27,8 +27,8 @@
 
 Sumber: `career-bharata/src/app/`.
 
-- **`/` — Landing**: hero (background `/hero/pixel.jpg` + overlay gradien gelap, teks putih) **disatukan dengan daftar lowongan** (anchor `#lowongan`, komponen `careers/jobs-browser.tsx`: pencarian + filter klien). Muncul **modal "WASPADA"** anti-penipuan rekrutmen saat pertama membuka landing (pola serupa portal karir Pertamina) — implementasi `useSyncExternalStore` agar aman SSR.
-- **`/lowongan/[slug]` — Detail lowongan**: satu baris **judul + tombol "Lamar Sekarang"** (tombol tidak terkubur di bawah), sub-judul = **jenis pekerjaan** (dari master `job_types`) + jumlah posisi; di bawah tombol: keterangan **"Sebelum tanggal {deadline}"** (bulan disingkat, `timeZone: "UTC"` agar tanggal deadline tak bergeser ke H+1). Isi: deskripsi/persyaratan/benefit (HTML disanitasi) + section **Penempatan** di paling bawah. **Tanpa** badge status, badge skill, atau departemen (keputusan UI: bukan info yang dicari pelamar).
+- **`/` — Landing**: hero (background `/hero/pixel.jpg` + overlay gradien gelap, teks putih) **disatukan dengan daftar lowongan** (anchor `#lowongan`, komponen `careers/jobs-browser.tsx`: pencarian + filter klien). Muncul **modal "WASPADA"** anti-penipuan rekrutmen saat pertama membuka landing (pola serupa portal karir Pertamina) — implementasi `useSyncExternalStore` agar aman SSR. 🟡 **Sub-judul tiap baris kini diawali nama perusahaan perekrut** (branch `feat/nama-perusahaan-lowongan`, belum merge): `[job.company_name, job.job_type, jumlah posisi].filter(Boolean)` di `jobs-browser.tsx`, perusahaan paling depan karena satu portal kini memuat lowongan beberapa perusahaan grup sekaligus.
+- **`/lowongan/[slug]` — Detail lowongan**: satu baris **judul + tombol "Lamar Sekarang"** (tombol tidak terkubur di bawah), sub-judul = **jenis pekerjaan** (dari master `job_types`) + jumlah posisi; di bawah tombol: keterangan **"Sebelum tanggal {deadline}"** (bulan disingkat, `timeZone: "UTC"` agar tanggal deadline tak bergeser ke H+1). Isi: deskripsi/persyaratan/benefit (HTML disanitasi) + section **Penempatan** di paling bawah. **Tanpa** badge status, badge skill, atau departemen (keputusan UI: bukan info yang dicari pelamar). 🟡 Sub-judul juga diawali `posting.company_name` sejak branch di atas, dengan alasan sama.
 - **`/lowongan/[slug]/lamar` — Form lamaran** (halaman sendiri, bukan modal): field **native model `candidate`** (nama_lengkap, email, no_hp, jenis_kelamin, tanggal_lahir, alamat, pendidikan, ipk, pengalaman, expected_salary, dll) — **bukan** form-builder `custom_question`; + **upload satu berkas PDF gabungan (maks 10 MB)** → dikirim `multipart/form-data`. Sukses → redirect ke **`/lowongan/[slug]/lamar/sukses`**.
 - **`/lowongan/[slug]/lamar/sukses` — Konfirmasi terkirim**: menyebut posisi yang dilamar, memberi tahu konfirmasi sudah dikirim ke email, satu tombol "Lihat Lowongan Lain", plus peringatan rekrutmen **tidak dipungut biaya**. **Tanpa token, tanpa nomor lamaran** — pelamar tak punya cara memeriksa kemajuan lamarannya sendiri; satu-satunya kontak balik adalah tim rekrutmen menghubunginya.
 - **`/psikotes/[token]`: mengerjakan psikotes** (`components/psikotes/`: `mesin-tes.tsx`, `ledger-kolom.tsx`, `sapaan.tsx`, `tes-sudah-selesai.tsx`; `lib/psikotes/mesin.ts`). Dibuka kandidat **tanpa login**, dijaga token di URL. Rincian Kraepelin: **[[HRIS - Psikotes Kraepelin]]**.
@@ -54,14 +54,27 @@ Detail: [[API - Recruitment Service]] §Publik.
 
 `GET /public/recruitment/track/:token` **tidak lagi dipakai dan tidak lagi ada di BE**. Rutenya dibuang dari gateway di bip-erp #1824 (merged 2026-09-10): sudah hilang dari gateway dev dan prod (prod sejak 2026-09-11).
 
-**Gotcha kontrak:** `posisi_dilamar` **wajib** dikirim (server tidak mengisinya dari `posting_id`); `tanggal_lahir` **RFC3339**; nilai enum casing **persis** BE (mis. `jenis_kelamin` "Laki-laki"/"Perempuan"). Lamaran sukses → kandidat menerima **email otomatis** "Lamaran Anda Telah Kami Terima" (✅ terverifikasi live) via [[Microservices - Notification Service]].
+**Gotcha kontrak:** `posisi_dilamar` **wajib** dikirim (server tidak mengisinya dari `posting_id`; divalidasi lebih dulu, `services/recruitment/models_candidate.go:131`); `tanggal_lahir` **RFC3339**; nilai enum casing **persis** BE (mis. `jenis_kelamin` "Laki-laki"/"Perempuan"). Lamaran sukses → kandidat menerima **email otomatis** "Lamaran Anda Telah Kami Terima" (✅ terverifikasi live) via [[Microservices - Notification Service]].
+
+🟡 **`posting_id` sendiri kini JUGA wajib** (branch rekrutmen lintas perusahaan, belum merge,
+diverifikasi `services/recruitment/public_handlers.go`: `POST /apply` membalas `400 {"error":
+"posting_id wajib diisi"}` bila kosong, `400 {"error": "posting_id tidak valid"}` bila bukan
+ObjectID). Sebelum branch ini `posting_id` opsional (lamaran tanpa `posting_id` sah, kandidatnya
+tanpa perusahaan tujuan yang jelas); sesudahnya WAJIB karena **perusahaan kandidat diturunkan
+dari lowongannya, tak pernah dari header/body** (rute `/public` tak lewat `ValidateJWT`, jadi
+header `BIP-*` di sini bisa dikarang siapa pun). `career-bharata` sudah mengikuti: tipe
+`ApplyDTO.posting_id` di `src/lib/recruitment-api.ts` berubah dari opsional jadi wajib, dan portal
+selalu mengirimnya (form lamaran selalu dibuka dari halaman detail satu lowongan). Ini **dua**
+field wajib yang berbeda perannya: `posisi_dilamar` teks bebas untuk keperluan HR/MPP,
+`posting_id` yang menentukan perusahaan tujuan.
 
 ## Belum Diimplementasikan / Catatan
 
 - ✅ **Sudah live di prod** (terukur 2026-09-11): container `career-bharata` di VPS Biznet (`~/apps/career-bharata`, remote `bip-itteam-internal/career-bharata`, branch `master`), port host `3005`, dan `career.bharatainternasional.com` melayani halaman psikotes. Catatan lama "belum go-live, belum ada remote/domain/deploy" sudah tidak berlaku.
 - **BE penopang: ✅ semua deployed & terverifikasi live di dev (2026-07-16)** — slug, job_type dari master, upload berkas (E2E multipart → `cv_object` → HR preview PDF valid), email kandidat (nama pengirim via `RECRUITMENT_EMAIL_FROM`, env sudah diset user). Tak ada lagi yang menunggu deploy BE.
 - **Production 0 lowongan** — 5 lowongan hanya di **dev** (seed). Requisition → approve → posting harus dibuat dari nol di production sebelum portal menampilkan apa pun.
-- **Halaman legal masih draf** — perlu review pihak berwenang sebelum publish.
+- **Halaman legal masih draf** — perlu review pihak berwenang sebelum publish. 🟡 **Legal per perusahaan grup: TBD.** `/syarat-penggunaan` dan `/kebijakan-privasi` (`legal-page.tsx`) SATU untuk seluruh portal, tak dibedakan per perusahaan perekrut walau satu portal kini melayani lowongan beberapa perusahaan grup; keputusan user "satu portal" tidak menjawab siapa pengendali data pelamar per perusahaan. Belum ada rencana kode untuk ini; dicatat sebagai TBD di [[HRIS - Recruitment]] §Rekrutmen Lintas Perusahaan, bukan diimplementasikan.
+- 🟡 **Filter perusahaan di landing: belum ada.** `jobs-browser.tsx` menampilkan nama perusahaan per baris (lihat di atas) tapi tak menawarkan filter berdasarkan perusahaan; belum diminta.
 - **`pnpm dev` rusak di path ber-spasi** (`c:\Data utama\...`): Turbopack panic "Next.js package not found"; `next dev --webpack` → `ENOENT .next/browser/default-stylesheet.css` (500 di route dinamis). **Preview andal = `pnpm build` lalu `pnpm start`**. Bukan bug kode portal.
 - `public/hero/pixel.jpg` **±2,9 MB** — perlu dioptimasi sebelum go-live.
 - **Tanpa captcha/anti-spam** dan tanpa rate-limit sisi portal (gateway `/public` sudah rate-limited) — pertimbangkan Turnstile sebelum publik.
@@ -78,6 +91,7 @@ Detail: [[API - Recruitment Service]] §Publik.
 
 ## Dokumen Terkait
 
-- [[HRIS - Recruitment]] — konsep/bisnis & keputusan HRD
+- [[HRIS - Recruitment]] — konsep/bisnis & keputusan HRD, termasuk §Rekrutmen Lintas Perusahaan
 - [[API - Recruitment Service]] · [[Microservices - Recruitment Service]]
 - [[APP - Website Bharata Internasional]] — situs korporat (halaman karir terpisah, sumber data berbeda)
+- [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] (🟡 branch, belum merge)

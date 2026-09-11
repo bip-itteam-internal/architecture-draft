@@ -230,7 +230,7 @@ Yang dilonggarkan **menu, bukan data**. Angka labanya dijaga dua lapis yang tak 
 |---|---|---|---|---|---|---|
 | `hris` | ✅ | ✅ | | ✅ | `hris.pengajuan.view`, `hris.pengajuan.approve`, `hris.divisi.view` | own/div/all |
 | `payroll` | ✅ | ✅ | ✅ | ✅ | | all |
-| `recruitment` | ✅ | ✅ | ✅ | ✅ | | div/all |
+| `recruitment` | ✅ | ✅ | ✅ | ✅ | `recruitment.requisition_cross_dept`, `recruitment.cross_company` (ADITIF, di luar tangga, lihat catatan di bawah) | div/all |
 | `kpi` | ✅ | ✅ | | ✅ | | own/div/all |
 | `training` | ✅ | ✅ | | ✅ | | all |
 | `hrdoc` | ✅ | ✅ | | ✅ | | own/div/all |
@@ -266,6 +266,20 @@ Yang dilonggarkan **menu, bukan data**. Angka labanya dijaga dua lapis yang tak 
 > - **`approve` dipecah empat, bukan disatukan.** Blueprint menaruh empat pihak pada tingkat nominal berbeda; menyatukannya berarti siapa pun yang boleh menyetujui belanja kecil otomatis boleh menyetujui yang bernilai puluhan juta. Contoh konkret kenapa tangga empat-kata-kerja tak selalu cukup.
 >
 > Izin memposting jurnal **sengaja belum ada**: arah jurnal masih menunggu keputusan Finance (ERP berhenti di pencatatan, atau menulis ke Accurate), dan menyediakan izinnya sekarang berarti menjanjikan kemampuan yang belum diputuskan bentuknya. Konsep bisnisnya di [[Finance - Kas Kecil dan Pengajuan Budget]].
+
+> **Modul `recruitment`: dua izin ADITIF di luar tangga, dan mereka tidak boleh mencabut tier saat berdiri sendiri** (`shared-library/common/catalog_recruitment.go`, ditegakkan `services/recruitment/permission_gate.go`). `recruitment.requisition_cross_dept` ([[ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen]], 2026-09-07) melebarkan pilihan DEPARTEMEN untuk `POST /requisitions`; `recruitment.cross_company` ([[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]], branch `feat/recruitment-lintas-perusahaan`, **belum merge** per 2026-09-11) melebarkan cakupan PERUSAHAAN untuk seluruh pipeline yang sudah dipegang. Keduanya:
+>
+> - **Tak pernah membuka izin pipeline itu sendiri.** Pemegang tanpa `recruitment.view` tetap tak bisa membuka daftar apa pun. Satu-satunya hak yang `cross_company` buka sendiri: `POST /requisitions` atas nama perusahaan lain (perusahaan tujuan bisa belum punya atasan pemakai ERP).
+> - **SENGAJA TIDAK masuk `RecruitmentTierDefault` maupun paket admin** (`recruitmentIzinPipeline`): fallback tier mensintesis izin recruitment dari `system_roles["hris"]`, dan diukur di produksi 2026-09-07 **6 dari 10** pemegang `hris:supervisor` adalah developer Tech Development. Memasukkan salah satu izin aditif ke tier atau ke paket admin akan memberi mereka wewenang lintas-departemen/lintas-perusahaan tanpa pernah diputuskan siapa pun. Penjaga: `TestRecruitmentTierDefaultTanpaIzinLintasDept`, `TestRecruitmentTierDefaultTanpaIzinLintasPerusahaan`, `TestPaketAdminTanpaIzinLintasPerusahaan`.
+> - Paketnya masing-masing berisi **TEPAT satu izin** (`recruitment_pengaju_lintas`, `recruitment_lintas_perusahaan`), dipasang ke posisi yang **sudah** memegang paket recruitment lain; isi tambahan apa pun akan diam-diam melebarkan hak di luar yang diputuskan.
+>
+> ⛔ **Jebakan yang ditutup lewat ADR 0092 §2**: memasang HANYA paket aditif ke posisi tanpa paket recruitment lain dulu membuat `izinRecruitmentEfektif` menilai "klaim memuat izin modul recruitment" jadi benar, lalu **mencabut** seluruh izin tier-nya. Terjadi di produksi 2026-09-08 pada posisi Direktur (`view`/`work`/`approve` dari tier `hris:supervisor` lenyap tanpa satu pun galat), menurut komentar kode. Ditutup dengan mengeluarkan izin ADITIF dari penilaian "klaim memuat izin modul" (`izinAditifRecruitment`, diturunkan dari katalog dikurangi `recruitmentIzinPipeline()`, bukan diketik ulang) sambil tetap menyertakannya ke hasil akhir. Sekelas dengan alasan WMS **tidak** memakai `KlaimMemuatIzinModul` di atas, tapi solusinya kebalikannya: WMS mengeluarkan SELURUH modulnya dari mekanisme itu, recruitment hanya mengeluarkan DUA izin aditifnya dari SATU penilaian (apakah klaim "memuat modul"); `view`/`work`/`approve`/`manage` tetap tunduk aturan biasa.
+>
+> **Aturan "siapa boleh lintas perusahaan" tinggal di satu tempat**: `common.BolehLintasPerusahaan(c, izin)` (`shared-library/common/company_scope.go`) = admin pusat (`system_roles.group = admin`) ATAU pemegang `izin`, `izin` kosong tak pernah membuka apa pun. Dipakai recruitment-service dan employee-service (lewat `EffectiveCompanyIDDenganIzin`, lihat [[Microservices - Employee Service]] §Multi-perusahaan) supaya kedua service tak menulis aturan aksesnya sendiri-sendiri.
+>
+> ⚠️ **`recruitment.cross_company` wajib dipasang JUGA ke posisi SPV HRD penyetuju**, bukan cuma ke recruiter lintas (keputusan `/review` 2026-09-11). Tanpanya mereka tetap menerima notifikasi requisition perusahaan lain (kini menyebut nama perusahaannya), tapi mendapat **404** saat membukanya, sebab permintaan per-ID di luar cakupan sengaja tak membocorkan keberadaannya.
+>
+> Berlaku setelah **login ulang** (izin dipanggang ke klaim JWT saat terbit), sama seperti ADR 0080. Status per 2026-09-11: branch `feat/recruitment-lintas-perusahaan`, **belum merge, belum deploy, paket belum terpasang ke posisi mana pun**.
 
 > **Penyimpangan rencana vs implementasi (per 2026-07-30).** Katalog `finance` yang sudah live memakai izin **per-objek**, bukan tangga tingkat: `finance.ar.view`, `finance.ar.export`, `finance.ap.view`, `finance.profit.view`, `finance.payout.view`, `finance.kastoko.view`. Bentuk itu masuk akal untuk finance karena tiap objek (piutang, utang, laba, pencairan, kas toko) memang ditinjau orang berbeda, tapi ia belum diselaraskan dengan ADR 0030 yang menetapkan tangga `view/work/approve/manage` plus pengecualian terbatas. **Perlu diputuskan:** perlebar ADR untuk mengizinkan pola per-objek pada modul multi-objek, atau selaraskan finance ke tangga. Selama belum diputuskan, dua pola hidup berbarengan dan itu akan membingungkan modul berikutnya.
 

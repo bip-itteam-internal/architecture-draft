@@ -4,7 +4,7 @@
 
 - **Stack**: Go + Fiber v2 + MongoDB (`recruitment_db`) — selaras pola service bip-erp lain
 - **Path**: `services/recruitment` (go.mod per-service; build/vet dari folder itu)
-- **Status**: ⚠️ **Implemented (BE)** — Fase 1-3 + adopsi ERPGo (A–F) + portal publik (browse/apply/track), **sudah di `main`** & jalan di dev. Belum: AI CV screening, psikotes online, WhatsApp kandidat, Glints sync, FE internal (erp-frontend Candidate Pipeline berjalan terpisah). Di belakang [[CORE - API Master Gateway]], auth **SSO** ([[CORE - SSO Flow]]), role `system_roles["hris"]`. Port `6979`, mongo `recruitment-mongo-db`. · 🔴 **Multi-perusahaan: belum ter-scope** — tak ada field company; requisition/posting/kandidat/interview/assessment + **portal karir publik** (`/public/postings`, `/apply`) bersama semua tenant. Fase lanjut: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
+- **Status**: ⚠️ **Implemented (BE)** — Fase 1-3 + adopsi ERPGo (A–F) + portal publik (browse/apply/track), **sudah di `main`** & jalan di dev. Belum: AI CV screening, psikotes online, WhatsApp kandidat, Glints sync, FE internal (erp-frontend Candidate Pipeline berjalan terpisah). Di belakang [[CORE - API Master Gateway]], auth **SSO** ([[CORE - SSO Flow]]), role `system_roles["hris"]`. Port `6979`, mongo `recruitment-mongo-db`. · 🔴 **Multi-perusahaan (di `main`): belum ter-scope** — tak ada field company; requisition/posting/kandidat/interview/assessment + **portal karir publik** (`/public/postings`, `/apply`) bersama semua tenant. **(2026-09-11)** Kode lengkap ada di branch `feat/recruitment-lintas-perusahaan`, **belum merge, belum deploy, paket belum terpasang ke posisi mana pun**: enam koleksi proses diberi `company_id`, ditambah `GET /companies` dan `?company=`. Lihat bagian **Increment: Rekrutmen Lintas Perusahaan** di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]. Fase lanjut yang lebih tua: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].
 - **⚠️ Deploy MANUAL**: workflow "BIP ERP — Deploy to Dev" **disabled** → **merge ≠ deploy**. Deploy: SSH `erp@10.10.10.121:/home/erp/apps/bip-erp` → `git reset --hard origin/main` + `docker compose build/up -d recruitment-service`. Selalu **deploy BE sebelum FE/portal** untuk perubahan kontrak.
 - **Konsumen publik**: [[APP - Portal Karir Bharata]] · **Endpoint lengkap**: [[API - Recruitment Service]]
 
@@ -73,7 +73,7 @@
 
 ## Dependensi & Integrasi
 
-- [[Microservices - Employee Service]] — master posisi/departemen (`PositionTitle*`), cek duplikasi, **handoff `/onboarding/register`** saat hire
+- [[Microservices - Employee Service]] — master posisi/departemen (`PositionTitle*`), cek duplikasi, **handoff `/onboarding/register`** saat hire. **(2026-09-11, branch belum merge)** + master `company` (`GET /master/companies`, dicache) untuk nama & validasi perusahaan tujuan, dan `/internal/mpp-vacancies` kini membawa `company_id`; lihat Increment **Rekrutmen Lintas Perusahaan** di bawah
 - [[Microservices - File Service]] — CV/berkas pelamar, report PDF psikotes, surat penawaran (MinIO)
 - [[Microservices - Notification Service]] — notifikasi internal (inbox/FCM) + **kandidat & pewawancara (interview User/Final) via Email/Resend** (`/email/send`, sudah dipakai) + WhatsApp (menyusul)
 - [[CORE - OCR Document Service]] — OCR CV hasil scan (untuk AI screening fase lanjut)
@@ -113,7 +113,7 @@
 
 > Ditambah setelah Fase 1-3 (branch `feat/recruitment-service`). Kandidat bisa **melamar sendiri** tanpa login, **selain** input oleh HR. Versi MVP dari "portal publik" (UI/form publik & captcha = fase lanjut).
 
-- **Service:** `POST /apply` (tanpa JWT/RBAC; tetap di belakang gateway key). `email` **wajib**; `posting_id` opsional (bila diisi → lowongan harus **ada & Open**). Service yang mengontrol field internal (`status=Applied`, `progress=CV Screening`, dll) — kiriman klien untuk itu diabaikan. Sukses → email "lamaran diterima" + respons minimal (`candidate_id`).
+- **Service:** `POST /apply` (tanpa JWT/RBAC; tetap di belakang gateway key). `email` **wajib**; `posting_id` **awalnya opsional** (bila diisi → lowongan harus **ada & Open**). ⚠️ **(2026-09-11, branch `feat/recruitment-lintas-perusahaan`, belum merge)** `posting_id` **kini WAJIB** (dulu opsional): kandidat publik perlu diturunkan perusahaannya dari lowongan, jadi tanpa lowongan tak ada perusahaan tujuan yang jelas. Detail kode error lengkap: [[API - Recruitment Service]] bagian Publik. Service yang mengontrol field internal (`status=Applied`, `progress=CV Screening`, dll), kiriman klien untuk itu diabaikan. Sukses → email "lamaran diterima" + respons minimal (`candidate_id`).
 - **Gateway:** `POST /public/recruitment/apply` (grup `/public`, **rate-limited**) → forward ke recruitment `/apply` — lihat [[CORE - API Master Gateway]].
 - HR tetap pakai `POST /candidates` (JWT + role isHR). Keduanya menghasilkan record kandidat yang sama.
 
@@ -267,6 +267,69 @@ Menutup gap **"notifikasi email ke pewawancara"** dari increment Interview Orche
 - Form jadwal interview: input **Lokasi** + kirim **snapshot Panel** (nama+email pewawancara) saat menjadwalkan.
 - Menu **"Interview Saya"** (dulu `/portal/interviews`, Portal Saya) **dihapus dari navigasi** — digantikan link 1-sesi per email. Komponen `MyInterviewsPage` + route `/portal/interviews` **dibiarkan dormant** (reversible, tak dihapus dari kode).
 
+## Increment: Rekrutmen Lintas Perusahaan (2026-09-11, ⚠️ belum merge, belum deploy)
+
+> Recruiter yang bekerja di satu perusahaan grup menangani rekrutmen **semua** perusahaan grup lewat izin `recruitment.cross_company` yang dipasang sadar ke posisi (bukan daftar perusahaan tertentu). Pengguna lain tetap terkunci ke perusahaannya sendiri. Branch `feat/recruitment-lintas-perusahaan` (bip-erp, erp-frontend) + `feat/nama-perusahaan-lowongan` (career-bharata). Keputusan & konsekuensi lengkap: [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]. Endpoint lengkap: [[API - Recruitment Service]] bagian **Perusahaan**.
+
+### Perusahaan diturunkan satu arah, anak kandidat tanpa salinan
+
+Enam koleksi proses rekrutmen diberi `company_id`: `job_requisition`, `job_posting`, `candidate`, `manpower_plan`, `onboarding_review`, `onboarding_instance` (`services/recruitment/perusahaan.go`, `migrate_company.go`). Rantainya satu arah, tak pernah diketik ulang bila induknya ada:
+
+```
+requisition.company_id  (SPV: perusahaan sendiri | pemegang izin lintas: dipilih, divalidasi aktif)
+    -> posting.company_id    (selalu dari requisition)
+        -> candidate.company_id  (dari posting; tanpa posting: perusahaanTujuan)
+            -> interview / offer / hasil tes / background check / psikotes: TIDAK disimpan, dibaca lewat kandidat
+```
+
+`manpower_plan`, `onboarding_review`, `onboarding_instance` distempel `perusahaanTujuan` langsung (perusahaan sendiri untuk non-lintas; tervalidasi ke master untuk lintas). Dokumen anak kandidat (interview, offer, hasil tes, background check, psikotes) sengaja TIDAK diberi `company_id` sendiri: perusahaannya selalu dibaca dari kandidatnya (`kandidatTerjangkau`, `idKandidatDalamCakupan`), supaya tak bisa menyimpang bila kandidatnya kelak dipindah lowongan.
+
+`klausaPerusahaan` untuk BIP sengaja ikut menangkap dokumen tanpa field `company_id` (null/absen) dan string kosong: backfill yang gagal sebagian tak boleh membuat data lama BIP lenyap dari layar tanpa satu pun galat. Perusahaan lain tak punya data lama, jadi cukup kesamaan persis.
+
+### Backfill `migrate_company.go`
+
+Dipanggil sekali saat startup, sebelum rute didaftarkan: mengisi `company_id = BIP` pada dokumen ber-`company_id` `$in: [nil, ""]` di keenam koleksi di atas. Idempoten (run kedua mengubah nol dokumen), best-effort per koleksi (kegagalan satu koleksi di-log, tak menghentikan service; data yang tertinggal tetap terlihat BIP karena `klausaPerusahaan` BIP menangkap dokumen tanpa field). BIP dipilih karena sebelum fitur ini recruitment hanya pernah dipakai BIP (komentar `normalPerusahaan`, `perusahaan.go`).
+
+### Izin aditif, bukan pengganti tier
+
+`recruitment.cross_company` dan paket `recruitment_lintas_perusahaan` ("Rekrutmen: Lintas Perusahaan", `shared-library/common/catalog_recruitment.go`) berisi TEPAT satu izin. Sengaja TIDAK masuk `RecruitmentTierDefault` maupun paket admin (penjaga `TestRecruitmentTierDefaultTanpaIzinLintasPerusahaan`, `TestPaketAdminTanpaIzinLintasPerusahaan`): fallback tier akan memberikannya ke setiap pemegang `hris` tanpa paket. Izin ini aditif, melebarkan cakupan perusahaan izin pipeline yang sudah dipegang, bukan memberi izin pipeline itu sendiri. Satu-satunya hak yang ia buka sendiri: `POST /requisitions` (`requireAtasanAtauLintasPerusahaan`), karena perusahaan tujuan bisa belum punya atasan yang memakai ERP.
+
+`izinRecruitmentEfektif` (`permission_gate.go`) TIDAK menghitung izin aditif (`requisition_cross_dept`, `cross_company`, diturunkan dari katalog dikurangi izin pipeline lewat `izinAditifRecruitment`) saat menilai "klaim memuat izin modul recruitment", dan selalu menyertakannya ke hasil. Ini menutup jebakan yang dicatat [[ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen]]: tanpa penjagaan ini, memasang satu paket aditif ke posisi yang belum punya paket recruitment lain membuat cabang "klaim memuat izin modul" menang lalu MENCABUT seluruh izin tier-nya. Menurut komentar kode, itu terjadi di produksi 2026-09-08 pada posisi Direktur.
+
+### Cache master perusahaan: 5 menit segar, jeda gagal 30 detik, salinan basi tetap dipakai
+
+recruitment-service tak menyimpan salinan perusahaan; ia membaca `GET /master/companies` milik employee-service lewat cache in-memory (`cachePerusahaan`, `perusahaan.go`), bukan tiap kali langsung ke jaringan:
+
+- **Segar**: salinan berumur kurang dari 5 menit (`umurCachePerusahaan`) dipakai apa adanya, tanpa panggilan jaringan.
+- **Gagal dimuat ulang**: kegagalan diingat 30 detik (`jedaGagalPerusahaan`). Selama jeda itu TIDAK ADA panggilan jaringan baru sama sekali, termasuk permintaan paksa-segar (`perusahaanTujuan` memuat ulang sekali saat perusahaan yang diminta belum ada di cache). Tanpa jeda ini, tiap baris daftar lowongan publik dan tiap email kandidat menunggu timeout `InternalRequest` (10 detik) sendiri-sendiri, dan gateway sudah memutus portal karir sebelum baris kedua selesai.
+- **Salinan basi**: bila gagal dimuat ulang tapi masih ada salinan lama, salinan itu tetap dipakai dan ditandai `basi`. Pemanggil yang MENOLAK sesuatu berdasarkan isi daftar (`perusahaanTujuan`, validasi `POST /requisitions`) wajib membaca tanda ini: salinan basi bisa tak mengenal perusahaan yang baru dibuat, dan penolakannya jadi `503` (bukan `400` "tak dikenal") supaya orangnya tahu untuk mencoba lagi, bukan membetulkan pilihan yang sebenarnya sudah benar. Pemanggil yang hanya MENAMPILKAN (nama perusahaan di email, `GET /companies`) memakai salinan basi apa adanya: tampilan yang sedikit usang lebih berguna daripada `503`.
+- **Tanpa salinan sama sekali**: galat diteruskan apa adanya (`503` di `GET /companies`, nama jadi key mentah di email).
+
+Dipakai untuk: `{{perusahaan}}` di email kandidat dan undangan panel/penilai, `company_name` di portal karir (`GET /public/postings`, `GET /public/postings/:id`), notifikasi requisition baru ke SPV HRD, validasi perusahaan tujuan (`perusahaanTujuan`), dan pemilih `GET /companies` (dibaca dari cache yang SAMA supaya pemilih tak pernah menawarkan status aktif yang berbeda dari penilaian validatornya).
+
+### Dependensi baru: endpoint publik portal karir kini bergantung employee-service
+
+Sebelum fitur ini, `GET /public/postings*` dan `POST /apply` tak menyentuh employee-service sama sekali (`/apply` hanya memanggil notification-service untuk email). Sekarang keduanya memanggil `namaPerusahaan`: daftar dan detail lowongan untuk `company_name`, `/apply` untuk nama perusahaan di email "lamaran diterima". Dampaknya dikurangi cache dan jeda gagal di atas, tapi tetap panggilan jaringan saat cache meleset. Employee-service yang lambat atau padam kini ikut memperlambat endpoint publik portal karir, bukan cuma layar HR internal.
+
+### Pemindai sumber `penjaga_perusahaan_test.go`
+
+Lima test AST memindai `services/recruitment/*.go` (bukan file `_test.go`), bukan memanggil handler dengan database sungguhan (service ini tak punya database di test):
+
+- `TestSetiapFindOneKoleksiBerperusahaanTerjaga`: tiap fungsi yang memanggil `FindOne` pada koleksi berperusahaan (`requisitionsCol`, `postingsCol`, `candidatesCol`, `offersCol`, `interviewsCol`, `manpowerPlansCol`, `onboardingReviewsCol`, `onboardingInstancesCol`) wajib terdaftar di peta `findOneTerjaga` dengan penjaga yang benar-benar dipanggil di badan fungsinya (atau alasan tertulis kenapa sengaja tanpa penjaga).
+- `TestSetiapDaftarKoleksiBerperusahaanDisaring`: tiap fungsi yang membaca/mengubah banyak dokumen (`Find`/`CountDocuments`/`Aggregate`/`Distinct`/`DeleteMany`/`UpdateMany`) wajib terdaftar di `daftarTersaring`.
+- `TestSetiapRutePerIDMencapaiPenjaga`: tiap rute per-ID di `routes.go` (`/candidates/:id`, `/offers/:id`, `/postings/:id`, `/requisitions/:id`, `/manpower-plans/:id`, `/onboarding-reviews/:id`, `/onboarding-instances/:id`, `/stages/:kind/:id`, `/interviews/:id`, `/mpp/vacancies/:employeeID`) wajib mencapai penjaganya, langsung atau lewat satu tingkat helper.
+- `TestHelperTanpaPenjagaHanyaDariPemanggilBerpenjaga`: helper yang memuat dokumen berperusahaan TANPA penjaga sendiri (mis. `muatReview`, `enrichOffers`) hanya boleh dipanggil dari daftar pemanggil yang terdaftar; pemanggil baru yang tak terdaftar membuat test merah.
+- `TestSetiapInsertKoleksiBerperusahaanMenstempelPerusahaan`: tiap fungsi yang `InsertOne`/`InsertMany`/`ReplaceOne` ke koleksi berperusahaan wajib punya penimpaan `CompanyID` di badannya.
+
+**Batasnya, tertulis di kode**: pemindai tak membaca ARGUMEN (mengoper perusahaan yang salah ke penjaga yang benar tetap lolos) dan tak mengikuti koleksi yang dioper lewat variabel. Versi pertama pemindai ini hanya membandingkan himpunan nama fungsi, dan menghapus blok `boleh` di `fetchCandidate` tak membuat test mana pun merah; diperbaiki supaya yang diperiksa adalah kehadiran pemanggilan penjaganya di AST, bukan sekadar namanya ada di daftar.
+
+### Catatan deploy (belum dijalankan)
+
+- **employee-service tak boleh tertinggal dari recruitment-service.** Tanpa `company_id` di `/internal/mpp-vacancies` (employee-service), posisi kosong perusahaan lain terbaca BIP di `GET /mpp/vacancies`, dan keputusan "Buat rencana" tercatat BIP dengan `201` tanpa satu pun galat. Perubahan katalog izin juga menuntut kedua service naik bersama (pola [[ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen]]). BE sebelum FE, seperti biasa. career-bharata aman kapan pun (`company_name` field opsional di tipe).
+- **Paket `recruitment_lintas_perusahaan` dipasang ke posisi recruiter yang SUDAH punya paket recruitment lain**, DAN ke posisi SPV HRD penyetuju (keputusan user saat `/review` 2026-09-11). Tanpa yang kedua, SPV HRD tetap menerima notifikasi requisition perusahaan lain (kini menyebut nama perusahaannya) tapi mendapat `404` saat membukanya.
+- **Berlaku sesudah login ulang**: izin dipanggang ke klaim JWT saat login, sama seperti ADR 0080. Cache respons gateway yang berkunci `employee_id` juga bisa menahan respons lama sampai TTL habis.
+- Gerbang verifikasi sebelum paket dipasang, lewat gateway: `GET /api/recruitment/companies` membalas `200`/`403` (bukan `404` rute hilang); baris `GET /api/recruitment/mpp/vacancies` membawa `company_id`.
+
 ## Dokumen Terkait
 
 - [[HRIS - Recruitment]] — konsep/bisnis & keputusan HRD (pasangan dok ini)
@@ -274,3 +337,4 @@ Menutup gap **"notifikasi email ke pewawancara"** dari increment Interview Orche
 - [[APP - Portal Karir Bharata]] — portal karir publik (konsumen `/public/recruitment/*`)
 - [[Microservices - Employee Service]] · [[Microservices - Notification Service]] · [[Microservices - File Service]]
 - [[CORE - API Master Gateway]] · [[CORE - SSO Flow]]
+- [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] (rekrutmen lintas perusahaan, branch belum merge) · [[ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen]] · [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]

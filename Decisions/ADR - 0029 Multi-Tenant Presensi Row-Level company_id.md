@@ -1,4 +1,4 @@
-**Status**: ⚠️ Implemented (ada catatan). Fase 1 (Presensi) + Fase 2 parsial sudah di `main`; perusahaan kedua (ELT) sudah terdaftar & terpakai di dev; payroll, recruitment, HRD-document, dan task-management BELUM ter-scope.
+**Status**: ⚠️ Implemented (ada catatan). Fase 1 (Presensi) + Fase 2 parsial sudah di `main`; perusahaan kedua (ELT) sudah terdaftar & terpakai di dev; payroll, HRD-document, dan task-management BELUM ter-scope. Recruitment ter-scope di branch lewat [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] (belum merge per 2026-09-11).
 
 ## Context
 
@@ -10,10 +10,10 @@ Multi-tenant **satu database** dengan penanda **`company_id` row-level** (BUKAN 
 
 - `company_id` = key perusahaan (mis. `"BIP"`, `"PGL"`); default `common.DefaultCompanyID = "BIP"`. Disimpan di `work_data`, klaim JWT, dan header `BIP-Company-ID`.
 - **Gateway** meng-inject `BIP-Company-ID` + `BIP-System-Roles` dari klaim JWT ke **semua** request internal (`routes.Reroute`); service-to-service diteruskan via `InternalRequest`.
-- `common.CompanyID(c)` = perusahaan **penulis** (dipakai di create/stamp); `common.EffectiveCompanyID(c)` = perusahaan **pembaca**, menghormati override `?company=` **hanya** untuk central admin. `IsCentralAdmin` = **`system_roles.group = admin`** (`common.SystemRoleGroup`, `shared-library/common/company_scope.go:27`). Pemetaan interim ke `system_roles.it` supervisor/admin **sudah DICABUT** supaya "admin IT" dan "admin grup" terpisah; regresinya dikunci `shared-library/common/company_scope_test.go`.
+- `common.CompanyID(c)` = perusahaan **penulis** (dipakai di create/stamp); `common.EffectiveCompanyID(c)` = perusahaan **pembaca**, menghormati override `?company=` **hanya** untuk central admin. `IsCentralAdmin` = **`system_roles.group = admin`** (`common.SystemRoleGroup`, `shared-library/common/company_scope.go:27`). Pemetaan interim ke `system_roles.it` supervisor/admin **sudah DICABUT** supaya "admin IT" dan "admin grup" terpisah; regresinya dikunci `shared-library/common/company_scope_test.go`. **Pengecualian sempit** (branch, belum merge per 2026-09-11): varian berizin `common.EffectiveCompanyIDDenganIzin` juga menghormati override bagi pemegang `recruitment.cross_company`, dan dipakai HANYA di data referensi rekrutmen employee-service; `EffectiveCompanyID` sendiri tetap admin pusat saja. Lihat [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] §5.
 - **BIP = perusahaan default**; data lama di-backfill `company_id=BIP`; fallback di mana-mana → perilaku BIP tak berubah (gerbang regresi wajib).
-- Master perusahaan: collection `master_company` (`key`/`name`/`code`) + CRUD `/master/companies` (gate IT supervisor). `code` = prefix `employee_id` per perusahaan (wajib & unik).
-- Capture presensi via **MyBharata mobile** — ter-scope otomatis via JWT (interceptor kirim Bearer; endpoint tak kirim identitas perusahaan). **Admin pusat** = peran `system_roles.group = admin` (`common.IsCentralAdmin`, `shared-library/common/company_scope.go:27`; gerbang rute `common.RequireCentralAdmin`, `roles.go:94`), **bukan lagi** IT supervisor/admin. Pemberiannya dijaga `preserveCentralAdminRole` (`services/employee/central_admin.go:21`): `PATCH /account/roles` digerbang `RequireITStaff`, jadi tanpa penjagaan itu staf IT bisa mengangkat dirinya sendiri jadi admin grup. Frontend masih memakai patokan interim lama, lihat §Masih terbuka.
+- Master perusahaan: collection `master_company` (`key`/`name`/`code`/`active`). `GET /master/companies` **tanpa gerbang peran** (semua pemakai login); `POST /master/companies` digerbang `common.RequireCentralAdmin`; tidak ada PUT/DELETE (`services/employee/master_data.go`). `code` = prefix `employee_id` per perusahaan (wajib & unik). Catatan lama "CRUD, gate IT supervisor" di sini basi dan dikoreksi 2026-09-11; klaim yang sama sempat tersalin ke komentar kode dan rencana fitur rekrutmen.
+- Capture presensi via **MyBharata mobile** — ter-scope otomatis via JWT (interceptor kirim Bearer; endpoint tak kirim identitas perusahaan). **Admin pusat** = peran `system_roles.group = admin` (`common.IsCentralAdmin`, `shared-library/common/company_scope.go:27`; gerbang rute `common.RequireCentralAdmin`, `roles.go:286`), **bukan lagi** IT supervisor/admin. Pemberiannya dijaga `preserveCentralAdminRole` (`services/employee/central_admin.go:21`): `PATCH /account/roles` digerbang `RequireITStaff`, jadi tanpa penjagaan itu staf IT bisa mengangkat dirinya sendiri jadi admin grup. Frontend masih memakai patokan interim lama, lihat §Masih terbuka.
 
 ## Scope Fase 1 (di `main`)
 
@@ -35,7 +35,7 @@ Paket **presensi penuh**: absen, jadwal, izin/cuti/sakit + approval, laporan HR.
 
 **Di LUAR fase 1 (belum ter-scope, per desain, fase lanjut):**
 - **Payroll** — `company_id` = badan usaha penggaji (kop slip), **BUKAN tenant** (`services/payroll/models_employee_salary.go:31`); `listEmployeeSalaries`/run/THR campur semua perusahaan.
-- **Recruitment** — tanpa field company; portal karir publik (`/public/postings`, `/apply`) bersama semua tenant.
+- **Recruitment** — ⚠️ ter-scope di branch (belum merge per 2026-09-11), lihat [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]: `company_id` di enam koleksi data proses (backfill BIP), anak kandidat membaca perusahaan lewat kandidat, pemegang `recruitment.cross_company` menangani semua perusahaan. Portal karir publik (`/public/postings`, `/apply`) tetap satu untuk semua tenant; tiap lowongan kini menyebut perusahaannya, dan `/apply` wajib `posting_id` supaya perusahaan kandidat diturunkan dari lowongan.
 - **HRD-document** — distribusi global (`my/documents` + `target:all` sampai ke semua tenant).
 - **Task-management (Helpdesk IT)** — tanpa field company; tiket bercampur lintas perusahaan.
 - **Departemen per-perusahaan** — ✅ **live di main via PR #652**: `master_department.company_id` + scope `/data-type/department`,`/position`,`/master/departments` (`EffectiveCompanyID`) + migrasi backfill BIP. (Catatan proses: PR #649 sempat **ter-orphan** ke branch stacked yang sudah mati, lalu dipulihkan via #652.)
@@ -134,3 +134,4 @@ Seluruh ADR ini bertumpu pada satu asumsi diam-diam: **setiap pemegang akun puny
 - [[CORE - API Master Gateway]] · [[CORE - SSO Flow]] · [[DB - Overview and Notes]]
 - [[APP - MyBharata]] · [[APP - Web ERP]]
 - [[ADR - 0002 Database-per-Service]] (multi-tenant di sini = row-level dalam DB per-service, bukan DB per-tenant)
+- [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] (recruitment ber-`company_id` + override referensi berizin yang sempit)

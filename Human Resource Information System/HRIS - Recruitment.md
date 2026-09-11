@@ -2,7 +2,7 @@
 
 *Desain (to-be) subsistem **Recruitment** — mengelola **siklus depan karyawan**: dari kebutuhan posisi sampai jadi karyawan aktif. Memisahkan subsistem **Talent acquisition → Interview → On-boarding** yang sekarang menumpuk di [[HRIS - Analysis]] ke ruangnya sendiri.*
 
-- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board
+- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. 🟡 **Rekrutmen lintas perusahaan: kode lengkap di branch, BELUM merge maupun deploy** (diukur 2026-09-11, lihat bagian "Rekrutmen Lintas Perusahaan" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]])
 - **Target arsitektur**: microservice `recruitment-service` baru ([[Microservices - Recruitment Service]]) + modul web, dengan **rollout bertahap**
 - Titik singgung yang sudah ada di kode: `POST /onboarding/register` (aktivasi akun karyawan baru) di [[Microservices - Employee Service]] — menjadi handoff akhir recruitment
 
@@ -132,6 +132,120 @@
   - **Glints (TapLoker)** — ATS/job-portal eksternal yang dipakai aktif (sumber pelamar utama). Pemetaan stage Glints → pipeline kita: *Chat Dimulai/Terhubung* → Screening · *Skill & Psikotes* → Technical Test (skill) + Psikotes (kita pisahkan) · *Wawancara* → Interview · *Negosiasi* → Offer · *Direkrut* → Hired · *Belum Sesuai* → Rejected. ⚠️ **Beda urutan**: Glints menaruh **Skill & Psikotes sebelum Wawancara**, sedangkan proses internal kita **psikotes setelah interview** (keputusan HRD) — perlu disadari saat memetakan dari Glints. Komunikasi kandidat saat ini lewat **chat/WA Glints**. Relasi `recruitment-service` ↔ Glints (impor/sinkron vs menggantikan) = **TBD strategis**
 - **UI**: modul **Recruitment** di [[APP - Web ERP]] (HR & SPV) + **portal karir publik** untuk pelamar ✅ [[APP - Portal Karir Bharata]] — lihat lowongan, **melamar sendiri** (field native `candidate` + **satu berkas PDF gabungan maks 10 MB**). ⛔ **Cek status lamaran via `tracking_token` sudah DIHAPUS** (2026-07-24) — pelamar kini hanya menerima email konfirmasi, tanpa cara memeriksa kemajuan lamarannya sendiri. Menggantikan alur **Google Form** lama (lamaran langsung masuk pipeline, HR tak lagi memindahkan data manual)
 
+## Rekrutmen Lintas Perusahaan
+
+> 🟡 **Kode lengkap di branch, BELUM merge maupun deploy** (diukur 2026-09-11): bip-erp
+> `feat/recruitment-lintas-perusahaan`, erp-frontend `feat/recruitment-lintas-perusahaan`.
+> Keputusan arsitektur: [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]. Landasan:
+> [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] (`company_id` = batas data),
+> [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] +
+> [[ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen]] (wewenang
+> khusus lewat paket izin yang dipasang sadar ke posisi).
+
+*Sebelum fitur ini, `recruitment-service` sama sekali tak mengenal perusahaan (28 koleksi tanpa
+`company_id`) dan satu-satunya jalan lintas perusahaan adalah admin pusat. Kebutuhannya: satu
+recruiter (karyawan BIP) menangani rekrutmen SEMUA perusahaan grup, sementara pengguna lain (SPV
+departemen, HR biasa) tetap hanya melihat perusahaannya sendiri.*
+
+**Keputusan user (2026-09-11):**
+1. Recruiter lintas perusahaan menangani SEMUA perusahaan grup lewat SATU paket izin baru
+   (`recruitment.cross_company`, paket `recruitment_lintas_perusahaan`, berisi tepat satu izin;
+   `shared-library/common/catalog_recruitment.go:216-223`); pengguna lain tetap terkunci ke
+   perusahaannya sendiri.
+2. Requisition untuk perusahaan B boleh diajukan **SPV B** (perusahaan sendiri, perilaku lama)
+   **DAN** recruiter lintas atas nama B.
+3. Satu portal karir untuk seluruh perusahaan grup; tiap lowongan menyebut nama perusahaan
+   perekrut; halaman legal per perusahaan **TBD**, lihat [[APP - Portal Karir Bharata]].
+4. Email kandidat menyebut nama perusahaan dari `master_company` (dibaca lewat cache, bukan
+   disalin, lihat [[REF - Kepemilikan Data]]); logo tetap SATU untuk semua perusahaan, bukan per
+   perusahaan.
+5. Saat `/review`: paket juga dipasang ke posisi SPV HRD penyetuju (lihat "Penyetuju" di bawah);
+   notifikasi requisition menyebut nama perusahaan; daftar karyawan perusahaan lain yang dibuka
+   lewat izin ini disempitkan (`username`/`phone_number`/`photo` dikosongkan), detail di
+   [[Microservices - Employee Service]] dan [[CORE - RBAC dan Permission Set]].
+
+### Persona
+
+| Persona | Peran & Divisi | Akses/RBAC | Device |
+|---|---|---|---|
+| **Recruiter Lintas Perusahaan** | Staf/SPV di departemen Human Resource BIP, sudah memegang paket recruitment biasa (mis. pelaksana/penyetuju) DITAMBAH paket baru `recruitment_lintas_perusahaan` | Melihat & mengelola requisition, lowongan, kandidat, MPP, onboarding SEMUA perusahaan grup; membaca referensi perusahaan lain di employee-service (departemen, posisi, daftar karyawan, proyeksi disempitkan); satu-satunya hak yang izin ini buka SENDIRI adalah mengajukan requisition atas nama perusahaan lain | Web ERP (desktop, HR) |
+| **SPV Perusahaan Lain** (mis. CV Elit) | Atasan/kepala departemen perusahaan B, TANPA paket lintas | Mengajukan requisition untuk departemennya sendiri di perusahaan B (perilaku lama, `company_id` otomatis dari identitasnya); tak melihat perusahaan lain | Web ERP / Portal Saya |
+| **SPV HRD Penyetuju (BIP)** | Posisi penyetuju requisition/offer (wewenangnya dari tier `hris` supervisor/admin atau paket penyetuju recruitment) | Wajib DITAMBAHI paket `recruitment_lintas_perusahaan` supaya bisa membuka & menyetujui requisition perusahaan lain (tanpanya notifikasi tetap tiba tapi membuka/menyetujuinya dibalas 404, lihat "Penyetuju" di bawah) | Web ERP |
+
+⚠️ **Izin `recruitment.cross_company` bersifat ADITIF, bukan pengganti.** Ia melebarkan cakupan
+PERUSAHAAN dari izin pipeline (`recruitment.view`/`work`/`approve`/`manage`) yang sudah dipegang
+posisi itu; pemegangnya tanpa izin pipeline tetap tak bisa membuka daftar apa pun
+(`shared-library/common/catalog_recruitment.go:69-84`). Satu-satunya hak yang ia buka SENDIRI
+adalah `POST /requisitions` atas nama perusahaan lain, karena perusahaan tujuan bisa belum punya
+atasan yang memakai ERP (`services/recruitment/rbac.go:89-97` `requireAtasanAtauLintasPerusahaan`).
+Paket ini SENGAJA tidak masuk `RecruitmentTierDefault` maupun paket admin bawaan
+(`catalog_recruitment.go:61-84`). Kalau ikut, setiap pemegang tier `hris:supervisor`/`admin`
+otomatis mendapat wewenang lintas perusahaan tanpa pernah diputuskan siapa pun, jebakan yang sama
+dengan yang dicatat [[ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen]].
+
+### Alur Pengguna
+
+**Alur A (SPV perusahaan B butuh orang, recruiter di BIP yang memproses, jalur biasa)**
+1. SPV B di Portal Saya > Job Requisitions > Buat → tercatat perusahaan B otomatis (identitas SPV
+   B sendiri, bukan pilihan) → berikutnya: review di Recruitment > Requisitions (notif inbox ke
+   SPV HRD, perilaku lama).
+2. Recruiter/SPV HRD lintas di Requisitions: kolom + filter Perusahaan → setujui → SPV B
+   menerima notifikasi disetujui (perilaku lama, tak berubah).
+3. Recruiter di Postings > Buat → pilih requisition B → perusahaan ikut requisition (read-only)
+   → tampil di portal karir dengan nama perusahaan B.
+4. Pelamar di `career.bharatainternasional.com` → lamar → email "lamaran diterima" atas nama B.
+5. Recruiter di Candidates (filter B) → seleksi → Interviews: pemilih pewawancara menampilkan
+   karyawan B + karyawan sendiri, berlabel perusahaan.
+6. Offer → hire → HRIS > Tambah Karyawan → pilih perusahaan B → "Dari kandidat" (hanya
+   menampilkan kandidat B) → karyawan dibuat di B, kandidat tertaut.
+7. Onboarding checklist (pilih perusahaan B) dan review onboarding (peserta dipilih dari karyawan
+   B; perusahaan sesi mengikuti peserta) → karyawan B.
+
+Selesai ketika: karyawan baru tercatat di perusahaan B dan onboarding-nya berjalan.
+
+**Alur B (recruiter mengajukan requisition atas nama B, B belum punya SPV di ERP)**
+1. Recruiter di Portal Saya > Job Requisitions > Buat → pilih Perusahaan B → departemen/posisi
+   milik B → Simpan → "Tercatat di perusahaan B, departemen X". Dari sini alurnya menyatu dengan
+   langkah 2 Alur A.
+
+**Titik putus yang tersisa (dicatat, tidak ditutup fitur ini):**
+- Langkah 6 (dari detail kandidat ke Tambah Karyawan di HRIS) pindah modul tanpa tautan dari
+  detail kandidat. Celah **LAMA**, bukan akibat fitur ini.
+- Recruiter yang paketnya belum dipasang, atau sudah dipasang tapi belum login ulang, hanya
+  melihat perusahaannya sendiri TANPA petunjuk bahwa ia seharusnya melihat lebih. Lihat
+  [[Microservices - Recruitment Service]] (catatan deploy) untuk urutan pemasangan paket dan
+  gerbang verifikasinya.
+
+### Penyetuju requisition tetap satu tim di BIP
+
+Notifikasi requisition baru dikirim ke SEMUA pemegang `role_system=hris`
+(`role_value=supervisor|admin`), tanpa parameter perusahaan
+(`services/recruitment/notify.go:56-76` `notifyHRSupervisors`), jadi penerimanya tetap tim SPV
+HRD BIP walau requisition-nya untuk perusahaan lain. Pesannya
+(`services/recruitment/requisition_notify.go:11-26`) menyebut nama perusahaan tujuan supaya
+requisition "CV Elit" tidak terbaca sebagai kebutuhan departemen bernama sama di BIP.
+
+Konsekuensinya: paket `recruitment_lintas_perusahaan` **wajib** juga dipasang ke posisi SPV HRD
+penyetuju, bukan hanya ke recruiter (tanpanya notifikasi tiba tapi membuka/menyetujui requisition
+perusahaan lain dibalas 404, karena penjaga per-ID
+(`bolehBukaRequisition`/`requisitionTerjangkau`, `services/recruitment/perusahaan.go:208-232`)
+menolaknya). Deploy fitur ini karena itu wajib mengukur dulu siapa penyetujunya sebelum memasang
+paket, lihat [[Microservices - Recruitment Service]].
+
+### Belum Diputuskan / Di Luar Lingkup (fitur ini)
+
+- **Halaman legal / pengendali data pelamar per perusahaan**: TBD. Satu portal, tiap lowongan
+  menyebut perusahaan perekrutnya, tapi syarat & ketentuan serta kebijakan privasi masih SATU
+  untuk seluruh grup, lihat [[APP - Portal Karir Bharata]].
+- **Logo per perusahaan**: tidak dibangun (keputusan user "nama saja"); `master_company` belum
+  punya field logo.
+- **Filter perusahaan di portal karir publik**: belum diminta, label nama perekrut di tiap
+  lowongan dianggap cukup.
+- **Perusahaan tertentu per recruiter** (mis. recruiter hanya menangani sebagian perusahaan
+  grup): tidak ada; keputusan user: semua perusahaan grup.
+- **Master/katalog rekrutmen** (babak interview, psikotes, lookup, template email, lokasi) tetap
+  GLOBAL, tak ikut perusahaan. Belum ada pemakai yang butuh versi berbeda.
+
 ## Keputusan (sudah disepakati HRD)
 
 - **Kuota headcount**: **tanpa batasan** — requisition tak dicek/dibatasi kuota; "jumlah dibutuhkan" bersifat informasional.
@@ -212,3 +326,4 @@
 - [[Microservices - Employee Service]] — onboarding/register & master data
 - [[Microservices - Notification Service]] · [[Microservices - File Service]]
 - [[APP - Web ERP]]
+- [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] (rekrutmen lintas perusahaan, 🟡 branch, belum merge) · [[REF - Kepemilikan Data]] · [[CORE - RBAC dan Permission Set]]

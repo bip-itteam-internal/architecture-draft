@@ -35,6 +35,8 @@ Baris terakhir yang paling menentukan bentuk keputusan ini: fallback tier `RECRU
 
 `POST /requisitions` tetap digerbang `isSupervisor` (atasan di modul mana pun). `recruitment.requisition_cross_dept` hanya melebarkan **pilihan departemen**, dan tidak pernah memberi hak mengajukan kepada yang belum punya.
 
+> Diperluas [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] (branch, belum merge per 2026-09-11): gerbangnya kini `isSupervisor` ATAU pemegang `recruitment.cross_company`, untuk perusahaan tujuan yang belum punya atasan pemakai ERP. `requisition_cross_dept` sendiri tetap tidak membuka rute ini.
+
 Pembedaan ini wajib. `catalog_recruitment.go` sudah mencatat sejak awal bahwa memetakan gerbang dasar `POST /requisitions` ke izin recruitment akan **mencabut** hak SPV departemen non-HR, sebab pengajunya justru orang di luar HR.
 
 ### 2. Paketnya berisi TEPAT satu izin
@@ -69,7 +71,7 @@ Sebabnya `Kesekretariatan / Direktur` **tidak punya paket izin sama sekali** har
 
 - ⛔ **Setuju-sendiri diterima sadar.** SPV HRD boleh mengajukan requisition lintas-departemen lalu menyetujuinya sendiri: `hrReviewRequisition` tak punya penjaga `RequestedBy != EmployeeID`. Jejaknya hanya `writeAudit("requisition.approved", ...)`. Sebelum perubahan ini kemampuan itu sudah ada tapi terbatas departemennya sendiri; sekarang cakupannya seluruh perusahaan. Bila kelak dianggap masalah, perbaikannya satu penjaga di handler itu, dan tidak buntu karena tiga posisi berbeda memegang `recruitment.approve`.
 - ⚠️ **Berlaku setelah login ulang.** Izin dipanggang ke klaim JWT saat login (`shared-library/auth/jwt.go`), beda dari jenjang yang ditanya hidup-hidup ke employee-service dan langsung berlaku. Memasang paket tanpa login ulang **gagal senyap**: paket terpasang, orangnya mencoba, tak terjadi apa-apa.
-- ⚠️ **Memasang paket ke posisi yang tadinya tanpa paket bisa MENCABUT izin.** `izinRecruitmentEfektif` berhenti memakai fallback tier begitu klaim memuat izin modul recruitment. Karena itu posisi Direktur wajib menerima `recruitment_pelaksana` + `recruitment_penyetuju` **berbarengan** dengan paket baru; memasang paket baru sendirian justru mencabut `view` dan `approve` yang hari ini ia dapat dari tier.
+- ⚠️ **Memasang paket ke posisi yang tadinya tanpa paket bisa MENCABUT izin.** `izinRecruitmentEfektif` berhenti memakai fallback tier begitu klaim memuat izin modul recruitment. Karena itu posisi Direktur wajib menerima `recruitment_pelaksana` + `recruitment_penyetuju` **berbarengan** dengan paket baru; memasang paket baru sendirian justru mencabut `view` dan `approve` yang hari ini ia dapat dari tier. **Ditutup** di [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] §2 (branch, belum merge per 2026-09-11): izin aditif tak lagi dihitung saat menilai klaim modul, jadi paket aditif tak mencabut tier. Sampai itu ter-deploy, peringatan ini tetap berlaku.
 - **Perubahan katalog izin menuntut deploy DUA container**: `employee-service` (menyisipkan paket ke `master_permission_set` lewat `migrateMissingDefaultPermissionSets`, dan memvalidasi pemasangan) dan `recruitment-service` (menegakkan gerbangnya). Naik sendiri-sendiri gagal senyap di dua arah.
 
 **Utang yang sengaja tidak disentuh**
@@ -82,6 +84,7 @@ Sebabnya `Kesekretariatan / Direktur` **tidak punya paket izin sama sekali** har
 
 - [[ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen]] — keputusan yang digantikan
 - [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] — sumbu hak akses yang dipulihkan
+- [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]: izin aditif kedua (`recruitment.cross_company`) dan penutupan jebakan paket sempit
 - [[Microservices - Recruitment Service]] — implementasi requisition & alur approval
 - [[HRIS - Recruitment]] — konsep/bisnis rekrutmen
 - [[Microservices - Employee Service]] — pemilik `master_department` & `master_permission_set`
