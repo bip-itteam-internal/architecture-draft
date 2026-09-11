@@ -5,6 +5,7 @@
 - **Status**: ⚠️ Implemented (live di dev **dan prod** sejak 2026-08-01; **penilaian karyawan, tipe form, dan rekap per orang dinilai** merged 2026-08-02 lewat PR #907 + #908 — **live di dev DAN prod** sejak 2026-08-02). **Form berulang** (`recurrence`, `period_key`, `?period=`) merged ke `main` 2026-08-03 lewat PR #938, #940, #942 — **setelah** deploy prod 08-01/08-02, jadi **status prod belum diverifikasi**. Baru didokumentasikan 2026-08-06 dan belum punya catatan uji end-to-end.
 - **Indeks layanan departemen** (`metric_key`, `settings.anonymous`, rute `/me/service-index`) ⚠️ **merged ke `main` 2026-08-25** lewat PR [#1417](https://github.com/bip-itteam-internal/bip-erp/pull/1417); perbaikan hasil review menyusul di PR [#1418](https://github.com/bip-itteam-internal/bip-erp/pull/1418) (lingkup baca `EffectiveCompanyID`, indeks unik parsial, `settings.anonymous` jadi pointer). **Belum di-deploy dan belum diuji lewat gateway** — jalur sukses endpoint dan bentuk `has_form:false` menyentuh Mongo sehingga test-nya melewatkan diri tanpa database. Konsumennya kartu Indeks Layanan IT di [[APP - Web ERP]] (erp-frontend [#1205](https://github.com/bip-itteam-internal/erp-frontend/pull/1205), [#1206](https://github.com/bip-itteam-internal/erp-frontend/pull/1206)).
 - **Kaizen** (`form_type: "kaizen"`, rute `/kaizen/*`, `/me/kaizen*`, `/internal/kaizen/metrics`) ✅ **live dev + prod** sejak 2026-08-06 lewat PR #1016, #1028, #1029, #1034, #1039, #1044, #1046 — seluruhnya teruji end-to-end di dev. Belum ada satu pun form kaizen di prod, jadi masih inert.
+- **Inspeksi Satgas 5R & K3** (`metric_key: inspeksi_satgas`, gerbang izin `kepatuhan.satgas.input` di jalur isi, `metric_key` di `/me/forms`, rute `/me/satgas`) ⚠️ **di branch bip-erp `feat/form-builder-satgas-kepatuhan`, belum merge, belum deploy, belum diuji lewat gateway** (2026-09-11). Keputusan: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
 - **Implementasi**: [[Microservices - Form Builder Service]]
 - **Indeks**: [[API - Index]]
 - **Konsumen**: seluruh rute `/forms*` — termasuk `analytics`, `responses`, `export` — dipakai [[APP - Web ERP]]. Rute **`/me/*`** dipakai [[APP - MyBharata]] (section Survei di beranda + halaman pengisian), dan **`/me/kaizen*`** dipakai menu Kaizen tersendiri di aplikasi itu.
@@ -100,12 +101,13 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/me/capability` | `{can_manage, can_write, can_manage_type_rules, departments[], form_types_by_department{}}` — apa yang boleh dilakukan pemanggil di Form Builder. `can_write` lahir bersama katalog izin (PR [#1138](https://github.com/bip-itteam-internal/bip-erp/pull/1138), merged & live di dev **dan prod** 2026-08-10): pemegang paket "Lihat" membuka layarnya (`can_manage`) tapi tak boleh membuat atau menyunting form (`can_write`). Selama fase satu nilainya selalu sama dengan `can_manage` |
-| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `form_type`, `submitted`, `blocks_attendance`, `gate_end_date`). Form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous`. Pada form berulang, `submitted` dihitung terhadap **periode berjalan**, dan form yang putarannya **belum buka tidak muncul sama sekali** |
-| GET | `/me/forms/:id/subjects` | Daftar orang yang harus DINILAI pemanggil + `progress{done,total,anonymous}`. `409` bila form tak menilai siapa pun |
-| POST | `/me/forms/:id/responses` | Kirim jawaban (+`subject_employee_id` untuk form penilaian). `403` bila bukan sasaran atau menilai orang di luar daftar, `409` bila form tak `published`, orang itu sudah dinilai, **atau putaran form berulang belum dibuka**. Balas `subject_done`, `subject_total`, `all_completed` |
+| GET | `/me/forms` | Form terbit yang ditujukan ke pemanggil (+`owner_department`, `form_type`, `submitted`, `blocks_attendance`, `gate_end_date`). Form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous`. Pada form berulang, `submitted` dihitung terhadap **periode berjalan**, dan form yang putarannya **belum buka tidak muncul sama sekali**. ⚠️ *(di branch Satgas, belum merge)* Tiap entri membawa **`metric_key`** (kosong = form biasa; `inspeksi_satgas` = form Satgas yang dikeluarkan klien dari daftar survei), dan form Satgas **tak muncul** bagi yang tak memegang `kepatuhan.satgas.input` |
+| GET | `/me/forms/:id/subjects` | Daftar orang yang harus DINILAI pemanggil + `progress{done,total,anonymous}`. `409` bila form tak menilai siapa pun. ⚠️ *(di branch Satgas)* `403` berpesan pada form Satgas bila tak memegang izin |
+| POST | `/me/forms/:id/responses` | Kirim jawaban (+`subject_employee_id` untuk form penilaian). `403` bila bukan sasaran atau menilai orang di luar daftar, `409` bila form tak `published`, orang itu sudah dinilai, **atau putaran form berulang belum dibuka**. Balas `subject_done`, `subject_total`, `all_completed`. ⚠️ *(di branch Satgas)* `403` berpesan pada form Satgas bila tak memegang izin; kiriman form Satgas tak memicu notifikasi "selesai" |
+| GET | `/me/satgas` | ⚠️ *(di branch Satgas, belum merge)* Menu Satgas 5R & K3 untuk MyBharata. Tanpa izin `200 {allowed:false, forms:[]}`; dengan izin `200 {allowed:true, forms:[...]}` berisi ringkasan per PIC. Rincian di bagian di bawah |
 | GET | `/me/responses` | Riwayat jawaban sendiri |
 | GET | `/me/service-index` | **Indeks layanan sebuah departemen** pada satu bulan. `?department=` dan `?period=YYYY-MM` **keduanya wajib**. Balas `{has_form, form_id, title, department, period_key, index, scored_questions, respondents, audience_size, coverage_pct, aspects[], unweighted[]}` |
-| POST | `/me/forms/:id/uploads` | Unggah satu lampiran (**multipart**, field `file` + `field_key`). `201` membalas `{file_name, size, upload_id}`. Cap 4 MB milik file-service; `413` bila lewat. **`409` bila putaran form berulang belum dibuka**, diperiksa SEBELUM berkasnya naik supaya tak meninggalkan objek yatim |
+| POST | `/me/forms/:id/uploads` | Unggah satu lampiran (**multipart**, field `file` + `field_key`). `201` membalas `{file_name, size, upload_id}`. Cap 4 MB milik file-service; `413` bila lewat. **`409` bila putaran form berulang belum dibuka**, diperiksa SEBELUM berkasnya naik supaya tak meninggalkan objek yatim. ⚠️ *(di branch Satgas)* `403` berpesan pada form Satgas bila tak memegang izin, juga diperiksa sebelum berkas naik |
 | GET | `/me/uploads/:uploadId/preview` | Presigned URL lampiran sendiri. `404` untuk id yang bukan miliknya |
 | GET | `/forms/:id/uploads/:uploadId/preview` | Idem untuk **pengelola form** (grup `/forms`, digerbang `requireFormManager`) |
 
@@ -122,6 +124,35 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 > **Kenapa `/me/capability` ada di grup pengisian, bukan di balik `requireFormManager`.** Daftar departemen aktif tinggal di konfigurasi server; tanpa endpoint ini setiap klien harus menyalinnya dan pasti melenceng saat daftarnya berubah. Ditaruh di `/me` supaya yang tak berhak menerima `can_manage:false` yang bisa dibaca klien, bukan `403` yang harus ditebak artinya. `departments` sengaja dikosongkan bila `can_manage:false`.
 >
 > **`form_types_by_department` adalah daftar POSITIF per departemen** (tipe yang boleh dibuat, sudah dihitung server), supaya klien tak memegang satu baris pun logika aturan. Per departemen, bukan datar: SPV HRGA membawahi dua sekaligus, dan meratakannya salah ke dua arah — irisan menyembunyikan tipe yang sebenarnya boleh, gabungan menawarkan tipe yang pasti ditolak `403`. Field ini **absen pada versi lama**; klien wajib menganggap absen = semua tipe boleh, karena BE dan FE tak naik bersamaan. **`can_manage_type_rules` dihitung TERPISAH dari `can_manage`** — admin IT belum tentu mengelola satu departemen pun.
+
+## Inspeksi Satgas 5R & K3 (`/me/satgas` dan gerbang izin)
+
+> ⚠️ **Di branch bip-erp `feat/form-builder-satgas-kepatuhan`, belum merge, belum deploy** (2026-09-11). Keputusan: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
+
+**Gerbang.** Form ber-`metric_key: inspeksi_satgas` hanya bisa diisi pemegang izin `kepatuhan.satgas.input`, diperiksa di `POST /me/forms/:id/responses`, `POST /me/forms/:id/uploads`, `GET /me/forms/:id/subjects`, dan penyaring `GET /me/forms`. Tolakannya **`403 {"error": "..."}`** dengan pesan yang menyebut paket "Kepatuhan: Petugas Satgas 5R & K3" dan perlunya login ulang, diperiksa **sesudah** audience, jadi bukan-sasaran tetap mendapat `403` yang lama. Form tanpa penanda tak tersentuh. Kill-switch `KEPATUHAN_PERMISSION_ENFORCEMENT=off` mengembalikan form Satgas ke aturan audience saja.
+
+**`GET /me/satgas`** meniru `/me/kaizen`: yang tak berhak menerima `200 {allowed:false, forms:[]}`, bukan `403`, dan izinnya dinilai **sebelum** database disentuh. Pemegang izin menerima:
+
+```json
+{
+  "allowed": true,
+  "forms": [{
+    "form_id": "...", "title": "...", "description": "...",
+    "period_key": "2026-09", "opens_at": "...", "closes_at": "...",
+    "people": [{
+      "employee_id": "...", "full_name": "...", "department": "...", "position": "...",
+      "status": "open_finding", "submission_count": 2, "last_submitted_at": "..."
+    }],
+    "counts": {"not_rated": 0, "open_finding": 1, "resolved": 10}
+  }]
+}
+```
+
+- Hanya form Satgas **terbit** yang putarannya **buka** dan pemanggilnya masuk audience. Form berulang di luar jendela periode tidak dikirim.
+- `people` = roster sasaran yang dibekukan saat terbit. Kiriman atas orang di luar roster diabaikan.
+- `status` diturunkan dari **kiriman terakhir** atas orang itu pada periode berjalan, dari petugas **siapa pun**: tanpa kiriman `not_rated`; "Ada temuan?" = ya `open_finding`; = tidak `resolved`. Jawaban yang tak terbaca dibaca `open_finding`. Seri waktu dipecah lewat ObjectID.
+- `last_submitted_at` absen bila `not_rated`. `forms` selalu array (`[]`, bukan `null`).
+- Ringkasan ini **status**, bukan skor. Skor dan KPI dari cek ulang terakhir belum ada (T3).
 
 ## Kaizen untuk karyawan (`/me/kaizen*`)
 
