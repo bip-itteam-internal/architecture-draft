@@ -11,8 +11,8 @@
 
 *Kontrak kerja PKWT ditandatangani di sistem sendiri dengan tanda tangan elektronik **tidak tersertifikasi**, **tatap muka di kantor dan didampingi HRD**: karyawan menggores tanda tangan di perangkat HR setelah HRD mencocokkan KTP-nya, lalu direktur mengonfirmasi dari Ruang Direktur. e-Meterai dibubuhkan HR di luar sistem. Kebutuhan kedua, kontrak habis yang tak terpantau, dijawab terpisah dengan pengingat. Menggantikan [[ADR - 0019 Kontrak Kerja Elektronik via Service Internal + Lapisan Tersertifikasi]], yang memilih jalur tersertifikasi lewat PSrE dan tak pernah diratifikasi. Cara kerja domainnya di [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]].*
 
-- **Status**: 🟡 **Diusulkan**, disetujui pemilik proses 2026-09-11 lewat `/analisa-kebutuhan` dan **direvisi hari yang sama**: tanda tangan PIN jarak jauh di MyBharata diganti tanda tangan tatap muka didampingi HRD (§4, §6, §7). Kode tanda tangan belum ada. ⚠️ **§2 (pengingat): kode selesai di branch `feat/employee-pengingat-kontrak` 2026-09-11, belum merge dan belum deploy.** Keabsahan hukum menunggu konfirmasi legal.
-- **Path di repo**: `bip-erp/services/employee/contract*.go` · `bip-erp/services/employee/contract_tanda_tangan*.go` (baru) · `bip-erp/services/employee/contract_pengingat.go` (baru, ada di branch) · `bip-erp/services/employee/cron.go` · `bip-erp/services/employee/warning_notify.go` · `bip-erp/shared-library/models/employee/models.go` · `bip-erp/shared-library/models/employee/contract_pengingat.go` (baru, ada di branch) · `bip-erp/services/file/main.go` · `erp-frontend/src/features/hris/contract/` · `erp-frontend/src/features/direktur/` · `mybharata-app/lib/src/features/contract/` (baru, baca-saja)
+- **Status**: 🟡 **Diusulkan**, disetujui pemilik proses 2026-09-11 lewat `/analisa-kebutuhan` dan **direvisi hari yang sama**: tanda tangan PIN jarak jauh di MyBharata diganti tanda tangan tatap muka didampingi HRD (§4, §6, §7). Kode tanda tangan belum ada. ⚠️ **§2 (pengingat): merged 2026-09-11 (bip-erp PR #1851) dan naik di DEV; PROD ditahan sampai data kontrak prod diukur.** Keabsahan hukum menunggu konfirmasi legal.
+- **Path di repo**: `bip-erp/services/employee/contract*.go` · `bip-erp/services/employee/contract_tanda_tangan*.go` (baru) · `bip-erp/services/employee/contract_pengingat.go` · `bip-erp/services/employee/cron.go` · `bip-erp/services/employee/warning_notify.go` · `bip-erp/shared-library/models/employee/models.go` · `bip-erp/shared-library/models/employee/contract_pengingat.go` · `bip-erp/services/file/main.go` · `erp-frontend/src/features/hris/contract/` · `erp-frontend/src/features/direktur/` · `mybharata-app/lib/src/features/contract/` (baru, baca-saja)
 - **Tanggal**: 2026-09-11
 
 ## Context
@@ -38,7 +38,7 @@
 
 Karena tanda tangan tidak memakai akun maupun PIN karyawan (§6, §7), lubang 1-5 dan 8 **tidak menahan fitur ini**, tetapi tetap lubang keamanan akun yang dicatat sebagai task terpisah. Lubang 6 dan 7 tetap relevan dan dijawab §8 dan §9.
 
-**Data nyata tidak terukur.** Volume kontrak per bulan dan kontrak kedaluwarsa pada karyawan aktif tidak bisa dibaca dari prod (ditolak classifier dua kali). Skrip baca-saja disiapkan di `.task-plans/cek-kontrak-esign-prod.ps1`. Angkanya kini penting untuk beban HRD dan direktur, bukan lagi untuk cakupan MyBharata.
+**Data nyata.** Volume kontrak per bulan dan kontrak kedaluwarsa pada karyawan aktif tidak bisa dibaca dari prod (ditolak classifier dua kali). Skrip baca-saja disiapkan di `.task-plans/cek-kontrak-esign-prod.ps1`. Di DEV 2026-09-11, 110 dari 172 karyawan aktif punya kontrak terakhir yang sudah lewat, seluruhnya hasil migrasi (dok domain §Pengingat Kontrak Habis).
 
 **Aturan bisnis.** Peraturan Perusahaan (`mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md`) tidak mengatur PKWT, penandatanganan, maupun meterai. Yang bersinggungan hanya komponen gaji di Lampiran 1 (tunjangan kehadiran, uang makan), yang nilainya diambil dari payroll, tidak dihitung ulang.
 
@@ -52,7 +52,7 @@ Tanpa PSrE, tanpa e-KYC, tanpa vendor. Menggantikan ADR 0019 seluruhnya.
 
 Kebutuhan kedua tidak menunggu tanda tangan. Cron employee-service mengirim inbox kategori `reminder` (sudah terdaftar dan terpetakan di MyBharata maupun Web ERP): satu ringkasan harian per supervisor HR per perusahaan saat kontrak masuk status "segera berakhir", H-30, H-7, dan untuk kontrak kedaluwarsa pada karyawan aktif sekali per minggu; ke atasan langsung H-14 kalender untuk penilaian kinerja (Pasal 2 ayat 6 template PKWT). Status "segera berakhir" memakai satu fungsi klasifikasi yang sama dengan daftar, ringkasan, dan riwayat kontrak. Rencananya di `.task-plans/2026-09-11-pengingat-kontrak-habis.md`.
 
-**Implementasi (branch `feat/employee-pengingat-kontrak`, belum merge)**: yang dipantau kontrak terakhir tiap karyawan aktif di perusahaannya sekarang; jejak kiriman disimpan di koleksi sendiri `employee_contract_pengingat`, dan hanya kiriman yang berhasil yang dicatat; karyawan tanpa atasan tercatat ditandai ke HR; pesan tanpa tautan ke halaman Kontrak. Penyatuan aturan status menghitung dalam tanggal WIB, sehingga hari terakhir kontrak berstatus `ending` di daftar, ringkasan, dan riwayat. Rinciannya di dok domain §Pengingat Kontrak Habis.
+**Implementasi (bip-erp PR #1851, merged 2026-09-11; DEV ya, PROD ditahan)**: yang dipantau kontrak terakhir tiap karyawan aktif di perusahaannya sekarang; jejak kiriman disimpan di koleksi sendiri `employee_contract_pengingat`, dan hanya kiriman yang berhasil yang dicatat; karyawan tanpa atasan tercatat ditandai ke HR; pesan tanpa tautan ke halaman Kontrak. Penyatuan aturan status menghitung dalam tanggal WIB, sehingga hari terakhir kontrak berstatus `ending` di daftar, ringkasan, dan riwayat. Rinciannya di dok domain §Pengingat Kontrak Habis.
 
 ### 3. Menempel di modul kontrak employee-service, bukan service baru
 
@@ -70,6 +70,8 @@ Berlaku untuk kontrak pertama maupun perpanjangan.
 4. Direktur menandatangani dari antrean Ruang Direktur, satu atau banyak sekaligus.
 5. HR membubuhkan e-Meterai di portal distributor resmi Peruri dan mengunggah hasilnya; sistem mengunci PDF dan menyimpan hash SHA-256-nya.
 6. Sistem menerbitkan lembar bukti tanda tangan dan mengirim salinan final (§10).
+
+**Usulan turunan untuk calon karyawan (2026-09-11, belum diputuskan)**: kontrak pertama ditandatangani **sesudah** HR membuat data karyawannya lewat Tambah Karyawan dari kandidat. Record kontrak (§11), pencocokan NIK (§6), dan salinan email (§10) semuanya bertumpu pada data karyawan, sedangkan data kandidat tidak punya NIK. Hal yang belum diputuskan (calon batal atau menolak, rincian gaji dari offer, kontrak yang belum ditandatangani terhadap pengingat) di dok domain §Calon karyawan dan karyawan aktif.
 
 **Urutan meterai dan letak goresan menunggu satu uji (S1).** HR memeteraikan satu PDF contoh lewat portal distributor yang dipakai.
 - Bila isi PDF asli tetap utuh byte per byte di dalam berkas bermeterai dan e-Meterai-nya masih lolos verifikasi: **urutan A**. Tanda tangan lebih dulu, goresan tercetak di kotak tanda tangan PDF, meterai paling akhir (langkah 5 di atas), dan saat unggah sistem memeriksa bahwa PDF bermeterai memuat PDF yang ditandatangani tanpa perubahan. Meterai tidak terbuang untuk kontrak yang batal.
@@ -119,11 +121,12 @@ Karyawan baru menerima PDF final dan lembar bukti lewat email (notification-serv
 - ⚠️ **Konfirmasi legal belum ada.** Rilis tanda tangan menunggu konfirmasi itu; pengingat tidak.
 - ⚠️ **Uji PDF bermeterai (S1) menentukan urutan A atau B.** Sebelum itu template dan alur backend tidak bisa difinalkan.
 - ⚠️ **Lubang keamanan akun (Context 1-5, 8) tetap ada di sistem** walau tidak lagi menahan fitur ini. "Kontrak Saya" di MyBharata memuat gaji, jadi temuan sampingan grounding mobile yang **belum diverifikasi** (tap notifikasi bisa melewati gerbang PIN karena kunci `user_pin` tak pernah ditulis) wajib dicek sebelum layar itu dirilis.
+- ⚠️ **Data kontrak migrasi yang tak pernah diperbarui** membuat bagian kedaluwarsa di ringkasan pengingat membengkak (DEV 2026-09-11: 110 dari 172 karyawan aktif, semuanya migrasi). Deploy PROD pengingat menunggu pengukuran PROD, lalu keputusan merapikan data atau mengubah aturan.
 - 🔗 **Deploy**: pengingat cukup employee-service. Prefix MinIO baru berarti file-service `up -d --build` bila biner belum memuatnya, kunci unik di `.env` dev dan prod, dan employee-service `--force-recreate`; bukti lewat hitungan prefix di log boot. Kategori inbox baru untuk alur tanda tangan (bila ada) berarti notification-service naik lebih dulu, lalu employee-service, keduanya di-rebuild (`shared-library/models/notification/models.go:269-273`). "Kontrak Saya" berarti satu rilis MyBharata (version name dan code naik bersama). Perubahan kontrak API berarti backend sebelum Web ERP dan MyBharata. Deploy prod dijalankan manusia.
 
 ## Dokumen Terkait
 
-- [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] (cara kerja) · [[HRIS - Personalia]]
+- [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] (cara kerja) · [[HRIS - Personalia]] · [[HRIS - Recruitment]] (hire calon karyawan)
 - [[ADR - 0019 Kontrak Kerja Elektronik via Service Internal + Lapisan Tersertifikasi]] (digantikan)
 - [[REF - Kepemilikan Data]] · [[API - Employee Service]] · [[Microservices - Employee Service]] · [[Microservices - File Service]] · [[Microservices - Notification Service]] · [[IT - Background Jobs & Schedulers]]
 - [[ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji]] (gerbang PIN per sesi) · [[ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus]] · [[ADR - 0002 Database-per-Service]]
