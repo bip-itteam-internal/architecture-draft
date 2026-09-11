@@ -20,11 +20,11 @@ Tentukan zona halaman sebelum memilih jenis bagan. Tiga zona yang wajib diputusk
 
 | Zona | Komponen yang sudah ada | Catatan |
 |---|---|---|
-| Baris saringan di ATAS | `PageShell` (`features/marketing-analytics/components/page-shell.tsx`) | Ia memakai `Banner bare` di dalam satu kartu, pola yang sama dengan `MainTable`. Jangan merakit baris saringan sendiri. |
+| Saringan di ATAS | `PageShell` (`features/marketing-analytics/components/page-shell.tsx`) | Ia memakai `Banner bare` di dalam satu kartu, pola yang sama dengan `MainTable`. Saringannya duduk di **laci Banner** (tombol Filter + isian berlabel, bentuk laci HRIS) yang **terbuka saat halaman dibuka**, karena saringan dan rentang waktu adalah titik awal alur pandangan (aturan 6); laci halaman daftar HRIS tetap tertutup. Jangan merakit baris saringan sendiri. ⚠️ Bentuk laci ini masih di erp-frontend branch `feat/ma-saringan-laci` (belum merge per 2026-09-12); di `main` saringannya masih berjajar di baris alat. |
 | Satu area fokus utama | belum ada komponennya | lihat aturan 2 |
 | Ruang untuk catatan/insight | `BarisKonteksVonis`, `kolom-keputusan.tsx` (marketing-analytics) | Angka tanpa kalimat menuntut pembacanya menyimpulkan sendiri, dan tiap pembaca menyimpulkan beda. |
 
-⚠️ `PageShell` punya prop `tanpaKartu` justru untuk halaman depan yang isinya sudah kartu semua. Membungkus kartu dengan kartu (aturan 5) lebih buruk daripada tanpa kerangka sama sekali, dan itu sudah tertulis di komentar komponennya.
+⚠️ `PageShell` punya prop `tanpaKartu` justru untuk halaman depan yang isinya sudah kartu semua. Membungkus kartu dengan kartu (aturan 5) lebih buruk daripada tanpa kerangka sama sekali, dan itu sudah tertulis di komentar komponennya. Di branch laci yang sama, kepala halaman tanpa kartu (judul + laci saringan) memakai **kartu Banner** sendiri: laci bergaris-atas yang duduk langsung di latar halaman terbaca sebagai pita lepas, bukan laci yang terbuka dari tombolnya.
 
 ### 2. Satu insight utama yang dominan
 
