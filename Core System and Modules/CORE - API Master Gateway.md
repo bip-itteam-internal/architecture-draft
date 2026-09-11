@@ -60,9 +60,12 @@
 - `/dev/*` & `/debug/*` (mint admin token) — khusus dev
 
 **Response Caching (Redis)**
-- Cache response GET, TTL 3 menit, hanya untuk JSON dengan status 200
-- Cache key: `cache:{module}:{employeeID}:{url}`
-- Module dikecualikan dari cache: file, hris, integration, inventory
+- Cache response GET, TTL 3 menit, hanya untuk JSON dengan status 200. Hit ditandai header `X-Cache: HIT`; miss tidak diberi header apa pun. Hanya jalur `/api/:module/*`; `/auth/*`, `/onboarding/*`, `/public/*`, dan `/ext/*` tidak pernah di-cache
+- Cache key: `cache:{module}:{employeeID}:{url}` (`url` = `OriginalURL`, termasuk query string)
+- **Invalidasi per modul untuk SEMUA employee**: tiap POST/PUT/PATCH/DELETE lewat `/api/:module/*` menghapus seluruh `cache:{module}:*` (`Invalidate`, `api-gateway/redis.go`), karena endpoint bersama (mis. HR melihat kandidat) tersimpan di bawah employee ID tiap pembaca
+- ⚠️ **Tulisan yang TIDAK lewat `/api/:module/*` tak pernah mengosongkan cache**: rute publik (`/public/*`), webhook eksternal (`/ext/*`), dan job latar di dalam service menulis DB-nya langsung. GET yang datanya ditulis lewat jalan itu tersaji basi sampai satu TTL tanpa galat apa pun, kecuali dimasukkan ke `noCacheRoutes`. Contoh yang belum dikecualikan: daftar kandidat sesudah pelamar mendaftar lewat `/public/recruitment/apply` (pelamar baru muncul sampai 3 menit terlambat; tidak merusak data)
+- Module dikecualikan dari cache (`noCacheModules`): file, hris, integration, inventory
+- Rute dikecualikan (`noCacheRoutes`, `api-gateway/redis.go`) adalah **satu-satunya daftar** dan diuji di `redis_test.go`; dok ini sengaja tidak menyalin entrinya supaya tak lahir daftar kedua. Entri tanpa `:` dicocokkan sebagai prefix string atas `OriginalURL` penuh. 🔄 **Bentuk kedua, entri ber-`:param`** (dicocokkan per segmen atas path tanpa query, `:nama` menerima satu segmen tak kosong, tetap bersifat prefix) beserta tiga entri psikotes (status massal, laporan, dan hasil tes kandidat, yang ditulis penutup sesi psikotes di luar gateway) ada di bip-erp branch `fix/api-gateway-psikotes-tanpa-cache`, **belum merged per 2026-09-11**. Path ketiga rute itu dijaga test di recruitment-service, sehingga rename di sana tanpa menyunting `noCacheRoutes` jadi merah. Lihat [[HRIS - Psikotes Kraepelin]]
 
 > ⚠️ **Kunci cache tidak memuat hak apa pun — hanya employee & URL.** Dua token milik ORANG YANG SAMA dengan klaim berbeda karena itu berbagi satu entri. Balasan token lama (mis. terbit sebelum `supervised_departments` atau sebuah permission-set dipasang) tersaji ke token baru selama TTL 3 menit, dan sebaliknya. Gejalanya: daftar yang seharusnya terisi tetap **kosong tanpa galat** sesaat setelah hak berubah — persis seperti "jabatan ini tak berhak", padahal cuma cache.
 >
