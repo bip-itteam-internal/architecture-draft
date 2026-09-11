@@ -306,6 +306,8 @@ Paket WMS adalah terjemahan langsung matriks tab yang sudah berjalan di `erp-fro
 
 > ⚠️ **Katalog tak membuka menunya sendiri, dan ini sistemik.** Sidebar memilih grup menu dari `Object.keys(systemRoles)` dan `proxy.ts` menggerbang rute dari `roles.<modul>`. Artinya memberi seseorang **paket** sebuah modul TANPA `system_roles.<modul>` tetap tak membuka menunya — berlaku sama untuk `hris`, `procurement`, dan kini `legal`. Sumbu "modul mana yang ada untuk saya" masih `system_roles`; permission-set baru mengatur "boleh apa di dalamnya". Menyatukan keduanya adalah keputusan arsitektur tersendiri, bukan pekerjaan migrasi satu modul.
 
+> ⚠️ **MyBharata tidak menerima klaim izin sama sekali (diperiksa ke kode 2026-09-11).** Body login dari gateway hanya membawa `system_roles`, `department`, dan `position` (`api-gateway/main.go:316-325`), dan aplikasi menggerbang menunya dari `system_roles` yang di-cache lokal, yang meloloskan semua menu bila peran belum termuat. Paket izin karena itu tak bisa memunculkan atau menyembunyikan menu MyBharata apa pun; gerbang yang sungguhan harus ditanyakan ke server. Rencana pertama menu MyBharata yang digerbang izin (modul tersendiri, tertutup sejak awal, supaya tak mencabut fallback tier `hris`/`formbuilder` pemegangnya): [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
+
 ## Belum Diimplementasikan / Catatan
 
 **Status penegakan per service** (scan 950 rute, 2026-07-29). "Telanjang" = rute user-facing tanpa middleware apa pun; rute sistem (`/internal`, `/public`, `/health`, `/webhook`) tidak dihitung.
@@ -518,6 +520,7 @@ Akar teknisnya satu angka: penanda izin di menu. Angka itu **bergerak, tapi bent
 - [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]] (jembatan untuk `manufacture` & `insentive`; separuhnya mulai dibongkar)
 - [[ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya]] (satu-satunya modul yang menggabung tier & paket, bukan menggantikannya)
 - [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]] (modul `menu`, penanda kunci, batas penegakannya)
+- [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] (rencana menu MyBharata pertama yang digerbang izin; modul tersendiri tanpa fallback tier)
 - [[ADR - 0003 SSO-only Gateway]] · [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]
 - [[DB - Data Dictionary]] · [[DB - Overview and Notes]]
 - [[APP - Web ERP]] · [[HRIS - Organization Structure]]

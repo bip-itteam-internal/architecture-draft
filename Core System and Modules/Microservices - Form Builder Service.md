@@ -211,6 +211,8 @@ Rekap per pertanyaan menjawab "aspek mana yang lemah"; `Overall` menjawab "siapa
 Nilai di luar rentang **diklem**: validasi menolaknya saat menulis, tapi dokumen lama bisa menyimpannya dan satu jawaban 7 pada skala 1..5 tak boleh keluar sebagai 150.
 
 > **Belum masuk KPI, dan itu disengaja.** Angkanya berhenti di layar analisa. Menyambungkannya ke `kpi_score` menuntut definisi yang stabil selamanya, sebab angka periode lalu harus tetap berarti saat rumusnya berubah. Melihatnya dulu di analisa memberi kesempatan mengoreksi rumus tanpa merusak riwayat siapa pun. Bila kelak dilanjutkan, polanya sudah ada di `kpi_sumber_kaizen.go`, dan [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] menetapkan employee-service tetap pemilik tunggal `kpi_score`.
+>
+> ⚠️ **Koreksi 2026-09-11: kalimat di atas sudah tidak benar.** Skor gabungan kini masuk KPI lewat form `evaluation` ber-`metric_key: service_team_index`, dibaca dua sumber di employee-service: `nilai_layanan_pribadi` (per orang, mis. metrik Security "Rating Pelayanan dan Keamanan") dan `indeks_layanan_tim` (KPI atasan), keduanya dari angka yang sama (`services/employee/kpi_sumber_indeks_layanan_tim.go:31-44`). Nilai per orang dirata-rata dari **semua** form bertanda tempat ia dinilai (`service_team_index.go:148-156`). Kapan dan lewat keputusan apa arah ini dibalik belum tercatat di ADR mana pun. Inspeksi Satgas sengaja tidak memakai jalur ini: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
 
 ## Indeks layanan departemen: `metric_key` + `GET /me/service-index`
 
@@ -614,6 +616,8 @@ Koleksi **`form_templates`** (`Collections.Templates`) menyimpan **cetakan** for
 ## Lampiran berkas (tipe field `file`)
 
 > PR [#1023](https://github.com/bip-itteam-internal/bip-erp/pull/1023) + [#1057](https://github.com/bip-itteam-internal/bip-erp/pull/1057), ✅ **live dev + prod 2026-08-06 dan TERUJI end-to-end di dev**. Berlaku **semua tipe form**, bukan cuma Kaizen.
+>
+> ⚠️ **Baru terpakai di BACKEND (diperiksa ke kode 2026-09-11).** Editor web tak bisa membuat field `file` (`erp-frontend/src/features/form-builder/types/form.ts:17-37` tak memuat tipenya, komentarnya menyebut "fase 2"), dan MyBharata tak bisa mengisinya (`lib/src/features/form/domain/entities/survey_field.dart:8-21`, jatuh ke `unknown`). Uji end-to-end di bawah dijalankan langsung ke API, bukan lewat klien. Akibatnya tak satu pun layar bisa memakai kemampuan ini, termasuk tipe `report` yang justru mewajibkan field berkas. Batas yang perlu diketahui perancang: satu field berisi satu `upload_id` (`validate.go:590-601`), jadi banyak berkas berarti beberapa field; jenis berkas tidak diperiksa server. Rencana klien: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
 
 **Unggah dulu, kirim jawaban kemudian.** Satu jawaban dikirim sebagai satu JSON, jadi berkas tak bisa ikut di dalamnya. `POST /me/forms/:id/uploads` (multipart) membalas `upload_id`, dan id itulah yang jadi **nilai jawaban** untuk field bertipe `file`.
 
@@ -637,6 +641,20 @@ Berkasnya sendiri tinggal di [[Microservices - File Service]] dengan prefix **`f
 Objeknya benar-benar mendarat di prefix `form/` — bagian yang paling mungkin diam-diam salah. Data ujinya dihapus dan diverifikasi bersih.
 
 > Percobaan pertama dibalas `403`, dan itu **benar**: skrip ujinya salah membaca `employee_id` (respons `/api/employee/me` datar, bukan bersarang di `data`), sehingga formnya menyasar daftar kosong dan pemanggil memang bukan sasarannya sendiri.
+
+## Inspeksi Satgas 5R & K3 (direncanakan)
+
+> **Status**: 🟡 **Diusulkan 2026-09-11, kode belum ada.** Keputusan dan alasannya: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]]. Daftar task: `Workspace/ANALISA - Inspeksi Satgas 5R dan K3.md`.
+
+Petugas OD & Industrial Relation menilai Office Boy dan Security lewat form `evaluation` (sasaran `positions`, berulang bulanan) dengan foto temuan dan foto perbaikan. Temuan dicek ulang beberapa hari kemudian, dan **nilai KPI bulan itu diambil dari cek ulang**. Yang direncanakan bertambah di service ini:
+
+- **Penanda form Satgas** (nama final di `/plan`), sah hanya pada `evaluation` berulang bulanan, dan ikut dikirim di `GET /me/forms` supaya MyBharata bisa mengeluarkannya dari daftar survei. Hari ini `settings` terkirim utuh ke klien sedangkan `metric_key` tidak. Penandanya **bukan** `service_team_index`: penanda itu melebur seluruh form bertanda di departemen (lihat koreksi di §Skor gabungan), sehingga skor 5R akan tercampur rating pelayanan di KPI anggota dan atasannya.
+- **Gerbang pengisian berbasis izin.** Kirim jawaban dan unggah foto pada form bertanda ditolak bila pengirim tak memegang izin modul Satgas. Modulnya tersendiri, bukan `formbuilder`, karena satu klaim `formbuilder.*` mematikan fallback tier pemegangnya (`permission_gate.go:89-92`). Hari ini jalur isi hanya memeriksa status terbit dan `audience` (`response_handlers.go:364-369`), jadi menyembunyikan menu di aplikasi tidak menahan apa pun.
+- **Nilai terakhir-menang per orang per periode**, di satu fungsi yang dipakai endpoint KPI internal, endpoint menu/rekap, dan tab analitik "Yang Dinilai" untuk form bertanda. `overallOf` (rata-rata antar jawaban, `skor_gabungan.go:119-142`) tetap berlaku untuk form lain. Tanpa jawaban dalam periode berarti belum dinilai, bukan 0.
+- **Endpoint menu di grup `/me`**, meniru `/me/kaizen`: form Satgas milik pemanggil yang berizin, beserta ringkasan kiriman periode ini per orang yang dinilai. Dipakai menu MyBharata dan halaman rekap web.
+- **Endpoint internal per orang** untuk sumber KPI baru di [[Microservices - Employee Service]]. Seperti rute internal lain, ia menggerbang dirinya sendiri ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]).
+
+Rumus konversi skala 1-5 ke 0-100 masih TBD (lihat ADR). `normalisasiSkala` (`skor_gabungan.go:61`) membuat 3 = 50, sedangkan praktik lembar HRD membuat 3 = 60.
 
 ## Bagian (section): penanda di daftar datar, bukan struktur bersarang
 
@@ -759,3 +777,4 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 - [[Microservices - Employee Service]] — penarik metrik Kaizen ke `kpi_score`
 - [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] · [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] · [[ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)]]
 - [[APP - Web ERP]] · [[APP - MyBharata]] — klien
+- [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]]: inspeksi Satgas 5R & K3 (penanda form, gerbang izin pengisian, nilai terakhir-menang, klien field foto)
