@@ -644,7 +644,7 @@ Objeknya benar-benar mendarat di prefix `form/` — bagian yang paling mungkin d
 
 ## Inspeksi Satgas 5R & K3 (penanda `inspeksi_satgas`)
 
-> **Status**: ⚠️ **T1+T2 terimplementasi di branch `feat/form-builder-satgas-kepatuhan`** (bip-erp, 4 commit di atas `main` f1bc2314), **belum merge, belum deploy, belum diuji lewat gateway**. Skor dan KPI dari cek ulang (T3), editor dan rekap web (T4/T5), dan menu MyBharata (T6) belum dikerjakan. Keputusan dan alasannya: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]]. Daftar task: `Workspace/ANALISA - Inspeksi Satgas 5R dan K3.md`.
+> **Status**: ⚠️ **T1+T2 terimplementasi di branch `feat/form-builder-satgas-kepatuhan`** (bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)), **belum merge, belum deploy, belum diuji lewat gateway**. Skor dan KPI dari cek ulang (T3), editor dan rekap web (T4/T5), dan menu MyBharata (T6) belum dikerjakan. Keputusan dan alasannya: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]]. Daftar task: `Workspace/ANALISA - Inspeksi Satgas 5R dan K3.md`.
 
 Petugas OD & Industrial Relation menilai Office Boy dan Security lewat form `evaluation` (sasaran `positions`, berulang bulanan) dengan foto temuan dan foto perbaikan. Temuan dicek ulang beberapa hari kemudian, dan **nilai KPI bulan itu diambil dari cek ulang**.
 
