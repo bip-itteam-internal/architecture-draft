@@ -30,7 +30,8 @@ Keputusan pemilik proses yang mengikat:
 - `PATCH /contract/:id` memakai `ReplaceOne`: field yang tidak ada di struct ikut terhapus. Status tanda tangan wajib masuk struct, catatan di koleksi sendiri.
 - Data kandidat tidak punya NIK, sedangkan record kontrak, pencocokan NIK, dan salinan email bertumpu pada data karyawan. Usulan: calon karyawan menandatangani sesudah dibuatkan data karyawan (dok domain §Calon karyawan dan karyawan aktif).
 - Akun karyawan baru langsung aktif saat dibuat (`services/employee/func.go:188-190`): calon karyawan yang sudah dibuatkan data ikut terhitung karyawan aktif sebelum menandatangani.
-- Kontrak hasil migrasi yang tak pernah diperbarui mendominasi data: DEV 2026-09-11, 110 dari 172 karyawan aktif kedaluwarsa, semuanya `migrated`.
+- Kontrak hasil migrasi yang tak pernah diperbarui mendominasi data: DEV 2026-09-11, 110 dari 172 karyawan aktif kedaluwarsa, semuanya `migrated`. Durasi kontrak migrasi juga tak bermakna, karena tanggal mulainya `join_date`.
+- `masa_evaluasi` di offer teks bebas (`"2"`, `"3 bulan"` di DEV), sedangkan jenis kontrak dan tanggal berakhir kontrak pertama diketik manual saat Tambah Karyawan: durasi di offer, data karyawan, dan PKWT bisa berbeda tanpa ketahuan.
 
 ---
 
@@ -53,7 +54,7 @@ Nomor dalam kurung = prasyarat. Tiap item cukup jelas untuk langsung dilempar ke
 **T15. Filter `ending_month` di `GET /contract` dalam tanggal WIB.** Bulan masih dibaca dari `contract_ending` dalam UTC, jadi kontrak yang tersimpan tengah malam WIB tanggal 1 masuk ke bulan sebelumnya. Perbaikannya mengubah hasil filter yang terlihat HR.
 *Prasyarat: T1 (memakai `tanggalWIB` yang sama).*
 
-**T16. Pesan atasan H-14 untuk kontrak `PKWT (Evaluasi)`.** Karyawan masa evaluasi sudah dinilai lewat Performance Review Onboarding di Recruitment, jadi pesan atasan dari T1 menjadi saluran penilaian kedua. Putuskan: lewati jenis ini, arahkan pesannya ke review itu, atau biarkan.
+**T16. Aturan pengingat untuk kontrak `PKWT (Evaluasi)`.** Masa evaluasi di DEV 2-3 bulan, sedangkan tahap T1 dirancang untuk PKWT belasan bulan. Kontrak evaluasi 2 bulan sudah "segera berakhir" sejak hari pertama, dan HR langsung menerima tahap "Berakhir dalam 2 bulan" begitu data karyawannya dibuat; kontrak 3 bulan menerima tahap itu sesudah sekitar sebulan, dan H-30 jatuh di pertengahan masa kerja. Pesan atasan H-14 juga menjadi saluran penilaian kedua di samping Performance Review Onboarding. Opsi yang dibahas 2026-09-12: untuk jenis ini lewati tahap 2 bulan (dan mungkin H-30), pertahankan H-7, arahkan penilaian ke Performance Review; atau biarkan.
 *Prasyarat: T1; butuh keputusan pemilik proses.*
 
 ### Prasyarat tanda tangan
@@ -69,8 +70,11 @@ Nomor dalam kurung = prasyarat. Tiap item cukup jelas untuk langsung dilempar ke
 **T6. Data penandatangan per perusahaan + field tempat lahir.** Nama, jabatan, dan alamat direktur per perusahaan (bukan `SetaraDirektur`), plus tempat lahir di `personal_data` beserta form pengisiannya. Tempat lahir calon karyawan sudah ada di data kandidat (`tempat_lahir`), jadi bisa terisi saat Tambah Karyawan dari kandidat.
 *Prasyarat: tidak ada.*
 
-**T7. Template PKWT + generator PDF draft + lembar bukti.** Isi dari `personal_data`, `work_data`, `employee_contract`, `employee_salary` (Lampiran 1, dengan pemetaan komponen ke kolom); versi template dicatat per kontrak; kotak tanda tangan mengikuti hasil S1. Periksa font untuk karakter di luar ASCII (preseden slip gaji hanya font inti). Untuk calon karyawan, gaji di offer hanya satu angka (`gaji_evaluasi`/`gaji_kontrak`): putuskan sumber rincian komponennya (payroll diisi dulu, atau offer diperluas).
-*Prasyarat: T5, T6, S1.*
+**T17. Masa evaluasi di offer jadi angka bulan + kontrak pertama terisi otomatis.** `masa_evaluasi` sekarang teks bebas (`services/recruitment/models_offer.go:43`, form `offer-form-dialog.tsx`; DEV berisi `"2"` dan `"3 bulan"`) dan hanya dipakai surat penawaran (`{{masa_evaluasi}}`), sedangkan jenis kontrak dan tanggal berakhir diketik manual saat Tambah Karyawan dari kandidat (`create-employee/index.tsx:219`). Ubah jadi angka bulan (nilai lama yang bisa diurai dimigrasikan, sisanya ditandai untuk HR), surat penawaran merender "N bulan", dan Tambah Karyawan dari kandidat mengisi `PKWT (Evaluasi)` + tanggal berakhir = tanggal mulai + masa evaluasi (HR tetap bisa mengubah).
+*Prasyarat: tidak ada.* Repo: recruitment-service + erp-frontend; deploy BE sebelum FE.
+
+**T7. Template PKWT + generator PDF draft + lembar bukti.** Isi dari `personal_data`, `work_data`, `employee_contract`, `employee_salary` (Lampiran 1, dengan pemetaan komponen ke kolom); versi template dicatat per kontrak; kotak tanda tangan mengikuti hasil S1. Periksa font untuk karakter di luar ASCII (preseden slip gaji hanya font inti). Durasi di Pasal 2 dihitung dari tanggal mulai dan berakhir saat PDF dibuat, tidak disimpan terpisah. Untuk calon karyawan, gaji di offer hanya satu angka (`gaji_evaluasi`/`gaji_kontrak`): putuskan sumber rincian komponennya (payroll diisi dulu, atau offer diperluas).
+*Prasyarat: T5, T6, S1; T17 disarankan lebih dulu supaya durasi kontrak pertama sama dengan offer.*
 
 **T8. Prefix arsip MinIO + kunci lampiran.** Prefix baru tanpa kunci baca di browser (pola `audit/`), dibaca lewat proxy employee-service; lampiran yang sudah dikunci tidak bisa diganti atau dihapus.
 *Prasyarat: tidak ada.* Deploy: file-service `up -d --build`, kunci unik di `.env` dev dan prod, employee-service `--force-recreate`, bukti lewat hitungan prefix di log boot.
@@ -130,16 +134,17 @@ Rinciannya di dok domain §Belum Diputuskan. Yang menahan task tertentu:
 - Format nomor kontrak → T5.
 - Letak data penandatangan per perusahaan → T6.
 - Lokasi kerja dan jam kerja di template, pemetaan komponen gaji Lampiran 1, rincian gaji calon karyawan dari offer → T7.
+- Format masa evaluasi di offer (teks bebas vs angka bulan) → T17.
 - Hasil S1 (urutan A/B) → T7, T9.
 - Draf lewat email sebelum datang, bentuk penolakan di tempat → T9.
 - Calon karyawan menandatangani sesudah dibuatkan data karyawan (usulan), jalan membatalkan calon yang batal atau menolak, kontrak belum ditandatangani terhadap pengingat → T9.
 - Retensi arsip → T8.
 - Bentuk hasil penilaian kinerja atasan → T14.
-- Pesan atasan untuk `PKWT (Evaluasi)` → T16.
+- Aturan tahap pengingat dan pesan atasan untuk `PKWT (Evaluasi)` → T16.
 - Kontrak kedaluwarsa hasil migrasi: rapikan data atau ubah aturan → T1, sesudah N3.
 
 ---
 
 ## 3. Mulai dari mana
 
-T1: baca hasil jalan cron 07:00 di DEV, ukur PROD (N3), putuskan soal kontrak kedaluwarsa migrasi, lalu deploy PROD. Paralel dengannya: S1 (minta HR memeteraikan satu PDF contoh), T5, T6, T8, T15, T16, dan K1-K4.
+T1: baca hasil jalan cron 07:00 di DEV, ukur PROD (N3), putuskan soal kontrak kedaluwarsa migrasi, lalu deploy PROD. Paralel dengannya: S1 (minta HR memeteraikan satu PDF contoh), T5, T6, T8, T15, T16, T17, dan K1-K4.
