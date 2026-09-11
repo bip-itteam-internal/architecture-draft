@@ -250,7 +250,7 @@ Yang dilonggarkan **menu, bukan data**. Angka labanya dijaga dua lapis yang tak 
 | `kaskecil` | (live & ditegakkan; 8 izin, `approve` DIPECAH EMPAT — lihat catatan di bawah) | | | | | own/div/all |
 | `menu` | (di luar tangga sepenuhnya: satu izin per MENU, bukan per aksi — `menu.finance.laporan`, `menu.finance.insentif`) | | | | | all |
 | `jadwal` | | | | ✅ | satu izin saja: `jadwal.hostlive.manage` | all |
-| `kepatuhan` | | | | | ⚠️ merged 2026-09-11 (PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)), deploy belum diukur; label layar "Kepatuhan" di branch erp-frontend `feat/form-builder-satgas-editor`. Di luar tangga: satu izin `kepatuhan.satgas.input` (mengisi inspeksi Satgas 5R & K3) | all |
+| `kepatuhan` | | | | | ⚠️ merged 2026-09-11 (PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)), deploy belum diukur; label layar "Kepatuhan" di erp-frontend PR [#1542](https://github.com/bip-itteam-internal/erp-frontend/pull/1542), belum merge. Di luar tangga: satu izin `kepatuhan.satgas.input` (mengisi inspeksi Satgas 5R & K3) | all |
 
 > **Modul `jadwal` — lahir karena PREFIKS izin menentukan kategori sidebar** (`shared-library/common/catalog_jadwal.go`, ditegakkan `services/attendance` lewat `gerbangRuteKelolaJadwal`). Ia menampung kewenangan menyusun jadwal kerja dan menugaskannya, hari ini baru satu izin untuk Host Live. Keputusannya di [[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]].
 >
