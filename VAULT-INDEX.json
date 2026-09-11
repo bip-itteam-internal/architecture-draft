@@ -706,18 +706,18 @@
         "Microservices - Employee Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "fe5c57687d79c0b98ee3a2f1d7c4c13f460db7bf543b240ca8a8c816905b0eb5",
-      "ukuran_kb": 20.7,
-      "ringkasan": "Menjawab: endpoint apa yang dipakai untuk mengajukan, meninjau, dan menyetujui requisition (termasuk siapa yang boleh mengajukan lintas departemen dan siapa pemberi persetujuan final), membuka lowongan, mengelola kandidat, serta merekam hasil tes, interview, dan background check. Juga menjawab endpoint psikotes online sisi HR (terbit, terbit ulang, laporan, status massal), rute publik portal karir tanpa JWT, dan jebakan urutan rute serta cache gateway 3 menit untuk `/api/recruitment/*`.",
+      "hash": "38a8c5a3afd439be1244d9e456f572730f5d449e863abbc9657021166d9d516d",
+      "ukuran_kb": 20.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan recruitment-service (job requisition, job posting, kandidat, tahap interview, hasil tes, background check, psikotes online sisi HR, onboarding, portal karir publik) dan role mana yang boleh memanggilnya (supervisor, HR, HR supervisor). Juga menjelaskan aturan seperti departemen requisition diambil dari identitas pengaju kecuali jenjang direktur, persetujuan final requisition oleh SPV HRD, perilaku upsert hasil tes, serta jebakan urutan rute `/candidates/psikotes/status` dan cache gateway 3 menit.",
       "kata_kunci": [
         "recruitment-service",
         "rekrutmen",
         "recruitment",
-        "requisition",
-        "job posting",
+        "job requisition",
+        "permintaan karyawan",
         "lowongan",
+        "job posting",
         "kandidat",
-        "test-result",
         "psikotes",
         "portal karir"
       ]
@@ -1580,20 +1580,20 @@
         "APP - MyBharata",
         "DB - Overview and Notes"
       ],
-      "hash": "e92ff174b1e67885131ba7e3aee4835d5dc43907728c4ea83579e0d82b28d79a",
-      "ukuran_kb": 13.7,
-      "ringkasan": "Menjawab: bagaimana api-gateway memvalidasi JWT, menerbitkan token login, menangani SSO ticket/redeem, dan meneruskan request ke service internal lewat `/api/:module/*` beserta header identitas (`BIP-Employee-Id`, `BIP-System-Roles`, `BIP-Company-ID`). Juga menjawab kenapa service wajib `ReadBufferSize` 32 KB (asal galat 431), kenapa prefix `/internal/` bukan batas keamanan karena gateway catch-all, rute publik/ext mana yang di-proxy khusus, dan bagaimana cache Redis GET 3 menit, cache key, serta invalidasinya bekerja.",
+      "hash": "1e7a3807ee694931c10fda04738c2cfd2997249b6d425c3413f6358e172a0398",
+      "ukuran_kb": 13.8,
+      "ringkasan": "Menjawab: bagaimana api-gateway memvalidasi JWT, menangani login/refresh/logout dan SSO one-time-code, lalu meneruskan request ke service lewat `/api/:module/*` beserta header identitas (`BIP-Employee-Id`, `BIP-System-Roles`, `BIP-Company-ID`), dan rute publik mana yang bisa diakses tanpa JWT. Juga menjelaskan cache Redis GET 3 menit beserta pengecualian dan invalidasinya, kenapa prefix `/internal/` bukan batas keamanan, serta kenapa tiap service wajib `ReadBufferSize` 32 KB supaya tidak kena 431.",
       "kata_kunci": [
         "api-gateway",
         "gateway",
         "JWT",
-        "reverse proxy",
-        "Redis cache",
-        "noCacheRoutes",
         "SSO",
+        "reverse proxy",
+        "cache Redis",
+        "noCacheRoutes",
         "431 Request Header Fields Too Large",
-        "BIP-Company-ID",
-        "internal gateway key"
+        "rute publik",
+        "rate limit"
       ]
     },
     {
@@ -2802,20 +2802,20 @@
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "a5f53953bb3671e9b34583d020b75c29a493c0395dbffc72818428e5ad2d6621",
+      "hash": "9488707abf2933fe71bdc7387d4703ff39a392f24ca2320de53cb37cb3a10076",
       "ukuran_kb": 52.2,
-      "ringkasan": "Menjawab: bagaimana siklus rekrutmen (requisition, lowongan, pelamar, babak seleksi, psikotes, offer, onboarding) diimplementasikan di recruitment-service, koleksi apa saja di `recruitment_db`, dan bagaimana cara deploy-nya. Juga menjawab bagaimana katalog babak `interview_round` dan `form_type` membedakan babak terjadwal dari babak hasil tes, bagaimana SP-Wiring menggerakkan progress dan status kandidat, bagaimana kandidat Hired ditautkan ke data karyawan, dan notifikasi email apa yang dikirim ke kandidat serta pewawancara.",
+      "ringkasan": "Menjawab: bagaimana recruitment-service mengelola siklus rekrutmen dari requisition, lowongan, pelamar, babak seleksi (interview, Psikotest, Technical Test, background check), offer, sampai handoff onboarding dan penautan kandidat Hired ke data karyawan. Menjelaskan alur approval requisition satu tahap oleh SPV HRD, katalog babak global dengan `form_type`, SP-Wiring hasil tes yang menggerakkan progress dan status kandidat, notifikasi email kandidat, model data `recruitment_db`, prosedur deploy manual, dan cakupan multi-perusahaan.",
       "kata_kunci": [
         "recruitment-service",
         "rekrutmen",
         "ATS",
-        "babak seleksi",
+        "requisition",
         "interview round",
-        "SP-Wiring",
+        "babak seleksi",
         "offer letter",
         "onboarding",
-        "recruitment_db",
-        "link-employee"
+        "hire ke karyawan",
+        "recruitment_db"
       ]
     },
     {
@@ -6061,7 +6061,7 @@
         "REF - Kepemilikan Data"
       ],
       "hash": "f2e9b7a3a0ecf1edc85d51e3c7ade441ff81b79985d534aa8886aa4b01b3179e",
-      "ukuran_kb": 23.9,
+      "ukuran_kb": 24.0,
       "ringkasan": "Menjawab: bagaimana metrik rasio KPI Host Live (mis. add to cart rate) dihitung bila host live di lebih dari satu channel (TikTok, Shopee, Lazada), yaitu satu angka gabungan dari jumlah pembilang dibagi jumlah penyebut seluruh channel, bukan rata-rata rasio per channel, dan kenapa penyebutnya klik produk, bukan viewers. Juga menjawab kenapa field channel di live_shifts menjadi prasyarat, apa yang terjadi pada channel yang semantik field-nya belum diperiksa (digalatkan, bukan dilewati), serta bagaimana cakupan, ambang sampel, target, dan rincian per channel di panel detail metrik diperlakukan. Menjelaskan pula kenapa data live Shopee belum bisa diambil (butuh otorisasi tingkat akun streamer) dan Lazada tidak punya data live, sehingga riwayat KPI sebelum dan sesudah penggabungan tidak sebanding.",
       "kata_kunci": [
         "KPI Host Live",
@@ -8420,20 +8420,20 @@
         "APP - Portal Karir Bharata",
         "HRIS - Candidate Assessment"
       ],
-      "hash": "ef209941bab91e62c249941b27f9258c82471ca628cd54f085a3861d57db70b8",
-      "ukuran_kb": 23.0,
-      "ringkasan": "Menjawab: bagaimana HR menerbitkan psikotes online Kraepelin, bagaimana kandidat mengerjakannya lewat magic link tanpa login, dan bagaimana server menilai serta menulis hasilnya ke Hasil Tes babak Psikotest dengan HR tetap memutuskan Pass/Fail. Juga menjawab bentuk koleksi `psikotes_session` dan index uniknya, konfigurasi kolom/baris/detik, tiga cara sesi berakhir (tuntas, ditinggalkan, kedaluwarsa), kenapa sesi terputus tidak diberi skor dan bagaimana tampil di layar HR, serta kenapa soal dan skor tidak bocor ke kandidat.",
+      "hash": "731e51495b101dec14e93b7e6efb039a8d7db0173562b4959145f73621bc7c9f",
+      "ukuran_kb": 23.3,
+      "ringkasan": "Menjawab: bagaimana HR menerbitkan psikotes online Kraepelin, bagaimana kandidat mengerjakannya lewat magic link tanpa login, bagaimana sesi berakhir (tuntas, ditinggalkan, kedaluwarsa) lalu dinilai otomatis, dan kenapa hasilnya tetap `Pending` sampai HR memutuskan Pass/Fail. Juga menjelaskan model `psikotes_session` dan index uniknya, konfigurasi kolom/baris/detik, kerahasiaan soal dan skor, perlakuan skor sesi terputus (T0), serta di mana laporan tampil di tab Hasil Tes.",
       "kata_kunci": [
         "psikotes",
-        "psychotest",
         "Kraepelin",
+        "psychotest",
+        "tes psikologi",
         "magic link",
         "psikotes_session",
-        "skoring psikotes",
         "sesi terputus",
         "Hasil Tes",
-        "tes online kandidat",
-        "selesai_karena"
+        "test result",
+        "rekrutmen"
       ]
     },
     {
@@ -13126,20 +13126,20 @@
         "CORE - API Master Gateway",
         "REF - Kepemilikan Data"
       ],
-      "hash": "142ad27af451a0311c1218d563bfb34a7e6c41a27dac6f1d13f1e5f0106cb1e0",
-      "ukuran_kb": 11.8,
-      "ringkasan": "Menjawab: apa saja yang harus diputuskan HRD sebelum psikotes diperluas ke CFIT, DISC, dan tipe lain (legalitas soal berlisensi, mesin kandidat erp-frontend vs career portal, pendampingan, tenggat tautan), dan pekerjaan apa yang bisa dilakukan tanpa kode. Juga menjawab urutan task dari penambalan psikotes berjalan (skor sesi terputus, cache gateway, skor tertimpa) sampai katalog `psikotes_tipe`, paket tes multi-bagian, CFIT, DISC, dan pengerjaan massal, beserta gerbang verifikasi tiap task.",
+      "hash": "bc9eef728404c5033d7b20844dc877aa3940e30b8578a85fe449d1d0dacb11a6",
+      "ukuran_kb": 12.2,
+      "ringkasan": "Menjawab: apa langkah kerja dan urutan tahap untuk memperluas psikotes dari Kraepelin ke banyak jenis (katalog tipe `psikotes_tipe`, CFIT, DISC, penerbitan massal), keputusan HRD apa yang masih menghalangi (legalitas soal berlisensi, pilihan mesin kandidat erp-frontend vs career portal, pendampingan, tenggat tautan), dan gerbang verifikasi tiap task. Juga merinci task tahap nol: laporan psikotes dan skor sesi terputus (T0), endpoint psikotes keluar dari cache gateway (T0a), serta Skor kosong yang menimpa skor otomatis (T0b).",
       "kata_kunci": [
         "psikotes multi-jenis",
         "CFIT",
         "DISC",
-        "bank soal",
-        "paket psikotes",
         "psikotes_tipe",
+        "bank soal",
         "katalog tipe psikotes",
         "ADR 0087",
         "career portal",
-        "analisa kebutuhan"
+        "analisa kebutuhan",
+        "Kraepelin"
       ]
     },
     {
