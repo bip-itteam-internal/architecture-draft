@@ -2,7 +2,7 @@
 
 Papan kerja hasil `/analisa-kebutuhan` 2026-09-11. Keputusan di [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]], cara kerja di [[Microservices - Form Builder Service]] bagian "Inspeksi Satgas 5R & K3".
 
-**Status papan (2026-09-11):** T1+T2 **merged** 2026-09-11 (bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)); deploy dev belum diukur dan verifikasi lewat gateway belum dijalankan. T4 **PR terbuka** (bip-erp [#1852](https://github.com/bip-itteam-internal/bip-erp/pull/1852) + erp-frontend [#1542](https://github.com/bip-itteam-internal/erp-frontend/pull/1542)), belum merge. T0, T3, T5, T6, dan T7 belum dimulai. Rencana (akar `erp/`): `.task-plans/2026-09-11-satgas-kepatuhan-izin-dan-gerbang.md` (T1+T2) dan `.task-plans/2026-09-11-form-builder-satgas-editor-dan-foto.md` (T4).
+**Status papan (2026-09-11):** T1+T2 **merged** 2026-09-11 (bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)); deploy dev belum diukur dan verifikasi lewat gateway belum dijalankan. T4: bip-erp [#1852](https://github.com/bip-itteam-internal/bip-erp/pull/1852) **merged** 2026-09-11 (deploy belum diukur), erp-frontend [#1542](https://github.com/bip-itteam-internal/erp-frontend/pull/1542) **belum merge**. T0, T3, T5, T6, dan T7 belum dimulai. Rencana (akar `erp/`): `.task-plans/2026-09-11-satgas-kepatuhan-izin-dan-gerbang.md` (T1+T2) dan `.task-plans/2026-09-11-form-builder-satgas-editor-dan-foto.md` (T4).
 
 **Kebutuhan asal** (dari manajemen): posisi Culture di HRD sebagai "intel perusahaan"; budaya kepatuhan kantor (sepatu, lanyard) dicatat diam-diam lewat MyBharata dan muncul besoknya per departemen; HRD punya rutinitas Satgas 5R & K3 yang sekarang lewat Google Form "Dokumentasi Temuan Inspeksi SATGAS 5R & K3" (foto, maks 10 berkas, 10 MB).
 
@@ -16,7 +16,7 @@ Papan kerja hasil `/analisa-kebutuhan` 2026-09-11. Keputusan di [[ADR - 0090 Ins
 - Usulan awal yang **gugur** setelah informasi pemakai masuk: AI penilai foto, peringkat antar departemen, master area.
 - Temuan data (lembar HRD "KPI DEPARTEMEN HRGA"): skor Satgas diketik dengan skala campur; Maret 2026 total KPI Office Girl 131 dari 100 lolos disetujui.
 
-**Urutan**: T0 (keputusan HR) berjalan paralel dan wajib selesai sebelum T3 go-live. T1+T2 (merged) → T3. T4 PR terbuka (#1852 + #1542); T6 bisa mulai sekarang (kontrak T2 sudah di `main`). T5 setelah T3. Tutup dengan T7. ⛔ **employee-service dan form-builder naik bersama, lalu web, lalu MyBharata.**
+**Urutan**: T0 (keputusan HR) berjalan paralel dan wajib selesai sebelum T3 go-live. T1+T2 (merged) → T3. T4: #1852 merged, #1542 menunggu merge; T6 bisa mulai sekarang (kontrak T2 sudah di `main`). T5 setelah T3. Tutup dengan T7. ⛔ **employee-service dan form-builder naik bersama, lalu web, lalu MyBharata.**
 
 ⚠️ **Koordinasi**: modul `kepatuhan` diusulkan dipakai juga oleh menu pencatat ADR 0085 (TBD "petugas ditunjuk"). Kabari Faiz nama modulnya supaya izin catatan kepatuhan masuk ke modul yang sama, bukan gerbang kedua.
 
@@ -54,17 +54,17 @@ Digabung satu PR atas keputusan user, supaya tak ada izin tanpa penegak yang ter
 
 **Cara verifikasi**: temuan skor 2 lalu cek ulang skor 5 untuk orang yang sama → nilai = konversi 5, **bukan** rata-rata; tab analitik menampilkan angka yang sama; orang tanpa jawaban → galat (jatuh manual), bukan 0; form ber-`service_team_index` tetap dirata-rata (uji membuktikan kedua aturan tak tertukar, dengan kontrol negatif). Satu panggilan sungguhan lewat gateway, dan draf KPI Office Boy uji terisi setelah HR memasang sumbernya di "Atur Target".
 
-## T4. Web: field foto Form Builder + sakelar penanda + label modul ⚠️ PR terbuka (#1852 + #1542)
+## T4. Web: field foto Form Builder + sakelar penanda + label modul ⚠️ #1852 merged, #1542 belum merge
 
-Dua PR, belum merge (urutan naik: bip-erp dulu, lalu erp-frontend):
+Dua PR (urutan naik: bip-erp dulu, lalu erp-frontend):
 
-- bip-erp PR [#1852](https://github.com/bip-itteam-internal/bip-erp/pull/1852) (`feat/form-builder-analitik-berkas`, `c9c509b6`): respons analitik membawa `file_fields [{key,label}]` di luar `fields`. **Temuan `/start-task`**: rute pratinjau saja tak cukup, karena backend membuang berkas dari `fields` dan tab Individu/Pertanyaan mengulang daftar itu (keputusan user: backend kirim daftar berkas).
-- erp-frontend PR [#1542](https://github.com/bip-itteam-internal/erp-frontend/pull/1542) (`feat/form-builder-satgas-editor`): `f5ab9f64` tipe `file` + cermin penanda `inspeksi_satgas` + label modul `kepatuhan`; `54cb1049` panel Satgas di form Penilaian (terkunci bila bertanda lain) + keterangan pertanyaan; `b5b8cedb` lampiran di tab Individu dan Pertanyaan; `5b45fb35` temuan review (kedipan galat, validasi id, 404, jenis berkas, helper syarat, celah test); `4ab15b2b` keputusan review.
+- bip-erp PR [#1852](https://github.com/bip-itteam-internal/bip-erp/pull/1852) (`feat/form-builder-analitik-berkas`, `c9c509b6`), **merged** 2026-09-11: respons analitik membawa `file_fields [{key,label}]` di luar `fields`. **Temuan `/start-task`**: rute pratinjau saja tak cukup, karena backend membuang berkas dari `fields` dan tab Individu/Pertanyaan mengulang daftar itu (keputusan user: backend kirim daftar berkas).
+- erp-frontend PR [#1542](https://github.com/bip-itteam-internal/erp-frontend/pull/1542) (`feat/form-builder-satgas-editor`), **belum merge**: `f5ab9f64` tipe `file` + cermin penanda `inspeksi_satgas` + label modul `kepatuhan`; `54cb1049` panel Satgas di form Penilaian (terkunci bila bertanda lain) + keterangan pertanyaan; `b5b8cedb` lampiran di tab Individu dan Pertanyaan; `5b45fb35` temuan review (kedipan galat, validasi id, 404, jenis berkas, helper syarat, celah test); `4ab15b2b` keputusan review.
 - **Keputusan user saat `/review`**: antrean Kaizen menampilkan penanda lampiran (bukan id); **pertanyaan berkas belum boleh wajib sampai T6**; mengganti tipe form melepas SEMUA penanda yang tak sah (`TIPE_PENANDA` + `lepasPenandaTakSah`); galat simpan editor kini tampil.
 - **Dikeluarkan dari T4**: kompresi gambar di web (erp-frontend tak punya jalur pengisian form; pindah ke T6).
 - Verifikasi lokal (sebelum merge `origin/main`): 561 test `src/features/form-builder` hijau, kontrol negatif 11 test kunci terbukti merah; sesudah commit `4ab15b2b` suite penuh 39 gagal identik dengan baseline merge-base e37e4adb dan `pnpm build` lolos. Sesudah merge `origin/main` 428d41b0: tsc, eslint, dan build lolos; suite penuh 37 gagal di 13 berkas, identik dengan 13 berkas yang sama di worktree baseline 428d41b0. BE sesudah merge `origin/main`: `go vet`, `go test`, `gofmt` bersih, dan kontrol negatif dua test `file_fields` terbukti merah.
 
-**Yang belum**: merge kedua PR (manusia), deploy (form-builder dulu, baru frontend), dan Cara Verifikasi di artefak rencana (gateway `file_fields`, layar alur A/B, terang/gelap, sekitar 390px, id/en, PDF sungguhan).
+**Yang belum**: merge #1542 (manusia), deploy dev form-builder berisi #1852 lalu frontend (ukur umur container, jangan diasumsikan), dan Cara Verifikasi di artefak rencana (gateway `file_fields`, layar alur A/B, terang/gelap, sekitar 390px, id/en, PDF sungguhan).
 
 ## T5. Web: halaman rekap Satgas
 
