@@ -578,8 +578,8 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "99f5f3426f60f4a244bca139393bd5405370d62926fd771021a8bd7cf29f81a5",
-      "ukuran_kb": 45.4,
+      "hash": "903725a1e4b557238c9c3dc3865b89907e34067805d4de3ea52655de7e9983f5",
+      "ukuran_kb": 45.5,
       "ringkasan": "Menjawab: endpoint apa saja yang tersedia di Marketing Analytics Service (beranda, ambang keputusan, pagu belanja iklan, kurva alokasi, laba per toko, video dan live, sesi live host, retur, price floor), method dan parameter tiap endpoint, serta konvensi respons dan aturan gerbang akses (siapa boleh menulis ambang/pagu). Juga menjelaskan definisi vonis laba (tanpa_data, belum_matang, rugi, waspada, sehat) dan kolom yang tidak boleh dijumlahkan (mis. pembatalan bukan komponen laba, orders_dikirim himpunan bagian dari orders).",
       "kata_kunci": [
         "marketing analytics",
@@ -1455,7 +1455,7 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "ea1b0ee0349a044e10b890be40d02c6cfb492aaf1409c7762fe0318ee5208ebb",
+      "hash": "04f86088d93a328e1bf900490a9eb71339c1ffb49ff59aa7c8de6fb6a4f581b8",
       "ukuran_kb": 408.0,
       "ringkasan": "Menjawab: apa itu portal web ERP (hris-dashboard/One Bharata), modul apa saja yang ada di dalamnya (HR, attendance, finance/insentif, marketplace, IT, GA), dan bagaimana autentikasi serta role-based access bekerja (system_roles per modul, SSO sebagai identity provider untuk aplikasi lain). Juga menjawab bagaimana menu dan sub-menu Pengaturan HRGA disusun, serta konvensi teknis frontend seperti data-fetching TanStack Query dan pembuatan bagan/chart.",
       "kata_kunci": [
@@ -2568,7 +2568,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **45 route** di berkas produksi `origin/main` (enumerasi ulang 2026-09-11, termasuk `/health`; audit 2026-08-26 menghitung 41; Analisis Live menambah dua lewat bip-erp #1841, merged dan di PROD 2026-09-11, jadi 47 saat merge; hitung ulang bila rute lain menyusul). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD dan dipakai host sejak 2026-09-09** (catatan lama \"0 dokumen\" dicoret 2026-09-11, lihat § Belum Diimplementasikan). Sejak 2026-09-11 klien pencatatnya hanya MyBharata: halaman web Sesi Live Host dihapus ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]; erp-frontend branch `chore/hapus-sesi-live-host-web`, belum merged).",
+      "status_teks": "Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **45 route** di berkas produksi `origin/main` (enumerasi ulang 2026-09-11, termasuk `/health`; audit 2026-08-26 menghitung 41; Analisis Live menambah dua lewat bip-erp #1841, merged dan di PROD 2026-09-11, jadi 47 saat merge; hitung ulang bila rute lain menyusul). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD dan dipakai host sejak 2026-09-09** (catatan lama \"0 dokumen\" dicoret 2026-09-11, lihat § Belum Diimplementasikan). Sejak 2026-09-11 klien pencatatnya hanya MyBharata: halaman web Sesi Live Host dihapus ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]; erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11, belum di PROD).",
       "publik": true,
       "tautan": [
         "Sales - Marketing Dashboard (Master Roadmap)",
@@ -2603,8 +2603,8 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "de3c4dcdcc7b5f31c45cf23f964d0ee824a7def82d48af520ca587adf1b61229",
-      "ukuran_kb": 125.2,
+      "hash": "ebaa7e59151473cd967b3ce87c71a461397a145b51868643670653276db753bd",
+      "ukuran_kb": 125.3,
       "ringkasan": "Menjawab: bagaimana arsitektur Marketing Analytics Service bekerja (membaca integration_db baca-saja dengan tiga lapis penjaga, pre-agregasi ke koleksi mart_*), endpoint apa saja yang ada, dan bagaimana aturan vonis laba (lima keadaan termasuk belum_matang dan tanpa_data) dirumuskan. Juga menjelaskan bagaimana sesi live host dicatat termasuk mekanisme ambil alih dan tutup otomatis, kolom mana yang tidak boleh dijumlahkan agar tidak menghitung ganda (iklan_sia_sia, pembatalan, kepemilikan vs collaboration_type), serta sumber data per channel (TikTok, Shopee, Lazada).",
       "kata_kunci": [
         "marketing analytics service",
@@ -6186,7 +6186,7 @@
         "ADR - 0002 Database-per-Service"
       ],
       "hash": "bef2d6c1912999da812b74d95922883b2983d874fb01074c341158a5350ec350",
-      "ukuran_kb": 17.0,
+      "ukuran_kb": 17.1,
       "ringkasan": "Menjawab: bagaimana kontrak PKWT direncanakan ditandatangani di sistem sendiri dengan tanda tangan elektronik tidak tersertifikasi secara tatap muka di kantor didampingi HRD, siapa Pihak Pertama (direktur yang ditetapkan per perusahaan), siapa yang membubuhkan e-Meterai (HR, di luar sistem), dan kenapa jalur PSrE/e-KYC dari ADR 0019 ditolak. Juga memuat keputusan memisahkan pengingat kontrak habis dari tanda tangan (kodenya masih di branch, belum merge), dasar hukum UU ITE dan PP 71/2019, lubang keamanan akun yang ditemukan, arsip terkunci, dan salinan kontrak untuk karyawan.",
       "kata_kunci": [
         "ADR 0089",
@@ -6254,8 +6254,8 @@
       "judul": "ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diputuskan** (2026-09-11, keputusan user). Kodenya di branch erp-frontend `chore/hapus-sesi-live-host-web`, **belum merged dan belum di PROD**.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Diputuskan, kode merged** (2026-09-11, keputusan user). Kodenya di erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11 20:02 WIB, **belum di PROD**. Cek layar di DEV sesudah merge belum dijalankan, dan prasyarat deploy PROD (host aktif sudah memakai build MyBharata yang memuat Sesi Live) belum dipastikan.",
       "publik": true,
       "tautan": [
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
@@ -6265,8 +6265,8 @@
         "APP - Web ERP",
         "APP - MyBharata"
       ],
-      "hash": "2d0898d370a2e6bf9dbe135c2f15cdaa57c64ead38a91568a7c0e5c2a0c32e39",
-      "ukuran_kb": 8.2,
+      "hash": "28202ea30c45dfc7e2cacb69d528013e7ef051c919179c7a98e3fae3009c2725",
+      "ukuran_kb": 8.4,
       "ringkasan": "Menjawab: kenapa halaman dan menu Sesi Live Host di web ERP dihapus, apa yang masih tersedia setelah penghapusan (ringkasan performa host di Analisis Live dan panel ICC, endpoint backend yang tidak berubah), dan siapa yang terdampak (host live yang sebelumnya mencatat lewat web, leader marketing yang kehilangan riwayat per sesi seluruh tim). Juga menjelaskan perbandingan pemakaian dua klien sebelumnya dan bagian mana dari ADR 0063/ADR 0088 yang ikut dicabut.",
       "kata_kunci": [
         "sesi live host",
@@ -8121,7 +8121,7 @@
         "HRIS - Big Pictures"
       ],
       "hash": "1a4b2472ac83d357f74afbd0bf167f25fd30939ec60e7a78e401500c94e02679",
-      "ukuran_kb": 30.0,
+      "ukuran_kb": 30.2,
       "ringkasan": "Menjawab: bagaimana rancangan digitalisasi kontrak PKWT/PKWTT bekerja (draft dari template berbasis data HRIS, tanda tangan tatap muka didampingi HRD, konfirmasi direktur dari Ruang Direktur, e-Meterai oleh HR, salinan ke karyawan), siapa persona yang terlibat, dan pondasi apa yang sudah ada di modul riwayat kontrak `employee_contract`. Juga memuat celah pondasi (nomor kontrak tak unik, lampiran bisa diganti, karyawan tak bisa membuka kontraknya sendiri), keamanan akun, landasan hukum, pemetaan field template PKWT ke sumber data, rancangan pengingat kontrak habis (kode di branch, belum merge), dan keputusan yang masih TBD.",
       "kata_kunci": [
         "kontrak kerja elektronik",
@@ -8559,7 +8559,7 @@
         "HRIS - Big Pictures"
       ],
       "hash": "58d8e90b0176d610b8f57ac1fcc5bf609d4bc69a262aac981959c9effe984455",
-      "ukuran_kb": 4.7,
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab: data administratif karyawan apa saja yang dikelola personalia (data personal, kontrak PKWT, BPJS, riwayat masa kerja), bagaimana urutan off-boarding/exit clearance (feedback, pengembalian inventaris, NDA, paklaring), dan bagaimana HR mencatat resign sekaligus menonaktifkan akun karyawan. Juga menjelaskan kebutuhan notifikasi sebelum kontrak habis beserta rancangan pengingatnya (kode di branch, belum merge), serta integrasi dengan employee-service, notification-service, dan inventaris GA.",
       "kata_kunci": [
         "personalia",
@@ -13451,7 +13451,7 @@
         "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)"
       ],
       "hash": "d7a78c4844296177525d9c816b971026475ff8bb02cec6dc3a07a5b991b195d6",
-      "ukuran_kb": 9.4,
+      "ukuran_kb": 9.6,
       "ringkasan": "Menjawab: task apa saja yang diturunkan dari kebutuhan tanda tangan kontrak kerja dan pengingat kontrak habis, bagaimana urutan gelombangnya, dan apa prasyarat tiap task (pengingat T1 yang kodenya di branch belum merge, uji PDF bermeterai S1, nomor kontrak unik, template PKWT, arsip MinIO terkunci, sesi tanda tangan tatap muka, Kontrak Saya di MyBharata, antrean Ruang Direktur). Juga memuat jebakan yang menggagalkan rancangan naif, task keamanan akun terpisah (limiter PIN, jejak reset akun, password awal acak), keputusan yang masih TBD, dan titik mulai pengerjaan.",
       "kata_kunci": [
         "analisa kebutuhan",
