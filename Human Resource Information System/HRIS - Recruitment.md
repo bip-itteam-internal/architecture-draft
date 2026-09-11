@@ -28,7 +28,7 @@
 7. **Offer & Decision** — keputusan + surat penawaran → kandidat accept/decline
 8. **Hire → Karyawan** — saat kandidat `Hired`, HR membuat **data karyawan** di HRIS "Tambah Karyawan" (mode *dari kandidat* — data kandidat diprefill, HR isi sisanya) via [[Microservices - Employee Service]]; kandidat lalu **ditautkan** ke `employee_id` (`PUT /candidates/:id/link-employee`, progress→Onboarding).
 	- ⚠️ **Koreksi (diukur 2026-09-12): hire TIDAK mengaktifkan akun.** `POST /candidates/:id/hire` hanya meneruskan ke `POST /onboarding/register` bila body membawa `employee_id` (`services/recruitment/offer_handlers.go` `hireCandidate`), dan endpoint itu mewajibkan username, password, **dan PIN baru** (`services/employee/main.go:3133`) yang tak pernah dikirim hire, jadi jalur itu selalu ditolak 400 dan hire ikut gagal. Akun diaktifkan **karyawan sendiri** lewat [[APP - MyBharata]].
-	- 🟡 **(erp-frontend `feat/rekrutmen-buka-alur`, belum merge)** dialog Hire tak lagi meminta Employee ID dan password sementara (body kosong, BE tak diubah), dan tab Offer di detail kandidat menampilkan tombol **Buat data karyawan** untuk kandidat Hired yang belum tertaut: tombol itu membuka HRIS > Karyawan dengan modal Tambah Karyawan langsung di mode dari kandidat (`/hris/employee?dari_kandidat=<id>`). Kandidat yang belum Hired, sudah tertaut, atau tak ditemukan jatuh ke layar awal modal dengan pesan.
+	- 🟡 **(erp-frontend `feat/rekrutmen-buka-alur`, belum merge)** dialog Hire tak lagi meminta Employee ID dan password sementara (body kosong, BE tak diubah), dan tab Offer di detail kandidat menampilkan tombol **Buat data karyawan** untuk kandidat Hired yang belum tertaut: tombol itu membuka HRIS > Karyawan dengan modal Tambah Karyawan langsung di mode dari kandidat (`/hris/employee?dari_kandidat=<id>`). Kandidat yang belum Hired, sudah tertaut, atau tak ditemukan jatuh ke layar awal modal dengan pesan. Perusahaan modal diturunkan dari `company_id` kandidat (kosong = BIP), bukan dipatok BIP; perusahaan kandidat yang tak ada di daftar perusahaan juga jatuh ke layar awal dengan pesan (diselaraskan dengan rekrutmen lintas perusahaan saat `main` digabung ke branch itu, 2026-09-12).
 9. **Masa Evaluasi & Performance Review Onboarding** — karyawan baru jalani masa evaluasi, berpuncak pada sesi **Performance Review** (presentasi → penilai lintas divisi menilai → keputusan status) — lihat bagian khusus di bawah. *(Onboarding checklist per-kandidat #492 dihapus 2026-07-18 — dead code.)* ⚠️ **Catatan itu tak lagi lengkap:** checklist onboarding **dibangun ulang 2026-07-26** sebagai template + instance per karyawan baru dengan penugasan PIC lintas tim (rincian di [[Microservices - Recruitment Service]]). PIC mengerjakan tugasnya di [[APP - MyBharata]]; 🟡 notifikasinya dirapikan di bip-erp `feat/recruitment-alur-kerja-hr` (belum merge), lihat §Alur Kerja HR.
 
 ## Screening (Manual; AI menyusul)
@@ -269,12 +269,10 @@ Selesai ketika: karyawan baru tercatat di perusahaan B dan onboarding-nya berjal
 - Langkah 6 (dari detail kandidat ke Tambah Karyawan di HRIS) pindah modul tanpa tautan dari
   detail kandidat. Celah **LAMA**, bukan akibat fitur ini. 🟡 Ditutup di erp-frontend
   `feat/rekrutmen-buka-alur` (belum merge): tombol **Buat data karyawan** di tab Offer, lihat
-  §Alur Kerja HR. ⚠️ **Risiko saat kedua branch digabung:** tautan `?dari_kandidat=` di branch itu
-  memulai modal dari kandidat dengan perusahaan **BIP** yang dipatok
-  (`create-employee/index.tsx`, sesuai perilaku `main` yang hanya membuka mode dari kandidat untuk
-  BIP), sedangkan branch ini membuka mode itu untuk perusahaan mana pun. Kandidat perusahaan B yang
-  dibuka lewat tautan akan dimulai di BIP; perusahaannya perlu diturunkan dari kandidat saat
-  keduanya disatukan.
+  §Alur Kerja HR. Risiko penggabungannya sudah ditutup 2026-09-12 saat `main` (yang memuat fitur
+  ini) digabung ke branch itu: tautan `?dari_kandidat=` kini memakai perusahaan dari `company_id`
+  kandidat (kosong = BIP), bukan BIP yang dipatok, sehingga kandidat perusahaan B dimulai di B
+  (`create-employee/index.tsx`, dijaga test yang merah bila perusahaannya dipatok lagi).
 - Recruiter yang paketnya belum dipasang, atau sudah dipasang tapi belum login ulang, hanya
   melihat perusahaannya sendiri TANPA petunjuk bahwa ia seharusnya melihat lebih. Lihat
   [[Microservices - Recruitment Service]] (catatan deploy) untuk urutan pemasangan paket dan
