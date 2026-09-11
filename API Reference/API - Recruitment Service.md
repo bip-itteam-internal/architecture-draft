@@ -56,7 +56,7 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
-| POST | `/candidates/:id/psikotes` | Terbitkan sesi psikotes + kirim magic link ke email kandidat (best-effort). **(2026-09-11, belum merged)** Body `{paket_id}` untuk tes berpaket atau `{config}` untuk Kraepelin lama; bagian yang belum siap atau soal yang jumlah kuncinya tak sesuai menggagalkan terbit dengan pesan. Balasan `{session_id, status, link}` (tanpa alamat email). Kandidat yang **sudah punya sesi → `409`** (sarankan Terbitkan Ulang). Babak `"Psikotest"` belum ada di master → `400` | HR |
+| POST | `/candidates/:id/psikotes` | Terbitkan sesi psikotes + kirim magic link ke email kandidat (best-effort). **(2026-09-11, bip-erp #1837)** Body `{paket_id}` untuk tes berpaket atau `{config}` untuk Kraepelin lama; bagian yang belum siap atau soal yang jumlah kuncinya tak sesuai menggagalkan terbit dengan pesan. Balasan `{session_id, status, link}` (tanpa alamat email). Kandidat yang **sudah punya sesi → `409`** (sarankan Terbitkan Ulang). Babak `"Psikotest"` belum ada di master → `400` | HR |
 | POST | `/candidates/:id/psikotes/reissue` | Terbitkan ulang. **`alasan` wajib** (kosong → `400`), body lain sama dengan terbit; sesi baru disiapkan dulu baru sesi lama dihapus, sehingga token lama mati | HR |
 | GET | `/candidates/:id/psikotes/report` | Laporan individual (metrik 4 kategori + skor keseluruhan + `selesai_karena`; **(T0, bip-erp #1828)** + `col_index` = jumlah kolom yang sempat dikirim). **(2026-09-11)** Sesi paket + `paket_nama` dan `bagian[]` (`nama`, `jenis_jawaban`, `status`, `selesai_karena`, waktu, dan salah satu `kraepelin`/`pilihan_ganda`/`disc`; hanya hitungan). **Tidak memuat soal/kunci jawaban**. Kandidat tanpa sesi → `404 {"error": ...}` | HR |
 | GET | `/candidates/psikotes/status` | Status **massal** untuk polling tabel (banyak id sekaligus, satu kueri `$in`). Tiap baris: `candidate_id`, `status`, `col_index`, `total_kolom`, `issued_at`, `last_seen_at?`; **(T0)** + `selesai_karena?` (omitempty, hanya sesi `finished`); **(2026-09-11)** sesi paket + `paket_nama`, `total_bagian`, `bagian_index`, `bagian_nama` (omitempty). **Tanpa** skor/kategori, dikunci test allowlist | HR |
@@ -74,7 +74,7 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 
 ### Katalog psikotes (sisi HR)
 
-**(2026-09-11, bip-erp `feat/recruitment-psikotes-multi-jenis`, belum merged.)** Rincian aturan dan alur: [[HRIS - Bank Soal dan Paket Psikotes]]. "lihat" = `PermRecruitmentView` + `isHR`; "tulis" = `PermRecruitmentWork` + `isHR`.
+**(2026-09-11, bip-erp #1837 merged `40323aae`, belum prod.)** Rincian aturan dan alur: [[HRIS - Bank Soal dan Paket Psikotes]]. "lihat" = `PermRecruitmentView` + `isHR`; "tulis" = `PermRecruitmentWork` + `isHR`.
 
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
@@ -160,7 +160,7 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 | POST | `/public/recruitment/psikotes/:token/columns/:index` | Submit satu kolom. Index sama **menimpa**; index lama tidak menarik balik progres; panjang jawaban ditentukan **server** |
 | POST | `/public/recruitment/psikotes/:token/finish` | Selesai + dinilai. Panggilan kedua tidak menghitung ulang |
 | POST | `/public/recruitment/psikotes/:token/abandon` | Dipanggil browser lewat `navigator.sendBeacon`. Balasan **selalu** `{ok:true}` tanpa skor. **(2026-09-11)** Sesi paket hanya ditutup bila bagian Kraepelin sedang berjalan; di bagian lain no-op |
-| POST | `.../:token/bagian/:b/mulai` | **(Tes berpaket, 2026-09-11, belum merged.)** Mulai bagian ke-b sesuai giliran. Bagian Kraepelin membalas config + kolom seperti `/start` lama |
+| POST | `.../:token/bagian/:b/mulai` | **(Tes berpaket, 2026-09-11, bip-erp #1837 + #1838, belum prod.)** Mulai bagian ke-b sesuai giliran. Bagian Kraepelin membalas config + kolom seperti `/start` lama |
 | POST | `.../:token/bagian/:b/kolom/:index` · `.../bagian/:b/selesai` | Kirim kolom dan tutup bagian Kraepelin di dalam paket |
 | POST | `.../:token/bagian/:b/subtes/:s/mulai` | Mulai subtes; server menulis deadline. Balasan soal **tanpa kunci/dimensi**, `soal_index`, `sisa_detik` (`null` bila tanpa timer) |
 | POST | `.../:token/bagian/:b/subtes/:s/jawab` | `{nomor, pilihan}` (pilihan ganda) atau `{nomor, most, least}` (DISC, keduanya beda). Maju saja; lewat deadline plus 5 detik → `409 waktu_habis` |
