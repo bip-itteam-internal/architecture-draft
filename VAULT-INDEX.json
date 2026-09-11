@@ -705,24 +705,25 @@
         "API - Index",
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "HRIS - Psikotes Kraepelin",
+        "HRIS - Bank Soal dan Paket Psikotes",
+        "CORE - API Master Gateway",
         "HRIS - Recruitment",
-        "Microservices - Employee Service",
-        "CORE - API Master Gateway"
+        "Microservices - Employee Service"
       ],
-      "hash": "702a8c6ca6a7734fe09a27237eaf080614d80cbe405b04e24eb4227b81800721",
-      "ukuran_kb": 20.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki recruitment-service untuk job requisition, job posting, kandidat, tahap seleksi (interview, hasil tes, background check), psikotes online sisi HR, offer, onboarding checklist, dan portal publik, beserta role RBAC yang boleh memanggilnya. Juga menjelaskan aturan penting seperti departemen requisition diambil dari identitas pengaju (kecuali jabatan berjenjang direktur), persetujuan final requisition oleh HR supervisor, rute `/candidates/psikotes/status` yang wajib didaftarkan sebelum `/candidates/:id`, dan efek cache gateway 3 menit.",
+      "hash": "877648e7a123a724575e2ef4acd625f5eff0b3156cdc59f4e8a22e9ee996dc25",
+      "ukuran_kb": 25.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan recruitment-service untuk requisition, job posting, kandidat, interview, hasil tes, background check, psikotes online, offer, onboarding checklist, dan portal karir publik, beserta role yang boleh memanggil tiap endpoint. Juga menjelaskan aturan penting seperti departemen requisition yang diambil dari identitas pengaju kecuali jabatan berjenjang direktur, persetujuan final requisition oleh HR supervisor setelah tahap Direktur dihapus, dan perilaku upsert hasil tes yang bisa menimpa skor otomatis psikotes.",
       "kata_kunci": [
         "recruitment-service",
-        "rekrutmen",
-        "requisition",
+        "API rekrutmen",
+        "job requisition",
+        "permintaan karyawan",
         "job posting",
         "lowongan",
         "kandidat",
-        "candidate",
         "psikotes",
-        "hasil tes",
-        "background check"
+        "interview round",
+        "ATS"
       ]
     },
     {
@@ -1311,24 +1312,25 @@
         "HRIS - Recruitment",
         "APP - Website Bharata Internasional",
         "HRIS - Psikotes Kraepelin",
+        "HRIS - Bank Soal dan Paket Psikotes",
         "API - Recruitment Service",
         "Microservices - Notification Service",
         "CORE - SSO Flow"
       ],
-      "hash": "b8e37692158745000bb8d31a13c1e31b51e13620a73eae6363bd4b1a646a01da",
-      "ukuran_kb": 13.4,
-      "ringkasan": "Menjawab: apa itu portal karir publik career.bharatainternasional.com, repo dan stack-nya (career-bharata, Next.js, branch master, pnpm), halaman apa saja yang tersedia (daftar lowongan, detail, form lamaran dengan satu PDF gabungan, halaman sukses, pengerjaan psikotes Kraepelin lewat magic link), dan endpoint `/public/recruitment/*` yang dikonsumsinya. Juga menjelaskan cara deploy Docker standalone beserta jebakan pemetaan port 3005:3011, perilaku tes yang berakhir saat halaman tersembunyi, dan bedanya dengan halaman karir website korporat.",
+      "hash": "213d64e39be02a87d477738a6ac84218feca3210bc7b1173c3ae6db279d84130",
+      "ukuran_kb": 14.6,
+      "ringkasan": "Menjawab: apa itu portal karir publik career.bharatainternasional.com, di repo mana ia tinggal (career-bharata, Next.js, pnpm, branch master), dan bagaimana pelamar melihat lowongan, melamar dengan satu berkas PDF, serta mengerjakan psikotes lewat magic link tanpa login. Juga menjelaskan cara deploy Docker standalone ke prod beserta jebakan port dan compose, kontrak BE `/public/recruitment/*` yang dipakai, dan bedanya dengan halaman karir di situs korporat.",
       "kata_kunci": [
         "portal karir",
         "career portal",
         "career-bharata",
-        "lowongan",
-        "lamaran",
-        "apply",
+        "career.bharatainternasional.com",
+        "lowongan kerja",
+        "lamar kerja",
         "pelamar",
-        "psikotes",
+        "psikotes kandidat",
         "magic link",
-        "career.bharatainternasional.com"
+        "public recruitment"
       ]
     },
     {
@@ -1568,6 +1570,7 @@
         "Microservices - Learning Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "HRIS - Psikotes Kraepelin",
+        "HRIS - Bank Soal dan Paket Psikotes",
         "API - Recruitment Service",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
@@ -1583,20 +1586,20 @@
         "APP - MyBharata",
         "DB - Overview and Notes"
       ],
-      "hash": "abf95545bd6b914aab3958bbaee89bbd7b519980ccdb5ddb34d36e017c070875",
-      "ukuran_kb": 13.9,
-      "ringkasan": "Menjawab: bagaimana api-gateway memvalidasi JWT, menerbitkan token lewat login dan SSO, menyuntikkan header identitas (BIP-Employee-Id, BIP-System-Roles, BIP-Company-ID) ke service internal, dan meneruskan request `/api/:module/*` serta rute khusus (`/auth/*`, `/public/recruitment/*`, `/public/guestbook`, `/ext/*`). Juga menjelaskan cache Redis GET 3 menit beserta pengecualian noCacheRoutes, kenapa prefix `/internal/` bukan batas keamanan, dan kenapa setiap service di belakang gateway wajib ReadBufferSize minimal 32 KB agar tidak membalas 431.",
+      "hash": "15cda6ee9a3c934dcf0d4780b391a0836087e429311bb5966af92efdbb417e10",
+      "ukuran_kb": 15.6,
+      "ringkasan": "Menjawab: bagaimana api-gateway bip-erp memvalidasi JWT, menerbitkan token login, menangani SSO one-time-code, menyuntikkan header identitas (BIP-Employee-Id, BIP-System-Roles, BIP-Company-ID, permission) ke service internal, dan merutekan `/api/:module/*` maupun rute publik tanpa JWT seperti lamaran dan psikotes kandidat. Juga menjelaskan jebakan yang sudah terbukti: 431 akibat ReadBufferSize service di bawah 32 KB, catch-all yang membuat prefix `/internal/` bukan batas keamanan, limiter yang bisa dilewati, serta rate limit dan cache Redis per rute.",
       "kata_kunci": [
         "api-gateway",
-        "gateway",
+        "API Master Gateway",
         "JWT",
         "SSO",
         "reverse proxy",
-        "routing",
+        "routing modul",
+        "rate limiter",
         "cache Redis",
-        "431",
-        "BIP-Company-ID",
-        "rate limit"
+        "header BIP",
+        "431 Request Header Fields Too Large"
       ]
     },
     {
@@ -2793,6 +2796,7 @@
         "HRIS - Psikotes Kraepelin",
         "Microservices - Employee Service",
         "Microservices - Notification Service",
+        "HRIS - Bank Soal dan Paket Psikotes",
         "HRIS - Recruitment Pipeline Redesign",
         "DB - Overview and Notes",
         "CORE - OCR Document Service",
@@ -2805,20 +2809,20 @@
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "aa5af39c63c6163f309e2840dbdf76482665d3e4e32a2cbc52bc16fec214df0f",
-      "ukuran_kb": 52.2,
-      "ringkasan": "Menjawab: apa cakupan recruitment-service mulai dari requisition, lowongan, kandidat, babak seleksi (interview, tes, background check, psikotes online), offer, sampai handoff ke karyawan, beserta model data `recruitment_db`, port, dan cara deploy manualnya. Juga menjelaskan cara kerja katalog babak global dan `form_type`, bagaimana hasil tes menggerakkan progress dan status kandidat (SP-Wiring), notifikasi email kandidat, serta riwayat increment seperti apply publik, requisition lintas-departemen oleh direktur, konversi kandidat ke karyawan, dan onboarding checklist.",
+      "hash": "666d0fc2210a4684fbcb7fec149eb6d186482c7407fce7bf8b2cd82cec023eed",
+      "ukuran_kb": 52.4,
+      "ringkasan": "Menjawab: bagaimana recruitment-service mengelola siklus rekrutmen dari requisition, lowongan, pelamar, babak seleksi, hasil tes, background check, psikotes, dan offer sampai handoff onboarding serta penautan kandidat ke data karyawan. Juga menjelaskan model data `recruitment_db`, katalog babak `interview_round` dan `form_type`, SP-Wiring yang menggerakkan progress dan status kandidat, notifikasi email kandidat, cara deploy manual ke dev, serta riwayat increment fitur seperti requisition lintas-departemen oleh direktur.",
       "kata_kunci": [
         "recruitment-service",
         "rekrutmen",
         "recruitment",
         "ATS",
+        "job requisition",
         "kandidat",
-        "babak seleksi",
         "interview round",
-        "offer",
-        "onboarding",
-        "recruitment_db"
+        "SP-Wiring",
+        "recruitment_db",
+        "onboarding"
       ]
     },
     {
@@ -6083,33 +6087,34 @@
       "judul": "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** — disetujui 2026-09-10, kode belum ada. Rincian di `## Deskripsi`.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Diterima, merged, belum prod**: disetujui 2026-09-10; T1 sampai T6 dikodekan, terverifikasi di DEV, dan merged 2026-09-11; prod belum. Rincian di `## Deskripsi`.",
       "publik": true,
       "tautan": [
         "HRIS - Psikotes Kraepelin",
+        "HRIS - Bank Soal dan Paket Psikotes",
         "ADR - 0002 Database-per-Service",
         "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
         "ADR - 0041 Izin Tipe Form Menempel di Departemen",
         "REF - Kepemilikan Data",
+        "CORE - API Master Gateway",
         "HRIS - Recruitment",
-        "HRIS - Bank Soal dan Paket Psikotes",
         "API - Recruitment Service"
       ],
-      "hash": "d7f2bf94b8d2b8f1dd6f2208c5488904f588f1c256b22801aac83403a384fc9e",
-      "ukuran_kb": 21.1,
-      "ringkasan": "Menjawab: bagaimana psikotes diperluas dari Kraepelin ke multi-jenis (CFIT, DISC, dan tipe lain), yaitu katalog tipe tes, bank soal, dan paket tes menjadi master data yang dikelola HRD sementara tiga bentuk jawaban (pilihan ganda, MOST/LEAST, angka-kolom) tetap berupa kode, dan paket dijalankan satu sesi satu tautan. Juga menjawab apa yang tidak dijanjikan (batas tanpa coding, sistem tidak menyimpulkan IQ atau kepribadian, legalitas soal berlisensi, tanpa drag and drop), data prod yang mendasari keputusan, tahapan kerja, dan hal yang belum diputuskan seperti pendampingan tes dan tenggat tautan.",
+      "hash": "40deb6e040f6ad1c759e4589b6d7dd6f833397ce339e6f90572f7de93b2f4160",
+      "ukuran_kb": 23.3,
+      "ringkasan": "Menjawab: kenapa psikotes diperluas dari Kraepelin saja menjadi multi-jenis (CFIT, DISC) dengan katalog tipe tes, bank soal, dan paket tes sebagai master data yang dikelola HRD, sementara tiga bentuk jawaban (pilihan ganda, MOST/LEAST, angka-kolom) tetap berupa kode. Juga menjelaskan apa yang sengaja tidak dijanjikan ke manajemen (batas klaim tanpa coding, tidak ada kesimpulan IQ atau kepribadian, legalitas soal berlisensi), keadaan prod yang terukur sebagai dasarnya, penyimpangan sadar saat pengodean, dan keputusan yang masih terbuka seperti pendampingan tes dan tenggat tautan.",
       "kata_kunci": [
+        "ADR 0087",
         "psikotes multi-jenis",
+        "katalog tipe tes",
         "bank soal",
         "paket tes",
-        "tipe tes",
         "CFIT",
         "DISC",
         "Kraepelin",
-        "master data",
-        "ADR 0087",
-        "psychotest"
+        "jenis jawaban",
+        "psychological test"
       ]
     },
     {
@@ -7344,37 +7349,37 @@
       "judul": "HRIS - Bank Soal dan Paket Psikotes",
       "area": "Human Resource Information System",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "**Direncanakan (Design)** — belum ada kode. Rencana disetujui 2026-09-10. Papan kerja: `Workspace/ANALISA - Psikotes Multi-Jenis.md`",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**: T1 sampai T6 dikodekan dan **merged 2026-09-11** (bip-erp #1837 `40323aae` dan #1838 `b73862af`, erp-frontend #1527 `42eccaf8`, career-bharata #10 `15240242`). Terverifikasi di DEV hari itu lewat gateway dan sebagai HR serta kandidat di Chrome (recruitment-service dan api-gateway dinaikkan dari branch; career portal dijalankan lokal terhadap gateway dev). Prod belum. Status ini bergerak, ukur ulang sebelum mengandalkannya. Papan kerja: `Workspace/ANALISA - Psikotes Multi-Jenis.md`",
       "publik": true,
       "tautan": [
         "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode",
         "HRIS - Psikotes Kraepelin",
         "Microservices - Recruitment Service",
+        "CORE - API Master Gateway",
         "APP - Web ERP",
+        "APP - Portal Karir Bharata",
         "API - Recruitment Service",
         "REF - Kepemilikan Data",
-        "ADR - 0041 Izin Tipe Form Menempel di Departemen",
-        "CORE - API Master Gateway",
         "Microservices - File Service",
         "Microservices - Notification Service",
-        "APP - Portal Karir Bharata",
-        "HRIS - Recruitment"
+        "HRIS - Recruitment",
+        "ADR - 0041 Izin Tipe Form Menempel di Departemen"
       ],
-      "hash": "71bb9732cb4d0f89a88eb92305578e32670859694010ef11fb40c224ab5137ce",
-      "ukuran_kb": 11.6,
-      "ringkasan": "Menjawab: bagaimana psikotes multi-jenis bekerja, yaitu model data psikotes_tipe, psikotes_item, psikotes_paket, dan perluasan psikotes_session, serta tiga bentuk jawaban (pilihan_ganda untuk CFIT, most_least untuk DISC, angka_kolom untuk Kraepelin) dan apa yang dihitung masing-masing. Juga menjelaskan alur HRD menyiapkan tipe, soal, dan paket per posisi lalu mengirim satu tautan ke kandidat, komponen yang dipakai ulang vs yang harus dibangun baru, dan jebakan seperti titik dispatcher yang terlewat, tag json:\"-\" pada kunci jawaban, serta index Mongo yang tidak berubah lewat deploy.",
+      "hash": "5633fc5aa7a7b9fbb58fff7876b4848a5fe27dd3b1ec28c0691f36a2932be1e5",
+      "ukuran_kb": 19.6,
+      "ringkasan": "Menjawab: bagaimana HRD mengelola tipe tes, bank soal (input manual, impor Excel, soal dan opsi bergambar), dan paket tes berurutan di Pengaturan Rekrutmen, serta bagaimana kandidat mengerjakan seluruh paket dari satu tautan. Juga menjelaskan tiga bentuk jawaban beserta cara penilaiannya, model data `psikotes_tipe`, `psikotes_item`, `psikotes_paket`, dan `psikotes_session`, aturan kesiapan paket, izin RBAC untuk membaca kunci jawaban, penutupan sesi paket, seed bawaan, dan jebakan yang sudah diketahui.",
       "kata_kunci": [
-        "bank soal psikotes",
+        "bank soal",
         "question bank",
         "paket psikotes",
-        "psikotes_tipe",
+        "tipe tes",
         "psikotes_item",
-        "psikotes_paket",
         "CFIT",
         "DISC",
         "pilihan ganda",
-        "MOST LEAST"
+        "most least",
+        "impor Excel"
       ]
     },
     {
@@ -8426,20 +8431,20 @@
         "APP - Portal Karir Bharata",
         "HRIS - Candidate Assessment"
       ],
-      "hash": "f951b580bea865adaa30a6a716d3bf1147d91bff93493298fabfc3dba034b607",
-      "ukuran_kb": 24.1,
-      "ringkasan": "Menjawab: bagaimana alur psikotes online Kraepelin berjalan, dari HR menerbitkan sesi, kandidat mengerjakan lewat magic link tanpa login, sampai server menilai dan menulis Hasil Tes berstatus Pending yang diputuskan HR. Juga menjelaskan model data `psikotes_session` dan index uniknya, konfigurasi kolom/baris/detik, endpoint HR dan publik, cara skoring (kecepatan, ketelitian, keajegan, ketahanan), tiga cara sesi berakhir (tuntas, ditinggalkan, kedaluwarsa), dan bagaimana sesi terputus ditampilkan di layar HR.",
+      "hash": "01360247b5a1eca683f271f936898116b4a8116fe55083b4d6024a1d97341878",
+      "ukuran_kb": 25.1,
+      "ringkasan": "Menjawab: bagaimana psikotes online Kraepelin berjalan, dari HR menekan Kirim Tes, kandidat mengerjakan lewat magic link tanpa login, sampai skor masuk ke Hasil Tes babak Psikotest berstatus Pending untuk diputuskan HR. Juga menjelaskan model data `psikotes_session` dan index uniknya, kerahasiaan soal dan skor, konfigurasi kolom, baris, dan detik, rumus skoring kecepatan, ketelitian, keajegan, dan ketahanan, tiga cara sesi berakhir (tuntas, ditinggalkan, kedaluwarsa), serta cara sesi terputus ditampilkan di layar HR.",
       "kata_kunci": [
-        "psikotes",
         "Kraepelin",
+        "psikotes online",
         "psychotest",
         "magic link",
         "psikotes_session",
-        "skoring",
+        "skoring psikotes",
         "sesi terputus",
         "hasil tes",
-        "kandidat",
-        "tes online"
+        "tes kecepatan",
+        "Kirim Tes"
       ]
     },
     {
@@ -10410,6 +10415,9 @@
         "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
         "HRIS - Payroll",
         "Microservices - Payroll Service",
+        "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode",
+        "HRIS - Bank Soal dan Paket Psikotes",
+        "HRIS - Psikotes Kraepelin",
         "HRIS - Kepatuhan Peraturan Perusahaan",
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan",
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
@@ -10418,22 +10426,20 @@
         "REF - PRD ERP",
         "REF - Alur Persetujuan"
       ],
-      "hash": "569e4e3202c1f539fc53e15c822e001ddb578e862063d3bf9d8bd27e0524a03d",
-      "ukuran_kb": 22.4,
-      "ringkasan": "Menjawab: siapa pemilik tiap fakta bisnis di ERP Bharata (service dan koleksi mana yang memegangnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Berguna saat kebutuhan baru datang untuk memutuskan apakah suatu data harus dibangun ulang atau sudah dimiliki departemen lain, serta membedakan salinan yang sah (satu arah, tak ditulis tangan, berpenjaga) dari duplikasi yang belum diputuskan. Juga menunjuk fakta mana yang punya dua penulis (mis. target profit insentif vs KPI) dan pengecualian database-per-service yang masih hidup di kode (task-management membaca employee_db dan attendance_db langsung).",
+      "hash": "41e33883913c13d3ff9692c612929d500a5740aeed7ae1f06b48a3f37c702495",
+      "ukuran_kb": 24.6,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis ERP (karyawan, departemen, hak akses, kontrak, jadwal, presensi, KPI, target insentif, psikotes, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjelaskan syarat salinan data yang sah beserta penjaganya, pengecualian ADR 0002 yang masih ada (misalnya task-management membaca database service lain langsung), duplikasi yang belum diputuskan, dan langkah memeriksa sebelum membangun penyimpanan baru.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "pemilik fakta bisnis",
+        "sumber kebenaran",
+        "source of truth",
         "database-per-service",
-        "single source of truth",
-        "satu fakta satu tempat",
-        "duplikasi data",
-        "salinan sinkron",
-        "MODULE_URL",
-        "work_data",
-        "kpi_score",
-        "RACI"
+        "SyncCollection",
+        "salinan data",
+        "duplikasi fakta",
+        "ADR 0002",
+        "pemilik fakta"
       ]
     },
     {
@@ -13134,20 +13140,20 @@
         "CORE - API Master Gateway",
         "REF - Kepemilikan Data"
       ],
-      "hash": "56ab2322a4f78953bb12495b205822615f2fd5d6e09673644f4a4fe99b0ca3b9",
-      "ukuran_kb": 12.8,
-      "ringkasan": "Menjawab: apa saja penghalang dan urutan pekerjaan untuk membangun psikotes multi-jenis, termasuk keputusan HRD yang masih ditunggu (legalitas soal CFIT/DISC, mesin kandidat mana yang dipertahankan antara erp-frontend dan career portal, pendampingan tes, tenggat tautan) dan pekerjaan data tanpa kode (config Kraepelin, sequence_number babak). Juga menjelaskan isi tiap task per tahap (T0, T0a, T0b, katalog, CFIT, DISC, massal) beserta gerbang verifikasinya.",
+      "hash": "0348e54f80f57d9707806089dc6aa62a47bf17056d626cea953901d74513137e",
+      "ukuran_kb": 14.9,
+      "ringkasan": "Menjawab: apa saja yang menghalangi pekerjaan psikotes multi-jenis (legalitas soal CFIT dan DISC, pilihan mesin kandidat antara erp-frontend dan career portal, pendampingan tes, tenggat tautan) dan pekerjaan data apa yang bisa dilakukan tanpa kode. Juga memuat urutan task per tahap, dari laporan psikotes dan skor sesi terputus (T0), cache gateway (T0a), skor kosong yang menimpa skor otomatis (T0b), sampai CFIT, DISC, dan fitur massal, lengkap dengan gerbang verifikasi tiap task.",
       "kata_kunci": [
+        "analisa psikotes",
         "psikotes multi-jenis",
-        "analisa kebutuhan",
+        "papan kerja",
         "task psikotes",
-        "bank soal",
         "CFIT",
         "DISC",
-        "Kraepelin",
-        "sesi terputus",
+        "legalitas soal",
         "cache gateway",
-        "papan kerja"
+        "sesi terputus",
+        "analisa kebutuhan"
       ]
     },
     {

@@ -56,10 +56,10 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
-| POST | `/candidates/:id/psikotes` | Terbitkan sesi psikotes + kirim magic link ke email kandidat. Kandidat yang **sudah punya sesi → `409`** (sarankan Terbitkan Ulang). Babak `"Psikotest"` belum ada di master → `400` | HR |
-| POST | `/candidates/:id/psikotes/reissue` | Terbitkan ulang. **`alasan` wajib** (kosong → `400`); sesi lama dihapus sehingga token lama mati | HR |
-| GET | `/candidates/:id/psikotes/report` | Laporan individual (metrik 4 kategori + skor keseluruhan + `selesai_karena`; **(T0, bip-erp #1828)** + `col_index` = jumlah kolom yang sempat dikirim). **Tidak memuat soal/kunci jawaban**. Kandidat tanpa sesi → `404 {"error": ...}` | HR |
-| GET | `/candidates/psikotes/status` | Status **massal** untuk polling tabel (banyak id sekaligus, satu kueri `$in`). Tiap baris: `candidate_id`, `status`, `col_index`, `total_kolom`, `issued_at`, `last_seen_at?`; **(T0)** + `selesai_karena?` (omitempty, hanya sesi `finished`). **Tanpa** skor/kategori, dikunci test allowlist | HR |
+| POST | `/candidates/:id/psikotes` | Terbitkan sesi psikotes + kirim magic link ke email kandidat (best-effort). **(2026-09-11, bip-erp #1837)** Body `{paket_id}` untuk tes berpaket atau `{config}` untuk Kraepelin lama; bagian yang belum siap atau soal yang jumlah kuncinya tak sesuai menggagalkan terbit dengan pesan. Balasan `{session_id, status, link}` (tanpa alamat email). Kandidat yang **sudah punya sesi → `409`** (sarankan Terbitkan Ulang). Babak `"Psikotest"` belum ada di master → `400` | HR |
+| POST | `/candidates/:id/psikotes/reissue` | Terbitkan ulang. **`alasan` wajib** (kosong → `400`), body lain sama dengan terbit; sesi baru disiapkan dulu baru sesi lama dihapus, sehingga token lama mati | HR |
+| GET | `/candidates/:id/psikotes/report` | Laporan individual (metrik 4 kategori + skor keseluruhan + `selesai_karena`; **(T0, bip-erp #1828)** + `col_index` = jumlah kolom yang sempat dikirim). **(2026-09-11)** Sesi paket + `paket_nama` dan `bagian[]` (`nama`, `jenis_jawaban`, `status`, `selesai_karena`, waktu, dan salah satu `kraepelin`/`pilihan_ganda`/`disc`; hanya hitungan). **Tidak memuat soal/kunci jawaban**. Kandidat tanpa sesi → `404 {"error": ...}` | HR |
+| GET | `/candidates/psikotes/status` | Status **massal** untuk polling tabel (banyak id sekaligus, satu kueri `$in`). Tiap baris: `candidate_id`, `status`, `col_index`, `total_kolom`, `issued_at`, `last_seen_at?`; **(T0)** + `selesai_karena?` (omitempty, hanya sesi `finished`); **(2026-09-11)** sesi paket + `paket_nama`, `total_bagian`, `bagian_index`, `bagian_nama` (omitempty). **Tanpa** skor/kategori, dikunci test allowlist | HR |
 
 > ⚠️ **`/candidates/psikotes/status` WAJIB terdaftar sebelum `GET /candidates/:id`**, kalau tidak ia tertelan sebagai permintaan kandidat ber-id `"psikotes"` dan membalas 200 berisi data yang salah, bukan 404. Di kode ada test yang mengunci urutannya.
 
@@ -71,6 +71,24 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 | POST | `/candidates/:id/offer/accept` · `/offer/decline` | Respon offer | HR |
 | POST | `/candidates/:id/hire` | Hire (butuh offer Accepted) → set `Hired` + onboarding handoff `/onboarding/register` (aktivasi akun). Pembuatan **data karyawan** dilakukan terpisah di HRIS "Tambah Karyawan" (dari kandidat) → `link-employee` | approver |
 | GET | `/audits` | Audit log keputusan | HR admin |
+
+### Katalog psikotes (sisi HR)
+
+**(2026-09-11, bip-erp #1837 merged `40323aae`, belum prod.)** Rincian aturan dan alur: [[HRIS - Bank Soal dan Paket Psikotes]]. "lihat" = `PermRecruitmentView` + `isHR`; "tulis" = `PermRecruitmentWork` + `isHR`.
+
+| Method | Path | Fungsi | Role |
+|---|---|---|---|
+| GET | `/psikotes/tipe` (`?active=true`) · `/psikotes/tipe/:id` | Daftar/detail tipe + `total_durasi_detik`, `jumlah_soal` per kode subtes, `kesiapan`, `subtes_kurang`, `dipakai_paket` | lihat |
+| POST/PUT/DELETE | `/psikotes/tipe` · `/psikotes/tipe/:id` | Buat/ubah/hapus tipe; `kode` dibuat server. `jenis_jawaban` di luar tiga nilai → `400`. Tipe bersoal: ganti jenis, buang subtes bersoal, atau ganti `jumlah_jawaban` subtes bersoal → `409`. Hapus tipe bersoal atau dipakai paket → `409` | tulis |
+| GET | `/psikotes/item?tipe_id=` | Daftar soal satu tipe, **termasuk kunci dan dimensi DISC**; karena itu digerbang setara tulis, bukan lihat | tulis |
+| POST/PUT/DELETE | `/psikotes/item` · `/psikotes/item/:id` | Buat/ubah/hapus soal, divalidasi terhadap tipenya (opsi 2 sampai 6, kunci sebanyak `jumlah_jawaban`, DISC tepat 4 kata berdimensi sah, gambar berpola kunci) | tulis |
+| PUT | `/psikotes/item-urutan` | `{tipe_id, subtes_kode, ids}`: urutan baru satu subtes (tombol naik/turun) | tulis |
+| POST | `/psikotes/impor-item` | `{tipe_id, dry_run, expected_hash, baris[]}`, maks 500 baris, divalidasi per baris. `dry_run` membalas `{baris[], valid, ditolak, hash}`; simpan wajib membawa hash yang sama, beda → `409` | tulis |
+| POST | `/psikotes/gambar` | Multipart `file`, maks 2 MB (`413`); PNG/JPG/GIF/WEBP ditentukan dari isi berkas (lainnya `415`). Balasan `{gambar: <kunci>}` | tulis |
+| GET | `/psikotes/gambar/:nama` | Pratinjau gambar untuk HR | lihat |
+| GET · POST/PUT/DELETE | `/psikotes/paket` · `/psikotes/paket/:id` | Paket berurutan + `siap`, `total_durasi_detik`, kesiapan per bagian | lihat · tulis |
+
+> `item-urutan` dan `impor-item` sengaja **satu segmen**, bukan `/psikotes/item/urutan`, supaya tak bersaudara dengan `/psikotes/item/:id` dan urutan pendaftaran rute tak menentukan kebenarannya. Semua perubahan tercatat di audit: `psikotes_tipe.*`, `psikotes_paket.*`, `psikotes_item.created|updated|deleted|reordered|imported` (ubah soal membawa penanda "kunci diubah" **tanpa nilai kuncinya**), `psikotes_gambar.uploaded`.
 
 ## Interview Rounds & Feedback (Fase F — adopsi ERPGo)
 | Method | Path | Fungsi | Role |
@@ -135,13 +153,23 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 | GET | `/public/recruitment/postings/:id` | Detail lowongan. **`:id` menerima `slug` ATAU ObjectID** (dicoba ObjectID dulu; gagal parse → lookup by `slug`). Respons + `slug` & **`job_type`** (nama, hasil resolve `job_type_id` → master `job_types`) |
 | POST | `/public/recruitment/apply` | Pelamar mendaftar sendiri (email + `posisi_dilamar` wajib). Respons **`201`** berisi **hanya** `{"message": "Lamaran terkirim. Konfirmasi telah dikirim ke email Anda."}` — **tanpa** `tracking_token`/`track_url` (fitur tracking dihapus, lihat di bawah). Kandidat lahir `progress: "CV Screening"`, `status: Pending`. **Dua bentuk body**: (a) JSON, atau (b) **`multipart/form-data`**: field `data` = JSON kandidat + file **`berkas`** = PDF **maks 10 MB** → MinIO `recruitment/cv/<candidate_id>/berkas.pdf` → set `cv_object` (HR buka via `GET /candidates/:id/cv/preview`) |
 
-| GET | `/public/recruitment/psikotes/:token` | Kandidat membuka sesi psikotes lewat magic link. **Tidak memuat digit soal** |
+| Method | Path (gateway) | Fungsi |
+|---|---|---|
+| GET | `/public/recruitment/psikotes/:token` | Kandidat membuka sesi psikotes lewat magic link. **Tidak memuat digit soal**; sesi paket + `paket` (bagian, `bagian_index`, tanpa soal) |
 | POST | `/public/recruitment/psikotes/:token/start` | Mulai mengerjakan. **Idempoten**: soal tidak digenerate ulang, lanjut dari kolom tersimpan |
 | POST | `/public/recruitment/psikotes/:token/columns/:index` | Submit satu kolom. Index sama **menimpa**; index lama tidak menarik balik progres; panjang jawaban ditentukan **server** |
 | POST | `/public/recruitment/psikotes/:token/finish` | Selesai + dinilai. Panggilan kedua tidak menghitung ulang |
-| POST | `/public/recruitment/psikotes/:token/abandon` | Dipanggil browser lewat `navigator.sendBeacon`. Balasan **selalu** `{ok:true}` tanpa skor |
+| POST | `/public/recruitment/psikotes/:token/abandon` | Dipanggil browser lewat `navigator.sendBeacon`. Balasan **selalu** `{ok:true}` tanpa skor. **(2026-09-11)** Sesi paket hanya ditutup bila bagian Kraepelin sedang berjalan; di bagian lain no-op |
+| POST | `.../:token/bagian/:b/mulai` | **(Tes berpaket, 2026-09-11, bip-erp #1837 + #1838, belum prod.)** Mulai bagian ke-b sesuai giliran. Bagian Kraepelin membalas config + kolom seperti `/start` lama |
+| POST | `.../:token/bagian/:b/kolom/:index` · `.../bagian/:b/selesai` | Kirim kolom dan tutup bagian Kraepelin di dalam paket |
+| POST | `.../:token/bagian/:b/subtes/:s/mulai` | Mulai subtes; server menulis deadline. Balasan soal **tanpa kunci/dimensi**, `soal_index`, `sisa_detik` (`null` bila tanpa timer) |
+| POST | `.../:token/bagian/:b/subtes/:s/jawab` | `{nomor, pilihan}` (pilihan ganda) atau `{nomor, most, least}` (DISC, keduanya beda). Maju saja; lewat deadline plus 5 detik → `409 waktu_habis` |
+| POST | `.../:token/bagian/:b/subtes/:s/selesai` | Tutup subtes; subtes terakhir menutup bagian, bagian terakhir menutup sesi |
+| GET | `.../:token/gambar/:nama` | Gambar soal/opsi, **hanya** yang ada di snapshot sesi token itu (lainnya 404) |
 
-> **Psikotes publik dijaga token, bukan sesi login.** Token 32 byte `crypto/rand` base64url, unik di level index. Tidak ada endpoint publik yang mengembalikan soal, kunci jawaban, atau skor — DTO-nya eksplisit dan ada test allowlist kunci JSON yang menggigit bila field internal bocor. Rincian: [[HRIS - Psikotes Kraepelin]].
+> **Psikotes publik dijaga token, bukan sesi login.** Token 32 byte `crypto/rand` base64url, unik di level index. Tidak ada endpoint publik yang mengembalikan kunci jawaban, dimensi DISC, atau skor; soal CFIT/DISC dikirim **tanpa kunci** saat subtesnya dimulai. DTO-nya eksplisit dan ada test allowlist kunci JSON yang menggigit bila field internal bocor. Rincian: [[HRIS - Psikotes Kraepelin]] dan [[HRIS - Bank Soal dan Paket Psikotes]].
+
+> **Galat mesin tes berpaket** berbentuk `{"error": <kalimat>, "kode": <kode>}` dengan kode `bukan_giliran`, `belum_mulai`, `waktu_habis`, `soal_terlewati`, `subtes_selesai` (409); career portal membaca `kode`. `POST .../columns/:index` dan `.../finish` menolak sesi paket (400). Gateway meneruskan semua rute ini lewat **satu rute umum berpenyaring** dengan limiter per token ([[CORE - API Master Gateway]]).
 
 > **Galat publik yang dibaca halaman kandidat** (`psikotes_public_handlers.go`): token tak dikenal → `404 {"error": "sesi tes tidak ditemukan"}`; sesi sudah `finished` → `410 {"error": "sesi tes sudah selesai"}`. Kuncinya **`error`**, bukan `message`. **(T0, career-bharata #9)** Portal karir memetakan 404 ke layar "tautan tidak berlaku" tanpa Coba Lagi dan 410 ke layar "tes sudah selesai"; mengubah status kode ini di BE mengubah layar yang dilihat kandidat.
 

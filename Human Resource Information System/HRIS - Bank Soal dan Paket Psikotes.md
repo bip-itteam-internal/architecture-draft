@@ -1,119 +1,171 @@
 ## Deskripsi
 
-*Cara kerja psikotes **multi-jenis**: katalog tipe tes, bank soal, dan paket tes yang dikelola HRD sendiri, dijalankan oleh tiga mesin penilaian yang tetap berupa kode. Keputusan dan alasannya ada di [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]]; dokumen ini menyimpan cara kerjanya. Jenis tes yang sudah berjalan hari ini dirinci di [[HRIS - Psikotes Kraepelin]].*
+*Cara kerja psikotes **multi-jenis**: katalog tipe tes, bank soal, dan paket tes yang dikelola HRD sendiri, dijalankan oleh tiga mesin penilaian yang tetap berupa kode. Keputusan dan alasannya ada di [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]]; dokumen ini menyimpan cara kerjanya. Rincian mesin Kraepelin (skoring, konfigurasi, sesi lama) tetap di [[HRIS - Psikotes Kraepelin]].*
 
-- **Status**: 🟡 **Direncanakan (Design)** — belum ada kode. Rencana disetujui 2026-09-10. Papan kerja: `Workspace/ANALISA - Psikotes Multi-Jenis.md`
-- **Sisi implementasi**: [[Microservices - Recruitment Service]] (BE) + [[APP - Web ERP]] (FE). Endpoint → [[API - Recruitment Service]]
-- **Grounded ke `origin/main` 2026-09-10.** Checkout lokal repo kode di mesin dev tertinggal ratusan commit dan sempat menyesatkan analisis ini sendiri; klaim tentang keadaan kode di dokumen ini diuji ke ref remote, bukan ke berkas di disk
+- **Status**: ⚠️ **Implemented (ada catatan)**: T1 sampai T6 dikodekan dan **merged 2026-09-11** (bip-erp #1837 `40323aae` dan #1838 `b73862af`, erp-frontend #1527 `42eccaf8`, career-bharata #10 `15240242`). Terverifikasi di DEV hari itu lewat gateway dan sebagai HR serta kandidat di Chrome (recruitment-service dan api-gateway dinaikkan dari branch; career portal dijalankan lokal terhadap gateway dev). Prod belum. Status ini bergerak, ukur ulang sebelum mengandalkannya. Papan kerja: `Workspace/ANALISA - Psikotes Multi-Jenis.md`
+- **Sisi implementasi**: [[Microservices - Recruitment Service]] (`services/recruitment/models_psikotes_katalog.go`, `psikotes_katalog_*.go`, `psikotes_paket_*.go`, `psikotes_impor.go`, `seed_psikotes.go`) · [[CORE - API Master Gateway]] (rute publik kandidat) · [[APP - Web ERP]] (layar HR) · [[APP - Portal Karir Bharata]] (layar kandidat). Endpoint: [[API - Recruitment Service]]
+- **Dibangun di atas asumsi tertulis** atas keputusan HRD yang belum ada (dipilih user 2026-09-11 supaya fitur siap dipakai): isi soal CFIT dan DISC berlisensi tanggung jawab HRD, jadi **tidak ada butir soal yang di-seed**; mesin kandidat baru hanya di career portal; CFIT boleh dikerjakan jarak jauh dengan batas waktu ditegakkan server. Ketiganya tetap menunggu konfirmasi HRD (§Belum Diputuskan).
 
 ## Latar Belakang
 
-CFIT dan DISC masih dikerjakan kandidat **di kertas** lalu **dikoreksi HR dengan tangan**, dan bebannya menumpuk musiman saat lowongan dibuka. Kraepelin sudah online sejak 2026-09-09 tetapi berdiri sendiri: nol percabangan berdasarkan jenis tes di seluruh jalur eksekusinya, dan bentuk penyimpanan soalnya hanya mengenal deret angka per kolom.
-
-Yang diminta manajemen adalah tiga menu. Yang dibutuhkan adalah berhentinya koreksi manual. Pembedaan itu, beserta akibatnya pada urutan kerja, dicatat di ADR 0087 `## Context`.
+CFIT dan DISC masih dikerjakan kandidat **di kertas** lalu **dikoreksi HR dengan tangan**, dan bebannya menumpuk musiman saat lowongan dibuka. Kraepelin sudah online sejak 2026-09-09 tetapi berdiri sendiri. Yang diminta manajemen adalah tiga menu; yang dibutuhkan adalah berhentinya koreksi manual. Pembedaan itu, beserta akibatnya pada urutan kerja, dicatat di ADR 0087 `## Context`.
 
 ## Ruang Lingkup
 
-**Masuk:** katalog tipe tes, bank soal per tipe, paket tes per posisi, tiga mesin penilaian, halaman laporan hasil, dan impor soal dari Excel.
+**Masuk:** katalog tipe tes, bank soal per tipe (manual dan impor Excel, soal dan opsi bergambar), paket tes berurutan, sesi multi-bagian untuk kandidat, tiga mesin penilaian, dan laporan hasil per bagian.
 
-**Tidak masuk:** konversi skor ke IQ atau profil, kesimpulan naratif otomatis, tabel norma, keputusan lolos atau gugur otomatis, dan bentuk jawaban di luar tiga yang dibangun.
+**Tidak masuk:** konversi skor ke IQ, norma, atau profil DISC; kesimpulan otomatis; keputusan lolos atau gugur; EPPS; notifikasi "hasil siap" ke HR; tenggat tautan; drag-and-drop; pembatasan paket per posisi atau per HR.
+
+## Persona / Pengguna
+
+| Persona | Peran & Divisi | Akses/RBAC | Device |
+|---|---|---|---|
+| HR rekrutmen | Staff atau Supervisor HRD | Baca katalog `PermRecruitmentView`; sunting katalog **dan membaca daftar soal** `PermRecruitmentWork` (daftar soal memuat kunci). Saat penegakan izin mati, keduanya jatuh ke peran HRIS (`isHR`) | Laptop |
+| Kandidat | Pelamar, tanpa akun ERP | Token acak di tautan email | Ponsel atau laptop |
+
+- **Tujuan**: HR menyusun tes tanpa developer dan membaca hasil tanpa mengoreksi; kandidat mengerjakan seluruh paket dari satu tautan.
+- **Pain point**: lembar CFIT dan DISC dikoreksi tangan; menambah atau mengubah tes menuntut developer.
+- **Aksi utama**: HR menyiapkan tipe, soal, dan paket sekali; mengirim paket per kandidat; membaca laporan per bagian. Kandidat mengerjakan bagian demi bagian.
 
 ## Tiga Bentuk Jawaban
 
-`jenis_jawaban` adalah **kontrak antara katalog dan mesin**, dan nilainya daftar-izin tertutup yang dijaga kode. Ini yang menentukan sampai mana "tanpa coding" berlaku.
+`jenis_jawaban` adalah **kontrak antara katalog dan mesin**, daftar-izin tertutup yang dijaga kode. Tipe dengan nilai lain **ditolak saat disimpan** (400), bukan gagal saat kandidat mengerjakannya. Menambah bentuk keempat wajib lewat ADR baru.
 
 | `jenis_jawaban` | Bentuk soal | Yang dihitung | Timer | Dipakai |
 |---|---|---|---|---|
-| `pilihan_ganda` | teks dan/atau gambar, satu kunci benar | benar/salah → skor mentah per subtes | per subtes | CFIT |
-| `most_least` | satu grup berisi empat kata sifat | tally empat dimensi, **tanpa benar/salah** | tidak ada (untimed) | DISC |
-| `angka_kolom` | deret digit per kolom | kecepatan, ketelitian, keajegan, ketahanan | per kolom | Kraepelin |
+| `pilihan_ganda` | Pertanyaan teks dan/atau gambar; 2 sampai 6 opsi teks dan/atau gambar; **1 atau 2 kunci per soal**, ditentukan `jumlah_jawaban` subtes | Benar per subtes. Soal berkunci dua benar hanya bila kedua pilihan tepat; urutan klik tak menentukan | Per subtes, ditegakkan server | CFIT (Klasifikasi memilih 2) |
+| `most_least` | Satu grup tepat 4 kata; tiap kata punya dimensi untuk Most dan untuk Least: D, I, S, C, atau N (tidak dihitung) | Tally Most, Least, dan Change (Most dikurangi Least). N ikut dicatat tapi tak pernah masuk Change. Tanpa benar/salah | Bawaan tanpa timer (kandidat melihat anjuran waktu); HR boleh memasang timer | DISC |
+| `angka_kolom` | Deret digit per kolom, dibuat otomatis per kandidat | Metrik Kraepelin | Per kolom | Kraepelin |
 
-Tipe tes yang menunjuk `jenis_jawaban` yang belum ada mesinnya **ditolak saat disimpan**, bukan gagal saat kandidat mengerjakannya. Menambah bentuk keempat wajib lewat ADR baru.
+⚠️ Dua hal di atas **menyimpang sadar** dari teks ADR 0087, yang menulis "satu kunci benar" dan DISC "untimed": Klasifikasi CFIT asli memilih dua jawaban, dan timer DISC dibiarkan sebagai pilihan HR dengan bawaan tanpa timer.
 
 ## Model Data
 
-Tiga koleksi baru di `recruitment_db`, service pemiliknya recruitment ([[REF - Kepemilikan Data]]).
+Koleksi baru di `recruitment_db`, pemiliknya recruitment ([[REF - Kepemilikan Data]]).
 
-**`psikotes_tipe`** — katalog yang dikelola HRD.
-`nama` · `deskripsi` · `jenis_jawaban` · `punya_subtes` + `subtes[]` (nama, jumlah soal, durasi) · `punya_timer` + durasi · `status` aktif/nonaktif.
+**`psikotes_tipe`**: `kode` (dibuat server, unik, stabil seumur tipe; seed mengenali tipe bawaannya lewat kode) · `nama` (maks 60) · `deskripsi` (maks 500) · `jenis_jawaban` · `punya_subtes` · `subtes[]` · `pakai_timer` · `anjuran` (maks 60) · `kraepelin` {`columns`, `rows`, `seconds`} · `status` `active`/`inactive`.
+Tiap subtes: `kode` (rujukan soal; mengganti nama subtes tak memutus soalnya) · `nama` · `petunjuk` (maks 1000) · `jumlah_soal` (0 sampai 200; **0 = pakai semua soal aktif**) · `durasi_detik` (30 detik sampai 2 jam bila bertimer) · `jumlah_jawaban` (1 atau 2, hanya pilihan ganda). Pilihan ganda 1 sampai 4 subtes; `most_least` tepat satu subtes tersirat; `angka_kolom` tanpa subtes.
+**Total waktu diturunkan server** (`total_durasi_detik`), tidak diketik: Kraepelin kolom × detik; tipe tanpa timer 0; selain itu jumlah durasi subtes.
 
-**`psikotes_item`** — bank soal per tipe tes.
-Bentuk isinya mengikuti `jenis_jawaban` tipe induknya: `pilihan_ganda` menyimpan pertanyaan, opsi, dan **satu kunci benar**; `most_least` menyimpan satu grup empat kata sifat beserta pemetaan dimensinya; `angka_kolom` **tidak menyimpan item sama sekali** karena soalnya dibangkitkan otomatis.
+**`psikotes_item`** (bank soal): `tipe_id` · `subtes_kode` · `urutan` · `pertanyaan` (maks 2000) · `gambar` (kunci objek, bukan path) · `opsi[]` {`teks` maks 300, `gambar`} · `kunci[]` (indeks opsi) · `kata[]` {`teks` maks 80, `most`, `least`} · `aktif`. Field bentuk lain disimpan sebagai slice kosong.
 
-> ⛔ Namanya sengaja **bukan** "bank soal" telanjang. Istilah itu sudah dipakai desain LMS People Development untuk quiz karyawan internal. Menurut [[REF - Kepemilikan Data]] itu **dua fakta berbeda, bukan salinan**, dan yang dilarang adalah membiarkan keduanya lahir tanpa ada yang tahu ada dua.
+> ⛔ Namanya sengaja **bukan** "bank soal" telanjang: istilah itu dipakai desain LMS People Development untuk quiz karyawan. Dua fakta berbeda, bukan salinan ([[REF - Kepemilikan Data]]).
 
-**`psikotes_paket`** — susunan tes per posisi (mis. "Paket Staff").
-Daftar tipe tes **berurutan**, masing-masing bisa dinyalakan atau dimatikan tanpa dihapus. Total waktu paket **diturunkan** dari penjumlahan durasi tipe yang aktif, tidak diketik tangan.
+**`psikotes_paket`**: `nama` · `deskripsi` · `bagian[]` {`tipe_id`, `aktif`} **berurutan** (urutan = urutan array; maks 8 bagian; satu tipe hanya sekali; minimal satu menyala) · `status`. Total waktu paket diturunkan dari bagian menyala yang bertimer.
 
-⚠️ **Menonaktifkan sebuah tipe tidak boleh mengunci paket atau sesi lama yang terlanjur memakainya.** Aturan berlaku saat sesuatu ditetapkan, bukan saat disunting ([[ADR - 0041 Izin Tipe Form Menempel di Departemen]]); kelas bug ini sudah pernah dibayar di form-builder saat sebuah tipe dihapus.
+**`psikotes_seed`**: penanda seed sekali-jalan per lingkungan.
 
-**`psikotes_session`** (sudah ada, diperluas). Satu paket dijalankan sebagai **satu sesi**, jadi index unik `(candidate_id, round_id)` **tidak disentuh**. Sub-progres per bagian disimpan di dalam sesi. Nilai `config`, `soal`, dan `hasil` sudah bertipe bebas, dan itu memang disengaja sejak awal.
+**`psikotes_session`** (diperluas, bukan diganti): sesi berpaket ber-`jenis: "paket"` dengan `paket_id`, `paket_nama`, `bagian[]`, dan `bagian_index` (sengaja tanpa `omitempty` karena dipakai filter). Tiap bagian menyimpan **snapshot** tipe, soal, dan kunci saat terbit (`json:"-"`), status dan `selesai_karena` sendiri, serta per subtes `status`, `deadline`, `soal_index`, dan jawaban. Satu paket = **satu sesi**, jadi index unik `(candidate_id, round_id)` **tidak disentuh**. Sesi Kraepelin lama tetap berjalan di jalurnya.
+
+**Index**: `idx_psikotes_tipe_kode` (unik) dan `idx_psikotes_item_tipe_subtes` (`tipe_id`, `subtes_kode`, `urutan`), dibuat saat boot **sebelum** seed.
+
+### Kesiapan
+
+Server menilai tiap tipe dengan **satu aturan** (`kesiapanSubtes`): subtes tanpa soal aktif = `soal_kosong`, soal aktif di bawah `jumlah_soal` = `soal_kurang`. Ditambah `tipe_nonaktif` dan `tipe_hilang` untuk bagian paket. Kraepelin selalu siap. Layar membaca **kodenya** (diterjemahkan FE, ADR 0010) dan daftar `subtes_kurang` per tipe; layar tak menghitung ulang aturan itu, supaya chip subtes di Tipe Tes dan Bank Soal tak pernah berbeda pendapat dengan label "belum siap" paket. Paket siap bila semua bagian menyalanya siap.
 
 ## Alur Pengguna
 
-**HRD menyiapkan (sekali, lalu sesekali):** buat tipe tes → isi bank soalnya (manual atau impor Excel, gambar diunggah untuk CFIT) → susun paket per posisi, atur urutan dan nyala/mati.
+**HR (erp-frontend, Pengaturan > Rekrutmen)**, tiga tab ditambahkan **di ujung** supaya tautan `?tab=` lama tak bergeser:
+1. **Tipe Tes**: kartu per tipe dengan jenis jawaban, waktu, jumlah soal aktif, chip subtes (amber bila kurang), kesiapan, dan tautan "Kelola soal" ke Bank Soal. Dialog tambah/sunting menghitung total waktu langsung.
+2. **Bank Soal**: pilih tipe dan subtes; tambah atau sunting soal (unggah gambar soal dan opsi, pilih kunci), naik/turun urutan, nonaktifkan. **Impor Excel**: unduh template, berkas dibaca di peramban, pratinjau per baris, baris rusak ditolak satu per satu, simpan hanya bila berkasnya sama dengan yang dipratinjau.
+3. **Paket Tes**: susun bagian dengan tombol naik/turun, nyala/mati per bagian, total waktu otomatis; bagian belum siap bertanda beserta tautan ke Bank Soal.
+4. **Rekrutmen > Kandidat** di babak Psikotest: **Kirim Tes** membuka dialog kartu paket. Bawaannya paket siap pertama. Paket belum siap terkunci dengan alasannya **dan tautan ke tempat membetulkannya** (Bank Soal, Tipe Tes, atau Paket Tes). Daftar paket yang gagal dimuat tampil sebagai galat dengan tombol coba lagi, bukan sebagai "belum ada paket". Sesudah terbit, tautan tampil untuk disalin; email berisi tautan dikirim bila kandidat punya alamat email.
+5. Tabel kandidat: badge "Bagian N dari M" selama berjalan; Selesai atau Terputus sesudahnya.
+6. Detail kandidat, tab **Hasil Tes**: laporan per bagian. Kraepelin memakai laporan dan kurva lama; CFIT benar per subtes; DISC tabel dan grafik Most/Least/Change (terang dan gelap). HR memutuskan Pass/Fail di kartu yang sama.
 
-**HRD menjalankan (per kandidat):** kandidat di babak Psikotest → HR memilih paket → kandidat menerima **satu tautan**.
+**Kandidat (career portal, tautan email)**:
+1. Sapaan, lalu **ringkasan paket** (bagian dan waktunya), lalu per bagian: petunjuk, mengerjakan, layar jeda "bagian N selesai, berikutnya ...", sampai Tes Selesai. Bagian tanpa subtes bernama (DISC, pilihan ganda satu subtes) menampilkan petunjuk HR untuk subtes tunggalnya di layar petunjuk.
+2. **CFIT**: layar pembuka tiap subtes, soal satu per satu, maju saja, hitung mundur dari sisa detik server; di laptop A sampai F memilih dan Enter lanjut. Saat waktu habis, pilihan yang sudah ditandai ikut terkirim lalu subtes ditutup.
+3. **DISC**: grup 4 kata, pilih satu "Paling sesuai" dan satu "Paling tidak sesuai"; memilih kata yang sama untuk peran lain melepas pilihan sebelumnya.
+4. **Kraepelin**: mesin lama. Meninggalkan halaman menutup tes, **hanya di bagian ini**.
+5. Terputus atau muat ulang: tautan yang sama melanjutkan dari bagian, subtes, dan soal terakhir; subtes yang waktunya sudah habis tertutup sendiri.
 
-**Kandidat:** buka tautan tanpa login → sapaan → instruksi → mengerjakan seluruh paket **berurutan sekali duduk** → selesai. Bila terputus, ia melanjutkan dari bagian yang belum selesai.
+Titik tunggu yang **tetap ada**: HR tak diberi notifikasi saat hasil siap; ia melihat badge tabel.
 
-**HRD membaca:** skor mentah dan grafik per tipe tes di halaman laporan. **Keputusan lolos atau tidak tetap di HR**; sistem berhenti di `Pending` dan tidak pernah menetapkan nasib kandidat.
+## Aturan dan Penjaga (server)
+
+- **Tipe yang sudah punya soal** menolak (409) tiga perubahan: mengganti jenis jawaban, membuang subtes yang masih bersoal, dan **mengganti jumlah jawaban subtes yang bersoal** (kunci soalnya dibuat untuk jumlah lama; diterima diam-diam, setiap jawaban kandidat dinilai salah). Menghapus tipe yang masih bersoal atau masih dipakai paket juga 409; jalannya menonaktifkan.
+- **Menonaktifkan tipe tidak mengunci sesi yang sudah terbit** (snapshot). Paket yang memakainya menjadi "belum siap" dan tak bisa dikirim sampai bagiannya dimatikan atau tipenya diaktifkan lagi.
+- **Terbit**: bagian menyala yang belum siap menggagalkan terbit dengan pesan yang menyebut bagiannya, tidak dilewati diam-diam. Soal yang jumlah kuncinya tak sama dengan `jumlah_jawaban` subtes juga menggagalkan terbit dengan arahan ke Bank Soal. Jumlah soal per subtes dipotong ke `jumlah_soal` menurut urutan bank.
+- **Snapshot**: tipe, soal, dan kunci dibekukan ke sesi saat terbit. Perubahan bank sesudahnya tak menyentuh sesi yang sudah terbit, supaya hasil terbaca dengan soal yang benar-benar dikerjakan.
+- **Gambar**: unggah multipart maks **2 MB**; tipe ditentukan dari **isi berkas** (PNG, JPG, GIF, WEBP; SVG dan non-gambar ditolak 415). Kunci objek 32 hex plus ekstensi disusun server di prefix `recruitment/psikotes/gambar/`, sehingga soal tak bisa merujuk objek lain di bucket (mis. CV kandidat). Objek **tak pernah dihapus**; mengganti gambar berarti kunci baru. Kandidat hanya bisa mengambil gambar yang ada di snapshot sesinya.
+- **Kunci dan dimensi** hanya untuk penyunting: daftar soal digerbang `PermRecruitmentWork`, bukan izin lihat yang paketnya berjangkauan semua orang. Kandidat menerima DTO eksplisit tanpa kunci, dimensi, maupun skor (dikunci test daftar-izin); laporan HR hanya membawa hitungan.
+- **Audit**: tipe dan paket (buat, ubah, hapus), soal (buat, ubah dengan penanda "kunci diubah" **tanpa nilai kuncinya**, hapus, urutan), impor, dan unggah gambar.
+- **Batas waktu**: deadline subtes ditulis server saat subtes dimulai. Jawaban yang tiba sesudah deadline plus toleransi 5 detik ditolak `409 waktu_habis`; nomor yang sudah dilewati `409 soal_terlewati`. Kode galat mesin lain: `bukan_giliran`, `belum_mulai`, `subtes_selesai`.
+- **Impor Excel**: server memvalidasi per baris dengan aturan yang sama dengan tambah manual, maks 500 baris. Pratinjau (`dry_run`) mengembalikan hash; simpan wajib membawa hash yang sama, beda berarti 409.
+
+## Penilaian dan Hasil Tes
+
+- Skor pilihan ganda dan tally DISC **dihitung saat laporan dibaca**, bukan disimpan.
+- Baris Hasil Tes Psikotest tetap `Pending`. **Skor hanya ditulis untuk paket berisi satu bagian Kraepelin yang tuntas** (bentuk yang sama dengan sesi lama); paket campuran menulis baris **tanpa skor** (`$unset`), karena tak ada satu angka yang jujur mewakili CFIT, DISC, dan Kraepelin sekaligus.
+
+## Penutupan Sesi Paket
+
+- Bagian yang tuntas memajukan giliran; bagian terakhir menutup sesi tuntas.
+- **Beacon meninggalkan halaman hanya menutup sesi saat bagian Kraepelin sedang berjalan**, ditegakkan server. Beacon di bagian lain, termasuk yang tiba sesudah bagian Kraepelin ditutup, tak menutup apa pun.
+- **Sapuan tanpa aktivitas**: 6 × detik per kolom saat bagian Kraepelin berjalan, selain itu **30 menit**. Filter penutup mengunci giliran bagian dan `last_seen_at` dari data yang dibaca, jadi kandidat yang ternyata aktif di sela baca dan tulis tak ikut ditutup.
+- Bagian yang sedang berjalan saat sesi ditutup ikut berakhir dengan alasan yang sama; bagian yang sudah tuntas tetap tuntas; bagian yang belum dimulai tetap pending. Penutup yang kalah balapan tak menulis Hasil Tes.
+
+## Bawaan (seed)
+
+Dipasang **sekali per lingkungan** (penanda `psikotes_seed`), tipe by `kode` dan paket by `_id` tetap dengan `$setOnInsert`, jadi suntingan HR tak pernah ditimpa dan seed yang terulang tak melahirkan salinan.
+
+| Bawaan | Isi |
+|---|---|
+| Tipe Kraepelin | 45 kolom × 40 baris × 30 detik = 22 menit 30 detik |
+| Tipe CFIT | Seri 13 soal 3 menit; Klasifikasi 14 soal 4 menit, **2 jawaban**; Matriks 13 soal 3 menit; Kondisi 10 soal 2 menit 30 detik. Total 12 menit 30 detik. **Tanpa butir soal** |
+| Tipe DISC | 24 grup, tanpa timer, anjuran "10-15 menit". **Tanpa butir soal** |
+| Paket Kraepelin | Kraepelin saja; siap dikirim |
+| Paket Staff | CFIT, DISC, Kraepelin; **belum siap** sampai bank soal CFIT dan DISC diisi HRD |
+
+⚠️ Permintaan manajemen menyebut CFIT "50 soal, 30 menit", tetapi durasi subtes yang diminta sendiri berjumlah 12 menit 30 detik. Seed mengikuti durasi per subtes; HR bisa mengubahnya di Tipe Tes.
 
 ## Yang Dipakai Ulang
 
 | Kebutuhan | Yang sudah ada |
 |---|---|
-| Sesi bertoken, magic link, status, idempotensi, sapuan kedaluwarsa | `psikotes_session` dan perkakasnya, sudah jenis-agnostik |
-| Kerangka layar kandidat | sapaan → instruksi → tes → selesai, lanjut-setelah-putus, retry berlapis |
-| Pola mesin pilihan ganda | `services/learning`: snapshot soal saat mulai, **timer ditegakkan server**, pencocokan lewat id soal sehingga pengacakan aman, kunci dibuang saat serialisasi. **Polanya**, bukan kodenya |
-| Urutan + nyala/mati | `AssessmentTypeIDs` yang sudah terurut, dan flag `Mandatory` |
-| Master bersub-struktur | dialog template onboarding: header + baris item dinamis berfield angka |
-| Impor Excel | `exceljs` + pembaca sheet bersama di FE; di BE pola dry-run dengan `expected_hash` dan penolakan 409 bila berkas berubah antara pratinjau dan simpan |
-| Unggah banyak gambar | pola `multiple` + grid thumbnail + hapus per gambar |
-| Struktur tabel | `MainTable` + `useTableState` + `Banner bare` di `toolbar`, sudah dipakai 8 halaman rekrutmen |
-
-## Yang Perlu Dibangun Baru
-
-- **Dispatcher `jenis_jawaban`.** Saat ini **nol** percabangan berdasarkan jenis: sepuluh titik pemanggilan di tiga berkas memanggil Kraepelin langsung, dan jenis sesi ditulis konstan, tidak pernah dari input HR.
-- **Bentuk penyimpanan soal untuk `pilihan_ganda` dan `most_least`.** Jembatan yang ada hanya menulis dan membaca dua kunci, sehingga apa pun di luar itu **hilang senyap** pada perjalanan bolak-balik.
-- **Gambar pada soal**, termasuk batas ukuran dan allowlist tipe berkas yang harus ditulis sendiri: unggahan recruitment saat ini **tidak punya keduanya**, satu-satunya pagar adalah batas body service.
-- **Halaman laporan hasil.** Komponennya sudah jadi dan sudah ada test-nya, tetapi belum pernah di-import di berkas mana pun.
-- **Tiga halaman pengelolaan** di Pengaturan Rekrutmen. Pola `LookupPage` yang ada **tidak cukup** karena bentuknya datar tanpa slot sub-koleksi.
-
-⚠️ **Pengurutan memakai tombol naik dan turun, bukan drag-and-drop.** Repo tidak punya satu pun pustaka DnD maupun implementasi buatan sendiri; dua komponen pengurut bertombol sudah terbukti dipakai. Tab baru di Pengaturan wajib ditambahkan **di ujung** supaya tautan `?tab=` lama tidak bergeser.
+| Sesi bertoken, magic link, status, idempotensi, sapuan kedaluwarsa | `psikotes_session` dan perkakasnya; diperluas dengan cabang paket, bukan disalin |
+| Mesin Kraepelin | `kraepelin_soal.go`, `kraepelin_scoring.go` apa adanya untuk bagian `angka_kolom` |
+| Pola mesin pilihan ganda | `services/learning`: snapshot saat mulai, timer ditegakkan server. **Polanya**, bukan kodenya |
+| Urutan dan nyala/mati | Semantik `AssessmentTypeIDs` dan `Mandatory`; tombol naik/turun (tanpa drag-and-drop) |
+| Impor Excel | `bacaSheetPertama` (exceljs) di FE; pola dry-run dengan `expected_hash` di BE |
+| Unggah dan pratinjau berkas | Pola berkas kandidat ke MinIO, **ditambah** batas ukuran dan daftar-izin tipe yang tak ada di pola lama |
+| Laporan dan grafik | `LaporanIndividual` + `KurvaKerja` untuk bagian Kraepelin; `ChartContainer` + `WARNA_BAGAN` untuk grafik DISC |
 
 ## Jebakan yang Sudah Diketahui
 
-- ⛔ **Titik dispatcher yang terlewat tidak akan berbunyi sebagai galat.** Ia akan menilai DISC dengan rumus Kraepelin dan menghasilkan angka yang masuk akal. Tiap titik wajib punya test yang menguncinya.
-- ⛔ **Menyembunyikan kunci jawaban dengan tag `json:"-"` mematikan penguraian body**, sehingga seluruh kunci tersimpan bernilai nol. Ini bug nyata yang sudah dibayar di LMS dan komentarnya masih ada di sana; baca sebelum meniru.
-- ⛔ **Mengganti spesifikasi index tidak terjadi lewat deploy.** Mongo menolak diam-diam, penjaganya cuma log, dan index lama tetap berlaku sementara build tampak sukses. Karena itu paket sengaja dijalankan sebagai satu sesi.
-- ⚠️ **Sesi yang berakhir `ditinggalkan` atau `kedaluwarsa` tetap menghasilkan skor.** Diukur di prod 2026-09-10: 2 dari 2 hasil tersimpan adalah artefak sesi yang terputus di kolom 1 dan kolom 3, dan HR tidak punya cara melihatnya. Ini dibereskan di tahap nol, sebelum jenis tes apa pun ditambahkan.
-- ⚠️ **Gateway meng-hardcode kelima path psikotes.** Endpoint publik berbentuk baru menuntut menyunting dan menaikkan gateway juga.
-- ⚠️ **Dua implementasi mesin tes kandidat masih hidup berdampingan** (erp-frontend dan career-bharata). Di prod kandidat memakai **career portal** (`ERP_FRONTEND_URL` prod berisi alamat career portal, dibaca 2026-09-10), jadi bentuk jawaban baru harus mendarat di sana. Selama erp-frontend belum resmi dipensiunkan, tiap bentuk jawaban berisiko dibangun dua kali.
-- ⚠️ **Batas waktu hari ini ditegakkan browser, bukan server.** Cukup untuk Kraepelin selama kandidatnya jujur, tapi tidak cukup untuk tes berkunci jawaban yang dikerjakan jarak jauh. Pola timer yang ditegakkan server dari waktu mulai sudah ada di LMS dan layak dicontek.
+- ⛔ **Menyembunyikan kunci jawaban dengan tag `json:"-"` mematikan penguraian body**, sehingga seluruh kunci tersimpan bernilai nol (bug LMS). Di sini kunci **tidak** diberi `json:"-"`; yang menjaganya DTO kandidat eksplisit plus gerbang daftar soal setara penyunting.
+- ⛔ **Mengganti spesifikasi index tidak terjadi lewat deploy.** Karena itu paket dijalankan sebagai satu sesi dan index unik sesi tak disentuh.
+- ⛔ **Titik percabangan jenis yang terlewat tak berbunyi sebagai galat.** Percabangannya kini per sesi: sesi `jenis: "paket"` bercabang per bagian menurut `jenis_jawaban`; endpoint lama `columns` dan `finish` **menolak** sesi paket (400); sapuan dan beacon punya cabang paket sendiri. Tak ada berkas "dispatcher" tersendiri seperti yang disebut ADR.
+- ⚠️ **Rute kandidat di gateway sengaja keluar dari limiter umum** 60 per menit per IP: satu subtes CFIT bergambar penuh (belasan soal × 7 gambar) melampauinya, dan jawaban yang ikut tertolak 429 hilang. Gantinya batas per token dan per IP sendiri ([[CORE - API Master Gateway]]). Jangan dikembalikan ke limiter umum.
+- ⚠️ **Paket bawaan Staff belum siap sampai HRD mengisi bank soal.** Di prod ini keadaan hari pertama, bukan kasus pinggir; dialog Kirim Tes karena itu menautkan alasan "belum siap" ke Bank Soal.
+- ⚠️ **Dua implementasi halaman kandidat.** Mesin CFIT dan DISC hanya ada di career portal. Halaman kandidat versi erp-frontend menolak sesi paket dengan pesan untuk membuka tautan lewat Portal Karir. Di DEV tautan psikotes mengarah ke erp-frontend (`ERP_FRONTEND_URL` dev), jadi tautan paket di dev berakhir di pesan itu; uji dev memakai career portal lokal dengan token yang sama.
 
 ## Belum Diputuskan (TBD)
 
-1. **Legalitas item CFIT dan DISC.** Keduanya instrumen berlisensi. Boleh atau tidaknya didigitalkan dan disimpan di server perusahaan **harus dijawab HRD sebelum bank soal diisi**. Risiko hukum, bukan teknis.
-2. **Bentuk jawaban EPPS.** Diasumsikan muat di `most_least` karena sama-sama pilihan berpasangan, tetapi **belum diperiksa**.
-3. **Mesin kandidat mana yang dipertahankan resmi.** De facto di prod sudah career portal; keputusan tertulisnya belum ada.
-4. **Bentuk perbaikan skor artefak**: ✅ diputuskan 2026-09-10 saat merencanakan tahap nol, yaitu sesi yang tidak tuntas tetap menulis baris Hasil Tes **tanpa skor**, dan status terputusnya dibaca dari laporan sesi.
-5. **Urutan babak di prod sudah menyimpang** (`sequence_number` berisi 1, 1, 2, 3, 3, 5, 7 — dua pasang bertabrakan, dua angka bolong). Apakah dirapikan sebagai data atau diberi penjaga keunikan, belum diputuskan.
-6. **Pendampingan.** Tes hari ini dikerjakan mandiri tanpa pendamping dan tanpa jejak tempat pengerjaan. Untuk CFIT, yang berkunci jawaban, ini menentukan apakah soalnya boleh dibuka lewat tautan publik sama sekali, dan bila boleh, timernya wajib ditegakkan server. **Wajib dijawab HRD sebelum tahap CFIT.** Rincian: [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] §Belum Diputuskan.
-7. **Tenggat tautan dan status kandidat.** Tautan yang belum dibuka tidak pernah kedaluwarsa, dan kandidat yang sudah ditolak tetap bisa mengerjakan. Rincian di ADR yang sama.
+1. **Legalitas item CFIT dan DISC** (B1). Fitur siap, isi bank soal tanggung jawab HRD dan harus dijawab sebelum diisi. Risiko hukum, bukan teknis.
+2. **Bentuk jawaban EPPS**: diasumsikan muat di `most_least`, belum diperiksa.
+3. **Mesin kandidat resmi** (B2): dibangun di career portal (de facto jalur prod); keputusan tertulisnya belum ada.
+4. **Pendampingan CFIT** (B3): dibangun dengan asumsi boleh jarak jauh, batas waktu ditegakkan server. HRD perlu menerima risikonya tertulis atau memilih pengerjaan diawasi. Rincian di ADR 0087 §Belum Diputuskan.
+5. **Tenggat tautan dan status kandidat** (B4): tautan yang belum dibuka tak pernah kedaluwarsa, dan kandidat yang sudah ditolak tetap bisa mengerjakan.
+6. **Urutan babak di prod** (`sequence_number` bertabrakan): dirapikan sebagai data atau diberi penjaga keunikan.
+7. **Keterangan per baris di pratinjau impor** ditampilkan dari kalimat server berbahasa Indonesia, juga saat bahasa layar Inggris. Belum diputuskan apakah dibiarkan (sama dengan pesan galat server di toast) atau diganti kode yang diterjemahkan FE.
+8. ✅ Bentuk perbaikan skor artefak: diputuskan 2026-09-10 (tahap nol), sesi tak tuntas menulis Hasil Tes tanpa skor.
 
 ## Dependensi & Integrasi
 
-- [[Microservices - Recruitment Service]] — rumah kodenya; babak Psikotest dicari **by nama** ber-`form_type: "test"`
-- [[CORE - API Master Gateway]] — mempublish rute publik tanpa JWT
-- [[Microservices - File Service]] — ⚠️ tidak dipakai: recruitment bicara langsung ke MinIO lewat shared-library, jadi batas 4 MB milik file-service **tidak berlaku** baginya dan harus ditulis sendiri
-- [[Microservices - Notification Service]] — email magic link ke kandidat
-- [[APP - Web ERP]] — layar HR dan halaman kandidat versi erp-frontend
-- [[APP - Portal Karir Bharata]] — halaman kandidat versi career portal
+- [[Microservices - Recruitment Service]]: rumah kodenya; babak Psikotest dicari by nama ber-`form_type: "test"`
+- [[CORE - API Master Gateway]]: satu rute umum publik untuk kandidat, penyaring token dan path, limiter sendiri
+- [[Microservices - File Service]]: ⚠️ tidak dipakai; recruitment bicara langsung ke MinIO lewat shared-library, jadi batas 2 MB di sini ditulis sendiri
+- [[Microservices - Notification Service]]: email magic link ke kandidat (best-effort)
+- [[APP - Web ERP]]: layar HR (Pengaturan Rekrutmen, Kirim Tes, laporan)
+- [[APP - Portal Karir Bharata]]: layar kandidat
 
 ## Dokumen Terkait
 
-- [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] — keputusan dan alasannya
-- [[HRIS - Psikotes Kraepelin]] — jenis tes yang sudah berjalan
-- [[HRIS - Recruitment]] — konsep dan keputusan HRD
-- [[API - Recruitment Service]] — kontrak endpoint
+- [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]]: keputusan dan alasannya
+- [[HRIS - Psikotes Kraepelin]]: mesin Kraepelin dan sesi lama
+- [[HRIS - Recruitment]]: konsep dan keputusan HRD
+- [[API - Recruitment Service]]: kontrak endpoint
+- [[REF - Kepemilikan Data]]: pemilik koleksi katalog dan salinan snapshot sesi
+- [[ADR - 0041 Izin Tipe Form Menempel di Departemen]]: aturan berlaku saat ditetapkan

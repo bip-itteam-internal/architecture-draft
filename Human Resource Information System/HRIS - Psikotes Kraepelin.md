@@ -6,7 +6,7 @@
 - ✅ **Tahap nol (T0) sesi terputus merged 2026-09-10** (bip-erp #1828 `6681c997` · erp-frontend #1522 `5fd30185` · career-bharata #9 `77bfafc5`) dan **naik di dev hari itu**: diukur dari biner (fungsi baru ada di Recruitment-Service, kunci i18n baru ada di bundle FE), lalu diverifikasi lewat gateway dan sebagai HR di browser (lihat §Sesi Terputus di Layar HR). **Prod naik 2026-09-11** oleh manusia (recruitment-service 05.17 WIB, erp-frontend 07.55, api-gateway 08.43, career-portal 08.44) dan lolos gerbang: biner dan bundle memuat kode baru, dua baris skor artefak dikosongkan, dan sebagai HR di layar prod kartu Seno terbaca Terputus dengan Skor kosong. Perilaku bertanda **(T0)** di bawah kini berlaku di prod. Ukur ulang sebelum dipakai.
 - **Menggantikan asumsi lama** bahwa psikotes "dilaksanakan staf HR di luar aplikasi" dan "psikotes online = fase lanjut". Keduanya sudah tidak berlaku; dokumen yang masih berbunyi begitu sudah dikoreksi ([[HRIS - Recruitment]]).
 - **Diverifikasi ke `origin/main` 2026-09-10** (bukan checkout lokal — lihat catatan di bagian akhir).
-- 🟡 **Perluasan ke multi-jenis sudah diputuskan** (CFIT, DISC, dan tipe lain lewat katalog yang dikelola HRD): [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] + [[HRIS - Bank Soal dan Paket Psikotes]]. Dokumen ini tetap menjadi rincian **jenis Kraepelin**; yang berlaku lintas-jenis pindah ke sana.
+- ⚠️ **Perluasan multi-jenis merged 2026-09-11 (bip-erp #1837 dan #1838, erp-frontend #1527, career-bharata #10), belum prod** (CFIT, DISC, dan tipe lain lewat katalog yang dikelola HRD): [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] + [[HRIS - Bank Soal dan Paket Psikotes]]. Kraepelin kini juga berjalan sebagai **bagian** di dalam paket (paket bawaan "Kraepelin" 45 kolom × 40 baris × 30 detik); Kirim Tes di erp-frontend memilih paket, sementara body lama `{config}` tetap diterima BE. Dokumen ini tetap rincian **mesin Kraepelin**; yang berlaku lintas-jenis ada di sana.
 
 ## Alur Pengguna
 
@@ -26,7 +26,7 @@
 | Field | Catatan |
 |---|---|
 | `candidate_id` + `round_id` | Kunci aturan **satu kandidat satu kali tes** |
-| `jenis` | `kraepelin`. Nilai inilah yang menentukan bentuk `soal`/`hasil` |
+| `jenis` | `kraepelin` untuk sesi lama; `paket` untuk sesi berpaket (bagian di field `bagian`, lihat [[HRIS - Bank Soal dan Paket Psikotes]]). Nilai inilah yang menentukan jalur penilaian |
 | `token` | Kunci akses magic link. 32 byte `crypto/rand`, base64url |
 | `status` | `pending` → `in_progress` → `finished` |
 | `config`, `soal`, `hasil` | Bertipe **bebas** (`bson.M`) |
@@ -43,7 +43,7 @@
 
 ### Kenapa `config`/`soal`/`hasil` bertipe bebas
 
-Disengaja. Bentuk soal dan hasil tiap jenis tes berbeda mendasar: Kraepelin menyimpan matriks digit per kolom dan empat kategori; DISC (belum dibangun) kemungkinan kuesioner pilihan tanpa konsep benar/salah; CFIT (belum dibangun) kemungkinan skor tunggal. Menegaskan salah satu bentuk itu di lapisan bersama memaksa semua jenis lain memuat field yang tak relevan baginya. **Jenis tes baru cukup menambah file skoring/soalnya sendiri**, tanpa mengubah skema bersama.
+Disengaja. Bentuk soal dan hasil tiap jenis tes berbeda mendasar: Kraepelin menyimpan matriks digit per kolom dan empat kategori; DISC (belum dibangun) kemungkinan kuesioner pilihan tanpa konsep benar/salah; CFIT (belum dibangun) kemungkinan skor tunggal. Menegaskan salah satu bentuk itu di lapisan bersama memaksa semua jenis lain memuat field yang tak relevan baginya. **Jenis tes baru cukup menambah file skoring/soalnya sendiri**, tanpa mengubah skema bersama. ⚠️ Janji ini diganti [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]]: titik ekstensinya **bentuk jawaban**, bukan jenis tes.
 
 ### Kerahasiaan soal dan skor
 
@@ -72,7 +72,7 @@ Dibekukan ke dalam sesi saat terbit, supaya hasil lama tetap terbaca dengan konf
 
 > ⚠️ `/candidates/psikotes/status` **wajib didaftarkan sebelum** `GET /candidates/:id`, kalau tidak ia tertelan sebagai permintaan kandidat ber-id "psikotes". Ini kelas bug rute-tertelan yang sudah pernah menggigit di sini (lihat [[Microservices - Calendar Service]]); di kode ada test yang mengunci urutannya.
 
-**Publik** (tanpa JWT, dijaga token di URL) — kelimanya dipublish gateway di bawah `/public/recruitment/psikotes/*`:
+**Publik** (tanpa JWT, dijaga token di URL), dipublish gateway lewat **satu rute umum** `/public/recruitment/psikotes/:token` dan `/:token/*` sejak 2026-09-11 (bip-erp #1838, belum prod; sebelumnya lima rute tertulis satu per satu). Sesi berpaket punya endpoint per bagian dan subtes ([[API - Recruitment Service]]); `columns` dan `finish` di bawah menolak sesi paket (400):
 
 | Method | Path (service) | Fungsi |
 |---|---|---|
@@ -125,7 +125,7 @@ Skor keseluruhan = **rata-rata skor keempat kategori**, lalu dipetakan ke katego
 
 	**Di prod yang dibuka kandidat adalah versi career portal.** `ERP_FRONTEND_URL` di container `Recruitment-Service` prod berisi `https://career.bharatainternasional.com` (dibaca 2026-09-10); nama variabelnya menyesatkan karena isinya bukan alamat erp-frontend. **Di dev kebalikannya**: tautan yang diterbitkan dev berawalan `https://erp-dev.bharatainternasional.com/psikotes/` (terukur 2026-09-10) dan career portal tidak ada di VM dev, jadi kandidat uji di dev membuka versi erp-frontend, dan layar career portal hanya bisa diuji di prod. Keputusan resmi mana yang dipertahankan belum ada ([[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] §Belum Diputuskan).
 
-	Keduanya **tidak sama perilakunya**. Hanya versi career portal yang memanggil `/abandon`, dan ia mengakhiri tes **seketika** begitu halaman tersembunyi (`visibilitychange → hidden`: pindah tab, peramban diminimalkan, layar ponsel terkunci, telepon masuk) atau ditutup (`pagehide`). Ini keputusan produk yang disengaja; komentar di kodenya menyebut Kraepelin mengukur ketahanan di bawah tekanan waktu tak terputus. Versi erp-frontend tidak punya listener apa pun (`git grep` nol), jadi di sana sesi terputus hanya ditutup sapuan server sebagai `kedaluwarsa`.
+	Keduanya **tidak sama perilakunya**. Hanya versi career portal yang memanggil `/abandon`, dan ia mengakhiri tes **seketika** begitu halaman tersembunyi (`visibilitychange → hidden`: pindah tab, peramban diminimalkan, layar ponsel terkunci, telepon masuk) atau ditutup (`pagehide`). Ini keputusan produk yang disengaja; komentar di kodenya menyebut Kraepelin mengukur ketahanan di bawah tekanan waktu tak terputus. Versi erp-frontend tidak punya listener apa pun (`git grep` nol), jadi di sana sesi terputus hanya ditutup sapuan server sebagai `kedaluwarsa`. **(2026-09-11, bip-erp #1837, career-bharata #10)** Tes berpaket hanya punya mesin di career portal; halaman versi erp-frontend menolak sesi paket dengan arahan membuka tautan lewat Portal Karir. Di sesi berpaket, beacon hanya menutup tes saat bagian Kraepelin sedang berjalan, dan itu ditegakkan server.
 - **Tes dikerjakan tanpa pendamping, dan sistem tidak tahu di mana.** Tidak ada langkah HR memulai tes, identitas hanya dikonfirmasi lewat klik "Benar, ini saya", dan BE tidak mencatat IP maupun perangkat (`git grep` nol). Ini menyimpang dari keputusan HRD yang tercatat di [[HRIS - Recruitment]] ("dilaksanakan & dicatat staf HR langsung"); keputusan penggantinya belum ada.
 - **Batas waktu per kolom ditegakkan browser, bukan server.** Server menerima kiriman kolom kapan saja selama sesi `in_progress` tanpa memeriksa lamanya; jam server satu-satunya adalah sapuan ketidakaktifan 6 × `seconds`. Kandidat yang mengutak-atik browsernya bisa mendapat waktu sampai kira-kira enam kali lipat per kolom tanpa terdeteksi. Total durasi tes = kolom × (detik + 1,2 detik transisi antar kolom).
 - **Tautan tidak punya tenggat.** `issued_at` hanya ditulis dan ditampilkan, tak pernah dibandingkan dengan waktu apa pun, sehingga tautan `pending` berlaku sampai HR menerbitkan ulang. Halaman kandidat juga tidak memeriksa status kandidat: yang sudah ditolak atau mengundurkan diri tetap bisa mengerjakan, dan hasilnya tetap tertulis ke Hasil Tes.
@@ -135,7 +135,7 @@ Skor keseluruhan = **rata-rata skor keempat kategori**, lalu dipetakan ke katego
 - ⚠️ **Menyimpan form Hasil Tes dengan Skor kosong menimpa skor otomatis psikotes.** `submitTestResult` menulis `score` apa adanya (`$set score: nil` bila tak dikirim), dan form Hasil Tes mengirim tanpa skor bila isiannya kosong. Skor sesi `tuntas` yang ditulis penutup sesi karena itu jadi `null` begitu HR menyimpan Pass/Fail tanpa mengisi Skor. Isian Skor terisi dari `/test-results`, jadi ia kosong bila HR membuka kartu sebelum kandidat selesai lalu tidak memuat ulang (atau responsnya masih versi cache, lihat butir di atas). Perbaikan BE-nya task T0b di ANALISA, menunggu keputusan arti "Skor dikosongkan": jangan diubah, atau HR sengaja menghapus.
 - **Dua baris Hasil Tes artefak di prod** (sesi kedaluwarsa di kolom 1 dari 30 dan sesi ditinggalkan di kolom 3 dari 50, keduanya `score=1`, diukur 2026-09-10) **tidak ikut berubah oleh deploy T0**, jadi dikosongkan dengan skrip dry-run/apply yang dijalankan manusia 2026-09-11 sesudah BE T0 naik: kedua baris kini `Pending` tanpa skor dan belum disimpan HR (diukur hari itu). Isian jawaban kedua sesi itu berpola (mis. 3-4-5 berulang), jadi skor rendahnya mencerminkan isian, bukan salah hitung. Ukur ulang sebelum dipakai.
 - **Badge sesi `pending` di tabel HR berbunyi "Terakhir aktif {waktu}"**, padahal waktunya adalah waktu terbit, bukan aktivitas kandidat. HR bisa mengira kandidat sudah membuka tautannya.
-- **Jenis tes lain belum ada.** Hanya `kraepelin`. DISC dan CFIT disebut di komentar kode sebagai contoh bentuk yang berbeda, keduanya **belum dibangun**.
+- **Jenis tes lain** merged 2026-09-11 (belum prod) sebagai bagian paket: CFIT (pilihan ganda) dan DISC (Most/Least), lihat [[HRIS - Bank Soal dan Paket Psikotes]]. Sesi lama tetap ber-`jenis: "kraepelin"`.
 - **Hasil selesai tidak memberi tahu siapa pun.** Tak ada notifikasi ke HR bahwa sebuah sesi sudah tuntas dan menunggu keputusan; HR harus melihat kolom status di tabel kandidat.
 - **Report PDF psikotes tidak ada.** Laporan tampil di layar HR; tak ada lampiran tersimpan di MinIO. Desain lama di [[HRIS - Recruitment]] yang menjanjikan "report PDF di MinIO" tetap belum terealisasi.
 - **Status deploy prod terukur 2026-09-11**: T0 dan T0a naik (biner, bundle, data, dan layar HR). Status ini bergerak; ukur ulang sebelum mengandalkannya.
@@ -145,7 +145,7 @@ Skor keseluruhan = **rata-rata skor keempat kategori**, lalu dipetakan ke katego
 
 - [[Microservices - Recruitment Service]] — rumah kodenya; babak Psikotest dicari **by nama** `"Psikotest"` ber-`form_type: "test"` (id berbeda per lingkungan karena seed per environment). Babak belum ada → `400` dengan pesan jelas.
 - [[Microservices - Notification Service]] — email magic link ke kandidat (template event `psikotes`), best-effort.
-- [[CORE - API Master Gateway]] — mempublish kelima rute publik tanpa JWT; juga meng-cache GET `/api/recruitment/*` 3 menit, kecuali **(T0a, #1832; live di dev dan prod 2026-09-11)** status massal, laporan, dan hasil tes kandidat (lihat catatan di atas).
+- [[CORE - API Master Gateway]] — mempublish rute publik kandidat tanpa JWT (satu rute umum berpenyaring sejak bip-erp #1838, belum prod); juga meng-cache GET `/api/recruitment/*` 3 menit, kecuali **(T0a, #1832; live di dev dan prod 2026-09-11)** status massal, laporan, dan hasil tes kandidat (lihat catatan di atas).
 - [[APP - Web ERP]] — layar HR (Kirim Tes/Kirim Ulang, badge status inline, **(T0)** laporan individual + kurva kerja di kartu Psikotest tab Hasil Tes) dan halaman kandidat versi erp-frontend.
 - [[APP - Portal Karir Bharata]] — halaman kandidat versi career portal.
 
