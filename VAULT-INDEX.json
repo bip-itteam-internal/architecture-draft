@@ -3496,10 +3496,10 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⛔",
-      "status_teks": "**Superseded** oleh [[ADR - 0089 Tanda Tangan Kontrak Kerja dengan PIN di Sistem Sendiri, e-Meterai Dibubuhkan HR]] (2026-09-11). Tak pernah diratifikasi. Pemilik proses memilih tanda tangan tidak tersertifikasi dengan PIN dan e-Meterai yang dibubuhkan HR, tanpa PSrE, e-KYC, maupun `contract-service`. Isi di bawah dipertahankan sebagai rekaman usulan.",
+      "status_teks": "**Superseded** oleh [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]] (2026-09-11). Tak pernah diratifikasi. Pemilik proses memilih tanda tangan tidak tersertifikasi dengan PIN dan e-Meterai yang dibubuhkan HR, tanpa PSrE, e-KYC, maupun `contract-service`. Isi di bawah dipertahankan sebagai rekaman usulan.",
       "publik": true,
       "tautan": [
-        "ADR - 0089 Tanda Tangan Kontrak Kerja dengan PIN di Sistem Sendiri, e-Meterai Dibubuhkan HR",
+        "ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR",
         "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)",
         "HRIS - Personalia",
         "HRIS - Recruitment",
@@ -3515,20 +3515,20 @@
         "Microservices - Notification Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "1b4450528a3a66c85977fc7a5a618f8038aa515fa54eb219f4dfdda3828ba300",
+      "hash": "b7e1c7abf07afc619b93f06934bcde62ddcf45cc7a816486f9ca7ac184d8ee90",
       "ukuran_kb": 8.7,
-      "ringkasan": "Menjawab: apa usulan awal kontrak kerja elektronik lewat jalur tersertifikasi (TTE dari PSrE, e-Meterai dari Peruri via API berlisensi, e-KYC karyawan, service baru contract-service) dan kenapa usulan itu digantikan ADR 0089 tanpa pernah diratifikasi. Juga menjawab kendala hukum TTE tersertifikasi dan bea meterai (meterai bukan syarat sah perjanjian), serta selisih antara usulan dan kenyataan kode, yaitu riwayat kontrak yang kini hidup di employee-service (koleksi employee_contract) alih-alih di service terpisah.",
+      "ringkasan": "Menjawab: apa rancangan awal kontrak kerja elektronik lewat jalur tersertifikasi (TTE dari PSrE, e-KYC karyawan, e-Meterai Peruri via API penyedia berlisensi, service baru `contract-service`), apa kendala hukum yang membentuknya, dan keputusan mana yang menggantikannya (ADR 0089). Juga menjawab selisih usulan itu terhadap modul riwayat kontrak `employee_contract` di employee-service, termasuk kenapa service tanda tangan terpisah tak boleh menjadi pemilik kedua record kontrak.",
       "kata_kunci": [
         "kontrak kerja elektronik",
-        "e-signing",
+        "e-contract",
         "tanda tangan elektronik tersertifikasi",
+        "TTE",
         "PSrE",
         "e-Meterai",
         "Peruri",
         "e-KYC",
         "contract-service",
-        "PKWT",
-        "superseded"
+        "PKWT"
       ]
     },
     {
@@ -6159,12 +6159,12 @@
       ]
     },
     {
-      "path": "Decisions/ADR - 0089 Tanda Tangan Kontrak Kerja dengan PIN di Sistem Sendiri, e-Meterai Dibubuhkan HR.md",
-      "judul": "ADR - 0089 Tanda Tangan Kontrak Kerja dengan PIN di Sistem Sendiri, e-Meterai Dibubuhkan HR",
+      "path": "Decisions/ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR.md",
+      "judul": "ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR",
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui pemilik proses 2026-09-11 lewat `/analisa-kebutuhan`, kode belum ada. Keabsahan hukum menunggu konfirmasi legal.",
+      "status_teks": "**Diusulkan**, disetujui pemilik proses 2026-09-11 lewat `/analisa-kebutuhan` dan **direvisi hari yang sama**: tanda tangan PIN jarak jauh di MyBharata diganti tanda tangan tatap muka didampingi HRD (§4, §6, §7). Kode belum ada. Keabsahan hukum menunggu konfirmasi legal.",
       "publik": true,
       "tautan": [
         "ADR - 0019 Kontrak Kerja Elektronik via Service Internal + Lapisan Tersertifikasi",
@@ -6179,20 +6179,20 @@
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus",
         "ADR - 0002 Database-per-Service"
       ],
-      "hash": "4c01ac68fea1872440ce731ec1c3bed3ac09c6c2160b07c2e9df9dc30e785f6c",
-      "ukuran_kb": 13.8,
-      "ringkasan": "Menjawab: bagaimana kontrak PKWT ditandatangani di sistem sendiri (tanda tangan elektronik tidak tersertifikasi dengan PIN yang diverifikasi server, terikat ke hash PDF yang sudah dibubuhi e-Meterai oleh HR di luar sistem), kenapa jalur PSrE dan e-KYC ditolak, dan apa dasar hukumnya menurut UU ITE dan PP 71/2019. Juga menjawab prasyarat keamanan PIN yang wajib ditutup sebelum rilis (tanpa limiter, reset akun IT, device_id Android, akun direktur dipakai bersama Sekretariat), kenapa pengingat kontrak habis dikerjakan lebih dulu, dan kenapa logikanya menempel di modul kontrak employee-service dengan catatan tanda tangan hanya-tambah tanpa TTL.",
+      "hash": "955b4097bd5526f52675ffb2781343efd91aa15b8ea6811952ec3690968d074b",
+      "ukuran_kb": 16.2,
+      "ringkasan": "Menjawab: bagaimana kontrak PKWT ditandatangani di sistem sendiri (tanda tangan elektronik tidak tersertifikasi, tatap muka di kantor dengan HRD mencocokkan KTP, direktur menandatangani massal dari Ruang Direktur), siapa yang membubuhkan e-Meterai, dan mengapa tidak ada tanda tangan jarak jauh, PSrE, maupun e-KYC. Juga menjawab dasar hukumnya (UU ITE, PP 71/2019), lubang keamanan akun yang ditemukan (PIN tanpa limiter, reset akun, device_id, akun direktur dipakai bersama Sekretariat, kunci MinIO di bundel browser), serta keputusan pengingat kontrak habis yang dikerjakan lebih dulu dan terpisah.",
       "kata_kunci": [
-        "tanda tangan PIN",
-        "e-signature tidak tersertifikasi",
+        "tanda tangan kontrak",
+        "e-signature",
+        "tanda tangan elektronik tidak tersertifikasi",
         "e-Meterai",
         "PKWT",
         "pengingat kontrak habis",
-        "contract expiry reminder",
-        "Pihak Pertama direktur",
+        "contract reminder",
         "Ruang Direktur",
-        "UU ITE PP 71/2019",
-        "employee_contract"
+        "HRD tatap muka",
+        "Pihak Pertama direktur"
       ]
     },
     {
@@ -8009,10 +8009,10 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "🟡",
-      "status_teks": "**Konsep / Direncanakan** untuk tanda tangan, e-Meterai, dan pengingat; belum ada di kode. Pondasinya (riwayat kontrak + lampiran PDF) sudah ✅ live, diverifikasi ke `bip-erp` `origin/main` `915ca2f8` pada 2026-09-11; rinciannya di §Pondasi yang Sudah Ada.",
+      "status_teks": "**Konsep / Direncanakan** untuk tanda tangan, e-Meterai, dan pengingat; belum ada di kode (rencana pengingat sudah disetujui 2026-09-11). Pondasinya (riwayat kontrak + lampiran PDF) sudah ✅ live, diverifikasi ke `bip-erp` `origin/main` `915ca2f8` pada 2026-09-11; rinciannya di §Pondasi yang Sudah Ada.",
       "publik": true,
       "tautan": [
-        "ADR - 0089 Tanda Tangan Kontrak Kerja dengan PIN di Sistem Sendiri, e-Meterai Dibubuhkan HR",
+        "ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR",
         "ADR - 0019 Kontrak Kerja Elektronik via Service Internal + Lapisan Tersertifikasi",
         "Microservices - Employee Service",
         "API - Employee Service",
@@ -8034,20 +8034,20 @@
         "HRIS - Compensation & Benefits",
         "HRIS - Big Pictures"
       ],
-      "hash": "aeadae5f81890f034c259da5f2d1c0fa8020578a68c830a5531ba8e9b1c17639",
-      "ukuran_kb": 23.2,
-      "ringkasan": "Menjawab: bagaimana alur kontrak kerja digital berjalan dari template berbasis data HRIS, persetujuan isi oleh karyawan, pembubuhan e-Meterai oleh HR, sampai tanda tangan PIN karyawan dan direktur, siapa persona yang terlibat beserta RBAC-nya, dan bagaimana field template PKWT dipetakan ke sumber datanya. Juga menjawab pondasi apa yang sudah ada di kode (koleksi employee_contract, nomor kontrak otomatis, lampiran PDF, status ongoing/ending/expired, feed kalender contract_end, cron) serta celah yang harus ditutup lebih dulu, seperti nomor kontrak tidak unik, lampiran bisa diganti, karyawan belum bisa membuka kontraknya sendiri, dan belum ada pengingat kontrak habis.",
+      "hash": "030f967542f7cebdd7fc1f8d55edecbe50cc8c8018bb698a6e4cdaa699b15a1a",
+      "ukuran_kb": 24.3,
+      "ringkasan": "Menjawab: bagaimana alur kontrak kerja elektronik berjalan dari template berbasis data HRIS, sesi tanda tangan tatap muka didampingi HRD, tanda tangan direktur, e-Meterai oleh HR, sampai salinan ke karyawan, serta siapa persona dan hak aksesnya. Juga menjawab pondasi modul `employee_contract` (nomor kontrak otomatis, lampiran PDF, status ongoing/ending/expired, feed kalender `contract_end`) beserta celahnya (nomor tak unik, lampiran bisa diganti, karyawan tak bisa membuka kontraknya sendiri), rancangan pengingat kontrak habis, pemetaan field template PKWT ke sumber data, dan hal yang belum diputuskan.",
       "kata_kunci": [
-        "kontrak kerja elektronik",
-        "e-signing",
-        "e-Meterai",
+        "kontrak kerja",
+        "employee contract",
+        "employee_contract",
         "PKWT",
         "PKWTT",
-        "employee_contract",
-        "riwayat kontrak",
-        "nomor kontrak",
-        "lampiran PDF kontrak",
-        "Kontrak Saya"
+        "e-signing",
+        "tanda tangan digital",
+        "e-Meterai",
+        "pengingat kontrak",
+        "template kontrak"
       ]
     },
     {
@@ -13331,23 +13331,23 @@
       "status_teks": null,
       "publik": false,
       "tautan": [
-        "ADR - 0089 Tanda Tangan Kontrak Kerja dengan PIN di Sistem Sendiri, e-Meterai Dibubuhkan HR",
+        "ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR",
         "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)"
       ],
-      "hash": "50790edc921422a282d65941cc1aa3b28d47497dc979900fea0db1d3730c7c3a",
-      "ukuran_kb": 7.6,
-      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk tanda tangan kontrak PKWT dan pengingat kontrak habis, dalam urutan gelombang apa (T1 sampai T12 plus N1 sampai N3), apa prasyarat tiap task, dan task mana yang dimulai lebih dulu (T1 pengingat, bisa paralel dengan T2, T3, T5, T6, T8). Juga menjawab jebakan yang menggagalkan rancangan naif (verify-pin mencari akun dari body, reset akun IT, SetaraDirektur meloloskan Corporate Secretary, prefix employee/, Build.ID), catatan deploy per task, dan keputusan TBD yang menahan task tertentu.",
+      "hash": "94b80e18708b77fa14a85932b94c6d3f6383c9e5ea638c3d12a5735b0ba29ae4",
+      "ukuran_kb": 8.2,
+      "ringkasan": "Menjawab: task apa saja yang dibutuhkan untuk tanda tangan kontrak kerja dan pengingat kontrak habis, urutannya per gelombang (T1 pengingat, S1 uji PDF bermeterai, T5 sampai T12 untuk pondasi dokumen, backend, dan layar Web ERP, MyBharata, Ruang Direktur), serta prasyarat tiap task. Juga menjawab jebakan yang menggagalkan rancangan naif (`SetaraDirektur` meloloskan Corporate Secretary, prefix MinIO `employee/`, `ReplaceOne` di PATCH kontrak, dua aturan batas hari status), task keamanan akun K1 sampai K4, pekerjaan non-kode (konfirmasi legal, SOP HR e-Meterai, ukur data prod), dan TBD yang menahan task tertentu.",
       "kata_kunci": [
         "analisa kebutuhan",
-        "daftar task kontrak",
-        "pengingat kontrak habis",
-        "contract reminder",
+        "daftar task",
+        "urutan kerja",
         "tanda tangan kontrak",
-        "limiter PIN",
-        "reset akun",
-        "konfirmasi legal",
-        "SOP e-Meterai",
-        "roadmap gelombang"
+        "pengingat kontrak habis",
+        "contract expiry reminder",
+        "e-Meterai",
+        "PKWT",
+        "Kontrak Saya",
+        "keamanan akun"
       ]
     },
     {
