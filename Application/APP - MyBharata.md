@@ -292,11 +292,11 @@ diperiksa; padanan web-nya dihapus 2026-09-11
 akun teratas di tiga toko berbeda). Digabung per nama, sesi tersimpan atas toko yang salah
 dan gagalnya senyap — riwayatnya berbunyi "belum ada data penjualan" selamanya.
 
-#### Ambil alih akun yang masih dipegang (⚠️ branch `feat/live-shift-ambil-alih`, 1.17.0+161, belum PR ke `dev`)
+#### Ambil alih akun yang masih dipegang (⚠️ PR [#143](https://github.com/bip-itteam-internal/my-bharata/pull/143) ke `dev`, 1.17.0+161, belum merge)
 
-Kode dan test selesai dan sudah direview 2026-09-12, **belum di-push**. Keputusannya
+Kode dan test selesai dan sudah direview 2026-09-12, **belum merge** (PR #143). Keputusannya
 [[ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift]] §2;
-backend-nya di bip-erp branch `feat/marketing-analytics-ambil-alih` yang juga belum merge, dan
+backend-nya di bip-erp PR [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855) yang juga belum merge, dan
 wajib naik lebih dulu. Kontrak rutenya di [[API - Marketing Analytics Service]].
 
 - **Penolakan Mulai menyebut pemegangnya.** Datasource mengurai `shift_berjalan` di badan 409
