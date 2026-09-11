@@ -109,7 +109,7 @@ Tutup: perbarui status ADR 0090 dan bagian Satgas di dok Form Builder ke ✅/⚠
 - Komentar di `services/form-builder/models_form.go` (blok tipe field) masih berbunyi "upload file belum ada, fase 2", padahal `FieldFile` sudah ada.
 - **Kegagalan test yang sudah ada di `origin/main`** (bukan dari branch ini): `shared-library/models/employee` `TestDefaultPermissionSetsValid` (+ saudaranya di `permission_set_payroll_test.go`) merah karena `init()` uji tak mendaftarkan katalog `manufacture`; `services/employee` `TestMetrikTanpaIklanGagalTerbacaPadaServiceLama` merah.
 - **Suite penuh erp-frontend di merge-base e37e4adb**: 39 test gagal di 15 berkas, jumlah dan daftarnya identik dengan worktree baseline terpisah, jadi baseline, bukan regresi. Di `origin/main` 428d41b0 turun jadi 37 gagal di 13 berkas (baseline dan branch identik). Salah satunya `src/app/(main)/form-builder/page.test.tsx`, jadi "test form-builder hijau" di papan ini berarti `src/features/form-builder`, bukan halaman rutenya.
-- **Komite Kaizen tak bisa membuka lampiran** (pratinjau khusus pengelola form). Antrean hanya menampilkan penanda; rute pratinjau komite task tersendiri bila Kaizen berfoto dipakai.
+- **Komite Kaizen tak bisa membuka lampiran** (pratinjau khusus pengelola form). Antrean hanya menampilkan penanda. Rute pratinjau untuk komite **tidak dikejar**: user menyatakan 2026-09-11 modul Kaizen akan dihapus nanti (belum ada ADR maupun task penghapusannya).
 - **Objek file-service tersimpan `application/octet-stream`** (`CreateFormFile` di `shared-library/routes/internal_request.go`), jadi PDF mungkin terunduh alih-alih tampil di pratinjau. Ukur di dev dengan berkas sungguhan; perbaikan content-type task tersendiri.
 
 ## Yang TIDAK jadi dikerjakan, beserta alasannya
