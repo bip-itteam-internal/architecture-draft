@@ -2,7 +2,7 @@
 
 Daftar task hasil `/analisa-kebutuhan` 2026-09-11, direvisi hari yang sama. Keputusan arsitekturalnya di [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]]; cara kerja domainnya di [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]].
 
-**Dibuat**: 2026-09-11 · **Status**: T1 rencana disetujui (`.task-plans/2026-09-11-pengingat-kontrak-habis.md`), sedang dikerjakan. Rilis tanda tangan (Gelombang 2-3) menunggu N1 (konfirmasi legal) dan S1 (uji PDF bermeterai).
+**Dibuat**: 2026-09-11 · **Status**: T1 kode selesai dan lolos `/review` di branch `feat/employee-pengingat-kontrak` (bip-erp), menunggu PR, merge, dan verifikasi dev. Rilis tanda tangan (Gelombang 2-3) menunggu N1 (konfirmasi legal) dan S1 (uji PDF bermeterai).
 
 ---
 
@@ -25,7 +25,7 @@ Keputusan pemilik proses yang mengikat:
 - `common.SetaraDirektur` meloloskan Corporate Secretary. Jangan dipakai sebagai gerbang Pihak Pertama.
 - Lampiran kontrak sekarang di prefix `employee/`, yang kunci bacanya ada di bundel browser.
 - Menempel goresan ke PDF yang sudah bermeterai bisa merusak e-Meterai dan sidik jarinya. Urutan ditentukan S1.
-- Status kontrak punya dua aturan batas hari (`klasifikasiKontrak` vs `statusKontrak`), dan tanggal disimpan sebagai tengah malam WIB. Hitung dalam tanggal WIB; T1 menyatukan keduanya.
+- Status kontrak punya dua aturan batas hari (`klasifikasiKontrak` vs `statusKontrak`), dan tanggal disimpan sebagai tengah malam WIB. Hitung dalam tanggal WIB; T1 menyatukan keduanya (di branch, belum merge).
 - `PATCH /contract/:id` memakai `ReplaceOne`: field yang tidak ada di struct ikut terhapus. Status tanda tangan wajib masuk struct, catatan di koleksi sendiri.
 
 ---
@@ -38,6 +38,16 @@ Nomor dalam kurung = prasyarat. Tiap item cukup jelas untuk langsung dilempar ke
 
 **T1. Pengingat kontrak habis.** Rencana disetujui: `.task-plans/2026-09-11-pengingat-kontrak-habis.md` (branch `feat/employee-pengingat-kontrak`). Cron harian 07:00 WIB di employee-service; ringkasan harian ke supervisor HR (masuk "segera berakhir", H-30, H-7, kedaluwarsa mingguan); atasan H-14 kalender; kategori `reminder`; menyatukan aturan status kontrak dalam tanggal WIB; catatan terkirim per (kontrak, tahap, penerima).
 *Prasyarat: tidak ada.* Deploy: employee-service saja.
+*Status 2026-09-11*: kode selesai dan lolos `/review`. Sisa: `/wrap` (PR), merge, verifikasi dev dengan `PENGINGAT_KONTRAK_SAAT_BOOT=true` (langkahnya di artefak rencana §Cara Verifikasi), lalu deploy prod oleh manusia.
+
+**T13. Tautan dari pesan pengingat ke halaman Kontrak.** Pesan T1 tanpa rute, karena halaman `/hris/contract` tidak membaca query string dan belum ada pemetaan rute inbox ke sana. Butuh pemetaan tautan inbox dan halaman yang membuka karyawan dari `?employee=` (sejalan dengan T11).
+*Prasyarat: T1.*
+
+**T14. Hasil penilaian kinerja atasan kembali ke HR.** T1 meminta atasan menilai kinerja H-14, tetapi hasilnya tidak tercatat di sistem dan HR tidak diberi tahu. Putuskan bentuknya lebih dulu: catatan pada kontrak, form, atau tetap di luar sistem.
+*Prasyarat: T1; butuh keputusan pemilik proses.*
+
+**T15. Filter `ending_month` di `GET /contract` dalam tanggal WIB.** Bulan masih dibaca dari `contract_ending` dalam UTC, jadi kontrak yang tersimpan tengah malam WIB tanggal 1 masuk ke bulan sebelumnya. Perbaikannya mengubah hasil filter yang terlihat HR.
+*Prasyarat: T1 (memakai `tanggalWIB` yang sama).*
 
 ### Prasyarat tanda tangan
 
@@ -96,7 +106,7 @@ Tanda tangan tidak memakai akun maupun PIN karyawan, jadi task ini tidak menahan
 
 **N2. SOP HR**: akun enterprise di distributor resmi e-Meterai, jenis kontrak yang dimeteraikan, jumlah meterai per kontrak, pencatatan biaya ke finance; SOP sesi tatap muka (pencocokan KTP, penolakan di tempat).
 
-**N3. Ukur data prod**: jalankan `.task-plans/cek-kontrak-esign-prod.ps1` (volume kontrak per bulan, kontrak kedaluwarsa pada karyawan aktif). Hasilnya menentukan beban HRD dan direktur.
+**N3. Ukur data prod**: jalankan `.task-plans/cek-kontrak-esign-prod.ps1` (volume kontrak per bulan, kontrak kedaluwarsa pada karyawan aktif). Hasilnya menentukan beban HRD dan direktur, dan panjang ringkasan pengingat pertama T1 di prod.
 
 ---
 
@@ -109,9 +119,10 @@ Rinciannya di dok domain §Belum Diputuskan. Yang menahan task tertentu:
 - Hasil S1 (urutan A/B) → T7, T9.
 - Draf lewat email sebelum datang, bentuk penolakan di tempat → T9.
 - Retensi arsip → T8.
+- Bentuk hasil penilaian kinerja atasan → T14.
 
 ---
 
 ## 3. Mulai dari mana
 
-T1 sedang dikerjakan. Paralel dengannya: S1 (minta HR memeteraikan satu PDF contoh), T5, T6, T8, dan K1-K4.
+T1 menunggu PR, merge, dan verifikasi dev. Paralel dengannya: S1 (minta HR memeteraikan satu PDF contoh), T5, T6, T8, T15, dan K1-K4.

@@ -11,8 +11,8 @@
 
 *Kontrak kerja PKWT ditandatangani di sistem sendiri dengan tanda tangan elektronik **tidak tersertifikasi**, **tatap muka di kantor dan didampingi HRD**: karyawan menggores tanda tangan di perangkat HR setelah HRD mencocokkan KTP-nya, lalu direktur mengonfirmasi dari Ruang Direktur. e-Meterai dibubuhkan HR di luar sistem. Kebutuhan kedua, kontrak habis yang tak terpantau, dijawab terpisah dengan pengingat. Menggantikan [[ADR - 0019 Kontrak Kerja Elektronik via Service Internal + Lapisan Tersertifikasi]], yang memilih jalur tersertifikasi lewat PSrE dan tak pernah diratifikasi. Cara kerja domainnya di [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]].*
 
-- **Status**: 🟡 **Diusulkan**, disetujui pemilik proses 2026-09-11 lewat `/analisa-kebutuhan` dan **direvisi hari yang sama**: tanda tangan PIN jarak jauh di MyBharata diganti tanda tangan tatap muka didampingi HRD (§4, §6, §7). Kode belum ada. Keabsahan hukum menunggu konfirmasi legal.
-- **Path di repo**: `bip-erp/services/employee/contract*.go` · `bip-erp/services/employee/contract_tanda_tangan*.go` (baru) · `bip-erp/services/employee/contract_pengingat.go` (baru) · `bip-erp/services/employee/cron.go` · `bip-erp/shared-library/models/employee/models.go` · `bip-erp/services/file/main.go` · `erp-frontend/src/features/hris/contract/` · `erp-frontend/src/features/direktur/` · `mybharata-app/lib/src/features/contract/` (baru, baca-saja)
+- **Status**: 🟡 **Diusulkan**, disetujui pemilik proses 2026-09-11 lewat `/analisa-kebutuhan` dan **direvisi hari yang sama**: tanda tangan PIN jarak jauh di MyBharata diganti tanda tangan tatap muka didampingi HRD (§4, §6, §7). Kode tanda tangan belum ada. ⚠️ **§2 (pengingat): kode selesai di branch `feat/employee-pengingat-kontrak` 2026-09-11, belum merge dan belum deploy.** Keabsahan hukum menunggu konfirmasi legal.
+- **Path di repo**: `bip-erp/services/employee/contract*.go` · `bip-erp/services/employee/contract_tanda_tangan*.go` (baru) · `bip-erp/services/employee/contract_pengingat.go` (baru, ada di branch) · `bip-erp/services/employee/cron.go` · `bip-erp/services/employee/warning_notify.go` · `bip-erp/shared-library/models/employee/models.go` · `bip-erp/shared-library/models/employee/contract_pengingat.go` (baru, ada di branch) · `bip-erp/services/file/main.go` · `erp-frontend/src/features/hris/contract/` · `erp-frontend/src/features/direktur/` · `mybharata-app/lib/src/features/contract/` (baru, baca-saja)
 - **Tanggal**: 2026-09-11
 
 ## Context
@@ -51,6 +51,8 @@ Tanpa PSrE, tanpa e-KYC, tanpa vendor. Menggantikan ADR 0019 seluruhnya.
 ### 2. Pengingat kontrak habis dikerjakan lebih dulu dan terpisah
 
 Kebutuhan kedua tidak menunggu tanda tangan. Cron employee-service mengirim inbox kategori `reminder` (sudah terdaftar dan terpetakan di MyBharata maupun Web ERP): satu ringkasan harian per supervisor HR per perusahaan saat kontrak masuk status "segera berakhir", H-30, H-7, dan untuk kontrak kedaluwarsa pada karyawan aktif sekali per minggu; ke atasan langsung H-14 kalender untuk penilaian kinerja (Pasal 2 ayat 6 template PKWT). Status "segera berakhir" memakai satu fungsi klasifikasi yang sama dengan daftar, ringkasan, dan riwayat kontrak. Rencananya di `.task-plans/2026-09-11-pengingat-kontrak-habis.md`.
+
+**Implementasi (branch `feat/employee-pengingat-kontrak`, belum merge)**: yang dipantau kontrak terakhir tiap karyawan aktif di perusahaannya sekarang; jejak kiriman disimpan di koleksi sendiri `employee_contract_pengingat`, dan hanya kiriman yang berhasil yang dicatat; karyawan tanpa atasan tercatat ditandai ke HR; pesan tanpa tautan ke halaman Kontrak. Penyatuan aturan status menghitung dalam tanggal WIB, sehingga hari terakhir kontrak berstatus `ending` di daftar, ringkasan, dan riwayat. Rinciannya di dok domain §Pengingat Kontrak Habis.
 
 ### 3. Menempel di modul kontrak employee-service, bukan service baru
 
@@ -123,6 +125,6 @@ Karyawan baru menerima PDF final dan lembar bukti lewat email (notification-serv
 
 - [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] (cara kerja) · [[HRIS - Personalia]]
 - [[ADR - 0019 Kontrak Kerja Elektronik via Service Internal + Lapisan Tersertifikasi]] (digantikan)
-- [[REF - Kepemilikan Data]] · [[API - Employee Service]] · [[Microservices - Employee Service]] · [[Microservices - File Service]] · [[Microservices - Notification Service]]
+- [[REF - Kepemilikan Data]] · [[API - Employee Service]] · [[Microservices - Employee Service]] · [[Microservices - File Service]] · [[Microservices - Notification Service]] · [[IT - Background Jobs & Schedulers]]
 - [[ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji]] (gerbang PIN per sesi) · [[ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus]] · [[ADR - 0002 Database-per-Service]]
 - Daftar task: `Workspace/ANALISA - Tanda Tangan Kontrak Kerja dan Pengingat Kontrak Habis.md`

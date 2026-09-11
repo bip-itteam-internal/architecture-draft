@@ -1,6 +1,6 @@
 ## ADR 0019 — Kontrak Kerja Elektronik: service internal + lapisan tersertifikasi (PSrE + e-Meterai) via API berlisensi
 
-- **Status**: ⛔ **Superseded** oleh [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]] (2026-09-11). Tak pernah diratifikasi. Pemilik proses memilih tanda tangan tidak tersertifikasi dengan PIN dan e-Meterai yang dibubuhkan HR, tanpa PSrE, e-KYC, maupun `contract-service`. Isi di bawah dipertahankan sebagai rekaman usulan.
+- **Status**: ⛔ **Superseded** oleh [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]] (2026-09-11). Tak pernah diratifikasi. Pemilik proses memilih tanda tangan tidak tersertifikasi **tatap muka di kantor, didampingi HRD** (tanpa PIN karyawan dan tanpa tanda tangan jarak jauh) dan e-Meterai yang dibubuhkan HR, tanpa PSrE, e-KYC, maupun `contract-service`. Isi di bawah dipertahankan sebagai rekaman usulan.
 - **Tanggal**: 2026-07-18 (revisi 2026-09-11)
 - **Konteks dok**: [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] · [[HRIS - Personalia]] · [[HRIS - Recruitment]] · [[Microservices - Employee Service]] · [[API - Employee Service]] · [[REF - Kepemilikan Data]] · [[CORE - HRIS Orchestrator]] · [[ADR - 0002 Database-per-Service]] · [[ADR - 0013 HRD Documents]]
 
@@ -18,7 +18,7 @@ Bagian Context, Decision, dan Consequences di bawah dipertahankan apa adanya seb
 |---|---|
 | §1 service baru `contract-service` memegang template, approval, arsip, dan audit | `contract-service` belum ada. Record kontrak dan arsip PDF ada di employee-service. Template, approval, dan jejak audit tanda tangan belum ada di mana pun |
 | §3 `new_hire` dipicu orkestrator setelah create-employee commit | kontrak pertama sudah dibentuk **di dalam** transaksi create-employee (`kontrakPertama`, `services/employee/func.go`). Pemicu tanda tangan belum ada |
-| §3 pengingat otomatis TBD karena tak ada cron | employee-service sudah menjalankan `robfig/cron` (`services/employee/cron.go`). Yang belum ada adalah pengingat kontraknya |
+| §3 pengingat otomatis TBD karena tak ada cron | employee-service sudah menjalankan `robfig/cron` (`services/employee/cron.go`). Pengingat kontraknya dibangun lewat [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]] §2 (branch `feat/employee-pengingat-kontrak`, belum merge per 2026-09-11) |
 | §5 arsip di MinIO prefix `contract/` + referensi di `work_document` | arsip di field `employee_contract.file`, object key `employee/<employee_id>/contract/<contract_id>/`. `work_document` tidak dipakai |
 | Context: "hanya view monitoring `GET /contract`" | ada riwayat per karyawan, nomor otomatis, lampiran PDF, dan ringkasan |
 
