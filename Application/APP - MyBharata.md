@@ -292,6 +292,66 @@ diperiksa; padanan web-nya dihapus 2026-09-11
 akun teratas di tiga toko berbeda). Digabung per nama, sesi tersimpan atas toko yang salah
 dan gagalnya senyap — riwayatnya berbunyi "belum ada data penjualan" selamanya.
 
+#### Ambil alih akun yang masih dipegang (⚠️ branch `feat/live-shift-ambil-alih`, 1.17.0+161, belum PR ke `dev`)
+
+Kode dan test selesai dan sudah direview 2026-09-12, **belum di-push**. Keputusannya
+[[ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift]] §2;
+backend-nya di bip-erp branch `feat/marketing-analytics-ambil-alih` yang juga belum merge, dan
+wajib naik lebih dulu. Kontrak rutenya di [[API - Marketing Analytics Service]].
+
+- **Penolakan Mulai menyebut pemegangnya.** Datasource mengurai `shift_berjalan` di badan 409
+  menjadi `SesiDipegangFailure` (turunan `SesiMasihBerjalanFailure`, jadi penanganan 409 lama
+  tetap berlaku); muatan yang rusak jatuh ke pesan umum lama, bukan ke galat parsing. Dialog
+  Mulai menampilkan panel berisi akun, **seluruh** nama host pemegang, dan jam mulainya dalam
+  WIB, dengan tombol **Ambil alih** dan tanpa Akhiri. 409 tanpa muatan (balapan index unik)
+  tetap snackbar lama.
+  - ⛔ **Pemegang disimpan di state dialog, bukan dibaca dari state bloc.** Halaman mengirim
+    `MuatSesiBerjalan` sesudah 409, dan state berikutnya tak lagi membawa pemegang, jadi panel
+    yang membaca state terakhir lenyap sepersekian detik sesudah muncul. Memilih toko atau
+    akun lagi membuang panelnya.
+  - `LiveShiftSesiMasihBerjalan` dan `MuatSesiBerjalan` kini mempertahankan daftar toko dan
+    kandidat co-host. Sebelumnya keduanya jadi `null` sesudah 409, dan pemilih di dialog mati
+    tepat saat host perlu memilih lagi.
+  - Pemegang yang ternyata pemakai sendiri (sesi dari HP lain) tidak diberi tombol; server
+    menolak ambil alih untuk kasus itu.
+- **Sisi peminta** (`PermintaanAmbilAlihBloc`, dibuat panel lewat `sl` dan ditutup bersamanya,
+  sehingga poll berhenti begitu dialog ditutup). Konfirmasi `CustomDialog` menyebut akun dan
+  pemegang **tanpa angka detik**: batasnya milik server, dan angka di aplikasi akan jadi
+  salinan kedua (keputusan review 2026-09-12). Sesudah terkirim, status dipoll tiap 2 detik
+  dengan hitung mundur dari `sisa_detik` server.
+  - Galat jaringan saat poll tetap menunggu dengan keterangan; galat yang **dijawab server**
+    menghentikan poll dan menampilkan kalimat server apa adanya (`data.error`, bukan reason
+    phrase HTTP yang ditaruh `api.dart` di `message`).
+  - Hasil: dijalankan (dialog memuat ulang sesi berjalan dan menutup lewat sinyal penutup yang
+    sama dengan Mulai), ditolak oleh siapa, kedaluwarsa, sesi berakhir. Status yang tak
+    dikenal adalah akhir, bukan alasan poll selamanya.
+  - ⛔ **Host yang dicatat diambil dari pilihan co-host yang SEDANG tampil**, satu sumber dengan
+    Mulai dan teks jumlah pembagi GMV, bukan dari muatan Mulai yang ditolak. Co-host masih bisa
+    diubah sesudah 409, dan `BagiRata` membagi GMV per kepala.
+- **Sisi pemegang** (`PersetujuanAmbilAlihBloc`, dibuat halaman Sesi Live). Selama halaman
+  terbuka dan aplikasi `resumed` (`WidgetsBindingObserver`), halaman memoll
+  `GET /live-shifts/ambil-alih/menunggu` tiap 3 detik. Permintaan baru membuka
+  `CustomBottomSheet` **sekali per id permintaan**, satu per satu: nama peminta, akun, jadwal
+  peminta dalam WIB (bila terbaca server), hitung mundur, Setujui dan Tolak.
+  - Tak bisa ditutup lewat usap, ketuk di luar, maupun tombol kembali (`isDismissible: false`,
+    `enableDrag: false`, `PopScope`). Tertutup sendiri saat hitung mundur habis atau saat
+    permintaannya hilang dari daftar, lalu halaman memuat ulang sesi berjalan.
+  - ⛔ Jendela ditutup dengan **context miliknya sendiri**; context halaman menutup halamannya.
+  - Galat Setujui atau Tolak tampil **di dalam jendela**, bukan snackbar: snackbar halaman
+    berada di bawah sheet modal dan tak terlihat selama jendelanya terbuka.
+  - Kartu beranda tidak memoll. Bila halaman Sesi Live tidak terbuka (aplikasi tertutup atau di
+    belakang), pemegang hanya menerima notifikasi, dan mengetuknya membuka halaman Notifikasi,
+    bukan Sesi Live (titik putus yang diterima ADR 0088).
+- **Riwayat** menambah baris alasan selesai: "Diambil alih oleh X pukul HH:MM WIB" (ditambah
+  "tanpa jawaban" bila pemegang diam), "Ditutup otomatis: shift berakhir", dan "Ditutup
+  otomatis: clock-out", yang juga dipakai untuk sesi tutup otomatis lama tanpa
+  `alasan_selesai`. Sesi yang diakhiri lewat tombol dan alasan yang tak dikenal tanpa label.
+- ⚠️ **Widget test sheet modal**: route yang didorong dari listener stream butuh satu rangka
+  pendek sebelum lompatan waktu. Tanpa itu lompatannya dihitung sebagai tik pertama animasi,
+  sheet tertinggal di bawah layar, dan ketukan pada tombolnya meleset tanpa galat (`find.text`
+  tetap menemukannya). Test jendela karena itu menjadikan peringatan hit test fatal
+  (`WidgetController.hitTestWarningShouldBeFatal`).
+
 ### Fitur pendukung lain
 - **QR Code**: tampilkan QR pribadi + akses scanner inventory
 - **Guest Book**: tamu eksternal mengisi buku tamu (scan QR, input manual, kategori)
