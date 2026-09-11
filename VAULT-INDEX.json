@@ -414,20 +414,20 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "b84bbdb91c1659f41feda79a35ed97fcd2672f2baa375acdb99bfacd7a712502",
-      "ukuran_kb": 91.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service lewat gateway `/api/integration/*` untuk marketplace (TikTok Shop/Business, Shopee), webhook publik, order terpadu dan ekspornya, aging piutang, feed retur lintas-channel, packet tracking, Accurate, dashboard FAT `/accounting/*`, profit dan profit insentif, ICC account mapping, kas toko/wallet, ulasan marketplace, status sinkron toko, serta kepemilikan toko per departemen. Juga menjelaskan parameter tiap rute (mis. `shopee_attribution`, `updated_since`, `order_ids`, `date_basis`, `with_total`), bentuk responsnya, siapa konsumennya (WMS, Web ERP), dan jebakan seperti `/health` yang tetap butuh gateway key.",
+      "hash": "a269ae86c35bea11b76084c84d6295bc222487cf716ecf49bed6c39bbad7c220",
+      "ukuran_kb": 92.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service (≈341 rute) untuk order marketplace, retur, packet tracking, aging piutang, webhook Shopee/TikTok, Accurate, dashboard FAT /accounting, profit insentif, ICC account mapping, kas toko, ulasan, dan status sinkron toko, beserta parameter dan bentuk responsnya. Juga menjelaskan jebakan pemakaian seperti filter shopee_attribution yang hanya berlaku untuk channel Shopee, unknown yang bukan organic, dan /health yang tetap butuh gateway key.",
       "kata_kunci": [
         "integration-service",
-        "API integration",
-        "endpoint marketplace",
-        "TikTok Shop",
-        "Shopee",
-        "Accurate",
-        "webhook",
-        "transaction orders",
+        "API endpoint",
+        "marketplace",
+        "order",
+        "retur",
+        "return",
         "packet tracking",
-        "piutang aging"
+        "piutang",
+        "accounts receivable",
+        "webhook"
       ]
     },
     {
@@ -841,7 +841,7 @@
         "order.order-items-get"
       ],
       "hash": "40849a92b3a96565fbc789742e61b75e3bbd942b6d18b298c097028cfbd2659e",
-      "ukuran_kb": 3.0,
+      "ukuran_kb": 2.9,
       "ringkasan": "Menjawab cara menarik daftar order dari Lazada Open API endpoint `/orders/get`, perbedaan filter waktu `created_after`/`created_before` (waktu order dibuat) vs `update_after`/`update_before` (waktu order berubah), dan kenapa window berbasis update penting sebagai jaring pengaman ketika webhook Lazada (LPM) mati. Juga mendokumentasikan jebakan status order-level yang bisa tertinggal dari status tracking sebenarnya.",
       "kata_kunci": [
         "Lazada",
@@ -1005,7 +1005,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 2.0,
+      "ukuran_kb": 1.9,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1057,7 +1057,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 3.0,
+      "ukuran_kb": 2.9,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1450,12 +1450,12 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "b2c009de777dc48f047c955392b32834f957c7af7d81217064c7450fe2eee844",
-      "ukuran_kb": 406.9,
-      "ringkasan": "Menjawab: apa itu portal web ERP `erp-frontend` (One Bharata), stack yang dipakai, cara login dan SSO Identity Provider bekerja, serta bagaimana cookie `system_roles` menggerbang sidebar dan menu per modul. Juga menjelaskan pengelompokan menu HRIS, halaman Pengaturan HRGA terpusat dengan penyaringan per tab, dukungan multi-perusahaan, konvensi data-fetching TanStack Query, dan konvensi bagan Recharts dengan `ChartContainer`.",
+      "hash": "fe0ba059680217f47afa58d5115c5a9e70ea8b5f6c5459c671da360f24fac8db",
+      "ukuran_kb": 407.9,
+      "ringkasan": "Menjawab: apa itu portal web One Bharata (erp-frontend), stack yang dipakai, bagaimana login, SSO identity provider, dan gating menu berdasarkan system_roles bekerja, serta bagaimana menu HRIS dan halaman Pengaturan HRGA dikelompokkan dan disaring per tab. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts/ChartContainer, dukungan multi-perusahaan, dan daftar modul yang sudah maupun belum diimplementasikan.",
       "kata_kunci": [
+        "Web ERP",
         "erp-frontend",
-        "web ERP",
         "One Bharata",
         "hris-dashboard",
         "SSO",
@@ -2411,20 +2411,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "671be8a4afa0ddf6c9afd02fe77551e4b6f5ae1f06452545f0b4976054bc9e56",
-      "ukuran_kb": 369.0,
-      "ringkasan": "Menjawab: bagaimana order marketplace (TikTok Shop, Shopee, Lazada) masuk lewat webhook dan dinormalkan jadi transaksi terpadu, bagaimana laporan iklan TikTok Business/GMV Max ditarik, serta bagaimana faktur, retur, dan penerimaan di-push ke Accurate Online. Juga menjawab cron/worker sync apa saja yang berjalan, pemetaan akun ICC dan kepemilikan toko per departemen, status sinkron per toko, dan rencana integrasi Meta Ads.",
+      "hash": "2e72e16445589ec7911413f7b44b210b2c4d43f548dfc237b0a47d5c7764440e",
+      "ukuran_kb": 373.3,
+      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) ke Accurate Online, bagaimana order masuk lewat webhook dan dinormalkan jadi model transaksi terpadu, serta bagaimana invoice, sales return, dan ringkasan harian didorong ke Accurate. Juga menjelaskan cron dan worker sync, GMV Max monitoring, ICC video metrics, rencana Meta Ads, atribusi order Shopee, ulasan marketplace, status sinkron per toko, dan catatan ketahanan/performa.",
       "kata_kunci": [
-        "integration-service",
+        "integration service",
         "marketplace",
-        "webhook",
-        "Shopee",
-        "TikTok Shop",
-        "Lazada",
         "Accurate",
-        "faktur sales invoice",
+        "TikTok Shop",
+        "Shopee",
+        "Lazada",
+        "webhook",
         "GMV Max",
-        "worker cron"
+        "sales invoice",
+        "cron worker"
       ]
     },
     {
@@ -2594,20 +2594,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "112af0269c34b46d2a2b32c05280864985ca670853278af2f1fbe445747fa43e",
-      "ukuran_kb": 114.9,
-      "ringkasan": "Menjawab: bagaimana Marketing Analytics Service mengagregasi laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live ke koleksi `mart_*`, serta bagaimana ia menjaga `integration_db` tetap baca-saja. Juga menjelaskan logika vonis laba lima keadaan (termasuk `belum_matang` dan pita materialitas), penjadwal sync 48 jam, sumber data per channel (TikTok, Shopee, Lazada), pencatatan sesi live host (`/live-shifts`), KPI Host Live, dan aturan pemakaian angka untuk mencegah hitung ganda.",
+      "hash": "1c57d55075a712f99631d50eb29dfa12013be60bb3c72f6edf638df43e498a07",
+      "ukuran_kb": 116.9,
+      "ringkasan": "Menjawab: bagaimana marketing-analytics service menghitung laba dan performa marketing per toko, produk, kampanye, video, dan live dari integration_db (baca-saja) ke koleksi mart_*, endpoint apa yang tersedia (beranda, ambang, pagu, live-shifts, KPI host live), dan bagaimana vonis laba seperti belum_matang ditentukan. Juga menjelaskan aturan pemakaian angka untuk mencegah hitung ganda (iklan_sia_sia, pembatalan, GMV live), penjadwal sync 48 jam, alokasi bundel/mapping SKU, dan catatan kejujuran data.",
       "kata_kunci": [
         "marketing analytics",
-        "mart_profit_attribution",
-        "laba marketing",
-        "profit attribution",
-        "vonis belum_matang",
-        "live-shifts",
-        "KPI Host Live",
-        "hitung ganda",
+        "mart",
+        "laba",
+        "profit",
+        "ROAS",
+        "live shift",
+        "sesi live",
+        "dashboard marketing",
         "iklan_sia_sia",
-        "integration_db baca-saja"
+        "hitung ganda"
       ]
     },
     {
@@ -4689,7 +4689,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "1af925998c51daaf89f4b362162b5f8c117e3db82e37169cbfe7b2e6ed084c92",
-      "ukuran_kb": 6.6,
+      "ukuran_kb": 6.5,
       "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal), dan bagaimana auto-disable Tahap 2 bekerja (counter kegagalan auth beruntun, ambang 5, reset saat sukses, satu Telegram tanpa damper terpisah — bukti flapping 36009006). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care.",
       "kata_kunci": [
         "adr",
@@ -4827,7 +4827,7 @@
         "APP - Web ERP"
       ],
       "hash": "3405a3dc1516fe9eff90d36e5a1a47c8a876d2dbaf6bc9537105816d5897ee6d",
-      "ukuran_kb": 10.2,
+      "ukuran_kb": 10.1,
       "ringkasan": "Menjawab: bagaimana penyesuaian statement TikTok (tt_statement_adjustments, mayoritas ganti rugi paket hilang / LOGISTICS_REIMBURSEMENT yang bukan penggantian ongkir) dibukukan ke Accurate — dilipat ke payout pesanan yang disebutnya lalu diurus mesin receipt, bukan sebagai baris pendapatan tersendiri — dan bagaimana pesanan yang tak ditemukan ditangani. Live 26 Agustus 2026 (PR #1451).",
       "kata_kunci": [
         "adr",
@@ -5136,7 +5136,7 @@
         "APP - MyBharata"
       ],
       "hash": "8f299536accfe2f767e7f9fa1316424efa1b578b89372f2b7727d367c74485c5",
-      "ukuran_kb": 26.0,
+      "ukuran_kb": 26.2,
       "ringkasan": "Menjawab: bagaimana siaran live serentak di beberapa akun dicatat (satu sesi per akun, bukan satu sesi multi-akun), dan kenapa jam siaran host dihitung sebagai jam dinding (union jendela waktu) bukan penjumlahan per sesi. Juga menjawab apakah tumpang tindih sesi antar-akun milik orang yang sama dianggap sah, ke departemen mana GMV diatribusikan, siapa yang boleh melihat sesi orang lain, bagaimana rasio per individu dihitung, dan data pengukuran produksi yang mendasari keputusannya.",
       "kata_kunci": [
         "siaran serentak",
@@ -6102,7 +6102,7 @@
         "API - Recruitment Service"
       ],
       "hash": "40deb6e040f6ad1c759e4589b6d7dd6f833397ce339e6f90572f7de93b2f4160",
-      "ukuran_kb": 23.3,
+      "ukuran_kb": 23.4,
       "ringkasan": "Menjawab: kenapa psikotes diperluas dari Kraepelin saja menjadi multi-jenis (CFIT, DISC) dengan katalog tipe tes, bank soal, dan paket tes sebagai master data yang dikelola HRD, sementara tiga bentuk jawaban (pilihan ganda, MOST/LEAST, angka-kolom) tetap berupa kode. Juga menjelaskan apa yang sengaja tidak dijanjikan ke manajemen (batas klaim tanpa coding, tidak ada kesimpulan IQ atau kepribadian, legalitas soal berlisensi), keadaan prod yang terukur sebagai dasarnya, penyimpangan sadar saat pengodean, dan keputusan yang masih terbuka seperti pendampingan tes dan tenggat tautan.",
       "kata_kunci": [
         "ADR 0087",
@@ -7367,7 +7367,7 @@
         "ADR - 0041 Izin Tipe Form Menempel di Departemen"
       ],
       "hash": "5633fc5aa7a7b9fbb58fff7876b4848a5fe27dd3b1ec28c0691f36a2932be1e5",
-      "ukuran_kb": 19.6,
+      "ukuran_kb": 19.8,
       "ringkasan": "Menjawab: bagaimana HRD mengelola tipe tes, bank soal (input manual, impor Excel, soal dan opsi bergambar), dan paket tes berurutan di Pengaturan Rekrutmen, serta bagaimana kandidat mengerjakan seluruh paket dari satu tautan. Juga menjelaskan tiga bentuk jawaban beserta cara penilaiannya, model data `psikotes_tipe`, `psikotes_item`, `psikotes_paket`, dan `psikotes_session`, aturan kesiapan paket, izin RBAC untuk membaca kunci jawaban, penutupan sesi paket, seed bawaan, dan jebakan yang sudah diketahui.",
       "kata_kunci": [
         "bank soal",
@@ -8432,7 +8432,7 @@
         "HRIS - Candidate Assessment"
       ],
       "hash": "01360247b5a1eca683f271f936898116b4a8116fe55083b4d6024a1d97341878",
-      "ukuran_kb": 25.1,
+      "ukuran_kb": 25.3,
       "ringkasan": "Menjawab: bagaimana psikotes online Kraepelin berjalan, dari HR menekan Kirim Tes, kandidat mengerjakan lewat magic link tanpa login, sampai skor masuk ke Hasil Tes babak Psikotest berstatus Pending untuk diputuskan HR. Juga menjelaskan model data `psikotes_session` dan index uniknya, kerahasiaan soal dan skor, konfigurasi kolom, baris, dan detik, rumus skoring kecepatan, ketelitian, keajegan, dan ketahanan, tiga cara sesi berakhir (tuntas, ditinggalkan, kedaluwarsa), serta cara sesi terputus ditampilkan di layar HR.",
       "kata_kunci": [
         "Kraepelin",
@@ -9507,7 +9507,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
-      "ukuran_kb": 6.9,
+      "ukuran_kb": 6.8,
       "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
       "kata_kunci": [
         "faktur",
@@ -11719,7 +11719,7 @@
         "ADR - 0008 Profit Engine Join via item_group_id"
       ],
       "hash": "a2ab0c1470d4eaaeac534e5df6058aabacec3f7cc173276b030a47195e303ea9",
-      "ukuran_kb": 18.9,
+      "ukuran_kb": 19.1,
       "ringkasan": "Menjawab: dari metrik prototipe Bharata Command Center milik Direktur, mana yang datanya sudah ada, perlu dirakit, tipis, atau tidak ada di `marketing-analytics`, per halaman prototipe beserta endpoint yang melayaninya. Juga menjelaskan kenapa cakupan metrik iklan TikTok rendah sementara Shopee (GMS) lengkap, jebakan seperti `broad_order` vs `direct_order` dan `total_advertising_cost` yang bukan belanja iklan, serta kenapa ketiadaan cacah order di mart menghalangi AOV dan CPA.",
       "kata_kunci": [
         "audit ketersediaan data",
