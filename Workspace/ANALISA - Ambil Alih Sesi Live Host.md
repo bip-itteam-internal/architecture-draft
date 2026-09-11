@@ -23,7 +23,7 @@ median 239 menit (maksimum 450). Aturan +60 memotong 0 dari 45 sesi sah (molor t
 2,8 menit).
 
 **Keadaan 2026-09-12**: T1 di PROD. T2 dan T4 kodenya selesai dan sudah direview di dua branch
-yang **belum di-push** (rencana `.task-plans/2026-09-11-ambil-alih-sesi-live.md`). T3 batal.
+yang **belum merge** (bip-erp PR #1855, my-bharata PR #143; rencana `.task-plans/2026-09-11-ambil-alih-sesi-live.md`). T3 batal.
 Sisa: PR dan merge T2 lalu T4, deploy BE, rilis MyBharata, dan T5.
 
 ## Urutan & dependensi
@@ -93,7 +93,7 @@ sesi berjalan yang sudah lewat +60, jadi periksa sesi berjalan sebelum deploy.
 ## T2. BE: ambil alih oleh host terjadwal
 
 **Status 2026-09-12**: kode selesai di bip-erp branch `feat/marketing-analytics-ambil-alih`
-(7 commit `c2ba308a..b8b2e8c8`), sudah direview, **belum di-push**; `origin/main` sudah maju 36
+(7 commit `c2ba308a..b8b2e8c8`), sudah direview, **PR #1855 belum merge**; `origin/main` sudah maju 36
 commit dan merge-nya belum dicoba. Review menemukan satu cacat kritis yang sudah diperbaiki:
 eksekusi menulis ulang `jeda` dari snapshot yang dibaca sebelum panggilan attendance, sehingga
 Jeda/Lanjutkan yang ditekan pemegang di celah itu tertimpa; kini bersyarat posisional seperti
@@ -162,7 +162,7 @@ di penolakan) sudah merged, dan T2 sudah ter-deploy.
 ## T4. MyBharata: tombol Ambil alih + label riwayat + rilis
 
 **Status 2026-09-12**: kode selesai di my-bharata branch `feat/live-shift-ambil-alih`
-(versi 1.17.0+161), sudah direview, **belum di-push**; suite `test/features/live_shift/` 311
+(versi 1.17.0+161), sudah direview, **PR #143 ke `dev` belum merge**; suite `test/features/live_shift/` 311
 test hijau. Brief celah 1 mobile (`.task-plans/briefs/2026-09-11-pemegang-akun-409-mybharata.md`)
 dilebur ke sini, tidak dikerjakan sebagai brief terpisah. Review menghasilkan dua perbaikan: host
 yang dicatat untuk ambil alih kini diambil dari pilihan co-host yang sedang tampil, dan
