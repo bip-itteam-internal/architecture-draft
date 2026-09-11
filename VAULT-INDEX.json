@@ -2596,20 +2596,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "6a4834e9f8adba47a21af628e4e298e62dd9e7aef7b25fa8fd4a23fa2d7e095f",
-      "ukuran_kb": 119.3,
-      "ringkasan": "Menjawab: bagaimana marketing-analytics-service menghitung laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live dari integration_db ke koleksi mart_* miliknya, endpoint apa saja yang tersedia (beranda, ambang, pagu, kurva alokasi, live-shifts, KPI host live, analisis live), dan bagaimana vonis laba lima keadaan termasuk belum_matang ditentukan. Juga menjelaskan aturan pemakaian angka supaya tidak hitung ganda (iklan_sia_sia, pembatalan, 24h_live_gmv, tiga angka penjualan live), penjadwal sync 48 jam, pencatatan sesi live oleh host beserta tutup otomatis dan siaran serentak, serta penjaga baca-saja atas database service lain.",
+      "hash": "0eed6fad11ed9ce2386880e93318d3864dc4e11d8717de6b9ca7fb347f13ace3",
+      "ukuran_kb": 118.9,
+      "ringkasan": "Menjawab: bagaimana service agregasi laba dan performa marketing bekerja (membaca `integration_db` baca-saja dengan tiga lapis penjaga, menyimpan pre-agregasi di koleksi `mart_*`, penjadwal internal 48 jam, job sync, health degraded), channel apa yang didukung (TikTok, Shopee, Lazada) dan keterbatasan datanya. Juga menjawab aturan pemakaian angka supaya tidak hitung ganda (`iklan_sia_sia`, `pembatalan`, tiga angka penjualan live), logika vonis `belum_matang` beserta ambang materialitasnya, KPI Host Live, dan cara kerja pencatatan sesi live host termasuk siaran serentak, kepemilikan sesi, dan tutup otomatis.",
       "kata_kunci": [
         "marketing analytics",
-        "laba marketing",
+        "mart",
+        "laba",
         "profit attribution",
-        "mart_*",
-        "sesi live host",
-        "live-shifts",
-        "beranda vonis laba",
-        "ambang ROAS",
+        "sesi live",
+        "live host",
+        "TikTok",
+        "Shopee",
         "hitung ganda",
-        "TikTok Shopee"
+        "KPI Host Live"
       ]
     },
     {
@@ -3517,17 +3517,17 @@
       ],
       "hash": "1b4450528a3a66c85977fc7a5a618f8038aa515fa54eb219f4dfdda3828ba300",
       "ukuran_kb": 8.7,
-      "ringkasan": "Menjawab: apa usulan awal kontrak kerja elektronik lewat contract-service baru dengan tanda tangan tersertifikasi PSrE, e-KYC karyawan, dan e-Meterai Peruri via API berlisensi, keputusan mana yang menggantikannya (ADR 0089), dan apa selisih usulan itu terhadap modul riwayat kontrak di employee-service. Berguna untuk menelusuri alasan historis dan kendala legal (UU ITE, PP 71/2019, bea meterai) di balik rancangan tanda tangan kontrak.",
+      "ringkasan": "Menjawab: apa usulan awal kontrak kerja elektronik lewat jalur tersertifikasi (TTE dari PSrE, e-Meterai dari Peruri via API berlisensi, e-KYC karyawan, service baru contract-service) dan kenapa usulan itu digantikan ADR 0089 tanpa pernah diratifikasi. Juga menjawab kendala hukum TTE tersertifikasi dan bea meterai (meterai bukan syarat sah perjanjian), serta selisih antara usulan dan kenyataan kode, yaitu riwayat kontrak yang kini hidup di employee-service (koleksi employee_contract) alih-alih di service terpisah.",
       "kata_kunci": [
         "kontrak kerja elektronik",
         "e-signing",
-        "e-Meterai",
+        "tanda tangan elektronik tersertifikasi",
         "PSrE",
-        "TTE tersertifikasi",
+        "e-Meterai",
+        "Peruri",
         "e-KYC",
         "contract-service",
         "PKWT",
-        "tanda tangan digital",
         "superseded"
       ]
     },
@@ -6127,7 +6127,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** (2026-09-11). Arahnya disetujui 2026-09-11 lewat `/analisa-kebutuhan`; kode belum ada. §2 direvisi di hari yang sama: ambil alih meminta persetujuan pemegang dengan batas 30 detik, dan diam berarti setuju. Berdiri di atas pengukuran prod 2026-09-11 dan di atas [[Microservices - Marketing Analytics Service]] yang berstatus ⚠️ Implemented dengan catatan, bukan di atas dok konsep. Papan kerja: `Workspace/ANALISA - Ambil Alih Sesi Live Host.md` (tidak diterbitkan).",
+      "status_teks": "**Diusulkan** (2026-09-11). Arahnya disetujui 2026-09-11 lewat `/analisa-kebutuhan`; kode belum ada. Berdiri di atas pengukuran prod 2026-09-11 dan di atas [[Microservices - Marketing Analytics Service]] yang berstatus ⚠️ Implemented dengan catatan, bukan di atas dok konsep. Papan kerja: `Workspace/ANALISA - Ambil Alih Sesi Live Host.md` (tidak diterbitkan).",
       "publik": true,
       "tautan": [
         "Microservices - Marketing Analytics Service",
@@ -6142,20 +6142,20 @@
         "APP - Web ERP",
         "APP - MyBharata"
       ],
-      "hash": "25f26f447be0262991d85b0e7fde4a0dc9920ecb958a4759aa9b7b014e465a34",
-      "ukuran_kb": 22.3,
-      "ringkasan": "Menjawab: bagaimana host live yang ditolak 409 karena sesi sebelumnya ditinggal terbuka bisa mengambil alih akun (persetujuan pemegang berbatas 30 detik, diam berarti setuju), kapan sesi tertutup sendiri (jam berakhir shift + 60 menit), dan kenapa leader tetap tidak boleh menghentikan sesi orang lain. Memuat kronologi insiden 10 ke 11 September 2026, pengukuran prod atas pergantian host, dampaknya ke atribusi GMV dan perlu_koreksi, serta jejak riwayat dan notifikasi yang dicatat.",
+      "hash": "75baaa419c99bce458d2ec23f27493683158aa4fd4ce9d00e474a8c8633f6ec3",
+      "ukuran_kb": 18.4,
+      "ringkasan": "Menjawab: apa yang terjadi bila Sesi Live Host ditinggal terbuka dan menahan akun sehingga host berikutnya ditolak 409, bagaimana host yang jadwalnya sedang berjalan bisa mengambil alih akun itu, dan kapan sesi ditutup otomatis (jam berakhir shift + 60 menit). Juga menjawab kenapa leader tetap tak boleh menghentikan sesi orang lain, kenapa menambah pengganti ke `host[]` atau memakai jeda adalah jalan pintas yang salah, serta dampak ke atribusi GMV dan porsi KPI dari insiden 10 ke 11 September 2026.",
       "kata_kunci": [
         "ambil alih",
         "takeover",
-        "sesi live host",
+        "sesi live",
         "live shift",
         "tutup otomatis",
-        "auto-close",
+        "auto close",
         "akhir shift",
-        "409 akun live",
-        "atribusi GMV",
-        "MyBharata"
+        "409 akun terkunci",
+        "host live",
+        "ADR 0088"
       ]
     },
     {
@@ -6181,18 +6181,18 @@
       ],
       "hash": "4c01ac68fea1872440ce731ec1c3bed3ac09c6c2160b07c2e9df9dc30e785f6c",
       "ukuran_kb": 13.8,
-      "ringkasan": "Menjawab: bagaimana kontrak PKWT ditandatangani di sistem sendiri dengan tanda tangan elektronik tidak tersertifikasi berbasis PIN yang diverifikasi server dan terikat ke hash PDF, siapa yang membubuhkan e-Meterai (HR di portal distributor, di luar sistem), dan kenapa jalur PSrE, e-KYC, dan service baru ditolak. Juga menjawab prasyarat keamanan PIN yang wajib ditutup sebelum rilis, siapa Pihak Pertama (direktur per perusahaan), di mana arsip disimpan, dan kenapa pengingat kontrak habis dikerjakan terpisah lebih dulu.",
+      "ringkasan": "Menjawab: bagaimana kontrak PKWT ditandatangani di sistem sendiri (tanda tangan elektronik tidak tersertifikasi dengan PIN yang diverifikasi server, terikat ke hash PDF yang sudah dibubuhi e-Meterai oleh HR di luar sistem), kenapa jalur PSrE dan e-KYC ditolak, dan apa dasar hukumnya menurut UU ITE dan PP 71/2019. Juga menjawab prasyarat keamanan PIN yang wajib ditutup sebelum rilis (tanpa limiter, reset akun IT, device_id Android, akun direktur dipakai bersama Sekretariat), kenapa pengingat kontrak habis dikerjakan lebih dulu, dan kenapa logikanya menempel di modul kontrak employee-service dengan catatan tanda tangan hanya-tambah tanpa TTL.",
       "kata_kunci": [
-        "tanda tangan kontrak",
-        "e-signing",
-        "PIN",
+        "tanda tangan PIN",
+        "e-signature tidak tersertifikasi",
         "e-Meterai",
         "PKWT",
-        "TTE tidak tersertifikasi",
         "pengingat kontrak habis",
+        "contract expiry reminder",
+        "Pihak Pertama direktur",
         "Ruang Direktur",
-        "employee_contract",
-        "UU ITE"
+        "UU ITE PP 71/2019",
+        "employee_contract"
       ]
     },
     {
@@ -8036,18 +8036,18 @@
       ],
       "hash": "aeadae5f81890f034c259da5f2d1c0fa8020578a68c830a5531ba8e9b1c17639",
       "ukuran_kb": 23.2,
-      "ringkasan": "Menjawab: bagaimana alur kontrak kerja PKWT/PKWTT digital berjalan, dari draft berbasis template dan data HRIS, persetujuan isi oleh karyawan, e-Meterai oleh HR, sampai tanda tangan PIN karyawan dan direktur, serta pengingat sebelum kontrak berakhir. Memetakan pondasi modul riwayat kontrak di employee-service (employee_contract, nomor otomatis, lampiran PDF, status ongoing/ending/expired), celah yang harus ditutup (nomor tak unik, lampiran bisa diganti, karyawan tak bisa membuka kontraknya sendiri), prasyarat keamanan PIN, persona, pemetaan field template, dan hal yang belum diputuskan.",
+      "ringkasan": "Menjawab: bagaimana alur kontrak kerja digital berjalan dari template berbasis data HRIS, persetujuan isi oleh karyawan, pembubuhan e-Meterai oleh HR, sampai tanda tangan PIN karyawan dan direktur, siapa persona yang terlibat beserta RBAC-nya, dan bagaimana field template PKWT dipetakan ke sumber datanya. Juga menjawab pondasi apa yang sudah ada di kode (koleksi employee_contract, nomor kontrak otomatis, lampiran PDF, status ongoing/ending/expired, feed kalender contract_end, cron) serta celah yang harus ditutup lebih dulu, seperti nomor kontrak tidak unik, lampiran bisa diganti, karyawan belum bisa membuka kontraknya sendiri, dan belum ada pengingat kontrak habis.",
       "kata_kunci": [
-        "kontrak kerja",
-        "employment contract",
+        "kontrak kerja elektronik",
+        "e-signing",
+        "e-Meterai",
         "PKWT",
         "PKWTT",
-        "e-Meterai",
-        "e-signing",
-        "tanda tangan PIN",
         "employee_contract",
-        "kontrak habis",
-        "template PKWT"
+        "riwayat kontrak",
+        "nomor kontrak",
+        "lampiran PDF kontrak",
+        "Kontrak Saya"
       ]
     },
     {
@@ -12806,19 +12806,20 @@
         "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
         "API - Marketing Analytics Service"
       ],
-      "hash": "698b69a8e87440f8f862117526a3de853852300f91c4eb668a3a36e654139fda",
-      "ukuran_kb": 10.7,
-      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk ambil alih sesi live host dan tutup otomatis akhir shift (T0 sampai T6), bagaimana urutan dan dependensinya, apa kriteria selesai berbasis test tiap task, dan bagaimana urutan deploy BE sebelum web dan MyBharata. Juga menjelaskan kenapa istirahat bolak-balik host tidak dibangun terpisah, perbaikan jadwal host yang wajib dilakukan HR, dan apa yang sengaja di luar lingkup.",
+      "hash": "dcf8facfc698e9d03f34d196e48356b3bfe5afac7f5b5fd8f10e06e4157227f3",
+      "ukuran_kb": 8.3,
+      "ringkasan": "Menjawab: task apa saja yang diturunkan dari keputusan ambil alih sesi live dan tutup otomatis akhir shift (T0 sampai T6), bagaimana urutan dan dependensinya, siapa yang mengerjakan (HR untuk jadwal, backend, web, MyBharata), dan kriteria selesai serta catatan deploy tiap item. Juga menjawab apa yang sengaja di luar lingkup (koreksi `perlu_koreksi` lewat layar, batas keras sesi tanpa jadwal, leader mengakhiri sesi orang lain) dan langkah verifikasi lapangan lewat gateway.",
       "kata_kunci": [
+        "analisa kebutuhan",
         "ambil alih",
-        "takeover",
         "sesi live host",
         "tutup otomatis",
         "daftar task",
-        "analisa kebutuhan",
-        "live shift",
+        "rencana kerja",
+        "MyBharata",
+        "verifikasi lapangan",
         "jadwal host live",
-        "urutan deploy"
+        "ADR 0088"
       ]
     },
     {
@@ -13336,18 +13337,18 @@
       ],
       "hash": "50790edc921422a282d65941cc1aa3b28d47497dc979900fea0db1d3730c7c3a",
       "ukuran_kb": 7.6,
-      "ringkasan": "Menjawab: task apa saja yang diperlukan untuk tanda tangan kontrak kerja dengan PIN dan pengingat kontrak habis, dibagi per gelombang (pengingat, pengamanan PIN, pondasi dokumen, alur backend, layar MyBharata, Web ERP, dan Ruang Direktur), beserta prasyarat tiap task, catatan deploy, dan item non-kode (konfirmasi legal, SOP e-Meterai, pengukuran data prod). Juga mencatat jebakan yang menggagalkan rancangan naif dan task mana yang bisa dimulai lebih dulu atau paralel.",
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk tanda tangan kontrak PKWT dan pengingat kontrak habis, dalam urutan gelombang apa (T1 sampai T12 plus N1 sampai N3), apa prasyarat tiap task, dan task mana yang dimulai lebih dulu (T1 pengingat, bisa paralel dengan T2, T3, T5, T6, T8). Juga menjawab jebakan yang menggagalkan rancangan naif (verify-pin mencari akun dari body, reset akun IT, SetaraDirektur meloloskan Corporate Secretary, prefix employee/, Build.ID), catatan deploy per task, dan keputusan TBD yang menahan task tertentu.",
       "kata_kunci": [
-        "tanda tangan kontrak",
+        "analisa kebutuhan",
+        "daftar task kontrak",
         "pengingat kontrak habis",
         "contract reminder",
-        "PIN",
-        "e-Meterai",
-        "PKWT",
-        "daftar task",
-        "analisa kebutuhan",
-        "Ruang Direktur",
-        "Kontrak Saya"
+        "tanda tangan kontrak",
+        "limiter PIN",
+        "reset akun",
+        "konfirmasi legal",
+        "SOP e-Meterai",
+        "roadmap gelombang"
       ]
     },
     {
