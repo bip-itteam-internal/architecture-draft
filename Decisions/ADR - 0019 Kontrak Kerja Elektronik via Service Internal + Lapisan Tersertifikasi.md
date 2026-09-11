@@ -1,6 +1,6 @@
 ## ADR 0019 — Kontrak Kerja Elektronik: service internal + lapisan tersertifikasi (PSrE + e-Meterai) via API berlisensi
 
-- **Status**: ⛔ **Superseded** oleh [[ADR - 0089 Tanda Tangan Kontrak Kerja dengan PIN di Sistem Sendiri, e-Meterai Dibubuhkan HR]] (2026-09-11). Tak pernah diratifikasi. Pemilik proses memilih tanda tangan tidak tersertifikasi dengan PIN dan e-Meterai yang dibubuhkan HR, tanpa PSrE, e-KYC, maupun `contract-service`. Isi di bawah dipertahankan sebagai rekaman usulan.
+- **Status**: ⛔ **Superseded** oleh [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]] (2026-09-11). Tak pernah diratifikasi. Pemilik proses memilih tanda tangan tidak tersertifikasi dengan PIN dan e-Meterai yang dibubuhkan HR, tanpa PSrE, e-KYC, maupun `contract-service`. Isi di bawah dipertahankan sebagai rekaman usulan.
 - **Tanggal**: 2026-07-18 (revisi 2026-09-11)
 - **Konteks dok**: [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] · [[HRIS - Personalia]] · [[HRIS - Recruitment]] · [[Microservices - Employee Service]] · [[API - Employee Service]] · [[REF - Kepemilikan Data]] · [[CORE - HRIS Orchestrator]] · [[ADR - 0002 Database-per-Service]] · [[ADR - 0013 HRD Documents]]
 
