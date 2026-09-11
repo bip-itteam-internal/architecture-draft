@@ -360,20 +360,20 @@
         "Finance - Incentive",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "8b12e0819d664a1bc6a82a112e312574ba76a782b1242f7df7dff1733bd8df34",
-      "ukuran_kb": 8.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan insentive-service lewat gateway `/api/insentive/*`, parameter dan bentuk balasan dashboard profit (`/profit-dashboard`, `/profit-dashboard/saya`, `/saya/keanggotaan`), rute master data profit (org, targets, opex, distribusi), serta rute warisan skema KPI-multiplier yang masih terdaftar tetapi menolak. Juga menjawab apa arti `mode=bergeser`, kode status (400/401/403/502/503) yang dikembalikan tiap rute, siapa yang boleh menulis target per level, dan mengapa rute `/profit/internal-affiliates` dihapus.",
+      "hash": "0f96a7888efd47c3871783e197e471bdd91b039144bb31c052246bf347651281",
+      "ukuran_kb": 9.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki insentive-service untuk skema profit-based (dashboard insentif per level, insentif milik sendiri, keanggotaan level, struktur tim, target profit, dan opex), apa arti parameter seperti `mode=bergeser` dan `refresh=1`, serta status HTTP apa yang dibalas saat gagal. Juga menjelaskan siapa boleh menulis target profit, kapan cache dashboard dibuang, dan rute warisan skema KPI-multiplier yang kini menolak atau sudah dihapus.",
       "kata_kunci": [
         "insentif",
         "incentive",
         "insentive-service",
         "profit-dashboard",
-        "endpoint insentif",
+        "insentif saya",
         "target profit",
+        "opex",
+        "biaya operasional",
         "mode bergeser",
-        "keanggotaan",
-        "master kpi",
-        "results approve"
+        "API endpoint"
       ]
     },
     {
@@ -1450,9 +1450,9 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "fe0ba059680217f47afa58d5115c5a9e70ea8b5f6c5459c671da360f24fac8db",
-      "ukuran_kb": 407.9,
-      "ringkasan": "Menjawab: apa itu portal web One Bharata (erp-frontend), stack yang dipakai, bagaimana login, SSO identity provider, dan gating menu berdasarkan system_roles bekerja, serta bagaimana menu HRIS dan halaman Pengaturan HRGA dikelompokkan dan disaring per tab. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts/ChartContainer, dukungan multi-perusahaan, dan daftar modul yang sudah maupun belum diimplementasikan.",
+      "hash": "de60ae24ec19b5e306cc60ef71c0600fc7004e7f0b4df172a12f4975f41c0617",
+      "ukuran_kb": 408.9,
+      "ringkasan": "Menjawab: apa itu portal web One Bharata (erp-frontend) dan stack-nya, bagaimana login, refresh token, dan SSO Identity Provider bekerja, serta bagaimana sidebar dan menu digerbang lewat `system_roles` per modul. Juga menjelaskan fitur multi-perusahaan (pemilih perusahaan, kelola shift/WiFi per perusahaan), pengelompokan menu HRIS dan halaman Pengaturan HRGA beserta penyaringan per tab, konvensi data-fetching TanStack Query, dan konvensi bagan Recharts.",
       "kata_kunci": [
         "Web ERP",
         "erp-frontend",
@@ -1460,10 +1460,10 @@
         "hris-dashboard",
         "SSO",
         "system_roles",
-        "sidebar menu",
+        "RBAC sidebar",
+        "multi-tenant",
         "Pengaturan HRGA",
-        "TanStack Query",
-        "Recharts"
+        "TanStack Query"
       ]
     },
     {
@@ -2320,6 +2320,7 @@
         "API - Insentive Service",
         "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
         "Microservices - Inventory Service",
+        "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "APP - Web ERP",
         "IT - Background Jobs & Schedulers",
         "Microservices - Marketing Analytics Service",
@@ -2327,24 +2328,23 @@
         "External - Accurate",
         "CORE - API Master Gateway",
         "Finance - Incentive",
-        "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "Sales - Incentive",
         "HRIS - Key Performance Index"
       ],
-      "hash": "fa613684bd8b94e4d4d0f4ae8bb9e63b185a8a6569de72d8a36b553897d36469",
-      "ukuran_kb": 19.7,
-      "ringkasan": "Menjawab: bagaimana insentif tim marketing dihitung dengan skema profit-based (rumus profit, tangga tarif per pencapaian, gerbang retur 7%, target per level ICC, Leader, Supervisor), dari mana tiap komponen angkanya ditarik (integration, payroll, Accurate, inventory), dan mengapa dashboard di-cache serta di-pre-warm. Juga menjawab siapa yang boleh menulis master data profit dan target, bagaimana hierarki Leader dan Supervisor diturunkan dari HRIS, beda jendela periode insentif (hangus) dan KPI (bergeser), rute warisan yang menolak, serta apa yang masih menahan angka dipakai untuk membayar.",
+      "hash": "a2ac9e70255b3de2ad974d59ecb1af72450697772441f42b1ae168432d2dbe69",
+      "ukuran_kb": 23.4,
+      "ringkasan": "Menjawab: bagaimana insentive-service menghitung insentif profit-based (rumus profit, tangga tarif, gerbang retur 7%, target yang dibagi turun Supervisor ke Leader dan ICC) dan dari mana ia menarik data (integration, payroll, Accurate). Juga menjelaskan cache dashboard dan pre-warm, perbedaan jendela periode insentif (hangus) vs KPI (bergeser), penurunan Leader/Supervisor dari hierarki HRIS, gerbang penulisan master data, serta catatan yang belum selesai.",
       "kata_kunci": [
         "insentif",
         "incentive",
-        "insentive-service",
+        "insentive service",
         "profit-based",
         "tarif insentif",
         "gerbang retur",
-        "target profit",
-        "ICC leader supervisor",
-        "biaya operasional",
-        "cache dashboard"
+        "ICC Leader Supervisor",
+        "cache dashboard",
+        "hierarki HRIS",
+        "target profit"
       ]
     },
     {
@@ -3997,7 +3997,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Accepted** — 2026-08-02, **diamandemen 2026-08-26**: hierarki beban berjenjang (SPV pakai proyek divisi saja) sudah diputuskan tetapi **belum diimplementasikan** — kode masih mencocokkan `employee_id` untuk semua level, sehingga proyek SPV tak ditemukan. Lihat §Consequences. Terkait: [[ADR - 0001 Akuntansi via Accurate]], [[ADR - 0002 Database-per-Service]], [[Microservices - Insentive Service]].",
+      "status_teks": "**Accepted** — 2026-08-02, **diamandemen 2026-08-26**: hierarki beban berjenjang (SPV pakai proyek divisi saja) sudah diputuskan tetapi **belum diimplementasikan** — kode masih mencocokkan `employee_id` untuk semua level, sehingga proyek SPV tak ditemukan. **Pembaruan 2026-09-04**: beban tanggungan Leader/SPV kini di kode dengan mekanisme berbeda (bip-erp [#1706](https://github.com/bip-itteam-internal/bip-erp/pull/1706)). Lihat §Consequences. Terkait: [[ADR - 0001 Akuntansi via Accurate]], [[ADR - 0002 Database-per-Service]], [[Microservices - Insentive Service]].",
       "publik": true,
       "tautan": [
         "ADR - 0001 Akuntansi via Accurate",
@@ -4010,22 +4010,20 @@
         "Microservices - Integration Service",
         "API - Integration Service"
       ],
-      "hash": "880dc4c8f046729b907d5b38a0744e42c3524ad72170266c4990c42c31ecfb04",
-      "ukuran_kb": 6.5,
-      "ringkasan": "Menjawab: dari mana angka Biaya Operasional pada rumus insentif profit-based diambil, yaitu beban karyawan dari Payroll Service dan beban non-gaji dari saldo GL akun 6000 per proyek di Accurate. Menjelaskan mengapa filternya wajib projectNo dan bukan projectName, akun mana saja yang dikecualikan agar tidak dobel hitung beserta alasannya, dan mengapa hasilnya disalin lokal 12 jam. Memuat amandemen hierarki beban berjenjang: SPV memakai proyek divisi saja, Leader dan Account Specialist memakai proyek ber-employee_id.",
+      "hash": "3bba31f52d6a60b8cd1e6bf27f5fa907f84aab93e87d63b6d07268ef7bffa26f",
+      "ukuran_kb": 7.6,
+      "ringkasan": "Menjawab: dari mana biaya operasional dalam rumus insentif diambil (beban karyawan dari payroll `employer-cost`, beban non-gaji dari saldo proyek Accurate), kenapa filter wajib `projectNo` bukan `projectName`, dan akun beban mana yang dikecualikan supaya tidak dihitung ganda. Juga menjelaskan amandemen hierarki beban berjenjang Supervisor/Leader/Account Specialist, risiko hitung ganda proyek divisi, dan konsekuensi data proyek yang belum terisi.",
       "kata_kunci": [
+        "ADR 0033",
         "biaya operasional",
         "opex",
         "beban non-gaji",
-        "Accurate",
+        "proyek Accurate",
         "projectNo",
-        "glaccount get-balance",
-        "akun 6000",
-        "dobel hitung",
+        "akun dikecualikan",
         "employer cost",
-        "payroll",
-        "insentif",
-        "ADR 0033"
+        "hitung ganda",
+        "insentif profit"
       ]
     },
     {
@@ -6401,20 +6399,20 @@
         "Finance - Bridging App",
         "HRIS - Compensation & Benefits"
       ],
-      "hash": "9daef5ea53de5dc19c0dc86a17028dee5931bb5fec2b1b0e772e9285e9db02be",
-      "ukuran_kb": 31.5,
-      "ringkasan": "Menjawab: bagaimana skema insentif marketing yang berlaku (profit-based per SK 010 dan 011/2026) menghitung insentif dari profit, tabel tarif per pencapaian target, aturan retur 7%, dasar uang cair, dan aturan hangus tanggal 25 bulan berikutnya. Juga menjawab siapa yang boleh melihat tiap layar insentif (Dashboard, Master Data, Insentif Saya, Panduan, rincian beban karyawan), bagaimana membaca layarnya (cache, toko tanpa penjualan, periode belum final), serta riwayat skema lama per jabatan (SPV, ADV, ICC, Host Live, Affiliator, CS, CRM) yang sudah dicabut.",
+      "hash": "249f779c152b4ea63524dafc86df5f37241ad6446957f7885f79d0c7bdbd9c04",
+      "ukuran_kb": 33.4,
+      "ringkasan": "Menjawab: bagaimana aturan bisnis insentif marketing yang berlaku menurut SK 010 & 011/2026 (rumus profit, tabel tarif per pencapaian, gerbang retur 7%, siapa mengetik target, dan order yang hangus setelah tanggal 25), serta siapa boleh melihat Dashboard, Master Data, dan Insentif Saya. Juga membantu membaca layar insentif yang tampak salah (cache, toko tanpa penjualan, bulan bawaan) dan menyimpan riwayat skema KPI-multiplier lama per jabatan yang sudah dicabut.",
       "kata_kunci": [
         "insentif",
         "incentive",
-        "insentif marketing",
-        "SK 010 011",
-        "tarif profit",
-        "retur 7%",
-        "uang cair",
+        "SK 010",
+        "SK 011",
+        "tarif insentif",
+        "target profit",
+        "gerbang retur 7%",
         "Insentif Saya",
-        "menu insentif profit",
-        "ICC ADV SPV"
+        "menu terbatas",
+        "ICC Leader Supervisor"
       ]
     },
     {
