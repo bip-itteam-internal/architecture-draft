@@ -1,4 +1,4 @@
-> **Status**: ⚠️ **Diterima, T1+T2 terimplementasi di branch** `feat/form-builder-satgas-kepatuhan` (bip-erp, 4 commit di atas `main` f1bc2314), **belum merge, belum deploy, belum diuji lewat gateway**. T3 sampai T7 belum dikerjakan. Rincian di `## Deskripsi`.
+> **Status**: ⚠️ **Diterima, T1+T2 terimplementasi di branch** `feat/form-builder-satgas-kepatuhan` (bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849), dibuka 2026-09-11), **belum merge, belum deploy, belum diuji lewat gateway**. T3 sampai T7 belum dikerjakan. Rincian di `## Deskripsi`.
 
 ## Untuk Manajemen
 
@@ -26,7 +26,7 @@ Dokumentasi inspeksi Satgas 5R & K3 pindah dari Google Form dan WhatsApp ke apli
 
 *Inspeksi Satgas 5R & K3 memakai Form Builder (tipe `evaluation`, yang dinilai Office Boy dan Security) dengan satu penanda form yang dibaca tiga pihak: MyBharata (menu khusus, bukan daftar survei), gerbang pengisian di server, dan satu sumber KPI per orang yang memakai **jawaban terakhir dalam periode**, bukan rata-rata. Menu dan pengisian digerbang modul izin baru yang tertutup sejak awal. Menyimpang dari jalur KPI form yang sudah ada (`service_team_index` ke `nilai_layanan_pribadi`), karena jalur itu melebur seluruh form bertanda di satu departemen dan merata-ratakan jawaban.*
 
-- **Status**: ⚠️ **Diterima, T1+T2 terimplementasi di branch** `feat/form-builder-satgas-kepatuhan`, belum merge dan belum deploy. Daftar task: `Workspace/ANALISA - Inspeksi Satgas 5R dan K3.md`
+- **Status**: ⚠️ **Diterima, T1+T2 terimplementasi di branch** `feat/form-builder-satgas-kepatuhan` (PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)), belum merge dan belum deploy. Daftar task: `Workspace/ANALISA - Inspeksi Satgas 5R dan K3.md`
 - **Path di repo**:
   - bip-erp, **T1+T2 (di branch)**: `shared-library/common/catalog_kepatuhan.go` · `shared-library/models/employee/permission_set.go` · `services/employee/permission_catalogs.go` · `services/form-builder/models_form.go` · `services/form-builder/validate.go` · `services/form-builder/satgas_gate.go` · `services/form-builder/satgas_me.go` · `services/form-builder/permission_gate.go` · `services/form-builder/response_handlers.go` · `services/form-builder/uploads.go` · `services/form-builder/form_handlers.go` · `services/form-builder/routes.go`
   - bip-erp, **T3 (baru, belum ada)**: pembaca nilai Satgas di form-builder + `services/employee/kpi_sumber_<satgas>.go`
