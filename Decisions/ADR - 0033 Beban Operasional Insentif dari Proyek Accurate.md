@@ -1,6 +1,6 @@
 # ADR - 0033 Beban Operasional Insentif dari Proyek Accurate
 
-**Status**: ⚠️ **Accepted** — 2026-08-02, **diamandemen 2026-08-26**: hierarki beban berjenjang (SPV pakai proyek divisi saja) sudah diputuskan tetapi **belum diimplementasikan** — kode masih mencocokkan `employee_id` untuk semua level, sehingga proyek SPV tak ditemukan. Lihat §Consequences. Terkait: [[ADR - 0001 Akuntansi via Accurate]], [[ADR - 0002 Database-per-Service]], [[Microservices - Insentive Service]].
+**Status**: ⚠️ **Accepted** — 2026-08-02, **diamandemen 2026-08-26**: hierarki beban berjenjang (SPV pakai proyek divisi saja) sudah diputuskan tetapi **belum diimplementasikan** — kode masih mencocokkan `employee_id` untuk semua level, sehingga proyek SPV tak ditemukan. **Pembaruan 2026-09-04**: beban tanggungan Leader/SPV kini di kode dengan mekanisme berbeda (bip-erp [#1706](https://github.com/bip-itteam-internal/bip-erp/pull/1706)). Lihat §Consequences. Terkait: [[ADR - 0001 Akuntansi via Accurate]], [[ADR - 0002 Database-per-Service]], [[Microservices - Insentive Service]].
 
 ## Context
 
@@ -68,6 +68,8 @@ Daftar beserta alasan tiap akun ada di `integration/internal/usecase/incentive_o
   Konsekuensinya SPV memakai proyek divisi **SAJA** — menjumlahkannya dengan proyek anggota berarti **hitung ganda**. Terukur prod 2026-08-26: `BIP - BH` induk Rp1.102.150.289 vs jumlah 40 proyek anggota Rp55.960.681, **20× lebih besar**; proyek divisi memang memuat beban yang tidak ada di proyek per orang.
 
   ⛔ **Kode belum mengikuti.** `ambilOpexAccurate` mencocokkan `employee_id` ke kode proyek untuk semua level, sehingga Aris Romadhoni (SPV Beauty Hacks) berstatus `proyek_tak_dikenal`. Maftuhissaiin (SPV Kyura) lolos dengan nilai **0** karena kebetulan ada proyek ber-kode `employee_id`-nya — **gagal diam-diam**, dan itu lebih berbahaya daripada yang gagal terang-terangan. Belum diverifikasi: berapa `bersih` proyek divisi setelah 14 akun kecualian dibuang — Rp1,1 M itu saldo **induk**, dan pada proyek per-orang 98% terbuang (Rp56 jt induk → Rp1,17 jt bersih).
+
+  **Pembaruan 2026-09-04 — di kode, dengan mekanisme berbeda.** `ambilOpexAccurate` kini hanya jalur cadangan; beban non-gaji utama datang dari beban marketing per orang yang sudah membagi proyek divisi ke anggotanya (`bagi_rata`, [[Microservices - Insentive Service]] §Biaya operasional). Di atasnya `AnggotaBebanOpex` (bip-erp [#1706](https://github.com/bip-itteam-internal/bip-erp/pull/1706)) menjumlahkan gaji, non-gaji, dan penyusutan per orang atas himpunan tanggungan: Leader = dirinya + anggota ICC; Supervisor = dirinya + tiap leader + anggota leader + ICC langsung. Supervisor **tidak** membaca proyek divisi sebagai satu angka seperti tabel di atas; beban divisi sampai ke SPV karena sudah terbagi ke orang-orang yang ia tanggung, sehingga tidak dihitung ganda. Belum diverifikasi ulang sejak pembaruan: apakah total beban SPV kini setara nilai `bersih` proyek divisinya.
 - **Tiga akun dikecualikan secara konservatif** (6202, 6204, 6205). Bila ternyata bukan bagian payroll, biaya tercatat terlalu kecil → profit dan insentif terbayar lebih besar dari seharusnya. Menunggu konfirmasi finance.
 - Menambah ketergantungan runtime insentif → integration → Accurate. Kegagalannya ditangani sebagai peringatan baris, bukan kegagalan dashboard.
 
