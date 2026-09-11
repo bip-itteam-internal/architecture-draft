@@ -322,6 +322,7 @@ bersifat global. Pipeline: `$unwind → $group by advertiser_id` untuk deduplika
 | **9** | Edit mapping yang sudah ada: ganti toko/advertiser per channel, pemegang, dan tim tanpa deaktivasi+assign ulang (lihat `PATCH /icc/mappings/:id` di atas) | ✅ Selesai — Backend (`feat/icc-mapping-edit`) + Frontend (`feat/icc-mapping-edit-ui`) sudah ter-merge ke `main` |
 | **10** | Advertiser TikTok Ads boleh dipegang >1 karyawan aktif: index diganti dari unique global jadi unique per-pasangan `(tiktok_advertiser_id, employee_id)`, `available-advertisers` tak lagi menyaring yang sudah assigned. Toko/Shopee/Lazada TETAP 1:1 (tidak diubah) | ✅ Selesai (2026-08-26), branch `feat/icc-advertiser-shared` |
 | **11** | Karyawan berposisi **Marketplace Advertiser** dipisah dari tab "Toko & Iklan" ke tab baru **"Marketplace Adv"** (pindah eksklusif, bukan duplikat) — lihat [[#Tab "Marketplace Adv" — Marketplace Advertiser dipisah dari Toko & Iklan]] | ✅ Selesai (2026-09-06), branch `feat/icc-marketplace-adv-tab` |
+| **12** | Kartu "Langsung di bawah SPV" disembunyikan dari tab **"Toko & Iklan"** begitu bagian Account Specialist-nya (`kelompok`) kosong — simetris dengan penyaringan yang sudah ada di tab Marketplace Adv (lihat [[#Tab "Marketplace Adv" — Marketplace Advertiser dipisah dari Toko & Iklan]]) | ✅ Selesai (2026-09-11), branch `feat/icc-sembunyikan-tanpa-leader-tab-toko` |
 
 ---
 
@@ -425,6 +426,23 @@ ICC Management (departemen = Kyura, Beauty Hacks, ...)
 > kandidatnya tidak dibatasi ke posisi ICC. Lihat [[#Tab "Marketplace Adv" —
 > Marketplace Advertiser dipisah dari Toko & Iklan]] untuk kelanjutannya.
 
+> ⚠️ **Susulan (Fase 12, 2026-09-11)**: diagram di atas sudah TIDAK akurat untuk tab
+> "Toko & Iklan" — kartu "Langsung di bawah SPV" sejak Fase 12 **disembunyikan** dari
+> tab itu bila bagian Account Specialist-nya (`kelompok`) kosong. Alasannya: karyawan
+> yang mendarat di kartu ini SELALU Marketplace Advertiser sejauh yang pernah terjadi
+> di data produksi (siapa pun berposisi ICC otomatis membuat atasan langsungnya jadi
+> kartu "leader" sendiri, lihat `susunTimLeader` — satu-satunya jalan ICC asli mendarat
+> di sini adalah `supervisor_id` kosong total di HRIS, celah data, bukan kasus "lapor ke
+> SPV"). Begitu tab "Marketplace Adv" berdiri sendiri (Fase 11), kartu ini jadi selalu
+> kosong di tab "Toko & Iklan" — dan tetap tampil kosong sampai Fase 12 menyamakan
+> aturannya dengan tab Marketplace Adv (yang sudah lebih dulu menyembunyikan kartu
+> kosong, lihat bagian Marketplace Adv di bawah). Logika penyaringan kini satu fungsi
+> murni teruji, `saringKartuUntukTab` (`kartu-leader.ts`) — dipakai `page.tsx`
+> menggantikan `.filter()` inline yang sebelumnya cuma menutup kasus tab Marketplace
+> Adv. Kartu ini tetap ADA & berfungsi penuh di tab Marketplace Adv, dan otomatis
+> muncul lagi di tab Toko & Iklan begitu `kelompok`-nya benar-benar terisi (bukan celah,
+> perilaku yang disengaja).
+
 Ikon **✎ (Ubah)** di tiap baris membuka dialog assign yang sama dalam mode edit — lihat kemampuan edit mapping di bagian `PATCH /icc/mappings/:id` di atas.
 
 ### Aturan pengelompokan (`hierarki-leader.ts` + `kartu-leader.ts`)
@@ -509,6 +527,10 @@ bawah seorang Leader di data nyata), tab "Marketplace Adv" secara praktis hanya 
 menampilkan kartu "Langsung di bawah SPV" — kartu jenis "leader" yang
 `kelompokMarketplaceAdv`-nya kosong disembunyikan dari tab ini (prinsip sama dengan
 kartu "Langsung di bawah SPV" yang juga tak dibuat bila tak ada isinya sama sekali).
+Prinsip yang sama diperluas ke ARAH SEBALIKNYA di Fase 12: tab "Toko & Iklan" kini
+menyembunyikan kartu "tanpa-leader" ini bila `kelompok`-nya (bagian Account Specialist)
+yang kosong — lihat catatan susulan di
+[[#Bentuk saat ini: kartu per leader di dalam tiap departemen]].
 
 ### Tombol Assign & alur kerja tidak berubah
 
