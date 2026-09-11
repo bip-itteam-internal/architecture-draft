@@ -617,7 +617,7 @@ Koleksi **`form_templates`** (`Collections.Templates`) menyimpan **cetakan** for
 
 > PR [#1023](https://github.com/bip-itteam-internal/bip-erp/pull/1023) + [#1057](https://github.com/bip-itteam-internal/bip-erp/pull/1057), ✅ **live dev + prod 2026-08-06 dan TERUJI end-to-end di dev**. Berlaku **semua tipe form**, bukan cuma Kaizen.
 >
-> ⚠️ **Baru terpakai di BACKEND (diperiksa ke kode 2026-09-11).** Editor web tak bisa membuat field `file` (`erp-frontend/src/features/form-builder/types/form.ts:17-37` tak memuat tipenya, komentarnya menyebut "fase 2"), dan MyBharata tak bisa mengisinya (`lib/src/features/form/domain/entities/survey_field.dart:8-21`, jatuh ke `unknown`). Uji end-to-end di bawah dijalankan langsung ke API, bukan lewat klien. Akibatnya tak satu pun layar bisa memakai kemampuan ini, termasuk tipe `report` yang justru mewajibkan field berkas. Batas yang perlu diketahui perancang: satu field berisi satu `upload_id` (`validate.go:590-601`), jadi banyak berkas berarti beberapa field; jenis berkas tidak diperiksa server. Rencana klien: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
+> ⚠️ **Klien baru sebagian (diperiksa ke kode 2026-09-11).** Editor web kini bisa membuat field `file`, dan pengelola membuka lampirannya dari tab Individu dan Pertanyaan analitik (T4 ADR 0090, **di branch** erp-frontend `feat/form-builder-satgas-editor` + bip-erp `feat/form-builder-analitik-berkas`, belum PR). MyBharata masih tak bisa mengisinya (`lib/src/features/form/domain/entities/survey_field.dart:8-21`, jatuh ke `unknown`) sampai T6, jadi editor **menolak pertanyaan berkas yang wajib** sampai saat itu, dan uji end-to-end di bawah tetap dijalankan langsung ke API. Tipe `report` yang mewajibkan field berkas masih tak bisa dibuat dari editor. Batas yang perlu diketahui perancang: satu field berisi satu `upload_id` (`validate.go`, cabang `FieldFile` di `validateAnswerValue`), jadi banyak berkas berarti beberapa field; jenis berkas tidak diperiksa server, dan objeknya tersimpan `application/octet-stream` sehingga PDF mungkin terunduh alih-alih tampil (belum diuji). Rencana klien: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
 
 **Unggah dulu, kirim jawaban kemudian.** Satu jawaban dikirim sebagai satu JSON, jadi berkas tak bisa ikut di dalamnya. `POST /me/forms/:id/uploads` (multipart) membalas `upload_id`, dan id itulah yang jadi **nilai jawaban** untuk field bertipe `file`.
 
@@ -628,6 +628,8 @@ Berkasnya sendiri tinggal di [[Microservices - File Service]] dengan prefix **`f
 **`FILE_MODULE_URL` dan `MINIO_FORM_KEY` dibaca `os.Getenv` langsung, di luar map `InternalURL`.** `ValidateInternalURL` panic pada entri kosong, jadi menaruhnya di sana berarti seluruh service mati — termasuk gerbang presensi dan pengisian form biasa — hanya karena env satu fitur belum diisi. Selama env belum ada, unggahan gagal dengan pesan "file-service belum dikonfigurasi" sementara sisa service tetap jalan.
 
 **Export CSV menulis path preview, bukan presigned URL**: presigned URL kedaluwarsa dalam hitungan menit sementara berkas export dibaca berhari-hari kemudian.
+
+**Analisa mengirim `file_fields`, terpisah dari `fields`** (⚠️ di branch `feat/form-builder-analitik-berkas`, belum merge). `aggregateResponses` mengeluarkan berkas dari `fields` karena kartu ringkasan atas deretan id unggahan tak berguna, tetapi tanpa daftar kedua klien tak tahu pertanyaan mana yang berisi lampiran, dan tab Individu serta Pertanyaan yang mengulang `fields` tak pernah menampilkannya. `file_fields` `[{key,label}]` diambil dari susunan pertanyaan periode yang sama dengan `fields`, urut sesuai form, dan **absen** pada form tanpa berkas. Nilainya sendiri tetap dibaca dari `/forms/:id/responses` dan dibuka lewat `GET /forms/:id/uploads/:uploadId/preview`.
 
 ### Hasil uji end-to-end di dev (2026-08-06)
 
@@ -644,7 +646,7 @@ Objeknya benar-benar mendarat di prefix `form/` — bagian yang paling mungkin d
 
 ## Inspeksi Satgas 5R & K3 (penanda `inspeksi_satgas`)
 
-> **Status**: ⚠️ **T1+T2 terimplementasi di branch `feat/form-builder-satgas-kepatuhan`** (bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)), **belum merge, belum deploy, belum diuji lewat gateway**. Skor dan KPI dari cek ulang (T3), editor dan rekap web (T4/T5), dan menu MyBharata (T6) belum dikerjakan. Keputusan dan alasannya: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]]. Daftar task: `Workspace/ANALISA - Inspeksi Satgas 5R dan K3.md`.
+> **Status**: ⚠️ **T1+T2 merged 2026-09-11** (bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)), **deploy belum diukur, belum diuji lewat gateway**. Editor web (sakelar penanda, field foto, lampiran di analitik) **di branch** (T4, belum PR). Skor dan KPI dari cek ulang (T3), rekap web (T5), dan menu MyBharata (T6) belum dikerjakan. Keputusan dan alasannya: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]]. Daftar task: `Workspace/ANALISA - Inspeksi Satgas 5R dan K3.md`.
 
 Petugas OD & Industrial Relation menilai Office Boy dan Security lewat form `evaluation` (sasaran `positions`, berulang bulanan) dengan foto temuan dan foto perbaikan. Temuan dicek ulang beberapa hari kemudian, dan **nilai KPI bulan itu diambil dari cek ulang**.
 
@@ -742,7 +744,7 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 > Perbaikannya memakai **reflection** (`reflect.Kind() == Slice`), bukan mendaftar tipe satu per satu, supaya bentuk lain ikut tertangani.
 >
 > **Pelajaran yang berlaku untuk service mana pun di repo ini:** 122 unit test service ini semuanya hijau saat bug ini hidup, karena setiap fixture dirakit tangan sebagai `[]interface{}` dan tak satu pun melewati BSON. Uji dengan data buatan sendiri **tidak** menguji lapisan decode database. Regresinya dikunci di `bson_values_test.go` memakai `primitive.A` asli.
-- **Upload file** belum didukung (menyusul via [[Microservices - File Service]], cap 4 MB).
+- ~~**Upload file** belum didukung~~: basi, sudah ada sejak 2026-08-06 lewat [[Microservices - File Service]] (cap 4 MB). Lihat butir ✅ di bawah dan §Lampiran berkas.
 - **Logika percabangan** (lompat seksi berdasarkan jawaban) belum ada.
 
 > [!warning] ⛔ CATATAN INI SUDAH BASI, dipertahankan karena isi selebihnya masih berlaku
