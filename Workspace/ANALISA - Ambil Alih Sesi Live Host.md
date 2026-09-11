@@ -22,21 +22,25 @@ akun yang sama. Bila pemegang lupa dan jalannya hanya tutup otomatis, host berik
 median 239 menit (maksimum 450). Aturan +60 memotong 0 dari 45 sesi sah (molor terbesar
 2,8 menit).
 
+**Keadaan 2026-09-12**: T1 di PROD. T2 dan T4 kodenya selesai dan sudah direview di dua branch
+yang **belum di-push** (rencana `.task-plans/2026-09-11-ambil-alih-sesi-live.md`). T3 batal.
+Sisa: PR dan merge T2 lalu T4, deploy BE, rilis MyBharata, dan T5.
+
 ## Urutan & dependensi
 
 ```
 T1 (BE: tutup otomatis +60) ────────────────────────────┐
 T2 (BE: ambil alih) ─┬─> T3 (web: BATAL, ADR 0091) ─────┼─> T5 (verifikasi lapangan)
                      └─> T4 (MyBharata: tombol + rilis) ┘
-brief celah 1 web ─────> T3      brief celah 1 mobile ──> T4
+brief celah 1 mobile dilebur ke T4; brief celah 1 web gugur bersama T3
 T0 (HR: jadwal) paralel, non-kode, wajib selesai sebelum T5
 ```
 
 ⚠️ **T1 berdiri sendiri dan naik lebih dulu.** Ia kecil, tanpa env baru, dan sendirian sudah
 mencegah kejadian 10 ke 11 September.
 
-⚠️ **Deploy BE sebelum klien** untuk T2 (kontrak bertambah). T3 dan T4 juga menunggu brief
-celah 1 masing-masing, karena tombol Ambil alih tinggal di layar penolakan yang dibangun brief itu.
+⚠️ **Deploy BE sebelum klien** untuk T2 (kontrak bertambah). Tombol Ambil alih tinggal di layar
+penolakan yang semula dibangun brief celah 1; untuk mobile brief itu dikerjakan di dalam T4.
 
 ---
 
@@ -88,6 +92,17 @@ sesi berjalan yang sudah lewat +60, jadi periksa sesi berjalan sebelum deploy.
 
 ## T2. BE: ambil alih oleh host terjadwal
 
+**Status 2026-09-12**: kode selesai di bip-erp branch `feat/marketing-analytics-ambil-alih`
+(7 commit `c2ba308a..b8b2e8c8`), sudah direview, **belum di-push**; `origin/main` sudah maju 36
+commit dan merge-nya belum dicoba. Review menemukan satu cacat kritis yang sudah diperbaiki:
+eksekusi menulis ulang `jeda` dari snapshot yang dibaca sebelum panggilan attendance, sehingga
+Jeda/Lanjutkan yang ditekan pemegang di celah itu tertimpa; kini bersyarat posisional seperti
+tutup otomatis. Keputusan perencanaan: permintaan disimpan di dokumen sesi lama; pemegang tahu
+lewat `GET /live-shifts/ambil-alih/menunggu` yang dipoll 3 detik; eksekusi karena diam dipicu
+pembacaan status oleh peminta dengan tenggang 20 detik sesudah batas; pemberitahuan atasan
+ditunda. Belum dipanggil lewat gateway DEV (butuh satu baris `department_shops` di Mongo DEV
+dan dua akun uji yang jadwalnya sedang berjalan).
+
 - Permintaan membawa **id sesi yang ditampilkan** di layar penolakan; bila pemegangnya sudah
   berganti, jawabannya 409 baru.
 - Gerbang: lolos `RequireLiveShiftUser`, penekan termasuk host sesi baru, jadwalnya
@@ -103,8 +118,9 @@ sesi berjalan yang sudah lewat +60, jadi periksa sesi berjalan sebelum deploy.
 - Eksekusi: gerbang diperiksa ulang; sesi lama `selesai` = detik eksekusi, jeda terbuka ikut
   ditutup, filter `selesai: null` (yang kalah balapan menerima 409); jejak siapa yang
   mengakhiri, alasan `ambil_alih`, dan cara persetujuan; sesi baru dimulai pada instan yang sama.
-- Pemberitahuan sesudah eksekusi ke seluruh host sesi lama dan atasan langsung mereka;
-  best-effort, kegagalan mencari atasan tidak menggagalkan ambil alih.
+- Pemberitahuan sesudah eksekusi ke seluruh host sesi lama; best-effort. Pemberitahuan ke
+  atasan langsung **ditunda** (keputusan 2026-09-11, revisi ADR 0088 §5): resolver atasan per
+  karyawan belum ada.
 - `bolehKelolaSesi` **tidak** diubah.
 
 ⚠️ Dua tulisan, bukan satu transaksi: bila sesi lama sudah tertutup tetapi sesi baru kalah
@@ -118,8 +134,8 @@ seketika, Tolak menggugurkan, diam 30 detik menjalankan; peminta yang sudah perg
 sesinya; pemegang yang menekan Akhiri selagi menunggu tidak menghasilkan 500; `selesai` sesi
 lama sama dengan `mulai` sesi baru; leader tetap 403 di `PATCH /:id/selesai`.
 
-**Deploy**: BE sebelum MyBharata (tombol web batal, lihat T3). Env baru untuk mencari atasan di employee-service
-berarti `up -d --force-recreate marketing-analytics-service`, bukan restart.
+**Deploy**: BE sebelum MyBharata (tombol web batal, lihat T3). Tanpa env baru sejak pemberitahuan
+atasan ditunda, dan tanpa kategori inbox baru: cukup `marketing-analytics-service`.
 
 **Mulai**: `jalankan /start-task Ambil alih sesi Sesi Live Host oleh host terjadwal (ADR 0088 §2)`
 
@@ -145,18 +161,27 @@ di penolakan) sudah merged, dan T2 sudah ter-deploy.
 
 ## T4. MyBharata: tombol Ambil alih + label riwayat + rilis
 
-**Prasyarat**: brief `.task-plans/briefs/2026-09-11-pemegang-akun-409-mybharata.md` sudah merged,
-dan T2 sudah ter-deploy.
+**Status 2026-09-12**: kode selesai di my-bharata branch `feat/live-shift-ambil-alih`
+(versi 1.17.0+161), sudah direview, **belum di-push**; suite `test/features/live_shift/` 311
+test hijau. Brief celah 1 mobile (`.task-plans/briefs/2026-09-11-pemegang-akun-409-mybharata.md`)
+dilebur ke sini, tidak dikerjakan sebagai brief terpisah. Review menghasilkan dua perbaikan: host
+yang dicatat untuk ambil alih kini diambil dari pilihan co-host yang sedang tampil, dan
+konfirmasi Ambil alih tidak menyebut angka detik (keputusan user; batasnya milik server).
+Penyimpangan sadar dari rencana: galat Setujui/Tolak tampil di dalam jendela karena snackbar
+tertutup sheet modal. Ketuk notifikasi membuka Sesi Live **tidak** dikerjakan (push ponsel
+tanpa `data`, ADR 0050 §4). Rinciannya di [[APP - MyBharata]] §Sesi Live Host.
+
+**Prasyarat**: T2 sudah ter-deploy.
 
 Sisi **peminta** sama dengan T3: tombol, konfirmasi, keadaan menunggu dengan hitungan mundur,
 label riwayat.
 
 Sisi **pemegang**: notifikasi dan **`CustomBottomSheet` yang muncul otomatis** di halaman Sesi
 Live yang sedang terbuka, berisi siapa yang meminta (nama, jadwal, akun), tombol Setujui dan
-Tolak, dan hitungan mundur; tertutup sendiri saat 30 detik habis. Cara halaman mengetahui
-permintaan secara seketika ditetapkan di `/plan` (baca ulang berkala selama halaman terbuka, atau
-pesan push saat aplikasi di depan). Jebakan yang sudah tercatat: `CustomBottomSheet` wajib dibuka
-dengan `context` yang benar, karena `Navigator.pop` dengan context yang salah menutup HALAMAN.
+Tolak, dan hitungan mundur; tertutup sendiri saat 30 detik habis. Halaman mengetahui permintaan
+lewat baca ulang berkala tiap 3 detik selama halaman terbuka dan aplikasi di depan (diputuskan
+saat perencanaan). Jebakan yang sudah tercatat: `CustomBottomSheet` wajib ditutup dengan
+`context` miliknya sendiri, karena `Navigator.pop` dengan context halaman menutup HALAMAN.
 
 PR ke `dev`. Rilis menaikkan version name **dan** code (`update_version.dart` dua argumen).
 
@@ -185,6 +210,10 @@ Tiap item yang naik memperbarui [[Microservices - Marketing Analytics Service]] 
 tutup otomatis akhir shift dari 🟡 ke ✅), [[API - Marketing Analytics Service]] (rute atau
 parameter baru), dan status ADR 0088.
 
+**Status 2026-09-12**: keempat dok itu dan [[APP - MyBharata]] sudah memuat T2 dan T4 dengan
+penanda "di branch, belum merge". Penanda itu diganti saat PR merged dan saat naik ke DEV dan
+PROD.
+
 ---
 
 ## Di luar lingkup, sengaja
@@ -197,9 +226,13 @@ parameter baru), dan status ADR 0088.
 - **Persetujuan tanpa batas waktu, dan persetujuan dari web.** Yang meninggalkan sesi justru orang
   yang tak bisa dihubungi, jadi diam berarti setuju sesudah 30 detik; jendela persetujuan hanya di
   MyBharata.
+- **Pemberitahuan ke atasan host lama.** Ditunda (keputusan 2026-09-11): resolver atasan per
+  karyawan belum ada.
+- **Ketuk notifikasi membuka halaman Sesi Live.** Butuh `data` di push ponsel dan mengubah
+  perilaku ketuk seluruh kategori (ADR 0050 §4).
 
 ## Terkait di luar papan ini (insiden 2026-09-11)
 
-- Brief celah 1 (dua berkas di T3 dan T4) siap untuk `/kerjakan`.
+- Brief celah 1 mobile dilebur ke T4; brief celah 1 web gugur bersama T3.
 - Skrip pindah toko carevolution (`.task-plans/2026-09-11-pindah-toko-carevolution.ps1`) belum
   dijalankan.
