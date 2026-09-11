@@ -2407,20 +2407,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "671be8a4afa0ddf6c9afd02fe77551e4b6f5ae1f06452545f0b4976054bc9e56",
-      "ukuran_kb": 369.0,
-      "ringkasan": "Menjawab: bagaimana order marketplace (TikTok Shop, Shopee, Lazada) masuk lewat webhook dan dinormalkan jadi transaksi terpadu, bagaimana laporan iklan TikTok Business/GMV Max ditarik, serta bagaimana faktur, retur, dan penerimaan di-push ke Accurate Online. Juga menjawab cron/worker sync apa saja yang berjalan, pemetaan akun ICC dan kepemilikan toko per departemen, status sinkron per toko, dan rencana integrasi Meta Ads.",
+      "hash": "28cb4c9133a4e167985f31fadb541b961b3cb2c5cfbcb038ff60dea84a8add1c",
+      "ukuran_kb": 371.6,
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Ads, Shopee, Lazada) lewat webhook dan OAuth, bagaimana order dan laporan iklan dinormalkan jadi model transaction, serta bagaimana invoice, sales return, dan penerimaan di-push ke Accurate. Juga menjelaskan endpoint GMV Max, ICC video metrics, mapping akun ICC, kepemilikan toko per departemen, cron/worker sync, status sinkron per toko, dan rencana client Meta Ads.",
       "kata_kunci": [
         "integration-service",
         "marketplace",
         "webhook",
+        "Accurate",
         "Shopee",
         "TikTok Shop",
-        "Lazada",
-        "Accurate",
-        "faktur sales invoice",
         "GMV Max",
-        "worker cron"
+        "sales invoice",
+        "sinkronisasi order",
+        "Meta Ads"
       ]
     },
     {
@@ -2588,20 +2588,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "c5ed51443470c0998e65c5263fbfb718a33271155454decde2c628cde1376fb1",
-      "ukuran_kb": 100.3,
-      "ringkasan": "Menjawab: bagaimana laba dan performa marketing per toko, produk, kampanye, video, dan live dihitung lalu disimpan di koleksi mart_*, endpoint apa saja yang tersedia (beranda, ambang ROAS/CPA, pagu, live-shifts, KPI host live), dan kenapa integration_db dibaca baca-saja. Juga menjelaskan aturan pemakaian angka agar tidak hitung ganda (iklan_sia_sia, pembatalan, GMV live), logika vonis laba belum_matang, penjadwal sync 48 jam, serta sumber data per channel.",
+      "hash": "f0897246bb5821b894f0c7d32112edbf1f418bfc70e2ca0bca55b248203f3b19",
+      "ukuran_kb": 102.4,
+      "ringkasan": "Menjawab: bagaimana laba dan performa marketing per toko, produk, kampanye, video, dan live dihitung dan disimpan di koleksi mart_*, endpoint apa yang tersedia (beranda, ambang, pagu, KPI host live, live-shifts), dan kenapa integration_db hanya boleh dibaca. Juga menjelaskan aturan vonis laba (termasuk belum_matang), job sync dan penjadwal 48 jam, serta kolom mana yang tidak boleh dijumlahkan (iklan_sia_sia, pembatalan, 24h_live_gmv) supaya tidak terjadi hitung ganda.",
       "kata_kunci": [
         "marketing-analytics",
         "laba marketing",
         "profit attribution",
         "mart",
+        "dashboard marketing",
         "ROAS",
-        "live session",
-        "live-shifts",
-        "iklan_sia_sia",
+        "live shift",
+        "KPI host live",
         "hitung ganda",
-        "dashboard marketing"
+        "iklan_sia_sia"
       ]
     },
     {
