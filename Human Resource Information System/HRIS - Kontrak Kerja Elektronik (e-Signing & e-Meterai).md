@@ -153,6 +153,7 @@ Ada dua kelompok penanda tangan. **Usulan (2026-09-11, belum diputuskan)**: cara
 | Data karyawan | dibuat lewat Tambah Karyawan "dari kandidat"; kontrak pertama otomatis | sudah ada; HR memakai Perpanjang |
 | Jenis kontrak lazim | `PKWT (Evaluasi)` | `PKWT` |
 | Tanggal mulai | `tanggal_mulai` di offer | sesudah kontrak lama berakhir |
+| Durasi dan tanggal berakhir | `masa_evaluasi` di offer, teks bebas (DEV: `"2"`, `"3 bulan"`); jenis kontrak dan tanggal berakhir diketik manual saat Tambah Karyawan (`erp-frontend` `create-employee/index.tsx:219`) | dipilih HR saat Perpanjang |
 | Gaji Lampiran 1 | `gaji_evaluasi` / `gaji_kontrak` di offer, satu angka tanpa rincian (`services/recruitment/models_offer.go:39-40`) | `employee_salary` payroll |
 | Penilaian sebelum kontrak berikutnya | Performance Review Onboarding (peserta `PKWT (Evaluasi)`) | pesan atasan H-14 dari pengingat; penilaiannya di luar sistem |
 | Salinan final | email | "Kontrak Saya" di MyBharata |
@@ -192,7 +193,7 @@ Menjawab kebutuhan kedua, terlepas dari tanda tangan, dan dirilis lebih dulu ([[
 - ⚠️ Pesan tidak bisa diketuk menuju halaman Kontrak: belum ada pemetaan rute inbox ke `/hris/contract`, dan halamannya tidak membaca query string. Pesan menyebut jalur menunya.
 - ⚠️ Hasil penilaian kinerja dari atasan tidak kembali ke sistem, dan HR tidak diberi tahu.
 - ⚠️ **Kontrak kedaluwarsa hasil migrasi.** Diukur di DEV 2026-09-11: **110 dari 172** karyawan aktif punya kontrak terakhir yang sudah lewat, dan **seluruhnya `migrated: true`** (lewat 1-30 hari: 3, 31-90: 30, 91-180: 60, 181-365: 17). Kemungkinan besar perpanjangannya terjadi di luar sistem dan tak pernah dicatat, bukan orang yang bekerja tanpa kontrak. Bila PROD serupa, bagian "Sudah berakhir" di ringkasan HR tiap Senin didominasi daftar ini. Keputusan 2026-09-11: **deploy PROD ditahan** sampai PROD diukur (`.task-plans/cek-kontrak-esign-prod.ps1`), lalu dipilih antara merapikan data atau mengubah aturan.
-- ⚠️ Untuk kontrak `PKWT (Evaluasi)`, pesan atasan H-14 tumpang tindih dengan Performance Review Onboarding di [[HRIS - Recruitment]] (§Belum Diputuskan).
+- ⚠️ **Tahap pengingat tidak cocok untuk `PKWT (Evaluasi)`.** Masa evaluasi di DEV 2-3 bulan, sedangkan ambang "segera berakhir" 2 bulan dirancang untuk PKWT belasan bulan. Kontrak evaluasi 2 bulan sudah berstatus segera berakhir sejak hari pertama, dan HR langsung menerima tahap "Berakhir dalam 2 bulan" begitu data karyawannya dibuat; kontrak 3 bulan masuk jendela sesudah sekitar sebulan, dan H-30 jatuh di pertengahan masa kerja. Pesan atasan H-14 juga tumpang tindih dengan Performance Review Onboarding di [[HRIS - Recruitment]]. Opsinya di §Belum Diputuskan.
 
 ## Pemetaan Field Template ← Sumber Data
 
@@ -206,7 +207,8 @@ Diisi otomatis saat dokumen dibuat, bukan diketik ulang. Dicek per isian templat
 | Pihak Kedua | tempat lahir | **tidak ada** field-nya di `PersonalData`; data kandidat punya `tempat_lahir` (`services/recruitment/models_candidate.go:30`) | ❌ |
 | Pasal 2 | jabatan | `work_data.position` | ✅ |
 | Pasal 2 | lokasi kerja | template menulis alamat kantor secara tetap; sumber per karyawan belum dipetakan | ⚠️ TBD |
-| Pasal 2 | durasi, tanggal mulai dan berakhir | `employee_contract.start_date` / `end_date` | ✅ |
+| Pasal 2 | durasi, tanggal mulai dan berakhir | `employee_contract.start_date` / `end_date`. **Durasi dihitung dari kedua tanggal saat PDF dibuat, tidak disimpan sebagai field sendiri**, supaya tak bisa berselisih dengan tanggal berakhir yang dibetulkan HR. Kontrak migrasi memakai `join_date` sebagai tanggal mulai, jadi durasinya tak bermakna (DEV 2026-09-11: 1 sampai 200 bulan); kontrak lama memang tidak ditandatangani ulang | ✅ |
+| Pasal 2 (karyawan baru) | masa evaluasi | recruitment `Offer.masa_evaluasi`: **teks bebas** (`services/recruitment/models_offer.go:43`, form `offer-form-dialog.tsx`), hanya dipakai surat penawaran (`{{masa_evaluasi}}`); tanggal berakhir kontrak pertama tetap diketik HR | ⚠️ |
 | Pasal 5 | jam kerja | template menulis jam tetap; karyawan shift/roster punya jadwal sendiri di attendance | ⚠️ TBD |
 | Lampiran 1 | gaji pokok | [[Microservices - Payroll Service]] `employee_salary.basic_salary` | ✅ |
 | Lampiran 1 | kehadiran, tunjangan jabatan, uang makan | `employee_salary.component_values` | ⚠️ pemetaan komponen ke kolom belum ada |
@@ -235,10 +237,11 @@ Diisi otomatis saat dokumen dibuat, bukan diketik ulang. Dicek per isian templat
 - **Field tempat lahir** di `personal_data`, termasuk siapa yang mengisinya. Data kandidat sudah punya `tempat_lahir`, jadi calon karyawan bisa terisi otomatis saat Tambah Karyawan dari kandidat; karyawan lama tetap perlu diisi.
 - **Lokasi kerja dan jam kerja** di template: tetap umum, atau diisi dari data per karyawan.
 - **Sumber gaji Lampiran 1**: `employee_salary` (`basic_salary` + `component_values`) untuk perpanjangan dan `Offer` untuk karyawan baru, beserta pemetaan komponen payroll ke kolom kehadiran, tunjangan jabatan, dan uang makan. Untuk calon karyawan, offer hanya menyimpan satu angka: payroll diisi dulu sebelum PDF dibuat, atau offer diperluas.
+- **Format masa evaluasi di offer**: teks bebas (`"2"`, `"3 bulan"` di DEV) tidak bisa dipakai menghitung tanggal berakhir. Usulan: angka bulan, lalu Tambah Karyawan dari kandidat mengisi otomatis jenis `PKWT (Evaluasi)` dan tanggal berakhir = tanggal mulai + masa evaluasi (HR tetap bisa mengubah), sehingga offer, data karyawan, dan PKWT menyebut durasi yang sama.
 - **Calon karyawan menandatangani sesudah data karyawannya dibuat** (usulan §Calon karyawan dan karyawan aktif): perlu disetujui pemilik proses.
 - **Calon karyawan batal datang atau menolak menandatangani** sesudah data karyawannya dibuat. Akunnya langsung aktif saat dibuat (`services/employee/func.go:188-190`), jadi orangnya sudah terhitung karyawan aktif (ikut pengingat dan daftar karyawan) sebelum menandatangani. Perlu jalan resmi membatalkannya.
 - **Kontrak yang belum ditandatangani dan pengingat.** Pengingat memilih kontrak ber-`start_date` terbaru tanpa melihat status tanda tangan (field-nya belum ada), jadi kontrak baru yang tertahan di draf atau menunggu tanda tangan membuat kontrak lama tampak sudah diperpanjang, dan tak ada yang diingatkan bila penandatanganannya macet. Kontrak pertama dari create-employee juga langsung dianggap berlaku. Saat status tanda tangan dibangun: kontrak baru baru dihitung sesudah `SELESAI`, atau ada pengingat terpisah untuk tanda tangan yang tertunda.
-- **Pesan atasan H-14 untuk `PKWT (Evaluasi)`**: tumpang tindih dengan Performance Review Onboarding yang sudah menilai karyawan masa evaluasi. Dilewati, diarahkan ke review itu, atau dibiarkan.
+- **Aturan pengingat untuk `PKWT (Evaluasi)`** (masa evaluasi 2-3 bulan): tahap 2 bulan dan H-30 jatuh terlalu awal, dan pesan atasan H-14 tumpang tindih dengan Performance Review Onboarding. Opsi: untuk jenis ini lewati tahap 2 bulan (dan mungkin H-30), pertahankan H-7, dan arahkan penilaian ke Performance Review; atau biarkan.
 - **Kontrak kedaluwarsa hasil migrasi** (§Pengingat Kontrak Habis): HR merapikan data dulu, atau aturan pengingat diubah (misalnya kontrak migrasi yang sudah lewat tidak diulang tiap minggu). Menunggu pengukuran PROD.
 - **Draf lewat email sebelum datang**: opsional; siapa yang memutuskan per kontrak.
 - **Penolakan atau koreksi di tempat**: bentuk catatannya dan siapa yang memperbaiki.
@@ -253,7 +256,7 @@ Diisi otomatis saat dokumen dibuat, bukan diketik ulang. Dicek per isian templat
 
 - [[Microservices - Employee Service]]: pemilik `employee_contract`, `personal_data`, `work_data`; rute kontrak di [[API - Employee Service]] §Kontrak Kerja; cron, helper inbox, penerima HR, rantai atasan.
 - [[Microservices - Payroll Service]]: `employee_salary` untuk Lampiran 1.
-- [[Microservices - Recruitment Service]]: term offer dan data kandidat untuk calon karyawan.
+- [[Microservices - Recruitment Service]]: term offer (gaji, tanggal mulai, masa evaluasi) dan data kandidat untuk calon karyawan.
 - [[Microservices - File Service]]: prefix arsip baru.
 - [[Microservices - Notification Service]]: inbox (`reminder`), email salinan dengan lampiran PDF.
 - [[Microservices - Calendar Service]]: feed `contract_end` (kontrak milik pemanggil).
