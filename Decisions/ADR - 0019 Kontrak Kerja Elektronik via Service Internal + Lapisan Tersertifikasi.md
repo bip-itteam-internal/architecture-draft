@@ -1,10 +1,28 @@
 ## ADR 0019 — Kontrak Kerja Elektronik: service internal + lapisan tersertifikasi (PSrE + e-Meterai) via API berlisensi
 
-- **Status**: 🟡 **Proposed** — konsep/desain, belum diimplementasi & belum diratifikasi tim.
-- **Tanggal**: 2026-07-18
-- **Konteks dok**: [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] · [[HRIS - Personalia]] · [[HRIS - Recruitment]] · [[Microservices - Employee Service]] · [[CORE - HRIS Orchestrator]] · [[ADR - 0002 Database-per-Service]] · [[ADR - 0013 HRD Documents]]
+- **Status**: 🟡 **Proposed**, belum diratifikasi tim. E-signing dan e-Meterai **belum dibangun**. Pondasinya (riwayat kontrak + lampiran PDF) sudah live di employee-service dan menyimpang dari §1, §3, dan §5; lihat bagian Revisi 2026-09-11.
+- **Tanggal**: 2026-07-18 (revisi 2026-09-11)
+- **Konteks dok**: [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] · [[HRIS - Personalia]] · [[HRIS - Recruitment]] · [[Microservices - Employee Service]] · [[API - Employee Service]] · [[REF - Kepemilikan Data]] · [[CORE - HRIS Orchestrator]] · [[ADR - 0002 Database-per-Service]] · [[ADR - 0013 HRD Documents]]
 
 > Catatan penomoran: penomoran ADR vault saat ini **tidak unik global** (ada tabrakan 0007/0013/0015/… antara seri HR-Core dan seri Retur/Sales-Finance). ADR ini memakai **0019** = nomor bebas global berikutnya untuk menghindari tabrakan baru.
+
+## Revisi 2026-09-11: pondasi kontrak dibangun di employee-service, bukan di service baru
+
+Bagian Context, Decision, dan Consequences di bawah dipertahankan apa adanya sebagai rekaman usulan 2026-07-18. Kodenya sudah bergerak, dan beberapa premisnya tak berlaku lagi (diverifikasi ke `bip-erp` `origin/main` `915ca2f8`, 2026-09-11).
+
+**Yang sudah dibangun**: modul riwayat kontrak di [[Microservices - Employee Service]], koleksi `employee_contract` (rute di [[API - Employee Service]] §Kontrak Kerja). Penandatanganannya sendiri tetap terjadi **di luar sistem**: field `EmployeeContract.File` didefinisikan sebagai lampiran PDF yang *sudah* bertanda tangan digital (`shared-library/models/employee/models.go`).
+
+**Selisih terhadap Decision**:
+
+| Decision (usulan 2026-07-18) | Kenyataan di kode |
+|---|---|
+| §1 service baru `contract-service` memegang template, approval, arsip, dan audit | `contract-service` belum ada. Record kontrak dan arsip PDF ada di employee-service. Template, approval, dan jejak audit tanda tangan belum ada di mana pun |
+| §3 `new_hire` dipicu orkestrator setelah create-employee commit | kontrak pertama sudah dibentuk **di dalam** transaksi create-employee (`kontrakPertama`, `services/employee/func.go`). Pemicu tanda tangan belum ada |
+| §3 pengingat otomatis TBD karena tak ada cron | employee-service sudah menjalankan `robfig/cron` (`services/employee/cron.go`). Yang belum ada adalah pengingat kontraknya |
+| §5 arsip di MinIO prefix `contract/` + referensi di `work_document` | arsip di field `employee_contract.file`, object key `employee/<employee_id>/contract/<contract_id>/`. `work_document` tidak dipakai |
+| Context: "hanya view monitoring `GET /contract`" | ada riwayat per karyawan, nomor otomatis, lampiran PDF, dan ringkasan |
+
+**Konsekuensi yang mengikat keputusan berikutnya**: [[REF - Kepemilikan Data]] menetapkan `employee_contract` sebagai pemilik fakta "kontrak kerja dan riwayatnya", dan `work_data.employment_type`/`contract_ending` hanya boleh ditulis modul kontrak. Bila e-signing kelak dibangun di service terpisah, service itu **tidak boleh** menjadi pemilik kedua record kontrak, jadi §1 dan §5 wajib diputuskan ulang saat ADR ini diratifikasi. Celah pondasi yang harus ditutup lebih dulu (nomor kontrak tak unik, lampiran bisa diganti, karyawan tanpa akses ke kontraknya) dicatat di [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] §Pondasi yang Sudah Ada.
 
 ## Context
 

@@ -131,6 +131,14 @@ Ringkasan/detail **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar) dari sat
 
 **`/internal/` bukan berarti privat** pada tabel di atas: gateway tetap meneruskannya dari internet, jadi tiap rute memeriksa identitas pemanggilnya sendiri. `/internal/late-recap` memaparkan siapa saja yang sering terlambat di seluruh perusahaan, karena itu digerbang `RequireHRISStaff`.
 
+## Sesi Live Host (panggilan mesin dari marketing-analytics)
+| Method | Path | Fungsi | Auth |
+|---|---|---|---|
+| GET | `/internal/jadwal-resolusi` | Vonis jadwal banyak karyawan pada SATU tanggal, untuk `shift_id` / `status_jadwal` / `jam_shift_berakhir` sesi live di [[Microservices - Marketing Analytics Service]]. Query `employee_id` (dipisah koma, maksimum **100**; lebih dari itu **400**, tidak dipotong) dan `tanggal` (`YYYY-MM-DD`, wajib, **400** bila tak terurai). Baris `{employee_id, tanggal, schedule_id, start, end, off_duty, ditemukan}`; `ditemukan: false` berarti tak ada jadwal, bukan galat | header `BIP-Gateway-ID` **dan** `?key=` = `ATTENDANCE_SERVICE_KEY` |
+| GET | `/internal/status-tap` | Instan clock-out per karyawan pada satu tanggal entri (`date` = hari MULAI shift; clock-out lewat tengah malam digulirkan ke hari berikutnya), untuk tutup otomatis sesi live. Query sama (1 sampai 100 id). Baris `{employee_id, clock_out_at, ada_entri}`: `clock_out_at` null berarti belum pulang **atau** tak tercatat hari itu, dan `ada_entri` yang membedakan keduanya | sama |
+
+⛔ **`ValidateGateway` global berdiri di depan SEMUA rute di tabel ini dan di tabel KPI di bawah** (`app.Use(validation.ValidateGateway(...))` di `main.go`, didaftarkan sebelum seluruh rute ini). Kunci layanan **menambah** syarat, bukan menggantikan header gateway: pemanggil langsung antar-service wajib mengirim `BIP-Gateway-ID` = `INTERNAL_GATEWAY_KEY` **dan** `?key=`. Mengirim `?key=` saja dibalas **401** dengan badan yang sama persis dengan kunci layanan yang salah (`InvalidGatewayKey`), jadi pesannya tak menyebut gerbang mana yang menolak. Itu yang terjadi pada marketing-analytics: setiap panggilannya dibalas 401 sejak 27 Agustus 2026 (diperbaiki di branch `fix/marketing-analytics-header-gateway-attendance`, 🟡 belum merged per 2026-09-11; lihat [[Microservices - Marketing Analytics Service]] §Tutup otomatis, resolusi jadwal & pengingat). Pola yang benar: `services/employee/kpi_sumber_kedisiplinan.go`.
+
 ## KPI (panggilan mesin)
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
