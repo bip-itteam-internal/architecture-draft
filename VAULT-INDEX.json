@@ -717,9 +717,9 @@
         "HRIS - Recruitment",
         "Microservices - Employee Service"
       ],
-      "hash": "1c26d387a88d9ace3f12672af4c3ab9c521c5543d481088f1158560d33e847af",
-      "ukuran_kb": 35.3,
-      "ringkasan": "Menjawab: endpoint apa saja milik recruitment-service (job requisition, job posting, candidate, stages & offer, psikotes, interview rounds & feedback, master & form, onboarding, portal publik tanpa JWT) beserta role yang boleh memanggilnya. Menjelaskan juga siapa yang boleh mengajukan dan menyetujui requisition (supervisor, SPV HRD, jenjang direktur lintas-departemen) serta aturan cakupan perusahaan pada rekrutmen lintas perusahaan (`GET /companies`, `?company=`, `company_id`, 404 untuk data di luar cakupan).",
+      "hash": "28a82bfaecdacbbeded9351d03499cfbb9e18b49fee0707839a399a5d490860c",
+      "ukuran_kb": 35.4,
+      "ringkasan": "Menjawab: endpoint apa saja milik recruitment-service (job requisition, job posting, candidate, stages & offer, psikotes, interview rounds & feedback, master & form, onboarding, portal publik tanpa JWT) beserta role yang boleh memanggilnya. Menjelaskan juga siapa yang boleh mengajukan dan menyetujui requisition (supervisor, SPV HRD, jenjang direktur lintas-departemen), field turunan di daftar Offers (`candidate_company_id`, `can_approve` yang mengikuti gerbang approve), serta aturan cakupan perusahaan pada rekrutmen lintas perusahaan (`GET /companies`, `?company=`, `company_id`, 404 untuk data di luar cakupan).",
       "kata_kunci": [
         "recruitment",
         "rekrutmen",
@@ -727,8 +727,8 @@
         "requisition",
         "permintaan karyawan",
         "kandidat",
-        "candidate",
-        "interview",
+        "offer",
+        "can_approve",
         "portal karir",
         "lintas perusahaan"
       ]
@@ -1466,9 +1466,9 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "e05c7bb2039b53239885917d2a556e7cff26bc68ade88d2f4ee22a296e8e3100",
-      "ukuran_kb": 422.1,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP/HRIS One Bharata, bagaimana autentikasi, SSO, role gating sidebar, dan Pengaturan HRGA bekerja, serta konvensi data-fetching dan bagan yang wajib diikuti. Juga mencatat perubahan per modul beserta gap yang belum diimplementasikan, mis. Recruitment (alur kerja HR, rekrutmen lintas perusahaan, onboarding checklist), payroll, KPI, presensi, dan Marketing Analytics (saringan pindah ke laci Banner bergaya HRIS yang terbuka saat halaman dibuka, lencana dan Bersihkan yang hanya menghitung saringan, bukan pilihan tampilan).",
+      "hash": "11aa86f63fce6b4bdf36671796ad74fa40bd160fc88816ee3ebdce1b21808b0b",
+      "ukuran_kb": 422.4,
+      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP/HRIS One Bharata, bagaimana autentikasi, SSO, role gating sidebar, dan Pengaturan HRGA bekerja, serta konvensi data-fetching dan bagan yang wajib diikuti. Juga mencatat perubahan per modul beserta gap yang belum diimplementasikan, mis. Recruitment (alur kerja HR, rekrutmen lintas perusahaan, onboarding checklist, Tambah Karyawan dari kandidat yang mengikuti perusahaan kandidat), payroll, KPI, presensi, dan Marketing Analytics (saringan pindah ke laci Banner bergaya HRIS yang terbuka saat halaman dibuka, lencana dan Bersihkan yang hanya menghitung saringan, bukan pilihan tampilan).",
       "kata_kunci": [
         "erp-frontend",
         "web ERP",
@@ -6209,7 +6209,7 @@
         "ADR - 0002 Database-per-Service"
       ],
       "hash": "60d6a4f45b371d573b71dcb3897aca654a52b3702a2b58b30d3fa1526f399537",
-      "ukuran_kb": 17.9,
+      "ukuran_kb": 18.0,
       "ringkasan": "Menjawab: apa keputusan cara menandatangani kontrak PKWT di sistem sendiri dengan tanda tangan elektronik tidak tersertifikasi, tatap muka di kantor didampingi HRD (tanpa PSrE, e-KYC, PIN karyawan, maupun tanda tangan jarak jauh), siapa Pihak Pertama (direktur per perusahaan), dan kenapa e-Meterai dibubuhkan HR di luar sistem. Juga menjelaskan pengingat kontrak habis yang dipisah dari tanda tangan, dasar hukum UU ITE dan PP 71/2019, lubang keamanan akun yang ditemukan (PIN tanpa limiter, akun direktur dipakai bersama Sekretariat, kunci MinIO di bundel browser), arsip di prefix terkunci, salinan untuk karyawan, dan konsekuensinya.",
       "kata_kunci": [
         "tanda tangan kontrak",
@@ -8182,7 +8182,7 @@
         "HRIS - Big Pictures"
       ],
       "hash": "1aa089e6f5ab67b44db220f380b289c5885729a53e202ae194b5e82c3d3ecc08",
-      "ukuran_kb": 36.3,
+      "ukuran_kb": 36.6,
       "ringkasan": "Menjawab: bagaimana kontrak kerja PKWT/PKWTT dibuat dari template berbasis data HRIS, ditandatangani tatap muka di kantor didampingi HRD, dikonfirmasi direktur dari Ruang Direktur, lalu dibubuhi e-Meterai oleh HR sebelum salinannya dikirim ke karyawan. Juga menjelaskan siapa persona dan hak aksesnya, pondasi riwayat kontrak di employee-service (koleksi employee_contract, lampiran PDF, nomor kontrak, status ongoing/ending/expired) beserta celah yang harus ditutup, pemetaan field template ke sumber data, keamanan akun direktur yang dipakai bersama Sekretariat, dan cara kerja pengingat kontrak habis.",
       "kata_kunci": [
         "kontrak kerja",
@@ -8824,9 +8824,9 @@
         "HRIS - Big Pictures",
         "HRIS - Recruitment Roadmap (Adopsi ERPGo)"
       ],
-      "hash": "6595f7f2e44d5948be58c9329f363e158b9660396d587a732ae4a1797885c309",
-      "ukuran_kb": 46.0,
-      "ringkasan": "Menjawab: bagaimana desain proses rekrutmen end-to-end dari permintaan karyawan sampai onboarding (requisition, sourcing Glints, screening manual, interview multi-tahap, psikotes dan tes keahlian, background check, offer, masa evaluasi), siapa aktor dan role yang terlibat, dan keputusan apa yang sudah disepakati HRD. Juga menjelaskan model data kandidat, alur kerja HR, persona dan alur pengguna rekrutmen lintas perusahaan, rollout bertahap, serta pertanyaan dan TBD yang masih terbuka.",
+      "hash": "8c3c7a9770fd41462c25d680fa66713afa4a1276f83037c481c1cbd021d63c26",
+      "ukuran_kb": 46.1,
+      "ringkasan": "Menjawab: bagaimana desain proses rekrutmen end-to-end dari permintaan karyawan sampai onboarding (requisition, sourcing Glints, screening manual, interview multi-tahap, psikotes dan tes keahlian, background check, offer, masa evaluasi), siapa aktor dan role yang terlibat, dan keputusan apa yang sudah disepakati HRD. Juga menjelaskan model data kandidat, alur kerja HR (titik putus yang dibuka, kotak Langkah berikutnya, tombol Buat data karyawan yang mengikuti perusahaan kandidat), persona dan alur pengguna rekrutmen lintas perusahaan, rollout bertahap, serta pertanyaan dan TBD yang masih terbuka.",
       "kata_kunci": [
         "rekrutmen",
         "recruitment",
@@ -8837,7 +8837,7 @@
         "psikotes",
         "background check",
         "onboarding",
-        "Glints"
+        "Buat data karyawan"
       ]
     },
     {
@@ -13526,7 +13526,7 @@
         "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)"
       ],
       "hash": "718584c3d1484fc243576c56aee227b5a81c8f6cd7372f7f7aa8a2bf0ee6cb8b",
-      "ukuran_kb": 13.8,
+      "ukuran_kb": 14.0,
       "ringkasan": "Menjawab: task apa saja yang perlu dikerjakan untuk tanda tangan kontrak kerja dan pengingat kontrak habis, dalam urutan gelombang beserta prasyaratnya (uji PDF bermeterai, nomor kontrak unik, data penandatangan, template PKWT, masa evaluasi di offer jadi angka bulan). Juga mencatat keputusan pemilik proses yang mengikat (tanpa PSrE dan e-KYC, tanda tangan di kantor didampingi HRD, e-Meterai dibubuhkan HR, kategori inbox reminder) serta jebakan yang menggagalkan rancangan naif, misalnya SetaraDirektur yang meloloskan Corporate Secretary, PATCH kontrak yang memakai ReplaceOne, dan kontrak hasil migrasi yang mendominasi data kedaluwarsa.",
       "kata_kunci": [
         "analisa kebutuhan",
