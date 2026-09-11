@@ -2,9 +2,9 @@
 
 *Desain (to-be) subsistem **Recruitment** — mengelola **siklus depan karyawan**: dari kebutuhan posisi sampai jadi karyawan aktif. Memisahkan subsistem **Talent acquisition → Interview → On-boarding** yang sekarang menumpuk di [[HRIS - Analysis]] ke ruangnya sendiri.*
 
-- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. 🟡 **Rekrutmen lintas perusahaan: kode lengkap di branch, BELUM merge maupun deploy** (diukur 2026-09-11, lihat bagian "Rekrutmen Lintas Perusahaan" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]])
+- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. 🟡 **Rekrutmen lintas perusahaan: kode lengkap di branch, BELUM merge maupun deploy** (diukur 2026-09-11, lihat bagian "Rekrutmen Lintas Perusahaan" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian "Alur Kerja HR" di bawah)
 - **Target arsitektur**: microservice `recruitment-service` baru ([[Microservices - Recruitment Service]]) + modul web, dengan **rollout bertahap**
-- Titik singgung yang sudah ada di kode: `POST /onboarding/register` (aktivasi akun karyawan baru) di [[Microservices - Employee Service]] — menjadi handoff akhir recruitment
+- Titik singgung yang sudah ada di kode: `POST /onboarding/register` (aktivasi akun karyawan baru) di [[Microservices - Employee Service]]. ⚠️ **Bukan handoff hire yang bekerja**: aktivasinya mewajibkan username, password, dan PIN baru yang diisi karyawan sendiri, jadi hire tak pernah berhasil memanggilnya (lihat langkah 8 pipeline di bawah)
 
 ## Latar Belakang
 
@@ -15,19 +15,21 @@
 
 ![[Recruitment Pipeline.excalidraw]]
 
-1. **Job Requisition** — SPV/atasan mengajukan posisi via **Form Permintaan Karyawan** (field: departemen, jumlah karyawan sekarang, jumlah dibutuhkan, posisi, **jenis permintaan: penambahan/penggantian**, alasan, **persyaratan/kualifikasi**: usia, jenis kelamin, pendidikan, pengalaman, kualifikasi, tugas & tanggung jawab, tanggal mulai). Alur: **SPV mengisi kualifikasi** → **SPV HRD review kualifikasi lalu menyetujui** (atau minta revisi) → status `Approved` → lowongan boleh dibuka. **Satu tahap persetujuan** sejak 2026-07-22: tahap Direktur dihapus, SPV HRD adalah pemberi persetujuan final. **Tanpa batasan kuota** (jumlah dibutuhkan bersifat informasional, bukan cap)
+1. **Job Requisition** — SPV/atasan mengajukan posisi via **Form Permintaan Karyawan** (field: departemen, jumlah karyawan sekarang, jumlah dibutuhkan, posisi, **jenis permintaan: penambahan/penggantian**, alasan, **persyaratan/kualifikasi**: usia, jenis kelamin, pendidikan, pengalaman, kualifikasi, tugas & tanggung jawab, tanggal mulai). Alur: **SPV mengisi kualifikasi** → **SPV HRD review kualifikasi lalu menyetujui** (atau minta revisi) → status `Approved` → lowongan boleh dibuka. **Satu tahap persetujuan** sejak 2026-07-22: tahap Direktur dihapus, SPV HRD adalah pemberi persetujuan final. **Tanpa batasan kuota** (jumlah dibutuhkan bersifat informasional, bukan cap). 🟡 **(erp-frontend `feat/rekrutmen-buka-alur`, belum merge)** di detail requisition, SPV HRD memutus lewat tiga tombol langsung: **Setujui** (konfirmasi menyebut posisi + departemen, catatan opsional), **Minta Revisi** (catatan wajib, hanya status `Submitted`), dan **Tolak**; dulu satu tombol HR Review membuka dialog berisi pilihan. Filter status halaman HR dan Portal Saya kini satu sumber, dan requisition lama di `HR Reviewed` berlabel "Menunggu Keputusan (alur lama)", bukan "Disetujui HR"
 2. **Sourcing & Job Posting** — HR membuka lowongan + mencatat **sumber pelamar**. Kanal eksternal utama saat ini: **Glints (TapLoker)** — ATS/job-portal yang dipakai aktif (PT Bharata terverifikasi: pasang lowongan, Pertanyaan Skrining, akses CV, chat WA); plus referral, walk-in, bootcamp
 3. **Candidate Management** — data pelamar (CV, kontak, posisi dilamar, sumber) + pelacakan pipeline via field **`progress`** (tahap) & **`status`** (keadaan), enum mengikuti **rekaman HRD** (lihat Model Data)
 4. **Screening (manual)** — HR menyaring CV/data pelamar **manual** terhadap kriteria posisi (lihat bagian khusus di bawah); **AI CV screening** direncanakan sebagai enhancement fase lanjut
 5. **Interview** — penjadwalan, **multi-tahap**: HR Interview → User Interview → **Technical Test (tes skill — terpisah dari psikotes)** → Final Interview (jumlah tahap tergantung posisi, mis. SPV) — HR + hiring manager/SPV dept; scoring + catatan per tahap. Lolos → **Background Check**. **Orkestrasi (✅ #498/#356):** sesi bisa ditautkan ke **babak** (`round_id`). **Feedback via link email (✅ #536/#381, 2026-07-18):** untuk stage **User & Final**, tiap pewawancara di panel (snapshot nama+email dikirim FE saat menjadwalkan, terpisah dari `Lokasi`) menerima **email undangan branded** (jadwal, lokasi/link meeting, tombol **"Buka Form Feedback"**) menuju halaman **login-gated tanpa sidebar** (`/interview-feedback/<id>`) tempat ia mengisi feedback sendiri (3 rating + rekomendasi, editable/upsert) — **menggantikan** menu **"Interview Saya"** (dihapus dari navigasi Portal Saya; komponen & endpoint `/interviews/assigned` tetap ada tapi dormant). Stage **HR**: tanpa email — HR isi feedback dari menu **Interviews** (dialog Lihat). **Kandidat** juga menerima email undangan jadwal (**semua stage**, tanpa link form). **Pengelolaan interview terpusat di menu Interviews (✅ FE):** jadwalkan (pilih kandidat aktif) + edit + hapus + salin link + lihat/isi feedback (terisi/total), semua dari sini; **detail kandidat menampilkan interview read-only** (jenis tahap lain — screening/tes/background check — tetap dicatat dari detail kandidat). Belum: kalender/reminder ICS, auto-advance tahap dari hasil.
-6. **Psikotes / Tes keahlian** — ✅ **terimplementasi sebagai babak bertipe tes**, bukan modul tersendiri. Psikotest dan Technical Test adalah dua babak ber-`form_type: "test"` di katalog babak; keduanya **tidak dijadwalkan** lewat Proses Seleksi, melainkan direkam sebagai **form hasil per kandidat** di tab "Hasil Tes" pada detail kandidat: `result` (Pass/Fail/Pending) + `score` opsional + catatan. Menyimpan hasil lewat form itu **memindahkan tahap kandidat ke babak itu** dan menderivasi status (Pass → `Pending`, Fail/Pending → `Hold`)
+6. **Psikotes / Tes keahlian** — ✅ **terimplementasi sebagai babak bertipe tes**, bukan modul tersendiri. Psikotest dan Technical Test adalah dua babak ber-`form_type: "test"` di katalog babak; keduanya **tidak dijadwalkan** lewat Proses Seleksi, melainkan direkam sebagai **form hasil per kandidat** di tab "Hasil Tes" pada detail kandidat: `result` (Pass/Fail/Pending) + `score` opsional + catatan. Menyimpan hasil lewat form itu **memindahkan tahap kandidat ke babak itu** dan menderivasi status (Pass → `Pending`, Fail/Pending → `Hold`). 🟡 **(bip-erp `feat/recruitment-alur-kerja-hr` + erp-frontend `feat/rekrutmen-buka-alur`, belum merge)** menerbitkan psikotes (terbit maupun terbit ulang) juga memindah progress ke babak Psikotest tanpa menyentuh status, dan tab Hasil Tes kini menawarkan **Kirim Psikotes** untuk kandidat yang belum punya sesi (dulu tombol pertamanya hanya ada di sel Progress, dan hanya saat progress sudah Psikotest)
 	- ✅ **Psikotes-nya sendiri kini dikerjakan DI DALAM sistem**, mode **online self-service** yang dulu ditandai TBD: HR menerbitkan sesi, kandidat mengerjakan **Kraepelin** lewat magic link tanpa login, server menilai empat kategori (kecepatan/ketelitian/keajegan/ketahanan), hasilnya masuk sebagai `result: Pending` di babak Psikotest, dengan `score` **hanya untuk sesi yang dituntaskan** sejak tahap nol (T0, bip-erp #1828, merged 2026-09-10; terbukti lewat gateway dev hari itu, live di prod 2026-09-11): sesi yang ditinggalkan atau kedaluwarsa menulis baris tanpa skor, karena skornya Rendah secara mekanis. Rincian: **[[HRIS - Psikotes Kraepelin]]**. **Technical Test** tetap dikerjakan di luar aplikasi dan hanya hasilnya yang diketik HR
 	- 🟡 **Perluasan ke multi-jenis sudah diputuskan 2026-09-10**: katalog tipe tes, bank soal, dan paket tes menjadi master data yang dikelola HRD, dijalankan tiga mesin penilaian yang tetap berupa kode. Lihat [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] dan [[HRIS - Bank Soal dan Paket Psikotes]]. Ini menjawab TBD lama "jenis tes dan tools" di bagian Pertanyaan untuk HRD
 	- ⚠️ **Sisa gap vs desain di dokumen ini:** **report PDF psikotes** masih belum ada tempatnya (laporan hanya tampil di layar HR, tak ada lampiran tersimpan), dan **bank soal untuk jenis tes selain Kraepelin** (DISC/CFIT) belum ada. Ambang lulus/tidak tetap keputusan HR, tak dikodekan — sistem sengaja berhenti di `Pending`
 	- ⚠️ **Gap urutan:** dokumen ini (dan keputusan HRD di bawah) menempatkan Psikotes **setelah** Background Check, sebelum Offering. Kode menaruh **Psikotest di urutan 3**, sebelum User Interview (`seed.go`). Urutannya bisa diubah HR dari katalog babak, jadi ini soal **data seed**, bukan kode — tapi keadaan awalnya memang tidak sesuai keputusan
 7. **Offer & Decision** — keputusan + surat penawaran → kandidat accept/decline
-8. **Hire → Karyawan** — saat kandidat `Hired`, HR membuat **data karyawan** di HRIS "Tambah Karyawan" (mode *dari kandidat* — data kandidat diprefill, HR isi sisanya) via [[Microservices - Employee Service]]; kandidat lalu **ditautkan** ke `employee_id` (`PUT /candidates/:id/link-employee`, progress→Onboarding). Aktivasi akun tetap via `POST /onboarding/register`.
-9. **Masa Evaluasi & Performance Review Onboarding** — karyawan baru jalani masa evaluasi, berpuncak pada sesi **Performance Review** (presentasi → penilai lintas divisi menilai → keputusan status) — lihat bagian khusus di bawah. *(Onboarding checklist per-kandidat #492 dihapus 2026-07-18 — dead code.)*
+8. **Hire → Karyawan** — saat kandidat `Hired`, HR membuat **data karyawan** di HRIS "Tambah Karyawan" (mode *dari kandidat* — data kandidat diprefill, HR isi sisanya) via [[Microservices - Employee Service]]; kandidat lalu **ditautkan** ke `employee_id` (`PUT /candidates/:id/link-employee`, progress→Onboarding).
+	- ⚠️ **Koreksi (diukur 2026-09-12): hire TIDAK mengaktifkan akun.** `POST /candidates/:id/hire` hanya meneruskan ke `POST /onboarding/register` bila body membawa `employee_id` (`services/recruitment/offer_handlers.go` `hireCandidate`), dan endpoint itu mewajibkan username, password, **dan PIN baru** (`services/employee/main.go:3133`) yang tak pernah dikirim hire, jadi jalur itu selalu ditolak 400 dan hire ikut gagal. Akun diaktifkan **karyawan sendiri** lewat [[APP - MyBharata]].
+	- 🟡 **(erp-frontend `feat/rekrutmen-buka-alur`, belum merge)** dialog Hire tak lagi meminta Employee ID dan password sementara (body kosong, BE tak diubah), dan tab Offer di detail kandidat menampilkan tombol **Buat data karyawan** untuk kandidat Hired yang belum tertaut: tombol itu membuka HRIS > Karyawan dengan modal Tambah Karyawan langsung di mode dari kandidat (`/hris/employee?dari_kandidat=<id>`). Kandidat yang belum Hired, sudah tertaut, atau tak ditemukan jatuh ke layar awal modal dengan pesan.
+9. **Masa Evaluasi & Performance Review Onboarding** — karyawan baru jalani masa evaluasi, berpuncak pada sesi **Performance Review** (presentasi → penilai lintas divisi menilai → keputusan status) — lihat bagian khusus di bawah. *(Onboarding checklist per-kandidat #492 dihapus 2026-07-18 — dead code.)* ⚠️ **Catatan itu tak lagi lengkap:** checklist onboarding **dibangun ulang 2026-07-26** sebagai template + instance per karyawan baru dengan penugasan PIC lintas tim (rincian di [[Microservices - Recruitment Service]]). PIC mengerjakan tugasnya di [[APP - MyBharata]]; 🟡 notifikasinya dirapikan di bip-erp `feat/recruitment-alur-kerja-hr` (belum merge), lihat §Alur Kerja HR.
 
 ## Screening (Manual; AI menyusul)
 
@@ -108,7 +110,7 @@
 
 *Setelah `Hired` → jadi karyawan, karyawan baru menjalani **masa evaluasi** (semacam masa percobaan). Di perusahaan, istilah "**onboarding**" merujuk ke fase ini, yang berpuncak pada sesi **Performance Review Onboarding**: peserta mempresentasikan hasil kerja, lalu **beberapa penilai** (karyawan lintas divisi, diundang HRGA) memberi penilaian; hasilnya jadi bahan HR memutuskan status.*
 
-> ~~**Onboarding checklist per-kandidat (#492/#346)**~~ **dihapus 2026-07-18** — alat centang tugas onboarding (kontrak/dokumen/IT setup) ini **tak pernah terpakai di FE** (komponen yatim) sejak dibangun, jadi dibuang sebagai dead code (BE+FE). Masa evaluasi kini didukung **hanya** oleh Performance Review Onboarding di bawah.
+> ~~**Onboarding checklist per-kandidat (#492/#346)**~~ **dihapus 2026-07-18** — alat centang tugas onboarding (kontrak/dokumen/IT setup) ini **tak pernah terpakai di FE** (komponen yatim) sejak dibangun, jadi dibuang sebagai dead code (BE+FE). Masa evaluasi kini didukung **hanya** oleh Performance Review Onboarding di bawah. ⚠️ Kalimat itu basi sejak **2026-07-26**: checklist onboarding dibangun ulang dengan model baru (template + instance per karyawan baru + penugasan PIC lintas tim, lihat increment "Onboarding Checklist (rebuild)" di [[Microservices - Recruitment Service]]), dan PIC mengerjakan tugasnya di [[APP - MyBharata]].
 
 **Performance Review Onboarding (⚠️ #493/#349)** — digitalisasi **Form Review Performance Masa Evaluasi** (dulu Google Form):
 - **HR** menjadwalkan sesi (peserta, waktu, tempat) + menugaskan **penilai**; sistem mengirim **undangan** (inbox + email) — menggantikan undangan manual HRGA.
@@ -131,6 +133,61 @@
   - **Psikotes** — modul di `recruitment-service`; mode **manual (dilaksanakan staf HR)** cukup catat hasil + lampiran via [[Microservices - File Service]], mode **online** butuh **test-engine + bank soal (TBD / fase lanjut)**; undangan jadwal via [[Microservices - Notification Service]]
   - **Glints (TapLoker)** — ATS/job-portal eksternal yang dipakai aktif (sumber pelamar utama). Pemetaan stage Glints → pipeline kita: *Chat Dimulai/Terhubung* → Screening · *Skill & Psikotes* → Technical Test (skill) + Psikotes (kita pisahkan) · *Wawancara* → Interview · *Negosiasi* → Offer · *Direkrut* → Hired · *Belum Sesuai* → Rejected. ⚠️ **Beda urutan**: Glints menaruh **Skill & Psikotes sebelum Wawancara**, sedangkan proses internal kita **psikotes setelah interview** (keputusan HRD) — perlu disadari saat memetakan dari Glints. Komunikasi kandidat saat ini lewat **chat/WA Glints**. Relasi `recruitment-service` ↔ Glints (impor/sinkron vs menggantikan) = **TBD strategis**
 - **UI**: modul **Recruitment** di [[APP - Web ERP]] (HR & SPV) + **portal karir publik** untuk pelamar ✅ [[APP - Portal Karir Bharata]] — lihat lowongan, **melamar sendiri** (field native `candidate` + **satu berkas PDF gabungan maks 10 MB**). ⛔ **Cek status lamaran via `tracking_token` sudah DIHAPUS** (2026-07-24) — pelamar kini hanya menerima email konfirmasi, tanpa cara memeriksa kemajuan lamarannya sendiri. Menggantikan alur **Google Form** lama (lamaran langsung masuk pipeline, HR tak lagi memindahkan data manual)
+
+## Alur Kerja HR (branch, belum merge)
+
+> 🟡 **Kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12): bip-erp
+> `feat/recruitment-alur-kerja-hr`, erp-frontend `feat/rekrutmen-buka-alur` (PR-A) dan
+> `feat/rekrutmen-langkah-berikutnya` (PR-B, di atas PR-A). Rincian layar: [[APP - Web ERP]]
+> (modul Recruitment). Sisi service: [[Microservices - Recruitment Service]] ·
+> [[API - Recruitment Service]].
+
+*QA dari sudut pandang HR rekrutmen (telusur kode 2026-09-11) menemukan pekerjaan satu kandidat
+tersebar di delapan tempat, dan tiga tombol langkah berikutnya menolak kandidat sampai HR mengubah
+Progress manual: Jadwalkan Sesi hanya menerima kelompok Interview padahal pelamar baru selalu CV
+Screening, Buat Offer hanya menerima progress Offering padahal progress baru pindah ke Offering saat
+offer dikirim, dan Kirim Tes pertama hanya muncul saat progress sudah Psikotest. Perubahan ini
+membuka titik putus itu, meringkas yang rumit, dan menambah kotak "Langkah berikutnya".*
+
+**Keputusan user:**
+1. (2026-09-11) Tugas onboarding PIC hanya lewat MyBharata: pesan notifikasi dibuat netral, kategori
+   `task-assigned`, `app_route` `/tugas-onboarding`; menu web tidak dikembalikan. Ketukan notifikasi
+   di ponsel tetap membuka halaman Notifikasi, karena `task-assigned` tak dipetakan ke rute di pemeta
+   rute notifikasi MyBharata (jatuh ke `default`).
+2. (2026-09-11) Kotak Langkah berikutnya dikerjakan sebagai PR kedua.
+3. (2026-09-11) Isian Tipe Assessment dan tab Tipe Asesmen dibuang; data backend dibiarkan.
+4. (2026-09-11) Nilai status kandidat tidak diubah (paritas spreadsheet HRD). Dua arti `Pending`
+   (sesi tanpa jadwal, atau penilaian Lolos) diatasi kotak Langkah berikutnya yang membaca keputusan
+   penilaian, bukan status.
+5. (2026-09-11) Seluruh self-service rekrutmen (penilaian interview, review masa evaluasi, tugas PIC,
+   pengajuan kebutuhan karyawan) pindah ke satu halaman Rekrutmen di [[APP - MyBharata]] sebagai
+   task berikutnya.
+6. (2026-09-12) Tombol Setujui offer mengikuti flag `can_approve` dari backend, bukan aturan peran
+   yang disalin ke frontend.
+
+**Alur pengguna: HR membawa pelamar baru sampai jadi karyawan**
+1. Detail kandidat (progress CV Screening) → kotak Langkah berikutnya **Jadwalkan HR Interview**
+   (PR-B), atau Proses Seleksi > Jadwalkan Sesi yang kini menerima kandidat CV Screening tanpa
+   mengubah Progress.
+2. Sesi dibuat → kotak menyebut "menunggu penilaian" dan menautkan ke detail sesi Proses Seleksi.
+3. Penilaian Lolos → tahap Psikotest: **Kirim Psikotes** (dari kotak atau tab Hasil Tes) → progress
+   pindah ke Psikotest otomatis.
+4. Hasil tes dan Background Check diputus di tab masing-masing.
+5. **Buat Offer** (dari kotak, atau menu Offers tanpa mengubah Progress) → **Setujui** (SPV HRD) →
+   **Kirim** (konfirmasi menyebut nama kandidat) → **Catat Jawaban**.
+6. **Hire** di tab Offer (tanpa isian akun) → **Buat data karyawan** → HRIS > Karyawan, modal
+   langsung di mode dari kandidat → kandidat tertaut ke karyawan.
+
+**SPV HRD memutus requisition:** detail requisition → **Setujui** (konfirmasi menyebut posisi +
+departemen) / **Minta Revisi** (catatan wajib) / **Tolak** → Buka Lowongan.
+
+**Titik putus yang diterima:** mengetuk notifikasi tugas onboarding membuka halaman Notifikasi,
+bukan layar tugas; yang mengantar PIC adalah teks pesannya.
+
+**Di luar lingkup:** halaman Rekrutmen self-service di MyBharata (task berikutnya); tombol Kembali
+detail requisition untuk atasan (pengajuan kebutuhan karyawan ikut pindah ke MyBharata); pencegahan
+offer ganda di backend (aturan "offer aktif" kini dihitung frontend); gambar panduan (PNG
+Excalidraw).
 
 ## Rekrutmen Lintas Perusahaan
 
@@ -210,7 +267,14 @@ Selesai ketika: karyawan baru tercatat di perusahaan B dan onboarding-nya berjal
 
 **Titik putus yang tersisa (dicatat, tidak ditutup fitur ini):**
 - Langkah 6 (dari detail kandidat ke Tambah Karyawan di HRIS) pindah modul tanpa tautan dari
-  detail kandidat. Celah **LAMA**, bukan akibat fitur ini.
+  detail kandidat. Celah **LAMA**, bukan akibat fitur ini. 🟡 Ditutup di erp-frontend
+  `feat/rekrutmen-buka-alur` (belum merge): tombol **Buat data karyawan** di tab Offer, lihat
+  §Alur Kerja HR. ⚠️ **Risiko saat kedua branch digabung:** tautan `?dari_kandidat=` di branch itu
+  memulai modal dari kandidat dengan perusahaan **BIP** yang dipatok
+  (`create-employee/index.tsx`, sesuai perilaku `main` yang hanya membuka mode dari kandidat untuk
+  BIP), sedangkan branch ini membuka mode itu untuk perusahaan mana pun. Kandidat perusahaan B yang
+  dibuka lewat tautan akan dimulai di BIP; perusahaannya perlu diturunkan dari kandidat saat
+  keduanya disatukan.
 - Recruiter yang paketnya belum dipasang, atau sudah dipasang tapi belum login ulang, hanya
   melihat perusahaannya sendiri TANPA petunjuk bahwa ia seharusnya melihat lebih. Lihat
   [[Microservices - Recruitment Service]] (catatan deploy) untuk urutan pemasangan paket dan

@@ -73,8 +73,8 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
-| POST | `/candidates/:id/psikotes` | Terbitkan sesi psikotes + kirim magic link ke email kandidat (best-effort). **(2026-09-11, bip-erp #1837)** Body `{paket_id}` untuk tes berpaket atau `{config}` untuk Kraepelin lama; bagian yang belum siap atau soal yang jumlah kuncinya tak sesuai menggagalkan terbit dengan pesan. Balasan `{session_id, status, link}` (tanpa alamat email). Kandidat yang **sudah punya sesi → `409`** (sarankan Terbitkan Ulang). Babak `"Psikotest"` belum ada di master → `400` | HR |
-| POST | `/candidates/:id/psikotes/reissue` | Terbitkan ulang. **`alasan` wajib** (kosong → `400`), body lain sama dengan terbit; sesi baru disiapkan dulu baru sesi lama dihapus, sehingga token lama mati | HR |
+| POST | `/candidates/:id/psikotes` | Terbitkan sesi psikotes + kirim magic link ke email kandidat (best-effort). **(2026-09-11, bip-erp #1837)** Body `{paket_id}` untuk tes berpaket atau `{config}` untuk Kraepelin lama; bagian yang belum siap atau soal yang jumlah kuncinya tak sesuai menggagalkan terbit dengan pesan. Balasan `{session_id, status, link}` (tanpa alamat email). Kandidat yang **sudah punya sesi → `409`** (sarankan Terbitkan Ulang). Babak `"Psikotest"` belum ada di master → `400`. 🟡 **(bip-erp `feat/recruitment-alur-kerja-hr`, belum merge)** Sesudah sesi tersimpan, progress kandidat dipindah ke babak Psikotest (`setProgressToBabak`, best-effort; status tidak disentuh; kandidat terminal atau di `Offering`/`Onboarding` tidak digerakkan) | HR |
+| POST | `/candidates/:id/psikotes/reissue` | Terbitkan ulang. **`alasan` wajib** (kosong → `400`), body lain sama dengan terbit; sesi baru disiapkan dulu baru sesi lama dihapus, sehingga token lama mati. 🟡 (branch yang sama) progress ikut dipindah ke babak Psikotest seperti terbit | HR |
 | GET | `/candidates/:id/psikotes/report` | Laporan individual (metrik 4 kategori + skor keseluruhan + `selesai_karena`; **(T0, bip-erp #1828)** + `col_index` = jumlah kolom yang sempat dikirim). **(2026-09-11)** Sesi paket + `paket_nama` dan `bagian[]` (`nama`, `jenis_jawaban`, `status`, `selesai_karena`, waktu, dan salah satu `kraepelin`/`pilihan_ganda`/`disc`; hanya hitungan). **Tidak memuat soal/kunci jawaban**. Kandidat tanpa sesi → `404 {"error": ...}` | HR |
 | GET | `/candidates/psikotes/status` | Status **massal** untuk polling tabel (banyak id sekaligus, satu kueri `$in`). Tiap baris: `candidate_id`, `status`, `col_index`, `total_kolom`, `issued_at`, `last_seen_at?`; **(T0)** + `selesai_karena?` (omitempty, hanya sesi `finished`); **(2026-09-11)** sesi paket + `paket_nama`, `total_bagian`, `bagian_index`, `bagian_nama` (omitempty). **Tanpa** skor/kategori, dikunci test allowlist | HR |
 
@@ -86,7 +86,13 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 | POST | `/candidates/:id/offer` | Terbitkan offer (→ Offering) | HR supervisor |
 | POST | `/candidates/:id/offer/letter` | Unggah surat penawaran PDF (MinIO) + email kandidat | HR supervisor |
 | POST | `/candidates/:id/offer/accept` · `/offer/decline` | Respon offer | HR |
-| POST | `/candidates/:id/hire` | Hire (butuh offer Accepted) → set `Hired` + onboarding handoff `/onboarding/register` (aktivasi akun). Pembuatan **data karyawan** dilakukan terpisah di HRIS "Tambah Karyawan" (dari kandidat) → `link-employee` | approver |
+| POST | `/candidates/:id/hire` | Hire (butuh offer Accepted, kalau tidak `409`) → progress `Onboarding` + status `Hired` + email kandidat (best-effort). Body `{employee_id?, temporary_password?}`: **hanya bila `employee_id` diisi** diteruskan ke employee-service `/onboarding/register`, yang mewajibkan juga username/password/PIN baru sehingga jalur itu selalu ditolak (diukur 2026-09-12); tanpa `employee_id` balasan `onboarding.performed: false`. Akun diaktifkan karyawan sendiri di MyBharata. 🟡 erp-frontend `feat/rekrutmen-buka-alur` (belum merge) mengirim body kosong. Pembuatan **data karyawan** dilakukan terpisah di HRIS "Tambah Karyawan" (dari kandidat) → `link-employee` | approver |
+| GET | `/offers` | Menu Offers: semua offer (terbaru dulu) + `candidate_name`/`candidate_position`. 🟡 **(bip-erp `feat/recruitment-alur-kerja-hr`, belum merge)** + **`can_approve`** (bool, tanpa `omitempty`): pemanggil lolos gerbang `POST /offers/:id/approve`, sama untuk seluruh daftar | HR (`recruitment.view`) |
+| POST | `/offers` | Buat draft: `Status=Draft`, `Approval=Pending`, `candidate_id` di body | HR (`recruitment.work`) |
+| PUT · DELETE | `/offers/:id` | Edit (mereset approval ke `Pending`) · hapus. Hanya saat `Draft` | HR (`recruitment.work`) |
+| POST | `/offers/:id/approve` | Setujui draft (`Pending` → `Approved`); bukan Draft atau sudah disetujui → `409` | HR supervisor (`recruitment.approve`) |
+| POST | `/offers/:id/send` | Kirim: Draft ber-`Approved` → `Sent`, progress kandidat → `Offering`, email penawaran ke kandidat (best-effort); belum disetujui → `409` | HR (`recruitment.work`) |
+| POST | `/offers/:id/negotiate` · `/accept` · `/decline` | Transisi status offer, menghormati `offerTransitions`; tak sah → `409`. Accept/decline mengisi `responded_at` | HR (`recruitment.work`) |
 | GET | `/audits` | Audit log keputusan | HR admin |
 
 ### Katalog psikotes (sisi HR)
@@ -154,7 +160,7 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 |---|---|---|---|
 | POST/GET | `/onboarding-templates` | Buat/daftar template (item: task/category/assigned_role/is_required/due_day) | HR |
 | GET/PUT/DELETE | `/onboarding-templates/:id` | Detail / edit (full-replace items) / hapus | HR |
-| POST | `/onboarding-instances` | Mulai onboarding: snapshot karyawan + template + `tasks[]` (item + PIC pilihan HR); BE hitung `due_date` (start+due_day), notif inbox tiap PIC | HR |
+| POST | `/onboarding-instances` | Mulai onboarding: snapshot karyawan + template + `tasks[]` (item + PIC pilihan HR); BE hitung `due_date` (start+due_day), notif inbox tiap PIC. 🟡 **(bip-erp `feat/recruitment-alur-kerja-hr`, belum merge)** satu notifikasi per PIC unik berkategori `task-assigned` + `app_route` `/tugas-onboarding`, pesannya menyebut jumlah tugas milik PIC itu dan menyuruh membuka aplikasi MyBharata (sebelumnya `request-waiting-review` dan menyebut menu web yang sudah dicabut). Kategori sudah terdaftar, jadi notification-service tak perlu ikut naik | HR |
 | GET | `/onboarding-instances` | Daftar (`?status=&employee_id=`) | HR |
 | GET | `/onboarding-instances/:id` | Detail progres | HR |
 | PUT | `/onboarding-instances/:id/complete` | Tutup manual (override) | HR |
