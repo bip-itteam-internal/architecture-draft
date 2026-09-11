@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan**, disetujui 2026-09-11, kode belum ada. Rincian di `## Deskripsi`.
+> **Status**: ⚠️ **Diterima, T1+T2 terimplementasi di branch** `feat/form-builder-satgas-kepatuhan` (bip-erp, 4 commit di atas `main` f1bc2314), **belum merge, belum deploy, belum diuji lewat gateway**. T3 sampai T7 belum dikerjakan. Rincian di `## Deskripsi`.
 
 ## Untuk Manajemen
 
@@ -20,17 +20,18 @@ Dokumentasi inspeksi Satgas 5R & K3 pindah dari Google Form dan WhatsApp ke apli
 - Temuan K3 hanya tercatat, belum punya alur tindak lanjut ke GA.
 - Tidak menyentuh sanksi, Surat Peringatan, maupun gaji secara langsung.
 
-**Perkiraan besaran kerja:** sedang, di tiga permukaan (backend, web, MyBharata). Sebagian besar bahan sudah ada: form penilaian per orang, penyimpanan foto di server, dan jalur ke KPI. Yang baru: hak akses khusus petugas, penanda form Satgas, aturan nilai dari cek ulang, halaman rekap, dan dukungan foto di aplikasi. Sebelum aktif, HR perlu memutuskan rumus konversi skor 1-5 ke nilai 0-100.
+**Perkiraan besaran kerja:** sedang, di tiga permukaan (backend, web, MyBharata). Sebagian besar bahan sudah ada: form penilaian per orang, penyimpanan foto di server, dan jalur ke KPI. Yang baru: hak akses khusus petugas, penanda form Satgas, aturan nilai dari cek ulang, halaman rekap, dan dukungan foto di aplikasi. Sebelum aktif, HR perlu memutuskan rumus konversi skor 1-5 ke nilai 0-100. Bagian backend pertama (hak akses, penanda, gerbang, dan data untuk menu) sudah dikerjakan dan menunggu review serta merge.
 
 ## Deskripsi
 
 *Inspeksi Satgas 5R & K3 memakai Form Builder (tipe `evaluation`, yang dinilai Office Boy dan Security) dengan satu penanda form yang dibaca tiga pihak: MyBharata (menu khusus, bukan daftar survei), gerbang pengisian di server, dan satu sumber KPI per orang yang memakai **jawaban terakhir dalam periode**, bukan rata-rata. Menu dan pengisian digerbang modul izin baru yang tertutup sejak awal. Menyimpang dari jalur KPI form yang sudah ada (`service_team_index` ke `nilai_layanan_pribadi`), karena jalur itu melebur seluruh form bertanda di satu departemen dan merata-ratakan jawaban.*
 
-- **Status**: 🟡 **Diusulkan**, disetujui 2026-09-11, kode belum ada. Daftar task: `Workspace/ANALISA - Inspeksi Satgas 5R dan K3.md`
-- **Path di repo** (nama final ditentukan `/plan`):
-  - bip-erp: `shared-library/common/catalog_<modul>.go` (baru) · `services/employee/permission_catalogs.go` · `services/employee/permission_set.go` · `services/form-builder/models_form.go` · `services/form-builder/validate.go` · `services/form-builder/response_handlers.go` · `services/form-builder/uploads.go` · `services/form-builder/<satgas>_me.go` (baru) · `services/form-builder/<satgas>_nilai.go` (baru) · `services/employee/kpi_sumber_<satgas>.go` (baru)
-  - erp-frontend: `src/features/form-builder/types/form.ts` · `src/features/form-builder/lib/schema.ts` · `src/features/form-builder/lib/field-types.ts` · `src/features/form-builder/components/question-row.tsx` · `src/features/form-builder/lib/format-answer.ts` · `src/features/hris/satgas/*` (baru) · `src/app/(main)/hris/satgas/page.tsx` (baru) · `src/components/layout/sidebar-menus.tsx`
-  - mybharata-app: `lib/src/features/form/domain/entities/survey_field.dart` · `lib/src/features/form/presentation/widgets/survey_field_input.dart` · `lib/src/features/form/data/datasources/survey_remote_datasource.dart` · `lib/src/features/form/presentation/bloc/survey_bloc.dart` · `lib/src/features/satgas/*` (baru) · `lib/src/features/home/presentation/widgets/home_page/home_quick_access.dart`
+- **Status**: ⚠️ **Diterima, T1+T2 terimplementasi di branch** `feat/form-builder-satgas-kepatuhan`, belum merge dan belum deploy. Daftar task: `Workspace/ANALISA - Inspeksi Satgas 5R dan K3.md`
+- **Path di repo**:
+  - bip-erp, **T1+T2 (di branch)**: `shared-library/common/catalog_kepatuhan.go` · `shared-library/models/employee/permission_set.go` · `services/employee/permission_catalogs.go` · `services/form-builder/models_form.go` · `services/form-builder/validate.go` · `services/form-builder/satgas_gate.go` · `services/form-builder/satgas_me.go` · `services/form-builder/permission_gate.go` · `services/form-builder/response_handlers.go` · `services/form-builder/uploads.go` · `services/form-builder/form_handlers.go` · `services/form-builder/routes.go`
+  - bip-erp, **T3 (baru, belum ada)**: pembaca nilai Satgas di form-builder + `services/employee/kpi_sumber_<satgas>.go`
+  - erp-frontend, **T4/T5 (baru, belum ada)**: `src/features/form-builder/types/form.ts` · `src/features/form-builder/lib/schema.ts` · `src/features/form-builder/lib/field-types.ts` · `src/features/form-builder/components/question-row.tsx` · `src/features/form-builder/lib/format-answer.ts` · `src/features/hris/master-data/lib/label-modul.ts` · `src/features/hris/satgas/*` · `src/app/(main)/hris/satgas/page.tsx` · `src/components/layout/sidebar-menus.tsx`
+  - mybharata-app, **T6 (baru, belum ada)**: `lib/src/features/form/domain/entities/survey_field.dart` · `lib/src/features/form/presentation/widgets/survey_field_input.dart` · `lib/src/features/form/data/datasources/survey_remote_datasource.dart` · `lib/src/features/form/presentation/bloc/survey_bloc.dart` · `lib/src/features/satgas/*` · `lib/src/features/home/presentation/widgets/home_page/home_quick_access.dart`
 - **Tanggal**: 2026-09-11
 
 ## Context
@@ -64,9 +65,11 @@ Yang dibuang dari usulan awal: penilaian foto oleh AI, peringkat antar departeme
 
 Satgas memakai form `evaluation` yang sudah ada: petugas mengisi, Office Boy dan Security menjadi `subject` (aturan `positions`), dan formnya berulang bulanan. Modul inspeksi tersendiri ditolak karena mengulang penyimpanan foto, potret sasaran, dan jalur KPI yang sudah ada, sekaligus membiarkan utang field `file` di klien tetap tak terbayar. Ini bukan tipe form baru, jadi aturan tipe [[ADR - 0041 Izin Tipe Form Menempel di Departemen]] tidak berubah.
 
-### 2. Satu penanda "inspeksi Satgas" di form, dibaca tiga pihak
+### 2. Satu penanda `inspeksi_satgas` di form, dibaca tiga pihak
 
-Form Satgas diberi penanda tersendiri (nama final di `/plan`, mengikuti [[REF - Penamaan Metrik & Sumber KPI]]), dinyalakan pengelola di editor web, dan sah hanya pada tipe `evaluation` yang berulang bulanan. Satu fakta itu dibaca MyBharata (menu Satgas, dikeluarkan dari daftar survei), gerbang server (§4), dan sumber KPI (§8).
+Form Satgas diberi penanda **`metric_key: inspeksi_satgas`** (`MetricSatgasInspeksi`), dinyalakan pengelola di editor web (T4; di branch ini baru lewat API). Satu fakta itu dibaca MyBharata (menu Satgas, dikeluarkan dari daftar survei), gerbang server (§4), dan sumber KPI (§8).
+
+Syaratnya ditegakkan saat form dibuat (`validateMetricKey` + `validateSatgas`): tipe `evaluation`, berulang bulanan, sasaran aktif, **tepat satu** pertanyaan `boolean` ("Ada temuan?"), dan **tanpa** `settings.single_response`. Tepat satu, karena pertanyaan itulah satu-satunya pembeda jawaban temuan dari cek ulang, dan memilih yang pertama dari beberapa akan membuat artinya bergantung urutan pertanyaan. Tanpa `single_response`, karena cek ulang adalah kiriman kedua atas orang yang sama pada periode yang sama dan `single_response` menolaknya `409`. Penandanya masuk `metrikJamak`, jadi Security dan Office Boy boleh punya form Satgas terpisah di departemen yang sama.
 
 Penandanya **bukan** `service_team_index`. Memakai penanda itu mencampur skor 5R dengan rating pelayanan di KPI anggota dan atasannya (§Context 2).
 
@@ -74,31 +77,33 @@ Penandanya **bukan** `service_team_index`. Memakai penanda itu mencampur skor 5R
 
 Untuk form bertanda Satgas, nilai seseorang dalam satu periode adalah jawaban terakhirnya, bukan rata-rata. Temuan pertama (skor rendah + foto temuan) tergantikan oleh cek ulang (skor final + foto perbaikan). PIC tanpa temuan cukup satu jawaban dengan skor penuh.
 
-Fungsinya satu, dan dipakai endpoint KPI, halaman rekap web, serta tab analitik "Yang Dinilai" untuk form bertanda. Analitik **tidak boleh** menampilkan rata-rata untuk form Satgas: temuan skor 2 lalu cek ulang skor 5 akan tampil 62,5 di analitik dan 100 di KPI, dua angka untuk satu orang di satu bulan tanpa petunjuk mana yang benar. Aturan rata-rata untuk form layanan tidak berubah. Kedua aturan dipilih eksplisit dari penandanya, tidak diwariskan diam-diam.
+Fungsinya satu, dan dipakai endpoint KPI, halaman rekap web, serta tab analitik "Yang Dinilai" untuk form bertanda. Analitik **tidak boleh** menampilkan rata-rata untuk form Satgas: temuan skor 2 lalu cek ulang skor 5 akan tampil 62,5 di analitik dan 100 di KPI, dua angka untuk satu orang di satu bulan tanpa petunjuk mana yang benar. Aturan rata-rata untuk form layanan tidak berubah. Kedua aturan dipilih eksplisit dari penandanya, tidak diwariskan diam-diam. **Di branch T1+T2, aturan ini baru dipakai untuk STATUS ringkasan menu (§5); skor, KPI, dan tab analitik adalah T3.**
 
 Tanpa jawaban dalam periode berarti "belum dinilai": sumber mengembalikan galat dan metrik jatuh ke penilaian manual, bukan 0 dan bukan 100.
 
-### 4. Gerbang: modul izin baru, tertutup sejak awal, ditegakkan server
+### 4. Gerbang: modul izin `kepatuhan`, tertutup sejak awal, ditegakkan server
 
-Izin Satgas berdiri di modul izin sendiri, bukan `hris` dan bukan `formbuilder`, supaya memasangnya tidak mencabut akses HRIS atau Form Builder milik petugas (§Context 7). Tanpa fallback tier: tak seorang pun memegangnya sampai IT memasang paket ke jabatan petugas OD & IR lewat [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]. Polanya meniru [[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]], bukan [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]].
+Izin Satgas berdiri di modul izin sendiri, **`kepatuhan`**, dengan satu izin **`kepatuhan.satgas.input`** dan satu paket bawaan **`kepatuhan_petugas_satgas`** ("Kepatuhan: Petugas Satgas 5R & K3"). Bukan `hris` dan bukan `formbuilder`, supaya memasangnya tidak mencabut akses HRIS atau Form Builder milik petugas (§Context 7). Tanpa fallback tier: tak seorang pun memegangnya sampai IT memasang paket ke jabatan petugas OD & IR lewat [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]. Polanya meniru [[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]], bukan [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]].
 
-Form-builder menolak kirim jawaban **dan** unggah foto pada form bertanda Satgas bila pengirimnya tak memegang izin itu. Ini akan menjadi gerbang pengisian berbasis izin yang pertama di Form Builder; semua preseden yang ada (`requireCultureManager`, peninjau Kaizen, `requireFormManager`) menggerbang kelola atau tinjau, bukan pengisian.
+Form-builder menolak kirim jawaban, unggah foto (sebelum berkas naik ke file-service), dan pembacaan daftar sasaran pada form bertanda Satgas bila pengirimnya tak memegang izin itu, dengan `403` berpesan yang menyebut paketnya dan perlunya login ulang. Form Satgas juga tak muncul di `/me/forms` bagi mereka. Semua jalur memakai satu predikat, jadi tak ada yang bisa menyimpang sendiri. Ini gerbang pengisian berbasis izin yang pertama di Form Builder; semua preseden yang ada (`requireCultureManager`, peninjau Kaizen, `requireFormManager`) menggerbang kelola atau tinjau, bukan pengisian.
 
-### 5. Menu MyBharata bertanya ke server, bukan ke `system_roles`
+Kill-switch **`KEPATUHAN_PERMISSION_ENFORCEMENT`**: hanya `off` yang mematikannya, dan saat itu form Satgas kembali ke perilaku form lain (cukup audience). Jalan mundur darurat, bukan mode operasi; sengaja tak ditulis di compose.
 
-Endpoint khusus di grup `/me`, meniru pola `/me/kaizen`, mengembalikan form Satgas milik pemanggil yang berizin beserta ringkasan kiriman periode ini per orang yang dinilai: siapa sudah bernilai final, siapa masih bertemuan. Menu tampil hanya bila server menjawab boleh. Cache `system_roles` tidak dipakai, karena tak memuat izin dan meloloskan semua saat belum termuat (§Context 6).
+### 5. Menu MyBharata bertanya ke server lewat `GET /me/satgas`, bukan ke `system_roles`
 
-Beranda menyaring form bertanda Satgas dengan pola `isKaizen`, sementara `pendingOf` sengaja tidak disaring supaya tautan notifikasi tetap jalan. Halaman isinya memakai `EvaluationFillPage` apa adanya.
+Endpoint **`GET /me/satgas`**, meniru pola `/me/kaizen`, menilai izin **sebelum** database disentuh: yang tak berhak dijawab `200 {allowed:false}`. Pemegang izin menerima form Satgas terbit yang putarannya buka dan ia masuk audience-nya, beserta ringkasan per PIC dari kiriman petugas **siapa pun** pada periode berjalan, berstatus `not_rated`, `open_finding`, atau `resolved`, diturunkan dari jawaban terakhir (§3). Jawaban "Ada temuan?" yang tak terbaca dibaca `open_finding`, supaya temuan yang tak pernah dicek tak tertutup sendiri. Menu tampil hanya bila server menjawab boleh. Cache `system_roles` tidak dipakai, karena tak memuat izin dan meloloskan semua saat belum termuat (§Context 6).
+
+`metric_key` kini ikut dikirim di `/me/forms`, sehingga beranda bisa menyaring form Satgas dengan pola `isKaizen`, sementara `pendingOf` sengaja tidak disaring agar tautan notifikasi tetap jalan. Halaman isinya memakai `EvaluationFillPage`, dengan satu penyesuaian di T6: halaman itu menutup diri saat semua orang sudah dinilai, padahal cek ulang menilai orang yang sudah pernah dinilai.
 
 ### 6. Halaman rekap Satgas di web
 
-Menu web di kategori HRIS, digerbang izin modul yang sama, membaca endpoint rekap yang sama dengan §5. Isinya: nilai per orang per bulan dari fungsi §3, foto temuan dan perbaikan, dan orang yang belum dicek ulang. Analitik generik Form Builder bukan tempat membaca nilai Satgas.
+Menu web di kategori HRIS, digerbang izin modul yang sama, membaca endpoint rekap yang sama dengan §5: nilai per orang per bulan dari fungsi §3, foto temuan dan perbaikan, dan orang yang belum dicek ulang. Analitik generik Form Builder bukan tempat membaca nilai Satgas.
 
 ### 7. Field foto di klien Form Builder
 
 Editor web bisa membuat field `file`, dan analitik menampilkan fotonya lewat rute pratinjau pengelola yang sudah ada. MyBharata memotret lalu mengompres sebelum unggah: resolusi dibatasi, ukuran diperiksa di bawah 4 MB, dan tombol kirim terkunci selama unggahan berjalan. Batas 4 MB file-service tidak dinaikkan.
 
-Banyak foto per orang berarti beberapa field `file` terpisah, karena satu field satu berkas dan unggahan sekali pakai per orang yang dinilai. `max_files` ditunda sampai ada pemakai kedua. Kemampuan ini sekaligus membuka tipe `report`, yang mewajibkan field berkas tetapi hari ini tak bisa diisi klien mana pun.
+Banyak foto per orang berarti beberapa field `file` terpisah, karena satu field satu berkas dan unggahan sekali pakai per orang yang dinilai. `max_files` ditunda sampai ada pemakai kedua. Kemampuan ini sekaligus membuka tipe `report`, yang mewajibkan field berkas tetapi hari ini tak bisa diisi klien mana pun. MyBharata juga harus mengenal tipe `boolean`, yang dipakai "Ada temuan?".
 
 ### 8. Sumber KPI per orang
 
@@ -108,7 +113,11 @@ Konversi skala 1-5 ke 0-100 hanya satu rumus, di backend. Nilainya berstatus dra
 
 ### 9. Hubungan dengan catatan kepatuhan (ADR 0085)
 
-Petugasnya sama. Modul izin §4 diusulkan menjadi gerbang tunggal petugas lapangan OD & IR untuk kedua fitur (satu modul, dua izin), menjawab TBD "petugas ditunjuk" di [[HRIS - Industrial Relation]], supaya siapa petugasnya tercatat di satu tempat. Datanya tetap terpisah: catatan atribut bukan KPI, inspeksi Satgas adalah KPI.
+Petugasnya sama. Modul izin `kepatuhan` diusulkan menjadi gerbang tunggal petugas lapangan OD & IR untuk kedua fitur (satu modul, dua izin), menjawab TBD "petugas ditunjuk" di [[HRIS - Industrial Relation]], supaya siapa petugasnya tercatat di satu tempat. Datanya tetap terpisah: catatan atribut bukan KPI, inspeksi Satgas adalah KPI.
+
+### 10. Form Satgas tak memicu notifikasi inbox form-builder
+
+Tidak saat terbit, dan tidak saat pengisian "selesai". Petugas bekerja dari menu Satgas yang sudah menampilkan siapa yang masih bertemuan. Notifikasi terbit akan membuat seluruh audience menerima kabar inspeksi; notifikasi selesai dikirim `notifySubmitted` pada SETIAP kiriman begitu seluruh sasaran pernah dinilai, sehingga tiap cek ulang akan melahirkan "sudah lengkap" yang sama lagi. Keduanya satu keputusan, jadi satu predikat (`kirimNotifForm`) untuk kedua titik. Bagian "selesai" diputuskan saat review T1+T2 (2026-09-11), sesudah perilaku berulangnya ditemukan di kode.
 
 ## Consequences
 
@@ -122,17 +131,19 @@ Petugasnya sama. Modul izin §4 diusulkan menjadi gerbang tunggal petugas lapang
 
 - ⚠️ Form-builder kini punya dua aturan agregasi per orang: rata-rata untuk layanan, terakhir-menang untuk Satgas. Wajib dipilih eksplisit dari penanda, dengan uji yang membuktikan keduanya tidak tertukar.
 - ⚠️ Nilai bergantung pada disiplin cek ulang. Temuan yang tak dicek ulang dalam periode tetap bernilai temuan. Ringkasan di menu §5 menampilkan siapa yang masih bertemuan justru untuk menahan ini.
+- ⚠️ Sampai T3, tab analitik "Yang Dinilai" masih merata-ratakan jawaban form Satgas. Analitik bukan tempat membaca nilainya.
 - Temuan dan cek ulang tidak saling tertaut di data. Yang menyatukannya hanya urutan waktu per orang per periode.
 - Daftar Office Boy dan Security yang dinilai dibekukan saat form terbit, jadi karyawan baru butuh form diterbitkan ulang.
 - PIC tidak diberi tahu lewat aplikasi dan tak bisa melihat temuan atas dirinya. WhatsApp tetap dipakai.
 - MyBharata versi lama melewati field foto lalu ditolak backend dengan pesan yang menyebut key field. Field foto jangan dibuat wajib sebelum petugas memperbarui aplikasinya.
+- Pengelola departemen pemilik form membaca seluruh jawaban dan foto lewat analitik Form Builder. Form Satgas karena itu sebaiknya dimiliki Human Resource saja; bila General Affair ikut jadi pemilik, pengelola dari departemen PIC membaca inspeksi atas timnya sendiri.
 
 ### Konsekuensi deploy
 
-- employee-service dan form-builder naik **bersama**: katalog izin diresolusi di yang satu dan ditegakkan di yang lain, dan sumber KPI baru memanggil endpoint internal baru. Sesudahnya erp-frontend, lalu MyBharata dengan version name dan versionCode dinaikkan.
-- Sesudah deploy, IT memasang paket izin ke jabatan petugas, lalu petugas login ulang (token berlaku 72 jam).
-- Katalog izin baru wajib terdaftar di seluruh tempat registrasinya. Yang terlewat gagal senyap ([[CORE - RBAC dan Permission Set]]).
-- Tanpa env baru dan tanpa kategori inbox baru. Env unggah form-builder (`FILE_MODULE_URL`, `MINIO_FORM_KEY`) tercatat live sejak 2026-08-06, tetapi belum diukur ulang di prod.
+- employee-service dan form-builder naik **bersama**: katalog izin diresolusi di yang satu dan ditegakkan di yang lain, dan sumber KPI baru (T3) memanggil endpoint internal baru. Sesudahnya erp-frontend, lalu MyBharata dengan version name dan versionCode dinaikkan.
+- Sesudah deploy, IT memasang paket izin ke jabatan petugas, lalu petugas login ulang (token berlaku 72 jam). Paketnya disisipkan otomatis saat employee-service boot.
+- Katalog izin baru wajib terdaftar di seluruh tempat registrasinya. Yang terlewat gagal senyap, tetapi kini tertangkap tiga uji penjaga employee-service ([[CORE - RBAC dan Permission Set]]).
+- Tanpa env wajib dan tanpa kategori inbox baru. Env unggah form-builder (`FILE_MODULE_URL`, `MINIO_FORM_KEY`) tercatat live sejak 2026-08-06, tetapi belum diukur ulang di prod.
 
 ### Yang sengaja tidak dilakukan
 
