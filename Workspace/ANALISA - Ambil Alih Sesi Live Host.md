@@ -54,9 +54,12 @@ berikutnya tervonis `dalam_shift`. Bukan pekerjaan kode.
 ## T1. BE: tutup otomatis di jam berakhir shift + 60 menit
 
 **Status 2026-09-11**: merged ke `main` (bip-erp #1847 pukul 16:21 WIB, erp-frontend #1539
-pukul 16:32 WIB); rencana `.task-plans/2026-09-11-tutup-otomatis-akhir-shift.md`. Sisa:
-verifikasi DEV lewat gateway, deploy PROD (BE `marketing-analytics-service` lalu FE
-`frontend-hris`, dijalankan manusia), dan daftar verifikasi pasca-merge di badan kedua PR.
+pukul 16:32 WIB) dan **di PROD** (`marketing-analytics-service` 16:55 WIB, `frontend-hris`
+16:59 WIB). Deploy prod dijalankan agent atas penegasan eksplisit user, menyimpang dari aturan
+tim bahwa prod dijalankan manusia. Gerbang biner dan bundel lolos; saat naik 0 dari 4 sesi
+berjalan tertutup. Rencana `.task-plans/2026-09-11-tutup-otomatis-akhir-shift.md`. Sisa: bukti
+perilaku pertama (pengingat 00:30, tutup 01:00 WIB 2026-09-12, bila dua sesi dalam shift tidak
+diakhiri), verifikasi DEV lewat gateway, dan daftar verifikasi pasca-merge di badan kedua PR.
 
 - Sesi berjalan yang melewati jam berakhir shift + 60 menit ditutup dengan `selesai` **tepat
   di batas itu** (bukan jam tik), `ditutup_otomatis: true`, alasan `shift_berakhir`.
