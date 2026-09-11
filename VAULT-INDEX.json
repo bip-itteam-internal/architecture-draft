@@ -13118,8 +13118,8 @@
         "Microservices - Form Builder Service",
         "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI"
       ],
-      "hash": "ce0d7f4d10758f1a917990d4ac92216078882565359ac3ae85129fdf989feb1e",
-      "ukuran_kb": 16.0,
+      "hash": "f38f167df9d8cbc7eba298d95c2f710b0e6ec580f565477a603bf7816879bed0",
+      "ukuran_kb": 16.1,
       "ringkasan": "Menjawab: dari kebutuhan manajemen apa fitur inspeksi Satgas 5R & K3 berasal, apa hasil wawancara dengan OD & Industrial Relation, keputusan user apa yang diambil, dan usulan mana yang gugur (AI penilai foto, peringkat antar departemen, master area). Juga memuat daftar task T0 sampai T7 beserta urutan, dependensi, perintah `/start-task`, cara verifikasi tiap task, keputusan HR yang wajib dijawab sebelum go-live, dan temuan sampingan untuk sinkronisasi dokumen.",
       "kata_kunci": [
         "analisa kebutuhan",
