@@ -2,7 +2,7 @@
 
 *Modul kas kecil per divisi beserta jalur pengajuan budget, menggantikan aturan yang kini berjalan lewat kesepakatan lisan dan chat. **Lintas divisi**, bukan fitur satu departemen: Finance yang menetapkan plafon dan aturannya, tiap divisi yang memakainya. Dokumen ini menggabungkan blueprint dari Finance dengan hasil pemeriksaan langsung ke data produksi, supaya lubang datanya terlihat sebelum ada yang mulai menulis kode.*
 
-- **Status**: ⚠️ **Digantikan sebagian, 26 Agustus 2026.** Jalur **pengajuan budget** diganti oleh [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]]; **kas kecil dipensiunkan bertahap** oleh ADR yang sama. Jalur pengeluaran kas kecil lengkap dan sudah merge (delapan PR, 5 Agustus 2026), **belum deploy** — dan kini tidak akan dilanjutkan. Dokumen ini dipertahankan sebagai catatan aturan bisnis dan lubang data yang ditemukan; aturan yang masih berlaku bagi modul penggantinya adalah ambang nominal, bukan plafon per divisi.
+- **Status**: ⚠️ **Digantikan sebagian; kode kas kecil TETAP hidup dan dipakai, koreksi 2026-09-12.** Jalur **pengajuan budget** diganti [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]] (dan modul pengganti itu sendiri sudah digantikan lagi, lihat catatan di bagian Tabrakan dengan Arsitektur); **kas kecil dipensiunkan bertahap** oleh ADR yang sama. Delapan PR kas kecil merge 5 Agustus 2026. **Koreksi**: versi dok sebelumnya menulis modul ini "belum deploy, dan kini tidak akan dilanjutkan"; itu usang. Diukur prod 2026-09-12: `kas_transaksi` **69** dokumen (terakhir 2026-08-26, 0 dalam 7 hari terakhir), `kas_plafon` **6**, `kas_parameter` **6**, `kas_unit` **1**, `kas_kategori` **1**, `kas_jurnal_outbox` **1**, `pengajuan_budget` **1** (2026-08-19). Modul ini SUDAH deploy dan datanya terus bertambah sesudah 5 Agustus, bukan berhenti di merge. Dokumen ini dipertahankan sebagai catatan aturan bisnis dan lubang data yang ditemukan; aturan yang masih berlaku bagi modul penggantinya adalah ambang nominal, bukan plafon per divisi.
 - **Sumber requirement**: Blueprint Modul Kas Kecil & Pengajuan Budget v1.0 (draft), disusun dari percakapan WhatsApp dengan Finance.
 - **Sumber angka sistem**: sensus langsung `employee_db` dan `procurement_db` produksi, **4 Agustus 2026**.
 - **Terkait**: [[GA - Form Pengadaan dan Pengajuan Dana]] mencatat dua form kertas GA yang menjadi bagian dari alur ini.
@@ -62,9 +62,18 @@ Nilai pada R-01, R-02, R-03, R-05, dan R-06 **wajib disimpan sebagai data**, buk
 
 ## Sudah Ada di Kode
 
-Delapan PR merge **5 Agustus 2026** (#986, #988, #990, #991, #992, #993, #994, #996), seluruhnya di `bip-erp/services/procurement/`. **Belum deploy.**
+Delapan PR merge **5 Agustus 2026** (#986, #988, #990, #991, #992, #993, #994, #996), seluruhnya di `bip-erp/services/procurement/`.
 
-Jalur pengeluaran kas kecil sudah lengkap dari catat sampai pertanggungjawaban. Yang belum ada: pengajuan, approval berjenjang, top-up, tutup buku, laporan, dan jurnal.
+Jalur pengeluaran kas kecil sudah lengkap dari catat sampai pertanggungjawaban. **Koreksi 2026-09-12**: versi dok sebelumnya menyebut pengajuan, approval berjenjang, tutup buku, laporan, dan jurnal sebagai "belum ada"; itu usang untuk sebagian besar daftar itu. Terverifikasi ADA di kode (snapshot origin/main 2026-09-12 pagi):
+
+- **Plafon per departemen per periode**: `GET/POST /kas/plafon` (`main.go:656-662`).
+- **Buku besar dengan saldo berjalan**: `GET /kas/buku-besar` (`main.go:716`).
+- **Jurnal ke Accurate lewat outbox**, dengan pratinjau, kirim, dan batal, digerbang kill switch env `ACCURATE_KAS_PUSH` (`main.go:728-730`; `kas_jurnal_handler.go`; `kas_jurnal_outbox.go`). Kill switch yang SAMA dipakai jurnal pengajuan barang (`pengajuan_barang_jurnal_kirim.go:30,53`).
+- **Alokasi awal bulan**: membongkar penampung akun 2205 jadi beban per CV, satu Journal Voucher per CV (`main.go:735-736`; `kas_alokasi.go:10-31`).
+- **Katalog Accurate** untuk dropdown akun beban, sumber dana CV, dan proyek karyawan (`main.go:669-705`).
+- **Pengajuan budget** sampai status DISETUJUI, lihat bagian di bawah.
+
+Yang TETAP belum ada, tak terbantahkan sesi ini: **top-up** (tak ada rute di `main.go`) dan **tutup buku bulanan + laporan** (lihat Tahapan Implementasi).
 
 ### Aturan dan perhitungan (fungsi murni, tanpa Mongo dan tanpa HTTP)
 
@@ -97,9 +106,11 @@ Seluruhnya berprefix `/kas`, di belakang gateway `/api/procurement/*`.
 
 Koleksi: `kas_unit`, `kas_kategori`, `kas_parameter`, `kas_plafon`, `kas_transaksi` di `procurement_db`.
 
-**Pengajuan budget** (`/api/procurement/budget/*`): `POST /budget/pengajuan` (buat DRAFT; terima `tautan` URL opsional, divalidasi http/https) → `POST .../:nomor/ajukan` (bekukan JenjangWajib) → antrean `GET /budget/persetujuan` + aksi `POST .../:nomor/setujui|tolak|revisi`. Tahap ditentukan **nominal** (Finance; Direktur bila ≥ ambang), penyetuju dari izin `approve.finance`/`approve.direksi` dan disaring per-departemen (lihat §Izin). Nomor mudah dibaca **`PB-<DEPT>-<YYYYMMDD>-<urut>`** (slug NAMA departemen + tanggal pengajuan WIB, urut per departemen per hari) — bukan acak. **Lampiran**: `POST .../:nomor/lampiran` (**append**, maks 5 berkas; pdf/jpg/png/webp/doc/docx/xls/xlsx) & `DELETE .../:nomor/lampiran?object=…`, boleh diubah sampai status final. Koleksi `pengajuan_budget`.
+**Pengajuan budget** (`/api/procurement/budget/*`): `POST /budget/pengajuan` (buat DRAFT; terima `tautan` URL opsional, divalidasi http/https) → `POST .../:nomor/ajukan` (bekukan JenjangWajib) → antrean `GET /budget/persetujuan` + aksi `POST .../:nomor/setujui|tolak|revisi`. **Koreksi 2026-09-12**: jenjang bukan cuma "Finance; Direktur bila ≥ ambang", melainkan ditentukan **Tujuan** yang dipilih pemohon (`pengajuan_budget_jenjang.go:55-71`, fungsi `JenjangUntukTujuan`): Tujuan `FINANCE` → tahap `[finance]`; `GA` → `[hrga, finance]`; `PROCUREMENT` → `[procurement, finance]`; ditambah tahap `direksi` di ujung bila nominal ≥ ambang Direktur (parameter berversi). Penyetuju per tahap dari izin `budget.approve.finance` / `budget.approve.direksi` / `budget.approve.aset` (GA) / `budget.approve.procurement`, gerbang rute `gateBudgetSalahSatu` meloloskan siapa pun pemegang salah satu izin itu (`main.go:784-795`), dan handler yang memutuskan izin mana yang COCOK dengan tahap berjalan. Izin lama `kaskecil.*` yang setara masih diterima selama masa peralihan (`pengajuan_budget_gate_izin.go:18-21,53-59`). ⚠️ Izin `budget.approve.atasan` (Kepala Divisi, tingkat 1) ada di katalog (`catalog_budget.go:58`) tapi **tidak dipakai** `JenjangUntukTujuan` — tak ada tahap "atasan" di ketiga jenjang. Cakupan departemen disaring `departemenTerlihatKas`/`bolehTindakDepartemenKas` (lihat §Izin). Nomor mudah dibaca **`PB-<DEPT>-<YYYYMMDD>-<urut>`** (slug NAMA departemen + tanggal pengajuan WIB, urut per departemen per hari), bukan acak. **Lampiran**: `POST .../:nomor/lampiran` (**append**, maks 5 berkas; pdf/jpg/png/webp/doc/docx/xls/xlsx) & `DELETE .../:nomor/lampiran?object=…`, boleh diubah sampai status final. Koleksi `pengajuan_budget`. Berhenti di status **DISETUJUI**; pencairan dan penjurnalan ke Accurate di luar cakupan modul ini (`main.go:756-758`).
 
 **Antarmuka (erp-frontend)**: menu "Ajukan Budget" + "Pengajuan Saya" **digabung** jadi satu menu **"Pengajuan Budget"** (halaman daftar); form pembuatan tampil sebagai **modal** dari tombol Ajukan. Lampiran banyak berkas dengan **preview klik-untuk-buka** — kartu berkas dulu, pdf/gambar baru dirender di **modal** saat diklik (bukan inline; office = nama+ikon, buka tab baru; gambar dikonversi **WebP** di klien sebelum unggah) — dan input **link** ada di form. Preview memakai presigned URL `GET /api/file/minio/preview` (dipakai ulang, bukan endpoint unduh baru). Panel daftar & persetujuan menampilkan **tautan** (bila ada) dan **riwayat persetujuan** (kapan & siapa — nama karyawan, bukan `employee_id`, dipetakan via `usePetaNamaKaryawan`). Antrean **Pengajuan Budget** juga muncul di **[[APP - Web ERP]]** Ruang Direktur, **dibatasi tahap direktur** (`?tahap=direktur` → `statusPersetujuanKas`): hanya pengajuan yang Finance sudah ACC yang tampil, walau akunnya kebetulan memegang `approve.finance` juga.
+
+⚠️ **Sidebar kas kecil, verifikasi 2026-09-12**: grup menu "Kas Kecil" **DICABUT** dari sidebar (ADR-0055), tetapi rutenya TETAP hidup, hanya pintunya yang dicabut: `/kas-kecil/*` tetap dapat dibuka langsung oleh siapa pun yang tahu URL-nya dan lolos gerbang izin (`erp-frontend/src/components/layout/sidebar-menus.tsx:830,837`). Grup "Budget" tetap tampil.
 
 ### Kenapa menumpang procurement-service
 
@@ -117,7 +128,7 @@ Beda pokok dari modul lain di repo. Monitoring, payroll, dan procurement menyedi
 
 > **Scoping persetujuan per departemen (2026-08-19).** `PengajuanBudget.Departemen` dibekukan dari `UnitKas.Departemen` saat pembuatan. Antrean (`ListPersetujuanBudget`) **dan** aksi (`Setujui`/`Tolak`/`Revisi`) disaring `departemenTerlihatKas`: penyetuju ber-reach `all` (paket Finance/Direktur default) & SPV IT melihat semua; reach `division`/`own` hanya departemen dalam `SupervisedDepartments` (departemen sendiri + supervisi, fallback token lama aman). Enforce **di aksi juga**, bukan cuma antrean, sebab API bisa dipanggil langsung dengan nomor mana pun. Migrasi `migrasiDepartemenPengajuanBudget` mengisi pengajuan lama dari unitnya saat service start.
 
-> **Sisi PENGAJUAN dibuka untuk SEMUA supervisor (2026-08-20).** Awalnya submit digerbang permission-set `kaskecil.pengajuan.save`. Kini `gateSupervisorKas` (`kas_gate.go`) meloloskan **semua supervisor** untuk buat/ajukan/lampiran; pemegang `pengajuan.save` lama tetap lolos. **Yang MENYETUJUI tetap hanya Finance/Direktur** (`approve.finance`/`approve.direksi`) — mengajukan bukan menyetujui. Sinyal "supervisor" = **`is_supervisor`** via klaim `supervised_departments` (`SupervisedDepartmentsStrict`, tanpa fallback), **BUKAN `system_roles`** (itu hak akses modul; banyak SPV departemen role modulnya "staff" dan akan terlewat). `BolehAjukanBudget` tetap membatasi pengajuan ke unit departemennya sendiri. `gateLihatKas` membuka baca unit/kategori/jalur + daftar/detail bagi supervisor **atau** pemegang izin kaskecil apa pun.
+> **Sisi PENGAJUAN dibuka untuk SEMUA supervisor (2026-08-20).** Awalnya submit digerbang permission-set `kaskecil.pengajuan.save`. ⚠️ **Koreksi 2026-09-12**: gerbangnya sudah PINDAH. `gateSupervisorKas` (`kas_gate.go:66`) masih ADA di kode tapi sudah **tidak dipanggil** dari kode non-test mana pun (satu-satunya sebutan lain hanya komentar di `pengajuan_budget_gate_izin.go:92`), jadi mati sebagai gerbang rute nyata. Gerbang yang benar-benar berjalan adalah `gateSubmitBudget`/`gateBacaBudget` (`pengajuan_budget_gate_izin.go:93-117`), pola dan perilakunya sama (semua supervisor lolos, pemegang `budget.pengajuan.save` atau padanan lama `kaskecil.pengajuan.save` tetap lolos) tetapi memakai izin `budget.*`. **Yang MENYETUJUI TIDAK lagi hanya Finance/Direktur**: lihat jenjang per Tujuan di §Pengajuan budget di atas, GA dan Procurement juga memegang tahap approval masing-masing. Sinyal "supervisor" = **`is_supervisor`** via klaim `supervised_departments` (`SupervisedDepartmentsStrict`, tanpa fallback), **BUKAN `system_roles`** (itu hak akses modul; banyak SPV departemen role modulnya "staff" dan akan terlewat). `BolehAjukanBudget` tetap membatasi pengajuan ke unit departemennya sendiri. `gateLihatKas` (kas kecil) dan `gateBacaBudget` (budget) membuka baca bagi supervisor **atau** pemegang izin modul terkait apa pun.
 
 > ⚠️ **Guard self-approval sempat MATI, sudah diperbaiki (2026-08-20).** `TentukanHasilSetujui` menolak pengaju menyetujui pengajuannya sendiri lewat `p.Pengaju == penyetuju`, tetapi `Pengaju` **tak pernah diisi** saat pembuatan (selalu kosong), sehingga guard tak pernah menyala — Direktur yang juga pengaju bisa menyetujui pengajuannya sendiri (persis skenario yang komentar guard sebut). Ditemukan lewat **simulasi flow end-to-end**; kini `Pengaju = DibuatOleh` diisi saat buat.
 
@@ -199,10 +210,12 @@ R-06 dan R-07 seluruhnya bergantung pada `m_kategori_belanja` beserta flag `is_a
 
 Blueprint memuat tabel `t_jurnal` dan menyebut pengeluaran "langsung terjurnal ke akuntansi". Pembukuan perusahaan ada di Accurate dan ERP sengaja **tidak** punya buku besar. Membuat `t_jurnal` di ERP melahirkan dua sumber kebenaran akuntansi.
 
-Dua jalan yang masuk akal, dan ini keputusan Finance:
+Dua jalan dipertimbangkan saat dok ini pertama ditulis. **Koreksi 2026-09-12**: jalan 2 sudah DIPILIH dan DIIMPLEMENTASIKAN, terverifikasi ke kode:
 
-1. **ERP berhenti di pencatatan.** Pengeluaran, bukti, dan status tersimpan di ERP; Finance mem-posting jurnalnya di Accurate seperti sekarang.
-2. **ERP menulis ke Accurate lewat API.** Belum pernah dilakukan untuk dokumen transaksi. Yang sudah terbukti berjalan baru penulisan data master pemasok dan barang di [[Microservices - Procurement Service]].
+1. ~~ERP berhenti di pencatatan.~~ Tidak dipilih.
+2. **ERP menulis ke Accurate lewat API.** Diimplementasikan lewat outbox (`kas_jurnal_outbox.go`), pratinjau/kirim/batal (`kas_jurnal_handler.go`, rute `main.go:728-730`), dan kill switch env `ACCURATE_KAS_PUSH` yang mati bawaan dan harus dinyalakan sadar (`kas_jurnal_handler.go:34`; kill switch yang sama dipakai jurnal pengajuan barang, `pengajuan_barang_jurnal_kirim.go:30,53`). Dengan ini jurnal kas kecil ikut ditulis balik ke Accurate. Klaim lama bahwa ERP baru pernah menulis data master pemasok dan barang ke Accurate sudah usang: integration-service menulis faktur, retur, dan penerimaan harian ([[Microservices - Integration Service]]), dan procurement-service menulis faktur pembelian serta pembayaran ([[Microservices - Procurement Service]]). Alokasi awal bulan (membongkar akun 2205 jadi beban per CV, `kas_alokasi.go:10-31`) memakai mekanisme outbox yang sama.
+
+Konsekuensinya Pertanyaan Terbuka #13 di bawah **terjawab**: menulis ke Accurate, bukan berhenti di pencatatan.
 
 ### Model data relasional di atas database dokumen
 
@@ -211,6 +224,12 @@ Blueprint memakai bentuk relasional (`t_`, `m_`, kunci asing). bip-erp memakai M
 ### Register aset belum ada ujungnya
 
 R-06 mengarahkan pembelian aset ke jalur pengajuan aset, dan blueprint menyebut `m_aset`. Register aset belum ada di sistem mana pun; [[GA - Inventory Management]] masih konsep. Jalur ini boleh dibangun lebih dulu, asalkan disadari bahwa ujungnya belum tersedia.
+
+### ⚠️ ADR-0055 sendiri sudah digantikan lagi, dan penggantinya BELUM punya ADR (temuan 2026-09-12)
+
+[[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]] memutuskan modul "Pengajuan Pembelian" empat tipe (UMUM/RAWMATERIAL/SOFTWARE/IKLAN) menggantikan Pengajuan Budget. Kode saat ini (snapshot origin/main 2026-09-12) sudah melangkah SATU KALI LAGI: modul itu digantikan **"Pengajuan Barang" lima tipe**: `UMUM`, `RAWMATERIAL`, `IKLAN`, `DANA`, `KONSUMSI` (`pengajuan_barang_jenjang.go:11-22`). Komentar kode menyatakannya eksplisit: *"Menggantikan modul pengajuan pembelian yang dihapus, sekaligus melebur alur permintaan barang gudang GA yang sebelumnya tinggal di inventory-service"* (`main.go:1105-1109`), dan model koleksi menyebut `PengajuanBarang` sebagai "modul lima tipe yang melebur permintaan barang gudang dan pengajuan pembelian menjadi satu dokumen" (`models.go:228-230`). Nama koleksi lama `pengajuan_pembelian` **masih terdaftar** (`models.go:302`, berdampingan `pengajuan_barang` di `:304`) dan masih menyimpan data historis (diukur prod 2026-09-12: 3 dokumen, terakhir 2026-08-26); pengajuan baru masuk ke koleksi `pengajuan_barang` (1 dokumen, 2026-09-02).
+
+**Penggantian kedua ini belum punya ADR.** Tidak ada `ADR - 00xx` di vault yang mendokumentasikan peralihan Pengajuan Pembelian empat tipe → Pengajuan Barang lima tipe. Ini catatan/TBD, bukan nomor ADR yang dikarang: rincian alur "Pengajuan Barang" lima tipe sepenuhnya milik [[Microservices - Procurement Service]], dok ini hanya mencatat bahwa rantai penggantian dari Pengajuan Budget sudah dua lapis dan lapis keduanya belum diarsipkan sebagai keputusan.
 
 ## Pertanyaan Terbuka
 
@@ -233,7 +252,7 @@ Ditambah tiga pertanyaan baru dari pemeriksaan sistem:
 
 11. **Siapa anggota Gudang TJ dan Bharata Club?** Keduanya sub-unit (lihat Lubang Data nomor 1), jadi yang dibutuhkan bukan departemen baru melainkan daftar PIC yang boleh bertransaksi atas unit kas itu. Untuk Gudang TJ: seluruh 11 orang berposisi Warehouse di Manufaktur, atau sebagian? Untuk Bharata Club: sebuah tim, atau anggaran kegiatan yang dipegang PIC yang ditunjuk?
 12. **Empat departemen tanpa plafon** (Percetakan, Tech Development, Quality, Marketing Offline Distribution, total 31 karyawan) memang tidak punya kas kecil, atau terlewat?
-13. **Jurnal**: ERP berhenti di pencatatan, atau menulis ke Accurate?
+13. ~~**Jurnal**: ERP berhenti di pencatatan, atau menulis ke Accurate?~~ **Terjawab, 2026-09-12**: menulis ke Accurate lewat outbox + kill switch `ACCURATE_KAS_PUSH` (lihat §Tabrakan dengan Arsitektur).
 
 ## Tahapan Implementasi
 
@@ -244,12 +263,14 @@ Blueprint mengusulkan enam fase, kurang lebih 16 minggu. Satu perubahan yang per
 | 0 | Isi penanda atasan untuk General Affair, Procurement, dan Percetakan; tambahkan `Human Resource` ke `master_department`; isi master unit kas beserta PIC-nya | **Tambahan**, bukan dari blueprint. Pekerjaan data, bukan kode. **Belum dikerjakan.** JANGAN mendaftarkan Gudang TJ atau Bharata Club sebagai departemen, lihat koreksi di Lubang Data nomor 1 |
 | 1 | Master data (divisi, plafon, kategori, parameter) + dashboard saldo | **Backend selesai** (unit kas, kategori, parameter, plafon, saldo). Sisa: layar FE dan pengisian datanya |
 | 2 | Transaksi kas kecil + R-01, R-03, R-06 + unggah bukti | **Backend selesai**, termasuk R-02, R-07, R-08, R-09 dan verifikasi Finance. Sisa: layar FE. **Unggah bukti butuh `MINIO_PROCUREMENT_KEY` dibuat lebih dulu di MinIO** |
-| 3 | Modul pengajuan + approval berjenjang + R-02, R-07 | 3 minggu |
-| 4 | Top-up (R-05) + tutup buku bulanan + laporan | 2 minggu |
-| 5 | Register aset + R-08, R-09. **Integrasi jurnal menunggu keputusan** | 3 minggu |
+| 3 | Modul pengajuan + approval berjenjang + R-02, R-07 | **Backend selesai** (`pengajuan_budget*.go`, jenjang per Tujuan FINANCE/GA/PROCUREMENT + ambang Direksi, verifikasi 2026-09-12). R-02/R-07 sebagai pemicu OTOMATIS dari nominal/kategori kas kecil: **TBD**, belum ditelusuri sesi ini |
+| 4 | Top-up (R-05) + tutup buku bulanan + laporan | Tak ada rute top-up di `main.go` (verifikasi 2026-09-12); tutup buku dan laporan juga tak ditemukan |
+| 5 | Register aset + R-08, R-09. ~~Integrasi jurnal menunggu keputusan~~ | **Jurnal SUDAH diimplementasikan** (lihat §Tabrakan dengan Arsitektur, verifikasi 2026-09-12). Register aset: **TBD**, belum ditelusuri sesi ini |
 | 6 | UAT, migrasi data, pelatihan, go-live paralel sebulan | 3 minggu |
 
 ## Perlu Tindakan Sebelum Deploy
+
+⚠️ **Catatan 2026-09-12**: bagian ini ditulis SEBELUM modul dideploy (Agustus 2026). Diukur prod 2026-09-12: master kas sudah terisi (1 unit, 1 kategori, 6 parameter, 6 plafon) dan paket kas kecil sudah dipegang setidaknya dua akun Finance (Cost Control dan Senior Accountant, lihat [[Finance - FAT Persona]]). Keadaan `MINIO_PROCUREMENT_KEY` dan penugasan paket di luar Finance belum diukur ulang (**TBD**).
 
 Tiga hal berikut bukan pekerjaan kode. Tanpa ketiganya, modul yang sudah merge tidak akan menghasilkan apa-apa selain penolakan.
 
@@ -260,16 +281,16 @@ Tiga hal berikut bukan pekerjaan kode. Tanpa ketiganya, modul yang sudah merge t
 ## Belum Diputuskan (TBD)
 
 - ~~Service mana yang memuat modul ini~~ **Sudah diputuskan: `procurement-service`**, dengan rute berprefix `/kas`. Menghemat satu modul gateway, dan isinya sengaja dipisahkan namanya karena modul ini bukan cermin Accurate seperti sisa service itu.
-- Penomoran pengajuan (penomoran transaksi sudah ada: `KK-<unit>-<YYYYMM>-<urut>`).
+- ~~Penomoran pengajuan~~ **Sudah ada, koreksi 2026-09-12**: `PB-<DEPT>-<YYYYMMDD>-<urut>` (lihat §Sudah Ada di Kode > Pengajuan budget). Penomoran transaksi kas kecil `KK-<unit>-<YYYYMM>-<urut>`.
 - Apakah unggah bukti memakai [[Microservices - File Service]] (batas 4 MB per berkas).
 
 ## Dependensi & Integrasi
 
 - [[Microservices - Employee Service]] — divisi, atasan, dan struktur organisasi untuk rantai approval
 - [[Microservices - File Service]] — penyimpanan bukti dan nota
-- [[Microservices - Procurement Service]] — pola setelan modul dan penomoran yang dapat dicontoh; juga satu-satunya service yang pernah menulis ke Accurate
+- [[Microservices - Procurement Service]] — pola setelan modul dan penomoran yang dapat dicontoh (catatan 2026-09-12: bukan lagi satu-satunya service yang menulis ke Accurate; integration-service juga menulis dokumen transaksi harian)
 - [[CORE - RBAC dan Permission Set]] — tujuh peran yang disebut blueprint
-- [[External - Accurate]] — tujuan akhir jurnal, bila jalan kedua dipilih
+- [[External - Accurate]] — tujuan jurnal; koreksi 2026-09-12, jalan kedua (ERP menulis ke Accurate) SUDAH diimplementasikan, lihat §Tabrakan dengan Arsitektur
 
 ## Dokumen Terkait
 
@@ -278,3 +299,4 @@ Tiga hal berikut bukan pekerjaan kode. Tanpa ketiganya, modul yang sudah merge t
 - [[HRIS - Organization Structure]] — sumber data atasan dan cakupan supervisi
 - [[ADR - 0001 Akuntansi via Accurate]] · [[ADR - 0002 Database-per-Service]]
 - [[Finance - Big Pictures]] — peta domain Finance
+- [[Finance - FAT Persona]]: persona per posisi Finance, termasuk siapa yang memegang paket kas kecil dan budget di prod

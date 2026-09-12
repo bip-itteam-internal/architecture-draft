@@ -6,7 +6,7 @@
 
 - **Stack**: Next.js (App Router) + TypeScript + shadcn/ui + TanStack Query + react-i18next — sama dengan [[APP - Web ERP]], sengaja, supaya layar yang sudah jadi dapat dipindahkan apa adanya
 - **Path di repo**: `audit-bharata` (**repo terpisah**, dibuat 2026-09-03); backend `bip-erp/services/finance` hari ini ([[Finance - Rancangan Finance Service]]), `services/audit` sesudah pemisahan
-- **Status**: ⚠️ **Implemented (ada catatan)** — repo ada, tiga layar jalan, 32 test hijau, `pnpm build` sukses. ⛔ **Belum pernah dijalankan terhadap API sungguhan**: origin aplikasi ini belum ada di allowlist CORS gateway (bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690), OPEN), dan paket izin `Audit: *` belum ditugaskan ke akun mana pun.
+- **Status**: ⚠️ **Implemented (ada catatan)**, diperbarui 2026-09-12: repo ada, tiga layar jalan, 32 test hijau, `pnpm build` sukses. **Koreksi 2026-09-12**: dua klaim di versi sebelumnya sudah usang. (1) PR CORS bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690) **tidak lagi OPEN**: origin `https://audit.bharatainternasional.com` dan port dev 3012 sudah ada di `api-gateway/main.go` per snapshot `origin/main` 2026-09-12 pagi. (2) Aplikasinya **sudah jalan sebagai kontainer di prod**: `Audit-App`, image `audit-bharata-audit-app` dibuat 2026-09-11T07:26Z, port host 3006 ke container 3012, env `MINIO_EMPLOYEE_READ_KEY`/`PORT`/`NODE_ENV` (diukur prod 2026-09-12). ⚠️ Paket izin `Audit: *` ke akun: **belum diukur ulang** sejak 2026-09-04 (saat itu belum ada penugasan). Status terkininya **TBD**, jangan diasumsikan sudah atau belum tanpa mengecek ulang.
 - **Keputusan**: [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]
 
 ## Latar Belakang
@@ -92,7 +92,7 @@ Tiap konsumen SSO menulis ulang keempatnya — belum ada paket bersama:
 - **Pain point**: kertas kerja dirakit ulang dari nol tiap bulan, dan datanya diminta dari divisi yang sedang diperiksa.
 - **Aksi utama**: meninjau baris yang berbunyi, menelusuri ke dokumen sumber, menandai wajar dengan alasan tertulis, atau menaikkannya jadi temuan.
 
-⛔ **Finance bukan pemakai aplikasi ini**, melainkan pihak yang dimintai klarifikasi.
+⛔ **Finance bukan pemakai aplikasi ini**, melainkan pihak yang dimintai klarifikasi. Peran dan tanggung jawab Finance selengkapnya (bukan disalin di sini): [[Finance - FAT Persona]].
 ⛔ **Direktur tidak meninjau, auditor tidak menyetel ukuran sampel.** Yang menetapkan beban pemeriksaan bukan yang mengerjakannya.
 ⛔ **Menu ini tidak muncul untuk siapa pun sampai paketnya dipasang.** Tak ada `system_roles.audit` dan `AuditTierDefault` mengembalikan kosong — memasang paket adalah langkah deploy, bukan langkah opsional.
 
@@ -118,7 +118,7 @@ Direksi — jauh lebih pendek, dan sengaja
 
 ## Belum Diimplementasikan / Catatan
 
-- **Repo, CI, dan hosting belum ada.** Semuanya TBD.
+- ~~Repo, CI, dan hosting belum ada.~~ **Koreksi 2026-09-12**: repo dan hosting **sudah ada** (`audit-bharata`, dibuat 2026-09-03; kontainer `Audit-App` jalan di prod, lihat Status di atas). **CI**: TBD, belum diperiksa sesi ini.
 - **Nama dan alamat final belum diputuskan.** Wadahnya untuk seluruh audit internal, jadi namanya wajib membedakan diri dari [[GA - Audit Internal System]] — dua hal bernama sama tanpa pembeda sudah terbukti membingungkan permanen di [[APP - Dynamic Task Tracker]].
 - **Bentuk layar untuk audit kepatuhan GA belum dirancang.** Registry 36 uji berbentuk pembanding dua sisi berangka; checklist kepatuhan berbentuk lain, dan belum diperiksa apakah keduanya muat dalam satu bentuk layar.
 - ⚠️ **`showFormErrorsToast` menulis ke store yang dibaca `form-errors-modal`.** Bila modal itu tidak dipasang di layout aplikasi baru, validasi lima unsur temuan **gagal tanpa satu pun galat** — tombolnya ditekan, tidak terjadi apa-apa.
