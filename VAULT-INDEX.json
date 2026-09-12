@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-12",
-  "jumlah_dokumen": 403,
+  "jumlah_dokumen": 404,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -170,28 +170,32 @@
       "publik": true,
       "tautan": [
         "Finance - Rancangan Finance Service",
+        "Finance - Audit Internal",
         "API - Index",
         "Microservices - Employee Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "Microservices - Calendar Service",
+        "Finance - FAT Persona",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "Microservices - Integration Service",
         "CORE - API Master Gateway",
+        "ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "2cf32a15824a6239fc1df820f0f5ba7875f7242f8dd1e6fd8f8c7d54cae56f32",
-      "ukuran_kb": 6.2,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan finance-service di balik gateway `/api/finance/*`, bagaimana mencatat/melihat/menghapus rekomendasi efisiensi Cost Control, dan bagaimana agregatnya dipakai sebagai sumber metrik KPI `kinerja_cost_control`. Menjelaskan pula kenapa rute didaftarkan tanpa mengulang nama modul (gateway memotong prefix `/api/finance`), bagaimana penjaga rute `/internal/` membedakan pemanggil orang lewat gateway dari pemanggil service pemegang kunci, dan kenapa periode dihitung memakai zona Asia/Jakarta. Juga menyebut apa yang sengaja belum/tidak ada di service ini: modul Tax, forecast kas mingguan, dan master anggaran OPEX.",
+      "hash": "7a796f6b2d4782dcd75658a5f3813d281f930f714083b070915457395e57087b",
+      "ukuran_kb": 17.4,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan finance-service untuk rekomendasi efisiensi Cost Control, kewajiban pajak per masa (Tax), Biaya Variabel Produksi, dan Audit Internal, beserta izin `finance.pajak.view/kelola/tenggat` dan `audit.*` yang menggerbanginya. Juga menjelaskan kenapa rute ditulis tanpa prefix modul, bagaimana rute `/internal/kpi/*` membedakan pemanggil orang dan service lewat ada-tidaknya header identitas, status kewajiban pajak yang tersimpan vs turunan, enam master jenis pajak bawaan, penjadwal terbit masa, dan feed kalender `tax_due`. Mencatat pula bahwa rute `/biaya-variabel*` tidak digerbang izin maupun `company_id`.",
       "kata_kunci": [
-        "finance service",
-        "API finance",
+        "finance-service",
+        "pajak",
+        "tax",
+        "kewajiban pajak",
         "cost control",
         "rekomendasi efisiensi",
-        "KPI",
-        "endpoint",
-        "internal route",
-        "prefix gateway",
-        "Asia/Jakarta",
-        "periode YYYY-MM"
+        "biaya variabel produksi",
+        "audit internal",
+        "finance.pajak.tenggat",
+        "KPI Tax Officer"
       ]
     },
     {
@@ -677,25 +681,25 @@
       "tautan": [
         "Microservices - Procurement Service",
         "API - Index",
-        "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
+        "Finance - Kas Kecil dan Pengajuan Budget",
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
         "ADR - 0001 Akuntansi via Accurate",
         "CORE - API Master Gateway"
       ],
-      "hash": "b02f5928cdc1388320cd0a5407a68f658222509950178e837801a87f64e1e54a",
-      "ukuran_kb": 29.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia untuk master Pemasok dan master Barang & Jasa di procurement-service (`/api/procurement/*`), termasuk bentuk request body, bentuk response, dan kode galat tiap rute (400 validasi, 404, 409 nomor/kode ganda, 502 bila Accurate tak terhubung). Menjawab juga bagaimana penomoran diusulkan (`/pemasok/usul-nomor` per kategori vs `/barang/usul-kode` global), katalog mana yang ditarik dari Accurate (syarat pembayaran, akun utang, kategori barang, satuan, pajak), arti `sync_status` PENDING/SYNCED/FAILED pada worker sync, serta field yang baca-saja seperti `merek` dan `tipe_persediaan`. Selain itu memuat cermin baca-saja modul Pembelian (Pesanan, Penerimaan, Permintaan Barang) dan rantai delapan tahap Pengajuan Pembelian.",
+      "hash": "ae20848cd7c3c38988a07724360a264a1d6d02141878ac3252f44d908103b277",
+      "ukuran_kb": 44.1,
+      "ringkasan": "Menjawab: endpoint apa saja di procurement-service untuk master Pemasok dan Barang & Jasa (CRUD, usul nomor/kode, katalog Accurate, import awal), cermin Pembelian dari Accurate, Permintaan/Pesanan/Penerimaan Barang ERP, Pengajuan Barang lima tipe, Tagihan Pemasok, Pembayaran Vendor, Aging Utang, Bukti Transfer, KPI Account Payable, serta Kas Kecil dan Pengajuan Budget. Memuat bentuk request/response, kode galat (400/404/409/502), arti `sync_status` (PENDING/SYNCED/FAILED), dan cara otorisasi lewat permission-set dengan fallback tier `procurement`.",
       "kata_kunci": [
         "procurement-service",
-        "pemasok vendor",
-        "master barang jasa",
-        "Accurate sync",
-        "sync_status",
-        "purchase order pesanan pembelian",
-        "penerimaan barang",
-        "permintaan barang",
-        "pengajuan pembelian",
-        "katalog satuan pajak"
+        "pemasok",
+        "vendor",
+        "barang & jasa",
+        "sync Accurate",
+        "purchase order",
+        "pengajuan barang",
+        "tagihan pemasok",
+        "aging utang",
+        "account payable"
       ]
     },
     {
@@ -1112,7 +1116,7 @@
       "area": "Application",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — repo ada, tiga layar jalan, 32 test hijau, `pnpm build` sukses. ⛔ **Belum pernah dijalankan terhadap API sungguhan**: origin aplikasi ini belum ada di allowlist CORS gateway (bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690), OPEN), dan paket izin `Audit: *` belum ditugaskan ke akun mana pun.",
+      "status_teks": "**Implemented (ada catatan)**, diperbarui 2026-09-12: repo ada, tiga layar jalan, 32 test hijau, `pnpm build` sukses. **Koreksi 2026-09-12**: dua klaim di versi sebelumnya sudah usang. (1) PR CORS bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690) **tidak lagi OPEN**: origin `https://audit.bharatainternasional.com` dan port dev 3012 sudah ada di `api-gateway/main.go` per snapshot `origin/main` 2026-09-12 pagi. (2) Aplikasinya **sudah jalan sebagai kontainer di prod**: `Audit-App`, image `audit-bharata-audit-app` dibuat 2026-09-11T07:26Z, port host 3006 ke container 3012, env `MINIO_EMPLOYEE_READ_KEY`/`PORT`/`NODE_ENV` (diukur prod 2026-09-12). ⚠️ Paket izin `Audit: *` ke akun: **belum diukur ulang** sejak 2026-09-04 (saat itu belum ada penugasan). Status terkininya **TBD**, jangan diasumsikan sudah atau belum tanpa mengecek ulang.",
       "publik": true,
       "tautan": [
         "APP - Web ERP",
@@ -1121,6 +1125,7 @@
         "Finance - Audit Internal",
         "CORE - SSO Flow",
         "ADR - 0003 SSO-only Gateway",
+        "Finance - FAT Persona",
         "GA - Audit Internal System",
         "APP - Dynamic Task Tracker",
         "APP - Portal Karir Bharata",
@@ -1128,20 +1133,20 @@
         "CORE - RBAC dan Permission Set",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "473fb28b8624d2883a7243978ef2176d2e6348a4890901533feaf688c1ec0aac",
-      "ukuran_kb": 10.2,
-      "ringkasan": "Menjawab: aplikasi web audit internal itu apa, kenapa ia berdiri di subdomain sendiri alih-alih jadi menu di dalam ERP, dan bagaimana penggunanya masuk lewat SSO ERP tanpa akun terpisah. Merinci tiga layar yang dipindahkan (kertas kerja, register temuan, setelan ukuran sampel) beserta izin yang menggerbanginya, berapa baris kode yang ikut pindah dari erp-frontend, dan keputusan terbuka soal MainTable/Banner di-fork atau dibangun ulang. Juga menjawab: apa saja yang wajib disiapkan tiap konsumen SSO baru (halaman callback, penjaga anti-loop logout, PR CORS ke gateway, penanganan 401) dan siapa persona pemakainya.",
+      "hash": "b6466f5cb094f5886d7a71f22b7e25902504c9b15a22d07d494899e34f8342b5",
+      "ukuran_kb": 11.0,
+      "ringkasan": "Menjawab: apa aplikasi audit internal yang berdiri sendiri (repo `audit-bharata`, subdomain sendiri), kenapa dipisah dari ERP, dan layar apa saja yang ada (kertas kerja bulanan, register temuan, setelan ukuran sampel) beserta izin yang menggerbanginya. Menjelaskan juga cara login lewat SSO ERP one-time code (JWT ERP dibuang setelah callback, origin CORS gateway wajib ditambah), persona auditor, reviewer silang, direktur, dan pembaca beserta paket `audit_*`, ukuran bagian yang dipindah dari erp-frontend, serta keputusan terbuka fork atau bangun ulang `MainTable`.",
       "kata_kunci": [
         "audit internal",
         "internal audit",
         "audit-bharata",
-        "aplikasi terpisah",
-        "subdomain",
-        "SSO",
-        "CORS gateway",
-        "kertas kerja",
+        "kertas kerja audit",
         "register temuan",
-        "izin audit"
+        "SSO one-time code",
+        "audit.view",
+        "CORS gateway",
+        "ukuran sampel",
+        "ADR 0074"
       ]
     },
     {
@@ -2148,6 +2153,7 @@
         "Microservices - Inventory Service",
         "HRIS - Matriks KPI per Departemen",
         "API - Finance Service",
+        "Finance - FAT Persona",
         "Microservices - Attendance Service",
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "APP - Web ERP",
@@ -2184,20 +2190,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "4003287bd59e29a291b55d9e0d6240c4fd761bd7f45b5fb6f37cbc66fe079770",
-      "ukuran_kb": 131.6,
-      "ringkasan": "Menjawab: apa peran employee-service sebagai master data karyawan dan sumber kebenaran autentikasi & onboarding (login username/employee_id, PIN, biometric, refresh token, registrasi, endpoint internal auth), serta endpoint admin akun IT seperti mengubah status aktif, forget-device, reset akun, dan pengaturan `system_roles`. Juga menjelaskan CRUD master departemen & system role beserta gerbang RBAC dan seed-nya, serta kenapa register Legal (perizinan, kontrak, dispute), R&D Regulatory (NIE/BPOM/Halal, pipeline produk), Quality (CAPA, incoming inspection, batch release), dan kontrak vendor/cost saving Procurement di-host di service ini.",
+      "hash": "0dc3f13bffd548a1703efc387a5a5a089671f0b4f4b34c6a972634a518b43814",
+      "ukuran_kb": 139.5,
+      "ringkasan": "Menjawab: endpoint apa saja di employee-service sebagai master data karyawan dan sumber autentikasi SSO (login username/employee_id, PIN, biometric, onboarding, refresh token), operasi admin akun oleh IT (aktif/nonaktif, forget-device, reset akun, system_roles), serta CRUD master departemen dan system role. Juga mencakup workspace posisi yang menumpang di service ini: register Legal (perizinan, kontrak, dispute), R&D Regulatory, Quality (CAPA, incoming inspection, batch release), register kontrak vendor dan cost saving Procurement, plus data KPI, kontrak, BPJS, kuota cuti, multi-tenant, akun pihak luar, dan resign.",
       "kata_kunci": [
         "employee-service",
         "master data karyawan",
-        "autentikasi",
-        "authentication",
-        "onboarding",
+        "login",
+        "autentikasi SSO",
         "reset akun",
+        "system_roles",
         "master department",
-        "system role",
-        "register perizinan legal",
-        "CAPA"
+        "register legal",
+        "CAPA quality",
+        "R&D regulatory"
       ]
     },
     {
@@ -2395,6 +2401,7 @@
         "IT - Background Jobs & Schedulers",
         "Microservices - Warehouse Service",
         "API - Warehouse Service",
+        "Finance - FAT Persona",
         "ADR - 0014 Accurate Token DB-backed via OAuth",
         "RUN - Accurate API Access Token (OAuth)",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur",
@@ -2437,22 +2444,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "6e7304e4fe8c1dd4253a7b95147aa0513194257ccd0627d97a20997a6eac4753",
-      "ukuran_kb": 372.5,
-      "ringkasan": "Menjawab bagaimana integration-service menghubungkan ERP ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) lewat webhook dan API, bagaimana order dan laporan iklan dinormalisasi jadi model transaction terpadu, dan bagaimana data itu di-bridge ke Accurate Online (invoice, ringkasan transaksi harian per-shop/channel, push Sales Invoice/Return). Juga menjelaskan automasi auto-ship/auto-approve yang sadar-holiday, manajemen kredensial OAuth per marketplace, endpoint GMV Max/ICC video metrics untuk insentif marketing, dan status jalur Desty yang sudah soft-disabled.",
+      "hash": "ce9e174a3373e161a7f7e38234450f944a7f29409796b156b631ac9bc75e8d5c",
+      "ukuran_kb": 380.5,
+      "ringkasan": "Menjawab: bagaimana integration-service menghubungkan ERP ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) lewat webhook dan sync terjadwal, menormalkan order jadi model transaksi terpadu, lalu bridging ke Accurate (Sales Invoice, Sales Return, ringkasan harian per toko). Mencakup webhook Shopee/TikTok dan verifikasi HMAC-nya, kredensial dan hari libur untuk auto-ship, laporan GMV Max dan metrik video ICC, rencana Meta Ads, ICC account mapping, ACL toko, fulfillment WMS, gross profit per produk, ulasan marketplace, worker cron, index MongoDB, dan status sinkron per toko.",
       "kata_kunci": [
         "integration-service",
         "marketplace",
         "TikTok Shop",
-        "TikTok Ads",
         "Shopee",
         "Lazada",
-        "Accurate Online",
         "webhook",
+        "Accurate bridging",
+        "sales invoice",
         "GMV Max",
-        "ICC",
-        "OAuth",
-        "sync marketplace"
+        "sync order"
       ]
     },
     {
@@ -2782,33 +2787,36 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — **sudah deploy dan terisi di produksi**. Sensus langsung `procurement_db` produksi **4 Agustus 2026**: `pemasok` 139, `barang` 955, `pesanan_pembelian` 1.038, `penerimaan` 1.841, `faktur_pembelian` 2.055, `permintaan_barang` 235, `katalog` 653, `pengaturan` 1, `pembayaran` 0, `purchase_order` 0. Frontend Master Pemasok, Barang & Jasa, dan ketiga tab Pembelian ada di `erp-frontend` (`src/features/procurement/`) — lihat [[APP - Web ERP]].",
+      "status_teks": "Implemented (ada catatan), **sudah deploy dan terisi di produksi**. Sensus langsung `procurement_db` produksi **diukur prod 2026-09-12** (24 koleksi total): `pemasok` 139, `barang` 955, `pesanan_pembelian` 1.087, `penerimaan` 1.926, `faktur_pembelian` 2.055 (terakhir 2026-07-30), `permintaan_barang` 257, `katalog` 757, `kas_transaksi` 69, `pengajuan_budget` 1, `pengajuan_pembelian` 3 (modul LAMA, terakhir 2026-08-26, lihat bab Pengajuan Barang di bawah), `pengajuan_barang` 1 (modul BARU, 2026-09-02), `pembayaran` 0, `pengaturan_penyetuju_pembelian` 0. `pemasok` dan `barang` TIDAK berubah dari sensus 4 Agustus 2026 (masih 139/955; lihat catatan di §Belum Diimplementasikan). Frontend Master Pemasok, Barang & Jasa, dan ketiga tab Pembelian ada di `erp-frontend` (`src/features/procurement/`), lihat [[APP - Web ERP]].",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
+        "Finance - Kas Kecil dan Pengajuan Budget",
         "APP - Web ERP",
         "API - Procurement Service",
         "Microservices - Employee Service",
         "CORE - RBAC dan Permission Set",
+        "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
         "HRIS - Otomasi Skor KPI",
         "ADR - 0001 Akuntansi via Accurate",
         "Microservices - Manufacture Service",
-        "Microservices - Integration Service"
+        "Microservices - Integration Service",
+        "Finance - FAT Persona"
       ],
-      "hash": "64a4900302b503752b7432e92eedfa6bd12f08446c0886edfece327b83c4cbd5",
-      "ukuran_kb": 35.3,
-      "ringkasan": "Menjawab: bagaimana master Pemasok dan master Barang & Jasa diinput di ERP lalu disinkronkan ke Accurate, serta bagaimana dokumen Pembelian (Permintaan Barang, Pesanan Pembelian, Penerimaan) dicerminkan balik dari Accurate untuk dipantau. Memuat aturan penomoran/usul kode, perilaku worker antrian sync, import awal, gerbang RBAC role procurement, dan jebakan integrasi Accurate yang sudah terverifikasi (field baca-saja, tipe data respons, perilaku edit parsial).",
+      "hash": "5865a8cae59967c8467aeed0b9aa2086bdd20defb784ad0de0de88f361610a4d",
+      "ukuran_kb": 51.2,
+      "ringkasan": "Menjawab: bagaimana procurement-service bekerja: master Pemasok dan Barang diinput di ERP lalu disinkronkan ke Accurate lewat worker antrean, sedangkan Pembelian (Pesanan/Penerimaan/Permintaan) ditarik dari Accurate sebagai cermin baca-saja. Menjelaskan susunan berkas, port, database, dan env (termasuk kill switch `ACCURATE_KAS_PUSH`), jumlah dokumen koleksi `procurement_db` di prod, sisi uang Pengajuan Barang lima tipe, faktur dan pembayaran vendor, KPI Account Payable, penomoran, import awal, jebakan integrasi Accurate, serta register kontrak vendor dan cost saving yang di-host employee-service.",
       "kata_kunci": [
         "procurement-service",
+        "pengadaan",
         "pemasok",
-        "supplier",
         "vendor",
-        "barang dan jasa",
-        "pembelian",
+        "sync Accurate",
+        "pesanan pembelian",
         "purchase order",
-        "penerimaan barang",
-        "Accurate",
-        "sync"
+        "faktur pembelian",
+        "pengajuan barang",
+        "KPI account payable"
       ]
     },
     {
@@ -5296,7 +5304,7 @@
         "REF - Penamaan Metrik & Sumber KPI"
       ],
       "hash": "986c92356a28f6e5d7cecda25991d35ee197cf415fad6f6c08996057876df910",
-      "ukuran_kb": 7.4,
+      "ukuran_kb": 7.5,
       "ringkasan": "Menjawab: mengapa KPI jabatan Culture & Industrial dihitung dari penilaian PESERTA (rating + masukan) alih-alih self-report officer, dan bagaimana modul Kelola Program Culture menggantikan pendekatan form realisasi (ADR 0065). Merinci skor komposit 30/30/40 (partisipasi/antusiasme/implementasi dihitung otomatis), resolusi target diundang otomatis dari jenis program, pemecahan distribusi pilar ke Core Value atomik, koleksi culture_programs/culture_feedback, dan batas kepemilikan kpi_score.",
       "kata_kunci": [
         "ADR 0066",
@@ -6027,7 +6035,7 @@
         "HRIS - Matriks KPI per Departemen"
       ],
       "hash": "ddd8211509695cc32e30ccaa08b6a00f19702f7f0cbadf6be3a93d9c89920515",
-      "ukuran_kb": 14.1,
+      "ukuran_kb": 14.2,
       "ringkasan": "Menjawab: bagaimana kehadiran Program Culture kini didefinisikan (scan QR fisik, bukan pengisi feedback), bagaimana metrik partisipasi/antusiasme/implementasi KPI Culture & Industrial dihitung setelah perubahan ini, dan bagaimana alur scan token + rating persisten berjalan di MyBharata. Menjelaskan juga peran master program untuk mengisi form pembuatan program otomatis, bagaimana walk-in tak diundang tetap dihitung hadir, serta koleksi/endpoint baru di form-builder dan repo mana saja yang tersentuh.",
       "kata_kunci": [
         "Program Culture",
@@ -6066,7 +6074,7 @@
         "APP - Web ERP"
       ],
       "hash": "cbe50357be0f60ff0c955244db65d7ea6a789c7e20f47bc80ee593d394467e49",
-      "ukuran_kb": 11.6,
+      "ukuran_kb": 11.7,
       "ringkasan": "Menjawab: kenapa modul Industrial Relation menyimpan catatan pelanggaran kepatuhan ringan (atribut kerja: sepatu, lanyard) di koleksi baru compliance_note yang terpisah dari Surat Peringatan dan kpi_score, dan kenapa catatan itu bukan sanksi, tidak memotong gaji, tidak menerbitkan SP otomatis, serta tidak masuk skor KPI. Menjelaskan siapa yang boleh mencatat (petugas IR/HR yang ditunjuk, lewat MyBharata, ditegakkan di server), siapa yang boleh membaca (visibilitas tiga-arah: petugas HR, karyawan atas dirinya, atasan atas departemennya via SupervisedDepartmentsStrict), dan kenapa jenis pelanggaran dibuat master data bukan enum Go. Juga menjawab kenapa data ini sensitif sehingga tidak didaftarkan ke calendar-service atau feed lintas modul.",
       "kata_kunci": [
         "industrial relation",
@@ -6403,7 +6411,7 @@
         "APP - MyBharata"
       ],
       "hash": "de6bb52f1e5f4d1e9b377c63fdf9770d088cebfcb6361869052ba23725a3c210",
-      "ukuran_kb": 13.3,
+      "ukuran_kb": 13.4,
       "ringkasan": "Menjawab: bagaimana program Culture yang bukan acara (non-event, mis. Kamis Batik) dinilai tanpa daftar hadir/scan/rating, yaitu lewat tanda \"terlaksana\" yang disetujui SPV HR (100 bila disetujui, else 0) dan masuk array komposit yang sama sehingga KPI officer dan bentuk GET /internal/culture/metrics tidak berubah. Menjelaskan penambahan field tipe (event/non_event) pada program dan master, serta jadwal hari/tanggal berulang di master yang mem-pra-isi tanggal saat program dibuat. Merekam alasan keputusan: KPI diatur SK (tak boleh didesain ulang) dan self-report harus ditahan gerbang approval.",
       "kata_kunci": [
         "ADR 0093",
@@ -6519,34 +6527,45 @@
       "judul": "Finance - Big Pictures",
       "area": "Finance System",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "**Konsep / Overview** — peta domain Finance System: sistem lama terenkapsulasi (sinkron ke Accurate), direncanakan dibangun ulang dari awal.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**. Peta domain Finance System. Rencana awal membangun ulang sistem finance di dalam ERP sudah sebagian terwujud (diukur 2026-09-12, lihat bagian \"Peta sistem finance di ERP\"); dua paragraf Deskripsi di bawah adalah latar belakang rencana itu, bukan keadaan hari ini.",
       "publik": true,
       "tautan": [
         "External - Accurate",
+        "API - Finance Service",
+        "Finance - Rancangan Finance Service",
+        "Finance - Audit Internal",
+        "Finance - Kas Kecil dan Pengajuan Budget",
+        "Microservices - Procurement Service",
+        "API - Procurement Service",
+        "Microservices - Integration Service",
+        "API - Integration Service",
+        "Finance - Incentive",
+        "Microservices - Insentive Service",
+        "Finance - Dashboard per Posisi (FAT)",
+        "APP - Audit Internal",
+        "Finance - FAT Persona",
         "APP - Buku Besar Konsolidasi CV FINCON",
         "Microservices - Payroll Service",
         "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
         "ADR - 0001 Akuntansi via Accurate",
         "Finance - Bridging App",
-        "Finance - Incentive",
-        "Finance - Dashboard per Posisi (FAT)",
         "Vendor - CRM"
       ],
-      "hash": "df7fa9027e59173000c7c0d2642a983fb831780ea25a2498c83ffa5239333f0b",
-      "ukuran_kb": 2.0,
-      "ringkasan": "Menjawab: seperti apa peta besar domain Finance di Bharata, mengapa sistem finance lama dianggap sudah terenkapsulasi dan direncanakan dibangun ulang dari awal, serta bagaimana data dari Vendor CRM dibersihkan dan disinkronkan ke Accurate. Memuat juga penunjuk ke sistem akuntansi kedua di luar peta ini (buku besar konsolidasi 40 CV) beserta konsekuensinya bahwa laba per CV kini punya dua sumber yang tak direkonsiliasi. Titik masuk untuk menemukan dokumen Finance lain seperti Bridging App, Incentive, dan Dashboard per Posisi FAT.",
+      "hash": "5dd3461f2f40450bd65378cc9593798777bbb047f0d2e8b2ad2cbeba97ded358",
+      "ukuran_kb": 3.6,
+      "ringkasan": "Menjawab: di mana saja fungsi finance tersebar di kode ERP (pajak, cost control, biaya variabel, audit di finance-service; kas kecil, pengajuan barang, utang pemasok di procurement-service; bridging Accurate, laporan keuangan, piutang di integration-service; insentif; dashboard per posisi; aplikasi audit) beserta dokumen rujukannya. Juga menjelaskan latar belakang rencana membangun ulang sistem finance, dan adanya buku besar konsolidasi 40 CV (FINCON) di luar ERP dan Accurate yang bertentangan dengan ADR 0001.",
       "kata_kunci": [
         "finance",
         "keuangan",
+        "peta domain finance",
         "big picture",
-        "overview",
         "Accurate",
-        "bridging",
-        "CRM",
-        "insentif",
-        "dashboard FAT",
-        "konsolidasi CV"
+        "FINCON",
+        "konsolidasi 40 CV",
+        "buku besar",
+        "ADR 0068",
+        "finance-service"
       ]
     },
     {
@@ -6617,6 +6636,7 @@
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "Finance - FAT Persona",
         "External - Accurate",
         "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
         "HRIS - Matriks KPI per Departemen",
@@ -6630,22 +6650,20 @@
         "Finance - Big Pictures",
         "Finance - Incentive"
       ],
-      "hash": "af01e49b037387adfad2a992e8a1ea000780157bc1183ecc13af82ffa62e6282",
-      "ukuran_kb": 9.5,
-      "ringkasan": "Menjawab: bagaimana dashboard Finance/Accounting/Tax (FAT) per posisi dibangun di erp-frontend, posisi apa saja yang punya halaman (spv, ar-staf, ar-leader, junior/senior accounting, cost control, tax, ap, cv), grafik dan indikator target mana yang sudah hidup beserta hook sumbernya, dan elemen mana yang masih menunggu endpoint backend. Menjelaskan prinsip datanya: tidak ada angka palsu, indikator pass/fail hanya untuk ambang yang sudah tertulis, dan angka lintas modul yang datang dari Accurate. Memuat pula penilaian isi divisi ini terhadap ADR 0076: 61 metrik di 8 posisi, penghambat log 1-on-1 dan Kaizen, kandidat visual utama per posisi, serta metrik yang salah petak (aset tetap ke manufacture_resi, Monitoring Team gabungan) yang harus diputuskan sebelum digambar.",
+      "hash": "7696aad29a2978164edb2c927218c499db4023b6db0a6fc98bf35d9e859a8e58",
+      "ukuran_kb": 10.0,
+      "ringkasan": "Menjawab: bagaimana dashboard per posisi Finance/Accounting/Tax (FAT) di erp-frontend disusun (perender data-driven, rute `/finance/posisi/<posisi>`, pustaka bagan lokal), grafik dan indikator apa per posisi yang memakai data nyata beserta hook sumbernya, dan elemen mana yang dirender sebagai panel \"menunggu penyambungan\". Juga menjelaskan prinsip tanpa angka palsu, ambang pass/fail, serta rancangan isi menurut ADR 0076: 61 metrik KPI, penghambat log 1-on-1 dan Kaizen, kandidat visual utama, metrik salah petak, dan kebutuhan backend.",
       "kata_kunci": [
         "dashboard FAT",
-        "finance",
-        "accounting",
-        "tax",
         "dashboard per posisi",
-        "AR staf",
-        "AR leader",
+        "finance accounting tax",
+        "AR staff",
         "cost control",
         "aging piutang",
-        "Accurate",
-        "panel menunggu penyambungan",
-        "kartu indikator target"
+        "aging utang",
+        "erp-frontend finance",
+        "ADR 0076",
+        "menunggu penyambungan"
       ]
     },
     {
@@ -6675,6 +6693,52 @@
         "pandas",
         "bridging app",
         "income_tiktok"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - FAT Persona.md",
+      "judul": "Finance - FAT Persona",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**. Ikut status dok induk [[Finance - Dashboard per Posisi (FAT)]]: layar per posisi dan alur uang di kode sudah ada, tetapi akses nyata di produksi belum cocok dengan rancangannya (Account Payable dan Tax Officer tanpa akses ke layar kerjanya), dan modul Pajak serta alur pembayaran AP belum pernah dipakai. Seluruh angka dan akses **diukur prod 2026-09-12**; ukur ulang sebelum dipakai mengambil keputusan.",
+      "publik": true,
+      "tautan": [
+        "Finance - Dashboard per Posisi (FAT)",
+        "Finance - Big Pictures",
+        "HRIS - Matriks KPI per Departemen",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
+        "ADR - 0001 Akuntansi via Accurate",
+        "APP - Buku Besar Konsolidasi CV FINCON",
+        "Microservices - Integration Service",
+        "Microservices - Procurement Service",
+        "Finance - Kas Kecil dan Pengajuan Budget",
+        "API - Finance Service",
+        "Finance - Rancangan Finance Service",
+        "Finance - Audit Internal",
+        "APP - Audit Internal",
+        "Finance - Incentive",
+        "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
+        "API - Procurement Service",
+        "Microservices - Insentive Service",
+        "CORE - RBAC dan Permission Set",
+        "HRIS - Payroll Persona"
+      ],
+      "hash": "d5393135ecf6e3252dff0821db95cd4ca762a40e006c5dc9250c7ef51dd0738c",
+      "ukuran_kb": 23.9,
+      "ringkasan": "Menjawab: siapa saja yang bekerja di divisi Finance, Accounting, dan Tax (Supervisor FAT, Senior/Junior Accountant, AR Leader, AR Staff, Account Payable, Cost Control, Tax Officer) serta aktor lintas divisi, apa tujuan, pain point, aksi utama, dan KPI tiap posisi, dan paket izin/RBAC apa yang benar-benar mereka pegang di prod. Juga menjelaskan alur kerja antar posisi: uang keluar lewat pengajuan barang lima tipe, uang masuk marketplace, tutup buku, kas kecil, pajak, insentif, beserta skenario gagalnya.",
+      "kata_kunci": [
+        "persona finance",
+        "FAT",
+        "account payable",
+        "tax officer",
+        "senior accountant",
+        "AR staff",
+        "supervisor finance",
+        "RBAC finance",
+        "permission set",
+        "alur pengajuan barang"
       ]
     },
     {
@@ -6725,7 +6789,7 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Digantikan sebagian, 26 Agustus 2026.** Jalur **pengajuan budget** diganti oleh [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]]; **kas kecil dipensiunkan bertahap** oleh ADR yang sama. Jalur pengeluaran kas kecil lengkap dan sudah merge (delapan PR, 5 Agustus 2026), **belum deploy** — dan kini tidak akan dilanjutkan. Dokumen ini dipertahankan sebagai catatan aturan bisnis dan lubang data yang ditemukan; aturan yang masih berlaku bagi modul penggantinya adalah ambang nominal, bukan plafon per divisi.",
+      "status_teks": "**Digantikan sebagian; kode kas kecil TETAP hidup dan dipakai, koreksi 2026-09-12.** Jalur **pengajuan budget** diganti [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]] (dan modul pengganti itu sendiri sudah digantikan lagi, lihat catatan di bagian Tabrakan dengan Arsitektur); **kas kecil dipensiunkan bertahap** oleh ADR yang sama. Delapan PR kas kecil merge 5 Agustus 2026. **Koreksi**: versi dok sebelumnya menulis modul ini \"belum deploy, dan kini tidak akan dilanjutkan\"; itu usang. Diukur prod 2026-09-12: `kas_transaksi` **69** dokumen (terakhir 2026-08-26, 0 dalam 7 hari terakhir), `kas_plafon` **6**, `kas_parameter` **6**, `kas_unit` **1**, `kas_kategori` **1**, `kas_jurnal_outbox` **1**, `pengajuan_budget` **1** (2026-08-19). Modul ini SUDAH deploy dan datanya terus bertambah sesudah 5 Agustus, bukan berhenti di merge. Dokumen ini dipertahankan sebagai catatan aturan bisnis dan lubang data yang ditemukan; aturan yang masih berlaku bagi modul penggantinya adalah ambang nominal, bukan plafon per divisi.",
       "publik": true,
       "tautan": [
         "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
@@ -6733,9 +6797,11 @@
         "APP - Web ERP",
         "HRIS - Organization Structure",
         "ADR - 0001 Akuntansi via Accurate",
+        "Microservices - Integration Service",
         "Microservices - Procurement Service",
         "ADR - 0002 Database-per-Service",
         "GA - Inventory Management",
+        "Finance - FAT Persona",
         "Microservices - File Service",
         "Microservices - Employee Service",
         "CORE - RBAC dan Permission Set",
@@ -6743,22 +6809,20 @@
         "GA - Procurement System",
         "Finance - Big Pictures"
       ],
-      "hash": "fc5e0a10b38987b69f7caa830d7d07ef1acfb9a87fcf162c8683c5768dc56517",
-      "ukuran_kb": 26.1,
-      "ringkasan": "Menjawab: berapa plafon kas kecil tiap divisi per bulan, aturan apa (R-01 sampai R-09) yang menentukan sebuah pengeluaran lewat jalur kas kecil atau jalur pengajuan berapproval, siapa approver-nya menurut nominal, dan status apa saja yang dilalui transaksi kas kecil, pengajuan, serta top-up. Merinci juga bagian mana yang sudah ada di kode `services/procurement` (fungsi aturan murni, endpoint `/kas` dan `/budget`, penomoran `PB-<DEPT>-<YYYYMMDD>-<urut>`, lampiran, antarmuka erp-frontend) dan lubang data yang ditemukan dari sensus produksi, seperti beda 'divisi' blueprint vs 'departemen' ERP serta master kategori belanja yang belum ada. Dipakai sebagai catatan aturan bisnis dan pertentangan arsitektur (buku besar sendiri vs ADR 0001 Accurate) meski jalur pengajuannya sudah digantikan.",
+      "hash": "47358b7d62d7e1fd9703a7defed73010609f1ab418ffd8156cd3b8ed56a72117",
+      "ukuran_kb": 33.4,
+      "ringkasan": "Menjawab: apa aturan bisnis kas kecil per divisi (plafon bulanan, ambang Rp 500.000, sembilan aturan R-01 sampai R-09, matriks approval, alur status) dan bagaimana jenjang pengajuan budget ditentukan Tujuan yang dipilih pemohon. Juga menjelaskan komponen kodenya di procurement-service (plafon, buku besar, jurnal ke Accurate lewat outbox, alokasi awal bulan, endpoint `/kas/*` dan `/budget/*`, izin tanpa fallback tier), lubang data di prod, tabrakan dengan ADR 0001, dan hubungannya dengan ADR 0055 yang menggantikannya sebagian.",
       "kata_kunci": [
         "kas kecil",
         "petty cash",
-        "plafon divisi",
         "pengajuan budget",
-        "budget request",
-        "approval finance",
-        "top-up",
-        "procurement service",
-        "kas_transaksi",
-        "lampiran bukti",
-        "kategori belanja",
-        "aset"
+        "plafon divisi",
+        "approval berjenjang",
+        "izin kaskecil",
+        "jurnal Accurate outbox",
+        "ACCURATE_KAS_PUSH",
+        "ADR 0055",
+        "top-up"
       ]
     },
     {
@@ -6767,10 +6831,11 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — **Fase 0 LIVE di dev & prod** sejak 2026-08-13, **daftar akun OPEX ditegakkan kode** dan metrik varians OPEX **sudah terisi otomatis** di KPI, serta **modul Cost Control Fase 1a (rekomendasi efisiensi, bobot 20%) sudah ada**, **Fase 1b (akurasi forecast kas mingguan, bobot 15%) sudah ada**, **metrik Admin & Non-Ops YoY (bobot 10%) sudah ada**, dan **grid \"Opex Marketing\" (7 kategori — breakdown manual, otomatis `incentive_profit`, dan alokasi headcount — sejak 2026-08-20, awalnya registry Beban Software manual 2026-08-19) sudah ada**. ⚠️ **Ketiga yang disebut terakhir mendarat di [[Microservices - Integration Service]], BUKAN di service ini** — beda dari Fase 1a yang memang di sini; lihat catatan gap di §Ruang Lingkup. Tersisa 🟡: modul Tax — lihat bab keputusan.",
+      "status_teks": "**Implemented (ada catatan)** — **Fase 0 LIVE di dev & prod** sejak 2026-08-13, **daftar akun OPEX ditegakkan kode** dan metrik varians OPEX **sudah terisi otomatis** di KPI, serta **modul Cost Control Fase 1a (rekomendasi efisiensi, bobot 20%) sudah ada**, **Fase 1b (akurasi forecast kas mingguan, bobot 15%) sudah ada**, **metrik Admin & Non-Ops YoY (bobot 10%) sudah ada**, dan **grid \"Opex Marketing\" (7 kategori — breakdown manual, otomatis `incentive_profit`, dan alokasi headcount — sejak 2026-08-20, awalnya registry Beban Software manual 2026-08-19) sudah ada**. ⚠️ **Ketiga yang disebut terakhir mendarat di [[Microservices - Integration Service]], BUKAN di service ini** — beda dari Fase 1a yang memang di sini; lihat catatan gap di §Ruang Lingkup. ✅ **Modul Tax (kewajiban per masa) sudah ADA di kode** (diukur 2026-09-12): 8 rute (`/pajak/ringkasan`, `/pajak/master`, `/pajak/master/seed`, `/pajak/master/:id`, `/pajak/terbitkan`, `/pajak/:id`, `/pajak/:id/tenggat`, `/pajak/:id/bukti/:jenis`) digerbang 3 izin `finance.pajak.view/kelola/tenggat`, penjadwal terbit masa (tik 10 menit, jendela tanggal 1) + pengingat H-7/H-3, feed `/internal/calendar-feed` (`kind: tax_due`), dan sumber KPI `kinerja_tax` lewat `/internal/kpi/tax`. Tabel rute lengkap: [[API - Finance Service]]. 🟡 Register pelaporan SPT, register temuan kepatuhan, dan klasifikasi akun deductible **belum dibangun** (koleksi `pajak_spt`/`pajak_temuan`/`pajak_klasifikasi_akun` dinamai, nol pemanggil). ⚠️ **Di prod datanya masih kosong**: `pajak_master` dan `pajak_kewajiban` nol dokumen, seed master belum pernah dijalankan (diukur 2026-09-12).",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
+        "API - Finance Service",
         "Finance - Big Pictures",
         "Finance - Dashboard per Posisi (FAT)",
         "HRIS - Otomasi Skor KPI",
@@ -6781,6 +6846,7 @@
         "Microservices - Calendar Service",
         "Microservices - Form Builder Service",
         "ADR - 0002 Database-per-Service",
+        "Finance - FAT Persona",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "REF - Alur Persetujuan",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
@@ -6789,7 +6855,6 @@
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "Microservices - Employee Service",
         "RUN - Menambah Metrik KPI Otomatis",
-        "API - Finance Service",
         "GA - Inventory Management",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
@@ -6803,27 +6868,20 @@
         "External - Accurate",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "027bfb07fba729973f3f83a31aa1178124cd31eb79040c48664b301b0f4982b0",
-      "ukuran_kb": 90.9,
-      "ringkasan": "Menjawab: apa yang ditampung finance-service (modul Tax, Cost Control, jembatan KPI `GET /internal/kpi/metrics` sebagai fasad seluruh departemen Finance), kenapa KPI Finance 0 dari 66 metrik terisi otomatis, dan bobot KPI mana yang dibuka oleh master anggaran OPEX, tracker pajak/SPT, dan forecast kas. Juga menjawab fitur mana yang justru dibangun di integration-service (Fase 1b forecast mingguan, Admin & Non-Ops YoY, grid Opex Marketing 7 kategori), tiga lapis rumus metrik dan mana yang boleh di sini, mengapa metrik AR bersifat departemen bukan per orang, alur dan mesin status modul Tax dan Cost Control, cara master data terisi (impor OPEX, kewajiban pajak dibangkitkan), rancangan menu/halaman frontend, serta keputusan mana yang masih ditunggu dari tim Finance.",
+      "hash": "c026bfde1933a2b6c1ef933f402a16823aefe091d28ca92144f445fa61400001",
+      "ukuran_kb": 95.7,
+      "ringkasan": "Menjawab: kenapa finance-service dirancang (metrik KPI Finance tak bisa terisi otomatis karena anggaran, tracker pajak, dan forecast kas tidak ada di sistem), modul apa yang masuk lingkupnya (Tax, Cost Control, jembatan KPI, jalur entri OPEX, Biaya Variabel Produksi), dan fitur mana yang justru dibangun di integration-service. Juga membahas RBAC dan izin, alur serta mesin status modul Tax dan Cost Control, cara master data terisi (impor anggaran OPEX, kewajiban pajak dibangkitkan sistem), rumpun metrik AR, grid Opex Marketing, daftar akun OPEX, dan keputusan yang ditunggu dari tim Finance.",
       "kata_kunci": [
         "finance-service",
-        "Finance Service",
-        "OPEX",
-        "anggaran",
-        "budget",
-        "Cost Control",
-        "Tax",
-        "pajak",
-        "SPT",
+        "rancangan finance",
+        "tax control",
+        "kewajiban pajak",
+        "cost control",
         "forecast kas",
-        "cashflow",
-        "KPI Finance",
-        "FAT",
-        "kinerja_finance",
-        "Opex Marketing",
-        "varians OPEX",
-        "Accurate"
+        "anggaran OPEX",
+        "jembatan KPI",
+        "kinerja_tax",
+        "Opex Marketing"
       ]
     },
     {
@@ -7286,7 +7344,7 @@
         "GA - Form Pengadaan dan Pengajuan Dana"
       ],
       "hash": "5a506ef2f6690f2d0fd48bd5da4134bc63d99b6af98efef405cd97c1c4ee6447",
-      "ukuran_kb": 7.6,
+      "ukuran_kb": 7.7,
       "ringkasan": "Menjawab: apa saja 11 SOP Procurement resmi PT Bharata (perencanaan kebutuhan, PR, seleksi vendor, RFQ, penerbitan PO, monitoring pengiriman, penerimaan+QC, verifikasi invoice, pembayaran, evaluasi vendor, cost saving, pelaporan) dan sejauh mana masing-masing sudah didukung ERP. Memetakan tahap SOP mana yang sudah ada di kode (Permintaan/Pesanan/Penerimaan), mana yang sebagian, dan mana yang belum dibangun (RFQ 3-vendor, matriks approval nominal >Rp50jt, AVL & dokumen legalitas vendor, scorecard/OTD vendor, pelaporan formal). Berguna untuk mengecek kepatuhan SOP sebelum merancang fitur procurement/manufacture baru.",
       "kata_kunci": [
         "procurement",
@@ -8319,7 +8377,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Salinan setia data production per **2026-08-01**, dengan bab **Tech Development** disegarkan langsung dari `employee_db` prod **2026-08-28** (status arsip template, konfigurasi `auto` yang benar-benar terpasang, dan ketersediaan tiap sumbernya). Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini. **Ralat 2026-08-31**: 18 sel yang menyatakan \"TIDAK ADA modul Kaizen\" dan 1 sel yang menyatakan \"TIDAK ADA modul forecast\" **salah** dan sudah diperbaiki — rinciannya di bagian [[#Ralat 2026-08-31 Kaizen dan forecast kas]]. **Segar 2026-09-02**: bab **Recruitment & Onboarding** ditulis ulang dari `employee_db` + `recruitment_db` prod (template aktifnya sudah berganti jadi `Recruitment` dan dua metriknya berbeda dari yang tercatat sebelumnya), sel `PPIC / Inventory Turnover Ratio` diralat karena berisi verdict rekrutmen yang salah tempel, dan baris rekrutmen di `KPI Supervisor HRGA` disegarkan angkanya.",
+      "status_teks": "Salinan setia data production per **2026-08-01**, dengan bab **Tech Development** disegarkan langsung dari `employee_db` prod **2026-08-28** (status arsip template, konfigurasi `auto` yang benar-benar terpasang, dan ketersediaan tiap sumbernya). Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini. **Ralat 2026-08-31**: 18 sel yang menyatakan \"TIDAK ADA modul Kaizen\" dan 1 sel yang menyatakan \"TIDAK ADA modul forecast\" **salah** dan sudah diperbaiki — rinciannya di bagian [[#Ralat 2026-08-31 Kaizen dan forecast kas]]. **Segar 2026-09-02**: bab **Recruitment & Onboarding** ditulis ulang dari `employee_db` + `recruitment_db` prod (template aktifnya sudah berganti jadi `Recruitment` dan dua metriknya berbeda dari yang tercatat sebelumnya), sel `PPIC / Inventory Turnover Ratio` diralat karena berisi verdict rekrutmen yang salah tempel, dan baris rekrutmen di `KPI Supervisor HRGA` disegarkan angkanya. **Segar 2026-09-12**: bab **Finance** ditulis ulang dari `employee_db` prod (template, konfigurasi `auto`, penetapan, dan skor 2026; rinciannya di bab itu).",
       "publik": true,
       "tautan": [
         "RUN - Menambah Metrik KPI Otomatis",
@@ -8330,10 +8388,12 @@
         "REF - Penamaan Metrik & Sumber KPI",
         "API - Task Management Service",
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
+        "Finance - FAT Persona",
         "Microservices - Procurement Service",
         "Microservices - Integration Service",
         "ANALISA - KPI Tax Officer",
         "Finance - Rancangan Finance Service",
+        "API - Finance Service",
         "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
         "Microservices - Form Builder Service",
         "ADR - 0066 Modul Kelola Program Culture",
@@ -8345,20 +8405,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "5acbbd456788ebcbdbebe82d329a438a0c801d4082a36360c025e5abc0cae109",
-      "ukuran_kb": 194.7,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang dipakai menilai tiap jabatan di tiap departemen di production (label persis, bobot, dan target dari `description` di `kpi_template`), serta berapa metrik per departemen yang otomatis, semi, terblokir data, atau manual. Menjadi acuan kerja dev departemen yang mengotomatiskan metrik, termasuk ralat bahwa modul Kaizen dan sumber `forecast_kas` ternyata ada di kode tetapi Kaizen diputuskan tidak dipakai untuk otomasi KPI (ADR 0061).",
+      "hash": "e005743de5a74f37f3aebee2bb8d9e8d21af3f698cd5865df55a206791ffc180",
+      "ukuran_kb": 210.7,
+      "ringkasan": "Menjawab: apa isi `kpi_template` di production per departemen dan posisi (label metrik persis, bobot, target/keterangan), berapa metrik tiap departemen yang otomatis, semi, terblokir data, atau manual, dan departemen mana yang belum punya template. Juga memuat ralat soal modul Kaizen dan forecast kas (Kaizen ada di kode tetapi diputuskan tidak dipakai untuk otomasi, ADR 0061), cara membaca dan memperbarui dokumen, serta rincian Finance termasuk konfigurasi `auto`, penetapan, dan penilaian 2026.",
       "kata_kunci": [
         "matriks KPI",
         "kpi_template",
         "metrik KPI",
-        "bobot",
+        "bobot KPI",
         "target KPI",
         "otomasi KPI",
-        "auto score",
-        "KPI per jabatan",
+        "KPI per departemen",
         "Kaizen",
-        "forecast kas"
+        "forecast kas",
+        "KPI Finance"
       ]
     },
     {
@@ -9124,9 +9184,13 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented — 47 job terjadwal + 1 dispatcher webhook (+1 pengingat kontrak habis employee 07:00 WIB, merged 2026-09-11, **LIVE** DEV 2026-09-11 dan PROD 2026-09-12) (+1 job background PERTAMA manufacture 2026-08-20, sweep konfirmasi retur macet, **DORMANT** — lihat tabel) (+1 penjadwal internal marketing-analytics 2026-08-01, **LIVE** — service itu sebelumnya tanpa scheduler sama sekali; per audit kode 2026-08-01: +19 job integration yang sebelumnya belum tercatat — rumpun Accurate (stock/aset/opex refresh, sweep faktur/retur/receipt, receipt-sync, sample-shipping-expense, anomali retur), rekonsiliasi (statement TikTok, income Lazada, status order, retur TikTok), resi (enrich cancel/reverse, safety-net WMS), wallet-sync, seed-mapping, guardian stale-toship; +4 job integration ditambahkan 2026-07-11: affiliate Shopee AMS performance/conversion & WMS resi bridge `sync-resi-wms`/`sync-shopee-tracking`; +1 guardian order Shopee `sync-shopee-orders` 2026-07-14, **belum deploy**; +1 guardian retur Shopee `sync-shopee-returns` 2026-07-15 & +1 guardian retur TikTok `recover-tiktok-returns` 2026-07-16 — memicu booking Retur Penjualan yang selama ini tak pernah menyala, **belum deploy**; +1 sync ulasan marketplace `sync-reviews` 2026-07-19 harian 06:45, **LIVE**; +3 job Packet Tracking `sync-tracking`/`detect-stuck`/`sync-return-tracking` 2026-07-17..18 — checkpoint pengiriman forward+retur & deteksi mandek, **LIVE**). *3 job reminder attendance (koreksi/leave/tukar jadwal) + auto-ignore koreksi & tukar jadwal + pre-alokasi sadar-swap dari **PR #165** — belum rilis ke prod.*",
+      "status_teks": "Implemented — 47 job terjadwal + 1 dispatcher webhook (+1 pengingat kontrak habis employee 07:00 WIB, merged 2026-09-11, **LIVE** DEV 2026-09-11 dan PROD 2026-09-12) (+1 job background PERTAMA manufacture 2026-08-20, sweep konfirmasi retur macet, **DORMANT** — lihat tabel) (+1 penjadwal internal marketing-analytics 2026-08-01, **LIVE** — service itu sebelumnya tanpa scheduler sama sekali; per audit kode 2026-08-01: +19 job integration yang sebelumnya belum tercatat — rumpun Accurate (stock/aset/opex refresh, sweep faktur/retur/receipt, receipt-sync, sample-shipping-expense, anomali retur), rekonsiliasi (statement TikTok, income Lazada, status order, retur TikTok), resi (enrich cancel/reverse, safety-net WMS), wallet-sync, seed-mapping, guardian stale-toship; +4 job integration ditambahkan 2026-07-11: affiliate Shopee AMS performance/conversion & WMS resi bridge `sync-resi-wms`/`sync-shopee-tracking`; +1 guardian order Shopee `sync-shopee-orders` 2026-07-14, **belum deploy**; +1 guardian retur Shopee `sync-shopee-returns` 2026-07-15 & +1 guardian retur TikTok `recover-tiktok-returns` 2026-07-16 — memicu booking Retur Penjualan yang selama ini tak pernah menyala, **belum deploy**; +1 sync ulasan marketplace `sync-reviews` 2026-07-19 harian 06:45, **LIVE**; +3 job Packet Tracking `sync-tracking`/`detect-stuck`/`sync-return-tracking` 2026-07-17..18 — checkpoint pengiriman forward+retur & deteksi mandek, **LIVE**). *3 job reminder attendance (koreksi/leave/tukar jadwal) + auto-ignore koreksi & tukar jadwal + pre-alokasi sadar-swap dari **PR #165** — belum rilis ke prod.* Audit kode 2026-09-12 (snapshot origin/main): **+15 job integration** yang belum punya baris tabel (`accurate-daily-invoice-gap-sweep`, `accurate-perlengkapan-cost-refresh`, `accurate-ppn-masukan-refresh`, `accurate-realisasi-nonops-refresh`, `piutang-snapshot-bulanan`, `sync-lazada-withdrawal-journal`, `reconciliation-alert`, `ringkasan-notif`, `lazada-credential-task`, `meta-credential-task`, `meta-commerce-order-poll`, `accurate-external-edit-sweep`, `accurate-snapshot-baseline-seed`, `accurate-serap-jurnal-kas`, `accurate-webhook-renew`), **+3 goroutine finance-service** (terbit masa pajak, pengingat pajak H-7/H-3, buka periode audit kertas kerja), dan **+3 goroutine procurement-service** (pengingat jatuh tempo faktur, antrean sync Accurate, impor pembelian terjadwal). Baris finance dan procurement di tabel sengaja dipersempit ke mekanisme dan file:line; rasionalnya tinggal di [[API - Finance Service]], [[Finance - Rancangan Finance Service]], [[Finance - Audit Internal]], dan [[Microservices - Procurement Service]]. ⛔ **Koreksi 2026-09-12**: `accurate-receipt-sweep` tidak pernah didaftarkan di `main.go` (`_ = tasks.NewReceiptSweepTask`); `receipt-sync` kini 5×/hari; `income-reconciler` TikTok hanya berjalan 06:30 sampai 23:30 WIB; cron harian insentive sudah dicabut 2026-07-30 bersama `cron_worker.go`.",
       "publik": false,
       "tautan": [
+        "API - Finance Service",
+        "Finance - Rancangan Finance Service",
+        "Finance - Audit Internal",
+        "Microservices - Procurement Service",
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak",
         "ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR",
@@ -9149,20 +9213,20 @@
         "External - Accurate",
         "External - Accurate Webhook"
       ],
-      "hash": "e0063c97593b6bb8d8c7b03fc8e71576cd67871b7c3d2e5db1d27352d1d9f7e1",
-      "ukuran_kb": 34.7,
-      "ringkasan": "Menjawab: cron, scheduler, dan worker latar belakang apa saja yang berjalan di tiap service bip-erp (employee, attendance, insentive, integration, manufacture, marketing-analytics, task-management, notification), jam jalannya dalam WIB, untuk apa, lock yang dipakai, dan lokasi file:line-nya. Juga menjawab perbedaan sintaks cron 5-field dan 6-field, webhook dispatcher dan poller in-process, service mana yang tanpa job background, serta risiko operasional seperti job yang terlewat saat container mati, job dormant yang perlu dinyalakan lewat env, dan penjadwal ganda bila replika lebih dari satu.",
+      "hash": "1151eb0b5d8c0174ab7628c8d0c4e5c354dc255537500fc56365c6360fe02b33",
+      "ukuran_kb": 47.4,
+      "ringkasan": "Menjawab: cron, scheduler, worker, dan goroutine latar belakang apa saja yang berjalan di tiap service bip-erp, kapan jadwalnya (WIB), untuk apa, lock-nya, dan di file mana didefinisikan. Juga menjelaskan sintaks cron per service (6-field robfig di integration vs 5-field klasik), job yang dicabut atau dimatikan lewat env (mis. cron insentif, sweep retur manufacture), dispatcher webhook, poller in-process, service tanpa job, serta risiko operasionalnya.",
       "kata_kunci": [
         "cron",
         "scheduler",
         "background job",
         "worker",
         "penjadwal",
-        "robfig/cron",
-        "lock",
-        "sync marketplace",
-        "reminder",
-        "WIB"
+        "goroutine ticker",
+        "robfig cron",
+        "finalisasi skor KPI",
+        "pengingat kontrak",
+        "webhook dispatcher"
       ]
     },
     {
@@ -10064,7 +10128,7 @@
         "WH - Management System"
       ],
       "hash": "8d2a9337ca3437bc81034f920197380aa9f9e669cf3d589e6f5865156a4f32f3",
-      "ukuran_kb": 7.5,
+      "ukuran_kb": 7.6,
       "ringkasan": "Menjawab: metrik KPI posisi Manufaktur (produksi + gudang) mana yang sudah bisa diotomasi sekarang, mana yang menunggu data WMS, dan mana yang tetap manual/subjektif. Menjelaskan kenapa source & endpoint `/kpi/*` sudah ada di kode tapi dorman (koleksi `production_log`/`batch_record`/`cycle_count` kosong karena WMS belum dipakai), dan mematahkan asumsi quick-win: `manufacture_stok`/`saldo_awal` cuma sisi sistem tanpa angka fisik, `manufacture_transaksi` semua INBOUND REUSE, `manufacture_resi` status order marketplace bukan kinerja orang. Juga memuat gerbang verifikasi yang wajib dilewati (adu output nyata WMS ke endpoint, buktikan lewat gateway `GET /kpi/auto-values`) sebelum mengklaim metrik otomatis saat WMS live.",
       "kata_kunci": [
         "KPI manufaktur",
@@ -10448,7 +10512,7 @@
         "QA - Register Perizinan & Sertifikasi"
       ],
       "hash": "23e3bd168ac5a48c16f9775bbc34e5fedf3ebe1e157b20409e69fdedb7075c5e",
-      "ukuran_kb": 9.0,
+      "ukuran_kb": 9.1,
       "ringkasan": "Menjawab: register mutu apa saja yang sudah ada di ERP divisi Quality — CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing, dan pengecekan raw material — berikut endpoint `/api/employee/quality/*`, collection MongoDB, dan model datanya. Juga menjawab siapa yang boleh mengakses apa (`quality:staff`, `quality:supervisor`, approver produksi & warehouse, staf marketing), bagaimana alur approval CAPA berjalan (Draft → Diajukan → persetujuan Produksi + Warehouse → finalisasi QA), dan aturan alert keterlambatan tiap register (tenggat H-7, Menunggu >3 hari, antrean >24 jam). Menjelaskan pula apa yang belum tersedia: Dashboard Mutu, IPC/Pre-Check/CPPB, dan checklist GMP/kalibrasi/storage.",
       "kata_kunci": [
         "quality",
@@ -13182,7 +13246,7 @@
         "Microservices - Form Builder Service"
       ],
       "hash": "0a7626b938a8ed09b938634e03c022c604145b021c548a80c3fc8136f1b250d7",
-      "ukuran_kb": 6.3,
+      "ukuran_kb": 6.4,
       "ringkasan": "Menjawab: fitur pengelolaan Program Culture (klub Badminton, Football, Ladies Sport, Billiard, Music) apa saja yang sudah ada di ERP versus yang masih dilakukan manual di Excel, dan gap mana yang layak dibangun. Merinci mengapa jadwal berulang, matriks distribusi per-pekan, target frekuensi vs realisasi, dokumentasi/biaya sesi, dan indikator per-klub belum tersedia, serta mana yang sengaja tidak dibuat (RSVP, KPI officer-centric). Papan kerja temuan yang tiap kandidat scope-nya masih menunggu keputusan pemilik produk sebelum jadi ADR + task.",
       "kata_kunci": [
         "program culture",
@@ -13799,7 +13863,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.2,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
