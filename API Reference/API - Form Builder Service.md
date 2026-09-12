@@ -127,7 +127,7 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 
 ## Inspeksi Satgas 5R & K3 (`/me/satgas` dan gerbang izin)
 
-> ⚠️ **Merged 2026-09-11** lewat bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849), **deploy belum diukur, belum diuji lewat gateway**. Konsumen MyBharata (menu Satgas, halaman isi, unggah foto) selesai di branch my-bharata `feat/satgas-inspeksi` 2026-09-12, belum PR. Keputusan: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
+> ⚠️ **Merged 2026-09-11** lewat bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849), **deploy belum diukur, belum diuji lewat gateway**. Konsumen MyBharata (menu Satgas, halaman isi, unggah foto) ada di PR draft my-bharata [#144](https://github.com/bip-itteam-internal/my-bharata/pull/144) (2026-09-12). Keputusan: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
 
 **Gerbang.** Form ber-`metric_key: inspeksi_satgas` hanya bisa diisi pemegang izin `kepatuhan.satgas.input`, diperiksa di `POST /me/forms/:id/responses`, `POST /me/forms/:id/uploads`, `GET /me/forms/:id/subjects`, dan penyaring `GET /me/forms`. Tolakannya **`403 {"error": "..."}`** dengan pesan yang menyebut paket "Kepatuhan: Petugas Satgas 5R & K3" dan perlunya login ulang, diperiksa **sesudah** audience, jadi bukan-sasaran tetap mendapat `403` yang lama. Form tanpa penanda tak tersentuh. Kill-switch `KEPATUHAN_PERMISSION_ENFORCEMENT=off` mengembalikan form Satgas ke aturan audience saja.
 
