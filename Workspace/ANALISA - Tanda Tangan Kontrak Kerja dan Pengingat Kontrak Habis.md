@@ -20,7 +20,8 @@ Keputusan pemilik proses yang mengikat:
 - e-Meterai dibubuhkan HR di luar sistem;
 - Pihak Pertama = direktur, dengan akun bersama Sekretariat diterima apa adanya;
 - pengingat memakai kategori `reminder`, ringkasan harian ke supervisor HR, atasan H-14 kalender, kedaluwarsa mingguan;
-- verifikasi DEV pengingat lewat jalan cron 07:00 WIB, dan deploy PROD pengingat menunggu data prod diukur (2026-09-11; diukur 2026-09-12: tidak ada kontrak kedaluwarsa, jadi tidak ada data yang dirapikan dan aturan tidak diubah).
+- verifikasi DEV pengingat lewat jalan cron 07:00 WIB, dan deploy PROD pengingat menunggu data prod diukur (2026-09-11; diukur 2026-09-12: tidak ada kontrak kedaluwarsa, jadi tidak ada data yang dirapikan dan aturan tidak diubah);
+- draf kontrak **tidak dikirim ke karyawan lebih dulu**: karyawan menerima dokumennya saat bertemu HR. Selama masa transisi, HR boleh mengirim dokumen isian otomatis secara opsional untuk menemukan kekurangan (2026-09-12, T18).
 
 ⛔ **Jebakan yang menggagalkan rancangan naif** (dicek ke `origin/main` 2026-09-11, rinciannya di dok domain):
 - `common.SetaraDirektur` meloloskan Corporate Secretary. Jangan dipakai sebagai gerbang Pihak Pertama.
@@ -74,8 +75,11 @@ Nomor dalam kurung = prasyarat. Tiap item cukup jelas untuk langsung dilempar ke
 **T17. Masa evaluasi di offer jadi angka bulan + kontrak pertama terisi otomatis.** `masa_evaluasi` sekarang teks bebas (`services/recruitment/models_offer.go:43`, form `offer-form-dialog.tsx`; DEV berisi `"2"` dan `"3 bulan"`) dan hanya dipakai surat penawaran (`{{masa_evaluasi}}`), sedangkan jenis kontrak dan tanggal berakhir diketik manual saat Tambah Karyawan dari kandidat (`create-employee/index.tsx:219`). Ubah jadi angka bulan (nilai lama yang bisa diurai dimigrasikan, sisanya ditandai untuk HR), surat penawaran merender "N bulan", dan Tambah Karyawan dari kandidat mengisi `PKWT (Evaluasi)` + tanggal berakhir = tanggal mulai + masa evaluasi (HR tetap bisa mengubah).
 *Prasyarat: tidak ada.* Repo: recruitment-service + erp-frontend; deploy BE sebelum FE.
 
+**T18. Dokumen PKWT masa transisi: isi otomatis + kirim opsional.** Keputusan pemilik proses 2026-09-12: sebelum alur tanda tangan (T9) ada, HR bisa membuat dokumen PKWT dari template HR yang diisi data sistem, dan boleh mengirimnya ke email karyawan **secara opsional** (per kontrak, hanya lewat tombol yang ditekan HR, tanpa kiriman otomatis dan tanpa lampiran di pesan pengingat). Tujuannya menemukan data dan isi template yang masih kurang: isian yang datanya belum ada (Pihak Pertama, tempat lahir, lokasi dan jam kerja, rincian gaji Lampiran 1, format nomor kontrak) ditandai jelas di dokumen, bukan dikosongkan diam-diam. Tanda tangan tetap basah; PDF bertanda tangan diunggah ke riwayat kontrak seperti sekarang. Rancangan akhir tetap: dokumen diberikan saat HR bertemu karyawan, tidak dikirim lebih dulu.
+*Prasyarat: berkas template PKWT dari HR (tidak disimpan di vault).* Diputuskan saat `/plan`: format keluaran (PDF lewat `go-pdf/fpdf` seperti slip gaji, atau isian template Word), sumber gaji Lampiran 1 (payroll atau ditandai belum ada), dan apakah kiriman dicatat. Repo: bip-erp (employee-service; email lewat notification-service `POST /email/send`) + erp-frontend (panel riwayat kontrak). Hasilnya dipakai ulang T7.
+
 **T7. Template PKWT + generator PDF draft + lembar bukti.** Isi dari `personal_data`, `work_data`, `employee_contract`, `employee_salary` (Lampiran 1, dengan pemetaan komponen ke kolom); versi template dicatat per kontrak; kotak tanda tangan mengikuti hasil S1. Periksa font untuk karakter di luar ASCII (preseden slip gaji hanya font inti). Durasi di Pasal 2 dihitung dari tanggal mulai dan berakhir saat PDF dibuat, tidak disimpan terpisah. Untuk calon karyawan, gaji di offer hanya satu angka (`gaji_evaluasi`/`gaji_kontrak`): putuskan sumber rincian komponennya (payroll diisi dulu, atau offer diperluas).
-*Prasyarat: T5, T6, S1; T17 disarankan lebih dulu supaya durasi kontrak pertama sama dengan offer.*
+*Prasyarat: T5, T6, S1; T17 disarankan lebih dulu supaya durasi kontrak pertama sama dengan offer; kekurangan yang ditemukan lewat T18 jadi masukan.*
 
 **T8. Prefix arsip MinIO + kunci lampiran.** Prefix baru tanpa kunci baca di browser (pola `audit/`), dibaca lewat proxy employee-service; lampiran yang sudah dikunci tidak bisa diganti atau dihapus.
 *Prasyarat: tidak ada.* Deploy: file-service `up -d --build`, kunci unik di `.env` dev dan prod, employee-service `--force-recreate`, bukti lewat hitungan prefix di log boot.
@@ -96,6 +100,8 @@ Tambahan dari telaah 2026-09-11:
 - sesuaikan pengingat T1: kontrak lama tetap diingatkan sampai kontrak baru `SELESAI`, atau ada pengingat terpisah untuk tanda tangan yang tertunda;
 - sediakan jalan membatalkan calon karyawan yang batal datang atau menolak menandatangani (akunnya sudah aktif sejak dibuat);
 - penolakan NIK di sesi menautkan ke layar perbaikan data karyawan.
+
+Keputusan 2026-09-12: draf tidak dikirim ke karyawan lebih dulu; karyawan menerima dokumennya saat sesi tatap muka, dan salinan final tetap dikirim sesudah selesai. Kirim opsional T18 hanya berlaku di masa transisi.
 
 *Prasyarat: T7, T8, S1.*
 
@@ -137,8 +143,9 @@ Rinciannya di dok domain §Belum Diputuskan. Yang menahan task tertentu:
 - Letak data penandatangan per perusahaan → T6.
 - Lokasi kerja dan jam kerja di template, pemetaan komponen gaji Lampiran 1, rincian gaji calon karyawan dari offer → T7.
 - Format masa evaluasi di offer (teks bebas vs angka bulan) → T17.
+- Format dokumen masa transisi (PDF atau isian template Word) dan sumber rincian gaji Lampiran 1 untuk dokumen itu → T18.
 - Hasil S1 (urutan A/B) → T7, T9.
-- Draf lewat email sebelum datang, bentuk penolakan di tempat → T9.
+- Bentuk penolakan di tempat → T9.
 - Calon karyawan menandatangani sesudah dibuatkan data karyawan (usulan), jalan membatalkan calon yang batal atau menolak, kontrak belum ditandatangani terhadap pengingat → T9.
 - Retensi arsip → T8.
 - Bentuk hasil penilaian kinerja atasan → T14.
@@ -148,4 +155,4 @@ Rinciannya di dok domain §Belum Diputuskan. Yang menahan task tertentu:
 
 ## 3. Mulai dari mana
 
-T1: baca jalan PROD pertama 2026-09-13 07:00 WIB dan cek dedupe di DEV. Paralel dengannya: S1 (minta HR memeteraikan satu PDF contoh), T5, T6, T8, T15, T16, T17, dan K1-K4.
+T1: baca jalan PROD pertama 2026-09-13 07:00 WIB dan cek dedupe di DEV. Paralel dengannya: T18 (sesudah HR menyerahkan berkas template PKWT), S1 (minta HR memeteraikan satu PDF contoh), T5, T6, T8, T15, T16, T17, dan K1-K4.
