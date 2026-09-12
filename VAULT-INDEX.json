@@ -2277,23 +2277,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "0c779de90b9ad797b5d0b49dc7a0180dd60d7b0e3eef71de98e0bf9d5dffb315",
-      "ukuran_kb": 115.6,
-      "ringkasan": "Menjawab: bagaimana sebuah departemen membuat form dinamis tanpa coding (10 tipe pertanyaan, 4 tipe form: survey/evaluation/checklist/kaizen), menerbitkan ke sasaran, membaca rekap/analisa jawaban, dan mengekspornya ke CSV. Menjelaskan juga bagaimana satu form dipakai menilai karyawan lain (sumbu subject), form berulang per periode bulanan/mingguan, program Kaizen dan Culture, gerbang kepatuhan yang menahan clock-in mobile, serta kepemilikan form per-departemen (bukan per-modul) dengan RBAC katalog formbuilder.",
+      "hash": "de1271db75b3e34a9f62d0a831ecf295601168bb33aaca32dddd0f2eac861ee2",
+      "ukuran_kb": 115.9,
+      "ringkasan": "Menjawab: apa itu Form Builder Service (pembuat form dinamis tanpa coding), tipe pertanyaan dan tipe form apa saja yang didukung (survey, evaluation, checklist, kaizen), siapa yang boleh mengelola form berdasarkan departemen pemilik, dan bagaimana form diterbitkan, diisi, dianalisa, serta diekspor ke CSV. Juga menjelaskan penilaian karyawan lain lewat sumbu subject, form berulang per periode bulanan dan mingguan, program Kaizen dan Culture beserta setoran metrik ke KPI, lampiran berkas, inspeksi Satgas 5R & K3, dan gerbang presensi yang menahan clock-in mobile bila form wajib belum diisi. Mencatat pula jebakan deploy: notification-service wajib ikut di-deploy supaya kategori inbox form-published dan form-submitted tidak ditolak.",
       "kata_kunci": [
         "form builder",
-        "form dinamis",
+        "formulir dinamis",
+        "survei",
         "survey",
-        "evaluation",
-        "checklist",
-        "kaizen",
-        "culture",
         "penilaian karyawan",
         "form berulang",
-        "periode",
-        "CSV export",
-        "kepatuhan clock-in",
-        "notifikasi inbox"
+        "kaizen",
+        "gerbang presensi",
+        "inspeksi 5R K3",
+        "form_builder_db"
       ]
     },
     {
