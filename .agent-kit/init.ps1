@@ -61,7 +61,56 @@ $hooks = @{
 if (-not $NoPreCommitHook) {
   # Matcher WAJIB mencakup PowerShell: di mesin dev Windows seluruh git dijalankan lewat tool
   # PowerShell, dan matcher `Bash` saja membuat gerbang ini tidak pernah menyala (ADR 0077).
-  $hooks['PreToolUse'] = @(@{ matcher='Bash|PowerShell'; hooks=@(@{ type='command'; command=(HookCmd 'pre-commit-gate.ps1') }) })
+  #
+  # TAPI `matcher` cuma menyaring NAMA tool, jadi sebelum ini SETIAP panggilan Bash/PowerShell
+  # (termasuk `Get-Location`, `ls`, dll -- yang sama sekali bukan urusan gerbang ini) tetap
+  # men-spawn satu powershell.exe baru untuk pre-commit-gate.ps1. Spawn itu sendiri 1-3+ detik
+  # di mesin sibuk (terukur 2026-09-12), dikalikan puluhan ribu panggilan sebulan.
+  #
+  # Field `if` (permission rule syntax) membuat Claude Code SENDIRI menyaring ISI command
+  # SEBELUM spawn: kalau polanya tak cocok, proses hook TIDAK dijalankan sama sekali. Dok
+  # hooks-guide (docs.claude.com/en/docs/claude-code/hooks-guide, redirect ke
+  # code.claude.com/docs/en/hooks-guide, bagian "Filter by tool name and arguments with the
+  # `if` field", dibaca ulang 2026-09-12) menulis untuk Bash: "When Claude Code can't
+  # determine which commands the Bash input runs, it runs your hook regardless of the
+  # pattern" (belum diverifikasi di versi terpasang 2.1.263) -- jadi kasus yang tak bisa
+  # diurai tetap men-spawn, bukan lolos senyap. Kutipan itu HANYA membahas mekanisme untuk
+  # tool Bash dan TIDAK menyebut peka-huruf maupun wildcard di AWAL pola seperti `*commit*`
+  # di bawah; dok yang sama juga menyebut filter `if` "best-effort" dan menyarankan permission
+  # system untuk hard allow/deny -- itu sebabnya penolakan SESUNGGUHNYA tetap dilakukan
+  # `pre-commit-gate.ps1` sendiri lewat exit 2, bukan oleh field `if` ini.
+  #
+  # `if` cuma menerima SATU scope tool per string (`Bash(...)` ATAU `PowerShell(...)`, tidak
+  # bisa digabung lewat "|" seperti `matcher`), jadi dipecah jadi dua entri PreToolUse, satu per
+  # tool, memanggil skrip gate yang SAMA. Pola sengaja LEBAR (wildcard di depan DAN belakang
+  # "commit") supaya tetap men-spawn untuk `-c`/`-C` di posisi mana pun, `Git.exe`, path lengkap
+  # lewat `&`, dan commit yang dirangkai `;`/baris baru -- lihat kontrol positif di
+  # tests/test-init.ps1.
+  #
+  # `if` ADALAH SYARAT PERLU penolakan, BUKAN sekadar pra-saring opsional: perintah yang tak
+  # cocok pola ini tidak pernah sampai ke `pre-commit-gate.ps1` sama sekali. Akibatnya fakta
+  # "perintah mana yang diperiksa gerbang" kini hidup di TIGA tempat -- pola di sini, cerminnya
+  # di init.sh, dan logika token/regex di pre-commit-gate.ps1/.sh sendiri (lihat penunjuk di
+  # kepala kedua skrip itu). Memperluas bentuk yang dikenali SKRIP GATE wajib diikuti
+  # memperluas pola `if` DI SINI dan di init.sh; kalau tidak, bentuk baru yang dikenali skrip
+  # tidak akan pernah sampai kesitu untuk diperiksa.
+  #
+  # TERVERIFIKASI LANGSUNG 2026-09-12 lewat tool PowerShell di sesi Claude Code hidup (bukan
+  # cuma test-init.ps1, yang memanggil skrip hook langsung dan melewati mesin pencocokan `if`
+  # milik Claude Code sama sekali): kedelapan bentuk commit berikut tetap DITOLAK (tanpa baris
+  # `EXIT=`) di branch main repo sandbox %TEMP% -- polos, `-c` sebelum `-C`, `Commit` kapital,
+  # `Git.exe`, path lengkap git.exe lewat `&`, `pushd; git add .; git commit; popd`, dipisah
+  # baris baru, dan `cd <repo>; git commit`; commit di branch fitur dan commit vault tetap
+  # LOLOS (EXIT=0). Untuk 'Commit' kapital gerbang TERBUKTI BERJALAN (ditolak); mekanismenya
+  # (pola tak peka huruf vs jatuh ke aturan input tak-terurai) TIDAK dibedakan pengujian ini.
+  # BELUM diverifikasi: entri `Bash(*commit*)` lewat tool Bash (mati di mesin dev Windows ini)
+  # dan mesin mac/linux mana pun -- siapa pun yang pertama re-init di sana adalah penguji
+  # pertamanya.
+  $gateCmd = HookCmd 'pre-commit-gate.ps1'
+  $hooks['PreToolUse'] = @(
+    @{ matcher = 'Bash'; hooks = @(@{ type = 'command'; command = $gateCmd; 'if' = 'Bash(*commit*)' }) },
+    @{ matcher = 'PowerShell'; hooks = @(@{ type = 'command'; command = $gateCmd; 'if' = 'PowerShell(*commit*)' }) }
+  )
 }
 # Plugin WAJIB tim, di-enable lewat settings SCOPE PROJECT supaya berlaku bagi siapa pun yang
 # clone + trust workspace ini — tak perlu tiap orang ingat menyalakannya sendiri.
@@ -109,7 +158,7 @@ Write-Host "OK. Agent-kit v$kitVer terpasang ke $claude"
 Write-Host "Project aktif: $active"
 Write-Host "Flow: /start-task -> /plan -> /implement -> /review -> /sync-docs -> /wrap"
 Write-Host "Loop: /brief -> /kerjakan (judge otomatis) -> PR | /papan-sesi | /supervise | /ekstrak-skill"
-if ($NoPreCommitHook) { Write-Host "(gerbang pre-commit: NONAKTIF)" } else { Write-Host "(gerbang pre-commit: aktif, matcher Bash|PowerShell)" }
+if ($NoPreCommitHook) { Write-Host "(gerbang pre-commit: NONAKTIF)" } else { Write-Host "(gerbang pre-commit: aktif, Bash+PowerShell, disaring 'if' isi command sebelum spawn)" }
 if ($hookDipasang.Count -gt 0) { Write-Host ("(pre-push terpasang: {0})" -f ($hookDipasang -join ', ')) }
 if ($hookDilewati.Count -gt 0) { Write-Host ("(pre-push DILEWATI: {0})" -f ($hookDilewati -join ', ')) }
 Write-Host "Restart sesi Claude Code supaya hook baru terbaca."

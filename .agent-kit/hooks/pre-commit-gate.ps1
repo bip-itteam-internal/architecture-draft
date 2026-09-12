@@ -13,6 +13,13 @@
 # bentuk perintah yang biasa ditulis agent. Yang masih dikenali: `-C "literal"`, `-C $v` dengan
 # `$v="literal"` di perintah yang sama, `$env:NAMA` di dalam string, dan `cd <path>; git commit`.
 # Selain kasus tolak: exit 0 + pengingat, persis perilaku lama.
+#
+# CATATAN (brief pre-commit-gate-overhead, 2026-09-12): init.ps1/init.sh memasang skrip ini
+# di belakang filter 'if' (pola *commit* pada isi command) sehingga proses ini TIDAK di-spawn
+# sama sekali kalau isi command tak cocok pola itu. Menambah bentuk commit baru yang dikenali
+# DI SINI wajib diikuti memperluas pola 'if' di init.ps1 DAN init.sh -- kalau tidak, bentuk
+# barunya tidak akan pernah sampai kesini untuk diperiksa. Detail dan hasil verifikasi ada di
+# komentar blok PreToolUse pada init.ps1, jangan diduplikasi di sini.
 $ErrorActionPreference = 'SilentlyContinue'
 if (-not [Console]::IsInputRedirected) { exit 0 }
 $raw = [Console]::In.ReadToEnd()

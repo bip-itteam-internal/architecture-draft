@@ -53,6 +53,11 @@ se_cmd="bash \\\"$claude/hooks/sesi-selesai.sh\\\""
 plugins_json='"superpowers@claude-plugins-official": true'
 
 # Matcher mencakup PowerShell juga: satu kit untuk Windows dan mac/linux (ADR 0077).
+# Dua entri PreToolUse terpisah (bukan satu matcher "Bash|PowerShell") + field "if" per entri:
+# alasan desain lengkap ada di init.ps1 (komentar di atas blok PreToolUse), jangan diduplikasi
+# di sini. TIDAK DIUJI: mesin dev ini tidak bisa menjalankan .sh (tool Bash mati di Windows),
+# jadi cermin ini belum pernah dijalankan; siapa pun di mac/linux yang pertama memakainya adalah
+# penguji pertamanya.
 if [ "$no_precommit" -eq 1 ]; then
   cat > "$claude/settings.json" <<JSON
 {
@@ -72,7 +77,10 @@ else
     "SessionStart":     [ { "hooks": [ { "type": "command", "command": "$ss_cmd" } ] } ],
     "UserPromptSubmit": [ { "hooks": [ { "type": "command", "command": "$up_cmd" } ] } ],
     "SessionEnd":       [ { "hooks": [ { "type": "command", "command": "$se_cmd" } ] } ],
-    "PreToolUse": [ { "matcher": "Bash|PowerShell", "hooks": [ { "type": "command", "command": "$pc_cmd" } ] } ]
+    "PreToolUse": [
+      { "matcher": "Bash", "hooks": [ { "type": "command", "if": "Bash(*commit*)", "command": "$pc_cmd" } ] },
+      { "matcher": "PowerShell", "hooks": [ { "type": "command", "if": "PowerShell(*commit*)", "command": "$pc_cmd" } ] }
+    ]
   }
 }
 JSON
@@ -103,7 +111,7 @@ echo "OK. Agent-kit v$kit_ver terpasang ke $claude"
 echo "Project aktif: $active"
 echo "Flow: /start-task -> /plan -> /implement -> /review -> /sync-docs -> /wrap"
 echo "Loop: /brief -> /kerjakan (judge otomatis) -> PR | /papan-sesi | /supervise | /ekstrak-skill"
-[ "$no_precommit" -eq 1 ] && echo "(gerbang pre-commit: NONAKTIF)" || echo "(gerbang pre-commit: aktif, matcher Bash|PowerShell)"
+[ "$no_precommit" -eq 1 ] && echo "(gerbang pre-commit: NONAKTIF)" || echo "(gerbang pre-commit: aktif, Bash+PowerShell, disaring 'if' isi command sebelum spawn)"
 [ -n "$dipasang" ] && echo "(pre-push terpasang:$dipasang)"
 [ -n "$dilewati" ] && echo "(pre-push DILEWATI:$dilewati)"
 echo "Restart sesi Claude Code supaya hook baru terbaca."
