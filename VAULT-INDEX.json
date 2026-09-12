@@ -1466,8 +1466,8 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "11aa86f63fce6b4bdf36671796ad74fa40bd160fc88816ee3ebdce1b21808b0b",
-      "ukuran_kb": 422.4,
+      "hash": "061c3c76ab162ce3f2e5147209165a72b4bdc8025445eceea545118c9fa23a4f",
+      "ukuran_kb": 422.9,
       "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP/HRIS One Bharata, bagaimana autentikasi, SSO, role gating sidebar, dan Pengaturan HRGA bekerja, serta konvensi data-fetching dan bagan yang wajib diikuti. Juga mencatat perubahan per modul beserta gap yang belum diimplementasikan, mis. Recruitment (alur kerja HR, rekrutmen lintas perusahaan, onboarding checklist, Tambah Karyawan dari kandidat yang mengikuti perusahaan kandidat), payroll, KPI, presensi, dan Marketing Analytics (saringan pindah ke laci Banner bergaya HRIS yang terbuka saat halaman dibuka, lencana dan Bersihkan yang hanya menghitung saringan, bukan pilihan tampilan).",
       "kata_kunci": [
         "erp-frontend",
@@ -6213,7 +6213,7 @@
         "ADR - 0002 Database-per-Service"
       ],
       "hash": "64d8427c28d798cbdf8261d7d1a96406490862ce52cbeaae54444486b60fca78",
-      "ukuran_kb": 18.4,
+      "ukuran_kb": 18.6,
       "ringkasan": "Menjawab: kenapa kontrak PKWT ditandatangani dengan tanda tangan elektronik tidak tersertifikasi di sistem sendiri (menggantikan jalur PSrE dan e-KYC di ADR 0019), bagaimana alur tatap muka didampingi HRD sampai direktur menandatangani dari Ruang Direktur, siapa yang membubuhkan e-Meterai, dan apa dasar hukumnya (UU ITE Pasal 11, PP 71/2019). Juga menjelaskan kenapa pengingat kontrak habis dipisah dari tanda tangan, kenapa fitur menempel di modul kontrak employee-service, lubang keamanan akun yang ditemukan (PIN tanpa limiter, akun direktur dipakai bersama Sekretariat, kunci baca MinIO di bundel browser), arsip di prefix terkunci, dan salinan kontrak untuk karyawan lewat email atau MyBharata.",
       "kata_kunci": [
         "tanda tangan elektronik",
@@ -8222,7 +8222,7 @@
         "HRIS - Big Pictures"
       ],
       "hash": "0bd1fa64bdd761a732c68f18fc59ed4273e5ed395574c1767a6905faa72987aa",
-      "ukuran_kb": 38.1,
+      "ukuran_kb": 38.4,
       "ringkasan": "Menjawab: bagaimana kontrak kerja PKWT/PKWTT dibuat dari template berbasis data HRIS, ditandatangani tatap muka didampingi HRD, dikonfirmasi direktur, dibubuhi e-Meterai oleh HR, lalu salinannya sampai ke karyawan, beserta peran tiap persona (HR, karyawan, direktur, atasan). Juga menjelaskan pondasi modul riwayat kontrak di employee-service (koleksi `employee_contract`, nomor kontrak otomatis, lampiran PDF, status ongoing/ending/expired, feed kalender `contract_end`), celah yang harus ditutup (nomor tidak unik, lampiran bisa diganti, karyawan tak punya jalur ke kontraknya sendiri), cara kerja pengingat kontrak habis, pemetaan field template ke sumber data, dan landasan hukumnya.",
       "kata_kunci": [
         "kontrak kerja elektronik",
@@ -8662,7 +8662,7 @@
         "HRIS - Big Pictures"
       ],
       "hash": "45db8e0c54d487ff90d0565dda8f33fb1e23d3b7dc33178f1b49ad5f5a734aa6",
-      "ukuran_kb": 4.6,
+      "ukuran_kb": 4.7,
       "ringkasan": "Menjawab: data administrasi kepegawaian apa saja yang dikelola personalia (data personal, kontrak PKWT, BPJS, riwayat masa kerja), bagaimana urutan off-boarding atau exit clearance (feedback, pengembalian inventaris ke GA, NDA, paklaring), dan siapa yang diberi tahu saat kontrak mendekati habis. Juga menjelaskan cara HR mencatat resign atau non-aktif karyawan (kategori, tanggal efektif, perbaikan, pembatalan) yang otomatis mematikan akun, serta dampaknya pada laporan absensi dan basis payroll.",
       "kata_kunci": [
         "personalia",
@@ -13599,7 +13599,7 @@
         "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)"
       ],
       "hash": "46ddd79c5222b1c81860b051afce0eb22867a82031868054f45bad76be0d0c12",
-      "ukuran_kb": 16.8,
+      "ukuran_kb": 17.0,
       "ringkasan": "Menjawab: masalah apa yang sebenarnya ada di balik permintaan tanda tangan dan meterai digital (biaya cetak PKWT dan kontrak habis tak terpantau), keputusan pemilik proses yang mengikat, dan jebakan yang menggagalkan rancangan naif (SetaraDirektur meloloskan Corporate Secretary, `PATCH /contract/:id` memakai ReplaceOne, data DEV tidak mewakili PROD). Berguna untuk tahu urutan task per gelombang (pengingat kontrak habis, uji PDF bermeterai, pondasi dokumen, backend tanda tangan, layar, keamanan akun), prasyarat tiap task, dan hal yang belum diputuskan.",
       "kata_kunci": [
         "analisa kebutuhan",
