@@ -1,4 +1,4 @@
-**Status**: ⚠️ **Implemented (ada catatan)** — **Fase 0 LIVE di dev & prod** sejak 2026-08-13, **daftar akun OPEX ditegakkan kode** dan metrik varians OPEX **sudah terisi otomatis** di KPI, serta **modul Cost Control Fase 1a (rekomendasi efisiensi, bobot 20%) sudah ada**, **Fase 1b (akurasi forecast kas mingguan, bobot 15%) sudah ada**, **metrik Admin & Non-Ops YoY (bobot 10%) sudah ada**, dan **grid "Opex Marketing" (7 kategori — breakdown manual, otomatis `incentive_profit`, dan alokasi headcount — sejak 2026-08-20, awalnya registry Beban Software manual 2026-08-19) sudah ada**. ⚠️ **Ketiga yang disebut terakhir mendarat di [[Microservices - Integration Service]], BUKAN di service ini** — beda dari Fase 1a yang memang di sini; lihat catatan gap di §Ruang Lingkup. Tersisa 🟡: modul Tax — lihat bab keputusan.
+**Status**: ⚠️ **Implemented (ada catatan)** — **Fase 0 LIVE di dev & prod** sejak 2026-08-13, **daftar akun OPEX ditegakkan kode** dan metrik varians OPEX **sudah terisi otomatis** di KPI, serta **modul Cost Control Fase 1a (rekomendasi efisiensi, bobot 20%) sudah ada**, **Fase 1b (akurasi forecast kas mingguan, bobot 15%) sudah ada**, **metrik Admin & Non-Ops YoY (bobot 10%) sudah ada**, dan **grid "Opex Marketing" (7 kategori — breakdown manual, otomatis `incentive_profit`, dan alokasi headcount — sejak 2026-08-20, awalnya registry Beban Software manual 2026-08-19) sudah ada**. ⚠️ **Ketiga yang disebut terakhir mendarat di [[Microservices - Integration Service]], BUKAN di service ini** — beda dari Fase 1a yang memang di sini; lihat catatan gap di §Ruang Lingkup. ✅ **Modul Tax (kewajiban per masa) sudah ADA di kode** (diukur 2026-09-12): 8 rute (`/pajak/ringkasan`, `/pajak/master`, `/pajak/master/seed`, `/pajak/master/:id`, `/pajak/terbitkan`, `/pajak/:id`, `/pajak/:id/tenggat`, `/pajak/:id/bukti/:jenis`) digerbang 3 izin `finance.pajak.view/kelola/tenggat`, penjadwal terbit masa (tik 10 menit, jendela tanggal 1) + pengingat H-7/H-3, feed `/internal/calendar-feed` (`kind: tax_due`), dan sumber KPI `kinerja_tax` lewat `/internal/kpi/tax`. Tabel rute lengkap: [[API - Finance Service]]. 🟡 Register pelaporan SPT, register temuan kepatuhan, dan klasifikasi akun deductible **belum dibangun** (koleksi `pajak_spt`/`pajak_temuan`/`pajak_klasifikasi_akun` dinamai, nol pemanggil). ⚠️ **Di prod datanya masih kosong**: `pajak_master` dan `pajak_kewajiban` nol dokumen, seed master belum pernah dijalankan (diukur 2026-09-12).
 
 ## Deskripsi
 
@@ -35,6 +35,11 @@ Bukti bahwa datanya **ada tetapi di luar sistem**: tiga rekap bulanan yang disus
 | **Cost Control** | Register penghematan (✅ Fase 1a, di service ini) · ~~forecast kas mingguan~~ (✅ ada, tapi bukan di sini — lihat catatan) | bobot 0,25 |
 | **Jembatan KPI** | `GET /internal/kpi/metrics` + satu sumber baru `kinerja_finance` di employee-service | mengaktifkan semuanya |
 | **Jalur entri OPEX** | Template unduh, salin periode, resolusi nama akun — **di integration-service** | bobot 0,85 |
+| **Biaya Variabel Produksi** *(di luar rancangan awal, ditambahkan atas permintaan HR)* | Pencatatan biaya produksi variabel per periode, dibandingkan bulan sama tahun lalu (bukan bulan sebelumnya, produksi bermusim) | bobot 10 (KPI SPV Manufacture F3) |
+
+> ⛔ **Catatan 2026-09-12, modul Biaya Variabel Produksi**: berbeda dari Tax dan Cost Control, rute-rutenya (`/biaya-variabel*`) **tidak bergerbang izin maupun `company_id` sama sekali**: `GET /biaya-variabel` dan sumber KPI-nya membalas data SELURUH tenant untuk periode yang sama. Rincian rute & catatan keamanan: [[API - Finance Service]] §Biaya Variabel Produksi.
+
+> ⛔ **Gap bertanggal 2026-09-12: jembatan KPI terpadu di baris di atas TIDAK ADA di kode.** `GET /internal/kpi/metrics` dan sumber tunggal `kinerja_finance` adalah rancangan awal yang tidak pernah dibangun. Yang benar-benar berjalan tiga endpoint TERPISAH, masing-masing dengan sumber KPI sendiri: `/internal/kpi/cost-control` (sumber `kinerja_cost_control`), `/internal/kpi/tax` (sumber `kinerja_tax`), `/internal/kpi/biaya-variabel` (sumber `biaya_variabel_produksi`); tiga berkas `kpi_sumber_*.go` berbeda di employee-service, bukan satu fasad. Seluruh isi bab "Lingkup jembatan KPI" dan diagram alur di bawah yang menunjuk `/internal/kpi/metrics` **menggambarkan rancangan, bukan endpoint yang benar-benar ada**. Rincian: [[API - Finance Service]] §Belum Ada.
 
 > ⚠️ **Gap rencana vs implementasi (ditemukan 2026-08-19).** Baris "forecast kas mingguan" di atas menyiratkan fitur itu dibangun di finance-service — pada praktiknya **tidak**. Fase 1b (breakdown mingguan), metrik Admin & Non-Ops YoY, dan registry Beban Software manual ("Opex Marketing") semuanya dibangun di [[Microservices - Integration Service]], bergabung dengan grup `/accounting` yang sudah ada di sana (`anggaran`, `anggaran/mingguan`, `admin-nonops`, `opex-manual` — lihat [[API - Integration Service]]). Alasannya konsisten dengan baris "Jalur entri OPEX" di atas: sumber datanya (Accurate, master anggaran OPEX) sudah hidup di integration-service, dan menaruh fitur turunannya di finance-service berarti satu panggilan HTTP lintas-service ekstra untuk setiap pembacaan — biaya yang sama yang sudah diakui dok ini sendiri di §Lingkup jembatan KPI ("satu konektor keluar, bukan dua"). Pola ini terbukti berulang tiga kali berturut-turut, jadi kemungkinan besar akan terus begitu untuk fitur Cost Control turunan Accurate berikutnya — pertimbangkan itu sebagai default, bukan pengecualian, saat merencanakan fitur baru di area ini.
 
@@ -187,6 +192,8 @@ flowchart TB
 | HR / Admin KPI | HRIS | mengonfigurasi sumber otomatis di `kpi_template` | Web ERP |
 | Seluruh karyawan | — | penerima notifikasi tenggat (hanya yang berhak) | MyBharata |
 
+> ⚠️ **Baris di atas menandai RBAC pajak/cost control sebagai "usulan"; paket `finance_pajak` kini SUDAH ADA** (lihat §RBAC di atas). Persona per posisi yang grounded ke akses NYATA di prod (bukan rancangan) ada di [[Finance - FAT Persona]] (diukur 2026-09-12: posisi **Tax Staff** dan **Account Payable** belum memegang paket apa pun).
+
 - **Tujuan**: berhenti menyusun rekap KPI bulanan dengan tangan; tenggat pajak tidak lagi bergantung pada ingatan seseorang.
 - **Pain point**: 55% bobot KPI Cost Control saat ini dihitung sendiri oleh yang dinilai, di spreadsheet, tanpa jejak audit. Tenggat pajak tidak punya pengingat sistem sama sekali.
 - **Aksi utama**: mencatat kewajiban & pelaporan pajak, mencatat temuan dan penghematan, mengisi forecast kas — lalu semuanya terbaca sendiri sebagai angka KPI.
@@ -212,16 +219,20 @@ flowchart LR
 Seluruhnya di `bip-erp/shared-library/common/catalog_finance.go` — `finance.ar.view`, `finance.ar.export`, `finance.ap.view`, `finance.profit.view`, `finance.payout.view`, `finance.kastoko.view`, `finance.accounting.view`.
 
 > ⚠️ **Ketujuh-tujuhnya izin BACA. Modul finance belum punya satu pun izin TULIS.** Akibatnya layar tulis `/finance/anggaran` hari ini dijaga `finance.accounting.view` — izin *melihat laporan keuangan* menjaga tombol *hapus baris anggaran*. Ini harus dibetulkan bersamaan, bukan diwariskan ke modul baru.
+>
+> ✅ **Koreksi 2026-09-12, khusus modul Tax**: kalimat di atas usang untuknya. `finance.pajak.view` / `finance.pajak.kelola` / `finance.pajak.tenggat` **sudah ada** (`catalog_finance.go:39-41`, diverifikasi langsung), dan dua di antaranya (`kelola`, `tenggat`) memang izin TULIS. Tier `supervisor` memegang ketiganya; tier `staff` finance **tidak memegang satu pun** izin pajak sama sekali (`catalog_finance.go:69-85`). Paket siap-pakai `finance_pajak` = `pajak.view` + `pajak.kelola` **tanpa** `pajak.tenggat` (`catalog_finance.go:140-149`), dirancang untuk Tax Officer, orang yang justru dinilai oleh tenggat itu sendiri; menggeser tenggat tetap kewenangan SPV FAT. Diukur prod 2026-09-12: Account Payable dan Tax Staff tidak memegang paket apa pun (lihat [[Finance - FAT Persona]]).
 
 ### Izin yang diusulkan (belum ada)
 
-| Izin | Untuk | Diberikan ke |
-|---|---|---|
-| `finance.pajak.view` | melihat kalender kewajiban, SPT, temuan | Finance staff, SPV, Direktur |
-| `finance.pajak.kelola` | mencatat & mengubah kewajiban, SPT, temuan, klasifikasi deductible | Tax Officer, SPV FAT |
-| `finance.costcontrol.view` | melihat register penghematan & forecast | Finance staff, SPV |
-| `finance.costcontrol.kelola` | mencatat & mengubah penghematan, forecast | Cost Control, SPV FAT |
-| `finance.anggaran.kelola` | menulis & menghapus baris anggaran OPEX | Cost Control, SPV FAT |
+⚠️ **Tabel ini sebagian usang sejak 2026-09-12**: dua baris pertama SUDAH ada (lihat koreksi di atas), disisakan di sini apa adanya sebagai jejak keputusan awal. Dua baris terakhir **masih benar-benar belum ada**: diverifikasi `finance.costcontrol.*` dan `finance.anggaran.kelola` nihil di `catalog_finance.go` (Grep, 2026-09-12).
+
+| Izin | Untuk | Diberikan ke | Status 2026-09-12 |
+|---|---|---|---|
+| `finance.pajak.view` | melihat kalender kewajiban, SPT, temuan | Finance staff, SPV, Direktur | ✅ ADA (cakupan realisasinya beda: lihat koreksi di atas) |
+| `finance.pajak.kelola` | mencatat & mengubah kewajiban, SPT, temuan, klasifikasi deductible | Tax Officer, SPV FAT | ✅ ADA |
+| `finance.costcontrol.view` | melihat register penghematan & forecast | Finance staff, SPV | 🟡 belum ada |
+| `finance.costcontrol.kelola` | mencatat & mengubah penghematan, forecast | Cost Control, SPV FAT | 🟡 belum ada |
+| `finance.anggaran.kelola` | menulis & menghapus baris anggaran OPEX | Cost Control, SPV FAT | 🟡 belum ada |
 
 Penambahan izin dilakukan di `catalog_finance.go` (satu sumber: dipakai seed employee-service, service penegak, dan gerbang halaman FE) plus mendaftarkan titik penegakannya.
 
@@ -279,6 +290,8 @@ stateDiagram-v2
 ```
 
 > Urutan **setor lalu lapor** benar untuk PPh 21/23 (setor tgl 10, lapor tgl 20). Jenis lain bisa berbeda urutan dan tenggatnya — **TBD**, wajib dikonfirmasi Tax Officer sebelum mesin status ini dikunci di kode.
+
+> ⚠️ **Gap bertanggal 2026-09-12**: diagram di atas adalah rancangan, bukan implementasi. Status yang benar-benar TERSIMPAN di kode hanya tiga: `terjadwal` / `disiapkan` / `dilaporkan` (`pajak_kewajiban.go:15-17`). **`Disetor` tidak ada sama sekali** sebagai status tersimpan maupun turunan. `terlambat` dan `dilaporkan_terlambat` memang ada, tapi sebagai status TURUNAN (`StatusTampil`, `pajak_kewajiban.go:22-23,124`) yang dihitung ulang tiap dibaca, tidak pernah ditulis ke Mongo. Rinciannya di [[API - Finance Service]] §Pajak, "Status TERSIMPAN hanya tiga, bukan empat".
 
 ## Alur — Modul Cost Control
 
@@ -449,6 +462,8 @@ Yang menghalangi bukan kemauan maupun kelengkapan, melainkan bentuk:
 ### Kewajiban pajak — dibangkitkan, bukan dibuat
 
 Tax Officer **tidak membuat baris**. Master jenis kewajiban diisi sekali (PPh 21, PPh 23, PPh 25, PPh 4 ayat 2, PPN Masa) beserta pola tenggatnya; baris per masa dibangkitkan sistem. Yang diketik hanya empat kolom: nilai, tanggal setor, tanggal lapor, nomor BPE.
+
+> ⚠️ **Gap bertanggal 2026-09-12**: rancangan di atas menyebut lima jenis; kode yang berjalan menyemai **enam**. `MasterBawaan` (`pajak_master_seed.go:14,24-60`) menambahkan **PPh Badan tahunan** (kode `PPH_BADAN`, tenggat tanggal 30 + offset 4 bulan, masa direpresentasikan bulan terakhir tahunnya) di luar lima yang direncanakan. Tenggatnya data yang bisa diubah SPV FAT lewat `PATCH /pajak/master/:id`, bukan konstanta kode. Lihat [[API - Finance Service]] §Pajak, "Master bawaan: enam jenis".
 
 **Notifikasi H-7/H-3 sekaligus menjadi pintu masuk pengisian** — tiap pengingat membawa `deep_link` ke baris yang harus dilengkapi. Pengingat yang hanya memberi tahu tanpa membuka pintunya akan diabaikan.
 
