@@ -8405,20 +8405,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "f923a3b185ab66f019a4bb12caa062b981004ac03bd805849658a579079bca4e",
-      "ukuran_kb": 216.4,
-      "ringkasan": "Menjawab: metrik, bobot, dan target KPI apa saja yang tersimpan di kpi_template production untuk tiap departemen dan jabatan (label ditulis persis termasuk typo karena label adalah kunci metrik di kode), serta berapa metrik per departemen yang otomatis, semi, terblokir data, atau manual. Juga menjawab ralat soal Kaizen dan forecast kas (modul Kaizen ada di sistem tetapi diputuskan tidak dipakai untuk otomasi KPI), detail konfigurasi auto, penetapan, skor 2026, dan siapa yang menilai KPI Finance, serta departemen mana yang belum punya template.",
+      "hash": "48940baeee2745053b6d0964f5e6c70db9abd7f7ffea71cbafda6feee02adc31",
+      "ukuran_kb": 218.0,
+      "ringkasan": "Menjawab: metrik, bobot, dan target apa saja yang tersimpan di `kpi_template` production untuk tiap jabatan per departemen (Beauty Hacks, Finance, General Affair, Human Resource, Kesekretariatan, Kyura, Manufaktur, Procurement, Quality, Tech Development), dan berapa metrik per departemen yang tergolong otomatis, semi, terblokir data, atau manual. Juga menjawab kenapa label metrik ditulis persis termasuk typo (label adalah kunci identitas di kode), kenapa target hanya ada di `description`, departemen mana yang belum punya template, serta ralat 2026-08-31 soal modul Kaizen dan sumber `forecast_kas` beserta keputusan Kaizen tidak dipakai untuk otomasi KPI. Dipakai dev departemen sebagai titik awal sebelum mengotomatiskan metrik, termasuk rincian penilaian Finance 2026 (siapa menilai, bukti, dan langit-langit skor SPV Finance).",
       "kata_kunci": [
         "matriks KPI",
         "kpi_template",
-        "metrik KPI per departemen",
+        "template KPI per departemen",
+        "metrik KPI",
         "bobot dan target KPI",
         "otomasi skor KPI",
-        "KPI otomatis vs manual",
+        "auto score",
         "Kaizen",
         "forecast kas",
-        "template KPI per jabatan",
-        "penilaian KPI Finance"
+        "penilaian kinerja"
       ]
     },
     {
