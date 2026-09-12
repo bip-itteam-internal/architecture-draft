@@ -84,7 +84,24 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 
 **`jenis` → `target` (penyebut partisipasi), di-snapshot saat simpan**: `internal` = seluruh karyawan aktif · `department` = jumlah staf `target_departemen` · `employees` = jumlah `target_karyawan` (dedup). Jenis `club`/`public` menyusul (TBD).
 
-**`tipe` (`event` | `non_event`)** — ⚠️ field baru, [[ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master]] (bip-erp PR #1861, T1). Sumbu **berbeda** dari `jenis` (resolve target) dan `pelaksanaan` (frekuensi). Master (`POST/PUT /culture/master-programs`) menyimpan `tipe` opsional (kosong → `event`); program **menyalinnya dari master**, klien tak dipercaya. `POST /culture/programs` **menolak `400`** bila master ber-`tipe=non_event` ("tipe non-event belum didukung") sampai perilaku non-event mendarat (task T3); master boleh menyimpannya sebagai katalog. Dokumen lama tanpa `tipe` dibaca `event` (tanpa migrasi).
+**`tipe` (`event` | `non_event`)** — [[ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master]]. Sumbu **berbeda** dari `jenis` (resolve target) dan `pelaksanaan` (frekuensi), **disalin master→program** (klien tak dipercaya); dokumen lama tanpa `tipe` dibaca `event` (tanpa migrasi). Status: T1 (field) **merged ke `main`** (PR #1861); **T2–T5** ⚠️ branch `feat/culture-tipe`, belum merge/prod.
+- **Event**: seperti di atas — target di-resolve, kehadiran scan, rating → komposit 30/30/40.
+- **Non-event** (mis. Kamis Batik): tanpa undangan/kehadiran/rating. `POST /culture/programs` **melewati** resolusi target & `scan_token`, `tanggal` **opsional**. Officer menandai pelaksanaan lewat `/culture/programs/:id/terlaksana` (bawah); skornya **100 bila ada tanda `approved` pada periode, selain itu 0** (`skorNonEvent`, satu tempat). **Tak tampil di alur rating peserta** (`/culture/feedback/*` menyaring `tipe != non_event`).
+
+**Master menyimpan jadwal berulang acuan** (⚠️ branch, T2): `jadwal_hari` (0–6, konvensi getDay) untuk `pelaksanaan=mingguan`, `jadwal_tanggal` (1–31) untuk `bulanan`. Opsional; hanya **pra-isi tanggal** saat membuat program (dihitung FE), TIDAK membangkitkan sesi.
+
+### Terlaksana non-event & approval (⚠️ branch `feat/culture-tipe`, ADR 0093)
+
+Koleksi `culture_terlaksana`: tanda pelaksanaan program **non-event** yang menunggu keputusan SPV HR. Hanya tanda `approved` yang membuat program terhitung 100 pada periodenya.
+
+| Method | Path | Gerbang | Fungsi |
+|---|---|---|---|
+| POST | `/culture/programs/:id/terlaksana` | pemilik program | Officer menandai program non-event terlaksana (`tanggal?`, `catatan?`) → status `pending`. Ditolak `400` bila program `event` |
+| GET | `/culture/programs/:id/terlaksana` | pemilik program | Riwayat tanda satu program |
+| GET | `/culture/terlaksana/pending` | `requireCultureManager` | Antrean approval SPV HR: seluruh tanda `pending`, diperkaya nama+pilar program |
+| PUT | `/culture/terlaksana/:id` | `requireCultureManager` | Keputusan SPV HR (`status`: `approved`\|`rejected`). Transisi **atomik** (filter `status=pending`); yang sudah diputus balas `409` |
+
+⚠️ **Loop approval belum bernotifikasi** (SPV HR tak dikabari saat pending, officer tak dikabari saat diputus) — follow-up terpisah, belum dikerjakan.
 
 **Skor komposit blueprint 30/30/40, otomatis** (`hitungSkorProgram`, satu tempat): Partisipasi 30% + Antusiasme 30% + Implementasi 40%, dengan **Implementasi = Partisipasi × Antusiasme ÷ 100** (dihitung, bukan diisi). KPI officer = rata-rata skor programnya. Detail konsep: [[Microservices - Form Builder Service]].
 
@@ -208,7 +225,7 @@ Transisi sah: belum ditinjau → `accepted`/`rejected`; `accepted` → `implemen
 |---|---|---|
 | GET | `/internal/compliance` | Form wajib yang belum diisi: `{blocking:[{id,title}], warning:[...]}`. Dipakai [[Microservices - Attendance Service]] saat clock-in |
 | GET | `/internal/kaizen/metrics` | Hitungan ide per orang pada satu periode: `{data{<employee_id>:{submitted,accepted,implemented}}, period_key, has_program}`. `?period=YYYY-MM` (default periode berjalan). Ditarik [[Microservices - Employee Service]] untuk skor KPI |
-| GET | `/internal/culture/metrics` | ⚠️ branch `feature/workspace-position`. Skor komposit program culture per officer pada satu periode: `{data{<employee_id>:{komposit[],jumlah}}, period_key, has_program}`. `?period=YYYY-MM`. Ditarik [[Microservices - Employee Service]] untuk sumber KPI `program_culture` (reduksi `rata_rata`) |
+| GET | `/internal/culture/metrics` | Skor komposit program culture per officer pada satu periode: `{data{<employee_id>:{komposit[],jumlah}}, period_key, has_program}`. `?period=YYYY-MM`. Ditarik [[Microservices - Employee Service]] untuk sumber KPI `program_culture` (reduksi `rata_rata`). Program **event** disaring `period_key`; program **non-event** (⚠️ branch, ADR 0093) ongoing → menyumbang **100/0** (ada tanda `approved` pada periode) ke array `komposit` **yang sama** — bentuk payload TETAP ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]) |
 
 > **Tiga angka, bukan satu.** Kepatuhan dihitung dari ide yang **diajukan** (karyawan memegang kendali penuh atas kepatuhannya sendiri), skor KPI dari ide yang **diterapkan** — begitulah redaksi metriknya di [[HRIS - Matriks KPI per Departemen]]. `has_program:false` membedakan "perusahaan ini belum menjalankan programnya" dari "gagal mengambil data"; hanya yang kedua layak dilaporkan sebagai metrik gagal hitung.
 
