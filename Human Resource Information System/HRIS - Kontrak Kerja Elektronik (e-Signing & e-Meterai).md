@@ -2,7 +2,7 @@
 
 *Digitalisasi kontrak kerja karyawan (PKWT/PKWTT): dokumen dibuat dari template berbasis data HRIS, ditandatangani secara elektronik **tidak tersertifikasi** **tatap muka di kantor dan didampingi HRD** (karyawan menggores tanda tangan di perangkat HR, direktur mengonfirmasi dari Ruang Direktur), dibubuhi **e-Meterai** oleh HR, lalu salinannya dikirim ke karyawan. Ditambah pengingat otomatis sebelum kontrak berakhir. Keputusannya di [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]], yang menggantikan rancangan tersertifikasi [[ADR - 0019 Kontrak Kerja Elektronik via Service Internal + Lapisan Tersertifikasi]]. Dibangun di atas modul riwayat kontrak yang **sudah live** di [[Microservices - Employee Service]] (koleksi `employee_contract`).*
 
-- **Status**: 🟡 **Konsep / Direncanakan** untuk tanda tangan dan e-Meterai; belum ada di kode. ✅ **Pengingat kontrak habis: merged 2026-09-11 (bip-erp PR #1851), naik di DEV 2026-09-11 dan PROD 2026-09-12**; jalan cron DEV sudah terverifikasi, jalan PROD pertama (2026-09-13 07:00 WIB) belum dibaca (§Pengingat Kontrak Habis). Pondasinya (riwayat kontrak + lampiran PDF) sudah ✅ live, diverifikasi ke `bip-erp` `origin/main` `915ca2f8` pada 2026-09-11; rinciannya di §Pondasi yang Sudah Ada.
+- **Status**: 🟡 **Konsep / Direncanakan** untuk tanda tangan dan e-Meterai; belum ada di kode. ✅ **Pengingat kontrak habis: merged 2026-09-11 (bip-erp PR #1851), naik di DEV 2026-09-11 dan PROD 2026-09-12**; jalan cron DEV sudah terverifikasi, jalan PROD pertama (2026-09-13 07:00 WIB) belum dibaca (§Pengingat Kontrak Habis). ⚠️ **Dokumen PKWT masa transisi (T18): selesai di branch 2026-09-12** (bip-erp `feat/employee-dokumen-pkwt`, erp-frontend `feat/hris-dokumen-pkwt`), belum PR, belum merged, belum di DEV (§Masa transisi). Pondasinya (riwayat kontrak + lampiran PDF) sudah ✅ live, diverifikasi ke `bip-erp` `origin/main` `915ca2f8` pada 2026-09-11; rinciannya di §Pondasi yang Sudah Ada.
 - **Ruang lingkup implementasi**: modul kontrak employee-service (status tanda tangan, sesi tanda tangan tatap muka, catatan tanda tangan, pengingat), prefix arsip MinIO baru, Web ERP (layar tanda tangan di perangkat HR, status di halaman Kontrak, antrean Ruang Direktur), salinan lewat email, dan MyBharata ("Kontrak Saya", baca-saja). Tanpa vendor PSrE, tanpa integrasi API meterai, tanpa tanda tangan jarak jauh.
 - **Endpoint yang sudah ada**: [[API - Employee Service]] §Kontrak Kerja. Layar HR: [[APP - Web ERP]] `/hris/contract`.
 
@@ -108,6 +108,7 @@ Mengikuti [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi 
 | Sesi tanda tangan tatap muka | modul kontrak: dibuka HRD (izin kerja HRIS), pencocokan NIK, goresan, pernyataan setuju | baru |
 | Catatan tanda tangan | koleksi baru, hanya-tambah, **tanpa TTL** | baru |
 | Template, PDF draft, lembar bukti | modul kontrak; preseden `go-pdf/fpdf` slip gaji | baru |
+| Dokumen masa transisi (T18) | `contract_pkwt*.go`: PDF isian dibuat saat diminta (`go-pdf/fpdf`), daftar kekurangan, kirim opsional; jejak di `employee_contract_dokumen_kirim` | ⚠️ di branch, belum merged (2026-09-12) |
 | Arsip PDF final, goresan, lembar bukti | prefix MinIO baru tanpa kunci baca di browser, dibaca lewat proxy employee-service | baru |
 | Pengingat | `contract_pengingat.go` + cron 07:00 WIB, `kirimInboxKategoriGalat`, kategori `reminder`, koleksi `employee_contract_pengingat` | ✅ DEV + PROD (2026-09-12) |
 | Salinan untuk karyawan baru | notification-service `POST /email/send` (lampiran PDF) | reuse |
@@ -141,7 +142,20 @@ jalur samping: KOREKSI_DIMINTA (kembali ke DRAFT) · DIBATALKAN (sebelum SELESAI
 
 ### Masa transisi: dokumen isian otomatis, kirim opsional
 
-🟡 **Direncanakan** (T18 di `Workspace/ANALISA - Tanda Tangan Kontrak Kerja dan Pengingat Kontrak Habis.md`), keputusan pemilik proses 2026-09-12. Sebelum alur di atas dibangun, HR bisa membuat dokumen PKWT yang diisi otomatis dari data sistem, lalu **boleh mengirimnya ke email karyawan secara opsional**: per kontrak, hanya lewat tombol yang ditekan HR, tanpa kiriman otomatis. Tujuannya menemukan data dan isi template yang masih kurang sebelum alur tanda tangan dibangun, jadi isian yang datanya belum ada di sistem (§Pemetaan Field Template ← Sumber Data) ditandai di dokumen, bukan dikosongkan diam-diam. Tanda tangan tetap basah, dan PDF bertanda tangan diunggah ke riwayat kontrak seperti sekarang. Pengingat kontrak habis tidak melampirkan maupun mengirim dokumen ini. Aturan rancangan akhir tetap: dokumen diberikan saat HR bertemu karyawan, tidak dikirim lebih dulu.
+⚠️ **Selesai di branch 2026-09-12, belum PR, belum merged, belum di DEV** (T18 di `Workspace/ANALISA - Tanda Tangan Kontrak Kerja dan Pengingat Kontrak Habis.md`; bip-erp `feat/employee-dokumen-pkwt`, erp-frontend `feat/hris-dokumen-pkwt`). Ukur ulang sebelum mengandalkan status ini: cek PR dan image employee-service. Keputusan pemilik proses 2026-09-12: sebelum alur di atas dibangun, HR bisa membuat dokumen PKWT yang diisi otomatis dari data sistem, lalu **boleh mengirimnya ke email karyawan secara opsional**: per kontrak, hanya lewat tombol yang ditekan HR, tanpa kiriman otomatis. Tujuannya menemukan data dan isi template yang masih kurang sebelum alur tanda tangan dibangun, jadi isian yang datanya belum ada di sistem (§Pemetaan Field Template ← Sumber Data) ditandai di dokumen, bukan dikosongkan diam-diam. Tanda tangan tetap basah, dan PDF bertanda tangan diunggah ke riwayat kontrak seperti sekarang. Pengingat kontrak habis tidak melampirkan maupun mengirim dokumen ini. Aturan rancangan akhir tetap: dokumen diberikan saat HR bertemu karyawan, tidak dikirim lebih dulu.
+
+**Alur HR** ([[APP - Web ERP]] `/hris/contract`): panel riwayat kontrak → tombol **Dokumen PKWT** (hanya jenis `PKWT` dan `PKWT (Evaluasi)`) → dialog berisi daftar data yang belum ada beserta tautan tempat membetulkannya (halaman detail karyawan `/hris/employee/<employee_id>`, atau Payroll → Gaji Karyawan yang belum bisa membuka satu karyawan dari URL, jadi tautannya ke daftar) → **Buka PDF** (aksi utama) → opsional **Kirim ke email** dengan konfirmasi yang menyebut nama, alamat, dan bahwa dokumen memuat gaji. Pemeriksaan diambil ulang tiap dialog dibuka, dan dialog menampilkan kiriman terakhir (alamat, waktu, `employee_id` pengirim). Rute dan bentuk responsnya di [[API - Employee Service]] §Kontrak Kerja.
+
+**Aturan yang dikunci kode**:
+- **Gerbang izin KERJA HRIS** (`PermHrisWork` + `RequireHRISStaff`) di ketiga rute, bukan izin baca, karena dokumen memuat gaji. Kontrak dicari dalam perusahaan efektif pemanggil (`EffectiveCompanyID`).
+- **Hanya `PKWT` dan `PKWT (Evaluasi)` milik PT BIP**: kop dan Pihak Pertama template tertulis tetap untuk BIP. Jenis atau perusahaan lain dijawab `didukung: false` di pemeriksaan dan 422 di PDF maupun kirim, tanpa membaca gaji.
+- **Isian kosong dicetak titik-titik dan masuk daftar kekurangan** (kode dan perlakuannya di §Pemetaan di dokumen masa transisi). Layar menerjemahkan kodenya; backend tidak mengirim kalimat.
+- **Gaji Lampiran 1 dibaca dari payroll** (`GET /employee-salary/:employeeId` lalu `GET /salary-components`, berurutan) dengan identitas HR pemanggil, tidak disimpan. **Izin `payroll.view` dinilai di employee-service lebih dulu** (`common.IzinPayrollEfektif`): `routes.InternalRequest` tidak meneruskan `BIP-Permissions`, sehingga payroll sendiri jatuh ke izin bawaan peran HRIS dan akan meloloskan HR yang paketnya sengaja tanpa `payroll.view`. Keterbatasan arah sebaliknya tetap ada: akun yang izin payroll-nya hanya dari paket bisa ditolak payroll walau berhak di layar Payroll. Env `PAYROLL_MODULE_URL` sengaja tidak divalidasi saat boot; kosong berarti kolom gaji kosong dan HR diberi tahu.
+- **PDF dibuat saat diminta, tidak disimpan**, tanpa logo dan **tanpa gambar tanda tangan atau stempel direktur**, supaya dokumen buatan sistem tak tampak sudah disetujui direktur. Teks template HR tinggal di kode, tidak disalin ke vault. Font inti fpdf (cp1252): karakter di luar itu diganti, tidak menggagalkan render.
+- **Kirim**: alamat hanya dari `personal_data.email_address`, diperiksa sebelum payroll dipanggil (kosong atau tak sah → 422 dan tombol nonaktif). Email teks polos berlampiran PDF lewat [[Microservices - Notification Service]] `POST /email/send`. Kiriman **dicatat hanya bila terkirim**: gagal kirim → 502 tanpa catatan; terkirim tetapi catatan gagal disimpan → 200 `tercatat: false`.
+- **Kirim ganda dan kirim ulang**: bytes PDF dibuat identik untuk dokumen yang sama (tanggal metadata = waktu kontrak dibuat, katalog tersortir), dan kunci idempoten memuat kiriman terakhir yang tercatat. Resend menyimpan kunci 24 jam dan menolak kunci sama berisi berbeda (409); tanpa keduanya, kirim ulang dalam 24 jam berbunyi "email gagal" padahal kiriman pertama sudah tiba (terbukti saat review 2026-09-12: 0 dari 5 render identik). Kini ulang sebelum tercatat (klik ganda, timeout) mengirim permintaan identik sehingga Resend tidak mengirim lagi, dan kirim ulang sesudah tercatat mendapat kunci baru. Riwayat kiriman yang tak terbaca menahan pengiriman (500).
+- ⚠️ **Anggaran waktu**: dua panggilan payroll berurutan (masing-masing maks 10 detik) ditambah email (maks 10 detik) menyentuh batas gateway 30 detik pada kasus terburuk. Diterima sebagai risiko: gejalanya 502 di layar sementara email bisa tetap keluar, dan kirim ulang sebelum tercatat tidak menggandakan email.
+- **Deploy**: employee-service (BE) sebelum frontend-hris (FE). Env baru `PAYROLL_MODULE_URL` di blok employee-service compose dev dan prod (container dibuat ulang). Tanpa kategori inbox baru; notification-service dan payroll-service tidak berubah.
 
 ### Calon karyawan dan karyawan aktif
 
@@ -219,6 +233,29 @@ Diisi otomatis saat dokumen dibuat, bukan diketik ulang. Dicek per isian templat
 | Lampiran 1 (karyawan baru) | gaji | recruitment `Offer.gaji_evaluasi` / `gaji_kontrak`: satu angka, tanpa rincian komponen | ⚠️ |
 | Pembuka | hari dan tanggal perjanjian | saat penandatanganan | baru |
 
+### Pemetaan di dokumen masa transisi (T18)
+
+Perlakuan tiap isian di PDF masa transisi (`susunDokumenPKWT`, `contract_pkwt.go`; di branch 2026-09-12). Kolom kode = kode kekurangan yang dikirim ke layar; perbaikan `info` tidak menunjuk layar mana pun.
+
+| Isian | Perlakuan | Kode kekurangan (tempat membetulkan) |
+|---|---|---|
+| Nomor | nomor sistem dicetak apa adanya; ditandai bila bukan format HR (`/HRD/PKWT/`) | `nomor_kosong`, `nomor_format_sistem` (info, T5) |
+| Pihak Pertama | teks tetap template, **selalu** ditandai | `pihak_pertama_template` (info, T6) |
+| Nama, tanggal lahir, alamat, telepon, email | dari `personal_data`; kosong dicetak titik-titik | `nama_kosong`, `tanggal_lahir_kosong`, `alamat_kosong`, `telepon_kosong`, `email_kosong`, `email_tidak_valid` (data karyawan) |
+| NIK | tetap dicetak walau panjangnya salah, supaya kekurangannya terlihat di kertas | `nik_kosong`, `nik_tidak_16_digit` (data karyawan) |
+| Tempat lahir | selalu titik-titik | `tempat_lahir_tidak_ada` (tulis tangan, T6) |
+| Jabatan | `work_data.position` | `jabatan_kosong` (data karyawan) |
+| Lokasi kerja (Pasal 2) dan jam kerja (Pasal 5) | teks tetap template, **selalu** ditandai: benar untuk jadwal kantor reguler, belum tentu untuk karyawan shift atau lokasi lain | `lokasi_jam_kerja_template` (info, T7) |
+| Durasi | bulan penuh dari `start_date`/`end_date` dalam tanggal WIB (tanggal berakhir ikut dihitung, atau tanggal yang sama); **bukan bulan penuh tidak dibulatkan**, dikosongkan | `durasi_bukan_bulan_penuh` (tulis tangan) |
+| Tanggal mulai dan berakhir | dicetak dengan tahun terbilang | |
+| Tanggal perjanjian (pembuka) | selalu titik-titik, diisi saat penandatanganan | |
+| Lampiran 1 gaji pokok | `employee_salary.basic_salary`; nol dianggap belum diisi | `gaji_pokok_kosong` (payroll) |
+| Lampiran 1 kehadiran, tunjangan jabatan, uang makan | komponen **pendapatan** payroll dicocokkan lewat **nama** `Tunjangan Kehadiran`, `Tunjangan Jabatan`, `Tunjangan Makan` (tanpa beda huruf dan spasi); komponen yang ada di master tetapi tak punya nilai untuk karyawan itu dihitung nol | `komponen_tidak_ditemukan` + nama komponen (payroll) |
+| Lampiran 1 total terima | jumlah dasar bulanan kolom yang tercetak (estimasi, bukan gaji bersih); **dikosongkan bila satu kolom saja kosong**, karena total parsial terlihat seperti angka final | |
+| Lampiran 1 saat payroll tak terbaca | seluruh kolom gaji kosong | `gaji_belum_ditetapkan` (payroll), `gaji_tak_berizin`, `gaji_tak_terjangkau`, `gaji_tak_dikonfigurasi` (info) |
+
+Komponen pendapatan lain yang punya nilai tidak dicetak dan tidak ikut total; namanya hanya ditampilkan ke HR sebagai keterangan. ⚠️ Hanya tipe `earning` yang dicocokkan, karena master payroll bisa punya komponen potongan bernama sama dengan tunjangan. ⚠️ Nama komponen di master PROD bisa sudah diganti HR; nama yang tak ditemukan dilaporkan, tidak ditebak.
+
 > Catatan struktur (grounded): penerima pengingat atasan diturunkan dari `work_data.supervisor_id` (atasan langsung, ditetapkan lewat `/supervisor-assignment`), dengan cadangan rantai atasan departemen yang sama dengan penyetuju cuti. Lihat [[HRIS - Organization Structure]].
 
 ## Data yang Ditulis
@@ -228,6 +265,7 @@ Diisi otomatis saat dokumen dibuat, bukan diketik ulang. Dicek per isian templat
 | `employee_contract` (pemilik) | status tanda tangan, rujukan PDF final, goresan, dan lembar bukti, hash | modul kontrak employee-service |
 | Koleksi catatan tanda tangan (baru) | satu dokumen per tindakan: sesi dibuka, tanda tangan karyawan (hasil pencocokan NIK, HRD pendamping, perangkat, waktu), tanda tangan direktur, unggah meterai, pembatalan | hanya-tambah, tanpa TTL; NIK yang diketik tidak disimpan |
 | `employee_contract_pengingat` (PR #1851) | satu dokumen per (kontrak, tahap, penerima) yang berhasil terkirim: `contract_id`, `employee_id`, `company_id`, `tahap`, `penerima_id`, `peran` (`hr`/`atasan`), `dikirim_pada` | penjaga idempotensi pengingat; index unik `contract_id + tahap + penerima_id`. Koleksi sendiri karena `PATCH /contract/:id` menimpa dokumen kontrak utuh lewat `ReplaceOne`, dan jejak kiriman bukan fakta kontrak |
+| `employee_contract_dokumen_kirim` (T18, di branch 2026-09-12) | satu dokumen per kiriman dokumen masa transisi yang **berhasil** keluar: `contract_id`, `employee_id`, `company_id`, `ke`, `dikirim_oleh` (`employee_id` HR pengirim), `dikirim_pada` | index `contract_id` + `dikirim_pada` menurun, dibuat saat boot; dibaca untuk "kiriman terakhir" di dialog dan untuk membentuk kunci idempoten email. Koleksi sendiri dengan alasan yang sama dengan pengingat |
 | Salinan `work_data` (`employment_type`, `contract_ending`) | tidak ditulis modul tanda tangan. Modul kontrak menyegarkannya sendiri lewat `segarkanSalinan` | pintu tulis lain membuang kedua field itu |
 | Prefix arsip MinIO (baru) | PDF final, goresan, lembar bukti | tanpa kunci baca di browser; tidak bisa diganti setelah dikunci |
 | [[Microservices - Notification Service]] | pengingat (`reminder`), pemberitahuan antrean direktur, email salinan | |
@@ -246,7 +284,7 @@ Diisi otomatis saat dokumen dibuat, bukan diketik ulang. Dicek per isian templat
 - **Calon karyawan batal datang atau menolak menandatangani** sesudah data karyawannya dibuat. Akunnya langsung aktif saat dibuat (`services/employee/func.go:188-190`), jadi orangnya sudah terhitung karyawan aktif (ikut pengingat dan daftar karyawan) sebelum menandatangani. Perlu jalan resmi membatalkannya.
 - **Kontrak yang belum ditandatangani dan pengingat.** Pengingat memilih kontrak ber-`start_date` terbaru tanpa melihat status tanda tangan (field-nya belum ada), jadi kontrak baru yang tertahan di draf atau menunggu tanda tangan membuat kontrak lama tampak sudah diperpanjang, dan tak ada yang diingatkan bila penandatanganannya macet. Kontrak pertama dari create-employee juga langsung dianggap berlaku. Saat status tanda tangan dibangun: kontrak baru baru dihitung sesudah `SELESAI`, atau ada pengingat terpisah untuk tanda tangan yang tertunda.
 - **Aturan pengingat untuk `PKWT (Evaluasi)`** (masa evaluasi 2-3 bulan): tahap 2 bulan dan H-30 jatuh terlalu awal, dan pesan atasan H-14 tumpang tindih dengan Performance Review Onboarding. Opsi: untuk jenis ini lewati tahap 2 bulan (dan mungkin H-30), pertahankan H-7, dan arahkan penilaian ke Performance Review; atau biarkan.
-- **Format dokumen masa transisi** (PDF dibangkitkan sistem atau isian template Word) dan sumber rincian gaji Lampiran 1 untuk dokumen itu (T18). Soal draf sudah diputuskan 2026-09-12: tidak dikirim lebih dulu pada rancangan akhir, kirim opsional hanya di masa transisi (§Masa transisi).
+- **Format dokumen masa transisi**: ✅ diputuskan 2026-09-12 (T18). PDF dibangkitkan sistem; gaji Lampiran 1 dari payroll dengan izin HR pemanggil; tanda tangan dan stempel direktur tidak dicetak; nomor sistem dicetak dan ditandai; tanggal perjanjian titik-titik; kop teks tanpa logo; hanya `PKWT` dan `PKWT (Evaluasi)`; kiriman dicatat di koleksi sendiri (§Masa transisi). Soal draf: tidak dikirim lebih dulu pada rancangan akhir, kirim opsional hanya di masa transisi.
 - **Penolakan atau koreksi di tempat**: bentuk catatannya dan siapa yang memperbaiki.
 - **Nama status** alur tanda tangan dan perlakuan kontrak lama (dianggap lampiran di luar sistem, tanpa status tanda tangan).
 - **Retensi arsip** kontrak bertanda tangan.
@@ -258,14 +296,14 @@ Diisi otomatis saat dokumen dibuat, bukan diketik ulang. Dicek per isian templat
 ## Dependensi & Integrasi
 
 - [[Microservices - Employee Service]]: pemilik `employee_contract`, `personal_data`, `work_data`; rute kontrak di [[API - Employee Service]] §Kontrak Kerja; cron, helper inbox, penerima HR, rantai atasan.
-- [[Microservices - Payroll Service]]: `employee_salary` untuk Lampiran 1.
+- [[Microservices - Payroll Service]]: `employee_salary` untuk Lampiran 1. Dokumen masa transisi (T18) membacanya lewat HTTP (`GET /employee-salary/:employeeId`, `GET /salary-components`, env `PAYROLL_MODULE_URL`) dengan identitas HR pemanggil; izin `payroll.view` dinilai di employee-service.
 - [[Microservices - Recruitment Service]]: term offer (gaji, tanggal mulai, masa evaluasi) dan data kandidat untuk calon karyawan.
 - [[Microservices - File Service]]: prefix arsip baru.
-- [[Microservices - Notification Service]]: inbox (`reminder`), email salinan dengan lampiran PDF.
+- [[Microservices - Notification Service]]: inbox (`reminder`), email salinan dengan lampiran PDF. Dokumen masa transisi memakai `POST /email/send` yang sama, dengan kunci idempoten.
 - [[Microservices - Calendar Service]]: feed `contract_end` (kontrak milik pemanggil).
 - [[CORE - HRIS Orchestrator]]: rantai hire (create-employee).
 - [[CORE - API Master Gateway]]: routing + auth SSO.
-- [[APP - Web ERP]] (`/hris/contract`, layar tanda tangan di perangkat HR, Ruang Direktur) dan [[APP - MyBharata]] ("Kontrak Saya").
+- [[APP - Web ERP]] (`/hris/contract` beserta dialog Dokumen PKWT masa transisi, layar tanda tangan di perangkat HR, Ruang Direktur) dan [[APP - MyBharata]] ("Kontrak Saya").
 
 ## Dokumen Terkait
 
