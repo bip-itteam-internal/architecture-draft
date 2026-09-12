@@ -2,7 +2,7 @@
 
 Papan kerja hasil `/analisa-kebutuhan` 2026-09-11. Keputusan di [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]], cara kerja di [[Microservices - Form Builder Service]] bagian "Inspeksi Satgas 5R & K3".
 
-**Status papan (2026-09-11):** T1+T2 **merged** 2026-09-11 (bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)); biner form-builder dev sudah memuatnya (diukur 2026-09-11), employee-service dev belum diukur, dan verifikasi gerbang Satgas lewat gateway belum dijalankan. T4 **merged** 2026-09-11 (bip-erp [#1852](https://github.com/bip-itteam-internal/bip-erp/pull/1852) + erp-frontend [#1542](https://github.com/bip-itteam-internal/erp-frontend/pull/1542)) dan **live dev**: `file_fields` terverifikasi lewat gateway dev, bundel frontend dev memuat editor baru. Prod belum. T0, T3, T5, T6, dan T7 belum dimulai. Rencana (akar `erp/`): `.task-plans/2026-09-11-satgas-kepatuhan-izin-dan-gerbang.md` (T1+T2) dan `.task-plans/2026-09-11-form-builder-satgas-editor-dan-foto.md` (T4).
+**Status papan (2026-09-12):** T1+T2 **merged** 2026-09-11 (bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)); biner form-builder dev sudah memuatnya (diukur 2026-09-11), employee-service dev belum diukur, dan verifikasi gerbang Satgas lewat gateway belum dijalankan. T4 **merged** 2026-09-11 (bip-erp [#1852](https://github.com/bip-itteam-internal/bip-erp/pull/1852) + erp-frontend [#1542](https://github.com/bip-itteam-internal/erp-frontend/pull/1542)) dan **live dev**: `file_fields` terverifikasi lewat gateway dev, bundel frontend dev memuat editor baru. Prod belum. **T6 selesai** 2026-09-12: PR draft my-bharata [#144](https://github.com/bip-itteam-internal/my-bharata/pull/144) (`1.18.0+162`, belum dicoba di perangkat) bersama PR draft erp-frontend [#1550](https://github.com/bip-itteam-internal/erp-frontend/pull/1550) (merge ditahan sampai adopsi). T0 sebagian dijawab 2026-09-12. T3, T5, dan T7 belum dimulai. Rencana (akar `erp/`): `.task-plans/2026-09-11-satgas-kepatuhan-izin-dan-gerbang.md` (T1+T2), `.task-plans/2026-09-11-form-builder-satgas-editor-dan-foto.md` (T4), dan `.task-plans/2026-09-12-mybharata-satgas-inspeksi.md` (T6).
 
 **Kebutuhan asal** (dari manajemen): posisi Culture di HRD sebagai "intel perusahaan"; budaya kepatuhan kantor (sepatu, lanyard) dicatat diam-diam lewat MyBharata dan muncul besoknya per departemen; HRD punya rutinitas Satgas 5R & K3 yang sekarang lewat Google Form "Dokumentasi Temuan Inspeksi SATGAS 5R & K3" (foto, maks 10 berkas, 10 MB).
 
@@ -16,7 +16,7 @@ Papan kerja hasil `/analisa-kebutuhan` 2026-09-11. Keputusan di [[ADR - 0090 Ins
 - Usulan awal yang **gugur** setelah informasi pemakai masuk: AI penilai foto, peringkat antar departemen, master area.
 - Temuan data (lembar HRD "KPI DEPARTEMEN HRGA"): skor Satgas diketik dengan skala campur; Maret 2026 total KPI Office Girl 131 dari 100 lolos disetujui.
 
-**Urutan**: T0 (keputusan HR) berjalan paralel dan wajib selesai sebelum T3 go-live. T1+T2 (merged) → T3. T4 merged dan live dev; T6 bisa mulai sekarang (kontrak T2 sudah di `main`). T5 setelah T3. Tutup dengan T7. ⛔ **employee-service dan form-builder naik bersama, lalu web, lalu MyBharata.**
+**Urutan**: T0 (keputusan HR) berjalan paralel dan wajib selesai sebelum T3 go-live. T1+T2 (merged) → T3. T4 merged dan live dev; T6 dalam PR draft (#144, #1550), menunggu uji perangkat. T5 setelah T3. Tutup dengan T7. ⛔ **employee-service dan form-builder naik bersama, lalu web, lalu MyBharata.**
 
 ⚠️ **Koordinasi**: modul `kepatuhan` diusulkan dipakai juga oleh menu pencatat ADR 0085 (TBD "petugas ditunjuk"). Kabari Faiz nama modulnya supaya izin catatan kepatuhan masuk ke modul yang sama, bukan gerbang kedua.
 
@@ -26,13 +26,13 @@ Papan kerja hasil `/analisa-kebutuhan` 2026-09-11. Keputusan di [[ADR - 0090 Ins
 
 Jawaban wajib sebelum go-live, dicatat ke ADR 0090 §TBD:
 
-- Rumus konversi skala 1-5 ke 0-100: `(v-1)/4` (rumus sistem, 3 = 50) atau `v/5` (praktik lembar HRD, 3 = 60).
-- Cek ulang yang jatuh ke bulan berikutnya masuk periode mana.
+- ✅ **Dijawab 2026-09-12**: rumus konversi skala 1-5 ke 0-100 memakai `(v-1)/4` (rumus sistem, 3 = 50), bukan `v/5`.
+- ✅ **Dijawab 2026-09-12**: cek ulang yang jatuh ke bulan berikutnya dihitung ke **periode bulan temuan**. ⚠️ Kode belum begitu, lihat T3.
 - Jumlah field foto per orang, dan apakah foto wajib.
 - Siapa selain petugas yang boleh membuka rekap web (usul: atasan Office Boy dan Security).
 - Jabatan persis yang dipasangi paket `kepatuhan_petugas_satgas`.
 
-**Cara verifikasi**: jawaban tertulis dari HR, ditempel ke ADR 0090.
+**Cara verifikasi**: jawaban tertulis dari HR, ditempel ke ADR 0090. Dua jawaban pertama sudah tercatat di ADR 0090 bagian "Diputuskan sesudah ADR ditulis".
 
 ## T1+T2. BE: modul izin `kepatuhan` + penanda + gerbang + `/me/satgas` ✅ merged #1849
 
@@ -49,6 +49,8 @@ Digabung satu PR atas keputusan user, supaya tak ada izin tanpa penegak yang ter
 ## T3. BE: nilai terakhir-menang, endpoint internal, sumber KPI
 
 **Bergantung T1+T2 dan T0 (rumus konversi).** Pembaca SKOR Satgas: jawaban terakhir per orang per periode, satu rumus konversi, dipakai endpoint internal form-builder dan tab analitik "Yang Dinilai" untuk form bertanda (hari ini tab itu masih `overallOf`, rata-rata). Pakai ulang `ringkasSatgas`/`kirimanLebihBaru` dari `satgas_me.go` untuk memilih jawaban terakhir, jangan menulis urutan-menang kedua. Sumber KPI per orang baru di employee-service. ⛔ Jangan memakai atau menyentuh `service_team_index` / `nilai_layanan_pribadi`.
+
+⚠️ **Keputusan T0 soal periode cek ulang belum ada di kode.** Kiriman selalu masuk periode yang sedang buka (`response_handlers.go:471`), dan `/me/satgas` hanya membaca periode berjalan (`satgas_me.go`). Cek ulang atas temuan bulan lalu harus bisa dihitung ke bulan temuan; rancang cara atribusinya di `/plan` T3 bersama tampilannya di menu MyBharata, jangan ditebak.
 
 `/start-task buat pembaca skor Satgas (jawaban terakhir per orang per periode, satu rumus konversi) untuk endpoint internal form-builder, tab analitik Yang Dinilai pada form inspeksi_satgas, dan sumber KPI per orang baru di employee-service`
 
@@ -75,20 +77,28 @@ Dua PR (urutan naik: bip-erp dulu, lalu erp-frontend):
 
 **Cara verifikasi**: angka per orang **sama persis** dengan draf KPI bulan yang sama; akun tanpa izin tidak melihat menu dan ditolak server. Struktur tabel HRIS (skill `/migrasi-tabel-hris`), tanpa `p-6` sendiri, tombol kembali lewat `SidebarBackButton`, loading pakai `Skeleton`, i18n id + en.
 
-## T6. MyBharata: field foto + `boolean`, menu Satgas, penyaring beranda, cek ulang
+## T6. MyBharata: field foto + `boolean`, menu Satgas, penyaring beranda, cek ulang ✅ selesai, PR draft #144 + #1550
 
 **Bergantung T1+T2 (merged #1849).**
+
+**Hasil 2026-09-12** (rencana `.task-plans/2026-09-12-mybharata-satgas-inspeksi.md`):
+
+- my-bharata PR [#144](https://github.com/bip-itteam-internal/my-bharata/pull/144) (**draft** ke `dev`), `feat/satgas-inspeksi` dari `origin/dev`, versi **`1.18.0+162`** (di atas `dev` `1.17.0+161`). Commit: `7c1e88e6` tipe `boolean`/`file`, `metric_key` + `isSatgas`, encoder bool; `c6eed734` unggah + kompresi + kunci tombol; `5a5c24ac` lint; `259ebf24` menu, kartu beranda, halaman Satgas, halaman isi; `4fa5203f` merge `origin/dev`; `a50365ae` versi; `6d51ce2a` tindak lanjut review (413 ke kunci sendiri, test DI dan halaman); `9be35bb6` pesan izin kamera/galeri ditolak dan perangkat tanpa kamera.
+- erp-frontend PR [#1550](https://github.com/bip-itteam-internal/erp-frontend/pull/1550) (**draft**, `feat/form-builder-berkas-wajib`, `6145448d`): mencabut aturan berkas wajib di `lib/schema.ts`, pemangkasan `required` di `lib/field-types.ts`, kunci sakelar di `components/question-row.tsx`, dan kalimat terakhir `formBuilder.question.fileHint`. Backend tak pernah melarang berkas wajib.
+- **Penyimpangan dari papan (keputusan user)**: halaman `SatgasFillPage` sendiri, bukan penyesuaian `EvaluationFillPage`; kartu beranda khusus petugas; foto dari kamera **dan** galeri; larangan berkas wajib dicabut di PR terpisah yang merge-nya ditahan sampai adopsi versi T6 terukur, bukan bersama rilis. Unggah hanya mengirim field `file`, karena backend tak membaca `field_key`.
+- **Verifikasi lokal**: sesudah merge `origin/dev`, 640 test hijau (satgas, home, form, kaizen, live_shift, core) dan `dart analyze` per folder bersih; sesudah tindak lanjut review, 610 test hijau di folder yang tersentuh. Kontrol negatif terbukti merah: encoder bool, gerbang menu sebelum `roles == null`, favorit Satgas saat izin belum dijawab, jawaban sesudah logout dibuang, kunci tombol selama unggah, pengosongan jawaban saat unggah. PR erp-frontend: 553 test `src/features/form-builder`, tsc, eslint, dan `pnpm build` lolos.
+- **Yang belum** (PR #144 tetap draft sampai ini lolos): build flavor dev di perangkat (akun berpaket melihat menu dan kartu, akun tanpa paket tidak, termasuk instalasi baru); form Satgas uji di dev (temuan dengan foto kamera ukuran penuh jadi `open_finding`, cek ulang "Tidak" dengan foto galeri jadi `resolved`, `GET /api/form-builder/me/satgas` lewat gateway dev menunjukkan status yang sama, foto terbuka di tab Individu); regresi form penilaian non-Satgas dan kirim Kaizen; ukur `app_version` petugas sebelum merge PR erp-frontend.
 
 - Tipe field **`file`** (kamera/galeri, `maxWidth` sekitar 1920, cek ukuran di bawah 4 MB, tombol kirim terkunci selama unggah, pola unggah-dulu-kirim-id) dan **`boolean`** (untuk "Ada temuan?"; hari ini jatuh ke `unknown`).
 - Menu Satgas di `home_quick_access.dart` yang bertanya ke `GET /me/satgas` (tampil bila `allowed`), bukan `system_roles`. Tampilkan status per PIC (`not_rated` / `open_finding` / `resolved`).
 - Form bertanda `inspeksi_satgas` dikeluarkan dari `SurveySection` lewat `metric_key` (pola `isKaizen`; `pendingOf` tidak disaring).
 - ⚠️ **Cek ulang**: `EvaluationFillPage` menutup diri saat semua orang sudah dinilai, dan daftar sasaran menandai orang yang sudah dinilai sebagai `done`. Menu Satgas harus bisa membuka pengisian untuk orang berstatus `open_finding` walau ia sudah pernah dinilai.
-- ⛔ **Cabut larangan wajib pada pertanyaan berkas di editor web** bersama rilis T6 (erp-frontend `lib/schema.ts` aturan berkas wajib, `lib/field-types.ts` pemangkasan `required`, `components/question-row.tsx` kunci sakelar, dan keterangan `formBuilder.question.fileHint`). Tanpa itu foto tak pernah bisa diwajibkan.
+- ⛔ **Cabut larangan wajib pada pertanyaan berkas di editor web** ~~bersama rilis T6~~ lewat PR terpisah yang merge-nya ditahan sampai adopsi versi T6 terukur (diubah user 2026-09-12) (erp-frontend `lib/schema.ts` aturan berkas wajib, `lib/field-types.ts` pemangkasan `required`, `components/question-row.tsx` kunci sakelar, dan keterangan `formBuilder.question.fileHint`). Tanpa itu foto tak pernah bisa diwajibkan.
 - Kompresi foto sebelum unggah (pindahan dari T4; web tak punya jalur pengisian).
 
 `/start-task tambah tipe field file dan boolean di form MyBharata, menu Satgas yang bertanya ke GET /me/satgas, penyaring form inspeksi_satgas dari SurveySection, dan pengisian cek ulang untuk PIC yang sudah pernah dinilai`
 
-**Cara verifikasi**: petugas berizin melihat menu, akun lain tidak, **termasuk saat cache peran kosong**; form Satgas tidak muncul di beranda, tetapi tautan notifikasinya tetap membuka form; foto ponsel ukuran penuh berhasil diunggah (terkompres); cek ulang atas PIC yang sudah dinilai bisa dikirim dan statusnya berpindah ke `resolved`. `dart analyze` per folder (bukan `flutter analyze` seluruh repo). Rilis menaikkan **version name** dan versionCode (`update_version.dart` dua argumen).
+**Cara verifikasi**: petugas berizin melihat menu, akun lain tidak, **termasuk saat cache peran kosong**; form Satgas tidak muncul di beranda ~~, tetapi tautan notifikasinya tetap membuka form~~ (dicoret 2026-09-12: jalur notifikasi yang membuka form tak ada untuk form mana pun, dan form Satgas tak mengirim notifikasi); foto ponsel ukuran penuh berhasil diunggah (terkompres); cek ulang atas PIC yang sudah dinilai bisa dikirim dan statusnya berpindah ke `resolved`. `dart analyze` per folder (bukan `flutter analyze` seluruh repo). Rilis menaikkan **version name** dan versionCode (`update_version.dart` dua argumen).
 
 ## T7. Verifikasi end-to-end + tutup dok
 
@@ -111,6 +121,10 @@ Tutup: perbarui status ADR 0090 dan bagian Satgas di dok Form Builder ke ✅/⚠
 - **Suite penuh erp-frontend di merge-base e37e4adb**: 39 test gagal di 15 berkas, jumlah dan daftarnya identik dengan worktree baseline terpisah, jadi baseline, bukan regresi. Di `origin/main` 428d41b0 turun jadi 37 gagal di 13 berkas (baseline dan branch identik). Salah satunya `src/app/(main)/form-builder/page.test.tsx`, jadi "test form-builder hijau" di papan ini berarti `src/features/form-builder`, bukan halaman rutenya.
 - **Komite Kaizen tak bisa membuka lampiran** (pratinjau khusus pengelola form). Antrean hanya menampilkan penanda. Rute pratinjau untuk komite **tidak dikejar**: user menyatakan 2026-09-11 modul Kaizen akan dihapus nanti (belum ada ADR maupun task penghapusannya).
 - **Objek file-service tersimpan `application/octet-stream`** (`CreateFormFile` di `shared-library/routes/internal_request.go`), jadi PDF mungkin terunduh alih-alih tampil di pratinjau. Ukur di dev dengan berkas sungguhan; perbaikan content-type task tersendiri.
+- **Angka versi minimum aplikasi di gateway ditulis mati** (`api-gateway/main.go:701`, `1101103` untuk android dan ios) dan sifatnya ajakan. Adopsi versi T6 tak bisa dipaksa dari server, jadi gerbang merge PR larangan berkas wajib mengukur `app_version` petugas.
+- **`EvaluationFillPage` mencoba ulang dengan `LoadEvaluation('')`** saat galat terjadi sebelum form sempat tampil (`evaluation_fill_page.dart`), jadi tombol Coba Lagi di sana tak pernah berhasil. Alur penilaian lain, task tersendiri.
+- **Form Satgas yang dibuka lewat `/survey/:id`** dialihkan `SurveyFillPage` ke `EvaluationFillPage` (alur yang menutup diri saat semua sudah dinilai). Menu Satgas tak memakai jalur itu, dan form Satgas tak mengirim notifikasi yang membawa tautannya.
+- **Riwayat Kaizen di MyBharata menampilkan `upload_id` mentah** untuk jawaban berkas (`answer_text.dart`), sudah begitu sebelum T6. Tidak dikejar karena Kaizen direncanakan dihapus.
 
 ## Yang TIDAK jadi dikerjakan, beserta alasannya
 

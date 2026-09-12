@@ -74,7 +74,7 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 |---|---|---|
 | GET | `/culture/employees` | Daftar karyawan aktif untuk pemilih target (ditarik dari employee-service via `EMPLOYEE_MODULE_URL`) |
 | GET | `/culture/programs` | Daftar program milik pemanggil; pengelola form boleh `?scope=all` (seluruh perusahaan). `?period=YYYY-MM`. Tiap baris membawa `hadir` (responden) |
-| POST | `/culture/programs` | Buat program (`nama`, `pilar`, `jenis`, `target_departemen`/`target_karyawan` sesuai jenis, `tanggal`, `jam_mulai`/`jam_selesai`). `target` **di-resolve otomatis** dari jenis, bukan diketik |
+| POST | `/culture/programs` | Buat program (`nama`, `pilar`, `jenis`, `target_departemen`/`target_karyawan` sesuai jenis, `tanggal`, `jam_mulai`/`jam_selesai`). `target` **di-resolve otomatis** dari jenis, bukan diketik. `tipe` **disalin dari master**, bukan dari klien |
 | PUT | `/culture/programs/:id` | Sunting program milik sendiri |
 | DELETE | `/culture/programs/:id` | Hapus program milik sendiri (feedback yatim ikut dibuang) |
 | GET | `/culture/feedback/programs` | Program aktif untuk dinilai (`?period=`) |
@@ -83,6 +83,8 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 | GET | `/culture/summary` | Ringkasan dashboard (`?period=`, `?scope=all`): rata-rata partisipasi/antusiasme/komposit, distribusi per pilar **atomik** (`pecahPilar`), daftar program terhitung |
 
 **`jenis` → `target` (penyebut partisipasi), di-snapshot saat simpan**: `internal` = seluruh karyawan aktif · `department` = jumlah staf `target_departemen` · `employees` = jumlah `target_karyawan` (dedup). Jenis `club`/`public` menyusul (TBD).
+
+**`tipe` (`event` | `non_event`)** — ⚠️ field baru, [[ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master]] (bip-erp PR #1861, T1). Sumbu **berbeda** dari `jenis` (resolve target) dan `pelaksanaan` (frekuensi). Master (`POST/PUT /culture/master-programs`) menyimpan `tipe` opsional (kosong → `event`); program **menyalinnya dari master**, klien tak dipercaya. `POST /culture/programs` **menolak `400`** bila master ber-`tipe=non_event` ("tipe non-event belum didukung") sampai perilaku non-event mendarat (task T3); master boleh menyimpannya sebagai katalog. Dokumen lama tanpa `tipe` dibaca `event` (tanpa migrasi).
 
 **Skor komposit blueprint 30/30/40, otomatis** (`hitungSkorProgram`, satu tempat): Partisipasi 30% + Antusiasme 30% + Implementasi 40%, dengan **Implementasi = Partisipasi × Antusiasme ÷ 100** (dihitung, bukan diisi). KPI officer = rata-rata skor programnya. Detail konsep: [[Microservices - Form Builder Service]].
 
@@ -107,7 +109,7 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 | GET | `/me/satgas` | ⚠️ *(Satgas, merged #1849, deploy belum diukur)* Menu Satgas 5R & K3 untuk MyBharata. Tanpa izin `200 {allowed:false, forms:[]}`; dengan izin `200 {allowed:true, forms:[...]}` berisi ringkasan per PIC. Rincian di bagian di bawah |
 | GET | `/me/responses` | Riwayat jawaban sendiri |
 | GET | `/me/service-index` | **Indeks layanan sebuah departemen** pada satu bulan. `?department=` dan `?period=YYYY-MM` **keduanya wajib**. Balas `{has_form, form_id, title, department, period_key, index, scored_questions, respondents, audience_size, coverage_pct, aspects[], unweighted[]}` |
-| POST | `/me/forms/:id/uploads` | Unggah satu lampiran (**multipart**, field `file` + `field_key`). `201` membalas `{file_name, size, upload_id}`. Cap 4 MB milik file-service; `413` bila lewat. **`409` bila putaran form berulang belum dibuka**, diperiksa SEBELUM berkasnya naik supaya tak meninggalkan objek yatim. ⚠️ *(Satgas, merged #1849)* `403` berpesan pada form Satgas bila tak memegang izin, juga diperiksa sebelum berkas naik |
+| POST | `/me/forms/:id/uploads` | Unggah satu lampiran (**multipart**, hanya field **`file`**; `field_key` tak dibaca, dan berkas baru dicocokkan ke pertanyaannya saat jawaban dikirim; diperiksa ke `uploads.go` 2026-09-12). `201` membalas `{"data": {upload_id, file_name, size}}`. `400` bila field `file` tak ada. Cap 4 MB milik file-service; `413 {"error": "Ukuran berkas melebihi batas 4 MB"}` bila lewat. `409` juga bila form tak `published`. **`409` bila putaran form berulang belum dibuka**, diperiksa SEBELUM berkasnya naik supaya tak meninggalkan objek yatim. ⚠️ *(Satgas, merged #1849)* `403` berpesan pada form Satgas bila tak memegang izin, juga diperiksa sebelum berkas naik |
 | GET | `/me/uploads/:uploadId/preview` | Presigned URL lampiran sendiri. `404` untuk id yang bukan miliknya |
 | GET | `/forms/:id/uploads/:uploadId/preview` | Idem untuk **pengelola form** (grup `/forms`, digerbang `requireFormManager`) |
 
@@ -127,7 +129,7 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 
 ## Inspeksi Satgas 5R & K3 (`/me/satgas` dan gerbang izin)
 
-> ⚠️ **Merged 2026-09-11** lewat bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849), **deploy belum diukur, belum diuji lewat gateway**. Keputusan: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
+> ⚠️ **Merged 2026-09-11** lewat bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849), **deploy belum diukur, belum diuji lewat gateway**. Konsumen MyBharata (menu Satgas, halaman isi, unggah foto) ada di PR draft my-bharata [#144](https://github.com/bip-itteam-internal/my-bharata/pull/144) (2026-09-12). Keputusan: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
 
 **Gerbang.** Form ber-`metric_key: inspeksi_satgas` hanya bisa diisi pemegang izin `kepatuhan.satgas.input`, diperiksa di `POST /me/forms/:id/responses`, `POST /me/forms/:id/uploads`, `GET /me/forms/:id/subjects`, dan penyaring `GET /me/forms`. Tolakannya **`403 {"error": "..."}`** dengan pesan yang menyebut paket "Kepatuhan: Petugas Satgas 5R & K3" dan perlunya login ulang, diperiksa **sesudah** audience, jadi bukan-sasaran tetap mendapat `403` yang lama. Form tanpa penanda tak tersentuh. Kill-switch `KEPATUHAN_PERMISSION_ENFORCEMENT=off` mengembalikan form Satgas ke aturan audience saja.
 
