@@ -221,20 +221,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "ab2e3a63e08ebbdb4a6b6cce3e078bc3a18ce069aeb96683481973f045f6ea54",
-      "ukuran_kb": 43.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service lewat gateway `/api/form-builder/*` untuk membuat, menyunting, menerbitkan, menutup, dan menghapus form, serta siapa yang boleh mengelolanya (tingkat peran plus cakupan departemen). Juga menjelaskan rute analisa dan export, pengisian karyawan `/me/*`, template form, aturan tipe form per departemen yang ditetapkan IT, program Culture, Kaizen, inspeksi Satgas 5R & K3, endpoint internal, bentuk data penting, dan kapan request dibalas 403, 409, atau 422.",
+      "hash": "e8dbfec7ccd9a6d43a4e6721d37fbef62d8bfcd55cbf274750d4b733ff67a6ac",
+      "ukuran_kb": 43.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service lewat gateway `/api/form-builder/*` untuk membuat, menyunting, menerbitkan, dan menghapus form, beserta gerbang RBAC per departemen dan arti kode galat seperti 403, 409, dan 422. Juga menjawab kontrak aturan tipe form per departemen (khusus IT), template form, program Culture, analisa & export, pengisian karyawan lewat `/me/*`, Kaizen, inspeksi Satgas 5R & K3 (`/me/satgas`), dan endpoint internal yang dipanggil service lain.",
       "kata_kunci": [
         "form builder",
-        "form dinamis",
+        "API form",
+        "/api/form-builder",
         "survei",
-        "endpoint form-builder",
-        "analytics",
-        "export CSV",
-        "form template",
-        "tipe form",
+        "survey",
+        "form-type-rules",
         "kaizen",
-        "Satgas 5R K3"
+        "Satgas 5R K3",
+        "/me/forms",
+        "export CSV"
       ]
     },
     {
@@ -1279,6 +1279,7 @@
         "API - Form Builder Service",
         "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Notification Service",
+        "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
         "ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus",
         "Microservices - Marketing Analytics Service",
         "API - Marketing Analytics Service",
@@ -1290,19 +1291,19 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "e1c13de68785c48171fc6af5e33d89daca33b08b229e3c970a800a113bce111c",
-      "ukuran_kb": 59.2,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitektur Flutter-nya (Clean Architecture feature-first, BLoC, get_it, dio dengan timeout, go_router, Firebase flavor dev/prod), bagaimana login JWT, biometric, PIN, dan kebijakan satu akun satu device bekerja, serta bagaimana aplikasi terhubung lewat API gateway. Juga menjawab fitur apa saja yang tersedia bagi karyawan (absensi, izin/cuti, lembur, slip gaji dengan gerbang PIN, KPI, survei form builder, Kaizen, pelatihan, Sesi Live Host dan ambil alih akun), perilaku konten dan menu per perusahaan (multi-tenant), cara membaca versi build dan rilis, roadmap, serta known issues.",
+      "hash": "03d1a4123b82d0a010f5fd9221b500f45cbbaeedf88920b2a2394a874cb52135",
+      "ukuran_kb": 63.8,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata (Flutter, Android/iOS), tech stack dan arsitekturnya (Clean Architecture feature-first, BLoC, get_it, dio lewat API gateway), serta cara autentikasinya (JWT, biometric, PIN, satu akun satu device). Juga menjawab fitur apa saja yang tersedia untuk karyawan (attendance, cuti/izin, lembur, slip gaji, KPI, survei Form Builder, Kaizen, Satgas 5R & K3, Sesi Live Host, pelatihan), selisih versi build vs versi rilis, perilaku multi-perusahaan, dan known issues.",
       "kata_kunci": [
         "MyBharata",
         "my_bharata",
-        "aplikasi mobile HRIS",
+        "aplikasi mobile",
         "Flutter",
+        "HRIS mobile",
         "absensi",
         "attendance",
         "slip gaji",
         "payslip",
-        "Sesi Live Host",
         "multi-tenant"
       ]
     },
@@ -1466,9 +1467,9 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "34a159785f293c55e32d7d96ccaae94adeb2f4768c6c738ff3277967db5ed1ee",
-      "ukuran_kb": 423.8,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS `erp-frontend` (One Bharata, hris-dashboard), stack-nya (Next.js App Router, React, shadcn/ui, TanStack Query, react-i18next), bagaimana login, cookie `system_roles`, role gating sidebar, dan SSO Identity Provider untuk aplikasi lain bekerja. Juga menjawab cara menu dikelompokkan (induk menu HRIS, Pengaturan HRGA terpusat per tab), dukungan multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), konvensi data-fetching TanStack Query dan konvensi bagan Recharts dengan ChartContainer, serta modul apa saja yang ada di web.",
+      "hash": "3d56058f33866aac79c76018a79a88331bb1ab2340412e98a1670d204a792a7c",
+      "ukuran_kb": 424.1,
+      "ringkasan": "Menjawab: apa itu portal web erp-frontend (\"One Bharata\", Next.js) beserta stack-nya, dan bagaimana login, SSO Identity Provider, serta gating menu berdasarkan `system_roles` dan paket izin bekerja. Juga menjawab konvensi data-fetching TanStack Query dan bagan Recharts, susunan menu HRIS dan Pengaturan HRGA terpusat, fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), serta daftar modul yang sudah ada dan yang belum.",
       "kata_kunci": [
         "Web ERP",
         "erp-frontend",
@@ -1476,10 +1477,10 @@
         "hris-dashboard",
         "Next.js",
         "SSO",
-        "system_roles",
         "sidebar menu",
+        "system_roles",
         "TanStack Query",
-        "Recharts"
+        "Pengaturan HRGA"
       ]
     },
     {
@@ -1825,20 +1826,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "1ae9d17ab223435fa3d69ce624fe2495374ce2a0a6b6f028769536565576170f",
-      "ukuran_kb": 112.0,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja dengan tiga sumbu (modul, tingkat aksi, cakupan/reach), bagaimana paket izin (permission set) ditempel ke posisi lalu diresolusi jadi klaim JWT saat login, dan bagaimana penegakannya di gateway, service, dan frontend. Juga menjawab modul mana yang sudah berkatalog dan menegakkan izin per aksi, apa itu fallback tier `system_roles` dan kenapa Fase dua dicabut, serta endpoint katalog izin, daftar modul, dan pengecualian per akun.",
+      "hash": "12baf36ca6ea4e70f262dabf8724e814571ea0807179c67213dcd09046f851e4",
+      "ukuran_kb": 112.2,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan data/reach), bagaimana paket hak (permission set) menempel pada posisi/jabatan lalu diresolusi jadi klaim JWT saat login, dan bagaimana penegakannya di gateway, service, serta frontend. Juga menjawab katalog izin mana saja yang terdaftar per modul, riwayat fase dua (tier fallback), API katalog modul dan pengecualian per akun, serta celah yang belum diimplementasikan.",
       "kata_kunci": [
         "RBAC",
         "permission set",
-        "paket izin",
+        "paket hak",
         "hak akses",
-        "katalog izin",
-        "tier fallback",
+        "access control",
         "system_roles",
-        "reach",
-        "JWT permissions",
-        "Hak per Posisi"
+        "katalog izin",
+        "RequirePermission",
+        "tier fallback",
+        "reach"
       ]
     },
     {
@@ -2276,23 +2277,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "0c779de90b9ad797b5d0b49dc7a0180dd60d7b0e3eef71de98e0bf9d5dffb315",
-      "ukuran_kb": 115.6,
-      "ringkasan": "Menjawab: bagaimana sebuah departemen membuat form dinamis tanpa coding (10 tipe pertanyaan, 4 tipe form: survey/evaluation/checklist/kaizen), menerbitkan ke sasaran, membaca rekap/analisa jawaban, dan mengekspornya ke CSV. Menjelaskan juga bagaimana satu form dipakai menilai karyawan lain (sumbu subject), form berulang per periode bulanan/mingguan, program Kaizen dan Culture, gerbang kepatuhan yang menahan clock-in mobile, serta kepemilikan form per-departemen (bukan per-modul) dengan RBAC katalog formbuilder.",
+      "hash": "de1271db75b3e34a9f62d0a831ecf295601168bb33aaca32dddd0f2eac861ee2",
+      "ukuran_kb": 115.9,
+      "ringkasan": "Menjawab: bagaimana form-builder-service (Go + Fiber + MongoDB `form_builder_db`) bekerja, mulai dari tipe pertanyaan dan tipe form, kepemilikan per departemen, penilaian karyawan lain (sumbu subject vs audience), notifikasi inbox, sampai form berulang per periode bulanan/mingguan. Juga menjawab cara kerja Kaizen, program Culture beserta setoran metrik ke KPI, template form, lampiran berkas, penanda inspeksi Satgas 5R & K3, gerbang presensi untuk form wajib, dan kenapa notification-service wajib ikut di-deploy.",
       "kata_kunci": [
         "form builder",
+        "form-builder-service",
         "form dinamis",
-        "survey",
+        "survei",
         "evaluation",
-        "checklist",
-        "kaizen",
-        "culture",
-        "penilaian karyawan",
         "form berulang",
-        "periode",
-        "CSV export",
-        "kepatuhan clock-in",
-        "notifikasi inbox"
+        "recurrence",
+        "kaizen",
+        "Culture",
+        "gerbang presensi"
       ]
     },
     {
@@ -6273,7 +6271,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Diterima, sebagian terimplementasi.** T1+T2 **merged** 2026-09-11 (bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)); biner form-builder dev memuatnya (diukur 2026-09-11), employee-service dev dan gerbang Satgas belum diuji lewat gateway. T4 **merged** 2026-09-11 (bip-erp [#1852](https://github.com/bip-itteam-internal/bip-erp/pull/1852) + erp-frontend [#1542](https://github.com/bip-itteam-internal/erp-frontend/pull/1542)) dan **live di dev**: `file_fields` terverifikasi lewat gateway dev, bundel frontend dev memuat editor baru. Layar belum dicoba sebagai orang, prod belum. T3, T5, T6, dan T7 belum dikerjakan. Rincian di `## Deskripsi`.",
+      "status_teks": "**Diterima, sebagian terimplementasi.** T1+T2 **merged** 2026-09-11 (bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)); biner form-builder dev memuatnya (diukur 2026-09-11), employee-service dev dan gerbang Satgas belum diuji lewat gateway. T4 **merged** 2026-09-11 (bip-erp [#1852](https://github.com/bip-itteam-internal/bip-erp/pull/1852) + erp-frontend [#1542](https://github.com/bip-itteam-internal/erp-frontend/pull/1542)) dan **live di dev**: `file_fields` terverifikasi lewat gateway dev, bundel frontend dev memuat editor baru. Layar belum dicoba sebagai orang, prod belum. T6 **selesai di branch** 2026-09-12 (my-bharata `feat/satgas-inspeksi`, `1.18.0+162`, belum PR, belum dicoba di perangkat), bersama PR erp-frontend `feat/form-builder-berkas-wajib` yang mencabut larangan berkas wajib (draft, merge ditahan sampai adopsi terukur). T3, T5, dan T7 belum dikerjakan. Rincian di `## Deskripsi`.",
       "publik": true,
       "tautan": [
         "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
@@ -6299,20 +6297,20 @@
         "APP - MyBharata",
         "APP - Web ERP"
       ],
-      "hash": "ae646430a029569d9075cc3a84432b6b4a844f75f690f1ef07b6653bc6e244bb",
-      "ukuran_kb": 26.0,
-      "ringkasan": "Menjawab: kenapa inspeksi Satgas 5R & K3 dibangun di atas Form Builder (tipe evaluation) alih-alih modul baru, dan kenapa nilai KPI Office Boy dan Security diambil dari jawaban cek ulang terakhir per orang per periode, bukan rata-rata. Juga menjelaskan penanda `inspeksi_satgas`, gerbang modul izin `kepatuhan` yang ditegakkan server, menu MyBharata lewat `GET /me/satgas`, halaman rekap web, field foto, sumber KPI per orang, apa yang sengaja tidak dijanjikan, dan keputusan HR yang masih TBD seperti rumus konversi skala 1-5 ke 0-100.",
+      "hash": "6257052336e05aea3de3ac716a980a7cd180b762c40d78bef987952153e5c1f3",
+      "ukuran_kb": 29.9,
+      "ringkasan": "Menjawab: kenapa inspeksi Satgas 5R & K3 memakai Form Builder (tipe evaluation dengan penanda `inspeksi_satgas`) alih-alih modul baru, dan kenapa nilai KPI Office Boy dan Security diambil dari jawaban cek ulang terakhir per periode, bukan rata-rata. Juga menjawab gerbang izin modul `kepatuhan`, menu khusus MyBharata lewat `GET /me/satgas`, halaman rekap web, field foto, sumber KPI per orang, hal yang sengaja tidak dijanjikan, serta keputusan lanjutan dan yang masih TBD (termasuk rumus konversi skor 1-5 ke 0-100).",
       "kata_kunci": [
         "ADR 0090",
         "Satgas 5R K3",
-        "inspeksi 5R",
-        "K3",
-        "cek ulang",
-        "KPI Office Boy",
+        "inspeksi",
+        "inspection",
+        "kepatuhan",
+        "Office Boy",
         "Security",
-        "kepatuhan.satgas.input",
-        "inspeksi_satgas",
-        "foto temuan"
+        "cek ulang",
+        "KPI",
+        "inspeksi_satgas"
       ]
     },
     {
@@ -13301,20 +13299,20 @@
         "Microservices - Form Builder Service",
         "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI"
       ],
-      "hash": "f38f167df9d8cbc7eba298d95c2f710b0e6ec580f565477a603bf7816879bed0",
-      "ukuran_kb": 16.1,
-      "ringkasan": "Menjawab: dari kebutuhan manajemen apa fitur inspeksi Satgas 5R & K3 berasal, apa hasil wawancara dengan OD & Industrial Relation, keputusan user apa yang diambil, dan usulan mana yang gugur (AI penilai foto, peringkat antar departemen, master area). Juga memuat daftar task T0 sampai T7 beserta urutan, dependensi, perintah `/start-task`, cara verifikasi tiap task, keputusan HR yang wajib dijawab sebelum go-live, dan temuan sampingan untuk sinkronisasi dokumen.",
+      "hash": "6f4c60be4c59e20cb24be8e1d50895652cdea371af80c60b4b503bbe43e955e3",
+      "ukuran_kb": 20.4,
+      "ringkasan": "Menjawab: apa kebutuhan asal manajemen dan hasil wawancara di balik fitur inspeksi Satgas 5R & K3, keputusan user yang sudah diambil, serta usulan yang gugur (AI penilai foto, peringkat antar departemen, master area). Juga menjawab pembagian task T0 sampai T7 (keputusan HR, modul izin kepatuhan, pembaca skor terakhir-menang, field foto web, halaman rekap, MyBharata, verifikasi end-to-end), urutan naik antar service, dan cara verifikasi tiap task.",
       "kata_kunci": [
         "analisa kebutuhan",
         "Satgas 5R K3",
+        "inspeksi",
         "daftar task",
-        "task list",
-        "Office Boy",
-        "Security",
-        "OD Industrial Relation",
-        "Culture",
-        "Google Form",
-        "kepatuhan"
+        "task breakdown",
+        "kepatuhan",
+        "MyBharata",
+        "Form Builder",
+        "KPI Office Boy",
+        "OD & Industrial Relation"
       ]
     },
     {
