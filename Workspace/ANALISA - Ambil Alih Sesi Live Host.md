@@ -22,9 +22,9 @@ akun yang sama. Bila pemegang lupa dan jalannya hanya tutup otomatis, host berik
 median 239 menit (maksimum 450). Aturan +60 memotong 0 dari 45 sesi sah (molor terbesar
 2,8 menit).
 
-**Keadaan 2026-09-12**: T1 di PROD. T2 dan T4 kodenya selesai dan sudah direview di dua branch
-yang **belum merge** (bip-erp PR #1855, my-bharata PR #143; rencana `.task-plans/2026-09-11-ambil-alih-sesi-live.md`). T3 batal.
-Sisa: PR dan merge T2 lalu T4, deploy BE, rilis MyBharata, dan T5.
+**Keadaan 2026-09-12 09:34 WIB**: T1 di PROD, belum pernah terpicu. T2 di PROD sejak 08:55 WIB (bip-erp #1855,
+DEV terverifikasi lewat gateway). T4 merged ke `dev` (my-bharata #143), rilis 1.17.0+161 belum diverifikasi. T3 batal.
+Sisa: rilis MyBharata, T5, dan T0 (HR). Rencana `.task-plans/2026-09-11-ambil-alih-sesi-live.md`.
 
 ## Urutan & dependensi
 
@@ -55,15 +55,19 @@ mengambil alih**, dan sesinya **tidak tertutup otomatis**.
 ([[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]]), dan sesi
 berikutnya tervonis `dalam_shift`. Bukan pekerjaan kode.
 
+**Status 2026-09-12**: belum terlihat dibetulkan. Pada 11 Sep host itu punya 6 sesi `luar_shift` dan 1
+`dalam_shift`, dan jam berakhir shift yang tercatat di sesinya masih 24:00 WIB.
+
 ## T1. BE: tutup otomatis di jam berakhir shift + 60 menit
 
 **Status 2026-09-11**: merged ke `main` (bip-erp #1847 pukul 16:21 WIB, erp-frontend #1539
 pukul 16:32 WIB) dan **di PROD** (`marketing-analytics-service` 16:55 WIB, `frontend-hris`
 16:59 WIB). Deploy prod dijalankan agent atas penegasan eksplisit user, menyimpang dari aturan
 tim bahwa prod dijalankan manusia. Gerbang biner dan bundel lolos; saat naik 0 dari 4 sesi
-berjalan tertutup. Rencana `.task-plans/2026-09-11-tutup-otomatis-akhir-shift.md`. Sisa: bukti
-perilaku pertama (pengingat 00:30, tutup 01:00 WIB 2026-09-12, bila dua sesi dalam shift tidak
-diakhiri), verifikasi DEV lewat gateway, dan daftar verifikasi pasca-merge di badan kedua PR.
+berjalan tertutup. Rencana `.task-plans/2026-09-11-tutup-otomatis-akhir-shift.md`. Per 2026-09-12
+09:34 WIB belum pernah terpicu: tak satu pun sesi ditutup otomatis sejak deploy, dan kelima sesi yang dimulai
+sesudahnya diakhiri host paling lambat semenit sesudah jam berakhir shift. Sisa: bukti perilaku pertama,
+verifikasi DEV lewat gateway, dan daftar verifikasi pasca-merge di badan kedua PR.
 
 - Sesi berjalan yang melewati jam berakhir shift + 60 menit ditutup dengan `selesai` **tepat
   di batas itu** (bukan jam tik), `ditutup_otomatis: true`, alasan `shift_berakhir`.
@@ -92,16 +96,17 @@ sesi berjalan yang sudah lewat +60, jadi periksa sesi berjalan sebelum deploy.
 
 ## T2. BE: ambil alih oleh host terjadwal
 
-**Status 2026-09-12**: kode selesai di bip-erp branch `feat/marketing-analytics-ambil-alih`
-(7 commit `c2ba308a..b8b2e8c8`), sudah direview, **PR #1855 belum merge**; `origin/main` sudah maju 36
-commit dan merge-nya belum dicoba. Review menemukan satu cacat kritis yang sudah diperbaiki:
+**Status 2026-09-12**: merged 07:31 WIB (bip-erp #1855, 7 commit `c2ba308a..b8b2e8c8`) dan **di PROD sejak
+08:55 WIB**. Deploy PROD pertama (07:32 WIB) membangun checkout yang ditarik 19 detik sebelum merge, jadi
+biner sempat tanpa rute ini; ketahuan dari gerbang nama fungsi. Review menemukan satu cacat kritis yang sudah diperbaiki:
 eksekusi menulis ulang `jeda` dari snapshot yang dibaca sebelum panggilan attendance, sehingga
 Jeda/Lanjutkan yang ditekan pemegang di celah itu tertimpa; kini bersyarat posisional seperti
 tutup otomatis. Keputusan perencanaan: permintaan disimpan di dokumen sesi lama; pemegang tahu
 lewat `GET /live-shifts/ambil-alih/menunggu` yang dipoll 3 detik; eksekusi karena diam dipicu
 pembacaan status oleh peminta dengan tenggang 20 detik sesudah batas; pemberitahuan atasan
-ditunda. Belum dipanggil lewat gateway DEV (butuh satu baris `department_shops` di Mongo DEV
-dan dua akun uji yang jadwalnya sedang berjalan).
+ditunda. DEV terverifikasi lewat gateway 08:02 WIB (`/menunggu` 200, status sesi karangan 404 dari handler);
+PROD lewat biner dan `/menunggu` 200 dari dalam container. Alur utuh belum dijalankan (butuh satu baris
+`department_shops` di Mongo DEV dan dua akun uji yang jadwalnya sedang berjalan).
 
 - Permintaan membawa **id sesi yang ditampilkan** di layar penolakan; bila pemegangnya sudah
   berganti, jawabannya 409 baru.
@@ -161,8 +166,8 @@ di penolakan) sudah merged, dan T2 sudah ter-deploy.
 
 ## T4. MyBharata: tombol Ambil alih + label riwayat + rilis
 
-**Status 2026-09-12**: kode selesai di my-bharata branch `feat/live-shift-ambil-alih`
-(versi 1.17.0+161), sudah direview, **PR #143 ke `dev` belum merge**; suite `test/features/live_shift/` 311
+**Status 2026-09-12**: merged ke `dev` 07:34 WIB (my-bharata #143, versi 1.17.0+161); **rilis ke host belum
+diverifikasi**, dan backend PROD yang jadi prasyaratnya sudah naik 08:55 WIB. Suite `test/features/live_shift/` 311
 test hijau. Brief celah 1 mobile (`.task-plans/briefs/2026-09-11-pemegang-akun-409-mybharata.md`)
 dilebur ke sini, tidak dikerjakan sebagai brief terpisah. Review menghasilkan dua perbaikan: host
 yang dicatat untuk ambil alih kini diambil dari pilihan co-host yang sedang tampil, dan
@@ -211,8 +216,8 @@ tutup otomatis akhir shift dari 🟡 ke ✅), [[API - Marketing Analytics Servic
 parameter baru), dan status ADR 0088.
 
 **Status 2026-09-12**: keempat dok itu dan [[APP - MyBharata]] sudah memuat T2 dan T4 dengan
-penanda "di branch, belum merge". Penanda itu diganti saat PR merged dan saat naik ke DEV dan
-PROD.
+status per 2026-09-12 09:34 WIB: T2 di PROD, T4 merged ke `dev`. Yang masih harus diperbarui: rilis
+MyBharata dan hasil T5.
 
 ---
 
@@ -234,5 +239,7 @@ PROD.
 ## Terkait di luar papan ini (insiden 2026-09-11)
 
 - Brief celah 1 mobile dilebur ke T4; brief celah 1 web gugur bersama T3.
-- Skrip pindah toko carevolution (`.task-plans/2026-09-11-pindah-toko-carevolution.ps1`) belum
-  dijalankan.
+- Skrip pindah toko carevolution (`.task-plans/2026-09-11-pindah-toko-carevolution.ps1`) sudah
+  dijalankan 2026-09-12 08:21 WIB: 8 sesi `carevolution.hub` dipindah dari Beautyhacks.co ke Beautyhacks.store dan
+  penjualannya kini terpasang ke sesi host (cadangan di `.task-plans/backup/`). Akar salah pilihnya, pemilih akun
+  tanpa batas waktu (`GET /live-shifts/akun`), belum dibetulkan.

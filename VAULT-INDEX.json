@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-12",
-  "jumlah_dokumen": 402,
+  "jumlah_dokumen": 403,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -221,20 +221,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "e8dbfec7ccd9a6d43a4e6721d37fbef62d8bfcd55cbf274750d4b733ff67a6ac",
-      "ukuran_kb": 43.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*` untuk membuat, menyunting, menerbitkan, dan menghapus form, serta siapa yang boleh mengelolanya (cakupan per departemen, kepemilikan bersama, aturan tipe form per departemen yang ditetapkan IT). Juga menjelaskan rute template form, program Culture, analisa dan export jawaban, pengisian oleh karyawan (`/me/*`), Kaizen, inspeksi Satgas 5R & K3 (`/me/satgas` dan gerbang izinnya), endpoint internal untuk service lain, dan bentuk data penting seperti `recurrence` dan `metric_key`.",
+      "hash": "ab2e3a63e08ebbdb4a6b6cce3e078bc3a18ce069aeb96683481973f045f6ea54",
+      "ukuran_kb": 43.0,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service lewat gateway `/api/form-builder/*` untuk membuat, menyunting, menerbitkan, menutup, dan menghapus form, serta siapa yang boleh mengelolanya (tingkat peran plus cakupan departemen). Juga menjelaskan rute analisa dan export, pengisian karyawan `/me/*`, template form, aturan tipe form per departemen yang ditetapkan IT, program Culture, Kaizen, inspeksi Satgas 5R & K3, endpoint internal, bentuk data penting, dan kapan request dibalas 403, 409, atau 422.",
       "kata_kunci": [
         "form builder",
         "form dinamis",
         "survei",
-        "survey",
-        "endpoint form",
+        "endpoint form-builder",
+        "analytics",
+        "export CSV",
+        "form template",
+        "tipe form",
         "kaizen",
-        "Satgas 5R K3",
-        "form berulang",
-        "recurrence",
-        "analytics export"
+        "Satgas 5R K3"
       ]
     },
     {
@@ -566,7 +566,7 @@
       "area": "API Reference",
       "jenis": "api",
       "status_emoji": "⚠️",
-      "status_teks": "Grounded ke kode (2026-08-30: **keempat-puluh-dua route punya baris di dok ini**). ⚠️ **Enumerasi ulang 2026-09-11**: `origin/main` kini **45 route**, dan `GET /icc/sla-chat` serta `GET /kpi/sla-chat-cs` (`routes.go`) belum punya baris di dok ini (di luar lingkup sync Analisis Live, perlu sync tersendiri). Analisis Live (bip-erp #1841, merged dan di PROD 2026-09-11) menambah `GET /lives/analisis` dan `GET /live-shifts/performa` (**47** saat merge; hitung ulang bila rute lain menyusul); keduanya sudah punya baris di bawah. Route ke-42 `GET /live-shifts/akun` (`live_shift_akun.go`) ditambahkan ke dok ini 2026-08-30; ia sudah ada di `origin/main` tetapi terlewat dari audit 2026-08-27, sehingga dok ini dan [[Microservices - Marketing Analytics Service]] sempat sama-sama menulis \"lima route\" untuk keluarga `/live-shifts` yang sebenarnya enam. Route ke-41 `/kpi/kinerja-live` masuk lewat PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486) (merged 2026-08-27); **status deploy belum diverifikasi — merged bukan deployed**. Sebelumnya 12 route tak terdokumentasi sama sekali; daftarnya + cara audit ulangnya ada di bagian **Cara mengaudit kelengkapan daftar ini** di kaki dokumen. ⚠️ **`GET /divisi` pindah sumber ke `department_shops` 2026-08-29** (fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]], PR [#1520](https://github.com/bip-itteam-internal/bip-erp/pull/1520) & [#1522](https://github.com/bip-itteam-internal/bip-erp/pull/1522)) — jumlah route tetap 41, tapi maknanya berubah; lihat baris `/divisi` di bawah. **Merged, belum di-deploy/diverifikasi lewat gateway.** ⚠️ **Lima rute ambil alih** ([[ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift]] §2) sudah punya baris di §Ambil alih sesi, tetapi kodenya masih di PR bip-erp [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855) (belum merge per 2026-09-12) dan tidak termasuk hitungan di atas.",
+      "status_teks": "Grounded ke kode (2026-08-30: **keempat-puluh-dua route punya baris di dok ini**). ⚠️ **Enumerasi ulang 2026-09-11**: `origin/main` kini **45 route**, dan `GET /icc/sla-chat` serta `GET /kpi/sla-chat-cs` (`routes.go`) belum punya baris di dok ini (di luar lingkup sync Analisis Live, perlu sync tersendiri). Analisis Live (bip-erp #1841, merged dan di PROD 2026-09-11) menambah `GET /lives/analisis` dan `GET /live-shifts/performa` (**47** saat merge; hitung ulang bila rute lain menyusul); keduanya sudah punya baris di bawah. Route ke-42 `GET /live-shifts/akun` (`live_shift_akun.go`) ditambahkan ke dok ini 2026-08-30; ia sudah ada di `origin/main` tetapi terlewat dari audit 2026-08-27, sehingga dok ini dan [[Microservices - Marketing Analytics Service]] sempat sama-sama menulis \"lima route\" untuk keluarga `/live-shifts` yang sebenarnya enam. Route ke-41 `/kpi/kinerja-live` masuk lewat PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486) (merged 2026-08-27); **status deploy belum diverifikasi — merged bukan deployed**. Sebelumnya 12 route tak terdokumentasi sama sekali; daftarnya + cara audit ulangnya ada di bagian **Cara mengaudit kelengkapan daftar ini** di kaki dokumen. ⚠️ **`GET /divisi` pindah sumber ke `department_shops` 2026-08-29** (fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]], PR [#1520](https://github.com/bip-itteam-internal/bip-erp/pull/1520) & [#1522](https://github.com/bip-itteam-internal/bip-erp/pull/1522)) — jumlah route tetap 41, tapi maknanya berubah; lihat baris `/divisi` di bawah. **Merged, belum di-deploy/diverifikasi lewat gateway.** ⚠️ **Lima rute ambil alih** ([[ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift]] §2) sudah punya baris di §Ambil alih sesi, dan kodenya di PROD sejak 2026-09-12 08:55 WIB (bip-erp [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855)), tetapi belum masuk hitungan di atas; hitung ulang pada enumerasi berikutnya.",
       "publik": true,
       "tautan": [
         "Microservices - Marketing Analytics Service",
@@ -581,20 +581,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "0ccb86a7923456bab5e8f11ee1054ed4da4b8f01431129817c6d88b1782d40fe",
-      "ukuran_kb": 52.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service lewat gateway `/api/marketing-analytics/*`, parameter dan konvensi responsnya (amplop `unavailable_channels`, `kolom_tidak_berlaku`, paginasi drill, 400 untuk enum tak dikenal), serta siapa yang boleh menulis ambang keputusan dan pagu belanja iklan. Juga menjelaskan arti lima nilai vonis laba di `/beranda`, keluarga rute laba, video & live, pencatatan dan ambil alih sesi live host (`/live-shifts`), retur, price floor, job sync, pengumpul KPI, dan cara mengaudit kelengkapan daftar route.",
+      "hash": "3c0f21026a1b5514722966a013e8ea98989db14a63fe27190f7779b8fc746823",
+      "ukuran_kb": 53.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda, ambang, pagu, kurva alokasi, laba per toko, video dan live, pencatatan sesi live host `/live-shifts` termasuk ambil alih, retur, price floor, job, pengumpul KPI), parameter serta gerbang aksesnya, dan prefix gateway yang dipakai. Juga menjelaskan konvensi respons (`unavailable_channels`, `kolom_tidak_berlaku`, 400 untuk enum tak dikenal, batas hari WIB, paginasi drill dengan `total: -1`), arti lima nilai vonis laba (tanpa_data, belum_matang, rugi, waspada, sehat), makna `null` versus nol, dan cara mengaudit kelengkapan daftar route terhadap kode.",
       "kata_kunci": [
-        "marketing analytics",
-        "API endpoint",
-        "beranda",
+        "marketing analytics API",
+        "endpoint",
+        "live-shifts",
+        "sesi live host",
+        "ambil alih",
         "vonis laba",
         "ambang ROAS",
         "pagu iklan",
-        "live-shifts",
-        "sesi live",
         "price floor",
-        "kurva alokasi"
+        "/api/marketing-analytics"
       ]
     },
     {
@@ -1279,7 +1279,6 @@
         "API - Form Builder Service",
         "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Notification Service",
-        "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
         "ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus",
         "Microservices - Marketing Analytics Service",
         "API - Marketing Analytics Service",
@@ -1291,19 +1290,19 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "5db0687542f63ce5701cccfbed168d6bdf69a1f3dc3f522a1778628a94998db6",
-      "ukuran_kb": 63.7,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata (Flutter, Android/iOS), tech stack dan arsitektur Clean Architecture feature-first yang dipakai, bagaimana login JWT, biometric, PIN, dan kebijakan satu akun satu device bekerja, serta bahwa aplikasi memanggil backend lewat API gateway. Juga menjelaskan fitur karyawan seperti absensi, izin/cuti, lembur, slip gaji ber-PIN, KPI, survei Form Builder, Kaizen, Satgas 5R & K3, Sesi Live Host, dan pelatihan, perilaku konten per perusahaan (multi-tenant), perbedaan versi build dev dengan versi rilis, roadmap, dan known issues.",
+      "hash": "e1c13de68785c48171fc6af5e33d89daca33b08b229e3c970a800a113bce111c",
+      "ukuran_kb": 59.2,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitektur Flutter-nya (Clean Architecture feature-first, BLoC, get_it, dio dengan timeout, go_router, Firebase flavor dev/prod), bagaimana login JWT, biometric, PIN, dan kebijakan satu akun satu device bekerja, serta bagaimana aplikasi terhubung lewat API gateway. Juga menjawab fitur apa saja yang tersedia bagi karyawan (absensi, izin/cuti, lembur, slip gaji dengan gerbang PIN, KPI, survei form builder, Kaizen, pelatihan, Sesi Live Host dan ambil alih akun), perilaku konten dan menu per perusahaan (multi-tenant), cara membaca versi build dan rilis, roadmap, serta known issues.",
       "kata_kunci": [
         "MyBharata",
         "my_bharata",
-        "aplikasi mobile",
-        "mobile app",
+        "aplikasi mobile HRIS",
         "Flutter",
-        "HRIS mobile",
         "absensi",
         "attendance",
         "slip gaji",
+        "payslip",
+        "Sesi Live Host",
         "multi-tenant"
       ]
     },
@@ -1313,7 +1312,7 @@
       "area": "Application",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas; **E2E terverifikasi live 2026-07-16**). ⛔ **Fitur \"cek status lamaran\" SUDAH DIHAPUS** (BE `a298ba70`, 2026-07-24; portal tak punya rute `/status` — diverifikasi 2026-09-10). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf (dan per perusahaan grup masih **TBD**, lihat [[HRIS - Recruitment]] §Rekrutmen Lintas Perusahaan), dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*). 🟡 **Nama perusahaan perekrut di daftar & detail lowongan: merged ke `master` 2026-09-12 ([#12](https://github.com/bip-itteam-internal/career-bharata/pull/12)), BELUM di prod** (diukur 2026-09-12: checkout prod `77bfafc`, image 2026-09-11 08:44 WIB, `company_name` di bundel 0; backend penopangnya sudah live prod). Deploy portal berikutnya ikut membawa psikotes berpaket #10 dan #11.",
+      "status_teks": "**Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas; **E2E terverifikasi live 2026-07-16**). ⛔ **Fitur \"cek status lamaran\" SUDAH DIHAPUS** (BE `a298ba70`, 2026-07-24; portal tak punya rute `/status` — diverifikasi 2026-09-10). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf (dan per perusahaan grup masih **TBD**, lihat [[HRIS - Recruitment]] §Rekrutmen Lintas Perusahaan), dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*). ✅ **Nama perusahaan perekrut di daftar & detail lowongan: live prod sejak 2026-09-12 08:45 WIB** ([#12](https://github.com/bip-itteam-internal/career-bharata/pull/12); diukur 09:44 WIB: checkout prod `6032152`, `company_name` di bundel 3 berkas, sebelumnya 0). Deploy yang sama ikut membawa psikotes berpaket #10 dan #11.",
       "publik": true,
       "tautan": [
         "HRIS - Recruitment",
@@ -1328,8 +1327,8 @@
         "CORE - SSO Flow",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "3fc0bfe605f2ee3eaf5a073b5941e478e75bc7c79fc248599e77352092d27a58",
-      "ukuran_kb": 18.9,
+      "hash": "e111d27b672ea6df5d1b0b91a311960f84016b7704662f6a0cdbbe3172aac847",
+      "ukuran_kb": 18.8,
       "ringkasan": "Menjawab: apa itu portal karir publik `career.bharatainternasional.com` (repo `career-bharata`, Next.js, pnpm), halaman apa saja yang tersedia bagi pelamar (daftar dan detail lowongan, form lamaran dengan satu PDF, konfirmasi terkirim, psikotes lewat magic link), dan endpoint `/public/recruitment/*` mana yang dikonsumsinya. Juga menjawab cara deploy Docker-nya di prod (port host 3005, `.env` wajib saat build), kenapa fitur cek status lamaran dihapus, apa bedanya dengan halaman karir situs korporat, dan bagaimana nama perusahaan perekrut ditampilkan untuk lowongan lintas perusahaan grup.",
       "kata_kunci": [
         "portal karir",
@@ -1467,20 +1466,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "540dd38f0f2935dde5c0b94f221028005869d94d5bfa763a56ef4a96c3b43399",
-      "ukuran_kb": 423.6,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS `erp-frontend` (\"One Bharata\"), stack-nya (Next.js, shadcn/ui, TanStack Query, react-i18next), dan bagaimana login, SSO Identity Provider, serta gating menu berdasarkan `system_roles` dan paket izin bekerja. Juga menjelaskan pengelompokan menu sidebar HRIS dan halaman Pengaturan HRGA terpusat, fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), konvensi data-fetching dan bagan Recharts dengan `ChartContainer`, serta daftar modul dan fitur web beserta catatannya.",
+      "hash": "34a159785f293c55e32d7d96ccaae94adeb2f4768c6c738ff3277967db5ed1ee",
+      "ukuran_kb": 423.8,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS `erp-frontend` (One Bharata, hris-dashboard), stack-nya (Next.js App Router, React, shadcn/ui, TanStack Query, react-i18next), bagaimana login, cookie `system_roles`, role gating sidebar, dan SSO Identity Provider untuk aplikasi lain bekerja. Juga menjawab cara menu dikelompokkan (induk menu HRIS, Pengaturan HRGA terpusat per tab), dukungan multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), konvensi data-fetching TanStack Query dan konvensi bagan Recharts dengan ChartContainer, serta modul apa saja yang ada di web.",
       "kata_kunci": [
         "Web ERP",
         "erp-frontend",
-        "hris-dashboard",
         "One Bharata",
+        "hris-dashboard",
         "Next.js",
         "SSO",
-        "sidebar menu",
         "system_roles",
-        "Pengaturan HRGA",
-        "TanStack Query"
+        "sidebar menu",
+        "TanStack Query",
+        "Recharts"
       ]
     },
     {
@@ -1826,20 +1825,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "12baf36ca6ea4e70f262dabf8724e814571ea0807179c67213dcd09046f851e4",
-      "ukuran_kb": 112.2,
-      "ringkasan": "Menjawab: bagaimana hak akses di bip-erp diatur lewat tiga sumbu (modul, tingkat aksi, cakupan data/reach), bagaimana paket hak (permission set) menempel ke posisi/jabatan lalu di-resolve jadi klaim JWT saat login, dan bagaimana penegakannya di gateway, service Go, serta frontend. Juga memuat katalog permission per modul yang terdaftar, persona pemberi hak (HR dan IT), fase dua pencabutan tier fallback `system_roles`, API katalog dan pengecualian per-akun, serta catatan celah menu terbatas untuk akun tanpa paket.",
+      "hash": "1ae9d17ab223435fa3d69ce624fe2495374ce2a0a6b6f028769536565576170f",
+      "ukuran_kb": 112.0,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja dengan tiga sumbu (modul, tingkat aksi, cakupan/reach), bagaimana paket izin (permission set) ditempel ke posisi lalu diresolusi jadi klaim JWT saat login, dan bagaimana penegakannya di gateway, service, dan frontend. Juga menjawab modul mana yang sudah berkatalog dan menegakkan izin per aksi, apa itu fallback tier `system_roles` dan kenapa Fase dua dicabut, serta endpoint katalog izin, daftar modul, dan pengecualian per akun.",
       "kata_kunci": [
         "RBAC",
         "permission set",
-        "paket hak",
+        "paket izin",
         "hak akses",
-        "access control",
-        "system_roles",
-        "katalog permission",
+        "katalog izin",
         "tier fallback",
-        "reach cakupan",
-        "Siapa Boleh Apa"
+        "system_roles",
+        "reach",
+        "JWT permissions",
+        "Hak per Posisi"
       ]
     },
     {
@@ -2277,20 +2276,23 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "de1271db75b3e34a9f62d0a831ecf295601168bb33aaca32dddd0f2eac861ee2",
-      "ukuran_kb": 115.9,
-      "ringkasan": "Menjawab: apa itu Form Builder Service (pembuat form dinamis tanpa coding), tipe pertanyaan dan tipe form apa saja yang didukung (survey, evaluation, checklist, kaizen), siapa yang boleh mengelola form berdasarkan departemen pemilik, dan bagaimana form diterbitkan, diisi, dianalisa, serta diekspor ke CSV. Juga menjelaskan penilaian karyawan lain lewat sumbu subject, form berulang per periode bulanan dan mingguan, program Kaizen dan Culture beserta setoran metrik ke KPI, lampiran berkas, inspeksi Satgas 5R & K3, dan gerbang presensi yang menahan clock-in mobile bila form wajib belum diisi. Mencatat pula jebakan deploy: notification-service wajib ikut di-deploy supaya kategori inbox form-published dan form-submitted tidak ditolak.",
+      "hash": "0c779de90b9ad797b5d0b49dc7a0180dd60d7b0e3eef71de98e0bf9d5dffb315",
+      "ukuran_kb": 115.6,
+      "ringkasan": "Menjawab: bagaimana sebuah departemen membuat form dinamis tanpa coding (10 tipe pertanyaan, 4 tipe form: survey/evaluation/checklist/kaizen), menerbitkan ke sasaran, membaca rekap/analisa jawaban, dan mengekspornya ke CSV. Menjelaskan juga bagaimana satu form dipakai menilai karyawan lain (sumbu subject), form berulang per periode bulanan/mingguan, program Kaizen dan Culture, gerbang kepatuhan yang menahan clock-in mobile, serta kepemilikan form per-departemen (bukan per-modul) dengan RBAC katalog formbuilder.",
       "kata_kunci": [
         "form builder",
-        "formulir dinamis",
-        "survei",
+        "form dinamis",
         "survey",
+        "evaluation",
+        "checklist",
+        "kaizen",
+        "culture",
         "penilaian karyawan",
         "form berulang",
-        "kaizen",
-        "gerbang presensi",
-        "inspeksi 5R K3",
-        "form_builder_db"
+        "periode",
+        "CSV export",
+        "kepatuhan clock-in",
+        "notifikasi inbox"
       ]
     },
     {
@@ -2413,6 +2415,8 @@
         "ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate",
         "External - Accurate Webhook",
         "ADR - 0069 Perlengkapan Per-Unit Opsional di inventory dengan Guard Anti-Kontaminasi",
+        "REF - Kepemilikan Data",
+        "ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia",
         "ADR - 0065 Payout yang Sudah Dibukukan Dokumen Lain Ditutup, Bukan Dibuat Ulang",
         "Sales - ICC Account Manager Mapping",
         "Sales - ICC Affiliate Mapping",
@@ -2434,20 +2438,22 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "671be8a4afa0ddf6c9afd02fe77551e4b6f5ae1f06452545f0b4976054bc9e56",
-      "ukuran_kb": 369.0,
-      "ringkasan": "Menjawab: bagaimana order marketplace (TikTok Shop, Shopee, Lazada) masuk lewat webhook dan dinormalkan jadi transaksi terpadu, bagaimana laporan iklan TikTok Business/GMV Max ditarik, serta bagaimana faktur, retur, dan penerimaan di-push ke Accurate Online. Juga menjawab cron/worker sync apa saja yang berjalan, pemetaan akun ICC dan kepemilikan toko per departemen, status sinkron per toko, dan rencana integrasi Meta Ads.",
+      "hash": "6e7304e4fe8c1dd4253a7b95147aa0513194257ccd0627d97a20997a6eac4753",
+      "ukuran_kb": 372.5,
+      "ringkasan": "Menjawab bagaimana integration-service menghubungkan ERP ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) lewat webhook dan API, bagaimana order dan laporan iklan dinormalisasi jadi model transaction terpadu, dan bagaimana data itu di-bridge ke Accurate Online (invoice, ringkasan transaksi harian per-shop/channel, push Sales Invoice/Return). Juga menjelaskan automasi auto-ship/auto-approve yang sadar-holiday, manajemen kredensial OAuth per marketplace, endpoint GMV Max/ICC video metrics untuk insentif marketing, dan status jalur Desty yang sudah soft-disabled.",
       "kata_kunci": [
         "integration-service",
         "marketplace",
-        "webhook",
-        "Shopee",
         "TikTok Shop",
+        "TikTok Ads",
+        "Shopee",
         "Lazada",
-        "Accurate",
-        "faktur sales invoice",
+        "Accurate Online",
+        "webhook",
         "GMV Max",
-        "worker cron"
+        "ICC",
+        "OAuth",
+        "sync marketplace"
       ]
     },
     {
@@ -2467,6 +2473,7 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate",
         "Microservices - Integration Service",
+        "ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia",
         "ADR - 0001 Akuntansi via Accurate",
         "Microservices - File Service",
         "CORE - API Master Gateway",
@@ -2475,20 +2482,22 @@
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "External - Accurate"
       ],
-      "hash": "bd63b1dc924dca9da5d6e1f77d30458ed30e14986d43ec354bd0dba2923dada4",
-      "ukuran_kb": 17.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang dipakai Inventory Service untuk mengelola aset/inventaris GA (create/detail/update/soft delete item, list, presigned URL MinIO), bagaimana ID aset dibentuk (pola INV-BIP-DDMMYY-NAMA-n dengan n = nomor tertinggi berprefix + 1), dan bagaimana serah-terima aset disetujui SPV departemen penyerah. Menjelaskan juga penyimpanan riwayat perbaikan + bukti nota, rumus penyusutan per pemegang (harga ÷ masa manfaat ÷ 12), pemetaan kategori→golongan Accurate & rekonsiliasi, serta gate RBAC ga.view/ga.work dan jebakan middleware per-prefix Fiber.",
+      "hash": "2564173c54c8685ee477025f3ff47e49aa0f061d67df3c692edcc45ceafee8c7",
+      "ukuran_kb": 17.9,
+      "ringkasan": "Menjawab bagaimana inventory-service (aset General Affairs) mencatat item peralatan — pembuatan item dengan ID unik berpola tanggal+nama, serah-terima aset antar pemegang beserta persetujuan SPV departemen penyerah, riwayat perbaikan dengan bukti nota, penghapusan aset lewat soft delete, dan perhitungan penyusutan bulanan per karyawan. Juga menjelaskan endpoint kategori bebas-ketik, upload dokumen presigned MinIO, serta pemetaan accurate_asset_no untuk rekonsiliasi dan KPI akurasi aset GA.",
       "kata_kunci": [
-        "inventory service",
-        "aset GA",
+        "inventory-service",
+        "aset",
         "asset tracking",
-        "serah-terima aset",
+        "GA",
+        "General Affairs",
+        "serah-terima",
         "handover",
         "penyusutan",
         "depreciation",
         "soft delete",
         "repair history",
-        "MinIO"
+        "rekonsiliasi Accurate"
       ]
     },
     {
@@ -2585,7 +2594,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **45 route** di berkas produksi `origin/main` (enumerasi ulang 2026-09-11, termasuk `/health`; audit 2026-08-26 menghitung 41; Analisis Live menambah dua lewat bip-erp #1841, merged dan di PROD 2026-09-11, jadi 47 saat merge; hitung ulang bila rute lain menyusul). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD dan dipakai host sejak 2026-09-09** (catatan lama \"0 dokumen\" dicoret 2026-09-11, lihat § Belum Diimplementasikan). Sejak 2026-09-11 klien pencatatnya hanya MyBharata: halaman web Sesi Live Host dihapus ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]; erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11, belum di PROD).",
+      "status_teks": "Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **45 route** di berkas produksi `origin/main` (enumerasi ulang 2026-09-11, termasuk `/health`; audit 2026-08-26 menghitung 41; Analisis Live menambah dua lewat bip-erp #1841, merged dan di PROD 2026-09-11, jadi 47 saat merge; hitung ulang bila rute lain menyusul). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD dan dipakai host sejak 2026-09-09** (catatan lama \"0 dokumen\" dicoret 2026-09-11, lihat § Belum Diimplementasikan). Sejak 2026-09-11 klien pencatatnya hanya MyBharata: halaman web Sesi Live Host dihapus ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]; erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11, di PROD sejak 2026-09-12 lewat image `frontend-hris` 07:35 WIB).",
       "publik": true,
       "tautan": [
         "Sales - Marketing Dashboard (Master Roadmap)",
@@ -2620,20 +2629,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "927029e8517edcf02679dc8855659e4a921dcba8aa5b65fc087818a86b467518",
-      "ukuran_kb": 129.5,
-      "ringkasan": "Menjawab: bagaimana service agregasi laba dan performa marketing bekerja, mulai dari membaca `integration_db` secara baca-saja lalu menulis koleksi `mart_*`, penjadwal internal 48 jam, job sync, channel TikTok/Shopee/Lazada, alokasi bundel dan mapping SKU, sampai logika vonis laba (termasuk `belum_matang` dan ambang materialitas). Juga menjawab kolom mana yang tak boleh dijumlahkan (`iklan_sia_sia`, `pembatalan`, tiga angka GMV live), bagaimana sesi live host dicatat, dimiliki, ditutup otomatis, dan diambil alih, serta batas kejujuran data seperti revenue Shopee yang masih harga list.",
+      "hash": "77770f464cc0531d14315aeb5483cca6d2670e407227e5244ccf471b23c0eb6c",
+      "ukuran_kb": 130.1,
+      "ringkasan": "Menjawab: bagaimana Marketing Analytics Service mengagregasi laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live dari `integration_db` (baca-saja, dijaga tiga lapis) ke koleksi `mart_*`, termasuk penjadwal internal 48 jam, job sync, sumber data TikTok/Shopee/Lazada, dan alokasi bundel serta mapping SKU. Juga menjawab logika vonis laba halaman beranda (belum_matang dan pita materialitas), cara kerja pencatatan sesi live host `/live-shifts` (siaran serentak, kepemilikan sesi, tutup otomatis akhir shift, ambil alih), Analisis Live dan KPI host live, serta aturan pemakaian angka agar tidak hitung ganda (`iklan_sia_sia`, `pembatalan`, GMV live, revenue setelah diskon).",
       "kata_kunci": [
-        "marketing analytics service",
+        "marketing analytics",
         "mart_profit_attribution",
-        "laba",
+        "laba toko",
         "profit",
-        "ROAS",
-        "live shift",
         "sesi live host",
-        "integration_db",
+        "live shift",
         "hitung ganda",
-        "TikTok Shopee"
+        "integration_db",
+        "GMV live",
+        "ROAS"
       ]
     },
     {
@@ -2838,7 +2847,7 @@
         "CORE - RBAC dan Permission Set",
         "ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen"
       ],
-      "hash": "fff2403cb3352675eaf757d0087ec8bcd71b06a38aee6f226301128f7b39836c",
+      "hash": "10e4ceec00f70129a2b9f789bf90a39feb77ccfe25be8fdd232beff63f269661",
       "ukuran_kb": 66.9,
       "ringkasan": "Menjawab: bagaimana recruitment-service mengimplementasikan siklus rekrutmen (requisition dengan persetujuan satu tahap SPV HRD, lowongan tanpa rentang gaji, kandidat, babak seleksi dari katalog global `interview_round`, hasil tes yang menggerakkan pipeline, background check, psikotes online, offer, onboarding) beserta model data `recruitment_db`. Juga menjawab cara deploy manualnya ke dev, riwayat increment (apply publik, hire jadi karyawan, onboarding checklist, interview orchestration), dan rancangan rekrutmen lintas perusahaan: penurunan `company_id`, backfill, cache master perusahaan, dan pemindai sumber.",
       "kata_kunci": [
@@ -6154,7 +6163,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Sebagian berlaku** (2026-09-12): §1 di PROD; §2 kodenya selesai, sudah direview, dan menunggu merge di bip-erp [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855) dan my-bharata [#143](https://github.com/bip-itteam-internal/my-bharata/pull/143). Arahnya disetujui 2026-09-11 lewat `/analisa-kebutuhan`. **§1 di PROD sejak 2026-09-11** (bip-erp [#1847](https://github.com/bip-itteam-internal/bip-erp/pull/1847) sebagai `marketing-analytics-service` 16:55 WIB, erp-frontend [#1539](https://github.com/bip-itteam-internal/erp-frontend/pull/1539) sebagai `frontend-hris` 16:59 WIB); gerbang biner dan bundel lolos, bukti perilaku pertama dan verifikasi DEV belum ada. **§2**: bip-erp branch `feat/marketing-analytics-ambil-alih` (7 commit) dan my-bharata branch `feat/live-shift-ambil-alih` (versi 1.17.0+161); belum PR, belum merge, belum di DEV maupun PROD. §2 direvisi di hari yang sama: ambil alih meminta persetujuan pemegang dengan batas 30 detik, dan diam berarti setuju. Berdiri di atas pengukuran prod 2026-09-11 dan di atas [[Microservices - Marketing Analytics Service]] yang berstatus ⚠️ Implemented dengan catatan, bukan di atas dok konsep. Papan kerja: `Workspace/ANALISA - Ambil Alih Sesi Live Host.md` (tidak diterbitkan). **Revisi 2026-09-11** ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]): bagian web dicabut, yaitu badge alasan penutupan di riwayat web (§1), riwayat web (§4), dan tombol Ambil alih web (T3); halaman web Sesi Live Host dihapus. **Revisi 2026-09-11 saat perencanaan §2**: pemberitahuan ke atasan ditunda (§5), dan cara-cara yang semula diserahkan ke `/plan` kini tertulis di §2. **Revisi 2026-09-12 saat review**: konfirmasi Ambil alih tidak menyebut angka detik (§4).",
+      "status_teks": "**Sebagian berlaku** (2026-09-12): §1 di PROD; §2 backend di PROD sejak 2026-09-12 08:55 WIB (bip-erp [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855)), klien merged ke `dev` (my-bharata [#143](https://github.com/bip-itteam-internal/my-bharata/pull/143)) dengan rilis 1.17.0+161 belum diverifikasi, dan alur utuh belum dijalankan. Arahnya disetujui 2026-09-11 lewat `/analisa-kebutuhan`. **§1 di PROD sejak 2026-09-11** (bip-erp [#1847](https://github.com/bip-itteam-internal/bip-erp/pull/1847) sebagai `marketing-analytics-service` 16:55 WIB, erp-frontend [#1539](https://github.com/bip-itteam-internal/erp-frontend/pull/1539) sebagai `frontend-hris` 16:59 WIB); gerbang biner dan bundel lolos; per 2026-09-12 09:34 WIB belum pernah terpicu (tak satu pun sesi ditutup otomatis sejak deploy), dan verifikasi DEV belum ada. **§2**: DEV terverifikasi lewat gateway 2026-09-12 08:02 WIB; PROD terbukti lewat gerbang nama fungsi di biner dan `GET /live-shifts/ambil-alih/menunggu` 200 dari dalam container (09:34 WIB). §2 direvisi di hari yang sama: ambil alih meminta persetujuan pemegang dengan batas 30 detik, dan diam berarti setuju. Berdiri di atas pengukuran prod 2026-09-11 dan di atas [[Microservices - Marketing Analytics Service]] yang berstatus ⚠️ Implemented dengan catatan, bukan di atas dok konsep. Papan kerja: `Workspace/ANALISA - Ambil Alih Sesi Live Host.md` (tidak diterbitkan). **Revisi 2026-09-11** ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]): bagian web dicabut, yaitu badge alasan penutupan di riwayat web (§1), riwayat web (§4), dan tombol Ambil alih web (T3); halaman web Sesi Live Host dihapus. **Revisi 2026-09-11 saat perencanaan §2**: pemberitahuan ke atasan ditunda (§5), dan cara-cara yang semula diserahkan ke `/plan` kini tertulis di §2. **Revisi 2026-09-12 saat review**: konfirmasi Ambil alih tidak menyebut angka detik (§4).",
       "publik": true,
       "tautan": [
         "ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus",
@@ -6171,20 +6180,52 @@
         "APP - Web ERP",
         "APP - MyBharata"
       ],
-      "hash": "8b834965ebe4c32df6cce0ccd789e86494a828781c62a2d495ce54b87f805601",
-      "ukuran_kb": 27.0,
-      "ringkasan": "Menjawab: kenapa host live yang jadwalnya sedang berjalan boleh mengambil alih akun yang sesinya ditinggal terbuka dan bagaimana alurnya (persetujuan pemegang berbatas 30 detik, diam berarti setuju, jejak siapa yang mengambil alih), serta kapan sesi ditutup otomatis (jam berakhir shift + 60 menit). Juga menjelaskan insiden 10 ke 11 September yang memicunya, dampaknya ke atribusi GMV dan `perlu_koreksi`, apa yang tetap dari keputusan bahwa leader tak boleh menghentikan sesi orang lain, notifikasi yang dipakai, dan konsekuensi yang diterima.",
+      "hash": "8cab33500ba3f11ea6a94840b3c758f0b3fb5acf3df75bfa479277773ab1af79",
+      "ukuran_kb": 27.2,
+      "ringkasan": "Menjawab: apa yang terjadi bila sesi live host ditinggal terbuka dan menahan akunnya, bagaimana host yang jadwalnya sedang berjalan bisa mengambil alih akun lewat permintaan dengan persetujuan pemegang berbatas 30 detik (diam berarti setuju), dan kapan sesi tertutup otomatis (jam berakhir shift + 60 menit). Juga menjelaskan kejadian pemicu 10 ke 11 September 2026, kenapa GMV live bisa salah atribusi dan dinolkan saat `perlu_koreksi`, apa yang tidak berubah dari keputusan bahwa leader tak boleh menghentikan sesi orang lain, jejak di riwayat, notifikasi, dan konsekuensinya.",
       "kata_kunci": [
-        "ADR 0088",
         "ambil alih sesi live",
         "takeover",
         "tutup otomatis",
-        "auto close",
+        "auto-close",
         "akhir shift",
         "host live",
         "409 akun dipegang",
         "persetujuan 30 detik",
-        "live shift"
+        "ADR 0088",
+        "live_shifts"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia.md",
+      "judul": "ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — kode selesai & ber-tes, bip-erp branch `feat/accurate-item-rename-auto-migrasi` (commit `71786d88`+`3674ba98`+`28cc5cfb`), **PR belum dibuka**. Asumsi kunci (id internal Accurate stabil lintas rename) belum diverifikasi empiris — lihat \"Belum selesai\".",
+      "publik": true,
+      "tautan": [
+        "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
+        "ADR - 0069 Perlengkapan Per-Unit Opsional di inventory dengan Guard Anti-Kontaminasi",
+        "REF - Kepemilikan Data",
+        "Microservices - Integration Service",
+        "Microservices - Inventory Service",
+        "GA - Inventory Management"
+      ],
+      "hash": "daa8200ab9d141bd6d5a80df3db85fc206cb4bc60729f11a2254fd8c27d1c0cd",
+      "ukuran_kb": 9.7,
+      "ringkasan": "Menjawab kenapa dan bagaimana sistem memindahkan padanan accurate_item_no barang perlengkapan secara otomatis (tanpa konfirmasi manusia) saat Accurate mengganti nomor item, memakai id internal Accurate (AccurateID) sebagai sinyal pencocokan yang stabil lintas rename. Menjelaskan kriteria kapan boleh menyimpang dari pola scanner-dan-manusia ADR-0066, mekanisme deteksi hilang dengan masa tenggang 3 jam, alur pemindahan padanan lewat endpoint pemilik data, serta batasan dan risiko yang belum terverifikasi empiris.",
+      "kata_kunci": [
+        "ADR-0088",
+        "auto-migrasi",
+        "padanan",
+        "accurate_item_no",
+        "AccurateID",
+        "perlengkapan",
+        "rename item Accurate",
+        "GA",
+        "inventory-service",
+        "integration-service"
       ]
     },
     {
@@ -6232,7 +6273,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Diterima, sebagian terimplementasi.** T1+T2 **merged** 2026-09-11 (bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)); biner form-builder dev memuatnya (diukur 2026-09-11), employee-service dev dan gerbang Satgas belum diuji lewat gateway. T4 **merged** 2026-09-11 (bip-erp [#1852](https://github.com/bip-itteam-internal/bip-erp/pull/1852) + erp-frontend [#1542](https://github.com/bip-itteam-internal/erp-frontend/pull/1542)) dan **live di dev**: `file_fields` terverifikasi lewat gateway dev, bundel frontend dev memuat editor baru. Layar belum dicoba sebagai orang, prod belum. T6 **selesai di branch** 2026-09-12 (my-bharata `feat/satgas-inspeksi`, `1.18.0+162`, belum PR, belum dicoba di perangkat), bersama PR erp-frontend `feat/form-builder-berkas-wajib` yang mencabut larangan berkas wajib (draft, merge ditahan sampai adopsi terukur). T3, T5, dan T7 belum dikerjakan. Rincian di `## Deskripsi`.",
+      "status_teks": "**Diterima, sebagian terimplementasi.** T1+T2 **merged** 2026-09-11 (bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849)); biner form-builder dev memuatnya (diukur 2026-09-11), employee-service dev dan gerbang Satgas belum diuji lewat gateway. T4 **merged** 2026-09-11 (bip-erp [#1852](https://github.com/bip-itteam-internal/bip-erp/pull/1852) + erp-frontend [#1542](https://github.com/bip-itteam-internal/erp-frontend/pull/1542)) dan **live di dev**: `file_fields` terverifikasi lewat gateway dev, bundel frontend dev memuat editor baru. Layar belum dicoba sebagai orang, prod belum. T3, T5, T6, dan T7 belum dikerjakan. Rincian di `## Deskripsi`.",
       "publik": true,
       "tautan": [
         "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
@@ -6258,20 +6299,20 @@
         "APP - MyBharata",
         "APP - Web ERP"
       ],
-      "hash": "6257052336e05aea3de3ac716a980a7cd180b762c40d78bef987952153e5c1f3",
-      "ukuran_kb": 29.9,
-      "ringkasan": "Menjawab: kenapa inspeksi Satgas 5R & K3 untuk penilaian Office Boy dan Security dibangun di Form Builder alih-alih modul baru, dan kenapa nilai KPI diambil dari jawaban cek ulang terakhir per orang per periode, bukan rata-rata seperti jalur `service_team_index`. Juga menjelaskan penanda `metric_key: inspeksi_satgas`, modul izin `kepatuhan` yang tertutup sejak awal, menu Satgas MyBharata lewat `GET /me/satgas`, halaman rekap web, field foto, sumber KPI per orang, hubungan dengan catatan kepatuhan ADR 0085, konsekuensi deploy, dan pertanyaan HR yang masih TBD.",
+      "hash": "ae646430a029569d9075cc3a84432b6b4a844f75f690f1ef07b6653bc6e244bb",
+      "ukuran_kb": 26.0,
+      "ringkasan": "Menjawab: kenapa inspeksi Satgas 5R & K3 dibangun di atas Form Builder (tipe evaluation) alih-alih modul baru, dan kenapa nilai KPI Office Boy dan Security diambil dari jawaban cek ulang terakhir per orang per periode, bukan rata-rata. Juga menjelaskan penanda `inspeksi_satgas`, gerbang modul izin `kepatuhan` yang ditegakkan server, menu MyBharata lewat `GET /me/satgas`, halaman rekap web, field foto, sumber KPI per orang, apa yang sengaja tidak dijanjikan, dan keputusan HR yang masih TBD seperti rumus konversi skala 1-5 ke 0-100.",
       "kata_kunci": [
-        "Satgas 5R",
+        "ADR 0090",
+        "Satgas 5R K3",
+        "inspeksi 5R",
         "K3",
-        "inspeksi",
-        "inspection",
-        "kepatuhan",
-        "inspeksi_satgas",
-        "KPI Office Boy Security",
         "cek ulang",
-        "foto temuan",
-        "ADR 0090"
+        "KPI Office Boy",
+        "Security",
+        "kepatuhan.satgas.input",
+        "inspeksi_satgas",
+        "foto temuan"
       ]
     },
     {
@@ -6280,7 +6321,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Diputuskan, kode merged** (2026-09-11, keputusan user). Kodenya di erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11 20:02 WIB, **belum di PROD**. Cek layar di DEV sesudah merge belum dijalankan, dan prasyarat deploy PROD (host aktif sudah memakai build MyBharata yang memuat Sesi Live) belum dipastikan.",
+      "status_teks": "**Diputuskan, di PROD** (2026-09-11, keputusan user). Kodenya di erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11 20:02 WIB, **di PROD sejak 2026-09-12** (image `frontend-hris` 07:35 WIB dibangun dari HEAD yang memuat merge-nya). Cek layar di DEV maupun PROD belum dijalankan, dan tidak tercatat apakah prasyarat deploy PROD (host aktif sudah memakai build MyBharata yang memuat Sesi Live) dipastikan lebih dulu.",
       "publik": true,
       "tautan": [
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
@@ -6290,18 +6331,19 @@
         "APP - Web ERP",
         "APP - MyBharata"
       ],
-      "hash": "28202ea30c45dfc7e2cacb69d528013e7ef051c919179c7a98e3fae3009c2725",
-      "ukuran_kb": 8.4,
-      "ringkasan": "Menjawab: kenapa halaman dan menu Sesi Live Host di web ERP dihapus, apa yang masih tersedia setelah penghapusan (ringkasan performa host di Analisis Live dan panel ICC, endpoint backend yang tidak berubah), dan siapa yang terdampak (host live yang sebelumnya mencatat lewat web, leader marketing yang kehilangan riwayat per sesi seluruh tim). Juga menjelaskan perbandingan pemakaian dua klien sebelumnya dan bagian mana dari ADR 0063/ADR 0088 yang ikut dicabut.",
+      "hash": "b37346772cad1985eadca5b0f2f07e36741f6778591b0cc5c286a37adbb844ec",
+      "ukuran_kb": 8.5,
+      "ringkasan": "Menjawab: kenapa halaman dan menu Sesi Live Host di web ERP (`/marketing-analytics/live-shift`) dihapus sehingga host mencatat Mulai, Jeda, dan Akhiri hanya lewat MyBharata, dan apa yang tetap dipertahankan (endpoint `/live-shifts*`, `usePerformaHost` untuk Analisis Live dan panel ICC). Juga menjawab bagian ADR 0063 dan ADR 0088 yang dicabut, izin frontend yang dibuang, dampaknya bagi host dan leader marketing (tak ada riwayat per sesi seluruh tim, tak bisa mencatat atas nama host), serta alternatif yang sengaja tidak diambil.",
       "kata_kunci": [
-        "sesi live host",
-        "MyBharata",
+        "Sesi Live Host",
         "halaman web dihapus",
+        "MyBharata",
         "live-shift",
-        "Analisis Live",
-        "ICC",
-        "penghapusan menu",
-        "single client"
+        "ADR 0091",
+        "pencatatan sesi live",
+        "usePerformaHost",
+        "leader marketing",
+        "host_live"
       ]
     },
     {
@@ -6310,7 +6352,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan): merged 2026-09-12 (bip-erp [#1853](https://github.com/bip-itteam-internal/bip-erp/pull/1853), erp-frontend [#1543](https://github.com/bip-itteam-internal/erp-frontend/pull/1543), career-bharata [#12](https://github.com/bip-itteam-internal/career-bharata/pull/12)). **Backend dan Web ERP live di prod** sejak 2026-09-12 (image dibangun 07:32 dan 07:35 WIB, gerbang biner dan bundel lulus, backfill `company_id` sudah jalan) dan terverifikasi lewat gateway dev 2026-09-12. Yang tersisa (diukur 2026-09-12): portal karir prod **belum di-deploy**; paket **belum dipasang** di prod, tetapi kedua pemegang posisi target sudah admin pusat sehingga lintas perusahaan sudah aktif bagi mereka; halaman Permintaan Rekrutmen melempar galat saat disaring ke perusahaan tanpa departemen (`data-type/department` membalas `{\"data\":null}`), perbaikannya di erp-frontend branch `fix/use-data-types-null`.",
+      "status_teks": "Implemented (ada catatan): merged 2026-09-12 (bip-erp [#1853](https://github.com/bip-itteam-internal/bip-erp/pull/1853), erp-frontend [#1543](https://github.com/bip-itteam-internal/erp-frontend/pull/1543), career-bharata [#12](https://github.com/bip-itteam-internal/career-bharata/pull/12)). **Backend dan Web ERP live di prod** sejak 2026-09-12 (image dibangun 07:32 dan 07:35 WIB, gerbang biner dan bundel lulus, backfill `company_id` sudah jalan) dan terverifikasi lewat gateway dev 2026-09-12. Portal karir menyusul live prod 2026-09-12 08:45 WIB (`company_name` ada di bundel). Galat halaman Permintaan Rekrutmen saat disaring ke perusahaan tanpa departemen (`data-type/department` membalas `{\"data\":null}`) diperbaiki erp-frontend [#1548](https://github.com/bip-itteam-internal/erp-frontend/pull/1548), live prod 09:43 WIB; perilakunya di layar belum diuji. Yang tersisa (diukur 2026-09-12 09:44 WIB): paket **belum dipasang** di prod (0 posisi, 0 akun), tetapi kedua pemegang posisi target sudah admin pusat sehingga lintas perusahaan sudah aktif bagi mereka.",
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
@@ -6327,8 +6369,8 @@
         "APP - Portal Karir Bharata",
         "APP - Web ERP"
       ],
-      "hash": "637a9a06c902e7584315bc0ebb0c32e6dd88c07a436d63a0221e133cf57ba403",
-      "ukuran_kb": 11.6,
+      "hash": "cdac182effbe8cacb68096742e460735e303235aa93cabfe49b17dcde8024221",
+      "ukuran_kb": 11.8,
       "ringkasan": "Menjawab: bagaimana recruiter di satu perusahaan grup bisa menangani rekrutmen seluruh perusahaan grup lewat izin aditif `recruitment.cross_company` (paket `recruitment_lintas_perusahaan`), dan kenapa izin aditif tak lagi mencabut fallback tier. Juga menjawab bagaimana `company_id` diturunkan satu arah dari requisition ke lowongan dan kandidat, aturan baca/tulis (`?company=` diabaikan untuk non-lintas, 404 di luar cakupan, 503 saat master tak pasti), kenapa `/apply` publik wajib `posting_id`, dan override data referensi employee-service yang sengaja disempitkan.",
       "kata_kunci": [
         "rekrutmen lintas perusahaan",
@@ -7111,6 +7153,7 @@
         "ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate",
         "ADR - 0069 Perlengkapan Per-Unit Opsional di inventory dengan Guard Anti-Kontaminasi",
         "Microservices - Integration Service",
+        "ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "APP - Web ERP",
         "GA - Procurement System",
@@ -7120,27 +7163,21 @@
         "CORE - OCR Document Service",
         "Form Permintaan Barang GA.pdf"
       ],
-      "hash": "49c3c0c9703783ef5a79b1c2bfad864885aeb2a5fb86521d6ee19dc170d69407",
-      "ukuran_kb": 18.6,
-      "ringkasan": "Menjawab: bagaimana General Affairs mencatat dan mengontrol aset/barang perusahaan — penomoran tag aset, serah-terima & persetujuan SPV, lokasi & estimasi penyusutan, riwayat perbaikan + bukti nota, soft-delete beralasan, rekonsiliasi aset & perlengkapan dengan Accurate untuk KPI, tab Cocokkan (search + filter status, skor KPI & cakupan gabungan aset tetap+perlengkapan 50:50), explorer padanan perlengkapan lingkup Gudang Utama (Terpasang X/N + label status Cocok/Belum Cocok/Belum Ada Padanan/Melebihi Qty + Total Biaya). Menjelaskan juga apa yang sengaja tak digabung/tak ditampilkan/tak diduplikasi (Akurasi tetap aset-tetap-saja, tanggal beli, nilai buku, barang gudang lain, tabel baru di Cocokkan) beserta alasannya.",
+      "hash": "68a18578fb9226e6769d95332cce9888f36f0f54c182d9fac1e83124299ed784",
+      "ukuran_kb": 19.5,
+      "ringkasan": "Menjawab ruang lingkup dan alur fitur inventory management di General Affairs — penomoran tag aset, serah-terima aset dengan persetujuan SPV, lokasi dan estimasi penyusutan aset, riwayat perbaikan berbukti nota, penghapusan aset (soft delete) dengan alasan wajib, serta rekonsiliasi aset tetap dan perlengkapan dengan Accurate untuk KPI akurasi GA. Juga menjelaskan status implementasi tiap fitur dan ADR terkait yang mengaturnya.",
       "kata_kunci": [
-        "inventory",
-        "aset",
         "GA",
-        "general affairs",
-        "perlengkapan",
-        "Gudang Utama",
+        "General Affairs",
+        "inventory management",
+        "aset",
+        "tag aset",
+        "serah-terima",
         "penyusutan",
-        "serah terima",
-        "Accurate",
-        "rekonsiliasi",
-        "cocokkan",
-        "skor KPI gabungan",
-        "cakupan kuantitas",
-        "status terpasang",
-        "Total Biaya",
         "soft delete",
-        "padanan"
+        "rekonsiliasi Accurate",
+        "opname perlengkapan",
+        "KPI akurasi aset"
       ]
     },
     {
@@ -8833,7 +8870,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. ⚠️ **Rekrutmen lintas perusahaan: merged 2026-09-12, backend dan Web ERP live di prod, portal karir prod belum, paket belum dipasang** (diukur 2026-09-12, lihat bagian \"Rekrutmen Lintas Perusahaan\" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian \"Alur Kerja HR\" di bawah)",
+      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. ⚠️ **Rekrutmen lintas perusahaan: merged 2026-09-12, backend, Web ERP, dan portal karir live di prod, paket belum dipasang** (diukur 2026-09-12, lihat bagian \"Rekrutmen Lintas Perusahaan\" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian \"Alur Kerja HR\" di bawah)",
       "publik": true,
       "tautan": [
         "HRIS - Analysis",
@@ -8863,8 +8900,8 @@
         "HRIS - Big Pictures",
         "HRIS - Recruitment Roadmap (Adopsi ERPGo)"
       ],
-      "hash": "ca7f30276dd1788b0ea65d0ef99a3f018a536773d6a0770ed0ac62f6a6a5b812",
-      "ukuran_kb": 48.4,
+      "hash": "eb6d7926d4dc4aa17823051185fd5c52bd28db4ab7b39eccf178fa58798a2267",
+      "ukuran_kb": 48.6,
       "ringkasan": "Menjawab: bagaimana alur rekrutmen end-to-end di Bharata, dari Form Permintaan Karyawan dan persetujuan SPV HRD, lowongan dan sumber pelamar (Glints/TapLoker), screening manual, interview multi-tahap dengan feedback lewat email, psikotes dan technical test, background check, offer, sampai onboarding dan masa evaluasi. Juga menjawab aktor dan persona, model data, keputusan yang sudah disepakati HRD, pertanyaan yang masih terbuka, rollout bertahap, serta alur pengguna rekrutmen lintas perusahaan.",
       "kata_kunci": [
         "rekrutmen",
@@ -10677,6 +10714,7 @@
         "Microservices - Integration Service",
         "ADR - 0001 Akuntansi via Accurate",
         "External - Accurate",
+        "ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia",
         "GA - Inventory Management",
         "ADR - 0049 Padanan Aset per-item berbasis nama menggantikan kategori-golongan",
         "Microservices - Notification Service",
@@ -10704,20 +10742,19 @@
         "REF - Alur Persetujuan",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "08d8764d64ac1f68a093c6795de960fc49fdcccc8088e63ba3e043da62f06451",
-      "ukuran_kb": 27.3,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis ERP (identitas karyawan, departemen, hak akses, kontrak, jadwal, presensi, skor dan target KPI, insentif profit, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab salinan data mana yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih hidup (task-management membaca DB service lain langsung), duplikasi yang belum diputuskan, dan cara memeriksa \"sudah ada belum\" sebelum membangun penyimpanan baru.",
+      "hash": "fc8fd8e831c6fc32f77f946c32a8ac7066190513b0dce80fa4df7856be81d23e",
+      "ukuran_kb": 28.2,
+      "ringkasan": "Menjawab siapa pemilik tiap fakta bisnis di ERP Bharata — service dan koleksi mana yang memegangnya, siapa yang boleh menulisnya, lewat jalan apa service lain boleh membacanya, dan salinan data mana yang sah beserta arah serta penjaganya. Dipakai untuk menjawab pertanyaan \"apakah data ini sudah ada di service lain\" sebelum membangun fitur atau penyimpanan baru, dan mendaftar duplikasi fakta yang belum diputuskan.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "source of truth",
-        "sumber kebenaran",
         "satu fakta satu tempat",
-        "salinan data",
-        "SyncCollection",
-        "duplikasi data",
         "database-per-service",
-        "ADR 0002"
+        "salinan data",
+        "duplikasi",
+        "RACI",
+        "employee-service",
+        "cross-service"
       ]
     },
     {
@@ -10732,7 +10769,7 @@
         "REF - Penamaan Metrik & Sumber KPI",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
       ],
-      "hash": "dd961be20b8750e759e67f06435a2256e72243e2b062c355426669d38e620548",
+      "hash": "7facf494330ce4d2e32284df5b82ba9937c2a1443ced4fafaf0095b38e25d378",
       "ukuran_kb": 8.8,
       "ringkasan": "Menjawab: bagaimana menyusun tata letak halaman dashboard/analytics di erp-frontend, mulai dari menentukan zona halaman (saringan di atas lewat `PageShell` yang memasang saringannya di laci `Banner` bergaya HRIS dan terbuka saat halaman dibuka, satu area fokus utama, ruang catatan), membuat satu insight utama yang dominan (`lg:col-span-2` di dalam `grid lg:grid-cols-3`), mengelompokkan kartu setema lewat jarak, sampai merancang urutan alur pandangan mata (saringan, kartu KPI, bagan inti, detail, catatan aksi). Menjelaskan bahwa `Container` layout `(main)` sudah memasang `p-4 sm:p-6` dan `gap-4 sm:gap-6` sehingga padding sendiri di halaman menghasilkan padding ganda, aturan jarak vertikal `gap-6` antar-seksi dan `gap-4` antar-kartu, serta kapan `PageShell tanpaKartu` dipakai dan mengapa kepala halamannya memakai kartu Banner. Memuat juga hasil pengukuran ke kode per 2026-09-03 (18 komponen bagan `ChartContainer`, 16 pemakai `PageShell`, 126 pemakai `MainTable`), catatan dua sistem desain di `marketing-insight` beserta dampak `bg-white` pada mode gelap, dan batas ruang lingkupnya terhadap aturan warna/bagan di team-memory serta skill `/migrasi-tabel-hris`.",
       "kata_kunci": [
@@ -13008,18 +13045,18 @@
         "APP - MyBharata",
         "API - Marketing Analytics Service"
       ],
-      "hash": "448f84ab2164166254a3451c48cca3c65a2dea866882bf85a87dd5c13f41d936",
-      "ukuran_kb": 14.3,
-      "ringkasan": "Menjawab: kebutuhan sebenarnya di balik permintaan tombol ambil alih sesi live, angka produksi yang mendasarinya (jumlah pergantian host, lama host berikutnya tertahan), dan pecahan pekerjaannya T0 sampai T6 beserta urutan, dependensi, dan kriteria selesai tiap item. Berguna untuk tahu bagian HR (membetulkan jadwal host), backend (tutup otomatis +60 menit, ambil alih dengan persetujuan), MyBharata (tombol dan jendela persetujuan), urutan deploy, verifikasi lapangan, dan hal yang sengaja di luar lingkup.",
+      "hash": "c57995162602ced877fd411ed57c0e69e27a0ff3d6f5352e388d777cb132985d",
+      "ukuran_kb": 15.1,
+      "ringkasan": "Menjawab: bagaimana permintaan tombol ambil alih sesi live diterjemahkan jadi rangkaian pekerjaan T0 sampai T6 (betulkan jadwal host oleh HR, tutup otomatis +60 menit, ambil alih di backend, tombol dan label riwayat di MyBharata, verifikasi lapangan), urutan serta dependensi deploy-nya, dan kriteria selesai tiap item. Juga menjawab angka produksi yang mendasarinya (pergantian host pada akun yang sama, lama host tertahan), kenapa istirahat bolak-balik tidak dibangun terpisah, keputusan perencanaan ambil alih (permintaan di dokumen sesi lama, polling `/live-shifts/ambil-alih/menunggu`, tenggang eksekusi), dan kenapa tombol versi web batal.",
       "kata_kunci": [
-        "analisa kebutuhan",
-        "ambil alih sesi live",
-        "takeover live",
-        "tutup otomatis shift",
-        "host live",
-        "MyBharata",
-        "jadwal host",
+        "analisa ambil alih",
         "papan kerja",
+        "sesi live host",
+        "takeover",
+        "tutup otomatis",
+        "jadwal host live",
+        "task breakdown",
+        "rilis MyBharata",
         "ADR 0088",
         "verifikasi lapangan"
       ]
@@ -13264,20 +13301,20 @@
         "Microservices - Form Builder Service",
         "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI"
       ],
-      "hash": "6f4c60be4c59e20cb24be8e1d50895652cdea371af80c60b4b503bbe43e955e3",
-      "ukuran_kb": 20.4,
-      "ringkasan": "Menjawab: bagaimana kebutuhan manajemen soal Satgas 5R & K3 diterjemahkan jadi task T0 sampai T7 (keputusan HR, modul izin `kepatuhan` dan gerbang, pembaca nilai terakhir dan sumber KPI, field foto Form Builder, halaman rekap web, menu Satgas MyBharata, verifikasi end-to-end), beserta urutan, dependensi, dan cara verifikasi tiap task. Juga mencatat hasil wawancara pemakai, jawaban HR soal rumus konversi skor 1-5 ke 0-100 dan atribusi cek ulang ke bulan temuan, urutan naik service, koordinasi modul izin dengan ADR 0085, serta usulan yang gugur seperti AI penilai foto dan peringkat antar departemen.",
+      "hash": "f38f167df9d8cbc7eba298d95c2f710b0e6ec580f565477a603bf7816879bed0",
+      "ukuran_kb": 16.1,
+      "ringkasan": "Menjawab: dari kebutuhan manajemen apa fitur inspeksi Satgas 5R & K3 berasal, apa hasil wawancara dengan OD & Industrial Relation, keputusan user apa yang diambil, dan usulan mana yang gugur (AI penilai foto, peringkat antar departemen, master area). Juga memuat daftar task T0 sampai T7 beserta urutan, dependensi, perintah `/start-task`, cara verifikasi tiap task, keputusan HR yang wajib dijawab sebelum go-live, dan temuan sampingan untuk sinkronisasi dokumen.",
       "kata_kunci": [
         "analisa kebutuhan",
         "Satgas 5R K3",
-        "papan kerja",
         "daftar task",
-        "inspeksi",
-        "kepatuhan",
-        "KPI Office Boy Security",
-        "rumus konversi skor",
+        "task list",
+        "Office Boy",
+        "Security",
+        "OD Industrial Relation",
+        "Culture",
         "Google Form",
-        "cek ulang"
+        "kepatuhan"
       ]
     },
     {
