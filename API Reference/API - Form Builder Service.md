@@ -74,7 +74,7 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 |---|---|---|
 | GET | `/culture/employees` | Daftar karyawan aktif untuk pemilih target (ditarik dari employee-service via `EMPLOYEE_MODULE_URL`) |
 | GET | `/culture/programs` | Daftar program milik pemanggil; pengelola form boleh `?scope=all` (seluruh perusahaan). `?period=YYYY-MM`. Tiap baris membawa `hadir` (responden) |
-| POST | `/culture/programs` | Buat program (`nama`, `pilar`, `jenis`, `target_departemen`/`target_karyawan` sesuai jenis, `tanggal`, `jam_mulai`/`jam_selesai`). `target` **di-resolve otomatis** dari jenis, bukan diketik |
+| POST | `/culture/programs` | Buat program (`nama`, `pilar`, `jenis`, `target_departemen`/`target_karyawan` sesuai jenis, `tanggal`, `jam_mulai`/`jam_selesai`). `target` **di-resolve otomatis** dari jenis, bukan diketik. `tipe` **disalin dari master**, bukan dari klien |
 | PUT | `/culture/programs/:id` | Sunting program milik sendiri |
 | DELETE | `/culture/programs/:id` | Hapus program milik sendiri (feedback yatim ikut dibuang) |
 | GET | `/culture/feedback/programs` | Program aktif untuk dinilai (`?period=`) |
@@ -83,6 +83,8 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 | GET | `/culture/summary` | Ringkasan dashboard (`?period=`, `?scope=all`): rata-rata partisipasi/antusiasme/komposit, distribusi per pilar **atomik** (`pecahPilar`), daftar program terhitung |
 
 **`jenis` → `target` (penyebut partisipasi), di-snapshot saat simpan**: `internal` = seluruh karyawan aktif · `department` = jumlah staf `target_departemen` · `employees` = jumlah `target_karyawan` (dedup). Jenis `club`/`public` menyusul (TBD).
+
+**`tipe` (`event` | `non_event`)** — ⚠️ field baru, [[ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master]] (bip-erp PR #1861, T1). Sumbu **berbeda** dari `jenis` (resolve target) dan `pelaksanaan` (frekuensi). Master (`POST/PUT /culture/master-programs`) menyimpan `tipe` opsional (kosong → `event`); program **menyalinnya dari master**, klien tak dipercaya. `POST /culture/programs` **menolak `400`** bila master ber-`tipe=non_event` ("tipe non-event belum didukung") sampai perilaku non-event mendarat (task T3); master boleh menyimpannya sebagai katalog. Dokumen lama tanpa `tipe` dibaca `event` (tanpa migrasi).
 
 **Skor komposit blueprint 30/30/40, otomatis** (`hitungSkorProgram`, satu tempat): Partisipasi 30% + Antusiasme 30% + Implementasi 40%, dengan **Implementasi = Partisipasi × Antusiasme ÷ 100** (dihitung, bukan diisi). KPI officer = rata-rata skor programnya. Detail konsep: [[Microservices - Form Builder Service]].
 
