@@ -2,13 +2,13 @@
 
 *Administrasi kepegawaian (personalia) — mengelola data administratif karyawan sepanjang masa kerja: data personal, kontrak (PKWT), BPJS, dokumen, riwayat masa kerja, hingga off-boarding/exit clearance. Beririsan dengan subsistem off-boarding di [[HRIS - Analysis]].*
 
-- **Status**: ⚠️ Sebagian diimplementasikan — **pencatatan resign & penonaktifan akun ✅ live di produksi 2026-08-05**; **riwayat kontrak ✅** (koleksi `employee_contract`, halaman `/hris/contract`); **pengingat kontrak habis ⚠️ merged 2026-09-11, DEV ya, PROD belum**; sisa off-boarding (exit clearance) masih 🟡 konsep
+- **Status**: ⚠️ Sebagian diimplementasikan — **pencatatan resign & penonaktifan akun ✅ live di produksi 2026-08-05**; **riwayat kontrak ✅** (koleksi `employee_contract`, halaman `/hris/contract`); **pengingat kontrak habis ✅ live DEV 2026-09-11 dan PROD 2026-09-12**; sisa off-boarding (exit clearance) masih 🟡 konsep
 
 ## Ruang Lingkup & Data
 
 Dokumen/data yang dikelola (sebagian sudah ada di [[Microservices - Employee Service]]):
 - **Data personal pegawai** (`personal_data`, `personal_document`)
-- **Kontrak / PKWT** (mis. BIP-203-0525): riwayat kontrak per karyawan, perpanjangan, dan lampiran PDF bertanda tangan sudah ada (rute di [[API - Employee Service]] §Kontrak Kerja). Kebutuhan: **notifikasi 1 bulan sebelum masa kontrak habis** → follow up ke SPV. Dijawab pengingat kontrak habis: ringkasan harian ke supervisor HR (saat kontrak masuk "segera berakhir", H-30, H-7, dan kontrak kedaluwarsa pada karyawan aktif sekali per minggu) dan pesan H-14 ke atasan langsung untuk penilaian kinerja. ⚠️ Merged 2026-09-11 (bip-erp PR #1851) dan naik di DEV; **PROD belum**, ditahan sampai data kontrak prod diukur. Rinciannya di [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] §Pengingat Kontrak Habis. Digitalisasi tanda tangan & e-Meterai kontrak di dok yang sama (🟡 direncanakan)
+- **Kontrak / PKWT** (mis. BIP-203-0525): riwayat kontrak per karyawan, perpanjangan, dan lampiran PDF bertanda tangan sudah ada (rute di [[API - Employee Service]] §Kontrak Kerja). Kebutuhan: **notifikasi 1 bulan sebelum masa kontrak habis** → follow up ke SPV. Dijawab pengingat kontrak habis: ringkasan harian ke supervisor HR (saat kontrak masuk "segera berakhir", H-30, H-7, dan kontrak kedaluwarsa pada karyawan aktif sekali per minggu) dan pesan H-14 ke atasan langsung untuk penilaian kinerja. ✅ Merged 2026-09-11 (bip-erp PR #1851), naik di DEV 2026-09-11 dan PROD 2026-09-12; jalan PROD pertama 2026-09-13 07:00 WIB belum dibaca. Rinciannya di [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] §Pengingat Kontrak Habis. Digitalisasi tanda tangan & e-Meterai kontrak di dok yang sama (🟡 direncanakan)
 - **BPJS**
 - **Riwayat masa kerja** (history)
 
@@ -38,7 +38,7 @@ Implementasi: [[Microservices - Employee Service]] · endpoint: [[API - Employee
 ## Integrasi
 
 - [[Microservices - Employee Service]] — endpoint contract, BPJS, personal data (RequireHRISStaff)
-- [[Microservices - Notification Service]]: notifikasi PKWT mendekati habis, inbox kategori `reminder` dari cron employee-service (⚠️ DEV ya, PROD belum; lihat [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] §Pengingat Kontrak Habis)
+- [[Microservices - Notification Service]]: notifikasi PKWT mendekati habis, inbox kategori `reminder` dari cron employee-service (✅ DEV dan PROD sejak 2026-09-12; lihat [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] §Pengingat Kontrak Habis)
 - [[GA - Inventory Management]] — pengembalian aset saat exit clearance
 - [[HRIS - Analysis]] — subsistem off-boarding
 
@@ -47,5 +47,5 @@ Implementasi: [[Microservices - Employee Service]] · endpoint: [[API - Employee
 - [[HRIS - Big Pictures]]
 - [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]] · [[API - Employee Service]] · [[APP - Web ERP]] · [[IT - Employee System]]
 - [[HRIS - Analysis]] · [[HRIS - Attrition]]
-- [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] — digitalisasi TTE + e-Meterai kontrak (🟡 direncanakan) dan pengingat kontrak habis (⚠️ DEV ya, PROD belum)
+- [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] — digitalisasi TTE + e-Meterai kontrak (🟡 direncanakan) dan pengingat kontrak habis (✅ DEV dan PROD sejak 2026-09-12)
 - [[Microservices - Employee Service]] · [[GA - Inventory Management]]
