@@ -107,7 +107,7 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 | GET | `/me/satgas` | ⚠️ *(Satgas, merged #1849, deploy belum diukur)* Menu Satgas 5R & K3 untuk MyBharata. Tanpa izin `200 {allowed:false, forms:[]}`; dengan izin `200 {allowed:true, forms:[...]}` berisi ringkasan per PIC. Rincian di bagian di bawah |
 | GET | `/me/responses` | Riwayat jawaban sendiri |
 | GET | `/me/service-index` | **Indeks layanan sebuah departemen** pada satu bulan. `?department=` dan `?period=YYYY-MM` **keduanya wajib**. Balas `{has_form, form_id, title, department, period_key, index, scored_questions, respondents, audience_size, coverage_pct, aspects[], unweighted[]}` |
-| POST | `/me/forms/:id/uploads` | Unggah satu lampiran (**multipart**, field `file` + `field_key`). `201` membalas `{file_name, size, upload_id}`. Cap 4 MB milik file-service; `413` bila lewat. **`409` bila putaran form berulang belum dibuka**, diperiksa SEBELUM berkasnya naik supaya tak meninggalkan objek yatim. ⚠️ *(Satgas, merged #1849)* `403` berpesan pada form Satgas bila tak memegang izin, juga diperiksa sebelum berkas naik |
+| POST | `/me/forms/:id/uploads` | Unggah satu lampiran (**multipart**, hanya field **`file`**; `field_key` tak dibaca, dan berkas baru dicocokkan ke pertanyaannya saat jawaban dikirim; diperiksa ke `uploads.go` 2026-09-12). `201` membalas `{"data": {upload_id, file_name, size}}`. `400` bila field `file` tak ada. Cap 4 MB milik file-service; `413 {"error": "Ukuran berkas melebihi batas 4 MB"}` bila lewat. `409` juga bila form tak `published`. **`409` bila putaran form berulang belum dibuka**, diperiksa SEBELUM berkasnya naik supaya tak meninggalkan objek yatim. ⚠️ *(Satgas, merged #1849)* `403` berpesan pada form Satgas bila tak memegang izin, juga diperiksa sebelum berkas naik |
 | GET | `/me/uploads/:uploadId/preview` | Presigned URL lampiran sendiri. `404` untuk id yang bukan miliknya |
 | GET | `/forms/:id/uploads/:uploadId/preview` | Idem untuk **pengelola form** (grup `/forms`, digerbang `requireFormManager`) |
 
@@ -127,7 +127,7 @@ Grup `/culture/*` digerbang **`requireEmployee`** (cukup karyawan terautentikasi
 
 ## Inspeksi Satgas 5R & K3 (`/me/satgas` dan gerbang izin)
 
-> ⚠️ **Merged 2026-09-11** lewat bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849), **deploy belum diukur, belum diuji lewat gateway**. Keputusan: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
+> ⚠️ **Merged 2026-09-11** lewat bip-erp PR [#1849](https://github.com/bip-itteam-internal/bip-erp/pull/1849), **deploy belum diukur, belum diuji lewat gateway**. Konsumen MyBharata (menu Satgas, halaman isi, unggah foto) selesai di branch my-bharata `feat/satgas-inspeksi` 2026-09-12, belum PR. Keputusan: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].
 
 **Gerbang.** Form ber-`metric_key: inspeksi_satgas` hanya bisa diisi pemegang izin `kepatuhan.satgas.input`, diperiksa di `POST /me/forms/:id/responses`, `POST /me/forms/:id/uploads`, `GET /me/forms/:id/subjects`, dan penyaring `GET /me/forms`. Tolakannya **`403 {"error": "..."}`** dengan pesan yang menyebut paket "Kepatuhan: Petugas Satgas 5R & K3" dan perlunya login ulang, diperiksa **sesudah** audience, jadi bukan-sasaran tetap mendapat `403` yang lama. Form tanpa penanda tak tersentuh. Kill-switch `KEPATUHAN_PERMISSION_ENFORCEMENT=off` mengembalikan form Satgas ke aturan audience saja.
 
