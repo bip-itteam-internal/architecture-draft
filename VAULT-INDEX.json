@@ -1466,8 +1466,8 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "e64cea0face8601e89046bf17560b4e9f22b2a0489497119f97eadf1912438b7",
-      "ukuran_kb": 423.3,
+      "hash": "c070051d47959535999d8227f6dadfc9056040a3c75a16c61d3d491c64135a6d",
+      "ukuran_kb": 423.7,
       "ringkasan": "Menjawab: apa itu portal web internal erp-frontend (\"One Bharata\"/hris-dashboard) beserta stack-nya, bagaimana login, refresh token, cookie `system_roles`, dan role gating sidebar bekerja, serta bagaimana web ini menjadi SSO Identity Provider lewat `redirect_url`. Juga menjelaskan dukungan multi-perusahaan (Kelola Perusahaan, CompanySwitcher admin pusat, rekrutmen lintas perusahaan lewat izin `recruitment.cross_company`), pengelompokan menu HRIS dengan menu induk bersarang, dan halaman Pengaturan HRGA terpusat (`SUB_MENU_PENGATURAN`). Memuat pula konvensi data-fetching TanStack Query dan konvensi bagan Recharts/`ChartContainer`.",
       "kata_kunci": [
         "erp-frontend",
@@ -10734,7 +10734,7 @@
         "REF - Penamaan Metrik & Sumber KPI",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
       ],
-      "hash": "dd961be20b8750e759e67f06435a2256e72243e2b062c355426669d38e620548",
+      "hash": "7facf494330ce4d2e32284df5b82ba9937c2a1443ced4fafaf0095b38e25d378",
       "ukuran_kb": 8.8,
       "ringkasan": "Menjawab: bagaimana menyusun tata letak halaman dashboard/analytics di erp-frontend, mulai dari menentukan zona halaman (saringan di atas lewat `PageShell` yang memasang saringannya di laci `Banner` bergaya HRIS dan terbuka saat halaman dibuka, satu area fokus utama, ruang catatan), membuat satu insight utama yang dominan (`lg:col-span-2` di dalam `grid lg:grid-cols-3`), mengelompokkan kartu setema lewat jarak, sampai merancang urutan alur pandangan mata (saringan, kartu KPI, bagan inti, detail, catatan aksi). Menjelaskan bahwa `Container` layout `(main)` sudah memasang `p-4 sm:p-6` dan `gap-4 sm:gap-6` sehingga padding sendiri di halaman menghasilkan padding ganda, aturan jarak vertikal `gap-6` antar-seksi dan `gap-4` antar-kartu, serta kapan `PageShell tanpaKartu` dipakai dan mengapa kepala halamannya memakai kartu Banner. Memuat juga hasil pengukuran ke kode per 2026-09-03 (18 komponen bagan `ChartContainer`, 16 pemakai `PageShell`, 126 pemakai `MainTable`), catatan dua sistem desain di `marketing-insight` beserta dampak `bg-white` pada mode gelap, dan batas ruang lingkupnya terhadap aturan warna/bagan di team-memory serta skill `/migrasi-tabel-hris`.",
       "kata_kunci": [
