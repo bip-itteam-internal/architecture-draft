@@ -1312,7 +1312,7 @@
       "area": "Application",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas; **E2E terverifikasi live 2026-07-16**). ⛔ **Fitur \"cek status lamaran\" SUDAH DIHAPUS** (BE `a298ba70`, 2026-07-24; portal tak punya rute `/status` — diverifikasi 2026-09-10). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf (dan per perusahaan grup masih **TBD**, lihat [[HRIS - Recruitment]] §Rekrutmen Lintas Perusahaan), dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*). 🟡 **Nama perusahaan perekrut di daftar & detail lowongan: merged ke `master` 2026-09-12 ([#12](https://github.com/bip-itteam-internal/career-bharata/pull/12)), BELUM di prod** (diukur 2026-09-12: checkout prod `77bfafc`, image 2026-09-11 08:44 WIB, `company_name` di bundel 0; backend penopangnya sudah live prod). Deploy portal berikutnya ikut membawa psikotes berpaket #10 dan #11.",
+      "status_teks": "**Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas; **E2E terverifikasi live 2026-07-16**). ⛔ **Fitur \"cek status lamaran\" SUDAH DIHAPUS** (BE `a298ba70`, 2026-07-24; portal tak punya rute `/status` — diverifikasi 2026-09-10). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf (dan per perusahaan grup masih **TBD**, lihat [[HRIS - Recruitment]] §Rekrutmen Lintas Perusahaan), dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*). ✅ **Nama perusahaan perekrut di daftar & detail lowongan: live prod sejak 2026-09-12 08:45 WIB** ([#12](https://github.com/bip-itteam-internal/career-bharata/pull/12); diukur 09:44 WIB: checkout prod `6032152`, `company_name` di bundel 3 berkas, sebelumnya 0). Deploy yang sama ikut membawa psikotes berpaket #10 dan #11.",
       "publik": true,
       "tautan": [
         "HRIS - Recruitment",
@@ -1327,8 +1327,8 @@
         "CORE - SSO Flow",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "3fc0bfe605f2ee3eaf5a073b5941e478e75bc7c79fc248599e77352092d27a58",
-      "ukuran_kb": 18.9,
+      "hash": "e111d27b672ea6df5d1b0b91a311960f84016b7704662f6a0cdbbe3172aac847",
+      "ukuran_kb": 18.8,
       "ringkasan": "Menjawab: apa itu portal karir publik `career.bharatainternasional.com` (repo `career-bharata`, Next.js, pnpm), halaman apa saja yang tersedia bagi pelamar (daftar dan detail lowongan, form lamaran dengan satu PDF, konfirmasi terkirim, psikotes lewat magic link), dan endpoint `/public/recruitment/*` mana yang dikonsumsinya. Juga menjawab cara deploy Docker-nya di prod (port host 3005, `.env` wajib saat build), kenapa fitur cek status lamaran dihapus, apa bedanya dengan halaman karir situs korporat, dan bagaimana nama perusahaan perekrut ditampilkan untuk lowongan lintas perusahaan grup.",
       "kata_kunci": [
         "portal karir",
@@ -1466,7 +1466,7 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "c070051d47959535999d8227f6dadfc9056040a3c75a16c61d3d491c64135a6d",
+      "hash": "018eb399e94eecce64db52e3eba316621e324ce2b4309e45dbd0849d9b0b75e4",
       "ukuran_kb": 423.7,
       "ringkasan": "Menjawab: apa itu portal web internal erp-frontend (\"One Bharata\"/hris-dashboard) beserta stack-nya, bagaimana login, refresh token, cookie `system_roles`, dan role gating sidebar bekerja, serta bagaimana web ini menjadi SSO Identity Provider lewat `redirect_url`. Juga menjelaskan dukungan multi-perusahaan (Kelola Perusahaan, CompanySwitcher admin pusat, rekrutmen lintas perusahaan lewat izin `recruitment.cross_company`), pengelompokan menu HRIS dengan menu induk bersarang, dan halaman Pengaturan HRGA terpusat (`SUB_MENU_PENGATURAN`). Memuat pula konvensi data-fetching TanStack Query dan konvensi bagan Recharts/`ChartContainer`.",
       "kata_kunci": [
@@ -2847,7 +2847,7 @@
         "CORE - RBAC dan Permission Set",
         "ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen"
       ],
-      "hash": "fff2403cb3352675eaf757d0087ec8bcd71b06a38aee6f226301128f7b39836c",
+      "hash": "10e4ceec00f70129a2b9f789bf90a39feb77ccfe25be8fdd232beff63f269661",
       "ukuran_kb": 66.9,
       "ringkasan": "Menjawab: bagaimana recruitment-service mengimplementasikan siklus rekrutmen (requisition dengan persetujuan satu tahap SPV HRD, lowongan tanpa rentang gaji, kandidat, babak seleksi dari katalog global `interview_round`, hasil tes yang menggerakkan pipeline, background check, psikotes online, offer, onboarding) beserta model data `recruitment_db`. Juga menjawab cara deploy manualnya ke dev, riwayat increment (apply publik, hire jadi karyawan, onboarding checklist, interview orchestration), dan rancangan rekrutmen lintas perusahaan: penurunan `company_id`, backfill, cache master perusahaan, dan pemindai sumber.",
       "kata_kunci": [
@@ -3481,7 +3481,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "076b1a4fb212adebd3801ec7b3443d492438a6a76da2345516b17d06f0ada9bb",
-      "ukuran_kb": 4.8,
+      "ukuran_kb": 4.9,
       "ringkasan": "Menjawab sumber tanggal yang dipakai untuk membukukan retur TikTok ke Accurate: kenapa update_time menyesatkan (ikut mundur karena settle refund) dan kenapa order_update_date dipilih sebagai gantinya, serta perbaikan zona waktu WIB untuk penomoran dokumen retur (RTR).",
       "kata_kunci": [
         "tanggal retur",
@@ -4206,7 +4206,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "ddca0201da7959b033620b4d876a8b18d58d146a1dd721bf9d3f6b75c917f3ec",
-      "ukuran_kb": 15.1,
+      "ukuran_kb": 15.2,
       "ringkasan": "Menjawab: bagaimana aset GA di ERP direkonsiliasi terhadap Aktiva Tetap di Accurate untuk menghasilkan skor KPI akurasi input aset staff GA, dan kenapa pencocokannya per-item lewat ceklis manual berbantuan (bukan agregat per-golongan) dengan `accurate_asset_no` disimpan agar periode berikutnya cocok otomatis. Menjelaskan pula kenapa aset yang belum ada di Accurate dihitung 100% (antrean tanggung jawab Finance, bukan GA) sementara Cakupan wajib tampil berdampingan dengan Akurasi, tiga tab modul Aset, penempatan yang menghormati batas service (inventory menyimpan nomor Accurate, feed KPI lewat employee-service), serta bagian mana yang di-supersede ADR-0049.",
       "kata_kunci": [
         "rekonsiliasi aset",
@@ -5361,7 +5361,7 @@
         "External - Accurate"
       ],
       "hash": "140f2789e531f6209bfdfc17bceca336e6f6048522951825a418bd4a22e2da22",
-      "ukuran_kb": 10.4,
+      "ukuran_kb": 10.5,
       "ringkasan": "Menjawab: mengapa opname perlengkapan GA dibuat sebagai perluasan tab Data Accurate (lewat pemilih tipe Aset Tetap/Perlengkapan) alih-alih modul baru, bagaimana perlengkapan dicocokkan per-KUANTITAS (hitung fisik GA vs qty Accurate) bukan per-unit, dan bagaimana skor akurasi opname dihitung untuk KPI staff GA. Menjelaskan juga koleksi ga_opname + endpoint /perlengkapan-opname, penangkapan kategori item Accurate saat sync, serta amandemen 2026-09-02 yang mengubah tab FE dari form opname jadi explorer padanan read-only (BE dibiarkan dormant).",
       "kata_kunci": [
         "opname perlengkapan",
@@ -6351,7 +6351,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan): merged 2026-09-12 (bip-erp [#1853](https://github.com/bip-itteam-internal/bip-erp/pull/1853), erp-frontend [#1543](https://github.com/bip-itteam-internal/erp-frontend/pull/1543), career-bharata [#12](https://github.com/bip-itteam-internal/career-bharata/pull/12)). **Backend dan Web ERP live di prod** sejak 2026-09-12 (image dibangun 07:32 dan 07:35 WIB, gerbang biner dan bundel lulus, backfill `company_id` sudah jalan) dan terverifikasi lewat gateway dev 2026-09-12. Yang tersisa (diukur 2026-09-12): portal karir prod **belum di-deploy**; paket **belum dipasang** di prod, tetapi kedua pemegang posisi target sudah admin pusat sehingga lintas perusahaan sudah aktif bagi mereka; halaman Permintaan Rekrutmen melempar galat saat disaring ke perusahaan tanpa departemen (`data-type/department` membalas `{\"data\":null}`), perbaikannya di erp-frontend branch `fix/use-data-types-null`.",
+      "status_teks": "Implemented (ada catatan): merged 2026-09-12 (bip-erp [#1853](https://github.com/bip-itteam-internal/bip-erp/pull/1853), erp-frontend [#1543](https://github.com/bip-itteam-internal/erp-frontend/pull/1543), career-bharata [#12](https://github.com/bip-itteam-internal/career-bharata/pull/12)). **Backend dan Web ERP live di prod** sejak 2026-09-12 (image dibangun 07:32 dan 07:35 WIB, gerbang biner dan bundel lulus, backfill `company_id` sudah jalan) dan terverifikasi lewat gateway dev 2026-09-12. Portal karir menyusul live prod 2026-09-12 08:45 WIB (`company_name` ada di bundel). Galat halaman Permintaan Rekrutmen saat disaring ke perusahaan tanpa departemen (`data-type/department` membalas `{\"data\":null}`) diperbaiki erp-frontend [#1548](https://github.com/bip-itteam-internal/erp-frontend/pull/1548), live prod 09:43 WIB; perilakunya di layar belum diuji. Yang tersisa (diukur 2026-09-12 09:44 WIB): paket **belum dipasang** di prod (0 posisi, 0 akun), tetapi kedua pemegang posisi target sudah admin pusat sehingga lintas perusahaan sudah aktif bagi mereka.",
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
@@ -6368,8 +6368,8 @@
         "APP - Portal Karir Bharata",
         "APP - Web ERP"
       ],
-      "hash": "637a9a06c902e7584315bc0ebb0c32e6dd88c07a436d63a0221e133cf57ba403",
-      "ukuran_kb": 11.6,
+      "hash": "cdac182effbe8cacb68096742e460735e303235aa93cabfe49b17dcde8024221",
+      "ukuran_kb": 11.8,
       "ringkasan": "Menjawab: bagaimana recruiter di satu perusahaan grup bisa menangani rekrutmen seluruh perusahaan grup lewat izin aditif `recruitment.cross_company` (paket `recruitment_lintas_perusahaan`), dan kenapa izin aditif tak lagi mencabut fallback tier. Juga menjawab bagaimana `company_id` diturunkan satu arah dari requisition ke lowongan dan kandidat, aturan baca/tulis (`?company=` diabaikan untuk non-lintas, 404 di luar cakupan, 503 saat master tak pasti), kenapa `/apply` publik wajib `posting_id`, dan override data referensi employee-service yang sengaja disempitkan.",
       "kata_kunci": [
         "rekrutmen lintas perusahaan",
@@ -6568,7 +6568,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "ee317d4d8664cf3c5227bcf8d3d018f9648ff0b9fdc9228e35cc31d4144a5c89",
-      "ukuran_kb": 15.9,
+      "ukuran_kb": 16.3,
       "ringkasan": "Menjawab endpoint dan alur kerja Finance Bridging versi Golang (penulisan ulang dari sistem Java): bagaimana membuat dan mengirim ringkasan transaksi Sales/Income/Return ke Accurate, halaman FE terkait per channel, status ringkasan, serta setting toko dan mapping produk.",
       "kata_kunci": [
         "Finance Bridging Golang",
@@ -6595,7 +6595,7 @@
         "Finance - Incentive"
       ],
       "hash": "8a3dba53269a5104fd1106064d8ed8159f96a7207b2c5a97ffc4a66f7a399504",
-      "ukuran_kb": 19.5,
+      "ukuran_kb": 19.6,
       "ringkasan": "Menjawab fitur dan struktur sistem Finance lama (Java/PostgreSQL/ReactJS) sebagai jembatan antara Accurate dan marketplace: master data, upload Excel per platform (TikTok/Shopee/Lazada/Tokopedia/KiriminAja), sinkronisasi ke Accurate, dan lokasi repositori kodenya.",
       "kata_kunci": [
         "Finance Bridging lama",
@@ -8869,7 +8869,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. ⚠️ **Rekrutmen lintas perusahaan: merged 2026-09-12, backend dan Web ERP live di prod, portal karir prod belum, paket belum dipasang** (diukur 2026-09-12, lihat bagian \"Rekrutmen Lintas Perusahaan\" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian \"Alur Kerja HR\" di bawah)",
+      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. ⚠️ **Rekrutmen lintas perusahaan: merged 2026-09-12, backend, Web ERP, dan portal karir live di prod, paket belum dipasang** (diukur 2026-09-12, lihat bagian \"Rekrutmen Lintas Perusahaan\" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian \"Alur Kerja HR\" di bawah)",
       "publik": true,
       "tautan": [
         "HRIS - Analysis",
@@ -8899,8 +8899,8 @@
         "HRIS - Big Pictures",
         "HRIS - Recruitment Roadmap (Adopsi ERPGo)"
       ],
-      "hash": "ca7f30276dd1788b0ea65d0ef99a3f018a536773d6a0770ed0ac62f6a6a5b812",
-      "ukuran_kb": 48.4,
+      "hash": "eb6d7926d4dc4aa17823051185fd5c52bd28db4ab7b39eccf178fa58798a2267",
+      "ukuran_kb": 48.6,
       "ringkasan": "Menjawab: bagaimana alur rekrutmen end-to-end di Bharata, dari Form Permintaan Karyawan dan persetujuan SPV HRD, lowongan dan sumber pelamar (Glints/TapLoker), screening manual, interview multi-tahap dengan feedback lewat email, psikotes dan technical test, background check, offer, sampai onboarding dan masa evaluasi. Juga menjawab aktor dan persona, model data, keputusan yang sudah disepakati HRD, pertanyaan yang masih terbuka, rollout bertahap, serta alur pengguna rekrutmen lintas perusahaan.",
       "kata_kunci": [
         "rekrutmen",
@@ -11419,7 +11419,7 @@
         "APP - Web ERP"
       ],
       "hash": "0115ceffe21b522769faac6e9286fe16c1737ff46d15d0f58ff2e9333c9cd7f0",
-      "ukuran_kb": 14.0,
+      "ukuran_kb": 14.2,
       "ringkasan": "Menjawab: bagaimana menerbitkan akun ERP untuk vendor, mitra, atau kontraktor tanpa menjadikannya karyawan, lalu memberinya akses ke modul tertentu. Menjelaskan cara memilih antara dua sumbu hak akses yang paling sering tertukar (Paket Hak vs Role Modul), cara memperpanjang dan menutup akses beserta batasnya, serta gejala umum saat vendor sudah dibuat tapi tetap tak bisa masuk.",
       "kata_kunci": [
         "akun eksternal",
@@ -12905,7 +12905,7 @@
         "APP - Web ERP"
       ],
       "hash": "c4637f8509f5c1a5a4144b1a335e575e34704efa5110b9829b98aa991eb3b130",
-      "ukuran_kb": 8.4,
+      "ukuran_kb": 8.5,
       "ringkasan": "Menjawab: apa rencana penyatuan menu-menu gudang yang kini terpecah per-tahap (Perlu Diproses, Antrian Pesanan, Pengambilan, Pengemasan, Riwayat Cetak Resi, Serah Terima) menjadi satu layar omnichannel \"Kelola Pesanan\" ala Desty tanpa mengubah backend, dan apa beda pratinjau Beta FE-only (data dummy, aksi mati) dengan menu produksi yang sudah wired ke endpoint nyata. Juga menjelaskan pemetaan tiap tab/sub-tab \"Siap Dikirim\" ke endpoint warehouse/integration, rencana mutasi bertahap fase 0-5 sampai cutover, gerbang dan nuansa yang wajib dipertahankan saat \"cuma ganti UI\" (gerbang rekon `exported_at`, kode packer T1/T2, guard TikTok `package_id` kosong, batch cap 100), persona pengguna dan RBAC-nya, serta hal yang belum diputuskan (tab Belum Dibayar, cakupan Sadewa, nasib menu lama).",
       "kata_kunci": [
         "Kelola Pesanan",
@@ -13576,7 +13576,7 @@
         "API - Integration Service"
       ],
       "hash": "682af984acc5651b53b35ab55dd597da43217b701b703cf3a6c0ff290504f199",
-      "ukuran_kb": 15.4,
+      "ukuran_kb": 15.5,
       "ringkasan": "Menjawab: bagaimana mekanisme ACL yang membatasi daftar toko marketplace yang boleh dilihat staf marketing (AllowedShops di endpoint GET /transactions/master/shops, integration-service) bekerja, kenapa sumber datanya bisa dipindah dari team_members/team_shops ke department_shops + work_data.department, dan bug apa yang sempat membuat staf non-marketing menerima daftar toko kosong. Juga mencatat status redesign (sudah dikodekan di branch terpisah, belum merge/deploy/verifikasi live) serta batas lingkup keputusan yang sengaja tidak diubah (gate rute RequireIntegrationStaff, exemption admin/supervisor integration).",
       "kata_kunci": [
         "AllowedShops",
@@ -13961,7 +13961,7 @@
         "WH - Warehouse Sadewa"
       ],
       "hash": "256b39d712a784b9ff443d528747ca065ab9eb8bbe91a08ffc13607cc07cb67a",
-      "ukuran_kb": 17.7,
+      "ukuran_kb": 17.9,
       "ringkasan": "Menjawab kenapa sidebar erp-frontend memicu request polling 30 detik ke endpoint warehouse/sadewa/accurate untuk semua karyawan tanpa peduli role atau halaman yang dibuka, dan rencana perbaikannya lewat gerbang enabled yang diturunkan dari menu yang benar-benar tampil. Memuat dua pembaruan 2026-08-29 yang menandai sebagian rencana ini usang lalu sebagian lagi sudah dikerjakan lewat jalan lain: branch fix/badge-sidebar-per-halaman memilih gerbang HALAMAN, sehingga Task 4 (kuartet refetch) gugur karena keduanya alternatif bukan pelengkap, Task 1 dan 3 turun prioritas, dan Task 5 tetap berdiri sendiri.",
       "kata_kunci": [
         "sidebar",
