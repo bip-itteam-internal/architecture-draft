@@ -56,6 +56,7 @@ Hari disimpan sebagai **angka `Date#getDay()`**, bukan string "Selasa", lalu dit
 - **Tidak ada backend**: belum ada service, koleksi, maupun object storage untuk klub, keanggotaan, jadwal, dan foto kegiatan. Konsekuensinya jadwal tidak bisa diubah dari UI dan **unggah foto belum tersedia**.
 - **Data dokumentasi = data contoh**, ditandai `TODO(BE)` di `data/activities.ts` dan badge di UI. Harus diganti data nyata sebelum dianggap arsip resmi.
 - **Keanggotaan klub, absensi kegiatan, dan notifikasi jadwal**: TBD, belum dibahas.
+- **Jadwal berulang menuju backend**: jadwal klub yang di sini masih konstanta FE direncanakan pindah ke **master program culture** (field jadwal hari/tanggal yang mem-pra-isi form), diusulkan [[ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master]]. ADR yang sama menambah **tipe program non-event** (mis. Kamis Batik) yang tak butuh absensi.
 - **Cakupan akses**: apakah menu dibuka untuk semua karyawan (via Portal Saya atau [[APP - MyBharata]]) atau tetap HR-only, masih TBD.
 - Struktur tipe `Club` dan `ClubActivity` sengaja dibuat menyerupai bentuk respons API supaya penggantian ke hook react-query nanti tidak mengubah komponen.
 
