@@ -117,20 +117,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "6083904d0cad0720729dddd3dc9fd5de0c5e45d14acbf0d660e7c15e2dbc3bf3",
+      "hash": "4e094ad0766418c74ae802e1c4ae8321f9d54afa41f2e66eff457375c0deb627",
       "ukuran_kb": 59.6,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service lewat gateway `/api/employee/*` (login dan onboarding, personal/work data, dokumen, jadwal kerja, akun, master departemen dan system role, KPI, cuti, kontrak kerja, resign, promosi/mutasi, surat peringatan) beserta gerbang RBAC tiap rute. Juga menjelaskan perilaku khusus seperti `/data-type/department?grouped=true`, penetapan penyetuju departemen (`/master/departments/:key/approver`), `menu-hidden`, jenjang jabatan, serta endpoint internal lintas-service seperti `/internal/department-approver` dan `/internal/permission-holders`.",
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service lewat gateway `/api/employee/*` (login password/PIN/biometrik, onboarding, personal & work data, dokumen, jadwal, akun, master departemen/perusahaan/system role, KPI, kontrak, resign, promosi-mutasi, SP) beserta gerbang RBAC tiap rute. Juga menjawab cara kerja rute khusus seperti `data-type/department?grouped=true`, penetapan penyetuju pengajuan departemen, menu-hidden dan jenjang jabatan per posisi, serta endpoint internal `department-approver` dan `permission-holders` untuk service lain.",
       "kata_kunci": [
         "employee-service",
-        "API karyawan",
-        "endpoint HRIS",
-        "login PIN",
+        "endpoint karyawan",
+        "login",
         "master departemen",
-        "penyetuju departemen",
+        "penyetuju pengajuan",
         "approver",
-        "kontrak kerja",
-        "RBAC",
-        "system roles"
+        "system roles",
+        "jenjang jabatan",
+        "job level",
+        "resign"
       ]
     },
     {
@@ -717,20 +717,20 @@
         "HRIS - Recruitment",
         "Microservices - Employee Service"
       ],
-      "hash": "28a82bfaecdacbbeded9351d03499cfbb9e18b49fee0707839a399a5d490860c",
-      "ukuran_kb": 35.4,
-      "ringkasan": "Menjawab: endpoint apa saja milik recruitment-service (job requisition, job posting, candidate, stages & offer, psikotes, interview rounds & feedback, master & form, onboarding, portal publik tanpa JWT) beserta role yang boleh memanggilnya. Menjelaskan juga siapa yang boleh mengajukan dan menyetujui requisition (supervisor, SPV HRD, jenjang direktur lintas-departemen), field turunan di daftar Offers (`candidate_company_id`, `can_approve` yang mengikuti gerbang approve), serta aturan cakupan perusahaan pada rekrutmen lintas perusahaan (`GET /companies`, `?company=`, `company_id`, 404 untuk data di luar cakupan).",
+      "hash": "4e9a68052cf9ce23f103839230270bc62add7e389fd5f0c0ceed1ed68df9cc2e",
+      "ukuran_kb": 35.8,
+      "ringkasan": "Menjawab: endpoint apa saja milik recruitment-service (`/api/recruitment/*` dan publik `/public/recruitment/*`) untuk requisition, lowongan, kandidat, babak seleksi, psikotes, interview, offer, onboarding, dan master, beserta role yang boleh memanggilnya. Juga menjawab aturan rekrutmen lintas perusahaan: siapa boleh melihat dan menulis data perusahaan lain lewat `recruitment.cross_company`, perilaku `?company=`, 404 untuk data di luar cakupan, serta siapa boleh mengajukan requisition untuk departemen atau perusahaan lain.",
       "kata_kunci": [
-        "recruitment",
+        "recruitment-service",
         "rekrutmen",
-        "API recruitment",
-        "requisition",
+        "job requisition",
         "permintaan karyawan",
+        "lowongan",
+        "job posting",
         "kandidat",
-        "offer",
-        "can_approve",
-        "portal karir",
-        "lintas perusahaan"
+        "lintas perusahaan",
+        "cross_company",
+        "portal karir publik"
       ]
     },
     {
@@ -1312,7 +1312,7 @@
       "area": "Application",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas; **E2E terverifikasi live 2026-07-16**). ⛔ **Fitur \"cek status lamaran\" SUDAH DIHAPUS** (BE `a298ba70`, 2026-07-24; portal tak punya rute `/status` — diverifikasi 2026-09-10). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf (dan per perusahaan grup masih **TBD**, lihat [[HRIS - Recruitment]] §Rekrutmen Lintas Perusahaan), dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*). 🟡 **Nama perusahaan perekrut di daftar & detail lowongan: branch career-bharata `feat/nama-perusahaan-lowongan`, BELUM merge ke `master` maupun prod** (diukur 2026-09-11, branch ahead 1 commit dari `origin/master`).",
+      "status_teks": "**Implemented (ada catatan)** — portal berjalan penuh terhadap BE dev (browse → detail → lamar + upload berkas; **E2E terverifikasi live 2026-07-16**). ⛔ **Fitur \"cek status lamaran\" SUDAH DIHAPUS** (BE `a298ba70`, 2026-07-24; portal tak punya rute `/status` — diverifikasi 2026-09-10). BE penopang **semua sudah deployed**. **SUDAH GO-LIVE**: repo GitHub ada, domain `career.bharatainternasional.com` aktif, dan portal **ter-deploy di prod VPS Biznet sejak 2026-08-02** (balas `200`). Yang masih tersisa: halaman legal masih draf (dan per perusahaan grup masih **TBD**, lihat [[HRIS - Recruitment]] §Rekrutmen Lintas Perusahaan), dan **production 0 lowongan** — `GET /public/recruitment/postings` balas `200 []`, jadi portalnya hidup tapi kosong sampai HR menerbitkan lowongan (lihat *Belum Diimplementasikan / Catatan*). 🟡 **Nama perusahaan perekrut di daftar & detail lowongan: merged ke `master` 2026-09-12 ([#12](https://github.com/bip-itteam-internal/career-bharata/pull/12)), BELUM di prod** (diukur 2026-09-12: checkout prod `77bfafc`, image 2026-09-11 08:44 WIB, `company_name` di bundel 0; backend penopangnya sudah live prod). Deploy portal berikutnya ikut membawa psikotes berpaket #10 dan #11.",
       "publik": true,
       "tautan": [
         "HRIS - Recruitment",
@@ -1327,20 +1327,20 @@
         "CORE - SSO Flow",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "5c0d2352c9ba4b657f016e19c68918fc790492d8f8fab981e2f1dc2e2d7a3db2",
-      "ukuran_kb": 18.7,
-      "ringkasan": "Menjawab: apa itu portal karir publik `career.bharatainternasional.com` (repo `career-bharata`), halaman apa saja yang dipakai pelamar (daftar & detail lowongan, form lamaran dengan satu PDF, konfirmasi terkirim, pengerjaan psikotes lewat magic link), dan kontrak `/public/recruitment/*` yang dikonsumsinya tanpa login. Juga menjelaskan stack (Next.js, pnpm), cara deploy Docker standalone beserta jebakan port 3005 di server prod, alasan fitur cek status lamaran dihapus, dan bedanya dengan halaman karir situs korporat.",
+      "hash": "3fc0bfe605f2ee3eaf5a073b5941e478e75bc7c79fc248599e77352092d27a58",
+      "ukuran_kb": 18.9,
+      "ringkasan": "Menjawab: apa itu portal karir publik `career.bharatainternasional.com` (repo `career-bharata`, Next.js, pnpm), halaman apa saja yang tersedia bagi pelamar (daftar dan detail lowongan, form lamaran dengan satu PDF, konfirmasi terkirim, psikotes lewat magic link), dan endpoint `/public/recruitment/*` mana yang dikonsumsinya. Juga menjawab cara deploy Docker-nya di prod (port host 3005, `.env` wajib saat build), kenapa fitur cek status lamaran dihapus, apa bedanya dengan halaman karir situs korporat, dan bagaimana nama perusahaan perekrut ditampilkan untuk lowongan lintas perusahaan grup.",
       "kata_kunci": [
         "portal karir",
         "career portal",
         "career-bharata",
-        "lowongan kerja",
-        "job vacancy",
+        "lowongan",
         "lamaran",
-        "apply",
-        "psikotes online",
-        "magic link",
-        "pelamar"
+        "pelamar",
+        "job application",
+        "psikotes magic link",
+        "modal WASPADA",
+        "deploy Docker"
       ]
     },
     {
@@ -1466,20 +1466,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "061c3c76ab162ce3f2e5147209165a72b4bdc8025445eceea545118c9fa23a4f",
-      "ukuran_kb": 422.9,
-      "ringkasan": "Menjawab: modul dan halaman apa saja yang ada di portal web ERP/HRIS One Bharata, bagaimana autentikasi, SSO, role gating sidebar, dan Pengaturan HRGA bekerja, serta konvensi data-fetching dan bagan yang wajib diikuti. Juga mencatat perubahan per modul beserta gap yang belum diimplementasikan, mis. Recruitment (alur kerja HR, rekrutmen lintas perusahaan, onboarding checklist, Tambah Karyawan dari kandidat yang mengikuti perusahaan kandidat), payroll, KPI, presensi, dan Marketing Analytics (saringan pindah ke laci Banner bergaya HRIS yang terbuka saat halaman dibuka, lencana dan Bersihkan yang hanya menghitung saringan, bukan pilihan tampilan).",
+      "hash": "e64cea0face8601e89046bf17560b4e9f22b2a0489497119f97eadf1912438b7",
+      "ukuran_kb": 423.3,
+      "ringkasan": "Menjawab: apa itu portal web internal erp-frontend (\"One Bharata\"/hris-dashboard) beserta stack-nya, bagaimana login, refresh token, cookie `system_roles`, dan role gating sidebar bekerja, serta bagaimana web ini menjadi SSO Identity Provider lewat `redirect_url`. Juga menjelaskan dukungan multi-perusahaan (Kelola Perusahaan, CompanySwitcher admin pusat, rekrutmen lintas perusahaan lewat izin `recruitment.cross_company`), pengelompokan menu HRIS dengan menu induk bersarang, dan halaman Pengaturan HRGA terpusat (`SUB_MENU_PENGATURAN`). Memuat pula konvensi data-fetching TanStack Query dan konvensi bagan Recharts/`ChartContainer`.",
       "kata_kunci": [
         "erp-frontend",
-        "web ERP",
-        "HRIS dashboard",
         "One Bharata",
-        "sidebar role gating",
         "SSO",
+        "login",
+        "system_roles",
+        "sidebar menu",
+        "multi-perusahaan",
+        "multi-tenant",
         "Pengaturan HRGA",
-        "recruitment",
-        "laci saringan Marketing Analytics",
-        "filterPanel Banner"
+        "TanStack Query"
       ]
     },
     {
@@ -1825,20 +1825,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "b64d0f6575f33d81a911c24f0aa14cfef03213efd583fe233283a19c56a8452f",
-      "ukuran_kb": 111.8,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan/reach), paket izin (permission set) yang menempel pada posisi, dan penegakannya di gateway (klaim JWT `permissions`), service (`RequirePermission`, fallback tier), serta frontend. Juga menjawab katalog modul mana yang terdaftar beserta izinnya, endpoint katalog/modul/pengecualian per-akun, apa itu fase dua `*_TIER_FALLBACK` dan kenapa dicabut, serta celah yang masih terbuka seperti modul menu terbatas.",
+      "hash": "1ae9d17ab223435fa3d69ce624fe2495374ce2a0a6b6f028769536565576170f",
+      "ukuran_kb": 112.0,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja dengan tiga sumbu (modul, tingkat aksi, cakupan/reach), bagaimana paket izin (permission set) ditempel ke posisi lalu diresolusi jadi klaim JWT saat login, dan bagaimana penegakannya di gateway, service, dan frontend. Juga menjawab modul mana yang sudah berkatalog dan menegakkan izin per aksi, apa itu fallback tier `system_roles` dan kenapa Fase dua dicabut, serta endpoint katalog izin, daftar modul, dan pengecualian per akun.",
       "kata_kunci": [
         "RBAC",
-        "hak akses",
         "permission set",
         "paket izin",
+        "hak akses",
         "katalog izin",
-        "system_roles",
         "tier fallback",
+        "system_roles",
         "reach",
-        "cakupan data",
-        "hak per posisi"
+        "JWT permissions",
+        "Hak per Posisi"
       ]
     },
     {
@@ -2182,20 +2182,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "ffbe77b349f3d8da459e532cabcf215ed2f1e17c6595f5cbd913f8e2f3d567af",
-      "ukuran_kb": 131.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Employee Service sebagai master data karyawan dan sumber SSO (login username/employee_id, PIN, biometric, refresh token, onboarding register), operasi admin akun oleh IT (active-status, forget-device, reset, system roles), serta CRUD master data department dan system role beserta siapa yang berhak. Juga menjawab workspace apa yang di-host di service ini (Legal, R&D Regulatory, Quality, Procurement non-Accurate) dan gerbang izinnya, di mana is_active ditulis bersama jalur resign HR, serta catatan multi-perusahaan (tenant), akun pihak luar, dan dependensi dengan service lain.",
+      "hash": "4003287bd59e29a291b55d9e0d6240c4fd761bd7f45b5fb6f37cbc66fe079770",
+      "ukuran_kb": 131.6,
+      "ringkasan": "Menjawab: apa peran employee-service sebagai master data karyawan dan sumber kebenaran autentikasi & onboarding (login username/employee_id, PIN, biometric, refresh token, registrasi, endpoint internal auth), serta endpoint admin akun IT seperti mengubah status aktif, forget-device, reset akun, dan pengaturan `system_roles`. Juga menjelaskan CRUD master departemen & system role beserta gerbang RBAC dan seed-nya, serta kenapa register Legal (perizinan, kontrak, dispute), R&D Regulatory (NIE/BPOM/Halal, pipeline produk), Quality (CAPA, incoming inspection, batch release), dan kontrak vendor/cost saving Procurement di-host di service ini.",
       "kata_kunci": [
-        "employee service",
-        "karyawan",
-        "employee",
-        "login",
-        "PIN",
-        "SSO",
-        "master data department",
-        "system roles",
+        "employee-service",
+        "master data karyawan",
+        "autentikasi",
+        "authentication",
+        "onboarding",
         "reset akun",
-        "forget device"
+        "master department",
+        "system role",
+        "register perizinan legal",
+        "CAPA"
       ]
     },
     {
@@ -2811,7 +2811,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (BE)** — Fase 1-3 + adopsi ERPGo (A–F) + portal publik (browse/apply/track), **sudah di `main`** & jalan di dev. Belum: AI CV screening, psikotes online, WhatsApp kandidat, Glints sync, FE internal (erp-frontend Candidate Pipeline berjalan terpisah). Di belakang [[CORE - API Master Gateway]], auth **SSO** ([[CORE - SSO Flow]]), role `system_roles[\"hris\"]`. Port `6979`, mongo `recruitment-mongo-db`. · 🔴 **Multi-perusahaan (di `main`): belum ter-scope** — tak ada field company; requisition/posting/kandidat/interview/assessment + **portal karir publik** (`/public/postings`, `/apply`) bersama semua tenant. **(2026-09-11)** Kode lengkap ada di branch `feat/recruitment-lintas-perusahaan`, **belum merge, belum deploy, paket belum terpasang ke posisi mana pun**: enam koleksi proses diberi `company_id`, ditambah `GET /companies` dan `?company=`. Lihat bagian **Increment: Rekrutmen Lintas Perusahaan** di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]. Fase lanjut yang lebih tua: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].",
+      "status_teks": "**Implemented (BE)** — Fase 1-3 + adopsi ERPGo (A–F) + portal publik (browse/apply/track), **sudah di `main`** & jalan di dev. Belum: AI CV screening, psikotes online, WhatsApp kandidat, Glints sync, FE internal (erp-frontend Candidate Pipeline berjalan terpisah). Di belakang [[CORE - API Master Gateway]], auth **SSO** ([[CORE - SSO Flow]]), role `system_roles[\"hris\"]`. Port `6979`, mongo `recruitment-mongo-db`. · ✅ **Multi-perusahaan: ter-scope** (bip-erp [#1853](https://github.com/bip-itteam-internal/bip-erp/pull/1853), merged dan live prod 2026-09-12): enam koleksi proses diberi `company_id` (backfill prod mengisi BIP ke 30 dokumen lama), ditambah `GET /companies` dan `?company=`. Portal karir publik (`/public/postings`, `/apply`) tetap satu untuk semua tenant; perusahaan kandidat diturunkan dari lowongan. Paket izin belum dipasang di prod (per 2026-09-12). Lihat bagian **Increment: Rekrutmen Lintas Perusahaan** di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]. Fase lanjut yang lebih tua: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].",
       "publik": true,
       "tautan": [
         "HRIS - Recruitment",
@@ -2840,20 +2840,20 @@
         "CORE - RBAC dan Permission Set",
         "ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen"
       ],
-      "hash": "561158c8ecb48601cb9e5920180980eac5bcfd93fab3c27d1d9ccb6f7677c8a9",
+      "hash": "fff2403cb3352675eaf757d0087ec8bcd71b06a38aee6f226301128f7b39836c",
       "ukuran_kb": 66.9,
-      "ringkasan": "Menjawab: bagaimana recruitment-service mengimplementasikan siklus rekrutmen (requisition, posting, kandidat, babak seleksi interview/tes/background check, psikotes online Kraepelin, offer, onboarding) dan bagaimana hasil tes menggerakkan progress serta status kandidat. Juga menjelaskan model data `recruitment_db`, alur approval requisition oleh SPV HRD, riwayat increment (apply publik, adopsi ERPGo, konversi kandidat jadi karyawan, onboarding checklist, requisition lintas-departemen), cara deploy, dan desain rekrutmen lintas perusahaan (`company_id`, backfill, cache master perusahaan).",
+      "ringkasan": "Menjawab: bagaimana recruitment-service mengimplementasikan siklus rekrutmen (requisition dengan persetujuan satu tahap SPV HRD, lowongan tanpa rentang gaji, kandidat, babak seleksi dari katalog global `interview_round`, hasil tes yang menggerakkan pipeline, background check, psikotes online, offer, onboarding) beserta model data `recruitment_db`. Juga menjawab cara deploy manualnya ke dev, riwayat increment (apply publik, hire jadi karyawan, onboarding checklist, interview orchestration), dan rancangan rekrutmen lintas perusahaan: penurunan `company_id`, backfill, cache master perusahaan, dan pemindai sumber.",
       "kata_kunci": [
         "recruitment-service",
         "rekrutmen",
-        "recruitment",
-        "requisition",
-        "kandidat",
+        "recruitment_db",
         "babak seleksi",
-        "psikotes Kraepelin",
+        "interview round",
+        "hasil tes",
+        "psikotes",
         "offer",
         "onboarding",
-        "lintas perusahaan"
+        "company_id"
       ]
     },
     {
@@ -3867,7 +3867,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Fase 1 (Presensi) + Fase 2 parsial sudah di `main`; perusahaan kedua (ELT) sudah terdaftar & terpakai di dev; payroll, HRD-document, dan task-management BELUM ter-scope. Recruitment ter-scope di branch lewat [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] (belum merge per 2026-09-11).",
+      "status_teks": "Implemented (ada catatan). Fase 1 (Presensi) + Fase 2 parsial sudah di `main`; perusahaan kedua (ELT) sudah terdaftar & terpakai di dev; payroll, HRD-document, dan task-management BELUM ter-scope. Recruitment ter-scope lewat [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] (merged dan live prod 2026-09-12).",
       "publik": true,
       "tautan": [
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
@@ -3884,9 +3884,9 @@
         "APP - Web ERP",
         "ADR - 0002 Database-per-Service"
       ],
-      "hash": "49fda0d90e16049d398c30ea09404df032c291b4ffe0c7cf8ffc68efb5d8b7fa",
+      "hash": "56e3b0cdecb26617b6ed861d1308d1ee4c61fb4ac510fef803eb36f98f6c81d2",
       "ukuran_kb": 20.9,
-      "ringkasan": "Menjawab: kenapa multi-perusahaan (multi-tenant) bip-erp memakai satu database dengan penanda `company_id` row-level alih-alih database terpisah, bagaimana `company_id` mengalir lewat `work_data`, JWT, dan header `BIP-Company-ID`, serta beda `CompanyID`, `EffectiveCompanyID`, dan admin pusat (`system_roles.group = admin`). Juga mencatat modul mana yang sudah ter-scope (presensi, jadwal, fingerprint, WiFi, departemen, direktori karyawan) dan mana yang belum (payroll, HRD-document, task-management), beserta keterbatasan yang masih terbuka.",
+      "ringkasan": "Menjawab: kenapa bip-erp dibuat multi-tenant dalam satu database dengan penanda `company_id` per baris, bagaimana `company_id` dibawa lewat `work_data`, JWT, dan header `BIP-Company-ID`, serta beda `CompanyID` (penulis) dan `EffectiveCompanyID` (pembaca, override `?company=` hanya untuk admin pusat). Juga menjawab modul mana yang sudah ter-scope (presensi, jadwal, fingerprint, departemen, direktori karyawan, rekrutmen) dan mana yang belum (payroll, HRD-document, task-management), siapa admin pusat, serta celah yang masih terbuka.",
       "kata_kunci": [
         "multi-tenant",
         "multi-perusahaan",
@@ -3895,9 +3895,9 @@
         "admin pusat",
         "central admin",
         "EffectiveCompanyID",
-        "BIP-Company-ID",
+        "master_company",
         "presensi",
-        "master_company"
+        "ADR 0029"
       ]
     },
     {
@@ -5886,19 +5886,19 @@
         "HRIS - Recruitment",
         "Microservices - Employee Service"
       ],
-      "hash": "684ea2bec7d2b2aa7ea01c465b078c82b77a49dedcae742c8d5940a213e15067",
+      "hash": "dd36b3cdc78c068f5ecd329321923e8a72920b2a7c1ad0377f22269d9724eae1",
       "ukuran_kb": 9.0,
-      "ringkasan": "Menjawab: siapa yang boleh mengajukan Job Requisition untuk departemen lain dan kenapa gerbangnya dipindah dari jenjang jabatan (ADR 0062) ke permission set `recruitment.requisition_cross_dept` dengan paket `recruitment_pengaju_lintas`. Juga menjelaskan kenapa izin ini aditif dan tidak ikut tier fallback maupun paket admin, alasan peralihan dua tahap, serta konsekuensinya: setuju-sendiri oleh SPV HRD, perlu login ulang, dan risiko paket sempit mencabut izin tier.",
+      "ringkasan": "Menjawab: siapa yang boleh mengajukan Job Requisition untuk departemen lain dan kenapa gerbangnya dipindah dari jenjang jabatan direktur (ADR 0062) ke izin `recruitment.requisition_cross_dept` lewat paket `recruitment_pengaju_lintas`. Juga menjawab kenapa izin itu aditif dan tidak ikut tier maupun paket admin, kenapa peralihannya dua tahap, serta konsekuensinya: SPV HRD bisa menyetujui pengajuannya sendiri, izin baru berlaku setelah login ulang, dan perubahan katalog menuntut deploy dua container.",
       "kata_kunci": [
         "requisition lintas departemen",
-        "cross department",
         "permission set",
+        "recruitment.requisition_cross_dept",
         "recruitment_pengaju_lintas",
-        "requisition_cross_dept",
         "jenjang jabatan",
         "direktur",
         "tier fallback",
-        "Job Requisition"
+        "ADR 0080",
+        "ADR 0062"
       ]
     },
     {
@@ -6312,7 +6312,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan): kode lengkap di branch `feat/recruitment-lintas-perusahaan` (bip-erp, erp-frontend) dan `feat/nama-perusahaan-lowongan` (career-bharata) per 2026-09-11. **Belum merge, belum deploy**, paket belum terpasang ke posisi mana pun.",
+      "status_teks": "Implemented (ada catatan): merged 2026-09-12 (bip-erp [#1853](https://github.com/bip-itteam-internal/bip-erp/pull/1853), erp-frontend [#1543](https://github.com/bip-itteam-internal/erp-frontend/pull/1543), career-bharata [#12](https://github.com/bip-itteam-internal/career-bharata/pull/12)). **Backend dan Web ERP live di prod** sejak 2026-09-12 (image dibangun 07:32 dan 07:35 WIB, gerbang biner dan bundel lulus, backfill `company_id` sudah jalan) dan terverifikasi lewat gateway dev 2026-09-12. Yang tersisa (diukur 2026-09-12): portal karir prod **belum di-deploy**; paket **belum dipasang** di prod, tetapi kedua pemegang posisi target sudah admin pusat sehingga lintas perusahaan sudah aktif bagi mereka; halaman Permintaan Rekrutmen melempar galat saat disaring ke perusahaan tanpa departemen (`data-type/department` membalas `{\"data\":null}`), perbaikannya di erp-frontend branch `fix/use-data-types-null`.",
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
@@ -6329,9 +6329,9 @@
         "APP - Portal Karir Bharata",
         "APP - Web ERP"
       ],
-      "hash": "79a68f54d7519437835c980f8847afb64d7dcc87dd9c3a94d790d5a7937f7d9a",
-      "ukuran_kb": 11.0,
-      "ringkasan": "Menjawab: bagaimana recruiter di satu perusahaan grup bisa menangani rekrutmen semua perusahaan grup lewat izin aditif `recruitment.cross_company`, dan kenapa izin itu tidak ikut tier fallback maupun paket admin. Juga menjelaskan cara `company_id` diturunkan satu arah dari requisition ke posting dan kandidat, aturan baca/tulis (daftar, 404 per-ID, validasi perusahaan, 503), override data referensi employee-service yang sengaja sempit, dan nama perusahaan yang dibaca dari `master_company` untuk email kandidat dan portal karir.",
+      "hash": "637a9a06c902e7584315bc0ebb0c32e6dd88c07a436d63a0221e133cf57ba403",
+      "ukuran_kb": 11.6,
+      "ringkasan": "Menjawab: bagaimana recruiter di satu perusahaan grup bisa menangani rekrutmen seluruh perusahaan grup lewat izin aditif `recruitment.cross_company` (paket `recruitment_lintas_perusahaan`), dan kenapa izin aditif tak lagi mencabut fallback tier. Juga menjawab bagaimana `company_id` diturunkan satu arah dari requisition ke lowongan dan kandidat, aturan baca/tulis (`?company=` diabaikan untuk non-lintas, 404 di luar cakupan, 503 saat master tak pasti), kenapa `/apply` publik wajib `posting_id`, dan override data referensi employee-service yang sengaja disempitkan.",
       "kata_kunci": [
         "rekrutmen lintas perusahaan",
         "cross company",
@@ -6339,10 +6339,9 @@
         "paket izin",
         "company_id",
         "multi-perusahaan",
-        "recruiter",
-        "master_company",
-        "portal karir",
-        "izin aditif"
+        "izin aditif",
+        "EffectiveCompanyIDDenganIzin",
+        "ADR 0092"
       ]
     },
     {
@@ -8836,7 +8835,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. 🟡 **Rekrutmen lintas perusahaan: kode lengkap di branch, BELUM merge maupun deploy** (diukur 2026-09-11, lihat bagian \"Rekrutmen Lintas Perusahaan\" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian \"Alur Kerja HR\" di bawah)",
+      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. ⚠️ **Rekrutmen lintas perusahaan: merged 2026-09-12, backend dan Web ERP live di prod, portal karir prod belum, paket belum dipasang** (diukur 2026-09-12, lihat bagian \"Rekrutmen Lintas Perusahaan\" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian \"Alur Kerja HR\" di bawah)",
       "publik": true,
       "tautan": [
         "HRIS - Analysis",
@@ -8866,20 +8865,20 @@
         "HRIS - Big Pictures",
         "HRIS - Recruitment Roadmap (Adopsi ERPGo)"
       ],
-      "hash": "8c3c7a9770fd41462c25d680fa66713afa4a1276f83037c481c1cbd021d63c26",
-      "ukuran_kb": 46.5,
-      "ringkasan": "Menjawab: bagaimana desain proses rekrutmen end-to-end dari permintaan karyawan sampai onboarding (requisition, sourcing Glints, screening manual, interview multi-tahap, psikotes dan tes keahlian, background check, offer, masa evaluasi), siapa aktor dan role yang terlibat, dan keputusan apa yang sudah disepakati HRD. Juga menjelaskan model data kandidat, alur kerja HR (titik putus yang dibuka, kotak Langkah berikutnya, tombol Buat data karyawan yang mengikuti perusahaan kandidat), persona dan alur pengguna rekrutmen lintas perusahaan, rollout bertahap, serta pertanyaan dan TBD yang masih terbuka.",
+      "hash": "ca7f30276dd1788b0ea65d0ef99a3f018a536773d6a0770ed0ac62f6a6a5b812",
+      "ukuran_kb": 48.4,
+      "ringkasan": "Menjawab: bagaimana alur rekrutmen end-to-end di Bharata, dari Form Permintaan Karyawan dan persetujuan SPV HRD, lowongan dan sumber pelamar (Glints/TapLoker), screening manual, interview multi-tahap dengan feedback lewat email, psikotes dan technical test, background check, offer, sampai onboarding dan masa evaluasi. Juga menjawab aktor dan persona, model data, keputusan yang sudah disepakati HRD, pertanyaan yang masih terbuka, rollout bertahap, serta alur pengguna rekrutmen lintas perusahaan.",
       "kata_kunci": [
         "rekrutmen",
         "recruitment",
-        "pipeline rekrutmen",
         "Form Permintaan Karyawan",
         "job requisition",
+        "screening",
         "interview",
         "psikotes",
         "background check",
         "onboarding",
-        "Buat data karyawan"
+        "Glints"
       ]
     },
     {
@@ -10707,19 +10706,20 @@
         "REF - Alur Persetujuan",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "2e1b013b3503e9b2132fdc5148a23d646f7eee3b01a1d505909675c460cfcbed",
-      "ukuran_kb": 27.4,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis (data karyawan, departemen, hak akses, kontrak, jadwal, presensi, skor & target KPI, insentif profit, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab salinan data mana yang sah beserta arah dan penjaganya, pengecualian Database-per-Service yang masih hidup (mis. task-management membaca DB service lain langsung), duplikasi yang belum diputuskan, dan langkah yang dipakai sebelum membangun penyimpanan baru.",
+      "hash": "08d8764d64ac1f68a093c6795de960fc49fdcccc8088e63ba3e043da62f06451",
+      "ukuran_kb": 27.3,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis ERP (identitas karyawan, departemen, hak akses, kontrak, jadwal, presensi, skor dan target KPI, insentif profit, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab salinan data mana yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih hidup (task-management membaca DB service lain langsung), duplikasi yang belum diputuskan, dan cara memeriksa \"sudah ada belum\" sebelum membangun penyimpanan baru.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
         "source of truth",
         "sumber kebenaran",
-        "duplikasi data",
+        "satu fakta satu tempat",
         "salinan data",
         "SyncCollection",
+        "duplikasi data",
         "database-per-service",
-        "pemilik fakta"
+        "ADR 0002"
       ]
     },
     {
