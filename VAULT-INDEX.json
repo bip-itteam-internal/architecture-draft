@@ -8282,7 +8282,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "🟡",
-      "status_teks": "**Konsep / Direncanakan** untuk tanda tangan dan e-Meterai; belum ada di kode. ✅ **Pengingat kontrak habis: merged 2026-09-11 (bip-erp PR #1851), naik di DEV 2026-09-11 dan PROD 2026-09-12**; jalan cron DEV sudah terverifikasi, jalan PROD pertama (2026-09-13 07:00 WIB) belum dibaca (§Pengingat Kontrak Habis). ⚠️ **Dokumen PKWT masa transisi (T18): selesai di branch 2026-09-12** (bip-erp `feat/employee-dokumen-pkwt`, erp-frontend `feat/hris-dokumen-pkwt`), belum PR, belum merged, belum di DEV (§Masa transisi). Pondasinya (riwayat kontrak + lampiran PDF) sudah ✅ live, diverifikasi ke `bip-erp` `origin/main` `915ca2f8` pada 2026-09-11; rinciannya di §Pondasi yang Sudah Ada.",
+      "status_teks": "**Konsep / Direncanakan** untuk tanda tangan dan e-Meterai; belum ada di kode. ✅ **Pengingat kontrak habis: merged 2026-09-11 (bip-erp PR #1851), naik di DEV 2026-09-11 dan PROD 2026-09-12**; jalan cron DEV sudah terverifikasi, jalan PROD pertama (2026-09-13 07:00 WIB) belum dibaca (§Pengingat Kontrak Habis). ⚠️ **Dokumen PKWT masa transisi (T18): selesai di branch 2026-09-12** (bip-erp `feat/employee-dokumen-pkwt`, erp-frontend `feat/hris-dokumen-pkwt`), PR dibuka 2026-09-12 (bip-erp #1864, erp-frontend #1552), belum merged, belum di DEV (§Masa transisi). Pondasinya (riwayat kontrak + lampiran PDF) sudah ✅ live, diverifikasi ke `bip-erp` `origin/main` `915ca2f8` pada 2026-09-11; rinciannya di §Pondasi yang Sudah Ada.",
       "publik": true,
       "tautan": [
         "ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR",
@@ -8309,20 +8309,20 @@
         "IT - Background Jobs & Schedulers",
         "HRIS - Big Pictures"
       ],
-      "hash": "6bbe1e9a9770b793733907f0437cea932c3f69b312212ccb1aa980b730545533",
-      "ukuran_kb": 46.5,
-      "ringkasan": "Menjawab: bagaimana alur kontrak kerja elektronik PKWT/PKWTT dirancang, mulai dari dokumen isian otomatis dari data HRIS, penandatanganan tatap muka didampingi HRD, tanda tangan direktur dari Ruang Direktur, e-Meterai oleh HR, sampai salinan ke karyawan lewat email atau MyBharata, serta persona siapa saja yang terlibat. Juga menjawab pondasi modul kontrak di employee-service (`employee_contract`, nomor otomatis, lampiran PDF, status ongoing/ending/expired), celah yang harus ditutup (nomor tidak unik, lampiran bisa diganti), cara kerja pengingat kontrak habis, pemetaan field template PKWT ke sumber data, dan hal yang belum diputuskan.",
+      "hash": "d5cede0a9bddecdf7f4b01632bcd9bc675c709bc6fb44274835407535b5dd864",
+      "ukuran_kb": 46.6,
+      "ringkasan": "Menjawab: bagaimana kontrak kerja PKWT/PKWTT ditandatangani secara elektronik tidak tersertifikasi (tatap muka di kantor didampingi HRD, pencocokan NIK dari KTP, direktur menandatangani dari Ruang Direktur), kapan HR membubuhkan e-Meterai, urutan status A atau B, dan apa dasar hukumnya. Juga menjawab cara kerja pengingat kontrak habis (tahap 2 bulan, H-30, H-7, kedaluwarsa mingguan ke supervisor HR, H-14 ke atasan langsung, idempotensi per kontrak-tahap-penerima) serta dokumen PKWT masa transisi yang diisi otomatis dari data sistem dan dikirim opsional ke email karyawan. Memuat pemetaan isian template PKWT ke sumber datanya, celah modul riwayat kontrak `employee_contract` (nomor kontrak tidak unik, lampiran bisa diganti, karyawan tak punya jalur ke kontraknya), lubang keamanan akun terkait, dan daftar hal yang belum diputuskan.",
       "kata_kunci": [
-        "kontrak kerja elektronik",
-        "e-signing",
-        "e-Meterai",
+        "kontrak kerja",
+        "employment contract",
         "PKWT",
-        "PKWTT",
-        "employee_contract",
+        "e-Meterai",
+        "tanda tangan elektronik",
+        "e-signing",
         "pengingat kontrak habis",
-        "template PKWT",
-        "nomor kontrak",
-        "tanda tangan digital"
+        "contract expiry reminder",
+        "employee_contract",
+        "Dokumen PKWT"
       ]
     },
     {
@@ -13694,20 +13694,20 @@
         "ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR",
         "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)"
       ],
-      "hash": "5b40cc9ea70fd9689e5396a2288034a855d08f372ab65466368cf8c6962c0b22",
+      "hash": "39f005a18e2f8b692401332b84d926271e06ad3f1d42e8253fb9273e3dea39f5",
       "ukuran_kb": 17.7,
-      "ringkasan": "Menjawab: task apa saja dan dalam urutan apa untuk mewujudkan tanda tangan kontrak kerja dan pengingat kontrak habis (Gelombang 0 pengingat, prasyarat uji PDF bermeterai, Gelombang 1 pondasi dokumen seperti nomor kontrak unik dan data penandatangan, Gelombang 2-3 alur tanda tangan backend dan layar, keamanan akun, pekerjaan non-kode). Juga mencatat keputusan pemilik proses yang mengikat, jebakan yang menggagalkan rancangan naif (SetaraDirektur, `ReplaceOne` di PATCH kontrak, prefix MinIO `employee/`, data DEV tak mewakili PROD, kontrak PKWT Evaluasi), hal yang belum diputuskan, dan dari mana memulai.",
+      "ringkasan": "Menjawab: task apa saja yang dibutuhkan untuk tanda tangan kontrak kerja dan pengingat kontrak habis, bagaimana urutan gelombangnya, dan apa prasyarat tiap task (uji PDF bermeterai S1, konfirmasi legal, nomor kontrak unik, data penandatangan per perusahaan, masa evaluasi di offer). Juga menjawab keputusan pemilik proses yang mengikat (tanpa PSrE dan e-KYC, tatap muka didampingi HRD, e-Meterai dibubuhkan HR, draf tidak dikirim lebih dulu) serta jebakan yang menggagalkan rancangan naif, seperti `SetaraDirektur` yang meloloskan Corporate Secretary dan `PATCH /contract/:id` yang menimpa dokumen lewat `ReplaceOne`. Mencakup task keamanan akun (limiter PIN, password awal acak, ID perangkat), hasil pengukuran data kontrak prod, daftar TBD per task, dan titik mulai pengerjaan.",
       "kata_kunci": [
         "analisa kebutuhan",
-        "tanda tangan kontrak",
-        "pengingat kontrak habis",
-        "contract reminder",
         "daftar task",
+        "tanda tangan kontrak",
+        "contract signing",
+        "pengingat kontrak habis",
+        "contract expiry reminder",
         "e-Meterai",
-        "PKWT Evaluasi",
-        "nomor kontrak unik",
-        "uji PDF bermeterai",
-        "keamanan akun"
+        "PKWT (Evaluasi)",
+        "Ruang Direktur",
+        "keamanan akun PIN"
       ]
     },
     {
