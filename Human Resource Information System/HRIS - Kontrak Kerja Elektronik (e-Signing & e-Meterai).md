@@ -132,12 +132,16 @@ DRAFT ──▶ MENUNGGU_METERAI ──▶ MENUNGGU_TTD_KARYAWAN ──▶ MENUN
 jalur samping: KOREKSI_DIMINTA (kembali ke DRAFT) · DIBATALKAN (sebelum SELESAI)
 ```
 
-1. **Draft**: HR membuat kontrak baru atau perpanjangan; sistem mengisi template dan menerbitkan PDF draft. Draf boleh dikirim ke email karyawan lebih dulu.
+1. **Draft**: HR membuat kontrak baru atau perpanjangan; sistem mengisi template dan menerbitkan PDF draft. Draf **tidak dikirim ke karyawan lebih dulu** (keputusan pemilik proses 2026-09-12): karyawan menerima dokumennya saat bertemu HR di sesi tatap muka.
 2. **Sesi tatap muka**: karyawan datang ke kantor. HRD membuka sesi untuk kontrak itu di perangkat HR dan mengetik NIK dari KTP fisik; yang tidak cocok dengan `personal_data.nik_number` ditolak.
 3. **TTD karyawan**: karyawan membaca kontrak di layar, menggores tanda tangan, dan menyatakan setuju; atau minta koreksi (kembali ke HR).
 4. **TTD direktur**: kontrak masuk antrean Ruang Direktur; direktur menandatangani satu atau banyak sekaligus.
 5. **Meterai + kunci**: HR membubuhkan e-Meterai di portal distributor lalu mengunggahnya. Sistem menyimpan PDF di prefix arsip, menghitung hash SHA-256, dan mengunci lampiran. Pada urutan A, sistem memeriksa bahwa PDF bermeterai memuat PDF yang ditandatangani tanpa perubahan.
 6. **Selesai**: sistem menerbitkan lembar bukti tanda tangan (PDF terpisah), mengirim salinan (email untuk karyawan baru, "Kontrak Saya" untuk karyawan aktif), dan status di halaman Kontrak HR menjadi selesai.
+
+### Masa transisi: dokumen isian otomatis, kirim opsional
+
+🟡 **Direncanakan** (T18 di `Workspace/ANALISA - Tanda Tangan Kontrak Kerja dan Pengingat Kontrak Habis.md`), keputusan pemilik proses 2026-09-12. Sebelum alur di atas dibangun, HR bisa membuat dokumen PKWT yang diisi otomatis dari data sistem, lalu **boleh mengirimnya ke email karyawan secara opsional**: per kontrak, hanya lewat tombol yang ditekan HR, tanpa kiriman otomatis. Tujuannya menemukan data dan isi template yang masih kurang sebelum alur tanda tangan dibangun, jadi isian yang datanya belum ada di sistem (§Pemetaan Field Template ← Sumber Data) ditandai di dokumen, bukan dikosongkan diam-diam. Tanda tangan tetap basah, dan PDF bertanda tangan diunggah ke riwayat kontrak seperti sekarang. Pengingat kontrak habis tidak melampirkan maupun mengirim dokumen ini. Aturan rancangan akhir tetap: dokumen diberikan saat HR bertemu karyawan, tidak dikirim lebih dulu.
 
 ### Calon karyawan dan karyawan aktif
 
@@ -242,7 +246,7 @@ Diisi otomatis saat dokumen dibuat, bukan diketik ulang. Dicek per isian templat
 - **Calon karyawan batal datang atau menolak menandatangani** sesudah data karyawannya dibuat. Akunnya langsung aktif saat dibuat (`services/employee/func.go:188-190`), jadi orangnya sudah terhitung karyawan aktif (ikut pengingat dan daftar karyawan) sebelum menandatangani. Perlu jalan resmi membatalkannya.
 - **Kontrak yang belum ditandatangani dan pengingat.** Pengingat memilih kontrak ber-`start_date` terbaru tanpa melihat status tanda tangan (field-nya belum ada), jadi kontrak baru yang tertahan di draf atau menunggu tanda tangan membuat kontrak lama tampak sudah diperpanjang, dan tak ada yang diingatkan bila penandatanganannya macet. Kontrak pertama dari create-employee juga langsung dianggap berlaku. Saat status tanda tangan dibangun: kontrak baru baru dihitung sesudah `SELESAI`, atau ada pengingat terpisah untuk tanda tangan yang tertunda.
 - **Aturan pengingat untuk `PKWT (Evaluasi)`** (masa evaluasi 2-3 bulan): tahap 2 bulan dan H-30 jatuh terlalu awal, dan pesan atasan H-14 tumpang tindih dengan Performance Review Onboarding. Opsi: untuk jenis ini lewati tahap 2 bulan (dan mungkin H-30), pertahankan H-7, dan arahkan penilaian ke Performance Review; atau biarkan.
-- **Draf lewat email sebelum datang**: opsional; siapa yang memutuskan per kontrak.
+- **Format dokumen masa transisi** (PDF dibangkitkan sistem atau isian template Word) dan sumber rincian gaji Lampiran 1 untuk dokumen itu (T18). Soal draf sudah diputuskan 2026-09-12: tidak dikirim lebih dulu pada rancangan akhir, kirim opsional hanya di masa transisi (§Masa transisi).
 - **Penolakan atau koreksi di tempat**: bentuk catatannya dan siapa yang memperbaiki.
 - **Nama status** alur tanda tangan dan perlakuan kontrak lama (dianggap lampiran di luar sistem, tanpa status tanda tangan).
 - **Retensi arsip** kontrak bertanda tangan.
