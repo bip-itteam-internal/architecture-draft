@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-11",
+  "digenerate": "2026-09-12",
   "jumlah_dokumen": 393,
   "dokumen": [
     {
@@ -414,20 +414,20 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "5970d7426b23cb8526c5007a4cd50910688f96e69fbfe49c3448edef10ab1f96",
-      "ukuran_kb": 92.8,
-      "ringkasan": "Menjawab: endpoint apa yang tersedia di integration-service (webhook marketplace, order terpadu, retur, packet tracking, piutang, TikTok/Shopee/Accurate, accounting FAT, profit insentif, ICC mapping, kas toko, ulasan, status sinkron toko) beserta parameter dan bentuk responsnya. Berguna untuk mencari rute mana yang dipakai konsumen tertentu seperti WMS, dashboard finance, atau filter atribusi afiliasi Shopee.",
+      "hash": "d21ad21ae27ae8b54a72004a850594aa94e455c15abbf66da5f6def219479801",
+      "ukuran_kb": 93.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service (marketplace TikTok/Shopee/Lazada ke Accurate), parameter dan bentuk respons untuk order, retur, packet tracking, piutang, ekspor, profit insentif, ICC mapping, kas toko, ulasan, dan status sinkron toko. Juga menjawab endpoint mana yang publik (webhook) versus butuh gateway key, serta konsumen tiap endpoint (WMS, Web ERP, Manufacture).",
       "kata_kunci": [
         "integration-service",
         "API marketplace",
+        "Shopee",
+        "TikTok Shop",
+        "Accurate",
         "webhook",
         "transaction orders",
         "retur",
         "packet tracking",
-        "piutang",
-        "accounts receivable",
-        "Accurate",
-        "atribusi Shopee"
+        "piutang"
       ]
     },
     {
@@ -1451,20 +1451,20 @@
         "Finance - Bridging App",
         "GA - Inventory Management"
       ],
-      "hash": "77a04e03336277165a1a15c4136744d42ba01bcaefc18190b14ed99375c5f0e7",
-      "ukuran_kb": 409.0,
-      "ringkasan": "Menjawab: apa itu portal web One Bharata (erp-frontend), stack yang dipakai, bagaimana login, SSO, dan role gating sidebar bekerja, serta bagaimana menu HRIS dan halaman Pengaturan dikelompokkan dan disaring per tab. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts, dan daftar modul/fitur yang sudah ada di web.",
+      "hash": "290e7e065fcabfcf8b45b0c9bdb7796d4240a9420292c68026429241b825fb20",
+      "ukuran_kb": 409.6,
+      "ringkasan": "Menjawab: apa itu portal web One Bharata (erp-frontend), stack yang dipakai, bagaimana login, SSO, dan gating role lewat system_roles bekerja, serta bagaimana menu sidebar dan halaman Pengaturan HRGA dikelompokkan dan disaring per tab. Juga menjawab konvensi data-fetching TanStack Query, konvensi bagan Recharts, fitur multi-perusahaan, dan modul mana yang sudah atau belum ada di web.",
       "kata_kunci": [
-        "web ERP",
+        "Web ERP",
         "erp-frontend",
         "One Bharata",
         "hris-dashboard",
+        "Next.js",
         "SSO",
         "system_roles",
         "sidebar menu",
         "Pengaturan HRGA",
-        "TanStack Query",
-        "Recharts"
+        "TanStack Query"
       ]
     },
     {
