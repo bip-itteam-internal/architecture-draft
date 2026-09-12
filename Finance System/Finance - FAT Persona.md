@@ -37,7 +37,7 @@
 - **Device**: Web ERP.
 - **Tujuan**: "Menjaga kas: piutang tertagih, biaya di dalam anggaran, forecast dipercaya" (`spv.ts:13`).
 - **Pain point**: kotak persetujuan di dashboard hanya memuat proposal dan aksi Sadewa manufaktur serta hasil insentif berstatus DRAFT (`bip-erp/services/integration/internal/interface/http/persetujuan_handler.go:16-19`), sehingga pengajuan barang yang menunggu persetujuannya tidak tampil di sana. Skor KPI-nya memakai skor tim, jadi tak bisa final sebelum anggota dinilai (urutannya anggota, leader, lalu supervisor; lihat [[HRIS - Matriks KPI per Departemen]]).
-- **Aksi utama**: menyetujui tahap `pb_spv_finance` (izin `budget.approve.finance`) dan `pb_finance_setujui_bayar` (`budget.approve.pembayaran`) pada pengajuan barang (`bip-erp/services/procurement/pengajuan_barang_gate.go:41-55`); menggeser tenggat kewajiban pajak; menetapkan target profit level supervisor ([[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]]); menilai KPI tim.
+- **Aksi utama**: menyetujui tahap `pb_spv_finance` (izin `budget.approve.finance`) dan `pb_finance_setujui_bayar` (`budget.approve.pembayaran`) pada pengajuan barang (`bip-erp/services/procurement/pengajuan_barang_gate.go:41-55`); menggeser tenggat kewajiban pajak; menetapkan target profit level supervisor ([[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]]); menilai KPI tim. ⚠️ Di prod (diukur 2026-09-12) seluruh nilai manual Finance April sampai Juli 2026 diketik akun HR, bukan Supervisor; apakah Supervisor menilai di luar sistem **TBD** (lihat subbagian "Siapa menilai" di [[HRIS - Matriks KPI per Departemen]]).
 - **KPI**: "KPI Supervisor Finance", 5 metrik, kelimanya otomatis. Agustus 2026 bernilai 36,8 (Juli 79,7, dinilai manual).
 - ⚠️ **Catatan akses**: satu akun memegang paket untuk hampir semua tahap persetujuan budget (atasan, finance, direksi, GA, procurement, AP, QC, gudang). Di prod baru ada 1 pengajuan barang dan 0 dokumen pembayaran, jadi belum jelas apakah ini penataan masa uji. Pemisahan tugas perlu diputuskan sebelum alur dipakai penuh (**TBD**).
 
@@ -58,7 +58,7 @@
 - **Tujuan**: "Pencatatan harian: lengkap, tepat waktu, tanpa dikoreksi"; dinilai dari kecepatan dan kebersihan input, bukan jumlah baris (`junior-acc.ts:19-20`).
 - **Pain point**: belum ada alur maker-checker (siapa memeriksa input, apa yang terjadi pada input yang ditolak), sehingga metrik "dikoreksi" tak bisa dihitung.
 - **Aksi utama**: mencatat transaksi di Accurate; di ERP melihat KPI Saya.
-- **KPI**: seluruh metrik manual. April sampai Juli 2026, 6 sampai 7 orang bernilai 100 (atau 98,2 sampai 100) setiap bulan pada Accounting CV: metriknya belum membedakan kinerja, perlu dikonfirmasi ke penilai.
+- **KPI**: seluruh metrik manual. April sampai Juli 2026, 6 sampai 7 orang bernilai 100 (atau 98,2 sampai 100) setiap bulan pada Accounting CV: metriknya belum membedakan kinerja. Nilainya diketik akun HR tanpa catatan maupun bukti (`kpi_evidence` 0 dokumen), dan pencatatan harian mereka di Accurate tidak meninggalkan jejak pembuat di ERP (lihat subbagian "Siapa menilai" di [[HRIS - Matriks KPI per Departemen]]).
 
 ### AR Leader: pengejar piutang macet
 - **Peran & Divisi**: AR Leader, grade LEADER, melapor ke Supervisor FAT (`erp-frontend/src/features/finance/posisi/data/ar-leader.ts:12-18`).

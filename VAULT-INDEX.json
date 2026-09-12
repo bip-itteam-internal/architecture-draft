@@ -6722,20 +6722,20 @@
         "CORE - RBAC dan Permission Set",
         "HRIS - Payroll Persona"
       ],
-      "hash": "d5393135ecf6e3252dff0821db95cd4ca762a40e006c5dc9250c7ef51dd0738c",
-      "ukuran_kb": 24.1,
-      "ringkasan": "Menjawab: siapa saja yang bekerja di divisi Finance, Accounting, dan Tax (Supervisor FAT, Senior/Junior Accountant, AR Leader, AR Staff, Account Payable, Cost Control, Tax Officer) serta aktor lintas divisi, apa tujuan, pain point, aksi utama, dan KPI tiap posisi, dan paket izin/RBAC apa yang benar-benar mereka pegang di prod. Juga menjelaskan alur kerja antar posisi: uang keluar lewat pengajuan barang lima tipe, uang masuk marketplace, tutup buku, kas kecil, pajak, insentif, beserta skenario gagalnya.",
+      "hash": "f6555a796d8e182e8d1d73752ca69763fa8b7fed3093f30f94e9835036541c6d",
+      "ukuran_kb": 24.5,
+      "ringkasan": "Menjawab: siapa saja yang bekerja di divisi Finance, Accounting, dan Tax (Supervisor FAT, Senior Accountant, Junior Accountant, AR Leader, AR Staff, Account Payable, Cost Control, Tax Officer), apa tujuan, pain point, aksi utama, dan akses RBAC nyata tiap posisi di produksi (paket posisi, paket akun, tier system_roles). Juga menjawab bagaimana pekerjaan mengalir antar posisi dan aktor lain (pemohon, Procurement, GA, QC, Direktur, Internal Audit) pada alur uang keluar lewat pengajuan barang, uang masuk marketplace, tutup buku, kas kecil, pajak, dan insentif, beserta skenario gagalnya.",
       "kata_kunci": [
-        "persona finance",
-        "FAT",
-        "account payable",
-        "tax officer",
-        "senior accountant",
-        "AR staff",
-        "supervisor finance",
-        "RBAC finance",
-        "permission set",
-        "alur pengajuan barang"
+        "persona FAT",
+        "Finance Accounting Tax",
+        "Account Payable (AP)",
+        "Account Receivable (AR) piutang",
+        "Senior Accountant",
+        "Cost Control",
+        "Tax Officer pajak",
+        "pengajuan barang approval",
+        "kas kecil petty cash",
+        "RBAC paket izin finance"
       ]
     },
     {
@@ -8402,20 +8402,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "e005743de5a74f37f3aebee2bb8d9e8d21af3f698cd5865df55a206791ffc180",
-      "ukuran_kb": 210.7,
-      "ringkasan": "Menjawab: apa isi `kpi_template` di production per departemen dan posisi (label metrik persis, bobot, target/keterangan), berapa metrik tiap departemen yang otomatis, semi, terblokir data, atau manual, dan departemen mana yang belum punya template. Juga memuat ralat soal modul Kaizen dan forecast kas (Kaizen ada di kode tetapi diputuskan tidak dipakai untuk otomasi, ADR 0061), cara membaca dan memperbarui dokumen, serta rincian Finance termasuk konfigurasi `auto`, penetapan, dan penilaian 2026.",
+      "hash": "48940baeee2745053b6d0964f5e6c70db9abd7f7ffea71cbafda6feee02adc31",
+      "ukuran_kb": 218.0,
+      "ringkasan": "Menjawab: metrik, bobot, dan target apa saja yang tersimpan di `kpi_template` production untuk tiap jabatan per departemen (Beauty Hacks, Finance, General Affair, Human Resource, Kesekretariatan, Kyura, Manufaktur, Procurement, Quality, Tech Development), dan berapa metrik per departemen yang tergolong otomatis, semi, terblokir data, atau manual. Juga menjawab kenapa label metrik ditulis persis termasuk typo (label adalah kunci identitas di kode), kenapa target hanya ada di `description`, departemen mana yang belum punya template, serta ralat 2026-08-31 soal modul Kaizen dan sumber `forecast_kas` beserta keputusan Kaizen tidak dipakai untuk otomasi KPI. Dipakai dev departemen sebagai titik awal sebelum mengotomatiskan metrik, termasuk rincian penilaian Finance 2026 (siapa menilai, bukti, dan langit-langit skor SPV Finance).",
       "kata_kunci": [
         "matriks KPI",
         "kpi_template",
+        "template KPI per departemen",
         "metrik KPI",
-        "bobot KPI",
-        "target KPI",
-        "otomasi KPI",
-        "KPI per departemen",
+        "bobot dan target KPI",
+        "otomasi skor KPI",
+        "auto score",
         "Kaizen",
         "forecast kas",
-        "KPI Finance"
+        "penilaian kinerja"
       ]
     },
     {
