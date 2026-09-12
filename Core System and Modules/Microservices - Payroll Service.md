@@ -345,7 +345,7 @@ Gerbang §5a runbook deploy, dijalankan sungguhan lewat `/api/payroll/...`:
 
 ## Dependensi & Integrasi
 
-- [[Microservices - Employee Service]] — master karyawan (NPWP/BPJS/bank) via `employee_id`; juga penyedia `payroll-approx`
+- [[Microservices - Employee Service]] — master karyawan (NPWP/BPJS/bank) via `employee_id`; juga penyedia `payroll-approx`. Sebaliknya employee-service **membaca** `GET /employee-salary/:employeeId` + `GET /salary-components` untuk Lampiran 1 dokumen PKWT masa transisi (T18, di branch 2026-09-12) dengan identitas HR pemanggil; izin `payroll.view` dinilai di employee-service karena `BIP-Permissions` tidak diteruskan
 - [[Microservices - Attendance Service]] — `payroll-supplement` (agregasi kehadiran periode 26→25) = input kalkulasi (Fase 2, **sudah dipakai**)
 - [[CORE - API Master Gateway]] · [[CORE - SSO Flow]] — routing + auth
 - [[DB - Overview and Notes]] — pola database-per-service ([[ADR - 0002 Database-per-Service]])
