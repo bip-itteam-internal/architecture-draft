@@ -335,8 +335,8 @@ pemakaian dari komentar ke dok.
 - **`FilterTable` hanya mengenal `select` dan `date`.** Tidak ada filter angka. Ambang
   numerik jadi preset select atau kontrol sendiri di slot `actions`. Laci berisi lain
   (multi-pilih, pencarian) memakai prop `filterPanel` milik `Banner` + `FilterPanel`/
-  `FilterField`, bukan tipe baru di `FilterTable` (cek sudah di `origin/main`; asalnya
-  erp-frontend branch `feat/ma-saringan-laci`).
+  `FilterField`, bukan tipe baru di `FilterTable` (acuan: `PageShell` Marketing Analytics,
+  erp-frontend #1546).
 - **Aturan saling-kunci antar filter tidak menggabungkan `{...sebelum, ...sesudah}`.**
   Draft `FilterTable` disemai SEKALI saat panel dibuka; key yang hilang berarti "tak
   berubah", bukan "dikosongkan". Objek kosong `{}` ditangani lebih dulu = kosongkan semua.
