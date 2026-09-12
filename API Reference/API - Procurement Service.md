@@ -1,9 +1,9 @@
 ## Deskripsi
 
-*Endpoint **procurement-service** (master Pemasok + master Barang & Jasa: CRUD, penomoran, katalog, import awal, worker sync ke Accurate; plus cermin baca-saja Pembelian: Pesanan/Penerimaan/Permintaan Barang). Gateway: `/api/procurement/*`. Grounded ke `services/procurement/`.*
+*Endpoint **procurement-service** (master Pemasok + master Barang & Jasa: CRUD, penomoran, katalog, import awal, worker sync ke Accurate; cermin baca-saja Pembelian: Pesanan/Penerimaan/Permintaan Barang; Tagihan Pemasok + Pembayaran Vendor + Aging Utang; Pengajuan Barang lima tipe dengan alur berjenjang; dan modul Kas Kecil + Pengajuan Budget yang menumpang service ini). Gateway: `/api/procurement/*`. Grounded ke `services/procurement/` (snapshot origin/main 2026-09-12 pagi).*
 
-- **Implementasi**: [[Microservices - Procurement Service]] · **Status**: ⚠️ Implemented (ada catatan) — backend Pemasok/Barang lengkap & terverifikasi berjalan lokal (119 test PASS); belum di-deploy, import awal (pemasok maupun barang) belum dijalankan di produksi. Modul Pembelian (PR #810) ✅ terverifikasi terhadap Accurate produksi read-only.
-- **Indeks**: [[API - Index]] · Auth: gateway key `BIP-Gateway-ID` untuk semua route, plus role guard via `BIP-System-Roles` header (`system_roles["procurement"]`). Role yang diterima: `staff`, `spv`, `admin`; route import khusus `admin`.
+- **Implementasi**: [[Microservices - Procurement Service]] · **Status**: ⚠️ Implemented (ada catatan). Baris status sebelumnya di dok ini menyatakan service **belum di-deploy** dan import awal **belum dijalankan**, itu **usang**: [[Microservices - Procurement Service]] mencatat koreksi 2026-08-04, sudah deploy dan terisi di produksi (sensus `procurement_db` 4 Agustus 2026). Detail sensus per koleksi tidak diulang di sini, lihat dok itu. Modul Pembelian (PR #810) ✅ terverifikasi terhadap Accurate produksi read-only.
+- **Indeks**: [[API - Index]] · Auth: gateway key `BIP-Gateway-ID` untuk semua route, plus **permission-set** (ADR 0030) lewat header `BIP-System-Roles`/klaim JWT, **bukan lagi** guard tier `system_roles["procurement"]` yang tercatat di versi lama dok ini. Akun yang belum ditugaskan paket izin tetap dilayani **fallback tier** (`common.ProcurementTierDefault`) supaya akses lama tidak putus (`main.go:575-588`, diverifikasi). Modul Kas Kecil murni (bukan Pengajuan Budget) **tidak punya fallback tier**, lihat [[Finance - Kas Kecil dan Pengajuan Budget]] §Izin.
 
 ## Master Pemasok (✅ Diimplementasikan)
 
@@ -368,43 +368,135 @@ Entitas **milik ERP** (koleksi `penerimaan_erp`), melengkapi rantai PR→PO→RI
 
 > **No Terima ≠ No Form.** No Form (`number`) di-generate sistem & unik; No Terima (`no_terima`) nomor surat jalan pemasok yang **diketik manual** gudang/QC, wajib tapi tak dijamin unik. Gudang **wajib** per baris.
 
-## Pengajuan Pembelian — rantai delapan tahap (✅ Diimplementasikan)
+## Pengajuan Barang (lima tipe, menggantikan Pengajuan Pembelian) (✅ Diimplementasikan)
 
-Modul [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]], koleksi `pengajuan_pembelian`. Prefix `/pengajuan-pembelian`, **bukan** `/pembelian`: prefiks yang terakhir sudah dipakai cermin Accurate di atas, dan rute `:nomor` di sini akan menelannya.
+**Modul lama dihapus dari kode, diverifikasi 2026-09-12.** Prefix `/pengajuan-pembelian` beserta seluruh sub-rute yang sebelumnya didokumentasikan di bagian ini (`/saya`, `/perlu-aksi`, `/penyetuju*`, `/beli`, `/bayar`, `/terima`, `/stok/coba-lagi`, `PATCH /alokasi`, izin `budget.pengajuan.software`) **tidak ada lagi** di `services/procurement/`. Komentar `main.go:1105-1115` menyebutnya diganti "pengajuan barang lima tipe", sekaligus melebur alur permintaan barang gudang GA yang sebelumnya berada di inventory-service. Koleksi `PenunjukanPembelian` (penunjukan penyetuju per tahap ala [[ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap]]) tidak lagi punya satu pun rute HTTP; index Mongo-nya masih dipasang (`main.go:291-309`). `GET /internal/permission-holders` milik employee-service TETAP dipanggil service ini, kini untuk mencari penerima notifikasi tahap (`pengajuan_barang_notify_kirim.go:373`), bukan lagi lewat rute proksi kandidat penyetuju.
 
-⛔ **Rute literal didaftarkan sebelum saudara ber-`:nomor`.** Fiber mencocokkan sesuai urutan pendaftaran, dan rute yang tertelan membalas 200 berisi bentuk yang masuk akal, bukan 404.
+Koleksi baru `pengajuan_barang`, prefix rute `/pengajuan-barang` (`pengajuan_barang_handler.go:34-77`). Lima tipe (`pengajuan_barang_jenjang.go:11-22`): `UMUM`, `RAWMATERIAL`, `IKLAN`, `DANA`, `KONSUMSI`. KONSUMSI sengaja berbagi izin dengan DANA (keputusan bisnis eksplisit, bukan default tersembunyi). Status dokumen: `DRAFT`, `BERJALAN`, `SELESAI`, `DITOLAK`, `REVISI`, `DIBATALKAN`.
 
-Gerbangnya berlapis: gerbang rute menyaring "punya urusan dengan modul ini", sedangkan yang memutuskan apakah izin pemanggil COCOK dengan TAHAP yang sedang berjalan adalah handler — gerbang rute tak dapat melihat dokumennya.
+⛔ **Gerbang per tahap berada DI DALAM handler (`BolehMenindakTahap`, `pengajuan_barang_gate.go:210-241`), bukan middleware rute.** `DaftarkanRutePengajuanBarang(internal)` dipasang tanpa satu izin pun di gerbang rute karena wewenangnya berbeda tiap tahap, dan sebagian ditentukan hubungan organisasi, bukan izin (lihat kolom Wewenang di tabel bawah).
+
+| Method | Path | Fungsi | Wewenang |
+|---|---|---|---|
+| POST | `/pengajuan-barang/lampiran` | Unggah bukti SEBELUM dokumen dibuat, dipakai tipe DANA yang mensyaratkan bukti sudah ditalangi. Rute literal, wajib terdaftar sebelum `/:id`. | Terautentikasi (identitas dari header) |
+| POST | `/pengajuan-barang` | Buat pengajuan, lahir `DRAFT`. Body: `tipe`, `departemen?` (jatuh ke header bila kosong), `items[]`, `lampiran[]`, `tautan?`, `sudah_ditalangi`, `sumber_dana?`, `proyek_pembebanan?`. | Izin sesuai tipe (`IzinAjukanUntukTipe`): `budget.pengajuan.umum` / `.rawmaterial` / `.iklan` / `.dana` (DANA dan KONSUMSI sama-sama `.dana`) |
+| GET | `/pengajuan-barang` | Daftar dalam cakupan pemanggil. Query: `tipe`, `status`, `pengaju_id`, `perlu_perhatian` (dibandingkan string `"true"` persis). | Terautentikasi |
+| GET | `/pengajuan-barang/milik-saya` | Pengajuan milik pemanggil sendiri. | Terautentikasi |
+| GET | `/pengajuan-barang/antrean` | "Perlu aksi saya", tahap yang boleh ditindak pemanggil, disaring `TahapYangBolehDitindak` (memanggil `BolehMenindakTahap` yang sama, dikunci test `TestTahapYangBolehDitindak_SepakatDenganGerbang`). | Terautentikasi |
+| GET | `/pengajuan-barang/pembukuan` | Daftar keadaan pembukuan (jurnal ke Accurate) atas pengajuan uang, bawaan hanya yang GAGAL; `semua=true` untuk rekonsiliasi. | `budget.jurnal.view`, BUKAN `budget.view` yang dipegang setiap pemohon |
+| GET | `/pengajuan-barang/:id` | Detail. | Terautentikasi |
+| POST | `/pengajuan-barang/:id/setujui` | Menyetujui tahap berjalan. Tahap `pb_ap_transfer` menerima isian transfer (sumber dana + akun beban, divalidasi ke katalog Accurate bila terjangkau); ekor stok/bayar/jurnal dijalankan sesudah tahap maju. | `BolehMenindakTahap` per tahap, lihat peta di bawah |
+| POST | `/pengajuan-barang/:id/tolak` | Menolak, `alasan` wajib. | `BolehMenindakTahap` |
+| POST | `/pengajuan-barang/:id/revisi` | Mengembalikan untuk revisi, `alasan` wajib. | `BolehMenindakTahap` |
+| POST | `/pengajuan-barang/:id/ajukan-ulang` | Pengaju mengajukan ulang dokumen berstatus REVISI, boleh sekalian menyunting isi (`SuntinganPengajuan`) sebelum diajukan. | Hanya `Pengaju.ID`, bukan `BolehMenindakTahap` (dokumen REVISI tidak punya tahap berjalan) |
+| POST | `/pengajuan-barang/:id/cek-stok` | Menjawab cukup/tidaknya stok gudang; jawaban ini membekukan sisa jenjang. | `BolehMenindakTahap` (tahap `pb_cek_stok_ga`) |
+| POST | `/pengajuan-barang/:id/qc` | Mencatat hasil QC per baris barang (qty lulus/reject/karantina, batch, expired). Menggantikan makna lama `qc-gagal`; dokumen maju hanya bila karantina nol. | `BolehMenindakTahap` (tahap `pb_qc` / `pb_qc_ga`) |
+| POST | `/pengajuan-barang/:id/qc-gagal` | Rute LAMA, sengaja dipertahankan untuk kasus seluruh kiriman ditolak (tak ada angka per-baris yang perlu dicatat). Mengembalikan dokumen ke tahap procurement, bukan menolak. | `BolehMenindakTahap` |
+| POST | `/pengajuan-barang/:id/kembali-qc` | Memulangkan dokumen dari tahap penerimaan ke QC untuk cacat yang baru ketahuan saat barang dibuka. | `BolehMenindakTahap` |
+| POST | `/pengajuan-barang/:id/harga` | Procurement mengisi harga per baris, menaut ke master barang, memilih gudang tujuan; sisa jenjang dibekukan di sini. Tipe RAWMATERIAL divalidasi ke katalog bahan baku bila terjangkau. | `BolehMenindakTahap` (tahap `pb_procurement_beli`) |
+| POST | `/pengajuan-barang/:id/klaim-selesai` | Menutup klaim ke pemasok (barang diganti atau uang kembali). Dokumen sering sudah SELESAI (tahap kosong) sehingga tidak bisa digerbang `BolehMenindakTahap`. | Izin langsung `budget.approve.procurement` |
+| POST | `/pengajuan-barang/:id/ulangi-stok` | Mengulang HANYA penulisan stok yang gagal, kunci idempoten sama. Dokumen sering sudah maju/SELESAI sehingga tidak bisa digerbang tahap. | Izin langsung `budget.terima.ga` atau `budget.terima.rm` |
+| POST | `/pengajuan-barang/:id/terbitkan-faktur` | AP menerbitkan faktur pembelian dari hasil QC, memicu antrean sync ke Accurate (tidak menulis langsung). Idempoten lewat `bill_number` deterministik (`PB-<nomor pengajuan>`); qty yang berubah antar-sesi QC bertahap ditangani `PutuskanFakturAda`, bukan sekadar dibalas dari cache. | `BolehMenerbitkanFaktur`: izin `budget.ap.bayar` DAN status dokumen `BERJALAN` atau `SELESAI`, bukan gerbang tahap (`pengajuan_barang_gate.go:349-387`) |
+| POST | `/pengajuan-barang/:id/lampiran` | Unggah lampiran ke dokumen yang sudah ada. Hanya foto (jpg/jpeg/png/webp) dan PDF, maksimum 5 berkas per dokumen, 4 MB per berkas (beda dari lampiran Pengajuan Budget yang juga menerima office). | Terautentikasi, gerbang tahap tidak berlaku untuk lampiran |
+| DELETE | `/pengajuan-barang/:id/lampiran` | Hapus lampiran. | Terautentikasi |
+| GET | `/pengajuan-barang/:id/lampiran/pratinjau` | Pratinjau berkas lampiran. | Terautentikasi |
+| GET | `/pengajuan-barang/:nomor/pembayaran` | Menemukan dokumen pembayaran dari nomor pengajuan (AP bekerja dari nomor pengajuan, unggah bukti transfer beralamat id pembayaran, lihat bagian Bukti Transfer di bawah). | `budget.view` (`main.go:1143-1144`) |
+
+> **Lampiran punya endpoint unggah, bertentangan dengan catatan lama di dok ini.** Versi sebelumnya bagian "Belum Diimplementasikan" menyatakan lampiran pengajuan pembelian tidak punya endpoint unggah, itu berlaku untuk modul lama yang sudah dihapus. Modul Pengajuan Barang punya jalur unggah sebelum dan sesudah dokumen dibuat (`pengajuan_barang_lampiran.go`).
+
+**Peta tahap ke izin** (`izinPerTahap`, `pengajuan_barang_gate.go:41-55`, sumber tunggal, jangan disalin ke dok lain):
+
+| Tahap | Izin / dasar wewenang |
+|---|---|
+| `pb_spv_divisi` | Hubungan organisasi: atasan menaungi `Pengaju.Departemen` (bukan izin) |
+| `pb_spv_manufactur` | Hubungan organisasi: atasan menaungi departemen Manufaktur (nama diambil dari `common.DepartmentNameFromKey`, bukan literal) |
+| `pb_cek_stok_ga` | `budget.cek.stok` |
+| `pb_serah_ga` | `budget.terima.ga` |
+| `pb_spv_finance` | `budget.approve.finance` |
+| `pb_direktur` | `budget.approve.direksi` |
+| `pb_procurement_beli` | `budget.approve.procurement` |
+| `pb_finance_setujui_bayar` | `budget.approve.pembayaran` |
+| `pb_ap_transfer` | `budget.ap.bayar` |
+| `pb_qc` | `budget.qc.periksa` |
+| `pb_qc_ga` | `budget.terima.ga` (gudang GA yang memegang barangnya, bukan QC produksi) |
+| `pb_terima_ga` | `budget.terima.ga` |
+| `pb_terima_rm` | `budget.terima.rm` |
+
+> Pengaju TIDAK boleh menindak tahap keputusan atas dokumennya sendiri. `tahapKeputusanPengaju` lebih luas dari tahap persetujuan saja, ikut mencakup `pb_cek_stok_ga` dan `pb_procurement_beli` karena keduanya menentukan uang meski bukan tahap "approval" secara nama.
+
+> **Jejak langkah membawa pelakunya.** Tiap baris `riwayat` menyimpan `oleh` (employee_id) plus `nama` dan `posisi` yang **dibekukan saat tindakan terjadi**, diambil dari header `BIP-Fullname`/`BIP-Position`. Pola ini diwarisi dari modul lama.
+
+> **Pengabaran.** Tiap perpindahan tahap mengirim inbox berkategori `pengajuan-barang-*` (konstanta di `pengajuan_barang_notify.go:15` dan seterusnya, mis. `pengajuan-barang-perlu-persetujuan`, `pengajuan-barang-perlu-cek-stok`); penerimanya dicari lewat `GET /internal/permission-holders` milik employee-service (`pengajuan_barang_notify_kirim.go:373`). Kategori `pembelian-perlu-aksi`/`pembelian-diperbarui` yang tercatat di versi lama dok ini milik modul yang sudah dihapus. Bukti transfer punya dua kategori sendiri, `pengajuan-barang-bukti-perlu-review` dan `pengajuan-barang-bukti-disetujui` (`bukti_transfer_handler.go:47-48`); penolakan bukti sengaja dikirim ke AP dengan kategori perlu-review (`:476-480`).
+
+## Tagihan Pemasok, Pembayaran & Aging Utang (✅ Diimplementasikan)
+
+Koleksi `faktur_pembelian` (Accounts Payable). Berbeda dari Pembelian cermin Accurate di atas: tagihan **dibuat di ERP** lalu disinkronkan ke Accurate lewat antrean worker yang sama dengan master Pemasok/Barang, bukan sekadar ditarik baca-saja.
+
+| Method | Path | Fungsi | Izin |
+|---|---|---|---|
+| GET | `/tagihan` | Daftar tagihan pemasok. | `procurement.view` |
+| POST | `/tagihan` | Buat tagihan. | `procurement.tagihan.save` |
+| POST | `/tagihan/import` | Import tagihan dari Accurate (finance sudah mencatat langsung di sana sebelum modul ini ada). Rute LITERAL, wajib sebelum `/tagihan/:id/...` (dikunci `TestRuteImportFakturTidakTertangkapSebagaiID`). | `procurement.import` |
+| GET | `/tagihan/aging` | Sebaran nominal utang menurut jatuh tempo (dashboard AP), diagregasi backend agar zona waktu peramban tidak menggeser embernya. Rute literal, wajib sebelum `/tagihan/:id` (`TestRuteAgingTidakTertangkapSebagaiID`). | `procurement.view` |
+| GET | `/tagihan/per-pemasok` | Sisa utang dikelompokkan per pemasok (panel bar dashboard AP). Rute literal, wajib sebelum `/tagihan/:id` (`TestRutePerPemasokTidakTertangkapSebagaiID`). | `procurement.view` |
+| GET | `/tagihan/:id` | Detail tagihan, termasuk `total_down_payment` (uang muka yang sudah dialokasikan ke tagihan ini) dan `prime_owing` (sisa utang). | `procurement.view` |
+| GET | `/tagihan/:id/pembayaran` | Riwayat pembayaran atas satu tagihan. | `procurement.view` |
+| POST | `/tagihan/:id/kirim` | Melepas faktur berstatus DITAHAN ke antrean sync (DITAHAN ke PENDING). Faktur dari Pengajuan Barang sengaja tidak terkirim otomatis, layak ditinjau dulu sebelum masuk pembukuan sungguhan; worker yang benar-benar mengirim. | `procurement.tagihan.save` |
+| POST | `/tagihan/:id/tahan` | Menahan faktur yang gagal sync supaya berhenti dicoba ulang (lawan dari `/kirim`). Tanpa ini, faktur yang gagal karena datanya sendiri salah dicoba ulang tanpa batas. | `procurement.tagihan.save` |
+| POST | `/tagihan/:id/pembayaran` | Mencatat pembayaran baru atas satu tagihan (menentukan nominal & akun dari body). | `procurement.bayar.save` |
+| POST | `/pembayaran/:id/kirim` | Mengirim baris pembayaran yang **sudah tercatat** ke Accurate (`purchase-payment/save.do`). **Sengaja dipicu manusia, bukan worker**: rute ini menarik sisa utang terkini dari Accurate sebelum menembak sebagai penjaga kelebihan bayar, dan worker otomatis akan melewatkan pemeriksaan itu (`pembayaran_kirim.go:12-35`). Menutup celah lama: pembayaran hasil `SusunPembayaranDariPengajuan` sempat lahir PENDING tanpa satu pun worker yang memprosesnya. Menolak bila status bukan PENDING, bila bukti transfer belum diunggah atau ditolak pemeriksa, atau bila faktur belum tersinkron ke Accurate. | `procurement.bayar.save` |
+
+## Bukti Transfer (✅ Diimplementasikan)
+
+Melayani KEDUA asal pembayaran (tagihan vendor maupun Pengajuan Barang), sebab yang dibuktikan sama-sama uang keluar dari bank. **Tiga gerbang berbeda dengan sengaja**: yang mengunggah bukti tidak boleh memeriksa buktinya sendiri (`main.go:1117-1150`).
+
+| Method | Path | Fungsi | Izin |
+|---|---|---|---|
+| GET | `/pembayaran/antrean-bukti` | Antrean bukti yang menunggu diperiksa. Rute literal, wajib sebelum `/pembayaran/:id/...`. | `budget.bukti.review` |
+| POST | `/pembayaran/:id/bukti-transfer/review` | Menyetujui atau menolak bukti transfer. | `budget.bukti.review` |
+| GET | `/pembayaran/:id/bukti-transfer/file` | Mengunduh berkas bukti. | `budget.view` |
+| POST | `/pembayaran/:id/bukti-transfer` | Mengunggah bukti transfer atas satu baris pembayaran. `409` bila bukti sudah disetujui, `403` bila bukan milik pengunggah. | `budget.ap.bayar` |
+
+## KPI Account Payable (Internal, ✅ Diimplementasikan)
+
+Dua endpoint dipanggil **employee-service** (mesin, bukan manusia) saat menghitung skor KPI, digerbang **dua lapis**: header gateway biasa (siapa pun karyawan yang login lewat `/api/procurement/...` lolos lapis ini) DAN `?key=` yang dicocokkan ke env `PROCUREMENT_SERVICE_KEY` lewat `gerbangKunciLayananKPI` (`kpi_pembayaran.go:39-54`, pola sama `services/monitoring/kpi_uptime.go`). Kunci yang belum dikonfigurasi MENUTUP rute, bukan membukanya.
 
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/pengajuan-pembelian` | Daftar dalam cakupan pemanggil. Query: `tipe`, `status`, `batas` (bawaan 100, maksimum 500). |
-| GET | `/pengajuan-pembelian/saya` | Pengajuan milik pemanggil. Rute terpisah, bukan penyaring atas daftar umum: staf pengaju tak punya cakupan apa pun sehingga daftar umum kosong baginya. |
-| GET | `/pengajuan-pembelian/perlu-aksi` | Antrean yang menunggu tindakan pemanggil. Tahap mana saja yang masuk ditentukan izin **dan** penunjukan per tahap ([[ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap]]); frontend tidak merakit daftarnya sendiri. |
-| GET | `/pengajuan-pembelian/penyetuju` | Penunjukan seluruh tahap yang dapat ditetapkan, termasuk yang masih kosong (agar layar dapat membedakan "belum ditetapkan" dari "tahap tak ada"). Izin `budget.master.save`. |
-| GET | `/pengajuan-pembelian/penyetuju/kandidat?tahap=` | Pemegang izin tahap itu, diproksi ke `GET /internal/permission-holders` milik employee-service. **Layar tak pernah menyebut nama izin**: peta tahap→izin tinggal di service ini. `400` tahap tak dikenal, `502` employee-service tak terjangkau. Izin `budget.master.save`. |
-| PUT | `/pengajuan-pembelian/penyetuju/:tahap` | Menetapkan penyetuju satu tahap. Body `{"employee_ids": [...]}`; daftar kosong = kembalikan ke seluruh pemegang izin. `400` bila tahap tak dikenal, bila tahap `spv_divisi` (penyetujunya mengikuti departemen pengaju, diatur di HRIS), atau bila ada id yang **tidak memegang izin tahap itu**. `502` bila izin tak dapat diperiksa (gagal-tertutup). Izin `budget.master.save`. |
-| POST | `/pengajuan-pembelian` | Buat pengajuan. Selalu lahir **DRAFT**; `jenjang_wajib` belum dibekukan. `nominal` dihitung server dari Σ subtotal item dan **ditolak 400 bila dikirim klien**. Digerbang per TIPE (`budget.pengajuan.{umum,rawmaterial,software,iklan}`) di dalam handler, sebab tipe dibaca dari body. |
-| GET | `/pengajuan-pembelian/:nomor` | Detail. Pengaju selalu boleh melihat miliknya; selebihnya mengikuti cakupan departemen. |
-| PATCH | `/pengajuan-pembelian/:nomor` | Sunting DRAFT/REVISI oleh pengajunya. Menerima `keperluan`, `kategori_kode`, `tautan`, `items`. **TIPE tidak dapat diubah**, bahkan saat draft. Nilai kosong berarti "jangan sentuh", sehingga `tautan` yang sudah terisi tidak dapat dikosongkan lewat rute ini. |
-| POST | `/pengajuan-pembelian/:nomor/ajukan` | Membekukan `jenjang_wajib` dan ambang Direktur, lalu menjalankan dokumen. REVISI ikut boleh diajukan, dan jenjangnya **dihitung ulang**. |
-| POST | `/pengajuan-pembelian/:nomor/batal` | Pembatalan oleh pengaju. Ditolak `409` bila `nomor_po` sudah terisi. |
-| POST | `/pengajuan-pembelian/:nomor/setujui` · `/tolak` · `/revisi` | Gerbang persetujuan. Alasan **wajib** pada tolak dan revisi. `DITOLAK` hanya untuk penolakan saat belum ada uang keluar. |
-| POST | `/pengajuan-pembelian/:nomor/beli` | Tahap Procurement (`budget.approve.procurement`). Mencatat `nomor_po`; putaran kedua tidak menerbitkan PO baru. |
-| POST | `/pengajuan-pembelian/:nomor/bayar` | Tahap AP (`budget.ap.bayar`). Mencatat `id_pembayaran`. |
-| POST | `/pengajuan-pembelian/:nomor/qc` | Pemeriksaan mutu raw material (`budget.qc.periksa`). TIDAK LOLOS mengembalikan dokumen ke Procurement dengan status tetap `BERJALAN`, bukan `DITOLAK`. |
-| POST | `/pengajuan-pembelian/:nomor/terima` | Penerimaan gudang (`budget.terima.ga` / `budget.terima.rm`). Bertahap; `stok_ditulis: false` datang lewat jalur SUKSES dan wajib diperiksa pemanggil. |
-| POST | `/pengajuan-pembelian/:nomor/stok/coba-lagi` | Mengulang HANYA penulisan stok yang gagal. Body kosong: angkanya diambil server dari catatan penerimaan terakhir. |
-| PATCH | `/pengajuan-pembelian/:nomor/alokasi` | Alokasi akuntansi oleh Finance (`budget.approve.finance`). **Belum punya konsumen frontend.** |
+| GET | `/faktur/pembayaran-tren?bulan=YYYY-MM&key=...` | Tren ketepatan waktu pembayaran hutang per bulan: `tepat_waktu_persen` (nil bila tidak ada faktur yang bisa dinilai bulan itu, dibedakan sengaja dari 0% atau 100%), jumlah jatuh tempo/tepat waktu/terlambat/belum lunas/dikecualikan. Faktur lunas lewat alokasi uang muka (tanpa `lastPaymentDate` individual) dikecualikan dari penyebut, bukan dihukum maupun diluluskan. Menarik seluruh `purchase-invoice/list.do` dari Accurate, di-cache 1 jam in-memory. |
+| GET | `/pengajuan/kpi-ap?key=...` | Realisasi pengajuan untuk KPI Account Payable: ketepatan waktu (ambang 30 menit) dan ketepatan nominal. Gerbang dua lapis sama seperti di atas. |
 
-> **Jejak langkah membawa pelakunya.** Tiap baris `riwayat` menyimpan `oleh` (employee_id) plus `nama` dan `posisi` yang **dibekukan saat tindakan terjadi**, diambil dari header `BIP-Fullname`/`BIP-Position` sehingga tak menuntut satu pun panggilan lintas service. Sengaja tidak diterjemahkan dari `oleh` saat dibaca: jabatan berubah, dan jejak yang menerjemahkannya belakangan akan menyatakan bahwa yang menyetujui setahun lalu adalah jabatannya yang sekarang. Keduanya `omitempty` — baris yang dibuat sebelum field ini ada tidak memilikinya, dan pembacanya **wajib jatuh ke `oleh`**, bukan menampilkan kosong.
+## Kas Kecil & Pengajuan Budget (ringkas, ✅ Diimplementasikan)
 
-> **Pengabaran.** Tiap perpindahan tahap mengirim inbox `pembelian-perlu-aksi` ke penindak berikutnya, dan `pembelian-diperbarui` ke pengaju saat ditolak, diminta revisi, atau selesai. Best-effort: kegagalannya di-log dan tidak membatalkan transisi. Tahap yang **belum ditetapkan penyetujunya** sengaja tidak dikabari (dicatat di log), sebab menebak nama departemen tiap tahap di kode menghasilkan filter yang tak cocok dengan siapa pun: nol notifikasi tanpa satu pun tanda.
+Modul ini menumpang procurement-service demi menghemat satu modul gateway; isinya BUKAN cermin Accurate seperti sisa service ini, justru berhenti SEBELUM Accurate. **Aturan bisnis, jenjang persetujuan per Tujuan, ambang plafon, dan tabel endpoint inti kas kecil sudah lengkap di [[Finance - Kas Kecil dan Pengajuan Budget]] (§Sudah Ada di Kode, §Endpoint) dan TIDAK diulang di sini** (satu fakta satu tempat). Tabel di bawah hanya melengkapi rute yang belum tercatat di dok itu.
+
+| Method | Path | Fungsi | Izin |
+|---|---|---|---|
+| GET | `/kas/departemen` | Daftar departemen yang punya unit kas kecil, untuk dropdown plafon. | `kaskecil.view` |
+| GET / POST | `/kas/plafon` | Lihat / tetapkan plafon kas kecil per departemen per periode. | `kaskecil.view` (baca) · `kaskecil.master.save` (tulis) |
+| GET | `/kas/akun` · `/kas/cv` · `/kas/proyek` | Katalog Accurate untuk dropdown transaksi kas kecil: akun beban, CV (sumber dana), proyek karyawan. Ditarik hidup dari integration-service, bukan disalin jadi master ERP. | `kaskecil.view` |
+| GET | `/katalog/akun-beban` · `/katalog/sumber-dana/pt` · `/katalog/sumber-dana/cv` · `/katalog/proyek` · `/katalog/bahan-baku` · `/katalog/satuan` | Alamat NETRAL (tanpa prefix `/kas/`) untuk katalog Accurate yang sama, dipakai bersama modul Pengajuan Barang supaya pengaju dari divisi lain (PPIC, GA, marketing) tidak tergerbang izin kas kecil. Handler dipakai ulang, bukan disalin. `/katalog/bahan-baku` diteruskan dari manufaktur (kode bahan baku sah untuk tipe RAWMATERIAL). | `budget.view` ATAU izin kas manapun (`katalogBaca`, OR eksplisit) |
+| GET | `/katalog/gudang` | Daftar gudang Accurate untuk dropdown pengaturan. | `procurement.view` |
+| GET | `/kas/saldo` | Plafon, terpakai, sisa satu unit kas. | `kaskecil.view` |
+| POST | `/kas/putuskan-jalur` | Menjawab jalur mana yang berlaku (kas kecil vs pengajuan budget) untuk sebuah rencana transaksi, TANPA mencatat apa pun. | Baca kas |
+| GET | `/kas/buku-besar` | Baris + saldo berjalan, bentuk yang dicocokkan pemegang kas dengan uang fisik di tangannya. | `kaskecil.view` |
+| GET | `/kas/jurnal/pratinjau` · POST `/kas/jurnal/kirim` · POST `/kas/jurnal/:nomor/batal` | Jurnal harian ke Accurate. Urutan pendaftaran mengikat: pratinjau & kirim WAJIB sebelum `:nomor/batal`. | `kaskecil.approve.finance` |
+| GET | `/kas/alokasi/pratinjau` · POST `/kas/alokasi/kirim` | Alokasi awal bulan: membongkar penampung akun 2205 jadi beban per CV, satu Journal Voucher per CV. | `kaskecil.approve.finance` |
+| PATCH | `/kas/transaksi/:nomor/akun` | Penetapan akun beban oleh Finance, terpisah dari mencatat transaksi. | `kaskecil.approve.finance` |
+| POST | `/kas/transaksi/:nomor/cek-cc` | Cek CC (kartu kredit korporat) oleh Finance. | `kaskecil.approve.finance` |
+| GET / POST | `/budget/parameter` | Parameter berversi jalur PENGAJUAN BUDGET (ambang Direktur, dll), koleksi sama dengan `/kas/parameter` tapi lingkup kunci terpisah. | `kaskecil.view` (baca) · `kaskecil.master.save` (tulis, belum punya izin master sendiri) |
+| GET | `/budget/pengajuan` | Daftar pengajuan budget (di luar antrean persetujuan yang sudah didokumentasikan di [[Finance - Kas Kecil dan Pengajuan Budget]]). | `gateBacaBudget` |
+| GET | `/budget/pengajuan/:nomor` | Detail satu pengajuan budget. | `gateBacaBudget` |
+| PATCH | `/budget/pengajuan/:nomor` | Pemohon menyunting pengajuan miliknya sendiri; handler yang memverifikasi kepemilikan. | `budget.pengajuan.save` |
+| POST | `/budget/pengajuan/:nomor/batal` | Pembatalan oleh pemohon. | `budget.pengajuan.save` |
+| PATCH | `/budget/pengajuan/:nomor/alokasi` | Alokasi akuntansi (akun beban/CV/proyek) oleh Finance, tahap terakhir sebelum Direktur atau tahap tunggal bila jenjang tidak sampai Direktur. | `budget.approve.finance` |
+| POST | `/katalog/impor` | Penyegaran manual katalog Accurate (akun, cabang, departemen, kategori barang, satuan, pajak, dll), dipakai kas kecil DAN Pengajuan Barang. | `procurement.import` |
+
+> **Gerbang rute persetujuan budget sengaja LONGGAR.** `POST /budget/pengajuan/:nomor/setujui|tolak|revisi` meloloskan siapa pun pemegang salah satu izin `budget.approve.{finance,direksi,aset,procurement}` di gerbang rute; yang memutuskan izin mana yang COCOK dengan tahap berjalan pada dokumen tertentu adalah handler. Lolos di gerbang rute TIDAK berarti berwenang menyetujui tahap ini.
 
 ## Belum Diimplementasikan / Catatan
 
-- **Rute kas kecil, pengajuan budget lama, dan katalog Accurate belum didaftar di dokumen ini** (TBD). Yang sudah didaftar hanya master pemasok/barang, cermin Pembelian, rantai PR→PO→RI, dan Pengajuan Pembelian.
-- **Lampiran pengajuan pembelian tidak punya endpoint unggah.** Field `lampiran` ada di model dan sengaja dinolkan saat pembuatan, tetapi tak ada rute yang mengisinya.
+- **Lampiran pengajuan pembelian tidak punya endpoint unggah** sudah **tidak berlaku**; itu klaim atas modul lama yang dihapus. Lihat catatan di bagian Pengajuan Barang di atas.
 - Tidak ada endpoint **hapus pemasok** maupun **hapus barang** — penghapusan master dilakukan finance/procurement di Accurate.
 - Tidak ada endpoint **pemicu sync manual**; worker berjalan otomatis tiap 30 detik atas baris `PENDING`/`FAILED` (pemasok maupun barang).
 - **Toggle boolean pada `PUT /barang/:id`** (`pakai_ppn`, `kelola_nomor_seri`, `pakai_kadaluarsa`) hanya bisa **diaktifkan**, tidak bisa dinonaktifkan oleh payload yang tidak mengirim field itu — batasan `bool` biasa (tidak bisa membedakan "false" dari "tidak dikirim"). Tidak terasa di FE ERP karena form selalu mengirim seluruh field toggle.
@@ -418,6 +510,7 @@ Gerbangnya berlapis: gerbang rute menyaring "punya urusan dengan modul ini", sed
 - **Pembelian tidak punya endpoint tulis ke Accurate** — tak ada `POST`/`PUT`/`DELETE` yang mengirim pesanan/penerimaan/permintaan ke Accurate; seluruhnya dicatat finance di Accurate, ERP hanya mencerminkan. Pengecualian: `POST /penerimaan/:id/tandai-tidak-sesuai` dan `.../batal-tandai-tidak-sesuai` **menulis ke Mongo ERP saja** (catatan gudang internal) — Accurate tetap tidak pernah disentuh, penerimaan tetap cermin murni.
 - **Cermin `GET /permintaan` hanya tiga field** (`number`/`trans_date`/`status_name`) — `requisitionType` tidak dikembalikan `purchase-requisition/list.do`, bukan bug pengambilan data. Berlaku HANYA untuk endpoint cermin; layar Permintaan Barang kini memakai entitas ERP-native `/permintaan-erp` (data lengkap, lihat bagian di atas).
 - **`purchaseOrderId` di penerimaan hanya terisi dalam jendela 6 bulan** — di luar jendela itu, `pesanan_nomor` kosong bukan karena pembelian langsung, melainkan detailnya belum pernah ditarik (`detail_terambil=false`).
+- **TBD, ditemukan saat audit 2026-09-12, belum diverifikasi mana yang menang**: `GET /katalog/satuan` didaftarkan DUA kali di `main.go` dengan handler dan gerbang berbeda (`main.go:705` `katalogBaca` + `ListKatalogSatuan`, memanggil integration-service; `main.go:1076` `akses` + `KatalogHandler(JenisSatuan)`, membaca cermin Mongo `katalog`). Kelas masalahnya sama dengan jebakan rute tertelan yang sudah tercatat di tim (urutan pendaftaran Fiber mengikat), tetapi di sini KEDUANYA path literal tanpa parameter, jadi belum jelas dari pembacaan main.go saja mana yang benar-benar dieksekusi saat runtime. `TestKatalogTidakMemanggilAccurate` (yang mewajibkan rute ini tidak memanggil Accurate langsung) tidak membedakan keduanya karena `ListKatalogSatuan` sendiri memanggil integration-service, bukan `client *AccurateClient` yang di-mock test itu. Perlu ditelusuri terpisah (baca tree routing Fiber v2 atau uji manual) sebelum dok ini menyatakan gerbang/perilaku `GET /katalog/satuan` secara pasti; tabel di atas mengikuti dokumentasi lama untuk baris ini dan TIDAK memasukkannya ke bagian Kas Kecil ringkas karena alasan ini.
 
 ## Dependensi & Integrasi
 
@@ -427,4 +520,6 @@ Gerbangnya berlapis: gerbang rute menyaring "punya urusan dengan modul ini", sed
 ## Dokumen Terkait
 
 - [[Microservices - Procurement Service]]
+- [[Finance - Kas Kecil dan Pengajuan Budget]]
+- [[ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap]] (konteks historis, penunjukan per tahap sudah tidak berjalan lewat rute HTTP)
 - [[API - Index]]
