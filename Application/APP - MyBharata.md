@@ -156,7 +156,7 @@ Layar Insentif Saya pindah dari web ke aplikasi dan **menumpang daftar Slip Gaji
 
 **Hanya ada SATU daftar menu yang benar-benar dirender: `home_quick_access.dart`.** Grid beranda menampilkan favorit tersimpan pemakai, dan tombol **"Semua Menu"** membuka `showQuickAccessMoreBottomSheet` yang merender daftar yang sama tanpa penyaring. Menu baru **wajib** masuk ke situ.
 
-**Menu yang digerbang jawaban server** (branch T6 `feat/satgas-inspeksi`, 2026-09-12, belum PR): menu Satgas satu-satunya item yang tak digerbang `system_roles`. Barisnya dievaluasi **sebelum** `if (roles == null) return true;`, karena jalan pintas itu meloloskan semua menu saat cache peran kosong dan Satgas tak punya peran lokal. Item semacam ini wajib ikut dijaga di editor Atur Menu, yang memangkas lalu MENYIMPAN favorit yang tak diizinkan: selama izin belum dijawab server, rutenya dipertahankan (`preservedRoutes`). Penjaganya `home_quick_access_satgas_test.dart`, dengan kontrol negatif terbukti merah.
+**Menu yang digerbang jawaban server** (T6, PR draft [my-bharata#144](https://github.com/bip-itteam-internal/my-bharata/pull/144), 2026-09-12): menu Satgas satu-satunya item yang tak digerbang `system_roles`. Barisnya dievaluasi **sebelum** `if (roles == null) return true;`, karena jalan pintas itu meloloskan semua menu saat cache peran kosong dan Satgas tak punya peran lokal. Item semacam ini wajib ikut dijaga di editor Atur Menu, yang memangkas lalu MENYIMPAN favorit yang tak diizinkan: selama izin belum dijawab server, rutenya dipertahankan (`preservedRoutes`). Penjaganya `home_quick_access_satgas_test.dart`, dengan kontrol negatif terbukti merah.
 
 Grid hijau di atasnya (`home_menu_grid.dart`) bukan daftar menu umum: isinya empat pintasan tetap (Jadwal, Pengajuan, Slip Gaji, QR Code).
 
@@ -219,7 +219,7 @@ Sebabnya program Kaizen bukan "satu form lagi" bagi pengisinya: berulang tiap pe
 
 ### Satgas 5R dan K3
 
-> Status: 🔜 **selesai di branch** my-bharata `feat/satgas-inspeksi` 2026-09-12 (`1.18.0+162`, belum PR, belum dicoba di perangkat). Keputusan: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] §5 dan §7. Kontrak: [[API - Form Builder Service]].
+> Status: 🔜 **selesai di branch** my-bharata `feat/satgas-inspeksi` 2026-09-12 (`1.18.0+162`, PR draft [#144](https://github.com/bip-itteam-internal/my-bharata/pull/144), belum dicoba di perangkat). Keputusan: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] §5 dan §7. Kontrak: [[API - Form Builder Service]].
 
 Petugas Satgas mencatat temuan 5R & K3 atas Office Boy dan Security, lalu mengecek ulang beberapa hari kemudian.
 
