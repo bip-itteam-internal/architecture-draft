@@ -292,12 +292,12 @@ diperiksa; padanan web-nya dihapus 2026-09-11
 akun teratas di tiga toko berbeda). Digabung per nama, sesi tersimpan atas toko yang salah
 dan gagalnya senyap — riwayatnya berbunyi "belum ada data penjualan" selamanya.
 
-#### Ambil alih akun yang masih dipegang (⚠️ PR [#143](https://github.com/bip-itteam-internal/my-bharata/pull/143) ke `dev`, 1.17.0+161, belum merge)
+#### Ambil alih akun yang masih dipegang (⚠️ merged ke `dev` 2026-09-12 lewat [#143](https://github.com/bip-itteam-internal/my-bharata/pull/143), 1.17.0+161, rilis belum diverifikasi)
 
-Kode dan test selesai dan sudah direview 2026-09-12, **belum merge** (PR #143). Keputusannya
+Merged ke `dev` 2026-09-12 07:34 WIB (PR #143); rilis 1.17.0+161 ke host belum diverifikasi. Keputusannya
 [[ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift]] §2;
-backend-nya di bip-erp PR [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855) yang juga belum merge, dan
-wajib naik lebih dulu. Kontrak rutenya di [[API - Marketing Analytics Service]].
+backend-nya di bip-erp [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855), di PROD sejak 2026-09-12 08:55 WIB, yang
+memang wajib naik lebih dulu: aplikasi yang keluar sebelum itu membuat tombol Ambil alih kena 404. Kontrak rutenya di [[API - Marketing Analytics Service]].
 
 - **Penolakan Mulai menyebut pemegangnya.** Datasource mengurai `shift_berjalan` di badan 409
   menjadi `SesiDipegangFailure` (turunan `SesiMasihBerjalanFailure`, jadi penanganan 409 lama
