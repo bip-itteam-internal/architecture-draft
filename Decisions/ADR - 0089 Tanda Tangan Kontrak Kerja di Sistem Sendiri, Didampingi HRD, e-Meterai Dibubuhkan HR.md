@@ -64,7 +64,7 @@ Service penandatanganan generik ditolak sekarang karena belum ada pemakai kedua,
 
 Berlaku untuk kontrak pertama maupun perpanjangan.
 
-1. HR membuat kontrak; sistem mengisi template PKWT menjadi PDF draft. Draf **boleh** dikirim ke email karyawan lebih dulu supaya dibaca sebelum datang.
+1. HR membuat kontrak; sistem mengisi template PKWT menjadi PDF draft. Draf **tidak** dikirim ke email karyawan lebih dulu (keputusan pemilik proses 2026-09-12); karyawan membacanya saat bertemu HRD. Selama masa transisi, sebelum alur ini dibangun, HR boleh mengirim dokumen isian otomatis secara opsional untuk menemukan data dan isi template yang masih kurang (dok domain §Masa transisi).
 2. Karyawan datang ke kantor. HRD membuka sesi tanda tangan untuk kontrak itu di perangkat HR (dengan akun HRD sendiri) dan mengetik NIK dari KTP fisik; sistem mencocokkannya dengan `personal_data.nik_number`, dan yang tidak cocok ditolak.
 3. Karyawan membaca kontrak di layar, menggores tanda tangan, dan menyatakan setuju. Karyawan yang minta koreksi mengembalikan kontrak ke HR.
 4. Direktur menandatangani dari antrean Ruang Direktur, satu atau banyak sekaligus.
