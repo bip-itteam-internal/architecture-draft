@@ -33,19 +33,19 @@ Layarnya pun sudah ada, 16 halaman Marketing Analytics lengkap dengan saringan, 
 
 **b. Atribusi VIDEO tidak lewat pemetaan itu sama sekali.** `ICCVideoMetric` (`services/integration/internal/domain/entity/icc_video_metric.go`) beratribut **`creator_username`**, dijoin lewat `tt_business_campaign_items` dan tanggal tayangnya dari snapshot `tt_shop_video_performances`. Jadi metrik per-video ICC punya jalur atribusinya sendiri, dan `icc_account_mappings` bukan prasyaratnya.
 
-**c. Metrik per-video ICC SUDAH dihitung backend**, dan sudah dikonsumsi `services/insentive` lewat `EvaluateICCVideoIncentive` serta `IsICCVideoEligible`.
+**c. Metrik per-video ICC SUDAH dihitung backend, tetapi tak ada lagi yang mengonsumsinya.** ⚠️ **RALAT 2026-09-12**: kalimat lama di sini menyatakan `services/insentive` memakainya lewat `EvaluateICCVideoIncentive` serta `IsICCVideoEligible`. Kedua fungsi itu tak ada di `origin/main`: skema ICC bayar-per-video **dihapus 2026-07-30** oleh SK 011/DIR/SK6/VII/2026 yang menjadikan ICC berbasis profit (`services/insentive/business_rules.go:195-200`), dan `func.go:86-92` serta `main.go:580` kini menolak perhitungan itu secara eksplisit. Klaim lama tersalin dari dua komentar integration-service yang belum ikut diperbarui (`icc_video_metric.go:6`, `tiktok_business_handler.go:1191`). Endpoint `GET /api/integration/insight/icc-video-metrics` masih terdaftar (`services/integration/main.go:1205`) dan nol berkas frontend memanggilnya.
 
 ⛔ **Peringatan yang wajib dibaca sebelum merancang layar apa pun di atasnya**, tertulis di komentar entity-nya: **ROAS per-video TIDAK DAPAT DIANDALKAN**, karena alokasi biayanya bocor ke bucket campaign `-1`. Itu keputusan produk yang diterima sadar, bukan cacat yang belum ketahuan. Menggambar ROAS per video sebagai angka penilaian akan memberi kekeliruan itu tampilan resmi.
 
-**Konsekuensi rancangan yang berubah**: karena metriknya sudah ada dan sudah dipakai modul insentif, langkah berikutnya untuk divisi ini bukan membangun dashboard.
-
-✅ **Pemeriksaan itu sudah dilakukan 2026-09-04**, dan hasilnya lebih baik daripada dashboard mana pun: endpoint `GET /api/integration/insight/icc-video-metrics` **sudah hidup**, tetapi formulir insentif di frontend masih **mengetik CTR, Watch 25%, ROAS, dan Orders dengan tangan** per video. Nol berkas frontend memanggil endpoint itu. Pekerjaan berikutnya karena itu menyambungkan keduanya, bukan membangun layar baru. Rincian, bukti, dan peringatan ROAS-nya di [[Finance - Incentive]] § Metrik ICC sudah dihitung sistem.
+**Konsekuensi rancangan yang berubah (diralat 2026-09-12)**: rekomendasi 2026-09-04 untuk menyambungkan endpoint itu ke formulir insentif (`video-metrics-fields.tsx`, yang masih mengetik CTR, Watch 25%, ROAS, dan Orders dengan tangan) **gugur**, karena skema yang memakainya sudah dicabut. Posisi ini kini bernama **Account Specialist**, dan template KPI-nya tidak menilai video (lihat § ICC di bawah). Layar perbandingan per orangnya: halaman **Analisis Account Specialist** di [[APP - Web ERP]]. Rincian dan buktinya di [[Finance - Incentive]] § Metrik video ICC.
 
 Pola "yang mau dibangun ternyata sudah ada di modul lain" kini sudah berulang **empat kali** dalam analisis keluarga dokumen ini.
 
 ## Posisi yang bisa dirancang sekarang
 
 ### ICC (Internal Content Creator)
+
+⚠️ **Diukur ulang PROD 2026-09-12: tabel dan rancangan video di bawah milik template KPI lama berposisi "ICC"** (metrik video, dinilai manual), yang masih ada di `kpi_template`. Template posisi **Account Specialist** (Beauty Hacks dan Kyura) menilai hal lain: ROAS dari sumber `kinerja_toko` target 4,5 (bobot 0,2), profit dari `insentif_profit` 50 jt (bobot 0,6), dan `retur_persen` dari `insentif_profit` 7 (bobot 0,2). Layar perbandingan per orangnya kini halaman **Analisis Account Specialist** ([[APP - Web ERP]], [[Microservices - Marketing Analytics Service]]), yang sengaja tak memuat metrik video: 97% video 30 hari di toko berpemegang dibuat kreator yang tak terpetakan ke Account Specialist (terukur 2026-09-12). Target dan capaian profit tetap di Dashboard Insentif. Skema insentif per-video yang dulu memakai metrik ini sudah dicabut 2026-07-30 (lihat ralat c di atas), jadi rancangan di bawah dipertahankan hanya sebagai catatan template lama.
 
 Ada di kedua brand, 3 metrik, struktur sama.
 
@@ -62,7 +62,7 @@ Sumber ketiganya sama: `tt_shop_video_performances`, yang punya `published_at` d
 - **Visual utama**: cacah video per bulan terhadap target 125, dengan tiga pita standar (belum memenuhi, standar dasar, standar tinggi) ditumpuk. Satu bagan menjawab ketiga metriknya sekaligus, dan ketiganya memang membaca deret yang sama.
 - Daftar video bulan berjalan beserta GMV masing-masing, diurutkan menurun.
 
-⚠️ **Atribusinya lewat `creator_username`, bukan `icc_account_mappings`** (lihat ralat di atas). Jalur itu sudah ada dan sudah dipakai modul insentif, jadi posisi ini tidak terhalang pemetaan. Yang perlu diperiksa lebih dulu justru apakah layarnya sudah ada di `finance/incentive`.
+⚠️ **Atribusinya lewat `creator_username`, bukan `icc_account_mappings`** (lihat ralat di atas). Jalur itu sudah ada, jadi posisi ini tidak terhalang pemetaan. Tetapi sejak 2026-07-30 modul insentif tak lagi memakainya (skema per-video dicabut), dan formulir video di `finance/incentive` masih diketik tangan tanpa pemilik aturan (lihat [[Finance - Incentive]] § Metrik video ICC).
 
 ### Leader
 
