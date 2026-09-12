@@ -566,7 +566,7 @@
       "area": "API Reference",
       "jenis": "api",
       "status_emoji": "⚠️",
-      "status_teks": "Grounded ke kode (2026-08-30: **keempat-puluh-dua route punya baris di dok ini**). ⚠️ **Enumerasi ulang 2026-09-11**: `origin/main` kini **45 route**, dan `GET /icc/sla-chat` serta `GET /kpi/sla-chat-cs` (`routes.go`) belum punya baris di dok ini (di luar lingkup sync Analisis Live, perlu sync tersendiri). Analisis Live (bip-erp #1841, merged dan di PROD 2026-09-11) menambah `GET /lives/analisis` dan `GET /live-shifts/performa` (**47** saat merge; hitung ulang bila rute lain menyusul); keduanya sudah punya baris di bawah. Route ke-42 `GET /live-shifts/akun` (`live_shift_akun.go`) ditambahkan ke dok ini 2026-08-30; ia sudah ada di `origin/main` tetapi terlewat dari audit 2026-08-27, sehingga dok ini dan [[Microservices - Marketing Analytics Service]] sempat sama-sama menulis \"lima route\" untuk keluarga `/live-shifts` yang sebenarnya enam. Route ke-41 `/kpi/kinerja-live` masuk lewat PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486) (merged 2026-08-27); **status deploy belum diverifikasi — merged bukan deployed**. Sebelumnya 12 route tak terdokumentasi sama sekali; daftarnya + cara audit ulangnya ada di bagian **Cara mengaudit kelengkapan daftar ini** di kaki dokumen. ⚠️ **`GET /divisi` pindah sumber ke `department_shops` 2026-08-29** (fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]], PR [#1520](https://github.com/bip-itteam-internal/bip-erp/pull/1520) & [#1522](https://github.com/bip-itteam-internal/bip-erp/pull/1522)) — jumlah route tetap 41, tapi maknanya berubah; lihat baris `/divisi` di bawah. **Merged, belum di-deploy/diverifikasi lewat gateway.** ⚠️ **Lima rute ambil alih** ([[ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift]] §2) sudah punya baris di §Ambil alih sesi, tetapi kodenya masih di PR bip-erp [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855) (belum merge per 2026-09-12) dan tidak termasuk hitungan di atas.",
+      "status_teks": "Grounded ke kode (2026-08-30: **keempat-puluh-dua route punya baris di dok ini**). ⚠️ **Enumerasi ulang 2026-09-11**: `origin/main` kini **45 route**, dan `GET /icc/sla-chat` serta `GET /kpi/sla-chat-cs` (`routes.go`) belum punya baris di dok ini (di luar lingkup sync Analisis Live, perlu sync tersendiri). Analisis Live (bip-erp #1841, merged dan di PROD 2026-09-11) menambah `GET /lives/analisis` dan `GET /live-shifts/performa` (**47** saat merge; hitung ulang bila rute lain menyusul); keduanya sudah punya baris di bawah. Route ke-42 `GET /live-shifts/akun` (`live_shift_akun.go`) ditambahkan ke dok ini 2026-08-30; ia sudah ada di `origin/main` tetapi terlewat dari audit 2026-08-27, sehingga dok ini dan [[Microservices - Marketing Analytics Service]] sempat sama-sama menulis \"lima route\" untuk keluarga `/live-shifts` yang sebenarnya enam. Route ke-41 `/kpi/kinerja-live` masuk lewat PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486) (merged 2026-08-27); **status deploy belum diverifikasi — merged bukan deployed**. Sebelumnya 12 route tak terdokumentasi sama sekali; daftarnya + cara audit ulangnya ada di bagian **Cara mengaudit kelengkapan daftar ini** di kaki dokumen. ⚠️ **`GET /divisi` pindah sumber ke `department_shops` 2026-08-29** (fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]], PR [#1520](https://github.com/bip-itteam-internal/bip-erp/pull/1520) & [#1522](https://github.com/bip-itteam-internal/bip-erp/pull/1522)) — jumlah route tetap 41, tapi maknanya berubah; lihat baris `/divisi` di bawah. **Merged, belum di-deploy/diverifikasi lewat gateway.** ⚠️ **Lima rute ambil alih** ([[ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift]] §2) sudah punya baris di §Ambil alih sesi, dan kodenya di PROD sejak 2026-09-12 08:55 WIB (bip-erp [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855)), tetapi belum masuk hitungan di atas; hitung ulang pada enumerasi berikutnya.",
       "publik": true,
       "tautan": [
         "Microservices - Marketing Analytics Service",
@@ -581,20 +581,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "0ccb86a7923456bab5e8f11ee1054ed4da4b8f01431129817c6d88b1782d40fe",
-      "ukuran_kb": 52.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service lewat gateway `/api/marketing-analytics/*`, parameter dan konvensi responsnya (amplop `unavailable_channels`, `kolom_tidak_berlaku`, paginasi drill, 400 untuk enum tak dikenal), serta siapa yang boleh menulis ambang keputusan dan pagu belanja iklan. Juga menjelaskan arti lima nilai vonis laba di `/beranda`, keluarga rute laba, video & live, pencatatan dan ambil alih sesi live host (`/live-shifts`), retur, price floor, job sync, pengumpul KPI, dan cara mengaudit kelengkapan daftar route.",
+      "hash": "3c0f21026a1b5514722966a013e8ea98989db14a63fe27190f7779b8fc746823",
+      "ukuran_kb": 53.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda, ambang, pagu, kurva alokasi, laba per toko, video dan live, pencatatan sesi live host `/live-shifts` termasuk ambil alih, retur, price floor, job, pengumpul KPI), parameter serta gerbang aksesnya, dan prefix gateway yang dipakai. Juga menjelaskan konvensi respons (`unavailable_channels`, `kolom_tidak_berlaku`, 400 untuk enum tak dikenal, batas hari WIB, paginasi drill dengan `total: -1`), arti lima nilai vonis laba (tanpa_data, belum_matang, rugi, waspada, sehat), makna `null` versus nol, dan cara mengaudit kelengkapan daftar route terhadap kode.",
       "kata_kunci": [
-        "marketing analytics",
-        "API endpoint",
-        "beranda",
+        "marketing analytics API",
+        "endpoint",
+        "live-shifts",
+        "sesi live host",
+        "ambil alih",
         "vonis laba",
         "ambang ROAS",
         "pagu iklan",
-        "live-shifts",
-        "sesi live",
         "price floor",
-        "kurva alokasi"
+        "/api/marketing-analytics"
       ]
     },
     {
@@ -1290,19 +1290,19 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "040e1429a291e74a5269b2b4349a4b28055c3a48693390480d9d20a05279ba78",
-      "ukuran_kb": 59.1,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitekturnya (Flutter, BLoC, Clean Architecture, lewat API Gateway dengan JWT), bagaimana login, biometric, dan PIN bekerja, serta fitur apa saja yang tersedia bagi karyawan (absensi, cuti/izin, lembur, slip gaji, KPI, survei, Kaizen, Sesi Live Host, pelatihan). Juga menjelaskan beda versi build dan versi rilis, perilaku multi-perusahaan (menu dan konten per tenant), struktur menu beranda, roadmap, dan known issues.",
+      "hash": "e1c13de68785c48171fc6af5e33d89daca33b08b229e3c970a800a113bce111c",
+      "ukuran_kb": 59.2,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitektur Flutter-nya (Clean Architecture feature-first, BLoC, get_it, dio dengan timeout, go_router, Firebase flavor dev/prod), bagaimana login JWT, biometric, PIN, dan kebijakan satu akun satu device bekerja, serta bagaimana aplikasi terhubung lewat API gateway. Juga menjawab fitur apa saja yang tersedia bagi karyawan (absensi, izin/cuti, lembur, slip gaji dengan gerbang PIN, KPI, survei form builder, Kaizen, pelatihan, Sesi Live Host dan ambil alih akun), perilaku konten dan menu per perusahaan (multi-tenant), cara membaca versi build dan rilis, roadmap, serta known issues.",
       "kata_kunci": [
         "MyBharata",
         "my_bharata",
-        "aplikasi mobile",
+        "aplikasi mobile HRIS",
         "Flutter",
-        "HRIS mobile",
         "absensi",
         "attendance",
         "slip gaji",
         "payslip",
+        "Sesi Live Host",
         "multi-tenant"
       ]
     },
@@ -1466,20 +1466,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "018eb399e94eecce64db52e3eba316621e324ce2b4309e45dbd0849d9b0b75e4",
-      "ukuran_kb": 423.7,
-      "ringkasan": "Menjawab: apa itu portal web internal erp-frontend (\"One Bharata\"/hris-dashboard) beserta stack-nya, bagaimana login, refresh token, cookie `system_roles`, dan role gating sidebar bekerja, serta bagaimana web ini menjadi SSO Identity Provider lewat `redirect_url`. Juga menjelaskan dukungan multi-perusahaan (Kelola Perusahaan, CompanySwitcher admin pusat, rekrutmen lintas perusahaan lewat izin `recruitment.cross_company`), pengelompokan menu HRIS dengan menu induk bersarang, dan halaman Pengaturan HRGA terpusat (`SUB_MENU_PENGATURAN`). Memuat pula konvensi data-fetching TanStack Query dan konvensi bagan Recharts/`ChartContainer`.",
+      "hash": "34a159785f293c55e32d7d96ccaae94adeb2f4768c6c738ff3277967db5ed1ee",
+      "ukuran_kb": 423.8,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS `erp-frontend` (One Bharata, hris-dashboard), stack-nya (Next.js App Router, React, shadcn/ui, TanStack Query, react-i18next), bagaimana login, cookie `system_roles`, role gating sidebar, dan SSO Identity Provider untuk aplikasi lain bekerja. Juga menjawab cara menu dikelompokkan (induk menu HRIS, Pengaturan HRGA terpusat per tab), dukungan multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), konvensi data-fetching TanStack Query dan konvensi bagan Recharts dengan ChartContainer, serta modul apa saja yang ada di web.",
       "kata_kunci": [
+        "Web ERP",
         "erp-frontend",
         "One Bharata",
+        "hris-dashboard",
+        "Next.js",
         "SSO",
-        "login",
         "system_roles",
         "sidebar menu",
-        "multi-perusahaan",
-        "multi-tenant",
-        "Pengaturan HRGA",
-        "TanStack Query"
+        "TanStack Query",
+        "Recharts"
       ]
     },
     {
@@ -2594,7 +2594,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **45 route** di berkas produksi `origin/main` (enumerasi ulang 2026-09-11, termasuk `/health`; audit 2026-08-26 menghitung 41; Analisis Live menambah dua lewat bip-erp #1841, merged dan di PROD 2026-09-11, jadi 47 saat merge; hitung ulang bila rute lain menyusul). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD dan dipakai host sejak 2026-09-09** (catatan lama \"0 dokumen\" dicoret 2026-09-11, lihat § Belum Diimplementasikan). Sejak 2026-09-11 klien pencatatnya hanya MyBharata: halaman web Sesi Live Host dihapus ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]; erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11, belum di PROD).",
+      "status_teks": "Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **45 route** di berkas produksi `origin/main` (enumerasi ulang 2026-09-11, termasuk `/health`; audit 2026-08-26 menghitung 41; Analisis Live menambah dua lewat bip-erp #1841, merged dan di PROD 2026-09-11, jadi 47 saat merge; hitung ulang bila rute lain menyusul). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD dan dipakai host sejak 2026-09-09** (catatan lama \"0 dokumen\" dicoret 2026-09-11, lihat § Belum Diimplementasikan). Sejak 2026-09-11 klien pencatatnya hanya MyBharata: halaman web Sesi Live Host dihapus ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]; erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11, di PROD sejak 2026-09-12 lewat image `frontend-hris` 07:35 WIB).",
       "publik": true,
       "tautan": [
         "Sales - Marketing Dashboard (Master Roadmap)",
@@ -2629,20 +2629,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "927029e8517edcf02679dc8855659e4a921dcba8aa5b65fc087818a86b467518",
-      "ukuran_kb": 129.5,
-      "ringkasan": "Menjawab: bagaimana service agregasi laba dan performa marketing bekerja, mulai dari membaca `integration_db` secara baca-saja lalu menulis koleksi `mart_*`, penjadwal internal 48 jam, job sync, channel TikTok/Shopee/Lazada, alokasi bundel dan mapping SKU, sampai logika vonis laba (termasuk `belum_matang` dan ambang materialitas). Juga menjawab kolom mana yang tak boleh dijumlahkan (`iklan_sia_sia`, `pembatalan`, tiga angka GMV live), bagaimana sesi live host dicatat, dimiliki, ditutup otomatis, dan diambil alih, serta batas kejujuran data seperti revenue Shopee yang masih harga list.",
+      "hash": "77770f464cc0531d14315aeb5483cca6d2670e407227e5244ccf471b23c0eb6c",
+      "ukuran_kb": 130.1,
+      "ringkasan": "Menjawab: bagaimana Marketing Analytics Service mengagregasi laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live dari `integration_db` (baca-saja, dijaga tiga lapis) ke koleksi `mart_*`, termasuk penjadwal internal 48 jam, job sync, sumber data TikTok/Shopee/Lazada, dan alokasi bundel serta mapping SKU. Juga menjawab logika vonis laba halaman beranda (belum_matang dan pita materialitas), cara kerja pencatatan sesi live host `/live-shifts` (siaran serentak, kepemilikan sesi, tutup otomatis akhir shift, ambil alih), Analisis Live dan KPI host live, serta aturan pemakaian angka agar tidak hitung ganda (`iklan_sia_sia`, `pembatalan`, GMV live, revenue setelah diskon).",
       "kata_kunci": [
-        "marketing analytics service",
+        "marketing analytics",
         "mart_profit_attribution",
-        "laba",
+        "laba toko",
         "profit",
-        "ROAS",
-        "live shift",
         "sesi live host",
-        "integration_db",
+        "live shift",
         "hitung ganda",
-        "TikTok Shopee"
+        "integration_db",
+        "GMV live",
+        "ROAS"
       ]
     },
     {
@@ -6163,7 +6163,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Sebagian berlaku** (2026-09-12): §1 di PROD; §2 kodenya selesai, sudah direview, dan menunggu merge di bip-erp [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855) dan my-bharata [#143](https://github.com/bip-itteam-internal/my-bharata/pull/143). Arahnya disetujui 2026-09-11 lewat `/analisa-kebutuhan`. **§1 di PROD sejak 2026-09-11** (bip-erp [#1847](https://github.com/bip-itteam-internal/bip-erp/pull/1847) sebagai `marketing-analytics-service` 16:55 WIB, erp-frontend [#1539](https://github.com/bip-itteam-internal/erp-frontend/pull/1539) sebagai `frontend-hris` 16:59 WIB); gerbang biner dan bundel lolos, bukti perilaku pertama dan verifikasi DEV belum ada. **§2**: bip-erp branch `feat/marketing-analytics-ambil-alih` (7 commit) dan my-bharata branch `feat/live-shift-ambil-alih` (versi 1.17.0+161); belum PR, belum merge, belum di DEV maupun PROD. §2 direvisi di hari yang sama: ambil alih meminta persetujuan pemegang dengan batas 30 detik, dan diam berarti setuju. Berdiri di atas pengukuran prod 2026-09-11 dan di atas [[Microservices - Marketing Analytics Service]] yang berstatus ⚠️ Implemented dengan catatan, bukan di atas dok konsep. Papan kerja: `Workspace/ANALISA - Ambil Alih Sesi Live Host.md` (tidak diterbitkan). **Revisi 2026-09-11** ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]): bagian web dicabut, yaitu badge alasan penutupan di riwayat web (§1), riwayat web (§4), dan tombol Ambil alih web (T3); halaman web Sesi Live Host dihapus. **Revisi 2026-09-11 saat perencanaan §2**: pemberitahuan ke atasan ditunda (§5), dan cara-cara yang semula diserahkan ke `/plan` kini tertulis di §2. **Revisi 2026-09-12 saat review**: konfirmasi Ambil alih tidak menyebut angka detik (§4).",
+      "status_teks": "**Sebagian berlaku** (2026-09-12): §1 di PROD; §2 backend di PROD sejak 2026-09-12 08:55 WIB (bip-erp [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855)), klien merged ke `dev` (my-bharata [#143](https://github.com/bip-itteam-internal/my-bharata/pull/143)) dengan rilis 1.17.0+161 belum diverifikasi, dan alur utuh belum dijalankan. Arahnya disetujui 2026-09-11 lewat `/analisa-kebutuhan`. **§1 di PROD sejak 2026-09-11** (bip-erp [#1847](https://github.com/bip-itteam-internal/bip-erp/pull/1847) sebagai `marketing-analytics-service` 16:55 WIB, erp-frontend [#1539](https://github.com/bip-itteam-internal/erp-frontend/pull/1539) sebagai `frontend-hris` 16:59 WIB); gerbang biner dan bundel lolos; per 2026-09-12 09:34 WIB belum pernah terpicu (tak satu pun sesi ditutup otomatis sejak deploy), dan verifikasi DEV belum ada. **§2**: DEV terverifikasi lewat gateway 2026-09-12 08:02 WIB; PROD terbukti lewat gerbang nama fungsi di biner dan `GET /live-shifts/ambil-alih/menunggu` 200 dari dalam container (09:34 WIB). §2 direvisi di hari yang sama: ambil alih meminta persetujuan pemegang dengan batas 30 detik, dan diam berarti setuju. Berdiri di atas pengukuran prod 2026-09-11 dan di atas [[Microservices - Marketing Analytics Service]] yang berstatus ⚠️ Implemented dengan catatan, bukan di atas dok konsep. Papan kerja: `Workspace/ANALISA - Ambil Alih Sesi Live Host.md` (tidak diterbitkan). **Revisi 2026-09-11** ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]): bagian web dicabut, yaitu badge alasan penutupan di riwayat web (§1), riwayat web (§4), dan tombol Ambil alih web (T3); halaman web Sesi Live Host dihapus. **Revisi 2026-09-11 saat perencanaan §2**: pemberitahuan ke atasan ditunda (§5), dan cara-cara yang semula diserahkan ke `/plan` kini tertulis di §2. **Revisi 2026-09-12 saat review**: konfirmasi Ambil alih tidak menyebut angka detik (§4).",
       "publik": true,
       "tautan": [
         "ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus",
@@ -6180,20 +6180,20 @@
         "APP - Web ERP",
         "APP - MyBharata"
       ],
-      "hash": "8b834965ebe4c32df6cce0ccd789e86494a828781c62a2d495ce54b87f805601",
-      "ukuran_kb": 27.0,
-      "ringkasan": "Menjawab: kenapa host live yang jadwalnya sedang berjalan boleh mengambil alih akun yang sesinya ditinggal terbuka dan bagaimana alurnya (persetujuan pemegang berbatas 30 detik, diam berarti setuju, jejak siapa yang mengambil alih), serta kapan sesi ditutup otomatis (jam berakhir shift + 60 menit). Juga menjelaskan insiden 10 ke 11 September yang memicunya, dampaknya ke atribusi GMV dan `perlu_koreksi`, apa yang tetap dari keputusan bahwa leader tak boleh menghentikan sesi orang lain, notifikasi yang dipakai, dan konsekuensi yang diterima.",
+      "hash": "8cab33500ba3f11ea6a94840b3c758f0b3fb5acf3df75bfa479277773ab1af79",
+      "ukuran_kb": 27.2,
+      "ringkasan": "Menjawab: apa yang terjadi bila sesi live host ditinggal terbuka dan menahan akunnya, bagaimana host yang jadwalnya sedang berjalan bisa mengambil alih akun lewat permintaan dengan persetujuan pemegang berbatas 30 detik (diam berarti setuju), dan kapan sesi tertutup otomatis (jam berakhir shift + 60 menit). Juga menjelaskan kejadian pemicu 10 ke 11 September 2026, kenapa GMV live bisa salah atribusi dan dinolkan saat `perlu_koreksi`, apa yang tidak berubah dari keputusan bahwa leader tak boleh menghentikan sesi orang lain, jejak di riwayat, notifikasi, dan konsekuensinya.",
       "kata_kunci": [
-        "ADR 0088",
         "ambil alih sesi live",
         "takeover",
         "tutup otomatis",
-        "auto close",
+        "auto-close",
         "akhir shift",
         "host live",
         "409 akun dipegang",
         "persetujuan 30 detik",
-        "live shift"
+        "ADR 0088",
+        "live_shifts"
       ]
     },
     {
@@ -6321,7 +6321,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Diputuskan, kode merged** (2026-09-11, keputusan user). Kodenya di erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11 20:02 WIB, **belum di PROD**. Cek layar di DEV sesudah merge belum dijalankan, dan prasyarat deploy PROD (host aktif sudah memakai build MyBharata yang memuat Sesi Live) belum dipastikan.",
+      "status_teks": "**Diputuskan, di PROD** (2026-09-11, keputusan user). Kodenya di erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11 20:02 WIB, **di PROD sejak 2026-09-12** (image `frontend-hris` 07:35 WIB dibangun dari HEAD yang memuat merge-nya). Cek layar di DEV maupun PROD belum dijalankan, dan tidak tercatat apakah prasyarat deploy PROD (host aktif sudah memakai build MyBharata yang memuat Sesi Live) dipastikan lebih dulu.",
       "publik": true,
       "tautan": [
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
@@ -6331,18 +6331,19 @@
         "APP - Web ERP",
         "APP - MyBharata"
       ],
-      "hash": "28202ea30c45dfc7e2cacb69d528013e7ef051c919179c7a98e3fae3009c2725",
-      "ukuran_kb": 8.4,
-      "ringkasan": "Menjawab: kenapa halaman dan menu Sesi Live Host di web ERP dihapus, apa yang masih tersedia setelah penghapusan (ringkasan performa host di Analisis Live dan panel ICC, endpoint backend yang tidak berubah), dan siapa yang terdampak (host live yang sebelumnya mencatat lewat web, leader marketing yang kehilangan riwayat per sesi seluruh tim). Juga menjelaskan perbandingan pemakaian dua klien sebelumnya dan bagian mana dari ADR 0063/ADR 0088 yang ikut dicabut.",
+      "hash": "b37346772cad1985eadca5b0f2f07e36741f6778591b0cc5c286a37adbb844ec",
+      "ukuran_kb": 8.5,
+      "ringkasan": "Menjawab: kenapa halaman dan menu Sesi Live Host di web ERP (`/marketing-analytics/live-shift`) dihapus sehingga host mencatat Mulai, Jeda, dan Akhiri hanya lewat MyBharata, dan apa yang tetap dipertahankan (endpoint `/live-shifts*`, `usePerformaHost` untuk Analisis Live dan panel ICC). Juga menjawab bagian ADR 0063 dan ADR 0088 yang dicabut, izin frontend yang dibuang, dampaknya bagi host dan leader marketing (tak ada riwayat per sesi seluruh tim, tak bisa mencatat atas nama host), serta alternatif yang sengaja tidak diambil.",
       "kata_kunci": [
-        "sesi live host",
-        "MyBharata",
+        "Sesi Live Host",
         "halaman web dihapus",
+        "MyBharata",
         "live-shift",
-        "Analisis Live",
-        "ICC",
-        "penghapusan menu",
-        "single client"
+        "ADR 0091",
+        "pencatatan sesi live",
+        "usePerformaHost",
+        "leader marketing",
+        "host_live"
       ]
     },
     {
@@ -13044,18 +13045,18 @@
         "APP - MyBharata",
         "API - Marketing Analytics Service"
       ],
-      "hash": "448f84ab2164166254a3451c48cca3c65a2dea866882bf85a87dd5c13f41d936",
-      "ukuran_kb": 14.3,
-      "ringkasan": "Menjawab: kebutuhan sebenarnya di balik permintaan tombol ambil alih sesi live, angka produksi yang mendasarinya (jumlah pergantian host, lama host berikutnya tertahan), dan pecahan pekerjaannya T0 sampai T6 beserta urutan, dependensi, dan kriteria selesai tiap item. Berguna untuk tahu bagian HR (membetulkan jadwal host), backend (tutup otomatis +60 menit, ambil alih dengan persetujuan), MyBharata (tombol dan jendela persetujuan), urutan deploy, verifikasi lapangan, dan hal yang sengaja di luar lingkup.",
+      "hash": "c57995162602ced877fd411ed57c0e69e27a0ff3d6f5352e388d777cb132985d",
+      "ukuran_kb": 15.1,
+      "ringkasan": "Menjawab: bagaimana permintaan tombol ambil alih sesi live diterjemahkan jadi rangkaian pekerjaan T0 sampai T6 (betulkan jadwal host oleh HR, tutup otomatis +60 menit, ambil alih di backend, tombol dan label riwayat di MyBharata, verifikasi lapangan), urutan serta dependensi deploy-nya, dan kriteria selesai tiap item. Juga menjawab angka produksi yang mendasarinya (pergantian host pada akun yang sama, lama host tertahan), kenapa istirahat bolak-balik tidak dibangun terpisah, keputusan perencanaan ambil alih (permintaan di dokumen sesi lama, polling `/live-shifts/ambil-alih/menunggu`, tenggang eksekusi), dan kenapa tombol versi web batal.",
       "kata_kunci": [
-        "analisa kebutuhan",
-        "ambil alih sesi live",
-        "takeover live",
-        "tutup otomatis shift",
-        "host live",
-        "MyBharata",
-        "jadwal host",
+        "analisa ambil alih",
         "papan kerja",
+        "sesi live host",
+        "takeover",
+        "tutup otomatis",
+        "jadwal host live",
+        "task breakdown",
+        "rilis MyBharata",
         "ADR 0088",
         "verifikasi lapangan"
       ]
