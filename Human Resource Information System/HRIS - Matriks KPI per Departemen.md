@@ -610,8 +610,61 @@ Jumlah karyawan Finance yang punya `kpi_score` per periode, dari 16 karyawan akt
 | 2026-07 | AR Staff (3 orang, template berbeda) | AR STAFF PIUTANG · KPI AR Piutang · KPI AR Leader | 89,4 · 91,0 · 52,0 | 0 |
 
 - **Skor yang ber-`auto_value` penuh jauh di bawah skor manual bulan sebelumnya.** Skor total tidak dinormalisasi (lihat Langit-langit skor SPV di atas), jadi angka rendah berasal dari nilai per metrik; rincian per metrik belum ditelusuri (**TBD**).
-- **KPI Accounting CV**: 6 sampai 7 orang bernilai 100 (atau 98,2 sampai 100) setiap bulan April sampai Juli 2026, seluruhnya manual. Metriknya belum membedakan kinerja; perlu dikonfirmasi ke penilai.
+- **KPI Accounting CV**: 6 sampai 7 orang bernilai 100 (atau 98,2 sampai 100) setiap bulan April sampai Juli 2026, seluruhnya manual. Metriknya belum membedakan kinerja, dan nilainya diinput akun HR tanpa catatan maupun bukti (lihat subbagian berikut).
 - **Agustus baru 2 orang dinilai.** Untuk bulan lampau, F5 hanya membaca skor final anggota, jadi urutan penilaian anggota, leader, lalu supervisor tetap mengikat.
+
+#### Siapa menilai, buktinya, dan jejak kerja di ERP (diukur prod 2026-09-12)
+
+Pertanyaan yang dijawab subbagian ini: **apakah matriks dan skor KPI Finance memberi tahu apa yang benar-benar dikerjakan tiap orang?** Per 12 September 2026 jawabannya **tidak**. Matriks memuat apa yang *diharapkan* dari tiap posisi; skornya tidak membawa jejak pekerjaan. Nama dan ID karyawan sengaja tidak disalin ke dok ini.
+
+**Penginput skor.** Dari 61 `kpi_score` karyawan Finance periode April sampai Agustus 2026:
+
+| Penginput (posisi akun) | Skor | Periode |
+|---|---:|---|
+| Human Resource / `Training & Perfomance Officer` (akun pertama) | 19 | April sampai Mei |
+| Human Resource / HRD Supervisor | 25 | Mei sampai Juni |
+| Human Resource / `Training & Perfomance Officer` (akun kedua) | 15 | Juli |
+| Akun yang tidak cocok dengan data karyawan mana pun | 2 | Agustus (dua skor ber-`auto_value` di tabel atas) |
+
+Supervisor Finance tidak menginput satu pun skor timnya. Ini **berselisih** dengan [[Finance - FAT Persona]], yang menempatkan Supervisor FAT sebagai penilai terakhir KPI tim. Apakah Supervisor menilai di luar sistem lalu HR yang mengetik nilainya: **TBD**, perlu dikonfirmasi ke HR.
+
+**Catatan dan bukti.**
+- Dokumen skor (`KPIScore`, `shared-library/models/employee/models.go:729-736`) hanya menyimpan salinan template plus nilai per metrik. Di prod, metriknya berisi `label`, `description`, `weight`, `value`, dan `key`; field `auto_*` hanya ada di 8 metrik otomatis. **Tidak ada field catatan penilai.**
+- Lampiran bukti per metrik punya koleksi sendiri, `kpi_evidence` (`KPIEvidence`, `models.go:64` dan `:738-758`, lengkap dengan `note` dan `uploaded_by`). Isinya **0 dokumen untuk seluruh perusahaan**, bukan hanya Finance. Fiturnya ada, pemakainya belum.
+
+**Metrik bernilai 100 per template** (jumlah metrik bernilai 100 dari metrik di snapshot skor):
+
+| Template | April | Mei | Juni | Juli |
+|---|---|---|---|---|
+| KPI Accounting CV (6 sampai 7 orang) | 36/36 | 38/42 | 36/36 | 36/36 |
+| KPI Finance Staff Account Payable | 4/5 | 5/5 | 5/6 | 6/6 |
+| KPI Tax Officer | belum dinilai | belum dinilai | belum dinilai | 7/8 |
+| KPI Cost Control | 3/7 | 3/7 | 5/7 | 6/7 |
+| KPI Senior Accounting Bharata | 4/7 | 6/7 | 4/8 | 6/8 |
+| KPI Supervisor Finance | 0/5 | 3/5 | 3/5 | 3/5 |
+
+Account Payable dan Tax Staff bernilai hampir penuh, padahal akun keduanya tanpa izin finance apa pun, koleksi `pembayaran` di procurement berisi 0, dan modul pajak kosong (lihat [[Finance - FAT Persona]]). Itu **bukan bukti mereka tidak bekerja**; pekerjaannya kemungkinan terjadi di Accurate atau di luar sistem, sehingga tidak terlihat dari ERP.
+
+**Jejak kerja per posisi di ERP.** Pencatat dokumen yang bisa dipetakan ke posisi Finance:
+
+| Posisi | Jejak pencatat di ERP |
+|---|---|
+| AR Staff | `invoice_correction_logs` (jejak audit koreksi faktur manual oleh finance, `services/integration/internal/domain/entity/invoice_correction_log.go:45-48`): **233 dari 268**, 26 Agustus sampai 4 September 2026. `fake_order_import_batches`: 5 dari 6. `transaction_summary_reports`: 129, 2 sampai 15 Juli 2026. `item_histories` 10 dan `item_price_history` 5 (Juli sampai Agustus). |
+| Cost Control | `kas_plafon` 6 dari 6, `kas_parameter` 2 dari 6, `kas_jurnal_outbox` 1 dari 1, `anggaran_opex` 8 dari 233. |
+| Finance Supervisor | 1 entri persetujuan di `pengajuan_pembelian.riwayat`. |
+| Senior Accountant, Junior Accountant, Account Payable, Tax Staff | **Tidak ada** di koleksi mana pun yang punya field pencatat. |
+
+- Koreksi faktur dan batch impor tercatat sebagai nama, bukan ID. Nama itu cocok sebagian dengan dua kandidat yang **sama-sama** AR Staff, jadi posisinya pasti tapi orangnya belum.
+- 5.138 `transaction_summary_reports` lainnya ditulis aktor `Auto-Sync` milik worker (`services/integration/internal/worker/tasks/auto_summary_report.go:103`), bukan orang.
+- `product_costs` (HPP per produk): 45 dari 47 diunggah Tech Development Leader, 1 oleh Direktur, 1 oleh Fullstack Developer. Metrik HPP milik Account Payable tidak punya jejak di sini.
+- `kas_transaksi`: 68 dari 69 dibuat pada 26 Agustus 2026 oleh satu ID yang tidak ada di data karyawan. Asal ID itu (impor atau akun non-karyawan) **TBD**.
+- `audit_jejak` dan `audit_setelan_sampel` di `finance_db` hanya berisi pencatat Tech Development.
+
+**Accurate tidak menyimpan pembuat dokumen di ERP.** Dari 20 koleksi `accurate_*` di `integration_db`, **0** punya field pembuat atau pengubah (pemindaian kunci sampai kedalaman 6 atas 20 dokumen terbaru tiap koleksi), dan entity maupun klien Accurate di integration-service tidak memetakan field pengguna. Jadi siapa yang membuat faktur, jurnal, atau pembayaran di Accurate, yaitu sebagian besar pekerjaan Accounting, AP, dan Tax, **tidak bisa diketahui dari ERP**. Apakah API Accurate menyediakan data pembuat dokumen: **TBD**.
+
+**Cara ukur dan batasnya.** Field bernada pencatat (`created_by`, `createdBy`, `dibuat_oleh`, `uploaded_by`, `action_by`, `riwayat[].oleh`, dan sejenisnya) dicari di 50 dokumen terbaru tiap koleksi `procurement_db`, `finance_db`, dan `integration_db` sampai kedalaman 3, lalu dihitung atas 2000 dokumen terbaru. Nilainya dipetakan ke posisi lewat `employee_id`, `_id` akun, `username`, atau `full_name`; untuk objek aktor (`services/integration/internal/domain/entity/actor.go:9-16`) dipakai `employee_id`-nya. Koleksi tanpa field pencatat, misalnya faktur pembelian hasil sinkron Accurate, tidak bisa diatribusikan.
+
+**Keputusan yang tersisa (TBD HR dan pemilik metrik):** wajibkan unggah bukti per metrik lewat `kpi_evidence` yang sudah ada, atau tetapkan sumber jejak kerja lain untuk posisi yang pekerjaannya di Accurate.
 
 ## General Affair
 
