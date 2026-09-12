@@ -270,7 +270,7 @@ Menutup gap **"notifikasi email ke pewawancara"** dari increment Interview Orche
 
 ## Increment: Rekrutmen Lintas Perusahaan (2026-09-11, merged dan live prod 2026-09-12)
 
-> Recruiter yang bekerja di satu perusahaan grup menangani rekrutmen **semua** perusahaan grup lewat izin `recruitment.cross_company` yang dipasang sadar ke posisi (bukan daftar perusahaan tertentu). Pengguna lain tetap terkunci ke perusahaannya sendiri. Merged 2026-09-12 lewat bip-erp #1853, erp-frontend #1543, dan career-bharata #12; backend dan Web ERP live prod, portal karir prod belum (per 2026-09-12). Keputusan & konsekuensi lengkap: [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]. Endpoint lengkap: [[API - Recruitment Service]] bagian **Perusahaan**.
+> Recruiter yang bekerja di satu perusahaan grup menangani rekrutmen **semua** perusahaan grup lewat izin `recruitment.cross_company` yang dipasang sadar ke posisi (bukan daftar perusahaan tertentu). Pengguna lain tetap terkunci ke perusahaannya sendiri. Merged 2026-09-12 lewat bip-erp #1853, erp-frontend #1543, dan career-bharata #12; backend, Web ERP, dan portal karir live prod (per 2026-09-12). Keputusan & konsekuensi lengkap: [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]. Endpoint lengkap: [[API - Recruitment Service]] bagian **Perusahaan**.
 
 ### Perusahaan diturunkan satu arah, anak kandidat tanpa salinan
 

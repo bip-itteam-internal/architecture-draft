@@ -2,7 +2,7 @@
 
 *Desain (to-be) subsistem **Recruitment** — mengelola **siklus depan karyawan**: dari kebutuhan posisi sampai jadi karyawan aktif. Memisahkan subsistem **Talent acquisition → Interview → On-boarding** yang sekarang menumpuk di [[HRIS - Analysis]] ke ruangnya sendiri.*
 
-- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. ⚠️ **Rekrutmen lintas perusahaan: merged 2026-09-12, backend dan Web ERP live di prod, portal karir prod belum, paket belum dipasang** (diukur 2026-09-12, lihat bagian "Rekrutmen Lintas Perusahaan" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian "Alur Kerja HR" di bawah)
+- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. ⚠️ **Rekrutmen lintas perusahaan: merged 2026-09-12, backend, Web ERP, dan portal karir live di prod, paket belum dipasang** (diukur 2026-09-12, lihat bagian "Rekrutmen Lintas Perusahaan" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian "Alur Kerja HR" di bawah)
 - **Target arsitektur**: microservice `recruitment-service` baru ([[Microservices - Recruitment Service]]) + modul web, dengan **rollout bertahap**
 - Titik singgung yang sudah ada di kode: `POST /onboarding/register` (aktivasi akun karyawan baru) di [[Microservices - Employee Service]]. ⚠️ **Bukan handoff hire yang bekerja**: aktivasinya mewajibkan username, password, dan PIN baru yang diisi karyawan sendiri, jadi hire tak pernah berhasil memanggilnya (lihat langkah 8 pipeline di bawah)
 
@@ -198,9 +198,10 @@ Excalidraw).
 > - **Prod**: backend (seluruh stack dibangun ulang 07:32 WIB) dan Web ERP (07:35 WIB) sudah live, gerbang
 >   biner dan bundel lulus. Backfill mengisi `company_id=BIP` ke 30 dokumen lama; nol dokumen tanpa
 >   `company_id`, index unik lama MPP sudah di-drop, pengaju, pembuka lowongan, dan karyawan onboarding
->   non-BIP nol. Portal karir prod **belum** di-deploy. Paket `recruitment_lintas_perusahaan` **belum**
->   dipasang, tetapi kedua pemegang posisi target (HRD Supervisor, Recruitment & Onboarding) sudah admin
->   pusat (`system_roles.group = admin`), jadi lintas perusahaan sudah aktif bagi mereka.
+>   non-BIP nol. Portal karir live prod 08:45 WIB (`company_name` di bundel 3 berkas, sebelumnya 0). Paket
+>   `recruitment_lintas_perusahaan` **belum** dipasang (0 posisi, 0 akun, diukur 09:44 WIB), tetapi kedua
+>   pemegang posisi target (HRD Supervisor, Recruitment & Onboarding) sudah admin pusat
+>   (`system_roles.group = admin`), jadi lintas perusahaan sudah aktif bagi mereka.
 > - **Master perusahaan prod berbeda dari dev**: `ELT` bernama "Elite Packaging Solutions" (dev "CV Elit")
 >   dan punya satu departemen; `FLS` "FLASH COMPUTER" aktif tanpa departemen. Nama master inilah yang
 >   tampil di email, portal, dan notifikasi.
@@ -209,9 +210,11 @@ Excalidraw).
 >   ELT terbuka dengan `username`/`phone_number` kosong dan `role_system` ditolak 403; requisition tersimpan
 >   ELT; notifikasi SPV HRD menyebut "CV Elit"; SPV HRD bisa memutus requisition ELT. Belum diverifikasi:
 >   lowongan ELT di portal, melamar, dan perjalanan utuh recruiter di layar.
-> - ⚠️ **Halaman Permintaan Rekrutmen melempar galat** saat disaring ke perusahaan tanpa departemen:
+> - ✅ **Halaman Permintaan Rekrutmen sempat melempar galat** saat disaring ke perusahaan tanpa departemen:
 >   `GET /api/employee/data-type/department?company=` membalas `{"data":null}`, dan `useDataTypes`
->   meneruskannya ke `departments.filter(...)`. Perbaikannya di erp-frontend branch `fix/use-data-types-null`.
+>   meneruskannya ke `departments.filter(...)`. Diperbaiki erp-frontend
+>   [#1548](https://github.com/bip-itteam-internal/erp-frontend/pull/1548) (hook menormalkan `null` jadi `[]`),
+>   live prod 2026-09-12 09:43 WIB; perilakunya di layar (saring ke FLS) belum diuji.
 >
 > Keputusan arsitektur: [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]. Landasan:
 > [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] (`company_id` = batas data),
