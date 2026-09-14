@@ -190,6 +190,11 @@ menyertakan diagram ASCII. Sebutkan juga berkas mana yang sebaiknya diberi komen
 diagram inline: model dengan transisi status berlapis, service dengan pipeline
 multi-langkah.
 
+Diagram ASCII tetap wajib di artefak rencana karena bisa di-diff. Untuk alur yang melintasi
+tiga service atau lebih, atau yang perlu dijelaskan ke orang non-teknis, peta interaktif
+Archify boleh dilampirkan sebagai tambahan lewat skill `peta-alur`. Lampiran itu tidak
+menggantikan diagram ASCII.
+
 ---
 
 ## 6. Jangan

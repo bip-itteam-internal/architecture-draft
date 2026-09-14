@@ -146,3 +146,4 @@ memang tempat orangnya duduk.
 - [[APP - Web ERP]]
 - [[HRIS - Organization Structure]]
 - [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
+- [[Unlisted - Kesekretariatan (Big Pictures)]]: departemen pemilik modul `secretary`

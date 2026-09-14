@@ -2,7 +2,7 @@
 
 *Peta seluruh kapabilitas AI di ERP Bharata dalam satu tempat, beserta gerbang yang menentukan kapan pekerjaan AI baru boleh dimulai, dan rancangan kapabilitas prediktif pertama. Dibuat karena AI sudah berjalan di empat tempat yang tidak saling menaut, sehingga tidak ada yang dapat menjawab apa yang kita punya dan mana yang benar-benar hidup.*
 
-- **Status**: ⚠️ **Sebagian Implemented** — dua kapabilitas generatif hidup di produksi, satu WIP, tiga masih konsep tanpa kode. Kapabilitas prediktif belum berkode sama sekali.
+- **Status**: ⚠️ **Sebagian Implemented** — dua kapabilitas generatif hidup di produksi, satu WIP, empat masih konsep tanpa kode. Kapabilitas prediktif belum berkode sama sekali.
 - **Keputusan yang mengikat**: [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]
 - **Implementasi prediktif (rencana)**: [[Microservices - Marketing Analytics Service]]
 
@@ -24,12 +24,13 @@ Dua sifat yang sangat berbeda hidup berdampingan di sini, dan membedakannya pent
 | OCR dan document intelligence | Generatif | rencana OCR + RAG lokal | 🟡 konsep, **0 kode** | [[CORE - OCR Document Service]] |
 | Asisten tanya-jawab angka bisnis | Generatif | rencana Claude + Tool Runner | 🟡 konsep, **0 kode** | [[Microservices - Assistant Service]] |
 | Peringatan dini belanja iklan | **Prediktif** | belum ditentukan | 🟡 konsep, **0 kode** | dokumen ini |
+| Prediksi paket COD gagal antar | **Prediktif** | belum ditentukan | 🟡 ditinjau ulang 2026-09-14, **0 kode** | [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] §7 |
 
 Akses Claude ke vault lewat [[Microservices - Vault MCP Service]] sengaja **tidak** dimasukkan sebagai kapabilitas AI produk. Ia jalur baca dokumentasi untuk manusia, bukan fitur yang dipakai pengguna ERP.
 
 ⚠️ [[Microservices - Assistant Service]] adalah kapabilitas pertama yang **membaca data ERP atas nama seorang pemakai**, sehingga ia satu-satunya yang memunculkan pertanyaan hak akses per-orang. Empat kapabilitas sebelumnya tidak menyentuh data ERP sama sekali. Ia generatif, jadi gerbang label historis tidak mengikatnya, tetapi syarat ketiga ADR 0058 tetap mengikat penuh.
 
-Klaim "0 kode" pada dua baris di atas diverifikasi dengan `git grep` berbatas kata memakai kontrol positif dan negatif, bukan dengan pencarian teks biasa. Rincian dan alasannya di [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]].
+Klaim "0 kode" pada dua baris di atas diverifikasi dengan `git grep` berbatas kata memakai kontrol positif dan negatif, bukan dengan pencarian teks biasa. Rincian dan alasannya di [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]. Baris prediksi paket COD gagal antar diverifikasi dengan cara yang sama pada 2026-09-14: `git grep` pada origin/main tidak menemukan skor risiko retur, dengan kontrol positif 1.204 berkas integration yang menyebut retur.
 
 ## Ruang Lingkup / Cakupan (business view)
 
@@ -153,6 +154,47 @@ Kegagalannya berbentuk yang paling sulit disadari: orang menutup iklan yang sebe
 
 Tidak ada ramalan lintas musim. Riwayat pesanan yang efektif hanya Januari sampai Agustus 2026 dan baru padat sejak Mei, sehingga tidak ada satu pun siklus tahunan yang pernah terlihat data ini.
 
+## Kandidat yang Ditinjau Ulang: Paket COD Gagal Antar
+
+Ditambahkan 2026-09-14 setelah dua fakta di [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] terbukti keliru (lihat bagian Koreksi di ADR itu). Belum ada kode, dan belum boleh dibangun sebelum ongkos per paket dan tindakan toko terjawab.
+
+### Apa yang sebenarnya terjadi
+
+Retur fisik di ERP ini hampir seluruhnya **paket COD yang gagal diantar**. Dari 5.742 order yang barangnya kembali ke gudang, 97,8% dibatalkan sistem sesudah dikirim dan 97,5% memakai COD. Arah sebaliknya belum terbukti: pada order Juli yang dikirim lalu dibatalkan, baru 41% yang tercatat kembali ke gudang, dan nasib sisanya belum dipastikan. Laju retur fisik pada order Juli yang dikirim: TikTok 4,3%, Shopee 2,9%, sekitar 3.200 paket per bulan. Jeda dari order sampai retur tercatat: median 19 hari, 90% dalam 35 hari, 99% dalam 50 hari.
+
+### Tiga jebakan kebocoran data, semuanya terbukti
+
+Setiap fitur wajib diambil sebagaimana saat order dikirim, bukan dari keadaan terakhir yang tersimpan. Tiga kolom berikut berubah SESUDAH hasilnya terjadi, sehingga model yang memakainya tampak sangat akurat padahal hanya membaca jawaban:
+
+| Kolom | Apa yang terjadi | Bukti |
+|---|---|---|
+| `tt_shop_orders.recipient_address.district_info` | Dihapus marketplace setelah order batal | 88% order yang diretur beralamat kosong, lawan 5,6% order lain. Aturan yang memakai "provinsi kosong" tampak menangkap 78,5% retur dengan menandai 10% order, dan angka itu palsu. |
+| `transaction_orders.total_payment` (Shopee) | Dikosongkan setelah batal | Segmen bernilai kosong berlaju retur 48% |
+| `transaction_orders.buyer.province` (Shopee) | Disamarkan `****` | Tidak bisa dipakai sama sekali |
+
+Alamat yang tercatat sebelum pengiriman ada di `warehouse_db.fulfillment_orders.recipient_address`, berupa teks bebas dan baru tersedia sejak 2026-07-12.
+
+### Dua jebakan cara menghitung
+
+- **Populasinya adalah order yang sudah dikirim, apa pun status akhirnya.** Menyaring `status != CANCELLED` membuang 97,8% retur, karena paket gagal antar justru berstatus batal.
+- **Di `accurate_daily_returns`, `date_wib` adalah hari ORDER** (kunci dokumen harian Accurate), bukan hari barang kembali. Tanggal retur ada di `trans_date`, dan `date_source` hanya mencatat asal tanggal, bukan jenis retur. Retur fisik ditandai adanya `warehouse_items`; baris tanpa itu yang ber-`date_source=cancelled` adalah pembatalan order yang telanjur difakturkan.
+
+### Aturan sederhana bebas-bocor yang sudah diuji
+
+TikTok, order Juli yang dikirim. Riwayat pembeli dihitung lewat `tt_shop_orders.user_id` dari **waktu kejadian** sebelum 1 Juli (`delivery_time` untuk paket yang diterima, `cancel_time` bersama `collection_time` untuk paket yang gagal diantar), bukan dari status yang tersimpan sekarang:
+
+| Segmen | Porsi order | Porsi retur | Laju retur |
+|---|---|---|---|
+| COD, sebelumnya pernah gagal diantar | 0,7% | 2,6% | 15,7% |
+| COD, pernah order tapi belum pernah sukses menerima | 3,2% | 5,6% | 7,5% |
+| COD, pembeli baru | 64,7% | 86,2% | 5,7% |
+| COD, pernah sukses menerima | 12,2% | 4,6% | 1,6% |
+| Non-COD | 19,2% | 1,1% | 0,2% |
+
+⚠️ Versi pertama tabel ini menghitung riwayat dari status yang tersimpan, dan segmen belum-pernah-sukses tampak berlaju 10,8%. Itu sedikit bocor: order Juni yang baru gagal di bulan Juli ikut terbaca sebagai riwayat untuk order Juli. Dengan waktu kejadian, lajunya 7,5%.
+
+Kurir tidak membedakan, karena hampir seluruh pengiriman TikTok memakai J&T. Aturan yang sempit menangkap sedikit retur, aturan yang lebar menandai mayoritas order. Itu alasan sah untuk menguji model, tetapi belum bukti bahwa model akan menang.
+
 ## Persona / Pengguna
 
 | Persona | Peran & Divisi | Akses / RBAC | Device |
@@ -195,7 +237,8 @@ Kepemilikan toko dibaca dari pemetaan ICC yang sudah ada, bukan ditebak dari nam
 - **Perlakuan terhadap `gmv_max`**: apakah video yang belanjanya hanya berasal dari prorata campaign ikut diperingatkan, diperingatkan dengan penanda keyakinan lebih rendah, atau dikeluarkan sama sekali dari daftar. Belum diputuskan, dan pilihannya mengubah siapa yang muncul di layar.
 - **Seluruh sisi frontend**: halaman mana yang menampungnya, komponen apa yang dipakai, dan kunci i18n `id` serta `en` yang diwajibkan [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]] untuk tiap teks baru yang tampil ke pengguna.
 - **Runtime bila model terlatih ternyata diperlukan**: [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] §2 menetapkan tempatnya, yaitu service pemilik data, dan itu memadai untuk aturan statistik di Go. Untuk model terlatih belum terjawab, karena marketing-analytics adalah Go dan tidak ada service Python di bip-erp.
-- **Isi `accurate_daily_returns`** (7.779 baris) belum dibuka, dan dapat mengubah putusan pada kandidat retur.
+- **Ongkos satu paket COD yang gagal diantar** (ongkir berangkat dan kembali, packing, penanganan, barang rusak atau dikerjakan ulang). Sebagian besar tidak ada di sistem, dan angka inilah yang menentukan apakah kandidat prediksi paket COD gagal antar sepadan.
+- **Tindakan yang tersedia bagi toko** terhadap order COD berisiko sebelum dikirim. Kemampuan tiap marketplace belum diperiksa. Tanpa tindakan, prediksi apa pun hanya laporan.
 - **Penurunan tajam Maret 2026** belum dipastikan kenyataan bisnis atau lubang sinkronisasi. Bila lubang data, setiap model akan tersandung di titik yang sama.
 
 ## Dokumen Terkait

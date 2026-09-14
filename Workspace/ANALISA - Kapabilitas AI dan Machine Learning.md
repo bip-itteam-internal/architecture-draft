@@ -26,13 +26,23 @@ Keluaran: putusan tertulis, dan bila lubang, catatan di dok domain tentang renta
 
 Dependensi: tidak ada.
 
-### T3. Buka isi `accurate_daily_returns`
+### T3. Buka isi `accurate_daily_returns` (SELESAI 2026-09-14)
 
-7.779 baris, belum pernah dibuka. Berpotensi menjadi sumber label retur yang jauh lebih baik daripada 412 yang ditemukan di `transaction_orders`. Bila ternyata memadai, kandidat retur yang ditolak ADR 0058 §7 wajib ditinjau ulang lewat ADR baru, bukan lewat pengecualian diam-diam.
+Dibuka, dan membalik dua putusan ADR 0058 (lihat bagian Koreksi di sana). Retur fisik ternyata paket COD yang gagal diantar: 5.742 order, 97,8% dibatalkan sistem sesudah dikirim. Aturan sederhana bebas-bocor sudah diuji dan lemah; rincian beserta tiga jebakan kebocoran datanya di [[CORE - Kapabilitas AI dan Machine Learning]] bagian Kandidat yang Ditinjau Ulang.
 
-Keluaran: jumlah label yang benar-benar tersedia beserta rentang tanggalnya.
+ADR 0058 dikoreksi di tempat, bukan lewat ADR baru, karena statusnya masih Diusulkan dan yang keliru adalah dasarnya, bukan datanya yang bertambah.
 
-Dependensi: tidak ada. Boleh paralel dengan T1 dan T2.
+### T3b. Ukur ongkos satu paket COD yang gagal diantar
+
+Gerbang kandidat paket COD gagal antar. Ongkir berangkat dan kembali, packing, penanganan, dan barang yang rusak atau dikerjakan ulang (`manufacture_transaksi` punya `qtyReject` dan `qtyRework`). Dikali sekitar 3.200 paket per bulan, angka ini menentukan apakah kandidatnya sepadan. Sebagian besar tidak ada di sistem, jadi perlu dari tim operasional.
+
+Dependensi: tidak ada.
+
+### T3c. Pastikan tindakan yang tersedia bagi toko
+
+Gerbang kandidat yang sama. Apa yang bisa dilakukan toko terhadap order COD berisiko sebelum dikirim: konfirmasi lewat chat marketplace, menahan pengiriman, atau tidak ada sama sekali. Kemampuan tiap marketplace belum diperiksa. Tanpa tindakan, prediksi apa pun hanya laporan.
+
+Dependensi: tidak ada. Boleh paralel dengan T3b.
 
 ### T4. Ukur pembanding aturan sederhana
 

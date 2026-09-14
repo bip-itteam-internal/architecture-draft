@@ -13,18 +13,22 @@ lalu tawarkan install yang belum ada. **User cukup konfirmasi — kamu yang menj
 | **dataviz** | chart/visualisasi data konsisten | `claude plugin install dataviz@claude-plugins-official` |
 | **frontend-design** | arah desain UI (erp-frontend, mybharata) | `claude plugin install frontend-design@claude-plugins-official` |
 | **deep-research** | riset multi-sumber terverifikasi | `claude plugin install deep-research@claude-plugins-official` |
+| **archify** | peta arsitektur/alur interaktif dari kode; dipakai lewat skill tim `peta-alur` | `pnpm dlx skills add tt-a1i/archify --skill archify --agent claude-code --global --copy --yes` (**bukan** plugin marketplace) |
 
 ## Langkah
 1. **Cek terpasang**: tentukan skill mana yang SUDAH ada — bandingkan daftar di atas dengan skill
    yang tersedia di sesi ini (lihat daftar skill di `<system-reminder>`) DAN/ATAU jalankan
-   `claude plugin list`. Tandai tiap baris **✅ ada** / **⬜ belum**.
+   `claude plugin list` (archify: cek folder `~/.claude/skills/archify`). Tandai tiap baris
+   **✅ ada** / **⬜ belum**.
 2. **Sajikan** ringkas: yang ✅ dan yang ⬜ (+ kegunaan). Bila SEMUA ✅ → selesai
    ("semua skill rekomendasi tim sudah terpasang").
 3. Bila ada yang ⬜ → **tawarkan install** yang kurang (sebut command-nya). **BERHENTI, tunggu
    konfirmasi user** (boleh pilih sebagian).
-4. Setelah user konfirmasi → jalankan `claude plugin install <nama>@claude-plugins-official` untuk
-   tiap yang dipilih. Bila nama marketplace beda / install gagal headless → arahkan user verifikasi
-   via `/plugin` (tab Marketplaces) atau install manual lewat `/plugin` (tab Discover).
+4. Setelah user konfirmasi → jalankan perintah di kolom **Install** untuk tiap yang dipilih, lewat
+   tool PowerShell. Plugin marketplace: bila nama marketplace beda atau install gagal headless,
+   arahkan user verifikasi via `/plugin` (tab Marketplaces) atau install manual lewat `/plugin`
+   (tab Discover). archify: perintah `pnpm dlx skills add …` di tabel memasangnya ke
+   `~/.claude/skills/`.
 5. **Ingatkan**: skill baru umumnya baru aktif setelah **restart sesi** Claude Code.
 
 ## Catatan
