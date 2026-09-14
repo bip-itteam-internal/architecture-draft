@@ -251,7 +251,7 @@ Menutup TBD lama "mapping hire → data karyawan". Pembuatan **data master karya
 
 ## Increment: Link Form Feedback Interview (email pewawancara, 2026-07-18 — merged)
 
-> BE **PR #536** (bip-erp) + FE **PR #381** (erp-frontend), keduanya **merged** ke `main`. `go build`/`vet`/`test` hijau. **BE dilaporkan sudah ter-deploy di dev**; env `ERP_FRONTEND_URL` (pola sama dengan `reviewFormURL` di [[HRIS - Recruitment]] Performance Review Onboarding) sudah di-set di VM dev. Semula **⚠️ tak terdaftar** di `docker-compose.yml`/`.env.example` repo (masuk lewat `.env` server di luar repo); 🟡 **(bip-erp `fix/recruitment-tautan-email`, belum merge)** kini tercatat eksplisit di keduanya, lihat increment **Tautan Email per Penerima**.
+> BE **PR #536** (bip-erp) + FE **PR #381** (erp-frontend), keduanya **merged** ke `main`. `go build`/`vet`/`test` hijau. **BE dilaporkan sudah ter-deploy di dev**; env `ERP_FRONTEND_URL` (pola sama dengan `reviewFormURL` di [[HRIS - Recruitment]] Performance Review Onboarding) sudah di-set di VM dev. Semula **⚠️ tak terdaftar** di `docker-compose.yml`/`.env.example` repo (masuk lewat `.env` server di luar repo); ✅ **(bip-erp #1870, merged 2026-09-14)** kini tercatat eksplisit di keduanya, lihat increment **Tautan Email per Penerima**.
 
 Menutup gap **"notifikasi email ke pewawancara"** dari increment Interview Orchestration di atas: pewawancara stage **User/Final** kini mengisi feedback lewat **link 1-sesi via email** (login-gated), bukan lagi menu "Interview Saya".
 
@@ -332,7 +332,7 @@ Lima test AST memindai `services/recruitment/*.go` (bukan file `_test.go`), buka
 - **Berlaku sesudah login ulang**: izin dipanggang ke klaim JWT saat login, sama seperti ADR 0080. Cache respons gateway yang berkunci `employee_id` juga bisa menahan respons lama sampai TTL habis.
 - Gerbang verifikasi sebelum paket dipasang, lewat gateway: `GET /api/recruitment/companies` membalas `200`/`403` (bukan `404` rute hilang); baris `GET /api/recruitment/mpp/vacancies` membawa `company_id`.
 
-## Increment: Tautan Email per Penerima (2026-09-14, 🟡 bip-erp `fix/recruitment-tautan-email`, belum merge)
+## Increment: Tautan Email per Penerima (2026-09-14, ✅ bip-erp #1870 `32edb66c`, live dev dan prod 2026-09-14)
 
 > Laporan user 2026-09-12: penilai membuka tautan "isi penilaian onboarding" dari email dan tak muncul apa-apa. Diukur di prod (baca saja) hari itu: `.env` recruitment berisi `ERP_FRONTEND_URL=https://career.bharatainternasional.com` dan `CAREER_PORTAL_URL=career.bharatainternasional.com`, sehingga `career.bharatainternasional.com/onboarding-review/<id>` dan `/interview-feedback/<id>` membalas 404 "This page could not be found" (sama dengan path karangan), sementara `/psikotes/<token>` di sana 200. Alamat web ERP prod `https://erp.bharatainternasional.com`.
 
@@ -354,7 +354,7 @@ Tiga tautan email dirakit dari env, dan dulu ketiganya membaca `ERP_FRONTEND_URL
 - **Prod (dijalankan manusia)**: `ERP_FRONTEND_URL` di `.env` diubah ke `https://erp.bharatainternasional.com` **bersamaan** dengan build recruitment-service. Mengubah env lalu membuat ulang container dengan image lama memindahkan tautan psikotes ke web ERP, dan sesi berpaket ditolak di sana.
 - **Dev**: `.env` dev berisi `CAREER_PORTAL_URL=career.bharatainternasional.com` (portal karir prod, karena tak ada portal karir di VM dev) dan `ERP_FRONTEND_URL=https://erp-dev.bharatainternasional.com` (diukur 2026-09-12). Sesudah perubahan ini tautan psikotes dari dev membuka portal karir prod dan terbaca tidak berlaku; uji tes berpaket dev tetap lewat portal karir lokal.
 - Undangan penilai dan pewawancara yang terkirim sebelum env prod diperbaiki tetap membawa tautan lama; tak ada kirim ulang otomatis. HR menyalin tautan lewat **Salin Link Penilaian** (detail sesi Performance Review) atau salin link feedback (menu Interviews), keduanya dirakit dari `window.location.origin`.
-- Keadaan prod per 2026-09-14: branch belum merge, jadi belum ter-deploy. Ukur ulang sebelum dipakai.
+- Keadaan per 2026-09-14 (ukur ulang sebelum dipakai): merged 08:47 WIB. **Prod** dideploy manusia 08:48:59 WIB dengan `.env` `ERP_FRONTEND_URL=https://erp.bharatainternasional.com`; gerbang biner `urlDasarEnv` ada (kontrol positif ada, string karangan nol), `printenv` kedua env benar, dan dari server `erp.bharatainternasional.com/onboarding-review/x` serta `/interview-feedback/x` membalas 200 sementara `career.bharatainternasional.com/onboarding-review/x` 404. **Dev** dibangun manual 09:05 WIB karena pipeline belum memprosesnya; `POST /api/recruitment/candidates/<uji>/psikotes/reissue` lewat gateway membalas `link` berawalan `https://career.bharatainternasional.com/psikotes/`. Belum ada bukti dari email asli: pukul 09:09 WIB `interview_feedback` prod masih 0 dan belum ada undangan baru sejak deploy, jadi feedback pertama sesudah deploy adalah buktinya.
 
 ## Dokumen Terkait
 
