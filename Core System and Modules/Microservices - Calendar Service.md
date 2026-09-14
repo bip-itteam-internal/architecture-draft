@@ -40,7 +40,7 @@ Alasannya bukan kerapian: tiap kalender tambahan membawa salinan aturan visibili
 - **Prefix `/internal/` TIDAK membuat rute privat.** Gateway tetap meneruskan permintaan dari internet, jadi tiap endpoint feed wajib memeriksa identitas pemanggil sendiri. Lihat [[Microservices - Employee Service]] yang sudah mencatat pola ini di rute `/internal/check`.
 - **Jangan masukkan URL provider ke map yang divalidasi `ValidateInternalURL`.** Penjaga itu memanggil panic untuk URL kosong, dan di sini URL kosong adalah keadaan sah: service sumber yang belum ter-deploy cukup dilewati. Melanggar ini memadamkan seluruh kalender hanya karena satu service belum di-deploy.
 - **Jangan menulis ulang resolusi milik modul lain.** Feed shift memanggil resolver jadwal yang sama dengan halaman Jadwal, karena urutan menangnya berlapis (roster menimpa jadwal dasar, lalu Tukar Shift menimpa keduanya). Menyalin urutan itu melahirkan sumber kebenaran kedua yang pasti menyimpang.
-- **Jangan menambah endpoint kalender sendiri.** Rencana `GET /bookings/calendar` di [[GA - Asset Loan & Room Booking]] harus menjadi `/internal/calendar-feed` di [[Microservices - Inventory Service]] saat dikerjakan, bukan kalender kedua.
+- **Jangan menambah endpoint kalender sendiri.** Booking Ruang sudah menempuh jalan yang benar: rencana lama `GET /bookings/calendar` di [[GA - Asset Loan & Room Booking]] tidak dibangun, dan booking ruang masuk kalender lewat `/internal/calendar-feed` di [[Microservices - Inventory Service]] (kind `room_booking`, lihat § Aturan visibilitas feed Booking Ruang). Fitur bertanggal berikutnya menempuh jalan yang sama, bukan membangun kalender kedua.
 - **Feed yang gagal tidak boleh menjatuhkan kalender.** Kegagalan apa pun (termasuk 404 karena endpoint belum ada) turun kelas jadi penanda `degraded`, dan frontend memberi tahu pengguna. Kalender bolong tanpa pemberitahuan lebih berbahaya daripada kalender yang mengaku sedang pincang.
 
 ### Checklist untuk AI agent
@@ -79,6 +79,7 @@ Saat merencanakan fitur yang menyentuh tanggal, jawab dulu:
 | [[Microservices - Employee Service]] | `movement` | ⚠️ **merged ke `main` 2026-08-10** (PR [#1142](https://github.com/bip-itteam-internal/bip-erp/pull/1142)), belum diverifikasi lewat gateway. Promosi/mutasi pemanggil sendiri, seharian. Catatan `cancelled` tak pernah muncul (orang akan bersiap untuk kepindahan yang batal), `applied` tetap muncul sebab itu peristiwa yang benar-benar terjadi. `company_id` item diambil dari perusahaan **pembaca**, bukan dari dokumen: pemiliknya ada di tenant asal sebelum tanggal efektif dan di tenant tujuan sesudahnya, jadi item yang distempel salah satu sisi tersaring hilang persis di sisi tempat ia berdiri ([[ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id]]) |
 | [[Microservices - Task Management Service]] | `task_due` | Tenggat tugas pemanggil. Penyaring "belum selesai" memakai `completed_at`/`is_archived` **plus** status `Ditolak` secara eksplisit, karena penolakan tidak menstempel `completed_at` dan kosakata statusnya tidak konsisten (Done/Selesai/Dikerjakan/Progress/Ongoing/Todo/Request) |
 | [[Microservices - Form Builder Service]] | `form_period` | **Kaizen saja.** Hanya kaizen yang menyimpan snapshot peserta, jadi hanya di sana bisa dipastikan periode itu memang kewajiban pemanggil. Item ditaruh di `closes_at`, dan yang sudah memenuhi kuota dilewati lewat `countMyKaizenIdeas` yang sudah ada |
+| [[Microservices - Inventory Service]] | `room_booking` | Booking Ruang GA **milik pemanggil sendiri saja**, berjam, lingkup `personal`. Status booking dipetakan ke `tentative`/`confirmed`/`cancelled`, dan booking yang lahir dari modul lain dilewati. Rinciannya di § Aturan visibilitas feed Booking Ruang |
 | **calendar (sendiri)** | `event` | Agenda mandiri. Satu-satunya jenis yang menampilkan orang lain, dan itu sah karena pesertanya dilibatkan dengan sengaja oleh pembuatnya |
 
 ### Aturan visibilitas agenda mandiri
@@ -92,6 +93,41 @@ Ditegakkan `canViewEvent` di `event_visibility.go`, urutannya penting:
 Perbandingan tak peka huruf besar-kecil, dan **string kosong tidak pernah dianggap sama dengan string kosong** — kalau tidak, karyawan tanpa departemen akan saling melihat agenda departemen masing-masing.
 
 Query Mongo menyempitkan seadanya, lalu **tiap dokumen tetap dilewatkan `canViewEvent`**. Query adalah pengecil beban, bukan gerbang: menaruh aturan visibilitas di dua tempat berarti keduanya bisa menyimpang diam-diam.
+
+### Aturan visibilitas feed Booking Ruang (`room_booking`)
+
+Provider `{Key: "inventory", Label: "Booking Ruang"}` di `providers.go`, env `INVENTORY_MODULE_URL` di blok `calendar-service` pada `docker-compose.yml`. Env baru, jadi container dinaikkan dengan `--force-recreate calendar-service`, bukan `restart`. ⚠️ `docker-compose.dev.yml` tidak memuat blok `calendar-service` sama sekali (satu-satunya jejak kalender di sana adalah `CALENDAR_MODULE_URL` milik gateway). Feed-nya `services/inventory/calendar_feed.go`; keputusan desain Booking Ruang ada di [[ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor]].
+
+Penyaringan, urutannya:
+
+1. **Tanpa identitas pemanggil ditolak 403**, diperiksa paling awal. Prefix `/internal/` bukan batas keamanan ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]).
+2. **Rentang**: `from`/`to` wajib RFC3339, `to` tak boleh mendahului `from`, maksimal 400 hari. Pelanggaran dibalas 400.
+3. **Kueri disempitkan** ke `company_id` pemanggil (kalender selalu meneruskannya lewat `identityHeaders`), `pemohon_id` = pemanggil, `asal` tidak ada, dan **beririsan** dengan rentang (`mulai_at < to`, `selesai_at > from`), bukan "mulai di dalam rentang": rapat pukul 23:00 kemarin sampai 01:00 tetap tampil.
+4. **Tiap dokumen tetap dilewatkan `saringFeedPeminjaman`**, yang membuang booking milik orang lain dan booking ber-`asal` walau kuerinya sudah menyempit. Sama dengan agenda mandiri: kueri pengecil beban, bukan gerbang.
+
+Yang sengaja tidak dipancarkan:
+
+- **Jadwal ruang milik orang lain, sekalipun pemanggilnya penyetuju.** Feed ini tak punya cabang peran apa pun; yang perlu melihat jadwal ruang memakai halaman modulnya. Ini prinsip tiga lapis di atas.
+- **Booking yang lahir dari modul lain** (field `asal` terisi; komentar model menyebut Agenda, Interview, Program Culture, Pelatihan), karena agendanya sudah tampil lewat modul asalnya dan menampilkannya lagi membuat satu rapat terlihat dua kali. Per kode saat ini belum ada yang menulis `asal` (komentar `AsalPeminjaman`: diisi mulai irisan 4), jadi penyaring ini baru benar-benar bekerja begitu irisan itu ada.
+
+Bentuk item:
+
+| Field | Nilai |
+|---|---|
+| `id` | `inventory:room_booking:<nomor>`, mis. `inventory:room_booking:PJR-20260915-001` |
+| `start_at` / `end_at` | `mulai_at` / `selesai_at` booking; `all_day` selalu `false` |
+| `scope` | `personal` |
+| `status` | `DIAJUKAN` → `tentative`, `DISETUJUI` → `confirmed`, selainnya (`DITOLAK`, `DIBATALKAN`) → `cancelled`. Booking yang ditolak atau dibatalkan tidak dibuang dari feed; frontend menggambar `tentative` bertepi putus-putus dan `cancelled` dicoret (`statusStyle`) |
+| `company_id` | Perusahaan **pembaca**, pola yang sama dengan feed `movement` |
+| `title` | `Booking <nama ruang>`, ditambah ringkasan keperluan bila diisi |
+| `deep_link` | `/ga/peminjaman?nomor=<nomor>`. Web tak punya rute per nomor; halaman daftar membuka sheet detail dari `?nomor=` (`erp-frontend/src/app/(main)/ga/peminjaman/page.tsx`). Tujuannya sama dengan tombol notifikasi web Booking Ruang di [[Microservices - Notification Service]] |
+| `meta` | `nomor`, `ruang` |
+
+Galat sumber turun kelas, bukan panik: database belum terhubung dibalas 503, galat lain 500, dan keduanya membuat kalender menandai `inventory` di `degraded`. Feed kosong dikirim `{"items":[]}`, bukan `null`.
+
+Frontend: entri `room_booking` di `src/features/calendar/lib/kind-style.ts` (ikon `DoorOpen`, warna teal, label `calendar.kind.roomBooking` = "Booking Ruang" / "Room Booking"), sehingga saringan per jenis ikut menawarkannya lewat `KNOWN_KINDS`.
+
+Uji: `services/inventory/calendar_feed_test.go` (pemetaan status, bentuk item, penyaring per-dokumen, tanpa identitas 403, rentang tak sah 400, hanya milik pemanggil dengan sumber tiruan yang sengaja ikut mengembalikan milik orang lain, kosong bukan `null`, galat sumber 503/500) dan `TestFilterFeedPeminjamanBeririsanTanpaAsal` di `peminjaman_dokumen_test.go` untuk batas kueri.
 
 ## Mesin kewajiban (irisan 3) — mesinnya jalan, jalur pemakainya belum
 
@@ -191,7 +227,7 @@ Pelajarannya: **"boleh diakses" bukan "layak muncul di kalender"**. Kalender ada
 - **Irisan 3, sesi wajib — SEBAGIAN sudah ada, rinciannya di § Mesin kewajiban.** Template, periode, potret peserta, dan penerbitan tagihan berjalan sejak PR [#1074](https://github.com/bip-itteam-internal/bip-erp/pull/1074) (2026-08-07); polanya menyalin `FormPeriod` di [[Microservices - Form Builder Service]] yang sudah terbukti di produksi. Yang **belum** ada: rute pemakai, papan kepatuhan, feed `obligation`, rute internal KPI, dan frontend. Yang tetap berlaku sebagai rancangan: yang wajib memilih sendiri lawan sesinya dari kandidat yang lolos aturan `counterpart` per-template, ditegakkan **di server** bukan sekadar dipakai menyaring dropdown; dan menjadwalkan **tidak** langsung memenuhi kewajiban, pertemuannya tetap harus ditandai selesai supaya angka kepatuhan mengukur kenyataan, bukan niat.
 - ✅ **Sudah diverifikasi 2026-08-31, lihat § Keadaan terukur.** Biner kewajiban ada di DEV **dan** PROD; angka nol di produksi berarti "belum ada yang membuat template", bukan "binernya belum di sana".
 - **TIDAK ADA persetujuan lawan** (keputusan pemilik produk 2026-08-07, membatalkan rancangan sebelumnya). Sesi wajib dihitung sebagai KPI, jadi agenda yang menunggu tombol setuju berarti **kepatuhan seseorang ditentukan oleh kecepatan orang lain merespons**: yang sudah menjadwalkan tepat waktu bisa tercatat lalai hanya karena lawannya tak membuka aplikasi. Lawan **diberi tahu, bukan dimintai izin**. Konsekuensi yang diterima: kalender tak tahu apakah lawan bisa hadir, bentroknya baru ketahuan saat harinya tiba, dan diselesaikan lewat percakapan biasa. Akibatnya `POST /events/:id/respond` **tidak dibuat**, status `proposed` dihapus dari `obligation_fulfillments`, dan `EventParticipant.Status` tetap `pending` untuk semua peserta tanpa ada yang membacanya (field-nya dipertahankan hanya karena dokumen lama memuatnya).
-- **Belum ada**: booking ruang meeting, pengingat lewat [[Microservices - Notification Service]], kalender di [[APP - MyBharata]], seret untuk menggeser agenda.
+- **Belum ada**: pengingat lewat [[Microservices - Notification Service]], kalender di [[APP - MyBharata]], seret untuk menggeser agenda. Booking ruang meeting tidak lagi di daftar ini: ia masuk sebagai feed `room_booking` (§ Aturan visibilitas feed Booking Ruang).
 
 ### Catatan teknis dan gotcha
 
@@ -210,11 +246,13 @@ Pelajarannya: **"boleh diakses" bukan "layak muncul di kalender"**. Kalender ada
 ## Dependensi & Integrasi
 
 - [[CORE - API Master Gateway]] — rute `/api/calendar/*`, identitas pemanggil, dan `noCacheRoutes`.
-- [[Microservices - Attendance Service]] · [[Microservices - Employee Service]] · [[Microservices - Task Management Service]] · [[Microservices - Form Builder Service]] — penyedia feed. **Semuanya opsional**: URL kosong berarti feed-nya dilewati, dan itulah sebabnya URL provider tidak boleh masuk map yang divalidasi `ValidateInternalURL`.
+- [[Microservices - Attendance Service]] · [[Microservices - Employee Service]] · [[Microservices - Task Management Service]] · [[Microservices - Form Builder Service]] · [[Microservices - Inventory Service]]: penyedia feed. **Semuanya opsional**: URL kosong berarti feed-nya dilewati, dan itulah sebabnya URL provider tidak boleh masuk map yang divalidasi `ValidateInternalURL`.
 - [[CORE - RBAC dan Permission Set]] — penyaringan item tarikan tetap milik service sumber; kalender tidak menambah lapis izin sendiri, kecuali untuk agenda mandiri yang memang datanya.
 
 ## Dokumen Terkait
 
 - [[APP - Web ERP]] — halaman `/calendar`: tampilan **bulan**, **minggu berkolom jam**, dan **daftar agenda**; saringan per jenis yang diingat `localStorage`; formulir buat/sunting agenda; `deep_link` `/calendar?event=<id>` membuka agenda tertentu.
-- [[GA - Asset Loan & Room Booking]] — rencana booking ruang yang harus masuk sebagai feed, bukan kalender kedua.
+- [[GA - Asset Loan & Room Booking]]: konsep domain Booking Ruang; implementasinya masuk kalender sebagai feed `room_booking`, bukan kalender kedua.
+- [[ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor]]: keputusan desain Booking Ruang.
+- [[Microservices - Inventory Service]]: service pemilik booking ruang dan feed `room_booking`.
 - [[Microservices - Form Builder Service]] — asal pola periode dan papan kepatuhan untuk irisan 3.
