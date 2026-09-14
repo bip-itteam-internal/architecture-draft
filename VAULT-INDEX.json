@@ -422,20 +422,20 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "d21ad21ae27ae8b54a72004a850594aa94e455c15abbf66da5f6def219479801",
-      "ukuran_kb": 93.1,
-      "ringkasan": "Menjawab: endpoint apa yang tersedia di integration-service untuk webhook marketplace, order terpadu, export order, aging piutang, feed retur untuk WMS, packet tracking, TikTok Shop/Business, Shopee, Accurate, dashboard akuntansi FAT, profit insentif, ICC mapping, kas toko, ulasan, dan status sinkron toko. Menjelaskan parameter filter (mis. `shopee_attribution`, `order_ids`, `updated_since`), bentuk respons, batas paginasi, serta rute mana yang publik vs butuh gateway key.",
+      "hash": "b1877cac2370ae192a7c16a715db4124ada26ca369b091e215462fd33a4a86da",
+      "ukuran_kb": 93.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service (webhook marketplace, order terpadu, TikTok Shop/Business, Shopee, Accurate, dashboard FAT /accounting, profit insentif, ICC account mapping, kas toko, ulasan, status sinkron toko), parameter apa yang diterima tiap endpoint, dan bentuk respons yang dikembalikannya. Berguna untuk mencari cara menarik daftar/ekspor order, aging piutang, feed retur untuk WMS, packet tracking, atau filter atribusi afiliasi Shopee, serta endpoint mana yang butuh gateway key.",
       "kata_kunci": [
-        "integration service",
-        "marketplace",
-        "webhook",
-        "order",
-        "retur",
-        "return",
-        "piutang",
+        "integration-service",
+        "API endpoint",
+        "webhook marketplace",
+        "order terpadu",
+        "transaction orders",
+        "aging piutang",
         "accounts receivable",
+        "retur",
         "packet tracking",
-        "Accurate"
+        "shopee_attribution"
       ]
     },
     {
@@ -2457,20 +2457,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "0e263ce0465440f677ee7ac3d115e8df2a8eb8e4521d6e6a697a80e17b65ced9",
-      "ukuran_kb": 390.1,
-      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop/Business, Shopee, Lazada) ke Accurate, bagaimana webhook masuk dan diverifikasi, cron dan worker apa yang berjalan, serta fitur seperti GMV Max monitoring, ICC account mapping, kepemilikan toko per departemen, ulasan marketplace, dan status sinkron per toko. Juga memuat rencana Meta Ads, beban operasional insentif per proyek Accurate, gross profit per produk, dan catatan ketahanan/observability Shopee.",
+      "hash": "4d195b75837d1f4d3ed7f35dc52d05563dd7deaddc3bd7decbc385a9524b0a25",
+      "ukuran_kb": 396.3,
+      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) dengan Accurate Online, bagaimana order masuk lewat webhook lalu dinormalkan jadi transaksi terpadu, dan bagaimana invoice, ringkasan harian, serta Sales Invoice/Sales Return di-push ke Accurate. Juga menjelaskan fitur seperti GMV Max monitoring, metrik video ICC, auto-ship sadar hari libur, cron sync, rencana Meta Ads, kepemilikan toko per departemen, gross profit per produk, ulasan marketplace, dan status sinkron toko yang banned.",
       "kata_kunci": [
         "integration service",
         "marketplace",
-        "TikTok Shop",
-        "Shopee",
-        "Lazada",
-        "Accurate",
-        "webhook",
+        "Accurate Online",
+        "webhook Shopee TikTok",
+        "Sales Invoice",
         "GMV Max",
-        "ICC mapping",
-        "cron worker"
+        "ICC",
+        "cron sync",
+        "Meta Ads",
+        "status sinkron toko"
       ]
     },
     {
