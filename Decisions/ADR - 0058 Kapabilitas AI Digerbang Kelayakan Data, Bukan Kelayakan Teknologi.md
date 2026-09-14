@@ -2,16 +2,25 @@
 
 - **Yang berubah di layar**: belum ada, sekarang juga. Keputusan ini menetapkan gerbang dan urutannya. Yang direncanakan sesudahnya: satu daftar peringatan dini yang menandai iklan video yang belanjanya berjalan tanpa menghasilkan penjualan, beserta pemberitahuan ke penanggung jawab tokonya.
 - **Siapa terdampak**: tim ICC pemegang toko dan atasan marketing. Tidak menyentuh HR, keuangan, maupun karyawan umum.
-- **Tidak dijanjikan**: tidak ada ramalan setahun ke depan (riwayat data baru delapan bulan), tidak ada pengurangan retur, tidak ada prediksi karyawan mengundurkan diri maupun penilaian pelamar, dan sistem tidak memotong anggaran sendiri.
+- **Tidak dijanjikan**: tidak ada ramalan setahun ke depan (riwayat data baru delapan bulan), belum ada janji pengurangan paket COD gagal antar (kandidatnya sedang ditinjau ulang, lihat bagian Koreksi), tidak ada prediksi karyawan mengundurkan diri maupun penilaian pelamar, dan sistem tidak memotong anggaran sendiri.
 - **Besaran kerja**: satu pengukuran murah lebih dulu untuk menguji apakah aturan sederhana sudah cukup, baru dinilai apakah model perlu dibangun sama sekali.
 
 ## Deskripsi
 
 *Kelayakan pekerjaan AI di bip-erp ditentukan oleh kelayakan DATA-nya, bukan oleh ketersediaan teknologinya. Tiga syarat dijadikan gerbang, model menumpang service yang sudah memegang datanya alih-alih berdiri sebagai service AI terpisah, dan kapabilitas prediktif pertama diarahkan ke belanja iklan karena di situ syaratnya terpenuhi sekaligus uangnya terbesar.*
 
-- **Status**: 🟡 **Diusulkan**, 2026-08-28, kode belum ada. Berdiri di atas pengukuran langsung database produksi pada 2026-08-28.
+- **Status**: 🟡 **Diusulkan**, 2026-08-28, kode belum ada. Berdiri di atas pengukuran langsung database produksi pada 2026-08-28, dikoreksi 2026-09-14 (lihat bagian Koreksi).
 - **Path di repo**: `bip-erp/services/marketing-analytics/` (baru, lapisan peringatan dini). Tidak ada service baru dan tidak ada perubahan gateway.
 - **Tanggal**: 2026-08-28
+
+## Koreksi 2026-09-14
+
+*Dua fakta di keputusan ini ternyata keliru, dan keduanya menyangkut kandidat yang sama. Keputusan ini dikoreksi di tempat, bukan lewat ADR baru, karena statusnya masih Diusulkan dan yang keliru adalah dasarnya, bukan datanya yang bertambah. Aturan "tinjau ulang lewat ADR baru" di bagian Consequences dimaksudkan untuk data yang bertambah, dan tetap berlaku untuk itu.*
+
+1. **Prediksi retur ditolak karena labelnya dikira cuma 412.** Angka itu diambil dari `transaction_orders.status = RETURNED`. Retur penjualan yang sebenarnya tercatat di `integration_db.accurate_daily_returns`: **5.742 order yang barangnya benar-benar kembali ke gudang** (baris ber-`warehouse_items`, untuk order sejak Juli 2026), dan 999 dari 1.000 order_id cocok ke data order.
+2. **Prediksi pembatalan ditunda karena 30.374 pembatalan oleh sistem sesudah dikirim dianggap belum jelas maknanya, dengan dugaan selisih pencatatan.** Dugaan itu keliru. Dari 5.742 order yang barangnya kembali ke gudang, **97,8% berstatus akhir CANCELLED oleh SYSTEM**, seluruhnya punya `shipped_at`, dan 97,5% memakai COD: paket yang gagal diantar lalu pulang, dengan ongkos nyata. Pada order Juli yang dikirim lalu dibatalkan, 41% sudah tercatat kembali ke gudang; nasib sisanya belum dipastikan. Laju retur fisik pada order Juli yang dikirim: TikTok 4,3%, Shopee 2,9%, sekitar 3.200 paket per bulan.
+
+Akibatnya "prediksi retur" dan "prediksi pembatalan" ternyata satu kandidat yang sama, yaitu **prediksi paket COD gagal antar**, dan statusnya berubah dari ditolak menjadi ditinjau ulang (lihat §7). Diukur di produksi 2026-09-14 lewat kueri baca. Cara menghitungnya dan tiga jebakan kebocoran data yang ditemukan saat mengukur dicatat di [[CORE - Kapabilitas AI dan Machine Learning]].
 
 ## Context
 
@@ -48,13 +57,12 @@ Belanja iklan setara **61% laba kotor**, sementara retur hanya 2,4%. Pada tingka
 |---|---|---|
 | Iklan video tidak konversi | 581.677 negatif, ~71.204 positif | 146 hari |
 | Permintaan per SKU | 86 SKU, 34 dengan riwayat memadai | 8 bulan |
-| Pembatalan pesanan | 81.696, tetapi 39.520 diinisiasi sistem | 8 bulan |
+| Paket COD gagal antar (dikoreksi 2026-09-14, dulu tercatat terpisah sebagai pembatalan dan retur) | 5.742 order yang barangnya kembali ke gudang | sejak Juli 2026 |
 | Keluhan produk dari ulasan | 342 ulasan bintang 3 ke bawah | 18 bulan |
-| Retur | 412 | 8 bulan |
 | Karyawan mengundurkan diri | 0 kejadian | 7 bulan, 208 orang |
 | Penilaian pelamar | koleksi kosong | tidak ada |
 
-Yang gugur, gugur karena kekurangan contoh untuk dipelajari, bukan karena kekurangan teknologi. Perbedaan ini menentukan sikap: menambah data akan mengubah putusannya, sedangkan mengganti algoritma tidak.
+Yang gugur, gugur karena kekurangan contoh untuk dipelajari, bukan karena kekurangan teknologi. Perbedaan ini menentukan sikap: menambah data akan mengubah putusannya, sedangkan mengganti algoritma tidak. Satu kandidat sempat keliru digugurkan karena labelnya dicari di koleksi yang salah (lihat bagian Koreksi).
 
 ### Riwayat data jauh lebih pendek daripada yang terlihat
 
@@ -127,7 +135,9 @@ Kandidat kedua, ramalan permintaan per SKU untuk perencanaan produksi, disiapkan
 
 ### 7. Yang ditolak sekarang, beserta angkanya
 
-Ditolak agar tidak diusulkan berulang tanpa data baru: **prediksi retur** (412 label), **prediksi karyawan mengundurkan diri** (0 kejadian tercatat, 208 orang, riwayat 7 bulan), **penilaian pelamar otomatis** (koleksi rekrutmen kosong, ditambah risiko bias yang tidak sebanding), dan **prediksi pembatalan pesanan** (ditunda, bukan ditolak permanen, karena 39.520 dari 81.696 pembatalan diinisiasi sistem dan dari 30.458 pembatalan sesudah barang dikirim sebanyak 30.374 juga sistem sementara pembeli hanya 49, sehingga artinya perlu dipastikan lebih dulu).
+Ditolak agar tidak diusulkan berulang tanpa data baru: **prediksi karyawan mengundurkan diri** (0 kejadian tercatat, 208 orang, riwayat 7 bulan) dan **penilaian pelamar otomatis** (koleksi rekrutmen kosong, ditambah risiko bias yang tidak sebanding).
+
+**Prediksi paket COD gagal antar: ditinjau ulang, belum dibangun** (dikoreksi 2026-09-14; dulu tercatat terpisah sebagai "prediksi retur, ditolak, 412 label" dan "prediksi pembatalan, ditunda"). Labelnya ternyata ada, 5.742 order. Aturan sederhana yang bebas kebocoran data sudah diuji dan lemah: segmen paling tajam, COD dari pembeli yang pernah order tapi belum pernah sukses menerima paket, lajunya 10,8% tetapi hanya menangkap 6,8% retur, sedangkan aturan yang lebih lebar menandai mayoritas order karena 81% order TikTok memang COD. Jadi model punya alasan untuk diuji (§3), tetapi belum boleh dibangun sebelum dua pertanyaan yang bukan teknis terjawab: **berapa ongkos satu paket COD yang gagal diantar**, dan **tindakan apa yang tersedia bagi toko terhadap order COD berisiko sebelum dikirim**. Tanpa jawaban kedua, prediksi apa pun hanya laporan (§1, syarat ketiga).
 
 **Analisis keluhan produk dari ulasan** dikerjakan dengan LLM, bukan model yang dilatih, karena 342 contoh negatif terlalu sedikit untuk melatih apa pun sementara teksnya sudah tersedia dan pipeline sejenis sudah berjalan di [[Sales - TikTok Sentiment Pipeline]].
 
@@ -140,7 +150,7 @@ Ditolak agar tidak diusulkan berulang tanpa data baru: **prediksi retur** (412 l
 - **Tidak ada perubahan kontrak API sampai rancangannya matang**, jadi belum ada urutan deploy backend sebelum frontend yang perlu diikuti pada tahap ini.
 - **Janji kecepatannya terbatas pada dua harian**, mengikuti interval penjadwal yang terkunci di kode. Menjanjikan harian atau per jam atas nama keputusan ini adalah salah, dan mempercepatnya adalah keputusan tersendiri dengan ongkos kuota API yang belum dinilai.
 - **Keputusan §2 menetapkan TEMPAT model, bukan runtime-nya.** Untuk aturan statistik, service pemilik data yang berbahasa Go sudah memadai. Bila gerbang T4 nanti menyimpulkan model terlatih memang diperlukan, runtime-nya belum terjawab karena tidak ada service Python di bip-erp, dan itu akan menuntut keputusan tambahan. Dicatat terbuka di sini alih-alih dijawab sekarang, karena menjawabnya sebelum tahu modelnya perlu atau tidak berarti menebak.
-- **Keputusan ini berdiri di atas pengukuran satu titik waktu.** Dua lubang diketahui dan sengaja dicatat: isi `accurate_daily_returns` sebanyak 7.779 baris belum dibuka dan dapat mengubah putusan pada kandidat retur, dan penurunan tajam Maret 2026 belum dipastikan kenyataan bisnis atau lubang sinkronisasi. Keduanya masuk daftar kerja sebagai gerbang, bukan sebagai catatan kaki.
+- **Keputusan ini berdiri di atas pengukuran satu titik waktu, dan sudah sekali keliru karenanya.** Lubang pertama yang dicatat, isi `accurate_daily_returns`, dibuka 2026-09-14 dan membalik putusan pada kandidat retur (lihat bagian Koreksi). Lubang kedua, penurunan tajam Maret 2026, belum dipastikan kenyataan bisnis atau lubang sinkronisasi dan tetap menjadi gerbang di daftar kerja.
 
 ## Dokumen Terkait
 
