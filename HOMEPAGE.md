@@ -67,11 +67,11 @@ Service adalah end-point yang berinteraksi dengan database-nya masing-masing (da
 
 **Aplikasi** → [[BASE - Enterance Point]] · [[APP - Web ERP]] · [[APP - MyBharata]] · [[APP - Dynamic Task Tracker]] · [[APP - Ideamills]] · [[APP - Tiktok Insight Analyzer]] · [[APP (Extension) - Fingerprint Listener (Complete)]] · [[APP - Portal Karir Bharata]] (portal karir publik) · [[APP - Buku Besar Konsolidasi CV FINCON]] (akuntansi 40 CV, **di luar ERP** — [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]])
 
-**Domain (Big Pictures)** → [[HRIS - Big Pictures]] · [[Sales - Big Pictures]] · [[GA - Big Pictures]] · [[IT - Big Pictures]] · [[WH - Management System]] · [[Finance - Big Pictures]]
+**Domain (Big Pictures)** → [[HRIS - Big Pictures]] · [[Sales - Big Pictures]] · [[GA - Big Pictures]] · [[IT - Big Pictures]] · [[WH - Management System]] · [[Finance - Big Pictures]] · [[Unlisted - Kesekretariatan (Big Pictures)]] (departemen tanpa folder domain)
 
 **Quality & Regulatory** → [[QA - Big Pictures]] (CPOB/GMP · BPOM/izin edar · batch & traceability · deviation/CAPA · ED & recall — farmasi)
 
-**Reference** → [[REF - Glossary]] (glosarium istilah & singkatan Bharata) · [[REF - PRD ERP]] (peta PRD: delapan bagian PRD enterprise dipetakan ke dok sumber + gap) · [[REF - Kepemilikan Data]] (pemilik tiap fakta bisnis, salinan yang sah, duplikasi yang belum diputuskan)
+**Reference** → [[REF - Glossary]] (glosarium istilah & singkatan Bharata) · [[REF - PRD ERP]] (peta PRD: delapan bagian PRD enterprise dipetakan ke dok sumber + gap) · [[REF - Kepemilikan Data]] (pemilik tiap fakta bisnis, salinan yang sah, duplikasi yang belum diputuskan) · [[REF - Peta Departemen]] (departemen → kunci modul → dok induk, termasuk departemen yang belum punya rumah dok)
 
 **API Reference** → [[API - Index]] (daftar endpoint lengkap per service)
 

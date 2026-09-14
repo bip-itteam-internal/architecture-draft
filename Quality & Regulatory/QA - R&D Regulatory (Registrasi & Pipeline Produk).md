@@ -87,3 +87,4 @@ pribadi atau angka uang) dan pencabutannya satu baris di `peran_dari_jabatan.go`
 - [[QA - Register Perizinan & Sertifikasi]]
 - [[Microservices - Employee Service]]
 - [[CORE - RBAC dan Permission Set]]
+- [[Unlisted - Kesekretariatan (Big Pictures)]]: departemen pemilik modul `secretary`

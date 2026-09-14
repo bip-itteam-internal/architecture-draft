@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Rancangan isi dashboard per posisi untuk divisi **Kesekretariatan**, tujuh posisi. Diturunkan mengikuti [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]]. Ditaruh di `Unknown or not listed` karena divisi ini tidak punya padanan domain di vault: isinya bercampur sekretariat, branding, desain, audit internal, dan R&D regulatory.*
+*Rancangan isi dashboard per posisi untuk divisi **Kesekretariatan**, tujuh posisi. Diturunkan mengikuti [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]]. Ditaruh di `Unknown or not listed` karena divisi ini tidak punya padanan domain di vault: isinya bercampur sekretariat, branding, desain, audit internal, dan R&D regulatory. Dok induk divisinya: [[Unlisted - Kesekretariatan (Big Pictures)]].*
 
 - **Status**: 🟡 **Rancangan**. Tak satu pun posisi di divisi ini punya lembar dashboard.
 - **Angka KPI diukur 2026-08-28** (sumber: [[HRIS - Matriks KPI per Departemen]]). **Ukur ulang sebelum dipakai mengambil keputusan.**
@@ -98,6 +98,7 @@ Kenapa tetap tidak direkomendasikan sekarang: matriks KPI menyatakan kedelapan m
 - [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]] — prinsip penurunannya
 - [[REF - Layout Dashboard erp-frontend]] — cara menyusunnya di layar
 - [[HRIS - Matriks KPI per Departemen]] — sumber angka di dokumen ini
+- [[Unlisted - Kesekretariatan (Big Pictures)]]: dok induk divisi, pemetaan jabatan ke modul
 - [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]] · [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]] — modul yang memendekkan jarak Internal Audit
 - [[Finance - Audit Internal]] · [[APP - Audit Internal]] — modul Audit Internal
 - [[Microservices - Calendar Service]] · [[Microservices - Task Management Service]] — kandidat sumber agenda dan instruksi Direktur
