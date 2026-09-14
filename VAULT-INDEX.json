@@ -3511,7 +3511,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "076b1a4fb212adebd3801ec7b3443d492438a6a76da2345516b17d06f0ada9bb",
-      "ukuran_kb": 4.9,
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab sumber tanggal yang dipakai untuk membukukan retur TikTok ke Accurate: kenapa update_time menyesatkan (ikut mundur karena settle refund) dan kenapa order_update_date dipilih sebagai gantinya, serta perbaikan zona waktu WIB untuk penomoran dokumen retur (RTR).",
       "kata_kunci": [
         "tanggal retur",
@@ -4236,7 +4236,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "ddca0201da7959b033620b4d876a8b18d58d146a1dd721bf9d3f6b75c917f3ec",
-      "ukuran_kb": 15.2,
+      "ukuran_kb": 15.1,
       "ringkasan": "Menjawab: bagaimana aset GA di ERP direkonsiliasi terhadap Aktiva Tetap di Accurate untuk menghasilkan skor KPI akurasi input aset staff GA, dan kenapa pencocokannya per-item lewat ceklis manual berbantuan (bukan agregat per-golongan) dengan `accurate_asset_no` disimpan agar periode berikutnya cocok otomatis. Menjelaskan pula kenapa aset yang belum ada di Accurate dihitung 100% (antrean tanggung jawab Finance, bukan GA) sementara Cakupan wajib tampil berdampingan dengan Akurasi, tiga tab modul Aset, penempatan yang menghormati batas service (inventory menyimpan nomor Accurate, feed KPI lewat employee-service), serta bagian mana yang di-supersede ADR-0049.",
       "kata_kunci": [
         "rekonsiliasi aset",
@@ -5391,7 +5391,7 @@
         "External - Accurate"
       ],
       "hash": "140f2789e531f6209bfdfc17bceca336e6f6048522951825a418bd4a22e2da22",
-      "ukuran_kb": 10.5,
+      "ukuran_kb": 10.4,
       "ringkasan": "Menjawab: mengapa opname perlengkapan GA dibuat sebagai perluasan tab Data Accurate (lewat pemilih tipe Aset Tetap/Perlengkapan) alih-alih modul baru, bagaimana perlengkapan dicocokkan per-KUANTITAS (hitung fisik GA vs qty Accurate) bukan per-unit, dan bagaimana skor akurasi opname dihitung untuk KPI staff GA. Menjelaskan juga koleksi ga_opname + endpoint /perlengkapan-opname, penangkapan kategori item Accurate saat sync, serta amandemen 2026-09-02 yang mengubah tab FE dari form opname jadi explorer padanan read-only (BE dibiarkan dormant).",
       "kata_kunci": [
         "opname perlengkapan",
@@ -6239,24 +6239,24 @@
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "ADR - 0069 Perlengkapan Per-Unit Opsional di inventory dengan Guard Anti-Kontaminasi",
         "REF - Kepemilikan Data",
+        "GA - Inventory Management",
         "Microservices - Integration Service",
-        "Microservices - Inventory Service",
-        "GA - Inventory Management"
+        "Microservices - Inventory Service"
       ],
-      "hash": "daa8200ab9d141bd6d5a80df3db85fc206cb4bc60729f11a2254fd8c27d1c0cd",
-      "ukuran_kb": 9.7,
-      "ringkasan": "Menjawab kenapa dan bagaimana sistem memindahkan padanan accurate_item_no barang perlengkapan secara otomatis (tanpa konfirmasi manusia) saat Accurate mengganti nomor item, memakai id internal Accurate (AccurateID) sebagai sinyal pencocokan yang stabil lintas rename. Menjelaskan kriteria kapan boleh menyimpang dari pola scanner-dan-manusia ADR-0066, mekanisme deteksi hilang dengan masa tenggang 3 jam, alur pemindahan padanan lewat endpoint pemilik data, serta batasan dan risiko yang belum terverifikasi empiris.",
+      "hash": "2ce5d71a739740e936dd4bb22b59415e9cfe7003830f8ada60faa1aae6f91235",
+      "ukuran_kb": 10.2,
+      "ringkasan": "Menjawab: kenapa barang perlengkapan yang sama bisa tampil dobel di explorer GA saat Accurate mengganti nomor item, dan bagaimana sistem memindahkan padanan (accurate_item_no) secara otomatis lewat ID internal Accurate tanpa konfirmasi manusia. Menjelaskan juga syarat aman migrasi otomatis (tepat satu kandidat cocok via AccurateID, masa tenggang 3 jam sebelum dianggap rename, audit trail) serta limitasinya (item yang benar-benar terhapus di Accurate tetap jadi baris stale, kandidat ambigu tak ditindak).",
       "kata_kunci": [
-        "ADR-0088",
-        "auto-migrasi",
-        "padanan",
+        "auto-migrasi padanan",
         "accurate_item_no",
-        "AccurateID",
-        "perlengkapan",
         "rename item Accurate",
-        "GA",
+        "AccurateID",
+        "perlengkapan GA",
+        "padanan barang dobel",
         "inventory-service",
-        "integration-service"
+        "integration-service",
+        "audit trail migrasi",
+        "baris stale/yatim"
       ]
     },
     {
@@ -6682,7 +6682,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "ee317d4d8664cf3c5227bcf8d3d018f9648ff0b9fdc9228e35cc31d4144a5c89",
-      "ukuran_kb": 16.3,
+      "ukuran_kb": 15.9,
       "ringkasan": "Menjawab endpoint dan alur kerja Finance Bridging versi Golang (penulisan ulang dari sistem Java): bagaimana membuat dan mengirim ringkasan transaksi Sales/Income/Return ke Accurate, halaman FE terkait per channel, status ringkasan, serta setting toko dan mapping produk.",
       "kata_kunci": [
         "Finance Bridging Golang",
@@ -6709,7 +6709,7 @@
         "Finance - Incentive"
       ],
       "hash": "8a3dba53269a5104fd1106064d8ed8159f96a7207b2c5a97ffc4a66f7a399504",
-      "ukuran_kb": 19.6,
+      "ukuran_kb": 19.5,
       "ringkasan": "Menjawab fitur dan struktur sistem Finance lama (Java/PostgreSQL/ReactJS) sebagai jembatan antara Accurate dan marketplace: master data, upload Excel per platform (TikTok/Shopee/Lazada/Tokopedia/KiriminAja), sinkronisasi ke Accurate, dan lokasi repositori kodenya.",
       "kata_kunci": [
         "Finance Bridging lama",
@@ -7325,21 +7325,20 @@
         "CORE - OCR Document Service",
         "Form Permintaan Barang GA.pdf"
       ],
-      "hash": "68a18578fb9226e6769d95332cce9888f36f0f54c182d9fac1e83124299ed784",
-      "ukuran_kb": 19.5,
-      "ringkasan": "Menjawab ruang lingkup dan alur fitur inventory management di General Affairs — penomoran tag aset, serah-terima aset dengan persetujuan SPV, lokasi dan estimasi penyusutan aset, riwayat perbaikan berbukti nota, penghapusan aset (soft delete) dengan alasan wajib, serta rekonsiliasi aset tetap dan perlengkapan dengan Accurate untuk KPI akurasi GA. Juga menjelaskan status implementasi tiap fitur dan ADR terkait yang mengaturnya.",
+      "hash": "a920f60967689319d7bfccc459e8f645eeee6acb88d979a787761cc196b5224a",
+      "ukuran_kb": 20.6,
+      "ringkasan": "Menjawab: bagaimana sistem inventory GA memberi tag/nomor aset, bagaimana alur serah-terima aset antar-karyawan berikut persetujuan SPV, dan bagaimana nilai buku/penyusutan aset ditaksir. Menjelaskan juga bagaimana rekonsiliasi aset tetap dan perlengkapan dengan Accurate menghasilkan skor untuk KPI, serta fitur soft-delete aset, riwayat perbaikan dengan bukti nota, dan cakupan Gudang Utama untuk kuantitas/biaya perlengkapan.",
       "kata_kunci": [
-        "GA",
-        "General Affairs",
-        "inventory management",
-        "aset",
-        "tag aset",
-        "serah-terima",
-        "penyusutan",
-        "soft delete",
+        "inventory GA",
+        "asset management",
+        "tag aset INV-BIP",
+        "serah-terima aset",
+        "penyusutan/depresiasi",
         "rekonsiliasi Accurate",
         "opname perlengkapan",
-        "KPI akurasi aset"
+        "KPI akurasi aset",
+        "soft delete aset",
+        "Gudang Utama"
       ]
     },
     {
@@ -11603,7 +11602,7 @@
         "APP - Web ERP"
       ],
       "hash": "0115ceffe21b522769faac6e9286fe16c1737ff46d15d0f58ff2e9333c9cd7f0",
-      "ukuran_kb": 14.2,
+      "ukuran_kb": 14.0,
       "ringkasan": "Menjawab: bagaimana menerbitkan akun ERP untuk vendor, mitra, atau kontraktor tanpa menjadikannya karyawan, lalu memberinya akses ke modul tertentu. Menjelaskan cara memilih antara dua sumbu hak akses yang paling sering tertukar (Paket Hak vs Role Modul), cara memperpanjang dan menutup akses beserta batasnya, serta gejala umum saat vendor sudah dibuat tapi tetap tak bisa masuk.",
       "kata_kunci": [
         "akun eksternal",
@@ -13090,7 +13089,7 @@
         "APP - Web ERP"
       ],
       "hash": "c4637f8509f5c1a5a4144b1a335e575e34704efa5110b9829b98aa991eb3b130",
-      "ukuran_kb": 8.5,
+      "ukuran_kb": 8.4,
       "ringkasan": "Menjawab: apa rencana penyatuan menu-menu gudang yang kini terpecah per-tahap (Perlu Diproses, Antrian Pesanan, Pengambilan, Pengemasan, Riwayat Cetak Resi, Serah Terima) menjadi satu layar omnichannel \"Kelola Pesanan\" ala Desty tanpa mengubah backend, dan apa beda pratinjau Beta FE-only (data dummy, aksi mati) dengan menu produksi yang sudah wired ke endpoint nyata. Juga menjelaskan pemetaan tiap tab/sub-tab \"Siap Dikirim\" ke endpoint warehouse/integration, rencana mutasi bertahap fase 0-5 sampai cutover, gerbang dan nuansa yang wajib dipertahankan saat \"cuma ganti UI\" (gerbang rekon `exported_at`, kode packer T1/T2, guard TikTok `package_id` kosong, batch cap 100), persona pengguna dan RBAC-nya, serta hal yang belum diputuskan (tab Belum Dibayar, cakupan Sadewa, nasib menu lama).",
       "kata_kunci": [
         "Kelola Pesanan",
@@ -13761,7 +13760,7 @@
         "API - Integration Service"
       ],
       "hash": "682af984acc5651b53b35ab55dd597da43217b701b703cf3a6c0ff290504f199",
-      "ukuran_kb": 15.5,
+      "ukuran_kb": 15.4,
       "ringkasan": "Menjawab: bagaimana mekanisme ACL yang membatasi daftar toko marketplace yang boleh dilihat staf marketing (AllowedShops di endpoint GET /transactions/master/shops, integration-service) bekerja, kenapa sumber datanya bisa dipindah dari team_members/team_shops ke department_shops + work_data.department, dan bug apa yang sempat membuat staf non-marketing menerima daftar toko kosong. Juga mencatat status redesign (sudah dikodekan di branch terpisah, belum merge/deploy/verifikasi live) serta batas lingkup keputusan yang sengaja tidak diubah (gate rute RequireIntegrationStaff, exemption admin/supervisor integration).",
       "kata_kunci": [
         "AllowedShops",
@@ -14146,7 +14145,7 @@
         "WH - Warehouse Sadewa"
       ],
       "hash": "256b39d712a784b9ff443d528747ca065ab9eb8bbe91a08ffc13607cc07cb67a",
-      "ukuran_kb": 17.9,
+      "ukuran_kb": 17.7,
       "ringkasan": "Menjawab kenapa sidebar erp-frontend memicu request polling 30 detik ke endpoint warehouse/sadewa/accurate untuk semua karyawan tanpa peduli role atau halaman yang dibuka, dan rencana perbaikannya lewat gerbang enabled yang diturunkan dari menu yang benar-benar tampil. Memuat dua pembaruan 2026-08-29 yang menandai sebagian rencana ini usang lalu sebagian lagi sudah dikerjakan lewat jalan lain: branch fix/badge-sidebar-per-halaman memilih gerbang HALAMAN, sehingga Task 4 (kuartet refetch) gugur karena keduanya alternatif bukan pelengkap, Task 1 dan 3 turun prioritas, dan Task 5 tetap berdiri sendiri.",
       "kata_kunci": [
         "sidebar",
