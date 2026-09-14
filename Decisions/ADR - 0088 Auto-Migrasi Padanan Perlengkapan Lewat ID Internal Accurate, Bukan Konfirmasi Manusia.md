@@ -39,6 +39,7 @@ Saat Accurate mengganti nomor item perlengkapan, sistem kini memindahkan padanan
 - **Item yang genuinely terhapus di Accurate** (bukan rename — nol `accurate_id` match sama sekali) TETAP jadi baris stale selamanya, seperti hari ini. Tak ada sinyal untuk membedakan "sengaja dihapus, riwayatnya masih dibutuhkan" dari "beneran usang". Kandidat scanner ala ADR-0066 di masa depan bila ini jadi masalah nyata — bukan bagian ADR ini.
 - **Kandidat ambigu** (>1 item baru berbagi `accurate_id` — nyaris mustahil karena id Accurate unik per item) juga tak ditindak otomatis, cuma ter-log. Tak ada UI penanda untuk kasus ini; diterima sebagai limitasi sadar mengingat kelangkaannya.
 - `reconciled_at` unit ERP yang padanannya dipindah TIDAK ikut disentuh (beda dari `PATCH /item/:id` staf yang selalu men-stempelnya) — pasangan (unit ERP ↔ barang fisik) tak berubah, cuma nomor bukuan Accurate-nya; menyentuh `reconciled_at` akan salah menyiratkan staf memverifikasi ulang hari ini.
+- ⚠️ **Terbukti nyata di prod (2026-09-14)**: 120 dari 1028 baris `accurate_stocks` sudah stale SEBELUM ADR ini di-deploy — tak pernah sempat merekam `accurate_id` selagi masih hidup, jadi backlog ini TAK BISA dibereskan otomatis oleh mekanisme di atas, berapa lama pun ditunggu (bukan "akan hilang sendiri", karena item itu memang sudah tak akan pernah muncul lagi di batch sync). Mitigasinya BUKAN bagian ADR ini: fitur bulk pasang manual (`perlengkapan-pairing.tsx`, saran by-nama) di erp-frontend, lihat amandemen [[GA - Inventory Management]] 2026-09-14.
 
 ## Belum selesai
 
