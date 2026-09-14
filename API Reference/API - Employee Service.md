@@ -172,6 +172,32 @@ Baca digerbang `gateHris(PermHrisView, RequireHRISStaff)`, tulis `gateHris(PermH
 
 **Tidak ada `PATCH /warnings/:id`**, dan itu disengaja: surat yang sudah diterbitkan dan diberitahukan ke karyawan tak boleh bisa ditulis ulang tanpa bekas. Yang tersedia hanya pencabutan, yang meninggalkan jejak beserta alasannya.
 
+## Ringkasan Pengajuan (kartu halaman Pengajuan)
+
+Grounded ke `services/employee/ringkasan_pengajuan.go`. Konsumen: halaman `/portal/pengajuan` di [[APP - Web ERP]] (`useRingkasanPengajuan`, `angkaKartu` di `erp-frontend/src/features/pengajuan/`).
+
+| Method | Path | Fungsi | Gerbang |
+|---|---|---|---|
+| GET | `/pengajuan/ringkasan` | Angka antrean untuk kartu halaman Pengajuan dari SATU panggilan. Balasan `{data: {<kunci>: <angka>}, degraded: [<kunci>]}`; `data` tak pernah `null` dan `degraded` diurutkan. employee-service memanggil rute yang **sudah ada** di service sumber secara berbarengan, dengan header identitas pemanggil dan `BIP-Gateway-ID` ikut menyeberang, jadi gerbang tiap angka sama persis dengan gerbang layar yang dituju kartunya. Batas waktu 8 detik **per sumber**, badan balasan dibaca maksimal 4 MB. Didaftarkan sebagai rute literal (`TestRingkasanRuteTidakTertelan`) | Identitas (`BIP-Employee-ID` kosong: 403) |
+
+Sumber (`registriRingkasan`; menambah kartu berangka = menambah satu baris):
+
+| Kunci | Env base URL | Rute di service sumber | Cara hitung |
+|---|---|---|---|
+| `tiket` | `common.Env.TaskManagementModuleURL` | `/tasks/filter?pending_my_approval=true` | panjang array |
+| `pelatihan` | `common.Env.LearningModuleURL` | `/training/requests?as=reviewer` | panjang `data` |
+| `pembelian` | `common.Env.ProcurementModuleURL` | `/pengajuan-pembelian/perlu-aksi` | panjang `data` |
+| `karyawan` | `common.Env.AttendanceModuleURL` | `/hr/requests/summary` | field `menunggu` (absen = rusak, bukan nol) |
+| `booking` | `common.Env.InventoryModuleURL` | `/peminjaman/perlu-aksi` | panjang `data`. 🟡 Sumber kelima, bip-erp branch `feat/employee-ringkasan-booking-ruang`, belum merge per 2026-09-14 ([[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]]) |
+
+Tiga keadaan per kunci, dan ketiganya sengaja dibedakan:
+
+- **Kunci ada di `data`**: angkanya terbaca; nol berarti antreannya memang kosong.
+- **Kunci di `degraded`**, angkanya tidak dikirim: env base URL kosong, service tak terjangkau, status selain 200 (termasuk 404 untuk rute yang belum ter-deploy), atau bentuk balasan tak terbaca. Frontend menyembunyikan angka kartu itu, bukan menampilkan nol.
+- **Kunci absen dari keduanya**: service sumber menolak pemanggil (401 atau 403). Orang itu memang tak berhak atas antrean tersebut, jadi ini bukan kerusakan. Contoh: bukan penyetuju booking dibalas 403 oleh `GET /peminjaman/perlu-aksi`.
+
+⚠️ **Path di registri adalah kontrak lintas service yang tak terlihat test**: rute yang berpindah di seberang membuat kuncinya `degraded` selamanya tanpa galat build maupun test merah. Per 2026-09-14 `git grep` di `origin/main` bip-erp tak menemukan rute `/pengajuan-pembelian/perlu-aksi` di service mana pun (satu-satunya kemunculan string itu ada di registri ini), jadi kunci `pembelian` kemungkinan selalu `degraded`. Belum diukur lewat gateway (TBD).
+
 ## Listing · View · Me
 | Method | Path | Fungsi |
 |---|---|---|
