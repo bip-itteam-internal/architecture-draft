@@ -137,6 +137,21 @@ Sumber KPI baru dari [[Microservices - Form Builder Service]] (`GET /internal/cu
 
 Kunci i18n: **`srcProgramCulture` / `srcProgramCultureKet`** (dengan awalan `src` karena ini penamaan **SUMBER**, bukan metrik template — bedakan dari `mtk*` untuk metrik). Sumber ini **tanpa sub-metrik**, jadi tak butuh entri `METRIK_PER_SUMBER`; nama metrik yang dilayaninya (`culture`) unik dan tak dipakai sumber lain (per 2026-08-30). `SATUAN_PER_METRIK`/`FORMULA_PER_METRIK`: formula bakunya `rata_rata` (nilai 0–100), jadi mengikuti aturan yang sama dengan sumber Finance — formula boleh dilewatkan bila pengisi diminta memilih; satuan tetap wajib bila targetnya bukan skala 0–100.
 
+### 🟡 `nilai_inspeksi_satgas`: sumber baru (ADR 0090 T3)
+
+Sumber KPI **per orang** dari [[Microservices - Form Builder Service]] (`GET /internal/satgas/metrics`), untuk metrik Office Boy `Kebersihan 3` dan Security `Kerapihan dan kebersihan Pos` ([[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] §8). **Selesai di branch 2026-09-12, belum PR, belum merge, belum deploy**: backend bip-erp `feat/satgas-nilai-kpi`, label erp-frontend `feat/kpi-sumber-satgas`. Cara menarik dan pembedaan galatnya di [[Microservices - Employee Service]] (bagian Registry sumber data KPI).
+
+| Locale | Label sumber | Keterangan |
+|---|---|---|
+| `id.ts` | `Nilai inspeksi Satgas 5R` (24 karakter) | "Nilai akhir inspeksi Satgas 5R & K3 atas ORANG INI dalam sebulan, skala 0 sampai 100: yang dihitung kiriman terakhir (cek ulang menggantikan temuan), bukan rata-rata. Temuan yang masih boleh dicek ulang belum dihitung sampai batas cek ulangnya lewat. Angkanya dari form inspeksi Satgas di menu Form Builder (tab Yang Dinilai, terbuka bagi pengelola form itu)." |
+| `en.ts` | `Satgas 5R inspection score` (26 karakter) | "Final Satgas 5R & K3 inspection score for THIS PERSON in the month, on a 0 to 100 scale: the latest submission counts (a re-check replaces the finding), not an average. Findings still open for re-check are not counted until the re-check deadline passes…" |
+
+Kunci i18n: **`srcNilaiInspeksiSatgas` / `srcNilaiInspeksiSatgasKet`** (awalan `src`, penamaan SUMBER). Entri kamusnya di `label-otomatis.ts`, dan sumbernya masuk `SUMBER_PRODUKSI` di `label-otomatis.aturan.test.ts` **bersamaan dengan sumbernya**, bukan menunggu dipakai template: empat sumber sebelumnya sempat dipakai template produksi tanpa pernah masuk daftar itu, dan suite tetap hijau selama itu.
+
+- **Keterangannya menyebut aturan agregasi, dan itu keharusan di sini.** Bentuk formnya mirip penilaian layanan (`nilai_layanan_pribadi`, rata-rata penilaian), padahal nilai Satgas adalah kiriman **terakhir**: cek ulang menggantikan temuan. Tanpa kalimat itu angkanya terbaca seperti rata-rata penilaian biasa. Satuan (skala 0 sampai 100) dan menu tempat angkanya bisa dilihat sendiri juga tertulis, sesuai aturan keterangan di atas.
+- **Tanpa sub-metrik.** Backend mendaftar lewat `DaftarkanSumber` biasa, bukan `DaftarkanSumberBermetrik`, dan formula baku `rata_rata` datang dari katalog (`DaftarkanFormulaSumber`). Branch frontend karena itu tak menambah entri `METRIK_PER_SUMBER`, `METRIK_DIKENAL`, `SATUAN_PER_METRIK`, maupun `FORMULA_PER_METRIK`.
+- ⚠️ **Bukan cuma label: KALIMAT ALASAN backend juga dibaca frontend.** `caraMengatasiKey` (`auto-overview-view.tsx`) memilih saran di layar Otomasi KPI dengan mencocokkan potongan teks alasan: "menunggu cek ulang" ke `otomasiCaraMenungguCekUlang`; "belum ada inspeksi satgas" dan "tak menjawab pertanyaan skala" ke `otomasiCaraBelumDinilai`; sisa yang memuat "satgas" ke `otomasiCaraSatgasForm`. Salinan literal keenam kalimat `cuplikanNilaiSatgas` ada di `auto-overview-view.cara.test.tsx`. Mengubah kalimat di `kpi_sumber_inspeksi_satgas.go` tanpa memperbarui salinan itu tak menimbulkan galat apa pun; sarannya cuma diam-diam bergeser, karena pencocokan teks bukan kontrak.
+
 ## ⛔ Nama metrik menyiratkan ARAH, dan salah membacanya tak menimbulkan galat
 
 Aturan ini soal penamaan, tetapi ada satu akibat penamaan yang tidak berhenti di layar: **nama metrik menentukan `arah` mana yang benar bagi siapa pun yang mengonfigurasinya.**

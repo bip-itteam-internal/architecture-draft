@@ -162,6 +162,38 @@ db.submission_attempt.getIndexes()   # cari expireAfterSeconds pada index `at_1`
 
 Pola yang sama berlaku untuk TTL index mana pun yang lahir dari `ensure*Indexes()` di service lain. Aturan umumnya: **index yang sudah ada tidak pernah berubah karena deploy**, hanya index yang belum ada yang dibuat.
 
+## 3d. Kunci layanan baru → pengirim DAN penerima naik bersama, dengan `--force-recreate`
+
+Kopling ini berbeda lagi dari §3 dan §3a: bukan urutan panggilan, bukan isi biner, melainkan **nilai env yang harus sama di dua container**. Rute bahan penilaian KPI digerbang kunci layanan lewat query `key`, bukan header gateway, karena gateway memasang `BIP-Gateway-ID` pada setiap permintaan ber-JWT ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Cara menambah kunci semacam itu beserta rutenya ada di [[RUN - Menambah Metrik KPI Otomatis]]; bagian ini hanya soal men-deploy-nya. `.env.example` mencatat pasangan lain berpola sama (mis. `WAREHOUSE_SERVICE_KEY`, `ATTENDANCE_SERVICE_KEY`).
+
+> ⚠️ **`FORM_BUILDER_SERVICE_KEY`** ([[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] T3) ada di bip-erp branch `feat/satgas-nilai-kpi` per 2026-09-12: **belum PR, belum merge, belum deploy**. Isi `.env` DEV dan PROD untuk env ini **belum diukur**.
+
+| Container | Perannya | Bila env-nya kosong |
+|---|---|---|
+| `form-builder-service` | penerima: `GET /internal/satgas/metrics` memeriksa `key` | rute menolak **semua** pemanggil dengan 401 (gagal tertutup) |
+| `employee-service` | pengirim: sumber KPI `nilai_inspeksi_satgas` | sumbernya gagal hitung: `FORM_BUILDER_SERVICE_KEY belum diatur` |
+
+Nilai yang berbeda di kedua blok berakibat sama dengan kosong di penerima, dan employee-service menuliskannya `form-builder menolak kunci layanan (401); periksa FORM_BUILDER_SERVICE_KEY di form-builder dan employee-service`. Kedua galat itu berkelas `gagal mengambil data`, bukan `belum dapat dihitung`, jadi selama metriknya belum diisi manual, **skor orang yang templatenya memakai sumber ini tidak ditampilkan** (`adaSumberGagalTanpaNilai`), bukan cuma satu metrik yang kosong.
+
+Env dibaca saat container **DIBUAT**, jadi `restart` tidak cukup (baris `--force-recreate` di §5). Perintahnya §1 ditambah `--force-recreate`, penyedia rute lebih dulu sesuai §3:
+
+```bash
+docker compose up -d --build --force-recreate form-builder-service --no-deps
+docker compose up -d --build --force-recreate employee-service --no-deps
+```
+
+Gerbang umur image §1b tetap berlaku untuk keduanya. `/health` hijau tak membuktikan apa pun di sini; yang membuktikan adalah tiga pemeriksaan ini, masing-masing menjawab satu kegagalan:
+
+1. **Rutenya tertutup bagi karyawan.** Lewat gateway dengan JWT karyawan biasa, tanpa `key`: `GET /api/form-builder/internal/satgas/metrics?period=<YYYY-MM>` harus **401** berbadan `{"error":"Unauthorized gateway"}`. Badan `Invalid or expired token` berarti gateway yang menolak JWT-nya, jadi gerbang kuncinya belum teruji. **200 di sini adalah kebocoran nilai per orang.**
+2. **Kuncinya sama di kedua container.** Dari dalam `Employee-Service`, memakai env container itu sendiri (kutip tunggal, supaya variabelnya diurai di dalam container, bukan di shell host). Rute ini baca-saja:
+
+   ```bash
+   docker exec Employee-Service sh -c 'wget -qO- --header="BIP-Gateway-ID: $INTERNAL_GATEWAY_KEY" "$FORM_BUILDER_MODULE_URL/internal/satgas/metrics?period=<YYYY-MM>&company_id=BIP&key=$FORM_BUILDER_SERVICE_KEY"'
+   ```
+
+   Harus 200 **berbentuk kontrak**, bukan sekadar 200: `has_form` dan `period_key` selalu ada; `orang[]` hanya bila `has_form` true, tiap butirnya `employee_id`, `forms_dinilai`, `forms_total`, `ada_kiriman`, `menunggu_cek_ulang` (plus `nilai`, `batas_cek_ulang`, `form_tanpa_skala` bila terisi), dan **tanpa** nama, departemen, atau jabatan. Header gateway wajib ikut karena form-builder memasang `ValidateGateway` untuk seluruh rutenya; tanpa header itu 401-nya datang dari gerbang tersebut dan tak mengatakan apa pun tentang kuncinya.
+3. **Sumbernya membaca, bukan gagal.** Untuk metrik yang sudah dipasang HR dengan sumber `nilai_inspeksi_satgas`, `GET /api/employee/kpi/auto-values?employee_id=<id>&period=<YYYY-MM>&template_id=<id>` harus mengembalikan `auto_value` terisi atau `auto_basis` berawalan `belum dapat dihitung:`, dengan `auto_gagal_sumber: false`. Berawalan `gagal mengambil data:` berarti sumbernya tak berhasil membaca, dan kalimat sesudahnya menyebut sebabnya, termasuk env mana yang belum benar. (`POST /kpi/auto-values/pratinjau` sudah dicabut, jadi pemeriksaan ini butuh metrik yang sudah terpasang di template.)
+
 ## 4. Verifikasi pasca-deploy
 
 ```bash
@@ -181,12 +213,15 @@ docker logs <Container-Name> --tail 40
 | Sweep/reconciler tak jalan | `REDIS_URL` kosong | pastikan env redis terisi; log akan bilang "tidak diaktifkan" |
 | Endpoint balas **502** di dev padahal rute & gerbangnya benar | service-nya tak didefinisikan di `docker-compose.dev.yml` walau `*_MODULE_URL`-nya terpasang → mati di resolusi DNS | tambahkan service + mongo-nya ke compose dev (§3a2), bukan mengubah kode |
 | Fitur jalan normal tapi **notifikasinya tak pernah tiba**, tanpa galat di layar | kategori inbox baru; `notification-service` masih memegang `InboxCategories` lama dan menolak `400`, sementara pengiriman best-effort hanya nge-log | rebuild `notification-service` juga (§3a), lalu picu satu notifikasi sungguhan untuk memastikan |
+| Metrik KPI bersumber `nilai_inspeksi_satgas` berbasis `gagal mengambil data: FORM_BUILDER_SERVICE_KEY belum diatur` atau `gagal mengambil data: form-builder menolak kunci layanan (401)...`, dan skor orangnya tak tampil | `FORM_BUILDER_SERVICE_KEY` kosong di employee-service, kosong atau berbeda nilai di form-builder, atau `.env` sudah diisi tapi container belum dibuat ulang | isi nilai yang SAMA di kedua blok, `--force-recreate` keduanya, lalu tiga pemeriksaan §3d |
 
 ## Dokumen Terkait
 
 - [[Microservices - Warehouse Service]] · [[Microservices - Integration Service]] — implementasi service
 - [[Microservices - Form Builder Service]] · [[Microservices - Notification Service]] — pasangan yang wajib naik bersama saat kategori inbox bertambah (§3a)
 - [[HRIS - Kaizen (Ide Perbaikan)]] — fitur yang kegagalan senyapnya jadi contoh di §3a
+- [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] · [[Microservices - Employee Service]] (pasangan pengirim dan penerima `FORM_BUILDER_SERVICE_KEY`, §3d)
+- [[RUN - Menambah Metrik KPI Otomatis]] (cara menambah kunci layanan beserta rutenya, §3d)
 - [[IT - Background Jobs & Schedulers]] — poller in-process (reconciler + sweep) yang restart otomatis
 - [[RUN - Deploy Task Management Service]] — runbook deploy service lain (dengan migrasi data)
 - [[CORE - API Master Gateway]] — health via gateway
