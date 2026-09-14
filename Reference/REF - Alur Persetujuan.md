@@ -6,15 +6,16 @@
 - **Path di repo**: `bip-erp/services/{attendance,payroll,recruitment,procurement,manufacture,insentive,inventory,task-management,hrd-document,employee,integration}` · `bip-erp/shared-library/common/jabatan_direktur.go`
 - **Kenapa referensi ini ada**: pertanyaan "persetujuan apa saja yang ada, dan siapa yang boleh" sebelumnya hanya bisa dijawab dengan membaca 11 service satu per satu. Sekali disusun, ia juga memperlihatkan pola yang tak terlihat dari satu alur saja.
 
-## Tiga cara gerbang persetujuan ditulis
+## Empat cara gerbang persetujuan ditulis
 
 Yang membuat inventaris ini sulit disusun, dan mudah salah:
 
 1. **Middleware di daftar rute** — `gate(perm, fallback)` atau `common.Require*`. Terlihat langsung saat membaca `routes.go`.
 2. **Di dalam handler** — mis. `BolehSetujuiPesanan(position)` di procurement. **Tak terlihat** saat menyapu daftar rute; sapuan pertama dokumen ini salah melaporkannya "tanpa gerbang".
 3. **Slot pada dokumennya** — cuti & dinas menyimpan siapa reviewernya di `spv_status`; gerbangnya mencocokkan pemanggil dengan slot itu.
+4. **Daftar penunjukan di koleksi tersendiri** (ditambahkan 2026-09-14): Booking Ruang menyimpan penyetuju yang ditunjuk HR di `ga_peminjaman_penyetuju`, satu dokumen per perusahaan, lalu mencocokkan pemanggil dengannya di fungsi transisi murni (`bolehMemutus`, `services/inventory/peminjaman_transisi.go:45-57`). Rute setujui dan tolak hanya bergerbang identitas (`services/inventory/peminjaman_handler.go:55-56`), jadi sapuan rute akan membacanya "tanpa gerbang".
 
-> ⚠️ **Menyapu `routes.go` saja menghasilkan kesimpulan yang salah.** Dua dari tiga cara di atas tak muncul di sana.
+> ⚠️ **Menyapu `routes.go` saja menghasilkan kesimpulan yang salah.** Tiga dari empat cara di atas tak muncul di sana.
 
 ## Inventaris
 
@@ -50,6 +51,30 @@ Yang membuat inventaris ini sulit disusun, dan mudah salah:
 | WMS — batch record, rekon MO, proposal, Sadewa | manufacture | peran WMS per tab |
 | Task Management — approve/reject tugas | task-management | `ticket.triage` / admin space |
 | Kotak Adopsi — adopt & reject draft | integration | peran integration |
+
+### Berbasis PENUNJUKAN (daftar yang disimpan)
+
+| Alur | Service | Penyetuju |
+|---|---|---|
+| Booking Ruang: setujui & tolak | inventory | siapa pun di daftar penyetuju yang ditunjuk supervisor atau admin HRIS/IT untuk perusahaan booking itu, satu daftar untuk semua ruang; **bukan** atasan pemohon dan **bukan** izin (katalog `ga` sengaja tanpa `ga.approve`, `services/inventory/peminjaman_model.go:30-32`) |
+
+Rincian Booking Ruang (dipetakan 2026-09-14 dari `services/inventory/peminjaman_{transisi,setujui,handler,pengajuan,bentrok,notify}.go`):
+
+- **Satu tahap.** `DIAJUKAN` → `DISETUJUI` atau `DITOLAK`, plus `DIBATALKAN` oleh pemohon (diagram status di `peminjaman_model.go:17-24`). Tak ada urutan antar-penyetuju: satu nama di daftar cukup (`Memuat`, `peminjaman_model.go:164-177`). Tolak wajib beralasan, maksimal 500 karakter (`ValidasiAlasanPeminjaman`, `peminjaman_model.go:248-258`).
+- **Penyetuju tak boleh memutus booking miliknya sendiri**, sekalipun ia ditunjuk: 403 (`bolehMemutus`, `peminjaman_transisi.go:45-57`). Antrean `GET /peminjaman/perlu-aksi` tak memuat booking milik pembacanya (`peminjaman_handler.go:265-271`), dan kabar perlu-aksi tak dikirim ke pemohon yang juga penyetuju (`penerimaPerluAksi`, `peminjaman_notify.go:64-78`).
+- **Lingkup perusahaan.** Daftar penyetuju dibaca dari perusahaan booking; penyetuju dari perusahaan lain menerima 404, bukan 403 (`bolehLihatPeminjaman`, `peminjaman_pengajuan.go:106-125`).
+- **Pengajuan ditolak 422 bila daftar penyetuju perusahaan kosong** (`peminjaman_pengajuan.go:43-45`); form sudah diberi tahu lewat `ada_penyetuju` sebelum diisi (`peminjaman_handler.go:153-155`).
+- **Pemeriksaan saat menyetujui, berurutan** (`SetujuiPeminjaman`, `peminjaman_setujui.go:11-20`, `:54-148`):
+  1. status masih `DIAJUKAN` (409), pemanggil ditunjuk dan bukan pemohon (403), jam selesai belum lewat (409) (`TentukanSetujui`, `peminjaman_transisi.go:21-32`);
+  2. ruang dibaca **ulang**: ruang yang sudah dinonaktifkan atau jadwal yang kini di luar jam operasional ruang ditolak 409, dengan pesan yang menyuruh penyetuju menolak booking itu (`ValidasiRuangSaatSetujui`, `peminjaman_bentrok.go:165-184`). Booking yang **sudah** disetujui tidak ikut dibatalkan oleh perubahan ruang itu;
+  3. kunci sewa per ruang 15 detik; gagal mendapat kunci dibalas 409 "sedang diproses penyetuju lain" (`peminjaman_kunci.go:36`, `peminjaman_setujui.go:69-75`);
+  4. bentrok dengan booking `DISETUJUI` di ruang yang sama dibalas 409 (`peminjaman_setujui.go:84-90`);
+  5. tulis berpenjaga status **dan** jadwal, sehingga pengubahan jam oleh pemohon di sela cek dan tulis membuat persetujuan kalah 409 (`peminjaman_setujui.go:92-102`, `filterPenjagaPeminjaman` di `peminjaman_repo.go:92-100`);
+  6. cek ulang bentrok: yang bertumpuk dikembalikan ke `DIAJUKAN` dan dibalas 409; cek ulang yang **gagal dibaca** juga dikembalikan ke `DIAJUKAN` dan dibalas 503, gagal-tertutup (`peminjaman_setujui.go:104-119`).
+- **Ditolak otomatis** hanya dalam satu keadaan: begitu satu booking disetujui, pengajuan `DIAJUKAN` lain di ruang yang sama yang jamnya bertumpuk ditolak server (riwayat `tolak_otomatis` oleh `sistem`, alasan menyebut nomor booking yang disetujui), dan pemohonnya dikabari dengan judul yang berbeda dari penolakan manual (`peminjaman_setujui.go:125-146`, `PilihTolakOtomatis` di `peminjaman_bentrok.go:51-67`, `peminjaman_notify.go:109-113`). Penolakan otomatis yang gagal tersimpan hanya dicatat di log dan tak membatalkan persetujuannya; bila antrean bertumpuk tak terbaca, tolak otomatis dilewati dan pengajuan yang tertinggal kelak ditahan cek bentrok saat hendak disetujui (`peminjaman_setujui.go:125-130`, `:139-141`).
+- **Tak ada kedaluwarsa otomatis.** Pengajuan yang jam selesainya lewat tetap `DIAJUKAN`: tak bisa disetujui lagi (409) dan tak ditagihkan di antrean (`peminjaman_transisi.go:28-30`, `peminjaman_handler.go:255-261`). Penulis status `DITOLAK` di kode hanya handler tolak dan tolak otomatis di atas.
+- **Pengubahan oleh pemohon.** Memindah ruang atau jam booking yang sudah disetujui mengembalikannya ke `DIAJUKAN`, melepas slot lamanya, dan mengabari penyetuju lagi; mengubah isian (nomor WA, keperluan, keterangan) mempertahankan status (`TentukanUbah`, `peminjaman_transisi.go:82-111`; `statusSesudahUbah`, `peminjaman_pengajuan.go:269-278`; `peminjaman_handler.go:579-583`).
+- **Yang menunjuk penyetuju**: supervisor atau admin HRIS/IT lewat `PUT /peminjaman/penyetuju` (`peminjaman_handler.go:50`, `shared-library/common/roles.go:300-303`), divalidasi ke karyawan aktif lewat employee-service dan gagal-tertutup saat daftar karyawan tak terbaca. Rincian kepemilikan datanya di [[REF - Kepemilikan Data]].
 
 ### Ditutup 2026-08-10
 
@@ -100,8 +125,12 @@ Ketiganya kini menunjuk **`common.SetaraDirektur`** (`shared-library/common/jaba
 
 - **Persetujuan PO di Accurate tak bisa ditindaklanjuti dari ERP.** ERP menyimpan salinan pesanan Accurate (`status_name: "Diajukan"`), tapi Accurate hanya menyediakan `save.do` — tak ada endpoint approval. Alur yang bisa diputus dari ERP adalah `pesanan_erp`, yang terpisah dari cermin itu.
 
+- **Booking Ruang: wewenang memutus sudah ada di server, layar untuk memutus belum.** Web ERP sengaja tanpa tombol setujui dan tolak: halaman Ruang & Booking hanya menulis master ruang dan daftar penyetuju (`erp-frontend/src/features/ga/peminjaman/hooks/use-ruang.ts:37`, `:60`; `use-penyetuju-peminjaman.ts:43`), dan detail booking memberi tahu penyetuju bahwa keputusannya diambil lewat menu Pengajuan MyBharata (`erp-frontend/src/features/ga/peminjaman/components/peminjaman-detail-sheet.tsx:57-64`, teks `ga.peminjaman.detail.setujuiLewatMyBharata`). Layar MyBharata untuk mengajukan dan memutus **direncanakan** (irisan 2 [[ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor]]); sampai itu, antrean `GET /peminjaman/perlu-aksi` dan aksi setujui atau tolak hanya terjangkau lewat API. Kelasnya sama dengan "wewenang memutus tanpa kemampuan melihat" di atas, bedanya yang ini diketahui dan dijadwalkan.
+- **Booking Ruang: dua keadaan yang membuat pengajuan menunggu orang yang tak bisa memutus.** (1) Pemohon yang menjadi satu-satunya penyetuju di daftar: pengajuannya lolos (daftar tak kosong), ia sendiri ditolak memutus, dan tak ada penerima kabar lain, jadi keadaannya hanya tercatat di log (`services/inventory/peminjaman_notify.go:128-134`, `peminjaman_transisi.go:53-55`). (2) Penyetuju yang resign atau pindah perusahaan tetap tercatat dan tetap dikabari, karena penunjukan hanya diperiksa saat disimpan; yang pindah perusahaan menerima 404 atas booking perusahaan lamanya (`peminjaman_pengajuan.go:121-123`). Bila seluruh daftar dalam keadaan itu, antreannya menggantung. Layar HR menandai penyetuju tak aktif tetapi tidak membersihkannya (`erp-frontend/src/features/ga/peminjaman/components/penyetuju-peminjaman-manager.tsx:125-133`).
+
 ## Dokumen Terkait
 
+- [[ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor]] (Booking Ruang) · [[Microservices - Inventory Service]]
 - [[REF - Rantai Pengajuan Lintas Modul]] — **sumbu berbeda, dipakai bersama.** Dokumen ini menjawab *siapa yang berwenang memutuskan*; yang itu menjawab *rantai bisnis mana yang terpecah jadi beberapa pengajuan terpisah, dan di titik mana ia putus*. Inventaris di sini disusun per-mekanisme-gerbang, di sana per-alur-bisnis.
 - [[CORE - RBAC dan Permission Set]] · [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]
 - [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]] · [[ADR - 0031 Prefix internal Bukan Batas Keamanan]]
