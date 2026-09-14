@@ -79,7 +79,7 @@ Irisan 3: pola harian atau mingguan, maksimal 3 bulan, satu persetujuan untuk sa
 - **Alasan riwayat buatan server masih teks bahasa Indonesia** yang tampil apa adanya di locale en; dibuat terstruktur bersama layar MyBharata (irisan 2).
 - **Saringan jenis agenda yang tersimpan di kalender web** bisa menyembunyikan `room_booking` bagi orang yang pernah menyimpan pilihan; ditangani sebagai task terpisah di kode kalender bersama.
 - **Deploy lintas container.** inventory-service, notification-service (kategori inbox baru), dan calendar-service (provider baru) naik bersama; inventory-service butuh env `EMPLOYEE_MODULE_URL`, `NOTIFICATION_MODULE_URL`, `NOTIFICATION_SERVICE_KEY`, calendar-service butuh `INVENTORY_MODULE_URL`. Lihat [[RUN - Deploy Microservices bip-erp]].
-- Temuan sampingan yang diperbaiki di kerja yang sama: notifikasi SPV Permintaan Barang GA tak pernah terkirim karena klien resolver atasan memakai nama header gateway yang salah dan tak meneruskan identitas pemanggil.
+- Temuan sampingan yang diperbaiki di kerja yang sama: notifikasi SPV Permintaan Barang GA tak pernah terkirim karena dua cacat berlapis. Klien resolver atasan memakai nama header gateway yang salah dan tak meneruskan identitas pemanggil. Lebih mendasar lagi, kiriman inbox inventory (`kirimInbox`, dipakai Permintaan Barang dan Booking Ruang) tak pernah membawa `BIP-Gateway-ID`, sehingga ditolak 401 oleh notification-service. Cacat kedua baru ketahuan saat verifikasi lewat gateway dev 2026-09-14, karena seluruh test mengganti pengirimnya dengan tiruan.
 
 ### Yang sengaja tidak dilakukan
 

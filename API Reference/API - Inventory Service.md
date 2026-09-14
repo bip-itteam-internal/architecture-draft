@@ -121,7 +121,7 @@ Grounded ke `services/inventory/peminjaman_*.go`. Keputusan desain: [[ADR - 0094
 - **Penjaga balapan**: setiap penulisan status memakai filter `{nomor, status diharapkan, sumber_id, mulai_at, selesai_at}` (`filterPenjagaPeminjaman`); tak cocok dibalas 409. Isian tidak ikut dijaga, jadi dua perubahan isian bersamaan saling timpa.
 
 ### Notifikasi
-- Dikirim di goroutine (`jalankanNotifikasiPeminjaman`), tidak ditunggu respons, best-effort (galat hanya dicatat log). Endpoint notification-service: `POST /inbox/send?key=` (`kirimInbox`).
+- Dikirim di goroutine (`jalankanNotifikasiPeminjaman`), tidak ditunggu respons, best-effort (galat hanya dicatat log). Endpoint notification-service: `POST /inbox/send?key=` dengan header `BIP-Gateway-ID` (`kirimInbox`). Tanpa header itu notification-service membalas 401 dan kabarnya hilang senyap, dan itulah yang terjadi sampai 2026-09-14.
 - `peminjaman-ga-perlu-aksi` → seluruh penyetuju kecuali pemohon: saat diajukan, dan saat booking yang `DISETUJUI` diubah ruang atau jamnya.
 - `peminjaman-ga-diperbarui` → pemohon: disetujui, ditolak (dengan alasan), ditolak otomatis (judul berbeda: slot sudah dipakai booking lain). Batal tidak mengirim kabar.
 - `app_route` `/ga/peminjaman/<nomor>`; notification-service memetakannya ke `/ga/peminjaman?nomor=<nomor>` untuk push web (`services/notification/webpush.go`). Lihat [[Microservices - Notification Service]].

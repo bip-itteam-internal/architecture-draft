@@ -28,7 +28,7 @@
 	- `GET /article` — `?id`, `?recent`, atau seluruhnya; **ter-scope tenant**: hanya artikel `company_id` = perusahaan pembaca (`EffectiveCompanyID`) ATAU yang ber-`group_wide` (broadcast Bharata Group). Berlaku di ketiga cabang (all / recent / by-id).
 	- `POST /article` — multipart; distempel `company_id` = perusahaan pembuat (`CompanyID(c)`, default BIP). Flag `group_wide` **hanya boleh diset admin pusat** (`IsCentralAdmin`) supaya perusahaan biasa tak bisa broadcast lintas-tenant.
 	- `DELETE /article`
-- **Route pengiriman (ber-service-key, `?key=` cocok `NotificationServiceKey`):**
+- **Route pengiriman (ber-service-key, `?key=` cocok `NotificationServiceKey`):** ⚠️ kunci layanan TIDAK menggantikan gerbang gateway. `validation.ValidateGateway` dipasang global (`app.Use` di `main.go`) sebelum rute-rute ini didaftarkan, jadi pemanggil wajib mengirim header `BIP-Gateway-ID` (nilai `INTERNAL_GATEWAY_KEY`) selain `?key=`. Tanpa header itu balasannya 401 `Unauthorized gateway` sebelum kunci layanan sempat diperiksa, dan pengirim yang best-effort hanya mencatatnya di log. Klien HTTP yang merakit permintaannya sendiri wajib memasang header ini; contoh yang lolos berminggu-minggu adalah `kirimInbox` di [[Microservices - Inventory Service]] (2026-08-27 sampai 2026-09-14), yang tak tertangkap test karena pengirimnya selalu diganti tiruan.
 	- `POST /inbox/send`
 	- `POST /wa/send-personal`
 	- `POST /wa/send-group`
