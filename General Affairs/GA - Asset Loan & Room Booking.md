@@ -1,112 +1,109 @@
 ## Deskripsi
 
-*Konsep & **desain** (sisi General Affairs) **peminjaman aset** — mengelola alur **pinjam → pakai → kembali** untuk: booking **ruang meeting**, pinjam **barang/aset bergerak**, dan booking **kendaraan operasional**. Tujuannya agar pemakaian bersama terjadwal (tak bentrok), terlacak (siapa pinjam apa, kapan), dan akuntabel (kondisi/kebersihan saat dikembalikan). Master data asetnya ada di [[GA - Inventory Management]]; dok ini menambahkan alur peminjamannya.*
+*Konsep dan desain (sisi General Affairs) **peminjaman aset**: alur pinjam, pakai, kembali untuk **ruang rapat**, **barang/aset bergerak**, dan **kendaraan operasional**, supaya pemakaian bersama terjadwal (tak bentrok), terlacak (siapa memakai apa, kapan), dan akuntabel. Master aset ada di [[GA - Inventory Management]]; dok ini menambahkan alur peminjamannya. Keputusan desain yang berlaku untuk booking ruang dicatat di [[ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor]], yang merevisi desain rilis-1 versi 2026-07-18.*
 
-- **Status**: 🟡 Konsep / Direncanakan — **desain rilis-1 (Booking Ruang) sudah terkunci**, belum ada implementasi kode.
-- **Rumah kode (rencana)**: extend service inventory ([[Microservices - Inventory Service]]) — booking = tambahan alur di atas master aset GA. Endpoint detail → [[API - Inventory Service]] (saat sudah dikode).
+- **Status**: ⚠️ Implemented (ada catatan). **Booking ruang**: irisan 1 dari 7 ada di kode (inventory-service, feed kalender, notifikasi, layar web Ruang & Booking, penunjukan penyetuju). Layar MyBharata untuk mengajukan dan memutus (irisan 2), booking berulang (irisan 3), dan pemilih ruang di modul lain (irisan 4 sampai 7) belum ada. **Barang dan kendaraan**: masih konsep, ditunda.
+- **Rumah kode**: [[Microservices - Inventory Service]] (koleksi `ga_ruang`, `ga_peminjaman`, `ga_peminjaman_penyetuju`, lihat [[DB - Data Dictionary]]). Kontrak endpoint: [[API - Inventory Service]].
 - **Sumber bisnis**: 2 sheet *"Form Peminjaman Ruangan"* + *"Syarat Dan Ketentuan Peminjaman Ruangan"* (PT Bharata Internasional Pharmaceutical).
 
 ## Latar Belakang
 
-- Peminjaman ruang, barang, dan kendaraan saat ini berjalan manual/ad-hoc lewat spreadsheet → rawan **bentrok jadwal**, sulit tahu **siapa memakai apa**, dan kondisi/kebersihan saat kembali tidak tercatat. Spreadsheet **tidak punya kolom status** dan pengecekan bentrok dilakukan manual (rawan human error).
-- Pada proses lama, **hanya Team GA yang mengisi form** (GA sebagai gatekeeper). Desain baru menggeser ini ke **self-service + approval GA** (lihat [Keputusan Desain](#keputusan-desain-rilis-1)) — mengurangi beban input GA sekaligus tetap memberi GA kontrol.
-- [[GA - Inventory Management]] menyimpan **master aset**, tetapi belum ada **alur pinjam-kembali** terstruktur. Konsep ini melengkapi sisi itu.
+- Peminjaman ruang, barang, dan kendaraan berjalan manual lewat spreadsheet: rawan **bentrok jadwal**, sulit tahu **siapa memakai apa**, dan spreadsheet **tak punya kolom status** sehingga cek bentrok dilakukan manual.
+- Pada proses lama **hanya Team GA yang mengisi form**. Desain yang berlaku menggeser ini ke **self-service lewat MyBharata** dengan **penyetuju yang ditunjuk HR** (bukan GA otomatis, bukan atasan pemohon).
+- [[GA - Inventory Management]] menyimpan master aset, tetapi belum ada alur pinjam-kembali terstruktur. Konsep ini melengkapi sisi itu.
 
 ## Ruang Lingkup / Cakupan (business view)
 
-- **Booking ruang meeting** — jadwal pemakaian (anti-bentrok), kapasitas/fasilitas, durasi. → **fokus rilis-1**.
-- **Pinjam barang/aset bergerak** — mis. proyektor, alat ukur, perkakas; dengan **tanggal kembali** + catatan **kondisi** saat pinjam & kembali. → **fase berikutnya** (memanfaatkan master aset yang sudah ada di [[Microservices - Inventory Service]]).
-- **Booking kendaraan operasional** — tujuan, jadwal, peminjam. → **fase berikutnya**. *(Pemeliharaan/servis kendaraan **di luar lingkup** → [[GA - Machine & Utility Maintenance]].)*
-- **Alur umum**: ajuan/booking → **approval GA** → pakai → **kembali + cek kondisi/kebersihan** → catat; bila aset rusak/hilang → **eskalasi** ke maintenance ([[GA - Machine & Utility Maintenance]] / [[GA - Building Maintenance]]).
-- **Ketersediaan & riwayat**: kalender ketersediaan per ruang/aset; riwayat peminjaman per aset & per peminjam.
+- **Booking ruang rapat**: jadwal pemakaian anti-bentrok, jam operasional per ruang, kapasitas dan fasilitas sebagai informasi. Dibangun dalam tujuh irisan: (1) inti inventory-service + layar web; (2) MyBharata untuk mengajukan dan memutus; (3) booking berulang harian/mingguan maksimal 3 bulan, satu persetujuan per seri; (4) pemilih ruang + Agenda Kalender; (5) Interview + Onboarding review; (6) Program Culture; (7) Pelatihan.
+- **Satu sumber ruang kantor** (direncanakan, irisan 4 sampai 7): Agenda Kalender, Interview, Onboarding review, Program Culture, dan Pelatihan memilih ruang kantor dari Booking Ruang. Teks bebas hanya untuk lokasi luar kantor dan ditolak bila sama dengan nama ruang terdaftar. Booking yang lahir dari modul tetap butuh persetujuan.
+- **Pinjam barang/aset bergerak**: ditunda. Durasi dan sanksi masih TBD, dan sanksi menyentuh Peraturan Perusahaan.
+- **Booking kendaraan operasional**: ditunda. Sopir, odometer, dan irisannya dengan Perjalanan Dinas masih TBD. Pemeliharaan kendaraan di luar lingkup, lihat [[GA - Machine & Utility Maintenance]].
+- **Tidak dikerjakan** (keputusan 2026-09-12): checklist kebersihan saat selesai, persetujuan dan perubahan booking lewat web, badge sidebar dan kartu Office Boy.
 
 ## Persona / Pengguna
 
 | Persona | Peran & Divisi | Akses / RBAC | Device |
 |---|---|---|---|
-| **Peminjam** | Karyawan lintas divisi (HRD, Kyura, Beautyhacks, IT, dll) | Karyawan terautentikasi (tanpa gate GA) — self-request | [[APP - MyBharata]] (mobile) |
-| **Team GA** | GA staff / supervisor | `RequireGeneralAffair` (modul `ga`: staff/supervisor/admin) — approve, tolak, selesai, kelola master ruang | [[APP - Web ERP]] (web) |
-| **Penanggung jawab** | Kontak yang no. WA-nya dicatat pada peminjaman (bisa = peminjam) | — (referensi kontak, wajib diisi) | — |
+| **Pemohon** | Karyawan lintas divisi | Cukup identitas (tanpa izin modul) | [[APP - MyBharata]] untuk mengajukan (irisan 2); [[APP - Web ERP]] tab Booking Saya (baca-saja) |
+| **Penyetuju** | Karyawan yang ditunjuk HR, satu daftar per perusahaan (bukan atasan pemohon) | Penunjukan di daftar penyetuju, bukan izin; tak boleh memutus booking miliknya sendiri | [[APP - MyBharata]] (irisan 2) |
+| **Team GA** | Staf / supervisor GA | `ga.view` (jadwal seluruh booking, termasuk nama dan nomor WA pemohon), `ga.work` (tambah, ubah, nonaktifkan ruang) | [[APP - Web ERP]] (Ruang & Booking) |
+| **HR** | Supervisor HRIS atau IT | Gerbang `RequireHRISOrITSupervisor` | [[APP - Web ERP]] (Pengaturan > Organisasi & Jabatan) |
+| **Penanggung jawab** | Kontak yang nomor WA-nya dicatat di booking (umumnya pemohon sendiri) | Referensi kontak, wajib diisi | |
 
-- **Peminjam** — *Tujuan*: memesan ruang tanpa harus menghubungi GA manual. *Pain point*: tidak tahu ruang kosong/bentrok. *Aksi utama*: ajukan booking, pantau status.
-- **Team GA** — *Tujuan*: kontrol pemakaian ruang tanpa mengetik semua form. *Pain point*: bentrok jadwal & ruang ditinggal kotor. *Aksi utama*: setujui/tolak, verifikasi checklist saat selesai.
+- **Pemohon**: *Tujuan*: memesan ruang tanpa menghubungi GA. *Pain point*: tak tahu ruang mana yang kosong. *Aksi utama*: ajukan, ubah jam, batalkan, pantau status.
+- **Penyetuju**: *Tujuan*: memutus cepat tanpa bentrok. *Pain point*: dua pengajuan untuk slot yang sama. *Aksi utama*: setujui atau tolak dengan alasan.
+- **Team GA**: *Tujuan*: daftar ruang yang benar dan tahu pemakaian ruang. *Pain point*: ruang dipakai tanpa tercatat. *Aksi utama*: kelola ruang, lihat jadwal.
+- **HR**: *Tujuan*: selalu ada penyetuju aktif. *Pain point*: penyetuju resign sehingga antrean menggantung. *Aksi utama*: tunjuk dan ganti penyetuju.
 
-## Keputusan Desain (rilis-1)
+## Keputusan Desain
 
-Desain ini **menetapkan keputusan** atas beberapa **TBD** konsep awal:
+Desain rilis-1 versi 2026-07-18 (approval tim GA, status `Selesai` dengan checklist kebersihan, kategori notifikasi `request-*`, kontrak `/rooms` dan `/bookings/*` termasuk `GET /bookings/calendar`, id `RESV-`) **digantikan** oleh [[ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor]]. Ringkasnya:
 
-1. **Scope rilis-1 = ruang saja.** Device & kendaraan ditunda ke fase berikutnya.
-2. **Self-service + approval GA** (bukan lagi GA-only). Peminjam mengajukan sendiri via [[APP - MyBharata]]; GA menyetujui/menolak & mengelola via [[APP - Web ERP]]. *Ini mengubah proses manual lama (GA-only) — disepakati sebagai perbaikan efisiensi.*
-3. **Notifikasi lewat MyBharata**, bukan blast WhatsApp. **Nomor WA tetap wajib diisi** sebagai kontak penanggung jawab, tetapi notifikasi status (diajukan/disetujui/ditolak) dikirim via [[Microservices - Notification Service]] (inbox + push FCM) memakai kategori inbox yang sudah dirender MyBharata (`request-created`, `request-approved`, `request-rejected`).
-4. **Rumah kode = [[Microservices - Inventory Service]]** (extend), bukan service baru — booking memakai kembali RBAC GA, identitas header gateway, dan berdampingan dengan master aset.
+1. **Scope yang dibangun = ruang.** Barang dan kendaraan ditunda.
+2. **Pemohon lewat MyBharata, penyetuju ditunjuk HR**, satu daftar untuk semua ruang dalam satu perusahaan. Web tidak menyetujui dan tidak mengubah booking.
+3. **Notifikasi lewat inbox/push MyBharata** dengan dua kategori khusus: `peminjaman-ga-perlu-aksi` (penyetuju) dan `peminjaman-ga-diperbarui` (pemohon), lewat [[Microservices - Notification Service]].
+4. **Rumah kode = [[Microservices - Inventory Service]]**, bukan service baru.
+5. **Kalender lewat feed milik pembaca** ([[Microservices - Calendar Service]], kind `room_booking`), bukan kalender GA sendiri.
 
 ### Status Booking
 
-`Diajukan → Disetujui | Ditolak → Selesai`, plus `Dibatalkan`.
+`DIAJUKAN → DISETUJUI | DITOLAK`, plus `DIBATALKAN`.
 
-- **Diajukan** — dibuat peminjam.
-- **Disetujui / Ditolak** — aksi GA (tolak menyertakan alasan).
-- **Selesai** — aksi GA saat pemakaian usai; **mengisi checklist** kelengkapan + kebersihan/kerapihan.
-- **Dibatalkan** — oleh peminjam (selagi masih `Diajukan`) atau GA.
-- **Berlangsung** — **state turunan** untuk tampilan (Disetujui & waktu-kini dalam rentang booking), **bukan** transisi ber-aksi di rilis-1.
+- **DIAJUKAN**: dibuat pemohon, atau booking disetujui yang diubah ruang/jamnya.
+- **DISETUJUI / DITOLAK**: keputusan penyetuju; tolak wajib beralasan. Pengajuan lain yang bertumpuk dengan booking yang baru disetujui **ditolak otomatis**.
+- **DIBATALKAN**: oleh pemohon, selagi masih diajukan atau sesudah disetujui selama belum mulai.
+- "Berlangsung" dan "Selesai" **bukan status tersimpan**; keduanya dibaca dari jam. Checklist kebersihan tidak ada.
 
 ### Aturan Anti-Bentrok
 
-Booking baru **bentrok** bila ada booking lain pada **ruang yang sama** berstatus `Disetujui` dan rentang waktunya **overlap**: `mulaiBaru < selesaiLama && mulaiLama < selesaiBaru`. Banyak pengajuan (`Diajukan`) boleh antre pada slot yang sama; **saat GA menyetujui**, overlap terhadap booking yang sudah `Disetujui` **ditolak**. *(Catatan: inventory-mongo bukan replica set → tanpa multi-document transaction; enforcement pakai re-check saat approve.)*
+Booking bentrok bila ada booking lain di **ruang yang sama** berstatus `DISETUJUI` dengan rentang yang overlap: `mulaiBaru < selesaiLama && mulaiLama < selesaiBaru` (bersinggungan tepat di batas tidak bentrok). Banyak pengajuan boleh antre di slot yang sama; yang menentukan adalah persetujuan. Jam dibaca WIB, kelipatan 30 menit, mulai dan selesai di hari yang sama, di dalam jam operasional ruang. Karena inventory-mongo bukan replica set (tanpa transaksi), persetujuan ditahan dengan kunci sewa per ruang, penulisan berpenjaga status dan jadwal, dan cek ulang sesudah menulis. Rinciannya di ADR 0094 §5.
 
-## Alur Proses (rilis-1)
+## Alur Proses
 
-1. **Ajukan** — peminjam pilih ruang, tanggal & jam mulai/selesai, keperluan, **no. WA** (wajib), keterangan → status `Diajukan`; notifikasi `request-created` ke peminjam.
-2. **Review GA** — GA lihat antrean & kalender; **setujui** (cek anti-bentrok) atau **tolak** (alasan) → notifikasi ke peminjam.
-3. **Pakai** — peminjam memakai ruang sesuai jam; wajib jaga kebersihan & tidak merusak fasilitas (Syarat & Ketentuan).
-4. **Selesai + verifikasi** — GA menandai `Selesai` sambil mengisi **checklist kelengkapan** & **kebersihan/kerapihan**; device (bila ada, fase berikutnya) dikembalikan ke GA.
-5. **Eskalasi** — bila ada kerusakan → [[GA - Machine & Utility Maintenance]] / [[GA - Building Maintenance]].
+1. **Tunjuk penyetuju** (HR, web): supervisor HRIS/IT memilih karyawan aktif. Selama daftar kosong, pengajuan ditolak dan layar menyampaikannya lebih dulu.
+2. **Daftarkan ruang** (GA, web): nama, lokasi, kapasitas, fasilitas, jam buka dan tutup. Ruang tak pernah dihapus, hanya dinonaktifkan.
+3. **Ajukan** (pemohon, MyBharata irisan 2): pilih ruang dan jam kosong, isi keperluan (wajib), nomor WA (wajib, 8 sampai 15 angka), keterangan → `DIAJUKAN`; penyetuju dikabari.
+4. **Putuskan** (penyetuju, MyBharata irisan 2): setujui (ruang dibaca ulang; ruang yang sudah nonaktif atau jam di luar jam operasional yang berlaku ditolak dengan pesan menyuruh menolak booking itu) atau tolak dengan alasan; pemohon dikabari.
+5. **Ubah atau batal** (pemohon, sebelum mulai): perubahan ruang atau jam mengembalikan booking disetujui ke antrean dan melepas slot lamanya; perubahan isian saja tidak. Pemohon yang sudah pindah perusahaan hanya bisa membatalkan.
+6. **Pakai**: sesuai jam; wajib menjaga kebersihan dan tidak merusak fasilitas (Syarat & Ketentuan).
+7. **Eskalasi**: bila ada kerusakan, ke [[GA - Machine & Utility Maintenance]] / [[GA - Building Maintenance]].
 
-## Rencana Kontrak (belum diimplementasi)
+## Kontrak dan Data
 
-> Ditandai **rencana** — akan menjadi grounded & pindah detailnya ke [[API - Inventory Service]] setelah dikode.
-
-**Master ruang** (`rooms`): `GET /rooms` (semua auth) · `POST/PATCH/DELETE /rooms` (GA). Seed awal: *Ruang Meeting L3*, *Ruang Training L3*.
-
-**Booking** (`room_bookings`):
-- `POST /bookings` — self-service (identitas dari header gateway; `pic_phone` wajib).
-- `GET /bookings/my` — pengajuan milik peminjam.
-- `GET /bookings` · `GET /bookings/:id` · `GET /bookings/calendar` — GA (list/detail/kalender).
-- `PATCH /bookings/:id/approve` · `/reject` · `/complete` · `/cancel` — transisi status (guard + anti-bentrok saat approve).
-
-**Data (rencana koleksi):**
-- `rooms` — `name`, `location/floor`, `capacity`, `facilities[]`, `is_active`.
-- `room_bookings` — `_id` (`RESV-YYYY-nnn`), `room_id`/`room_name`, `requester{employee_id,full_name,department}`, `pic_phone`, `purpose`, `start_at`/`end_at`, `status`, `notes`, `approval{by,at,reason}`, `completion{completeness_ok,cleanliness_ok,notes,by,at}`, `metadata`.
-
-*(Skema final didokumentasikan di [[DB - Data Dictionary]] saat implementasi.)*
+Kontrak endpoint (`/peminjaman/*` di inventory-service) didokumentasikan di [[API - Inventory Service]]; skema koleksi di [[DB - Data Dictionary]]. Nomor booking `PJR-YYYYMMDD-nnn`.
 
 ## Konsumen Data
 
-- [[GA - Inventory Management]] — status aset (tersedia / sedang dipinjam) & data master aset yang dapat dipinjam (relevan saat fase device).
-- [[GA - Machine & Utility Maintenance]] · [[GA - Building Maintenance]] — menerima eskalasi bila aset rusak saat dikembalikan.
-- [[APP - MyBharata]] — entry-point peminjam (menu **Peminjaman Ruangan**; sebelumnya *Coming Soon*).
-- [[APP - Web ERP]] — konsol GA (approval, kalender, checklist).
+- [[APP - Web ERP]]: halaman Ruang & Booking (booking sendiri, jadwal, ruang) dan tab penunjukan penyetuju di Pengaturan.
+- [[APP - MyBharata]]: pintu masuk pemohon dan penyetuju (irisan 2).
+- [[Microservices - Calendar Service]]: feed `inventory` / kind `room_booking`, hanya booking milik pembaca.
+- [[Microservices - Notification Service]]: kabar perlu-aksi dan diperbarui.
+- Agenda Kalender, Interview, Onboarding review, Program Culture, Pelatihan: pemilih ruang kantor (direncanakan irisan 4 sampai 7).
+- [[GA - Inventory Management]]: status aset yang dipinjam (relevan saat fase barang).
+- [[GA - Machine & Utility Maintenance]] · [[GA - Building Maintenance]]: eskalasi kerusakan.
 
 ## Kendala
 
-- Master aset masih 🟡 (lihat [[GA - Inventory Management]]) — peminjaman **device** (fase berikut) butuh daftar aset yang rapi sebagai fondasi. **Booking ruang tidak bergantung** pada ini (master ruang berdiri sendiri).
-- Penjadwalan anti-bentrok tanpa multi-document transaction (inventory-mongo bukan replica set) → andalkan re-check saat approve; race tipis mungkin perlu penjaga tambahan.
-- Push FCM butuh device MyBharata terdaftar per `employee_id`; bila tak ada, inbox tetap tampil (notifikasi best-effort — gagal ≠ gagal booking).
+- Sampai irisan 2 terbit, pengajuan dan persetujuan hanya lewat API; web sengaja baca-saja untuk booking.
+- Penyetuju yang resign atau pindah tenant tetap tercatat sampai HR melepasnya; layar HR hanya menandainya.
+- Push FCM butuh device MyBharata terdaftar; bila tak ada, inbox tetap tampil (notifikasi best-effort, gagal kirim tidak menggagalkan booking).
+- Master aset untuk fase barang masih perlu dirapikan (lihat [[GA - Inventory Management]]); booking ruang tidak bergantung padanya.
 
 ## Belum Diputuskan (TBD)
 
-- **Fase device/aset**: kategori aset yang boleh dipinjam; kondisi pinjam vs kembali; durasi maks & sanksi telat.
-- **Kendaraan**: dengan sopir atau dikemudikan sendiri; data BBM/odometer; approver.
-- **Durasi maksimum** & aturan booking berulang (recurring) untuk ruang.
-- **Integrasi kalender eksternal** (mis. Google Calendar) atau internal saja.
-- **Master ruang**: apakah GA kelola CRUD penuh di rilis-1 atau cukup seed dulu (CRUD UI menyusul).
-- Catatan: menu **"Loan"** di [[APP - MyBharata]] **bukan** peminjaman aset di dok ini (kemungkinan **pinjaman karyawan/kasbon** — sisi HR; perlu konfirmasi).
+- **Barang/aset**: kategori yang boleh dipinjam, kondisi pinjam vs kembali, durasi maksimum dan sanksi telat (menyentuh Peraturan Perusahaan).
+- **Kendaraan**: dengan sopir atau dikemudikan sendiri, BBM/odometer, irisan dengan Perjalanan Dinas, penyetuju.
+- **Durasi maksimum dan kapasitas wajib** untuk ruang: belum ada aturan bisnisnya.
+- **Integrasi kalender eksternal** (mis. Google Calendar).
+- Catatan: menu **"Loan"** di [[APP - MyBharata]] **bukan** peminjaman aset di dok ini (kemungkinan pinjaman karyawan/kasbon, sisi HR; perlu konfirmasi).
 
 ## Dokumen Terkait
 
-- [[GA - Inventory Management]] — master aset (fondasi peminjaman device)
-- [[Microservices - Inventory Service]] — service rumah kode · [[API - Inventory Service]] — kontrak endpoint
-- [[Microservices - Notification Service]] — notifikasi inbox/push ke MyBharata
-- [[GA - Machine & Utility Maintenance]] · [[GA - Building Maintenance]] — eskalasi kerusakan
-- [[APP - MyBharata]] · [[APP - Web ERP]] — entry-point pengguna
+- [[ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor]]: keputusan desain yang berlaku
+- [[GA - Inventory Management]]: master aset
+- [[Microservices - Inventory Service]] · [[API - Inventory Service]] · [[DB - Data Dictionary]]
+- [[Microservices - Calendar Service]] · [[Microservices - Notification Service]]
+- [[REF - Kepemilikan Data]] · [[REF - Alur Persetujuan]]
+- [[GA - Machine & Utility Maintenance]] · [[GA - Building Maintenance]]
+- [[APP - MyBharata]] · [[APP - Web ERP]]
 - [[GA - Big Pictures]]

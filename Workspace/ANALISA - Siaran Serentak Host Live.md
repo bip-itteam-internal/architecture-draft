@@ -56,6 +56,10 @@ keduanya merged dan di-deploy (BE 20:27, FE 20:30). Diverifikasi dengan kontrol 
 dan negatif: biner BE memuat `boleh_kelola` dan pesan 403 baru, bundel FE memuat seluruh
 penandanya. Tiga lubang otorisasi pra-eksisting ikut ditutup di PR yang sama.
 
+⛔ **Halaman web itu dihapus 2026-09-11**
+([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]): pencatatan dan
+tampilan N sesi kini hanya di MyBharata.
+
 Ganti pengambilan elemen pertama menjadi daftar; tiap sesi punya kartu, tombol Jeda dan
 Akhiri, penghitung durasi, dan peringatan ambang sendiri.
 
@@ -66,7 +70,7 @@ Akhiri, penghitung durasi, dan peringatan ambang sendiri.
 **Selesai bila**: dua sesi berjalan atas satu orang tampil sebagai dua kartu, dan Akhiri
 pada kartu kedua benar-benar menutup sesi kedua (bukan yang pertama).
 
-## ✅ T2. Mobile menampilkan seluruh sesi berjalan — SELESAI di branch, belum merged
+## ✅ T2. Mobile menampilkan seluruh sesi berjalan: merged ke dev (my-bharata #128, 2026-08-31)
 
 **Selesai 2026-08-30** di branch mybharata-app `feat/live-shift-sesi-jamak` (6 commit,
 PR ke `dev`). `sesiBerjalan` kini `List<LiveShift>?`, `milik.first` dibuang, halaman penuh
@@ -168,6 +172,8 @@ sekaligus.
 
 ✅ **Sudah tayang di prod 2026-08-30** (erp-frontend
 [#1325](https://github.com/bip-itteam-internal/erp-frontend/pull/1325)), bersama T1.
+⛔ **Dicabut 2026-09-11** bersama halaman web Sesi Live Host
+([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]).
 Catatan lama "belum bisa dilihat siapa pun sampai T1 tayang" sudah tak berlaku: backend T1
 ikut di-deploy hari itu juga.
 
@@ -252,13 +258,15 @@ Mobile tertinggal di **tiga** hal, bukan satu. Ketiganya sudah tercatat terpisah
 atau di bawah; dikumpulkan di sini supaya tak ada yang lolos saat mobile digarap.
 
 1. ✅ **T2 — menampilkan seluruh sesi berjalan. SELESAI** 2026-08-30 di branch
-   `feat/live-shift-sesi-jamak`, belum merged. Rinciannya di §T2 di atas, termasuk koreksi
+   `feat/live-shift-sesi-jamak`, merged ke `dev` lewat my-bharata #128 (2026-08-31). Rinciannya di §T2 di atas, termasuk koreksi
    bahwa `_versiSesiBerjalan` **tidak** perlu dirancang ulang.
 2. **T8 — pemilih toko.** `shop_id` masih diketik tangan padahal konstanta endpoint
-   daftar toko sudah ada dan nol pemakai. Salah ketik menghasilkan 200 kosong lalu sesi
+   daftar toko sudah ada dan nol pemakai. Per 2026-09-11 `origin/dev` sudah memanggil daftar
+   toko; belum diverifikasi di perangkat. Salah ketik menghasilkan 200 kosong lalu sesi
    tersimpan ke toko yang tak bisa dijodohkan, dan **GMV-nya hilang selamanya**.
 3. **T14 (baru) — padanan T7: memilih beberapa akun sekaligus.** Web mendapatkannya di
-   T7; mobile masih satu akun per dialog. Perlu memutuskan lebih dulu apakah pola
+   T7 (dicabut 2026-09-11, ADR 0091); mobile per catatan 2026-08-30 masih satu akun per
+   dialog, belum diperiksa ulang. Perlu memutuskan lebih dulu apakah pola
    combobox ber-search web bisa ditiru, karena `CustomSelectBottomSheet` di mobile
    radio/single-select dan satu-satunya multi-select yang ada (`AssigneeSelectSheet`)
    tinggal di `features/task/`, bukan di `core/widgets/`.

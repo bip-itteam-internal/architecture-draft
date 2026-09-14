@@ -40,7 +40,10 @@ Yang wajib dicek di sini:
 
 - **Komponen shared frontend.** Reuse yang asli lewat adapter, jangan bikin tiruan
   look-alike. Halaman daftar sudah punya `MainTable` + `useTableState` + `FilterTable`;
-  jangan merakit tabel, filter, atau paginasi sendiri.
+  jangan merakit tabel, filter, atau paginasi sendiri. Untuk rencana ber-UI, ikuti urutan
+  pakai → susun → adapter → baru-lokal dan peta tempat mencarinya di `ui-checklist.md` §1,
+  lalu tulis di `## Alur Pengguna` keadaan layar yang dirancang (memuat, kosong, galat,
+  terkunci, sebagian) serta aksi utamanya, sesuai `ui-checklist.md` §2.
 - **Master data yang sudah ada.** Cek dulu sebelum menambah field baru; sering yang
   dibutuhkan sudah ada dengan nama lain.
 - **Pemilik fakta.** Sebelum menambah koleksi, field, atau layar tulis untuk sebuah fakta

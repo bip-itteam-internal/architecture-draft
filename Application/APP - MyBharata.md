@@ -6,7 +6,7 @@
 - **Multi-perusahaan** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]): presensi (absen/jadwal/izin) ter-scope **otomatis via JWT** (tak ada perubahan). **Profil Perusahaan** dari `/me` (BIP profil penuh; perusahaan lain nama saja) & **onboarding** (welcome + setup-selesai) dari respons login `new_user`, membuang hardcode "PT Bharata". **Konten dinamis per tenant (F2-C, PR #90)**: helper `CompanyScope` / `companyScopeOf(context)` dari `UserProfileBloc` (key kosong = BIP demi kompatibilitas token lama); blok "Tentang Perusahaan" (Visi/Misi/Company Info/SOP) & "Bharata Community" hanya untuk BIP, sedangkan kartu cuaca kantor dan nama pada strap QR lanyard kini ikut nama perusahaan user. **Menu Pengajuan disembunyikan untuk non-BIP (PR #91)** selama pilot, di dua entry point (`home_menu_grid` + `more_menu`), karena perusahaan lain fokus presensi dulu. ✅ **Gerbang itu DIBUKA di PR [#113](https://github.com/bip-itteam-internal/my-bharata/pull/113)** (**merged ke `dev`**; `companyScopeOf(context).isBip` dicabut di kedua entry point): `attendance-service` kini menyaring per `company_id` di seluruh jalurnya, jadi menahannya lebih lama berarti seluruh karyawan CV Elit dan Sadewa tak bisa mengajukan cuti lewat aplikasi sama sekali padahal servernya sudah siap. ⚠️ Dua gerbang KONTEN (visi-misi + Bharata Community di beranda, profil perusahaan lengkap) **sengaja TIDAK ikut dibuka**: di baliknya `CompanyInfoModel.dummy()` dan `ClubEntity.sample()`, yaitu data BIP yang dipaku di kode. Mencabut kondisinya tidak membuka akses, melainkan menampilkan visi-misi dan alamat PT Bharata Internasional kepada karyawan CV Elit seolah itu perusahaannya sendiri. Yang dibutuhkan di sana konten per-tenant, bukan penghapusan `if`. **Status rilis**: PR #89/#90/#91 sudah **merged ke `dev`** (versionCode 120), belum naik ke `main`. **Masih TBD (butuh data per-perusahaan di BE):** kontak HR, nama gedung + guestbook, handbook/SOP PDF. Kontak IT sengaja tetap pusat (helpdesk grup, dipakai juga pra-login sebelum perusahaan diketahui).
 
 - Pengguna: karyawan, supervisor, HRD, IT admin, dan tamu eksternal (guest book)
-- Versi build saat ini: **1.14.9+143** (`origin/dev`; `pubspec.yaml`) — naik dari 135 lewat PR #107 (slip gaji terbit + unduh PDF), #108 (menu Kaizen), #109 (progres KPI bulan berjalan), #110 (kategori notifikasi `employee-moved`), #111 (section Survei ke puncak beranda), #112 (menu Pelatihan), #113 (membuka Pengajuan untuk non-BIP), dan [#114](https://github.com/bip-itteam-internal/my-bharata/pull/114) (memunculkan menu Kaizen & Pelatihan yang ternyata tak pernah terjangkau — lihat [[#Struktur menu beranda]]).
+- Versi build saat ini: **1.14.9+143** (`origin/dev`; `pubspec.yaml`). ⚠️ Angka ini basi: `origin/dev` terukur **1.17.0+161** pada 2026-09-12, dan PR T6 [#144](https://github.com/bip-itteam-internal/my-bharata/pull/144) membawa **1.18.0+162** ke `dev` saat merged 2026-09-14 (publish Codemagic terpicu). Daftar PR berikut riwayat sampai 143 — naik dari 135 lewat PR #107 (slip gaji terbit + unduh PDF), #108 (menu Kaizen), #109 (progres KPI bulan berjalan), #110 (kategori notifikasi `employee-moved`), #111 (section Survei ke puncak beranda), #112 (menu Pelatihan), #113 (membuka Pengajuan untuk non-BIP), dan [#114](https://github.com/bip-itteam-internal/my-bharata/pull/114) (memunculkan menu Kaizen & Pelatihan yang ternyata tak pernah terjangkau — lihat [[#Struktur menu beranda]]).
 - Versi rilis: **1.14.5+135** (`origin/main`, tag `v1.14.5+135`, GitHub Release 2026-08-03) — itulah yang terpasang di HP pemakai. Seluruh PR di atas **belum ikut rilis**; catatan lama di sini menyebut rilis terakhir masih `1.14.2+132` dan `main` belum pernah ditarik dari `dev`, dua-duanya sudah tidak berlaku.
 - Target platform: Android (minSdk 23 / Android 6.0+), iOS 13+
 - Survei perangkat mobile karyawan [terdaftar di sini](https://docs.google.com/spreadsheets/d/1w2blhMgFx1BI9zu6ni5gmQJab_NfMhdocm0cj5pyO_s/edit?usp=sharing)
@@ -127,7 +127,7 @@ Layar Insentif Saya pindah dari web ke aplikasi dan **menumpang daftar Slip Gaji
 ### Survei / Form Builder
 - **Section "Survei" di beranda**, berisi form terbit yang ditujukan ke karyawan itu dan **belum** ia isi. Tiap kartu menampilkan jumlah pertanyaan, tenggat gerbang, dan penanda merah **"Wajib sebelum absen"** bila form-nya menahan clock-in.
 - **Posisinya paling atas** di daftar beranda — anak pertama `SliverList`, **di atas** kartu "menunggu persetujuan" (PR [#111](https://github.com/bip-itteam-internal/my-bharata/pull/111), **merged ke `dev` 2026-08-11**, versionCode **140**). Sebelumnya berada di bawah section "Akses Cepat". Tak ada `SizedBox` pemisah yang dipasang di puncak daftar: section membawa jaraknya sendiri di dua sisi (atas 16 dari `padding` bawaan `SectionHeader`, bawah 16 dari `SizedBox` terakhir di `Column`-nya), sehingga saat ia menyembunyikan diri — yang terjadi pada mayoritas pemakai, lihat catatan di bawah — puncak beranda tak meninggalkan celah menggantung.
-- **Halaman pengisian `/survey/:id`** merender **9 tipe pertanyaan** (`short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`), memvalidasi cermin aturan backend sebelum kirim, lalu menyegarkan section supaya form yang baru diisi langsung lenyap.
+- **Halaman pengisian `/survey/:id`** merender **9 tipe pertanyaan** (`short_text`, `long_text`, `number`, `date`, `time`, `dropdown`, `radio`, `checkbox`, `scale`; T6, merged ke `dev` 2026-09-14, menambah `boolean` dan `file`, lihat [[#Satgas 5R dan K3]]), memvalidasi cermin aturan backend sebelum kirim, lalu menyegarkan section supaya form yang baru diisi langsung lenyap.
 - **Dropdown, tanggal, dan jam memakai satu jalur yang sama** (PR [#95](https://github.com/bip-itteam-internal/my-bharata/pull/95)): mode nilai `CustomFormField` + pemilih milik aplikasi. Dropdown memakai **`CustomSelectBottomSheet`**, bukan `DropdownButtonFormField` bawaan Material — repo sudah punya komponennya, dan menu melayang di layar sempit sering terpotong sedangkan lembar bawah memang dirancang untuk jempol. Ketiganya kini punya tombol **"Kosongkan"** saat pertanyaannya opsional; sebelumnya tanggal dan jam terkunci begitu tersentuh karena pemilih tak punya cara bawaan membatalkan pilihan.
 - **Keterangan ujung skala** digambar di bawah deretan angka bila dikirim backend; satu ujung saja tetap digambar.
 - **Pengisian per bagian** (PR [#95](https://github.com/bip-itteam-internal/my-bharata/pull/95)): form berbagian dipecah jadi satu halaman per bagian lewat `splitSurveyPages()` — fungsi murni, teruji tanpa merender. Form **tanpa** bagian tetap satu halaman tanpa navigasi, jadi perilaku lamanya tak berubah. Pemeriksaan jawaban berjalan **per halaman** saat menekan Berikutnya; menundanya sampai tombol kirim berarti pengisi baru menemukan kesalahan bagian pertama setelah menyelesaikan bagian terakhir. Saat mengirim, kesalahan pertama membawa layar **lompat ke halamannya**, karena pesan untuk pertanyaan yang tak terlihat membuat pengisi menebak-nebak.
@@ -155,6 +155,8 @@ Layar Insentif Saya pindah dari web ke aplikasi dan **menumpang daftar Slip Gaji
 > Status: ✅ Implemented — diperbaiki di PR [#114](https://github.com/bip-itteam-internal/my-bharata/pull/114), **merged ke `dev`** 2026-08-11 (versionCode **143**). ⚠️ Belum diverifikasi di aplikasi berjalan; lihat catatan di akhir bagian ini.
 
 **Hanya ada SATU daftar menu yang benar-benar dirender: `home_quick_access.dart`.** Grid beranda menampilkan favorit tersimpan pemakai, dan tombol **"Semua Menu"** membuka `showQuickAccessMoreBottomSheet` yang merender daftar yang sama tanpa penyaring. Menu baru **wajib** masuk ke situ.
+
+**Menu yang digerbang jawaban server** (T6, PR [my-bharata#144](https://github.com/bip-itteam-internal/my-bharata/pull/144), merged ke `dev` 2026-09-14): menu Satgas satu-satunya item yang tak digerbang `system_roles`. Barisnya dievaluasi **sebelum** `if (roles == null) return true;`, karena jalan pintas itu meloloskan semua menu saat cache peran kosong dan Satgas tak punya peran lokal. Item semacam ini wajib ikut dijaga di editor Atur Menu, yang memangkas lalu MENYIMPAN favorit yang tak diizinkan: selama izin belum dijawab server, rutenya dipertahankan (`preservedRoutes`). Penjaganya `home_quick_access_satgas_test.dart`, dengan kontrol negatif terbukti merah.
 
 Grid hijau di atasnya (`home_menu_grid.dart`) bukan daftar menu umum: isinya empat pintasan tetap (Jadwal, Pengajuan, Slip Gaji, QR Code).
 
@@ -215,7 +217,35 @@ Sebabnya program Kaizen bukan "satu form lagi" bagi pengisinya: berulang tiap pe
 > dikunci test berikut kontrol negatifnya di
 > [[Microservices - Notification Service]]. Diverifikasi langsung di dev **dan** prod.
 
-### Sesi Live Host (`/live-shift`) — ⚠️ live di `dev`, siaran serentak selesai di branch
+### Satgas 5R dan K3
+
+> Status: ⚠️ **merged ke `dev` 2026-09-14** lewat my-bharata PR [#144](https://github.com/bip-itteam-internal/my-bharata/pull/144): T6 plus cek ulang lintas bulan T3 (commit `0972270c` sampai `97032157`), versi `1.18.0+162`, publish Codemagic terpicu. Belum dicoba di perangkat dengan build dari `dev` (menu, kartu, halaman isi dari `fields`, "Dari {departemen}", foto, muat ulang), dan kartu cek ulang lintas bulan baru bisa dibuktikan 1-5 Oktober 2026. Kartu cek ulang butuh backend T3 bip-erp ([#1866](https://github.com/bip-itteam-internal/bip-erp/pull/1866), [#1867](https://github.com/bip-itteam-internal/bip-erp/pull/1867), merged 2026-09-14): di dev `/me/satgas` petugas berpaket sudah membawa `fields` dan `owner_department`, kiriman dan unggahan menerima `period_key`; prod belum deploy. Tanpa field barunya kartu itu tak muncul dan halaman isi jatuh ke `/me/forms`. Keputusan: [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] §3, §5, dan §7. Kontrak: [[API - Form Builder Service]].
+
+Petugas Satgas mencatat temuan 5R & K3 atas Office Boy dan Security, lalu mengecek ulang beberapa hari kemudian.
+
+- **Menu "Satgas 5R & K3"** di Akses Cepat hanya untuk yang dijawab `allowed:true` oleh `GET /api/form-builder/me/satgas` (lihat [[#Struktur menu beranda]]). Belum dijawab, gagal pertama, `allowed:false`, dan `404` dari backend lama semuanya dibaca tak berhak. Jawabannya dipegang satu `SatgasCubit` di `app_root.dart`: dimuat saat login, tarik-segarkan beranda, aplikasi kembali ke depan, dan halaman Satgas dibuka; dikosongkan saat logout, dan jawaban yang tiba sesudah logout dibuang. Kegagalan sesudah sukses mempertahankan jawaban terakhir.
+- **Kartu beranda** khusus petugas: "N belum dinilai, N masih ada temuan", hanya bila ada orang yang perlu didatangi. Ini jalan masuk bagi petugas yang grid favoritnya sudah tersimpan sebelum menu ada. Dirakit dari `Card` + `ListTile`, bukan `InfoCard`, karena `InfoCard.onTap` tak pernah dipakai di dalamnya.
+- **Halaman Satgas** (`/satgas`): per form yang putarannya buka, status tiap orang (Belum dinilai, Masih ada temuan, Selesai; status tak dikenal dibaca masih ada temuan), dengan yang masih bertemuan di atas. **Semua orang bisa dibuka, termasuk yang Selesai.** Hitungan diturunkan dari daftar orang, bukan dari `counts` backend. Keadaan: kerangka `ShimmerBox`, galat + coba lagi, terkunci ("minta IT memasang paket, lalu login ulang"), kosong.
+- **Kartu cek ulang temuan bulan lalu** (T3): `/me/satgas` bisa mengirim entri ber-`cek_ulang: true` untuk bulan lalu, berisi hanya orang yang temuannya masih boleh dicek ulang, beserta `batas_cek_ulang`, `fields`, dan `owner_department` (dibaca `SatgasOverviewModel`). Kartunya menyebut bulan temuan dan batasnya, "Cek ulang temuan {bulan}, paling lambat {tanggal}", menggantikan rentang putaran, dan ringkasannya "{n} orang menunggu cek ulang" alih-alih hitungan belum dinilai. Server mengirim kartu itu sampai batasnya, termasuk di rentang mati awal bulan saat putaran berjalan belum buka.
+	- **Tanggal batas diformat dalam WIB** (`DateFormatter.convertToIndonesiaTime`), bukan zona perangkat: petugas di WITA akan membaca tanggal sesudah batas yang disebut pesan tolakan server. Tanggalnya sendiri dikirim server, tidak dihitung aplikasi.
+	- **Kalimatnya dirakit di satu tempat, `kalimatCekUlang`**, dipakai kartu dan kepala halaman isi, supaya keduanya tak mungkin menyebut bulan atau tanggal yang berbeda.
+	- **Urutan kartu mengikuti server** (kartu cek ulang sebuah form mendahului kartu putaran berjalannya), tidak diurutkan ulang di aplikasi. Selain kartu itu, menu tetap hanya menampilkan periode berjalan.
+- **`SatgasFillPage`**, bukan `EvaluationFillPage` (yang menutup diri begitu semua orang pernah dinilai), **menerima kartu utuh**: `SatgasFillArgs.dari(form, person)` membawa form, orang, periode, judul, keterangan, departemen pemilik, dan `fields` ke `SatgasFillCubit`, sebagai satu objek karena `registerFactoryParam` hanya punya dua slot. Kiriman membawa `subject_employee_id`.
+	- **Susunan pertanyaan dirakit dari `fields` kartu, tanpa memanggil `/me/forms`.** Susunan itu milik periode yang memvalidasi kiriman, sedangkan `/me/forms` menyembunyikan form selama putaran berjalan belum buka, tepat saat cek ulang bulan lalu masih boleh dikirim. `/me/forms` daftar penuh tinggal **cadangan** bila `fields` kosong (backend lama); form yang tak ada di daftar itu menerangkan dirinya, bukan halaman kosong.
+	- **Kepala halaman isi**: `SatgasPersonHeader` menambahkan kalimat cek ulang hanya untuk kartu cek ulang. Orang yang sama bisa tampil di kartu cek ulang dan di kartu putaran berjalan berjudul sama, dan tanpa kalimat itu kedua halaman isinya identik. Kepala form (`SurveyHeader`) menyebut "Dari {departemen}" dari `owner_department` kartu.
+	- **`period_key` kartu ikut ke kiriman jawaban** (badan `period_key`) **dan unggah foto** (FormData `period_key`), hanya bila terisi; kosong berarti periode berjalan, persis perilaku sebelumnya. Keduanya wajib sama karena form-builder mencocokkan lampiran dengan periode jawabannya, sehingga foto cek ulang bulan lalu yang diunggah ke bulan berjalan akan ditolak saat kirim. Periodenya dibawa `SurveyUploadCubit.periodKey` (DI `registerFactoryParam<SurveyUploadCubit, String, String?>`, diisi dari `SurveyFillView.periodKey`).
+- **Halaman Satgas memuat ulang daftar SETIAP kali kembali** dari halaman isi, bukan hanya sesudah tersimpan. Tolakan `409` justru paling sering berarti daftarnya basi: temuan yang sama sudah dinyatakan selesai oleh petugas lain, atau batas cek ulang lewat selagi halaman isi terbuka. Pesannya kalimat server apa adanya. Data lama tetap tampil selama memuat (`SatgasCubit` mempertahankan `overview`), jadi layar tak berkedip ke kerangka.
+- Form bertanda `inspeksi_satgas` dikeluarkan dari section Survei lewat `Survey.isSatgas` di `surveySectionOf`; `pendingOf` tidak disaring.
+- Fitur `features/satgas`.
+
+#### Pertanyaan foto dan Ya/Tidak (berlaku untuk semua form)
+
+- **`boolean`**: dua radio Ya/Tidak, plus Kosongkan untuk yang opsional. Dikirim sebagai **bool JSON** (`answer_encoder.dart`); teks `"false"` akan dibaca backend sebagai masih bertemuan tanpa galat. `false` jawaban sah untuk pertanyaan wajib.
+- **`file`**: satu foto dari kamera atau galeri. Diperkecil ke sisi terpanjang 1920 px dan disimpan ulang JPEG (kualitas 80, turun sampai 60) di isolate hingga di bawah 3,8 MB (`core/utils/photo_compressor.dart`), lalu **diunggah lebih dulu** ke `POST /me/forms/:id/uploads` (hanya field `file`). Jawaban pertanyaan berisi `upload_id` dan dikosongkan selama unggah; Kembali, Lanjut, dan Kirim terkunci selama ada unggahan berjalan. `SurveyUploadCubit` hanya dibuat bila form punya pertanyaan berkas.
+- Pesan galat: `403`/`409` memakai kalimat server (paket Satgas, putaran belum buka); `413` dan foto yang tetap terlalu besar memakai `errorPhotoTooLarge`; foto tak terbaca `errorPhotoProcessing`; izin kamera/galeri ditolak (`camera_access_denied`, `photo_access_denied`) menunjuk ke Pengaturan ponsel; perangkat tanpa kamera (`no_available_camera`) diarahkan ke galeri. Teks izin kamera dan galeri iOS menyebut lampiran form dan foto inspeksi.
+- ⚠️ Versi lama menampilkan kedua tipe sebagai "belum didukung" dan melewatinya saat memeriksa isian, jadi ADR 0090 menahan pencabutan larangan berkas wajib di editor web sampai adopsi versi ini terukur. Pencabutannya, erp-frontend PR [#1550](https://github.com/bip-itteam-internal/erp-frontend/pull/1550), justru merged ke `main` 2026-09-14 SEBELUM adopsi 1.18.0 terukur: pertanyaan foto wajib kini bisa dibuat, dan pengisi beraplikasi lama akan ditolak server (prod frontend belum deploy).
+
+### Sesi Live Host (`/live-shift`): ⚠️ live di `dev`, satu-satunya klien pencatatan sejak 2026-09-11
 
 Host live mencatat sendiri siaran TikTok-nya dari HP: Mulai (toko + akun), Jeda/Lanjutkan,
 Akhiri, plus riwayat 7 hari terakhir dengan porsi GMV-nya sendiri. Ini catatan yang ditulis
@@ -224,15 +254,21 @@ keduanya dijodohkan lewat toko **dan** akun.
 
 Menunya digerbang **host saja** (`isHostLive`), sengaja tanpa leader marketing: tombol
 Mulai/Akhiri di kartu tidak digerbang peran, jadi memberi leader akses menu berarti memberi
-leader jalan memulai sesi atas namanya sendiri. Ini **berbeda dari web**, yang memang
-memberi leader akses lihat-saja.
+leader jalan memulai sesi atas namanya sendiri. Web dulu memberi leader akses ke halaman
+Sesi Live Host; halaman itu dihapus 2026-09-11
+([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]).
 
 Backend, kontrak, dan aturan bisnisnya di [[Microservices - Marketing Analytics Service]]
 dan [[API - Marketing Analytics Service]]; keputusannya di
 [[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]].
 
-**Siaran serentak** (T2, branch `feat/live-shift-sesi-jamak`, versionCode 152, belum
-merged): host memegang beberapa akun sekaligus, jadi sesi berjalan adalah **daftar**, bukan
+⛔ **Sejak 2026-09-11 menu ini satu-satunya klien pencatatan sesi live**
+([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]): halaman web
+Sesi Live Host dihapus. Menunya ada di `origin/dev` (1.16.0+160), tidak di `origin/main`
+(1.14.5+135), jadi host yang belum memasang build yang memuatnya tak punya jalan lain untuk
+mencatat sesi.
+
+**Siaran serentak** (T2, my-bharata #128, merged ke `dev` 2026-08-31): host memegang beberapa akun sekaligus, jadi sesi berjalan adalah **daftar**, bukan
 satu. Halaman penuh merender satu kartu per sesi dengan timer dan peringatan ambangnya
 masing-masing. **Beranda tetap satu kartu** supaya tak berubah jadi daftar panjang, dengan
 penanda "Lihat N sesi lainnya" yang **bisa ditekan** menuju halaman penuh — sebagai teks
@@ -269,18 +305,82 @@ Yang mudah terlewat saat menyentuh layar ini:
   lebar HP yang lazim. Tak pernah tertangkap test karena permukaan test bawaan 800 px.
   Diperbaiki di komponennya; ini menyentuh **seluruh** pemakai `CustomButton`.
 
-⛔ **Belum terverifikasi di perangkat sungguhan**, dan `live_shifts` produksi masih **0
-dokumen** sejak fiturnya ada.
+⛔ **Belum terverifikasi di perangkat sungguhan.** ~~`live_shifts` produksi masih 0
+dokumen~~: tidak berlaku lagi, terukur 74 sesi per 2026-09-11; dari klien mana tidak terukur
+(tak ada field maupun log yang mencatatnya).
 
-**Belum ada di mobile** (sudah ada di web): pemilih toko — `shop_id` masih **diketik
-tangan**, dan salah ketik menghasilkan 200 kosong lalu sesi tersimpan ke toko yang tak bisa
-dijodohkan sehingga **GMV-nya hilang selamanya**; dan memilih beberapa akun sekaligus dalam
-satu dialog.
+~~Belum ada di mobile: pemilih toko, `shop_id` masih diketik tangan~~: **per 2026-09-11
+`origin/dev` sudah memanggil daftar toko** (`Api.marketingToko`) dan pemilih akun
+(`GET /live-shifts/akun`), belum diverifikasi di perangkat. Salah ketik `shop_id` dulu
+menghasilkan 200 kosong lalu sesi tersimpan ke toko yang tak bisa dijodohkan sehingga
+**GMV-nya hilang selamanya**. Memilih beberapa akun sekaligus dalam satu dialog belum
+diperiksa; padanan web-nya dihapus 2026-09-11
+([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]).
 
 ⚠️ Klien mana pun yang kelak merakit daftar akun **lintas toko** wajib berkunci
 `shop_id` + akun, bukan nama akun saja: nama akun berulang antar toko (`hexativ` adalah
 akun teratas di tiga toko berbeda). Digabung per nama, sesi tersimpan atas toko yang salah
 dan gagalnya senyap — riwayatnya berbunyi "belum ada data penjualan" selamanya.
+
+#### Ambil alih akun yang masih dipegang (⚠️ merged ke `dev` 2026-09-12 lewat [#143](https://github.com/bip-itteam-internal/my-bharata/pull/143), 1.17.0+161, rilis belum diverifikasi)
+
+Merged ke `dev` 2026-09-12 07:34 WIB (PR #143); rilis 1.17.0+161 ke host belum diverifikasi. Keputusannya
+[[ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift]] §2;
+backend-nya di bip-erp [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855), di PROD sejak 2026-09-12 08:55 WIB, yang
+memang wajib naik lebih dulu: aplikasi yang keluar sebelum itu membuat tombol Ambil alih kena 404. Kontrak rutenya di [[API - Marketing Analytics Service]].
+
+- **Penolakan Mulai menyebut pemegangnya.** Datasource mengurai `shift_berjalan` di badan 409
+  menjadi `SesiDipegangFailure` (turunan `SesiMasihBerjalanFailure`, jadi penanganan 409 lama
+  tetap berlaku); muatan yang rusak jatuh ke pesan umum lama, bukan ke galat parsing. Dialog
+  Mulai menampilkan panel berisi akun, **seluruh** nama host pemegang, dan jam mulainya dalam
+  WIB, dengan tombol **Ambil alih** dan tanpa Akhiri. 409 tanpa muatan (balapan index unik)
+  tetap snackbar lama.
+  - ⛔ **Pemegang disimpan di state dialog, bukan dibaca dari state bloc.** Halaman mengirim
+    `MuatSesiBerjalan` sesudah 409, dan state berikutnya tak lagi membawa pemegang, jadi panel
+    yang membaca state terakhir lenyap sepersekian detik sesudah muncul. Memilih toko atau
+    akun lagi membuang panelnya.
+  - `LiveShiftSesiMasihBerjalan` dan `MuatSesiBerjalan` kini mempertahankan daftar toko dan
+    kandidat co-host. Sebelumnya keduanya jadi `null` sesudah 409, dan pemilih di dialog mati
+    tepat saat host perlu memilih lagi.
+  - Pemegang yang ternyata pemakai sendiri (sesi dari HP lain) tidak diberi tombol; server
+    menolak ambil alih untuk kasus itu.
+- **Sisi peminta** (`PermintaanAmbilAlihBloc`, dibuat panel lewat `sl` dan ditutup bersamanya,
+  sehingga poll berhenti begitu dialog ditutup). Konfirmasi `CustomDialog` menyebut akun dan
+  pemegang **tanpa angka detik**: batasnya milik server, dan angka di aplikasi akan jadi
+  salinan kedua (keputusan review 2026-09-12). Sesudah terkirim, status dipoll tiap 2 detik
+  dengan hitung mundur dari `sisa_detik` server.
+  - Galat jaringan saat poll tetap menunggu dengan keterangan; galat yang **dijawab server**
+    menghentikan poll dan menampilkan kalimat server apa adanya (`data.error`, bukan reason
+    phrase HTTP yang ditaruh `api.dart` di `message`).
+  - Hasil: dijalankan (dialog memuat ulang sesi berjalan dan menutup lewat sinyal penutup yang
+    sama dengan Mulai), ditolak oleh siapa, kedaluwarsa, sesi berakhir. Status yang tak
+    dikenal adalah akhir, bukan alasan poll selamanya.
+  - ⛔ **Host yang dicatat diambil dari pilihan co-host yang SEDANG tampil**, satu sumber dengan
+    Mulai dan teks jumlah pembagi GMV, bukan dari muatan Mulai yang ditolak. Co-host masih bisa
+    diubah sesudah 409, dan `BagiRata` membagi GMV per kepala.
+- **Sisi pemegang** (`PersetujuanAmbilAlihBloc`, dibuat halaman Sesi Live). Selama halaman
+  terbuka dan aplikasi `resumed` (`WidgetsBindingObserver`), halaman memoll
+  `GET /live-shifts/ambil-alih/menunggu` tiap 3 detik. Permintaan baru membuka
+  `CustomBottomSheet` **sekali per id permintaan**, satu per satu: nama peminta, akun, jadwal
+  peminta dalam WIB (bila terbaca server), hitung mundur, Setujui dan Tolak.
+  - Tak bisa ditutup lewat usap, ketuk di luar, maupun tombol kembali (`isDismissible: false`,
+    `enableDrag: false`, `PopScope`). Tertutup sendiri saat hitung mundur habis atau saat
+    permintaannya hilang dari daftar, lalu halaman memuat ulang sesi berjalan.
+  - ⛔ Jendela ditutup dengan **context miliknya sendiri**; context halaman menutup halamannya.
+  - Galat Setujui atau Tolak tampil **di dalam jendela**, bukan snackbar: snackbar halaman
+    berada di bawah sheet modal dan tak terlihat selama jendelanya terbuka.
+  - Kartu beranda tidak memoll. Bila halaman Sesi Live tidak terbuka (aplikasi tertutup atau di
+    belakang), pemegang hanya menerima notifikasi, dan mengetuknya membuka halaman Notifikasi,
+    bukan Sesi Live (titik putus yang diterima ADR 0088).
+- **Riwayat** menambah baris alasan selesai: "Diambil alih oleh X pukul HH:MM WIB" (ditambah
+  "tanpa jawaban" bila pemegang diam), "Ditutup otomatis: shift berakhir", dan "Ditutup
+  otomatis: clock-out", yang juga dipakai untuk sesi tutup otomatis lama tanpa
+  `alasan_selesai`. Sesi yang diakhiri lewat tombol dan alasan yang tak dikenal tanpa label.
+- ⚠️ **Widget test sheet modal**: route yang didorong dari listener stream butuh satu rangka
+  pendek sebelum lompatan waktu. Tanpa itu lompatannya dihitung sebagai tik pertama animasi,
+  sheet tertinggal di bawah layar, dan ketukan pada tombolnya meleset tanpa galat (`find.text`
+  tetap menemukannya). Test jendela karena itu menjadikan peringatan hit test fatal
+  (`WidgetController.hitTestWarningShouldBeFatal`).
 
 ### Fitur pendukung lain
 - **QR Code**: tampilkan QR pribadi + akses scanner inventory

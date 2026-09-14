@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # pre-commit-gate.sh — cermin pre-commit-gate.ps1 (alasan desain ada di sana).
 # MENOLAK `git commit` di branch default repo KODE lewat exit 2; vault dikecualikan.
+#
+# CATATAN (brief pre-commit-gate-overhead, 2026-09-12): init.sh memasang skrip ini di
+# belakang filter "if" (pola *commit*) sehingga proses ini TIDAK di-spawn sama sekali kalau
+# isi command tak cocok. Menambah bentuk commit baru yang dikenali DI SINI wajib diikuti
+# memperluas pola "if" di init.ps1 DAN init.sh -- lihat komentar di init.ps1 untuk detail dan
+# hasil verifikasi.
 raw="$( [ -t 0 ] && printf '' || cat )"
 [ -n "$raw" ] || exit 0
 if command -v python3 >/dev/null 2>&1; then

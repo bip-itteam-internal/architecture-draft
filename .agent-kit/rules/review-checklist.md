@@ -333,7 +333,10 @@ pemakaian dari komentar ke dok.
   transform membuat kolomnya mustahil ikut bahasa aktif. Format di `render` kolom pakai
   `intlLocale(lang)`.
 - **`FilterTable` hanya mengenal `select` dan `date`.** Tidak ada filter angka. Ambang
-  numerik jadi preset select atau kontrol sendiri di slot `actions`.
+  numerik jadi preset select atau kontrol sendiri di slot `actions`. Laci berisi lain
+  (multi-pilih, pencarian) memakai prop `filterPanel` milik `Banner` + `FilterPanel`/
+  `FilterField`, bukan tipe baru di `FilterTable` (acuan: `PageShell` Marketing Analytics,
+  erp-frontend #1546).
 - **Aturan saling-kunci antar filter tidak menggabungkan `{...sebelum, ...sesudah}`.**
   Draft `FilterTable` disemai SEKALI saat panel dibuka; key yang hilang berarti "tak
   berubah", bukan "dikosongkan". Objek kosong `{}` ditangani lebih dulu = kosongkan semua.
@@ -344,7 +347,12 @@ pemakaian dari komentar ke dok.
   `Skeleton` (`@/components/ui/skeleton`) di **erp-frontend**, `ShimmerBox` di
   **mybharata** (Flutter). `ShimmerBox` TIDAK ADA di erp-frontend; menyuruhnya di sana
   berarti menyuruh membuat komponen baru, bukan memakai ulang yang sudah dipakai 155 berkas.
-- **Komponen tiruan look-alike** alih-alih reuse komponen shared via adapter.
+- **Komponen tiruan look-alike** alih-alih reuse komponen shared via adapter, atau komponen
+  baru padahal padanannya sudah ada. Periksa diff ber-UI terhadap `ui-checklist.md`: urutan
+  reuse di §1 dan kriteria mutu di §2 (satu aksi utama per area, lima keadaan, umpan balik
+  aksi, token + mode gelap, responsif, aksesibilitas). Komponen baru tanpa alasan tertulis
+  adalah temuan. Keadaan yang hilang sampai membuat pengguna salah paham (kosong terbaca
+  "tidak ada", 403 terbaca rusak) naik ke kritis, sekelas §F.
 - Error validasi form tidak lewat `showFormErrorsToast`.
 
 ### K. Celah test

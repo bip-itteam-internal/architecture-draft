@@ -170,6 +170,35 @@ try {
   $errTxt = if (Test-Path $errf) { Get-Content $errf -Raw } else { '' }
   Check ($rc -eq 2 -and $errTxt -match "branch 'main'") "cd <repo>; git commit: ditolak karena main (exit $rc)"
 
+  # ---- KONTROL POSITIF TAMBAHAN (brief pre-commit-gate-overhead 2026-09-12): bentuk commit
+  # yang logikanya SUDAH menolak hari ini tapi belum pernah diuji eksplisit. $proj masih di
+  # branch main sejak blok di atas. Dijalankan lewat $gate = skrip yang benar-benar dipasang
+  # init (bukan path kit langsung), sama seperti kontrol di atas.
+  $cmdCKecil = 'git -c core.fsmonitor=false -C "' + $proj + '" commit -m "x"'   # -c SEBELUM -C
+  $rc = Invoke-Hook $gate @{ session_id='sesi-uji'; cwd=$tmp; hook_event_name='PreToolUse'; tool_name='PowerShell'; tool_input=@{ command=$cmdCKecil } } $errf
+  Check ($rc -eq 2) "KONTROL POSITIF: '-c' sebelum '-C', tetap DITOLAK (exit $rc)"
+
+  $cmdKapital = 'git -C "' + $proj + '" Commit -m "x"'   # huruf kapital pada subperintah
+  $rc = Invoke-Hook $gate @{ session_id='sesi-uji'; cwd=$tmp; hook_event_name='PreToolUse'; tool_name='PowerShell'; tool_input=@{ command=$cmdKapital } } $errf
+  Check ($rc -eq 2) "KONTROL POSITIF: 'Commit' huruf kapital, tetap DITOLAK (exit $rc)"
+
+  $cmdGitExe = 'Git.exe -C "' + $proj + '" commit -m "x"'
+  $rc = Invoke-Hook $gate @{ session_id='sesi-uji'; cwd=$tmp; hook_event_name='PreToolUse'; tool_name='PowerShell'; tool_input=@{ command=$cmdGitExe } } $errf
+  Check ($rc -eq 2) "KONTROL POSITIF: 'Git.exe' (bukan 'git' polos), tetap DITOLAK (exit $rc)"
+
+  $gitExePath = (Get-Command git).Source   # path lengkap git.exe di mesin ini, bukan dikarang
+  $cmdAmpersand = '& "' + $gitExePath + '" -C "' + $proj + '" commit -m "x"'
+  $rc = Invoke-Hook $gate @{ session_id='sesi-uji'; cwd=$tmp; hook_event_name='PreToolUse'; tool_name='PowerShell'; tool_input=@{ command=$cmdAmpersand } } $errf
+  Check ($rc -eq 2) "KONTROL POSITIF: path lengkap git.exe lewat '&', tetap DITOLAK (exit $rc)"
+
+  $cmdChain = 'git add .; git commit -m "x"'
+  $rc = Invoke-Hook $gate @{ session_id='sesi-uji'; cwd=$proj; hook_event_name='PreToolUse'; tool_name='PowerShell'; tool_input=@{ command=$cmdChain } } $errf
+  Check ($rc -eq 2) "KONTROL POSITIF: 'git add .; git commit' dirangkai ';', tetap DITOLAK (exit $rc)"
+
+  $cmdBaris = 'git status' + "`r`n" + 'git commit -m "x"'
+  $rc = Invoke-Hook $gate @{ session_id='sesi-uji'; cwd=$proj; hook_event_name='PreToolUse'; tool_name='PowerShell'; tool_input=@{ command=$cmdBaris } } $errf
+  Check ($rc -eq 2) "KONTROL POSITIF: 'git status' + 'git commit' baris baru, tetap DITOLAK (exit $rc)"
+
   # ---- loop-kirim: BEST-EFFORT, tidak pernah menahan ----
   $lk = Join-Path $claude 'hooks/loop-kirim.ps1'
   # JSON dilewatkan lewat berkas: argumen ber-kutip ke proses baru dilucuti Windows (lihat komentar di skrip)
@@ -210,12 +239,30 @@ try {
   $rc = Invoke-Ps $tr @('-Transkrip', $junk, '-Keluaran', (Join-Path $tmp 'junk.md')) $null $errf
   Check ($rc -ne 0) "transkrip-ringkas: <50% terurai DITOLAK, bukan ringkasan kosong (exit $rc)"
 
-  # ---- init tanpa -NoPreCommitHook: matcher wajib mencakup PowerShell ----
+  # ---- init tanpa -NoPreCommitHook: gerbang terpasang utk Bash DAN PowerShell, disaring 'if' ----
+  # Sejak brief pre-commit-gate-overhead (2026-09-12): bukan lagi SATU entri matcher
+  # "Bash|PowerShell" (yang men-spawn utk SETIAP panggilan), melainkan DUA entri terpisah,
+  # masing-masing memakai field `if` supaya Claude Code menyaring ISI command sebelum spawn.
+  # `if` sendiri TIDAK bisa diuji test-init (test ini memanggil skrip hook langsung, bukan lewat
+  # mesin pencocokan `if` milik Claude Code) -- yang diperiksa di sini cuma BENTUK konfigurasi.
   & (Join-Path $svVault '.agent-kit/init.ps1') -Workspace $tmp -ActiveProject 'demo-proj' | Out-Null
   $st2 = Get-Content (Join-Path $claude 'settings.json') -Raw | ConvertFrom-Json
-  $m = $st2.hooks.PreToolUse[0].matcher
-  Check ($m -match 'PowerShell' -and $m -match 'Bash') "matcher pre-commit = Bash|PowerShell ($m)"
-  Check (($st2.hooks.PreToolUse[0].hooks[0].command) -match 'pre-commit-gate') 'PreToolUse memanggil pre-commit-gate, bukan reminder'
+  $ptu = @($st2.hooks.PreToolUse)
+  Check ($ptu.Count -eq 2) "PreToolUse punya 2 entri terpisah, Bash dan PowerShell ($($ptu.Count))"
+  $bashEntry = $ptu | Where-Object { $_.matcher -eq 'Bash' }
+  $psEntry   = $ptu | Where-Object { $_.matcher -eq 'PowerShell' }
+  Check ($null -ne $bashEntry -and $null -ne $psEntry) "gerbang terpasang untuk tool Bash DAN PowerShell (matcher: $($ptu.matcher -join ', '))"
+  Check ($null -ne $bashEntry -and ($bashEntry.hooks[0].command -match 'pre-commit-gate')) 'entri Bash memanggil pre-commit-gate, bukan reminder'
+  Check ($null -ne $psEntry -and ($psEntry.hooks[0].command -match 'pre-commit-gate')) 'entri PowerShell memanggil pre-commit-gate, bukan reminder'
+  # Dipatok PERSIS lewat -ceq, BUKAN -match longgar: pola longgar ('(?i)commit') tetap PASS
+  # walau polanya DIPERSEMPIT (mis. 'PowerShell(git commit*)'), padahal penyempitan semacam
+  # itulah yang membuat bentuk '-C'/'Git.exe'/'&'/';' di kontrol positif atas gagal-terbuka
+  # (proses hook tidak pernah di-spawn Claude Code untuk bentuk itu). Mengubah pola 'if' di
+  # init.ps1/init.sh WAJIB mengulang kontrol positif langsung di sesi Claude Code hidup
+  # (skill ubah-hook-agent-kit §7) -- test-init ini TIDAK bisa membuktikan perilaku `if`
+  # sesungguhnya, cuma bentuk konfigurasinya.
+  Check ($null -ne $bashEntry -and ($bashEntry.hooks[0].'if' -ceq 'Bash(*commit*)')) "entri Bash: filter 'if' PERSIS 'Bash(*commit*)' ($($bashEntry.hooks[0].'if'))"
+  Check ($null -ne $psEntry -and ($psEntry.hooks[0].'if' -ceq 'PowerShell(*commit*)')) "entri PowerShell: filter 'if' PERSIS 'PowerShell(*commit*)' ($($psEntry.hooks[0].'if'))"
 
   # v1.0.1: re-init harus prune file lama yg sudah tak ada di kit, tapi tetap salin yg nyata
   $stale = Join-Path $claude 'commands/__stale-test__.md'

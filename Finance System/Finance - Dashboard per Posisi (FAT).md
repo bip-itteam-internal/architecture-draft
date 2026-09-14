@@ -12,6 +12,8 @@ Kode: `erp-frontend/src/features/finance/posisi/`
 
 Hak akses per posisi mengikuti model RBAC yang hak-nya menempel di posisi — lihat [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].
 
+Siapa pemegang tiap posisi di produksi, akses nyatanya, dan bagaimana pekerjaan mengalir antar posisi dicatat di [[Finance - FAT Persona]] (diukur prod 2026-09-12). Temuan terpentingnya bagi layar ini: Account Payable dan Tax Officer di prod belum memegang izin apa pun, sehingga dashboard posisinya belum bisa mereka buka.
+
 ## Prinsip data (penting)
 
 - **Tidak ada angka palsu.** Elemen yang hook-nya belum dipanggil dirender sebagai panel **"menunggu penyambungan data"** dengan nama hook-nya terlihat — bukan angka nol yang terbaca "tidak ada transaksi". Tiap helper grafik mengembalikan keadaan **kosong** saat datanya `undefined`.
@@ -97,6 +99,7 @@ Empat posisi AR adalah kelompok paling siap, dan ketiganya sudah punya elemen hi
 - [[REF - Layout Dashboard erp-frontend]] — cara menyusunnya di layar
 - [[HRIS - Matriks KPI per Departemen]] — sumber angka bagian rancangan
 - [[Finance - Big Pictures]] — peta domain Finance System
+- [[Finance - FAT Persona]]: persona per posisi, akses nyata di prod, dan alur kerja antar posisi
 - [[Finance - Incentive]] — dashboard insentif (menu Finance terkait)
 - [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] — model hak akses per posisi
 - [[External - Accurate]] — sumber angka akuntansi (laba rugi, varians anggaran)
