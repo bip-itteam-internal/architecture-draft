@@ -118,7 +118,9 @@
 - **HR** melihat **rekap** (rata-rata per aspek + semua uraian) lalu mencatat **keputusan status**: **Lulus / Diperpanjang / Tidak Lulus**.
 - Kriteria bersifat **tetap (purpose-built)**, bukan form builder — keputusan sadar (form-builder `custom_question` sebelumnya sudah dihapus karena tak terpakai). Implementasi: [[Microservices - Recruitment Service]] & [[API - Recruitment Service]].
 
-> **Persona penilai:** karyawan mana pun bisa diundang menilai (lintas divisi); aksesnya via menu **"Review Onboarding Saya"** (Portal Saya). Keputusan status tetap di HR.
+> **Persona penilai:** karyawan mana pun bisa diundang menilai (lintas divisi). Menu **"Review Onboarding Saya"** (Portal Saya) sudah dicabut; penilai masuk lewat **tautan di email undangan** ke web ERP (`/onboarding-review/<employee_id peserta>`), login dengan akunnya sendiri, dan form hanya tampil bila akun itu penilai sesi tersebut. Keputusan status tetap di HR.
+>
+> ⚠️ **Tautan itu 404 di prod** (diukur 2026-09-12): env `ERP_FRONTEND_URL` recruitment prod berisi alamat portal karir, jadi undangan penilai dan pewawancara membuka portal karir. Perbaikannya memisahkan env per penerima (🟡 bip-erp `fix/recruitment-tautan-email`, belum merge) dan menuntut `.env` prod diubah saat deploy; rinciannya di [[Microservices - Recruitment Service]] increment **Tautan Email per Penerima**. Sementara itu HR memakai **Salin Link Penilaian** di detail sesi lalu mengirimkannya manual. Penilai yang belum login tidak dikembalikan ke form sesudah login dan perlu membuka tautannya sekali lagi.
 
 ## Arsitektur & Integrasi
 

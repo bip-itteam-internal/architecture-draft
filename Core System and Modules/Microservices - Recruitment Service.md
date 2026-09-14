@@ -51,6 +51,7 @@
 ### Notifikasi
 - Internal (approval/jadwal/offer, inbox/FCM) + **kandidat via Email (Resend) ✅** — "lamaran diterima" saat input pelamar & "penawaran kerja" + PDF saat unggah offer letter; WhatsApp kandidat menyusul — lewat [[Microservices - Notification Service]] (`POST /email/send`)
 - **Interview (✅ #536/#381):** saat `recordInterview`, **kandidat** dapat email jadwal (semua stage, tanpa link) & **pewawancara** stage **User/Final** dapat email undangan + **link form feedback** (login-gated) — lihat increment di bawah
+- ⚠️ **Tautan di email dibuka dua penerima di dua aplikasi**: tautan karyawan (form feedback interview, form penilaian onboarding) menuju web ERP, tautan pelamar (psikotes) menuju [[APP - Portal Karir Bharata]]. Di prod 2026-09-12 tautan karyawan 404 karena ikut env portal karir; rinciannya di increment **Tautan Email per Penerima** di bawah.
 
 ## Model Data (`recruitment_db`)
 
@@ -237,7 +238,7 @@ Menutup TBD lama "mapping hire → data karyawan". Pembuatan **data master karya
 - **Kriteria 7 + uraian 3 = konstanta** (`reviewCriteriaKeys`) — **purpose-built, bukan form builder** (Custom Questions form-builder sengaja sudah dihapus; nilai fitur ada di alur undang→isi→rekap→putuskan, bukan di field).
 - **HR (isHR):** `POST /onboarding-reviews` (body `{employee_id, peserta_name, peserta_position, peserta_department, scheduled_at, location, reviewers[]}` — peserta = snapshot karyawan dari FE, **BE tak lagi lookup koleksi kandidat / cek StHired**; peserta di-skip bila ikut di `reviewers[]` → **cegah self-review**; buat + undang penilai via `notifyInbox` inbox internal + email Resend best-effort), `GET` (list, filter `?status=&employee_id=`), `GET /:id` (rekap semua jawaban), `PUT /:id/decide`.
 - **Penilai (requireAuth, karyawan mana pun):** `GET /onboarding-reviews/assigned` (tugas saya + jawaban saya; jawaban penilai lain disembunyikan), `POST /:id/response` (edit sampai `Decided`).
-- **FE (erp-frontend):** halaman khusus HR (menu Recruitment → **Performance Review**: list + buat + detail rekap + keputusan) + menu **Review Onboarding Saya** (Portal Saya, **semua karyawan**: form 7 rating + 3 uraian).
+- **FE (erp-frontend):** halaman khusus HR (menu Recruitment → **Performance Review**: list + buat + detail rekap + keputusan) + menu **Review Onboarding Saya** (Portal Saya, **semua karyawan**: form 7 rating + 3 uraian). ⚠️ Menu **Review Onboarding Saya** kemudian dicabut; penilai kini masuk lewat tautan email `<ERP_FRONTEND_URL>/onboarding-review/<employee_id peserta>` (`reviewFormURL`, halaman `src/app/onboarding-review/[employeeId]` di luar grup `(main)`). Halaman itu membaca `GET /onboarding-reviews/assigned` dan hanya menampilkan form bila akun yang login termasuk penilai sesi tersebut; selain itu ia berbunyi "bukan penilai untuk sesi ini", juga saat permintaan daftarnya gagal.
 
 ## Increment: Interview Orchestration (2026-07-17, #498/#356 — merged)
 
@@ -250,7 +251,7 @@ Menutup TBD lama "mapping hire → data karyawan". Pembuatan **data master karya
 
 ## Increment: Link Form Feedback Interview (email pewawancara, 2026-07-18 — merged)
 
-> BE **PR #536** (bip-erp) + FE **PR #381** (erp-frontend), keduanya **merged** ke `main`. `go build`/`vet`/`test` hijau. **BE dilaporkan sudah ter-deploy di dev**; env `ERP_FRONTEND_URL` (pola sama dengan `reviewFormURL` di [[HRIS - Recruitment]] Performance Review Onboarding) sudah di-set di VM dev — **⚠️ tak terdaftar** di `docker-compose.yml`/`.env.example` repo (masuk lewat `.env` VM di luar repo; tak bisa diverifikasi dari kode saja).
+> BE **PR #536** (bip-erp) + FE **PR #381** (erp-frontend), keduanya **merged** ke `main`. `go build`/`vet`/`test` hijau. **BE dilaporkan sudah ter-deploy di dev**; env `ERP_FRONTEND_URL` (pola sama dengan `reviewFormURL` di [[HRIS - Recruitment]] Performance Review Onboarding) sudah di-set di VM dev. Semula **⚠️ tak terdaftar** di `docker-compose.yml`/`.env.example` repo (masuk lewat `.env` server di luar repo); 🟡 **(bip-erp `fix/recruitment-tautan-email`, belum merge)** kini tercatat eksplisit di keduanya, lihat increment **Tautan Email per Penerima**.
 
 Menutup gap **"notifikasi email ke pewawancara"** dari increment Interview Orchestration di atas: pewawancara stage **User/Final** kini mengisi feedback lewat **link 1-sesi via email** (login-gated), bukan lagi menu "Interview Saya".
 
@@ -330,6 +331,30 @@ Lima test AST memindai `services/recruitment/*.go` (bukan file `_test.go`), buka
 - **Paket `recruitment_lintas_perusahaan` dipasang ke posisi recruiter yang SUDAH punya paket recruitment lain**, DAN ke posisi SPV HRD penyetuju (keputusan user saat `/review` 2026-09-11). Tanpa yang kedua, SPV HRD tetap menerima notifikasi requisition perusahaan lain (kini menyebut nama perusahaannya) tapi mendapat `404` saat membukanya.
 - **Berlaku sesudah login ulang**: izin dipanggang ke klaim JWT saat login, sama seperti ADR 0080. Cache respons gateway yang berkunci `employee_id` juga bisa menahan respons lama sampai TTL habis.
 - Gerbang verifikasi sebelum paket dipasang, lewat gateway: `GET /api/recruitment/companies` membalas `200`/`403` (bukan `404` rute hilang); baris `GET /api/recruitment/mpp/vacancies` membawa `company_id`.
+
+## Increment: Tautan Email per Penerima (2026-09-14, 🟡 bip-erp `fix/recruitment-tautan-email`, belum merge)
+
+> Laporan user 2026-09-12: penilai membuka tautan "isi penilaian onboarding" dari email dan tak muncul apa-apa. Diukur di prod (baca saja) hari itu: `.env` recruitment berisi `ERP_FRONTEND_URL=https://career.bharatainternasional.com` dan `CAREER_PORTAL_URL=career.bharatainternasional.com`, sehingga `career.bharatainternasional.com/onboarding-review/<id>` dan `/interview-feedback/<id>` membalas 404 "This page could not be found" (sama dengan path karangan), sementara `/psikotes/<token>` di sana 200. Alamat web ERP prod `https://erp.bharatainternasional.com`.
+
+Tiga tautan email dirakit dari env, dan dulu ketiganya membaca `ERP_FRONTEND_URL`. Nilai itu sengaja diisi alamat portal karir supaya pelamar mengerjakan psikotes di [[APP - Portal Karir Bharata]] (lihat [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] §Belum Diputuskan butir 4), dan tautan karyawan ikut ke sana tanpa satu pun galat.
+
+| Env | Penerima | Aplikasi | Tautan (perakit) |
+|---|---|---|---|
+| `ERP_FRONTEND_URL` | karyawan | web ERP | `/interview-feedback/<id>` (`interviewFeedbackURL`), `/onboarding-review/<employee_id>` (`reviewFormURL`) |
+| `CAREER_PORTAL_URL` | pelamar | portal karir | `/psikotes/<token>` (`psikotesURL`, juga `link` di respons `POST /candidates/:id/psikotes` dan `/reissue`), logo email `/logo/logo.png` (`emailLogoURL`) |
+
+- **Satu tempat**: `services/recruitment/tautan_env.go` memuat konstanta `envWebERP`/`envPortalKarir` dan `urlDasarEnv` (buang spasi dan `/` penutup, tambah `https://` bila tanpa skema), menggantikan empat salinan aturan yang sama.
+- **Tanpa fallback lintas penerima**: env kosong menghasilkan tautan kosong (email tanpa tombol, kotak tautan psikotes di layar HR kosong). Tautan ke aplikasi yang salah terbaca normal padahal 404, atau untuk psikotes berpaket ditolak halaman versi erp-frontend.
+- **Test**: `tautan_env_test.go` (`TestUrlDasarEnv`, `TestTautanEmailPisahAudiens` dengan nama env ditulis literal, `TestTautanEmailTanpaFallbackLintasAudiens`), `TestOnboardingReviewVarsLinkForm`, `TestEmailLogoURL`. Kontrol mutasi `go test -overlay` merah pada ketiga mutan: psikotes membaca web ERP, fallback ke web ERP, dan `link_form` dari perakit yang salah.
+- **Konfigurasi**: `.env.example` dan blok recruitment-service di `docker-compose.yml` memuat kedua env beserta larangan mengisi `ERP_FRONTEND_URL` dengan alamat portal karir.
+
+### Catatan deploy
+
+- Hanya recruitment-service; tanpa env baru, shared-library, gateway, atau kategori inbox.
+- **Prod (dijalankan manusia)**: `ERP_FRONTEND_URL` di `.env` diubah ke `https://erp.bharatainternasional.com` **bersamaan** dengan build recruitment-service. Mengubah env lalu membuat ulang container dengan image lama memindahkan tautan psikotes ke web ERP, dan sesi berpaket ditolak di sana.
+- **Dev**: `.env` dev berisi `CAREER_PORTAL_URL=career.bharatainternasional.com` (portal karir prod, karena tak ada portal karir di VM dev) dan `ERP_FRONTEND_URL=https://erp-dev.bharatainternasional.com` (diukur 2026-09-12). Sesudah perubahan ini tautan psikotes dari dev membuka portal karir prod dan terbaca tidak berlaku; uji tes berpaket dev tetap lewat portal karir lokal.
+- Undangan penilai dan pewawancara yang terkirim sebelum env prod diperbaiki tetap membawa tautan lama; tak ada kirim ulang otomatis. HR menyalin tautan lewat **Salin Link Penilaian** (detail sesi Performance Review) atau salin link feedback (menu Interviews), keduanya dirakit dari `window.location.origin`.
+- Keadaan prod per 2026-09-14: branch belum merge, jadi belum ter-deploy. Ukur ulang sebelum dipakai.
 
 ## Dokumen Terkait
 
