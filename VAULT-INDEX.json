@@ -457,8 +457,8 @@
         "Microservices - Calendar Service",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI"
       ],
-      "hash": "8857f1dc95af2a1737dd455a26de42aaba3b66d86273f9cb153093deea05ae64",
-      "ukuran_kb": 22.3,
+      "hash": "4e40879c458ccf73ecb0093503a58d051080985f7e2bc163b564a2e188e73e09",
+      "ukuran_kb": 22.5,
       "ringkasan": "Menjawab: endpoint apa saja yang disediakan inventory-service lewat gateway `/api/inventory/*` (master item, kategori, pemetaan kategori ke golongan Accurate, item aset, serah-terima, repair history, opname perlengkapan, padanan `accurate_item_no`) beserta gerbang auth tiap rute. Juga menjawab kontrak Booking Ruang GA `/peminjaman*`: lapisan gerbang (identitas, `ga.view`/`ga.work`, penunjukan HR), bentuk respons, kode status aksi, notifikasi, dan feed kalender. Memuat kontrak request dan validasi `POST /item`, `PATCH /item/:id`, approve-handover, summary, dan upload dokumen presigned.",
       "kata_kunci": [
         "inventory-service",
@@ -2508,8 +2508,8 @@
         "External - Accurate",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id"
       ],
-      "hash": "dc23b871479cd9e9113efffb3fb1f17b9d2187c69e4bbae8482a1ea9da319d21",
-      "ukuran_kb": 28.6,
+      "hash": "dd41c6a6688052b315141fc78db23d723cf18430e26351ce98be0226e88d70dd",
+      "ukuran_kb": 29.1,
       "ringkasan": "Menjawab: apa yang dikelola inventory-service (aset GA, bukan stok gudang, sekaligus rumah kode Booking Ruang GA) dan fitur apa yang tersedia: pembuatan item dengan pola ID `INV-BIP-DDMMYY-NAMA-n`, upload dokumen MinIO, serah-terima aset dan persetujuan SPV, soft delete aset, repair history dengan bukti nota, pemetaan kategori ke golongan Accurate, ceklis rekonsiliasi, serta penyusutan per pemegang untuk insentive-service. Juga menjawab jebakan middleware grup Fiber yang berlaku per-prefix sehingga approve-handover tertolak 403 bagi SPV non-GA.",
       "kata_kunci": [
         "inventory-service",
@@ -2718,11 +2718,11 @@
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "Microservices - Employee Service",
+        "Microservices - Inventory Service",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus",
         "Microservices - Attendance Service",
         "Microservices - Task Management Service",
         "APP - MyBharata",
-        "Microservices - Inventory Service",
         "Microservices - Calendar Service",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "HRIS - Employee Request & Approval",
@@ -2737,8 +2737,8 @@
         "DB - Overview and Notes",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "dd5667d37eaea325a56be4ce19bd72870519ff4e7293d007e3e02746aa5aad28",
-      "ukuran_kb": 18.9,
+      "hash": "19704183ec1dc37daa20f8cdd9cd97a1b7fb419354e15b7b47a0394eb573728e",
+      "ukuran_kb": 19.6,
       "ringkasan": "Menjawab: channel notifikasi apa saja yang disediakan notification-service (inbox in-app, FCM push, WhatsApp, email Resend, splash, article) dan endpoint pengirimnya yang memakai service key. Juga menjawab kenapa paginasi inbox bersifat opt-in (MyBharata butuh array telanjang), bagaimana push ke browser dan ponsel di-fan-out dari `/inbox/send` tanpa penyaringan kategori (ADR 0050), urutan deploy yang mengikat, penulisan ulang `AppRoute` jadi `WebRoute` (termasuk Booking Ruang), dan scoping `company_id` untuk article dan FCM.",
       "kata_kunci": [
         "notification-service",
@@ -6333,7 +6333,7 @@
         "APP - Web ERP"
       ],
       "hash": "23d279e9a55501cb86556398afcd1108b90ddf5164d6110f6e1c6169c65970f5",
-      "ukuran_kb": 40.9,
+      "ukuran_kb": 41.1,
       "ringkasan": "Menjawab: kenapa inspeksi Satgas 5R dan K3 dipindah dari Google Form dan WhatsApp ke Form Builder, dan bagaimana nilai KPI Office Boy serta Security diambil dari jawaban cek ulang terakhir per orang per periode, bukan rata-rata. Juga menjawab siapa yang boleh mengisi (modul izin `kepatuhan.satgas.input`, menu MyBharata lewat `GET /me/satgas`), rumus konversi skor 1-5 ke 0-100, aturan cek ulang lintas bulan sampai tanggal 5, apa yang sengaja tidak dijanjikan (tanpa AI, tanpa peringkat antar departemen), konsekuensi deploy, dan keputusan HR yang masih TBD.",
       "kata_kunci": [
         "Satgas 5R K3",
@@ -6506,8 +6506,8 @@
         "REF - Kepemilikan Data",
         "REF - Alur Persetujuan"
       ],
-      "hash": "6dbe9c7ebf888a7bc5ca6bad0340b5a153026caa196f4e2191d7ce6347369bfa",
-      "ukuran_kb": 11.2,
+      "hash": "7c4dc12cdf71fbb60808c55f338b5b033da12148327358cdfba215c1c2520664",
+      "ukuran_kb": 11.4,
       "ringkasan": "Menjawab: kenapa booking ruang rapat dibangun di inventory-service dengan pemohon lewat MyBharata dan satu daftar penyetuju yang ditunjuk HR per perusahaan (bukan GA, bukan atasan pemohon), serta apa saja yang menyimpang dari desain rilis-1 (tanpa status Selesai dan checklist kebersihan, kontrak `/peminjaman` dan nomor `PJR-`). Juga menjawab aturan status, pembatalan dan perubahan booking, anti-bentrok tanpa transaksi (kunci sewa per ruang, cek ulang), dua kategori notifikasi, feed kalender milik pembaca, rencana satu sumber ruang kantor, dan booking berulang.",
       "kata_kunci": [
         "ADR 0094",
@@ -7040,7 +7040,7 @@
         "GA - Big Pictures"
       ],
       "hash": "d2d95d615bc84f37022e9242992e2d94979302bddebbfc690a9794da75cbe8d3",
-      "ukuran_kb": 10.5,
+      "ukuran_kb": 10.4,
       "ringkasan": "Menjawab: bagaimana konsep peminjaman aset GA (ruang rapat, barang bergerak, kendaraan operasional) dirancang, apa lingkup booking ruang dalam tujuh irisan, dan bagian mana yang ditunda (barang dan kendaraan). Juga menjawab siapa persona beserta hak aksesnya (pemohon, penyetuju ditunjuk HR, Team GA, HR), status booking, aturan anti-bentrok, alur proses dari menunjuk penyetuju sampai eskalasi kerusakan, serta keputusan desain rilis-1 yang digantikan ADR 0094.",
       "kata_kunci": [
         "peminjaman aset",
@@ -13485,7 +13485,7 @@
         "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI"
       ],
       "hash": "5aa983e03e4cd128199473ec0e00979365e3f17625b9ca363777a6584ce46061",
-      "ukuran_kb": 27.2,
+      "ukuran_kb": 27.4,
       "ringkasan": "Menjawab: apa kebutuhan asal dari manajemen dan HRD di balik fitur Satgas 5R dan K3, hasil wawancara pemakai (OD & Industrial Relation Officer, KPI perorangan Office Boy dan Security), serta usulan mana yang gugur dan kenapa. Juga menjawab pembagian task T0 sampai T7 beserta isinya (keputusan HR, modul izin kepatuhan dan gerbang, nilai terakhir-menang dan sumber KPI, field foto Form Builder, rekap web, menu MyBharata, verifikasi end-to-end), urutan deploy yang mengikat, dan keputusan HR yang masih harus dijawab.",
       "kata_kunci": [
         "Satgas 5R K3",
