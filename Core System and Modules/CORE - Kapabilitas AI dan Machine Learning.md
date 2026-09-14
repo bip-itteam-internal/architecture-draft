@@ -181,14 +181,17 @@ Alamat yang tercatat sebelum pengiriman ada di `warehouse_db.fulfillment_orders.
 
 ### Aturan sederhana bebas-bocor yang sudah diuji
 
-TikTok, order Juli yang dikirim, dengan riwayat pembeli dihitung hanya dari order sebelum Juli lewat `tt_shop_orders.user_id`:
+TikTok, order Juli yang dikirim. Riwayat pembeli dihitung lewat `tt_shop_orders.user_id` dari **waktu kejadian** sebelum 1 Juli (`delivery_time` untuk paket yang diterima, `cancel_time` bersama `collection_time` untuk paket yang gagal diantar), bukan dari status yang tersimpan sekarang:
 
 | Segmen | Porsi order | Porsi retur | Laju retur |
 |---|---|---|---|
+| COD, sebelumnya pernah gagal diantar | 0,7% | 2,6% | 15,7% |
+| COD, pernah order tapi belum pernah sukses menerima | 3,2% | 5,6% | 7,5% |
 | COD, pembeli baru | 64,7% | 86,2% | 5,7% |
-| COD, pernah order tapi belum pernah sukses menerima | 2,7% | 6,8% | 10,8% |
-| COD, pernah sukses menerima | 13,4% | 5,9% | 1,9% |
-| Non-COD | sekitar 19% | sekitar 1% | 0,2% sampai 0,4% |
+| COD, pernah sukses menerima | 12,2% | 4,6% | 1,6% |
+| Non-COD | 19,2% | 1,1% | 0,2% |
+
+⚠️ Versi pertama tabel ini menghitung riwayat dari status yang tersimpan, dan segmen belum-pernah-sukses tampak berlaju 10,8%. Itu sedikit bocor: order Juni yang baru gagal di bulan Juli ikut terbaca sebagai riwayat untuk order Juli. Dengan waktu kejadian, lajunya 7,5%.
 
 Kurir tidak membedakan, karena hampir seluruh pengiriman TikTok memakai J&T. Aturan yang sempit menangkap sedikit retur, aturan yang lebar menandai mayoritas order. Itu alasan sah untuk menguji model, tetapi belum bukti bahwa model akan menang.
 

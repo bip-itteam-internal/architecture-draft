@@ -1733,9 +1733,9 @@
         "Sales - Marketing Analytics (Audit Ketersediaan Data)",
         "ADR - 0008 Profit Engine Join via item_group_id"
       ],
-      "hash": "dd4cd21ef6e55fe649d990053a8fbbaae1eda49a6015524553c3a40ced0ad148",
-      "ukuran_kb": 22.9,
-      "ringkasan": "Menjawab: kapabilitas AI apa saja yang dimiliki ERP Bharata beserta statusnya, bagaimana alur sistem marketing-analytics dari marketplace sampai layar ICC, dan rancangan peringatan dini belanja iklan video beserta batas kesegaran 48 jam serta aturan pemakaian kolom laba yang mudah salah dijumlahkan. Menjawab pula kenapa retur fisik ternyata paket COD gagal antar yang dibatalkan sistem sesudah dikirim, tiga jebakan kebocoran data saat membangun prediksinya (alamat TikTok dihapus setelah order batal, total_payment Shopee dikosongkan, provinsi Shopee disamarkan), dan hasil uji aturan sederhana berbasis COD dan riwayat pembeli.",
+      "hash": "67f1722aa8894bc4ee44ecfa312689e6b6199a1d84700772faf0b049df038f71",
+      "ukuran_kb": 23.3,
+      "ringkasan": "Menjawab: kapabilitas AI apa saja yang dimiliki ERP Bharata beserta statusnya, bagaimana alur sistem marketing-analytics dari marketplace sampai layar ICC, dan rancangan peringatan dini belanja iklan video beserta batas kesegaran 48 jam serta aturan pemakaian kolom laba yang mudah salah dijumlahkan. Menjawab pula kenapa retur fisik ternyata paket COD gagal antar yang dibatalkan sistem sesudah dikirim, tiga jebakan kebocoran data saat membangun prediksinya, dan hasil uji aturan sederhana berbasis COD dan riwayat pembeli yang dihitung dari waktu kejadian, termasuk kenapa versi pertama yang memakai status tersimpan menghasilkan angka yang sedikit bocor.",
       "kata_kunci": [
         "AI",
         "machine learning",
@@ -1744,8 +1744,8 @@
         "paket COD gagal antar",
         "retur",
         "kebocoran data",
+        "riwayat pembeli",
         "alur sistem",
-        "kesegaran data",
         "RTS"
       ]
     },
@@ -4966,9 +4966,9 @@
         "API - Marketing Analytics Service",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "cd7a0944d8d2e7f6d9d2d1fe4cf49d3f4d8e67f4675e1ed8503e873902675ed8",
-      "ukuran_kb": 16.6,
-      "ringkasan": "Menjawab: kenapa kelayakan pekerjaan AI di bip-erp ditentukan oleh kelayakan datanya, tiga syarat gerbang sebelum model boleh dibangun, kenapa model menumpang service pemilik data, dan kandidat mana yang ditolak beserta angkanya. Memuat koreksi 2026-09-14: label retur semula diambil dari koleksi yang salah (412 dari transaction_orders, padahal 5.742 order kembali ke gudang menurut accurate_daily_returns) dan pembatalan oleh sistem sesudah dikirim ternyata paket COD gagal antar dengan ongkos nyata, sehingga prediksi paket COD gagal antar berubah dari ditolak menjadi ditinjau ulang, serta alasan koreksinya dilakukan di tempat, bukan lewat ADR baru.",
+      "hash": "34ad3f7307fffb98d9eb44741dcddc295d6b74086856bacee7f3b1d0a2690186",
+      "ukuran_kb": 16.8,
+      "ringkasan": "Menjawab: kenapa kelayakan pekerjaan AI di bip-erp ditentukan oleh kelayakan datanya, tiga syarat gerbang sebelum model boleh dibangun, kenapa model menumpang service pemilik data, dan kandidat mana yang ditolak beserta angkanya. Memuat koreksi 2026-09-14: label retur semula diambil dari koleksi yang salah (412 dari transaction_orders, padahal 5.742 order kembali ke gudang menurut accurate_daily_returns) dan pembatalan oleh sistem sesudah dikirim ternyata paket COD gagal antar dengan ongkos nyata, sehingga prediksi paket COD gagal antar berubah dari ditolak menjadi ditinjau ulang, beserta hasil uji aturan riwayat pembeli yang dihitung dari waktu kejadian dan alasan koreksinya dilakukan di tempat.",
       "kata_kunci": [
         "ADR 0058",
         "AI",
