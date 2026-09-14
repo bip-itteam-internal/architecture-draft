@@ -100,9 +100,12 @@ if (-not $NoPreCommitHook) {
   # milik Claude Code sama sekali): kedelapan bentuk commit berikut tetap DITOLAK (tanpa baris
   # `EXIT=`) di branch main repo sandbox %TEMP% -- polos, `-c` sebelum `-C`, `Commit` kapital,
   # `Git.exe`, path lengkap git.exe lewat `&`, `pushd; git add .; git commit; popd`, dipisah
-  # baris baru, dan `cd <repo>; git commit`; commit di branch fitur dan commit vault tetap
-  # LOLOS (EXIT=0). Untuk 'Commit' kapital gerbang TERBUKTI BERJALAN (ditolak); mekanismenya
-  # (pola tak peka huruf vs jatuh ke aturan input tak-terurai) TIDAK dibedakan pengujian ini.
+  # baris baru, dan `cd <repo>; git commit`. Kontrol negatif: commit di branch fitur lolos
+  # (EXIT=0, konteks hook "Reminder sebelum commit"); `commit --dry-run` di vault `main` lolos
+  # gerbang juga (EXIT=1 wajar untuk dry-run tanpa perubahan ter-stage, konteks hook "Vault:
+  # stage per-nama berkas" muncul). Untuk 'Commit' kapital gerbang TERBUKTI BERJALAN (ditolak);
+  # mekanismenya (pola tak peka huruf vs jatuh ke aturan input tak-terurai) TIDAK dibedakan
+  # pengujian ini.
   # BELUM diverifikasi: entri `Bash(*commit*)` lewat tool Bash (mati di mesin dev Windows ini)
   # dan mesin mac/linux mana pun -- siapa pun yang pertama re-init di sana adalah penguji
   # pertamanya.
