@@ -123,7 +123,7 @@ Pemohon
                                                             ▼
 Supervisor FAT: setujui                                   (pb_spv_finance)
   ▼
-[Direktur, bila nominal >= ambang; IKLAN dan KONSUMSI tidak pernah ke Direktur]
+[Direktur, bila nominal >= ambang; hanya IKLAN yang tidak pernah ke Direktur — KONSUMSI ikut ambang sejak ADR-0090]
   ▼
 Supervisor FAT: setujui bayar                             (pb_finance_setujui_bayar)
   ▼

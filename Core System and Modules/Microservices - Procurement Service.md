@@ -122,7 +122,7 @@ UMUM        : cek_stok_ga -> [cukup: serah_ga]
 RAWMATERIAL : spv_manufactur -> procurement_beli -> spv_finance -> [direktur] -> finance_setujui_bayar -> ap_transfer -> qc -> terima_rm
 IKLAN       : (spv_divisi) -> spv_finance -> finance_setujui_bayar -> ap_transfer        (KEBAL Direktur, berapa pun nominalnya)
 DANA        : (spv_divisi) -> spv_finance -> [direktur] -> finance_setujui_bayar -> ap_transfer
-KONSUMSI    : (spv_divisi) -> spv_finance -> finance_setujui_bayar -> ap_transfer        (KEBAL Direktur, keputusan bisnis 2026-09-09)
+KONSUMSI    : (spv_divisi) -> spv_finance -> [direktur] -> finance_setujui_bayar -> ap_transfer  (identik DANA sejak [[ADR - 0090 KONSUMSI Eskalasi ke Direktur di Ambang Berbagi, Bukan Kebal]], membalik keputusan 2026-09-09)
 ```
 
 `(spv_divisi)` hanya disisipkan bila pengaju BUKAN supervisor. `[direktur]` hanya bila nominal ≥ ambang Direktur berversi DAN tipenya tidak kebal. UMUM dan bagian "stok habis" membekukan sisa jenjang secara BERTAHAP (dua kali untuk UMUM: setelah jawaban stok, lalu setelah harga diisi): nominal yang menentukan ambang Direktur baru pasti setelah Procurement mengisi harga, bukan saat pengaju submit.
