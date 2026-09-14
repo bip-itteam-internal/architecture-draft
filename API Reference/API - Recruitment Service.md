@@ -141,7 +141,7 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 
 > **Onboarding checklist (versi lama) dihapus** (2026-07-18): endpoint `/checklists` · `/checklists/:id/items` (template) **dan** `/candidates/:id/onboarding*` (instance per-kandidat) **tak ada lagi** — komponen FE-nya yatim/tak pernah dirender (dead code). **DIBANGUN ULANG 2026-07-26** dengan endpoint & model baru (`/onboarding-templates*`, `/onboarding-instances*`, `/onboarding-tasks/assigned`) — lihat section **Onboarding Checklist** di bawah. Performance Review Onboarding tetap terpisah.
 
-## Performance Review Onboarding (⚠️ PR #493/#349 — belum merged/deploy)
+## Performance Review Onboarding (✅ #493/#349, merged)
 > Digitalisasi Form Review Performance Masa Evaluasi (dulu Google Form). Peserta = **karyawan masa evaluasi** (`employment_type` "PKWT (Evaluasi)"); penilai = karyawan mana pun (identitas SSO). Peserta tak boleh menilai dirinya sendiri. Kriteria 7+3 **konstanta** (purpose-built, bukan form builder).
 
 | Method | Path | Fungsi | Role |

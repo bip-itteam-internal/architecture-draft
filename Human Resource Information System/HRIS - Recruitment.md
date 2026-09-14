@@ -100,7 +100,7 @@
 - `job_type` / `candidate_source` / `interview_type` — lookup (name, is_active) untuk klasifikasi lowongan, sumber pelamar, jenis interview
 - `job_location` — master lokasi kerja (name, remote_work, alamat, city/state/country/postal_code, status); dipakai dropdown Location di `job_posting`
 - ~~`onboarding_checklist` + `checklist_item` + `onboarding_progress`~~ — **dihapus 2026-07-18** (template checklist onboarding + instance per-kandidat; dead code — komponen FE tak pernah dirender)
-- `onboarding_review` + `onboarding_review_response` (⚠️ #493) — sesi **Performance Review Onboarding** (masa evaluasi): peserta (**karyawan masa evaluasi**, `employment_type` "PKWT (Evaluasi)"), jadwal, penilai, 7 rating + 3 uraian per penilai, keputusan status
+- `onboarding_review` + `onboarding_review_response` (✅ #493, merged) — sesi **Performance Review Onboarding** (masa evaluasi): peserta (**karyawan masa evaluasi**, `employment_type` "PKWT (Evaluasi)"), jadwal, penilai, 7 rating + 3 uraian per penilai, keputusan status
 - `job_posting` **diperkaya**: job_type/location/branch, number_of_positions, priority, min/max experience & salary, application_deadline, is_featured, toggle show_* (profile/resume/cover), required_skills, description/requirements/benefits/terms_condition (HTML). *(Toggle `ask_gender`/`ask_date_of_birth` dibuang #503/#358 — jenis_kelamin & tanggal_lahir kini SELALU wajib pelamar.)*
 - `candidate` **diperkaya**: source_id, country, profile_image/cover_letter (MinIO), expected/current_salary, notice_period, portfolio_url, linkedin_url, education, **`employee_id`** (terisi saat kandidat Hired dikonversi jadi karyawan)
 
@@ -112,7 +112,7 @@
 
 > ~~**Onboarding checklist per-kandidat (#492/#346)**~~ **dihapus 2026-07-18** — alat centang tugas onboarding (kontrak/dokumen/IT setup) ini **tak pernah terpakai di FE** (komponen yatim) sejak dibangun, jadi dibuang sebagai dead code (BE+FE). Masa evaluasi kini didukung **hanya** oleh Performance Review Onboarding di bawah. ⚠️ Kalimat itu basi sejak **2026-07-26**: checklist onboarding dibangun ulang dengan model baru (template + instance per karyawan baru + penugasan PIC lintas tim, lihat increment "Onboarding Checklist (rebuild)" di [[Microservices - Recruitment Service]]), dan PIC mengerjakan tugasnya di [[APP - MyBharata]].
 
-**Performance Review Onboarding (⚠️ #493/#349)** — digitalisasi **Form Review Performance Masa Evaluasi** (dulu Google Form):
+**Performance Review Onboarding (✅ #493/#349, merged; kodenya ada di `origin/main` bip-erp dan erp-frontend, diperiksa 2026-09-14)** — digitalisasi **Form Review Performance Masa Evaluasi** (dulu Google Form):
 - **HR** menjadwalkan sesi (peserta, waktu, tempat) + menugaskan **penilai**; sistem mengirim **undangan** (inbox + email) — menggantikan undangan manual HRGA.
 - **Penilai** (karyawan mana pun, identitas SSO) mengisi **7 aspek skala 1–5** (pemahaman pekerjaan, jelaskan hasil, jelaskan kendala & solusi, jawab pertanyaan, presentasi & komunikasi, kerapihan materi, profesionalisme) + **3 uraian** (kelebihan/kontribusi, yang perlu ditingkatkan, saran pengembangan).
 - **HR** melihat **rekap** (rata-rata per aspek + semua uraian) lalu mencatat **keputusan status**: **Lulus / Diperpanjang / Tidak Lulus**.
@@ -121,6 +121,21 @@
 > **Persona penilai:** karyawan mana pun bisa diundang menilai (lintas divisi). Menu **"Review Onboarding Saya"** (Portal Saya) sudah dicabut; penilai masuk lewat **tautan di email undangan** ke web ERP (`/onboarding-review/<employee_id peserta>`), login dengan akunnya sendiri, dan form hanya tampil bila akun itu penilai sesi tersebut. Keputusan status tetap di HR.
 >
 > ✅ **Diperbaiki 2026-09-14** (bip-erp #1870 `32edb66c`, live prod 08:48 WIB). Sampai hari itu env `ERP_FRONTEND_URL` recruitment prod berisi alamat portal karir (diukur 2026-09-12), jadi undangan penilai dan pewawancara membuka portal karir lalu 404. Kini tautan karyawan membaca `ERP_FRONTEND_URL` = `https://erp.bharatainternasional.com` dan tautan psikotes membaca `CAREER_PORTAL_URL`; rinciannya di [[Microservices - Recruitment Service]] increment **Tautan Email per Penerima**. ⚠️ Undangan yang terkirim sebelum deploy tetap membawa tautan lama: HR memakai **Salin Link Penilaian** di detail sesi (atau salin link feedback di menu Interviews) lalu mengirimkannya manual. Penilai yang belum login tidak dikembalikan ke form sesudah login dan perlu membuka tautannya sekali lagi.
+
+> 🟡 **Isi form disamakan dengan Google Form lama** (erp-frontend `feat/onboarding-review-samakan-gform`, **belum merge**, 2026-09-14). Pembandingnya struktur Google Form "Form Review Performance Masa Evaluasi" yang diurai langsung dari halamannya:
+>
+> | Bagian Google Form | Di ERP sesudah perubahan |
+> |---|---|
+> | Judul + 2 paragraf pembuka | Disalin verbatim (`rvfTitle`, `rvfIntro1`, `rvfIntro2`) |
+> | 7 aspek skala 1–5, wajib, tanpa label ujung | Tidak berubah: teks, skala, dan urutannya memang sudah identik |
+> | 3 uraian, wajib | Kini kalimat tanya versi Google Form: "Apa kelebihan atau kontribusi utama yang ditunjukkan karyawan selama masa evaluasi?", "Kompetensi atau aspek apa yang masih perlu ditingkatkan oleh karyawan?", "Berikan saran, masukan, atau rekomendasi untuk pengembangan karyawan ke depan." Kunci jawaban `strengths`/`improvements`/`recommendations` tetap, jadi jawaban lama tak terdampak |
+> | Nama, jabatan, departemen **penilai** dan **peserta** (6 isian) | **Tidak** dijadikan isian (keputusan user 2026-09-14). Penilai tampil hanya-baca dari snapshot `reviewers[]` sesi yang cocok dengan akun login (cadangan `my_response.reviewer_*`; blok disembunyikan bila tak diketahui), peserta dari snapshot sesi. Alasannya: datanya sudah ada, dan pilihan departemen di Google Form (Beautyhacks, Kyura x GlowBooster, HRGA) bukan nama master departemen. HRGA adalah label grup, bukan `work_data.department` siapa pun |
+>
+> Ikut berubah: rekap HR menulis tiap pertanyaan uraian **di atas** jawabannya (dulu sebaris `label: jawaban`, sehingga terbaca "...evaluasi?: jawaban"), dan galat memuat `GET /onboarding-reviews/assigned` selain 401 kini tampil sebagai galat dengan tombol coba lagi, bukan "bukan penilai untuk sesi ini". Backend tidak berubah.
+>
+> ⚠️ **Teks pertanyaan kini hidup di locale erp-frontend** (`hris.recruitment.rvc*` dan `rve*`), dikunci sama persis dengan Google Form oleh `i18n-onboarding-review.test.ts`. Halaman Rekrutmen MyBharata yang direncanakan (§Alur Kerja HR, keputusan butir 5) wajib memutuskan sumber tunggal teks ini, bukan menyalinnya, supaya redaksi tidak menyimpang antar-aplikasi.
+>
+> **Titik putus yang tersisa** (task terpisah, keputusan user 2026-09-14): penilai yang belum login tidak dikembalikan ke form (`redirectToLogin` di `src/lib/axios.ts` tanpa alamat kembali); undangan inbox tidak membawa tautan (pesannya menyuruh membuka email, `onboarding_review_handlers.go`); HR tidak diberi tahu saat penilai mengirim penilaian (`submitReviewResponse`).
 
 ## Arsitektur & Integrasi
 
@@ -388,7 +403,7 @@ paket, lihat [[Microservices - Recruitment Service]].
 - [x] **Interview — feedback via link email** — pewawancara stage User/Final isi feedback lewat **email + link login-gated** (`/interview-feedback/<id>`), menggantikan menu "Interview Saya" (dihapus dari navigasi); HR pantau semua sesi via menu baru **Interviews** — ✅ BE #536 / FE #381 (2026-07-18, merged & ter-deploy dev)
 - [x] **Interview — pengelolaan terpusat di menu Interviews** — buat/jadwalkan (picker kandidat aktif) + edit + hapus interview dipindah dari **detail kandidat** ke menu **Interviews**; detail kandidat jadi **read-only** untuk interview. FE-only (BE tak berubah — endpoint sudah pakai `id`) — ✅ FE `feat/interview-manage-on-menu` (2026-07-18)
 - [x] ~~**Onboarding checklist per-kandidat**~~ — **DIHAPUS 2026-07-18** (dead code, komponen FE tak pernah dirender) — bekas BE #492 / FE #346
-- [x] **Performance Review Onboarding (masa evaluasi)** — sesi review multi-penilai (7 rating + 3 uraian) → keputusan status — ⚠️ BE #493 / FE #349 (PR, belum merged/deploy)
+- [x] **Performance Review Onboarding (masa evaluasi)** — sesi review multi-penilai (7 rating + 3 uraian) → keputusan status — ✅ BE #493 / FE #349 (merged; halaman penilai membalas 200 di prod, terukur 2026-09-14 pada increment Tautan Email di [[Microservices - Recruitment Service]]). 🟡 Isi form disamakan dengan Google Form lama: erp-frontend `feat/onboarding-review-samakan-gform` (belum merge), lihat §Masa Evaluasi
 - [ ] **Fase 4 (enhancement)** — **AI CV screening** (skor & rekomendasi, HR putuskan) + **WhatsApp** notifikasi kandidat
 - [ ] **Fase 5 (opsional, sisa)** — **psikotes online** (test-engine + bank soal) + integrasi job board (mis. JobStreet)
 - [ ] **Fase F–I (adopsi ERPGo lanjut)** — [x] interview rounds+feedback (✅ BE); ~~onboarding checklist per-kandidat #492~~ (dihapus 2026-07-18); [ ] offer letter template, career/recruitment settings
