@@ -2,7 +2,7 @@
 
 *Dok induk departemen **Kesekretariatan** (`master_department.key` = `secretary`). Departemen ini tidak punya folder domain di vault karena isinya bercampur: pimpinan (Direktur dan Corporate Secretary), pendukung Direktur, branding dan desain korporat, Legal, R&D Regulatory, dan Internal Audit. Dok ini tidak menyalin isi dok detail. Tugasnya memetakan tiap jabatan ke modul sistem yang benar-benar dipakainya, lalu menunjuk dok yang memilikinya.*
 
-- **Status**: ⚠️ Implemented (ada catatan). Modul `secretary` hidup di kode dengan dua area kerja (Legal dan R&D) ditambah satu layar KPI departemen, tetapi sebagian besar jabatan di departemen ini tidak punya modul kerja apa pun di sistem. Kolom kode diverifikasi ke `origin/main` bip-erp `72183415` dan erp-frontend `bd7320d3` pada 2026-09-14. Angka karyawan dan template bertanggal sesuai sumber yang disebut di tiap baris dan **belum diukur ulang ke produksi**.
+- **Status**: ⚠️ Implemented (ada catatan). Modul `secretary` hidup di kode dengan dua area kerja (Legal dan R&D) ditambah satu layar KPI departemen, tetapi sebagian besar jabatan di departemen ini tidak punya modul kerja apa pun di sistem. Kolom kode diverifikasi ke `origin/main` bip-erp `72183415` dan erp-frontend `bd7320d3` pada 2026-09-14. Jumlah karyawan dan template **diukur ulang ke produksi 2026-09-14** (sensus baca-saja `employee_db`); pemegang tiap jabatan **belum** diukur.
 - **Implementasi**: [[Microservices - Employee Service]] (register Legal dan R&D di-host di sini) · [[APP - Web ERP]] (kategori sidebar SEKRETARIAT dan Ruang Direktur)
 - **Dok detail**: [[QA - Register Perizinan & Sertifikasi]] · [[QA - R&D Regulatory (Registrasi & Pipeline Produk)]] · [[Unlisted - Dashboard per Posisi (Kesekretariatan)]]
 - **Peta lintas departemen**: [[REF - Peta Departemen]]
@@ -11,7 +11,7 @@
 
 - Sebelum dok ini ditulis (2026-09-14), bagian-bagian departemen ini tercatat di tiga tempat tanpa satu titik masuk: register Legal dan R&D di folder `Quality & Regulatory`, rancangan dashboard di `Unknown or not listed`, dan Ruang Direktur di dalam [[APP - Web ERP]]. Dok dashboard-nya sendiri menyatakan divisi ini "tidak punya padanan domain di vault".
 - Legal dan R&D semula dirancang sebagai departemen dan modul sendiri (`legal`, `rnd`). Keduanya dilebur ke modul `secretary` pada 2026-08-13 karena departemennya tidak pernah ada di `master_department` produksi, sementara satu-satunya karyawan berjabatan Legal duduk di Kesekretariatan (komentar `shared-library/common/catalog_secretary.go` dan `DefaultDepartments()` di `shared-library/models/employee/master_data.go`). Rute halaman `/legal/*` dan `/rnd/*` sengaja tidak ikut pindah karena `menu_hidden` menyimpan URL dan mencocokkannya persis.
-- Ukuran: **11 karyawan** (diukur produksi 2026-08-04, [[Finance - Kas Kecil dan Pengajuan Budget]]). Empat di antaranya belum punya atasan langsung (`supervisor_id`) per 2026-08-26 ([[ADR - 0054 Peninjau Ide Kaizen Bisa Atasan Departemen, Bukan Hanya Komite Terpusat]]).
+- Ukuran (sensus produksi 2026-09-14): **11 karyawan di `work_data`, 8 dengan akun aktif**; `master_department` memuat 11 jabatan (jumlahnya sama dengan seed, namanya belum dibandingkan); `kpi_template` memuat 7 template aktif dan 1 arsip. Angka 11 sudah sama sejak pengukuran 2026-08-04 di [[Finance - Kas Kecil dan Pengajuan Budget]]. Empat karyawan belum punya atasan langsung (`supervisor_id`) per 2026-08-26 ([[ADR - 0054 Peninjau Ide Kaizen Bisa Atasan Departemen, Bukan Hanya Komite Terpusat]]).
 
 ## Ruang Lingkup / Cakupan
 

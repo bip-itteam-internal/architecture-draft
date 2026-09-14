@@ -31,6 +31,8 @@ Kolom **Klasifikasi otomasi** per departemen memakai empat kategori dari [[HRIS 
 
 Dua departemen di `work_data` **tidak muncul di sini karena belum punya template sama sekali**: Percetakan (13 karyawan) dan Marketing Offline Distribution (1 karyawan).
 
+> ⚠️ **Ralat 2026-09-14 (sensus produksi baca-saja):** kalimat di atas benar untuk salinan 2026-08-01, tetapi tak lagi utuh. `kpi_template` kini memuat **4 template aktif berdepartemen `Printing`**, sementara departemen yang sama di `master_department` (key `printing`) dan di `work_data` (14 karyawan) bernama **`Percetakan`**. Pratinjau KPI Saya mencari template dengan nama departemen persis (`services/employee/kpi_me_pratinjau.go`), jadi keempat template itu tidak cocok dengan satu karyawan pun di jalur tersebut. Bab untuk keempat template itu belum ditulis di dokumen ini. Rinciannya di [[REF - Peta Departemen]]. Marketing Offline Distribution tetap tanpa template.
+
 ## Ralat 2026-08-31 Kaizen dan forecast kas
 
 > **Status ralat**: ✅ diverifikasi ke kode `bip-erp` `main` (`9734bea0`, 2026-08-28) pada 2026-08-31.

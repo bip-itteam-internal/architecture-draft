@@ -2063,6 +2063,7 @@
         "HRIS - Attendance Correction",
         "HRIS - Perjalanan Dinas",
         "HRIS - Organization Structure",
+        "REF - Peta Departemen",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus",
         "DB - Overview and Notes",
         "Microservices - File Service",
@@ -2070,20 +2071,20 @@
         "CORE - HRIS Orchestrator",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "dfe394e0092fdf049ad3e7f57e9c52a770cd523a4b3994df6dc2af195f95d8ef",
-      "ukuran_kb": 52.2,
-      "ringkasan": "Menjawab: bagaimana attendance-service (Go/Fiber/MongoDB) menangani absensi end-to-end, mulai dari clock-in/out multi-metode, resolusi dan rotasi jadwal kerja, cuti, perjalanan dinas, guestbook, dan hari libur, hingga fakta kehadiran (`late_hours`, `leave_hours`, `alpha`) yang dikonsumsi payroll. Juga menjawab integrasinya dengan HRIS (rekap telat untuk usulan SP, rekap kedisiplinan untuk KPI, Sesi Live Host), mengapa rute mesin memakai kunci layanan sekaligus header gateway, status multi-tenant `company_id`, serta di mana aturan jadwal dan sanksi telat sebenarnya diatur (dokumen Peraturan Perusahaan di repo mobile).",
+      "hash": "65d1193c29a67eb0f16fed3ba32d7aa2066324f6c26686dfd519564847342f4d",
+      "ukuran_kb": 52.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan attendance-service (clock-in/out, resolusi dan rotasi jadwal kerja, schedule-list per perusahaan, WiFi kantor, rekap telat untuk usulan SP1, rekap kedisiplinan untuk KPI, resolusi jadwal dan status tap untuk Sesi Live Host), serta bagaimana rute internalnya digerbang (kunci layanan ATTENDANCE_SERVICE_KEY ditambah header BIP-Gateway-ID). Juga menjawab bagaimana batas periode telat (26 bulan lalu sampai 25 bulan ini) ditentukan dan dipakai bersama, dan menunjuk bahwa aturan jam kerja, ambang telat, dan sanksinya ada di BUSINESS_LOGIC_IMPLEMENTATION.md repo mobile, bukan di vault.",
       "kata_kunci": [
         "attendance-service",
         "absensi",
         "presensi",
+        "clock-in clock-out",
         "jadwal kerja",
-        "rotasi shift",
+        "schedule-list",
         "rekap telat",
-        "surat peringatan",
-        "SP",
-        "multi-tenant",
-        "kedisiplinan KPI"
+        "late recap SP1",
+        "kedisiplinan KPI",
+        "ATTENDANCE_SERVICE_KEY"
       ]
     },
     {
@@ -8484,6 +8485,7 @@
         "RUN - Menambah Metrik KPI Otomatis",
         "HRIS - Otomasi Skor KPI",
         "Microservices - Employee Service",
+        "REF - Peta Departemen",
         "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
         "HRIS - Kaizen (Ide Perbaikan)",
         "REF - Penamaan Metrik & Sumber KPI",
@@ -8506,20 +8508,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "845fe09b07f1f6223c2ef2659e77656e60f755ed72ce5cf8181be1248fc4c45e",
-      "ukuran_kb": 220.2,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai tiap jabatan di production, lengkap dengan label persis, bobot, dan target (isi `description` pada `kpi_template`), dikelompokkan per departemen. Juga menjawab berapa metrik per departemen yang otomatis, semi, terblokir data, atau manual beserta PIC dev-nya, kenapa label tidak boleh dibetulkan ejaannya, serta ralat soal modul Kaizen dan forecast kas (sumbernya ada di kode, tetapi Kaizen diputuskan tidak dipakai untuk otomasi KPI).",
+      "hash": "08808e32f003c82df56cdaa12a1869b8285d86347e957817b0e08009ad55fe31",
+      "ukuran_kb": 220.8,
+      "ringkasan": "Menjawab: metrik, bobot, dan target apa saja yang tersimpan di kpi_template production untuk tiap departemen dan jabatan, berapa metrik per departemen yang tergolong otomatis, semi, terblokir data, atau manual, dan siapa dev penanggung jawab otomasinya. Juga menjawab cara membaca label metrik (typo dipertahankan karena label adalah kunci identitas di kode), ralat soal modul Kaizen dan sumber forecast_kas beserta keputusan Kaizen tidak dipakai untuk otomasi KPI, serta template berdepartemen Printing yang tidak cocok dengan karyawan Percetakan.",
       "kata_kunci": [
-        "matriks KPI",
+        "KPI",
         "kpi_template",
-        "template KPI",
+        "matriks KPI",
         "metrik KPI",
         "bobot dan target",
-        "KPI per jabatan",
-        "KPI departemen",
-        "otomasi KPI",
+        "otomasi skor KPI",
+        "auto-score",
         "Kaizen",
-        "forecast kas"
+        "forecast_kas",
+        "template KPI per departemen"
       ]
     },
     {
@@ -8553,20 +8555,20 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "25fabb63af0d37ada1d69f62c59c8a321dd0a04399604f6d4b133eccef3ec485",
-      "ukuran_kb": 56.6,
-      "ringkasan": "Menjawab: bagaimana departemen dan jabatan dikelola sebagai master data (`master_department`, `position_items`, `position_key`), bagaimana jenjang jabatan lima tingkat (Pelaksana sampai Direktur) disimpan beserta rank renggangnya, dan kenapa jenjang sengaja bukan sumbu hak akses. Juga menjawab siapa penyetuju pengajuan per departemen (`is_supervisor`) dan bedanya dengan atasan langsung, bagaimana `supervised_by` membentuk label grup seperti HRGA, urutan rantai pencarian atasan, serta bagan organisasi di `/hris/org-chart`.",
+      "hash": "e31015eafe17a54627808fc4fc4fa7857bf3a6a48fa9f1aefe48d2016afb8c38",
+      "ukuran_kb": 57.3,
+      "ringkasan": "Menjawab: bagaimana departemen, jabatan (positions dan position_items ber-position_key), dan jenjang jabatan (master_job_level, rank renggang) disimpan dan dikelola, bagaimana bagan organisasi dan tab Peta Struktur ditampilkan, dan kenapa jenjang jabatan sengaja bukan sumber hak akses. Juga menjawab siapa penyetuju pengajuan per departemen (work_data.is_supervisor), bedanya dengan atasan langsung, bagaimana cakupan supervisi antar-departemen (supervised_by, label HRGA) bekerja, dan urutan rantai pencarian atasan yang dipakai bersama semua pemanggil.",
       "kata_kunci": [
         "struktur organisasi",
         "org chart",
         "master_department",
         "jabatan",
+        "position_key",
         "jenjang jabatan",
         "job level",
-        "atasan",
         "is_supervisor",
         "supervised_by",
-        "HRGA"
+        "atasan langsung"
       ]
     },
     {
@@ -11031,12 +11033,12 @@
       "area": "Reference",
       "jenis": "reference",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Kolom kode diverifikasi ke `origin/main` bip-erp `72183415` dan erp-frontend `bd7320d3` pada 2026-09-14. Daftar departemennya diambil dari sensus produksi **2026-08-19** di [[HRIS - Organization Structure]] dan **belum diukur ulang**, karena pembacaan produksi dari sesi penyusunan ditolak. Departemen yang lahir sesudah tanggal itu belum tentu ada di sini. ⚠️ **Ukur ulang sebelum dipakai mengambil keputusan.**",
+      "status_teks": "Implemented (ada catatan). Kolom kode diverifikasi ke `origin/main` bip-erp `72183415` dan erp-frontend `bd7320d3`. Daftar departemen, jumlah karyawan, dan jumlah template diukur dari sensus produksi baca-saja `employee_db` pada **2026-09-14**. ⚠️ **Ukur ulang sebelum dipakai mengambil keputusan.** Temuan terpenting sensus itu: departemen ber-key `printing` bernama `Percetakan` di data, tetapi `Printing` di kode dan di template KPI; lihat bab \"Selisih nama Printing dan Percetakan\".",
       "publik": true,
       "tautan": [
-        "HRIS - Organization Structure",
         "Microservices - Employee Service",
         "HRIS - Big Pictures",
+        "HRIS - Organization Structure",
         "HRIS - Dashboard per Posisi",
         "GA - Big Pictures",
         "GA - Dashboard per Posisi",
@@ -11061,9 +11063,8 @@
         "Microservices - Procurement Service",
         "GA - Form Pengadaan dan Pengajuan Dana",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
-        "APP - Audit Internal",
         "Microservices - Attendance Service",
-        "Finance - Kas Kecil dan Pengajuan Budget",
+        "APP - Audit Internal",
         "GA - Procurement System",
         "REF - Kepemilikan Data",
         "REF - Dashboard per Posisi (Indeks Cakupan)",
@@ -11072,20 +11073,20 @@
         "APP - Web ERP",
         "HOMEPAGE"
       ],
-      "hash": "4fb6d54c7d98548a55bdbc4f2bd486ac54fb134fff227e823179258faff591f9",
-      "ukuran_kb": 10.2,
-      "ringkasan": "Menjawab: departemen X memakai kunci modul apa, masuk kategori sidebar mana, dan didokumentasikan di dok vault mana, termasuk departemen yang belum punya dok induk (Printing, Marketing Offline Distribution) dan kapan dok induknya layak dibuat. Juga menjawab kunci dan label yang terdengar seperti departemen padahal bukan (`legal`, `rnd`, kategori sidebar `marketing`, label HRGA) serta kenapa `finance` di `deptKeyToNames` ikut mencakup Procurement.",
+      "hash": "ef62dbfaa8910d6df3f6e07d49c2578ee672bfd1e7d3e62364487d3986ed2f01",
+      "ukuran_kb": 14.4,
+      "ringkasan": "Menjawab: departemen X didokumentasikan di dok vault mana, apa kunci modul (deptKeyToNames) dan kategori sidebar-nya, berapa karyawan dan template KPI-nya menurut sensus produksi, dan departemen mana yang belum punya dok induk beserta alasannya. Juga menjawab selisih nama Printing vs Percetakan dan akibatnya pada picker jadwal kerja serta pratinjau template KPI, dan kunci mana yang terdengar seperti departemen padahal bukan (kategori marketing, label HRGA).",
       "kata_kunci": [
         "peta departemen",
         "department map",
         "deptKeyToNames",
-        "kunci modul",
-        "module key",
         "kategori sidebar",
-        "dok induk",
+        "master_department",
         "Printing",
-        "Marketing Offline Distribution",
-        "HRGA"
+        "Percetakan",
+        "HRGA",
+        "dok induk departemen",
+        "Marketing Offline Distribution"
       ]
     },
     {
@@ -13007,7 +13008,7 @@
       "area": "Unknown or not listed",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Modul `secretary` hidup di kode dengan dua area kerja (Legal dan R&D) ditambah satu layar KPI departemen, tetapi sebagian besar jabatan di departemen ini tidak punya modul kerja apa pun di sistem. Kolom kode diverifikasi ke `origin/main` bip-erp `72183415` dan erp-frontend `bd7320d3` pada 2026-09-14. Angka karyawan dan template bertanggal sesuai sumber yang disebut di tiap baris dan **belum diukur ulang ke produksi**.",
+      "status_teks": "Implemented (ada catatan). Modul `secretary` hidup di kode dengan dua area kerja (Legal dan R&D) ditambah satu layar KPI departemen, tetapi sebagian besar jabatan di departemen ini tidak punya modul kerja apa pun di sistem. Kolom kode diverifikasi ke `origin/main` bip-erp `72183415` dan erp-frontend `bd7320d3` pada 2026-09-14. Jumlah karyawan dan template **diukur ulang ke produksi 2026-09-14** (sensus baca-saja `employee_db`); pemegang tiap jabatan **belum** diukur.",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
@@ -13027,19 +13028,19 @@
         "Finance - Audit Internal",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi"
       ],
-      "hash": "8757c41ae5be7b883d476aca2e211de62af286b47d639338bcb9a2b85c3ea371",
-      "ukuran_kb": 12.1,
-      "ringkasan": "Menjawab: jabatan apa saja di departemen Kesekretariatan, modul atau layar sistem apa yang dipakai tiap jabatan, dan peran apa yang diturunkan dari jabatannya, termasuk Corporate Secretary yang setara Direktur dalam memutus persetujuan. Juga menjawab isi modul `secretary` (area Legal dan R&D, katalog izin, 25 rute di employee-service, menu sidebar SEKRETARIAT), kenapa `system_roles.secretary` sengaja tidak membuka register Legal maupun R&D, dan di mana Ruang Direktur didokumentasikan.",
+      "hash": "77e58b13332f4bfc463e5e177a75d82e5baafcd267f4343c5beb771e59659e80",
+      "ukuran_kb": 12.4,
+      "ringkasan": "Menjawab: jabatan apa saja di departemen Kesekretariatan (key secretary), modul sistem yang dipakai tiap jabatan (Legal, R&D Regulatory, Internal Audit, Ruang Direktur), dan dok detail mana yang memilikinya. Juga menjawab bagaimana katalog izin secretary.legal dan secretary.rnd, peran turunan dari jabatan, sidebar SEKRETARIAT, dan kesetaraan Corporate Secretary dengan Direktur dalam persetujuan bekerja, kenapa system_roles.secretary tidak membuka Legal maupun R&D, dan kenapa Legal serta R&D dilebur ke modul secretary.",
       "kata_kunci": [
         "Kesekretariatan",
         "secretary",
-        "Sekretariat",
-        "Direktur",
+        "sekretariat",
         "Corporate Secretary",
-        "Ruang Direktur",
-        "modul secretary",
         "Legal",
-        "R&D",
+        "R&D Regulatory",
+        "Ruang Direktur",
+        "Internal Audit",
+        "peran dari jabatan",
         "SetaraDirektur"
       ]
     },
