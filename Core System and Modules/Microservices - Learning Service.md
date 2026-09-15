@@ -5,7 +5,7 @@
 - **Stack:** Go + Fiber v2 + MongoDB (`learning_db`), discaffold dari `services/.template`
 - **Path:** `services/learning`
 - **Port internal:** 6987 · **Modul gateway:** `learning` (`/api/learning/*`)
-- **Status**: ⚠️ **Implemented (ada catatan)** — service **live di dev + produksi 2026-08-06** (bip-erp PR [#1020](https://github.com/bip-itteam-internal/bip-erp/pull/1020), frontend [erp-frontend#814](https://github.com/bip-itteam-internal/erp-frontend/pull/814)), data 4 koleksi dipindah di kedua lingkungan dengan jumlah terverifikasi cocok, dan pengajuan + evaluasi + `/me` **terverifikasi lewat gateway hidup 2026-08-19**. Post-test berskor (PR [#1321](https://github.com/bip-itteam-internal/bip-erp/pull/1321), merged 2026-08-20) **ada di biner produksi** (diperiksa 2026-09-15). **Catatannya bukan di service melainkan di pemakaiannya**: per 2026-09-15 `training_request`, `trainer_evaluation`, dan `quiz_attempt` di produksi masih **0**, post-test belum punya layar di web maupun MyBharata, dan belum ada sumber KPI yang membaca `learning_db`. Materi, pre-test, kurikulum, dan Talent Pool **belum ada**. Konsep & rencana lanjutan: [[HRIS - Training Program]]
+- **Status**: ⚠️ **Implemented (ada catatan)** — service **live di dev + produksi 2026-08-06** (bip-erp PR [#1020](https://github.com/bip-itteam-internal/bip-erp/pull/1020), frontend [erp-frontend#814](https://github.com/bip-itteam-internal/erp-frontend/pull/814)), data 4 koleksi dipindah di kedua lingkungan dengan jumlah terverifikasi cocok, dan pengajuan + evaluasi + `/me` **terverifikasi lewat gateway hidup 2026-08-19**. Post-test berskor (PR [#1321](https://github.com/bip-itteam-internal/bip-erp/pull/1321), merged 2026-08-20) **ada di biner produksi** (diperiksa 2026-09-15). **Catatannya bukan di service melainkan di pemakaiannya**: per 2026-09-15 `training_request`, `trainer_evaluation`, dan `quiz_attempt` di produksi masih **0**, post-test belum punya layar di web maupun MyBharata. ✅ **Sejak 2026-09-15 service ini melayani mesin KPI dan kalender terpusat** (bip-erp PR [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895), image produksi 13:20 WIB, diverifikasi dari dalam container; DEV belum dideploy): `GET /kpi/pelatihan` berkunci `LEARNING_SERVICE_KEY` dan `GET /internal/calendar-feed`, lihat bagian masing-masing di bawah. Materi, pre-test, kurikulum, dan Talent Pool **belum ada**. Konsep & rencana lanjutan: [[HRIS - Training Program]]
 
 ## Kenapa service sendiri
 
@@ -15,7 +15,7 @@ Service ini **tidak menyimpan** master karyawan, jabatan, maupun departemen. Sem
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
-Daftar lengkap: [[API - Learning Service]]. Ringkasnya delapan kelompok; empat pertama pindahan utuh dari Employee Service, sisanya dibangun di service ini:
+Daftar lengkap: [[API - Learning Service]]. Ringkasnya sepuluh kelompok; empat pertama pindahan utuh dari Employee Service, sisanya dibangun di service ini:
 
 - **Master jenis pelatihan** — CRUD `/training/types`
 - **Master trainer** — CRUD `/training/trainers`, internal (tautan `employee_id`) atau eksternal
@@ -25,6 +25,8 @@ Daftar lengkap: [[API - Learning Service]]. Ringkasnya delapan kelompok; empat p
 - **Evaluasi trainer** — `POST /me/trainings/:id/evaluation` (peserta mengisi) + `GET /training/:id/evaluation` & `/training/trainers/:id/evaluation` (agregat), lihat bagian tersendiri di bawah
 - **Course & bank soal post-test**: `/courses`, `/courses/:id/quiz`, rekap dan ekspor CSV percobaan, lihat bagian Post-test di bawah
 - **Mengerjakan post-test**: `POST /me/post-test/:trainingId/start`, `POST /me/post-test/attempt/:id`, pembatalan `PATCH /attempts/:id/void`
+- **Bahan KPI pelatihan** (panggilan mesin, berkunci `LEARNING_SERVICE_KEY`): `GET /kpi/pelatihan`, lihat bagian tersendiri di bawah
+- **Feed kalender**: `GET /internal/calendar-feed`, hanya kelas yang diikuti pemanggil sebagai peserta, lihat bagian tersendiri di bawah
 
 RBAC: baca digerbang `PermTrainingView`; tulis digerbang `PermTrainingWork` (event, peserta) atau `PermTrainingManage` (master, course, soal). `RequireHRISStaff` hanya berlaku sebagai gerbang lama saat kill-switch `TRAINING_PERMISSION_ENFORCEMENT=off`; selama kill-switch menyala ia tidak dijalankan (`permission_gate.go`). Rute `/me/*` dan pembuatan pengajuan tidak digerbang izin modul; yang menggerbang identitas pemanggil dan relasinya (lihat bagian masing-masing). Rincian per rute: [[API - Learning Service]]. Fungsi validasi murni (`ValidateTraining`, `CanEnroll`, `IsValidStatusTransition`, `validateTrainer`) beserta ujinya ada di `services/learning/models_training.go` dan `models_training_test.go`.
 
@@ -50,6 +52,7 @@ Sampai sebelum ini **semua penjadwalan berangkat dari HR**; karyawan dan atasan 
 - **Pengaju yang ternyata supervisor departemen itu sendiri melewati tahap SPV** — antrean yang menunggu tanda tangan diri sendiri tak pernah selesai.
 - **Penolakan di tahap mana pun FINAL.** Kalau penolakan SPV diteruskan, HR menerima hal yang atasannya sudah tolak, dan persetujuan di atasnya membatalkan keputusan atasan tanpa ada yang menyadarinya.
 - **Tahap ditentukan STATUS, bukan dikirim klien**; kalau klien memilih tahap, siapa pun yang tahu bentuk permintaannya bisa mengaku menindak tahap HR. Dan tak seorang pun memutus pengajuannya sendiri.
+- ✅ **Riwayat keputusan (`as=reviewed`) disaring ke pemanggil sejak PR [#1892](https://github.com/bip-itteam-internal/bip-erp/pull/1892)** (merged 2026-09-15, ikut di image produksi hari itu). Sebelumnya siapa pun yang punya identitas di perusahaan menerima **seluruh** pengajuan yang sudah diputuskan. Kini pemegang `training.view` atau `training.work` melihat seluruh riwayat perusahaannya (izin baca riwayat pelatihan memang sudah dibukanya), sedangkan selainnya hanya pengajuan yang tahap SPV-nya menunjuk dirinya. Rincian di [[API - Learning Service]].
 - **Membuat pengajuan tak digerbang izin modul**: meminta pelatihan bukan hak mengelola pelatihan. Yang menggerbang identitas.
 - **Notifikasi memakai kategori `request-*` yang SUDAH ADA**, bukan kategori baru — jadi **tanpa deploy dua container** dan tanpa perubahan MyBharata. `request-waiting-review` sengaja dihindari walau terdaftar: MyBharata memetakan `request-review`, bukan nama itu, sehingga ia jatuh ke `system`.
 - ⚠️ **`app_route` notifikasinya sempat berisi rute WEB** (`/hris/training/requests`) sejak fitur ini lahir. Field itu dibaca MyBharata untuk menentukan layar yang dibuka, dan aplikasi tak punya satu pun rute berawalan `/hris/`, jadi deep link-nya tak pernah bisa mendarat. Diperbaiki jadi `/pengajuan-pelatihan` di PR [#1198](https://github.com/bip-itteam-internal/bip-erp/pull/1198) bersama pindahnya sisi pengajuan ke aplikasi. **Nilainya harus sama persis dengan `RouteNames.trainingRequests`** di my-bharata; tak ada apa pun yang memaksa keduanya sejalan, jadi masing-masing repo mengunci nilainya lewat test, dan yang di sini menolak awalan `/hris/` secara eksplisit alih-alih sekadar mencocokkan satu nilai. Berkas `request_notify.go` sebelumnya tak punya satu pun test.
@@ -114,12 +117,50 @@ Irisan LMS pertama yang benar-benar ada: **bukti kompetensi sesudah kelas**. Tig
 
 Kolom gerbang di atas berlaku selama kill-switch `TRAINING_PERMISSION_ENFORCEMENT` menyala; bila dimatikan, rute kelola dan rekap jatuh ke gerbang lama `RequireHRISStaff`. Grup `/courses` sengaja **tidak** diletakkan di bawah `/training`: segmen statik sesudah `/training/:id` akan ter-match sebagai event ber-id `courses`.
 
-⚠️ **Terpasang di produksi, belum punya layar, belum dipakai.** Biner `Learning-Service` prod (image 2026-09-14) memuat `/me/post-test`, `quiz_attempt`, dan `attempts/export`, dengan kontrol negatif string karangan → 0 (diperiksa 2026-09-15). Tetapi `erp-frontend` `main` dan `my-bharata` `dev` sama-sama **nol** pemanggil `/courses` maupun `/me/post-test` (komentar `home_quick_access.dart` di aplikasi menyebut isinya "BELUM LMS penuh (course, materi, post-test)"), dan per 2026-09-15 koleksi `course` **belum pernah terbentuk**, `quiz` 0, `quiz_attempt` 0. Konsekuensinya, metrik KPI yang menunggu skor training (mis. `Skor Penilaian Training All Karyawan > 70` di [[HRIS - Matriks KPI per Departemen]]) menunggu **frontend** dan **sumber KPI**, bukan backend service ini.
+⚠️ **Terpasang di produksi, belum punya layar, belum dipakai.** Biner `Learning-Service` prod (image 2026-09-14) memuat `/me/post-test`, `quiz_attempt`, dan `attempts/export`, dengan kontrol negatif string karangan → 0 (diperiksa 2026-09-15). Tetapi `erp-frontend` `main` dan `my-bharata` `dev` sama-sama **nol** pemanggil `/courses` maupun `/me/post-test` (komentar `home_quick_access.dart` di aplikasi menyebut isinya "BELUM LMS penuh (course, materi, post-test)"), dan per 2026-09-15 koleksi `course` **belum pernah terbentuk**, `quiz` 0, `quiz_attempt` 0. Konsekuensinya, metrik KPI yang menunggu skor training (mis. `Skor Penilaian Training All Karyawan > 70` di [[HRIS - Matriks KPI per Departemen]]) menunggu **frontend** dan data, bukan backend service ini; sumber KPI-nya sudah ada sejak 2026-09-15 (lihat bagian berikut).
+
+## Bahan KPI pelatihan (`GET /kpi/pelatihan`): ✅ merged 2026-09-15 (PR [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895))
+
+Rute **mesin** untuk sumber KPI `pelatihan` di [[Microservices - Employee Service]] (`services/learning/kpi_pelatihan.go`). Sebelum ini tak satu pun sumber KPI bisa membaca `learning_db`, sehingga kehadiran, skor post-test, dan evaluasi trainer diketik tangan di template `People and Development`.
+
+- **Digerbang kunci layanan `LEARNING_SERVICE_KEY` lewat query `key`** (`GerbangKunciLearning`), bukan header gateway: gateway memasang `BIP-Gateway-ID` pada setiap permintaan ber-JWT ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Kunci server kosong **menutup** rute. `ValidateGateway` tetap berlaku di depannya, jadi pemanggil juga membawa `BIP-Gateway-ID`.
+- **Parameter**: `periode` `YYYY-MM` (bulan kalender WIB, bukan siklus payroll 26-25 seperti `/kpi/attendance`), `company_id` wajib eksplisit (panggilan mesin tak membawa JWT), `employee_id` dipisah koma dan maksimal 200 per panggilan (pemanggil yang memecah). Cacat dibalas 400; database belum tersambung 503.
+- **Atribusi periode**: hanya kelas `Completed` yang `end_date`-nya jatuh di bulan itu. Dibandingkan sebagai instan waktu, jadi tanggal yang tersimpan tengah malam WIB dalam UTC tetap jatuh di bulan yang benar; dikunci test untuk kelas yang selesai tanggal 1 pukul 00:00 WIB dan tanggal terakhir pukul 23:30 WIB.
+- **Muatan per pendaftaran**, bukan agregat: `training_id`, `employee_id`, `hadir`, `wajib_post_test` (kelas bertautan course), `skor_terbaik_persen` (skor tertinggi dari percobaan yang sudah dikirim dan tidak dibatalkan; `null` = belum ada, berbeda dari 0). Sengaja tanpa nama, jabatan, maupun jawaban.
+- **Evaluasi dikirim sebagai `{responden, jumlah_nilai}` yang bisa dijumlah**, bukan rata-rata: pemanggil memecah cakupannya, dan rata-rata yang sudah dibulatkan tak bisa digabung antar-panggilan. Ambang 3 responden karena itu diterapkan pemanggil sesudah seluruh batch digabung. Muatan ini hanya sampai ke mesin berkunci, tak pernah ke layar.
+- Saringan perusahaan, periode, dan cakupan diulang per dokumen di fungsi murni `rakitKPIPelatihan`; baris peserta atau evaluasi yang tercatat ganda dihitung sekali.
+- Kontrak muatan dikunci literal `contohMuatanKPIPelatihan` di `kpi_pelatihan_test.go`, yang dibandingkan dengan jawaban handler sungguhan dan dibaca apa adanya oleh test kontrak di employee-service.
+
+## Feed kalender pelatihan (`GET /internal/calendar-feed`): ✅ merged 2026-09-15 (PR [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895))
+
+Provider `learning` di [[Microservices - Calendar Service]] (`services/learning/calendar_feed.go`). Aturan visibilitas dan bentuk itemnya dicatat lengkap di dok kalender; ringkasnya:
+
+- **Hanya kelas yang diikuti pemanggil sebagai peserta.** Pemegang izin Pelatihan sah melihat seluruh kelas di halaman Pelatihan, tetapi itu bukan alasan kelas orang lain masuk kalendernya (prinsip tiga lapis kalender). Kueri disempitkan ke baris `training_participant` milik pemanggil, dan tiap kelas tetap dilewatkan penyaring per dokumen `saringFeedPelatihan`; dikunci test dengan sumber tiruan yang sengaja mengembalikan kelas orang lain.
+- Tanpa identitas 403; rentang cacat (bukan RFC3339, `to` mendahului `from`, lebih dari 400 hari) 400; database belum tersambung 503.
+- Item `learning:training:<id>`, lingkup `personal`, `deep_link` `/hris/pelatihan-saya` (bukan `/hris/training`, yang menuntut `training.view`). Berjam hanya bila kelasnya satu hari dan kedua jamnya `HH:MM` sah dengan jam selesai sesudah jam mulai; selain itu seharian 00:00 sampai 23:59:59 WIB. Sengaja tidak memakai `rentangPelaksanaan`, yang melebarkan jendela kehadiran saat jam rusak.
+- Trainer internal belum ikut: tautan yang layak bagi trainer yang bukan HR belum ada.
+
+### Verifikasi produksi 2026-09-15 (kedua rute)
+
+Image `Learning-Service` 13:20:52 WIB (merge 12:59:59), deploy dijalankan manusia. DEV belum dideploy karena sshd VM dev tak mengirim banner sepanjang siang itu. Diperiksa dari dalam container, baca-saja:
+
+| Pemeriksaan | Hasil |
+|---|---|
+| `grep -ac /kpi/pelatihan /service` (sebelum deploy 0) | 1; kontrol positif `gofiber` 342, string karangan 0 |
+| Hash `LEARNING_SERVICE_KEY` di Learning-Service dan Employee-Service | sama |
+| `GET /kpi/pelatihan?periode=2026-09&company_id=BIP&employee_id=…&key=…` dari Employee-Service | 200 berbentuk kontrak, `pendaftaran: []` |
+| Tanpa `key` | 401 |
+| `/kpi/pelatihan-karangan` (prefiks sama) | 404 |
+| Feed, identitas peserta nyata, Agustus 2026 | 1 item `learning:training:…`; agregator kalender memuatnya dengan `degraded: []` |
+| Feed, identitas bukan peserta | `{"items":[]}` |
+| Feed tanpa identitas | 403 |
+
+⚠️ **Dua temuan data produksi dari verifikasi itu.** Jam kelas tersimpan `09.00`/`11.00` (titik, bukan `HH:MM`), sehingga item kalendernya seharian dan jendela kehadiran mandiri melebar sehari penuh (`jamKeMenit` hanya mengurai titik dua). Kelas yang sama (14 Agustus) masih `Scheduled` sebulan kemudian, jadi tak pernah terhitung KPI sampai HR menandainya `Completed`.
 
 ## Belum Diimplementasikan / Catatan
 
 - **Sebagian besar fitur LMS belum ada.** Yang sudah: course tipis, bank soal post-test, skoring, dan rekaman percobaan (lihat Post-test di atas), serta penilaian trainer. Yang belum: materi PDF & video, **pre-test** (jenis `pre` sudah ada di `QuizKinds`, tetapi seluruh rute hanya melayani `post`), kurikulum per jabatan, tenggat, Talent Pool, dan **layar** course/post-test di web maupun MyBharata. Desainnya di [[HRIS - Training Program]].
-- ⚠️ **Belum ada jalur ke mesin KPI.** Service ini tak punya rute `/internal/`, dan employee-service tak punya satu pun sumber KPI yang membaca `learning_db` (`git grep` `training|pelatihan|learning` di `services/employee/kpi_*.go` = 0 hasil, kontrol positif `tiket` = 10 berkas; diperiksa 2026-09-15). Kehadiran, skor post-test, dan evaluasi trainer karena itu belum bisa mengisi KPI siapa pun, termasuk posisi yang dinilai dari pelatihan (Training & Perfomance Officer, Culture & Industrial, HRD Supervisor). Mengisi datanya saja tidak cukup: sumber KPI-nya tetap harus ditulis dev. Lihat [[HRIS - Matriks KPI per Departemen]].
+- ✅ ~~**Belum ada jalur ke mesin KPI.**~~ **Tersambung 2026-09-15** (PR [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895)): `GET /kpi/pelatihan` di service ini dan sumber `pelatihan` di employee-service, keduanya live di produksi. Yang tersisa bukan kode: tiga metriknya belum dikonfigurasi di template mana pun, data produksi belum cukup (satu-satunya kelas berpeserta masih `Scheduled`), dan metrik "terlaksana sesuai rencana" menunggu entitas rencana (Tahap 2). Posisi yang dinilai dari pelatihan (Training & Perfomance Officer, Culture & Industrial, HRD Supervisor) dirinci di [[HRIS - Matriks KPI per Departemen]]. Catatan pagi hari yang sama ("tak punya rute `/internal/`, nol sumber KPI") benar sebelum merge.
 - ✅ ~~Keempat koleksi belum punya `company_id`~~ — **sudah terpasang**: baca memakai `EffectiveCompanyID`, tulis memakai `CompanyID`, dan `ReplaceOne` sengaja mempertahankannya. Aturan operasional lama "jangan beri role `hris` ke akun non-BIP" **tak lagi jadi satu-satunya penjagaan**.
 - ✅ ~~Rute baca Training tidak punya gerbang role~~ — **sudah digerbang** `gate(PermTrainingView, nil)`, bersama RBAC permission-set penuh (`PermTrainingView`/`Work`/`Manage`) berikut kill-switch `TRAINING_PERMISSION_ENFORCEMENT` dan sakelar fase dua `TRAINING_TIER_FALLBACK`.
 - ⚠️ **`max_participants` sempat DIKUMPULKAN tanpa pernah ditegakkan** — diperbaiki 2026-08-10 (PR [#1147](https://github.com/bip-itteam-internal/bip-erp/pull/1147)). Kolom itu disebut "cap keras" di **tiga tempat** (komentar field, komentar rute, dokumen vault) sementara `CanEnroll` tak pernah menerima kapasitasnya: HR mengisi kuota 20, orang ke-21 masuk tanpa keluhan apa pun. Pola yang sudah berulang di repo ini — dirakit benar, tak dibaca siapa pun, nol test merah. Nol/negatif = tanpa batas, dan duplikat diperiksa lebih dulu daripada kuota supaya pesannya tidak menyesatkan.
@@ -138,7 +179,8 @@ Kolom gerbang di atas berlaku selama kill-switch `TRAINING_PERMISSION_ENFORCEMEN
 
 - **MongoDB `learning_db`** — koleksi `training_type`, `trainer`, `training`, `training_participant`, `training_request`, `trainer_evaluation`, `course`, `quiz`, `quiz_attempt`. Lihat [[DB - Overview and Notes]].
 - [[Microservices - Notification Service]] — inbox pengajuan, memakai kategori `request-*` yang sudah ada.
-- [[Microservices - Employee Service]] — sumber master departemen (verifikasi `department_key`) dan master karyawan untuk pemilih peserta serta trainer internal.
+- [[Microservices - Employee Service]] — sumber master departemen (verifikasi `department_key`) dan master karyawan untuk pemilih peserta serta trainer internal. Sejak 2026-09-15 arahnya juga sebaliknya: sumber KPI `pelatihan` di employee-service **memanggil** `GET /kpi/pelatihan` di service ini, dengan env `LEARNING_SERVICE_KEY` bernilai sama di kedua blok compose.
+- [[Microservices - Calendar Service]]: memanggil `GET /internal/calendar-feed` (provider `learning`, env `LEARNING_MODULE_URL` di blok calendar-service).
 - [[CORE - API Master Gateway]] — modul `learning`, env `LEARNING_MODULE_URL`.
 - [[APP - Web ERP]] — layar `/hris/training` dan `/hris/training/masters` di grup menu People Development.
 
