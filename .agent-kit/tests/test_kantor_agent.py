@@ -228,6 +228,13 @@ def test_di_dalam_workspace_beda_huruf_di_windows(tmp_path):
     assert ka.di_dalam_workspace(ws.upper(), ws.lower())
 
 
+def test_waktu_tujuh_digit_pecahan_dari_powershell():
+    # berkas sesi kit ditulis PowerShell ToString('o'): 7 digit; Python <= 3.10 hanya menerima 3 atau 6
+    assert ka._waktu("2026-09-08T01:15:11.0245893Z") == datetime(2026, 9, 8, 1, 15, 11, 24589, tzinfo=timezone.utc)
+    assert ka._waktu("2026-09-15T06:34:00.123Z") == datetime(2026, 9, 15, 6, 34, 0, 123000, tzinfo=timezone.utc)
+    assert ka._waktu("bukan waktu") is None and ka._waktu(None) is None
+
+
 # ---------- pengumpulan dari disk ----------
 
 def test_kumpulkan_lead_dengan_subagent_hidup(lingkungan):
@@ -283,7 +290,8 @@ def test_session_end_kit_memulangkan_sesi_kecuali_dilanjutkan(lingkungan):
     ws, proyek = lingkungan
     tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [end_turn(ws, -60)], _epoch(-60))
     kit = ws / ".task-plans" / "sesi" / "sesi-a.json"
-    kit.write_text(json.dumps({"session_id": "sesi-a", "status": "selesai", "selesai": _ts(-30), "tahap": "wrap"}), encoding="utf-8")
+    selesai_ps = (SEKARANG + timedelta(seconds=-30)).strftime("%Y-%m-%dT%H:%M:%S") + ".1234567Z"  # bentuk ToString('o') PowerShell
+    kit.write_text(json.dumps({"session_id": "sesi-a", "status": "selesai", "selesai": selesai_ps, "tahap": "wrap"}), encoding="utf-8")
     assert kumpulkan(ws, proyek)["sesi"] == []
     # SessionEnd yang LEBIH LAMA dari kejadian terakhir = sesi dilanjutkan (--resume): tetap hidup.
     # Berkas ditulis ber-BOM karena PowerShell di sebagian mesin menulisnya begitu.
@@ -346,6 +354,34 @@ def test_satu_hasil_tool_raksasa_membuat_ekor_diperluas(lingkungan):
     assert (data["sesi"][0]["area"], data["sesi"][0]["keadaan"]) == ("meja", "berpikir")
 
 
+def test_cache_tidak_basi_setelah_transkrip_bertambah(lingkungan):
+    ws, proyek = lingkungan
+    f = tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [tool_use(ws, "PowerShell", "toolu_a", None, -30)], _epoch(-30))
+    assert kumpulkan(ws, proyek)["sesi"][0]["area"] == "server"
+    with f.open("a", encoding="utf-8") as h:
+        h.write(json.dumps(tool_result(ws, "toolu_a", -5)) + "\n")
+    e = _epoch(-5)
+    os.utime(f, (e, e))
+    s = kumpulkan(ws, proyek)["sesi"][0]
+    assert (s["area"], s["keadaan"]) == ("meja", "berpikir")
+
+
+def test_judul_bertahan_walau_ai_title_keluar_dari_ekor(lingkungan):
+    ws, proyek = lingkungan
+    judul = baris("ai-title", ws)
+    judul["aiTitle"] = "Judul lama"
+    f = tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [judul, end_turn(ws, -60)], _epoch(-60))
+    assert kumpulkan(ws, proyek)["sesi"][0]["judul"] == "Judul lama"
+    panjang = end_turn(ws, -5)
+    panjang["message"]["content"][0]["text"] = "y" * 3000
+    with f.open("a", encoding="utf-8") as h:
+        for _ in range(40):  # lebih dari 64 KB baris baru tanpa ai-title
+            h.write(json.dumps(panjang) + "\n")
+    e = _epoch(-5)
+    os.utime(f, (e, e))
+    assert kumpulkan(ws, proyek)["sesi"][0]["judul"] == "Judul lama"
+
+
 # ---------- keluaran ----------
 
 def test_render_js_dapat_diurai_kembali():
@@ -378,9 +414,12 @@ def test_sekali_menulis_data_js(lingkungan):
 
 def test_loop_berhenti_saat_sepi_dan_menandainya(lingkungan):
     ws, proyek = lingkungan
-    assert ka.main(["--workspace", str(ws), "--proyek-dir", str(proyek), "--loop", "0.01", "--sepi-menit", "0.001"]) == 0
+    log = ws / "penulis.log"
+    assert ka.main(["--workspace", str(ws), "--proyek-dir", str(proyek), "--loop", "0.01", "--sepi-menit", "0.001",
+                    "--log", str(log)]) == 0
     data = baca_data(ws)
     assert data["penulis"]["berhenti"] == "sepi"
+    assert "tak ada sesi hidup" in log.read_text(encoding="utf-8")
     assert not (ws / ".task-plans" / "kantor-agent.pid").exists()
 
 

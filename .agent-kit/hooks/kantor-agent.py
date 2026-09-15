@@ -22,9 +22,9 @@ Desain: architecture-draft/.agent-kit/docs/2026-09-15-kantor-agent-design.md
 pakai: kantor-agent.py --workspace WS [--proyek-dir DIR] (--sekali | --loop DETIK) [--sepi-menit 60] [--keluaran DIR]
 """
 import argparse
-import glob
 import json
 import os
+import re
 import sys
 import time
 from collections import OrderedDict, deque
@@ -34,9 +34,15 @@ VERSI_DATA = 1
 HIDUP_UTAMA_DETIK = 30 * 60
 HIDUP_SUB_DETIK = 10 * 60
 DIAM_MENIT = 10
-EKOR_UTAMA = 256 * 1024
-EKOR_SUB = 128 * 1024
+# Ekor pertama sengaja pendek dan diperluas bila tak memuat user/assistant (baca_ekor). Diukur 2026-09-15
+# atas 7 transkrip hidup: ekor 256 KB median 320 ms per tick, 64 KB sekitar 200 ms, sebelum cache per berkas.
+EKOR_UTAMA = 64 * 1024
+EKOR_SUB = 32 * 1024
 EKOR_MAKS = 2 * 1024 * 1024
+# prasaring daftar direktori, sengaja longgar (lihat _daftar_jsonl)
+PRASARING_UTAMA_DETIK = 6 * 3600
+PRASARING_SUB_DETIK = 30 * 60
+_CACHE = {}  # path -> ((ukuran, mtime_ns), (hasil urai, baris_diurai, baris_rusak))
 # transkrip sependek ini tanpa user/assistant = sesi yang baru lahir, bukan tanda format berubah
 MIN_BARIS_TANPA_PERCAKAPAN = 20
 GAGAL_TULIS_MAKS = 5
@@ -149,11 +155,16 @@ def urai(kejadian):
     return {"judul": judul, "pr": pr, "cwd": cwd, "tertunda": tertunda, "akhir": akhir, "dikenal": dikenal}
 
 
+_PECAHAN_LEBIH = re.compile(r"(\.\d{6})\d+")
+
+
 def _waktu(ts):
     if not ts:
         return None
+    # berkas sesi kit ditulis PowerShell ToString('o') dengan 7 digit pecahan; Python <= 3.10 hanya menerima 6
+    teks = _PECAHAN_LEBIH.sub(r"\1", str(ts).replace("Z", "+00:00"))
     try:
-        d = datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
+        d = datetime.fromisoformat(teks)
     except ValueError:
         return None
     return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
@@ -235,7 +246,7 @@ def baca_ekor(path, awal=EKOR_UTAMA, maks=EKOR_MAKS):
     """(kejadian, baris_diurai, baris_rusak) dari ekor berkas.
 
     Bila ekor tak memuat satu pun kejadian user/assistant padahal berkasnya lebih besar, ekor
-    diperluas sampai `maks`: satu hasil tool bisa lebih dari 256 KB, dan ekor yang cuma berisi
+    diperluas sampai `maks`: satu hasil tool bisa lebih besar dari ekornya, dan ekor yang cuma berisi
     potongannya tak boleh terbaca sebagai format berubah."""
     ukuran = os.path.getsize(path)
     n = awal
@@ -256,19 +267,62 @@ def _baca_json(path):
     return o if isinstance(o, dict) else {}
 
 
-def _kumpulkan_subagent(folder_sesi, sekarang):
+def _daftar_jsonl(folder, epoch, prasaring, awalan=""):
+    """[(path, os.stat)] berkas .jsonl di `folder` yang mungkin hidup.
+
+    os.stat per berkas di Windows membuka handle: terukur 77 ms untuk 167 transkrip per tick (2026-09-15).
+    Data daftar direktori (DirEntry.stat) jauh lebih murah tapi bisa tertinggal untuk berkas yang sedang
+    terbuka, jadi hanya dipakai sebagai prasaring longgar; kandidatnya lalu di-stat tepat."""
+    hasil = []
+    try:
+        entri = os.scandir(folder)
+    except OSError:
+        return hasil
+    with entri:
+        for e in entri:
+            if not (e.name.endswith(".jsonl") and e.name.startswith(awalan)):
+                continue
+            try:
+                if not e.is_file() or epoch - e.stat().st_mtime > prasaring:
+                    continue
+                hasil.append((e.path, os.stat(e.path)))
+            except OSError:
+                continue  # terhapus di tengah tick
+    hasil.sort(key=lambda x: x[0])
+    return hasil
+
+
+def _urai_berkas(path, st, awal, terlihat):
+    """urai() atas ekor berkas, di-cache per (ukuran, mtime): hanya transkrip yang berubah yang diurai ulang."""
+    terlihat.add(path)
+    kunci = (st.st_size, st.st_mtime_ns)
+    lama = _CACHE.get(path)
+    if lama and lama[0] == kunci:
+        return lama[1]
+    kejadian, d, r = baca_ekor(path, awal)
+    u = urai(kejadian)
+    if lama:  # judul dan PR bisa jatuh di luar ekor yang pendek: pertahankan yang terakhir terlihat
+        if u["judul"] is None:
+            u["judul"] = lama[1][0]["judul"]
+        if u["pr"] is None:
+            u["pr"] = lama[1][0]["pr"]
+    _CACHE[path] = (kunci, (u, d, r))
+    return u, d, r
+
+
+def _kumpulkan_subagent(folder_sesi, sekarang, terlihat):
     hasil, diurai, rusak = [], 0, 0
     epoch = sekarang.timestamp()
-    for sp in sorted(glob.glob(os.path.join(glob.escape(folder_sesi), "subagents", "agent-*.jsonl"))):
+    prasaring = HIDUP_SUB_DETIK + PRASARING_SUB_DETIK
+    for sp, st in _daftar_jsonl(os.path.join(folder_sesi, "subagents"), epoch, prasaring, "agent-"):
+        if epoch - st.st_mtime > HIDUP_SUB_DETIK:
+            continue
         try:
-            if epoch - os.path.getmtime(sp) > HIDUP_SUB_DETIK:
-                continue
-            kejadian, d, r = baca_ekor(sp, EKOR_SUB)
+            u, d, r = _urai_berkas(sp, st, EKOR_SUB, terlihat)
         except OSError:
             continue  # terkunci atau terhapus di tengah tick: coba lagi tick berikutnya
         diurai += d
         rusak += r
-        u = urai(kejadian)
         if u["akhir"] is None or selesai_giliran(u):
             continue  # subagent yang end_turn sudah pulang
         meta = _baca_json(sp[: -len(".jsonl")] + ".meta.json")
@@ -282,16 +336,21 @@ def kumpulkan(proyek_dir, workspace, sekarang):
     """Data lengkap untuk halaman, tanpa blok `penulis` (diisi pemanggil)."""
     epoch = sekarang.timestamp()
     sesi, diurai, rusak, luar, tanpa_percakapan = [], 0, 0, 0, 0
-    for path in glob.glob(os.path.join(glob.escape(proyek_dir), "*", "*.jsonl")):
+    terlihat = set()
+    try:
+        with os.scandir(proyek_dir) as entri:
+            folder_proyek = sorted(e.path for e in entri if e.is_dir())
+    except OSError:
+        folder_proyek = []
+    for path, st in [x for f in folder_proyek for x in _daftar_jsonl(f, epoch, PRASARING_UTAMA_DETIK)]:
+        if epoch - st.st_mtime > HIDUP_UTAMA_DETIK:
+            continue
         try:
-            if epoch - os.path.getmtime(path) > HIDUP_UTAMA_DETIK:
-                continue
-            kejadian, d, r = baca_ekor(path)
+            u, d, r = _urai_berkas(path, st, EKOR_UTAMA, terlihat)
         except OSError:
             continue
         diurai += d
         rusak += r
-        u = urai(kejadian)
         if u["dikenal"] == 0 and d >= MIN_BARIS_TANPA_PERCAKAPAN:
             tanpa_percakapan += 1
         if not di_dalam_workspace(u["cwd"], workspace):
@@ -304,7 +363,7 @@ def kumpulkan(proyek_dir, workspace, sekarang):
         t_selesai = _waktu(kit.get("selesai")) if kit.get("status") == "selesai" else None
         if t_selesai and (t_akhir is None or t_selesai >= t_akhir):
             continue  # SessionEnd lebih baru dari kejadian terakhir: sudah pulang (yang lebih lama = --resume)
-        anak, d2, r2 = _kumpulkan_subagent(path[: -len(".jsonl")], sekarang)
+        anak, d2, r2 = _kumpulkan_subagent(path[: -len(".jsonl")], sekarang, terlihat)
         diurai += d2
         rusak += r2
         sesi.append(dict(id=sid, judul=_potong(u["judul"] or kit.get("task") or "", 90), tahap=kit.get("tahap") or "",
@@ -314,6 +373,8 @@ def kumpulkan(proyek_dir, workspace, sekarang):
     for s in sesi:
         del s["_mulai"]
     dikenali = not (diurai and rusak * 2 > diurai) and tanpa_percakapan == 0
+    for k in [k for k in _CACHE if k not in terlihat]:
+        del _CACHE[k]  # transkrip yang tak lagi hidup tidak ditahan di memori
     return {
         "versi": VERSI_DATA,
         "dibuat": sekarang.isoformat().replace("+00:00", "Z"),
@@ -372,6 +433,7 @@ def main(argv=None):
     mode.add_argument("--loop", type=float, metavar="DETIK")
     ap.add_argument("--sepi-menit", type=float, default=60.0)
     ap.add_argument("--keluaran")
+    ap.add_argument("--log", help="catat ke berkas ini, bukan stdout/stderr (dipakai launcher)")
     a = ap.parse_args(argv)
     workspace = os.path.abspath(a.workspace)
     keluaran = a.keluaran or os.path.join(workspace, ".task-plans")
@@ -380,6 +442,12 @@ def main(argv=None):
     path_pid = os.path.join(keluaran, NAMA_PID)
     penulis = {"pid": os.getpid(), "interval_detik": a.loop or 0, "berhenti": None, "tick_ms": None}
     durasi = deque(maxlen=120)
+    # launcher memberi --log supaya proses lepas tak perlu mewarisi handle stdout/stderr siapa pun
+    log = open(a.log, "a", encoding="utf-8") if a.log else None
+
+    def catat(pesan, galat=False):
+        tujuan = log or (sys.stderr if galat else sys.stdout)
+        print("%s kantor-agent: %s" % (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), pesan), file=tujuan, flush=True)
 
     def satu_tick():
         t0 = time.perf_counter()
@@ -393,13 +461,16 @@ def main(argv=None):
         try:
             tulis_atomik(path_data, render_js(satu_tick()))
         except OSError as e:
-            print("kantor-agent: gagal menulis %s: %s" % (path_data, e), file=sys.stderr)
+            catat("gagal menulis %s: %s" % (path_data, e), galat=True)
             return 3
+        finally:
+            if log:
+                log.close()
         return 0
 
     with open(path_pid, "w", encoding="utf-8") as f:
         f.write(str(os.getpid()))
-    print("kantor-agent: pid %d menulis %s tiap %s detik" % (os.getpid(), path_data, a.loop), flush=True)
+    catat("pid %d menulis %s tiap %s detik" % (os.getpid(), path_data, a.loop))
     gagal = 0
     sepi_sejak = None
     try:
@@ -417,18 +488,20 @@ def main(argv=None):
                 gagal = 0
             except OSError as e:
                 gagal += 1
-                print("kantor-agent: gagal menulis (%d/%d): %s" % (gagal, GAGAL_TULIS_MAKS, e), file=sys.stderr, flush=True)
+                catat("gagal menulis (%d/%d): %s" % (gagal, GAGAL_TULIS_MAKS, e), galat=True)
                 if gagal >= GAGAL_TULIS_MAKS:
-                    print("kantor-agent: berhenti, %d kali berturut-turut gagal menulis" % gagal, file=sys.stderr, flush=True)
+                    catat("berhenti, %d kali berturut-turut gagal menulis" % gagal, galat=True)
                     return 3
             if sepi:
-                print("kantor-agent: tak ada sesi hidup selama %s menit, berhenti" % a.sepi_menit, flush=True)
+                catat("tak ada sesi hidup selama %s menit, berhenti" % a.sepi_menit)
                 return 0
             time.sleep(a.loop)
     except KeyboardInterrupt:
         return 0
     finally:
         _hapus_pid(path_pid)
+        if log:
+            log.close()
 
 
 if __name__ == "__main__":
