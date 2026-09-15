@@ -2,13 +2,13 @@
 
 Peminjaman ruang rapat selama ini dicatat di spreadsheet tanpa kolom status dan tanpa cek bentrok. Desain lama di vault (dikunci 2026-07-18) menaruh persetujuan di tangan tim GA lewat web dan menutup tiap booking dengan checklist kebersihan. Keputusan pemilik proses (2026-09-12) mengubahnya: karyawan **mengajukan lewat MyBharata**, **HR menunjuk siapa yang menyetujui** (bukan GA otomatis, bukan atasan pemohon), penyetuju memutus lewat MyBharata, dan **Booking Ruang menjadi satu-satunya sumber ruang kantor** bagi Agenda Kalender, Interview, Onboarding review, Program Culture, dan Pelatihan.
 
-**Terdampak**: seluruh karyawan (mengajukan), penyetuju yang ditunjuk HR (memutus), staf GA (mendaftarkan ruang, melihat jadwal), HR (menunjuk penyetuju). **Yang TIDAK dijanjikan**: peminjaman kendaraan dan barang (ditunda), checklist kebersihan (dihapus), persetujuan lewat web (tidak dibuat), durasi maksimum dan sanksi (belum ada aturan bisnisnya). **Besaran kerja**: besar, dipecah tujuh irisan; irisan 1 (inventory-service dan layar web) sudah ada di kode.
+**Terdampak**: seluruh karyawan (mengajukan), penyetuju yang ditunjuk HR (memutus), staf GA (mendaftarkan ruang, melihat jadwal), HR (menunjuk penyetuju). **Yang TIDAK dijanjikan**: peminjaman kendaraan dan barang (ditunda), checklist kebersihan (dihapus), persetujuan lewat web (semula tidak dibuat; dibalik [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]] pada 2026-09-14), durasi maksimum dan sanksi (belum ada aturan bisnisnya). **Besaran kerja**: besar, dipecah tujuh irisan; irisan 1 (inventory-service dan layar web) sudah ada di kode.
 
 ## Deskripsi
 
 *Booking ruang rapat dibangun di inventory-service dengan satu tahap persetujuan oleh daftar penyetuju yang ditunjuk HR per perusahaan. Karyawan mengajukan dan penyetuju memutus lewat MyBharata; web dipakai GA untuk mengelola ruang dan melihat jadwal, dan dipakai HR untuk menunjuk penyetuju. Kelak Booking Ruang menjadi satu-satunya sumber "ruang kantor" bagi modul lain. ADR ini mencatat penyimpangan sadar dari desain rilis-1 di [[GA - Asset Loan & Room Booking]].*
 
-- **Status**: ⚠️ **Diterima, sebagian terimplementasi** (keputusan 2026-09-12, disempurnakan hasil review 2026-09-14). Irisan 1 dari 7 ada di kode; irisan 2 sampai 7 belum.
+- **Status**: ⚠️ **Diterima, sebagian terimplementasi** (keputusan 2026-09-12, disempurnakan hasil review 2026-09-14). Irisan 1 dari 7 ada di kode; irisan 2 sampai 7 belum. **§2, satu butir Consequences, dan satu butir "Yang sengaja tidak dilakukan" diamandemen [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]]** (2026-09-14): web kini juga mengajukan dan memutus booking.
 - **Path di repo** (irisan 1):
   - `bip-erp/services/inventory/peminjaman_*.go`, `bip-erp/services/inventory/calendar_feed.go`
   - `bip-erp/shared-library/models/inventory/models.go` (koleksi), `bip-erp/shared-library/models/notification/models.go` (kategori inbox)
@@ -31,6 +31,8 @@ Peminjaman ruang rapat selama ini dicatat di spreadsheet tanpa kolom status dan 
 Tiga koleksi: `ga_ruang` (master ruang), `ga_peminjaman` (booking, field `jenis` bernilai `ruang` supaya kendaraan dan barang kelak tak butuh koleksi baru), dan `ga_peminjaman_penyetuju` (satu daftar per perusahaan). Rute berawalan `/peminjaman` (bukan `/bookings`), nomor `PJR-YYYYMMDD-nnn` (bukan `RESV-`). Kontrak lengkap di [[API - Inventory Service]].
 
 ### 2. Pemohon lewat MyBharata, web baca-saja untuk booking
+
+> ⚠️ **Diamandemen** [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]] (2026-09-14): pengajuan, perubahan jadwal, pembatalan, dan persetujuan booking kini juga dilakukan di web, lewat kartu Booking Ruang di halaman Pengajuan dan tab Perlu Keputusan. Teks di bawah dipertahankan sebagai catatan keputusan asalnya.
 
 Mengajukan cukup **identitas**, tanpa izin modul: seluruh karyawan boleh memesan ruang, sementara paket izin GA belum tentu terpasang di semua posisi. Layar pengajuan dan persetujuan di MyBharata (menu Pengajuan) adalah irisan 2. Web **tidak** menyetujui atau mengubah booking: halaman Ruang & Booking menampilkan booking sendiri, jadwal seluruh perusahaan (`ga.view`), dan master ruang (`ga.work` untuk tambah, ubah, nonaktifkan; ruang tak pernah dihapus). Detail booking di web memberi tahu pemohon dan penyetuju bahwa tindakannya dilakukan di MyBharata.
 
@@ -73,7 +75,7 @@ Irisan 3: pola harian atau mingguan, maksimal 3 bulan, satu persetujuan untuk sa
 ### Yang memburuk atau diterima sadar
 
 - **`ga.view` kini membuka jadwal seluruh booking beserta nama dan nomor WA pemohon.** Description paket "GA: Lihat" dan "GA: Pelaksana" diperbarui di kode, tetapi seed tidak menimpa dokumen yang sudah ada, jadi DB lama butuh backfill terpisah. Lihat [[CORE - RBAC dan Permission Set]].
-- **Sampai irisan 2 terbit, pengajuan dan persetujuan hanya bisa lewat API.** Web sengaja tak punya tombol aksi.
+- **Sampai irisan 2 terbit, pengajuan dan persetujuan hanya bisa lewat API.** Web sengaja tak punya tombol aksi. *Diamandemen [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]]: sejak irisan 1b web punya aksi booking.*
 - **Penyetuju basi tidak dibersihkan.** Penyetuju yang resign atau pindah tenant tetap tercatat sampai HR melepasnya; layar HR hanya menandainya.
 - **Dua perubahan isian yang bersamaan saling timpa** (yang terakhir menang). Diterima karena hanya pemohon sendiri yang bisa mengubah bookingnya.
 - **Alasan riwayat buatan server masih teks bahasa Indonesia** yang tampil apa adanya di locale en; dibuat terstruktur bersama layar MyBharata (irisan 2).
@@ -83,7 +85,7 @@ Irisan 3: pola harian atau mingguan, maksimal 3 bulan, satu persetujuan untuk sa
 
 ### Yang sengaja tidak dilakukan
 
-- Persetujuan dan perubahan booking lewat web.
+- Persetujuan dan perubahan booking lewat web. *Diamandemen [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]]: kini dibuat.*
 - Checklist kebersihan dan status `Selesai`.
 - Badge sidebar dan kartu Office Boy.
 - Durasi maksimum, kapasitas wajib, dan sanksi: aturan bisnisnya belum ada, jadi tidak dikarang.
@@ -92,6 +94,7 @@ Irisan 3: pola harian atau mingguan, maksimal 3 bulan, satu persetujuan untuk sa
 
 ## Dokumen Terkait
 
+- [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]]: amandemen §2 (aksi booking lewat web)
 - [[GA - Asset Loan & Room Booking]]: konsep domain yang desain rilis-1-nya direvisi ADR ini
 - [[Microservices - Inventory Service]] · [[API - Inventory Service]]: rumah kode dan kontrak
 - [[Microservices - Calendar Service]] · [[Microservices - Notification Service]]: feed dan kabar
