@@ -729,8 +729,8 @@
         "HRIS - Recruitment",
         "Microservices - Employee Service"
       ],
-      "hash": "1d523d108cf9a6fa945cf6087c20a39d342851631f35efeca50481ab3f999989",
-      "ukuran_kb": 36.6,
+      "hash": "8825ac444ced1768249ad4f1396d52fd12df27fbd05000890ab4fd66d383d7e7",
+      "ukuran_kb": 36.7,
       "ringkasan": "Menjawab: endpoint apa saja yang dimiliki recruitment-service (requisition, job posting, kandidat, tahap seleksi dan offer, psikotes, interview rounds dan feedback, master, onboarding, serta portal karir publik tanpa JWT) dan role atau izin mana yang boleh memanggil tiap endpoint. Juga menjelaskan siapa boleh mengajukan requisition (supervisor, jabatan berjenjang direktur lintas-departemen, pemegang `recruitment.cross_company`) serta cara kerja cakupan perusahaan pada rekrutmen lintas perusahaan: `GET /companies`, `?company=`, body `company_id`, dan kapan respons berupa 403, 404, 400, atau 503.",
       "kata_kunci": [
         "recruitment-service",
@@ -1484,8 +1484,8 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "d5631c33e092b0e522328a6a9bc6d0478f5005b8463b829c703140ba632c79b9",
-      "ukuran_kb": 450.4,
+      "hash": "7db05a7f804f2aad26b57c129c8a5e7e82526e2552bd0a740ba8082e3b2ab3f7",
+      "ukuran_kb": 450.5,
       "ringkasan": "Menjawab: apa itu portal web ERP/HRIS One Bharata (erp-frontend), stack apa yang dipakai, dan modul serta menu apa saja yang ada per kategori sidebar (termasuk Pengaturan HRGA terpusat). Juga menjelaskan cara login, refresh token, dan SSO ke aplikasi lain seperti Task Manager, bagaimana `system_roles` dan paket izin menggerbang menu, serta cara admin pusat mengelola multi-perusahaan lewat `CompanySwitcher` dan rekrutmen lintas perusahaan. Memuat konvensi frontend untuk data-fetching TanStack Query (hook sidebar ber-`enabled`, badge `refetchOnWindowFocus`, pencacah membalas angka) dan bagan Recharts dengan `ChartContainer`.",
       "kata_kunci": [
         "erp-frontend",
@@ -2888,8 +2888,8 @@
         "ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode"
       ],
-      "hash": "7071dc3528bc4241bb85304d6b9c1ce474c2090700742cbd9aacf7cb801526c9",
-      "ukuran_kb": 76.9,
+      "hash": "b0250e94bbe22b618c0850c7693c8d2608573e020447d03771dda2cc74b4c163",
+      "ukuran_kb": 77.1,
       "ringkasan": "Menjawab: bagaimana recruitment-service diimplementasikan (Go/Fiber, `recruitment_db`, port 6979, cara deploy) dan bagaimana tiap tahap pipeline bekerja di kode, mulai approval requisition oleh SPV HRD, katalog babak `interview_round` beserta `form_type`, perekaman hasil tes yang menggerakkan `progress` dan status kandidat (SP-Wiring), background check, psikotes Kraepelin, sampai offer dan onboarding. Juga mencatat riwayat increment seperti apply publik, notifikasi email kandidat, konversi kandidat jadi karyawan, form feedback interview via link email, dan rekrutmen lintas perusahaan (penurunan `company_id`, backfill, cache master perusahaan, penjaga pemindai sumber).",
       "kata_kunci": [
         "recruitment-service",
@@ -9109,8 +9109,8 @@
         "HRIS - Big Pictures",
         "HRIS - Recruitment Roadmap (Adopsi ERPGo)"
       ],
-      "hash": "c90fc18f7678669f29e2417a91450045c716eedde4b01723d93aadf42f1bb2be",
-      "ukuran_kb": 53.7,
+      "hash": "bd45be3e856679ff1841f6bd12b22d236dff5bd81f16c4b345853c4280fef8ff",
+      "ukuran_kb": 54.0,
       "ringkasan": "Menjawab: bagaimana alur rekrutmen end-to-end dari sisi bisnis HRD, mulai Form Permintaan Karyawan dan persetujuan SPV HRD, sourcing lewat Glints/TapLoker, screening CV manual, interview multi-tahap dengan feedback pewawancara, psikotes dan technical test, background check, offer, sampai onboarding dan masa evaluasi. Juga menjelaskan aktor dan persona yang terlibat, model data `progress` dan `status` kandidat, rekrutmen lintas perusahaan (siapa boleh mengelola perusahaan lain dan kenapa penyetuju requisition tetap satu tim di BIP), keputusan yang sudah disepakati HRD, pertanyaan yang masih terbuka, dan tahapan rollout.",
       "kata_kunci": [
         "rekrutmen",
