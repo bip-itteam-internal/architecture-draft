@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kantor Agent</title>
+<!--
+  kantor-agent.template.html: SATU-SATUNYA penulis UI Kantor Agent (/kantor-agent).
+
+  Data dari kantor-agent-data.js (ditulis kantor-agent.py) dimuat ulang tiap 2 detik lewat <script>
+  yang disuntik ulang. Cara ini jalan di file:// tanpa server, dan terbukti membaca isi terbaru
+  (spike CDP 2026-09-15). Halaman ini TIDAK menurunkan keadaan dari transkrip: aturan area, keadaan,
+  dan peran hanya ada di penulis. Yang diputuskan di sini hanya penempatan: pod, slot, rute jalan,
+  histeresis berpikir, dan label.
+
+  Palet identitas: 6 slot palet dark /dashboard (divalidasi validate_palette.js 2026-09-07). Lead ke-7
+  dan seterusnya abu netral; identitas tak pernah bergantung pada warna saja karena nama selalu tertulis.
+  Desain: architecture-draft/.agent-kit/docs/2026-09-15-kantor-agent-design.md
+-->
+<style>
+:root{
+  --page:#0d0d0d; --surface:#1a1a19; --border:rgba(255,255,255,.10);
+  --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781; --grid:#2c2c2a;
+  --good:#0ca30c; --warning:#fab219; --serious:#ec835a;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--page);color:var(--ink-2);font:13px/1.5 var(--mono)}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 20px;border-bottom:1px solid var(--border)}
+header h1{margin:0;font-size:13px;letter-spacing:.14em;color:var(--ink);font-weight:600}
+.info{color:var(--muted);font-size:12px}
+.status{margin-left:auto;font-size:12px;color:var(--muted)}
+.status.live{color:var(--good)}
+.status.basi{color:var(--warning)}
+.banner{margin:10px 20px 0;padding:8px 12px;border-radius:4px;border:1px solid var(--warning);color:var(--ink);background:rgba(250,178,25,.08);font-size:12px}
+.banner.galat{border-color:var(--serious);background:rgba(236,131,90,.10)}
+.legenda{margin:0;padding:8px 20px 0;color:var(--muted);font-size:12px}
+.legenda b{color:var(--ink-2);font-weight:600}
+.tab{display:flex;flex-wrap:wrap;gap:6px;padding:10px 20px 0}
+.tab button{font:inherit;font-size:12px;background:var(--surface);color:var(--ink-2);border:1px solid var(--border);border-radius:4px;padding:3px 10px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.tab button i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.tab button[aria-pressed="true"]{color:var(--ink);border-color:var(--ink-2);font-weight:600}
+main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;padding:12px 20px 16px}
+@media (max-width:1100px){main{grid-template-columns:1fr}}
+.panggung{position:relative;border:1px solid var(--border);border-radius:6px;background:radial-gradient(ellipse at 50% 45%,#1d2230 0,#0d0d0d 75%);overflow:hidden}
+.panggung svg{display:block;width:100%;height:auto}
+.panggung.basi #dunia .robot,.panggung.basi #label{opacity:.4}
+.kosong-panggung{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);margin:0;padding:10px 14px;max-width:80%;text-align:center;background:rgba(13,13,13,.88);border:1px solid var(--border);border-radius:4px;color:var(--ink-2)}
+svg text{font-family:var(--mono)}
+.papan rect{fill:rgba(13,13,13,.82);stroke:rgba(255,255,255,.2)}
+.papan text{fill:#fff;font-size:8.5px;letter-spacing:.12em;font-weight:700}
+.tag rect.dasar{fill:rgba(10,10,10,.9)}
+.tag text{fill:#fff;font-size:8px}
+.gelembung rect{fill:#fff}
+.gelembung text{fill:#111;font-size:7.5px}
+.robot{cursor:pointer}
+.robot .badan{transform-box:fill-box;transform-origin:50% 100%}
+.robot.jalan .badan{animation:langkah .3s linear infinite}
+.robot.ketik .badan{animation:ketik .45s ease-in-out infinite}
+.robot.baca .badan{animation:baca 2.4s ease-in-out infinite}
+.robot.redup{opacity:.45}
+.robot.sorot{filter:drop-shadow(0 0 5px #fff)}
+.tag.redup,.gelembung.redup{opacity:.45}
+.led{animation:kedip 1.4s steps(1) infinite}
+.pikir circle{fill:#fff;animation:titik 1.5s ease-in-out infinite}
+.pikir circle:nth-child(2){animation-delay:.25s}
+.pikir circle:nth-child(3){animation-delay:.5s}
+@keyframes langkah{50%{transform:translateY(-1.5px)}}
+@keyframes ketik{50%{transform:translateY(-1px)}}
+@keyframes baca{50%{transform:rotate(-3deg)}}
+@keyframes kedip{50%{opacity:.25}}
+@keyframes titik{0%,100%{opacity:.25}50%{opacity:1}}
+aside{border:1px solid var(--border);border-radius:6px;background:var(--surface);padding:12px 14px;max-height:800px;overflow:auto}
+aside h2{margin:0 0 8px;font-size:11px;letter-spacing:.14em;color:var(--muted);font-weight:600}
+aside h2.jarak{margin-top:14px}
+.kartu{border-top:1px solid var(--grid);padding:8px 6px;margin:0 -6px;border-radius:4px}
+.kartu:first-child{border-top:0}
+.kartu.sorot{background:rgba(255,255,255,.05)}
+.kepala{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.kepala i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.kepala b{color:#fff}
+.chip{border:1px solid var(--border);border-radius:3px;padding:0 6px;font-size:11px}
+.chip.peringatan{border-color:var(--warning);color:var(--warning)}
+.judul{color:var(--ink);margin:3px 0 2px}
+.kini{font-size:12px}
+.anak{font-size:11px;color:var(--muted);padding-left:10px}
+.kosong{color:var(--muted);font-size:12px;margin:0}
+.feed{list-style:none;margin:0;padding:0;font-size:11px}
+.feed li{padding:3px 0;border-top:1px solid var(--grid)}
+.feed li:first-child{border-top:0}
+.feed i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.feed time{color:var(--muted);margin-right:6px}
+footer{padding:0 20px 20px;color:var(--muted);font-size:11px}
+footer ul{margin:0;padding-left:18px}
+footer li{margin:2px 0}
+@media (prefers-reduced-motion:reduce){.robot .badan,.led,.pikir circle{animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1>KANTOR AGENT</h1>
+  <span class="info" id="info">menunggu penulis</span>
+  <span class="status" id="status"></span>
+</header>
+<div class="banner" id="banner" role="status" hidden></div>
+<p class="legenda"><b>Perpustakaan</b> baca &amp; cari · <b>Meja</b> edit &amp; berpikir · <b>Ruang server</b> PowerShell, test, build, git · <b>Ruang rapat</b> menunggu subagent · <b>Lounge</b> menunggu Anda</p>
+<nav class="tab" id="tab" aria-label="Lead"></nav>
+
+<main>
+  <div class="panggung" id="panggung">
+    <svg id="denah" viewBox="-450 -150 1000 640" role="img" aria-label="Denah kantor agent"></svg>
+    <p class="kosong-panggung" id="kosong">Menunggu penulis...</p>
+  </div>
+  <aside>
+    <h2>LEAD HIDUP</h2>
+    <div id="panel"><p class="kosong">Belum ada data.</p></div>
+    <h2 class="jarak">FEED PERPINDAHAN</h2>
+    <ol class="feed" id="feed"><li class="kosong">Belum ada perpindahan.</li></ol>
+  </aside>
+</main>
+
+<footer><ul>
+  <li>Sesi hidup = transkrip Claude Code ditulis dalam 30 menit terakhir dan cwd-nya di dalam workspace ini. Satu mesin saja.</li>
+  <li>Prompt izin tidak tercatat di transkrip: tanda <b>?</b> pada tool yang berjalan lebih dari 60 detik berarti tool itu mungkin sedang menunggu persetujuan.</li>
+  <li>Menunggu tugas shell latar tampil sebagai "menunggu Anda"; subagent latar tampil sebagai robot kecil.</li>
+  <li>Format transkrip dinyatakan internal oleh Claude Code dan bisa berubah di rilis mana pun; bila begitu, halaman ini menampilkan peringatan, bukan kantor kosong.</li>
+</ul></footer>
+
+<script>
+(function () {
+  'use strict';
+  var NS = 'http://www.w3.org/2000/svg';
+  var HW = 20, HH = 10, HZ = 22, W = 26, D = 20;
+  var INTERVAL_MUAT = 2000, BASI_MS = 10000, BERPIKIR_KE_MEJA_MS = 20000;
+  var JALAN_MIN_MS = 400, JALAN_MAKS_MS = 3000, KECEPATAN = 7;   // unit lantai per detik
+  var PADAT = 4;                                                  // robot per ruang sebelum label ringkas
+  var RUANG_PADAT = { perpustakaan: 1, server: 1, rapat: 1, lounge: 1, koridor: 1 };
+  var WARNA = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300'];
+  var ABU = '#8a8f98', LED_KOSONG = '#3a3f48';
+  var NAMA_AREA = { perpustakaan: 'Perpustakaan', meja: 'Meja', server: 'Ruang server', rapat: 'Ruang rapat', lounge: 'Lounge', koridor: 'Koridor', pintu: 'Pintu' };
+
+  var svg = document.getElementById('denah');
+  var panggung = document.getElementById('panggung');
+  var elInfo = document.getElementById('info');
+  var elStatus = document.getElementById('status');
+  var elBanner = document.getElementById('banner');
+  var elTab = document.getElementById('tab');
+  var elPanel = document.getElementById('panel');
+  var elFeed = document.getElementById('feed');
+  var elKosong = document.getElementById('kosong');
+  var gerakHalus = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var halamanMulai = Date.now();
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function potong(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+  function P(x, y, z) { return [(x - y) * HW, (x + y) * HH - (z || 0) * HZ]; }
+  function pts(a) { return a.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' '); }
+  function durasi(d) {
+    if (d == null) return '';
+    if (d < 60) return d + 's';
+    if (d < 3600) return Math.floor(d / 60) + 'm' + String(d % 60).padStart(2, '0') + 's';
+    return Math.floor(d / 3600) + 'j' + String(Math.floor(d / 60) % 60).padStart(2, '0') + 'm';
+  }
+  function jam(iso) { var t = Date.parse(iso); return isNaN(t) ? '?' : new Date(t).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+  function campur(hex, t) {
+    var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255, tuju = t < 0 ? 0 : 255, k = Math.abs(t);
+    r = Math.round(r + (tuju - r) * k); g = Math.round(g + (tuju - g) * k); b = Math.round(b + (tuju - b) * k);
+    return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
+  }
+  // balok isometrik: yang terlihat hanya sisi selatan (kiri layar), timur (kanan layar), dan atas
+  function box(x, y, z, w, d, h, warna, o) {
+    o = o || {};
+    var ek = (o.opacity != null ? ' fill-opacity="' + o.opacity + '"' : '') + (o.garis ? ' stroke="' + o.garis + '" stroke-width=".5"' : '');
+    var puncak = [P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)];
+    var timur = [P(x + w, y, z + h), P(x + w, y + d, z + h), P(x + w, y + d, z), P(x + w, y, z)];
+    var selatan = [P(x, y + d, z + h), P(x + w, y + d, z + h), P(x + w, y + d, z), P(x, y + d, z)];
+    return '<polygon points="' + pts(selatan) + '" fill="' + campur(warna, -0.1) + '"' + ek + '/>' +
+      '<polygon points="' + pts(timur) + '" fill="' + campur(warna, -0.28) + '"' + ek + '/>' +
+      '<polygon points="' + pts(puncak) + '" fill="' + campur(warna, 0.08) + '"' + ek + '/>';
+  }
+  function mukaSelatan(y, x0, x1, z0, z1, warna, ekstra) {
+    return '<polygon' + (ekstra || '') + ' points="' + pts([P(x0, y, z1), P(x1, y, z1), P(x1, y, z0), P(x0, y, z0)]) + '" fill="' + warna + '"/>';
+  }
+  function lantai(x, y, w, d, warna) { return '<polygon points="' + pts([P(x, y), P(x + w, y), P(x + w, y + d), P(x, y + d)]) + '" fill="' + warna + '"/>'; }
+  function segmen(a, b, celah) {
+    var out = [];
+    for (var s = a; s < b - 1e-6; s += 1) {
+      var s0 = s, s1 = Math.min(s + 1, b);
+      (celah || []).forEach(function (c) {
+        if (s1 <= c[0] || s0 >= c[1]) return;
+        if (s0 < c[0]) out.push([s0, c[0]]);
+        s0 = Math.max(s0, c[1]);
+      });
+      if (s1 - s0 > 1e-6) out.push([s0, s1]);
+    }
+    return out;
+  }
+
+  // ---------------- geometri: pod, slot, koridor ----------------
+  var POD = [[1.4, 8.7], [5.4, 8.7], [9.4, 8.7], [13.4, 8.7], [1.4, 11.9], [5.4, 11.9], [9.4, 11.9], [13.4, 11.9]];
+  var KURSI_RAPAT = [];
+  for (var kr = 0; kr < 8; kr++) { var sud = Math.PI / 8 + kr * Math.PI / 4; KURSI_RAPAT.push([22 + 2.55 * Math.cos(sud), 11.5 + 2.55 * Math.sin(sud)]); }
+  var H1 = 7.0, H2 = 16.6, V1 = 17.4;
+  function s1(x) { return { x: x, y: H1, seg: 'H1' }; }
+  function s2(x) { return { x: x, y: H2, seg: 'H2' }; }
+  function sv(y) { return { x: V1, y: y, seg: 'V1' }; }
+  function spot(grup, x, y, dz, sambung, masuk) {
+    return { grup: grup, x: x, y: y, dz: dz == null ? null : dz, sambung: sambung, masuk: (masuk || []).map(function (p) { return { x: p[0], y: p[1] }; }) };
+  }
+  var PINTU = spot('pintu', 0.55, 18.5, null, s2(1.2), [[1.2, 18.5]]);
+  var SPOT = {
+    perpustakaan: [[1.65, 1.6], [4.35, 1.6], [7.55, 1.6], [10.25, 1.6], [3.2, 4.75], [4.6, 4.75], [8.0, 4.75], [9.4, 4.75], [1.2, 3.3], [11.0, 3.3]]
+      .map(function (p) { return spot('perpustakaan', p[0], p[1], null, s1(6), [[6, 6.0], [6, 5.3]]); }),
+    server: [[13.55, 1.8], [14.95, 1.8], [16.35, 1.8], [17.75, 1.8], [19.15, 1.8], [20.55, 1.8], [21.95, 5.0, 0.47], [23.05, 5.0, 0.47], [24.2, 3.6]]
+      .map(function (p) { return spot('server', p[0], p[1], p[2], s1(15), [[15, 6.0], [15, 5.3]]); }),
+    rapat: KURSI_RAPAT.map(function (p) { return spot('rapat', p[0], p[1], 0.42, sv(11.25), [[18.0, 11.25], [19.3, 11.25]]); }),
+    lounge: [[18.8, 19.3, 0.42], [21.2, 19.3, 0.42], [20.0, 19.3, 0.42], [20.5, 16.95, 0.45], [21.8, 16.95, 0.45], [12.45, 17.65, 0.5], [14.05, 17.95, 0.5], [23.6, 18.2]]
+      .map(function (p) { return spot('lounge', p[0], p[1], p[2], s2(Math.min(25, p[0])), []); }),
+    koridor: [],
+    cadangan: []
+  };
+  for (var kk = 0; kk < 16; kk++) SPOT.koridor.push(spot('koridor', 2 + kk * 1.45, H1, null, s1(2 + kk * 1.45), []));
+  for (var kc = 0; kc < 6; kc++) SPOT.cadangan.push(spot('cadangan', 2.8 + kc * 2.1, 14.6, 0.42, s2(1.4), [[1.4, 14.6]]));
+  var SPOT_LEAD_POD = POD.map(function (p, n) { return spot('pod' + n, p[0] + 0.8, p[1] + 0.45, 0.47, s1(p[0] - 0.8), [[p[0] - 0.8, p[1] + 0.45]]); });
+  POD.forEach(function (p, n) {
+    var px = p[0], py = p[1];
+    SPOT['pod' + n] = [
+      spot('pod' + n, px - 0.45, py + 1.5, 0.42, s1(px - 0.8), [[px - 0.8, py + 1.5]]),
+      spot('pod' + n, px + 2.85, py + 1.5, 0.42, s1(px + 3.2), [[px + 3.2, py + 1.5]]),
+      spot('pod' + n, px + 0.9, py + 2.6, null, s1(px - 0.8), [[px - 0.8, py + 2.6]]),
+      spot('pod' + n, px + 1.8, py + 2.6, null, s1(px - 0.8), [[px - 0.8, py + 2.6]])
+    ];
+  });
+  var slotMilik = {};
+  Object.keys(SPOT).forEach(function (k) { slotMilik[k] = []; });
+  var J1 = { x: V1, y: H1, seg: 'V1' }, J2 = { x: V1, y: H2, seg: 'V1' };
+  function jalurKoridor(a, b) {
+    if (a.seg === b.seg) return [b];
+    var ke = { H1: J1, H2: J2 };
+    if (a.seg === 'V1') return [ke[b.seg], b];
+    if (b.seg === 'V1') return [ke[a.seg], b];
+    return [ke[a.seg], ke[b.seg], b];
+  }
+  function proyeksiKoridor(x, y) {
+    var c = [
+      { x: Math.max(0.8, Math.min(25.2, x)), y: H1, seg: 'H1' },
+      { x: Math.max(0.8, Math.min(25.2, x)), y: H2, seg: 'H2' },
+      { x: V1, y: Math.max(H1, Math.min(H2, y)), seg: 'V1' }
+    ];
+    c.sort(function (a, b) { return Math.hypot(a.x - x, a.y - y) - Math.hypot(b.x - x, b.y - y); });
+    return c[0];
+  }
+
+  // ---------------- denah statis, dirender sekali ke kelompok kedalaman ----------------
+  var KELOMPOK_MIN = -2, KELOMPOK_MAKS = 60, KELOMPOK_DEPAN = 99;
+  function idxKelompok(k) { return k >= 1000 ? KELOMPOK_DEPAN : Math.max(KELOMPOK_MIN, Math.min(KELOMPOK_MAKS, Math.floor(k))); }
+  var kelompokEl = new Map();
+  var ledPod = [];
+  var PAPAN_KOTAK = [];
+  var elPapanTeks = {};
+  var lapisLabel = null;
+
+  function bangunDenah() {
+    var lapisLantai = [], item = [], papan = [];
+    function taruh(k, s) { item.push({ k: k, s: s }); }
+
+    lapisLantai.push(box(0, 0, -0.45, W, D, 0.45, '#6f685c'));
+    lapisLantai.push(lantai(0, 0, W, D, '#dccfb4'));
+    lapisLantai.push(lantai(0, 0, 12, 6, '#c2a47c'));
+    lapisLantai.push(lantai(12, 0, 14, 6, '#aab1ba'));
+    lapisLantai.push(lantai(0, 6, 26, 2, '#e6dcc6'));
+    lapisLantai.push(lantai(18, 8, 8, 7, '#9c9fbf'));
+    lapisLantai.push(lantai(0, 16.9, 9, 3.1, '#cdbf9f'));
+    lapisLantai.push(lantai(17, 16.3, 8.6, 3.5, '#8fa07e'));
+    lapisLantai.push(lantai(0.25, 17.8, 1.6, 1.4, '#3b3f46'));
+    var grid = '';
+    for (var i = 1; i < W; i++) { var a = P(i, 0), b = P(i, D); grid += '<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"/>'; }
+    for (var j = 1; j < D; j++) { var c = P(0, j), e = P(W, j); grid += '<line x1="' + c[0] + '" y1="' + c[1] + '" x2="' + e[0] + '" y2="' + e[1] + '"/>'; }
+    lapisLantai.push('<g stroke="#000" stroke-opacity=".06" stroke-width=".6">' + grid + '</g>');
+
+    var DINDING = '#ece7dc';
+    taruh(-102, box(-0.25, -0.25, 0, 0.25, 0.25, 3.2, DINDING));
+    segmen(0, W).forEach(function (s) { taruh(-101 + s[0] * 0.001, box(s[0], -0.25, 0, s[1] - s[0], 0.25, 3.2, DINDING)); });
+    segmen(0, D, [[17.6, 19.4]]).forEach(function (s) { taruh(-101 + s[0] * 0.001, box(-0.25, s[0], 0, 0.25, s[1] - s[0], 3.2, DINDING)); });
+    taruh(-100, '<polygon points="' + pts([P(0, 17.6, 2.4), P(0, 19.4, 2.4), P(0, 19.4, 0), P(0, 17.6, 0)]) + '" fill="#20242b"/>' +
+      box(-0.25, 17.6, 2.4, 0.25, 1.8, 0.8, DINDING) + box(-0.06, 17.48, 0, 0.12, 0.12, 2.45, '#8a6a47') + box(-0.06, 19.4, 0, 0.12, 0.12, 2.45, '#8a6a47'));
+    taruh(-99, box(0, 9.4, 1.0, 0.06, 3.4, 1.25, '#f7f7f5') +
+      '<polyline points="' + pts([P(0.07, 10.0, 1.9), P(0.07, 10.8, 1.75), P(0.07, 11.6, 1.95)]) + '" stroke="#3987e5" stroke-width="1.2" fill="none"/>' +
+      '<polyline points="' + pts([P(0.07, 10.2, 1.45), P(0.07, 12.2, 1.45)]) + '" stroke="#d95926" stroke-width="1.2" fill="none"/>');
+    segmen(0, W).forEach(function (s) { taruh(1000 + s[0], box(s[0], D, 0, s[1] - s[0], 0.22, 0.55, '#d8d2c4')); });
+    segmen(0, D).forEach(function (s) { taruh(1000 + s[0], box(W, s[0], 0, 0.22, s[1] - s[0], 0.55, '#d8d2c4')); });
+    taruh(1100, box(W, D, 0, 0.22, 0.22, 0.55, '#d8d2c4'));
+
+    var KACA = '#b9d3e6';
+    function kaca(sumbu, tetap, dari, sampai, celah) {
+      segmen(dari, sampai, celah).forEach(function (s) {
+        var bx = sumbu === 'x'
+          ? box(s[0], tetap - 0.05, 0, s[1] - s[0], 0.1, 2.3, KACA, { opacity: 0.28, garis: '#e8f3fb' })
+          : box(tetap - 0.05, s[0], 0, 0.1, s[1] - s[0], 2.3, KACA, { opacity: 0.28, garis: '#e8f3fb' });
+        taruh((s[0] + s[1]) / 2 + tetap, bx);
+      });
+    }
+    kaca('y', 12, 0, 6);
+    kaca('x', 6, 0, 12, [[5, 7]]);
+    kaca('x', 6, 12, 26, [[14, 16]]);
+    kaca('y', 18, 8, 15, [[10.5, 12]]);
+    kaca('x', 8, 18, 26);
+    kaca('x', 15, 18, 26);
+
+    function tanaman(x, y) {
+      taruh(x + y, box(x - 0.2, y - 0.2, 0, 0.4, 0.4, 0.4, '#b56b45') + box(x - 0.3, y - 0.3, 0.4, 0.6, 0.6, 0.55, '#3f8f52') + box(x - 0.18, y - 0.18, 0.95, 0.36, 0.36, 0.3, '#4fa862'));
+    }
+    var BUKU = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#e8e3d6', '#5b6b8c'];
+    function rakBuku(x, y, w) {
+      var s = box(x, y, 0, w, 0.7, 2.5, '#7a5a36');
+      [0.2, 0.95, 1.7].forEach(function (z, r) {
+        var cx = x + 0.12, n = 0;
+        while (cx < x + w - 0.25) {
+          var bw = 0.12 + ((n * 7 + r * 3) % 4) * 0.04, bh = 0.45 + ((n * 5 + r) % 3) * 0.08;
+          s += box(cx, y + 0.62, z, bw, 0.12, bh, BUKU[(n + r * 2) % BUKU.length]);
+          cx += bw + 0.02; n++;
+        }
+      });
+      taruh(x + w / 2 + y + 0.35, s);
+    }
+    function mejaBaca(x, y) {
+      var s = '';
+      [[0.15, 0.15], [2.33, 0.15], [0.15, 0.93], [2.33, 0.93]].forEach(function (p) { s += box(x + p[0], y + p[1], 0, 0.12, 0.12, 0.7, '#5a4630'); });
+      s += box(x, y, 0.7, 2.6, 1.2, 0.08, '#a07b52') + box(x + 0.9, y + 0.4, 0.78, 0.5, 0.35, 0.08, '#d55181');
+      taruh(x + 1.3 + y + 0.6, s);
+    }
+    function rakServer(x, y) {
+      var s = box(x, y, 0, 1.1, 0.8, 2.6, '#2a2f37');
+      for (var r = 0; r < 6; r++) {
+        var z = 0.3 + r * 0.38, warna = r % 3 === 0 ? '#3987e5' : '#3cdc8c';
+        s += mukaSelatan(y + 0.8, x + 0.15, x + 0.35, z, z + 0.08, warna, ' class="led" style="animation-delay:' + (((x * 10 + r * 3) % 10) / 10).toFixed(1) + 's"');
+        s += mukaSelatan(y + 0.8, x + 0.45, x + 0.98, z + 0.02, z + 0.05, '#15181d');
+      }
+      taruh(x + 0.55 + y + 0.4, s);
+    }
+    function mejaKonsol(x, y) {
+      var s = '';
+      [[0.15, 0.15], [2.53, 0.15], [0.15, 0.73], [2.53, 0.73]].forEach(function (p) { s += box(x + p[0], y + p[1], 0, 0.12, 0.12, 0.7, '#3a3d44'); });
+      s += box(x, y, 0.7, 2.8, 1.0, 0.08, '#5b6270');
+      [0.3, 1.5].forEach(function (a) {
+        s += box(x + a, y + 0.05, 0.78, 0.95, 0.08, 0.55, '#1b1e24');
+        s += mukaSelatan(y + 0.13, x + a + 0.06, x + a + 0.89, 0.83, 1.28, '#2a6f97');
+      });
+      taruh(x + 1.4 + y + 0.5, s);
+    }
+    function kursi(x, y, warna) {
+      taruh(x + y - 0.05, box(x - 0.05, y - 0.05, 0, 0.1, 0.1, 0.38, '#3a3d44') + box(x - 0.28, y - 0.32, 0.46, 0.56, 0.08, 0.5, warna) + box(x - 0.28, y - 0.25, 0.38, 0.56, 0.52, 0.09, warna));
+    }
+    function bangku(x, y, warna) {
+      taruh(x + y - 0.05, box(x - 0.05, y - 0.05, 0, 0.1, 0.1, 0.34, '#3a3d44') + box(x - 0.22, y - 0.22, 0.34, 0.44, 0.44, 0.08, warna || '#7b8190'));
+    }
+    function kursiSantai(x, y) {   // sandaran di utara: yang duduk menghadap penonton
+      taruh(x + y - 0.1, box(x - 0.38, y - 0.3, 0, 0.76, 0.66, 0.42, '#6b7fa8') + box(x - 0.38, y - 0.42, 0.42, 0.76, 0.2, 0.46, '#5c6f96'));
+    }
+    function sofa(x, y, w) {        // sandaran di utara, menghadap penonton
+      taruh(x - 0.2 + y, box(x - 0.2, y, 0, 0.2, 0.9, 0.62, '#3f4a73'));
+      segmen(x, x + w).forEach(function (s) { taruh((s[0] + s[1]) / 2 + y - 0.1, box(s[0], y, 0, s[1] - s[0], 0.9, 0.42, '#4d5a8a') + box(s[0], y, 0.42, s[1] - s[0], 0.25, 0.52, '#44507c')); });
+      taruh(x + w + y + 0.95, box(x + w, y, 0, 0.2, 0.9, 0.62, '#3f4a73'));
+    }
+    function pod(n) {
+      var px = POD[n][0], py = POD[n][1], dx = px, dy = py + 0.9, s = '';
+      [[0.1, 0.1], [2.18, 0.1], [0.1, 0.98], [2.18, 0.98]].forEach(function (p) { s += box(dx + p[0], dy + p[1], 0, 0.12, 0.12, 0.7, '#4a3a28'); });
+      s += box(dx, dy, 0.7, 2.4, 1.2, 0.08, '#b08a5f');
+      s += box(dx + 0.35, dy + 0.3, 0.78, 0.7, 0.25, 0.03, '#d9d6cf');
+      s += box(dx + 1.55, dy + 0.85, 0.78, 0.12, 0.12, 0.22, '#2a2d33');
+      s += box(dx + 1.1, dy + 0.9, 1.0, 1.0, 0.1, 0.55, '#23262d');
+      s += mukaSelatan(dy + 1.0, dx + 1.2, dx + 2.0, 1.06, 1.12, LED_KOSONG, ' id="led-pod-' + n + '"');
+      taruh(dx + 1.2 + dy + 0.6, s);
+      kursi(px + 0.8, py + 0.45, '#5a5f6b');
+      bangku(px - 0.45, py + 1.5);
+      bangku(px + 2.85, py + 1.5);
+    }
+    function mejaBundar(cx, cy, r) {
+      var atas = P(cx, cy, 0.76), bawah = P(cx, cy, 0.66), rx = r * HW * Math.SQRT2, ry = r * HH * Math.SQRT2;
+      var s = box(cx - 0.2, cy - 0.2, 0, 0.4, 0.4, 0.66, '#3a3d44');
+      s += '<path d="M' + (atas[0] - rx) + ',' + atas[1] + ' L' + (bawah[0] - rx) + ',' + bawah[1] + ' A' + rx + ',' + ry + ' 0 0 0 ' + (bawah[0] + rx) + ',' + bawah[1] + ' L' + (atas[0] + rx) + ',' + atas[1] + ' Z" fill="#7d6446"/>';
+      s += '<ellipse cx="' + atas[0] + '" cy="' + atas[1] + '" rx="' + rx + '" ry="' + ry + '" fill="#b8996e"/>';
+      taruh(cx + cy, s);
+    }
+
+    [0.4, 3.1, 6.3, 9.0].forEach(function (x) { rakBuku(x, 0.05, 2.5); });
+    mejaBaca(2.4, 3.0); mejaBaca(7.2, 3.0);
+    tanaman(11.4, 5.4);
+    [13.0, 14.4, 15.8, 17.2, 18.6, 20.0].forEach(function (x) { rakServer(x, 0.15); });
+    rakServer(24.7, 0.4); rakServer(24.7, 1.8);
+    mejaKonsol(21.2, 3.6);
+    kursi(21.95, 5.0, '#5a5f6b'); kursi(23.05, 5.0, '#5a5f6b');
+    POD.forEach(function (_, n) { pod(n); });
+    segmen(2.0, 14.0).forEach(function (s) { taruh((s[0] + s[1]) / 2 + 15.55, box(s[0] + 0.44, 15.5, 0, 0.12, 0.12, 0.7, '#4a3a28') + box(s[0], 15.1, 0.7, s[1] - s[0], 0.9, 0.08, '#c2a57c')); });
+    SPOT.cadangan.forEach(function (sp) { bangku(sp.x, sp.y); });
+    tanaman(0.6, 7.3); tanaman(17.4, 7.3); tanaman(17.4, 16.0); tanaman(25.4, 7.5);
+    mejaBundar(22, 11.5, 1.8);
+    KURSI_RAPAT.forEach(function (p) { bangku(p[0], p[1], '#5a5f6b'); });
+    sofa(18.2, 18.85, 3.6);
+    kursiSantai(20.5, 16.95); kursiSantai(21.8, 16.95);
+    taruh(20.2 + 0.9 + 17.9 + 0.4, box(20.2, 17.9, 0, 1.8, 0.7, 0.36, '#8a6a47'));
+    taruh(12.45 + 17.65, box(12.1, 17.3, 0, 0.7, 0.7, 0.35, '#d98a4a') + box(12.2, 17.4, 0.35, 0.5, 0.5, 0.15, '#e39a5c'));
+    taruh(14.05 + 17.95, box(13.7, 17.6, 0, 0.7, 0.7, 0.35, '#c65a7a') + box(13.8, 17.7, 0.35, 0.5, 0.5, 0.15, '#d06c8a'));
+    segmen(10.6, 15.2).forEach(function (s) { taruh((s[0] + s[1]) / 2 + 19.45, box(s[0], 19.15, 0, s[1] - s[0], 0.65, 0.95, '#d9d3c7')); });
+    taruh(11.2 + 19.45 + 0.1, box(11.0, 19.25, 0.95, 0.45, 0.4, 0.5, '#2f333a'));
+    taruh(15.8 + 19.4, box(15.4, 19.0, 0, 0.8, 0.8, 1.9, '#dfe3e8'));
+    tanaman(9.6, 19.4); tanaman(25.5, 15.6);
+    segmen(3.0, 6.4).forEach(function (s) { taruh((s[0] + s[1]) / 2 + 17.7, box(s[0], 17.3, 0, s[1] - s[0], 0.8, 1.0, '#e2d8c5')); });
+    tanaman(8.4, 17.4);
+
+    function tandaArea(area, teks, x, y, z) {
+      var p = P(x, y, z), w = (teks.length + 3) * 5.6 + 14;
+      papan.push('<g class="papan" transform="translate(' + p[0].toFixed(1) + ',' + p[1].toFixed(1) + ')"><rect x="' + (-w / 2) + '" y="-10" width="' + w + '" height="14" rx="2"/><text id="papan-' + area + '" text-anchor="middle" y="0.5">' + teks + '</text></g>');
+      PAPAN_KOTAK.push([p[0] - w / 2, p[1] - 10, p[0] + w / 2, p[1] + 4]);
+    }
+    tandaArea('perpustakaan', 'PERPUSTAKAAN', 6, 3, 3.3);
+    tandaArea('server', 'RUANG SERVER', 19, 3, 3.3);
+    tandaArea('meja', 'AREA MEJA · 8 POD', 8.5, 8.2, 2.3);
+    tandaArea('rapat', 'RUANG RAPAT', 22, 8.6, 2.9);
+    tandaArea('lounge', 'LOUNGE', 23.2, 16.3, 2.2);
+    tandaArea('pintu', 'PINTU MASUK', 1.6, 18.5, 3.1);
+
+    item.sort(function (a, b) { return a.k - b.k; });
+    var isi = new Map();
+    item.forEach(function (it) { var k = idxKelompok(it.k); isi.set(k, (isi.get(k) || '') + it.s); });
+    var dunia = '';
+    for (var kx = KELOMPOK_MIN; kx <= KELOMPOK_MAKS; kx++) dunia += '<g data-k="' + kx + '">' + (isi.get(kx) || '') + '</g>';
+    dunia += '<g data-k="' + KELOMPOK_DEPAN + '">' + (isi.get(KELOMPOK_DEPAN) || '') + '</g>';
+    svg.innerHTML = '<g id="lantai">' + lapisLantai.join('') + '</g><g id="dunia">' + dunia + '</g><g id="papan-area">' + papan.join('') + '</g><g id="label"></g>';
+    svg.querySelectorAll('#dunia > g').forEach(function (g) { kelompokEl.set(Number(g.getAttribute('data-k')), g); });
+    POD.forEach(function (_, n) { ledPod.push(document.getElementById('led-pod-' + n)); });
+    ['perpustakaan', 'server', 'meja', 'rapat', 'lounge', 'pintu'].forEach(function (a) { elPapanTeks[a] = document.getElementById('papan-' + a); });
+    lapisLabel = document.getElementById('label');
+  }
+
+  // ---------------- robot ----------------
+  function gambarRobot(warna, kecil, dudukZ) {
+    var s = kecil ? 1.0 : 1.4, z0 = dudukZ != null ? dudukZ : 0.32 * s;
+    function B(x, y, z, w, d, h, c) { return box(x * s, y * s, z0 + z * s, w * s, d * s, h * s, c); }
+    var gelap = campur(warna, -0.35), terang = campur(warna, 0.25), out = '';
+    if (dudukZ == null) out += box(-0.2 * s, -0.08 * s, 0, 0.14 * s, 0.16 * s, 0.32 * s, '#2b2e35') + box(0.06 * s, -0.08 * s, 0, 0.14 * s, 0.16 * s, 0.32 * s, '#2b2e35');
+    out += B(-0.36, -0.07, 0.1, 0.1, 0.14, 0.34, gelap);
+    out += B(-0.25, -0.17, 0, 0.5, 0.34, 0.5, warna);
+    out += mukaSelatan(0.17 * s, -0.08 * s, 0.08 * s, z0 + 0.25 * s, z0 + 0.37 * s, '#ffffff', ' fill-opacity=".7"');
+    out += B(0.26, -0.07, 0.1, 0.1, 0.14, 0.34, gelap);
+    out += B(-0.27, -0.22, 0.54, 0.54, 0.44, 0.38, terang);
+    out += mukaSelatan(0.22 * s, -0.2 * s, 0.2 * s, z0 + 0.64 * s, z0 + 0.82 * s, '#11151b');
+    out += mukaSelatan(0.22 * s, -0.13 * s, -0.05 * s, z0 + 0.7 * s, z0 + 0.76 * s, '#88ffff');
+    out += mukaSelatan(0.22 * s, 0.05 * s, 0.13 * s, z0 + 0.7 * s, z0 + 0.76 * s, '#88ffff');
+    out += B(-0.03, -0.03, 0.92, 0.06, 0.06, 0.18, '#c9ced6');
+    out += B(-0.06, -0.06, 1.1, 0.12, 0.12, 0.1, warna);
+    return { svg: out, puncak: z0 + 1.22 * s };
+  }
+
+  var robots = new Map();
+  var podMilik = POD.map(function () { return null; });
+  var warnaMilik = WARNA.map(function () { return null; });
+  var dataTerakhir = null, sorotId = null, labelKotor = true, tabTanda = '';
+  var feed = [];
+
+  function warnaRobot(r) {
+    if (r.tipe === 'lead') return r.warnaIdx >= 0 ? WARNA[r.warnaIdx] : ABU;
+    var induk = robots.get(r.indukKey);
+    return induk ? warnaRobot(induk) : ABU;
+  }
+  function labelRobot(r) { return r.tipe === 'lead' ? potong(r.judul || r.key.slice(0, 8), 20) : (r.peran || 'subagent'); }
+
+  function buatRobot(key, tipe, indukKey) {
+    var r = { key: key, tipe: tipe, indukKey: indukKey, x: PINTU.x, y: PINTU.y, spot: PINTU, tujuan: null, jalan: false,
+      pergi: false, areaSekarang: null, berpikirSejak: null, warnaIdx: -1, pod: -1, slot: null, kelompok: null, kunciBadan: '' };
+    r.el = document.createElementNS(NS, 'g');
+    r.el.setAttribute('class', 'robot');
+    r.el.setAttribute('data-lead', tipe === 'lead' ? key : indukKey);
+    r.el.innerHTML = '<title></title><g class="badan"></g>';
+    robots.set(key, r);
+    if (tipe === 'lead') klaimIdentitas(r); else gambarBadan(r);
+    letakkan(r);
+    return r;
+  }
+  // Warna dan pod dilepas saat Lead MULAI pulang, bukan saat ia hilang di pintu: tanpa ini Lead baru yang
+  // datang selagi Lead lama berjalan ke pintu kebagian abu walau Lead yang hidup tak sampai enam
+  // (tertangkap screenshot keadaan ramai, 2026-09-15).
+  function lepasIdentitas(r) {
+    if (r.tipe !== 'lead') return;
+    if (r.warnaIdx >= 0 && warnaMilik[r.warnaIdx] === r.key) warnaMilik[r.warnaIdx] = null;
+    if (r.pod >= 0 && podMilik[r.pod] === r.key) { podMilik[r.pod] = null; ledPod[r.pod].setAttribute('fill', LED_KOSONG); }
+  }
+  function klaimIdentitas(r) {
+    if (r.tipe !== 'lead') return;
+    if (!(r.warnaIdx >= 0 && warnaMilik[r.warnaIdx] === r.key)) {
+      if (r.warnaIdx >= 0 && warnaMilik[r.warnaIdx] == null) warnaMilik[r.warnaIdx] = r.key;
+      else { r.warnaIdx = warnaMilik.indexOf(null); if (r.warnaIdx >= 0) warnaMilik[r.warnaIdx] = r.key; }
+    }
+    if (!(r.pod >= 0 && podMilik[r.pod] === r.key)) {
+      if (r.pod >= 0 && podMilik[r.pod] == null) podMilik[r.pod] = r.key;
+      else { r.pod = podMilik.indexOf(null); if (r.pod >= 0) podMilik[r.pod] = r.key; }
+    }
+    if (r.pod >= 0) ledPod[r.pod].setAttribute('fill', warnaRobot(r));
+    r.kunciBadan = '';
+    gambarBadan(r);
+  }
+  function hapusRobot(r) {
+    if (r.el.parentNode) r.el.parentNode.removeChild(r.el);
+    if (r.warnaIdx >= 0 && warnaMilik[r.warnaIdx] === r.key) warnaMilik[r.warnaIdx] = null;
+    if (r.pod >= 0 && podMilik[r.pod] === r.key) { podMilik[r.pod] = null; ledPod[r.pod].setAttribute('fill', LED_KOSONG); }
+    lepasSlot(r);
+    robots.delete(r.key);
+    labelKotor = true;
+  }
+  function gambarBadan(r) {
+    var duduk = !r.jalan && r.spot && r.spot.dz != null ? r.spot.dz : null;
+    var warna = warnaRobot(r), kunci = warna + '|' + duduk;
+    if (kunci === r.kunciBadan) return;
+    var g = gambarRobot(warna, r.tipe === 'sub', duduk);
+    r.el.lastChild.innerHTML = g.svg;
+    r.puncak = g.puncak;
+    r.kunciBadan = kunci;
+  }
+  function letakkan(r) {
+    var p = P(r.x, r.y);
+    r.el.setAttribute('transform', 'translate(' + p[0].toFixed(1) + ',' + p[1].toFixed(1) + ')');
+    var k = idxKelompok(r.x + r.y + 0.01);
+    if (k !== r.kelompok) { kelompokEl.get(k).appendChild(r.el); r.kelompok = k; }
+  }
+
+  // ---------------- slot dan tujuan ----------------
+  function lepasSlot(r) {
+    if (!r.slot) return;
+    var daftar = slotMilik[r.slot.area];
+    if (daftar && daftar[r.slot.i] === r.key) daftar[r.slot.i] = null;
+    r.slot = null;
+  }
+  function ambilSlot(r, area) {
+    if (r.slot && r.slot.area === area) return SPOT[area][r.slot.i];
+    if (r.slot && r.slot.luapan === area) {   // sedang antre: masuk begitu ada slot kosong
+      var kosong = slotMilik[area].indexOf(null), daftarArea = slotMilik[area];
+      var bebas = -1;
+      for (var q = 0; q < SPOT[area].length; q++) if (!daftarArea[q]) { bebas = q; break; }
+      if (bebas < 0) return SPOT.koridor[r.slot.i];
+      void kosong;
+    }
+    lepasSlot(r);
+    var daftar = slotMilik[area], spots = SPOT[area];
+    for (var i = 0; i < spots.length; i++) if (!daftar[i]) { daftar[i] = r.key; r.slot = { area: area, i: i }; return spots[i]; }
+    var kor = slotMilik.koridor;
+    for (var k = 0; k < SPOT.koridor.length; k++) if (!kor[k]) { kor[k] = r.key; r.slot = { area: 'koridor', i: k, luapan: area }; return SPOT.koridor[k]; }
+    return SPOT.koridor[SPOT.koridor.length - 1];
+  }
+  function spotMeja(r) {
+    if (r.tipe === 'lead') {
+      if (r.pod >= 0) { lepasSlot(r); return SPOT_LEAD_POD[r.pod]; }
+      return ambilSlot(r, 'cadangan');
+    }
+    var induk = robots.get(r.indukKey);
+    if (induk && induk.pod >= 0) return ambilSlot(r, 'pod' + induk.pod);
+    return ambilSlot(r, 'koridor');
+  }
+  function areaTujuan(r, sekarang) {
+    if (r.keadaan === 'berpikir') {
+      // berpikir = diam di tempat; kembali ke meja hanya bila berpikir lebih dari 20 detik. Tanpa ini pola nyata
+      // Read, pikir, Read dengan interval data 2 detik membuat robot selalu di tengah jalan.
+      if (!r.berpikirSejak) r.berpikirSejak = sekarang;
+      if (!r.areaSekarang || r.areaSekarang === 'meja' || r.areaSekarang === 'pintu') return 'meja';
+      if (sekarang - r.berpikirSejak >= BERPIKIR_KE_MEJA_MS) return 'meja';
+      return r.areaSekarang;
+    }
+    r.berpikirSejak = null;
+    return r.area || 'meja';
+  }
+  function arahkan(r, sekarang) {
+    var area, sp;
+    if (r.pergi) { lepasSlot(r); area = 'pintu'; sp = PINTU; }
+    else {
+      area = areaTujuan(r, sekarang);
+      sp = area === 'meja' ? spotMeja(r) : ambilSlot(r, area);
+    }
+    if (sp === r.tujuan) return;
+    var areaLama = r.areaSekarang;
+    r.tujuan = sp;
+    r.areaSekarang = area;
+    if (area !== areaLama) catatFeed(r, areaLama, area);
+    mulaiJalan(r, sp);
+  }
+  function titik(p) { return { x: p.x, y: p.y }; }
+  function mulaiJalan(r, tujuan) {
+    var jalur;
+    if (r.jalan) {
+      var c = proyeksiKoridor(r.x, r.y);
+      jalur = [c].concat(jalurKoridor(c, tujuan.sambung), tujuan.masuk);
+    } else if (r.spot && r.spot.grup === tujuan.grup) {
+      jalur = [];
+    } else {
+      var asal = r.spot || PINTU;
+      jalur = asal.masuk.slice().reverse().concat([asal.sambung], jalurKoridor(asal.sambung, tujuan.sambung), tujuan.masuk);
+    }
+    jalur = [{ x: r.x, y: r.y }].concat(jalur.map(titik), [{ x: tujuan.x, y: tujuan.y }]);
+    var bersih = [jalur[0]];
+    for (var i = 1; i < jalur.length; i++) {
+      var s = bersih[bersih.length - 1];
+      if (Math.hypot(jalur[i].x - s.x, jalur[i].y - s.y) > 1e-3) bersih.push(jalur[i]);
+    }
+    var kum = [0];
+    for (var j = 1; j < bersih.length; j++) kum.push(kum[j - 1] + Math.hypot(bersih[j].x - bersih[j - 1].x, bersih[j].y - bersih[j - 1].y));
+    var panjang = kum[kum.length - 1];
+    if (!gerakHalus || panjang < 1e-3) { r.x = tujuan.x; r.y = tujuan.y; tiba(r); return; }
+    r.jalur = bersih; r.kum = kum; r.panjang = panjang;
+    r.mulai = performance.now();
+    r.lama = Math.max(JALAN_MIN_MS, Math.min(JALAN_MAKS_MS, panjang / KECEPATAN * 1000));
+    r.jalan = true;
+    r.spot = null;
+    r.el.classList.add('jalan');
+    gambarBadan(r);
+    labelKotor = true;
+  }
+  function tiba(r) {
+    r.jalan = false;
+    r.jalur = null;
+    r.spot = r.tujuan;
+    r.x = r.spot.x; r.y = r.spot.y;
+    r.el.classList.remove('jalan');
+    if (r.pergi && r.spot === PINTU) { hapusRobot(r); return; }
+    gambarBadan(r);
+    letakkan(r);
+    perbaruiKelas(r);
+    labelKotor = true;
+  }
+  function bingkai(now) {
+    var ada = false;
+    robots.forEach(function (r) {
+      if (!r.jalan) return;
+      ada = true;
+      var t = Math.min(1, (now - r.mulai) / r.lama), jarak = t * r.panjang, i = 1;
+      while (i < r.kum.length - 1 && r.kum[i] < jarak) i++;
+      var a = r.jalur[i - 1], b = r.jalur[i], seg = r.kum[i] - r.kum[i - 1], u = seg > 0 ? (jarak - r.kum[i - 1]) / seg : 1;
+      r.x = a.x + (b.x - a.x) * u; r.y = a.y + (b.y - a.y) * u;
+      if (t >= 1) tiba(r); else letakkan(r);
+    });
+    if (ada || labelKotor) { tataLabel(); labelKotor = false; }
+    requestAnimationFrame(bingkai);
+  }
+
+  // ---------------- teks ----------------
+  function lewatDetik() { return dataTerakhir ? Math.max(0, (Date.now() - Date.parse(dataTerakhir.dibuat)) / 1000) : 0; }
+  function durasiKini(r, lewat) { return r.durasi_detik != null ? Math.round(r.durasi_detik + lewat) : null; }
+  function diamKini(r, lewat) { return r.diam_detik != null ? Math.round(r.diam_detik + lewat) : null; }
+  function kini(r, lewat) {
+    if (r.pergi) return 'pulang';
+    if (r.keadaan === 'berpikir') return 'berpikir';
+    if (r.keadaan === 'menunggu_subagent') return 'menunggu subagent';
+    if (r.keadaan === 'menunggu_anda') return r.alat ? 'tanya: ' + (r.detail || r.alat) : 'menunggu Anda';
+    var dur = durasiKini(r, lewat);
+    return (r.alat || '?') + (r.detail ? ' · ' + r.detail : '') + (dur != null && dur >= 60 ? ' · ' + durasi(dur) : '');
+  }
+  function mungkinIzin(r, lewat) { var dur = durasiKini(r, lewat); return r.keadaan === 'alat' && dur != null && dur >= 60; }
+  function perbaruiKelas(r) {
+    var lewat = lewatDetik(), diam = diamKini(r, lewat);
+    r.el.classList.toggle('ketik', !r.jalan && r.keadaan === 'alat' && r.areaSekarang === 'meja');
+    r.el.classList.toggle('baca', !r.jalan && r.keadaan === 'alat' && r.areaSekarang === 'perpustakaan');
+    r.el.classList.toggle('redup', diam != null && diam >= 600);
+    r.el.classList.toggle('sorot', sorotId != null && r.el.getAttribute('data-lead') === sorotId);
+    var judul = r.tipe === 'lead'
+      ? r.key + '\n' + (r.judul || '(tanpa judul)') + '\n' + (NAMA_AREA[r.areaSekarang] || '') + ' · ' + kini(r, lewat)
+      : (r.jenis || 'subagent') + ': ' + (r.deskripsi || '') + '\n' + (NAMA_AREA[r.areaSekarang] || '') + ' · ' + kini(r, lewat);
+    if (mungkinIzin(r, lewat)) judul += '\nPrompt izin tidak tercatat di transkrip: tool ini mungkin sedang menunggu persetujuan.';
+    r.el.firstChild.textContent = judul;
+  }
+
+  function tataLabel() {
+    if (!lapisLabel) return;
+    var lewat = lewatDetik(), terpakai = PAPAN_KOTAK.slice(), hitung = {}, kandidat = [];
+    robots.forEach(function (r) { if (!r.pergi && r.areaSekarang) hitung[r.areaSekarang] = (hitung[r.areaSekarang] || 0) + 1; });
+    robots.forEach(function (r) {
+      var padat = RUANG_PADAT[r.areaSekarang] && hitung[r.areaSekarang] >= PADAT;
+      var warna = warnaRobot(r), atas = P(r.x, r.y, (r.puncak || 1.5) + 0.3), kepalaY = P(r.x, r.y, (r.puncak || 1.5) + 0.02)[1];
+      var diam = diamKini(r, lewat), redup = diam != null && diam >= 600;
+      var teks = labelRobot(r) + (redup ? ' · diam ' + durasi(diam) : '') + (r.pergi ? ' · pulang' : '');
+      var lw = teks.length * 4.85 + 14, isi = '', pikir = false;
+      if (r.tipe === 'lead' && !r.pergi && !padat) {
+        if (r.keadaan === 'berpikir') pikir = true;
+        else if (r.keadaan === 'menunggu_subagent') isi = 'menunggu ' + (r.jumlahSub || 0) + ' subagent';
+        else if (r.keadaan === 'menunggu_anda') isi = r.alat ? potong('tanya: ' + (r.detail || r.alat), 30) : 'menunggu Anda';
+        else if (r.keadaan === 'alat') {
+          var dur = durasiKini(r, lewat);
+          isi = potong(r.alat + (r.detail ? ' · ' + r.detail : ''), 30) + (dur != null && dur >= 60 ? ' · ' + durasi(dur) + ' ?' : '');
+        }
+      }
+      var bw = isi ? isi.length * 4.55 + 10 : 0;
+      kandidat.push({ r: r, prioritas: r.tipe === 'lead' ? 0 : 1, x: atas[0], y: atas[1], kepalaY: kepalaY, lebar: Math.max(lw, bw, pikir ? lw + 30 : 0),
+        tinggi: isi || pikir ? 27 : 12, teks: teks, lw: lw, isi: isi, bw: bw, pikir: pikir, warna: warna, redup: redup });
+    });
+    kandidat.sort(function (a, b) { return a.prioritas - b.prioritas || b.y - a.y; });
+    var GESER = [];
+    [0, -14, -28, -42, -56, -70, -84, -98].forEach(function (dy) { [0, -46, 46].forEach(function (dx) { GESER.push([dx, dy]); }); });
+    function bentrok(k) { return terpakai.some(function (t) { return !(k[2] <= t[0] || k[0] >= t[2] || k[3] <= t[1] || k[1] >= t[3]); }); }
+    var html = '';
+    kandidat.forEach(function (l) {
+      var pilih = [0, 0];
+      for (var g = 0; g < GESER.length; g++) {
+        var kk = [l.x + GESER[g][0] - l.lebar / 2 - 2, l.y + GESER[g][1] - l.tinggi + 3, l.x + GESER[g][0] + l.lebar / 2 + 2, l.y + GESER[g][1] + 4];
+        if (!bentrok(kk)) { pilih = GESER[g]; break; }
+      }
+      var dx = pilih[0], dy = pilih[1], X = (l.x + dx).toFixed(1), Y = (l.y + dy).toFixed(1), kelasRedup = l.redup ? ' redup' : '';
+      terpakai.push([l.x + dx - l.lebar / 2 - 2, l.y + dy - l.tinggi + 3, l.x + dx + l.lebar / 2 + 2, l.y + dy + 4]);
+      if (dx || dy) html += '<line x1="' + l.x.toFixed(1) + '" y1="' + l.kepalaY.toFixed(1) + '" x2="' + X + '" y2="' + (l.y + dy + 3).toFixed(1) + '" stroke="#ffffff" stroke-opacity=".6" stroke-width=".7"/>';
+      html += '<g class="tag' + kelasRedup + '" transform="translate(' + X + ',' + Y + ')"><rect class="dasar" x="' + (-l.lw / 2) + '" y="-9" width="' + l.lw + '" height="12" rx="2"/><rect x="' + (-l.lw / 2) + '" y="-9" width="3" height="12" fill="' + l.warna + '"/><text text-anchor="middle" x="1.5" y="0">' + esc(l.teks) + '</text></g>';
+      if (l.isi) html += '<g class="gelembung' + kelasRedup + '" transform="translate(' + X + ',' + (l.y + dy - 15).toFixed(1) + ')"><rect x="' + (-l.bw / 2) + '" y="-9" width="' + l.bw + '" height="11" rx="5"/><text text-anchor="middle" y="-0.5">' + esc(l.isi) + '</text></g>';
+      else if (l.pikir) html += '<g class="pikir" transform="translate(' + (l.x + dx + l.lw / 2 + 4).toFixed(1) + ',' + (l.y + dy - 4).toFixed(1) + ')"><circle r="1.6"/><circle cx="5" cy="-4" r="2.2"/><circle cx="12" cy="-9" r="3"/></g>';
+    });
+    lapisLabel.innerHTML = html;
+    // antrean koridor: tampilkan +N pada papan area yang meluap
+    var luapan = {};
+    robots.forEach(function (r) { if (r.slot && r.slot.luapan) luapan[r.slot.luapan] = (luapan[r.slot.luapan] || 0) + 1; });
+    Object.keys(elPapanTeks).forEach(function (a) {
+      var dasar = { perpustakaan: 'PERPUSTAKAAN', server: 'RUANG SERVER', meja: 'AREA MEJA · 8 POD', rapat: 'RUANG RAPAT', lounge: 'LOUNGE', pintu: 'PINTU MASUK' }[a];
+      var t = dasar + (luapan[a] ? ' +' + luapan[a] : '');
+      if (elPapanTeks[a] && elPapanTeks[a].textContent !== t) elPapanTeks[a].textContent = t;
+    });
+  }
+
+  // ---------------- data ----------------
+  function salin(r, s) {
+    ['judul', 'tahap', 'pr', 'area', 'keadaan', 'alat', 'detail', 'durasi_detik', 'diam_detik', 'jenis', 'peran', 'deskripsi'].forEach(function (k) { r[k] = s[k]; });
+    r.jumlahSub = (s.subagent || []).length;
+  }
+  function catatFeed(r, dari, ke) {
+    var teks;
+    if (ke === 'pintu') teks = labelRobot(r) + ' pulang';
+    else if (dari == null || dari === 'pintu') teks = labelRobot(r) + ' masuk → ' + NAMA_AREA[ke];
+    else teks = labelRobot(r) + ' → ' + NAMA_AREA[ke] + (r.alat && r.keadaan !== 'berpikir' ? ' (' + r.alat + (r.detail ? ': ' + r.detail : '') + ')' : '');
+    feed.unshift({ waktu: new Date(), warna: warnaRobot(r), teks: teks, sub: r.tipe === 'sub' });
+    if (feed.length > 30) feed.length = 30;
+    renderFeed();
+  }
+  function terima(d) {
+    if (!d || typeof d !== 'object' || !Array.isArray(d.sesi)) return;
+    if (dataTerakhir && d.dibuat === dataTerakhir.dibuat) return;
+    dataTerakhir = d;
+    var sekarang = Date.now(), hadir = new Set();
+    d.sesi.forEach(function (s) {
+      hadir.add(s.id);
+      (s.subagent || []).forEach(function (a) { hadir.add(s.id + ':' + a.id); });
+    });
+    // yang pulang dilepas identitasnya DULU, supaya Lead baru di data yang sama tak kebagian abu
+    robots.forEach(function (r) { if (!hadir.has(r.key) && !r.pergi) { r.pergi = true; lepasIdentitas(r); } });
+    d.sesi.forEach(function (s) {
+      var r = robots.get(s.id) || buatRobot(s.id, 'lead', null);
+      if (r.pergi) { r.pergi = false; klaimIdentitas(r); }
+      salin(r, s);
+      (s.subagent || []).forEach(function (a) {
+        var key = s.id + ':' + a.id;
+        var ra = robots.get(key) || buatRobot(key, 'sub', s.id);
+        ra.pergi = false;
+        salin(ra, a);
+      });
+    });
+    robots.forEach(function (r) { arahkan(r, sekarang); });
+    robots.forEach(perbaruiKelas);
+    labelKotor = true;
+    renderPanel();
+    perbaruiStatus();
+  }
+  function muat() {
+    var s = document.createElement('script');
+    s.src = 'kantor-agent-data.js?t=' + Date.now();
+    s.onload = function () { s.remove(); terima(window.__KANTOR__); };
+    s.onerror = function () { s.remove(); perbaruiStatus(); };
+    document.head.appendChild(s);
+  }
+
+  // ---------------- panel, tab, feed, status ----------------
+  function urutLead(a, b) {
+    var ka = a.pod >= 0 ? a.pod : 100 + (a.slot ? a.slot.i : 0), kb = b.pod >= 0 ? b.pod : 100 + (b.slot ? b.slot.i : 0);
+    return ka - kb || (a.key < b.key ? -1 : 1);
+  }
+  function renderPanel() {
+    var lewat = lewatDetik();
+    var leads = [];
+    robots.forEach(function (r) { if (r.tipe === 'lead' && !r.pergi) leads.push(r); });
+    leads.sort(urutLead);
+    var tanda = leads.map(function (r) { return r.key + '|' + labelRobot(r) + '|' + warnaRobot(r); }).join(';') + '#' + sorotId;
+    if (tanda !== tabTanda) {
+      tabTanda = tanda;
+      elTab.innerHTML = leads.map(function (r) {
+        return '<button type="button" data-id="' + esc(r.key) + '" aria-pressed="' + (sorotId === r.key) + '"><i style="background:' + warnaRobot(r) + '"></i>' + esc(potong(r.judul || r.key.slice(0, 8), 26)) + '</button>';
+      }).join('');
+    }
+    if (!leads.length) { elPanel.innerHTML = '<p class="kosong">' + (dataTerakhir ? 'Tak ada sesi hidup.' : 'Belum ada data.') + '</p>'; return; }
+    elPanel.innerHTML = leads.map(function (r) {
+      var anak = [];
+      robots.forEach(function (a) { if (a.tipe === 'sub' && a.indukKey === r.key && !a.pergi) anak.push(a); });
+      var diam = diamKini(r, lewat);
+      return '<div class="kartu' + (sorotId === r.key ? ' sorot' : '') + '" id="k-' + esc(r.key) + '">' +
+        '<div class="kepala"><i style="background:' + warnaRobot(r) + '"></i><b title="' + esc(r.key) + '">' + esc(r.key.slice(0, 8)) + '</b>' +
+        (r.tahap && r.tahap !== 'mulai' ? '<span class="chip">' + esc(r.tahap) + '</span>' : '') +
+        (r.pr ? '<span class="chip">PR ' + esc(r.pr) + '</span>' : '') +
+        (diam != null && diam >= 600 ? '<span class="chip">diam ' + durasi(diam) + '</span>' : '') +
+        (mungkinIzin(r, lewat) ? '<span class="chip peringatan" title="Prompt izin tidak tercatat di transkrip">? izin</span>' : '') + '</div>' +
+        '<div class="judul">' + esc(r.judul || '(tanpa judul)') + '</div>' +
+        '<div class="kini">' + esc((NAMA_AREA[r.areaSekarang] || '') + ' · ' + kini(r, lewat)) + '</div>' +
+        anak.map(function (a) { return '<div class="anak">↳ ' + esc(a.peran + ' · ' + (NAMA_AREA[a.areaSekarang] || '') + ' · ' + kini(a, lewat) + (a.deskripsi ? ' · ' + a.deskripsi : '')) + '</div>'; }).join('') +
+        '</div>';
+    }).join('');
+  }
+  function renderFeed() {
+    if (!feed.length) { elFeed.innerHTML = '<li class="kosong">Belum ada perpindahan.</li>'; return; }
+    elFeed.innerHTML = feed.map(function (f) {
+      return '<li><time>' + f.waktu.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + '</time><i style="background:' + f.warna + '"></i>' + esc(f.teks) + '</li>';
+    }).join('');
+  }
+  function perbaruiStatus() {
+    var d = dataTerakhir, banner = '', galat = false;
+    if (!d) {
+      panggung.classList.remove('basi');
+      elStatus.textContent = '';
+      elStatus.className = 'status';
+      elInfo.textContent = 'menunggu penulis';
+      elKosong.hidden = false;
+      elKosong.textContent = Date.now() - halamanMulai > 6000
+        ? 'Belum ada data dari penulis. Jalankan /kantor-agent; penulis menulis .task-plans/kantor-agent-data.js di samping halaman ini.'
+        : 'Menunggu penulis...';
+      elBanner.hidden = true;
+      return;
+    }
+    var umur = Date.now() - Date.parse(d.dibuat), basi = !(umur <= BASI_MS);
+    panggung.classList.toggle('basi', basi);
+    var nLead = d.sesi.length, nSub = d.sesi.reduce(function (n, s) { return n + (s.subagent || []).length; }, 0);
+    elInfo.textContent = nLead + ' Lead · ' + nSub + ' subagent';
+    svg.setAttribute('aria-label', 'Denah kantor agent: ' + nLead + ' Lead, ' + nSub + ' subagent');
+    elStatus.className = 'status ' + (basi ? 'basi' : 'live');
+    elStatus.textContent = basi ? 'data basi' : 'live · ' + Math.max(0, Math.round(umur / 1000)) + ' dtk lalu';
+    if (d.penulis && d.penulis.berhenti === 'sepi') banner = 'Penulis berhenti: tak ada sesi hidup cukup lama. Jalankan /kantor-agent untuk menyalakannya lagi.';
+    else if (basi) banner = 'Data berhenti sejak ' + jam(d.dibuat) + ' (' + durasi(Math.max(0, Math.round(umur / 1000))) + ' lalu). Penulis mati atau dihentikan; jalankan /kantor-agent.';
+    if (d.skema && d.skema.dikenali === false) {
+      galat = true;
+      banner = (banner ? banner + ' ' : '') + 'Format transkrip Claude Code tidak dikenali (' + d.skema.baris_rusak + ' dari ' + d.skema.baris_diurai + ' baris rusak). Perbarui agent-kit.';
+    }
+    elBanner.hidden = !banner;
+    elBanner.textContent = banner;
+    elBanner.className = 'banner' + (galat ? ' galat' : '');
+    if (nLead === 0) {
+      var dilewati = d.skema && d.skema.dilewati_luar_workspace;
+      elKosong.hidden = false;
+      elKosong.textContent = 'Tak ada sesi Claude Code yang hidup di workspace ini (transkrip ditulis ≤ ' + ((d.ambang && d.ambang.hidup_menit) || 30) + ' menit).' +
+        (dilewati ? ' ' + dilewati + ' transkrip hidup di luar workspace dilewati.' : '');
+    } else {
+      elKosong.hidden = true;
+    }
+  }
+  function detik() {
+    var sekarang = Date.now();
+    robots.forEach(function (r) { arahkan(r, sekarang); perbaruiKelas(r); });   // histeresis berpikir butuh dievaluasi tanpa data baru
+    labelKotor = true;
+    renderPanel();
+    perbaruiStatus();
+  }
+
+  elTab.addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    var id = b.getAttribute('data-id');
+    sorotId = sorotId === id ? null : id;
+    robots.forEach(perbaruiKelas);
+    tabTanda = '';
+    renderPanel();
+    if (sorotId) { var k = document.getElementById('k-' + sorotId); if (k) k.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+  });
+  svg.addEventListener('click', function (e) {
+    var g = e.target.closest('.robot');
+    if (!g) return;
+    var id = g.getAttribute('data-lead');
+    sorotId = sorotId === id ? null : id;
+    robots.forEach(perbaruiKelas);
+    tabTanda = '';
+    renderPanel();
+  });
+
+  // hanya-baca, untuk verifikasi lewat CDP (tests/kantor-agent-browser.ps1); tidak mengubah apa pun
+  window.__KANTOR_UJI__ = {
+    robot: function () {
+      var out = [];
+      robots.forEach(function (r) { out.push({ key: r.key, tipe: r.tipe, area: r.areaSekarang, pod: r.pod, warna: warnaRobot(r), jalan: r.jalan, pergi: r.pergi, x: +r.x.toFixed(2), y: +r.y.toFixed(2) }); });
+      return out;
+    },
+    layar: function () {
+      return { ada_data: !!dataTerakhir, dibuat: dataTerakhir && dataTerakhir.dibuat, basi: panggung.classList.contains('basi'),
+        banner: elBanner.hidden ? '' : elBanner.textContent, kosong: elKosong.hidden ? '' : elKosong.textContent };
+    }
+  };
+
+  bangunDenah();
+  perbaruiStatus();
+  muat();
+  setInterval(muat, INTERVAL_MUAT);
+  setInterval(detik, 1000);
+  requestAnimationFrame(bingkai);
+})();
+</script>
+</body>
+</html>
