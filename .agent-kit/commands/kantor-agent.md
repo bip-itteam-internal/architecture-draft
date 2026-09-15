@@ -34,6 +34,7 @@ Argumen: `[--berhenti]` (hentikan penulis latar), `[--sekali]` (tulis data satu 
 ## Membaca halaman
 
 - Banner **data basi**: penulis mati atau dihentikan. Jalankan `/kantor-agent` lagi.
+- Banner **snapshot sekali**: halaman dibuka dengan `--sekali`, datanya memang tidak diperbarui.
 - Banner **penulis berhenti**: tak ada sesi hidup cukup lama, penulis keluar sendiri.
 - Banner **format transkrip tidak dikenali**: rilis Claude Code mengubah format transkrip, yang oleh dok
   resmi dinyatakan internal. Perbarui kit; jangan menyimpulkan apa pun dari robot yang tampil.

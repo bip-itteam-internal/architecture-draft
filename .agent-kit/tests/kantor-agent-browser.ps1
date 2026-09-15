@@ -32,13 +32,13 @@ $dataJs = Join-Path $halaman 'kantor-agent-data.js'
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 $inv = [Globalization.CultureInfo]::InvariantCulture
 
-function Tulis-Data($sesi, [bool]$Dikenali = $true, $Berhenti = $null, [int]$UmurDetik = 0, [int]$HidupMenit = 30, [int]$DiamMenit = 10) {
+function Tulis-Data($sesi, [bool]$Dikenali = $true, $Berhenti = $null, [int]$UmurDetik = 0, [int]$HidupMenit = 30, [int]$DiamMenit = 10, [int]$Interval = 2) {
   $data = [ordered]@{
     versi = 1
     dibuat = (Get-Date).ToUniversalTime().AddSeconds(-$UmurDetik).ToString('yyyy-MM-ddTHH:mm:ss.fffZ', $inv)
     ambang = [ordered]@{ hidup_menit = $HidupMenit; diam_menit = $DiamMenit }
     skema = [ordered]@{ baris_diurai = 100; baris_rusak = $(if ($Dikenali) { 0 } else { 80 }); dikenali = $Dikenali; dilewati_luar_workspace = 0 }
-    penulis = [ordered]@{ pid = 1; interval_detik = 2; berhenti = $Berhenti; tick_ms = $null }
+    penulis = [ordered]@{ pid = 1; interval_detik = $Interval; berhenti = $Berhenti; tick_ms = $null }
     sesi = @($sesi)
   }
   $tmp = $dataJs + '.tmp'
@@ -170,6 +170,11 @@ try {
   $ok = Tunggu { $l = Layar; $l.basi -and $l.banner -match 'Data berhenti' } 8
   Check $ok '7 basi: banner data berhenti dan robot diredupkan'
   Foto '7-basi'
+
+  # 7b. --sekali (interval 0): snapshot yang disengaja tidak boleh berbunyi "penulis mati"
+  Tulis-Data @((Sesi 'dddddddd-0001' 'Lead basi' 'lounge' 'menunggu_anda')) -UmurDetik 30 -Interval 0
+  $ok = Tunggu { $l = Layar; $l.basi -and $l.banner -match 'Snapshot sekali' -and $l.banner -notmatch 'mati' } 8
+  Check $ok '7b sekali: banner snapshot sekali, bukan penulis mati'
 
   # 8. penulis berhenti karena sepi
   Tulis-Data @() -Berhenti 'sepi' -UmurDetik 30

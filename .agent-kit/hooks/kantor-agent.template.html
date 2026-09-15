@@ -826,14 +826,16 @@ footer li{margin:2px 0}
       return;
     }
     var umur = Date.now() - Date.parse(d.dibuat), basi = !(umur <= BASI_MS);
+    var sekali = !!(d.penulis && d.penulis.interval_detik === 0);   // --sekali: snapshot yang disengaja, bukan penulis mati
     panggung.classList.toggle('basi', basi);
     var nLead = d.sesi.length, nSub = d.sesi.reduce(function (n, s) { return n + (s.subagent || []).length; }, 0);
     elInfo.textContent = nLead + ' Lead · ' + nSub + ' subagent';
     if (d.ambang && d.ambang.hidup_menit) elAmbangHidup.textContent = d.ambang.hidup_menit;
     svg.setAttribute('aria-label', 'Denah kantor agent: ' + nLead + ' Lead, ' + nSub + ' subagent');
     elStatus.className = 'status ' + (basi ? 'basi' : 'live');
-    elStatus.textContent = basi ? 'data basi' : 'live · ' + Math.max(0, Math.round(umur / 1000)) + ' dtk lalu';
+    elStatus.textContent = basi ? (sekali ? 'snapshot' : 'data basi') : 'live · ' + Math.max(0, Math.round(umur / 1000)) + ' dtk lalu';
     if (d.penulis && d.penulis.berhenti === 'sepi') banner = 'Penulis berhenti: tak ada sesi hidup cukup lama. Jalankan /kantor-agent untuk menyalakannya lagi.';
+    else if (basi && sekali) banner = 'Snapshot sekali (--sekali) dari ' + jam(d.dibuat) + '. Jalankan /kantor-agent tanpa --sekali untuk data live.';
     else if (basi) banner = 'Data berhenti sejak ' + jam(d.dibuat) + ' (' + durasi(Math.max(0, Math.round(umur / 1000))) + ' lalu). Penulis mati atau dihentikan; jalankan /kantor-agent.';
     if (d.skema && d.skema.dikenali === false) {
       galat = true;
