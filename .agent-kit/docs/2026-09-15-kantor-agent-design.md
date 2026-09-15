@@ -417,6 +417,11 @@ dan menempelkan keluarannya.
   luar workspace (misalnya worktree `C:\wt\...`) tidak tampil.
 - **Menunggu tugas shell latar (`run_in_background`) tidak dibedakan dari menunggu Anda**: Lead
   tampil di lounge. Subagent latar tertangani karena transkripnya sendiri hidup.
+- **Tool yang sudah berjalan sebelum pesan asistennya selesai ditulis belum terlihat.** Claude Code
+  menjalankan tool call pertama selagi model masih menulis tool call berikutnya di pesan yang sama,
+  tetapi baris pesan baru masuk ke transkrip setelah pesannya lengkap. Selama itu robot tampil
+  berpikir di Meja. Terukur 2026-09-15: Agent berjalan sejak 14:15:09, baris pesannya baru tertulis
+  14:15:31 karena tool call kedua memuat perintah panjang.
 - **Langkah model yang sangat panjang** tanpa tulisan transkrip bisa memicu tanda "diam" walau sesi
   masih bekerja.
 - **Sesi yang ditutup tanpa `SessionEnd`** baru pulang setelah 30 menit tanpa tulisan transkrip.
