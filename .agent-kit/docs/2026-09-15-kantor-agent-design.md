@@ -491,8 +491,9 @@ Menutup kekurangan 1.20.0 atas permintaan pemilik. Rencana dan catatan implement
 Selama dialog AskUserQuestion sesi pelaksana terbuka (2026-09-15), registri berubah di detik yang sama ke
 `status: "waiting"` + `waitingFor: "input needed"`, lalu kembali `busy` saat dijawab. Hook percobaan
 `PermissionRequest` menyala di detik yang sama, `Notification permission_prompt` 8 detik kemudian. Registri cukup
-dan lebih cepat, jadi opsi hook tidak dibangun dan ADR 0077 tak perlu direvisi. Nilai `permission prompt` untuk
-dialog izin tool mengikuti dok Claude Code dan belum teramati langsung.
+dan lebih cepat, jadi opsi hook tidak dibangun dan ADR 0077 tak perlu direvisi. Nilai `permission prompt` untuk dialog
+izin tool **teramati langsung 2026-09-16**: sesi terminal (CLI 2.1.263) yang menunggu persetujuan tool PowerShell
+tercatat `status: "waiting"` + `waitingFor: "permission prompt"`, dan kembali `busy` saat disetujui.
 
 ### Model keadaan v2
 
@@ -556,6 +557,10 @@ robot dipulangkan dan banner menyuruh `--berhenti` lalu `/kantor-agent`. Kedua a
   ~100 KB di luar ekor tampil menunggu tugas latar untuk tugas itu; dua launcher serentak menghasilkan satu penulis;
   tombol salin di halaman terpasang mengisi clipboard; tick p50 8 ms, p95 15 ms sesudah tick pertama (p95 tujuh tick
   awal 423 ms karena membaca jendela 8 MB).
+- Dialog izin tool sungguhan (2026-09-16, sesi terminal mode default, direkam tiap 0,3 detik): registri berubah ke
+  `waiting` + `waitingFor: "permission prompt"` pada 06.32.29,387; halaman menampilkan gelembung "! izin: PowerShell"
+  pada 06.32.31,1, **1,7 detik** kemudian, dengan robot tetap di Ruang server; sesudah disetujui (registri `busy`
+  06.32.45,1) gelembungnya hilang pada 06.32.48,2, **3,1 detik** kemudian.
 - Test: pytest 110 (dari 72), `test-init.ps1` 71, `kantor-agent-browser.ps1` 27 check (clipboard dibaca balik dengan
   menempel, karena `readText` ditolak di `file://`). Kontrol mutasi yang terbukti merah: `procStart`, kunci penulis,
   pelacakan perintah yang dipindah ke latar, jendela 8 MB, prasaring baris, pelacak tak dipakai, `is_error` TaskStop,
@@ -566,6 +571,8 @@ robot dipulangkan dan banner menyuruh `--berhenti` lalu `/kantor-agent`. Kedua a
 ### Batas v2
 
 - Registri dan kuncinya format internal; yang menjaganya cek silang dan banner.
-- `waitingFor: "permission prompt"` belum teramati langsung.
+- Registri hanya memuat sesi yang sudah berjalan: sesi yang masih tertahan di layar awal, dan **sesi anak** (proses
+  `claude` yang mewarisi `CLAUDE_CODE_CHILD_SESSION` dan `CLAUDE_CODE_SESSION_ID` dari shell tool sesi lain), tidak
+  punya entri sendiri.
 - Tugas latar yang dimulai sebelum jendela 8 MB saat penulis pertama melihat sesinya tak terlihat.
 - `kantor-agent.sh` belum pernah dijalankan.

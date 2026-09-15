@@ -140,7 +140,8 @@ Dalam satu batch tool paralel, hasil tool singkat sering baru tertulis ke transk
 
 **Batas yang disadari**
 
-- Menunggu izin dibaca dari registri: `waitingFor` yang memuat "permission" menjadi gelembung **!**. Nilai `permission prompt` untuk dialog izin tool mengikuti dok Claude Code; yang sudah teramati langsung baru `input needed` dari dialog pertanyaan (2026-09-15). Bila registri tak terbaca, prompt izin kembali hanya ditebak: tool yang tertunda ≥ 60 detik diberi tanda `?`.
+- Menunggu izin dibaca dari registri: `waitingFor` yang memuat "permission" menjadi gelembung **!**. Diukur 2026-09-16 dengan dialog izin tool sungguhan: registri berubah ke `waiting` + `waitingFor: "permission prompt"`, gelembungnya tampil 1,7 detik kemudian, dan hilang 3,1 detik sesudah disetujui. Bila registri tak terbaca, prompt izin kembali hanya ditebak: tool yang tertunda ≥ 60 detik diberi tanda `?`.
+- Sesi yang masih tertahan di layar awal, dan sesi anak yang dijalankan dari shell tool sesi lain (mewarisi `CLAUDE_CODE_CHILD_SESSION`), tidak punya entri registri sendiri sehingga tidak tampil.
 - Satu mesin, dan hanya sesi yang `cwd`-nya di dalam workspace.
 - Tugas shell latar yang dimulai sebelum 8 MB terakhir transkrip, saat penulis pertama melihat sesinya, tak terlihat; sesi yang hanya menunggu tugas setua itu tampil menunggu Anda.
 - Tool yang sudah berjalan sementara model masih menulis tool call berikutnya di pesan yang sama belum tercatat di transkrip, karena baris pesan baru ditulis setelah pesannya lengkap. Selama itu robot tampil berpikir di Meja (terukur 22 detik untuk pesan yang memuat perintah panjang, 2026-09-15).
