@@ -2,7 +2,7 @@
 
 *Konsep dan desain (sisi General Affairs) **peminjaman aset**: alur pinjam, pakai, kembali untuk **ruang rapat**, **barang/aset bergerak**, dan **kendaraan operasional**, supaya pemakaian bersama terjadwal (tak bentrok), terlacak (siapa memakai apa, kapan), dan akuntabel. Master aset ada di [[GA - Inventory Management]]; dok ini menambahkan alur peminjamannya. Keputusan desain yang berlaku untuk booking ruang dicatat di [[ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor]] (merevisi desain rilis-1 versi 2026-07-18), yang diamandemen [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]].*
 
-- **Status**: ⚠️ Implemented (ada catatan). **Booking ruang**: irisan 1 dari 7 ada di kode (inventory-service, feed kalender, notifikasi, layar web Ruang & Booking, penunjukan penyetuju). **Irisan 1b** (mengajukan, mengubah jadwal, membatalkan, menyetujui, dan menolak lewat web, plus kartu Booking Ruang di halaman Pengajuan) terimplementasi di branch, **belum merge** per 2026-09-14. Layar MyBharata (irisan 2), booking berulang (irisan 3), dan pemilih ruang di modul lain (irisan 4 sampai 7) belum ada. **Barang dan kendaraan**: masih konsep, ditunda.
+- **Status**: ⚠️ Implemented (ada catatan). **Booking ruang**: irisan 1 dari 7 ada di kode (inventory-service, feed kalender, notifikasi, layar web Ruang & Booking, penunjukan penyetuju). **Irisan 1b** (mengajukan, mengubah jadwal, membatalkan, menyetujui, dan menolak lewat web, plus kartu Booking Ruang di halaman Pengajuan) terimplementasi di branch, **belum merge** per 2026-09-14. **Irisan 2** (MyBharata: kartu Booking Ruang di menu Pengajuan, form dan detail booking, booking di daftar pengajuan terpadu, notifikasi berlabel; riwayat terstruktur dua bahasa di web dan MyBharata) terimplementasi di branch, **belum merge** per 2026-09-15. Booking berulang (irisan 3) dan pemilih ruang di modul lain (irisan 4 sampai 7) belum ada. **Barang dan kendaraan**: masih konsep, ditunda.
 - **Rumah kode**: [[Microservices - Inventory Service]] (koleksi `ga_ruang`, `ga_peminjaman`, `ga_peminjaman_penyetuju`, lihat [[DB - Data Dictionary]]). Kontrak endpoint: [[API - Inventory Service]].
 - **Sumber bisnis**: 2 sheet *"Form Peminjaman Ruangan"* + *"Syarat Dan Ketentuan Peminjaman Ruangan"* (PT Bharata Internasional Pharmaceutical).
 
@@ -24,8 +24,8 @@
 
 | Persona | Peran & Divisi | Akses / RBAC | Device |
 |---|---|---|---|
-| **Pemohon** | Karyawan lintas divisi | Cukup identitas (tanpa izin modul) | [[APP - Web ERP]]: kartu Booking Ruang di halaman Pengajuan dan tab Booking Saya (ajukan, ubah jadwal, batal; irisan 1b). [[APP - MyBharata]] (irisan 2) |
-| **Penyetuju** | Karyawan yang ditunjuk HR, satu daftar per perusahaan (bukan atasan pemohon) | Penunjukan di daftar penyetuju, bukan izin; tak boleh memutus booking miliknya sendiri | [[APP - Web ERP]]: tab Perlu Keputusan dan detail booking (irisan 1b). [[APP - MyBharata]] (irisan 2) |
+| **Pemohon** | Karyawan lintas divisi | Cukup identitas (tanpa izin modul) | [[APP - Web ERP]]: kartu Booking Ruang di halaman Pengajuan dan tab Booking Saya (ajukan, ubah jadwal, batal; irisan 1b). [[APP - MyBharata]]: kartu Booking Ruang di menu Pengajuan, Aktivitas Saya, dan Riwayat (irisan 2, branch) |
+| **Penyetuju** | Karyawan yang ditunjuk HR, satu daftar per perusahaan (bukan atasan pemohon) | Penunjukan di daftar penyetuju, bukan izin; tak boleh memutus booking miliknya sendiri | [[APP - Web ERP]]: tab Perlu Keputusan dan detail booking (irisan 1b). [[APP - MyBharata]]: chip Booking di antrean Review Submission dan detail booking (irisan 2, branch) |
 | **Team GA** | Staf / supervisor GA | `ga.view` (jadwal seluruh booking, termasuk nama dan nomor WA pemohon), `ga.work` (tambah, ubah, nonaktifkan ruang) | [[APP - Web ERP]] (Ruang & Booking) |
 | **HR** | Supervisor HRIS atau IT | Gerbang `RequireHRISOrITSupervisor` | [[APP - Web ERP]] (Pengaturan > Organisasi & Jabatan) |
 | **Penanggung jawab** | Kontak yang nomor WA-nya dicatat di booking (umumnya pemohon sendiri) | Referensi kontak, wajib diisi | |
@@ -62,8 +62,8 @@ Booking bentrok bila ada booking lain di **ruang yang sama** berstatus `DISETUJU
 
 1. **Tunjuk penyetuju** (HR, web): supervisor HRIS/IT memilih karyawan aktif. Selama daftar kosong, pengajuan ditolak dan layar menyampaikannya lebih dulu.
 2. **Daftarkan ruang** (GA, web): nama, lokasi, kapasitas, fasilitas, jam buka dan tutup. Ruang tak pernah dihapus, hanya dinonaktifkan.
-3. **Ajukan** (pemohon; web lewat kartu Booking Ruang di halaman Pengajuan sejak irisan 1b, MyBharata di irisan 2): pilih ruang dan jam kosong, isi keperluan (wajib), nomor WA (wajib, 8 sampai 15 angka), keterangan → `DIAJUKAN`; penyetuju dikabari.
-4. **Putuskan** (penyetuju; web lewat tab Perlu Keputusan sejak irisan 1b, MyBharata di irisan 2): setujui (ruang dibaca ulang; ruang yang sudah nonaktif atau jam di luar jam operasional yang berlaku ditolak dengan pesan menyuruh menolak booking itu) atau tolak dengan alasan; pemohon dikabari.
+3. **Ajukan** (pemohon; web lewat kartu Booking Ruang di halaman Pengajuan sejak irisan 1b, MyBharata lewat kartu Booking Ruang di grid Pengajuan sejak irisan 2): pilih ruang dan jam kosong, isi keperluan (wajib), nomor WA (wajib, 8 sampai 15 angka), keterangan → `DIAJUKAN`; penyetuju dikabari.
+4. **Putuskan** (penyetuju; web lewat tab Perlu Keputusan sejak irisan 1b, MyBharata lewat chip Booking di Review Submission sejak irisan 2): setujui (ruang dibaca ulang; ruang yang sudah nonaktif atau jam di luar jam operasional yang berlaku ditolak dengan pesan menyuruh menolak booking itu) atau tolak dengan alasan; pemohon dikabari.
 5. **Ubah atau batal** (pemohon, sebelum mulai): perubahan ruang atau jam mengembalikan booking disetujui ke antrean dan melepas slot lamanya; perubahan isian saja tidak. Pemohon yang sudah pindah perusahaan hanya bisa membatalkan.
 6. **Pakai**: sesuai jam; wajib menjaga kebersihan dan tidak merusak fasilitas (Syarat & Ketentuan).
 7. **Eskalasi**: bila ada kerusakan, ke [[GA - Machine & Utility Maintenance]] / [[GA - Building Maintenance]].
@@ -76,7 +76,8 @@ Kontrak endpoint (`/peminjaman/*` di inventory-service) didokumentasikan di [[AP
 
 - [[APP - Web ERP]]: halaman Ruang & Booking (booking sendiri, antrean penyetuju, jadwal, ruang) beserta aksi mengajukan, mengubah jadwal, membatalkan, menyetujui, dan menolak (irisan 1b); kartu Booking Ruang di halaman Pengajuan; tab penunjukan penyetuju di Pengaturan.
 - [[API - Employee Service]]: `GET /pengajuan/ringkasan` membaca antrean penyetuju (`GET /peminjaman/perlu-aksi`) sebagai angka kartu Booking Ruang.
-- [[APP - MyBharata]]: pintu masuk pemohon dan penyetuju (irisan 2).
+- [[APP - MyBharata]]: pintu masuk pemohon dan penyetuju (irisan 2): kartu Booking Ruang di menu Pengajuan, form dan detail booking, booking di daftar pengajuan terpadu.
+- [[API - Attendance Service]]: daftar pengajuan terpadu memuat booking milik pemanggil dan antrean penyetuju bila klien meminta `include=booking`, dibaca dari inventory tanpa salinan (irisan 2).
 - [[Microservices - Calendar Service]]: feed `inventory` / kind `room_booking`, hanya booking milik pembaca.
 - [[Microservices - Notification Service]]: kabar perlu-aksi dan diperbarui.
 - Agenda Kalender, Interview, Onboarding review, Program Culture, Pelatihan: pemilih ruang kantor (direncanakan irisan 4 sampai 7).
@@ -85,7 +86,7 @@ Kontrak endpoint (`/peminjaman/*` di inventory-service) didokumentasikan di [[AP
 
 ## Kendala
 
-- Aksi booking lewat web (irisan 1b) belum merge per 2026-09-14; sebelum terbit, pengajuan dan persetujuan hanya terjangkau lewat API.
+- Aksi booking lewat web (irisan 1b) serta layar MyBharata, daftar terpadu, dan riwayat terstruktur (irisan 2) belum merge per 2026-09-15; sebelum terbit, pengajuan dan persetujuan hanya terjangkau lewat API.
 - Pengajuan yang jam selesainya sudah lewat tetap `DIAJUKAN` (tak ada kedaluwarsa otomatis). Web tak menawarkan Tolak untuknya, sama dengan antrean server yang menyaringnya; pemohonnya masih bisa membatalkan.
 - Penyetuju yang resign atau pindah tenant tetap tercatat sampai HR melepasnya; layar HR hanya menandainya.
 - Push FCM butuh device MyBharata terdaftar; bila tak ada, inbox tetap tampil (notifikasi best-effort, gagal kirim tidak menggagalkan booking).
