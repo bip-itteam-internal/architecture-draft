@@ -160,6 +160,29 @@ def test_beberapa_tool_paralel_yang_masih_tertunda_menentukan():
     assert (k["area"], k["alat"]) == ("perpustakaan", "Read")
 
 
+def test_batch_tool_lambat_dulu_hasil_read_tertahan_tetap_di_ruang_server():
+    # transkrip nyata: [PowerShell, Read] satu pesan, hasil Read baru tertulis setelah PowerShell selesai
+    k = keadaan_dari([tool_use(WS, "PowerShell", "toolu_a", {"description": "verifikasi"}, -100),
+                      tool_use(WS, "Read", "toolu_b", {"file_path": "x/indeks.md"}, -99)])
+    assert (k["area"], k["alat"], k["detail"]) == ("server", "PowerShell", "verifikasi")
+    assert k["durasi_detik"] == 100
+
+
+def test_batch_tool_cepat_dulu_hasil_tertahan_tetap_di_ruang_alat_lambat():
+    k = keadaan_dari([tool_use(WS, "Grep", "toolu_a", None, -100), tool_use(WS, "Agent", "toolu_b", None, -99)])
+    assert (k["area"], k["alat"]) == ("rapat", "Agent")
+
+
+def test_batch_tool_lambat_semua_yang_paling_awal_menentukan():
+    k = keadaan_dari([tool_use(WS, "Agent", "toolu_a", None, -100), tool_use(WS, "PowerShell", "toolu_b", None, -99)])
+    assert (k["area"], k["alat"]) == ("rapat", "Agent")
+
+
+def test_batch_tool_singkat_semua_yang_paling_awal_menentukan():
+    k = keadaan_dari([tool_use(WS, "Edit", "toolu_a", None, -30), tool_use(WS, "Read", "toolu_b", None, -29)])
+    assert (k["area"], k["alat"]) == ("meja", "Edit")
+
+
 def test_detail_read_hanya_nama_berkas_bukan_path():
     k = keadaan_dari([tool_use(WS, "Read", "toolu_a", {"file_path": "C:/dalam/sekali/handler_kpi.go"}, -3)])
     assert k["detail"] == "handler_kpi.go"

@@ -194,9 +194,15 @@ Diturunkan dari kejadian terakhir yang bermakna. `attachment`, `queue-operation`
 dihapus oleh `tool_result`-nya, oleh `end_turn`, dan oleh prompt baru dari user (kejadian `user`
 tanpa `tool_result` dan bukan `isMeta`).
 
+Dalam satu batch tool paralel, hasil tool singkat (Read, Edit) sering baru tertulis setelah tool
+lambat di batch yang sama selesai. Diukur 2026-09-15 atas 25 transkrip: pada 125 batch yang tool
+lambatnya lebih dulu, hasil tool singkatnya ikut tertahan, sehingga aturan "tool tertunda terakhir"
+menaruh robot di Perpustakaan selama PowerShell berjalan. Karena itu yang menentukan area adalah tool
+tertunda paling awal di luar Perpustakaan/Meja, dan bila tak ada, yang paling awal.
+
 | Urutan | Kondisi | Area | Keadaan |
 |---|---|---|---|
-| 1 | Ada `tool_use` tertunda | menurut tool tertunda terakhir | `alat` (atau `menunggu_anda` untuk tool Lounge) |
+| 1 | Ada `tool_use` tertunda | menurut tool tertunda paling awal di luar Perpustakaan/Meja (bila tak ada: paling awal) | `alat` (atau `menunggu_anda` untuk tool Lounge) |
 | 2 | `end_turn` dan masih ada subagent hidup | Ruang rapat | `menunggu_subagent` |
 | 3 | `end_turn` tanpa subagent hidup | Lounge | `menunggu_anda` |
 | 4 | Selain itu (sesudah hasil tool, prompt baru, thinking) | Meja sendiri | `berpikir` |

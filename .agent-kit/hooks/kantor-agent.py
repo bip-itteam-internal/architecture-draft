@@ -193,7 +193,10 @@ def turunkan_keadaan(u, ada_subagent, sekarang):
     akhir = u["akhir"]
     diam = _detik_sejak(akhir.get("timestamp"), sekarang) if akhir else None
     if u["tertunda"]:
-        nama, masukan, ts = next(reversed(u["tertunda"].values()))
+        # batch paralel: hasil tool singkat sering baru tertulis setelah tool lambat di batch yang sama selesai,
+        # jadi yang menentukan tool paling awal di luar perpustakaan/meja, bukan yang terakhir
+        semua = list(u["tertunda"].values())
+        nama, masukan, ts = next((t for t in semua if area_alat(t[0]) not in ("perpustakaan", "meja")), semua[0])
         area = area_alat(nama)
         return {"area": area, "keadaan": "menunggu_anda" if area == "lounge" else "alat", "alat": nama or "",
                 "detail": detail_alat(nama, masukan), "sejak": ts, "durasi_detik": _detik_sejak(ts, sekarang),
