@@ -47,11 +47,18 @@ DIAM_MENIT = 10
 EKOR_UTAMA = 64 * 1024
 EKOR_SUB = 32 * 1024
 EKOR_MAKS = 2 * 1024 * 1024
+# Tugas shell latar TIDAK diambil dari ekor di atas: terukur 2026-09-15 atas 430 tugas latar bernotifikasi di 35 transkrip
+# 7 hari, jarak awal tugas ke notifikasinya p50 78 KB, p90 480 KB, maks 6,6 MB (239 tugas lebih dari 64 KB). Jendela
+# pertama pelacak bertahap (_latar_berkas) karena itu 8 MB; sesudahnya hanya byte baru yang dibaca.
+EKOR_LATAR = 8 * 1024 * 1024
+LATAR_TUNDA_MAKS = 256  # tool_use yang hasilnya belum terlihat oleh pelacak; hasil selalu datang jauh sebelum batas ini
+LATAR_MAKS = 32
 # prasaring daftar direktori, sengaja longgar (lihat _daftar_jsonl)
 PRASARING_UTAMA_DETIK = 6 * 3600
 PRASARING_SUB_DETIK = 30 * 60
 _CACHE = {}  # path -> ((ukuran, mtime_ns), (hasil urai, baris_diurai, baris_rusak))
 _LOKASI = {}  # sessionId -> path transkrip terakhir ditemukan, supaya tak mencari ulang di tiap folder proyek
+_LATAR = {}  # path -> {"offset", "tunda", "latar"}: pelacak tugas shell latar bertahap per transkrip
 # transkrip sependek ini tanpa user/assistant = sesi yang baru lahir, bukan tanda format berubah
 MIN_BARIS_TANPA_PERCAKAPAN = 20
 GAGAL_TULIS_MAKS = 5
@@ -130,6 +137,10 @@ _ID_NOTIFIKASI = re.compile(r"<task-id>\s*([^<\s]+)\s*</task-id>")
 # Tugas yang dihentikan TaskStop TIDAK pernah mendapat <task-notification> (terukur 2026-09-15: 2 dari 2 di transkrip
 # sesi pelaksana), jadi penutupnya tool_result TaskStop itu sendiri. shell_id = nama parameternya yang lama.
 PENGHENTI_LATAR = ("TaskStop",)
+# Baris yang mungkin mengubah pelacak tugas latar; baris lain dilewati sebelum json.loads. PowerShell/Bash untuk tool_use
+# perintah yang kelak dipindah ke latar karena timeout (inputnya tanpa run_in_background).
+_PENANDA_LATAR = (b"run_in_background", b"backgroundTaskId", b"task-notification", b"task_id", b"shell_id",
+                  b"PowerShell", b'"Bash"')
 
 
 def _teks_blok(isi):
@@ -154,6 +165,43 @@ def _tutup_latar(latar, teks):
             latar.pop(m.group(1), None)
 
 
+def lacak_latar(tunda, latar, o):
+    """Satu kejadian ke pelacak tugas shell latar. SATU-SATUNYA aturan latar: dipakai `urai` atas ekor dan
+    `_latar_berkas` atas jendela bertahap.
+
+    `tunda` = tool_use yang hasilnya belum terlihat (tidak dikosongkan end_turn: hasil tool tetap datang sesudahnya),
+    `latar` = tugas yang sudah dimulai dan belum diberi <task-notification> atau dihentikan TaskStop yang berhasil."""
+    t = o.get("type")
+    if t == "assistant":
+        for b in (o.get("message") or {}).get("content") or []:
+            if isinstance(b, dict) and b.get("type") == "tool_use":
+                tunda[b.get("id")] = (b.get("name"), b.get("input"), o.get("timestamp"))
+        while len(tunda) > LATAR_TUNDA_MAKS:
+            tunda.popitem(last=False)
+    elif t == "user" and not o.get("isMeta"):
+        isi = (o.get("message") or {}).get("content")
+        if isinstance(isi, list):
+            r = o.get("toolUseResult")
+            for b in isi:
+                if not (isinstance(b, dict) and b.get("type") == "tool_result"):
+                    continue
+                asal = tunda.pop(b.get("tool_use_id"), None)
+                if not (asal and isinstance(asal[1], dict)):
+                    continue
+                if asal[0] in PENGHENTI_LATAR:
+                    if not b.get("is_error"):  # ditolak atau gagal: tugasnya belum tentu berhenti
+                        latar.pop(str(asal[1].get("task_id") or asal[1].get("shell_id")), None)
+                elif asal[1].get("run_in_background") is True or (isinstance(r, dict) and r.get("backgroundTaskId")):
+                    tid = _id_tugas_latar(o, b)
+                    if tid:
+                        latar[tid] = asal
+                        while len(latar) > LATAR_MAKS:
+                            latar.popitem(last=False)
+        _tutup_latar(latar, _teks_blok(isi))
+    elif t == "queue-operation":
+        _tutup_latar(latar, o.get("content"))
+
+
 def urai(kejadian):
     """Satu lintasan atas kejadian berurutan.
 
@@ -162,16 +210,19 @@ def urai(kejadian):
     `latar` = tugas shell latar (run_in_background, atau perintah yang dipindah ke latar karena timeout) yang sudah
     dimulai dan belum diberi <task-notification> atau dihentikan TaskStop; tidak dihapus end_turn maupun prompt
     baru, karena tugasnya memang tetap berjalan.
+    Aturan `latar` ada di `lacak_latar`, bersama pelacak bertahap per berkas.
     Tipe selain user/assistant/queue-operation (attachment, ...) tidak mengubah keadaan; ai-title
     dan pr-link hanya dibaca sebagai label."""
     judul = pr = cwd = None
     tertunda = OrderedDict()
+    tunda_latar = OrderedDict()
     latar = OrderedDict()
     akhir = None
     dikenal = 0
     for o in kejadian:
         if not isinstance(o, dict):
             continue
+        lacak_latar(tunda_latar, latar, o)
         t = o.get("type")
         if o.get("cwd"):
             cwd = o["cwd"]
@@ -198,23 +249,11 @@ def urai(kejadian):
             if isinstance(isi, list):
                 for b in isi:
                     if isinstance(b, dict) and b.get("type") == "tool_result":
-                        asal = tertunda.pop(b.get("tool_use_id"), None)
+                        tertunda.pop(b.get("tool_use_id"), None)
                         ada_hasil = True
-                        if not (asal and isinstance(asal[1], dict)):
-                            continue
-                        r = o.get("toolUseResult")
-                        if asal[0] in PENGHENTI_LATAR:
-                            latar.pop(str(asal[1].get("task_id") or asal[1].get("shell_id")), None)
-                        elif asal[1].get("run_in_background") is True or (isinstance(r, dict) and r.get("backgroundTaskId")):
-                            tid = _id_tugas_latar(o, b)
-                            if tid:
-                                latar[tid] = asal
-            _tutup_latar(latar, _teks_blok(isi))
             if not ada_hasil:
                 tertunda.clear()  # prompt baru dari user
             akhir = o
-        elif t == "queue-operation":
-            _tutup_latar(latar, o.get("content"))
     return {"judul": judul, "pr": pr, "cwd": cwd, "tertunda": tertunda, "latar": latar, "akhir": akhir,
             "dikenal": dikenal}
 
@@ -537,8 +576,42 @@ def _cari_transkrip(folder_proyek, sid):
     return None, None
 
 
+def _latar_berkas(path, ukuran):
+    """Tugas shell latar yang belum selesai di transkrip `path`, dilacak bertahap (lihat EKOR_LATAR).
+
+    Berkas yang pertama kali terlihat dibaca dari EKOR_LATAR terakhir dengan baris pertamanya yang terpotong dibuang;
+    sesudahnya hanya byte baru. Baris terakhir yang belum lengkap dibaca ulang di tick berikutnya."""
+    s = _LATAR.get(path)
+    potong = False
+    if s is None or ukuran < s["offset"]:  # baru terlihat, atau berkasnya diganti lebih pendek
+        s = {"offset": max(0, ukuran - EKOR_LATAR), "tunda": OrderedDict(), "latar": OrderedDict()}
+        _LATAR[path] = s
+        potong = s["offset"] > 0
+    if ukuran > s["offset"]:
+        with open(path, "rb") as f:
+            f.seek(s["offset"])
+            data = f.read(ukuran - s["offset"])
+        mulai = 0
+        if potong:
+            nl = data.find(b"\n")
+            mulai = nl + 1 if nl >= 0 else len(data)
+        akhir = data.rfind(b"\n") + 1
+        for baris in data[mulai:akhir].split(b"\n") if akhir > mulai else ():
+            if not baris or not any(p in baris for p in _PENANDA_LATAR):
+                continue
+            try:
+                o = json.loads(baris)
+            except ValueError:
+                continue
+            if isinstance(o, dict):
+                lacak_latar(s["tunda"], s["latar"], o)
+        s["offset"] += max(akhir, mulai)
+    return s["latar"]
+
+
 def _urai_berkas(path, st, awal, terlihat):
-    """urai() atas ekor berkas, di-cache per (ukuran, mtime): hanya transkrip yang berubah yang diurai ulang."""
+    """urai() atas ekor berkas, di-cache per (ukuran, mtime): hanya transkrip yang berubah yang diurai ulang.
+    `latar` diganti hasil pelacak bertahap: ekor terlalu pendek untuk tugas latar (lihat EKOR_LATAR)."""
     terlihat.add(path)
     kunci = (st.st_size, st.st_mtime_ns)
     lama = _CACHE.get(path)
@@ -546,6 +619,7 @@ def _urai_berkas(path, st, awal, terlihat):
         return lama[1]
     kejadian, d, r = baca_ekor(path, awal)
     u = urai(kejadian)
+    u["latar"] = OrderedDict(_latar_berkas(path, st.st_size))
     if lama:  # judul dan PR bisa jatuh di luar ekor yang pendek: pertahankan yang terakhir terlihat
         if u["judul"] is None:
             u["judul"] = lama[1][0]["judul"]
@@ -641,8 +715,9 @@ def kumpulkan(proyek_dir, workspace, sekarang, registri_dir=None, hidup=None):
     for s in sesi:
         del s["_mulai"]
     dikenali = not (diurai and rusak * 2 > diurai) and tanpa_percakapan == 0
-    for k in [k for k in _CACHE if k not in terlihat]:
-        del _CACHE[k]  # transkrip yang tak lagi hidup tidak ditahan di memori
+    for cache in (_CACHE, _LATAR):
+        for k in [k for k in cache if k not in terlihat]:
+            del cache[k]  # transkrip yang tak lagi hidup tidak ditahan di memori
     return {
         "versi": VERSI_DATA,
         "dibuat": sekarang.isoformat().replace("+00:00", "Z"),

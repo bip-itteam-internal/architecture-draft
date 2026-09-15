@@ -675,6 +675,72 @@ def test_urai_tugas_latar_yang_dihentikan_taskstop_ikut_tertutup():
     assert list(ka.urai(mulai)["latar"]) == ["b1", "b2"]
     assert list(ka.urai(mulai + henti[:2])["latar"]) == ["b2"]
     assert dict(ka.urai(mulai + henti)["latar"]) == {}
+    ditolak = tool_result(WS, "toolu_u", -9)
+    ditolak["message"]["content"][0]["is_error"] = True  # TaskStop ditolak atau gagal: tugasnya belum tentu berhenti
+    assert list(ka.urai(mulai + [tool_use(WS, "TaskStop", "toolu_u", {"task_id": "b1"}, -10), ditolak])["latar"]) == ["b1", "b2"]
+
+
+def _hasil_besar(ws, tool_id, detik, isi):
+    o = tool_result(ws, tool_id, detik)
+    o["message"]["content"][0]["content"] = isi
+    return o
+
+
+def _pengisi(ws, awalan, n, detik, ukuran=30000):
+    # n pasang tool_use Read + hasil tool ~30 KB: mendorong kejadian sebelumnya ke luar ekor
+    out = []
+    for i in range(n):
+        out += [tool_use(ws, "Read", "toolu_%s%d" % (awalan, i), {"file_path": "%s%d.py" % (awalan, i)}, detik + i),
+                _hasil_besar(ws, "toolu_%s%d" % (awalan, i), detik + i, "x" * ukuran)]
+    return out
+
+
+def test_tugas_latar_yang_awalnya_di_luar_ekor_tetap_terlacak_bertahap(lingkungan2):
+    # terukur 2026-09-15 di sesi pelaksana: sampler yang dimulai ~460 KB sebelum sesinya diam sudah jauh di luar
+    # ekor 64 KB, jadi sesi yang sedang menunggunya tampil "menunggu Anda"
+    ws, proyek, reg = lingkungan2
+    kejadian = ([tool_use(ws, "PowerShell", "toolu_a", {"description": "uji panjang", "run_in_background": True}, -600),
+                 hasil_latar(ws, "toolu_a", "b1", -599)] + _pengisi(ws, "r", 4, -500) + [end_turn(ws, -50)])
+    f = tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", kejadian, _epoch(-50))
+    ekor, _, _ = ka.baca_ekor(str(f))
+    assert not any((o.get("toolUseResult") or {}).get("backgroundTaskId") for o in ekor)  # prasyarat: di luar ekor
+    tulis_registri(reg, 101, "sesi-a", ws, status="idle", diperbarui=-50)
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"], s["detail"]) == ("server", "menunggu_latar", "uji panjang")
+    tulis_jsonl(f, kejadian + [notifikasi_latar(ws, "b1", -5)], _epoch(-5))  # berkas tumbuh: hanya byte baru dibaca
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"]) == ("lounge", "menunggu_anda")
+
+
+def test_pelacak_latar_berkas_melacak_perintah_yang_dipindah_ke_latar_di_luar_ekor(lingkungan2):
+    # tool_use perintah biasa (tanpa run_in_background) wajib lolos prasaring pelacak: hasilnya baru belakangan
+    # membawa backgroundTaskId karena timeout
+    ws, proyek, reg = lingkungan2
+    hasil = tool_result(ws, "toolu_a", -359)
+    hasil["message"]["content"][0]["content"] = "Command did not complete within its 180s timeout and was moved to the background (ID: b9)."
+    hasil["toolUseResult"] = {"stdout": "", "stderr": "", "interrupted": False, "backgroundTaskId": "b9", "timedOutAfterMs": 180000}
+    kejadian = ([tool_use(ws, "PowerShell", "toolu_a", {"description": "build lambat"}, -540), hasil]
+                + _pengisi(ws, "r", 4, -300) + [end_turn(ws, -50)])
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", kejadian, _epoch(-50))
+    tulis_registri(reg, 101, "sesi-a", ws, status="idle", diperbarui=-50)
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"], s["detail"]) == ("server", "menunggu_latar", "build lambat")
+
+
+def test_pelacak_latar_membaca_jendela_ekor_latar_terakhir(lingkungan2, monkeypatch):
+    # Berkas pertama kali terlihat dibaca dari EKOR_LATAR terakhir, bukan dari awal (transkrip bisa puluhan MB).
+    # Jendela 120 KB di sini jatuh di tengah hasil tool 30 KB tanpa merusak pelacakan: tugas "baru" (di luar ekor
+    # 64 KB, di dalam jendela) terlacak, tugas "tua" (di luar jendela) tidak.
+    ws, proyek, reg = lingkungan2
+    monkeypatch.setattr(ka, "EKOR_LATAR", 120 * 1024)
+    kejadian = ([tool_use(ws, "PowerShell", "toolu_t", {"description": "tua", "run_in_background": True}, -900),
+                 hasil_latar(ws, "toolu_t", "b-tua", -899)] + _pengisi(ws, "p", 2, -800)
+                + [tool_use(ws, "PowerShell", "toolu_b", {"description": "baru", "run_in_background": True}, -600),
+                   hasil_latar(ws, "toolu_b", "b-baru", -599)] + _pengisi(ws, "q", 3, -500) + [end_turn(ws, -50)])
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", kejadian, _epoch(-50))
+    tulis_registri(reg, 101, "sesi-a", ws, status="idle", diperbarui=-50)
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["keadaan"], s["detail"]) == ("menunggu_latar", "baru")
 
 
 def test_registri_tugas_latar_dari_proses_sebelumnya_tidak_ditunggu(lingkungan2):
