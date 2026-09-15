@@ -183,3 +183,4 @@ Temuan review kode 2026-08-31, seluruhnya terverifikasi ke berkas & barisnya.
 - [[Finance - Rancangan Finance Service]] — modul finance yang direncanakan di ERP
 - [[API - Integration Service]] — endpoint `/accounting/*` yang membaca Accurate hari ini
 - [[External - Accurate]] · [[Microservices - Payroll Service]] · [[HRIS - Matriks KPI per Departemen]]
+- [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]]: arah yang diusulkan, aplikasi ini jadi spesifikasi dan sumber migrasi · [[Finance - Buku Besar CV]]
