@@ -4,7 +4,7 @@ Papan kerja untuk [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi 
 Dok aplikasi [[APP - Audit Internal]], dok domain [[Finance - Audit Internal]].
 
 Disusun 2026-09-03.
-**Status per 2026-09-03: Fase 3 (aplikasi) SELESAI, Fase 1 (pemisahan service + database) BELUM DIMULAI.** Repo `audit-bharata` ada dengan tiga layar, 32 test hijau, build sukses. Modul audit sendiri masih di dalam `services/finance` dan **live di produksi** dengan 36 baris uji nyata.
+**Status per 2026-09-03: Fase 3 (aplikasi) SELESAI, Fase 1 (pemisahan service + database) BELUM DIMULAI.** **Per 2026-09-15**: registry 36 uji diganti 38 item uji petik ([[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]), dan T3.8 dikerjakan di branch, belum merge. Repo `audit-bharata` ada dengan tiga layar, 32 test hijau, build sukses. Modul audit sendiri masih di dalam `services/finance` dan **live di produksi** dengan 36 baris uji nyata.
 
 ⛔ **URUTAN YANG DIANJURKAN: Fase 1 sebelum Fase 3.** Membalik urutannya menerbitkan penampakan independensi di atas penyimpanan yang belum terpisah, dan itu lebih berbahaya daripada tidak memisahkan sama sekali — orang berhenti bertanya.
 
@@ -58,6 +58,7 @@ Disusun 2026-09-03.
 - [ ] **T2.1 — Daftarkan keempat izin `audit.*` ke `TANPA_BYPASS_SEMUA_MENU`** (`erp-frontend/src/utils/menu-permission.ts`).
   ⚠️ **Ini membalik keputusan 2026-09-02** yang memilih mengikuti konvensi modul ber-tier-default kosong. Konvensi itu benar untuk modul tanpa tuntutan kerahasiaan; tuntutan "yang diaudit tidak boleh melihat sebelum terbit" membuatnya tidak berlaku.
   **Selesai bila**: ada test yang membuktikan pemegang `system_roles.it: supervisor` **tanpa** paket audit tidak melihat menunya, dan kontrol negatifnya membuktikan yang berpaket tetap melihat.
+  ⛔ **Gugur 2026-09-15**: menu audit dicabut dari erp-frontend (T3.8, ADR 0098), jadi tak ada item sidebar yang bisa diloloskan bypass. Empat entri `audit.*: tolak` di `FALLBACK` tetap dipertahankan.
 
 - [ ] **T2.2 — Bangun `GET /internal/audit/pemasok`** di procurement-service. Bergerbang sendiri — `/internal/` bukan batas keamanan.
 - [ ] **T2.3 — Bangun `GET /internal/audit/karyawan`** di employee-service. Bergerbang sendiri.
@@ -90,6 +91,7 @@ Disusun 2026-09-03.
 - [x] **T3.7 — Guard build**: gagalkan build bila `.env` tak ada, supaya situs produksi tidak menunjuk alamat dev secara senyap.
 
 - [ ] **T3.8 — Cabut rute `/audit*` dari `erp-frontend`** setelah situsnya hidup dan terverifikasi. Jangan sebelumnya.
+  - ⚠️ **Dikerjakan 2026-09-15** di branch `feat/cabut-audit-internal-erp` bersama ADR 0098, **belum merge**. Alamat lama dialihkan (307) ke `NEXT_PUBLIC_AUDIT_URL`. Kotaknya sengaja belum dicentang: syarat "terverifikasi" menuntut perjalanan pengguna di situs audit, dan itu belum ditempuh.
 
 ---
 
