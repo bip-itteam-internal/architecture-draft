@@ -233,7 +233,7 @@ Klasifikasi internal **tidak boleh bergantung** pada ada-tidaknya pemegang. Akib
 
 ### Untuk TOKO tidak perlu mekanisme serupa
 
-Toko yang **belum dipegang** staf ICC sudah otomatis internal karena kepemilikannya tercatat berlapis di tempat lain: `tt_shop_authorized_shops` (toko terautorisasi = milik kita) dan `department_shops` (toko milik departemen mana — di kodenya ditegaskan ini *kepemilikan*, berbeda dari `/marketing/teams` yang *kontrol akses*). `icc_account_mappings` hanya tahu soal **penugasan**. Kesalahan yang harus dihindari: memakai mapping ICC sebagai penentu "ini toko kita atau bukan".
+Toko yang **belum dipegang** staf ICC sudah otomatis internal karena kepemilikannya tercatat berlapis di tempat lain: `tt_shop_authorized_shops` (toko terautorisasi = milik kita) dan `department_shops` (toko milik departemen mana — di kodenya ditegaskan ini *kepemilikan*, berbeda dari ACL "siapa boleh lihat toko apa" di `AllowedShops`/`ShopACLUseCase`, dulu `/marketing/teams` sebelum dicabut Fase Contract 2026-09-15). `icc_account_mappings` hanya tahu soal **penugasan**. Kesalahan yang harus dihindari: memakai mapping ICC sebagai penentu "ini toko kita atau bukan".
 
 ### Field advertiser TIDAK diganti
 

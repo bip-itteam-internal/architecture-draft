@@ -314,24 +314,21 @@ Menandai staf **Affiliate Acquisition** masuk tim channel **tiktok** atau **shop
 
 Semua gate `RequireMarketingLeader`. Koleksi `affiliate_channel_team`; partial unique `(employee_id, is_active=true)` — satu channel aktif per karyawan. `channel` divalidasi ke `tiktok`/`shopee` (usecase). Dikelola dari **menu Affiliate** (dialog "Tim Channel") di [[APP - Web ERP]].
 
-### Marketing Team & Shop ACL (admin only)
-- `/marketing/teams` — CRUD tim marketing (gated `RequireIntegrationAdmin` = supervisor/admin module integration)
-- Anggota tim: assign/unassign member (`/marketing/teams/:id/members`)
-- **Shop ACL**: assign/unassign toko ke tim (`/marketing/teams/:id/shops`) — kontrol akses toko per tim marketing
+### Shop ACL — "siapa boleh lihat toko apa" (`ShopACLUseCase`)
 
-Koleksi `marketing_teams` + `team_shops`. **Dipakai [[Microservices - Marketing Analytics Service]]** sebagai sumber saringan divisi **dan satu-satunya sumber Shopee** untuk kolom penanggung jawab toko — jadi mencabutnya tanpa pengganti mengosongkan keduanya tanpa satu pun error. Isi produksi 2026-08-11 tipis: **3 tim** (`aris`, `BH`, `GB-KY` — tak satu pun cocok nama departemen), **1 anggota**, **5 toko**. Penyatuannya ke `department_shops` diputuskan di [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]].
+✅ **CRUD Teams DICABUT TOTAL 2026-09-15** (Fase Contract, [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] §Migrasi langkah 4). Menu `/marketing/teams` (dulu CRUD tim marketing + assign member/shop, gated `RequireIntegrationAdmin`), koleksi `marketing_teams`/`team_shops`/`team_members`, dan seluruh entity/repo pendukungnya (`MarketingTeam`/`TeamMember`/`TeamShop`) sudah dihapus fisik dari kode. `cmd/departmentshopsseed` (CLI seed sekali-jalan yang dulu memakai `team_shops` sebagai fallback) ikut dihapus — tugasnya sudah tuntas. Koleksi Mongo-nya sendiri **dibiarkan** (tak ada kode yang menyentuhnya lagi, aman sebagai data mati; drop fisik opsional, keputusan manusia terpisah).
 
-⚠️ **Fungsi KEDUA, independen dari kepemilikan toko di atas: ACL "siapa boleh lihat toko apa"** (`AllowedShops`, dipanggil `transaction_handler.go` di `GET /transactions/master/shops`, gerbang rute `RequireIntegrationStaff`) — memfilter dropdown toko di puluhan halaman Accurate/payouts/gross-profit/transaksi lewat hook FE `useFetchShops()`. Sampai commit sebelum 2026-09-05 sumbernya `team_members`/`team_shops`; **branch `feat/acl-shops-department-source` (commit `f4d45777`, belum merge)** menggantinya baca `department_shops` + `BIP-Department` header. Detail lengkap (termasuk kenapa gate rute & exemption supervisor/admin TIDAK ikut berubah): [[ANALISA - Redesign ACL AllowedShops Berbasis Department Shops]].
+Yang **bertahan** hanyalah fungsi ACL "siapa boleh lihat toko apa" — kini `ShopACLUseCase` (dulu satu bagian dari `MarketingTeamUseCase` yang sama, disusutkan saat CRUD-nya dicabut). Dipanggil `transaction_handler.go` di `GET /transactions/master/shops` (gerbang rute `RequireIntegrationStaff`), memfilter dropdown toko di puluhan halaman Accurate/payouts/gross-profit/transaksi lewat hook FE `useFetchShops()`. Sumbernya `department_shops` + `BIP-Department` header (sejak 2026-09-05, live prod PR #1727) — bukan lagi `team_members`/`team_shops`. Detail lengkap (termasuk kenapa gate rute & exemption supervisor/admin TIDAK ikut berubah): [[ANALISA - Redesign ACL AllowedShops Berbasis Department Shops]].
 
 ### Kepemilikan toko per departemen (`department_shops`)
 
-> Grounded ke `internal/domain/entity/department_shop.go` + `usecase/department_shop_usecase.go`. **Terbangun tetapi belum tersambung**: 0 dokumen di produksi, belum ada UI, belum ada pembaca.
+> Grounded ke `internal/domain/entity/department_shop.go` + `usecase/department_shop_usecase.go`. ✅ **Live di produksi**: 58 toko terpetakan, UI di tab "Kepemilikan Toko" ICC Management, dipakai saringan `/divisi` + kolom `icc` di [[Microservices - Marketing Analytics Service]] DAN ACL `AllowedShops` di bawah — sumber tunggal sejak Fase Contract selesai 2026-09-15.
 
 - `GET /department-shops` — daftar pemetaan · `RequireIntegrationStaff`
 - `GET /department-shops/kesehatan` — **laporan ketidakcocokan**: toko terotorisasi yang belum dipetakan (yatim) + pemetaan tanpa otorisasi (sisa) · `RequireIntegrationStaff`
 - `POST /department-shops` (upsert) · `DELETE /department-shops` — **`RequireIntegrationAdmin`**
 
-**Bukan pengganti `/marketing/teams`, melainkan jawaban pertanyaan yang berbeda.** Team Shop adalah **kontrol akses** — satu toko boleh dilihat banyak tim. `department_shops` adalah **kepemilikan**, dan karenanya tunggal: satu toko yang dimiliki dua departemen membuat omzetnya terhitung dua kali dan menaikkan skor dua supervisor sekaligus. Ketunggalan ditegakkan index unik `(channel, shop_id)`.
+**Beda konsep dari §Shop ACL di atas, bukan bertumpuk.** ACL menjawab "siapa boleh lihat toko apa" (satu toko boleh dilihat banyak departemen, lewat filter `AllowedShops`). `department_shops` adalah **kepemilikan**, dan karenanya tunggal: satu toko yang dimiliki dua departemen membuat omzetnya terhitung dua kali dan menaikkan skor dua supervisor sekaligus. Ketunggalan ditegakkan index unik `(channel, shop_id)`. Sejak Fase Contract 2026-09-15, keduanya bahkan membaca koleksi yang SAMA (`department_shops`) — beda konsepnya murni di lapisan pertanyaan yang dijawab, bukan lagi di sumber datanya.
 
 `Department` disimpan sebagai **nama** departemen milik employee-service — kopling longgar yang di sistem ini **terbukti bisa membusuk**: `icc_account_mappings.team` pernah menulis "Tech Development" untuk 12 mapping karyawan yang `work_data`-nya Kyura/Beauty Hacks (diperbaiki 2026-08-07). Karena itu endpoint `/kesehatan` **bagian wajib fitur, bukan tambahan**. `ShopName` hanya untuk tampilan dan **tidak pernah** dipakai mencocokkan: nama toko di produksi ada yang berspasi di ujung dan ada yang beda hanya huruf besar-kecil.
 

@@ -64,7 +64,7 @@ Doc: [[Microservices - Integration Service]]
 - items / master catalog
 - credentials
 - holidays
-- marketing_teams (grouping tim + shop ACL)
+- ⛔ marketing_teams/team_shops/team_members — RETIRED 2026-09-15 (Fase Contract, [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]); dead data, digantikan `department_shops`
 - accurate_products
 - accurate_bank_accounts
 - accurate_kv_configs
