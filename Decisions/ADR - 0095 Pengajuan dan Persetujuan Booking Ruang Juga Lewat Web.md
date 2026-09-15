@@ -40,7 +40,7 @@ Menu Portal Saya **Booking Ruang** (tanpa izin) menuju `/ga/peminjaman?tab=saya`
 
 ### 4. MyBharata tetap berikutnya
 
-Irisan 2 tetap membangun layar MyBharata. Daftar pemohon dan antrean peninjau di sana direncanakan lewat daftar pengajuan terpadu attendance-service (booking ikut lewat parameter opt-in), sedangkan detail dan aksi booking tetap memanggil inventory-service. Rinciannya diputuskan di rencana irisan 2.
+Irisan 2 tetap membangun layar MyBharata. Daftar pemohon dan antrean peninjau di sana direncanakan lewat daftar pengajuan terpadu attendance-service (booking ikut lewat parameter opt-in), sedangkan detail dan aksi booking tetap memanggil inventory-service. Rinciannya diputuskan di rencana irisan 2. *Terimplementasi di branch, belum merge per 2026-09-15: attendance-service memuat booking hanya bila klien mengirim `include=booking` (antrean `as=reviewer` dan daftar milik sendiri; tab sudah diputus dan mode admin tanpa booking), dengan `degraded` saat inventory tak terbaca; MyBharata membuka detail dan aksi booking langsung ke inventory-service. Lihat [[API - Attendance Service]] dan [[APP - MyBharata]].*
 
 ## Consequences
 
@@ -61,7 +61,7 @@ Irisan 2 tetap membangun layar MyBharata. Daftar pemohon dan antrean peninjau di
 ### Yang sengaja tidak dilakukan
 
 - Daftar gabungan izin dan booking di web: web belum punya daftar izin untuk karyawan.
-- Alasan riwayat terstruktur dua bahasa: dikerjakan irisan 2 untuk kedua klien.
+- Alasan riwayat terstruktur dua bahasa: dikerjakan irisan 2 untuk kedua klien (web: commit tambahan di erp-frontend `feat/ga-peminjaman-aksi-web`; MyBharata: branch `feat/booking-ruang`; keduanya belum merge per 2026-09-15).
 - Mengangkat grid slot ke komponen bersama: ini pemakai pertama.
 
 ## Dokumen Terkait
