@@ -20,6 +20,8 @@
 
 Tiga tab terbawah tampak kosong **bukan karena belum dirapikan**, melainkan karena metrik yang menilai orangnya tidak punya angka di sistem. Merapikan tata letaknya tidak akan mengubah apa pun.
 
+**Di bawah isi setiap tab posisi selalu ada matriks KPI posisinya.** `IsiTab` merender `MatriksKpi` untuk tiap tab berposisi (`kartu/isi-tab.tsx:45`), berisi label, bobot, dan status otomasi dari `GET /kpi/auto-overview` (`hooks/use-matriks-kpi-hrga.ts:100-101`) plus kolom **Kelayakan** yang disalin di frontend (`lib/kpi-hrga/kelayakan.ts`). Kolom "Yang tampil hari ini" di atas menghitung isi khusus tab di atas matriks itu, bukan matriksnya. ⚠️ Kolom Kelayakan dikunci **nama template + label** (`kunciMetrik`, `kelayakan.ts:140`), jadi template yang berganti nama tak punya entri dan barisnya tampil "belum dinilai" sampai daftar itu diperbarui.
+
 ## HRD Supervisor
 
 **Dinilai dari** (template `KPI Supervisor HRGA`, 10 metrik):
@@ -115,7 +117,7 @@ Tiga tab terbawah tampak kosong **bukan karena belum dirapikan**, melainkan kare
 | 0,1 | Employee productivity 120 juta per karyawan | pendapatan (`GET /accounting/profit-loss`) dan `work_data` ada, definisinya belum | ⚠️ perlu definisi + sumber baru |
 | 0,1 | Training satisfaction score (1-10) | `trainer_evaluation` 0; skala di sistem 1-5 | ❌ |
 
-**Bisa ditampilkan sekarang.** Tak satu pun metrik KPI posisi ini berangka. Tab yang ada (`isi-people-dev.tsx`) merender antrean pengajuan pelatihan yang menunggu tindakan (`as=reviewer`, status Menunggu SPV/HR) beserta tautan ke halamannya, tiga kartu angka umum (total karyawan, departemen, posisi), sebaran departemen, agenda, dan pengumuman. Antrean itu sumbu "pekerjaan yang menunggu" yang benar; kartu angka dan sebarannya tidak menjawab satu pun metrik posisi ini.
+**Bisa ditampilkan sekarang.** Tak satu pun metrik KPI posisi ini berangka. Tab yang ada (`isi-people-dev.tsx`) merender antrean pengajuan pelatihan yang menunggu tindakan (`as=reviewer`, status Menunggu SPV/HR) beserta tautan ke halamannya, tiga kartu angka umum (total karyawan, departemen, posisi), sebaran departemen, agenda, dan pengumuman. Antrean itu sumbu "pekerjaan yang menunggu" yang benar; kartu angka dan sebarannya tidak menjawab satu pun metrik posisi ini. Di bawahnya matriks KPI posisi ini tampil (lihat Ringkasan keadaan), tetapi **kolom Kelayakan masih milik template lama**: entrinya hanya ada untuk template `People Development` (`kelayakan.ts:246-250`), sehingga keenam metrik template aktif `People and Development` tampil "belum dinilai".
 
 ⛔ **Empat metrik (bobot 0,75) terkunci pada modul Training yang belum dipakai, dan mengisinya saja tidak cukup.** Per 2026-09-15 `learning_db` prod berisi 2 pelatihan, 1 peserta yang belum hadir, 0 evaluasi trainer, dan 0 post-test. Sesudah datanya terisi pun belum ada sumber KPI yang membaca `learning_db`, jadi dev tetap harus menulisnya, dan post-test belum punya layar di web maupun aplikasi. Nilai yang diketik untuk Agustus 2026 (attendance 92, skor training 83, kepuasan 77) karena itu tidak berasal dari sistem; perbandingannya di [[HRIS - Matriks KPI per Departemen]].
 

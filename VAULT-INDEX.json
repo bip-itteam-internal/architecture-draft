@@ -1270,7 +1270,7 @@
       "area": "Application",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented — aplikasi HRIS mobile produksi (Flutter, Android/iOS). **Rilis di HP pemakai: `1.14.5+135`** (`origin/main`, GitHub Release 2026-08-03); `origin/dev` sudah di **`1.14.9+143`** dan belum ditarik ke `main`, jadi delapan PR terakhir termasuk **Pelatihan Saya** (#112) belum sampai ke siapa pun. Angka lama \"rilis dev 1.10.2+104\" di baris ini sudah tidak berlaku (diverifikasi ke `pubspec.yaml` kedua branch 2026-08-19).",
+      "status_teks": "Implemented — aplikasi HRIS mobile produksi (Flutter, Android/iOS). **Rilis di HP pemakai: `1.14.5+135`** (`origin/main`, GitHub Release 2026-08-03; masih rilis GitHub terbaru per 2026-09-15); `origin/dev` sudah di **`1.18.1+163`** (diukur 2026-09-15) dan belum ditarik ke `main`, jadi PR sesudah 135, termasuk **Pelatihan Saya** (#112) dan **Pengajuan Pelatihan** (#115), belum ada di rilis GitHub itu. Angka lama \"rilis dev 1.10.2+104\" dan \"dev 1.14.9+143\" di baris ini sudah tidak berlaku.",
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
@@ -1308,20 +1308,20 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "f0485daca0a7dc7e45e959791adc7042b2b9a1a2d99e04ebed5b4494b7f1f134",
-      "ukuran_kb": 67.8,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata (Flutter, Android dan iOS), fitur HR apa saja yang tersedia bagi karyawan (absensi, cuti dan izin, lembur, slip gaji, KPI, survei, Kaizen, Satgas 5R K3, Sesi Live Host, pelatihan), dan versi mana yang ada di branch `dev` dibanding yang terpasang di HP pemakai. Juga menjawab arsitekturnya (Clean Architecture feature-first, BLoC, get_it, dio lewat API gateway), cara autentikasi (JWT, biometric, PIN, satu akun satu device), serta perilaku multi-perusahaan: menu dan konten mana yang dibatasi per tenant dan kenapa.",
+      "hash": "9e8cc23c20ae09726736722214beaa8733eec6509146d04085448186499292f0",
+      "ukuran_kb": 68.3,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile HRIS MyBharata (Flutter untuk Android/iOS), tech stack dan arsitekturnya (Clean Architecture feature-first, BLoC, get_it, dio lewat API Gateway, Firebase flavor dev/prod), serta cara autentikasinya (JWT, biometric, PIN, satu akun satu device, onboarding karyawan baru). Juga menjawab fitur apa saja yang tersedia per menu (absensi, izin/cuti, lembur, slip gaji dengan PIN, KPI, survei/form, Kaizen, Satgas 5R dan K3, Sesi Live Host, Pelatihan Saya, pengajuan pelatihan), versi mana yang ada di rilis GitHub dibanding branch dev, dan bagaimana aplikasi berperilaku untuk karyawan perusahaan non-BIP (multi-tenant, CompanyScope).",
       "kata_kunci": [
         "MyBharata",
         "my_bharata",
         "aplikasi mobile",
         "Flutter",
-        "HRIS mobile",
-        "absensi",
         "attendance",
+        "absensi",
         "slip gaji",
         "multi-tenant",
-        "versi rilis"
+        "versi rilis",
+        "biometric"
       ]
     },
     {
@@ -5352,7 +5352,7 @@
         "REF - Penamaan Metrik & Sumber KPI"
       ],
       "hash": "986c92356a28f6e5d7cecda25991d35ee197cf415fad6f6c08996057876df910",
-      "ukuran_kb": 7.4,
+      "ukuran_kb": 7.5,
       "ringkasan": "Menjawab: mengapa KPI jabatan Culture & Industrial dihitung dari penilaian PESERTA (rating + masukan) alih-alih self-report officer, dan bagaimana modul Kelola Program Culture menggantikan pendekatan form realisasi (ADR 0065). Merinci skor komposit 30/30/40 (partisipasi/antusiasme/implementasi dihitung otomatis), resolusi target diundang otomatis dari jenis program, pemecahan distribusi pilar ke Core Value atomik, koleksi culture_programs/culture_feedback, dan batas kepemilikan kpi_score.",
       "kata_kunci": [
         "ADR 0066",
@@ -6083,7 +6083,7 @@
         "HRIS - Matriks KPI per Departemen"
       ],
       "hash": "ddd8211509695cc32e30ccaa08b6a00f19702f7f0cbadf6be3a93d9c89920515",
-      "ukuran_kb": 14.1,
+      "ukuran_kb": 14.2,
       "ringkasan": "Menjawab: bagaimana kehadiran Program Culture kini didefinisikan (scan QR fisik, bukan pengisi feedback), bagaimana metrik partisipasi/antusiasme/implementasi KPI Culture & Industrial dihitung setelah perubahan ini, dan bagaimana alur scan token + rating persisten berjalan di MyBharata. Menjelaskan juga peran master program untuk mengisi form pembuatan program otomatis, bagaimana walk-in tak diundang tetap dihitung hadir, serta koleksi/endpoint baru di form-builder dan repo mana saja yang tersentuh.",
       "kata_kunci": [
         "Program Culture",
@@ -6122,7 +6122,7 @@
         "APP - Web ERP"
       ],
       "hash": "cbe50357be0f60ff0c955244db65d7ea6a789c7e20f47bc80ee593d394467e49",
-      "ukuran_kb": 11.6,
+      "ukuran_kb": 11.7,
       "ringkasan": "Menjawab: kenapa modul Industrial Relation menyimpan catatan pelanggaran kepatuhan ringan (atribut kerja: sepatu, lanyard) di koleksi baru compliance_note yang terpisah dari Surat Peringatan dan kpi_score, dan kenapa catatan itu bukan sanksi, tidak memotong gaji, tidak menerbitkan SP otomatis, serta tidak masuk skor KPI. Menjelaskan siapa yang boleh mencatat (petugas IR/HR yang ditunjuk, lewat MyBharata, ditegakkan di server), siapa yang boleh membaca (visibilitas tiga-arah: petugas HR, karyawan atas dirinya, atasan atas departemennya via SupervisedDepartmentsStrict), dan kenapa jenis pelanggaran dibuat master data bukan enum Go. Juga menjawab kenapa data ini sensitif sehingga tidak didaftarkan ke calendar-service atau feed lintas modul.",
       "kata_kunci": [
         "industrial relation",
@@ -6388,7 +6388,7 @@
         "Microservices - Procurement Service"
       ],
       "hash": "b3033dc0e598a4f656d9031924d6bf99ba2ac1d851f6dd6d41a145330f97a47b",
-      "ukuran_kb": 4.9,
+      "ukuran_kb": 5.0,
       "ringkasan": "Menjawab: mengapa Pengajuan Pembelian tipe KONSUMSI kini wajib disetujui Direktur bila nominal mencapai ambang (Rp 5 juta), membalik keputusan sebelumnya yang membuatnya kebal Direktur dan berhenti di SPV Finance. Menjelaskan jenjang persetujuan KONSUMSI yang kini identik DANA, alasan ambang tetap berbagi (tidak per tipe), dan mengapa KONSUMSI tetap tipe terpisah untuk pelaporan. Berguna untuk memahami rantai approval pengajuan pembelian dan keputusan yang tadinya hanya hidup sebagai komentar kode.",
       "kata_kunci": [
         "KONSUMSI",
@@ -6492,7 +6492,7 @@
         "APP - MyBharata"
       ],
       "hash": "de6bb52f1e5f4d1e9b377c63fdf9770d088cebfcb6361869052ba23725a3c210",
-      "ukuran_kb": 13.3,
+      "ukuran_kb": 13.4,
       "ringkasan": "Menjawab: bagaimana program Culture yang bukan acara (non-event, mis. Kamis Batik) dinilai tanpa daftar hadir/scan/rating, yaitu lewat tanda \"terlaksana\" yang disetujui SPV HR (100 bila disetujui, else 0) dan masuk array komposit yang sama sehingga KPI officer dan bentuk GET /internal/culture/metrics tidak berubah. Menjelaskan penambahan field tipe (event/non_event) pada program dan master, serta jadwal hari/tanggal berulang di master yang mem-pra-isi tanggal saat program dibuat. Merekam alasan keputusan: KPI diatur SK (tak boleh didesain ulang) dan self-report harus ditahan gerbang approval.",
       "kata_kunci": [
         "ADR 0093",
@@ -7510,7 +7510,7 @@
         "GA - Form Pengadaan dan Pengajuan Dana"
       ],
       "hash": "5a506ef2f6690f2d0fd48bd5da4134bc63d99b6af98efef405cd97c1c4ee6447",
-      "ukuran_kb": 7.6,
+      "ukuran_kb": 7.7,
       "ringkasan": "Menjawab: apa saja 11 SOP Procurement resmi PT Bharata (perencanaan kebutuhan, PR, seleksi vendor, RFQ, penerbitan PO, monitoring pengiriman, penerimaan+QC, verifikasi invoice, pembayaran, evaluasi vendor, cost saving, pelaporan) dan sejauh mana masing-masing sudah didukung ERP. Memetakan tahap SOP mana yang sudah ada di kode (Permintaan/Pesanan/Penerimaan), mana yang sebagian, dan mana yang belum dibangun (RFQ 3-vendor, matriks approval nominal >Rp50jt, AVL & dokumen legalitas vendor, scorecard/OTD vendor, pelaporan formal). Berguna untuk mengecek kepatuhan SOP sebelum merancang fitur procurement/manufacture baru.",
       "kata_kunci": [
         "procurement",
@@ -8097,19 +8097,19 @@
         "HRIS - Pengembangan Organisasi (Community of Interest)",
         "HRIS - Key Performance Index"
       ],
-      "hash": "ea11e10667529fd9f3fd66673aac1eac441e03068f4e0c8a7d3da6d1ec7ededf",
-      "ukuran_kb": 13.4,
-      "ringkasan": "Menjawab: apa yang seharusnya tampil di dashboard `/hris` untuk lima posisi divisi Human Resource (HRD Supervisor, Personalia, Culture & Industrial, Recruitment & Onboarding, Training & Performance Officer), metrik KPI mana yang sudah punya sumber data dan mana yang belum, serta visual utama yang layak untuk tiap tab. Menjelaskan juga kenapa sebagian tab tampak kosong (ketiadaan data, bukan tata letak), metrik yang sumbernya salah petak atau menjawab pertanyaan lain (aset vs retur, turnover probation), apa yang sengaja tidak ditampilkan (Kaizen, cuti hari ini sebagai antrean), dan urutan kebutuhan backend. Diturunkan dari ADR 0076 dan memuat catatan bahwa HRGA bukan nama departemen.",
+      "hash": "fc93348e9ec04cbaef07fc0fdbae2c732af3f71bde03fd173cb97d345ddca187",
+      "ukuran_kb": 14.3,
+      "ringkasan": "Menjawab: apa yang seharusnya tampil di tab dashboard `/hris` untuk tiap posisi Human Resource (HRD Supervisor, Personalia, Culture & Industrial, Recruitment & Onboarding, Training & Performance Officer) dibanding yang tampil hari ini, diturunkan dari metrik KPI, antrean, dan ambang sesuai ADR 0076. Juga menjawab metrik KPI mana per posisi yang sudah punya sumber data dan mana yang belum, kenapa beberapa tab tampak kosong, visual utama apa yang tepat (mis. sebaran skor terhadap ambang 70, bukan rata-rata), kebutuhan backend yang harus didahulukan, serta kenapa HRGA bukan nama departemen.",
       "kata_kunci": [
         "dashboard per posisi",
-        "dashboard HRIS",
+        "position dashboard",
+        "/hris",
         "HRGA",
+        "matriks KPI",
+        "sumber KPI",
         "HRD Supervisor",
         "Personalia",
-        "Recruitment & Onboarding",
-        "Training & Performance Officer",
         "Culture & Industrial",
-        "sumber KPI",
         "ADR 0076"
       ]
     },
@@ -9227,7 +9227,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**MVP Implemented (ada catatan)** — live di dev + produksi 2026-08-06 dan terverifikasi lewat gateway 2026-08-19, kini dilayani **[[Microservices - Learning Service]]** (`/api/learning/*`), UI `/hris/training`. Sebelumnya menumpang Employee Service; dipindah lewat **LMS Fase 0** (bip-erp [#1020](https://github.com/bip-itteam-internal/bip-erp/pull/1020), erp-frontend [#814](https://github.com/bip-itteam-internal/erp-frontend/pull/814)). MVP awal: BE #545/#550 + FE #390/#391, refine FE #396. **Dua catatan yang menentukan jawaban \"sudah ready?\"**: (1) alur **karyawan biasa terputus** sejak 2026-08-13 karena menu web dicabut sebelum aplikasinya rilis, jadi yang terpakai baru sisi HR + supervisor; (2) **seluruh fitur LMS** (materi, kuis, skoring, kurikulum jabatan, Talent Pool) **belum ada kode sama sekali** — yang live adalah modul Pelatihan, bukan LMS.",
+      "status_teks": "**MVP Implemented (ada catatan)** — live di dev + produksi 2026-08-06 dan terverifikasi lewat gateway 2026-08-19, kini dilayani **[[Microservices - Learning Service]]** (`/api/learning/*`), UI `/hris/training`. Sebelumnya menumpang Employee Service; dipindah lewat **LMS Fase 0** (bip-erp [#1020](https://github.com/bip-itteam-internal/bip-erp/pull/1020), erp-frontend [#814](https://github.com/bip-itteam-internal/erp-frontend/pull/814)). MVP awal: BE #545/#550 + FE #390/#391, refine FE #396. **Dua catatan yang menentukan jawaban \"sudah ready?\"** (diperiksa ulang 2026-09-15): (1) layar karyawan (**Pelatihan Saya** dan **Pengajuan Pelatihan**) sudah merged ke `dev` MyBharata tetapi **belum ada di rilis GitHub terbaru** `v1.14.5+135`, dan `training_request` di produksi masih **0**, jadi yang terbukti dipakai baru sisi HR; (2) dari LMS, baru **post-test berskor** (course, bank soal, rekaman percobaan) yang ada di kode dan produksi (PR [#1321](https://github.com/bip-itteam-internal/bip-erp/pull/1321), 2026-08-20), **tanpa layar**; materi, pre-test, kurikulum jabatan, dan Talent Pool **belum ada kode**.",
       "publik": true,
       "tautan": [
         "Microservices - Learning Service",
@@ -9244,29 +9244,30 @@
         "Microservices - Notification Service",
         "HRIS - Organization Structure",
         "APP - MyBharata",
+        "HRIS - Matriks KPI per Departemen",
         "ADR - 0002 Database-per-Service",
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
         "APP - Web ERP",
         "HRIS - Work Review",
+        "Microservices - Calendar Service",
         "HRIS - Big Pictures",
         "HRIS - Analysis"
       ],
-      "hash": "810b98c736524b8b06eba402af0912cd47a6967a6488e1dc91723b5eeb06477b",
-      "ukuran_kb": 22.7,
-      "ringkasan": "Menjawab: bagaimana desain modul pelatihan dan pengembangan karyawan (training and development) disusun untuk Bharata, entitas apa saja yang masuk MVP (jenis pelatihan, trainer internal versus eksternal, event pelatihan, peserta dan kehadiran), dan apa alur proses bisnis serta aktor dan role-nya. Menjawab juga fitur mana dari modul Training ERPGo yang diambil, disesuaikan, atau dibuang beserta alasannya (Branch dibuang dan disisakan Department karena perusahaan single-site, field Cost hanya informasional karena pembukuan lewat Accurate, AI assist dan grid view ditunda). Berisi keputusan penempatan arsitektur ke service `learning`, rantai persetujuan pengajuan dan penilaian trainer empat aspek dengan ambang tiga responden, serta rencana rollout bertahap ke arah LMS People Development (materi, pre/post test, skoring otomatis, kurikulum per jabatan, sertifikat PDF) dan daftar hal yang masih TBD.",
+      "hash": "0c4e4abcc7b5ae9c7172b93ac123d68ba60bf8f0df982f9a7dfde3f6804bdb3c",
+      "ukuran_kb": 26.5,
+      "ringkasan": "Menjawab: apa cakupan modul pelatihan karyawan (jenis training, trainer internal/eksternal, jadwal, peserta dan kehadiran), bagaimana ia diadaptasi secara selektif dari modul Training ERPGo (Branch dibuang, Cost hanya informasional), dan di mana ditempatkan (Learning Service `/api/learning`, `learning_db`, UI `/hris/training`). Juga menjawab bagaimana alur pengajuan pelatihan dan persetujuannya (SPV lalu HR), evaluasi trainer empat aspek dengan ambang tiga responden, apakah karyawan biasa bisa memakai Pelatihan Saya dan Pengajuan Pelatihan lewat MyBharata, serta rencana lanjutan ke LMS People Development (post-test, materi, pre-test, kurikulum jabatan, Talent Pool).",
       "kata_kunci": [
-        "training program",
-        "pelatihan karyawan",
-        "training and development",
+        "pelatihan",
+        "training",
+        "Learning Service",
         "LMS",
-        "People Development",
-        "ERPGo",
-        "jenis pelatihan",
         "trainer",
-        "kehadiran pelatihan",
-        "sertifikat pelatihan",
-        "Talent Pool"
+        "pengajuan pelatihan",
+        "training request",
+        "ERPGo",
+        "evaluasi trainer",
+        "People Development"
       ]
     },
     {
@@ -10296,7 +10297,7 @@
         "WH - Management System"
       ],
       "hash": "8d2a9337ca3437bc81034f920197380aa9f9e669cf3d589e6f5865156a4f32f3",
-      "ukuran_kb": 7.5,
+      "ukuran_kb": 7.6,
       "ringkasan": "Menjawab: metrik KPI posisi Manufaktur (produksi + gudang) mana yang sudah bisa diotomasi sekarang, mana yang menunggu data WMS, dan mana yang tetap manual/subjektif. Menjelaskan kenapa source & endpoint `/kpi/*` sudah ada di kode tapi dorman (koleksi `production_log`/`batch_record`/`cycle_count` kosong karena WMS belum dipakai), dan mematahkan asumsi quick-win: `manufacture_stok`/`saldo_awal` cuma sisi sistem tanpa angka fisik, `manufacture_transaksi` semua INBOUND REUSE, `manufacture_resi` status order marketplace bukan kinerja orang. Juga memuat gerbang verifikasi yang wajib dilewati (adu output nyata WMS ke endpoint, buktikan lewat gateway `GET /kpi/auto-values`) sebelum mengklaim metrik otomatis saat WMS live.",
       "kata_kunci": [
         "KPI manufaktur",
@@ -13542,7 +13543,7 @@
         "Microservices - Form Builder Service"
       ],
       "hash": "0a7626b938a8ed09b938634e03c022c604145b021c548a80c3fc8136f1b250d7",
-      "ukuran_kb": 6.3,
+      "ukuran_kb": 6.4,
       "ringkasan": "Menjawab: fitur pengelolaan Program Culture (klub Badminton, Football, Ladies Sport, Billiard, Music) apa saja yang sudah ada di ERP versus yang masih dilakukan manual di Excel, dan gap mana yang layak dibangun. Merinci mengapa jadwal berulang, matriks distribusi per-pekan, target frekuensi vs realisasi, dokumentasi/biaya sesi, dan indikator per-klub belum tersedia, serta mana yang sengaja tidak dibuat (RSVP, KPI officer-centric). Papan kerja temuan yang tiap kandidat scope-nya masih menunggu keputusan pemilik produk sebelum jadi ADR + task.",
       "kata_kunci": [
         "program culture",
@@ -14161,7 +14162,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.2,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
