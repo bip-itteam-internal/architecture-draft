@@ -5834,24 +5834,20 @@
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
         "DEVELOPER GUIDE"
       ],
-      "hash": "77e13755aac1afccc7ef2c57d1de2f16643c95ef5ed4f042384285e55ced639d",
-      "ukuran_kb": 21.0,
-      "ringkasan": "Menjawab: kenapa usulan arsitektur AI Engineering Loop penuh (orkestrasi Trigger.dev, mix model vendor lain, dashboard live, agent yang merge sendiri) ditolak, apa yang dibangun sebagai gantinya di agent-kit (gerbang lokal, papan sesi, loop /brief -> /kerjakan dengan judge dua lapis), dan kenapa wewenang merge ke branch utama tetap dipegang manusia bukan agent. Juga menjawab pengukuran kondisi gerbang otomatis (Actions, branch protection) sebelum keputusan ini diambil dan tabel substitusi tiap komponen dokumen rujukan.",
+      "hash": "13f3f15cbe7646cbcfe99eb4a791f8abdfa97c2fed9ae79638c52ffaf1ef5b8b",
+      "ukuran_kb": 21.8,
+      "ringkasan": "Menjawab: apakah agent AI boleh menggabungkan (merge) perubahannya sendiri ke main, dan mengapa wewenang itu ditahan sampai ada gerbang yang benar-benar bisa menolak (commit di branch utama, push yang gagal tsc/lint/build atau go build). Menjelaskan juga mengapa usulan AI Engineering Loop multi-agent (Trigger.dev, campuran model DeepSeek/Kimi/GLM) awalnya ditolak lalu dibangun dengan substitusi: agen Claude Code per domain, judge dua lapis mesin dan penilai, supervisor yang hanya menulis draft skill, dashboard statis, dan Kantor Agent. Berguna untuk tahu mengapa gerbang dipasang lokal dan bukan di GitHub Actions, serta apa saja yang sengaja tidak dibangun.",
       "kata_kunci": [
-        "ADR 0077",
-        "otonomi merge",
-        "agent-kit",
-        "gerbang lokal",
-        "pre-commit",
-        "pre-push",
-        "loop otonom",
-        "/brief",
-        "/kerjakan",
-        "judge",
-        "papan sesi",
+        "otonomi agent",
+        "merge agent",
         "AI Engineering Loop",
-        "PR",
-        "merge agent"
+        "gerbang lokal",
+        "judge",
+        "supervisor",
+        "papan sesi",
+        "pre-push",
+        "Kantor Agent",
+        "wewenang merge"
       ]
     },
     {
@@ -6753,20 +6749,20 @@
         "RUN - Onboarding Developer Baru",
         "IT - Environment Inventory"
       ],
-      "hash": "7f1d174439b5f77a5f4bb0c492e684b3ff7b6502ee635c75cccd8379daffd41d",
-      "ukuran_kb": 5.9,
-      "ringkasan": "Menjawab: bagaimana cara kerja tunggal untuk developer manusia maupun AI agent di workspace ERP Bharata -- struktur workspace sibling-repo, flow wajib per task (/start-task sampai /wrap), tools yang dipakai (pnpm, Obsidian, Docker, Flutter), konvensi git/rilis, dan ke mana harus mulai membaca sebelum menulis kode.",
+      "hash": "db81628b64c23b270c78d3eca3a5f9daa5331d2b9906ebc29838df7f44e25547",
+      "ukuran_kb": 6.0,
+      "ringkasan": "Menjawab: dari mana developer ERP Bharata (manusia maupun AI agent) mulai bekerja, bagaimana susunan folder workspace sibling (architecture-draft, bip-erp, erp-frontend, mybharata-app), dan tools apa yang dipakai (pnpm, Go + Fiber, Docker Compose, Flutter, Obsidian). Menjelaskan alur kerja per task agent-kit dan loop otonom /brief lalu /kerjakan, konvensi dokumentasi vault, aturan git dan rilis (semua repo kode wajib PR, vault push langsung), cara mengakses dok arsitektur termasuk lewat Vault MCP, serta checklist onboarding hari pertama.",
       "kata_kunci": [
         "developer guide",
+        "panduan developer",
         "onboarding",
-        "workspace ERP",
-        "sibling repo",
+        "cara kerja",
+        "workspace sibling",
         "agent-kit",
-        "flow wajib",
-        "slash command",
-        "pnpm",
-        "arch-first",
-        "start-task"
+        "alur kerja",
+        "workflow",
+        "konvensi git",
+        "pnpm"
       ]
     },
     {
@@ -9884,7 +9880,7 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)**, agent-kit **1.15.0** (2026-09-06), terakhir berubah di **1.18.0** (2026-09-12), diperiksa ulang ke kit 1.19.0 pada 2026-09-15. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi berkas satu mesin; (3) baseline test diukur sekali 2026-09-06 dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia; (6) **gerbang kit atas dirinya sendiri belum berjalan**, tak ada yang otomatis menjalankan `tests/test-init.ps1` maupun pytest `Tools/`; (7) **repo selain Node dan Go (mis. `mybharata-app`) tidak punya gerbang deterministik**, jadi lapis mesin `/judge` lolos tanpa memeriksa apa pun di sana.",
+      "status_teks": "**Implemented (ada catatan)**, agent-kit **1.15.0** (2026-09-06), terakhir berubah di **1.20.0** (2026-09-15, Kantor Agent); bagian lain diperiksa ulang ke kit 1.19.0 pada 2026-09-15. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi berkas satu mesin; (3) baseline test diukur sekali 2026-09-06 dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia; (6) **gerbang kit atas dirinya sendiri belum berjalan**, tak ada yang otomatis menjalankan `tests/test-init.ps1` maupun pytest `Tools/`; (7) **repo selain Node dan Go (mis. `mybharata-app`) tidak punya gerbang deterministik**, jadi lapis mesin `/judge` lolos tanpa memeriksa apa pun di sana; (8) **Kantor Agent membaca format transkrip yang dinyatakan internal oleh Claude Code**, jadi bisa patah di rilis mana pun; kerusakannya tampil sebagai banner, bukan kantor kosong.",
       "publik": false,
       "tautan": [
         "ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak",
@@ -9896,20 +9892,20 @@
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "244ab0933e8f1f9c3e7ad2c3cd279a057d4cd3d486747e485a0a26b55667d9ba",
-      "ukuran_kb": 18.0,
-      "ringkasan": "Menjawab: gerbang otomatis apa yang menolak commit langsung ke branch utama dan push yang gagal tsc/lint/build atau go build, bagaimana hook pre-commit (Claude Code) dan pre-push (git) dipasang lewat init, dan repo mana yang lolos tanpa pemeriksaan (mis. mybharata-app). Menjelaskan juga cara kerja loop otonom /brief lalu /kerjakan sampai PR (worktree pendek, agen loop-<domain>, /judge dua lapis mesin + agen dengan baseline test, maksimal 2 perbaikan), papan sesi untuk melihat sesi Claude Code mana mengerjakan apa, serta /supervise, /ekstrak-skill, dan dashboard kit. Berguna untuk tahu kenapa merge tetap manusia (ADR 0077) dan celah yang masih terbuka seperti --no-verify dan test kit sendiri yang belum digerbang.",
+      "hash": "0e7726fe24fbec37306a9df09404718105681eb3a3472cd0cc124d4071abfb78",
+      "ukuran_kb": 22.8,
+      "ringkasan": "Menjawab: bagaimana hook pre-commit menolak commit di branch utama repo kode dan bagaimana githook pre-push menjalankan tsc/lint/build atau go build per service, bagaimana papan sesi mencatat sesi Claude Code mana sedang mengerjakan apa, dan bagaimana loop otonom /brief, /kerjakan, /judge berjalan dari worktree sampai PR dengan maksimum dua pengulangan. Menjelaskan juga judge dua lapis (gerbang deterministik dibanding baseline test plus agen penilai read-only), supervisi dan ekstraksi skill, dashboard, Kantor Agent, serta batas yang disadari seperti --no-verify, repo selain Node/Go tanpa gerbang deterministik, dan kaitannya dengan papan aktivitas developer tim.",
       "kata_kunci": [
         "gerbang repo",
-        "pre-commit hook",
-        "pre-push",
+        "pre-commit gate",
+        "pre-push hook",
         "papan sesi",
-        "AI Engineering Loop",
+        "session board",
         "loop otonom",
-        "/brief /kerjakan",
+        "/kerjakan",
         "/judge",
-        "agent-kit",
-        "ADR 0077"
+        "baseline test",
+        "Kantor Agent"
       ]
     },
     {
@@ -11960,19 +11956,20 @@
         "IT - Helpdesk",
         "IT - Monitoring System"
       ],
-      "hash": "a1257d9ea61655a758665974bfd29df775e73ab945ed9e9c9d6ccfedd702f422",
-      "ukuran_kb": 5.7,
-      "ringkasan": "Menjawab langkah demi langkah membawa developer baru dari nol sampai bisa menjalankan dan berkontribusi ke bip-erp: clone vault dan repo kode sebagai sibling, menjalankan agent-kit init untuk memasang command/hook/gerbang, memahami alur request dan stack lokal, flow task wajib, opsi ikut papan aktivitas tim lewat loop ingest, serta cara mengelola beberapa project sekaligus (pindah project aktif). Juga memuat langkah verifikasi setup dan langkah rollback bila command atau gerbang tidak muncul.",
+      "hash": "56d22bc024ae2ae3ebe21dfcba2c4086cca4836baa5cde46752ab3202b54592a",
+      "ukuran_kb": 5.8,
+      "ringkasan": "Menjawab: langkah apa saja untuk menyiapkan developer baru dari nol sampai bisa berkontribusi ke bip-erp, termasuk cara menjalankan init agent-kit di Windows maupun mac/linux dan mengapa sesi Claude Code wajib di-restart sesudahnya. Menjelaskan cara memegang beberapa repo sekaligus dan memindahkan project aktif, cara mendaftarkan diri ke papan aktivitas tim lewat loop-ingest.json, cara memverifikasi command flow, core.hooksPath, dan gerbang commit, serta apa yang dicek bila /sync-docs atau command lain tidak muncul.",
       "kata_kunci": [
-        "onboarding developer",
-        "agent-kit init",
-        "core.hooksPath",
-        "multi-project",
+        "onboarding",
+        "developer baru",
+        "setup environment",
+        "init agent-kit",
+        "init.ps1",
         "project aktif",
-        "flow wajib",
-        "verifikasi setup",
-        "rollback init",
-        "clone sibling"
+        "multi-project",
+        "core.hooksPath",
+        "loop-ingest",
+        "restart sesi"
       ]
     },
     {

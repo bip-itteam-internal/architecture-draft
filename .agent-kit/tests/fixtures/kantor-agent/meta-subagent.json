@@ -1,0 +1,8 @@
+{
+  "agentType": "general-purpose",
+  "description": "x",
+  "requestNonInteractive": true,
+  "requestShape": "background",
+  "spawnDepth": 1,
+  "toolUseId": "toolu_000036"
+}
