@@ -122,7 +122,7 @@ Beberapa baris di bawah memang cacat di datanya, dan sengaja disalin apa adanya 
 Cacat pada **dokumen ini sendiri**, bukan pada datanya:
 
 - **Verdict salah tempel antar-departemen.** Sel `PPIC / Inventory Turnover Ratio` berisi verdict rekrutmen sampai diralat 2026-09-02. Kegagalannya senyap karena selnya terbaca wajar bila hanya kolom Rekomendasi yang dibaca, dan dev yang mengikutinya akan menyelidiki modul yang salah. **Saat menyegarkan satu bab, cocokkan isi kolom Sumber dengan label metriknya, jangan hanya menyalin baris.**
-- ⚠️ **Belum diperiksa: kalimat `TIDAK ADA tracker pajak/audit internal/CAPA/izin BPOM` muncul 13 kali** di bab yang saling berjauhan (Beauty Hacks, Finance, Kyura, Manufaktur, Quality, PPIC). Sebagiannya jelas cocok, tetapi `PPIC / Factory Utilization` menerima kalimat itu untuk utilisasi mesin yang tak ada hubungannya dengan pajak maupun BPOM. Belum diukur ulang, jadi **jangan dipercaya sebelum diverifikasi**; kemungkinan besar ia kalimat cadangan yang tersebar terlalu luas, sekelas dengan salah tempel di atas.
+- ⚠️ **Belum diperiksa: kalimat `TIDAK ADA tracker pajak/audit internal/CAPA/izin BPOM` muncul 12 kali** di bab yang saling berjauhan (Finance 4, Quality 4, Kesekretariatan 2, Manufaktur 2 termasuk PPIC 1). Dihitung ulang 2026-09-15: semula 13, satu hilang saat bab Host Live Beauty Hacks disegarkan (sel `ROI` template arsip `HOST LIVE`), dan daftar bab versi sebelumnya keliru menyebut Kyura dan Beauty Hacks. Sebagiannya jelas cocok, tetapi `PPIC / Factory Utilization` menerima kalimat itu untuk utilisasi mesin yang tak ada hubungannya dengan pajak maupun BPOM. Belum diukur ulang, jadi **jangan dipercaya sebelum diverifikasi**; kemungkinan besar ia kalimat cadangan yang tersebar terlalu luas, sekelas dengan salah tempel di atas.
 
 ## Cara memperbarui dokumen ini
 
@@ -280,13 +280,37 @@ Template `CUSTOMER SERVICE`, 3 metrik.
 
 ### Host Live
 
-Template `HOST LIVE`, 3 metrik.
+> ✅ **Segar 2026-09-15**, diukur langsung dari `employee_db` prod (baca-saja), menggantikan salinan 2026-08-01. Template lama `HOST LIVE` (`Conversion` 0,6 · `ROI` 0,3 · `Perfomance Monitoring` 0,1, seluruhnya manual) kini berstatus **`arsip`** (terakhir diubah 2026-08-22). Yang menilai host sekarang `Host Live Beautyhacks` (dibuat 2026-08-06, terakhir diubah 2026-08-27), isi metriknya identik dengan `Host Live Kyura` di bab Kyura (hanya `key` metrik kedua yang berbeda). Klasifikasi departemen di atas (**14 / 2 / 0 / 14**) masih salinan 2026-08-01 dan **belum** memasukkan perubahan ini. Temuan yang berlaku untuk kedua departemen (kenapa skor Agustus identik, skor beku yang keliru, target 7 vs keputusan pemilik metrik) ditulis sekali di bab Kyura › Host Live.
 
-| Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
+Template `Host Live Beautyhacks`, 3 metrik, **seluruhnya otomatis**. 4 karyawan aktif ber-`position` Host Live (diukur 2026-09-15).
+
+| Bobot | Label (`key`) | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
-| 0.6 | `Conversion` | Jumlah konversi live dalam sebulan | tt_business_gmv_max_performance_reports (712.855) + marketing_analytics mart_profit_attribution (405.543, level ad/campaign/video/shop/product). Untuk level departemen perlu pemetaan toko ke departemen lebih dulu. | Bisa otomatis, tapi tentukan dulu toko mana milik departemen mana. Tanpa itu ada toko yang omzetnya tidak terhitung, dan itu sudah pernah terjadi senilai Rp 715 juta dalam sebulan. |
-| 0.3 | `ROI` | Skor final KPI tercapai sesuai target | TIDAK ADA tracker pajak/audit internal/CAPA/izin BPOM. | Belum bisa otomatis. Temuan audit, pelaporan pajak, dan izin BPOM belum dicatat di sistem. |
-| 0.1 | `Perfomance Monitoring` | Skor final KPI tercapai sesuai target | SIRKULAR: merujuk skor pemegangnya sendiri, sehingga metrik ikut menentukan dirinya. Tetap manual sampai maknanya diputuskan ulang. | Tetap manual dulu. Metrik ini menilai skor orang itu sendiri, jadi nilainya ikut menentukan dirinya sendiri. Maksudnya perlu diperjelas lebih dulu. |
+| 0.7 | `Conversion Rate` (`conversion`) | Target Minimal 7% | ✅ `auto`: sumber `kinerja_live` metrik `conversion_rate` (pesanan dibayar ÷ klik produk × 100), formula `rata_rata`, target **7**, arah naik, scope `individu`. Rumus dan penjaganya di [[Microservices - Employee Service]] § `kinerja_live`. | Sudah otomatis. Angkanya dihitung dari siaran yang dicatat host sendiri di MyBharata, jadi host yang tak mencatat shift tak punya skor otomatis. |
+| 0.1 | `Add to Chart` (`perfomance-monitoring`) | Target Minimal 7% | ✅ `auto`: `kinerja_live` metrik `add_to_cart_rate` (masuk keranjang ÷ klik produk dari sesi yang data keranjangnya terukur × 100), `rata_rata`, target **7**, naik, `individu`. `key` mewarisi metrik lama karena `key` diturunkan sekali lalu dipertahankan (`KPIMetric.Key`). | Sudah otomatis. Deskripsinya sama persis dengan Conversion Rate; pastikan ke pemilik metrik bahwa target 7% memang dimaksud (lihat bab Kyura). |
+| 0.2 | `Average view duration` (`average-view-duration`) | Target Minimal 60 detik | ✅ `auto`: `kinerja_live` metrik `avg_viewing_duration` (rata-rata detik tonton, ditimbang tayangan), `rata_rata`, target **60**, naik, `individu`. | Sudah otomatis. |
+
+Ketiga blok `auto` memuat `target_per_karyawan` untuk satu karyawan dengan angka yang sama dengan target umum, jadi tak mengubah hasil siapa pun.
+
+**Keadaan skor Host Live Beauty Hacks** (diukur `kpi_score` prod 2026-09-15; ID karyawan sengaja tidak disalin):
+
+| Periode | Template di snapshot | Penilai | Skor |
+|---|---|---|---|
+| 2026-07 | `HOST LIVE BH` (`Conversion` 0,7 · `Perfomance Monitoring` 0,3) | manual, 3 host | 19,6 untuk ketiganya |
+| 2026-07 | `Host Live Beautyhacks` | `OTOMASI`, 1 host | 90, dengan `Add to Chart` bernilai **0**; host ini baru masuk 26 Agustus 2026 (lihat bab Kyura › Host Live) |
+| 2026-08 | `Host Live Beautyhacks` | `OTOMASI`, 3 host | **90,29 identik** untuk ketiganya |
+
+Template `HOST LIVE BH` yang dipakai skor manual Juli **tak lagi ada** di `kpi_template`: kueri nama dan posisi `host live` hanya menemukan empat template, yaitu dua di atas, `Host Live Kyura`, dan `Host Live Support Kyura`.
+
+⚠️ **September 2026: tak satu pun dari 4 host Beauty Hacks akan dibekukan otomatis bila keadaannya bertahan** (diukur lewat `GET /kpi/kinerja-live` prod per 15 September, bulan masih berjalan). Pembekuan menuntut ketiga metrik punya angka (`layakDifinalisasi`), dan tiap host gagal pada paling sedikit satu:
+
+| Keadaan | Host | Sebab |
+|---|---:|---|
+| Belum mencatat shift sama sekali | 1 | ketiga metrik "belum ada shift live tercatat" |
+| Klik porsi di bawah ambang 100 | 2 | 34 dan 30 klik, jadi `conversion_rate` dan `add_to_cart_rate` "belum dapat dihitung"; durasi tonton tetap terhitung (31 dan 35 detik) |
+| Shift tercatat, belum satu pun terjodoh | 1 | host baru (masuk 14 September), 2 shift tak cocok dengan siaran mana pun |
+
+Volume departemennya memang kecil: jalur departemen menghitung **262 klik** dari 16 siaran host sepanjang 1 sampai 15 September, sementara ambang 100 klik per orang dikalibrasi dari akun brand bervolume tinggi (sekitar 123 klik per jam siaran). Dua host yang shift-nya terjodoh juga membawa **8 dan 6 shift tak terjodoh**. Keputusan untuk pemilik metrik (**TBD**): ambang per departemen, atau menerima bahwa Host Live Beauty Hacks dinilai manual.
 
 ### ICC
 
@@ -1066,12 +1090,45 @@ Template `Customer service`, 3 metrik.
 
 ### Host Live
 
-Template `HOST LIVE KYURA`, 2 metrik.
+> ✅ **Segar 2026-09-15**, diukur langsung dari `employee_db` prod (baca-saja), menggantikan salinan 2026-08-01 (`HOST LIVE KYURA`: `Conversion` 0,7 · `ROI` 0,3, manual). Yang menilai host sekarang `Host Live Kyura` (dokumen dibuat 2026-05-23, terakhir diubah 2026-08-27), seluruh metriknya otomatis. Klasifikasi departemen di atas (**16 / 1 / 0 / 10**) masih salinan 2026-08-01 dan **belum** memasukkan perubahan ini. Posisi `Live Support` punya template sendiri, `Host Live Support Kyura` (4 metrik manual, dibuat 2026-08-05), yang belum punya bab di dokumen ini.
 
-| Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
+Template `Host Live Kyura`, 3 metrik, **seluruhnya otomatis**. 7 karyawan aktif ber-`position` Host Live (diukur 2026-09-15). Isinya identik dengan `Host Live Beautyhacks` di bab Beauty Hacks.
+
+| Bobot | Label (`key`) | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
-| 0.7 | `Conversion` | Jumlah konversi live dalam sebulan 2500 | tt_business_gmv_max_performance_reports (712.855) + marketing_analytics mart_profit_attribution (405.543, level ad/campaign/video/shop/product). Untuk level departemen perlu pemetaan toko ke departemen lebih dulu. | Bisa otomatis, tapi tentukan dulu toko mana milik departemen mana. Tanpa itu ada toko yang omzetnya tidak terhitung, dan itu sudah pernah terjadi senilai Rp 715 juta dalam sebulan. |
-| 0.3 | `ROI` | Jumlah Roi 4 | tt_business_gmv_max_performance_reports (712.855) + marketing_analytics mart_profit_attribution (405.543, level ad/campaign/video/shop/product). Untuk level departemen perlu pemetaan toko ke departemen lebih dulu. | Bisa otomatis, tapi tentukan dulu toko mana milik departemen mana. Tanpa itu ada toko yang omzetnya tidak terhitung, dan itu sudah pernah terjadi senilai Rp 715 juta dalam sebulan. |
+| 0.7 | `Conversion Rate` (`conversion`) | Target Minimal 7% | ✅ `auto`: sumber `kinerja_live` metrik `conversion_rate`, formula `rata_rata`, target **7**, arah naik, scope `individu`. | Sudah otomatis. |
+| 0.1 | `Add to Chart` (`roi`) | Target Minimal 7% | ✅ `auto`: `kinerja_live` metrik `add_to_cart_rate`, `rata_rata`, target **7**, naik, `individu`. `key` mewarisi metrik `ROI` lama. | Sudah otomatis. Pastikan target 7% memang dimaksud (temuan 4 di bawah). |
+| 0.2 | `Average view duration` (`average-view-duration`) | Target Minimal 60 detik | ✅ `auto`: `kinerja_live` metrik `avg_viewing_duration`, `rata_rata`, target **60**, naik, `individu`. | Sudah otomatis. |
+
+**Keadaan skor Host Live Kyura** (diukur `kpi_score` prod 2026-09-15; ID karyawan sengaja tidak disalin):
+
+| Periode | Template di snapshot | Penilai | Skor |
+|---|---|---|---|
+| 2026-07 | `HOST LIVE KYURA` (`Conversion` · `ROI`) | manual, 7 host (satu kini nonaktif) | 100 (3 host), 91,32 (1 host), 83,97 (3 host) |
+| 2026-07 | `Host Live Kyura` | `OTOMASI`, 1 host | 90, dengan `Add to Chart` bernilai **0** |
+| 2026-08 | `Host Live Kyura` | `OTOMASI`, 7 host | **94,18 identik** untuk ketujuhnya |
+
+#### Temuan Host Live yang berlaku untuk kedua departemen (diukur prod 2026-09-15)
+
+1. **Skor Agustus 2026 adalah angka TIM yang ditempel ke tiap host, walau scope-nya `individu`.** Kesepuluh dokumen `kpi_score` Agustus dibekukan `OTOMASI` pada 1 September 02:00 WIB dengan nilai identik per departemen: Kyura 7 host **94,18**, Beauty Hacks 3 host **90,29**. Saat itu sumber `kinerja_live` belum menghormati scope `individu`; jalur per orang baru berjalan 2026-09-09 ([[Microservices - Employee Service]] § `kinerja_live`). Realisasi yang tersimpan cocok dengan jalur departemen yang dihitung ulang hari ini, misalnya durasi tonton Kyura 67,45 beku vs 67,25 dan Beauty Hacks 30,86 vs 30,77 (selisih kecil karena data siaran bergeser). Skor beku tidak dihitung ulang ([[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]]).
+2. **Skor Agustus Kyura sekitar 4 poin terlalu rendah.** Pembekuan terjadi sebelum rasio berpasangan (bip-erp #1840, PROD 2026-09-11). Rumus lama membagi masuk keranjang dengan **seluruh** klik, sehingga `Add to Chart` beku 2,93%. Rumus sekarang hanya memakai klik dari sesi yang data keranjangnya terukur; dihitung ulang atas data Agustus hasilnya 1.746 ÷ 30.284 = **5,77%** (seluruh klik Agustus 58.251). Nilai metrik itu naik 41,81 → 82,36 dan skor tiap host **94,18 → 98,24**. Beauty Hacks praktis tak berubah (90,26 dihitung ulang vs 90,29 beku), karena conversion rate dan add to cart-nya di atas target sehingga terpotong di 100 pada kedua rumus. Koreksi snapshot beku menuntut keputusan dan skrip yang dijalankan manusia (**TBD**).
+3. **Dua skor Juli beku dengan `Add to Chart` bernilai 0** (satu host per departemen, masing-masing skor 90). Keduanya dibekukan `OTOMASI` 28 Agustus 02:00 WIB, beberapa jam sesudah perubahan terakhir kedua template (27 Agustus 17:53 dan 17:55 WIB), ketika data keranjang belum diambil (per 27 Agustus nol dari 2.365 sesi Agustus memilikinya, [[Microservices - Marketing Analytics Service]] § KPI Host Live), sehingga rumus lama menghasilkan 0%. Nol itu berarti "belum terukur", bukan hasil kerja, jadi masing-masing kehilangan hingga 10 poin. Sejak #1840 keadaan ini tak terulang: tanpa klik berkeranjang metriknya digalatkan. ⚠️ Host Beauty Hacks yang menerima skor Juli itu **baru masuk 26 Agustus 2026** (`work_data.join_date`), jadi skor Juli dan skor Agustus sebulan penuhnya dibuat untuk masa sebelum ia bekerja. Sebabnya di mesin finalisasi, bukan di sumber ini: [[HRIS - Otomasi Skor KPI]] § Belum Diimplementasikan / Catatan.
+4. **Target di prod tidak sama dengan keputusan yang tercatat di kode.** Komentar `kpi_sumber_live.go` dan `kpi_live.go` menulis keputusan pemilik metrik 2026-08-27: `conversion_rate` target **2%**, `add_to_cart_rate` **5%**, durasi tonton 60 detik. Prod memakai **7 dan 7**. Kode sendiri menyatakan target milik HR, jadi prod yang berlaku, tetapi selisihnya besar: pada proyeksi September di bawah, host dengan conversion rate 4,35% mendapat 70,7 dengan target 7 dan 7, dan 97,2 dengan target 2 dan 5. Deskripsi `Add to Chart` juga tertulis "Target Minimal 7%" persis seperti Conversion Rate. **TBD**: konfirmasi pemilik metrik.
+5. **Conversion rate dan add to cart per host cenderung terbaca lebih rendah** karena pembulatan ke bawah per sesi di marketing-analytics. Mekanismenya di [[Microservices - Employee Service]] § `kinerja_live`; besarnya untuk host Kyura belum diukur.
+
+**Proyeksi September 2026 Kyura** (lewat `GET /kpi/kinerja-live` prod per 15 September, bulan masih berjalan, target 7 · 7 · 60). Ketujuh host lolos seluruh penjaga, jadi akan dibekukan otomatis bila keadaannya bertahan:
+
+| Klik porsi | Conversion rate | Add to cart | Durasi tonton | Proyeksi skor | Cakupan shift |
+|---:|---:|---:|---:|---:|---|
+| 2.624 | 6,63% | 4,99% | 68,2 dtk | 93,4 | 100% |
+| 2.314 | 6,57% | 5,01% | 67,3 dtk | 92,8 | 100% |
+| 2.128 | 6,34% | 4,84% | 65,4 dtk | 90,4 | 87% (`semi`) |
+| 480 | 5,00% | 8,33% | 53,9 dtk | 78,0 | 100% |
+| 1.328 | 5,27% | 4,97% | 52,1 dtk | 77,2 | 77% (`semi`) |
+| 429 | 4,90% | 8,86% | 52,2 dtk | 76,4 | 90% (`semi`) |
+| 552 | 4,35% | 9,24% | 51,7 dtk | 70,7 | 93% (`semi`) |
+
+`semi` berarti sebagian shift orang itu tak terjodoh dengan siaran mana pun (7 shift di Kyura). Status itu tidak menahan pembekuan: `layakDifinalisasi` hanya memeriksa ada tidaknya angka, dan `kpi_finalisasi.go` tidak membaca cakupan sama sekali.
 
 ### ICC
 
