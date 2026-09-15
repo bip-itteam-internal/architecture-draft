@@ -7997,24 +7997,25 @@
         "ADR - 0002 Database-per-Service",
         "HRIS - Key Performance Index",
         "HRIS - Compensation & Benefits",
+        "HRIS - Bank Soal dan Paket Psikotes",
         "HRIS - Big Pictures",
         "HRIS - Analysis",
         "HRIS - Personalia"
       ],
-      "hash": "4740a21a6985c941ee1599c266adc1e27dacf9eff481468d784df7210673e4fb",
-      "ukuran_kb": 12.3,
-      "ringkasan": "Menjawab: bagaimana jenjang karier, promosi, mutasi, dan kaderisasi dikelola di HRIS, termasuk tangga lima tingkat master_job_level yang menempel ke jabatan lewat position_items[].level_key dan dikelola di tab Jenjang Jabatan. Menjelaskan modul Promosi & Mutasi di /hris/mutasi (jenis dipilih HR bukan disimpulkan sistem, notifikasi saat perpindahan diterapkan, kontrak kerja baru wajib tapi tidak dibuat sistem) dan batasannya terhadap Talent Pool. Menjadi rujukan desain Kaderisasi / Talent Pool: alur usulan atasan ke persetujuan HR ke status siap, koleksi talent_candidate di service learning, syarat belajar terpenuhi lewat kurikulum jabatan tujuan, dan pemisahan tegas antara yang dihitung sistem dengan penilaian kelayakan yang tetap milik HR.",
+      "hash": "c765726bff56c6876dacddbac48bb2f44f21b52935990ecf4d45adee542fb623",
+      "ukuran_kb": 13.5,
+      "ringkasan": "Menjawab: bagaimana tangga jenjang karier (lima tingkat di master_job_level) menempel ke jabatan, dan bagaimana promosi serta mutasi, termasuk mutasi antar-perusahaan BIP ke ELT, dicatat di employee_movement beserta tanggal efektif, SK, notifikasi, dan nasib employee_id, masa kerja, kuota cuti, dan BPJS. Juga menjawab bagaimana kaderisasi/Talent Pool dirancang: atasan mengusulkan, HR menyetujui, syarat belajar dihitung dari kurikulum jabatan tujuan, transisi status kandidat, dan kenapa sistem tidak memutuskan kelayakan promosi.",
       "kata_kunci": [
-        "karier",
-        "career path",
         "promosi",
         "promotion",
         "mutasi",
+        "mutasi antar-perusahaan",
+        "jenjang karier",
+        "career path",
         "kaderisasi",
         "talent pool",
         "succession planning",
-        "jenjang jabatan",
-        "job level"
+        "employee_movement"
       ]
     },
     {
