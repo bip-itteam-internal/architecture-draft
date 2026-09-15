@@ -236,6 +236,8 @@ Seluruhnya di `bip-erp/shared-library/common/catalog_finance.go` — `finance.ar
 
 Penambahan izin dilakukan di `catalog_finance.go` (satu sumber: dipakai seed employee-service, service penegak, dan gerbang halaman FE) plus mendaftarkan titik penegakannya.
 
+> 🔜 **Modul izin kedua di finance-service: `akuntansicv`** (buku besar CV, branch `feat/finance-entitas-cv`, belum merge per 2026-09-15). Katalognya sengaja **di luar** `catalog_finance.go`, di `shared-library/common/catalog_akuntansi_cv.go`: `akuntansicv.view`, `akuntansicv.kelola`, `akuntansicv.cv.tulis`, tiga paket, tanpa fallback tier. Prefiks `finance` ditolak karena klaim izin modul menang atas tier: paket sempit ber-prefiks `finance` akan mencabut tier `finance` yang hari ini menopang AR dan Cost Control. Modul ini juga tidak lewat diagram di atas: gerbangnya `RequirePermission` langsung, jadi pemegang paketnya lolos tanpa `system_roles.finance`. Rinciannya di [[Finance - Buku Besar CV]] dan [[API - Finance Service]] §Buku Besar CV.
+
 ### Persetujuan
 
 Belum ada alur persetujuan yang direncanakan untuk modul ini — lihat TBD. Inventaris alur yang sudah ada: [[REF - Alur Persetujuan]].

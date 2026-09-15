@@ -172,6 +172,8 @@ Kopling ini berbeda lagi dari §3 dan §3a: bukan urutan panggilan, bukan isi bi
 >
 > ⛔ **Deploy yang dijalankan tepat sebelum merge membangun commit lama, dan tampak seperti deploy PR-mu.** Pukul 12:50 sampai 12:54 WIB hari yang sama, image learning dan employee sudah dibangun ulang dari `720d0813`, beberapa menit **sebelum** #1895 merged; container yang "baru naik" itu tak memuat satu pun kode #1895. Karena itu gerbang `git merge-base --is-ancestor <mergeCommit> HEAD` dijalankan **sebelum** build, dan string khas di biner diukur **sebelum dan sesudah**, bukan hanya sesudah.
 
+> 🔜 **`PAYROLL_SERVICE_KEY`** (master entitas CV, [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] T1; branch `feat/finance-entitas-cv`, **belum merge per 2026-09-15**) mengikuti pola yang sama dengan pasangan berbeda: **penerima** `payroll-service` (`GET /internal/badan-usaha` memeriksa `key`; env kosong membalas **503**, kunci salah **401**), **pengirim** `finance-service`, yang juga mendapat env baru **`PAYROLL_MODULE_URL`**. Keduanya ada di `docker-compose.yml`; `docker-compose.dev.yml` hanya memasang kuncinya di payroll-service karena finance-service tidak didefinisikan di compose dev. Bila kunci di finance-service kosong atau berbeda, laporan kecocokan menandai sumber payroll **galat** berikut sebabnya dan PATCH rujukan badan usaha dibalas 503; tidak ada temuan palsu. Isi `.env` dev **sebelum** merge (pelajaran `FORM_BUILDER_SERVICE_KEY` di atas), naikkan payroll-service lebih dulu lalu finance-service, keduanya `--force-recreate`. Rilis yang sama menyentuh `shared-library` (katalog `akuntansicv`), jadi employee-service ikut naik supaya paket barunya ter-seed.
+
 | Container | Perannya | Bila env-nya kosong |
 |---|---|---|
 | `form-builder-service` | penerima: `GET /internal/satgas/metrics` memeriksa `key` | rute menolak **semua** pemanggil dengan 401 (gagal tertutup) |
@@ -229,6 +231,7 @@ docker logs <Container-Name> --tail 40
 - [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] · [[Microservices - Employee Service]] (pasangan pengirim dan penerima `FORM_BUILDER_SERVICE_KEY`, §3d)
 - [[RUN - Menambah Metrik KPI Otomatis]] (cara menambah kunci layanan beserta rutenya, §3d)
 - [[Microservices - Learning Service]] · [[Microservices - Calendar Service]]: pasangan `LEARNING_SERVICE_KEY` dan env `LEARNING_MODULE_URL` di blok calendar-service (§3d)
+- [[Finance - Buku Besar CV]] · [[API - Payroll Service]]: pasangan `PAYROLL_SERVICE_KEY` payroll-service dan finance-service, plus env `PAYROLL_MODULE_URL` di blok finance-service (§3d)
 - [[IT - Background Jobs & Schedulers]] — poller in-process (reconciler + sweep) yang restart otomatis
 - [[RUN - Deploy Task Management Service]] — runbook deploy service lain (dengan migrasi data)
 - [[CORE - API Master Gateway]] — health via gateway
