@@ -11104,6 +11104,8 @@
         "Microservices - Integration Service",
         "ADR - 0001 Akuntansi via Accurate",
         "External - Accurate",
+        "Finance - Audit Internal",
+        "ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual",
         "ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia",
         "GA - Inventory Management",
         "ADR - 0049 Padanan Aset per-item berbasis nama menggantikan kategori-golongan",
@@ -11137,20 +11139,20 @@
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
         "Microservices - Inventory Service"
       ],
-      "hash": "66f27777b19b0a5823a17a554c9c4b2dbcd8cabd8c4e8d8dd83aa5671d3331ff",
-      "ukuran_kb": 40.6,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis di ERP (data karyawan, jadwal, presensi, KPI, target insentif, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab salinan data mana yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih ada (misalnya task-management membaca database service lain langsung), duplikasi fakta yang belum diputuskan, dan apa yang perlu dicek sebelum membangun penyimpanan atau fitur baru.",
+      "hash": "ec77a98cc737471f55285749086db5dff8a79ded41298bc54da10448e831defe",
+      "ukuran_kb": 41.7,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki sebuah fakta bisnis (identitas dan data kerja karyawan, hak akses, kontrak, jadwal, presensi dan cuti, skor serta target KPI, target insentif profit), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab salinan data mana yang sah beserta arah dan penjaganya, pengecualian ADR 0002 (database-per-service) yang masih hidup di kode, dan duplikasi fakta yang belum diputuskan. Dipakai untuk mengecek apakah data yang dibutuhkan sudah dimiliki departemen lain sebelum membangun penyimpanan atau fitur baru.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "satu fakta satu tempat",
+        "sumber kebenaran",
         "source of truth",
-        "database-per-service",
-        "ADR 0002",
-        "SyncCollection",
+        "satu fakta satu tempat",
         "duplikasi data",
+        "database-per-service",
         "salinan data",
-        "pemilik fakta"
+        "SyncCollection",
+        "pemilik fakta bisnis"
       ]
     },
     {
