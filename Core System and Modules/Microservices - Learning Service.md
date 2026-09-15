@@ -15,7 +15,7 @@ Service ini **tidak menyimpan** master karyawan, jabatan, maupun departemen. Sem
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 
-Daftar lengkap: [[API - Learning Service]] (per 2026-09-15 rute course dan post-test belum tercantum di sana; daftarnya ada di bagian Post-test di bawah). Ringkasnya delapan kelompok; empat pertama pindahan utuh dari Employee Service, sisanya dibangun di service ini:
+Daftar lengkap: [[API - Learning Service]]. Ringkasnya delapan kelompok; empat pertama pindahan utuh dari Employee Service, sisanya dibangun di service ini:
 
 - **Master jenis pelatihan** — CRUD `/training/types`
 - **Master trainer** — CRUD `/training/trainers`, internal (tautan `employee_id`) atau eksternal
@@ -26,7 +26,7 @@ Daftar lengkap: [[API - Learning Service]] (per 2026-09-15 rute course dan post-
 - **Course & bank soal post-test**: `/courses`, `/courses/:id/quiz`, rekap dan ekspor CSV percobaan, lihat bagian Post-test di bawah
 - **Mengerjakan post-test**: `POST /me/post-test/:trainingId/start`, `POST /me/post-test/attempt/:id`, pembatalan `PATCH /attempts/:id/void`
 
-RBAC: baca digerbang `PermTrainingView`; tulis digerbang `PermTrainingWork` (event, peserta) atau `PermTrainingManage` (master, course, soal), ditambah `RequireHRISStaff`. Rute `/me/*` dan pembuatan pengajuan tidak digerbang izin modul; yang menggerbang identitas pemanggil dan relasinya (lihat bagian masing-masing). Fungsi validasi murni (`ValidateTraining`, `CanEnroll`, `IsValidStatusTransition`, `validateTrainer`) beserta ujinya ada di `services/learning/models_training.go` dan `models_training_test.go`.
+RBAC: baca digerbang `PermTrainingView`; tulis digerbang `PermTrainingWork` (event, peserta) atau `PermTrainingManage` (master, course, soal). `RequireHRISStaff` hanya berlaku sebagai gerbang lama saat kill-switch `TRAINING_PERMISSION_ENFORCEMENT=off`; selama kill-switch menyala ia tidak dijalankan (`permission_gate.go`). Rute `/me/*` dan pembuatan pengajuan tidak digerbang izin modul; yang menggerbang identitas pemanggil dan relasinya (lihat bagian masing-masing). Rincian per rute: [[API - Learning Service]]. Fungsi validasi murni (`ValidateTraining`, `CanEnroll`, `IsValidStatusTransition`, `validateTrainer`) beserta ujinya ada di `services/learning/models_training.go` dan `models_training_test.go`.
 
 ### Verifikasi departemen lewat panggilan internal
 
@@ -112,7 +112,7 @@ Irisan LMS pertama yang benar-benar ada: **bukti kompetensi sesudah kelas**. Tig
 | POST | `/me/post-test/:trainingId/start` · `/me/post-test/attempt/:id` | identitas peserta |
 | PATCH | `/attempts/:id/void` | manage |
 
-Rute kelola dan rekap juga menuntut `RequireHRISStaff`. Grup `/courses` sengaja **tidak** diletakkan di bawah `/training`: segmen statik sesudah `/training/:id` akan ter-match sebagai event ber-id `courses`.
+Kolom gerbang di atas berlaku selama kill-switch `TRAINING_PERMISSION_ENFORCEMENT` menyala; bila dimatikan, rute kelola dan rekap jatuh ke gerbang lama `RequireHRISStaff`. Grup `/courses` sengaja **tidak** diletakkan di bawah `/training`: segmen statik sesudah `/training/:id` akan ter-match sebagai event ber-id `courses`.
 
 ⚠️ **Terpasang di produksi, belum punya layar, belum dipakai.** Biner `Learning-Service` prod (image 2026-09-14) memuat `/me/post-test`, `quiz_attempt`, dan `attempts/export`, dengan kontrol negatif string karangan → 0 (diperiksa 2026-09-15). Tetapi `erp-frontend` `main` dan `my-bharata` `dev` sama-sama **nol** pemanggil `/courses` maupun `/me/post-test` (komentar `home_quick_access.dart` di aplikasi menyebut isinya "BELUM LMS penuh (course, materi, post-test)"), dan per 2026-09-15 koleksi `course` **belum pernah terbentuk**, `quiz` 0, `quiz_attempt` 0. Konsekuensinya, metrik KPI yang menunggu skor training (mis. `Skor Penilaian Training All Karyawan > 70` di [[HRIS - Matriks KPI per Departemen]]) menunggu **frontend** dan **sumber KPI**, bukan backend service ini.
 

@@ -509,7 +509,7 @@
       "area": "API Reference",
       "jenis": "api",
       "status_emoji": "✅",
-      "status_teks": "Grounded ke kode, live di dev + produksi 2026-08-06; pengajuan, evaluasi, dan `/me` **terverifikasi lewat gateway hidup 2026-08-19**",
+      "status_teks": "Grounded ke kode `bip-erp` `origin/main` (diperiksa 2026-09-15); live di dev + produksi 2026-08-06; pengajuan, evaluasi, dan `/me` **terverifikasi lewat gateway hidup 2026-08-19**; rute post-test ada di biner produksi (diperiksa 2026-09-15)",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
@@ -519,20 +519,20 @@
         "API - Index",
         "CORE - API Master Gateway"
       ],
-      "hash": "60ffb9b52eff8b9ff45f6aa0f3b32d55e8b8b00ce1c507b5fec98116f6a8fe71",
-      "ukuran_kb": 8.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di service learning (modul gateway `/api/learning/*`), bagaimana membuat jenis pelatihan dan trainer, bagaimana mengelola event pelatihan beserta transisi statusnya, dan bagaimana peserta di-enroll serta kehadirannya ditandai. Menjawab juga bagaimana pengajuan pelatihan dibuat dan direview, endpoint mana yang dipakai layar karyawan (`/me/trainings`), serta bagaimana agregat penilaian trainer dibatasi ambang tiga responden. Berisi jebakan urutan registrasi rute Fiber (rute statik sebelum rute param) dan pemetaan kode status verifikasi `department_key` (404 jadi 400, gangguan server jadi 502) termasuk perbedaan satuan key versus nama departemen.",
+      "hash": "198bfdd1f585479392eefd08621a6fe17bc38e5db07b305e7013be50d2879cb4",
+      "ukuran_kb": 17.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di learning-service (`/api/learning/*`, port 6987) untuk master jenis pelatihan dan trainer, event pelatihan, peserta dan kehadiran, pengajuan pelatihan, layar karyawan `/me`, agregat evaluasi trainer, course dan bank soal, serta mengerjakan post-test. Juga menjelaskan gerbang izin `training.view`/`training.work`/`training.manage` beserta tier fallback dan kill-switch, transisi status event dan jebakan PUT full-replace (course_id, max_participants ikut terhapus), kuota peserta 409, pencatat kehadiran mandiri vs HR, dan arti balasan 400/502 saat verifikasi `department_key` termasuk jebakan key vs nama departemen yang memicu 409 supervisor.",
       "kata_kunci": [
         "learning service",
-        "API learning",
         "pelatihan",
         "training",
-        "endpoint pelatihan",
+        "LMS",
+        "trainer",
+        "post-test",
         "pengajuan pelatihan",
         "training request",
-        "evaluasi trainer",
-        "trainer evaluation",
-        "department_key"
+        "kehadiran peserta",
+        "training.manage"
       ]
     },
     {
@@ -2560,20 +2560,20 @@
         "API - Index",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id"
       ],
-      "hash": "531cefe77cc82239ef7c6e71edc2f8f6a76d9823c7b7497b5765a2260a8bf7dc",
-      "ukuran_kb": 26.2,
-      "ringkasan": "Menjawab: service mana yang menangani modul pelatihan karyawan dan fondasi LMS People Development, kenapa Training dipindah dari Employee Service ke service sendiri (`learning_db`, port 6987, modul gateway `learning`), dan endpoint apa saja yang ada (jenis pelatihan, trainer, event dan peserta, pengajuan, evaluasi trainer, course dan post-test berskor) beserta gerbang RBAC-nya. Juga menjelaskan bagaimana departemen diverifikasi lewat panggilan internal ke Employee Service (404 jadi 400, gangguan jadi 502, `EMPLOYEE_MODULE_URL` tidak masuk `InternalURL`) dan aturan rantai approval pengajuan pelatihan SPV lalu HR (supervisor dipaku saat dibuat, penolakan final, kategori notifikasi `request-*`).",
+      "hash": "335fa9f7e6a19d17eb1f0e6a4167a5ae0ff3bcfc8c9eb3a361e20839128d5fb6",
+      "ukuran_kb": 26.4,
+      "ringkasan": "Menjawab: kenapa modul Training dipindah dari Employee Service ke service sendiri (`learning_db`) pada LMS Fase 0, fitur apa yang sudah ada (master, event, peserta, pengajuan pelatihan, evaluasi trainer, layar `/me/trainings`, course dan post-test berskor) serta apa yang belum (materi, pre-test, kurikulum jabatan, Talent Pool, layar post-test, sumber KPI). Juga menjelaskan keputusan desain pengajuan dua tahap SPV ke HR (supervisor dipaku saat dibuat, penolakan final, pengaju supervisor melewati tahap SPV, notifikasi kategori `request-*`), verifikasi departemen lewat panggilan internal ke employee-service dengan `EMPLOYEE_MODULE_URL` di luar `ValidateInternalURL`, bug pencarian supervisor memakai key bukan nama, serta dependensi dan integrasinya.",
       "kata_kunci": [
         "learning service",
+        "LMS",
+        "People Development",
         "pelatihan",
         "training",
-        "LMS",
-        "post-test",
-        "evaluasi trainer",
-        "pengajuan pelatihan",
-        "training request",
         "learning_db",
-        "People Development"
+        "pengajuan pelatihan",
+        "evaluasi trainer",
+        "post-test",
+        "Talent Pool"
       ]
     },
     {
