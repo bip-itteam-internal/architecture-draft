@@ -247,6 +247,17 @@ def selesai_giliran(u):
             and (a.get("message") or {}).get("stop_reason") == "end_turn")
 
 
+def _tool_penentu(tertunda):
+    """(nama, input, timestamp) tool tertunda yang menentukan area, atau None.
+
+    Batch paralel: hasil tool singkat sering baru tertulis setelah tool lambat di batch yang sama selesai,
+    jadi yang menentukan tool paling awal di luar perpustakaan/meja, bukan yang terakhir."""
+    semua = list(tertunda.values())
+    if not semua:
+        return None
+    return next((t for t in semua if area_alat(t[0]) not in ("perpustakaan", "meja")), semua[0])
+
+
 def turunkan_keadaan(u, ada_subagent, sekarang, registri=None):
     """Keadaan robot dari hasil `urai`, dan dari entri registri sesi bila ada.
 
@@ -257,24 +268,37 @@ def turunkan_keadaan(u, ada_subagent, sekarang, registri=None):
             │     ├─ subagent hidup ≥1 ──────────────> [menunggu_subagent @rapat]
             │     └─ selain itu ─────────────────────> [menunggu_anda @lounge]
             └──────────── prompt baru / registri busy ───┘
+     registri waiting (dialog terbuka) ─┬─ waitingFor "permission prompt" ─> [menunggu_izin @area tool, atau lounge]
+                                        └─ alasan lain ────────────────────> [menunggu_anda @lounge]
 
     Registri menang atas transkrip untuk "prosesnya sedang bekerja atau tidak": status proses berubah
-    seketika, sedangkan baris transkrip bisa baru tertulis belakangan. Tool tertunda tetap menentukan area."""
+    seketika, sedangkan baris transkrip bisa baru tertulis belakangan. Tool tertunda tetap menentukan area.
+    S0 2026-09-15: dialog AskUserQuestion membuat registri "waiting" + waitingFor "input needed" di detik yang
+    sama dengan dialognya, 8 detik lebih cepat dari hook Notification permission_prompt."""
     akhir = u["akhir"]
     t_status = registri.get("status_sejak") if registri else None
     t_akhir = _waktu(akhir.get("timestamp")) if akhir else None
     t_diam = max([t for t in (t_akhir, t_status) if t is not None], default=None)
     diam = None if t_diam is None else max(0, int((sekarang - t_diam).total_seconds()))
-    if u["tertunda"]:
-        # batch paralel: hasil tool singkat sering baru tertulis setelah tool lambat di batch yang sama selesai,
-        # jadi yang menentukan tool paling awal di luar perpustakaan/meja, bukan yang terakhir
-        semua = list(u["tertunda"].values())
-        nama, masukan, ts = next((t for t in semua if area_alat(t[0]) not in ("perpustakaan", "meja")), semua[0])
+    status = registri.get("status") if registri else None
+    menunggu = registri.get("menunggu") if registri else None
+    tunda = _tool_penentu(u["tertunda"])
+    if status == "waiting" or menunggu:
+        izin = "permission" in str(menunggu or "").lower()
+        keadaan = "menunggu_izin" if izin else "menunggu_anda"
+        if tunda:
+            nama, masukan, ts = tunda
+            return {"area": area_alat(nama) if izin else "lounge", "keadaan": keadaan, "alat": nama or "",
+                    "detail": detail_alat(nama, masukan), "sejak": ts, "durasi_detik": _detik_sejak(ts, sekarang),
+                    "diam_detik": diam}
+        return {"area": "lounge", "keadaan": keadaan, "alat": "", "detail": "" if izin else str(menunggu or ""),
+                "sejak": _iso(t_status), "durasi_detik": None, "diam_detik": diam}
+    if tunda:
+        nama, masukan, ts = tunda
         area = area_alat(nama)
         return {"area": area, "keadaan": "menunggu_anda" if area == "lounge" else "alat", "alat": nama or "",
                 "detail": detail_alat(nama, masukan), "sejak": ts, "durasi_detik": _detik_sejak(ts, sekarang),
                 "diam_detik": diam}
-    status = registri.get("status") if registri else None
     sejak = akhir.get("timestamp") if akhir else _iso(t_status)
     selesai = selesai_giliran(u) if registri is None else status != "busy"
     if selesai and u["latar"]:
@@ -595,6 +619,7 @@ def kumpulkan(proyek_dir, workspace, sekarang, registri_dir=None, hidup=None):
         sesi.append(dict(id=sid, judul=_potong(u["judul"] or kit.get("task") or "", 90), tahap=kit.get("tahap") or "",
                          pr=u["pr"], asal=e.get("asal") if e else None, nama=e.get("nama") if e else None,
                          pid=e.get("pid") if e else None, status_proses=e.get("status") if e else None,
+                         menunggu=e.get("menunggu") if e else None,
                          _mulai=mulai, **turunkan_keadaan(u, bool(anak), sekarang, e), subagent=anak))
     sesi.sort(key=lambda s: (s["_mulai"], s["id"]))
     for s in sesi:

@@ -672,6 +672,52 @@ def test_registri_idle_dengan_subagent_hidup_menunggu_di_rapat(lingkungan2):
     assert (s["area"], s["keadaan"], len(s["subagent"])) == ("rapat", "menunggu_subagent", 1)
 
 
+# S0 2026-09-15: selama dialog AskUserQuestion terbuka, registri sesi berubah pada detik yang sama ke
+# status "waiting" + waitingFor "input needed" (kunci baru), lalu kembali "busy" setelah dijawab. Hook
+# PermissionRequest menyala di detik yang sama, Notification permission_prompt 8 detik kemudian. Dok agent-view
+# menyebut nilai waitingFor lain: "permission prompt", "sandbox request", "worker request", "dialog open".
+
+def test_registri_menunggu_izin_tool_tetap_di_ruang_toolnya(lingkungan2):
+    ws, proyek, reg = lingkungan2
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [tool_use(ws, "PowerShell", "toolu_a", {"description": "hapus berkas"}, -20)], _epoch(-20))
+    tulis_registri(reg, 101, "sesi-a", ws, status="waiting", diperbarui=-19, waitingFor="permission prompt")
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"], s["alat"], s["detail"]) == ("server", "menunggu_izin", "PowerShell", "hapus berkas")
+    assert s["menunggu"] == "permission prompt"
+
+
+def test_registri_menunggu_izin_sebelum_tool_tertulis_di_lounge(lingkungan2):
+    ws, proyek, reg = lingkungan2
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [prompt(ws, -30)], _epoch(-30))
+    tulis_registri(reg, 101, "sesi-a", ws, status="waiting", diperbarui=-3, waitingFor="permission prompt")
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"], s["alat"]) == ("lounge", "menunggu_izin", "")
+
+
+def test_registri_menunggu_input_askuserquestion_di_lounge_dengan_header(lingkungan2):
+    ws, proyek, reg = lingkungan2
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [tool_use(ws, "AskUserQuestion", "toolu_a", {"questions": [{"header": "S0", "question": "?"}]}, -10)], _epoch(-10))
+    tulis_registri(reg, 101, "sesi-a", ws, status="waiting", diperbarui=-10, waitingFor="input needed")
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"], s["alat"], s["detail"]) == ("lounge", "menunggu_anda", "AskUserQuestion", "S0")
+    assert s["menunggu"] == "input needed"
+
+
+def test_registri_menunggu_alasan_lain_di_lounge_dengan_alasannya(lingkungan2):
+    ws, proyek, reg = lingkungan2
+    tulis_registri(reg, 101, "sesi-a", ws, status="waiting", diperbarui=-5, waitingFor="sandbox request")
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"], s["detail"], s["diam_detik"]) == ("lounge", "menunggu_anda", "sandbox request", 5)
+
+
+def test_registri_busy_tanpa_waitingfor_tidak_menunggu(lingkungan2):
+    ws, proyek, reg = lingkungan2
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [tool_use(ws, "Edit", "toolu_a", {"file_path": "a/b.py"}, -4)], _epoch(-4))
+    tulis_registri(reg, 101, "sesi-a", ws, status="busy")
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["keadaan"], s["menunggu"]) == ("alat", None)
+
+
 def test_registri_tak_terbaca_turun_ke_mode_transkrip(lingkungan2):
     ws, proyek, reg = lingkungan2  # folder registri sengaja tidak dibuat
     tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [tool_use(ws, "Edit", "toolu_a", None, -5)], _epoch(-5))
