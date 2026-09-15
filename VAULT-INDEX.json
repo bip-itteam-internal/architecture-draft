@@ -1190,7 +1190,7 @@
         "Finance - Buku Besar CV"
       ],
       "hash": "c61fb8375758e4263e5aac3678d04fc019397221aad1cbfbbc74c8d35fcca2f1",
-      "ukuran_kb": 20.6,
+      "ukuran_kb": 20.8,
       "ringkasan": "Menjawab: apa itu aplikasi CV FINCON, di mana repo dan database-nya (repo pribadi di luar org, Supabase, di luar ERP dan gateway), serta modul apa saja yang dimilikinya: jurnal kas, piutang, utang, umum, penyesuaian, saldo awal, buku besar, laporan keuangan, aset tetap, dan konsolidasi 40 CV dengan jurnal eliminasi. Juga menjawab siapa penggunanya dan pembagian CV per akun, bagaimana jurnal kas didorong ke Google Sheets, model data Supabase, titik temunya dengan ERP, serta catatan risiko teknis seperti otorisasi hanya di klien dan simpan optimistik tanpa transaksi.",
       "kata_kunci": [
         "FINCON",
@@ -1490,20 +1490,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "41cdab149fac5f0ca5a1d81bb56df0458d25fa74558a6baa0661711704500b2e",
-      "ukuran_kb": 450.5,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS One Bharata (erp-frontend), stack apa yang dipakai, dan modul serta menu apa saja yang ada per kategori sidebar (termasuk Pengaturan HRGA terpusat). Juga menjelaskan cara login, refresh token, dan SSO ke aplikasi lain seperti Task Manager, bagaimana `system_roles` dan paket izin menggerbang menu, serta cara admin pusat mengelola multi-perusahaan lewat `CompanySwitcher` dan rekrutmen lintas perusahaan. Memuat konvensi frontend untuk data-fetching TanStack Query (hook sidebar ber-`enabled`, badge `refetchOnWindowFocus`, pencacah membalas angka) dan bagan Recharts dengan `ChartContainer`.",
+      "hash": "31ca7dfeeb89a323d0a4dab1c96ea1e99c7499b4430c7ba441a668a17e639f61",
+      "ukuran_kb": 453.7,
+      "ringkasan": "Menjawab: apa saja modul dan fitur portal web ERP/HRIS One Bharata (erp-frontend), stack yang dipakai, serta bagaimana login, refresh token, SSO Identity Provider, dan gating menu lewat system_roles maupun paket izin bekerja. Juga menjawab bagaimana menu HRIS dan Pengaturan HRGA dikelompokkan (menu induk bersarang, SUB_MENU_PENGATURAN), cara kerja fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), dan konvensi data-fetching TanStack Query serta bagan Recharts/ChartContainer.",
       "kata_kunci": [
         "erp-frontend",
+        "web ERP",
         "One Bharata",
         "hris-dashboard",
-        "web ERP",
         "SSO",
         "system_roles",
-        "menu sidebar",
+        "sidebar menu",
+        "Pengaturan HRGA",
         "multi-perusahaan",
-        "TanStack Query",
-        "Recharts"
+        "TanStack Query"
       ]
     },
     {
@@ -1737,6 +1737,7 @@
         "Sales - TikTok Sentiment Pipeline",
         "CORE - OCR Document Service",
         "Microservices - Assistant Service",
+        "APP - Web ERP",
         "Microservices - Vault MCP Service",
         "API - Marketing Analytics Service",
         "Sales - Profit Engine (Design)",
@@ -1744,20 +1745,20 @@
         "Sales - Marketing Analytics (Audit Ketersediaan Data)",
         "ADR - 0008 Profit Engine Join via item_group_id"
       ],
-      "hash": "89125d586896a55dd25ee944307b3c7f542e340e47950babef3c0d14e06fcf86",
-      "ukuran_kb": 23.6,
-      "ringkasan": "Menjawab: kapabilitas AI apa saja yang dimiliki ERP Bharata beserta statusnya, bagaimana alur sistem marketing-analytics dari marketplace sampai layar ICC, dan rancangan peringatan dini belanja iklan video beserta batas kesegaran 48 jam serta aturan pemakaian kolom laba yang mudah salah dijumlahkan. Menjawab pula kenapa retur fisik ternyata paket COD gagal antar yang dibatalkan sistem sesudah dikirim, tiga jebakan kebocoran data saat membangun prediksinya, dan hasil uji aturan sederhana berbasis COD dan riwayat pembeli yang dihitung dari waktu kejadian, termasuk kenapa versi pertama yang memakai status tersimpan menghasilkan angka yang sedikit bocor.",
+      "hash": "11ab509d5190251dd30c0fb249f387fe2260346363f07381c2979bd3bd9ed260",
+      "ukuran_kb": 23.8,
+      "ringkasan": "Menjawab: kapabilitas AI apa saja yang dimiliki ERP Bharata (generatif vs prediktif, engine, dan dokumen pemiliknya), serta gerbang kelayakan data ADR 0058 yang menentukan kapan pekerjaan AI baru boleh dimulai. Juga menjawab bagaimana alur data marketing-analytics menopang rancangan peringatan dini belanja iklan video (batas kesegaran, aturan pemakaian kolom, sumber belanja per video) dan mengapa prediksi paket COD gagal antar ditinjau ulang beserta jebakan kebocoran datanya.",
       "kata_kunci": [
         "AI",
         "machine learning",
+        "ML",
         "kapabilitas AI",
+        "prediktif",
+        "generatif",
+        "ADR 0058",
         "peringatan dini iklan",
-        "paket COD gagal antar",
-        "retur",
-        "kebocoran data",
-        "riwayat pembeli",
-        "alur sistem",
-        "RTS"
+        "COD gagal antar",
+        "kelayakan data"
       ]
     },
     {
@@ -2676,22 +2677,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "e3c9ea7e07d61d2d7dc5616c192ba48fbadd3c94bd4944d10614dabf1f844f43",
-      "ukuran_kb": 138.3,
-      "ringkasan": "Menjawab: bagaimana marketing-analytics service mengagregasi laba dan performa marketing per toko, produk, kampanye, video, dan live ke koleksi `mart_*` dengan membaca `integration_db` baca-saja, dan bagaimana vonis beranda (sehat/rugi/belum matang/tanpa data) diputuskan. Menjelaskan endpoint seperti `/beranda`, `/ambang`, `/pagu`, analisis live dan Account Specialist, KPI host live, pencatatan sesi live `/live-shifts`, serta aturan pemakaian angka untuk mencegah hitung ganda (`iklan_sia_sia`, `pembatalan`, GMV live). Sumber `/divisi` dan kolom `icc` sudah `department_shops` sejak Fase Contract 2026-09-15 selesai — `team_shops`/`marketing_teams` dan dead code pembacanya sudah dihapus fisik, bukan lagi sekadar tak terpanggil.",
+      "hash": "fdfa28283fcabdda7dad5a135fcc81aac12e1b92740b3f96ec63ce390a5718c3",
+      "ukuran_kb": 139.0,
+      "ringkasan": "Menjawab: bagaimana service marketing-analytics menghitung laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live dari integration_db (baca-saja) ke koleksi mart_*, endpoint apa saja yang tersedia (beranda, ambang, pagu, analisis live, Account Specialist, KPI host live, live-shifts), dan bagaimana penjadwal 48 jam serta job sync bekerja. Juga menjawab aturan pemakaian angka supaya tidak hitung ganda (iklan_sia_sia, pembatalan, GMV live), logika vonis lima keadaan di beranda, perbedaan sumber TikTok, Shopee, dan Lazada, serta batas hari WIB vs UTC.",
       "kata_kunci": [
+        "marketing-analytics",
         "marketing analytics",
-        "mart",
         "laba",
-        "profit attribution",
+        "profit",
+        "mart_profit_attribution",
+        "sesi live",
+        "live-shifts",
         "ROAS",
-        "live shift",
-        "sesi live host",
-        "Account Specialist",
-        "hitung ganda",
-        "dashboard marketing",
-        "department_shops",
-        "fase contract"
+        "iklan",
+        "job sync"
       ]
     },
     {
@@ -3075,7 +3074,7 @@
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi"
       ],
       "hash": "12d653aa8e374085b2f8beb234d6c8a1b1da743626195f71e0b262facb3b1a5c",
-      "ukuran_kb": 2.5,
+      "ukuran_kb": 2.6,
       "ringkasan": "Menjawab: kenapa ERP (bip-erp) tidak membangun akuntansi double-entry atau general ledger sendiri, apa saja yang menjadi ranah Accurate (COA, jurnal, buku besar, neraca, laba rugi), dan apa peran bip-erp sebagai penjembatan data orders dan purchase ke Accurate. Juga menjelaskan konsekuensinya bagi fitur accounting internal dan bagaimana keputusan ini ditantang oleh buku besar 40 CV di luar Accurate, dengan rujukan ke ADR 0068 dan usulan amandemen di ADR 0096.",
       "kata_kunci": [
         "Accurate",
@@ -5455,7 +5454,7 @@
         "API - Integration Service"
       ],
       "hash": "eca2dcfd259457b1594cc52e44cabfbd423c71aaa7a90ff825eddbc56480d382",
-      "ukuran_kb": 6.2,
+      "ukuran_kb": 6.3,
       "ringkasan": "Menjawab: kenapa buku besar konsolidasi 40 CV (FINCON) yang berjalan di luar Accurate dan di luar ERP bertentangan dengan ADR 0001, bukti bahwa entitas CV-nya sama dengan payroll dan Accurate, serta risiko dua laba rugi per CV tanpa rekonsiliasi. Juga menjawab tiga pilihan arah (A kukuhkan Accurate, B amandemen jadi lapisan konsolidasi yang menarik saldo dari Accurate, C akui sebagai sistem terpisah yang dipagari) beserta untung rugi dan konsekuensinya bagi KPI Accounting CV.",
       "kata_kunci": [
         "ADR 0068",
@@ -6616,7 +6615,7 @@
         "RUN - Deploy Microservices bip-erp"
       ],
       "hash": "44acb8ff546e838e5145a91a60df70a971fe82be755b55dfa550a08408cf124c",
-      "ukuran_kb": 15.9,
+      "ukuran_kb": 16.0,
       "ringkasan": "Menjawab: kenapa buku besar dan konsolidasi 40 CV dibangun di dalam ERP dengan FINCON sebagai spesifikasi dan sumber migrasi sementara PT tetap di Accurate, apa yang berubah di layar bagi Junior Accountant pemegang CV, SPV FAT, dan pemohon pembayaran, serta apa yang tidak dijanjikan (transfer bank tetap manual, Coretax di luar ERP, PT tidak pindah). Juga menjawab alasan menolak opsi A, B, dan C di ADR 0068, bug FINCON yang wajib diperbaiki saat dibangun ulang, identitas CV yang terpecah, cakupan akses per CV di server, aturan pembukuan, dan urutan jalur pembayaran paralel lalu otomasi jurnal.",
       "kata_kunci": [
         "ADR 0096",
@@ -6859,7 +6858,7 @@
         "CORE - RBAC dan Permission Set"
       ],
       "hash": "d56a03d3dcd9aa45c909739879dd86969d6c5cbe13d69613534b0feccb5f87e5",
-      "ukuran_kb": 10.9,
+      "ukuran_kb": 11.1,
       "ringkasan": "Menjawab: bagaimana modul buku besar CV di ERP dirancang, meliputi master entitas CV01 sampai CV40 dan pemegang CV, bagan akun bersama, jenis jurnal dan format nomor voucher BKK/BKM, laporan keuangan per CV, kertas kerja konsolidasi, serta tutup buku dan rekonsiliasi mutasi rekening. Juga menjawab sumber jurnal otomatis yang direncanakan (pengajuan uang, kas kecil, gaji dan BPJS TK, penjualan dan penarikan saldo marketplace), kolom settlement marketplace mana yang tidak boleh dijumlahkan sebagai baris jurnal (gerbang kolom), persona yang terlibat, dan hal yang belum diputuskan.",
       "kata_kunci": [
         "buku besar CV",
@@ -12436,28 +12435,28 @@
       "tautan": [
         "Microservices - Marketing Analytics Service",
         "DB - Data Dictionary",
+        "APP - Web ERP",
         "Microservices - Inventory Service",
         "Finance - Incentive",
         "HRIS - Otomasi Skor KPI",
         "API - Marketing Analytics Service",
-        "APP - Web ERP",
         "Sales - Marketing Dashboard (Index)",
         "ADR - 0008 Profit Engine Join via item_group_id"
       ],
-      "hash": "840e2e6bbeaf9c50e2749f08259150b332ad0ea4f71e29a9b5f10a455796621e",
-      "ukuran_kb": 19.1,
-      "ringkasan": "Menjawab: dari metrik-metrik di prototipe dashboard Command Center Direktur, mana yang datanya sudah tersedia di Marketing Analytics Service (ADA), mana yang bahannya ada tapi belum dihitung (RAKIT), mana yang cakupan datanya rendah (TIPIS), dan mana yang memang tidak ada sumbernya. Juga memetakan tiap halaman prototipe ke endpoint yang sesuai serta menjelaskan kenapa metrik iklan TikTok (CVR, CPA, ROAS platform) nyaris tak bisa dipakai sementara Shopee justru lengkap.",
+      "hash": "152cb06264be80ad39feec48b7c8ff755405454d1c4fee2bfc9bfb87d34931c5",
+      "ukuran_kb": 19.7,
+      "ringkasan": "Menjawab: dari metrik prototipe Bharata Command Center milik Direktur, mana yang datanya sudah ADA, perlu RAKIT, TIPIS, atau TIDAK ADA di marketing-analytics, beserta endpoint untuk tiap 13 halamannya. Juga menjawab kenapa cakupan metrik iklan TikTok rendah sementara Shopee lengkap, cara menghitung konversi, CPA, dan ROAS Shopee dari report.expense dan broad_order, serta jebakan seperti menjumlahkan broad_order dengan direct_order atau membaca laba dari baris level campaign.",
       "kata_kunci": [
-        "audit data",
-        "Command Center",
-        "prototipe direktur",
-        "cakupan data iklan",
-        "TikTok Ads",
-        "Shopee ads",
+        "audit ketersediaan data",
+        "prototipe Direktur",
+        "Bharata Command Center",
+        "cakupan metrik iklan",
         "CPA",
         "ROAS",
-        "GMV platform",
-        "broad_order"
+        "konversi iklan",
+        "Shopee GMS",
+        "TikTok Ads",
+        "funnel"
       ]
     },
     {
@@ -14091,7 +14090,7 @@
         "REF - Kepemilikan Data"
       ],
       "hash": "5b3e36942e549a799e19ad9bbcc678c103c6b90794409f80557dfab7a6395b8b",
-      "ukuran_kb": 9.7,
+      "ukuran_kb": 9.8,
       "ringkasan": "Menjawab: task apa saja (T1 sampai T10) untuk membangun sistem finance CV di ERP, mulai dari master entitas CV dan cakupan akses per CV, pembayaran per CV lewat Pengajuan Barang, inti buku besar, laporan dan konsolidasi, migrasi FINCON dan jalan paralel, jurnal otomatis, payroll per badan usaha, penjualan marketplace, sampai rekonsiliasi mutasi rekening dan tutup buku. Juga menjawab prasyarat non-kode (persetujuan SPV FAT dan IT, ekspor data FINCON, paket izin), urutan deploy yang mengikat, serta repo, test, verifikasi, dan dependensi tiap task.",
       "kata_kunci": [
         "analisa kebutuhan",
