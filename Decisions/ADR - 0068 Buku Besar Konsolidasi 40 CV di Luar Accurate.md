@@ -1,6 +1,6 @@
 ## ADR 0068 — Buku besar konsolidasi 40 CV yang berjalan di luar Accurate
 
-- **Status**: 🟡 **Proposed** — keberadaan sistemnya **fakta**, arahnya **belum diputuskan**. Keputusan ada di SPV FAT + IT, bukan di dokumen ini.
+- **Status**: 🟡 **Proposed** — keberadaan sistemnya **fakta**, arahnya **belum diputuskan**. Keputusan ada di SPV FAT + IT, bukan di dokumen ini. Arah yang diusulkan per 2026-09-15: [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] (🟡 Diusulkan), opsi keempat di luar A, B, dan C.
 - **Tanggal**: 2026-08-31 (sistemnya sendiri berjalan sejak 2026-08-05)
 - **Konteks dok**: [[APP - Buku Besar Konsolidasi CV FINCON]] · [[ADR - 0001 Akuntansi via Accurate]] · [[Finance - Big Pictures]]
 
