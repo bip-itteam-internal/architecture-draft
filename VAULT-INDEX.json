@@ -9892,8 +9892,8 @@
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "0e7726fe24fbec37306a9df09404718105681eb3a3472cd0cc124d4071abfb78",
-      "ukuran_kb": 22.8,
+      "hash": "d5c8a0981e3eaeb4783be17c61f395ebf2ce9ef3cb482f9a812e47feb78ed575",
+      "ukuran_kb": 23.1,
       "ringkasan": "Menjawab: bagaimana hook pre-commit menolak commit di branch utama repo kode dan bagaimana githook pre-push menjalankan tsc/lint/build atau go build per service, bagaimana papan sesi mencatat sesi Claude Code mana sedang mengerjakan apa, dan bagaimana loop otonom /brief, /kerjakan, /judge berjalan dari worktree sampai PR dengan maksimum dua pengulangan. Menjelaskan juga judge dua lapis (gerbang deterministik dibanding baseline test plus agen penilai read-only), supervisi dan ekstraksi skill, dashboard, Kantor Agent, serta batas yang disadari seperti --no-verify, repo selain Node/Go tanpa gerbang deterministik, dan kaitannya dengan papan aktivitas developer tim.",
       "kata_kunci": [
         "gerbang repo",
