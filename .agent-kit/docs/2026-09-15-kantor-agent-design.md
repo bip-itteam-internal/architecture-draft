@@ -1,10 +1,10 @@
 # Desain: Kantor Agent, denah isometrik sesi Claude Code yang hidup (v1.20.0)
 
-- **Status**: 🟡 Diusulkan. Desain disetujui pemilik per bagian pada 2026-09-15; belum ada kode
+- **Status**: ✅ Implemented, agent-kit 1.20.0 (2026-09-15). Desain disetujui pemilik per bagian pada hari yang sama; yang berubah saat implementasi dan review dicatat di § Perubahan dari desain awal
 - **Tanggal**: 2026-09-15
-- **Versi kit target**: 1.20.0 (dari 1.19.0)
-- **Keputusan arsitektur**: `Decisions/ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak` (baris baru di tabel Revisi, ditulis saat `/sync-docs`)
-- **Cara kerja untuk pembaca non-kit**: `IT/IT - Gerbang Repo dan Papan Sesi Agent` (bagian baru, ditulis saat `/sync-docs`)
+- **Versi kit**: 1.20.0 (dari 1.19.0)
+- **Keputusan arsitektur**: `Decisions/ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak` (baris Kantor Agent di tabel Revisi)
+- **Cara kerja untuk pembaca non-kit**: `IT/IT - Gerbang Repo dan Papan Sesi Agent` (bagian Kantor Agent)
 - **Mockup**: lokal di `.task-plans/mockup/` pada mesin perancang. Sengaja tidak disalin ke vault karena memuat judul sesi nyata, dan repo vault PUBLIC
 
 ## Konteks
@@ -120,8 +120,9 @@ mati atau berhenti (banner menyebut sejak kapan dan perintah untuk menyalakannya
 | `hooks/kantor-agent.template.html` | **Satu-satunya penulis UI**: denah SVG isometrik, robot, label, tab, panel, feed |
 | `hooks/kantor-agent.ps1` | Launcher Windows: mencari Python, mencegah penulis ganda, menyalin template, menjalankan penulis terlepas, membuka halaman, `-Berhenti` |
 | `hooks/kantor-agent.sh` | Launcher mac/linux dengan `python3`, pola `dashboard.sh` |
-| `commands/kantor-agent.md` | `/kantor-agent [--berhenti]` |
+| `commands/kantor-agent.md` | `/kantor-agent [--berhenti] [--sekali]` |
 | `tests/test_kantor_agent.py`, `tests/fixtures/kantor-agent/` | Unit test fungsi murni penulis atas potongan transkrip sungguhan |
+| `tests/kantor-agent-browser.ps1` | Verifikasi manual halaman di Chrome sungguhan lewat CDP |
 
 Keluaran di `.task-plans/` (bukan repo git): `kantor-agent.html` (salinan template, ditimpa tiap
 launcher jalan), `kantor-agent-data.js`, `kantor-agent.pid`, `kantor-agent.log`.
@@ -129,8 +130,8 @@ launcher jalan), `kantor-agent-data.js`, `kantor-agent.pid`, `kantor-agent.log`.
 Antarmuka:
 
 ```
-kantor-agent.py  --workspace WS [--proyek-dir DIR] (--sekali | --loop DETIK) [--sepi-menit 60]
-kantor-agent.ps1 [-Workspace WS] [-ProyekDir DIR] [-Sekali] [-Interval 2] [-TanpaBuka] [-Berhenti]
+kantor-agent.py  --workspace WS [--proyek-dir DIR] (--sekali | --loop DETIK) [--sepi-menit 60] [--keluaran DIR] [--log BERKAS]
+kantor-agent.ps1 [-Workspace WS] [-ProyekDir DIR] [-Sekali] [-Interval 2] [-SepiMenit 60] [-TanpaBuka] [-Berhenti] [-Python EXE]
 ```
 
 `--proyek-dir` bawaannya `~/.claude/projects`; hanya test yang menggantinya.
@@ -150,16 +151,25 @@ kantor-agent.ps1 [-Workspace WS] [-ProyekDir DIR] [-Sekali] [-Interval 2] [-Tanp
 - Mencari Python berurutan: `architecture-draft/Tools/.venv/Scripts/python.exe`, `py -3`,
   `python3`. Urutan ini mengikuti `commands/index-vault.md`: `python` global di banyak mesin tim
   menunjuk ke venv proyek lain. Tak ada satu pun: exit 2 dengan pesan.
-- `kantor-agent.pid` berisi PID yang masih hidup: tidak menyalakan penulis kedua, cukup mencetak
-  PID-nya.
+- `kantor-agent.pid` berisi PID yang masih hidup **dan** command line proses itu memuat
+  `kantor-agent.py`: tidak menyalakan penulis kedua, cukup mencetak PID-nya. PID basi yang sudah
+  dipakai proses lain tidak terbaca sebagai penulis. Penjagaan ini ada di launcher, bukan kunci di
+  penulis, jadi dua launcher pada detik yang sama masih bisa menyalakan dua penulis.
 - Menyalin template ke `.task-plans/kantor-agent.html`, menjalankan penulis terlepas dengan
-  `--loop 2` (keluaran ke log), lalu membuka halaman kecuali `-TanpaBuka`.
+  `--loop 2 --log .task-plans/kantor-agent.log` (penulis mencatat sendiri, jadi tak ada handle yang
+  diwariskan ke proses lepas), menunggu penulis hidup paling lama 30 detik (exit 3 bila tidak), lalu
+  membuka halaman kecuali `-TanpaBuka`. Penulis terbukti tetap hidup setelah panggilan tool yang
+  menjalankan launcher selesai.
 
 **Pemilihan sesi tiap tick**
 
-- Kandidat: `<proyek-dir>/*/*.jsonl` dengan mtime ≤ 30 menit.
-- Yang dibaca hanya ekor: 256 KB untuk transkrip utama, 128 KB untuk subagent; baris pertama yang
-  terpotong dibuang.
+- Kandidat: `<proyek-dir>/*/*.jsonl` dengan mtime ≤ 30 menit. Daftar direktori (`os.scandir`)
+  dipakai sebagai prasaring longgar (6 jam), baru kandidatnya di-`stat` tepat: `os.stat` per berkas
+  di Windows terukur 77 ms untuk 167 transkrip per tick.
+- Yang dibaca hanya ekor: 64 KB untuk transkrip utama, 32 KB untuk subagent (desain awal 256/128 KB
+  terukur median 320 ms per tick); baris pertama yang terpotong dan baris terakhir yang sedang
+  ditulis dibuang. Hasil urai di-cache per `(ukuran, mtime)`, jadi hanya transkrip yang berubah yang
+  diurai ulang; judul dan PR yang jatuh di luar ekor dipertahankan dari urai sebelumnya.
 - Sesi masuk bila `cwd` terakhir di transkrip berada di dalam workspace (dibandingkan setelah
   `normcase`).
 - `.task-plans/sesi/<id>.json` hanya pelengkap: `tahap`, `task`, dan `status=selesai` (membuat
@@ -169,7 +179,8 @@ kantor-agent.ps1 [-Workspace WS] [-ProyekDir DIR] [-Sekali] [-Interval 2] [-Tanp
 
 - Menyuntik ulang `<script src="kantor-agent-data.js?t=<ms>">` tiap 2 detik. Data sah terakhir
   dipertahankan bila muatan gagal atau berkasnya terbaca terpotong.
-- Basi bila `sekarang − dibuat > 10 detik`.
+- Basi bila `sekarang − dibuat > 10 detik`. Data dari `--sekali` (`penulis.interval_detik = 0`)
+  tampil sebagai snapshot sekali, bukan penulis mati.
 
 ## 2. Model keadaan
 
@@ -225,10 +236,11 @@ tertunda paling awal di luar Perpustakaan/Meja, dan bila tak ada, yang paling aw
 
 ### Penanda di atas robot
 
-- **Durasi tool** selalu tampil (`PowerShell · 2m14s`). Setelah 60 detik muncul ikon "?" dengan
-  keterangan "prompt izin tidak tercatat di transkrip".
-- **Diam**: kejadian terakhir lebih dari 10 menit lalu. Robot diredupkan dan diberi label
-  `diam 14m`.
+- **Durasi tool** tampil setelah 60 detik, bersama tanda "?" dan keterangan "prompt izin tidak
+  tercatat di transkrip" (`PowerShell · 2m14s ?`). Di bawah itu gelembung hanya memuat alat dan
+  detailnya.
+- **Diam**: kejadian terakhir lebih dari `ambang.diam_menit` (10) menit lalu. Robot diredupkan dan
+  diberi label `diam 14m`. Ambang diam dan hidup dibaca halaman dari data, tidak ditulis ulang.
 
 ### Kontrak data
 
@@ -238,9 +250,9 @@ tertunda paling awal di luar Perpustakaan/Meja, dan bila tak ada, yang paling aw
 window.__KANTOR__ = {
   versi: 1,
   dibuat: "<ISO UTC>",
-  penulis: { pid: 1234, interval_detik: 2, berhenti: null },   // "sepi" | "galat" pada tulisan terakhir
+  penulis: { pid: 1234, interval_detik: 2, berhenti: null, tick_ms: { p50, p95, n } },   // berhenti "sepi" pada tulisan terakhir; interval 0 = --sekali
   ambang: { hidup_menit: 30, diam_menit: 10 },
-  skema: { baris_diurai: 812, baris_rusak: 0, dikenali: true },
+  skema: { baris_diurai: 812, baris_rusak: 0, dikenali: true, dilewati_luar_workspace: 0 },
   sesi: [{
     id, judul, tahap, pr,
     area,        // "perpustakaan" | "meja" | "server" | "rapat" | "lounge"
@@ -257,10 +269,10 @@ window.__KANTOR__ = {
 - Data hanya ditulis ke disk lokal dan tidak dikirim ke mana pun. Ini berbeda dari `loop-kirim`,
   yang sengaja tanpa judul karena mengirim ke papan tim.
 - `skema.dikenali = false` bila lebih dari separuh baris gagal diurai, atau ada transkrip hidup
-  tanpa satu pun kejadian `user`/`assistant` di ekornya. Ambang ini sama dengan penolakan di
-  `transkrip-ringkas.ps1`. Sebelum menyimpulkan yang kedua, ekor diperluas sampai 2 MB: satu hasil
-  tool bisa lebih besar dari 256 KB, dan ekor yang cuma berisi potongan baris itu tak boleh terbaca
-  sebagai format berubah.
+  sepanjang ≥ 20 baris tanpa satu pun kejadian `user`/`assistant` di ekornya (yang lebih pendek
+  dianggap sesi yang baru lahir). Ambang separuh sama dengan penolakan di `transkrip-ringkas.ps1`.
+  Sebelum menyimpulkan yang kedua, ekor diperluas ×4 sampai 2 MB: satu hasil tool bisa lebih besar
+  dari ekornya, dan ekor yang cuma berisi potongan baris itu tak boleh terbaca sebagai format berubah.
 
 ## 3. Denah dan perilaku robot
 
@@ -344,13 +356,15 @@ isi ruang di belakangnya tetap terlihat.
 
 | Kejadian | Penulis | Halaman |
 |---|---|---|
-| Python tak ditemukan | launcher exit 2: "butuh Python 3 (venv vault / py / python3)" | tidak dibuka |
+| Python tak ditemukan | launcher exit 2: "butuh Python 3.8+. Dicari: <venv vault>, py -3, python3" | tidak dibuka |
 | Penulis sudah jalan | tidak menyalakan yang kedua, mencetak PID lama | normal |
+| Penulis tak menyala dalam 30 detik | launcher exit 3, menunjuk `kantor-agent.log` | tidak dibuka |
 | Penulis mati | tidak ada | banner basi bila `dibuat` lebih dari 10 detik, robot diredupkan |
 | Format transkrip berubah | tetap menulis, `skema.dikenali = false` | banner "perbarui kit" |
-| Satu transkrip terkunci atau terhapus di tengah tick | berkas itu dilewati pada tick ini dan dicatat, tidak crash | sesinya hilang sementara |
-| Menulis `data.js` gagal 5 kali berturut-turut | exit 3 dengan pesan di log | banner basi |
-| Sepi 60 menit | menulis data terakhir berisi `penulis.berhenti: "sepi"`, lalu exit 0 | banner "penulis berhenti: sepi 60 menit" |
+| Satu transkrip terkunci atau terhapus di tengah tick | berkas itu dilewati pada tick ini, tidak crash | sesinya hilang sementara |
+| Menulis `data.js` gagal 5 kali berturut-turut | exit 3 dengan pesan di log; berkas sementara tiap percobaan dibuang | banner basi |
+| Sepi 60 menit | menulis data terakhir berisi `penulis.berhenti: "sepi"`, lalu exit 0 | banner "penulis berhenti: tak ada sesi hidup cukup lama" |
+| `--sekali` | menulis sekali, tanpa PID, `interval_detik: 0` | setelah 10 detik banner "snapshot sekali", bukan "penulis mati" |
 
 ### Pengujian: tiap lapis harus bisa merah
 
@@ -366,7 +380,10 @@ isi ruang di belakangnya tetap terlihat.
    `kantor-agent-data.js` versi 1 memuat sesi uji di area yang benar dan HTML tersalin.
 3. **Browser nyata**, gerbang sebelum `/wrap`: pola CDP dari spike (halaman membaca data A, penulis
    menulis B, halaman menampilkan B dalam ≤ 3 detik), ditambah screenshot kelima keadaan layar dan
-   satu area berisi ≥ 4 robot. jsdom tak bisa membuktikan ini.
+   satu area berisi ≥ 4 robot. jsdom tak bisa membuktikan ini. Dibangun sebagai
+   `tests/kantor-agent-browser.ps1` (manual, butuh Chrome): memuat, normal, data B tanpa reload
+   dengan pod dan warna stabil, ambang dari data, ramai, format berubah, kosong, basi, snapshot
+   `--sekali`, sepi, dan 0 galat JavaScript.
 4. **Beban**: durasi tick penulis diukur dengan sesi hidup nyata; lolos bila p95 ≤ 200 ms.
    Pembanding terukur: membaca ekor 13 transkrip butuh 45 ms.
 
@@ -403,10 +420,32 @@ dan menempelkan keluarannya.
 - **Langkah model yang sangat panjang** tanpa tulisan transkrip bisa memicu tanda "diam" walau sesi
   masih bekerja.
 - **Sesi yang ditutup tanpa `SessionEnd`** baru pulang setelah 30 menit tanpa tulisan transkrip.
+- **Dua `/kantor-agent` pada detik yang sama** bisa menyalakan dua penulis yang menulis isi sama;
+  `--berhenti` hanya menghentikan yang tercatat di berkas PID.
+- **Launcher `.sh` belum pernah dijalankan** di mac/linux; galatnya terlihat oleh pemakai pertama.
 
 ## Belum diputuskan (TBD)
 
-- **Transkrip agent milik tool `Workflow`**: tidak teramati dalam sampel pengukuran. Lokasi dan
-  bentuknya diperiksa saat `/plan`; sampai terbukti, agent-agent itu tidak ditampilkan. Lead yang
-  memanggil `Workflow` tetap tampil di ruang rapat.
+- **Transkrip agent milik tool `Workflow`**: tidak teramati. Diperiksa saat `/plan` (2026-09-15):
+  0 pemanggilan `Workflow` nyata di 78 transkrip utama 14 hari, jadi lokasi dan bentuk transkripnya
+  belum pernah terlihat, dan agent-agent itu tidak ditampilkan. Lead yang memanggil `Workflow` tetap
+  tampil di ruang rapat.
 - **Tautan dari panel SESI `/dashboard` ke Kantor Agent**: di luar lingkup rilis ini.
+
+## Perubahan dari desain awal
+
+Ditemukan saat implementasi, verifikasi data nyata, dan `/review` (2026-09-15). Faktanya sudah
+diperbarui di bagian masing-masing; daftar ini hanya penunjuk.
+
+- Ekor transkrip diperpendek, daftar direktori jadi prasaring, dan hasil urai di-cache (§ Pemilihan
+  sesi tiap tick). Tick p95 93 ms saat diukur, 68,9 ms atas 6 sesi hidup nyata.
+- Tool penentu area dalam batch paralel: paling awal di luar Perpustakaan/Meja, bukan yang terakhir
+  (§ Aturan area). Ditemukan verifikasi data nyata: robot sesi yang menjalankan PowerShell dua
+  menit tampil di Perpustakaan.
+- Pecahan detik 7 digit yang ditulis PowerShell di berkas sesi dinormalkan, karena Python ≤ 3.10
+  menolaknya.
+- Transkrip pendek tanpa percakapan tidak lagi terbaca sebagai format berubah (§ Kontrak data).
+- Penulis tunggal dijaga launcher lewat PID dan command line, penulis menerima `--log` (§ Launcher).
+- Dari `/review`: ambang diam dan hidup dibaca halaman dari data (§ Penanda); data `--sekali` tampil
+  sebagai snapshot (§ Halaman, § Galat); teks papan area dan angka 60 detik masing-masing hidup di
+  satu konstanta template.
