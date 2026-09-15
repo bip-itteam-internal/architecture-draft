@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-15",
-  "jumlah_dokumen": 409,
+  "jumlah_dokumen": 412,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1185,22 +1185,24 @@
         "Microservices - Integration Service",
         "External - Accurate",
         "Finance - Bridging App New Golang",
-        "Finance - Big Pictures"
+        "Finance - Big Pictures",
+        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
+        "Finance - Buku Besar CV"
       ],
-      "hash": "a0cf1c46edeb94e6548690715aaf5e79ac36247b2f6eac4d8e29082fe91ad1ce",
+      "hash": "c61fb8375758e4263e5aac3678d04fc019397221aad1cbfbbc74c8d35fcca2f1",
       "ukuran_kb": 20.6,
-      "ringkasan": "Menjawab: aplikasi akuntansi apa yang dipakai membukukan 40 CV grup Bharata di luar ERP, modul apa saja yang ada (jurnal kas/piutang/utang/umum/penyesuaian, saldo awal, buku besar, laba rugi, neraca, arus kas metode langsung, perubahan ekuitas, aset tetap, kertas kerja konsolidasi + jurnal eliminasi intercompany), dan siapa yang boleh mengaksesnya. Menjelaskan juga arsitekturnya yang langsung ke Supabase tanpa backend dan tanpa API Gateway, webhook Google Sheets untuk jurnal kas, serta pembagian akun admin1 sampai admin6 per kelompok CV. Berguna untuk memahami mengapa laba per CV punya sumber angka kedua di luar Accurate.",
+      "ringkasan": "Menjawab: apa itu aplikasi CV FINCON, di mana repo dan database-nya (repo pribadi di luar org, Supabase, di luar ERP dan gateway), serta modul apa saja yang dimilikinya: jurnal kas, piutang, utang, umum, penyesuaian, saldo awal, buku besar, laporan keuangan, aset tetap, dan konsolidasi 40 CV dengan jurnal eliminasi. Juga menjawab siapa penggunanya dan pembagian CV per akun, bagaimana jurnal kas didorong ke Google Sheets, model data Supabase, titik temunya dengan ERP, serta catatan risiko teknis seperti otorisasi hanya di klien dan simpan optimistik tanpa transaksi.",
       "kata_kunci": [
-        "CV FINCON",
-        "buku besar",
+        "FINCON",
+        "buku besar CV",
         "general ledger",
-        "konsolidasi",
-        "consolidation",
+        "konsolidasi 40 CV",
         "jurnal eliminasi",
-        "intercompany",
-        "40 CV",
         "Supabase",
-        "consolidated-accounting-app"
+        "consolidated-accounting-app",
+        "aset tetap",
+        "penyusutan",
+        "laporan keuangan"
       ]
     },
     {
@@ -3069,22 +3071,23 @@
         "Finance - Bridging App",
         "Microservices - Integration Service",
         "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
-        "APP - Buku Besar Konsolidasi CV FINCON"
+        "APP - Buku Besar Konsolidasi CV FINCON",
+        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi"
       ],
-      "hash": "f78d06d69f0e783381a650ba2e8ec9e4979d6c1089ac06a31fd9600dafd1402b",
-      "ukuran_kb": 2.2,
-      "ringkasan": "Menjawab: mengapa ERP internal tidak membangun akuntansi double-entry atau general ledger sendiri, dan sampai di mana batas tanggung jawab bip-erp terhadap pembukuan. Menetapkan bahwa COA, jurnal, buku besar, neraca, dan laba rugi adalah domain Accurate sementara bip-erp hanya menjembatani data orders dan purchase lewat Bridging App / Integration Service. Memuat juga catatan bahwa keputusan ini sedang ditantang keadaan sejak Agustus 2026 tetapi belum dicabut maupun diamandemen.",
+      "hash": "12d653aa8e374085b2f8beb234d6c8a1b1da743626195f71e0b262facb3b1a5c",
+      "ukuran_kb": 2.5,
+      "ringkasan": "Menjawab: kenapa ERP (bip-erp) tidak membangun akuntansi double-entry atau general ledger sendiri, apa saja yang menjadi ranah Accurate (COA, jurnal, buku besar, neraca, laba rugi), dan apa peran bip-erp sebagai penjembatan data orders dan purchase ke Accurate. Juga menjelaskan konsekuensinya bagi fitur accounting internal dan bagaimana keputusan ini ditantang oleh buku besar 40 CV di luar Accurate, dengan rujukan ke ADR 0068 dan usulan amandemen di ADR 0096.",
       "kata_kunci": [
-        "ADR 0001",
         "Accurate",
         "akuntansi",
         "accounting",
-        "double-entry",
         "general ledger",
-        "chart of accounts",
+        "double-entry",
+        "bridging app",
         "COA",
-        "bridging",
-        "out-of-scope"
+        "buku besar",
+        "ADR 0001",
+        "integrasi Accurate"
       ]
     },
     {
@@ -5436,9 +5439,10 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Proposed** — keberadaan sistemnya **fakta**, arahnya **belum diputuskan**. Keputusan ada di SPV FAT + IT, bukan di dokumen ini.",
+      "status_teks": "**Proposed** — keberadaan sistemnya **fakta**, arahnya **belum diputuskan**. Keputusan ada di SPV FAT + IT, bukan di dokumen ini. Arah yang diusulkan per 2026-09-15: [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] (🟡 Diusulkan), opsi keempat di luar A, B, dan C.",
       "publik": true,
       "tautan": [
+        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
         "APP - Buku Besar Konsolidasi CV FINCON",
         "ADR - 0001 Akuntansi via Accurate",
         "Finance - Big Pictures",
@@ -5450,20 +5454,20 @@
         "Finance - Dashboard per Posisi (FAT)",
         "API - Integration Service"
       ],
-      "hash": "fa79eaa300c195d632739d384f2086453987ba70a244f61fea1f328a3250c1b3",
-      "ukuran_kb": 6.1,
-      "ringkasan": "Menjawab: apa yang harus dilakukan terhadap buku besar konsolidasi 40 CV yang berjalan di luar ERP dan di luar Accurate, dan apa saja pilihan arahnya (A kukuhkan ADR 0001 lalu bangun konsolidasi di atas data Accurate, B amandemen supaya aplikasi berhenti membukukan sendiri dan hanya jadi lapisan konsolidasi, C akui sebagai sistem terpisah tetapi dipagari SSO, RBAC, RLS, test, dan rekonsiliasi). Menjelaskan alasan mengapa ini bukan sekadar alat bantu pribadi: entitas CV-nya sama dengan Payroll Service dan Accurate, laba rugi jadi punya dua sumber tanpa rekonsiliasi, celah kertas kerja konsolidasi memang nyata, dan ada metrik KPI Accounting CV berbobot 0,30 yang menunggu keluarannya. Statusnya masih Proposed, keputusan ada di SPV FAT dan IT.",
+      "hash": "eca2dcfd259457b1594cc52e44cabfbd423c71aaa7a90ff825eddbc56480d382",
+      "ukuran_kb": 6.2,
+      "ringkasan": "Menjawab: kenapa buku besar konsolidasi 40 CV (FINCON) yang berjalan di luar Accurate dan di luar ERP bertentangan dengan ADR 0001, bukti bahwa entitas CV-nya sama dengan payroll dan Accurate, serta risiko dua laba rugi per CV tanpa rekonsiliasi. Juga menjawab tiga pilihan arah (A kukuhkan Accurate, B amandemen jadi lapisan konsolidasi yang menarik saldo dari Accurate, C akui sebagai sistem terpisah yang dipagari) beserta untung rugi dan konsekuensinya bagi KPI Accounting CV.",
       "kata_kunci": [
         "ADR 0068",
-        "konsolidasi",
-        "consolidation",
-        "40 CV",
-        "Accurate",
+        "konsolidasi 40 CV",
+        "FINCON",
+        "buku besar di luar Accurate",
+        "eliminasi intercompany",
         "rekonsiliasi",
-        "buku besar kedua",
+        "KPI Accounting CV",
+        "general ledger",
         "tata kelola",
-        "shadow IT",
-        "KPI Accounting CV"
+        "dua laba rugi"
       ]
     },
     {
@@ -6583,6 +6587,51 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi.md",
+      "judul": "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, arah disetujui lewat `/analisa-kebutuhan` 2026-09-15, kode belum ada. Berlaku setelah disetujui SPV FAT dan IT, pemutus yang ditetapkan ADR 0068.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
+        "APP - Buku Besar Konsolidasi CV FINCON",
+        "ADR - 0001 Akuntansi via Accurate",
+        "Finance - Buku Besar CV",
+        "ADR - 0014 Accurate Token DB-backed via OAuth",
+        "REF - Kepemilikan Data",
+        "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
+        "Finance - FAT Persona",
+        "Finance - Kas Kecil dan Pengajuan Budget",
+        "Finance - Rancangan Finance Service",
+        "Finance - Big Pictures",
+        "Microservices - Procurement Service",
+        "Microservices - Payroll Service",
+        "Microservices - Integration Service",
+        "Microservices - Notification Service",
+        "External - Accurate",
+        "CORE - RBAC dan Permission Set",
+        "HRIS - Matriks KPI per Departemen",
+        "RUN - Deploy Microservices bip-erp"
+      ],
+      "hash": "44acb8ff546e838e5145a91a60df70a971fe82be755b55dfa550a08408cf124c",
+      "ukuran_kb": 15.9,
+      "ringkasan": "Menjawab: kenapa buku besar dan konsolidasi 40 CV dibangun di dalam ERP dengan FINCON sebagai spesifikasi dan sumber migrasi sementara PT tetap di Accurate, apa yang berubah di layar bagi Junior Accountant pemegang CV, SPV FAT, dan pemohon pembayaran, serta apa yang tidak dijanjikan (transfer bank tetap manual, Coretax di luar ERP, PT tidak pindah). Juga menjawab alasan menolak opsi A, B, dan C di ADR 0068, bug FINCON yang wajib diperbaiki saat dibangun ulang, identitas CV yang terpecah, cakupan akses per CV di server, aturan pembukuan, dan urutan jalur pembayaran paralel lalu otomasi jurnal.",
+      "kata_kunci": [
+        "ADR 0096",
+        "buku besar CV",
+        "general ledger 40 CV",
+        "FINCON",
+        "konsolidasi",
+        "Junior Accountant pemegang CV",
+        "Pengajuan Barang",
+        "amandemen ADR 0001",
+        "cakupan akses per CV",
+        "jurnal otomatis"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -6779,6 +6828,50 @@
         "TikTok Shopee Lazada Tokopedia",
         "sinkronisasi Accurate",
         "rekonsiliasi"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - Buku Besar CV.md",
+      "judul": "Finance - Buku Besar CV",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Konsep**, belum ada di kode (dirancang 2026-09-15). Pembukuan 40 CV hari ini masih berjalan di FINCON, di luar ERP.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
+        "APP - Buku Besar Konsolidasi CV FINCON",
+        "Finance - Rancangan Finance Service",
+        "API - Finance Service",
+        "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
+        "REF - Kepemilikan Data",
+        "Microservices - Procurement Service",
+        "Finance - Kas Kecil dan Pengajuan Budget",
+        "Microservices - Payroll Service",
+        "Microservices - Integration Service",
+        "Finance - Dashboard per Posisi (FAT)",
+        "ADR - 0078 Klasifikasi Fee Lazada Mengikuti Pemetaan COA Finance",
+        "Finance - FAT Persona",
+        "HRIS - Matriks KPI per Departemen",
+        "External - Accurate",
+        "ADR - 0001 Akuntansi via Accurate",
+        "Finance - Big Pictures",
+        "CORE - RBAC dan Permission Set"
+      ],
+      "hash": "d56a03d3dcd9aa45c909739879dd86969d6c5cbe13d69613534b0feccb5f87e5",
+      "ukuran_kb": 10.9,
+      "ringkasan": "Menjawab: bagaimana modul buku besar CV di ERP dirancang, meliputi master entitas CV01 sampai CV40 dan pemegang CV, bagan akun bersama, jenis jurnal dan format nomor voucher BKK/BKM, laporan keuangan per CV, kertas kerja konsolidasi, serta tutup buku dan rekonsiliasi mutasi rekening. Juga menjawab sumber jurnal otomatis yang direncanakan (pengajuan uang, kas kecil, gaji dan BPJS TK, penjualan dan penarikan saldo marketplace), kolom settlement marketplace mana yang tidak boleh dijumlahkan sebagai baris jurnal (gerbang kolom), persona yang terlibat, dan hal yang belum diputuskan.",
+      "kata_kunci": [
+        "buku besar CV",
+        "general ledger",
+        "COA",
+        "bagan akun",
+        "voucher BKK BKM",
+        "konsolidasi",
+        "tutup buku",
+        "rekonsiliasi bank",
+        "gerbang kolom",
+        "jurnal otomatis"
       ]
     },
     {
@@ -10983,26 +11076,26 @@
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan",
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "RUN - Deploy Microservices bip-erp",
+        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
         "DB - Data Dictionary",
         "REF - PRD ERP",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
         "Microservices - Inventory Service"
       ],
-      "hash": "09b8c6a078144d9816af67138a293810a0951f088ed943e7b5ffcda25184aee2",
-      "ukuran_kb": 39.4,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis (identitas karyawan, departemen, hak akses, kontrak, jadwal, presensi, skor dan target KPI, insentif profit, toko per divisi, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab kapan salinan data dianggap sah (satu arah, tak ditulis tangan, berpenjaga), pengecualian ADR 0002 yang masih hidup (mis. task-management membaca DB service lain langsung), duplikasi yang belum diputuskan, koleksi yang sudah RETIRED (`marketing_teams`/`team_shops`, Fase Contract 2026-09-15), dan cara memeriksa peta ini sebelum membangun penyimpanan baru.",
+      "hash": "553f830e956e0a3f20414f47216d67d7c48ee888a2652f16f26338decf444e5c",
+      "ukuran_kb": 40.0,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis di ERP (identitas karyawan, departemen, hak akses, kontrak, jadwal, presensi, skor dan target KPI, target insentif, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab salinan data mana yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih hidup di kode (misalnya task-management membaca DB service lain langsung), duplikasi yang belum diputuskan, dan cara memeriksa kepemilikan sebelum membangun penyimpanan baru.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
         "sumber kebenaran",
         "source of truth",
-        "satu fakta satu tempat",
+        "satu fakta satu pemilik",
         "SyncCollection",
         "salinan data",
         "duplikasi data",
         "database-per-service",
-        "ADR 0002",
-        "retired collection"
+        "ADR 0002"
       ]
     },
     {
@@ -13982,6 +14075,35 @@
         "task breakdown",
         "KPI individu",
         "verifikasi lapangan"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Sistem Finance CV di ERP.md",
+      "judul": "ANALISA - Sistem Finance CV di ERP",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "🟡",
+      "status_teks": "Daftar task dari `/analisa-kebutuhan` 2026-09-15. Keputusannya di [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]], cara kerjanya di [[Finance - Buku Besar CV]]; dok ini papan kerja, bukan arsitektur. Coret item begitu PR-nya merge, dan pindahkan keadaannya ke dok domain lewat `/sync-docs`, jangan menumpuk status di sini.",
+      "publik": false,
+      "tautan": [
+        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
+        "Finance - Buku Besar CV",
+        "REF - Kepemilikan Data"
+      ],
+      "hash": "5b3e36942e549a799e19ad9bbcc678c103c6b90794409f80557dfab7a6395b8b",
+      "ukuran_kb": 9.7,
+      "ringkasan": "Menjawab: task apa saja (T1 sampai T10) untuk membangun sistem finance CV di ERP, mulai dari master entitas CV dan cakupan akses per CV, pembayaran per CV lewat Pengajuan Barang, inti buku besar, laporan dan konsolidasi, migrasi FINCON dan jalan paralel, jurnal otomatis, payroll per badan usaha, penjualan marketplace, sampai rekonsiliasi mutasi rekening dan tutup buku. Juga menjawab prasyarat non-kode (persetujuan SPV FAT dan IT, ekspor data FINCON, paket izin), urutan deploy yang mengikat, serta repo, test, verifikasi, dan dependensi tiap task.",
+      "kata_kunci": [
+        "analisa kebutuhan",
+        "daftar task",
+        "finance CV",
+        "buku besar CV",
+        "migrasi FINCON",
+        "pembayaran per CV",
+        "urutan deploy",
+        "pemegang CV",
+        "payroll per badan usaha",
+        "rekonsiliasi mutasi rekening"
       ]
     },
     {
