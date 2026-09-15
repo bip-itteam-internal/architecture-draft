@@ -423,6 +423,17 @@ def test_tulis_atomik_tanpa_sisa_berkas_sementara(tmp_path):
     assert [p.name for p in tmp_path.iterdir()] == ["data.js"]
 
 
+def test_tulis_atomik_gagal_ganti_nama_tidak_meninggalkan_berkas_sementara(tmp_path, monkeypatch):
+    # antivirus/pengindeks mengunci tujuan: tiap tick yang gagal tak boleh menumpuk .tmp di .task-plans
+    def dikunci(sumber, tujuan):
+        raise PermissionError("dikunci pengindeks")
+
+    monkeypatch.setattr(ka.os, "replace", dikunci)
+    with pytest.raises(PermissionError):
+        ka.tulis_atomik(str(tmp_path / "data.js"), "a")
+    assert list(tmp_path.iterdir()) == []
+
+
 def test_sekali_menulis_data_js(lingkungan):
     ws, proyek = lingkungan
     kini = datetime.now(timezone.utc)

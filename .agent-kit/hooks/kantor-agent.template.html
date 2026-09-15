@@ -121,7 +121,7 @@ footer li{margin:2px 0}
 </main>
 
 <footer><ul>
-  <li>Sesi hidup = transkrip Claude Code ditulis dalam 30 menit terakhir dan cwd-nya di dalam workspace ini. Satu mesin saja.</li>
+  <li>Sesi hidup = transkrip Claude Code ditulis dalam <span id="ambang-hidup">30</span> menit terakhir dan cwd-nya di dalam workspace ini. Satu mesin saja.</li>
   <li>Prompt izin tidak tercatat di transkrip: tanda <b>?</b> pada tool yang berjalan lebih dari 60 detik berarti tool itu mungkin sedang menunggu persetujuan.</li>
   <li>Menunggu tugas shell latar tampil sebagai "menunggu Anda"; subagent latar tampil sebagai robot kecil.</li>
   <li>Format transkrip dinyatakan internal oleh Claude Code dan bisa berubah di rilis mana pun; bila begitu, halaman ini menampilkan peringatan, bukan kantor kosong.</li>
@@ -133,6 +133,7 @@ footer li{margin:2px 0}
   var NS = 'http://www.w3.org/2000/svg';
   var HW = 20, HH = 10, HZ = 22, W = 26, D = 20;
   var INTERVAL_MUAT = 2000, BASI_MS = 10000, BERPIKIR_KE_MEJA_MS = 20000;
+  var IZIN_MUNGKIN_DETIK = 60;                                    // tool selama ini tanpa hasil: mungkin menunggu prompt izin
   var JALAN_MIN_MS = 400, JALAN_MAKS_MS = 3000, KECEPATAN = 7;   // unit lantai per detik
   var PADAT = 4;                                                  // robot per ruang sebelum label ringkas
   var RUANG_PADAT = { perpustakaan: 1, server: 1, rapat: 1, lounge: 1, koridor: 1 };
@@ -149,6 +150,7 @@ footer li{margin:2px 0}
   var elPanel = document.getElementById('panel');
   var elFeed = document.getElementById('feed');
   var elKosong = document.getElementById('kosong');
+  var elAmbangHidup = document.getElementById('ambang-hidup');
   var gerakHalus = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var halamanMulai = Date.now();
 
@@ -259,6 +261,7 @@ footer li{margin:2px 0}
   var ledPod = [];
   var PAPAN_KOTAK = [];
   var elPapanTeks = {};
+  var TEKS_PAPAN = { perpustakaan: 'PERPUSTAKAAN', server: 'RUANG SERVER', meja: 'AREA MEJA · ' + POD.length + ' POD', rapat: 'RUANG RAPAT', lounge: 'LOUNGE', pintu: 'PINTU MASUK' };
   var lapisLabel = null;
 
   function bangunDenah() {
@@ -409,17 +412,17 @@ footer li{margin:2px 0}
     segmen(3.0, 6.4).forEach(function (s) { taruh((s[0] + s[1]) / 2 + 17.7, box(s[0], 17.3, 0, s[1] - s[0], 0.8, 1.0, '#e2d8c5')); });
     tanaman(8.4, 17.4);
 
-    function tandaArea(area, teks, x, y, z) {
-      var p = P(x, y, z), w = (teks.length + 3) * 5.6 + 14;
+    function tandaArea(area, x, y, z) {
+      var teks = TEKS_PAPAN[area], p = P(x, y, z), w = (teks.length + 3) * 5.6 + 14;
       papan.push('<g class="papan" transform="translate(' + p[0].toFixed(1) + ',' + p[1].toFixed(1) + ')"><rect x="' + (-w / 2) + '" y="-10" width="' + w + '" height="14" rx="2"/><text id="papan-' + area + '" text-anchor="middle" y="0.5">' + teks + '</text></g>');
       PAPAN_KOTAK.push([p[0] - w / 2, p[1] - 10, p[0] + w / 2, p[1] + 4]);
     }
-    tandaArea('perpustakaan', 'PERPUSTAKAAN', 6, 3, 3.3);
-    tandaArea('server', 'RUANG SERVER', 19, 3, 3.3);
-    tandaArea('meja', 'AREA MEJA · 8 POD', 8.5, 8.2, 2.3);
-    tandaArea('rapat', 'RUANG RAPAT', 22, 8.6, 2.9);
-    tandaArea('lounge', 'LOUNGE', 23.2, 16.3, 2.2);
-    tandaArea('pintu', 'PINTU MASUK', 1.6, 18.5, 3.1);
+    tandaArea('perpustakaan', 6, 3, 3.3);
+    tandaArea('server', 19, 3, 3.3);
+    tandaArea('meja', 8.5, 8.2, 2.3);
+    tandaArea('rapat', 22, 8.6, 2.9);
+    tandaArea('lounge', 23.2, 16.3, 2.2);
+    tandaArea('pintu', 1.6, 18.5, 3.1);
 
     item.sort(function (a, b) { return a.k - b.k; });
     var isi = new Map();
@@ -430,7 +433,7 @@ footer li{margin:2px 0}
     svg.innerHTML = '<g id="lantai">' + lapisLantai.join('') + '</g><g id="dunia">' + dunia + '</g><g id="papan-area">' + papan.join('') + '</g><g id="label"></g>';
     svg.querySelectorAll('#dunia > g').forEach(function (g) { kelompokEl.set(Number(g.getAttribute('data-k')), g); });
     POD.forEach(function (_, n) { ledPod.push(document.getElementById('led-pod-' + n)); });
-    ['perpustakaan', 'server', 'meja', 'rapat', 'lounge', 'pintu'].forEach(function (a) { elPapanTeks[a] = document.getElementById('papan-' + a); });
+    Object.keys(TEKS_PAPAN).forEach(function (a) { elPapanTeks[a] = document.getElementById('papan-' + a); });
     lapisLabel = document.getElementById('label');
   }
 
@@ -534,11 +537,9 @@ footer li{margin:2px 0}
   function ambilSlot(r, area) {
     if (r.slot && r.slot.area === area) return SPOT[area][r.slot.i];
     if (r.slot && r.slot.luapan === area) {   // sedang antre: masuk begitu ada slot kosong
-      var kosong = slotMilik[area].indexOf(null), daftarArea = slotMilik[area];
-      var bebas = -1;
+      var daftarArea = slotMilik[area], bebas = -1;
       for (var q = 0; q < SPOT[area].length; q++) if (!daftarArea[q]) { bebas = q; break; }
       if (bebas < 0) return SPOT.koridor[r.slot.i];
-      void kosong;
     }
     lepasSlot(r);
     var daftar = slotMilik[area], spots = SPOT[area];
@@ -644,20 +645,22 @@ footer li{margin:2px 0}
   function lewatDetik() { return dataTerakhir ? Math.max(0, (Date.now() - Date.parse(dataTerakhir.dibuat)) / 1000) : 0; }
   function durasiKini(r, lewat) { return r.durasi_detik != null ? Math.round(r.durasi_detik + lewat) : null; }
   function diamKini(r, lewat) { return r.diam_detik != null ? Math.round(r.diam_detik + lewat) : null; }
+  // ambang diam milik penulis (DIAM_MENIT) dan dikirim di data; 10 hanya dipakai selagi data belum ada
+  function diamLama(diam) { return diam != null && diam >= ((dataTerakhir && dataTerakhir.ambang && dataTerakhir.ambang.diam_menit) || 10) * 60; }
   function kini(r, lewat) {
     if (r.pergi) return 'pulang';
     if (r.keadaan === 'berpikir') return 'berpikir';
     if (r.keadaan === 'menunggu_subagent') return 'menunggu subagent';
     if (r.keadaan === 'menunggu_anda') return r.alat ? 'tanya: ' + (r.detail || r.alat) : 'menunggu Anda';
     var dur = durasiKini(r, lewat);
-    return (r.alat || '?') + (r.detail ? ' · ' + r.detail : '') + (dur != null && dur >= 60 ? ' · ' + durasi(dur) : '');
+    return (r.alat || '?') + (r.detail ? ' · ' + r.detail : '') + (dur != null && dur >= IZIN_MUNGKIN_DETIK ? ' · ' + durasi(dur) : '');
   }
-  function mungkinIzin(r, lewat) { var dur = durasiKini(r, lewat); return r.keadaan === 'alat' && dur != null && dur >= 60; }
+  function mungkinIzin(r, lewat) { var dur = durasiKini(r, lewat); return r.keadaan === 'alat' && dur != null && dur >= IZIN_MUNGKIN_DETIK; }
   function perbaruiKelas(r) {
     var lewat = lewatDetik(), diam = diamKini(r, lewat);
     r.el.classList.toggle('ketik', !r.jalan && r.keadaan === 'alat' && r.areaSekarang === 'meja');
     r.el.classList.toggle('baca', !r.jalan && r.keadaan === 'alat' && r.areaSekarang === 'perpustakaan');
-    r.el.classList.toggle('redup', diam != null && diam >= 600);
+    r.el.classList.toggle('redup', diamLama(diam));
     r.el.classList.toggle('sorot', sorotId != null && r.el.getAttribute('data-lead') === sorotId);
     var judul = r.tipe === 'lead'
       ? r.key + '\n' + (r.judul || '(tanpa judul)') + '\n' + (NAMA_AREA[r.areaSekarang] || '') + ' · ' + kini(r, lewat)
@@ -673,7 +676,7 @@ footer li{margin:2px 0}
     robots.forEach(function (r) {
       var padat = RUANG_PADAT[r.areaSekarang] && hitung[r.areaSekarang] >= PADAT;
       var warna = warnaRobot(r), atas = P(r.x, r.y, (r.puncak || 1.5) + 0.3), kepalaY = P(r.x, r.y, (r.puncak || 1.5) + 0.02)[1];
-      var diam = diamKini(r, lewat), redup = diam != null && diam >= 600;
+      var diam = diamKini(r, lewat), redup = diamLama(diam);
       var teks = labelRobot(r) + (redup ? ' · diam ' + durasi(diam) : '') + (r.pergi ? ' · pulang' : '');
       var lw = teks.length * 4.85 + 14, isi = '', pikir = false;
       if (r.tipe === 'lead' && !r.pergi && !padat) {
@@ -682,7 +685,7 @@ footer li{margin:2px 0}
         else if (r.keadaan === 'menunggu_anda') isi = r.alat ? potong('tanya: ' + (r.detail || r.alat), 30) : 'menunggu Anda';
         else if (r.keadaan === 'alat') {
           var dur = durasiKini(r, lewat);
-          isi = potong(r.alat + (r.detail ? ' · ' + r.detail : ''), 30) + (dur != null && dur >= 60 ? ' · ' + durasi(dur) + ' ?' : '');
+          isi = potong(r.alat + (r.detail ? ' · ' + r.detail : ''), 30) + (dur != null && dur >= IZIN_MUNGKIN_DETIK ? ' · ' + durasi(dur) + ' ?' : '');
         }
       }
       var bw = isi ? isi.length * 4.55 + 10 : 0;
@@ -712,7 +715,7 @@ footer li{margin:2px 0}
     var luapan = {};
     robots.forEach(function (r) { if (r.slot && r.slot.luapan) luapan[r.slot.luapan] = (luapan[r.slot.luapan] || 0) + 1; });
     Object.keys(elPapanTeks).forEach(function (a) {
-      var dasar = { perpustakaan: 'PERPUSTAKAAN', server: 'RUANG SERVER', meja: 'AREA MEJA · 8 POD', rapat: 'RUANG RAPAT', lounge: 'LOUNGE', pintu: 'PINTU MASUK' }[a];
+      var dasar = TEKS_PAPAN[a];
       var t = dasar + (luapan[a] ? ' +' + luapan[a] : '');
       if (elPapanTeks[a] && elPapanTeks[a].textContent !== t) elPapanTeks[a].textContent = t;
     });
@@ -794,7 +797,7 @@ footer li{margin:2px 0}
         '<div class="kepala"><i style="background:' + warnaRobot(r) + '"></i><b title="' + esc(r.key) + '">' + esc(r.key.slice(0, 8)) + '</b>' +
         (r.tahap && r.tahap !== 'mulai' ? '<span class="chip">' + esc(r.tahap) + '</span>' : '') +
         (r.pr ? '<span class="chip">PR ' + esc(r.pr) + '</span>' : '') +
-        (diam != null && diam >= 600 ? '<span class="chip">diam ' + durasi(diam) + '</span>' : '') +
+        (diamLama(diam) ? '<span class="chip">diam ' + durasi(diam) + '</span>' : '') +
         (mungkinIzin(r, lewat) ? '<span class="chip peringatan" title="Prompt izin tidak tercatat di transkrip">? izin</span>' : '') + '</div>' +
         '<div class="judul">' + esc(r.judul || '(tanpa judul)') + '</div>' +
         '<div class="kini">' + esc((NAMA_AREA[r.areaSekarang] || '') + ' · ' + kini(r, lewat)) + '</div>' +
@@ -826,6 +829,7 @@ footer li{margin:2px 0}
     panggung.classList.toggle('basi', basi);
     var nLead = d.sesi.length, nSub = d.sesi.reduce(function (n, s) { return n + (s.subagent || []).length; }, 0);
     elInfo.textContent = nLead + ' Lead · ' + nSub + ' subagent';
+    if (d.ambang && d.ambang.hidup_menit) elAmbangHidup.textContent = d.ambang.hidup_menit;
     svg.setAttribute('aria-label', 'Denah kantor agent: ' + nLead + ' Lead, ' + nSub + ' subagent');
     elStatus.className = 'status ' + (basi ? 'basi' : 'live');
     elStatus.textContent = basi ? 'data basi' : 'live · ' + Math.max(0, Math.round(umur / 1000)) + ' dtk lalu';

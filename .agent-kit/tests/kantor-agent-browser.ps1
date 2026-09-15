@@ -32,11 +32,11 @@ $dataJs = Join-Path $halaman 'kantor-agent-data.js'
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 $inv = [Globalization.CultureInfo]::InvariantCulture
 
-function Tulis-Data($sesi, [bool]$Dikenali = $true, $Berhenti = $null, [int]$UmurDetik = 0) {
+function Tulis-Data($sesi, [bool]$Dikenali = $true, $Berhenti = $null, [int]$UmurDetik = 0, [int]$HidupMenit = 30, [int]$DiamMenit = 10) {
   $data = [ordered]@{
     versi = 1
     dibuat = (Get-Date).ToUniversalTime().AddSeconds(-$UmurDetik).ToString('yyyy-MM-ddTHH:mm:ss.fffZ', $inv)
-    ambang = [ordered]@{ hidup_menit = 30; diam_menit = 10 }
+    ambang = [ordered]@{ hidup_menit = $HidupMenit; diam_menit = $DiamMenit }
     skema = [ordered]@{ baris_diurai = 100; baris_rusak = $(if ($Dikenali) { 0 } else { 80 }); dikenali = $Dikenali; dilewati_luar_workspace = 0 }
     penulis = [ordered]@{ pid = 1; interval_detik = 2; berhenti = $Berhenti; tick_ms = $null }
     sesi = @($sesi)
@@ -133,6 +133,13 @@ try {
   $a2 = $r | Where-Object { $_.key -eq 'aaaaaaaa-1111' }
   $b2 = $r | Where-Object { $_.key -eq 'bbbbbbbb-2222' }
   Check ($a2.pod -eq $podA -and $a2.warna -eq $warnaA -and $b2.pod -eq $podB -and $b2.warna -eq $warnaB) "3 pod dan warna Lead stabil antar-data (pod $podA/$podB, warna $warnaA/$warnaB)"
+
+  # 3b. ambang diam dan hidup milik penulis (data.ambang), bukan angka yang ditulis mati di halaman
+  $diam = Sesi 'aaaaaaaa-1111' 'Lead di server' 'meja' 'alat' 'Edit' 'x.py'
+  $diam.diam_detik = 90
+  Tulis-Data @($diam, (Sesi 'bbbbbbbb-2222' 'Lead di meja' 'server' 'alat' 'PowerShell' 'go build')) -HidupMenit 45 -DiamMenit 1
+  $ok = Tunggu { Eval '!!document.querySelector(''.robot.redup'') && document.getElementById(''ambang-hidup'').textContent === ''45''' } 6
+  Check $ok '3b ambang dari penulis: diam_menit 1 meredupkan Lead yang diam 90 detik, footer menyebut 45 menit'
 
   # 4. ramai: enam Lead di ruang server -> label ringkas
   Tulis-Data (1..6 | ForEach-Object { Sesi ('cccccccc-000' + $_) ('Lead ramai ' + $_) 'server' 'alat' 'PowerShell' 'pnpm test' })
