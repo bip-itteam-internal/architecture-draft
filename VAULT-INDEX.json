@@ -2216,9 +2216,9 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "3775e753d3fb7c816cf297fa95911eab81d0e76b3b5639af0d75f667d3a99690",
-      "ukuran_kb": 152.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki employee-service sebagai master data karyawan dan sumber kebenaran autentikasi (login username atau employee_id, PIN, biometric, refresh token, registrasi onboarding). Juga menjawab operasi admin akun oleh IT (ubah status aktif, forget-device, reset akun, baca dan set system_roles), CRUD master departemen dan system role beserta gerbang aksesnya, serta workspace yang di-host di service ini seperti register Legal, R&D Regulatory, Quality (CAPA, incoming inspection, batch release), dan kontrak vendor serta cost saving Procurement. Memuat pula registry sumber skor KPI otomatis beserta aturan tiap sumber, misalnya KPI Host Live `kinerja_live` (scope individu, ambang klik, target yang terpasang di prod, dan pembulatan per sesi yang menekan rasio).",
+      "hash": "85be716db897c9f7fdb40be4c17f635c6b499af23c3d080c1f8da10b6de980b8",
+      "ukuran_kb": 154.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki employee-service sebagai master data karyawan dan sumber kebenaran autentikasi (login username atau employee_id, PIN, biometric, refresh token, registrasi onboarding). Juga menjawab operasi admin akun oleh IT (ubah status aktif, forget-device, reset akun, baca dan set system_roles), CRUD master departemen dan system role beserta gerbang aksesnya, serta workspace yang di-host di service ini seperti register Legal, R&D Regulatory, Quality (CAPA, incoming inspection, batch release), dan kontrak vendor serta cost saving Procurement. Memuat pula registry sumber skor KPI otomatis beserta aturan tiap sumber, misalnya KPI Host Live `kinerja_live` (scope individu, ambang klik, target yang terpasang di prod, pembulatan per sesi yang menekan rasio, dan scope department yang tidak menghasilkan angka tim).",
       "kata_kunci": [
         "employee-service",
         "master data karyawan",
@@ -8574,8 +8574,8 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "c4f39a247cb560875cef2c4222ea544188db6398570de4bdb5aff604ca07d4df",
-      "ukuran_kb": 240.2,
+      "hash": "613562d5974a4a1d14370731bb2f4cb333ddbe783a1a3feef609b9d9e1547f7f",
+      "ukuran_kb": 240.9,
       "ringkasan": "Menjawab: metrik KPI apa saja yang dipakai menilai tiap posisi per departemen di production (isi `kpi_template`), berapa bobot dan target tiap metrik (target tersimpan di `description`), berapa yang otomatis, semi, terblokir data, atau manual per departemen, dan siapa dev penanggung jawabnya. Juga menjelaskan cara membaca label metrik yang ditulis persis termasuk typo, cacat yang sudah diketahui, ketidakcocokan template `Printing` vs departemen `Percetakan`, serta ralat bahwa modul Kaizen dan sumber `forecast_kas` ada di kode tetapi Kaizen tetap dinilai manual (ADR 0061). Menjawab pula bagaimana KPI Host Live Beauty Hacks dan Kyura dinilai otomatis dari siaran live (conversion rate, add to cart, durasi tonton), kenapa skor Agustus 2026 host identik per departemen dan sebagian skor beku keliru, serta host mana yang tak akan dibekukan otomatis karena klik di bawah ambang, serta kenapa skor September 2026 berisiko hanya mewakili sebagian bulan karena pencatatan shift baru dipakai sejak 9 September.",
       "kata_kunci": [
         "matriks KPI",
