@@ -7,7 +7,7 @@
 - **Stack**: Go + Fiber v2 (service `marketing-analytics`), MongoDB (koleksi `mart_*`)
 - **Path di repo**: `bip-erp/services/marketing-analytics/`
 - **Status**: ⚠️ Implemented (ada catatan) — **13 dari 13 halaman prototipe sudah punya endpoint**, tetapi cakupan per-metrik timpang: lapisan laba Bharata lengkap, lapisan metrik platform (Ads Manager & Seller Center) tipis sampai kosong **di TikTok**, dan **utuh di Shopee**.
-- **Tanggal audit**: 2026-08-09; cakupan lapisan iklan disegarkan **2026-09-02** (lihat § Cakupan metrik iklan berbeda tajam per channel)
+- **Tanggal audit**: 2026-08-09; cakupan lapisan iklan disegarkan **2026-09-02**; baris laba dan keputusan per video disegarkan **2026-09-15** (lihat § Cakupan metrik iklan berbeda tajam per channel)
 - **Sumber prototipe**: `Marketing_Analytics_Lengkap_Bharata.html` (dari Direktur, 13 halaman + 10 penambahan)
 
 ## Cara membaca label
@@ -171,9 +171,9 @@ Service kita punya lebih dari prototipe: `/profit/products`, `/profit/items`, dr
 | Kreator | ADA | `creator_username` |
 | Sumber (organik/boost/ads) | ADA | `sumber` + `ada_sumber_lain` |
 | Spend per video | ADA | `spend_vsa` + `spend_gmv_max` |
-| ⭐ Laba per video | TIDAK ADA | `/videos` membawa GMV dan spend, **tidak** `net_settlement`/`hpp`. Drill `/videos/orders` cakupannya **affiliate-saja** |
+| ⭐ Laba per video | ADA sebagian (TikTok GMV Max) | **Diperbarui 2026-09-15.** `/videos` membawa `gross_profit` (revenue kotor GMV Max dikurangi HPP dan biaya iklan prorata, sejak tanggal efektif modul) dan `/videos/periode` membawa `revenue`/`ads_cost`/`gross_profit`/`hpp` per rentang. Fee marketplace dan retur **tidak** termasuk karena order tak menyimpan `video_id`; video organik, VSA murni, dan Shopee tetap null. Drill `/videos/orders` cakupannya **affiliate-saja**. Dipakai blok "Perlu tindakan" tab GMV Max di [[APP - Web ERP]] |
 | Hook (Before-After, POV, Testimoni) | TIDAK ADA | Tak ada field klasifikasi kreatif |
-| Keputusan (menang/boost/fatigue/stop) | TIDAK ADA | Butuh definisi ambang lebih dulu |
+| Keputusan (menang/boost/fatigue/stop) | RAKIT sebagian | **2026-09-15**: hanya "stop" untuk video GMV Max yang rugi (aturan laba kotor < 0 dengan tiga sebab) di blok "Perlu tindakan" [[APP - Web ERP]]; menang, boost, dan fatigue masih butuh definisi ambang |
 
 ## 6 · Live Shopping
 
