@@ -8559,9 +8559,9 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "62ba25159b49b73d035958cef3fb1736d99bc954c3d37dc4d54fcb734e58a9ba",
-      "ukuran_kb": 237.2,
-      "ringkasan": "Menjawab: metrik KPI apa saja yang dipakai menilai tiap posisi per departemen di production (isi `kpi_template`), berapa bobot dan target tiap metrik (target tersimpan di `description`), berapa yang otomatis, semi, terblokir data, atau manual per departemen, dan siapa dev penanggung jawabnya. Juga menjelaskan cara membaca label metrik yang ditulis persis termasuk typo, cacat yang sudah diketahui, ketidakcocokan template `Printing` vs departemen `Percetakan`, serta ralat bahwa modul Kaizen dan sumber `forecast_kas` ada di kode tetapi Kaizen tetap dinilai manual (ADR 0061). Menjawab pula bagaimana KPI Host Live Beauty Hacks dan Kyura dinilai otomatis dari siaran live (conversion rate, add to cart, durasi tonton), kenapa skor Agustus 2026 host identik per departemen dan sebagian skor beku keliru, serta host mana yang tak akan dibekukan otomatis karena klik di bawah ambang.",
+      "hash": "1e0e0857288752ef3eadfc8986b8096bec8cfd41e4cf3a7dddbc3e57b3022d9a",
+      "ukuran_kb": 239.0,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang dipakai menilai tiap posisi per departemen di production (isi `kpi_template`), berapa bobot dan target tiap metrik (target tersimpan di `description`), berapa yang otomatis, semi, terblokir data, atau manual per departemen, dan siapa dev penanggung jawabnya. Juga menjelaskan cara membaca label metrik yang ditulis persis termasuk typo, cacat yang sudah diketahui, ketidakcocokan template `Printing` vs departemen `Percetakan`, serta ralat bahwa modul Kaizen dan sumber `forecast_kas` ada di kode tetapi Kaizen tetap dinilai manual (ADR 0061). Menjawab pula bagaimana KPI Host Live Beauty Hacks dan Kyura dinilai otomatis dari siaran live (conversion rate, add to cart, durasi tonton), kenapa skor Agustus 2026 host identik per departemen dan sebagian skor beku keliru, serta host mana yang tak akan dibekukan otomatis karena klik di bawah ambang, serta kenapa skor September 2026 berisiko hanya mewakili sebagian bulan karena pencatatan shift baru dipakai sejak 9 September.",
       "kata_kunci": [
         "matriks KPI",
         "kpi_template",
