@@ -123,14 +123,14 @@ Penjadwal audit membuka periode (bulan sebelumnya, tutup buku) tiap tanggal 6 pu
 
 ### Kontrak Audit Internal versi uji petik
 
-Grounded ke `audit_handler.go`, `audit_registry.go`, dan `audit_tindakan.go` di branch bip-erp `feat/finance-audit-uji-petik` ([[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]), **belum merge per 2026-09-15**. `main` masih mengirim bentuk matriks 36 uji.
+Grounded ke `audit_handler.go`, `audit_registry.go`, dan `audit_tindakan.go` di branch bip-erp `feat/finance-audit-uji-petik` ([[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]), **belum merge per 2026-09-15**. `main` masih mengirim bentuk matriks 36 uji.
 
 - **`GET /audit/uji`**: array 38 objek `{kode, nomor, bagian, tahap, pos, nama, titik_awal, pembanding, kriteria_cocok, tujuan, sampel, metode}`. `bagian` = `accounting` | `tax`; `tahap` = 2 | 3; `metode` = `acak` | `terarah` | `populasi_penuh`.
 - **`GET /audit/periode/:periode`**: `{periode, kertas_kerja, sudah_dibuka, jumlah_item, baris_di_luar_daftar, di_luar_lingkup, baris}`.
   - `baris` hanya berisi kode yang terdaftar. Tiap baris membawa antara lain `kode_uji`, `nama`, `nomor`, `bagian`, `tahap`, `pos`, `keadaan_efektif`, `tinjauan` (`oleh`, `pada`, `alasan`, `sampel`) bila ada, dan `temuan_id` bila bertemuan.
   - `di_luar_lingkup` = 5 objek `{kode, area, akibat}`.
   - `baris_di_luar_daftar` = cacah baris berkode lama yang disaring; layar tidak menampilkannya.
-  - ⚠️ `jumlah_item` juga penanda versi: layar menganggap respons tanpanya berasal dari backend sebelum ADR 0097.
+  - ⚠️ `jumlah_item` juga penanda versi: layar menganggap respons tanpanya berasal dari backend sebelum ADR 0098.
 - **`POST .../tarik`**: menyemai baris item yang belum ada, membalas `{periode, jumlah_item}`. Aman diulang: `keadaan_tinjauan`, `tinjauan`, dan `temuan_id` tidak ditulis.
 - **`PATCH .../baris/:kode/tinjau`**: badan `{alasan, sampel}`, keduanya wajib.
 - **`POST .../baris/:kode/temuan`**: badan `{kondisi, sampel, klasifikasi?}`; `kondisi` dan `sampel` wajib, `klasifikasi` opsional (`mayor` | `moderat` | `minor`). `kriteria` kiriman diabaikan dan diisi dari `kriteria_cocok` registry. Id temuan `<periode>-<kode>`; menerbitkan ulang merevisi, dan jejak beraksi `revisi` menyimpan isi sebelumnya.
@@ -159,7 +159,7 @@ Grounded ke `audit_handler.go`, `audit_registry.go`, dan `audit_tindakan.go` di 
 ## Dokumen Terkait
 
 - [[Finance - Rancangan Finance Service]] — rancangan & status modul
-- [[Finance - Audit Internal]]: domain lengkap modul Audit Internal (38 item uji petik; matriks lama di Arsip) · [[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]
+- [[Finance - Audit Internal]]: domain lengkap modul Audit Internal (38 item uji petik; matriks lama di Arsip) · [[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]
 - [[Finance - FAT Persona]]: persona per posisi FAT (Tax Officer, Cost Control, SPV FAT), grounded ke izin dan paket prod
 - [[Microservices - Employee Service]] — pemilik `kpi_template`; tempat sumber `kinerja_cost_control`, `kinerja_tax`, `biaya_variabel_produksi` terdaftar
 - [[Microservices - Integration Service]] — pemilik `anggaran_opex` & varians

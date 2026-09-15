@@ -6,8 +6,8 @@
 
 - **Stack**: Next.js (App Router) + TypeScript + shadcn/ui + TanStack Query + react-i18next — sama dengan [[APP - Web ERP]], sengaja, supaya layar yang sudah jadi dapat dipindahkan apa adanya
 - **Path di repo**: `audit-bharata` (**repo terpisah**, dibuat 2026-09-03); backend `bip-erp/services/finance` hari ini ([[Finance - Rancangan Finance Service]]), `services/audit` sesudah pemisahan
-- **Status**: ⚠️ **Implemented (ada catatan)**, diperbarui 2026-09-15. Kontainer prod `Audit-App` (image dibuat 2026-09-11, diukur 2026-09-12) masih versi **matriks 36 uji** dengan tiga layar. Versi **uji petik** ([[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]) dikerjakan di branch `feat/uji-petik-manual`, **belum merge**: dua layar, 88 test hijau, `pnpm build` sukses. CORS gateway untuk `https://audit.bharatainternasional.com` dan port dev 3012 sudah ada di `api-gateway/main.go` (koreksi 2026-09-12). ⚠️ Paket izin `Audit: *` ke akun **belum diukur ulang** sejak 2026-09-04; status terkininya **TBD**.
-- **Keputusan**: [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]] · [[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]
+- **Status**: ⚠️ **Implemented (ada catatan)**, diperbarui 2026-09-15. Kontainer prod `Audit-App` (image dibuat 2026-09-11, diukur 2026-09-12) masih versi **matriks 36 uji** dengan tiga layar. Versi **uji petik** ([[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]) dikerjakan di branch `feat/uji-petik-manual`, **belum merge**: dua layar, 88 test hijau, `pnpm build` sukses. CORS gateway untuk `https://audit.bharatainternasional.com` dan port dev 3012 sudah ada di `api-gateway/main.go` (koreksi 2026-09-12). ⚠️ Paket izin `Audit: *` ke akun **belum diukur ulang** sejak 2026-09-04; status terkininya **TBD**.
+- **Keputusan**: [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]] · [[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]
 
 ## Latar Belakang
 
@@ -36,7 +36,7 @@ Domainnya di [[Finance - Audit Internal]]. Yang ditegakkan layar:
 - **Item belum diperiksa tidak disembunyikan**, dan keadaan `belum_diperiksa` bernada netral, bukan merah.
 - **`keadaan_efektif` dibaca dari respons**, tidak dihitung ulang.
 - **Kalimat pembuka dan cakupan dihitung dari `jumlah_item`**, supaya kertas kerja yang barisnya kurang tak pernah terbaca "seluruhnya wajar".
-- **Respons tanpa `jumlah_item`** dianggap backend sebelum ADR 0097; layar menyatakan server belum diperbarui.
+- **Respons tanpa `jumlah_item`** dianggap backend sebelum ADR 0098; layar menyatakan server belum diperbarui.
 - **Tombol Siapkan kertas kerja** muncul bagi pemegang `audit.tinjau` saat baris kurang dari `jumlah_item`. Pembaca melihat kalimat bahwa kertas kerja belum disiapkan auditor.
 - **Panel item** berurutan kerja: keterangan item (titik awal, pembanding, kriteria, tujuan, sampel yang dituntut, metode), kesimpulan tersimpan, lampiran bukti, lalu isian sampel dan catatan. Tombol ditahan sampai keduanya terisi, dan sampai keterangan item (serta temuan lama untuk revisi) termuat; galat muatnya ditampilkan.
 - **Tandai wajar tidak ditawarkan pada item bertemuan.** **Jadikan temuan** dan **Revisi temuan** lewat dialog yang menyebut item dan periodenya, dengan pengingat perluasan sampel hanya untuk metode acak. Revisi punya judul, tombol, dan toast sendiri.
@@ -90,7 +90,7 @@ Tiap konsumen SSO menulis ulang keempatnya — belum ada paket bersama:
 |---|---|---|---|
 | Auditor internal | Posisinya **belum ada**; direncanakan | `audit_auditor` (view, tinjau, terbitkan) | Web |
 | Reviewer silang | Staf dari divisi di luar yang diaudit | `audit_auditor` | Web |
-| Direktur | Penerima laporan | `audit_direksi` (view; `master.save` tanpa aksi sejak ADR 0097) | Web |
+| Direktur | Penerima laporan | `audit_direksi` (view; `master.save` tanpa aksi sejak ADR 0098) | Web |
 | Pembaca | Ditunjuk per kasus | `audit_pembaca` (view) | Web |
 
 - **Tujuan**: memastikan ketepatan angka, mendeteksi indikasi kecurangan, dan menutup peluangnya.
@@ -141,7 +141,7 @@ Dari ERP
 - [[CORE - SSO Flow]] — jalur masuk; [[CORE - API Master Gateway]] — CORS dan routing
 - [[Finance - Audit Internal]] — dok domain: 38 item uji petik, keadaan baris, dan aturan layar
 - [[API - Finance Service]] — kontrak rute `/api/finance/audit/*`
-- [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]] — keputusan pemisahan · [[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]] — registry uji petik
+- [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]] — keputusan pemisahan · [[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]] — registry uji petik
 - [[CORE - RBAC dan Permission Set]] — katalog izin `audit.*` dan tiga paket bawaan
 - [[APP - Web ERP]] — asal layarnya, kini hanya mengalihkan alamat lama
 

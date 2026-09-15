@@ -4,9 +4,9 @@
 
 *Pemeriksaan bulanan atas pekerjaan Accounting dan Tax PT Bharata Internasional Pharmaceutical lewat 38 item uji petik dua arah. Tiap item diperiksa auditor dengan menelusuri sampel ke dokumen, lalu disimpulkan Wajar atau Temuan beserta sampel dan catatannya. Sistem menyiapkan kertas kerja, memaksa bukti pemeriksaan tertulis, dan menjaga jejaknya; ia tidak menyimpulkan apa pun sendiri. Modulnya hidup di finance-service, layarnya di [[APP - Audit Internal]].*
 
-- **Status**: ⚠️ **Implemented (ada catatan)**. Yang LIVE di prod sejak 2026-09-03 masih **matriks 36 uji** (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676) + [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)). Registry **38 item uji petik** ([[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]) dikerjakan di branch bip-erp `feat/finance-audit-uji-petik` dan audit-bharata `feat/uji-petik-manual`, **belum merge** per 2026-09-15; merge bip-erp menunggu pemeriksaan data prod (lihat TBD). Paket izin `Audit: *` per pengukuran 2026-09-04 belum ditempel ke posisi mana pun.
+- **Status**: ⚠️ **Implemented (ada catatan)**. Yang LIVE di prod sejak 2026-09-03 masih **matriks 36 uji** (bip-erp [#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676) + [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)). Registry **38 item uji petik** ([[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]) dikerjakan di branch bip-erp `feat/finance-audit-uji-petik` dan audit-bharata `feat/uji-petik-manual`, **belum merge** per 2026-09-15; merge bip-erp menunggu pemeriksaan data prod (lihat TBD). Paket izin `Audit: *` per pengukuran 2026-09-04 belum ditempel ke posisi mana pun.
 - **Implementasi**: modul di `bip-erp/services/finance/audit_*.go`, registry item di `audit_item_petik.go`; layar di repo `audit-bharata` ([[APP - Audit Internal]]). Layar lama di `erp-frontend` dicabut di branch `feat/cabut-audit-internal-erp`, dan alamatnya dialihkan ke aplikasi audit.
-- **Keputusan**: [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]] (diamandemen [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]; §8 diganti ADR 0097) · [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]] (§3 diganti ADR 0097) · [[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]
+- **Keputusan**: [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]] (diamandemen [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]; §8 diganti ADR 0098) · [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]] (§3 diganti ADR 0098) · [[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]
 - ⛔ **Modul ini AKAN PINDAH** keluar `finance-service` jadi service + database sendiri. Dok ini tetap memegang domainnya, apa pun rumahnya. Papan kerjanya [[ANALISA - Audit Internal Terpisah]].
 
 ## Latar Belakang
@@ -15,7 +15,7 @@ Auditnya sudah berjalan manual dan prosedurnya sudah terbukti sekali dipakai, de
 
 Baseline itu memunculkan angka yang jadi contoh uji yang berbunyi: selisih buku besar terhadap buku pembantu piutang Rp 954,7 juta, saldo barang dalam proses minus Rp 164 juta, harga pokok penjualan 13,4% dari pendapatan, PPN keluaran Rp 295 juta atas pendapatan Rp 70,6 miliar, 13 akun tanpa 2FA, dan proses akhir bulan tertinggal dua bulan.
 
-**Sejak 2026-09-15 daftarnya diganti.** Manajemen menyerahkan dokumen "Item Pengecekan Accounting dan Tax": 38 item uji petik yang ditelusuri auditor ke dokumen. Matriks 36 uji sebelumnya hanya punya 6 penjalan otomatis, dan di prod periode 2026-08 hasilnya 32 `belum_diimplementasi` dan 4 `gagal_tarik` (diukur 2026-09-03). Pondasi yang dipilih sengaja manual: vonis Wajar atau Temuan dengan sampel dan catatan wajib, tanpa AI ([[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]). Matriks lama beserta aturannya dipindah ke bagian **Arsip** di bawah, tidak dibuang.
+**Sejak 2026-09-15 daftarnya diganti.** Manajemen menyerahkan dokumen "Item Pengecekan Accounting dan Tax": 38 item uji petik yang ditelusuri auditor ke dokumen. Matriks 36 uji sebelumnya hanya punya 6 penjalan otomatis, dan di prod periode 2026-08 hasilnya 32 `belum_diimplementasi` dan 4 `gagal_tarik` (diukur 2026-09-03). Pondasi yang dipilih sengaja manual: vonis Wajar atau Temuan dengan sampel dan catatan wajib, tanpa AI ([[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]). Matriks lama beserta aturannya dipindah ke bagian **Arsip** di bawah, tidak dibuang.
 
 **Independensi bergeser tempat.** Matriks lama menarik angka lewat kredensial sistem, sehingga angka yang diperiksa tidak melewati tangan divisi yang diaudit. Item uji petik menaruh independensi di **pembandingnya**: rekening koran, hitung fisik, dashboard platform, dokumen dari kantor pajak, dan untuk gaji, aturan Peraturan Perusahaan serta daftar karyawan HRIS, bukan data yang dipegang Finance.
 
@@ -104,7 +104,7 @@ Tempat menaruh bukti sudah ada sejak 2026-09-03 (bip-erp [#1699](https://github.
 
 ## Sampling
 
-- **Ukuran sampel bagian kalimat item** (mis. "3 rekening dipilih acak", "20 item dipilih acak"), bukan master data. Setelan ukuran sampel milik Direksi berlantai 5 (ADR 0073 §8) **diganti** ADR 0097: rute `PUT /audit/setelan-sampel/:kode` masih ada tetapi menolak item tanpa penjalan, yaitu seluruh 38 item, dan halaman setelannya dicabut.
+- **Ukuran sampel bagian kalimat item** (mis. "3 rekening dipilih acak", "20 item dipilih acak"), bukan master data. Setelan ukuran sampel milik Direksi berlantai 5 (ADR 0073 §8) **diganti** ADR 0098: rute `PUT /audit/setelan-sampel/:kode` masih ada tetapi menolak item tanpa penjalan, yaitu seluruh 38 item, dan halaman setelannya dicabut.
 - **Acak dan terarah menjawab pertanyaan yang berbeda.** Acak dipakai bila kesimpulannya diekstrapolasi ke populasi dan yang diperiksa tak boleh bisa menebak; terarah dipakai bila yang dicari memang barang yang dilihat auditor atau batas periode. Sampel acak untuk "5 surat jalan terakhir sebelum tutup buku" akan melewatkan pisah batasnya.
 - ⛔ **Pemilihan sampel tidak tercatat mesin.** Yang tersimpan hanya kalimat sampel dari auditor di tinjauan atau temuan. Benih, ukuran populasi, dan daftar item terpilih tidak disimpan, jadi klaim "sampelnya tidak dipilih yang mudah" bergantung pada kejujuran kalimat itu. `PenarikanSampel` (`audit_sampling.go`) dan koleksi `audit_sampel` dideklarasikan tetapi nol penulis dan nol pembaca (diverifikasi `git grep` 2026-09-03).
 
@@ -158,7 +158,7 @@ Layar membaca `keadaan_efektif` dari respons dan **tidak** menghitung ulang urut
 |---|---|---|---|
 | Auditor internal | Posisinya **belum ada**; direncanakan | `audit_auditor` (view, tinjau, terbitkan) | Web ([[APP - Audit Internal]]) |
 | Reviewer silang | Staf dari divisi di luar yang diaudit | `audit_auditor` | Web |
-| Direktur | Penerima laporan | `audit_direksi` (view; `master.save` tanpa aksi sejak ADR 0097) | Web |
+| Direktur | Penerima laporan | `audit_direksi` (view; `master.save` tanpa aksi sejak ADR 0098) | Web |
 
 - **Tujuan**: memastikan ketepatan angka, mendeteksi indikasi kecurangan, dan menutup peluangnya.
 - **Pain point**: kertas kerja dirakit ulang dari nol tiap bulan, dan datanya diminta dari divisi yang sedang diperiksa.
@@ -200,7 +200,7 @@ Layar membaca `keadaan_efektif` dari respons dan **tidak** menghitung ulang urut
 
 ## Arsip: Matriks 36 Uji (dilepas 2026-09-15)
 
-Dilepas dari registry oleh [[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]. Kode penjalannya disimpan tanpa dipanggil. Bagian ini dipertahankan karena aturannya berlaku lagi bila penjalan itu dipasang ulang, dan karena beberapa pelajarannya berlaku untuk modul mana pun yang membaca Accurate.
+Dilepas dari registry oleh [[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]. Kode penjalannya disimpan tanpa dipanggil. Bagian ini dipertahankan karena aturannya berlaku lagi bila penjalan itu dipasang ulang, dan karena beberapa pelajarannya berlaku untuk modul mana pun yang membaca Accurate.
 
 ### 36 uji, tiga kelompok menurut asal sisi pembandingnya
 
@@ -244,7 +244,7 @@ Diukur di prod 2026-09-03 pada periode 2026-08: **32 `belum diimplementasi`, 4 `
 
 ### Sampling sepuluh uji
 
-Dari 36 uji, sepuluh menuntut pemilihan sampel. Lima menuntut acak (konfirmasi saldo pelanggan, stock opname, cek fisik aset, retur penjualan, penyesuaian persediaan); lima harus terarah (jurnal manual besar, kapitalisasi versus beban, pisah batas penjualan, varian produksi, penjualan PT ke CV). Cash opname butuh **waktu** yang acak, bukan item yang acak. Ukuran sampelnya master data Direksi berlantai 5 untuk acak, berbenih `crypto/rand` (diganti ADR 0097 untuk item uji petik).
+Dari 36 uji, sepuluh menuntut pemilihan sampel. Lima menuntut acak (konfirmasi saldo pelanggan, stock opname, cek fisik aset, retur penjualan, penyesuaian persediaan); lima harus terarah (jurnal manual besar, kapitalisasi versus beban, pisah batas penjualan, varian produksi, penjualan PT ke CV). Cash opname butuh **waktu** yang acak, bukan item yang acak. Ukuran sampelnya master data Direksi berlantai 5 untuk acak, berbenih `crypto/rand` (diganti ADR 0098 untuk item uji petik).
 
 ### Kategori sidebar `audit` di Web ERP (dicabut)
 
@@ -267,7 +267,7 @@ Dari 36 uji, sepuluh menuntut pemilihan sampel. Lima menuntut acak (konfirmasi s
 
 ## Dokumen Terkait
 
-- [[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]] · [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]] · [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]
+- [[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]] · [[ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri]] · [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]
 - [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]] · [[Microservices - File Service]]
 - [[ADR - 0001 Akuntansi via Accurate]] · [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]]
 - [[API - Finance Service]] · [[API - Integration Service]] · [[Microservices - Integration Service]] · [[External - Accurate]]
