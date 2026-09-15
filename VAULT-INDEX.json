@@ -739,20 +739,20 @@
         "HRIS - Recruitment",
         "Microservices - Employee Service"
       ],
-      "hash": "f5d4546baf94eba77ea625dfe53e1de047544f501324a55540cd9d3b2c0d81ca",
+      "hash": "d7aeaaf995a5cd4b9091e9e69102db0fa8c9a96d0bae38e1e30bb392b1db5628",
       "ukuran_kb": 37.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan recruitment-service (job requisition, job posting, kandidat, stage dan offer, psikotes sisi HR, interview round dan feedback, master, onboarding, serta rute publik /public/recruitment tanpa JWT) dan role mana yang boleh memanggilnya. Juga menjelaskan rekrutmen lintas perusahaan: cakupan baca dan tulis lewat izin recruitment.cross_company atau admin pusat, kapan balasan 404, 400, atau 503, serta siapa boleh mengajukan requisition untuk departemen lain (jenjang direktur).",
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki recruitment-service (job requisition, job posting, kandidat, stage dan offer, psikotes sisi HR, interview round dan feedback, master, performance review dan checklist onboarding, rute publik portal karir tanpa JWT) beserta role atau izin yang dibutuhkan tiap endpoint. Juga menjelaskan cara kerja rekrutmen lintas perusahaan (`GET /companies`, `?company=`, body `company_id`, `candidate_company_id`, 404 untuk dokumen di luar cakupan, 503 saat master perusahaan tak terjangkau) dan siapa yang boleh mengajukan requisition: supervisor, jenjang direktur untuk departemen lain, atau pemegang `recruitment.cross_company`/admin pusat.",
       "kata_kunci": [
         "recruitment-service",
         "endpoint rekrutmen",
         "job requisition",
         "permintaan karyawan",
         "job posting",
-        "lowongan",
         "kandidat",
         "interview feedback",
         "lintas perusahaan",
-        "recruitment.cross_company"
+        "recruitment.cross_company",
+        "portal karir publik"
       ]
     },
     {
@@ -6198,7 +6198,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Diterima, merged, belum prod**: disetujui 2026-09-10; T1 sampai T6 dikodekan, terverifikasi di DEV, dan merged 2026-09-11; prod belum. Revisi layar kandidat (2026-09-11) **merged 2026-09-11**. DISC tanpa kunci skor (2026-09-15, penyimpangan 9) dikodekan di branch, **belum merged**. Rincian dan addendumnya di `## Deskripsi`.",
+      "status_teks": "**Diterima, merged, belum prod**: disetujui 2026-09-10; T1 sampai T6 dikodekan, terverifikasi di DEV, dan merged 2026-09-11; prod belum. Revisi layar kandidat (2026-09-11) **merged 2026-09-11**. DISC tanpa kunci skor (2026-09-15, penyimpangan 9) **merged 2026-09-15** dan terverifikasi di DEV; prod belum diukur. Rincian dan addendumnya di `## Deskripsi`.",
       "publik": true,
       "tautan": [
         "HRIS - Psikotes Kraepelin",
@@ -6212,18 +6212,18 @@
         "HRIS - Recruitment",
         "API - Recruitment Service"
       ],
-      "hash": "26d8cdd0c58836414459e36f3f5783fd4a5c28dbf45ba8eb6234a72fe4aac3a7",
-      "ukuran_kb": 29.1,
-      "ringkasan": "Menjawab: kenapa katalog tipe psikotes, bank soal, dan paket tes dijadikan master data yang dikelola HRD sementara tiga bentuk jawaban (pilihan ganda, MOST/LEAST, angka-kolom) tetap berupa kode, dan sampai mana janji tanpa coding berlaku (sistem tidak menyimpulkan IQ atau kepribadian, legalitas soal berlisensi tanggung jawab HRD). Juga mencatat penyimpangan sadar saat dikodekan, seperti CFIT dengan dua kunci, boleh kembali ke soal sebelumnya, nama tes disembunyikan dari kandidat, dan soal contoh wajib, serta addendum di branch agar DISC tanpa kunci skor dinilai HR dari lembar jawaban di layar. Keputusan yang masih terbuka, misalnya pengerjaan tanpa pengawasan dan tautan tanpa tenggat, juga dicatat.",
+      "hash": "2d8b6a3b5dad561931d5da60941c2bd2b2616d8d8bb4029bd402eebbc6dd034f",
+      "ukuran_kb": 29.2,
+      "ringkasan": "Menjawab: kenapa katalog tipe psikotes, bank soal, dan paket tes dijadikan master data yang dikelola HRD sementara bentuk jawaban (pilihan ganda, MOST/LEAST, angka-kolom) tetap kode, sampai mana batas janji tanpa coding, dan kenapa satu paket dijalankan sebagai satu sesi dengan satu tautan dikerjakan sekali duduk. Juga mencatat penyimpangan sadar dari rencana (CFIT boleh dua kunci, timer DISC opsional, pilihan ganda boleh kembali ke soal sebelumnya, nama tes disembunyikan dari kandidat, soal contoh wajib, DISC tanpa kunci skor sehingga HR menilai DISC sendiri dari layar) serta hal yang belum diputuskan seperti pengawasan tes jarak jauh, tenggat tautan, dan legalitas mendigitalkan soal berlisensi.",
       "kata_kunci": [
-        "psikotes",
+        "psikotes multi-jenis",
         "psychological test",
+        "bank soal",
+        "question bank",
+        "paket tes",
         "CFIT",
         "DISC",
         "Kraepelin",
-        "bank soal",
-        "paket tes",
-        "tipe tes",
         "jenis_jawaban",
         "ADR 0087"
       ]
@@ -7991,20 +7991,20 @@
         "HRIS - Recruitment",
         "ADR - 0041 Izin Tipe Form Menempel di Departemen"
       ],
-      "hash": "71857ea07282e6f951857894188d81fdf9007b1219dc824302e64aed5285bf4c",
+      "hash": "547be63d836402d67d2a1bffb8f20f9415e8d3a21cc419825f699481310b3b5a",
       "ukuran_kb": 32.6,
-      "ringkasan": "Menjawab: bagaimana HRD mengelola tipe tes, bank soal (input manual, impor Excel, soal dan opsi bergambar, soal contoh), dan paket psikotes, bagaimana kandidat mengerjakan seluruh paket lewat satu tautan, dan bagaimana tiga mesin penilaian (pilihan_ganda, most_least, angka_kolom) menghitung hasil CFIT, DISC, dan Kraepelin. Juga memuat model data koleksi psikotes_tipe dan psikotes_item, izin RBAC untuk membaca daftar soal yang memuat kunci, aturan penjaga server, penutupan sesi paket, seed bawaan, jebakan yang sudah diketahui, dan perubahan di branch agar grup DISC boleh tanpa kunci skor sehingga HR menilai dari lembar jawaban.",
+      "ringkasan": "Menjawab: bagaimana HRD mengelola tipe tes, bank soal (input manual, impor Excel, soal dan opsi bergambar, soal contoh), dan paket tes berurutan, bagaimana tiga bentuk jawaban `pilihan_ganda`, `most_least`, dan `angka_kolom` dinilai, serta seperti apa model data `psikotes_tipe` dan `psikotes_item`. Juga menjelaskan alur kandidat mengerjakan seluruh paket dari satu tautan, aturan penjaga di server, bentuk laporan hasil per bagian termasuk lembar jawaban DISC tanpa kunci yang dinilai HR sendiri, penutupan sesi paket, data bawaan (seed), jebakan yang sudah diketahui, dan hak akses HR (`PermRecruitmentView` vs `PermRecruitmentWork`).",
       "kata_kunci": [
         "bank soal",
         "question bank",
         "paket psikotes",
-        "psikotes multi-jenis",
-        "CFIT",
-        "DISC",
-        "Kraepelin",
+        "tipe tes",
         "psikotes_tipe",
+        "psikotes_item",
         "soal contoh",
-        "skoring psikotes"
+        "DISC tanpa kunci",
+        "CFIT",
+        "impor Excel"
       ]
     },
     {
@@ -9230,20 +9230,20 @@
         "HRIS - Big Pictures",
         "HRIS - Recruitment Roadmap (Adopsi ERPGo)"
       ],
-      "hash": "0771236d1de18c468fc27c785e21fbcada4f00b3a6b8e1152ceda6d9d331f77b",
+      "hash": "1d20aa81a311e1449defea9e125810a9b880c49b16df3345e57cb2b28273ff62",
       "ukuran_kb": 54.2,
-      "ringkasan": "Menjawab: bagaimana alur rekrutmen end-to-end berjalan, dari permintaan karyawan (job requisition) dengan persetujuan SPV HRD, lowongan dan sumber pelamar seperti Glints, screening manual, interview multi-tahap dengan feedback lewat link email, psikotes dan technical test, offer, sampai onboarding dan masa evaluasi. Juga menjelaskan aktor dan role, model data kandidat (progress dan status), rekrutmen lintas perusahaan lewat paket izin, perubahan alur kerja HR yang ada di branch, keputusan yang sudah disepakati HRD, pertanyaan yang masih terbuka, dan rencana rollout bertahap.",
+      "ringkasan": "Menjawab: bagaimana siklus rekrutmen end-to-end berjalan, dari job requisition dan persetujuan SPV HRD, sourcing dan job posting, manajemen kandidat, screening manual, interview multi-tahap dengan form feedback via link email, psikotes dan technical test, offer, sampai onboarding dan masa evaluasi, siapa aktor dan role di tiap langkah, serta model data kandidat (`progress` dan `status`). Juga membahas alur kerja HR di layar, rekrutmen lintas perusahaan lewat paket izin, keputusan yang sudah disepakati HRD, pertanyaan yang masih terbuka, dan rencana rollout bertahap.",
       "kata_kunci": [
         "rekrutmen",
         "recruitment",
-        "hiring",
+        "ATS",
+        "pipeline rekrutmen",
         "job requisition",
         "permintaan karyawan",
         "interview",
-        "wawancara",
         "onboarding",
         "lintas perusahaan",
-        "ATS"
+        "Glints"
       ]
     },
     {
