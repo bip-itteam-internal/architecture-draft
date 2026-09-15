@@ -112,11 +112,11 @@ Ringkasan/detail **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar, plus **B
 | GET | `/hr/requests` | Daftar ringkas untuk **peninjau / admin HR**. `?as=reviewer` (antrian) / `reviewed` (sudah) = difilter per peran **rekan / atasan(SPV) / HRD** (rekan hanya untuk Tukar); tanpa `as` = mode admin HR (hanya yang sudah sampai HRD). Filter `?type=`, `?status=`, `?department=`, `?search=`, `?from=`/`?to=` (yyyy-MM-dd, atas `metadata.created_at`), `?page=`/`?limit=` (bawaan 20, maks 100), `?include=booking` (hanya berlaku `as=reviewer`). Guard: pemohon tak muncul atas pengajuan sendiri | header; mode admin: `hris.pengajuan.view` (fallback dept HR / posisi Cost Control) |
 | GET | `/hr/requests/detail` | Dokumen penuh satu pengajuan by `?type=` & `?id=`; `?as=self` (pemilik) / `reviewer\|reviewed` (peninjau, filter per jenis; item tab "sudah" hanya cocok `as=reviewed`) / tanpa = admin HR. Body = doc per jenis (sama dengan `/*/view`) | header; mode admin: `hris.pengajuan.view` (fallback sama) |
 
-> FE mybharata: "Aktivitas Saya" pakai `/requests/mine`; "Review Submission" + kartu beranda pending pakai `/hr/requests` (+ `/hr/requests/detail` fetch-on-tap). Detail: [[APP - MyBharata]]. Aplikasi **selalu** mengirim `as`, jadi ia tak pernah menyentuh mode admin dan tak terpengaruh gerbang izinnya. Versi dengan Booking Ruang (my-bharata branch `feat/booking-ruang`, `1.18.3+165`) juga selalu mengirim `page`/`limit` dan `include=booking`.
+> FE mybharata: "Aktivitas Saya" pakai `/requests/mine`; "Review Submission" + kartu beranda pending pakai `/hr/requests` (+ `/hr/requests/detail` fetch-on-tap). Detail: [[APP - MyBharata]]. Aplikasi **selalu** mengirim `as`, jadi ia tak pernah menyentuh mode admin dan tak terpengaruh gerbang izinnya. Versi dengan Booking Ruang (my-bharata `1.18.3+165`, #149 merged ke `dev` 2026-09-15) juga selalu mengirim `page`/`limit` dan `include=booking`.
 
 ### Booking Ruang di daftar terpadu (`?include=booking`)
 
-> Status: ⚠️ bip-erp branch `feat/attendance-pengajuan-booking`, **belum merge** per 2026-09-15 (ukur ulang sebelum dipakai). Keputusan: [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]] §4.
+> Status: ⚠️ bip-erp [#1898](https://github.com/bip-itteam-internal/bip-erp/pull/1898) **merged 2026-09-15**, belum di PROD dan belum diverifikasi lewat gateway dev (ukur ulang sebelum dipakai). Keputusan: [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]] §4.
 
 Booking milik [[Microservices - Inventory Service]]; attendance membacanya lewat HTTP saat daftar diminta, tanpa menyimpan salinan (`pengajuan_booking.go`).
 

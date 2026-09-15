@@ -8,7 +8,7 @@ ADR 0094 menaruh pengajuan dan persetujuan booking ruang di MyBharata, sementara
 
 *Amandemen [[ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor]]: web tidak lagi baca-saja untuk booking. Pemohon mengajukan, mengubah jadwal, dan membatalkan; penyetuju yang ditunjuk HR menyetujui dan menolak; semuanya memakai kontrak `/peminjaman*` inventory-service apa adanya. Keputusan lain ADR 0094 (penyetuju ditunjuk HR, status, anti-bentrok, notifikasi, kalender, satu sumber ruang kantor) tetap berlaku.*
 
-- **Status**: ⚠️ **Diterima, terimplementasi di branch, belum merge** (dicatat 2026-09-14, ukur ulang sebelum dipakai): erp-frontend `feat/ga-peminjaman-aksi-web`, bip-erp `feat/employee-ringkasan-booking-ruang`.
+- **Status**: ⚠️ **Diterima, terimplementasi, sudah di prod**: erp-frontend [#1576](https://github.com/bip-itteam-internal/erp-frontend/pull/1576) dan bip-erp [#1884](https://github.com/bip-itteam-internal/bip-erp/pull/1884) merged 2026-09-15 11:48 WIB. Diukur 2026-09-15 15:04 WIB: image prod employee-service (13:21) dan frontend (13:23) dibangun dari repo yang memuat kedua merge commit, dan biner Employee-Service memuat `/peminjaman/perlu-aksi`. Catatan: perjalanan di dev belum diverifikasi karena VM dev tak melayani.
 - **Path di repo**:
   - `erp-frontend/src/features/ga/peminjaman/` (`lib/slot.ts`, `lib/pengajuan-form.ts`, `lib/status.ts`, `hooks/use-peminjaman.ts`, `components/slot-grid.tsx`, `components/peminjaman-form-dialog.tsx`, `components/aksi-pemohon.tsx`, `components/aksi-penyetuju.tsx`, `components/peminjaman-detail-sheet.tsx`)
   - `erp-frontend/src/app/(main)/ga/peminjaman/page.tsx`
@@ -40,7 +40,7 @@ Menu Portal Saya **Booking Ruang** (tanpa izin) menuju `/ga/peminjaman?tab=saya`
 
 ### 4. MyBharata tetap berikutnya
 
-Irisan 2 tetap membangun layar MyBharata. Daftar pemohon dan antrean peninjau di sana direncanakan lewat daftar pengajuan terpadu attendance-service (booking ikut lewat parameter opt-in), sedangkan detail dan aksi booking tetap memanggil inventory-service. Rinciannya diputuskan di rencana irisan 2. *Terimplementasi di branch, belum merge per 2026-09-15: attendance-service memuat booking hanya bila klien mengirim `include=booking` (antrean `as=reviewer` dan daftar milik sendiri; tab sudah diputus dan mode admin tanpa booking), dengan `degraded` saat inventory tak terbaca; MyBharata membuka detail dan aksi booking langsung ke inventory-service. Lihat [[API - Attendance Service]] dan [[APP - MyBharata]].*
+Irisan 2 tetap membangun layar MyBharata. Daftar pemohon dan antrean peninjau di sana direncanakan lewat daftar pengajuan terpadu attendance-service (booking ikut lewat parameter opt-in), sedangkan detail dan aksi booking tetap memanggil inventory-service. Rinciannya diputuskan di rencana irisan 2. *Terimplementasi (bip-erp #1898 dan my-bharata #149 merged 2026-09-15, belum di PROD maupun store): attendance-service memuat booking hanya bila klien mengirim `include=booking` (antrean `as=reviewer` dan daftar milik sendiri; tab sudah diputus dan mode admin tanpa booking), dengan `degraded` saat inventory tak terbaca; MyBharata membuka detail dan aksi booking langsung ke inventory-service. Lihat [[API - Attendance Service]] dan [[APP - MyBharata]].*
 
 ## Consequences
 
@@ -61,7 +61,7 @@ Irisan 2 tetap membangun layar MyBharata. Daftar pemohon dan antrean peninjau di
 ### Yang sengaja tidak dilakukan
 
 - Daftar gabungan izin dan booking di web: web belum punya daftar izin untuk karyawan.
-- Alasan riwayat terstruktur dua bahasa: dikerjakan irisan 2 untuk kedua klien (web: commit tambahan di erp-frontend `feat/ga-peminjaman-aksi-web`; MyBharata: branch `feat/booking-ruang`; keduanya belum merge per 2026-09-15).
+- Alasan riwayat terstruktur dua bahasa: dikerjakan irisan 2 untuk kedua klien (web: erp-frontend [#1587](https://github.com/bip-itteam-internal/erp-frontend/pull/1587), dipindah dari #1576 yang keburu merged; MyBharata: [#149](https://github.com/bip-itteam-internal/my-bharata/pull/149); keduanya merged 2026-09-15, belum di PROD maupun store).
 - Mengangkat grid slot ke komponen bersama: ini pemakai pertama.
 
 ## Dokumen Terkait
