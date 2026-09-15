@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-15",
-  "jumlah_dokumen": 413,
+  "jumlah_dokumen": 412,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -63,19 +63,19 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "ac1a5714c6e2a090e1983893bb3ef5cabd4820830be27f704cee162299cd7303",
+      "hash": "9592e9d166a542522e611d6e9a464742091133c745ba8528c0ae9d7d933b37e8",
       "ukuran_kb": 27.8,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan attendance-service lewat gateway `/api/attendance/*` untuk clock-in/out (tap), daftar entri dan laporan absensi, jadwal kerja, definisi shift dan rotasi perusahaan, hari libur, serta roster per tanggal, beserta parameter, format tanggal, dan gerbang RBAC tiap rute. Juga menjawab kontrak pengajuan cuti/izin, tukar jadwal (schedule exchange), koreksi absen, perjalanan dinas, penunjukan pengganti, daftar HR request terpadu termasuk booking ruang (`include=booking`), guestbook, WiFi, payroll-supplement, dan rute panggilan mesin untuk Sesi Live Host dan KPI.",
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di attendance-service untuk clock-in/out (tap), daftar entri dan laporan presensi, jadwal harian, definisi shift dan rotasi perusahaan, hari libur, serta gerbang RBAC tiap rute. Menjelaskan juga pengajuan cuti/izin, tukar jadwal, koreksi absen (window koreksi, kode 409/422), roster jadwal per tanggal, pergantian jadwal terjadwal, perjalanan dinas, dan pengganti pada pengajuan. Termasuk parameter filter (format tanggal DD-MM-YYYY, periode 26 ke 25), payroll-supplement untuk potongan kehadiran, daftar HR request terpadu yang bisa memuat booking ruang lewat `include=booking`, guestbook, WiFi, dan panggilan mesin untuk Sesi Live Host dan KPI.",
       "kata_kunci": [
         "attendance-service",
-        "absensi",
+        "presensi",
         "attendance",
         "clock-in",
+        "jadwal shift",
         "cuti",
         "leave request",
-        "tukar jadwal",
         "koreksi absen",
-        "roster",
+        "tukar jadwal",
         "payroll-supplement"
       ]
     },
@@ -121,22 +121,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "7cb2005dbec5d7f3a4e3a889e42cf143ea0f18af0b435092304b99783f83ca30",
-      "ukuran_kb": 64.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di employee-service (auth/login/SSO, onboarding, data personal dan work data, akun sistem, master data departemen dan system role) beserta gerbang RBAC masing-masing. Juga menjawab bagaimana departemen digrupkan (mis. label HRGA), bagaimana penyetuju pengajuan tiap departemen ditetapkan dan dibaca lintas-service, serta apa saja endpoint KPI, kontrak kerja, resign, promosi/mutasi, dan surat peringatan beserta status implementasinya.",
+      "hash": "ea396d172546e4d7d8856ab5493d3826618414fecfc71b9816733781394b87ea",
+      "ukuran_kb": 64.4,
+      "ringkasan": "Menjawab: endpoint employee-service untuk login dan onboarding, CRUD data personal, work data, dokumen dan jadwal karyawan, kelola akun (aktif/nonaktif, forget device, reset), serta master data departemen, perusahaan (tenant), system role, jenjang jabatan, dan menu tersembunyi per posisi. Menjelaskan cara menetapkan penyetuju pengajuan departemen (satu-satunya jalur penulis `is_supervisor`), rute internal lintas-service untuk penyetuju departemen dan pemegang izin, serta opsi `grouped=true` untuk departemen grup seperti HRGA. Juga memuat endpoint akun pihak luar, KPI, kontrak kerja, resign, promosi/mutasi, surat peringatan, dan ringkasan pengajuan.",
       "kata_kunci": [
         "employee-service",
-        "API",
-        "endpoint",
-        "RBAC",
-        "auth",
+        "data karyawan",
+        "master department",
         "login",
-        "SSO",
-        "master data",
-        "departemen",
-        "penyetuju pengajuan",
+        "auth",
+        "penyetuju departemen",
+        "approver",
         "system roles",
-        "HRIS"
+        "kontrak kerja",
+        "surat peringatan"
       ]
     },
     {
@@ -468,20 +466,20 @@
         "Microservices - Calendar Service",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI"
       ],
-      "hash": "8a6d87ebf5804a5f984222cb9017e9fa099c5b825da5df5f50bd0c7d404c8cc1",
-      "ukuran_kb": 23.4,
-      "ringkasan": "Menjawab: endpoint apa yang dimiliki inventory-service (`/api/inventory/*`) untuk aset GA, master item dan enum, pemetaan kategori ERP ke golongan Accurate, riwayat perbaikan, opname perlengkapan, dan padanan perlengkapan Accurate, beserta gerbang aksesnya. Juga menjawab kontrak Booking Ruang (`/peminjaman*`): master ruang, slot 30 menit, pengajuan, setujui/tolak, daftar penyetuju, kode status aksi, notifikasi, dan feed kalender, serta validasi request `POST /item`, `PATCH /item/:id`, persetujuan serah-terima, dan upload dokumen presigned.",
+      "hash": "5c1a686aead9a025e5a3166c83132a93c2053f5804c14baa43f72876c919ce95",
+      "ukuran_kb": 23.5,
+      "ringkasan": "Menjawab: endpoint inventory-service untuk aset GA (item inventaris, kategori, pemetaan kategori ke golongan Accurate, serah-terima dan persetujuan SPV, riwayat perbaikan, upload dokumen presigned) serta opname dan padanan perlengkapan Accurate. Merinci kontrak Booking Ruang `/peminjaman*` (master ruang, slot 30 menit, ajukan, ubah, batal, setujui, tolak, penunjukan penyetuju), lapisan gerbangnya, bentuk data, validasi, kode status aksi, notifikasi, dan feed kalender. Juga memuat kontrak request dan validasi rinci untuk buat, update, dan list item.",
       "kata_kunci": [
         "inventory-service",
         "aset GA",
         "inventaris",
+        "asset tracking",
         "booking ruang",
-        "peminjaman",
+        "peminjaman ruang",
         "room booking",
         "opname perlengkapan",
-        "repair history",
-        "serah-terima",
-        "category-mapping Accurate"
+        "serah-terima aset",
+        "repair history"
       ]
     },
     {
@@ -595,7 +593,6 @@
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift",
         "API - Index",
-        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus",
         "ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
@@ -604,20 +601,22 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "bc4244cf04b11c547bde989faf5eba4d6e3559ff1ec654c41ad9b7b8822336ea",
-      "ukuran_kb": 55.9,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan marketing-analytics lewat gateway /api/marketing-analytics/* (beranda, ambang, pagu, kurva alokasi, laba, video dan live, pencatatan sesi live host /live-shifts termasuk ambil alih sesi, retur, price floor, job, pengumpul KPI), berikut parameter, gerbang akses, dan kode galatnya. Juga menjelaskan konvensi respons (unavailable_channels, kolom_tidak_berlaku, paginasi drill, total -1), lima nilai vonis laba (tanpa_data, belum_matang, rugi, waspada, sehat), arti null versus nol, dan cara mengaudit kelengkapan daftar route terhadap kode.",
+      "hash": "0a8847c0e076df331d9b917763d92b57fa29a7347de99f629c40d3d44f186faa",
+      "ukuran_kb": 55.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda dan vonis laba, ambang ROAS, pagu belanja iklan, kurva alokasi, laba per toko/produk/kampanye, video dan live, pencatatan sesi live host `/live-shifts` termasuk ambil alih sesi, retur, price floor, job, dan pengumpul KPI), serta siapa yang boleh menulis (gerbang `RequireMarketingLeader`, kepemilikan PATCH). Juga menjawab konvensi responsnya (`unavailable_channels`, `kolom_tidak_berlaku`, paginasi drill, 400 untuk enum tak dikenal, batas hari WIB), arti lima nilai vonis (`tanpa_data`, `belum_matang`, `rugi`, `waspada`, `sehat`) dan makna `null` versus nol, sumber `/divisi` (`department_shops`, bukan lagi `marketing_teams` sejak menu Teams dicabut total 2026-09-15), plus cara mengaudit kelengkapan daftar route terhadap kode.",
       "kata_kunci": [
         "marketing analytics",
-        "endpoint",
-        "API reference",
+        "endpoint API",
         "beranda",
+        "vonis laba",
         "ambang ROAS",
         "pagu iklan",
-        "kurva alokasi",
         "live-shifts",
-        "vonis laba",
-        "ambil alih sesi live"
+        "sesi live host",
+        "ambil alih sesi",
+        "price floor",
+        "divisi",
+        "department_shops"
       ]
     },
     {
@@ -1279,7 +1278,7 @@
       "area": "Application",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented — aplikasi HRIS mobile produksi (Flutter, Android/iOS). **Rilis di HP pemakai: `1.14.5+135`** (`origin/main`, GitHub Release 2026-08-03; masih rilis GitHub terbaru per 2026-09-15); `origin/dev` sudah di **`1.18.2+164`** (diukur 2026-09-15) dan belum ditarik ke `main`, jadi PR sesudah 135, termasuk **Pelatihan Saya** (#112) dan **Pengajuan Pelatihan** (#115), belum ada di rilis GitHub itu. Angka lama \"rilis dev 1.10.2+104\" dan \"dev 1.14.9+143\" di baris ini sudah tidak berlaku.",
+      "status_teks": "Implemented — aplikasi HRIS mobile produksi (Flutter, Android/iOS). **Rilis di HP pemakai: `1.14.5+135`** (`origin/main`, GitHub Release 2026-08-03; masih rilis GitHub terbaru per 2026-09-15); `origin/dev` sudah di **`1.18.3+165`** (Booking Ruang #149 merged 2026-09-15, diukur hari itu) dan belum ditarik ke `main`, jadi PR sesudah 135, termasuk **Pelatihan Saya** (#112) dan **Pengajuan Pelatihan** (#115), belum ada di rilis GitHub itu. Angka lama \"rilis dev 1.10.2+104\" dan \"dev 1.14.9+143\" di baris ini sudah tidak berlaku.",
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
@@ -1321,9 +1320,9 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "2a7bfa5d0daccd372ac6c0b40b113f6205bc7d2a93de8b884d44a1e42d774d8e",
-      "ukuran_kb": 72.7,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata (Flutter, Android/iOS), riwayat versi dan rilisnya, tech stack, arsitektur Clean Architecture feature-first, dan cara autentikasi (JWT, biometric, PIN, satu akun satu device) yang lewat API gateway. Juga menjawab fitur apa saja yang ada di aplikasi, misalnya attendance, izin/cuti, booking ruang, lembur, slip gaji dengan PIN, KPI, survei/form builder, Kaizen, Satgas 5R/K3, Sesi Live Host, dan pelatihan, serta perilaku multi-perusahaan, struktur menu beranda, roadmap, dan known issues.",
+      "hash": "925b285c6caadc7701052e00c7b199dbb453144ccb0da5fe4721bfe3ee13b299",
+      "ukuran_kb": 72.9,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata (Flutter Android/iOS), tech stack dan arsitektur Clean Architecture feature-first yang dipakai, serta cara autentikasinya (JWT, biometric, PIN, satu akun satu device) lewat API gateway. Menjelaskan fitur-fiturnya seperti presensi, pengajuan izin/cuti, booking ruang, lembur, slip gaji dengan gerbang PIN, KPI dan task management, survei form builder, Kaizen, Satgas 5R dan K3, Sesi Live Host, dan pelatihan. Juga membahas perilaku multi-perusahaan per tenant, struktur menu beranda, catatan versi build dan rilis, roadmap, serta known issues.",
       "kata_kunci": [
         "MyBharata",
         "my_bharata",
@@ -1331,10 +1330,10 @@
         "mobile app",
         "Flutter",
         "HRIS mobile",
+        "multi-tenant",
         "slip gaji",
-        "payslip",
-        "multi-perusahaan",
-        "Codemagic"
+        "presensi",
+        "versi rilis"
       ]
     },
     {
@@ -1434,7 +1433,6 @@
         "API - Employee Service",
         "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
         "Microservices - Calendar Service",
-        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Attrition",
         "Microservices - Attendance Service",
@@ -1503,20 +1501,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "a56438bb2f8f027a47ce5251710be9267b41ed3a6ae72ab1d53fdc61ecd01c04",
-      "ukuran_kb": 457.7,
-      "ringkasan": "Menjawab: apa itu portal web ERP erp-frontend (One Bharata / hris-dashboard), stack teknologinya, bagaimana login, refresh token, dan SSO Identity Provider bekerja, serta bagaimana system_roles dan paket izin menggerbang sidebar dan halaman (termasuk kategori Audit Internal dan menu induk HRIS). Juga menjadi rujukan fitur multi-perusahaan, Pengaturan HRGA terpusat, konvensi data-fetching TanStack Query dan bagan Recharts, serta daftar modul yang sudah dan belum diimplementasikan.",
+      "hash": "741d9465e6c86b17e07f52cf802697c5380d6f002ea76ac3920c822feab52bed",
+      "ukuran_kb": 454.6,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS `erp-frontend` (One Bharata, Next.js), stack yang dipakai, cara login dan refresh token, perannya sebagai SSO Identity Provider, serta bagaimana `system_roles` dan paket izin menggerbang menu sidebar. Menjelaskan fitur multi-perusahaan (pemilih perusahaan admin pusat, rekrutmen lintas perusahaan), pengelompokan menu HRIS dan Pengaturan HRGA terpusat beserta tab-tabnya. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts dengan `ChartContainer`, daftar modul yang ada, dan dependensi integrasinya.",
       "kata_kunci": [
-        "web ERP",
         "erp-frontend",
-        "One Bharata",
+        "Web ERP",
         "hris-dashboard",
+        "One Bharata",
+        "Next.js",
         "SSO",
-        "login",
         "system_roles",
         "sidebar menu",
-        "multi-perusahaan",
-        "Pengaturan HRGA"
+        "Pengaturan HRGA",
+        "TanStack Query"
       ]
     },
     {
@@ -2100,20 +2098,20 @@
         "CORE - HRIS Orchestrator",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "16f59569579b6b5b5dc1a94ece999a5b5f2f1c5528d2b383794e8357790c49b8",
-      "ukuran_kb": 53.9,
-      "ringkasan": "Menjawab: apa tanggung jawab attendance-service (clock-in/out multi-metode, resolusi dan rotasi jadwal, cuti, perjalanan dinas, guestbook, hari libur, laporan absensi dan payroll), stack-nya, dan fitur apa saja yang tersedia termasuk integrasi internal seperti rekap telat untuk usulan SP, rekap kedisiplinan untuk KPI, dan rute Sesi Live Host. Juga menjawab di mana aturan jadwal, ambang telat, dan sanksi sebenarnya diatur (`BUSINESS_LOGIC_IMPLEMENTATION.md` di repo mybharata), bagaimana gerbang kunci layanan dan header gateway bekerja, dukungan multi-tenant, serta dependensi service ini.",
+      "hash": "b3fc57e1f5270d8f71ef1cdf04e889f6b0ff0987f4553eb3f11df800eb875c41",
+      "ukuran_kb": 54.0,
+      "ringkasan": "Menjawab: apa tanggung jawab attendance-service (clock-in/out multi-metode, resolusi dan rotasi jadwal, cuti, perjalanan dinas, guestbook, hari libur, laporan untuk payroll) dan di mana aturan jam kerja, ambang telat, serta sanksinya ditetapkan (dokumen Peraturan Perusahaan di repo mobile). Menjelaskan rute integrasi seperti rekap telat untuk usulan SP, rekap kedisiplinan untuk KPI, jadwal-resolusi dan status-tap untuk Sesi Live Host, serta cara kunci layanan dan header gateway bekerja bersama. Juga memuat catatan multi-perusahaan, schedule-list hibrida per perusahaan, dan dependensi service.",
       "kata_kunci": [
         "attendance-service",
         "absensi",
         "presensi",
         "jadwal kerja",
-        "late-recap",
+        "rotasi shift",
+        "late recap",
         "rekap telat",
-        "Surat Peringatan",
-        "kedisiplinan KPI",
-        "ATTENDANCE_SERVICE_KEY",
-        "multi-tenant"
+        "surat peringatan",
+        "KPI kedisiplinan",
+        "ATTENDANCE_SERVICE_KEY"
       ]
     },
     {
@@ -2513,7 +2511,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan): aset, repair, dan reporting lengkap; **Booking Ruang GA** irisan 1 dari 7 di kode (backend + layar web); irisan 1b (aksi web) dan irisan 2 (MyBharata, riwayat terstruktur) di branch, belum merge per 2026-09-15",
+      "status_teks": "Implemented (ada catatan): aset, repair, dan reporting lengkap; **Booking Ruang GA** irisan 1 dari 7 di kode (backend + layar web); irisan 1b (aksi web) merged dan di prod 2026-09-15; irisan 2 (MyBharata, riwayat terstruktur) merged 2026-09-15, belum di PROD maupun store",
       "publik": true,
       "tautan": [
         "CORE - RBAC dan Permission Set",
@@ -2545,20 +2543,20 @@
         "External - Accurate",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id"
       ],
-      "hash": "5cf67ea6e8a40d4cc63a4b829257f4871c01f88872ec0a922cded258217f9ec4",
-      "ukuran_kb": 30.8,
-      "ringkasan": "Menjawab: apa fungsi inventory-service untuk pelacakan aset General Affairs, bagaimana ID aset `INV-BIP-...` dibuat, dan bagaimana pemegang aset, serah-terima dengan persetujuan SPV, rekonsiliasi ke aset Accurate, soft delete, serta riwayat perbaikan beserta bukti nota ditangani. Juga menjawab bagaimana penyusutan per pemegang dihitung untuk insentif, kenapa perlengkapan dikecualikan dari penyusutan, bagaimana gerbang izin `ga.view`/`ga.work` berlaku pada grup `/item`, dan di mana Booking Ruang GA ditempatkan.",
+      "hash": "f6739b0b865b38665ec4a158f70cffcb57235ce3337d6a3d23adfab5bdbc0e19",
+      "ukuran_kb": 30.9,
+      "ringkasan": "Menjawab: bagaimana inventory-service mengelola aset/inventaris GA, termasuk pola ID item, pemegang aset opsional, soft delete beralasan, dokumen MinIO, riwayat perbaikan dengan bukti nota, dan serah-terima yang disetujui SPV (serta kenapa gerbang grup `/item` ikut berlaku di rute approve-handover). Menjelaskan pemetaan kategori ke golongan Accurate, penyusutan per pemegang untuk biaya operasional insentif, perlengkapan yang dipadankan ke Accurate dan dikecualikan dari penyusutan, serta posisi Booking Ruang di service ini.",
       "kata_kunci": [
         "inventory-service",
         "aset GA",
-        "asset tracking",
+        "asset management",
+        "inventaris",
         "serah-terima aset",
         "handover",
         "penyusutan",
         "depreciation",
         "soft delete",
-        "repair history",
-        "Booking Ruang"
+        "booking ruang"
       ]
     },
     {
@@ -2665,8 +2663,6 @@
         "Microservices - Integration Service",
         "ADR - 0002 Database-per-Service",
         "API - Marketing Analytics Service",
-        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
-        "REF - Kepemilikan Data",
         "APP - Web ERP",
         "Microservices - Employee Service",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
@@ -2694,20 +2690,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "1d26e1e2293cb06ef578779f0cbd8a505679cd1aa16f17a35fc77dbb456031a9",
-      "ukuran_kb": 139.8,
-      "ringkasan": "Menjawab: bagaimana marketing-analytics menyusun mart laba dan performa marketing (toko, produk, kampanye, iklan, video, live) dari integration_db secara baca-saja, bagaimana penjadwal 48 jam dan job sync-nya berjalan, koleksi mart_* apa saja yang dimilikinya, dan sumber data per channel TikTok, Shopee, dan Lazada. Juga menjelaskan aturan vonis laba termasuk belum_matang, larangan hitung ganda antar kolom (iklan_sia_sia, pembatalan, 24h_live_gmv), kejujuran data revenue dan diskon, pencatatan serta ambil alih sesi live host, dan Analisis Live maupun Analisis Account Specialist.",
+      "hash": "f0b3d177306958fdc3a3899d073927e48285d2703080b8d0adcb376f1c134647",
+      "ukuran_kb": 139.1,
+      "ringkasan": "Menjawab: bagaimana service marketing-analytics menghitung laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live dari integration_db (baca-saja) ke koleksi mart_*, endpoint apa saja yang tersedia (beranda, ambang, pagu, analisis live, Account Specialist, KPI host live, live-shifts), dan bagaimana penjadwal 48 jam serta job sync bekerja. Juga menjawab aturan pemakaian angka supaya tidak hitung ganda (iklan_sia_sia, pembatalan, GMV live), logika vonis lima keadaan di beranda, perbedaan sumber TikTok, Shopee, dan Lazada, serta batas hari WIB vs UTC.",
       "kata_kunci": [
-        "marketing analytics service",
-        "mart_profit_attribution",
-        "laba per toko",
+        "marketing-analytics",
+        "marketing analytics",
+        "laba",
         "profit",
-        "sesi live host",
+        "mart_profit_attribution",
+        "sesi live",
         "live-shifts",
-        "hitung ganda",
-        "iklan_sia_sia",
-        "penjadwal 48 jam",
-        "belum_matang"
+        "ROAS",
+        "iklan",
+        "job sync"
       ]
     },
     {
@@ -2779,9 +2775,9 @@
         "DB - Overview and Notes",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "fbf3108b230bd5fb12a41a9aa01cba2592b60f242cdabf1a465f1e2640828503",
+      "hash": "6363ddd47a955c67ba75dd6fc6c794daee8dc075c2752bb86a7eac0573c2b847",
       "ukuran_kb": 21.4,
-      "ringkasan": "Menjawab: bagaimana notification-service mengirim notifikasi lewat inbox in-app, FCM push ponsel, web push browser, WhatsApp, dan email Resend, termasuk paginasi inbox, mark-read, splash promotion, dan artikel per tenant. Juga menjawab kenapa rute pengiriman butuh service key sekaligus header `BIP-Gateway-ID`, bagaimana fan-out push dua kanal dipusatkan di `/inbox/send`, peran daftar-izin `InboxCategories`, pemetaan rute web dari `AppRoute` (misalnya Booking Ruang), dan urutan deploy yang mengikat.",
+      "ringkasan": "Menjawab: bagaimana notification-service menyatukan kanal inbox in-app, push FCM ke browser dan ponsel, WhatsApp, email Resend, splash, dan article, termasuk scope multi-perusahaan untuk FCM dan artikel. Menjelaskan kontrak inbox (paginasi opt-in dan kenapa bentuk bawaan tetap array telanjang, mark-read berfilter pemilik), rute pengiriman ber-service-key yang tetap butuh header `BIP-Gateway-ID`, fan-out push terpusat dari `/inbox/send`, daftar-izin `InboxCategories`, pemetaan `AppRoute` ke rute web termasuk Booking Ruang, serta urutan deploy yang mengikat.",
       "kata_kunci": [
         "notification-service",
         "notifikasi",
@@ -2789,10 +2785,10 @@
         "push notification",
         "FCM",
         "web push",
+        "InboxCategories",
         "WhatsApp",
         "email Resend",
-        "InboxCategories",
-        "splash article"
+        "BIP-Gateway-ID"
       ]
     },
     {
@@ -6533,7 +6529,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Diterima, sebagian terimplementasi** (keputusan 2026-09-12, disempurnakan hasil review 2026-09-14). Irisan 1 dari 7 ada di kode; irisan 1b dan 2 terimplementasi di branch, belum merge per 2026-09-15; irisan 3 sampai 7 belum. **§2, satu butir Consequences, dan satu butir \"Yang sengaja tidak dilakukan\" diamandemen [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]]** (2026-09-14): web kini juga mengajukan dan memutus booking.",
+      "status_teks": "**Diterima, sebagian terimplementasi** (keputusan 2026-09-12, disempurnakan hasil review 2026-09-14). Irisan 1 dan 1b ada di kode dan di prod (1b merged dan naik 2026-09-15, lihat [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]]); irisan 2 merged 2026-09-15 (bip-erp #1898 dan #1899, erp-frontend #1587, my-bharata #149 ke `dev`), belum di PROD maupun store; irisan 3 sampai 7 belum. **§2, satu butir Consequences, dan satu butir \"Yang sengaja tidak dilakukan\" diamandemen [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]]** (2026-09-14): web kini juga mengajukan dan memutus booking.",
       "publik": true,
       "tautan": [
         "ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web",
@@ -6551,19 +6547,19 @@
         "REF - Kepemilikan Data",
         "REF - Alur Persetujuan"
       ],
-      "hash": "238515146e03c3d24df30c782081a12d6e10d5c0f9d6f7037ab2eea5353c4a2e",
-      "ukuran_kb": 12.7,
-      "ringkasan": "Menjawab: kenapa booking ruang rapat dibangun di inventory-service dengan kontrak `/peminjaman`, siapa yang mengajukan dan siapa yang menyetujui (penyetuju ditunjuk HR per perusahaan, bukan GA atau atasan pemohon), dan kenapa desain lama berbasis approval GA dan checklist kebersihan ditinggalkan. Juga menjawab status booking yang berlaku, cara mencegah bentrok tanpa transaksi Mongo (kunci sewa per ruang), kategori notifikasi, feed kalender, rencana Booking Ruang sebagai satu sumber ruang kantor dan booking berulang, serta konsekuensi yang diterima sadar.",
+      "hash": "7ddc4d1678a77030c5ac69f95110566b8f06d4514a91fbddae7e3b51aee2cccd",
+      "ukuran_kb": 12.9,
+      "ringkasan": "Menjawab: kenapa booking ruang rapat dibangun di inventory-service dengan kontrak `/peminjaman`, siapa yang mengajukan dan menyetujui (penyetuju ditunjuk HR per perusahaan, bukan GA atau atasan pemohon), dan kenapa checklist kebersihan serta status Selesai dari desain lama dihapus. Menjelaskan alur status booking, cara mencegah bentrok tanpa transaksi Mongo (kunci sewa per ruang, tulis berpenjaga, cek ulang), dua kategori notifikasi, feed kalender milik pembaca, rencana Booking Ruang sebagai satu sumber ruang kantor dan booking berulang, serta konsekuensi yang diterima.",
       "kata_kunci": [
         "ADR 0094",
         "booking ruang",
         "room booking",
         "peminjaman ruang",
-        "ruang rapat",
-        "meeting room",
-        "penyetuju",
-        "approval",
+        "penyetuju booking",
         "anti-bentrok",
+        "ga_peminjaman",
+        "PJR",
+        "satu sumber ruang kantor",
         "MyBharata"
       ]
     },
@@ -6573,7 +6569,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Diterima, terimplementasi di branch, belum merge** (dicatat 2026-09-14, ukur ulang sebelum dipakai): erp-frontend `feat/ga-peminjaman-aksi-web`, bip-erp `feat/employee-ringkasan-booking-ruang`.",
+      "status_teks": "**Diterima, terimplementasi, sudah di prod**: erp-frontend [#1576](https://github.com/bip-itteam-internal/erp-frontend/pull/1576) dan bip-erp [#1884](https://github.com/bip-itteam-internal/bip-erp/pull/1884) merged 2026-09-15 11:48 WIB. Diukur 2026-09-15 15:04 WIB: image prod employee-service (13:21) dan frontend (13:23) dibangun dari repo yang memuat kedua merge commit, dan biner Employee-Service memuat `/peminjaman/perlu-aksi`. Catatan: perjalanan di dev belum diverifikasi karena VM dev tak melayani.",
       "publik": true,
       "tautan": [
         "ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor",
@@ -6586,9 +6582,9 @@
         "Microservices - Inventory Service",
         "REF - Alur Persetujuan"
       ],
-      "hash": "167b72ac8612a21576ed5a4d566f5d3fc21af50daea22ea2ae8d9dab0665e1fd",
-      "ukuran_kb": 7.7,
-      "ringkasan": "Menjawab: kenapa pengajuan, ubah jadwal, pembatalan, dan persetujuan booking ruang juga dibuat di web (amandemen ADR 0094), dan bagaimana alurnya di layar: tab Booking Saya dengan grid slot 30 menit, tab Perlu Keputusan untuk penyetuju, dan kartu Booking Ruang di halaman Pengajuan Portal Saya. Juga menjawab dari mana angka antrean kartu diambil (`/pengajuan/ringkasan` employee-service), rencana MyBharata lewat daftar pengajuan terpadu, urutan deploy, dan kompromi yang diterima sadar.",
+      "hash": "7bb041b957e136385e18370ceda6a1bacfc249918f2d5a3ae11ab3ba4b15d170",
+      "ukuran_kb": 8.2,
+      "ringkasan": "Menjawab: kenapa pengajuan, ubah jadwal, pembatalan, dan persetujuan booking ruang juga bisa dilakukan lewat web, mengamandemen ADR 0094 yang semula menjadikan web baca-saja untuk booking. Menjelaskan alurnya di web (kartu Booking Ruang di halaman Pengajuan, tab Booking Saya dan Perlu Keputusan, grid slot 30 menit), sumber angka antrean di ringkasan pengajuan employee-service, hubungannya dengan layar MyBharata, serta konsekuensi yang diterima seperti aturan tombol yang dicerminkan di frontend dan urutan deploy.",
       "kata_kunci": [
         "ADR 0095",
         "booking ruang web",
@@ -6596,10 +6592,9 @@
         "Perlu Keputusan",
         "Booking Saya",
         "portal pengajuan",
-        "slot 30 menit",
         "persetujuan booking",
-        "approval",
-        "erp-frontend"
+        "grid slot",
+        "amandemen ADR 0094"
       ]
     },
     {
@@ -6645,42 +6640,6 @@
         "amandemen ADR 0001",
         "cakupan akses per CV",
         "jurnal otomatis"
-      ]
-    },
-    {
-      "path": "Decisions/ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance.md",
-      "judul": "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
-      "area": "Decisions",
-      "jenis": "adr",
-      "status_emoji": "⚠️",
-      "status_teks": "**Diterima, terimplementasi di branch, belum merge** (dicatat 2026-09-15, ukur ulang sebelum dipakai): erp-frontend `feat/marketing-iklan-dashboard`. Tanpa perubahan backend, env, maupun kontrak.",
-      "publik": true,
-      "tautan": [
-        "REF - Kepemilikan Data",
-        "Finance - Rancangan Finance Service",
-        "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
-        "Sales - Dashboard per Posisi (Beauty Hacks & Kyura)",
-        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
-        "Microservices - Marketing Analytics Service",
-        "API - Marketing Analytics Service",
-        "Sales - Marketing Analytics (Audit Ketersediaan Data)",
-        "APP - Web ERP",
-        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
-      ],
-      "hash": "94efadb8519b584d49643ed29cda5597994f4961a4669d9444df1afc54527be9",
-      "ukuran_kb": 10.9,
-      "ringkasan": "Menjawab: dari mana anggaran iklan di Ringkasan Marketing Analytics dibaca (Master Anggaran OPEX Finance, akun Beban Iklan per departemen Accurate, bukan mart_pagu), kenapa anggarannya ditampilkan per brand Beauty Hacks dan Kyura tanpa dijumlahkan, dan bagaimana belanja iklan bulan berjalan dibandingkan terhadapnya. Juga memutuskan kartu ROAS vs target di baris utama dan ROI laba di baris kedua beserta rumusnya, keadaan layar yang tak boleh jatuh ke 0%, dan SPV/Leader brand mendarat di Ringkasan Marketing lewat isPemimpinBrand.",
-      "kata_kunci": [
-        "anggaran iklan",
-        "ad budget",
-        "Master Anggaran OPEX",
-        "Beban Iklan",
-        "budget terpakai",
-        "mart_pagu",
-        "ROAS vs target",
-        "ROI laba",
-        "dashboard SPV Leader",
-        "Beauty Hacks Kyura"
       ]
     },
     {
@@ -7226,7 +7185,7 @@
       "area": "General Affairs",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). **Booking ruang**: irisan 1 dari 7 ada di kode (inventory-service, feed kalender, notifikasi, layar web Ruang & Booking, penunjukan penyetuju). **Irisan 1b** (mengajukan, mengubah jadwal, membatalkan, menyetujui, dan menolak lewat web, plus kartu Booking Ruang di halaman Pengajuan) terimplementasi di branch, **belum merge** per 2026-09-14. **Irisan 2** (MyBharata: kartu Booking Ruang di menu Pengajuan, form dan detail booking, booking di daftar pengajuan terpadu, notifikasi berlabel; riwayat terstruktur dua bahasa di web dan MyBharata) terimplementasi di branch, **belum merge** per 2026-09-15. Booking berulang (irisan 3) dan pemilih ruang di modul lain (irisan 4 sampai 7) belum ada. **Barang dan kendaraan**: masih konsep, ditunda.",
+      "status_teks": "Implemented (ada catatan). **Booking ruang**: irisan 1 dari 7 ada di kode (inventory-service, feed kalender, notifikasi, layar web Ruang & Booking, penunjukan penyetuju). **Irisan 1b** (mengajukan, mengubah jadwal, membatalkan, menyetujui, dan menolak lewat web, plus kartu Booking Ruang di halaman Pengajuan) merged 2026-09-15 (erp-frontend #1576, bip-erp #1884) dan naik ke prod hari itu juga; perjalanan di dev belum diverifikasi. **Irisan 2** (MyBharata: kartu Booking Ruang di menu Pengajuan, form dan detail booking, booking di daftar pengajuan terpadu, notifikasi berlabel; riwayat terstruktur dua bahasa di web dan MyBharata) merged 2026-09-15 (bip-erp #1898 dan #1899, erp-frontend #1587, my-bharata #149 ke `dev`), **belum di PROD maupun store**. Booking berulang (irisan 3) dan pemilih ruang di modul lain (irisan 4 sampai 7) belum ada. **Barang dan kendaraan**: masih konsep, ditunda.",
       "publik": true,
       "tautan": [
         "GA - Inventory Management",
@@ -7247,20 +7206,20 @@
         "REF - Alur Persetujuan",
         "GA - Big Pictures"
       ],
-      "hash": "32f0a8f0abe5d9a167a9dc1415c16f865711b16c320d57d94f4ae0a7b7863339",
-      "ukuran_kb": 12.8,
-      "ringkasan": "Menjawab: apa konsep peminjaman aset GA (ruang rapat, barang, kendaraan operasional), kenapa proses spreadsheet lama diganti, dan cakupan mana yang dibangun serta yang ditunda. Juga menjawab siapa persona beserta hak aksesnya (pemohon, penyetuju yang ditunjuk HR, Team GA, HR), status booking, aturan anti-bentrok, alur proses dari penunjukan penyetuju sampai booking, tahapan irisan termasuk satu sumber ruang kantor, kontrak data, konsumen, kendala, dan hal yang belum diputuskan.",
+      "hash": "86cd59d8311f7d80c42be21104c50eccb70e17133eb7cafea759110db33fee66",
+      "ukuran_kb": 13.0,
+      "ringkasan": "Menjawab: bagaimana konsep peminjaman aset GA (ruang rapat, barang, kendaraan operasional) dan booking ruang bekerja dari sisi bisnis, siapa personanya (pemohon, penyetuju yang ditunjuk HR, Team GA, HR) beserta akses dan perangkatnya, serta urutan irisan pembangunannya. Menjelaskan status booking, aturan anti-bentrok, keputusan desain yang menggantikan rilis-1 versi lama, alur proses, kontrak data dan konsumennya, kendala, serta hal yang masih TBD seperti durasi dan sanksi peminjaman barang dan kendaraan.",
       "kata_kunci": [
         "peminjaman aset",
         "asset loan",
         "booking ruang",
         "room booking",
         "ruang rapat",
+        "meeting room",
         "peminjaman kendaraan",
         "General Affairs",
         "GA",
-        "anti-bentrok",
-        "penyetuju booking"
+        "anti-bentrok"
       ]
     },
     {
@@ -8331,20 +8290,20 @@
         "Microservices - Employee Service",
         "APP - MyBharata"
       ],
-      "hash": "60fe13e73a8015b02ed81b96e70f822ba574e5626f5ddaace9338a83de6cfcd6",
+      "hash": "c211a797a1d9b65cbf967fbdd32ca7259c787faee46658ee3a46c02cda364f6d",
       "ukuran_kb": 10.1,
-      "ringkasan": "Menjawab: bagaimana pola umum pengajuan karyawan (izin/cuti/sakit, dinas, koreksi absen, tukar jadwal) berjalan dari pengajuan, review berjenjang SPV lalu HRD, sampai diterapkan ke attendance, dan komponen bersama apa yang dipakai di attendance-service. Juga menjawab siapa yang berhak melihat semua pengajuan lewat `GET /hr/requests` dan memutuskan tahap HRD (izin `hris.pengajuan.view` dan `hris.pengajuan.approve`), bagaimana atasan menunjuk pengganti saat menyetujui cuti atau dinas, dan batas tanggal per jenis request.",
+      "ringkasan": "Menjawab: bagaimana pola umum pengajuan karyawan (izin/cuti/sakit, dinas, koreksi, tukar jadwal) direview berjenjang dari SPV ke HRD lalu diterapkan ke attendance, termasuk koleksi dan endpoint tiap jenis. Menjelaskan endpoint admin HR `/hr/requests` untuk melihat semua pengajuan, izin `hris.pengajuan.view` dan `hris.pengajuan.approve` beserta fallback-nya, penunjukan pengganti oleh atasan saat menyetujui, komponen bersama di kode (ReviewData, getSupervisorData, build*ReviewFilter), serta batas tanggal per jenis request.",
       "kata_kunci": [
-        "pengajuan karyawan",
         "employee request",
+        "pengajuan karyawan",
         "approval",
         "persetujuan berjenjang",
-        "HR request",
+        "HR requests",
+        "SPV HRD",
         "pengganti",
         "replacement",
         "hris.pengajuan.approve",
-        "Submission",
-        "SPV HRD"
+        "Submission"
       ]
     },
     {
@@ -10947,6 +10906,7 @@
         "APP - Web ERP",
         "ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web",
         "ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor",
+        "APP - MyBharata",
         "Microservices - Inventory Service",
         "REF - Rantai Pengajuan Lintas Modul",
         "CORE - RBAC dan Permission Set",
@@ -10958,20 +10918,20 @@
         "Microservices - Procurement Service",
         "Microservices - Manufacture Service"
       ],
-      "hash": "32f9de2f7b902e44f073d8c24468b338a07279e778409a86682c7c1b5a730680",
+      "hash": "1ef86fdff263d1a7556ecccc63c87ad379e7e87ad34e8ba4459bdb54d6973846",
       "ukuran_kb": 16.7,
-      "ringkasan": "Menjawab: alur persetujuan (approval) apa saja yang ada di seluruh ERP Bharata dan siapa yang berwenang memutuskannya, dikelompokkan menurut cara gerbangnya ditulis (middleware rute, di dalam handler, slot pada dokumen, atau daftar penunjukan tersendiri). Juga menjelaskan secara rinci urutan pemeriksaan approval Booking Ruang (siapa boleh menyetujui/menolak, kunci sewa per ruang, cek bentrok, penolakan otomatis) dan kenapa menyapu daftar rute saja tidak cukup untuk menemukan seluruh gerbang persetujuan.",
+      "ringkasan": "Menjawab: alur persetujuan apa saja yang ada di seluruh service ERP Bharata dan siapa yang berwenang memutuskan masing-masing, dikelompokkan berbasis slot dokumen, jabatan, izin/peran, atau daftar penunjukan. Menjelaskan empat cara gerbang persetujuan ditulis dan kenapa menyapu `routes.go` saja menghasilkan kesimpulan salah, rincian pemeriksaan persetujuan Booking Ruang (kunci sewa, bentrok, tolak otomatis, tanpa kedaluwarsa otomatis), serta wewenang setingkat Direktur.",
       "kata_kunci": [
-        "approval",
-        "persetujuan",
         "alur persetujuan",
-        "RBAC",
-        "gerbang",
+        "approval flow",
+        "approver",
         "penyetuju",
-        "cuti",
-        "procurement",
+        "wewenang",
+        "setara Direktur",
+        "SetaraDirektur",
+        "gerbang persetujuan",
         "booking ruang",
-        "inventaris approval"
+        "procurement approval"
       ]
     },
     {
@@ -11099,8 +11059,6 @@
         "Microservices - Integration Service",
         "ADR - 0001 Akuntansi via Accurate",
         "External - Accurate",
-        "Finance - Rancangan Finance Service",
-        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia",
         "GA - Inventory Management",
         "ADR - 0049 Padanan Aset per-item berbasis nama menggantikan kategori-golongan",
@@ -11132,22 +11090,21 @@
         "DB - Data Dictionary",
         "REF - PRD ERP",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
-        "Microservices - Inventory Service",
-        "Microservices - Marketing Analytics Service"
+        "Microservices - Inventory Service"
       ],
-      "hash": "53910d0abcb37fa219b4e3061dc80cc8422241c7721f5c7d1e3342e5b6457f80",
-      "ukuran_kb": 42.7,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki sebuah fakta bisnis (identitas dan data kerja karyawan, jadwal, presensi dan cuti, KPI, target insentif profit, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Dipakai sebelum membangun fitur baru untuk mengecek apakah datanya sudah dimiliki departemen lain, salinan mana yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih hidup di kode, dan duplikasi yang belum diputuskan.",
+      "hash": "9d76463321707b4ad00b8f96d20b7bc69f91cccb7d283ed5ccfc1025d7ff204a",
+      "ukuran_kb": 40.6,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis (identitas karyawan, departemen, hak akses, kontrak, jadwal, presensi, KPI, target insentif, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Menjelaskan empat aturan kepemilikan data, salinan yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih ada di kode, duplikasi yang belum diputuskan, serta cara memakai peta ini sebelum membangun fitur baru agar tidak menduplikasi data milik departemen lain.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "sumber kebenaran",
-        "source of truth",
+        "single source of truth",
+        "satu fakta satu tempat",
         "database-per-service",
-        "salinan data",
-        "SyncCollection",
-        "duplikasi fakta",
         "ADR 0002",
+        "SyncCollection",
+        "duplikasi data",
+        "salinan data",
         "pemilik fakta"
       ]
     },
@@ -12201,7 +12158,6 @@
       "tautan": [
         "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
         "Sales - Marketing Dashboard (Index)",
-        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "HRIS - Matriks KPI per Departemen",
         "APP - Web ERP",
         "Finance - Incentive",
@@ -12213,20 +12169,20 @@
         "Sales - Marketing Analytics (Audit Ketersediaan Data)",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing"
       ],
-      "hash": "51191d60a639f877efeabaad9ed713a5237a50a1cefc12c99e9bd0ec265afe32",
-      "ukuran_kb": 16.1,
-      "ringkasan": "Menjawab: apa isi dashboard yang dirancang untuk tiap posisi di divisi Beauty Hacks dan Kyura (ICC/Account Specialist, Leader, Marketplace Advertiser, Affiliate, Host Live, Customer Support, Supervisor), metrik KPI beserta target per brand, dan posisi mana yang tidak direkomendasikan dibuatkan dashboard (Meta Advertiser, Buzzer, Video Editor). Juga mencatat ketersediaan data atribusi ke orang (icc_account_mappings, creator_username), peringatan bahwa ROAS per-video tak dapat diandalkan, metrik sirkular lintas posisi, dan kebutuhan backend terurut.",
+      "hash": "ff2d03974b87cceb8556e20c959a6ae89d2ee1b4bca5fa6a14c2273498cd19fb",
+      "ukuran_kb": 14.8,
+      "ringkasan": "Menjawab: dashboard apa yang layak dirancang untuk tiap posisi di divisi Beauty Hacks dan Kyura (ICC/Account Specialist, Leader, Marketplace Advertiser, Affiliate, Host Live, Customer Support, Supervisor), metrik KPI dan target per brand, serta visual utamanya. Juga menjawab posisi mana yang tidak direkomendasikan dibuatkan dashboard (Meta Advertiser, Buzzer, Video Editor), bagaimana atribusi ke orang bekerja (`icc_account_mappings` versus `creator_username`), kenapa ROAS per-video tak dapat diandalkan, dan kebutuhan backend apa yang harus dipenuhi lebih dulu.",
       "kata_kunci": [
         "dashboard per posisi",
         "Beauty Hacks",
         "Kyura",
-        "Account Specialist",
+        "KPI",
         "ICC",
-        "Leader",
+        "Account Specialist",
         "Host Live",
-        "KPI marketing",
-        "icc_account_mappings",
-        "ROAS per video"
+        "atribusi",
+        "ROAS per video",
+        "ADR 0076"
       ]
     },
     {
@@ -12491,7 +12447,6 @@
       "publik": true,
       "tautan": [
         "Microservices - Marketing Analytics Service",
-        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "DB - Data Dictionary",
         "APP - Web ERP",
         "Microservices - Inventory Service",
@@ -12501,20 +12456,20 @@
         "Sales - Marketing Dashboard (Index)",
         "ADR - 0008 Profit Engine Join via item_group_id"
       ],
-      "hash": "84a2e23e931319e3d3e03fcca6366fef2e94dd5f9c914cf4bc353c035b5b2c95",
-      "ukuran_kb": 20.2,
-      "ringkasan": "Menjawab: metrik mana dari prototipe Bharata Command Center milik Direktur yang datanya sudah ada, perlu dirakit, tipis, atau tidak ada di marketing-analytics, lengkap dengan peta 13 halaman prototipe ke endpoint dan keputusan yang diminta. Juga menjelaskan kenapa cakupan metrik iklan TikTok rendah sementara Shopee GMS lengkap, jebakan menjumlahkan broad_order dan direct_order, kenapa total_advertising_cost bukan belanja Shopee Ads, dan kenapa laba hanya sah dibaca dari level shop.",
+      "hash": "152cb06264be80ad39feec48b7c8ff755405454d1c4fee2bfc9bfb87d34931c5",
+      "ukuran_kb": 19.7,
+      "ringkasan": "Menjawab: dari metrik prototipe Bharata Command Center milik Direktur, mana yang datanya sudah ADA, perlu RAKIT, TIPIS, atau TIDAK ADA di marketing-analytics, beserta endpoint untuk tiap 13 halamannya. Juga menjawab kenapa cakupan metrik iklan TikTok rendah sementara Shopee lengkap, cara menghitung konversi, CPA, dan ROAS Shopee dari report.expense dan broad_order, serta jebakan seperti menjumlahkan broad_order dengan direct_order atau membaca laba dari baris level campaign.",
       "kata_kunci": [
         "audit ketersediaan data",
         "prototipe Direktur",
         "Bharata Command Center",
-        "marketing analytics",
-        "metrik iklan",
+        "cakupan metrik iklan",
         "CPA",
         "ROAS",
+        "konversi iklan",
         "Shopee GMS",
-        "broad_order",
-        "cakupan data"
+        "TikTok Ads",
+        "funnel"
       ]
     },
     {
