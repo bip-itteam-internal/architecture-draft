@@ -141,6 +141,7 @@ Dalam satu batch tool paralel, hasil tool singkat sering baru tertulis ke transk
 - Prompt izin tidak tercatat di transkrip. Tool yang tertunda ≥ 60 detik diberi tanda `?`, bukan ditebak.
 - Satu mesin, dan hanya sesi yang `cwd`-nya di dalam workspace.
 - Menunggu tugas shell latar (`run_in_background`) tampil sebagai menunggu Anda.
+- Tool yang sudah berjalan sementara model masih menulis tool call berikutnya di pesan yang sama belum tercatat di transkrip, karena baris pesan baru ditulis setelah pesannya lengkap. Selama itu robot tampil berpikir di Meja (terukur 22 detik untuk pesan yang memuat perintah panjang, 2026-09-15).
 - Dua `/kantor-agent` pada detik yang sama bisa menyalakan dua penulis, dan `--berhenti` hanya menghentikan satu.
 - Launcher `.sh` belum pernah dijalankan di mac/linux.
 - ADR 0077 §5 menyebut "tanpa dashboard"; halaman ini dicatat sebagai baris di tabel Revisi ADR itu karena prinsip berkas-bukan-layanan tetap dipatuhi.
