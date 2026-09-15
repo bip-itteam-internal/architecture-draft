@@ -237,7 +237,8 @@ try {
   $tombol = Teks-Tombol 'aaaaaaaa-1111'
   Start-Sleep -Seconds 3
   $tetap = Eval '(function () { var m = document.activeElement; return !!m && m.classList.contains("id-manual") && m.selectionEnd - m.selectionStart === m.value.length; })()'
-  $null = Cdp 'Runtime.evaluate' @{ expression = 'delete navigator.clipboard.writeText; delete document.execCommand' }
+  # pengguna selesai menyalin: fokus keluar dari kolom, supaya panel tak tertahan 15 detik di langkah berikutnya
+  $null = Cdp 'Runtime.evaluate' @{ expression = 'delete navigator.clipboard.writeText; delete document.execCommand; document.activeElement && document.activeElement.blur()' }
   Check ($ok -and $tombol -eq 'salin manual' -and $tetap) "3e salin manual: kedua jalan gagal -> kolom id terpilih, tetap terpilih melewati render tiap detik (tombol '$tombol')"
   Foto '3e-salin-manual'
 

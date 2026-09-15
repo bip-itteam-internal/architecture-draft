@@ -743,6 +743,21 @@ def test_pelacak_latar_membaca_jendela_ekor_latar_terakhir(lingkungan2, monkeypa
     assert (s["keadaan"], s["detail"]) == ("menunggu_latar", "baru")
 
 
+def test_pelacak_latar_mulai_ulang_bila_berkas_mengecil(lingkungan2):
+    # berkas yang diganti isi lain yang lebih pendek tak boleh menahan tugas latar dari isi lamanya
+    ws, proyek, reg = lingkungan2
+    lama = ([tool_use(ws, "PowerShell", "toolu_a", {"description": "lama", "run_in_background": True}, -600),
+             hasil_latar(ws, "toolu_a", "b-lama", -599)] + _pengisi(ws, "r", 3, -500) + [end_turn(ws, -60)])
+    f = tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", lama, _epoch(-60))
+    tulis_registri(reg, 101, "sesi-a", ws, status="idle", diperbarui=-50)
+    assert kumpulkan2(ws, proyek, reg)["sesi"][0]["detail"] == "lama"
+    baru = [tool_use(ws, "PowerShell", "toolu_b", {"description": "baru", "run_in_background": True}, -40),
+            hasil_latar(ws, "toolu_b", "b-baru", -39), end_turn(ws, -30)]
+    tulis_jsonl(f, baru, _epoch(-30))
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["keadaan"], s["detail"]) == ("menunggu_latar", "baru")
+
+
 def test_registri_tugas_latar_dari_proses_sebelumnya_tidak_ditunggu(lingkungan2):
     # tugas shell latar ikut mati bersama proses Claude Code yang menjalankannya: sesi yang dilanjutkan di proses
     # baru (startedAt registri sesudah tugas dimulai) tidak sedang menunggunya. Kontrolnya test di bawah, yang
@@ -815,6 +830,24 @@ def test_registri_menunggu_alasan_lain_di_lounge_dengan_alasannya(lingkungan2):
     tulis_registri(reg, 101, "sesi-a", ws, status="waiting", diperbarui=-5, waitingFor="sandbox request")
     s = kumpulkan2(ws, proyek, reg)["sesi"][0]
     assert (s["area"], s["keadaan"], s["detail"], s["diam_detik"]) == ("lounge", "menunggu_anda", "sandbox request", 5)
+
+
+def test_registri_menunggu_alasan_lain_saat_tool_tertunda_menampilkan_alasannya(lingkungan2):
+    # Halaman menulis "tanya: <detail>" untuk menunggu_anda yang membawa alat. Untuk alasan selain dialog AskUserQuestion
+    # (mis. sandbox request saat PowerShell tertunda) yang ditampilkan alasannya, bukan detail tool yang terbaca pertanyaan.
+    ws, proyek, reg = lingkungan2
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [tool_use(ws, "PowerShell", "toolu_a", {"description": "pnpm test"}, -20)], _epoch(-20))
+    tulis_registri(reg, 101, "sesi-a", ws, status="waiting", diperbarui=-5, waitingFor="sandbox request")
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"], s["alat"], s["detail"]) == ("lounge", "menunggu_anda", "", "sandbox request")
+
+
+def test_versi_data_halaman_sama_dengan_penulis():
+    # halaman tidak menafsirkan data versi lain (robot pulang + banner), jadi kedua angka ini wajib naik bersama
+    import re
+    teks = (HERE.parent / "hooks" / "kantor-agent.template.html").read_text(encoding="utf-8")
+    m = re.search(r"var VERSI_DATA_HALAMAN = (\d+);", teks)
+    assert m is not None and int(m.group(1)) == ka.VERSI_DATA
 
 
 def test_registri_busy_tanpa_waitingfor_tidak_menunggu(lingkungan2):

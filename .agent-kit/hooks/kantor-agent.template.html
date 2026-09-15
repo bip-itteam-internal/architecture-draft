@@ -745,7 +745,7 @@ footer li{margin:2px 0}
   // ---------------- data ----------------
   function salin(r, s) {
     ['judul', 'tahap', 'pr', 'area', 'keadaan', 'alat', 'detail', 'durasi_detik', 'diam_detik', 'jenis', 'peran', 'deskripsi',
-      'asal', 'nama', 'pid', 'status_proses', 'menunggu'].forEach(function (k) { r[k] = s[k]; });
+      'asal', 'nama', 'pid'].forEach(function (k) { r[k] = s[k]; });
     r.jumlahSub = (s.subagent || []).length;
   }
   function catatFeed(r, dari, ke) {

@@ -4,7 +4,7 @@ kantor-agent.template.html. Launcher: kantor-agent.ps1 (Windows) / kantor-agent.
 
 Sumber per tick:
 - registri sesi Claude Code (~/.claude/sessions/<pid>.json): sesi mana yang TERBUKA dan apakah prosesnya
-  sedang bekerja (status busy/idle). Diamati 2026-09-15: `claude agents --json` mencatat 7 sesi terbuka,
+  sedang bekerja atau tertahan dialog (status busy/idle/waiting + waitingFor). Diamati 2026-09-15: `claude agents --json` mencatat 7 sesi terbuka,
   sementara tebakan dari mtime transkrip hanya menemukan 6, karena sesi yang lama diam tak menulis transkrip.
 - ekor transkrip sesi: tool yang sedang dipakai, tugas shell latar, judul, PR, subagent.
 - berkas sesi kit (.task-plans/sesi): tahap dan task.
@@ -66,7 +66,7 @@ NAMA_DATA = "kantor-agent-data.js"
 NAMA_PID = "kantor-agent.pid"
 NAMA_KUNCI = "kantor-agent.lock"
 REGISTRI_DIR = os.path.join(os.path.expanduser("~"), ".claude", "sessions")
-# `claude agents --json` terukur 6,7 sampai 8,6 detik per panggilan (2026-09-15): cek silang, bukan sumber per tick
+# `claude agents --json` terukur 2,3 sampai 9,5 detik per panggilan (2026-09-15): cek silang, bukan sumber per tick
 CEK_SILANG_DETIK = 60
 CEK_SILANG_BATAS_DETIK = 30
 TIDAK_COCOK_MAKS = 2
@@ -334,7 +334,9 @@ def turunkan_keadaan(u, ada_subagent, sekarang, registri=None):
     if status == "waiting" or menunggu:
         izin = "permission" in str(menunggu or "").lower()
         keadaan = "menunggu_izin" if izin else "menunggu_anda"
-        if tunda:
+        # Dialog AskUserQuestion membawa pertanyaannya sendiri. Untuk alasan lain, tool tertunda cuma kebetulan dan yang
+        # ditampilkan alasannya: halaman menulis menunggu_anda yang membawa alat sebagai "tanya: <detail>".
+        if tunda and (izin or tunda[0] == "AskUserQuestion"):
             nama, masukan, ts = tunda
             return {"area": area_alat(nama) if izin else "lounge", "keadaan": keadaan, "alat": nama or "",
                     "detail": detail_alat(nama, masukan), "sejak": ts, "durasi_detik": _detik_sejak(ts, sekarang),
@@ -453,7 +455,8 @@ def baca_registri(folder, workspace, hidup):
     """({sessionId: entri}, info) dari registri sesi Claude Code (~/.claude/sessions/<pid>.json).
 
     Format INTERNAL, diamati 2026-09-15 di Claude Code 2.1.269: berkas sesi yang ditutup terhapus, dan
-    statusnya busy/idle. Berpenjaga cek silang `claude agents --json`; folder yang tak terbaca membuat
+    statusnya busy/idle/waiting (waitingFor hanya ada selama dialog terbuka). Berpenjaga cek silang
+    `claude agents --json`; folder yang tak terbaca membuat
     pemanggil turun ke mode transkrip."""
     info = {"terbaca": False, "berkas": 0, "rusak": 0, "luar": 0}
     sesi = {}
@@ -753,8 +756,8 @@ def tulis_atomik(path, teks):
 class CekSilang:
     """Mencocokkan registri dengan `claude agents --json` (terdokumentasi) tiap `interval_detik`.
 
-    Subprocess dijalankan tanpa ditunggu: tick penulis tetap 2 detik walau perintahnya terukur 6,7 sampai
-    8,6 detik (2026-09-15). Keluarannya ditampung di berkas sementara, bukan pipe, supaya anak yang menulis
+    Subprocess dijalankan tanpa ditunggu: tick penulis tetap 2 detik walau perintahnya terukur 2,3 sampai
+    9,5 detik (2026-09-15). Keluarannya ditampung di berkas sementara, bukan pipe, supaya anak yang menulis
     banyak tidak tertahan buffer lalu terbaca "menggantung". Satu kali tak cocok bisa sekadar jeda antar-
     bacaan (sesi dibuka atau ditutup di tengahnya), jadi baru ditandai setelah TIDAK_COCOK_MAKS kali berturut."""
 
