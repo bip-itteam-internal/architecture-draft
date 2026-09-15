@@ -14,14 +14,14 @@
 |---|---|---|---|
 | Staf Quality (QA/QC) | department `quality` | `quality:staff` — kelola CAPA/inspeksi/batch; validasi komplain; cek RM; finalisasi QA CAPA | Web ERP |
 | Supervisor Quality | department `quality` | `quality:supervisor` — termasuk hapus; menu KPI | Web ERP |
-| Staf Marketing | department Kyura/Beauty Hacks (role `kyura`/`beauty_hacks`) / adv `insentive` | `RequireMarketingStaff` — input komplain ke QC (`/icc/komplain-qc`) | Web ERP |
+| Staf Marketing | department Kyura/Beauty Hacks (role `kyura`/`beauty_hacks`) / adv `insentive` | `RequireMarketingStaff` — input komplain ke QC (`/icc/komplain-qc`); mengubah hanya komplain **miliknya** selagi menunggu validasi (🟡 belum merge, lihat register Komplain QC) | Web ERP |
 | Admin Produksi / Admin Warehouse | modul `manufacture`/`warehouse` | approver alur CAPA (`RequireCAPAApprover`) | Web ERP |
 
 - **Tujuan**: satu tempat mencatat temuan & tindak lanjut, memutuskan lulus/tolak bahan, dan me-release/hold batch — dengan alert keterlambatan.
 
 ## Fitur (Sudah Diimplementasikan)
 
-Dipanggil FE lewat `/api/employee/quality/*`. Semua GET/POST/PUT gate `RequireQualityStaff`, DELETE gate `RequireQualitySupervisor`.
+Dipanggil FE lewat `/api/employee/quality/*`. Semua GET/POST/PUT gate `RequireQualityStaff`, DELETE gate `RequireQualitySupervisor`, kecuali register Komplain QC yang gerbangnya dirinci di bagiannya.
 
 **Register CAPA & Temuan Audit** (`quality_capa.go`, collection `quality_capa`):
 - `GET/POST /quality/capa`, `GET/PUT/DELETE /quality/capa/:id`. Filter `?source=`&`?severity=`&`?status=`.
@@ -38,6 +38,8 @@ Dipanggil FE lewat `/api/employee/quality/*`. Semua GET/POST/PUT gate `RequireQu
 
 **Komplain QC dari Marketing** (`quality_complaint.go`, collection `quality_complaint`):
 - `GET /quality/complaints` (gate `RequireQualityOrMarketing`, filter `?status=`), `POST /quality/complaints` & `PUT /quality/complaints/:id` (gate `RequireMarketingStaff`; edit hanya selagi "Menunggu Validasi"), `PUT /quality/complaints/:id/validate` (gate `RequireQualityStaff`), `DELETE` (supervisor).
+- **Hanya pengaju yang boleh mengubah** (🟡 bip-erp branch `fix/komplain-qc-cek-pemilik` + erp-frontend branch `fix/komplain-qc-edit-pemilik`, **belum merge** per 2026-09-15). `PUT /quality/complaints/:id` diterima hanya dari **pengaju** (`metadata.created_by`, diisi sekali saat `POST` dan tak ditimpa saat diubah) atau **SPV/admin IT** (`common.IsITSupervisor`), lewat fungsi murni `bolehUbahKomplain`. Urutannya: tanpa `BIP-Employee-ID` dibalas **403** sebelum membaca Mongo; bukan pengaju **403** berkalimat, diperiksa **sebelum** status; komplain yang sudah divalidasi tetap **409**. Sebelumnya gerbangnya `RequireMarketingStaff` saja, sehingga staf marketing mana pun bisa menulis ulang komplain orang lain sementara komplain itu tetap tercatat, dan hasil validasinya tetap dikirim, atas nama pengaju asli.
+  - Layar ICC **mencerminkan** aturan itu di `features/quality/complaint/lib/boleh-ubah.ts`: tombol Ubah hanya untuk yang berhak, komplain orang lain yang masih menunggu berbunyi "diajukan orang lain", dan tombol ikon Ubah kini berlabel. Cerminnya memakai `isSupervisorOrAdmin` (`it` supervisor **atau** admin, setara backend), bukan `isItSupervisor` yang hanya mengenal supervisor. Dua salinan aturan ini **disengaja**: layar hanya menyembunyikan tombol yang pasti ditolak, penolakan tetap di backend, dan keduanya diuji matriks kasus yang sama. Ubah keduanya bersama.
 - Alur: **Marketing menginput** komplain yang menuding kesalahan QC (status "Menunggu Validasi") → **QC memvalidasi** verdict **Valid** (memang kesalahan QC) / **Ditolak** (bukan; alasan wajib). Model `QualityComplaint`: `title`, `description`, `product`, `sku`, `order_ref`, `severity`, `status`, `verdict`, `reason`, `validated_by`, `validated_at`, file.
 - FE: input di workspace **ICC** (`/icc/komplain-qc`, marketing brand Kyura/Beauty Hacks), validasi di workspace **Quality** (`/quality/komplain`). `features/quality/complaint/*`.
 - **Notifikasi menutup loop** (2026-09-15, `quality_complaint_notify.go`): saat Marketing menginput → inbox **`komplain-qc-diajukan`** ke **seluruh staf QC** perusahaan pengaju (ketuk ke `/quality/komplain`, memuat severity/produk untuk triase); saat QC memvalidasi → inbox **`komplain-qc-divalidasi`** ke **pengaju** (verdict + alasan, ketuk ke `/icc/komplain-qc`). Best-effort sesudah simpan. Sebelumnya alur **bisu** di kedua arah sehingga komplain menganggur (0 tersimpan di prod). Kategori & jebakan deploy di [[Microservices - Notification Service]] (employee-service + notification-service **naik bersama**); pemetaan [[APP - MyBharata]] menyusul (interim tampil "Sistem").
@@ -58,6 +60,10 @@ Dipanggil FE lewat `/api/employee/quality/*`. Semua GET/POST/PUT gate `RequireQu
 - **IPC, Pre-Check Batch Record, Dokumen CPPB** (form terkait Dokumen Produksi Batch/L. Hasil Produksi) — **belum**; perlu integrasi ke modul Manufacture.
 - **Checklist GMP / Kalibrasi / Kontrol Ruang Penyimpanan** (P2/P3) — **belum**.
 - **Komplain QC dari Marketing** — ✅ live (lihat register di atas). **Komplain & Rating Produk dari review marketplace** (sumber `/integration/reviews`) tetap **belum** difilter-mutu di modul Quality (register `quality_complaint` khusus komplain internal marketing→QC, bukan review pembeli).
+- **Race simpan komplain vs validasi QC** (sudah ada sebelum aturan pemilik; follow-up) — `PUT /quality/complaints/:id` menimpa lewat `ReplaceOne` berfilter `_id` saja. Validasi QC yang mendarat di antara baca dan simpan tertimpa kembali menjadi "Menunggu Validasi" **tanpa pesan**, padahal notifikasi `komplain-qc-divalidasi` sudah terkirim ke pengaju. Perbaikannya: status "Menunggu Validasi" masuk filter dan balasan 409 bila `MatchedCount` 0. **Belum**.
+- **Daftar komplain terbuka lintas brand dan lintas perusahaan** — `GET /quality/complaints` hanya menyaring `?status=`, dan `QualityComplaint` tak menyimpan `company_id` (notifikasi memakai perusahaan pemanggil). Menutupnya butuh migrasi data dan keputusan visibilitas; **belum diputuskan**.
+- **`POST` tanpa identitas menyimpan `created_by` kosong** — hanya bisa terjadi lewat token layanan, karena gateway selalu mengisi `BIP-Employee-ID` dari JWT. Komplain seperti itu hanya bisa diubah SPV/admin IT, dan hasil validasinya tak diberitahukan ke siapa pun (dicatat di log `quality_complaint_notify.go`).
+- **Tabel `/icc/komplain-qc` tak menampilkan pengaju** (data hanya membawa `employee_id`), jadi komplain milik orang lain tak menyebut siapa yang bisa dimintai koreksi. Titik putus yang diterima sadar saat aturan pemilik dibuat.
 - **Hosting di employee-service** (TBD) — sama seperti Legal/R&D; ekstrak ke service `quality` bila beban tumbuh.
 - **Verifikasi runtime**: build/typecheck lolos; smoke-test E2E belum — perlu redeploy `docker-compose.dev.yml`.
 
