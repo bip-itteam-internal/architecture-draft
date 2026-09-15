@@ -123,6 +123,76 @@ try {
   $dashJson = $null; try { if ($dashTxt -match '(?s)<script id="data" type="application/json">(.*?)</script>') { $dashJson = ($Matches[1] -replace '<\\/', '</') | ConvertFrom-Json } } catch {}
   Check ($null -ne $dashJson -and $dashJson.versi -eq 1 -and $dashJson.gh.ok -eq $false) 'JSON tertanam sah, versi 1, gh ditandai tidak tersedia (bukan nol senyap)'
 
+  # ---- kantor-agent (kit 1.20.0): launcher + penulis Python atas folder proyek palsu ----
+  # Transkrip disusun dari templat baris NYATA (tests/fixtures/kantor-agent), bukan rakitan tangan.
+  # sesi-uji sudah 'selesai' (sesi-selesai di atas) tapi kejadiannya LEBIH BARU = kasus --resume: tetap hidup.
+  $kaPs = Join-Path $claude 'hooks/kantor-agent.ps1'
+  Check (Test-Path $kaPs) 'kantor-agent.ps1 tersalin'
+  $kaTemplat = (Get-Content (Join-Path $kitRoot 'tests/fixtures/kantor-agent/baris-nyata.json') -Raw -Encoding UTF8) | ConvertFrom-Json
+  $kaBaris = $kaTemplat.assistant_tool_use
+  $kaBaris.cwd = $tmp
+  $kaBaris.timestamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ss.fffZ', [Globalization.CultureInfo]::InvariantCulture)
+  $kaBaris.message.content[0].name = 'Edit'
+  $kaBaris.message.content[0].input = [pscustomobject]@{ file_path = 'uji/berkas_uji.py' }
+  $kaUtf8 = New-Object System.Text.UTF8Encoding($false)
+  $kaProyek = Join-Path $tmp 'proyek-palsu'
+  New-Item -ItemType Directory -Force -Path (Join-Path $kaProyek 'slug-uji') | Out-Null
+  [IO.File]::WriteAllText((Join-Path $kaProyek 'slug-uji/sesi-uji.jsonl'), (($kaBaris | ConvertTo-Json -Depth 20 -Compress) + "`n"), $kaUtf8)
+  $kaData = Join-Path $tmp '.task-plans/kantor-agent-data.js'
+  function Read-KantorData([string]$path) {
+    if (-not (Test-Path $path)) { return $null }
+    $t = [IO.File]::ReadAllText($path, [Text.Encoding]::UTF8)
+    $awalan = 'window.__KANTOR__ = '
+    if (-not $t.StartsWith($awalan)) { return $null }
+    try { return ($t.Substring($awalan.Length).TrimEnd().TrimEnd(';') | ConvertFrom-Json) } catch { return $null }
+  }
+  function Invoke-PsLepas([string]$script, [string[]]$argsSkrip) {
+    # BUKAN Invoke-Ps (Start-Process -Wait): launcher mode loop sengaja meninggalkan penulis yang hidup,
+    # jadi yang ditunggu hanya proses launcher-nya sendiri lewat WaitForExit.
+    $argList = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + $script + '"')) + @($argsSkrip | ForEach-Object { if ($_ -match '\s') { '"' + $_ + '"' } else { $_ } })
+    $p = Start-Process -FilePath 'powershell' -ArgumentList $argList -WindowStyle Hidden -PassThru
+    $null = $p.Handle   # tanpa ini ExitCode bisa kosong sesudah proses selesai (PS 5.1)
+    if (-not $p.WaitForExit(90000)) { try { $p.Kill() } catch {}; return -1 }
+    return $p.ExitCode
+  }
+  function Get-PenulisUji { @(Get-CimInstance Win32_Process -Filter "Name='python.exe'" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like '*kantor-agent.py*' -and $_.CommandLine -like ('*' + $tmp + '*') }) }
+
+  $rc = Invoke-Ps $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaProyek, '-Sekali', '-TanpaBuka') $null $errf
+  $d = Read-KantorData $kaData
+  $s0 = if ($null -ne $d -and @($d.sesi).Count -gt 0) { @($d.sesi)[0] } else { $null }
+  Check ($rc -eq 0 -and $null -ne $d -and $d.versi -eq 1) "kantor-agent -Sekali: data.js versi 1 tertulis (exit $rc)"
+  Check ($null -ne $s0 -and $s0.id -eq 'sesi-uji' -and $s0.area -eq 'meja' -and $s0.alat -eq 'Edit' -and $s0.detail -eq 'berkas_uji.py') "kantor-agent: sesi-uji di meja, alat Edit, detail nama berkas ($($s0.area)/$($s0.alat)/$($s0.detail))"
+  Check ($null -ne $d -and $d.skema.dikenali -eq $true) 'kantor-agent: transkrip dari templat nyata dikenali'
+  $kaHtml = Join-Path $tmp '.task-plans/kantor-agent.html'
+  Check ((Test-Path $kaHtml) -and ((Get-Content $kaHtml -Raw -Encoding UTF8) -match 'kantor-agent-data\.js')) 'kantor-agent: HTML tersalin dari template dan memuat data.js'
+
+  # format berubah: lebih dari separuh baris rusak -> dikenali=false, bukan kantor kosong yang senyap
+  $kaRusak = Join-Path $tmp 'proyek-rusak'
+  New-Item -ItemType Directory -Force -Path (Join-Path $kaRusak 'slug-uji') | Out-Null
+  [IO.File]::WriteAllText((Join-Path $kaRusak 'slug-uji/sesi-rusak.jsonl'), (($kaBaris | ConvertTo-Json -Depth 20 -Compress) + "`n{rusak`n{rusak`n{rusak`n"), $kaUtf8)
+  $rc = Invoke-Ps $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaRusak, '-Sekali', '-TanpaBuka') $null $errf
+  $d = Read-KantorData $kaData
+  Check ($rc -eq 0 -and $null -ne $d -and $d.skema.dikenali -eq $false) "kantor-agent: >50% baris rusak -> dikenali=false (exit $rc)"
+
+  # Python yang ditunjuk tak ada -> exit 2 dengan pesan, bukan diam
+  $rc = Invoke-Ps $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaProyek, '-Sekali', '-TanpaBuka', '-Python', (Join-Path $tmp 'tidak-ada\python.exe')) $null $errf
+  $errTxt = if (Test-Path $errf) { Get-Content $errf -Raw } else { '' }
+  Check ($rc -eq 2 -and $errTxt -match 'Python') "kantor-agent: -Python tak ada -> exit 2 + pesan (exit $rc)"
+
+  # mode loop: launcher kedua TIDAK menyalakan penulis kedua; -Berhenti menghentikannya dan membuang pid
+  $rc = Invoke-PsLepas $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaProyek, '-Interval', '1', '-TanpaBuka')
+  $sw = [Diagnostics.Stopwatch]::StartNew()
+  while (@(Get-PenulisUji).Count -lt 1 -and $sw.Elapsed.TotalSeconds -lt 30) { Start-Sleep -Milliseconds 500 }
+  $n1 = @(Get-PenulisUji).Count
+  $rc2 = Invoke-PsLepas $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaProyek, '-Interval', '1', '-TanpaBuka')
+  Start-Sleep -Seconds 2
+  $n2 = @(Get-PenulisUji).Count
+  Check ($rc -eq 0 -and $rc2 -eq 0 -and $n1 -eq 1 -and $n2 -eq 1) "kantor-agent loop: launcher dua kali = satu penulis (exit $rc/$rc2, proses $n1 lalu $n2)"
+  $rc = Invoke-PsLepas $kaPs @('-Workspace', $tmp, '-Berhenti')
+  $sw = [Diagnostics.Stopwatch]::StartNew()
+  while (@(Get-PenulisUji).Count -gt 0 -and $sw.Elapsed.TotalSeconds -lt 15) { Start-Sleep -Milliseconds 500 }
+  Check ($rc -eq 0 -and @(Get-PenulisUji).Count -eq 0 -and -not (Test-Path (Join-Path $tmp '.task-plans/kantor-agent.pid'))) "kantor-agent -Berhenti: penulis mati, berkas pid terhapus (exit $rc)"
+
   # ---- pre-commit-gate: KONTROL POSITIF (harus menolak) dan NEGATIF (harus lolos) ----
   $gate = Join-Path $claude 'hooks/pre-commit-gate.ps1'
   Check (Test-Path $gate) 'pre-commit-gate.ps1 tersalin'
@@ -272,6 +342,8 @@ try {
   Check (Test-Path (Join-Path $claude 'commands/start-task.md')) 're-init tetap salin command nyata'
 }
 finally {
+  # penulis kantor-agent yang tertinggal (test gagal di tengah) jangan sampai hidup terus
+  Get-CimInstance Win32_Process -Filter "Name='python.exe'" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like '*kantor-agent.py*' -and $_.CommandLine -like ('*' + $tmp + '*') } | ForEach-Object { try { Stop-Process -Id $_.ProcessId -Force -ErrorAction Stop } catch {} }
   if (Test-Path $tmp) { Remove-Item -Recurse -Force $tmp }
 }
 if ($fail -gt 0) { Write-Host "$fail gagal"; exit 1 } else { Write-Host 'Semua lulus'; exit 0 }
