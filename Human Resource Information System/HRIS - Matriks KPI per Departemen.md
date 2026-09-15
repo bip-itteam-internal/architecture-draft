@@ -2,7 +2,7 @@
 
 *Isi lengkap `kpi_template` di **production**: seluruh label metrik, bobot, dan targetnya, dikelompokkan per departemen. Dokumen kerja untuk dev departemen yang akan mengotomatiskan metriknya. Cara mengerjakannya ada di [[RUN - Menambah Metrik KPI Otomatis]]; latar belakang dan analisis kelayakannya di [[HRIS - Otomasi Skor KPI]].*
 
-- **Status**: ⚠️ Salinan setia data production per **2026-08-01**, dengan bab **Tech Development** disegarkan langsung dari `employee_db` prod **2026-08-28** (status arsip template, konfigurasi `auto` yang benar-benar terpasang, dan ketersediaan tiap sumbernya). Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini. **Ralat 2026-08-31**: 18 sel yang menyatakan "TIDAK ADA modul Kaizen" dan 1 sel yang menyatakan "TIDAK ADA modul forecast" **salah** dan sudah diperbaiki — rinciannya di bagian [[#Ralat 2026-08-31 Kaizen dan forecast kas]]. **Segar 2026-09-02**: bab **Recruitment & Onboarding** ditulis ulang dari `employee_db` + `recruitment_db` prod (template aktifnya sudah berganti jadi `Recruitment` dan dua metriknya berbeda dari yang tercatat sebelumnya), sel `PPIC / Inventory Turnover Ratio` diralat karena berisi verdict rekrutmen yang salah tempel, dan baris rekrutmen di `KPI Supervisor HRGA` disegarkan angkanya. **Segar 2026-09-12**: bab **Finance** ditulis ulang dari `employee_db` prod (template, konfigurasi `auto`, penetapan, dan skor 2026; rinciannya di bab itu).
+- **Status**: ⚠️ Salinan setia data production per **2026-08-01**, dengan bab **Tech Development** disegarkan langsung dari `employee_db` prod **2026-08-28** (status arsip template, konfigurasi `auto` yang benar-benar terpasang, dan ketersediaan tiap sumbernya). Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini. **Ralat 2026-08-31**: 18 sel yang menyatakan "TIDAK ADA modul Kaizen" dan 1 sel yang menyatakan "TIDAK ADA modul forecast" **salah** dan sudah diperbaiki — rinciannya di bagian [[#Ralat 2026-08-31 Kaizen dan forecast kas]]. **Segar 2026-09-02**: bab **Recruitment & Onboarding** ditulis ulang dari `employee_db` + `recruitment_db` prod (template aktifnya sudah berganti jadi `Recruitment` dan dua metriknya berbeda dari yang tercatat sebelumnya), sel `PPIC / Inventory Turnover Ratio` diralat karena berisi verdict rekrutmen yang salah tempel, dan baris rekrutmen di `KPI Supervisor HRGA` disegarkan angkanya. **Segar 2026-09-12**: bab **Finance** ditulis ulang dari `employee_db` prod (template, konfigurasi `auto`, penetapan, dan skor 2026; rinciannya di bab itu). **Segar 2026-09-15**: bab **Training & Perfomance Officer** ditulis ulang dari `employee_db` + `learning_db` prod (template aktifnya sudah berganti jadi `People and Development` dengan 6 metrik, dan modul Training ternyata sudah punya post-test berskor yang belum dipakai; rinciannya di bab itu).
 - **Sumber**: koleksi `kpi_template` di `employee_db` ([[Microservices - Employee Service]]).
 
 ## Cara membaca
@@ -20,14 +20,14 @@ Kolom **Klasifikasi otomasi** per departemen memakai empat kategori dari [[HRIS 
 | Beauty Hacks     |       11 |      30 |       14 |      2 |              0 |      14 | kukuh |
 | Finance          |       12 |      62 |       16 |    TBD¹ |             TBD¹ |     TBD¹ | ozi   |
 | General Affair   |        5 |      24 |        1 |      5 |              1 |      17 | irfan |
-| Human Resource   |        5 |      31 |        7 |      6 |              9 |       9 | irfan |
+| Human Resource   |        5 |      32 |        6 |      7 |              9 |      10 | irfan |
 | Kesekretariatan  |        7 |      28 |        0 |      0 |              0 |      28 | ozi   |
 | Kyura            |        9 |      27 |       16 |      1 |              0 |      10 | kukuh |
 | Manufaktur       |        9 |      52 |        3 |     16 |             16 |      17 | izan  |
 | Procurement      |        2 |      10 |        4 |      2 |              0 |       4 | faiz  |
 | Quality          |        4 |      18 |        1 |      2 |              8 |       7 | faiz  |
 | Tech Development |        7 |      30 |       14 |      9 |              0 |       7 | izan  |
-| **Total**        |   **70** | **311** |   **73** | **60** |         **34** | **144** |       |
+| **Total**        |   **70** | **312** |   **72** | **61** |         **34** | **145** |       |
 
 Dua departemen di `work_data` **tidak muncul di sini karena belum punya template sama sekali**: Percetakan (13 karyawan) dan Marketing Offline Distribution (1 karyawan).
 
@@ -117,7 +117,8 @@ Beberapa baris di bawah memang cacat di datanya, dan sengaja disalin apa adanya 
 - **Label memakai target korporat, bukan metrik personal.** `Revenue 240M`, `Net Income 20%`, `Penurunan HPP 5%` muncul sebagai label di posisi Staff Inventory, Tax Staff, dan QA RND. Metrik sebenarnya ada di deskripsinya.
 - **Template menilai produk departemen lain.** `Kyura / Kyura Supervisor` memuat `Customer Satisfactions untuk Produk Beautyhacks 4,5 dari 5`.
 - **Satu deskripsi memuat tiga angka.** `Kyura Supervisor / Revenue 240M` berbobot 0,6: label menyebut 240M, deskripsinya menyebut profit 546 juta dan omzet 4.090.000.000.
-- **Target pindah dari `description` ke `label`.** Template `Recruitment` (22 Agu 2026) mengisi kelima `description`-nya dengan `Target 100%` yang seragam dan memindahkan kalimat metriknya ke `label`. Aturan baca di [[#Cara membaca]] ("target sebenarnya tersimpan di `description`") karena itu **tidak berlaku universal**, dan template generasi baru lain perlu diperiksa apakah mengikuti pola yang sama.
+- **Target pindah dari `description` ke `label`.** Template `Recruitment` (22 Agu 2026) mengisi kelima `description`-nya dengan `Target 100%` yang seragam dan memindahkan kalimat metriknya ke `label`. Aturan baca di [[#Cara membaca]] ("target sebenarnya tersimpan di `description`") karena itu **tidak berlaku universal**. Diperiksa 2026-09-15: `People and Development` (juga 22 Agu 2026) mengikuti pola yang sama (`Target 100%`, `Target 100% > 70`, `Target Skala 10`); template generasi baru lainnya belum diperiksa.
+- **`key` dipakai ulang untuk metrik yang berbeda.** `People and Development` mempertahankan `key` `kpi` dari template arsipnya, padahal metriknya berganti dari SLA pengumpulan KPI jadi Employee Productivity. Rinciannya di [[#Training & Perfomance Officer]].
 
 Cacat pada **dokumen ini sendiri**, bukan pada datanya:
 
@@ -737,9 +738,10 @@ Template `Security Team`, 4 metrik.
 
 ## Human Resource
 
-5 template, 31 metrik. Klasifikasi otomasi: **7 / 6 / 9 / 9** (sebelum 2026-09-02 tertulis
-7 / 5 / 10 / 9; satu metrik Recruitment & Onboarding berpindah dari *terblokir data* ke
-*butuh definisi*, penjelasannya di bab posisi itu).
+5 template, 32 metrik. Klasifikasi otomasi: **6 / 7 / 9 / 10**. Riwayat: sebelum 2026-09-02
+tertulis 7 / 5 / 10 / 9 (satu metrik Recruitment & Onboarding berpindah dari *terblokir data*
+ke *butuh definisi*), lalu 7 / 6 / 9 / 9 dengan 31 metrik sampai 2026-09-15 (template Training &
+Perfomance Officer berganti). Penjelasan keduanya ada di bab posisi masing-masing.
 
 ### Culture & Industrial
 
@@ -935,15 +937,83 @@ semi 0 → 1, manual tetap 1.
 
 ### Training & Perfomance Officer
 
-Template `People Development`, 5 metrik.
+Template `People and Development`, 6 metrik. Dipegang **1 orang aktif**; dua pemegang lain di `work_data` sudah nonaktif.
 
-| Bobot | Label | Target / keterangan | Sumber di sistem erp | Rekomendasi |
+> ✅ **Disegarkan langsung dari prod 2026-09-15** (`employee_db` + `learning_db`, baca-saja).
+> Template yang dipakai menilai kini bernama **`People and Development`**
+> (`6a891157a8f110c4ae85b6b9`, dibuat 22 Agu 2026). Template `People Development` yang
+> tercatat di versi lama dokumen ini (`6a100f8bb55c29fbe5a1f196`, Mei 2026) berstatus
+> **`arsip`** sejak 25 Agu 2026. Yang berubah lebih dari sekadar kata:
+>
+> - **Metrik bertambah satu**: `Kesesuaian materi LMS dengan jobdesk ` (`peningkatan-performance-2`, 0,15).
+> - **Bobot bergeser**: skor penilaian training 0,2 → 0,35, terlaksana sesuai rencana 0,35 → 0,2, attendance rate 0,25 → 0,1.
+> - ⚠️ **`key` `kpi` dipakai ulang untuk metrik yang BERBEDA.** Di template arsip ia berarti
+>   *SLA pengumpulan KPI*, di template aktif *Employee Productivity 120 juta per karyawan*.
+>   `key` adalah identitas metrik untuk otomasi yang sengaja dipertahankan walau labelnya
+>   berubah (`KPIMetric.Key`, `shared-library/models/employee/models.go`), jadi pembacaan apa
+>   pun yang menjajarkan metrik lintas generasi template lewat `key` akan menyamakan dua metrik
+>   yang tak berhubungan. Bandingkan dengan [[#Recruitment & Onboarding]]: di sana `key` ikut
+>   berganti (`kaizen` → `turnover`).
+> - `description` mengikuti pola generasi 22 Agustus: kalimat metrik pindah ke `label`,
+>   `description` berisi target. Lihat [[#Cacat yang sudah diketahui]].
+
+**Nol dari 6 metrik punya blok `auto`**, jadi keenamnya diketik tangan. Penetapan eksplisit
+orangnya masih menunjuk template **arsip** (berlaku `2026-07`), dan untuk resolusi otomatis itu
+tidak berdampak: kandidat resolusi hanya memuat template aktif (`templateKandidatPerPosisi`
+dengan `hanyaAktif`, `services/employee/kpi_assignment.go:80-95`), dan posisi berkandidat
+tunggal langsung memakainya (`pilihTemplateEfektif`, `kpi_auto_scores.go:97-102`). Skor yang
+tersimpan juga memakai template yang benar: `2026-07` = 97,14 (template lama) dan `2026-08` =
+80,95 (template aktif), keduanya tanpa `auto_value`. `metadata.created_by` kedua skor itu adalah
+akun pemegang posisi sendiri, begitu pula pembuat template aktifnya; di data tidak ada jejak
+penilai kedua. Apakah itu memang alurnya atau HRD Supervisor menilai di luar sistem: **TBD**,
+perlu dikonfirmasi ke HR.
+
+⚠️ **Nilai `2026-08` tidak mungkin berasal dari modul Training.** Dibandingkan dengan isi
+`learning_db` prod 2026-09-15:
+
+| Metrik | Nilai diketik | Isi modul Training di prod |
+|---|---:|---|
+| Training attendance rate | 92 | `training_participant` **1** baris seumur hidup, `attended: false` |
+| Skor penilaian training > 70 | 83 | `quiz_attempt` **0**, `quiz` **0**, koleksi `course` belum pernah terbentuk |
+| Training satisfaction score | 77 | `trainer_evaluation` **0** |
+| Terlaksana sesuai rencana | 100 | `training` **2**: *time management* (14 Agu) masih `Scheduled` dengan 0 hadir; *Pendampingan Alur Distribusi Offline* (mulai 10 Agu) baru diinput 10 Sep, 13 menit **sesudah** skor Agustus disimpan |
+
+Nilainya dicatat di luar sistem, dan modul yang semestinya menjadi sumbernya baru mulai diisi
+10 Sep 2026.
+
+| Bobot | Label (`key`) | Target / keterangan | Sumber di sistem erp | Rekomendasi |
 |---:|---|---|---|---|
-| 0.35 | `Training & Development` | Terlaksananya kegiatan training & performance officer sesuai dengan rencana. | Modul Training ADA di kode tapi koleksi training & training_participant KOSONG di prod. Skor & survei kepuasan training juga belum ada fieldnya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu pelatihan sudah ada, hanya belum ada yang mengisinya. Nilai dan survei kepuasan pelatihan memang belum ada tempatnya. |
-| 0.25 | `Training & Development 2` | Training Attendance Rate | Modul Training ADA di kode tapi koleksi training & training_participant KOSONG di prod. Skor & survei kepuasan training juga belum ada fieldnya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu pelatihan sudah ada, hanya belum ada yang mengisinya. Nilai dan survei kepuasan pelatihan memang belum ada tempatnya. |
-| 0.2 | `Peningkatan Performance` | Skor Penilaian Training All Karyawan > 70 | Modul Training ADA di kode tapi koleksi training & training_participant KOSONG di prod. Skor & survei kepuasan training juga belum ada fieldnya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu pelatihan sudah ada, hanya belum ada yang mengisinya. Nilai dan survei kepuasan pelatihan memang belum ada tempatnya. |
-| 0.1 | `KPI` | SLA Pengumpulan KPI tepat waktu dan ter-update | GET /task-management/report/sla. Pembacaan ulang prod 2026-08-06: resolusi **214 sampel** terukur seumur hidup (56 di Juli), response 63. Angka "0 sampel" di versi sebelumnya SALAH, sebabnya sensus memakai nama field `completedAt` padahal BSON-nya `completed_at`. | Bisa otomatis sekarang. Kecepatan menanggapi dan menyelesaikan tiket dua-duanya sudah terhitung. Yang perlu diperhatikan justru hasilnya: on-time rate Juli rendah, jadi sepakati dulu targetnya sebelum dipakai menilai orang. |
-| 0.1 | `Pelayanan` | Training Satisfaction Score | Modul Training ADA di kode tapi koleksi training & training_participant KOSONG di prod. Skor & survei kepuasan training juga belum ada fieldnya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu pelatihan sudah ada, hanya belum ada yang mengisinya. Nilai dan survei kepuasan pelatihan memang belum ada tempatnya. |
+| 0.2 | `Terlaksananya kegiatan training & performance officer sesuai dengan rencana.` (`training-development`) | `Target 100%` | Modul Training ADA dan ter-deploy ([[Microservices - Learning Service]]); prod 2026-09-15 `training` **2**. Status kelas tercatat (`Scheduled → Ongoing → Completed`, atau `Cancelled`), tetapi **tidak ada entitas "rencana"** yang terpisah dari kelas yang dijadwalkan, jadi pembandingnya belum ada. Tidak ada sumber KPI yang membaca `learning_db`. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru untuk mencatat pelaksanaannya: menu pelatihan sudah ada dan baru dua kelas yang diinput. Yang tetap perlu disepakati: "rencana" diambil dari mana, sebab sistem tidak menyimpan rencana terpisah dari jadwal kelasnya. |
+| 0.1 | `Training Attendance Rate` (`training-development-2`) | `Target 100%` | `training_participant.attended` (boolean, ditandai HR atau lewat hadir mandiri berjendela waktu). Prod: **1** peserta seumur hidup, belum hadir. Tidak ada sumber KPI yang membacanya. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru. Menu peserta dan kehadiran sudah ada, hanya belum diisi. Sesudah terisi pun tetap butuh dev menulis sumber KPI baru. |
+| 0.35 | `Skor Penilaian Training All Karyawan > 70 ` (`peningkatan-performance`) | `Target 100% > 70` | **Post-test berskor sudah ADA dan ter-deploy** (bip-erp [#1321](https://github.com/bip-itteam-internal/bip-erp/pull/1321), merged 2026-08-20; biner prod memuat `quiz_attempt`, kontrol negatif 0): `course` + `quiz` + `quiz_attempt`, skor dinilai terhadap snapshot soal. Prod: `quiz` **0**, `quiz_attempt` **0**, koleksi `course` belum pernah terbentuk. Belum ada layar untuk menyusun soal maupun mengerjakannya: nol pemanggil `/courses` dan `/me/post-test` di `erp-frontend` `main` maupun `my-bharata` `dev`. | Belum bisa sekarang. Mesin ujiannya sudah ada, tetapi belum ada layar untuk memakainya dan belum ada satu pun ujian. Bunyi "All Karyawan > 70" dengan target 100% menunjuk reduksi **`rasio_ambang`** (ambang 70, target 100), bukan `rata_rata`; lihat callout "Rata-rata min 70" di [[#HRD Supervisor]]. |
+| 0.15 | `Kesesuaian materi LMS dengan jobdesk ` (`peningkatan-performance-2`) | `Target Skala 10` | **TIDAK ADA sumber.** `course` hanya berisi judul, deskripsi, dan ambang lulus; materi PDF dan video belum ada (`services/learning/models_course.go`). Jobdesk per posisi juga belum punya tempat di sistem mana pun (lihat metrik jobdesk di [[#Recruitment & Onboarding]]). | Belum bisa otomatis. Materi LMS dan jobdesk per posisi dua-duanya belum ada di sistem. Target berupa skala 10 berarti ada yang menilai kesesuaiannya, jadi putuskan juga siapa penilainya. |
+| 0.1 | `Memastikan Employee Productivity sebesar 120 juta per Employee ` (`kpi`) | `Target 100%` | Bahan mentahnya ADA di dua service: pendapatan dari laporan laba rugi Accurate lewat `GET /accounting/profit-loss` (integration-service meneruskannya ke `profit-loss.do` Accurate, `accurate_client_report.go:94`) dan jumlah karyawan dari `work_data`. **Tidak ada sumber KPI** yang menggabungkan keduanya. Metrik serupa di [[#HRD Supervisor]] (`Employee Productivity sebesar 120 Juta per Employee ( DIv. Marketing )`) dipetakan ke modul Training, jadi kedua baris belum sepakat soal apa yang diukur. | Bisa otomatis, tapi sepakati dulu: pendapatan seluruh perusahaan atau hanya Divisi Marketing (label di HRD Supervisor menyebut Div. Marketing), per bulan atau per tahun, dan karyawan mana yang jadi penyebut. Sesudah itu tetap butuh dev menulis sumber baru. Metrik ini dan milik HRD Supervisor wajib didefinisikan **sekali** untuk keduanya. |
+| 0.1 | `Training Satisfaction Score ( 1 - 10 )` (`pelayanan`) | `Target Skala 10` | Evaluasi pasca-pelatihan ADA (`trainer_evaluation`: peserta menilai trainer pada empat aspek **1..5**, agregat baru tampil setelah 3 responden, `services/learning/models_evaluation.go`). Prod: **0** evaluasi. ⚠️ **Skalanya tidak cocok**: template berskala 1-10, sistem 1-5. | Belum bisa sekarang, tapi tidak perlu bikin fitur baru untuk mengumpulkan datanya. Samakan dulu skalanya (target diubah ke 1-5, atau konversi yang disepakati), lalu tetap butuh sumber KPI baru. |
+
+**Akar masalahnya satu untuk empat metrik (bobot 0,75): modul Training ter-deploy tetapi belum
+dipakai.** Per 2026-09-15 `learning_db` prod berisi `training` 2, `training_participant` 1,
+`trainer` 2, `training_type` 2, sedangkan `training_request`, `trainer_evaluation`, `quiz`, dan
+`quiz_attempt` nol dan `course` belum pernah terbentuk.
+
+⚠️ **Mengisi modul saja tidak cukup.** Tidak ada satu pun sumber KPI yang membaca `learning_db`
+(`git grep` `training|pelatihan|learning` di `services/employee/kpi_*.go` = 0 hasil, kontrol
+positif `tiket` = 10 berkas), dan service `learning` tidak punya rute `/internal/` untuk
+dikonsumsi employee-service. Sesudah datanya terisi, attendance rate, skor post-test, dan
+kepuasan (bobot 0,55) masih menunggu dev menulis sumber baru, "sesuai rencana" (0,2) menunggu
+definisi, dan post-test masih menunggu layarnya.
+
+**Pergeseran klasifikasi akibat pembaruan ini**, supaya angka bab dan ringkasan bisa
+ditelusuri. Basis lamanya dibaca dari teks bab versi sebelumnya: empat metrik *modul ada tapi
+datanya kosong* dan satu (`KPI`, SLA pengumpulan) *sumber ada dan terisi*, karena
+Rekomendasinya berbunyi "Bisa otomatis sekarang". Template aktif: empat *modul ada tapi datanya
+kosong* (rencana, attendance, skor, kepuasan), satu *sumber ada tapi butuh definisi*
+(productivity), dan satu *tidak ada sumber sama sekali* (LMS vs jobdesk). Bersih: otomatis 1 → 0,
+semi 0 → 1, terblokir tetap 4, manual 0 → 1, metrik 31 → 32.
+
+⚠️ **Satu *otomatis* yang hilang bukan kemampuan yang hilang.** Sumber yang ditunjuk baris lama,
+`GET /task-management/report/sla`, mengukur tenggat **tiket** Task Management (konektor KPI-nya
+di `services/employee/kpi_sumber_tiket.go`), bukan ketepatan **pengumpulan KPI**. Vonis "bisa
+otomatis sekarang" di baris itu sudah salah petak sejak awal.
 
 ## Kesekretariatan
 

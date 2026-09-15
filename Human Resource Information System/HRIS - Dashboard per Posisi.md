@@ -3,7 +3,7 @@
 *Rancangan isi dashboard per posisi untuk divisi **Human Resource**, lima posisi. Diturunkan mengikuti [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]]. Berbeda dari divisi lain, kelima posisi ini **sudah punya lembarnya** di `/hris`, jadi dokumen ini membandingkan yang tampil hari ini dengan yang seharusnya, bukan merancang dari nol.*
 
 - **Status**: ⚠️ **Sebagian sudah ada**. Kelima tab hidup di `/hris` (Ringkasan Divisi HRGA), tetapi tiga di antaranya nyaris kosong dan sebabnya bukan tata letak melainkan ketiadaan data.
-- **Angka KPI diukur 2026-08-28**, bab Recruitment disegarkan **2026-09-02** (sumber: [[HRIS - Matriks KPI per Departemen]]). **Ukur ulang sebelum dipakai mengambil keputusan.**
+- **Angka KPI diukur 2026-08-28**, bab Recruitment disegarkan **2026-09-02**, bab Training & Performance Officer disegarkan **2026-09-15** (sumber: [[HRIS - Matriks KPI per Departemen]]). **Ukur ulang sebelum dipakai mengambil keputusan.**
 - **Path di repo**: `erp-frontend/src/features/hris/dashboard/kartu/isi/`
 
 > Divisi **General Affair** berbagi rute yang sama (`/hris`) karena keduanya satu grup supervisi HRGA, tetapi posisinya dirancang di [[GA - Dashboard per Posisi]]. Lihat § HRGA bukan nama departemen di bawah.
@@ -16,7 +16,7 @@
 | Personalia | `personalia` | 5 | 3 | 2 antrean + 2 kartu pelengkap |
 | Culture & Industrial | `org-dev` | 6 | 1 | 1 sebaran + 1 panel belum-bersumber |
 | Recruitment & Onboarding | `recruitment` | 5 | 0 | 1 kartu tenggat |
-| Training & Performance Officer | `people-dev` | 5 | 1 | 1 sebaran |
+| Training & Performance Officer | `people-dev` | 6 | 0 | 1 antrean + 3 kartu angka umum + 1 sebaran |
 
 Tiga tab terbawah tampak kosong **bukan karena belum dirapikan**, melainkan karena metrik yang menilai orangnya tidak punya angka di sistem. Merapikan tata letaknya tidak akan mengubah apa pun.
 
@@ -104,21 +104,22 @@ Tiga tab terbawah tampak kosong **bukan karena belum dirapikan**, melainkan kare
 
 ## Training & Performance Officer
 
-**Dinilai dari** (template `People Development`, 5 metrik):
+**Dinilai dari** (template `People and Development`, 6 metrik, disegarkan 2026-09-15; template 5-metrik `People Development` diarsipkan 25 Agu 2026):
 
 | Bobot | Metrik | Sumber | Keadaan |
 |---:|---|---|---|
-| 0,35 | Terlaksananya kegiatan training sesuai rencana | koleksi `training` kosong | ❌ |
-| 0,25 | Training attendance rate | koleksi `training` kosong | ❌ |
-| 0,2 | Skor penilaian training > 70 | koleksi `training` kosong | ❌ |
-| 0,1 | SLA pengumpulan KPI tepat waktu | `GET /task-management/report/sla` | ✅ 214 sampel terukur |
-| 0,1 | Training satisfaction score | koleksi `training` kosong | ❌ |
+| 0,35 | Skor penilaian training seluruh karyawan > 70 | post-test berskor ada di service `learning` tapi tanpa layar; `quiz_attempt` 0 | ❌ |
+| 0,2 | Terlaksananya kegiatan training sesuai rencana | `training` 2; tak ada entitas "rencana" untuk pembanding | ❌ |
+| 0,15 | Kesesuaian materi LMS dengan jobdesk | materi LMS dan jobdesk per posisi belum ada di sistem | ❌ |
+| 0,1 | Training attendance rate | `training_participant` 1, belum hadir | ❌ |
+| 0,1 | Employee productivity 120 juta per karyawan | pendapatan (`GET /accounting/profit-loss`) dan `work_data` ada, definisinya belum | ⚠️ perlu definisi + sumber baru |
+| 0,1 | Training satisfaction score (1-10) | `trainer_evaluation` 0; skala di sistem 1-5 | ❌ |
 
-**Bisa ditampilkan sekarang.** Hanya SLA pengumpulan KPI, berbobot 0,1. Tab yang ada merender sebaran departemen dan daftar pengajuan training untuk ditinjau, dan yang kedua itu justru sumbu "pekerjaan yang menunggu" yang benar.
+**Bisa ditampilkan sekarang.** Tak satu pun metrik KPI posisi ini berangka. Tab yang ada (`isi-people-dev.tsx`) merender antrean pengajuan pelatihan yang menunggu tindakan (`as=reviewer`, status Menunggu SPV/HR) beserta tautan ke halamannya, tiga kartu angka umum (total karyawan, departemen, posisi), sebaran departemen, agenda, dan pengumuman. Antrean itu sumbu "pekerjaan yang menunggu" yang benar; kartu angka dan sebarannya tidak menjawab satu pun metrik posisi ini.
 
-⛔ **Empat dari lima metriknya, total bobot 0,9, terkunci pada SATU hal: koleksi `training` dan `training_participant` kosong di produksi.** Ini bukan lima pekerjaan melainkan satu. Begitu modul Training benar-benar dipakai, posisi ini melompat dari hampir tak terukur menjadi hampir seluruhnya terukur.
+⛔ **Empat metrik (bobot 0,75) terkunci pada modul Training yang belum dipakai, dan mengisinya saja tidak cukup.** Per 2026-09-15 `learning_db` prod berisi 2 pelatihan, 1 peserta yang belum hadir, 0 evaluasi trainer, dan 0 post-test. Sesudah datanya terisi pun belum ada sumber KPI yang membaca `learning_db`, jadi dev tetap harus menulisnya, dan post-test belum punya layar di web maupun aplikasi. Nilai yang diketik untuk Agustus 2026 (attendance 92, skor training 83, kepuasan 77) karena itu tidak berasal dari sistem; perbandingannya di [[HRIS - Matriks KPI per Departemen]].
 
-**Rekomendasi rancangan.** Tunda perancangan layarnya sampai modul Training terisi. Merancang sekarang berarti merancang untuk data yang bentuk akhirnya belum diketahui.
+**Rekomendasi rancangan.** Tunda perancangan layarnya sampai modul Training terisi **dan** sumber KPI-nya ada. Merancang sekarang berarti merancang untuk data yang bentuk akhirnya belum diketahui.
 
 ## HRGA bukan nama departemen
 
@@ -128,11 +129,11 @@ Konsekuensinya untuk dashboard: layar yang menyaring anggota per orang wajib mem
 
 ## Kebutuhan backend, terurut
 
-1. **Isi modul Training di produksi.** Satu pekerjaan yang membuka bobot 0,9 di Training & Performance Officer plus 0,4 di Culture & Industrial dan 0,15 di HRD Supervisor. Tak ada pekerjaan lain di divisi ini yang sebanding daya ungkitnya.
+1. **Isi modul Training di produksi, lalu tulis sumber KPI yang membacanya.** Dua langkah, dua pemilik: pelatihan, peserta, kehadiran, evaluasi, dan post-test diisi HR (modulnya sudah ter-deploy), sedangkan sumber KPI atas `learning_db` pekerjaan dev (belum ada satu pun), dan post-test masih menunggu layarnya. Keduanya membuka bobot 0,75 di Training & Performance Officer (0,55 langsung, 0,2 menunggu definisi "rencana") plus 0,4 di Culture & Industrial dan 0,15 di HRD Supervisor. Tak ada pekerjaan lain di divisi ini yang sebanding daya ungkitnya.
 2. **Merge sumber `program_culture`** dari branch `feature/workspace-position`. Sudah ada, tinggal mendarat.
 3. **Perbaiki metrik turnover probation.** Bukan penyambungan melainkan **koreksi pertanyaan**: sumber yang terdaftar mengukur resign sukarela seluruh perusahaan.
 4. **Perbaiki metrik aset HRD Supervisor.** Sumbernya data retur, deskripsinya monitoring aset. Salah petak yang menghasilkan angka masuk akal.
-5. **Tempat menyimpan jobdesk per posisi.** Belum ada di sistem mana pun, mengunci metrik berbobot 0,25.
+5. **Tempat menyimpan jobdesk per posisi.** Belum ada di sistem mana pun, mengunci metrik berbobot 0,25 di Recruitment & Onboarding dan 0,15 di Training & Performance Officer (yang juga menunggu materi LMS).
 6. **Koleksi `candidate`** supaya time to fulfilment punya ujung pengukuran.
 7. **Master anggaran departemen GA** untuk metrik efisiensi biaya.
 
@@ -143,6 +144,7 @@ Konsekuensinya untuk dashboard: layar yang menyaring anggota per orang wajib mem
 - [[HRIS - Matriks KPI per Departemen]] — sumber angka di dokumen ini
 - [[GA - Dashboard per Posisi]] — divisi saudara yang berbagi rute `/hris`
 - [[HRIS - Training Program]] — modul yang mengunci daya ungkit terbesar divisi ini
+- [[Microservices - Learning Service]]: backend modul Training (pelatihan, peserta, evaluasi, post-test)
 - [[HRIS - Recruitment]] — modul untuk posisi Recruitment & Onboarding
 - [[HRIS - Personalia]] — modul untuk posisi Personalia
 - [[HRIS - Pengembangan Organisasi (Community of Interest)]] — modul untuk Culture & Industrial
