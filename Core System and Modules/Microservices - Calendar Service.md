@@ -80,6 +80,7 @@ Saat merencanakan fitur yang menyentuh tanggal, jawab dulu:
 | [[Microservices - Task Management Service]] | `task_due` | Tenggat tugas pemanggil. Penyaring "belum selesai" memakai `completed_at`/`is_archived` **plus** status `Ditolak` secara eksplisit, karena penolakan tidak menstempel `completed_at` dan kosakata statusnya tidak konsisten (Done/Selesai/Dikerjakan/Progress/Ongoing/Todo/Request) |
 | [[Microservices - Form Builder Service]] | `form_period` | **Kaizen saja.** Hanya kaizen yang menyimpan snapshot peserta, jadi hanya di sana bisa dipastikan periode itu memang kewajiban pemanggil. Item ditaruh di `closes_at`, dan yang sudah memenuhi kuota dilewati lewat `countMyKaizenIdeas` yang sudah ada |
 | [[Microservices - Inventory Service]] | `room_booking` | Booking Ruang GA **milik pemanggil sendiri saja**, berjam, lingkup `personal`. Status booking dipetakan ke `tentative`/`confirmed`/`cancelled`, dan booking yang lahir dari modul lain dilewati. Rinciannya di § Aturan visibilitas feed Booking Ruang |
+| [[Microservices - Learning Service]] | `training` | Kelas pelatihan yang diikuti pemanggil **sebagai peserta saja**, lingkup `personal`. Berjam bila kelasnya satu hari dan kedua jamnya `HH:MM` sah, selain itu seharian. `Cancelled` → `cancelled`, sisanya `confirmed`. bip-erp [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895), live PROD 2026-09-15. Rinciannya di § Aturan visibilitas feed Pelatihan |
 | **calendar (sendiri)** | `event` | Agenda mandiri. Satu-satunya jenis yang menampilkan orang lain, dan itu sah karena pesertanya dilibatkan dengan sengaja oleh pembuatnya |
 
 ### Aturan visibilitas agenda mandiri
@@ -128,6 +129,39 @@ Galat sumber turun kelas, bukan panik: database belum terhubung dibalas 503, gal
 Frontend: entri `room_booking` di `src/features/calendar/lib/kind-style.ts` (ikon `DoorOpen`, warna teal, label `calendar.kind.roomBooking` = "Booking Ruang" / "Room Booking"), sehingga saringan per jenis ikut menawarkannya lewat `KNOWN_KINDS`.
 
 Uji: `services/inventory/calendar_feed_test.go` (pemetaan status, bentuk item, penyaring per-dokumen, tanpa identitas 403, rentang tak sah 400, hanya milik pemanggil dengan sumber tiruan yang sengaja ikut mengembalikan milik orang lain, kosong bukan `null`, galat sumber 503/500) dan `TestFilterFeedPeminjamanBeririsanTanpaAsal` di `peminjaman_dokumen_test.go` untuk batas kueri.
+
+### Aturan visibilitas feed Pelatihan (`training`)
+
+Provider `{Key: "learning", Label: "Pelatihan"}` di `providers.go`, env `LEARNING_MODULE_URL` di blok `calendar-service` pada `docker-compose.yml` (env baru, jadi `--force-recreate calendar-service`, bukan `restart`). Feed-nya `services/learning/calendar_feed.go`, bip-erp PR [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895) (merged 2026-09-15).
+
+Penyaringan, urutannya:
+
+1. **Tanpa identitas pemanggil ditolak 403**, diperiksa paling awal.
+2. **Rentang**: `from`/`to` wajib RFC3339, `to` tak boleh mendahului `from`, maksimal 400 hari. Pelanggaran dibalas 400.
+3. **Kueri disempitkan** ke baris `training_participant` milik pemanggil di perusahaannya (`common.CompanyID`), lalu kelas yang dirujuknya dengan `start_date < to` dan `end_date >= from - 24 jam`. Batas bawah dilonggarkan sehari karena `end_date` tersimpan tengah malam hari **terakhir**, sementara kelasnya berlangsung sampai akhir hari itu.
+4. **Tiap kelas tetap dilewatkan `saringFeedPelatihan`**, yang membuang kelas tanpa baris peserta milik pemanggil dan kelas yang tak beririsan dengan rentang. Kueri pengecil beban, bukan gerbang.
+
+Yang sengaja tidak dipancarkan: **kelas yang tidak diikuti pemanggil sebagai peserta**, sekalipun pemanggilnya pemegang `training.view` atau trainer kelas itu. Pengelola punya halaman Pelatihan; trainer internal belum punya tautan yang layak. Ini prinsip tiga lapis di atas.
+
+Bentuk item:
+
+| Field | Nilai |
+|---|---|
+| `id` | `learning:training:<_id kelas>` |
+| `start_at` / `end_at` / `all_day` | Berjam hanya bila `start_date` dan `end_date` jatuh di hari WIB yang sama **dan** `start_time`/`end_time` sah `HH:MM` dengan jam selesai sesudah jam mulai. Selain itu seharian, 00:00 hari pertama sampai 23:59:59 hari terakhir WIB (konvensi feed attendance). ⚠️ Jam yang tersimpan `09.00` (titik) tak terbaca dan jatuh ke seharian; kelas produksi pertama memang tersimpan begitu |
+| `scope` | `personal`; `owner` = pemanggil |
+| `status` | `Cancelled` → `cancelled`, sisanya `confirmed` |
+| `company_id` | Perusahaan **pembaca**, pola yang sama dengan feed `movement` |
+| `deep_link` | `/hris/pelatihan-saya` (layar peserta; `/hris/training` menuntut `training.view`) |
+| `meta` | `lokasi` bila diisi |
+
+Galat sumber turun kelas: database belum tersambung 503, galat lain 500, dan keduanya membuat kalender menandai `learning` di `degraded`. Feed kosong dikirim `{"items":[]}`, bukan `null`.
+
+Frontend: entri `training` di `src/features/calendar/lib/kind-style.ts` (ikon `GraduationCap`, warna oranye, label `calendar.kind.training` = "Pelatihan" / "Training"), erp-frontend [#1584](https://github.com/bip-itteam-internal/erp-frontend/pull/1584).
+
+Uji: `services/learning/calendar_feed_test.go` (tanpa identitas 403, rentang tak sah 400, `items` tak pernah `null`, penyaring per dokumen dengan sumber tiruan yang ikut mengembalikan kelas orang lain, berjam vs seharian termasuk jam rusak, pemetaan status, batas kueri `$lt`/`$gte`).
+
+**Terverifikasi di produksi 2026-09-15** dari dalam `Calendar-Service`, baca-saja: identitas peserta nyata untuk Agustus 2026 menghasilkan 1 item, baik lewat feed langsung maupun lewat agregator `GET /` dengan `degraded: []`; identitas bukan peserta `{"items":[]}`; tanpa identitas 403. DEV belum dideploy.
 
 ## Mesin kewajiban (irisan 3) — mesinnya jalan, jalur pemakainya belum
 
@@ -246,7 +280,7 @@ Pelajarannya: **"boleh diakses" bukan "layak muncul di kalender"**. Kalender ada
 ## Dependensi & Integrasi
 
 - [[CORE - API Master Gateway]] — rute `/api/calendar/*`, identitas pemanggil, dan `noCacheRoutes`.
-- [[Microservices - Attendance Service]] · [[Microservices - Employee Service]] · [[Microservices - Task Management Service]] · [[Microservices - Form Builder Service]] · [[Microservices - Inventory Service]]: penyedia feed. **Semuanya opsional**: URL kosong berarti feed-nya dilewati, dan itulah sebabnya URL provider tidak boleh masuk map yang divalidasi `ValidateInternalURL`.
+- [[Microservices - Attendance Service]] · [[Microservices - Employee Service]] · [[Microservices - Task Management Service]] · [[Microservices - Form Builder Service]] · [[Microservices - Inventory Service]] · [[Microservices - Learning Service]]: penyedia feed. **Semuanya opsional**: URL kosong berarti feed-nya dilewati, dan itulah sebabnya URL provider tidak boleh masuk map yang divalidasi `ValidateInternalURL`.
 - [[CORE - RBAC dan Permission Set]] — penyaringan item tarikan tetap milik service sumber; kalender tidak menambah lapis izin sendiri, kecuali untuk agenda mandiri yang memang datanya.
 
 ## Dokumen Terkait

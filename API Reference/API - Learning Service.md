@@ -2,7 +2,7 @@
 
 *Endpoint service `learning` (modul gateway **`/api/learning/*`**, port internal 6987). Isinya modul pelatihan karyawan yang dipindah utuh dari [[Microservices - Employee Service]] pada LMS Fase 0, ditambah pengajuan, evaluasi trainer, layar karyawan, dan post-test yang dibangun di service ini. Implementasi & catatan: [[Microservices - Learning Service]] · konsep: [[HRIS - Training Program]].*
 
-- **Status**: ✅ Grounded ke kode `bip-erp` `origin/main` (diperiksa 2026-09-15); live di dev + produksi 2026-08-06; pengajuan, evaluasi, dan `/me` **terverifikasi lewat gateway hidup 2026-08-19**; rute post-test ada di biner produksi (diperiksa 2026-09-15)
+- **Status**: ✅ Grounded ke kode `bip-erp` `origin/main` (diperiksa 2026-09-15); live di dev + produksi 2026-08-06; pengajuan, evaluasi, dan `/me` **terverifikasi lewat gateway hidup 2026-08-19**; rute post-test ada di biner produksi (diperiksa 2026-09-15); `GET /kpi/pelatihan` dan `GET /internal/calendar-feed` (PR [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895)) **live di produksi 2026-09-15** dan diverifikasi dari dalam container, bersama penyaringan `as=reviewed` (PR [#1892](https://github.com/bip-itteam-internal/bip-erp/pull/1892)); DEV belum dideploy
 - **RBAC**: izin modul `training` (`training.view` · `training.work` · `training.manage`), rincian di [[#Gerbang izin]]
 - **Catatan pemindahan**: path internalnya **tidak berubah** dari versi lama, hanya prefix modulnya. `/api/employee/training/...` menjadi `/api/learning/training/...`
 
@@ -89,13 +89,13 @@ Mengirim key ke sana menghasilkan nol supervisor lalu **409 "departemen belum pu
 | Method | Path | Gerbang | Fungsi |
 |---|---|---|---|
 | POST | `/training/requests` | identitas | Buat pengajuan. Body `{employee_id?, department_key?, training_type_id atau topic, reason, estimated_cost?}`; `employee_id` kosong = untuk diri sendiri, `department_key` kosong = departemen pemanggil. Balas 201 `{_id, status}` |
-| GET | `/training/requests?as=self\|reviewer\|reviewed` | identitas | `self` = untuk ATAU oleh pemanggil; `reviewer` = tahap SPV yang menunjuk pemanggil, ditambah seluruh `Menunggu HR` bila memegang `training.work`, tanpa pengajuan milik sendiri; `reviewed` = pengajuan `Disetujui`/`Ditolak` |
+| GET | `/training/requests?as=self\|reviewer\|reviewed` | identitas | `self` = untuk ATAU oleh pemanggil; `reviewer` = tahap SPV yang menunjuk pemanggil, ditambah seluruh `Menunggu HR` bila memegang `training.work`, tanpa pengajuan milik sendiri; `reviewed` = pengajuan `Disetujui`/`Ditolak`: pemegang `training.view` atau `training.work` melihat seluruh riwayat keputusan perusahaannya, selain itu hanya yang tahap SPV-nya menunjuk pemanggil (`spv_review.employee_id`) |
 | PATCH | `/training/requests/:id/review` | SPV yang ditunjuk · `training.work` untuk tahap HR | `{approve, note}`. Tahap ditentukan STATUS, bukan dikirim klien; tak seorang pun memutus pengajuannya sendiri |
 | POST | `/training/requests/:id/cancel` | pembuat | Hanya `requested_by`, hanya selama belum diputuskan |
 
 Status: `Menunggu SPV` → `Menunggu HR` → `Disetujui`, atau `Ditolak` di tahap mana pun, atau `Dibatalkan` oleh pembuatnya. Pengaju yang ternyata supervisor departemen itu sendiri langsung mulai di `Menunggu HR`; departemen tanpa supervisor ditolak 409.
 
-⚠️ **`as=reviewed` TIDAK disaring ke pemanggil.** Filternya hanya `company_id` dan status (`request.go`, cabang `reviewed`), jadi siapa pun yang punya identitas di perusahaan itu menerima **seluruh** pengajuan yang sudah diputuskan di perusahaannya. Komentar di atas rute menyatakan ketiga sudut pandang "relasional, yang membatasi adalah siapa pemanggilnya"; untuk `reviewed` itu tidak sesuai dengan kodenya.
+✅ ~~**`as=reviewed` TIDAK disaring ke pemanggil.**~~ **Diperbaiki PR [#1892](https://github.com/bip-itteam-internal/bip-erp/pull/1892)** (merged 2026-09-15; image `Learning-Service` produksi hari itu dibangun dari commit yang memuatnya). Sebelumnya filternya hanya `company_id` dan status, jadi siapa pun yang punya identitas di perusahaan itu menerima **seluruh** pengajuan yang sudah diputuskan. Kini cabang `reviewed` di `request.go` membaca `izinTrainingEfektif`: tanpa `training.view` maupun `training.work`, filter ditambah `spv_review.employee_id` = pemanggil. Riwayat keputusan dibuka untuk `training.view` karena izin itu sudah membuka baca riwayat pelatihan siapa pun. Dikunci `TestPengajuanAsReviewedDisaringPerPemanggil` (`request_handler_test.go`).
 
 ⚠️ **`/training/requests` didaftarkan SEBELUM rute event.** Ia segmen statik; ditaruh sesudah `/training/:id` membuat seluruh permintaannya ter-match sebagai event ber-id `"requests"` lalu dibalas 400 *"id is not a valid ObjectID"*.
 
@@ -154,6 +154,36 @@ Grup `/courses` sengaja **tidak** diletakkan di bawah `/training`: segmen statik
 - Penilaian memakai **snapshot** soal yang dibekukan saat percobaan dimulai; lulus bila `score × 100 ≥ passing_score × max_score`.
 - `/me/post-test/attempt/:id` didaftarkan sebelum `/me/post-test/:trainingId/start` supaya `attempt` tak ter-match sebagai `trainingId`.
 
+## Bahan KPI (panggilan mesin)
+
+| Method | Path | Gerbang | Fungsi |
+|---|---|---|---|
+| GET | `/kpi/pelatihan?periode=YYYY-MM&company_id=&employee_id=A,B&key=` | kunci layanan `LEARNING_SERVICE_KEY` (query `key`) + `BIP-Gateway-ID` | Bahan sumber KPI `pelatihan` di [[Microservices - Employee Service]] |
+
+- **Gerbang**: `key` kosong atau salah, maupun kunci server yang belum diatur, dibalas **401**. Rute ini tak digerbang izin modul maupun identitas; pemanggilnya mesin.
+- **Validasi**: `periode` wajib `YYYY-MM` (bulan kalender WIB), `company_id` wajib, `employee_id` wajib dan maksimal **200** per panggilan; pelanggaran dibalas **400** (untuk batas id disertai `maks`). Database belum tersambung **503**.
+- **Jawaban** `{"data": {...}}`:
+
+| Field | Isi |
+|---|---|
+| `periode`, `dari`, `sampai` | Periode dan batasnya dalam WIB (`dari` inklusif, `sampai` eksklusif) |
+| `pendaftaran[]` | Satu baris per pendaftaran pada kelas `Completed` yang `end_date`-nya di periode itu, disaring ke `company_id` dan `employee_id` yang diminta, diurutkan `training_id` lalu `employee_id`: `training_id`, `employee_id`, `hadir`, `wajib_post_test` (kelas punya `course_id`), `skor_terbaik_persen` (skor tertinggi dari percobaan post-test yang dikirim dan tidak dibatalkan; `null` bila belum ada atau kelasnya tanpa post-test) |
+| `evaluasi` | `{responden, jumlah_nilai}` untuk kelas dan karyawan yang sama; `jumlah_nilai` = total empat aspek seluruh responden, jadi rata-rata per aspek = `jumlah_nilai / (responden × 4)`. **Tanpa** identitas penilai dan **tanpa** ambang responden: ambangnya diterapkan pemanggil atas gabungan batch |
+
+`pendaftaran` tak pernah `null`. Contoh muatan yang dikunci test: `contohMuatanKPIPelatihan` di `services/learning/kpi_pelatihan_test.go`.
+
+## Feed Kalender
+
+| Method | Path | Gerbang | Fungsi |
+|---|---|---|---|
+| GET | `/internal/calendar-feed?from=<RFC3339>&to=<RFC3339>` | identitas (`BIP-Employee-ID`) | Kelas yang diikuti pemanggil sebagai peserta, dalam bentuk item [[Microservices - Calendar Service]] |
+
+- Tanpa identitas **403**; `from`/`to` kosong, bukan RFC3339, `to` mendahului `from`, atau lebih dari 400 hari **400**; database belum tersambung **503**; galat lain **500**.
+- Jawaban `{"items": [...]}`, tak pernah `null`. Item: `id` `learning:training:<id>`, `source` `learning`, `kind` `training`, `title`, `start_at`/`end_at`/`all_day`, `scope` `personal`, `owner` (pemanggil), `company_id` (perusahaan pembaca), `status` (`cancelled` bila kelas `Cancelled`, selain itu `confirmed`), `deep_link` `/hris/pelatihan-saya`, `meta.lokasi`. Aturan berjam vs seharian ada di dok kalender.
+- `/internal/` **bukan** privat ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]); karena itu penyaringan ke peserta dikerjakan di rute ini.
+
+✅ **Kedua rute terverifikasi di produksi 2026-09-15** dari dalam container, beserta kontrol negatifnya (rincian di [[Microservices - Learning Service]]). **Belum pernah dipanggil lewat gateway**: `/kpi/pelatihan` dipanggil langsung oleh employee-service, dan feed dipanggil calendar-service.
+
 ## Lain-lain
 
 | Method | Path | Fungsi |
@@ -162,7 +192,7 @@ Grup `/courses` sengaja **tidak** diletakkan di bawah `/training`: segmen statik
 
 ## Belum Ada
 
-Endpoint LMS lanjutan **belum ada**: materi PDF & video pada course, **pre-test** (model mengenal jenis `pre`, tetapi seluruh rute hanya melayani `post`), kurikulum jabatan, tenggat, Talent Pool. Desainnya di [[HRIS - Training Program]]. Rute `/internal/` untuk dikonsumsi service lain juga belum ada, sehingga data pelatihan belum bisa dibaca mesin KPI; lihat [[Microservices - Learning Service]].
+Endpoint LMS lanjutan **belum ada**: materi PDF & video pada course, **pre-test** (model mengenal jenis `pre`, tetapi seluruh rute hanya melayani `post`), kurikulum jabatan, tenggat, Talent Pool. Desainnya di [[HRIS - Training Program]]. Bahan KPI (`/kpi/pelatihan`) dan feed kalender (`/internal/calendar-feed`) sudah ada sejak 2026-09-15, lihat bagian masing-masing di atas.
 
 ✅ ~~Seluruh endpoint pengajuan, evaluasi, dan penanda `/me` belum pernah diverifikasi lewat gateway hidup~~ — **terverifikasi 2026-08-19** lewat gateway dev, sesudah image `learning-service` dibuild ulang di dev dan produksi:
 
