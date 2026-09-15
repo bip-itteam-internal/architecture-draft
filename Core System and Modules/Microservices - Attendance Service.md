@@ -66,6 +66,7 @@
 
 **Pengajuan terpadu (`hr_admin.go`)**
 - `GET /hr/requests` + `/hr/requests/detail` — daftar & detail lintas jenis. Mode admin (tanpa `?as`) digerbang **`hris.pengajuan.view`**; mode `?as=reviewer|reviewed|self` relasional, tak digerbang izin. Kontrak lengkapnya di [[API - Attendance Service]].
+- **Booking Ruang di daftar terpadu** (`pengajuan_booking.go`; irisan 2, branch `feat/attendance-pengajuan-booking`, belum merge per 2026-09-15): `GET /requests/mine` (`self_requests.go`) dan `GET /hr/requests?as=reviewer` memuat booking dari [[Microservices - Inventory Service]] hanya bila klien mengirim `include=booking`, tanpa menyimpan salinan. Inventory yang tak terbaca menandai `degraded: ["booking"]`, bukan menggagalkan daftar izin. `limit` kedua rute kini dijepit 100.
 - Cabang **tahap HRD** di keempat rute `review` digerbang **`hris.pengajuan.approve`**, dan `build*ReviewFilter` menerima hak yang sama supaya antrean tak menampilkan pengajuan yang menolak saat ditindak. Gerbangnya di dalam handler (predikat `izinPengajuan`), bukan middleware, karena satu rute melayani tahap SPV dan tahap HRD sekaligus. Fallback union + kill-switch: [[CORE - RBAC dan Permission Set]].
 
 **Holidays**
@@ -202,6 +203,7 @@
 - [[Microservices - File Service]] — upload dokumen pendukung leave request.
 - [[Microservices - Notification Service]] — pengiriman notifikasi FCM (guestbook, review leave request).
 - [[Microservices - Form Builder Service]] — gerbang form wajib pada clock-in mobile (⚠️ merged 2026-08-01, belum live di dev). **Dependensi ini sengaja dibuat lunak**: `FORM_BUILDER_MODULE_URL` **TIDAK** dimasukkan ke map `InternalURL` karena `validation.ValidateInternalURL` melakukan panic bila ada nilai kosong — menaruhnya di sana berarti attendance menolak boot di lingkungan yang env-nya belum menyusul, dan presensi seluruh perusahaan ikut mati. Kosong = gerbang mati, presensi normal. Panggilannya juga memakai klien HTTP sendiri ber-timeout **1,5 detik** (bukan `routes.InternalRequest` yang 10 detik, terlalu lama untuk jalur clock-in) dan **gagal-terbuka** di semua jalur error. Urutan deploy: form-builder lebih dulu, attendance menyusul.
+- [[Microservices - Inventory Service]]: daftar pengajuan terpadu membaca `/peminjaman/saya` dan `/peminjaman/perlu-aksi` bila klien meminta `include=booking` (irisan 2 Booking Ruang, branch, belum merge per 2026-09-15). Dependensinya **lunak dengan pola yang sama** seperti form-builder: `INVENTORY_MODULE_URL` di blok compose `attendance-service` tetapi di luar `InternalURL`, kosong = booking `degraded` dan presensi tetap jalan; klien HTTP sendiri ber-timeout 5 detik, berjalan berbarengan dengan pembacaan Mongo. Header `BIP-Gateway-ID` dan identitas pemanggil diteruskan karena inventory yang menyaring hak. Env baru menuntut `--force-recreate attendance-service`.
 - [[CORE - API Master Gateway]] — entry point routing request ke service.
 - [[CORE - HRIS Orchestrator]] — konsumen `internal/summary`, `report`, `payroll-supplement`, dan force-update entry.
 - **MinIO** — penyimpanan file metadata fingerprint export.
