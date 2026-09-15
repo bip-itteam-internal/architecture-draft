@@ -20,7 +20,7 @@ Enam jenis HR request (Lembur menyusul). Sejak **penyeragaman 2026-07**, keempat
 
 Satu endpoint melihat **semua** pengajuan lintas koleksi — `services/attendance/hr_admin.go` (lihat [[Microservices - Attendance Service]]):
 
-- `GET /hr/requests` — daftar ringkas. `request_type` **granular**: **Izin, Cuti, Sakit, Dinas, Koreksi, Tukar** (Izin/Cuti/Sakit = nilai `leave_type` pada `leave_request`). Filter: `type`, `status`, `department`, `search`, `from`, `to` + pagination `page`/`limit`. Balas `{ data, total, page, limit }` (urut `created_at` desc); `data[]` = `{ id, request_type, employee_id, full_name, department, subtype, status, created_at }`.
+- `GET /hr/requests` — daftar ringkas. `request_type` **granular**: **Izin, Cuti, Sakit, Dinas, Koreksi, Tukar** (Izin/Cuti/Sakit = nilai `leave_type` pada `leave_request`). Filter: `type`, `status`, `department`, `search`, `from`, `to` + pagination `page`/`limit`. Balas `{ data, total, page, limit }` (urut `created_at` desc); `data[]` = `{ id, request_type, employee_id, full_name, department, subtype, status, created_at }`. `Booking` (Booking Ruang GA) tak pernah muncul di mode admin ini; ia hanya ikut `/requests/mine` dan `?as=reviewer` bila klien meminta `include=booking` (irisan 2, branch), lihat [[API - Attendance Service]].
 - `GET /hr/requests/detail?type=&id=` — full doc satu pengajuan (bypass filter per-user; admin boleh lihat semua).
 - Tak berhak → `403`.
 
