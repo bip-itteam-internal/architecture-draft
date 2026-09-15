@@ -157,11 +157,22 @@ try {
   }
   function Get-PenulisUji { @(Get-CimInstance Win32_Process -Filter "Name='python.exe'" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like '*kantor-agent.py*' -and $_.CommandLine -like ('*' + $tmp + '*') }) }
 
-  $rc = Invoke-Ps $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaProyek, '-Sekali', '-TanpaBuka') $null $errf
+  # registri sesi palsu berbentuk ~/.claude/sessions/<pid>.json (kit 1.21.0). PID dipinjam dari proses yang
+  # memang hidup (test ini dan induknya) dan tanpa procStart, supaya pemeriksa hidup lolos tanpa menebak FILETIME.
+  $kaReg = Join-Path $tmp 'registri-palsu'
+  New-Item -ItemType Directory -Force -Path $kaReg | Out-Null
+  $kaMs = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+  $kaInduk = [int](Get-CimInstance Win32_Process -Filter "ProcessId=$PID").ParentProcessId
+  [IO.File]::WriteAllText((Join-Path $kaReg "$PID.json"), (@{ pid = $PID; sessionId = 'sesi-uji'; cwd = $tmp; kind = 'interactive'; entrypoint = 'cli'; name = 'uji-01'; status = 'busy'; statusUpdatedAt = $kaMs; updatedAt = $kaMs; startedAt = $kaMs } | ConvertTo-Json -Compress), $kaUtf8)
+  [IO.File]::WriteAllText((Join-Path $kaReg "$kaInduk.json"), (@{ pid = $kaInduk; sessionId = 'sesi-diam'; cwd = $tmp; kind = 'interactive'; entrypoint = 'claude-vscode'; name = 'uji-02'; status = 'idle'; statusUpdatedAt = ($kaMs - 7200000); updatedAt = ($kaMs - 7200000); startedAt = ($kaMs - 9000000) } | ConvertTo-Json -Compress), $kaUtf8)
+
+  $rc = Invoke-Ps $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaProyek, '-RegistriDir', $kaReg, '-Sekali', '-TanpaBuka') $null $errf
   $d = Read-KantorData $kaData
-  $s0 = if ($null -ne $d -and @($d.sesi).Count -gt 0) { @($d.sesi)[0] } else { $null }
+  $s0 = @($d.sesi) | Where-Object { $_.id -eq 'sesi-uji' } | Select-Object -First 1
+  $sDiam = @($d.sesi) | Where-Object { $_.id -eq 'sesi-diam' } | Select-Object -First 1
   Check ($rc -eq 0 -and $null -ne $d -and $d.versi -eq 1) "kantor-agent -Sekali: data.js versi 1 tertulis (exit $rc)"
   Check ($null -ne $s0 -and $s0.id -eq 'sesi-uji' -and $s0.area -eq 'meja' -and $s0.alat -eq 'Edit' -and $s0.detail -eq 'berkas_uji.py') "kantor-agent: sesi-uji di meja, alat Edit, detail nama berkas ($($s0.area)/$($s0.alat)/$($s0.detail))"
+  Check ($null -ne $d -and $d.skema.sumber_hidup -eq 'registri' -and $null -ne $sDiam -and $sDiam.area -eq 'lounge' -and $sDiam.diam_detik -ge 7000 -and $sDiam.asal -eq 'claude-vscode') "kantor-agent: registri -> sesi terbuka yang diam 2 jam tanpa transkrip tampil di lounge ($($d.skema.sumber_hidup)/$($sDiam.area)/$($sDiam.diam_detik))"
   Check ($null -ne $d -and $d.skema.dikenali -eq $true) 'kantor-agent: transkrip dari templat nyata dikenali'
   $kaHtml = Join-Path $tmp '.task-plans/kantor-agent.html'
   Check ((Test-Path $kaHtml) -and ((Get-Content $kaHtml -Raw -Encoding UTF8) -match 'kantor-agent-data\.js')) 'kantor-agent: HTML tersalin dari template dan memuat data.js'
@@ -170,7 +181,7 @@ try {
   $kaRusak = Join-Path $tmp 'proyek-rusak'
   New-Item -ItemType Directory -Force -Path (Join-Path $kaRusak 'slug-uji') | Out-Null
   [IO.File]::WriteAllText((Join-Path $kaRusak 'slug-uji/sesi-rusak.jsonl'), (($kaBaris | ConvertTo-Json -Depth 20 -Compress) + "`n{rusak`n{rusak`n{rusak`n"), $kaUtf8)
-  $rc = Invoke-Ps $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaRusak, '-Sekali', '-TanpaBuka') $null $errf
+  $rc = Invoke-Ps $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaRusak, '-RegistriDir', (Join-Path $tmp 'tanpa-registri'), '-Sekali', '-TanpaBuka') $null $errf   # mode transkrip
   $d = Read-KantorData $kaData
   Check ($rc -eq 0 -and $null -ne $d -and $d.skema.dikenali -eq $false) "kantor-agent: >50% baris rusak -> dikenali=false (exit $rc)"
 
@@ -180,11 +191,11 @@ try {
   Check ($rc -eq 2 -and $errTxt -match 'Python') "kantor-agent: -Python tak ada -> exit 2 + pesan (exit $rc)"
 
   # mode loop: launcher kedua TIDAK menyalakan penulis kedua; -Berhenti menghentikannya dan membuang pid
-  $rc = Invoke-PsLepas $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaProyek, '-Interval', '1', '-TanpaBuka')
+  $rc = Invoke-PsLepas $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaProyek, '-RegistriDir', $kaReg, '-CekSilangDetik', '0', '-Interval', '1', '-TanpaBuka')
   $sw = [Diagnostics.Stopwatch]::StartNew()
   while (@(Get-PenulisUji).Count -lt 1 -and $sw.Elapsed.TotalSeconds -lt 30) { Start-Sleep -Milliseconds 500 }
   $n1 = @(Get-PenulisUji).Count
-  $rc2 = Invoke-PsLepas $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaProyek, '-Interval', '1', '-TanpaBuka')
+  $rc2 = Invoke-PsLepas $kaPs @('-Workspace', $tmp, '-ProyekDir', $kaProyek, '-RegistriDir', $kaReg, '-CekSilangDetik', '0', '-Interval', '1', '-TanpaBuka')
   Start-Sleep -Seconds 2
   $n2 = @(Get-PenulisUji).Count
   Check ($rc -eq 0 -and $rc2 -eq 0 -and $n1 -eq 1 -and $n2 -eq 1) "kantor-agent loop: launcher dua kali = satu penulis (exit $rc/$rc2, proses $n1 lalu $n2)"
@@ -192,6 +203,17 @@ try {
   $sw = [Diagnostics.Stopwatch]::StartNew()
   while (@(Get-PenulisUji).Count -gt 0 -and $sw.Elapsed.TotalSeconds -lt 15) { Start-Sleep -Milliseconds 500 }
   Check ($rc -eq 0 -and @(Get-PenulisUji).Count -eq 0 -and -not (Test-Path (Join-Path $tmp '.task-plans/kantor-agent.pid'))) "kantor-agent -Berhenti: penulis mati, berkas pid terhapus (exit $rc)"
+
+  # dua launcher SERENTAK: keduanya bisa lolos cek PID sebelum ada yang menulis pid; kunci penulis (kit 1.21.0)
+  # membuat yang kalah keluar 4 dan launcher-nya melapor "sudah jalan", jadi tetap satu penulis
+  $argSerentak = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + $kaPs + '"'), '-Workspace', ('"' + $tmp + '"'), '-ProyekDir', ('"' + $kaProyek + '"'), '-RegistriDir', ('"' + $kaReg + '"'), '-CekSilangDetik', '0', '-Interval', '1', '-TanpaBuka')
+  $l1 = Start-Process -FilePath 'powershell' -ArgumentList $argSerentak -WindowStyle Hidden -PassThru; $null = $l1.Handle
+  $l2 = Start-Process -FilePath 'powershell' -ArgumentList $argSerentak -WindowStyle Hidden -PassThru; $null = $l2.Handle
+  $null = $l1.WaitForExit(90000); $null = $l2.WaitForExit(90000)
+  Start-Sleep -Seconds 3
+  $nSerentak = @(Get-PenulisUji).Count
+  Check ($l1.ExitCode -eq 0 -and $l2.ExitCode -eq 0 -and $nSerentak -eq 1) "kantor-agent: dua launcher serentak = satu penulis (exit $($l1.ExitCode)/$($l2.ExitCode), proses $nSerentak)"
+  $null = Invoke-PsLepas $kaPs @('-Workspace', $tmp, '-Berhenti')
 
   # ---- pre-commit-gate: KONTROL POSITIF (harus menolak) dan NEGATIF (harus lolos) ----
   $gate = Join-Path $claude 'hooks/pre-commit-gate.ps1'

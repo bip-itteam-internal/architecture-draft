@@ -11,6 +11,7 @@ Jalankan (Windows, dari akar workspace; tanpa cache supaya vault tidak kotor):
 import importlib.util
 import json
 import os
+import subprocess
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -438,7 +439,8 @@ def test_sekali_menulis_data_js(lingkungan):
     ws, proyek = lingkungan
     kini = datetime.now(timezone.utc)
     tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [tool_use(ws, "Edit", "toolu_a", {"file_path": "a/b.py"}, -2, dasar=kini)], time.time())
-    assert ka.main(["--workspace", str(ws), "--proyek-dir", str(proyek), "--sekali"]) == 0
+    assert ka.main(["--workspace", str(ws), "--proyek-dir", str(proyek), "--sekali",
+                    "--registri-dir", str(ws / "tanpa-registri")]) == 0
     data = baca_data(ws)
     assert data["versi"] == 1
     assert [(s["id"], s["area"], s["alat"], s["detail"]) for s in data["sesi"]] == [("sesi-a", "meja", "Edit", "b.py")]
@@ -450,7 +452,7 @@ def test_loop_berhenti_saat_sepi_dan_menandainya(lingkungan):
     ws, proyek = lingkungan
     log = ws / "penulis.log"
     assert ka.main(["--workspace", str(ws), "--proyek-dir", str(proyek), "--loop", "0.01", "--sepi-menit", "0.001",
-                    "--log", str(log)]) == 0
+                    "--log", str(log), "--registri-dir", str(ws / "tanpa-registri"), "--cek-silang-detik", "0"]) == 0
     data = baca_data(ws)
     assert data["penulis"]["berhenti"] == "sepi"
     assert "tak ada sesi hidup" in log.read_text(encoding="utf-8")
@@ -466,5 +468,303 @@ def test_loop_keluar_3_setelah_lima_kali_berturut_gagal_menulis(lingkungan, monk
         raise PermissionError("dikunci pengindeks")
 
     monkeypatch.setattr(ka, "tulis_atomik", gagal)
-    assert ka.main(["--workspace", str(ws), "--proyek-dir", str(proyek), "--loop", "0.01", "--sepi-menit", "10"]) == 3
+    assert ka.main(["--workspace", str(ws), "--proyek-dir", str(proyek), "--loop", "0.01", "--sepi-menit", "10",
+                    "--registri-dir", str(ws / "tanpa-registri"), "--cek-silang-detik", "0"]) == 3
     assert len(panggilan) == 5
+
+
+# ---------- v2: registri sesi ~/.claude/sessions/<pid>.json ----------
+# Bentuk berkas diamati 2026-09-15 (Claude Code 2.1.269, 6 sesi hidup): kunci di bawah, berkas sesi yang
+# ditutup terhapus, dan procStart = FILETIME GetProcessTimes proses itu (6 dari 6 cocok).
+
+def _ms(detik, dasar=SEKARANG):
+    return int((dasar + timedelta(seconds=detik)).timestamp() * 1000)
+
+
+def tulis_registri(folder, pid, sid, cwd, status="busy", diperbarui=-30, **ekstra):
+    folder.mkdir(parents=True, exist_ok=True)
+    isi = {"pid": pid, "sessionId": sid, "cwd": str(cwd), "kind": "interactive", "entrypoint": "claude-vscode",
+           "name": "erp-8f", "status": status, "statusUpdatedAt": _ms(diperbarui), "updatedAt": _ms(diperbarui),
+           "startedAt": _ms(-7200), "procStart": "134339285124572081", "version": "2.1.269",
+           "messagingSocketPath": "x", "peerFeatures": "notify_idle", "peerProtocol": 1, "pidDomain": "win32:x"}
+    isi.update(ekstra)
+    p = folder / ("%d.json" % pid)
+    p.write_text(json.dumps(isi), encoding="utf-8")
+    return p
+
+
+def selalu_hidup(pid, proc_start):
+    return True
+
+
+@pytest.fixture
+def lingkungan2(lingkungan, tmp_path):
+    ws, proyek = lingkungan
+    return ws, proyek, tmp_path / "sessions"
+
+
+def kumpulkan2(ws, proyek, reg, hidup=selalu_hidup):
+    return ka.kumpulkan(str(proyek), str(ws), SEKARANG, registri_dir=str(reg), hidup=hidup)
+
+
+def test_registri_berkas_sah_dibaca_kunci_tak_dikenal_diabaikan(tmp_path):
+    reg = tmp_path / "sessions"
+    tulis_registri(reg, 101, "sesi-a", tmp_path / "ws", status="idle", diperbarui=-90, kunciBaru={"x": 1})
+    sesi, info = ka.baca_registri(str(reg), str(tmp_path / "ws"), selalu_hidup)
+    assert (info["terbaca"], info["berkas"], info["rusak"], info["luar"]) == (True, 1, 0, 0)
+    e = sesi["sesi-a"]
+    assert (e["pid"], e["status"], e["asal"], e["nama"]) == (101, "idle", "claude-vscode", "erp-8f")
+    assert e["status_sejak"] == SEKARANG + timedelta(seconds=-90)
+
+
+def test_registri_json_rusak_dan_tanpa_kunci_wajib_dihitung_rusak(tmp_path):
+    reg = tmp_path / "sessions"
+    reg.mkdir()
+    (reg / "1.json").write_text("{rusak", encoding="utf-8")
+    (reg / "2.json").write_text(json.dumps({"pid": 2, "cwd": str(tmp_path)}), encoding="utf-8")  # tanpa sessionId
+    sesi, info = ka.baca_registri(str(reg), str(tmp_path), selalu_hidup)
+    assert sesi == {} and (info["terbaca"], info["berkas"], info["rusak"]) == (True, 2, 2)
+
+
+def test_registri_pid_mati_atau_didaur_ulang_dilewati_dan_procstart_diteruskan(tmp_path):
+    ws, reg = tmp_path / "ws", tmp_path / "sessions"
+    tulis_registri(reg, 101, "hidup", ws)
+    tulis_registri(reg, 202, "mati", ws)
+    diperiksa = []
+
+    def hidup(pid, proc_start):
+        diperiksa.append((pid, proc_start))
+        return pid == 101
+
+    sesi, _ = ka.baca_registri(str(reg), str(ws), hidup)
+    assert list(sesi) == ["hidup"]
+    assert (202, "134339285124572081") in diperiksa
+
+
+def test_registri_cwd_di_luar_workspace_dilewati_dan_dihitung(tmp_path):
+    reg = tmp_path / "sessions"
+    tulis_registri(reg, 101, "luar", tmp_path / "lain")
+    sesi, info = ka.baca_registri(str(reg), str(tmp_path / "ws"), selalu_hidup)
+    assert sesi == {} and (info["rusak"], info["luar"]) == (0, 1)
+
+
+def test_registri_folder_tak_ada_tidak_terbaca(tmp_path):
+    sesi, info = ka.baca_registri(str(tmp_path / "tidak-ada"), str(tmp_path), selalu_hidup)
+    assert sesi == {} and info["terbaca"] is False
+
+
+@pytest.mark.skipif(os.name != "nt", reason="pemeriksa hidup lewat ctypes hanya di Windows")
+def test_proses_hidup_windows_tanpa_os_kill_dan_mencocokkan_procstart(monkeypatch):
+    def jangan(*a, **k):
+        raise AssertionError("os.kill di Windows = TerminateProcess: membunuh sesi yang diperiksa")
+
+    monkeypatch.setattr(ka.os, "kill", jangan)
+    sendiri = os.getpid()
+    mulai = ka.waktu_buat_proses(sendiri)
+    assert isinstance(mulai, int) and mulai > 0
+    assert ka.proses_hidup(sendiri, str(mulai)) is True
+    assert ka.proses_hidup(sendiri, str(mulai + 1)) is False  # PID sama, proses lain: didaur ulang
+    assert ka.proses_hidup(sendiri, None) is True
+    anak = subprocess.Popen([sys.executable, "-c", "pass"])
+    anak.wait()
+    assert ka.proses_hidup(anak.pid, None) is False
+
+
+def test_sesi_registri_diam_lama_tetap_tampil_walau_transkrip_tua(lingkungan2):
+    ws, proyek, reg = lingkungan2
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [prompt(ws, -30060), end_turn(ws, -30000)], _epoch(-30000))
+    tulis_registri(reg, 101, "sesi-a", ws, status="idle", diperbarui=-30000)
+    data = kumpulkan2(ws, proyek, reg)
+    s = data["sesi"][0]
+    assert (s["id"], s["area"], s["keadaan"], s["diam_detik"]) == ("sesi-a", "lounge", "menunggu_anda", 30000)
+    assert (s["asal"], s["nama"], s["pid"], s["status_proses"]) == ("claude-vscode", "erp-8f", 101, "idle")
+    assert data["skema"]["sumber_hidup"] == "registri"
+
+
+def test_transkrip_hidup_tanpa_entri_registri_sudah_pulang(lingkungan2):
+    ws, proyek, reg = lingkungan2
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [tool_use(ws, "Read", "toolu_a", None, -5)], _epoch(-5))
+    tulis_registri(reg, 101, "sesi-lain", ws, status="idle")
+    assert [s["id"] for s in kumpulkan2(ws, proyek, reg)["sesi"]] == ["sesi-lain"]
+
+
+def test_sesi_registri_tanpa_transkrip_tampil_dari_status_proses(lingkungan2):
+    ws, proyek, reg = lingkungan2
+    tulis_registri(reg, 101, "baru-busy", ws, status="busy", diperbarui=-3)
+    tulis_registri(reg, 102, "baru-idle", ws, status="idle", diperbarui=-40)
+    sesi = {s["id"]: s for s in kumpulkan2(ws, proyek, reg)["sesi"]}
+    assert (sesi["baru-busy"]["area"], sesi["baru-busy"]["keadaan"]) == ("meja", "berpikir")
+    assert (sesi["baru-idle"]["area"], sesi["baru-idle"]["keadaan"], sesi["baru-idle"]["diam_detik"]) == (
+        "lounge", "menunggu_anda", 40)
+
+
+def test_registri_busy_sesudah_end_turn_berarti_berpikir(lingkungan2):
+    # prompt baru sudah dikirim tetapi barisnya belum tertulis: registri lebih dulu tahu
+    ws, proyek, reg = lingkungan2
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [end_turn(ws, -60)], _epoch(-60))
+    tulis_registri(reg, 101, "sesi-a", ws, status="busy", diperbarui=-2)
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"]) == ("meja", "berpikir")
+
+
+def test_registri_idle_tanpa_end_turn_berarti_menunggu_anda(lingkungan2):
+    # giliran dihentikan (Esc) tanpa end_turn: mode transkrip terbaca berpikir selamanya
+    ws, proyek, reg = lingkungan2
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [prompt(ws, -60), baris("assistant_thinking", ws, -50)], _epoch(-50))
+    tulis_registri(reg, 101, "sesi-a", ws, status="idle", diperbarui=-45)
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"]) == ("lounge", "menunggu_anda")
+
+
+def test_tool_tertunda_tetap_menentukan_area_saat_registri_busy(lingkungan2):
+    ws, proyek, reg = lingkungan2
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [tool_use(ws, "PowerShell", "toolu_a", {"description": "uji"}, -12)], _epoch(-12))
+    tulis_registri(reg, 101, "sesi-a", ws, status="busy")
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"], s["alat"]) == ("server", "alat", "PowerShell")
+
+
+def hasil_latar(ws, tool_id, task_id, detik):
+    # bentuk nyata: toolUseResult.backgroundTaskId + teks "Command running in background with ID: ..."
+    o = tool_result(ws, tool_id, detik)
+    o["message"]["content"][0]["content"] = "Command running in background with ID: %s. Output is being written to: x" % task_id
+    o["toolUseResult"] = {"backgroundTaskId": task_id, "stdout": "", "stderr": "", "interrupted": False}
+    return o
+
+
+def notifikasi_latar(ws, task_id, detik, status="completed"):
+    # bentuk nyata: queue-operation enqueue berisi <task-notification> dengan <task-id> dan <status>
+    o = baris("queue-operation", ws, detik)
+    o["operation"] = "enqueue"
+    o["content"] = ("<task-notification>\n<task-id>%s</task-id>\n<tool-use-id>toolu_x</tool-use-id>\n"
+                    "<status>%s</status>\n<summary>x</summary>\n</task-notification>" % (task_id, status))
+    return o
+
+
+def test_urai_melacak_tugas_latar_sampai_notifikasinya():
+    mulai = [tool_use(WS, "PowerShell", "toolu_a", {"description": "uji panjang", "run_in_background": True}, -60),
+             hasil_latar(WS, "toolu_a", "b1", -59), end_turn(WS, -50)]
+    u = ka.urai(mulai)
+    assert list(u["latar"]) == ["b1"] and u["latar"]["b1"][0] == "PowerShell"
+    assert dict(ka.urai(mulai + [notifikasi_latar(WS, "b1", -10)])["latar"]) == {}
+
+
+def test_registri_idle_dengan_tugas_latar_menunggu_di_ruang_server(lingkungan2):
+    ws, proyek, reg = lingkungan2
+    kejadian = [tool_use(ws, "PowerShell", "toolu_a", {"description": "uji panjang", "run_in_background": True}, -60),
+                hasil_latar(ws, "toolu_a", "b1", -59), end_turn(ws, -50)]
+    f = tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", kejadian, _epoch(-50))
+    tulis_registri(reg, 101, "sesi-a", ws, status="idle", diperbarui=-50)
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"], s["alat"], s["detail"]) == ("server", "menunggu_latar", "PowerShell", "uji panjang")
+    tulis_jsonl(f, kejadian + [notifikasi_latar(ws, "b1", -5)], _epoch(-5))
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"]) == ("lounge", "menunggu_anda")
+
+
+def test_registri_idle_dengan_subagent_hidup_menunggu_di_rapat(lingkungan2):
+    ws, proyek, reg = lingkungan2
+    folder = proyek / "slug-uji"
+    tulis_jsonl(folder / "sesi-a.jsonl", [end_turn(ws, -60)], _epoch(-60))
+    tulis_jsonl(folder / "sesi-a" / "subagents" / "agent-x1.jsonl", [tool_use(ws, "Grep", "toolu_s", None, -5, subagent=True)], _epoch(-5))
+    tulis_registri(reg, 101, "sesi-a", ws, status="idle", diperbarui=-60)
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"], len(s["subagent"])) == ("rapat", "menunggu_subagent", 1)
+
+
+def test_registri_tak_terbaca_turun_ke_mode_transkrip(lingkungan2):
+    ws, proyek, reg = lingkungan2  # folder registri sengaja tidak dibuat
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [tool_use(ws, "Edit", "toolu_a", None, -5)], _epoch(-5))
+    data = kumpulkan2(ws, proyek, reg)
+    assert [s["id"] for s in data["sesi"]] == ["sesi-a"]
+    assert data["skema"]["sumber_hidup"] == "transkrip"
+
+
+def test_tanpa_registri_dir_mode_transkrip(lingkungan):
+    ws, proyek = lingkungan
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", [end_turn(ws, -60)], _epoch(-60))
+    assert kumpulkan(ws, proyek)["skema"]["sumber_hidup"] == "transkrip"
+
+
+# ---------- v2: cek silang `claude agents --json` ----------
+
+def _cek_sampai_selesai(cek, sid_registri, batas=20):
+    t0 = time.monotonic()
+    cek.tick(sid_registri)
+    while time.monotonic() - t0 < batas:
+        if not cek.berjalan():
+            return cek.status()
+        time.sleep(0.05)
+        cek.tick(sid_registri)
+    raise AssertionError("cek silang tak selesai dalam %s detik" % batas)
+
+
+def _perintah_cetak(daftar):
+    return [sys.executable, "-c", "import json, sys; sys.stdout.write(json.dumps(%r))" % (daftar,)]
+
+
+def test_cek_silang_cocok_dengan_registri_workspace(tmp_path):
+    ws = str(tmp_path / "ws")
+    agents = [{"pid": 1, "cwd": ws, "kind": "interactive", "sessionId": "sesi-a", "status": "busy"},
+              {"pid": 2, "cwd": str(tmp_path / "lain"), "kind": "interactive", "sessionId": "luar", "status": "idle"}]
+    cek = ka.CekSilang(_perintah_cetak(agents), ws, interval_detik=0, batas_detik=20)
+    st = _cek_sampai_selesai(cek, {"sesi-a"})
+    assert (st["dicek"], st["cocok"]) == (True, True)
+
+
+def test_cek_silang_tak_cocok_baru_ditandai_setelah_dua_kali_berturut(tmp_path):
+    ws = str(tmp_path / "ws")
+    agents = [{"pid": 1, "cwd": ws, "sessionId": "sesi-a"}, {"pid": 2, "cwd": ws, "sessionId": "sesi-b"}]
+    cek = ka.CekSilang(_perintah_cetak(agents), ws, interval_detik=0, batas_detik=20)
+    assert _cek_sampai_selesai(cek, {"sesi-a"})["cocok"] is True  # sekali tak cocok bisa sekadar jeda waktu
+    assert _cek_sampai_selesai(cek, {"sesi-a"})["cocok"] is False
+    assert _cek_sampai_selesai(cek, {"sesi-a", "sesi-b"})["cocok"] is True
+
+
+def test_cek_silang_menggantung_dihentikan_dan_tick_tidak_menunggu(tmp_path):
+    cek = ka.CekSilang([sys.executable, "-c", "import time; time.sleep(60)"], str(tmp_path), interval_detik=0, batas_detik=1)
+    t0 = time.monotonic()
+    cek.tick(set())
+    assert time.monotonic() - t0 < 5  # memulai subprocess tidak menunggu hasilnya (anaknya tidur 60 detik)
+    st = _cek_sampai_selesai(cek, set())
+    assert st["dicek"] is False and "batas" in st["catatan"]
+
+
+def test_cek_silang_perintah_tak_ada(tmp_path):
+    cek = ka.CekSilang([str(tmp_path / "tidak-ada.exe"), "agents", "--json"], str(tmp_path), interval_detik=0)
+    cek.tick(set())
+    st = cek.status()
+    assert st["dicek"] is False and st["catatan"] and cek.berjalan() is False
+
+
+def test_cek_silang_keluaran_bukan_json_tidak_dianggap_cocok(tmp_path):
+    cek = ka.CekSilang([sys.executable, "-c", "print('bukan json')"], str(tmp_path), interval_detik=0, batas_detik=20)
+    st = _cek_sampai_selesai(cek, set())
+    assert st["dicek"] is False and st["cocok"] is None
+
+
+# ---------- v2: satu penulis per workspace ----------
+
+def test_kunci_penulis_eksklusif_dan_lepas_setelah_ditutup(tmp_path):
+    path = str(tmp_path / "kantor-agent.lock")
+    pertama = ka.kunci_penulis(path)
+    assert pertama is not None
+    assert ka.kunci_penulis(path) is None
+    pertama.close()
+    kedua = ka.kunci_penulis(path)
+    assert kedua is not None
+    kedua.close()
+
+
+def test_loop_keluar_4_bila_penulis_lain_memegang_kunci(lingkungan):
+    ws, proyek = lingkungan
+    kunci = ka.kunci_penulis(str(ws / ".task-plans" / "kantor-agent.lock"))
+    try:
+        t0 = time.monotonic()
+        # sepi sekejap: kode yang benar keluar 4 sebelum loop, mutan tanpa kunci keluar 0 cepat (bukan menggantung)
+        assert ka.main(["--workspace", str(ws), "--proyek-dir", str(proyek), "--loop", "0.01", "--sepi-menit", "0.001",
+                        "--registri-dir", str(ws / "tanpa-registri"), "--cek-silang-detik", "0"]) == 4
+        assert time.monotonic() - t0 < 5
+        assert not (ws / ".task-plans" / "kantor-agent-data.js").exists()
+    finally:
+        kunci.close()
