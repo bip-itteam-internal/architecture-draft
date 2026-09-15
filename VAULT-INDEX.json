@@ -425,9 +425,9 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "b1877cac2370ae192a7c16a715db4124ada26ca369b091e215462fd33a4a86da",
-      "ukuran_kb": 94.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service (webhook marketplace, order/transaksi, TikTok Shop/Business, Shopee, Accurate, dashboard accounting FAT, profit insentif, ICC account mapping, kas toko, ulasan, status sinkron toko), beserta parameter, filter, dan bentuk respons tiap rute. Juga menjawab cara memakai endpoint seperti ekspor order, aging piutang, feed retur untuk WMS, packet tracking, dan filter atribusi afiliasi Shopee, serta aturan gateway key dan path publik webhook.",
+      "hash": "2ca8a6bd23e4f84f36fcaa38a586141840ba49642e1579604537c2c588dfe9cd",
+      "ukuran_kb": 93.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service (webhook marketplace, order/transaksi, TikTok Shop/Business, Shopee, Accurate, dashboard accounting FAT, profit insentif, ICC account mapping, kas toko, ulasan, status sinkron toko, kepemilikan toko per departemen), beserta parameter, filter, dan bentuk respons tiap rute. Juga menjawab cara memakai endpoint seperti ekspor order, aging piutang, feed retur untuk WMS, packet tracking, dan filter atribusi afiliasi Shopee, serta aturan gateway key dan path publik webhook. Mencatat bahwa CRUD Teams marketing (`/marketing/teams`) sudah dicabut total 2026-09-15 (Fase Contract) — ACL sisa toko kini murni filter `AllowedShops` di `/transactions/master/shops`.",
       "kata_kunci": [
         "integration-service",
         "API endpoint",
@@ -438,7 +438,9 @@
         "feed retur WMS",
         "Accurate",
         "shopee_attribution",
-        "ICC account mapping"
+        "ICC account mapping",
+        "department-shops",
+        "fase contract"
       ]
     },
     {
@@ -593,9 +595,9 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "ee729130a83fb9dac57534e3291d3d6b0027eec208a7e64d135f6c03f934d105",
+      "hash": "0a8847c0e076df331d9b917763d92b57fa29a7347de99f629c40d3d44f186faa",
       "ukuran_kb": 55.6,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda dan vonis laba, ambang ROAS, pagu belanja iklan, kurva alokasi, laba per toko/produk/kampanye, video dan live, pencatatan sesi live host `/live-shifts` termasuk ambil alih sesi, retur, price floor, job, dan pengumpul KPI), serta siapa yang boleh menulis (gerbang `RequireMarketingLeader`, kepemilikan PATCH). Juga menjawab konvensi responsnya (`unavailable_channels`, `kolom_tidak_berlaku`, paginasi drill, 400 untuk enum tak dikenal, batas hari WIB), arti lima nilai vonis (`tanpa_data`, `belum_matang`, `rugi`, `waspada`, `sehat`) dan makna `null` versus nol, plus cara mengaudit kelengkapan daftar route terhadap kode.",
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda dan vonis laba, ambang ROAS, pagu belanja iklan, kurva alokasi, laba per toko/produk/kampanye, video dan live, pencatatan sesi live host `/live-shifts` termasuk ambil alih sesi, retur, price floor, job, dan pengumpul KPI), serta siapa yang boleh menulis (gerbang `RequireMarketingLeader`, kepemilikan PATCH). Juga menjawab konvensi responsnya (`unavailable_channels`, `kolom_tidak_berlaku`, paginasi drill, 400 untuk enum tak dikenal, batas hari WIB), arti lima nilai vonis (`tanpa_data`, `belum_matang`, `rugi`, `waspada`, `sehat`) dan makna `null` versus nol, sumber `/divisi` (`department_shops`, bukan lagi `marketing_teams` sejak menu Teams dicabut total 2026-09-15), plus cara mengaudit kelengkapan daftar route terhadap kode.",
       "kata_kunci": [
         "marketing analytics",
         "endpoint API",
@@ -606,7 +608,9 @@
         "live-shifts",
         "sesi live host",
         "ambil alih sesi",
-        "price floor"
+        "price floor",
+        "divisi",
+        "department_shops"
       ]
     },
     {
@@ -1738,7 +1742,7 @@
         "Sales - Marketing Analytics (Audit Ketersediaan Data)",
         "ADR - 0008 Profit Engine Join via item_group_id"
       ],
-      "hash": "67f1722aa8894bc4ee44ecfa312689e6b6199a1d84700772faf0b049df038f71",
+      "hash": "89125d586896a55dd25ee944307b3c7f542e340e47950babef3c0d14e06fcf86",
       "ukuran_kb": 23.6,
       "ringkasan": "Menjawab: kapabilitas AI apa saja yang dimiliki ERP Bharata beserta statusnya, bagaimana alur sistem marketing-analytics dari marketplace sampai layar ICC, dan rancangan peringatan dini belanja iklan video beserta batas kesegaran 48 jam serta aturan pemakaian kolom laba yang mudah salah dijumlahkan. Menjawab pula kenapa retur fisik ternyata paket COD gagal antar yang dibatalkan sistem sesudah dikirim, tiga jebakan kebocoran data saat membangun prediksinya, dan hasil uji aturan sederhana berbasis COD dan riwayat pembeli yang dihitung dari waktu kejadian, termasuk kenapa versi pertama yang memakai status tersimpan menghasilkan angka yang sedikit bocor.",
       "kata_kunci": [
@@ -1922,6 +1926,7 @@
         "Microservices - Insentive Service",
         "Microservices - Integration Service",
         "Microservices - Marketing Analytics Service",
+        "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace",
         "ADR - 0052 Status Sinkron per Toko",
         "Microservices - Inventory Service",
@@ -1931,9 +1936,9 @@
         "Microservices - File Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "8dad83979db4989fd119849c32bd55f07d0c5bf30302194de76116d7237c33f9",
-      "ukuran_kb": 18.5,
-      "ringkasan": "Menjawab: field apa saja yang ada di tiap koleksi MongoDB per service (employee, attendance, notification, insentive, integration, inventory, tiktok-shop, task-management) beserta tipenya, sesuai struct Go. Berguna untuk mencari arti field seperti `work_data.company_id`, `system_authentication.permission_sets`, `master_department.position_items`, atau struktur `attendance_entries` dan `leave_request`.",
+      "hash": "d704ebffd920bc08d83a75440c89545b7f390986f03606d322053a191e469ef6",
+      "ukuran_kb": 18.8,
+      "ringkasan": "Menjawab: field apa saja yang ada di tiap koleksi MongoDB per service (employee, attendance, notification, insentive, integration, inventory, tiktok-shop, task-management) beserta tipenya, sesuai struct Go. Berguna untuk mencari arti field seperti `work_data.company_id`, `system_authentication.permission_sets`, `master_department.position_items`, atau struktur `attendance_entries` dan `leave_request`. Mencatat koleksi yang sudah RETIRED (mis. `marketing_teams`, dicabut Fase Contract 2026-09-15) supaya tak dikira masih aktif.",
       "kata_kunci": [
         "data dictionary",
         "kamus data",
@@ -1944,7 +1949,8 @@
         "work_data",
         "system_authentication",
         "master_department",
-        "attendance_entries"
+        "attendance_entries",
+        "retired collection"
       ]
     },
     {
@@ -1963,6 +1969,7 @@
         "Microservices - Notification Service",
         "Microservices - Insentive Service",
         "Microservices - Integration Service",
+        "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "Microservices - Inventory Service",
         "Microservices - TikTok Shop Service",
         "Microservices - Task Management Service",
@@ -1975,9 +1982,9 @@
         "Microservices - Form Builder Service",
         "Microservices - File Service"
       ],
-      "hash": "7617c01e0e983478eee9fccc3d110e198945f69169efd5079cf7f9b51003b9be",
-      "ukuran_kb": 9.6,
-      "ringkasan": "Menjawab: service mana memiliki database mana, collection apa saja yang ada di tiap database, dan siapa pemilik sebuah data di pola database-per-service. Berguna saat mencari tempat penyimpanan sebuah entitas (work_data, attendance_entries, transaction_orders, candidate, psikotes_session, salary_component, forms, dan lainnya), saat memeriksa koleksi mana yang sudah membawa company_id untuk multi-perusahaan, atau saat menelusuri pengecualian akses lintas database seperti task-management yang membaca employee_db dan attendance_db read-only. Menyebut juga infrastruktur data bersama (Redis, MinIO), replica set employee-service, dan konvensi waktu UTC.",
+      "hash": "64324141ece08e6577b15dc69ae46dce17f50690d78ec92da392782593bf3007",
+      "ukuran_kb": 9.7,
+      "ringkasan": "Menjawab: service mana memiliki database mana, collection apa saja yang ada di tiap database, dan siapa pemilik sebuah data di pola database-per-service. Berguna saat mencari tempat penyimpanan sebuah entitas (work_data, attendance_entries, transaction_orders, candidate, psikotes_session, salary_component, forms, dan lainnya), saat memeriksa koleksi mana yang sudah membawa company_id untuk multi-perusahaan, atau saat menelusuri pengecualian akses lintas database seperti task-management yang membaca employee_db dan attendance_db read-only. Menyebut juga infrastruktur data bersama (Redis, MinIO), replica set employee-service, konvensi waktu UTC, dan koleksi yang sudah RETIRED (`marketing_teams`/`team_shops`/`team_members`, Fase Contract 2026-09-15).",
       "kata_kunci": [
         "database",
         "MongoDB",
@@ -2463,9 +2470,9 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "4d195b75837d1f4d3ed7f35dc52d05563dd7deaddc3bd7decbc385a9524b0a25",
-      "ukuran_kb": 396.3,
-      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) ke Accurate Online, bagaimana order masuk lewat webhook direct lalu dinormalkan jadi model transaksi terpadu, dan bagaimana Sales Invoice serta Sales Return di-push ke Accurate. Juga menjelaskan fitur-fitur di dalamnya (GMV Max monitoring/overview, ICC video metrics, rencana Meta Ads, cron sync, kepemilikan toko per departemen, status sinkron toko, ulasan marketplace, index MongoDB) beserta gotcha seperti bypass verifikasi signature Shopee dan rate limit TikTok.",
+      "hash": "af2f0ec97bfea16bd56610408b7985acdc0c62536c96fcd3c5bb58db780587a3",
+      "ukuran_kb": 396.6,
+      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) ke Accurate Online, bagaimana order masuk lewat webhook direct lalu dinormalkan jadi model transaksi terpadu, dan bagaimana Sales Invoice serta Sales Return di-push ke Accurate. Juga menjelaskan fitur-fitur di dalamnya (GMV Max monitoring/overview, ICC video metrics, rencana Meta Ads, cron sync, kepemilikan toko per departemen via `department_shops`, ACL toko `ShopACLUseCase`/`AllowedShops`, status sinkron toko, ulasan marketplace, index MongoDB) beserta gotcha seperti bypass verifikasi signature Shopee dan rate limit TikTok. Mencatat Fase Contract 2026-09-15: CRUD Teams marketing (`/marketing/teams`, koleksi `marketing_teams`/`team_shops`/`team_members`) dicabut total, `MarketingTeamUseCase` disusutkan+di-rename `ShopACLUseCase`.",
       "kata_kunci": [
         "integration service",
         "marketplace integration",
@@ -2476,7 +2483,10 @@
         "sales invoice",
         "faktur",
         "GMV Max",
-        "cron sync"
+        "cron sync",
+        "ShopACLUseCase",
+        "department_shops",
+        "fase contract"
       ]
     },
     {
@@ -2664,9 +2674,9 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "a5bfa2ba69a4fb3182b6bc53fcb8bb1a0e6ab43ff898bb7f8aa94d2106b41d2b",
+      "hash": "e3c9ea7e07d61d2d7dc5616c192ba48fbadd3c94bd4944d10614dabf1f844f43",
       "ukuran_kb": 138.3,
-      "ringkasan": "Menjawab: bagaimana marketing-analytics service mengagregasi laba dan performa marketing per toko, produk, kampanye, video, dan live ke koleksi `mart_*` dengan membaca `integration_db` baca-saja, dan bagaimana vonis beranda (sehat/rugi/belum matang/tanpa data) diputuskan. Menjelaskan endpoint seperti `/beranda`, `/ambang`, `/pagu`, analisis live dan Account Specialist, KPI host live, pencatatan sesi live `/live-shifts`, serta aturan pemakaian angka untuk mencegah hitung ganda (`iklan_sia_sia`, `pembatalan`, GMV live).",
+      "ringkasan": "Menjawab: bagaimana marketing-analytics service mengagregasi laba dan performa marketing per toko, produk, kampanye, video, dan live ke koleksi `mart_*` dengan membaca `integration_db` baca-saja, dan bagaimana vonis beranda (sehat/rugi/belum matang/tanpa data) diputuskan. Menjelaskan endpoint seperti `/beranda`, `/ambang`, `/pagu`, analisis live dan Account Specialist, KPI host live, pencatatan sesi live `/live-shifts`, serta aturan pemakaian angka untuk mencegah hitung ganda (`iklan_sia_sia`, `pembatalan`, GMV live). Sumber `/divisi` dan kolom `icc` sudah `department_shops` sejak Fase Contract 2026-09-15 selesai — `team_shops`/`marketing_teams` dan dead code pembacanya sudah dihapus fisik, bukan lagi sekadar tak terpanggil.",
       "kata_kunci": [
         "marketing analytics",
         "mart",
@@ -2677,7 +2687,9 @@
         "sesi live host",
         "Account Specialist",
         "hitung ganda",
-        "dashboard marketing"
+        "dashboard marketing",
+        "department_shops",
+        "fase contract"
       ]
     },
     {
@@ -3522,7 +3534,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "076b1a4fb212adebd3801ec7b3443d492438a6a76da2345516b17d06f0ada9bb",
-      "ukuran_kb": 4.9,
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab sumber tanggal yang dipakai untuk membukukan retur TikTok ke Accurate: kenapa update_time menyesatkan (ikut mundur karena settle refund) dan kenapa order_update_date dipilih sebagai gantinya, serta perbaikan zona waktu WIB untuk penomoran dokumen retur (RTR).",
       "kata_kunci": [
         "tanggal retur",
@@ -4245,7 +4257,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "ddca0201da7959b033620b4d876a8b18d58d146a1dd721bf9d3f6b75c917f3ec",
-      "ukuran_kb": 15.2,
+      "ukuran_kb": 15.1,
       "ringkasan": "Menjawab: bagaimana aset GA di ERP direkonsiliasi terhadap Aktiva Tetap di Accurate untuk menghasilkan skor KPI akurasi input aset staff GA, dan kenapa pencocokannya per-item lewat ceklis manual berbantuan (bukan agregat per-golongan) dengan `accurate_asset_no` disimpan agar periode berikutnya cocok otomatis. Menjelaskan pula kenapa aset yang belum ada di Accurate dihitung 100% (antrean tanggung jawab Finance, bukan GA) sementara Cakupan wajib tampil berdampingan dengan Akurasi, tiga tab modul Aset, penempatan yang menghormati batas service (inventory menyimpan nomor Accurate, feed KPI lewat employee-service), serta bagian mana yang di-supersede ADR-0049.",
       "kata_kunci": [
         "rekonsiliasi aset",
@@ -4513,8 +4525,8 @@
       "judul": "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "⚠️",
-      "status_teks": "Expand/Migrate/Contract (kode+data) selesai dan terverifikasi live di prod (2026-09-02); pencabutan fisik dead code/koleksi lama masih tertunda. Penyemaian awal 16 pemetaan (2026-08-11) tumbuh lewat entri manual susulan jadi **58 toko terpetakan**; laporan kesehatan `/department-shops/kesehatan` per 2026-09-02 menunjukkan **2 yatim** (`Series Glowbooster` — lama, menunggu keputusan; **`BEAUTYHACKS BHARATA`** — toko baru 2026-09-01, **belum di-assign meski tab assign-nya sudah live**, actionable), drift `Menyimpang` nol. **Contract (kode+data) SELESAI DAN TERVERIFIKASI**: kedua pembaca (`/divisi` dan kolom penanggung jawab ICC) dikonfirmasi lewat grep biner produksi — 0 referensi `team_shops`, dead-code-eliminated. Backfill `POST /jobs/sync-profit-attribution/trigger?hari=120` sudah dijalankan, menutupi 85,8% dokumen mart (batas 120 hari menjelaskan sisanya, bukan kegagalan — lihat §Migrasi langkah 4). **Pencabutan FISIK masih tertunda**: `bacaTokoTim`/`bacaNamaTim` (dead code) belum dihapus dari `integration_db.go`, `marketing_teams`/`team_shops` masih ada di database, menu `/integration/teams` masih di sidebar. UI assign toko yatim sudah dibangun (tab \"Kepemilikan Toko\" di ICC Management, erp-frontend, 2026-09-01/02) — gerbang tulisnya dibuka lewat `RequireMarketingLeader` dengan penyempitan per departemen di handler (leader/SPV hanya boleh assign ke departemennya sendiri, laporan yatim tetap lintas-divisi), bukan lagi murni `RequireIntegrationAdmin` seperti disebut §Aktor dan wewenang di bawah — bagian itu perlu dibaca sebagai historis, lihat [[API - Integration Service]] untuk kontrak terkini. Rincian status per-langkah: §Migrasi. Menyusul [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] dan [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]; **tidak** menggantikan keduanya.",
+      "status_emoji": "✅",
+      "status_teks": "Expand/Migrate/Contract (kode+data) DAN pencabutan fisik SELESAI dan terverifikasi live di prod. Penyemaian awal 16 pemetaan (2026-08-11) tumbuh lewat entri manual susulan jadi **58 toko terpetakan**; laporan kesehatan `/department-shops/kesehatan` per 2026-09-02 menunjukkan **2 yatim** (`Series Glowbooster` — lama, menunggu keputusan; **`BEAUTYHACKS BHARATA`** — toko baru 2026-09-01, **belum di-assign meski tab assign-nya sudah live**, actionable), drift `Menyimpang` nol. **Contract (kode+data) SELESAI DAN TERVERIFIKASI**: kedua pembaca (`/divisi` dan kolom penanggung jawab ICC) dikonfirmasi lewat grep biner produksi — 0 referensi `team_shops`, dead-code-eliminated. Backfill `POST /jobs/sync-profit-attribution/trigger?hari=120` sudah dijalankan, menutupi 85,8% dokumen mart (batas 120 hari menjelaskan sisanya, bukan kegagalan — lihat §Migrasi langkah 4). **Pencabutan FISIK SELESAI (2026-09-15, PR bip-erp #1888 + erp-frontend #1579, merge ke `main`)**: `bacaTokoTim`/`bacaNamaTim`/`indeksDivisiDari` (dead code) dihapus dari `integration_db.go`/`divisi.go`; CRUD Teams (`marketing_team_handler.go`, `marketing_team_repo.go`, entity `MarketingTeam`/`TeamMember`/`TeamShop`) dihapus total dari `services/integration`; route `/marketing/teams/*` dan menu sidebar \"Teams\" (`/integration/teams`) dihapus; `MarketingTeamUseCase` disusutkan+di-rename jadi `ShopACLUseCase` (isinya cuma `AllowedShops`, satu-satunya method yang masih dipakai — baca `department_shops`). Koleksi Mongo `team_shops`/`marketing_teams`/`team_members` sengaja **TIDAK di-drop** — tak ada lagi kode yang membaca/menulisnya, jadi aman dibiarkan sebagai data mati; drop fisik (opsional) tetap keputusan manusia lewat `mongosh` langsung, bukan bagian deploy kode. UI assign toko yatim sudah dibangun (tab \"Kepemilikan Toko\" di ICC Management, erp-frontend, 2026-09-01/02) — gerbang tulisnya dibuka lewat `RequireMarketingLeader` dengan penyempitan per departemen di handler (leader/SPV hanya boleh assign ke departemennya sendiri, laporan yatim tetap lintas-divisi), bukan lagi murni `RequireIntegrationAdmin` seperti disebut §Aktor dan wewenang di bawah — bagian itu perlu dibaca sebagai historis, lihat [[API - Integration Service]] untuk kontrak terkini. Rincian status per-langkah: §Migrasi. Menyusul [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] dan [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]; **tidak** menggantikan keduanya.",
       "publik": true,
       "tautan": [
         "API - Integration Service",
@@ -4528,9 +4540,9 @@
         "Microservices - Integration Service",
         "Sales - ICC Account Manager Mapping"
       ],
-      "hash": "f4260977d94acdfe7a83d2523fca117a64faadc8726dec1d3e33cce9864781d6",
-      "ukuran_kb": 27.3,
-      "ringkasan": "Menjawab: kenapa ada tiga mekanisme berbeda yang tak saling tahu untuk menentukan toko marketplace ini milik tim/departemen mana (marketing_teams/team_shops, icc_account_mappings, department_shops), apa keputusan yang diambil untuk menyatukannya ke department_shops sebagai sumber tunggal, dan bagaimana proses migrasinya (termasuk daftar toko yang dipindah beserta dasar keputusannya, mana yang berbukti data dan mana yang keputusan pemilik fitur). Juga mencatat status migrasi terkini: data dan kode sudah berpindah, ACL AllowedShops pengganti sudah merge+deploy+diverifikasi live (2026-09-14), tapi pencabutan fisik dead code/koleksi lama (fase contract) masih tertunda meski syaratnya sudah terpenuhi.",
+      "hash": "7f4baa5fd1c853bd7c68c6ae4d6d1e47b0aa9198922094cd6368d98c81621258",
+      "ukuran_kb": 27.5,
+      "ringkasan": "Menjawab: kenapa ada tiga mekanisme berbeda yang tak saling tahu untuk menentukan toko marketplace ini milik tim/departemen mana (marketing_teams/team_shops, icc_account_mappings, department_shops), apa keputusan yang diambil untuk menyatukannya ke department_shops sebagai sumber tunggal, dan bagaimana proses migrasinya (termasuk daftar toko yang dipindah beserta dasar keputusannya, mana yang berbukti data dan mana yang keputusan pemilik fitur). Mencatat status migrasi FINAL: Expand/Migrate/Contract (kode+data) DAN pencabutan fisik dead code/koleksi lama SELESAI 2026-09-15 — CRUD Teams, route `/marketing/teams`, menu sidebar, dan dead code reader lama semuanya sudah dihapus dari kode; koleksi Mongo lama dibiarkan sebagai data mati.",
       "kata_kunci": [
         "department_shops",
         "team_shops",
@@ -4542,7 +4554,8 @@
         "Kyura",
         "single source of truth",
         "ADR-0045",
-        "fase contract"
+        "fase contract",
+        "ShopACLUseCase"
       ]
     },
     {
@@ -5401,7 +5414,7 @@
         "External - Accurate"
       ],
       "hash": "140f2789e531f6209bfdfc17bceca336e6f6048522951825a418bd4a22e2da22",
-      "ukuran_kb": 10.5,
+      "ukuran_kb": 10.4,
       "ringkasan": "Menjawab: mengapa opname perlengkapan GA dibuat sebagai perluasan tab Data Accurate (lewat pemilih tipe Aset Tetap/Perlengkapan) alih-alih modul baru, bagaimana perlengkapan dicocokkan per-KUANTITAS (hitung fisik GA vs qty Accurate) bukan per-unit, dan bagaimana skor akurasi opname dihitung untuk KPI staff GA. Menjelaskan juga koleksi ga_opname + endpoint /perlengkapan-opname, penangkapan kategori item Accurate saat sync, serta amandemen 2026-09-02 yang mengubah tab FE dari form opname jadi explorer padanan read-only (BE dibiarkan dormant).",
       "kata_kunci": [
         "opname perlengkapan",
@@ -6254,7 +6267,7 @@
         "Microservices - Inventory Service"
       ],
       "hash": "2ce5d71a739740e936dd4bb22b59415e9cfe7003830f8ada60faa1aae6f91235",
-      "ukuran_kb": 10.3,
+      "ukuran_kb": 10.2,
       "ringkasan": "Menjawab: kenapa barang perlengkapan yang sama bisa tampil dobel di explorer GA saat Accurate mengganti nomor item, dan bagaimana sistem memindahkan padanan (accurate_item_no) secara otomatis lewat ID internal Accurate tanpa konfirmasi manusia. Menjelaskan juga syarat aman migrasi otomatis (tepat satu kandidat cocok via AccurateID, masa tenggang 3 jam sebelum dianggap rename, audit trail) serta limitasinya (item yang benar-benar terhapus di Accurate tetap jadi baris stale, kandidat ambigu tak ditindak).",
       "kata_kunci": [
         "auto-migrasi padanan",
@@ -6727,7 +6740,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "ee317d4d8664cf3c5227bcf8d3d018f9648ff0b9fdc9228e35cc31d4144a5c89",
-      "ukuran_kb": 16.3,
+      "ukuran_kb": 15.9,
       "ringkasan": "Menjawab endpoint dan alur kerja Finance Bridging versi Golang (penulisan ulang dari sistem Java): bagaimana membuat dan mengirim ringkasan transaksi Sales/Income/Return ke Accurate, halaman FE terkait per channel, status ringkasan, serta setting toko dan mapping produk.",
       "kata_kunci": [
         "Finance Bridging Golang",
@@ -6754,7 +6767,7 @@
         "Finance - Incentive"
       ],
       "hash": "8a3dba53269a5104fd1106064d8ed8159f96a7207b2c5a97ffc4a66f7a399504",
-      "ukuran_kb": 19.6,
+      "ukuran_kb": 19.5,
       "ringkasan": "Menjawab fitur dan struktur sistem Finance lama (Java/PostgreSQL/ReactJS) sebagai jembatan antara Accurate dan marketplace: master data, upload Excel per platform (TikTok/Shopee/Lazada/Tokopedia/KiriminAja), sinkronisasi ke Accurate, dan lokasi repositori kodenya.",
       "kata_kunci": [
         "Finance Bridging lama",
@@ -10930,6 +10943,7 @@
         "HRIS - Otomasi Skor KPI",
         "Sales - Incentive",
         "Microservices - Insentive Service",
+        "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "Sales - ICC Account Manager Mapping",
         "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
         "Sales - Marketplace Integration",
@@ -10968,9 +10982,9 @@
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
         "Microservices - Inventory Service"
       ],
-      "hash": "75115fd6f21a38ee23a08be9447f26c9fa56745082b0ec0fa1f0269fe2984ba0",
-      "ukuran_kb": 39.1,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis (identitas karyawan, departemen, hak akses, kontrak, jadwal, presensi, skor dan target KPI, insentif profit, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab kapan salinan data dianggap sah (satu arah, tak ditulis tangan, berpenjaga), pengecualian ADR 0002 yang masih hidup (mis. task-management membaca DB service lain langsung), duplikasi yang belum diputuskan, dan cara memeriksa peta ini sebelum membangun penyimpanan baru.",
+      "hash": "09b8c6a078144d9816af67138a293810a0951f088ed943e7b5ffcda25184aee2",
+      "ukuran_kb": 39.4,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis (identitas karyawan, departemen, hak akses, kontrak, jadwal, presensi, skor dan target KPI, insentif profit, toko per divisi, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab kapan salinan data dianggap sah (satu arah, tak ditulis tangan, berpenjaga), pengecualian ADR 0002 yang masih hidup (mis. task-management membaca DB service lain langsung), duplikasi yang belum diputuskan, koleksi yang sudah RETIRED (`marketing_teams`/`team_shops`, Fase Contract 2026-09-15), dan cara memeriksa peta ini sebelum membangun penyimpanan baru.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
@@ -10981,7 +10995,8 @@
         "salinan data",
         "duplikasi data",
         "database-per-service",
-        "ADR 0002"
+        "ADR 0002",
+        "retired collection"
       ]
     },
     {
@@ -11716,7 +11731,7 @@
         "APP - Web ERP"
       ],
       "hash": "0115ceffe21b522769faac6e9286fe16c1737ff46d15d0f58ff2e9333c9cd7f0",
-      "ukuran_kb": 14.2,
+      "ukuran_kb": 14.0,
       "ringkasan": "Menjawab: bagaimana menerbitkan akun ERP untuk vendor, mitra, atau kontraktor tanpa menjadikannya karyawan, lalu memberinya akses ke modul tertentu. Menjelaskan cara memilih antara dua sumbu hak akses yang paling sering tertukar (Paket Hak vs Role Modul), cara memperpanjang dan menutup akses beserta batasnya, serta gejala umum saat vendor sudah dibuat tapi tetap tak bisa masuk.",
       "kata_kunci": [
         "akun eksternal",
@@ -12240,8 +12255,8 @@
         "Microservices - Integration Service",
         "Microservices - Employee Service"
       ],
-      "hash": "384137253d81100a45581bd1eb6c91fc24f364b6683d99ba9e59e6a67473f1fe",
-      "ukuran_kb": 30.7,
+      "hash": "4ddeaf23f105ea993882f293cec41911c5a6b0e9c751d2c376195a22440b5b09",
+      "ukuran_kb": 30.8,
       "ringkasan": "Menjawab: bagaimana sistem membedakan order affiliate TikTok dari kreator internal (ICC, karyawan Bharata peserta program Internal Content Creator) versus kreator eksternal, yang sebelumnya hanya tampak sebagai `creator_username` di `affiliate_orders`. Menjelaskan mekanisme lama yang hardcoded di `internal-creators.ts` beserta alasan pencabutannya, tiga opsi arsitektur yang dipertimbangkan, dan mengapa rekomendasi Opsi A akhirnya di-supersede oleh pengelolaan langsung lewat ICC Management dengan koleksi `icc_affiliate_accounts` yang memisahkan kepemilikan dari penugasan. Memuat juga aturan normalisasi username, penanganan rename lewat edit di tempat plus alias, risiko akun bersama, aturan impor Excel, serta dua gap yang masih terbuka: `last_seen_at` yang field-nya ada tetapi tak punya satu pun penulis di kode, dan ketiadaan cara membedakan akun yang kena ban dari yang hidup karena `is_active` sudah dipakai untuk menandai baris registri yang pensiun.",
       "kata_kunci": [
         "ICC",
@@ -12440,9 +12455,9 @@
         "API - Marketing Analytics Service",
         "Sales - Marketing Dashboard (Index)"
       ],
-      "hash": "fdd990b530843f4018fc65a5d99e58417b3e8e43bcede002a76ed5336566b608",
-      "ukuran_kb": 14.4,
-      "ringkasan": "Arsip roadmap 30 Juni 2026 yang menjawab: komponen data, API client, dan halaman frontend apa saja yang sudah ada dan wajib dipakai ulang alih-alih dibangun ulang, serta apa saja yang saat itu masih kosong (HPP per SKU, config RAPB dan target, profit engine, penyimpanan video performance, client affiliate, live analytics, RBAC). Merinci sembilan engine yang diminta mockup beserta urutan pembangunannya dan peringatan agar definisi laba diselaraskan dulu dengan SPVProfitTier di service `insentive` supaya tidak lahir dua rumus laba. Juga menjawab dari mana data affiliate berasal, scope TikTok mana yang dibutuhkan (733764 Read Seller Affiliate Collaborations), bagaimana join lintas sumber divalidasi ke data produksi, dan apa saja blocker eksternal yang harus dikonfirmasi ke tim.",
+      "hash": "defcf9e5e85fedc950d8e5a2d42bd7ec280ca106b81d2db12a45cd6269d3346f",
+      "ukuran_kb": 14.5,
+      "ringkasan": "Arsip roadmap 30 Juni 2026 yang menjawab: komponen data, API client, dan halaman frontend apa saja yang sudah ada dan wajib dipakai ulang alih-alih dibangun ulang, serta apa saja yang saat itu masih kosong (HPP per SKU, config RAPB dan target, profit engine, penyimpanan video performance, client affiliate, live analytics, RBAC). Merinci sembilan engine yang diminta mockup beserta urutan pembangunannya dan peringatan agar definisi laba diselaraskan dulu dengan SPVProfitTier di service `insentive` supaya tidak lahir dua rumus laba. Juga menjawab dari mana data affiliate berasal, scope TikTok mana yang dibutuhkan (733764 Read Seller Affiliate Collaborations), bagaimana join lintas sumber divalidasi ke data produksi, dan apa saja blocker eksternal yang harus dikonfirmasi ke tim. Koleksi `marketing_teams`/`team_shops`/`team_members` yang disebut sebagai ACL tim→toko sudah RETIRED (Fase Contract 2026-09-15).",
       "kata_kunci": [
         "master roadmap",
         "marketing ads",
@@ -13246,7 +13261,7 @@
         "APP - Web ERP"
       ],
       "hash": "c4637f8509f5c1a5a4144b1a335e575e34704efa5110b9829b98aa991eb3b130",
-      "ukuran_kb": 8.5,
+      "ukuran_kb": 8.4,
       "ringkasan": "Menjawab: apa rencana penyatuan menu-menu gudang yang kini terpecah per-tahap (Perlu Diproses, Antrian Pesanan, Pengambilan, Pengemasan, Riwayat Cetak Resi, Serah Terima) menjadi satu layar omnichannel \"Kelola Pesanan\" ala Desty tanpa mengubah backend, dan apa beda pratinjau Beta FE-only (data dummy, aksi mati) dengan menu produksi yang sudah wired ke endpoint nyata. Juga menjelaskan pemetaan tiap tab/sub-tab \"Siap Dikirim\" ke endpoint warehouse/integration, rencana mutasi bertahap fase 0-5 sampai cutover, gerbang dan nuansa yang wajib dipertahankan saat \"cuma ganti UI\" (gerbang rekon `exported_at`, kode packer T1/T2, guard TikTok `package_id` kosong, batch cap 100), persona pengguna dan RBAC-nya, serta hal yang belum diputuskan (tab Belum Dibayar, cakupan Sadewa, nasib menu lama).",
       "kata_kunci": [
         "Kelola Pesanan",
@@ -13909,16 +13924,16 @@
       "area": "Workspace",
       "jenis": "workspace",
       "status_emoji": "✅",
-      "status_teks": "Perbaikan CEPAT (Temuan 2) sudah dikerjakan & terverifikasi live prod (2026-09-02, `common.IsMarketingDepartmentStaff`, bip-erp branch `fix/shop-acl-marketing-only`). **Redesign PENUH (Rekomendasi §1) SUDAH MERGE + DEPLOY + DIVERIFIKASI LIVE** — bip-erp branch `feat/acl-shops-department-source`, PR #1727 merge ke `main` 2026-09-05, `DepartmentShopLister` dikonfirmasi ada di biner prod `Integration-Service` per pengecekan 2026-09-14 (9 hari observasi live, lewat beberapa redeploy container lain). Riset awal dilakukan 2026-09-02 sebagai kelanjutan investigasi Fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]], setelah rencana \"cabut menu Teams sepenuhnya\" dibatalkan karena ditemukan fungsi ACL yang masih aktif. **Dengan ini, syarat \"redesign di-deploy DAN diverifikasi live beberapa waktu\" di §Di luar lingkup terpenuhi — Fase Contract (lihat dokumen itu) sekarang bisa mulai direncanakan.**",
+      "status_teks": "Perbaikan CEPAT (Temuan 2) sudah dikerjakan & terverifikasi live prod (2026-09-02, `common.IsMarketingDepartmentStaff`, bip-erp branch `fix/shop-acl-marketing-only`). **Redesign PENUH (Rekomendasi §1) SUDAH MERGE + DEPLOY + DIVERIFIKASI LIVE** — bip-erp branch `feat/acl-shops-department-source`, PR #1727 merge ke `main` 2026-09-05, `DepartmentShopLister` dikonfirmasi ada di biner prod `Integration-Service` per pengecekan 2026-09-14 (9 hari observasi live, lewat beberapa redeploy container lain). Riset awal dilakukan 2026-09-02 sebagai kelanjutan investigasi Fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]], setelah rencana \"cabut menu Teams sepenuhnya\" dibatalkan karena ditemukan fungsi ACL yang masih aktif. **Fase Contract sendiri sudah SELESAI DIKERJAKAN 2026-09-15** (bip-erp PR #1888, erp-frontend PR #1579) — lihat [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] §Migrasi langkah 4 untuk cakupan lengkap pencabutannya.",
       "publik": false,
       "tautan": [
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "Microservices - Integration Service",
         "API - Integration Service"
       ],
-      "hash": "9ee7eb444ac78e5b962ac498951e620628442c28c6f190d3af1efb7982706491",
-      "ukuran_kb": 15.9,
-      "ringkasan": "Menjawab: bagaimana mekanisme ACL yang membatasi daftar toko marketplace yang boleh dilihat staf marketing (AllowedShops di endpoint GET /transactions/master/shops, integration-service) bekerja, kenapa sumber datanya bisa dipindah dari team_members/team_shops ke department_shops + work_data.department, dan bug apa yang sempat membuat staf non-marketing menerima daftar toko kosong. Juga mencatat status redesign: sudah dikodekan, di-merge (PR #1727, 2026-09-05), di-deploy, dan diverifikasi live di prod (dikonfirmasi ulang 2026-09-14, 9 hari observasi) — sehingga syarat untuk memulai Fase Contract (pencabutan team_shops/team_members/menu Teams) kini terpenuhi. Juga mencatat batas lingkup keputusan yang sengaja tidak diubah (gate rute RequireIntegrationStaff, exemption admin/supervisor integration).",
+      "hash": "15311d96ce19afd582bf5609ce8312b1a5433f1db782391b9b5f1d1bfe023c1f",
+      "ukuran_kb": 15.8,
+      "ringkasan": "Menjawab: bagaimana mekanisme ACL yang membatasi daftar toko marketplace yang boleh dilihat staf marketing (AllowedShops di endpoint GET /transactions/master/shops, integration-service) bekerja, kenapa sumber datanya bisa dipindah dari team_members/team_shops ke department_shops + work_data.department, dan bug apa yang sempat membuat staf non-marketing menerima daftar toko kosong. Mencatat status FINAL: redesign merge+deploy+live (PR #1727, 2026-09-05) DAN Fase Contract-nya SENDIRI SUDAH SELESAI (2026-09-15, bip-erp PR #1888 + erp-frontend PR #1579) — team_shops/team_members/menu Teams/CRUD-nya sudah dicabut fisik dari kode. Juga mencatat batas lingkup keputusan yang sengaja tidak diubah (gate rute RequireIntegrationStaff, exemption admin/supervisor integration).",
       "kata_kunci": [
         "AllowedShops",
         "ACL toko",
@@ -13930,7 +13945,8 @@
         "integration-service",
         "marketing ACL",
         "redesign ACL",
-        "fase contract"
+        "fase contract",
+        "ShopACLUseCase"
       ]
     },
     {
@@ -14303,7 +14319,7 @@
         "WH - Warehouse Sadewa"
       ],
       "hash": "256b39d712a784b9ff443d528747ca065ab9eb8bbe91a08ffc13607cc07cb67a",
-      "ukuran_kb": 17.9,
+      "ukuran_kb": 17.7,
       "ringkasan": "Menjawab kenapa sidebar erp-frontend memicu request polling 30 detik ke endpoint warehouse/sadewa/accurate untuk semua karyawan tanpa peduli role atau halaman yang dibuka, dan rencana perbaikannya lewat gerbang enabled yang diturunkan dari menu yang benar-benar tampil. Memuat dua pembaruan 2026-08-29 yang menandai sebagian rencana ini usang lalu sebagian lagi sudah dikerjakan lewat jalan lain: branch fix/badge-sidebar-per-halaman memilih gerbang HALAMAN, sehingga Task 4 (kuartet refetch) gugur karena keduanya alternatif bukan pelengkap, Task 1 dan 3 turun prioritas, dan Task 5 tetap berdiri sendiri.",
       "kata_kunci": [
         "sidebar",

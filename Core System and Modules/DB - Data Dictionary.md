@@ -62,7 +62,7 @@ Doc: [[Microservices - Integration Service]]
 - **items** (`ItemProduct`): _id, parent_id?, name?, item_type?, sku?, base_price? (float64), has_children? (bool), variations? ([]ItemProduct), items? ([]BundleItemDetail), bundle_contents? ([]BundleItem), created_at, updated_at, deleted_at?
 - **credentials**: `Credential`{_id, platform, store_id, key, value} · `ShopeeCredential`{_id, name, access_token, refresh_token, expire_in (int64), shop_id_list ([]int64), user_id_list, supplier_id_list, merchant_id_list, account_type, metric_types ([]string), expired_at, created_at, updated_at, deleted_at?}
 - **holidays** (`Holiday`): _id, date (YYYY-MM-DD), description
-- **marketing_teams** (`MarketingTeam`): _id, name, description, created_at, updated_at, deleted_at?
+- ⛔ **marketing_teams** — **RETIRED 2026-09-15** (Fase Contract, [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]). Entity `MarketingTeam` (dulu: _id, name, description, created_at, updated_at, deleted_at?) sudah dihapus dari kode; koleksi Mongo dibiarkan sebagai data mati (tak ada kode yang membaca/menulisnya lagi), sengaja tidak di-drop. Kepemilikan toko kini `department_shops`.
 - **accurate_products** (`AccurateProduct`): _id, item_id, item_name?, item_sku?, item_base_price? (float64), item_type?, product_code, created_at, updated_at
 - **accurate_bank_accounts** (`AccurateBankAccount`): _id, bank_name, bank_code, branch_name, branch_code, account_name, account_number, account_currency, accurate_id, created_at, updated_at
 - **accurate_kv_configs** (`AccurateKVConfig`): _id, key, value, description, type, created_at, updated_at

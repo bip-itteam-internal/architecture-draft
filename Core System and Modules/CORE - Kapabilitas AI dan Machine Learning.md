@@ -208,7 +208,7 @@ Kurir tidak membedakan, karena hampir seluruh pengiriman TikTok memakai J&T. Atu
 
 Kepemilikan toko dibaca dari pemetaan ICC yang sudah ada, bukan ditebak dari nama toko. Dua kenyataan yang membentuknya: **satu toko dapat dipegang lebih dari satu orang** (terukur di produksi 2026-07-31), dan **cakupannya tidak pernah penuh**. Keadaan belum termapping karena itu wajib punya tampilannya sendiri yang tidak dapat disalahbaca, bukan didiamkan.
 
-⚠️ Angka cakupannya bergerak, jadi jangan disalin dari komentar kode. Komentar di `penanggung_jawab.go` menyebut 37 dari 38 toko (terukur 1 sampai 12 Agustus 2026), sedangkan catatan job di produksi pada 2026-08-28 menyebut **55 toko dari dua sumber** (`icc_account_mappings` dan `team_shops`). Toko di luar itu berbunyi "belum ditetapkan" sampai mapping-nya dilengkapi lewat ICC Management atau Teams.
+⚠️ Angka cakupannya bergerak, jadi jangan disalin dari komentar kode. Komentar di `penanggung_jawab.go` menyebut 37 dari 38 toko (terukur 1 sampai 12 Agustus 2026), sedangkan catatan job di produksi pada 2026-08-28 menyebut **55 toko dari dua sumber** (`icc_account_mappings` dan `team_shops`). Toko di luar itu berbunyi "belum ditetapkan" sampai mapping-nya dilengkapi lewat ICC Management (menu Teams yang dulu jadi alternatif sudah dicabut total 2026-09-15, Fase Contract).
 
 ## Konsumen Data
 

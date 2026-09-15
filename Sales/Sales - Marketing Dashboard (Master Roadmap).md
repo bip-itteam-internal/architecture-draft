@@ -25,7 +25,7 @@ Mayoritas data sudah mengalir & sebagian UI sudah ada (tersebar di module accura
 - `tt_business_integrated_reports` / `_summary_reports` — ads metrics per-ad + summary advertiser
 - `shopee_gms_item_performances` / `_campaign_performances` — ads Shopee
 - `shopee_escrow_details`, `tt_shop_transaction_by_orders` — settlement real
-- `marketing_teams` / `team_members` / `team_shops` — ACL tim→toko (employee_id)
+- ⛔ `marketing_teams` / `team_members` / `team_shops` — RETIRED 2026-09-15 (Fase Contract). Kepemilikan toko kini `department_shops`; ACL "siapa boleh lihat toko apa" kini `ShopACLUseCase` baca `department_shops` juga
 - `items` — master SKU+nama+base_price (**tanpa HPP**)
 
 ### API client existing
@@ -163,7 +163,7 @@ order/settlement (tt_shop_order_details)
 | **2. Profit Engine** | join (no ingest baru) | gmv-max product report, transaction income, settlement | — |
 | **3. Dashboard tab 1–4** | FE + endpoint | ads-analytics, product-performance, integration-accurate | — |
 | **4. Creative + Creator** | wire `GetShopVideoPerformance` → simpan → FE; ganti MOCK_ADS_CONTENT | video API existing, incentive videos[] | map open_id→employee |
-| **5. Marketing/Creator akuntabilitas** | reuse incentive engine + ACL | **finance/incentive**, marketing_teams | perluas role/mapping |
+| **5. Marketing/Creator akuntabilitas** | reuse incentive engine + ACL | **finance/incentive**, `department_shops` (dulu `marketing_teams`, RETIRED 2026-09-15) | perluas role/mapping |
 | **6. Affiliate** | client baru (API resmi ada) | komisi total existing (sbg biaya) | **konfirmasi scope app** |
 | **7. Live** | riset dulu | — | sumber gelap |
 | **8. RBAC** | tata kelola | — | terakhir (belum urgent) |
