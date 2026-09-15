@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-15",
-  "jumlah_dokumen": 412,
+  "jumlah_dokumen": 413,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -593,6 +593,7 @@
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift",
         "API - Index",
+        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus",
         "ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
@@ -601,22 +602,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "0a8847c0e076df331d9b917763d92b57fa29a7347de99f629c40d3d44f186faa",
-      "ukuran_kb": 55.6,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda dan vonis laba, ambang ROAS, pagu belanja iklan, kurva alokasi, laba per toko/produk/kampanye, video dan live, pencatatan sesi live host `/live-shifts` termasuk ambil alih sesi, retur, price floor, job, dan pengumpul KPI), serta siapa yang boleh menulis (gerbang `RequireMarketingLeader`, kepemilikan PATCH). Juga menjawab konvensi responsnya (`unavailable_channels`, `kolom_tidak_berlaku`, paginasi drill, 400 untuk enum tak dikenal, batas hari WIB), arti lima nilai vonis (`tanpa_data`, `belum_matang`, `rugi`, `waspada`, `sehat`) dan makna `null` versus nol, sumber `/divisi` (`department_shops`, bukan lagi `marketing_teams` sejak menu Teams dicabut total 2026-09-15), plus cara mengaudit kelengkapan daftar route terhadap kode.",
+      "hash": "bc4244cf04b11c547bde989faf5eba4d6e3559ff1ec654c41ad9b7b8822336ea",
+      "ukuran_kb": 55.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda, ambang, pagu, kurva alokasi, laba, video dan live, pencatatan sesi live host, retur, price floor, job, pengumpul KPI), parameter serta konvensi responsnya (amplop rows/unavailable_channels, kolom_tidak_berlaku, paginasi drill, batas hari WIB), dan endpoint mana yang digerbang RequireMarketingLeader. Juga menjelaskan arti lima nilai vonis laba (tanpa_data, belum_matang, rugi, waspada, sehat), makna null vs nol, dan cara mengaudit kelengkapan daftar route terhadap kode.",
       "kata_kunci": [
         "marketing analytics",
-        "endpoint API",
+        "API endpoint",
         "beranda",
-        "vonis laba",
         "ambang ROAS",
-        "pagu iklan",
+        "pagu belanja iklan",
+        "ad budget",
+        "vonis laba",
         "live-shifts",
         "sesi live host",
-        "ambil alih sesi",
-        "price floor",
-        "divisi",
-        "department_shops"
+        "price floor"
       ]
     },
     {
@@ -1433,6 +1432,7 @@
         "API - Employee Service",
         "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
         "Microservices - Calendar Service",
+        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Attrition",
         "Microservices - Attendance Service",
@@ -1501,20 +1501,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "741d9465e6c86b17e07f52cf802697c5380d6f002ea76ac3920c822feab52bed",
-      "ukuran_kb": 454.6,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS `erp-frontend` (One Bharata, Next.js), stack yang dipakai, cara login dan refresh token, perannya sebagai SSO Identity Provider, serta bagaimana `system_roles` dan paket izin menggerbang menu sidebar. Menjelaskan fitur multi-perusahaan (pemilih perusahaan admin pusat, rekrutmen lintas perusahaan), pengelompokan menu HRIS dan Pengaturan HRGA terpusat beserta tab-tabnya. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts dengan `ChartContainer`, daftar modul yang ada, dan dependensi integrasinya.",
+      "hash": "30e1954f0391fb5d5724d5457059b75d8e6abff5cd3cb647e0ede506c4fefb9f",
+      "ukuran_kb": 457.7,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS (hris-dashboard, One Bharata) beserta stack-nya, bagaimana login, SSO identity provider, dan system_roles menggerbang menu sidebar, serta bagaimana menu HRIS dan Pengaturan HRGA dikelompokkan. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts/ChartContainer, fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), dan daftar modul/fitur yang ada di web.",
       "kata_kunci": [
+        "web ERP",
         "erp-frontend",
-        "Web ERP",
         "hris-dashboard",
         "One Bharata",
-        "Next.js",
         "SSO",
         "system_roles",
         "sidebar menu",
         "Pengaturan HRGA",
-        "TanStack Query"
+        "TanStack Query",
+        "Recharts"
       ]
     },
     {
@@ -2663,6 +2663,8 @@
         "Microservices - Integration Service",
         "ADR - 0002 Database-per-Service",
         "API - Marketing Analytics Service",
+        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
+        "REF - Kepemilikan Data",
         "APP - Web ERP",
         "Microservices - Employee Service",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
@@ -2690,20 +2692,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "f0b3d177306958fdc3a3899d073927e48285d2703080b8d0adcb376f1c134647",
-      "ukuran_kb": 139.1,
-      "ringkasan": "Menjawab: bagaimana service marketing-analytics menghitung laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live dari integration_db (baca-saja) ke koleksi mart_*, endpoint apa saja yang tersedia (beranda, ambang, pagu, analisis live, Account Specialist, KPI host live, live-shifts), dan bagaimana penjadwal 48 jam serta job sync bekerja. Juga menjawab aturan pemakaian angka supaya tidak hitung ganda (iklan_sia_sia, pembatalan, GMV live), logika vonis lima keadaan di beranda, perbedaan sumber TikTok, Shopee, dan Lazada, serta batas hari WIB vs UTC.",
+      "hash": "1d26e1e2293cb06ef578779f0cbd8a505679cd1aa16f17a35fc77dbb456031a9",
+      "ukuran_kb": 139.8,
+      "ringkasan": "Menjawab: bagaimana service marketing-analytics membangun mart laba dan performa marketing (toko, produk, kampanye, iklan, video, live) dari integration_db secara baca-saja, bagaimana penjadwal 48 jam dan job sync bekerja, koleksi mart apa saja yang ada, dan sumber data per channel TikTok, Shopee, Lazada. Juga menjelaskan logika vonis beranda (termasuk belum_matang dan pita materialitas), pencatatan serta ambil alih sesi live host, alokasi bundel dan mapping SKU, serta aturan pemakaian angka supaya tidak hitung ganda (iklan_sia_sia, pembatalan, 24h_live_gmv, revenue setelah diskon).",
       "kata_kunci": [
-        "marketing-analytics",
-        "marketing analytics",
-        "laba",
-        "profit",
+        "marketing-analytics service",
         "mart_profit_attribution",
+        "laba marketing",
+        "profit attribution",
+        "job sync",
+        "penjadwal 48 jam",
         "sesi live",
-        "live-shifts",
-        "ROAS",
-        "iklan",
-        "job sync"
+        "live shift",
+        "hitung ganda",
+        "iklan_sia_sia"
       ]
     },
     {
@@ -6640,6 +6642,42 @@
         "amandemen ADR 0001",
         "cakupan akses per CV",
         "jurnal otomatis"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance.md",
+      "judul": "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "**Diterima, terimplementasi di branch, belum merge** (dicatat 2026-09-15, ukur ulang sebelum dipakai): erp-frontend `feat/marketing-iklan-dashboard`. Tanpa perubahan backend, env, maupun kontrak.",
+      "publik": true,
+      "tautan": [
+        "REF - Kepemilikan Data",
+        "Finance - Rancangan Finance Service",
+        "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
+        "Sales - Dashboard per Posisi (Beauty Hacks & Kyura)",
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "Microservices - Marketing Analytics Service",
+        "API - Marketing Analytics Service",
+        "Sales - Marketing Analytics (Audit Ketersediaan Data)",
+        "APP - Web ERP",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
+      ],
+      "hash": "94efadb8519b584d49643ed29cda5597994f4961a4669d9444df1afc54527be9",
+      "ukuran_kb": 10.9,
+      "ringkasan": "Menjawab: dari mana angka anggaran iklan (budget terpakai) di Ringkasan Marketing diambil, yaitu Master Anggaran OPEX Finance akun Beban Iklan per departemen Accurate, bagaimana brand Beauty Hacks dan Kyura dipetakan ke departemen Accurate, dan kenapa anggaran tidak dijumlah antar brand. Juga menjelaskan nasib mart_pagu, beda ROAS vs target dengan ROI laba, keadaan layar saat anggaran belum ada, nol, atau terkunci, dan kenapa SPV/Leader brand mendarat di Ringkasan Marketing.",
+      "kata_kunci": [
+        "ADR 0097",
+        "anggaran iklan",
+        "ad budget",
+        "budget terpakai",
+        "Master Anggaran OPEX",
+        "Beban Iklan",
+        "mart_pagu",
+        "ROAS vs target",
+        "ROI laba",
+        "isPemimpinBrand"
       ]
     },
     {
@@ -11059,6 +11097,8 @@
         "Microservices - Integration Service",
         "ADR - 0001 Akuntansi via Accurate",
         "External - Accurate",
+        "Finance - Rancangan Finance Service",
+        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia",
         "GA - Inventory Management",
         "ADR - 0049 Padanan Aset per-item berbasis nama menggantikan kategori-golongan",
@@ -11090,22 +11130,23 @@
         "DB - Data Dictionary",
         "REF - PRD ERP",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
-        "Microservices - Inventory Service"
+        "Microservices - Inventory Service",
+        "Microservices - Marketing Analytics Service"
       ],
-      "hash": "9d76463321707b4ad00b8f96d20b7bc69f91cccb7d283ed5ccfc1025d7ff204a",
-      "ukuran_kb": 40.6,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis (identitas karyawan, departemen, hak akses, kontrak, jadwal, presensi, KPI, target insentif, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Menjelaskan empat aturan kepemilikan data, salinan yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih ada di kode, duplikasi yang belum diputuskan, serta cara memakai peta ini sebelum membangun fitur baru agar tidak menduplikasi data milik departemen lain.",
+      "hash": "c74255512f5ed443dc1d435c90651c32acb89e6ce7587770e2327787ac96aa6d",
+      "ukuran_kb": 42.7,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki suatu fakta bisnis (identitas karyawan, jadwal, presensi, skor dan target KPI, target insentif profit, dll), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga mendaftar salinan data yang sah beserta arah sinkron dan penjaganya, pengecualian ADR 0002 yang masih hidup (mis. task-management membaca database lain langsung), duplikasi fakta yang belum diputuskan, dan cara memeriksanya sebelum membangun penyimpanan baru.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
+        "satu fakta satu pemilik",
         "single source of truth",
-        "satu fakta satu tempat",
         "database-per-service",
         "ADR 0002",
         "SyncCollection",
-        "duplikasi data",
         "salinan data",
-        "pemilik fakta"
+        "duplikasi fakta",
+        "service pemilik"
       ]
     },
     {
@@ -12158,6 +12199,7 @@
       "tautan": [
         "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
         "Sales - Marketing Dashboard (Index)",
+        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "HRIS - Matriks KPI per Departemen",
         "APP - Web ERP",
         "Finance - Incentive",
@@ -12169,20 +12211,20 @@
         "Sales - Marketing Analytics (Audit Ketersediaan Data)",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing"
       ],
-      "hash": "ff2d03974b87cceb8556e20c959a6ae89d2ee1b4bca5fa6a14c2273498cd19fb",
-      "ukuran_kb": 14.8,
-      "ringkasan": "Menjawab: dashboard apa yang layak dirancang untuk tiap posisi di divisi Beauty Hacks dan Kyura (ICC/Account Specialist, Leader, Marketplace Advertiser, Affiliate, Host Live, Customer Support, Supervisor), metrik KPI dan target per brand, serta visual utamanya. Juga menjawab posisi mana yang tidak direkomendasikan dibuatkan dashboard (Meta Advertiser, Buzzer, Video Editor), bagaimana atribusi ke orang bekerja (`icc_account_mappings` versus `creator_username`), kenapa ROAS per-video tak dapat diandalkan, dan kebutuhan backend apa yang harus dipenuhi lebih dulu.",
+      "hash": "51191d60a639f877efeabaad9ed713a5237a50a1cefc12c99e9bd0ec265afe32",
+      "ukuran_kb": 16.1,
+      "ringkasan": "Menjawab: dashboard apa yang layak dibuat untuk tiap posisi di divisi Beauty Hacks dan Kyura (ICC/Account Specialist, Leader, Marketplace Advertiser, Affiliate, Host Live, Customer Support, Supervisor), metrik KPI dan target per brand, serta sumber data dan cara atribusinya ke orang (icc_account_mappings, creator_username). Juga menjelaskan posisi yang tidak direkomendasikan dibuatkan dashboard (Meta Advertiser, Buzzer, Video Editor), peringatan ROAS per video, tampilan bawaan SPV/Leader, dan kebutuhan backend yang terurut.",
       "kata_kunci": [
         "dashboard per posisi",
         "Beauty Hacks",
         "Kyura",
-        "KPI",
         "ICC",
         "Account Specialist",
         "Host Live",
-        "atribusi",
-        "ROAS per video",
-        "ADR 0076"
+        "Marketplace Advertiser",
+        "KPI brand",
+        "icc_account_mappings",
+        "SPV Leader"
       ]
     },
     {
@@ -12447,6 +12489,7 @@
       "publik": true,
       "tautan": [
         "Microservices - Marketing Analytics Service",
+        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "DB - Data Dictionary",
         "APP - Web ERP",
         "Microservices - Inventory Service",
@@ -12456,20 +12499,20 @@
         "Sales - Marketing Dashboard (Index)",
         "ADR - 0008 Profit Engine Join via item_group_id"
       ],
-      "hash": "152cb06264be80ad39feec48b7c8ff755405454d1c4fee2bfc9bfb87d34931c5",
-      "ukuran_kb": 19.7,
-      "ringkasan": "Menjawab: dari metrik prototipe Bharata Command Center milik Direktur, mana yang datanya sudah ADA, perlu RAKIT, TIPIS, atau TIDAK ADA di marketing-analytics, beserta endpoint untuk tiap 13 halamannya. Juga menjawab kenapa cakupan metrik iklan TikTok rendah sementara Shopee lengkap, cara menghitung konversi, CPA, dan ROAS Shopee dari report.expense dan broad_order, serta jebakan seperti menjumlahkan broad_order dengan direct_order atau membaca laba dari baris level campaign.",
+      "hash": "84a2e23e931319e3d3e03fcca6366fef2e94dd5f9c914cf4bc353c035b5b2c95",
+      "ukuran_kb": 20.2,
+      "ringkasan": "Menjawab: dari metrik prototipe Bharata Command Center milik Direktur, mana yang datanya sudah ada, perlu dirakit, tipis, atau tidak ada di marketing-analytics, dan endpoint mana yang memenuhi tiap halaman prototipe. Juga menjelaskan kenapa cakupan metrik iklan TikTok rendah sementara Shopee lengkap, jebakan broad_order vs direct_order dan total_advertising_cost, di level mana laba Shopee sah dibaca, serta keputusan yang diminta (kejar sumber data atau coret).",
       "kata_kunci": [
         "audit ketersediaan data",
+        "data availability",
         "prototipe Direktur",
         "Bharata Command Center",
-        "cakupan metrik iklan",
+        "metrik iklan",
+        "cakupan data",
         "CPA",
         "ROAS",
-        "konversi iklan",
         "Shopee GMS",
-        "TikTok Ads",
-        "funnel"
+        "TikTok Ads"
       ]
     },
     {
