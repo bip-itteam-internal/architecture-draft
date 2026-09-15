@@ -1,8 +1,8 @@
-# Desain: Kantor Agent, denah isometrik sesi Claude Code yang hidup (v1.20.0)
+# Desain: Kantor Agent, denah isometrik sesi Claude Code yang hidup (v1.20.0, v2 di 1.21.0)
 
-- **Status**: ✅ Implemented, agent-kit 1.20.0 (2026-09-15). Desain disetujui pemilik per bagian pada hari yang sama; yang berubah saat implementasi dan review dicatat di § Perubahan dari desain awal
-- **Tanggal**: 2026-09-15
-- **Versi kit**: 1.20.0 (dari 1.19.0)
+- **Status**: ✅ Implemented, agent-kit 1.20.0 (2026-09-15), v2 di 1.21.0 (2026-09-16). Desain disetujui pemilik per bagian pada hari yang sama; yang berubah saat implementasi dan review dicatat di § Perubahan dari desain awal. **v2 menggantikan sebagian bagian di bawah** (sumber sesi, menunggu izin, tugas latar, penulis tunggal, kontrak data versi 2): lihat § v2 di akhir dok
+- **Tanggal**: 2026-09-15 (v2: 2026-09-16)
+- **Versi kit**: 1.20.0 (dari 1.19.0); v2 1.21.0
 - **Keputusan arsitektur**: `Decisions/ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak` (baris Kantor Agent di tabel Revisi)
 - **Cara kerja untuk pembaca non-kit**: `IT/IT - Gerbang Repo dan Papan Sesi Agent` (bagian Kantor Agent)
 - **Mockup**: lokal di `.task-plans/mockup/` pada mesin perancang. Sengaja tidak disalin ke vault karena memuat judul sesi nyata, dan repo vault PUBLIC
@@ -410,13 +410,14 @@ dan menempelkan keluarannya.
 ## Batas yang disadari
 
 - **Prompt izin tidak tercatat di transkrip.** Tool yang tertunda lebih dari 60 detik diberi tanda
-  "?" dengan keterangan itu, bukan ditebak.
+  "?" dengan keterangan itu, bukan ditebak. 1.21.0 membacanya dari registri sesi (§ v2); tanda "?"
+  tinggal untuk mode transkrip.
 - **Format transkrip internal.** Bisa patah di rilis Claude Code mana pun; terdeteksi sebagai
   "format berubah", dan perbaikannya di kit.
 - **Satu mesin, dan hanya sesi yang `cwd`-nya di dalam workspace.** Sesi yang dibuka dari folder di
   luar workspace (misalnya worktree `C:\wt\...`) tidak tampil.
 - **Menunggu tugas shell latar (`run_in_background`) tidak dibedakan dari menunggu Anda**: Lead
-  tampil di lounge. Subagent latar tertangani karena transkripnya sendiri hidup.
+  tampil di lounge. Subagent latar tertangani karena transkripnya sendiri hidup. Ditutup di 1.21.0 (§ v2).
 - **Tool yang sudah berjalan sebelum pesan asistennya selesai ditulis belum terlihat.** Claude Code
   menjalankan tool call pertama selagi model masih menulis tool call berikutnya di pesan yang sama,
   tetapi baris pesan baru masuk ke transkrip setelah pesannya lengkap. Selama itu robot tampil
@@ -424,9 +425,10 @@ dan menempelkan keluarannya.
   14:15:31 karena tool call kedua memuat perintah panjang.
 - **Langkah model yang sangat panjang** tanpa tulisan transkrip bisa memicu tanda "diam" walau sesi
   masih bekerja.
-- **Sesi yang ditutup tanpa `SessionEnd`** baru pulang setelah 30 menit tanpa tulisan transkrip.
+- **Sesi yang ditutup tanpa `SessionEnd`** baru pulang setelah 30 menit tanpa tulisan transkrip. Dengan
+  registri (1.21.0) sesi pulang begitu prosesnya mati atau berkas registrinya terhapus.
 - **Dua `/kantor-agent` pada detik yang sama** bisa menyalakan dua penulis yang menulis isi sama;
-  `--berhenti` hanya menghentikan yang tercatat di berkas PID.
+  `--berhenti` hanya menghentikan yang tercatat di berkas PID. Ditutup di 1.21.0 dengan kunci penulis (§ v2).
 - **Launcher `.sh` belum pernah dijalankan** di mac/linux; galatnya terlihat oleh pemakai pertama.
 
 ## Belum diputuskan (TBD)
@@ -454,3 +456,116 @@ diperbarui di bagian masing-masing; daftar ini hanya penunjuk.
 - Dari `/review`: ambang diam dan hidup dibaca halaman dari data (§ Penanda); data `--sekali` tampil
   sebagai snapshot (§ Halaman, § Galat); teks papan area dan angka 60 detik masing-masing hidup di
   satu konstanta template.
+
+## v2 (kit 1.21.0, 2026-09-16)
+
+Menutup kekurangan 1.20.0 atas permintaan pemilik. Rencana dan catatan implementasinya ada di
+`.task-plans/2026-09-15-kantor-agent-v2.md` pada workspace pelaksana (bukan repo).
+
+### Keputusan pemilik
+
+| # | Pertanyaan | Dipilih | Ditolak, dan kenapa |
+|---|---|---|---|
+| 1 | Latensi tool | tanpa hook per tool call | hook `PreToolUse`/`PostToolUse`: spawn Python 0,65 sampai 0,9 detik per tool call di semua sesi |
+| 2 | Sesi hidup | registri sesi tiap tick, dicocokkan `claude agents --json` tiap 60 detik | `claude agents --json` per tick: 2,3 sampai 9,5 detik per panggilan |
+| 3 | Jalan ke sesi | tombol salin id + petunjuk | memfokuskan jendela sesi lewat protocol handler Windows |
+| 4 | Pixel Agents | spike mode tanpa hook | memasang hook globalnya: lewat persetujuan UI dan mengubah `~/.claude/settings.json` |
+
+### Sumber
+
+- **Registri sesi** `~/.claude/sessions/<pid>.json`, format internal yang diamati di Claude Code 2.1.269. Kunci
+  yang dipakai: `sessionId`, `pid`, `cwd`, `status` (busy/idle/waiting), `statusUpdatedAt`, `waitingFor` (hanya
+  selama dialog terbuka), `startedAt`, `procStart`, `entrypoint`, `name`, `updatedAt`. Berkasnya terhapus saat
+  sesi ditutup.
+- Proses dianggap hidup lewat `OpenProcess` + `GetExitCodeProcess`, dan waktu buatnya harus sama dengan
+  `procStart` (FILETIME `GetProcessTimes`, cocok di 6 dari 6 sesi) supaya PID yang didaur ulang tak terbaca hidup.
+  `os.kill(pid, 0)` hanya dipakai di posix, karena di Windows ia memanggil TerminateProcess.
+- **Cek silang** `claude agents --json` (terdokumentasi) tiap 60 detik sebagai subprocess yang tak ditunggu, batas
+  30 detik, keluaran ke berkas sementara. Himpunan sesi yang berbeda dua kali berturut-turut membuat
+  `skema.registri_cocok = false` dan memasang banner.
+- Registri tak terbaca: mode 1.20.0 (transkrip ≤ 30 menit), `skema.sumber_hidup = "transkrip"`, dan banner.
+- Ekor transkrip tetap menentukan tool, area, judul, PR, dan subagent.
+
+### S0: sumber "menunggu izin"
+
+Selama dialog AskUserQuestion sesi pelaksana terbuka (2026-09-15), registri berubah di detik yang sama ke
+`status: "waiting"` + `waitingFor: "input needed"`, lalu kembali `busy` saat dijawab. Hook percobaan
+`PermissionRequest` menyala di detik yang sama, `Notification permission_prompt` 8 detik kemudian. Registri cukup
+dan lebih cepat, jadi opsi hook tidak dibangun dan ADR 0077 tak perlu direvisi. Nilai `permission prompt` untuk
+dialog izin tool mengikuti dok Claude Code dan belum teramati langsung.
+
+### Model keadaan v2
+
+| Urutan | Kondisi | Area | Keadaan |
+|---|---|---|---|
+| 1 | registri `waiting`, `waitingFor` memuat "permission" | area tool tertunda, atau Lounge | `menunggu_izin` |
+| 2 | registri `waiting` karena alasan lain | Lounge (AskUserQuestion membawa header-nya; alasan lain tampil apa adanya) | `menunggu_anda` |
+| 3 | ada `tool_use` tertunda | seperti 1.20.0 | `alat` / `menunggu_anda` |
+| 4 | giliran selesai (registri tidak busy; mode transkrip: `end_turn`) dan tugas shell latar belum selesai | Ruang server | `menunggu_latar` |
+| 5 | giliran selesai dan subagent hidup | Ruang rapat | `menunggu_subagent` |
+| 6 | giliran selesai | Lounge | `menunggu_anda` |
+| 7 | selain itu | Meja | `berpikir` |
+
+Registri menang atas transkrip untuk "prosesnya sedang bekerja atau tidak": statusnya berubah seketika,
+sedangkan baris transkrip bisa tertulis belakangan. Diam dihitung dari yang terbaru antara kejadian terakhir dan
+`statusUpdatedAt`.
+
+### Tugas shell latar
+
+- **Dimulai**: tool_result ber-`toolUseResult.backgroundTaskId`, untuk tool_use ber-`run_in_background` atau
+  perintah yang dipindah ke latar karena timeout 180 detik (tanpa `run_in_background`, ber-`timedOutAfterMs`).
+- **Selesai**: `<task-notification>` ber-`<task-id>` di `queue-operation` atau pesan user, atau tool_result TaskStop
+  yang tidak `is_error`. Tugas yang dihentikan TaskStop tak pernah mendapat notifikasi (terukur 2 dari 2).
+- Tugas yang dimulai sebelum `startedAt` registri (sesi dilanjutkan di proses baru) tidak ditunggu; `startedAt`
+  terukur 1,6 sampai 8,9 detik sesudah `procStart`.
+- Dilacak **bertahap per transkrip**, bukan dari ekor 64 KB. Jarak awal tugas ke notifikasinya terukur p50 78 KB,
+  p90 480 KB, maks 6,6 MB atas 430 tugas di 35 transkrip 7 hari (239 lebih dari 64 KB). Berkas yang pertama kali
+  terlihat dibaca dari 8 MB terakhir, sesudahnya hanya byte baru; baris tanpa penanda dilewati sebelum `json.loads`;
+  berkas yang mengecil membuat pelacaknya mulai ulang. Satu aturan (`lacak_latar`) dipakai urai ekor dan pelacak.
+
+### Penulis tunggal
+
+Penulis memegang kunci `.task-plans/kantor-agent.lock` (`msvcrt.locking` / `fcntl.flock`) selama hidup. Penulis
+kedua keluar 4; launcher membaca exit 4 sebagai "sudah jalan" lalu menunggu PID pemenangnya. Venv `python.exe` di
+Windows adalah redirector yang menjalankan base python sebagai proses anak dengan command line yang sama, jadi dua
+proses per penulis bukan penulis ganda; PID yang dicatat milik anaknya.
+
+### Kontrak data versi 2
+
+`versi: 2`. Tambahan di `skema`: `sumber_hidup` ("registri" | "transkrip"), `registri_dicek`, `registri_cocok`,
+`registri_catatan`. Tambahan per sesi: `asal` (entrypoint registri), `nama`, `pid`, `status_proses`, `menunggu`
+(`waitingFor`). `keadaan` bertambah `menunggu_izin` dan `menunggu_latar`. Halaman tidak menafsirkan data versi lain:
+robot dipulangkan dan banner menyuruh `--berhenti` lalu `/kantor-agent`. Kedua angka versi dijaga test.
+
+### Halaman
+
+- `menunggu_izin`: robot bersinar, gelembung "! izin" yang tak ikut label ringkas ruang padat dan tak pernah
+  diredupkan, chip "! izin" di kartu.
+- `menunggu_latar`: gelembung dan kartu "tugas latar" di Ruang server.
+- Tanda "?" tebakan izin hanya di mode transkrip.
+- Kartu: asal (VS Code / terminal), petunjuk (nama, pid), dan tombol **salin id**: `navigator.clipboard`, lalu
+  `execCommand('copy')`, lalu kolom id terpilih untuk salin manual. Panel tak ditulis ulang bila HTML-nya sama, dan
+  tidak selama kolom salin manual dipakai (paling lama 15 detik).
+- Banner baru: versi data tak cocok, registri tak terbaca, registri tak cocok dengan `claude agents`.
+
+### Bukti v2
+
+- Workspace nyata (2026-09-15): 6 dari 6 sesi sama dengan `claude agents --json`, termasuk sesi yang diam 6 jam;
+  dialog pertanyaan sesi lain tercatat `waiting` + `input needed` dan tampil menunggu Anda di Lounge; `git push` sesi
+  lain yang masih berjalan tampil menunggu tugas latar; sesi pelaksana yang diam dengan tugas latar yang awalnya
+  ~100 KB di luar ekor tampil menunggu tugas latar untuk tugas itu; dua launcher serentak menghasilkan satu penulis;
+  tombol salin di halaman terpasang mengisi clipboard; tick p50 8 ms, p95 15 ms sesudah tick pertama (p95 tujuh tick
+  awal 423 ms karena membaca jendela 8 MB).
+- Test: pytest 110 (dari 72), `test-init.ps1` 71, `kantor-agent-browser.ps1` 27 check (clipboard dibaca balik dengan
+  menempel, karena `readText` ditolak di `file://`). Kontrol mutasi yang terbukti merah: `procStart`, kunci penulis,
+  pelacakan perintah yang dipindah ke latar, jendela 8 MB, prasaring baris, pelacak tak dipakai, `is_error` TaskStop,
+  dan reset berkas yang mengecil.
+- Spike Pixel Agents 1.4.1 mode tanpa hook: sesi dibaca dari transkrip dan izin ditebak dari timer, setara tanda "?"
+  1.20.0; `~/.claude/settings.json` global tidak berubah.
+
+### Batas v2
+
+- Registri dan kuncinya format internal; yang menjaganya cek silang dan banner.
+- `waitingFor: "permission prompt"` belum teramati langsung.
+- Tugas latar yang dimulai sebelum jendela 8 MB saat penulis pertama melihat sesinya tak terlihat.
+- `kantor-agent.sh` belum pernah dijalankan.
