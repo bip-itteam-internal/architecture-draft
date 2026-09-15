@@ -11,7 +11,7 @@
 
 *Audit internal dikeluarkan dari `finance-service` menjadi service sendiri dengan database dan kredensial sendiri, lalu layarnya dikeluarkan dari `erp-frontend` menjadi aplikasi di subdomain sendiri yang masuk lewat SSO ERP. Keputusan ini **membalik ADR 0073 §1** dan berdiri di atas dua tuntutan yang saat itu belum dinyatakan: pihak yang diperiksa tidak boleh dapat mengubah bukti pemeriksaan tentang dirinya, dan modul ini akan menjadi wadah bagi seluruh audit internal, bukan audit pembukuan saja.*
 
-- **Status**: ⚠️ **Implemented sebagian** — **§2 (aplikasi terpisah) SUDAH DIKERJAKAN**: repo [`bip-itteam-internal/audit-bharata`](https://github.com/bip-itteam-internal/audit-bharata) **PRIVATE** dibuat 2026-09-03 dan 15 commit sudah naik — sebelumnya aplikasinya HANYA ada di satu laptop tanpa remote sama sekali, jadi "repo ada" sempat berarti sesuatu yang jauh lebih rapuh daripada yang terbaca. Tiga layar jalan, 64 test hijau, build sukses; PR CORS bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690) OPEN. **§1 (pemisahan service + database) BELUM dimulai.** §5 (bypass super-akses) belum dikerjakan.
+- **Status**: ⚠️ **Implemented sebagian** — **§2 (aplikasi terpisah) SUDAH DIKERJAKAN**: repo [`bip-itteam-internal/audit-bharata`](https://github.com/bip-itteam-internal/audit-bharata) **PRIVATE** dibuat 2026-09-03 dan 15 commit sudah naik — sebelumnya aplikasinya HANYA ada di satu laptop tanpa remote sama sekali, jadi "repo ada" sempat berarti sesuatu yang jauh lebih rapuh daripada yang terbaca. Tiga layar jalan, 64 test hijau, build sukses; PR CORS bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690) OPEN. **§1 (pemisahan service + database) BELUM dimulai.** §5 (bypass super-akses) tidak pernah dikerjakan dan **gugur 2026-09-15**: menu audit dicabut dari Web ERP ([[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]], branch belum merge), jadi tak ada item sidebar yang bisa diloloskan bypass.
 - **Path di repo**: `bip-erp/services/audit/*` (baru) · `bip-erp/shared-library/common/env.go` · `bip-erp/api-gateway/main.go` · `bip-erp/docker-compose.yml` · `bip-erp/.github/workflows/deploy.yml` · `erp-frontend/src/utils/menu-permission.ts` · repo aplikasi baru (baru)
 - **Tanggal**: 2026-09-03
 
@@ -70,6 +70,8 @@ Keputusan diambil **sekarang**, sebelum GA dibangun, karena setelahnya menuntut 
 Ini konsisten dengan ADR 0073 §5 yang sudah menolak menyatukan temuan audit ke `quality_capa` karena `CAPA_AREAS` terkunci `["Produksi","Gudang"]` dan memberi makan `temuan_capa_produksi`. Penolakan yang sama berlaku untuk penyatuan berikutnya.
 
 ### 5. Bypass super-akses menu DITUTUP untuk izin audit
+
+> ⛔ **GUGUR 2026-09-15**: kategori sidebar `audit` dan rute `/audit*` dicabut dari erp-frontend ([[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]); alamat lamanya dialihkan ke aplikasi audit. Empat entri `audit.*: tolak` di `FALLBACK` tetap dipertahankan. Bila menu audit kelak dipasang lagi di ERP, keputusan di bawah hidup kembali.
 
 Keempat izin `audit.*` didaftarkan ke `TANPA_BYPASS_SEMUA_MENU` di `erp-frontend/src/utils/menu-permission.ts`.
 

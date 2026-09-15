@@ -97,29 +97,50 @@ Bahan KPI SPV Manufacture F3 "Kontrol ketat biaya produksi variabel" (bobot 10),
 
 ## Audit Internal
 
-Modul terpisah, di-host di service ini (ADR 0073, diamandemen 2026-09-02); lihat [[Finance - Audit Internal]] untuk domain lengkap (36 uji, tiga kelompok, semantik kolom, aturan layar). Tabel di bawah hanya memetakan rute; **jangan salin logika audit ke sini**.
+Modul terpisah, di-host di service ini (ADR 0073, diamandemen 2026-09-02); lihat [[Finance - Audit Internal]] untuk domain lengkap (38 item uji petik, keadaan baris, aturan layar; matriks 36 uji lama di bagian Arsip-nya). Tabel di bawah hanya memetakan rute; **jangan salin logika audit ke sini**.
 
 | Method | Path | Izin | Fungsi |
 |---|---|---|---|
-| GET | `/audit/uji` | `audit.view` | Daftar definisi uji |
-| GET | `/audit/temuan` | `audit.view` | Daftar temuan |
+| GET | `/audit/uji` | `audit.view` | Registry item pemeriksaan (bentuk di Kontrak di bawah) |
+| GET | `/audit/temuan?periode=` | `audit.view` | Daftar temuan; `periode` kosong = seluruh periode (register) |
 | GET | `/audit/jejak?periode=&kunci=` | `audit.view` | Jejak perubahan (belum tercatat di dok API sebelumnya) |
 | GET | `/audit/setelan-sampel` | `audit.view` | Setelan sampling |
-| PUT | `/audit/setelan-sampel/:kode` | `audit.master.save`* | Ubah setelan sampling |
+| PUT | `/audit/setelan-sampel/:kode` | `audit.master.save`* | Ubah setelan sampling. ⚠️ Versi uji petik menolak (400) item tanpa penjalan, yaitu seluruh 38 item |
 | GET | `/audit/bukti/:id/berkas` | `audit.view` | Unduh berkas bukti |
 | DELETE | `/audit/bukti/:id` | `audit.tinjau`* | Hapus bukti |
 | GET | `/audit/periode/:periode` | `audit.view` | Kertas kerja satu periode |
-| POST | `/audit/periode/:periode/tarik` | `audit.tinjau`* | Tarik ulang periode |
-| PATCH | `/audit/periode/:periode/baris/:kode/tinjau` | `audit.tinjau`* | Tinjau satu baris |
-| POST | `/audit/periode/:periode/baris/:kode/temuan` | `audit.temuan.terbitkan`* | Terbitkan temuan dari baris |
+| POST | `/audit/periode/:periode/tarik` | `audit.tinjau`* | Menyiapkan kertas kerja (tombol "Siapkan kertas kerja"); aman diulang |
+| PATCH | `/audit/periode/:periode/baris/:kode/tinjau` | `audit.tinjau`* | Tandai satu item wajar |
+| POST | `/audit/periode/:periode/baris/:kode/temuan` | `audit.temuan.terbitkan`* | Terbitkan atau revisi temuan dari baris |
 | GET | `/audit/periode/:periode/baris/:kode/bukti` | `audit.view` | Daftar bukti baris (sengaja `view`, bukan `tinjau`: melihat bukti bagian dari membaca laporan) |
 | POST | `/audit/periode/:periode/baris/:kode/bukti` | `audit.tinjau`* | Unggah bukti baris |
 
-*Nama konstanta persis: `common.PermAuditView`, `common.PermAuditMasterSave`, `common.PermAuditTinjau`, `common.PermAuditTemuanTerbitkan` (`audit_handler.go:331-355`). Izin ber-prefiks `audit`, BUKAN `finance`: pemegang izin finance tidak otomatis membuka kertas kerja yang memeriksa pekerjaannya sendiri.
+*Nama konstanta persis: `common.PermAuditView`, `common.PermAuditMasterSave`, `common.PermAuditTinjau`, `common.PermAuditTemuanTerbitkan` (`DaftarkanRuteAudit` di `audit_handler.go`). Izin ber-prefiks `audit`, BUKAN `finance`: pemegang izin finance tidak otomatis membuka kertas kerja yang memeriksa pekerjaannya sendiri.
 
 ⚠️ **Status kertas kerja `terbit` (`KertasKerjaTerbit`, `audit_kertas_kerja.go:26`) dideklarasikan dan DIBACA (`:289`) tapi tak punya rute penulis.** Diverifikasi: `git grep` atas `KertasKerjaTerbit`/`TerbitPada`/`TerbitOleh` di seluruh `services/finance` hanya mengembalikan deklarasi struct + satu titik baca, nol penulis.
 
 Penjadwal audit membuka periode (bulan sebelumnya, tutup buku) tiap tanggal 6 pukul 01:00 WIB (`audit_kertas_kerja.go:133-165`), sengaja terpisah dari penjadwal pajak (tanggal 1): jendelanya berbeda, dan menyatukan dua fakta yang kebetulan berbentuk sama akan mengunci keduanya bergerak bersama.
+
+### Kontrak Audit Internal versi uji petik
+
+Grounded ke `audit_handler.go`, `audit_registry.go`, dan `audit_tindakan.go` di branch bip-erp `feat/finance-audit-uji-petik` ([[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]), **belum merge per 2026-09-15**. `main` masih mengirim bentuk matriks 36 uji.
+
+- **`GET /audit/uji`**: array 38 objek `{kode, nomor, bagian, tahap, pos, nama, titik_awal, pembanding, kriteria_cocok, tujuan, sampel, metode}`. `bagian` = `accounting` | `tax`; `tahap` = 2 | 3; `metode` = `acak` | `terarah` | `populasi_penuh`.
+- **`GET /audit/periode/:periode`**: `{periode, kertas_kerja, sudah_dibuka, jumlah_item, baris_di_luar_daftar, di_luar_lingkup, baris}`.
+  - `baris` hanya berisi kode yang terdaftar. Tiap baris membawa antara lain `kode_uji`, `nama`, `nomor`, `bagian`, `tahap`, `pos`, `keadaan_efektif`, `tinjauan` (`oleh`, `pada`, `alasan`, `sampel`) bila ada, dan `temuan_id` bila bertemuan.
+  - `di_luar_lingkup` = 5 objek `{kode, area, akibat}`.
+  - `baris_di_luar_daftar` = cacah baris berkode lama yang disaring; layar tidak menampilkannya.
+  - ⚠️ `jumlah_item` juga penanda versi: layar menganggap respons tanpanya berasal dari backend sebelum ADR 0097.
+- **`POST .../tarik`**: menyemai baris item yang belum ada, membalas `{periode, jumlah_item}`. Aman diulang: `keadaan_tinjauan`, `tinjauan`, dan `temuan_id` tidak ditulis.
+- **`PATCH .../baris/:kode/tinjau`**: badan `{alasan, sampel}`, keduanya wajib.
+- **`POST .../baris/:kode/temuan`**: badan `{kondisi, sampel, klasifikasi?}`; `kondisi` dan `sampel` wajib, `klasifikasi` opsional (`mayor` | `moderat` | `minor`). `kriteria` kiriman diabaikan dan diisi dari `kriteria_cocok` registry. Id temuan `<periode>-<kode>`; menerbitkan ulang merevisi, dan jejak beraksi `revisi` menyimpan isi sebelumnya.
+
+| Status | Arti | Tinjau | Temuan |
+|---|---|---|---|
+| 400 | Kesalahan pengisi: catatan atau sampel kosong, item tak terdaftar, klasifikasi tak sah; pada tinjau juga `jadi_temuan: true` | ✅ | ✅ |
+| 404 | Baris item belum ada di kertas kerja periode itu | ✅ | ✅ |
+| 409 | Item sudah jadi temuan, termasuk bila temuannya terbit di sela pembacaan dan penulisan; koreksinya lewat revisi temuan | ✅ | — |
+| 500 | Gangguan server atau database | ✅ | ✅ |
 
 ## Catatan Kontrak
 
@@ -138,7 +159,7 @@ Penjadwal audit membuka periode (bulan sebelumnya, tutup buku) tiap tanggal 6 pu
 ## Dokumen Terkait
 
 - [[Finance - Rancangan Finance Service]] — rancangan & status modul
-- [[Finance - Audit Internal]]: domain lengkap modul Audit Internal (36 uji, semantik kolom)
+- [[Finance - Audit Internal]]: domain lengkap modul Audit Internal (38 item uji petik; matriks lama di Arsip) · [[ADR - 0097 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]
 - [[Finance - FAT Persona]]: persona per posisi FAT (Tax Officer, Cost Control, SPV FAT), grounded ke izin dan paket prod
 - [[Microservices - Employee Service]] — pemilik `kpi_template`; tempat sumber `kinerja_cost_control`, `kinerja_tax`, `biaya_variabel_produksi` terdaftar
 - [[Microservices - Integration Service]] — pemilik `anggaran_opex` & varians
