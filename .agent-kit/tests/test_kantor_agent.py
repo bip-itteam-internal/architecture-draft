@@ -649,6 +649,47 @@ def test_urai_melacak_tugas_latar_sampai_notifikasinya():
     assert dict(ka.urai(mulai + [notifikasi_latar(WS, "b1", -10)])["latar"]) == {}
 
 
+def test_urai_perintah_yang_dipindah_ke_latar_karena_timeout_ikut_dilacak():
+    # bentuk nyata (transkrip sesi pelaksana 2026-09-15): tanpa run_in_background, toolUseResult membawa
+    # backgroundTaskId + timedOutAfterMs dan teksnya "moved to the background (ID: ...)"
+    o = tool_result(WS, "toolu_a", -59)
+    o["message"]["content"][0]["content"] = ("Command did not complete within its 180s timeout and was moved to the "
+                                             "background (ID: b9). Output is being written to: x")
+    o["toolUseResult"] = {"stdout": "", "stderr": "", "interrupted": False, "backgroundTaskId": "b9", "timedOutAfterMs": 180000}
+    u = ka.urai([tool_use(WS, "PowerShell", "toolu_a", {"description": "uji lambat"}, -240), o])
+    assert list(u["latar"]) == ["b9"] and u["latar"]["b9"][0] == "PowerShell"
+    biasa = ka.urai([tool_use(WS, "PowerShell", "toolu_b", {"description": "uji cepat"}, -30), tool_result(WS, "toolu_b", -29)])
+    assert dict(biasa["latar"]) == {}
+
+
+def test_urai_tugas_latar_yang_dihentikan_taskstop_ikut_tertutup():
+    # terukur 2026-09-15 di transkrip sesi pelaksana: tugas yang dihentikan TaskStop tak pernah mendapat
+    # <task-notification>, jadi tanpa ini sesi yang diam tampil "menunggu tugas latar" untuk tugas yang sudah mati.
+    # shell_id = nama parameter lama TaskStop (masih diterima, ditandai deprecated di skemanya)
+    mulai = [tool_use(WS, "PowerShell", "toolu_a", {"description": "uji panjang", "run_in_background": True}, -60),
+             hasil_latar(WS, "toolu_a", "b1", -59),
+             tool_use(WS, "PowerShell", "toolu_b", {"description": "uji lain", "run_in_background": True}, -58),
+             hasil_latar(WS, "toolu_b", "b2", -57)]
+    henti = [tool_use(WS, "TaskStop", "toolu_s", {"task_id": "b1"}, -30), tool_result(WS, "toolu_s", -29),
+             tool_use(WS, "TaskStop", "toolu_t", {"shell_id": "b2"}, -20), tool_result(WS, "toolu_t", -19)]
+    assert list(ka.urai(mulai)["latar"]) == ["b1", "b2"]
+    assert list(ka.urai(mulai + henti[:2])["latar"]) == ["b2"]
+    assert dict(ka.urai(mulai + henti)["latar"]) == {}
+
+
+def test_registri_tugas_latar_dari_proses_sebelumnya_tidak_ditunggu(lingkungan2):
+    # tugas shell latar ikut mati bersama proses Claude Code yang menjalankannya: sesi yang dilanjutkan di proses
+    # baru (startedAt registri sesudah tugas dimulai) tidak sedang menunggunya. Kontrolnya test di bawah, yang
+    # startedAt-nya (bawaan -7200) sebelum tugas dimulai.
+    ws, proyek, reg = lingkungan2
+    kejadian = [tool_use(ws, "PowerShell", "toolu_a", {"description": "uji panjang", "run_in_background": True}, -600),
+                hasil_latar(ws, "toolu_a", "b1", -599), end_turn(ws, -590), prompt(ws, -60), end_turn(ws, -50)]
+    tulis_jsonl(proyek / "slug-uji" / "sesi-a.jsonl", kejadian, _epoch(-50))
+    tulis_registri(reg, 101, "sesi-a", ws, status="idle", diperbarui=-50, startedAt=_ms(-120))
+    s = kumpulkan2(ws, proyek, reg)["sesi"][0]
+    assert (s["area"], s["keadaan"]) == ("lounge", "menunggu_anda")
+
+
 def test_registri_idle_dengan_tugas_latar_menunggu_di_ruang_server(lingkungan2):
     ws, proyek, reg = lingkungan2
     kejadian = [tool_use(ws, "PowerShell", "toolu_a", {"description": "uji panjang", "run_in_background": True}, -60),

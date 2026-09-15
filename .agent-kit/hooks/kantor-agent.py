@@ -127,6 +127,9 @@ def detail_alat(nama, masukan):
 # sebagai queue-operation (atau pesan user) berisi <task-notification><task-id><id></task-id>...
 _ID_LATAR = re.compile(r"background with ID: ([A-Za-z0-9_-]+)")
 _ID_NOTIFIKASI = re.compile(r"<task-id>\s*([^<\s]+)\s*</task-id>")
+# Tugas yang dihentikan TaskStop TIDAK pernah mendapat <task-notification> (terukur 2026-09-15: 2 dari 2 di transkrip
+# sesi pelaksana), jadi penutupnya tool_result TaskStop itu sendiri. shell_id = nama parameternya yang lama.
+PENGHENTI_LATAR = ("TaskStop",)
 
 
 def _teks_blok(isi):
@@ -156,8 +159,9 @@ def urai(kejadian):
 
     `tertunda` = tool_use yang belum punya tool_result. Dihapus oleh tool_result-nya, oleh
     end_turn, dan oleh prompt baru dari user (kejadian user tanpa tool_result dan bukan isMeta).
-    `latar` = tugas shell latar yang sudah dimulai dan belum diberi <task-notification>; tidak dihapus
-    end_turn maupun prompt baru, karena tugasnya memang tetap berjalan.
+    `latar` = tugas shell latar (run_in_background, atau perintah yang dipindah ke latar karena timeout) yang sudah
+    dimulai dan belum diberi <task-notification> atau dihentikan TaskStop; tidak dihapus end_turn maupun prompt
+    baru, karena tugasnya memang tetap berjalan.
     Tipe selain user/assistant/queue-operation (attachment, ...) tidak mengubah keadaan; ai-title
     dan pr-link hanya dibaca sebagai label."""
     judul = pr = cwd = None
@@ -196,7 +200,12 @@ def urai(kejadian):
                     if isinstance(b, dict) and b.get("type") == "tool_result":
                         asal = tertunda.pop(b.get("tool_use_id"), None)
                         ada_hasil = True
-                        if asal and isinstance(asal[1], dict) and asal[1].get("run_in_background") is True:
+                        if not (asal and isinstance(asal[1], dict)):
+                            continue
+                        r = o.get("toolUseResult")
+                        if asal[0] in PENGHENTI_LATAR:
+                            latar.pop(str(asal[1].get("task_id") or asal[1].get("shell_id")), None)
+                        elif asal[1].get("run_in_background") is True or (isinstance(r, dict) and r.get("backgroundTaskId")):
                             tid = _id_tugas_latar(o, b)
                             if tid:
                                 latar[tid] = asal
@@ -301,8 +310,15 @@ def turunkan_keadaan(u, ada_subagent, sekarang, registri=None):
                 "diam_detik": diam}
     sejak = akhir.get("timestamp") if akhir else _iso(t_status)
     selesai = selesai_giliran(u) if registri is None else status != "busy"
-    if selesai and u["latar"]:
-        nama, masukan, ts = next(iter(u["latar"].values()))  # tugas latar paling awal yang belum selesai
+    latar = list(u["latar"].values())
+    lahir = registri.get("mulai") if registri else None
+    if lahir is not None:
+        # Tugas shell latar mati bersama proses Claude Code yang menjalankannya: yang dimulai sebelum proses sesi ini
+        # lahir (sesi dilanjutkan di proses baru) tak sedang ditunggu. startedAt registri terukur 1,6 sampai 8,9 detik
+        # SESUDAH procStart (6 sesi, 2026-09-15), jadi tugas milik proses ini selalu dimulai sesudahnya.
+        latar = [v for v in latar if (_waktu(v[2]) or lahir) >= lahir]
+    if selesai and latar:
+        nama, masukan, ts = latar[0]  # tugas latar paling awal yang belum selesai
         return {"area": "server", "keadaan": "menunggu_latar", "alat": nama or "", "detail": detail_alat(nama, masukan),
                 "sejak": ts, "durasi_detik": _detik_sejak(ts, sekarang), "diam_detik": diam}
     if selesai:
