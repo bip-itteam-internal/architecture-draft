@@ -188,7 +188,7 @@ Sumber (`registriRingkasan`; menambah kartu berangka = menambah satu baris):
 | `pelatihan` | `common.Env.LearningModuleURL` | `/training/requests?as=reviewer` | panjang `data` |
 | `pembelian` | `common.Env.ProcurementModuleURL` | `/pengajuan-pembelian/perlu-aksi` | panjang `data` |
 | `karyawan` | `common.Env.AttendanceModuleURL` | `/hr/requests/summary` | field `menunggu` (absen = rusak, bukan nol) |
-| `booking` | `common.Env.InventoryModuleURL` | `/peminjaman/perlu-aksi` | panjang `data`. 🟡 Sumber kelima, bip-erp branch `feat/employee-ringkasan-booking-ruang`, belum merge per 2026-09-14 ([[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]]) |
+| `booking` | `common.Env.InventoryModuleURL` | `/peminjaman/perlu-aksi` | panjang `data`. Sumber kelima, bip-erp [#1884](https://github.com/bip-itteam-internal/bip-erp/pull/1884), merged dan di prod 2026-09-15: biner Employee-Service prod memuat `/peminjaman/perlu-aksi` ([[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]]) |
 
 Tiga keadaan per kunci, dan ketiganya sengaja dibedakan:
 

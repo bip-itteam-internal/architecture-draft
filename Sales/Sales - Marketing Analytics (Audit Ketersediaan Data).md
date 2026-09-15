@@ -96,7 +96,7 @@ Service kita punya lebih dari prototipe: `/profit/products`, `/profit/items`, dr
 | Metrik prototipe | Label | Keterangan |
 |---|---|---|
 | Spend MTD | ADA | `ads_cost` |
-| Pagu / anggaran | TIDAK ADA | Tak ada konsep anggaran di service ini |
+| Pagu / anggaran | ADA (di luar service ini) | Anggaran iklan per brand per bulan dikelola Finance di Master Anggaran OPEX (integration `anggaran_opex`, akun Beban Iklan per departemen Accurate); 🔜 Ringkasan membacanya per brand sejak branch erp-frontend `feat/marketing-iklan-dashboard` (belum merge per 2026-09-15). Service ini sendiri punya `mart_pagu` (`GET/POST /pagu`, per channel+toko+bulan), PROD 0 baris per 2026-09-15 dan tak lagi dibaca beranda. [[ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance]] |
 | GMV platform | TIPIS | `total_onsite_on_web_cart_value`, ikut cakupan 18–77% |
 | GMV settlement | RAKIT | `net_settlement` ada per baris, belum dijumlah ke kartu vonis |
 | ⭐ Laba after-ads | ADA | `gross_profit`, sudah jadi angka utama halaman depan |
