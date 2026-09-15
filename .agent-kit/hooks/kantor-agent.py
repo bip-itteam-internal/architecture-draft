@@ -38,7 +38,7 @@ import time
 from collections import OrderedDict, deque
 from datetime import datetime, timezone
 
-VERSI_DATA = 1
+VERSI_DATA = 2
 HIDUP_UTAMA_DETIK = 30 * 60
 HIDUP_SUB_DETIK = 10 * 60
 DIAM_MENIT = 10

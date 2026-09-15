@@ -442,7 +442,7 @@ def test_sekali_menulis_data_js(lingkungan):
     assert ka.main(["--workspace", str(ws), "--proyek-dir", str(proyek), "--sekali",
                     "--registri-dir", str(ws / "tanpa-registri")]) == 0
     data = baca_data(ws)
-    assert data["versi"] == 1
+    assert data["versi"] == 2
     assert [(s["id"], s["area"], s["alat"], s["detail"]) for s in data["sesi"]] == [("sesi-a", "meja", "Edit", "b.py")]
     assert data["penulis"]["berhenti"] is None
     assert not (ws / ".task-plans" / "kantor-agent.pid").exists()

@@ -170,7 +170,7 @@ try {
   $d = Read-KantorData $kaData
   $s0 = @($d.sesi) | Where-Object { $_.id -eq 'sesi-uji' } | Select-Object -First 1
   $sDiam = @($d.sesi) | Where-Object { $_.id -eq 'sesi-diam' } | Select-Object -First 1
-  Check ($rc -eq 0 -and $null -ne $d -and $d.versi -eq 1) "kantor-agent -Sekali: data.js versi 1 tertulis (exit $rc)"
+  Check ($rc -eq 0 -and $null -ne $d -and $d.versi -eq 2) "kantor-agent -Sekali: data.js versi 2 tertulis (exit $rc)"
   Check ($null -ne $s0 -and $s0.id -eq 'sesi-uji' -and $s0.area -eq 'meja' -and $s0.alat -eq 'Edit' -and $s0.detail -eq 'berkas_uji.py') "kantor-agent: sesi-uji di meja, alat Edit, detail nama berkas ($($s0.area)/$($s0.alat)/$($s0.detail))"
   Check ($null -ne $d -and $d.skema.sumber_hidup -eq 'registri' -and $null -ne $sDiam -and $sDiam.area -eq 'lounge' -and $sDiam.diam_detik -ge 7000 -and $sDiam.asal -eq 'claude-vscode') "kantor-agent: registri -> sesi terbuka yang diam 2 jam tanpa transkrip tampil di lounge ($($d.skema.sumber_hidup)/$($sDiam.area)/$($sDiam.diam_detik))"
   Check ($null -ne $d -and $d.skema.dikenali -eq $true) 'kantor-agent: transkrip dari templat nyata dikenali'
