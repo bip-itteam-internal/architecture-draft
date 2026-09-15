@@ -1490,8 +1490,8 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "31ca7dfeeb89a323d0a4dab1c96ea1e99c7499b4430c7ba441a668a17e639f61",
-      "ukuran_kb": 453.7,
+      "hash": "db71aae2bf865e5281d87c0c8910e36b7dc28a98fe57d2fe7c0b6679361a3ff3",
+      "ukuran_kb": 454.0,
       "ringkasan": "Menjawab: apa saja modul dan fitur portal web ERP/HRIS One Bharata (erp-frontend), stack yang dipakai, serta bagaimana login, refresh token, SSO Identity Provider, dan gating menu lewat system_roles maupun paket izin bekerja. Juga menjawab bagaimana menu HRIS dan Pengaturan HRGA dikelompokkan (menu induk bersarang, SUB_MENU_PENGATURAN), cara kerja fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), dan konvensi data-fetching TanStack Query serta bagan Recharts/ChartContainer.",
       "kata_kunci": [
         "erp-frontend",
@@ -2677,7 +2677,7 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "fdfa28283fcabdda7dad5a135fcc81aac12e1b92740b3f96ec63ce390a5718c3",
+      "hash": "56197f2960768a4a188154fd97b5261a14886d2b130512959a8cad2c9550643f",
       "ukuran_kb": 139.0,
       "ringkasan": "Menjawab: bagaimana service marketing-analytics menghitung laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live dari integration_db (baca-saja) ke koleksi mart_*, endpoint apa saja yang tersedia (beranda, ambang, pagu, analisis live, Account Specialist, KPI host live, live-shifts), dan bagaimana penjadwal 48 jam serta job sync bekerja. Juga menjawab aturan pemakaian angka supaya tidak hitung ganda (iklan_sia_sia, pembatalan, GMV live), logika vonis lima keadaan di beranda, perbedaan sumber TikTok, Shopee, dan Lazada, serta batas hari WIB vs UTC.",
       "kata_kunci": [
