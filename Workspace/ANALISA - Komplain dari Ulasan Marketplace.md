@@ -1,36 +1,39 @@
 # ANALISA - Komplain dari Ulasan Marketplace
 
-Daftar task hasil `/analisa-kebutuhan` 2026-09-16. Keputusannya di [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]].
+Daftar task hasil `/analisa-kebutuhan` 2026-09-16, **direvisi hari yang sama**. Keputusannya di [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]].
 
 Papan kerja, bukan arsitektur. Tiap item cukup jelas untuk langsung dilempar ke `/start-task`.
 
+⚠️ **Revisi 2026-09-16.** Daftar pertama dibuka dengan "T1. Master kategori komplain". **Task itu DIBATALKAN.** Gerbang cari-sebelum-membangun di `/plan` menemukan register komplain gudang sudah ada lengkap dengan daftar kategori tertutupnya sendiri, sehingga master ketiga hanya akan jadi sumber kedua yang menyimpang. Jangan mencarinya lagi di daftar ini.
+
 ## Menunggu keputusan orang, bukan kode
 
-- [ ] **K1. Penindak internal untuk keluhan pengiriman lama.** Tidak ada departemen ekspedisi di sistem, dan kurirnya didominasi SPX milik Shopee. Pilihannya: diarahkan ke CS yang mengajukan klaim ke marketplace, ke Manufaktur sebagai pengirim, atau diakui di luar kendali dan tidak dibuatkan tiket. Memblokir seeding kategori `pengiriman_lama` saja, bukan seluruh pekerjaan.
-- [ ] **K2. Kewajiban regulatif untuk keluhan dugaan efek tidak diinginkan.** Vault tidak punya dasarnya dan melarang mengarangnya. Pertanyaan untuk QA/RA: apakah keluhan semacam itu wajib masuk jalur CAPA atau pelaporan BPOM. Memblokir kategori itu saja.
-- [ ] **K3. Lima toko Beauty Hacks tanpa CS.** Terukur 2026-09-16. Apakah memang belum ditugaskan atau pemetaannya tertinggal. Berdiri sendiri, tidak memblokir pekerjaan ini, tetapi memengaruhi KPI penyelesaian komplain yang sudah berjalan.
+- [ ] **K1. Tujuan yang belum punya register.** Keluhan yang mengarah ke ekspedisi, vendor, atau tim brand tidak punya tempat mencatat. Pilihannya: dibuatkan nanti, dialihkan ke CS sebagai pengaju klaim ke marketplace, atau diakui di luar kendali dan cukup ditampilkan tanpa tiket. Tidak memblokir jalur gudang dan QC.
+- [ ] **K2. Kewajiban regulatif untuk keluhan dugaan efek tidak diinginkan.** Vault tidak punya dasarnya dan melarang mengarangnya. Pertanyaan untuk QA/RA: wajib masuk jalur CAPA atau pelaporan BPOM atau tidak.
+- [ ] **K3. Lima toko Beauty Hacks tanpa CS.** Terukur 2026-09-16. Berdiri sendiri, tetapi memengaruhi KPI penyelesaian komplain yang sudah berjalan.
 
-## Backend, berurutan
+## Backend
 
-- [ ] **T1. Master kategori komplain.** Koleksi baru di employee-service mengikuti pola master yang sudah ada: `key`, `label`, `order`, `active`, `metadata`, ditambah penindak internal dan pihak luar. CRUD digerbang satu departemen. Seed kategori awal kecuali yang diblokir K1 dan K2.
-- [ ] **T2. Tujuan dan salinan ulasan di register komplain.** Bergantung T1. Tambah field tujuan departemen, kategori, sumber, dan blok salinan ulasan. Gerbang validasi berubah dari khusus Quality menjadi per tujuan. Vonis jadi tiga nilai termasuk pengalihan, plus kolom tindakan dan tanggal. **Sekaligus tutup dua utang**: `company_id` yang belum ada, dan race `ReplaceOne` berfilter `_id` saja.
-- [ ] **T3. Kategori inbox dan notifikasi per departemen.** Bergantung T2. Pola dua kategori: satu ke penerima saat diajukan, satu ke pengaju saat diputuskan. ⚠️ employee-service dan notification-service wajib naik bersama, notification-service lebih dulu.
-- [ ] **T4. Pemicu notifikasi ulasan bintang rendah ke pemegang toko.** Dapat berdiri paralel dengan T2. Penerimanya diturunkan dari `department_shops`. Service mana yang memicunya diputuskan di `/plan`, sebab ulasan dimiliki integration-service sementara notifikasi bertetangga dengan employee-service.
-- [ ] **T5. Pengisian otomatis kurir dan produk dari order.** Bergantung T2. Sumbernya `shopee_order_details.shipping_carrier`, dijodohkan lewat `order_sn` milik ulasan.
+- [ ] **T1. Buka rute BACA `/wms/komplain` ke marketing.** Kecil tetapi memblokir layarnya. Hari ini daftar pembacanya adalah peran gudang saja, dan kodenya sendiri mencatat bahwa membuka ke marketing menuntut komposisi dua gerbang dan merupakan perubahan tersendiri. Pastikan penyaringan Sadewa tetap berlaku.
+- [ ] **T2. Salinan ulasan di register.** Blok ringkas berisi channel, id ulasan, bintang, teks, foto, dan tanggal, disalin saat komplain dibuat. Untuk jalur gudang menumpang `keterangan` dan `bukti_foto` yang sudah ada bila cukup; untuk jalur QC menuntut field baru. Tambahkan penanda sumber supaya komplain dari ulasan terbedakan dari yang diketik manual.
+- [ ] **T3. Notifikasi untuk register gudang.** Hari ini register itu tidak mengirim notifikasi sama sekali. Ikuti pola dua kategori milik jalur QC: satu ke penerima saat diajukan, satu ke pengaju saat ditindaklanjuti. ⚠️ Kategori inbox baru berarti service pengirim dan notification-service wajib naik bersama, notification-service lebih dulu.
+- [ ] **T4. Pemicu notifikasi ulasan bintang rendah ke pemegang toko.** Penerimanya diturunkan dari `department_shops`. Service mana yang memicunya diputuskan di `/plan`, sebab ulasan dimiliki integration-service.
 
 ## Frontend
 
-- [ ] **T6. Tombol ajukan komplain dari baris ulasan.** Bergantung T2. Di halaman Ulasan yang sudah ada, membawa serta `order_sn`, produk, bintang, teks, dan foto. Menampilkan penanda bila ulasan itu sudah pernah dikomplainkan, tanpa melarang pengajuan kedua.
-- [ ] **T7. Kotak masuk komplain per departemen dan layar tindakan.** Bergantung T2 dan T3. Keterlihatannya menyalin pola [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]]. Wajib memuat tiga vonis dan kolom tindakan.
-- [ ] **T8. Penanda "hanya Shopee" di layar.** Kecil, tetapi wajib, supaya ketiadaan TikTok tidak terbaca sebagai kelalaian.
+- [ ] **T5. Layar komplain gudang.** Pekerjaan terbesar di daftar ini, dan satu-satunya sebab register itu nol dokumen di produksi padahal sudah terpasang di KPI. Butuh daftar, filter periode dan status dan kategori, serta aksi tindak lanjut sampai selesai. Bergantung T1.
+- [ ] **T6. Tombol ajukan komplain dari baris ulasan.** Di halaman Ulasan yang sudah ada. Pengaju memilih TUJUAN lebih dulu, lalu kategori dari daftar milik tujuan itu sendiri. `order_sn`, produk, bintang, teks, dan foto terbawa otomatis. Bergantung T2.
+- [ ] **T7. Penanda keadaan di layar.** Hanya Shopee, dan tujuan yang belum terlayani ditampilkan apa adanya alih-alih dipaksa masuk register yang ada.
 
 ## Sesudah data terkumpul
 
-- [ ] **T9. Rekap pola per toko dan per kategori.** Baru berguna setelah beberapa bulan terkumpul. Ini juga yang kelak menjadi dasar menentukan tenggat, menggantikan angka tebakan.
+- [ ] **T8. Rekap pola per toko dan per kategori.** Baru berguna setelah beberapa bulan. Ini juga yang kelak jadi dasar menentukan tenggat, menggantikan angka tebakan.
 
 ## Di luar lingkup
 
+- **Master kategori komplain. DIBATALKAN**, lihat catatan revisi di atas.
+- Register komplain ketiga. Dua yang ada sudah cukup untuk gudang dan QC.
 - Klasifikasi otomatis atau LLM. Volumenya 3 sampai 4 per bulan.
 - Membalas pembeli. Tetap milik CS di Seller Center.
 - TikTok. Tidak ada teks ulasan per pembeli sama sekali.
-- Tenggat dan SLA. Lihat keputusan 11 di ADR.
+- Tenggat dan SLA. Lihat keputusan 9 di ADR.
