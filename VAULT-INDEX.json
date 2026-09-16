@@ -9971,7 +9971,7 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)**, agent-kit **1.15.0** (2026-09-06), terakhir berubah di **1.21.0** (2026-09-16, Kantor Agent v2); bagian lain diperiksa ulang ke kit 1.19.0 pada 2026-09-15. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi berkas satu mesin; (3) baseline test diukur sekali 2026-09-06 dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia; (6) **gerbang kit atas dirinya sendiri belum berjalan**, tak ada yang otomatis menjalankan `tests/test-init.ps1` maupun pytest `Tools/`; (7) **repo selain Node dan Go (mis. `mybharata-app`) tidak punya gerbang deterministik**, jadi lapis mesin `/judge` lolos tanpa memeriksa apa pun di sana; (8) **Kantor Agent membaca dua format internal Claude Code**, registri sesi `~/.claude/sessions` dan transkrip, jadi bisa patah di rilis mana pun; kerusakannya tampil sebagai banner (registri dicocokkan dengan `claude agents --json` yang terdokumentasi), bukan kantor kosong.",
+      "status_teks": "**Implemented (ada catatan)**, agent-kit **1.15.0** (2026-09-06), terakhir berubah di **1.22.0** (2026-09-16, arah hadap robot Kantor Agent); bagian lain diperiksa ulang ke kit 1.19.0 pada 2026-09-15. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi berkas satu mesin; (3) baseline test diukur sekali 2026-09-06 dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia; (6) **gerbang kit atas dirinya sendiri belum berjalan**, tak ada yang otomatis menjalankan `tests/test-init.ps1` maupun pytest `Tools/`; (7) **repo selain Node dan Go (mis. `mybharata-app`) tidak punya gerbang deterministik**, jadi lapis mesin `/judge` lolos tanpa memeriksa apa pun di sana; (8) **Kantor Agent membaca dua format internal Claude Code**, registri sesi `~/.claude/sessions` dan transkrip, jadi bisa patah di rilis mana pun; kerusakannya tampil sebagai banner (registri dicocokkan dengan `claude agents --json` yang terdokumentasi), bukan kantor kosong.",
       "publik": false,
       "tautan": [
         "ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak",
@@ -9983,20 +9983,20 @@
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "2858a253fb7e3bea75b1044e8022f8f04bc1ecc5bfc64d19f6ee3ec5a82d26bc",
-      "ukuran_kb": 26.5,
-      "ringkasan": "Menjawab: bagaimana hook pre-commit menolak commit di branch utama repo kode dan githook pre-push menjalankan tsc/lint/build atau go build per service, bagaimana papan sesi mencatat sesi Claude Code mana sedang mengerjakan apa, dan bagaimana loop otonom /brief, /kerjakan, /judge berjalan dari worktree sampai PR dengan maksimum dua pengulangan. Menjelaskan juga judge dua lapis (gerbang deterministik dibanding baseline test plus agen penilai read-only), supervisi dan ekstraksi skill, dashboard, dan Kantor Agent: denah isometrik sesi yang terbuka menurut registri sesi Claude Code dan ekor transkrip, termasuk sesi yang menunggu izin atau menunggu tugas shell latar, tombol salin id sesi, dan batas yang disadari seperti --no-verify serta repo selain Node/Go tanpa gerbang deterministik.",
+      "hash": "cdd09941f005a1bcd7a16635a9ef433b15faee33215b34efca59b02da8c545be",
+      "ukuran_kb": 27.0,
+      "ringkasan": "Menjawab: gerbang apa yang menolak commit di branch utama repo kode dan push yang gagal pemeriksaan dasar, bagaimana papan sesi dan Kantor Agent memperlihatkan sesi Claude Code mana sedang mengerjakan apa, dan bagaimana loop otonom /brief lalu /kerjakan mengerjakan satu task kecil sampai berhenti di PR dengan merge tetap di tangan manusia. Menjelaskan juga batas tiap mekanisme: gerbang yang masih bisa dilewati --no-verify, repo selain Node dan Go yang tak punya gerbang deterministik, dan format internal Claude Code (registri sesi dan transkrip) yang dibaca Kantor Agent sehingga bisa patah di rilis mana pun.",
       "kata_kunci": [
         "gerbang repo",
-        "pre-commit gate",
-        "pre-push hook",
+        "pre-commit",
+        "pre-push",
         "papan sesi",
-        "loop otonom",
-        "/judge",
-        "baseline test",
         "Kantor Agent",
-        "menunggu izin",
-        "claude agents"
+        "loop otonom",
+        "brief",
+        "kerjakan",
+        "judge",
+        "agent-kit"
       ]
     },
     {
