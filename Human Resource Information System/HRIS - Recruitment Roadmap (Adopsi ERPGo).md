@@ -59,14 +59,14 @@ tags: [hris, recruitment, roadmap]
 | Job Posting → **AI assist** konten (title/requirements/benefits) | ❌ | 🔮 selaras kapabilitas AI internal (sejajar "AI CV screening" di roadmap) |
 | Job Posting → Application Questions | ⛔ ikut Custom Questions dihapus | ⏭️ skip |
 | Candidates (Tracking ID, source, field lengkap, CV/cover/profile MinIO, apply publik) | ⚠️ `candidate` ✅, **Tracking ID ⛔ dihapus** (2026-07-24) | Kandidat tak punya cara melacak lamarannya sendiri |
-| Candidates → ubah **Status inline** dari daftar | ⚠️ ubah tahap via detail kandidat / `advance` | 🟢 quick-win: ubah status/tahap inline dari list |
+| Candidates → ubah **Status inline** dari daftar | ✅ **2026-09-16** — kolom **Aksi** per baris: Hold / Waiting List · Jadikan Buffer · Aktifkan Kembali · Tolak · Withdraw, lewat endpoint yang sudah ada. Status kandidat **tetap read-only** dan diturunkan sistem (SP-Status-Derived): yang ditawarkan **kejadian**, bukan penetapan status. Kandidat final tak punya menu sama sekali. Progress (babak) memang sudah inline sejak sebelumnya | — (erp-frontend [#1613](https://github.com/bip-itteam-internal/erp-frontend/pull/1613)) |
 
 ### Fase 3 — Seleksi
 | Fitur ERPGo | Status bip-erp | Rekomendasi |
 |---|---|---|
 | Interview Rounds (per lowongan, sequence, status) | ✅ `interview_round` (#498) | — |
 | Interviews (jadwal, tipe, durasi, lokasi) | ✅ dikelola dari **menu Interviews** (#385) | — |
-| Interviews → **Status lifecycle** (Scheduled/Completed/Cancelled/No-show) | ⛔ sengaja tanpa status di v1 | 🟡 revisit: Completed/Cancelled/No-show berguna untuk dashboard & funnel |
+| Interviews → **Status lifecycle** (Scheduled/Completed/Cancelled/No-show) | ✅ **2026-09-16** — `PUT /interviews/:id/status`, nilai tersimpan `Scheduled`/`Completed`/`Cancelled`/`NoShow`. Batal & Tidak hadir **wajib beralasan**. Koreksi salah tandai lewat **pembatalan penandaan** (kembali ke Terjadwal), bukan loncat antar-hasil. Sesi lama tanpa field status dibaca **Terjadwal** di lapisan baca (tanpa migrasi). Tampil di menu Interviews + kartu donut **Hasil Sesi Interview** di dashboard | — (bip-erp [#1924](https://github.com/bip-itteam-internal/bip-erp/pull/1924)) |
 | Interview Feedback (rating + rekomendasi, panel) | ✅ + link email pewawancara (#536) | — |
 | Candidate Assessments (Score% + Pass/Fail/Pending) | ⚠️ **terpisah**: Technical Test (skill/score/notes) + Psikotes (mode/scores/interpretasi/report PDF), **tanpa status hasil terpadu**; keduanya **catat manual** (tes di luar sistem) | 🟡 tambah **status hasil (Lulus/Tidak/Pending)**; opsi tes online (bank soal/upload jawaban) — lihat catatan Tes |
 
@@ -89,12 +89,12 @@ tags: [hris, recruitment, roadmap]
 
 **🟢 Prioritas — data sudah ada, nilai tinggi:**
 1. ~~**Dashboard Rekrutmen**~~ ✅ **SELESAI 2026-07-18** (FE `feat/recruitment-dashboard`) — KPI (Total Kandidat/Lowongan Open/Interviews/Onboarded) + hiring funnel (kumulatif + %) + donut status kandidat + donut onboarding progress + **kalender interview**. Reuse recharts+StatSummary, agregasi FE (BE tak diubah). Sisa opsional: Copy Portal + QR.
-2. **Quick wins:** ubah status/tahap kandidat **inline** dari daftar; **tanggal kedaluwarsa** + state "Dikirim" pada Offer.
+2. **Quick wins:** ~~ubah status kandidat **inline** dari daftar~~ ✅ **SELESAI 2026-09-16** (aksi per baris: hold/buffer/resume/tolak/withdraw, status tetap system-derived) — sisa: **tanggal kedaluwarsa** + state "Dikirim" pada Offer.
 
 **🟡 Pertimbangkan — nilai jelas, effort sedang:**
 3. **Offer Letter template** (+ konten di System Setup); field status approval eksplisit di offer = **opsional** (role-gating issue→hire sudah ada; approval berat ada di requisition).
 4. **Status hasil asesmen** (Lulus/Tidak/Pending) untuk Technical Test & Psikotes; opsi **tes online** (bank soal / kirim tugas + upload jawaban) — menjawab pertanyaan pengembangan Tes.
-5. **Interview status lifecycle** (Completed/Cancelled/No-show) — mendukung dashboard/funnel.
+5. ~~**Interview status lifecycle** (Completed/Cancelled/No-show)~~ ✅ **SELESAI 2026-09-16** — ditandai HR dari menu Interviews, tampil sebagai kartu donut **Hasil Sesi Interview** di dashboard. **Tidak** menggerakkan status kandidat (keputusan produk: kandidat yang tak hadir belum tentu gugur). **Sisa yang belum:** tile KPI "Interviews" dan kalender dashboard masih menghitung sesi batal sebagai sesi hidup.
 6. **Config konten Career Portal** (About/Tips/What-Happens-Next/FAQ) via System Setup.
 
 **🔮 Future — selaras kapabilitas AI internal:**
