@@ -647,9 +647,11 @@ disembunyikan.
 pada `<main>`, yang membuat gridnya satu kolom sehingga denah mengisi ruangnya; terukur di jendela 1600px, panggung
 melebar dari 1188px ke 1527px. Isi panel tidak dibongkar, jadi kartunya kembali utuh saat ditampilkan lagi.
 
-Pilihannya diingat lewat `localStorage`. Di `file://` Chrome menolak akses itu dengan `SecurityError`, jadi baca dan
-tulisnya dibungkus `try` dan kegagalannya ditelan: saklarnya tetap bekerja, hanya tak diingat antar-buka. Ini
-satu-satunya tempat halaman menyimpan keadaan milik pembaca, dan kehilangannya tidak mengubah arti apa pun.
+Pilihannya diingat lewat `localStorage`, dan itu **terukur bisa dipakai di `file://`** pada Chrome mesin ini
+(dugaan awal bahwa Chrome menolaknya dengan `SecurityError` salah, dan diperiksa sebelum ditulis di sini). Baca dan
+tulisnya tetap dibungkus `try` karena sebagian peramban dan konfigurasi memang menolak penyimpanan di `file://`; di
+situ saklarnya tetap bekerja, hanya tak diingat antar-buka. Ini satu-satunya tempat halaman menyimpan keadaan milik
+pembaca, dan kehilangannya tidak mengubah arti apa pun.
 
 **Bilah gulir.** 6px lewat `::-webkit-scrollbar`, dan `scrollbar-width: thin` sengaja **hanya** dipasang di dalam
 `@supports not selector(::-webkit-scrollbar)`. Alasannya sifat Chrome yang sudah terukur di tempat lain: begitu

@@ -177,8 +177,9 @@ footer li{margin:2px 0}
   var elSisi = document.getElementById('sisi');
   var elSaklar = document.getElementById('saklar-panel');
 
-  // Saklar panel samping. Pilihannya diingat lewat localStorage bila ada; di file:// Chrome menolaknya
-  // dengan SecurityError, jadi kegagalannya ditelan dan saklarnya tetap bekerja untuk sesi ini.
+  // Saklar panel samping. Pilihannya diingat lewat localStorage, yang terukur bisa dipakai di file:// pada
+  // Chrome; pembungkus try tetap ada karena sebagian peramban dan konfigurasi menolak penyimpanan di file://,
+  // dan di situ saklarnya tetap bekerja untuk sesi itu saja.
   var KUNCI_PANEL = 'kantor-agent:panel';
   function pasangPanel(tampil) {
     elSisi.hidden = !tampil;
