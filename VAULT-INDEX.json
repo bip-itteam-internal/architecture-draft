@@ -534,20 +534,20 @@
         "API - Index",
         "CORE - API Master Gateway"
       ],
-      "hash": "a576fa4cb1f3460ae2c0009d6cf7f2611cd925bdc95666cd119066424c37208f",
-      "ukuran_kb": 27.5,
-      "ringkasan": "Menjawab: endpoint apa saja di service `learning` (gateway `/api/learning/*`) untuk master jenis pelatihan dan trainer, event pelatihan, peserta dan kehadiran, pengajuan pelatihan, evaluasi trainer, course dan bank soal, post-test, sertifikat, bahan KPI, serta feed kalender. Menjelaskan gerbang izin modul `training` (`training.view` / `training.work` / `training.manage`), kill-switch `TRAINING_PERMISSION_ENFORCEMENT`, dan pemetaan kode status saat verifikasi `department_key` ke employee-service (404 jadi 400, gangguan server jadi 502). Menjawab juga kenapa `department_key` berisi key tidak boleh dikirim ke pencarian supervisor yang menyaring nama departemen, dan kenapa `PUT /training/:id` bersifat full-replace.",
+      "hash": "3407981860715a417b401848e69a1009dc0622d2f05e7b1c8470458acc02b08c",
+      "ukuran_kb": 31.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di modul gateway /api/learning/*, izin mana (training.view / training.work / training.manage) yang membuka tiap rute, dan bagaimana kill-switch TRAINING_PERMISSION_ENFORCEMENT serta fallback tier system_roles hris bekerja. Berisi kontrak CRUD master jenis pelatihan dan trainer, event pelatihan beserta guard transisi status, peserta dan kehadiran, pengajuan pelatihan, evaluasi trainer, course dan bank soal, post-test, sertifikat, rencana pelatihan tahunan, bahan KPI, serta feed kalender. Juga menjelaskan kenapa PUT bersifat full-replace, kode status verifikasi department_key (404 jadi 400, 5xx jadi 502), dan jebakan satuan department_key (key) versus work_data.department (nama) yang membuat pencarian supervisor gagal.",
       "kata_kunci": [
-        "learning-service",
-        "API endpoint",
-        "training",
-        "pelatihan",
+        "learning service",
+        "API pelatihan",
+        "training endpoint",
+        "training.view training.work training.manage",
+        "RBAC pelatihan",
         "post-test",
-        "trainer",
-        "izin training",
-        "department_key",
+        "sertifikat pelatihan",
         "pengajuan pelatihan",
-        "kehadiran"
+        "department_key",
+        "calendar-feed"
       ]
     },
     {
@@ -708,24 +708,14 @@
         "API - Index",
         "Finance - Kas Kecil dan Pengajuan Budget",
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
+        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
         "ADR - 0001 Akuntansi via Accurate",
         "CORE - API Master Gateway"
       ],
-      "hash": "ae20848cd7c3c38988a07724360a264a1d6d02141878ac3252f44d908103b277",
-      "ukuran_kb": 44.1,
-      "ringkasan": "Menjawab: endpoint apa saja di procurement-service untuk master Pemasok dan Barang & Jasa (CRUD, usul nomor/kode, katalog Accurate, import awal), cermin Pembelian dari Accurate, Permintaan/Pesanan/Penerimaan Barang ERP, Pengajuan Barang lima tipe, Tagihan Pemasok, Pembayaran Vendor, Aging Utang, Bukti Transfer, KPI Account Payable, serta Kas Kecil dan Pengajuan Budget. Memuat bentuk request/response, kode galat (400/404/409/502), arti `sync_status` (PENDING/SYNCED/FAILED), dan cara otorisasi lewat permission-set dengan fallback tier `procurement`.",
-      "kata_kunci": [
-        "procurement-service",
-        "pemasok",
-        "vendor",
-        "barang & jasa",
-        "sync Accurate",
-        "purchase order",
-        "pengajuan barang",
-        "tagihan pemasok",
-        "aging utang",
-        "account payable"
-      ]
+      "hash": "7722c6614093aec0e989b239f2228548204f911c07e96506f637bb83b7e506e8",
+      "ukuran_kb": 46.2,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "API Reference/API - Recruitment Service.md",
@@ -1323,24 +1313,25 @@
         "ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift",
         "Microservices - Learning Service",
         "HRIS - Training Program",
+        "API - Learning Service",
         "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program",
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "f7c740bb4fe683fecbcd5432df71b0d8fe50ccc11dd6e0cdd85a39bfcf8ee03f",
-      "ukuran_kb": 75.8,
-      "ringkasan": "Menjawab: apa saja yang bisa dikerjakan karyawan lewat aplikasi mobile MyBharata (attendance, cuti dan izin, lembur, payroll/slip gaji, KPI, survei, booking ruang, sesi live host, guest book) dan bagaimana aplikasinya dibangun: Flutter dengan BLoC, Clean Architecture feature-first, dio plus fpdart, go_router, dan Firebase dua flavor. Menjelaskan autentikasi JWT dengan biometric dan PIN, kebijakan satu akun satu device, serta fakta bahwa aplikasi memang memanggil lewat API gateway, bukan langsung ke service. Berguna saat perlu tahu versi build dan versi rilis, struktur menu beranda, dan batas konten yang di-scope per perusahaan (tenant).",
+      "hash": "a848aae3e9190116ef2ae8f93f98ff03aa76618d97abfd82dda6d74dc93e3567",
+      "ukuran_kb": 82.5,
+      "ringkasan": "Menjawab: apa saja yang bisa dikerjakan karyawan lewat aplikasi mobile MyBharata (attendance, cuti dan izin, lembur, payroll dan slip gaji, KPI, survei, Kaizen, Sesi Live Host, Booking Ruang, pelatihan), bagaimana arsitektur Flutter-nya disusun (Clean Architecture feature-first, BLoC, get_it, dio, go_router, fpdart), dan bagaimana autentikasinya bekerja (JWT Bearer lewat gateway, biometric, PIN, kebijakan satu akun satu device). Juga menjawab pertanyaan versi: versi mana yang benar-benar terpasang di HP pemakai versus yang baru ada di branch dev, dan fitur mana yang sudah merged tapi belum ikut rilis. Memuat aturan multi-perusahaan (scoping company_id lewat JWT, CompanyScope, gerbang konten per tenant) dan daftar known issues serta roadmap.",
       "kata_kunci": [
         "MyBharata",
-        "mobile app",
+        "aplikasi mobile HRIS",
         "Flutter",
         "BLoC",
-        "absensi",
-        "attendance",
-        "multi-perusahaan",
-        "tenant",
-        "JWT",
-        "go_router"
+        "absensi karyawan",
+        "slip gaji mobile",
+        "multi-tenant company_id",
+        "geofencing biometric PIN",
+        "versionCode rilis",
+        "employee self-service"
       ]
     },
     {
@@ -1514,20 +1505,21 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "0d845ab5b709e6634c5f58a1eba74a3a1ce47acf68fe44f29526b986a0554e36",
-      "ukuran_kb": 472.7,
-      "ringkasan": "Menjawab: bagaimana arsitektur dan konvensi frontend ERP Bharata (erp-frontend, alias hris-dashboard/One Bharata) disusun — stack teknologi, cara kerja login dan SSO ke aplikasi lain, struktur role dan menu sidebar per modul, serta konvensi wajib untuk data-fetching dan bagan yang berlaku di seluruh halaman. Juga menjawab modul/fitur apa saja yang sudah diimplementasikan (multi-perusahaan, pengaturan HRGA terpusat, recruitment lintas perusahaan) dan mana yang masih di branch/belum merge.",
+      "hash": "4fff1204b74f590bdd6cc4712cadc7451cab42b33aeef75ca56395da82cd72c3",
+      "ukuran_kb": 477.8,
+      "ringkasan": "Menjawab: apa itu portal web hris-dashboard (One Bharata), modul apa saja yang ada di dalamnya (HR, attendance, finance dan insentif, integrasi marketplace, IT, GA, recruitment), dan bagaimana login, refresh token, serta SSO Identity Provider (ticket one-time code) bekerja. Menjelaskan cara kerja role gating: key system_roles per modul, peran admin/supervisor/security, kategori sidebar mana yang lahir dari paket izin (audit) dan mana yang dialiaskan (legal, rnd), serta struktur menu bersarang dan halaman Pengaturan HRGA terpusat beserta sub-menu dan tabnya. Juga memuat konvensi data-fetching TanStack Query (hook sidebar wajib enabled, pencacah balas angka) dan konvensi bagan Recharts dengan ChartContainer.",
       "kata_kunci": [
+        "Web ERP",
         "erp-frontend",
         "hris-dashboard",
         "One Bharata",
-        "Next.js",
+        "Next.js React",
         "SSO",
         "system_roles",
-        "sidebar menu",
-        "multi-perusahaan",
+        "role gating sidebar",
+        "Pengaturan HRGA",
         "TanStack Query",
-        "role gating"
+        "Recharts ChartContainer"
       ]
     },
     {
@@ -2601,20 +2593,20 @@
         "API - Index",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id"
       ],
-      "hash": "045eed04f8f1cf0a0c5361531ccde486df8abb600dd627ffd04559b6746d1ca5",
-      "ukuran_kb": 43.5,
-      "ringkasan": "Menjawab: kenapa modul pelatihan dipisah jadi service `learning` sendiri, apa saja kelompok fitur di dalamnya (master jenis dan trainer, event, peserta dan kehadiran, pengajuan, evaluasi trainer, course dan post-test, bahan KPI pelatihan, feed kalender), dan bagaimana ia membaca master karyawan lewat panggilan HTTP internal ke employee-service alih-alih menyimpannya sendiri. Menjelaskan rancangan rantai persetujuan pengajuan SPV ke HR berikut alasan dua tahap, pemisahan `employee_id` dari `requested_by`, dan pemakuan supervisor saat pengajuan dibuat. Berguna saat menelusuri verifikasi `department_key` lewat `EMPLOYEE_MODULE_URL` yang sengaja tidak masuk map `InternalURL` dan pemetaan galatnya.",
+      "hash": "575d61d825fe056149500fb935fb91f525b756530a2ba1b2f359b45dbd203031",
+      "ukuran_kb": 47.1,
+      "ringkasan": "Menjawab: kenapa modul Training dipisah jadi service sendiri (LMS Fase 0, database-per-service), apa stack dan batas kepemilikan datanya (Go, Fiber, MongoDB learning_db, tidak menyimpan master karyawan), dan fitur apa saja yang sudah ada versus yang belum (materi, pre-test, kurikulum jabatan, Talent Pool). Menjelaskan rancangan pengajuan pelatihan rantai SPV ke HR beserta alasan dua tahap, evaluasi trainer, layar karyawan /me, post-test berskor, bahan KPI pelatihan, dan feed kalender. Juga memuat pelajaran teknis: verifikasi departemen lewat panggilan internal ke employee-service, kenapa EMPLOYEE_MODULE_URL tidak masuk map InternalURL, pentingnya url.PathEscape, dan pemetaan 404 jadi 400 versus 502.",
       "kata_kunci": [
-        "learning-service",
-        "pelatihan",
-        "training",
+        "learning service",
         "LMS",
+        "training microservice",
         "learning_db",
-        "post-test",
-        "pengajuan pelatihan",
+        "Go Fiber MongoDB",
+        "database-per-service",
         "evaluasi trainer",
-        "approval SPV HR",
-        "calendar-feed"
+        "post-test kuis",
+        "KPI pelatihan",
+        "internal request employee-service"
       ]
     },
     {
@@ -6625,7 +6617,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, arah disetujui lewat `/analisa-kebutuhan` 2026-09-15. Berlaku setelah disetujui SPV FAT dan IT, pemutus yang ditetapkan ADR 0068. ⚠️ **§2 dan §3 (T1) dikodekan** di branch `feat/finance-entitas-cv` bip-erp dan erp-frontend 2026-09-15, **belum merge**; §1 dan §4 sampai §8 belum ada di kode. §2 diamandemen 2026-09-15 (pencocokan nama sesudah normalisasi format), lihat catatan di bawahnya.",
+      "status_teks": "**Diusulkan**, arah disetujui lewat `/analisa-kebutuhan` 2026-09-15. Berlaku setelah disetujui SPV FAT dan IT, pemutus yang ditetapkan ADR 0068. ⚠️ **§2 dan §3 (T1) MERGE 2026-09-16** (bip-erp [#1905](https://github.com/bip-itteam-internal/bip-erp/pull/1905), erp-frontend [#1592](https://github.com/bip-itteam-internal/erp-frontend/pull/1592)), **belum di PROD**. **§6 Jalur A (T2) dikodekan** di branch `feat/procurement-pembayaran-cv` kedua repo 2026-09-16, belum merge. §1, §4, §5, §7, dan §8 belum ada di kode. §2 diamandemen 2026-09-15 (pencocokan nama sesudah normalisasi format), lihat catatan di bawahnya.",
       "publik": true,
       "tautan": [
         "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
@@ -6636,6 +6628,7 @@
         "REF - Kepemilikan Data",
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
         "CORE - RBAC dan Permission Set",
+        "Microservices - Procurement Service",
         "RUN - Deploy Microservices bip-erp",
         "API - Finance Service",
         "API - Payroll Service",
@@ -6643,27 +6636,32 @@
         "Finance - Kas Kecil dan Pengajuan Budget",
         "Finance - Rancangan Finance Service",
         "Finance - Big Pictures",
-        "Microservices - Procurement Service",
         "Microservices - Payroll Service",
         "Microservices - Integration Service",
         "Microservices - Notification Service",
         "External - Accurate",
         "HRIS - Matriks KPI per Departemen"
       ],
-      "hash": "ceee3d407f1b9de17362f4fb06b94ebe483ec3c49c6bdd35a1fe16efeea1b403",
-      "ukuran_kb": 19.4,
-      "ringkasan": "Menjawab: kenapa pembukuan 40 CV grup dibangun di dalam ERP (finance-service) dengan FINCON sebagai spesifikasi dan sumber migrasi, sementara PT tetap di Accurate, dan kenapa opsi lain di ADR 0068 tidak dipilih. Menjelaskan keputusan satu identitas CV berkode CV01 sampai CV40, cakupan akses per CV lewat penugasan pemegang, aturan pembukuan (jurnal atomik, nominal dalam sen, nomor voucher, kunci periode), jalur antrean pembayaran per CV, serta konsekuensi dan hal yang sengaja tidak dilakukan.",
+      "hash": "a7510a9668730246fc714382c650545c3a791d54c9bf6f9fda03bcac43692544",
+      "ukuran_kb": 21.2,
+      "ringkasan": "Menjawab: kenapa pembukuan 40 CV grup diputuskan dibangun di dalam bip-erp alih-alih tetap di aplikasi terpisah (FINCON) atau dipaksakan ke Accurate, dan kenapa pembukuan PT tetap di Accurate sehingga ADR 0001 hanya diamandemen untuk lapisan CV. Menjelaskan urutan pengerjaannya (antrean pembayaran per CV lebih dulu, lalu buku besar setara FINCON, otomasi jurnal dari pembayaran/kas kecil/gaji/marketplace, impor mutasi bank dan kunci bulanan), identitas CV satu pintu, cakupan akses per CV yang ditegakkan server, serta bug FINCON yang wajib diperbaiki saat dibangun ulang alih-alih disalin (arus kas akun 12, neraca konsolidasi tak kumulatif, eliminasi laba rugi, nomor voucher tak unik, impor mode ganti). Juga menjawab apa yang TIDAK dijanjikan: tidak ada koneksi API bank, Coretax tetap di luar ERP, konsolidasi tahap pertama tanpa PT, dan migrasi data lama menunggu ekspor dari pemilik aplikasi lama.",
       "kata_kunci": [
-        "ADR 0096",
         "buku besar CV",
         "general ledger",
-        "konsolidasi 40 CV",
+        "40 CV",
         "FINCON",
+        "konsolidasi",
         "Accurate",
-        "akuntansi CV",
-        "pemegang CV",
+        "Finance",
+        "Junior Accountant",
+        "pembayaran CV",
         "jurnal",
-        "entitas CV"
+        "COA",
+        "chart of accounts",
+        "ADR 0096",
+        "ADR 0068",
+        "ADR 0001",
+        "eliminasi"
       ]
     },
     {
@@ -8845,20 +8843,25 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "2044edb97dbc493d05623283a3700fe1ac066979e3150365a3f627d61a729b86",
-      "ukuran_kb": 253.1,
-      "ringkasan": "Menjawab: posisi apa saja yang punya template KPI di produksi, metrik dan bobot persis apa yang dipakai menilai tiap posisi, dan metrik mana yang sudah otomatis versus masih dinilai manual beserta alasannya. Dipakai dev departemen untuk memutuskan metrik mana yang layak diotomatiskan berikutnya, karena tiap baris menyebut sumber data di sistem erp dan apa yang menghalanginya. Memuat juga temuan hasil pengukuran langsung ke employee_db prod per departemen, termasuk skor yang telanjur beku atas komposisi template lama dan template yang belum punya bab.",
+      "hash": "854ad962e6f5493ee75dce8985fd6797c8d7259a6a8744e4b2e424183f94ce53",
+      "ukuran_kb": 253.9,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang benar-benar dipakai menilai tiap jabatan di production, berapa bobotnya, dan apa targetnya, disalin apa adanya dari koleksi `kpi_template` termasuk typo dan penomoran label karena label itu kunci identitas metrik di kode. Menjawab pula metrik mana yang bisa diotomatiskan dan mana yang belum, lewat klasifikasi empat kategori (sumber ada dan terisi / butuh definisi / modul ada tapi datanya kosong / tidak ada sumber sama sekali) beserta rekap per departemen untuk Beauty Hacks, Finance, General Affair, Human Resource, Kesekretariatan, Kyura, Manufaktur, Procurement, Quality, dan Tech Development. Berguna untuk menjawab pertanyaan seperti \"posisi ini dinilai dari apa\", \"kenapa target metrik cuma ada di description\", departemen mana yang belum punya template (Percetakan/Printing, Marketing Offline Distribution), dan ralat-ralat yang sudah dicatat (Kaizen dan forecast kas).",
       "kata_kunci": [
         "KPI",
         "kpi_template",
-        "matriks KPI per departemen",
-        "bobot metrik",
+        "matriks KPI",
+        "metrik",
+        "bobot",
+        "target",
         "otomasi skor KPI",
-        "auto score",
+        "departemen",
+        "jabatan",
         "penilaian karyawan",
-        "performance appraisal",
+        "performance",
+        "HRIS",
         "employee_db",
-        "template per posisi"
+        "Kaizen",
+        "scorecard"
       ]
     },
     {
@@ -9525,20 +9528,20 @@
         "HRIS - Big Pictures",
         "HRIS - Analysis"
       ],
-      "hash": "0419445b74214cfa546482d62ac303d87f089506da39cb4c0a6e90eb64946a6e",
-      "ukuran_kb": 36.5,
-      "ringkasan": "Menjawab: bagaimana modul pelatihan karyawan dirancang dari sisi bisnis, mulai ruang lingkup MVP (jenis pelatihan, trainer, event, peserta dan kehadiran), adaptasi selektif dari modul Training ERPGo (apa yang diambil, disesuaikan, dan dibuang, termasuk Branch yang diganti Department), model data, alur proses, sampai aktor dan personanya. Menjelaskan keputusan penempatan arsitekturnya di service `learning` sendiri dan rencana rollout bertahap menuju LMS People Development (materi, pre/post test, kurikulum per jabatan, Talent Pool yang dicatat di dok Career & Promotion). Berguna untuk tahu apa yang sengaja di luar cakupan dan apa yang masih TBD sebelum mengusulkan fitur pelatihan baru.",
+      "hash": "4a6354553752efb83a13be9040b6be97ac884e63ccbf5d7ed51d812c61c69afc",
+      "ukuran_kb": 38.0,
+      "ringkasan": "Menjawab: bagaimana program pelatihan karyawan dirancang dari sisi bisnis, apa saja ruang lingkup MVP-nya (training types, trainers, event training, peserta dan kehadiran), dan fitur ERPGo mana yang diambil, disesuaikan, atau dibuang beserta alasannya (mis. Branch dibuang karena perusahaan single-site, Cost hanya informasional). Menjelaskan model data, alur proses bisnis, aktor dan persona, keputusan penempatan arsitektur ke service learning sendiri, serta rencana rollout bertahap menuju LMS People Development (materi, pre/post test, kurikulum jabatan). Juga mencatat celah alur karyawan biasa: menu self-service pelatihan dicabut dari web sebelum penggantinya di MyBharata benar-benar sampai ke pemakai.",
       "kata_kunci": [
         "training program",
-        "pelatihan",
-        "LMS",
+        "pelatihan karyawan",
         "people development",
+        "LMS",
         "ERPGo",
-        "trainer",
-        "MVP pelatihan",
-        "kurikulum jabatan",
-        "sertifikat pelatihan",
-        "HRIS"
+        "training types trainers",
+        "pengajuan pelatihan approval",
+        "evaluasi trainer",
+        "rencana pelatihan tahunan",
+        "sertifikat pelatihan"
       ]
     },
     {
@@ -14986,5 +14989,7 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "API Reference/API - Procurement Service.md"
+  ]
 }

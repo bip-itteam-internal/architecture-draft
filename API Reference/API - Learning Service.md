@@ -72,9 +72,9 @@ Verifikasi memanggil `GET {EMPLOYEE_MODULE_URL}/master/departments/{key}` di [[M
 
 Mengirim key ke sana menghasilkan nol supervisor lalu **409 "departemen belum punya supervisor"** — galat yang menuduh data master padahal yang salah satuan nilainya. Terjadi nyata di `POST /training/requests` sejak PR #1148; **6 dari 10 departemen** punya key ≠ name sehingga pengajuan mustahil dibuat untuk keenamnya, sementara empat sisanya jalan karena kebetulan key-nya sama dengan namanya. Diperbaiki PR #1153.
 
-## Rencana Pelatihan Tahunan (`/training/plan-items`) — 🟡 di branch, belum merged
+## Rencana Pelatihan Tahunan (`/training/plan-items`)
 
-⚠️ Dibaca dari branch `be-rencana` (`services/learning/rencana.go`, `models_rencana.go`), PR bip-erp #1903/#1904 (TERBUKA per 2026-09-16) — **belum ada di `origin/main`, belum dideploy**.
+✅ Sudah di `origin/main` (diukur 2026-09-16: `git grep plan-items origin/main -- services/learning` menemukan `rencana.go`, `training.go`, dan tiga berkas uji; kontrol negatif string karangan nol hit). Sumber: `services/learning/rencana.go`, `models_rencana.go`.
 
 | Method | Path | Izin | Fungsi |
 |---|---|---|---|
@@ -90,9 +90,9 @@ Mengirim key ke sana menghasilkan nol supervisor lalu **409 "departemen belum pu
 - `department_key`/`training_type_id` opsional, diverifikasi ke master yang sama dengan Event Pelatihan bila diisi (`rencana.go:85-103`).
 - Aturan lengkap tiap gerbang 409 (kapan terkunci, kapan `sudah_mulai` berlaku, kenapa membatalkan butir yang sudah terlaksana ditolak): [[Microservices - Learning Service]].
 
-## Bahan KPI Rencana (panggilan mesin) — 🟡 di branch, belum merged
+## Bahan KPI Rencana (panggilan mesin)
 
-⚠️ Dibaca dari branch `be-rencana` (`services/learning/kpi_rencana_pelatihan.go`), PR bip-erp #1903/#1904 (TERBUKA per 2026-09-16) — **belum ada di `origin/main`, belum dideploy**.
+✅ Sudah di `origin/main` (`services/learning/kpi_rencana_pelatihan.go`), diukur bersama § Rencana Pelatihan Tahunan di atas.
 
 | Method | Path | Gerbang | Fungsi |
 |---|---|---|---|
@@ -141,7 +141,11 @@ Status: `Menunggu SPV` → `Menunggu HR` → `Disetujui`, atau `Ditolak` di taha
 
 Identitas **selalu** dari header yang diisi gateway dari klaim JWT, tak pernah dari path maupun query.
 
-Baris `/me/trainings*` berbentuk rata: `training_id`, `title`, `status`, `department_key`, `location`, `start_date`/`end_date` (`YYYY-MM-DD`, WIB), `start_time`/`end_time`, `attendance_open`, `attended`, `trainer_id`, `trainer_name`, dan keputusan yang dihitung **server**: `can_attend` + `attend_block_reason`, serta `boleh_menilai` + `sudah_dinilai`. Kedua penanda penilaian dikirim **tanpa `omitempty`** supaya klien bisa membedakan "tidak boleh" dari "server lama yang belum punya field ini". `attend_block_reason` kosong bila boleh hadir, dan kosong pula bila sudah hadir.
+Baris `/me/trainings*` berbentuk rata: `training_id`, `title`, `status`, `department_key`, `location`, `start_date`/`end_date` (`YYYY-MM-DD`, WIB), `start_time`/`end_time`, `attendance_open`, `attended`, `trainer_id`, `trainer_name`, `sertifikat_tersedia` + `nomor_sertifikat`, dan keputusan yang dihitung **server**: `can_attend` + `attend_block_reason`, `boleh_menilai` + `sudah_dinilai`, serta `post_test_tersedia` + `post_test_lulus`. Penanda-penanda itu dikirim **tanpa `omitempty`** supaya klien bisa membedakan "tidak boleh" dari "server lama yang belum punya field ini". `attend_block_reason` kosong bila boleh hadir, dan kosong pula bila sudah hadir.
+
+- `post_test_tersedia` mengirim **KEPUTUSAN**, bukan fakta mentah: ia memanggil `BolehMengerjakanPostTest`, aturan yang sama dengan penjaga rute `start`, jadi kelas yang belum `Completed` maupun yang sudah dilulusi tak menyalakannya. Itu disengaja — `/me/trainings` justru hanya memuat `Scheduled` dan `Ongoing`, sehingga penanda berbasis "ada bank soalnya" saja akan menyala persis di daftar yang tak satu pun barisnya boleh dikerjakan. Konsekuensi yang diterima sadar: tombol Kerjakan hanya bisa muncul di `/me/trainings/history`.
+- Galat membaca bank soal sengaja **gagal-TERBUKA** (penanda tetap menyala lalu server menjawab "post-test belum disiapkan"), pola yang sama dengan `boleh_menilai`. Menutupnya diam-diam berarti peserta kehilangan ujiannya tanpa penjelasan.
+- `post_test_lulus` berskala **course**, bukan kelas, sejalan dengan aturan `sudahLulus` di server; dua kelas yang berbagi satu course karena itu tak bisa menampilkan penanda yang bertentangan dengan penolakan server.
 
 ## Agregat Penilaian Trainer
 
@@ -161,8 +165,8 @@ Grup `/courses` sengaja **tidak** diletakkan di bawah `/training`: segmen statik
 | Method | Path | Izin | Fungsi |
 |---|---|---|---|
 | GET | `/courses` · `/courses/:id` | view | List (`{data, count}`) / detail course |
-| POST | `/courses` | manage | `{title, description?, passing_score}` (`passing_score` 0..100, 0 = tanpa ambang); `is_active` diset `true` |
-| PUT | `/courses/:id` | manage | Ubah (full-replace) |
+| POST | `/courses` | manage | `{title, description?, passing_score, max_attempt?, retry_cooldown_hours?}` (`passing_score` 0..100, 0 = tanpa ambang; `max_attempt` ≥ 0, 0 = tanpa batas; `retry_cooldown_hours` 0..8760, 0 = tanpa jeda); `is_active` diset `true` |
+| PUT | `/courses/:id` | manage | Ubah (full-replace, **kecuali `is_active`** yang dipulihkan dari dokumen lama bila kuncinya tak dikirim) |
 | DELETE | `/courses/:id` | manage | Hapus beserta quiz-nya. **409 bila course sudah punya percobaan**; nonaktifkan lewat `is_active` |
 | GET | `/courses/:id/quiz` | manage | Bank soal post-test **berikut kunci** (`correct_index`); karena memuat kunci, GET pun digerbang `manage` |
 | PUT | `/courses/:id/quiz` | manage | Upsert `{questions: [{id, text, options, correct_index, points}], shuffle, time_limit_minutes}`. `course_id` diambil dari path dan `kind` selalu `post` |
@@ -171,23 +175,28 @@ Grup `/courses` sengaja **tidak** diletakkan di bawah `/training`: segmen statik
 
 - **Validasi soal**: `id` wajib dan unik dalam satu quiz (jawaban dicocokkan lewat id, bukan urutan), minimal 2 opsi, `correct_index` dalam rentang, `points` > 0, `time_limit_minutes` ≥ 0 (0 = tanpa batas). Satu quiz per course per jenis, dikunci unique index `{course_id, kind}`.
 - Kunci jawaban tak pernah keluar lewat rute lain: `Question.MarshalJSON` membuang `correct_index`, dan hanya `GET /courses/:id/quiz` yang merakit bentuk berkunci.
-- ⚠️ `PUT /courses/:id` full-replace termasuk `is_active`: permintaan tanpa field itu **menonaktifkan** course.
+- **Batas mengulang** hidup di course, bukan di quiz: `max_attempt` (kuota) dan `retry_cooldown_hours` (jeda antar-percobaan, dihitung dari `started_at` percobaan terakhir). Keduanya 0 pada course lama, jadi perilaku sebelum fitur ini tidak berubah tanpa tindakan HR. Nilai course memakai percobaan **TERBAIK**, jadi tanpa kuota metrik KPI-nya mengukur ketekunan mengulang, bukan kemampuan.
+- ⚠️ `PUT /courses/:id` full-replace, tetapi `is_active` **dikecualikan**: bila kunci itu tak ada di badan permintaan, nilainya diambil dari dokumen lama. Sebelum 2026-09-16 tidak demikian, dan akibatnya satu permintaan Ubah yang cuma membetulkan judul menonaktifkan course-nya diam-diam. Mengirim `is_active: false` secara sengaja tetap berlaku — yang diperiksa kehadiran kuncinya, bukan nilainya.
 
 ## Post-test (peserta)
 
 | Method | Path | Gerbang | Fungsi |
 |---|---|---|---|
-| POST | `/me/post-test/:trainingId/start` | identitas | Mulai percobaan. Syarat: peserta terdaftar, event punya `course_id`, status `Completed`, belum pernah lulus (gagal syarat → 403; quiz belum disiapkan → 404). Balas 201 `{attempt_id, time_limit_minutes, questions: [{id, text, options, points}]}`, tanpa kunci, diacak bila `shuffle` |
+| POST | `/me/post-test/:trainingId/start` | identitas | Mulai percobaan BARU (memakan satu kuota). Syarat: peserta terdaftar, event punya `course_id`, status `Completed`, belum pernah lulus (gagal syarat → 403; quiz belum disiapkan → 404); kuota habis atau masih dalam jeda → 403 dengan pesan yang menyebut **kapan** boleh mengulang (WIB). Balas 201 `{attempt_id, attempt_no, started_at, time_limit_minutes, sisa_detik, questions: [{id, text, options, points}]}`, tanpa kunci, diacak bila `shuffle` |
+| GET | `/me/post-test/attempt/:id` | identitas (pemilik) | **Melanjutkan** percobaan yang sedang berjalan, tanpa memakan kuota. Balas bentuk yang SAMA dengan `start`; soal disajikan pada urutan snapshot, tidak diacak ulang. Sudah dikirim atau dibatalkan → 409; lewat batas waktu → 409 dan percobaannya dihanguskan; percobaan orang lain → 404 (ditolak lewat **filter kueri**, bukan diperiksa sesudah dibaca) |
 | POST | `/me/post-test/attempt/:id` | identitas (pemilik) | `{answers: [{question_id, selected_index}]}`. Balas `{score, max_score, passed, passing_score}`. Sudah dikirim atau dibatalkan → 409; lewat batas waktu → 409 dan percobaan **hangus** (boleh mengulang); percobaan orang lain → 404 |
 | PATCH | `/attempts/:id/void` | manage | `{reason}` wajib. Menandai batal **tanpa menghapus** barisnya |
 
-- Tanpa header identitas, ketiga rute membalas **401** sebelum handler jalan.
+- Tanpa header identitas, keempat rute membalas **401** sebelum handler jalan.
 - Penilaian memakai **snapshot** soal yang dibekukan saat percobaan dimulai; lulus bila `score × 100 ≥ passing_score × max_score`.
-- `/me/post-test/attempt/:id` didaftarkan sebelum `/me/post-test/:trainingId/start` supaya `attempt` tak ter-match sebagai `trainingId`.
+- `/me/post-test/attempt/:id` (POST maupun GET) didaftarkan sebelum `/me/post-test/:trainingId/start` supaya `attempt` tak ter-match sebagai `trainingId`.
+- `sisa_detik` **-1 = tanpa batas waktu**, bukan "habis". Rute lanjutkan mengubah nol jadi 409, jadi klien tak pernah benar-benar menerima nol. Kedua rute merakitnya lewat fungsi yang sama supaya artinya tak bisa menyimpang; sebelum 2026-09-16 rute `start` tak mengirimkannya sama sekali, dan penunjuk mundur di klien karena itu membaca "tanpa batas" sepanjang percobaan pertama.
+- ⛔ **Percobaan yang dihanguskan SISTEM karena lewat batas waktu TETAP memakan kuota** dan tetap menahan jeda; yang **dibatalkan HR** tidak, sebab mengembalikan kesempatan justru satu-satunya guna pembatalan. Pembedanya `voided_by == "system"` (konstanta `PembatalSistem`), bukan ada-tidaknya `voided_at`. Tanpa pembedaan itu `max_attempt` tak mengikat sama sekali untuk kuis berbatas waktu: mulai, biarkan waktunya habis, tekan Kirim, mulai lagi — berulang tanpa batas.
+- ⚠️ **Utang yang diketahui**: penjagaan kuota masih baca-periksa-tulis (`FindMany` → aturan → `InsertOne`) tanpa unique index di `quiz_attempt`, jadi dua permintaan Mulai yang tiba berbarengan sama-sama lolos dan menghasilkan dua baris ber-`attempt_no` sama. Indeks `quiz` di service yang sama sengaja unik dengan alasan yang persis ini.
 
-## Sertifikat Pelatihan — 🟡 di branch, belum merged
+## Sertifikat Pelatihan
 
-⚠️ Dibaca dari branch `be-sertifikat` (`services/learning/sertifikat.go`, `models_sertifikat.go`, `sertifikat_pdf.go`), PR bip-erp #1903/#1904 (TERBUKA per 2026-09-16) — **belum ada di `origin/main`, belum dideploy**.
+✅ Sudah di `origin/main` (diukur 2026-09-16: `git grep certificate-settings origin/main -- services/learning` menemukan `sertifikat.go`, `training.go`, dan tiga berkas uji; kontrol negatif string karangan nol hit). Sumber: `services/learning/sertifikat.go`, `models_sertifikat.go`, `sertifikat_pdf.go`.
 
 | Method | Path | Izin | Fungsi |
 |---|---|---|---|
@@ -263,6 +272,8 @@ Kontrol negatif itu bagian dari buktinya, bukan pelengkap: ia berprefiks **sama*
 ⚠️ **Rute course dan post-test belum pernah diverifikasi lewat gateway produksi.** Yang terbukti 2026-09-15 hanya keberadaan string rutenya di biner `Learning-Service` prod (`/me/post-test`, `quiz_attempt`, `attempts/export`, kontrol negatif string karangan → 0).
 
 ⚠️ **Terpasang bukan berarti terpakai.** Di produksi 2026-09-15 koleksi `training_request`, `trainer_evaluation`, `quiz`, dan `quiz_attempt` sama-sama **0 dokumen**, dan `course` belum pernah terbentuk, walau endpointnya live sejak 2026-08-11 (pengajuan, evaluasi) dan 2026-08-20 (post-test). Sebabnya ada di alur pemakai dan ketiadaan layar, lihat [[Microservices - Learning Service]].
+
+🔜 **Layarnya sedang dibangun (Tahap 3a), belum merged.** Per 2026-09-16 ada tiga PR TERBUKA yang menutup ketiadaan layar di atas: bip-erp **#1913** (rute lanjutkan percobaan, batas mengulang, penanda `post_test_*`), erp-frontend **#1603** (menu Materi E-Learning, bank soal, rekaman percobaan, layar peserta), my-bharata **#151** (layar peserta di ponsel). **Belum ada satu pun yang di-merge maupun dideploy**, jadi angka 0 dokumen di atas masih berlaku dan rute course/post-test masih belum pernah dipanggil lewat gateway mana pun. Ukur ulang sesudah deploy sebelum mengutip bagian ini.
 
 ## Dokumen Terkait
 
