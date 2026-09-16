@@ -399,10 +399,12 @@ footer li{margin:2px 0}
       s += box(dx + 0.35, dy + 0.3, 0.78, 0.7, 0.25, 0.03, '#d9d6cf');
       s += box(dx + 1.55, dy + 0.85, 0.78, 0.12, 0.12, 0.22, '#2a2d33');
       // Monitor di sisi utara meja, layarnya menghadap robot; penonton melihat punggung monitor. Penanda warna Lead
-      // pindah jadi pantulan cahaya layar di permukaan meja, tetap ber-id led-pod-<n> supaya logika identitas tak berubah.
+      // pindah jadi lampu meja, tetap ber-id led-pod-<n> supaya logika identitas tak berubah. Ia ditaruh di sisi
+      // SELATAN monitor, bukan di sisi layarnya: meja di sisi utara tertutup badan monitor dari sudut pandang ini,
+      // jadi penanda di sana hanya terlihat karena tergambar belakangan, bukan karena benar-benar kelihatan.
       s += box(dx + 1.15, dy + 0.35, 0.78, 0.9, 0.1, 0.5, '#23262d');
-      s += '<polygon id="led-pod-' + n + '" points="' + pts([P(dx + 1.15, dy + 0.06, 0.781), P(dx + 2.05, dy + 0.06, 0.781),
-        P(dx + 2.05, dy + 0.34, 0.781), P(dx + 1.15, dy + 0.34, 0.781)]) + '" fill="' + LED_KOSONG + '" fill-opacity=".9"/>';
+      s += '<polygon id="led-pod-' + n + '" points="' + pts([P(dx + 1.15, dy + 0.52, 0.781), P(dx + 2.05, dy + 0.52, 0.781),
+        P(dx + 2.05, dy + 0.8, 0.781), P(dx + 1.15, dy + 0.8, 0.781)]) + '" fill="' + LED_KOSONG + '" fill-opacity=".9"/>';
       taruh(dx + 1.2 + dy + 0.6, s);
       kursi(px + 0.8, py + 0.45, '#5a5f6b', 'selatan');
       bangku(px - 0.45, py + 1.5);
@@ -489,10 +491,14 @@ footer li{margin:2px 0}
     }
     var gelap = campur(warna, -0.35), terang = campur(warna, 0.25), out = '';
     if (dudukZ == null) out += K(-0.2, -0.08, 0, 0.14, 0.16, 0.32, '#2b2e35') + K(0.06, -0.08, 0, 0.14, 0.16, 0.32, '#2b2e35');
-    out += B(-0.36, -0.07, 0.1, 0.1, 0.14, 0.34, gelap);
+    // Rotasi menukar lengan mana yang lebih dekat kamera, jadi urutan gambarnya ikut ditukar; tanpa ini
+    // robot yang menghadap timur atau utara kehilangan satu lengan di balik badannya.
+    var lenganA = B(-0.36, -0.07, 0.1, 0.1, 0.14, 0.34, gelap), lenganB = B(0.26, -0.07, 0.1, 0.1, 0.14, 0.34, gelap);
+    var tukarLengan = putar === 1 || putar === 2;
+    out += tukarLengan ? lenganB : lenganA;
     out += B(-0.25, -0.17, 0, 0.5, 0.34, 0.5, warna);
     out += sisi(0.17, -0.08, 0.08, z0 + 0.25 * s, z0 + 0.37 * s, '#ffffff', ' fill-opacity=".7"');
-    out += B(0.26, -0.07, 0.1, 0.1, 0.14, 0.34, gelap);
+    out += tukarLengan ? lenganA : lenganB;
     out += B(-0.27, -0.22, 0.54, 0.54, 0.44, 0.38, terang);
     out += sisi(0.22, -0.2, 0.2, z0 + 0.64 * s, z0 + 0.82 * s, '#11151b');
     out += sisi(0.22, -0.13, -0.05, z0 + 0.7 * s, z0 + 0.76 * s, '#88ffff');

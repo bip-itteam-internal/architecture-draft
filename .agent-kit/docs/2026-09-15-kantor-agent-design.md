@@ -607,9 +607,15 @@ lewat `R(x, y, w, d)`, dan wajah digambar lewat `sisi(yb, ...)` yang memutuskan 
 sisi yang terlihat; `mukaTimur` menemani `mukaSelatan`. Kunci cache `gambarBadan` memuat arah, jadi badan digambar
 ulang hanya saat robotnya benar-benar berputar.
 
+**Urutan gambar ikut dirotasi.** Penggambar ini tak punya penyangga kedalaman: yang lebih dekat kamera harus
+digambar belakangan. Rotasi menukar lengan mana yang lebih dekat, jadi urutan kedua lengan ikut ditukar untuk hadap
+timur dan utara. Tanpa itu robot yang membelakangi kehilangan satu lengan di balik badannya, dan gagalnya senyap
+karena sisanya tetap terlihat seperti robot yang utuh.
+
 **Monitor pod.** Layarnya kini menghadap robot di sisi utara meja, jadi penonton melihat punggung monitor. Penanda
-warna Lead pindah menjadi pantulan cahaya layar di permukaan meja dan tetap ber-id `led-pod-<n>`, sehingga logika
-identitas di halaman tidak berubah.
+warna Lead pindah menjadi lampu di permukaan meja dan tetap ber-id `led-pod-<n>`, sehingga logika identitas di
+halaman tidak berubah. Ia ditaruh di sisi **selatan** monitor, bukan di sisi layarnya: meja di sisi utara tertutup
+badan monitor dari sudut pandang ini, jadi penanda di sana hanya akan terlihat karena tergambar belakangan.
 
 **Test.** `tests/kantor-agent-browser.ps1` naik ke 37 check: arah di pod, bangku pod, ruang server, perpustakaan,
 lounge, kursi rapat yang dicocokkan dengan vektor ke pusat meja, robot membelakangi tanpa mata, arah saat berjalan,
