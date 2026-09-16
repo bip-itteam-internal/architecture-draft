@@ -1,4 +1,4 @@
-**Status**: ⚠️ **Implemented (ada catatan)** — kode selesai & ber-tes (PR #1552, **belum merge**). Ekspor belum dialihkan ke salinan; penjadwalan pemindai belum dipasang. Lihat "Belum selesai".
+**Status**: ⚠️ **Implemented (ada catatan)** — kode selesai & ber-tes (PR #1552, **merged 2026-08-31**; penanda "belum merge" lama basi, diverifikasi `gh pr view` 2026-09-16). Ekspor belum dialihkan ke salinan; penjadwalan pemindai belum dipasang. Lihat "Belum selesai".
 
 # ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift
 

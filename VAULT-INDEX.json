@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-15",
+  "digenerate": "2026-09-16",
   "jumlah_dokumen": 414,
   "dokumen": [
     {
@@ -427,22 +427,22 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "2ca8a6bd23e4f84f36fcaa38a586141840ba49642e1579604537c2c588dfe9cd",
-      "ukuran_kb": 93.9,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service (webhook marketplace, order/transaksi, TikTok Shop/Business, Shopee, Accurate, dashboard accounting FAT, profit insentif, ICC account mapping, kas toko, ulasan, status sinkron toko, kepemilikan toko per departemen), beserta parameter, filter, dan bentuk respons tiap rute. Juga menjawab cara memakai endpoint seperti ekspor order, aging piutang, feed retur untuk WMS, packet tracking, dan filter atribusi afiliasi Shopee, serta aturan gateway key dan path publik webhook. Mencatat bahwa CRUD Teams marketing (`/marketing/teams`) sudah dicabut total 2026-09-15 (Fase Contract) — ACL sisa toko kini murni filter `AllowedShops` di `/transactions/master/shops`.",
+      "hash": "870c39cee17ef2c519a355d2889e26d8c5accb0cc4955f5f1c53b328d9b03b7d",
+      "ukuran_kb": 94.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service lewat gateway `/api/integration/*` dan webhook publik `/ext/webhook/:service`, serta parameter persis tiap rute. Berguna untuk menemukan cara menarik order terpadu, ekspor order, aging piutang, feed retur lintas-channel untuk WMS, packet tracking, laporan iklan TikTok Business, data Shopee, jembatan Accurate, dashboard FAT, profit & profit insentif, ICC account mapping, kas toko/wallet, ulasan marketplace, status sinkron toko, dan worker/jobs. Juga menjelaskan gerbang autentikasi (semua rute butuh gateway key, termasuk `/health`, kecuali webhook publik) dan jebakan filter seperti `shopee_attribution` yang hanya berlaku untuk channel Shopee.",
       "kata_kunci": [
-        "integration-service",
-        "API endpoint",
-        "webhook marketplace",
+        "integration service",
+        "endpoint",
+        "API",
+        "webhook",
         "transaction orders",
-        "piutang aging",
         "packet tracking",
-        "feed retur WMS",
+        "piutang",
+        "aging",
+        "retur",
         "Accurate",
-        "shopee_attribution",
-        "ICC account mapping",
-        "department-shops",
-        "fase contract"
+        "Shopee",
+        "TikTok"
       ]
     },
     {
@@ -2490,23 +2490,22 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "af2f0ec97bfea16bd56610408b7985acdc0c62536c96fcd3c5bb58db780587a3",
-      "ukuran_kb": 396.6,
-      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) ke Accurate Online, bagaimana order masuk lewat webhook direct lalu dinormalkan jadi model transaksi terpadu, dan bagaimana Sales Invoice serta Sales Return di-push ke Accurate. Juga menjelaskan fitur-fitur di dalamnya (GMV Max monitoring/overview, ICC video metrics, rencana Meta Ads, cron sync, kepemilikan toko per departemen via `department_shops`, ACL toko `ShopACLUseCase`/`AllowedShops`, status sinkron toko, ulasan marketplace, index MongoDB) beserta gotcha seperti bypass verifikasi signature Shopee dan rate limit TikTok. Mencatat Fase Contract 2026-09-15: CRUD Teams marketing (`/marketing/teams`, koleksi `marketing_teams`/`team_shops`/`team_members`) dicabut total, `MarketingTeamUseCase` disusutkan+di-rename `ShopACLUseCase`.",
+      "hash": "f3836d20912055984abde76541b810fbb3741dc64cfb276f3800525f8414c08b",
+      "ukuran_kb": 398.3,
+      "ringkasan": "Menjawab: apa tanggung jawab integration-service, bagaimana order marketplace (TikTok Shop, Shopee, Lazada) masuk lewat webhook dan dinormalkan jadi model transaksi terpadu, serta bagaimana bridging akuntansi ke Accurate Online (sales invoice, sales return, ringkasan harian per toko) bekerja. Menjelaskan juga modul TikTok Business/Ads (GMV Max monitoring & overview, ICC video metrics), kredensial OAuth per marketplace, ACL toko, kepemilikan toko per departemen, WMS bridge, worker/cron, atribusi order afiliasi Shopee, serta catatan observability, index MongoDB jalur panas, dan status sinkron per toko. Memuat jejak masalah nyata beserta perbaikannya (rate limit TikTok, filter advertiser_id salah field, Desty soft-disabled).",
       "kata_kunci": [
         "integration service",
-        "marketplace integration",
-        "TikTok Shop",
+        "marketplace",
         "Shopee",
+        "TikTok Shop",
+        "TikTok Business",
         "Lazada",
-        "Accurate Online",
-        "sales invoice",
-        "faktur",
+        "Accurate",
+        "webhook",
         "GMV Max",
-        "cron sync",
-        "ShopACLUseCase",
-        "department_shops",
-        "fase contract"
+        "sync",
+        "cron",
+        "OAuth"
       ]
     },
     {
@@ -2626,6 +2625,7 @@
         "IT - Background Jobs & Schedulers",
         "ADR - 0002 Database-per-Service",
         "APP - Web ERP",
+        "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "ADR - 0052 Status Sinkron per Toko",
         "ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya",
         "Manufacture - Issue Code Audit 2026-06",
@@ -2637,20 +2637,22 @@
         "DB - Overview and Notes",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
-      "hash": "7ca14994d37495a6e1e5be786c80b80db80acb5f3fb98f0387a14eb730565d71",
-      "ukuran_kb": 65.7,
-      "ringkasan": "Menjawab: apa yang dikelola manufacture-service (WMS manufaktur), yaitu master bahan dan produk/bundle, stok per sektor, transaksi in/out, formula/BOM, produksi, material order, PO, proposal koreksi, dan audit log, serta dari mana tiap master bersumber (bahan dan stok dari Accurate, barang jadi dari HPP integration, formula dari Excel). Juga menjelaskan cara kerja sync/align dengan Accurate dan HPP, push pergerakan WMS ke Accurate sebagai Penyesuaian Persediaan (outbox, kill switch, akar kegagalan format `transDate`), snapshot saldo awal/akhir bulanan, model data `manufacture_db`, keputusan teknis, dan catatan TBD.",
+      "hash": "280602cc57a5c9681b4220dcd62c7d62572d876da237a3cd5920b7c0827a2277",
+      "ukuran_kb": 66.4,
+      "ringkasan": "Menjawab: bagaimana WMS/manufacture-service mengelola master bahan baku dan produk, stok per gudang, transaksi in/out, formula/BOM, produksi, PO, proposal koreksi, dan audit log. Menjelaskan dari mana master datang sekarang (bahan & angka stok dari Accurate, barang jadi & bundle dari data HPP integration, formula dari import Excel, sync Google Sheets sudah dihapus), cara kerja push pergerakan WMS ke Accurate lewat outbox penyesuaian persediaan beserta kill switch dan akar kegagalan format transDate, serta mekanisme saldo awal/akhir bulanan yang idempoten. Juga menyebut stack, port, database `manufacture_db`, dan tautan ke daftar rute lengkap.",
       "kata_kunci": [
         "manufacture service",
         "WMS",
-        "warehouse management",
-        "master bahan",
-        "master produk",
+        "warehouse",
+        "gudang",
         "stok",
-        "formula BOM",
-        "saldo awal bulanan",
-        "push Accurate",
-        "manufacture_db"
+        "master bahan",
+        "bundle",
+        "formula",
+        "BOM",
+        "Accurate push",
+        "saldo awal",
+        "HPP"
       ]
     },
     {
@@ -3827,21 +3829,22 @@
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "117faee1e04dd896985ded57202108c24222ead393a089736449394e7714c0c2",
-      "ukuran_kb": 91.0,
-      "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi dua sub-tab (SUMBER vs INPUT WMS), menu mana yang boleh punya badge status \"sudah/belum dicatat\" dan kenapa sebagian sengaja tidak punya, serta siapa yang tercatat sebagai penginput sebuah baris log. Menjelaskan sumber pembanding tiap menu (feed retur marketplace, resi marketplace agregat per SKU, Procurement PO, Surat Jalan, laporan hasil produksi), alasan hanya resi COMPLETED + SHIPPED dihitung keluar gudang sementara TO_SHIP dikecualikan, pemecahan bundle ke komponen, dan kenapa nama penginput distempel server dari header username alih-alih dikirim client. Juga mencatat gerbang gudang backend untuk retur barang-balik, perubahannya jadi per-order lalu penilaian scan per-SKU, dan deteksi komponen paket yang tak pernah discan.",
+      "hash": "c016832da834aa7a04344f348d81a7b4ae282e8f66796824e93994f4ae7c7745",
+      "ukuran_kb": 92.1,
+      "ringkasan": "Menjawab: kenapa tiap menu WMS dipecah jadi dua sub-tab (SUMBER vs INPUT WMS), menu mana yang boleh punya badge \"sudah/belum dicatat\" dan kenapa menu tanpa kunci join sengaja tak diberi badge. Menjelaskan aturan status resi yang dihitung keluar gudang (COMPLETED + SHIPPED, TO_SHIP dikecualikan), agregasi tab sumber Keluar FG per SKU dengan bundle dipecah ke komponen, serta kenapa nama penginput distempel server dari header gateway dan bukan dikirim client. Juga memuat gerbang gudang untuk retur (per-order, status SEBAGIAN) dan konfirmasi scan per-SKU beserta temuan scan yang hilang.",
       "kata_kunci": [
+        "ADR 0025",
         "WMS",
         "log sumber",
         "input gudang",
         "retur",
-        "return ekspedisi",
-        "keluar FG",
-        "inbound RM",
-        "created_by_name",
         "gerbang gudang",
+        "scan",
         "resi",
-        "ADR 0025"
+        "created_by_name",
+        "audit",
+        "Keluar FG",
+        "Inbound RM"
       ]
     },
     {
@@ -4368,7 +4371,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "✅",
-      "status_teks": "**Implemented & Deployed** (2026-08-06, PR #1017 commit `35b1860d`; koreksi data existing Juli+Agustus **SELESAI** hari yang sama lewat **dua gelombang** — 245 + 109 dokumen, sisa temuan **0**, nomor RTR utuh; gelombang 1 sempat bocor 109 dokumen karena detektornya bergantung fetch Accurate yang gagal senyap, lihat Consequences). Menyempurnakan pembentukan baris Retur Penjualan untuk SKU **paket/bundle** — uang mengikuti harga paket di faktur, stok tetap mengikuti pecahan komponen.",
+      "status_teks": "**Implemented & Deployed** (2026-08-06, PR #1017 commit `35b1860d`; koreksi data existing Juli+Agustus **SELESAI** hari yang sama lewat **dua gelombang** — 245 + 109 dokumen, sisa temuan **0**, nomor RTR utuh; gelombang 1 sempat bocor 109 dokumen karena detektornya bergantung fetch Accurate yang gagal senyap, lihat Consequences). Menyempurnakan pembentukan baris Retur Penjualan untuk SKU **paket/bundle** — uang mengikuti harga paket di faktur, stok tetap mengikuti pecahan komponen. ⚠️ **Amandemen 2026-09-15** (🟡 belum merge): paket dari order **BATAL** dibukukan UTUH walau komponennya baru sebagian discan — lihat butir terakhir Consequences.",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
@@ -4377,22 +4380,21 @@
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur"
       ],
-      "hash": "b07e9f3499b416156a9d8ead98abdd57083a32ec17fa97ffb90fb739027652e5",
-      "ukuran_kb": 13.8,
-      "ringkasan": "Menjawab: kenapa retur SKU paket/bundle dibukukan sebagai baris induk faktur dan bukan dipecah jadi komponen, serta bagaimana uang mengikuti harga paket sementara stok tetap turun per komponen. Menjelaskan akar bug over-reversal (\"ter-book Rp0\" dan nilai retur melebihi harga paket), aturan alokasi untuk retur sebagian (proporsional, bobot all-or-nothing), dan hasil koreksi data lama dua gelombang. Juga menjawab kenapa detektor audit yang bergantung fetch Accurate gagal senyap dan pengaman apa yang dipakai saat re-book massal.",
+      "hash": "e7aa7d18dcc4c2d8f1834f9c8fad5df724e0321cf2ecadfe331b7bec7faae518",
+      "ukuran_kb": 18.7,
+      "ringkasan": "Menjawab: kenapa retur SKU paket/bundle dibukukan sebagai baris INDUK faktur berharga (bukan dipecah jadi komponen berharga), sehingga uang mengikuti harga paket di faktur sementara stok tetap bergerak lewat sub-baris komponen @Rp0 yang diturunkan Accurate. Menjelaskan akar bug over-reversal \"Ter-book Rp0\" (konteks paket hilang di `buildWarehouseDetailItems`), aturan retur sebagian (alokasi proporsional largest-remainder, bobot all-or-nothing atau rata), bentuk dokumen retur yang berubah, serta kronologi koreksi data lama dua gelombang. Memuat pelajaran metodologis penting: detektor yang bergantung fetch Accurate gagal senyap saat 429 sehingga hasilnya hanya batas bawah, dan pengaman re-book massal lewat cacah `accurate_return_id`.",
       "kata_kunci": [
         "ADR 0040",
-        "retur",
-        "return",
+        "retur paket",
         "bundle",
-        "paket",
-        "Accurate",
+        "baris induk",
         "sales return",
-        "RTR",
+        "Accurate",
         "over-reversal",
-        "faktur",
-        "invoice",
-        "returnfix"
+        "alokasi proporsional",
+        "returnfix",
+        "RTR",
+        "faktur"
       ]
     },
     {
@@ -5393,7 +5395,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — kode selesai & ber-tes (PR #1552, **belum merge**). Ekspor belum dialihkan ke salinan; penjadwalan pemindai belum dipasang. Lihat \"Belum selesai\".",
+      "status_teks": "**Implemented (ada catatan)** — kode selesai & ber-tes (PR #1552, **merged 2026-08-31**; penanda \"belum merge\" lama basi, diverifikasi `gh pr view` 2026-09-16). Ekspor belum dialihkan ke salinan; penjadwalan pemindai belum dipasang. Lihat \"Belum selesai\".",
       "publik": true,
       "tautan": [
         "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
@@ -5401,20 +5403,20 @@
         "API - Integration Service",
         "APP - Web ERP"
       ],
-      "hash": "2280e613beeb279072608155921a02f05b8477348ae6dcca60f0168af9128187",
-      "ukuran_kb": 6.0,
-      "ringkasan": "Menjawab: kenapa baris retur menyimpan salinan (mirror) dokumen Retur Penjualan Accurate, apa yang ikut disalin (kepala dokumen, baris termasuk ekspansi bundle, total, `SyncedAt`), dan kapan salinan itu diisi maupun dibatalkan (`$unset` saat `SetGroupResult` dipanggil). Menjawab juga: kenapa salinan hanya boleh dipakai untuk menampilkan dan tidak pernah untuk memutuskan pembukuan, bagaimana pemindai drift read-only mendeteksi `BEDA_TOTAL` dan `DOKUMEN_HILANG` lewat `sales-return/list.do` (100 dokumen per panggilan), serta batas yang diterima sadar — perubahan yang tak mengubah total tak tertangkap. Rujukan saat ekspor Laporan Retur lambat/kena rate limit, atau saat perlu menyegarkan satu dokumen retur secara manual.",
+      "hash": "a9c73117fdf156b2ad7e58ea1a53c1f18f3b16c86280a6363daaeeaf8bef36f9",
+      "ukuran_kb": 6.1,
+      "ringkasan": "Menjawab: kenapa baris retur menyimpan salinan (cermin) dokumen Retur Penjualan Accurate agar layar detail dan ekspor tak menembak API tiap kali, dan kenapa salinan itu wajib datang sepaket dengan pemindai drift `cmd/returndriftscan`. Menjelaskan aturan pemakaiannya — cermin untuk MELIHAT, Accurate untuk MEMUTUSKAN — pengisian lazy saat dipakai (bukan backfill), pembatalan cermin lewat `$unset` di `SetGroupResult`, dua kelas temuan drift (BEDA_TOTAL, DOKUMEN_HILANG), dan perbaikan lewat tombol Segarkan oleh manusia. Juga mencatat batas yang diterima sadar (perbandingan hanya total) dan bagian yang belum selesai: penjadwalan pemindai, pengalihan ekspor ke salinan, dan frontend.",
       "kata_kunci": [
-        "mirror retur",
-        "cermin",
-        "drift scan",
+        "ADR 0066",
+        "cermin retur",
+        "accurate_mirror",
+        "drift",
         "returndriftscan",
         "sales return",
         "Accurate",
-        "ekspor laporan retur",
-        "rate limit",
-        "ADR 0066",
-        "refresh retur"
+        "ekspor retur",
+        "cache",
+        "refresh"
       ]
     },
     {
