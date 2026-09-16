@@ -742,27 +742,26 @@
         "APP - Portal Karir Bharata",
         "API - Index",
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
-        "HRIS - Psikotes Kraepelin",
         "HRIS - Bank Soal dan Paket Psikotes",
+        "HRIS - Psikotes Kraepelin",
         "CORE - API Master Gateway",
         "HRIS - Recruitment",
         "Microservices - Employee Service"
       ],
-      "hash": "ce65bc858567a859908eaf110ad4cefe76ba7c949decf5641e5441616b900ba0",
-      "ukuran_kb": 39.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang dipakai alur rekrutmen (`/api/recruitment/*` ber-JWT dan `/public/recruitment/*` tanpa JWT), dari Job Requisition, Job Posting, Candidate, tahap seleksi dan psikotes online, Interview Rounds beserta feedback, master dan form builder, Performance Review Onboarding, sampai Onboarding Checklist. Menjelaskan siapa yang boleh memanggil tiap rute (`isSupervisor`, `isHR`, `isHRSupervisor`, `isApprover`), dan bagaimana rekrutmen lintas perusahaan bekerja: `GET /companies`, parameter `?company=`, `company_id` di body, aturan cakupan baca/tulis pemakai non-lintas, serta kenapa dokumen milik perusahaan lain dijawab 404 dan master perusahaan yang tak terjangkau dijawab 503.",
+      "hash": "b157c54d0b13367c1dbe386516e21d531362e2d055ef36e42e5510996e27110a",
+      "ukuran_kb": 39.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki recruitment-service (requisition, job posting, kandidat, tahap dan offer, psikotes, interview rounds, onboarding, portal karir publik) beserta method, path, dan role yang boleh memanggilnya. Juga menjawab bagaimana cakupan perusahaan bekerja pada rekrutmen lintas perusahaan (izin recruitment.cross_company, ?company=, per-ID di luar cakupan dibalas 404), siapa boleh mengajukan requisition lintas departemen (jenjang direktur), dan bagian mana dari dok ini yang belum diverifikasi ulang ke routes.go.",
       "kata_kunci": [
         "recruitment-service",
-        "API recruitment",
-        "job requisition",
+        "rekrutmen",
+        "requisition",
         "job posting",
         "kandidat",
         "candidate",
-        "interview",
-        "offer",
-        "portal karir",
         "lintas perusahaan",
-        "cross company"
+        "cross_company",
+        "portal karir",
+        "ATS"
       ]
     },
     {
@@ -6224,7 +6223,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Diterima, merged, belum prod**: disetujui 2026-09-10; T1 sampai T6 dikodekan, terverifikasi di DEV, dan merged 2026-09-11; prod belum. Revisi layar kandidat (2026-09-11) **merged 2026-09-11**. DISC tanpa kunci skor (2026-09-15, penyimpangan 9) **merged 2026-09-15** dan terverifikasi di DEV; prod belum diukur. Rincian dan addendumnya di `## Deskripsi`.",
+      "status_teks": "**Diterima, merged, belum prod**: disetujui 2026-09-10; T1 sampai T6 dikodekan, terverifikasi di DEV, dan merged 2026-09-11; prod belum. Revisi layar kandidat (2026-09-11) **merged 2026-09-11**. DISC tanpa kunci skor (2026-09-15, penyimpangan 9) **merged 2026-09-15** dan terverifikasi di DEV; prod belum diukur. Persen hasil akhir pilihan ganda (2026-09-17, butir 11) **PR terbuka**; percobaan pertamanya merged lalu sedang dicabut (11b). Rincian dan addendumnya di `## Deskripsi`.",
       "publik": true,
       "tautan": [
         "HRIS - Psikotes Kraepelin",
@@ -6238,20 +6237,20 @@
         "HRIS - Recruitment",
         "API - Recruitment Service"
       ],
-      "hash": "26118e863f1b9bbc5b9db9b4c52687c6d9708e30a5be4852c2420c8e2048eb92",
-      "ukuran_kb": 31.3,
-      "ringkasan": "Menjawab: kenapa daftar tipe psikotes, bank soal, dan paket tes dijadikan master data yang dikelola HRD sendiri, sementara cara menjawab soal tetap berupa kode lewat tiga mesin penilaian (pilihan ganda berkunci, MOST/LEAST, angka-kolom). Menjelaskan batas nyata dari janji 'tanpa coding' (bentuk jawaban keempat seperti tes menggambar tetap butuh developer), apa yang sengaja tidak dijanjikan (sistem tidak menyimpulkan IQ, profil kepribadian, atau kelulusan kandidat; legalitas butir soal berlisensi urusan HRD; tanpa drag and drop), dan penyimpangan sadar yang disepakati saat dikodekan, termasuk DISC tanpa kunci skor sehingga HR tetap menilai sendiri, pilihan ganda boleh kembali ke soal sebelumnya, nama tes disembunyikan dari kandidat, dan soal contoh wajib per subtes. Juga mencatat hal yang belum diputuskan, terutama pengerjaan tes jarak jauh tanpa pengawasan dan tautan tanpa tenggat.",
+      "hash": "f33cc1cdfe8d45d582c19601c048ea026cb1863b70ed7b46454932c1701bd5bf",
+      "ukuran_kb": 33.2,
+      "ringkasan": "Menjawab: kenapa katalog tipe tes, bank soal, dan paket psikotes dijadikan master data yang dikelola HRD sementara tiga bentuk jawaban (pilihan ganda, MOST/LEAST, angka-kolom) tetap berupa kode, dan apa batas janji \"tanpa coding\"-nya. Juga menjawab penyimpangan sadar yang diambil (1 atau 2 kunci per soal, kandidat boleh kembali ke soal sebelumnya, nama tes disembunyikan dari kandidat, soal contoh wajib, DISC tanpa kunci skor sehingga HR menilai sendiri) serta keputusan HRD yang belum diambil seperti pengawasan tes jarak jauh dan legalitas butir CFIT/DISC berlisensi.",
       "kata_kunci": [
         "psikotes",
         "psychological test",
-        "ADR 0087",
+        "bank soal",
+        "paket tes",
         "CFIT",
         "DISC",
         "Kraepelin",
-        "katalog tipe tes",
-        "master data",
-        "jenis jawaban",
-        "rekrutmen"
+        "jenis_jawaban",
+        "soal contoh",
+        "ADR 0087"
       ]
     },
     {
@@ -8203,20 +8202,20 @@
         "HRIS - Recruitment",
         "ADR - 0041 Izin Tipe Form Menempel di Departemen"
       ],
-      "hash": "28df88198b4275394a3f909d59b76d084696c4a5d096bda28acece817d187ecc",
-      "ukuran_kb": 36.3,
-      "ringkasan": "Menjawab: bagaimana psikotes multi-jenis bekerja sehari-hari, yaitu bagaimana HR menyusun tipe tes beserta subtesnya, mengisi bank soal secara manual atau impor Excel termasuk soal dan opsi bergambar, merangkainya jadi paket berurutan, lalu mengirim satu tautan agar kandidat mengerjakan seluruh bagian sekali duduk. Merinci tiga bentuk jawaban beserta cara skor dihitung dan aturan timernya (pilihan ganda dengan satu atau dua kunci per soal, most_least dengan tally Most, Least, dan Change, serta angka_kolom untuk Kraepelin), model data koleksi psikotes di recruitment_db, siapa yang boleh membaca dan menyunting (PermRecruitmentView versus PermRecruitmentWork, karena daftar soal memuat kunci), serta aturan penjaga di server. Juga menjawab apa yang sengaja di luar lingkup, misalnya konversi ke IQ atau norma, kesimpulan otomatis lolos atau gugur, EPPS, dan tenggat tautan.",
+      "hash": "fdbdcb0f03d90b3da448334515c2cca53fb29301f63fcbaaafc47a7c53db0259",
+      "ukuran_kb": 38.7,
+      "ringkasan": "Menjawab: bagaimana psikotes multi-jenis bekerja dari sisi HR dan kandidat, yaitu cara menyusun tipe tes, mengisi bank soal (manual, impor Excel, soal bergambar), membentuk paket tes berurutan, dan bagaimana tiap bentuk jawaban dinilai (benar per subtes, tally Most/Least/Change, metrik Kraepelin). Juga menjawab model data koleksi psikotes_tipe dan psikotes_item, aturan penjaga server, siapa boleh membaca daftar soal berkunci, cara kerja DISC tanpa kunci dan bank Penalaran Gambar internal pengganti CFIT, serta jebakan dan hal yang belum diputuskan.",
       "kata_kunci": [
         "bank soal",
         "question bank",
-        "paket tes",
-        "psikotes",
-        "CFIT",
+        "paket psikotes",
+        "tipe tes",
+        "psikotes_tipe",
+        "psikotes_item",
         "DISC",
-        "Kraepelin",
-        "most_least",
-        "impor Excel",
-        "recruitment_db"
+        "CFIT",
+        "Penalaran Gambar",
+        "impor Excel"
       ]
     },
     {
