@@ -623,8 +623,16 @@ saat berjalan, arah kembali ke kursinya setibanya, badan yang benar-benar digamb
 warna pod tetap ada. Check baru itu dilihat merah lebih dulu (arah kosong, dan robot yang membelakangi masih punya
 dua mata).
 
-Dua kontrol mutasi dijalankan atas suite itu. Menukar timur dan barat di `arahDari` membuat dua check merah (kursi
-rapat dan arah saat berjalan). Membuang arah dari kunci cache `gambarBadan` juga membuat dua merah, tetapi hanya
-sesudah check "badan digambar ulang saat berputar" ditambahkan: check arah yang lain membaca keadaan `arah` milik
-robot, bukan badan yang tergambar, jadi jalur berjalan tak terjaga tanpanya. Titik berdiri ruang server tak
-mengubah `dudukZ`, sehingga tanpa arah kunci cache-nya benar-benar sama dan badan lama bertahan.
+Tiga kontrol mutasi dijalankan atas suite itu, dan dua di antaranya menemukan lubang di test-nya sendiri lebih dulu.
+
+Menukar timur dan barat di `arahDari` membuat dua check merah (kursi rapat dan arah saat berjalan). Membuang arah
+dari kunci cache `gambarBadan` juga membuat dua merah, tetapi hanya sesudah check "badan digambar ulang saat
+berputar" ditambahkan: check arah yang lain membaca keadaan `arah` milik robot, bukan badan yang tergambar, jadi
+jalur berjalan tak terjaga tanpanya. Titik berdiri ruang server tak mengubah `dudukZ`, sehingga tanpa arah kunci
+cache-nya benar-benar sama dan badan lama bertahan.
+
+Menukar utara dan selatan mula-mula **tidak tertangkap sama sekali**. Cabang sumbu y `arahDari` hanya dipakai kursi
+rapat (arah area lain ditulis mati di `SPOT`), dan test-nya cuma mengisi satu kursi yang kebetulan menghadap barat.
+Karena itu 3f kini mengisi empat kursi sekaligus, memeriksa tiap kursi terhadap vektornya sendiri, dan menuntut
+kedua sumbu terwakili. Sesudah itu mutasi yang sama membuat check-nya merah sambil menyebut dua kursi yang
+terbalik.

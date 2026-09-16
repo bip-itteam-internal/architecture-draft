@@ -250,11 +250,13 @@ try {
   Tulis-Data @((Sesi 'aaaaaaaa-1111' 'Lead di meja' 'meja' 'alat' 'Edit' 'x.py' @((Sub 'sub1' 'Peneliti' 'meja' 'alat' 'Edit'), (Sub 'sub2' 'Peneliti' 'meja' 'alat' 'Edit'))),
     (Sesi 'bbbbbbbb-2222' 'Lead di server' 'server' 'alat' 'PowerShell' 'pnpm test'),
     (Sesi 'cccccccc-3333' 'Lead di rapat' 'rapat' 'menunggu_subagent'),
+    (Sesi 'cccccccc-3334' 'Lead di rapat 2' 'rapat' 'menunggu_subagent'),
+    (Sesi 'cccccccc-3335' 'Lead di rapat 3' 'rapat' 'menunggu_subagent'),
+    (Sesi 'cccccccc-3336' 'Lead di rapat 4' 'rapat' 'menunggu_subagent'),
     (Sesi 'dddddddd-4444' 'Lead di lounge' 'lounge' 'menunggu_anda'),
     (Sesi 'eeeeeeee-5555' 'Lead di perpustakaan' 'perpustakaan' 'alat' 'Grep' 'pola'))
-  $ok = Tunggu { @(Robot | Where-Object { -not $_.pergi -and -not $_.jalan }).Count -eq 7 } 30
+  $ok = Tunggu { @(Robot | Where-Object { -not $_.pergi -and -not $_.jalan }).Count -eq 10 } 40
   $rA = Robot | Where-Object { $_.key -eq 'aaaaaaaa-1111' }
-  $rRapat = Robot | Where-Object { $_.key -eq 'cccccccc-3333' }
   Check ($ok -and (Arah 'aaaaaaaa-1111') -eq 'selatan') "3f arah: Lead di pod menghadap mejanya, selatan (dapat '$(Arah 'aaaaaaaa-1111')')"
   $barat = Robot | Where-Object { $_.key -like 'aaaaaaaa-1111:*' -and $_.x -lt $rA.x }
   $timur = Robot | Where-Object { $_.key -like 'aaaaaaaa-1111:*' -and $_.x -gt $rA.x }
@@ -262,12 +264,18 @@ try {
   Check ((Arah 'bbbbbbbb-2222') -eq 'utara') "3f arah: robot ruang server menghadap rak, utara (dapat '$(Arah 'bbbbbbbb-2222')')"
   Check ((Arah 'eeeeeeee-5555') -eq 'utara') "3f arah: robot perpustakaan menghadap rak buku, utara (dapat '$(Arah 'eeeeeeee-5555')')"
   Check ((Arah 'dddddddd-4444') -eq 'selatan') "3f arah: robot lounge menghadap penonton, selatan (dapat '$(Arah 'dddddddd-4444')')"
-  $keTengah = '?'
-  if ($rRapat) {
-    $dx = 22 - $rRapat.x; $dy = 11.5 - $rRapat.y
-    $keTengah = if ([Math]::Abs($dx) -ge [Math]::Abs($dy)) { if ($dx -ge 0) { 'timur' } else { 'barat' } } else { if ($dy -ge 0) { 'selatan' } else { 'utara' } }
+  # empat kursi terisi supaya KEDUA sumbu pembulatan teruji: satu kursi saja bisa kebetulan timur/barat
+  # sehingga cabang utara/selatan lolos tanpa penjaga
+  $rapatSemua = @(Robot | Where-Object { $_.area -eq 'rapat' -and -not $_.pergi })
+  $salah = @()
+  foreach ($r in $rapatSemua) {
+    $dx = 22 - $r.x; $dy = 11.5 - $r.y
+    $h = if ([Math]::Abs($dx) -ge [Math]::Abs($dy)) { if ($dx -ge 0) { 'timur' } else { 'barat' } } else { if ($dy -ge 0) { 'selatan' } else { 'utara' } }
+    if ($r.arah -ne $h) { $salah += ("{0} di ({1};{2}) menghadap {3}, seharusnya {4}" -f $r.key.Substring(0, 8), $r.x, $r.y, $r.arah, $h) }
   }
-  Check ((Arah 'cccccccc-3333') -eq $keTengah) "3f arah: kursi ruang rapat menghadap pusat meja, dibulatkan empat arah (dapat '$(Arah 'cccccccc-3333')', seharusnya '$keTengah')"
+  $sumbuX = @($rapatSemua | Where-Object { $_.arah -eq 'timur' -or $_.arah -eq 'barat' }).Count
+  $sumbuY = @($rapatSemua | Where-Object { $_.arah -eq 'utara' -or $_.arah -eq 'selatan' }).Count
+  Check ($rapatSemua.Count -ge 4 -and $salah.Count -eq 0 -and $sumbuX -ge 1 -and $sumbuY -ge 1) "3f arah: $($rapatSemua.Count) kursi ruang rapat menghadap pusat meja, dibulatkan empat arah, kedua sumbu terwakili ($sumbuX timur/barat, $sumbuY utara/selatan; salah: $($salah -join '; '))"
   $mata = Eval '(function () { var g = document.querySelector("[data-lead=eeeeeeee-5555] .badan"); return g ? (g.innerHTML.match(/88ffff/g) || []).length : -1; })()'
   Check ($mata -eq 0) "3f arah: robot yang menghadap utara digambar dari punggung, tanpa mata ($mata mata)"
   $ledOk = Eval '(function () { var e = document.getElementById("led-pod-0"); return !!e && !!e.getAttribute("fill"); })()'
