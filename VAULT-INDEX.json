@@ -6774,8 +6774,8 @@
       "judul": "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "🟡",
+      "status_teks": "Diusulkan. Keputusannya diambil 2026-09-16; kodenya belum ada.",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
@@ -6790,20 +6790,18 @@
         "APP - Web ERP",
         "Sales - ICC Account Manager Mapping"
       ],
-      "hash": "840869d59851a022fc78d232d30aab42854de2808b1a333a751aa8baa28e01da",
-      "ukuran_kb": 12.2,
-      "ringkasan": "Menjawab: bagaimana ulasan Shopee berbintang rendah dirutekan jadi komplain ke departemen yang tepat (gudang, QC, dst), kenapa TikTok tidak ikut, dan kenapa fitur ini memperluas register komplain QC yang sudah ada alih-alih membangun modul tiket baru. Juga menjelaskan sumber data ulasan (`marketplace_reviews`), alasan volume kecil membuat kategorisasi tetap manual, kategori komplain sebagai master data, dan penurunan departemen tujuan dari `department_shops`.",
+      "hash": "8d026503130eb2dd022a05ed2800c66bd75c71bfa5c88c3be61fdef539a23440",
+      "ukuran_kb": 12.3,
+      "ringkasan": "Menjawab: bagaimana ulasan pembeli Shopee berbintang rendah dirutekan jadi komplain ke departemen yang tepat (gudang, QC), kenapa dikerjakan dengan memperluas register komplain yang sudah ada alih-alih membuat modul tiket baru, dan kenapa fitur ini hanya berlaku untuk Shopee, bukan TikTok. Juga menjelaskan keputusan desain di baliknya: kategori komplain sebagai master data (bukan konstanta kode), departemen penerima diturunkan dari department_shops (bukan dari pemilik akun), isi ulasan disalin ke komplain (bukan ditautkan lewat id), dan kategori dipilih manusia karena volumenya cuma 3-4 ulasan per bulan.",
       "kata_kunci": [
         "komplain",
-        "ulasan",
-        "review marketplace",
+        "ulasan marketplace",
+        "review",
         "Shopee",
-        "ADR 0099",
+        "QC",
+        "gudang",
         "register komplain",
-        "kategori komplain",
-        "department_shops",
-        "Account Specialist",
-        "ICC"
+        "Account Specialist"
       ]
     },
     {

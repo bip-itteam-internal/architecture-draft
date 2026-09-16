@@ -1,3 +1,5 @@
+> **Status**: 🟡 Diusulkan. Keputusannya diambil 2026-09-16; kodenya belum ada.
+
 ## Untuk Manajemen
 
 Pemegang toko akan diberi tahu saat ada ulasan pembeli berbintang rendah, dan dari baris ulasan itu ia bisa langsung meneruskannya ke unit yang benar-benar bisa memperbaikinya, misalnya gudang untuk salah kirim atau QC untuk dugaan produk tidak asli. Unit penerima mendapat kotak masuk sendiri, menuliskan tindakan yang diambil, lalu menutupnya, dan pemegang toko dikabari hasilnya. Hari ini tidak ada satu pun dari rangkaian itu: tidak ada pemberitahuan ulasan sama sekali, dan satu-satunya jalur komplain yang tersedia hanya bermuara ke QC.
@@ -18,7 +20,6 @@ Perkiraan besaran kerja: sedang, dan sebagian besarnya sudah berdiri. Register k
 
 *Komplain yang lahir dari ulasan marketplace dirutekan ke departemen yang tepat dengan memperluas register komplain yang sudah ada, bukan dengan membangun modul tiket baru. Kategori keluhan menentukan tujuannya, dan pemetaan itu hidup sebagai master data, bukan sebagai konstanta di kode.*
 
-- **Status**: 🟡 Diusulkan
 - **Path di repo**:
   - `bip-erp/shared-library/models/employee/models.go` (`QualityComplaint`, field tujuan dan salinan ulasan)
   - `bip-erp/shared-library/models/employee/master_data.go` (master kategori komplain, **baru**)
