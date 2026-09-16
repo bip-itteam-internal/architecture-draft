@@ -275,6 +275,54 @@ order BATAL kini dibukukan UTUH mengikuti order walau komponennya belum lengkap 
 komponen di Accurate mendahului fisik** dan ditutup lewat scan susulan. Keputusan & batasannya di
 [[ADR - 0040 Retur Paket Utuh via Baris Induk Faktur]] (amandemen 2026-09-15).
 
+> **Amandemen — GERBANG PUNYA JALAN MASUK, TAK PUNYA JALAN KELUAR** (🟡 2026-09-16, branch
+`feat/retur-lepas-tertahan`, belum merge). Decision #8 mengatur kapan retur DITAHAN dan tak pernah
+mengatur apa yang terjadi bila buktinya **tak akan pernah datang**. Paket yang kembali SEBELUM scan
+retur WMS berlaku tak pernah discan, jadi barisnya PENDING selamanya dan satu-satunya cara
+membereskannya adalah menyunting Mongo langsung. Terukur prod 2026-09-16 (baca-saja): **623 baris
+menunggu scan**, **287 di antaranya hari-kirim Juli** (1.365 order, **Rp164,3 jt**), sisanya Agustus
+229 baris / September 117 baris. Ini bukan antrean yang lambat, ini antrean tanpa ujung.
+>
+> **Keputusan**: penanda baru `AccurateDailyReturn.LepasTanpaScan` (+ `LepasAlasan`) melonggarkan
+`holdForWarehouse` untuk baris yang SENGAJA dilepas, dan perkakas ops `cmd/returnlepas` yang
+menyetelnya. Dibuat **TERPISAH dari `PraGerbangScan`** walau efeknya sama: yang itu menyatakan
+"dokumennya sudah pernah terbukukan sebelum gerbang ada", yang ini "barangnya kembali sebelum scan
+WMS ada". Dua sejarah berbeda; satu penanda untuk keduanya membuat pertanyaan "kenapa gerbang tak
+berlaku di baris ini" kehilangan jawaban tunggalnya.
+>
+> ⛔ **Pelepasan dilakukan per-ORDER, bukan per-baris.** Satu keranjang `TUNGGU:<faktur>` menaungi
+banyak order sedangkan `trans_date`-nya hanya SATU: diukur atas 1.365 order Juli, hanya **338** yang
+tanggal batalnya sama dengan tanggal keranjangnya, **979 BERBEDA**. Melepas seluruh keranjang berarti
+memberi satu tanggal untuk kejadian yang tersebar berhari-hari. Dokumen karena itu bertanggal
+KEJADIAN retur (`resolveReturnTransDate` → `cancelled_at`), dan order yang tak punya tanggal kejadian
+(**48 dari 1.365**) **DITOLAK** — tidak dijatuhkan ke hari ini, karena itu menerbitkan dokumen
+akuntansi bertanggal hari pelepasan tanpa seorang pun memutuskannya.
+>
+> ⛔ **Konsekuensi yang diterima sadar: stok WMS TIDAK ikut bertambah.** Dokumen retur menambah stok
+di Accurate, sementara WMS hanya bergerak lewat scan — dan populasi ini justru yang tak pernah
+discan. Jadi untuk baris-baris ini kedua sistem memang berbeda, dan itu **bukan bug**: keputusan
+pemilik 2026-09-16 setelah ditimbang, karena barangnya sudah diurus gudang dengan caranya sendiri
+berbulan-bulan lalu. Jangan "diperbaiki" diam-diam.
+>
+> **Penjaga perkakas** (jangan dicabut): dry-run default; `--apply` wajib `--cadangan`; mode lepas
+wajib `--faktur-file` berisi faktur yang TERBUKTI belum pernah dibalik; dan **verifikasi ulang ke
+Accurate tepat sebelum tiap order dilepas** — bukan bersandar pada daftar yang dibuat kemarin.
+Alasannya terukur: dari 228 faktur Juli yang tertahan, **86 sudah punya pembalikan yang ERP tak tahu
+(Rp87,5 jt)** — tambalan manual finance. Membukukannya lagi = dokumen dobel yang tak bisa dibatalkan
+otomatis. Daftar faktur yang terbaca KOSONG **ditolak berisik**, karena himpunan kosong mematikan
+penyaringan dan justru MELEBARKAN lingkup saat penjaganya dipasang.
+>
+> ⚠️ **Koreksi atas amandemen 2026-08-20 di atas** ("jalan pintas gerbang untuk PERKAKAS OPS"):
+klaim bahwa `RetryDailyReturn` menghormati `WithSkipWarehouseGate` **tidak lagi benar di
+`origin/main`** per 2026-09-16 — jalan pintas itu kini hanya ada di `SyncOrderReturn` (dua titik),
+sementara gerbang di jalur Retry tanpa cek skip. Hilang saat model keranjang `TUNGGU` mendarat
+(`6929f94d`). Dicatat di sini alih-alih menyunting amandemen lama: yang lama benar pada tanggalnya.
+>
+> Menyusul di FE: **umur tunggu** di tab Menunggu Scan Auto-Sync Retur (ambang 30 hari) dan penanda
+**"tanpa nomor resi — cari pakai Nomor Order"** di feed WMS untuk barang-balik yang nomornya tak ada
+di mana pun (**30 order cancel Shopee Juli**; resinya juga nol di `shopee_order_details`, jadi worker
+enrich takkan pernah mengisinya).
+
 ## Dokumen Terkait
 
 - [[Microservices - Manufacture Service]] · [[APP - Web ERP]] · [[API - Manufacture Service]]
