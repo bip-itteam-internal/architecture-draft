@@ -5,6 +5,7 @@
 - **Status**: ⚠️ **Implemented (ada catatan)**: T1 sampai T6 dikodekan dan **merged 2026-09-11** (bip-erp #1837 `40323aae` dan #1838 `b73862af`, erp-frontend #1527 `42eccaf8`, career-bharata #10 `15240242`). Terverifikasi di DEV hari itu lewat gateway dan sebagai HR serta kandidat di Chrome (recruitment-service dan api-gateway dinaikkan dari branch; career portal dijalankan lokal terhadap gateway dev). Prod belum. Status ini bergerak, ukur ulang sebelum mengandalkannya. Papan kerja: `Workspace/ANALISA - Psikotes Multi-Jenis.md`
 - **Revisi layar kandidat** (tahap tanpa nama tes, soal contoh wajib, boleh kembali, sapaan berdetail): **merged 2026-09-11** (bip-erp #1850 `9bdded4a`, erp-frontend #1541 `428d41b0`, career-bharata #11 `441cf713`; diperiksa ke GitHub 2026-09-15). Teks bertanda *(revisi)* di bawah kini berlaku di `main`; status prod-nya tidak diukur di sini.
 - **DISC tanpa kunci skor** (keputusan user 2026-09-15: kunci skor DISC tidak dimuat ke sistem, HR menilai DISC sendiri dari layar): **merged 2026-09-15** (bip-erp #1900 `1683de56`, erp-frontend #1589 `bb3a6117`). Terverifikasi di DEV hari itu lewat gateway dan layar HR dengan backend sungguhan; 24 grup DISC tanpa kunci dimuat ke bank dev. Status prod belum diukur di sini. Teks bertanda *(tanpa kunci)* di bawah kini berlaku di `main`. Keputusan dan penyimpangannya: [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]] butir (9).
+- *(internal)* **Bank CFIT diisi soal internal, bukan butir berlisensi** (keputusan user 2026-09-15: HRD tidak punya bahan CFIT, jadi soalnya dibuat agent). 50 soal penalaran gambar orisinal + 2 soal contoh per subtes **dimuat ke DEV 2026-09-16** lewat gateway, dan tipe berkode `cfit` di DEV berganti nama jadi "Penalaran Gambar (internal)". **Tanpa perubahan kode repo**: yang berubah data katalog dan bank soal. Prod belum, dijalankan manusia. Cara kerjanya di §Bank Penalaran Gambar (internal); keputusannya butir (10) di [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]].
 - **Sisi implementasi**: [[Microservices - Recruitment Service]] (`services/recruitment/models_psikotes_katalog.go`, `psikotes_katalog_*.go`, `psikotes_paket_*.go`, `psikotes_impor.go`, `seed_psikotes.go`) · [[CORE - API Master Gateway]] (rute publik kandidat) · [[APP - Web ERP]] (layar HR) · [[APP - Portal Karir Bharata]] (layar kandidat). Endpoint: [[API - Recruitment Service]]
 - **Dibangun di atas asumsi tertulis** atas keputusan HRD yang belum ada (dipilih user 2026-09-11 supaya fitur siap dipakai): isi soal CFIT dan DISC berlisensi tanggung jawab HRD, jadi **tidak ada butir soal yang di-seed**; mesin kandidat baru hanya di career portal; CFIT boleh dikerjakan jarak jauh dengan batas waktu ditegakkan server. Ketiganya tetap menunggu konfirmasi HRD (§Belum Diputuskan).
 
@@ -133,11 +134,26 @@ Dipasang **sekali per lingkungan** (penanda `psikotes_seed`), tipe by `kode` dan
 | Tipe CFIT | Seri 13 soal 3 menit; Klasifikasi 14 soal 4 menit, **2 jawaban**; Matriks 13 soal 3 menit; Kondisi 10 soal 2 menit 30 detik. Total 12 menit 30 detik. **Tanpa butir soal** |
 | Tipe DISC | 24 grup, tanpa timer, anjuran "10-15 menit". **Tanpa butir soal** |
 | Paket Kraepelin | Kraepelin saja; siap dikirim |
-| Paket Staff | CFIT, DISC, Kraepelin; **belum siap** sampai bank soal CFIT dan DISC diisi HRD |
+| Paket Staff | CFIT, DISC, Kraepelin; **belum siap** sampai bank soal CFIT dan DISC diisi. *(internal)* Di DEV **siap sejak 2026-09-16** (diukur lewat gateway: `siap` true untuk paket dan ketiga bagiannya, total 2.100 detik); di prod masih belum |
 
 ⚠️ Permintaan manajemen menyebut CFIT "50 soal, 30 menit", tetapi durasi subtes yang diminta sendiri berjumlah 12 menit 30 detik. Seed mengikuti durasi per subtes; HR bisa mengubahnya di Tipe Tes.
 
 *(revisi)* Ketiga tipe bawaan membawa `penjelasan_kandidat` netral tanpa nama tes. Lingkungan yang sudah ter-seed diisi saat boot hanya untuk tipe bawaan yang field-nya **absen** (`$exists: false`), jadi suntingan HR tak ditimpa. Paket bawaan berisi CFIT tetap belum siap sampai HRD mengisi soal contoh tiap subtes, selain soal aslinya.
+
+### Bank Penalaran Gambar (internal)
+
+*(internal)* Seed **tetap tanpa butir soal**; yang terisi adalah DATA di DEV (2026-09-16). Soalnya orisinal buatan internal, bukan butir CFIT berlisensi: keputusannya butir (10) di [[ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode]].
+
+| Hal | Isi |
+|---|---|
+| Sumber soal | Dibangkitkan skrip berbenih tetap `buat_cfit.py` (Pillow) di `erp/.task-plans/bahan-psikotes/cfit/`: 50 soal asli + 2 soal contoh per subtes, lima opsi bergambar, kesulitan bertahap. Membangkitkan ulang menghasilkan gambar yang byte-identik selama skrip dan benihnya tak berubah |
+| Bukti kunci | `test_buat_cfit.py` memakai pemeriksa yang ditulis TERPISAH dari pembangkitnya: seri dan matriks dihitung ulang dari aturannya, klasifikasi wajib hanya punya satu pasangan yang bisa dibenarkan satu sifat, kondisi diuji geometri (ada wilayah yang muat titik). Kontrol negatif menuntut enam soal cacat buatan ditolak |
+| Cara muat | `muat_cfit.py` lewat gateway, pratinjau sebagai bawaan: unggah tiap PNG (`POST /psikotes/gambar`), lalu `POST /psikotes/item` per soal, soal contoh dulu baru soal asli tiap subtes. **Impor Excel tak bisa dipakai** karena teks saja (`psikotes_impor.go`). Loader berhenti bila tipe sudah bersoal, dan mencatat id soal serta kunci gambar ke `hasil-muat-<host>.json` |
+| Terukur di DEV | 332 gambar, 58 soal; `jumlah_soal` 13/14/13/10, `jumlah_contoh` 2 tiap subtes, kesiapan siap, subtes identik dengan sebelum ganti nama |
+| Uji kandidat | Satu sesi paket uji dikerjakan penuh lewat API publik: urutan soal sama dengan manifest, kunci soal contoh sama dengan manifest, gambar 200 PNG selagi sesi berjalan lalu **410 sesudah sesi tutup**, laporan HR benar = jumlah soal dikurangi satu di tiap subtes |
+| Prod | Belum. Dijalankan manusia sesudah fitur psikotes multi-jenis naik ke prod |
+
+⚠️ Tingkat kesulitan disusun dari rancangan dan **belum diukur** dari hasil kandidat: tak ada norma, dan skor tetap jumlah benar mentah. Batas waktu subtes masih bawaan seed dan belum diuji terhadap soal ini.
 
 ## Yang Dipakai Ulang
 
@@ -165,7 +181,7 @@ Dipasang **sekali per lingkungan** (penanda `psikotes_seed`), tipe by `kode` dan
 
 ## Belum Diputuskan (TBD)
 
-1. **Legalitas item CFIT dan DISC** (B1). Fitur siap, isi bank soal tanggung jawab HRD dan harus dijawab sebelum diisi. Risiko hukum, bukan teknis.
+1. **Legalitas item DISC** (B1). Risiko hukum, bukan teknis: lembar DISC berasal dari bahan HRD, jadi izin pemakaiannya harus dijawab HRD. *(internal)* **Untuk CFIT butir ini tertutup 2026-09-16**: banknya tidak memakai butir berlisensi sama sekali, melainkan soal penalaran gambar orisinal buatan internal (§Bank Penalaran Gambar (internal)).
 2. **Bentuk jawaban EPPS**: diasumsikan muat di `most_least`, belum diperiksa.
 3. **Mesin kandidat resmi** (B2): dibangun di career portal (de facto jalur prod); keputusan tertulisnya belum ada.
 4. **Pendampingan CFIT** (B3): dibangun dengan asumsi boleh jarak jauh, batas waktu ditegakkan server. HRD perlu menerima risikonya tertulis atau memilih pengerjaan diawasi. Rincian di ADR 0087 §Belum Diputuskan.
