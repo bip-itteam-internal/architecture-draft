@@ -6780,28 +6780,31 @@
       "tautan": [
         "Microservices - Integration Service",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
-        "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
-        "ADR - 0060 Cakupan Keterlihatan Tiket Engagement",
         "QA - Deviation & CAPA",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus",
+        "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "Microservices - Notification Service",
         "Microservices - Employee Service",
+        "Microservices - Warehouse Service",
         "APP - Web ERP",
-        "Sales - ICC Account Manager Mapping"
+        "Sales - ICC Account Manager Mapping",
+        "ADR - 0060 Cakupan Keterlihatan Tiket Engagement"
       ],
-      "hash": "8d026503130eb2dd022a05ed2800c66bd75c71bfa5c88c3be61fdef539a23440",
-      "ukuran_kb": 12.3,
-      "ringkasan": "Menjawab: bagaimana ulasan pembeli Shopee berbintang rendah dirutekan jadi komplain ke departemen yang tepat (gudang, QC), kenapa dikerjakan dengan memperluas register komplain yang sudah ada alih-alih membuat modul tiket baru, dan kenapa fitur ini hanya berlaku untuk Shopee, bukan TikTok. Juga menjelaskan keputusan desain di baliknya: kategori komplain sebagai master data (bukan konstanta kode), departemen penerima diturunkan dari department_shops (bukan dari pemilik akun), isi ulasan disalin ke komplain (bukan ditautkan lewat id), dan kategori dipilih manusia karena volumenya cuma 3-4 ulasan per bulan.",
+      "hash": "7bb810ec84c7cae9aae96e22b2f5e13e19e9fc980033222646736811308df220",
+      "ukuran_kb": 11.5,
+      "ringkasan": "Menjawab: bagaimana komplain yang lahir dari ulasan marketplace berbintang rendah dirutekan ke unit yang tepat (gudang packing atau QC), kenapa keputusannya memakai register komplain yang SUDAH ADA di masing-masing tujuan alih-alih membangun register atau master kategori ketiga, dan kenapa register komplain gudang yang sudah lengkap di kode ternyata belum pernah dipakai satu kali pun di produksi karena tidak punya layar.",
       "kata_kunci": [
         "komplain",
-        "ulasan marketplace",
+        "ulasan",
         "review",
+        "marketplace",
         "Shopee",
-        "QC",
         "gudang",
+        "warehouse",
+        "QC",
         "register komplain",
-        "Account Specialist"
+        "ADR 0099"
       ]
     },
     {
@@ -10950,19 +10953,19 @@
         "APP - Web ERP",
         "QA - Register Perizinan & Sertifikasi"
       ],
-      "hash": "f24136f2c2fe803068d83534a500477dbf57e5f2391277ec2180fb7472c7a391",
-      "ukuran_kb": 13.2,
-      "ringkasan": "Menjawab: bagaimana divisi Quality mencatat temuan CAPA/audit beserta alur persetujuannya, bagaimana incoming inspection bahan/kemasan dan antrean release/hold batch dikelola, serta bagaimana komplain QC dari marketing diinput, divalidasi, dan dinotifikasi dua arah -- termasuk siapa yang boleh mengubah komplain milik siapa.",
+      "hash": "6f1f8bd9a61ceb78ec1f26875421cbacca1fb3f634c32e2bb393f0daef2031ab",
+      "ukuran_kb": 13.4,
+      "ringkasan": "Menjawab: apa saja register kerja operasional divisi Quality (CAPA & temuan audit, incoming inspection bahan/kemasan datang, antrean release/hold batch, dan komplain QC dari marketing), endpoint dan RBAC siapa boleh membuat/mengubah/memvalidasi tiap register, bagaimana alur persetujuan CAPA dua approver (produksi dan warehouse) bekerja, serta bagaimana notifikasi komplain QC menutup loop antara marketing dan QC.",
       "kata_kunci": [
+        "Quality",
         "QA",
-        "quality",
+        "QC",
         "CAPA",
         "incoming inspection",
         "batch release",
         "komplain QC",
-        "audit BPOM",
-        "RBAC quality",
-        "temuan",
+        "RBAC",
+        "temuan audit",
         "ICC"
       ]
     },
@@ -14028,21 +14031,22 @@
       "status_teks": null,
       "publik": false,
       "tautan": [
-        "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
-        "ADR - 0060 Cakupan Keterlihatan Tiket Engagement"
+        "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada"
       ],
-      "hash": "931f38fed0734eaabb73d334901a171eb14589e1e6dce895bba41291bab8bf2b",
-      "ukuran_kb": 3.7,
-      "ringkasan": "Menjawab: urutan dan ketergantungan task untuk membangun fitur komplain dari ulasan marketplace (master kategori, field tujuan di register komplain, notifikasi per departemen, tombol ajukan dari layar ulasan, kotak masuk departemen), serta daftar keputusan yang masih menunggu manajemen/QA seperti penindak keluhan pengiriman lama dan kewajiban regulatif efek samping sebelum kategori itu bisa di-seed.",
+      "hash": "3a3ed3998ade4d2d1399333672f53e31c21f8ae28c16d047613db268aaf9ee11",
+      "ukuran_kb": 3.9,
+      "ringkasan": "Menjawab: daftar task konkret hasil /analisa-kebutuhan untuk fitur komplain dari ulasan marketplace (backend membuka rute baca ke marketing, menyalin data ulasan, notifikasi register gudang; frontend layar komplain gudang dan tombol ajukan dari baris ulasan), keputusan mana yang masih menunggu manajemen (tujuan komplain tanpa register, kewajiban regulatif efek samping, toko tanpa CS), dan apa saja yang sengaja di luar lingkup seperti master kategori baru dan dukungan TikTok.",
       "kata_kunci": [
-        "ANALISA",
-        "task list",
-        "komplain ulasan",
+        "komplain",
+        "ulasan",
+        "marketplace",
+        "task",
+        "analisa kebutuhan",
+        "backend",
+        "frontend",
         "ADR 0099",
-        "backlog",
-        "roadmap",
-        "keputusan tertunda",
-        "kategori komplain"
+        "Shopee",
+        "gudang"
       ]
     },
     {
