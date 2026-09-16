@@ -2,7 +2,7 @@
 
 *Endpoint service `learning` (modul gateway **`/api/learning/*`**, port internal 6987). Isinya modul pelatihan karyawan yang dipindah utuh dari [[Microservices - Employee Service]] pada LMS Fase 0, ditambah pengajuan, evaluasi trainer, layar karyawan, dan post-test yang dibangun di service ini. Implementasi & catatan: [[Microservices - Learning Service]] · konsep: [[HRIS - Training Program]].*
 
-- **Status**: ✅ Grounded ke kode `bip-erp` `origin/main` (diperiksa 2026-09-15); live di dev + produksi 2026-08-06; pengajuan, evaluasi, dan `/me` **terverifikasi lewat gateway hidup 2026-08-19**; rute post-test ada di biner produksi (diperiksa 2026-09-15); `GET /kpi/pelatihan` dan `GET /internal/calendar-feed` (PR [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895)) **live di produksi 2026-09-15** dan diverifikasi dari dalam container, bersama penyaringan `as=reviewed` (PR [#1892](https://github.com/bip-itteam-internal/bip-erp/pull/1892)); DEV belum dideploy
+- **Status**: ✅ Grounded ke kode `bip-erp` `origin/main` (diperiksa 2026-09-15); live di dev + produksi 2026-08-06; pengajuan, evaluasi, dan `/me` **terverifikasi lewat gateway hidup 2026-08-19**; rute post-test ada di biner produksi (diperiksa 2026-09-15); `GET /kpi/pelatihan` dan `GET /internal/calendar-feed` (PR [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895)) **live di produksi 2026-09-15** dan diverifikasi dari dalam container, bersama penyaringan `as=reviewed` (PR [#1892](https://github.com/bip-itteam-internal/bip-erp/pull/1892)); DEV belum dideploy. ⚠️ **Kecuali** § Rencana Pelatihan Tahunan, § Bahan KPI Rencana, dan § Sertifikat Pelatihan di bawah: bagian-bagian itu dibaca dari branch `be-rencana`/`be-sertifikat` (PR bip-erp #1903 dan #1904, **TERBUKA** per 2026-09-16) — **belum ada di `origin/main`, belum dideploy ke dev maupun produksi**.
 - **RBAC**: izin modul `training` (`training.view` · `training.work` · `training.manage`), rincian di [[#Gerbang izin]]
 - **Catatan pemindahan**: path internalnya **tidak berubah** dari versi lama, hanya prefix modulnya. `/api/employee/training/...` menjadi `/api/learning/training/...`
 
@@ -19,6 +19,7 @@ Rute kelola digerbang `gate(izin, fallback)` (`services/learning/permission_gate
 - Izin dibaca dari klaim JWT (header `BIP-Permissions`) **bila klaim itu memuat izin modul `training`**. Bila tidak, dan sakelar `TRAINING_TIER_FALLBACK` menyala (bawaan), tier `system_roles["hris"]` admin, supervisor, maupun staff mendapat **ketiga** izin sekaligus (`TrainingTierDefault`, `shared-library/common/catalog_training.go`).
 - Kill-switch `TRAINING_PERMISSION_ENFORCEMENT=off` mengembalikan gerbang lama: rute tulis jatuh ke `RequireHRISStaff`, rute baca terbuka. Selama kill-switch menyala, `RequireHRISStaff` **tidak** dijalankan. Kedua sakelar dibaca sekali saat service start.
 - **Tidak digerbang izin modul**: pengajuan pelatihan, seluruh `/me/*`, dan mengerjakan post-test. Yang menggerbang identitas pemanggil dan relasinya.
+- ⚠️ **Rute baca sertifikat pelatihan** (`/training/certificate-settings`, `/training/certificates/:certId/pdf`, `/training/:id/certificates` — di branch, belum merged, lihat § Sertifikat Pelatihan) **memakai fallback `RequireHRISStaff`, BUKAN `nil`**, beda dari pola baca lain di file ini. Rute-rute ini baru; bila fallback-nya `nil`, kill-switch mati akan membuka baca status dan unduh PDF sertifikat rekan kerja ke karyawan mana pun. Keputusan 2026-09-15 membatasinya ke peserta sendiri dan HR (`sertifikat.go:460-465`).
 
 ## Master — Jenis Pelatihan & Trainer
 
@@ -70,6 +71,36 @@ Verifikasi memanggil `GET {EMPLOYEE_MODULE_URL}/master/departments/{key}` di [[M
 `department_key` adalah **key** (`master_department.key`, mis. `it`); `work_data.department` menyimpan **nama** (`Tech Development`). Pencarian supervisor di [[Microservices - Employee Service]] (`/list?type=supervisor&department=`) menyaring **nama**, bukan key.
 
 Mengirim key ke sana menghasilkan nol supervisor lalu **409 "departemen belum punya supervisor"** — galat yang menuduh data master padahal yang salah satuan nilainya. Terjadi nyata di `POST /training/requests` sejak PR #1148; **6 dari 10 departemen** punya key ≠ name sehingga pengajuan mustahil dibuat untuk keenamnya, sementara empat sisanya jalan karena kebetulan key-nya sama dengan namanya. Diperbaiki PR #1153.
+
+## Rencana Pelatihan Tahunan (`/training/plan-items`) — 🟡 di branch, belum merged
+
+⚠️ Dibaca dari branch `be-rencana` (`services/learning/rencana.go`, `models_rencana.go`), PR bip-erp #1903/#1904 (TERBUKA per 2026-09-16) — **belum ada di `origin/main`, belum dideploy**.
+
+| Method | Path | Izin | Fungsi |
+|---|---|---|---|
+| GET | `/training/plan-items?tahun=YYYY` | view | Daftar butir rencana tahun itu (bawaan tahun berjalan WIB) beserta status pelaksanaan dan kelas tertaut |
+| POST | `/training/plan-items` | work | Tambah butir `{tahun, bulan, judul, training_type_id?, department_key?, catatan?}`. Bulan target sudah lewat → 409 |
+| PUT | `/training/plan-items/:id` | work | Ubah isi/bulan butir aktif. Bulan tujuan sudah lewat, butir dibatalkan/terkunci, atau memindah butir yang bulannya sudah berjalan → 409 |
+| POST | `/training/plan-items/:id/cancel` | work | Batalkan, `{alasan}` wajib (maks 500 karakter). Sudah dibatalkan, terkunci, atau sudah terlaksana → 409 |
+| DELETE | `/training/plan-items/:id` | work | Hapus. Terkunci, bulan sudah berjalan, atau masih tertaut kelas → 409 |
+
+- Gerbang sama seperti Event Pelatihan: `gate(PermTrainingView, nil)` untuk baca, `gate(PermTrainingWork, RequireHRISStaff)` untuk seluruh rute tulis (`rencana.go:114,149,181,247,310`).
+- Rute statik, wajib didaftarkan sebelum `/training/:id` (`rencana.go:19-20`).
+- Tiap baris respons membawa tambahan yang DIHITUNG server: `status_pelaksanaan` (`direncanakan`/`terlaksana`/`terlaksana_terlambat`/`belum_terlaksana`/`dibatalkan`), **`terkunci`** (bulan target sudah lewat), **`sudah_mulai`** (bulan target sudah dimulai — mengunci aksi Hapus dan Pindah Bulan), dan `kelas` (ringkasan kelas tertaut) (`models_rencana.go:250-259`).
+- `department_key`/`training_type_id` opsional, diverifikasi ke master yang sama dengan Event Pelatihan bila diisi (`rencana.go:85-103`).
+- Aturan lengkap tiap gerbang 409 (kapan terkunci, kapan `sudah_mulai` berlaku, kenapa membatalkan butir yang sudah terlaksana ditolak): [[Microservices - Learning Service]].
+
+## Bahan KPI Rencana (panggilan mesin) — 🟡 di branch, belum merged
+
+⚠️ Dibaca dari branch `be-rencana` (`services/learning/kpi_rencana_pelatihan.go`), PR bip-erp #1903/#1904 (TERBUKA per 2026-09-16) — **belum ada di `origin/main`, belum dideploy**.
+
+| Method | Path | Gerbang | Fungsi |
+|---|---|---|---|
+| GET | `/kpi/rencana-pelatihan?periode=YYYY-MM&company_id=&key=` | kunci layanan `LEARNING_SERVICE_KEY` (sama dengan `/kpi/pelatihan`) | Bahan sumber KPI baru `rencana_pelatihan` |
+
+- `periode` (`YYYY-MM`) dan `company_id` wajib; cacat → 400; database belum tersambung → 503 (`kpi_rencana_pelatihan.go:130-141`).
+- Jawaban `{"data": {periode, dari, sampai, butir: [{id, judul, status_pelaksanaan}]}}`; `butir` tak pernah `null` (`kpi_rencana_pelatihan.go:30-43,70-92`).
+- Melaporkan **status per butir**, bukan persentase — dihitung fungsi murni yang sama dengan layar Rencana, sehingga layar dan KPI tak mungkin berselisih (`kpi_rencana_pelatihan.go:57-92`). Sisi pemanggil (sumber KPI `rencana_pelatihan` di employee-service) **belum dibaca/diverifikasi** untuk dok ini. Rincian: [[Microservices - Learning Service]].
 
 ## Peserta & Kehadiran
 
@@ -153,6 +184,28 @@ Grup `/courses` sengaja **tidak** diletakkan di bawah `/training`: segmen statik
 - Tanpa header identitas, ketiga rute membalas **401** sebelum handler jalan.
 - Penilaian memakai **snapshot** soal yang dibekukan saat percobaan dimulai; lulus bila `score × 100 ≥ passing_score × max_score`.
 - `/me/post-test/attempt/:id` didaftarkan sebelum `/me/post-test/:trainingId/start` supaya `attempt` tak ter-match sebagai `trainingId`.
+
+## Sertifikat Pelatihan — 🟡 di branch, belum merged
+
+⚠️ Dibaca dari branch `be-sertifikat` (`services/learning/sertifikat.go`, `models_sertifikat.go`, `sertifikat_pdf.go`), PR bip-erp #1903/#1904 (TERBUKA per 2026-09-16) — **belum ada di `origin/main`, belum dideploy**.
+
+| Method | Path | Izin | Fungsi |
+|---|---|---|---|
+| GET | `/training/certificate-settings` | view, fallback `RequireHRISStaff` | Penanda tangan sertifikat perusahaan pemanggil |
+| PUT | `/training/certificate-settings` | manage, fallback `RequireHRISStaff` | Simpan `{penanda_tangan_nama, penanda_tangan_jabatan}`; memicu penerbitan tertunda utk maksimal 50 kelas `Completed` terbaru |
+| GET | `/training/certificates/:certId/pdf` | view, fallback `RequireHRISStaff` | Unduh PDF (HR). Sertifikat dicabut → 410 |
+| GET | `/training/:id/certificates` | view, fallback `RequireHRISStaff` | Status sertifikat tiap peserta kelas, dihitung LIVE |
+| POST | `/training/:id/certificates/sync` | work, fallback `RequireHRISStaff` | Terbitkan yang berhak/tertunda dan cabut yang gugur, manual |
+| GET | `/me/trainings/:id/certificate` | identitas peserta | Unduh PDF sertifikat aktif milik pemanggil sendiri. Belum terbit → 404 |
+
+Fallback `RequireHRISStaff` (bukan `nil`) pada kelima rute HR: lihat catatan di § Gerbang izin.
+
+- Sertifikat **terbit otomatis**: kelas `Completed` dan (tanpa `course_id` → hadir; ber-`course_id` → lulus post-test course yang tertaut sekarang) (`syaratSertifikat`, `models_sertifikat.go:129-157`).
+- Status per peserta (`status`): `terbit`, `tertunda`, `tidak_berhak`, `dicabut` (`models_sertifikat.go:41-45`).
+- Kode alasan (`alasan_kode`): `kelas_belum_selesai`, `tidak_hadir`, `belum_lulus_post_test`, `penanda_tangan_belum_diatur`, `nama_peserta_tak_terbaca`, `belum_diterbitkan`, `peserta_dihapus`, dan dua yang khusus status LIVE — **`syarat_gugur`** (sertifikat masih aktif tapi syaratnya sudah gugur, mis. kehadiran dikoreksi; hanya tampil di `GET /training/:id/certificates`, tak pernah disimpan) dan **`kelas_dihapus`** (jaring pengaman sesudah kelas dihapus) (`models_sertifikat.go:47-61`).
+- `DELETE /training/:id` dibalas **409** bila kelasnya sudah menerbitkan sertifikat aktif (`training.go:485-499`).
+- Nomor `NNN/SERT/<company_id>/<romawi bulan>/<tahun terbit WIB>`, tak pernah dipakai ulang; format **belum dikonfirmasi HR** (`formatNomorSertifikat`, `models_sertifikat.go:161-168`).
+- Rincian lengkap (state machine terbit/cabut, privasi snapshot, index unik, pemicu sinkron otomatis): [[Microservices - Learning Service]].
 
 ## Bahan KPI (panggilan mesin)
 
