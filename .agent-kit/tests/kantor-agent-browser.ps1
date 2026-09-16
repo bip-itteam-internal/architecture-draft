@@ -246,18 +246,19 @@ try {
   # atau timur, karena proyeksi ini tak pernah memperlihatkan sisi utara dan barat.
   function Arah([string]$key) { $r = Robot | Where-Object { $_.key -eq $key }; if ($r) { return $r.arah }; return $null }
   # keadaan 'alat' dipakai, bukan 'berpikir': histeresis berpikir menahan robot di ruang sebelumnya 20 detik
-  Tulis-Data @((Sesi 'aaaaaaaa-1111' 'Lead di meja' 'meja' 'alat' 'Edit' 'x.py' @((Sub 'sub1' 'Peneliti' 'meja' 'alat' 'Edit'))),
+  # dua subagent supaya KEDUA bangku pod terisi: yang di barat meja menghadap timur, yang di timur menghadap barat
+  Tulis-Data @((Sesi 'aaaaaaaa-1111' 'Lead di meja' 'meja' 'alat' 'Edit' 'x.py' @((Sub 'sub1' 'Peneliti' 'meja' 'alat' 'Edit'), (Sub 'sub2' 'Peneliti' 'meja' 'alat' 'Edit'))),
     (Sesi 'bbbbbbbb-2222' 'Lead di server' 'server' 'alat' 'PowerShell' 'pnpm test'),
     (Sesi 'cccccccc-3333' 'Lead di rapat' 'rapat' 'menunggu_subagent'),
     (Sesi 'dddddddd-4444' 'Lead di lounge' 'lounge' 'menunggu_anda'),
     (Sesi 'eeeeeeee-5555' 'Lead di perpustakaan' 'perpustakaan' 'alat' 'Grep' 'pola'))
-  $ok = Tunggu { @(Robot | Where-Object { -not $_.pergi -and -not $_.jalan }).Count -eq 6 } 30
+  $ok = Tunggu { @(Robot | Where-Object { -not $_.pergi -and -not $_.jalan }).Count -eq 7 } 30
   $rA = Robot | Where-Object { $_.key -eq 'aaaaaaaa-1111' }
-  $rS = Robot | Where-Object { $_.key -eq 'aaaaaaaa-1111:sub1' }
   $rRapat = Robot | Where-Object { $_.key -eq 'cccccccc-3333' }
   Check ($ok -and (Arah 'aaaaaaaa-1111') -eq 'selatan') "3f arah: Lead di pod menghadap mejanya, selatan (dapat '$(Arah 'aaaaaaaa-1111')')"
-  $bangkuHarap = if ($rS -and $rA -and $rS.x -lt $rA.x) { 'timur' } else { 'barat' }
-  Check ((Arah 'aaaaaaaa-1111:sub1') -eq $bangkuHarap) "3f arah: subagent di bangku pod menghadap mejanya, $bangkuHarap (dapat '$(Arah 'aaaaaaaa-1111:sub1')')"
+  $barat = Robot | Where-Object { $_.key -like 'aaaaaaaa-1111:*' -and $_.x -lt $rA.x }
+  $timur = Robot | Where-Object { $_.key -like 'aaaaaaaa-1111:*' -and $_.x -gt $rA.x }
+  Check ($barat -and $timur -and $barat.arah -eq 'timur' -and $timur.arah -eq 'barat') "3f arah: bangku pod sisi barat menghadap timur dan sisi timur menghadap barat (dapat '$($barat.arah)' dan '$($timur.arah)')"
   Check ((Arah 'bbbbbbbb-2222') -eq 'utara') "3f arah: robot ruang server menghadap rak, utara (dapat '$(Arah 'bbbbbbbb-2222')')"
   Check ((Arah 'eeeeeeee-5555') -eq 'utara') "3f arah: robot perpustakaan menghadap rak buku, utara (dapat '$(Arah 'eeeeeeee-5555')')"
   Check ((Arah 'dddddddd-4444') -eq 'selatan') "3f arah: robot lounge menghadap penonton, selatan (dapat '$(Arah 'dddddddd-4444')')"
