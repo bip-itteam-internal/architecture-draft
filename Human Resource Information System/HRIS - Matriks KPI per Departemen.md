@@ -2,7 +2,7 @@
 
 *Isi lengkap `kpi_template` di **production**: seluruh label metrik, bobot, dan targetnya, dikelompokkan per departemen. Dokumen kerja untuk dev departemen yang akan mengotomatiskan metriknya. Cara mengerjakannya ada di [[RUN - Menambah Metrik KPI Otomatis]]; latar belakang dan analisis kelayakannya di [[HRIS - Otomasi Skor KPI]].*
 
-- **Status**: ⚠️ Salinan setia data production per **2026-08-01**, dengan bab **Tech Development** disegarkan langsung dari `employee_db` prod **2026-08-28** (status arsip template, konfigurasi `auto` yang benar-benar terpasang, dan ketersediaan tiap sumbernya). Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini. **Ralat 2026-08-31**: 18 sel yang menyatakan "TIDAK ADA modul Kaizen" dan 1 sel yang menyatakan "TIDAK ADA modul forecast" **salah** dan sudah diperbaiki — rinciannya di bagian [[#Ralat 2026-08-31 Kaizen dan forecast kas]]. **Segar 2026-09-02**: bab **Recruitment & Onboarding** ditulis ulang dari `employee_db` + `recruitment_db` prod (template aktifnya sudah berganti jadi `Recruitment` dan dua metriknya berbeda dari yang tercatat sebelumnya), sel `PPIC / Inventory Turnover Ratio` diralat karena berisi verdict rekrutmen yang salah tempel, dan baris rekrutmen di `KPI Supervisor HRGA` disegarkan angkanya. **Segar 2026-09-12**: bab **Finance** ditulis ulang dari `employee_db` prod (template, konfigurasi `auto`, penetapan, dan skor 2026; rinciannya di bab itu). **Segar 2026-09-15**: bab **Training & Perfomance Officer** ditulis ulang dari `employee_db` + `learning_db` prod (template aktifnya sudah berganti jadi `People and Development` dengan 6 metrik, dan modul Training ternyata sudah punya post-test berskor yang belum dipakai; rinciannya di bab itu). **Segar 2026-09-15 sore**: sumber KPI `pelatihan` (tiga sub-metrik) live di produksi; baris metrik pelatihan di bab Training & Perfomance Officer dan Culture & Industrial disegarkan, dan **klasifikasinya tidak bergeser** karena konektor kini ada tetapi datanya masih kosong. **Dicatat 2026-09-16**: baris `Terlaksananya kegiatan training & performance officer sesuai dengan rencana` (bab Training & Perfomance Officer) disegarkan — sumber KPI baru `rencana_pelatihan` (Tahap 2 Training & Performance Officer) SUDAH DITULIS di employee-service, tapi kodenya masih di **branch**, belum merged, belum deployed (bip-erp PR #1903 dan #1904 **OPEN**); klasifikasi baris itu **tidak bergeser** dari *modul ada tapi datanya kosong*.
+- **Status**: ⚠️ Salinan setia data production per **2026-08-01**, dengan bab **Tech Development** disegarkan langsung dari `employee_db` prod **2026-08-28** (status arsip template, konfigurasi `auto` yang benar-benar terpasang, dan ketersediaan tiap sumbernya). Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini. **Ralat 2026-08-31**: 18 sel yang menyatakan "TIDAK ADA modul Kaizen" dan 1 sel yang menyatakan "TIDAK ADA modul forecast" **salah** dan sudah diperbaiki — rinciannya di bagian [[#Ralat 2026-08-31 Kaizen dan forecast kas]]. **Segar 2026-09-02**: bab **Recruitment & Onboarding** ditulis ulang dari `employee_db` + `recruitment_db` prod (template aktifnya sudah berganti jadi `Recruitment` dan dua metriknya berbeda dari yang tercatat sebelumnya), sel `PPIC / Inventory Turnover Ratio` diralat karena berisi verdict rekrutmen yang salah tempel, dan baris rekrutmen di `KPI Supervisor HRGA` disegarkan angkanya. **Segar 2026-09-12**: bab **Finance** ditulis ulang dari `employee_db` prod (template, konfigurasi `auto`, penetapan, dan skor 2026; rinciannya di bab itu). **Segar 2026-09-15**: bab **Training & Perfomance Officer** ditulis ulang dari `employee_db` + `learning_db` prod (template aktifnya sudah berganti jadi `People and Development` dengan 6 metrik, dan modul Training ternyata sudah punya post-test berskor yang belum dipakai; rinciannya di bab itu). **Segar 2026-09-15 sore**: sumber KPI `pelatihan` (tiga sub-metrik) live di produksi; baris metrik pelatihan di bab Training & Perfomance Officer dan Culture & Industrial disegarkan, dan **klasifikasinya tidak bergeser** karena konektor kini ada tetapi datanya masih kosong. **Dicatat 2026-09-16**: baris `Terlaksananya kegiatan training & performance officer sesuai dengan rencana` (bab Training & Perfomance Officer) disegarkan — sumber KPI baru `rencana_pelatihan` (Tahap 2 Training & Performance Officer) SUDAH DITULIS di employee-service, tapi kodenya masih di **branch**, belum merged, belum deployed (bip-erp PR #1903 dan #1904 **OPEN**); klasifikasi baris itu **tidak bergeser** dari *modul ada tapi datanya kosong*. **Ditambah 2026-09-16**: bab **Live Support** (Kyura) ditulis dari `employee_db` prod — template `Host Live Support Kyura` seluruhnya manual, satu karyawan, satu-satunya skor ada di 2026-07, dan Agustus belum dinilai; hitungan template departemen Kyura juga dicatat sudah tertinggal dari salinan 2026-08-01 (17 template, 12 aktif).
 - **Sumber**: koleksi `kpi_template` di `employee_db` ([[Microservices - Employee Service]]).
 
 ## Cara membaca
@@ -1124,6 +1124,8 @@ Template `VIDEOGRAPHER & EDITOR COMPANY`, 4 metrik.
 
 9 template, 27 metrik. Klasifikasi otomasi: **16 / 1 / 0 / 10**.
 
+> ⚠️ **Hitungan di atas salinan 2026-08-01 dan sudah tertinggal** (sensus prod baca-saja 2026-09-16). `kpi_template` kini memuat **17** template berdepartemen `Kyura`: **12 aktif** dan **5** ber-`status: arsip` (`KPI Kyura Supervisor`, `INTERNAL CONTENT CREATOR `, `LEADER TIKTOK KYURA`, `Customer service`, `MARKETPLACE ADVERTISER`). Keduabelas yang aktif memuat **33** metrik, **20** di antaranya ber-blok `auto`. Bab-bab di bawah masih menyalin keadaan 1 Agustus kecuali **Host Live** dan **Live Support** yang bertanggal sendiri, dan klasifikasi empat kategori **belum** dihitung ulang. Posisi yang punya template aktif tanpa bab di sini: `Engagement Team`, `Account Specialist`, `Bootcamp Content Creator`, `Shop Quality`, dan `Admin Marketplace Kyura` (template kedua untuk `Customer Support`).
+
 > ✅ **Posisi ICC sudah maju melewati snapshot ini.** Per sensus 2026-08-20, ICC Kyura (11 orang) memegang template dengan otomasi PENUH (bobot 1,00) dan skornya kini **dibekukan otomatis** oleh sistem tiap tanggal 1 — lihat [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]]. Tabel ICC di bawah tetap salinan struktur metrik per 1 Agustus; rumus sumber yang benar-benar berjalan sekarang ada di `kpi_sumber_kinerja_toko.go` ([[Microservices - Employee Service]]).
 
 ### Affiliate
@@ -1160,7 +1162,7 @@ Template `Customer service`, 3 metrik.
 
 ### Host Live
 
-> ✅ **Segar 2026-09-15**, diukur langsung dari `employee_db` prod (baca-saja), menggantikan salinan 2026-08-01 (`HOST LIVE KYURA`: `Conversion` 0,7 · `ROI` 0,3, manual). Yang menilai host sekarang `Host Live Kyura` (dokumen dibuat 2026-05-23, terakhir diubah 2026-08-27), seluruh metriknya otomatis. Klasifikasi departemen di atas (**16 / 1 / 0 / 10**) masih salinan 2026-08-01 dan **belum** memasukkan perubahan ini. Posisi `Live Support` punya template sendiri, `Host Live Support Kyura` (4 metrik manual, dibuat 2026-08-05), yang belum punya bab di dokumen ini.
+> ✅ **Segar 2026-09-15**, diukur langsung dari `employee_db` prod (baca-saja), menggantikan salinan 2026-08-01 (`HOST LIVE KYURA`: `Conversion` 0,7 · `ROI` 0,3, manual). Yang menilai host sekarang `Host Live Kyura` (dokumen dibuat 2026-05-23, terakhir diubah 2026-08-27), seluruh metriknya otomatis. Klasifikasi departemen di atas (**16 / 1 / 0 / 10**) masih salinan 2026-08-01 dan **belum** memasukkan perubahan ini. Posisi `Live Support` punya template sendiri, `Host Live Support Kyura` (4 metrik manual, dibuat 2026-08-05); babnya ditulis 2026-09-16 dan ada di bawah.
 
 Template `Host Live Kyura`, 3 metrik, **seluruhnya otomatis**. 7 karyawan aktif ber-`position` Host Live (diukur 2026-09-15). Isinya identik dengan `Host Live Beautyhacks` di bab Beauty Hacks.
 
@@ -1231,6 +1233,52 @@ Template `LEADER TIKTOK KYURA`, 3 metrik.
 | 0.4 | `ROI` | Rata-rata biaya iklan yang dikeluarkan per konversi 3.2 | tt_business_gmv_max_performance_reports (712.855) + marketing_analytics mart_profit_attribution (405.543, level ad/campaign/video/shop/product). Untuk level departemen perlu pemetaan toko ke departemen lebih dulu. | Bisa otomatis, tapi tentukan dulu toko mana milik departemen mana. Tanpa itu ada toko yang omzetnya tidak terhitung, dan itu sudah pernah terjadi senilai Rp 715 juta dalam sebulan. |
 | 0.4 | `Conversion / OMZET` | Jumlah konversi yang tertera pada dashboard akun pengiklan 54000 | tt_business_gmv_max_performance_reports (712.855) + marketing_analytics mart_profit_attribution (405.543, level ad/campaign/video/shop/product). Untuk level departemen perlu pemetaan toko ke departemen lebih dulu. | Bisa otomatis, tapi tentukan dulu toko mana milik departemen mana. Tanpa itu ada toko yang omzetnya tidak terhitung, dan itu sudah pernah terjadi senilai Rp 715 juta dalam sebulan. |
 | 0.2 | `Perfomance Monitoring` | Skor final KPI tercapai sesuai target | SIRKULAR: merujuk skor pemegangnya sendiri, sehingga metrik ikut menentukan dirinya. Tetap manual sampai maknanya diputuskan ulang. | Tetap manual dulu. Metrik ini menilai skor orang itu sendiri, jadi nilainya ikut menentukan dirinya sendiri. Maksudnya perlu diperjelas lebih dulu. |
+
+### Live Support
+
+> ✅ **Ditulis 2026-09-16**, diukur langsung dari `employee_db` prod (baca-saja). Bab ini tidak ada pada salinan 2026-08-01 karena templatenya baru dibuat 2026-08-05. Klasifikasi departemen Kyura di atas (**16 / 1 / 0 / 10**) belum memasukkannya.
+
+Template `Host Live Support Kyura`, 4 metrik, **tak satu pun otomatis** (tidak ada blok `auto` sama sekali). Dibuat 2026-08-05, terakhir diubah 2026-08-29, aktif (tanpa `status: arsip`). **1 karyawan aktif** ber-`position` Live Support per 2026-09-16, dan ia satu-satunya yang pernah dinilai dengan template ini.
+
+Posisi ini bukan Host Live. Yang dinilai kerja penunjang siaran (kelengkapan alat, tema, cuplikan konten, display etalase), bukan performa siarannya, sehingga sumber `kinerja_live` yang sudah otomatis penuh untuk bab Host Live tidak menjawab satu metrik pun di sini.
+
+| Bobot | Label (`key`) | Target / keterangan | Sumber di sistem erp | Rekomendasi |
+|---:|---|---|---|---|
+| 0.2 | `Memastikan kelengkapan device penunjang host live` (`pengelolaan-kelengkapan-alat`) | Target 100% | Belum dipetakan. Tentukan dengan langkah 1 di [[RUN - Menambah Metrik KPI Otomatis]] (hitung dokumen sumbernya di prod, bukan keberadaan koleksinya). | Perlu diperiksa dulu. Yang dinilai kondisi dan kelengkapan alat; belum jelas data mana di sistem yang menjawabnya. |
+| 0.35 | `Membuat tema hostlive perbulan` (`kualitas-tema`) | Minimal 10 tema | Belum dipetakan. `live_shifts` dan `mart_live_sessions` ([[Microservices - Marketing Analytics Service]]) mencatat sesi yang **berjalan**, bukan tema yang disiapkan, jadi keduanya bukan kandidat. | Perlu diperiksa dulu. Yang dihitung jumlah tema yang dibuat, dan pencatatan siaran tidak menyimpan tema sama sekali. |
+| 0.35 | `Membuat cuplikan konten (Teaser)` (`kuantitas-tema`) | Minimal 10 cuplikan konten | Belum dipetakan. Kandidat terdekat `tt_shop_video_performances` yang sudah dipakai metrik ICC, tetapi dua syaratnya belum diukur: adakah penanda yang membedakan teaser dari video biasa, dan apakah pemegang posisi ini terpetakan ke akun mana pun. | Perlu diperiksa dulu. Ini yang paling mungkin diotomatiskan di antara keempatnya, tapi jangan dijanjikan sebelum dua syarat itu diukur. |
+| 0.1 | `Memastikan display product dietalase hostlive sesuai standart ` (`pengelolaan-product-display`) | Target 100% display produk sesuai standar | Belum dipetakan. Yang dinilai kerapian etalase saat siaran, penilaian visual. | Perlu diperiksa dulu, tapi kemungkinan besar tetap manual karena yang dinilai penilaian orang atas tampilan. |
+
+⚠️ **`label` dan `key` bercerita beda, akibat perubahan 2026-08-29.** Nilai `label` sekarang berisi kalimat yang dulu ada di `description`, sementara `description` berisi targetnya. Snapshot `kpi_score` Juli menyimpan bentuk lama, dan `key` masih mengikuti bentuk lama itu:
+
+| `key` | `label` sekarang | `label` di snapshot Juli |
+|---|---|---|
+| `pengelolaan-kelengkapan-alat` | Memastikan kelengkapan device penunjang host live | Pengelolaan & Kelengkapan Alat |
+| `kualitas-tema` | Membuat tema hostlive perbulan | Kualitas Tema |
+| `kuantitas-tema` | Membuat cuplikan konten (Teaser) | Kuantitas Tema |
+| `pengelolaan-product-display` | Memastikan display product dietalase hostlive sesuai standart␣ | Pengelolaan Product Display |
+
+Akibatnya di layar nama metrik tampil sebagai kalimat panjang, bukan nama metrik, dengan targetnya sebagai keterangan di bawahnya. Label terakhir juga berspasi di ujung (ditandai `␣` di tabel), kelas yang sudah tercatat memutus pencocokan nama tanpa normalisasi trim.
+
+**Keadaan skor** (diukur `kpi_score` prod 2026-09-16; ID karyawan sengaja tidak disalin):
+
+| Periode | Template di snapshot | Penilai | Skor |
+|---|---|---|---|
+| 2026-06 | — | **belum dinilai** | — |
+| 2026-07 | `HOST LIVE SUPPORT`, **5** metrik | manual, 1 orang | 80 |
+| 2026-08 | — | **belum dinilai** | — |
+
+Juli satu-satunya skor yang pernah ada untuk posisi ini. Karyawannya masuk 2026-05-26, jadi Juni memang bulan penuh pertamanya dan tetap kosong.
+
+#### Temuan Live Support (diukur prod 2026-09-16)
+
+1. **Agustus 2026 belum dinilai, dan tidak akan terisi sendiri.** Departemen Kyura punya 22 dokumen `kpi_score` periode 2026-08 dan Live Support bukan salah satunya. Karena tak satu pun metriknya otomatis, template ini berada di luar jangkauan pembekuan otomatis ([[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]]): harus ada penilai yang mengisi, cron tidak akan menambalnya. Posisi Kyura lain yang punya skor Juli tetapi tidak punya skor Agustus: `Buzzer`, `ICC`, `Meta Advertiser`. (`ICC` 11 orang di Juli dan `Account Specialist` 11 orang di Agustus polanya cocok dengan penggantian nama posisi, tetapi itu **belum diverifikasi**.)
+
+2. **Skor Juli dibekukan atas komposisi yang berbeda dari template sekarang, jadi tren bulan-ke-bulan posisi ini tidak sebanding.** `kpi_score` menyimpan salinan template apa adanya saat penilaian, sehingga snapshot Juli tak ikut berubah ketika templatenya disunting. Snapshot itu bernama `HOST LIVE SUPPORT` dan memuat **5** metrik: keempat metrik sekarang plus `Core Values` (`core-values`, deskripsi `Kaizen`) berbobot 0,05, dengan `kuantitas-tema` masih 0,3 bukan 0,35. Skor 80 itu = 0,2×50 + 0,35×100 + 0,3×100 + 0,1×50 + 0,05×0. Template sekarang membuang `Core Values` dan memindahkan bobotnya ke `kuantitas-tema`. Yang perlu disadari bukan bugnya melainkan bahwa Juli dan Agustus dinilai atas dasar yang berbeda; pembuangan `Core Values` sendiri selaras dengan [[ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI]].
+
+3. **Penetapan templatenya hasil migrasi, bukan penetapan yang pernah dilakukan orang.** Satu-satunya dokumen `kpi_template_assignment` untuk posisi ini dibuat `migrasi:semai-dari-kpi_score` dengan `berlaku_mulai` `2026-07` dan `company_id` **kosong**. Itu tidak menghalangi apa pun hari ini karena pencocokan template berjalan lewat `department` + `position` (`kpi_me_pratinjau.go`, `kpi_finalisasi.go`), bukan lewat penetapan, tetapi jangan dibaca sebagai bukti bahwa posisi ini pernah ditetapkan secara sadar.
+
+4. **`work_data.position_key` pemegang posisi ini masih `videographer`** sementara `position`-nya sudah `Live Support`, dan ia satu-satunya pemegang `position_key` itu di seluruh prod. **Tidak berpengaruh ke KPI**, karena pencocokan template memakai nama `position`. Yang terdampak paket izin yang menempel pada `position_key`, dan `system_roles` orang itu kosong. Dicatat di sini supaya pembaca bab ini tidak salah menduga KPI-nya ikut terdampak.
 
 ### Marketplace Advertiser
 
