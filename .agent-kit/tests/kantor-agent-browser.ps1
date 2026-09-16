@@ -242,6 +242,41 @@ try {
   Check ($ok -and $tombol -eq 'salin manual' -and $tetap) "3e salin manual: kedua jalan gagal -> kolom id terpilih, tetap terpilih melewati render tiap detik (tombol '$tombol')"
   Foto '3e-salin-manual'
 
+  # 3f. arah hadap: duduk mengikuti perabot, berjalan mengikuti jalur. Wajah hanya tergambar saat hadap selatan
+  # atau timur, karena proyeksi ini tak pernah memperlihatkan sisi utara dan barat.
+  function Arah([string]$key) { $r = Robot | Where-Object { $_.key -eq $key }; if ($r) { return $r.arah }; return $null }
+  # keadaan 'alat' dipakai, bukan 'berpikir': histeresis berpikir menahan robot di ruang sebelumnya 20 detik
+  Tulis-Data @((Sesi 'aaaaaaaa-1111' 'Lead di meja' 'meja' 'alat' 'Edit' 'x.py' @((Sub 'sub1' 'Peneliti' 'meja' 'alat' 'Edit'))),
+    (Sesi 'bbbbbbbb-2222' 'Lead di server' 'server' 'alat' 'PowerShell' 'pnpm test'),
+    (Sesi 'cccccccc-3333' 'Lead di rapat' 'rapat' 'menunggu_subagent'),
+    (Sesi 'dddddddd-4444' 'Lead di lounge' 'lounge' 'menunggu_anda'),
+    (Sesi 'eeeeeeee-5555' 'Lead di perpustakaan' 'perpustakaan' 'alat' 'Grep' 'pola'))
+  $ok = Tunggu { @(Robot | Where-Object { -not $_.pergi -and -not $_.jalan }).Count -eq 6 } 30
+  $rA = Robot | Where-Object { $_.key -eq 'aaaaaaaa-1111' }
+  $rS = Robot | Where-Object { $_.key -eq 'aaaaaaaa-1111:sub1' }
+  $rRapat = Robot | Where-Object { $_.key -eq 'cccccccc-3333' }
+  Check ($ok -and (Arah 'aaaaaaaa-1111') -eq 'selatan') "3f arah: Lead di pod menghadap mejanya, selatan (dapat '$(Arah 'aaaaaaaa-1111')')"
+  $bangkuHarap = if ($rS -and $rA -and $rS.x -lt $rA.x) { 'timur' } else { 'barat' }
+  Check ((Arah 'aaaaaaaa-1111:sub1') -eq $bangkuHarap) "3f arah: subagent di bangku pod menghadap mejanya, $bangkuHarap (dapat '$(Arah 'aaaaaaaa-1111:sub1')')"
+  Check ((Arah 'bbbbbbbb-2222') -eq 'utara') "3f arah: robot ruang server menghadap rak, utara (dapat '$(Arah 'bbbbbbbb-2222')')"
+  Check ((Arah 'eeeeeeee-5555') -eq 'utara') "3f arah: robot perpustakaan menghadap rak buku, utara (dapat '$(Arah 'eeeeeeee-5555')')"
+  Check ((Arah 'dddddddd-4444') -eq 'selatan') "3f arah: robot lounge menghadap penonton, selatan (dapat '$(Arah 'dddddddd-4444')')"
+  $keTengah = '?'
+  if ($rRapat) {
+    $dx = 22 - $rRapat.x; $dy = 11.5 - $rRapat.y
+    $keTengah = if ([Math]::Abs($dx) -ge [Math]::Abs($dy)) { if ($dx -ge 0) { 'timur' } else { 'barat' } } else { if ($dy -ge 0) { 'selatan' } else { 'utara' } }
+  }
+  Check ((Arah 'cccccccc-3333') -eq $keTengah) "3f arah: kursi ruang rapat menghadap pusat meja, dibulatkan empat arah (dapat '$(Arah 'cccccccc-3333')', seharusnya '$keTengah')"
+  $mata = Eval '(function () { var g = document.querySelector("[data-lead=eeeeeeee-5555] .badan"); return g ? (g.innerHTML.match(/88ffff/g) || []).length : -1; })()'
+  Check ($mata -eq 0) "3f arah: robot yang menghadap utara digambar dari punggung, tanpa mata ($mata mata)"
+  $ledOk = Eval '(function () { var e = document.getElementById("led-pod-0"); return !!e && !!e.getAttribute("fill"); })()'
+  Check ($ledOk -eq $true) '3f pod: penanda warna Lead tetap ada sesudah layar monitor diputar menghadap robot'
+  Foto '3f-arah'
+
+  # 3g. arah saat berjalan mengikuti jalur, lalu kembali ke arah kursinya setibanya
+  Tulis-Data @((Sesi 'eeeeeeee-5555' 'Lead di perpustakaan' 'server' 'alat' 'PowerShell' 'jalan jauh'))
+  Check (Tunggu { $r = Robot | Where-Object { $_.key -eq 'eeeeeeee-5555' }; $r -and $r.jalan -and $r.arah -eq 'timur' } 12) '3g arah: robot yang berjalan ke ruang server menghadap timur selagi berjalan'
+  Check (Tunggu { $r = Robot | Where-Object { $_.key -eq 'eeeeeeee-5555' }; $r -and -not $r.jalan -and $r.arah -eq 'utara' } 20) '3g arah: setibanya di ruang server, arahnya kembali mengikuti kursinya (utara)'
   # 4. ramai: enam Lead di ruang server -> label ringkas
   Tulis-Data (1..6 | ForEach-Object { Sesi ('cccccccc-000' + $_) ('Lead ramai ' + $_) 'server' 'alat' 'PowerShell' 'pnpm test' })
   $ok = Tunggu { @(Robot | Where-Object { -not $_.pergi -and $_.area -eq 'server' -and -not $_.jalan }).Count -eq 6 } 25
