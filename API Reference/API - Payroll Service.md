@@ -2,7 +2,7 @@
 
 *Daftar endpoint **Payroll Service** — grounded ke kode (`services/payroll/routes.go` + `main.go` + `rbac.go`; audit 2026-08-26, **34 route** di berkas produksi termasuk `/health` dan `/me`). Arsitektur, fase, rumus perhitungan, dan keadaan produksinya: [[Microservices - Payroll Service]].*
 
-- **Status**: ⚠️ Grounded ke kode (2026-09-01). Dok ini **baru dibuat** pada sync 2026-08-26 — sebelumnya payroll satu-satunya service besar tanpa berkas `API -`, padahal ia menghitung uang. · ⛔ **Dua rute impor di §Impor Payroll Run BELUM ada di produksi**: kodenya masih di branch `feat/payroll-impor-run` yang belum merged dan belum di-deploy. 34 route di atas tetap angka produksi hari ini; dengan kedua rute itu jadi **36**.
+- **Status**: ⚠️ Grounded ke kode (2026-09-01). Dok ini **baru dibuat** pada sync 2026-08-26 — sebelumnya payroll satu-satunya service besar tanpa berkas `API -`, padahal ia menghitung uang. · ⛔ **Dua rute impor di §Impor Payroll Run BELUM ada di produksi**: kodenya masih di branch `feat/payroll-impor-run` yang belum merged dan belum di-deploy. 34 route di atas tetap angka produksi hari ini; dengan kedua rute itu jadi **36**. · ⚠️ Satu rute internal lagi, `GET /internal/badan-usaha`, ada di branch `feat/finance-entitas-cv` dan belum merge (2026-09-15), lihat §Rute internal.
 - **Prefix gateway**: `/api/payroll/*` → path internal tanpa prefix (`api-gateway/main.go`, env `PAYROLL_MODULE_URL`). Routing & auth: [[API - Index]].
 
 ⛔ **Sebelum menyentuh apa pun yang mengubah angka di sini**, baca lebih dulu `mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md` — turunan Peraturan Perusahaan yang menentukan jatah, ambang, dan besaran potongan. Berkas itu ada di repo **mobile**, tak tertaut dari alur kerja payroll mana pun, dan tak akan ditemukan kecuali dicari. Ia yang menang bila perilaku sistem bertentangan dengannya.
@@ -140,6 +140,12 @@ Hak bawaan tiap karyawan atas datanya sendiri, ditegakkan lewat `employee_id` da
 
 ⚠️ **Penjaga "hanya published" hidup di satu fungsi** (`findMyPayslipLine`) yang dipakai bersama versi JSON dan PDF. Penjaga yang hidup di dua tempat cepat atau lambat berubah di satu tempat saja, dan yang bocor adalah slip yang belum disetujui.
 
+## Rute internal (tanpa `gate()`, berkunci layanan)
+
+| Method | Path | Gerbang | Catatan |
+|---|---|---|---|
+| GET | `/internal/badan-usaha?key=` | kunci layanan `PAYROLL_SERVICE_KEY` di query | ⚠️ **Branch `feat/finance-entitas-cv`, belum merge (2026-09-15).** Id dan nama badan usaha (`payroll_company`), terurut nama: `{"data":[{"id","name"}]}`, **tanpa** NPWP dan rekening. Env kosong = **503** (rute tertutup sampai diisi); kunci salah atau absen = **401**, dibandingkan `subtle.ConstantTimeCompare`. Pemanggil: finance-service (master entitas CV dan laporan kecocokan, [[Finance - Buku Besar CV]]), tanpa identitas orang. Penjaganya di handler, bukan prefix `/internal/` ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). `GET /companies` tidak dipakai karena menuntut identitas HR, sedangkan `InternalRequest` tak meneruskan `BIP-Permissions` |
+
 ## Health & identitas
 
 | Method | Path | Catatan |
@@ -155,4 +161,4 @@ Hak bawaan tiap karyawan atas datanya sendiri, ditegakkan lewat `employee_id` da
 
 - [[Microservices - Payroll Service]] · [[API - Index]] · [[CORE - API Master Gateway]]
 - [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] · [[CORE - RBAC dan Permission Set]]
-- [[Microservices - Attendance Service]] (sumber `/payroll-supplement`) · [[Microservices - Employee Service]] (masa kerja THR) · [[Microservices - Insentive Service]] (konsumen `/employer-cost`)
+- [[Microservices - Attendance Service]] (sumber `/payroll-supplement`) · [[Microservices - Employee Service]] (masa kerja THR) · [[Microservices - Insentive Service]] (konsumen `/employer-cost`) · [[Finance - Buku Besar CV]] (konsumen `/internal/badan-usaha`)

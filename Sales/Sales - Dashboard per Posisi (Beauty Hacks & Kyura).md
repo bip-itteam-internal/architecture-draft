@@ -3,6 +3,7 @@
 *Rancangan isi dashboard per posisi untuk dua divisi brand, **Beauty Hacks** (10 posisi) dan **Kyura** (9 posisi). Diturunkan mengikuti [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]]. Keduanya digabung dalam satu dokumen karena **berbagi delapan posisi dengan nama dan struktur metrik yang sama persis**; yang berbeda hanya angka targetnya.*
 
 - **Status**: 🟡 **Rancangan**. Tak satu pun posisi di sini punya lembar per posisi. Yang ada [[Sales - Marketing Dashboard (Index)|Marketing Analytics]], 16 halaman per TOPIK, bukan per orang.
+- **Tampilan bawaan SPV & Leader** (🔜 branch erp-frontend `feat/marketing-iklan-dashboard`, belum merge per 2026-09-15): `/dashboard` mereka membuka Ringkasan Marketing Analytics lewat peran (`isPemimpinBrand`: SPV/admin `kyura` atau `beauty_hacks`, atau `insentive: adv_leader`), berisi belanja iklan, ROAS vs target, ROI laba, dan anggaran iklan terpakai per brand dari Master Anggaran Finance ([[ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance]]). Itu layar per TOPIK yang sama bagi seluruh pembacanya, bukan lembar per posisi yang dirancang di bawah.
 - **Angka KPI diukur 2026-08-28** (sumber: [[HRIS - Matriks KPI per Departemen]]). **Ukur ulang sebelum dipakai mengambil keputusan.**
 - **Path di repo**: `erp-frontend/src/features/marketing-analytics/` · `erp-frontend/src/features/marketing-insight/`
 
@@ -73,6 +74,8 @@ Ada di kedua brand, 3 metrik. Beauty Hacks: Performance Monitoring (0,2), Conver
 - **Visual utama**: tren ROI bulanan terhadap ambang (BH > 3,2; Kyura 3,2). Ia berbobot 0,4 dan satu-satunya yang bergerak tajam.
 - Kartu konversi terhadap target (BH 120.000; Kyura 54.000).
 - Sebaran skor KPI anggota tim terhadap ambang.
+
+⚠️ **Yang tampil hari ini untuk Leader dan SPV bukan bagan di atas** (🔜 branch erp-frontend `feat/marketing-iklan-dashboard`, belum merge per 2026-09-15). Ringkasan Marketing menilai ROAS vs target terhadap `roas_min` modul Marketing Analytics (PROD 4,5 berlaku 2026-08-01), **bukan** ambang "ROI" KPI Leader 3,2, dan kartu ROI di sana adalah ROI laba (laba ÷ biaya iklan) yang definisinya berbeda. Tren ROI bulanan terhadap ambang KPI belum dibangun; menyamakan kedua ambang keputusan pemilik KPI ([[ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance]]).
 
 ⚠️ Metrik Performance Monitoring Beauty Hacks memakai `skor_tim` dengan reduksi `rasio_ambang`, dan **cakupan tim menuntut `work_data.supervisor_id` terisi**. Bila belum, angkanya bukan salah melainkan tak keluar sama sekali.
 
@@ -164,3 +167,4 @@ Ia tetap manual sampai maknanya diputuskan ulang, dan **tidak boleh digambar di 
 - [[Sales - Marketing Analytics (Audit Ketersediaan Data)]] — audit sumber angka divisi ini
 - [[Microservices - Marketing Analytics Service]] — pemilik `mart_profit_attribution`
 - [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] — kepemilikan toko dan tim
+- [[ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance]]: tampilan bawaan SPV/Leader dan anggaran iklan per brand

@@ -2,34 +2,47 @@
 
 ## Deskripsi
 
-*Aplikasi web berdiri sendiri di subdomainnya sendiri untuk seluruh audit internal perusahaan, masuk lewat SSO ERP tanpa akun terpisah. Isinya kertas kerja bulanan, register temuan, dan pengaturan ukuran sampel. Ia sengaja BUKAN menu di dalam ERP: pihak yang diperiksa tidak boleh memegang kunci penyimpanan bukti pemeriksaan tentang dirinya, dan audit kepatuhan yang menyusul tidak punya rumah yang masuk akal di dalam service keuangan.*
+*Aplikasi web berdiri sendiri di subdomainnya sendiri untuk seluruh audit internal perusahaan, masuk lewat SSO ERP tanpa akun terpisah. Isinya kertas kerja bulanan 38 item uji petik dan register temuan. Ia sengaja BUKAN menu di dalam ERP: pihak yang diperiksa tidak boleh memegang kunci penyimpanan bukti pemeriksaan tentang dirinya, dan audit kepatuhan yang menyusul tidak punya rumah yang masuk akal di dalam service keuangan.*
 
 - **Stack**: Next.js (App Router) + TypeScript + shadcn/ui + TanStack Query + react-i18next — sama dengan [[APP - Web ERP]], sengaja, supaya layar yang sudah jadi dapat dipindahkan apa adanya
 - **Path di repo**: `audit-bharata` (**repo terpisah**, dibuat 2026-09-03); backend `bip-erp/services/finance` hari ini ([[Finance - Rancangan Finance Service]]), `services/audit` sesudah pemisahan
-- **Status**: ⚠️ **Implemented (ada catatan)**, diperbarui 2026-09-12: repo ada, tiga layar jalan, 32 test hijau, `pnpm build` sukses. **Koreksi 2026-09-12**: dua klaim di versi sebelumnya sudah usang. (1) PR CORS bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690) **tidak lagi OPEN**: origin `https://audit.bharatainternasional.com` dan port dev 3012 sudah ada di `api-gateway/main.go` per snapshot `origin/main` 2026-09-12 pagi. (2) Aplikasinya **sudah jalan sebagai kontainer di prod**: `Audit-App`, image `audit-bharata-audit-app` dibuat 2026-09-11T07:26Z, port host 3006 ke container 3012, env `MINIO_EMPLOYEE_READ_KEY`/`PORT`/`NODE_ENV` (diukur prod 2026-09-12). ⚠️ Paket izin `Audit: *` ke akun: **belum diukur ulang** sejak 2026-09-04 (saat itu belum ada penugasan). Status terkininya **TBD**, jangan diasumsikan sudah atau belum tanpa mengecek ulang.
-- **Keputusan**: [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]
+- **Status**: ⚠️ **Implemented (ada catatan)**, diperbarui 2026-09-15. Kontainer prod `Audit-App` (image dibuat 2026-09-11, diukur 2026-09-12) masih versi **matriks 36 uji** dengan tiga layar. Versi **uji petik** ([[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]) dikerjakan di branch `feat/uji-petik-manual`, **belum merge**: dua layar, 88 test hijau, `pnpm build` sukses. CORS gateway untuk `https://audit.bharatainternasional.com` dan port dev 3012 sudah ada di `api-gateway/main.go` (koreksi 2026-09-12). ⚠️ Paket izin `Audit: *` ke akun **belum diukur ulang** sejak 2026-09-04; status terkininya **TBD**.
+- **Keputusan**: [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]] · [[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]
 
 ## Latar Belakang
 
-Layar audit pertama dibangun sebagai tiga rute di dalam `erp-frontend` (`/audit`, `/audit/temuan`, `/audit/setelan`) dan sudah merged. Ia **belum pernah dijalankan satu kali pun** — `finance-service` tidak ada di `docker-compose.dev.yml`, jadi tak ada satu baris data pun yang pernah dimuat.
+Layar audit pertama dibangun sebagai tiga rute di dalam `erp-frontend` (`/audit`, `/audit/temuan`, `/audit/setelan`), merged dan live di prod sejak 2026-09-03.
 
-Pemindahannya diputuskan sebelum layar itu sempat dipakai, atas dua tuntutan yang baru dinyatakan: bukti pemeriksaan harus tersimpan dengan kunci yang tidak dipegang pihak yang diperiksa, dan wadahnya akan menampung seluruh audit internal termasuk kepatuhan GA. Alasan lengkapnya di ADR 0074.
+Pemindahannya diputuskan atas dua tuntutan: bukti pemeriksaan harus tersimpan dengan kunci yang tidak dipegang pihak yang diperiksa, dan wadahnya akan menampung seluruh audit internal termasuk kepatuhan GA. Alasan lengkapnya di ADR 0074.
+
+**Rute di ERP dicabut 2026-09-15** (branch erp-frontend `feat/cabut-audit-internal-erp`, belum merge). Alamat lama `/audit*` dialihkan (307) ke aplikasi ini lewat env `NEXT_PUBLIC_AUDIT_URL`, jadi bookmark lama tidak berakhir di 404. Rinciannya di [[APP - Web ERP]].
 
 ## Ruang Lingkup
 
-### Tiga layar, dipindahkan apa adanya
+### Dua layar (versi uji petik)
 
 | Rute | Isi | Digerbang |
 |---|---|---|
-| `/` | Kertas kerja bulanan, 36 baris uji | `audit.view` |
-| `/temuan` | Register temuan lima unsur, lintas periode | `audit.view` |
-| `/setelan` | Ukuran sampel per uji | `audit.master.save` |
+| `/` | Kertas kerja bulanan: 38 item dikelompokkan bagian dan tahap, panel detail per item, dan kartu lima area di luar lingkup | `audit.view`; aksi `audit.tinjau` dan `audit.temuan.terbitkan` |
+| `/temuan` | Register temuan lintas periode, terbaru di atas; `?id=<id temuan>` membuka detailnya langsung | `audit.view` |
 
-Aturan tampilannya **tidak berubah** dan sudah tertulis di [[Finance - Audit Internal]]: kelompok 1 naik ke atas bukan yang paling merah, baris `menunggu_data` dan `belum_diimplementasi` tidak disembunyikan, `keadaan_efektif` dibaca dari respons bukan dihitung ulang, dan tiga izin tulis digerbang terpisah.
+`/setelan` (ukuran sampel per uji) **dicabut** bersama menunya: ukuran sampel kini bagian kalimat tiap item.
 
-### Yang dipindahkan, dan berapa
+### Aturan tampilan
 
-Diukur 2026-09-03 atas `erp-frontend`.
+Domainnya di [[Finance - Audit Internal]]. Yang ditegakkan layar:
+
+- **Urutan mengikuti dokumen sumber**: Accounting lalu Tax, Tahap 2 lalu Tahap 3, lalu nomor sebagai angka. Bukan menurut keadaan: auditor bekerja dari dokumen bernomor.
+- **Item belum diperiksa tidak disembunyikan**, dan keadaan `belum_diperiksa` bernada netral, bukan merah.
+- **`keadaan_efektif` dibaca dari respons**, tidak dihitung ulang.
+- **Kalimat pembuka dan cakupan dihitung dari `jumlah_item`**, supaya kertas kerja yang barisnya kurang tak pernah terbaca "seluruhnya wajar".
+- **Respons tanpa `jumlah_item`** dianggap backend sebelum ADR 0098; layar menyatakan server belum diperbarui.
+- **Tombol Siapkan kertas kerja** muncul bagi pemegang `audit.tinjau` saat baris kurang dari `jumlah_item`. Pembaca melihat kalimat bahwa kertas kerja belum disiapkan auditor.
+- **Panel item** berurutan kerja: keterangan item (titik awal, pembanding, kriteria, tujuan, sampel yang dituntut, metode), kesimpulan tersimpan, lampiran bukti, lalu isian sampel dan catatan. Tombol ditahan sampai keduanya terisi, dan sampai keterangan item (serta temuan lama untuk revisi) termuat; galat muatnya ditampilkan.
+- **Tandai wajar tidak ditawarkan pada item bertemuan.** **Jadikan temuan** dan **Revisi temuan** lewat dialog yang menyebut item dan periodenya, dengan pengingat perluasan sampel hanya untuk metode acak. Revisi punya judul, tombol, dan toast sendiri.
+- **Pemegang izin tanpa aksi pada baris itu** melihat kalimat keterangan, bukan isian tanpa tombol.
+
+### Riwayat: yang dipindahkan dari erp-frontend (diukur 2026-09-03)
 
 | Bagian | Baris | Perlakuan |
 |---|---|---|
@@ -41,17 +54,9 @@ Diukur 2026-09-03 atas `erp-frontend`.
 | Terjemahan `audit.*` + `common` | 281 | Ukir dari locale 10.000 baris |
 | `menu-permission` | **1.476 → ~8** | Tulis ulang |
 | `reconciliation-view` | **285 → ~10** | Inline satu predikat |
-| `MainTable` + `Banner` + `FilterTable` | 1.187 | ⚠️ Keputusan terbuka, lihat di bawah |
+| `MainTable` + `Banner` + `FilterTable` | 1.187 | Dibangun ulang, lihat di bawah |
 
-**Port pragmatis ≈ 1.470 baris di luar modul audit sendiri. Port harfiah ≈ 4.030 baris.**
-
-### ⚠️ Keputusan terbuka: tabel di-fork atau dibangun ulang
-
-`MainTable` dipakai **124 halaman lain** di erp-frontend, `Banner` **106**. Mem-fork keduanya berarti bercabang dari sebanyak itu, dan perbaikan bug di satu sisi tidak akan menyeberang — kelas "sumber kebenaran kedua" yang berulang kali menggigit di sini.
-
-Yang memurahkan pilihan bangun-ulang: halaman audit hanya memakai **13 dari 19 prop** `MainTable`. `columnGroups`, `footer`, `rowClassName`, `pageSizeOptions`, `description`, dan `hideExport` tak satu pun dipakai.
-
-⚠️ **`MainTable` menyeret `exceljs`** lewat import statis, dan prop `hideExport` **tidak** menghilangkannya dari bundle.
+**Diputuskan: tabel dibangun ulang, bukan di-fork.** `MainTable` dipakai 124 halaman lain di erp-frontend dan `Banner` 106, sementara halaman audit hanya memakai 13 dari 19 prop `MainTable`. Ikut hilang `exceljs`, yang diseret `MainTable` lewat import statis walau `hideExport` menyala.
 
 ## Autentikasi
 
@@ -76,7 +81,7 @@ Tiap konsumen SSO menulis ulang keempatnya — belum ada paket bersama:
 
 - Halaman `/auth/callback`, **dikecualikan dari guard** aplikasi
 - Penjaga anti-loop saat logout (`?logged_out=1`); tanpanya redirect otomatis dan auto-login berputar tanpa henti
-- ⛔ **PR CORS ke `api-gateway/main.go` dan deploy gateway.** Daftar origin di-**hardcode di Go**, bukan env. Sudah dibuka: bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690) (origin `https://audit.bharatainternasional.com` + port dev **3012**). [[CORE - SSO Flow]] menyatakan menambah konsumen "tidak butuh perubahan backend" dan itu **salah** untuk konsumen berbasis peramban — Portal Karir membuktikannya lewat PR #460, dan PR #1690 membuktikannya kedua kalinya.
+- ⛔ **CORS di `api-gateway/main.go` dan deploy gateway.** Daftar origin di-**hardcode di Go**, bukan env. Untuk aplikasi ini dikerjakan lewat bip-erp [#1690](https://github.com/bip-itteam-internal/bip-erp/pull/1690) (origin `https://audit.bharatainternasional.com` + port dev **3012**). [[CORE - SSO Flow]] pernah menyatakan menambah konsumen "tidak butuh perubahan backend" dan itu **salah** untuk konsumen berbasis peramban — Portal Karir membuktikannya lewat PR #460, dan PR #1690 membuktikannya kedua kalinya.
 - Penanganan 401 setelah 72 jam; jalur SSO **tidak** menerbitkan refresh token
 
 ## Persona / Pengguna
@@ -85,55 +90,60 @@ Tiap konsumen SSO menulis ulang keempatnya — belum ada paket bersama:
 |---|---|---|---|
 | Auditor internal | Posisinya **belum ada**; direncanakan | `audit_auditor` (view, tinjau, terbitkan) | Web |
 | Reviewer silang | Staf dari divisi di luar yang diaudit | `audit_auditor` | Web |
-| Direktur | Penerima laporan, penyetel ukuran sampel | `audit_direksi` (view, master.save) | Web |
+| Direktur | Penerima laporan | `audit_direksi` (view; `master.save` tanpa aksi sejak ADR 0098) | Web |
 | Pembaca | Ditunjuk per kasus | `audit_pembaca` (view) | Web |
 
 - **Tujuan**: memastikan ketepatan angka, mendeteksi indikasi kecurangan, dan menutup peluangnya.
 - **Pain point**: kertas kerja dirakit ulang dari nol tiap bulan, dan datanya diminta dari divisi yang sedang diperiksa.
-- **Aksi utama**: meninjau baris yang berbunyi, menelusuri ke dokumen sumber, menandai wajar dengan alasan tertulis, atau menaikkannya jadi temuan.
+- **Aksi utama**: menelusuri sampel tiap item ke dokumen, lalu menyimpulkan Wajar atau Temuan dengan sampel dan catatan.
 
 ⛔ **Finance bukan pemakai aplikasi ini**, melainkan pihak yang dimintai klarifikasi. Peran dan tanggung jawab Finance selengkapnya (bukan disalin di sini): [[Finance - FAT Persona]].
-⛔ **Direktur tidak meninjau, auditor tidak menyetel ukuran sampel.** Yang menetapkan beban pemeriksaan bukan yang mengerjakannya.
-⛔ **Menu ini tidak muncul untuk siapa pun sampai paketnya dipasang.** Tak ada `system_roles.audit` dan `AuditTierDefault` mengembalikan kosong — memasang paket adalah langkah deploy, bukan langkah opsional.
+⛔ **Direktur tidak meninjau.** Yang membaca laporan bukan yang mengerjakan pemeriksaannya.
+⛔ **Aksi tulis tidak muncul untuk siapa pun sampai paketnya dipasang.** Tak ada `system_roles.audit` dan `AuditTierDefault` mengembalikan kosong — memasang paket adalah langkah deploy, bukan langkah opsional.
 
 ## Alur Pengguna
 
 ```
-Auditor internal — menutup pemeriksaan bulan berjalan
-  tanggal 6 jam 1 WIB   periode bulan lalu dibuka otomatis
-  1. buka /            kertas kerja, kelompok 1 di atas
-  2. klik baris berbunyi   panel detail: dua sisi + selisih + kondisi ideal
-  3. telusuri              ⛔ DI LUAR SISTEM
-  4. kembali ke panel      tandai wajar (alasan WAJIB)
-                           ATAU jadikan temuan (lima unsur)
-  5. temuan terbit         panel tetap terbuka + tautan ke register
-  n. selesai ketika Direktur melihat daftar temuan bulan itu
+Auditor internal: memeriksa satu periode
+  tanggal 6 jam 01:00 WIB   periode bulan lalu dibuka otomatis
+  1. buka /                 kertas kerja periode; bila barisnya kurang: "Siapkan kertas kerja"
+  2. buka item              panel: titik awal, pembanding, kriteria, sampel yang dituntut
+  3. telusuri               ⛔ DI LUAR SISTEM (rekening koran, gudang, dashboard, arsip pajak)
+  4. kembali ke panel       isi sampel beserta cara memilih, dan catatan
+                            Tandai wajar
+                            ATAU Jadikan temuan -> dialog (pengingat perluas ke 10, item acak)
+  5. temuan terbit          panel tetap terbuka + tautan "Lihat di register" (/temuan?id=)
+  n. selesai ketika cakupan "38 dari 38 item sudah dinilai"
 
-Direksi — jauh lebih pendek, dan sengaja
-  buka /setelan → ubah ukuran sampel → selesai
-  TIDAK meninjau baris; tombol aksinya memang tidak muncul untuknya
+Direktur / Pembaca: membaca
+  buka / atau /temuan -> panel hanya-baca (sampel dan catatan terlihat, tanpa tombol)
+
+Dari ERP
+  bookmark /audit atau /audit/temuan -> dialihkan ke aplikasi ini (bila NEXT_PUBLIC_AUDIT_URL terisi saat build)
 ```
 
-⚠️ **Alur ini belum pernah ditempuh satu orang pun.** Seluruhnya dari kode dan rencana, bukan dari layar yang berjalan.
+⚠️ **Alur ini belum pernah ditempuh satu orang pun.** Seluruhnya dari kode dan test, bukan dari layar yang berjalan.
 
 ## Belum Diimplementasikan / Catatan
 
-- ~~Repo, CI, dan hosting belum ada.~~ **Koreksi 2026-09-12**: repo dan hosting **sudah ada** (`audit-bharata`, dibuat 2026-09-03; kontainer `Audit-App` jalan di prod, lihat Status di atas). **CI**: TBD, belum diperiksa sesi ini.
-- **Nama dan alamat final belum diputuskan.** Wadahnya untuk seluruh audit internal, jadi namanya wajib membedakan diri dari [[GA - Audit Internal System]] — dua hal bernama sama tanpa pembeda sudah terbukti membingungkan permanen di [[APP - Dynamic Task Tracker]].
-- **Bentuk layar untuk audit kepatuhan GA belum dirancang.** Registry 36 uji berbentuk pembanding dua sisi berangka; checklist kepatuhan berbentuk lain, dan belum diperiksa apakah keduanya muat dalam satu bentuk layar.
-- ⚠️ **`showFormErrorsToast` menulis ke store yang dibaca `form-errors-modal`.** Bila modal itu tidak dipasang di layout aplikasi baru, validasi lima unsur temuan **gagal tanpa satu pun galat** — tombolnya ditekan, tidak terjadi apa-apa.
+- **CI**: TBD, belum diperiksa.
+- **Nama dan alamatnya sudah dipakai** (repo `audit-bharata`, `audit.bharatainternasional.com`). Karena wadahnya untuk seluruh audit internal, namanya tetap wajib membedakan diri dari [[GA - Audit Internal System]] — dua hal bernama sama tanpa pembeda sudah terbukti membingungkan permanen di [[APP - Dynamic Task Tracker]].
+- **Bentuk layar untuk audit kepatuhan GA belum dirancang.** Registry uji petik berbentuk daftar item bervonis manusia yang terikat bagian dan tahap; belum diperiksa apakah checklist kepatuhan muat di bentuk itu.
+- ⚠️ **Pemilihan sampel tidak tercatat mesin.** Yang tersimpan hanya kalimat sampel dari auditor; rinciannya di [[Finance - Audit Internal]].
+- ⚠️ **`Toaster` wajib terpasang di layout.** Tanpanya penolakan isian sampel dan catatan hilang tanpa satu pun galat.
 - ⚠️ **Badge shadcn stok tidak cukup.** `tampilan.ts` menuntut varian `success` dan `warning`; `npx shadcn add badge` saja akan gagal ketik-periksa.
-- ⚠️ **i18n wajib, bukan opsional**, bila `MainTable`/`Banner` diport — ketiganya memanggil `useTranslation`.
 - ⚠️ **`pnpm dev` rusak di path ber-spasi** (`c:\Data utama\...`), pelajaran dari [[APP - Portal Karir Bharata]]. Pratinjau andal lewat `pnpm build` + `pnpm start`.
 - ⚠️ **Build wajib digagalkan bila `.env` tak ada.** Portal Karir hampir menerbitkan situs produksi yang menunjuk alamat dev secara senyap karena kodenya jatuh ke fallback.
+- ⚠️ **Deploy versi uji petik wajib sesudah finance-service.** Layar baru di atas backend lama menyatakan server belum diperbarui; layar lama di atas backend baru ditolak saat meninjau karena tidak mengirim sampel.
 
 ## Dependensi & Integrasi
 
 - [[CORE - SSO Flow]] — jalur masuk; [[CORE - API Master Gateway]] — CORS dan routing
-- [[Finance - Audit Internal]] — dok domain 36 uji, semantik kolom, dan aturan layar
-- [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]] — keputusan pemisahan
+- [[Finance - Audit Internal]] — dok domain: 38 item uji petik, keadaan baris, dan aturan layar
+- [[API - Finance Service]] — kontrak rute `/api/finance/audit/*`
+- [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]] — keputusan pemisahan · [[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]] — registry uji petik
 - [[CORE - RBAC dan Permission Set]] — katalog izin `audit.*` dan tiga paket bawaan
-- [[APP - Web ERP]] — asal layarnya, dan sumber komponen bersama yang dipindahkan
+- [[APP - Web ERP]] — asal layarnya, kini hanya mengalihkan alamat lama
 
 ## Dokumen Terkait
 

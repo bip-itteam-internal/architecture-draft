@@ -1,9 +1,9 @@
 ## Deskripsi
 
-*Endpoint **finance-service** (master data divisi FAT: Cost Control, Tax, Biaya Variabel Produksi, dan Audit Internal). Gateway: `/api/finance/*`. Grounded ke `services/finance/routes.go`, `pajak_handler.go`, `biaya_variabel_handler.go`, `audit_handler.go`.*
+*Endpoint **finance-service** (master data divisi FAT: Cost Control, Tax, Biaya Variabel Produksi, Audit Internal, dan Buku Besar CV). Gateway: `/api/finance/*`. Grounded ke `services/finance/routes.go`, `pajak_handler.go`, `biaya_variabel_handler.go`, `audit_handler.go`, dan (branch) `akuntansi_cv_handler.go`.*
 
-- **Implementasi**: [[Finance - Rancangan Finance Service]] · **Status**: ⚠️ Implemented (ada catatan), Fase 0 + Cost Control Fase 1a + **modul Tax (kewajiban per masa) ada di kode**, tetapi datanya di prod masih kosong (master jenis pajak 0, kewajiban 0; seed master belum pernah dijalankan) + Biaya Variabel Produksi + Audit Internal ([[Finance - Audit Internal]]); register pelaporan SPT/temuan/klasifikasi akun masih deklarasi koleksi tanpa pemanggil (diukur 2026-09-12)
-- **Indeks**: [[API - Index]] · **RBAC**: gerbang kunci gateway di seluruh rute (`ValidateGateway`), plus izin per-modul (`finance.pajak.*`, `audit.*`) dan pemeriksaan identitas per-handler pada rute `/internal/` (lihat catatan di bawah). ⚠️ **Rute `/biaya-variabel*` TIDAK bergerbang izin maupun `company_id` sama sekali**, lihat bagian Biaya Variabel Produksi.
+- **Implementasi**: [[Finance - Rancangan Finance Service]] · **Status**: ⚠️ Implemented (ada catatan), Fase 0 + Cost Control Fase 1a + **modul Tax (kewajiban per masa) ada di kode**, tetapi datanya di prod masih kosong (master jenis pajak 0, kewajiban 0; seed master belum pernah dijalankan) + Biaya Variabel Produksi + Audit Internal ([[Finance - Audit Internal]]); register pelaporan SPT/temuan/klasifikasi akun masih deklarasi koleksi tanpa pemanggil (diukur 2026-09-12) · Buku Besar CV T1 (master entitas, penugasan, cakupan tulis) di branch `feat/finance-entitas-cv`, **belum merge** (2026-09-15)
+- **Indeks**: [[API - Index]] · **RBAC**: gerbang kunci gateway di seluruh rute (`ValidateGateway`), plus izin per-modul (`finance.pajak.*`, `audit.*`, dan di branch `akuntansicv.*`) dan pemeriksaan identitas per-handler pada rute `/internal/` (lihat catatan di bawah). ⚠️ **Rute `/biaya-variabel*` TIDAK bergerbang izin maupun `company_id` sama sekali**, lihat bagian Biaya Variabel Produksi.
 
 > ⚠️ **Rute ditulis TANPA mengulang nama modul.** Gateway membuang prefix `/api/finance` sebelum meneruskan (`routes.Reroute` → `strings.TrimPrefix`), jadi `/api/finance/cost-control/rekomendasi` tiba di service sebagai `/cost-control/rekomendasi`. Mendaftarkannya sebagai `/finance/cost-control/...` membuat SELURUH permintaan lewat jalur normal membalas 404 sementara unit test tetap hijau. Dikunci `routes_test.go` dan `rekomendasi_handler_test.go`.
 
@@ -11,7 +11,7 @@
 
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/` | Identitas service (`{"service":"finance","modul":["pajak","cost-control"]}`). Ada sejak Fase 0 justru untuk membuktikan kontrak pemotongan prefix di atas benar-benar dipenuhi |
+| GET | `/` | Identitas service (`{"service":"finance","modul":["pajak","cost-control"]}`; branch `feat/finance-entitas-cv` menambah `"akuntansi-cv"`). Ada sejak Fase 0 justru untuk membuktikan kontrak pemotongan prefix di atas benar-benar dipenuhi |
 | GET | `/health` | Healthcheck container. Didaftarkan **SEBELUM** gerbang gateway — healthcheck memasang kuncinya sendiri, dan menaruhnya di belakang gerbang membuat container tak pernah dinyatakan sehat |
 
 ## Cost Control — Rekomendasi Efisiensi
@@ -97,29 +97,74 @@ Bahan KPI SPV Manufacture F3 "Kontrol ketat biaya produksi variabel" (bobot 10),
 
 ## Audit Internal
 
-Modul terpisah, di-host di service ini (ADR 0073, diamandemen 2026-09-02); lihat [[Finance - Audit Internal]] untuk domain lengkap (36 uji, tiga kelompok, semantik kolom, aturan layar). Tabel di bawah hanya memetakan rute; **jangan salin logika audit ke sini**.
+Modul terpisah, di-host di service ini (ADR 0073, diamandemen 2026-09-02); lihat [[Finance - Audit Internal]] untuk domain lengkap (38 item uji petik, keadaan baris, aturan layar; matriks 36 uji lama di bagian Arsip-nya). Tabel di bawah hanya memetakan rute; **jangan salin logika audit ke sini**.
 
 | Method | Path | Izin | Fungsi |
 |---|---|---|---|
-| GET | `/audit/uji` | `audit.view` | Daftar definisi uji |
-| GET | `/audit/temuan` | `audit.view` | Daftar temuan |
+| GET | `/audit/uji` | `audit.view` | Registry item pemeriksaan (bentuk di Kontrak di bawah) |
+| GET | `/audit/temuan?periode=` | `audit.view` | Daftar temuan; `periode` kosong = seluruh periode (register) |
 | GET | `/audit/jejak?periode=&kunci=` | `audit.view` | Jejak perubahan (belum tercatat di dok API sebelumnya) |
 | GET | `/audit/setelan-sampel` | `audit.view` | Setelan sampling |
-| PUT | `/audit/setelan-sampel/:kode` | `audit.master.save`* | Ubah setelan sampling |
+| PUT | `/audit/setelan-sampel/:kode` | `audit.master.save`* | Ubah setelan sampling. ⚠️ Versi uji petik menolak (400) item tanpa penjalan, yaitu seluruh 38 item |
 | GET | `/audit/bukti/:id/berkas` | `audit.view` | Unduh berkas bukti |
 | DELETE | `/audit/bukti/:id` | `audit.tinjau`* | Hapus bukti |
 | GET | `/audit/periode/:periode` | `audit.view` | Kertas kerja satu periode |
-| POST | `/audit/periode/:periode/tarik` | `audit.tinjau`* | Tarik ulang periode |
-| PATCH | `/audit/periode/:periode/baris/:kode/tinjau` | `audit.tinjau`* | Tinjau satu baris |
-| POST | `/audit/periode/:periode/baris/:kode/temuan` | `audit.temuan.terbitkan`* | Terbitkan temuan dari baris |
+| POST | `/audit/periode/:periode/tarik` | `audit.tinjau`* | Menyiapkan kertas kerja (tombol "Siapkan kertas kerja"); aman diulang |
+| PATCH | `/audit/periode/:periode/baris/:kode/tinjau` | `audit.tinjau`* | Tandai satu item wajar |
+| POST | `/audit/periode/:periode/baris/:kode/temuan` | `audit.temuan.terbitkan`* | Terbitkan atau revisi temuan dari baris |
 | GET | `/audit/periode/:periode/baris/:kode/bukti` | `audit.view` | Daftar bukti baris (sengaja `view`, bukan `tinjau`: melihat bukti bagian dari membaca laporan) |
 | POST | `/audit/periode/:periode/baris/:kode/bukti` | `audit.tinjau`* | Unggah bukti baris |
 
-*Nama konstanta persis: `common.PermAuditView`, `common.PermAuditMasterSave`, `common.PermAuditTinjau`, `common.PermAuditTemuanTerbitkan` (`audit_handler.go:331-355`). Izin ber-prefiks `audit`, BUKAN `finance`: pemegang izin finance tidak otomatis membuka kertas kerja yang memeriksa pekerjaannya sendiri.
+*Nama konstanta persis: `common.PermAuditView`, `common.PermAuditMasterSave`, `common.PermAuditTinjau`, `common.PermAuditTemuanTerbitkan` (`DaftarkanRuteAudit` di `audit_handler.go`). Izin ber-prefiks `audit`, BUKAN `finance`: pemegang izin finance tidak otomatis membuka kertas kerja yang memeriksa pekerjaannya sendiri.
 
 ⚠️ **Status kertas kerja `terbit` (`KertasKerjaTerbit`, `audit_kertas_kerja.go:26`) dideklarasikan dan DIBACA (`:289`) tapi tak punya rute penulis.** Diverifikasi: `git grep` atas `KertasKerjaTerbit`/`TerbitPada`/`TerbitOleh` di seluruh `services/finance` hanya mengembalikan deklarasi struct + satu titik baca, nol penulis.
 
 Penjadwal audit membuka periode (bulan sebelumnya, tutup buku) tiap tanggal 6 pukul 01:00 WIB (`audit_kertas_kerja.go:133-165`), sengaja terpisah dari penjadwal pajak (tanggal 1): jendelanya berbeda, dan menyatukan dua fakta yang kebetulan berbentuk sama akan mengunci keduanya bergerak bersama.
+
+### Kontrak Audit Internal versi uji petik
+
+Grounded ke `audit_handler.go`, `audit_registry.go`, dan `audit_tindakan.go` di branch bip-erp `feat/finance-audit-uji-petik` ([[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]), **belum merge per 2026-09-15**. `main` masih mengirim bentuk matriks 36 uji.
+
+- **`GET /audit/uji`**: array 38 objek `{kode, nomor, bagian, tahap, pos, nama, titik_awal, pembanding, kriteria_cocok, tujuan, sampel, metode}`. `bagian` = `accounting` | `tax`; `tahap` = 2 | 3; `metode` = `acak` | `terarah` | `populasi_penuh`.
+- **`GET /audit/periode/:periode`**: `{periode, kertas_kerja, sudah_dibuka, jumlah_item, baris_di_luar_daftar, di_luar_lingkup, baris}`.
+  - `baris` hanya berisi kode yang terdaftar. Tiap baris membawa antara lain `kode_uji`, `nama`, `nomor`, `bagian`, `tahap`, `pos`, `keadaan_efektif`, `tinjauan` (`oleh`, `pada`, `alasan`, `sampel`) bila ada, dan `temuan_id` bila bertemuan.
+  - `di_luar_lingkup` = 5 objek `{kode, area, akibat}`.
+  - `baris_di_luar_daftar` = cacah baris berkode lama yang disaring; layar tidak menampilkannya.
+  - ⚠️ `jumlah_item` juga penanda versi: layar menganggap respons tanpanya berasal dari backend sebelum ADR 0098.
+- **`POST .../tarik`**: menyemai baris item yang belum ada, membalas `{periode, jumlah_item}`. Aman diulang: `keadaan_tinjauan`, `tinjauan`, dan `temuan_id` tidak ditulis.
+- **`PATCH .../baris/:kode/tinjau`**: badan `{alasan, sampel}`, keduanya wajib.
+- **`POST .../baris/:kode/temuan`**: badan `{kondisi, sampel, klasifikasi?}`; `kondisi` dan `sampel` wajib, `klasifikasi` opsional (`mayor` | `moderat` | `minor`). `kriteria` kiriman diabaikan dan diisi dari `kriteria_cocok` registry. Id temuan `<periode>-<kode>`; menerbitkan ulang merevisi, dan jejak beraksi `revisi` menyimpan isi sebelumnya.
+
+| Status | Arti | Tinjau | Temuan |
+|---|---|---|---|
+| 400 | Kesalahan pengisi: catatan atau sampel kosong, item tak terdaftar, klasifikasi tak sah; pada tinjau juga `jadi_temuan: true` | ✅ | ✅ |
+| 404 | Baris item belum ada di kertas kerja periode itu | ✅ | ✅ |
+| 409 | Item sudah jadi temuan, termasuk bila temuannya terbit di sela pembacaan dan penulisan; koreksinya lewat revisi temuan | ✅ | — |
+| 500 | Gangguan server atau database | ✅ | ✅ |
+
+## Buku Besar CV: Entitas, Penugasan, Cakupan (T1)
+
+Master entitas CV, pemegang tiap CV, dan cakupan tulis per CV ([[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] §2-3; domain di [[Finance - Buku Besar CV]]). Grounded ke `akuntansi_cv_handler.go` di branch `feat/finance-entitas-cv`, **belum merge per 2026-09-15**. FE: `/finance/entitas-cv` dan `/finance/entitas-cv/saya`.
+
+| Method | Path | Izin | Fungsi |
+|---|---|---|---|
+| GET | `/akuntansi-cv/entitas` | `akuntansicv.view` | Master entitas perusahaan pemanggil, terurut kode. Selalu array |
+| GET | `/akuntansi-cv/entitas/bawaan` | `akuntansicv.view` | `{jumlah, belum_disemai}`, dihitung per kode dari daftar CV bawaan backend; layar memakainya untuk tombol Semai |
+| POST | `/akuntansi-cv/entitas/seed` | `akuntansicv.kelola` | Semai idempoten lalu pasang rujukan kosong yang cocok tunggal. Balasan `{dibuat, sudah_ada, payroll, rekening}`, tiap ringkas `{sumber, dipasangkan[], tak_cocok[], ambigu[]}`. Sumber galat tidak menghalangi semai |
+| GET | `/akuntansi-cv/sumber` | `akuntansicv.kelola` | Pilihan dialog ubah: `{badan_usaha[], rekening[], sumber: {payroll, integration}}`; sumber galat = daftar kosong plus status galat berikut sebabnya |
+| GET | `/akuntansi-cv/kecocokan` | `akuntansicv.view` | Laporan `{sumber: {payroll, integration, employee}, temuan[]}`, 200 walau sebagian sumber galat |
+| GET | `/akuntansi-cv/penugasan` | `akuntansicv.view` | `{penugasan: [{kode_cv, pemegang[], versi, diubah_oleh, diubah_pada}], pemegang_izin[], sumber: {employee}}`. CV tanpa dokumen = belum pernah ditugaskan. employee galat = `pemegang_izin: []` plus status galat, penugasan tetap dikirim |
+| GET | `/akuntansi-cv/calon-pemegang` | `akuntansicv.kelola` | Pemegang izin `akuntansicv.cv.tulis` di perusahaan pemanggil. Tak terbaca = **503**, bukan `[]` |
+| GET | `/akuntansi-cv/cakupan/saya` | *(identitas saja)* | `{boleh_tulis, kode_cv[], entitas[]}` dari `CakupanTulisCV`; tanpa izin tulis dijawab kosong tanpa membaca database |
+| GET | `/akuntansi-cv/jejak?kode=` | `akuntansicv.view` | Jejak terbaru, maksimal 200 baris tanpa penanda terpotong |
+| PATCH | `/akuntansi-cv/entitas/:kode` | `akuntansicv.kelola` | Ubah sebagian (`nama`, `payroll_company_id`, `akun_accurate_no`, `aktif`; seluruhnya pointer, rujukan `""` = lepas). 400 body tanpa perubahan atau nama kosong; 404 CV belum ada; 409 rujukan sudah dipakai CV lain (menyebut CV-nya); 422 rujukan tak ada di sumber atau akun bukan rekening CV; 503 sumber tak terbaca |
+| PUT | `/akuntansi-cv/penugasan/:kode` | `akuntansicv.kelola` | Ganti seluruh pemegang. Body `{employee_ids, versi}`, keduanya wajib (`versi` 0 = belum pernah ditugaskan). 403 pemanggil ada di daftar; 422 bukan pemegang izin (menyebut id); 503 daftar pemegang izin tak terbaca; 404 CV belum ada; **409 versi basi**. Balasan `{kode_cv, pemegang, versi}` |
+
+- **Perusahaan dari header `BIP-Company-ID` saja**; kosong = 400. Berbeda dari pola pajak (`companyIDEfektif`) yang menerima jatuhan dari query.
+- **Rute literal didaftarkan sebelum saudara ber-`:kode`**, dikunci `TestRuteLiteralAkuntansiCVTerdaftarSebelumParam`; kode CV divalidasi `^CV\d{2}$` (400).
+- **Sumber**: badan usaha dari payroll-service `GET /internal/badan-usaha` berkunci `PAYROLL_SERVICE_KEY` ([[API - Payroll Service]]); rekening dari integration `GET /accurate/gl-accounts`, yang di-cache integration sehingga rekening baru di Accurate bisa belum terlihat; pemegang izin dari employee-service `GET /internal/permission-holders` tanpa identitas pemanggil. Tiap bacaan dibatasi 12 detik, dan galat URL tidak membocorkan `?key=`.
+- **Izin ber-prefiks `akuntansicv`, BUKAN `finance`**: klaim izin modul menang atas tier, jadi paket sempit ber-prefiks `finance` akan mencabut tier `finance` pemegangnya ([[CORE - RBAC dan Permission Set]]).
+- **Index** disiapkan saat boot per koleksi, galatnya digabung: `uniq_company_kode_cv`, `uniq_company_payroll_cv` dan `uniq_company_akun_cv` (parsial `$gt: ""`), `uniq_company_kode_penugasan_cv`, `company_kunci_pada_jejak_cv`. Gagal dibuat = log keras, service tetap hidup.
 
 ## Catatan Kontrak
 
@@ -138,7 +183,8 @@ Penjadwal audit membuka periode (bulan sebelumnya, tutup buku) tiap tanggal 6 pu
 ## Dokumen Terkait
 
 - [[Finance - Rancangan Finance Service]] — rancangan & status modul
-- [[Finance - Audit Internal]]: domain lengkap modul Audit Internal (36 uji, semantik kolom)
+- [[Finance - Buku Besar CV]] · [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]]: modul buku besar CV (T1) · [[API - Payroll Service]]: sumber badan usaha
+- [[Finance - Audit Internal]]: domain lengkap modul Audit Internal (38 item uji petik; matriks lama di Arsip) · [[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]
 - [[Finance - FAT Persona]]: persona per posisi FAT (Tax Officer, Cost Control, SPV FAT), grounded ke izin dan paket prod
 - [[Microservices - Employee Service]] — pemilik `kpi_template`; tempat sumber `kinerja_cost_control`, `kinerja_tax`, `biaya_variabel_produksi` terdaftar
 - [[Microservices - Integration Service]] — pemilik `anggaran_opex` & varians

@@ -2,9 +2,9 @@
 
 ## Deskripsi
 
-*AI Engineering Loop di agent-kit: **gerbang lokal** yang menolak commit di branch utama dan push yang gagal pemeriksaan dasar, **papan sesi** yang menunjukkan sesi kerja mana sedang mengerjakan apa, dan **loop otonom** `/brief` → `/kerjakan` yang mengerjakan satu task kecil lewat agen domain, dinilai dua lapis (mesin dan penilai), lalu berhenti di PR. Semuanya hidup di mesin developer, tanpa layanan dan tanpa biaya berjalan di luar langganan Claude. Keputusan, substitusi dari dokumen rujukan, dan batasnya ada di [[ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak]].*
+*AI Engineering Loop di agent-kit: **gerbang lokal** yang menolak commit di branch utama dan push yang gagal pemeriksaan dasar, **papan sesi** yang menunjukkan sesi kerja mana sedang mengerjakan apa, **Kantor Agent** yang menampilkan sesi yang sedang hidup sebagai robot di denah kantor sesuai alat yang sedang dipakai, dan **loop otonom** `/brief` → `/kerjakan` yang mengerjakan satu task kecil lewat agen domain, dinilai dua lapis (mesin dan penilai), lalu berhenti di PR. Semuanya hidup di mesin developer, tanpa layanan dan tanpa biaya berjalan di luar langganan Claude. Keputusan, substitusi dari dokumen rujukan, dan batasnya ada di [[ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak]].*
 
-- **Status**: ⚠️ **Implemented (ada catatan)**, agent-kit **1.15.0** (2026-09-06), terakhir berubah di **1.18.0** (2026-09-12), diperiksa ulang ke kit 1.19.0 pada 2026-09-15. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi berkas satu mesin; (3) baseline test diukur sekali 2026-09-06 dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia; (6) **gerbang kit atas dirinya sendiri belum berjalan**, tak ada yang otomatis menjalankan `tests/test-init.ps1` maupun pytest `Tools/`; (7) **repo selain Node dan Go (mis. `mybharata-app`) tidak punya gerbang deterministik**, jadi lapis mesin `/judge` lolos tanpa memeriksa apa pun di sana.
+- **Status**: ⚠️ **Implemented (ada catatan)**, agent-kit **1.15.0** (2026-09-06), terakhir berubah di **1.20.0** (2026-09-15, Kantor Agent); bagian lain diperiksa ulang ke kit 1.19.0 pada 2026-09-15. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi berkas satu mesin; (3) baseline test diukur sekali 2026-09-06 dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia; (6) **gerbang kit atas dirinya sendiri belum berjalan**, tak ada yang otomatis menjalankan `tests/test-init.ps1` maupun pytest `Tools/`; (7) **repo selain Node dan Go (mis. `mybharata-app`) tidak punya gerbang deterministik**, jadi lapis mesin `/judge` lolos tanpa memeriksa apa pun di sana; (8) **Kantor Agent membaca format transkrip yang dinyatakan internal oleh Claude Code**, jadi bisa patah di rilis mana pun; kerusakannya tampil sebagai banner, bukan kantor kosong.
 
 ## Latar Belakang
 
@@ -34,9 +34,11 @@ Kebutuhan kedua datang dari pemilik proses: lebih dari empat sesi kerja berjalan
 6. **Judges dua lapis.** `/judge` menjalankan `gerbang.ps1` DAN agen `loop-judge` (`opus`, hanya `Read/Grep/Glob`) yang menilai kepatuhan brief per kriteria, `review-checklist` Pass 1, dan solusi nakal. Isi gerbang mesin: repo Node `pnpm tsc`, `lint`, `build`, dan vitest dibanding `baseline/<repo>.json`; bip-erp `go build ./...` dan `go test` per service tersentuh, dibanding baseline. Lolos hanya bila **keduanya** lolos; agen tidak berwenang membatalkan mesin. ⚠️ Untuk repo jenis lain `gerbang.ps1` hanya mencatat *"jenis repo 'lain': tidak ada gerbang deterministik"* dan tetap mengembalikan lolos karena tak ada gerbang yang gagal, sehingga di sana yang benar-benar menilai tinggal agen judge. Log gerbang dua brief `mybharata-app` (2026-09-09) sama-sama mencatat nol gerbang dan lolos; pada salah satunya orkestrator menambahkan pemeriksaan pengganti (`flutter test`, `dart analyze`) secara manual, dan tidak ada skrip kit yang menjalankannya.
 7. **Supervisi dan ekstraksi skill.** `/supervise` → agen `loop-supervisor` (`fable`) membaca brief/verdict/sesi/skill dan menulis laporan + **draft** ke `skills/_draft/`; `/supervise --terapkan <nama>` dijalankan manusia. `/ekstrak-skill` → `transkrip-ringkas` (skrip, menolak bila skema transkrip tidak terurai) → agen `loop-ekstrak-skill` (`fable`) → draft.
 
+8. **Kantor Agent** (kit 1.20.0). `/kantor-agent` membuka denah kantor isometrik berisi sesi Claude Code yang **sedang hidup** di workspace ini, diperbarui tiap 2 detik tanpa layanan. Rincian di § Kantor Agent.
+
 **Yang sengaja TIDAK termasuk**
 
-- Layanan orkestrasi eksternal (Trigger.dev), vendor model lain, dashboard web live, agent merge, supervisor auto-apply. Alasan tiap substitusi di ADR bagian Revisi.
+- Layanan orkestrasi eksternal (Trigger.dev), vendor model lain, layanan web live (Kantor Agent memperbarui diri lewat berkas, bukan server), agent merge, supervisor auto-apply. Alasan tiap substitusi di ADR bagian Revisi.
 - Menghidupkan kembali GitHub Actions atau branch protection. Di luar mandat, alasan biaya dan paket akun.
 - Memperbaiki review kode. Angka review 2,2% adalah masalah orang, bukan masalah alat.
 - Suite E2E baru. Yang ada hanya **baseline** suite yang sudah ada; bahan bakar sebesar sistem rujukan (E2E tests 288/1.644) belum ada di sini.
@@ -112,12 +114,46 @@ Ditinjau memakai dasbor sistem rujukan sebagai daftar panel. Saat itu diputuskan
 
 Yang perlu diingat saat meninjau ulang: **panel yang paling dibutuhkan justru tidak ada di dasbor rujukan itu.** Dasbor itu menghitung PR yang sudah jadi, sedangkan kebutuhan di sini adalah sesi yang sedang berjalan dan belum menghasilkan PR apa pun.
 
+## Kantor Agent (kit 1.20.0, 2026-09-15)
+
+`/kantor-agent` menjawab pertanyaan yang tak bisa dijawab papan sesi: sesi mana **sedang melakukan apa sekarang**. Papan sesi hanya tahu `tahap`, yang berubah lewat slash command (61 dari 72 sesi aktif masih `mulai`), dan status `aktif`, yang terukur tak bisa dipercaya (72 dari 99 berkas aktif, hanya 7 transkripnya ditulis dalam 10 menit terakhir; keduanya diukur 2026-09-15). Karena itu sumbernya **ekor transkrip Claude Code**, bukan berkas sesi. Desain dan keputusannya: `architecture-draft/.agent-kit/docs/2026-09-15-kantor-agent-design.md`.
+
+**Bentuknya.** Tiap sesi hidup tampil sebagai robot **Lead** di denah kantor isometrik (SVG, tanpa library), dan tiap subagent hidup sebagai robot kecil berperan menurut `agentType` (`general-purpose` Generalis, `Explore` Peneliti, `Plan` Arsitek, agen `loop-*` sesuai perannya, jenis lain dengan nama aslinya). Robot berjalan lewat koridor ke area sesuai tool yang sedang dipakai:
+
+| Tool yang tertunda | Area |
+|---|---|
+| Read, Grep, Glob, WebFetch, WebSearch, Skill, ToolSearch | Perpustakaan |
+| Edit, Write, NotebookEdit; juga saat berpikir di antara tool | Meja |
+| PowerShell, Bash, Monitor, TaskOutput, TaskStop; tool MCP dan tool tak dikenal | Ruang server |
+| Agent, Workflow, SendMessage; juga saat giliran selesai tetapi subagent masih hidup | Ruang rapat |
+| AskUserQuestion, ExitPlanMode; juga saat giliran selesai tanpa subagent | Lounge (menunggu Anda) |
+
+Dalam satu batch tool paralel, hasil tool singkat sering baru tertulis ke transkrip setelah tool lambat di batch yang sama selesai (diukur atas 25 transkrip), jadi yang menentukan area adalah tool tertunda **paling awal di luar Perpustakaan/Meja**, bukan yang terakhir.
+
+**Cara kerjanya.** `hooks/kantor-agent.py` satu-satunya penulis data, hanya pustaka standar Python: tiap 2 detik membaca ekor transkrip yang ditulis ≤ 30 menit dan ber-`cwd` di dalam workspace (subagent: ≤ 10 menit dan belum `end_turn`), lalu menulis `.task-plans/kantor-agent-data.js` secara atomik. `hooks/kantor-agent.template.html` satu-satunya penulis UI; halaman `.task-plans/kantor-agent.html` memuat ulang data itu lewat `<script>` yang disuntik ulang, yang terbukti membaca isi terbaru di `file://`. Launcher `hooks/kantor-agent.ps1` / `.sh` mencari Python (venv vault, `py -3`, `python3`), menjaga hanya satu penulis hidup per workspace (PID + command line proses), dan `--berhenti` menghentikannya. Penulis berhenti sendiri setelah 60 menit tanpa sesi hidup. Data tidak dikirim ke mana pun, beda dari peristiwa `loop-ingest` ke papan tim.
+
+**Tak ada yang senyap.** Penulis mati: banner data basi setelah 10 detik dan robot diredupkan. Format transkrip berubah: banner "perbarui kit", bukan kantor kosong. Python tak ada: launcher exit 2 dan menyebut lokasi yang dicari. Data dari `--sekali`: banner snapshot sekali, bukan penulis mati.
+
+**Terukur.** Tick p95 68,9 ms atas 6 sesi hidup nyata; perubahan transkrip terbaca halaman dalam 0,7 sampai 2,7 detik; penulis tetap hidup setelah panggilan tool yang menyalakannya selesai. Test: `tests/test_kantor_agent.py` (72 test atas templat baris transkrip nyata yang dibersihkan), `tests/test-init.ps1` (+9 assertion), dan `tests/kantor-agent-browser.ps1` (manual, lewat CDP). Seperti test kit lain, ketiganya dijalankan manual (catatan 6 di Status).
+
+**Batas yang disadari**
+
+- Prompt izin tidak tercatat di transkrip. Tool yang tertunda ≥ 60 detik diberi tanda `?`, bukan ditebak.
+- Satu mesin, dan hanya sesi yang `cwd`-nya di dalam workspace.
+- Menunggu tugas shell latar (`run_in_background`) tampil sebagai menunggu Anda.
+- Tool yang sudah berjalan sementara model masih menulis tool call berikutnya di pesan yang sama belum tercatat di transkrip, karena baris pesan baru ditulis setelah pesannya lengkap. Selama itu robot tampil berpikir di Meja (terukur 22 detik untuk pesan yang memuat perintah panjang, 2026-09-15).
+- Dua `/kantor-agent` pada detik yang sama bisa menyalakan dua penulis, dan `--berhenti` hanya menghentikan satu.
+- Launcher `.sh` belum pernah dijalankan di mac/linux.
+- ADR 0077 §5 menyebut "tanpa dashboard"; halaman ini dicatat sebagai baris di tabel Revisi ADR itu karena prinsip berkas-bukan-layanan tetap dipatuhi.
+
 ## Belum Diputuskan (TBD)
 
 - Apakah papan sesi berkas perlu lintas-mesin. Dirancang untuk satu mesin karena jumlah dev yang benar-benar memakai kit belum diukur. Sejak kit 1.17.0 peristiwa sesi dari mesin yang menyalakan ingest sudah tampil di papan tim, tetapi tanpa judul task; papan berkas yang lengkap tetap satu mesin.
 - ~~Apakah keluaran papan sesi layak disalurkan ke [[IT - Papan Aktivitas Developer]] sebagai sumber kedua, atau justru harus tetap terpisah agar tidak melahirkan dua angka yang menyimpang.~~ **Dijawab 2026-09-07** (kit 1.17.0): disalurkan sebagai peristiwa opt-in ke `POST /loop/ingest` dan ditampilkan di bagian Loop otonom yang terpisah dari tabel PR, jadi angka PR tidak dihitung ulang. Rinciannya di § Batas dengan Papan Aktivitas Developer dan [[ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP]].
 - Bentuk gerbang untuk repo selain Node dan Go. Loop sudah dipakai di `mybharata-app`, sementara `pre-push` dan `gerbang.ps1` sama-sama tidak memeriksa apa pun di sana (Ruang Lingkup butir 2 dan 6). Belum diputuskan apakah keduanya perlu mengenali Flutter (`flutter test`, `dart analyze`), atau `gerbang.ps1` perlu gagal-tertutup untuk jenis repo yang tak dikenalnya.
 - ~~Ekstraksi skill dari sesi manual. Bahan mentahnya sudah menumpuk (`erp/.agents/AGENTS.md`, 721 baris, 26 entri ber-`originSessionId`) dan cetakan pipeline-nya sudah terbukti di `Tools/`, tetapi urutannya sesudah gerbang dan papan sesi.~~ **Dibangun 2026-09-06** (kit 1.15.0) sebagai `/ekstrak-skill`, lihat Ruang Lingkup butir 7.
+- Agent milik tool `Workflow` di Kantor Agent. Tidak ditampilkan: pemindaian 78 transkrip utama 14 hari (2026-09-15) menemukan 0 pemanggilan `Workflow` nyata, jadi lokasi dan bentuk transkrip agent-nya belum pernah teramati. Lead yang memanggil `Workflow` tetap tampil di ruang rapat.
+- Tautan dari panel SESI `/dashboard` ke Kantor Agent. Belum dibuat.
 
 ## Dokumen Terkait
 

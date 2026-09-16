@@ -8,14 +8,15 @@ Pembukuan 40 CV grup akan dikerjakan **di dalam ERP**, memakai aplikasi buku bes
 
 *Menjawab [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]] dengan opsi keempat yang tidak ada di sana: buku besar dan konsolidasi 40 CV dibangun di dalam bip-erp dengan [[APP - Buku Besar Konsolidasi CV FINCON]] sebagai spesifikasi dan sumber migrasi, sementara PT tetap dibukukan di Accurate. Mengusulkan amandemen [[ADR - 0001 Akuntansi via Accurate]] khusus lapisan CV. Cara kerjanya di [[Finance - Buku Besar CV]].*
 
-- **Status**: 🟡 **Diusulkan**, arah disetujui lewat `/analisa-kebutuhan` 2026-09-15, kode belum ada. Berlaku setelah disetujui SPV FAT dan IT, pemutus yang ditetapkan ADR 0068.
+- **Status**: 🟡 **Diusulkan**, arah disetujui lewat `/analisa-kebutuhan` 2026-09-15. Berlaku setelah disetujui SPV FAT dan IT, pemutus yang ditetapkan ADR 0068. ⚠️ **§2 dan §3 (T1) dikodekan** di branch `feat/finance-entitas-cv` bip-erp dan erp-frontend 2026-09-15, **belum merge**; §1 dan §4 sampai §8 belum ada di kode. §2 diamandemen 2026-09-15 (pencocokan nama sesudah normalisasi format), lihat catatan di bawahnya.
 - **Path di repo**:
-  - `bip-erp/services/finance/` modul buku besar CV: master entitas, COA, jurnal, laporan, konsolidasi (baru)
-  - `bip-erp/shared-library/common/` katalog izin buku besar CV dan cakupan per CV (baru)
+  - `bip-erp/services/finance/` modul buku besar CV: master entitas, COA, jurnal, laporan, konsolidasi (baru). T1 di branch: `akuntansi_cv_{entitas,penugasan,kecocokan,sumber,handler,jejak,bawaan,semai}.go`
+  - `bip-erp/shared-library/common/` katalog izin buku besar CV (baru). T1 di branch: `catalog_akuntansi_cv.go`, `akun_cv_accurate.go` (aturan rekening CV 1299 pindah dari procurement)
+  - `bip-erp/services/payroll/company_internal.go` rute internal badan usaha untuk master entitas CV (T1, branch)
   - `bip-erp/services/procurement/pengajuan_barang*.go`, `pembayaran.go`, `bukti_transfer*.go` (CV tujuan, antrean transfer per pemegang CV)
   - `bip-erp/services/payroll/` daftar bayar dan rekap iuran per badan usaha (baru)
   - `bip-erp/services/integration/` pemetaan toko ke CV dan jurnal penjualan per CV (baru)
-  - `erp-frontend/src/app/(main)/finance/buku-besar-cv/` (baru) · `erp-frontend/src/features/finance/buku-besar-cv/` (baru)
+  - `erp-frontend/src/app/(main)/finance/buku-besar-cv/` (baru) · `erp-frontend/src/features/finance/buku-besar-cv/` (baru). T1 di branch: `src/app/(main)/finance/entitas-cv/` dan `src/features/finance/entitas-cv/`
 - **Tanggal**: 2026-09-15
 
 ## Context
@@ -56,11 +57,17 @@ Buku besar, bagan akun, jurnal, laporan keuangan, dan konsolidasi **lapisan 40 C
 
 ### 2. Satu identitas CV
 
-finance-service memegang master entitas CV berkode `CV01` sampai `CV40` (mengikuti FINCON), dengan rujukan ke badan usaha payroll, rekening Accurate 1299xx, dan nama resmi. Konsumen lain merujuk kodenya. Salinan yang sudah ada tidak diketik ulang; kecocokannya dijaga pemindai drift, sesuai syarat salinan sah di [[REF - Kepemilikan Data]]. Toko marketplace dipetakan ke kode CV di master yang sama. Nama yang tidak cocok persis ditetapkan manusia, tidak dicocokkan otomatis.
+finance-service memegang master entitas CV berkode `CV01` sampai `CV40` (mengikuti FINCON), dengan rujukan ke badan usaha payroll, rekening Accurate 1299xx, dan nama resmi. Konsumen lain merujuk kodenya. Salinan yang sudah ada tidak diketik ulang; kecocokannya dijaga pemindai drift, sesuai syarat salinan sah di [[REF - Kepemilikan Data]]. Toko marketplace dipetakan ke kode CV di master yang sama. Nama yang sama sesudah normalisasi format dan cocok ke tepat satu kandidat dipasangkan otomatis; nama yang tetap berbeda sesudah normalisasi, atau cocok ke lebih dari satu kandidat, ditetapkan manusia.
+
+> **Amandemen 2026-09-15 (T1).** Kalimat semula berbunyi "Nama yang tidak cocok persis ditetapkan manusia, tidak dicocokkan otomatis." Normalisasinya hanya menyamakan FORMAT, tidak menebak kata: buang karakter format Unicode (satu nama rekening Accurate prod diawali U+2060 sehingga tak pernah cocok persis dengan apa pun), buang nomor rekening dalam kurung terakhir, huruf kecil, buang kode bank bila ia token pertama (mis. BMRI), buang token "cv", lalu satukan tanpa pemisah (`NormalisasiNamaEntitas`, `services/finance/akuntansi_cv_entitas.go`). Singkatan tidak ditebak: "Sinar Kosmetik Indonesia" tetap berbeda dari "Sinar Kosmetik Indo" dan ditetapkan manusia. Laporan kecocokan membandingkan nama dengan kunci yang sama, jadi selisih yang hanya format tidak dilaporkan.
+>
+> **Penerapan T1 (branch, belum merge).** Pemindai drift berbentuk laporan kecocokan yang dihitung saat dibuka (`GET /api/finance/akuntansi-cv/kecocokan`), tanpa penjadwal dan tanpa koleksi hasil; sumber yang gagal dibaca tidak melahirkan temuan. Pemetaan toko marketplace **ditunda ke T8** (keputusan user 2026-09-15): master T1 belum punya field toko.
 
 ### 3. Cakupan akses per CV ditegakkan server
 
 Penugasan pemegang CV disimpan **per karyawan**, menggantikan akun bersama per kelompok CV di FINCON. Izin buku besar CV diberi dimensi cakupan CV: Junior Accountant menulis hanya CV yang ditugaskan; Senior Accountant, SPV FAT, Tax, dan Direktur membaca semua CV. Penugasan **menyempitkan** izin dan tidak pernah memberi hak, mengikuti pola [[ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap]]. Antrean dan gerbang aksi memakai fungsi yang sama.
+
+> **Penerapan T1 (branch, belum merge).** Izinnya modul `akuntansicv` **tanpa fallback tier**: `akuntansicv.view` (baca), `akuntansicv.kelola` (master dan penugasan), `akuntansicv.cv.tulis` (pembukuan CV yang ditugaskan), dalam tiga paket "Buku Besar CV: Pengelola" (view + kelola, sengaja tanpa `cv.tulis`), "Pembaca", dan "Pemegang" ([[CORE - RBAC dan Permission Set]]). Cakupan tulis = irisan izin `cv.tulis`, penugasan, dan CV aktif, dihitung satu fungsi `CakupanTulisCV` yang wajib dipakai layar dan gerbang T2/T3. Dua keputusan user 2026-09-15 mempersempit pola ADR 0057: **CV tanpa pemegang tertutup untuk tulis** (ADR 0057 membuka tahap tanpa penunjukan bagi semua pemegang izin), dan **CV nonaktif tertutup untuk tulis**, tetap terbaca. Penugasan disimpan satu dokumen per CV dan diganti atomik berprasyarat versi; pengelola tak bisa menugaskan dirinya sendiri (403). Rinciannya di [[Finance - Buku Besar CV]].
 
 ### 4. Aturan pembukuan yang dikunci sejak awal
 
@@ -107,6 +114,7 @@ Baris jurnal penjualan per CV hanya dibentuk dari komponen sejajar identitas inc
 - **Migrasi bergantung pada pemilik FINCON** untuk mengekspor data; isi dan volume Supabase belum diketahui.
 - **Pekerjaan terbesar** di antara opsi yang ada, dan jalan paralel satu siklus tutup buku menambah beban pembandingan.
 - **Katalog izin di shared-library** membuat seluruh service ter-build saat pre-push; employee-service, procurement, dan finance-service naik bersama saat cakupan CV dirilis, backend sebelum frontend. Kategori inbox baru untuk antrean transfer menuntut service pengirim dan notification-service naik bersama.
+- **T1 menambah pasangan kunci layanan payroll.** finance-service membaca badan usaha lewat `GET /internal/badan-usaha` payroll-service berkunci `PAYROLL_SERVICE_KEY` (nilai sama di kedua container, `--force-recreate`), ditambah env `PAYROLL_MODULE_URL` di blok finance-service. Rilis T1 karena itu menaikkan employee-service (katalog dan paket baru), payroll-service, lalu finance-service, backend sebelum frontend; procurement boleh menyusul karena perubahannya hanya memindahkan aturan rekening CV ke shared-library ([[RUN - Deploy Microservices bip-erp]] §3d).
 - **Status ADR 0001 dan ADR 0068 tidak diubah dokumen ini**; keduanya hanya diberi tautan. Bila SPV FAT dan IT menyetujui, ADR 0001 diberi amandemen lapisan CV dan ADR 0068 ditandai Superseded.
 
 ### Yang sengaja tidak dilakukan
@@ -118,7 +126,7 @@ Baris jurnal penjualan per CV hanya dibentuk dari komponen sejajar identitas inc
 
 ## Dokumen Terkait
 
-- [[Finance - Buku Besar CV]]: cara kerja modul yang diputuskan di sini
+- [[Finance - Buku Besar CV]]: cara kerja modul yang diputuskan di sini · [[API - Finance Service]] dan [[API - Payroll Service]]: rute T1
 - [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]] yang dijawab · [[ADR - 0001 Akuntansi via Accurate]] yang diusulkan diamandemen · [[APP - Buku Besar Konsolidasi CV FINCON]] spesifikasi dan sumber migrasi
 - [[Finance - FAT Persona]] · [[Finance - Kas Kecil dan Pengajuan Budget]] · [[Finance - Rancangan Finance Service]] · [[Finance - Big Pictures]]
 - [[Microservices - Procurement Service]] · [[Microservices - Payroll Service]] · [[Microservices - Integration Service]] · [[Microservices - Notification Service]] · [[External - Accurate]] · [[ADR - 0014 Accurate Token DB-backed via OAuth]]

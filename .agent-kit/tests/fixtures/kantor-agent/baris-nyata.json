@@ -1,0 +1,500 @@
+{
+  "ai-title": {
+    "aiTitle": "x",
+    "sessionId": "00000000-0000-4000-8000-000000000006",
+    "type": "ai-title"
+  },
+  "assistant_end_turn": {
+    "apiBlockIndex": 1,
+    "cwd": "{WORKSPACE}",
+    "effort": "x",
+    "entrypoint": "claude-vscode",
+    "gitBranch": "x",
+    "isSidechain": false,
+    "message": {
+      "container": null,
+      "content": [
+        {
+          "text": "x",
+          "type": "text"
+        }
+      ],
+      "context_management": null,
+      "diagnostics": null,
+      "id": "msg_000020",
+      "model": "claude-opus-5",
+      "role": "assistant",
+      "stop_details": null,
+      "stop_reason": "end_turn",
+      "stop_sequence": null,
+      "type": "message",
+      "usage": {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 1809,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 1809,
+        "cache_read_input_tokens": 313298,
+        "inference_geo": "x",
+        "input_tokens": 32,
+        "iterations": [
+          {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 1809,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 1809,
+            "cache_read_input_tokens": 313298,
+            "input_tokens": 32,
+            "output_tokens": 518,
+            "type": "message"
+          }
+        ],
+        "output_tokens": 518,
+        "output_tokens_details": {
+          "thinking_tokens": 211
+        },
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "x",
+        "speed": "x"
+      }
+    },
+    "parentUuid": "00000000-0000-4000-8000-000000000019",
+    "perTurnEffort": null,
+    "requestId": "req_000021",
+    "sessionId": "00000000-0000-4000-8000-000000000023",
+    "slug": "x",
+    "timestamp": "2026-01-01T00:00:00.000Z",
+    "type": "assistant",
+    "userType": "external",
+    "uuid": "00000000-0000-4000-8000-000000000022",
+    "version": "2.1.269"
+  },
+  "assistant_thinking": {
+    "apiBlockIndex": 0,
+    "cwd": "{WORKSPACE}",
+    "effort": "x",
+    "entrypoint": "claude-vscode",
+    "gitBranch": "x",
+    "isSidechain": false,
+    "message": {
+      "container": null,
+      "content": [
+        {
+          "signature": "x",
+          "thinking": "",
+          "type": "thinking"
+        }
+      ],
+      "context_management": null,
+      "diagnostics": null,
+      "id": "msg_000012",
+      "model": "claude-opus-5",
+      "role": "assistant",
+      "stop_details": null,
+      "stop_reason": "tool_use",
+      "stop_sequence": null,
+      "type": "message",
+      "usage": {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 4285,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 4285,
+        "cache_read_input_tokens": 596052,
+        "inference_geo": "x",
+        "input_tokens": 32,
+        "iterations": [
+          {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 4285,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 4285,
+            "cache_read_input_tokens": 596052,
+            "input_tokens": 32,
+            "output_tokens": 5333,
+            "type": "message"
+          }
+        ],
+        "output_tokens": 5333,
+        "output_tokens_details": {
+          "thinking_tokens": 3307
+        },
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "x",
+        "speed": "x"
+      }
+    },
+    "parentUuid": "00000000-0000-4000-8000-000000000011",
+    "perTurnEffort": null,
+    "requestId": "req_000013",
+    "sessionId": "00000000-0000-4000-8000-000000000006",
+    "slug": "x",
+    "timestamp": "2026-01-01T00:00:00.000Z",
+    "type": "assistant",
+    "userType": "external",
+    "uuid": "00000000-0000-4000-8000-000000000014",
+    "version": "2.1.269"
+  },
+  "assistant_tool_use": {
+    "apiBlockIndex": 3,
+    "cwd": "{WORKSPACE}",
+    "effort": "x",
+    "entrypoint": "claude-vscode",
+    "gitBranch": "x",
+    "isSidechain": false,
+    "message": {
+      "container": null,
+      "content": [
+        {
+          "caller": {
+            "type": "direct"
+          },
+          "id": "toolu_000003",
+          "input": {
+            "file_path": "x"
+          },
+          "name": "Read",
+          "type": "tool_use"
+        }
+      ],
+      "context_management": null,
+      "diagnostics": null,
+      "id": "msg_000002",
+      "model": "claude-opus-5",
+      "role": "assistant",
+      "stop_details": null,
+      "stop_reason": "tool_use",
+      "stop_sequence": null,
+      "type": "message",
+      "usage": {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2251,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 2251,
+        "cache_read_input_tokens": 593801,
+        "inference_geo": "x",
+        "input_tokens": 32,
+        "iterations": [
+          {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 2251,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 2251,
+            "cache_read_input_tokens": 593801,
+            "input_tokens": 32,
+            "output_tokens": 2161,
+            "type": "message"
+          }
+        ],
+        "output_tokens": 2161,
+        "output_tokens_details": {
+          "thinking_tokens": 1183
+        },
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "x",
+        "speed": "x"
+      }
+    },
+    "parentUuid": "00000000-0000-4000-8000-000000000001",
+    "perTurnEffort": null,
+    "requestId": "req_000004",
+    "sessionId": "00000000-0000-4000-8000-000000000006",
+    "slug": "x",
+    "timestamp": "2026-01-01T00:00:00.000Z",
+    "type": "assistant",
+    "userType": "external",
+    "uuid": "00000000-0000-4000-8000-000000000005",
+    "version": "2.1.269",
+    "wireToolInputs": {
+      "toolu_000003": {
+        "file_path": "x"
+      }
+    }
+  },
+  "attachment": {
+    "attachment": {
+      "text": "x",
+      "type": "total_tokens_reminder"
+    },
+    "cwd": "{WORKSPACE}",
+    "entrypoint": "claude-vscode",
+    "gitBranch": "x",
+    "isSidechain": false,
+    "parentUuid": "00000000-0000-4000-8000-000000000009",
+    "rendered": [
+      {
+        "content": "x"
+      }
+    ],
+    "sessionId": "00000000-0000-4000-8000-000000000006",
+    "slug": "x",
+    "timestamp": "2026-01-01T00:00:00.000Z",
+    "type": "attachment",
+    "userType": "external",
+    "uuid": "00000000-0000-4000-8000-000000000010",
+    "version": "2.1.269"
+  },
+  "pr-link": {
+    "prNumber": 1900,
+    "prRepository": "x",
+    "prUrl": "x",
+    "sessionId": "00000000-0000-4000-8000-000000000006",
+    "timestamp": "2026-01-01T00:00:00.000Z",
+    "type": "pr-link"
+  },
+  "queue-operation": {
+    "content": "x",
+    "operation": "enqueue",
+    "sessionId": "00000000-0000-4000-8000-000000000006",
+    "timestamp": "2026-01-01T00:00:00.000Z",
+    "type": "queue-operation"
+  },
+  "subagent_assistant_end_turn": {
+    "agentId": "00000000-0000-4000-8000-000000000027",
+    "apiBlockIndex": 1,
+    "attributionAgent": "x",
+    "attributionSkill": "x",
+    "cwd": "{WORKSPACE}",
+    "effort": "x",
+    "entrypoint": "claude-vscode",
+    "gitBranch": "x",
+    "isSidechain": true,
+    "message": {
+      "container": null,
+      "content": [
+        {
+          "text": "x",
+          "type": "text"
+        }
+      ],
+      "context_management": null,
+      "diagnostics": null,
+      "id": "msg_000033",
+      "model": "claude-opus-5",
+      "role": "assistant",
+      "stop_details": null,
+      "stop_reason": "end_turn",
+      "stop_sequence": null,
+      "type": "message",
+      "usage": {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 421
+        },
+        "cache_creation_input_tokens": 421,
+        "cache_read_input_tokens": 286180,
+        "inference_geo": "x",
+        "input_tokens": 32,
+        "iterations": [
+          {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 421
+            },
+            "cache_creation_input_tokens": 421,
+            "cache_read_input_tokens": 286180,
+            "input_tokens": 32,
+            "output_tokens": 12123,
+            "type": "message"
+          }
+        ],
+        "output_tokens": 12123,
+        "output_tokens_details": {
+          "thinking_tokens": 8247
+        },
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "x",
+        "speed": "x"
+      }
+    },
+    "parentUuid": "00000000-0000-4000-8000-000000000032",
+    "perTurnEffort": null,
+    "requestId": "req_000034",
+    "sessionId": "00000000-0000-4000-8000-000000000023",
+    "timestamp": "2026-01-01T00:00:00.000Z",
+    "type": "assistant",
+    "userType": "external",
+    "uuid": "00000000-0000-4000-8000-000000000035",
+    "version": "2.1.269"
+  },
+  "subagent_assistant_tool_use": {
+    "agentId": "00000000-0000-4000-8000-000000000027",
+    "apiBlockIndex": 1,
+    "attributionAgent": "x",
+    "attributionSkill": "x",
+    "cwd": "{WORKSPACE}",
+    "effort": "x",
+    "entrypoint": "claude-vscode",
+    "gitBranch": "x",
+    "isSidechain": true,
+    "message": {
+      "container": null,
+      "content": [
+        {
+          "caller": {
+            "type": "direct"
+          },
+          "id": "toolu_000029",
+          "input": {
+            "command": "x",
+            "description": "x"
+          },
+          "name": "PowerShell",
+          "type": "tool_use"
+        }
+      ],
+      "context_management": null,
+      "diagnostics": null,
+      "id": "msg_000028",
+      "model": "claude-opus-5",
+      "role": "assistant",
+      "stop_details": null,
+      "stop_reason": null,
+      "stop_sequence": null,
+      "type": "message",
+      "usage": {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 20267
+        },
+        "cache_creation_input_tokens": 20267,
+        "cache_read_input_tokens": 89825,
+        "inference_geo": "x",
+        "input_tokens": 32,
+        "output_tokens": 7,
+        "service_tier": "x"
+      }
+    },
+    "parentUuid": "00000000-0000-4000-8000-000000000026",
+    "perTurnEffort": null,
+    "requestId": "req_000030",
+    "sessionId": "00000000-0000-4000-8000-000000000023",
+    "timestamp": "2026-01-01T00:00:00.000Z",
+    "type": "assistant",
+    "userType": "external",
+    "uuid": "00000000-0000-4000-8000-000000000031",
+    "version": "2.1.269",
+    "wireToolInputs": {
+      "toolu_000029": {
+        "command": "x",
+        "description": "x"
+      }
+    }
+  },
+  "user_meta": {
+    "cwd": "{WORKSPACE}",
+    "entrypoint": "claude-vscode",
+    "gitBranch": "x",
+    "isMeta": true,
+    "isSidechain": false,
+    "message": {
+      "content": [
+        {
+          "text": "x",
+          "type": "text"
+        }
+      ],
+      "role": "user"
+    },
+    "parentUuid": "00000000-0000-4000-8000-000000000015",
+    "promptId": "00000000-0000-4000-8000-000000000016",
+    "sessionId": "00000000-0000-4000-8000-000000000018",
+    "sourceToolUseID": "x",
+    "timestamp": "2026-01-01T00:00:00.000Z",
+    "turnCompanion": true,
+    "type": "user",
+    "userType": "external",
+    "uuid": "00000000-0000-4000-8000-000000000017",
+    "version": "2.1.269"
+  },
+  "user_prompt": {
+    "cwd": "{WORKSPACE}",
+    "entrypoint": "claude-vscode",
+    "gitBranch": "x",
+    "isSidechain": false,
+    "message": {
+      "content": "x",
+      "role": "user"
+    },
+    "origin": {
+      "kind": "x"
+    },
+    "parentUuid": "00000000-0000-4000-8000-000000000022",
+    "permissionMode": "x",
+    "promptId": "00000000-0000-4000-8000-000000000024",
+    "promptSource": "x",
+    "queueSkipAttachments": true,
+    "sessionId": "00000000-0000-4000-8000-000000000023",
+    "slug": "x",
+    "timestamp": "2026-01-01T00:00:00.000Z",
+    "type": "user",
+    "userType": "external",
+    "uuid": "00000000-0000-4000-8000-000000000025",
+    "version": "2.1.269"
+  },
+  "user_tool_result": {
+    "cwd": "{WORKSPACE}",
+    "entrypoint": "claude-vscode",
+    "gitBranch": "x",
+    "isSidechain": false,
+    "message": {
+      "content": [
+        {
+          "content": [
+            {
+              "source": {
+                "data": "x",
+                "media_type": "x",
+                "type": "base64"
+              },
+              "type": "image"
+            }
+          ],
+          "tool_use_id": "toolu_000003",
+          "type": "tool_result"
+        }
+      ],
+      "role": "user"
+    },
+    "parentUuid": "00000000-0000-4000-8000-000000000005",
+    "promptId": "00000000-0000-4000-8000-000000000007",
+    "sessionId": "00000000-0000-4000-8000-000000000006",
+    "slug": "x",
+    "sourceToolAssistantUUID": "x",
+    "timestamp": "2026-01-01T00:00:00.000Z",
+    "toolUseResult": {
+      "file": {
+        "base64": "x",
+        "dimensions": {
+          "displayHeight": 112,
+          "displayWidth": 1063,
+          "originalHeight": 112,
+          "originalWidth": 1063
+        },
+        "originalSize": 14454,
+        "type": "image/png"
+      },
+      "type": "image"
+    },
+    "type": "user",
+    "userType": "external",
+    "uuid": "00000000-0000-4000-8000-000000000008",
+    "version": "2.1.269"
+  }
+}

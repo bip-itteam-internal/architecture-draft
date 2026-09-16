@@ -76,6 +76,8 @@ Dua endpoint yang sebelumnya tak disebut sama sekali di dokumen ini.
 
 **`/pagu`** (`pagu_handler.go`) menyimpan pagu belanja iklan per `channel`+`shop_id`+`bulan`. Pola penyimpanannya **sama dengan `mart_ambang`**: append-only, koreksi datang sebagai baris baru dan `paguUntuk` memilih `created_at` termuda, sehingga penilaian periode lampau tak berubah surut. `GET` tak digerbang (tiap pembaca perlu tahu terhadap pagu mana belanjanya dinilai), `POST` digerbang `RequireMarketingLeader`. `nominal` bertipe `*float64` karena **pagu 0 itu sah** ("bulan ini memang tak dianggarkan") dan harus terbedakan dari field yang tak dikirim. Gagal baca dibalas **5xx, bukan daftar kosong** — "belum ada pagu" dan "database tak terbaca" menuntut tindakan berbeda.
 
+⚠️ **Ringkasan tak lagi membaca `/pagu`** (🔜 branch erp-frontend `feat/marketing-iklan-dashboard`, belum merge per 2026-09-15; [[ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance]]). Anggaran iklan yang ditampilkan halaman depan kini per brand per bulan dari Master Anggaran OPEX Finance (integration `anggaran_opex`, akun Beban Iklan), dibaca frontend langsung ke integration; service ini tak menyimpan salinannya. `GET/POST /pagu` dan halaman `/marketing-analytics/pagu` tetap ada, tetapi tak lagi bertautan dari layar mana pun, dan PROD `mart_pagu` 0 baris per 2026-09-15. Dua tempat untuk anggaran belanja iklan dicatat di [[REF - Kepemilikan Data]] §Duplikasi.
+
 **`/kurva-alokasi`** (`kurva_alokasi.go`) memasang kurva hasil-belanja per kanal untuk blok simulasi alokasi. Tiga bentuk dicoba pada tiap kanal, seluruhnya linear-dalam-parameter setelah transformasi sehingga cukup kuadrat-terkecil biasa (tanpa optimizer, tanpa tebakan awal):
 
 | Bentuk | Rumus | Ada karena |

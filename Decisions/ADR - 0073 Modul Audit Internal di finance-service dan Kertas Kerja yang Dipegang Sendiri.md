@@ -11,6 +11,7 @@
 
 - **Status**: ✅ **Implemented** — **LIVE DI PRODUKSI per 2026-09-03** ([#1676](https://github.com/bip-itteam-internal/bip-erp/pull/1676) + [#1679](https://github.com/bip-itteam-internal/bip-erp/pull/1679)), dengan 36 baris uji nyata di `finance_db` prod. Layar di Web ERP juga live (erp-frontend [#1429](https://github.com/bip-itteam-internal/erp-frontend/pull/1429)).
 - ⛔ **§1 DIAMANDEMEN [[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]]** (2026-09-03): audit dipisah jadi service dan database sendiri. Alasan penolakan di §1 tidak dibantah — ia kalah oleh dua tuntutan yang saat itu belum dinyatakan (bukti tak boleh diubah pihak yang diperiksa; wadahnya menampung seluruh audit internal termasuk kepatuhan GA). **Keputusan §2 sampai §11 tetap berlaku.**
+- ⛔ **§8 DIGANTI dan §3 tak tercermin di [[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]]** (2026-09-15, branch belum merge): registry 36 uji diganti 38 item uji petik yang diperiksa manusia. Ukuran sampel kini bagian kalimat item, bukan master data Direksi berlantai 5, dan item tidak lagi mendeklarasikan sumber per sisi. §3 dan §8 di bawah berlaku hanya untuk penjalan matriks lama yang disimpan tanpa dipanggil.
 - **Path di repo**: `bip-erp/services/finance/audit_*.go` · `bip-erp/shared-library/common/catalog_audit.go` · `bip-erp/services/employee/permission_catalogs.go` · `bip-erp/services/integration/internal/interface/http/riwayat_akun_handler.go` · `bip-erp/docker-compose.yml` · `erp-frontend/src/app/(main)/audit/*` · `erp-frontend/src/features/audit/*` · `erp-frontend/src/components/layout/sidebar-menus.tsx` · `erp-frontend/src/utils/menu-permission.ts`
 - **Tanggal**: 2026-09-02 (diamandemen di hari yang sama, lihat §1 dan §8)
 
@@ -50,6 +51,8 @@ Seluruh angka ditarik lewat `/accounting/*` dan saudara-saudaranya. Modul audit 
 Satu endpoint baru ditambahkan ke integration-service alih-alih dibuat sendiri: `GET /accounting/riwayat-akun`, membungkus metode klien yang sudah ada dan sudah ber-test.
 
 ### 3. Modul ini BUKAN modul Accurate
+
+> ⚠️ **Tidak tercermin di registry uji petik** ([[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]], 2026-09-15): tipe `Sisi`, `JenisSumber`, dan `Pelaksana` dihapus dari `audit_registry.go` di branch `feat/finance-audit-uji-petik`. Pembandingnya kini kalimat per item.
 
 **Diamandemen 2026-09-02.** Dari 36 pengujian, sisi yang bersumber Accurate justru minoritas. Registry karena itu mendeklarasikan **sumber per sisi**, lima jenis: `accurate`, `erp` (modul ERP sendiri), `unggahan` (rekening koran, SPT, berita acara, akta), `input_manusia` (hitung fisik, jawaban konfirmasi), dan `aturan` (tak ada sisi lawan sama sekali).
 
@@ -94,6 +97,8 @@ Bukan kasus tepi: penjadwal menyala tiap sepuluh menit di dalam jendela, dan tom
 Menyertainya: periode yang **sudah diterbitkan menolak ditarik ulang**. Laporan yang sudah diserahkan tidak boleh berubah angkanya di bawah tanda tangan.
 
 ### 8. Ukuran sampel adalah master data Direksi, berlantai, dan berjejak
+
+> ⛔ **DIGANTI [[ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual]] (2026-09-15)**: ukuran sampel item uji petik tertulis di kolom sampel item, halaman setelannya dicabut, dan `PUT /audit/setelan-sampel/:kode` menolak item tanpa penjalan. Butir di bawah berlaku hanya untuk penjalan matriks lama.
 
 - Izin `audit.master.save` **terpisah** dari `audit.tinjau`. Yang menyetel ukuran sampel menentukan beban kerja peninjau; menyatukannya membuat peninjau menyetel sendiri berapa banyak yang harus ia periksa.
 - **Lantai 5 untuk metode acak.** Ukuran sampel adalah tuas yang dapat mematikan kontrol **tanpa terlihat mematikannya**: disetel 1, ujinya tetap berjalan dan tetap hijau, dan dari layar "bersih dengan sampel 1" terbaca sama dengan "bersih dengan sampel 40".
