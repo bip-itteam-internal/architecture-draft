@@ -9983,7 +9983,7 @@
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "cdd09941f005a1bcd7a16635a9ef433b15faee33215b34efca59b02da8c545be",
+      "hash": "c888b7df80156cd0082aff0368f45f94120302ba718e03f283a1418a26001e5d",
       "ukuran_kb": 27.0,
       "ringkasan": "Menjawab: gerbang apa yang menolak commit di branch utama repo kode dan push yang gagal pemeriksaan dasar, bagaimana papan sesi dan Kantor Agent memperlihatkan sesi Claude Code mana sedang mengerjakan apa, dan bagaimana loop otonom /brief lalu /kerjakan mengerjakan satu task kecil sampai berhenti di PR dengan merge tetap di tangan manusia. Menjelaskan juga batas tiap mekanisme: gerbang yang masih bisa dilewati --no-verify, repo selain Node dan Go yang tak punya gerbang deterministik, dan format internal Claude Code (registri sesi dan transkrip) yang dibaca Kantor Agent sehingga bisa patah di rilis mana pun.",
       "kata_kunci": [
