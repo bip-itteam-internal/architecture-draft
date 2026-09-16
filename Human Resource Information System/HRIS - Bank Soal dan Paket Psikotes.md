@@ -151,7 +151,7 @@ Dipasang **sekali per lingkungan** (penanda `psikotes_seed`), tipe by `kode` dan
 | Cara muat | `muat_cfit.py` lewat gateway, pratinjau sebagai bawaan: unggah tiap PNG (`POST /psikotes/gambar`), lalu `POST /psikotes/item` per soal, soal contoh dulu baru soal asli tiap subtes. **Impor Excel tak bisa dipakai** karena teks saja (`psikotes_impor.go`). Loader berhenti bila tipe sudah bersoal, dan mencatat id soal serta kunci gambar ke `hasil-muat-<host>.json` |
 | Terukur di DEV | 332 gambar, 58 soal; `jumlah_soal` 13/14/13/10, `jumlah_contoh` 2 tiap subtes, kesiapan siap, subtes identik dengan sebelum ganti nama |
 | Uji kandidat | Satu sesi paket uji dikerjakan penuh lewat API publik: urutan soal sama dengan manifest, kunci soal contoh sama dengan manifest, gambar 200 PNG selagi sesi berjalan lalu **410 sesudah sesi tutup**, laporan HR benar = jumlah soal dikurangi satu di tiap subtes |
-| Prod | Belum. Dijalankan manusia sesudah fitur psikotes multi-jenis naik ke prod |
+| Prod | **Dimuat 2026-09-16** dengan skrip yang sama (58 soal, 332 gambar), berbarengan dengan 24 grup DISC. Sesudahnya tipe siap dan paket bawaan **Staff siap dikirim** (2.100 detik). ⚠️ Dijalankan **agent atas perintah eksplisit user** ("pake akun ku saja"), menyimpang dari aturan tim bahwa eksekusi prod dilakukan manusia; penyimpangannya disebut lebih dulu dan ditegaskan user sebelum jalan. Tak ada sesi kandidat uji yang dibuat di prod |
 
 ⚠️ Tingkat kesulitan disusun dari rancangan dan **belum diukur** dari hasil kandidat: tak ada norma, dan skor tetap jumlah benar mentah. Batas waktu subtes masih bawaan seed dan belum diuji terhadap soal ini.
 

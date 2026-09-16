@@ -298,7 +298,8 @@ isi ruang di belakangnya tetap terlihat.
   menampilkan `+N`.
 - Tempat duduk menghadap penonton (sofa, kursi santai), dan kursi Lead berada di sisi utara meja,
   supaya wajah robot terlihat di atas monitor. Perabot yang membelakangi penonton menutupi robotnya,
-  dan itu terlihat di mockup pertama.
+  dan itu terlihat di mockup pertama. **Direvisi di 1.22.0** (§ Arah hadap robot): robot kini menghadap arah
+  yang benar, dan yang membelakangi penonton memang tak memperlihatkan wajahnya.
 
 ### Urutan kedalaman
 
@@ -323,6 +324,7 @@ isi ruang di belakangnya tetap terlihat.
   berpikir lebih dari 20 detik, atau saat mulai Edit/Write. Alasannya: pola nyata Read, pikir, Read
   dengan interval data 2 detik membuat robot yang selalu kembali ke meja tak pernah tiba di mana pun.
 - Muncul dari pintu masuk; pulang berjalan ke pintu lalu hilang.
+- **Arah hadap** mengikuti perabot saat duduk dan mengikuti jalur saat berjalan (§ Arah hadap robot, 1.22.0).
 - Animasi kerja hanya saat berhenti: membaca (perpustakaan), mengetik dengan lampu monitor berwarna
   Lead (meja), lampu rak berkedip (server), duduk (rapat, lounge). Dengan `prefers-reduced-motion`,
   robot berpindah tanpa berjalan dan tanpa animasi berulang.
@@ -576,3 +578,94 @@ robot dipulangkan dan banner menyuruh `--berhenti` lalu `/kantor-agent`. Kedua a
   punya entri sendiri.
 - Tugas latar yang dimulai sebelum jendela 8 MB saat penulis pertama melihat sesinya tak terlihat.
 - `kantor-agent.sh` belum pernah dijalankan.
+
+## Arah hadap robot (kit 1.22.0, 2026-09-16)
+
+Permintaan pemilik sesudah melihat halaman terpasang: robot selalu menatap penonton, walau duduk menghadap meja atau
+berjalan menyamping. Keputusan 1.20.0 yang menaruh semua tempat duduk menghadap penonton dicabut di sini.
+
+**Geometri yang membatasi.** `box()` hanya menggambar tiga sisi (selatan, timur, atas), jadi robot yang menghadap
+utara atau barat memang tak pernah memperlihatkan wajahnya. Pemilik memilih yang paling realistis: wajah boleh
+hilang, dan yang membelakangi diberi garis engsel punggung supaya tak terbaca sebagai robot rusak. Identitas tetap
+terbaca dari label nama di atas kepala dan dari warnanya.
+
+| Tempat | Arah | Alasan |
+|---|---|---|
+| Kursi Lead di pod | selatan | mejanya ada di selatan kursinya |
+| Bangku subagent pod barat dan timur | timur dan barat | menghadap meja |
+| Titik berdiri pod | utara | meja ada di utaranya |
+| Rak dan konsol ruang server | utara | rak di dinding utara, meja konsol di utara kursinya |
+| Meja baca dan rak perpustakaan | utara | rak di dinding utara |
+| Kursi ruang rapat | ke pusat meja, dibulatkan empat arah | delapan kursi melingkari meja bundar |
+| Sofa, kursi santai, beanbag lounge | selatan | sandaran di utara, menghadap penonton |
+| Meja cadangan | selatan | mejanya di selatan |
+| Koridor dan pintu | selatan dan timur | jalur, bukan tempat duduk |
+| Sedang berjalan | arah segmen jalur | dihitung per segmen, bukan per frame |
+
+**Bentuknya di kode.** `gambarRobot(warna, kecil, dudukZ, arah)` merotasi tiap kotak badan 90 derajat per langkah
+lewat `R(x, y, w, d)`, dan wajah digambar lewat `sisi(yb, ...)` yang memutuskan sendiri apakah bidang itu jatuh di
+sisi yang terlihat; `mukaTimur` menemani `mukaSelatan`. Kunci cache `gambarBadan` memuat arah, jadi badan digambar
+ulang hanya saat robotnya benar-benar berputar.
+
+**Urutan gambar ikut dirotasi.** Penggambar ini tak punya penyangga kedalaman: yang lebih dekat kamera harus
+digambar belakangan. Rotasi menukar lengan mana yang lebih dekat, jadi urutan kedua lengan ikut ditukar untuk hadap
+timur dan utara. Tanpa itu robot yang membelakangi kehilangan satu lengan di balik badannya, dan gagalnya senyap
+karena sisanya tetap terlihat seperti robot yang utuh.
+
+**Monitor pod.** Layarnya kini menghadap robot di sisi utara meja, jadi penonton melihat punggung monitor. Penanda
+warna Lead pindah menjadi lampu di permukaan meja dan tetap ber-id `led-pod-<n>`, sehingga logika identitas di
+halaman tidak berubah. Ia ditaruh di sisi **selatan** monitor, bukan di sisi layarnya: meja di sisi utara tertutup
+badan monitor dari sudut pandang ini, jadi penanda di sana hanya akan terlihat karena tergambar belakangan.
+
+**Test.** `tests/kantor-agent-browser.ps1` naik ke 38 check: arah di pod, kedua bangku pod, ruang server,
+perpustakaan, lounge, kursi rapat yang dicocokkan dengan vektor ke pusat meja, robot membelakangi tanpa mata, arah
+saat berjalan, arah kembali ke kursinya setibanya, badan yang benar-benar digambar ulang saat berputar, dan penanda
+warna pod tetap ada. Check baru itu dilihat merah lebih dulu (arah kosong, dan robot yang membelakangi masih punya
+dua mata).
+
+Tiga kontrol mutasi dijalankan atas suite itu, dan dua di antaranya menemukan lubang di test-nya sendiri lebih dulu.
+
+Menukar timur dan barat di `arahDari` membuat dua check merah (kursi rapat dan arah saat berjalan). Membuang arah
+dari kunci cache `gambarBadan` juga membuat dua merah, tetapi hanya sesudah check "badan digambar ulang saat
+berputar" ditambahkan: check arah yang lain membaca keadaan `arah` milik robot, bukan badan yang tergambar, jadi
+jalur berjalan tak terjaga tanpanya. Titik berdiri ruang server tak mengubah `dudukZ`, sehingga tanpa arah kunci
+cache-nya benar-benar sama dan badan lama bertahan.
+
+Menukar utara dan selatan mula-mula **tidak tertangkap sama sekali**. Cabang sumbu y `arahDari` hanya dipakai kursi
+rapat (arah area lain ditulis mati di `SPOT`), dan test-nya cuma mengisi satu kursi yang kebetulan menghadap barat.
+Karena itu 3f kini mengisi empat kursi sekaligus, memeriksa tiap kursi terhadap vektornya sendiri, dan menuntut
+kedua sumbu terwakili. Sesudah itu mutasi yang sama membuat check-nya merah sambil menyebut dua kursi yang
+terbalik.
+
+## Panel samping bisa disembunyikan (kit 1.23.0, 2026-09-16)
+
+Permintaan pemilik atas halaman terpasang: bilah gulir panel **LEAD HIDUP** dikecilkan, dan panelnya bisa
+disembunyikan.
+
+**Saklar.** Satu tombol di kanan atas header, `#saklar-panel`, memakai `aria-expanded` dan teksnya ikut berganti
+(`sembunyikan panel` ↔ `tampilkan panel`). Menyembunyikan memasang `hidden` pada `<aside>` dan kelas `tanpa-panel`
+pada `<main>`, yang membuat gridnya satu kolom sehingga denah mengisi ruangnya; terukur di jendela 1600px, panggung
+melebar dari 1188px ke 1527px. Isi panel tidak dibongkar, jadi kartunya kembali utuh saat ditampilkan lagi.
+
+Pilihannya diingat lewat `localStorage`. Di `file://` Chrome menolak akses itu dengan `SecurityError`, jadi baca dan
+tulisnya dibungkus `try` dan kegagalannya ditelan: saklarnya tetap bekerja, hanya tak diingat antar-buka. Ini
+satu-satunya tempat halaman menyimpan keadaan milik pembaca, dan kehilangannya tidak mengubah arti apa pun.
+
+**Bilah gulir.** 6px lewat `::-webkit-scrollbar`, dan `scrollbar-width: thin` sengaja **hanya** dipasang di dalam
+`@supports not selector(::-webkit-scrollbar)`. Alasannya sifat Chrome yang sudah terukur di tempat lain: begitu
+`scrollbar-width` dipasang pada elemen yang sama, seluruh pseudo-element `::-webkit-scrollbar` diabaikan, dan
+`thin` di sana menghasilkan 10px sementara aturan webkit saja menghasilkan 6px. Peramban yang tak mengenal
+`::-webkit-scrollbar` (Firefox) tetap mendapat bilah tipis lewat cabang `@supports` itu.
+
+**Uji.** `tests/kantor-agent-browser.ps1` naik ke 41 check: lebar bilah gulir diukur di peramban dengan elemen
+**kontrol** pembanding, panel disembunyikan lalu dikembalikan, dan denah dibuktikan melebar.
+
+Dua hal membuat check bilah gulir nyaris vakum, dan keduanya hanya ketahuan dari mengukur:
+
+- Harness uji menjalankan Chrome dengan `--hide-scrollbars`, sehingga bilah bawaan terukur **0px** dan check-nya
+  akan lolos untuk aturan CSS apa pun. Flag itu dilepas; bilah yang ikut terpotret di screenshot adalah harga yang
+  murah.
+- `offsetWidth - clientWidth` pada `<aside>` memuat dua border 1px miliknya, jadi angka mentahnya 8px dan bukan 6px.
+  Border dikurangkan lebih dulu supaya yang diklaim spec ini sama dengan yang diukur.
+
+Kontrol mutasi: mematikan aturan `::-webkit-scrollbar` membuat check itu merah dengan bilah kembali ke 15px.

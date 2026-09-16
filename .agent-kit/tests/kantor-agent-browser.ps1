@@ -63,7 +63,9 @@ function Sub($id, $peran, $area, $keadaan, $alat = '') {
 
 $ud = Join-Path $Keluaran 'chrome-profil'
 $url = ([Uri](Join-Path $halaman 'kantor-agent.html')).AbsoluteUri
-$proses = Start-Process -FilePath $Chrome -ArgumentList @('--headless=new', '--disable-gpu', '--hide-scrollbars', "--user-data-dir=$ud", "--remote-debugging-port=$Port", '--window-size=1600,1150', $url) -PassThru -WindowStyle Hidden
+# TANPA --hide-scrollbars: flag itu membuat lebar bilah gulir terukur 0px, sehingga uji ketebalan bilah
+# di 3h akan lolos untuk aturan CSS apa pun. Bilah yang ikut terpotret di screenshot adalah harga yang murah.
+$proses = Start-Process -FilePath $Chrome -ArgumentList @('--headless=new', '--disable-gpu', "--user-data-dir=$ud", "--remote-debugging-port=$Port", '--window-size=1600,1150', $url) -PassThru -WindowStyle Hidden
 $script:galatJs = New-Object System.Collections.ArrayList
 $ws = $null
 try {
@@ -241,6 +243,93 @@ try {
   $null = Cdp 'Runtime.evaluate' @{ expression = 'delete navigator.clipboard.writeText; delete document.execCommand; document.activeElement && document.activeElement.blur()' }
   Check ($ok -and $tombol -eq 'salin manual' -and $tetap) "3e salin manual: kedua jalan gagal -> kolom id terpilih, tetap terpilih melewati render tiap detik (tombol '$tombol')"
   Foto '3e-salin-manual'
+
+  # 3f. arah hadap: duduk mengikuti perabot, berjalan mengikuti jalur. Wajah hanya tergambar saat hadap selatan
+  # atau timur, karena proyeksi ini tak pernah memperlihatkan sisi utara dan barat.
+  function Arah([string]$key) { $r = Robot | Where-Object { $_.key -eq $key }; if ($r) { return $r.arah }; return $null }
+  # keadaan 'alat' dipakai, bukan 'berpikir': histeresis berpikir menahan robot di ruang sebelumnya 20 detik
+  # dua subagent supaya KEDUA bangku pod terisi: yang di barat meja menghadap timur, yang di timur menghadap barat
+  Tulis-Data @((Sesi 'aaaaaaaa-1111' 'Lead di meja' 'meja' 'alat' 'Edit' 'x.py' @((Sub 'sub1' 'Peneliti' 'meja' 'alat' 'Edit'), (Sub 'sub2' 'Peneliti' 'meja' 'alat' 'Edit'))),
+    (Sesi 'bbbbbbbb-2222' 'Lead di server' 'server' 'alat' 'PowerShell' 'pnpm test'),
+    (Sesi 'cccccccc-3333' 'Lead di rapat' 'rapat' 'menunggu_subagent'),
+    (Sesi 'cccccccc-3334' 'Lead di rapat 2' 'rapat' 'menunggu_subagent'),
+    (Sesi 'cccccccc-3335' 'Lead di rapat 3' 'rapat' 'menunggu_subagent'),
+    (Sesi 'cccccccc-3336' 'Lead di rapat 4' 'rapat' 'menunggu_subagent'),
+    (Sesi 'dddddddd-4444' 'Lead di lounge' 'lounge' 'menunggu_anda'),
+    (Sesi 'eeeeeeee-5555' 'Lead di perpustakaan' 'perpustakaan' 'alat' 'Grep' 'pola'))
+  $ok = Tunggu { @(Robot | Where-Object { -not $_.pergi -and -not $_.jalan }).Count -eq 10 } 40
+  $rA = Robot | Where-Object { $_.key -eq 'aaaaaaaa-1111' }
+  Check ($ok -and (Arah 'aaaaaaaa-1111') -eq 'selatan') "3f arah: Lead di pod menghadap mejanya, selatan (dapat '$(Arah 'aaaaaaaa-1111')')"
+  $barat = Robot | Where-Object { $_.key -like 'aaaaaaaa-1111:*' -and $_.x -lt $rA.x }
+  $timur = Robot | Where-Object { $_.key -like 'aaaaaaaa-1111:*' -and $_.x -gt $rA.x }
+  Check ($barat -and $timur -and $barat.arah -eq 'timur' -and $timur.arah -eq 'barat') "3f arah: bangku pod sisi barat menghadap timur dan sisi timur menghadap barat (dapat '$($barat.arah)' dan '$($timur.arah)')"
+  Check ((Arah 'bbbbbbbb-2222') -eq 'utara') "3f arah: robot ruang server menghadap rak, utara (dapat '$(Arah 'bbbbbbbb-2222')')"
+  Check ((Arah 'eeeeeeee-5555') -eq 'utara') "3f arah: robot perpustakaan menghadap rak buku, utara (dapat '$(Arah 'eeeeeeee-5555')')"
+  Check ((Arah 'dddddddd-4444') -eq 'selatan') "3f arah: robot lounge menghadap penonton, selatan (dapat '$(Arah 'dddddddd-4444')')"
+  # empat kursi terisi supaya KEDUA sumbu pembulatan teruji: satu kursi saja bisa kebetulan timur/barat
+  # sehingga cabang utara/selatan lolos tanpa penjaga
+  $rapatSemua = @(Robot | Where-Object { $_.area -eq 'rapat' -and -not $_.pergi })
+  $salah = @()
+  foreach ($r in $rapatSemua) {
+    $dx = 22 - $r.x; $dy = 11.5 - $r.y
+    $h = if ([Math]::Abs($dx) -ge [Math]::Abs($dy)) { if ($dx -ge 0) { 'timur' } else { 'barat' } } else { if ($dy -ge 0) { 'selatan' } else { 'utara' } }
+    if ($r.arah -ne $h) { $salah += ("{0} di ({1};{2}) menghadap {3}, seharusnya {4}" -f $r.key.Substring(0, 8), $r.x, $r.y, $r.arah, $h) }
+  }
+  $sumbuX = @($rapatSemua | Where-Object { $_.arah -eq 'timur' -or $_.arah -eq 'barat' }).Count
+  $sumbuY = @($rapatSemua | Where-Object { $_.arah -eq 'utara' -or $_.arah -eq 'selatan' }).Count
+  Check ($rapatSemua.Count -ge 4 -and $salah.Count -eq 0 -and $sumbuX -ge 1 -and $sumbuY -ge 1) "3f arah: $($rapatSemua.Count) kursi ruang rapat menghadap pusat meja, dibulatkan empat arah, kedua sumbu terwakili ($sumbuX timur/barat, $sumbuY utara/selatan; salah: $($salah -join '; '))"
+  $mata = Eval '(function () { var g = document.querySelector("[data-lead=eeeeeeee-5555] .badan"); return g ? (g.innerHTML.match(/88ffff/g) || []).length : -1; })()'
+  Check ($mata -eq 0) "3f arah: robot yang menghadap utara digambar dari punggung, tanpa mata ($mata mata)"
+  $ledOk = Eval '(function () { var e = document.getElementById("led-pod-0"); return !!e && !!e.getAttribute("fill"); })()'
+  Check ($ledOk -eq $true) '3f pod: penanda warna Lead tetap ada sesudah layar monitor diputar menghadap robot'
+  Foto '3f-arah'
+
+  # 3g. arah saat berjalan mengikuti jalur, lalu kembali ke arah kursinya setibanya
+  Tulis-Data @((Sesi 'eeeeeeee-5555' 'Lead di perpustakaan' 'server' 'alat' 'PowerShell' 'jalan jauh'))
+  Check (Tunggu { $r = Robot | Where-Object { $_.key -eq 'eeeeeeee-5555' }; $r -and $r.jalan -and $r.arah -eq 'timur' } 12) '3g arah: robot yang berjalan ke ruang server menghadap timur selagi berjalan'
+  Check (Tunggu { $r = Robot | Where-Object { $_.key -eq 'eeeeeeee-5555' }; $r -and -not $r.jalan -and $r.arah -eq 'utara' } 20) '3g arah: setibanya di ruang server, arahnya kembali mengikuti kursinya (utara)'
+  # BADAN-nya, bukan cuma keadaan arah: titik berdiri ruang server tak mengubah dudukZ, jadi bila kunci cache
+  # gambarBadan tak memuat arah, badan hasil jalan ke timur (bermata) tetap terpasang dan mata masih terhitung
+  $mataTiba = Eval '(function () { var g = document.querySelector("[data-lead=eeeeeeee-5555] .badan"); return g ? (g.innerHTML.match(/88ffff/g) || []).length : -1; })()'
+  Check ($mataTiba -eq 0) "3g arah: badan digambar ulang saat berputar, bukan cuma keadaannya ($mataTiba mata sesudah menghadap utara)"
+
+  # 3h. panel samping bisa disembunyikan, dan bilah gulirnya lebih tipis dari bawaan peramban.
+  # Lebar bilah WAJIB diukur di peramban dengan elemen KONTROL pembanding: membacanya dari aturan CSS
+  # menyesatkan, karena scrollbar-width dan ::-webkit-scrollbar tidak sama-sama berlaku di tiap peramban.
+  $bilah = Eval '(function () {
+    var a = document.getElementById("sisi");
+    var k = document.createElement("div");
+    k.style.cssText = "position:absolute;left:-9999px;top:0;width:200px;height:100px;overflow-y:scroll";
+    k.innerHTML = "<div style=\"height:400px\"></div>";
+    document.body.appendChild(k);
+    var kontrol = k.offsetWidth - k.clientWidth;
+    var sisiAsli = a.style.overflowY;
+    a.style.overflowY = "scroll";
+    var cs = getComputedStyle(a);
+    var tepi = parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth);
+    var panel = a.offsetWidth - a.clientWidth - tepi;
+    a.style.overflowY = sisiAsli;
+    k.parentNode.removeChild(k);
+    return { panel: panel, kontrol: kontrol };
+  })()'
+  Check ($bilah.panel -gt 0 -and $bilah.panel -le 6 -and $bilah.panel -lt $bilah.kontrol) "3h panel: bilah gulir panel $($bilah.panel)px, lebih tipis dari bilah bawaan $($bilah.kontrol)px"
+  $sebelum = Eval '(function () { return document.getElementById("panggung").getBoundingClientRect().width; })()'
+  Eval '(function () { document.getElementById("saklar-panel").click(); return 1; })()' | Out-Null
+  $sesudah = Eval '(function () {
+    var a = document.getElementById("sisi"), s = document.getElementById("saklar-panel");
+    return { sembunyi: a.hidden, satuKolom: document.querySelector("main").classList.contains("tanpa-panel"),
+      teks: s.textContent.trim(), aria: s.getAttribute("aria-expanded"),
+      panggung: document.getElementById("panggung").getBoundingClientRect().width };
+  })()'
+  Check ($sesudah.sembunyi -eq $true -and $sesudah.satuKolom -eq $true -and $sesudah.teks -eq 'tampilkan panel' -and $sesudah.aria -eq 'false' -and $sesudah.panggung -gt $sebelum) "3h panel: saklar menyembunyikan panel dan denah melebar ($([int]$sebelum)px -> $([int]$sesudah.panggung)px)"
+  Eval '(function () { document.getElementById("saklar-panel").click(); return 1; })()' | Out-Null
+  $kembali = Eval '(function () {
+    var a = document.getElementById("sisi"), s = document.getElementById("saklar-panel");
+    return { tampil: !a.hidden, teks: s.textContent.trim(), aria: s.getAttribute("aria-expanded"),
+      kartu: document.querySelectorAll("#panel .kartu").length };
+  })()'
+  Check ($kembali.tampil -eq $true -and $kembali.teks -eq 'sembunyikan panel' -and $kembali.aria -eq 'true' -and $kembali.kartu -gt 0) "3h panel: saklar mengembalikannya lengkap dengan kartunya ($($kembali.kartu) kartu)"
+  Foto '3h-panel'
 
   # 4. ramai: enam Lead di ruang server -> label ringkas
   Tulis-Data (1..6 | ForEach-Object { Sesi ('cccccccc-000' + $_) ('Lead ramai ' + $_) 'server' 'alat' 'PowerShell' 'pnpm test' })
