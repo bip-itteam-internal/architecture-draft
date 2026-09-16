@@ -298,7 +298,8 @@ isi ruang di belakangnya tetap terlihat.
   menampilkan `+N`.
 - Tempat duduk menghadap penonton (sofa, kursi santai), dan kursi Lead berada di sisi utara meja,
   supaya wajah robot terlihat di atas monitor. Perabot yang membelakangi penonton menutupi robotnya,
-  dan itu terlihat di mockup pertama.
+  dan itu terlihat di mockup pertama. **Direvisi di 1.22.0** (§ Arah hadap robot): robot kini menghadap arah
+  yang benar, dan yang membelakangi penonton memang tak memperlihatkan wajahnya.
 
 ### Urutan kedalaman
 
@@ -323,6 +324,7 @@ isi ruang di belakangnya tetap terlihat.
   berpikir lebih dari 20 detik, atau saat mulai Edit/Write. Alasannya: pola nyata Read, pikir, Read
   dengan interval data 2 detik membuat robot yang selalu kembali ke meja tak pernah tiba di mana pun.
 - Muncul dari pintu masuk; pulang berjalan ke pintu lalu hilang.
+- **Arah hadap** mengikuti perabot saat duduk dan mengikuti jalur saat berjalan (§ Arah hadap robot, 1.22.0).
 - Animasi kerja hanya saat berhenti: membaca (perpustakaan), mengetik dengan lampu monitor berwarna
   Lead (meja), lampu rak berkedip (server), duduk (rapat, lounge). Dengan `prefers-reduced-motion`,
   robot berpindah tanpa berjalan dan tanpa animasi berulang.
@@ -576,3 +578,40 @@ robot dipulangkan dan banner menyuruh `--berhenti` lalu `/kantor-agent`. Kedua a
   punya entri sendiri.
 - Tugas latar yang dimulai sebelum jendela 8 MB saat penulis pertama melihat sesinya tak terlihat.
 - `kantor-agent.sh` belum pernah dijalankan.
+
+## Arah hadap robot (kit 1.22.0, 2026-09-16)
+
+Permintaan pemilik sesudah melihat halaman terpasang: robot selalu menatap penonton, walau duduk menghadap meja atau
+berjalan menyamping. Keputusan 1.20.0 yang menaruh semua tempat duduk menghadap penonton dicabut di sini.
+
+**Geometri yang membatasi.** `box()` hanya menggambar tiga sisi (selatan, timur, atas), jadi robot yang menghadap
+utara atau barat memang tak pernah memperlihatkan wajahnya. Pemilik memilih yang paling realistis: wajah boleh
+hilang, dan yang membelakangi diberi garis engsel punggung supaya tak terbaca sebagai robot rusak. Identitas tetap
+terbaca dari label nama di atas kepala dan dari warnanya.
+
+| Tempat | Arah | Alasan |
+|---|---|---|
+| Kursi Lead di pod | selatan | mejanya ada di selatan kursinya |
+| Bangku subagent pod barat dan timur | timur dan barat | menghadap meja |
+| Titik berdiri pod | utara | meja ada di utaranya |
+| Rak dan konsol ruang server | utara | rak di dinding utara, meja konsol di utara kursinya |
+| Meja baca dan rak perpustakaan | utara | rak di dinding utara |
+| Kursi ruang rapat | ke pusat meja, dibulatkan empat arah | delapan kursi melingkari meja bundar |
+| Sofa, kursi santai, beanbag lounge | selatan | sandaran di utara, menghadap penonton |
+| Meja cadangan | selatan | mejanya di selatan |
+| Koridor dan pintu | selatan dan timur | jalur, bukan tempat duduk |
+| Sedang berjalan | arah segmen jalur | dihitung per segmen, bukan per frame |
+
+**Bentuknya di kode.** `gambarRobot(warna, kecil, dudukZ, arah)` merotasi tiap kotak badan 90 derajat per langkah
+lewat `R(x, y, w, d)`, dan wajah digambar lewat `sisi(yb, ...)` yang memutuskan sendiri apakah bidang itu jatuh di
+sisi yang terlihat; `mukaTimur` menemani `mukaSelatan`. Kunci cache `gambarBadan` memuat arah, jadi badan digambar
+ulang hanya saat robotnya benar-benar berputar.
+
+**Monitor pod.** Layarnya kini menghadap robot di sisi utara meja, jadi penonton melihat punggung monitor. Penanda
+warna Lead pindah menjadi pantulan cahaya layar di permukaan meja dan tetap ber-id `led-pod-<n>`, sehingga logika
+identitas di halaman tidak berubah.
+
+**Test.** `tests/kantor-agent-browser.ps1` naik ke 37 check: arah di pod, bangku pod, ruang server, perpustakaan,
+lounge, kursi rapat yang dicocokkan dengan vektor ke pusat meja, robot membelakangi tanpa mata, arah saat berjalan,
+arah kembali ke kursinya setibanya, dan penanda warna pod tetap ada. Sembilan check baru itu dilihat merah lebih
+dulu (arah kosong, dan robot yang membelakangi masih punya dua mata).
