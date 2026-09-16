@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-16",
-  "jumlah_dokumen": 417,
+  "jumlah_dokumen": 418,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -878,7 +878,7 @@
         "order.order-items-get"
       ],
       "hash": "40849a92b3a96565fbc789742e61b75e3bbd942b6d18b298c097028cfbd2659e",
-      "ukuran_kb": 3.0,
+      "ukuran_kb": 2.9,
       "ringkasan": "Menjawab cara menarik daftar order dari Lazada Open API endpoint `/orders/get`, perbedaan filter waktu `created_after`/`created_before` (waktu order dibuat) vs `update_after`/`update_before` (waktu order berubah), dan kenapa window berbasis update penting sebagai jaring pengaman ketika webhook Lazada (LPM) mati. Juga mendokumentasikan jebakan status order-level yang bisa tertinggal dari status tracking sebenarnya.",
       "kata_kunci": [
         "Lazada",
@@ -1042,7 +1042,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 2.0,
+      "ukuran_kb": 1.9,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1094,7 +1094,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 3.0,
+      "ukuran_kb": 2.9,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1515,20 +1515,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "d3b2607956071405083b98b639b74c191aeef1ac8f15c9b6687e03168e9c0b92",
-      "ukuran_kb": 469.5,
-      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (hris-dashboard / One Bharata), stack teknologinya apa, dan bagaimana login, refresh token, serta perannya sebagai SSO Identity Provider untuk aplikasi lain bekerja. Juga menjawab: bagaimana sidebar dan halaman digerbang dari cookie system_roles (daftar module dan role, termasuk kasus legal/rnd yang dialiaskan dan modul audit yang hanya lahir dari paket izin), bagaimana menu dikelompokkan lewat menu induk bersarang, dan apa saja tab di Pengaturan HRGA terpusat. Memuat konvensi data-fetching TanStack Query (hook sidebar wajib enabled, badge pakai refetchOnWindowFocus, pencacah membalas angka), konvensi bagan Recharts/ChartContainer, dukungan multi-perusahaan termasuk rekrutmen lintas perusahaan, serta daftar modul yang sudah dan belum diimplementasikan.",
+      "hash": "19d5a99a854f02174748081b256744698c8cbbdd32338955c6cc34da7c84ee4f",
+      "ukuran_kb": 471.6,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (erp-frontend), stack dan struktur menunya, serta bagaimana login, refresh token, dan SSO Identity Provider bekerja. Menjelaskan juga bagaimana hak akses dibaca dari cookie `system_roles` per modul/role, bagaimana sidebar dan kategori menu di-gate, dan bagaimana dukungan multi-perusahaan (company switcher, departemen, shift, WiFi, rekrutmen lintas perusahaan) tersusun. Memuat konvensi data-fetching TanStack Query dan konvensi bagan Recharts/ChartContainer yang berlaku untuk halaman-halaman frontend.",
       "kata_kunci": [
-        "web ERP",
         "erp-frontend",
-        "hris-dashboard",
         "One Bharata",
+        "hris-dashboard",
+        "Next.js",
         "SSO",
         "system_roles",
         "role gating",
-        "sidebar menu",
-        "TanStack Query",
-        "multi-perusahaan"
+        "multi-tenant",
+        "company switcher",
+        "pengaturan HRGA"
       ]
     },
     {
@@ -2470,6 +2470,7 @@
         "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
         "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris",
         "RUN - Import Koreksi Faktur dari Rekap Lengkap",
+        "ADR - 0100 Penerimaan Beda dengan Accurate Diputus di Halaman Penerimaan",
         "Microservices - Employee Service",
         "HRIS - Otomasi Skor KPI",
         "ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate",
@@ -2499,26 +2500,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "c22fa5cc26201566e96ce2ebc0169f73b49e912f05396b0e2468af77bfcbe271",
-      "ukuran_kb": 402.2,
-      "ringkasan": "Dokumen implementasi service integrasi marketplace sekaligus bridge akuntansi ke Accurate Online (Go + Fiber + MongoDB + Redis, `services/integration`). Menjawab: bagaimana order TikTok Shop/Shopee/Lazada masuk lewat webhook dan dinormalkan jadi model transaction terpadu, bagaimana laporan iklan TikTok Business/GMV Max ditarik dan diagregasi (termasuk aturan GMV winner dan perbaikan ROI/ROAS), bagaimana kredensial OAuth, auto-ship/auto-approve sadar-holiday, ICC account mapping, Shop ACL, kepemilikan toko per departemen, WMS bridge, profit per produk, dan cron worker bekerja. Juga sumber untuk atribusi order Shopee, observability/ketahanan Shopee, index Mongo jalur panas, alarm toko tanpa config Accurate, status sinkron per toko, serta bagian yang masih konsep (Meta Ads) atau sudah soft-disabled (Desty).",
+      "hash": "9100a8c0db85cbcd9f457879ca682c9a3debd9e3c8a125f3de5faa01418bee53",
+      "ukuran_kb": 405.5,
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) lewat webhook dan job sync, endpoint apa saja yang tersedia, dan bagaimana order dinormalkan jadi model transaksi terpadu. Menjelaskan jalur bridging akuntansi ke Accurate (Sales Invoice, Sales Return, ringkasan harian per toko), manajemen kredensial OAuth, automasi auto-ship/auto-approve sadar-holiday, serta metrik iklan seperti GMV Max monitoring/overview dan ICC video metrics. Juga memuat catatan observability, index MongoDB jalur panas, ACL toko, kepemilikan toko per departemen, dan status sinkron per toko.",
       "kata_kunci": [
         "integration service",
-        "microservice",
-        "Go Fiber",
         "marketplace",
-        "TikTok Business",
-        "GMV Max",
+        "TikTok Shop",
         "Shopee",
         "Lazada",
         "Accurate",
         "webhook",
-        "cron worker",
-        "ICC mapping",
-        "Shop ACL",
-        "atribusi afiliasi",
-        "Meta Ads",
-        "Desty"
+        "GMV Max",
+        "sales invoice",
+        "OAuth credentials"
       ]
     },
     {
@@ -4820,7 +4815,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "1af925998c51daaf89f4b362162b5f8c117e3db82e37169cbfe7b2e6ed084c92",
-      "ukuran_kb": 6.6,
+      "ukuran_kb": 6.5,
       "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal), dan bagaimana auto-disable Tahap 2 bekerja (counter kegagalan auth beruntun, ambang 5, reset saat sukses, satu Telegram tanpa damper terpisah — bukti flapping 36009006). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care.",
       "kata_kunci": [
         "adr",
@@ -4958,7 +4953,7 @@
         "APP - Web ERP"
       ],
       "hash": "3405a3dc1516fe9eff90d36e5a1a47c8a876d2dbaf6bc9537105816d5897ee6d",
-      "ukuran_kb": 10.2,
+      "ukuran_kb": 10.1,
       "ringkasan": "Menjawab: bagaimana penyesuaian statement TikTok (tt_statement_adjustments, mayoritas ganti rugi paket hilang / LOGISTICS_REIMBURSEMENT yang bukan penggantian ongkir) dibukukan ke Accurate — dilipat ke payout pesanan yang disebutnya lalu diurus mesin receipt, bukan sebagai baris pendapatan tersendiri — dan bagaimana pesanan yang tak ditemukan ditangani. Live 26 Agustus 2026 (PR #1451).",
       "kata_kunci": [
         "adr",
@@ -5817,7 +5812,7 @@
         "External - Accurate"
       ],
       "hash": "88f3c03bd55060706f79617cace5e8835a2ecc4419733de53f3d0c971547bfe2",
-      "ukuran_kb": 15.0,
+      "ukuran_kb": 14.9,
       "ringkasan": "Menjawab: bagaimana koreksi faktur yang dinyatakan finance lewat Excel Rekap Lengkap diterjemahkan sistem ke tuas yang sudah ada (pindah hari, Mapping SKU, qty per unit, riwayat Harga Jual, gudang per pesanan), dan kenapa tidak ada override per baris faktur. Menjelaskan koreksi mana yang ditolak (sel Accurate Number kosong, FO, paket multi-komponen, faktur terkunci tertentu), kewajiban persetujuan untuk perubahan master-data, serta amandemen koreksi gudang yang memecah baris faktur per gudang.",
       "kata_kunci": [
         "koreksi faktur",
@@ -6716,7 +6711,7 @@
         "ADR - 0001 Akuntansi via Accurate"
       ],
       "hash": "7f8ea537557b43453b7f3177676f1922e408142ec5b24b4bb6ffd59931e15190",
-      "ukuran_kb": 10.5,
+      "ukuran_kb": 10.4,
       "ringkasan": "ADR yang memutuskan perlakuan kompensasi Shopee yang cair bercicilan untuk satu pesanan: cicilan pertama tetap dibukukan otomatis, cicilan kedua dan seterusnya ditahan lalu dicatat tim AR lewat koreksi manual di ERP. Menjawab: kapan aturan ini mulai berlaku (kv `shopee-compensation-susulan-hold-date`), akun mana yang disarankan (diskon 4003 bila cair di bulan yang sama, Pendapatan Lain-lain 8001 bila beda bulan), bagaimana laman Kompensasi Cicilan dan endpoint `GET /accurate/compensation-installments` bekerja, arti status MENUNGGU/TERTUNDA/SELESAI, mengapa penahanan bersifat lengket agar uang tak terbukukan dua kali, dan apa yang sengaja tidak dijanjikan (pembukuan otomatis cicilan kedua, penanda kompensasi final, penerimaan yang isinya hanya kompensasi ditahan).",
       "kata_kunci": [
         "ADR 0097",
@@ -6792,7 +6787,7 @@
         "ADR - 0060 Cakupan Keterlihatan Tiket Engagement"
       ],
       "hash": "7bb810ec84c7cae9aae96e22b2f5e13e19e9fc980033222646736811308df220",
-      "ukuran_kb": 11.5,
+      "ukuran_kb": 11.6,
       "ringkasan": "Menjawab: bagaimana komplain yang lahir dari ulasan marketplace berbintang rendah dirutekan ke unit yang tepat (gudang packing atau QC), kenapa keputusannya memakai register komplain yang SUDAH ADA di masing-masing tujuan alih-alih membangun register atau master kategori ketiga, dan kenapa register komplain gudang yang sudah lengkap di kode ternyata belum pernah dipakai satu kali pun di produksi karena tidak punya layar.",
       "kata_kunci": [
         "komplain",
@@ -6805,6 +6800,37 @@
         "QC",
         "register komplain",
         "ADR 0099"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0100 Penerimaan Beda dengan Accurate Diputus di Halaman Penerimaan.md",
+      "judul": "ADR - 0100 Penerimaan Beda dengan Accurate Diputus di Halaman Penerimaan",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan) — kode selesai & ber-test di dua branch (`bip-erp` `feat/adopsi-penerimaan-finance`, `erp-frontend` `feat/penerimaan-beda-accurate`); **PR belum dibuka, belum deploy**.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Integration Service",
+        "APP - Web ERP",
+        "IT - Background Jobs & Schedulers",
+        "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
+        "API - Integration Service"
+      ],
+      "hash": "9763c415885f93f6222c0d032538477cee71ae84e20b64ebfd3def47b17068a3",
+      "ukuran_kb": 6.0,
+      "ringkasan": "Menjawab: apa yang harus terjadi bila dokumen Penerimaan (Bukti Terima Kas) di Accurate isinya berbeda dari hitungan ERP, siapa yang memutuskan, dan di layar mana keputusan itu diambil. Menjelaskan gerbang \"selaras = tak perlu keputusan\" (draf ditutup BASI otomatis pada siklus receipt-sync), pemindahan keputusan ke modal detail Penerimaan dengan tiga kolom rupiah (terakhir dikirim ERP, isi Accurate, hitungan ERP sekarang), serta alasan adopsi wajib dihitung terhadap hitungan sekarang agar tidak memotong dua kali. Memuat konsekuensi terukur, batas Lazada, dan utang dokumentasi endpoint Kotak Adopsi.",
+      "kata_kunci": [
+        "penerimaan",
+        "Bukti Terima Kas",
+        "receipt",
+        "Accurate",
+        "EXTERNAL_EDIT",
+        "Kotak Adopsi",
+        "penyesuaian manual",
+        "receipt-sync",
+        "adopsi",
+        "ADR 0100"
       ]
     },
     {
@@ -10319,7 +10345,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
-      "ukuran_kb": 6.9,
+      "ukuran_kb": 6.8,
       "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
       "kata_kunci": [
         "faktur",
@@ -11913,7 +11939,7 @@
         "External - Accurate"
       ],
       "hash": "526782f4478f447d6f83ea082ecdfc2526e7623bd22e5945d6509565be60a2d0",
-      "ukuran_kb": 11.5,
+      "ukuran_kb": 11.4,
       "ringkasan": "Menjawab: langkah demi langkah memperbaiki faktur Auto-Sync Accurate secara massal dengan mengunduh, menyunting, dan mengunggah kembali file Rekap Lengkap, termasuk kolom mana yang boleh disunting dan artinya. Menjelaskan prasyarat role, cara membaca pratinjau dan menyetujui perubahan master-data, cara verifikasi (unggah ulang tanpa suntingan harus 0 koreksi), serta arti pesan galat dan tindakannya.",
       "kata_kunci": [
         "import koreksi",
