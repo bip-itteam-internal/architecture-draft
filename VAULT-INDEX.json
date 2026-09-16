@@ -608,20 +608,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "bc4244cf04b11c547bde989faf5eba4d6e3559ff1ec654c41ad9b7b8822336ea",
-      "ukuran_kb": 55.9,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda, ambang, pagu, kurva alokasi, laba, video dan live, pencatatan sesi live host, retur, price floor, job, pengumpul KPI), parameter serta konvensi responsnya (amplop rows/unavailable_channels, kolom_tidak_berlaku, paginasi drill, batas hari WIB), dan endpoint mana yang digerbang RequireMarketingLeader. Juga menjelaskan arti lima nilai vonis laba (tanpa_data, belum_matang, rugi, waspada, sehat), makna null vs nol, dan cara mengaudit kelengkapan daftar route terhadap kode.",
+      "hash": "e25080c17241ccb2ffac1cd5a7371ad3550b7946b9eaa546dee440f1ea986732",
+      "ukuran_kb": 56.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service beserta path, parameter, dan gerbang role-nya (mis. POST /ambang dan POST /pagu yang butuh RequireMarketingLeader). Menjelaskan konvensi respons service ini: amplop rows/unavailable_channels, kolom_tidak_berlaku, enum tak dikenal dibalas 400 berisi daftar nilai sah, batas tanggal hari WIB, dan paginasi drill (limit bawaan 50 maks 500, total -1 berarti cacah gagal). Juga menjawab: bagaimana vonis laba di /beranda dihitung dengan lima keadaan (tanpa_data, belum_matang, rugi, waspada, sehat), apa arti nilai null pada ROAS/persen, bagaimana endpoint /live-shifts serta ambil alih sesi bekerja, dan bagaimana cara mengaudit ulang kelengkapan daftar route ini terhadap kode.",
       "kata_kunci": [
         "marketing analytics",
-        "API endpoint",
+        "endpoint",
+        "API",
+        "route",
         "beranda",
-        "ambang ROAS",
-        "pagu belanja iklan",
-        "ad budget",
-        "vonis laba",
+        "ambang keputusan",
+        "roas",
+        "pagu iklan",
         "live-shifts",
-        "sesi live host",
-        "price floor"
+        "sesi live"
       ]
     },
     {
@@ -1513,20 +1513,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "2706d46a7ad5d5ef0f8faedf84bc1f868a2713397c8fd9067de864013d02cf58",
-      "ukuran_kb": 466.2,
-      "ringkasan": "Menjawab: apa itu portal web ERP `erp-frontend` (One Bharata), stack-nya (Next.js App Router, React, shadcn/Radix/Tailwind, TanStack Query, react-hook-form plus zod, recharts, react-i18next), dan bagaimana login, cookie `system_roles`, serta perannya sebagai SSO Identity Provider bekerja. Menjelaskan aturan role gating sidebar per modul, pengelompokan menu HRIS lewat menu induk bersarang, dan halaman Pengaturan HRGA terpusat beserta sub-menu dan tab-nya. Memuat juga konvensi data-fetching TanStack Query (hook sidebar wajib ber-`enabled`, pencacah membalas angka) dan konvensi bagan Recharts yang mengikat halaman baru.",
+      "hash": "0225db18e5210bd061308d2a0c5b32c7ecdc8b4251a095a827acb9c5f2f611ad",
+      "ukuran_kb": 466.7,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal hris-dashboard (One Bharata), stack yang dipakainya (Next.js App Router, React, shadcn/Radix/Tailwind, TanStack Query, react-hook-form/zod, recharts, leaflet, react-i18next), dan modul apa saja yang sudah ada di dalamnya. Menjelaskan cara login dan otorisasi: cookie system_roles (peta module ke role), daftar module dan role yang sah, cara sidebar dan halaman digerbang, kategori audit yang lahir dari paket izin tanpa key system_roles, serta peran web ini sebagai SSO Identity Provider (tiket one-time code, allowlist redirect_url). Juga menjawab: bagaimana menu dikelompokkan lewat menu induk bersarang (bukan field group), apa isi Pengaturan HRGA terpusat dan tab-tabnya, bagaimana dukungan multi-perusahaan dan rekrutmen lintas perusahaan bekerja, serta konvensi data-fetching TanStack Query dan konvensi bagan Recharts/ChartContainer yang berlaku di repo ini.",
       "kata_kunci": [
         "erp-frontend",
-        "web ERP",
+        "hris-dashboard",
         "One Bharata",
+        "web ERP",
+        "frontend",
         "Next.js",
-        "SSO",
         "system_roles",
-        "sidebar gating",
-        "TanStack Query",
-        "Recharts",
-        "i18n"
+        "role gating",
+        "SSO",
+        "multi-perusahaan"
       ]
     },
     {
@@ -2702,20 +2702,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "1d26e1e2293cb06ef578779f0cbd8a505679cd1aa16f17a35fc77dbb456031a9",
-      "ukuran_kb": 139.8,
-      "ringkasan": "Menjawab: bagaimana service marketing-analytics membangun mart laba dan performa marketing (toko, produk, kampanye, iklan, video, live) dari integration_db secara baca-saja, bagaimana penjadwal 48 jam dan job sync bekerja, koleksi mart apa saja yang ada, dan sumber data per channel TikTok, Shopee, Lazada. Juga menjelaskan logika vonis beranda (termasuk belum_matang dan pita materialitas), pencatatan serta ambil alih sesi live host, alokasi bundel dan mapping SKU, serta aturan pemakaian angka supaya tidak hitung ganda (iklan_sia_sia, pembatalan, 24h_live_gmv, revenue setelah diskon).",
+      "hash": "50e4e03cd6aed0c5030d76e83b4c287293b49966ee0f7208b2ee3a636ee5c8d9",
+      "ukuran_kb": 141.1,
+      "ringkasan": "Menjawab: apa tugas Marketing Analytics Service, di mana kodenya, port dan prefix gateway-nya, serta kenapa ia menyimpan pre-agregasi ke koleksi mart_* miliknya sendiri alih-alih menghitung ulang tiap request. Menjelaskan dua prinsip arsitektur yang wajib dijaga: integration_db dibaca baca-saja dengan tiga lapis penjaga (tipe reader tanpa metode tulis, test pemindai AST, read preference secondaryPreferred) dan /health turun jadi degraded 503 bila index unik gagal dibuat karena index itu fondasi idempotensi sync. Juga menjawab: bagaimana vonis laba lima keadaan dan aturan belum_matang beserta empat iterasi kegagalannya, bagaimana penjadwal internal 48 jam dan job sync bekerja, channel mana yang didukung (TikTok, Shopee, Lazada), aturan pemakaian angka agar tak terjadi hitung ganda (iklan_sia_sia, pembatalan, gmv_live_tanpa_performa, per_orang, kepemilikan afiliasi), dan catatan kejujuran data seperti perbedaan revenue TikTok vs Shopee.",
       "kata_kunci": [
-        "marketing-analytics service",
+        "marketing analytics service",
+        "microservice",
+        "marketing_analytics_db",
         "mart_profit_attribution",
-        "laba marketing",
-        "profit attribution",
-        "job sync",
+        "integration_db baca-saja",
         "penjadwal 48 jam",
-        "sesi live",
-        "live shift",
+        "job sync",
+        "vonis laba",
         "hitung ganda",
-        "iklan_sia_sia"
+        "live shift"
       ]
     },
     {
