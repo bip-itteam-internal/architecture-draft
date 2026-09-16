@@ -99,11 +99,11 @@ Klasifikasi fee Lazada ke akun Accurate mengikuti [[ADR - 0078 Klasifikasi Fee L
 
 | Persona | Peran & Divisi | Akses / RBAC | Device |
 |---|---|---|---|
-| Junior Accountant pemegang CV | Junior Accountant, FAT | Paket "Buku Besar CV: Pemegang" (`akuntansicv.cv.tulis`) plus penugasan per CV (T1, branch); paket belum dipasang di prod. Per 2026-09-12 lima dari tujuh belum punya paket izin apa pun ([[Finance - FAT Persona]]) | Web ERP |
+| Junior Accountant pemegang CV | Junior Accountant, FAT | **DUA paket**: "Buku Besar CV: Pemegang" (`akuntansicv.cv.tulis`, merge 2026-09-16) yang membuka layar **CV Saya**, plus "Budget: Transfer Kas CV" (`budget.cv.transfer`, T2 branch) yang membuka tahap transfer. Antrean transfernya tinggal di CV Saya, bukan `/finance/ap` yang digerbang `finance.ap.view`. Belum dipasang di prod; per 2026-09-12 lima dari tujuh belum punya paket izin apa pun ([[Finance - FAT Persona]]) | Web ERP |
 | Senior Accountant | Senior Accountant, FAT | Baca semua CV lewat paket "Buku Besar CV: Pembaca" (`akuntansicv.view`, rencana pemasangan T1); pemeriksa jurnal manual; review bukti transfer | Web ERP |
 | SPV FAT | Finance Supervisor | Paket "Buku Besar CV: Pengelola" (`akuntansicv.view` + `akuntansicv.kelola`, sengaja tanpa `cv.tulis`, rencana pemasangan T1): semai, rujukan, penugasan; `budget.approve.finance`, `budget.approve.pembayaran`; kunci periode (TBD) | Web ERP |
 | Tax Officer | Tax Staff | Baca semua CV untuk omzet dan pajak CV lewat paket "Buku Besar CV: Pembaca" (rencana pemasangan T1) | Web ERP |
-| Account Payable | Account Payable | Transfer pengajuan bersumber dana rekening PT, `budget.ap.bayar` | Web ERP |
+| Account Payable | Account Payable | Transfer pengajuan bersumber dana rekening PT, `budget.ap.bayar`. Dokumen ber-kode CV **tidak** masuk antreannya (T2, branch) | Web ERP |
 | Pemohon | Karyawan Marketing, HR, GA | `budget_pemohon_*` | Web ERP |
 | Direktur | Direksi | Baca master entitas dan penugasan lewat paket "Buku Besar CV: Pembaca" (rencana pemasangan T1); izin laporan dan konsolidasi TBD | Web ERP |
 

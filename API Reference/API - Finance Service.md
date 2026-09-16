@@ -25,6 +25,18 @@ Memasok metrik KPI Cost Control **"minimal 3 rekomendasi efisiensi cost driver s
 | DELETE | `/cost-control/rekomendasi/:id` | Hapus milik sendiri. Pemilik ikut jadi filter, bukan hanya id, sebab gateway tidak memeriksa kepemilikan baris. "Tidak ada" dan "bukan milikmu" **sengaja tak dibedakan** — membedakannya memberi tahu penanya bahwa sebuah id memang ada |
 | GET | `/internal/kpi/cost-control?periode=YYYY-MM&employee_id=` | Agregat untuk sumber KPI `kinerja_cost_control` di [[Microservices - Employee Service]]. Membalas `{"rekomendasi_efisiensi": n}` |
 
+### Rute mesin penugasan pemegang CV (T2, branch)
+
+| Method | Endpoint | Keterangan |
+|---|---|---|
+| GET | `/internal/cv/penugasan?key=&company_id=` | Kode CV beserta `aktif`, `akun_accurate_no`, dan `pemegang[]`. Pemakainya procurement-service untuk menentukan siapa yang boleh menindak tahap transfer pengajuan yang dibayar dari rekening CV ([[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] §6 Jalur A). Digerbang **`FINANCE_SERVICE_KEY`** dengan `subtle.ConstantTimeCompare`, bukan oleh prefix `/internal/`: env kosong membalas **503** yang menyebut env-nya (401 polos membuat orang mencurigai sisi pemanggil), kunci salah **401**, `company_id` kosong **400** |
+
+Tiga keputusan yang layak dibaca sebelum menambah rute mesin berikutnya:
+
+- **Yang dibagikan DATA, bukan keputusan boleh-tidaknya.** Aturan "ditugaskan DAN CV aktif" hidup di `shared-library/common/cv_penugasan.go` dan dipakai KEDUA service; izinnya disumbang masing-masing pemanggil (finance `akuntansicv.cv.tulis`, procurement `budget.cv.transfer`). Menjawab kebolehan dari sini berarti menanam izin milik modul lain di dalam finance.
+- **Muatannya SEMPIT**, mengikuti preseden `/internal/badan-usaha`: nama resmi, singkatan, dan rujukan badan usaha payroll tidak ikut. Kunci layanan yang bocor tak boleh sekaligus membocorkan master.
+- **Gagal-tertutup di kedua pembacaan**, dan galat aslinya hanya masuk log. Daftar kosong di sisi procurement berarti "tak seorang pun ditugaskan", sehingga galat database akan menolak seluruh transfer CV dengan alasan yang salah. CV yang belum punya pemegang tetap dikirim dengan `pemegang: []`, supaya pemanggil dapat membedakannya dari CV yang tidak ada.
+
 ### Penjaga rute `/internal/` — bentuknya TIDAK seperti feed kalender
 
 Prefix `/internal/` **bukan** batas keamanan: gateway tetap meneruskannya dari internet ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Tetapi penjaganya di sini **tidak bisa** sekadar "wajib ada identitas" seperti feed kalender, karena pemanggil sahnya justru sumber KPI di employee-service yang memakai `routes.InternalRequest(nil, …)` — panggilan itu hanya membawa kunci gateway, **tanpa header identitas sama sekali**. Menuntut identitas akan memblokir pemanggil yang benar sambil tetap meloloskan orang lewat gateway.
