@@ -63,7 +63,9 @@ function Sub($id, $peran, $area, $keadaan, $alat = '') {
 
 $ud = Join-Path $Keluaran 'chrome-profil'
 $url = ([Uri](Join-Path $halaman 'kantor-agent.html')).AbsoluteUri
-$proses = Start-Process -FilePath $Chrome -ArgumentList @('--headless=new', '--disable-gpu', '--hide-scrollbars', "--user-data-dir=$ud", "--remote-debugging-port=$Port", '--window-size=1600,1150', $url) -PassThru -WindowStyle Hidden
+# TANPA --hide-scrollbars: flag itu membuat lebar bilah gulir terukur 0px, sehingga uji ketebalan bilah
+# di 3h akan lolos untuk aturan CSS apa pun. Bilah yang ikut terpotret di screenshot adalah harga yang murah.
+$proses = Start-Process -FilePath $Chrome -ArgumentList @('--headless=new', '--disable-gpu', "--user-data-dir=$ud", "--remote-debugging-port=$Port", '--window-size=1600,1150', $url) -PassThru -WindowStyle Hidden
 $script:galatJs = New-Object System.Collections.ArrayList
 $ws = $null
 try {
@@ -290,6 +292,45 @@ try {
   # gambarBadan tak memuat arah, badan hasil jalan ke timur (bermata) tetap terpasang dan mata masih terhitung
   $mataTiba = Eval '(function () { var g = document.querySelector("[data-lead=eeeeeeee-5555] .badan"); return g ? (g.innerHTML.match(/88ffff/g) || []).length : -1; })()'
   Check ($mataTiba -eq 0) "3g arah: badan digambar ulang saat berputar, bukan cuma keadaannya ($mataTiba mata sesudah menghadap utara)"
+
+  # 3h. panel samping bisa disembunyikan, dan bilah gulirnya lebih tipis dari bawaan peramban.
+  # Lebar bilah WAJIB diukur di peramban dengan elemen KONTROL pembanding: membacanya dari aturan CSS
+  # menyesatkan, karena scrollbar-width dan ::-webkit-scrollbar tidak sama-sama berlaku di tiap peramban.
+  $bilah = Eval '(function () {
+    var a = document.getElementById("sisi");
+    var k = document.createElement("div");
+    k.style.cssText = "position:absolute;left:-9999px;top:0;width:200px;height:100px;overflow-y:scroll";
+    k.innerHTML = "<div style=\"height:400px\"></div>";
+    document.body.appendChild(k);
+    var kontrol = k.offsetWidth - k.clientWidth;
+    var sisiAsli = a.style.overflowY;
+    a.style.overflowY = "scroll";
+    var cs = getComputedStyle(a);
+    var tepi = parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth);
+    var panel = a.offsetWidth - a.clientWidth - tepi;
+    a.style.overflowY = sisiAsli;
+    k.parentNode.removeChild(k);
+    return { panel: panel, kontrol: kontrol };
+  })()'
+  Check ($bilah.panel -gt 0 -and $bilah.panel -le 6 -and $bilah.panel -lt $bilah.kontrol) "3h panel: bilah gulir panel $($bilah.panel)px, lebih tipis dari bilah bawaan $($bilah.kontrol)px"
+  $sebelum = Eval '(function () { return document.getElementById("panggung").getBoundingClientRect().width; })()'
+  Eval '(function () { document.getElementById("saklar-panel").click(); return 1; })()' | Out-Null
+  $sesudah = Eval '(function () {
+    var a = document.getElementById("sisi"), s = document.getElementById("saklar-panel");
+    return { sembunyi: a.hidden, satuKolom: document.querySelector("main").classList.contains("tanpa-panel"),
+      teks: s.textContent.trim(), aria: s.getAttribute("aria-expanded"),
+      panggung: document.getElementById("panggung").getBoundingClientRect().width };
+  })()'
+  Check ($sesudah.sembunyi -eq $true -and $sesudah.satuKolom -eq $true -and $sesudah.teks -eq 'tampilkan panel' -and $sesudah.aria -eq 'false' -and $sesudah.panggung -gt $sebelum) "3h panel: saklar menyembunyikan panel dan denah melebar ($([int]$sebelum)px -> $([int]$sesudah.panggung)px)"
+  Eval '(function () { document.getElementById("saklar-panel").click(); return 1; })()' | Out-Null
+  $kembali = Eval '(function () {
+    var a = document.getElementById("sisi"), s = document.getElementById("saklar-panel");
+    return { tampil: !a.hidden, teks: s.textContent.trim(), aria: s.getAttribute("aria-expanded"),
+      kartu: document.querySelectorAll("#panel .kartu").length };
+  })()'
+  Check ($kembali.tampil -eq $true -and $kembali.teks -eq 'sembunyikan panel' -and $kembali.aria -eq 'true' -and $kembali.kartu -gt 0) "3h panel: saklar mengembalikannya lengkap dengan kartunya ($($kembali.kartu) kartu)"
+  Foto '3h-panel'
+
   # 4. ramai: enam Lead di ruang server -> label ringkas
   Tulis-Data (1..6 | ForEach-Object { Sesi ('cccccccc-000' + $_) ('Lead ramai ' + $_) 'server' 'alat' 'PowerShell' 'pnpm test' })
   $ok = Tunggu { @(Robot | Where-Object { -not $_.pergi -and $_.area -eq 'server' -and -not $_.jalan }).Count -eq 6 } 25

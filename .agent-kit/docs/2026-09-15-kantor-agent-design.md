@@ -636,3 +636,36 @@ rapat (arah area lain ditulis mati di `SPOT`), dan test-nya cuma mengisi satu ku
 Karena itu 3f kini mengisi empat kursi sekaligus, memeriksa tiap kursi terhadap vektornya sendiri, dan menuntut
 kedua sumbu terwakili. Sesudah itu mutasi yang sama membuat check-nya merah sambil menyebut dua kursi yang
 terbalik.
+
+## Panel samping bisa disembunyikan (kit 1.23.0, 2026-09-16)
+
+Permintaan pemilik atas halaman terpasang: bilah gulir panel **LEAD HIDUP** dikecilkan, dan panelnya bisa
+disembunyikan.
+
+**Saklar.** Satu tombol di kanan atas header, `#saklar-panel`, memakai `aria-expanded` dan teksnya ikut berganti
+(`sembunyikan panel` ↔ `tampilkan panel`). Menyembunyikan memasang `hidden` pada `<aside>` dan kelas `tanpa-panel`
+pada `<main>`, yang membuat gridnya satu kolom sehingga denah mengisi ruangnya; terukur di jendela 1600px, panggung
+melebar dari 1188px ke 1527px. Isi panel tidak dibongkar, jadi kartunya kembali utuh saat ditampilkan lagi.
+
+Pilihannya diingat lewat `localStorage`. Di `file://` Chrome menolak akses itu dengan `SecurityError`, jadi baca dan
+tulisnya dibungkus `try` dan kegagalannya ditelan: saklarnya tetap bekerja, hanya tak diingat antar-buka. Ini
+satu-satunya tempat halaman menyimpan keadaan milik pembaca, dan kehilangannya tidak mengubah arti apa pun.
+
+**Bilah gulir.** 6px lewat `::-webkit-scrollbar`, dan `scrollbar-width: thin` sengaja **hanya** dipasang di dalam
+`@supports not selector(::-webkit-scrollbar)`. Alasannya sifat Chrome yang sudah terukur di tempat lain: begitu
+`scrollbar-width` dipasang pada elemen yang sama, seluruh pseudo-element `::-webkit-scrollbar` diabaikan, dan
+`thin` di sana menghasilkan 10px sementara aturan webkit saja menghasilkan 6px. Peramban yang tak mengenal
+`::-webkit-scrollbar` (Firefox) tetap mendapat bilah tipis lewat cabang `@supports` itu.
+
+**Uji.** `tests/kantor-agent-browser.ps1` naik ke 41 check: lebar bilah gulir diukur di peramban dengan elemen
+**kontrol** pembanding, panel disembunyikan lalu dikembalikan, dan denah dibuktikan melebar.
+
+Dua hal membuat check bilah gulir nyaris vakum, dan keduanya hanya ketahuan dari mengukur:
+
+- Harness uji menjalankan Chrome dengan `--hide-scrollbars`, sehingga bilah bawaan terukur **0px** dan check-nya
+  akan lolos untuk aturan CSS apa pun. Flag itu dilepas; bilah yang ikut terpotret di screenshot adalah harga yang
+  murah.
+- `offsetWidth - clientWidth` pada `<aside>` memuat dua border 1px miliknya, jadi angka mentahnya 8px dan bukan 6px.
+  Border dikurangkan lebih dulu supaya yang diklaim spec ini sama dengan yang diukur.
+
+Kontrol mutasi: mematikan aturan `::-webkit-scrollbar` membuat check itu merah dengan bilah kembali ke 15px.

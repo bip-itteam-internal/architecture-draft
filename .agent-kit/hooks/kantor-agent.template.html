@@ -43,6 +43,9 @@ header h1{margin:0;font-size:13px;letter-spacing:.14em;color:var(--ink);font-wei
 .tab button[aria-pressed="true"]{color:var(--ink);border-color:var(--ink-2);font-weight:600}
 main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;padding:12px 20px 16px}
 @media (max-width:1100px){main{grid-template-columns:1fr}}
+main.tanpa-panel{grid-template-columns:minmax(0,1fr)}
+.saklar{font:inherit;font-size:12px;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:3px 10px;cursor:pointer}
+.saklar:hover,.saklar:focus-visible{color:var(--ink);border-color:var(--ink-2)}
 .panggung{position:relative;border:1px solid var(--border);border-radius:6px;background:radial-gradient(ellipse at 50% 45%,#1d2230 0,#0d0d0d 75%);overflow:hidden}
 .panggung svg{display:block;width:100%;height:auto}
 .panggung.basi #dunia .robot,.panggung.basi #label{opacity:.4}
@@ -75,6 +78,14 @@ svg text{font-family:var(--mono)}
 @keyframes kedip{50%{opacity:.25}}
 @keyframes titik{0%,100%{opacity:.25}50%{opacity:1}}
 aside{border:1px solid var(--border);border-radius:6px;background:var(--surface);padding:12px 14px;max-height:800px;overflow:auto}
+/* Bilah gulir tipis. Di Chrome `scrollbar-width` MENANG atas ::-webkit-scrollbar, dan `thin` di sana
+   terukur 10px sementara aturan webkit saja 6px, jadi scrollbar-width sengaja hanya dipasang untuk
+   peramban yang tak mengenal ::-webkit-scrollbar (Firefox). Diukur di browser, bukan dibaca dari kelas. */
+aside::-webkit-scrollbar{width:6px;height:6px}
+aside::-webkit-scrollbar-track{background:transparent}
+aside::-webkit-scrollbar-thumb{background:#3a3f48;border-radius:3px}
+aside::-webkit-scrollbar-thumb:hover{background:#4d535e}
+@supports not selector(::-webkit-scrollbar){aside{scrollbar-width:thin;scrollbar-color:#3a3f48 transparent}}
 aside h2{margin:0 0 8px;font-size:11px;letter-spacing:.14em;color:var(--muted);font-weight:600}
 aside h2.jarak{margin-top:14px}
 .kartu{border-top:1px solid var(--grid);padding:8px 6px;margin:0 -6px;border-radius:4px}
@@ -110,6 +121,7 @@ footer li{margin:2px 0}
   <h1>KANTOR AGENT</h1>
   <span class="info" id="info">menunggu penulis</span>
   <span class="status" id="status"></span>
+  <button type="button" class="saklar" id="saklar-panel" aria-controls="sisi" aria-expanded="true">sembunyikan panel</button>
 </header>
 <div class="banner" id="banner" role="status" hidden></div>
 <p class="legenda"><b>Perpustakaan</b> baca &amp; cari · <b>Meja</b> edit &amp; berpikir · <b>Ruang server</b> PowerShell, test, build, git, tugas latar · <b>Ruang rapat</b> menunggu subagent · <b>Lounge</b> menunggu Anda · <b>!</b> minta izin Anda</p>
@@ -120,7 +132,7 @@ footer li{margin:2px 0}
     <svg id="denah" viewBox="-450 -150 1000 640" role="img" aria-label="Denah kantor agent"></svg>
     <p class="kosong-panggung" id="kosong">Menunggu penulis...</p>
   </div>
-  <aside>
+  <aside id="sisi">
     <h2>LEAD HIDUP</h2>
     <div id="panel"><p class="kosong">Belum ada data.</p></div>
     <h2 class="jarak">FEED PERPINDAHAN</h2>
@@ -161,6 +173,24 @@ footer li{margin:2px 0}
   var elFeed = document.getElementById('feed');
   var elKosong = document.getElementById('kosong');
   var elAmbangHidup = document.getElementById('ambang-hidup');
+  var elMain = document.querySelector('main');
+  var elSisi = document.getElementById('sisi');
+  var elSaklar = document.getElementById('saklar-panel');
+
+  // Saklar panel samping. Pilihannya diingat lewat localStorage bila ada; di file:// Chrome menolaknya
+  // dengan SecurityError, jadi kegagalannya ditelan dan saklarnya tetap bekerja untuk sesi ini.
+  var KUNCI_PANEL = 'kantor-agent:panel';
+  function pasangPanel(tampil) {
+    elSisi.hidden = !tampil;
+    elMain.classList.toggle('tanpa-panel', !tampil);
+    elSaklar.setAttribute('aria-expanded', tampil ? 'true' : 'false');
+    elSaklar.textContent = tampil ? 'sembunyikan panel' : 'tampilkan panel';
+    try { localStorage.setItem(KUNCI_PANEL, tampil ? '1' : '0'); } catch (e) { }
+  }
+  var panelAwal = null;
+  try { panelAwal = localStorage.getItem(KUNCI_PANEL); } catch (e) { }
+  pasangPanel(panelAwal !== '0');
+  elSaklar.addEventListener('click', function () { pasangPanel(elSaklar.getAttribute('aria-expanded') !== 'true'); });
   var gerakHalus = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var halamanMulai = Date.now();
 
