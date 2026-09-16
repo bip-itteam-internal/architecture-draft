@@ -37,7 +37,17 @@ if hidup; then
   echo "Penulis Kantor Agent sudah jalan (pid $P); tidak menyalakan yang kedua."
 else
   nohup python3 "$DIR/kantor-agent.py" --workspace "$WS" --proyek-dir "$PROYEK" --loop "$INTERVAL" --sepi-menit "$SEPI" --log "$LOG" >/dev/null 2>&1 &
-  echo "Penulis Kantor Agent menyala (pid $!)."
+  BARU=$!
+  # Tunggu PID tercatat. Penulis yang kalah kunci (dua launcher serentak, kit 1.21.0) keluar 4 tanpa menulis PID,
+  # jadi yang ditunggu PID pemenangnya, siapa pun itu, bukan hanya proses yang baru dinyalakan.
+  i=0
+  while [ "$i" -lt 100 ] && ! hidup; do sleep 0.3; i=$((i + 1)); done
+  if ! hidup; then echo "kantor-agent: penulis tidak menyala dalam 30 detik. Lihat $LOG" >&2; exit 3; fi
+  if [ "$P" = "$BARU" ]; then
+    echo "Penulis Kantor Agent menyala (pid $P)."
+  else
+    echo "Penulis Kantor Agent sudah jalan (pid $P); tidak menyalakan yang kedua."
+  fi
 fi
 echo "Kantor Agent: $HTML  (hentikan: kantor-agent.sh --berhenti)"
 buka

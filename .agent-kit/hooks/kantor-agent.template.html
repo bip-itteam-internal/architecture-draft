@@ -54,12 +54,15 @@ svg text{font-family:var(--mono)}
 .tag text{fill:#fff;font-size:8px}
 .gelembung rect{fill:#fff}
 .gelembung text{fill:#111;font-size:7.5px}
+.gelembung.izin rect{fill:#ec835a}
+.gelembung.izin text{font-weight:700}
 .robot{cursor:pointer}
 .robot .badan{transform-box:fill-box;transform-origin:50% 100%}
 .robot.jalan .badan{animation:langkah .3s linear infinite}
 .robot.ketik .badan{animation:ketik .45s ease-in-out infinite}
 .robot.baca .badan{animation:baca 2.4s ease-in-out infinite}
 .robot.redup{opacity:.45}
+.robot.izin{filter:drop-shadow(0 0 5px #ec835a)}
 .robot.sorot{filter:drop-shadow(0 0 5px #fff)}
 .tag.redup,.gelembung.redup{opacity:.45}
 .led{animation:kedip 1.4s steps(1) infinite}
@@ -82,6 +85,11 @@ aside h2.jarak{margin-top:14px}
 .kepala b{color:#fff}
 .chip{border:1px solid var(--border);border-radius:3px;padding:0 6px;font-size:11px}
 .chip.peringatan{border-color:var(--warning);color:var(--warning)}
+.chip.izin{border-color:var(--serious);color:var(--serious);font-weight:600}
+.salin{font:inherit;font-size:11px;margin-left:auto;background:transparent;color:var(--ink-2);border:1px solid var(--border);border-radius:3px;padding:0 6px;cursor:pointer}
+.salin:hover{color:var(--ink);border-color:var(--ink-2)}
+.petunjuk{font-size:11px;color:var(--muted)}
+.id-manual{display:block;width:100%;margin-top:4px;font:inherit;font-size:11px;background:var(--page);color:var(--ink);border:1px solid var(--serious);border-radius:3px;padding:1px 4px}
 .judul{color:var(--ink);margin:3px 0 2px}
 .kini{font-size:12px}
 .anak{font-size:11px;color:var(--muted);padding-left:10px}
@@ -104,7 +112,7 @@ footer li{margin:2px 0}
   <span class="status" id="status"></span>
 </header>
 <div class="banner" id="banner" role="status" hidden></div>
-<p class="legenda"><b>Perpustakaan</b> baca &amp; cari · <b>Meja</b> edit &amp; berpikir · <b>Ruang server</b> PowerShell, test, build, git · <b>Ruang rapat</b> menunggu subagent · <b>Lounge</b> menunggu Anda</p>
+<p class="legenda"><b>Perpustakaan</b> baca &amp; cari · <b>Meja</b> edit &amp; berpikir · <b>Ruang server</b> PowerShell, test, build, git, tugas latar · <b>Ruang rapat</b> menunggu subagent · <b>Lounge</b> menunggu Anda · <b>!</b> minta izin Anda</p>
 <nav class="tab" id="tab" aria-label="Lead"></nav>
 
 <main>
@@ -121,9 +129,9 @@ footer li{margin:2px 0}
 </main>
 
 <footer><ul>
-  <li>Sesi hidup = transkrip Claude Code ditulis dalam <span id="ambang-hidup">30</span> menit terakhir dan cwd-nya di dalam workspace ini. Satu mesin saja.</li>
-  <li>Prompt izin tidak tercatat di transkrip: tanda <b>?</b> pada tool yang berjalan lebih dari 60 detik berarti tool itu mungkin sedang menunggu persetujuan.</li>
-  <li>Menunggu tugas shell latar tampil sebagai "menunggu Anda"; subagent latar tampil sebagai robot kecil.</li>
+  <li>Sesi = sesi Claude Code yang TERBUKA menurut registri Claude Code (~/.claude/sessions) dan cwd-nya di dalam workspace ini. Bila registri tak terbaca, sesi ditebak dari transkrip yang ditulis dalam <span id="ambang-hidup">30</span> menit terakhir. Satu mesin saja.</li>
+  <li>Gelembung <b>!</b> = sesi sedang menunggu izin Anda, dibaca dari registri. Tanpa registri, prompt izin tak tercatat: tanda <b>?</b> pada tool yang berjalan lebih dari 60 detik berarti tool itu mungkin sedang menunggu persetujuan.</li>
+  <li>Tugas shell latar yang belum selesai tampil di ruang server sebagai "menunggu tugas latar"; subagent latar tampil sebagai robot kecil.</li>
   <li>Format transkrip dinyatakan internal oleh Claude Code dan bisa berubah di rilis mana pun; bila begitu, halaman ini menampilkan peringatan, bukan kantor kosong.</li>
 </ul></footer>
 
@@ -140,6 +148,8 @@ footer li{margin:2px 0}
   var WARNA = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300'];
   var ABU = '#8a8f98', LED_KOSONG = '#3a3f48';
   var NAMA_AREA = { perpustakaan: 'Perpustakaan', meja: 'Meja', server: 'Ruang server', rapat: 'Ruang rapat', lounge: 'Lounge', koridor: 'Koridor', pintu: 'Pintu' };
+  var VERSI_DATA_HALAMAN = 2;                                     // naik bersama VERSI_DATA di kantor-agent.py
+  var NAMA_ASAL = { 'claude-vscode': 'VS Code', cli: 'terminal' };  // entrypoint registri; yang tak dikenal tampil apa adanya
 
   var svg = document.getElementById('denah');
   var panggung = document.getElementById('panggung');
@@ -459,7 +469,7 @@ footer li{margin:2px 0}
   var robots = new Map();
   var podMilik = POD.map(function () { return null; });
   var warnaMilik = WARNA.map(function () { return null; });
-  var dataTerakhir = null, sorotId = null, labelKotor = true, tabTanda = '';
+  var dataTerakhir = null, sorotId = null, labelKotor = true, tabTanda = '', panelTerakhir = '', salinStatus = null;
   var feed = [];
 
   function warnaRobot(r) {
@@ -651,20 +661,27 @@ footer li{margin:2px 0}
     if (r.pergi) return 'pulang';
     if (r.keadaan === 'berpikir') return 'berpikir';
     if (r.keadaan === 'menunggu_subagent') return 'menunggu subagent';
-    if (r.keadaan === 'menunggu_anda') return r.alat ? 'tanya: ' + (r.detail || r.alat) : 'menunggu Anda';
+    if (r.keadaan === 'menunggu_izin') return 'minta izin' + (r.alat ? ': ' + r.alat + (r.detail ? ' · ' + r.detail : '') : '');
+    if (r.keadaan === 'menunggu_latar') return 'menunggu tugas latar: ' + (r.detail || r.alat || '?');
+    if (r.keadaan === 'menunggu_anda') return r.alat ? 'tanya: ' + (r.detail || r.alat) : (r.detail ? 'menunggu Anda (' + r.detail + ')' : 'menunggu Anda');
     var dur = durasiKini(r, lewat);
     return (r.alat || '?') + (r.detail ? ' · ' + r.detail : '') + (dur != null && dur >= IZIN_MUNGKIN_DETIK ? ' · ' + durasi(dur) : '');
   }
-  function mungkinIzin(r, lewat) { var dur = durasiKini(r, lewat); return r.keadaan === 'alat' && dur != null && dur >= IZIN_MUNGKIN_DETIK; }
+  function registriAktif() { return !!(dataTerakhir && dataTerakhir.skema && dataTerakhir.skema.sumber_hidup === 'registri'); }
+  // dengan registri, dialog izin terbaca langsung sebagai menunggu_izin; tebakan dari durasi hanya untuk mode transkrip
+  function mungkinIzin(r, lewat) { var dur = durasiKini(r, lewat); return !registriAktif() && r.keadaan === 'alat' && dur != null && dur >= IZIN_MUNGKIN_DETIK; }
   function perbaruiKelas(r) {
     var lewat = lewatDetik(), diam = diamKini(r, lewat);
     r.el.classList.toggle('ketik', !r.jalan && r.keadaan === 'alat' && r.areaSekarang === 'meja');
     r.el.classList.toggle('baca', !r.jalan && r.keadaan === 'alat' && r.areaSekarang === 'perpustakaan');
-    r.el.classList.toggle('redup', diamLama(diam));
+    // sesi yang menunggu izin tak pernah diredupkan: makin lama ia menunggu, makin perlu dilihat
+    r.el.classList.toggle('redup', diamLama(diam) && r.keadaan !== 'menunggu_izin');
+    r.el.classList.toggle('izin', !r.pergi && r.keadaan === 'menunggu_izin');
     r.el.classList.toggle('sorot', sorotId != null && r.el.getAttribute('data-lead') === sorotId);
     var judul = r.tipe === 'lead'
       ? r.key + '\n' + (r.judul || '(tanpa judul)') + '\n' + (NAMA_AREA[r.areaSekarang] || '') + ' · ' + kini(r, lewat)
       : (r.jenis || 'subagent') + ': ' + (r.deskripsi || '') + '\n' + (NAMA_AREA[r.areaSekarang] || '') + ' · ' + kini(r, lewat);
+    if (r.tipe === 'lead' && r.keadaan === 'menunggu_izin') judul += '\nSesi ini menunggu izin Anda: buka sesinya untuk menjawab.';
     if (mungkinIzin(r, lewat)) judul += '\nPrompt izin tidak tercatat di transkrip: tool ini mungkin sedang menunggu persetujuan.';
     r.el.firstChild.textContent = judul;
   }
@@ -676,21 +693,25 @@ footer li{margin:2px 0}
     robots.forEach(function (r) {
       var padat = RUANG_PADAT[r.areaSekarang] && hitung[r.areaSekarang] >= PADAT;
       var warna = warnaRobot(r), atas = P(r.x, r.y, (r.puncak || 1.5) + 0.3), kepalaY = P(r.x, r.y, (r.puncak || 1.5) + 0.02)[1];
-      var diam = diamKini(r, lewat), redup = diamLama(diam);
+      var izin = r.tipe === 'lead' && !r.pergi && r.keadaan === 'menunggu_izin';
+      var diam = diamKini(r, lewat), redup = diamLama(diam) && !izin;
       var teks = labelRobot(r) + (redup ? ' · diam ' + durasi(diam) : '') + (r.pergi ? ' · pulang' : '');
       var lw = teks.length * 4.85 + 14, isi = '', pikir = false;
-      if (r.tipe === 'lead' && !r.pergi && !padat) {
+      // izin tak ikut label ringkas ruang padat: satu-satunya keadaan yang berhenti sampai Anda menjawab
+      if (izin) isi = potong('! izin' + (r.alat ? ': ' + r.alat + (r.detail ? ' · ' + r.detail : '') : ''), 30);
+      else if (r.tipe === 'lead' && !r.pergi && !padat) {
         if (r.keadaan === 'berpikir') pikir = true;
         else if (r.keadaan === 'menunggu_subagent') isi = 'menunggu ' + (r.jumlahSub || 0) + ' subagent';
+        else if (r.keadaan === 'menunggu_latar') isi = potong('tugas latar: ' + (r.detail || r.alat || '?'), 30);
         else if (r.keadaan === 'menunggu_anda') isi = r.alat ? potong('tanya: ' + (r.detail || r.alat), 30) : 'menunggu Anda';
         else if (r.keadaan === 'alat') {
           var dur = durasiKini(r, lewat);
-          isi = potong(r.alat + (r.detail ? ' · ' + r.detail : ''), 30) + (dur != null && dur >= IZIN_MUNGKIN_DETIK ? ' · ' + durasi(dur) + ' ?' : '');
+          isi = potong(r.alat + (r.detail ? ' · ' + r.detail : ''), 30) + (dur != null && dur >= IZIN_MUNGKIN_DETIK ? ' · ' + durasi(dur) : '') + (mungkinIzin(r, lewat) ? ' ?' : '');
         }
       }
       var bw = isi ? isi.length * 4.55 + 10 : 0;
-      kandidat.push({ r: r, prioritas: r.tipe === 'lead' ? 0 : 1, x: atas[0], y: atas[1], kepalaY: kepalaY, lebar: Math.max(lw, bw, pikir ? lw + 30 : 0),
-        tinggi: isi || pikir ? 27 : 12, teks: teks, lw: lw, isi: isi, bw: bw, pikir: pikir, warna: warna, redup: redup });
+      kandidat.push({ r: r, prioritas: izin ? -1 : r.tipe === 'lead' ? 0 : 1, x: atas[0], y: atas[1], kepalaY: kepalaY, lebar: Math.max(lw, bw, pikir ? lw + 30 : 0),
+        tinggi: isi || pikir ? 27 : 12, teks: teks, lw: lw, isi: isi, bw: bw, pikir: pikir, warna: warna, redup: redup, izin: izin });
     });
     kandidat.sort(function (a, b) { return a.prioritas - b.prioritas || b.y - a.y; });
     var GESER = [];
@@ -707,7 +728,7 @@ footer li{margin:2px 0}
       terpakai.push([l.x + dx - l.lebar / 2 - 2, l.y + dy - l.tinggi + 3, l.x + dx + l.lebar / 2 + 2, l.y + dy + 4]);
       if (dx || dy) html += '<line x1="' + l.x.toFixed(1) + '" y1="' + l.kepalaY.toFixed(1) + '" x2="' + X + '" y2="' + (l.y + dy + 3).toFixed(1) + '" stroke="#ffffff" stroke-opacity=".6" stroke-width=".7"/>';
       html += '<g class="tag' + kelasRedup + '" transform="translate(' + X + ',' + Y + ')"><rect class="dasar" x="' + (-l.lw / 2) + '" y="-9" width="' + l.lw + '" height="12" rx="2"/><rect x="' + (-l.lw / 2) + '" y="-9" width="3" height="12" fill="' + l.warna + '"/><text text-anchor="middle" x="1.5" y="0">' + esc(l.teks) + '</text></g>';
-      if (l.isi) html += '<g class="gelembung' + kelasRedup + '" transform="translate(' + X + ',' + (l.y + dy - 15).toFixed(1) + ')"><rect x="' + (-l.bw / 2) + '" y="-9" width="' + l.bw + '" height="11" rx="5"/><text text-anchor="middle" y="-0.5">' + esc(l.isi) + '</text></g>';
+      if (l.isi) html += '<g class="gelembung' + (l.izin ? ' izin' : '') + kelasRedup + '" transform="translate(' + X + ',' + (l.y + dy - 15).toFixed(1) + ')"><rect x="' + (-l.bw / 2) + '" y="-9" width="' + l.bw + '" height="11" rx="5"/><text text-anchor="middle" y="-0.5">' + esc(l.isi) + '</text></g>';
       else if (l.pikir) html += '<g class="pikir" transform="translate(' + (l.x + dx + l.lw / 2 + 4).toFixed(1) + ',' + (l.y + dy - 4).toFixed(1) + ')"><circle r="1.6"/><circle cx="5" cy="-4" r="2.2"/><circle cx="12" cy="-9" r="3"/></g>';
     });
     lapisLabel.innerHTML = html;
@@ -723,7 +744,8 @@ footer li{margin:2px 0}
 
   // ---------------- data ----------------
   function salin(r, s) {
-    ['judul', 'tahap', 'pr', 'area', 'keadaan', 'alat', 'detail', 'durasi_detik', 'diam_detik', 'jenis', 'peran', 'deskripsi'].forEach(function (k) { r[k] = s[k]; });
+    ['judul', 'tahap', 'pr', 'area', 'keadaan', 'alat', 'detail', 'durasi_detik', 'diam_detik', 'jenis', 'peran', 'deskripsi',
+      'asal', 'nama', 'pid'].forEach(function (k) { r[k] = s[k]; });
     r.jumlahSub = (s.subagent || []).length;
   }
   function catatFeed(r, dari, ke) {
@@ -735,18 +757,22 @@ footer li{margin:2px 0}
     if (feed.length > 30) feed.length = 30;
     renderFeed();
   }
+  // Data versi lain (tab lama melewati upgrade kit, atau penulis dari kit lama masih jalan) tidak ditafsirkan: arti
+  // field-nya bisa berbeda. Robot dipulangkan dan banner menyebut cara membetulkannya.
+  function versiCocok(d) { return !!d && d.versi === VERSI_DATA_HALAMAN; }
+  function sesiData(d) { return versiCocok(d) ? d.sesi : []; }
   function terima(d) {
     if (!d || typeof d !== 'object' || !Array.isArray(d.sesi)) return;
     if (dataTerakhir && d.dibuat === dataTerakhir.dibuat) return;
     dataTerakhir = d;
-    var sekarang = Date.now(), hadir = new Set();
-    d.sesi.forEach(function (s) {
+    var sekarang = Date.now(), hadir = new Set(), sesi = sesiData(d);
+    sesi.forEach(function (s) {
       hadir.add(s.id);
       (s.subagent || []).forEach(function (a) { hadir.add(s.id + ':' + a.id); });
     });
     // yang pulang dilepas identitasnya DULU, supaya Lead baru di data yang sama tak kebagian abu
     robots.forEach(function (r) { if (!hadir.has(r.key) && !r.pergi) { r.pergi = true; lepasIdentitas(r); } });
-    d.sesi.forEach(function (s) {
+    sesi.forEach(function (s) {
       var r = robots.get(s.id) || buatRobot(s.id, 'lead', null);
       if (r.pergi) { r.pergi = false; klaimIdentitas(r); }
       salin(r, s);
@@ -788,22 +814,45 @@ footer li{margin:2px 0}
         return '<button type="button" data-id="' + esc(r.key) + '" aria-pressed="' + (sorotId === r.key) + '"><i style="background:' + warnaRobot(r) + '"></i>' + esc(potong(r.judul || r.key.slice(0, 8), 26)) + '</button>';
       }).join('');
     }
-    if (!leads.length) { elPanel.innerHTML = '<p class="kosong">' + (dataTerakhir ? 'Tak ada sesi hidup.' : 'Belum ada data.') + '</p>'; return; }
-    elPanel.innerHTML = leads.map(function (r) {
+    var html;
+    if (!leads.length) html = '<p class="kosong">' + (!dataTerakhir ? 'Belum ada data.' : !versiCocok(dataTerakhir) ? 'Versi data tidak cocok.' : 'Tak ada sesi hidup.') + '</p>';
+    else html = leads.map(function (r) {
       var anak = [];
       robots.forEach(function (a) { if (a.tipe === 'sub' && a.indukKey === r.key && !a.pergi) anak.push(a); });
-      var diam = diamKini(r, lewat);
+      var diam = diamKini(r, lewat), izin = r.keadaan === 'menunggu_izin', asal = r.asal ? (NAMA_ASAL[r.asal] || r.asal) : '', arah = petunjuk(r);
+      var st = salinStatus && salinStatus.id === r.key && Date.now() < salinStatus.sampai ? salinStatus : null;
       return '<div class="kartu' + (sorotId === r.key ? ' sorot' : '') + '" id="k-' + esc(r.key) + '">' +
         '<div class="kepala"><i style="background:' + warnaRobot(r) + '"></i><b title="' + esc(r.key) + '">' + esc(r.key.slice(0, 8)) + '</b>' +
+        (asal ? '<span class="chip asal">' + esc(asal) + '</span>' : '') +
         (r.tahap && r.tahap !== 'mulai' ? '<span class="chip">' + esc(r.tahap) + '</span>' : '') +
         (r.pr ? '<span class="chip">PR ' + esc(r.pr) + '</span>' : '') +
-        (diamLama(diam) ? '<span class="chip">diam ' + durasi(diam) + '</span>' : '') +
-        (mungkinIzin(r, lewat) ? '<span class="chip peringatan" title="Prompt izin tidak tercatat di transkrip">? izin</span>' : '') + '</div>' +
+        (izin ? '<span class="chip izin">! izin</span>' : '') +
+        (diamLama(diam) && !izin ? '<span class="chip">diam ' + durasi(diam) + '</span>' : '') +
+        (mungkinIzin(r, lewat) ? '<span class="chip peringatan" title="Prompt izin tidak tercatat di transkrip">? izin</span>' : '') +
+        '<button type="button" class="salin" data-salin="' + esc(r.key) + '" title="Salin id sesi lengkap">' + esc(st ? st.teks : 'salin id') + '</button></div>' +
         '<div class="judul">' + esc(r.judul || '(tanpa judul)') + '</div>' +
         '<div class="kini">' + esc((NAMA_AREA[r.areaSekarang] || '') + ' · ' + kini(r, lewat)) + '</div>' +
+        (arah ? '<div class="petunjuk">' + esc(arah) + '</div>' : '') +
+        (st && st.manual ? '<input class="id-manual" readonly aria-label="Id sesi, salin manual" value="' + esc(r.key) + '">' : '') +
         anak.map(function (a) { return '<div class="anak">↳ ' + esc(a.peran + ' · ' + (NAMA_AREA[a.areaSekarang] || '') + ' · ' + kini(a, lewat) + (a.deskripsi ? ' · ' + a.deskripsi : '')) + '</div>'; }).join('') +
         '</div>';
     }).join('');
+    // panel dirender tiap detik: menulis ulang HTML yang sama membuang fokus tombol salin dan teks yang sedang dipilih
+    // selagi kolom salin manual dipakai, panel tidak ditulis ulang karena pilihan teksnya akan hilang tiap detik. Hanya
+    // selama batas umpan baliknya: fokus yang tertinggal di kolom itu (jendela ditinggal) tak boleh membekukan panel.
+    var aktif = document.activeElement;
+    if (salinStatus && salinStatus.manual && Date.now() < salinStatus.sampai &&
+        aktif && aktif.classList && aktif.classList.contains('id-manual') && elPanel.contains(aktif)) return;
+    if (html !== panelTerakhir) { elPanel.innerHTML = html; panelTerakhir = html; }
+  }
+  // cara ke sesinya dari luar halaman; halaman ini tak bisa memfokuskan jendela sesi
+  function petunjuk(r) {
+    var bagian = [];
+    if (r.asal === 'claude-vscode') bagian.push('buka di panel Claude Code, jendela VS Code workspace ini');
+    else if (r.asal === 'cli') bagian.push('buka di jendela terminal yang menjalankan claude');
+    if (r.nama) bagian.push('nama ' + r.nama);
+    if (r.pid != null) bagian.push('pid ' + r.pid);
+    return bagian.join(' · ');
   }
   function renderFeed() {
     if (!feed.length) { elFeed.innerHTML = '<li class="kosong">Belum ada perpindahan.</li>'; return; }
@@ -828,27 +877,45 @@ footer li{margin:2px 0}
     var umur = Date.now() - Date.parse(d.dibuat), basi = !(umur <= BASI_MS);
     var sekali = !!(d.penulis && d.penulis.interval_detik === 0);   // --sekali: snapshot yang disengaja, bukan penulis mati
     panggung.classList.toggle('basi', basi);
-    var nLead = d.sesi.length, nSub = d.sesi.reduce(function (n, s) { return n + (s.subagent || []).length; }, 0);
-    elInfo.textContent = nLead + ' Lead · ' + nSub + ' subagent';
+    var sesi = sesiData(d), skema = d.skema || {}, cocok = versiCocok(d), hidupMenit = (d.ambang && d.ambang.hidup_menit) || 30;
+    var nLead = sesi.length, nSub = sesi.reduce(function (n, s) { return n + (s.subagent || []).length; }, 0);
+    elInfo.textContent = cocok ? nLead + ' Lead · ' + nSub + ' subagent' : 'versi data tidak cocok';
     if (d.ambang && d.ambang.hidup_menit) elAmbangHidup.textContent = d.ambang.hidup_menit;
     svg.setAttribute('aria-label', 'Denah kantor agent: ' + nLead + ' Lead, ' + nSub + ' subagent');
     elStatus.className = 'status ' + (basi ? 'basi' : 'live');
     elStatus.textContent = basi ? (sekali ? 'snapshot' : 'data basi') : 'live · ' + Math.max(0, Math.round(umur / 1000)) + ' dtk lalu';
-    if (d.penulis && d.penulis.berhenti === 'sepi') banner = 'Penulis berhenti: tak ada sesi hidup cukup lama. Jalankan /kantor-agent untuk menyalakannya lagi.';
-    else if (basi && sekali) banner = 'Snapshot sekali (--sekali) dari ' + jam(d.dibuat) + '. Jalankan /kantor-agent tanpa --sekali untuk data live.';
-    else if (basi) banner = 'Data berhenti sejak ' + jam(d.dibuat) + ' (' + durasi(Math.max(0, Math.round(umur / 1000))) + ' lalu). Penulis mati atau dihentikan; jalankan /kantor-agent.';
-    if (d.skema && d.skema.dikenali === false) {
+    var pesan = [];
+    if (!cocok) {
       galat = true;
-      banner = (banner ? banner + ' ' : '') + 'Format transkrip Claude Code tidak dikenali (' + d.skema.baris_rusak + ' dari ' + d.skema.baris_diurai + ' baris rusak). Perbarui agent-kit.';
+      pesan.push('Data dari penulis versi ' + d.versi + ', halaman ini membaca versi ' + VERSI_DATA_HALAMAN + ': penulis dan halaman berasal dari agent-kit yang berbeda. Jalankan /kantor-agent --berhenti, lalu /kantor-agent.');
     }
+    if (d.penulis && d.penulis.berhenti === 'sepi') pesan.push('Penulis berhenti: tak ada sesi hidup cukup lama. Jalankan /kantor-agent untuk menyalakannya lagi.');
+    else if (basi && sekali) pesan.push('Snapshot sekali (--sekali) dari ' + jam(d.dibuat) + '. Jalankan /kantor-agent tanpa --sekali untuk data live.');
+    else if (basi) pesan.push('Data berhenti sejak ' + jam(d.dibuat) + ' (' + durasi(Math.max(0, Math.round(umur / 1000))) + ' lalu). Penulis mati atau dihentikan; jalankan /kantor-agent.');
+    if (skema.dikenali === false) {
+      galat = true;
+      pesan.push('Format transkrip Claude Code tidak dikenali (' + skema.baris_rusak + ' dari ' + skema.baris_diurai + ' baris rusak). Perbarui agent-kit.');
+    }
+    if (cocok && skema.sumber_hidup === 'transkrip') {
+      pesan.push('Registri sesi Claude Code (~/.claude/sessions) tak terbaca: sesi ditebak dari transkrip yang ditulis ≤ ' + hidupMenit + ' menit, jadi sesi yang lama diam tak tampil dan prompt izin hanya ditebak (?).');
+    }
+    if (cocok && skema.registri_dicek && skema.registri_cocok === false) {
+      pesan.push('Registri sesi tidak cocok dengan claude agents (' + nLead + ' sesi di registri, ' + (skema.registri_catatan || '?') + '): jumlah robot bisa keliru. Format registri mungkin berubah; perbarui agent-kit.');
+    }
+    banner = pesan.join(' ');
     elBanner.hidden = !banner;
     elBanner.textContent = banner;
     elBanner.className = 'banner' + (galat ? ' galat' : '');
-    if (nLead === 0) {
-      var dilewati = d.skema && d.skema.dilewati_luar_workspace;
+    if (!cocok) {
       elKosong.hidden = false;
-      elKosong.textContent = 'Tak ada sesi Claude Code yang hidup di workspace ini (transkrip ditulis ≤ ' + ((d.ambang && d.ambang.hidup_menit) || 30) + ' menit).' +
-        (dilewati ? ' ' + dilewati + ' transkrip hidup di luar workspace dilewati.' : '');
+      elKosong.textContent = 'Versi data tidak cocok dengan halaman ini; lihat banner di atas.';
+    } else if (nLead === 0) {
+      var dilewati = skema.dilewati_luar_workspace;
+      elKosong.hidden = false;
+      elKosong.textContent = (skema.sumber_hidup === 'registri'
+        ? 'Tak ada sesi Claude Code yang terbuka di workspace ini.'
+        : 'Tak ada sesi Claude Code yang hidup di workspace ini (transkrip ditulis ≤ ' + hidupMenit + ' menit).') +
+        (dilewati ? ' ' + dilewati + ' sesi di luar workspace dilewati.' : '');
     } else {
       elKosong.hidden = true;
     }
@@ -881,11 +948,43 @@ footer li{margin:2px 0}
     renderPanel();
   });
 
+  // Salin id: navigator.clipboard lebih dulu (bisa ditolak tanpa izin atau di file://), lalu execCommand, lalu kolom
+  // teks terpilih untuk disalin manual. Umpan baliknya disimpan di salinStatus karena panel dirender ulang tiap detik.
+  function tandaiSalin(id, teks, ms, manual) {
+    salinStatus = { id: id, teks: teks, sampai: Date.now() + ms, manual: !!manual };
+    renderPanel();
+  }
+  function salinExecCommand(teks) {
+    var t = document.createElement('textarea'), ok = false;
+    t.value = teks;
+    t.setAttribute('readonly', '');
+    t.style.position = 'fixed'; t.style.top = '0'; t.style.opacity = '0';
+    document.body.appendChild(t);
+    t.select();
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(t);
+    return ok;
+  }
+  elPanel.addEventListener('click', function (e) {
+    var b = e.target.closest('.salin');
+    if (!b) return;
+    var id = b.getAttribute('data-salin');
+    function cadangan() {
+      if (salinExecCommand(id)) { tandaiSalin(id, 'tersalin', 2000); return; }
+      tandaiSalin(id, 'salin manual', 15000, true);
+      var m = elPanel.querySelector('.id-manual');
+      if (m) { m.focus(); m.select(); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(id).then(function () { tandaiSalin(id, 'tersalin', 2000); }, cadangan);
+    else cadangan();
+  });
+  elPanel.addEventListener('focusin', function (e) { if (e.target.classList.contains('id-manual')) e.target.select(); });
+
   // hanya-baca, untuk verifikasi lewat CDP (tests/kantor-agent-browser.ps1); tidak mengubah apa pun
   window.__KANTOR_UJI__ = {
     robot: function () {
       var out = [];
-      robots.forEach(function (r) { out.push({ key: r.key, tipe: r.tipe, area: r.areaSekarang, pod: r.pod, warna: warnaRobot(r), jalan: r.jalan, pergi: r.pergi, x: +r.x.toFixed(2), y: +r.y.toFixed(2) }); });
+      robots.forEach(function (r) { out.push({ key: r.key, tipe: r.tipe, area: r.areaSekarang, keadaan: r.keadaan, izin: r.el.classList.contains('izin'), pod: r.pod, warna: warnaRobot(r), jalan: r.jalan, pergi: r.pergi, x: +r.x.toFixed(2), y: +r.y.toFixed(2) }); });
       return out;
     },
     layar: function () {
