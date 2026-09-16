@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-16",
-  "jumlah_dokumen": 415,
+  "jumlah_dokumen": 417,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -6770,6 +6770,43 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada.md",
+      "judul": "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [
+        "Microservices - Integration Service",
+        "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
+        "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
+        "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
+        "ADR - 0060 Cakupan Keterlihatan Tiket Engagement",
+        "QA - Deviation & CAPA",
+        "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus",
+        "Microservices - Notification Service",
+        "Microservices - Employee Service",
+        "APP - Web ERP",
+        "Sales - ICC Account Manager Mapping"
+      ],
+      "hash": "840869d59851a022fc78d232d30aab42854de2808b1a333a751aa8baa28e01da",
+      "ukuran_kb": 12.2,
+      "ringkasan": "Menjawab: bagaimana ulasan Shopee berbintang rendah dirutekan jadi komplain ke departemen yang tepat (gudang, QC, dst), kenapa TikTok tidak ikut, dan kenapa fitur ini memperluas register komplain QC yang sudah ada alih-alih membangun modul tiket baru. Juga menjelaskan sumber data ulasan (`marketplace_reviews`), alasan volume kecil membuat kategorisasi tetap manual, kategori komplain sebagai master data, dan penurunan departemen tujuan dari `department_shops`.",
+      "kata_kunci": [
+        "komplain",
+        "ulasan",
+        "review marketplace",
+        "Shopee",
+        "ADR 0099",
+        "register komplain",
+        "kategori komplain",
+        "department_shops",
+        "Account Specialist",
+        "ICC"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -8120,20 +8157,20 @@
         "HRIS - Recruitment",
         "ADR - 0041 Izin Tipe Form Menempel di Departemen"
       ],
-      "hash": "524265caf077d6a8c701f506467ed160c8fd4d981785b8135bf9b5ed190fd533",
-      "ukuran_kb": 35.6,
-      "ringkasan": "Menjawab: bagaimana psikotes multi-jenis bekerja sehari-hari — bagaimana HRD membuat tipe tes beserta subtesnya, mengisi bank soal (manual maupun impor Excel, soal dan opsi bergambar), merangkai paket tes berurutan, dan bagaimana kandidat mengerjakan seluruh paket dari satu tautan sekali duduk. Merinci tiga bentuk jawaban (`pilihan_ganda`, `most_least`, `angka_kolom`) beserta apa yang dihitung tiap mesin penilaian, aturan timer per subtes yang ditegakkan server, model data koleksi `psikotes_tipe` dan `psikotes_item` di `recruitment_db`, serta izin HR (PermRecruitmentView untuk baca, PermRecruitmentWork untuk sunting dan melihat kunci). Dipakai saat perlu tahu penjaga validasi server, kewajiban soal contoh, penurunan total durasi, atau kenapa grup DISC tanpa kunci hanya menampilkan lembar jawaban alih-alih skor.",
+      "hash": "ff01b402a25783aaed4be0c5810065a1114d0b1b8f5eeb8c114121575fc47fb7",
+      "ukuran_kb": 35.9,
+      "ringkasan": "Menjawab: bagaimana HRD menyusun katalog tipe psikotes (CFIT, DISC, Kraepelin), bank soal, dan paket tes multi-bagian tanpa bantuan developer, bagaimana tiga bentuk jawaban (pilihan_ganda, most_least, angka_kolom) masing-masing dinilai, serta status merge dan verifikasi tiap bagian termasuk keputusan yang masih ditahan seperti DISC tanpa kunci skor dan bank CFIT internal.",
       "kata_kunci": [
         "psikotes",
-        "bank soal",
-        "paket tes",
-        "psikotes_tipe",
+        "psikotest",
         "CFIT",
         "DISC",
         "Kraepelin",
-        "most_least",
-        "impor Excel",
-        "recruitment_db"
+        "bank soal",
+        "paket tes",
+        "recruitment",
+        "career portal",
+        "ADR 0087"
       ]
     },
     {
@@ -10909,25 +10946,26 @@
         "APP - MyBharata",
         "Manufacture - Stock & Material Management",
         "CORE - RBAC dan Permission Set",
+        "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
         "Microservices - Employee Service",
         "CORE - API Master Gateway",
         "APP - Web ERP",
         "QA - Register Perizinan & Sertifikasi"
       ],
-      "hash": "ff1ce74761f7e91696e95695fda7103e3c71fe337b2bb7732ebc276a8080c89f",
-      "ukuran_kb": 12.5,
-      "ringkasan": "Menjawab: register mutu apa saja yang ada di workspace Quality ERP (CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing, pengecekan RM), endpoint dan collection MongoDB masing-masing, serta siapa boleh melihat, mengubah, atau menghapus lewat RBAC quality:staff/supervisor. Menjelaskan juga alur approval CAPA (QA mengajukan, Admin Produksi dan Admin Warehouse wajib approve, QA finalisasi), aturan alert keterlambatan (tenggat CAPA H-7, incoming Menunggu lebih dari 3 hari, batch Menunggu lebih dari 24 jam), dan alur komplain Marketing ke QC termasuk siapa yang boleh mengubah komplain serta notifikasi inbox yang dikirim ke QC dan pengaju.",
+      "hash": "f24136f2c2fe803068d83534a500477dbf57e5f2391277ec2180fb7472c7a391",
+      "ukuran_kb": 13.2,
+      "ringkasan": "Menjawab: bagaimana divisi Quality mencatat temuan CAPA/audit beserta alur persetujuannya, bagaimana incoming inspection bahan/kemasan dan antrean release/hold batch dikelola, serta bagaimana komplain QC dari marketing diinput, divalidasi, dan dinotifikasi dua arah -- termasuk siapa yang boleh mengubah komplain milik siapa.",
       "kata_kunci": [
+        "QA",
+        "quality",
         "CAPA",
-        "temuan audit",
-        "BPOM",
         "incoming inspection",
         "batch release",
         "komplain QC",
-        "mutu",
-        "quality",
-        "QA/QC",
-        "pengecekan RM"
+        "audit BPOM",
+        "RBAC quality",
+        "temuan",
+        "ICC"
       ]
     },
     {
@@ -13981,6 +14019,32 @@
         "MCP backend",
         "tindak lanjut",
         "audit kepatuhan"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Komplain dari Ulasan Marketplace.md",
+      "judul": "ANALISA - Komplain dari Ulasan Marketplace",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
+        "ADR - 0060 Cakupan Keterlihatan Tiket Engagement"
+      ],
+      "hash": "931f38fed0734eaabb73d334901a171eb14589e1e6dce895bba41291bab8bf2b",
+      "ukuran_kb": 3.7,
+      "ringkasan": "Menjawab: urutan dan ketergantungan task untuk membangun fitur komplain dari ulasan marketplace (master kategori, field tujuan di register komplain, notifikasi per departemen, tombol ajukan dari layar ulasan, kotak masuk departemen), serta daftar keputusan yang masih menunggu manajemen/QA seperti penindak keluhan pengiriman lama dan kewajiban regulatif efek samping sebelum kategori itu bisa di-seed.",
+      "kata_kunci": [
+        "ANALISA",
+        "task list",
+        "komplain ulasan",
+        "ADR 0099",
+        "backlog",
+        "roadmap",
+        "keputusan tertunda",
+        "kategori komplain"
       ]
     },
     {
