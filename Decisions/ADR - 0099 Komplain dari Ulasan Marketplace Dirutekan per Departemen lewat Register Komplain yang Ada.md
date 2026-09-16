@@ -1,4 +1,6 @@
-> **Status**: ⚠️ Diterima, sebagian diimplementasikan. Keputusannya diambil 2026-09-16; **keputusan 1 dan 3 sudah ada di kode hari itu juga** (rute baca `/wms/komplain` dibuka ke marketing dengan cakupan toko dibatasi server, dan layar `/warehouse/komplain` berdiri), belum di-merge dan belum di PROD. Sisanya masih usulan.
+> **Status**: ⚠️ Diterima, sebagian besar diimplementasikan. **Keputusan 1, 2, 3, 4, 5, dan 6 sudah ada di kode** per 2026-09-16 dan **merged ke `main` hari itu juga**, terverifikasi di DEV; belum di PROD. Sisanya (notifikasi, jalur QC dari ulasan, tujuan tanpa register) masih usulan.
+>
+> ⛔ **Satu asumsi ADR ini terbukti KELIRU dan sudah dikoreksi di kode.** Persona "Account Specialist" di sini diasumsikan terjangkau lewat peran marketing. Diukur di PROD 2026-09-16: keempat puluh orangnya berperan `insentive: icc`, **nol** punya peran `kyura`/`beauty_hacks`, dan hanya **dua** punya peran `integration`. Peran tidak mewakili kepemilikan toko, jadi hak baca dan hak mengajukan diturunkan dari `icc_account_mappings`, bukan dari daftar peran. Jangan merancang gerbang berikutnya di atas asumsi lama itu.
 
 ## Untuk Manajemen
 

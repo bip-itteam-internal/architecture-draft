@@ -22,7 +22,7 @@ Papan kerja, bukan arsitektur. Tiap item cukup jelas untuk langsung dilempar ke 
 ## Frontend
 
 - [x] **T5. Layar komplain gudang.** ✅ 2026-09-16, branch erp-frontend `feat/warehouse-komplain-layar` (belum merge, belum PROD). `/warehouse/komplain`, SATU layar untuk dua audiens dengan kolom Aksi yang berbeda, dua entri menu ke URL yang sama karena marketing tak punya peran `warehouse`. ⛔ **Layar ini lahir KOSONG dan akan tetap kosong sampai T6 mendarat** — tak ada satu pun cara mengajukan komplain lewat layar mana pun. Itu syarat yang disepakati saat memilih mengerjakan T5 lebih dulu.
-- [ ] **T6. Tombol ajukan komplain dari baris ulasan.** Di halaman Ulasan yang sudah ada. Pengaju memilih TUJUAN lebih dulu, lalu kategori dari daftar milik tujuan itu sendiri. `order_sn`, produk, bintang, teks, dan foto terbawa otomatis. Bergantung T2.
+- [x] **T6. Tombol ajukan komplain dari baris ulasan.** ✅ 2026-09-16, branch erp-frontend `feat/ajukan-komplain-dari-ulasan` dan bip-erp `feat/komplain-dari-ulasan`. Tujuan dipilih lebih dulu (hanya Gudang yang punya register; QC dan ekspedisi tampil tak dapat dipilih berikut alasannya), lalu kategori milik gudang. `order_sn`, teks, foto, bintang, dan `comment_id` terbawa otomatis. **T2 ikut terpenuhi untuk jalur gudang**: salinan ulasan disimpan di register beserta penanda sumber yang ditimpa server. Tombolnya digerbang KEPEMILIKAN toko, bukan peran. ⚠️ Ulasan lama (sebelum WMS menarik pesanan per 1 Juli 2026) ditolak 404, dan itu keadaan normal yang dijelaskan di modalnya.
 - [ ] **T7. Penanda keadaan di layar.** Hanya Shopee, dan tujuan yang belum terlayani ditampilkan apa adanya alih-alih dipaksa masuk register yang ada.
 
 ## Sesudah data terkumpul
