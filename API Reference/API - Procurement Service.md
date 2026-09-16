@@ -379,13 +379,13 @@ Koleksi baru `pengajuan_barang`, prefix rute `/pengajuan-barang` (`pengajuan_bar
 | Method | Path | Fungsi | Wewenang |
 |---|---|---|---|
 | POST | `/pengajuan-barang/lampiran` | Unggah bukti SEBELUM dokumen dibuat, dipakai tipe DANA yang mensyaratkan bukti sudah ditalangi. Rute literal, wajib terdaftar sebelum `/:id`. | Terautentikasi (identitas dari header) |
-| POST | `/pengajuan-barang` | Buat pengajuan, lahir `DRAFT`. Body: `tipe`, `departemen?` (jatuh ke header bila kosong), `items[]`, `lampiran[]`, `tautan?`, `sudah_ditalangi`, `sumber_dana?`, `proyek_pembebanan?`. | Izin sesuai tipe (`IzinAjukanUntukTipe`): `budget.pengajuan.umum` / `.rawmaterial` / `.iklan` / `.dana` (DANA dan KONSUMSI sama-sama `.dana`) |
+| POST | `/pengajuan-barang` | Buat pengajuan, lahir `DRAFT`. Body: `tipe`, `departemen?` (jatuh ke header bila kosong), `items[]`, `lampiran[]`, `tautan?`, `sudah_ditalangi`, `sumber_dana?`, `proyek_pembebanan?`. ⚠️ `kode_cv` TIDAK diterima di sini: CV pembayar ditetapkan SPV Finance jauh kemudian, pada `pb_finance_setujui_bayar`. | Izin sesuai tipe (`IzinAjukanUntukTipe`): `budget.pengajuan.umum` / `.rawmaterial` / `.iklan` / `.dana` (DANA dan KONSUMSI sama-sama `.dana`) |
 | GET | `/pengajuan-barang` | Daftar dalam cakupan pemanggil. Query: `tipe`, `status`, `pengaju_id`, `perlu_perhatian` (dibandingkan string `"true"` persis). | Terautentikasi |
 | GET | `/pengajuan-barang/milik-saya` | Pengajuan milik pemanggil sendiri. | Terautentikasi |
-| GET | `/pengajuan-barang/antrean` | "Perlu aksi saya", tahap yang boleh ditindak pemanggil, disaring `TahapYangBolehDitindak` (memanggil `BolehMenindakTahap` yang sama, dikunci test `TestTahapYangBolehDitindak_SepakatDenganGerbang`). | Terautentikasi |
+| GET | `/pengajuan-barang/antrean` | "Perlu aksi saya", tahap yang boleh ditindak pemanggil, disaring `TahapYangBolehDitindak` (memanggil `BolehMenindakTahap` yang sama, dikunci test `TestTahapYangBolehDitindak_SepakatDenganGerbang`). ⚠️ **Respons membawa `cakupan_cv_gagal` di samping `data`** (T2, branch): `true` berarti daftar CV pemanggil TAK TERBACA dari finance-service, bukan "tak ada tugas". Tanpa penanda ini antrean yang kehilangan seluruh dokumen CV terbaca sebagai antrean kosong. | Terautentikasi |
 | GET | `/pengajuan-barang/pembukuan` | Daftar keadaan pembukuan (jurnal ke Accurate) atas pengajuan uang, bawaan hanya yang GAGAL; `semua=true` untuk rekonsiliasi. | `budget.jurnal.view`, BUKAN `budget.view` yang dipegang setiap pemohon |
 | GET | `/pengajuan-barang/:id` | Detail. | Terautentikasi |
-| POST | `/pengajuan-barang/:id/setujui` | Menyetujui tahap berjalan. Tahap `pb_ap_transfer` menerima isian transfer (sumber dana + akun beban, divalidasi ke katalog Accurate bila terjangkau); ekor stok/bayar/jurnal dijalankan sesudah tahap maju. | `BolehMenindakTahap` per tahap, lihat peta di bawah |
+| POST | `/pengajuan-barang/:id/setujui` | Menyetujui tahap berjalan. Tahap `pb_ap_transfer` menerima isian transfer (sumber dana + akun beban, divalidasi ke katalog Accurate bila terjangkau); ekor stok/bayar/jurnal dijalankan sesudah tahap maju. ⚠️ **Tahap `pb_finance_setujui_bayar` menerima `kode_cv`** (T2, branch): CV yang membayar, dipilih SPV Finance. Field-nya **pointer** — tidak disebut berarti "jangan ubah", `""` berarti "dibayar PT". Tanpa pembedaan itu, tombol Setujui polos akan menghapus CV yang sudah dipilih. CV di luar master atau yang nonaktif ditolak 400; daftar CV tak terbaca ditolak **503**, bukan disimpan tanpa diperiksa. | `BolehMenindakTahap` per tahap, lihat peta di bawah |
 | POST | `/pengajuan-barang/:id/tolak` | Menolak, `alasan` wajib. | `BolehMenindakTahap` |
 | POST | `/pengajuan-barang/:id/revisi` | Mengembalikan untuk revisi, `alasan` wajib. | `BolehMenindakTahap` |
 | POST | `/pengajuan-barang/:id/ajukan-ulang` | Pengaju mengajukan ulang dokumen berstatus REVISI, boleh sekalian menyunting isi (`SuntinganPengajuan`) sebelum diajukan. | Hanya `Pengaju.ID`, bukan `BolehMenindakTahap` (dokumen REVISI tidak punya tahap berjalan) |
@@ -416,11 +416,13 @@ Koleksi baru `pengajuan_barang`, prefix rute `/pengajuan-barang` (`pengajuan_bar
 | `pb_direktur` | `budget.approve.direksi` |
 | `pb_procurement_beli` | `budget.approve.procurement` |
 | `pb_finance_setujui_bayar` | `budget.approve.pembayaran` |
-| `pb_ap_transfer` | `budget.ap.bayar` |
+| `pb_ap_transfer` | **Bercabang menurut sumber dana** (T2, branch): dokumen tanpa `kode_cv` (dibayar PT) `budget.ap.bayar`; dokumen ber-`kode_cv` `budget.cv.transfer` **DAN** ditugaskan memegang CV itu **DAN** CV-nya aktif. Kedua cabang TIDAK saling membuka |
 | `pb_qc` | `budget.qc.periksa` |
 | `pb_qc_ga` | `budget.terima.ga` (gudang GA yang memegang barangnya, bukan QC produksi) |
 | `pb_terima_ga` | `budget.terima.ga` |
 | `pb_terima_rm` | `budget.terima.rm` |
+
+> ⚠️ **Percabangan tahap transfer (T2 Jalur A, branch, [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] §6).** Izinnya **baru**, bukan memakai ulang `budget.ap.bayar` lalu dipersempit penugasan: penugasan hanya membatasi CV mana yang boleh disentuh, ia tak punya apa pun untuk menutup cabang PT, jadi satu izin bersama akan membuat pemegang CV ikut boleh memindahkan uang PT tanpa satu pun layar memperlihatkannya. Cakupan CV dibaca dari finance-service (`GET /internal/cv/penugasan`) dan **gagal-tertutup**; nilai yang sama dipakai gerbang DAN filter query antrean, sebab dua perhitungan terpisah melahirkan gejala "antrean berisi, tombol ditolak". Rekening yang dipilih saat transfer wajib MILIK CV dokumen: `ValidasiSumberDana` hanya memeriksa keberadaan di katalog Accurate, dan seluruh rekening CV ada di sana.
 
 > Pengaju TIDAK boleh menindak tahap keputusan atas dokumennya sendiri. `tahapKeputusanPengaju` lebih luas dari tahap persetujuan saja, ikut mencakup `pb_cek_stok_ga` dan `pb_procurement_beli` karena keduanya menentukan uang meski bukan tahap "approval" secara nama.
 
@@ -455,7 +457,7 @@ Melayani KEDUA asal pembayaran (tagihan vendor maupun Pengajuan Barang), sebab y
 | GET | `/pembayaran/antrean-bukti` | Antrean bukti yang menunggu diperiksa. Rute literal, wajib sebelum `/pembayaran/:id/...`. | `budget.bukti.review` |
 | POST | `/pembayaran/:id/bukti-transfer/review` | Menyetujui atau menolak bukti transfer. | `budget.bukti.review` |
 | GET | `/pembayaran/:id/bukti-transfer/file` | Mengunduh berkas bukti. | `budget.view` |
-| POST | `/pembayaran/:id/bukti-transfer` | Mengunggah bukti transfer atas satu baris pembayaran. `409` bila bukti sudah disetujui, `403` bila bukan milik pengunggah. | `budget.ap.bayar` |
+| POST | `/pembayaran/:id/bukti-transfer` | Mengunggah bukti transfer atas satu baris pembayaran. `409` bila bukti sudah disetujui, `403` bila bukan milik pengunggah. | `budget.ap.bayar` **ATAU** `budget.cv.transfer` (T2, branch). OR di gerbang rute saja, dan itu cukup karena penyempitan per dokumen sudah ada di handler: hanya PENCATAT pembayarannya yang boleh mengunggah, dan pemegang CV menjadi pencatat saat ia menyelesaikan tahap transfer. Gerbang **review** sengaja TIDAK ikut dilebarkan |
 
 ## KPI Account Payable (Internal, ✅ Diimplementasikan)
 

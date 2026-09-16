@@ -3,7 +3,7 @@
 *Endpoint **warehouse-service** (WMS Tinggarjaya fulfillment MVP: event ingestion, state machine, reconciler, operasi gudang). Gateway: `/api/warehouse/*`. Grounded ke `services/warehouse/`.*
 
 - **Implementasi**: [[Microservices - Warehouse Service]] · **Status**: ⚠️ Implemented (ada catatan) — event ingestion ✅; operasi WMS lengkap termasuk handover ✅; master produk CRUD ✅; frontend sebagian ✅
-- **Indeks**: [[API - Index]] · Auth: gateway key `BIP-Gateway-ID` untuk semua route. Operasional WMS tambahan: role guard via `BIP-System-Roles` header (`system_roles["warehouse"]`).
+- **Indeks**: [[API - Index]] · Auth: gateway key `BIP-Gateway-ID` untuk semua route. Operasional WMS tambahan: role guard via `BIP-System-Roles` header (`system_roles["warehouse"]`). ⚠️ **Kecuali rute komplain**, yang gerbangnya berbeda per method dan menyertakan peran marketing — lihat *Komplain Gudang*.
 
 ## Fulfillment — Event Ingestion (✅ Diimplementasikan)
 
@@ -253,6 +253,52 @@ Assignment toko marketplace → Warehouse Sadewa (men-scope antrian/feed menu Sa
 | POST | `/wms/sadewa-shops` | Assign toko — upsert `{shop_id, channel, shop_name}` by `shop_id`+`channel` |
 | DELETE | `/wms/sadewa-shops/:shopId?channel=` | Lepas assignment toko |
 
+## Komplain Gudang (✅ Diimplementasikan)
+
+Keluhan **marketing atas pekerjaan gudang packing**, sekaligus sumber KPI baris 1 gudang packing. Path group `/wms/`. ⚠️ Gerbangnya **berbeda per method**, dan bedanya disengaja: yang dinilai tidak mengisi nilainya sendiri.
+
+| Method | Path | Role yang Diizinkan | Fungsi |
+|---|---|---|---|
+| POST | `/wms/komplain` | marketing **ATAU pemegang toko** (`gerbangAjukanKomplain`) | Catat keluhan. 404 bila `order_id` tak ada di `fulfillment_orders`; 409 bila `(order_id, kategori)` sudah pernah dicatat; 400 + `kategori_tersedia` bila kategori di luar daftar; **403 bila pemanggil masuk lewat kepemilikan tetapi pesanannya milik toko lain** |
+| GET | `/wms/komplain` | peran gudang, marketing, **ATAU pemegang toko** (`gerbangBacaKomplain`) | Daftar; filter `periode` (`YYYY-MM`), `status`, `kategori`, `shop_ids`. Urut `dilaporkan_at` desc, **limit 1.000, tanpa paginasi** |
+| PUT | `/wms/komplain/:id/tindak-lanjut` | admin_gudang, leader, spv | Ubah `status` + `tindak_lanjut`. `selesai_at` diisi saat selesai/ditolak, **dihapus** saat dibuka kembali |
+
+**Kategori (daftar tertutup)**: `salah_produk` · `salah_jumlah` · `salah_alamat` · `rusak_kemasan` · `kurang_lengkap`.
+**Status**: `baru` · `diproses` · `selesai` · `ditolak`.
+
+**Request body** `POST /wms/komplain`:
+```json
+{
+  "order_id":          "string (wajib) — harus ada di fulfillment_orders",
+  "kategori":          "string (wajib) — salah satu dari daftar tertutup",
+  "keterangan":        "string",
+  "bukti_foto":        ["url"],
+
+  "ulasan_comment_id": "string — diisi bila komplainnya lahir dari ulasan",
+  "ulasan_channel":    "string",
+  "ulasan_teks":       "string",
+  "ulasan_bintang":    0
+}
+```
+⚠️ `packer_code`, `packed_by`, dan `printed_by_role` **tidak diterima dari body** — server menyalinnya dari pesanannya sendiri.
+
+⛔ **`sumber` juga tidak diterima dari body.** Server menurunkannya: ada `ulasan_comment_id` berarti `ulasan`, tidak ada berarti `manual`. Mengirim `"sumber": "ulasan"` tanpa id ulasan **tetap** tersimpan sebagai `manual`. `ulasan_bintang` di luar 1..5 disimpan nol, yang berarti "tak diketahui".
+
+**Cakupan baris yang dikembalikan `GET /wms/komplain`** ditentukan SERVER dari identitas pemanggil, bukan dari query:
+
+| Pemanggil | Yang terlihat |
+|---|---|
+| Peran gudang, pengawas WMS (PPIC/SPV manufaktur) | semua komplain, tanpa panggilan lintas service |
+| SPV/leader marketing (`common.IsMarketingLeader`) | semua komplain, tanpa panggilan lintas service |
+| **Pemegang toko** (siapa pun yang punya mapping ICC aktif) | hanya toko yang ia pegang, dari `GET /icc/mappings/me` milik integration-service |
+| Tak memegang toko dan bukan keduanya | **403**, bukan daftar kosong |
+| Mitra Sadewa (`admin_gudang_sadewa`) | dibatasi `batasiFilterKeSadewa` seperti rute Sadewa lain |
+
+⛔ **Cakupan diturunkan dari KEPEMILIKAN, bukan dari daftar peran, dan itu koreksi terukur.** Versi pertama memakai `IsMarketingDepartmentStaff`; diukur di PROD 2026-09-16 predikat itu cocok ke enam orang yang semuanya supervisor, sehingga cabangnya tak pernah dieksekusi, sementara keempat puluh Account Specialist (`insentive: icc`) tak lolos gerbang mana pun. Detail: [[Microservices - Warehouse Service]].
+
+⛔ Gagal menentukan cakupan (integration tak terjangkau, balasannya tak berbentuk) dijawab **500 bersebab**, bukan daftar kosong: daftar kosong akan berbunyi "belum ada komplain" kepada orang yang sebenarnya punya. Permintaan tanpa `BIP-Employee-ID` dijawab **401**, bukan 500. `"data": null` dari `/icc/mappings/me` berarti **nol toko**, bukan balasan rusak. Detail: [[Microservices - Warehouse Service]].
+
 ## Dokumen Terkait
 
 - [[Microservices - Warehouse Service]] · [[WH - Fulfillment Flow & WMS Tinggarjaya]] · [[API - Integration Service]] · [[API - Index]]
+- [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] — alasan rute baca dibuka ke marketing

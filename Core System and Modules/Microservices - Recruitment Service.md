@@ -57,7 +57,7 @@
 
 > Detail field per collection ada di [[HRIS - Recruitment]] (hindari duplikasi).
 
-- **Backbone internal:** `job_requisition` · `job_posting` · `candidate` (+`progress`/`status`) · `interview` · `interview_round` (katalog babak **global**) · `interview_feedback` · `candidate_test_result` · **`psikotes_session`** · `background_check` · `offer` · katalog psikotes `psikotes_tipe`, `psikotes_item`, `psikotes_paket`, `psikotes_seed` (2026-09-11, bip-erp #1837; [[HRIS - Bank Soal dan Paket Psikotes]])
+- **Backbone internal:** `job_requisition` · `job_posting` · `candidate` (+`progress`/`status`) · `interview` (+`status`/`status_reason`/`status_at` sejak 2026-09-16, lihat increment **Status Siklus Sesi Interview**) · `interview_round` (katalog babak **global**) · `interview_feedback` · `candidate_test_result` · **`psikotes_session`** · `background_check` · `offer` · katalog psikotes `psikotes_tipe`, `psikotes_item`, `psikotes_paket`, `psikotes_seed` (2026-09-11, bip-erp #1837; [[HRIS - Bank Soal dan Paket Psikotes]])
 	- ⚠️ **Koleksi yang pernah didokumentasikan tapi TIDAK ada di kode:** `screening_result`, `technical_test_result`, `psychotest`, `psychotest_result` — dibuang saat redesign pipeline 2026-07-18 ([[HRIS - Recruitment Pipeline Redesign]]). `background_check` kemudian lahir kembali sebagai model tersendiri (`models_background_check.go`), bukan struct stage lama. `models_stages.go` kini hanya menyisakan `Interview` + `InterviewPanelist`
 - **Adopsi ERPGo (✅ Fase A–E):** `job_type` · `candidate_source` · `interview_type` · `job_location` (master); `job_posting` & `candidate` diperkaya (lihat increment di bawah). *(`custom_question` form-builder **dihapus** #486; `onboarding_checklist`/`checklist_item` per-kandidat lama **dihapus** 2026-07-18.)*
 - **Onboarding Checklist (✅ dibangun ulang 2026-07-26):** `onboarding_template` (master) + `onboarding_instance` (per karyawan baru, `tasks[]` snapshot) — model BARU dengan penugasan PIC lintas-tim + notif, menggantikan versi lama yang dibuang. Lihat increment di bawah.
@@ -367,6 +367,28 @@ Tiga tautan email dirakit dari env, dan dulu ketiganya membaca `ERP_FRONTEND_URL
 - **Dev**: `.env` dev berisi `CAREER_PORTAL_URL=career.bharatainternasional.com` (portal karir prod, karena tak ada portal karir di VM dev) dan `ERP_FRONTEND_URL=https://erp-dev.bharatainternasional.com` (diukur 2026-09-12). Sesudah perubahan ini tautan psikotes dari dev membuka portal karir prod dan terbaca tidak berlaku; uji tes berpaket dev tetap lewat portal karir lokal.
 - Undangan penilai dan pewawancara yang terkirim sebelum env prod diperbaiki tetap membawa tautan lama; tak ada kirim ulang otomatis. HR menyalin tautan lewat **Salin Link Penilaian** (detail sesi Performance Review) atau salin link feedback (menu Interviews), keduanya dirakit dari `window.location.origin`.
 - Keadaan per 2026-09-14 (ukur ulang sebelum dipakai): merged 08:47 WIB. **Prod** dideploy manusia 08:48:59 WIB dengan `.env` `ERP_FRONTEND_URL=https://erp.bharatainternasional.com`; gerbang biner `urlDasarEnv` ada (kontrol positif ada, string karangan nol), `printenv` kedua env benar, dan dari server `erp.bharatainternasional.com/onboarding-review/x` serta `/interview-feedback/x` membalas 200 sementara `career.bharatainternasional.com/onboarding-review/x` 404. **Dev** dibangun manual 09:05 WIB karena pipeline belum memprosesnya; `POST /api/recruitment/candidates/<uji>/psikotes/reissue` lewat gateway membalas `link` berawalan `https://career.bharatainternasional.com/psikotes/`. Belum ada bukti dari email asli: pukul 09:09 WIB `interview_feedback` prod masih 0 dan belum ada undangan baru sejak deploy, jadi feedback pertama sesudah deploy adalah buktinya.
+
+## Increment: Status Siklus Sesi Interview (2026-09-16, bip-erp [#1924](https://github.com/bip-itteam-internal/bip-erp/pull/1924) — merged? ukur ulang; belum deploy)
+
+> Sesi interview cuma punya jadwal, tak punya hasil. Akibatnya dashboard tak bisa membedakan sesi yang benar-benar terjadi dari sesi yang batal atau kandidatnya tak datang, dan HR tak punya tempat mencatat sebabnya.
+
+- **Model**: `Interview` dapat `status` · `status_reason` · `status_at` (`bson:",omitempty"`). Nilai tersimpan **berbahasa Inggris** (`Scheduled`/`Completed`/`Cancelled`/`NoShow`), labelnya diterjemahkan di layar — pola yang sama dengan `OfferStatus`.
+- **Endpoint**: `PUT /interviews/:id/status` (gate `PermRecruitmentWork` + `isHR`, setara rute interview lain yang mengubah data). Penjaga perusahaan `interviewTerjangkau` dipanggil **sebelum** dokumen dibaca, jadi sesi di luar cakupan dibalas 404 yang sama dengan sesi yang memang tak ada.
+- **Aturan sebagai fungsi murni** (`interview_status.go`, teruji tanpa database): `transisiInterviewSah` · `perluAlasanInterview` · `statusInterviewAtau` · `normalkanStatusSesi` · `filterUbahStatusInterview` · `sesiMenerimaPenilaian`.
+- **Transisi sengaja tidak bebas**: hasil → hasil lain harus lewat **pembatalan penandaan** (kembali ke Terjadwal). Riwayat auditnya jadi terbaca sebagai koreksi, bukan sesi yang diam-diam berubah dari Selesai jadi Tidak hadir.
+- **Kunci optimistik**: filter update menyertakan status lama; untuk `Scheduled` filternya ber-`$or` supaya dokumen lama yang belum punya field itu ikut cocok. Yang kalah balapan dapat 409, bukan menang diam-diam. **`PUT /stages/interviews/:id` memakai kunci yang sama** (`kunciTulisInterview`) — tanpa itu jalur edit jadwal tetap baca-lalu-tulis polos dan menimpa balik penandaan yang mendarat di sela-selanya.
+- ⛔ **Penilaian ditolak untuk sesi batal/tidak hadir** (`POST /interviews/:id/feedback` → 409). Bukan kerapian: penilaian ikut **menggerakkan status kandidat** lewat `wireDecisionToStatus`, jadi sesi yang tak pernah terjadi bisa meloloskan atau menggugurkan orang.
+- **NoShow TIDAK menggerakkan status kandidat** (keputusan produk 2026-09-16): kandidat yang tak datang belum tentu gugur, dan menggerakkannya otomatis membuat keputusan HR diambil sistem.
+
+### ⛔ Harga keputusan "tanpa migrasi", baca sebelum menambah filter status
+
+Sesi yang terjadwal sebelum fitur ini tersimpan **tanpa** field `status`, dan dibaca sebagai `Scheduled` lewat `normalkanStatusSesi` di **tiga** jalur baca (`/interviews`, `/interviews/assigned`, `/candidates/:id/stages`). Normalisasinya terjadi **sesudah** query, jadi ia tak menolong penyaring di sisi server: `bson.M{"status": "Scheduled"}` polos akan **melewatkan seluruh sesi lama** dan membalas 200 berisi baris kurang, tanpa satu pun galat — kelas yang sama dengan 200-berisi-nol-baris di § RBAC. Filter status apa pun wajib memakai bentuk `$or` yang sama dengan `filterUbahStatusInterview`.
+
+### Catatan deploy
+
+- Hanya `Recruitment-Service`. **Gateway tidak perlu naik**: rute baru ada di bawah prefiks `/api/recruitment` yang sudah diteruskan. Tanpa env baru, indeks baru, koleksi baru, atau kategori inbox baru.
+- **BE sebelum FE** (perubahan kontrak). FE lama di atas BE baru tetap jalan: ketiga field tambahan diabaikan.
+- Belum diverifikasi lewat gateway di dev saat dokumen ini ditulis; itu gerbang `/wrap` yang masih terbuka.
 
 ## Dokumen Terkait
 

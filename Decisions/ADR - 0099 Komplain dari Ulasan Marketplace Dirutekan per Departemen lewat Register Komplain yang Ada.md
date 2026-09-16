@@ -1,4 +1,6 @@
-> **Status**: 🟡 Diusulkan. Keputusannya diambil 2026-09-16; kodenya belum ada.
+> **Status**: ⚠️ Diterima, sebagian besar diimplementasikan. **Keputusan 1, 2, 3, 4, 5, dan 6 sudah ada di kode** per 2026-09-16 dan **merged ke `main` hari itu juga**, terverifikasi di DEV; belum di PROD. Sisanya (notifikasi, jalur QC dari ulasan, tujuan tanpa register) masih usulan.
+>
+> ⛔ **Satu asumsi ADR ini terbukti KELIRU dan sudah dikoreksi di kode.** Persona "Account Specialist" di sini diasumsikan terjangkau lewat peran marketing. Diukur di PROD 2026-09-16: keempat puluh orangnya berperan `insentive: icc`, **nol** punya peran `kyura`/`beauty_hacks`, dan hanya **dua** punya peran `integration`. Peran tidak mewakili kepemilikan toko, jadi hak baca dan hak mengajukan diturunkan dari `icc_account_mappings`, bukan dari daftar peran. Jangan merancang gerbang berikutnya di atas asumsi lama itu.
 
 ## Untuk Manajemen
 
@@ -23,11 +25,12 @@ Perkiraan besaran kerja: **lebih kecil daripada dugaan awal**. Yang terbesar ada
 *Komplain yang lahir dari ulasan marketplace dirutekan ke unit yang tepat dengan memakai register komplain yang SUDAH ADA di masing-masing tujuan, bukan dengan membangun register ketiga dan bukan dengan menambahkan tujuan ke salah satunya. Pekerjaan utamanya membukakan pintu: layar untuk register gudang yang selama ini tak punya layar, dan tautan dari baris ulasan.*
 
 - **Path di repo**:
-  - `bip-erp/services/warehouse/komplain.go` (register gudang, sudah ada; rute baca perlu dibuka ke marketing)
+  - `bip-erp/services/warehouse/komplain.go` (register gudang, sudah ada; rute bacanya ✅ dibuka ke marketing 2026-09-16)
+  - `bip-erp/services/warehouse/komplain_akses.go` (✅ **baru**, 2026-09-16: gerbang baca komposit gudang-atau-marketing + resolver cakupan toko lewat `GET /icc/mappings/me`)
   - `bip-erp/services/employee/quality_complaint.go` (register QC, sudah ada; menerima salinan ulasan)
   - `bip-erp/shared-library/models/employee/models.go` (`QualityComplaint`, blok salinan ulasan)
   - `erp-frontend/src/app/(main)/integration/reviews/` (tombol ajukan dari baris ulasan, **baru**)
-  - `erp-frontend/src/app/(main)/wms/` (layar komplain gudang, **baru**)
+  - `erp-frontend/src/app/(main)/warehouse/komplain/` + `src/features/warehouse/komplain/` (✅ layar komplain gudang, **baru** 2026-09-16; rutenya `/warehouse`, bukan `/wms` seperti dugaan awal ADR ini)
 - **Tanggal**: 2026-09-16 (direvisi hari yang sama, lihat Context)
 
 ## Context
