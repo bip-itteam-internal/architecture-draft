@@ -278,6 +278,10 @@ try {
   Tulis-Data @((Sesi 'eeeeeeee-5555' 'Lead di perpustakaan' 'server' 'alat' 'PowerShell' 'jalan jauh'))
   Check (Tunggu { $r = Robot | Where-Object { $_.key -eq 'eeeeeeee-5555' }; $r -and $r.jalan -and $r.arah -eq 'timur' } 12) '3g arah: robot yang berjalan ke ruang server menghadap timur selagi berjalan'
   Check (Tunggu { $r = Robot | Where-Object { $_.key -eq 'eeeeeeee-5555' }; $r -and -not $r.jalan -and $r.arah -eq 'utara' } 20) '3g arah: setibanya di ruang server, arahnya kembali mengikuti kursinya (utara)'
+  # BADAN-nya, bukan cuma keadaan arah: titik berdiri ruang server tak mengubah dudukZ, jadi bila kunci cache
+  # gambarBadan tak memuat arah, badan hasil jalan ke timur (bermata) tetap terpasang dan mata masih terhitung
+  $mataTiba = Eval '(function () { var g = document.querySelector("[data-lead=eeeeeeee-5555] .badan"); return g ? (g.innerHTML.match(/88ffff/g) || []).length : -1; })()'
+  Check ($mataTiba -eq 0) "3g arah: badan digambar ulang saat berputar, bukan cuma keadaannya ($mataTiba mata sesudah menghadap utara)"
   # 4. ramai: enam Lead di ruang server -> label ringkas
   Tulis-Data (1..6 | ForEach-Object { Sesi ('cccccccc-000' + $_) ('Lead ramai ' + $_) 'server' 'alat' 'PowerShell' 'pnpm test' })
   $ok = Tunggu { @(Robot | Where-Object { -not $_.pergi -and $_.area -eq 'server' -and -not $_.jalan }).Count -eq 6 } 25
