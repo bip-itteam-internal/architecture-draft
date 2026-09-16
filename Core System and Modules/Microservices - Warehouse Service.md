@@ -3,9 +3,9 @@
 *Microservice **warehouse-service** — WMS Tinggarjaya fulfillment MVP: event ingestion, state machine fulfillment, reconciler periodik, dan operasi gudang approve/pick/pack/RTS/label/dashboard. Implementasi nyata dari konsep [[WH - Fulfillment Flow & WMS Tinggarjaya]].*
 
 - **Stack**: Go + Fiber v2 + MongoDB (driver resmi) + Redis (via redsync distributed lock) + shared-library; di belakang [[CORE - API Master Gateway]] (`/api/warehouse/*`), route internal dilindungi `BIP-Gateway-ID`.
-- **Path di repo**: `bip-erp/services/warehouse/` · flat package `main` · `models.go` (state machine) · `fulfillment_event.go` (event ingestion) · `reconciler.go` (sync 60s) · `fulfillment_ops.go` (operasi WMS + role guard).
+- **Path di repo**: `bip-erp/services/warehouse/` · flat package `main` · `models.go` (state machine) · `fulfillment_event.go` (event ingestion) · `reconciler.go` (sync 60s) · `fulfillment_ops.go` (operasi WMS + role guard) · `komplain.go` (register komplain marketing ke gudang, bahan KPI packing) · `komplain_akses.go` (gerbang baca komposit + cakupan toko pemanggil).
 - **Port**: `6980` (default). **Database**: `warehouse_db` (MongoDB per-service). **Env kunci**: `MONGO_URI`, `MONGO_DB`, `REDIS_URL`, `INTERNAL_GATEWAY_KEY`, `INTEGRATION_MODULE_URL`.
-- **Status**: ⚠️ Implemented (ada catatan) — event ingestion + reconciler ✅; operasi WMS lengkap (approve/pick/pack/rts/labels/handover/dashboard/export rekon) ✅; jalur cepat APPROVED→RTS + gerbang rekon `exported_at` ✅; master produk CRUD ✅; frontend warehouse lengkap ✅ (queue+filter+unduh, picking, packing, RTS, label, handover). ✅ **Deadlock cursor reconciler diperbaiki & deploy 2026-07-24** (PR #638, commit `14b9795c`) — lihat *Event Ingestion & Reconciler*.
+- **Status**: ⚠️ Implemented (ada catatan) — event ingestion + reconciler ✅; operasi WMS lengkap (approve/pick/pack/rts/labels/handover/dashboard/export rekon) ✅; jalur cepat APPROVED→RTS + gerbang rekon `exported_at` ✅; master produk CRUD ✅; frontend warehouse lengkap ✅ (queue+filter+unduh, picking, packing, RTS, label, handover). ✅ **Deadlock cursor reconciler diperbaiki & deploy 2026-07-24** (PR #638, commit `14b9795c`) — lihat *Event Ingestion & Reconciler*. ⚠️ **Register komplain gudang** ✅ ada di kode (termasuk gerbang baca untuk marketing, 2026-09-16) tetapi **nol dokumen di produksi**: layarnya baru dibangun dan **belum ada satu pun cara mengajukan komplain lewat layar** — lihat *Komplain Gudang*.
 - **API**: [[API - Warehouse Service]].
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
@@ -47,13 +47,37 @@ Role guard via `system_roles["warehouse"]` (header `BIP-System-Roles` dari gatew
 - **`POST /fulfillment/handover`** — konfirmasi serah-terima ke kurir; LABEL_PRINTED → HANDED_OVER. Catat `handed_over_at`. Pola sama dengan approve/pick (batch, non-all-or-nothing, `{transitioned, skipped, failed}`). Role: admin_gudang, leader, spv.
 - **`GET /fulfillment/dashboard`** — MongoDB `$group by status_wms + $sum 1`; kembalikan `{data:[{status,count}], counts:{STATUS:N}}`. Role: admin_gudang, leader, spv, admin_qc.
 
+### Komplain Gudang (`komplain.go`, `komplain_akses.go`)
+
+Register keluhan **marketing atas pekerjaan gudang packing**, dan sekaligus sumber **KPI baris 1 gudang packing** (dibaca `services/employee/kpi_sumber_warehouse_packing.go` sebagai `KomplainPacking` dan `KomplainBelumSelesai`). Arti statusnya karena itu bukan urusan tampilan saja: komplain yang ditutup atau dibuka kembali menggeser skor orang.
+
+⚠️ **Yang dinilai tidak mengisi nilainya sendiri.** Rute TULIS digerbang `common.RequireMarketingStaff`, bukan peran gudang, dan pengawas WMS (PPIC & supervisor manufaktur) sengaja **tidak** dilewatkan di sana. Rute tindak lanjut sebaliknya: hanya `admin_gudang`, `leader`, `spv`.
+
+- **`POST /wms/komplain`** — catat satu keluhan. `order_id` wajib **ada di `fulfillment_orders`**, kalau tidak 404. `packer_code`, `packed_by`, dan `printed_by_role` **disalin server dari pesanannya**, tidak diambil dari body: atribusi tim yang boleh diketik pelapor bukan atribusi, dan pesanan bisa dicetak ulang tim lain belakangan. Indeks unik `(order_id, kategori)` menolak keluhan sejenis kedua atas pesanan yang sama dengan **409** — tanpa itu, satu pesanan bermasalah yang dilaporkan tiga orang menurunkan skor gudang tiga kali. Role: marketing (`kyura`/`beauty_hacks` staf ke atas, `insentive: adv_leader`, `integration` spv/admin, `it` staf ke atas).
+- **`GET /wms/komplain`** — daftar; filter `periode` (`YYYY-MM`, rentang WIB), `status`, `kategori`, `shop_ids`. Urut `dilaporkan_at` menurun, **dipotong 1.000 baris, tanpa paginasi**. Role: peran gudang **ATAU** marketing (lihat gerbang komposit di bawah).
+- **`PUT /wms/komplain/:id/tindak-lanjut`** — ubah `status` + `tindak_lanjut`. `selesai_at` diisi saat `selesai`/`ditolak` dan **DIHAPUS** saat dibuka kembali; komplain `diproses` yang masih membawa cap selesai akan terhitung tuntas oleh laporan mana pun yang membaca cap itu. Role: `admin_gudang`, `leader`, `spv`.
+
+**Kategori adalah daftar TERTUTUP**: `salah_produk`, `salah_jumlah`, `salah_alamat`, `rusak_kemasan`, `kurang_lengkap`. Nilai di luar daftar ditolak **400** berikut `kategori_tersedia`, bukan disimpan diam-diam — teks bebas membuat metriknya mustahil dijumlahkan dan tiap bulan melahirkan ejaan baru yang tak pernah bisa disatukan lagi. Status: `baru`, `diproses`, `selesai`, `ditolak`. **Cakupannya sengaja hanya kesalahan packing, bukan retur**: retur barang jadi sudah tercatat di manufacture-service, dan mencatatnya ulang di sini melahirkan dua catatan retur yang pasti menyimpang.
+
+#### Gerbang baca komposit dan cakupan toko (2026-09-16)
+
+Rute BACA semula peran gudang saja, sehingga marketing yang **justru pencatatnya** tak pernah bisa melihat nasib komplainnya sendiri. Sejak [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]], bacanya dibuka ke marketing **berikut pembatasan cakupan**, dua hal yang wajib datang bersamaan.
+
+- **`gerbangBacaKomplain`** mengomposisikan `warehouseGuard(...)` dengan `common.IsMarketingLeader` / `common.IsMarketingDepartmentStaff`, **bukan menyalin daftar peran**. Marketing diperiksa lebih dulu karena `warehouseGuard` menulis respons 401/403 sendiri saat menolak. Permintaan **tanpa `BIP-Employee-ID` tidak lolos cabang marketing** dan jatuh ke `warehouseGuard` yang menjawab 401; tanpa itu ia lolos gerbang lalu mati sebagai 500 di resolver cakupan, dan 500 menyuruh orang melaporkan kerusakan server padahal yang kurang identitasnya.
+- **`cakupanTokoKomplain`** menjawab daftar `shop_id` yang boleh dilihat pemanggil. ⛔ **`nil` berarti TANPA BATAS, `[]string{}` berarti nol baris** — menyamakan keduanya membuat Account Specialist yang belum dipetakan melihat SELURUH komplain, kebocoran yang tak menghasilkan satu pun galat. Peran gudang, pengawas WMS, dan leader marketing dapat `nil`; staf marketing dapat daftar tokonya sendiri.
+- **Daftar toko diambil lewat HTTP ke `GET /icc/mappings/me` milik [[Microservices - Integration Service]]**, bukan dengan membaca `icc_account_mappings` langsung: koleksi itu milik integration-service ([[ADR - 0002 Database-per-Service]]). Ketiga channel (`tiktok_shop_id`, `shopee_shop_id`, `lazada_shop_id`) diambil, sebab `fulfillment_orders` memuat ketiganya.
+- ⛔ **Gagal memanggil integration dikembalikan sebagai 500 bersebab, BUKAN daftar kosong dan bukan "lihat semua".** Daftar kosong akan membuat layar berbunyi "belum ada komplain" kepada orang yang sebenarnya punya.
+- ⚠️ **`"data": null` dari `/icc/mappings/me` adalah jawaban SAH untuk "tak memegang toko apa pun", bukan balasan rusak.** Amplop integration-service memakai `Data any` ber-`omitempty` sementara repositorinya mengembalikan slice nil saat nol dokumen, dan slice nil di dalam interface non-nil terbit sebagai `null`, bukan `[]`. Menyamakannya dengan kunci `data` yang hilang membuat **setiap** orang marketing yang tak memegang toko menerima 500 saat membuka layarnya. Penguraiannya karena itu lewat `json.RawMessage`: kunci absen tetap galat, `null` jadi nol toko, bentuk yang bukan array tetap galat.
+- **Urutannya: filter query → cakupan pemanggil → `batasiFilterKeSadewa`.** Ketiganya memakai bentuk `$in` yang sama sehingga saling **mengiris**, bukan saling menimpa, dan saringan query yang lebih LUAS ditolak. Mitra Sadewa tetap dibatasi lapisan terakhir.
+
 ## Model Data (`warehouse_db`)
 
-3 collection, grounded ke `models.go`:
+4 collection, grounded ke `models.go` dan `komplain.go`:
 
 - `fulfillment_orders` — state machine per order marketplace. Field: `order_id`, `channel`, `shop_id`, `shop_name`, `order_status_mp`, `status_wms`, `items[]{sku, barcode, nama, qty, rak}`, `update_time` (watermark), `recipient_name`, `recipient_address`, `shipping_provider` (kurir/**Expedisi**; backfill-if-empty menembus watermark — lihat `awb`), `package_id` (TikTok: diambil dari PackageID line-item pertama saat event/reconciler; boleh kosong untuk Shopee atau order TikTok lama), `approved_by/at`, `picked_by/at`, `packed_by/at`, `packer_code` (kode tim packer harian T1/T2 — dari batch labels atau scan pack), `exported_at`/`exported_by` (cap tarikan data rekon — gerbang RTS), `awb` (no resi; TikTok tidak dikembalikan saat RTS → diisi dari `tracking_number` marketplace via event/reconciler, backfill-if-empty, menembus watermark karena resi terbit tanpa menaikkan `update_time`; pola yang sama kini dipakai `shipping_provider`/`package_id`/`recipient` lewat helper bersama `backfillEmptyFields` — lihat fix-log P6 2026-07-27), `rts_at`, `rts_error`, `label_printed_at`, `handed_over_at`, `history[]{actor, at, from, to, note}`, `created_at`, `updated_at`. **Index**: `{order_id, channel}` unique compound, `{status_wms}`, `{update_time}`.
 - `warehouse_products` — master SKU + lokasi rak. Field: `sku`, `barcode`, `nama`, `lokasi_rak`. CRUD manual (Task 5–9).
 - `sync_cursors` — watermark reconciler (koleksi bersama dengan pola integration service).
+- `warehouse_komplain_gudang` — keluhan marketing atas pekerjaan gudang packing. Field: `order_id`, `channel`, `shop_id`, `kategori` (daftar tertutup), `packer_code`/`packed_by`/`printed_by_role` (**denormalisasi dari `fulfillment_orders` saat komplain dibuat**, disalin bukan di-join), `keterangan`, `bukti_foto[]`, `dilaporkan_oleh`, `dilaporkan_at`, `status`, `tindak_lanjut`, `selesai_at`. **Index**: `(order_id, kategori)` unique. ⚠️ **Nol dokumen di produksi per 2026-09-16** — bukan karena gudang tak pernah salah kirim, melainkan karena modul ini belum punya satu pun layar sampai hari itu.
 
 ## State Machine `status_wms`
 
@@ -91,6 +115,9 @@ integration `shouldNotifyWarehouse` ikut meneruskan status tersebut.
 
 ## Belum Diimplementasikan / Catatan (TBD)
 
+- ⛔ **Komplain gudang belum punya pintu masuk data.** `POST /wms/komplain` sudah live dan digerbang marketing, tetapi **tak ada layar mana pun yang memanggilnya** — layar `/warehouse/komplain` hari ini baca dan tindak lanjut saja. Selama itu register ini tetap nol dokumen dan KPI baris 1 gudang packing selalu bernilai "tanpa komplain", yang terbaca sebagai prestasi padahal artinya belum ada yang mencatat. Pengajuan dari baris ulasan marketplace adalah task T6 pada daftar kerja `Workspace/ANALISA - Komplain dari Ulasan Marketplace` (tidak ditautkan: dok published tak boleh menaut ke Workspace).
+- **Komplain tak memicu notifikasi apa pun.** Gudang harus membuka halaman berulang untuk tahu ada keluhan baru; kategori inbox untuk ini belum ada, dan menambahnya menuntut dua container naik bersama.
+- **`GET /wms/komplain` tidak berpaginasi**, hanya dipotong 1.000 baris. Aman selama volumenya puluhan per bulan seperti yang diperkirakan ADR 0099; bila register ini ramai, paginasi harus ditambahkan sebelum layarnya melambat diam-diam.
 - Label Shopee bersifat async 3-langkah (create → poll → download) — FE harus retry order yang masih PROCESSING.
 - ⚠️ Penandaan LABEL_PRINTED (dan log reprint) bersifat per-batch integration 200 OK, bukan per hasil order — order Shopee yang masih PROCESSING ikut tertandai printed. Mitigasi: tombol **Cetak Ulang** di FE Riwayat Cetak Resi (order tetap bisa di-retry walau sudah keluar dari layar Pengemasan). Perbaikan ideal: parse hasil per order sebelum menandai.
 - Cetak ulang setelah HANDED_OVER tidak dicatat di history (hanya saat masih LABEL_PRINTED).
@@ -105,7 +132,7 @@ integration `shouldNotifyWarehouse` ikut meneruskan status tersebut.
 ## Dependensi & Integrasi
 
 - [[CORE - API Master Gateway]] (routing + gateway key middleware)
-- [[Microservices - Integration Service]] — sumber order TO_SHIP (pull via reconciler + push via hook); endpoint internal ship-batch + labels (dibangun Task 5+)
+- [[Microservices - Integration Service]] — sumber order TO_SHIP (pull via reconciler + push via hook); endpoint internal ship-batch + labels (dibangun Task 5+); **sejak 2026-09-16 juga dipanggil di jalur BACA komplain** (`GET /icc/mappings/me`, timeout 10 detik, header `BIP-Gateway-ID` + `BIP-Employee-ID`) untuk menentukan cakupan toko pemanggil. Ini satu-satunya panggilan lintas service di jalur baca, dan kegagalannya sengaja jadi 500 bersebab, bukan daftar kosong.
 - [[External - Accurate]] — hilir settlement (tidak langsung dari warehouse)
 - [[WH - Fulfillment Flow & WMS Tinggarjaya]] — arsitektur lengkap + gap analysis
 - [[DB - Overview and Notes]] · [[APP - Web ERP]] (frontend modul warehouse — TBD)
