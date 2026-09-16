@@ -617,7 +617,14 @@ warna Lead pindah menjadi lampu di permukaan meja dan tetap ber-id `led-pod-<n>`
 halaman tidak berubah. Ia ditaruh di sisi **selatan** monitor, bukan di sisi layarnya: meja di sisi utara tertutup
 badan monitor dari sudut pandang ini, jadi penanda di sana hanya akan terlihat karena tergambar belakangan.
 
-**Test.** `tests/kantor-agent-browser.ps1` naik ke 37 check: arah di pod, bangku pod, ruang server, perpustakaan,
-lounge, kursi rapat yang dicocokkan dengan vektor ke pusat meja, robot membelakangi tanpa mata, arah saat berjalan,
-arah kembali ke kursinya setibanya, dan penanda warna pod tetap ada. Sembilan check baru itu dilihat merah lebih
-dulu (arah kosong, dan robot yang membelakangi masih punya dua mata).
+**Test.** `tests/kantor-agent-browser.ps1` naik ke 38 check: arah di pod, kedua bangku pod, ruang server,
+perpustakaan, lounge, kursi rapat yang dicocokkan dengan vektor ke pusat meja, robot membelakangi tanpa mata, arah
+saat berjalan, arah kembali ke kursinya setibanya, badan yang benar-benar digambar ulang saat berputar, dan penanda
+warna pod tetap ada. Check baru itu dilihat merah lebih dulu (arah kosong, dan robot yang membelakangi masih punya
+dua mata).
+
+Dua kontrol mutasi dijalankan atas suite itu. Menukar timur dan barat di `arahDari` membuat dua check merah (kursi
+rapat dan arah saat berjalan). Membuang arah dari kunci cache `gambarBadan` juga membuat dua merah, tetapi hanya
+sesudah check "badan digambar ulang saat berputar" ditambahkan: check arah yang lain membaca keadaan `arah` milik
+robot, bukan badan yang tergambar, jadi jalur berjalan tak terjaga tanpanya. Titik berdiri ruang server tak
+mengubah `dudukZ`, sehingga tanpa arah kunci cache-nya benar-benar sama dan badan lama bertahan.
