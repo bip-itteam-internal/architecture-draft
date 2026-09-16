@@ -229,8 +229,8 @@ dobel). ⛔ Kirim 39 resi sekaligus kena **batas waktu gateway 30 detik** (502) 
 sebagian** (56→30) — 502 di endpoint ini BUKAN "tak ada yang terjadi"; ukur ulang keadaan sebelum mengulang. Batch 7
 resi aman; operasinya idempoten.
 
-> **Amandemen — komponen paket yang TAK PERNAH discan: kelas tetangga, deteksinya ditambahkan (🟡 PR #1804 belum
-merge).** Retur **paket** yang komponennya cuma discan sebagian **tetap menerbitkan dokumen** — hanya kurang isinya —
+> **Amandemen — komponen paket yang TAK PERNAH discan: kelas tetangga, deteksinya ditambahkan (✅ PR #1804, merged
+2026-09-09).** Retur **paket** yang komponennya cuma discan sebagian **tetap menerbitkan dokumen** — hanya kurang isinya —
 jadi tak ada yang berbunyi salah: penjualan terbalik kurang, stok komponennya tak pernah bertambah, barangnya diam di
 gudang. Beda dari amandemen di atas: datanya **tak pernah lahir**, bukan hilang di jalan, jadi fix per-SKU tak
 menyentuhnya. Terukur 2026-09-09: **17 order** (TikTok 12 dari 1.720 order paket ber-scan, Shopee 5 dari 162),
@@ -262,6 +262,18 @@ jumlah di bawah seharusnya) dan **SKU salah scan** (SKU yang tak ada di order sa
 `putuskanKonfirmasi`/`keadaanRetur.sudahTercatat` (`retur_konfirmasi_ulang.go`), `buildSweepFilter`
 (`retur_konfirmasi_sweep.go`), tes `accurate_return_komponen_belum_discan_test.go` +
 `accurate_return_scanned_skus_test.go` + `retur_konfirmasi_per_sku_test.go`.
+
+> **Amandemen — komponen kurang kini PUNYA tampilan, dan paket order batal tak lagi menunggu scannya**
+(🟡 2026-09-15, branch `fix/retur-paket-batal-ikut-order`, belum merge). Dua "sisa terbuka" di atas
+sebagian tertutup. **(1)** Tampilannya bukan layar WMS melainkan **kolom Excel di dua tempat**:
+`Komponen Belum Discan` di Laporan Retur finance (kolom ke-13; "Scan Gudang" jadi **"Sebagian discan"**)
+dan di Ekspor Retur Gudang WMS (`komponen_belum_discan`, tercentang bawaan) — keduanya memakai
+perakitan yang sama, `komponenKurangOrder`. **(2)** Kelas **SKU salah scan** sudah ditangani di jalur
+PEMBUKUAN sejak PR #1830 (`koreksiBarangAsing`: barang ikut ORDER), bukan di sumbu deteksi ini; yang
+masih terbuka tetap **qty kurang**. ⛔ **Penyimpangan sadar dari "kondisi gudang menang"**: paket dari
+order BATAL kini dibukukan UTUH mengikuti order walau komponennya belum lengkap discan, jadi **stok
+komponen di Accurate mendahului fisik** dan ditutup lewat scan susulan. Keputusan & batasannya di
+[[ADR - 0040 Retur Paket Utuh via Baris Induk Faktur]] (amandemen 2026-09-15).
 
 ## Dokumen Terkait
 
