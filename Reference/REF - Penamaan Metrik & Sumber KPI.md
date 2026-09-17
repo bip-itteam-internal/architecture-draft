@@ -126,6 +126,27 @@ Kunci i18n: `hris.kpi.mtkPiutangLewat90` / `…Ket`.
 
 ⚠️ **Penjaga satuan yang ditulis bersamanya memerahkan DUA metrik yang sudah lama dipakai template produksi**: keterangan `piutang_lewat_14_persen` dan `piutang_lewat_60_persen` sama sekali tak menyebut satuan maupun arah. Keduanya ikut dibetulkan, satu frasa masing-masing. Polanya sama dengan temuan `kinerja_affiliate_tim` di bawah: **penjaga yang ditulis untuk entri baru hampir selalu menemukan entri lama yang melanggar aturan yang sama**, dan itu justru gunanya.
 
+### 🟡 `selesai_dinilai` — metrik keempat `kinerja_tiket` (Building Maintenance)
+
+Metrik baru pada sumber **`kinerja_tiket`** yang sudah ada, untuk metrik kerusakan template `Building and Maintenance Staff` (GA, bobot 0,35). **bip-erp PR [#1962](https://github.com/bip-itteam-internal/bip-erp/pull/1962) + erp-frontend PR [#1638](https://github.com/bip-itteam-internal/erp-frontend/pull/1638)** (merged 2026-09-17, live di DEV dan terverifikasi lewat gateway 2026-09-17, belum deploy PROD). Perilakunya di [[Microservices - Employee Service]].
+
+| Locale | Label | Keterangan |
+|---|---|---|
+| `id.ts` | `Tiket selesai & dinilai (%)` (27 karakter) | "Persentase tiket yang ditugaskan pada periode itu yang sudah selesai DAN sudah dinilai pengajunya. Nilai dari penangan tiket itu sendiri tidak dihitung. Isi ambang dengan bintang minimal (1 sampai 5), target dalam persen. Menu Manajemen Tugas." |
+| `en.ts` | `Tickets resolved & rated (%)` (28 karakter, tepat di batas) | "Percentage of tickets assigned in the period that were resolved AND rated by their requester. Ratings given by the ticket's own handler are not counted. Set the threshold to the minimum stars (1 to 5); the target is a percentage. Task Management menu." |
+
+Kunci i18n: `hris.kpi.mtkSelesaiDinilai` / `…Ket`. Label memakai `(%)`, bukan `(persen)` seperti tiga metrik saudaranya, karena `(persen)` membuat label melewati batas 28 karakter.
+
+| Tempat | Status | Catatan |
+|---|---|---|
+| Kamus label (`label-otomatis.ts` `METRIK`) | ✅ | |
+| `METRIK_DIKENAL` | ✅ | kontrol negatif: entri kamus dihapus sementara → penjaga merah tepat pada `selesai_dinilai` |
+| `SATUAN_PER_METRIK` | ✅ `persen` | satuan TARGET; ambangnya bintang dan tak memengaruhi satuan |
+| `FORMULA_PER_METRIK` | ⬜ tidak diisi | `kinerja_tiket` memanggil `DaftarkanFormulaSumber` (`rasio_ambang`), jadi rumus datang dari katalog; tiga metrik saudaranya juga tak diisi |
+| `METRIK_PER_SUMBER` | ⬜ tidak perlu | `git grep selesai_dinilai` di kedua repo sebelum ditambahkan: 0 hasil |
+
+⛔ **Keterangannya menyebut bahwa ambang = BINTANG minimal 1..5, dan itu keharusan.** Metrik saudaranya `ontime` memakai `rasio_ambang` berambang **0**, sehingga pengisi yang meniru konfigurasinya akan mengisi ambang 0. Untuk metrik ini ambang 0 meloloskan nol pengganti dan memberi setiap orang 100%; backend menolaknya saat menghitung, tetapi keterangan adalah satu-satunya tempat pengisi membaca aturannya saat ia memilih.
+
 ### 🟡 `program_culture` — sumber baru (branch `feature/workspace-position`)
 
 Sumber KPI baru dari [[Microservices - Form Builder Service]] (`GET /internal/culture/metrics`), memasok metrik `culture` KPI Culture & Industrial. **Belum merge/prod.** Nilainya **skor komposit** program culture (blueprint 30/30/40), bukan % sesuai jadwal — lihat [[ADR - 0066 Modul Kelola Program Culture]]. Label ramah + keterangan ditaruh di kamus `label-otomatis.ts` dan dua locale `src/i18n/locales/{id,en}.ts`.
