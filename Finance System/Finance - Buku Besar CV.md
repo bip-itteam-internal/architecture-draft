@@ -4,7 +4,7 @@
 
 *Konsep modul buku besar dan konsolidasi 40 CV grup di dalam ERP: satu identitas CV, bagan akun, jurnal, laporan keuangan per CV, kertas kerja konsolidasi, tutup buku, dan jurnal otomatis dari pembayaran, kas kecil, payroll, marketplace, serta mutasi bank. Keputusan dan alasannya di [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]]; spesifikasi awalnya [[APP - Buku Besar Konsolidasi CV FINCON]].*
 
-- **Status**: 🟡 **Konsep** untuk bagan akun, jurnal, laporan, konsolidasi, dan tutup buku (dirancang 2026-09-15); pembukuan 40 CV hari ini masih berjalan di FINCON, di luar ERP. ⚠️ **Master entitas CV, penugasan pemegang, dan cakupan tulis (T1) dikodekan** di branch `feat/finance-entitas-cv` bip-erp dan erp-frontend 2026-09-15, **belum merge**, lihat §Master entitas CV dan §Belum Diimplementasikan / Catatan.
+- **Status**: 🟡 **Konsep** untuk bagan akun, jurnal, laporan, konsolidasi, dan tutup buku (dirancang 2026-09-15); pembukuan 40 CV hari ini masih berjalan di FINCON, di luar ERP. ⚠️ **Master entitas CV, penugasan pemegang, dan cakupan tulis (T1) MERGE 2026-09-16** (bip-erp #1905, erp-frontend #1592), dan antrean transfer kas CV (T2) merge 2026-09-16 dan 17; keduanya **di prod sejak 2026-09-17** tetapi belum dipakai, karena paket "Budget: Transfer Kas CV" belum dipasang dan data penugasan masih nol (diukur 2026-09-17), lihat §Master entitas CV dan §Belum Diimplementasikan / Catatan.
 - **Implementasi**: modul finance-service ([[Finance - Rancangan Finance Service]]); rute T1 di [[API - Finance Service]] §Buku Besar CV, layar `/finance/entitas-cv` dan `/finance/entitas-cv/saya` di [[APP - Web ERP]]. Sisanya TBD.
 
 ## Latar Belakang
@@ -22,7 +22,7 @@
 - PT hanya dirujuk sebagai lawan transaksi; pembukuannya tetap di Accurate.
 - Penugasan pemegang CV per karyawan. FINCON hari ini membagi CV ke enam akun bersama (7, 7, 7, 7, 6, dan 6 CV); pembagian itu titik awal, bukan ketentuan.
 
-**Yang dikodekan T1** (branch `feat/finance-entitas-cv`, belum merge; `bip-erp/services/finance/akuntansi_cv_*.go`):
+**Yang dikodekan T1** (merge 2026-09-16, bip-erp #1905; `bip-erp/services/finance/akuntansi_cv_*.go`):
 
 - **Semai**: 40 CV bawaan dari FINCON `src/utils/accounting.js` `DEFAULT_COMPANIES` (kode, singkatan tiga huruf, nama) di-upsert `$setOnInsert` per perusahaan, jadi mengulang semai tak menimpa nama yang sudah dikoreksi. Rujukan diisi otomatis hanya bila masih kosong, hanya untuk CV aktif, dan hanya untuk cocok tunggal sesudah normalisasi format nama ([[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] §2 amandemen); ambigu dan tak cocok dibiarkan kosong lalu dilaporkan. Tombol Semai tampil selama `GET /akuntansi-cv/entitas/bawaan` menyebut ada kode bawaan yang belum disemai; jumlah CV bawaan hanya hidup di daftar bawaan backend.
 - **Rujukan**: `payroll_company_id` (badan usaha payroll, dibaca lewat rute internal payroll berkunci layanan) dan `akun_accurate_no` (anak COA 1299, bukan induknya, `common.AdalahRekeningCV`, dibaca dari bagan akun Accurate lewat integration). Satu rujukan hanya boleh dipakai satu CV (index unik parsial dan 409). Mengubah rujukan diperiksa ke sumbernya: sumber tak terbaca 503, rujukan tak ada 422. Bagan akun dibaca integration dari cache, jadi rekening yang baru dibuat di Accurate bisa belum terlihat beberapa saat.
@@ -99,11 +99,11 @@ Klasifikasi fee Lazada ke akun Accurate mengikuti [[ADR - 0078 Klasifikasi Fee L
 
 | Persona | Peran & Divisi | Akses / RBAC | Device |
 |---|---|---|---|
-| Junior Accountant pemegang CV | Junior Accountant, FAT | **DUA paket**: "Buku Besar CV: Pemegang" (`akuntansicv.cv.tulis`, merge 2026-09-16) yang membuka layar **CV Saya**, plus "Budget: Transfer Kas CV" (`budget.cv.transfer`, T2 branch) yang membuka tahap transfer. Antrean transfernya tinggal di CV Saya, bukan `/finance/ap` yang digerbang `finance.ap.view`. Belum dipasang di prod; per 2026-09-12 lima dari tujuh belum punya paket izin apa pun ([[Finance - FAT Persona]]) | Web ERP |
+| Junior Accountant pemegang CV | Junior Accountant, FAT | **DUA paket**: "Buku Besar CV: Pemegang" (`akuntansicv.cv.tulis`, merge 2026-09-16) yang membuka layar **CV Saya**, plus "Budget: Transfer Kas CV" (`budget.cv.transfer`, T2, merge 2026-09-16) yang membuka tahap transfer. Antrean transfernya tinggal di CV Saya, bukan `/finance/ap` yang digerbang `finance.ap.view`. Belum dipasang di prod; per 2026-09-12 lima dari tujuh belum punya paket izin apa pun ([[Finance - FAT Persona]]) | Web ERP |
 | Senior Accountant | Senior Accountant, FAT | Baca semua CV lewat paket "Buku Besar CV: Pembaca" (`akuntansicv.view`, rencana pemasangan T1); pemeriksa jurnal manual; review bukti transfer | Web ERP |
 | SPV FAT | Finance Supervisor | Paket "Buku Besar CV: Pengelola" (`akuntansicv.view` + `akuntansicv.kelola`, sengaja tanpa `cv.tulis`, rencana pemasangan T1): semai, rujukan, penugasan; `budget.approve.finance`, `budget.approve.pembayaran`; kunci periode (TBD) | Web ERP |
 | Tax Officer | Tax Staff | Baca semua CV untuk omzet dan pajak CV lewat paket "Buku Besar CV: Pembaca" (rencana pemasangan T1) | Web ERP |
-| Account Payable | Account Payable | Transfer pengajuan bersumber dana rekening PT, `budget.ap.bayar`. Dokumen ber-kode CV **tidak** masuk antreannya (T2, branch) | Web ERP |
+| Account Payable | Account Payable | Transfer pengajuan bersumber dana rekening PT, `budget.ap.bayar`. Dokumen ber-kode CV **tidak** masuk antreannya (T2) | Web ERP |
 | Pemohon | Karyawan Marketing, HR, GA | `budget_pemohon_*` | Web ERP |
 | Direktur | Direksi | Baca master entitas dan penugasan lewat paket "Buku Besar CV: Pembaca" (rencana pemasangan T1); izin laporan dan konsolidasi TBD | Web ERP |
 
