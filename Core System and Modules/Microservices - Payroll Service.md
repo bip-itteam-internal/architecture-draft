@@ -347,7 +347,7 @@ Gerbang §5a runbook deploy, dijalankan sungguhan lewat `/api/payroll/...`:
 
 - [[Microservices - Employee Service]] — master karyawan (NPWP/BPJS/bank) via `employee_id`; juga penyedia `payroll-approx`. Sebaliknya employee-service **membaca** `GET /employee-salary/:employeeId` + `GET /salary-components` untuk Lampiran 1 dokumen PKWT masa transisi (T18, di branch 2026-09-12) dengan identitas HR pemanggil; izin `payroll.view` dinilai di employee-service karena `BIP-Permissions` tidak diteruskan
 - [[Microservices - Attendance Service]] — `payroll-supplement` (agregasi kehadiran periode 26→25) = input kalkulasi (Fase 2, **sudah dipakai**)
-- [[Finance - Buku Besar CV]]: finance-service membaca id dan nama badan usaha lewat `GET /internal/badan-usaha` berkunci `PAYROLL_SERVICE_KEY` untuk master entitas CV dan laporan kecocokannya, tanpa NPWP dan rekening (branch `feat/finance-entitas-cv`, belum merge 2026-09-15). Rutenya di [[API - Payroll Service]] §Rute internal
+- [[Finance - Buku Besar CV]]: finance-service membaca id dan nama badan usaha lewat `GET /internal/badan-usaha` berkunci `PAYROLL_SERVICE_KEY` untuk master entitas CV dan laporan kecocokannya, tanpa NPWP dan rekening (merge 2026-09-16 lewat bip-erp #1905, di prod sejak 2026-09-17). Rutenya di [[API - Payroll Service]] §Rute internal
 - [[CORE - API Master Gateway]] · [[CORE - SSO Flow]] — routing + auth
 - [[DB - Overview and Notes]] — pola database-per-service ([[ADR - 0002 Database-per-Service]])
 

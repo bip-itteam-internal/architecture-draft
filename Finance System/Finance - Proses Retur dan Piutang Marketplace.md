@@ -28,7 +28,7 @@ Gudang men-scan retur tepat waktu → retur terbukukan otomatis → AR menangani
 
 - **A** Disiplin scan retur di gudang, karena antrean pembukuan retur Finance adalah antrean scan gudang.
 - **B** Ukur besar celah retur yang lolos sinkron (rekap unggah manual yang dikirim ke IT adalah sumber volumenya), lalu tutup penyebabnya.
-- **B** Satu daftar pengecualian retur dan piutang di ERP untuk menggantikan basis data kerja.
+- **B** Satu daftar pengecualian retur dan piutang di ERP untuk menggantikan basis data kerja. 🟡 Sisi retur diusulkan jadi tab **Selisih Retur** di Auto Sync Retur ([[ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]], 2026-09-17): menunggu scan >30 hari, dibukukan tanpa scan, komponen paket belum discan, scan tak sampai pembukuan, dan (Tahap 2) catatan ERP berbeda dari isi Accurate. **Piutang minus dan retur yang lolos sinkron belum tercakup** di sana.
 - **TBD** Pemilik pelacakan paket yang tertahan di ekspedisi.
 - **TBD** Kenapa fitur pelacakan cancel dan retur yang sudah ada di ERP belum membantu; tanyakan saat wawancara sebelum membangun fitur pelacakan baru.
 
@@ -45,4 +45,4 @@ Sumber data baseline: Rekap unggah manual yang dikirim ke IT; daftar retur PENDI
 ## Dokumen Terkait
 
 - [[Finance - Proses Bisnis dan Kebutuhan Sistem]] · [[Finance - Kalender dan Rantai Tenggat]] · [[Finance - Sambungan dan Permintaan Data Lintas Departemen]] · [[Finance - FAT Persona]]
-- [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] · [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] · [[Microservices - Integration Service]]
+- [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] · [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] · [[ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]] · [[Microservices - Integration Service]]
