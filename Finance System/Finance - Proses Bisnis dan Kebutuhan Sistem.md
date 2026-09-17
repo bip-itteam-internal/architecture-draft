@@ -25,6 +25,8 @@
 6. **Angka yang belum lengkap harus mengaku.** Layar yang menjumlah data sebagian menyebut apa yang tidak ikut dihitung (contoh yang sudah ada: kartu Varians OPEX, `erp-frontend/src/features/finance/anggaran/components/kartu-varians-opex.tsx:107-140`).
 7. **Batas sistem jelas.** ERP tidak memindahkan uang (transfer tetap di bank) dan tidak menggantikan Coretax. Buku PT tetap di Accurate ([[ADR - 0001 Akuntansi via Accurate]]); buku CV diarahkan ke ERP ([[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]]).
 8. **Efisiensi dibuktikan dengan ukuran sebelum dan sesudah**, bukan dengan fitur yang sudah rilis.
+9. **Tenggat tampil di kalender terpusat, bukan kalender sendiri.** Fitur bertanggal mendaftarkan feed ke [[Microservices - Calendar Service]]. Tenggat pajak sudah melakukannya (`bip-erp/services/finance/pajak_calendar_feed.go:156`, rute `routes.go:137`, provider `bip-erp/services/calendar/providers.go:38`); tenggat lain di § Kalender bulanan belum.
+10. **Yang meminta data melihatnya sendiri.** Data yang rutin diminta dari Finance (§ Data yang diminta dari Finance) disediakan di layar peminta sesuai hak aksesnya, bukan dikirim ulang lewat chat.
 
 ## Peta proses
 
@@ -41,6 +43,29 @@
 | P9 | Anggaran, kas kecil, dana kegiatan | Cost Control | Semua divisi, GA | Accurate, Excel, kertas | Anggaran dan kas kecil ada; dana kegiatan belum ada |
 | P10 | Tutup buku, stock opname, laporan | Senior Accountant, Cost Control | Gudang, Direktur | Excel, Accurate | Laporan dibaca dari Accurate; checklist belum ada |
 | P11 | Costing HPP produk | AP | APJ, Procurement, PPIC, SPV Marketing | Templat Excel, WhatsApp | Belum ada; hanya kartu hasil |
+
+## Kalender bulanan dan rantai tenggat
+
+Tanggal di bawah berasal dari isian survei 2026-09, bukan aturan perusahaan; konfirmasi ke Supervisor FAT sebelum dijadikan tenggat sistem. Yang penting bagi rancangan adalah **rantainya**: langkah di kanan tidak bisa dikerjakan sebelum langkah di kiri selesai, jadi keterlambatan di awal rantai menumpuk di minggu pertama.
+
+| Tanggal | Kegiatan | Proses | Bergantung pada |
+|---|---|---|---|
+| 1 | Pembayaran gaji | P7, P2 | Rekap gaji dari HR tiba dan diperiksa sebelum tanggal 1 |
+| 1 | Unduh rekening koran, rekonsiliasi awal bulan | P5 | Rekening koran baru tersedia tanggal 1 |
+| 1 | Pencocokan penjualan dashboard, ERP, dan Accurate | P3 | Sinkron marketplace bulan lalu lengkap |
+| 1 sampai 3 | Kode billing PPh final, PPh 21, PPh 25 | P8 | Omzet per CV dari pengolahan penjualan (P3); gaji (P7) |
+| 1 sampai 3 | Kas kecil GA dan marketing | P9 | Lampiran pengeluaran dari unit |
+| 1 sampai 5 | Tutup buku kas umum, laporan keuangan bulanan | P10 | Seluruh input akhir bulan lengkap |
+| 2 | Rekonsiliasi penjualan dengan gudang | P3, P4 | Balasan gudang |
+| 5 (sebagian 6 sampai 10) | Pembayaran hutang supplier dan PPh final | P2, P8 | Kode billing; data penarikan kas toko |
+| 10 | Pembayaran iuran BPJS TK | P7, P2 | Tagihan dan lampiran per badan usaha dari HR |
+| 20 | Kode billing PPh 23 dan PPN | P8 | Data pembelian dan pembayaran |
+| Beberapa tanggal tetap per brand | Pembayaran iklan dan FO | P1, P2 | Permintaan dari marketing; frekuensinya tidak konsisten antar isian (TBD volume) |
+| Sekitar 25 sampai 28 | Stock opname gudang dan rekonsiliasi stok | P10 | Hitung fisik tim gudang |
+| Mulai 26, lalu sekitar 29 sampai 30 | Pengecekan rekap gaji (kehadiran dan potongan, lalu rekening dan PPh) | P7 | Rekap dari HR |
+| 30 atau 31 | Penarikan afiliasi, cut-off | P9, P10 | Data afiliasi |
+
+Kebutuhan sistem dari rantai ini: tiap tenggat punya pemilik dan pengingat ke pemilik langkah sebelumnya, terdaftar di kalender terpusat (prinsip 9), dan daftar periksa tutup buku (P10) memperlihatkan langkah mana yang masih menahan rantai.
 
 ## Proses
 
@@ -64,7 +89,8 @@
 
 - **Tujuan**: uang keluar dengan nominal benar, dari rekening yang benar, berbukti, dan tercatat, dengan satu kali input.
 - **Hari ini** (*survei 2026-09*):
-  - Kas CV: BKK Excel dicetak → unggah AppSheet → input Kopra → persetujuan → unduh bukti → jurnal → arsip AppSheet dan kertas → bukti dikirim lewat WhatsApp. Satu pembayaran diketik empat sampai lima kali, dan proses yang sama berjalan terpisah di tiap kelompok CV.
+  - Kas CV: BKK Excel dicetak → unggah AppSheet → input Kopra → persetujuan → unduh bukti → jurnal → arsip AppSheet dan kertas → bukti dikirim lewat WhatsApp. Satu pembayaran diketik empat sampai lima kali, dan proses yang sama berjalan terpisah di tiap kelompok CV. Persetujuan ada dua lapis: Supervisor FAT memeriksa, lalu "atasan" menyetujui di internet banking.
+  - Iklan: top up juga diinput ke iLink Kas Iklan. Sebagian iklan dibayar ke kas iklan lebih dulu lalu diganti dari kas CV, karena ada bank yang tidak bisa membayar virtual account langsung; satu biaya iklan menjadi dua transfer dan dua jurnal.
   - Rekening PT: tagihan masuk → internet banking → BKK/BKM kertas → persetujuan Supervisor FAT → arsip bantex bulanan → bukti lewat WhatsApp.
 - **Sudah ada di ERP**:
   - Tahap `pb_finance_setujui_bayar` (Supervisor FAT memilih kas CV pembayar) dan `pb_ap_transfer` yang bercabang: rekening PT oleh pemegang `budget.ap.bayar`, kas CV oleh pemegang `budget.cv.transfer` yang ditugaskan ke CV itu (`bip-erp/services/procurement/pengajuan_barang_gate.go:245-284`); antrean transfer CV di layar CV Saya. Rinciannya di [[Finance - Buku Besar CV]].
@@ -77,6 +103,8 @@
   - **B** Pembayaran tanpa faktur (tipe DANA, IKLAN, KONSUMSI) dibukukan lewat jurnal umum yang tidak terbit selama saklar kas mati; kapan saklar dinyalakan perlu diputuskan sesudah diuji.
   - **C** Jurnal otomatis buku CV dari pembayaran berbukti (T6).
   - **TBD** Berkas transfer massal ke bank belum dianalisa.
+  - **TBD** Siapa "atasan" yang menyetujui di internet banking, dan apakah persetujuan di bank itu tetap ada sesudah persetujuan pindah ke ERP.
+  - **TBD** Jalur iklan lewat kas iklan lalu diganti kas CV dipertahankan, atau bank pembayar virtual account diganti supaya satu biaya iklan cukup satu transfer.
 - **Kontrol wajib**: pelaksana transfer, penyetuju, pemeriksa bukti, dan pelaku rekonsiliasi bank adalah peran berbeda.
 - **Ukuran**: jumlah BKK per bulan per CV (ekspor AppSheet), transaksi Kopra per rekening per bulan, lama dari disetujui sampai ditransfer, jumlah pengetikan ulang per pembayaran (target satu).
 
@@ -92,12 +120,13 @@
   - **TBD** Isi, aturan, dan pemilik alat web rekap penarikan CV ditelusuri sebelum T8 dirancang, supaya tidak membangun tandingannya dari nol.
   - **TBD** Income yang belum masuk sinkron dan masih diinput manual: kanal dan penyebabnya belum diukur.
 - **Kontrol wajib**: satu kolom dihitung sekali; kolom yang merupakan bagian dari kolom lain tidak dijumlahkan.
+- **Risiko pencatatan ganda**: faktur, retur, dan penerimaan marketplace sudah dikirim otomatis ke Accurate, sementara penjualan per CV juga dijurnal manual. Bila keduanya mencatat transaksi yang sama untuk entitas yang sama, penjualan terhitung dua kali. Buku mana yang menjadi dasar laporan CV masih TBD nomor 1 di [[Finance - Buku Besar CV]]; T8 wajib menjawabnya sebelum menerbitkan jurnal penjualan CV.
 - **Ukuran**: jam rekap penjualan per hari; jumlah selisih dashboard, ERP, dan Accurate pada pencocokan awal bulan; tanggal data penarikan tersedia bagi pengolah.
 
 ### P4. Retur dan piutang marketplace
 
 - **Tujuan**: retur dibukukan sekali, sesuai barang yang benar-benar kembali, dan piutang terbuka akurat tanpa basis data kerja paralel.
-- **Hari ini** (*survei 2026-09*): retur divalidasi di empat sumber (ERP, marketplace, Accurate, gudang); retur yang belum discan dikejar ke gudang dan ekspedisi (tindak lanjut tiga sampai lima hari); piutang minus ditelusuri karena income yang berubah jadi retur; retur yang ternyata belum terbukukan diunggah manual, dan untuk faktur sejak Juli 2026 dicatat lalu dilaporkan ke IT.
+- **Hari ini** (*survei 2026-09*): retur divalidasi di empat sumber (ERP, marketplace, Accurate, gudang); retur yang belum discan dikejar ke gudang dan ekspedisi (tindak lanjut tiga sampai lima hari); piutang minus ditelusuri karena income yang berubah jadi retur; retur yang ternyata belum terbukukan diunggah manual, dan untuk faktur sejak Juli 2026 dicatat lalu dilaporkan ke IT. Fitur pelacakan cancel dan retur di ERP disebut belum membantu.
 - **Sudah ada di ERP**: sinkron retur ke Accurate dengan gerbang payout ([[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]]) dan gerbang gudang: retur barang kembali ditahan PENDING sampai gudang men-scan barangnya ([[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]]). Per 2026-08-06: 908 baris PENDING, 900 menunggu scan ([[Microservices - Integration Service]]). Order yang dikirim sebelum 1 Juli 2026 memang dibukukan manual oleh Finance.
 - **Alur target**: gudang men-scan retur tepat waktu → retur terbukukan otomatis → AR menangani pengecualian dari satu daftar di ERP (belum discan, lolos sinkron, piutang minus) → piutang terbuka diperbarui.
 - **Celah**:
@@ -105,6 +134,7 @@
   - **B** Ukur besar celah retur yang lolos sinkron (rekap unggah manual yang dikirim ke IT adalah sumber volumenya), lalu tutup penyebabnya.
   - **B** Satu daftar pengecualian retur dan piutang di ERP untuk menggantikan basis data kerja.
   - **TBD** Pemilik pelacakan paket yang tertahan di ekspedisi.
+  - **TBD** Kenapa fitur pelacakan cancel dan retur yang sudah ada di ERP belum membantu; tanyakan saat wawancara sebelum membangun fitur pelacakan baru.
 - **Kontrol wajib**: retur yang sudah diserap penerimaan tidak dibukukan lagi (gerbang payout).
 - **Ukuran**: jumlah retur yang diunggah manual per bulan; umur retur PENDING yang menunggu scan.
 
@@ -211,6 +241,10 @@
 
 Urutan orang dan sistem: sistem dipakai lebih dulu, baru cara kerja manual yang digantikannya dihentikan. Menghentikan cara manual sebelum sistemnya berjalan memindahkan beban, tidak menghapusnya. Masa jalan paralel (mis. buku CV bersama FINCON satu siklus, T5) sementara menambah kerja dan perlu dijadwalkan di luar minggu tutup buku.
 
+**Mulai bertahap dan terukur.** Kelompok A dijalankan dulu pada lingkup kecil, misalnya satu atau dua CV membayar lewat Pengajuan Barang selama satu bulan, dengan baseline dari § Ukuran efisiensi diambil sebelumnya. Hasilnya dibandingkan sebelum cakupan diperluas ke seluruh CV dan rekening PT.
+
+**Kapasitas IT ikut dihitung.** Survei mencatat perbaikan data atau sistem ditunggu 1 sampai 5 hari per kasus. Tiap modul baru menambah hal yang bisa salah dan harus diperbaiki; tanpa kapasitas perbaikan, efisiensi di Finance berpindah menjadi antrean di IT. Sebelum modul dirilis, tetapkan siapa menangani laporan selisih dan berapa lama targetnya.
+
 ## Sambungan dengan departemen lain
 
 Sebagian perbaikan proses Finance dikerjakan di modul milik departemen lain.
@@ -224,6 +258,21 @@ Sebagian perbaikan proses Finance dikerjakan di modul milik departemen lain.
 | Marketing | Permintaan iklan lewat pengajuan; rekap iklan dan afiliasi untuk tutup buku | Procurement, marketing | Tipe IKLAN ada; penarikan rekap untuk tutup buku belum diperiksa |
 | IT | Sinkron marketplace ke Accurate yang lengkap; perbaikan selisih | Integration | Jalan; celah retur dan income manual belum diukur |
 | Pihak luar | Transfer, rekening koran, Coretax, seller center | Di luar ERP | Tetap manual; mutasi bank direncanakan diimpor (T9) |
+
+## Data yang diminta dari Finance
+
+Permintaan yang hari ini dilayani lewat chat atau berkas (*survei 2026-09*). Arah sistemnya: peminta melihat sendiri di ERP sesuai hak aksesnya (prinsip 10).
+
+| Data | Diminta oleh | Dilayani hari ini oleh | Proses | Arah di sistem |
+|---|---|---|---|---|
+| Bukti transfer | Pemohon, HR, Marketing, pemasok | Junior Accountant, AP, Cost Control | P2 | Bukti menempel di pengajuan; pemohon dikabari saat bukti disetujui |
+| Totalan penjualan | Departemen lain | AR | P3 | Laporan penjualan per toko dan per entitas |
+| Retur yang masih tertahan | Gudang | AR | P4 | Daftar retur PENDING yang sama untuk gudang dan AR |
+| Kode billing pajak | Junior Accountant | Tax | P8 | Kewajiban dan kode billing di Tax Control, masuk antrean bayar |
+| Realisasi anggaran | Departemen lain; laporan realisasi RAPB ke Direktur | Cost Control | P9 | Varians per pos yang bisa ditelusuri, dibaca sesuai hak akses |
+| Pencapaian target profit, penilaian realisasi iklan | Departemen lain (peminta tidak disebut di survei) | Cost Control | P9 | Dashboard insentif yang sudah ada ([[Finance - Incentive]]); apakah cakupannya sama dengan yang diminta: TBD |
+| Hasil costing HPP | SPV Marketing | AP lewat Supervisor FAT | P11 | TBD bersama P11 |
+| Laporan keuangan | Direktur, departemen lain | Senior Accountant | P10 | Laporan dari buku entitas; hak baca per peran (TBD) |
 
 ## Pertanyaan wajib sebelum membangun
 
@@ -277,6 +326,10 @@ Diputuskan Supervisor FAT atau manajemen sebelum kelompok A berjalan:
 ## Belum Diputuskan (TBD)
 
 - Tipe atau jalur pengajuan untuk pajak, iuran BPJS, dan hutang supplier CV (P1).
+- Penyetuju di internet banking dan jalur iklan lewat kas iklan (P2).
+- Buku dasar laporan penjualan CV supaya penjualan tidak tercatat dua kali (P3, P6).
+- Alasan fitur pelacakan cancel dan retur belum membantu (P4).
+- Tanggal di § Kalender bulanan sebagai tenggat resmi (konfirmasi Supervisor FAT).
 - Berkas transfer massal ke bank (P2).
 - Isi dan pemilik alat web rekap penarikan CV; kanal income yang masih diinput manual (P3).
 - Pemilik pelacakan paket tertahan di ekspedisi (P4).
