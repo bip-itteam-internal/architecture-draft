@@ -154,6 +154,11 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 | GET | `/onboarding-reviews/assigned` | Sesi yang ditugaskan ke saya (+ jawaban saya) | auth (penilai) |
 | POST | `/onboarding-reviews/:id/response` | Submit/ubah jawaban `{ratings(7×1-5), strengths, improvements, recommendations}` — boleh edit sampai sesi `Decided` | auth (penilai) |
 
+> 🔜 **Kontrak berubah di branch `feat/recruitment-form-penilaian-onboarding-v2` (BELUM merged maupun deploy, 2026-09-17).** Rute tetap sama; yang berubah body dan aturannya ("Penilaian Masa Onboarding", [[HRIS - Recruitment]] §Masa Evaluasi):
+> - `POST /:id/response` form baru: `{form_versi: 2, ratings, komentar, rekomendasi_status, rekomendasi_lainnya}`. `ratings` tepat 20 kunci bernilai 1-5; kunci lain ditolak **400**, termasuk kunci form lama. Kiriman **tanpa** `form_versi` tetap divalidasi sebagai form lama (`{ratings(7×1-5), strengths, improvements, recommendations}`) supaya erp-frontend lama jalan selama jeda deploy. Versi jawaban seorang penilai tak bisa berganti: kiriman berversi lain atas jawaban yang ada dibalas **409**, begitu pula kiriman serentak yang bentrok index unik jawaban per penilai.
+> - `PUT /:id/decide`: `{outcome, outcome_lainnya, note}`. `outcome` ∈ `perpanjang_3` · `perpanjang_6` · `perpanjang_12` · `phk` · `lainnya`, kode yang sama dengan `rekomendasi_status`; `outcome_lainnya` wajib bila `lainnya`. `Lulus`/`Diperpanjang`/`Tidak Lulus` dibalas **400**, walau masih terbaca di `decision.outcome` sesi lama. ⚠️ Dialog keputusan erp-frontend lama mengirim kosakata lama, jadi frontend wajib naik segera sesudah backend.
+> - Jawaban di `responses[]` dan `my_response` membawa `form_versi` (absen = form lama), `komentar`, `rekomendasi_status`, `rekomendasi_lainnya`.
+
 ## Onboarding Checklist (rebuild 2026-07-26 — ✅ BE live dev, PR #692/#524)
 > Template tugas onboarding karyawan baru + instansiasi per orang + penugasan **PIC lintas-tim** + notif inbox + pelacakan progres. **≠ Performance Review Onboarding** (yang itu penilaian masa evaluasi). Detail: [[Microservices - Recruitment Service]].
 

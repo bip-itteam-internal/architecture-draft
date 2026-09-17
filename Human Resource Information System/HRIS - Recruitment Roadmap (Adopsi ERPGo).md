@@ -24,7 +24,7 @@ tags: [hris, recruitment, roadmap]
 3. **Candidate** — pipeline **`progress` + `status`** ⛔ *(`tracking_token` sudah dihapus 2026-07-24; `progress` kini nama babak dari katalog, bukan 10 tahap tetap)*; field lengkap + salary expected/current, notice, portfolio/linkedin, source; berkas **CV + profile image + cover letter** (MinIO); aksi create/update/**advance**/reject/withdraw/**link-employee**; **apply publik + tracking**. Flags can_issue_offer/upload_letter/respond/hire.
 4. **Stage records (timeline seleksi, 5 jenis)** — `GET /stages` + PUT/DELETE per record: **Screening** (lanjut/reject) · **Interview** (dari menu Interviews: HR/User/Final, panel, rounds per-lowongan, feedback rating+rekomendasi + link email) · **Technical Test** (skill/score/notes — **manual**) · **Background Check** (clear/issue) · **Psikotes** (jenis/mode/scores/interpretasi + **report PDF**; `online` placeholder).
 5. **Offer & Hire** — issue (HR supervisor) → upload **letter PDF** → accept/decline → **hire** (Direktur/approver). Status `Issued/Accepted/Declined`. → link-employee jadi karyawan.
-6. **"Onboarding" = masa evaluasi** — **Performance Review Onboarding** (multi-penilai 7 rating + 3 uraian → Lulus/Diperpanjang/Tidak Lulus, penilai isi via link). **Bukan** checklist tugas.
+6. **"Onboarding" = masa evaluasi** — **Performance Review Onboarding** (multi-penilai 7 rating + 3 uraian → Lulus/Diperpanjang/Tidak Lulus, penilai isi via link). **Bukan** checklist tugas. 🔜 Di branch, belum merged (2026-09-17): form diganti "Penilaian Masa Onboarding" (20 butir + komentar + rekomendasi status kepegawaian) dan keputusan HR berpilihan perpanjang 3/6/12 bulan · PHK · lainnya, lihat [[HRIS - Recruitment]] §Masa Evaluasi.
 7. **Master & Settings (System Setup)** — master `job_type`/`candidate_source`/`interview_type`/`job_location`; **Kelola Template Email** per-event (preview/test-send/reset); **audit log** (HR admin).
 
 **Sudah dihapus (jangan dihitung ada):** Custom Questions (#486), Onboarding Checklist template + per-kandidat (2026-07-18), toggle `ask_gender`/`ask_date_of_birth`/`ask_country`.
@@ -37,7 +37,7 @@ tags: [hris, recruitment, roadmap]
 | KPI cards (Total Candidates, Active Jobs, Interviews, Onboarded) | ✅ **dibangun** — Total Kandidat · Lowongan Open · Interviews (total) · Onboarded (kandidat tahap Onboarding) | ✅ FE `feat/recruitment-dashboard` |
 | Hiring Funnel (Applications→…→Hired) | ✅ **dibangun** — kumulatif "mencapai ≥ tahap" + **persentase** (agregasi `progress`) | ✅ |
 | Status Overview — donut Candidate Status | ✅ **dibangun** (donut per `status`) | ✅ |
-| Status Overview — donut Onboarding Progress | ✅ **dibangun** (dari Performance Review masa-evaluasi: Scheduled + outcome Lulus/Diperpanjang/Tidak Lulus) | ✅ |
+| Status Overview — donut Onboarding Progress | ✅ **dibangun** (dari Performance Review masa-evaluasi: Scheduled + outcome Lulus/Diperpanjang/Tidak Lulus). 🔜 Di branch (belum merged, 2026-09-17): kategori pilihan status kepegawaian HRD + keputusan lama, berlabel | ✅ |
 | Interview Calendar | ✅ **dibangun** (grid bulan + navigasi, dari `scheduled_at`) | ✅ |
 | Copy Career Portal + QR | ❌ belum (portal ada [[APP - Portal Karir Bharata]]) | 🟡 tombol salin link + QR (opsional) |
 
