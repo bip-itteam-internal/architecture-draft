@@ -7661,20 +7661,20 @@
         "Finance - Big Pictures",
         "Finance - Dashboard per Posisi (FAT)"
       ],
-      "hash": "add7a3c525df96c0e2b5787c98ac380b64e27d643cd26ddc407840be1b7c0e7c",
-      "ukuran_kb": 19.3,
-      "ringkasan": "Menjawab: proses bisnis Finance apa saja (P1 sampai P14) dan dok mana yang merinci tiap proses, posisi Finance mana (Supervisor FAT, Senior dan Junior Accountant, AR, AP, Cost Control, Tax) mengerjakan proses apa, serta seberapa jauh ERP sudah mencakup dan sesuai dengan kebutuhan tiap proses. Juga menjadi pintu masuk untuk prinsip rancangan, kelompok kebutuhan A/B/C, urutan pengerjaan dan ketergantungan termasuk buku besar 40 CV, pertanyaan wajib sebelum membangun, keputusan yang dibutuhkan, dan hal yang sengaja tidak dibangun.",
+      "hash": "54a3b7ae2a17bf7d08632b89f9f7a901cb0a6d37521aba70dabc9d49aabe3b7b",
+      "ukuran_kb": 19.4,
+      "ringkasan": "Menjawab: apa saja empat belas proses bisnis Finance (P1 sampai P14), posisi Finance mana yang mengerjakan proses apa, dan seberapa jauh ERP mencakup serta sesuai dengan kebutuhan tiap proses. Juga menjawab prinsip rancangan sistem Finance, pengelompokan celah A/B/C, urutan pengerjaan beserta ketergantungannya, pertanyaan wajib sebelum membangun, dan keputusan yang masih dibutuhkan dari manajemen.",
       "kata_kunci": [
         "proses bisnis Finance",
-        "business process",
-        "kebutuhan sistem",
         "peta proses",
         "FAT",
+        "kebutuhan sistem",
         "cakupan ERP",
         "gap analysis",
-        "celah",
-        "buku besar CV",
-        "Accurate"
+        "posisi Finance",
+        "Accurate",
+        "FINCON",
+        "prioritas pengerjaan"
       ]
     },
     {
@@ -7727,20 +7727,20 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Finance - FAT Persona"
       ],
-      "hash": "9c04e96b6d58ebf776b1d52573d7a4a9b46dc4d6f5f50ed6c798a6d32389c0f8",
-      "ukuran_kb": 3.4,
-      "ringkasan": "Menjawab: bagaimana rekap gaji dan data BPJS dari HR diperiksa dan dibayar Finance per badan usaha hari ini, apa yang sudah disediakan payroll ERP, dan seperti apa alur target sampai daftar transfer bank, rekap iuran BPJS, dan jurnal gaji otomatis. Juga menjawab celah apa yang harus ditutup (T7), kontrol pemisahan tugas antara penghitung dan pembayar gaji, serta ukuran efisiensi prosesnya.",
+      "hash": "7248f458f4d1e8ddb14ed581fb755ba37a73d8aad555bb272ee97a0f5c905605",
+      "ukuran_kb": 3.6,
+      "ringkasan": "Menjawab: bagaimana Finance hari ini menerima, memeriksa, dan membayar rekap gaji serta iuran BPJS dari HR, dan apa yang sudah disediakan payroll ERP per badan usaha. Juga menjawab alur target dari payroll sampai daftar transfer bank, rekap iuran BPJS, dan jurnal gaji, kontrol pemisahan tugas antara penghitung dan pembayar gaji, serta ukuran efisiensi prosesnya.",
       "kata_kunci": [
         "gaji",
         "payroll",
+        "BPJS",
         "iuran BPJS",
+        "salary",
         "daftar transfer bank",
         "jurnal gaji",
         "badan usaha",
         "P7",
-        "salary",
-        "rekap gaji",
-        "PPh 21"
+        "Kopra"
       ]
     },
     {
@@ -7835,20 +7835,20 @@
         "Finance - Kalender dan Rantai Tenggat",
         "Finance - Sambungan dan Permintaan Data Lintas Departemen"
       ],
-      "hash": "99a6a4559949ce6adf72195965433141e87ef44e43d07f33fc6ef94386541b90",
-      "ukuran_kb": 7.1,
-      "ringkasan": "Menjawab: bagaimana pembayaran keluar dari rekening PT dan kas CV dikerjakan hari ini (BKK, AppSheet, Kopra, internet banking, top up iklan), tahap ERP mana yang menangani transfer, unggah dan pemeriksaan bukti, dokumen pembayaran ke Accurate, dan jurnal kas. Juga menjawab kenapa pengingat jatuh tempo hutang pemasok tidak sampai ke AP dan bisa basi karena impor faktur Accurate manual, celah yang harus ditutup, pemisahan peran pelaksana, penyetuju, dan pemeriksa, serta ukuran efisiensinya.",
+      "hash": "0c697fa5be3231cdd48ea9748c516de4c22aba109f3455f397a137d108cef5eb",
+      "ukuran_kb": 9.9,
+      "ringkasan": "Menjawab: bagaimana pembayaran keluar dari rekening PT dan kas CV dikerjakan hari ini (BKK, AppSheet, Kopra, internet banking), siapa yang mentransfer dan memeriksa bukti di ERP, serta bagaimana pengingat jatuh tempo hutang pemasok dan KPI AP membaca data faktur. Juga menjawab alur target pembayaran satu kali input, celah yang perlu ditutup (notifikasi pembayaran PENDING, saklar ACCURATE_KAS_PUSH, jalur kas iklan), dan bahan apa yang diminta dari Finance untuk berkas unggah massal Kopra.",
       "kata_kunci": [
         "pembayaran keluar",
-        "outgoing payment",
-        "kas CV",
-        "rekening PT",
-        "BKK",
-        "hutang pemasok",
-        "accounts payable",
+        "payment",
+        "account payable",
         "AP",
-        "jatuh tempo",
-        "P2"
+        "kas CV",
+        "BKK",
+        "Kopra",
+        "bukti transfer",
+        "jatuh tempo hutang",
+        "ACCURATE_KAS_PUSH"
       ]
     },
     {
@@ -15301,23 +15301,24 @@
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
         "Finance - Buku Besar CV",
         "Finance - FAT Persona",
+        "Finance - Proses Pembayaran Keluar",
         "REF - Kepemilikan Data",
         "Finance - Proses Bisnis dan Kebutuhan Sistem"
       ],
-      "hash": "a1ba0d0ba9d0e4749d7fb9942e1df3a93598455f2e2567fb92602e6fff8012af",
-      "ukuran_kb": 13.2,
-      "ringkasan": "Menjawab: task apa saja (T1 sampai T10) untuk membangun buku besar 40 CV di ERP dengan FINCON sebagai spesifikasi sesuai ADR 0096, mulai master entitas CV dan pemegang CV, pembayaran keluar per CV lewat Pengajuan Barang, inti buku besar, laporan dan konsolidasi, migrasi FINCON, jurnal otomatis, payroll per badan usaha, penjualan marketplace per CV, impor mutasi rekening, sampai tutup buku. Juga menjawab prasyarat non-kode (persetujuan, paket izin, data penugasan, ekspor FINCON), urutan deploy yang mengikat, dan masukan survei lanjutan. Untuk peta kebutuhan sistem Finance secara keseluruhan, dok ini hanya menunjuk ke Finance - Proses Bisnis dan Kebutuhan Sistem.",
+      "hash": "3f1c64502b784cebc639a8c33debaa8823295094b2cd2872cd1c43d1e11d0a44",
+      "ukuran_kb": 13.6,
+      "ringkasan": "Menjawab: task apa saja (T1 sampai T10) untuk membangun sistem Finance 40 CV di ERP, mulai dari master entitas CV, pembayaran per CV, buku besar, laporan konsolidasi, migrasi FINCON, sampai payroll dan rekonsiliasi mutasi rekening. Juga menjawab prasyarat non-kode yang harus dipenuhi (persetujuan ADR 0096, paket izin, data penugasan CV, templat Kopra), urutan deploy yang mengikat, serta cara test dan verifikasi tiap task.",
       "kata_kunci": [
         "buku besar CV",
+        "general ledger",
         "40 CV",
         "FINCON",
         "ADR 0096",
         "pemegang CV",
-        "jurnal CV",
         "konsolidasi",
-        "BKK",
-        "mutasi rekening",
-        "analisa kebutuhan finance"
+        "migrasi FINCON",
+        "daftar task",
+        "analisa kebutuhan"
       ]
     },
     {
