@@ -854,19 +854,19 @@
         "API - Integration Service",
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada"
       ],
-      "hash": "4c6dfcacb35d8bfbe84ee35531d1de946d95221aec5fddced1633b6ffea9a9ae",
-      "ukuran_kb": 23.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di warehouse-service — event ingestion fulfillment, operasi WMS (queue, approve, pick, pack, RTS, cetak label, handover, dashboard), master produk, toko gudang Sadewa, dan komplain gudang — beserta method/path, role yang diizinkan, format request/response, dan kode error tiap endpoint. Juga menjawab bagaimana auth diberlakukan (gateway key BIP-Gateway-ID, role guard header BIP-System-Roles) dan pengecualian gerbang untuk rute komplain.",
+      "hash": "5d84385a88734e4bf2892d82c281fab35bf3b9f30f052349e6a548d803e349cb",
+      "ukuran_kb": 26.0,
+      "ringkasan": "Menjawab: apa saja endpoint warehouse-service (fulfillment events, operasi WMS approve/pick/pack/RTS/label/handover, master produk, toko gudang Sadewa, komplain gudang), role mana yang diizinkan tiap rute, serta bentuk request/response dan kode error yang bisa muncul.",
       "kata_kunci": [
         "warehouse-service",
-        "WMS",
         "fulfillment",
-        "API endpoint",
+        "API",
+        "endpoint",
+        "WMS",
+        "komplain gudang",
         "resi",
         "arrange",
-        "packing",
-        "komplain gudang",
-        "Sadewa",
+        "handover",
         "role guard"
       ]
     },
@@ -883,7 +883,7 @@
         "order.order-items-get"
       ],
       "hash": "40849a92b3a96565fbc789742e61b75e3bbd942b6d18b298c097028cfbd2659e",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab cara menarik daftar order dari Lazada Open API endpoint `/orders/get`, perbedaan filter waktu `created_after`/`created_before` (waktu order dibuat) vs `update_after`/`update_before` (waktu order berubah), dan kenapa window berbasis update penting sebagai jaring pengaman ketika webhook Lazada (LPM) mati. Juga mendokumentasikan jebakan status order-level yang bisa tertinggal dari status tracking sebenarnya.",
       "kata_kunci": [
         "Lazada",
@@ -1047,7 +1047,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 1.9,
+      "ukuran_kb": 2.0,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1099,7 +1099,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -3106,20 +3106,20 @@
         "IT - Background Jobs & Schedulers",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "e9828fcd3da741f65d91c1ccea8925f49aba1421a367e3595274d0d6b5169329",
-      "ukuran_kb": 42.8,
-      "ringkasan": "Menjawab: bagaimana warehouse-service (WMS Tinggarjaya) menangani event ingestion order, reconciler sinkronisasi status pesanan, operasi gudang (approve/pick/pack/RTS/label/handover/dashboard), role guard termasuk mitra gudang Sadewa yang izinnya tidak diwarisi otomatis, serta bagaimana register komplain gudang (kategori, status, notifikasi) bekerja dan diakses lintas departemen.",
+      "hash": "b1e797b2fd8d8d3bffbc228895d000c2b399cc4d7d3d9ab8372cdc613ac39a5f",
+      "ukuran_kb": 44.7,
+      "ringkasan": "Menjawab: bagaimana arsitektur warehouse-service disusun (stack, port, database, env), bagaimana event ingestion, reconciler 60 detik (dengan cursor per status), dan open-order sweep bekerja, serta bagaimana gerbang akses role -- termasuk pengecualian admin_gudang_sadewa -- dan notifikasi komplain gudang diimplementasikan.",
       "kata_kunci": [
         "warehouse-service",
-        "WMS",
-        "Tinggarjaya",
-        "fulfillment",
+        "microservice",
         "reconciler",
-        "picking packing",
-        "RTS",
-        "label resi",
+        "state machine",
+        "status_wms",
         "Sadewa",
-        "komplain gudang"
+        "komplain gudang",
+        "notifikasi",
+        "arsitektur",
+        "fulfillment"
       ]
     },
     {
@@ -4855,7 +4855,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "1af925998c51daaf89f4b362162b5f8c117e3db82e37169cbfe7b2e6ed084c92",
-      "ukuran_kb": 6.5,
+      "ukuran_kb": 6.6,
       "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal), dan bagaimana auto-disable Tahap 2 bekerja (counter kegagalan auth beruntun, ambang 5, reset saat sukses, satu Telegram tanpa damper terpisah — bukti flapping 36009006). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care.",
       "kata_kunci": [
         "adr",
@@ -4993,7 +4993,7 @@
         "APP - Web ERP"
       ],
       "hash": "3405a3dc1516fe9eff90d36e5a1a47c8a876d2dbaf6bc9537105816d5897ee6d",
-      "ukuran_kb": 10.1,
+      "ukuran_kb": 10.2,
       "ringkasan": "Menjawab: bagaimana penyesuaian statement TikTok (tt_statement_adjustments, mayoritas ganti rugi paket hilang / LOGISTICS_REIMBURSEMENT yang bukan penggantian ongkir) dibukukan ke Accurate — dilipat ke payout pesanan yang disebutnya lalu diurus mesin receipt, bukan sebagai baris pendapatan tersendiri — dan bagaimana pesanan yang tak ditemukan ditangani. Live 26 Agustus 2026 (PR #1451).",
       "kata_kunci": [
         "adr",
@@ -5853,7 +5853,7 @@
         "External - Accurate"
       ],
       "hash": "88f3c03bd55060706f79617cace5e8835a2ecc4419733de53f3d0c971547bfe2",
-      "ukuran_kb": 14.9,
+      "ukuran_kb": 15.0,
       "ringkasan": "Menjawab: bagaimana koreksi faktur yang dinyatakan finance lewat Excel Rekap Lengkap diterjemahkan sistem ke tuas yang sudah ada (pindah hari, Mapping SKU, qty per unit, riwayat Harga Jual, gudang per pesanan), dan kenapa tidak ada override per baris faktur. Menjelaskan koreksi mana yang ditolak (sel Accurate Number kosong, FO, paket multi-komponen, faktur terkunci tertentu), kewajiban persetujuan untuk perubahan master-data, serta amandemen koreksi gudang yang memecah baris faktur per gudang.",
       "kata_kunci": [
         "koreksi faktur",
@@ -6753,7 +6753,7 @@
         "ADR - 0001 Akuntansi via Accurate"
       ],
       "hash": "25ab1b4ad3c7b5e6987da7013a762fca4e0b59b0066c3c33fc7f1fcc453f406e",
-      "ukuran_kb": 10.7,
+      "ukuran_kb": 10.8,
       "ringkasan": "Menjawab: bagaimana ERP menangani kompensasi Shopee yang cair lebih dari sekali per pesanan, mengapa cicilan kedua dst ditahan dari penerimaan otomatis Accurate, dan bagaimana tim AR mencatatnya lewat laman Kompensasi Cicilan dengan koreksi manual. Juga menjawab aturan pemilihan akun (diskon 4003 bila bulan sama, Pendapatan Lain-lain 8001 bila beda bulan), arti status MENUNGGU/TERTUNDA/SELESAI, dan peran kv shopee-compensation-susulan-hold-date.",
       "kata_kunci": [
         "kompensasi Shopee",
@@ -6859,7 +6859,7 @@
         "API - Integration Service"
       ],
       "hash": "9763c415885f93f6222c0d032538477cee71ae84e20b64ebfd3def47b17068a3",
-      "ukuran_kb": 6.0,
+      "ukuran_kb": 6.1,
       "ringkasan": "Menjawab: apa yang terjadi bila dokumen Penerimaan (Bukti Terima Kas) di Accurate isinya berbeda dari hitungan ERP, kenapa mekanisme penahanan EXTERNAL_EDIT lama tak pernah menutup lingkarannya, dan siapa yang memutuskan selisihnya. Juga menjawab: kenapa dokumen yang sudah selaras ditutup mesin tanpa manusia (draf jadi BASI), kenapa adopsi harus dihitung terhadap hitungan ERP sekarang bukan kiriman lama (untuk mencegah potongan ganda), di mana keputusan finance dipindahkan (modal detail Penerimaan dengan tabel tiga kolom rupiah, Kotak Adopsi jadi daftar lintas dokumen), dan kenapa labelnya dijaga netral \"Beda dengan Accurate\". Memuat konsekuensi terukur beserta batasan yang masih terbuka: Lazada belum punya kolom ketiga, pemindahan pelunasan ke akun GL belum punya tuas koreksi, dan endpoint Kotak Adopsi belum terdokumentasi.",
       "kata_kunci": [
         "penerimaan",
@@ -6962,7 +6962,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A). **Keputusan 2 sisi register gudang (T9) merged 2026-09-17** (bip-erp #1957, erp-frontend #1634), terverifikasi DEV lewat gateway dan bundel frontend, **belum PROD**; keputusan lain belum ada kodenya. Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.",
+      "status_teks": "**Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A). **Keputusan 2 sisi register gudang (T9) merged 2026-09-17** (bip-erp #1957, erp-frontend #1634), terverifikasi DEV lewat gateway dan bundel frontend, **belum PROD**. **Keputusan 7 bagian `ditolak` (T10) merged 2026-09-17** (bip-erp #1965, erp-frontend #1641), terverifikasi DEV lewat gateway, **belum PROD**; bagian `dialihkan` menunggu T13. Keputusan lain belum ada kodenya. Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.",
       "publik": true,
       "tautan": [
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
@@ -6972,6 +6972,7 @@
         "QA - Deviation & CAPA",
         "ADR - 0002 Database-per-Service",
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
+        "API - Warehouse Service",
         "REF - Kepemilikan Data",
         "Microservices - Employee Service",
         "Microservices - Integration Service",
@@ -6980,20 +6981,19 @@
         "APP - MyBharata",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus"
       ],
-      "hash": "a4390fdd64c89029cdb9cb95b7038fdcb7c1f1da80f436ffcc7d866a07eec257",
-      "ukuran_kb": 17.1,
-      "ringkasan": "Menjawab: kenapa dan bagaimana seluruh komplain produk (dari ulasan marketplace maupun tanpa ulasan) digabung jadi satu formulir dengan unit tujuan diturunkan otomatis dari kategori yang dipilih pengaju, bukan dipilih manual seperti keputusan sebelumnya. Juga menjawab apa yang berubah bagi pengaju dan unit penerima (ganti kategori, alih komplain ke unit lain, pemilahan kategori \"Lainnya\" oleh SPV brand), dampaknya ke KPI packer gudang, serta batasan yang sengaja tidak dijanjikan (nomor batch, kedaluwarsa, integrasi CAPA, ekspedisi/vendor).",
+      "hash": "f29c9d3036bfec862cb1ddadf5ae308f6a9e3e0818fab844914b37f474e2a20b",
+      "ukuran_kb": 17.9,
+      "ringkasan": "Menjawab: mengapa komplain produk dipindah dari alur pilih-unit-tujuan menjadi satu formulir berbasis kategori, bagaimana unit tujuan diturunkan dari register pemilik kategori tanpa tabel pemetaan atau register ketiga, dan apa dampaknya ke KPI packer gudang saat komplain ditolak atau dialihkan.",
       "kata_kunci": [
-        "ADR 0103",
         "komplain produk",
         "satu pintu",
+        "ADR 0103",
         "kategori komplain",
-        "unit tujuan",
+        "register gudang",
+        "register QC",
         "KPI packer",
-        "quality complaint",
-        "register komplain",
-        "Kyura",
-        "Beauty Hacks"
+        "ulasan marketplace",
+        "ganti kategori"
       ]
     },
     {
@@ -11261,7 +11261,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
-      "ukuran_kb": 6.8,
+      "ukuran_kb": 6.9,
       "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
       "kata_kunci": [
         "faktur",
@@ -12906,7 +12906,7 @@
         "External - Accurate"
       ],
       "hash": "526782f4478f447d6f83ea082ecdfc2526e7623bd22e5945d6509565be60a2d0",
-      "ukuran_kb": 11.4,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab: langkah demi langkah memperbaiki faktur Auto-Sync Accurate secara massal dengan mengunduh, menyunting, dan mengunggah kembali file Rekap Lengkap, termasuk kolom mana yang boleh disunting dan artinya. Menjelaskan prasyarat role, cara membaca pratinjau dan menyetujui perubahan master-data, cara verifikasi (unggah ulang tanpa suntingan harus 0 koreksi), serta arti pesan galat dan tindakannya.",
       "kata_kunci": [
         "import koreksi",
@@ -15059,21 +15059,21 @@
         "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "APP - MyBharata",
         "APP - Web ERP",
+        "API - Warehouse Service",
         "REF - Kepemilikan Data"
       ],
-      "hash": "fb3d5f8f6c8c2c7c413c06a0ea772630480b5d88fa5a38ef365f7f89eee447b1",
-      "ukuran_kb": 12.2,
-      "ringkasan": "Menjawab: daftar task konkret beserta status pengerjaannya untuk fitur komplain dari ulasan marketplace (backend, frontend, dan alur satu pintu ADR 0103), termasuk keputusan yang masih menunggu manajemen seperti tujuan komplain yang belum punya register, kewajiban regulatif BPOM, dan toko Beauty Hacks tanpa CS.",
+      "hash": "d1096d1bfb2ae2a6e0dc5585f0d65eeaaa2fdab6a73a68d7dfab118cc8f7f8e4",
+      "ukuran_kb": 13.6,
+      "ringkasan": "Menjawab: daftar task teknis (T1 sampai T14) hasil /analisa-kebutuhan untuk fitur komplain dari ulasan marketplace, mana yang sudah selesai dan mana yang masih menunggu keputusan manajemen (K1 sampai K6), serta urutan pengerjaan revisi satu-pintu mengikuti ADR 0103.",
       "kata_kunci": [
-        "ANALISA komplain",
-        "daftar task",
+        "komplain",
         "ulasan marketplace",
-        "satu pintu",
-        "ADR 0103",
-        "warehouse komplain",
-        "quality complaint QC",
+        "analisa kebutuhan",
+        "daftar task",
+        "warehouse",
+        "QC",
         "backlog",
-        "analisa-kebutuhan"
+        "revisi satu pintu"
       ]
     },
     {

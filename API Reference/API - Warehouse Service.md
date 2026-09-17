@@ -261,7 +261,7 @@ Keluhan **marketing atas pekerjaan gudang packing**, sekaligus sumber KPI baris 
 |---|---|---|---|
 | POST | `/wms/komplain` | marketing **ATAU pemegang toko** (`gerbangAjukanKomplain`) | Catat keluhan. 404 bila `order_id` tak ada di `fulfillment_orders`; 409 bila `(order_id, kategori)` sudah pernah dicatat; 400 + `kategori_tersedia` bila kategori di luar daftar; **403 bila pemanggil masuk lewat kepemilikan tetapi pesanannya milik toko lain** |
 | GET | `/wms/komplain` | peran gudang, marketing, **ATAU pemegang toko** (`gerbangBacaKomplain`) | Daftar; filter `periode` (`YYYY-MM`), `status`, `kategori`, `shop_ids`. Urut `dilaporkan_at` desc, **limit 1.000, tanpa paginasi** |
-| PUT | `/wms/komplain/:id/tindak-lanjut` | admin_gudang, leader, spv | Ubah `status` + `tindak_lanjut`. `selesai_at` diisi saat selesai/ditolak, **dihapus** saat dibuka kembali |
+| PUT | `/wms/komplain/:id/tindak-lanjut` | admin_gudang, leader, spv | Ubah `status` + `tindak_lanjut`. `selesai_at` diisi saat selesai/ditolak, **dihapus** saat dibuka kembali. ✅ bip-erp [#1965](https://github.com/bip-itteam-internal/bip-erp/pull/1965) (merged 2026-09-17, terverifikasi gateway DEV, belum PROD): status `ditolak` dengan `tindak_lanjut` kosong atau spasi saja → **400** `alasan penolakan wajib diisi di tindak_lanjut: ...`, diperiksa sebelum Mongo disentuh. `selesai` tanpa tindak lanjut tetap diterima backend |
 | GET | `/wms/komplain/kategori` | ✅ bip-erp [#1957](https://github.com/bip-itteam-internal/bip-erp/pull/1957) merged 2026-09-17, terverifikasi gateway DEV, belum PROD · siapa pun beridentitas (`gerbangIdentitasKomplain`, tanpa peran) | Daftar kode kategori `{"data": ["salah_produk", ...]}`, berurutan, tanpa label dan tanpa unit. 401 tanpa `BIP-Employee-ID` atau tanpa kunci gateway. Isinya sama dengan `kategori_tersedia` pada balasan 400 POST |
 
 **Kategori (daftar tertutup)**: `salah_produk` · `salah_jumlah` · `salah_alamat` · `rusak_kemasan` · `kurang_lengkap`. Konsumen membaca daftarnya dari `GET /wms/komplain/kategori`, bukan menyalin daftar di atas ([[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]] keputusan 2).
@@ -298,6 +298,24 @@ Keluhan **marketing atas pekerjaan gudang packing**, sekaligus sumber KPI baris 
 ⛔ **Cakupan diturunkan dari KEPEMILIKAN, bukan dari daftar peran, dan itu koreksi terukur.** Versi pertama memakai `IsMarketingDepartmentStaff`; diukur di PROD 2026-09-16 predikat itu cocok ke enam orang yang semuanya supervisor, sehingga cabangnya tak pernah dieksekusi, sementara keempat puluh Account Specialist (`insentive: icc`) tak lolos gerbang mana pun. Detail: [[Microservices - Warehouse Service]].
 
 ⛔ Gagal menentukan cakupan (integration tak terjangkau, balasannya tak berbentuk) dijawab **500 bersebab**, bukan daftar kosong: daftar kosong akan berbunyi "belum ada komplain" kepada orang yang sebenarnya punya. Permintaan tanpa `BIP-Employee-ID` dijawab **401**, bukan 500. `"data": null` dari `/icc/mappings/me` berarti **nol toko**, bukan balasan rusak. Detail: [[Microservices - Warehouse Service]].
+
+### Bahan KPI: `GET /kpi/komplain-gudang?periode=YYYY-MM&key=`
+
+Dibaca employee-service (`services/employee/kpi_sumber_warehouse_packing.go`) untuk KPI baris 1 gudang packing. Digerbang **kunci layanan** `WAREHOUSE_SERVICE_KEY` (`gerbangKunciKpiWarehouse`), bukan `BIP-Gateway-ID`; nama tag JSON-nya kontrak dengan `agregatKomplainGudang` di employee-service (`services/warehouse/kpi_komplain.go:27-59`).
+
+| Field | Arti |
+|---|---|
+| `periode` | `YYYY-MM` yang diminta |
+| `total_pesanan` | pesanan non-`CANCELLED` yang `handed_over_at`-nya jatuh di periode (penyebut) |
+| `komplain_packing` | komplain berkategori sah yang **dilaporkan** di periode, **tanpa yang `ditolak`** (pembilang) |
+| `komplain_belum_selesai` | himpunan bagian dari `komplain_packing` yang belum `selesai` |
+| `komplain_ditolak` | komplain berkategori sah yang ditolak gudang, dilaporkan di periode. ✅ Aditif sejak bip-erp #1965 |
+| `per_kategori` | cacah per kategori, **tanpa** yang ditolak |
+| `per_packer[]` | `{packer_code, pesanan, komplain}`; `komplain` juga **tanpa** yang ditolak |
+
+⛔ **`komplain_ditolak` BUKAN komponen akurasi dan JANGAN dijumlahkan ke `komplain_packing`.** Keduanya himpunan terpisah: yang ditolak sudah dikeluarkan dari pembilang, dari `per_kategori`, dan dari `per_packer`. Menjumlahkannya mengembalikan aturan lama (keluhan yang dibantah gudang menurunkan skor packer) tanpa satu pun galat. Field itu ada hanya supaya pengecualiannya terlihat: employee-service menuliskannya di catatan penilaian sebagai "N komplain ditolak gudang tidak ikut dihitung", sehingga gudang yang menolak semua komplain demi skor tetap ketahuan. Sebelum #1965, komplain `ditolak` ikut dihitung ([[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]] keputusan 7).
+
+⚠️ `komplain_belum_selesai` juga himpunan bagian, bukan kolom sejajar: menjumlahkannya ke `komplain_packing` menghitung komplain yang sama dua kali.
 
 ## Dokumen Terkait
 
