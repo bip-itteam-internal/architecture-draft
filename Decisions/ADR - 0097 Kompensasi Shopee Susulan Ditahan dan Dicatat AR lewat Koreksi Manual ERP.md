@@ -8,7 +8,7 @@ Shopee kadang membayar kompensasi satu pesanan **lebih dari sekali** (contoh pro
 
 *Menggantikan perlakuan cicilan susulan kompensasi Shopee yang dicatat di [[Microservices - Integration Service]] (PR #1731: susulan dibukukan sebagai tambahan pelunasan faktur; PR #1782: kelebihan kompensasi tetap diskon 4003 bernilai minus) — untuk hari penerimaan pada/sesudah tanggal kv. Hari sebelumnya tetap memakai model lama supaya dokumen yang sudah terkirim tak di-EDIT.*
 
-- **Status**: ⚠️ **Diterima, terimplementasi di branch `fix/kompensasi-shopee-cicilan`, belum PR, belum merge, belum deploy** (diperiksa 2026-09-15: bip-erp 6 commit, erp-frontend 4 commit, keduanya belum di remote). Berlaku di prod hanya setelah deploy **dan** kv diisi manusia.
+- **Status**: ⚠️ **Diterima, merged (bip-erp #1909, erp-frontend #1595) dan terpasang di prod — terverifikasi 2026-09-16 lewat string di biner Integration-Service, rute `compensation-installments` membalas 200, dan build FE memuat laman Kompensasi Cicilan. BELUM BERLAKU**: kv `shopee-compensation-susulan-hold-date` belum ada di prod (diperiksa 2026-09-17), jadi penahanan dorman. Isian kv di layar Config Accurate menyusul lewat branch `feat/kv-katalog-tanggal` (belum merged, lihat [[APP - Web ERP]]); sampai itu hanya lewat `POST /accurate/settings/kv-configs`.
 - **Path di repo**:
   - `bip-erp/services/integration/internal/usecase/accurate_receipt_wallet_adjustment.go` (penahanan di `resolveWalletAdjustments`, `catatPenahananShopee`, `penahananTersimpan`)
   - `bip-erp/services/integration/internal/usecase/accurate_receipt_kompensasi_cicilan.go` (laman, aturan akun, `statusPenahananPenerimaan`)
