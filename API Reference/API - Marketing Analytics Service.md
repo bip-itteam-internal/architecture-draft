@@ -195,7 +195,7 @@ Keduanya membalas **200 dengan amplop `unavailable_channels: SEMUA`** saat sumbe
 
 ## Monitoring sesi live (`/live-support/sesi*`)
 
-🟡 **Belum merged, belum deploy** (bip-erp `feat/marketing-analytics-monitoring-sesi-live`). Keputusan: [[ADR - 0108 Monitoring Sesi Live di Web Hanya Baca untuk Leader dan Live Support]]; aturan lengkap: [[Microservices - Marketing Analytics Service]] § Monitoring sesi live hanya baca. Hanya baca; tanpa tutup otomatis saat dibaca. Seluruh galat berbentuk `{"error": "<pesan>"}`. `live_support_sesi.go`.
+⚠️ **Merged 2026-09-18, di DEV, belum PROD** (bip-erp [#1966](https://github.com/bip-itteam-internal/bip-erp/pull/1966)). Keputusan: [[ADR - 0108 Monitoring Sesi Live di Web Hanya Baca untuk Leader dan Live Support]]; aturan lengkap: [[Microservices - Marketing Analytics Service]] § Monitoring sesi live hanya baca. Hanya baca; tanpa tutup otomatis saat dibaca. Seluruh galat berbentuk `{"error": "<pesan>"}`. `live_support_sesi.go`.
 
 **Gerbang (di handler, sama untuk kedua rute)**: header `BIP-Employee-ID` kosong → **403**; `common.IsMarketingLeader` → lingkup `semua`; jabatan Live Support (`PosisiCocok`) → lingkup `departemen`; selain itu → **403** berpesan syarat.
 
