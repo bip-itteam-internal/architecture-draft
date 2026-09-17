@@ -13,6 +13,7 @@ Pembayaran CV dicatat berkali-kali oleh Junior Accountant (voucher BKK di FINCON
 - **Data penugasan CV** di dev dan prod masih nol (diukur 2026-09-17): Supervisor FAT menyemai 40 CV dan menugaskan pemegangnya sebelum T2 bisa dipakai siapa pun.
 - **Data volume**: ekspor AppSheet tiga bulan (jumlah BKK per jenis per CV) dan jumlah transaksi Kopra per rekening, untuk ukuran antrean T2.
 - **Contoh berkas mutasi rekening** untuk T9.
+- **Templat unggah massal Kopra** dari Finance (dicatat 2026-09-17): templat resmi per jenis transaksi, satu contoh terisi yang diterima Kopra dengan data disamarkan, aturan penolakan, rekening sumber, pengunggah dan penyetuju, serta laporan hasil. Daftar lengkapnya di [[Finance - Proses Pembayaran Keluar]] § Berkas unggah Kopra. Ekspor transfer (T2 lanjutan dan T7) tidak dirancang sebelum bahan ini diterima.
 
 ## Urutan deploy yang mengikat
 
