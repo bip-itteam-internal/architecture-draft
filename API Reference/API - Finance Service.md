@@ -1,9 +1,9 @@
 ## Deskripsi
 
-*Endpoint **finance-service** (master data divisi FAT: Cost Control, Tax, Biaya Variabel Produksi, Audit Internal, dan Buku Besar CV). Gateway: `/api/finance/*`. Grounded ke `services/finance/routes.go`, `pajak_handler.go`, `biaya_variabel_handler.go`, `audit_handler.go`, dan (branch) `akuntansi_cv_handler.go`.*
+*Endpoint **finance-service** (master data divisi FAT: Cost Control, Tax, Biaya Variabel Produksi, Audit Internal, dan Buku Besar CV). Gateway: `/api/finance/*`. Grounded ke `services/finance/routes.go`, `pajak_handler.go`, `biaya_variabel_handler.go`, `audit_handler.go`, `akuntansi_cv_handler.go`, dan `akuntansi_cv_internal.go`.*
 
-- **Implementasi**: [[Finance - Rancangan Finance Service]] · **Status**: ⚠️ Implemented (ada catatan), Fase 0 + Cost Control Fase 1a + **modul Tax (kewajiban per masa) ada di kode**, tetapi datanya di prod masih kosong (master jenis pajak 0, kewajiban 0; seed master belum pernah dijalankan) + Biaya Variabel Produksi + Audit Internal ([[Finance - Audit Internal]]); register pelaporan SPT/temuan/klasifikasi akun masih deklarasi koleksi tanpa pemanggil (diukur 2026-09-12) · Buku Besar CV T1 (master entitas, penugasan, cakupan tulis) di branch `feat/finance-entitas-cv`, **belum merge** (2026-09-15)
-- **Indeks**: [[API - Index]] · **RBAC**: gerbang kunci gateway di seluruh rute (`ValidateGateway`), plus izin per-modul (`finance.pajak.*`, `audit.*`, dan di branch `akuntansicv.*`) dan pemeriksaan identitas per-handler pada rute `/internal/` (lihat catatan di bawah). ⚠️ **Rute `/biaya-variabel*` TIDAK bergerbang izin maupun `company_id` sama sekali**, lihat bagian Biaya Variabel Produksi.
+- **Implementasi**: [[Finance - Rancangan Finance Service]] · **Status**: ⚠️ Implemented (ada catatan), Fase 0 + Cost Control Fase 1a + **modul Tax (kewajiban per masa) ada di kode**, tetapi datanya di prod masih kosong (master jenis pajak 0, kewajiban 0; seed master belum pernah dijalankan) + Biaya Variabel Produksi + Audit Internal ([[Finance - Audit Internal]]); register pelaporan SPT/temuan/klasifikasi akun masih deklarasi koleksi tanpa pemanggil (diukur 2026-09-12) · Buku Besar CV T1 (master entitas, penugasan, cakupan tulis) **merge 2026-09-16** (bip-erp #1905) dan rute mesin penugasan T2 merge 2026-09-16, keduanya di prod sejak 2026-09-17; data penugasan di prod masih nol per 2026-09-17
+- **Indeks**: [[API - Index]] · **RBAC**: gerbang kunci gateway di seluruh rute (`ValidateGateway`), plus izin per-modul (`finance.pajak.*`, `audit.*`, `akuntansicv.*`) dan pemeriksaan identitas per-handler pada rute `/internal/` (lihat catatan di bawah). ⚠️ **Rute `/biaya-variabel*` TIDAK bergerbang izin maupun `company_id` sama sekali**, lihat bagian Biaya Variabel Produksi.
 
 > ⚠️ **Rute ditulis TANPA mengulang nama modul.** Gateway membuang prefix `/api/finance` sebelum meneruskan (`routes.Reroute` → `strings.TrimPrefix`), jadi `/api/finance/cost-control/rekomendasi` tiba di service sebagai `/cost-control/rekomendasi`. Mendaftarkannya sebagai `/finance/cost-control/...` membuat SELURUH permintaan lewat jalur normal membalas 404 sementara unit test tetap hijau. Dikunci `routes_test.go` dan `rekomendasi_handler_test.go`.
 
@@ -11,7 +11,7 @@
 
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/` | Identitas service (`{"service":"finance","modul":["pajak","cost-control"]}`; branch `feat/finance-entitas-cv` menambah `"akuntansi-cv"`). Ada sejak Fase 0 justru untuk membuktikan kontrak pemotongan prefix di atas benar-benar dipenuhi |
+| GET | `/` | Identitas service (`{"service":"finance","modul":["pajak","cost-control","akuntansi-cv"]}`, `routes.go:32`). Ada sejak Fase 0 justru untuk membuktikan kontrak pemotongan prefix di atas benar-benar dipenuhi |
 | GET | `/health` | Healthcheck container. Didaftarkan **SEBELUM** gerbang gateway — healthcheck memasang kuncinya sendiri, dan menaruhnya di belakang gerbang membuat container tak pernah dinyatakan sehat |
 
 ## Cost Control — Rekomendasi Efisiensi
@@ -25,11 +25,11 @@ Memasok metrik KPI Cost Control **"minimal 3 rekomendasi efisiensi cost driver s
 | DELETE | `/cost-control/rekomendasi/:id` | Hapus milik sendiri. Pemilik ikut jadi filter, bukan hanya id, sebab gateway tidak memeriksa kepemilikan baris. "Tidak ada" dan "bukan milikmu" **sengaja tak dibedakan** — membedakannya memberi tahu penanya bahwa sebuah id memang ada |
 | GET | `/internal/kpi/cost-control?periode=YYYY-MM&employee_id=` | Agregat untuk sumber KPI `kinerja_cost_control` di [[Microservices - Employee Service]]. Membalas `{"rekomendasi_efisiensi": n}` |
 
-### Rute mesin penugasan pemegang CV (T2, branch)
+### Rute mesin penugasan pemegang CV (T2, merge 2026-09-16)
 
 | Method | Endpoint | Keterangan |
 |---|---|---|
-| GET | `/internal/cv/penugasan?key=&company_id=` | Kode CV beserta `aktif`, `akun_accurate_no`, dan `pemegang[]`. Pemakainya procurement-service untuk menentukan siapa yang boleh menindak tahap transfer pengajuan yang dibayar dari rekening CV ([[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] §6 Jalur A). Digerbang **`FINANCE_SERVICE_KEY`** dengan `subtle.ConstantTimeCompare`, bukan oleh prefix `/internal/`: env kosong membalas **503** yang menyebut env-nya (401 polos membuat orang mencurigai sisi pemanggil), kunci salah **401**, `company_id` kosong **400** |
+| GET | `/internal/cv/penugasan?key=&company_id=` | Kode CV beserta `aktif`, `akun_accurate_no`, dan `pemegang[]`. Pemakainya procurement-service untuk menentukan siapa yang boleh menindak tahap transfer pengajuan yang dibayar dari rekening CV ([[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] §6 Jalur A). Digerbang **`FINANCE_SERVICE_KEY`** dengan `subtle.ConstantTimeCompare`, bukan oleh prefix `/internal/`: env kosong membalas **503** yang menyebut env-nya (401 polos membuat orang mencurigai sisi pemanggil), kunci salah **401**, `company_id` kosong **400**. ⚠️ Kunci layanan **menambah** syarat, bukan menggantikan header gateway: `ValidateGateway` berdiri di depan seluruh rute termasuk `/internal/`, jadi pemanggil wajib mengirim `BIP-Gateway-ID` juga. Klien procurement semula hanya mengirim kunci, sehingga setiap panggilan ditolak 401 dan cakupan CV selalu gagal-tertutup tanpa galat yang menunjuk sebabnya; diperbaiki bip-erp #1929 (`services/procurement/cv_penugasan_sumber.go:88`) |
 
 Tiga keputusan yang layak dibaca sebelum menambah rute mesin berikutnya:
 
@@ -156,7 +156,7 @@ Grounded ke `audit_handler.go`, `audit_registry.go`, dan `audit_tindakan.go` di 
 
 ## Buku Besar CV: Entitas, Penugasan, Cakupan (T1)
 
-Master entitas CV, pemegang tiap CV, dan cakupan tulis per CV ([[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] §2-3; domain di [[Finance - Buku Besar CV]]). Grounded ke `akuntansi_cv_handler.go` di branch `feat/finance-entitas-cv`, **belum merge per 2026-09-15**. FE: `/finance/entitas-cv` dan `/finance/entitas-cv/saya`.
+Master entitas CV, pemegang tiap CV, dan cakupan tulis per CV ([[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] §2-3; domain di [[Finance - Buku Besar CV]]). Grounded ke `akuntansi_cv_handler.go` di `origin/main` (merge 2026-09-16, bip-erp #1905). FE: `/finance/entitas-cv` dan `/finance/entitas-cv/saya`.
 
 | Method | Path | Izin | Fungsi |
 |---|---|---|---|
