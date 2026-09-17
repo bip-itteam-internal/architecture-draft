@@ -140,7 +140,8 @@ di detik ke-0. Ajakannya memang "ajukan koreksi", jadi ia tak perlu tiba lebih a
 untuk tap sudah dikerjakan pengingat T-30 menit yang terpisah.
 
 Pengingat T-30 menit itu sendiri hanya untuk orang yang **belum tap** dan **memang masuk**
-hari itu (⚠️ belum merge, belum di-deploy). Cuti, sakit, izin sehari, dan dinas yang sudah
+hari itu (⚠️ bip-erp [#1942](https://github.com/bip-itteam-internal/bip-erp/pull/1942), belum
+merge, belum di-deploy). Cuti, sakit, izin sehari, dan dinas yang sudah
 tercatat saat entri disemai tidak diingatkan; izin per jam tetap diingatkan karena orangnya
 tetap wajib tap. Sebelumnya pengingat ini terkirim ke semua orang padahal tap dibuka dua jam
 sebelum shift, sehingga yang datang pagi menerima "Jangan lupa Clock In" sesudah ia tap,
