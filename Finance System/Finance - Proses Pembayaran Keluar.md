@@ -38,13 +38,33 @@ Pengajuan disetujui (P1) → antrean bayar di layar pelaksana dengan notifikasi 
 - **A** Pelaksana bayar rekening PT memegang `budget.ap.bayar`, supaya pengingat jatuh tempo hutang pemasok sampai ke orang yang membayar.
 - **B** Faktur pemasok di ERP selalu mutakhir terhadap Accurate (impor terjadwal, atau pengingat membaca Accurate langsung seperti KPI AP). Selama belum, pengingat jatuh tempo dan antrean hutang di bawah hanya memuat faktur sampai impor manual terakhir.
 - **B** Daftar hutang pemasok yang mendekati atau lewat jatuh tempo tampil sebagai antrean di layar pelaksana bayar; hari ini antrean "perlu dibayar" belum tampil di dashboard AP ([[Finance - FAT Persona]]).
-- **TBD** Berkas transfer massal ke bank belum dianalisa.
+- **C** ERP menghasilkan berkas unggah massal Kopra dari pembayaran yang sudah disetujui, supaya rekening tujuan dan nominal tidak diketik ulang di Kopra satu per satu. Formatnya belum diketahui dan diminta dari Finance lebih dulu (§ Berkas unggah Kopra). `git grep` 2026-09-17 tidak menemukan kata `kopra` maupun ekspor transfer massal di bip-erp dan erp-frontend (kontrol positif: `xlsx` atau `excelize` ada di 112 berkas bip-erp). Pustaka Excel `excelize` sudah dipakai insentif, integration, manufacture, marketing-analytics, dan warehouse, belum di procurement.
 - **TBD** Siapa "atasan" yang menyetujui di internet banking, dan apakah persetujuan di bank itu tetap ada sesudah persetujuan pindah ke ERP.
 - **TBD** Jalur iklan lewat kas iklan lalu diganti kas CV dipertahankan, atau bank pembayar virtual account diganti supaya satu biaya iklan cukup satu transfer.
 
+## Berkas unggah Kopra: yang diminta dari Finance
+
+**Tujuan.** Dari pembayaran yang sudah disetujui di ERP, sistem menghasilkan berkas yang bisa langsung diunggah ke Kopra, sehingga rekening tujuan, nominal, dan keterangan tidak diketik ulang. Transfer dan persetujuannya tetap di bank; ERP menyiapkan berkas, bukan memindahkan uang ([[Finance - Proses Bisnis dan Kebutuhan Sistem]] § Prinsip rancangan butir 7). Dicatat 2026-09-17 atas permintaan IT; belum dirancang sampai bahan di bawah diterima.
+
+**Diminta dari Finance** (Supervisor FAT atau pemegang akses Kopra):
+
+1. **Templat resmi unggah massal** apa adanya, yaitu berkas kosong yang diunduh dari menu Kopra, untuk tiap jenis transaksi yang dipakai.
+2. **Satu contoh berkas yang pernah diunggah dan diterima Kopra**, dengan nomor rekening dan nama disamarkan.
+3. **Jenis transfer yang dipakai**: sesama bank, antarbank (BI-FAST, SKN, RTGS), pembayaran virtual account, dan gaji; serta apakah tiap jenis punya templat sendiri.
+4. **Aturan yang membuat unggahan ditolak Kopra**: format tanggal dan nominal, kode bank tujuan, panjang keterangan, batas baris per berkas, dan karakter yang tidak diterima.
+5. **Rekening sumber**: rekening PT dan CV mana saja yang dibayar lewat Kopra, dan apakah satu berkas hanya boleh memuat satu rekening sumber.
+6. **Pengunggah dan penyetuju di Kopra**: siapa yang mengunggah, siapa yang menyetujui, dan apakah susunan itu tetap sesudah persetujuan pindah ke ERP (terkait TBD "atasan" di § Celah).
+7. **Laporan hasil dari Kopra**: apakah status per baris dan nomor referensi transfer bisa diunduh, supaya hasilnya dicocokkan balik ke ERP dan menggantikan unggah bukti satu per satu.
+
+**Diperiksa IT sesudah bahan diterima** (TBD):
+
+- Sumber rekening tujuan per jenis pembayaran: master pemasok, isian pengajuan, atau data karyawan untuk gaji (`bank_details` di data kerja karyawan; field lama `bank_detail` sudah ditandai usang, `bip-erp/shared-library/models/employee/models.go:357-358`).
+- Pembagian berkas: per rekening sumber, per CV, per jenis transfer, atau per tanggal bayar.
+- Pembayaran yang sudah masuk berkas ditandai supaya tidak terekspor dua kali.
+
 ## Kontrol wajib
 
-Pelaksana transfer, penyetuju, pemeriksa bukti, dan pelaku rekonsiliasi bank adalah peran berbeda.
+Pelaksana transfer, penyetuju, pemeriksa bukti, dan pelaku rekonsiliasi bank adalah peran berbeda. Berkas unggah Kopra hanya memuat pembayaran yang sudah disetujui di ERP, dan isinya tidak disunting tangan sesudah diekspor; koreksi dilakukan di ERP lalu berkas dibuat ulang.
 
 ## Ukuran efisiensi
 
