@@ -18,7 +18,7 @@ Rekap gaji dan data BPJS datang dari HR lewat WhatsApp, Excel, dan email per CV 
 
 ## Sudah ada di ERP
 
-Payroll per badan usaha (41 entitas), dua dasar upah BPJS, potongan kehadiran dari attendance-service, dan beban perusahaan per karyawan ([[Microservices - Payroll Service]]). Per akhir Agustus 2026 baru dua run di prod. Aturan potongan dan sanksi mengikuti [[HRIS - Kepatuhan Peraturan Perusahaan]].
+Payroll per badan usaha (41 entitas), dua dasar upah BPJS, potongan kehadiran dari attendance-service, dan beban perusahaan per karyawan ([[Microservices - Payroll Service]]). Prod 2026-09-17 (jumlah dokumen per koleksi, baca-saja): 1 run payroll, dibuat 2026-09-03, berisi 174 baris; 180 data gaji karyawan; 23 komponen gaji; 41 badan usaha. Dua run draft yang tercatat akhir Agustus (dibuat Juli dan Agustus) tidak ada lagi. Status run itu (draft, disetujui, atau terbit) belum diukur. Aturan potongan dan sanksi mengikuti [[HRIS - Kepatuhan Peraturan Perusahaan]].
 
 ## Alur target
 
