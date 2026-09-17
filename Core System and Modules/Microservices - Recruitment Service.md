@@ -320,7 +320,7 @@ Dipanggil sekali saat startup, sebelum rute didaftarkan: mengisi `company_id = B
 
 `recruitment.cross_company` dan paket `recruitment_lintas_perusahaan` ("Rekrutmen: Lintas Perusahaan", `shared-library/common/catalog_recruitment.go`) berisi TEPAT satu izin. Sengaja TIDAK masuk `RecruitmentTierDefault` maupun paket admin (penjaga `TestRecruitmentTierDefaultTanpaIzinLintasPerusahaan`, `TestPaketAdminTanpaIzinLintasPerusahaan`): fallback tier akan memberikannya ke setiap pemegang `hris` tanpa paket. Izin ini aditif, melebarkan cakupan perusahaan izin pipeline yang sudah dipegang, bukan memberi izin pipeline itu sendiri. Satu-satunya hak yang ia buka sendiri: `POST /requisitions` (`requireAtasanAtauLintasPerusahaan`), karena perusahaan tujuan bisa belum punya atasan yang memakai ERP.
 
-`izinRecruitmentEfektif` (`permission_gate.go`) TIDAK menghitung izin aditif (`requisition_cross_dept`, `cross_company`, diturunkan dari katalog dikurangi izin pipeline lewat `izinAditifRecruitment`) saat menilai "klaim memuat izin modul recruitment", dan selalu menyertakannya ke hasil. Ini menutup jebakan yang dicatat [[ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen]]: tanpa penjagaan ini, memasang satu paket aditif ke posisi yang belum punya paket recruitment lain membuat cabang "klaim memuat izin modul" menang lalu MENCABUT seluruh izin tier-nya. Menurut komentar kode, itu terjadi di produksi 2026-09-08 pada posisi Direktur.
+`izinRecruitmentEfektif` (`permission_gate.go`) TIDAK menghitung izin aditif (`requisition_cross_dept`, `cross_company`, dan 🔜 `manpower_plan_manage` di branch MPP, lihat increment di bawah; diturunkan dari katalog dikurangi izin pipeline lewat `izinAditifRecruitment`) saat menilai "klaim memuat izin modul recruitment", dan selalu menyertakannya ke hasil. Ini menutup jebakan yang dicatat [[ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen]]: tanpa penjagaan ini, memasang satu paket aditif ke posisi yang belum punya paket recruitment lain membuat cabang "klaim memuat izin modul" menang lalu MENCABUT seluruh izin tier-nya. Menurut komentar kode, itu terjadi di produksi 2026-09-08 pada posisi Direktur.
 
 ### Cache master perusahaan: 5 menit segar, jeda gagal 30 detik, salinan basi tetap dipakai
 
@@ -355,6 +355,40 @@ Lima test AST memindai `services/recruitment/*.go` (bukan file `_test.go`), buka
 - **Paket `recruitment_lintas_perusahaan` dipasang ke posisi recruiter yang SUDAH punya paket recruitment lain**, DAN ke posisi SPV HRD penyetuju (keputusan user saat `/review` 2026-09-11). Tanpa yang kedua, SPV HRD tetap menerima notifikasi requisition perusahaan lain (kini menyebut nama perusahaannya) tapi mendapat `404` saat membukanya.
 - **Berlaku sesudah login ulang**: izin dipanggang ke klaim JWT saat login, sama seperti ADR 0080. Cache respons gateway yang berkunci `employee_id` juga bisa menahan respons lama sampai TTL habis.
 - Gerbang verifikasi sebelum paket dipasang, lewat gateway: `GET /api/recruitment/companies` membalas `200`/`403` (bukan `404` rute hilang); baris `GET /api/recruitment/mpp/vacancies` membawa `company_id`.
+
+## Increment: MPP Posisi Kosong per Resign dan Hak Tulis Penyusun MPP (2026-09-17, 🔜 branch, belum merged)
+
+> 🔜 **Status**: bip-erp `fix/recruitment-mpp-posisi-kosong-hak-tulis` dan erp-frontend `fix/rekrutmen-mpp-posisi-kosong-hak-tulis`, belum di-push, belum PR, belum deploy (2026-09-17). Endpointnya di [[API - Recruitment Service]] §Manpower Planning (MPP) & Posisi Kosong; konsep bisnisnya di [[HRIS - Recruitment]] §Rencana Tenaga Kerja (MPP).
+
+**Dua cacat yang ditutup.** (1) Posisi Kosong membaca `employee_resign` tanpa saringan status, jadi resign yang DIBATALKAN tetap tampil sebagai kandidat pengganti, dan keputusan HR yang berkunci `employee_id` saja menyembunyikan resign ULANG orang yang sama. (2) Komentar rute dan panduan menyebut tulis MPP "hanya SPV HRD", padahal gerbangnya `recruitment.work`, yang lewat fallback tier dipegang setiap pemegang `hris` (diukur prod 2026-09-17: 13 akun).
+
+### Hak tulis: izin aditif ketiga
+
+- `recruitment.manpower_plan_manage` + paket `recruitment_penyusun_mpp` ("Rekrutmen: Penyusun MPP", TEPAT satu izin; `shared-library/common/catalog_recruitment.go`) masuk katalog, **tidak** masuk `RecruitmentTierDefault`, izin pipeline, maupun paket Admin/Pelaksana (penjaga `catalog_recruitment_mpp_test.go`). Direktur dan developer, yang memegang paket pipeline penuh, sengaja hanya MELIHAT MPP.
+- `POST/PUT/DELETE /manpower-plans` dan `POST /mpp/vacancies/:employeeID/decision` → `gate(PermRecruitmentManpowerPlanManage, isHRSupervisor)`. GET tetap. Dikunci `mpp_izin_rute_test.go` lewat `RegisterRoutes` asli: tier hris staff/supervisor, paket Pelaksana, dan paket pipeline penuh ditolak `403` di keempat rute; pemegang paket MPP (dengan atau tanpa paket pipeline) lolos ke validasi handler (`400` tepat).
+- Paketnya sendirian (tanpa paket rekrutmen lain) memang lolos gerbang backend, tetapi **frontend menyembunyikan seluruh menu Rekrutmen** bagi pemegang itu: `bolehMenu` menganggap izin `recruitment.*` apa pun sebagai "modul diatur paket", termasuk izin aditif. Karena itu deskripsi paket menyebut "yang sudah memegang paket rekrutmen lain"; perbaikan tuntas di FE task terpisah. Kelas yang sama berlaku untuk `cross_company`.
+- **Kill-switch** `RECRUITMENT_PERMISSION_ENFORCEMENT=off`: gerbang kembali ke `isHRSupervisor` (tier hris supervisor, 6 dari 10 pemegangnya developer per 2026-09-07), dan staf rekrutmen bertier `hris:staff` ditolak. Diterima user 2026-09-17 sebagai perilaku mode darurat.
+
+### Keputusan per resign, tanpa migrasi
+
+- employee-service mengirim hanya resign `scheduled` + `applied`, beserta `resign_id`, `status`, `resign_dibuat_pada` (timestamp `_id`), lihat [[Microservices - Employee Service]].
+- `VacancyDecision.ResignID` (`bson:"resign_id,omitempty"`). `keputusanMenutupi(d, v)`: `employee_id` beda → tidak; employee-service lama (baris tanpa `resign_id`) → ya (perilaku lama); keputusan ber-`resign_id` → hanya resign yang sama; keputusan LAMA tanpa `resign_id` → ya bila resign dibuat ≤ `diputus_pada`. Fixture `TestKeputusanLamaProdTetapMenutupi` meniru keenam keputusan prod (2026-09-08) atas enam resign (dibuat 2026-08-27..30).
+- Upsert `filterUpsertKeputusan`: dengan `resign_id` → `{employee_id, resign_id}`; tanpa (FE lama) → `{employee_id, resign_id: {$exists: false}}`, supaya keputusan per-resign tak tertimpa. Hanya `$set`, tanpa `$setOnInsert`.
+- `decideVacancy` memvalidasi pasangan orang+resign ke daftar posisi kosong untuk **semua** pemanggil yang mengirim `resign_id`, termasuk lintas perusahaan (`404` bila tak ada). Tanpa itu, pemegang lintas (pemegang posisi HRD Supervisor dan Recruitment & Onboarding tercatat admin pusat per 2026-09-12) bisa menimpa keputusan orang lain lewat pasangan yang tak cocok. Penjaga perusahaan (baris posisi kosong dan baris MPP) tetap khusus non-lintas. Audit `mpp_vacancy.decided` menyebut `resign_id`.
+- Tetap tanpa index unik (kekurangan lama; duplikat serentak jarang, task terpisah).
+
+### Frontend
+
+Tombol Tambah/Edit/Hapus MPP, tombol "Buat rencana"/"Tidak diganti", dan kotak kritikal hanya untuk pemegang izin di klaim JWT (`features/hris/recruitment/mpp/lib/izin-mpp.ts`, fail-closed, tanpa fallback tier). Pembaca lain melihat kalimat "Keputusan diambil SPV HRD atau staf rekrutmen. Baru diberi hak? Login ulang." Label status Terjadwal/Efektif; key baris per `resign_id`; tahun rencana pengganti = `max(tahun tanggal efektif, tahun berjalan)` (resign terjadwal tahun depan → tahun depan; resign tahun lalu yang baru diputuskan → tahun berjalan, supaya ikut cakupan MPP tahun itu); pesan sukses menyebut tahunnya, karena rencana tahun depan tak tampil di tabel tahun berjalan.
+
+### Deploy (dijalankan manusia) dan gerbang verifikasi
+
+1. **employee-service** naik (paket default tersisip lewat `migrateMissingDefaultPermissionSets`, dan saringan status aktif).
+2. **Prasyarat** sebelum memasang paket: posisi `hrd_supervisor` dan `recruitment_onboarding` memegang paket rekrutmen NON-aditif. recruitment-service LAMA menganggap izin baru sebagai izin pipeline (daftar aditifnya dihitung dari katalog lama), sehingga klaim yang hanya memuat izin aditif MENCABUT izin tier. Diukur prod 2026-09-17: keduanya memegang `recruitment_lihat`, `recruitment_pelaksana`, `recruitment_penyetuju`, `recruitment_admin`, dan `recruitment_pengaju_lintas` (`recruitment_lintas_perusahaan` belum terpasang di keduanya), jadi prasyarat terpenuhi saat itu. Ukur ulang sebelum deploy.
+3. IT memasang "Rekrutmen: Penyusun MPP" ke kedua posisi (layar Hak per Posisi), pemegangnya login ulang.
+4. **recruitment-service** naik, lalu **erp-frontend**. recruitment-service sebelum langkah 3 = tak seorang pun bisa menulis MPP (`403`, terlihat).
+- Jangan putuskan baris Posisi Kosong berstatus terjadwal selama employee-service baru + FE lama (FE lama memakai tahun berjalan dan tak menampilkan status).
+- **Gerbang pembeda biner** ("daftar posisi kosong tetap tanpa 6 baris lama" juga lolos di biner lama): employee `/internal/mpp-vacancies` dari dalam jaringan docker memuat `resign_id` + `status` dan tanggal efektif sama dengan tanggal kalender WIB; `POST /api/recruitment/manpower-plans` body `{}` dengan akun pemegang `work` tanpa paket MPP → biner baru `403`, lama `400` (tak menulis data); header `X-Cache` bukan HIT (rute daftar di-cache 3 menit).
 
 ## Increment: Tautan Email per Penerima (2026-09-14, ✅ bip-erp #1870 `32edb66c`, live dev dan prod 2026-09-14)
 

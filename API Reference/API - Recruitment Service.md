@@ -48,6 +48,22 @@
 | GET | `/postings` · `/postings/:id` | List (`?status=&requisition_id=`) / detail | auth |
 | PUT/POST | `/postings/:id` · `/postings/:id/close` | Edit / tutup lowongan | HR |
 
+## Manpower Planning (MPP) & Posisi Kosong
+
+> 🔜 **Gerbang tulis di tabel ini ada di branch `fix/recruitment-mpp-posisi-kosong-hak-tulis` (bip-erp), belum merged per 2026-09-17.** Di `main` gerbangnya masih `recruitment.work` (fallback `isHRSupervisor`) untuk tulis MPP dan `recruitment.work` (fallback `isHR`) untuk keputusan posisi kosong, sehingga setiap pemegang `hris` lolos lewat fallback tier (diukur prod 2026-09-17: 13 akun). Keputusan user 2026-09-17: menulis MPP dan memutuskan posisi kosong **hanya SPV HRD dan staf rekrutmen**, lewat izin aditif `recruitment.manpower_plan_manage` (paket "Rekrutmen: Penyusun MPP"). Kolom Role = izin (fallback saat kill-switch `RECRUITMENT_PERMISSION_ENFORCEMENT=off`).
+
+| Method | Path | Fungsi | Role |
+|---|---|---|---|
+| GET | `/manpower-plans/coverage?tahun=YYYY` | KPI "Presentase Data Base Buffer Kebutuhan MPP" (`hitungCoverage`); tanpa `?tahun=` = tahun berjalan. Didaftarkan SEBELUM `/manpower-plans/:id` supaya "coverage" tak tertelan sebagai id | `recruitment.view` (`isHR`) |
+| GET | `/manpower-plans` · `/manpower-plans/:id` | Daftar / detail rencana tenaga kerja (satu baris = satu posisi per tahun; baris dari resign membawa `dari_resign_employee_id` + `dari_resign_nama`) | `recruitment.view` (`isHR`) |
+| POST · PUT · DELETE | `/manpower-plans` · `/manpower-plans/:id` | Tambah / ubah / hapus baris (`tahun`, `department`, `posisi`, `jumlah_rencana`, `is_kritikal`, `catatan`, `company_id` untuk lintas). DELETE permanen | 🔜 `recruitment.manpower_plan_manage` (`isHRSupervisor`); `main`: `recruitment.work` |
+| GET | `/mpp/vacancies` | Posisi kosong akibat resign yang BELUM diputuskan: ditarik langsung dari employee-service `/internal/mpp-vacancies` tiap kali (gagal → `503` berpesan, bukan daftar kosong), disaring cakupan perusahaan, dikurangi yang sudah punya keputusan. 🔜 Baris membawa `resign_id`, `status` (`scheduled`/`applied`), `resign_dibuat_pada`. ⚠️ Rute ini di-cache Redis gateway 3 menit per karyawan (tak ada di `noCacheRoutes`), dan membatalkan resign lewat modul employee tak menghapus cache modul recruitment | `recruitment.work` (`isHR`) |
+| POST | `/mpp/vacancies/:employeeID/decision` | Putuskan posisi kosong. Body: `keputusan` (`diganti`/`tidak_diganti`), `alasan` (wajib untuk `tidak_diganti`), `manpower_plan_id` (baris MPP pengganti), 🔜 `resign_id`. Upsert ke `mpp_vacancy_decision`, audit `mpp_vacancy.decided`. 🔜 Dengan `resign_id`: kunci upsert `employee_id`+`resign_id`, dan pasangan orang+resign wajib ada di daftar posisi kosong untuk SEMUA pemanggil termasuk lintas perusahaan (tak ada → `404 posisi kosong tidak ditemukan`). Tanpa `resign_id` (FE lama): jalur lama berkunci `employee_id` (hanya menyentuh keputusan tanpa `resign_id`). Non-lintas juga dijaga perusahaan posisi kosong dan baris MPP-nya | 🔜 `recruitment.manpower_plan_manage` (`isHRSupervisor`); `main`: `recruitment.work` (`isHR`) |
+
+- **Keputusan menutupi resign, bukan orang** (🔜 branch): keputusan ber-`resign_id` hanya menyembunyikan resign itu, jadi resign ULANG orang yang sama sesudah batal tampil lagi. Keputusan LAMA tanpa `resign_id` menyembunyikan resign orang itu yang dibuat **≤ `diputus_pada`** (`keputusanMenutupi`); diukur prod 2026-09-17, keenam keputusan lama (2026-09-08) atas enam resign yang dibuat 2026-08-27..30 tetap tertutup tanpa migrasi data. employee-service lama (tanpa `resign_id`) = pencocokan per orang seperti sebelumnya.
+- **Izin baru berlaku sesudah login ulang** (dipanggang ke klaim JWT). Kill-switch enforcement dimatikan = tulis MPP kembali ke `isHRSupervisor` (tier hris supervisor, termasuk developer), dan staf rekrutmen bertier `hris:staff` ditolak; diterima user 2026-09-17 sebagai perilaku mode darurat.
+- Rincian desain dan urutan deploy: [[Microservices - Recruitment Service]] §Increment MPP Posisi Kosong per Resign.
+
 ## Candidate
 | Method | Path | Fungsi | Role |
 |---|---|---|---|
