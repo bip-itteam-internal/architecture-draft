@@ -14409,23 +14409,32 @@
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
         "Finance - Buku Besar CV",
         "Finance - FAT Persona",
-        "REF - Kepemilikan Data"
+        "REF - Kepemilikan Data",
+        "Microservices - Procurement Service",
+        "API - Finance Service",
+        "Microservices - Payroll Service",
+        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
+        "Microservices - Integration Service",
+        "Manufacture - Stock & Material Management",
+        "ADR - 0001 Akuntansi via Accurate"
       ],
-      "hash": "3fed770d616f3add3b541765cf601042ae631468e7cef627327c320ab1896001",
-      "ukuran_kb": 13.9,
-      "ringkasan": "Menjawab: task apa saja (T1 sampai T10) untuk membangun buku besar 40 CV di ERP menggantikan FINCON, urutannya, repo yang disentuh, test dan cara verifikasinya, serta mana yang sudah merge. Juga menjawab prasyarat non-kode (persetujuan ADR 0096, ekspor FINCON, paket izin pemegang CV, data penugasan) dan urutan deploy yang mengikat untuk shared-library, kategori inbox, dan env baru. Mencatat dampak survei alur kerja Finance lanjutan ke T2, T8, dan T9 serta kandidat task di luar ADR 0096.",
+      "hash": "989d74de026c70b42e220eb72680c61b25518560b773b10bf902d0a40c2d8765",
+      "ukuran_kb": 19.9,
+      "ringkasan": "Menjawab: task apa saja (T1 sampai T10) untuk membangun buku besar 40 CV di ERP menggantikan FINCON, urutannya, repo yang disentuh, test dan cara verifikasinya, serta mana yang sudah merge. Juga menjawab sistem apa saja yang dibutuhkan Finance: yang sudah ada dan tinggal dipakai (Pengajuan Barang, Tax Control, payroll, scan retur gudang), yang perlu diperbaiki (rekonsiliasi kas toko, pengajuan ke pos anggaran, varians, kotak persetujuan), yang belum ada (payroll ke bank, mutasi bank, penjualan per CV, pertanggungjawaban dana, costing HPP), yang sengaja tidak dibangun, kebutuhan per posisi, dan keputusan manajemen yang dibutuhkan.",
       "kata_kunci": [
         "buku besar CV",
-        "general ledger",
         "FINCON",
         "40 CV",
         "pemegang CV",
-        "Junior Accountant",
         "ADR 0096",
-        "konsolidasi laporan keuangan",
-        "migrasi FINCON",
         "pembayaran CV transfer",
-        "survei alur kerja Finance"
+        "kebutuhan sistem Finance",
+        "survei alur kerja Finance",
+        "rekonsiliasi kas toko",
+        "payroll transfer bank",
+        "mutasi rekening",
+        "pertanggungjawaban dana kegiatan",
+        "costing HPP"
       ]
     },
     {
