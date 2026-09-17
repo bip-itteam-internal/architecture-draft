@@ -231,5 +231,22 @@ Tiga keadaan per kunci, dan ketiganya sengaja dibedakan:
 
 > ~90 endpoint. Daftar lengkap path per `:doc_type`/method ada di `services/employee/main.go`.
 
+## Quality — Komplain QC dari Marketing
+
+> Register `quality_complaint`, di-host employee-service bersama workspace Quality lain (`RegisterQualityRoutes`, prefix `/quality`). Marketing menginput komplain yang menuding kesalahan QC; QC memvalidasi. Konsep, alur, dan catatannya di [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]].
+
+| Method | Path | Fungsi | RBAC |
+|---|---|---|---|
+| GET | `/quality/complaints` | Daftar komplain; filter `?status=`. Tanpa paginasi, tanpa saringan perusahaan | `RequireQualityOrMarketing` |
+| GET | `/quality/complaints/kategori` | 🟡 Daftar kode kategori tertutup `{"data": [kode berurutan]}`, tanpa label dan tanpa unit. Isinya sama persis dengan `kategori_tersedia` pada penolakan 400. ⛔ Didaftarkan **paling atas** di grup `/quality` supaya tak tertelan rute ber-`:id` kelak. **Selesai di branch `feat/employee-komplain-qc-kategori`, belum merge** | Identitas saja (`gerbangIdentitasKomplainQC`): tanpa `BIP-Employee-ID` → **401**, tanpa syarat peran |
+| POST | `/quality/complaints` | Catat komplain. `title` wajib. Status dipaksa "Menunggu Validasi"; verdict/alasan/validator dikosongkan; `metadata.created_by` dari `BIP-Employee-ID`. 🟡 Sejak branch di atas: `kategori` **wajib** — kosong → 400 "kategori wajib dipilih", di luar daftar → 400 "kategori tidak dikenal", keduanya + `kategori_tersedia` | `RequireMarketingStaff` |
+| PUT | `/quality/complaints/:id` | Ubah isi komplain **selagi** "Menunggu Validasi". Tanpa identitas **403**, bukan pengaju **403**, sudah divalidasi **409**. ⚠️ Mengganti dokumen **utuh** (`ReplaceOne`), jadi 🟡 `kategori` ikut wajib di sini: kiriman tanpa kategori yang lolos akan menghapus kategori tersimpan tanpa pesan | `RequireMarketingStaff` + pengaju (`metadata.created_by`) atau SPV/admin IT |
+| PUT | `/quality/complaints/:id/validate` | Vonis QC: `verdict` **Valid** atau **Ditolak** (alasan wajib bila Ditolak). Mengisi `validated_by`/`validated_at`, lalu mengabari pengaju | `RequireQualityStaff` |
+| DELETE | `/quality/complaints/:id` | Hapus permanen | `RequireQualitySupervisor` |
+
+**Kategori (daftar tertutup)** 🟡: `dugaan_tidak_asli` · `segel_terbuka` · `isi_tidak_sesuai` · `kedaluwarsa`. Konsumen membaca daftarnya dari `GET /quality/complaints/kategori`, bukan menyalin daftar di atas ([[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]] keputusan 2 dan 3). ⛔ Menambah kategori menuntut label kabar di backend **dan** terjemahan `quality.komplain.kategoriLabel.<kode>` di `id.ts` dan `en.ts` erp-frontend; tanpa terjemahan kategorinya tetap bisa dipilih tetapi tampil sebagai kode mentah.
+
+**Status**: `Menunggu Validasi` · `Valid` · `Ditolak`. Gateway membuang prefix `/api/employee`, jadi frontend memanggilnya di `/api/employee/quality/complaints...`.
+
 ## Dokumen Terkait
 - [[Microservices - Employee Service]] · [[HRIS - Payroll]] · [[HRIS - Key Performance Index]] · [[HRIS - Personalia]] · [[API - Index]]

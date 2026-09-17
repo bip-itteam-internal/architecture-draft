@@ -122,23 +122,25 @@
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "Microservices - Integration Service",
         "APP - MyBharata",
+        "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "0236d2a5928004e94b770d113c23eb2391ccc95a798d261c1e10cb20f712a169",
-      "ukuran_kb": 66.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service lewat gateway /api/employee (login, onboarding, personal/work data, dokumen, jadwal, akun, master departemen dan system role), serta RBAC apa yang menggerbangi tiap rute. Juga menjawab cara menetapkan penyetuju pengajuan departemen, menyembunyikan menu per jabatan, mengatur jenjang jabatan, memakai filter departemen bergrup (grouped=true), dan endpoint internal lintas-service seperti department-approver dan permission-holders.",
+      "hash": "eb80e17ea499c94b48fa6cb484f8983c046766e47271b5bc53b03d877d81e80e",
+      "ukuran_kb": 69.2,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service untuk login dan onboarding karyawan, CRUD data personal/work, kelola akun dan system role, master data departemen, serta modul KPI, cuti, kontrak kerja, resign, promosi/mutasi, dan surat peringatan. Juga menjelaskan RBAC tiap endpoint dan perilaku khusus seperti penggabungan departemen berlabel HRGA dan penetapan penyetuju pengajuan per departemen.",
       "kata_kunci": [
         "employee-service",
-        "endpoint karyawan",
+        "API endpoint",
+        "auth",
         "login",
-        "master departemen",
+        "onboarding",
+        "master data departemen",
         "system role",
-        "penyetuju pengajuan",
-        "approver",
-        "jenjang jabatan",
-        "menu-hidden",
-        "RequireHRISOrITSupervisor"
+        "RBAC",
+        "KPI",
+        "kontrak kerja"
       ]
     },
     {
@@ -1538,22 +1540,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "02c59dcc81e1a62ba8ab9825084a6a23cb41046b73e955cb7f59871cc7c43be1",
-      "ukuran_kb": 526.0,
-      "ringkasan": "Menjawab: apa stack dan struktur portal web ERP (erp-frontend, \"One Bharata\"), bagaimana login, refresh token, dan SSO Identity Provider bekerja, serta bagaimana cookie system_roles (modul dan role) menggerbang sidebar dan menu. Juga menjawab cara menu dikelompokkan lewat induk bersarang (termasuk Pengaturan HRGA terpusat dan tab-tabnya), bagaimana fitur multi-perusahaan seperti CompanySwitcher dan rekrutmen lintas perusahaan tampil di web, serta konvensi data-fetching TanStack Query dan bagan Recharts yang wajib diikuti. Menjawab pula induk menu Live Support beserta bentuknya per persona, setoran tema dan teaser, serta halaman Monitoring Sesi Live (tab Sedang Berjalan dan Riwayat, panel rincian sesi, izin marketing.sesi-live.view).",
+      "hash": "62879669d2eefb4766fd9e13110cf20651e4fc1ebb0c6c2b3ba5014fc8b85091",
+      "ukuran_kb": 528.0,
+      "ringkasan": "Menjawab: apa itu aplikasi web ERP (hris-dashboard / One Bharata), stack teknologi yang dipakai (Next.js, TanStack Query, dst), bagaimana autentikasi dan SSO Identity Provider bekerja, bagaimana role dan module diatur lewat cookie system_roles, serta struktur menu sidebar dan konvensi data-fetching/bagan yang dipakai di seluruh halaman frontend.",
       "kata_kunci": [
-        "web ERP",
         "erp-frontend",
+        "hris-dashboard",
         "One Bharata",
+        "web ERP",
         "SSO",
         "system_roles",
         "sidebar menu",
-        "Pengaturan HRGA",
-        "multi-perusahaan",
-        "TanStack Query",
-        "Recharts",
-        "induk Live Support",
-        "Monitoring Sesi Live"
+        "Next.js",
+        "role gating",
+        "multi-perusahaan"
       ]
     },
     {
@@ -2214,10 +2214,10 @@
         "QA - Register Perizinan & Sertifikasi",
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
+        "API - Employee Service",
         "Microservices - Procurement Service",
         "Microservices - Learning Service",
         "ADR - 0002 Database-per-Service",
-        "API - Employee Service",
         "Microservices - Payroll Service",
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
@@ -2276,19 +2276,19 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "3eb9cfec4311bac2de8d1804c661f4668d8d78d5bcc834f0f3f9ccb3e60b169b",
-      "ukuran_kb": 191.0,
-      "ringkasan": "Menjawab: bagaimana login (username/employee_id, PIN, biometrik), refresh token, dan registrasi onboarding bekerja di employee-service sebagai sumber SSO, serta operasi admin akun IT seperti reset akun, forget device, status aktif, dan system_roles. Menjelaskan juga endpoint master data departemen dan system role beserta gerbang RBAC-nya, dan workspace Legal, R&D Regulatory, Quality, serta Procurement non-Accurate yang di-host di service ini, termasuk kaitannya dengan resign/nonaktif akun.",
+      "hash": "8d8d26771597bc43db0fcb1e84bc231e27a1a6f07b8bb3ef7c470e03379bd35f",
+      "ukuran_kb": 191.7,
+      "ringkasan": "Menjawab: fitur dan endpoint apa saja yang dimiliki employee-service sebagai source of truth autentikasi dan data karyawan, termasuk workspace posisi Legal, R&D Regulatory, dan Quality (CAPA/incoming/batch release) yang di-host di service ini. Juga menjelaskan status implementasi tiap fitur (live prod vs live di kode belum di-deploy), mekanisme admin akun (reset, forget-device, active-status), dan integrasi lintas-service.",
       "kata_kunci": [
-        "employee service",
-        "karyawan",
-        "autentikasi",
-        "login",
-        "SSO",
-        "onboarding",
-        "reset akun",
-        "master department",
-        "system_roles",
+        "employee-service",
+        "microservice",
+        "source of truth",
+        "auth",
+        "Legal",
+        "R&D Regulatory",
+        "Quality CAPA",
+        "master data",
+        "account admin",
         "resign"
       ]
     },
@@ -2836,20 +2836,20 @@
         "DB - Overview and Notes",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "d9f39675406416c0190be72d23b4e261dea2e1f68fa8bdff08edaf27e1c68060",
-      "ukuran_kb": 25.9,
-      "ringkasan": "Menjawab: bagaimana notification-service mengelola inbox in-app, push FCM (web dan mobile), WhatsApp, splash promotion, dan article lintas-perusahaan; bagaimana kategori inbox didaftarkan lewat daftar-izin `InboxCategories`; serta bagaimana push dua kanal (browser + ponsel) di-fan-out terpusat dari `/inbox/send` beserta gerbang keamanannya (BIP-Gateway-ID, service key).",
+      "hash": "38b6e74ff2edba79d5c646e36140246e8348e9cf386232f458afadbd2e568231",
+      "ukuran_kb": 26.2,
+      "ringkasan": "Menjawab: bagaimana notification-service mengirim dan menyimpan notifikasi lintas channel (inbox in-app, push FCM browser/ponsel, WhatsApp, email via Resend, splash promotion, article), termasuk aturan paginasi inbox, kategori inbox sebagai daftar-izin, dan mekanisme fan-out push dua kanal yang dipusatkan dari /inbox/send.",
       "kata_kunci": [
         "notification-service",
         "inbox",
-        "push notification",
-        "FCM",
+        "FCM push",
         "WhatsApp",
+        "email Resend",
         "splash promotion",
-        "article broadcast",
-        "InboxCategories",
-        "BIP-Gateway-ID",
-        "fan-out"
+        "article",
+        "kategori inbox",
+        "push notifikasi",
+        "webpush"
       ]
     },
     {
@@ -6988,6 +6988,7 @@
         "QA - Deviation & CAPA",
         "ADR - 0002 Database-per-Service",
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
+        "API - Employee Service",
         "API - Warehouse Service",
         "REF - Kepemilikan Data",
         "Microservices - Employee Service",
@@ -6997,21 +6998,20 @@
         "APP - MyBharata",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus"
       ],
-      "hash": "f29c9d3036bfec862cb1ddadf5ae308f6a9e3e0818fab844914b37f474e2a20b",
-      "ukuran_kb": 17.9,
-      "ringkasan": "Menjawab kenapa dan bagaimana pengajuan komplain produk disatukan jadi satu formulir dengan unit tujuan diturunkan dari kategori yang dipilih pengaju, bukan dipilih langsung, serta bagaimana pengalihan antar unit dan pemilahan keluhan tanpa kategori bekerja. Menjelaskan juga dampaknya ke skor KPI packer gudang saat komplain ditolak atau dialihkan, data pengukuran PROD yang mendasari keputusan, dan siapa saja yang terdampak.",
+      "hash": "c860c1c83f007d4af3c541e7eb97576bcc8b7b92e90cc8a6d5dfcb1a12fda750",
+      "ukuran_kb": 19.5,
+      "ringkasan": "Menjawab: kenapa dan bagaimana komplain produk dari ulasan marketplace maupun tanpa ulasan disatukan jadi satu formulir, dengan unit tujuan diturunkan otomatis dari kategori yang dipilih pengaju alih-alih dipilih manual. Menjelaskan mekanisme ganti kategori/alih unit, dampaknya ke KPI packer gudang, serta status implementasi tiap bagian (register gudang, alasan ditolak, dialihkan) per 2026-09-17.",
       "kata_kunci": [
         "komplain produk",
         "satu pintu",
         "ADR 0103",
         "kategori komplain",
-        "KPI packer",
         "ganti kategori",
-        "dialihkan",
-        "ditolak",
-        "register komplain",
-        "gudang",
-        "QC"
+        "KPI packer",
+        "komplain gudang",
+        "komplain QC",
+        "ulasan marketplace",
+        "unit tujuan"
       ]
     },
     {
@@ -7110,7 +7110,7 @@
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
       "hash": "10e03c14dfb4018120b4f2f559be908b61ab5ac1dada0e0f90b82aad779158f4",
-      "ukuran_kb": 8.6,
+      "ukuran_kb": 8.7,
       "ringkasan": "Menjawab: bagaimana tema host live dan teaser Live Support dinilai untuk KPI, yaitu disetor per karya dengan tautan bukti di web ERP lalu disetujui atau ditolak penyetuju departemen penyetor, dan hanya yang disetujui dihitung. Menjelaskan kenapa bukan penilaian diri, Form Builder, atau data video TikTok, kenapa periodenya bulan setor pertama, bagaimana penolakan diperbaiki, dan kenapa marketing-analytics kini memanggil employee-service (menyimpang dari ADR 0101 §3). Juga menjawab risiko yang terbuka: departemen tanpa penyetuju, setoran yang menunggu saat skor dibekukan, dan gerbang menu Tinjau yang cermin.",
       "kata_kunci": [
         "ADR 0106",
@@ -7178,7 +7178,7 @@
         "ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift"
       ],
       "hash": "cc4883e5d5f36e165f2aab8065026624ee86110634db61d8c60f358f5fc4ea69",
-      "ukuran_kb": 10.8,
+      "ukuran_kb": 10.9,
       "ringkasan": "Menjawab: kenapa web ERP kembali punya layar sesi live per sesi, siapa yang boleh melihatnya (leader marketing seluruh toko beserta angka penjualan, jabatan Live Support hanya toko departemennya tanpa angka), dan kenapa layar itu hanya baca tanpa Mulai, Jeda, Akhiri, atau Ambil alih. Juga menjawab kenapa dibuat rute baru /live-support/sesi alih-alih memperluas /live-shifts, kenapa tidak menjalankan tutup otomatis saat dibaca, kenapa status permintaan ambil alih diturunkan server, bagian ADR 0091 yang dibuka kembali, serta risiko yang diterima (sesi menggantung tampil hingga tik berikutnya, pemegang integration supervisor ikut melihat angka).",
       "kata_kunci": [
         "ADR 0108",
@@ -12025,20 +12025,20 @@
         "APP - Web ERP",
         "QA - Register Perizinan & Sertifikasi"
       ],
-      "hash": "cb4b7423f0ca62ace2fbe4cbade1e57382fb75519c7ed57047e3728386e429a7",
-      "ukuran_kb": 15.6,
-      "ringkasan": "Menjawab: bagaimana register CAPA & temuan audit, incoming inspection bahan/kemasan datang, antrean release batch, dan komplain QC dari marketing bekerja di divisi Quality, siapa saja persona dan RBAC yang terlibat (staf/supervisor Quality, approver CAPA dari produksi & warehouse, marketing pengaju komplain), serta bagaimana alur persetujuan CAPA dua approver dan notifikasi komplain QC saling menutup loop. Juga mencatat fitur apa yang belum ada (Dashboard Mutu, IPC/CPPB, checklist GMP).",
+      "hash": "9e3e25a81904c4e5ef0ab5f9332008de58b4ebca4e0449249bd74a56b307b5b1",
+      "ukuran_kb": 18.3,
+      "ringkasan": "Menjawab: apa saja register operasional milik divisi Quality (CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing) beserta alur status, alert keterlambatan, dan RBAC tiap register. Juga menjelaskan alur persetujuan CAPA dua approver dan aturan siapa boleh mengubah komplain QC yang diajukan marketing.",
       "kata_kunci": [
+        "Quality",
         "CAPA",
         "temuan audit",
         "incoming inspection",
-        "release batch",
+        "batch release",
         "komplain QC",
-        "Quality",
-        "QA",
-        "BPOM",
+        "quality_complaint",
         "approval CAPA",
-        "RBAC quality"
+        "QA",
+        "ICC"
       ]
     },
     {
@@ -12298,6 +12298,9 @@
         "Sales - ICC Account Manager Mapping",
         "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
+        "Microservices - Warehouse Service",
+        "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "Sales - Marketplace Integration",
         "Microservices - Integration Service",
         "ADR - 0001 Akuntansi via Accurate",
@@ -12342,22 +12345,18 @@
         "Microservices - Inventory Service",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "a77ecdb7c753a5be9b73768f90e7be9bfc0022851a71d90d44324d73b45c0eac",
-      "ukuran_kb": 54.3,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis di ERP (data karyawan, jadwal, presensi, hak akses, KPI, kesiapan live, entitas CV, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Dipakai sebelum membangun fitur atau penyimpanan baru untuk mengecek apakah faktanya sudah dimiliki departemen lain, salinan mana yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih hidup (mis. task-management membaca employee_db langsung), dan duplikasi yang belum diputuskan. Mencatat pula pemilik setoran tema dan teaser Live Support di marketing-analytics dan penyetuju yang ditanyakan ke employee-service, bukan disalin.",
+      "hash": "162e5aaf9b29bc709fa39c022363f03d90055c728fcdc8ceacaf93ba0f47a87b",
+      "ukuran_kb": 55.6,
+      "ringkasan": "Menjawab: siapa pemilik (service dan koleksi) tiap fakta bisnis di ERP Bharata, siapa yang boleh menulisnya, lewat jalur apa service lain boleh membacanya, dan salinan mana yang sah beserta penjaganya. Dipakai untuk menjawab 'apakah data ini sudah ada di service lain sebelum membangun yang baru' dan mendaftar duplikasi fakta yang belum diputuskan.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "sumber kebenaran",
         "source of truth",
-        "satu fakta satu tempat",
+        "satu fakta satu pemilik",
         "duplikasi data",
-        "salinan sah",
+        "salinan data",
         "SyncCollection",
-        "database-per-service",
-        "ADR 0002",
-        "setoran karya live support",
-        "penyetuju departemen"
+        "database-per-service"
       ]
     },
     {
@@ -15147,20 +15146,18 @@
         "REF - Kepemilikan Data",
         "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko"
       ],
-      "hash": "be5706271206be97976acdd2d87e09196d8fee1089aa0f319e2845c506a8409d",
-      "ukuran_kb": 14.4,
-      "ringkasan": "Menjawab task apa saja yang sudah selesai dan yang masih berjalan untuk fitur komplain dari ulasan marketplace (T1-T14 beserta PR terkait dan tanggal deploy), dan keputusan apa yang masih menunggu pemilik proses (K1-K6) seperti daftar kategori komplain QC dan tujuan yang belum punya register. Berguna untuk melacak progres per task sebelum melanjutkan pekerjaan di area ini.",
+      "hash": "a5d98cb9b989c8300ab35a7d8345b03f5c6bf7edeea62813207d432b71406f48",
+      "ukuran_kb": 15.2,
+      "ringkasan": "Menjawab: daftar task backend/frontend dan keputusan yang masih menunggu manajemen untuk implementasi fitur komplain dari ulasan marketplace, termasuk status tiap task (T1-T14), keputusan yang dibatalkan (master kategori pusat), dan pertanyaan terbuka seperti kategori komplain QC serta tujuan ekspedisi/vendor yang belum punya register.",
       "kata_kunci": [
-        "komplain",
+        "ANALISA Komplain Ulasan Marketplace",
+        "task board",
+        "komplain gudang",
+        "komplain QC",
+        "satu pintu",
         "ulasan marketplace",
-        "task list",
-        "analisa kebutuhan",
-        "ADR 0099",
-        "ADR 0103",
-        "QC",
-        "gudang",
-        "roadmap",
-        "Beauty Hacks"
+        "warehouse komplain",
+        "kategori komplain"
       ]
     },
     {
