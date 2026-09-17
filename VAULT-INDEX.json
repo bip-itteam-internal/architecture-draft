@@ -533,20 +533,20 @@
         "API - Index",
         "CORE - API Master Gateway"
       ],
-      "hash": "207d0325fa46766188bbb8413da78738787b1f191c1d846f179166d88a54a4d7",
-      "ukuran_kb": 42.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di service learning (master jenis pelatihan & trainer, event pelatihan, peserta & kehadiran, pengajuan pelatihan, evaluasi trainer, course & bank soal, pre-test/post-test, sertifikat, bahan KPI, feed kalender), izin RBAC apa yang menggerbang tiap rute, dan status merge/deploy tiap kelompok endpoint per 2026-09-17.",
+      "hash": "f519ceaaa263df010f3a4f2e8aff6aee0ee56e636dc169058ac9688cb5b7713a",
+      "ukuran_kb": 42.4,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di modul Learning (event pelatihan, peserta & kehadiran, pengajuan pelatihan, evaluasi trainer, course dan bank soal pre-test/post-test, sertifikat, bahan KPI, feed kalender), izin RBAC yang menggerbang tiap rute, dan status merge/deploy tiap bagiannya di dev maupun produksi. Juga menjelaskan aturan verifikasi department_key ke employee-service beserta kode status galatnya, serta perbedaan resolusi departemen antara event pelatihan dan pengajuan pelatihan.",
       "kata_kunci": [
         "learning service",
         "training",
         "pelatihan",
-        "API endpoint",
-        "RBAC training",
-        "pengajuan pelatihan",
-        "evaluasi trainer",
+        "API training",
         "post-test",
         "pre-test",
-        "sertifikat pelatihan"
+        "sertifikat pelatihan",
+        "training request",
+        "pengajuan pelatihan",
+        "RBAC training"
       ]
     },
     {
@@ -877,7 +877,7 @@
         "order.order-items-get"
       ],
       "hash": "40849a92b3a96565fbc789742e61b75e3bbd942b6d18b298c097028cfbd2659e",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab cara menarik daftar order dari Lazada Open API endpoint `/orders/get`, perbedaan filter waktu `created_after`/`created_before` (waktu order dibuat) vs `update_after`/`update_before` (waktu order berubah), dan kenapa window berbasis update penting sebagai jaring pengaman ketika webhook Lazada (LPM) mati. Juga mendokumentasikan jebakan status order-level yang bisa tertinggal dari status tracking sebenarnya.",
       "kata_kunci": [
         "Lazada",
@@ -1041,7 +1041,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 1.9,
+      "ukuran_kb": 2.0,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1093,7 +1093,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1520,19 +1520,19 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "bc38e9ee256bd1d2671b0e7e3e2ef58b96683cba6e214f7e2ad8ad1a6b336da7",
-      "ukuran_kb": 492.1,
-      "ringkasan": "Menjawab: modul dan fitur apa saja yang ada di portal web ERP/HRIS (hris-dashboard/erp-frontend), bagaimana autentikasi, role, dan role-based sidebar bekerja, bagaimana dukungan multi-perusahaan diterapkan (kelola perusahaan, company switcher, rekrutmen lintas perusahaan), serta konvensi teknis data-fetching dan chart yang dipakai tim FE.",
+      "hash": "0579a16c19cba40c0e7b265acc8068aacf4b21961b381a9fe015017eee6618d0",
+      "ukuran_kb": 493.0,
+      "ringkasan": "Menjawab: apa itu portal hris-dashboard (One Bharata), stack teknologi yang dipakainya, bagaimana alur login dan SSO Identity Provider bekerja, serta bagaimana struktur menu sidebar dan role-based access (system_roles) diatur. Juga menjelaskan fitur multi-perusahaan (company switcher, kelola departemen/shift per perusahaan) dan struktur halaman Pengaturan HRGA terpusat beserta tab-tabnya.",
       "kata_kunci": [
         "erp-frontend",
         "hris-dashboard",
-        "web ERP",
         "One Bharata",
+        "web ERP",
         "SSO",
+        "sidebar",
         "system_roles",
         "multi-perusahaan",
-        "sidebar",
-        "recruitment lintas perusahaan",
+        "multi-tenant",
         "Pengaturan HRGA"
       ]
     },
@@ -2018,20 +2018,20 @@
         "Microservices - Form Builder Service",
         "Microservices - File Service"
       ],
-      "hash": "4497ac916e47007c548a0b07c146747e0edc7d0d01bc9f6052196eafe9a0ee56",
-      "ukuran_kb": 12.8,
-      "ringkasan": "Menjawab: koleksi MongoDB apa saja yang dimiliki tiap microservice bip-erp dan di container Mongo mana ia tinggal, mengikuti pola database-per-service. Dipakai saat perlu tahu di database mana sebuah data tersimpan, service mana pemiliknya, koleksi mana yang membawa `company_id` untuk multi-perusahaan, dan pengecualian yang membaca database service lain secara read-only. Menyebut juga infrastruktur data bersama (Redis untuk cache dan queue, MinIO untuk object storage), employee-service yang berjalan sebagai replica set, dan konvensi seluruh waktu server disimpan UTC.",
+      "hash": "ff15d84c5c4f29309eacaee452258453b973f0096f85e833c775b71fc0e9a190",
+      "ukuran_kb": 13.0,
+      "ringkasan": "Menjawab: database MongoDB mana yang dimiliki tiap microservice bip-erp dan collection apa saja isinya, mengikuti pola database-per-service. Juga menjelaskan pengecualian akses lintas-database (task-management membaca employee_db dan attendance_db secara read-only) serta infrastruktur data bersama seperti Redis dan MinIO.",
       "kata_kunci": [
-        "database",
+        "database per service",
         "MongoDB",
-        "koleksi",
         "collection",
-        "database-per-service",
         "employee_db",
         "attendance_db",
-        "company_id",
+        "learning_db",
         "Redis",
-        "MinIO"
+        "MinIO",
+        "arsitektur data",
+        "ownership data"
       ]
     },
     {
@@ -2605,20 +2605,20 @@
         "API - Index",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id"
       ],
-      "hash": "c52aa59084617650a87547f319b7b8623ab3f85edf351e3b53e43a4e8dfd0fd2",
-      "ukuran_kb": 58.1,
-      "ringkasan": "Menjawab: bagaimana service learning diimplementasikan (stack, port, database), kenapa modul Training dipisah dari Employee Service, endpoint apa saja yang sudah dibangun di service ini, dan bagaimana status tiap tahap pengembangan (pengajuan, evaluasi, post-test, rencana pelatihan tahunan, sertifikat, pre-test) per 2026-09-17.",
+      "hash": "a77636cdbaf324fd7b97d8bebd6fa8f2e24e7fe9284e8eb3c70878d221fee565",
+      "ukuran_kb": 59.0,
+      "ringkasan": "Menjawab: kenapa modul Training dipisah jadi service sendiri (learning-service), fitur apa saja yang sudah berjalan (event pelatihan, pengajuan SPV→HR, evaluasi trainer, post-test berskor, bahan KPI, feed kalender) dan mana yang masih di branch/belum merge (pre-test, rencana pelatihan tahunan, sertifikat otomatis). Juga menjelaskan cara verifikasi department_key lewat panggilan internal ke employee-service dan status deploy tiap bagian di dev/produksi.",
       "kata_kunci": [
         "learning service",
-        "microservice",
+        "LMS",
         "training",
         "pelatihan",
-        "Fiber",
-        "MongoDB",
         "post-test",
+        "pre-test",
+        "training request",
+        "evaluasi trainer",
         "sertifikat pelatihan",
-        "rencana pelatihan tahunan",
-        "LMS"
+        "rencana pelatihan tahunan"
       ]
     },
     {
@@ -4826,7 +4826,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "1af925998c51daaf89f4b362162b5f8c117e3db82e37169cbfe7b2e6ed084c92",
-      "ukuran_kb": 6.5,
+      "ukuran_kb": 6.6,
       "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal), dan bagaimana auto-disable Tahap 2 bekerja (counter kegagalan auth beruntun, ambang 5, reset saat sukses, satu Telegram tanpa damper terpisah — bukti flapping 36009006). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care.",
       "kata_kunci": [
         "adr",
@@ -4964,7 +4964,7 @@
         "APP - Web ERP"
       ],
       "hash": "3405a3dc1516fe9eff90d36e5a1a47c8a876d2dbaf6bc9537105816d5897ee6d",
-      "ukuran_kb": 10.1,
+      "ukuran_kb": 10.2,
       "ringkasan": "Menjawab: bagaimana penyesuaian statement TikTok (tt_statement_adjustments, mayoritas ganti rugi paket hilang / LOGISTICS_REIMBURSEMENT yang bukan penggantian ongkir) dibukukan ke Accurate — dilipat ke payout pesanan yang disebutnya lalu diurus mesin receipt, bukan sebagai baris pendapatan tersendiri — dan bagaimana pesanan yang tak ditemukan ditangani. Live 26 Agustus 2026 (PR #1451).",
       "kata_kunci": [
         "adr",
@@ -5823,7 +5823,7 @@
         "External - Accurate"
       ],
       "hash": "88f3c03bd55060706f79617cace5e8835a2ecc4419733de53f3d0c971547bfe2",
-      "ukuran_kb": 14.9,
+      "ukuran_kb": 15.0,
       "ringkasan": "Menjawab: bagaimana koreksi faktur yang dinyatakan finance lewat Excel Rekap Lengkap diterjemahkan sistem ke tuas yang sudah ada (pindah hari, Mapping SKU, qty per unit, riwayat Harga Jual, gudang per pesanan), dan kenapa tidak ada override per baris faktur. Menjelaskan koreksi mana yang ditolak (sel Accurate Number kosong, FO, paket multi-komponen, faktur terkunci tertentu), kewajiban persetujuan untuk perubahan master-data, serta amandemen koreksi gudang yang memecah baris faktur per gudang.",
       "kata_kunci": [
         "koreksi faktur",
@@ -6728,7 +6728,7 @@
         "ADR - 0001 Akuntansi via Accurate"
       ],
       "hash": "7f8ea537557b43453b7f3177676f1922e408142ec5b24b4bb6ffd59931e15190",
-      "ukuran_kb": 10.4,
+      "ukuran_kb": 10.5,
       "ringkasan": "ADR yang memutuskan perlakuan kompensasi Shopee yang cair bercicilan untuk satu pesanan: cicilan pertama tetap dibukukan otomatis, cicilan kedua dan seterusnya ditahan lalu dicatat tim AR lewat koreksi manual di ERP. Menjawab: kapan aturan ini mulai berlaku (kv `shopee-compensation-susulan-hold-date`), akun mana yang disarankan (diskon 4003 bila cair di bulan yang sama, Pendapatan Lain-lain 8001 bila beda bulan), bagaimana laman Kompensasi Cicilan dan endpoint `GET /accurate/compensation-installments` bekerja, arti status MENUNGGU/TERTUNDA/SELESAI, mengapa penahanan bersifat lengket agar uang tak terbukukan dua kali, dan apa yang sengaja tidak dijanjikan (pembukuan otomatis cicilan kedua, penanda kompensasi final, penerimaan yang isinya hanya kompensasi ditahan).",
       "kata_kunci": [
         "ADR 0097",
@@ -6835,7 +6835,7 @@
         "API - Integration Service"
       ],
       "hash": "9763c415885f93f6222c0d032538477cee71ae84e20b64ebfd3def47b17068a3",
-      "ukuran_kb": 6.0,
+      "ukuran_kb": 6.1,
       "ringkasan": "Menjawab: apa yang terjadi bila dokumen Penerimaan (Bukti Terima Kas) di Accurate isinya berbeda dari hitungan ERP, kenapa mekanisme penahanan EXTERNAL_EDIT lama tak pernah menutup lingkarannya, dan siapa yang memutuskan selisihnya. Juga menjawab: kenapa dokumen yang sudah selaras ditutup mesin tanpa manusia (draf jadi BASI), kenapa adopsi harus dihitung terhadap hitungan ERP sekarang bukan kiriman lama (untuk mencegah potongan ganda), di mana keputusan finance dipindahkan (modal detail Penerimaan dengan tabel tiga kolom rupiah, Kotak Adopsi jadi daftar lintas dokumen), dan kenapa labelnya dijaga netral \"Beda dengan Accurate\". Memuat konsekuensi terukur beserta batasan yang masih terbuka: Lazada belum punya kolom ketiga, pemindahan pelunasan ke akun GL belum punya tuas koreksi, dan endpoint Kotak Adopsi belum terdokumentasi.",
       "kata_kunci": [
         "penerimaan",
@@ -10408,7 +10408,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
-      "ukuran_kb": 6.8,
+      "ukuran_kb": 6.9,
       "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
       "kata_kunci": [
         "faktur",
@@ -12004,7 +12004,7 @@
         "External - Accurate"
       ],
       "hash": "526782f4478f447d6f83ea082ecdfc2526e7623bd22e5945d6509565be60a2d0",
-      "ukuran_kb": 11.4,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab: langkah demi langkah memperbaiki faktur Auto-Sync Accurate secara massal dengan mengunduh, menyunting, dan mengunggah kembali file Rekap Lengkap, termasuk kolom mana yang boleh disunting dan artinya. Menjelaskan prasyarat role, cara membaca pratinjau dan menyetujui perubahan master-data, cara verifikasi (unggah ulang tanpa suntingan harus 0 koreksi), serta arti pesan galat dan tindakannya.",
       "kata_kunci": [
         "import koreksi",
