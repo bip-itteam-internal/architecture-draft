@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-17",
-  "jumlah_dokumen": 422,
+  "jumlah_dokumen": 423,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -6918,7 +6918,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "d977993cfcdc6ff7da376eb9daf6068fc544b26c2b0bed43a154cd808468a571",
-      "ukuran_kb": 11.4,
+      "ukuran_kb": 11.6,
       "ringkasan": "Menjawab: bagaimana dua metrik KPI Training & Performance Officer yang selama ini diisi manual (kesesuaian materi dan dampak pelatihan) akhirnya diisi otomatis oleh sistem -- pertanyaan kesesuaian materi skala 1-10 ditanyakan langsung ke peserta terpisah dari penilaian trainer, dan dampak pelatihan dihitung dari kenaikan skor kpi_score peserta antara bulan sebelum dan sesudah kelas dengan jeda dua bulan. Juga menjelaskan kenapa opsi membangun jobdesk per posisi dan kurikulum per jabatan ditolak untuk keputusan ini, serta metrik apa yang tidak ikut dijumlah ke nilai kepuasan trainer.",
       "kata_kunci": [
         "kesesuaian materi",
@@ -7050,6 +7050,7 @@
         "Finance - Dashboard per Posisi (FAT)",
         "APP - Audit Internal",
         "Finance - FAT Persona",
+        "Finance - Proses Bisnis dan Kebutuhan Sistem",
         "APP - Buku Besar Konsolidasi CV FINCON",
         "Microservices - Payroll Service",
         "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
@@ -7057,20 +7058,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "5dd3461f2f40450bd65378cc9593798777bbb047f0d2e8b2ad2cbeba97ded358",
-      "ukuran_kb": 3.6,
-      "ringkasan": "Menjawab: di mana saja fungsi finance tersebar di kode ERP (pajak, cost control, biaya variabel, audit di finance-service; kas kecil, pengajuan barang, utang pemasok di procurement-service; bridging Accurate, laporan keuangan, piutang di integration-service; insentif; dashboard per posisi; aplikasi audit) beserta dokumen rujukannya. Juga menjelaskan latar belakang rencana membangun ulang sistem finance, dan adanya buku besar konsolidasi 40 CV (FINCON) di luar ERP dan Accurate yang bertentangan dengan ADR 0001.",
+      "hash": "32d1db9b5535585bc828c52f26b8e5c4ab4427aec9ab85e2ee12a5824c473a7f",
+      "ukuran_kb": 3.9,
+      "ringkasan": "Menjawab: bagian sistem finance mana yang hidup di service ERP mana (finance-service untuk pajak, cost control, dan audit; procurement untuk kas kecil, pengajuan budget, dan utang pemasok; integration untuk bridging Accurate, laporan keuangan, dan piutang marketplace; insentif; menu dan dashboard Finance) beserta dok rinciannya. Juga menjelaskan kenapa finance dibangun ulang di ERP, dan adanya buku besar konsolidasi 40 CV (FINCON) yang berjalan di luar ERP dan Accurate (ADR 0068). Menjadi pintu ke persona FAT dan panduan proses bisnis Finance.",
       "kata_kunci": [
         "finance",
         "keuangan",
         "peta domain finance",
-        "big picture",
         "Accurate",
+        "bridging",
         "FINCON",
-        "konsolidasi 40 CV",
-        "buku besar",
-        "ADR 0068",
-        "finance-service"
+        "buku besar konsolidasi CV",
+        "finance-service",
+        "procurement",
+        "integration-service"
       ]
     },
     {
@@ -7274,28 +7275,26 @@
         "Finance - Audit Internal",
         "APP - Audit Internal",
         "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
+        "Finance - Proses Bisnis dan Kebutuhan Sistem",
         "API - Procurement Service",
         "Microservices - Insentive Service",
         "CORE - RBAC dan Permission Set",
         "HRIS - Payroll Persona"
       ],
-      "hash": "f81c7555a1f5a2bce7d95d8544ce677394f2fabd13ff414eecd138f2e2aee99e",
-      "ukuran_kb": 33.4,
-      "ringkasan": "Menjawab: siapa saja yang bekerja di divisi Finance, Accounting, dan Tax (Supervisor FAT, Senior dan Junior Accountant, AR, Account Payable, Cost Control, Tax Officer), apa tujuan, pain point, aksi utama, KPI, dan akses RBAC tiap posisi di prod. Juga menjawab bagaimana pekerjaan mengalir antar posisi untuk uang keluar lewat pengajuan barang, uang masuk marketplace, tutup buku, kas kecil, pajak, dan insentif, serta posisi mana yang belum punya paket izin ke layar kerjanya. Memuat praktik kerja nyata dari survei alur kerja Finance 2026-09: rekonsiliasi kas toko marketplace sebagai beban lintas jabatan, pembayaran PT dan pajak yang masih di luar ERP, costing HPP di Excel, pemeriksaan rekap gaji, dan cabang transfer kas CV.",
+      "hash": "a1ed672195ccaf10c3d481c2677be721f9444c40f3788e076836e6104b7ae785",
+      "ukuran_kb": 33.5,
+      "ringkasan": "Menjawab: siapa saja posisi di divisi Finance, Accounting, dan Tax (Supervisor FAT, Senior dan Junior Accountant, AR Leader, AR Staff, Account Payable, Cost Control, Tax Officer) beserta tujuan, pain point, aksi utama, KPI, dan akses RBAC nyatanya di prod. Juga menjawab bagaimana pekerjaan mengalir antar posisi dan departemen lain pada uang keluar (pengajuan barang lima tipe), uang masuk marketplace, tutup buku, kas kecil, pajak, dan insentif, termasuk skenario gagal dan celah akses (mis. AP dan Tax tanpa paket izin).",
       "kata_kunci": [
-        "persona Finance",
+        "persona finance",
         "FAT",
         "Finance Accounting Tax",
-        "RBAC finance",
         "Account Payable",
-        "AR piutang",
-        "Tax Officer pajak",
-        "Cost Control kas kecil",
-        "pengajuan barang approval",
-        "alur kerja finance",
-        "survei alur kerja Finance",
-        "rekonsiliasi kas toko marketplace",
-        "costing HPP"
+        "AP",
+        "AR",
+        "piutang",
+        "Cost Control",
+        "Tax Officer",
+        "RBAC paket izin"
       ]
     },
     {
@@ -7383,6 +7382,54 @@
         "ACCURATE_KAS_PUSH",
         "ADR 0055",
         "top-up"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - Proses Bisnis dan Kebutuhan Sistem.md",
+      "judul": "Finance - Proses Bisnis dan Kebutuhan Sistem",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**. Sebagian besar proses sudah punya modul di kode tetapi belum dipakai di prod; sebagian lain 🟡 direncanakan (buku besar CV, penjualan per CV, mutasi bank, payroll ke bank) atau belum diputuskan. Keadaan kode diperiksa ke `origin/main` 2026-09-17; keadaan prod bertanggal di tiap butir, ukur ulang sebelum dipakai memutuskan.",
+      "publik": true,
+      "tautan": [
+        "Finance - FAT Persona",
+        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
+        "REF - Kepemilikan Data",
+        "ADR - 0001 Akuntansi via Accurate",
+        "Microservices - Procurement Service",
+        "Finance - Kas Kecil dan Pengajuan Budget",
+        "Finance - Buku Besar CV",
+        "Microservices - Integration Service",
+        "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
+        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
+        "APP - Buku Besar Konsolidasi CV FINCON",
+        "Microservices - Payroll Service",
+        "HRIS - Kepatuhan Peraturan Perusahaan",
+        "API - Finance Service",
+        "Finance - Rancangan Finance Service",
+        "Finance - Dashboard per Posisi (FAT)",
+        "Finance - Audit Internal",
+        "Microservices - Manufacture Service",
+        "Manufacture - Stock & Material Management",
+        "Finance - Incentive",
+        "Sales - HPP Master (Plan)",
+        "Finance - Big Pictures"
+      ],
+      "hash": "27fa9ec8acb0adf540e55196a7f50d7914a2e6a82c4f6757b48becc8aab6cae4",
+      "ukuran_kb": 34.2,
+      "ringkasan": "Panduan membangun sistem per proses bisnis Finance, P1 sampai P11: pengajuan pengeluaran dan persetujuan, pembayaran keluar (rekening PT dan kas CV), penjualan marketplace dan uang masuk, retur dan piutang marketplace, rekonsiliasi kas toko dan bank, pencatatan dan buku besar, gaji dan iuran BPJS, pajak, anggaran dan kas kecil dan dana kegiatan, tutup buku dan stock opname dan laporan, serta costing HPP produk. Menjawab untuk tiap proses: apa tujuannya, siapa perannya, bagaimana dikerjakan hari ini, apa yang sudah ada di ERP, alur target, celah kelompok A (pakai), B (perbaiki), C (bangun), kontrol wajib, dan ukuran efisiensinya. Juga menjawab prinsip rancangan, urutan pengerjaan dan ketergantungan, sambungan dengan departemen lain, pertanyaan wajib sebelum membangun, keputusan yang dibutuhkan, dan yang sengaja tidak dibangun.",
+      "kata_kunci": [
+        "proses bisnis finance",
+        "kebutuhan sistem finance",
+        "P1-P11",
+        "pengajuan pengeluaran",
+        "pembayaran keluar",
+        "rekonsiliasi bank",
+        "buku besar",
+        "payroll BPJS",
+        "pajak",
+        "costing HPP"
       ]
     },
     {
@@ -14211,7 +14258,7 @@
         "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI"
       ],
       "hash": "58e634682fecee7570efb0a91d3937b0f465d0b5bc6c82834646d4c77eaf734a",
-      "ukuran_kb": 5.6,
+      "ukuran_kb": 5.7,
       "ringkasan": "Menjawab: apa saja task teknis dan urutan pengerjaannya untuk mengimplementasikan ADR-0102 (kesesuaian materi dinilai peserta dan kenaikan KPI peserta sebagai metrik pelatihan) -- dari perubahan backend learning-service dan employee-service, penambahan kontrak GET /kpi/pelatihan, layar web dan MyBharata, sampai urutan deploy dan gerbang verifikasinya. Papan kerja yang berubah tiap item selesai, bukan dokumen arsitektur atau rencana per berkas.",
       "kata_kunci": [
         "task pelatihan",
@@ -14513,31 +14560,22 @@
         "Finance - Buku Besar CV",
         "Finance - FAT Persona",
         "REF - Kepemilikan Data",
-        "Microservices - Procurement Service",
-        "API - Finance Service",
-        "Microservices - Payroll Service",
-        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
-        "Microservices - Integration Service",
-        "Manufacture - Stock & Material Management",
-        "ADR - 0001 Akuntansi via Accurate"
+        "Finance - Proses Bisnis dan Kebutuhan Sistem"
       ],
-      "hash": "989d74de026c70b42e220eb72680c61b25518560b773b10bf902d0a40c2d8765",
-      "ukuran_kb": 19.9,
-      "ringkasan": "Menjawab: task apa saja (T1 sampai T10) untuk membangun buku besar 40 CV di ERP menggantikan FINCON, urutannya, repo yang disentuh, test dan cara verifikasinya, serta mana yang sudah merge. Juga menjawab sistem apa saja yang dibutuhkan Finance: yang sudah ada dan tinggal dipakai (Pengajuan Barang, Tax Control, payroll, scan retur gudang), yang perlu diperbaiki (rekonsiliasi kas toko, pengajuan ke pos anggaran, varians, kotak persetujuan), yang belum ada (payroll ke bank, mutasi bank, penjualan per CV, pertanggungjawaban dana, costing HPP), yang sengaja tidak dibangun, kebutuhan per posisi, dan keputusan manajemen yang dibutuhkan.",
+      "hash": "a1ba0d0ba9d0e4749d7fb9942e1df3a93598455f2e2567fb92602e6fff8012af",
+      "ukuran_kb": 13.2,
+      "ringkasan": "Menjawab: task apa saja (T1 sampai T10) untuk membangun buku besar 40 CV di ERP dengan FINCON sebagai spesifikasi sesuai ADR 0096, mulai master entitas CV dan pemegang CV, pembayaran keluar per CV lewat Pengajuan Barang, inti buku besar, laporan dan konsolidasi, migrasi FINCON, jurnal otomatis, payroll per badan usaha, penjualan marketplace per CV, impor mutasi rekening, sampai tutup buku. Juga menjawab prasyarat non-kode (persetujuan, paket izin, data penugasan, ekspor FINCON), urutan deploy yang mengikat, dan masukan survei lanjutan. Untuk peta kebutuhan sistem Finance secara keseluruhan, dok ini hanya menunjuk ke Finance - Proses Bisnis dan Kebutuhan Sistem.",
       "kata_kunci": [
         "buku besar CV",
-        "FINCON",
         "40 CV",
-        "pemegang CV",
+        "FINCON",
         "ADR 0096",
-        "pembayaran CV transfer",
-        "kebutuhan sistem Finance",
-        "survei alur kerja Finance",
-        "rekonsiliasi kas toko",
-        "payroll transfer bank",
+        "pemegang CV",
+        "jurnal CV",
+        "konsolidasi",
+        "BKK",
         "mutasi rekening",
-        "pertanggungjawaban dana kegiatan",
-        "costing HPP"
+        "analisa kebutuhan finance"
       ]
     },
     {
