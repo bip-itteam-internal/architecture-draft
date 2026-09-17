@@ -1508,11 +1508,11 @@
         "API - Manufacture Service",
         "API - Warehouse Service",
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
+        "Microservices - Notification Service",
         "API - Procurement Service",
         "CORE - API Master Gateway",
         "RUN - Deploy Microservices bip-erp",
         "REF - Alur Persetujuan",
-        "Microservices - Notification Service",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus",
         "BASE - Enterance Point",
         "Finance - Incentive",
@@ -1520,20 +1520,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "0579a16c19cba40c0e7b265acc8068aacf4b21961b381a9fe015017eee6618d0",
-      "ukuran_kb": 493.0,
-      "ringkasan": "Menjawab: apa itu portal hris-dashboard (One Bharata), stack teknologi yang dipakainya, bagaimana alur login dan SSO Identity Provider bekerja, serta bagaimana struktur menu sidebar dan role-based access (system_roles) diatur. Juga menjelaskan fitur multi-perusahaan (company switcher, kelola departemen/shift per perusahaan) dan struktur halaman Pengaturan HRGA terpusat beserta tab-tabnya.",
+      "hash": "c37f8665f0bca3b25b4693076d110125890be54e90ba7da991705989fbceb2d6",
+      "ukuran_kb": 493.9,
+      "ringkasan": "Menjawab pertanyaan seputar arsitektur frontend ERP (hris-dashboard / One Bharata): stack teknologi yang dipakai, bagaimana autentikasi dan SSO antar-aplikasi bekerja, bagaimana role dan menu sidebar digerbang dari cookie system_roles, serta konvensi wajib untuk data-fetching (TanStack Query) dan bagan (Recharts + ChartContainer) di seluruh halaman. Juga menjelaskan dukungan multi-perusahaan (company switcher, kelola departemen/shift/WiFi per perusahaan, rekrutmen lintas perusahaan) dan daftar modul yang sudah diimplementasikan vs belum.",
       "kata_kunci": [
         "erp-frontend",
         "hris-dashboard",
         "One Bharata",
-        "web ERP",
         "SSO",
-        "sidebar",
         "system_roles",
+        "role gating",
+        "sidebar menu",
         "multi-perusahaan",
-        "multi-tenant",
-        "Pengaturan HRGA"
+        "company switcher",
+        "TanStack Query"
       ]
     },
     {
@@ -2793,6 +2793,8 @@
         "APP - Web ERP",
         "ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
+        "Microservices - Warehouse Service",
+        "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
         "Microservices - Recruitment Service",
         "ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri)",
         "Microservices - File Service",
@@ -2800,20 +2802,20 @@
         "DB - Overview and Notes",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "6363ddd47a955c67ba75dd6fc6c794daee8dc075c2752bb86a7eac0573c2b847",
-      "ukuran_kb": 21.4,
-      "ringkasan": "Menjawab: bagaimana notification-service menyatukan kanal inbox in-app, push FCM ke browser dan ponsel, WhatsApp, email Resend, splash, dan article, termasuk scope multi-perusahaan untuk FCM dan artikel. Menjelaskan kontrak inbox (paginasi opt-in dan kenapa bentuk bawaan tetap array telanjang, mark-read berfilter pemilik), rute pengiriman ber-service-key yang tetap butuh header `BIP-Gateway-ID`, fan-out push terpusat dari `/inbox/send`, daftar-izin `InboxCategories`, pemetaan `AppRoute` ke rute web termasuk Booking Ruang, serta urutan deploy yang mengikat.",
+      "hash": "097e4c385af1d248b382f6ea7dda773c5cbf8c7d2b478f14d3bc452e82f4a1cb",
+      "ukuran_kb": 23.8,
+      "ringkasan": "Menjawab pertanyaan tentang bagaimana notifikasi dikirim ke berbagai channel (inbox in-app, push FCM browser/ponsel, WhatsApp, splash promotion, article) dari satu notification-service, termasuk daftar endpoint, aturan paginasi inbox yang opt-in, kategori inbox sebagai daftar-izin, dan mekanisme fan-out push dua kanal yang dipusatkan dari satu titik pengiriman (/inbox/send). Juga menjelaskan gerbang keamanan (header BIP-Gateway-ID + service key) dan urutan deploy yang mengikat sejak fan-out push dipusatkan.",
       "kata_kunci": [
         "notification-service",
-        "notifikasi",
         "inbox",
         "push notification",
         "FCM",
-        "web push",
-        "InboxCategories",
         "WhatsApp",
-        "email Resend",
-        "BIP-Gateway-ID"
+        "splash",
+        "article",
+        "InboxCategories",
+        "BIP-Gateway-ID",
+        "fan-out"
       ]
     },
     {
@@ -3060,7 +3062,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — event ingestion + reconciler ✅; operasi WMS lengkap (approve/pick/pack/rts/labels/handover/dashboard/export rekon) ✅; jalur cepat APPROVED→RTS + gerbang rekon `exported_at` ✅; master produk CRUD ✅; frontend warehouse lengkap ✅ (queue+filter+unduh, picking, packing, RTS, label, handover). ✅ **Deadlock cursor reconciler diperbaiki & deploy 2026-07-24** (PR #638, commit `14b9795c`) — lihat *Event Ingestion & Reconciler*. ⚠️ **Register komplain gudang** ✅ ada di kode (termasuk gerbang baca untuk marketing, 2026-09-16) tetapi **nol dokumen di produksi**: layarnya baru dibangun dan **belum ada satu pun cara mengajukan komplain lewat layar** — lihat *Komplain Gudang*.",
+      "status_teks": "Implemented (ada catatan) — event ingestion + reconciler ✅; operasi WMS lengkap (approve/pick/pack/rts/labels/handover/dashboard/export rekon) ✅; jalur cepat APPROVED→RTS + gerbang rekon `exported_at` ✅; master produk CRUD ✅; frontend warehouse lengkap ✅ (queue+filter+unduh, picking, packing, RTS, label, handover). ✅ **Deadlock cursor reconciler diperbaiki & deploy 2026-07-24** (PR #638, commit `14b9795c`) — lihat *Event Ingestion & Reconciler*. ⚠️ **Register komplain gudang** ✅ ada di kode berikut layar baca-tindak-lanjut dan pintu pengajuan dari baris ulasan marketplace (seluruhnya merged 2026-09-16, di DEV, **belum di PROD**), jadi di produksi masih **nol dokumen**. 🔜 Notifikasi ke gudang dan pengaju ada di branch `feat/warehouse-komplain-notifikasi` — lihat *Komplain Gudang*.",
       "publik": true,
       "tautan": [
         "WH - Fulfillment Flow & WMS Tinggarjaya",
@@ -3073,26 +3075,29 @@
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
         "Microservices - Integration Service",
         "ADR - 0002 Database-per-Service",
+        "Microservices - Notification Service",
+        "Microservices - Employee Service",
         "External - Accurate",
         "DB - Overview and Notes",
         "APP - Web ERP",
         "IT - Background Jobs & Schedulers",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "1491b4a581dd720fa13e3ac8b57f031345b66361dd2316529a6c95a544cc8581",
-      "ukuran_kb": 33.8,
-      "ringkasan": "Menjawab bagaimana warehouse-service bekerja di balik layar — alur event ingestion dari integration-service, reconciler periodik dan open-order sweep sebagai jaring pengaman celah sinkronisasi, state machine status_wms, dan role guard operasi WMS termasuk pengecualian akses mitra gudang Sadewa. Juga menjelaskan fitur register komplain gudang (keluhan dari marketing ke tim packing) beserta gerbang baca kompositnya.",
+      "hash": "61a500191d95c485deee5d674c0839b8f176917272f82e7fee344c5a9e106fa0",
+      "ukuran_kb": 37.9,
+      "ringkasan": "Menjawab pertanyaan tentang cara kerja warehouse-service (WMS Tinggarjaya): bagaimana event order dari marketplace masuk dan disinkronkan lewat reconciler 60 detik dan open-order sweep 5 menit, state machine status_wms, operasi gudang harian (approve, pick, pack, RTS, label, dashboard) beserta role guard-nya termasuk pembatasan khusus mitra gudang Sadewa. Juga mencakup register komplain gudang yang jadi bahan KPI packing, endpoint API, model data warehouse_db, dan status implementasi tiap fitur (sudah di prod vs masih di branch).",
       "kata_kunci": [
         "warehouse-service",
-        "WMS Tinggarjaya",
+        "WMS",
+        "Tinggarjaya",
+        "fulfillment",
         "reconciler",
-        "open-order sweep",
-        "state machine",
         "status_wms",
-        "admin_gudang",
-        "Sadewa",
+        "picking",
+        "packing",
+        "RTS",
         "komplain gudang",
-        "fulfillment_orders"
+        "Sadewa"
       ]
     },
     {
@@ -6787,7 +6792,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Diterima, sebagian besar diimplementasikan. **Keputusan 1, 2, 3, 4, 5, dan 6 sudah ada di kode** per 2026-09-16 dan **merged ke `main` hari itu juga**, terverifikasi di DEV; belum di PROD. Sisanya (notifikasi, jalur QC dari ulasan, tujuan tanpa register) masih usulan.",
+      "status_teks": "Diterima, sebagian besar diimplementasikan. **Keputusan 1, 2, 3, 4, 5, dan 6 sudah ada di kode** per 2026-09-16 dan **merged ke `main` hari itu juga**, terverifikasi di DEV; belum di PROD. **Keputusan 8 separuh berjalan**: notifikasi register GUDANG ada di branch bip-erp `feat/warehouse-komplain-notifikasi` + erp-frontend `feat/inbox-kategori-komplain-gudang` per 2026-09-17, belum merge; notifikasi ulasan bintang rendah ke pemegang toko belum dikerjakan. Sisanya (jalur QC dari ulasan, tujuan tanpa register) masih usulan.",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
@@ -6795,28 +6800,28 @@
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
         "QA - Deviation & CAPA",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus",
+        "Microservices - Warehouse Service",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "Microservices - Notification Service",
         "Microservices - Employee Service",
-        "Microservices - Warehouse Service",
         "APP - Web ERP",
         "Sales - ICC Account Manager Mapping",
         "ADR - 0060 Cakupan Keterlihatan Tiket Engagement"
       ],
-      "hash": "6cb6bf9567a67520310d38f3e8cb4551a791f6b726aa98b897326029fe726a64",
-      "ukuran_kb": 12.6,
-      "ringkasan": "Menjawab bagaimana komplain yang lahir dari ulasan marketplace (khusus Shopee) dirutekan ke unit yang tepat — gudang packing atau QC — dengan memakai register komplain yang sudah ada, bukan membangun register baru. Menjelaskan alasan keputusan (volume ulasan rendah, kepemilikan toko diturunkan dari peta Account Specialist bukan dari peran marketing) serta batas lingkup: hanya Shopee, tidak melayani ekspedisi/vendor/tim brand, dan tanpa klasifikasi otomatis.",
+      "hash": "cc2b06af95a7563e7a01bc3191051681bf862dda9f38c0ea6e050ea97720225c",
+      "ukuran_kb": 13.7,
+      "ringkasan": "Menjawab pertanyaan kenapa dan bagaimana komplain yang berasal dari ulasan marketplace (Shopee) dirutekan ke register komplain yang SUDAH ADA per departemen tujuan (gudang lewat warehouse_komplain_gudang, QC lewat quality_complaint) alih-alih membangun register ketiga. Menjelaskan data ulasan yang mendasari keputusan (volume kecil per bulan, sebaran tema keluhan, kepemilikan toko diturunkan dari icc_account_mappings bukan dari peran marketing), status implementasi tiap keputusan, serta apa yang sengaja tidak dijanjikan (TikTok, balas otomatis ke pembeli, klasifikasi otomatis, tenggat SLA).",
       "kata_kunci": [
+        "ADR 0099",
         "komplain",
         "ulasan marketplace",
         "review",
         "warehouse_komplain_gudang",
         "quality_complaint",
+        "Shopee",
         "Account Specialist",
         "icc_account_mappings",
-        "Shopee",
-        "register komplain",
-        "ADR 0099"
+        "register komplain"
       ]
     },
     {
@@ -14122,22 +14127,22 @@
       "status_teks": null,
       "publik": false,
       "tautan": [
-        "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada"
+        "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
+        "APP - MyBharata"
       ],
-      "hash": "9c1800aff2c62885132cd66ed904a9651ca1842f59899ef24bd47187065cd1f1",
-      "ukuran_kb": 4.8,
-      "ringkasan": "Menjawab daftar task konkret hasil analisa kebutuhan untuk fitur komplain dari ulasan marketplace — mana yang sudah dikerjakan (rute baca gudang, layar komplain, tombol ajukan dari baris ulasan), mana yang menunggu keputusan manajemen (tujuan komplain tanpa register, kewajiban regulatif BPOM, toko Beauty Hacks tanpa CS), dan mana yang masih backlog (notifikasi, rekap pola per toko). Juga mencatat task yang dibatalkan (master kategori komplain) beserta alasannya.",
+      "hash": "2b26f146f0aa7192b08e7bc1c33472c2a03798534071407252532b632ab8d2eb",
+      "ukuran_kb": 5.7,
+      "ringkasan": "Menjawab pertanyaan tentang status pengerjaan fitur komplain dari ulasan marketplace: daftar task backend (buka rute baca register gudang, salinan ulasan ke register, notifikasi ke gudang) dan frontend (layar komplain gudang, tombol ajukan dari baris ulasan) beserta status merged/branch/PROD tiap task per 2026-09-17. Juga mencatat keputusan yang masih menunggu manajemen (tujuan komplain tanpa register seperti ekspedisi/vendor, kewajiban regulatif keluhan efek samping, lima toko Beauty Hacks tanpa CS) dan task yang dibatalkan (master kategori komplain baru).",
       "kata_kunci": [
-        "komplain",
+        "ANALISA komplain",
         "ulasan marketplace",
-        "daftar task",
+        "task list",
         "warehouse komplain",
-        "notifikasi",
-        "Account Specialist",
-        "Beauty Hacks",
-        "backlog",
+        "T1-T8",
         "analisa-kebutuhan",
-        "ADR 0099"
+        "Beauty Hacks",
+        "ADR-0099",
+        "register komplain"
       ]
     },
     {
