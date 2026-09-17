@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-18",
-  "jumlah_dokumen": 446,
+  "jumlah_dokumen": 448,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -7193,6 +7193,46 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0109 Penyelenggara Pelatihan Internal atau Eksternal dengan Master Vendor Milik HR dan Bank Sertifikat Dua Sumber.md",
+      "judul": "ADR - 0109 Penyelenggara Pelatihan Internal atau Eksternal dengan Master Vendor Milik HR dan Bank Sertifikat Dua Sumber",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan** 2026-09-18, disetujui pemilik proses (Opsi B: catatan dan bukti dulu, berkas besar menyusul). **Belum ada kode sama sekali** untuk seluruh keputusan di bawah.",
+      "publik": true,
+      "tautan": [
+        "HRIS - Training Program",
+        "Microservices - Learning Service",
+        "API - Learning Service",
+        "Microservices - File Service",
+        "REF - Kepemilikan Data",
+        "ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul",
+        "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI",
+        "HRIS - Kepatuhan Peraturan Perusahaan",
+        "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
+        "API - File Service",
+        "HRIS - Dashboard per Posisi",
+        "ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR",
+        "ADR - 0001 Akuntansi via Accurate",
+        "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
+      ],
+      "hash": "2b6acb054d5442199b06ff1d50795443c1faee130e752ff7f36eec2a6e9e0d00",
+      "ukuran_kb": 27.7,
+      "ringkasan": "Menjawab: bagaimana penyelenggara pelatihan dicatat (Internal per departemen atau Eksternal per vendor), kenapa master vendor pelatihan dibuat sendiri di learning-service alih-alih memakai master Pemasok Procurement yang terikat Accurate, dan bagaimana vendor pada trainer diperlakukan sebagai afiliasi bukan penentu penyelenggara. Menjelaskan juga saklar e-sertifikat per kelas yang disimpan terbalik supaya form lama tidak mematikannya, bank sertifikat dua sumber (sertifikat internal yang terbit sendiri plus sertifikat pihak luar yang diunggah HR), penghidupan spesimen tanda tangan, stempel, dan logo di PDF, prefix `learning/` di file-service, serta riwayat pelatihan per karyawan. Menjawab pula apa yang sengaja tidak dijanjikan: upload materi PPT dipisah jadi keputusan sendiri karena batas unggah 4 MB, ikatan dinas dan ganti rugi biaya pelatihan tetap dihitung manual HR, dan masa berlaku sertifikat dicatat tanpa pengingat otomatis.",
+      "kata_kunci": [
+        "penyelenggara pelatihan",
+        "training organizer",
+        "vendor pelatihan",
+        "master vendor",
+        "e-sertifikat",
+        "bank sertifikat",
+        "sertifikat eksternal",
+        "riwayat pelatihan",
+        "learning-service",
+        "tanda tangan stempel logo"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -10538,6 +10578,7 @@
         "Microservices - File Service",
         "HRIS - Employee Request & Approval",
         "Microservices - Notification Service",
+        "ADR - 0109 Penyelenggara Pelatihan Internal atau Eksternal dengan Master Vendor Milik HR dan Bank Sertifikat Dua Sumber",
         "HRIS - Organization Structure",
         "HRIS - Matriks KPI per Departemen",
         "APP - MyBharata",
@@ -10545,26 +10586,29 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
         "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI",
+        "ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul",
+        "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
+        "HRIS - Kepatuhan Peraturan Perusahaan",
         "APP - Web ERP",
         "HRIS - Work Review",
         "Microservices - Calendar Service",
         "HRIS - Big Pictures",
         "HRIS - Analysis"
       ],
-      "hash": "6b646dd9e33ce028f5b940658b7160741c39078500d655104042b79e26f00e41",
-      "ukuran_kb": 52.6,
-      "ringkasan": "Menjawab: bagaimana desain modul pelatihan dan pengembangan karyawan (jenis pelatihan, trainer internal/eksternal, event, peserta dan kehadiran), apa yang diambil, disesuaikan, dan dibuang dari referensi modul Training ERPGo, serta alur proses bisnisnya termasuk pengajuan dengan approval SPV lalu HR dan alur ujian pre-test/post-test. Juga menjawab model data, aktor dan role, penempatan arsitektur di learning-service, rollout bertahap menuju LMS People Development, dan hal yang belum diputuskan.",
+      "hash": "79362aede7c86c0924555d819c5ec9235add17a2c690101514126b2072737b18",
+      "ukuran_kb": 59.1,
+      "ringkasan": "Menjawab: bagaimana modul pelatihan dan pengembangan karyawan dirancang di ERP Bharata, entitas apa saja yang dipakai (jenis pelatihan, trainer internal atau eksternal, kelas pelatihan, peserta dan kehadiran), dan bagian mana dari modul Training ERPGo yang diambil, disesuaikan, atau dibuang. Menjelaskan alur pengajuan pelatihan beserta rantai persetujuan SPV lalu HR, penilaian trainer empat aspek dengan ambang tiga responden, alur ujian e-learning pre-test dan post-test, serta rencana pelatihan tahunan dan sertifikat. Menjawab juga di mana modul ini tinggal secara arsitektur (learning-service, `/api/learning/*`, UI `/hris/training`) dan bagaimana rollout bertahapnya menuju LMS People Development dan Talent Pool.",
       "kata_kunci": [
+        "pelatihan",
+        "training",
         "training program",
-        "program pelatihan",
-        "training & development",
-        "LMS People Development",
-        "ERPGo",
         "trainer",
+        "LMS",
+        "e-learning",
         "pengajuan pelatihan",
-        "Pelatihan Saya",
-        "pre-test post-test",
-        "rollout pelatihan"
+        "training request",
+        "evaluasi trainer",
+        "sertifikat pelatihan"
       ]
     },
     {
@@ -12322,6 +12366,9 @@
         "Microservices - Task Management Service",
         "Microservices - Learning Service",
         "HRIS - Matriks KPI per Departemen",
+        "ADR - 0109 Penyelenggara Pelatihan Internal atau Eksternal dengan Master Vendor Milik HR dan Bank Sertifikat Dua Sumber",
+        "HRIS - Training Program",
+        "Microservices - File Service",
         "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program",
         "Microservices - Form Builder Service",
         "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
@@ -12345,18 +12392,20 @@
         "Microservices - Inventory Service",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "162e5aaf9b29bc709fa39c022363f03d90055c728fcdc8ceacaf93ba0f47a87b",
-      "ukuran_kb": 55.6,
-      "ringkasan": "Menjawab: siapa pemilik (service dan koleksi) tiap fakta bisnis di ERP Bharata, siapa yang boleh menulisnya, lewat jalur apa service lain boleh membacanya, dan salinan mana yang sah beserta penjaganya. Dipakai untuk menjawab 'apakah data ini sudah ada di service lain sebelum membangun yang baru' dan mendaftar duplikasi fakta yang belum diputuskan.",
+      "hash": "96aef018c3e0eb799b98338be07a01143676a8184043ad9e25636e0eee7f0d40",
+      "ukuran_kb": 58.0,
+      "ringkasan": "Menjawab: siapa pemilik tiap fakta bisnis di ERP Bharata, service dan koleksi mana yang memegangnya, siapa yang boleh menulisnya, dan lewat jalan mana service lain boleh membacanya. Dipakai untuk memeriksa apakah sebuah data sudah dimiliki departemen atau service lain sebelum membangun penyimpanan baru, dan untuk menilai apakah sebuah salinan sah (arah satu, tak pernah ditulis tangan, ada penjaganya) atau sebenarnya duplikasi yang belum diputuskan. Memuat juga pengecualian ADR 0002 yang masih hidup di kode, daftar duplikasi yang belum diputuskan, cara memakai peta ini saat kebutuhan baru datang, dan service yang belum dipetakan.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
+        "sumber kebenaran",
         "source of truth",
-        "satu fakta satu pemilik",
+        "database-per-service",
         "duplikasi data",
         "salinan data",
+        "sinkronisasi",
         "SyncCollection",
-        "database-per-service"
+        "satu fakta satu tempat"
       ]
     },
     {
@@ -15288,6 +15337,35 @@
         "pemilih tipe",
         "ADR 0067",
         "hitung fisik"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Penyelenggara dan Bank Sertifikat Pelatihan.md",
+      "judul": "ANALISA - Penyelenggara dan Bank Sertifikat Pelatihan",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0109 Penyelenggara Pelatihan Internal atau Eksternal dengan Master Vendor Milik HR dan Bank Sertifikat Dua Sumber",
+        "HRIS - Kepatuhan Peraturan Perusahaan",
+        "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
+      ],
+      "hash": "4d36def16893314f0170e7399aec08e8a5cebc6a03ce49773964f27fdac5f636",
+      "ukuran_kb": 14.7,
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mewujudkan ADR 0109 dan dalam urutan apa, mulai dari mengukur isi `learning_db` prod, menambah peserta beberapa orang sekaligus, master vendor pelatihan, penyelenggara pada kelas dan pada butir rencana, vendor pada trainer, saklar e-sertifikat, prefix `learning/` di file-service, sertifikat eksternal, spesimen tanda tangan, sampai riwayat pelatihan per karyawan. Menyebut dependensi antar task, jebakan kode yang wajib dihindari (PUT memakai `ReplaceOne` yang menghapus field baru, whitelist input butir rencana yang mengabaikan field tak terdaftar, rute statis yang tertelan rute ber-parameter), serta test dan kontrol yang wajib menyertainya. Menjelaskan juga syarat deploy-nya: file-service dan learning-service naik bersama dengan `--force-recreate` karena env dibaca saat container dibuat, dan PROD dijalankan manusia.",
+      "kata_kunci": [
+        "daftar task pelatihan",
+        "analisa kebutuhan",
+        "training_vendor",
+        "training_participant",
+        "sertifikat eksternal",
+        "prefix learning file-service",
+        "force-recreate",
+        "penyelenggara internal eksternal",
+        "saklar e-sertifikat",
+        "rencana pelatihan"
       ]
     },
     {
