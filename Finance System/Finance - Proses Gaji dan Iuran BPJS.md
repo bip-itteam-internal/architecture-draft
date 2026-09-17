@@ -18,7 +18,7 @@ Rekap gaji dan data BPJS datang dari HR lewat WhatsApp, Excel, dan email per CV 
 
 ## Sudah ada di ERP
 
-Payroll per badan usaha (41 entitas), dua dasar upah BPJS, potongan kehadiran dari attendance-service, dan beban perusahaan per karyawan ([[Microservices - Payroll Service]]). Per akhir Agustus 2026 baru dua run di prod. Aturan potongan dan sanksi mengikuti [[HRIS - Kepatuhan Peraturan Perusahaan]].
+Payroll per badan usaha (41 entitas), dua dasar upah BPJS, potongan kehadiran dari attendance-service, dan beban perusahaan per karyawan ([[Microservices - Payroll Service]]). Prod 2026-09-17 (jumlah dokumen per koleksi, baca-saja): 1 run payroll, dibuat 2026-09-03, berisi 174 baris; 180 data gaji karyawan; 23 komponen gaji; 41 badan usaha. Dua run draft yang tercatat akhir Agustus (dibuat Juli dan Agustus) tidak ada lagi. Status run itu (draft, disetujui, atau terbit) belum diukur. Aturan potongan dan sanksi mengikuti [[HRIS - Kepatuhan Peraturan Perusahaan]].
 
 ## Alur target
 
@@ -27,7 +27,7 @@ HR menjalankan payroll di ERP → pengecekan Finance memakai data kehadiran dan 
 ## Celah
 
 - **A** HR memakai payroll ERP sebagai sumber gaji.
-- **C** Daftar transfer bank, rekap iuran BPJS per badan usaha, dan jurnal gaji (T7). `git grep` 2026-09-17 atas `services/payroll` tidak menemukan ekspor transfer bank, rekap BPJS, maupun pemanggilan Accurate atau jurnal (kontrol positif: kata `bpjs` ada di 33 berkas).
+- **C** Daftar transfer bank, rekap iuran BPJS per badan usaha, dan jurnal gaji (T7). `git grep` 2026-09-17 atas `services/payroll` tidak menemukan ekspor transfer bank, rekap BPJS, maupun pemanggilan Accurate atau jurnal (kontrol positif: kata `bpjs` ada di 33 berkas). Daftar transfer gaji dibuat dalam format unggah massal Kopra bila rekening badan usaha dibayar lewat Kopra; bahan formatnya diminta dari Finance bersama pembayaran lain ([[Finance - Proses Pembayaran Keluar]] § Berkas unggah Kopra).
 - **TBD** Apakah pemeriksaan rekap gaji dari dua sudut (kehadiran dan potongan; rekening dan PPh) tetap dua langkah sesudah payroll ERP dipakai.
 
 ## Kontrol wajib

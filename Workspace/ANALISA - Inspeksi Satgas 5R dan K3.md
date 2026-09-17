@@ -77,9 +77,17 @@ Dua PR (urutan naik: bip-erp dulu, lalu erp-frontend):
 
 **Yang belum**: deploy prod (manusia; form-builder dulu, baru frontend) dan sisa Cara Verifikasi di artefak rencana: layar alur A/B ditempuh sebagai orang, terang/gelap, sekitar 390px, id/en, dan PDF sungguhan.
 
-## T5. Web: halaman rekap Satgas
+## T5. Web: halaman rekap Satgas ⚠️ code selesai di branch `feat/satgas-rekap`, PR pending (2026-09-17)
 
 **Bergantung T3.** Menu di kategori HRIS, digerbang izin modul `kepatuhan`, membaca data yang sama dengan menu MyBharata. Isi: nilai per orang per bulan, foto temuan dan perbaikan, orang yang belum dicek ulang. Menunya tak boleh bertumpu pada fallback: entri `FALLBACK` di `menu-permission.ts` wajib ada untuk izin `kepatuhan.*` (izin tanpa entri diloloskan `bolehMenu`).
+
+**Hasil 2026-09-17** (rencana `.task-plans/2026-09-17-satgas-rekap-web-hris.md`; belum merged, belum deploy):
+
+- **Izin baca baru** `kepatuhan.satgas.view` + paket `kepatuhan_pembaca_rekap_satgas` (dipasang IT ke posisi **Supervisor HR** dan jabatan **Culture & Industrial** — satu jabatan), di `shared-library/common/catalog_kepatuhan.go`. Pembaca rekap ≠ pengisi; petugas (`.input`) juga boleh membaca. Sudah diantisipasi komentar `catalog_kepatuhan.go` sebelumnya.
+- **bip-erp** (branch `feat/satgas-rekap`): rute kaya `GET /satgas/rekap?period=YYYY-MM` (`satgas_rekap.go`) digerbang izin baca lewat JWT, memakai `nilaiSatgasPeriode` yang SAMA dengan KPI (helper `kumpulkanBahanSatgas`/`sumberSatgasDariBahan` diekstrak dari `satgas_metrics.go` untuk dipakai bersama → angka rekap = KPI, terkunci test), plus foto temuan (kiriman awal) dan perbaikan (kiriman terakhir). Rute pratinjau `GET /satgas/uploads/:uploadId/preview` (`satgas_preview.go`) digerbang izin baca + dikunci ke unggahan milik form Satgas (anti-IDOR). ⛔ **BUKAN** melebarkan `/internal/satgas/metrics` yang sempit.
+- **erp-frontend** (branch `feat/satgas-rekap`): halaman `/hris/satgas` (`features/hris/satgas/*`), menu HRIS digerbang `kepatuhan.satgas.view` + entri `FALLBACK` tolak + masuk `TANPA_BYPASS_SEMUA_MENU` (super-akses IT/Direktur tak melihatnya tanpa paket → cegah alur putus 403, temuan `/review`). Picker bulan lewat query string, filter status, tabel HRIS (MainTable + Banner bare), Skeleton, dialog foto (presigned saat diklik), i18n id+en.
+- **Verifikasi lokal**: form-builder `go test` hijau (termasuk `satgas_rekap_test.go`: konsistensi rekap=KPI, pemilih foto, gerbang 403 lewat Fiber); shared-library common hijau; employee-service hijau (baseline `manufacture.*` yang sudah dikenal tetap merah, bukan regresi). erp-frontend `pnpm tsc`, eslint, `pnpm build` lolos; vitest satgas (keys i18n + statusOrang + gerbang menu + bolehItemSidebar) hijau.
+- **Yang belum**: PR + merge (manusia), deploy (manusia; employee-service + form-builder BERSAMA karena katalog izin di shared-library, lalu erp-frontend), IT memasang paket `kepatuhan_pembaca_rekap_satgas` ke posisi pembaca, dan verifikasi lewat gateway dev (angka rekap = draf KPI bulan sama; akun tanpa paket 403). `/sync-docs` penuh ke dok published (Form Builder Service, API, ADR 0090 §6) menyusul SESUDAH merge.
 
 ⚠️ **Bahan dari T3**: angka per orang dihitung `nilaiSatgasPeriode` (form-builder, di dalam proses, struct kaya tanpa tag JSON). Rute `/internal/satgas/metrics` sengaja SEMPIT (tanpa nama, rincian per form, dan foto), jadi rekap web butuh rute dan bentuk kirimannya sendiri yang memakai fungsi yang sama, bukan melebarkan rute internal itu.
 

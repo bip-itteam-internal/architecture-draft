@@ -4,7 +4,7 @@
 
 *Proses P2, pembayaran keluar (rekening PT dan kas CV), dari [[Finance - Proses Bisnis dan Kebutuhan Sistem]]. Dok ini memuat tujuan, cara dikerjakan hari ini, yang sudah ada di ERP, alur target di sistem, celah yang harus ditutup, kontrol yang wajib dijaga, dan ukuran untuk membuktikan efisiensinya. Penilaian cakupan dan kesesuaiannya ada di dok induk.*
 
-- **Status**: ⚠️ **Implemented (ada catatan)**. Tahap transfer rekening PT dan kas CV, unggah dan pemeriksaan bukti, serta dokumen pembayaran ada di kode; belum dipakai di prod (0 dokumen pembayaran per 2026-09-12) dan jurnal otomatis buku CV 🟡 direncanakan.
+- **Status**: ⚠️ **Implemented (ada catatan)**. Tahap transfer rekening PT dan kas CV, unggah dan pemeriksaan bukti, serta dokumen pembayaran ada di kode; belum dipakai di prod (0 dokumen pembayaran dan 1 Pengajuan Barang per 2026-09-17) dan jurnal otomatis buku CV 🟡 direncanakan.
 - **Sumber**: survei alur kerja Finance (isian mandiri 14 sampai 16 September 2026, butir bertanda *survei 2026-09*), kode `bip-erp` dan `erp-frontend` di `origin/main` 2026-09-17. Keadaan prod bertanggal di tiap butir; ukur ulang sebelum dipakai memutuskan.
 - **Kelompok celah**: **A** sudah ada, tinggal dipakai · **B** sudah ada, perlu diperbaiki · **C** belum ada, perlu dibangun (definisi di dok induk).
 
@@ -22,8 +22,8 @@ Uang keluar dengan nominal benar, dari rekening yang benar, berbukti, dan tercat
 
 - Tahap `pb_finance_setujui_bayar` (Supervisor FAT memilih kas CV pembayar) dan `pb_ap_transfer` yang bercabang: rekening PT oleh pemegang `budget.ap.bayar`, kas CV oleh pemegang `budget.cv.transfer` yang ditugaskan ke CV itu (`bip-erp/services/procurement/pengajuan_barang_gate.go:245-284`); antrean transfer CV di layar CV Saya. Rinciannya di [[Finance - Buku Besar CV]].
 - Unggah bukti oleh pelaksana, pemeriksaan bukti oleh Senior Accountant, faktur pembelian dari hasil QC, dokumen pembayaran yang dikirim manual ke Accurate (`bip-erp/services/procurement/pembayaran_kirim.go:12-29`), dan jurnal kas ke Accurate di balik saklar `ACCURATE_KAS_PUSH` yang bawaannya mati (`bip-erp/services/procurement/kas_jurnal_handler.go:28-37`).
-- Prod: 0 dokumen pembayaran (2026-09-12); data penugasan pemegang CV 0 (2026-09-17).
-- **Hutang pemasok dan jatuh tempo**: pengingat harian untuk faktur pembelian yang mendekati jatuh tempo dikirim dengan kategori "perlu dibayar" ke setiap pemegang `budget.ap.bayar` di perusahaan default (`bip-erp/services/procurement/jatuh_tempo_pengingat.go:43-56`, `:110-113`). Per 2026-09-12 pemegang izin itu di Finance hanya Supervisor FAT dan Senior Accountant, sehingga pengingat tidak sampai ke AP ([[Finance - FAT Persona]] § Skenario Gagal). KPI AP menghitung persentase faktur jatuh tempo bulan itu yang dibayar paling lambat pada tanggal jatuh temponya, dari data faktur pembelian Accurate lewat procurement-service (`bip-erp/services/employee/kpi_sumber_ap.go:16-30`).
+- Prod 2026-09-17 (jumlah dokumen per koleksi, baca-saja): 0 dokumen pembayaran; 1 Pengajuan Barang, dibuat 2026-09-02; 0 entitas CV dan 0 penugasan pemegang CV.
+- **Hutang pemasok dan jatuh tempo**: pengingat harian untuk faktur pembelian yang mendekati jatuh tempo dikirim dengan kategori "perlu dibayar" ke setiap pemegang `budget.ap.bayar` di perusahaan default (`bip-erp/services/procurement/jatuh_tempo_pengingat.go:43-56`, `:110-113`). Per 2026-09-12 pemegang izin itu di Finance hanya Supervisor FAT dan Senior Accountant, sehingga pengingat tidak sampai ke AP ([[Finance - FAT Persona]] § Skenario Gagal). ⚠️ **Pengingat membaca faktur yang tersimpan di ERP, bukan Accurate** (`bip-erp/services/procurement/jatuh_tempo_pengingat.go:64`), dan faktur dari Accurate hanya masuk lewat impor yang dijalankan admin, `POST /tagihan/import` (`bip-erp/services/procurement/main.go:834`); `git grep` 2026-09-17 tidak menemukan pemanggil `ImportFakturDenganKlien` selain rute itu, jadi tak ada penjadwal. Prod 2026-09-17: 2.055 faktur, sama dengan hitungan 2026-07-31, dokumen terbaru dibuat 2026-07-30. Artinya faktur Accurate sesudah impor terakhir tidak pernah diingatkan, dan sisa utang yang dibaca pengingat hanya sebaru impor terakhir. KPI AP menghitung persentase faktur jatuh tempo bulan itu yang dibayar paling lambat pada tanggal jatuh temponya, dari data faktur pembelian Accurate lewat procurement-service (`bip-erp/services/employee/kpi_sumber_ap.go:16-30`); sumber ini membaca daftar faktur Accurate langsung (`bip-erp/services/procurement/kpi_pembayaran.go`), jadi tidak ikut basi seperti pengingat.
 
 ## Alur target
 
@@ -36,14 +36,35 @@ Pengajuan disetujui (P1) → antrean bayar di layar pelaksana dengan notifikasi 
 - **B** Pembayaran tanpa faktur (tipe DANA, IKLAN, KONSUMSI) dibukukan lewat jurnal umum yang tidak terbit selama saklar kas mati; kapan saklar dinyalakan perlu diputuskan sesudah diuji.
 - **C** Jurnal otomatis buku CV dari pembayaran berbukti (T6).
 - **A** Pelaksana bayar rekening PT memegang `budget.ap.bayar`, supaya pengingat jatuh tempo hutang pemasok sampai ke orang yang membayar.
+- **B** Faktur pemasok di ERP selalu mutakhir terhadap Accurate (impor terjadwal, atau pengingat membaca Accurate langsung seperti KPI AP). Selama belum, pengingat jatuh tempo dan antrean hutang di bawah hanya memuat faktur sampai impor manual terakhir.
 - **B** Daftar hutang pemasok yang mendekati atau lewat jatuh tempo tampil sebagai antrean di layar pelaksana bayar; hari ini antrean "perlu dibayar" belum tampil di dashboard AP ([[Finance - FAT Persona]]).
-- **TBD** Berkas transfer massal ke bank belum dianalisa.
+- **C** ERP menghasilkan berkas unggah massal Kopra dari pembayaran yang sudah disetujui, supaya rekening tujuan dan nominal tidak diketik ulang di Kopra satu per satu. Formatnya belum diketahui dan diminta dari Finance lebih dulu (§ Berkas unggah Kopra). `git grep` 2026-09-17 tidak menemukan kata `kopra` maupun ekspor transfer massal di bip-erp dan erp-frontend (kontrol positif: `xlsx` atau `excelize` ada di 112 berkas bip-erp). Pustaka Excel `excelize` sudah dipakai insentif, integration, manufacture, marketing-analytics, dan warehouse, belum di procurement.
 - **TBD** Siapa "atasan" yang menyetujui di internet banking, dan apakah persetujuan di bank itu tetap ada sesudah persetujuan pindah ke ERP.
 - **TBD** Jalur iklan lewat kas iklan lalu diganti kas CV dipertahankan, atau bank pembayar virtual account diganti supaya satu biaya iklan cukup satu transfer.
 
+## Berkas unggah Kopra: yang diminta dari Finance
+
+**Tujuan.** Dari pembayaran yang sudah disetujui di ERP, sistem menghasilkan berkas yang bisa langsung diunggah ke Kopra, sehingga rekening tujuan, nominal, dan keterangan tidak diketik ulang. Transfer dan persetujuannya tetap di bank; ERP menyiapkan berkas, bukan memindahkan uang ([[Finance - Proses Bisnis dan Kebutuhan Sistem]] § Prinsip rancangan butir 7). Dicatat 2026-09-17 atas permintaan IT; belum dirancang sampai bahan di bawah diterima.
+
+**Diminta dari Finance** (Supervisor FAT atau pemegang akses Kopra):
+
+1. **Templat resmi unggah massal** apa adanya, yaitu berkas kosong yang diunduh dari menu Kopra, untuk tiap jenis transaksi yang dipakai.
+2. **Satu contoh berkas yang pernah diunggah dan diterima Kopra**, dengan nomor rekening dan nama disamarkan.
+3. **Jenis transfer yang dipakai**: sesama bank, antarbank (BI-FAST, SKN, RTGS), pembayaran virtual account, dan gaji; serta apakah tiap jenis punya templat sendiri.
+4. **Aturan yang membuat unggahan ditolak Kopra**: format tanggal dan nominal, kode bank tujuan, panjang keterangan, batas baris per berkas, dan karakter yang tidak diterima.
+5. **Rekening sumber**: rekening PT dan CV mana saja yang dibayar lewat Kopra, dan apakah satu berkas hanya boleh memuat satu rekening sumber.
+6. **Pengunggah dan penyetuju di Kopra**: siapa yang mengunggah, siapa yang menyetujui, dan apakah susunan itu tetap sesudah persetujuan pindah ke ERP (terkait TBD "atasan" di § Celah).
+7. **Laporan hasil dari Kopra**: apakah status per baris dan nomor referensi transfer bisa diunduh, supaya hasilnya dicocokkan balik ke ERP dan menggantikan unggah bukti satu per satu.
+
+**Diperiksa IT sesudah bahan diterima** (TBD):
+
+- Sumber rekening tujuan per jenis pembayaran: master pemasok, isian pengajuan, atau data karyawan untuk gaji (`bank_details` di data kerja karyawan; field lama `bank_detail` sudah ditandai usang, `bip-erp/shared-library/models/employee/models.go:357-358`).
+- Pembagian berkas: per rekening sumber, per CV, per jenis transfer, atau per tanggal bayar.
+- Pembayaran yang sudah masuk berkas ditandai supaya tidak terekspor dua kali.
+
 ## Kontrol wajib
 
-Pelaksana transfer, penyetuju, pemeriksa bukti, dan pelaku rekonsiliasi bank adalah peran berbeda.
+Pelaksana transfer, penyetuju, pemeriksa bukti, dan pelaku rekonsiliasi bank adalah peran berbeda. Berkas unggah Kopra hanya memuat pembayaran yang sudah disetujui di ERP, dan isinya tidak disunting tangan sesudah diekspor; koreksi dilakukan di ERP lalu berkas dibuat ulang.
 
 ## Ukuran efisiensi
 
