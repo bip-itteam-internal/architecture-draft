@@ -128,7 +128,7 @@ Kunci i18n: `hris.kpi.mtkPiutangLewat90` / `…Ket`.
 
 ### 🟡 `selesai_dinilai` — metrik keempat `kinerja_tiket` (Building Maintenance)
 
-Metrik baru pada sumber **`kinerja_tiket`** yang sudah ada, untuk metrik kerusakan template `Building and Maintenance Staff` (GA, bobot 0,35). **Branch `feat/kpi-tiket-selesai-dinilai`** di bip-erp dan erp-frontend (2026-09-17, belum merge/deploy). Perilakunya di [[Microservices - Employee Service]].
+Metrik baru pada sumber **`kinerja_tiket`** yang sudah ada, untuk metrik kerusakan template `Building and Maintenance Staff` (GA, bobot 0,35). **bip-erp PR [#1962](https://github.com/bip-itteam-internal/bip-erp/pull/1962) + erp-frontend PR [#1638](https://github.com/bip-itteam-internal/erp-frontend/pull/1638)** (dibuka 2026-09-17, belum merge/deploy). Perilakunya di [[Microservices - Employee Service]].
 
 | Locale | Label | Keterangan |
 |---|---|---|
