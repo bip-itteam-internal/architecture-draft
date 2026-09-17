@@ -1520,20 +1520,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "c37f8665f0bca3b25b4693076d110125890be54e90ba7da991705989fbceb2d6",
-      "ukuran_kb": 493.9,
-      "ringkasan": "Menjawab pertanyaan seputar arsitektur frontend ERP (hris-dashboard / One Bharata): stack teknologi yang dipakai, bagaimana autentikasi dan SSO antar-aplikasi bekerja, bagaimana role dan menu sidebar digerbang dari cookie system_roles, serta konvensi wajib untuk data-fetching (TanStack Query) dan bagan (Recharts + ChartContainer) di seluruh halaman. Juga menjelaskan dukungan multi-perusahaan (company switcher, kelola departemen/shift/WiFi per perusahaan, rekrutmen lintas perusahaan) dan daftar modul yang sudah diimplementasikan vs belum.",
+      "hash": "8f018a95a56c04c8a23b193f7440fcfd936dfff2bef947a65e1c78bca8cd3d63",
+      "ukuran_kb": 494.1,
+      "ringkasan": "Menjawab: apa itu erp-frontend (\"One Bharata\") dan stack teknologinya, bagaimana autentikasi serta role-based access bekerja (cookie system_roles, SSO Identity Provider untuk app lain seperti Task Manager), dan bagaimana struktur menu/sidebar (kategori, sub-menu, Pengaturan HRGA terpusat) tersusun. Juga menjelaskan konvensi data-fetching TanStack Query dan bagan Recharts/ChartContainer, dukungan multi-perusahaan (multi-tenant), serta daftar modul/fitur yang sudah dan belum diimplementasikan.",
       "kata_kunci": [
         "erp-frontend",
-        "hris-dashboard",
         "One Bharata",
         "SSO",
         "system_roles",
-        "role gating",
+        "role-based access",
+        "RBAC",
         "sidebar menu",
+        "TanStack Query",
         "multi-perusahaan",
-        "company switcher",
-        "TanStack Query"
+        "multi-tenant"
       ]
     },
     {
@@ -2018,20 +2018,20 @@
         "Microservices - Form Builder Service",
         "Microservices - File Service"
       ],
-      "hash": "ff15d84c5c4f29309eacaee452258453b973f0096f85e833c775b71fc0e9a190",
-      "ukuran_kb": 13.0,
-      "ringkasan": "Menjawab: database MongoDB mana yang dimiliki tiap microservice bip-erp dan collection apa saja isinya, mengikuti pola database-per-service. Juga menjelaskan pengecualian akses lintas-database (task-management membaca employee_db dan attendance_db secara read-only) serta infrastruktur data bersama seperti Redis dan MinIO.",
+      "hash": "69f9b92a3595b11f617d63c1c250ebd878479574f93f12e798b3dc45a9d8d17f",
+      "ukuran_kb": 13.1,
+      "ringkasan": "Menjawab: service mana memiliki database MongoDB apa dan collection utama apa saja di dalamnya (employee, attendance, notification, insentive, integration, inventory, tiktok-shop, task-management, recruitment, payroll, learning, form-builder), serta bagaimana pola database-per-service diterapkan di bip-erp beserta infrastruktur data bersama (Redis, MinIO). Juga mencatat pengecualian akses lintas-database (task-management membaca employee_db dan attendance_db read-only) dan status multi-tenant (company_id) per koleksi.",
       "kata_kunci": [
-        "database per service",
+        "database-per-service",
         "MongoDB",
         "collection",
-        "employee_db",
-        "attendance_db",
-        "learning_db",
+        "koleksi",
         "Redis",
         "MinIO",
-        "arsitektur data",
-        "ownership data"
+        "multi-tenant",
+        "company_id",
+        "replica set",
+        "employee_db"
       ]
     },
     {
@@ -2605,20 +2605,20 @@
         "API - Index",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id"
       ],
-      "hash": "a77636cdbaf324fd7b97d8bebd6fa8f2e24e7fe9284e8eb3c70878d221fee565",
-      "ukuran_kb": 59.0,
-      "ringkasan": "Menjawab: kenapa modul Training dipisah jadi service sendiri (learning-service), fitur apa saja yang sudah berjalan (event pelatihan, pengajuan SPV→HR, evaluasi trainer, post-test berskor, bahan KPI, feed kalender) dan mana yang masih di branch/belum merge (pre-test, rencana pelatihan tahunan, sertifikat otomatis). Juga menjelaskan cara verifikasi department_key lewat panggilan internal ke employee-service dan status deploy tiap bagian di dev/produksi.",
+      "hash": "472199f2d624774966e862b682711f1a038771bd46823837c16130f3c4715800",
+      "ukuran_kb": 59.2,
+      "ringkasan": "Menjawab: fitur apa saja yang ada di Learning Service (master jenis pelatihan & trainer, event pelatihan, pengajuan pelatihan rantai SPV→HR, evaluasi trainer, course & bank soal post-test/pre-test, rencana pelatihan tahunan, sertifikat otomatis) beserta status implementasi tiap fitur (merged, live dev/prod, atau masih di branch). Juga menjelaskan kenapa modul Training dipisah dari Employee Service jadi service sendiri, cara verifikasi departemen lewat panggilan internal, dan integrasinya dengan mesin KPI serta kalender terpusat.",
       "kata_kunci": [
-        "learning service",
+        "Learning Service",
         "LMS",
-        "training",
         "pelatihan",
+        "training",
         "post-test",
         "pre-test",
-        "training request",
+        "pengajuan pelatihan",
         "evaluasi trainer",
-        "sertifikat pelatihan",
-        "rencana pelatihan tahunan"
+        "kalender terpusat",
+        "KPI pelatihan"
       ]
     },
     {
