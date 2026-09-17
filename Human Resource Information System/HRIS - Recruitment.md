@@ -2,7 +2,7 @@
 
 *Desain (to-be) subsistem **Recruitment** — mengelola **siklus depan karyawan**: dari kebutuhan posisi sampai jadi karyawan aktif. Memisahkan subsistem **Talent acquisition → Interview → On-boarding** yang sekarang menumpuk di [[HRIS - Analysis]] ke ruangnya sendiri.*
 
-- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. ⚠️ **Rekrutmen lintas perusahaan: merged 2026-09-12, backend, Web ERP, dan portal karir live di prod, paket belum dipasang** (diukur 2026-09-12, lihat bagian "Rekrutmen Lintas Perusahaan" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian "Alur Kerja HR" di bawah) · 🔜 **Form Penilaian Masa Onboarding (20 butir + keputusan status kepegawaian HRD): kode lengkap di branch, BELUM merged maupun deploy** (2026-09-17, lihat §Masa Evaluasi & Performance Review Onboarding)
+- **Status**: ⚠️ **BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. ⚠️ **Rekrutmen lintas perusahaan: merged 2026-09-12, backend, Web ERP, dan portal karir live di prod, paket belum dipasang** (diukur 2026-09-12, lihat bagian "Rekrutmen Lintas Perusahaan" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian "Alur Kerja HR" di bawah) · 🔜 **Form Penilaian Masa Onboarding (20 butir + keputusan status kepegawaian HRD): kode lengkap di branch, BELUM merged maupun deploy** (2026-09-17, lihat §Masa Evaluasi & Performance Review Onboarding) · ⚠️ **MPP: Posisi Kosong per resign (resign batal tak lagi tampil) + hak tulis MPP hanya SPV HRD dan staf rekrutmen: merged 2026-09-17 (bip-erp #1961, erp-frontend #1637), deploy dan paket posisi belum diverifikasi** (lihat §Rencana Tenaga Kerja (MPP))
 - **Target arsitektur**: microservice `recruitment-service` baru ([[Microservices - Recruitment Service]]) + modul web, dengan **rollout bertahap**
 - Titik singgung yang sudah ada di kode: `POST /onboarding/register` (aktivasi akun karyawan baru) di [[Microservices - Employee Service]]. ⚠️ **Bukan handoff hire yang bekerja**: aktivasinya mewajibkan username, password, dan PIN baru yang diisi karyawan sendiri, jadi hire tak pernah berhasil memanggilnya (lihat langkah 8 pipeline di bawah)
 
@@ -225,6 +225,37 @@ bukan layar tugas; yang mengantar PIC adalah teks pesannya.
 detail requisition untuk atasan (pengajuan kebutuhan karyawan ikut pindah ke MyBharata); pencegahan
 offer ganda di backend (aturan "offer aktif" kini dihitung frontend); gambar panduan (PNG
 Excalidraw).
+
+## Rencana Tenaga Kerja (MPP)
+
+> ⚠️ **Perubahan 2026-09-17 sudah merged** (bip-erp [#1961](https://github.com/bip-itteam-internal/bip-erp/pull/1961), erp-frontend [#1637](https://github.com/bip-itteam-internal/erp-frontend/pull/1637)), **deploy, uji layar, dan pemasangan paket ke dua posisi belum diverifikasi**; sampai itu terjadi, perilaku lama masih berlaku di prod. Rincian teknis: [[Microservices - Recruitment Service]] §Increment MPP Posisi Kosong per Resign; endpoint: [[API - Recruitment Service]] §Manpower Planning (MPP) & Posisi Kosong.
+
+Menu **Recruitment > Manpower Planning** menyimpan rencana kebutuhan karyawan **per tahun** (satu baris = satu posisi; baris dari resign = satu orang yang digantikan) dan menjadi penyebut KPI "Presentase Data Base Buffer Kebutuhan MPP". Bagian **Posisi Kosong** di atas tabel memuat karyawan yang keluar dan belum diputuskan: HR memilih **Buat rencana** (baris MPP pengganti) atau **Tidak diganti** (alasan wajib).
+
+**Keputusan user 2026-09-17** (berlaku begitu perubahan di atas ter-deploy dan paketnya dipasang):
+
+- **Siapa boleh menulis**: menambah, mengubah, menghapus rencana, dan memutuskan posisi kosong **hanya SPV HRD dan staf rekrutmen**, lewat paket izin "Rekrutmen: Penyusun MPP" yang dipasang ke posisi HRD Supervisor dan Recruitment & Onboarding. Direktur, developer, dan staf HR lain tetap **melihat**. Sebelumnya setiap pemegang `hris` bisa menulis (diukur prod 2026-09-17: 13 akun), berlawanan dengan panduan yang menyebut "hanya SPV HRD". Saat kill-switch izin recruitment dimatikan (mode darurat), aturannya kembali ke tier hris supervisor.
+- **Resign yang dibatalkan tidak tampil** di Posisi Kosong; **resign terjadwal tampil** (berlabel Terjadwal) supaya pengganti bisa direncanakan sebelum orangnya keluar. Yang sudah keluar berlabel Efektif.
+- **Keputusan menempel pada resign, bukan orang**: orang yang resign lagi sesudah resign sebelumnya dibatalkan muncul lagi sebagai posisi kosong. Enam keputusan lama di prod tetap berlaku tanpa migrasi.
+- **Tahun rencana pengganti** = tahun tanggal efektif bila itu tahun depan, selain itu tahun berjalan (resign Desember yang baru diputuskan Januari masuk tahun berjalan dan ikut cakupan KPI tahun itu). Pesan suksesnya menyebut tahun, karena rencana tahun depan tak tampil di tabel tahun berjalan.
+
+**Alur pengguna**
+
+```
+SPV HRD / staf rekrutmen:
+  Recruitment > Manpower Planning > Posisi Kosong
+  → baris: nama, posisi/departemen, kategori, tanggal efektif, Terjadwal/Efektif
+  → "Buat rencana" → baris MPP lahir, baris posisi kosong hilang        @ layar sama
+  → "Tidak diganti" → isi alasan → simpan, baris hilang                   @ layar sama
+
+Staf HR lain, Direktur, developer:
+  Manpower Planning → tabel + ringkasan cakupan + Posisi Kosong, TANPA tombol
+  → kalimat "Keputusan diambil SPV HRD atau staf rekrutmen. Baru diberi hak? Login ulang."
+```
+
+⚠️ **Titik putus yang diketahui**: paket yang baru dipasang baru berlaku sesudah **login ulang**; sebelum itu tombolnya tak muncul. Pemegang paket "Rekrutmen: Lihat"/"Penyetuju" saja (tanpa `recruitment.work`) membuka halaman ini tetapi membaca "Daftar posisi kosong tidak bisa dimuat", karena daftarnya digerbang `recruitment.work` (sudah begitu sebelum perubahan ini).
+
+**Belum di sistem (TBD)**: lembar HRD "Actual vs Planning MPP" memakai rencana **per bulan** per Divisi > Departemen > Posisi dengan kolom Actual, Gap, Keterangan, dan Deadline; sistem hanya menyimpan rencana **per tahun** tanpa Actual/Gap. Menyamakannya kebutuhan baru (lewat `/analisa-kebutuhan` bila HRD setuju), bukan bagian perubahan di atas.
 
 ## Rekrutmen Lintas Perusahaan
 

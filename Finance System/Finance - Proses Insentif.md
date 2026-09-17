@@ -24,6 +24,7 @@ Insentif karyawan dicantumkan sebagai pekerjaan oleh Junior Accountant dan Cost 
 - **Periode**: order masuk bulan M bila dikirim di bulan M dan uangnya cair paling lambat tanggal 25 bulan M+1; yang cair sesudahnya hangus untuk insentif, sedangkan KPI memakai jendela bergeser ([[Finance - Incentive]] § Aturan periode).
 - **Layar dan akses**: Dashboard Insentif dan Master Target dibuka pemegang paket "Menu: Insentif Profit"; rincian beban karyawan hanya untuk Finance; menulis target digerbang terpisah dan lebih ketat. Hasil insentif berstatus DRAFT tampil di kotak persetujuan dashboard Finance (`bip-erp/services/integration/internal/interface/http/persetujuan_handler.go:16-19`).
 - **Penerima**: insentif sendiri tampil di slip gaji MyBharata ([[ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji]]).
+- **Prod 2026-09-17** (jumlah dokumen per koleksi `insentive_db`, baca-saja): 62 target profit, terbaru dibuat 2026-09-11; 6 hasil insentif tersimpan (`incentive_results`), terbaru dibuat 2026-07-10; `incentive_opex` 0. Target terus diisi, tetapi tidak ada hasil baru yang tersimpan sejak Juli.
 
 ## Alur target
 
@@ -34,7 +35,7 @@ Master data lengkap (atribusi toko ke ICC, beban non-gaji per proyek karyawan, H
 - **A** Atribusi toko ke ICC dilengkapi. Per 2026-08-02 baru 10 dari 28 toko punya pemetaan, sehingga sebagian besar profit Juli tidak berpemilik.
 - **A** Beban non-gaji dibukukan ke proyek karyawan di Accurate. Per 2026-08-02 baru 6 dari 62 proyek karyawan terisi.
 - **A** Target Leader diisi. Pembagian rata turun praktis tidak berjalan karena `incentive_org` kosong; per 2026-09-11 target September belum memuat Leader.
-- **B** Alur persetujuan dan pembekuan periode. [[Finance - Incentive]] mencatat alur approval/freeze belum ada per 2026-08-02, sementara hasil DRAFT kini sudah tampil di kotak persetujuan; periksa ulang apa yang sudah terkunci sesudah disetujui.
+- **B** Alur persetujuan dan pembekuan periode. [[Finance - Incentive]] mencatat alur approval/freeze belum ada per 2026-08-02, sementara hasil DRAFT kini sudah tampil di kotak persetujuan; periksa ulang apa yang sudah terkunci sesudah disetujui. Koleksi hasil tersimpan tidak bertambah sejak 2026-07-10 (diukur 2026-09-17); apakah dashboard menghitung saat dibuka tanpa menyimpan, atau penyimpanannya berhenti, belum diperiksa (**TBD**).
 - **TBD** HPP yang dipakai perhitungan menunggu Finance melengkapinya; kaitannya dengan costing di [[Finance - Proses Costing HPP Produk]].
 - **TBD** Keputusan terbuka untuk Finance: PPN di dalam profit, target sebelum atau sesudah opex, dan jadwal bayar menurut SK (tanggal 1 atau 5) terhadap cutoff pencairan tanggal 25.
 - **TBD** Hierarki tim insentif sebagai turunan HRIS atau pemilik untuk konteksnya sendiri ([[REF - Kepemilikan Data]] § Duplikasi).

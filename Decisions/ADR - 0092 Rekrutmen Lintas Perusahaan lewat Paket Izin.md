@@ -37,6 +37,8 @@ Aturan "siapa boleh lintas" tinggal di satu tempat, `common.BolehLintasPerusahaa
 
 Ini menutup jebakan yang dicatat ADR 0080 §Consequences: memasang satu paket aditif ke posisi yang belum punya paket recruitment lain membuat klaim "memuat izin modul" lalu mencabut seluruh izin tier-nya. Menurut komentar kode, itu terjadi di produksi 2026-09-08 pada posisi Direktur.
 
+> **Catatan perluasan 2026-09-17** (bip-erp [#1961](https://github.com/bip-itteam-internal/bip-erp/pull/1961), merged 2026-09-17, deploy belum diverifikasi): pola §1 dan §2 dipakai ulang untuk izin aditif ketiga, `recruitment.manpower_plan_manage` (paket "Rekrutmen: Penyusun MPP"), yang mengambil alih gerbang tulis MPP dan keputusan posisi kosong dari `recruitment.work` atas keputusan user bahwa hanya SPV HRD dan staf rekrutmen boleh menulis MPP. Karena §2 menurunkan daftar aditif dari katalog, izin ketiga otomatis ikut dikecualikan tanpa kode baru di `permission_gate.go`. Satu batas §2 yang terungkap saat itu: pengecualiannya hanya berlaku di biner BARU, jadi selama recruitment-service lama masih jalan izin aditif yang belum ada di katalognya terbaca sebagai izin pipeline. Rinciannya di [[Microservices - Recruitment Service]] §Increment MPP Posisi Kosong per Resign dan [[CORE - RBAC dan Permission Set]].
+
 ### 3. Perusahaan diturunkan satu arah, anak kandidat tanpa salinan
 
 ```

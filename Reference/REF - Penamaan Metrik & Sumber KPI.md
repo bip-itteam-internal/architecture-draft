@@ -126,6 +126,27 @@ Kunci i18n: `hris.kpi.mtkPiutangLewat90` / `…Ket`.
 
 ⚠️ **Penjaga satuan yang ditulis bersamanya memerahkan DUA metrik yang sudah lama dipakai template produksi**: keterangan `piutang_lewat_14_persen` dan `piutang_lewat_60_persen` sama sekali tak menyebut satuan maupun arah. Keduanya ikut dibetulkan, satu frasa masing-masing. Polanya sama dengan temuan `kinerja_affiliate_tim` di bawah: **penjaga yang ditulis untuk entri baru hampir selalu menemukan entri lama yang melanggar aturan yang sama**, dan itu justru gunanya.
 
+### 🟡 `selesai_dinilai` — metrik keempat `kinerja_tiket` (Building Maintenance)
+
+Metrik baru pada sumber **`kinerja_tiket`** yang sudah ada, untuk metrik kerusakan template `Building and Maintenance Staff` (GA, bobot 0,35). **bip-erp PR [#1962](https://github.com/bip-itteam-internal/bip-erp/pull/1962) + erp-frontend PR [#1638](https://github.com/bip-itteam-internal/erp-frontend/pull/1638)** (dibuka 2026-09-17, belum merge/deploy). Perilakunya di [[Microservices - Employee Service]].
+
+| Locale | Label | Keterangan |
+|---|---|---|
+| `id.ts` | `Tiket selesai & dinilai (%)` (27 karakter) | "Persentase tiket yang ditugaskan pada periode itu yang sudah selesai DAN sudah dinilai pengajunya. Nilai dari penangan tiket itu sendiri tidak dihitung. Isi ambang dengan bintang minimal (1 sampai 5), target dalam persen. Menu Manajemen Tugas." |
+| `en.ts` | `Tickets resolved & rated (%)` (28 karakter, tepat di batas) | "Percentage of tickets assigned in the period that were resolved AND rated by their requester. Ratings given by the ticket's own handler are not counted. Set the threshold to the minimum stars (1 to 5); the target is a percentage. Task Management menu." |
+
+Kunci i18n: `hris.kpi.mtkSelesaiDinilai` / `…Ket`. Label memakai `(%)`, bukan `(persen)` seperti tiga metrik saudaranya, karena `(persen)` membuat label melewati batas 28 karakter.
+
+| Tempat | Status | Catatan |
+|---|---|---|
+| Kamus label (`label-otomatis.ts` `METRIK`) | ✅ | |
+| `METRIK_DIKENAL` | ✅ | kontrol negatif: entri kamus dihapus sementara → penjaga merah tepat pada `selesai_dinilai` |
+| `SATUAN_PER_METRIK` | ✅ `persen` | satuan TARGET; ambangnya bintang dan tak memengaruhi satuan |
+| `FORMULA_PER_METRIK` | ⬜ tidak diisi | `kinerja_tiket` memanggil `DaftarkanFormulaSumber` (`rasio_ambang`), jadi rumus datang dari katalog; tiga metrik saudaranya juga tak diisi |
+| `METRIK_PER_SUMBER` | ⬜ tidak perlu | `git grep selesai_dinilai` di kedua repo sebelum ditambahkan: 0 hasil |
+
+⛔ **Keterangannya menyebut bahwa ambang = BINTANG minimal 1..5, dan itu keharusan.** Metrik saudaranya `ontime` memakai `rasio_ambang` berambang **0**, sehingga pengisi yang meniru konfigurasinya akan mengisi ambang 0. Untuk metrik ini ambang 0 meloloskan nol pengganti dan memberi setiap orang 100%; backend menolaknya saat menghitung, tetapi keterangan adalah satu-satunya tempat pengisi membaca aturannya saat ia memilih.
+
 ### 🟡 `program_culture` — sumber baru (branch `feature/workspace-position`)
 
 Sumber KPI baru dari [[Microservices - Form Builder Service]] (`GET /internal/culture/metrics`), memasok metrik `culture` KPI Culture & Industrial. **Belum merge/prod.** Nilainya **skor komposit** program culture (blueprint 30/30/40), bukan % sesuai jadwal — lihat [[ADR - 0066 Modul Kelola Program Culture]]. Label ramah + keterangan ditaruh di kamus `label-otomatis.ts` dan dua locale `src/i18n/locales/{id,en}.ts`.
@@ -151,6 +172,39 @@ Kunci i18n: **`srcNilaiInspeksiSatgas` / `srcNilaiInspeksiSatgasKet`** (awalan `
 - **Keterangannya menyebut aturan agregasi, dan itu keharusan di sini.** Bentuk formnya mirip penilaian layanan (`nilai_layanan_pribadi`, rata-rata penilaian), padahal nilai Satgas adalah kiriman **terakhir**: cek ulang menggantikan temuan. Tanpa kalimat itu angkanya terbaca seperti rata-rata penilaian biasa. Satuan (skala 0 sampai 100) dan menu tempat angkanya bisa dilihat sendiri juga tertulis, sesuai aturan keterangan di atas.
 - **Tanpa sub-metrik.** Backend mendaftar lewat `DaftarkanSumber` biasa, bukan `DaftarkanSumberBermetrik`, dan formula baku `rata_rata` datang dari katalog (`DaftarkanFormulaSumber`). Frontend karena itu tak menambah entri `METRIK_PER_SUMBER`, `METRIK_DIKENAL`, `SATUAN_PER_METRIK`, maupun `FORMULA_PER_METRIK`.
 - ⚠️ **Bukan cuma label: KALIMAT ALASAN backend juga dibaca frontend.** `caraMengatasiKey` (`auto-overview-view.tsx`) memilih saran di layar Otomasi KPI dengan mencocokkan potongan teks alasan: "menunggu cek ulang" ke `otomasiCaraMenungguCekUlang`; "belum ada inspeksi satgas" dan "tak menjawab pertanyaan skala" ke `otomasiCaraBelumDinilai`; sisa yang memuat "satgas" ke `otomasiCaraSatgasForm`. Salinan literal keenam kalimat `cuplikanNilaiSatgas` ada di `auto-overview-view.cara.test.tsx`. Mengubah kalimat di `kpi_sumber_inspeksi_satgas.go` tanpa memperbarui salinan itu tak menimbulkan galat apa pun; sarannya cuma diam-diam bergeser, karena pencocokan teks bukan kontrak.
+
+### ⚠️ Tiga metrik sumber `pelatihan`: `kesesuaian_materi_skala10`, `kenaikan_kpi_peserta_persen`, `peningkatan_post_test_persen`
+
+Metrik sumber **`pelatihan`** untuk posisi Training & Performance Officer; cara hitung dan aturan pemakaiannya di [[Microservices - Employee Service]] (bagian Registry sumber data KPI). Dua yang pertama lahir dari [[ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI]] (backend bip-erp PR [#1951](https://github.com/bip-itteam-internal/bip-erp/pull/1951), merged 2026-09-17). Yang ketiga sudah terdaftar di katalog backend sejak Tahap 3b (bip-erp PR [#1934](https://github.com/bip-itteam-internal/bip-erp/pull/1934), merged 2026-09-17). Label, keterangan, dan satuan ketiganya masuk bersama di erp-frontend PR [#1631](https://github.com/bip-itteam-internal/erp-frontend/pull/1631), **merged 2026-09-17 09:19 UTC** (merge commit `36fa3e8a`, diukur `gh pr view` 2026-09-17). **Status deploy frontend belum diukur**, dan perhitungan kedua metrik ADR 0102 baru terbukti unit test (belum lewat template di DEV). Dicatat di sini karena checklist empat-tempatnya ditempuh dengan alasan `FORMULA_PER_METRIK` yang berbeda dari contoh Finance di atas, dan karena metrik ketiga membuktikan lubang penjaga yang sudah dicatat di "Keadaan terukur".
+
+| Metrik | Locale | Label | Keterangan |
+|---|---|---|---|
+| `kesesuaian_materi_skala10` | `id.ts` | `Kesesuaian materi pelatihan` (27 karakter) | "Rata-rata jawaban peserta atas pertanyaan seberapa sesuai materi pelatihan dengan pekerjaannya, skala 1 sampai 10, bukan 0 sampai 100, jadi isi target dalam skala itu, misalnya 8. Dari kelas yang selesai pada bulan itu, minimal 3 jawaban. Terpisah dari kepuasan trainer. Menu HRIS (Pelatihan, ringkasan penilaian)." |
+| | `en.ts` | `Training content relevance` (26 karakter) | "Average of participants' answers to how relevant the training material is to their job, on a 1 to 10 scale, not 0 to 100, so set the target on that scale, e.g. 8. From classes that ended that month, at least 3 answers. Separate from trainer satisfaction. HRIS menu (Training, rating summary)." |
+| `kenaikan_kpi_peserta_persen` | `id.ts` | `Kenaikan KPI peserta` (20 karakter) | "Persen peserta yang hadir yang skor KPI-nya naik dari bulan sebelum pelatihan dimulai ke bulan sesudah pelatihan selesai. Menilai kelas yang selesai dua bulan sebelum periode ini, supaya skor bulan sesudahnya sudah terisi. Peserta tanpa skor di salah satu bulan tidak ikut dihitung. Kenaikan tidak membuktikan pelatihan penyebabnya. Menu KPI." |
+| | `en.ts` | `Participant KPI increase` (24 karakter) | "Percentage of attending participants whose KPI score rose from the month before the training started to the month after it ended. Assesses classes that ended two months before this period, so the later score is already filled in. Participants without a score in either month are left out. An increase does not prove the training caused it. KPI menu." |
+| `peningkatan_post_test_persen` | `id.ts` | `Peningkatan post-test` (21 karakter) | "Persen peserta kelas bertautan materi yang skor post-testnya naik dari pre-test, di kelas yang selesai pada bulan itu. Peserta yang belum punya pre-test dan post-test tidak ikut dihitung dan menurunkan cakupan. Berbeda dari skor post-test yang mengukur penguasaan akhir. Menu HRIS (Pelatihan)." |
+| | `en.ts` | `Post-test improvement` (21 karakter) | "Percentage of participants in material-linked classes whose post-test score rose above their pre-test, in classes that ended that month. Participants without both a pre-test and a post-test are left out and lower the coverage. Unlike the post-test score, which measures final mastery. HRIS menu (Training)." |
+
+Kunci i18n (teks di atas disalin dari `src/i18n/locales/id.ts:2010-2018` dan `en.ts:1880-1888`): `hris.kpi.mtkKesesuaianMateri` / `…Ket`, `hris.kpi.mtkKenaikanKpiPeserta` / `…Ket`, `hris.kpi.mtkPeningkatanPostTest` / `…Ket`.
+
+Checklist **empat tempat**, apa adanya (baris erp-frontend diukur di `origin/main` 2026-09-17 sesudah #1631):
+
+| Tempat | `kesesuaian_materi_skala10` | `kenaikan_kpi_peserta_persen` | `peningkatan_post_test_persen` |
+|---|---|---|---|
+| Kamus label (`label-otomatis.ts` `METRIK`, baris 221-234) | ✅ | ✅ | ✅ baru ada sejak #1631 |
+| `METRIK_DIKENAL` (`label-otomatis.aturan.test.ts:163-171`) | ✅ | ✅ | ✅ baru ada sejak #1631 |
+| `SATUAN_PER_METRIK` (`konfigurasi-otomatis-rules.ts:291-296`) | ✅ `nilai` | ✅ `persen` | ✅ `persen` |
+| `FORMULA_PER_METRIK` | ⬜ tidak diisi | ⬜ tidak diisi | ⬜ tidak diisi |
+| `METRIK_PER_SUMBER` | ⬜ tidak perlu | ⬜ tidak perlu | ⬜ tidak perlu |
+| Penjaga i18next asli `METRIK_PELATIHAN` (`kpi-pelatihan-keys.test.ts:18-25`) | ✅ + frasa wajib | ✅ + frasa wajib | ✅ |
+
+- ⚠️ **`FORMULA_PER_METRIK` sengaja tidak diisi, dan alasannya KEBALIKAN dari contoh Finance.** Sumber grup Finance tidak memanggil `DaftarkanFormulaSumber`, sehingga pengisi diminta memilih rumus sendiri. Sumber `pelatihan` justru **mendaftarkan** `rata_rata` untuk keenam metriknya ke katalog (`kpi_sumber_pelatihan.go:300-307` di bip-erp), dan `formulaKatalog` (`auto-block-rules.ts:99-110`) membaca `formula_metrik` katalog lebih dulu, baru jatuh ke `FORMULA_PER_METRIK` sebagai jaring terakhir. Entri frontend untuk metrik ini hanya akan jadi salinan kedua dari fakta milik backend. Metrik pelatihan yang sudah lebih dulu hidup (`kehadiran_peserta_persen`, `skor_post_test_persen`, `kepuasan_trainer_skala10`) juga tidak punya entri di sana.
+- ⚠️ **Satuan `nilai` pada `kesesuaian_materi_skala10` menuntut kalimat skala di keterangannya**, sama dengan kepuasan trainer. Satuan layar `nilai` berbunyi skala 100, sehingga target 80 untuk realisasi yang paling tinggi 10 memberi skor nol tiap bulan tanpa satu pun galat. Penjaganya `kpi-pelatihan-keys.test.ts:87-96` menuntut "1 sampai 10" / "1 to 10" **dan** "kepuasan trainer" / "trainer satisfaction" di kedua locale; frasa kedua membawa aturan sejajar milik backend (jangan dijumlah atau dirata-rata bersama kepuasan trainer) sampai ke layar pengisi.
+- ⚠️ **Keterangan `kenaikan_kpi_peserta_persen` wajib menyebut jeda dua bulan** (`kpi-pelatihan-keys.test.ts:98-105`, "dua bulan" / "two months"): tanpa itu angka September dibaca sebagai hasil pelatihan September. Kalimat "Kenaikan tidak membuktikan pelatihan penyebabnya" membawa aturan pemakaian backend ke layar, tetapi **tidak** dijaga test.
+- **Tidak butuh `METRIK_PER_SUMBER`**: ketiga nama metrik hanya dipakai sumber `pelatihan` (`git grep` bip-erp `origin/main` 2026-09-17, hanya `kpi_sumber_pelatihan.go`). Bila kelak dipakai sumber lain, entri per-pasangan wajib ikut.
+- ⛔ **`peningkatan_post_test_persen` sempat terdaftar di backend TANPA label maupun satuan di frontend.** Sebelum #1631, `git grep` ketiga nama metrik di `origin/main` erp-frontend (commit `17af94df`, induk merge #1631) menghasilkan **nol** kemunculan: kamus label, `METRIK_DIKENAL`, `SATUAN_PER_METRIK`, dan `METRIK_PELATIHAN` sama-sama tak memuatnya. Akibatnya metrik ini tampil sebagai token mentah tanpa keterangan (komentar penjaganya, `label-otomatis.aturan.test.ts:167`), dan satuannya jatuh ke penurunan formula `satuanTarget` (`konfigurasi-otomatis-rules.ts:208-223`, `rata_rata` jadi `nilai`), sehingga target **persen** tampil bersatuan skor. Tak satu pun test merah.
+- **Pelajarannya: `METRIK_DIKENAL` hanya menjaga metrik yang SUDAH didaftarkan ke daftarnya.** Metrik yang lahir di backend tanpa ada yang menambahkannya ke daftar itu tak memerahkan apa pun, persis lubang yang dicatat di "Keadaan terukur" sejak 2026-08-26. Bentuknya pun sama dengan `piutang_lewat_14_persen`: metrik baru pada sumber yang **sudah** berlabel lengkap, sehingga penjaga tingkat sumber (`SUMBER_PRODUKSI`) tetap sah berbunyi lengkap. Lubangnya ditutup di PR frontend yang sama dengan dua metrik ADR 0102, bukan oleh penjaga yang berbunyi; bagi metrik backend berikutnya, penjaga ini tetap tak akan berbunyi.
 
 ## ⛔ Nama metrik menyiratkan ARAH, dan salah membacanya tak menimbulkan galat
 

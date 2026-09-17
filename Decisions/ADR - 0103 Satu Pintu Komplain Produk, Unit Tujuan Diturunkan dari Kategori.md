@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A). **Belum ada kodenya.** Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.
+> **Status**: 🟡 **Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A). **Keputusan 2 sisi register gudang (T9) merged 2026-09-17** (bip-erp #1957, erp-frontend #1634), terverifikasi DEV lewat gateway dan bundel frontend, **belum PROD**; keputusan lain belum ada kodenya. Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.
 
 ## Untuk Manajemen
 
@@ -79,6 +79,7 @@ Penggolongan manual atas 65 ulasan yang sama: gudang 11, mutu produk 13 (dugaan 
 1. **Satu pintu untuk semua komplain produk; pengaju memilih KATEGORI, bukan unit.** Kategori ditampilkan berkelompok per unit, dan sesudah dipilih unit tujuannya tampil sebagai keterangan yang tak bisa diubah. Pintu yang sama dipakai dari baris ulasan maupun tanpa ulasan.
 
 2. **Unit tujuan diturunkan dari register yang MEMILIKI kategori itu.** Tidak ada tabel pemetaan kategori ke unit dan tidak ada master kategori pusat: masing-masing register menerbitkan daftar kategori tertutupnya lewat endpoint baca, dan frontend menyusun pintunya dari keduanya. Satu fakta tetap tinggal di satu tempat, dan salinan tangan di frontend dihapus. ADR 0099 keputusan 1 (dua register, tanpa register ketiga) tetap berlaku.
+   - *Sisi register gudang (T9, merged 2026-09-17, bip-erp #1957 + erp-frontend #1634, belum PROD):* `GET /wms/komplain/kategori` membalas kode saja, berurutan, tanpa field unit (pemanggil tahu unitnya dari rute yang ia minta). Digerbang **identitas saja**, bukan gerbang baca komplain: kodenya tak rahasia, dan gerbang baca memaksa pemegang toko memanggil integration-service. Label ditulis frontend per kode (`warehouse.komplain.kategoriLabel.<kode>`); kode tanpa terjemahan tampil sebagai kodenya. Rinciannya di [[Microservices - Warehouse Service]].
 
 3. **Register QC mendapat daftar kategori tertutup, dan isinya ditetapkan tim QC.** Usulan awal dari penggolongan ulasan: `dugaan_tidak_asli`, `segel_terbuka`, `isi_tidak_sesuai`, `kedaluwarsa`. **Tingkat keparahan ditentukan QC saat validasi**, bukan ditebak pengaju.
 
