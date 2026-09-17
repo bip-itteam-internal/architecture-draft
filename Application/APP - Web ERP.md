@@ -214,7 +214,7 @@
 	- **Judul dialog jadi "Penilaian Pelatihan"** (en "Rate Training"; `id.ts:3802`, `en.ts:3638`), dulu "Nilai Trainer": dengan judul lama, angka 1-10 kesesuaian terbaca sebagai penilaian trainer.
 	- **Kunci `kesesuaian_materi` DIHILANGKAN bila tak dijawab**, bukan dikirim `null` atau `0` (`muatanPenilaian`, `evaluation/lib/agregat.ts:64-77`): bentuk tanpa kunci sama dengan klien lama yang diterima server, sedangkan 0 ditolak.
 	- **Blok "Kesesuaian materi dengan pekerjaan" di ringkasan penilaian per kelas** (halaman Pelatihan; `BlokKesesuaian`, `evaluation-summary-dialog.tsx:99-129`): jumlah responden kesesuaian ditampilkan sendiri, angka "dari 10" hanya bila server menandai `kesesuaian.ditampilkan`, selain itu kalimat "Kurang N responden lagi". Penandanya dibaca dari `kesesuaian`, bukan dari agregat trainer, sebab trainer bisa sudah terbuka dengan lima penilai sementara kesesuaian baru satu jawaban. Blok tak dirender bila server tak mengirim `kesesuaian` (`:191`), yaitu server lama dan ringkasan per trainer. ⛔ Blok sendiri, bukan aspek kelima: jangan dirata-rata bersama `rata_rata` trainer (komentar tipe `AgregatKesesuaian`, `evaluation/types.ts`).
-	- Pertanyaan yang sama di MyBharata belum ada (T7 ditunda); lihat [[HRIS - Training Program]].
+	- Pertanyaan yang sama di MyBharata merged ke `dev` lewat my-bharata [#156](https://github.com/bip-itteam-internal/my-bharata/pull/156) 2026-09-17, menunggu rilis store; lihat [[HRIS - Training Program]].
 
 ## Konvensi Data-Fetching (TanStack Query)
 
