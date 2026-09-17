@@ -262,9 +262,9 @@ Keluhan **marketing atas pekerjaan gudang packing**, sekaligus sumber KPI baris 
 | POST | `/wms/komplain` | marketing **ATAU pemegang toko** (`gerbangAjukanKomplain`) | Catat keluhan. 404 bila `order_id` tak ada di `fulfillment_orders`; 409 bila `(order_id, kategori)` sudah pernah dicatat; 400 + `kategori_tersedia` bila kategori di luar daftar; **403 bila pemanggil masuk lewat kepemilikan tetapi pesanannya milik toko lain** |
 | GET | `/wms/komplain` | peran gudang, marketing, **ATAU pemegang toko** (`gerbangBacaKomplain`) | Daftar; filter `periode` (`YYYY-MM`), `status`, `kategori`, `shop_ids`. Urut `dilaporkan_at` desc, **limit 1.000, tanpa paginasi** |
 | PUT | `/wms/komplain/:id/tindak-lanjut` | admin_gudang, leader, spv | Ubah `status` + `tindak_lanjut`. `selesai_at` diisi saat selesai/ditolak, **dihapus** saat dibuka kembali |
-| GET | `/wms/komplain/kategori` | 🟡 **branch, belum merged** · siapa pun beridentitas (`gerbangIdentitasKomplain`, tanpa peran) | Daftar kode kategori `{"data": ["salah_produk", ...]}`, berurutan, tanpa label dan tanpa unit. 401 tanpa `BIP-Employee-ID` atau tanpa kunci gateway. Isinya sama dengan `kategori_tersedia` pada balasan 400 POST |
+| GET | `/wms/komplain/kategori` | ✅ bip-erp [#1957](https://github.com/bip-itteam-internal/bip-erp/pull/1957) merged 2026-09-17, terverifikasi gateway DEV, belum PROD · siapa pun beridentitas (`gerbangIdentitasKomplain`, tanpa peran) | Daftar kode kategori `{"data": ["salah_produk", ...]}`, berurutan, tanpa label dan tanpa unit. 401 tanpa `BIP-Employee-ID` atau tanpa kunci gateway. Isinya sama dengan `kategori_tersedia` pada balasan 400 POST |
 
-**Kategori (daftar tertutup)**: `salah_produk` · `salah_jumlah` · `salah_alamat` · `rusak_kemasan` · `kurang_lengkap`. Konsumen membaca daftarnya dari `GET /wms/komplain/kategori` (setelah merged), bukan menyalin daftar di atas ([[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]] keputusan 2).
+**Kategori (daftar tertutup)**: `salah_produk` · `salah_jumlah` · `salah_alamat` · `rusak_kemasan` · `kurang_lengkap`. Konsumen membaca daftarnya dari `GET /wms/komplain/kategori`, bukan menyalin daftar di atas ([[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]] keputusan 2).
 **Status**: `baru` · `diproses` · `selesai` · `ditolak`.
 
 **Request body** `POST /wms/komplain`:
