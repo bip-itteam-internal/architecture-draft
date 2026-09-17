@@ -879,7 +879,7 @@
         "order.order-items-get"
       ],
       "hash": "40849a92b3a96565fbc789742e61b75e3bbd942b6d18b298c097028cfbd2659e",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab cara menarik daftar order dari Lazada Open API endpoint `/orders/get`, perbedaan filter waktu `created_after`/`created_before` (waktu order dibuat) vs `update_after`/`update_before` (waktu order berubah), dan kenapa window berbasis update penting sebagai jaring pengaman ketika webhook Lazada (LPM) mati. Juga mendokumentasikan jebakan status order-level yang bisa tertinggal dari status tracking sebenarnya.",
       "kata_kunci": [
         "Lazada",
@@ -1043,7 +1043,7 @@
       "publik": true,
       "tautan": [],
       "hash": "497247a0c9c610e80943a077bde9c90567fc50bc42af63aa9c14e09b4843c255",
-      "ukuran_kb": 1.9,
+      "ukuran_kb": 2.0,
       "ringkasan": "Menjawab pertanyaan detail field request/response endpoint TikTok Shop `return_refund.returns_search` (cari retur/refund seller) termasuk field apa saja yang tersedia (return_id, return_status, return_tracking_number, refund_amount, dst) dan bagaimana data ini mengisi `transaction_orders.return` di ERP. Berguna saat butuh tahu resi retur TikTok atau status retur per order sebelum mengubah kode integrasi.",
       "kata_kunci": [
         "TikTok Shop",
@@ -1095,7 +1095,7 @@
         "API - Integration Service"
       ],
       "hash": "a0d018cee900448cbe331f88333a05ce33b4c141be99d84538c0f91cf317251c",
-      "ukuran_kb": 2.9,
+      "ukuran_kb": 3.0,
       "ringkasan": "Menjawab bagaimana cara mencari detail endpoint TikTok Shop API yang belum terdokumentasi (urutan: cek Endpoints/Index dulu, lalu grep kode, WebSearch, terakhir minta user paste dari Partner Center), kenapa folder ini beda alur dari Shopee Open API v2 (TikTok tak punya backend doc publik yang bisa di-fetch skrip, portalnya SPA), dan bagaimana algoritma signing (`sign` HMAC-SHA256) serta auth (app_key, shop_cipher, access_token) dihitung untuk tiap request ke TikTok Shop.",
       "kata_kunci": [
         "TikTok Shop",
@@ -2858,19 +2858,19 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "cfdc99bff86a84a8615833947801db53718b9cb3c42cfd8d8b91beb457a96bd6",
-      "ukuran_kb": 59.6,
-      "ringkasan": "Menjawab: endpoint apa yang dimiliki payroll-service untuk konfigurasi BPJS, pajak PPh21 TER, komponen gaji, badan usaha penggaji, dan gaji per karyawan, serta bagaimana payroll run dihitung, disetujui, dan slip diterbitkan. Juga menjawab cara kerja potongan kehadiran, periode kehadiran, lingkup run, THR, PDF slip, impor run dari spreadsheet HRD, model data payroll_db, dan di mana aturan bisnis gaji dari Peraturan Perusahaan harus dicari.",
+      "hash": "05f6dbed12f0f1afa247ed8a785bb328f792d75788f6e6a186fd85702cba6e89",
+      "ukuran_kb": 60.1,
+      "ringkasan": "Menjawab: bagaimana payroll-service mengelola master komponen gaji, konfigurasi BPJS dan PPh21 TER, master badan usaha penggaji (kop slip), dan penetapan gaji per karyawan, serta bagaimana payroll run berjalan dari kalkulasi, approve, sampai slip dan PDF slip terbit. Juga menjelaskan potongan kehadiran (telat, izin, mangkir, uang makan), periode kehadiran, lingkup run (semua, karyawan, magang), THR, impor payroll run dari spreadsheet HRD, pembulatan BPJS, dan beban pemberi kerja untuk modul insentif. Menunjuk sumber aturan bisnis di BUSINESS_LOGIC_IMPLEMENTATION.md milik mybharata dan menerangkan arti company_id sebagai badan usaha penggaji, bukan tenant.",
       "kata_kunci": [
         "payroll",
         "penggajian",
         "slip gaji",
+        "payslip",
         "payroll run",
         "BPJS",
         "PPh21 TER",
-        "potongan kehadiran",
         "THR",
-        "komponen gaji",
+        "potongan kehadiran",
         "badan usaha"
       ]
     },
@@ -2880,7 +2880,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan), **sudah deploy dan terisi di produksi**. Sensus langsung `procurement_db` produksi **diukur prod 2026-09-12** (24 koleksi total): `pemasok` 139, `barang` 955, `pesanan_pembelian` 1.087, `penerimaan` 1.926, `faktur_pembelian` 2.055 (terakhir 2026-07-30), `permintaan_barang` 257, `katalog` 757, `kas_transaksi` 69, `pengajuan_budget` 1, `pengajuan_pembelian` 3 (modul LAMA, terakhir 2026-08-26, lihat bab Pengajuan Barang di bawah), `pengajuan_barang` 1 (modul BARU, 2026-09-02), `pembayaran` 0, `pengaturan_penyetuju_pembelian` 0. `pemasok` dan `barang` TIDAK berubah dari sensus 4 Agustus 2026 (masih 139/955; lihat catatan di §Belum Diimplementasikan). Frontend Master Pemasok, Barang & Jasa, dan ketiga tab Pembelian ada di `erp-frontend` (`src/features/procurement/`), lihat [[APP - Web ERP]].",
+      "status_teks": "Implemented (ada catatan), **sudah deploy dan terisi di produksi**. Sensus langsung `procurement_db` produksi **diukur prod 2026-09-12** (24 koleksi total): `pemasok` 139, `barang` 955, `pesanan_pembelian` 1.087, `penerimaan` 1.926, `faktur_pembelian` 2.055 (terakhir 2026-07-30), `permintaan_barang` 257, `katalog` 757, `kas_transaksi` 69, `pengajuan_budget` 1, `pengajuan_pembelian` 3 (modul LAMA, terakhir 2026-08-26, lihat bab Pengajuan Barang di bawah), `pengajuan_barang` 1 (modul BARU, 2026-09-02), `pembayaran` 0, `pengaturan_penyetuju_pembelian` 0. **Diukur ulang 2026-09-17**: `pesanan_pembelian` 1.093 dan `penerimaan` 1.936 (keduanya terbaru 2026-09-16), `katalog` 773, sedangkan `faktur_pembelian` (2.055, terbaru 2026-07-30), `kas_transaksi` (69, terbaru 2026-08-26), `pengajuan_barang` (1), dan `pembayaran` (0) tidak berubah. `pemasok` dan `barang` TIDAK berubah dari sensus 4 Agustus 2026 (masih 139/955; lihat catatan di §Belum Diimplementasikan). Frontend Master Pemasok, Barang & Jasa, dan ketiga tab Pembelian ada di `erp-frontend` (`src/features/procurement/`), lihat [[APP - Web ERP]].",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
@@ -2899,20 +2899,20 @@
         "Microservices - Integration Service",
         "Finance - FAT Persona"
       ],
-      "hash": "ebbafa9ed24a848322c2fb1865c22ebe3a374c9f567ed80a9dd54cefd85f0ce9",
-      "ukuran_kb": 53.6,
-      "ringkasan": "Menjawab: bagaimana procurement-service mengelola master pemasok dan barang yang disinkronkan ke Accurate Online, serta bagaimana Pesanan, Penerimaan, dan Permintaan Barang dicerminkan atau dibuat di ERP beserta persetujuannya. Juga menjawab alur Pengajuan Barang lima tipe sisi uang, tagihan dan faktur pemasok, pembayaran vendor, KPI Account Payable, worker sync dan import awal, penomoran, jebakan integrasi Accurate, serta gerbang RBAC modul procurement.",
+      "hash": "aacc2bd9f9dcaf9cec2e8f6e1f548696b653cba44e4be0a06cbcd10f490883b4",
+      "ukuran_kb": 54.3,
+      "ringkasan": "Menjawab: bagaimana master pemasok (vendor) dan barang & jasa diinput di ERP lalu disinkronkan ke Accurate Online, dan bagaimana Pesanan Pembelian, Penerimaan Barang, serta Permintaan Barang dicerminkan dari Accurate atau dibuat di ERP beserta persetujuannya. Juga menjelaskan Pengajuan Barang lima tipe sisi uang, tagihan dan faktur pemasok, pembayaran vendor dan bukti transfer, kas bank, aging utang, KPI Account Payable, penomoran, worker sync, import awal, port dan env service, serta jebakan integrasi Accurate.",
       "kata_kunci": [
         "procurement",
         "pengadaan",
         "pemasok",
         "vendor",
-        "barang dan jasa",
-        "Accurate",
         "purchase order",
         "penerimaan barang",
+        "Accurate",
         "faktur pembelian",
-        "account payable"
+        "account payable",
+        "pengajuan barang"
       ]
     },
     {
@@ -4844,7 +4844,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "1af925998c51daaf89f4b362162b5f8c117e3db82e37169cbfe7b2e6ed084c92",
-      "ukuran_kb": 6.5,
+      "ukuran_kb": 6.6,
       "ringkasan": "Menjawab: kenapa toko yang di-banned marketplace perlu bisa dinonaktifkan dari seluruh worker sync, kenapa statusnya disimpan di koleksi terpisah, aturan apa yang mengikat worker baru (wajib ListSyncableShops, fail-open, skip harus bersinyal), dan bagaimana auto-disable Tahap 2 bekerja (counter kegagalan auth beruntun, ambang 5, reset saat sukses, satu Telegram tanpa damper terpisah — bukti flapping 36009006). Live prod 2026-08-24; pemakaian perdana = disable toko Rainbow Care.",
       "kata_kunci": [
         "adr",
@@ -4982,7 +4982,7 @@
         "APP - Web ERP"
       ],
       "hash": "3405a3dc1516fe9eff90d36e5a1a47c8a876d2dbaf6bc9537105816d5897ee6d",
-      "ukuran_kb": 10.1,
+      "ukuran_kb": 10.2,
       "ringkasan": "Menjawab: bagaimana penyesuaian statement TikTok (tt_statement_adjustments, mayoritas ganti rugi paket hilang / LOGISTICS_REIMBURSEMENT yang bukan penggantian ongkir) dibukukan ke Accurate — dilipat ke payout pesanan yang disebutnya lalu diurus mesin receipt, bukan sebagai baris pendapatan tersendiri — dan bagaimana pesanan yang tak ditemukan ditangani. Live 26 Agustus 2026 (PR #1451).",
       "kata_kunci": [
         "adr",
@@ -5842,7 +5842,7 @@
         "External - Accurate"
       ],
       "hash": "88f3c03bd55060706f79617cace5e8835a2ecc4419733de53f3d0c971547bfe2",
-      "ukuran_kb": 14.9,
+      "ukuran_kb": 15.0,
       "ringkasan": "Menjawab: bagaimana koreksi faktur yang dinyatakan finance lewat Excel Rekap Lengkap diterjemahkan sistem ke tuas yang sudah ada (pindah hari, Mapping SKU, qty per unit, riwayat Harga Jual, gudang per pesanan), dan kenapa tidak ada override per baris faktur. Menjelaskan koreksi mana yang ditolak (sel Accurate Number kosong, FO, paket multi-komponen, faktur terkunci tertentu), kewajiban persetujuan untuk perubahan master-data, serta amandemen koreksi gudang yang memecah baris faktur per gudang.",
       "kata_kunci": [
         "koreksi faktur",
@@ -6741,7 +6741,7 @@
         "ADR - 0001 Akuntansi via Accurate"
       ],
       "hash": "25ab1b4ad3c7b5e6987da7013a762fca4e0b59b0066c3c33fc7f1fcc453f406e",
-      "ukuran_kb": 10.7,
+      "ukuran_kb": 10.8,
       "ringkasan": "Menjawab: bagaimana ERP menangani kompensasi Shopee yang cair lebih dari sekali per pesanan, mengapa cicilan kedua dst ditahan dari penerimaan otomatis Accurate, dan bagaimana tim AR mencatatnya lewat laman Kompensasi Cicilan dengan koreksi manual. Juga menjawab aturan pemilihan akun (diskon 4003 bila bulan sama, Pendapatan Lain-lain 8001 bila beda bulan), arti status MENUNGGU/TERTUNDA/SELESAI, dan peran kv shopee-compensation-susulan-hold-date.",
       "kata_kunci": [
         "kompensasi Shopee",
@@ -6847,7 +6847,7 @@
         "API - Integration Service"
       ],
       "hash": "9763c415885f93f6222c0d032538477cee71ae84e20b64ebfd3def47b17068a3",
-      "ukuran_kb": 6.0,
+      "ukuran_kb": 6.1,
       "ringkasan": "Menjawab: apa yang terjadi bila dokumen Penerimaan (Bukti Terima Kas) di Accurate isinya berbeda dari hitungan ERP, kenapa mekanisme penahanan EXTERNAL_EDIT lama tak pernah menutup lingkarannya, dan siapa yang memutuskan selisihnya. Juga menjawab: kenapa dokumen yang sudah selaras ditutup mesin tanpa manusia (draf jadi BASI), kenapa adopsi harus dihitung terhadap hitungan ERP sekarang bukan kiriman lama (untuk mencegah potongan ganda), di mana keputusan finance dipindahkan (modal detail Penerimaan dengan tabel tiga kolom rupiah, Kotak Adopsi jadi daftar lintas dokumen), dan kenapa labelnya dijaga netral \"Beda dengan Accurate\". Memuat konsekuensi terukur beserta batasan yang masih terbuka: Lazada belum punya kolom ketiga, pemindahan pelunasan ke akun GL belum punya tuas koreksi, dan endpoint Kotak Adopsi belum terdokumentasi.",
       "kata_kunci": [
         "penerimaan",
@@ -7554,7 +7554,7 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)**. Master anggaran, varians, dan kas kecil ada (kas kecil dipakai); varians belum bisa ditelusuri ke transaksi dan pertanggungjawaban dana kegiatan belum ada.",
+      "status_teks": "**Implemented (ada catatan)**. Master anggaran, varians, dan kas kecil ada; kas kecil pernah dipakai satu unit tetapi tidak ada transaksi baru sejak 2026-08-26 (diukur 2026-09-17); varians belum bisa ditelusuri ke transaksi dan pertanggungjawaban dana kegiatan belum ada.",
       "publik": true,
       "tautan": [
         "Finance - Proses Bisnis dan Kebutuhan Sistem",
@@ -7565,20 +7565,20 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Finance - FAT Persona"
       ],
-      "hash": "72945a9743006cab937059a8527fc85eaf7307bcc50e3fb4a33edea0d41a8515",
-      "ukuran_kb": 4.6,
-      "ringkasan": "Menjawab: bagaimana Finance mengendalikan pengeluaran terhadap anggaran (RAPB/OPEX), mengelola kas kecil per unit, dan mempertanggungjawabkan dana kegiatan sampai sisa dikembalikan atau kekurangan diganti. Menjelaskan fitur yang sudah ada di ERP (master anggaran, kartu Varians OPEX, forecast kas mingguan dan KPI forecast_kas), celah seperti varians yang tak bisa ditelusuri ke transaksi dan pertanggungjawaban dana kegiatan yang belum ada, serta kontrol dan ukuran efisiensinya.",
+      "hash": "0f9230f0560bcc29301d10c122e333d255032d358c730c0252a41d6ed6ee981e",
+      "ukuran_kb": 5.0,
+      "ringkasan": "Menjawab: bagaimana Finance mengerjakan proses anggaran, kas kecil, dan dana kegiatan hari ini, fitur ERP apa yang sudah menopangnya (master anggaran OPEX, kartu Varians OPEX, breakdown mingguan, forecast kas mingguan, kas kecil), dan seperti apa alur target di sistem. Juga menjelaskan celah yang harus ditutup (varians belum tertelusur ke transaksi, pengajuan belum membawa pos anggaran, pertanggungjawaban dana kegiatan, cakupan forecast kas), kontrol pemisahan tugas yang wajib dijaga, dan ukuran efisiensinya.",
       "kata_kunci": [
         "anggaran",
         "budget",
-        "RAPB",
-        "OPEX",
-        "varians anggaran",
         "kas kecil",
         "petty cash",
         "dana kegiatan",
+        "varians OPEX",
         "forecast kas",
-        "cash flow forecast"
+        "RAPB",
+        "Cost Control",
+        "P9"
       ]
     },
     {
@@ -7661,9 +7661,9 @@
         "Finance - Big Pictures",
         "Finance - Dashboard per Posisi (FAT)"
       ],
-      "hash": "9f335388771b70e86ca388b663ae755f7cecbc63ae84c58649d4d49fcfe22c34",
-      "ukuran_kb": 18.1,
-      "ringkasan": "Menjawab: apa saja empat belas proses bisnis Finance (P1 sampai P14), posisi Finance mana mengerjakan proses apa, dan seberapa jauh ERP sudah mencakup serta sesuai dengan kebutuhan tiap proses. Ini pintu masuk untuk memilih proses yang akan dibangun, urutan pengerjaan celah (kelompok A, B, C), pertanyaan wajib sebelum membangun, keputusan yang dibutuhkan, dan hal yang sengaja tidak dibangun.",
+      "hash": "add7a3c525df96c0e2b5787c98ac380b64e27d643cd26ddc407840be1b7c0e7c",
+      "ukuran_kb": 19.3,
+      "ringkasan": "Menjawab: proses bisnis Finance apa saja (P1 sampai P14) dan dok mana yang merinci tiap proses, posisi Finance mana (Supervisor FAT, Senior dan Junior Accountant, AR, AP, Cost Control, Tax) mengerjakan proses apa, serta seberapa jauh ERP sudah mencakup dan sesuai dengan kebutuhan tiap proses. Juga menjadi pintu masuk untuk prinsip rancangan, kelompok kebutuhan A/B/C, urutan pengerjaan dan ketergantungan termasuk buku besar 40 CV, pertanyaan wajib sebelum membangun, keputusan yang dibutuhkan, dan hal yang sengaja tidak dibangun.",
       "kata_kunci": [
         "proses bisnis Finance",
         "business process",
@@ -7672,8 +7672,8 @@
         "FAT",
         "cakupan ERP",
         "gap analysis",
-        "posisi Finance",
-        "urutan pengerjaan",
+        "celah",
+        "buku besar CV",
         "Accurate"
       ]
     },
@@ -7727,20 +7727,20 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Finance - FAT Persona"
       ],
-      "hash": "f067f260ef88d2aaa455976250970d34d0c98aaf891f0807ce81d7bf2a91c6b2",
-      "ukuran_kb": 3.2,
-      "ringkasan": "Menjawab untuk proses P7 (gaji dan iuran BPJS): bagaimana Finance menerima rekap gaji dan BPJS dari HR, memeriksanya per orang, lalu mengetik ulang pembayaran ke bank hari ini, dan apa yang sudah ada di Payroll Service (payroll per badan usaha, dasar upah BPJS, potongan kehadiran). Juga menjawab alur target sampai jurnal gaji otomatis, celah yang tersisa (daftar transfer bank, rekap iuran BPJS, jurnal gaji T7), kontrol pemisahan tugas, dan ukuran efisiensinya.",
+      "hash": "9c04e96b6d58ebf776b1d52573d7a4a9b46dc4d6f5f50ed6c798a6d32389c0f8",
+      "ukuran_kb": 3.4,
+      "ringkasan": "Menjawab: bagaimana rekap gaji dan data BPJS dari HR diperiksa dan dibayar Finance per badan usaha hari ini, apa yang sudah disediakan payroll ERP, dan seperti apa alur target sampai daftar transfer bank, rekap iuran BPJS, dan jurnal gaji otomatis. Juga menjawab celah apa yang harus ditutup (T7), kontrol pemisahan tugas antara penghitung dan pembayar gaji, serta ukuran efisiensi prosesnya.",
       "kata_kunci": [
-        "P7",
         "gaji",
         "payroll",
         "iuran BPJS",
-        "BPJS TK",
-        "salary",
-        "transfer bank gaji",
+        "daftar transfer bank",
         "jurnal gaji",
-        "rekap gaji HR",
-        "badan usaha"
+        "badan usaha",
+        "P7",
+        "salary",
+        "rekap gaji",
+        "PPh 21"
       ]
     },
     {
@@ -7766,20 +7766,20 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Microservices - Insentive Service"
       ],
-      "hash": "49d973405cf270226c3fe0ae7057952644ba84248c2763ed4226c8c0c863eacc",
-      "ukuran_kb": 6.0,
-      "ringkasan": "Menjawab: bagaimana insentif berbasis profit dihitung, ditetapkan targetnya, diperiksa, disetujui, dan dibayarkan, serta siapa yang boleh menetapkan target dan melihat beban karyawan. Menjelaskan fitur yang sudah ada (mesin insentif, Dashboard Insentif, Master Target, slip MyBharata), celah yang menahan pemakaian seperti atribusi toko ke ICC, beban non-gaji per proyek Accurate, dan target Leader, serta keputusan terbuka soal PPN, opex, dan jadwal bayar terhadap cutoff tanggal 25.",
+      "hash": "5cb7e0689bdca45c4d30b9f2f83e345d99ef30c821efd1986392f7059718c48a",
+      "ukuran_kb": 6.5,
+      "ringkasan": "Menjawab: bagaimana insentif berbasis profit dihitung (rumus profit, tarif bertingkat, gerbang retur, periode cutoff tanggal 25), siapa yang menetapkan target dan siapa yang boleh melihat beban karyawan, serta alur target dari master data sampai persetujuan, pembekuan periode, dan tampil di slip MyBharata. Juga menjawab master data apa yang belum lengkap (atribusi toko ke ICC, proyek Accurate, target Leader), keputusan Finance yang masih terbuka, dan kontrol yang wajib dijaga.",
       "kata_kunci": [
         "insentif",
         "incentive",
-        "insentif profit",
+        "profit",
         "target profit",
-        "Dashboard Insentif",
         "Master Target",
+        "Dashboard Insentif",
         "ICC",
-        "approval insentif",
-        "beban operasional",
-        "SK insentif"
+        "P12",
+        "opex",
+        "cutoff pencairan"
       ]
     },
     {
@@ -7788,7 +7788,7 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)**. Tax Control ada di kode; master jenis pajak dan kewajiban di prod masih kosong (2026-09-12), dan data acuan satu sumber belum ada.",
+      "status_teks": "**Implemented (ada catatan)**. Tax Control ada di kode; master jenis pajak dan kewajiban di prod masih kosong (diukur ulang 2026-09-17), dan data acuan satu sumber belum ada.",
       "publik": true,
       "tautan": [
         "Finance - Proses Bisnis dan Kebutuhan Sistem",
@@ -7803,20 +7803,20 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Finance - FAT Persona"
       ],
-      "hash": "b9b2882a1e412abe5f539ee8367d119d8b4fffafc55b2063cfa8521a1569bdf2",
-      "ukuran_kb": 4.0,
-      "ringkasan": "Menjawab: bagaimana proses pajak (P8) Finance dikerjakan hari ini lewat Coretax, kapan kode billing PPh 21, PPh 23, PPh 25, PPh final, dan PPN dibuat dan dibayar, serta apa yang sudah disediakan Tax Control di ERP (kewajiban per masa, pengingat H-7 dan H-3, unggah BPE). Juga menjawab celah yang harus ditutup: data acuan satu sumber untuk omzet dan pembelian, laporan keuangan untuk SPT tahunan, cut-off persediaan, kontrol pemisahan peran, dan ukuran efisiensinya.",
+      "hash": "34a006ca73c38133c879019274cf8fb06b3b48fa26297089b2590d830857b179",
+      "ukuran_kb": 4.1,
+      "ringkasan": "Menjawab: bagaimana Finance menyiapkan, mengekualisasi dengan Coretax, melaporkan, dan membayar pajak per masa (jadwal kode billing PPh final, PPh 21, PPh 23, PPh 25, PPN), apa yang disediakan Tax Control di ERP, dan bagaimana kewajiban tahunan seperti PPh Badan dilacak. Juga menjawab celah data acuan dan cut-off, sumber laporan keuangan untuk SPT tahunan, kontrol pemeriksa angka laporan, dan ukuran efisiensinya.",
       "kata_kunci": [
         "pajak",
         "tax",
         "Tax Control",
         "Coretax",
         "kode billing",
-        "PPh 21",
-        "PPN",
         "SPT tahunan",
+        "PPN",
+        "PPh",
         "ekualisasi",
-        "BPE"
+        "P8"
       ]
     },
     {
@@ -7825,7 +7825,7 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)**. Tahap transfer rekening PT dan kas CV, unggah dan pemeriksaan bukti, serta dokumen pembayaran ada di kode; belum dipakai di prod (0 dokumen pembayaran per 2026-09-12) dan jurnal otomatis buku CV 🟡 direncanakan.",
+      "status_teks": "**Implemented (ada catatan)**. Tahap transfer rekening PT dan kas CV, unggah dan pemeriksaan bukti, serta dokumen pembayaran ada di kode; belum dipakai di prod (0 dokumen pembayaran dan 1 Pengajuan Barang per 2026-09-17) dan jurnal otomatis buku CV 🟡 direncanakan.",
       "publik": true,
       "tautan": [
         "Finance - Proses Bisnis dan Kebutuhan Sistem",
@@ -7835,20 +7835,20 @@
         "Finance - Kalender dan Rantai Tenggat",
         "Finance - Sambungan dan Permintaan Data Lintas Departemen"
       ],
-      "hash": "f668fb78c353e3553a57d923901a24b21d219974b364d12f30c631e1ffbe72ea",
-      "ukuran_kb": 6.0,
-      "ringkasan": "Menjawab: bagaimana pembayaran keluar (P2) dari rekening PT dan kas CV dikerjakan hari ini (BKK Excel, AppSheet, Kopra, internet banking, bukti lewat WhatsApp) dan apa yang sudah ada di ERP (tahap setujui bayar dan transfer AP atau CV, unggah dan pemeriksaan bukti, dokumen pembayaran ke Accurate, saklar jurnal kas, pengingat jatuh tempo hutang pemasok). Juga menjawab alur target satu kali input, celah seperti notifikasi dokumen PENDING dan jurnal otomatis buku CV, pemisahan peran pelaksana transfer dan penyetuju, serta ukuran efisiensi termasuk KPI AP.",
+      "hash": "99a6a4559949ce6adf72195965433141e87ef44e43d07f33fc6ef94386541b90",
+      "ukuran_kb": 7.1,
+      "ringkasan": "Menjawab: bagaimana pembayaran keluar dari rekening PT dan kas CV dikerjakan hari ini (BKK, AppSheet, Kopra, internet banking, top up iklan), tahap ERP mana yang menangani transfer, unggah dan pemeriksaan bukti, dokumen pembayaran ke Accurate, dan jurnal kas. Juga menjawab kenapa pengingat jatuh tempo hutang pemasok tidak sampai ke AP dan bisa basi karena impor faktur Accurate manual, celah yang harus ditutup, pemisahan peran pelaksana, penyetuju, dan pemeriksa, serta ukuran efisiensinya.",
       "kata_kunci": [
         "pembayaran keluar",
         "outgoing payment",
-        "transfer",
         "kas CV",
+        "rekening PT",
         "BKK",
-        "bukti transfer",
         "hutang pemasok",
         "accounts payable",
         "AP",
-        "jatuh tempo"
+        "jatuh tempo",
+        "P2"
       ]
     },
     {
@@ -11203,7 +11203,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "31fe110178261ab5f65b917dc394e1b8a33130c02afadac9ef6f245e537148ad",
-      "ukuran_kb": 6.8,
+      "ukuran_kb": 6.9,
       "ringkasan": "Menjawab: apa yang terjadi pada faktur auto-sync Agustus 2026 yang isinya menyimpang dari ERP, berapa nilai kelebihan dan kekurangan catatnya, dan tindakan apa yang dijalankan untuk membersihkannya beserta bukti sebelum-sesudah. Menjelaskan rantai sebabnya, yaitu retry yang mengulang payload append sehingga menggandakan baris, lalu detektor perubahan eksternal yang menyangka kerusakan itu editan finance dan menahan penulisan sehingga kekurangan terus tumbuh. Memuat dua jebakan yang ditemukan di tengah jalan (bias saringan alat pemeriksa dan faktur berlabel RETURN_LOCKED yang melapor sukses padahal tak menulis apa pun) serta usul perbaikan berikutnya.",
       "kata_kunci": [
         "faktur",
@@ -12844,7 +12844,7 @@
         "External - Accurate"
       ],
       "hash": "526782f4478f447d6f83ea082ecdfc2526e7623bd22e5945d6509565be60a2d0",
-      "ukuran_kb": 11.4,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab: langkah demi langkah memperbaiki faktur Auto-Sync Accurate secara massal dengan mengunduh, menyunting, dan mengunggah kembali file Rekap Lengkap, termasuk kolom mana yang boleh disunting dan artinya. Menjelaskan prasyarat role, cara membaca pratinjau dan menyetujui perubahan master-data, cara verifikasi (unggah ulang tanpa suntingan harus 0 koreksi), serta arti pesan galat dan tindakannya.",
       "kata_kunci": [
         "import koreksi",
