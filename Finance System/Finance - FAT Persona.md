@@ -277,6 +277,7 @@ Rincian: [[Finance - Incentive]], [[ADR - 0079 Target Profit Satu Pintu di Insen
 
 ## Dokumen Terkait
 
+- [[Finance - Proses Bisnis dan Kebutuhan Sistem]]: panduan membangun sistem per proses bisnis, memakai praktik nyata di dok ini
 - [[Finance - Dashboard per Posisi (FAT)]] · [[Finance - Big Pictures]] · [[HRIS - Matriks KPI per Departemen]]
 - [[Finance - Kas Kecil dan Pengajuan Budget]] · [[Microservices - Procurement Service]] · [[API - Procurement Service]]
 - [[API - Finance Service]] · [[Finance - Rancangan Finance Service]] · [[Finance - Audit Internal]] · [[APP - Audit Internal]]
