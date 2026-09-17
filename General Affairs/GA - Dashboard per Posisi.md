@@ -45,14 +45,13 @@ Dari **24 metrik General Affair, sembilan terkunci pada satu hal yang sama**: ti
 
 ⚠️ **Nama posisi ini dipakai DUA peran berbeda dengan tulisan yang sama persis**: `Building & Maintenance` (4 metrik) dan `General Asset Staff` (5 metrik). Keduanya karena itu berbagi satu tab `ga` yang menggabungkan aset dan pemeliharaan. **Memisahkan lembarnya menuntut HR memecah nama posisi di master data lebih dulu**, dan itu bukan pekerjaan frontend.
 
-**Dinilai dari, peran Building & Maintenance:**
+**Dinilai dari, peran Building & Maintenance** (diukur ulang 2026-09-17: template aktif kini `Building and Maintenance Staff`, 3 metrik; rinciannya di [[HRIS - Matriks KPI per Departemen]]):
 
 | Bobot | Metrik | Sumber | Keadaan |
 |---:|---|---|---|
-| 0,3 | Realisasi preventive maintenance | modul checklist belum ada | ❌ |
-| 0,3 | Kecepatan menyelesaikan kerusakan | `inventory_db` | ❌ repair history KOSONG |
-| 0,25 | Efisiensi biaya maintenance | master anggaran belum ada | ❌ |
-| 0,15 | Daily report checklist | belum dipetakan | ❌ |
+| 0,3 | Realisasi preventive maintenance | modul checklist belum ada; space tiket tanpa tipe preventif | ❌ |
+| 0,35 | Menyelesaikan kerusakan (perbaikan berhasil ÷ total) | tiket space task-management `Building Maintenance`, sumber `kinerja_tiket` / `selesai_dinilai` | 🟡 branch 2026-09-17, belum merge; 9 tiket Juni-September, 6 masih Todo |
+| 0,35 | Efisiensi biaya maintenance | master anggaran belum ada | ❌ |
 
 **Dinilai dari, peran General Asset Staff:**
 
