@@ -4,6 +4,7 @@
 
 - **Implementasi**: [[Microservices - Recruitment Service]] · **Status**: ⚠️ BE Fase 1-3 + master ERPGo (A–F) + portal publik (browse/apply/track) + requisition se-departemen — increment 2026-07-16 deployed & terverifikasi live di dev. **Custom Questions dihapus** (#486/#342). **hire→karyawan** (endpoint `link-employee`, PR #490) **merged, belum deploy**. **Link Form Feedback Interview** (`GET /interviews`, panel/location, feedback hardening — PR #536/#381) **merged & dilaporkan ter-deploy dev** (2026-07-18).
 - **Rekrutmen lintas perusahaan** (`GET /companies`, `?company=`, `company_id`/`candidate_company_id`, gerbang `POST /requisitions` diperluas, `/apply` publik kini wajib `posting_id`): merged 2026-09-12 (bip-erp [#1853](https://github.com/bip-itteam-internal/bip-erp/pull/1853)), **live prod 2026-09-12** (Recruitment-Service dibangun ulang 07:32 WIB, gerbang biner lulus) dan terverifikasi lewat gateway dev; paket belum dipasang di prod (per 2026-09-12). Lihat bagian **Perusahaan** di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]].
+- **Bahan KPI (panggilan mesin)**: `GET /kpi/rekrutmen` & `GET /kpi/review-evaluasi`, digerbang **kunci layanan** `RECRUITMENT_SERVICE_KEY` (bukan izin modul) — merged 2026-09-18 (bip-erp [#1967](https://github.com/bip-itteam-internal/bip-erp/pull/1967)), **belum di-deploy dan env-nya belum diisi**. Lihat bagian **Bahan KPI (panggilan mesin)** di bawah.
 - **Konsumen publik**: [[APP - Portal Karir Bharata]]
 - ⚠️ **Cakupan verifikasi 2026-09-10**: yang diperiksa ulang ke `routes.go` pada pass ini **hanya** blok **Stages** (tahap/tes/background check) dan **Interview Rounds**. Blok lain (Candidate `PUT /advance`, Offer `/candidates/:id/offer*`) **belum** diperiksa dan sudah terlihat menyimpang dari `routes.go` — jangan diperlakukan sebagai grounded sampai di-sync tersendiri.
 - **Indeks**: [[API - Index]] · Role: `isSupervisor` (ajukan), `isHR`/`isHRSupervisor` (kelola/review **+ persetujuan final requisition** sejak 2026-07-22), `isApprover` (HR admin/Secretary — **tidak lagi dipakai di requisition**, masih dipakai untuk hire kandidat).
@@ -63,6 +64,51 @@
 - **Keputusan menutupi resign, bukan orang** (#1961): keputusan ber-`resign_id` hanya menyembunyikan resign itu, jadi resign ULANG orang yang sama sesudah batal tampil lagi. Keputusan LAMA tanpa `resign_id` menyembunyikan resign orang itu yang dibuat **≤ `diputus_pada`** (`keputusanMenutupi`); diukur prod 2026-09-17, keenam keputusan lama (2026-09-08) atas enam resign yang dibuat 2026-08-27..30 tetap tertutup tanpa migrasi data. employee-service lama (tanpa `resign_id`) = pencocokan per orang seperti sebelumnya.
 - **Izin baru berlaku sesudah login ulang** (dipanggang ke klaim JWT). Kill-switch enforcement dimatikan = tulis MPP kembali ke `isHRSupervisor` (tier hris supervisor, termasuk developer), dan staf rekrutmen bertier `hris:staff` ditolak; diterima user 2026-09-17 sebagai perilaku mode darurat.
 - Rincian desain dan urutan deploy: [[Microservices - Recruitment Service]] §Increment MPP Posisi Kosong per Resign.
+
+## Bahan KPI (panggilan mesin)
+
+> ⚠️ **Merged 2026-09-18** (bip-erp [#1967](https://github.com/bip-itteam-internal/bip-erp/pull/1967), merge commit `df81baba`) — **sudah di `main`, belum di-deploy** ke DEV maupun PROD, dan env `RECRUITMENT_SERVICE_KEY` **belum diisi di lingkungan mana pun**. Kunci kosong MENUTUP kedua rute, jadi sampai env-nya dipasang keduanya membalas `401` di mana pun mereka naik. Rincian desain: [[Microservices - Recruitment Service]] §Increment Bahan KPI Rekrutmen.
+
+| Method | Path | Gerbang | Fungsi |
+|---|---|---|---|
+| GET | `/kpi/rekrutmen?periode=YYYY-MM&company_id=&key=` | kunci layanan `RECRUITMENT_SERVICE_KEY` (query `key`) + `BIP-Gateway-ID` | Bahan pemenuhan requisition + cakupan buffer MPP satu perusahaan satu periode |
+| GET | `/kpi/review-evaluasi?company_id=&employee_id=A,B&key=` | sama | Status & waktu keputusan review masa evaluasi untuk daftar karyawan |
+
+- **Gerbang = kunci layanan, BUKAN izin modul** ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Rute izin modul menjawab "apa yang boleh dilihat ORANG INI"; ini panggilan **mesin** dari employee-service tanpa JWT yang menanyakan satu PERUSAHAAN. `key` kosong, salah, **atau kunci server yang belum dikonfigurasi** dibalas `401` (`GerbangKunciRekrutmen`, `kpi_rekrutmen.go:59-64`) — gagal tertutup, bukan terbuka.
+- ⚠️ **`ValidateGateway` global tetap berdiri di depan SEMUA rute service ini** (`main.go:70`; rutenya didaftarkan sesudahnya di `main.go:96`), jadi pemanggil wajib mengirim header `BIP-Gateway-ID` **juga** — kunci layanan tidak menggantikannya. Sisi pemanggil memasangnya dari `INTERNAL_GATEWAY_KEY` (`services/employee/kpi_sumber_rekrutmen.go:664`).
+- Path-nya `/kpi/...`, **bukan** `/recruitment/kpi/...`: gateway membuang prefiks `/api/recruitment` (`RegisterKPIRekrutmenRoutes`, `kpi_rekrutmen.go:363-368`).
+- **Parameter cacat dibalas `400` tanpa menyentuh data sama sekali** (dikunci `TestKPIRekrutmenParameterCacat400TanpaMembacaData`): `periode` bukan `YYYY-MM` (panjangnya salah **maupun** bulan yang tak terurai seperti `2026-13`), `company_id` kosong (**diminta eksplisit** — panggilan mesin tanpa JWT, dan perusahaan kosong akan diam-diam dibaca BIP), `employee_id` kosong/hanya koma, dan `employee_id` melebihi **200** per permintaan (balasannya menyertakan `maks`; batas TEKNIS panjang query string, bukan kebijakan — pemanggil memecah daftarnya, dan employee-service memecah per 100).
+- **`503` bila Mongo belum tersambung**, `500` untuk galat lain (`balasGagalBacaKPIRekrutmen`, `kpi_rekrutmen.go:370-377`). `503` sengaja dibedakan supaya pemanggil tahu ini keadaan sementara, bukan bahan yang memang kosong.
+- **Batas baca 12 detik** (`batasBacaKPIRekrutmen`), **sengaja lebih pendek** dari batas klien employee-service 15 detik (`klienRecruitment`, `kpi_sumber_rekrutmen.go:595`): kalau lebih panjang, pemanggil menyerah lebih dulu sementara kueri di sini masih jalan, dan yang dibaca pemanggil cuma "tak terjangkau" tanpa sebab.
+- **Seluruh array dikirim `[]`, tak pernah `null`** (dikunci `TestKPIRekrutmenArrayKosongBukanNull`). Konsumen membedakan "kunci hilang" (galat) dari "daftar kosong" (belum ada data); `null` meruntuhkan pembedaan itu — kelas yang sama dengan `"data": null` di [[API - Employee Service]].
+- **Tanpa nama orang** di kedua muatan: yang dikirim id, posisi, hitungan, dan waktu.
+
+### Muatan `/kpi/rekrutmen`
+
+`{"data": {periode, dari, sampai, requisisi[], requisisi_tanpa_jejak_persetujuan, diterima_tanpa_posting, coverage}}`. `dari`/`sampai` = `[awal bulan, awal bulan berikutnya)` dalam **WIB**, dikirim eksplisit.
+
+| Field | Isi |
+|---|---|
+| `requisisi[]` | `id`, `posisi`, `jumlah_dibutuhkan`, `disetujui_pada`, `kritikal` (bool), `diterima_pada[]` (waktu kandidat `Hired` yang tertaut lewat lowongan requisition itu, urut waktu). Urut `disetujui_pada` lalu `id` |
+| `requisisi_tanpa_jejak_persetujuan` | Cacah requisition `Approved`/`Posted` **tanpa** audit persetujuan yang mungkin berpengaruh ke periode ini |
+| `diterima_tanpa_posting` | Cacah kandidat `Hired` di periode ini yang tak punya lowongan, jadi tak tertaut ke requisition mana pun |
+| `coverage` | Cakupan buffer MPP **sudah jadi** (lihat di bawah) |
+
+- ⛔ **Waktu persetujuan diambil dari audit `requisition.approved`, bukan dari dokumen requisition**: requisition **tak punya** field `approved_at`, dan `updated_at`-nya tertimpa saat lowongan dibuka (`Posted`). Bila jejaknya tercatat **ganda** (mis. disetujui ulang), yang menentukan adalah yang **TERAWAL** (`kpi_rekrutmen.go:139-144`).
+- **Requisition tanpa jejak audit dihitung terpisah, tidak dikarang**: waktu persetujuannya mustahil diketahui, jadi ia tak dikirim sebagai baris — tapi jumlahnya disebut supaya pengecualiannya **tak senyap**. Yang dihitung hanya yang mungkin berpengaruh ke periode ini (`updated_at` tidak sebelum awal jendela **dan** `created_at` sebelum akhir periode); tanpa saringan itu requisition lama dari sebelum jejak audit ada akan muncul di Rincian **tiap bulan**.
+- **Jendela persetujuan 31 hari** sebelum awal periode (`jendelaPersetujuanHari`): cukup lebar untuk tenggat berapa pun yang jatuh di periode itu. Jendela ini **tidak** menentukan lolos/gagal.
+- ⛔ **Penanda `kritikal` mengikuti MPP TAHUN PERSETUJUAN**, bukan tahun periode KPI (`kpi_rekrutmen.go:182-187`, dikunci `TestRakitKPIRekrutmenKritikalMengikutiTahunPersetujuan`) — requisition yang disetujui Desember dinilai dengan MPP tahun itu walau skornya terbit Januari. Aturannya **satu sumber**, `kunciKritikal` (`mpp_coverage.go:83-91`), yang juga dipakai cakupan buffer: satu departemen menandai posisi kritikal sudah cukup, dan posisi bernama sama di perusahaan lain tak ikut kritikal.
+- ⛔ **`coverage` dikirim JADI, bukan bahan mentah.** Isinya sama persis dengan `GET /manpower-plans/coverage` (`tahun`, `semua`/`kritikal` ber-`jumlah_buffer`/`jumlah_rencana`/`persen`, `posisi_tanpa_padanan[]`, `per_posisi[]`) karena keduanya memanggil `muatCoverage` yang **sama** (`mpp_coverage.go:222-237`; layar lewat `manpowerCoverage`, KPI lewat `ambilBahanKPIRekrutmenMongo`). Tujuannya satu: angka di layar Manpower Planning dan angka KPI **tak pernah dihitung dua cara**. `persen` tetap `null` bila penyebutnya nol ("MPP belum disusun", beda arti dari 0%).
+- **TIDAK ADA angka target, tenggat, atau perhitungan nilai di rute ini** — slot, tenggat, dan persentase dihitung sumber KPI di employee-service, target diisi HR lewat template ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]). Cakupan buffer satu-satunya pengecualian, dengan alasan di butir atas.
+
+### Muatan `/kpi/review-evaluasi`
+
+`{"data": {"review": [{employee_id, status, diputus_pada}]}}`. `diputus_pada` **nullable** (`null` selama sesi belum `Decided`).
+
+- **Kode keputusan (`outcome`) sengaja TIDAK dikirim**: metrik yang memakainya menilai **KETEPATAN WAKTU** keputusan, bukan hasilnya. Mengirimkannya mengundang pemakaian yang tak pernah diputuskan.
+- Kueri dibatasi proyeksi `employee_id`/`status`/`decision.decided_at` dan disaring cakupan perusahaan yang diminta (`ambilReviewEvaluasiMongo`, `kpi_rekrutmen.go:332-350`).
+
+**Konsumen**: sumber KPI **`rekrutmen`** di [[Microservices - Employee Service]] (`services/employee/kpi_sumber_rekrutmen.go`), yang membaca kontrak muatan ini lewat test kontrak berliteral bersama — mengubah bentuk respons di sini tanpa memperbarui konsumennya membuat test di sana merah.
 
 ## Candidate
 | Method | Path | Fungsi | Role |
@@ -230,3 +276,4 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 ## Dokumen Terkait
 - [[Microservices - Recruitment Service]] · [[HRIS - Recruitment]] · [[Microservices - Employee Service]] · [[CORE - API Master Gateway]] · [[API - Index]]
 - [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] (rekrutmen lintas perusahaan, live prod 2026-09-12)
+- [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] (gerbang dan batas rute bahan KPI)

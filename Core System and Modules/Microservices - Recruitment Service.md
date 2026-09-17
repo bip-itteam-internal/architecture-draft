@@ -75,6 +75,7 @@
 
 ## Dependensi & Integrasi
 
+- [[Microservices - Employee Service]] — **arah sebaliknya sejak 2026-09-18**: employee-service memanggil service ini (`GET /kpi/rekrutmen`, `GET /kpi/review-evaluasi`) saat menghitung sumber KPI `rekrutmen`, langsung di dalam jaringan docker (bukan lewat gateway), digerbang `RECRUITMENT_SERVICE_KEY`. ⚠️ **Merged, belum deploy, env belum diisi** — lihat increment **Bahan KPI Rekrutmen** di bawah
 - [[Microservices - Employee Service]] — master posisi/departemen (`PositionTitle*`), cek duplikasi, **handoff `/onboarding/register`** saat hire. **(2026-09-11, live prod 2026-09-12)** + master `company` (`GET /master/companies`, dicache) untuk nama & validasi perusahaan tujuan, dan `/internal/mpp-vacancies` kini membawa `company_id`; lihat Increment **Rekrutmen Lintas Perusahaan** di bawah
 - [[Microservices - File Service]] — CV/berkas pelamar, report PDF psikotes, surat penawaran (MinIO)
 - [[Microservices - Notification Service]] — notifikasi internal (inbox/FCM) + **kandidat & pewawancara (interview User/Final) via Email/Resend** (`/email/send`, sudah dipakai) + WhatsApp (menyusul)
@@ -436,6 +437,59 @@ Sesi yang terjadwal sebelum fitur ini tersimpan **tanpa** field `status`, dan di
 - **BE sebelum FE** (perubahan kontrak). FE lama di atas BE baru tetap jalan: ketiga field tambahan diabaikan.
 - Belum diverifikasi lewat gateway di dev saat dokumen ini ditulis; itu gerbang `/wrap` yang masih terbuka.
 
+## Increment: Bahan KPI Rekrutmen (panggilan mesin, 2026-09-18 — ⚠️ merged, BELUM deploy)
+
+> ⚠️ **Status**: bip-erp [#1967](https://github.com/bip-itteam-internal/bip-erp/pull/1967) **merged 2026-09-18** (merge commit `df81baba`) — **sudah di `main`, belum di-deploy** ke DEV maupun PROD, dan env `RECRUITMENT_SERVICE_KEY` **belum diisi di lingkungan mana pun**. Jangan membacanya sebagai fitur yang hidup: sampai env-nya dipasang, kedua rute membalas `401` di mana pun binernya naik (kunci kosong menutup rute). Kontrak endpoint lengkap: [[API - Recruitment Service]] §Bahan KPI (panggilan mesin). Sisi pemanggil: sumber KPI `rekrutmen` di [[Microservices - Employee Service]].
+
+Dua rute BARU melayani metrik pemenuhan rekrutmen SPV HRD dan posisi Recruitment & Onboarding yang selama ini **diketik tangan**: pemenuhan requisition tepat waktu, cakupan database buffer MPP, dan keputusan review masa evaluasi.
+
+- `GET /kpi/rekrutmen?periode=YYYY-MM&company_id=&key=`
+- `GET /kpi/review-evaluasi?company_id=&employee_id=A,B&key=`
+
+### Gerbang: kunci layanan, bukan izin modul
+
+Rutenya **sengaja terpisah** dari rute HR yang digerbang izin modul, dan berkas kodenya pun terpisah (`services/recruitment/kpi_rekrutmen.go`): rute izin modul menjawab "apa yang boleh dilihat ORANG INI", sedangkan ini panggilan **MESIN** dari employee-service tanpa JWT yang menanyakan satu PERUSAHAAN.
+
+- `GerbangKunciRekrutmen` membandingkan query `?key=` dengan env `RECRUITMENT_SERVICE_KEY` (`shared-library/common/env.go:72-78,165`). Kunci salah, kosong, **maupun kunci server yang belum dikonfigurasi** → `401`. **Gagal tertutup**, dengan alasan yang sama seperti `ATTENDANCE_SERVICE_KEY` dan `LEARNING_SERVICE_KEY` ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]): header gateway BUKAN bukti, karena gateway memasang `BIP-Gateway-ID` untuk **setiap** permintaan ber-JWT.
+- ⚠️ **`ValidateGateway` global tetap berdiri di depan**: rutenya didaftarkan **sesudahnya** (`main.go:70` lalu `main.go:96`), jadi kunci layanan **menambah** gerbang, tidak menggantikannya — pemanggil wajib mengirim `BIP-Gateway-ID` juga (dipasang dari `INTERNAL_GATEWAY_KEY` di `services/employee/kpi_sumber_rekrutmen.go:664`).
+- Env dipasang di **dua blok** pada **kedua** berkas compose, dengan nilai yang sama — employee-service mengirim, recruitment-service memeriksa: `docker-compose.yml:293` & `:751`, `docker-compose.dev.yml:141` & `:527` — dan tercatat di `.env.example:241`. Nilai yang **berbeda** antara kedua blok = `401` yang terbaca seperti rute hilang, dan itu satu-satunya gejalanya.
+- `TestKPIRekrutmenDigerbangKunciLayanan` menguji keempat kombinasi untuk **kedua** path, dan kasus "kunci benar" dibuktikan lewat `503` (lolos gerbang, berhenti di penjaga DB nil) — bukan `200`, yang di test tanpa database tak bisa dibedakan dari gerbang yang sengaja dilewati.
+
+### Waktu persetujuan hanya ada di audit
+
+⛔ Requisition **tak punya** field `approved_at`, dan `updated_at`-nya **tertimpa** saat lowongan dibuka (`Posted`). Satu-satunya jejak waktu persetujuan adalah audit `requisition.approved` (`aksiRequisitionDisetujui`).
+
+- Jejak **ganda** (disetujui ulang) diselesaikan dengan mengambil yang **TERAWAL** — itu yang menentukan tenggat.
+- Requisition `Approved`/`Posted` **tanpa** jejak audit (audit ditulis best-effort, jadi ada yang tak punya) **tidak dikarang** waktunya: ia tak dikirim sebagai baris, hanya dicacah ke `requisisi_tanpa_jejak_persetujuan` supaya pengecualiannya tak senyap. Yang dicacah hanya yang **mungkin berpengaruh** ke periode itu (`updated_at` tidak sebelum awal jendela dan `created_at` sebelum akhir periode); tanpa saringan itu requisition lama dari sebelum jejak audit ada muncul di Rincian tiap bulan.
+- Jendela bacanya `jendelaPersetujuanHari` = **31 hari** sebelum awal periode: cukup lebar untuk tenggat berapa pun yang jatuh di periode itu, dan **tidak** menentukan lolos/gagal.
+
+### Satu aturan kritikal, satu rumus cakupan
+
+⛔ Penanda `kritikal` per requisition mengikuti MPP **TAHUN PERSETUJUAN**, bukan tahun periode KPI — requisition yang disetujui Desember dinilai dengan MPP tahun itu walau skornya terbit Januari (`TestRakitKPIRekrutmenKritikalMengikutiTahunPersetujuan`).
+
+- Aturannya diekstrak jadi **satu** fungsi, `kunciKritikal` (`mpp_coverage.go:83-91`), dipakai penanda requisition **dan** cakupan buffer. Satu departemen menandai posisi kritikal sudah cukup (ambang yang lebih ketat menang: melonggarkannya diam-diam lebih berbahaya daripada terlalu ketat), dan posisi bernama sama di perusahaan lain tak ikut kritikal.
+- **Cakupan buffer dikirim JADI**, bukan bahan mentah — satu-satunya perhitungan nilai di rute ini, dan sadar. Handler layar `GET /manpower-plans/coverage` kini memakai `muatCoverage` yang **sama** (`mpp_coverage.go:222-237`), yang memuat rencana + buffer lalu memanggil `hitungCoverage`. Ekstraksi ini (`muatCoverage`, `bufferPosisi` yang kini menerima `cakupanPerusahaan` alih-alih `*fiber.Ctx`) ada supaya angka di layar Manpower Planning dan angka KPI **tak pernah dihitung dua cara**.
+- **Selain itu tak ada angka target, tenggat, atau perhitungan nilai di berkas ini**: slot, tenggat, dan persentase dihitung sumber KPI di employee-service, target diisi HR lewat template ([[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]).
+
+### Batas waktu dan batas daftar
+
+- `batasBacaKPIRekrutmen` = **12 detik**, **sengaja lebih pendek** dari batas klien employee-service **15 detik** (`klienRecruitment`, `kpi_sumber_rekrutmen.go:595`). Kalau lebih panjang, pemanggil menyerah lebih dulu sementara kueri di sini masih jalan, dan yang dibaca pemanggil cuma "tak terjangkau" tanpa sebab.
+- `maksIDPerPermintaanKPIRekrutmen` = **200** `employee_id` per permintaan review evaluasi, batas **TEKNIS** (panjang query string) bukan kebijakan; pemanggil memecah daftarnya (employee-service per 100). Batasnya **inklusif** dan dikunci `TestReviewEvaluasiTepatBatasIDDilayani` — batas yang menyempit diam-diam baru terasa saat batch pemanggil dinaikkan.
+
+### Perakitan murni dan penjaga kontrak
+
+- `rakitKPIRekrutmen` dan `rakitReviewEvaluasi` **fungsi murni**; pembacaan Mongo dipisah ke `ambilBahanKPIRekrutmen`/`ambilReviewEvaluasi` yang berupa **variabel** supaya test dapat menggantinya. Penjaga `mongodb.DB == nil` ada di lapisan baca itu (`errDBRekrutmenBelumSiap` → `503`), jadi handler bisa diuji lewat `app.Test` tanpa database sama sekali.
+- **Kontrak muatan dikunci literal JSON**: `contohMuatanKPIRekrutmen` dan `contohMuatanReviewEvaluasi` (`kpi_rekrutmen_test.go`) dibaca test kontrak di `services/employee` (`kpi_sumber_rekrutmen_kontrak_test.go`), jadi mengubah bentuk respons tanpa memperbarui konsumennya membuat test di sana merah. ⚠️ Tiap field yang dibaca konsumen **wajib bernilai bukan nol** di literal itu (kritikal `true`, hitungan > 0, persen terisi): field bernilai nol yang kuncinya di-rename tetap terurai sebagai nol di konsumen, dan test kontraknya ikut **hijau**.
+- **Array selalu `[]`, tak pernah `null`** (`TestKPIRekrutmenArrayKosongBukanNull`): konsumen membedakan "kunci hilang" (galat) dari "daftar kosong" (belum ada data), dan `null` meruntuhkan pembedaan itu.
+- **Tanpa nama orang** di kedua muatan, dan kode keputusan review (`outcome`) sengaja tak dikirim karena metriknya menilai **ketepatan waktu**, bukan hasil keputusannya.
+
+### Catatan deploy (belum dijalankan)
+
+1. **Isi `RECRUITMENT_SERVICE_KEY` lebih dulu**, dengan nilai yang **sama** di blok employee-service dan recruitment-service. Tanpa itu kedua rute `401` dan metriknya dilaporkan gagal hitung menyebut nama env-nya — bukan skor nol yang menyesatkan.
+2. Naikkan **recruitment-service dan employee-service** (env baru = `docker compose up -d --force-recreate`, bukan `restart`; env dibaca saat container DIBUAT).
+3. **Gateway tidak perlu naik**: rutenya di bawah prefiks `/api/recruitment` yang sudah diteruskan, dan employee-service memanggilnya **langsung** di dalam jaringan docker, tidak lewat gateway. Tanpa koleksi baru, index baru, atau kategori inbox baru.
+4. **Gerbang verifikasi**: panggil kedua rute dari dalam jaringan docker dengan `key` benar + `BIP-Gateway-ID` → `200` berbentuk kontrak di atas, dan dengan `key` karangan → `401` (kontrol negatif; tanpa itu `200` tak membuktikan gerbangnya bekerja). `503` berarti binernya naik tapi Mongo belum tersambung, bukan kunci salah.
+
 ## Dokumen Terkait
 
 - [[HRIS - Recruitment]] — konsep/bisnis & keputusan HRD (pasangan dok ini)
@@ -444,3 +498,4 @@ Sesi yang terjadwal sebelum fitur ini tersimpan **tanpa** field `status`, dan di
 - [[Microservices - Employee Service]] · [[Microservices - Notification Service]] · [[Microservices - File Service]]
 - [[CORE - API Master Gateway]] · [[CORE - SSO Flow]]
 - [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] (rekrutmen lintas perusahaan, live prod 2026-09-12) · [[ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen]] · [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]
+- [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] (kunci layanan untuk panggilan mesin) · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] (batas antara pengumpul bahan dan penghitung skor)
