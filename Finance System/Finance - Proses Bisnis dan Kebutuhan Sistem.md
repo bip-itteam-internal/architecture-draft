@@ -59,21 +59,23 @@ Dua pertanyaan dijawab terpisah: apakah prosesnya **tercover** modul ERP, dan ap
 | Kode | Tercover di ERP | Sesuai kebutuhan | Inti alasannya |
 |---|---|---|---|
 | P1 | Ada | Sebagian | Rantai persetujuan sesuai; pengajuan belum membawa pos anggaran, kotak persetujuan Supervisor FAT belum memuatnya, jalur pajak, BPJS, dan hutang CV belum ada; hampir tak dipakai |
-| P2 | Ada (rekening PT dan kas CV) | Sebagian | Arah menghapus BKK dan AppSheet tepat; notifikasi pembayaran PENDING, saklar jurnal kas, dan jalur iklan lewat kas iklan belum; belum dipakai |
+| P2 | Ada (rekening PT dan kas CV) | Sebagian | Arah menghapus BKK dan AppSheet tepat; notifikasi pembayaran PENDING, saklar jurnal kas, dan jalur iklan lewat kas iklan belum; pengingat jatuh tempo membaca faktur hasil impor manual terakhir (dokumen terbaru 2026-07-30); belum dipakai (0 pembayaran per 2026-09-17) |
 | P3 | Sebagian | Sebagian | Sinkron marketplace ke Accurate menolong; penjualan dan penarikan per CV, kebutuhan utamanya, belum ada |
 | P4 | Sebagian | Kurang | Validasi di empat sumber masih manual, ada retur yang lolos sinkron, fitur pelacakan cancel dan retur disebut belum membantu |
 | P5 | Sebagian | Tidak sesuai | Layar rekonsiliasi kas toko tidak cocok dengan format kerja; impor mutasi bank belum ada |
 | P6 | PT lewat Accurate; CV belum | CV belum | Buku 40 CV masih di luar ERP dengan jurnal manual; T3 sampai T6 menunggu ADR 0096 |
-| P7 | Sebagian | Belum menjawab kebutuhan Finance | Perhitungan payroll ada; daftar transfer bank, rekap iuran BPJS, dan jurnal gaji belum; payroll baru dua kali dijalankan di prod |
+| P7 | Sebagian | Belum menjawab kebutuhan Finance | Perhitungan payroll ada; daftar transfer bank, rekap iuran BPJS, dan jurnal gaji belum; baru satu run payroll di prod per 2026-09-17 |
 | P8 | Ada (Tax Control) | Kurang | Hambatan utama (data acuan dan cut-off) tidak dijawab modul; master pajak di prod kosong |
-| P9 | Sebagian | Sebagian | Kas kecil dipakai; varians tidak bisa ditelusuri ke transaksi; pertanggungjawaban dana kegiatan belum ada |
+| P9 | Sebagian | Sebagian | Kas kecil pernah dipakai satu unit, tanpa transaksi baru sejak 2026-08-26; varians tidak bisa ditelusuri ke transaksi; pertanggungjawaban dana kegiatan belum ada |
 | P10 | Sebagian | Kurang | Laporan dibaca dari Accurate; daftar periksa tutup buku dan opname digital belum ada |
 | P11 | Belum | Belum | Seluruhnya di Excel dan WhatsApp |
-| P12 | Ada (mesin insentif, Dashboard, Master Target) | Sebagian | Mesin jalan; master data belum lengkap (atribusi toko, beban non-gaji per proyek, HPP), target Leader belum diisi, dan beberapa keputusan hitung masih terbuka |
+| P12 | Ada (mesin insentif, Dashboard, Master Target) | Sebagian | Mesin jalan; master data belum lengkap (atribusi toko, beban non-gaji per proyek, HPP), target Leader belum diisi, dan beberapa keputusan hitung masih terbuka; hasil insentif tersimpan terakhir 2026-07-10 |
 | P13 | Sebagian | Belum bisa dinilai | Aktiva tetap dibaca dari Accurate dan aset GA dipadankan; langkah kerja aset tetap di Finance tidak dirinci survei; register aset buku CV direncanakan |
 | P14 | Sebagian | Kurang | Umur piutang terbaca dan dinilai KPI otomatis; kontak, janji bayar, dan hasil penagihan dicatat di luar sistem; pemilik proses belum punya pemegang aktif |
 
 **Ringkasan**: 4 proses sudah ada di kode (P1, P2, P8, P12), 8 tercover sebagian (P3, P4, P5, P7, P9, P10, P13, P14), dan 2 belum (buku CV di P6, dan P11). Tidak ada proses yang sudah sesuai penuh sekaligus dipakai.
+
+**Pemakaian di prod, diukur 2026-09-17** (jumlah dokumen dan tanggal dokumen terbaru per koleksi, baca-saja; tanggal adalah saat dokumen dibuat, bukan terakhir diubah). **Jalan**: cermin pesanan dan penerimaan pembelian dari Accurate (terbaru 2026-09-16), data master payroll (180 data gaji, 41 badan usaha), pengisian target insentif (62, terbaru 2026-09-11). **Pernah dipakai, berhenti**: kas kecil (69 transaksi satu unit, terbaru 2026-08-26), hasil insentif tersimpan (terbaru 2026-07-10), impor faktur pemasok (terbaru 2026-07-30). **Ada di prod, kosong**: pembayaran (0), Pengajuan Barang (1), entitas dan pemegang CV (0), master dan kewajiban pajak (0), rekomendasi efisiensi (0). Payroll baru satu run (2026-09-03). Sinkron marketplace, piutang, dan anggaran di integration-service belum ikut diukur.
 
 **Penilaian pengguna** (*survei 2026-09*, digabung per sisi pekerjaan): peran di sisi data marketplace menilai ERP terbantu; peran di sisi pembayaran, buku CV, pajak, dan kendali anggaran menilai sedikit terbantu atau belum memakai ERP untuk pekerjaan Finance.
 
@@ -101,8 +103,8 @@ Dua pertanyaan dijawab terpisah: apakah prosesnya **tercover** modul ERP, dan ap
 
 | Kelompok | Arti | Isi |
 |---|---|---|
-| **A. Sudah ada, tinggal dipakai** | Tanpa kode baru; butuh keputusan, paket izin, data master, dan keterlibatan departemen lain | Pengajuan Barang dan pembayaran (P1, P2); Tax Control (P8); payroll oleh HR (P7); disiplin scan retur gudang (P4); master data insentif (P12); pemilik proses penagihan (P14) |
-| **B. Sudah ada, perlu diperbaiki** | Perubahan kecil sampai menengah pada modul yang ada | Pengajuan tersambung pos anggaran (P1, P9); kotak persetujuan memuat pengajuan barang (P1); notifikasi pembayaran PENDING (P2); format rekonsiliasi kas toko dan celah retur (P4, P5); varians yang bisa ditelusuri (P9); antrean hutang pemasok jatuh tempo (P2); persetujuan dan pembekuan periode insentif (P12) |
+| **A. Sudah ada, tinggal dipakai** | Tanpa kode baru; butuh keputusan, paket izin, data master, dan keterlibatan departemen lain | Pengajuan Barang dan pembayaran (P1, P2); Tax Control (P8); payroll oleh HR (P7); kas kecil dipakai lagi dan diperluas (P9); disiplin scan retur gudang (P4); master data insentif (P12); pemilik proses penagihan (P14) |
+| **B. Sudah ada, perlu diperbaiki** | Perubahan kecil sampai menengah pada modul yang ada | Pengajuan tersambung pos anggaran (P1, P9); kotak persetujuan memuat pengajuan barang (P1); notifikasi pembayaran PENDING (P2); format rekonsiliasi kas toko dan celah retur (P4, P5); varians yang bisa ditelusuri (P9); antrean hutang pemasok jatuh tempo dan faktur pemasok yang selalu mutakhir terhadap Accurate (P2); persetujuan dan pembekuan periode insentif (P12) |
 | **C. Belum ada, perlu dibangun** | Modul atau alur baru | Payroll ke bank, BPJS, dan jurnal gaji (T7); impor mutasi bank dan rekonsiliasi (T9); penjualan per CV (T8); buku besar CV, laporan, migrasi, jurnal otomatis (T3 sampai T6); daftar periksa tutup buku (T10); pertanggungjawaban dana kegiatan; costing HPP; laporan keuangan untuk SPT tahunan (P8); register aset dan penyusutan buku CV (P13); log kontak dan janji bayar penagihan (P14) |
 | **D. Sengaja tidak dibangun** | Di luar batas sistem | Lihat § Yang sengaja tidak dibangun |
 
