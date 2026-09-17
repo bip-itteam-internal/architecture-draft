@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-17",
-  "jumlah_dokumen": 444,
+  "jumlah_dokumen": 445,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -854,19 +854,19 @@
         "API - Integration Service",
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada"
       ],
-      "hash": "5d84385a88734e4bf2892d82c281fab35bf3b9f30f052349e6a548d803e349cb",
-      "ukuran_kb": 26.0,
-      "ringkasan": "Menjawab: apa saja endpoint warehouse-service (fulfillment events, operasi WMS approve/pick/pack/RTS/label/handover, master produk, toko gudang Sadewa, komplain gudang), role mana yang diizinkan tiap rute, serta bentuk request/response dan kode error yang bisa muncul.",
+      "hash": "4c6dfcacb35d8bfbe84ee35531d1de946d95221aec5fddced1633b6ffea9a9ae",
+      "ukuran_kb": 23.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di warehouse-service — event ingestion fulfillment, operasi WMS (queue, approve, pick, pack, RTS, cetak label, handover, dashboard), master produk, toko gudang Sadewa, dan komplain gudang — beserta method/path, role yang diizinkan, format request/response, dan kode error tiap endpoint. Juga menjawab bagaimana auth diberlakukan (gateway key BIP-Gateway-ID, role guard header BIP-System-Roles) dan pengecualian gerbang untuk rute komplain.",
       "kata_kunci": [
         "warehouse-service",
-        "fulfillment",
-        "API",
-        "endpoint",
         "WMS",
-        "komplain gudang",
+        "fulfillment",
+        "API endpoint",
         "resi",
         "arrange",
-        "handover",
+        "packing",
+        "komplain gudang",
+        "Sadewa",
         "role guard"
       ]
     },
@@ -1514,11 +1514,12 @@
         "ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
         "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
+        "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko",
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI",
         "API - Manufacture Service",
         "API - Warehouse Service",
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
-        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "Microservices - Notification Service",
         "API - Procurement Service",
         "CORE - API Master Gateway",
@@ -1531,20 +1532,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "94eeedff550dabab765186a1469fd26bf7db59f93fd5823a7191d4427cde9382",
-      "ukuran_kb": 515.9,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (erp-frontend), stack yang dipakai, bagaimana login, SSO identity provider, dan role gating `system_roles` menentukan menu yang terlihat, serta bagaimana menu HRIS dan Pengaturan HRGA dikelompokkan. Juga menjawab konvensi data-fetching TanStack Query, konvensi bagan Recharts/ChartContainer, fitur multi-perusahaan (company switcher, rekrutmen lintas perusahaan), dan daftar modul yang sudah maupun belum dibangun.",
+      "hash": "0962a6e8de5c8e36c05c0d2a744397ebad22077d3e84bde77fc711d23a6e4d2f",
+      "ukuran_kb": 519.6,
+      "ringkasan": "Menjawab: apa stack dan struktur portal web ERP (erp-frontend, \"One Bharata\"), bagaimana login, refresh token, dan SSO Identity Provider bekerja, serta bagaimana cookie system_roles (modul dan role) menggerbang sidebar dan menu. Juga menjawab cara menu dikelompokkan lewat induk bersarang (termasuk Pengaturan HRGA terpusat dan tab-tabnya), bagaimana fitur multi-perusahaan seperti CompanySwitcher dan rekrutmen lintas perusahaan tampil di web, serta konvensi data-fetching TanStack Query dan bagan Recharts yang wajib diikuti.",
       "kata_kunci": [
-        "Web ERP",
+        "web ERP",
         "erp-frontend",
         "One Bharata",
-        "hris-dashboard",
         "SSO",
         "system_roles",
-        "role gating",
         "sidebar menu",
-        "multi-tenant",
-        "TanStack Query"
+        "Pengaturan HRGA",
+        "multi-perusahaan",
+        "TanStack Query",
+        "Recharts"
       ]
     },
     {
@@ -1859,6 +1860,7 @@
         "REF - Alur Persetujuan",
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko",
         "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
         "Finance - Kas Kecil dan Pengajuan Budget",
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
@@ -1895,20 +1897,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "06e97d63a19c5cc691b8fecba1fb87cddf89e943cf47758e36ad358fc6eaee2d",
-      "ukuran_kb": 123.6,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp diatur lewat tiga sumbu (modul, tingkat aksi, cakupan data/reach), bagaimana paket hak (permission set) dipasang ke posisi/jabatan, dan bagaimana izin efektif diresolusi saat login lalu ditegakkan di gateway, service, dan frontend. Juga menjawab modul mana yang sudah berkatalog izin, apa itu fallback tier dan kill-switch fase dua, serta di berkas mana katalog didaftarkan.",
+      "hash": "a20752339ddb977977e99a83149fce511132d75a11896f741e17afcec3ed2495",
+      "ukuran_kb": 126.8,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp disusun dalam tiga sumbu (modul, tingkat aksi, cakupan data), apa itu paket hak (permission set) yang menempel pada posisi, dan bagaimana izin efektif di-resolve saat login ke klaim JWT lalu diteruskan gateway lewat BIP-Permissions. Juga menjawab katalog modul mana saja yang terdaftar dan di berkas mana mendaftarkannya, cara penegakan RequirePermission dan gate dengan tier fallback, endpoint katalog untuk frontend, serta riwayat fase dua yang dinyalakan lalu dicabut.",
       "kata_kunci": [
         "RBAC",
+        "hak akses",
         "permission set",
         "paket hak",
-        "hak akses",
-        "izin",
         "katalog izin",
-        "system_roles",
-        "reach",
+        "permission catalog",
         "tier fallback",
-        "Siapa Boleh Apa"
+        "BIP-Permissions",
+        "reach cakupan",
+        "Hak per Posisi"
       ]
     },
     {
@@ -3106,20 +3108,20 @@
         "IT - Background Jobs & Schedulers",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "b1e797b2fd8d8d3bffbc228895d000c2b399cc4d7d3d9ab8372cdc613ac39a5f",
-      "ukuran_kb": 44.7,
-      "ringkasan": "Menjawab: bagaimana arsitektur warehouse-service disusun (stack, port, database, env), bagaimana event ingestion, reconciler 60 detik (dengan cursor per status), dan open-order sweep bekerja, serta bagaimana gerbang akses role -- termasuk pengecualian admin_gudang_sadewa -- dan notifikasi komplain gudang diimplementasikan.",
+      "hash": "e9828fcd3da741f65d91c1ccea8925f49aba1421a367e3595274d0d6b5169329",
+      "ukuran_kb": 42.8,
+      "ringkasan": "Menjawab: bagaimana warehouse-service (WMS Tinggarjaya) menangani event ingestion order, reconciler sinkronisasi status pesanan, operasi gudang (approve/pick/pack/RTS/label/handover/dashboard), role guard termasuk mitra gudang Sadewa yang izinnya tidak diwarisi otomatis, serta bagaimana register komplain gudang (kategori, status, notifikasi) bekerja dan diakses lintas departemen.",
       "kata_kunci": [
         "warehouse-service",
-        "microservice",
+        "WMS",
+        "Tinggarjaya",
+        "fulfillment",
         "reconciler",
-        "state machine",
-        "status_wms",
+        "picking packing",
+        "RTS",
+        "label resi",
         "Sadewa",
-        "komplain gudang",
-        "notifikasi",
-        "arsitektur",
-        "fulfillment"
+        "komplain gudang"
       ]
     },
     {
@@ -6962,7 +6964,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A). **Keputusan 2 sisi register gudang (T9) merged 2026-09-17** (bip-erp #1957, erp-frontend #1634), terverifikasi DEV lewat gateway dan bundel frontend, **belum PROD**. **Keputusan 7 bagian `ditolak` (T10) merged 2026-09-17** (bip-erp #1965, erp-frontend #1641), terverifikasi DEV lewat gateway, **belum PROD**; bagian `dialihkan` menunggu T13. Keputusan lain belum ada kodenya. Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.",
+      "status_teks": "**Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A). **Keputusan 2 sisi register gudang (T9) merged 2026-09-17** (bip-erp #1957, erp-frontend #1634), terverifikasi DEV lewat gateway dan bundel frontend, **belum PROD**; keputusan lain belum ada kodenya. Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.",
       "publik": true,
       "tautan": [
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
@@ -6972,7 +6974,6 @@
         "QA - Deviation & CAPA",
         "ADR - 0002 Database-per-Service",
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
-        "API - Warehouse Service",
         "REF - Kepemilikan Data",
         "Microservices - Employee Service",
         "Microservices - Integration Service",
@@ -6981,19 +6982,20 @@
         "APP - MyBharata",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus"
       ],
-      "hash": "f29c9d3036bfec862cb1ddadf5ae308f6a9e3e0818fab844914b37f474e2a20b",
-      "ukuran_kb": 17.9,
-      "ringkasan": "Menjawab: mengapa komplain produk dipindah dari alur pilih-unit-tujuan menjadi satu formulir berbasis kategori, bagaimana unit tujuan diturunkan dari register pemilik kategori tanpa tabel pemetaan atau register ketiga, dan apa dampaknya ke KPI packer gudang saat komplain ditolak atau dialihkan.",
+      "hash": "a4390fdd64c89029cdb9cb95b7038fdcb7c1f1da80f436ffcc7d866a07eec257",
+      "ukuran_kb": 17.1,
+      "ringkasan": "Menjawab: kenapa dan bagaimana seluruh komplain produk (dari ulasan marketplace maupun tanpa ulasan) digabung jadi satu formulir dengan unit tujuan diturunkan otomatis dari kategori yang dipilih pengaju, bukan dipilih manual seperti keputusan sebelumnya. Juga menjawab apa yang berubah bagi pengaju dan unit penerima (ganti kategori, alih komplain ke unit lain, pemilahan kategori \"Lainnya\" oleh SPV brand), dampaknya ke KPI packer gudang, serta batasan yang sengaja tidak dijanjikan (nomor batch, kedaluwarsa, integrasi CAPA, ekspedisi/vendor).",
       "kata_kunci": [
+        "ADR 0103",
         "komplain produk",
         "satu pintu",
-        "ADR 0103",
         "kategori komplain",
-        "register gudang",
-        "register QC",
+        "unit tujuan",
         "KPI packer",
-        "ulasan marketplace",
-        "ganti kategori"
+        "quality complaint",
+        "register komplain",
+        "Kyura",
+        "Beauty Hacks"
       ]
     },
     {
@@ -7105,6 +7107,40 @@
         "department approver",
         "KPI Live Support",
         "live_support_karya"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko.md",
+      "judul": "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "✅",
+      "status_teks": "Diputuskan 2026-09-17, **merged, belum PROD**: bip-erp [#1963](https://github.com/bip-itteam-internal/bip-erp/pull/1963) (katalog, paket, registrasi) dan [#1964](https://github.com/bip-itteam-internal/bip-erp/pull/1964) (jalur izin di gerbang baca komplain gudang), erp-frontend [#1640](https://github.com/bip-itteam-internal/erp-frontend/pull/1640) (induk menu dan gerbang). DEV terukur lewat gateway 2026-09-17: modul `akuntoko` ada di `/master/permission-modules`, paket ter-seed dengan dua izinnya, dan akun uji tanpa peran gudang/marketing mendapat `GET /api/warehouse/wms/komplain` 403 tanpa paket, 200 `{\"data\":[]}` sesudah paket tingkat akun dipasang dan login ulang, lalu 403 lagi sesudah dicabut.",
+      "publik": true,
+      "tautan": [
+        "HRIS - Otomasi Skor KPI",
+        "CORE - RBAC dan Permission Set",
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
+        "CORE - API Master Gateway",
+        "APP - Web ERP",
+        "Sales - ICC Account Manager Mapping",
+        "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
+        "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada"
+      ],
+      "hash": "32b6075570c8f4539bc6ed6a836339c9fc3f4f19b683bd07d0d5213e49657fca",
+      "ukuran_kb": 8.3,
+      "ringkasan": "Menjawab: kenapa Account Specialist dan Marketplace Advertiser tidak bisa membuka Performa Saya, Ulasan, dan Komplain ke Gudang, dan kenapa aksesnya dibuka lewat modul izin akuntoko (akuntoko.performa.view, akuntoko.komplain.work, paket marketing_akuntoko_pemegang) yang dipasang HR ke posisi, bukan dengan menambah daftar peran. Juga menjawab kenapa prefiksnya bukan marketing, kenapa paket tidak dipecah dan Komplain ke QC tidak ikut, bagaimana menu dikelompokkan ke induk \"Pekerjaan Saya\" dan \"Kelola Tim\", urutan deploy, serta efek cache gateway saat paket dicabut.",
+      "kata_kunci": [
+        "akuntoko",
+        "pemegang akun toko",
+        "Account Specialist",
+        "Marketplace Advertiser",
+        "permission set",
+        "izin posisi",
+        "Pekerjaan Saya",
+        "komplain gudang",
+        "Performa Saya",
+        "ADR 0107"
       ]
     },
     {
@@ -13500,25 +13536,24 @@
         "Microservices - Insentive Service",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
+        "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko",
         "ADR - 0009 Affiliate via Search Seller Affiliate Orders API",
         "Sales - Incentive"
       ],
-      "hash": "d1a48ad8d32a989cb7350f638edf76f49a2d191ae033be8b65583d3fa760a1b9",
-      "ukuran_kb": 43.1,
-      "ringkasan": "Menjawab: bagaimana karyawan ICC (posisi HRIS, sebagian sudah berganti label jadi Account Specialist) dipetakan ke toko TikTok Shop dan akun TikTok Ads (advertiser) yang mereka kelola, termasuk model data `icc_account_mappings`, aturan kepemilikan (satu toko hanya satu karyawan aktif, satu advertiser boleh dipegang beberapa karyawan sekaligus), serta flow assign oleh SPV/leader, dashboard performa ICC, dan endpoint API-nya. Juga menjelaskan relasi leader dan akumulasi insentif (model lama vs model FE saat ini beserta gap-nya), jebakan pencocokan posisi lewat `position_key` vs label `position` setelah rename jabatan, pemisahan tab Marketplace Advertiser dari Toko & Iklan di halaman ICC Management, dan kenapa kartu \"Langsung di bawah SPV\" disembunyikan dari tab Toko & Iklan begitu kosong.",
+      "hash": "70040fbbcd94fb369ff5d4aa9b06b1dc870cb85fbeeac37e0093c1c4a8252c08",
+      "ukuran_kb": 44.4,
+      "ringkasan": "Menjawab: bagaimana karyawan ICC/Account Specialist dipetakan ke toko TikTok Shop dan akun TikTok Ads advertiser di koleksi icc_account_mappings, termasuk aturan satu toko satu pemegang aktif sementara satu advertiser boleh dipegang beberapa karyawan, dan dari mana field team diisi. Juga menjawab alur SPV membuat mapping, Performa Saya dan Team Performance, rotasi pemegang akun, endpoint /icc/mappings, relasi leader dan akumulasi insentif, tampilan kartu per leader di ICC Management, tab Marketplace Adv, serta jebakan rename posisi ICC ke Account Specialist lewat position_key.",
       "kata_kunci": [
         "ICC",
-        "Account Manager",
         "Account Specialist",
-        "TikTok Shop",
-        "TikTok Ads",
-        "advertiser",
+        "Account Manager",
         "icc_account_mappings",
+        "TikTok Shop",
+        "TikTok Ads advertiser",
+        "ICC Management",
+        "Performa Saya",
         "position_key",
-        "leader",
-        "Marketplace Advertiser",
-        "Langsung di bawah SPV",
-        "tanpa-leader"
+        "mapping toko"
       ]
     },
     {
@@ -15059,21 +15094,23 @@
         "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "APP - MyBharata",
         "APP - Web ERP",
-        "API - Warehouse Service",
-        "REF - Kepemilikan Data"
+        "REF - Kepemilikan Data",
+        "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko"
       ],
-      "hash": "d1096d1bfb2ae2a6e0dc5585f0d65eeaaa2fdab6a73a68d7dfab118cc8f7f8e4",
-      "ukuran_kb": 13.6,
-      "ringkasan": "Menjawab: daftar task teknis (T1 sampai T14) hasil /analisa-kebutuhan untuk fitur komplain dari ulasan marketplace, mana yang sudah selesai dan mana yang masih menunggu keputusan manajemen (K1 sampai K6), serta urutan pengerjaan revisi satu-pintu mengikuti ADR 0103.",
+      "hash": "430e683e23c1eb3009abb659e6a9d9297ec14a8919d8beac89a461220ab66e5f",
+      "ukuran_kb": 13.0,
+      "ringkasan": "Menjawab: task apa saja yang diturunkan dari kebutuhan mengubah ulasan marketplace jadi komplain yang dirutekan ke register gudang atau QC, termasuk kenapa master kategori komplain pusat dibatalkan dan apa arti revisi \"satu pintu\" (unit tujuan diturunkan dari kategori). Juga menjawab keputusan orang yang masih ditunggu (tujuan ekspedisi/vendor, kewajiban BPOM untuk efek tidak diinginkan, toko tanpa CS, kategori QC, perubahan KPI packer) serta rincian task backend dan frontend seperti rute baca /wms/komplain, notifikasi komplain gudang, dan tombol ajukan komplain dari baris ulasan.",
       "kata_kunci": [
-        "komplain",
-        "ulasan marketplace",
+        "komplain ulasan",
+        "review marketplace",
+        "komplain gudang",
+        "komplain QC",
+        "satu pintu",
+        "kategori komplain",
+        "register komplain",
+        "KPI packer",
         "analisa kebutuhan",
-        "daftar task",
-        "warehouse",
-        "QC",
-        "backlog",
-        "revisi satu pintu"
+        "Shopee ulasan"
       ]
     },
     {
