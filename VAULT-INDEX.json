@@ -594,7 +594,7 @@
       "area": "API Reference",
       "jenis": "api",
       "status_emoji": "⚠️",
-      "status_teks": "Grounded ke kode (2026-08-30: **keempat-puluh-dua route punya baris di dok ini**). ⚠️ **Enumerasi ulang 2026-09-12** (baris `app.Get|Post|Patch|Put|Delete(` di `services/marketing-analytics/` non-test yang bukan komentar): **53** di `origin/main`, **54** di branch Analisis Account Specialist yang menambah `GET /penanggung-jawab/analisis` (sudah punya baris di § Analisis Account Specialist, belum PR). Angka metode baris tak sebanding langsung dengan enumerasi sebelumnya di bawah. ⚠️ **Enumerasi ulang 2026-09-11**: `origin/main` kini **45 route**, dan `GET /icc/sla-chat` serta `GET /kpi/sla-chat-cs` (`routes.go`) belum punya baris di dok ini (di luar lingkup sync Analisis Live, perlu sync tersendiri). Analisis Live (bip-erp #1841, merged dan di PROD 2026-09-11) menambah `GET /lives/analisis` dan `GET /live-shifts/performa` (**47** saat merge; hitung ulang bila rute lain menyusul); keduanya sudah punya baris di bawah. Route ke-42 `GET /live-shifts/akun` (`live_shift_akun.go`) ditambahkan ke dok ini 2026-08-30; ia sudah ada di `origin/main` tetapi terlewat dari audit 2026-08-27, sehingga dok ini dan [[Microservices - Marketing Analytics Service]] sempat sama-sama menulis \"lima route\" untuk keluarga `/live-shifts` yang sebenarnya enam. Route ke-41 `/kpi/kinerja-live` masuk lewat PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486) (merged 2026-08-27); **status deploy belum diverifikasi — merged bukan deployed**. Sebelumnya 12 route tak terdokumentasi sama sekali; daftarnya + cara audit ulangnya ada di bagian **Cara mengaudit kelengkapan daftar ini** di kaki dokumen. ⚠️ **`GET /divisi` pindah sumber ke `department_shops` 2026-08-29** (fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]], PR [#1520](https://github.com/bip-itteam-internal/bip-erp/pull/1520) & [#1522](https://github.com/bip-itteam-internal/bip-erp/pull/1522)) — jumlah route tetap 41, tapi maknanya berubah; lihat baris `/divisi` di bawah. **Merged, belum di-deploy/diverifikasi lewat gateway.** ⚠️ **Lima rute ambil alih** ([[ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift]] §2) sudah punya baris di §Ambil alih sesi, dan kodenya di PROD sejak 2026-09-12 08:55 WIB (bip-erp [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855)), tetapi belum masuk hitungan di atas; hitung ulang pada enumerasi berikutnya. 🟡 **Tujuh rute setoran karya Live Support** (enam `/live-support/*` + `GET /kpi/karya-live-support`, branch `feat/marketing-analytics-karya-live-support`, **belum merged** per 2026-09-17) sudah punya baris di § Setoran karya Live Support dan § Pengumpul KPI, tetapi belum masuk hitungan mana pun di atas.",
+      "status_teks": "Grounded ke kode (2026-08-30: **keempat-puluh-dua route punya baris di dok ini**). ⚠️ **Enumerasi ulang 2026-09-12** (baris `app.Get|Post|Patch|Put|Delete(` di `services/marketing-analytics/` non-test yang bukan komentar): **53** di `origin/main`, **54** di branch Analisis Account Specialist yang menambah `GET /penanggung-jawab/analisis` (sudah punya baris di § Analisis Account Specialist, belum PR). Angka metode baris tak sebanding langsung dengan enumerasi sebelumnya di bawah. ⚠️ **Enumerasi ulang 2026-09-11**: `origin/main` kini **45 route**, dan `GET /icc/sla-chat` serta `GET /kpi/sla-chat-cs` (`routes.go`) belum punya baris di dok ini (di luar lingkup sync Analisis Live, perlu sync tersendiri). Analisis Live (bip-erp #1841, merged dan di PROD 2026-09-11) menambah `GET /lives/analisis` dan `GET /live-shifts/performa` (**47** saat merge; hitung ulang bila rute lain menyusul); keduanya sudah punya baris di bawah. Route ke-42 `GET /live-shifts/akun` (`live_shift_akun.go`) ditambahkan ke dok ini 2026-08-30; ia sudah ada di `origin/main` tetapi terlewat dari audit 2026-08-27, sehingga dok ini dan [[Microservices - Marketing Analytics Service]] sempat sama-sama menulis \"lima route\" untuk keluarga `/live-shifts` yang sebenarnya enam. Route ke-41 `/kpi/kinerja-live` masuk lewat PR [#1479](https://github.com/bip-itteam-internal/bip-erp/pull/1479) & [#1486](https://github.com/bip-itteam-internal/bip-erp/pull/1486) (merged 2026-08-27); **status deploy belum diverifikasi — merged bukan deployed**. Sebelumnya 12 route tak terdokumentasi sama sekali; daftarnya + cara audit ulangnya ada di bagian **Cara mengaudit kelengkapan daftar ini** di kaki dokumen. ⚠️ **`GET /divisi` pindah sumber ke `department_shops` 2026-08-29** (fase Contract [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]], PR [#1520](https://github.com/bip-itteam-internal/bip-erp/pull/1520) & [#1522](https://github.com/bip-itteam-internal/bip-erp/pull/1522)) — jumlah route tetap 41, tapi maknanya berubah; lihat baris `/divisi` di bawah. **Merged, belum di-deploy/diverifikasi lewat gateway.** ⚠️ **Lima rute ambil alih** ([[ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift]] §2) sudah punya baris di §Ambil alih sesi, dan kodenya di PROD sejak 2026-09-12 08:55 WIB (bip-erp [#1855](https://github.com/bip-itteam-internal/bip-erp/pull/1855)), tetapi belum masuk hitungan di atas; hitung ulang pada enumerasi berikutnya. 🟡 **Tujuh rute setoran karya Live Support** (enam `/live-support/*` + `GET /kpi/karya-live-support`, branch [#1954](https://github.com/bip-itteam-internal/bip-erp/pull/1954) `feat/marketing-analytics-karya-live-support`, **belum merged** per 2026-09-17) sudah punya baris di § Setoran karya Live Support dan § Pengumpul KPI, tetapi belum masuk hitungan mana pun di atas.",
       "publik": true,
       "tautan": [
         "Microservices - Marketing Analytics Service",
@@ -612,8 +612,8 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "fbc0ab557155fe54dbd799ef465cb242d558c716c6de7ea3dfe6dcab434c7c21",
-      "ukuran_kb": 62.1,
+      "hash": "40f9845cf98a214e9ccc4a9ecaf906209e95bc84d366f74fbed59a07ce152a91",
+      "ukuran_kb": 62.2,
       "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service, apa bentuk parameter dan amplop responsnya (rows, unavailable_channels, kolom_tidak_berlaku, paginasi limit/offset, total -1 = cacah gagal), dan endpoint mana yang digerbang RequireMarketingLeader. Juga menjawab: bagaimana vonis laba di /beranda ditentukan (lima nilai: tanpa_data, belum_matang, rugi, waspada, sehat), bagaimana ambang keputusan (roas_min, cpa_maks) dan pagu belanja iklan ditetapkan secara append-only/effective-dated, serta apa arti nilai null (tak terhitung, bukan nol). Memuat pula rute pencatatan sesi live host, ambil alih sesi, price floor, job/penjadwal, pengumpul KPI, dan prosedur mengaudit ulang kelengkapan daftar rute terhadap kode. Menjawab pula bentuk body `POST /live-shifts` yang menerima `pendukung[]` dan ceklis `kesiapan`, serta `GET /kpi/kesiapan-live` untuk KPI Live Support. Menjawab pula rute setoran tema & teaser Live Support (`/live-support/toko`, setor, `/saya`, `/antrean`, perbaiki, keputusan) beserta kode galatnya, dan `GET /kpi/karya-live-support` tanpa parameter department.",
       "kata_kunci": [
         "marketing analytics",
@@ -1528,8 +1528,8 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "820124831415023cd47d018d6187c74f7ac449c63d4ad871b064952f337bd6ef",
-      "ukuran_kb": 504.7,
+      "hash": "450c92c375b67690691368a8a17ff919695d0ba038c21196d737f6f4db2f99f8",
+      "ukuran_kb": 504.8,
       "ringkasan": "Menjawab: apa itu portal web One Bharata (erp-frontend), stack yang dipakai, bagaimana login, SSO, dan role gating sidebar lewat cookie system_roles bekerja, serta bagaimana menu HRIS dan Pengaturan HRGA dikelompokkan. Juga menjawab fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), konvensi data-fetching TanStack Query dan bagan Recharts, serta modul apa saja yang ada dan belum ada di web ERP. Menjawab pula induk menu Live Support (ambangSarang 2) dengan halaman Setor Tema & Teaser dan Tinjau Setoran, izin cerminnya, badge antrean, dan cacat yang ditemukan saat verifikasi layar.",
       "kata_kunci": [
         "web ERP",
@@ -2265,8 +2265,8 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "2b44acc2a11de011c7598d446b4676f130fe13af8118f1b7c19ba457c5e4e3a0",
-      "ukuran_kb": 176.9,
+      "hash": "1c84d7da4623d839d485a9ec13915ee82462b22df781a2da97b644c27c5c192b",
+      "ukuran_kb": 177.0,
       "ringkasan": "Menjawab: apa peran employee-service sebagai master data karyawan dan sumber kebenaran autentikasi (login username/employee_id, PIN, biometric, refresh token, onboarding/registrasi), serta data KPI, kontrak, BPJS, dan kuota cuti yang dikelolanya. Juga menjawab endpoint admin akun untuk IT (status aktif, forget-device, hard reset, system roles), CRUD master departemen dan system role beserta siapa yang boleh mengubahnya, dan register non-Accurate yang di-host di service ini (Legal, R&D Regulatory, Quality, Procurement) dengan gerbang izinnya. Menyinggung pula cakupan multi-perusahaan (tenant), akun pihak luar (vendor/mitra), dan resign/non-aktif karyawan. Menjawab pula sumber KPI kesiapan_live dan karya_live_support untuk Live Support, termasuk kenapa reduksi karya memakai jumlah_nilai, nol disetujui sah, dan setoran menunggu disebut di Catatan.",
       "kata_kunci": [
         "employee service",
@@ -2734,7 +2734,7 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "ee65ce8e5b83a746478e7e323f6d0579bdf50e07a9c4d634f09066dfca1a73a3",
+      "hash": "be7355b0e4e4e53e89b8f462b53b335e19df00a48d6b4e48867bbda1e735052d",
       "ukuran_kb": 152.9,
       "ringkasan": "Menjawab: bagaimana service agregasi laba dan performa marketing bekerja, kenapa ia menyimpan pre-agregasi ke koleksi mart_* sendiri alih-alih menghitung ulang tiap request, dan bagaimana akses baca-saja ke integration_db dijaga tiga lapis (tipe reader, uji AST anti-penulisan, read preference secondaryPreferred). Juga menjawab: kenapa /health turun jadi degraded bila index unik gagal dibuat, bagaimana vonis laba /beranda diturunkan (termasuk riwayat empat iterasi aturan belum_matang dan alasan butuh ambang materialitas), serta kenapa angka hanya dijumlahkan dari level shop. Memuat penjadwal 48 jam, job sync, koleksi dan channel (TikTok, Shopee, Lazada), alokasi bundel dan mapping SKU, aturan larangan hitung ganda antar kolom (iklan_sia_sia, pembatalan, gmv live, per_orang), catatan kejujuran data, serta pencatatan sesi live host beserta ambil alih dan tutup otomatis. Menjawab pula ceklis kesiapan siaran dan Live Support yang bertugas di `live_shifts` (`pendukung[]`, `kesiapan`, daftar-izin `dokumenLiveShift`) serta endpoint `/kpi/kesiapan-live` beserta arti field `sesi_berceklis` dan `toko_diminta`. Menjawab pula register setoran tema & teaser Live Support (`live_support_karya`): gerbang jabatan dan penyetuju departemen via employee-service, periode bulan setor WIB, tautan teaser unik, notifikasi keputusan lewat AppRoute, dan `/kpi/karya-live-support`.",
       "kata_kunci": [
@@ -2825,8 +2825,8 @@
         "DB - Overview and Notes",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "c4b3f4c148b112281103bec053922cbd5f1f3db6d15f85c7ddc8f36bd673c966",
-      "ukuran_kb": 25.6,
+      "hash": "7a9e49609c50922492f9bcd3e382daf81c016235bd22d242c91326c1d620ceeb",
+      "ukuran_kb": 25.8,
       "ringkasan": "Menjawab pertanyaan tentang bagaimana notifikasi dikirim ke berbagai channel (inbox in-app, push FCM browser/ponsel, WhatsApp, splash promotion, article) dari satu notification-service, termasuk daftar endpoint, aturan paginasi inbox yang opt-in, kategori inbox sebagai daftar-izin, dan mekanisme fan-out push dua kanal yang dipusatkan dari satu titik pengiriman (/inbox/send). Juga menjelaskan gerbang keamanan (header BIP-Gateway-ID + service key) dan urutan deploy yang mengikat sejak fan-out push dipusatkan. Menjawab pula bagaimana tombol tujuan dan tautan push diturunkan dari AppRoute lewat aturan web route, serta kategori per fitur seperti komplain gudang dan live-support-karya-decided beserta kewajiban deploy bersama.",
       "kata_kunci": [
         "notification-service",
@@ -7080,7 +7080,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "Diputuskan dan dikodekan, **belum merged dan belum deploy** (2026-09-17). Kode di tiga branch: bip-erp `feat/marketing-analytics-karya-live-support` (marketing-analytics, notification-service, shared-library), bip-erp `feat/employee-karya-live-support` (employee-service), erp-frontend `feat/live-support-karya`. Test hijau di ketiganya; layar diverifikasi di Chrome atas hasil build dengan stub API. Belum pernah dipanggil lewat gateway mana pun.",
+      "status_teks": "Diputuskan dan dikodekan, **belum merged dan belum deploy** (2026-09-17). Kode di tiga branch: bip-erp [#1954](https://github.com/bip-itteam-internal/bip-erp/pull/1954) `feat/marketing-analytics-karya-live-support` (marketing-analytics, notification-service, shared-library), bip-erp [#1955](https://github.com/bip-itteam-internal/bip-erp/pull/1955) `feat/employee-karya-live-support` (employee-service), erp-frontend [#1632](https://github.com/bip-itteam-internal/erp-frontend/pull/1632) `feat/live-support-karya`. Test hijau di ketiganya; layar diverifikasi di Chrome atas hasil build dengan stub API. Belum pernah dipanggil lewat gateway mana pun.",
       "publik": true,
       "tautan": [
         "Microservices - Marketing Analytics Service",
@@ -7097,8 +7097,8 @@
         "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "a50913c10457ba82044c67d7c2cf2db476f7c0b46aa0e307067f907290a4a7ff",
-      "ukuran_kb": 8.4,
+      "hash": "9946f60322a1ccb00df54b88031d00ffd277299061dec6c426254d738f389757",
+      "ukuran_kb": 8.6,
       "ringkasan": "Menjawab: bagaimana tema host live dan teaser Live Support dinilai untuk KPI, yaitu disetor per karya dengan tautan bukti di web ERP lalu disetujui atau ditolak penyetuju departemen penyetor, dan hanya yang disetujui dihitung. Menjelaskan kenapa bukan penilaian diri, Form Builder, atau data video TikTok, kenapa periodenya bulan setor pertama, bagaimana penolakan diperbaiki, dan kenapa marketing-analytics kini memanggil employee-service (menyimpang dari ADR 0101 §3). Juga menjawab risiko yang terbuka: departemen tanpa penyetuju, setoran yang menunggu saat skor dibekukan, dan gerbang menu Tinjau yang cermin.",
       "kata_kunci": [
         "ADR 0106",
