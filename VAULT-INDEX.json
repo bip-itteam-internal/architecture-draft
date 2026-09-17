@@ -2116,20 +2116,20 @@
         "CORE - HRIS Orchestrator",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "b3fc57e1f5270d8f71ef1cdf04e889f6b0ff0987f4553eb3f11df800eb875c41",
-      "ukuran_kb": 54.0,
-      "ringkasan": "Menjawab: apa tanggung jawab attendance-service (clock-in/out multi-metode, resolusi dan rotasi jadwal, cuti, perjalanan dinas, guestbook, hari libur, laporan untuk payroll) dan di mana aturan jam kerja, ambang telat, serta sanksinya ditetapkan (dokumen Peraturan Perusahaan di repo mobile). Menjelaskan rute integrasi seperti rekap telat untuk usulan SP, rekap kedisiplinan untuk KPI, jadwal-resolusi dan status-tap untuk Sesi Live Host, serta cara kunci layanan dan header gateway bekerja bersama. Juga memuat catatan multi-perusahaan, schedule-list hibrida per perusahaan, dan dependensi service.",
+      "hash": "4aaa149bdcb5c2a598d6012c629d3e2f7d805beaba92e2c7f9fe494f401adbcf",
+      "ukuran_kb": 56.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki attendance-service (clock-in/out, registry data type, jadwal kerja dan rotasi shift, WiFi kantor, leave, perjalanan dinas, guestbook, hari libur, laporan), bagaimana `schedule-list` di-resolve per perusahaan, dan di mana aturan jadwal, ambang telat, serta sanksi sebenarnya diatur (BUSINESS_LOGIC_IMPLEMENTATION.md di repo mobile). Juga menjawab bagaimana service lain memanggil rute internal seperti `/internal/jadwal-resolusi`, `/internal/status-tap`, `/internal/late-recap` untuk usulan SP1, dan `/kpi/attendance` untuk KPI kedisiplinan, termasuk gerbang `ATTENDANCE_SERVICE_KEY` yang tetap mewajibkan header `BIP-Gateway-ID` dan batas periode 26 ke 25 dari `rentangPeriodeTelat`.",
       "kata_kunci": [
-        "attendance-service",
+        "attendance service",
         "absensi",
         "presensi",
-        "jadwal kerja",
-        "rotasi shift",
-        "late recap",
-        "rekap telat",
-        "surat peringatan",
+        "clock-in clock-out",
+        "jadwal kerja shift rotasi",
+        "late recap SP1",
         "KPI kedisiplinan",
-        "ATTENDANCE_SERVICE_KEY"
+        "cron pengingat notifikasi presensi",
+        "jadwal-resolusi status-tap sesi live",
+        "WiFi kantor networks"
       ]
     },
     {
@@ -8176,23 +8176,20 @@
         "HRIS - Attendance Correction",
         "HRIS - Tukar Jadwal Kerja"
       ],
-      "hash": "ba98039371b19ac83248588f79715a308ae8fd65646adc7804a49143955eed0d",
-      "ukuran_kb": 13.6,
-      "ringkasan": "Menjawab: bagaimana presensi karyawan direkam (mesin fingerprint Solution X105, aplikasi mobile dengan face recognition, geolocation dan geofencing WiFi), serta bagaimana HR melihat dan menyaringnya di layar Kelola Kehadiran per bulan kalender dan per departemen. Menjelaskan perilaku kartu ringkasan di atas tabel: aturan pembanding bulan berjalan versus bulan selesai, penanganan periode kosong atau masa depan, dan mengapa kartu kalender tak boleh memakai rentang siklus payroll 26→25. Juga merinci rencana kartu Terlambat yang bersumber dari buku tamu (kejadian unik, bukan baris) beserta rumus persentase kehadiran berbasis keterlambatan, dan menegaskan kartu itu bukan daftar kandidat SP karena usulan SP dihitung terpisah dari status entri atas siklus payroll.",
+      "hash": "bff24464927b65d552671265c489418bec36ff0c68f16e2f0cd2d769d5e914fd",
+      "ukuran_kb": 14.2,
+      "ringkasan": "Menjawab: bagaimana sistem presensi karyawan dirancang (mesin fingerprint Solution X105 dengan listener pyzk sebagai fallback, aplikasi mobile dengan face recognition, geolocation, dan geofencing WiFi dalam radius 50 m), serta bagaimana layar attendance HRIS menyaring data per bulan kalender dan departemen. Juga menjawab bagaimana kartu ringkasan membandingkan bulan berjalan vs bulan selesai, kenapa kartu Terlambat bersumber dari buku tamu security dan bukan status entri (dan bedanya dengan hitungan kandidat SP berbasis siklus payroll 26 ke 25), rumus persentase kehadiran berbasis keterlambatan, serta ambang dan toleransi keterlambatan yang juga mengikat cron.",
       "kata_kunci": [
-        "attendance",
-        "kehadiran",
+        "attendance system",
         "presensi",
         "absensi",
-        "fingerprint",
-        "Solution X105",
-        "geofencing",
-        "terlambat",
-        "late",
-        "kelola kehadiran",
-        "HRIS",
-        "toleransi keterlambatan",
-        "SP"
+        "fingerprint Solution X105",
+        "face recognition geofencing",
+        "ringkasan kehadiran bulanan",
+        "kartu terlambat guestbook",
+        "pengingat belum absen",
+        "persentase kehadiran",
+        "toleransi keterlambatan"
       ]
     },
     {
@@ -10458,7 +10455,7 @@
         "CORE - API Master Gateway"
       ],
       "hash": "c7ebd8bab72d4cbee92013e9fdc120e2ba1f5c6f8798f80799aa8dc2d8ea38fe",
-      "ukuran_kb": 10.7,
+      "ukuran_kb": 10.8,
       "ringkasan": "Menjawab: seberapa lengkap dan sejauh mana progres 19 item checklist ERP manajemen untuk Marketing dan Integration menurut kode per 17 Sep 2026, item mana yang observasinya keliru atau salah tafsir menu (Laba per Level, Engagement, PO Barang Jadi, Teams, Inventories), dan usulan status Selesai/Dalam Proses/Revisi/Belum Mulai/Tidak Relevan per item. Juga mencatat temuan keamanan Integration secara umum (rincian di issue privat), menu yang belum masuk checklist, keputusan manajemen yang dibutuhkan, dan dok vault yang tertinggal.",
       "kata_kunci": [
         "audit checklist ERP",
