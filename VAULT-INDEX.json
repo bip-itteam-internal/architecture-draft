@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-17",
-  "jumlah_dokumen": 418,
+  "jumlah_dokumen": 419,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -115,6 +115,7 @@
         "HRIS - Disciplinary (Surat Peringatan)",
         "API - Attendance Service",
         "ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web",
+        "ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "Microservices - Integration Service",
@@ -122,9 +123,9 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "21ef87eb36219830c8ca3f6ab052eaefcb2dfb54c451aa0c70f75f0688c90742",
-      "ukuran_kb": 65.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service lewat gateway `/api/employee/*`, mulai dari login (password/PIN/biometric) dan onboarding, CRUD personal data, work data, dokumen, dan jadwal, sampai master departemen, system role, jenjang jabatan, dan penetapan penyetuju pengajuan. Menjelaskan gerbang RBAC tiap rute (`RequireHRISStaff`, `RequireITStaff`, `RequireHRISOrITSupervisor`, `RequireKPIDepartmentRBAC`), arti `grouped=true` dan `all=true` pada `/data-type/*`, serta rute internal lintas-service seperti `/internal/department-approver` dan `/internal/permission-holders`. Dipakai saat perlu tahu path, method, gerbang izin, dan kontrak respons sebelum memanggil atau menambah rute di service ini.",
+      "hash": "80936a839e04cb7b99d1928f2769d6147f76c06434db5a615c2886835e5ba66e",
+      "ukuran_kb": 65.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service lewat gateway `/api/employee/*`, mulai dari login (password/PIN/biometric) dan onboarding, CRUD personal data, work data, dokumen, dan jadwal, sampai master departemen, system role, jenjang jabatan, dan penetapan penyetuju pengajuan. Menjelaskan gerbang RBAC tiap rute (`RequireHRISStaff`, `RequireITStaff`, `RequireHRISOrITSupervisor`, `RequireKPIDepartmentRBAC`), arti `grouped=true` dan `all=true` pada `/data-type/*`, serta rute internal lintas-service seperti `/internal/department-approver` dan `/internal/permission-holders`. Dipakai saat perlu tahu path, method, gerbang izin, dan kontrak respons sebelum memanggil atau menambah rute di service ini. Memuat juga daftar `type` sah untuk `GET /list`, termasuk `host-live-candidate` dan `live-support-candidate` untuk pemilih sesi live.",
       "kata_kunci": [
         "employee-service",
         "API endpoint",
@@ -134,8 +135,8 @@
         "RBAC",
         "work data",
         "penyetuju pengajuan",
-        "data-type",
-        "gateway"
+        "GET /list type",
+        "live-support-candidate"
       ]
     },
     {
@@ -603,15 +604,16 @@
         "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus",
         "ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel",
+        "ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
         "APP - MyBharata",
         "Microservices - Employee Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "ded18a7e1354f276e949de6516f0dfbcd169a6050a5abcbb75a37856b6110dc7",
-      "ukuran_kb": 56.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service, apa bentuk parameter dan amplop responsnya (rows, unavailable_channels, kolom_tidak_berlaku, paginasi limit/offset, total -1 = cacah gagal), dan endpoint mana yang digerbang RequireMarketingLeader. Juga menjawab: bagaimana vonis laba di /beranda ditentukan (lima nilai: tanpa_data, belum_matang, rugi, waspada, sehat), bagaimana ambang keputusan (roas_min, cpa_maks) dan pagu belanja iklan ditetapkan secara append-only/effective-dated, serta apa arti nilai null (tak terhitung, bukan nol). Memuat pula rute pencatatan sesi live host, ambil alih sesi, price floor, job/penjadwal, pengumpul KPI, dan prosedur mengaudit ulang kelengkapan daftar rute terhadap kode.",
+      "hash": "fea8c9e5dc991b2fa3ffb2e06c7f754a4a182608bc229a69956183bfb54575c7",
+      "ukuran_kb": 58.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service, apa bentuk parameter dan amplop responsnya (rows, unavailable_channels, kolom_tidak_berlaku, paginasi limit/offset, total -1 = cacah gagal), dan endpoint mana yang digerbang RequireMarketingLeader. Juga menjawab: bagaimana vonis laba di /beranda ditentukan (lima nilai: tanpa_data, belum_matang, rugi, waspada, sehat), bagaimana ambang keputusan (roas_min, cpa_maks) dan pagu belanja iklan ditetapkan secara append-only/effective-dated, serta apa arti nilai null (tak terhitung, bukan nol). Memuat pula rute pencatatan sesi live host, ambil alih sesi, price floor, job/penjadwal, pengumpul KPI, dan prosedur mengaudit ulang kelengkapan daftar rute terhadap kode. Menjawab pula bentuk body `POST /live-shifts` yang menerima `pendukung[]` dan ceklis `kesiapan`, serta `GET /kpi/kesiapan-live` untuk KPI Live Support.",
       "kata_kunci": [
         "marketing analytics",
         "endpoint",
@@ -619,10 +621,10 @@
         "beranda",
         "ambang",
         "roas_min",
-        "cpa_maks",
         "pagu iklan",
-        "kurva alokasi",
-        "live shift"
+        "live shift",
+        "kesiapan siaran",
+        "kpi kesiapan-live"
       ]
     },
     {
@@ -2218,6 +2220,7 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "DB - Overview and Notes",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
+        "ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support",
         "Microservices - Form Builder Service",
         "ADR - 0066 Modul Kelola Program Culture",
         "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
@@ -2251,20 +2254,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "23d34e5508ac0311d54043168971a05da03027be1e2e1cb912f89a0149fd641c",
-      "ukuran_kb": 167.9,
-      "ringkasan": "Menjawab: apa tanggung jawab employee service sebagai master data karyawan dan sumber autentikasi (login username/employee_id, PIN, biometric, refresh token, onboarding register), endpoint admin akun untuk IT (reset, forget-device, roles, status aktif), dan master data departemen serta system roles. Juga menjawab register yang menumpang di service ini (Legal, R&D Regulatory, Quality, kontrak dan saving Procurement), serta pengelolaan KPI, kontrak, BPJS, kuota cuti, resign/non-aktif, akun pihak luar, dan cakupan multi-perusahaan.",
+      "hash": "9caf4d12da2ae5bf55ad4b0ca94c204338d6f8c17f7614aad115253e7caddfe9",
+      "ukuran_kb": 172.0,
+      "ringkasan": "Menjawab: apa tanggung jawab employee service sebagai master data karyawan dan sumber autentikasi (login username/employee_id, PIN, biometric, refresh token, onboarding register), endpoint admin akun untuk IT (reset, forget-device, roles, status aktif), dan master data departemen serta system roles. Juga menjawab register yang menumpang di service ini (Legal, R&D Regulatory, Quality, kontrak dan saving Procurement), serta pengelolaan KPI, kontrak, BPJS, kuota cuti, resign/non-aktif, akun pihak luar, dan cakupan multi-perusahaan. Mencatat sumber KPI otomatis yang menumpang di sini, termasuk `kesiapan_live` untuk posisi Live Support (penjaga posisi dua lapis, persen null jadi galat) dan daftar type `GET /list`.",
       "kata_kunci": [
         "employee service",
         "master karyawan",
         "login",
         "autentikasi",
-        "onboarding",
         "system_roles",
         "master department",
-        "reset akun",
         "resign",
-        "legal register"
+        "sumber KPI",
+        "kesiapan_live",
+        "Live Support"
       ]
     },
     {
@@ -2679,10 +2682,11 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **53 baris pendaftaran rute** di berkas produksi `origin/main` (enumerasi ulang 2026-09-12 dengan metode baris, lihat § Endpoint; enumerasi sebelumnya 45 pada 2026-09-11 dan 41 pada audit 2026-08-26, tak sebanding langsung; branch Analisis Account Specialist menambah satu, belum PR). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD dan dipakai host sejak 2026-09-09** (catatan lama \"0 dokumen\" dicoret 2026-09-11, lihat § Belum Diimplementasikan). Sejak 2026-09-11 klien pencatatnya hanya MyBharata: halaman web Sesi Live Host dihapus ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]; erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11, di PROD sejak 2026-09-12 lewat image `frontend-hris` 07:35 WIB).",
+      "status_teks": "Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **53 baris pendaftaran rute** di berkas produksi `origin/main` (enumerasi ulang 2026-09-12 dengan metode baris, lihat § Endpoint; enumerasi sebelumnya 45 pada 2026-09-11 dan 41 pada audit 2026-08-26, tak sebanding langsung; branch Analisis Account Specialist menambah satu, belum PR). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD dan dipakai host sejak 2026-09-09** (catatan lama \"0 dokumen\" dicoret 2026-09-11, lihat § Belum Diimplementasikan). **Sejak 2026-09-17 di PROD**: `live_shifts` menerima ceklis kesiapan siaran + Live Support yang bertugas, dan rute baru `GET /kpi/kesiapan-live` (di luar hitungan 53 baris di atas yang bertanggal 2026-09-12) melayani KPI posisi Live Support ([[ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support]]). Sejak 2026-09-11 klien pencatatnya hanya MyBharata: halaman web Sesi Live Host dihapus ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]; erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11, di PROD sejak 2026-09-12 lewat image `frontend-hris` 07:35 WIB).",
       "publik": true,
       "tautan": [
         "Sales - Marketing Dashboard (Master Roadmap)",
+        "ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support",
         "ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus",
         "Microservices - Integration Service",
         "ADR - 0002 Database-per-Service",
@@ -2694,11 +2698,11 @@
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel",
+        "APP - MyBharata",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
         "ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift",
         "Microservices - Attendance Service",
-        "APP - MyBharata",
         "ADR - 0052 Status Sinkron per Toko",
         "Sales - ICC Affiliate Mapping",
         "IT - Background Jobs & Schedulers",
@@ -2716,20 +2720,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "35240389edb8edf9b1645efeb4ed5092825037c631ba50db9b4d5b404192be9a",
-      "ukuran_kb": 141.6,
-      "ringkasan": "Menjawab: bagaimana service agregasi laba dan performa marketing bekerja, kenapa ia menyimpan pre-agregasi ke koleksi mart_* sendiri alih-alih menghitung ulang tiap request, dan bagaimana akses baca-saja ke integration_db dijaga tiga lapis (tipe reader, uji AST anti-penulisan, read preference secondaryPreferred). Juga menjawab: kenapa /health turun jadi degraded bila index unik gagal dibuat, bagaimana vonis laba /beranda diturunkan (termasuk riwayat empat iterasi aturan belum_matang dan alasan butuh ambang materialitas), serta kenapa angka hanya dijumlahkan dari level shop. Memuat penjadwal 48 jam, job sync, koleksi dan channel (TikTok, Shopee, Lazada), alokasi bundel dan mapping SKU, aturan larangan hitung ganda antar kolom (iklan_sia_sia, pembatalan, gmv live, per_orang), catatan kejujuran data, serta pencatatan sesi live host beserta ambil alih dan tutup otomatis.",
+      "hash": "8c6dcf00eaec911c335a4490863dd572c136c94099a90679cd15a4370316ab1e",
+      "ukuran_kb": 146.7,
+      "ringkasan": "Menjawab: bagaimana service agregasi laba dan performa marketing bekerja, kenapa ia menyimpan pre-agregasi ke koleksi mart_* sendiri alih-alih menghitung ulang tiap request, dan bagaimana akses baca-saja ke integration_db dijaga tiga lapis (tipe reader, uji AST anti-penulisan, read preference secondaryPreferred). Juga menjawab: kenapa /health turun jadi degraded bila index unik gagal dibuat, bagaimana vonis laba /beranda diturunkan (termasuk riwayat empat iterasi aturan belum_matang dan alasan butuh ambang materialitas), serta kenapa angka hanya dijumlahkan dari level shop. Memuat penjadwal 48 jam, job sync, koleksi dan channel (TikTok, Shopee, Lazada), alokasi bundel dan mapping SKU, aturan larangan hitung ganda antar kolom (iklan_sia_sia, pembatalan, gmv live, per_orang), catatan kejujuran data, serta pencatatan sesi live host beserta ambil alih dan tutup otomatis. Menjawab pula ceklis kesiapan siaran dan Live Support yang bertugas di `live_shifts` (`pendukung[]`, `kesiapan`, daftar-izin `dokumenLiveShift`) serta endpoint `/kpi/kesiapan-live` beserta arti field `sesi_berceklis` dan `toko_diminta`.",
       "kata_kunci": [
         "marketing analytics service",
         "mart_",
         "profit attribution",
         "integration_db baca-saja",
         "hitung ganda",
-        "job sync",
         "penjadwal",
         "live session",
-        "iklan_sia_sia",
-        "ROAS"
+        "ROAS",
+        "ceklis kesiapan siaran",
+        "live_shifts pendukung"
       ]
     },
     {
@@ -6854,6 +6858,47 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support.md",
+      "judul": "ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan). Backend dan web **di PROD sejak 2026-09-17** (image `employee-service` 08:12:44, `marketing-analytics-service` 08:12:27, `frontend-hris` 08:16:21 WIB; gerbang biner dan fungsional diverifikasi). MyBharata **merged ke `dev`, belum dirilis**. Blok `auto` di template **belum dipasang** (sengaja, lihat Consequences).",
+      "publik": true,
+      "tautan": [
+        "Microservices - Marketing Analytics Service",
+        "Microservices - Employee Service",
+        "APP - MyBharata",
+        "HRIS - Matriks KPI per Departemen",
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
+        "REF - Kepemilikan Data",
+        "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
+        "ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus",
+        "API - Marketing Analytics Service",
+        "API - Employee Service",
+        "REF - Penamaan Metrik & Sumber KPI",
+        "RUN - Menambah Metrik KPI Otomatis",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
+        "ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift"
+      ],
+      "hash": "581690597bea28ecdd58b2fda3445d6166688585f423897a970d39b21b12b794",
+      "ukuran_kb": 8.5,
+      "ringkasan": "Menjawab: bagaimana posisi Live Support dinilai otomatis, yaitu lewat ceklis dua butir (alat lengkap, display etalase sesuai) yang diisi host sebelum Mulai di MyBharata beserta Live Support yang bertugas di `live_shifts.pendukung[]`. Menjelaskan kenapa Live Support tidak dicatat sebagai co-host, kenapa sumber `kesiapan_live` dipisah dari `kinerja_live`, kenapa sesi tanpa ceklis keluar dari penyebut dan persen null jadi galat, serta kenapa ambil alih mewarisi pendukung tetapi tidak kesiapan. Juga menjawab apa yang masih terbuka: skor tetap manual karena tema dan teaser tak punya pencatat, blok auto belum dipasang, dan risiko kolusi host.",
+      "kata_kunci": [
+        "ADR 0101",
+        "kesiapan siaran",
+        "ceklis sebelum live",
+        "Live Support",
+        "KPI Live Support",
+        "kesiapan_live",
+        "pendukung live",
+        "device lengkap",
+        "display etalase",
+        "live_shifts"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -8886,15 +8931,16 @@
         "APP - Web ERP",
         "HRIS - Training Program",
         "Microservices - Marketing Analytics Service",
+        "ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support",
         "Microservices - Calendar Service",
         "Microservices - Monitoring Service",
         "HRIS - Alur KPI Otomatis.excalidraw",
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "b56b6ec2f378152e1e510dfcf86911d48dd015fd90a8246a0ae2bec063c1812a",
-      "ukuran_kb": 257.2,
-      "ringkasan": "Menjawab: metrik, bobot, dan target KPI apa saja yang benar-benar dipakai menilai tiap jabatan per departemen di production (salinan setia kpi_template, label ditulis persis termasuk typo), dan metrik mana yang bisa diotomatiskan menurut empat kategori (sumber terisi, butuh definisi, modul ada tapi data kosong, tanpa sumber). Juga menjawab ralat 2026-08-31 soal modul Kaizen dan forecast kas, ketidakcocokan template departemen Printing vs Percetakan, siapa dev pemilik tiap departemen, serta sumber KPI pelatihan dan rencana_pelatihan (PR bip-erp #1903 dan #1904 merged 2026-09-16; Tahap 3b pre-test belum merge per 2026-09-17).",
+      "hash": "4aecd06f53757bbe1d8a36c875b6bfcbb94d44e1cdd895edc043a1d7c9e3adc4",
+      "ukuran_kb": 258.3,
+      "ringkasan": "Menjawab: metrik, bobot, dan target KPI apa saja yang benar-benar dipakai menilai tiap jabatan per departemen di production (salinan setia kpi_template, label ditulis persis termasuk typo), dan metrik mana yang bisa diotomatiskan menurut empat kategori (sumber terisi, butuh definisi, modul ada tapi data kosong, tanpa sumber). Juga menjawab ralat 2026-08-31 soal modul Kaizen dan forecast kas, ketidakcocokan template departemen Printing vs Percetakan, siapa dev pemilik tiap departemen, serta sumber KPI pelatihan dan rencana_pelatihan (PR bip-erp #1903 dan #1904 merged 2026-09-16; Tahap 3b pre-test belum merge per 2026-09-17). Bab Kyura Live Support mencatat template `Host Live Support Kyura` dan dua metriknya yang kini bersumber `kesiapan_live` (PROD 2026-09-17, blok auto belum dipasang).",
       "kata_kunci": [
         "matriks KPI",
         "kpi_template",
@@ -8904,7 +8950,7 @@
         "auto score",
         "Kaizen",
         "Finance Supervisor",
-        "Training & Perfomance Officer",
+        "Live Support",
         "Percetakan Printing"
       ]
     },
@@ -11263,6 +11309,7 @@
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Attendance System",
         "Microservices - Attendance Service",
+        "ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
         "HRIS - Otomasi Skor KPI",
@@ -11316,8 +11363,8 @@
         "Microservices - Inventory Service",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "49ad4ed9787a198d2fdaa98c6b4c925867b91c5ad59640947aadd0641dc9606d",
-      "ukuran_kb": 52.1,
+      "hash": "31fa85519020e748c5a5843b769f96f596c6fa6e098b0f40e647335a89762cc2",
+      "ukuran_kb": 53.2,
       "ringkasan": "Menjawab \"siapa pemilik fakta bisnis ini\" untuk tiap data di ERP — service dan koleksi mana yang jadi sumber kebenaran, siapa yang boleh menulisnya, lewat jalur apa service lain boleh membacanya, dan salinan mana yang sah beserta arah serta penjaganya. Juga mendaftar duplikasi fakta yang belum diputuskan dan pengecualian ADR 0002 (database-per-service) yang masih hidup di kode, dipakai untuk mengecek lebih dulu apakah sebuah data sudah dimiliki departemen lain sebelum membangun fitur baru.",
       "kata_kunci": [
         "kepemilikan data",
