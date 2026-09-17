@@ -9,7 +9,7 @@
 
 *Dua metrik KPI Training & Performance Officer yang belum bisa dinilai sistem diisi dari data yang sudah ada: kesesuaian materi dari satu pertanyaan 1-10 kepada peserta yang disimpan TERPISAH dari penilaian trainer, dan dampak pelatihan dari kenaikan skor KPI peserta antara bulan sebelum dan sesudah pelatihan dengan jeda dua bulan. Jobdesk per posisi dipisah jadi keputusan sendiri.*
 
-- **Status**: 🟡 **Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A1 + K1), kode belum ada.
+- **Status**: 🟡 **Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A1 + K1). Per 2026-09-17: penyimpanan jawaban kesesuaian dan tambahan kontrak `GET /kpi/pelatihan` (T1-T2) sudah ditulis di branch bip-erp `feat/learning-kesesuaian-materi`, **belum PR, belum merged, belum deploy**; kedua metrik, layar web, dan MyBharata belum ada kodenya. Rujukan baris kode di Context dibaca dari `origin/main` sebelum branch itu.
 - **Path di repo**: `bip-erp/services/learning/models_evaluation.go` · `evaluation.go` · `kpi_pelatihan.go` · `bip-erp/services/employee/kpi_sumber_pelatihan.go` (metrik baru) · `erp-frontend/src/features/hris/training/evaluation/components/evaluation-form-dialog.tsx` · `erp-frontend/src/features/hris/kpi/lib/label-otomatis.ts` · `my-bharata/lib/src/features/training/presentation/widgets/trainer_evaluation_sheet.dart`
 - **Tanggal**: 2026-09-17
 - **Terkait**: [[HRIS - Training Program]] · [[HRIS - Matriks KPI per Departemen]] · [[Microservices - Learning Service]] · [[Microservices - Employee Service]]
@@ -91,7 +91,8 @@ Keduanya dipisah ke analisa sendiri bersama metrik Recruitment & Onboarding `Ket
 
 ### Konsekuensi deploy
 
-- `learning-service` dan `employee-service` **naik bersamaan**, karena kontrak `GET /kpi/pelatihan` bertambah (dijaga uji kontrak yang sudah ada). Backend lebih dulu, lalu erp-frontend, lalu **rilis MyBharata** dengan version name dan code dinaikkan.
+- `learning-service` dan `employee-service` **naik bersamaan** begitu metrik `kesesuaian_materi_skala10` dan `kenaikan_kpi_peserta_persen` (T3/T4) ikut, karena kontrak `GET /kpi/pelatihan` bertambah (dijaga uji kontrak yang sudah ada). Backend lebih dulu, lalu erp-frontend, lalu **rilis MyBharata** dengan version name dan code dinaikkan.
+	- **Penyempitan sadar untuk T1-T2 saja** (diputuskan saat `/plan` 2026-09-17): selama belum ada metrik yang membaca tambahan kontrak, urutan kedua service **bebas**. Learning lama dengan employee baru membuat `kesesuaian` terbaca *tidak tersedia* tanpa memadamkan metrik lain; learning baru dengan employee lama hanya membuat kunci barunya diabaikan. Rincian di [[Microservices - Employee Service]].
 - Tanpa env baru, tanpa kategori inbox baru, tanpa migrasi data.
 - HR memasang dua sumber baru di Atur Target sesudah deploy. Template tidak berubah sendiri.
 
