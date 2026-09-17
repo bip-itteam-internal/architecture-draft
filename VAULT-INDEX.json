@@ -46,6 +46,7 @@
         "HRIS - Attendance System",
         "APP - MyBharata",
         "Microservices - Payroll Service",
+        "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
         "Microservices - Form Builder Service",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "Microservices - Notification Service",
@@ -63,8 +64,8 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "9592e9d166a542522e611d6e9a464742091133c745ba8528c0ae9d7d933b37e8",
-      "ukuran_kb": 27.8,
+      "hash": "603dbd6a780224cd5c7f0b2bf155a7f03c58d8aea743d4ca4c04bb06cf5f02c5",
+      "ukuran_kb": 28.5,
       "ringkasan": "Menjawab: endpoint apa saja yang tersedia di attendance-service untuk clock-in/out (tap), daftar entri dan laporan presensi, jadwal harian, definisi shift dan rotasi perusahaan, hari libur, serta gerbang RBAC tiap rute. Menjelaskan juga pengajuan cuti/izin, tukar jadwal, koreksi absen (window koreksi, kode 409/422), roster jadwal per tanggal, pergantian jadwal terjadwal, perjalanan dinas, dan pengganti pada pengajuan. Termasuk parameter filter (format tanggal DD-MM-YYYY, periode 26 ke 25), payroll-supplement untuk potongan kehadiran, daftar HR request terpadu yang bisa memuat booking ruang lewat `include=booking`, guestbook, WiFi, dan panggilan mesin untuk Sesi Live Host dan KPI.",
       "kata_kunci": [
         "attendance-service",
@@ -76,7 +77,8 @@
         "leave request",
         "koreksi absen",
         "tukar jadwal",
-        "payroll-supplement"
+        "payroll-supplement",
+        "attendance today"
       ]
     },
     {
@@ -1530,8 +1532,8 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "97b0bdad8790ccf83cabb3c3708893f8708b30c3b5888e65f0f8bfa95aad072d",
-      "ukuran_kb": 514.1,
+      "hash": "59b9def7db047ad8de5427065a49f718f30c08343ff3cbe25d6d5bf570307ff2",
+      "ukuran_kb": 516.0,
       "ringkasan": "Menjawab: apa itu portal web ERP/HRIS `hris-dashboard` (One Bharata) di repo erp-frontend, stack-nya (Next.js, shadcn/ui, TanStack Query, react-i18next), dan bagaimana login, SSO Identity Provider, serta gating menu berdasarkan `system_roles` dan paket izin bekerja. Juga menjelaskan pengelompokan menu sidebar HRIS, halaman Pengaturan HRGA terpusat, fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), konvensi data-fetching dan bagan Recharts, serta daftar modul yang ada.",
       "kata_kunci": [
         "Web ERP",
@@ -7037,7 +7039,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** (2026-09-17). Arah disetujui user; kode belum ada. Membalik konsekuensi \"kehilangan kartu Kehadiran dan Pengumuman\" yang diterima 2026-08-26 dan 2026-09-15.",
+      "status_teks": "**Diusulkan** (2026-09-17). Irisan 1 sudah diimplementasikan di branch erp-frontend `feat/beranda-portal-zona` (belum merge, belum di `main`) dan diverifikasi di layar terhadap backend DEV; irisan 2 dan 3 belum. Membalik konsekuensi \"kehilangan kartu Kehadiran dan Pengumuman\" yang diterima 2026-08-26 dan 2026-09-15.",
       "publik": true,
       "tautan": [
         "APP - Web ERP",
@@ -7051,20 +7053,20 @@
         "HRIS - Key Performance Index",
         "REF - Dashboard per Posisi (Indeks Cakupan)"
       ],
-      "hash": "f345198ce84212b939d1f10568852b9352ddc87867831743743cc334ab0bbdd4",
-      "ukuran_kb": 14.0,
-      "ringkasan": "Menjawab: bagaimana halaman beranda /dashboard web ERP disusun ulang jadi empat zona (kepala saya, perlu tindakan, hari ini, ruang kerja posisi), siapa yang melihat zona mana, dan kenapa beranda menumpuk bagian personal dan dashboard departemen alih-alih memilih salah satunya. Juga menjawab dari mana angka antrean persetujuan diambil (GET /api/employee/pengajuan/ringkasan), jebakan hook bernama sama, apa yang tidak dijanjikan, dan tahapan pembangunannya.",
+      "hash": "75153199ece29f5445995f0a5f83a412f4ba506cd76449052ccdf84099d2c754",
+      "ukuran_kb": 21.5,
+      "ringkasan": "Menjawab: bagaimana susunan beranda portal /dashboard web ERP untuk semua karyawan (kepala dengan kehadiran hari ini, Perlu tindakan saya, agenda hari ini, KPI saya, pengumuman, lalu ruang kerja posisi), kenapa bagian personal tidak lagi digantikan dashboard departemen, dan dari mana angka antrean dibaca (GET /api/employee/pengajuan/ringkasan). Juga menjawab kenapa kehadiran hanya tampil bila catatan /attendance/today bertanggal hari ini, kenapa KPI menampilkan metrik yang menunggu dan skor bulan lalu alih-alih skor bulan berjalan, kenapa catatan Pengajuan Barang & Dana tak termuat tampil permanen, status irisan 1 di branch, serta irisan 2-3 dan hal yang belum diputuskan.",
       "kata_kunci": [
-        "beranda",
-        "homepage",
-        "/dashboard",
-        "portal",
+        "beranda portal",
+        "dashboard",
+        "home page",
+        "Portal Saya",
         "perlu tindakan",
         "pending approval",
         "pengajuan ringkasan",
-        "zona personal",
-        "ruang kerja posisi",
-        "kehadiran hari ini"
+        "kehadiran hari ini",
+        "KPI saya",
+        "zona personal"
       ]
     },
     {
